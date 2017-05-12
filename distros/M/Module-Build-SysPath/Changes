@@ -1,0 +1,29 @@
+Revision history for Module-Build-SysPath
+
+0.17    20 Sep 2014
+    - qw now with () (required for new Perl versions) - thanks Slaven Rezić
+
+0.16    21 Sep 2011
+    - fix build_requires
+
+0.15    16 May 2011
+    - add support for srvdir
+
+0.14    16 May 2011
+    - Added testing using Test::Dirs
+    - dist fixes
+
+0.13    12 Feb 2009
+    - fixed empty folders (having .exists) creation
+
+0.12    15 Dec 2009
+    - skip files and folders with . prefix (was making problems when distribution was an SVN/CVS checkout)
+
+0.11    20 Nov 2009
+    - A looooot of Pod
+
+0.10    30 Oct 2009
+    - fixed dependency on Sys::Path 0.09
+
+0.09    20 Oct 2009
+    - created by splitting from Sys::Path distribution

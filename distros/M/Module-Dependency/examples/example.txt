@@ -1,0 +1,94 @@
+Here are the example plain text outputs from the makeText function.
+These were generated from the same parameters as the example GIFs and they
+show the same relationships. See README.EXAMPLES for more info.
+
+=========================================================================
+
+Dependencies for all scripts
+----------------------------
+
+Key: Parent> indicates parent dependencies
+      Child> are child dependencies
+       ****> indicates the item(s) from which the relationships are drawn
+
+Grapher.pm 1.22 - Thu Sep 26 00:06:55 2002
+
+   ****> +- x.pl, y.pl, z.cgi
+         |
+  Child> +- a, b, c
+         |
+  Child> +- d, e
+         |
+  Child> +- f, g, h
+
+=========================================================================
+
+Parent & child dependencies for package d
+-----------------------------------------
+
+Key: Parent> indicates parent dependencies
+      Child> are child dependencies
+       ****> indicates the item(s) from which the relationships are drawn
+
+Grapher.pm 1.22 - Thu Sep 26 00:06:56 2002
+
+ Parent> +- x.pl, y.pl
+         |
+ Parent> +- a, b, c
+         |
+   ****> +- d
+         |
+  Child> +- f, g, h
+
+=========================================================================
+
+Dependencies for package b
+--------------------------
+
+Key: Parent> indicates parent dependencies
+      Child> are child dependencies
+       ****> indicates the item(s) from which the relationships are drawn
+
+Grapher.pm 1.22 - Thu Sep 26 00:06:57 2002
+
+   ****> +- b
+         |
+  Child> +- d, e
+         |
+  Child> +- f, g, h
+
+=========================================================================
+
+Parent dependencies for package e
+---------------------------------
+
+Key: Parent> indicates parent dependencies
+      Child> are child dependencies
+       ****> indicates the item(s) from which the relationships are drawn
+
+Grapher.pm 1.22 - Thu Sep 26 00:06:58 2002
+
+ Parent> +- x.pl, y.pl
+         |
+ Parent> +- a, b
+         |
+   ****> +- e
+
+=========================================================================
+
+Parent & child dependencies for packages e,b
+--------------------------------------------
+
+Key: Parent> indicates parent dependencies
+      Child> are child dependencies
+       ****> indicates the item(s) from which the relationships are drawn
+
+Grapher.pm 1.22 - Thu Sep 26 00:06:58 2002
+
+ Parent> +- a, x.pl, y.pl
+         |
+   ****> +- b, e
+         |
+  Child> +- d, g
+         |
+  Child> +- f, h

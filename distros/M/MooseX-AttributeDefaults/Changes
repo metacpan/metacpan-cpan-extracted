@@ -1,0 +1,8 @@
+Revision history for MooseX-AttributeDefaults
+
+0.02    Oct 1, 2009
+        Documented use of a trait to provide defaults instead of a metaclass,
+        added a test to make sure that usage works.
+
+0.01    July 7, 2008
+        Initial release.

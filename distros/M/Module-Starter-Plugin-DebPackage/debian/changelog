@@ -1,0 +1,31 @@
+libmodule-starter-plugin-debpackage-perl (0.0.5) hardy; urgency=low
+
+  * Added tests of the added debian configuration files
+
+ -- Bradley <bjdean@bjdean.id.au>  Tue, 26 Jan 2010 20:30:23 +1100
+
+libmodule-starter-plugin-debpackage-perl (0.0.4) hardy; urgency=low
+
+  * Added dependency on libversion-perl (version) to package configuration
+
+ -- Bradley <bjdean@bjdean.id.au>  Mon, 25 Jan 2010 23:43:33 +1100
+
+libmodule-starter-plugin-debpackage-perl (0.0.3) hardy; urgency=low
+
+  * Added POD (pod-coverage.t now passes)
+  * Removed TODO from boilerplate.t (as this was done)
+  * Added filters to manifest.t to ignore .git and *.swp files
+
+ -- Bradley Dean <bjdean@bjdean.id.au>  Wed, 20 Jan 2010 08:04:11 +1100
+
+libmodule-starter-plugin-debpackage-perl (0.0.2) hardy; urgency=low
+
+  * Added missing Module::Install and dpkg dependencies on module-starter
+
+ -- Bradley Dean <bjdean@bjdean.id.au>  Wed, 20 Jan 2010 03:20:33 +1100
+
+libmodule-starter-plugin-debpackage-perl (0.0.1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Bradley Dean <bjdean@bjdean.id.au>  Wed, 20 Jan 2010 02:14:37 +1100

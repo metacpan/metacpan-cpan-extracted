@@ -1,0 +1,37 @@
+#!/usr/bin/env perl
+#
+# Permute all the pitch sets and tally up resulting counts on prime form
+# and ic vector renditions of said pitch sets. (A modification of this
+# would be to save all the results to a database, so that all the data
+# is around to query, but that would be more work.)
+
+use strict;
+use warnings;
+
+use Algorithm::Permute ();
+use IO::Handle         ();
+use Music::AtonalUtil  ();
+
+STDOUT->autoflush(1);
+
+my $mau  = Music::AtonalUtil->new;
+my $imax = $mau->scale_degrees;
+
+for my $set_size ( 2 .. $imax - 1 ) {
+  my $p = Algorithm::Permute->new( [ 0 .. $imax-1 ], $set_size );
+
+  my ( %icv, %psc, %seen );
+  while ( my @set = $p->next ) {
+    next unless $seen{join '', sort @set}++;
+    $psc{ join ',', @{ $mau->prime_form( \@set ) } }++;
+    $icv{ join '',  @{ scalar $mau->interval_class_content( \@set ) } }++;
+  }
+
+  for my $pset ( sort keys %psc ) {
+    print "[$pset]\t$psc{$pset}\n";
+  }
+  for my $ic ( sort keys %icv ) {
+    print "$ic\t$icv{$ic}\n";
+  }
+  print "\n";
+}

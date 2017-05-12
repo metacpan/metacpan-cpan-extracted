@@ -1,0 +1,138 @@
+    Release Name: 0.4101 2010-08-20
+        *   Added File::Slurp and File::stat as a requirement
+
+    Release Name: 0.4101 2010-08-20
+        *   Added DateTimeX::Easy as a requirement
+
+    Release Name: 0.4101 2010-08-16
+        *   Another rewrite of the method system.  Now you can pass 
+            pbp=>1 when importing to get PBP style get_ and set_ methods.
+
+        *   Bugfixes and POD cleaning
+
+        *   Added a test module for module testing
+
+	Release Name: 0.40_03 2010-08-01
+		*	Text::Levenshtien was not being detected.
+
+	Release Name: 0.40_02 2010-07-28 
+		*	Fixed minor testing issue, which caused test to assume that
+			Text::Levenshtien was installed.
+
+	Release Name: 0.40_01 2010-07-27
+    
+        *   Normalized Version number accross plugins
+
+		*	Started using git and github
+
+		* 	Added capability methods to plugins (required_values, set_values
+			and saved_values).  Not sure what to do with them now...
+
+		*	Significant improvment in testing, which found bugs that
+			were fixed.
+
+			* Tracknum and Discnum didn't work correctly
+
+			* Epoch times failed completly.
+
+		*	Fixed severe memory leak by with weaken
+
+		*	Changed accessor modules to not use Autoload
+
+		*	Fixed a few open file handles that didn't have a close.
+
+    Release Name: 0.33 2008-02-24
+        *   Revised POD (thanks Ivan Tubert-Brohman for Test::Spelling!)
+
+        *   Added the ability for plugins to set a verbosity level with
+            status method
+
+        *   Added datamethods upc and ean with value checking. Sets one if
+            other is set.
+
+        *   Cleaned up some of the code
+
+        *   Started using Pod::Readme for README and CHANGES
+
+    Release Name: 0.32 2008-02-23
+        *   Fixed critical bug with Term::ANSIColor
+
+    Release Name: 0.31 2008-02-22
+        *   Added example
+
+        *   Added used_datamethods method
+
+    Release Name: 0.30 2008-02-20
+        *   Config::Options .07 now required
+
+        *   POD and Kwalitee changes
+
+    Release Name: 0.29  
+        *   Fixed bug in autoplugin default settings preventing ogg and flac
+            from working.
+
+    Release Name: 0.28 2008-02-11
+        *   Seperated plugins into seperate distributions
+
+        *   Revised module detection code to actually work
+
+        *   Plugins for autoplugin process are now loaded based on a new
+            option, autoplugin This option is a hash ref of file extenstions
+            to plugins
+
+        *   Revised POD
+
+        *   Added simple test script now that plugins have been seperated
+
+        *   Revised help in musictag script
+
+        *   Added option to use --[presetname] to call a preset in musictag
+
+    Release Name: 0.27 2007-12-17
+        *   More documentation and tested POD.
+
+        *   datamethods method now can be used to add new datamethods
+
+        *   Added test for MusicBrainz and Amazon plugins
+
+        *   Revised releasedate and recorddate internal storage to store as
+            releasetime and recordtime -- with full timestamps
+
+        *   Added releasetime, recordtime, releaseepoch, and recordepoech
+            datamethods
+
+        *   Support for TIME ID3v2 tag
+
+        *   After much thought, replaced Ogg::Vorbis::Header with
+            Ogg::Vorbis::Header::PurePerl and added vorbiscomment to write
+            tags
+
+        *   Revised OGG and FLAC plugins to clean up code (much slicker now)
+
+    Release Name: 0.26 2007-12-10
+        *   Removed several prerequistes that weren't used
+
+        *   Fixed error in README about prerequisite
+
+    Release Name: 0.25
+        *   Support many more tags for flac, ogg, and m4a
+
+        *   Removed autotag safetag quicktag musictag musicsort musicinfo
+            scripts All is done by musictag now
+
+        *   Added tests for some plugins. More to do!
+
+        *   Bug Fixes
+
+        *   Documentation improvments
+
+        *   Added preset option for musictag
+
+    Release Name: 0.24
+        *   Bug Fixes
+
+        *   Revised MP3 Tags to read Picard tags
+
+    Release Name: 0.23
+        *   Initial Public Release
+

@@ -1,0 +1,40 @@
+---
+abstract: 'lift expression evaluation to compile time'
+author:
+  - 'Andrew Main (Zefram) <zefram@fysh.org>'
+build_requires:
+  Devel::CallParser: 0.001
+  ExtUtils::CBuilder: 0.15
+  IO::File: 1.03
+  Module::Build: 0
+  Test::More: 0
+  perl: 5.013008
+  strict: 0
+  warnings: 0
+configure_requires:
+  Module::Build: 0
+  perl: 5.013008
+  strict: 0
+  warnings: 0
+dynamic_config: 0
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Memoize-Lift
+provides:
+  Memoize::Lift:
+    file: lib/Memoize/Lift.pm
+    version: 0
+requires:
+  Devel::CallParser: 0.001
+  Exporter: 0
+  XSLoader: 0
+  parent: 0
+  perl: 5.013008
+  strict: 0
+  warnings: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.000

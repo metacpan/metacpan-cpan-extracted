@@ -1,0 +1,268 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008000"^^doap-deps:CpanId ], [ doap-deps:on "Sub::Util 1.40"^^doap-deps:CpanId ];
+	doap-deps:runtime-suggestion [ doap-deps:on "Moo 1.002000"^^doap-deps:CpanId ], [ doap-deps:on "Moose 2.0000"^^doap-deps:CpanId ], [ doap-deps:on "Mouse 1.00"^^doap-deps:CpanId ], [
+		doap-deps:on "Class::Tiny::Antlers"^^doap-deps:CpanId;
+	];
+	doap-deps:test-recommendation [ doap-deps:on "Moose 2.0000"^^doap-deps:CpanId ], [ doap-deps:on "Moo 1.002000"^^doap-deps:CpanId ], [
+		doap-deps:on "Types::Standard 0.006"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [
+		doap-deps:on "Test::Requires 0.06"^^doap-deps:CpanId;
+	], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ];
+	doap-deps:test-suggestion [ doap-deps:on "Mouse 1.00"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-MungeHas>;
+	doap:created         "2013-05-27"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/MooseX-MungeHas>;
+	doap:homepage        <https://metacpan.org/release/MooseX-MungeHas>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "MooseX-MungeHas";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-007>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-moosex-mungehas>;
+	];
+	doap:shortdesc       "munge your \"has\" (works with Moo, Moose and Mouse)".
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-000_01>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Preview release";
+	dc:identifier        "MooseX-MungeHas-0.000_01"^^xsd:string;
+	dc:issued            "2013-05-27"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-MungeHas-0.000_01.tar.gz>;
+	doap:revision        "0.000_01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-000_02>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "MooseX-MungeHas-0.000_02"^^xsd:string;
+	dc:issued            "2013-05-31"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Depend on newer version of Eval::TypeTiny.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Make coerce => 0|1 work in Moo.";
+		], [
+			a doap-changeset:Removal;
+			rdfs:label "Drop the idea of shortcutting import with a single coderef; it doesn't work out so well.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Much improved test suite.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-MungeHas-0.000_02.tar.gz>;
+	doap:revision        "0.000_02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-000_03>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "MooseX-MungeHas-0.000_03"^^xsd:string;
+	dc:issued            "2013-05-31"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix weird overloading-related bug in Perl < 5.17.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-MungeHas-0.000_03.tar.gz>;
+	doap:revision        "0.000_03"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-000_04>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "MooseX-MungeHas-0.000_04"^^xsd:string;
+	dc:issued            "2013-05-31"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "local @_ doesn't work with goto in Perl < 5.18. (Only affects Mouse.)";
+			doap-changeset:thanks <urn:uuid:5af8f9d0-2381-4f00-95e4-5af701aa8da8>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-MungeHas-0.000_04.tar.gz>;
+	doap:revision        "0.000_04"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-001>
+	a                    doap:Version;
+	dc:identifier        "MooseX-MungeHas-0.001"^^xsd:string;
+	dc:issued            "2013-06-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition, doap-changeset:Documentation;
+			rdfs:label "examples/relax-type-constraints.pl";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-MungeHas-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "MooseX-MungeHas-0.002"^^xsd:string;
+	dc:issued            "2013-08-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix syntax error compiling the eq_1 munger.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-MungeHas-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "MooseX-MungeHas-0.003"^^xsd:string;
+	dc:issued            "2013-08-28"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Use the `$_` variable for the attribute name instead of `$.`.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Use the `%_` hash for the attribute spec instead of `%$_`.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-MungeHas-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "MooseX-MungeHas-0.004"^^xsd:string;
+	dc:issued            "2013-08-29"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix a stray `$.` that wasn't changed in 0.003.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/arodland>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-MungeHas-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-005>
+	a                    doap:Version;
+	rdfs:label           "tobyink ♥ isa";
+	dc:identifier        "MooseX-MungeHas-0.005"^^xsd:string;
+	dc:issued            "2014-02-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Allow Moo-style isa=>sub{...} in Moose and Mouse.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Remove the absolute dependency on Eval::TypeTiny; allow Eval::Closure to be used in its stead.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Always enable the eq_1 feature; it's never useful for it to be disabled.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Various documentation improvements.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "s/find_or_parse_type_constraint/find_or_create_isa_type_constraint/";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/92557>;
+			doap-changeset:thanks <urn:uuid:382de9f9-3ec0-4aa1-ba60-aa80709e75ac>;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "No longer depend on Eval::TypeTiny.";
+		], [
+			a doap-changeset:Packaging, doap-changeset:Tests;
+			rdfs:label "No longer depend on Types::Standard for tests; skip those tests if it's not installed.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-MungeHas-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-006>
+	a                    doap:Version;
+	rdfs:label           "tobyink ♥ builder";
+	dc:identifier        "MooseX-MungeHas-0.006"^^xsd:string;
+	dc:issued            "2014-09-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Allow Object::Simple-style `has $name=>$coderef` in Moo, Moose, and Mouse.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Allow `has $name=>$type` in Moo, Moose, and Mouse.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Allow Moo-style `builder=>$coderef` in Moose and Mouse.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-MungeHas-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "MooseX-MungeHas-0.007"^^xsd:string;
+	dc:issued            "2014-09-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Better detection of OO framework.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Allow exporting of more than one `has` function.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Bugfix for interaction of `is_rw` and `has $name=>$builder`.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-MungeHas-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/arodland>
+	a                    foaf:Person;
+	foaf:name            "Andrew Rodland";
+	foaf:nick            "ARODLAND";
+	foaf:page            <https://metacpan.org/author/ARODLAND>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/92557>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "92557"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=92557>.
+
+<urn:uuid:382de9f9-3ec0-4aa1-ba60-aa80709e75ac>
+	foaf:name            "Pierre Masci";
+	foaf:page            <http://www.perlmonks.org/?node_id=946673>.
+
+<urn:uuid:5af8f9d0-2381-4f00-95e4-5af701aa8da8>
+	a                    foaf:Person;
+	foaf:name            "Luc J. Bourhis";
+	foaf:page            <https://github.com/luc-j-bourhis>.
+

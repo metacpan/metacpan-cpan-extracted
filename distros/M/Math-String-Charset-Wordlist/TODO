@@ -1,0 +1,7 @@
+
+* Cache the very first and last record, since str2num() always needs them
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

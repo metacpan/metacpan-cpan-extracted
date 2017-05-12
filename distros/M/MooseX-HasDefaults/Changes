@@ -1,0 +1,7 @@
+0.03  2010-07-23
+    * Use the new Moose::Exporter API
+
+0.02  2009-12-28
+    * Stop using "has +" in roles, especially since it wasn't doing anything
+      anyway
+

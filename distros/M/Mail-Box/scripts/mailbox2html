@@ -1,0 +1,545 @@
+#!/usr/bin/perl -w
+use strict;
+
+use Mail::Box::Manager;
+
+my $VERSION = '2.107';
+
+Mail::Box->VERSION($VERSION);
+
+# file-globals.
+my ($manager, @folderpage, @messagepage);
+
+sub create_folder(@);
+sub create_message(@);
+sub clean_dir($);
+sub default_folderpage();
+sub default_messagepage();
+
+=head1 NAME
+
+mailbox2html - EXPERIMENTAL: convert mail folders into an HTML structure
+
+=head1 SYNOPSIS
+
+mailbox2html [-src folder] [-dest directory] [-norecurse]
+
+=cut
+
+sub usage($)
+{   my $rc = shift;
+
+    warn <<USAGE;
+Usage: $0 [options]
+    options:
+       -cleanup              clean the destination directory before producing
+       -dest directory       output location of translated
+       -folderpage filename  template for folder-pages
+       -help  -?             show this help
+       -index filename       name of the directory-index
+       -messagepage filename template for message-pages
+       -norecurse            descend into sub-folders
+       -src folder           folder(-directory) to be translated into html
+       -template             the page-template file
+       -verbose              verbose messages
+USAGE
+
+    exit $rc;
+}
+
+my %option =
+  ( cleanup     => 0
+  , dest        => exists $ENV{TMPDIR} ? "$ENV{TMPDIR}/mail2html"
+                 : -d '/var/tmp'       ? '/var/tmp/mail2html'
+                 : -d '/tmp'           ? '/tmp/mail2html'
+                 :                       '.'
+  , folderpage  => undef
+  , help        => 0
+  , index       => 'index.html'
+  , messagepage => undef
+  , recurse     => 1
+  , src         => exists $ENV{MAIL}   ? $ENV{MAIL}
+                 : exists $ENV{mail}   ? $ENV{mail}
+                 : exists $ENV{HOME} && -d "$ENV{HOME}/Mail" ? "$ENV{HOME}/Mail"
+                 : exists $ENV{home} && -d "$ENV{home}/Mail" ? "$ENV{home}/Mail"
+                 : '.'
+
+  , verbose     => 0
+  );
+
+sub get_options()
+{   use Getopt::Long;
+    GetOptions \%option
+      , 'src=s'
+      , 'dest=s'
+      , 'folderpage=s'
+      , 'index=s'
+      , 'messagepage=s'
+      , 'recurse!'
+      , 'verbose!'
+      , 'cleanup!'
+      , 'help|?!';
+}
+
+sub trace(@) { warn @_,"\n" if $option{verbose} }
+
+sub clean_dir($)
+{   my $dir = shift;
+    trace "cleaning $dir.\n";
+
+    opendir DIR, $dir or return;
+    my (@files, @directories);
+
+    while(my $entry = readdir DIR)
+    {   next if $entry =~ m/^\.\.?$/;
+        if(-d $entry) {push @directories, $entry}
+        else          {push @files, $entry}
+    }
+
+    closedir DIR;
+
+    unlink "$dir/$_"    for @files;
+    clean_dir "$dir/$_" for @directories;
+    unlink $dir;
+}
+
+sub create_uplinks(@)
+{   return () unless @_;
+    my @links = ('<B>'.(pop).'</B>');
+    my $href  = '..';
+    while(@_)
+    {   unshift @links, "<A HREF=$href>".(pop)."</A>";
+        $href .= '/..';
+    }
+    @links;
+}
+
+sub create_folder(@)
+{   my %args       = @_;
+    my $folder     = $args{folder};
+    my $name       = $folder->name;
+
+    #
+    # Output location
+    #
+
+    my $dirname    = "$args{dest}/$name";
+    for($dirname)      # some cleanups.
+    {   s!/\./!/!g;
+        s!/\=(/|$)!/!g;
+    }
+    unless(-d $dirname)
+    {   trace "Create directory $dirname.";
+        mkdir $dirname, 0700
+            or die "Cannot create directory $dirname: $!\n";
+    }
+    my $filename   = "$dirname/$option{index}";
+
+    #
+    # Sub-directory preparations.
+    #
+
+    my @subfolders;
+    if($option{recurse})
+    {    my @subs  = sort $folder->listSubFolders;
+         my $prev;
+
+         for(my $i=0; $i<@subs; $i++)
+         {
+             my @path = $args{path} ? @{$args{path}} : ();
+             my $sub  = $folder->openSubFolder($subs[$i]);
+             my $sum  = create_folder
+               ( folder   => $sub
+               , dest     => $args{dest}
+               , path     => [ @path , $name]
+               , previous => ($i <= 0 ? ''
+                 : "Previous:&nbsp;<A HREF=\"../$subs[$i-1]\">$subs[$i-1]</A>")
+               , next     => ($i >= @subs-1 ? ''
+                 : "Next:&nbsp;<A HREF=\"../$subs[$i+1]\">$subs[$i+1]</A>")
+               );
+             push @subfolders, $sum;
+         }
+    }
+
+    #
+    # Summerize data about this folder.
+    #
+
+    trace "processing folder $name";
+
+    my @uplinks  = create_uplinks @{$args{path}};
+    my @messages = $folder->messages;
+
+    my %sum      =              # collect info for super-folder, so no place
+      ( foldername    => $name  # for sub-folder stuff.
+      , foldersize    => 0
+      , seen_messages => 0
+      , nr_messages   => scalar @messages
+      , nr_subfolders => scalar @subfolders
+      );
+
+    $sum{foldersize} += $_->{foldersize} foreach @subfolders;
+    $sum{newest} = $sum{oldest} = $messages[0]->timestamp if @messages;
+
+    foreach my $message (@messages)
+    {   $sum{deleted}++       if $message->deleted;
+        $sum{seen_messages}++ if $message->label('seen');
+        $sum{foldersize} += $message->size;
+        if(my $timestamp  = $message->timestamp)
+        {   $sum{newest_message} = $timestamp if $timestamp > $sum{newest};
+            $sum{oldest_message} = $timestamp if $timestamp < $sum{oldest};
+        }
+
+        create_message
+         ( message   => $message
+         , folder    => $folder
+         , manager   => $manager
+         , dirname   => $dirname
+         );
+    }
+
+    $sum{new_messages} = @messages - $sum{seen_messages};
+
+    #
+    # Page output.
+    #
+
+    local *HTML;
+    open HTML, '>', $filename
+        or die "Cannot create $filename: $!\n";
+
+    my $oldout = select HTML;
+
+    use_template
+       ( template   => \@folderpage
+       , folder     => $folder
+       , subfolders => \@subfolders
+       , messages   => \@messages
+       , manager    => $manager
+       , %sum
+       );
+
+    select $oldout;
+    close HTML;
+
+    \%sum;
+}
+
+sub create_message(@)
+{   my %args     = @_;
+    my $message  = $args{message};
+
+    # f.i. usable for constructing links, because all specials are stripped.
+    my $clean_id = $message->messageID;
+    for($clean_id)
+    {   s/^\s*\<(.*?)\>\s*$/$1/g;
+        tr/a-zA-Z0-9_/-/cs;
+    }
+    my $filename = "$args{dirname}/${clean_id}.html";
+    my $subject  = $message->head->get('subject') || '&lt;no subject&gt;';
+    chomp $subject;
+
+    $message->label
+      ( clean_id => $clean_id
+      , filename => $filename
+      , subject  => $subject
+      );
+
+    local *HTML;
+    open HTML, '>', $filename
+        or die "Cannot create $filename: $!\n";
+
+    my $oldout = select HTML;
+
+    use_template
+     ( template => \@messagepage
+     , message  => $message
+     , filename => $filename
+     , folder   => $args{folder}
+     , subject  => $subject
+     , manager  => $manager
+     , indexfile=> $option{index}
+     );
+
+    select $oldout;
+    close HTML;
+}
+
+sub parse_template($@)
+{   my $name = shift;
+    my (@parts, $rest);
+    while(@_)
+    {   $rest .= shift;
+        while($rest =~ m/\<\#perl\b/)
+        {   push @parts, $`;
+            $rest  = $';
+            $rest .= shift while @_ && $rest !~ m/\#\>/;
+
+            $rest  =~ m/\#\>/
+                or die "Perl part not closed in $name.\n";
+
+            (my $code, $rest) = split /\s*\#\>\s*/, $rest, 2;
+            if($code =~ s/^\s*BEGIN\s+//)
+            {   WEBPAGE::run_code($code);
+                $rest = (pop @parts).$rest;
+            }
+            else
+            {   push @parts, $code;
+            }
+        }
+    }
+    push @parts, $rest;
+    @parts;
+}
+
+sub use_template(@)
+{   my %args  = @_;
+
+    foreach (keys %args)
+    {   no strict 'refs';
+        ${"WEBPAGE::$_"} = $args{$_};
+    }
+
+    my $template = $args{template};
+    my $lines    = @$template;
+    for(my $t=0; $t<$lines; $t++)
+    {   print $template->[$t++];
+        WEBPAGE::run_code($template->[$t]) if $t<$lines;
+    }
+}
+
+package WEBPAGE;
+no strict;
+sub run_code($)
+{   eval shift;
+    die $@ if $@;
+}
+
+package main;
+use strict;
+
+#####
+##### MAIN
+#####
+
+usage 22 unless get_options;
+usage 0 if $option{help};
+
+# Prepare destination directory.
+
+clean_dir $option{dest}
+    if $option{cleanup} && -d $option{dest};
+
+unless(-d $option{dest})
+{   trace "Creating $option{dest}.";
+    mkdir $option{dest}, 0700
+       or die "Cannot create destination directory $option{dest}: $!\n";
+}
+
+#
+# Get the configuration
+#
+
+# Parse folderpage.
+
+if(my $foldtempl = $option{folderpage})
+{   trace "Parsing folderpage-template from $foldtempl.";
+    open TEMPLATE, $foldtempl
+        or die "Cannot read $foldtempl: $!\n";
+
+    @folderpage = parse_template 'folderpage', <TEMPLATE>;
+    close TEMPLATE;
+}
+else
+{   trace "Taking default folderpage template.";
+    @folderpage = parse_template 'default folderpage', default_folderpage;
+}
+
+# Parse messagepage.
+
+if(my $msgtempl = $option{messagepage})
+{   trace "Parsing messagepage-template from $msgtempl.";
+    open TEMPLATE, $msgtempl
+        or die "Cannot read $msgtempl: $!\n";
+
+    @messagepage = parse_template 'messagepage', <TEMPLATE>;
+    close TEMPLATE;
+}
+else
+{   trace "Taking default messagepage template.";
+    @messagepage = parse_template 'default messagepage', default_messagepage;
+}
+
+#
+# Start handling the folder
+#
+
+trace "Start folder manager.";
+$manager  = Mail::Box::Manager->new;
+
+trace "Opening folder `$option{src}'.";
+my $folder = $manager->open
+  ( folderdir  => $option{src}
+  , folder     => '='          # open folderdir
+  , extract    => 'ALWAYS'     # need all messages anyway.
+  );
+
+die "Cannot open folder `$option{src}'.\n"
+    unless $folder;
+
+trace "Folder-type is ",ref $folder, ".";
+
+create_folder
+  ( dest   => $option{dest}
+  , folder => $folder
+  );
+
+#-------------------------------------------
+
+sub default_folderpage()
+{   <<'DEFAULT_FOLDERPAGE';
+<#perl BEGIN
+
+  use File::Basename;
+
+  sub nicemessage($)
+  {   my $msg = shift;
+      '<A HREF="'.(basename $msg->label('filename')).'">'
+      . $msg->label('subject') . '</A>';
+  }
+
+  sub polish($)
+  {   my @lines = split /\n/, shift;
+      foreach (@lines)
+      {   if( my ($layout,$rest) = m/^(.*?)(\<.*)$/ )
+          {  $layout =~ s/ /&nbsp;/g;
+             $_ = "<TT>$layout</TT>$rest";
+          }
+          s/$/<BR>\n/;
+      }
+      @lines;
+  }
+#>
+
+<HTML>
+<HEAD><TITLE><#perl print $foldername#></TITLE></HEAD>
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+See the templates as included in the Mail::Box-package for nicer output
+and more detailed examples.
+<#perl
+print "SUB: $nr_subfolders ".@$subfolders."\n";
+print "NR=$nr_subfolders, NR=".@$subfolders."\n";
+  if($nr_subfolders)
+  {   print "<H4>$nr_subfolders subfolders:</H4>\n";
+      foreach (@$subfolders)
+      {   my $subname = basename $_->{foldername};
+          print "<A HREF=\"$subname/$indexfile\">$subname</A> "
+              , "($_->{nr_messages} messages)<BR>\n";
+      }
+  }
+
+  if($nr_messages)
+  {   print "\n<H4>$nr_messages messages:</H4>\n";
+      print polish($_->threadToString(\&nicemessage))
+         foreach $manager->threads(folder => $folder)->sortedAll;
+  }
+
+ #>
+</BODY></HTML>
+DEFAULT_FOLDERPAGE
+}
+
+sub default_messagepage()
+{   <<'DEFAULT_MESSAGEPAGE';
+
+<HTML><HEAD><TITLE><#perl print $subject#></TITLE></HEAD>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+<PRE>
+<#perl if($message) {$message->print(select)} else {print '<undef>'} #>
+</PRE>
+</BODY></HTML>
+DEFAULT_MESSAGEPAGE
+}
+
+#-------------------------------------------
+
+__END__
+
+=head1 DESCRIPTION
+
+Convert various kinds of mail folders to HTML, permitting them to be
+read by a web browser.
+
+Options:
+
+=over 4
+
+=item -cleanup =E<gt> BOOLEAN
+
+(or C<-cleanup> or C<-nocleanup>) removes the directory before generating
+the data.
+
+=item -dest =E<gt> DIRECTORY
+
+The output directory. When this option is not specified, the program will
+try to create a sub-directory named C<mail2html> in the directory pointed
+to by the environment variable TMPDIR or tmpdir, otherwise the output will
+be in C</var/tmp> or C</tmp>.
+
+=item -folderpage =E<gt> FILENAME
+
+# DWC Hm... 2nd sentence doesn't make sense
+The template which is used to create folder pages.  See the examples with
+the distribution of this code for examples.
+
+=item -help =E<gt> BOOLEAN
+
+(or C<-help> or C<-?>) Print a brief help
+
+=item -index =E<gt> FILENAME
+
+The filename which the web server loads when the user specifies only the
+name of the directory in a URL. This option is set to C<index.html> by
+default.
+
+=item -messagepage =E<gt> FILENAME
+
+# DWC Hm... 2nd sentence doesn't make sense
+The template which is used to create one page per message.
+See the examples with the distribution of this code for examples.
+
+=item -recurse =E<gt> BOOLEAN
+
+(or C<-recurse> or <-norecurse>) Recurse through subfolders.  By default,
+recursive production is enabled.
+
+=item -src =E<gt> FILE | DIRECTORY
+
+Start with the folder(-directory) which can be found at the specified
+location.  The type of folder is auto-detected.  By default, the contents
+of the directory specified by the C<MAIL> or C<mail> environment variable
+are used. If these variables are not defined, C<HOME> and C<home> are
+checked for a sub-directory named C<Mail>.  If these are unsuccessful as
+well, the current directory is used.
+
+=item -verbose =E<gt> BOOLEAN
+
+(or C<-verbose> or C<-noverbose>) Be verbose about the progress of the
+program.  This is especially useful for debugging purposes.
+
+=back
+
+=head1 AUTHOR
+
+Mark Overmeer (F<Mark@Overmeer.net>).
+All rights reserved.  This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+=head1 VERSION
+
+This code is beta, version 2.107
+
+=cut
+
+1;

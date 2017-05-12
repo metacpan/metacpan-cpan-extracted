@@ -1,0 +1,44 @@
+---
+abstract: 'Moose Role to provide simple hierarchical tree functionality to objects'
+author:
+  - 'Michael Jemmeson <mjemmeson@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Find: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  List::Util: 0
+  Moose: 0
+  Test::More: 0
+  Test::Most: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Tree
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  MooseX::Tree:
+    file: lib/MooseX/Tree.pm
+    version: 0.001
+requires:
+  MooseX::Role::Parameterized: 0
+  perl: 5.006
+resources:
+  bugtracker: https://github.com/mjemmeson/moosex-tree/issues
+  homepage: https://metacpan.org/release/MooseX-Tree
+  repository: git://github.com/mjemmeson/moosex-tree.git
+version: 0.001

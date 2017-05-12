@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                MARC-Detrans
+version:             1.41
+abstract:            De-transliterate text and MARC records
+license:             ~
+author:              
+    - Ed Summers <ehs@pobox.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Class::Accessor:               0.19
+    MARC::Record:                  1.38
+    Test::Exception:               0
+    XML::SAX:                      0.12
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

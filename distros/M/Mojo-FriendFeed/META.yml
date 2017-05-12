@@ -1,0 +1,26 @@
+---
+abstract: 'A non-blocking FriendFeed listener for Mojolicious'
+author:
+  - 'Joel Berger <joel.a.berger@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-FriendFeed
+provides:
+  Mojo::FriendFeed:
+    file: lib/Mojo/FriendFeed.pm
+    version: '0.05'
+requires:
+  Mojolicious: '4.0'
+  perl: v5.16.0
+resources:
+  bugtracker: https://github.com/jberger/Mojo-FriendFeed/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/jberger/Mojo-FriendFeed
+version: '0.05'

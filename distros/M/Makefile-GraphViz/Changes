@@ -1,0 +1,234 @@
+Revision history for Perl extension Makefile::GraphViz.
+
+0.21 2014-12-07
+Most of the changes are contributed by Alexander Kriegisch.
+
+* now we use the 2-clause BSD license. also updated the copyright years.
+
+* Differentiate between 'end_with' nodes and tree leaves
+
+    - 'end_with' nodes get link URLs and another colour, but normal tree leaves
+      (prerequisites without target definitions) should look just like any other
+      normal node.
+    - Fix tests to reflect this change.
+
+* 'end_with' nodes without prerequisites are no real end nodes
+
+    So they should be treated like normal nodes, i.e. we
+    - do not paint them green,
+    - do not add URLs to them,
+    - do not call end node callbacks for them which might otherwise cause the
+      creation of trivial, one-node sub-graphs,
+
+    Please note that there also is one incompatible little change in behaviour:
+    'end_with' nodes, no matter if with or without prerequisites, now get their
+    commands/recipes printed because this is what a user would expect for a node
+    occurring in a graph with 'trim_mode == false'. One test file was changed to
+    reflect this new behaviour.
+
+* New API hook 'end_with_callback' for handling 'end_with' events
+
+    Now users can call 'plot' like this to recursively create sub-graphs for
+    'end_with' nodes:
+
+    %targets=( "all" => 0, "install" => 0 );
+    @targets_to_do = keys %targets;
+    while (@targets_to_do)
+    {
+        $target = @targets_to_do[0];
+        $gv = $parser->plot(
+            $target,
+            end_with => [ "foo", qr{^.+-bar$} ],
+            no_end_with => [ $target ],
+            end_with_callback => sub($)
+            {
+                my $target = shift;
+                $targets{$target} = 0 unless exists $targets{$target};
+            },
+            ...
+        );
+        ...
+        $targets{$target} = 1;
+        @targets_to_do = grep { ! $targets{$_} } keys %targets;
+    }
+
+* Set graph name (useful when creating image maps or PS/PDF with links, looks
+  nicer in browser)
+
+* New options 'normal_end_node_style' and 'vir_end_node_style' (defaulting to
+    light green instead of light yellow background) visually indicate 'end_with'
+    nodes, so the user immediately detects that those nodes have (hidden) sub-nodes
+    which might be accessible via mouse click in image map or SVG scenarios.
+
+* New option 'url_fct' with default implementation '_url' sets target URLs for
+    'end_with' nodes, assuming that they will be linked to other graphs starting
+    where the current graph ends. This is useful when generating interlinked SVG
+    files (mode 'svg') or graphics + image maps (mode 'cmapx'). This way users can
+    create hierarchies or webs of graphs and sub-graphs.
+
+* Change 'fillcolor' to similar, but web-safe yellow #ffff99.
+
+* Set default font to Arial because when generating SVG the default would
+      otherwise be Times New Roman which looks kinda ugly.
+
+* New options 'node_trim_fct' and 'cmd_trim_fct' enable user-specified trimming
+    functions for target names/paths and command node content. The previous,
+    hard-wired behaviour is now just a default.
+
+* Bugfix: Do not falsely display "|" as a node name anymore because it is not a
+    dependency but just a separator between normal and order-only dependencies.
+
+* Display 'end_with' nodes with surrounding square brackets (e.g. "[my_target]")
+    to visually indicate that the node contains dependent targets which are not
+    displayed.
+
+* Make sure code nodes have left-justifies rather than centered text by adding
+    "\l" to each end of line instead of "\n", so as for GraphViz to know what we
+    want.
+
+* Add new options 'no_end_with' and 'no_exclude', specifying exceptions for
+    'end_with' and 'exclude'. Regex and string matches are allowed. This is
+    especially helpful if the make target name matches an 'end_with' regex pattern
+    but should not be a graph end point. The result would be a single node - not
+    very insightful. ;-) So just add $ARGV[1] (or wherever the caller stores the
+    target name) to 'no_end_with' and you are safe.
+
+* Changed default layout from top-down to left-right (rankdir=1). This is better
+    for most medium-sized to large graphs.
+
+* Changed default GraphViz font size to 10.
+
+* Changed node style for code to "note" shape (looks like a paper sheet),
+      Monospace font (size 8), light grey background (#dddddd).
+
+0.20 2011-11-29
+* bugfix: dot complained about the "edge;" syntax error when no --edge-len
+  option is not specified while running the "gvmake" utility.
+  thanks Jasmin Jessich.
+
+0.19 2011-08-18
+* updated docs with new author name, author email address, and new git repository address.
+* updated tests for Makefile::Parser 0.214.
+
+0.18 2008-06-20
+* now we use Getopt::Long rather than Getopt::Std for command line option handling and.
+* we've added two new options --debug and --edge-len (for neato).
+
+0.17 2008-03-16
+* added support for double-colon rules.
+* now we require Makefile::Parser for support of double-colon rules
+  and multiple single-colon instances.
+
+0.16 2007-03-16
+* minor POD fixes
+* bumped the Makefile::Parser version we require here to 0.16
+
+0.15 2007-03-12
+* lowered the version number for the building prerequisites
+* bumped the Makefile::Parser version to 0.14
+
+0.14 2007-03-10
+* minor POD fixes
+* requires Makefile::Parser 0.13 now
+
+0.13 2007-03-03
+* fixed a bottle-neck in sub plot_all (the roots method is now called instead of the targets method)
+* updated the tests accordingly.
+
+0.12 2007-03-03
+
+* index script/ as before
+* minor POD tweaks
+
+0.11 2007-03-03
+
+* implemented the plot_all method mentioned in the SYNOPSIS (RT bug #24828)
+  (Ken Williams)++
+* added t/plot_all.t to test this new method
+* improved the POD a bit
+* added the -a option to gvmake to plot all the goals in the input Makefile
+* used "#!/usr/bin/env perl" in gvmake to improve portability.
+* updated the author's email address
+* added missing files to MANIFEST (make distcheck now passes)
+* Makefile.PL now requires Test::More 0.62
+* updated Test::Cover report in the POD
+
+
+0.10 10/28/2005
+* Move the repository to http://svn.berlios.de/svnroot/repos/makefilegv.
+    The OpenFoundtry seems to have been down for weeks.
+* Update the POD doc accordingly
+* Changed the colors used in the output inspired by Jack Shen's works. Jack++
+* Updated the samples accordingly.
+* Put the ~ in front of standard output file names, so TortoiseSVN won't skip them.
+* Updated the tester accordingly.
+
+
+0.09 10/20/2005
+* Remove blib from the repository.
+
+0.08 10/17/2005
+* Make the pictures cmintest.png and doc.png used by
+    samples.html up to date.
+* Move the sample pictures to a new folder named samples,
+    and update the links in samples.html accordingly.
+* Updated META.yml to the current version.
+* Tested against Makefile::Parser 0.11 and all tests passed.
+
+0.07 10/16/2005
+* Update the version number to 0.07
+* Remove the .pl extention from the gvmake script. Slaven++
+* Add TODOs to gvmake
+* Update the SYNOPSIS section in gvmake's POD doc
+* Fix a bug concerning CR in test files in Cygwin. Now
+    file comparison in the tests ingores all the CR, LF, and
+    \s characters, leading full passing rate under Cygwin.
+    Slaven++
+
+0.06 10/15/2005
+* Force this module to use Makefile::Parser 0.09. A serious
+    bug concerning suffix rule parsing is fixed in
+    Makefile::Parser 0.09
+* Add more tests for Makefiles that uses implicit rules
+    extensively.
+
+0.05 10/15/2005
+* Fix a tiny bug in script/gvmake.pl, suppressing a stupid
+    warning caused by the default Makefile name.
+* Fix a bug in trim_cmd. It now functions properly
+* Append ``...'' to trimmed command so as to make a difference
+    in appearance.
+* Force this module to use the lastes Makefile::Parser 0.08 so
+    as to get support for implicit rules.
+
+0.04 10/5/2005
+* Force this module to use the latest Makefile::Parser 0.07
+* Host this module to the SVN server at OSSF.
+* Strip CR from t/* and use File::Compare::compare_text to
+    compare files.
+
+0.03 2005-10-4
+* Add options "end_with" and "exclude" to the ->plot method,
+    giving even more control over the size of the rendered tree.
+* Rename option "vir_tars" to "vir_nodes".
+* Add option "normal_nodes" to rewrite the default behavior.
+* Add gvmake.pl to /script directory
+* Use DOT format instead of PNG in the test script,
+    reducing space requirements significantly.
+
+0.02  10/4/2005
+* Fix the CR/LF problem in the test file, making the module
+    working on Cygwin and other platforms.
+* Add command node to the output graphs.
+* Provide "trim_mode" option to the ->plot method so as to
+    determine whether plot command nodes.
+* Provide various options to ->plot, such as "edge_style",
+    "normal_node_style", "vir_node_style", "cmd_style",
+    "init_args", "vir_tars", and "gv". So the users get a
+    much more controls over the output graphic format.
+* Fix the back-slash problem in GraphViz labels.
+
+0.01  Fri Sep 30 21:12:10 2005
+* original version; created by h2xs 1.23 with options
+  	-AX Makefile::GraphViz
+

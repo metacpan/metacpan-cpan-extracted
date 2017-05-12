@@ -1,0 +1,49 @@
+
+### TagProvider.pm
+
+    package TagProvider;
+
+    use MooseX::ComposedBehavior {
+      sugar_name   => 'add_tags',
+      also_compose => [ qw(_instance_tags) ],
+      compositor   => sub { @{ $_[1] } }, # @_ is ($self, \@all_results),
+      method_name  => 'tags',
+    };
+
+### Foo.pm
+
+    package Foo;
+    use Moose::Role;
+    use TagProvider;
+
+    add_tags { qw(foo bar) };
+
+### Bar.pm
+
+    package Bar;
+    use Moose::Role;
+    use TagProvider;
+
+    add_tags { qw(bar quux) };
+
+### Thing.pm
+
+    package Thing;
+    use Moose;
+    use TagProvider;
+    with qw(Foo Bar);
+
+    add_tags { qw(bingo) };
+
+    has tags => (
+      isa => 'ArrayRef[Str]',
+      traits   => 'Array',
+      handles  => { _instance_tags => 'elements' },
+      init_arg => 'tags',
+    );
+
+# code
+
+    my $obj = Thing->new({ tags => [ qw(xyzzy) ] });
+
+    $obj->tags;  # bag of: foo bar bar quux bingo xyzzy

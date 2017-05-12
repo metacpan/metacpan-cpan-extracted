@@ -1,0 +1,32 @@
+---
+abstract: 'Generate ppport.h'
+author:
+  - 'Tokuhiro Matsuno E<lt>tokuhirom AAJKLFJEF@ GMAIL COME<gt>'
+build_requires:
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Build-Pluggable-PPPort
+no_index:
+  directory:
+    - inc
+provides:
+  Module::Build::Pluggable::PPPort:
+    file: lib/Module/Build/Pluggable/PPPort.pm
+    version: 0.04
+requires:
+  Class::Accessor::Lite: 0
+  Devel::PPPort: 3.19
+  Module::Build::Pluggable: 0.03
+  parent: 0
+  perl: 5.008001
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

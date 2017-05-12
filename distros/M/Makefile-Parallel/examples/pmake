@@ -1,0 +1,143 @@
+#!/usr/bin/perl -s
+
+use Makefile::Parallel;
+
+our ($clock, $pbs, $dump, $clean, $debug, $local, $continue, $mail);
+
+die "You cannot use both pbs and local sub-systems...\n" if ($pbs && $local);
+die "Mail can be used only with pbs...\n" if $mail && !$pbs;
+
+my $makefile = shift or die usage();
+
+process_makefile($makefile,
+    {
+        scheduler => $pbs ? 'PBS' : 'LOCAL',
+        local     => $local,
+        dump      => $dump,
+        clock     => $clock,
+        clean     => $clean,
+        debug     => $debug,
+        continue  => $continue,
+        $mail ? (mail => $mail) : (),
+    }
+);
+
+sub usage() {
+    print <<EOF;
+pmake Usage:
+    pmake <options> file.pmake
+
+    For more info about the options please read the perldoc.
+EOF
+}
+
+=head1 NAME
+
+pmake - Makefile-Paralell  Scheduler
+
+=head1 SYNOPSIS
+
+ pmake [options] file.pmake
+
+=head1 DESCRIPTION
+
+The pmake scheduler program reads a textual specification
+of a PMakefile and schedules it to a sub-system.
+
+The basic syntax of this program is:
+
+    pmake <options> file.pmake
+
+Without options, the pmake program reads the makefile specification and runs
+it on the local CPU, using one process the time. As you execute the program
+it will print some useful logging text and allows the user to see how is the
+process going.
+
+At the end of the pipeline, a report is printed, stating for each job, the start
+and end date-time, and the elapsed time on a human readable string.
+Is also generates a makefile's dependecy graph representation for easly see
+how the jobs relate to each other and how much time did they take to run.
+
+=head1 Options
+
+=head2 debug
+
+=over 4
+
+This flag makes the log output more verbose allowing to debug certain parts
+of the code. A "log" directory is created with tons of debug information.
+It's used mainly on the development environment. But please compress this
+directory and sent it to me when you have a reporto of something not working.
+It will help a lot.
+
+=back
+
+=head2 dump
+
+=over 4
+
+This options makes the pmake program parse the makefile to a internal
+representation, and return a serialiazed version of the
+structure, without actually doing any run. Used in the developement
+purposes.
+
+=back
+
+=head2 continue
+
+=over 4
+
+This options makes the pmake program try to continue a previous interrupted
+run. The pmake scheduler saves a journal with usefull information, so
+it can recovery in a the case of a disaster. Imagine this situation: you
+have a specification that takes 1 week to conclude on a high performance
+cluster. In the last process you discover you have an error, so the whole
+process fails, and you have to resubmit the jobs form the beginning. You
+certainly will like the -continue option for this.
+
+=back
+
+=head2 clean
+
+=over 4
+
+Running jobs with pmake can produce a number of temporary files that
+may be floating in your directory at the end of the execution.
+If you think that it's too dangerous to try yourself the removal
+of the files, call pmake with this option and a makefile, and it
+will (probably) do the job.
+
+=back
+
+pmake accepts options specific to the local sub-system:
+
+=head2 local[=n]
+
+=over 4
+
+This flag forces the pmake to use the Local Scheduler (it already uses
+it by default). However, it is possible to pass a optional integer
+n, to specify how many parallel jobs do you want to run on your
+desktop computer. We recommend to use n between 1 and maximum
+logical CPUs on the target machine.
+
+=back
+
+pmake accepts options specific to the PBS sub-system:
+
+=head2 pbs
+
+=over 4
+
+This flag enables the use of the PBS scheduler. The result of running
+this option on a system without PBS is undefined. The program
+behaves exactly the same, producint the same output, but in the
+background, PBS scripts are created and submitted to the cluster queue.
+
+=back
+
+You can find some simple examples of the specification on the /examples
+directory of the distribution. Sorry the lack of documentation on the
+syntax for now.
+
+=cut

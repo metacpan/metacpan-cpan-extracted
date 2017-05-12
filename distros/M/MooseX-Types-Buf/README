@@ -1,0 +1,31 @@
+NAME
+    MooseX::Types::Buf - Moose type definitions for Byte buffers
+
+SYNOPSIS
+      use Moose;
+      use MooseX::Types::Buf;
+
+      has 'raw_data' => ( is => 'rw', isa => 'Buf', coerce => 1 );
+
+DESCRIPTION
+    This module lets you specify attributes as Byte buffers.
+
+TYPES / COERCIONS
+  Buf
+    Coercions provided:
+
+    from Str
+        Turns off the Unicode bit using "Encode::encode_utf8($_)".
+
+        If the Unicode bit is already off, the coercion is a no-op.
+
+    to Str
+        No-op; the Unicode bit is left off.
+
+AUTHORS
+    唐鳳 <cpan@audreyt.org>
+
+CC0 1.0 Universal
+    To the extent possible under law, 唐鳳 has waived all copyright and
+    related or neighboring rights to MooseX-Types-Buf.
+

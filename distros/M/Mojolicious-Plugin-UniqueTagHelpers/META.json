@@ -1,0 +1,56 @@
+{
+   "abstract" : "Mojolicious Plugin to use unique javascript and stylesheet links.",
+   "author" : [
+      "Roman V. Nikolaev <rshadow@rambler.ru>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-UniqueTagHelpers",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "5.54",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rshadow/mojolicious-plugin-unique_tag_helpers/issues"
+      },
+      "homepage" : "https://github.com/rshadow/mojolicious-plugin-unique_tag_helpers",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com:rshadow/mojolicious-plugin-unique_tag_helpers.git",
+         "web" : "https://github.com/rshadow/mojolicious-plugin-unique_tag_helpers"
+      }
+   },
+   "version" : "1.3"
+}

@@ -1,0 +1,28 @@
+---
+abstract: 'Get cover art from coveralia.com'
+author:
+  - 'Marius Gavrilescu <marius@ieval.ro>'
+build_requires:
+  Test::RequiresInternet: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Music-Tag-Coveralia
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Music::Tag: '0'
+  Music::Tag::Generic: '0'
+  WWW::Search: '0'
+  WWW::Search::Coveralia: '0'
+  perl: '5.014000'
+resources:
+  repository: https://git.ieval.ro/?p=music-tag-coveralia.git
+version: '0.001'

@@ -1,0 +1,29 @@
+#
+# Taken from MaxScale
+#
+# This CMake file tries to find the Perl regular expression libraries
+# The following variables are set:
+# PCRE2_FOUND - System has the PCRE library
+# PCRE2_LIBRARIES - The PCRE library file
+# PCRE2_INCLUDE_DIRS - The folder with the PCRE headers
+
+FIND_LIBRARY (PCRE2_LIBRARIES NAMES pcre2 pcre2-8)
+FIND_PATH (PCRE2_INCLUDE_DIRS pcre2.h)
+IF (PCRE2_LIBRARIES AND PCRE2_INCLUDE_DIRS)
+  MESSAGE (STATUS "")
+  MESSAGE (STATUS "PCRE2 Setup:")
+  MESSAGE (STATUS "------------")
+  MESSAGE (STATUS "     LIBRARIES: ${PCRE2_LIBRARIES}")
+  MESSAGE (STATUS "  INCLUDE_DIRS: ${PCRE2_INCLUDE_DIRS}")
+  SET (PCRE2_FOUND TRUE CACHE BOOL "Found PCRE2 libraries" FORCE)
+  GET_FILENAME_COMPONENT(PCRE2_DIRECTORY "${PCRE2_LIBRARIES}" DIRECTORY CACHE)
+  IF ("${CMAKE_HOST_SYSTEM}" MATCHES ".*Windows.*")
+    SET (PCRE2_RUNTIME_DIRECTORY "${PCRE2_DIRECTORY}/../bin")
+  ELSE ()
+    SET (PCRE2_RUNTIME_DIRECTORY "${PCRE2_DIRECTORY}")
+  ENDIF ()
+else()
+  MESSAGE(STATUS "")
+  MESSAGE(STATUS "PCRE2 Setup: buit-in")
+  SET(PCRE2_FOUND FALSE CACHE BOOL "Found PCRE2 libraries" FORCE)
+endif()

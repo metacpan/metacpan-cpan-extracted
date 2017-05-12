@@ -1,0 +1,48 @@
+                        Perl Mail::Queue::DB Module
+
+   Copyright (C) 2004  S. Zachariah Sprackett <zacs@cpan.org>
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+DESCRIPTION
+
+   Mail::Queue::DB allows one to create a local outgoing email store in 
+   Berkel DB format.  This mail can then be flushed over SSH or some other 
+   connection to an appropriate mailhost.  This module and the associated
+   tools work well on systems like laptops that need to be able to send
+   mail while offline.  It was designed to be complementary to
+   OfflineIMAP.
+
+
+INSTALLATION
+
+   Follow the standard recipe:
+
+   $ perl Makefile.PL
+   $ make
+   $ make test
+
+   If all tests pass, then run:
+
+   $ make install
+
+BUG REPORTS
+
+   Bug reports are definitely welcome.  Please do not forget to tell me 
+   what version / platform you are running on.  If possible a code snippet
+   to reproduce the bug is always helpful.
+
+   Bug reports can be sent to me at mailto:zacs@cpan.org

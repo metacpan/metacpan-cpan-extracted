@@ -1,0 +1,571 @@
+From foo@bar.com  Tue Mar 25 12:39:56 2003
+Return-Path: <tony@soto.kasei.com>
+Received: from soto.kasei.com (soto.kasei.com [194.202.192.40])
+	by zero.twingle.net (Postfix) with ESMTP id E4F0A79F
+	for <tony@twingle.net>; Fri, 17 Jan 2003 12:37:52 +0000 (UTC)
+Received: by soto.kasei.com (Postfix, from userid 1011)
+	id A608D1C119; Fri, 17 Jan 2003 12:36:18 +0000 (GMT)
+Resent-From: tony@soto.kasei.com
+Resent-Date: Fri, 17 Jan 2003 12:36:18 +0000
+Resent-Message-ID: <20030117123618.GQ22940@soto.kasei.com>
+Resent-To: tony@twingle.net
+Received: by soto.kasei.com (Postfix, from userid 65534)
+	id 4F9771C646; Sun, 24 Nov 2002 21:28:32 +0000 (GMT)
+Received: from www.auug.org.au (www.auug.org.au [150.101.248.57])
+	by soto.kasei.com (Postfix) with ESMTP id 8F3D11C368
+	for <tony-aegis@kasei.com>; Sun, 24 Nov 2002 21:28:30 +0000 (GMT)
+Received: from www.auug.org.au (localhost [127.0.0.1])
+	by www.auug.org.au (Postfix) with ESMTP
+	id 980B83284C; Mon, 25 Nov 2002 07:57:50 +1030 (CST)
+Received: from geri (N671P025.adsl.highway.telekom.at [62.47.27.217])
+	by www.auug.org.au (Postfix) with ESMTP id 089A132603
+	for <aegis-users@auug.org.au>; Sun, 24 Nov 2002 23:54:46 +1030 (CST)
+Received: from nlin by geri with local (Exim 3.36 #1 (Debian))
+	id 18Fy8G-0000ZZ-00; Sun, 24 Nov 2002 14:53:12 +0000
+To: Ralf Fassel <ralf@akutech.de>
+Cc: Derrick 'dman' Hudson <dman@dman.ddts.net>,
+	aegis-users@auug.org.au
+Subject: Re: [Aegis]Re: getting started (with aegis)
+Message-ID: <20021124145312.GA1759@nlin.net>
+Mime-Version: 1.0
+User-Agent: Mutt/1.4i
+From: nlin@nlin.net
+Sender: aegis-users-admin@auug.org.au
+Errors-To: aegis-users-admin@auug.org.au
+X-BeenThere: aegis-users@auug.org.au
+X-Mailman-Version: 2.0.8
+Precedence: bulk
+List-Unsubscribe: <http://www.auug.org.au/mailman/listinfo/aegis-users>,
+	<mailto:aegis-users-request@auug.org.au?subject=unsubscribe>
+List-Id: Users of Aegis software <aegis-users.auug.org.au>
+List-Post: <mailto:aegis-users@auug.org.au>
+List-Help: <mailto:aegis-users-request@auug.org.au?subject=help>
+List-Subscribe: <http://www.auug.org.au/mailman/listinfo/aegis-users>,
+	<mailto:aegis-users-request@auug.org.au?subject=subscribe>
+List-Archive: <http://www.auug.org.au/mailman/private/aegis-users/>
+Date: Sun, 24 Nov 2002 14:53:12 +0000
+X-Spam-Status: No, hits=-0.5 required=5.0
+	tests=KNOWN_MAILING_LIST,NO_REAL_NAME,QUOTED_EMAIL_TEXT,
+	      SPAM_PHRASE_00_01,USER_AGENT,USER_AGENT_MUTT
+	version=2.43
+X-Spam-Level: 
+Content-Type: text/plain; charset="us-ascii"
+Content-Length: 895
+Lines: 22
+Content-Transfer-Encoding: 8bit
+
+On Sat, Nov 23, 2002 at 04:32:07PM +0100, Ralf Fassel wrote:
+> The exit status `2' is the problem here.  Note that the default
+> `diff_command' checks for exit status -le 1:
+>   "set +e; diff -c '$original' '$input' > '$output'; test $? -le 1";
+> 
+> | After reading the manpage, it looks like the '-a' option is required,
+> | and adding that to the config works.
+> 
+> Hmm, I'm using diff 2.7, which gives me 1 in this case.  Maybe
+> something changed in diff 2.8 w/ regards to the exit status...
+
+Something definitely did change, which I reported as an issue to the
+Debian package maintainers over 3 months ago (to date, no action has been
+taken on the report). For details, see:
+
+http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=160701
+
+-Norman
+_______________________________________________
+Aegis-users mailing list
+Aegis-users@auug.org.au
+http://www.auug.org.au/mailman/listinfo/aegis-users
+From foo@bar.com  Tue Mar 25 12:39:56 2003
+Return-Path: <tony@soto.kasei.com>
+Received: from soto.kasei.com (soto.kasei.com [194.202.192.40])
+	by zero.twingle.net (Postfix) with ESMTP id ED1A58AF
+	for <tony@twingle.net>; Fri, 17 Jan 2003 12:37:52 +0000 (UTC)
+Received: by soto.kasei.com (Postfix, from userid 1011)
+	id D41A31C133; Fri, 17 Jan 2003 12:36:18 +0000 (GMT)
+Resent-From: tony@soto.kasei.com
+Resent-Date: Fri, 17 Jan 2003 12:36:18 +0000
+Resent-Message-ID: <20030117123618.GR22940@soto.kasei.com>
+Resent-To: tony@twingle.net
+Received: by soto.kasei.com (Postfix, from userid 65534)
+	id 7F3B71C65A; Mon, 25 Nov 2002 12:06:06 +0000 (GMT)
+Received: from www.auug.org.au (www.auug.org.au [150.101.248.57])
+	by soto.kasei.com (Postfix) with ESMTP id B2DDD1C64D
+	for <tony-aegis@kasei.com>; Mon, 25 Nov 2002 12:06:04 +0000 (GMT)
+Received: from www.auug.org.au (localhost [127.0.0.1])
+	by www.auug.org.au (Postfix) with ESMTP
+	id 17AFC32856; Mon, 25 Nov 2002 22:35:26 +1030 (CST)
+Received: from colossus.systems.pipex.net (colossus.systems.pipex.net [62.241.160.73])
+	by www.auug.org.au (Postfix) with ESMTP id 6C67732603
+	for <aegis-users@auug.org.au>; Mon, 25 Nov 2002 22:31:31 +1030 (CST)
+Received: from cloaked.freeserve.co.uk (81-86-163-141.dsl.pipex.com [81.86.163.141])
+	by colossus.systems.pipex.net (Postfix) with ESMTP id 1FFB216000789
+	for <aegis-users@auug.org.au>; Mon, 25 Nov 2002 12:01:27 +0000 (GMT)
+Received: from news by cloaked.freeserve.co.uk with local (Exim 3.36 #1 (Debian))
+	id 18GHva-00023w-00
+	for <aegis-users@auug.org.au>; Mon, 25 Nov 2002 12:01:26 +0000
+Received: from 127.0.0.1 by 127.0.0.1 with nntp; 25 Nov 2002 12:01:26 GMT
+To: aegis-users@auug.org.au
+Organization: A poorly-maintained Debian GNU/Linux InterNetNews site
+From: MJ Ray <markj@cloaked.freeserve.co.uk>
+Subject: Re: [Aegis]Re: getting started (with aegis)
+References: <20021124145312.GA1759@nlin.net>
+Message-Id: <slrnau448m.7l4.markj+0111@cloaked.freeserve.co.uk>
+User-Agent: slrn/0.9.7.4 (Linux)
+NNTP-Posting-Host: 127.0.0.1
+Sender: aegis-users-admin@auug.org.au
+Errors-To: aegis-users-admin@auug.org.au
+X-BeenThere: aegis-users@auug.org.au
+X-Mailman-Version: 2.0.8
+Precedence: bulk
+List-Unsubscribe: <http://www.auug.org.au/mailman/listinfo/aegis-users>,
+	<mailto:aegis-users-request@auug.org.au?subject=unsubscribe>
+List-Id: Users of Aegis software <aegis-users.auug.org.au>
+List-Post: <mailto:aegis-users@auug.org.au>
+List-Help: <mailto:aegis-users-request@auug.org.au?subject=help>
+List-Subscribe: <http://www.auug.org.au/mailman/listinfo/aegis-users>,
+	<mailto:aegis-users-request@auug.org.au?subject=subscribe>
+List-Archive: <http://www.auug.org.au/mailman/private/aegis-users/>
+Date: Mon, 25 Nov 2002 12:01:26 GMT
+X-Spam-Status: No, hits=-1.3 required=5.0
+	tests=KNOWN_MAILING_LIST,NOSPAM_INC,QUOTED_EMAIL_TEXT,REFERENCES,
+	      SPAM_PHRASE_00_01,USER_AGENT
+	version=2.43
+X-Spam-Level: 
+Content-Type: text/plain; charset="us-ascii"
+Content-Length: 686
+Lines: 18
+Content-Transfer-Encoding: 8bit
+
+nlin@nlin.net <nlin@nlin.net> wrote:
+> Something definitely did change, which I reported as an issue to the
+> Debian package maintainers over 3 months ago (to date, no action has been
+> taken on the report). 
+
+That seems to be because there is no consensus on exactly what the bug
+actually is, much less what to do with it.  Can people please read the bug
+report and state on the list what they think the correct solution is?  Then
+we can produce a patch and get a fix into debian.
+
+Hasn't this hurt any other distributions?  Why?
+
+MJR
+
+_______________________________________________
+Aegis-users mailing list
+Aegis-users@auug.org.au
+http://www.auug.org.au/mailman/listinfo/aegis-users
+From foo@bar.com  Tue Mar 25 12:39:56 2003
+Return-Path: <tony@soto.kasei.com>
+Received: from soto.kasei.com (soto.kasei.com [194.202.192.40])
+	by zero.twingle.net (Postfix) with ESMTP id 409E38B0
+	for <tony@twingle.net>; Fri, 17 Jan 2003 12:37:53 +0000 (UTC)
+Received: by soto.kasei.com (Postfix, from userid 1011)
+	id 11F5C1C174; Fri, 17 Jan 2003 12:36:19 +0000 (GMT)
+Resent-From: tony@soto.kasei.com
+Resent-Date: Fri, 17 Jan 2003 12:36:18 +0000
+Resent-Message-ID: <20030117123618.GS22940@soto.kasei.com>
+Resent-To: tony@twingle.net
+Received: by soto.kasei.com (Postfix, from userid 65534)
+	id 89D351C66A; Mon, 25 Nov 2002 13:50:32 +0000 (GMT)
+Received: from www.auug.org.au (www.auug.org.au [150.101.248.57])
+	by soto.kasei.com (Postfix) with ESMTP id 036871C65D
+	for <tony-aegis@kasei.com>; Mon, 25 Nov 2002 13:50:30 +0000 (GMT)
+Received: from www.auug.org.au (localhost [127.0.0.1])
+	by www.auug.org.au (Postfix) with ESMTP
+	id 2E92432858; Tue, 26 Nov 2002 00:19:53 +1030 (CST)
+Received: from mailc0911.dte2k.de (mail.t-intra.de [62.156.147.75])
+	by www.auug.org.au (Postfix) with ESMTP id 9254932603
+	for <aegis-users@auug.org.au>; Tue, 26 Nov 2002 00:16:36 +1030 (CST)
+Received: from mailc0907.dte2k.de ([10.50.185.7]) by mailc0911.dte2k.de with Microsoft SMTPSVC(5.0.2195.5329);
+	 Mon, 25 Nov 2002 14:46:32 +0100
+Received: from jupiter.akutech-local.de ([80.134.88.103]) by mailc0907.dte2k.de with Microsoft SMTPSVC(5.0.2195.5329);
+	 Mon, 25 Nov 2002 14:46:32 +0100
+Received: from jupiter.akutech-local.de (localhost [127.0.0.1])
+	by jupiter.akutech-local.de (8.12.3/8.12.3) with ESMTP id gAPDkU1V548824;
+	Mon, 25 Nov 2002 14:46:30 +0100 (MET)
+Received: (from ralf@localhost)
+	by jupiter.akutech-local.de (8.12.3/8.12.3/Submit) id gAPDkTq4553778;
+	Mon, 25 Nov 2002 14:46:29 +0100 (MET)
+MIME-Version: 1.0
+Message-ID: <15842.10677.577458.656565@jupiter.akutech-local.de>
+From: Ralf Fassel <ralf@akutech.de>
+To: MJ Ray <markj@cloaked.freeserve.co.uk>
+Cc: aegis-users@auug.org.au
+Subject: Re: [Aegis]Re: getting started (with aegis)
+In-Reply-To: <slrnau448m.7l4.markj+0111@cloaked.freeserve.co.uk>
+References: <20021124145312.GA1759@nlin.net>
+	<slrnau448m.7l4.markj+0111@cloaked.freeserve.co.uk>
+Organization: Akustik Technologie Goettingen
+X-OriginalArrivalTime: 25 Nov 2002 13:46:32.0508 (UTC) FILETIME=[1052AFC0:01C29489]
+Sender: aegis-users-admin@auug.org.au
+Errors-To: aegis-users-admin@auug.org.au
+X-BeenThere: aegis-users@auug.org.au
+X-Mailman-Version: 2.0.8
+Precedence: bulk
+List-Unsubscribe: <http://www.auug.org.au/mailman/listinfo/aegis-users>,
+	<mailto:aegis-users-request@auug.org.au?subject=unsubscribe>
+List-Id: Users of Aegis software <aegis-users.auug.org.au>
+List-Post: <mailto:aegis-users@auug.org.au>
+List-Help: <mailto:aegis-users-request@auug.org.au?subject=help>
+List-Subscribe: <http://www.auug.org.au/mailman/listinfo/aegis-users>,
+	<mailto:aegis-users-request@auug.org.au?subject=subscribe>
+List-Archive: <http://www.auug.org.au/mailman/private/aegis-users/>
+Date: Mon, 25 Nov 2002 14:46:29 +0100
+X-Spam-Status: No, hits=-0.8 required=5.0
+	tests=IN_REP_TO,KNOWN_MAILING_LIST,NOSPAM_INC,REFERENCES,
+	      SPAM_PHRASE_00_01
+	version=2.43
+X-Spam-Level: 
+Content-Type: text/plain; charset="us-ascii"
+Content-Length: 2883
+Lines: 62
+Content-Transfer-Encoding: 8bit
+
+* MJ Ray
+| nlin@nlin.net <nlin@nlin.net> wrote:
+| > Something definitely did change, which I reported as an issue to the
+| > Debian package maintainers over 3 months ago (to date, no action has been
+| > taken on the report). 
+| 
+| That seems to be because there is no consensus on exactly what the
+| bug actually is, much less what to do with it.  Can people please
+| read the bug report and state on the list what they think the
+| correct solution is?  Then we can produce a patch and get a fix into
+| debian.
+
+I don't think this is a debian issue, since debian merely
+redistributes the GNU diff package.
+
+The `bug' is not a `bug' per se: an exit code has changed under
+certain circumstances (diffing binary files), and now the aegis
+diff_command is no longer adequate for that situation.  IMHO, the
+default aegis diff command needs changing, not the `diff' program.
+
+Aegis uses `diff' to collect the changes to files in a human-readable
+form.  Aegis does *not* use diff to check whether the file has changed
+at all, it uses a checksum for that purpose.  But *if* the file has
+changed (as indicated by the checksum) then the `diff' command is
+called to produce a human-readable form of the differences for
+inspection.  Now the exit command of that process is checked, and if
+it isn't 0 (no diff) or 1 (some diff) it is considered an error.
+`diff' 2.8 is now exiting 2 for binary files, so the command `fails'
+in the aegis sense.  aegis can't tell whether diff had some other
+problem like file-not-found or out-of-memory (also exit status 2).
+
+So the easy solution is:
+- add a comment to the aegis standard config files stating to add `-a'
+  *if* you're using GNU diffa *and* binary files.  I vaguely remember
+  that there is already some comment about GNU diff > 2.7 requiring -a
+  in the aegis docs.  diff -a produces huge diff files in case of
+  binary inputs which might or might not be a problem.
+
+- The solution better resembling the current situation would be to
+  call `cmp' if `diff' reports an error (exit > 1).  Then we would get
+  `files A and B differ, char x, line y' which is close enough to the
+  `binary files A and B differ' message which diff 2.7 produced.
+
+ diff_command =
+  "set +e; diff -c '$original' '$input' > '$output'; if test $? -gt 1 \
+  ; then cmp '$original' '$input' > '$output' ; test $? -le 1 \
+  ; else ; exit 0 ; fi";
+Warning: not tested, the idea being to call `cmp' in case `diff'
+reports failure (exit state > 1).
+
+| Hasn't this hurt any other distributions?  Why?
+
+Because they do not check the `diff' exit status?  Because they do not
+use `diff' to list the differences?  Because they do not feed binary
+files to `diff'?  Hard to tell without knowing which packages actually
+_use_ `diff'.
+
+R'
+_______________________________________________
+Aegis-users mailing list
+Aegis-users@auug.org.au
+http://www.auug.org.au/mailman/listinfo/aegis-users
+From foo@bar.com  Tue Mar 25 12:39:56 2003
+Return-Path: <tony@soto.kasei.com>
+Received: from soto.kasei.com (soto.kasei.com [194.202.192.40])
+	by zero.twingle.net (Postfix) with ESMTP id A7BCF8B1
+	for <tony@twingle.net>; Fri, 17 Jan 2003 12:37:53 +0000 (UTC)
+Received: by soto.kasei.com (Postfix, from userid 1011)
+	id 3C18C1C119; Fri, 17 Jan 2003 12:36:19 +0000 (GMT)
+Resent-From: tony@soto.kasei.com
+Resent-Date: Fri, 17 Jan 2003 12:36:19 +0000
+Resent-Message-ID: <20030117123619.GT22940@soto.kasei.com>
+Resent-To: tony@twingle.net
+Received: by soto.kasei.com (Postfix, from userid 65534)
+	id 02E801C688; Mon, 25 Nov 2002 17:21:47 +0000 (GMT)
+Received: from www.auug.org.au (www.auug.org.au [150.101.248.57])
+	by soto.kasei.com (Postfix) with ESMTP id 8CAE41C671
+	for <tony-aegis@kasei.com>; Mon, 25 Nov 2002 17:21:46 +0000 (GMT)
+Received: from www.auug.org.au (localhost [127.0.0.1])
+	by www.auug.org.au (Postfix) with ESMTP
+	id B29DD32850; Tue, 26 Nov 2002 03:51:12 +1030 (CST)
+Received: from gw-eg.lrtw.org (ns.lrtw.org [216.235.9.242])
+	by www.auug.org.au (Postfix) with ESMTP id E8C9632603
+	for <aegis-users@auug.org.au>; Tue, 26 Nov 2002 03:47:33 +1030 (CST)
+Received: from scratch (wifi.vpn.int.lrtw.org [192.168.10.13])
+	by gw-eg.lrtw.org (Postfix) with ESMTP
+	id 37AB05649E; Mon, 25 Nov 2002 12:17:29 -0500 (EST)
+Received: from davis by scratch with local (Exim 3.35 #1 (Debian))
+	id 18GMs3-00062n-00; Mon, 25 Nov 2002 12:18:07 -0500
+From: Chris Davis <davis@lrtw.org>
+To: Ralf Fassel <ralf@akutech.de>
+Cc: aegis-users@auug.org.au
+Subject: Re: [Aegis]Re: getting started (with aegis)
+Message-ID: <20021125171807.GK8236@somanetworks.com>
+References: <20021124145312.GA1759@nlin.net> <slrnau448m.7l4.markj+0111@cloaked.freeserve.co.uk> <15842.10677.577458.656565@jupiter.akutech-local.de>
+Mime-Version: 1.0
+In-Reply-To: <15842.10677.577458.656565@jupiter.akutech-local.de>
+User-Agent: Mutt/1.3.28i
+Sender: aegis-users-admin@auug.org.au
+Errors-To: aegis-users-admin@auug.org.au
+X-BeenThere: aegis-users@auug.org.au
+X-Mailman-Version: 2.0.8
+Precedence: bulk
+List-Unsubscribe: <http://www.auug.org.au/mailman/listinfo/aegis-users>,
+	<mailto:aegis-users-request@auug.org.au?subject=unsubscribe>
+List-Id: Users of Aegis software <aegis-users.auug.org.au>
+List-Post: <mailto:aegis-users@auug.org.au>
+List-Help: <mailto:aegis-users-request@auug.org.au?subject=help>
+List-Subscribe: <http://www.auug.org.au/mailman/listinfo/aegis-users>,
+	<mailto:aegis-users-request@auug.org.au?subject=subscribe>
+List-Archive: <http://www.auug.org.au/mailman/private/aegis-users/>
+Date: Mon, 25 Nov 2002 12:18:07 -0500
+X-Spam-Status: No, hits=-3.1 required=5.0
+	tests=IN_REP_TO,KNOWN_MAILING_LIST,QUOTED_EMAIL_TEXT,REFERENCES,
+	      SPAM_PHRASE_00_01,USER_AGENT,USER_AGENT_MUTT
+	version=2.43
+X-Spam-Level: 
+Content-Type: text/plain; charset="us-ascii"
+Content-Length: 2128
+Lines: 50
+Content-Transfer-Encoding: 8bit
+
+On Mon, 25 Nov 2002, Ralf Fassel wrote:
+> I don't think this is a debian issue, since debian merely
+> redistributes the GNU diff package.
+
+Agreed.  diff changed the meaning of its return codes.  Upstream for diff
+thinks everything is now ok, and anything relying on diff'ing binary files
+getting a proper return code is buggy. 
+
+The debian diff maintainer has no say in the matter, since he just packages
+upstreams source.  Other then going back to an old version of diff and
+sticking with it (which is a bad idea for other reasons) there is no good
+way to change this. 
+
+
+> So the easy solution is:
+> - add a comment to the aegis standard config files stating to add `-a'
+>   *if* you're using GNU diffa *and* binary files.  I vaguely remember
+>   that there is already some comment about GNU diff > 2.7 requiring -a
+>   in the aegis docs.  diff -a produces huge diff files in case of
+>   binary inputs which might or might not be a problem.
+> 
+> - The solution better resembling the current situation would be to
+>   call `cmp' if `diff' reports an error (exit > 1).  Then we would get
+>   `files A and B differ, char x, line y' which is close enough to the
+>   `binary files A and B differ' message which diff 2.7 produced.
+> 
+>  diff_command =
+>   "set +e; diff -c '$original' '$input' > '$output'; if test $? -gt 1 \
+>   ; then cmp '$original' '$input' > '$output' ; test $? -le 1 \
+>   ; else ; exit 0 ; fi";
+> Warning: not tested, the idea being to call `cmp' in case `diff'
+> reports failure (exit state > 1).
+
+Something like this should work. I'll try it out tonight, and include it with
+my next upload.
+
+> | Hasn't this hurt any other distributions?  Why?
+> 
+> Because they do not check the `diff' exit status?  Because they do not
+> use `diff' to list the differences?  Because they do not feed binary
+> files to `diff'?  Hard to tell without knowing which packages actually
+> _use_ `diff'.
+
+How many times does diff get used on binary files?  I use xdelta myself.
+
+c
+_______________________________________________
+Aegis-users mailing list
+Aegis-users@auug.org.au
+http://www.auug.org.au/mailman/listinfo/aegis-users
+From foo@bar.com  Tue Mar 25 12:39:56 2003
+Return-Path: <tony@soto.kasei.com>
+Received: from soto.kasei.com (soto.kasei.com [194.202.192.40])
+	by zero.twingle.net (Postfix) with ESMTP id 85B3C8B5
+	for <tony@twingle.net>; Fri, 17 Jan 2003 12:37:54 +0000 (UTC)
+Received: by soto.kasei.com (Postfix, from userid 1011)
+	id 445701C12E; Fri, 17 Jan 2003 12:36:20 +0000 (GMT)
+Resent-From: tony@soto.kasei.com
+Resent-Date: Fri, 17 Jan 2003 12:36:20 +0000
+Resent-Message-ID: <20030117123620.GX22940@soto.kasei.com>
+Resent-To: tony@twingle.net
+Received: by soto.kasei.com (Postfix, from userid 65534)
+	id 53FA61C68F; Tue, 26 Nov 2002 08:27:41 +0000 (GMT)
+Received: from www.auug.org.au (www.auug.org.au [150.101.248.57])
+	by soto.kasei.com (Postfix) with ESMTP id DDBEA1C3EF
+	for <tony-aegis@kasei.com>; Tue, 26 Nov 2002 08:27:39 +0000 (GMT)
+Received: from www.auug.org.au (localhost [127.0.0.1])
+	by www.auug.org.au (Postfix) with ESMTP
+	id 472E03285C; Tue, 26 Nov 2002 18:57:02 +1030 (CST)
+Received: from mailc0911.dte2k.de (mail.t-intra.de [62.156.147.75])
+	by www.auug.org.au (Postfix) with ESMTP id 0901232603
+	for <aegis-users@auug.org.au>; Tue, 26 Nov 2002 18:53:36 +1030 (CST)
+Received: from mailc0906.dte2k.de ([10.50.185.6]) by mailc0911.dte2k.de with Microsoft SMTPSVC(5.0.2195.5329);
+	 Tue, 26 Nov 2002 09:23:33 +0100
+Received: from jupiter.akutech-local.de ([217.84.235.78]) by mailc0906.dte2k.de with Microsoft SMTPSVC(5.0.2195.5329);
+	 Tue, 26 Nov 2002 09:23:33 +0100
+Received: from jupiter.akutech-local.de (localhost [127.0.0.1])
+	by jupiter.akutech-local.de (8.12.3/8.12.3) with ESMTP id gAQ8NW1V541061;
+	Tue, 26 Nov 2002 09:23:32 +0100 (MET)
+Received: (from ralf@localhost)
+	by jupiter.akutech-local.de (8.12.3/8.12.3/Submit) id gAQ8NWoL538208;
+	Tue, 26 Nov 2002 09:23:32 +0100 (MET)
+MIME-Version: 1.0
+Message-ID: <15843.12163.554914.469248@jupiter.akutech-local.de>
+From: Ralf Fassel <ralf@akutech.de>
+To: MJ Ray <markj@cloaked.freeserve.co.uk>
+Cc: aegis-users@auug.org.au
+Subject: Re: [Aegis]Re: getting started (with aegis) 
+In-Reply-To: <E18GPHf-0000zp-00@cloaked.freeserve.co.uk>
+References: <20021124145312.GA1759@nlin.net>
+	<slrnau448m.7l4.markj+0111@cloaked.freeserve.co.uk>
+	<15842.10677.577458.656565@jupiter.akutech-local.de>
+	<E18GPHf-0000zp-00@cloaked.freeserve.co.uk>
+Organization: Akustik Technologie Goettingen
+X-OriginalArrivalTime: 26 Nov 2002 08:23:33.0540 (UTC) FILETIME=[1BF89640:01C29525]
+Sender: aegis-users-admin@auug.org.au
+Errors-To: aegis-users-admin@auug.org.au
+X-BeenThere: aegis-users@auug.org.au
+X-Mailman-Version: 2.0.8
+Precedence: bulk
+List-Unsubscribe: <http://www.auug.org.au/mailman/listinfo/aegis-users>,
+	<mailto:aegis-users-request@auug.org.au?subject=unsubscribe>
+List-Id: Users of Aegis software <aegis-users.auug.org.au>
+List-Post: <mailto:aegis-users@auug.org.au>
+List-Help: <mailto:aegis-users-request@auug.org.au?subject=help>
+List-Subscribe: <http://www.auug.org.au/mailman/listinfo/aegis-users>,
+	<mailto:aegis-users-request@auug.org.au?subject=subscribe>
+List-Archive: <http://www.auug.org.au/mailman/private/aegis-users/>
+Date: Tue, 26 Nov 2002 09:23:31 +0100
+X-Spam-Status: No, hits=-0.8 required=5.0
+	tests=IN_REP_TO,KNOWN_MAILING_LIST,NOSPAM_INC,REFERENCES,
+	      SPAM_PHRASE_00_01
+	version=2.43
+X-Spam-Level: 
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
+Content-Length: 1384
+Lines: 33
+
+* MJ Ray
+| > diff_command is no longer adequate for that situation.  IMHO, the
+| > default aegis diff command needs changing, not the `diff' program.
+| 
+| I admit I'm still a little "at sea": is this merely in debian, or in the
+| aegis source too?
+
+Aegis has no `diff_command' per se, but it comes with some example
+configurations, which all contain the diff exit status test `test $?
+-le 1'.  The aegis end-user needs a configuration file containing a
+diff_command, and most of the times s/he will copy it from the
+examples and modify it (eg. the `build' command most of the times
+needs changing, too).
+
+I don't know whether debian ships the aegis package with a
+preinstalled project already containing a `config' file.  *If* it
+does, the `diff_command' in there should be changed to be compatible
+with the other tools distributed.
+
+Aegis itself contains in it's User Guide, section on `using diff and
+merge' the following on `diff_command':
+
+    Binary files will often cause modern versions of GNU Diff to exit
+    with an exit status of 2, which is probably reasonable most of the
+    time.  If your project contains binary files, you may want to
+    treat all files as text files.  Use the GNU Diff -a option in this
+    case.
+
+R'
+_______________________________________________
+Aegis-users mailing list
+Aegis-users@auug.org.au
+http://www.auug.org.au/mailman/listinfo/aegis-users
+From foo@bar.com  Tue Mar 25 12:39:56 2003
+Return-Path: <tony@soto.kasei.com>
+Received: from soto.kasei.com (soto.kasei.com [194.202.192.40])
+	by zero.twingle.net (Postfix) with ESMTP id 45EC18B4
+	for <tony@twingle.net>; Fri, 17 Jan 2003 12:37:54 +0000 (UTC)
+Received: by soto.kasei.com (Postfix, from userid 1011)
+	id 1C4741C133; Fri, 17 Jan 2003 12:36:19 +0000 (GMT)
+Resent-From: tony@soto.kasei.com
+Resent-Date: Fri, 17 Jan 2003 12:36:19 +0000
+Resent-Message-ID: <20030117123619.GW22940@soto.kasei.com>
+Resent-To: tony@twingle.net
+Received: by soto.kasei.com (Postfix, from userid 65534)
+	id 23B9D1C68A; Mon, 25 Nov 2002 19:57:23 +0000 (GMT)
+Received: from www.auug.org.au (www.auug.org.au [150.101.248.57])
+	by soto.kasei.com (Postfix) with ESMTP id 6561E1C679
+	for <tony-aegis@kasei.com>; Mon, 25 Nov 2002 19:57:21 +0000 (GMT)
+Received: from www.auug.org.au (localhost [127.0.0.1])
+	by www.auug.org.au (Postfix) with ESMTP
+	id 137A932859; Tue, 26 Nov 2002 06:26:47 +1030 (CST)
+Received: from colossus.systems.pipex.net (colossus.systems.pipex.net [62.241.160.73])
+	by www.auug.org.au (Postfix) with ESMTP id A0E9F32603
+	for <aegis-users@auug.org.au>; Tue, 26 Nov 2002 06:22:52 +1030 (CST)
+Received: from cloaked.freeserve.co.uk (81-86-163-141.dsl.pipex.com [81.86.163.141])
+	by colossus.systems.pipex.net (Postfix) with ESMTP
+	id 9F856160007E8; Mon, 25 Nov 2002 19:52:43 +0000 (GMT)
+Received: from cloaked.freeserve.co.uk ([127.0.0.1] ident=markj)
+	by cloaked.freeserve.co.uk with esmtp (Exim 3.36 #1 (Debian))
+	id 18GPHf-0000zp-00; Mon, 25 Nov 2002 19:52:43 +0000
+From: MJ Ray <markj@cloaked.freeserve.co.uk>
+To: Ralf Fassel <ralf@akutech.de>
+Cc: aegis-users@auug.org.au
+Subject: Re: [Aegis]Re: getting started (with aegis) 
+In-Reply-To: Message from Ralf Fassel <ralf@akutech.de> 
+   of "Mon, 25 Nov 2002 14:46:29 +0100." <15842.10677.577458.656565@jupiter.akutech-local.de> 
+References: <20021124145312.GA1759@nlin.net> <slrnau448m.7l4.markj+0111@cloaked.freeserve.co.uk>  <15842.10677.577458.656565@jupiter.akutech-local.de> 
+Message-Id: <E18GPHf-0000zp-00@cloaked.freeserve.co.uk>
+Sender: aegis-users-admin@auug.org.au
+Errors-To: aegis-users-admin@auug.org.au
+X-BeenThere: aegis-users@auug.org.au
+X-Mailman-Version: 2.0.8
+Precedence: bulk
+List-Unsubscribe: <http://www.auug.org.au/mailman/listinfo/aegis-users>,
+	<mailto:aegis-users-request@auug.org.au?subject=unsubscribe>
+List-Id: Users of Aegis software <aegis-users.auug.org.au>
+List-Post: <mailto:aegis-users@auug.org.au>
+List-Help: <mailto:aegis-users-request@auug.org.au?subject=help>
+List-Subscribe: <http://www.auug.org.au/mailman/listinfo/aegis-users>,
+	<mailto:aegis-users-request@auug.org.au?subject=subscribe>
+List-Archive: <http://www.auug.org.au/mailman/private/aegis-users/>
+Date: Mon, 25 Nov 2002 19:52:43 +0000
+X-Spam-Status: No, hits=-1.7 required=5.0
+	tests=IN_REP_TO,KNOWN_MAILING_LIST,QUOTED_EMAIL_TEXT,REFERENCES,
+	      SIGNATURE_SHORT_DENSE,SPAM_PHRASE_00_01
+	version=2.43
+X-Spam-Level: 
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
+Content-Length: 597
+Lines: 13
+
+> diff_command is no longer adequate for that situation.  IMHO, the
+> default aegis diff command needs changing, not the `diff' program.
+
+I admit I'm still a little "at sea": is this merely in debian, or in the
+aegis source too?
+-- 
+MJR|                                                                  v
+---|--[ Making the world a better place: one LoC at a time....  ]-----|
+   `--[ http://mjr.towers.org.uk/ ]---------[ slef at jabber.at ]-----'
+_______________________________________________
+Aegis-users mailing list
+Aegis-users@auug.org.au
+http://www.auug.org.au/mailman/listinfo/aegis-users

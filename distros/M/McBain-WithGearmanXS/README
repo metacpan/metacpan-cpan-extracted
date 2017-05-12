@@ -1,0 +1,173 @@
+NAME
+    McBain::WithGearmanXS - Load a McBain API as a Gearman worker
+
+SYNOPSIS
+            # write your API as you normally would, and create
+            # a simple start-up script:
+
+            #!/usr/bin/perl -w
+
+            use warnings;
+            use strict;
+            use MyAPI -withGearmanXS;
+
+            MyAPI->work('localhost', 4730);
+
+DESCRIPTION
+    "McBain::WithGearmanXS" turns your McBain API into a Gearman worker,
+    making it easy to consume your APIs with Gearman clients.
+
+    When your API is loaded, this module will traverse its routes, and
+    create a queue for each methods found. So, for example, if your API
+    looks like this...
+
+            package MyAPI;
+
+            use McBain;
+
+            get '/multiply' => (
+                    ...
+            );
+
+            post '/divide' => (
+                    ...
+            );
+
+    ...then the following queues will be created:
+
+            GET:/multiply
+            POST:/divide
+
+    The workers created receive payloads in JSON format, and convert them
+    into the hash-refs your API's methods expect to receive. Results are
+    sent back to the clients in JSON as well. Note that if an API method
+    does not return a hash-ref, this runner module will automatically turn
+    it into a hash-ref to ensure that conversion into JSON will be possible.
+    The created hash-ref will have one key - holding the method's name, with
+    whatever was returned from the method as its value. For example, if
+    method "GET:/divide" in topic "/math" returns an integer (say 7), then
+    the client will get the JSON "{ "GET:/math/divide": 7 }".
+
+  CAVEATS
+    There are some disadvantages to using this runner:
+
+    *   Since a queue is created for every route and method in the API,
+        "McBain" cannot intercept calls to routes that do not exist.
+
+    *   You can't use regular expressions when defining queues. Well, you
+        can, but they won't work.
+
+    *   Gearman provides no way of providing a detailed error message when
+        jobs fail, therefore all "McBain" can do is indicate that the job
+        has failed and no more.
+
+    The first two I hope to overcome in a next version, or even a different
+    runner, by creating just one queue that simply forwards the requests to
+    "McBain".
+
+METHODS EXPORTED TO YOUR API
+  work( [ $host, $port ] )
+    Connects the Gearman worker created by the module to the Gearman server
+    running at the host and port provided. If none are provided, "localhost"
+    and 4730 are used, respectively.
+
+    The method never returns, so that the worker listens for jobs
+    continuously.
+
+METHODS REQUIRED BY MCBAIN
+    This runner module implements the following methods required by
+    "McBain":
+
+  init( )
+    Creates the "work( $host, $port )" method for the root topic of the API.
+
+  generate_env( $job )
+    Receives the Gearman::XS::Job object and creates "McBain"'s standard env
+    hash-ref from it.
+
+  generate_res( $env, $res )
+    Converts the result from an API method in JSON. Read the discussion
+    under "DESCRIPTION" for more info.
+
+  handle_exception( $err, $job )
+    Simply calls "$job->send_fail" to return a job failed status to the
+    client.
+
+CONFIGURATION AND ENVIRONMENT
+    No configuration files are required.
+
+DEPENDENCIES
+    "McBain::WithGearmanXS" depends on the following CPAN modules:
+
+    *   Carp
+
+    *   Gearman::XS
+
+    *   JSON
+
+INCOMPATIBILITIES WITH OTHER MODULES
+    None reported.
+
+BUGS AND LIMITATIONS
+    Please report any bugs or feature requests to
+    "bug-McBain-WithGearmanXS@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=McBain-WithGearmanXS>.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+            perldoc McBain::WithGearmanXS
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=McBain-WithGearmanXS>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/McBain-WithGearmanXS>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/McBain-WithGearmanXS>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/McBain-WithGearmanXS/>
+
+AUTHOR
+    Ido Perlmuter <ido@ido50.net>
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2013, Ido Perlmuter "ido@ido50.net".
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either version 5.8.1 or any later
+    version. See perlartistic and perlgpl.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

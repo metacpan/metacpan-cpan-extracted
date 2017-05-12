@@ -1,0 +1,29 @@
+---
+abstract: unknown
+author:
+  - 'Companies House <chgovuk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MojoX-Plugin-PODRenderer
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  Class::MOP: 2.0603
+  File::Find: 1.20
+  Mojolicious: 4.68
+  Pod::Simple: 3.20
+  boolean: 0.30
+resources:
+  repository: https://github.com/companieshouse/MojoX-Plugin-PODRenderer
+version: 0.01

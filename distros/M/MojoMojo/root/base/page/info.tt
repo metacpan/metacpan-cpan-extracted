@@ -1,0 +1,94 @@
+[%
+    IF page.name == "/";
+        _name = c.pref( "name" );
+    ELSE;
+        _name = c.expand_wikilink( page.name_orig );
+    END
+%]
+
+[% WRAPPER page/wrapper.tt title = loc('Page info for x', page.path) %]
+<div id="content">
+
+<h2 id="title" class="editable">[% page.name_orig | html %]</h2>
+
+<h3>[% loc( 'x revisions', page.versions_rs.count )%]:</h3>
+
+<table id="revisions">
+    <thead>
+        <tr>
+            <th>[% loc('Version') %]</th>
+            <th>[% loc('Date') %]</th>
+            <th>[% loc('Created by') %]</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+[% FOREACH version IN page.versions %]
+        <tr>
+            <td>[% version.version %]</td>
+            <td>[% version.created.strftime( '%Y-%m-%d %H:%M:%S' ) %]</td>
+            <td>
+                <a href="[% c.uri_for( version.creator.link ) _ '.profile' %]"
+                   title="[% loc('Profile for x', version.creator.name ) %]"
+                   >[% version.creator.name %]</a> 
+            </td>
+            <td>
+                <a href="[% c.uri_for('view', { rev => version.version } ) %]">[% loc('Show revision') %]</a>
+            </td>
+        </tr>
+[% END %]
+    </tbody>
+</table>
+
+
+<dl id="pageInfoMeta">
+    <dt>[%loc('Active version')%]:</dt>
+    <dd>[% page.content_version %]</dd>
+
+    <dt>[%loc('Content size')%]:</dt>
+    <dd>[% body_length %] [% loc('chars') %]</dd>
+
+    <dt>[%loc('Children')%]:</dt>
+    <dd>[% page.children.size || 0 %]</dd>
+
+    <dt>[%loc('Descendants')%]:</dt>
+    <dd>[% page.descendants.size %]</dd>
+
+    <dt>[%loc('Links to')%]:</dt>
+    <dd>[% page.links_to.size || 0 %] [% loc('pages') %]</dd>
+
+    <dt>[%loc('Links from')%]:</dt>
+    <dd>[% page.links_from.size || 0%] [% loc('pages') %]</dd>
+
+    <dt>[%loc('Attachments size')%]:</dt>
+    <dd>[% attachments_size || 0%] [% loc('bytes') %]</dd>
+
+    <dt>[%loc('Attachments')%]:</dt>
+    <dd>[% attachments || 0%]</dd>
+
+    <dt>[%loc('Photos')%]:</dt>
+    <dd>[% page.has_photos || 0 %]</dd>
+</dl>
+
+[% page.content.abstract %]
+
+[% IF page.links_to.first ; +%]
+<h3>[% loc('Linked from') %]:</h3>
+        <ul>
+    [% FOR linkitem = page.links_to +%]
+        <li>
+            <a class="existingWikiWord" title="[% linkitem.from_page.name_orig %]" href="[% c.uri_for(linkitem.from_page.path) %]">[% c.expand_wikilink(linkitem.from_page.path) %]</a>
+        </li>
+    [% END %]
+        </ul>
+[% END %]
+
+</div>
+
+[%+ IF c.user.obj.can_edit(page)  # FIXME: inline editing needs to be formatted same as viewing the element.%]
+<script type="text/javascript"><!--
+    $('#title').editInPlace({ show_buttons: true, url: '[% c.uri_for('info/title') %]'});
+--></script>
+[%+ END %]
+
+[% END # WRAPPER %]

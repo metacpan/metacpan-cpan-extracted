@@ -1,0 +1,8 @@
+#!/usr/bin/env perl -w
+use strict;
+use lib 'lib';
+
+use Math::Primality qw/ is_strong_pseudoprime /;
+my $n = shift;
+my $pp= is_strong_pseudoprime( $n );
+print "$n:$pp\n";

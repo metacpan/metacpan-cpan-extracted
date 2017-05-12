@@ -1,0 +1,32 @@
+Music::NeoRiemannianTonnetz - performs Neo-Riemann operations on set classes
+
+To install this module, use CPAN, for example:
+
+  cpanm Music::NeoRiemannianTonnetz
+
+For the source code, see:
+
+http://github.com/thrig/Music-NeoRiemannianTonnetz
+
+This can be built and installed by running:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Run perldoc(1) on Music::NeoRiemannianTonnetz for more documentation.
+
+DEPENDENCIES
+
+Some knowledge of music theory will likely benefit the user, for this module,
+in particular:
+
+https://en.wikipedia.org/wiki/Neo-Riemannian_theory
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013-2015 by Jeremy Mates
+
+This module is free software; you can redistribute it and/or modify it
+under the Artistic License (2.0).

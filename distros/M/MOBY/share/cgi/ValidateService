@@ -1,0 +1,253 @@
+#!/usr/bin/perl -w
+#-----------------------------------------------------------------
+# ValidateService
+# Author: Edward Kawas <edward.kawas@gmail.com>,
+# For copyright and disclaimer see below.
+#
+# $Id: ValidateService,v 1.1 2008/02/21 00:21:27 kawas Exp $
+#-----------------------------------------------------------------
+
+# this file contains the code that provides details regarding
+# 'ping' statistics
+use strict;
+use CGI qw/:standard/;
+use XML::LibXML;
+use MOBY::Config;
+
+
+#here we put path to the isAlive.xml created by the test script
+my $CONF  = MOBY::Config->new;
+my $PATH = $CONF->{mobycentral}->{service_tester_path} || '/tmp/';
+$PATH = $PATH . '/isAliveStats.xml';
+
+my $form = new CGI;
+use Data::Dumper;
+my %p = $form->Vars unless param('keywords');
+%p = ($form->param('keywords') => '') if param('keywords');
+
+if (defined $p{'service'} and defined $p{'authority'}) {
+	print $form->header('text/plain');
+	my $parser = XML::LibXML->new();
+	my $doc = $parser->parse_file($PATH);
+	do {
+		print "true";
+		return;
+	} unless $doc;
+	
+	do {
+		print "You forgot to specify either a service name or an authority. (x0003) Please try again.";
+		return;
+	} unless $p{'authority'} and $p{'service'};
+	my $value = "true";
+	my $id = $p{'authority'} . "," . $p{'service'};
+	my @nodelist = $doc->getElementsByTagName("service");
+	for my $node (@nodelist) {
+		next unless ($node->getAttribute( 'id' ) eq $id );
+		$value = $node->textContent;
+		last;
+	}
+	print "$value";
+} elsif (not exists $p{'service'} and exists $p{'authority'}) {
+	print $form->header('text/plain');
+	my $parser = XML::LibXML->new();
+	my $doc = $parser->parse_file($PATH);
+	do {
+		print "Statistics could not be obtained (x0001). Please try again soon.\n";
+		exit(0);
+	} unless $doc;
+	do {
+		print "You forgot to specify an authority! (x0002). Please try again.\n";
+		exit(0);
+	} unless $p{'authority'};
+	my $value = "true";
+	my $id = $p{'authority'};
+	my @nodelist = $doc->getElementsByTagName("authority");
+	print "Service Provider: $id\n";
+	for my $node (@nodelist) {
+		next unless ($node->getAttribute( 'id' ) eq $id );
+		my @services = $node->getElementsByTagName('service');
+		my $id_length = length($id)+1;
+		my @results = ();
+		for my $s (@services) {
+			my $name = $s->getAttribute('id');
+			next unless $name;
+			$name = substr($name, $id_length, length($name) );
+			$value = $s->textContent;
+			push @results, "\t$name,$value\n";
+		}
+		# case insensitive sort
+		# print sort{uc($a) cmp uc($b)}(@results);
+		# case sensitive sort
+		print sort(@results);
+		last;
+	}
+} elsif (exists $p{'getDeadServices'}) {
+	print $form->header('text/plain');
+	print DEAD_MSG();
+	my $parser = XML::LibXML->new();
+	my $doc = $parser->parse_file($PATH);
+	do {
+		print "Statistics could not be obtained (x0004). Please try again soon.\n";
+		exit(0);
+	} unless $doc;
+	my @nodelist = $doc->getElementsByTagName("authority");
+	my %hash = ();
+	for my $node (@nodelist) {
+		next unless $node->getAttribute( 'id' );
+		my $id = $node->getAttribute( 'id' );
+		my @services = $node->getElementsByTagName('service');
+		my $id_length = length($id)+1;
+		my @results = ();
+		my $value = '';
+		for my $s (@services) {
+			my $name = $s->getAttribute('id');
+			next unless $name;
+			$name = substr($name, $id_length, length($name) );
+			next unless $s->textContent eq 'false';
+			push @results, "\t\t$name\n";
+		}
+		# case insensitive sort
+		#$hash{$id} = sort{uc($a) cmp uc($b)}(@results);
+		# case sensitive sort
+		@results = sort(@results);
+		push @{$hash{$id}} , @results;
+	}
+	for my $key (sort keys %hash ) {
+		my @array = @{ $hash{$key} };
+		my $size = @array;
+		next unless $size > 0;
+		print "\t$key\n";
+		print sort{uc($a) cmp uc($b)}(@{$hash{$key}});
+		print "\n";
+	}
+} elsif (exists $p{'getStats'}) {
+	print $form->header('text/plain');
+	my $str = STAT_MSG();
+	my %providers = ();
+	my $alive_services = 0;
+	my $total = 0;
+	my $bad_providers = 0;
+	my $provider_count = 0;
+	my $parser = XML::LibXML->new();
+	my $doc = $parser->parse_file($PATH);
+	do {
+		print "Statistics could not be obtained (x0005). Please try again soon.\n";
+		exit(0);
+	} unless $doc;
+	my @nodelist = $doc->getElementsByTagName("authority");
+	for my $node (@nodelist) {
+		next unless $node->getAttribute( 'id' );
+		my $id = $node->getAttribute( 'id' );
+		$providers{$id} = undef;
+		my @services = $node->getElementsByTagName('service');
+		for my $s (@services) {
+			my $name = $s->getAttribute('id');
+			next unless $name;
+			my $value = $s->textContent;
+			$alive_services++ if $value eq 'true';
+			$providers{$id} = 1 if $value eq 'true';
+			$total++;
+		}
+	}
+	for my $key (keys %providers) {
+		$bad_providers++ unless $providers{$key};
+		$provider_count++;
+	}
+	
+	$str =~ s/\@providers\@/$provider_count/;
+	$str =~ s/\@bad_providers\@/$bad_providers/;
+	$str =~ s/\@services_alive\@/$alive_services/;
+	my $dead = $total - $alive_services;
+	$str =~ s/\@services_dead\@/$dead/;
+	$dead = ($alive_services / $total) * 100;
+	$dead = sprintf("%.2f", $dead);
+	$str =~ s/\@percent_alive\@/$dead/;
+	print $str;
+
+} else {
+	print $form->header('text/plain');
+	my $parser = XML::LibXML->new();
+	my $doc = $parser->parse_file($PATH);
+	do {
+		print "Statistics could not be obtained (x0005). Please try again soon.\n";
+		exit(0);
+	} unless $doc;
+	my @nodelist = $doc->getElementsByTagName("authority");
+	my %hash = ();
+	for my $node (@nodelist) {
+		next unless $node->getAttribute( 'id' );
+		my $id = $node->getAttribute( 'id' );
+		my @services = $node->getElementsByTagName('service');
+		my $id_length = length($id)+1;
+		my @results = ();
+		my $value = '';
+		for my $s (@services) {
+			my $name = $s->getAttribute('id');
+			next unless $name;
+			$name = substr($name, $id_length, length($name) );
+			my $value = $s->textContent;
+			push @results, "\t$name,$value\n";
+		}
+		# case insensitive sort
+		#$hash{$id} = sort{uc($a) cmp uc($b)}(@results);
+		# case sensitive sort
+		@results = sort(@results);
+		push @{$hash{$id}} , @results;
+	}
+	for my $key (sort keys %hash ) {
+		my @array = @{ $hash{$key} };
+		my $size = @array;
+		next unless $size > 0;
+		print "$key\n";
+		print sort{uc($a) cmp uc($b)}(@{$hash{$key}});
+		print "\n";
+	}
+}
+
+sub DEAD_MSG {
+
+my $msg =<<EOF;
+
+    The following are services, sorted by Service Provider, have been identified as "dead" by the MOBY Service Testing agent.
+      
+      A "dead" service is one that does not respond correctly to a MOBY "ping"; where a correct "ping" request/response is:
+      
+      REQUEST
+      
+            <MOBY>
+            	<mobyContent></mobyContent>
+            </MOBY>
+      
+      RESPONSE
+      
+            <MOBY>
+            	<mobyContent></mobyContent>
+            </MOBY>
+      
+      The status of all services is tested hourly, and is recorded in the 
+      LSID metadata for each service as a boolean value in the RDF tag
+       "isAlive", which may be used by client software to filter-out
+       non-functional services.
+
+
+
+EOF
+
+return $msg;
+}
+
+sub STAT_MSG {
+
+my $msg =<<EOF;
+
+   There are \@providers\@ service providers, with at least one registered service, registered with this registry.
+   	Of these service providers, there are \@bad_providers\@ that don't have at least one working service.
+   There are \@services_alive\@ services that are reachable in their current state.
+   There are \@services_dead\@ services that are not reachable.
+   
+   	That represents approximately \@percent_alive\@\% in terms of alive services.
+
+EOF
+
+return $msg;
+}

@@ -1,0 +1,6 @@
+0.002 31-10-2011
+  - Return undef for the case where we're asked to parse a string
+    consisting of purely whitespace
+0.001 16-02-2011
+  - Initial version abstracted from work code as I never want to
+    think about this again.

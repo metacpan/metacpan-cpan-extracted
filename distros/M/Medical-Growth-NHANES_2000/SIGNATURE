@@ -1,0 +1,73 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2d34311a4e5200a69c4ebfbaa407fb1e0453cf01 Build.PL
+SHA1 8d50227a5589fc11e2b52ddbe26ffa30aec41693 Changes
+SHA1 ed14ae6683003a478c3b585ebb7709c31e7e0f5d MANIFEST
+SHA1 9c08d884061918c221f3f2b357d82405ede9d0f4 META.json
+SHA1 61da3579f97f27661eca4548409df10f269983cd Makefile.PL
+SHA1 3fecb8d29b3a96f0b2a821b8db34bfe8c5951cba README
+SHA1 e0c14c91b38ca6c73513c3f7e1a354aec6dbb3a4 lib/Medical/Growth/NHANES_2000.pm
+SHA1 c2e8731c42fb683b2e21755e39a5bbb34ca91406 lib/Medical/Growth/NHANES_2000/BMI_for_Age/Child/Female.pm
+SHA1 c71ce4aa426b1d83060ec1c6a30dc9cd62aee77a lib/Medical/Growth/NHANES_2000/BMI_for_Age/Child/Male.pm
+SHA1 f246dacdf44c868cd70efa1be3c6df3314f773d7 lib/Medical/Growth/NHANES_2000/Base.pm
+SHA1 36515c9e190321d39f417e416df9d0c4adbd452e lib/Medical/Growth/NHANES_2000/HC_for_Age/Infant/Female.pm
+SHA1 0f7e868753fdf13e6b0fb68791b761418020fbb3 lib/Medical/Growth/NHANES_2000/HC_for_Age/Infant/Male.pm
+SHA1 297553e574bba1eb5697a6de65415fa88b2d37cb lib/Medical/Growth/NHANES_2000/Height_for_Age/Child/Female.pm
+SHA1 c7f019f3cc08eb508b0126d902f713665d3b10e7 lib/Medical/Growth/NHANES_2000/Height_for_Age/Child/Male.pm
+SHA1 b62467c7f8fce96dc9938d6c755bdf68b229e829 lib/Medical/Growth/NHANES_2000/Length_for_Age/Infant/Female.pm
+SHA1 1252c6db44a53a7f75f1b512c4470197b33f6331 lib/Medical/Growth/NHANES_2000/Length_for_Age/Infant/Male.pm
+SHA1 1c998eabd8a2d6fef017f2579e1def2393c3bed9 lib/Medical/Growth/NHANES_2000/Weight_for_Age/Child/Female.pm
+SHA1 6241506112fbf42f41bc7f173a485eafd6009cf5 lib/Medical/Growth/NHANES_2000/Weight_for_Age/Child/Male.pm
+SHA1 83c75d89dd07273e95fad74fc7035268e13cb741 lib/Medical/Growth/NHANES_2000/Weight_for_Age/Infant/Female.pm
+SHA1 debeb4f3b8f40bcfe89b3b8617722dfc4de697e1 lib/Medical/Growth/NHANES_2000/Weight_for_Age/Infant/Male.pm
+SHA1 c029ee17e7d90f64e7fde34b00afc56ba79fca2e lib/Medical/Growth/NHANES_2000/Weight_for_Height/Child/Female.pm
+SHA1 5920c384bb97b1d9d5bbe5b4a61996a6a2d24c96 lib/Medical/Growth/NHANES_2000/Weight_for_Height/Child/Male.pm
+SHA1 89f92fc8f283d6d4eac835e66066c21d8694b5f9 lib/Medical/Growth/NHANES_2000/Weight_for_Length/Infant/Female.pm
+SHA1 c76b926536a829c94231bf61b0052115b9a830d6 lib/Medical/Growth/NHANES_2000/Weight_for_Length/Infant/Male.pm
+SHA1 ed63c36710d967d6a8945e54c6061d641e3be800 t/core_measure_class.t
+SHA1 9874dde7716493caf39d5f226db374d144b83e94 t/lib/My_Growth_Test.pm
+SHA1 c4289579847901c0a5a2f7e74c0e9ba53d77ca80 t/lib/My_Test_Base.pm
+SHA1 72303312a08629706a2f96066b8f76efb959b2ee t/measure_base.t
+SHA1 49a7879686a6d2812c7f35b71e5d767a9301d99a t/measure_bmi_age_child_female.t
+SHA1 6ba66d34eeb3daaf020314d2f57264cfb23b5607 t/measure_bmi_age_child_male.t
+SHA1 0c710bd6475e0137979a2c4e62d392933082785c t/measure_hc_age_infant_female.t
+SHA1 c3428075989989521732e36037e74a34fe364640 t/measure_hc_age_infant_male.t
+SHA1 c88f8ff2e1f1f1e214582c67b8e7475a726ea9c3 t/measure_height_age_child_female.t
+SHA1 c0cbe4cdd02b51f7640ead3d38d96d2aa9877acc t/measure_height_age_child_male.t
+SHA1 88ddd134cb9d62f70d433bf3cb2ec4e2f112883f t/measure_length_age_infant_female.t
+SHA1 77c199b8a58453d459408a943c4aa86c93d66a5b t/measure_length_age_infant_male.t
+SHA1 e7d388bc9cea95eaba78eb8e4dc23f9c10221d53 t/measure_weight_age_child_female.t
+SHA1 11772148f744371d8d745e665ac2136162292c44 t/measure_weight_age_child_male.t
+SHA1 80c6cc312d6ebeddcccf8763bc8ed3a296bba833 t/measure_weight_age_infant_female.t
+SHA1 fc23e7cb99e12b15f1e050a5a364d1ab639aaf7b t/measure_weight_age_infant_male.t
+SHA1 d0982506abc2928b8f887ae17110ec73f74028c7 t/measure_weight_height_child_female.t
+SHA1 b69ca53b7fc7b83c2a0391d625d0b396a417ae5c t/measure_weight_height_child_male.t
+SHA1 a25ca18fc72f11556fdf6a9c2b8098d6f25e8e19 t/measure_weight_length_infant_female.t
+SHA1 e8583ed2291c57305095ba3e355f7147de90f1db t/measure_weight_length_infant_male.t
+SHA1 ca37d7b91c2299a98877a6f36d3fab51e8dd906f t/release-pod-coverage.t
+SHA1 e7fc4d8f3f29ee522cb53914648393524fc7a6d4 t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJUWY4qAAoJEFXmkwhreRSJO2IH/2jK50TrwW5Aqu543wxYb1q6
+9dp3UzTRAVfFhxeknakSNDgY1nYn88fwv2XfwJ1ff31GE0LoQg8XjS1745FE7CAM
+r7A+LdKMA4/epojG9O4OSkTd/wbXDPGY+bYV2NR23RYYoDckYG8PYsEDOyTqla7T
+sbzYEpJ0YY4Uob6mA5D79kxhVdQaAvEFsVMqmojNvQw8zU8Iqvu599Y69KXlS7RH
+Q8lX2IaqwnY7BekUPH/ljvSq2X2rpVQFXsybsdbbGSplxyKa6N8hXsC2+Te3o/DY
+eCWkBdlVIjC8aP8OIytRaWN7Gq5QQJBP5L7g0UoWDG40Depd7Y47pulQdfZvH5s=
+=vcI7
+-----END PGP SIGNATURE-----

@@ -1,0 +1,18 @@
+Revision history for MojoX-UserAgent-Throttler
+
+v1.0.2  2017-02-22 06:51:27 EET
+	- Require Mojolicious-7.13.
+
+v1.0.1  2016-03-01 01:03:06 EET
+	- Require Mojolicious-6.40.
+
+v1.0.0  2016-02-18 01:06:17 EET
+	- Switch to Dist::Milla.
+	- Fix compatibility with Mojolicious-6.43.
+	- Fix tests portability.
+
+0.1.1   2014-12-10 10:28:09 EET
+	- Fix typo in doc.
+
+0.1.0	2014-12-10 09:48:05 EET
+	- Initial release.

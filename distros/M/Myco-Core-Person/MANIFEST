@@ -1,0 +1,7 @@
+README
+MANIFEST
+Changes
+Makefile.PL
+lib/Myco/Core/Person.pm
+t/person.t
+META.yml                                 Module meta-data (added by MakeMaker)

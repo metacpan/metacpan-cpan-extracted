@@ -1,0 +1,30 @@
+---
+abstract: "Use and handle any data like a database source in test mode"
+author:
+  - 'Alexander Ponomarev <shootnix@cpan.org>'
+build_requires:
+  DBD::AnyData: 0
+  English: 0
+  Module::Build: 0.38
+  Mojolicious::Lite: 0
+  Test::Mojo: 0
+  Test::More: 0
+  Try::Tiny: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-AnyData
+requires:
+  DBI: 0
+  DBD::AnyData: 0
+  Mojo::Base: 0
+resources:
+  bugtracker: https://github.com/shootnix/Mojolicious-Plugin-AnyData/issues
+  repository: git://github.com/shootnix/Mojolicious-Plugin-AnyData.git
+version: 1.20

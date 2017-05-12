@@ -1,0 +1,17 @@
+Please consult the README to check that you have the necessary
+prerequisites.
+
+You install Mail::Field::Received, as you would install any perl
+module library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of Mail::Field::Received in your
+home directory, then you should try to produce the initial Makefile
+with something like this command:
+
+   perl Makefile.PL LIB=~/perl
+

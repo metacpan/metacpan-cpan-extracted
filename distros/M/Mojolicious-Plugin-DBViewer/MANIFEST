@@ -1,0 +1,40 @@
+Changes
+lib/Mojolicious/Plugin/DBViewer.pm
+lib/Mojolicious/Plugin/DBViewer/Command.pm
+lib/Mojolicious/Plugin/DBViewer/MySQL.pm
+lib/Mojolicious/Plugin/DBViewer/MySQL/Command.pm
+lib/Mojolicious/Plugin/DBViewer/public/css/bootstrap-responsive.css
+lib/Mojolicious/Plugin/DBViewer/public/css/bootstrap.css
+lib/Mojolicious/Plugin/DBViewer/public/img/glyphicons-halflings-white.png
+lib/Mojolicious/Plugin/DBViewer/public/img/glyphicons-halflings.png
+lib/Mojolicious/Plugin/DBViewer/public/js/bootstrap.js
+lib/Mojolicious/Plugin/DBViewer/public/js/jquery-1.9.1.js
+lib/Mojolicious/Plugin/DBViewer/SQLite/Command.pm
+lib/Mojolicious/Plugin/DBViewer/templates/dbviewer/auto/charsets.html.ep
+lib/Mojolicious/Plugin/DBViewer/templates/dbviewer/auto/create-tables.html.ep
+lib/Mojolicious/Plugin/DBViewer/templates/dbviewer/auto/database-engines.html.ep
+lib/Mojolicious/Plugin/DBViewer/templates/dbviewer/auto/index.html.ep
+lib/Mojolicious/Plugin/DBViewer/templates/dbviewer/auto/null-allowed-columns.html.ep
+lib/Mojolicious/Plugin/DBViewer/templates/dbviewer/auto/primary-keys.html.ep
+lib/Mojolicious/Plugin/DBViewer/templates/dbviewer/auto/select-statements.html.ep
+lib/Mojolicious/Plugin/DBViewer/templates/dbviewer/auto/select.html.ep
+lib/Mojolicious/Plugin/DBViewer/templates/dbviewer/auto/table.html.ep
+lib/Mojolicious/Plugin/DBViewer/templates/dbviewer/auto/tables.html.ep
+lib/Mojolicious/Plugin/DBViewer/templates/dbviewer/navi.html.ep
+lib/Mojolicious/Plugin/DBViewer/templates/layouts/dbviewer_common.html.ep
+Makefile.PL
+MANIFEST			This list of files
+MYMETA.json
+MYMETA.yml
+README
+t/common-basic.t
+t/load.t
+t/mysql-basic.t
+t/mysql-only.t
+t/mysql-test-empty-prefix.pl
+t/mysql-test.pl
+t/sqlite-basic.t
+t/sqlite-only.t
+t/sqlite-test.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

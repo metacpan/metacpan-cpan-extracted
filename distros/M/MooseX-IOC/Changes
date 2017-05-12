@@ -1,0 +1,14 @@
+Revision history for Perl extension MooseX-IOC
+
+0.03 Monday, Jun 29, 2009
+    - fixing a warning from newer Mooses
+    - removed pod-coverage.t
+
+0.02 Monday, July 9, 2007
+    - now allows the use of a 'default' as well
+      as a 'service' option (thanks nuffin)
+      - added tests for this
+
+0.01 Wed, May 9th 2007
+    - scratching an itch, making IOC easier to
+      use for Moose classes

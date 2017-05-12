@@ -1,0 +1,19 @@
+=head1 NAME
+
+aaaaaaa
+
+=head1 DESCRIPTION
+
+This text contains a node X<aaa>aaa and a link to
+a node L<b/bbb>.
+
+=over 4
+
+=item aaa
+
+was?X<was>
+
+=back
+
+X<blub>
+

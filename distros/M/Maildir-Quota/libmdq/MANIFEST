@@ -1,0 +1,13 @@
+COPYING.LIB
+Makefile.in
+NEWS
+README
+VERSION
+config.h.in
+configure
+configure.in
+install-sh
+make-dist
+mdq.3
+mdq.c
+mdq.h.in

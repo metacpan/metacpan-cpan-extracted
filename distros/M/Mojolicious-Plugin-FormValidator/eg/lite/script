@@ -1,0 +1,61 @@
+#!/opt/perl
+
+use Mojolicious::Lite;
+
+plugin 'FormValidator';
+
+my $profiles = {
+    "/" => {
+        required => [qw(username)],
+        optional => [qw(email)],
+
+        field_filters => {
+            username => ['trim', 'lc'],
+        },
+
+        constraint_methods => {
+            username => Data::FormValidator::Constraints::FV_length_between(4, 32),
+            email => Data::FormValidator::Constraints::email(),
+        },
+    },
+};
+
+get "/" => (dfv_verify => $profiles->{"/"}) => sub {
+    my $self = shift;
+
+    $self->render("index");
+};
+
+get "/unchecked" => sub {
+    my $self = shift;
+
+    $self->stash(username => $self->param("username") // "");
+    $self->stash(email => $self->param("email") // "");
+
+    $self->render("unchecked");
+};
+
+app->start;
+
+__DATA__
+
+@@ index.html.ep
+<!DOCTYPE html> 
+<html> 
+<body>
+    <form> 
+        <%== _dfv_error('username') ? "<font color=red>Username</font>" : "Username" %>: <input type=text name=username value="<%= $username %>"> <br />
+        <%== _dfv_error('email') ? "<font color=red>Email</font>" : "Email" %>: <input type=text name=email value="<%= $email %>"> <br />
+        <input type=submit>
+    </form>
+</body>
+</html>
+
+@@ unchecked.html.ep
+<!DOCTYPE html> 
+<html> 
+<body>
+    Username: <%= $username %> <br />
+    Email: <%= $email %> <br />
+</body>
+</html>

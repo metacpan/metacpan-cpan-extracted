@@ -1,0 +1,11 @@
+Changes
+lib/Mail/Message/Attachment/Stripper.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/01.t
+t/Mail/attached
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

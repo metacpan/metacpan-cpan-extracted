@@ -1,0 +1,46 @@
+=encoding utf8
+
+Доброго всем
+
+=head1 Mojolicious::Plugin::Helper::Vars
+
+¡ ¡ ¡ ALL GLORY TO GLORIA ! ! !
+
+=head1 NAME
+
+Mojolicious::Plugin::Helper::Vars - Stash & every_params to one var named.
+
+=head1 SINOPSYS
+
+    $app->plugin('Helper::Vars');
+    
+    # controller
+    $c->param('foo'=>[1,2,3]);
+    $foo = $c->vars('foo'); # 1
+    
+    $c->stash('foo'=>['undef']);
+    $c->stash('Foo'=>5);
+    @foo = $c->vars('foo', 'Foo'); # (1,2,3,undef,5)
+    
+    
+
+
+=head1 OPTIONS
+
+=over 4
+
+=item * B<helper>
+
+Name of the helper. Default - 'vars'.
+
+Возвращает объединенный список stash & every_param и в скалярном контексте первое из определенных. String value 'undef' convert to undef.
+
+=back
+
+=head1 SEE ALSO
+
+L<Mojolicious::Plugin::ParamExpand>
+
+=head1 AUTHOR
+
+Михаил Че (Mikhail Che), C<< <mche [on] cpan.org> >>

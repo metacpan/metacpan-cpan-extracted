@@ -1,0 +1,10 @@
+Unknown option: man
+Usage:
+    basic.pl [OPTIONS]
+
+Options:
+     --help -? --usage - Bool. Display the usage message and exit
+     --verbose         - Bool. Say lots about what we do
+     --greet           - Str. Default=World. Who to say hello to.
+     --language        - Str. Default=en. Language to greet in.
+

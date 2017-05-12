@@ -1,0 +1,18 @@
+Build.PL
+Changes
+examples/simple.pl
+lib/Mojolicious/Plugin/Humane.pm
+lib/Mojolicious/Plugin/Humane/files/humane-3.2.0/bigbox.css
+lib/Mojolicious/Plugin/Humane/files/humane-3.2.0/boldlight.css
+lib/Mojolicious/Plugin/Humane/files/humane-3.2.0/flatty.css
+lib/Mojolicious/Plugin/Humane/files/humane-3.2.0/humane.min.js
+lib/Mojolicious/Plugin/Humane/files/humane-3.2.0/jackedup.css
+lib/Mojolicious/Plugin/Humane/files/humane-3.2.0/libnotify.css
+lib/Mojolicious/Plugin/Humane/files/humane-3.2.0/original.css
+lib/Mojolicious/Plugin/Humane/files/humane-3.2.0/readme.md
+MANIFEST			This list of files
+META.json
+META.yml
+README.pod
+t/basic.t
+t/noauto.t

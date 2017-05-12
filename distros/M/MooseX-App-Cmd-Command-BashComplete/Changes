@@ -1,0 +1,13 @@
+0.04
+    - Broken META.yml in 0.03
+
+0.03
+    - Added prefix to generated shell functions to support more
+      MooseX::App:Cmd bins
+
+0.02
+    - Fix broken test due to new MooseX::App::Cmd release
+
+0.01
+    - First version.
+

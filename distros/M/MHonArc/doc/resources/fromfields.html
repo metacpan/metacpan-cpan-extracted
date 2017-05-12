@@ -1,0 +1,135 @@
+<html>
+<head>
+<title>MHonArc Resources: FROMFIELDS</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="force.html">FORCE</a>]</td><td><nobr>[<a href="../resources.html#fromfields">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="genidx.html">GENIDX</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>FROMFIELDS</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p>
+<code>M2H_FROMFIELDS=</code><var>field1</var><code>:</code><var
+>field2</var><code>:</code><var>...</var><code>:</code><var
+>fieldN</var>
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p>
+<code>&lt;FROMFIELDS&gt;</code><br>
+<var>field1</var><code>:</code><var
+>field2</var><code>:</code><var>...</var><code>:</code><var
+>fieldN</var><br>
+<code>&lt;/FROMFIELDS&gt;</code><br>
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p>
+<code>-fromfields </code><var>field1</var><code>:</code><var
+>field2</var><code>:</code><var>...</var><code>:</code><var
+>fieldN</var>
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>FROMFIELDS specify the message header fields MHonArc will search to
+determine who the author of a message is (which determines the
+value of the <b>$FROM*$</b> resource variables).
+Each field will be checked in the ordered specified.
+</p>
+<p>The value of the FROMFIELDS is a colon separated
+list of message header fields to check.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<pre>
+from:mail-reply-to:reply-to:return-path:apparently-from:sender:resent-sender
+</pre>
+
+<p>This resource is intended to reflect who the author is and not necessarily
+where replies of the message should be directed.  This is why the
+<tt>From: </tt> field has higher precendence than the reply-to fields.
+However, if it is desired that it reflect where replies should be
+directed, then put <tt>mail-reply-to</tt> and <tt>reply-to</tt> first.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>None.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>2.1.2
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p><a href="datefields.html">DATEFIELDS</a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="force.html">FORCE</a>]</td><td><nobr>[<a href="../resources.html#fromfields">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="genidx.html">GENIDX</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2003/10/06 22:04:17 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"
+><strong>MHonArc</strong></a><br>
+Copyright &#169; 1998-1999, <a href="http://www.earlhood.com/"
+>Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org"
+>mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

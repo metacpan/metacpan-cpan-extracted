@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Module-AutoINC.t
+lib/Module/AutoINC.pm

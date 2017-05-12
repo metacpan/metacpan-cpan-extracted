@@ -1,0 +1,10 @@
+use blib;
+use Markup::Perl;
+<html>
+<body>
+<h1><perl>src('t/src2.xml')</perl></h1>
+<perl>my $foo = "FOO"; our $bar = "bar";</perl>
+<h2><perl>src('t/src2.xml')</perl></h2>
+<h3><perl>print $foo.$bar</perl></h3>
+</body>
+</html>

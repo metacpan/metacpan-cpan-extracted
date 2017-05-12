@@ -1,0 +1,175 @@
+
+# PODNAME: Map::Metro::Plugin::Map::Athens::Lines
+# ABSTRACT: Lines and stations in the Athens map
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Map::Metro::Plugin::Map::Athens::Lines - Lines and stations in the Athens map
+
+=head1 VERSION
+
+Version 0.1102, released 2016-01-27.
+
+=head1 LINES
+
+=head2 Metro 1: Kifisia → Piraeus [M1]
+
+=for HTML <div style="background-color: #00853f; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Kifisia
+    KAT
+    Marousi
+    Nerantziotissa     (P2)
+    Eirini
+    Irakleio
+    Nea Ionia
+    Pefkakia
+    Perissos
+    Ano Patisia
+    Agios Eleftherios
+    Kato Patisia
+    Agios Nikolaos
+    Attiki             (M2)
+    Victoria
+    Omonia             (M2)
+    Monastiraki        (M3)
+    Thiseio
+    Petralona
+    Tavros
+    Kallithea
+    Moschato
+    Faliro
+    Piraeus            (P1)
+
+=head2 Metro 2: Anthoupoli → Elliniko [M2]
+
+=for HTML <div style="background-color: #ee3124; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Anthoupoli
+    Peristeri
+    Agios Antonios
+    Sepolia
+    Attiki           (M1)
+    Larissa Station  (P1)
+    Metaxourghio
+    Omonia           (M1)
+    Panepistimio
+    Syntagma         (M3)
+    Akropoli
+    Syngrou Fix
+    Neos Kosmos
+    Agios Ioannis
+    Dafni
+    Agios Dimitrios
+    Ilioupoli
+    Alimos
+    Argyroupoli
+    Elliniko
+
+=head2 Metro 3: Agia Marina → Athens International Airport [M3]
+
+=for HTML <div style="background-color: #0093d0; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Agia Marina
+    Egaleo
+    Eleonas
+    Kerameikos
+    Monastiraki                   (M1)
+    Syntagma                      (M2)
+    Evangelismos
+    Megaro Moussikis
+    Ambelokipi
+    Panormou
+    Katehaki
+    Ethniki Amyna
+    Holargos
+    Nomismatokopio
+    Agia Paraskevi
+    Chalandri
+    Doukissis Plakentias          (P2)
+    Pallini                       (P2)
+    Paiania-Kantza                (P2)
+    Koropi                        (P2)
+    Athens International Airport  (P2)
+
+=head2 Proastiakos 1: Kiato → Piraeus [P1]
+
+=for HTML <div style="background-color: #0069aa; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Kiato
+    Zevgolatio
+    Corinth
+    Kineta
+    Megara
+    Agioi Theodoroi
+    Nea Peramos
+    Magoula
+    Aspropyrgos
+    Ano Liosia       (P2)
+    Agioi Anargyroi
+    Larissa Station  (M2)
+    Rentis
+    Lefka
+    Piraeus          (M1)
+
+=head2 Proastiakos 2: Ano Liosia → Athens International Airport [P2]
+
+=for HTML <div style="background-color: #fdb913; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Ano Liosia                    (P1)
+    Acharnai Railway Center
+    Metamorfosi
+    Irakleio P
+    Nerantziotissa                (M1)
+    Kifisias
+    Pentelis
+    Doukissis Plakentias          (M3)
+    Pallini                       (M3)
+    Paiania-Kantza                (M3)
+    Koropi                        (M3)
+    Athens International Airport  (M3)
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Map::Metro::Plugin::Map::Athens>
+
+=item *
+
+L<Task::MapMetro::Maps>
+
+=item *
+
+L<Map::Metro>
+
+=back
+
+=head1 SOURCE
+
+L<https://github.com/Csson/p5-Map-Metro-Athens>
+
+=head1 HOMEPAGE
+
+L<https://metacpan.org/release/Map-Metro-Plugin-Map-Athens>
+
+=head1 AUTHOR
+
+Erik Carlsson <info@code301.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Erik Carlsson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

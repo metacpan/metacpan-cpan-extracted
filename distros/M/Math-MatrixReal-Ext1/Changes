@@ -1,0 +1,34 @@
+Revision history for Perl extension Math::MatrixReal::Ext1.
+0.07 Sat Aug 13 21:28:15 EDT 2005
+    
+    - Noticed some tabs in various places and removed them.  
+      Eww!  Tabs!  
+
+0.06 Sat Aug 13 15:24:49 EDT 2005
+
+    - merged new_from_cols and new_from_rows into one private
+      function which is called by wrappers
+
+    - added tests to exercise all of the known failure modes
+
+    - added new_from_columns() alias for new_from_cols() just to
+      save some poor person the grief
+
+    - changed CHANGES file to be latest changes first
+
+0.05 Mon Aug  8 19:33:16 EDT 2005
+
+    - Using ->isa check to see if what's being passed in is a 
+      Math::MatrixReal thing, rather than requiring than looking
+      at ref($foo) and seeing if it matches /^Math::MatrixReal/
+
+    - Some other minor style updates
+
+0.04 Fri Mar 23 20:23:47 EST 2001
+    - incorporated interface changes as per suggestion 
+      in a comp.lang.perl.modules post
+    - updated documentation and test script accordingly
+    - this breaks any old code (all two scripts)
+
+0.01  Thu Jan 25 14:37:31 2001
+    - original version; created by h2xs 1.19

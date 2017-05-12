@@ -1,0 +1,26 @@
+
+Revision history for Perl module Mutex.
+
+1.004 Fri Apr 28 16:00:00 EST 2017
+
+  * Fixed Mutex::Flock, tmp_file missing script name in path.
+
+1.003 Wed Apr 05 01:30:00 EST 2017
+
+  * Updated Mutex to not croak when running Perl in taint mode via perl -T.
+    Failing -T was Mutex::Util.
+
+1.002 Fri Mar 31 11:00:00 EST 2017
+
+  * Check for EINTR during sysread and syswrite.
+  * Removed unused _sock_ready from Mutex::Util.
+  * Updated documentation.
+
+1.001 Fri Mar 24 03:00:00 EST 2017
+
+  * Applied corrections to documentation.
+
+1.000 Fri Mar 24 02:00:00 EST 2017
+
+  * First release.
+

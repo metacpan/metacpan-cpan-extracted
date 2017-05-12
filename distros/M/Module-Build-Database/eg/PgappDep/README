@@ -1,0 +1,3 @@
+This example contains two MBD dists, PgappA and PgappB each manage a schema in the same
+PostgreSQL database, where PgappA has tables thare are accessed as views in PgappB's
+schema.

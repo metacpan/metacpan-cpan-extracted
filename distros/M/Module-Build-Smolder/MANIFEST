@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Module/Build/Smolder.pm
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/01-tap-archive.t
+t/02-validation.t
+t/fake_tests/fail.t
+t/fake_tests/pass.t
+xt/pod-coverage.t
+xt/pod.t

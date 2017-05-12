@@ -1,0 +1,1002 @@
+#!/usr/bin/perl
+
+# <UPDATE> - You may need to comment the next line out or change it to where
+#            you have the Monotone::AutomateStdio library installed.
+
+use lib "<Location Of Monotone::AutomateStdio>";
+
+use strict;
+use warnings;
+
+use Carp qw(cluck);
+use File::Basename;
+use POSIX qw(strftime);
+use Storable;
+use Data::Dumper;
+use GDBM_File;
+use IO::File;
+use IO::Handle;
+use Monotone::AutomateStdio qw(:capabilities :severities :streams);
+use Data::Dumper;
+
+use constant RAW         => 0;
+use constant LIST        => 1;
+use constant RECORD_LIST => 2;
+use constant RECORD      => 3;
+use constant CODE        => 4;
+use constant VARIABLE    => 5;
+
+# <UPDATE> - Enter your key id in the line below.
+
+my $key_id = '<Key Id>';
+
+my ($data,
+    %hash,
+    $last_error_message,
+    @list,
+    $mtn);
+
+my @test_list =
+    ({fn   => \&Monotone::AutomateStdio::ancestors,
+      desc => "ancestors",
+      type => LIST,
+      args => ["f06e40cb1d2b4f5c0db387e7a6c37681f1f89294",
+               "b8e6b77245cf29caa1f69bfb13749d785b13eac7"]},
+
+     {fn   => \&Monotone::AutomateStdio::ancestry_difference,
+      desc => "ancestry_difference",
+      type => LIST,
+      args => ["f06e40cb1d2b4f5c0db387e7a6c37681f1f89294",
+               "b8e6b77245cf29caa1f69bfb13749d785b13eac7"]},
+
+     {fn   => \&Monotone::AutomateStdio::branches,
+      desc => "branches",
+      type => LIST,
+      args => []},
+
+     {fn   => undef,
+      desc => "cert",
+      type => CODE,
+      code => sub {
+                  $mtn->cert("f06e40cb1d2b4f5c0db387e7a6c37681f1f89294",
+                             "daleks",
+                             "exterminate!");
+                  printf("Added the daleks cert\n");
+              }},
+
+     {fn   => \&Monotone::AutomateStdio::certs,
+      desc => "certs",
+      type => RECORD_LIST,
+      args => ["f06e40cb1d2b4f5c0db387e7a6c37681f1f89294"]},
+
+     {fn   => undef,
+      desc => "checkout",
+      feat => MTN_CHECKOUT,
+      type => CODE,
+      code => sub {
+                  my ($p_buffer,
+                      $pfh,
+                      $t_buffer,
+                      $tfh);
+                  $p_buffer = $t_buffer = "";
+                  open($pfh, ">", \$p_buffer);
+                  open($tfh, ">", \$t_buffer);
+                  $mtn->register_stream_handle(MTN_P_STREAM, $pfh);
+                  $mtn->register_stream_handle(MTN_T_STREAM, $tfh);
+                  $mtn->checkout(["branch" => "net.venge.monotone"],
+                                 "../MTN-TESTER-WS");
+                  $mtn->register_stream_handle(MTN_P_STREAM, undef);
+                  $mtn->register_stream_handle(MTN_T_STREAM, undef);
+                  $pfh->close();
+                  $tfh->close();
+                  $mtn->closedown();
+                  print(" ----- Output of checkout progress stream -----\n");
+                  print($p_buffer);
+                  print("\n ----------\n");
+                  print(" ----- Output of checkout ticker stream -----\n");
+                  print($t_buffer);
+                  print("\n ----------\n");
+                  system("ls -1 ../MTN-TESTER-WS");
+                  system("/bin/rm -rf ../MTN-TESTER-WS");
+              }},
+
+     {fn   => \&Monotone::AutomateStdio::children,
+      desc => "children",
+      type => LIST,
+      args => ["95c9125530ea297d244b522426997942635d3891"]},
+
+     {fn   => \&Monotone::AutomateStdio::common_ancestors,
+      desc => "common_ancestors",
+      type => LIST,
+      args => ["f06e40cb1d2b4f5c0db387e7a6c37681f1f89294",
+               "b8e6b77245cf29caa1f69bfb13749d785b13eac7"]},
+
+     {fn   => \&Monotone::AutomateStdio::content_diff,
+      desc => "content_diff (revision)",
+      type => RAW,
+      args => [[],
+               "9b264ec9247ce99cd1fdc5293e869c1a60b01c4c",
+               "f06e40cb1d2b4f5c0db387e7a6c37681f1f89294"]},
+
+     {fn   => \&Monotone::AutomateStdio::content_diff,
+      desc => "content_diff (file)",
+      type => RAW,
+      args => [[],
+               "9b264ec9247ce99cd1fdc5293e869c1a60b01c4c",
+               "f06e40cb1d2b4f5c0db387e7a6c37681f1f89294",
+               "Makefile.am"]},
+
+     {fn   => \&Monotone::AutomateStdio::content_diff,
+      desc => "content_diff (file - options excluding options.cc)",
+      type => RAW,
+      args => [[exclude => "options.cc"],
+               "9b264ec9247ce99cd1fdc5293e869c1a60b01c4c",
+               "f06e40cb1d2b4f5c0db387e7a6c37681f1f89294"]},
+
+     {fn   => \&Monotone::AutomateStdio::content_diff,
+      desc => "content_diff (file - options excluding options.cc)",
+      feat => MTN_CONTENT_DIFF_EXTRA_OPTIONS,
+      type => RAW,
+      args => [[exclude => "options.cc",
+                "with-header"],
+               "9b264ec9247ce99cd1fdc5293e869c1a60b01c4c",
+               "f06e40cb1d2b4f5c0db387e7a6c37681f1f89294"]},
+
+     {fn   => \&Monotone::AutomateStdio::db_get,
+      desc => "db_get",
+      feat => MTN_DB_GET,
+      type => CODE,
+      code => sub {
+                  my $value;
+                  print("Adding database default-server variable.\n");
+                  $mtn->db_set("database", "default-server", "www.test.com");
+                  $mtn->db_get(\$value, "database", "default-server");
+                  printf("database default-server = `%s'\n", $value);
+              }},
+
+     {fn   => \&Monotone::AutomateStdio::descendents,
+      desc => "descendents",
+      type => LIST,
+      args => ["95c9125530ea297d244b522426997942635d3891"]},
+
+     {fn   => \&Monotone::AutomateStdio::drop_attribute,
+      desc => "drop_attribute",
+      feat => MTN_DROP_ATTRIBUTE,
+      type => CODE,
+      code => sub {
+                  $mtn->drop_attribute("contrib/dtrace2calltree.py",
+                                       "mtn:execute");
+                  $mtn->drop_attribute("contrib/colorize");
+                  print("Dropped attributes on contrib/dtrace2calltree.py and "
+                        . "contrib/colorize\n");
+              }},
+
+     {fn   => \&Monotone::AutomateStdio::drop_db_variables,
+      desc => "drop_db_variables",
+      feat => MTN_DROP_DB_VARIABLES,
+      type => CODE,
+      code => sub {
+                  print("Adding test variables.\n");
+                  $mtn->set_db_variable("test-vars", "var1", "hello");
+                  $mtn->set_db_variable("test-vars", "var2", "good bye");
+                  $mtn->set_db_variable("TST-vars",
+                                        "greeting",
+                                        "good day");
+                  system("mtn ls vars");
+                  print("Removing all TST-vars variables and "
+                        . "test-vars:var1.\n");
+                  $mtn->drop_db_variables("TST-vars");
+                  $mtn->drop_db_variables("test-vars", "var1");
+                  system("mtn ls vars");
+                  print("Removing all test-vars variables.\n");
+                  $mtn->drop_db_variables("test-vars");
+                  system("mtn ls vars");
+              }},
+
+     {fn   => \&Monotone::AutomateStdio::erase_ancestors,
+      desc => "erase_ancestors",
+      type => LIST,
+      args => ["05cb265ad778107218701fa76a91bdf4770b85a8",
+               "110816e646d42ca45e8205778255cece9c8f2159",
+               "95c9125530ea297d244b522426997942635d3891"]},
+
+     {fn   => \&Monotone::AutomateStdio::erase_descendants,
+      desc => "erase_descendants",
+      feat => MTN_ERASE_DESCENDANTS,
+      type => LIST,
+      args => ["b9a5862a8ba577538f27c69656d8a6bb60ecb777",
+               "5fee1e9c463d3cd7439bea9c483d9d88d0b057d5",
+               "ee9d2b736adc24fb9a5926f68304814e93ee8726"]},
+
+     {fn   => \&Monotone::AutomateStdio::file_merge,
+      desc => "file_merge (on a mergeable conflict)",
+      feat => MTN_FILE_MERGE,
+      type => RAW,
+      args => ["05cb265ad778107218701fa76a91bdf4770b85a8",
+               "Makefile.am",
+               "110816e646d42ca45e8205778255cece9c8f2159",
+               "Makefile.am"]},
+
+     {fn   => \&Monotone::AutomateStdio::file_merge,
+      desc => "file_merge (on an unmergeable conflict)",
+      feat => MTN_FILE_MERGE,
+      type => RAW,
+      args => ["5fee1e9c463d3cd7439bea9c483d9d88d0b057d5",
+               "ui.cc",
+               "b9a5862a8ba577538f27c69656d8a6bb60ecb777",
+               "ui.cc"]},
+
+     {fn   => \&Monotone::AutomateStdio::generate_key,
+      desc => "generate_key",
+      type => RECORD,
+      args => ["pooh.bear_XxX_1234\@test-id.com",
+               "little brain"]},
+
+     {fn   => \&Monotone::AutomateStdio::get_attributes,
+      desc => "get_attributes (on a file that has none)",
+      type => RECORD_LIST,
+      args => ["NEWS"]},
+
+     {fn   => \&Monotone::AutomateStdio::get_attributes,
+      desc => "get_attributes (on a file that now has none)",
+      type => RECORD_LIST,
+      args => ["contrib/dtrace2calltree.py"]},
+
+     {fn   => \&Monotone::AutomateStdio::get_attributes,
+      desc => "get_attributes (on a file that has a few)",
+      feat => MTN_DROP_DB_VARIABLES,
+      type => RECORD_LIST,
+      args => ["snowdonia.xcf"]},
+
+     {fn   => \&Monotone::AutomateStdio::get_attributes,
+      desc => "get_attributes (on a file that has a few - older revision)",
+      feat => MTN_GET_ATTRIBUTES_TAKING_OPTIONS,
+      type => RECORD_LIST,
+      args => ["snowdonia.xcf",
+               "b9a5862a8ba577538f27c69656d8a6bb60ecb777"]},
+
+     {fn   => \&Monotone::AutomateStdio::get_base_revision_id,
+      desc => "get_base_revision_id",
+      type => VARIABLE,
+      args => []},
+
+     {fn   => \&Monotone::AutomateStdio::get_content_changed,
+      desc => "get_content_changed",
+      type => LIST,
+      args => ["ec5d40149421cbd1b6984de0806d323f9e1e6e60",
+               "Makefile.am"]},
+
+     {fn   => \&Monotone::AutomateStdio::get_corresponding_path,
+      desc => "get_corresponding_path",
+      type => VARIABLE,
+      args => ["3db17c6db8b05b11950caec36116e5f0cc518f82",
+               "work.cc",
+               "95c9125530ea297d244b522426997942635d3891"]},
+
+     {fn   => \&Monotone::AutomateStdio::get_current_revision,
+      desc => "get_current_revision (no options)",
+      feat => MTN_GET_CURRENT_REVISION,
+      prec => sub {
+                  system("mtn rm work.hh");
+                  system("mtn rm unix/README");
+                  system("cp ../COPYING vocab.hh");
+                  system("cp ../COPYING NEW.txt");
+                  system("mtn add NEW.txt");
+              },
+      posc => sub {
+                  system("mtn --quiet revert .");
+                  system("rm NEW.txt");
+              },
+      type => RECORD_LIST,
+      args => []},
+
+     {fn   => \&Monotone::AutomateStdio::get_current_revision,
+      desc => "get_current_revision (file restriction)",
+      feat => MTN_GET_CURRENT_REVISION,
+      prec => sub {
+                  system("mtn rm work.hh");
+                  system("mtn rm unix/README");
+                  system("cp ../COPYING vocab.hh");
+                  system("cp ../COPYING NEW.txt");
+                  system("mtn add NEW.txt");
+              },
+      posc => sub {
+                  system("mtn --quiet revert .");
+                  system("rm NEW.txt");
+              },
+      type => RECORD_LIST,
+      args => [[],
+               "NEW.txt"]},
+
+     {fn   => \&Monotone::AutomateStdio::get_current_revision,
+      desc => "get_current_revision (file restriction and depth option)",
+      feat => MTN_GET_CURRENT_REVISION,
+      prec => sub {
+                  system("mtn rm work.hh");
+                  system("mtn rm unix/README");
+                  system("cp ../COPYING vocab.hh");
+                  system("cp ../COPYING NEW.txt");
+                  system("mtn add NEW.txt");
+              },
+      posc => sub {
+                  system("mtn --quiet revert .");
+                  system("rm NEW.txt");
+              },
+      type => RECORD_LIST,
+      args => [["depth" => 1],
+               "NEW.txt"]},
+
+     {fn   => \&Monotone::AutomateStdio::get_current_revision,
+      desc => "get_current_revision (exclude option)",
+      feat => MTN_GET_CURRENT_REVISION,
+      prec => sub {
+                  system("mtn rm work.hh");
+                  system("mtn rm unix/README");
+                  system("cp ../COPYING vocab.hh");
+                  system("cp ../COPYING NEW.txt");
+                  system("mtn add NEW.txt");
+              },
+      posc => sub {
+                  system("mtn --quiet revert .");
+                  system("rm NEW.txt");
+              },
+      type => RECORD_LIST,
+      args => [["exclude" => "vocab.hh"]]},
+
+     {fn   => \&Monotone::AutomateStdio::get_current_revision,
+      desc => "get_current_revision (depth and exclude option)",
+      feat => MTN_GET_CURRENT_REVISION,
+      prec => sub {
+                  system("mtn rm work.hh");
+                  system("mtn rm unix/README");
+                  system("cp ../COPYING vocab.hh");
+                  system("cp ../COPYING NEW.txt");
+                  system("mtn add NEW.txt");
+              },
+      posc => sub {
+                  system("mtn --quiet revert .");
+                  system("rm NEW.txt");
+              },
+      type => RECORD_LIST,
+      args => [["depth"   => 1,
+                "exclude" => "vocab.hh"]]},
+
+     {fn   => \&Monotone::AutomateStdio::get_current_revision_id,
+      desc => "get_current_revision_id",
+      type => VARIABLE,
+      args => []},
+
+     {fn   => \&Monotone::AutomateStdio::get_db_name,
+      desc => "get_db_name",
+      type => CODE,
+      code => sub {
+                  printf("Database name = `%s'\n",
+                         defined($mtn->get_db_name())
+                             ? $mtn->get_db_name() : "<Workspace>");
+              }},
+
+     {fn   => \&Monotone::AutomateStdio::get_db_variables,
+      desc => "get_db_variables",
+      feat => MTN_GET_DB_VARIABLES,
+      type => RECORD_LIST,
+      prec => sub {
+                  my @list;
+                  print("Adding test variables.\n");
+                  $mtn->set_db_variable("test-vars", "var1", "hello");
+                  $mtn->set_db_variable("test-vars", "var2", "good bye");
+                  $mtn->set_db_variable("TST-vars",
+                                        "greeting",
+                                        "good day");
+                  system("mtn ls vars");
+              },
+      posc => sub {
+                  print("Removing all test-vars and TST-vars variables.\n");
+                  $mtn->drop_db_variables("test-vars");
+                  $mtn->drop_db_variables("TST-vars");
+              }},
+
+     {fn   => \&Monotone::AutomateStdio::get_extended_manifest_of,
+      desc => "get_extended_manifest_of",
+      feat => MTN_GET_EXTENDED_MANIFEST_OF,
+      type => RECORD_LIST,
+      args => ["95c9125530ea297d244b522426997942635d3891"]},
+
+     {fn   => \&Monotone::AutomateStdio::get_file,
+      desc => "get_file (fetching the COPYING file)",
+      type => RAW,
+      args => ["7d7e3bd4448ca5450c1a211675734ed6a5eae18a"]},
+
+     {fn   => \&Monotone::AutomateStdio::get_file_of,
+      desc => "get_file_of (fetching the INSTALL file)",
+      type => RAW,
+      args => ["INSTALL",
+               "ec5d40149421cbd1b6984de0806d323f9e1e6e60"]},
+
+     {fn   => \&Monotone::AutomateStdio::get_file_size,
+      desc => "get_file_size (file snowdonia.xcf)",
+      feat => MTN_GET_FILE_SIZE,
+      type => VARIABLE,
+      args => ["fa7079a79ac61b8e41d3932c35875534d69e8ed8"]},
+
+     {fn   => \&Monotone::AutomateStdio::get_manifest_of,
+      desc => "get_manifest_of",
+      type => RECORD_LIST,
+      args => ["ec5d40149421cbd1b6984de0806d323f9e1e6e60"]},
+
+     {fn   => \&Monotone::AutomateStdio::get_option,
+      desc => "get_option (getting the branch option value)",
+      type => VARIABLE,
+      args => ["branch"]},
+
+     {fn   => \&Monotone::AutomateStdio::get_pid,
+      desc => "get_pid",
+      type => CODE,
+      code => sub {
+                  printf("MTN process id = `%d'\n", $mtn->get_pid());
+              }},
+
+     {fn   => \&Monotone::AutomateStdio::get_revision,
+      desc => "get_revision",
+      type => RECORD_LIST,
+      args => ["95c9125530ea297d244b522426997942635d3891"]},
+
+     {fn   => \&Monotone::AutomateStdio::get_workspace_root,
+      desc => "get_workspace_root",
+      feat => MTN_GET_WORKSPACE_ROOT,
+      type => VARIABLE,
+      args => []},
+
+     {fn   => \&Monotone::AutomateStdio::graph,
+      desc => "graph",
+      type => RECORD_LIST,
+      args => []},
+
+     {fn   => \&Monotone::AutomateStdio::heads,
+      desc => "heads",
+      type => LIST,
+      args => ["net.venge.monotone.contrib.lib.automate-stdio.test"]},
+
+     {fn   => \&Monotone::AutomateStdio::identify,
+      desc => "identify (file database.cc)",
+      type => VARIABLE,
+      args => ["database.cc"]},
+
+     {fn   => \&Monotone::AutomateStdio::inventory,
+      desc => "inventory (no options)",
+      type => RECORD_LIST,
+      args => []},
+
+     {fn   => \&Monotone::AutomateStdio::inventory,
+      desc => "inventory (depth option)",
+      feat => MTN_INVENTORY_TAKING_OPTIONS,
+      type => RECORD_LIST,
+      args => [["depth" => 1]]},
+
+     {fn   => \&Monotone::AutomateStdio::inventory,
+      desc => "inventory (depth + exclude play.cc options)",
+      feat => MTN_INVENTORY_TAKING_OPTIONS,
+      type => RECORD_LIST,
+      args => [["depth"   => 1,
+                "exclude" => "play.cc"]]},
+
+     {fn   => \&Monotone::AutomateStdio::inventory,
+      desc => "inventory (most options)",
+      feat => MTN_INVENTORY_TAKING_OPTIONS,
+      type => RECORD_LIST,
+      args => [["depth"   => 1,
+                "exclude" => "play.cc",
+                "no-corresponding-renames",
+                "no-ignored",
+                "no-unknown"]]},
+
+     {fn   => \&Monotone::AutomateStdio::inventory,
+      desc => "inventory (all options generates nothing)",
+      feat => MTN_INVENTORY_TAKING_OPTIONS,
+      type => RECORD_LIST,
+      args => [["depth"   => 1,
+                "exclude" => "play.cc",
+                "no-corresponding-renames",
+                "no-ignored",
+                "no-unknown",
+                "no-unchanged"],
+               "unix"]},
+
+     {fn   => \&Monotone::AutomateStdio::inventory,
+      desc => "inventory (just changed unknown files)",
+      feat => MTN_INVENTORY_TAKING_OPTIONS,
+      type => RECORD_LIST,
+      args => [["no-unchanged"]],
+      prec => sub {
+                  system("ls -la > log");
+                  system("cp ../COPYING another-file");
+              },
+      posc => sub {
+                  system("rm log another-file");
+              }},
+
+     {fn   => \&Monotone::AutomateStdio::inventory,
+      desc => "inventory (restrict output to those files under unix)",
+      feat => MTN_INVENTORY_TAKING_OPTIONS,
+      type => RECORD_LIST,
+      args => [[],
+               "unix"]},
+
+     {fn   => \&Monotone::AutomateStdio::keys,
+      desc => "keys",
+      type => RECORD_LIST,
+      args => []},
+
+     {fn   => \&Monotone::AutomateStdio::leaves,
+      desc => "leaves",
+      type => LIST,
+      args => []},
+
+     {fn   => \&Monotone::AutomateStdio::log,
+      desc => "log (everything)",
+      feat => MTN_LOG,
+      type => LIST,
+      args => [["from" => "ee9d2b736adc24fb9a5926f68304814e93ee8726"]]},
+
+     {fn   => \&Monotone::AutomateStdio::log,
+      desc => "log (of snowdonia.xcf)",
+      feat => MTN_LOG,
+      type => LIST,
+      args => [["from" => "ee9d2b736adc24fb9a5926f68304814e93ee8726"],
+               "snowdonia.xcf"]},
+
+     {fn   => \&Monotone::AutomateStdio::lua,
+      desc => "lua",
+      feat => MTN_LUA,
+      type => RAW,
+      args => ["ignore_file",
+               "'Makefile.am'"]},
+
+     {fn   => \&Monotone::AutomateStdio::packet_for_fdata,
+      desc => "packet_for_fdata",
+      type => RAW,
+      args => ["8d87e9368e3f3ebd63df11e12610ac90ac2ee4e5"]},
+
+     {fn   => \&Monotone::AutomateStdio::packet_for_fdelta,
+      desc => "packet_for_fdelta",
+      type => RAW,
+      args => ["0682f911f2598d229d218fd28cc5964534bd3c65",
+               "8d87e9368e3f3ebd63df11e12610ac90ac2ee4e5"]},
+
+     {fn   => \&Monotone::AutomateStdio::packet_for_rdata,
+      desc => "packet_for_rdata",
+      type => RAW,
+      args => ["ec5d40149421cbd1b6984de0806d323f9e1e6e60"]},
+
+     {fn   => \&Monotone::AutomateStdio::packets_for_certs,
+      desc => "packets_for_certs",
+      type => RAW,
+      args => ["ec5d40149421cbd1b6984de0806d323f9e1e6e60"]},
+
+     {fn   => \&Monotone::AutomateStdio::parents,
+      desc => "parents",
+      type => RAW,
+      args => ["ec5d40149421cbd1b6984de0806d323f9e1e6e60"]},
+
+     {fn   => \&Monotone::AutomateStdio::put_file,
+      desc => "put_file",
+      type => CODE,
+      code => sub {
+                  my $data_file = IO::File->new("../COPYING", "r");
+                  my ($base_rev,
+                      $fdata,
+                      $file_id,
+                      $old_file_id,
+                      $rev_data,
+                      $rev_id);
+
+                  $data_file->sysread($fdata, 64000);
+                  $data_file = undef;
+
+                  $mtn->put_file(\$file_id, undef, $fdata);
+                  printf("Put test-put-file.txt, file id = %s\n", $file_id);
+                  $mtn->get_base_revision_id(\$base_rev);
+                  $rev_data = "format_version \"1\"\n\n"
+                      . "new_manifest "
+                          . "[0000000000000000000000000000000000000000]\n\n"
+                      . "old_revision [" . $base_rev . "]\n\n"
+                      . "add_file \"test-put-file.txt\"\n"
+                      . " content [" . $file_id . "]\n";
+                  $mtn->put_revision(\$rev_id, $rev_data);
+                  $mtn->cert($rev_id, "author", "aecooper\@coosoft.plus.com");
+                  $mtn->cert($rev_id,
+                             "branch",
+                             "net.venge.monotone.contrib.lib.automate-stdio."
+                                 . "test");
+                  $mtn->cert($rev_id, "changelog", "Automated checkin.");
+                  $mtn->cert($rev_id, "date", "2008-10-16T18:42:30");
+                  printf("Put revision, revision id = %s\n", $rev_id);
+
+                  $fdata = substr($fdata, 5);
+                  $old_file_id = $file_id;
+                  $mtn->put_file(\$file_id, $old_file_id, $fdata);
+                  printf("Put modified test-put-file.txt, file id = %s\n",
+                         $file_id);
+                  $base_rev = $rev_id;
+                  $rev_data = "format_version \"1\"\n\n"
+                      . "new_manifest "
+                          . "[0000000000000000000000000000000000000000]\n\n"
+                      . "old_revision [" . $base_rev . "]\n\n"
+                      . "patch \"test-put-file.txt\"\n"
+                      . " from [" . $old_file_id . "]\n"
+                      . "   to [" . $file_id . "]\n";
+                  $mtn->put_revision(\$rev_id, $rev_data);
+                  $mtn->cert($rev_id, "author", "aecooper\@coosoft.plus.com");
+                  $mtn->cert($rev_id,
+                             "branch",
+                             "net.venge.monotone.contrib.lib.automate-stdio."
+                                 . "test");
+                  $mtn->cert($rev_id, "changelog", "Automated checkin #2.");
+                  $mtn->cert($rev_id, "date", "2008-10-16T18:42:35");
+                  printf("Put revision, revision id = %s\n", $rev_id);
+
+                  print("Displaying revision change log:\n");
+                  system("mtn update");
+                  system("mtn log --last 5 --no-graph");
+              }},
+
+     {fn   => undef,
+      desc => "get/drop/put_public_key",
+      feat => MTN_GET_PUBLIC_KEY,
+      type => CODE,
+      code => sub {
+                  my $data;
+                  $mtn->put_public_key
+                      ("[pubkey drwho\@bbc.co.uk]\n"
+                       . "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC+kmyQB3E4q7cr"
+                       . "e9C9WCqHrF4A5A0bQzNLPVmc9ix3Jw6JPEi/dLhQMqJ5AjRbXXeE"
+                       . "v854J7KoDJQSgRTeONih5C9mNlv/F8arrQ+0w1ov+dfKEhpFcsjA"
+                       . "VIfuSmEx9Wid9KL+kh3Chij1BeINeSckGfudv2O8U7wLLMK7toCb"
+                       . "5wIDAQAB\n"
+                       . "[end]\n");
+                  print("Added the drwho\@bbc.co.uk public key\n");
+                  print("Now getting the drwho\@bbc.co.uk public key:\n");
+                  $mtn->get_public_key(\$data, "drwho\@bbc.co.uk");
+                  print($data);
+                  print("Now dropping the drwho\@bbc.co.uk public key\n");
+                  $mtn->drop_public_key("drwho\@bbc.co.uk");
+                  print("Now getting the drwho\@bbc.co.uk public key:\n");
+                  $mtn->get_public_key(\$data, "drwho\@bbc.co.uk");
+                  print($data);
+              }},
+
+     {fn   => undef,
+      desc => "read_packets",
+      feat => MTN_READ_PACKETS,
+      type => CODE,
+      code => sub {
+                  $mtn->read_packets
+                      ('[pubkey piglet@aamilne.com] '
+                       . 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDKBEOCGipeYi1/'
+                           . 'dVI93aks2jMZbU4PBj2p '
+                       . '+gtncni0xEd8MffZ3Zx4FQOsI1PAqVPmNhxA18VKJ0kRg97IUj/'
+                           . 'GpsZMFemhEO96mp3tLT29 '
+                       . 'F8mW302RlfaXEk7BdP0MXHuRrpXyDJ30YDzUZ+tNqlcgkQTvS+'
+                           . 'LfUr/US71/blGDzwIDAQAB '
+                       . '[end]');
+                  print("Added the piglet\@aamilne.com key\n");
+                  system("mtn ls keys");
+              }},
+
+     {fn   => \&Monotone::AutomateStdio::roots,
+      desc => "roots",
+      type => LIST,
+      args => []},
+
+     {fn   => \&Monotone::AutomateStdio::select,
+      desc => "select",
+      type => LIST,
+      args => ["b:net.venge.monotone.contrib.lib.automate-stdio.test"]},
+
+     {fn   => \&Monotone::AutomateStdio::set_attribute,
+      desc => "set_attribute",
+      feat => MTN_SET_ATTRIBUTE,
+      type => CODE,
+      code => sub {
+                  $mtn->set_attribute("database.cc",
+                                      "mtn:test-attr",
+                                      "this-is-a-test-value");
+                  print("Added mtn:test-attr to file database.cc.\n");
+              }},
+
+     {fn   => \&Monotone::AutomateStdio::show_conflicts,
+      desc => "show_conflicts",
+      feat => MTN_SHOW_CONFLICTS,
+      type => RECORD_LIST,
+      args => ["26cfbb87b400321bda71277e1d2c0ba1d5e9898f",
+               "15db9bc261c01c4ca5cdb052aec69d29f3bec58a"]},
+
+     {fn   => \&Monotone::AutomateStdio::show_conflicts,
+      desc => "show_conflicts (with internal merge resolution)",
+      feat => MTN_SHOW_CONFLICTS,
+      type => RECORD_LIST,
+      args => ["05cb265ad778107218701fa76a91bdf4770b85a8",
+               "110816e646d42ca45e8205778255cece9c8f2159"]},
+
+     {fn   => \&Monotone::AutomateStdio::tags,
+      desc => "tags (no branch restrictions)",
+      type => RECORD_LIST,
+      args => []},
+
+     {fn   => \&Monotone::AutomateStdio::tags,
+      desc => "tags (with branch restriction)",
+      type => RECORD_LIST,
+      args => ["net.venge.monotone.contrib.lib.automate-stdio.test"]},
+
+     {fn   => \&Monotone::AutomateStdio::toposort,
+      desc => "toposort",
+      type => LIST,
+      args => ["b8e6b77245cf29caa1f69bfb13749d785b13eac7",
+               "805c482bc9bb80cd393be7d3ba01a65377d91d9c",
+               "afd43cf2ce01fa4513fb1673eae47be3b48008f6"]},
+
+     {fn   => undef,
+      desc => "sync/pull/push",
+      feat => MTN_SYNCHRONISATION,
+      type => CODE,
+      code => sub {
+                  foreach my $op ("sync", "pull", "push")
+                  {
+                      my (@list,
+                          $p_buffer,
+                          $pfh,
+                          $t_buffer,
+                          $tfh);
+                      $p_buffer = $t_buffer = "";
+                      open($pfh, ">", \$p_buffer);
+                      open($tfh, ">", \$t_buffer);
+                      $mtn->register_stream_handle(MTN_P_STREAM, $pfh);
+                      $mtn->register_stream_handle(MTN_T_STREAM, $tfh);
+                      &{$Monotone::AutomateStdio::{$op}}($mtn,
+                                                         \@list,
+                                                         [],
+                                                         "mtn://localhost/?*");
+                      $mtn->register_stream_handle(MTN_P_STREAM, undef);
+                      $mtn->register_stream_handle(MTN_T_STREAM, undef);
+                      $pfh->close();
+                      $tfh->close();
+                      print(" ----- Structured Data For $op -----\n");
+                      print(Dumper(\@list));
+                      print("\n ----------\n");
+                      print(" ----- Output of $op progress stream -----\n");
+                      print($p_buffer);
+                      print("\n ----------\n");
+                      print(" ----- Output of $op ticker stream -----\n");
+                      print($t_buffer);
+                      print("\n ----------\n");
+                  }
+                  $mtn->drop_db_variables("database");
+                  $mtn->drop_db_variables("known-servers");
+              }},
+
+     {fn   => undef,
+      desc => "remote connections (getting a branch listing)",
+      feat => MTN_REMOTE_CONNECTIONS,
+      type => CODE,
+      code => sub {
+                  my (@branches,
+                      $rmtn);
+                  $rmtn = Monotone::AutomateStdio->
+                      new_from_service("localhost", ["--key" => $key_id]);
+                  $rmtn->branches(\@branches);
+                  foreach my $branch (@branches)
+                  {
+                      print($branch . "\n");
+                  }
+              }},
+
+     {fn   => undef,
+      desc => "update",
+      feat => MTN_UPDATE,
+      type => CODE,
+      code => sub {
+                  foreach my $op ([revision => "i:1d8d91f5976860dbcabe209829ff"
+                                       . "2e34d8119a58"],
+                                  [branch   => "net.venge.monotone",
+                                   revision => "i:c2de1dbfe651d26a0d0a33d43c50"
+                                       . "444583c5dad8"],
+                                  [branch   => "net.venge.monotone.contrib.lib"
+                                       . ".automate-stdio.test",
+                                   revision => "h:"])
+                  {
+                      my ($p_buffer,
+                          $pfh,
+                          $t_buffer,
+                          $tfh);
+                      $p_buffer = $t_buffer = "";
+                      open($pfh, ">", \$p_buffer);
+                      open($tfh, ">", \$t_buffer);
+                      $mtn->register_stream_handle(MTN_P_STREAM, $pfh);
+                      $mtn->register_stream_handle(MTN_T_STREAM, $tfh);
+                      $mtn->update($op);
+                      $mtn->register_stream_handle(MTN_P_STREAM, undef);
+                      $mtn->register_stream_handle(MTN_T_STREAM, undef);
+                      $pfh->close();
+                      $tfh->close();
+                      print(" ----- Output of progress stream -----\n");
+                      print($p_buffer);
+                      print("\n ----------\n");
+                      print(" ----- Output of ticker stream -----\n");
+                      print($t_buffer);
+                      print("\n ----------\n");
+                  }
+              }});
+
+print <<EOF;
+Monotone::AutomateStdio Test Harness Script
+
+NOTE:
+1) This test harness needs a copy of the venge.net database and specifically
+   the net.venge.monotone.contrib.lib.automate-stdio.test branch. It also needs
+   a Monotone server on the local machine for automate remote_stdio testing if
+   the version of Monotone is above 0.45.
+
+2) WARNING: This test harness does modify the database by adding some
+   revisions. Do not sync these changes back into any proper database. Please
+   take a copy of a good database and remove all database variables by using
+   the mtn unset command.
+
+3) This script will probably need to be modified to make it work in your
+   environment. Look for <UPDATE> tokens in the source code for pointers as to
+   what may need to change.
+
+4) Do not come complaining to me when you use this script and it trashes
+   something. You should always make backup copies anyway. :-).
+
+Ctrl-C now if you do not like the above!
+
+Tony Cooper.
+
+[Press <Return> to start the tests]
+EOF
+readline(STDIN);
+
+Monotone::AutomateStdio->suppress_utf8_conversion(1);
+$mtn = Monotone::AutomateStdio->new(["--key" => $key_id]);
+
+$data = undef;
+if ($mtn->supports(MTN_DB_GET))
+{
+    $data = undef if (! $mtn->db_get(\$data, "database", "default-server"));
+}
+else
+{
+    my @list;
+    $mtn->get_db_variables(\@list, "database");
+    foreach my $entry (@list)
+    {
+        if ($entry->{name} eq "default-server")
+        {
+            $data = $entry->{value};
+            last;
+        }
+    }
+}
+die("Your test database will sync to `" . $data . "' - this is unsafe")
+    if (defined($data));
+
+# Please note that when opening a database we need to use the --key option as
+# additional private keys are added during testing.
+
+# Clear out any error state created from the above tests.
+
+$mtn = undef;
+$mtn = Monotone::AutomateStdio->new(["--key" => $key_id]);
+
+Monotone::AutomateStdio->register_error_handler
+    (MTN_SEVERITY_ALL,
+     sub
+     {
+         my ($severity, $message) = @_;
+         printf(STDERR "\n\n====================\nPROBLEM (%s): %s\n",
+                $severity, $message);
+         cluck();
+     });
+
+$last_error_message = "";
+foreach my $test (@test_list)
+{
+    if (! exists($test->{feat}) || $mtn->supports($test->{feat}))
+    {
+        printf(" ========== %s ==========\n", $test->{desc});
+        if (exists($test->{prec}))
+        {
+            $test->{prec}();
+        }
+        if ($test->{type} == RAW)
+        {
+            if (! $test->{fn}($mtn, \$data, @{$test->{args}}))
+            {
+                printf(STDERR "OOPS: %s\n", $mtn->get_error_message());
+            }
+            else
+            {
+                print($data);
+            }
+        }
+        elsif ($test->{type} == LIST)
+        {
+            if (! $test->{fn}($mtn, \@list, @{$test->{args}}))
+            {
+                printf(STDERR "OOPS: %s\n", $mtn->get_error_message());
+            }
+            else
+            {
+                print(Dumper(\@list));
+            }
+        }
+        elsif ($test->{type} == RECORD)
+        {
+            if (! $test->{fn}($mtn, \%hash, @{$test->{args}}))
+            {
+                printf(STDERR "OOPS: %s\n", $mtn->get_error_message());
+            }
+            else
+            {
+                print(Dumper(\%hash));
+            }
+        }
+        elsif ($test->{type} == RECORD_LIST)
+        {
+            printf("  ---------- Raw Data ----------\n");
+            if (! $test->{fn}($mtn, \$data, @{$test->{args}}))
+            {
+                printf(STDERR "OOPS: %s\n", $mtn->get_error_message());
+            }
+            else
+            {
+                print($data);
+            }
+            printf("  ---------- Structured Data ----------\n");
+            if (! $test->{fn}($mtn, \@list, @{$test->{args}}))
+            {
+                printf(STDERR "OOPS: %s\n", $mtn->get_error_message());
+            }
+            else
+            {
+                print(Dumper(\@list));
+            }
+        }
+        elsif ($test->{type} == VARIABLE)
+        {
+            if (! $test->{fn}($mtn, \$data, @{$test->{args}}))
+            {
+                printf(STDERR "OOPS: %s\n", $mtn->get_error_message());
+            }
+            else
+            {
+                print("Variable = `" . $data . "'\n");
+            }
+        }
+        elsif ($test->{type} == CODE)
+        {
+            $test->{code}();
+        }
+        if (exists($test->{posc}))
+        {
+            $test->{posc}();
+        }
+        if ($mtn->get_error_message() ne $last_error_message)
+        {
+            $last_error_message = $mtn->get_error_message();
+            printf("\nget_error_message() method returned `%s'\n",
+                   $last_error_message);
+        }
+        else
+        {
+            printf("\nget_error_message() method return value is unchanged\n");
+        }
+    }
+}
+
+printf("Last error message `%s'\n", $mtn->get_error_message());
+print Dumper (\$mtn);
+
+printf("Destroying object.\n");
+$mtn = undef;
+
+exit(0);

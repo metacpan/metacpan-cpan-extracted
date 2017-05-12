@@ -1,0 +1,8 @@
+0.03  Thu, 04 Feb 2010 04:15:09 +0100
+  * Use rebless_instance_back that's now part of Moose (Jesse Luehrs).
+
+0.02  Tue, 13 Oct 2009 11:25:24 +0200
+  * Specify test dependencies (Closes RT#50431).
+
+0.01  Thu, 08 Oct 2009 23:08:04 +0200
+  * Initial release.

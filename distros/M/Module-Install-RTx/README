@@ -1,0 +1,142 @@
+NAME
+    Module::Install::RTx - RT extension installer
+
+SYNOPSIS
+    In the Makefile.PL of the "RT-Extension-Example" module:
+
+        use inc::Module::Install;
+        RTx 'RT-Extension-Example';
+
+        requires_rt '4.2.0';
+        rt_too_new  '4.4.0';
+
+        WriteAll();
+
+DESCRIPTION
+    This Module::Install extension implements several functions for
+    installing RT extensions:
+
+  RTx '*extension name*'
+    This function arranges for the following directories to be installed, if
+    they exist (assuming "RTx('RT-Extension-Example')"):
+
+        ./bin    => $RT::LocalPluginPath/RT-Extension-Example/bin
+        ./etc    => $RT::LocalPluginPath/RT-Extension-Example/etc
+        ./html   => $RT::LocalPluginPath/RT-Extension-Example/html
+        ./lib    => $RT::LocalPluginPath/RT-Extension-Example/lib
+        ./po     => $RT::LocalPluginPath/RT-Extension-Example/po
+        ./sbin   => $RT::LocalPluginPath/RT-Extension-Example/sbin
+        ./static => $RT::LocalPluginPath/RT-Extension-Example/static
+        ./var    => $RT::LocalPluginPath/RT-Extension-Example/var
+
+    Accepts an optional argument hashref after the extension name with two
+    possible keys
+
+  deprecated_rt
+        If set to a true value, skips the enforced RT-4.0.0 minimum version check
+
+        You should set a perl_version if using this option and requires_rt(), because requires_rt
+        only handles figuring our what perl you need if you're on RT 4.0.0 or higher.
+
+  no_readme_generation
+        If set to a true value, will not call readme_from on the extension's primary perl module.
+
+  requires_rt *version*
+    Takes one argument, a valid RT version. If an attempt is made to install
+    on an RT than that version, it will die before Makefile creation.
+
+  requires_rt_plugin *RT::Extension::Example* [, *version*]
+    Ensures that the given RT extension (and optional version) is installed
+    in the target RT instance; "requires" cannot be used because RT
+    extensions are not in @INC.
+
+  rt_too_new *version* [, *message*]
+    Takes one argument, a valid RT version, and prevents this module from
+    being installed on any version of RT equal to or newer than that. Useful
+    if a particular release of an extension only works on 4.0.x but not
+    4.2.x.
+
+    Takes an optional second argument which allows you to specify a custom
+    error message. This message is passed to sprintf with two string
+    arguments, the current RT version and the version you specify.
+
+  remove_files
+    If set to a true value, during installation any files listed in a
+    "remove_files" file will be removed from the destination directories.
+    This feature is for removing files that have been deleted or moved in
+    the current version and leaving the old version in place when upgrading
+    can cause problems.
+
+    RTx looks for a "remove_files" file in the etc/upgrade directory of the
+    distribution. The format of the "remove_files" file is as follows:
+
+        package Module::Install::RTx;
+
+        @remove_files = qw(
+        html/dir/file_to_remove
+        );
+        1;
+
+    The file locations are relative to the distribution. The destination
+    directory prefix is added automatically.
+
+CAVEATS
+    *   Us the full name when calling RTx method in Makefile.PL; while
+        "RTx('Foo')" was once supported, it is no longer.
+
+ENVIRONMENT
+    RTHOME
+        Path to the RT installation that contains a valid lib/RT.pm.
+
+EXAMPLES
+    To install an extension which makes use of this installer:
+
+        perl Makefile.PL RTHOME=/opt/rt4
+
+    This will install all subdirs into the $RT::LocalPluginPath dir as
+    configured in RT::Generated.
+
+    To install an extension into the (vendor) plugin path:
+
+        perl Makefile.PL RTHOME=/opt/rt4 INSTALLDIRS=vendor
+
+    This will install all subdirs into the $RT::PluginPath which is
+    specifically meant for plugins that are installed through other
+    packaging utils like APT or RPM.
+
+SEE ALSO
+    Module::Install
+
+    <http://www.bestpractical.com/rt/>
+
+AUTHORS
+    Best Practical Solutions
+
+    (Originally) Audrey Tang <cpan@audreyt.org>
+
+COPYRIGHT
+    Copyright 2003, 2004, 2007 by Audrey Tang <cpan@audreyt.org>. Copyright
+    2008-2014 Best Practical Solutions
+
+    This software is released under the MIT license cited below.
+
+  The "MIT" License
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+

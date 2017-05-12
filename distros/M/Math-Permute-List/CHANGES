@@ -1,0 +1,8 @@
+Change Log
+
+1.004 21 Mar 2009 Initial release
+1.005 24 Jan 2015 Permute the empty list per Philipp Rumpf
+1.006 25 Jan 2015 Break memory loop      per Philipp Rumpf
+1.007 25 Jan 2015 World writables set correctly using some excellent perl from http://www.perlmonks.org/?node=bart
+
+

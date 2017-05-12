@@ -1,0 +1,42 @@
+---
+abstract: 'Perform homogeneous product'
+author:
+  - '@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Math-Homogeneous
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Math::Homogeneous:
+    file: lib/Math/Homogeneous.pm
+    version: 0.03
+requires:
+  Clone: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/hoto17296/Math-Homogeneous/issues
+  homepage: https://github.com/hoto17296/Math-Homogeneous
+  repository: git://github.com/hoto17296/Math-Homogeneous.git
+version: 0.03
+x_contributors:
+  - 'papix <mail@papix.net>'
+  - 'hoto <hoto17296@gmail.com>'

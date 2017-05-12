@@ -1,0 +1,9 @@
+Revision history for Perl extension Math::Vector::Real::Farthest.
+
+0.02  Apr 26, 2014
+      - use new Sort::Key::Top sub nslotpartref instead of nkeypartref
+
+0.01  Mon Apr 21 11:58:45 2014
+	- original version; created by h2xs 1.23 with options
+		-AXn Math::Vector::Real::Farthest
+

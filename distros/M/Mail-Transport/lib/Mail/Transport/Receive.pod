@@ -1,0 +1,223 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Transport::Receive - receive messages
+
+=head1 INHERITANCE
+
+ Mail::Transport::Receive
+   is a Mail::Transport
+   is a Mail::Reporter
+
+ Mail::Transport::Receive is extended by
+   Mail::Transport::IMAP4
+   Mail::Transport::POP3
+
+=head1 SYNOPSIS
+
+ my $receiver = Mail::Transport::POP3->new(...);
+ my $message = $receiver->receive($id);
+
+=head1 DESCRIPTION
+
+Each object which extends L<Mail::Transport::Receive|Mail::Transport::Receive> implement
+a protocol which can get messages into your application.  The internals
+of each implementation can differ quite a lot, so have a look at each
+separate manual page as well.
+
+Current message receivers:
+
+=over 4
+
+=item * L<Mail::Transport::POP3|Mail::Transport::POP3>
+
+Implements the POP3 protocol.  See also L<Mail::Box::POP3|Mail::Box::POP3>.
+
+=back
+
+Extends L<"DESCRIPTION" in Mail::Transport|Mail::Transport/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Transport|Mail::Transport/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Mail::Transport|Mail::Transport/"Constructors">.
+ 
+=over 4
+
+=item Mail::Transport::Receive-E<gt>B<new>(%options)
+
+Inherited, see L<Mail::Transport/"METHODS">
+
+=back
+
+=head2 Receiving mail
+
+=over 4
+
+=item $obj-E<gt>B<receive>( [$unique_message_id] )
+
+Receive one message from the remote server.  Some receivers will provide
+the next message automatically, other are random access and use the
+specified ID.
+
+=back
+
+=head2 Server connection
+
+Extends L<"Server connection" in Mail::Transport|Mail::Transport/"Server connection">.
+ 
+=over 4
+
+=item $obj-E<gt>B<findBinary>( $name, [@directories] )
+
+Inherited, see L<Mail::Transport/"Server connection">
+
+=item $obj-E<gt>B<remoteHost>()
+
+Inherited, see L<Mail::Transport/"Server connection">
+
+=item $obj-E<gt>B<retry>()
+
+Inherited, see L<Mail::Transport/"Server connection">
+
+=back
+
+=head2 Error handling
+
+Extends L<"Error handling" in Mail::Transport|Mail::Transport/"Error handling">.
+ 
+=over 4
+
+=item $obj-E<gt>B<AUTOLOAD>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<addReport>($object)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+=item Mail::Transport::Receive-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<errors>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<log>( [$level, [$strings]] )
+
+=item Mail::Transport::Receive-E<gt>B<log>( [$level, [$strings]] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logPriority>($level)
+
+=item Mail::Transport::Receive-E<gt>B<logPriority>($level)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<notImplemented>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<report>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<reportAll>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<trace>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<warnings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=back
+
+=head2 Cleanup
+
+Extends L<"Cleanup" in Mail::Transport|Mail::Transport/"Cleanup">.
+ 
+=over 4
+
+=item $obj-E<gt>B<DESTROY>()
+
+Inherited, see L<Mail::Reporter/"Cleanup">
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Warning: Avoid program abuse: specify an absolute path for $exec.
+
+Specifying explicit locations for executables of email transfer agents
+should only be done with absolute file names, to avoid various pontential
+security problems.
+
+=item Warning: Executable $exec does not exist.
+
+The explicitly indicated mail transfer agent does not exists. The normal
+settings are used to find the correct location.
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Transport distribution version 3.000,
+built on February 02, 2017.
+
+Do not forget to read
+L</Mail::Box-Overview>,
+L</Mail::Box-Cookbook>, and
+L</Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L</Mail::Message>,
+L</Mail::Box>,
+L</Mail::Box::IMAP4>,
+L</Mail::Box::POP3>,
+L</Mail::Box::Parser::C>,
+L</Mail::Box::Dbx> (unpublished),
+L</Mail::Transport>,
+L</Object::Realize::Later>, and
+L</User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

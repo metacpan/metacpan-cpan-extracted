@@ -1,0 +1,41 @@
+NAME
+    MooX::SetOnce - write-once attributes for Moo
+
+SYNOPSIS
+      package MyClass;
+      use Moo;
+      use MooX::SetOnce;
+
+      has attr => ( is => 'rw', once => 1 );
+
+DESCRIPTION
+    MooX::SetOnce creates attributes that are not lazy and not set, but that
+    cannot be altered once set.
+
+    The logic is very simple: if you try to alter the value of an attribute
+    with the SetOnce trait, either by accessor or writer, and the attribute
+    has a value, it will throw an exception.
+
+    If the attribute has a clearer, you may clear the attribute and set it
+    again.
+
+    If a Moose module extends or composes a module using MooX::SetOnce,
+    MooseX::SetOnce will be loaded to provide the Moose implementation.
+
+SEE ALSO
+    MooseX::SetOnce
+
+AUTHOR
+    haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+  CONTRIBUTORS
+    None so far.
+
+COPYRIGHT
+    Copyright (c) 2013 the MooX::SetOnce "AUTHOR" and "CONTRIBUTORS" as
+    listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

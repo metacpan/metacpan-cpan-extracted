@@ -1,0 +1,31 @@
+Revision history for Perl extension HTML::Mason::ApacheHandler2.
+
+0.05  Tue Apr 13 08:36:23 HST 2004
+        - Verified with Mason 1.26.
+        - Changed the '$r' passed to Mason pages from type
+          'Apache::Request' to 'Apache::RequestRec' to conform
+          to the parameter passed to mod_perl 2 handlers. This
+          WILL break your Mason pages that currently use '$r'.
+          To get the corresponding 'Apache::Request' in your
+          pages under 0.05, do:
+
+            $rr = Apache::Request->new( $r );
+
+          '$rr' is now an 'Apache::Request', while '$r' is
+          an 'Apache::RequestRec'.
+
+0.04  Mon Mar 22 00:31:28 HST 2004
+        - Fixed MasonX::Request2 sub-classing bug.
+
+0.03  March 2004
+        - Added MasonX::Request2 and MasonX::Buffer2 to subclass
+          HTML::Mason::Request/Buffer and fix buffer flushing
+          for redirect.
+
+0.02  Februrary 2004
+        - Name change to MasonX::Apache2Handler as per Mason's
+          request.
+
+0.01  Tue Jan 27 18:34:49 2004
+	- original version; created by h2xs 1.23 with options
+		-A -X -b 5.8.0 -n HTML::Mason::ApacheHandler2

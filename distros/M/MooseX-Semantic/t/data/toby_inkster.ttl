@@ -1,0 +1,17 @@
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix og: <http://ogp.me/ns#> .
+@prefix dc: <http://purl.org/dc/terms/> .
+
+<http://tobyinkster.co.uk/#i> 
+    foaf:name "Toby Inkster" ;
+    foaf:topic-interest "Technology"@en,
+                        "Perl"@en;
+    og:country-name "UK",
+                    "USA";
+    dc:subject "homepage";
+    foaf:knows <http://kasei.us/about/foaf.xrdf#greg> ;
+    foaf:generic_one_to_one_relation <http://kasei.us/about/foaf.xrdf#greg> .
+
+<http://kasei.us/about/foaf.xrdf#greg>
+    foaf:name "Gregory Williams" ;
+    dc:subject "perl".

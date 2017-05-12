@@ -1,0 +1,51 @@
+###
+### Perl Tidy Config file
+###
+
+
+--check-syntax
+--output-line-ending=unix
+
+--maximum-line-length=0
+--indent-columns=2
+--continuation-indentation=2
+--closing-token-indentation=0
+
+--vertical-tightness=0
+--vertical-tightness-closing=0
+
+--comma-arrow-breakpoints=0
+
+# Place opening bracket on same line
+-nbl
+
+# } else {
+--cuddled-else
+
+# don't outdent labels
+-nola
+
+# Blank line stuff
+--maximum-consecutive-blank-lines=2
+--noblanks-before-blocks
+--blanks-before-subs
+--blanks-before-comments
+
+# Parentheses
+--paren-tightness=2
+--square-bracket-tightness=2
+--brace-tightness=0
+--block-brace-tightness=0
+--space-keyword-paren
+
+--nospace-terminal-semicolon
+--nospace-for-semicolon
+
+# Comments
+--hanging-side-comments
+--indent-block-comments
+
+--opening-sub-brace-on-new-line
+
+--stack-opening-tokens
+--stack-closing-tokens

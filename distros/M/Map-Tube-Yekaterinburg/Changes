@@ -1,0 +1,29 @@
+0.05 2015-10-16T11:57:49+02:00
+ - Improve comment in xml file.
+ - Improve description for get_lines() in doc.
+ - Update to Map::Tube 3.06.
+
+0.04 2015-10-05T23:25:44+02:00
+ - Add EXAMPLE4 to doc.
+ - Add get_line_by_id() and get_line_by_name() methods to doc.
+ - Add tests for get_node_by_id() and get_node_by_name() methods.
+ - Move author tests to xt/ directory.
+ - Rewrite SEE ALSO section to new style.
+ - Update Module::Install to 1.16 version.
+
+0.03 2015-03-13T04:50:24+01:00
+ - Add test of map validity.
+ - Update examples/ex3.pl file.
+
+0.02 2015-02-17T20:51:44+01:00
+ - Add <?xml> header to XML document.
+ - Add EXAMPLE3 section in doc.
+ - Add get_lines() method to doc.
+ - Add get_stations() method to doc.
+ - Add lines to XML document.
+ - Improve SEE ALSO section in doc.
+ - Remove obsolete code from EXAMPLE1 section in doc.
+ - Update copyright years to 2015.
+
+0.01 2014-12-21T09:24:58+01:00
+ - First version

@@ -1,0 +1,14 @@
+Changes
+INSTALL
+MANIFEST
+Makefile.PL
+README
+lib/Math/LP.pm
+lib/Math/LP/Constraint.pm
+lib/Math/LP/LinearCombination.pm
+lib/Math/LP/Object.pm
+lib/Math/LP/Variable.pm
+t/bound.t
+t/simple.t
+t/simple_int.t
+t/wim_dt_06.t

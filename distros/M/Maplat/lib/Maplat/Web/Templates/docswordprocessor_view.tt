@@ -1,0 +1,26 @@
+[% IF statustext %]
+<p align="center">
+    <div class="[% statuscolor %]">[% tr.tr(statustext) %]</div>
+</p>
+[% END %]
+<p align="center">
+    <form name="textdoc" method="post" action="[% PostLink %]">
+        <table class="data" align="center" id="MainDataTable">
+            <tr class="tabheader">
+                <th colspan="2">[% tr.tr("Word Processor (Viewer)") %]</th>
+            </tr>
+            <tr>
+                <td>File:</td>
+                <td>[% FileName %]<input type="hidden" name="filename" value="[% FileName %]"</td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    [% FileData %] 
+                    <input type="hidden" name="mode" value="[% EditMode %]">
+                    <input type="hidden" name="fileid" value="[% FileID %]">
+                </td>
+            </tr>
+        </table>
+    </form>
+</p>
+<script> $(function(){ $('textarea.fck').fck({path: '/static/fckeditor/'}); }); </script>

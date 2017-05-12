@@ -1,0 +1,15 @@
+This is the Mac::iTunes distribution, which contains both Mac specific
+and OS neutral components. The Mac-specific portions interface with
+the iTunes application through Applescript. The neutral portions deal
+with the file and preference formats, which you may want to use on a 
+computer that can read the files on a Mac (or in some other fashion).
+
+If you are on a Mac and do not want the AppleScript portions, probably
+because they are still pretty rough, you can set the environment variable
+NO_MAC
+
+	env NO_MAC=1 perl Makefile.PL
+	
+If you are not on a Mac, you get the same effect automatically.
+
+Otherwise, it's the standard Perl module installation stuff.

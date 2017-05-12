@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Mozilla-Mork.t
+lib/Mozilla/Mork.pm
+META.yml                                 Module meta-data (added by MakeMaker)

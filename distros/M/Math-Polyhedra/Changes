@@ -1,0 +1,6 @@
+Revision history for Perl extension Math::Polyhedra.
+
+0.7  Wed May  7 17:53:52 2003
+	- original version by Ed Halley <ed@halley.cc>
+	  created by h2xs 1.22 with options -A -X Math::Polyhedra
+

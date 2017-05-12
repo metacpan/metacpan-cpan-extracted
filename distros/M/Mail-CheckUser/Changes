@@ -1,0 +1,229 @@
+Revision history for Perl module Mail::CheckUser
+
+1.24  Sat Nov 26 22:00:00 2016
+	- Prevent inadvertent CBL blocks during test.
+	  (Use http://www.abuseat.org/lookup.cgi to remove)
+
+1.23  Sat Nov 26 21:00:00 2016
+	- Make sure all tests pass.
+
+1.22  Sat Nov 26 12:00:00 2016
+	- Add Treat_Grey_As_Fail feature.
+	  (See https://postgrey.schweikert.ch/)
+	- Patch by Rob Brown
+
+1.21  Thu Sep 18 12:00:00 2003
+	- Fix cufilter to handle bounce messages better.
+	- Avoid cufilter redundant checking.
+	- Handle special wildcard gTLD bogus domains.
+	  (See http://www.imperialviolet.org/dnsfix.html)
+	- Patches by Rob Brown
+
+1.20  Mon Sep 01 12:00:00 2003
+	- Run the forward lookups of MX records through the
+	  Net::DNS resolver object to detect slow lookups
+	  within the timeout restricted.  The normal
+	  gethostbyname did not honor the timeout.
+	- Taint cleaner.
+	- Add procmail filter example.
+
+1.19  Sat Mar 08 12:00:00 2003
+	- Correct syntax for Net::Ping::ping and nack.
+	- Avoids a problem when the MX entry does not resolve.
+	- Prevent this crash: "Usage> nack($failed_ack_host)"
+	- Bug reported by peter@hiplists.com (Peter Beltemacchi)
+
+1.18  Tue Dec 10 20:00:00 2002
+	- Latest version broke MAIL/RCPT check. Stupid, stupid, stupid
+	  me - it actually caused failure of one test in test suite
+	  but I misinterpreted it and though that mailboxes at
+	  hotmail.com cannot be verified by Mail::CheckUser
+	  anymore. Note to myself - never release anything in hurry.
+	  Reported by Kevin Cassidy and fixed independently by Rob
+	  Brown.
+	- Added $Treat_Full_As_Fail config variable and new check code
+	  CU_MAILBOX_FULL to report full boxes (Rob Brown).
+
+1.17  Sat Nov 30 23:02:20 2002
+	- Be polite with SMTP servers - try to issue QUIT command
+	  before disconnecting. Suggested by Tom Allison.
+	- Workaround Perl bug (#18784) which causes userpart regexp
+	  matching failures with correct userparts in Perl 5.8.0.
+	  Patch by Rodger Bagnall.
+	- Remove notice that MAIL/RCPT check works with mailboxes
+	  on hotmail.com from documentation. It seems it is not
+	  true anymore.
+
+1.16  Wed Nov 18 09:30:00 2002
+	- Add $Mail::CheckUser::Net_DNS_Resolver feature
+	  to allow customizeable Net::DNS::Resolver object.
+	- Utilize udp_timeout feature in Net::DNS
+	  to avoid excessive dns delays (Rob Brown).
+	- Do not allow "special" characters in username.
+	- Break RFC by allowing domains with "--"
+
+1.15  Fri Nov  8 00:02:23 2002
+	- Minor documentaion and code fixes.
+
+1.14  Sat Oct 19 23:59:00 2002
+	- A little more robust for when some mail servers are down.
+	- Uses Net::Ping to determine remote reachability.
+	- Added setting $Mail::CheckUser::Skip_SYN
+	  to retain the old 1.13 functionality.
+	- Patches by bbb@cpan.org (Rob Brown)
+
+1.13  Sat Mar  9 23:59:00 2002
+	- I had to bump version because of corrupted CPAN upload.
+
+1.12  Sat Mar  9 23:50:33 2002
+	- Fix die if all SMTP servers for mail domain are found as
+	  unreachable during SMTP checks. Thanks to Michal
+	  Weinfurtner for bug report.
+	- Added additional status code CU_SMTP_UNREACHABLE which is
+	  set if all SMTP servers for mail domain are found as
+	  unreachable during SMTP checks.
+
+1.11  Thu Mar  7 19:13:29 2002
+	- Fix example in POD documentation.
+
+1.10  Wed Mar  6 01:25:28 2002
+	- Added subroutine 'last_check'. Based on patch from Cloyce
+	  D. Spradling.
+	- Use Test.pm for test suite.
+	- Do not treat email address as invalid if SMTP server replies
+	  with error on MAIL FROM command.
+	- If email is undefined check_email dies instead of
+	  omitting warning.
+	- A lot of documentation fixes: grammar and spelling
+	  clean-up, rewritten section 'IMPORTANT WARNING'.
+	  Thanks to Cloyce D. Spradling for patch.
+	- Changed my email address from m_ilya@agava.com to
+	  ilya@martynov.org in module documentation.
+
+1.02  Fri Jul  6 14:51:06 2001
+	- Fixed minor bug in sample code snippet in pod documentaion.
+	  Thanks to David Olszynski for correction.
+
+1.01  Tue Jul  3 15:40:40 2001
+	- Fixed bug which allowed to pass email addresses with two or
+	  more '@' chars as correct.
+
+1.00  Wed Jun 27 19:03:20 2001
+	- Added more tests for email address syntax check.
+	- Fixed spelling (with ispell) it this file :).
+	- Replaced 'validness' with 'validity' in docs. I'm sorry -
+	  English isn't my native language. Thanks to Dudley Cadet for
+	  this correction.
+	- This is 'offical' stable release. Now I'm already working on
+	  new rewritten version of this module which will have some
+	  new features: OO API, access to DNS resolver object (so it
+	  will be possible to set DNS servers for hostname resolving)
+	  and many others useful things.
+
+0.92  Fri Mar  9 15:11:34 2001
+	- Minor fix: don't get records of type 'IN' in hostname checks
+	  via DNS.
+	- Value $Mail::CheckUser::Helo_Domain option variable wasn't
+	  respected if SMTP server is verified with combination of
+	  MAIL and RCPT commands.
+	- Added disabling warnings that comes from Net::SMTP in
+	  timeout conditions.
+	- Incompatible change: Removed old VRFY check. Probably nobody
+	  even notice it.
+	- No longer putting rfcs into distro.
+	- Some minor pod doc fixes.
+
+0.91  Fri Jan 12 19:06:29 2001
+	- Added section IMPORTANT WARNINGS to pod documentation. I'm
+	  really tired to answer same questions :) Hope this will help.
+	- Added $Mail::CheckUser::Helo_Domain parameter. This allows
+	  to specify domain name used in HELO query. It can help if
+	  SMTP servers doesn't like default domain used in HELO query.
+	- Added LICENSE section to README and similar info to CheckUser.pm.
+	- Changed resolver behavior: now all domain names are checked in
+	  root zone. It means thats email addresses like someone@foo.bar
+	  will not be accepted as valid anymore just because your local
+	  computer resolves domain foo.bar.mydomain.com and have 'search
+	  mydomain.com' in his /etc/resolv.conf.
+
+0.90  Thu Nov 16 16:31:10 2000
+	- Removed some tests because some my test mailboxes have became
+	  invalid.
+	- Some minor pod doc fixes.
+	- Marking this release as 0.90 since I believe it has reached stable
+	  state now.
+
+0.17  Mon Sep 25 21:06:06 2000
+	- Added workaround against annoying warning under Perl 5.6 in
+	  Net::DNS module which is used by this module.
+
+0.16  Mon Sep 11 22:44:11 2000
+	- Add another check: now module can verify user on SMTP servers
+	  using combination of MAIL and RCPT commands. This check can detect
+	  validity of mailboxes on more SMTP servers then VRFY check. By
+	  default module now uses this new check. Old VRFY is still
+	  supported but can be possibly removed in future because it seems
+	  there is no need in it if we have MAIL/RCPT check (thanks for idea
+	  to Marc Jauvin).
+
+0.15  Tue Aug 29 15:40:28 2000
+	- Added some notes about third email address validity check into
+	  README and pod documentation.
+
+0.14  Sat Aug 26 21:10:08 2000
+	- Added more tests for emails address syntax.
+	- Fix for bug with verifying user on SMTP servers that support
+	  multiple domains (thanks to Karen R Sabog).
+
+0.13  Mon Aug 14 19:20:16 2000
+	- Added into distro rfc 821.
+	- Changes in regexp which handles emails syntax (it doesn't allow
+	  space in username anymore).
+	- Added more tests for emails address syntax.
+
+0.12  Wed Jul 19 20:33:29 2000
+	- Fixed bug in SMTP return codes handling (thanks to Rolf Beutner).
+
+0.11  Fri Jul 14 03:16:45 2000
+	- Added global variable $Mail::CheckUser::Treat_Timeout_As_Fail.
+	- Updated documentation.
+
+0.10  Sun Jul  9 04:50:59 2000
+	- Added missed README file to distribution.
+
+0.09  Sun Jul  9 02:51:36 2000
+	- Documentation fixes.
+	- Makefile.PL have better compatibility with CPAN.
+	- First release on CPAN.
+
+0.08  Sat Jul  8 20:46:49 2000
+	- Added more verbose debug logging.
+	- Added requirement for IO::Handle 1.21: earlier version has
+       	  problems with timeouts handling.
+
+0.07  Wed Apr  5 17:32:41 2000
+	- Documentation fixes: there was mentioned check_mail instead
+	  check_email.
+
+0.06  Tue Nov 16 03:51:03 1999
+	- Fixed bug with handling DNS request timeouts.
+
+0.05  Mon Nov 15 19:29:15 1999
+	- Script test.pl was split into four tests scripts and they
+	  were moved to 't' directory.
+
+0.04  Sat Nov 13 16:03:01 1999
+	- Documentation for Mail::CheckUser expanded a bit.
+	- Some syntax fixes in Mail::CheckUser documentation.
+
+0.03  Fri Nov 12 22:02:43 1999
+	- Documentation fixes for Mail::CheckUser.
+
+0.02  Fri Nov 12 21:56:59 1999
+	- Added global variable $Mail::CheckUser::Skip_SMTP_Checks
+	  which enables/disables connection to mail server to check
+	  if user exists on it.
+
+0.01  Tue Nov  2 04:34:00 1999
+	- First working version.
+

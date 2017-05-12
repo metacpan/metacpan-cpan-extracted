@@ -1,0 +1,86 @@
+{
+   "abstract" : "Cursor Extension for Mojo::Pg",
+   "author" : [
+      "Nathaniel Nutter C<nnutter@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-PgX-Cursor",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojo::Pg" : "2.0",
+            "Mojolicious" : "6.0",
+            "Time::HiRes" : "1.00",
+            "UUID::Tiny" : "1.01",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Mojo::PgX::Cursor" : {
+         "file" : "lib/Mojo/PgX/Cursor.pm",
+         "version" : "0.502001"
+      },
+      "Mojo::PgX::Cursor::Cursor" : {
+         "file" : "lib/Mojo/PgX/Cursor/Cursor.pm"
+      },
+      "Mojo::PgX::Cursor::Database" : {
+         "file" : "lib/Mojo/PgX/Cursor/Database.pm"
+      },
+      "Mojo::PgX::Cursor::Results" : {
+         "file" : "lib/Mojo/PgX/Cursor/Results.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nnutter/mojo-pgx-cursor/issues"
+      },
+      "homepage" : "https://github.com/nnutter/mojo-pgx-cursor",
+      "repository" : {
+         "url" : "git://github.com/nnutter/mojo-pgx-cursor.git",
+         "web" : "https://github.com/nnutter/mojo-pgx-cursor"
+      }
+   },
+   "version" : "0.502001",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

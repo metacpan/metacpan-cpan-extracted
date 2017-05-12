@@ -1,0 +1,93 @@
+0.35 Wed Dec 24 13:10:28 PST 2014
+ - Remove Module::Install::PMC from dist
+
+0.34 Sat Aug 16 16:09:53 PDT 2014
+ - Fix strict/warnings
+
+0.33 Sat Aug 16 15:31:37 PDT 2014
+ - Fix comments
+
+0.32 Sat Aug 16 15:26:25 PDT 2014
+ - Change pod to swim
+
+0.31 Sat Aug 16 14:07:04 PDT 2014
+ - Remove =travis section
+
+0.30 Sat Aug 16 11:32:59 PDT 2014
+ - Meta 0.0.2
+
+0.29 Sat Aug 16 03:49:25 PDT 2014
+ - Eliminate spurious trailing whitespace
+
+0.28 Sat Aug 16 02:19:16 PDT 2014
+ - Eliminate File::Basename
+
+0.27 Fri Aug 15 18:45:31 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.26 Wed Aug 13 12:13:45 PDT 2014
+ - Fix tests to use `inc` for Test::Base
+
+0.25 Wed Aug 13 11:23:45 PDT 2014
+ - Fix indexing by not splitting VERSION lines (Module::Install modules)
+
+0.24 Tue Aug 12 12:29:12 PDT 2014
+ - Switch to Zilla::Dist
+
+0.23 Tue Jun 14 00:09:03 EST 2011
+ - Release with Module::Package 0.25 to fix previous issues.
+
+0.22 Sun Jun 12 03:46:23 EST 2011
+ - Add Digest::SHA1 to deps
+
+0.21 Fri Jun 10 22:04:26 EST 2011
+ - Make modern
+ - Switch to Module::Package
+ - Use Stardoc
+ - Move out of Kwiki repo
+
+0.20 Tue Oct 17 02:16:18 PDT 2006
+ - Removed a leftover 'use XXX;' that made tests fail.
+
+0.19 Sun Oct  1 10:05:13 CST 2006
+ - Recognize whitespace after the heredoc marker, e.g. "<< 'FOO'"
+ - Don't treat a literal '<<' string by itself as a heredoc marker.
+ - Don't treat '<<=' as a heredoc marker.
+ - Support 'use_means_now'.
+
+0.18 Mon Jul 17 14:33:39 PDT 2006
+ - Patch from ruoso to make Makefile .pmc targets dep on .pm files.
+ - Refactor caller stack number into a method.
+
+0.17 Sun Jul  2 22:36:34 CDT 2006
+ - Support for compiling non-module files.
+
+0.16 Mon Jun 26 11:50:46 CDT 2006
+ - Pugs tree changes
+ - Support v6
+
+0.15 Sun Mar 26 12:34:58 PST 2006
+ - Added ability to fold out potentially conflicting code.
+ - Added a context block to pass more info to compilers.
+
+0.14 Tue Mar 14 13:02:11 PST 2006
+ - Added Module::Install support for pmc
+ - Lots of nice changes by audreyt
+
+0.13 Mon Mar 13 06:49:18 PST 2006
+ - Applied a freshness_check patch from audreyt
+ - Added a ToDo list
+ - Apostrophe is a package delimiter.
+
+0.12 Sun Mar 12 10:56:26 PST 2006
+ - Don't allow .pl -> .plc
+
+0.11 Sun Mar 12 10:05:47 PST 2006
+ - Fixed API bugs
+ - Fixed Doc
+ - Applied changes from audreyt
+ - Added stub for freshness check
+
+0.10 Sun Mar 12 05:47:06 PST 2006
+ - Maiden voyage
+

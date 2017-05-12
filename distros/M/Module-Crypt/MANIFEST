@@ -1,0 +1,11 @@
+Changelog
+Crypt.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-basic.t
+META.yml                                Module meta-data (added by MakeMaker)
+t/02-nopass.t
+t/03-death.t
+t/04-addl1.t
+t/05-addl2.t

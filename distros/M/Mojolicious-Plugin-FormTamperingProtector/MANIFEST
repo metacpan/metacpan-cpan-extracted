@@ -1,0 +1,22 @@
+Changes
+lib/.DS_Store
+lib/HTML/ValidationRules/Legacy.pm
+lib/Mojolicious/.DS_Store
+lib/Mojolicious/Plugin/FormTamperingProtector.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+t/00_load.t
+t/01_partial.t
+t/02_basic.t
+t/public/test2.css
+t/templates/test1.html.ep
+t/test_app.pl
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod.t
+xt/podcoverage.t
+xt/podspell.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

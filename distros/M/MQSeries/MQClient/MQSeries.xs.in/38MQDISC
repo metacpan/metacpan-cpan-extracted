@@ -1,0 +1,21 @@
+# -*-c-*-
+#
+# $Id: 38MQDISC,v 33.4 2012/09/26 16:10:05 jettisu Exp $
+#
+# (c) 1999-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+void
+MQDISC(Hconn,CompCode,Reason)
+	MQHCONN	Hconn
+	MQLONG	CompCode = NO_INIT
+	MQLONG	Reason = NO_INIT
+
+    CODE:
+	MQDISC(&Hconn,&CompCode,&Reason);
+    OUTPUT:
+	Hconn
+	CompCode
+	Reason
+

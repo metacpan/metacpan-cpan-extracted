@@ -1,0 +1,33 @@
+---
+abstract: 'music tension analysis'
+author:
+  - 'Jeremy Mates <jmates@cpan.org>'
+build_requires:
+  Test::Most: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+  strict: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Music-Tension
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  List::Util: '0'
+  Scalar::Util: '0'
+  strict: '0'
+version: '0.70'
+x_homepageresources:
+  repository:
+    type: git
+    url: git://github.com/thrig/Music-Tension.git
+    web: https://github.com/thrig/Music-Tension
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

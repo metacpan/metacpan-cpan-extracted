@@ -1,0 +1,43 @@
+---
+abstract: 'session data store plugin for Mojolicious'
+author:
+  - 'hayajo <hayajo@cpan.org>'
+build_requires:
+  Plack::Middleware::Session: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-SessionStore
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Mojolicious::Plugin::SessionStore:
+    file: lib/Mojolicious/Plugin/SessionStore.pm
+    version: '0.05'
+  Mojolicious::Sessions::Storable:
+    file: lib/Mojolicious/Sessions/Storable.pm
+    version: '0.05'
+requires:
+  Digest::SHA1: '0'
+  Mojolicious: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/hayajo/Mojolicious-Plugin-SessionStore/issues
+  homepage: https://github.com/hayajo/Mojolicious-Plugin-SessionStore
+  repository: git://github.com/hayajo/Mojolicious-Plugin-SessionStore.git
+version: '0.05'
+x_authority: cpan:HAYAJO

@@ -1,0 +1,69 @@
+INSTALLING a single Math::Matlab::Server
+----------------------------------------
+
+The following steps describe how to install a server which uses a
+Math::Matlab::Local object for computations.
+
+1. Install a mod_perl enabled web server (http://perl.apache.org/).
+
+2. Do 'make install' of this package.
+
+3. Choose the root Matlab working directory to be used by your Server
+(e.g. /etc/httpd/matlab-server). Make sure your web-server user has
+permissions to write to this directory.
+
+4. Choose the base URL for your Server (e.g. /matlab-server).
+
+5. Create a group and user(s) to be used for Basic Authentication. (see
+Apache docs for more details). (e.g. make a group called 'matlab_server').
+
+6. Add the following to your httpd.conf file:
+
+    PerlModule Math::Matlab::Server
+    PerlModule Math::Matlab::Local
+    <Perl>
+    $Math::Matlab::Server::CONFIG = {
+        class => 'Math::Matlab::Local',
+        args => {   root_mwd    => '#ROOT_MWD#',
+                    cmd         => '#MATLAB_EXE#'
+                }
+    };
+    </Perl>
+    
+    <Location #BASE_URL#>
+        SetHandler perl-script
+        PerlHandler Math::Matlab::Server
+        AuthName Matlab-Server
+        AuthType Basic
+        Order Allow,Deny
+        Allow from #MY_IPs#
+        AuthUserFile #USER_FILE#
+        AuthGroupFile #GROUP_FILE#
+        Order Allow,Deny
+        require group #GROUP#
+    </Location>
+
+The following strings between #-# should be replaced by actually values,
+such as:
+
+    #ROOT_MWD#      /etc/httpd/matlab-server
+    #MATLAB_EXE#    /usr/local/bin/matlab -nojvm -nodisplay
+    #BASE_URL#      /matlab-server
+    #MY_IPs#        myclient.mydomain.com
+    #USER_FILE#     /etc/httpd/users
+    #GROUP_FILE#    /etc/httpd/groups
+    #GROUP#         matlab_server
+
+7. Copy the server test files to the root_mwd of the server.
+
+    e.g. cp -r server/* /etc/httpd/matlab-server
+
+8. Start the server.
+
+Note: $Math::Matlab::Server::CONFIG can specify any sub-class of
+Math::Matlab along with the arguments needed by the constructor and the
+server will use this Math::Matlab object to perform the calculations.
+E.g. you could have a configuration with several servers set up with
+Math::Matlab::Local objects and one with a Math::Matlab::Pool which
+contains a Local and Remote's which point to the other servers. This is
+one way of implementing a pool of servers.

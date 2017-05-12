@@ -1,0 +1,29 @@
+Macrame version 0.11
+====================
+
+a proposal for a LISP-like macro language for Perl 5.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+a recent, perhaps hyperrecent* Filter::Simple version
+
+COPYRIGHT AND LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+
+*hyperrecent means so recent it hasn't been written yet
+
+
+

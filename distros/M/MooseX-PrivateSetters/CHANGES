@@ -1,0 +1,37 @@
+0.08    2011-08-29
+        - Actually include the second point from 0.07
+        - Sync README with POD
+
+0.07    2011-08-28
+        - Fix silly spelling of declare. Reported by confound via IRC.
+        - Clarified prefix used when attribute is declared with a
+          leading underscore. Reported by confound via IRC.
+
+0.06    2011-08-28
+        - Fix silly spelling of SemiAffordanceAccessors
+          (RT#70560). Reported by Shawn H. Corey. Thanks!
+
+0.05    2011-05-09
+        - Fix minimum perl version (RT#67749). Now requires perl 5.8.3
+
+0.04    2011-04-04
+        - Make compatable with upcoming Moose 2.0 (code provided my
+          Dave Rolsky). See
+          http://blog.moose.perl.org/2011/03/changes-to-moosex-modules-with-moose-20.html
+          for details.
+
+0.03    2010-07-25
+	- Minor documentation changes
+
+0.02    2010-07-24
+        - Update TODO
+        - Improve documentation
+        - Modernise by using class_metaroles in
+          Moose::Exporter->setup_import_methods
+        - Add tests for attributes starting with double underscore
+        - Bump Moose prereq to 0.94, add repository
+        - add TODO.org
+
+0.01    2010-07-15
+        - Initial release
+        - Based on Dave Rolsky's MooseX-SemiAffordanceAccessor-0.05

@@ -1,0 +1,26 @@
+From: David Bremner <bremner@debian.org>
+To: ddb@cpan.org
+Subject: testing inline PGP
+User-Agent: Notmuch/0.4 (http://notmuchmail.org) Emacs/23.2.1 (x86_64-pc-linux-gnu)
+Date: Sun, 12 Dec 2010 15:26:43 -0400
+Message-ID: <87bp4qrdvw.fsf@zancas.localnet>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Sender-Verified: bremner@unb.ca
+
+=2D----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+
+This message has tr=C3=A9s ex=C3=B6tic characters.
+=2D----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iJwEAQECAAYFAk0FIfQACgkQTiiN/0Um85n1pAP9GG4DFyjdvhv6M77tf7dmhn+w
+QeWF3jhw2z5agg3m7N063lO8UrRn1+wap4XsuRGDAWYoIT+nR9UJccl3VV22WpW6
+hMYhQZTKiOkHlKiNRoy+Zb+3P9ohpGguL0+VxqLKa7KibWC06gIkBOFTnxSaIakB
+xoSuXPvRiK0FYwxnqWo=3D
+=3DEDyV
+=2D----END PGP SIGNATURE-----
+

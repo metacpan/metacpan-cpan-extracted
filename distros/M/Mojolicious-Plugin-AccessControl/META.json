@@ -1,0 +1,68 @@
+{
+   "abstract" : "Access control",
+   "author" : [
+      "hayajo <hayajo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.4, Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-AccessControl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.030"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "2.63",
+            "Net::CIDR::Lite" : "0.21",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hayajo/Mojolicious-Plugin-AccessControl/issues"
+      },
+      "homepage" : "https://github.com/hayajo/Mojolicious-Plugin-AccessControl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hayajo/Mojolicious-Plugin-AccessControl.git",
+         "web" : "https://github.com/hayajo/Mojolicious-Plugin-AccessControl"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [
+      "Oliver Guenther <mail@oliverguenther.de>",
+      "hayato imai <hayato.imai@gmail.com>"
+   ]
+}
+

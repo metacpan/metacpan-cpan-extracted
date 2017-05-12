@@ -1,0 +1,259 @@
+0.202000 2016-12-19
+
+- The data insertion code was significantly refactored in order to improve
+  performance on inserts that result in record merges.
+
+
+0.201004 2016-12-07
+
+[ BUG FIXES ]
+
+- In an IPv6 tree with aliasing enabled, the IPv4 root node is now fixed,
+  meaning that it cannot be merged away or replaced. Previously, it was
+  possible for this node to be freed, causing aliases to be invalid.
+
+
+0.201003 2016-11-30
+
+[ BUG FIXES ]
+
+- The previous release included many unneeded modules in the configure phase
+  prereqs.
+
+
+0.201002 2016-11-30
+
+[ ENHANCEMENTS ]
+
+- Data merges are now cached so that we do not have to merge the same two
+  hashes repeatedly.
+- Remove unnecessary encode call that slowed down generation of data key on
+  inserts.
+
+
+0.201001 2016-07-13
+
+[ BUG FIXES ]
+
+- The writer now throws an exception if you try to insert a network that
+  contains an alias node. Previously, the alias node would be overwritten.
+
+
+0.201000 2016-04-22
+
+[ ENHANCEMENTS ]
+
+- The insertion methods now take a merge_strategy argument.
+- An add-only-if-parent-exists merge strategy was added. This replaces the
+  functionality of insert_only_if_parent_exists.
+
+[ OTHER ]
+
+- Deprecated insert_only_if_parent_exists and force_overwrite insertion
+  arguments. These arguments will now warn and will be removed in a future
+  major release.
+- Deprecated merge_record_collisions constructor argument. This argument will
+  now warn and will be removed in a future major release.
+
+
+0.200004 2016-04-20
+
+[ ENHANCEMENTS ]
+
+- Added the optional tree insertion argument insert_only_if_parent_exists.
+  When enabled, data will be inserted if a record already exists for the
+  network and only if the parent hash reference already exists. This argument
+  can only be used when the merge_strategy is "recurse".
+
+
+0.200003 2016-04-11
+
+[ BACKWARDS INCOMPATIBILITIES ]
+
+- The Teredo range is no longer removed from the database when
+  "remove_reserved_networks" is enabled. This range is globally routable and
+  aliased to the IPv4 range when "alias_ipv6_to_ipv4" is enabled. Previously
+  this alias would be removed if both "alias_ipv6_to_ipv4" and
+  "remove_reserved_networks" were enabled.
+
+[ ENHANCEMENTS ]
+
+- Allow changing the record size when unfreezing a frozen tree
+
+
+0.200002 2016-04-07
+
+[ BACKWARDS INCOMPATIBILITIES ]
+
+- The in-memory tree now has a root record rather than a root node. This fixes
+  the insertion of a /0 network (GitHub #55) and a segmentation fault when
+  merging two /1 networks into a /0 network (GitHub #58). Although insertions
+  of /0 are allowed (e.g., to create a default record for the database),
+  writing, iterating, and freezing a database that only contains a single /0
+  data record are currently forbidden.
+
+[ BUG FIXES ]
+
+- Fixed a bug where an incorrect node_count could be written to the database,
+  causing invalid metadata errors when reading it.
+
+[ OTHER ]
+
+- The node_count() method on the Tree object now always recalculates the node
+  count rather than using a possibly incorrect cached value.
+
+
+0.200001 2016-04-04
+
+[ BACKWARDS INCOMPATIBILITIES ]
+
+- Inserts into IPv4 aliased subtrees are no longer allowed when
+  alias_ipv6_to_ipv4 is enabled. When using an aliased tree, you will only be
+  able to insert IPv4 networks into ::0.0.0.0/96. If you are inserting these
+  addresses using IPv4 notation, not IPv6, this is the default location and
+  the change will not affect you. The reason for this is that inserting into
+  the aliased subnets leads to complications in determining the correct tree
+  depth for the insert and could also cause unintentional overwriting of data.
+
+[ BUG FIXES ]
+
+- Some memory leaks when throwing an exception were fixed.
+
+
+0.200000 2016-03-31
+
+[ BACKWARDS INCOMPATIBILITIES ]
+
+- When calling $tree->write_tree(), this module now defaults to removing
+  reserved and private networks from the tree before writing the tree to the
+  filehandle. If you want to create a tree that contains private networks, set
+  the constructor parameter "remove_reserved_networks" to false. This change
+  of behavior was done to allow code that previously used
+  Net::Works::Network->range_as_subnets() to use the new insert_range() method
+  added in this release.
+- When recursively merging a subtree, alias nodes are no longer followed.
+  Although this is a behavior change, it should not affect most users are
+  previously aliasing was done when the tree was written.
+
+[ ENHANCEMENTS ]
+
+- This module no longer used Net::Works internally. This was done to improve
+  performance.
+- Added MaxMind::DB::Writer::Tree->insert_range() method to provide a
+  mechanism for adding IP address ranges that are not well-defined networks.
+- Added MaxMind::DB::Writer::Tree->remove_network() to allow for removing a
+  network from a tree.
+
+[ BUG FIXES ]
+
+- Previously, inserting IPv6-mapped IPv4 addresses into a IPv6 tree with IPv4
+  aliasing enabled could result in a corrupt search tree unless the deprecated
+  "::a.b.c.d" mapping was used. This happened because the IPv4 aliasing was
+  only done after all of the data had been inserted.
+
+
+0.100007 2016-03-24
+
+- MaxMind::DB::Writer::Tree->new now accepts a merge_strategy parameter. When
+  merge_record_collisions is set, the default merge strategy is "toplevel",
+  which only merges the top level of the record hash. A new "recurse" merge
+  strategy has been added, which recursively merged the records data
+  structure, including both arrays and hashes. Please see the documentation
+  for more details.
+
+
+0.100006 2016-01-18
+
+- The documentation incorrectly stated the the MaxMind::DB::Writer::Tree->new
+  parameter "map_key_type_callback" was optional. It is actually required.
+
+
+0.100005 2015-10-26
+
+- $tree->insert_network now takes an optional additional-arguments hash
+  reference parameter. If this hash contains a truthy value for the
+  force_overwrite key, any data for the network will be overwritten even when
+  merge_record_collisions is enabled.
+
+
+0.100004 2015-07-15
+
+- Previously two equivalent data structures added to a database could end up
+  with different keys, causing both to be added to the final file separately.
+  The key generation was updated to reduce the likelihood of this happening.
+
+
+0.100003 2015-06-04
+
+- Fixed a bug in the data thawing code that incorrectly incremented the
+  SV referencing the HV rather than the HV. This could cause warnings about
+  attempts to free an unreferenced SV.
+- Fixed memory leaks on merge failures.
+- Minor code cleanups.
+
+
+0.100002 2015-04-23
+
+- Fixed test suite on OS X: Altered to cope with different Net::Works network
+  rendering on OS X
+
+
+0.100001 2015-03-12
+
+- Updated to the latest versions of the Math::Int128 (0.21) and Math::Int64
+  (0.51) C API integration code, as well as depending on the newest version of
+  the module from Perl.
+
+
+0.080000 2015-03-04
+
+- Implemented $tree->freeze_tree and
+  MaxMind::DB::Writer::Tree->new_from_frozen_tree methods. This provides a way
+  of passing the tree between different processes.
+
+- Made the attribute reader methods for all values passed to the constructor
+  public.
+
+- Added some docs on how insert order affects overlapping networks. GitHub
+  #18.
+
+- Fixed memory leaks when adding data to the tree.
+
+- Reduced the size of various structs used in the C code to reduce memory
+  usage.
+
+
+0.060000 2014-11-11
+
+- The map_key_type_callback argument for the MaxMind::DB::Writer::Tree class
+  is now required. In some use cases it's not really used but in the most
+  common use case leaving it out simply leads to confusing errors when
+  attempting to write the tree to disk. GH #10.
+
+
+0.050007 2014-10-20
+
+- The writer now iterates over the search tree in depth-first order when the
+  MaxMind::DB::Writer::Tree->iterate method is called. This means that
+  networks are seen in IP address order.
+
+
+0.050006 2014-07-28
+
+- The writer now throw an error when writing out the database if it would try
+  to write a record value in the search tree that is larger than the search
+  tree can handle. For example, if your record size is 24 bits, you cannot
+  write a value larger than (2^24)-1. Fixed by Greg Oschwald.
+
+- The Build.PL file shipped with this distro now dies if you try to run it on
+  Windows, since this module simply doesn't work on Windows.
+
+
+0.050005 2014-07-03
+
+- The merge-on-collision feature was fairly broken. Fixed by Greg Oschwald.
+
+
+0.050004 2014-05-27
+
+- First public release

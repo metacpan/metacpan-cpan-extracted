@@ -1,0 +1,13 @@
+Changes
+examples/placeholder.pl
+lib/LaunchPad.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/prereq.t
+t/test_manifest
+META.yml                                 Module meta-data (added by MakeMaker)

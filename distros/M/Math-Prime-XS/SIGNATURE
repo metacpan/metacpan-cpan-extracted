@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4c16de3e0571083b89bcafeea743bd248cc4c8ad Build.PL
+SHA1 181c7b9db8f0a0f5e3582e4e547ba9e0b11fb4a3 Changes
+SHA1 81db9702f82d5345602938b84fe0cee74fc0373d INSTALL
+SHA1 c8474dc066071d3aafbb6ab627ee6fda653e8380 MANIFEST
+SHA1 800d986fcee1bd1d8c4eec73a1ed57091a08c670 META.json
+SHA1 9bd529926d993aa3ac07f9b45bee74f7f4da9852 META.yml
+SHA1 3de1b8a5ae7b68f55e6ccdab346f0d61541a9eac Makefile.PL
+SHA1 79e131debb9f84ecc7e01a668b2ff9a7bc754c8a README
+SHA1 12d8640f380f42a1b208bf3856469e9945a2bde2 XS.xs
+SHA1 2be5e039fb8f84f90d657eb180754363167471f1 devel/boolean-speed.pl
+SHA1 f55e2176368717a35aaabf63231edc6a8d46a907 devel/cmpthese.pl
+SHA1 63eba60ea5a942f5d26dbbc64dcb170ce7977270 devel/isprime-speed.pl
+SHA1 ffcf6f27122e603137b8c191c5d4dd84bca824f8 lib/Math/Prime/XS.pm
+SHA1 fdc6f1f1efb37342d0c63ed913a98bb7deaf1634 ppport.h
+SHA1 025a278d529682714cfc286bf5e5670f7953eae2 t/00-load.t
+SHA1 2e8e89e5102195ede7974827255f46ccb97c108b t/functions.t
+SHA1 77263166082b5e5f1f4478b458b136d598b7e92e t/isprime-vs-sieve.t
+SHA1 a91d9f77eebca01d127c823c11dbf655983bae58 t/pod-coverage.t
+SHA1 1c2221234c6e97bd628d78e90052efb1a794e6ec t/pod.t
+SHA1 bced66a4479e7dddb6d7a88f60e3f2df221563b0 xt/isprime-oeis.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJXykdfAAoJEPjQtOfS0hGR+gQP/1zHtsBQOBKngfankWlDChHJ
+cOItWZ9/rd8uNeobHxrq55/1VlTLmmUZ9NviRSlv6Z4e0y6h1S1gu1cAIXg+IVpG
+6NPmAeAZZC3x72YfDNO8/fetdlkzw2RkcwH0c1YiUczX93XcCUmrCVFy06WBxE4d
+XkP2L/1C+z2ECUvMxrZzFbeif5CNJXJPiDJICDgsfgF9WGElOR3dW29SShdYUbyN
+DU7evzm181cJMklfs+AZKMzSBiwuBFsRofqo/BhlWSnmMXr7zlDU39bn0fT9poRl
+gvIwXlJV6ZLEw+6Sg0FSAJ5yBYn7o5Zx/e4F1bM1U8U4ZL6PwrFKCgbhQlSk+pgW
+UDqGpTwcbfUh4HMSewfoaYawO7Nyx8fY0ruwUKKoPsEubh5C9cwJTNw7/+u0GvQk
+YIGxn3wILBUW05zB87AbjGsfU/KUaLvP+/UdjZxR1UIrzf9DRaA95Q20ejVvy5+2
+A85EJYHRU3zPng//j5zKmanIbCHdPaJKDy+JDvYuRCRT9kHh/sBq15TNOAxvylDI
+cZhIJ3rDUd9GpAw+Kw97dVei6p0DwaDiE92+zK2lHqSFqNMB699l1vpFb0hUeoEh
+OvY+53/F+HGHTYiswbSYOjvDoW0DFNA5G4013vf8Tz8Q8G084Nl4c1EP/TVBfqKc
+Gg2kMcSR93kZco7hGS4J
+=jsDk
+-----END PGP SIGNATURE-----

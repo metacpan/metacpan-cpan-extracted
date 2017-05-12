@@ -1,0 +1,311 @@
+{
+   "abstract" : "CPAN module authoring tool",
+   "author" : [
+      "Tokuhiro Matsuno < tokuhirom@gmail.com >"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.9",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Minilla",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "CPAN::Uploader" : "0",
+            "Pod::Escapes" : "0",
+            "Software::License" : "0.103010",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.101080",
+            "Test::PAUSE::Permissions" : "0",
+            "Test::Pod" : "0",
+            "Test::Spellunker" : "v0.2.7",
+            "Version::Next" : "0"
+         },
+         "requires" : {
+            "App::cpanminus" : "1.6902",
+            "Archive::Tar" : "1.60",
+            "CPAN::Meta" : "2.132830",
+            "Config::Identity" : "0",
+            "Data::Section::Simple" : "0.04",
+            "ExtUtils::Manifest" : "1.54",
+            "File::Copy::Recursive" : "0",
+            "File::Which" : "0",
+            "File::pushd" : "0",
+            "Getopt::Long" : "2.36",
+            "Module::CPANfile" : "0.9025",
+            "Module::Metadata" : "1.000027",
+            "Module::Runtime" : "0",
+            "Moo" : "1.001",
+            "Pod::Markdown" : "1.322",
+            "TAP::Harness::Env" : "0",
+            "TOML" : "0.95",
+            "Term::ANSIColor" : "0",
+            "Text::MicroTemplate" : "0.20",
+            "Time::Piece" : "1.16",
+            "Try::Tiny" : "0",
+            "URI" : "0",
+            "parent" : "0",
+            "perl" : "5.008005",
+            "version" : "0"
+         },
+         "suggests" : {
+            "Devel::PPPort" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Devel::CheckLib" : "0"
+         },
+         "requires" : {
+            "CPAN::Meta::Validator" : "0",
+            "File::Temp" : "0",
+            "JSON" : "0",
+            "Module::Build::Tiny" : "0.035",
+            "Test::More" : "0.98",
+            "Test::Output" : "0",
+            "Test::Requires" : "0"
+         },
+         "suggests" : {
+            "Dist::Zilla" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Minilla" : {
+         "file" : "lib/Minilla.pm",
+         "version" : "v3.0.10"
+      },
+      "Minilla::CLI" : {
+         "file" : "lib/Minilla/CLI.pm"
+      },
+      "Minilla::CLI::Build" : {
+         "file" : "lib/Minilla/CLI/Build.pm"
+      },
+      "Minilla::CLI::Clean" : {
+         "file" : "lib/Minilla/CLI/Clean.pm"
+      },
+      "Minilla::CLI::Dist" : {
+         "file" : "lib/Minilla/CLI/Dist.pm"
+      },
+      "Minilla::CLI::Help" : {
+         "file" : "lib/Minilla/CLI/Help.pm"
+      },
+      "Minilla::CLI::Install" : {
+         "file" : "lib/Minilla/CLI/Install.pm"
+      },
+      "Minilla::CLI::Migrate" : {
+         "file" : "lib/Minilla/CLI/Migrate.pm"
+      },
+      "Minilla::CLI::New" : {
+         "file" : "lib/Minilla/CLI/New.pm"
+      },
+      "Minilla::CLI::Release" : {
+         "file" : "lib/Minilla/CLI/Release.pm"
+      },
+      "Minilla::CLI::Run" : {
+         "file" : "lib/Minilla/CLI/Run.pm"
+      },
+      "Minilla::CLI::Test" : {
+         "file" : "lib/Minilla/CLI/Test.pm"
+      },
+      "Minilla::Error::CommandExit" : {
+         "file" : "lib/Minilla/Errors.pm"
+      },
+      "Minilla::Errors" : {
+         "file" : "lib/Minilla/Errors.pm"
+      },
+      "Minilla::FileGatherer" : {
+         "file" : "lib/Minilla/FileGatherer.pm"
+      },
+      "Minilla::Git" : {
+         "file" : "lib/Minilla/Git.pm"
+      },
+      "Minilla::Gitignore" : {
+         "file" : "lib/Minilla/Gitignore.pm"
+      },
+      "Minilla::License::Perl_5" : {
+         "file" : "lib/Minilla/License/Perl_5.pm"
+      },
+      "Minilla::License::Unknown" : {
+         "file" : "lib/Minilla/License/Unknown.pm"
+      },
+      "Minilla::Logger" : {
+         "file" : "lib/Minilla/Logger.pm"
+      },
+      "Minilla::Metadata" : {
+         "file" : "lib/Minilla/Metadata.pm"
+      },
+      "Minilla::Migrate" : {
+         "file" : "lib/Minilla/Migrate.pm"
+      },
+      "Minilla::ModuleMaker::ExtUtilsMakeMaker" : {
+         "file" : "lib/Minilla/ModuleMaker/ExtUtilsMakeMaker.pm"
+      },
+      "Minilla::ModuleMaker::ModuleBuild" : {
+         "file" : "lib/Minilla/ModuleMaker/ModuleBuild.pm"
+      },
+      "Minilla::ModuleMaker::ModuleBuildTiny" : {
+         "file" : "lib/Minilla/ModuleMaker/ModuleBuildTiny.pm"
+      },
+      "Minilla::Profile::Base" : {
+         "file" : "lib/Minilla/Profile/Base.pm"
+      },
+      "Minilla::Profile::Default" : {
+         "file" : "lib/Minilla/Profile/Default.pm"
+      },
+      "Minilla::Profile::ExtUtilsMakeMaker" : {
+         "file" : "lib/Minilla/Profile/ExtUtilsMakeMaker.pm"
+      },
+      "Minilla::Profile::ModuleBuild" : {
+         "file" : "lib/Minilla/Profile/ModuleBuild.pm"
+      },
+      "Minilla::Profile::ModuleBuildTiny" : {
+         "file" : "lib/Minilla/Profile/ModuleBuildTiny.pm"
+      },
+      "Minilla::Profile::XS" : {
+         "file" : "lib/Minilla/Profile/XS.pm"
+      },
+      "Minilla::Project" : {
+         "file" : "lib/Minilla/Project.pm"
+      },
+      "Minilla::Release::BumpVersion" : {
+         "file" : "lib/Minilla/Release/BumpVersion.pm"
+      },
+      "Minilla::Release::CheckChanges" : {
+         "file" : "lib/Minilla/Release/CheckChanges.pm"
+      },
+      "Minilla::Release::CheckOrigin" : {
+         "file" : "lib/Minilla/Release/CheckOrigin.pm"
+      },
+      "Minilla::Release::CheckUntrackedFiles" : {
+         "file" : "lib/Minilla/Release/CheckUntrackedFiles.pm"
+      },
+      "Minilla::Release::Commit" : {
+         "file" : "lib/Minilla/Release/Commit.pm"
+      },
+      "Minilla::Release::DistTest" : {
+         "file" : "lib/Minilla/Release/DistTest.pm"
+      },
+      "Minilla::Release::MakeDist" : {
+         "file" : "lib/Minilla/Release/MakeDist.pm"
+      },
+      "Minilla::Release::RegenerateFiles" : {
+         "file" : "lib/Minilla/Release/RegenerateFiles.pm"
+      },
+      "Minilla::Release::RewriteChanges" : {
+         "file" : "lib/Minilla/Release/RewriteChanges.pm"
+      },
+      "Minilla::Release::RunHooks" : {
+         "file" : "lib/Minilla/Release/RunHooks.pm"
+      },
+      "Minilla::Release::Tag" : {
+         "file" : "lib/Minilla/Release/Tag.pm"
+      },
+      "Minilla::Release::UploadToCPAN" : {
+         "file" : "lib/Minilla/Release/UploadToCPAN.pm"
+      },
+      "Minilla::ReleaseTest" : {
+         "file" : "lib/Minilla/ReleaseTest.pm"
+      },
+      "Minilla::Util" : {
+         "file" : "lib/Minilla/Util.pm"
+      },
+      "Minilla::WorkDir" : {
+         "file" : "lib/Minilla/WorkDir.pm"
+      },
+      "Module::BumpVersion" : {
+         "file" : "lib/Module/BumpVersion.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Minilla/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Minilla",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Minilla.git",
+         "web" : "https://github.com/tokuhirom/Minilla"
+      }
+   },
+   "version" : "v3.0.10",
+   "x_authority" : "cpan:TOKUHIROM",
+   "x_contributors" : [
+      "mattn <mattn.jp@gmail.com>",
+      "Daisuke Murase <typester@cpan.org>",
+      "kazhiramatsu <kazhiramatsu.github@gmail.com>",
+      "Keiji, Yoshimi <walf443@gmail.com>",
+      "Yuji Shimada <xaicron@gmail.com>",
+      "Fuji, Goro <g.psy.va@gmail.com>",
+      "GeJ <geraud@hyaku.nijuu.nana>",
+      "Ryo Okamoto <ryo@aquahill.net>",
+      "Oleg Gashev <oleg@gashev.net>",
+      "keita.iseki <keita.iseki@gmail.com>",
+      "hideo55 <hide.o.j55@gmail.com>",
+      "ITO Nobuaki <daydream.trippers@gmail.com>",
+      "ysasaki <aloelight@gmail.com>",
+      "Hiroyuki Akabane <hirobanex@gmail.com>",
+      "TAGOMORI Satoshi <tagomoris@gmail.com>",
+      "Jiro Nishiguchi <jiro@cpan.org>",
+      "Masahiro Nagano <kazeburo@gmail.com>",
+      "Helmut Wollmersdorfer <helmut@wollmersdorfer.at>",
+      "Kenichi Ishigaki <ishigaki@cpan.org>",
+      "Graham Knop <haarg@haarg.org>",
+      "Nathaniel Nutter <iam@nnutter.com>",
+      "Songmu <y.songmu@gmail.com>",
+      "Manni Heumann <github@lxxi.org>",
+      "iwata-motonori <motonori.iwata@dena.com>",
+      "aereal <aereal@aereal.org>",
+      "Daisuke Maki <lestrrat+github@gmail.com>",
+      "Klaus Eichner <klaus03@gmail.com>",
+      "moznion <moznion@gmail.com>",
+      "Fitz Elliott <felliott@fiskur.org>",
+      "Tatsuhiko Miyagawa <miyagawa@gmail.com>",
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
+      "karupanerura <karupa@cpan.org>",
+      "Alex Kapranoff <kappa@yandex.ru>",
+      "Alex Kapranoff <alex@kapranoff.ru>",
+      "Jose Luis Perez Diez <jluis@escomposlinux.org>",
+      "Pine Mizune <pinemz@gmail.com>",
+      "sago35 <sago35@gmail.com>",
+      "Jörg Forstreuter <forstreuter@belwue.de>",
+      "amarnus <amar@semantics3.com>",
+      "Zak B. Elep <zakame@zakame.net>",
+      "tokuhirom <tokuhirom@gmail.com>",
+      "Shoichi Kaji <skaji@cpan.org>",
+      "Shoichi Kaji <skaji@outlook.com>",
+      "Syohei YOSHIDA <syohex@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

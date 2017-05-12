@@ -1,0 +1,25 @@
+---
+abstract: 'Role for those who prefer LogHandler'
+author:
+  - 'NJWalker <njwalker@gmail.com>'
+build_requires:
+  File::Remove: 0
+  Moose: 0
+  Test::Spec: 0
+  autodie: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Role-LogHandler
+requires:
+  Log::Handler: 0
+  MooseX::Role::Parameterized: 0
+  namespace::autoclean: 0
+  strict: 0
+  warnings: 0
+version: 0.008

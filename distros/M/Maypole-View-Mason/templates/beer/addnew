@@ -1,0 +1,38 @@
+<h3>Add a new <%$classmetadata->{moniker}%></h3>
+<P>
+<FORM METHOD="post" ACTION="<%$base%>/<%$classmetadata->{moniker}%>/do_edit/">
+    <INPUT TYPE="hidden" NAME="action" VALUE="create">
+    <INPUT TYPE="hidden" NAME="class" VALUE="<%$classmetadata->{name}%>">
+    <TABLE class="view">
+<%perl>
+foreach my $col (@{$classmetadata->{columns}}) {
+  next if $col eq "id";
+    my $element = $classmetadata->{cgi}->{$col};
+    if ($col eq "brewery") {
+        my $create_url = $base . "/brewery/edit";
+        my $new_element = HTML::Element->new("option", 
+                class=> "redirect",
+                value=> $create_url)->push_content("Create new brewery");
+        my ($child) = $element->content_list;
+        my $foo = $element->attr("name", "navi");
+        $child = $child->attr("selected", "selected");
+        $element =
+            $element->unshift_content(HTML::Element->new("option", value=>" "));
+            $element->attr("onChange", "go()");
+            $element = $element->unshift_content($new_element);
+}
+</%perl>
+     <TR> <TD class="field"> <% $classmetadata->{colnames}->{$col} %>
+     </TD>
+          <TD> <% $element->as_HTML %> </TD> </TR>
+%}
+    </TABLE>
+    <INPUT TYPE="submit" NAME="create" VALUE="create">
+</FORM>
+<%once>
+use HTML::Element;
+</%once>
+<%args>
+$classmetadata
+$base
+</%args>

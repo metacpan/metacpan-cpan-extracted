@@ -1,0 +1,17 @@
+Build.PL
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+eg/dla1.pl
+eg/dla2.pl
+eg/dla-config.xml
+eg/index.mc
+eg/dla.mc
+lib/Math/Fractal/DLA.pm
+lib/Math/Fractal/DLA/Explode.pm
+lib/Math/Fractal/DLA/Surrounding.pm
+lib/Math/Fractal/DLA/Race2Center.pm
+lib/Math/Fractal/DLA/GrowUp.pm
+t/basic.t

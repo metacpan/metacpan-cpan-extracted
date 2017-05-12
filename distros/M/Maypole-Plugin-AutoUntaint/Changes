@@ -1,0 +1,28 @@
+Revision history for Maypole-Plugin-AutoUntaint
+
+0.07    Tues 28 Jun 2005 12:40
+        - fixed bug in auto_untaint to catch non-existent classes (thanks Will Hawes)
+
+0.05    Tues 31 May 2005 21:15
+        - moved installation of CDBI::P::AutoUntaint::auto_untaint() into model 
+            from start of MM::P::AutoUntaint::auto_untaint() to setup(). Otherwise, 
+            custom model classes were not yet loaded when I tried to install CDBI::Plugin::Type
+            into them.
+        - removed call to auto_untaint() from setup() - it resulted in 2 calls to auto_untaint()
+
+0.04    Thur 28 Apr 2005 15:20
+        - loads CDBI::Plugin::Type into the model class, which is now 
+            needed by CDBI::Plugin::AutoUntaint
+        - using CDBI::Plugin::AutoUntaint's strict mode
+
+0.03    Thur 28 Apr 2005 09:15
+        - pod updates
+
+0.02    Wed  27 Apr 2005 22:00
+        - pod updates
+        - removed hackery to deal with Maypole not dying on cue,
+            since in fact it does.
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

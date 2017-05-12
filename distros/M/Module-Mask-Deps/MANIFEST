@@ -1,0 +1,25 @@
+Build.PL
+Changes
+lib/Module/Mask/Deps.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/01..deps.t
+t/02..versions.t
+t/99..pod.t
+t/data/Test-Dist1/Build.PL
+t/data/Test-Dist1/lib/Test/Dist1.pm
+t/data/Test-Dist1/Makefile.PL
+t/data/Test-Dist1/MANIFEST
+t/data/Test-Dist1/MANIFEST.SKIP
+t/data/Test-Dist1/META.yml
+t/data/Test-Dist1/test.pl
+t/data/Test-Dist2/lib/Test/Dist2.pm
+t/data/Test-Dist2/Makefile.PL
+t/data/Test-Dist2/META.json
+t/lib/Bar.pm
+t/lib/Baz.pm
+t/lib/Baz/Qux.pm
+t/lib/Foo.pm

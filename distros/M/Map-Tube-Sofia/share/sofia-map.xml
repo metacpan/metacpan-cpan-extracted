@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tube name="Софийско метро">
+  <!-- https://bg.wikipedia.org/wiki/Софийско_метро -->
+  <lines>
+    <line id="I" name="Първи метродиаметър" color="red"/>
+    <line id="II" name="Втори метродиаметър" color="blue"/>
+  </lines>
+  <stations>
+    <!-- Stations on multiple lines. -->
+    <station id="ОБЕЛЯ" name="Обеля" line="Първи метродиаметър,Втори метродиаметър" link="A02,B02"/>
+    <station id="СЕРДИКА" name="Сердика" line="Първи метродиаметър,Втори метродиаметър" link="A07,A09,B08,B10"/>
+
+    <station id="A02" name="Сливница" line="Първи метродиаметър" link="ОБЕЛЯ,A03"/>
+    <station id="A03" name="Люлин" line="Първи метродиаметър" link="A02,A04"/>
+    <station id="A04" name="Западен парк" line="Първи метродиаметър" link="A03,A05"/>
+    <station id="A05" name="Вардар" line="Първи метродиаметър" link="A04,A06"/>
+    <station id="A06" name="Константин Величков" line="Първи метродиаметър" link="A05,A07"/>
+    <station id="A07" name="Опълченска" line="Първи метродиаметър" link="A06,СЕРДИКА"/>
+    <station id="A09" name="СУ „Св. Климент Охридски“" line="Първи метродиаметър" link="СЕРДИКА,A10"/>
+    <station id="A10" name="Стадион „Васил Левски“" line="Първи метродиаметър" link="A09,A11"/>
+    <station id="A11" name="Жолио Кюри" line="Първи метродиаметър" link="A10,A12"/>
+    <station id="A12" name="Г. М. Димитров" line="Първи метродиаметър" link="A11,A13"/>
+    <station id="A13" name="Мусагеница" line="Първи метродиаметър" link="A12,A14"/>
+    <station id="A14" name="Младост 1" line="Първи метродиаметър" link="A13,A15"/>
+    <station id="A15" name="Младост 3" line="Първи метродиаметър" link="A14,A16"/>
+    <station id="A16" name="ИЕЦ - Цариградско шосе" line="Първи метродиаметър" link="A15"/>
+
+    <station id="B02" name="Ломско шосе" line="Втори метродиаметър" link="ОБЕЛЯ,B03"/>
+    <station id="B03" name="Бели Дунав" line="Втори метродиаметър" link="B02,B04"/>
+    <station id="B04" name="Надежда" line="Втори метродиаметър" link="B03,B05"/>
+    <station id="B05" name="Хан Кубрат" line="Втори метродиаметър" link="B04,B06"/>
+    <station id="B06" name="Княгиня Мария Луиза" line="Втори метродиаметър" link="B05,B07"/>
+    <station id="B07" name="Централна жп гара" line="Втори метродиаметър" link="B06,B08"/>
+    <station id="B08" name="Лъвов мост" line="Втори метродиаметър" link="B07,СЕРДИКА"/>
+    <station id="B10" name="НДК" line="Втори метродиаметър" link="СЕРДИКА,B11"/>
+    <station id="B11" name="Европейски съюз" line="Втори метродиаметър" link="B10,B12"/>
+    <station id="B12" name="Джеймс Баучер" line="Втори метродиаметър" link="B11"/>
+  </stations>
+</tube>

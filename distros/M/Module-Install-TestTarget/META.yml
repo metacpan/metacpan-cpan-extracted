@@ -1,0 +1,24 @@
+---
+abstract: 'Assembles test targets for `make` with code snippets'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Install-TestTarget
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Module::Install: 1.00
+  Test::More: 0.96
+  Test::Requires: 0
+version: 0.19

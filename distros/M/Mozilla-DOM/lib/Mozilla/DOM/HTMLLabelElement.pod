@@ -1,0 +1,68 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLLabelElement
+
+=for object Mozilla::DOM::HTMLLabelElement
+
+Mozilla::DOM::HTMLLabelElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLLabelElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLLabelElement interface is the interface to a [X]HTML
+ * label element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLLabelElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $accesskey = $htmllabelelement->B<GetAccessKey>()
+
+=head2 $form = $htmllabelelement->B<GetForm>()
+
+=head2 $htmlfor = $htmllabelelement->B<GetHtmlFor>()
+
+=head2 $htmllabelelement->B<SetAccessKey>($accesskey)
+
+=over
+
+=over
+
+=item * $accesskey (string)
+
+=back
+
+=back
+
+=head2 $htmllabelelement->B<SetHtmlFor>($htmlfor)
+
+=over
+
+=over
+
+=item * $htmlfor (string)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

@@ -1,0 +1,8 @@
+"order date","customer id","customer first_name","customer last_name","order number","item name","item manufacturer","item price"
+"2013-02-01 12:32:00",7,Publius,Ovidius,23,"fountain pen",acme,$3.25
+"2013-02-01 12:32:00",7,Publius,Ovidius,23,journal,acme,$5.50
+"2013-02-01 13:01:00",22,John,"Davidson ",42,journal,acme,$5.50
+"2013-02-02 10:19:53",401,Christina,Rosetti,991-2,journal,acme,$5.50
+"2013-02-02 09:00:00",19,"John ",Davidson,29,journal,PaperWorks,$4.50
+"2013-02-05 19:23:04",19,John,Davidson,53-1,"pen, ball point",acme,$.99
+"2013-02-02 10:19:53",401,Christina,Roseti,13,journal,acme,$5.50

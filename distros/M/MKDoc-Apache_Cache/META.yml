@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         MKDoc-Apache_Cache
+version:      0.71
+version_from: lib/MKDoc/Apache_Cache.pm
+installdirs:  site
+requires:
+    Apache:                        1.20
+    Cache::Cache:                  1.01
+    Compress::Zlib:                1.33
+    Digest::MD5:                   2.33
+    HTTP::Date:                    0.1
+    MKDoc::Control_List:           0.1
+    Test::More:                    0.47
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

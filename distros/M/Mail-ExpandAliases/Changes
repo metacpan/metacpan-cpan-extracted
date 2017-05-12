@@ -1,0 +1,30 @@
+# ----------------------------------------------------------------------
+# Changelog for Mail::ExpandAliases
+# ----------------------------------------------------------------------
+
+# ----------------------------------------------------------------------
+# Version 0.49                                              July 1, 2010
+# ----------------------------------------------------------------------
+
+* Fixed a bug in exists() that would have been caught with better tests.
+
+# ----------------------------------------------------------------------
+# Version 0.48                                              July 1, 2010
+# ----------------------------------------------------------------------
+
+* Added check and exists methods.  check() returns the literall,
+  non-recursively-expanded alias value, and exists returns a boolean
+  indicating whether an alias is defined in a file.
+
+# ----------------------------------------------------------------------
+# Version 0.45                                              (Unreleased)
+# ----------------------------------------------------------------------
+
+* Added patch from Thomas Kishel <tom@kishel.net>, which adds a method
+  that returns a list of all of the aliases in the aliase file.
+
+# ----------------------------------------------------------------------
+# Version 0.44                                        September 22, 2004 
+# ----------------------------------------------------------------------
+
+* Initial import from old CVS repository.

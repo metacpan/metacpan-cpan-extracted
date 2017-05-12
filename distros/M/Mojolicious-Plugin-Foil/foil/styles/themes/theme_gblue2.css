@@ -1,0 +1,136 @@
+/* ================================================================== */
+/* THEME: Grey-Blue 2
+ * dark_on_light
+ */
+/* ================================================================== */
+/* THEME: Grey-Blue
+ */
+/* ================================================================== */
+/* THEME: Grey-Blue - fonts
+ */
+/* ------------------------------------------------------------------ */
+/* Fonts */
+h1, h2, h3, h4 {
+  font-family: Angular, Dalek, elektra, verdana, helvetica, arial, sans-serif;
+  font-weight: normal;
+  color: black;
+}
+
+/* ================================================================== */
+/* ICONS - dark on light
+ * Nav arrows with transparent backgrounds
+ */
+.side nav li > ul {
+  list-style-image: url(nav_black.png);
+}
+
+/* ================================================================== */
+/* General */
+.verge, header,
+footer, .side, .fancy {
+  color: #000033;
+  background: #ccccff;
+  border-color: navy;
+}
+
+header,
+footer {
+  background-image: url(gblue_h.jpg);
+}
+
+.side {
+  background-image: url(gblue_side.jpg);
+}
+
+body {
+  color: #000033;
+  background-color: #ccccff;
+}
+
+a:link {
+  color: #003366;
+}
+
+a:visited {
+  color: #330066;
+}
+
+.fancy {
+  color: #000033;
+  background-image: url("gblue_side.jpg");
+  border: 5px double #6666ff;
+  padding: 0;
+}
+.fancy li {
+  padding: 0.5em;
+  margin: 5px;
+  border: 5px solid #6666ff;
+  background-color: #ccccff;
+  background: linear-gradient(#ccccff, #809fff);
+}
+.fancy li a:link {
+  color: #003366;
+}
+.fancy li a:visited {
+  color: #330066;
+}
+
+.button, input[type=submit], header nav a,
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: #000033;
+  border-color: navy;
+  background-color: #aaaadd;
+}
+
+.button a:link, input[type=submit] a:link, header nav a a:link,
+header nav .selflink a:link,
+header nav em a:link,
+header nav .current a a:link, a.button:link, header nav a:link {
+  color: #000033;
+}
+
+.button a:visited, input[type=submit] a:visited, header nav a a:visited,
+header nav .selflink a:visited,
+header nav em a:visited,
+header nav .current a a:visited, a.button:visited, header nav a:visited {
+  color: #330066;
+}
+
+header nav li {
+  border-color: #555588;
+}
+
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: #9900CC;
+  background-color: #ccccff;
+}
+
+/* ================================================================== */
+/* THEME: Grey-Blue 2 - fonts
+ */
+/* ------------------------------------------------------------------ */
+/* Fonts */
+h1, h2, h3, h4 {
+  font-family: Bahamas, Blippo, "Bauhaus 93", HomewardBound, Vogue, Totem, Crescent, verdana, helvetica, arial, sans-serif;
+  font-weight: normal;
+  color: black;
+}
+
+/* ================================================================== */
+/* General */
+.verge, header,
+footer, .side, .fancy {
+  color: #000033;
+  background: #9999cc;
+  border-color: navy;
+}
+
+header,
+footer,
+.side {
+  background-image: url(gblue2_h.jpg);
+}

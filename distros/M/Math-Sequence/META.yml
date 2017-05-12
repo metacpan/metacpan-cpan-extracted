@@ -1,0 +1,12 @@
+--- #YAML:1.0
+name: Math-Sequence
+version: 1.00
+abstract: Perl extension dealing with mathematic sequences
+license: perl
+distribution_type: module
+requires:
+  Test::More: 0.44
+  Math::Symbolic: 0.128
+  Parse::RecDescent: 1.8
+dynamic_config: 0
+

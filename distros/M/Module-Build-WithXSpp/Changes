@@ -1,0 +1,52 @@
+Revision history for Perl extension Module::Build::WithXSpp.
+
+0.13   Mon Sep 30 16:00 CEST 2013
+  - Better detection of when .xs file needs regenerating.
+
+0.13   Mon Jan 28 20:50 CEST 2013
+  - Additional support for 'cpp_source_files' property on top of
+    'cpp_source_dirs'.
+
+0.12   Sat Oct  6 11:40 CEST 2012
+  - POD fixes from Florian Schlichting
+
+0.11   Wed Dec 28 08:00 CEST 2011
+  - Fix for spaces in paths (attempt 1)
+
+0.10   Wed Aug  3 19:19 CEST 2011
+  - ExtUtils::Typemap has been renamed to ExtUtils::Typemaps.
+
+0.09   Thu Mar  3 20:00 CEST 2011
+  - Offer early_includes option to include your headers before
+    loading the polluting perl stuff. (Suggested by Shmuel
+    Fomberg)
+
+0.08   Thu Jan 20 20:00 CEST 2011
+  - Workaround duplicate typemap files on case-insensitive
+    file systems (RT #64240, diagnosed and fixed
+    by Shmuel Fomberg)
+
+0.07   Thu Jul 15 20:00 CEST 2010
+  - Fixed detection of .xspt XS++ typemap files
+
+0.06   Tue Jul 13 20:00 CEST 2010
+  - Automatic build-time dependency on EU::XSpp
+
+0.05   Mon Jul 12 20:00 CEST 2010
+  - Build dir now searched for headers. XS and XS++ have no
+    business there.
+
+0.04   Mon Jul 12 20:00 CEST 2010
+  - Requires ExtUtils::CppGuess 0.04
+  - Fix extra-{compiler,linker}-flags handling
+  - Build dir now searched for headers, XS, and XS++
+  - Auto-adds configuration-time dependency on EU::CppGuess
+
+0.03   Sun Jul 11 10:00 CEST 2010
+  - Add support for typemap modules
+
+0.02   Sat Jul 10 10:00 CEST 2010
+  - Add missing dependency on ExtUtils::CppGuess.
+
+0.01   Fri Jul  9 20:00 CEST 2010
+  - First release.

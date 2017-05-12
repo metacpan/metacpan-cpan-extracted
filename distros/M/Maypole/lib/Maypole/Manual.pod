@@ -1,0 +1,142 @@
+=head1 NAME
+
+Maypole::Manual - The Maypole Manual
+
+=head1 DESCRIPTION
+
+The Maypole documentation is arranged over several files; this is 
+the right one to start with, as it provides an overview of the
+entire set of Maypole manuals, with a brief description of each.
+Some of these manuals are not yet finished, but they should still
+be useful.
+
+=over 4
+
+=item L<Maypole::Manual::About> - Overview of the Project
+
+This document is a general introduction to Maypole: what it is, what it
+does and how it works.
+
+Maypole is a framework for Web development. At the basic level, it
+converts a URL like C<http://www.mysite.com/product/display/12> into a
+method call such as "perform the C<display> method on item C<12> in the
+C<product> table" and then shows the result: here, presumably, a
+description of item C<12> in your product database,
+
+It is based on Model-View-Controller (MVC), a design paradigm in
+which each major aspect of an application's operation is
+handled by a different and totally separate system).
+
+Basic installation instructions are given. A sample Web
+application--the Beer database--is introduced, set up, and
+discussed. Finally, the path a Maypole request takes as it
+moves through the system is described.
+
+=item L<Maypole::Manual::Model> - Model Classes *
+
+This document introduces the I<model class>, which controls
+the interaction between Maypole and your database. The use of
+"actions"--method calls that operate on your database--is
+discussed. Maypole's default model class is L<Class::DBI>,
+which basically creates a class for each table in your
+database and provides a variety of convenient methods for
+manipulating each table and its relations. It integrates very
+smoothly with Maypole's default L<view class|Maypole::Manual::View>,
+the L<Template|Template> Toolkit.
+
+=item L<Maypole::Manual::View> - View Classes *
+
+This document is an extensive discussion of Maypole's I<view class>,
+which takes the data produced by the model (see
+above) and sends it through a templating
+system in order to produce output. It focusses chiefly on
+the L<Template> Toolkit, which is Maypole's default templating
+system, but discusses other possibilities.
+
+=item L<Maypole::Manual::StandardTemplates> - Standard actions and templates *
+
+This document discusses the standard actions and templates
+that Maypole uses. The standard actions (method calls that
+operate on your database) include C<list>, which generates a
+paged list of a table suitable for browsing, and C<search>, which
+handles a search query and generates search results.
+
+The standard templates, which generate output for display on
+the Web, also include C<list>, which displays the entries in a
+table, and C<search>, which displays the result of a search.
+
+You'll note that most actions are associated with templates.
+
+This document also introduces the theory behind Maypole's
+actions and templates, showing you how to write your own
+so that you can have a highly customized application.
+
+=item L<Maypole::Manual::Plugins> - writing Maypole plugins
+
+Useful information for plugin authors. 
+
+=item L<Maypole::Manual::Terminology> - pinning down usage
+
+As well as defining common terms used in Maypole discussions, this document 
+briefly discusses the MVC-ness of Maypole. 
+
+=item L<Maypole::Manual::Workflow> - Description of the Request Workflow 
+
+This is a technical document that describes the progress of a
+request through the entire Maypole system. It should be of
+interest chiefly to those people hacking on Maypole itself,
+and not to most of those who are using it.
+
+=item L<Maypole::Manual::Beer> - The Beer Database Revisited *
+
+This document gives a close look at the Beer database that
+was introduced in L<Maypole::Manual::About>.
+
+=item L<Maypole::Manual::Cookbook> - The Maypole Cookbook 
+
+This extensive document is Maypole's main "How do I do X?" FAQ.
+It provides a wide variety of cookbook-like techniques that
+are useful both for themselves, and as examples of what sort
+of things can be done with Maypole processes.
+
+=item L<Maypole::Manual::Flox> - Case Study: Flox social network *
+
+This is an example of how to construct a large Web application
+in Maypole: a "social network", similar to Friendster and
+Orkut. It shows, specifically, the database structure and the
+variety of customized techniques that make such a system
+work.
+
+=item L<Maypole::Manual::BuySpy> - Case Study: iBuySpy *
+
+This is an example of the C<ASP.NET> sample portal application
+ported to Maypole. L<http://www.ibuyspy.com> is a fictional
+e-commerce site that is relatively sophisticated. It is much
+better as a Maypole application.
+
+=back
+
+  * indicates incomplete chapters.
+
+=head1 SEE ALSO
+
+L<http://maypole.perl.org>
+
+=head1 AUTHOR
+
+The Maypole Manual was written by Simon Cozens. A generous grant from the Perl
+Foundation in the first quarter of 2004 funded some of the chapters of this
+manual.
+
+This overview was rewritten by Jesse Sheidlower, C<jester#panix.com>,
+based on Simon Cozens' original I<Overview> document.
+
+In December 2004, Dave Howorth, C<dave.howorth#acm.org> kindly donated some
+of his spare time to improve the structure of the manual and bring it up to
+date.
+
+=head1 AUTHOR EMERITUS
+
+Simon Cozens, C<simon#cpan.org>
+
+=cut

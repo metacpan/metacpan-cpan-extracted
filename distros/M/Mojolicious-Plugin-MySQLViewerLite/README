@@ -1,0 +1,32 @@
+Mojolicious::Plugin::MySQLViewerLite
+
+  Mojolicious plugin to display mysql database information on browser
+
+CAUTION
+
+  this module is merged into Mojolicious::Plugin::DBViewer.
+  this module is DEPRECATED and will be removed from CPAN in 2018/4/1.
+
+SYNOPSYS
+
+  # Mojolicious::Lite
+  plugin 'MySQLViewerLite', dbh => $dbh;
+
+  # Mojolicious
+  $app->plugin('MySQLViewerLite', dbh => $dbh);
+
+  # Access
+  http://localhost:3000/mysqlviewerlite
+  
+DESCRIPTION
+
+  Mojolicious::Plugin::MySQLViewerLite is Mojolicious plugin
+  to display MySQL database information on browser.
+
+  This module have the following features.
+
+    - Display all table names
+    - Display show create table
+    - Select * from TABLE
+    - Display primary keys, null allowed columnes,
+      database engines, and charsets in all tables.

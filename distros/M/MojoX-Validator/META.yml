@@ -1,0 +1,26 @@
+---
+abstract: 'Data validator'
+author:
+  - 'Viacheslav Tykhanovskyi <vti@cpan.org>'
+build_requires: {}
+configure_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MojoX-Validator
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  Input::Validator: '0'
+  Mojolicious: '5.81'
+  perl: '5.008007'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/vti/mojox-validator
+version: '0.0016'

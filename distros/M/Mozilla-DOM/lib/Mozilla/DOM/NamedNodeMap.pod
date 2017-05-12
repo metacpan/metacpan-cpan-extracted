@@ -1,0 +1,128 @@
+=head1 NAME
+
+Mozilla::DOM::NamedNodeMap
+
+=for object Mozilla::DOM::NamedNodeMap
+
+Mozilla::DOM::NamedNodeMap is a wrapper around an instance of Mozilla's
+nsIDOMNamedNodeMap interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+ * Objects implementing the nsIDOMNamedNodeMap interface are used to 
+ * represent collections of nodes that can be accessed by name.
+ *
+ * For more information on this interface please see 
+ * http://www.w3.org/TR/DOM-Level-2-Core/
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::NamedNodeMap->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $len = $namednodemap->B<GetLength>()
+
+=head2 $node = $namednodemap->B<GetNamedItem>($name)
+
+=over
+
+=over
+
+=item * $name (string)
+
+=back
+
+=back
+
+=head2 $node = $namednodemap->B<GetNamedItemNS>($namespaceURI, $localName)
+
+=over
+
+=over
+
+=item * $namespaceURI (string)
+
+=item * $localName (string)
+
+=back
+
+=back
+
+=head2 $node = $namednodemap->B<Item>(PRUint32 index)
+
+=over
+
+=over
+
+=item * $index (integer (long))
+
+=back
+
+=back
+
+=head2 $node = $namednodemap->B<RemoveNamedItem>($name)
+
+=over
+
+=over
+
+=item * $name (string)
+
+=back
+
+=back
+
+=head2 $node = $namednodemap->B<RemoveNamedItemNS>($namespaceURI, $localName)
+
+=over
+
+=over
+
+=item * $namespaceURI (string)
+
+=item * $localName (string)
+
+=back
+
+=back
+
+=head2 $node = $namednodemap->B<SetNamedItem>($node)
+
+=over
+
+=over
+
+=item * $arg (Mozilla::DOM::Node)
+
+=back
+
+what is named about this?
+
+=back
+
+=head2 $node = $namednodemap->B<SetNamedItemNS>($node)
+
+=over
+
+=over
+
+=item * $arg (Mozilla::DOM::Node)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

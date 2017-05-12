@@ -1,0 +1,160 @@
+Revision history for MVC-Neaf
+
+0.17    Fri Apr 28 2017
+        - API Add postmodern sugar: get + post '/path' => sub { ... }.
+        - API Add put(), head() prototyped sugar.
+        - API Add -headers => [...] to handler return hash
+        - API BREAK Kill get_form_as_hash, undeprecate get_form_as_list for now
+        - API BREAK Finally removed path_info w/o path_info_regex
+        - API Add get_url_base, get_url_rel, and get_url_full with override capabilities
+        - API Added session engine auto-load to sugar api
+        - API Add deprecated warning for Req->set_default
+        - MOD Add directory listing to static aka X::Files
+        - MOD Add fine-grained serve_file method to X::Files (thx @akuklev)
+        - DOC Add hook flow diagram NOCODE
+
+0.16    Mon Mar 27 2017
+        - API Add implicit HEAD handler whenever GET is defined
+        - API MINOR Add dash-prefixed defaults to route()
+        - MOD Add cookie-based session backend (X::Session::Cookie)
+        - MOD Add SQL-based session backend (X::Session::SQL)
+        - MOD Add session backend DIY class (X::Session::Base)
+        - BUG Make Neaf::CLI work with given Neaf object and not global one
+        - DEV Add some crude options to run_test()
+
+0.15    Wed Mar 22 2017
+        - API BREAK Kill session deprecated warning
+        - BUG Allow utf8 path-info
+        - MOD Add form->as_url, form->sign to form data object
+        - BUG Fix binmode in static file serving
+        - API add pre_route, pre_render hook phases, add hook prepend, fixup docs
+
+0.14    Sun Dec 18 2016
+        - API add_hook() method, hooks: pre_logic, pre_content, pre_reply, pre_cleanup
+        - API set_path_defaults( '/path' => { foo => ... } )
+        - API Add Request->stash(), Request->reply() for hook intercommunication
+        - API Add experimental prototyped sugar: get /foo, post /bar, neaf error 404 ...;
+
+0.1302  Thu Dec  1 2016
+        - BUG Fix locale-dependent dates, create MVC::Neaf::Util class
+
+0.13    Thu Dec  1 2016
+        - API BREAK Add path_info_regex => qr/.../ parameter to route() & path_info()
+        - API BREAK static() no .dotfiles by default, add allow_dots => 1 to overcome
+        - NET Add Expires: header controlled by cache_ttl in static() and route()
+        - NET Append Allow: header to a 405 error as per HTTP/1.1 spec
+
+0.1201  Sun Nov 13 2016
+        - BUG Fixed File::Session fail under Windows OS
+
+0.12    Fri Nov 11 2016
+        BROKE API! Incompatibilities were gently introduced with a nice
+        DEPRECATED warning to account for early design mistakes.
+        The warnings will NOT become errors until at least 0.15
+        API BREAK Remove pre_route callback return check
+        API BREAK Change session engine return format
+        API BREAK path_info now requires validation regexp, just like param() and get_cookie()
+        API BREAK Remove implicit default empty value in Request->param
+        API BREAK Add set_error_handler (CODEREF || HASH), deprecate error_template(HASH)
+        NET Add Request->body() for raw request data
+        API Add multi_param() feature
+        API Remove GET params from POST request, add url_param() for fetching them
+        MOD Add file-based session engine
+        MOD ServerStat can be subclassed with a do_write method instead of on_write callback
+        MOD Make JSON view faster and more tolerant
+        BUG Fix foo|bar regexps defeating RE quoting
+
+0.1101  Fri Oct 28 2016
+        TST Fix tests
+        BUG Fix Request->session vs view_as behaviour
+
+0.11    Sun Oct 23 2016
+        API Deprecated old form() substitutes
+        API Allow different handlers per (method, path) combo; default allowed methods = [GET, POST, HEAD]
+        DOC Update readme & checklist, write style guide
+        DOC Improve CORE docs, add example snippets there
+
+0.10    Tue Oct 18 2016
+        API Add cache_ttl to cache static files, move static to X::Files
+        DEV Make MVC::Neaf call cli-debug if CGI detected w/nonempty @ARGV
+        API add is_post shorthand for method() eq POST
+        BUG Fix X::Session sloppy pack() and double base64
+
+0.09    Sat Oct 01 2016
+        MOD Add form validator with resubmission, redo LIVR support completely
+        DEV Add CLI debugging module
+        API Add delete_cookie to Request, add more stuff to dump()
+        API Move neaf_err $@; function into core
+        API Add set_header, push_header and remove_header to Request
+        TST Reach 100% coverage on Neaf.pm & Request.pm
+        BUG Replace md5 with sha1+sha224 in session generation
+        BUG Bugs fixed, even more added
+        DOC Better documentation on the main module
+
+0.08    Mon Sep 26 2016
+        BUG Bugfix in session, content type detection, and static files
+        BUG Fix content type autodetection, enforce utf8 more rigorously
+        NET Add Content-Disposition header to static mode
+        API Allow passing session to view 'as is' if needed
+        REF Rewrite session mechanism in a more reasonable way
+
+0.07    Thu Sep 22 2016
+        API Add X::Session for session storage, add Req->session
+        API Add Validation::LIVR-based form validation
+        API Add MVC::Neaf->static( uri => localdir ) for serving static content
+        API Add MVC::Neaf->alias( newpath, oldpath ) for creating, well, aliases
+        DEV Add Request->dump() for debugging
+        DEV Add MVC::Neaf->get_routes() for introspection, fixup docs for route()
+        TPL TT view now passes its args to Template engine
+        TST Make ALL examples run together under CGI, PSGI, or mod_perl
+        REF Use HTTP::Headers throughout the code instead of homegrown hash
+        REF Rename -callback => -jsonp, callback(in view) => on_render
+        BUG Bugs fixed, even more added
+
+0.06    Tue Sep 6 2016
+        API Add async content serving via -continue, write(), close()
+        API Add per-route view defaults, add MVC::Neaf::View
+        API Add fancy foo=>bar=>baz paths in MVC::Neaf->route
+        API Add MVC::Neaf::Exception signalling, add neaf_err
+        TST Increase cover -t to 70%, add autotest to load ALL modules
+        BUG Bugs fixed, even more added
+
+0.05    Sun Sep 4 2016
+        API Add method => [GET, POST] restrictions to MVC::Neaf->route
+        API Add fancy error templates via MVC::Neaf->error_template
+        DEV Add custom error handler via MVC::Neaf->on_error
+        DEV Add MVC::Neaf->server_stat and MVC::Neaf::X::ServerStat plugin
+        API Add req->postpone(CODEREF) method to delay execution
+        API Add a ton of getters to Request.
+        TST Add examples: http request breakdown and a tiny 200-line wiki
+        BUG Bugs fixed, even more introduced
+        Semireal PSGI app actually released to the net, using Neaf now
+
+0.04    Fri Sep 2 2016
+        NET HEAD request handled, Content-Length served
+        API Add multiparameter form validation EXPERIMENTAL
+        API Add global and per-request set_default() methods
+        DEV Add MVC::Neaf::View::Dumper - just dump raw reply from controller
+        BUG Bugs fixed, even more introduced
+        Semireal psgi app migrated from ad-hoc framework
+
+0.03    Thu Sep 01 2016
+        API Add Apache2/mod_perl2 support
+        DOC Update MVC::Neaf documentation
+        API Cookie now requires regexp validation
+        API Add MVC::Neaf->pre_route( CODE ) for mangling initial request
+        API add request->set_param( name : value )
+        API Everything in utf-8 now by default
+        BUG Bugs fixed, even more introduced
+
+0.02    Wed Aug 31 2016
+        API Now -content can be used to return raw content, e.g. images
+        API Add uploads
+        TST Add apache2 tempdir auxiliary script to test under apache
+        API Add cookies, add redirects, add referer
+        API Add View::JS with jsonp support
+        API Add View::TT with basic Template support
+
+0.01    Somewhere in the August
+        First version, released on an unsuspecting world.
+

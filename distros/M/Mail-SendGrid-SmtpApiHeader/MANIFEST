@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+lib/Mail/SendGrid/SmtpApiHeader.pm
+t/01-tests.t
+META.yml                                 Module meta-data (added by MakeMaker)

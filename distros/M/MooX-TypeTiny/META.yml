@@ -1,0 +1,29 @@
+---
+abstract: 'Optimized type checks for Moo + Type::Tiny'
+author:
+  - 'haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>'
+build_requires:
+  Test::Fatal: '0.003'
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-TypeTiny
+no_index:
+  directory:
+    - t
+    - xt
+requires:
+  Moo: '1.004003'
+  Type::Tiny: '1.000002'
+resources:
+  IRC: irc://irc.perl.org/#web-simple
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-TypeTiny
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/haarg/MooX-TypeTiny.git
+version: '0.001003'

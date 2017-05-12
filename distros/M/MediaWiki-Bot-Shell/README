@@ -1,0 +1,140 @@
+NAME
+    MediaWiki::Bot::Shell - a shell interface to your MediaWiki::Bot
+
+SYNOPSIS
+        use MediaWiki::Bot::Shell;
+
+        my $shell = MediaWiki::Bot::Shell->new();
+        $shell->cmdloop();
+
+DESCRIPTION
+    This provides a shell interface to your MediaWiki::Bot. By initializing
+    one or more MediaWiki::Bot objects and using them for the duration of
+    your shell session, initialization costs are amortized.
+
+    Configuration data is read from ~/.perlwikibot-shell.rc, or prompted for
+    at startup.
+
+    You should probably run "pwb", which is included with this module, to
+    enter your shell.
+
+OPTIONS
+    Options are passed to the constructor as a hashref. Options are
+    currently:
+
+    debug
+        Like it says on the tin. Setting debug provides debug output from
+        this module, as well as from the underlying MediaWiki::Bot
+        object(s).
+
+    norc
+        Don't read options from ~/.perlwikibot-shell.rc. This will result in
+        the user being prompted for username, password etc.
+
+COMMANDS
+  delete
+    This will delete a page on the wiki you're currently using:
+
+        delete "Main Page" "for teh lulz"
+
+    To delete a page on another wiki, use [[w:fr:Page Title]]:
+
+        delete "[[w:fr:Page Title]]" "pour les lulz"
+
+    Make sure you quote your input correctly.
+
+  set_wiki
+    Switch wikis:
+
+        set_wiki meta.wikimedia.org
+        set_wiki secure.wikimedia.org wikipedia/meta/w
+
+  debug
+    Turn debugging on or off
+
+        debug on
+        debug off
+
+  read
+    Read the wikitext of the given page. Remember to quote the page title
+    correctly:
+
+        read "Main Page"
+
+  kill
+    Lock a cross-wiki vandal's account:
+
+        kill "Some stupid vandal"
+
+  nuke
+    The nuclear option: globally lock *and hide* an account:
+
+        nuke "Mike.lifeguard lives at 123 Main St."
+
+  globalblock
+    Apply a global block to an IP or CIDR range:
+
+        globalblock 127.0.0.1 --expiry "31 hours"
+        globalblock 192.168.0.1 --no-anon-only
+
+   Options:
+    --block, --no-block
+        Whether to block or unblock the target. Default is to block. When
+        unblocking, all settings except "--reason" are ignored.
+
+    --anon-only, --ao
+    --no-anon-only, --no-ao
+        Whether to block only anonymous users, or all users. Default is to
+        hardblock (no-anon-only).
+
+    --reason, --summary
+        Sets the block reason.
+
+    --expiry, --length
+        Sets the block expiry.
+
+  rollback
+    Finds all top edits by the specified user and rolls them back using
+    mark-as-bot.
+
+        rollback "Fugly vandal"
+
+    --force
+        Override the 10-query limit. Use this when reverting mass vandals
+        which have done hundreds of edits. The limit is intended to guard
+        against accidentally rolling back edits of an established user.
+
+    Note that this does not (currently) revert page moves, nor delete page
+    creations.
+
+SEE ALSO
+    pwb, MediaWiki::Bot and the admin plugin.
+
+BUGS
+    Yes. This is a proof-of-concept, and there are several issues with both
+    MediaWiki::Bot::Plugin::Steward and this module. It should be considered
+    pre-alpha. I'm releasing the code so others can find and fix them, in
+    the hope that it will be useful for others.
+
+    Please do not report bugs to me without a patch. I have no plans to work
+    on this further.
+
+AUTHOR
+    Mike.lifeguard <mike.lifeguard@gmail.com>
+
+COPYING
+    Copyright (C) 2010 by Mike.lifeguard.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 3 of the License, or (at your
+    option) any later version.
+
+    This library is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program. If not, see <http://www.gnu.org/licenses/>.
+

@@ -1,0 +1,27 @@
+---
+abstract: 'a shell interface to your MediaWiki::Bot'
+author:
+  - 'Mike.lifeguard <lifeguard@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102345, CPAN::Meta::Converter version 2.102400'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MediaWiki-Bot-Shell
+requires:
+  Config::General: 0
+  Encode: 0
+  File::Copy: 0
+  Getopt::Long: 0
+  IO::Handle: 0
+  MediaWiki::Bot: 0
+  Pod::Select: 0
+  Pod::Text::Termcap: 0
+  Term::Prompt: 0
+  Term::Shell: 0
+version: 0.002

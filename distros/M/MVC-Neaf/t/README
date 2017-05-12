@@ -1,0 +1,6 @@
+0xx = if this fails, stop
+1xx = core modules w/o routing
+2xx = core modules
+4xx = error handling
+8xx = plugins
+9xx = experimental & deprecated

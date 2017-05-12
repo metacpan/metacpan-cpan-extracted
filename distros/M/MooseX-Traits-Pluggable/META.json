@@ -1,0 +1,77 @@
+{
+   "abstract" : "trait loading and resolution for Moose",
+   "author" : [
+      "Rafael Kitover <rkitover@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Traits-Pluggable",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Load" : "0",
+            "List::MoreUtils" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util" : "0",
+            "Scalar::Util" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Moose" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "base" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-MooseX-Traits-Pluggable@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Traits-Pluggable"
+      },
+      "homepage" : "http://metacpan.org/release/MooseX-Traits-Pluggable",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rkitover/moosex-traits-pluggable.git",
+         "web" : "http://github.com/rkitover/moosex-traits-pluggable"
+      }
+   },
+   "version" : "0.12",
+   "x_authority" : "cpan:RKITOVER"
+}
+

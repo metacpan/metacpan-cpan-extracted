@@ -1,0 +1,47 @@
+NAME
+    Mojolicious::Plugin::Web::Auth::Site::Runkeeper - Runkeeper OAuth Plugin
+    for Mojolicious::Plugin::Web::Auth
+
+VERSION
+    version 0.000001
+
+SYNOPSIS
+        # Mojolicious
+        $self->plugin('Web::Auth',
+            module      => 'Runkeeper',
+            key         => 'Runkeeper consumer key',
+            secret      => 'Runkeeper consumer secret',
+            on_finished => sub {
+                my ( $c, $access_token, $access_secret ) = @_;
+                ...
+            },
+        );
+
+        # Mojolicious::Lite
+        plugin 'Web::Auth',
+            module      => 'Runkeeper',
+            key         => 'Runkeeper consumer key',
+            secret      => 'Runkeeper consumer secret',
+            on_finished => sub {
+                my ( $c, $access_token, $access_secret ) = @_;
+                ...
+            };
+
+
+        # default authentication endpoint: /auth/runkeeper/authenticate
+        # default callback endpoint: /auth/runkeeper/callback
+
+DESCRIPTION
+    This module adds Runkeeper
+    <https://runkeeper.com/developer/healthgraph/overview> support to
+    Mojolicious::Plugin::Web::Auth.
+
+AUTHOR
+    Olaf Alders <olaf@wundercounter.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2016 by Olaf Alders.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

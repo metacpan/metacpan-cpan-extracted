@@ -1,0 +1,148 @@
+#!/usr/bin/perl
+
+use IO::Pty;
+use Event qw(loop);
+use Event::Watcher qw(R W);
+use Time::HiRes qw/sleep time/;
+use IO::Handle;
+
+$p = new IO::Pty;
+$p->blocking(0);
+
+# this calls sox
+#$PLAYULAW = "| sox -traw -r8000 -U -b - -tossdsp /dev/dsp";
+#$RECULAW  = "sox -tossdsp -r8000 /dev/dsp -traw -U -b - |";
+
+# this is for linux/suns (and works better)
+$PLAYULAW = ">/dev/audio";
+$RECULAW  = "</dev/audio";
+
+# 0 AT
+# 1 playing
+# 2 recording
+
+$ETX="\003";
+$DLE="\020";
+$DC4="\024";
+
+$CPS=8000;
+
+print "please connect to ",$p->slave->ttyname,"\n";
+print "press '?' and enter for help\n";
+
+$|=1;
+
+$state=0;
+$sending=0;
+
+sub clip0($) { $_[0] < 0 ? 0 : $_[0] }
+
+sub state {
+   print "switching from state $state to $_[0]\n";
+   $state=shift;
+   close SOUND;
+   if ($state==1) { open SOUND,$PLAYULAW or die };
+   if ($state==2) { open SOUND,$RECULAW  or die };
+   SOUND->autoflush(1);
+}
+
+my $mr; $mr = Event->io(fd => fileno $p, poll => R, cb => sub {
+   my $self=shift;
+   my $l;
+   $l = sysread $p, $input, 1024,length($input);
+   if ($state==0) {
+      if ($input =~ s/^([^\r\n]*)[\r\n]+//) {
+         $line = $1;
+         $line =~ y/\x00-\x1f//d;
+         print "got command »$line«\n";
+         if ($line =~ /^ATA/) {
+            $output .= "VCON\r\n";
+         } elsif ($line =~ /^AT\+VTX\+VRX/) {
+            $output .= "CONNECT\r\n";
+            print "switching on voice *playback*\n";
+            state(1);
+            $sending = 1;
+         } elsif ($line =~ /^AT/) {
+            $output.="OK\r\n";
+         }
+      }
+      select undef,undef,undef,0.1;
+   } elsif ($state) {
+      $input=~s/^((?:[^$DLE]+|$DLE[^$ETX$DC4])*)//o;
+      my $data=$1;
+      $data=~s/$DLE$DLE/$DLE/go;
+      print SOUND $data if $state==1;
+      if ($input=~s/^$DLE($ETX|$DC4)//o) {
+         print "ETX received, terminating send\n";
+         $output .= "$DLE$ETX\r\nVCON\r\n";
+         $sending = 0;
+         state(0);
+      }
+      # throttle the sound output... easier than I thought
+      $mr->stop;
+      Event->timer(after => clip0(-0.1 + length ($data) / $CPS), cb => sub { $mr->start });
+   }
+});
+
+my $mw; $mw = Event->io(fd => fileno $p, poll => W, cb => sub {
+   my $self=shift;
+   my $l;
+   if($sending) {
+      if (!$output) {
+         if ($state==2) {
+            sysread SOUND, $output, 512;
+            $output =~ s/$DLE/$DLE$DLE/go;
+         } elsif ($state==1) {
+            $output="\xFE\xFF" x 256 unless $output;
+         }
+      }
+   }
+   $l = syswrite $p, $output;
+   substr ($output, 0, $l)="" if $l > 0;
+   $mw->stop;
+   Event->timer(after => clip0(-0.001 + $l / $CPS), cb => sub { $mw->start });
+});
+
+Event->io(fd => 0, poll => R, cb => sub {
+   my $l=<STDIN>;
+   chomp $l;
+   if ($l=~/^r$/) {
+      $output.="CALLER NUMBER: 512182285\r\nRING\r\n";
+   } elsif ($l=~/^i$/) {
+      $output=$input="";
+      state(0);
+      print "initialized\n";
+   } elsif ($l=~/^h$/) {
+      $output="$DLE$ETX";
+      #$sending=0;
+      #state(0);
+      print "sent ETX\n";
+   } elsif ($l=~/^m$/) {
+      state(2) if $state == 1;
+   } elsif ($l=~/^p$/) {
+      state(1) if $state == 2;
+   } elsif ($l=~/^q$/) {
+      unloop;
+   } elsif ($l=~/^[*0-9A-D#]+$/) {
+      print "sending touchtones for '$l'\n";
+      $l=~s/(.)/$DLE$1/g;
+      $output="$l$output";
+   } elsif ($l=~/^\?/) {
+      print <<EOF;
+
+i	re-initialize/reset
+r	send a ring (without number)
+m	answer (switch from playback to record)
+p	playback (switch to playback from record)
+h	send ETX (end of voice transmission, "remote hangup")
+[0-9a-d*#]	simulate press of touchtone key
+?	this help
+      
+EOF
+   }
+});
+
+# this actually uses polling(!)
+
+loop;
+

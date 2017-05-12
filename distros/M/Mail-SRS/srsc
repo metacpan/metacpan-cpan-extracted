@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use IO::Socket;
+use Mail::SRS::Daemon qw(:all);
+
+my $sock = new IO::Socket::UNIX(
+				Type	=> SOCK_STREAM,
+				Peer	=> $SRSSOCKET,
+					);
+$sock->autoflush(1);
+while (<>) {
+	$sock->print($_);
+	my $line = <$sock>;
+	print $line;
+	last if $sock->eof;
+}
+
+=head1 NAME
+
+srsc - a trivial commandline interface to srsd.
+
+=head1 SYNOPSIS
+
+srsc
+
+=head1 DESCRIPTION
+
+What you type into srsc is sent over the socket to srsd. What it
+returns is printed.
+
+This client is provided for debugging purposes only and is not intended
+to be a part of the official toolset.
+
+=head1 SEE ALSO
+
+L<Mail::SRS>, L<Mail::SRS::Daemon>, L<srsd>,
+http://www.anarres.org/projects/srs/
+
+=head1 AUTHOR
+
+    Shevek
+    CPAN ID: SHEVEK
+    cpan@anarres.org
+    http://www.anarres.org/projects/
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004 Shevek. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

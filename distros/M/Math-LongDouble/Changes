@@ -1,0 +1,103 @@
+ 0.18
+  - tweak output of try2.in.
+  - alter test 12 in t/overload_cmp_reversal.t to cater for dragonfly (in addition
+    to freebsd).
+  - alter test 2 in t/special.t to cater for dragonfly's reduced erfl and erfcl
+    precision.
+
+ 0.17
+  - Additional checks to Makefile.PL, trying to eliminate multiple FAIL reports
+    that emanate from Slaven's and Bingos' freebsd and dragonfly machines.
+
+ 0.16
+  - Improve the workaround for the __MINGW64__ modfl bug.
+  - Align default output precision with mpfr library. (ie Rewrite
+    calculation of _DIGITS in LongDouble.xs.)
+  - Extend the modf_LD mingw64 workaround to include mingw-runtime version 5.0.
+  - Fix cmp overloading.
+
+ 0.15
+  - Another rewrite of try.in aimed at eliminating the continuing
+    FAIL reports from Bingos' NetBSD machines.
+  - Rewrite try2.in to avoid constants.
+
+ 0.14
+  - 0.13 failed to pick when Bingos' BSD machines were going to choke on erfl() - so
+    I've rewritten try.in so that it actually outputs something.
+  - Change try3.in and try4.in to actually output something.
+
+ 0.13
+  - add implementation of sincosl(), for use when that function is not available.
+  - runtime version 4 modfl() segfaults, so we introduce our own rendition of modfl()
+    if that runtime is in place. See http://sourceforge.net/p/mingw-w64/bugs/478/
+  - if test 6 of t/int.t reports that overloaded int(-0.6257) returns 0 instead
+    of -0, we no longer record that as "not ok". We do however emit a message
+    stating that we got '0' instead of the expected '-0'.
+  - add some more diagnostics to tests 2, 3 and 5 of t/prec.t in an attempt to
+    find out why one (or more ?) of chorny's smokers fails those tests.
+  - Add nnumflag(), set_nnum() and clear_nnum() functions. Also check for
+    non-numeric strings handed to strtold().
+
+ 0.12
+  - approx()imate test 3 result of pow.t if it fails initially.
+  - run try.exe to check for undefined references that don't show up until
+    runtime.
+  - add more diagnostics to nan_pow.t for failing nan**0 tests.
+  - tweaks to cmp.t to try to fix or better understand some strange failures on FreeBSD.
+
+ 0.11
+  - Add extra checks, workarounds, tests wrt (the possibly unimplemented)
+    isnanl(), nanl() and signbitl().
+
+
+ 0.10
+  - Fix checking for nan**0 bug.
+  - Modify t/nan_pow.t and t/overload.t to accommodate nan**0 bug.
+  - Check for (and workaround) absence of isnanl(). (Assume that if isnanl
+    is missing then so is nanl - and work around that, too.)
+
+ 0.09
+  - Work around bug on some compilers that has nan**0 is NaN.
+  - Allow less stringent checking on cbrt() calculations that should return
+    an integer value. (This accommodates a minor, but nonetheless annoying,
+    bug with some libc versions.)
+
+ 0.08
+  - Provide more float.h and math.h constants.
+
+ 0.07
+  - Add math library functions.
+  - Add ld_bytes function.
+  - Allow overloading of UV, IV, NV and PV types.
+  - Remove support for *signed* NaN.
+
+ 0.06
+  - Add -DOLDPERL capability to Makefile.PL
+  - Add LD_LDBL_MANT_DIG and LD_DBL_MANT_DIG
+
+ 0.05
+  - Provide LD_DBL_DIG LD_LDBL_DIG ld_min_inter_prec ld_max_orig_len
+    ld_min_inter_base and ld_max_orig_base functions.
+  - Define PERL_NO_GET_CONTEXT.
+  - Add metadata to Makefile.PL.
+
+ 0.04
+  - Use float.h's LDBL_DIG to set the initial value of _DIGITS in LongDouble.xs.
+  - Add _LDBL_DIG XSub so that we can see the value of float.h's LDBL_DIG.
+  - Amend t/prec.t to work with powerpc64 (where long double has 106 bits of
+    precision).
+
+ 0.03
+  - Fix LDtoLD and STRtoLD documentation.
+  - Alter the way that strEQ gets hold of HvNAME(SvSTASH(SvRV(sv))) - so that -Wall
+    doesn't emit "null argument" warnings. (Thanks Daniel Kahn Gillmor.)
+  - Add t/stringification.t.
+  - Fix typos in documentation.
+  - Fix bug in new() - it wasn't handling infinity/nan args correctly.
+
+ 0.02
+  - Replace '_precision' (not exported) with 'ld_get_prec' (exported).
+  - Provide 'ld_set_prec'.
+  - Remove LONG_DOUBLE_DECIMAL_PRECISION macro.
+  - Provide LdtoSTRP.
+  - set default precision of stringified values to 18 decimal digits.

@@ -1,0 +1,23 @@
+Revision history for Math-Rational-Approx
+
+0.02
+
+  * release as stable
+
+0.01_01
+
+[ BUGFIX ]
+
+  * make work with current version of Moo
+
+[ BUILD ]
+
+  * add more author requirements
+
+  * transfer dependency from MooX::Types::MooseLike to
+    MooX::Types::MooseLike::Numeric
+
+
+0.01
+       Initial release.
+

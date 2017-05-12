@@ -1,0 +1,19 @@
+Revision history for ImageTester
+
+0.2.5 DCOLLINS April 7 2009
+	Changes made since 0.2.1:
+		* Add a number of updated templates to the bot's rules
+0.2.1 DCOLLINS December 30 2008
+	Changes made since 0.2.0:
+		* 0.2.0 was released this morning at about 12:30 AM. Now that I've slept, I see what I screwed up. The module is in there twice becuase I had extracted the last version, and didn't clean up. This release is to simply clean up the directory. 
+0.2.0 DCOLLINS December 30 2008
+	Changes made since 0.1.2:
+		* Moved the module to the MediaWiki::Bot namespace
+0.1.2 DCOLLINS December 27 2008
+	Changes made since 0.1.1:
+		* None. I just forgot to add the module itself to the MANIFEST, so it wasn't included in the PAUSE uploads.
+0.1.1 DCOLLINS December 27 2008
+	Changes made since 0.1.0:
+		* Added some more automatic issue resolution
+0.1.0 DCOLLINS December 27 2008
+	* Initial version

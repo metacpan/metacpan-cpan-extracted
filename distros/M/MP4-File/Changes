@@ -1,0 +1,68 @@
+-------------------------
+Version 0.08 (2009-10-02)
+-------------------------
+
+* compatibility release for mp4v2-1.9
+
+* dropped support for FreeForm metadata
+
+-------------------------
+Version 0.07 (2008-05-11)
+-------------------------
+
+* it's hard to index something that we don't ship...
+  (forgot to include Devel::CheckLib in the package)
+
+-------------------------
+Version 0.06 (2008-05-11)
+-------------------------
+
+* make sure we don't index Devel::CheckLib
+
+-------------------------
+Version 0.05 (2008-05-11)
+-------------------------
+
+* use Devel::CheckLib to check for libmp4v2
+
+-------------------------
+Version 0.04 (2008-04-20)
+-------------------------
+
+* try to improve the check for libmp4v2 header file
+
+-------------------------
+Version 0.03 (2008-04-20)
+-------------------------
+
+* make Makefile.PL check for C compiler and libmp4v2
+  header file
+
+* add the following methods:
+
+   Info
+   FileInfo
+   Optimize
+   GetMetadataCoverArtCount
+   DeleteMetadataFreeForm
+   GetMetadataFreeForm
+   SetMetadataFreeForm
+
+* add rudimentary documentation
+
+* enable POD coverage testing
+
+* add more tests
+
+-------------------------
+Version 0.02 (2008-04-13)
+-------------------------
+
+* add license tag
+
+-------------------------
+Version 0.01 (2008-04-08)
+-------------------------
+
+* initial release
+

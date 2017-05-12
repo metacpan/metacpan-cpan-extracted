@@ -1,0 +1,9 @@
+Revision history for Perl extension Math::PartialOrder.
+
+0.01 Fri Oct 26 13:29:59 CEST 2001
+	- Name change to Math::PartialOrder-0.01
+	- got rid of Masked and Enum subclasses
+
+Sat Oct 20 14:08:57 2001
+	- original distributed version created as QuD::Hierarchy-0.08
+	- created by ExtUtils::ModuleMaker 0.20102

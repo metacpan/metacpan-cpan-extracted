@@ -1,0 +1,58 @@
+PREFACE
+
+This is a document which describes how to install the
+module which you received this document with. This is a
+quick intro and should probably work for most people most
+of the time. If you have more specific requirements or you
+encounter problems with the procedure please read the more
+complete documentation on how to install modules from CPAN
+which came with your perl distribution. On most systems
+this is available by running "perldoc perlmodinstall".
+
+------------------------------------------------------------
+PREREQUISITES
+
+Check that you have all the prerequisites installed.
+You can find them in Makefile.PL listed in PREREQ_PM.
+If you fail to install any of them then you will be
+prompted for them again in the installation phase.
+
+------------------------------------------------------------
+STANDARD INSTALLATION
+
+On most systems, just do this from the command line:
+
+	perl Makefile.PL
+	make test
+	make install
+
+Please note that you'll need permission to write to the
+standard installation directories; under Unix-like systems, this
+often means that you must be logged in as "root". This comment
+applies only to the "make install" command at the end. the first
+two stages are better executed as a regular user for system
+health reasons.
+
+If you're on a non-Unix platform, you might be using 'dmake'
+instead of 'make'.
+
+The tests should all pass. I advise you not to install if any
+of the tests fail - and this is especially true if you're
+upgrading. It's your call.
+
+------------------------------------------------------------
+NON-STANDARD INSTALLATION
+
+To install to a non-standard place (e.g., "/home/me/lib"), 
+see the manual page for ExtUtils::MakeMaker, or try this:
+
+	perl Makefile.PL LIB=/home/me/lib
+	make test
+	make install
+
+------------------------------------------------------------
+PROBLEMS
+
+If you encounter any problems with the installation procedure
+or in the testing phase please email the author. Patches,
+enhancements and fixes will be received warmly.

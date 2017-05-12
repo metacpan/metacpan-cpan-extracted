@@ -1,0 +1,47 @@
+/* ================================================================== */
+/* THEME: Cloud2
+ * dark_on_light
+ */
+@import 'functions';
+@import 'theme_cloud.css';
+@import 'fonts_cloud2';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: hsl(220,50,70);
+$verge-fg: set-fg($verge-bg);
+$verge-border: navy;
+$main-bg: hsl(220,45,80);
+$main-fg: set-fg($main-bg);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+    border-radius: 0;
+}
+header,
+footer,
+.side {
+    @extend .verge;
+    background-image: url(cloud_h.jpg);
+    background-attachment: fixed;
+}
+
+#main-wrap {
+    color: $main-fg;
+    background: $main-bg;
+    border: solid 1px $verge-border;
+    box-shadow:rgba(0,0,0,0.8) 3px 3px 10px;
+    margin-top: 0.75em;
+    margin-bottom: 0.75em;
+}
+
+body {
+	color: $verge-bg;
+	background: $verge-fg url(cloud_body.jpg) fixed;
+}
+

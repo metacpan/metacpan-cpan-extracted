@@ -1,0 +1,9 @@
+1.03  Sun, 22 Apr 2012 17:11:16 -0400
+  * Clarified MERGE cache options and fixed bug
+  * Documentation fixes
+
+1.02  Mon, 29 Nov 2010 18:33:58 +0100
+  * First release with a changelog, woo!
+  * Synchronise with changes in bleadperl up to version 1.01_03.
+  * Memoize::Saves, an experimental example module previously included in this
+    distribution, has been removed and put into its own distribution on CPAN.

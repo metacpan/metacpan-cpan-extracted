@@ -1,0 +1,137 @@
+Mozilla::DOM
+------------
+
+This module wraps the Mozilla DOM interface in Perl.
+In conjuction with an embedded Gecko widget (e.g. Gtk2::MozEmbed),
+you can use Perl to manipulate the browser DOM, handle DOM signals,
+and create events such as mouse clicks -- all within a Mozilla-like
+browser (so it also does JavaScript). See `perldoc Mozilla::DOM`
+for more details. 
+
+There are examples in the `examples' directory showing how
+to use this module with Gtk2::MozEmbed. See the README file
+in that directory. Check out Mozilla::Mechanize for a WWW::Mechanize-like
+module that uses Mozilla::DOM. See `perldoc Mozilla::DOM::index` for
+a list of all the POD files distributed with this module.
+
+
+Dependencies
+------------
+
+You might have to manually install ExtUtils::Depends and ExtUtils::PkgConfig
+before anything else. Sorry about that. You'll also have to install Mozilla
+with its development headers (I think you can also just install the SDK).
+
+Mozilla::DOM depends on:
+
+  ExtUtils::Depends
+  ExtUtils::PkgConfig
+  `pkg-config --modversion mozilla-xpcom` >= 1.7
+    or
+  `pkg-config --modversion firefox-xpcom` >= 1.0
+
+Update: those are fairly ancient now. You might also use "XULRunner",
+so your package could be 'libxul' or 'libxul-unstable', for example.
+If your package name is different, please let me know; the various
+distributions of Linux like to mix things up a bit...
+
+
+Installation
+------------
+
+To install Mozilla::DOM, run the following commands:
+
+  perl Makefile.PL
+  make           (this can take a while)
+  make test      (not really any tests yet)
+  make install   (as root)
+
+(See "Dependencies" above.)
+
+For this module to be useful, you'll probably also want
+to build and install Gtk2::MozEmbed *after* you install this.
+That module includes Mozilla::DOM (through the magic of
+ExtUtils::Depends) if it's already installed.
+IMPORTANT: if you upgrade Mozilla::DOM, you also need
+to rebuild and reinstall Gtk2::MozEmbed (possibly "force install").
+
+
+Experimental features
+---------------------
+
+Some features are added "experimentally". These are generally ones
+that are either known not to be completely working, or I'm not sure
+if they're really done right. I'll try to mark these clearly in the
+documentation as experimental. To enable an experimental feature,
+you pass an argument on the command line, for example
+
+  perl Makefile.PL DEFINE="-DMDEXP_EVENT_LISTENER"
+
+where "MDEXP" is just a (namespace-like) prefix and the rest
+of the name identifies which feature is being enabled. Currently
+the following features are experimental: EVENT_LISTENER.
+
+
+Troubleshooting
+---------------
+
+A common problem seems to be that header files are put in different
+directories for different installations of Mozilla. If so, you'll
+get an error like
+
+  mozilladom2perl.h:37:27: nsIWebBrowser.h: No such file or directory
+  mozilladom2perl.h:38:26: nsISelection.h: No such file or directory
+
+If this happens, do
+
+  find . -name 'nsIWebBrowser.h'
+
+from within the Mozilla include directory (e.g. /usr/include/mozilla).
+It will probably be under a subdirectory of /usr/include/mozilla/.
+Try adding that subdirectory to the set_inc method in Makefile.PL,
+and please report it to me.
+
+*
+
+If you find that this module segfaults on Ubuntu, try this solution
+from Boris Sukholitko which worked for me:
+- add /usr/lib/firefox to /etc/ld.so.conf
+- run /sbin/ldconfig
+- remove /usr/lib/firefox/components/compreg.dat (regenerates itself)
+
+*
+
+On Ubuntu Jaunty, I've installed the libxul-unstable package, and it seems
+they don't have either the directory in /etc/ld.so.conf.d/ or symlinks
+to it, so you get an error complaining that 'libxul.so' can't be found.
+As a hack, I did this....
+
+  # cd /etc/ld.so.conf.d/
+  # cat >> libxulcrap.conf
+  /usr/lib/xulrunner-devel-1.9.0.14/lib
+  ctrl-d
+  # ldconfig
+
+(You might also cat that onto /etc/ld.so.conf .)
+
+A better way might be to do
+
+  export LD_LIBRARY_PATH="$(pkg-config --variable=sdkdir libxul-unstable)/lib":$LD_LIBRARY_PATH
+
+in your ~/.bashrc .
+(Note: "sdkdir" might be "libdir" and "libxul-unstable" might be lots of things...)
+
+*
+
+If you get something like this:
+
+  make: *** No rule to make target `/usr/lib/perl5/5.8.7/i386-linux/CORE/
+EXTERN.h', needed by `xs/DOM.o'. Stop. 
+
+you probably need to install a "perl-dev" package.
+
+
+Bugs
+----
+
+You can send bugs to me directly: Scott Lanning <slanning@cpan.org>

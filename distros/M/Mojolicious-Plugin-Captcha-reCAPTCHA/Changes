@@ -1,0 +1,20 @@
+Revision history for Mojolicious-Plugin-Captcha-reCAPTCHA
+
+0.05  2015-11-09
+      - This module is now considered deprecated; users
+	    should switch to Mojolicious::Plugin::ReCAPTCHAv2
+      - No other functional changes
+
+0.04  2012-10-02
+      - Additional configuration options
+      - Additional helper to retrieve the reCAPTCHA HTML in
+        the template instead of via the stash
+      - Improved documentation
+
+0.03  2012-03-23
+      Internal clean up, adjustments for CPAN release
+
+0.02  ?
+
+0.01  2011-11-28
+      + initial version

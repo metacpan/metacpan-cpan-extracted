@@ -1,0 +1,19 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+
+use Module::Husbandry qw( newpmbin parse_cli );
+
+newpmbin parse_cli \@ARGV, {
+    param_count => "1..",
+    examples    => <<'END_EXAMPLES',
+%p bin/foo            ## Create bin/foo
+
+%p bin/foo bin/bar    ## as above, but for multiple programs
+END_EXAMPLES
+
+    description  => <<'END_DESCRIPTION',
+Creates files from a template and rebuilds the
+Makefile.
+END_DESCRIPTION
+};

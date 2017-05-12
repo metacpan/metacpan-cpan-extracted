@@ -1,0 +1,13 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title><% $the_title %></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=<% $request->document_encoding %>"/>
+    <link title="Maypole" href="<% $base %>/css/maypole.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+<div class="content">
+<%init>
+    my $the_title = $config->{application_name} || "A poorly configured Maypole application";
+</%init>

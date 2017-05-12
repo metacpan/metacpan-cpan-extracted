@@ -1,0 +1,48 @@
+Module::Compile::SimpleU(s3e)r Contributed Perl DocumentaMtoidounle::Compile::Simple(3)
+
+
+
+NNAAMMEE
+       Module::Compile::Simple - Even Simpler Perl Module Compilation
+
+SSYYNNOOPPSSIISS
+           package Foo;
+           use Module::Compile::Simple;
+           transform($source);
+
+       In _B_a_r_._p_m
+
+           package Bar;
+
+           use Foo;
+           ...
+           no Foo
+
+DDEESSCCRRIIPPTTIIOONN
+       "Module::Compile::Simple" makes it easier to write Module::Compile mod-
+       ules, doing compile-time source filtering.
+
+       After using "Module::Compile::Simple", apply transformation on $source.
+
+TTOODDOO
+       Make this work:
+
+           use Module::Compile::Simple '$source';
+
+SSEEEE AALLSSOO
+       Module::Compile
+
+AAUUTTHHOORRSS
+       Chia-liang Kao <clkao@clkao.org>
+
+CCOOPPYYRRIIGGHHTT
+       Copyright (c) 2006. Chia-liang Kao. All rights reserved.
+
+       This program is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+       See <http://www.perl.com/perl/misc/Artistic.html>
+
+
+
+perl v5.8.5                       2006-03-29        Module::Compile::Simple(3)

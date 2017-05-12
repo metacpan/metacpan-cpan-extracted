@@ -1,0 +1,15 @@
+
+severity = 5
+
+#------------------------------------------------------------------------------
+
+[CodeLayout::RequireTidyCode]
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME|DESCRIPTION|SYNOPSIS|AUTHOR|COPYRIGHT
+script_sections = NAME|DESCRIPTION|SYNOPSIS|AUTHOR|COPYRIGHT
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+[-Subroutines::ProhibitExplicitReturnUndef]

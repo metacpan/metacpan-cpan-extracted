@@ -1,0 +1,205 @@
+Changes file for Module::Info::File
+
+1.00 2016-01-05 Major release, update recommended
+
+- Exchanged all file/file contents parsing code for Module::Metadata
+
+  WARNING! this release fixes a bug for multiple package definitions for a file.
+  It now returns the first package encountered instead of the package definition encountered, 
+  this alters behaviour, but the behaviour seems more correct.
+
+  Thanks to Dai Okabayashi for PRs #2 and #3, eventhough they where never put to uses
+
+
+0.14 2014-08-27 bug fix release, update not necessary
+
+- Removed use of UNIVERSAL, the API used was deprecated and no 
+  longer necessary, see Github issue [#1]
+
+
+0.13 2014-08-25 maintenance release, update not necessary
+
+- Additions to MANIFEST.SKIP
+
+- License upgraded to Artistic 2.0 from Artistic 1.0
+
+
+0.12 2014-08-23 maintenance release, update not necessary
+
+- Specified Perl version to 5.6 as pointed out by Perl::Critic
+
+- Ported from Module::Build to Dist::Zilla
+
+
+0.11 2007-03-17 maintenance release, update not necessary
+
+- Added t/perlcriticrc
+
+- Updated t/pod.t, t/pod-coverage.t, t/kwalitee.t and t/critic
+  to more contemporary versions
+
+- Updated version number in POD
+
+
+0.10 2007-02-13 bug fix release, update recommended
+
+- Bugfix release, a mistake I have made before, when letting
+  Module::Build create the Makefile.PL is auto includes the bin
+  directory, but with a full path referring to a path on the
+  Build host.
+
+  I have renamed bin/version.pl to script/version.pl and added
+  it to Build.PL so not the Makefile.PL is generated correctly
+
+  From Build.PL:
+
+  scripts => {
+      'script/version.pl'   => 'script/version.pl',
+  },
+
+  From Makefile.PL:
+
+  'EXE_FILES' => [
+        'script/version.pl'
+   ],
+
+
+0.09 2007-02-12 bug fix release, update recommended
+
+- Added a Perl::Critic test t/critic.t (courtesy of Jeffrey Ryan
+  Thalhammer, Test::Perl::Critic)
+
+- Refactored parts of the code, mostly regular expressions - all
+  tests pass
+
+- Ran code through perltidy aswell (level 1 perlcritic warning)
+
+- Ran code through Perl::Critic all the way to level1 and
+  updated POD and code accordingly after reading the referenced
+  sections in PBP - they all made perfect sense
+
+  Checked with Lars Thegler on the use of 2 vs. 3 argument
+  version of open and since FreeBSD 4.x is declared EoL,
+  Perl 5.6.x is the official version and compability for older
+  perl is no longer required, if somebody would require this I
+  would be willing to invest the time and effort
+
+- Fixed a bug reported by  Eric D. Peterson, he experienced
+  problems with traversing all his packages and getting the
+  information using new_from_file()
+
+  Apparently the DBD::Oracle has a closure in which the package
+  is defined. See: Oracle::DBD, t/oracle_package_bug.t and
+  drafts/OracleLikePackage.pm for an example
+
+  I have changed the package matching regular expression,
+  considering using PPI it might however be serious overkill.
+
+- Changed from ExtUtils::MakeMaker to Module::Build
+
+- Added a Kwalitee test t/kwalitee.t
+  (courtesy of chromatic, Test::Kwalitee)
+
+- Added a test more to t/File.t
+
+
+0.08 2004-11-13 bug fix release, update recommended
+
+ - Improved the VERSION locating regular expression
+
+ - Added use of Carp (also added in Makefile.PL)
+
+ - Added t/00_load.t
+
+ - Removed Multipackage files (no longer at part of the
+   distribution)
+
+ - new_from_file no longer supports list context, I have readded
+   this to the TODO, since the implementation in 0.07 was not
+   good, so multiple package definitions in files are no longer
+   handled.
+
+ - Fixed serious bug in the setting of the version number, this
+   bug only occurred on Linux boxes running Perl 5.8.4.
+
+ - Added some better exception handling to the version.pl script
+
+ - Added some more debug information to the version.pl script
+
+ - Turned this CHANGES file upside down
+
+ - Added CPAN testers to the ACKNOWLEDGE section
+
+ - Added version_bug.t to t/ (not in distribution)
+
+0.07 2004-09-19 bug fix release, update recommended
+
+- Added list context for constructor (new_from_file)
+
+- bin/version.pl updated to accomodate this
+
+
+0.06 2004-07-23 bug fix release, update recommended
+
+- Patched with patch from LTHEGLER, should now work under
+  5.005_03, open was using the unecessary 3 arguments instead of just two.
+
+
+0.05 2004-02-28 maintenance release, update not neccessary
+
+- Updated bin/version.pl with POD required to have the script in
+  the CPAN scripts directory (http://www.cpan.org/scripts/). The
+  script was uploaded alone to PAUSE together with the release
+  of 0.04
+
+- Added handling of directories so it is possible to get version
+  numbers of all perl modules in a directory recursively with
+  bin/version.pl
+
+- Added INSTALL file
+
+- Makefile.PL had a makeover
+
+
+0.04 2004-01-10 maintenance release, update not neccessary
+
+- Updated bin/version.pl updated with error handling
+
+- Update bin/version.pl with $VERSION number, I think this is a
+  requirement for scripts in the scripts section on CPAN
+
+- Added File::Spec to Makefile.PL
+
+- Fixed a few bugs in bin/version.pl (I think I must have lost a
+  version at some point)
+
+- Added handling of .pl scripts
+
+- Added a warning in the case where script is not a .pl or .pm
+
+0.03 2003-12-20 maintenance release, update not neccessary
+
+- POD cleaned and reviewed by Rias.
+
+- ACKNOWLEDGE section added
+
+- Added information to t/Info.t so if the Module::Info tests
+  fail, the test asks the tester to mail me the information
+
+
+0.02 2003-11-03 maintenance release, update not neccessary
+
+- Added TODO file
+
+- Added Changes file (this file)
+
+- Added description to NAME section
+
+- Added use of File::Basename to make test on Win32 work
+
+- Fixed bug (rt: #4147) - broken tests on Win32
+
+
+0.01 2003.09.30
+
+Initial revision

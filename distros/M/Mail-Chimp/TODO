@@ -1,0 +1,8 @@
+TODO list for Perl module Mail::Chimp
+
+- Support deprecated methods (the ambitious version would do that per
+  api version, but that's probably too much trouble)
+
+
+
+

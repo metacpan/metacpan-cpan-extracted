@@ -1,0 +1,66 @@
+{
+   "abstract" : "Cryptographically-secure, cross-platform replacement for rand()",
+   "author" : [
+      "Max Kanat-Alexander <mkanat@cpan.org>",
+      "Arthur Axel \"fREW\" Schmidt <math-random-secure@afoolishmanifesto.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Math-Random-Secure",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Statistics::Test::RandomWalk" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Math::Random::ISAAC::XS" : "0"
+         },
+         "requires" : {
+            "Crypt::Random::Source" : "0.07",
+            "Math::Random::ISAAC" : "1.001",
+            "Moo" : "2"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::LeakTrace" : "0"
+         },
+         "requires" : {
+            "List::MoreUtils" : "0",
+            "Test::More" : "0",
+            "Test::SharedFork" : "0",
+            "Test::Warn" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/frioux/Math-Random-Secure/issues"
+      },
+      "homepage" : "https://github.com/frioux/Math-Random-Secure",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/frioux/Math-Random-Secure.git",
+         "web" : "https://github.com/frioux/Math-Random-Secure"
+      }
+   },
+   "version" : "0.080001",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+}
+

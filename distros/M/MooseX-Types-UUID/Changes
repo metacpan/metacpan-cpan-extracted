@@ -1,0 +1,14 @@
+0.03 Mon Jan 06 19:11:00 GMT 2012
+     Lower case UUIDs are now supported, as this is documented in the standard
+     at: http://www.itu.int/rec/T-REC-X.667-200409-S/dologin.asp?lang=e&id=T-REC-X.667-200409-S!!PDF-E&type=items
+     (RT#74728)
+     Move to gitmo.
+     Add repository resource to META.yml (RT#74729)
+     Make preferred bugtracker explicit as RT (RT#74730)
+
+0.02 Sat Jan 31 20:44:59 CST 2009
+     Fix a missing comma
+
+0.01 Mon Apr 21 16:21:58 CDT 2008
+     Initial release
+

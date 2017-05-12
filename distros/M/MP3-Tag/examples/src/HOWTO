@@ -1,0 +1,54 @@
+J:\test-programs\perl\beethoven_process.pl 0 Opus SubOp Dates			m:/html/beethoven/Oeuvres/ListOpus.html >Beethoven.lv-Op
+J:\test-programs\perl\beethoven_process.pl 0 WoO SubWoO "Composition Dates"	m:/html/beethoven/Oeuvres/ListWoO.html  >Beethoven.lv-WoO
+perl "-F/\x20\/\/\x20/" -wnale "$l{$F[0]}{$F[1] or q()} = $F[2] if $F[2]; END {my $pref = q(Op. ); for $op (sort keys %l) {my @v = values %{$l{$op}}; my $v = $v[0]; my $same = 1; $_ eq $v or $same = 0 for @v; if ($same) {print qq($pref$op // $v)} else {for my $n (sort keys %{$l{$op}}) {print qq($pref$op-$n // $l{$op}{$n});}}}}" Beethoven.lv-Op >Beethoven.lv
+perl "-F/\x20\/\/\x20/" -wnale "$l{$F[0]}{$F[1] or q()} = $F[2] if $F[2]; END {my $pref = q(WoO ); for $op (sort keys %l) {my @v = values %{$l{$op}}; my $v = $v[0]; my $same = 1; $_ eq $v or $same = 0 for @v; if ($same) {print qq($pref$op // $v)} else {for my $n (sort keys %{$l{$op}}) {print qq($pref$op-$n // $l{$op}{$n});}}}}" Beethoven.lv-WoO >>Beethoven.lv
+
+perl "-F/\x20\/\/\x20/" -wnale "push @{$l{$F[0]}{$F[1] or q()}}, $F[2] if $F[2] and (not $l{$F[0]}{$F[1] or q()} or $l{$F[0]}{$F[1] or q()}[0] ne $F[2]); END {my $pref = q(Op. ); for $op (sort keys %l) {my @v = values %{$l{$op}}; my $v = qq(@{$v[0]}); my $same = 1; qq(@$_) eq $v or $same = 0 for @v; if ($same) {print qq($pref$op // $v)} else {for my $n (sort keys %{$l{$op}}) {print qq($pref$op-$n // @{$l{$op}{$n}});}}}}" Beethoven.lv-Op   >Beethoven.lv
+perl "-F/\x20\/\/\x20/" -wnale "push @{$l{$F[0]}{$F[1] or q()}}, $F[2] if $F[2] and (not $l{$F[0]}{$F[1] or q()} or $l{$F[0]}{$F[1] or q()}[0] ne $F[2]); END {my $pref = q(WoO ); for $op (sort keys %l) {my @v = values %{$l{$op}}; my $v = qq(@{$v[0]}); my $same = 1; qq(@$_) eq $v or $same = 0 for @v; if ($same) {print qq($pref$op // $v)} else {for my $n (sort keys %{$l{$op}}) {print qq($pref$op-$n // @{$l{$op}{$n}});}}}}" Beethoven.lv-WoO >>Beethoven.lv
+
+
+perl "-F/\x20\/\/\x20/" -wnale "($y = $F[1]) =~ s/\s*--?\s*/--/g; $y = join q(,), sort split /\s+/, $y; print qq($F[0] // $y)" Beethoven.lv >Beethoven.lv-y
+
+compare-lv.pl "!=" >o-neq
+compare-lv.pl ">" >o-more
+compare-lv.pl "<" >o-less
+
+## Find duplicates (same for Op):
+perl "-F/\x20\/\/\x20/" -wnale "$F[1] ||= ''; print qq($F[0]-$F[1])" Beethoven.lv-WoO | sort | uniq -d
+
+OP:
+113-		Overture + Incidental Music
+117-		Overture + Incidental Music
+130-		Alternate Finale
+16-		Different arrangements (same datas)
+61-		Different arrangements (different datas)
+72- Different overtures (different datas); overtures have same Opus, may have No
+84-		Overture + Incidental Music
+
+WoO
+105-		Different versions of a song (different tonalities too)
+116-		2 versions
+15-1			Dance + Piano version
+15-2
+15-3
+15-4
+15-5
+15-6
+158-1		158a 158b (different dates)
+158-2
+158-3
+158-4
+158-5
+158-6
+158-7
+74-		Song + Piano Variations
+
+
+extract-y.pl wiki Beethoven.wiki >Beethoven.wiki_y
+extract-y.pl codm Beethoven.codm  Beethoven.codm-from-err  >"Beethoven.codm+codm-from-err_y"
+extract-y.pl merge codm/beethovenlv/wiki Beethoven.codm_y Beethoven.lv-y Beethoven.wiki_y >Beethoven.all_y 
+J:\test-programs\perl\beethoven_process.pl 0 WoO SubWoO "Title" m:/html/beethoven/Oeuvres/ListWoO.html  >Beethoven.lv-WoO-tit0
+perl "-F/\x20\/\/\x20/" -wnale "$F[0] .= qq(, No. $F[1]) if $F[1]; $F[2] =~ s/:\s+\"/ \"/; print qq($F[2]; WoO $F[0])" Beethoven.lv-WoO-tit0 >Beethoven.lv-WoO-tit
+
+extract-y.pl fix Beethoven.all_y Beethoven.lv-WoO-tit >Beethoven.lv-WoO-tit_with_y
+extract-y.pl fix Beethoven.all_y Beethoven.wiki  >Beethoven.wiki_with_y

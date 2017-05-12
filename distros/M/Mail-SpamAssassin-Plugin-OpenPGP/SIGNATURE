@@ -1,0 +1,79 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 3bbb0dd56aad7efec9b20ab7fdd889ab09df2bd4 Build.PL
+SHA1 77847455de92b580039039146b3e68cb8503e796 Changes
+SHA1 2b8b815229aa8a61e483fb4ba0588b8b6c491890 LICENSE-Apache.txt
+SHA1 cf398c2a73851acae027d4e591b62c23e2fef8e4 MANIFEST
+SHA1 cb145d7db363b64d355eb990659f206c1077cca7 MANIFEST.SKIP
+SHA1 8f4de38baf87cc3c80e22a42d38b6abe38308235 META.yml
+SHA1 251d966d2e1f6a2b5532c292d4f43d21ed9d0f07 NOTICE.txt
+SHA1 9d3b34db332fdfa58402956fb290ee0873cfe635 README
+SHA1 0c9e90a6e962fdba9902cceed09b41a830b13af5 etc/26_openpgp.cf
+SHA1 439dc180bd26255a53fc2556c9db27d5f635dd1c etc/init_openpgp.pre
+SHA1 6251dae9d9411607c0c60e8753700d9588f89fd7 lib/Mail/SpamAssassin/Plugin/OpenPGP.pm
+SHA1 8ea48df280439619c7618774150445c2d8d849b2 rules/10_misc.cf
+SHA1 283f7364f5dfb5db1c75c2bdec90ea8e7784a86c rules/test_load_plugin.pre
+SHA1 ee9aa2a0c155c661439643b1a60181cf0ba980e0 rules/user_prefs.template
+SHA1 c74b253b51081af1c2d875602bd605f97a82992c t/00-load.t
+SHA1 20ca644ea438d62736b14927418b3f5a55d8f73a t/SATest.pm
+SHA1 36a006f19ef904960814d887f7b01b1c4adad0c4 t/acceptance-bad.t
+SHA1 9ba5d3d2e11e11f075e6cffa6c652e3f16ddf740 t/acceptance-base.pl
+SHA1 dfe2eaed25f28be8ca2efba7628b782499932943 t/acceptance-encrypted.t
+SHA1 9ce883ae9a639045b004c7ed74f825fa01b1c89d t/acceptance-good.t
+SHA1 ec7620732ee33756f8f41acb296edebcf6326a8e t/acceptance-normal.t
+SHA1 acf21dd4a8fdc491004882fb59f8d523959c1106 t/acceptance-unknown.t
+SHA1 2c317c92eb043906db6789f9f01744cbc0e6c53e t/boilerplate.t
+SHA1 4529db8acd258e0c931248890af27035d86ae97b t/config
+SHA1 2a6200b4970e6761833432f119ab35ff04a6de42 t/config.dist
+SHA1 fcce8356d8eb3da3749892fe73fb3e14caeead14 t/data/email2.eml
+SHA1 5fb1d47c4c8c66f2c983d5778773c09df4870997 t/data/expired.eml
+SHA1 212ad1c42fc61db4701d34d56842ce855936f2f0 t/data/gpg_encrypted.eml
+SHA1 70eccc6edad85a2c9233f410d300b8f71bd94c7c t/data/gpg_evolution.eml
+SHA1 ed3a240465228954c97a985ec4a85f9e8848a3ab t/data/gpg_part_signed.eml
+SHA1 22536d4b9f56cae4226c67c4c8baa100e5c82a6d t/data/gpg_signed_8bit.eml
+SHA1 2e3c7144ef70cb6d47aa1a17f0b6271337e20c48 t/data/gpg_signed_attachment2.eml
+SHA1 b52c4b62fbd54e5969e15aad460cc8986a946241 t/data/gpg_signed_binary_attachment.eml
+SHA1 df21213fb24c86713da63cce037a62b2b9471b23 t/data/gpg_signed_nokeyfound.eml
+SHA1 2b17a4efb5674fa24c3895c7fd0b8d7d817b2a3b t/data/gpg_subkey.eml
+SHA1 cea7ebdbf911f34e74a08232db9cd6affb87a95f t/data/gpg_thunderbird.eml
+SHA1 77bc1554a529a418f5c92418d8ee140268fe6494 t/data/gpg_wrongsender.eml
+SHA1 04a10fbffac76d49e7eee588dce9502dde66a4e1 t/data/mismatched_time.eml
+SHA1 f3dbbb7747246c423be9357b2149cd7a70a9ef51 t/data/pks_signed.eml
+SHA1 09a743a289b64bbfea5d49419d448541e13806fc t/data/plain.eml
+SHA1 6bc4af0024b7e30d032fd71a882e94b9c28e40c0 t/data/signed_inline.eml
+SHA1 67158ca0c1b0c8a216085a5e8afc5b50ada7ec1a t/data/signed_inline_firstpart.eml
+SHA1 dfbc7dd4ac5d5ffdf8cfc3569e6ea0ae26fa8272 t/data/signed_inline_secondpart.eml
+SHA1 ee26e956e67616989a3f2810f9719659c68b1d66 t/gpg-home/pubring.gpg
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/test_dir
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (GNU/Linux)
+
+iQIVAwUBR9NdY2c36lVi77tzAQopHQ//X9Ge9/waoce793Bl7cFUqfNJc/8BOe9h
+6QGwhK3lBTGa8gs29qM16Q29Iryy7VV6mQiSLvmjiaW7VBSONls0c+DVB6saS5jj
+fdTMLeKJD9QUeHBD5n1x9Q1gDNUecx+QAWWvaslrAiu2hbiIpdrf6bWIms+UKvtd
+rBr90BZzKo3CrySwMJSBpRLFv7GriANd59WwE4QXLd3kHfsejNi+M6+iXisFdUhs
+7b3IWeASSqMkZrTcLEHUVCGlo4h98X0UAjIm7OiKlLYyLaATdNJOwI0pNGh5UUGx
+2F1eNCVPGhxNnh+1ErgFxJeD9IwrdwgQihUznANHbdH/C2D0A7XZKNb5ZHmXzUFf
+awnCrMj/3Ld7tLlOPlimiTTMg+tT92627DkzJde+fdqttCf8TArgSXLTptD66PU4
+IyXeb1RfKo5f0bgh4kQQygQAPL5ybwi+iJBiBXl875mrv0iXiqNj1lgS+1DuVa/5
+qb9gnfkTzXrigZSvMXcq1pQxiY3ornzeW443vTrNXPH1gdaFFyKatM3jEt9beE5w
+FBSZua0IEBoiRzr5/NbRxXuLrVDHpgIFE2OdHm1dZG92uuteX7Zt/BtBDqlljMkb
+tTCecDnfKtCaJyGjewToBVsBvYfh4aPP6/g/ahPHBJ12RnHsJ0V3odCCNgtw7ZeU
+RNLM3LHu5SU=
+=e2IA
+-----END PGP SIGNATURE-----

@@ -1,0 +1,42 @@
+Math::Project3D
+===============
+
+INTRODUCTION
+
+This distribution allows the projection of points of a three dimensional
+function of an arbitrary number of parameters onto an arbitrary plane.
+The function is compiled from three component functions (anonymous
+subroutines containing arbitrary Perl code) by Math::Project_3D::Function
+using some black magic and code generation for performance reasons.
+
+The module relies heavily on the Math::MatrixReal module. Without it,
+you would not see this realized.
+
+Detailed documentation can be found as pod in the module files.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   pray
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Math::Project3D::Function (in this distribution)
+  Math::MatrixReal
+  Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002-2006 Steffen Mueller, all rights reserved.
+
+Author can be reached at <smueller@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

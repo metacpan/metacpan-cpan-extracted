@@ -1,0 +1,33 @@
+Changes
+ignore.txt
+lib/Mock/Sub.pm
+lib/Mock/Sub/Child.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-called.t
+t/02-called_count.t
+t/03-instantiate.t
+t/04-return_value.t
+t/05-side_effect.t
+t/06-reset.t
+t/07-name.t
+t/08-called_with.t
+t/09-void_context.t
+t/10-unmock.t
+t/11-state.t
+t/12-mocked_subs.t
+t/13-mocked_objects.t
+t/14-core_subs.t
+t/15-remock.t
+t/16-non_exist_warn.t
+t/17-no_warnings.t
+t/data/One.pm
+t/data/Two.pm
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

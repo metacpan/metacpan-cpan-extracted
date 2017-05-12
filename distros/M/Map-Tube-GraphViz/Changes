@@ -1,0 +1,38 @@
+0.06 2015-02-24T08:09:07+01:00
+ [Map::Tube::GraphViz]
+ - Add EXAMPLE4 section in doc and examples/ex4.pl.
+
+ [Map::Tube::GraphViz::Utils]
+ - Add node_color_id() subroutine.
+
+0.05 2015-01-29T23:42:27+01:00
+ - Add tests.
+ - Improve constructor error check of 'tube' parameter.
+ - Update examples/ex3.pl example.
+
+0.04 2015-01-27T07:59:41+01:00
+ - Add 'g' parameter for GraphViz2 object.
+ - Add EXAMPLE3 section to doc with overlapping.
+ - Add images for EXAMPLE sections to doc.
+ - Fix graph name.
+ - Fix minimal version of Perl to 5.6.0.
+ - Remove 'driver' => 'neato' from EXAMPLE sections in doc (is default).
+
+0.03 2015-01-25T01:17:05+01:00
+ - Improve CONTRIBUTORS section in doc.
+ - Remove Map::Tube::GraphViz from SEE ALSO section in doc.
+ - Rewrite to Map::Tube 2.72 version API (Map::Tube::Node->line).
+
+0.02 2015-01-19T23:25:15+01:00
+ - Add 'name' parameter (Thanks Gisbert W. Selke).
+ - Add Map::Tube::Graph, Map::Tube::Plugin::Graph and Map::Metro::Graph to
+   SEE ALSO section in doc.
+ - Add Map::Tube::GraphViz, Map::Tube::Text::Table and Task::Map::Tube to
+   SEE ALSO section in doc.
+ - Add error check to GraphViz->run method (Thanks Gisbert W. Selke).
+ - Change default 'driver' parameter to 'neato'.
+ - Rewrite check of output formats (Thanks Gisbert W. Selke).
+ - Update copyright years to 2015.
+
+0.01 2014-12-17T01:20:04+01:00
+ - First version

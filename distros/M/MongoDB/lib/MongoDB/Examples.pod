@@ -1,0 +1,469 @@
+#
+#  Copyright 2009-2013 10gen, Inc.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+
+
+# PODNAME: MongoDB::Examples
+# ABSTRACT: Some examples of MongoDB syntax
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+MongoDB::Examples - Some examples of MongoDB syntax
+
+=head1 VERSION
+
+version v1.8.0
+
+=head1 MAPPING SQL TO MONGODB
+
+For developers familiar with SQL, the following chart should help you see how
+many common SQL queries could be expressed in MongoDB.
+
+These are Perl-specific examples of translating SQL queries to MongoDB's query
+language.  To see the mappings for JavaScript (or another language), see
+L<http://docs.mongodb.org/manual/reference/sql-comparison/>.
+
+In the following examples, C<$db> is a L<MongoDB::Database> object which was
+retrieved by using C<get_database>. See L<MongoDB::MongoClient>,
+L<MongoDB::Database> and L<MongoDB::Collection> for more on the methods
+you see below.
+
+=over
+
+=item C<CREATE TABLE USERS (a Number, b Number)>
+
+    Implicit, can be done explicitly.
+
+=item C<INSERT INTO USERS VALUES(1,1)>
+
+    $db->get_collection( 'users' )->insert_one( { a => 1, b => 1 } );
+
+=item C<SELECT a,b FROM users>
+
+    $db->get_collection( 'users')->find( { } )->fields( { a => 1, b => 1 });
+
+=item C<SELECT * FROM users>
+
+    $db->get_collection( 'users' )->find;
+
+=item C<SELECT * FROM users WHERE age=33>
+
+    $db->get_collection( 'users' )->find( { age => 33 } )
+
+=item C<SELECT a,b FROM users WHERE age=33>
+
+    $db->get_collection( 'users' )->find( { age => 33 } )->fields( { a => 1, b => 1 });
+
+=item C<SELECT * FROM users WHERE age=33 ORDER BY name>
+
+    $db->get_collection( 'users' )->find( { age => 33 } )->sort( { name => 1 } );
+
+=item C<< SELECT * FROM users WHERE age>33 >>
+
+    $db->get_collection( 'users' )->find( { age => { '$gt' => 33 } } );
+
+=item C<< SELECT * FROM users WHERE age<33 >>
+
+    $db->get_collection( 'users' )->find( { age => { '$lt' => 33 } } );
+
+=item C<SELECT * FROM users WHERE name LIKE "%Joe%">
+
+    $db->get_collection( 'users' )->find( { name => qr/Joe/ } );
+
+=item C<SELECT * FROM users WHERE name LIKE "Joe%">
+
+    $db->get_collection( 'users' )->find( {name => qr/^Joe/ } );
+
+=item C<< SELECT * FROM users WHERE age>33 AND age<=40 >>
+
+    $db->get_collection( 'users' )->find( { age => { '$gt' => 33, '$lte' => 40 } } );
+
+=item C<SELECT * FROM users ORDER BY name DESC>
+
+    $db->get_collection( 'users' )->find->sort( { name => -1 } );
+
+=item C<CREATE INDEX myindexname ON users(name)>
+
+    my $indexes = $db->get_collection( 'users' )->indexes;
+    $indexes->create_one( [ name => 1 ] );
+
+=item C<CREATE INDEX myindexname ON users(name,ts DESC)>
+
+    my $indexes = $db->get_collection( 'users' )->indexes;
+    $indexes->create_one( [ name => 1, ts => -1 ] );
+
+=item C<SELECT * FROM users WHERE a=1 and b='q'>
+
+    $db->get_collection( 'users' )->find( {a => 1, b => "q" } );
+
+=item C<SELECT * FROM users LIMIT 10 SKIP 20>
+
+    $db->get_collection( 'users' )->find->limit(10)->skip(20);
+
+=item C<SELECT * FROM users WHERE a=1 or b=2>
+
+    $db->get_collection( 'users' )->find( { '$or' => [ {a => 1 }, { b => 2 } ] } );
+
+=item C<SELECT * FROM users LIMIT 1>
+
+    $db->get_collection( 'users' )->find->limit(1);
+
+=item C<EXPLAIN SELECT * FROM users WHERE z=3>
+
+    $db->get_collection( 'users' )->find( { z => 3 } )->explain;
+
+=item C<SELECT DISTINCT last_name FROM users>
+
+    $db->get_collection( 'users' )->distinct( 'last_name' );
+
+=item C<SELECT COUNT(*y) FROM users>
+
+    $db->get_collection( 'users' )->count;
+
+=item C<< SELECT COUNT(*y) FROM users where age > 30 >>
+
+    $db->get_collection( 'users' )->count( { "age" => { '$gt' => 30 } } );
+
+=item C<SELECT COUNT(age) from users>
+
+    $db->get_collection( 'users' )->count( { age => { '$exists' => 1 } } );
+
+=item C<UPDATE users SET a=1 WHERE b='q'>
+
+    $db->get_collection( 'users' )->update_many( { b => "q" }, { '$set' => { a => 1 } } );
+
+=item C<UPDATE users SET a=a+2 WHERE b='q'>
+
+    $db->get_collection( 'users' )->update_many( { b => "q" }, { '$inc' => { a => 2 } } );
+
+=item C<DELETE FROM users WHERE z="abc">
+
+    $db->get_database( 'users' )->delete_many( { z => "abc" } );
+
+=back
+
+=head1 DATABASE COMMANDS
+
+If you do something in the MongoDB shell and you would like to translate it to
+Perl, the best way is to run the function in the shell without parentheses, which
+will print the source.  You can then generally translate the source into Perl
+fairly easily.
+
+For example, suppose we want to use C<db.foo.validate> in Perl.  We could
+run:
+
+    > db.foo.validate
+    function (full) {
+        var cmd = {validate:this.getName()};
+        if (typeof full == "object") {
+            Object.extend(cmd, full);
+        } else {
+            cmd.full = full;
+        }
+        var res = this._db.runCommand(cmd);
+        if (typeof res.valid == "undefined") {
+            res.valid = false;
+            var raw = res.result || res.raw;
+            if (raw) {
+                var str = "-" + tojson(raw);
+                res.valid = !(str.match(/exception/) || str.match(/corrupt/));
+                var p = /lastExtentSize:(\d+)/;
+                var r = p.exec(str);
+                if (r) {
+                    res.lastExtentSize = Number(r[1]);
+                }
+            }
+        }
+        return res;
+    }
+
+Next, we can translate the important parts into Perl:
+
+    $db->run_command( [ validate => "foo" ] );
+
+=head2 Find-one-and-modify
+
+The find-one-and-modify commands in L<MongoDB::Collection> are similar to
+update (or remove), but will return the modified document.  They can be
+useful for implementing queues or locks.
+
+For example, suppose we had a list of things to do, and we wanted to remove
+the highest-priority item for processing.  We could do a
+L<find|MongoDB::Collection/find> and then a
+L<delete_one|MongoDB::Collection/delete_one>, but that wouldn't be atomic
+(a write could occur between the query and the remove).  Instead, we could
+use L<find_one_and_delete|MongoDB::Collection/find_one_and_delete>:
+
+    my $coll = $db->get_collection('todo');
+    my $next_task = $todo->find_one_and_delete(
+        {}, # empty filter means any document
+        { sort => {priority => -1} },
+    );
+
+This will atomically find and pop the next-highest-priority task.
+
+See L<http://www.mongodb.org/display/DOCS/findAndModify+Command> for more
+details on find-and-modify.
+
+=head1 AGGREGATION
+
+The aggregation framework is MongoDB's analogy for SQL GROUP BY queries,
+but more generic and more powerful. An invocation of the aggregation framework
+specifies a series of stages in a pipeline to be executed in order by
+the server. Each stage of the pipeline is
+drawn from one of the following so-called "pipeline operators":
+C<$project>, C<$match>, C<$limit>, C<$skip>, C<$unwind>, C<$group>,
+C<$sort>, and C<$geoNear>.
+
+The aggregation framework is the preferred way of performing
+most aggregation tasks. New in version 2.2, it has largely
+obviated L<mapReduce|http://docs.mongodb.org/manual/reference/command/mapReduce/#dbcmd.mapReduce>,
+and L<group|http://docs.mongodb.org/manual/reference/command/group/#dbcmd.group>.
+
+See the MongoDB aggregation framework documentation for more
+information (L<http://docs.mongodb.org/manual/aggregation/>).
+
+=head2 $match and $group
+
+The C<$group> pipeline operator is used like GROUP BY in SQL. For example,
+suppose we have a number of local businesses stored in a "business" collection. 
+If we wanted to find the number of coffeeshops in each neighborhood, we
+could do:
+
+    my $out = $db->get_collection('business')->aggregate(
+        [
+            {'$match' => {'type' => 'coffeeshop'}},
+            {'$group' => {'_id' => '$neighborhood', 'num_coffeshops' => {'$sum' => 1}}}
+        ]
+    );
+
+The SQL equivalent is C<SELECT neighborhood, COUNT(*) FROM business GROUP BY neighborhood WHERE type = 'coffeeshop'>.
+After executing the above aggregation query, C<$out> will contain a
+L<MongoDB::QueryResult>, allowing us to iterate through result documents
+such as the following:
+
+    (
+         {
+             '_id' => 'Soho',
+             'num_coffeshops' => 23
+         },
+         {
+             '_id' => 'Chinatown',
+             'num_coffeshops' => 14 
+         },
+         {
+             '_id' => 'Upper East Side',
+             'num_coffeshops' => 10
+         },
+         {
+             '_id' => 'East Village',
+             'num_coffeshops' => 87
+         }
+    )
+
+Note that L<aggregate|MongoDB::Collection/aggregate> takes an array reference as
+an argument. Each element of the array is document which specifies a stage
+in the aggregation pipeline. Here our aggregation query consists of a
+C<$match> phase followed by a C<$group> phase. Use C<$match> to filter the
+documents in the collection prior to aggregation. The C<_id> field in the
+C<$group> stage specifies the key to group by; the C<$> in C<'$neighborhood'>
+indicates that we are referencing the name of a key. Finally, we use the
+C<$sum> operator to add one for every document in a particular neighborhood.
+There are other operators, such as C<$avg>, C<$max>, C<$min>, C<$push>, and
+C<$addToSet>, which can be used in the C<$group> phase and work much like
+C<$sum>.
+
+=head2 $project and $unwind
+
+Now let's look at a more complex example of the aggregation framework that
+makes use of the C<$project> and C<$unwind> pipeline operators. Suppose
+we have a collection called 'courses' which contains information on college
+courses. An example document in the collection looks like this:
+
+    {
+        '_id' => 'CSCI0170',
+        'name' => 'Computer Science 17',
+        'description' => 'An Integrated Introduction to Computer Science',
+        'instructor_id' => 29823498,
+        'instructor_name' => 'A. Greenwald',
+        'students' => [
+            { 'student_id' => 91736114, 'student_name' => 'D. Storch' },
+            { 'student_id' => 89100891, 'student_name' => 'J. Rassi' }
+        ]
+    }
+
+We wish to generate a report containing one document per student that indicates
+the courses in which each student is enrolled. The following call to
+C<aggregate> will do the trick:
+
+    my $out = $db->get_collection('courses')->aggregate([
+        {'$unwind' => '$students'},
+        {'$project' => {
+                '_id' => 0,
+                'course' => '$_id',
+                'student_id' => '$students.student_id',
+            }
+        },
+        {'$group' => {
+                '_id' => '$student_id',
+                'courses' => {'$addToSet' => '$course'}
+            }
+        }
+    ]);
+
+The output documents will each have a student ID number and an array of the
+courses in which that student is enrolled:
+
+    (
+        {
+            '_id' => 91736114,
+            'courses' => ['CSCI0170', 'CSCI0220', 'APMA1650', 'HIST1230']
+        },
+        {
+            '_id' => 89100891,
+            'courses' => ['CSCI0170', 'CSCI1670', 'CSCI1690']
+        }
+    )
+
+The C<$unwind> stage of the aggregation query "peels off" elements of the courses
+array one-by-one and places them in their own documents. After this phase completes,
+there is a separate document for each (course, student) pair. The C<$project> stage
+then throws out unnecessary fields and keeps the ones we are interested in. It also
+pulls the student ID field out of its subdocument and creates a top-level field
+with the key C<student_id>. Last, we group by student ID, using C<$addToSet> in
+order to add the unique courses for each student to the C<courses> array.
+
+=head2 $sort, $skip, and $limit
+
+The C<$sort>, C<$skip>, and C<$limit> pipeline operators work much like their
+companion methods in L<MongoDB::Cursor>. Returning to the previous students and
+courses example, suppose that we were particularly interested in the student with
+the ID that is numerically third-to-highest. We could retrieve the course list for that
+student by adding C<$sort>, C<$skip>, and C<$limit> phases to the pipeline:
+
+    my $out = $db->get_collection('courses')->aggregate([
+        {'$unwind' => '$students'},
+        {'$project' => {
+                '_id' => 0,
+                'course' => '$_id',
+                'student_id' => '$students.student_id',
+            }
+        },
+        {'$group' => {
+                '_id' => '$student_id',
+                'courses' => {'$addToSet' => '$course'}
+            }
+        },
+        {'$sort' => {'_id' => -1}},
+        {'$skip' => 2},
+        {'$limit' => 1}
+    ]);
+
+=head1 QUERYING
+
+=head2 Nested Fields
+
+MongoDB allows you to store deeply nested structures and then query for fields
+within them using I<dot-notation>.  For example, suppose we have a users
+collection with documents that look like:
+
+    {
+        "userId" => 12345,
+        "address" => {
+            "street" => "123 Main St",
+            "city" => "Springfield",
+            "state" => "MN",
+            "zip" => "43213"
+        }
+    }
+
+If we want to query for all users from Springfield, we can do:
+
+    my $cursor = $users->find({"address.city" => "Springfield"});
+
+This will search documents for an "address" field that is a subdocument and a
+"city" field within the subdocument.
+
+=head1 UPDATING
+
+=head2 Positional Operator
+
+In MongoDB 1.3.4 and later, you can use positional operator, C<$>, to update
+elements of an array.  For instance, suppose you have an array of user
+information and you want to update a user's name.
+
+A sample document in JavaScript:
+
+    {
+        "users" : [
+            {
+                "name" : "bill",
+                "age" : 60
+            },
+            {
+                "name" : "fred",
+                "age" : 29
+            },
+        ]
+    }
+
+The update:
+
+    $coll->update_one({"users.name" => "fred"}, {'users.$.name' => "george"});
+
+This will update the array so that the element containing C<"name" =E<gt> "fred">
+now has C<"name" =E<gt> "george">.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+David Golden <david@mongodb.com>
+
+=item *
+
+Rassi <rassi@mongodb.com>
+
+=item *
+
+Mike Friedman <friedo@friedo.com>
+
+=item *
+
+Kristina Chodorow <k.chodorow@gmail.com>
+
+=item *
+
+Florian Ragwitz <rafl@debian.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by MongoDB, Inc.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

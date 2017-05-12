@@ -1,0 +1,30 @@
+Revision history for Module-Install-ExtraTests
+
+0.008     2012-12-29
+          fix a documentation/code mismatch on VERSION (thanks, ETHER)
+
+0.007     2010-04-23
+          Only call the custom MakeMaker methods if the Makefile.PL actually
+          used (by FLORA)
+
+0.006     2008-12-11
+          fix 0.005's change for Win32 (patch by FLORA, report by Taro Nishino)
+
+0.005     2008-12-02
+          enable AUTHOR_TESTING env var (patch by FLORA)
+
+0.004     2008-10-22
+          stop dying when ./xt doesn't exist (requested by FLORA)
+
+0.003     2008-04-13
+          remove space accidentally inserted into variable name
+            (thanks, Taro Nishino!)
+
+0.002     2008-04-11
+          fix the way the custom harness is located so it works for users
+          without Module::Install installed; thanks to smoke test report from
+          iamcat
+
+0.001     2008-04-10
+          first release
+

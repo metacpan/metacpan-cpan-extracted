@@ -1,0 +1,79 @@
+# Copyright 2015 Jeffrey Kegler
+# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# redistribute it and/or modify it under the terms of the GNU Lesser
+# General Public License as published by the Free Software Foundation,
+# either version 3 of the License, or (at your option) any later version.
+#
+# Marpa::R2 is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser
+# General Public License along with Marpa::R2.  If not, see
+# http://www.gnu.org/licenses/.
+
+This document describes how to link an external static library with
+Marpa::R2.  This method, and this document, are intended for re-packagers
+and other very advanced users.  This method is not supported by the CPAN
+infrastructure.  Most users should prefer the basic method described in
+the INSTALL document at the top level of the Marpa::R2 CPAN directory.
+
+Here are the steps:
+
+1.) Be sure the library that you are building is a match to the one
+that Marpa::R2 expects.  The expected version can be found in the
+core/read_only/LIB_VERSION file.  Do *NOT* edit this file.  This version
+number must match exactly the version number of your external static
+library.
+
+2.) Build an external static library using the separate Libmarpa
+repository.  Instructions on how to build Libmarpa can be found beginning
+in the INSTALL file at the top level of the Libmarpa repository.
+Libmarpa's repository is here: https://github.com/jeffreykegler/libmarpa
+
+3.) Install the external static library.  Where and how you install it
+is up to you.  The Libmarpa distribution is set up to use autoconf.
+Instructions on how to install using autoconf can be found in the
+autoconf documentation.  Here, we will assume that, for test purposes,
+you have installed the external static library in /tmp/libmarpa.a.
+
+4.) Build Marpa::R2 to use the external static library.
+
+   ./Build code --libmarpa-external=/tmp/libmarpa.a
+
+or, to build and test
+
+   ./Build test --libmarpa-external=/tmp/libmarpa.a
+
+5.)  Once, you've switched to an external Libmarpa, a
+"--libmarpa-external" option *must* be specified every time you use
+"Build" with a target which has Libmarpa as a dependency.  If you forget
+to specify a "--libmarpa-external" option, ./Build will abend with
+an error message.  To go back to using the internal Libmarpa, use the
+"--libmarpa-internal" option.
+
+   ./Build code --libmarpa-internal=on
+
+TAGS
+====
+
+You can configure Libmarpa to include a "tag" which identifies it.
+If Libmarpa is compiled with GCC, the tag defaults to a time stamp,
+but it can be set explicitly: For instructions on how to set the tag,
+see the installation documentation of Libmarpa.
+
+The tag appears at the beginning of Marpa::R2's test output:
+
+    t/00-load.t ............ 1/4 # Marpa::R2 version is 2.085_004
+    # Libmarpa version is 6.0.3
+    # Libmarpa tag: testing123
+
+LINKER FLAGS
+============
+
+The value of "libmarpa-external" option is passed literally as a set of
+arguments to the linker, after being split on whitespace.  This means
+it is not restricted to being only the name of the static library to
+be linked.  It can also be used to pass other kinds of arguments to
+the linker.

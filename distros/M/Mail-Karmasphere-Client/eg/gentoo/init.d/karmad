@@ -1,0 +1,22 @@
+#!/sbin/runscript
+# Copyright 1999-2006 Shevek
+# Distributed under the terms of the GNU General Public License, v2 or later
+
+# NB: Config is in /etc/conf.d/karmad
+
+depend() {
+	need net
+}
+
+start() {
+	ebegin "Starting karmad"
+	start-stop-daemon --start --background \
+		--exec ${KARMAD_PROG} -- ${KARMAD_OPTS}
+	eend $? "Failed to start karmad"
+}
+
+stop() {
+	ebegin "Stopping karmad"
+	start-stop-daemon --stop --quiet --name $(basename ${KARMAD_PROG})
+	eend $? "Failed to stop karmad"
+}

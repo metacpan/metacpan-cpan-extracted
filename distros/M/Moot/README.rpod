@@ -1,0 +1,57 @@
+=encoding utf8
+
+=pod
+
+README for perl package Moot (formerly known as moot-perl)
+
+=head1 ABSTRACT
+
+Moot - Perl interface to the libmoot part-of-speech tagging library
+
+=head1 REQUIREMENTS
+
+=over 4
+
+=item libmoot E<gt>= v2.10.0
+
+Current sources for the libmoot package should be available from
+http://kaskade.dwds.de/~moocow/projects/moot/
+
+=back
+
+
+=head1 DESCRIPTION
+
+The Moot package provides Perl bindings for the libmoot HMM part-of-speech tagging library,
+including the moot/WASTE tokenizer.
+
+=head2 Citations
+
+If you use the moot/WASTE tokenizer in a scientific publication, please acknowledge its use by citing
+the following paper:
+
+=over 4
+
+Bryan Jurish and Kay-Michael Würzner. "Word and Sentence Tokenization with Hidden Markov Models."
+Journal for Language Technology and Computational Linguistics, 28(2):61-83, 2013.
+URL http://www.jlcl.org/2013_Heft2/3Jurish.pdf
+
+=back
+
+If you use moot for class-based sequence labelling (e.g. part-of-speech tagging), please cite:
+
+=over 4
+
+Bryan Jurish. "A hybrid approach to part-of-speech tagging."
+Technical report, Project Kollokationen im Wörterbuch,
+Berlin-Brandenburgische Akademie der Wissenschaften, 2003.
+URL http://kaskade.dwds.de/~moocow/mirror/pubs/dwdst-report.pdf
+
+=back
+
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=cut

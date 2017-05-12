@@ -1,0 +1,39 @@
+Mail-SpamAssassin-Plugin-OpenPGP
+
+A SpamAssassin plugin to validate OpenPGP signatures
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Mail::SpamAssassin::Plugin::OpenPGP
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Mail-SpamAssassin-Plugin-OpenPGP
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mail-SpamAssassin-Plugin-OpenPGP
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Mail-SpamAssassin-Plugin-OpenPGP
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Mail-SpamAssassin-Plugin-OpenPGP
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Dave Brondsema
+
+This program is released under the following licenses: Apache License, Version 2.0

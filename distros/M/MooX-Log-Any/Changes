@@ -1,0 +1,30 @@
+Revision history for MooX-Log-Any
+
+0.004004  2016-01-19 22:09:43-05:00 America/New_York
+  - Fixed issue 3
+
+0.004003  2015-10-29 10:45:03-07:00 America/Los_Angeles
+  - Fixed issue 6
+
+0.004002  2015-04-07 11:19:55-04:00 America/New_York
+  - Removed double version
+  - Added compile test
+
+0.004001  2015-01-12 16:56:22-05:00 America/New_York
+  - Removed Log::Any::Adapter dependency issue #9
+
+0.004000  2015-01-07 10:27:26-05:00 America/New_York
+  - Changed PERL require modules to perl
+
+0.003001  2014-12-08 14:24:38-05:00 America/New_York
+  - Add version info to log.pm
+  - Add tests to check for version
+
+0.003     2014-09-22 19:14:22-07:00 America/Los_Angeles
+  - Fixed bug where logger(category) would return default category not specified one
+  - Fixed version info
+
+0.0.2
+  - Fixed distribution issues
+
+0.001     2013-01-07 21:23:14 America/New_York

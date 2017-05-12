@@ -1,0 +1,130 @@
+# NAME
+
+MsgPack::RPC - MessagePack RPC client
+
+# VERSION
+
+version 1.0.1
+
+# SYNOPSIS
+
+```perl
+use MsgPack::RPC;
+
+my $rpc = MsgPack::RPC->new( io => '127.0.0.1:6666' );
+
+$rpc->notify( 'something' => [ 'with', 'args' ] );
+
+$rpc->request( 
+    request_method => [ 'some', 'args' ] 
+)->on_done(sub{
+    my $resp = @_;
+
+    print "replied with: ", @_;
+});
+
+$rpc->loop;
+```
+
+# DESCRIPTION
+
+`MsgPack::RPC` implements a MessagePack RPC client following
+the protocol described at [https://github.com/msgpack-rpc/msgpack-rpc/blob/master/spec.md](https://github.com/msgpack-rpc/msgpack-rpc/blob/master/spec.md).
+
+# METHODS
+
+`MsgPack::RPC` consumes the role [MooseX::Role::Loggable](https://metacpan.org/pod/MooseX::Role::Loggable), and thus has all its
+exported methods.
+
+## new( %args )
+
+The class constructor takes all the arguments for [MooseX::Role::Loggable](https://metacpan.org/pod/MooseX::Role::Loggable), plus the following:
+
+- io( \[ $in\_fh, $out\_fh \] )
+- io( $socket )
+
+    Required. Defines which IO on which the MessagePack messages will be received and sent.
+
+    The IO can be a local socket (e.g., `/tmp/rpc.socket` ), a network socket (e.g., `127.0.0.1:6543`),
+    or a pair of filehandles.
+
+## io()
+
+Returns the IO descriptor(s) used by the object.
+
+## request( $method, $args, $id )
+
+Sends the request. The `$id` is optional, and will be automatically
+assigned from an internal self-incrementing list if not given.
+
+Returns a promise that will be fulfilled once a response is received. The response can be either a success 
+or a failure, and in both case the fulfilled promise will be given whatever values are passed in the response.
+
+```perl
+$rpc->request( 'ls', [ '/home', '/tmp' ] )
+    ->on_done(sub{ say for @_ })
+    ->on_fail(sub{ die "couldn't read directories: ", @_ });
+```
+
+## notify( $method, $args )
+
+Sends a notification. 
+
+## subscribe( $event\_name, \\&callback ) 
+
+```perl
+# 'ping' is a request
+$rpc->subscribe( ping => sub($msg) {
+    $msg->response->done('pong');
+});
+
+# 'log' is a notification
+$rpc->subscribe( log => sub($msg) {
+    print {$fh} @{$msg->args};
+});
+```
+
+Register a callback for the given event. If a notification or a request matching the
+is received, the callback will be called. The callback will be passed either a [MsgPack::RPC::Message](https://metacpan.org/pod/MsgPack::RPC::Message) (if triggered by
+a notification) or
+[MsgPack::RPC::Message::Request](https://metacpan.org/pod/MsgPack::RPC::Message::Request) object.
+
+Events can have any number of callbacks assigned to them. 
+
+The subscription system is implemented using the [Beam::Emitter](https://metacpan.org/pod/Beam::Emitter) role.
+
+## loop( $end\_condition )
+
+Reads and process messages from the incoming stream, endlessly if not be given an optional `$end_condition`.
+The end condition can be given a number of messages to read, or a promise that will end the loop once 
+fulfilled.
+
+```perl
+# loop until we get a response from our request
+
+my $response = $rpc->request('add', [1,2] );
+
+$response->on_done(sub{ print "sum is ", @_ });
+
+$rpc->loop($response);
+
+
+# loop 100 times
+$rpc->loop(100);
+```
+
+# SEE ALSO
+
+- [MsgPack::RPC::Message](https://metacpan.org/pod/MsgPack::RPC::Message)
+- [MsgPack::RPC::Message::Request](https://metacpan.org/pod/MsgPack::RPC::Message::Request)
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

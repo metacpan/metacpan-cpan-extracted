@@ -1,0 +1,9 @@
+Revision history for Perl extension Math::Calc::Euro.
+
+0.02  Fri Jan 18 11:36:00 2002
+	- Very small change in the documentation (fixed synopsis)
+
+0.01  Wed Jan 16 19:02:10 2002
+	- original version; created by h2xs 1.21 with options
+		-AXn Math::Calc::Euro
+

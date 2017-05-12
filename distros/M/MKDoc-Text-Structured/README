@@ -1,0 +1,55 @@
+MKDoc::Text::Structured
+=======================
+
+
+SUMMARY
+-------
+
+MKDoc::Text::Structured is a library which allows very simple
+text construct to be turned into HTML. These constructs are the ones
+you would be using when writing a text email or newsgroup message.
+
+MKDoc::Text::Structured follows the KISS philosophy. Comparing with
+similar modules which try to implement as many HTML constructs as possible,
+this module is incredibly restrictive, minimalistic and conservative.
+
+And in fact that's why we use it :-)
+
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Or better, use CPAN.pm
+
+
+DEPENDENCIES
+------------
+
+none.
+
+
+MISCELLANEOUS
+-------------
+
+Want to help us open-source MKDoc?
+Join the MKDoc-Modules community!
+
+http://lists.webarch.co.uk/mailman/listinfo/mkdoc-modules
+ 
+
+COPYRIGHT AND LICENCE
+---------------------
+
+This module free software and is distributed under the
+same license as Perl itself.
+
+Copyright (C) 2003 MKDoc Holdings Ltd.
+
+Author: Jean-Michel Hiver and others

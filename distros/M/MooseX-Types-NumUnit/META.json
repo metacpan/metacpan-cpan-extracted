@@ -1,0 +1,78 @@
+{
+   "abstract" : "Type(s) for using units in Moose",
+   "author" : [
+      "Joel Berger <joel.a.berger@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.3901, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Types-NumUnit",
+   "no_index" : {
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Moose" : "0",
+            "Moose::Exporter" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util::MetaRole" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::ClassAttribute" : "0",
+            "MooseX::Types" : "0",
+            "MooseX::Types::Moose" : "0",
+            "Physics::Unit" : "0.53",
+            "namespace::autoclean" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::Types::NumUnit" : {
+         "file" : "lib/MooseX/Types/NumUnit.pm",
+         "version" : "0.04"
+      },
+      "MooseX::Types::NumUnit::Role::Meta::Attribute" : {
+         "file" : "lib/MooseX/Types/NumUnit.pm",
+         "version" : "0.04"
+      },
+      "MooseX::Types::NumUnit::Role::Meta::Class" : {
+         "file" : "lib/MooseX/Types/NumUnit.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jberger/MooseX-Types-NumUnit/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jberger/MooseX-Types-NumUnit"
+      }
+   },
+   "version" : "0.04"
+}

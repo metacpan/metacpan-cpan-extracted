@@ -1,0 +1,34 @@
+---
+abstract: 'Factorize numbers and calculate matching multiplications'
+author:
+  - 'Steven Schubiger <schubiger@cpan.org>'
+build_requires:
+  ExtUtils::CBuilder: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4001, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Math-Factor-XS
+provides:
+  Math::Factor::XS:
+    file: lib/Math/Factor/XS.pm
+    version: 0.40
+recommends:
+  Test::Pod: 1.14
+  Test::Pod::Coverage: 1.04
+requires:
+  Carp: 0
+  Exporter: 0
+  List::MoreUtils: 0
+  Params::Validate: 0
+  Scalar::Util: 0
+  XSLoader: 0
+  boolean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.40

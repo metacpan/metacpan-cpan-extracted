@@ -1,0 +1,64 @@
+<html>
+<head>
+	<title>List</title>
+	<style><!--
+		body,td,a,p,.h{font-family:arial,sans-serif;}
+		h1{color: #ff7f00; font-size: 20px;}
+		.p{font-size: 14px;}
+		.t{font-size: 10px;}
+		a    { color: #646464; font-style: normal; font-weight: 400; text-decoration: none }
+		a:hover  { color: #ff7f00; font-style: normal; font-weight: 400; text-decoration: none }
+		//-->
+	</style>
+</head>
+<body>
+<h1>Address Book for [% letter %]</h1>
+
+[% FOREACH l = ['A'..'Z'] %]
+	[% IF letters.$l %]<a href="[% l %].html">[% l %]</a>[% ELSE %][% l %][% END %] 
+[% END %]
+<br /><br />
+
+[% USE table(people.sort('fullname'), rows=4) %]
+<table cellpadding="2" cellspacing="0" border="0" width="100%">
+[% FOREACH col = table.cols %]
+	<tr>
+	[% FOREACH person = col %]
+	<td valign="top">
+		[% IF person.fullname %]
+		<span class="p">
+			[% person.fullname %]<br />
+		</span>	
+		<span class="t">
+		[% tels = person.get('tel') %]
+		[% FOREACH tel = tels %]
+			[% FOREACH t = tel.types %]
+			[% IF t != 'pref' %]<strong>[% t %]</strong>[% END %]
+			[% END %]
+			[% tel.value %]<br />
+		[% END %]
+		[% FOREACH email = person.get('email') %]
+			[% FOREACH t = email.types %]
+			[% IF t != 'pref' && t != 'internet'%]<strong>[% t %]</strong>[% END %]
+			[% END %]
+			<a href="mailto:[% email.value %]">[% email.value %]</a></br>
+		[% END %]
+		[% FOREACH address = person.get('addresses') %]
+		[% FOREACH line = address.street.split("\\n") %]
+				[% line %]<br />
+			[% END %]
+			[% address.city %],<br />
+			
+			[% address.post_code %]
+		[% END %]
+		</span>
+		[% ELSE %]
+		&nbsp;
+		[% END %]
+		</td>
+		[% END %]
+	</tr>
+	[% END %]
+</table>
+</body>
+</html>

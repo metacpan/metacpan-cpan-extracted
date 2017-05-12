@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- https://ru.wikipedia.org/wiki/Самарский_метрополитен -->
+<tube name="Самарский метрополитен">
+  <lines>
+    <line id="1" name="Первая линия" color="red"/>
+<!--
+    <line id="2" name="Вторая линия" color="blue"/>
+    <line id="3" name="Третья линия" color="green"/>
+-->
+  </lines>
+  <stations>
+
+    <!-- https://ru.wikipedia.org/wiki/Первая_линия_(Самара) -->
+    <station id="1-01" name="Российская" line="1:1" link="1-02"/>
+    <station id="1-02" name="Московская" line="1:2" link="1-01,1-03"/>
+    <station id="1-03" name="Гагаринская" line="1:3" link="1-02,1-04"/>
+    <station id="1-04" name="Спортивная" line="1:4" link="1-03,1-05"/>
+    <station id="1-05" name="Советская" line="1:5" link="1-04,1-06"/>
+    <station id="1-06" name="Победа" line="1:6" link="1-05,1-07"/>
+    <station id="1-07" name="Безымянка" line="1:7" link="1-06,1-08"/>
+    <station id="1-08" name="Кировская" line="1:8" link="1-07,1-09"/>
+    <station id="1-09" name="Юнгородок" line="1:9" link="1-08"/>
+
+    <!-- https://ru.wikipedia.org/wiki/Вторая_линия_(Самара) -->
+<!--
+    <station id="2-01" name="Хлебная площадь" line="2:1" link="2-02"/>
+    <station id="2-02" name="Вокзальная" line="2:2" link="2-01,2-03"/>
+    <station id="2-03" name="Клиническая" line="2:3" link="2-02,2-04"/>
+    <station id="2-04" name="Карла Маркса" line="2:4" link="2-03,2-05"/>
+    <station id="2-05" name="Революционная" line="2:5" link="2-04,2-06"/>
+    <station id="2-06" name="Орловская" line="2:6" link="2-05,2-07"/>
+    <station id="2-07" name="XXII Партсъезда" line="2:7" link="2-06,2-08"/>
+    <station id="2-08" name="Титовская" line="2:8" link="2-07,2-09"/>
+    <station id="2-09" name="Ипподром" line="2:9" link="2-08,2-10"/>
+    <station id="2-10" name="Ташкентская" line="2:10" link="2-09,2-11"/>
+    <station id="2-11" name="Зоопарк" line="2:11" link="2-10,2-12"/>
+    <station id="2-12" name="18 километр" line="2:12" link="2-11"/>
+-->
+
+    <!-- https://ru.wikipedia.org/wiki/Третья_линия_(Самара) -->
+<!--
+    <station id="3-01" name="Шоколадная Фабрика" line="3:1" link="3-02"/>
+    <station id="3-02" name="Ново-Вокзальная" line="3:2" link="3-01,3-03"/>
+    <station id="3-03" name="Советской Армии" line="3:3" link="3-02,3-04"/>
+    <station id="3-04" name="Орловская" line="3:4" link="3-03,3-05"/>
+    <station id="3-05" name="Гагаринская-3" line="3:5" link="3-04,3-06"/>
+    <station id="3-06" name="Дом Молодёжи" line="3:6" link="3-05,3-07"/>
+    <station id="3-07" name="Куйбышевская" line="3:7" link="3-06,3-08"/>
+    <station id="3-08" name="Зареченская" line="3:8" link="3-07,3-09"/>
+    <station id="3-09" name="Кряж" line="3:9" link="3-08"/>
+-->
+  </stations>
+</tube>

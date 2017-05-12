@@ -1,0 +1,129 @@
+README for Mac::FileSpec::Unixish
+                                        Time-stamp: "2000-05-14 00:42:47 MDT"
+
+			Mac::FileSpec::Unixish
+
+[Partially excerpted from the POD.]
+Mac::FileSpec::Unixish -- Unixish-compatability in file specifications
+
+SYNOPSIS
+  use Mac::FileSpec::Unixish; # exports 'unixify' and 'nativize'
+  
+  @input = map( unixify($_), @ARGV);
+  foreach $item (@input) {
+    my $_native_item = nativize($item);
+    next unless
+             $item =~ m<([^/]+)$>s # assumes / is the path separator
+             and -f $_native_item;
+    printf("File %s is %d bytes long...\n", $1, -s _ );
+    open(IN, "<$_native_item")
+      || die "Can't open $_native_item : $!\n";
+    print "First line: ", scalar(<IN>);
+    close(IN);
+  }
+
+DESCRIPTION
+Mac::FileSpec::Unixish provides two functions, `nativize' and `unixify'
+(both of which are exported by default), that will allow you to denote
+and manipulate pathspecs in Unixish style, and let you convert these
+pathspecs to and from the native OS's format for conveying such things.
+It currently assumes that if you are not running under MacOS (as
+reported in `$^O'), you must be on a Unix box. If you want better, I
+suggest using File::Spec. (In essence, I wrote Mac::FileSpec::Unixish as
+a cheap hack to get around using File::Spec.)
+
+Using this library, you can, in your code, refer to files using a
+Unixish notation, a la:
+
+  $foo = "../analyses/ziz.txt";
+  open(OUT, '>' . &nativize($foo) ) || die "Couldn't open $foo \: $!";
+
+Under Unix, `nativize($foo)' will be simply "../analyses/ziz.txt"
+(`nativize' and `unixify' are nearly no-ops under Unixes); but under
+MacOS it will be "::analyses:ziz.txt".
+
+[...] In other words, this:
+
+  @items = map(&unixify($_), @ARGV);
+  foreach $one (@items) {
+    print "$one => ", -s &nativize($one), " bytes\n";
+    my $one_copy = $one;
+    $one_copy =~ s/[^/]+$//s;
+    print " in the directory $one_copy";
+  }
+
+will work equally well under MacOS as under Unix, regardless of the fact
+that items in @ARGV will be in "foo:bar:baz" format if run under MacOS,
+and "/foo/bar/baz" format if run under Unix. ...
+
+This library exists so that a careful programmer who knows what
+filespecs are legal and meaningful both under Mac and under Unix, can
+write code that manipulates files and filenawes, and have this code
+work equally well under MacOS and under Unix.  [...]  "Unixish" path
+specification means pathspecs expressed with the meanings that Unix
+assigns to '/', '.', and '..'  [...]
+
+
+PREREQUISITES
+
+This suite requires Perl 5; I've only used it under Perl 5.004, so for
+anything lower, you're on your own.
+
+Mac::FileSpec::Unixish doesn't use any nonstandard modules.
+
+
+INSTALLATION
+
+You install Mac::FileSpec::Unixish, as you would install any perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of Mac::FileSpec::Unixish under
+your home directory, then you should try to produce the initial
+Makefile with something like this command:
+
+  perl Makefile.PL LIB=~/perl
+
+Then you may need something like
+  setenv PERLLIB "$HOME/perl"
+in your shell initialization file (e.g., ~/.cshrc).
+
+
+DOCUMENTATION
+
+POD-format documentation is included in Unixish.pm.  POD is readable
+with the 'perldoc' utility or MacPerl's Shuck.  See ChangeLog for
+recent changes.
+
+
+MACPERL INSTALLATION NOTES
+
+Don't bother with the makefiles.  Just make a "Mac" directory in your
+MacPerl site_lib or lib directory, and a "FileSpec" directory under
+that, and then move Unixish.pm into there.
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+Mac::FileSpec::Unixish should just be sent to me at
+sburke@cpan.org
+
+
+AVAILABILITY
+
+The latest version of Mac::FileSpec::Unixish is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN/> to find a CPAN site near you.
+
+
+COPYRIGHT
+
+Copyright 1998-2000, Sean M. Burke <sburke@cpan.org>, all rights
+reserved.
+
+You may use and redistribute this library under the same terms as Perl itself.

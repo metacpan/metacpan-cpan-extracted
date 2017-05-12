@@ -1,0 +1,29 @@
+---
+abstract: 'a DateTime type for Moo'
+author:
+  - 'Luke Triantafyllidis <ltriant@cpan.org>'
+build_requires:
+  DateTime: 0
+  DateTime::Format::Strptime: 0
+  Moo: 0
+  Test::Exception: 0
+  Test::More: 0
+  aliased: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooX-Types-MooseLike-DateTime
+requires:
+  Exporter: 0
+  MooX::Types::MooseLike: 0
+  MooX::Types::MooseLike::Base: 0
+  Scalar::Util: 0
+  base: 0
+  strict: 0
+  warnings: 0
+version: 0.01

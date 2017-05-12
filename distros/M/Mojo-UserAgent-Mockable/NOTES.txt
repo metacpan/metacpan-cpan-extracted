@@ -1,0 +1,9 @@
+Anatomy of a Mojo transaction:
+
+HTTP
+----
+
+for <method> in (GET, POST, etc)
+    UA-><method> defined as UA->start( UA->build_tx(<method>, args) )
+    UA->start() calls UA->_start
+    UA->_start sets up connection 

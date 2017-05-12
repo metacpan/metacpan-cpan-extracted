@@ -1,0 +1,71 @@
+Revision history for MSWord-ToHTML
+
+0.010     2013-12-24
+  - Not only footnotes need to be renamed, but
+    StarWriter endnotes as well, in order not to
+    have colliding names/ids.
+
+0.009     2013-12-24
+  - Remove Word file that cannot be expanded on
+    Windows, change test counts accordingly. Thanks
+    to Alexandr Ciornii <notifications@github.com>.
+
+0.008 2013-10-06
+  - BREAKING: Switch to libreoffice instead of abiword.
+    abiword ceased to wrap footnotes in handy
+    classes that we could identify. This means that
+    any post-processing scripts you may have
+    written will now need to look for different
+    classnames of footnotes, i.e., sdfootnoteanc for
+    footnote refs in the text, and sdfootnotesym
+    for footnote contents at the bottom.
+  - Use file extension to hint which extractor
+    to use.
+  - Switch to Dist::Zilla.
+  - Remove pernicious "_GoBack" ids in Word docx-xml
+    derived HTML.
+  - Delete invalid XML characters before passing
+    the text to tidy.
+
+0.007 2013-07-06
+  - Fix *.docx processing by handling some uninit values
+  - Add test counts
+  - Remove spurious dep on Devel::Dwarn
+
+0.007 2013-07-06
+  - Fix *.docx processing by handling some uninit values
+  - Add test counts
+  - Remove spurious dep on Devel::Dwarn
+
+0.007 2013-07-06
+  - Fix *.docx processing by handling some uninit values
+  - Add test counts
+  - Remove spurious dep on Devel::Dwarn
+
+0.007 2013-07-06
+  - Fix *.docx processing by handling some uninit values
+  - Add test counts
+  - Remove spurious dep on Devel::Dwarn
+
+0.006 2012-06-22
+  - Fix inc/ directory; WriteAll was missing
+
+0.005 2012-01-10
+  - Add a method content to MSWord::ToHTML::HTML to retrieve
+    the new html file's content. This was wrong before: the file
+    attribute contains an IO::All::String, not an IO::All::File.
+
+  - Use Archive::Zip::MemberRead in type library.
+
+0.004 2011-08-13
+  - Add Module::Find to prereqs.
+
+0.003 2011-04-19
+  - Fixed documentation.
+
+0.002 2011-04-18
+  - Add missing dep, MooseX::Types::Path::Class,
+    to Makefile.PL.
+
+0.001 2011-04-18
+  - Initial release.

@@ -1,0 +1,488 @@
+#!/usr/bin/perl -w
+#-----------------------------------------------------------------
+# ServicePingerValidator
+# Author: Edward Kawas <edward.kawas@gmail.com>,
+# For copyright and disclaimer see below.
+#
+# $Id: ServicePingerValidator,v 1.2 2008/02/25 18:26:16 kawas Exp $
+#
+# NOTES:
+# 	1. This script assumes that a BioMOBY registry is properly
+#	   installed and that SetEnv commands have been added to
+#      the servers environment (e.g. httpd.conf)
+#-----------------------------------------------------------------
+
+use strict;
+use CGI qw/:standard/;
+use MOBY::Client::Central;
+use SOAP::Lite;
+
+# the registry to query
+my $URL = $ENV{MOBY_SERVER} || 'http://moby.ucalgary.ca/moby/MOBY-Central.pl';
+my $URI = $ENV{MOBY_URI} || 'http://moby.ucalgary.ca/MOBY/Central';
+my $TIMEOUT = 20;
+
+# create the central client and get all service providers once
+my $central =
+  MOBY::Client::Central->new(
+	Registries => { 
+		mobycentral => { 
+			URL => $URL,
+			URI => $URI
+		}
+	}
+);
+
+
+my $url = url( -relative => 1, -path_info => 1 );
+
+my $form = new CGI;
+
+my %p = $form->Vars unless param('keywords');
+%p = ($form->param('keywords') => '') if param('keywords');
+
+my $service   = $p{'service'} || '';
+my $authority = $p{'authority'} || '';
+
+if ($service and $authority) {
+	
+	my $name = $p{'service'};
+	$name =~ s/ //g;
+	$name = "" unless $name;
+	
+	
+	print "Content-type: text/html\n\n";
+	my $old = $|;
+	$| = 1;
+	# ping the service and output results
+	my ( $second, $minute, $hour, @whatever ) = localtime();
+		print "<p>Finding services registered by '$authority' @ $hour:$minute:$second</p>";
+		my ( $services, $reg ) = $central->findService( Registry => "mobycentral", serviceName=>$name, authURI => $authority );
+		( $second, $minute, $hour, @whatever ) = localtime();
+		print "<p>Services found "
+	  	. scalar @$services
+	  	. "... processing @ $hour:$minute:$second </p>";
+ 
+		my $count = 0;
+		print "<pre>\tservice count: " . scalar (@$services) . "</pre>";
+		foreach (@$services) {
+			# ignore test services
+				my $name = $_->name;
+				my $auth = $_->authority;
+				my $url  = $_->URL;
+
+				do {
+					# dont process localhost addresses ...
+					print "localhost services are usually dead since the service most likely isn't hosted on this server!<br/>";
+					next;
+				} if $url =~ /localhost/;
+	
+				print "<p>Calling: " . $auth . "," . $name . "</p>";
+				my $soap =
+				  SOAP::Lite->uri("http://biomoby.org/")
+				  ->proxy( $url, timeout => $TIMEOUT )->on_fault(
+					sub {
+						my $soap = shift;
+						my $res  = shift;
+						print "<pre>      " . $auth . "," . $name . " ~ is dead:\n</pre><br/>$res<br/>";
+					}
+				  );
+
+				my $input = &_empty_input();
+				my $out   =
+				  $soap->$name( SOAP::Data->type( 'string' => "$input" ) )->result;
+				# validate the XML if we get a response
+				my $good_xml = 1;
+				do {
+					eval {
+					        my $parser  = XML::LibXML->new();
+					        $parser->parse_string($out);
+					};
+					$good_xml = 0 if $@;
+				} if $out;
+				  
+				do {
+					$out =~ s/&/&amp;/g;
+                    $out =~ s/>/&gt;/g;
+                    $out =~ s/</&lt;/g;
+					print "<pre>     " . $auth . "," . $name . " isAlive.\n     output:\n$out</pre><br/>";
+				} if $out and $good_xml;
+				
+				do {
+					$out =~ s/&/&amp;/g;
+                    $out =~ s/>/&gt;/g;
+                    $out =~ s/</&lt;/g;
+					print "<pre>     " . $auth . "," . $name . " isAlive but produced invalid XML.\n     output:\n$out</pre><br/>";
+				} if $out and not $good_xml;
+				
+				do {
+					print "<pre>     " . $auth . "," . $name . " ~ did not respond!</pre><br/>";
+				} unless $out;
+		}
+		$| = $old;
+	
+} elsif ($authority and not $service) {
+	
+	print "Content-type: text/html\n\n";
+	my $old = $|;
+	$| = 1;
+	# ping the service and output results
+	my ( $second, $minute, $hour, @whatever ) = localtime();
+		print "<p>Finding services registered by '$authority' @ $hour:$minute:$second</p>";
+		my ( $services, $reg ) = $central->findService( Registry => "mobycentral", authURI => $authority );
+		( $second, $minute, $hour, @whatever ) = localtime();
+		print "<p>Services found "
+	  	. scalar @$services
+	  	. "... processing @ $hour:$minute:$second </p>";
+ 
+		my $count = 0;
+		print "<pre>\tservice count: " . scalar (@$services) . "</pre>";
+		foreach (@$services) {
+			# ignore test services
+				my $name = $_->name;
+				my $auth = $_->authority;
+				my $url  = $_->URL;
+
+				do {
+					# dont process localhost addresses ...
+					print "localhost services are usually dead since the service most likely isn't hosted on this server!<br/>";
+					next;
+				} if $url =~ /localhost/;
+	
+				print "<p>Calling: " . $auth . "," . $name . "</p>";
+				my $soap =
+				  SOAP::Lite->uri("http://biomoby.org/")
+				  ->proxy( $url, timeout => $TIMEOUT )->on_fault(
+					sub {
+						my $soap = shift;
+						my $res  = shift;
+						print "<pre>      " . $auth . "," . $name . " ~ is dead:\n</pre><br/>$res<br/>";
+					}
+				  );
+
+				my $input = &_empty_input();
+				my $out   =
+				  $soap->$name( SOAP::Data->type( 'string' => "$input" ) )->result;
+				# validate the XML if we get a response
+				my $good_xml = 1;
+				do {
+					eval {
+					        my $parser  = XML::LibXML->new();
+					        $parser->parse_string($out);
+					};
+					$good_xml = 0 if $@;
+				} if $out;
+				
+				do {
+					$out =~ s/&/&amp;/g;
+                    $out =~ s/>/&gt;/g;
+                    $out =~ s/</&lt;/g;
+					print "<pre>     " . $auth . "," . $name . " isAlive.\n     output:\n$out</pre><br/>";
+				} if $out and $good_xml;
+				
+				do {
+					$out =~ s/&/&amp;/g;
+                    $out =~ s/>/&gt;/g;
+                    $out =~ s/</&lt;/g;
+					print "<pre>     " . $auth . "," . $name . " isAlive but produced invalid XML.\n     output:\n$out</pre><br/>";
+				} if $out and not $good_xml;
+				
+				do {
+					print "<pre>     " . $auth . "," . $name . " ~ did not respond!</pre><br/>";
+				} unless $out;
+		}
+		$| = $old;
+} else {
+	print "Content-type: text/html\n\n";
+	print &GENERATE_FORM();
+}
+
+sub _empty_input {
+	return <<'END_OF_XML';
+<?xml version="1.0" encoding="UTF-8"?>
+<moby:MOBY xmlns:moby="http://www.biomoby.org/moby">
+  <moby:mobyContent>
+  </moby:mobyContent>
+</moby:MOBY>
+END_OF_XML
+}
+
+sub GENERATE_FORM {
+	
+my $values = "";
+
+my $m = MOBY::Client::Central->new();
+my @URIs = $m->retrieveServiceProviders();
+foreach my $uri (@URIs) {
+	next if $uri eq '127.0.0.1';
+	$values .= "<option value='$uri'>$uri</option>\n"
+}
+
+
+my $msg =<<EOF;
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Test your services!</title>
+<style type="text/css">
+<!--
+body {
+	background: #ffffcd;
+	color: #000000;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12pt;
+	font-weight: normal;
+	margin-top: 110px;
+	margin-right: 1em;
+	margin-bottom: 1em;
+	margin-left: 1em;
+	background-position: left top;
+	background-repeat: no-repeat;
+}
+.indent {
+	margin-left: 5em;
+}
+.hidden {
+	visibility:hidden;
+}
+.visible {
+	visibility:visible;
+}
+
+iframe {
+	width:100%;
+	height:300px;
+	background:#FFDC75 none repeat scroll 0%;
+	font-family:sans-serif,Tahoma,Arial;
+	text-align:left;
+}
+
+td.text {
+	background: #ffffcd;
+	color: #000000;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12pt;
+	font-weight: normal;
+	margin-top: 110px;
+	margin-right: 1em;
+	margin-bottom: 1em;
+	margin-left: 1em;
+}
+h1 {
+	border: solid;
+	text-align:center;
+	background-color:yellow;
+	color: navy;
+}
+h2 {
+	border: ridge;
+	padding: 5px;
+	background-color:yellow;
+	color: navy;
+}
+h3 {
+	border: none;
+	padding: 5px;
+	background-color:yellow;
+	color: navy;
+}
+.subtitle {
+	border: none;
+	padding: 5px;
+	background-color:yellow;
+	color: navy;
+}
+a:link {
+	color: #0000ff;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	text-decoration: underline
+}
+a:visited {
+	color: #0099ff;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	text-decoration: underline
+}
+a:active {
+	color: #0000ff;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	text-decoration: underline
+}
+a:hover {
+	color: #336666;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	text-decoration: underline
+}
+li {
+	list-style-type: square;
+	margin: 1em;
+	list-style-image: url(b_yellow.gif);
+}
+li.tiny {
+	list-style-type: square;
+	margin: 0;
+	list-style-image: none;
+}
+li.count {
+	list-style-type: upper-roman;
+	list-style-image: none;
+	margin: 0;
+}
+li.dcount {
+	list-style-type: decimal;
+	list-style-image: none;
+	margin: 0;
+}
+dd {
+	margin-bottom: 0.5em
+}
+.address {
+	font-size: 5pt;
+	margin-right:1em
+}
+.smaller {
+	font-size: 8pt
+}
+.note {
+	font-style: italic;
+	padding-left: 5em;
+	margin: 1em;
+}
+.update {
+	background-color:#ccffcd;
+}
+pre.code {
+	border: ridge;
+	padding: 5px;
+	background-color:#FFFF99;
+	color: navy;
+}
+pre.script {
+	padding: 5px;
+	background-color: white;
+	color: navy;
+}
+pre.script2 {
+	padding: 5px;
+	background-color: white;
+	color: navy;
+	margin-left: 5em;
+}
+pre.sscript {
+	padding: 5px;
+	background-color: white;
+	color: navy;
+	font-size: 8pt;
+}
+pre.ssscript {
+	padding: 5px;
+	background-color: white;
+	color: navy;
+	font-size: 6pt;
+}
+tr.options {
+	background-color: #FFFF99;
+	color: navy;
+}
+b.step {
+	background-color: white;
+	color: navy;
+	font-size: 8pt;
+}
+.motto {
+	text-align: right;
+	font-style: italic;
+	font-size: 10pt;
+}
+.motto-signature {
+	text-align: right;
+	font-style: normal;
+	font-size: 8pt;
+}
+.sb {
+	font-weight: bold;
+	font-size: 8pt;
+}
+.sbred {
+	font-weight: bold;
+	font-size: 8pt;
+	color: red;
+}
+.mail {
+	font-size: medium;
+}
+-->
+</style>
+<script>
+<!--
+if( !window.XMLHttpRequest ) XMLHttpRequest = function(){
+        try{ return new ActiveXObject("MSXML3.XMLHTTP") }catch(e){}
+        try{ return new ActiveXObject("MSXML2.XMLHTTP.3.0") }catch(e){}
+        try{ return new ActiveXObject("Msxml2.XMLHTTP") }catch(e){}
+        try{ return new ActiveXObject("Microsoft.XMLHTTP") }catch(e){}
+        throw new Error("Could not find an XMLHttpRequest alternative.")
+};
+
+
+
+function testServices(auth,name)
+{
+	document.getElementById('output_div').className = 'visible'
+	var u = location.href + "?authority=" + auth + "&service="+name
+	//window.open(u)
+	document.getElementById('results').src=u;
+	return false;
+}
+//-->
+</script>
+</head>
+<body>
+<h1>Check your services</h1>
+<h3>Introduction</h3>
+<p class="indent">Use this page to determine whether or not the BioMOBY service pinger can successfully contact your services. </p>
+<p class="indent">Simply select a service provider and enter an optional service name in the form below and submit the form. The pinger then will be called on your service provider/name combination and the results will be printed out below.</p>
+<h3>How does it work?</h3>
+<p class="indent">The BioMOBY service pinger simply attempts to call your service(s) with the empty BioMOBY xml message shown below. If your service responds, then the service is considered alive. Otherwise the service is reported as dead.</p>
+<h4>Sample XML message sent to services:</h4>
+<pre class="code">&lt;MOBY&gt;
+  &lt;mobyContent&gt;&lt;/mobyContent&gt;
+&lt;/MOBY&gt;
+</pre>
+<h3>Let's check your services:</h3>
+<form id="form" name="form" method="post" action="javascript:void(0);" onsubmit="javascript:testServices(document.form.authority.value,document.form.service.value);">
+  <label>Service Provider
+  <select name="authority" id="authority">
+  $values
+  </select>
+  </label>
+  <p>
+    <label>Service Name:
+    <input type="text" name="name" id="service" />
+    </label>
+  </p>
+  <p>
+    <label>
+    <input type="submit" name="submit" id="__submit__" onclick="javascript:void(0);" value="Check My Services" />
+    </label>
+  </p>
+</form>
+<hr />
+
+<div class='hidden' id='output_div'>
+	<iframe src='' frameborder='0' id='results'></iframe>
+</div>
+<div align="center" class="popup" id="__modular__popup__"/>
+</body>
+
+</html>
+
+
+EOF
+
+return $msg;
+}

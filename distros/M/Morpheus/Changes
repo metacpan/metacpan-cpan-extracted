@@ -1,0 +1,47 @@
+Revision history for Morpheus
+
+0.46    Mon Dec 10, 2012
+        * fix t/file.t
+
+0.45    Mon Dec 10, 2012
+        * cyclic dependencies handling improved
+
+0.44    Wed Jun 20, 2012
+        * don't package debian/ and debuild/ dirs
+
+0.43    Wed Nov 16, 2011
+        * fix bin/morph tests to run Config{perlpath} perl
+
+0.42    Mon Nov 07, 2011
+        * skip #line pragma for non files
+
+0.41    Wed Nov 02, 2011
+        * limit max identifier length is sandbox package
+
+0.40    Sat May 21, 2011
+        * script.t test checks output of 'morph' script less strictly,
+        now compatible with modern Data::Dumper and JSON versions
+
+0.39    Tue Mar 15, 2011
+        * allow 'morph' script to dump nonrefs in json mode
+
+0.38    Thu Mar 10, 2011
+        * import syntax fixed for deeply nested parameters
+
+0.37_01 Mon Dec 27, 2010
+        * tests append to PERL5LIB if PERL5LIB is already defined
+
+0.37    Sat Dec 25, 2010
+        * tests use proper perl binary (thanks to Andreas Koenig for noticing)
+
+0.36    Sat Dec 18, 2010
+        * documentation
+        * normalize "/a//" to "a" (affects Morpheus::Defaults/Overrides etc.)
+
+0.34    Sat Nov 13, 2010
+        * call dh_perldeps when possible
+        * get rid of Sys::Hostname::Long and parent dependencies
+
+0.32    Tue Nov 02, 2010
+        * converted to Dist::Zilla
+        * a little bit of PODs

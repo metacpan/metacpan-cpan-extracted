@@ -1,0 +1,43 @@
+<p align="center">
+    <form name="setlang" method="post" action="[% PostLink %]">
+        <input type="hidden" name="mode" value="setlanguage">
+        [% tr.tr("Language") %]: <select name="language" onChange="document.setlang.submit();">
+                    [% FOREACH Language IN AvailLanguages %]
+                        <option value="[% Language.lang %]"
+                        [% IF Language.lang == EditLanguage %]
+                            selected="selected"
+                        [% END %]
+                        >[% Language.lang %] : [% Language.description %]</option>
+                    [% END %]
+                </select>
+    </form>
+</p>
+&nbsp;<br>
+<p align="center">
+    <form name="translations" method="post" action="[% PostLink %]">
+        <table class="data" align="center" id="MainDataTable">
+            <tr class="tabheader">
+                <th>[% tr.tr("Original") %]</th>
+                <th>[% tr.tr("Translation") %]</th>
+            </tr>
+            [% FOREACH trLine IN trLines %]
+                <tr>
+                    <td width="300px">
+                        <input type="hidden" name="originaltext" value="[% trLine.originaltext %]">
+                        [% trLine.originaltext %]
+                    </td>
+                    <td>
+                        <textarea name="translate_[% trLine.originaltext %]" rows="3" cols="40">[% trLine.translation %]</textarea>
+                    </td>
+                </tr>
+            [% END %]
+            <tr>
+                <td colspan="2" align="center">
+                    <input type="hidden" name="mode" value="change">
+                    <input type="submit" value="[% tr.tr("Change") %]">
+                    <input type="reset" value="[% tr.tr("Reset") %]">
+                </td>
+            </tr>                
+        </table>
+    </form>
+</p>

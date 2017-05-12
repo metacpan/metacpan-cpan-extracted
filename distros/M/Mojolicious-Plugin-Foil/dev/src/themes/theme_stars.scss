@@ -1,0 +1,59 @@
+/* ================================================================== */
+/* THEME: Stars
+ */
+@import 'functions';
+@import 'fonts_stars';
+@import 'icon_light_on_dark';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: #333333;
+$verge-fg: set-fg($verge-bg);
+$verge-border: white;
+$button-bg: #000033;
+$button-fg: set-fg($button-bg);
+$button-border: grey;
+$main-bg: #000033;
+$main-fg: set-fg($main-bg);
+$link-fg: set-link($main-bg);
+$link-visited: set-visited($main-bg);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+}
+
+header,
+footer {
+	@extend .verge;
+	background-image: url(stars.png);
+}
+
+.side {
+    @extend .verge;
+    background: #111111;
+}
+
+body {
+	color: $main-fg;
+	background: $main-bg;
+}
+
+@include some-links($link-fg, $link-visited);
+@include fancy($verge-fg, $verge-bg, "stars.png");
+@include make-buttons;
+
+header nav li {
+	border-color: grey;
+}
+header nav .selflink,
+header nav em,
+header nav .current a {
+	color: white;
+	background-color: black;
+}
+

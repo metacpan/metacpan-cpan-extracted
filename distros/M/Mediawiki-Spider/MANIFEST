@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Mediawiki-Spider.t
+lib/Mediawiki/Spider.pm
+lib/Mediawiki/Wikicopy.pm
+META.yml                                 Module meta-data (added by MakeMaker)

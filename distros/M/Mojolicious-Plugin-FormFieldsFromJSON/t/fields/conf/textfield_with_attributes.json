@@ -1,0 +1,10 @@
+ [
+    {
+        "label" : "Name",
+        "type" : "text",
+        "name" : "name",
+        "attributes" : {
+            "class" : "W75px"
+        }
+    }
+ ]

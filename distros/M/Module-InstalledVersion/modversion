@@ -1,0 +1,14 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use Module::InstalledVersion;
+my $m = Module::InstalledVersion->new($ARGV[0]);
+
+if ($m->{version}) {
+    print "$ARGV[0] version is $m->{version}\n";
+} elsif ($m->{dir}) {     # directory but no version
+    print "$ARGV[0] doesn't seem to have a proper version\n";
+} else {
+    print "Can't find $ARGV[0] in \@INC\n";
+}

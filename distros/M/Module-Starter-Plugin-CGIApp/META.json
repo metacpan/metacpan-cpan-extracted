@@ -1,0 +1,57 @@
+{
+   "abstract" : "template based module starter for CGI apps.",
+   "author" : [
+      "Jaldhar H. Vyas <jaldhar@braincells.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Module-Starter-Plugin-CGIApp",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Copy::Recursive" : "0",
+            "File::DirCompare" : "0",
+            "Test::MockTime" : "0",
+            "Test::More" : "0",
+            "Time::Piece" : "1.12"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "1.00",
+            "HTML::Template" : "0",
+            "Module::Starter" : "1.7",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Module::Starter::Plugin::CGIApp" : {
+         "file" : "lib/Module/Starter/Plugin/CGIApp.pm",
+         "version" : "0.44"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://jaldhar.github.com/Module-Starter-Plugin-CGIApp/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jaldhar/Module-Starter-Plugin-CGIApp"
+      }
+   },
+   "version" : "0.44"
+}

@@ -1,0 +1,61 @@
+{
+   "abstract" : "redis support for spamassassin AWL/TxRep",
+   "author" : [
+      "Markus Benning <ich@markusbenning.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mail-SpamAssassin-Plugin-RedisAWL",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mail::SpamAssassin::Logger" : "0",
+            "Mail::SpamAssassin::PersistentAddrList" : "0",
+            "Mail::SpamAssassin::Plugin" : "0",
+            "Mail::SpamAssassin::Util" : "0",
+            "Redis" : "0",
+            "perl" : "v5.8.5",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Mail-SpamAssassin-Plugin-RedisAWL@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mail-SpamAssassin-Plugin-RedisAWL"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/benningm/Mail-SpamAssassin-Plugin-RedisAWL",
+         "web" : "https://github.com/benningm/Mail-SpamAssassin-Plugin-RedisAWL.git"
+      }
+   },
+   "version" : "1.001"
+}
+

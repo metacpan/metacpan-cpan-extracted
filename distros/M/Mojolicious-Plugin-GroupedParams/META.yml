@@ -1,0 +1,23 @@
+---
+abstract: 'grouped params from query.'
+author:
+  - 'Ivan Sokolov <ivsokolov@cpan.org>'
+build_requires:
+  Mojolicious: 0.99995
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112580'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-GroupedParams
+provides:
+  Mojolicious::Plugin::GroupedParams:
+    file: lib/Mojolicious/Plugin/GroupedParams.pm
+    version: 0.04
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

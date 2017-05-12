@@ -1,0 +1,117 @@
+Changelog for Mojolicious-Broker
+
+0.012     2017-01-12 19:28:59-06:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed allow_origin.t test failing on new versions of Mojolicious
+      due to an invalid assumption in the test. Previously it was
+      accidentally working, now it is deliberately working. Thanks
+      @eserte for the report! [Github #37]
+
+0.011     2016-12-17 21:09:31-06:00 America/Chicago
+
+    [Fixed]
+
+    - Default inactivity timeout is now 4 hours instead of 20 minutes.
+      This makes it less likely that your subscribers will lose their
+      connection to the broker unexpectedly.
+
+0.010     2016-12-08 18:03:45-06:00 America/Chicago
+
+    [Added]
+
+    - /pub/*, /push/*, and /bus/* can now accept POST requests to post
+      new messages to the appropriate subscribers. This allows any
+      random HTTP client to send messages (but not receive them, yet)
+
+0.009 2016-09-02T01:23:40
+ - update dist settings from other projects
+ - upgrade perl versions in travis tests
+ - add documentation for the new architecture
+ - move bus pattern into controller/pattern object
+ - move cascading pub/sub into controller
+ - add simple pubsub controller and pattern
+ - refactor push/pull into composable parts
+ - - Auto add key 'provides' to META.* files using the dzil plugin
+   [MetaProvides::Package].   as recommended by CPANTS:
+   http://cpants.cpanauthors.org/dist/Mercury
+ - - Autogenerate META.json using dzil plugin [MetaJSON].
+ - add contributors to README
+ - add mail mapping for contributors
+ - add contributors to docs
+ - add release v0.008 announcement
+ - fix issue listing merges in release blog post
+
+0.008 2015-12-29T14:20:29Z
+ - Correct function name in documentation, and minor typos
+ - add Rexfile to deploy the demo Mercury app
+ - add example daemon init script
+ - add irc meta information
+ - change homepage in meta resources
+ - add release v0.007 announcement
+
+0.007 2015-12-13T23:22:32Z
+ - add link to website in main doc
+ - add informational website
+ - move example js code into single file
+ - fix pubsub in example application
+
+0.006 2015-11-21T00:41:48Z
+ - added rudimentary echo parameter to bus
+ - add usage help
+ - add chat example application
+
+0.005 2015-10-09T05:38:21Z
+ - fix test failure when re-using Test::Mojo object
+ - break single broker test into pattern tests
+ - fix link to the mercury broker command in docs
+
+0.004 2015-10-05T05:06:53Z
+ - add more detail on the various pattern docs
+ - expand configuration documentation
+ - add some other solutions to SEE ALSO
+ - add allow_origin config to check origin header
+ - fix bad state when cleaning up pull socket close
+ - add push/pull to the demo app
+ - add push/pull pattern
+ - test to ensure strangers don't get bus messages
+ - test pubsub messages being sent incorrectly
+ - add field to demo to test brokers on other hosts
+ - use correct file for README
+ - link SEE ALSO to main mercury docs
+
+0.003 2015-09-30T05:36:08Z
+ - add strict to test
+ - test pubsub topic hierarchy
+ - make pattern list easier to read in demo app
+ - move more important demo explanation to the left
+ - add text to demo app to indicate pub or sub urls
+ - use monospace font in demo app logs
+ - reformat intro text in demo app
+ - add bus messaging pattern
+ - move pubsub test into subtest
+
+0.002 2015-09-29T01:49:55Z
+ - fix gitignore from project rename
+ - add configuration file
+ - do not move the app home directory
+ - remove global Mojolicious mercury command
+ - fix mercury script showing mojo commands
+ - move main docs into mercury script
+ - add mercury command
+ - rename project to Mercury
+
+0.001 2015-09-27T07:07:34Z
+ - release v0.001
+ - add build artifacts
+ - remove extra strict/warnings
+ - add core prereqs
+ - add example app with pubsub sample
+ - fix pod spacing
+ - add routes pod directive
+ - add broker command
+ - remove perl 5.8 support
+ - add mojolicious prereq
+ - add initial broker app
+ - Minting dist

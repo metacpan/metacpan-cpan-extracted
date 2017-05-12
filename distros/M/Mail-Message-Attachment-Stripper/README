@@ -1,0 +1,46 @@
+NAME
+    Mail::Message::Attachment::Stripper - Strip the attachments from a mail
+
+SYNOPSIS
+            my $stripper = Mail::Message::Attachment::Stripper->new($mail);
+
+            my Mail::Message $msg = $stripper->message;
+            my @attachments       = $stripper->attachments;
+
+DESCRIPTION
+    Given a Mail::Message object, detach all attachments from the message.
+    These are then available separately.
+
+METHODS
+  new
+            my $stripper = Mail::Message::Attachment::Stripper->new($mail);
+
+    This should be instantiated with a Mail::Message object.
+
+  message
+            my Mail::Message $msg = $stripper->message;
+
+    This returns the message with all the attachments detached. This will
+    alter both the body and the header of the message.
+
+  attachments
+            my @attachments = $stripper->attachments;
+
+    This returns a list of all the attachments we found in the message, as a
+    hash of { filename, content_type, payload }.
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-Mail-Message-Attachment-Stripper@rt.cpan.org
+
+COPYRIGHT AND LICENSE
+      Copyright (C) 2002-2005 Kasei
+
+      This program is free software; you can redistribute it and/or modify it under
+      the terms of the GNU General Public License; either version 2 of the License,
+      or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful, but WITHOUT
+      ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+      FOR A PARTICULAR PURPOSE.
+

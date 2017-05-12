@@ -1,0 +1,56 @@
+Revision history for Perl extension Math::Base::Convert
+
+0.11  Thu Oct 22 15:31:10 PDT 2015
+	fix one more typo
+
+0.10  Wed Oct 21 19:56:19 PDT 2015
+	finish the typo corrections started in 0.09, sigh...
+
+0.09  Wed Oct 21 18:53:44 PDT 2015
+	corrected numerous typos thanks to patch by
+	gregor herrmann <gregoa@debian.org>
+
+0.08  Mon Jan 27 11:59:58 PST 2014
+        modify Makefile.PL to bypass missing 'pod2text'
+
+	correct documentation typo
+
+0.07  Tue Jan  8 13:47:58 PST 2013
+  revise Shortcuts 0.02 srindx table use to mask after shift
+
+  floating point error detected ONLY in 
+	fail   2012-12-30T20:29:47 v5.16.2/127e
+	fail   2013-01-03T03:49:32 v5.12.5/a2da
+	fail   2013-01-03T05:24:45 v5.14.3/127e
+	fail   2013-01-03T05:43:01 v5.17.6/127e
+  64 bit perl compiled with -Duselongdouble
+
+  wrap base calculation with int( ... +0.5) in Shortcuts.pm
+  $bp = int(log($base/log(2) + 0.5)
+
+  MANY thanks to Andreas Koenig <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+  for all the help he provide in tracking this bug down and to 
+  David Cantrell <david@cantrell.org.uk> for providing a guest account
+  on his system to do the testing.
+
+0.06  Wed Dec 26 00:08:52 PST 2012
+  changed Bases.pm array returns from arrays built in the sub
+  to arrays built in the package and already blessed scalars
+
+  add ascii lookup table
+
+0.05  Sun Dec 23 22:46:42 PST 2012
+  initial release
+
+0.04  Sat Dec 22 21:07:56 PST 2012
+  \Q \E metaquoting escape sequence to disable all 
+  metacharacters in later versions of Perl
+
+0.03  Tue Dec 18 17:44:58 PST 2012
+  archive before TO <-> FROM switch
+
+0.02  Wed Dec  5 17:56:47 PST 2012
+  separated math into CalcPP.pm
+
+0.01  Wed Dec  5 13:59:41 PST 2012
+  first development package

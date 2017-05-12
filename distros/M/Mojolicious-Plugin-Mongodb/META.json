@@ -1,0 +1,60 @@
+{
+   "abstract" : "Use MongoDB in Mojolicious",
+   "author" : [
+      "Ben van Staveren <madcat@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Mongodb",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojo::Base" : "0",
+            "MongoDB" : "0",
+            "MongoDB::Collection" : "0",
+            "Tie::IxHash" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Mojolicious::Lite" : "0",
+            "Test::Mojo" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/benvanstaveren/Mojolicious-Plugin-Mongodb/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/Mojolicious-Plugin-Mongodb/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/benvanstaveren/Mojolicious-Plugin-Mongodb.git",
+         "web" : "https://github.com/benvanstaveren/Mojolicious-Plugin-Mongodb"
+      }
+   },
+   "version" : "1.16"
+}
+

@@ -1,0 +1,148 @@
+NAME
+    MooseX::MungeHas - munge your "has" (works with Moo, Moose and Mouse)
+
+SYNOPSIS
+       package Foo::Bar;
+   
+       use Moose;
+       use MooseX::MungeHas "is_ro";
+   
+       has foo => ();             # read-only
+       has bar => (is => "rw");   # read-write
+
+DESCRIPTION
+    MooseX::MungeHas alters the behaviour of the attributes of your Moo, Moose
+    or Mouse based class. It manages to support all three because it doesn't
+    attempt to do anything smart with metathingies; it simply installs a
+    wrapper for `has` that munges the attribute specification hash before
+    passing it on to the original `has` function.
+
+    The following munges are always applied (simply because I can see no
+    sensible reason why you would not want them to be).
+
+    *   Implement `is => "rwp"` and `is => "lazy"` in Moose and Mouse.
+
+        (These already work in Moo.)
+
+    *   Implement `builder => 1`, `clearer => 1`, `predicate => 1`, and
+        `trigger => 1` in Moose and Mouse.
+
+        (These already work in Moo.)
+
+    *   Implement `builder => sub { ... }` in Moose and Mouse.
+
+        (This already works in Moo.)
+
+    *   Allow Moo to support `coerce => 0|1` for Type::Tiny type constraints.
+        (Moo normally expects a coderef for the coercion.)
+
+        (These already work in Moose and Mouse, and has actually been added to
+        Moo as of version 1.006000.)
+
+    *   Makes `has $name => sub { ... }` into a shortcut for:
+
+           has $name => (is => "lazy", builder => sub { ... });
+
+    *   Makes `has $name => $type_constraint` into a shortcut for:
+
+           has $name => (isa => $type_constraint);
+
+        (Assuming that $type_constraint is a blessed type constraint object a
+        la Type::Tiny, MooseX::Types, etc.)
+
+    When you import this module (i.e. `use MooseX::MungeHas`) you can provide
+    a list of additional mungers you want it to apply. These may be provided
+    as coderefs, though for a few common, useful sets of behaviour, there are
+    pre-defined shortcut strings.
+
+       # "no_isa" is a pre-defined shortcut;
+       # the other munger is a coderef.
+       #
+       use MooseX::MungeHas "no_isa", sub {
+          # Make constructor ignore private attributes
+          $_{init_arg} = undef if /^_/;
+       };
+
+    Within coderefs, the name of the attribute being processed is available in
+    the $_ variable, and the specification hash is available as %_.
+
+    You may provide multiple coderefs.
+
+    The following are the pre-defined shortcuts:
+
+    `is_ro`, `is_rw`, `is_rwp`, `is_lazy`
+        These mungers supply defaults for the `is` option.
+
+    `always_coerce`
+        Automatically provides `coerce => 1` if the type constraint provides
+        coercions. (Unless you've explicitly specified `coerce => 0`.)
+
+    `no_isa`
+        Switches off `isa` checks for attributes, unless they coerce.
+
+    `simple_isa`
+        Loosens type constraints if they don't coerce, and if it's likely to
+        make them significantly faster. (Loosening `Int` to `Num` won't speed
+        it up.)
+
+        Only works if you're using Type::Tiny constraints.
+
+    Mungers provided as coderefs are executed *after* predefined ones, but are
+    otherwise executed in the order specified.
+
+  Multiple Wrappers
+    Since version 0.007, it has been possible to use MooseX::MungeHas to
+    export multiple wrappers with different names:
+
+       package Foo;
+       use Moose;
+       use MooseX::MungeHas {
+          has_ro   => [ "is_ro", "always_coerce" ],
+          has_rw   => [ "is_rw", "always_coerce" ],
+       };
+   
+       has_ro "foo" => (required => 1);
+       has_rw "bar";
+
+    Note in the example above, MooseX::MungeHas has installed two brand new
+    wrapped `has` functions with different names, but it has left the standard
+    `has` function unmolested.
+
+    If you wanted to alter the standard function too, then you could use:
+
+       package Foo;
+       use Moose;
+       use MooseX::MungeHas {
+          has      => [          "always_coerce" ],
+          has_ro   => [ "is_ro", "always_coerce" ],
+          has_rw   => [ "is_rw", "always_coerce" ],
+       };
+   
+       has_ro "foo" => (required => 1);
+       has_rw "bar";
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-MungeHas>.
+
+SEE ALSO
+    Moo, Mouse, Moose, MooseX::AttributeShortcuts, MooseX::InlineTypes,
+    Type::Tiny::Manual.
+
+    Similar: MooseX::HasDefaults, MooseX::Attributes::Curried,
+    MooseX::Attribute::Prototype and MooseX::AttributeDefaults.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013-2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

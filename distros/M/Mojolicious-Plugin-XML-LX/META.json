@@ -1,0 +1,57 @@
+{
+   "abstract" : "is a plugin to support simple XML response from HASH.",
+   "author" : [
+      "Roman V. Nikolaev <rshadow@rambler.ru>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-XML-LX",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "4.72",
+            "XML::Hash::LX" : "0.0603",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rshadow/mojolicious-plugin-lx/issues"
+      },
+      "homepage" : "https://github.com/rshadow/mojolicious-plugin-lx",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com:rshadow/mojolicious-plugin-lx.git",
+         "web" : "https://github.com/rshadow/mojolicious-plugin-lx"
+      }
+   },
+   "version" : "1.0"
+}

@@ -1,0 +1,70 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 616d41257dc29419a02635a4aeb7e77e7d7ebc28 MANIFEST
+SHA1 eec0de9114d2dac829758d629cd0ccc0a8b864e5 META.yml
+SHA1 47c290553562343ca207cb62d1581bdb056e7bb2 Makefile.PL
+SHA1 8b836389e4bc170eb8d19b7296b2f4978ac36136 inc/Module/Install.pm
+SHA1 85b32a1d5f215d99f411c3dd6113b537fcd5c57d inc/Module/Install/Base.pm
+SHA1 fde745e180861c7c0ba3ee5a767cafdbdb1d3ebd inc/Module/Install/Can.pm
+SHA1 e259400ceb54c34def9c994f52d7091108ce7ffc inc/Module/Install/Fetch.pm
+SHA1 da42b522e5a7ffbae0ceec900f3635ad9990c565 inc/Module/Install/Makefile.pm
+SHA1 ba005818ee9f97146bfa4e14e53c684e9e446902 inc/Module/Install/Metadata.pm
+SHA1 85e6b1cf5b7ca81bfb469a99389fa947d4b8a08e inc/Module/Install/Win32.pm
+SHA1 d32dff9f0d2f02023ca6d79a48d62fd855916351 inc/Module/Install/WriteAll.pm
+SHA1 c9b90de224bac3969c8502513e23d9f60d5eedcd lib/Moose/Test.pm
+SHA1 75d7e2076a6b23e6f7ab32ee33eb357c1a009d73 lib/Moose/Test/Case.pm
+SHA1 23863c343e71078927df95ca8ed1aa1df2223c52 t/000_load.t
+SHA1 5fba76c1a41998247c7fb30410cee901c39b50b9 t/001_basic.t
+SHA1 968f6f8a4c6031374998bd3cdbb6adeb1169e1cc t/001_basic/Bar.pm
+SHA1 2a67e830efcb25e5208ece647701360e844538a0 t/001_basic/Foo.pm
+SHA1 e98904c502ffb1b56f992d98c7fa9224b5e72415 t/001_basic/test_Bar.pl
+SHA1 83e7610634599cb9ce96935b4676137793ec5477 t/001_basic/test_Foo.pl
+SHA1 b8dc5ccf5cb235f18741d662757b24d92c0dd5c0 t/002_basic_defaults.t
+SHA1 2a67e830efcb25e5208ece647701360e844538a0 t/002_basic_defaults/001_Foo.pm
+SHA1 83e7610634599cb9ce96935b4676137793ec5477 t/002_basic_defaults/001_test_Foo.pl
+SHA1 968f6f8a4c6031374998bd3cdbb6adeb1169e1cc t/002_basic_defaults/002_Bar.pm
+SHA1 e98904c502ffb1b56f992d98c7fa9224b5e72415 t/002_basic_defaults/002_test_Bar.pl
+SHA1 9e94e5deb9a8b34d718a592db4954edc154150f4 t/003_basic_dwim.t
+SHA1 2a67e830efcb25e5208ece647701360e844538a0 t/003_basic_dwim/001_Foo.pm
+SHA1 83e7610634599cb9ce96935b4676137793ec5477 t/003_basic_dwim/001_test_Foo.pl
+SHA1 968f6f8a4c6031374998bd3cdbb6adeb1169e1cc t/003_basic_dwim/002_Bar.pm
+SHA1 e98904c502ffb1b56f992d98c7fa9224b5e72415 t/003_basic_dwim/002_test_Bar.pl
+SHA1 ffb0eac1c3733b58bf1a66d43ddc7d27810c6649 t/004_create_test_body.t
+SHA1 2a67e830efcb25e5208ece647701360e844538a0 t/004_create_test_body/001_Foo.pm
+SHA1 83e7610634599cb9ce96935b4676137793ec5477 t/004_create_test_body/001_test_Foo.pl
+SHA1 968f6f8a4c6031374998bd3cdbb6adeb1169e1cc t/004_create_test_body/002_Bar.pm
+SHA1 e98904c502ffb1b56f992d98c7fa9224b5e72415 t/004_create_test_body/002_test_Bar.pl
+SHA1 bc041064c44623a89423330135944db25e819460 t/005_multiple_test_case--dont_postprocess.t
+SHA1 87db528f8b3e248c5b58e0d62c85b0dcf37058d6 t/005_multiple_test_case--postprocess.t
+SHA1 839064abda4891948b8151c64b73e5ccb7480e75 t/005_multiple_test_case/001_Foo.pm
+SHA1 dcfc4c529d68e13728090471b3b941498d71c1ef t/005_multiple_test_case/001_test_Foo.pl
+SHA1 51e84443b2d044365dc52e1830855d29deeee466 t/006_run_tests.t
+SHA1 2a67e830efcb25e5208ece647701360e844538a0 t/006_run_tests/001_Foo.pm
+SHA1 83e7610634599cb9ce96935b4676137793ec5477 t/006_run_tests/001_test_Foo.pl
+SHA1 968f6f8a4c6031374998bd3cdbb6adeb1169e1cc t/006_run_tests/002_Bar.pm
+SHA1 e98904c502ffb1b56f992d98c7fa9224b5e72415 t/006_run_tests/002_test_Bar.pl
+SHA1 1e375ba320b13b2a6c6a61438a947071a706ae54 t/007_multiple_run_test--dont_postprocess.t
+SHA1 362bd4e717b3cf98bae5885da1ec16ba8c6ca49c t/007_multiple_run_test--postprocess.t
+SHA1 839064abda4891948b8151c64b73e5ccb7480e75 t/007_multiple_run_test/001_Foo.pm
+SHA1 dcfc4c529d68e13728090471b3b941498d71c1ef t/007_multiple_run_test/001_test_Foo.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFI5EjesxfQtHhyRPoRAkVnAKCF7KZfpffU2tTc1rJVEoW0NZroXQCdE5za
+XZ3oL6ytgXrBWChUjdRyrWQ=
+=/NCW
+-----END PGP SIGNATURE-----

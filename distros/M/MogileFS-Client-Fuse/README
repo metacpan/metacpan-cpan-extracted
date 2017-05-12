@@ -1,0 +1,38 @@
+INTRODUCTION
+============
+
+This module provides support for mounting a MogileFS file store as a local
+filesystem using FUSE.
+
+INSTALLATION
+============
+
+MogileFS::Client::Fuse utilizes Module::Build for building and installation. To
+install run the following commands:
+
+> perl Build.PL
+> ./Build
+> ./Build test
+> ./Build install
+
+USAGE
+=====
+
+Currently this module depends on having MogileFS::Plugin::FilePaths active and
+enabled for the domain you are mounting.
+
+Once you have the FilePaths plugin enabled for your MogileFS domain, the easiest
+way to use this module is to use the included mount-mogilefs binary. The binary
+has several command line options for adjusting the configuration, below are the
+basic options for usage.
+
+> mount-mogilefs \
+>   --daemon \
+>   --tracker mogilefs1.example.com \
+>   --tracker mogilefs2.example.com \
+>   --domain fuse_namespace \
+>   /mnt/point
+
+Currently to unmount a mounted MogileFS filesystem use the following command:
+
+fusermount -u /mnt/point

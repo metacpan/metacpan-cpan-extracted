@@ -1,0 +1,11 @@
+hdlist_main.cz	media/main/release	Main	(3400m)
+noauto:hdlist_main_testing.cz	media/main/testing	Main	(3400m)
+noauto:hdlist_debug_main.cz	media/debug_main/release	debug_main_release	
+noauto:hdlist_debug_main_testing.cz	media/debug_main/testing	debug_main_testing	
+noauto:hdlist_main.src.cz	media/../../SRPMS/main/release	Main Sources	
+noauto:hdlist_main.src.cz	media/../../SRPMS/main/testing	Main Sources	
+hdlist_contrib.cz	media/contrib/release	Contrib	(4300m)
+noauto:hdlist_debug_contrib.src.cz	media/debug_contrib/release	debug_contrib_release	
+noauto:hdlist_contrib.src.cz	media/../../SRPMS/contrib/release	Contrib Sources	
+noauto:hdlist_non-free.cz	media/non-free/release	non-free_release	
+noauto:hdlist_non-free.src.cz	media/../../SRPMS/non-free/release	Non-free  Sources	

@@ -1,0 +1,55 @@
+{
+   "abstract" : "Moo types for numbers",
+   "author" : [
+      "mateu - Mateu X. Hunter (cpan:MATEU) <hunter@missoula.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooX-Types-MooseLike-Numeric",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Moo" : "1.004002",
+            "Test::Fatal" : "0.003",
+            "Test::More" : "0.96"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MooX::Types::MooseLike" : "0.23",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooX-Types-MooseLike-Numeric"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mateu/MooX-Types-MooseLike-Numeric.git"
+      },
+      "x_IRC" : "irc://irc.perl.org/#web-simple"
+   },
+   "version" : "1.03",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

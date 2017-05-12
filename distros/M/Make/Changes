@@ -1,0 +1,35 @@
+Changes in 1.1.2
+    fixed declaration of minimum Test::Compile version
+        a number of CPANtesters failures occured because
+        the test had an older non-OO version installed
+    use strict, use warnings everywhere, other bits of cleanup
+
+Changes in 1.1.1
+    clean-up with tidyall/perltidy, add configs for them
+    add tidy related tests
+    use strict and warnings in all tests
+    mostly releasing to get properly CPAN indexed
+
+Changes in 1.1.0
+	Cheat to allow installation on Strawberry Perl 5.22.0
+	add META.yml and META.json
+	modernize Makefile.PL
+	add /lib and move Make.pm there
+	match up distribution and module version numbers
+
+Changes in 0.03
+	Handle $(mktmp,file ...) for Win32
+	Handle dmake-like $(var:s,\,\\,) for Win32
+	Collapse rules which are partially specified as variables e.g.
+		$(INST_STATIC) :
+		libpTk.a :
+	both add dependancies to libpTk.a
+	Use negative-lookbehind to implement $$ as a literal $ e.g. in
+	command line perl scripts.
+	Add a test to keep cpan-testers from complaining it has not got one.
+
+
+Changes is 0.02
+	Sarathy's Win32 patches
+	Handle blank lines in build command sequences
+	Add README, Changes

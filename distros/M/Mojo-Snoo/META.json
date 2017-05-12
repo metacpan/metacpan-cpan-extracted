@@ -1,0 +1,71 @@
+{
+   "abstract" : "Mojo wrapper for the Reddit API",
+   "author" : [
+      "Curtis Brandt"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-Snoo",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "6",
+            "Moo" : "2.000001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aggrolite/Mojo-Snoo/issues"
+      },
+      "homepage" : "https://github.com/aggrolite/Mojo-Snoo",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/aggrolite/Mojo-Snoo.git",
+         "web" : "https://github.com/aggrolite/Mojo-Snoo"
+      }
+   },
+   "version" : "0.15",
+   "x_contributors" : [
+      "Curtis Brandt <curtis@cpan.org>",
+      "Hunter McMillen <mcmillhj@gmail.com>",
+      "Stefan Adams <stefan@borgia.com>"
+   ]
+}
+

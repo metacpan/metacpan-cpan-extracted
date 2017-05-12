@@ -1,0 +1,122 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use warnings;
+use File::Copy;
+use File::Spec::Functions;
+use File::Path qw(mkpath);
+use FindBin qw($Bin);
+
+# Set lib path to ../classes in platform neutral manner.  Whoo-wee!
+my $mycolib = catdir($Bin, updir(), "classes");
+my $mycotestlib = catdir($Bin, updir(), "test");
+eval "use lib '$mycolib'";
+
+chdir $mycolib;
+
+my $tmpldir = catfile('Myco', 'templates', );
+
+our $CVSMSG;
+
+MAIN: {
+    my $class = shift || die "syntax:  mkentity classname [-C]\n"
+                            ."    where -C supresses cvs add actions\n";
+    chomp $class;
+    $class =~ s/.pm$//;
+    my $nocvs = shift || 0;
+    $nocvs = $nocvs eq '-C' ? 1 : 0;
+    $nocvs = 1 unless exists $ENV{CVSROOT};
+
+    $CVSMSG = "Adding new entity class $class";
+
+    eval "use $class";   # Does $class already exist?
+    unless ($@) {
+	die "mkentity:  aborting - entity class $class already exists\n";
+    }
+
+    my @namebits = split /::/, $class;
+    my $localname = pop @namebits;
+    my $edir = catfile(@namebits);
+    my $efile = catfile($edir, $localname) . ".pm";
+    my $tdir = catfile($mycotestlib, $edir, $localname);
+
+    my $cvsadd_dir;
+    {
+	makedir($edir) unless -d $edir;
+	makedir($tdir) unless -d $tdir;
+
+=pod
+
+### DISABLED FOR NOW
+	# add new dir to CVS
+	if ($nocvs) {
+	    warn "\nNOTE: Because you passed the -C argument, you will have\n"
+	       . "to add this new class to cvs by hand.\n";
+	} elsif (-d catfile($edir, updir(), 'CVS')) {
+	    cvs_add($edir);
+	} else {
+           warn "\nNOTE: An intermdiate directory is not already part of cvs\n"
+	      . "repository.  You will have to handle the cvs add's for this\n"
+	      . "new class by hand.\n";
+	    $nocvs = 1;
+	}
+
+=cut
+
+    }
+
+    my $cvsfiles = [];
+    itmpl($class, catfile($tmpldir, "entity.pm"), $efile, $cvsfiles);
+    itmpl($class, catfile($tmpldir, "entityTest.pm"),
+                          catfile($tdir, "Test.pm"), $cvsfiles);
+
+#    cvs_add(@$cvsfiles) unless $nocvs;
+
+    print <<EMSG;
+
+class $class has been created!
+
+Next, as is appropriate, add the lines shown below to the correct spots in
+../classes/Myco/Schema.pm:
+
+    use $class;
+
+# in the args to Tangram::Schema->new() :
+    '$class' => \$${class}::schema,
+
+mkentity done.
+EMSG
+}
+
+sub itmpl {
+    my ($class, $tmpl, $dst, $addfiles) = @_;
+    open TMPL, $tmpl or die "mkentity:  can't open template $tmpl: $!\n";
+    open DST, ">$dst" or die "mkentity:  can't create file $dst: $!\n";
+
+    my $table = lc($class);
+    $table =~ s/^myco:://;
+    $table =~ s/::/_/g;
+    while(<TMPL>) {
+	s/Myco::Foo/$class/g;
+	s/(table => ')Foo/$1$table/g;
+	print DST;
+    }
+
+    close TMPL;
+    close DST;
+    push @$addfiles, $dst;
+}
+
+sub makedir {
+    my $path = shift;
+    eval { mkpath($path) };
+    die "mkentity: aborting - error while creating directory $path: $!@\n"
+      if $@;
+}
+
+sub cvs_add {
+    my $files = join ' ', @_;
+    system("cvs add -m '$CVSMSG' $files")
+      && die "mkentity: aborting - error while cvs adding $files: $!\n";
+    1;
+}

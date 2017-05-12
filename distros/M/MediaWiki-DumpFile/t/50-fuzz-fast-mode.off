@@ -1,0 +1,48 @@
+use strict;
+use warnings;
+
+use MediaWiki::Dumpfile;
+use MediaWiki::DumpFile::Pages;
+use MediaWiki::DumpFile::FastPages;
+
+my $input = shift(@ARGV);
+
+my $pages = MediaWiki::DumpFile::Pages->new(input => $input, fast => 1);
+
+my @titles;
+
+print "generating titles\n";
+while(my ($title, $text) = $pages->next) {
+	push(@titles, $title);
+}
+
+while(1) {
+	print "starting loop\n";
+	
+	my @copy = reverse(@titles);
+	$pages = MediaWiki::DumpFile::Pages->new(input => $input);
+	my $fast = 0;
+	
+	while(1) {
+		my $title;
+		
+		if (rand(1) > .5) {
+			$fast = 1;
+		} else {
+			$fast = 0;
+		}
+		
+		if ($fast) {
+			($title) = $pages->next($fast);
+			last unless defined $title;
+		} else {
+			my $page = $pages->next;
+			last unless defined $page;
+			$title = $page->title;
+		}
+		
+		die "failed" unless pop(@copy) eq $title;
+	}
+	
+	die "did not read number of entries right" unless scalar(@copy) == 0;
+}

@@ -1,0 +1,5 @@
+MANIFEST
+README
+Any.pm
+Makefile.PL
+t/any.t

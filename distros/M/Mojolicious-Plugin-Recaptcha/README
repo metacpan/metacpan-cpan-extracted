@@ -1,0 +1,100 @@
+NAME
+    Mojolicious::Plugin::Recaptcha - ReCaptcha plugin for Mojolicious
+    framework
+
+VERSION
+    0.63
+
+SYNOPSIS
+       # Mojolicious::Lite
+       plugin recaptcha => {
+          public_key  => '...',
+          private_key => '...',
+          lang        => 'ru'
+       };
+
+       # Mojolicious
+       $self->plugin(recaptcha => {
+          public_key  => '...',
+          private_key => '...',
+          lang        => 'ru',
+          ssl         => 1, # uses https Google URLs
+       });
+
+       # template
+       <form action="" method="post">
+          <%= recaptcha_html %>
+          <input type="submit" value="submit" name="submit" />
+       </form>
+
+       # set reCaptcha widget language from template
+       <form action="" method="post">
+         <%= recaptcha_html 'ru' %>
+         <input type="submit" value="submit" name="submit" />
+       </form>
+
+       # checking blocking way
+       $self->recaptcha;
+       unless ($self->stash('recaptcha_error')) {
+          # all ok
+       }
+
+       # checking non-blocking way
+       $self->render_later;
+       $self->recaptcha(sub {
+          my $ok = shift;
+          if ($ok) {
+
+          } else {
+             warn $self->stash('recaptcha_error');
+          }
+          # here you need call render
+          $self->render;
+       })
+
+Internationalisation support
+    *   English by default (en)
+
+    *   Dutch (nl)
+
+    *   French (fr)
+
+    *   German (de)
+
+    *   Portuguese (pt)
+
+    *   Russian (ru)
+
+    *   Spanish (es)
+
+    *   Turkish (tr)
+
+Options
+    Plugin support all recaptcha options:
+    <https://developers.google.com/recaptcha/docs/customization>
+
+SUPPORT
+    *   Repository
+
+        <http://github.com/konstantinov/Mojolicious-Plugin-Recaptcha>
+
+SEE ALSO
+    Mojolicious, Mojolicious::Plugin, Mojolicious::Lite
+
+THANKS
+    Special thanks for help in development
+
+      Alexander Voronov
+
+      Tim Wilde
+
+      Sangre
+
+      Fayland Lam
+
+COPYRIGHT & LICENSE
+    Copyright 2010-2012 Dmitry Konstantinov. All right reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,56 @@
+Return-Path: <dave@brondsema.net>
+Delivered-To: user0009-dave@brondsema.net
+Received: (qmail 18565 invoked by uid 0); 5 Mar 2005 15:44:14 -0000
+Received: from unknown (HELO ?192.168.1.101?) (user0009@68.74.132.90)
+  by 0 with SMTP; 5 Mar 2005 15:44:14 -0000
+Message-ID: <4229D3B1.6030205@brondsema.net>
+Date: Sat, 05 Mar 2005 10:43:45 -0500
+From: Dave Brondsema <dave@brondsema.net>
+User-Agent: Mozilla Thunderbird 1.0 (X11/20041206)
+X-Accept-Language: en-us, en
+MIME-Version: 1.0
+To: Dave Brondsema <dave@brondsema.net>
+Subject: 8bit test
+X-Enigmail-Version: 0.90.0.0
+X-Enigmail-Supports: pgp-inline, pgp-mime
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enig8974D986BF4D74962C4D6B1E"
+Content-Transfer-Encoding: 8bit
+X-Spam-Checker-Version: SpamAssassin 3.0.2 (2004-11-16) on ferrari
+X-Spam-Level: 
+X-Spam-Status: No, score=0.0 required=4.0 tests=none autolearn=failed 
+	version=3.0.2
+
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enig8974D986BF4D74962C4D6B1E
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+
+
+will this be 8 bit?
+
+maybe if i add crap: 网站建设
+
+--
+Dave Brondsema : dave@brondsema.net
+http://www.splike.com : programming
+http://csx.calvin.edu : student org
+http://www.brondsema.net : personal
+
+--------------enig8974D986BF4D74962C4D6B1E
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.0 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+
+iD8DBQFCKdOxVvBSb5uzznARAnWuAJsHE5qrA7PQ/BhjdPkCTGH1LDGeCwCfcpQf
+EC25UOw8RBum1pwT51lpN4Y=
+=TuTv
+-----END PGP SIGNATURE-----
+
+--------------enig8974D986BF4D74962C4D6B1E--
+

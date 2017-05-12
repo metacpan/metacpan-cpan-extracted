@@ -1,0 +1,76 @@
+Mail-File
+=========
+
+DESCRIPTION
+
+This module was written to overcome the problem of sending mail messages, 
+where there is no mail application available. 
+
+The aim of the module is to write messages to a text file, that will format
+the contents to include all the key elements of the message, such that the 
+file can be transported to another machine, which is then capable of sending 
+mail messages.
+
+DEPENDENCIES
+
+The distribution requires the following modules:
+
+  File::Basename
+  File::Path
+  File::Temp
+  Time::Piece
+
+For testing purposes, the following modules are required:
+
+  IO::File
+  Test::More
+
+For testing purposes, the following modules are desireable, but not essential:
+
+  Pod::Coverage
+  Test::CPAN::Meta
+  Test::CPAN::Meta::JSON
+  Test::Pod
+  Test::Pod::Coverage
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+CPAN TESTING
+
+This module was initially written to aid me in the CPAN Testing experience
+(see http://cpantesters.org for further details). Unfortunately the machine
+I was testing on didn't have sendmail or SMTP access, so I needed to store
+plain text mails to send later.
+
+BUGS, PATCHES & FIXES
+
+There are no known bugs at the time of this release. However, if you spot a
+bug or are experiencing difficulties that are not explained within the POD
+documentation, please submit a bug to the RT system (see link below). However,
+it would help greatly if you are able to pinpoint problems or even supply a 
+patch. 
+
+Fixes are dependent upon their severity and my availability. Should a fix not
+be forthcoming, please feel free to (politely) remind me by sending an email
+to barbie@cpan.org .
+
+RT: http://rt.cpan.org/Public/Dist/Display.html?Name=Mail-File
+
+AUTHOR
+
+Barbie <barbie@cpan.org>
+for Miss Barbell Productions, http://www.missbarbell.co.uk
+
+COPYRIGHT AND LICENSE
+
+Copyright © 2003-2014 Barbie for Miss Barbell Productions.
+
+This distribution is free software; you can redistribute it and/or
+modify it under the Artistic Licence v2.

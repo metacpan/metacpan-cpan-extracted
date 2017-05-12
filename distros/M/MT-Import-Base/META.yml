@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name: MT-Import-Base
+version: 1.01
+author:
+  - Aaron Straup Cope E<lt>ascope@cpan.orgE<gt>
+abstract: |-
+  base class for importing "stuff" into Movable Type.
+license: perl
+requires:
+  Date::Format: ''
+  Date::Parse: ''
+  File::Path: ''
+  File::Spec: ''
+  Log::Dispatch: ''
+build_requires:
+  Test::Simple: '>= 0.47'
+provides:
+  MT::Import::Base:
+    file: lib/MT/Import/Base.pm
+    version: 1.01
+generated_by: Module::Build version 0.2604

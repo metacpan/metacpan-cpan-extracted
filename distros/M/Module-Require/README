@@ -1,0 +1,86 @@
+NAME
+    Module::Require
+
+SYNOPSIS
+     use Module::Require qw: require_regex require_glob :;
+
+     require_regex q[DBD::.*];
+     require_regex qw[DBD::.* Foo::Bar_.*];
+     require_glob qw[DBD::* Foo::Bar_*];
+     walk_inc sub { m{(/|^)Bar_.*$} and return $_ }, undef, q"DBD";
+
+DESCRIPTION
+    This module provides a way to load in a series of modules without having
+    to know all the names, but just the pattern they fit. This can be useful
+    for allowing drop-in modules for application expansion without requiring
+    configuration or prior knowledge.
+
+    The regular expression and glob wildcards can only match the filename of
+    the module, not the directory in which it resides. So, for example,
+    "Apache::*" will load all the modules that begin with "Apache::",
+    including "Apache::Session", but will not load "Apache::Session::MySQL".
+    Likewise, *::Session is not allowed since the variable part of the
+    module name is not in the last component.
+
+    Note that unlike the Perl "require" keyword, quoting or leaving an
+    argument as a bareword does not affect how the function behaves.
+
+FUNCTIONS
+    walk_inc \&filter \&todo 'path'
+        This function will walk through @INC and pass each filename under
+        "path::" to &filter. If &filter returns a defined value, the
+        returned value is then passed to the &todo function. The default
+        path is '' (the empty string). The default filter function is to
+        return the argument. The default todo function is to load the
+        module.
+
+        For example,
+
+          print join "\n", walk_inc;
+
+        will try to load all the available modules, printing a list of
+        modules that could not be loaded. Note that files and directories
+        beginning with a period (`.') are not considered.
+
+          walk_inc sub { /^X/ and return $_ }, undef, 'Foo';
+
+        will try and load all the modules in the "Foo::" namespace that
+        begin with an `X', recursively.
+
+        Module files should end with ".pm" and directories otherwise. This
+        allows for an easy way to keep "walk_inc" from descending
+        directories. The filter function may also be used to transform
+        module names.
+
+        If the module is already in %INC it will be passed over.
+
+    require_regex
+        This function takes a list of files and searches @INC trying to find
+        all possible modules. Only the last part of the module name should
+        be the regex expression ("Foo::Bar_.*" is allowed, but "F.*::Bar" is
+        not). Each file found and successfully loaded is added to %INC. Any
+        file already in %INC is not loaded. No "import" functions are
+        called.
+
+        The function will return a list of files found but not loaded or, in
+        a scalar context, the number of such files. This is the opposite of
+        the sense of "require", with true meaning at least one file failed
+        to load.
+
+    require_glob
+        This function behaves the same as the "require_regex" function
+        except it uses the glob operator (<>) instead of regular
+        expressions.
+
+SEE ALSO
+    perldoc -f require.
+
+AUTHOR
+    James G. Smith <jsmith@cpan.org>
+
+COPYRIGHT
+    Copyright (C) 2001, 2004 Texas A&M University. All Rights Reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

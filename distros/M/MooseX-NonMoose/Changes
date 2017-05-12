@@ -1,0 +1,114 @@
+Revision history for MooseX-NonMoose
+
+0.26  2014-02-25
+      - fix dependency specification for Try::Tiny (Gareth Harper, #9)
+
+0.25  2014-02-06
+      - fix for Module::Runtime 0.014
+
+0.24  2013-09-07
+      - added missing lib include (Karen Etheridge)
+
+0.23  2013-09-04
+      - stop using old and deprecated (or soon to be deprecated) functions from
+        Class::MOP
+
+0.22  2011-05-09
+      - Fix issues where the metaclass gets reinitialized after the call to
+        'extends' but before 'make_immutable'. This could happen if a role
+        used an extension which provided an application_to_class metarole,
+        since the role application would then apply a metarole to the class,
+        and metarole application currently causes metaclass reinitialization
+        in Moose. (ugh.)
+
+0.21  2011-04-29
+      - Allow this module to work with constructors with names other than
+        'new'. If you're extending a class with a constructor named something
+        other than 'new', you should declare this when calling extends, as in:
+
+          extends 'Foo' => { -constructor_name => 'create' };
+
+        This will ensure that calling 'create' will also call Moose's
+        constructor.
+
+0.20  2011-03-22
+      - fix warning when passing inline_constructor => 0 with no superclass new
+        method (rafl).
+
+0.19  2011-03-02
+      - don't die if superclass doesn't have a 'new' method
+
+0.18  2011-02-09
+      - forward compat for Moose 2.0
+
+0.17  2010-11-08
+      - convert to Test::Fatal, and dep on it
+
+0.16  2010-10-05
+      - Make it work with Moose 1.15 (Dave Rolsky).
+
+0.15  2010-08-20
+      - Fix the fallback constructor call for hashref parameters (ribasushi,
+        t0m, castaway).
+
+0.14  2010-07-19
+      - Avoid warnings from Moose 1.09, part 2 (Dave Rolsky).
+
+0.13  2010-07-18
+      - Also avoid warnings in MooseX::NonMoose::InsideOut.
+
+0.12  2010-07-18
+      - Avoid warnings from Moose 1.09 (Dave Rolsky).
+
+0.11  2010-06-30
+      - Actually use the right test.
+
+0.10  2010-06-30
+      - Don't break if someone specifies a version to extends.
+
+0.09  2010-06-15
+      - Fix several issues relating to picking the correct constructor to call
+        from the constructor that we build.
+
+0.08  2010-05-20
+      - Fix inheriting from classes which don't bless their instances into the
+        correct class when subclassing (jhallock).
+
+      - Update for things fixed in latest Moose.
+
+0.07  2009-09-27
+      - Start adding support for non-Moose destructors. Destructor inlining
+        isn't supported yet, since Moose isn't quite flexible enough there for
+        it to be more than an annoying hack, but this should still work with
+        immutable classes anyway.
+
+0.06  2009-09-27
+      - defining a custom constructor in a class using mx-nonmoose now works
+
+      - use a less broken test for whether or not a superclass has an inlined
+        constructor (fixes issue uncovered by fixes to Moose's metaclass
+        compatibility fixing)
+
+0.05  2009-06-24
+      - gaaaaah, packaging is so stupid (remove stray test.pl file)
+
+0.04  2009-06-23
+      - Add tests and official support for alternate instance metaclasses, such
+        as MooseX::GlobRef and MooseX::InsideOut - including supplying a custom
+        exporter MooseX::NonMoose::InsideOut which should work in all possible
+        cases, when just using the same hash that the nonmoose class is using
+        would break
+
+      - Fix a couple issues with inheriting from MooseX::NonMoose classes -
+        make sure FOREIGNBUILDARGS is only called once, and fix some issues
+        with immutability
+
+0.03  2009-05-06
+      - Add a FOREIGNBUILDARGS method to support modifying the argument list
+        passed to the non-Moose constructor
+
+0.02  2009-04-29
+      - A few minor doc fixes
+
+0.01  2009-04-20
+      - Initial release

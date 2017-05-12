@@ -1,0 +1,273 @@
+NAME
+
+    Math::Calc::Parser - Parse and evaluate mathematical expressions
+
+SYNOPSIS
+
+      use Math::Calc::Parser 'calc';
+      
+      my $result = calc '2 + 2'; # 4
+      my $result = calc 'int rand 5'; # Random integer between 0 and 4
+      my $result = calc 'sqrt -1'; # i
+      my $result = calc '0xff << 2'; # 1020
+      my $result = calc '1/0'; # Division by 0 exception
+      
+      # Class methods
+      my $result = Math::Calc::Parser->evaluate('2 + 2'); # 4
+      my $result = Math::Calc::Parser->evaluate('3pi^2'); # 29.608813203268
+      my $result = Math::Calc::Parser->evaluate('0.7(ln 4)'); # 0.970406052783923
+      
+      # With more advanced error handling
+      my $result = Math::Calc::Parser->try_evaluate('rand(abs'); # undef (Mismatched parentheses)
+      if (defined $result) {
+        print "Result: $result\n";
+      } else {
+        print "Error: ".Math::Calc::Parser->error."\n";
+      }
+      
+      # Or as an object for more control
+      my $parser = Math::Calc::Parser->new;
+      $parser->add_functions(triple => { args => 1, code => sub { $_[0]*3 } });
+      $parser->add_functions(pow => { args => 2, code => sub { $_[0] ** $_[1] });
+      $parser->add_functions(one => sub { 1 }, two => sub { 2 }, three => sub { 3 });
+      
+      my $result = $parser->evaluate('2(triple one)'); # 2*(1*3) = 6
+      my $result = $parser->evaluate('pow(triple two, three)'); # (2*3)^3 = 216
+      my $result = $parser->try_evaluate('triple triple'); # undef (Malformed expression)
+      die $parser->error unless defined $result;
+      
+      $parser->remove_functions('pi', 'e');
+      $parser->evaluate('3pi'); # Invalid function exception
+
+DESCRIPTION
+
+    Math::Calc::Parser is a simplified mathematical expression evaluator
+    with support for complex and trigonometric operations, implicit
+    multiplication, and perlish "parentheses optional" functions, while
+    being safe for arbitrary user input. It parses input strings into a
+    structure based on Reverse Polish notation
+    <http://en.wikipedia.org/wiki/Reverse_Polish_notation> (RPN), and then
+    evaluates the result. The list of recognized functions may be
+    customized using "add_functions" and "remove_functions".
+
+FUNCTIONS
+
+ calc
+
+      use Math::Calc::Parser 'calc';
+      my $result = calc '2+2';
+      
+      $ perl -MMath::Calc::Parser=calc -E 'say calc "2+2"'
+      $ perl -Math -e '2+2'
+
+    Compact exportable function wrapping "evaluate" for string expressions.
+    Throws an exception on error. See ath for easy compact one-liners.
+
+METHODS
+
+    Aside from add_functions and remove_functions, all methods can be
+    called as class methods, and will act on a singleton object with the
+    default functions available.
+
+ new
+
+      my $parser = Math::Calc::Parser->new;
+
+    Creates a new Math::Calc::Parser object.
+
+ parse
+
+      my $parsed = Math::Calc::Parser->parse('5 / e^(i*pi)');
+      my $parsed = $parser->parse('3pi');
+
+    Parses a mathematical expression. On success, returns an array
+    reference representation of the expression in RPN notation which can be
+    passed to "evaluate". Throws an exception on failure.
+
+ evaluate
+
+      my $result = Math::Calc::Parser->evaluate($parsed);
+      my $result = Math::Calc::Parser->evaluate('log rand 7');
+      my $result = $parser->evaluate('round 13/3');
+
+    Evaluates a mathematical expression. The argument can be either an
+    arrayref from "parse" or a string expression which will be passed to
+    "parse". Returns the result of the expression on success or throws an
+    exception on failure.
+
+ try_evaluate
+
+      if (defined (my $result = Math::Calc::Parser->evaluate('floor 2.5'))) {
+        print "Result: $result\n";
+      } else {
+        print "Error: ".Math::Calc::Parser->error."\n";
+      }
+      
+      if (defined (my $result = $parser->evaluate('log(5'))) {
+            print "Result: $result\n";
+      } else {
+            print "Error: ".$parser->error."\n";
+      }
+
+    Same as "evaluate" but instead of throwing an exception on failure,
+    returns undef and sets the "error" attribute to the error message. The
+    error message for the most recent "try_evaluate" call can also be
+    retrieved from the package variable $Math::Calc::Parser::ERROR.
+
+ error
+
+      my $result = Math::Calc::Parser->try_evaluate('(i');
+      die Math::Calc::Parser->error unless defined $result;
+      my $result = $parser->try_evaluate('2//');
+      die $parser->error unless defined $result;
+
+    Returns the error message after a failed "try_evaluate".
+
+ add_functions
+
+      $parser->add_functions(
+        my_function => { args => 5, code => sub { return grep { $_ > 0 } @_; } },
+        other_function => sub { 20 }
+      );
+
+    Adds functions to be recognized by the parser object. Keys are function
+    names which must start with an alphabetic character and consist only of
+    word characters
+    <http://perldoc.perl.org/perlrecharclass.html#Word-characters>. Values
+    are either a hashref containing args and code keys, or a coderef that
+    is assumed to be a 0-argument function. args must be an integer greater
+    than or equal to 0. code or the passed coderef will be called with the
+    numeric operands passed as parameters, and must either return a numeric
+    result or throw an exception. Non-numeric results will be cast to
+    numbers in the usual perl fashion, and undefined results will throw an
+    evaluation error.
+
+ remove_functions
+
+      $parser->remove_functions('rand','nonexistent');
+
+    Removes functions from the parser object if they exist. Can be used to
+    remove default functions as well as functions previously added with
+    "add_functions".
+
+OPERATORS
+
+    Math::Calc::Parser recognizes the following operators with their usual
+    mathematical definitions.
+
+      +, -, *, /, %, ^, !, <<, >>
+
+    Note: + and - can represent both binary addition/subtraction and unary
+    negation.
+
+DEFAULT FUNCTIONS
+
+    Math::Calc::Parser parses several functions by default, which can be
+    customized using "add_functions" or "remove_functions" on an object
+    instance.
+
+    abs
+
+      Absolute value.
+
+    acos
+
+    asin
+
+    atan
+
+      Inverse sine, cosine, and tangent.
+
+    ceil
+
+      Round up to nearest integer.
+
+    cos
+
+      Cosine.
+
+    e
+
+      Euler's number.
+
+    floor
+
+      Round down to nearest integer.
+
+    i
+
+      Imaginary unit.
+
+    int
+
+      Cast (truncate) to integer.
+
+    ln
+
+      Natural log.
+
+    log
+
+      Log base 10.
+
+    logn
+
+      Log with arbitrary base given as second argument.
+
+    pi
+
+      π
+
+    rand
+
+      Random value between 0 and 1 (exclusive of 1).
+
+    round
+
+      Round to nearest integer, with halfway cases rounded away from zero.
+
+    sin
+
+      Sine.
+
+    sqrt
+
+      Square root.
+
+    tan
+
+      Tangent.
+
+CAVEATS
+
+    While parentheses are optional for functions with 0 or 1 argument, they
+    are required when a comma is used to separate multiple arguments.
+
+    Due to the nature of handling complex numbers, the evaluated result may
+    be a Math::Complex object. These objects can be directly printed or
+    used in numeric operations but may be more difficult to use in
+    comparisons.
+
+    Operators that are not defined to operate on complex numbers will
+    return the result of the operation on the real components of their
+    operands. This includes the operators <<, >>, %, and !.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book, dbook@cpan.org
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2015, Dan Book.
+
+    This library is free software; you may redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+SEE ALSO
+
+    Math::Complex
+

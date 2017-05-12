@@ -1,0 +1,2 @@
+# Named node with } in label. OK.
+[node] {color: red; label: <}>; shape: square}

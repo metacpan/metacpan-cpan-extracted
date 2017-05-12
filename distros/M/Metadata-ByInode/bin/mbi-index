@@ -1,0 +1,91 @@
+#!/usr/bin/perl -w
+use lib './lib';
+use Metadata::ByInode;
+use strict;
+use Getopt::Std;
+use Cwd;
+use Carp;
+use warnings;
+use CGI::Ex::Conf 'conf_read';
+use Smart::Comments '###';
+
+my $o = {};
+getopts('rl:d:m',$o);
+
+$o->{l} ||= cwd;
+$o->{d} ||= abs_dbfile_from_conf();
+$o->{m} ||=0;
+
+
+my $m = new Metadata::ByInode({abs_dbfile => $o->{d} });
+
+if ($o->{r}){
+	$m->_reset_db;
+	exit;
+}
+
+
+
+my $index_start = `date`;
+my $files_indexed = $m->index($o->{l},{ mime_type => $o->{m} });
+my $index_end = `date`;
+
+### $index_start
+### $index_end
+### $files_indexed
+### $o
+
+exit;
+
+sub abs_dbfile_from_conf {	
+	
+	-f '/etc/mbi.conf' or croak('missing /etc/mbi.conf');		
+	
+	my $conf = conf_read('/etc/mbi.conf');
+	$conf->{abs_dbfile} or croak('no abs dbfile specified in conf');
+	return $conf->{abs_dbfile};
+}
+
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+mbi-index - index files on disk
+
+=head1 USAGE
+
+=over 4
+
+=item -d 
+
+use some other sqlite db file, full path.
+
+=item -l 
+
+location, if not provided, will use pwd
+
+=item -m
+
+boolean, if we should index mime type
+
+=item -r
+
+reset db table, drops 'metadata' table and recreates
+
+=back
+
+=head1 /etc/mbi.conf
+
+You can optionally use a conf file instead of passing this command a -d path
+every time
+
+sample file:
+
+	---
+	abs_dbfile: /home/myself/mbi.db
+
+=cut

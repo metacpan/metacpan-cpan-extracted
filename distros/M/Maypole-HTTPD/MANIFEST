@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/Maypole/HTTPD.pm
+lib/Maypole/HTTPD/Frontend.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01basic.t
+t/02pod.t
+t/03podcoverage.t

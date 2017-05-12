@@ -1,0 +1,33 @@
+Mojolicious-Plugin-Crypto
+======================================
+
+[ Privacy is necessary for an open society in the electronic age.
+Privacy is not secrecy.  A private matter is something one doesn't
+want the whole world to know, but a secret matter is something one
+doesn't want anybody to know. Privacy is the power to selectively
+reveal oneself to the world. ...] 
+ 
+- A Cypherpunk's Manifesto - 
+
+https://w2.eff.org/Privacy/Crypto/Crypto_misc/cypherpunk.manifesto
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2014 by Marco Romano aka nemux - @nemux_
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

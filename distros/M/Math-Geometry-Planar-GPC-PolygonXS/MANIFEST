@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+PolygonXS.xs
+ppport.h
+functions.c
+functions.h
+gpc.c
+gpc.h
+README
+t/Math-Geometry-Planar-GPC-PolygonXS.t
+test_data/clipfile
+test_data/subjfile
+lib/Math/Geometry/Planar/GPC/PolygonXS.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

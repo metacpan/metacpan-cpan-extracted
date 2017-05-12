@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/MojoX/Log/Log4perl/Tiny.pm
+minil.toml
+t/00-compile.t
+t/01-instance.t
+META.yml
+MANIFEST

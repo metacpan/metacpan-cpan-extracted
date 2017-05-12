@@ -1,0 +1,36 @@
+Changelog for Math-KalmanFilter
+
+0.07 2016-04-07T02:54:43
+ - Remove manual badges section (Shantanu Bhadoria)
+ - Adding latest readme pod (Shantanu Bhadoria)
+ - Bump Changes (Shantanu Bhadoria)
+
+0.06 2016-04-04T08:58:09
+ - v0.06 (Shantanu Bhadoria)
+ - attempting to insert badges (Shantanu Bhadoria)
+ - updating README for badges (Shantanu Bhadoria)
+ - removed blead and 5.8 tests (Shantanu Bhadoria)
+ - travis ci link (Shantanu Bhadoria)
+ - Added travic ci link (Shantanu Bhadoria)
+ - Bump Changes (Shantanu Bhadoria)
+
+0.05 2016-04-04T03:28:58
+ - Adding stopwords (Shantanu Bhadoria)
+ - Adding new READMEs (Shantanu Bhadoria)
+ - Removing README (Shantanu Bhadoria)
+
+0.04 2016-04-04T03:24:10
+ - Adding CI Test (Shantanu Bhadoria)
+
+0.03 2013-10-16T05:06:53
+ - v0.03 (Shantanu Bhadoria)
+ - Doc fixes (Shantanu Bhadoria)
+ - Adding Changes (Shantanu Bhadoria)
+
+0.02 2013-09-16T08:48:51
+ - v0.02 (Shantanu Bhadoria)
+
+0.01 2013-09-15T16:19:48
+ - First push, Sensor Fusion of gyroscope and accelerometer (Shantanu
+   Bhadoria)
+ - Create README.md (Shantanu Bhadoria)

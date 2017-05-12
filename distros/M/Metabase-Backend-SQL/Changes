@@ -1,0 +1,11 @@
+Revision history for Metabase-Backend-SQLite
+
+1.001     2017-03-21 10:10:13-04:00 America/New_York
+
+    [Fixed]
+
+    - Fixed compatability with newer SQL::Translator
+
+1.000     2012-05-17 12:40:56 America/New_York
+
+    - Initial release to CPAN

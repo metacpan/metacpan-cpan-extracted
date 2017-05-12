@@ -1,0 +1,152 @@
+#!/usr/bin/perl
+
+use lib 'lib';
+
+use Microarray::GEO::SOFT;
+use strict;
+use Getopt::Long;
+use List::Vectorize;
+use Carp;
+
+my $id;
+my $proxy;
+my $file;
+my $tmpdir;
+my $verbose;
+my $sample_value_column;
+my $output_file;
+my $help;
+
+GetOptions(
+    'id=s' => \$id,
+    'proxy=s' => \$proxy,
+    'file=s' => \$file,
+    'tmp-dir=s' => \$tmpdir,
+    'verbose!' => \$verbose,
+    'output-file=s' => \$output_file,
+    'help!' => \$help,
+);
+
+# default value
+$verbose = defined($verbose) ? $verbose : 0;
+
+if($help) {
+    help();
+    exit;
+}
+
+if($id and $file) {
+    carp "WARNING: You have set both --id and --file. Only take --id.";
+}
+
+unless($id or $file) {
+    help();
+    exit;
+}
+
+my %setup = (verbose => $verbose,
+             tmp_dir => $tmpdir,
+             sample_value_column => $sample_value_column);
+    
+defined($tmpdir) ? 1 : delete($setup{tmp_dir});
+defined($sample_value_column) ? 1 : delete($setup{sample_value_column});
+    
+my $microarray;
+if($id) {
+    
+    $microarray = Microarray::GEO::SOFT->new(%setup);
+    $microarray->download($id, 'proxy' => $proxy);
+}
+elsif($file) {
+    $microarray = Microarray::GEO::SOFT->new(file => $file, %setup);
+}
+
+my $data = $microarray->parse;
+my $e;
+if($data->accession =~/^GSE/) {
+    
+    my $gpl_list = $data->list('GPL');
+    my $gds_list = $data->merge;
+    
+    my $i = 0;
+    foreach my $gds (@$gds_list) {
+        $i ++;
+        $e = $gds->soft2exprset;
+
+        if($output_file) {
+            $e->save("$output_file.$i");
+            print "File: $output_file.$i\n";
+        }
+        else {
+            $e->save($gds->accession.".table");
+            print "File: ".$gds->accession.".table\n";
+        }
+        
+    }
+    
+}
+elsif($data->accession =~/^GDS/) {
+    $output_file = $output_file ? $output_file : $data->accession.".table";
+    $e = $data->soft2exprset;
+    $e->save($output_file);
+    print "File: $output_file\n";
+}
+elsif($data->accession =~/^GPL/) {
+    $output_file = $output_file ? $output_file : $data->accession.".table";
+
+    write_table($data->matrix, 'row.names' => $data->rownames,
+                               'col.names' => $data->colnames,
+                               'file' => $output_file);
+    print "File: $output_file\n";
+}
+else {
+    croak "ERROR: Wrong accession number.";
+}
+
+
+sub help {
+print <<HELP;
+Usage: getgeo [OPTION]...
+Parse GEO SOFT format file.
+
+  --id=[GEOID]    
+  
+    GEO ID. such as GSE123, GDS123 or GPL123. If this is set, the script would 
+    download data from GEO FTP site.
+  
+  --proxy=[PROXY]    
+  
+    Proxy to connect to GEO FTP site. Format should look like
+    http://username:password\@host:port/.
+                           
+  --file=[FILE]  
+  
+    Filename for local GEO file. If --id is set, this option is ignored.
+  
+  --tmp-dir=[DIR]  
+  
+    Temporary directory name for processing of GEO data. By default it is 
+    '.tmp_soft' in your working directory.
+  
+  --verbose      
+  
+    Whether print message while processing.
+  
+  --sample-value-column=[FIELD]
+  
+    Since there may be multiple columns in GSM record, users may specify which 
+    column is the expression value they want. By default it is 'VALUE'. Ignored
+    when analyzing GPL and GDS data.
+  
+  --output-file=[FILE]
+  
+    Filename for the output file. By default it is 'GEOID.table' in your current 
+    working directory.
+  
+  --help
+  
+    Help message.
+
+HELP
+
+}

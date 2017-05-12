@@ -1,0 +1,236 @@
+------------------------ Yahoo! Groups Sponsor ---------------------~-->
+Send the freshest Valentine's flowers with a FREE vase from only $29.99!
+Shipped direct from the grower with a 7 day freshness guarantee and prices =
+so low you save 30-55% off retail!
+http://us.click.some.web.address.com/_iAw9B/xdlHAA/3jkFAA/ndFolB/TM
+---------------------------------------------------------------------~->
+
+There are 8 messages in this issue.
+
+Topics in this digest:
+
+     1. newbie -> pattern matching
+          From: "David" <tech_david@some.web.address.com>
+     2. AW: newbie -> pattern matching
+          From: "Lance Gunther, CH" <Gunther.Lance@some.web.address.com>
+     3. Re: newbie -> pattern matching
+          From: "adagio1977" <adagio1977@some.web.address.com>
+     4. Re: Returning 2 file handles?
+          From: "bruce" <bruce@some.web.address.com>
+     5. HOW TO DO This...
+          From: "fd809" <fd809@some.web.address.com>
+     6. Re: HOW TO DO This...
+          From: Thomas Sweden <Thomas.Sweden@some.web.address.com>
+     7. how to get the current working directory
+          From: "fd809" <fd809@some.web.address.com>
+     8. Re: HOW TO DO This...
+          From: "Derwood Davis" <dustin@some.web.address.com>
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 1
+  Date: Tue, 10 Feb 2004 17:33:03 +0530
+  From: "David" <tech_david@some.web.address.com>
+Subject: newbie -> pattern matching
+
+Hello All,
+
+               I am new perl. I ran the following script. It gives nothing=
+.
+I don't know where I did the mistake.
+
+$email=3D"david@hotmail.com";
+if ($email =3D~ /([^@])+@(.+)/) {
+       print "Username is $1\n";
+       print "Hostname is $2\n";
+   }
+
+
+Please help me.
+
+Regs,
+David.
+
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 2
+  Date: Tue, 10 Feb 2004 13:09:11 +0100
+  From: "Lance Gunther, CH" <Gunther.Lance@some.web.address.com>
+Subject: AW: newbie -> pattern matching
+
+Hello=20
+
+it may be better to use the split function
+
+my $email=3D 'david@hotmail.com';
+my @parts=3D split ('@', $email);
+
+print "Username is $parts[0]\n";
+print "Hostname is $parts[1]\n";
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 3
+  Date: Tue, 10 Feb 2004 13:29:21 -0000
+  From: "adagio1977" <adagio1977@some.web.address.com>
+Subject: Re: newbie -> pattern matching
+
+for one thing ... the @h will probably try to interpolate into a=20
+value which in this case will give you an empty list.  By the time=20
+you get to the RE, you will not have a '@'.  You need to do this to=20
+the string:
+
+(1) $email=3D"david\@blahblah.com";
+
+(2) Then put the + inside the parens so you capture the entire string=20
+before the '@' symbol.  If you kept it outside, you would only=20
+capture 'i'.
+if ($email =3D~ /([^@]+)@(.+)/) {=20
+
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 4
+  Date: Tue, 10 Feb 2004 20:00:29 -0000
+  From: "bruce" <bruce@some.web.address.com>
+Subject: Re: Returning 2 file handles?
+
+The overall program is to edit configuration files. My sub should=20
+return 2 file handles that it opens in the following manor.
+
+1)If a backup file doesn't exist
+ a.Call an OS copy command to make one=20
+2)Open the backup file as read only
+3)Open the original file=20
+4)Return both handles
+
+The rest of the program will copy the backup into the original with=20
+edits.
+
+This is my first perl program. Doing a "real" program off the bat to=20
+learn a new language may not be the easiest way, but its probably=20
+the most fun.
+
+O.K. So any variable that isn't specifically defined as local is=20
+global in scope. Is that correct?=20
+
+Also, I know what the variable prefixes @ %  and $ mean. What about=20
+*?
+
+Thanks for your reply.
+Bruce
+
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 5
+  Date: Tue, 10 Feb 2004 23:18:07 -0000
+  From: "fd809" <fd809@some.web.address.com>
+Subject: HOW TO DO This...
+
+I have folder called FIRST....
+I have 1000 files inside that folder.....
+I also have an application that runs on each of these files.......(I
+mean the application is called say : appl...
+the command is: appl -file1=20=20
+
+i need to execute this command on each of these 1000 files.....
+SO how do i write a perl script so that this command is automatically
+executed for each of those 1000 files in this folder.
+
+
+
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 6
+  Date: Tue, 10 Feb 2004 18:32:37 -0500
+  From: Thomas Sweden <Thomas.Sweden@some.web.address.com>
+Subject: Re: HOW TO DO This...
+
+Why do you need a perl script when a shell script (or batch script,
+depending on OS) would do the job just fine..
+
+#!/bin/sh
+cd FIRST ; ls * | while read FLNAME
+do
+/path/to/appl -$FLNAME
+done
+
+In perl you'd have to either mess with Globs or pipe all sorts of stuff,
+which, IMHO, is un-necessary.
+
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 7
+  Date: Wed, 11 Feb 2004 00:08:31 -0000
+  From: "fd809" <fd809@some.web.address.com>
+Subject: how to get the current working directory
+
+hello,
+How do you get the currentl working directory into a variable in perl ?
+and how do you change the directory inside a perl script.
+
+like say if i am in c:\perl
+and i need to make the current directory as:=20
+c:\
+then how do i do this.
+thanks.
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 8
+  Date: Tue, 10 Feb 2004 18:59:25 -0600 (CST)
+  From: "Derwood Davis" <dustin@some.web.address.com>
+Subject: Re: HOW TO DO This...
+
+Not too difficult to open the directory (opendir), read all the files into
+an array (@array =3D readdir()) and loop through the array (foreach)...
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+
+Unsubscribing info is here: http://help.yahoo.com/help/us/groups/groups-32.=
+html
+------------------------------------------------------------------------
+Yahoo! Groups Links
+
+<*> To visit your group on the web, go to:
+    http://groups.yahoo.com/group/perl-beginner/
+
+<*> To unsubscribe from this group, send an email to:
+    perl-beginner-unsubscribe@yahoogroups.com
+
+<*> Your use of Yahoo! Groups is subject to:
+    http://docs.yahoo.com/info/terms/
+=20
+------------------------------------------------------------------------
+

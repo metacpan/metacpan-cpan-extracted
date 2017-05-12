@@ -1,0 +1,24 @@
+---
+abstract: 'generate email created with MIME::Lite chunk by chunk, in memory-efficient way'
+author:
+  - 'Oleg G <oleg@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MIME-Lite-Generator
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  MIME::Lite: '3.02'
+resources:
+  repository: https://github.com/olegwtf/p5-MIME-Lite-Generator
+version: 0.02

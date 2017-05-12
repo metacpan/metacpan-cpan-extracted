@@ -1,0 +1,36 @@
+Revision history for Metaweb
+
+0.05    2007-09-10
+        * Fixed dependencies; s/JSON/JSON::XS/
+
+0.04    2007-09-09
+        * No longer accepts params to the login() method; use accessor
+          methods instead.
+        * Now uses JSON_XS which, allegedly, fixes problems with
+          string-to-integer conversions (in response to discussion on
+          freebase mailing list)
+        * Removed some diagnostic print statements that shouldn't have
+          been there in the first place, really
+        * Included examples/ directory in dist
+        * Updated documentation significantly
+        * See blog post at
+          http://infotrope.net/blog/2007/09/09/a-quick-tour-of-freebase/
+          for a quick tour of Freebase including use of this module.
+
+0.03    2007-09-09
+        * Previous version was missing the command line tool, 'metaweb'.
+          This has now been added to the MANIFEST so it should install
+          correctly.
+
+0.02    2007-08-24
+        * Now includes 'metaweb' command line script for easy command line
+          fiddling.
+        * json_query() now does writes as well as reads; query() doesn't
+          support writes yet, though.
+        * Changed API for json_query().  Now expects envelope (though
+          you can have it added for you it using the add_envelope arg).
+        * Documentation improvements, mostly in the general description area.
+
+0.01    2007-08-23 23:11
+        Simple interface to Metaweb/Freebase.  Alpha release.
+

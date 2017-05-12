@@ -1,0 +1,6 @@
+Revision history for Perl extension Math::Gauss.
+
+0.01  Sun Jul 31 11:44:05 2011
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Math::Gauss
+

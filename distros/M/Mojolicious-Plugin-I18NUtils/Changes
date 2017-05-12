@@ -1,0 +1,106 @@
+History for Mojolicious::Plugin::I18NUtils
+==========================================
+
+0.19 2015-11-17
+
+  [IMPROVEMENTS]
+  * add browser_languages to get the languages defined in Accept-Language header
+  * if locale/language is omitted in the method calls, it gets the language via browser_languages
+  * added tests for new behaviour
+
+0.18 2015-09-24
+
+  [IMPROVEMENTS]
+  * Need CLDR::Number 0.16 now (thanks to Nova Patch)
+  * fixed tests for new CLDR::Number version (thanks to Nova Patch)
+  * added more tests for 'at_least'
+
+0.17 2015-09-22
+
+  [BUGFIX]
+  * fix one test that was broken by the new CLDR v28 data, as provided in CLDR::Number v0.13.  (thanks to Nova Patch)
+
+0.16 2015-09-03
+
+  [DOCUMENTATION]
+  * fix documentation of 'at_least' (thanks to Nova Patch)
+
+0.15 2015-08-31
+
+  [BUGFIX]
+  * Tests were failing due to a new version of CLDR::Number. Those are fixed now (thanks to Nova Patch).
+
+0.14 2015-03-01
+
+  [IMPROVEMENTS]
+  * use "%d/%m/%Y" as default format which is (kind of) more natural than "%Y.%m.%d".
+  * return '' for invalid dates
+
+0.13 2014-12-31
+
+  [IMPROVEMENTS]
+  * add date_from_to to convert from one format to another one (e.g. format %d.%m.%Y to %Y-%m-%d)
+
+0.12 2014-12-29
+
+  [IMPROVEMENTS]
+  * added helper: locale_obj
+  * added class for locale strings
+
+0.11 2014-12-21
+
+  [BUGFIX]
+  * in date and datetime helpers the language setting was case sensitive. Now ar_sa and ar_SA returns the same value
+
+0.10 2014-12-20
+
+  [IMPROVEMENTS]
+  * accept reference to options for 'currency' to be able to format for 'cash'
+
+0.09 2014-12-19
+
+  [IMPROVEMENTS]
+  * add helper 'at_least'
+
+0.08 2014-12-18
+
+  [IMPROVEMENTS]
+  * add helper 'range'
+
+  [DOCUMENTATION]
+  * document currency, decimal, range
+
+0.07 2014-12-16
+
+  [IMPROVEMENTS]
+  * add helper 'decimal' to format numbers (using CLDR::Number)
+
+0.06 2014-12-15
+
+  [IMPROVEMENTS]
+  * add helper 'currency' to format currency strings (using CLDR::Number)
+
+0.05 2014-12-11
+
+  [IMPROVEMENTS]
+  * use Mojo::Base instead of "parent" (thanks Красимир Беров - github: kberov, PAUSE: BEROV)
+
+0.04 2014-12-11
+
+  [MISC]
+  * re-release as 0.03 included too many files
+
+0.03 2014-12-11
+
+  [IMPROVEMENTS]
+  * gain more speed thanks to state variables (thanks Красимир Беров - github: kberov, PAUSE: BEROV)
+
+0.02 2014-12-10
+
+  [DOCUMENTATION]
+  * Fix bug in Pod
+
+0.01_1  2014-12-10
+
+      * initial release
+

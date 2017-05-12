@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:                Mail-ClamAV
+version:             0.29
+abstract:            Perl extension for the clamav virus scanner
+license:             ~
+author:              
+    - David P.C. Wollmann <converter42@gmail.com>
+    - Scott Beck <sbeck@gossamer-threads.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+provides:
+    Mail::ClamAV:
+        file: ClamAV.pm
+        version: 0.29
+no_index:
+    directory:
+    - Inline
+requires:     
+    Inline:                        0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

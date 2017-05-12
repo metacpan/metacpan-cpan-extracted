@@ -1,0 +1,32 @@
+Revision history for Minions
+
+1.000000 2016-02-04T21:46:53Z
+        - The $self->{$__foo} syntax is now supported via an option,
+          the default now being $self->{$FOO}
+
+0.000008 2016-01-16T14:37:46Z
+        - Corrects test failures in Perl 5.12.x and earlier.
+        - The $__foo syntax is deprecated in favour of $FOO
+
+0.000007 2016-01-10T19:20:19Z
+        - Documentation updates.
+        - reader => 1 and writer => 1 are no longer supported (their meaning was not obvious)
+        - Simpler syntax for calling semiprivate methods.
+        - Added option to allow $self->{$ATTR} syntax.
+        - Migrated to Minilla.
+
+0.000006  2015-01-22 21:54:21 GMT
+        - Documentation updates.
+
+0.000005  2015-01-21 22:33:37 GMT
+        - More automation for implementations.
+        - More documentation added.
+
+0.000004  2014-12-12 21:09:49 GMT
+        - Test CPAN indexing. No changes.
+
+0.000003  2014-12-12 19:40:29 GMT
+        - Expanded docs. Renamed project (was Class::Minion).
+
+0.000002  2014-11-19 14:16:36 GMT
+        - Initial release

@@ -1,0 +1,27 @@
+---
+name: Math-ContinuedFraction
+version: 0.11
+author:
+  - 'John M. Gamble <jgamble@cpan.org>'
+abstract: Create and Manipulate Continued Fractions.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::Simple: 0
+requires:
+  Math::BigRat: 0
+configure_requires:
+  Module::Build: 0.340201
+provides:
+  Math::ContinuedFraction:
+    file: lib/Math/ContinuedFraction.pm
+    version: 0.11
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+keyword:
+  - math
+  - continued-fraction
+  - sequences

@@ -1,0 +1,25 @@
+0.12    2016-08-28 14:00:00
+        - Fix bug in header translation (pmorch++)
+0.11    2016-01-05 15:40:00
+        - Bumped Mojolicious requirement to 4.82
+0.10    2015-12-19 22:30:00
+        - Remove prohibited HTTP_CONTENT_(LENGTH|TYPE) keys (miyagawa++)
+0.09    2015-12-19 20:30:00
+        - Include CONTENT_TYPE and CONTENT_LENGTH psgi env keys
+        - Fix odd test failure
+0.08    2015-12-10 23:00:00
+        - Add rewrite option ala Plack::App::URLMap
+0.07    2015-11-17 20:30:00
+        - Handle the request body more correctly
+0.06    2015-11-16 03:00:00
+        - Fix packaging
+0.05    2015-11-15 23:00:00
+        - Added handling for PSGI delayed and streaming responses
+0.04    2015-06-03 20:45:00
+        - Allow instantiated PSGI app instances
+0.03    2015-06-03 14:30:00
+        - Fix psgi app location when plugin is installed
+0.02    2014-04-04 15:31:00
+        - Fix dependency on Plack
+0.01    2010-08-29 17:28:00
+        - Initial release

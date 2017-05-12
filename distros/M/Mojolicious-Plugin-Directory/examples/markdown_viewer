@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+use Mojolicious::Lite;
+use Text::Markdown qw/markdown/;
+use Encode qw/encode_utf8 decode_utf8/;
+
+plugin 'Directory', {
+    auto_index => 0, # disabled directory index
+    dir_index  => 'index.md',
+    root       => app->home->rel_dir('documents'),
+    handler    => sub {
+        my ( $c, $path ) = @_;
+        return unless $path =~ /\.(md|mkdn)$/;
+        my $markdown = Mojo::Util::slurp($path);
+        my $html = markdown( decode_utf8 $markdown );
+        $c->render( template => 'markdown', html => $html );
+    },
+};
+
+app->start;
+
+__DATA__
+
+@@ markdown.html.ep
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="/css/github.css" />
+  <title>Markdown Viewer</title>
+</head>
+<body>
+<%== $html %>
+</body>
+</html>

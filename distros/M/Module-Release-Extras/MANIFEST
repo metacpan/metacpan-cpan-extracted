@@ -1,0 +1,9 @@
+Build.PL
+lib/Module/Release/Extras.pm
+lib/Module/Release/ModuleBuild.pm
+lib/Module/Release/NIKC.pm
+lib/Module/Release/Subversion.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+t/pod.t

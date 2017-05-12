@@ -1,0 +1,22 @@
+Revision history for Mojo-YR
+
+0.06   2016-06-06
+       * Fix prev release with missing manifest
+
+0.05   2016-06-06
+       * Update to current sunrise api
+
+0.04   2014-06-13
+       * Fix documentation links to 1.9 version
+
+0.03   2014-06-11
+       * Update location api version
+       * Fix sunrise test
+
+0.02   2014-05-05
+       * Add sunrise api
+
+0.01   2014-05-24
+       * Started project
+       * Add location_forecast()
+       * Add text_forecast()

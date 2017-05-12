@@ -1,0 +1,30 @@
+karma_rcpt_acl:
+
+    # Check envelope sender
+	# This is really intended to emulate Postfix's protocol.
+
+    warn     set acl_m9  = ${readsocket{/tmp/karmad}\
+                           {client_address=$sender_host_address\nhelo_name=$sender_helo_name\
+                           \nsender=$sender_address\n\n}{20s}{\n}{socket failure}} 
+
+    # Continue quietly on socket error
+	# We could replace 'accept' here with 'defer'
+
+    accept   condition   = ${if eq{$acl_m9}{socket failure}{yes}{no}}
+             message     = Cannot connect to karmad
+
+    # Prepare answer and get results
+
+    warn     set acl_m9  = ${sg{$acl_m9}{\N=(.*)\n\N}{=\"\$1\" }}
+             set acl_m8  = ${extract{value}{$acl_m9}{$value}{unknown}}
+             set acl_m7  = ${extract{data}{$acl_m9}{$value}{}}
+
+    # Check for fail
+
+#    deny     condition   = ${if eq{$acl_m8}{bad}{yes}{no}}
+#             message     = $acl_m8: $acl_m7
+#             log_message = Considered 'bad' by Karma
+
+    warn     message     = X-Karma: $acl_m8: $acl_m7
+
+    accept

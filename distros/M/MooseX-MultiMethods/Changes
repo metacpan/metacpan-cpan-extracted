@@ -1,0 +1,37 @@
+0.10  Sun, 03 Jan 2010 20:55:47 +0100
+  * Properly report 'no variant' errors for multis from roles. Reported by
+    osfameron.
+
+0.09  Thu, 15 Oct 2009 23:47:36 +0200
+  * Depend on MooseX::Method::Signatures 0.29 because 0.28 slightly broken in a
+    way that caused utter fail with multi methods. Reported by Justin Hunter.
+
+0.08  Mon, 28 Sep 2009 18:03:14 +0200
+  * Implement better error reporting on ambiguous matches.
+
+0.07  Mon, 31 Aug 2009 19:51:44 +0200
+  * Fix failure in t/mxd.t if MooseX::Declare isn't available.
+
+0.06  Mon, 31 Aug 2009 19:18:03 +0200
+  * Adapt to yet another change in MooseX::Method::Signatures 0.24.
+
+0.05  Thu, 27 Aug 2009 15:39:40 +0200
+  * Adapt to MooseX::Method::Signatures 0.22.
+
+0.04  Sun, 16 Aug 2009 12:00:01 +0200
+  * Only set up MXMS for the caller if it doesn't already have a method keyword
+    installed (Closes RT#46705).
+
+0.03  Fri, 08 May 2009 00:33:59 +0200
+  * Redispatch upwards if possible, instead of quickly resigning to an error
+    when no variant was found in a class (Sartak).
+
+0.02  Wed, 22 Apr 2009 01:56:49 +0200
+  * Depend on MooseX::Types::VariantTable 0.02.
+    It sorts Types topologically now. All variants in a single
+    slot are tried for a match, and if the result is ambiguous
+    an error is thrown. This matches Perl 6's behavior for multi
+    method dispatch.
+
+0.01  Mon, 13 Apr 2009 06:12:44 +0200
+  * Initial release.

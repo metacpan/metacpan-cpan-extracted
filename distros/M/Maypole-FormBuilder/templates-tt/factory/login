@@ -1,0 +1,23 @@
+[% INCLUDE header %]
+    <div id="title">You need to log in</div>
+
+    <div id="login">
+    [% IF login_error %]
+        <div class="error"> [% login_error %] </div>
+    [% END %]
+    <form method="post" action="[% base %]/[% request.path %]">
+    <fieldset>
+    <legend>Login</legend>
+        <label>
+            <span class="field">Username:</span>
+	    <input name="[% config.auth.user_field || "user" %]" type="text" />
+        </label>
+	<label>
+	    <span class="field">Password:</span>
+       	    <input name="password" type="password" />
+	</label>	
+        <input type="submit" name="login" value="Submit"/>
+    </fieldset>
+    </form>
+    </div>
+

@@ -1,0 +1,186 @@
+0.33    2017-02-01 (PERLANCAR)
+
+	- No functional changes.
+
+        - [dist] Update repo link.
+
+        - [doc] Tweak POD links.
+
+
+0.32    2017-02-01 (PERLANCAR)
+
+	- Allow customizing whether to prioritize finding
+	  .pm/.pmc/.pod/prefix by making find_* ints instead of bools.
+
+
+0.31    2016-08-04 (PERLANCAR)
+
+	- No functional changes.
+
+        - [doc] Fix example in Synopsis (all=>1 returns arrayref, not list).
+
+        - [doc][build] Update repository link.
+
+
+0.30    2016-01-09 (PERLANCAR)
+
+	- Make $SEPARATOR a package global so it's accessible from outside.
+
+
+0.29    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.28    2015-04-15 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add note about the pro's and con's of using module_path() to
+	  check the availability of a module.
+
+
+0.27    2014-12-29 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] Remove copy-paste mistake.
+
+	- [opt] Avoid creating hash twice in podpath.
+
+
+0.26    2014-12-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- Adjust test: don't empty @INC because it will fail on some
+	  systems.
+
+
+0.25    2014-12-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Add link to Module::Path RT issue about the argument
+	  for/against doing abs_path().
+
+
+0.24    2014-12-26 (PERLANCAR)
+
+	- Make module tinier by avoiding the use of Perinci::Sub::Util.
+
+	- Add tests on entries in @INC not being a dir, doesn't exist, not
+	  -r, not -x (we don't add code for this, current code is doing
+	  fine).
+
+	- Add a reason of why we don't do abs_path() by default: there is
+	  usually no actual need to do so.
+
+
+0.23    2014-12-10 (PERLANCAR)
+
+        - No functional changes.
+
+        - POD wording/grammar fixes.
+
+
+0.22    2014-12-03 (PERLANCAR)
+
+        - Rename dist/module from SHARYANTO-Module-Path to Module-Path-More.
+
+
+0.21    2014-12-02 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix/sync Rinci metadata (find_prefix is by default 0).
+
+
+0.20     2014-08-26 (SHARYANTO)
+
+         - [Removed] Remove completion-related routines (moved to App-PMUtils).
+
+         - Add note in Description about why this module exists.
+
+
+0.19     2014-06-25 (SHARYANTO)
+
+         - Use case-insensitive module completion, for convenience.
+
+
+0.18     2014-06-25 (SHARYANTO)
+
+         - Fix typo.
+
+         - Use Complete::Util (renamed from SHARYANTO::Complete::Util).
+
+
+0.17     2014-06-24 (SHARYANTO)
+
+         - No functional changes.
+
+         - Fix test to avoid failure [CT].
+
+
+0.16     2014-06-24 (SHARYANTO)
+
+         - A couple of bug fixes and tweaks.
+
+
+0.15     2014-06-23 (SHARYANTO)
+
+         - Add completion routine 'module' argument.
+
+
+0.14     2014-06-22 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Rename dist/module from Alt::Module::Path::SHARYANTO to
+           SHARYANTO::Module::Path because I want to depend on this module on
+           CPAN (and don't want to force others to have to replace the original
+           Module::Path by installing this dist).
+
+         - Change interface (using hash argument) so it becomes standard Rinci
+           stuff.
+
+         [REMOVED FEATURES]
+
+         - Remove command-line script 'mpath' to avoid clash with the one from
+           Module-Path. Will replace with App-PMUtils' pmpath.
+
+
+0.13.2   2014-06-22 (SHARYANTO)
+
+         - [Bugfix] Fix logic bug which made --find-prefix negates other
+           --find-*.
+
+         - Add short options: -a (for --all), -P (for --abs).
+
+
+0.13.1   2014-06-22 (SHARYANTO)
+
+         - Add option: find_prefix (--find-prefix, -p).
+
+
+0.13     2014-04-25 (SHARYANTO)
+
+         - No functional changes.
+
+         - Increase version number to match original's (0.13).
+
+
+0.02     2014-04-12 (SHARYANTO)
+
+         - Some tweaks to bin/mpath: Make --pod equal to --find-pod --nofind-pm
+           --nofind-pmc. Turn on full by default if there are more than one
+           argument. Use tab as separator character.
+
+
+0.01     2014-04-09 (SHARYANTO)
+
+         - First release.

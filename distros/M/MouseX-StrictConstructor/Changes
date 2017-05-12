@@ -1,0 +1,9 @@
+Revision history for Perl extension MouseX::StrictConstructor.
+
+0.02 Tue Jul  6 20:37:11 2010
+    - Use the public API
+
+0.01  Tue Jul  6 18:30:04 2010
+	- original version; created by h2xs 1.23 with options
+		-AXn MouseX::StrictConstructor
+

@@ -1,0 +1,50 @@
+=head1 NAME
+
+Mozilla::DOM::NSHTMLOptionElement
+
+=for object Mozilla::DOM::NSHTMLOptionElement
+
+Mozilla::DOM::NSHTMLOptionElement is a wrapper around an instance of Mozilla's
+nsIDOMNSHTMLOptionElement interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::NSHTMLOptionElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $text = $nshtmloptionelement->B<GetText>()
+
+Output:
+
+=over
+
+=item $text (string)
+
+=back
+
+=head2 $nshtmloptionelement->B<SetText>($text)
+
+Input:
+
+=over
+
+=item $aText (string)
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

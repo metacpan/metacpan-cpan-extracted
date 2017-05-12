@@ -1,0 +1,200 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use MarpaX::Tester;
+use Getopt::Euclid;
+use File::Slurp;
+use Inline::Files;
+use Data::Dumper;
+
+# Read in grammar (from stdin if necessary) and build test object.
+my $gfile = $ARGV{'-g'} || '-';
+if ($gfile ne '-' and not -e $gfile) {
+   print STDERR "Grammar file $gfile not found\n";
+   exit(1);
+}
+
+$gfile = \*STDIN if $gfile eq '-';
+my $grammar = read_file ($gfile);
+my $r = MarpaX::Tester->new($grammar);
+
+# Read in the output template, if any.
+my $tfile = $ARGV{'-t'};
+my $tt;
+if (defined $tfile and not -e $tfile) {
+    print STDERR "Template file $tfile not found\n";
+    exit (1);
+}
+if ($tfile || $ARGV{'--html'}) {
+    use Template;
+    $tt = Template->new() || die $Template::ERROR;
+}
+
+# If the grammar doesn't compile, handle that situation and exit.
+if (not $r->{status}) {
+    my $r = $r->result;
+
+    if ($tt) {
+        $tt->process ($tfile ? $tfile : \*TEMPLATE, $r) || print STDERR $tt->error();
+        exit (1);
+    }
+    print "Marpa v" . $r->{ver} . " says:\n";
+    print $r->{error} . "\n";
+    print $r->{grammar};
+    exit (1);
+}
+
+# Find all tests from input file or from command line.
+my $ifile = $ARGV{'-i'};
+my $tests = $ARGV{'<test>'};
+$tests = [] unless $tests;
+
+my @all_tests = (@$tests);
+if (defined $ifile) {
+   if ($ifile ne '-' and not -e $ifile) {
+       print STDERR "Input file $ifile not found\n";
+       exit(1);
+   }
+   $ifile = \*STDIN if $ifile eq '-';
+   my $input = read_file ($ifile);
+   my $sep = $ARGV{'-s'};
+   if (defined $sep) {
+      if ($sep eq 'n') {
+          push @all_tests, grep {length($_) ? $_ : undef} split /\n/, $input;
+      } else {
+          push @all_tests, split /$sep\n/m, $input;
+      }
+   } else {
+      push @all_tests, $input;
+   }
+}
+
+# If no tests were specified, and the grammar parsed, then just print "ok" and exit.
+my $nr_tests = scalar @all_tests;
+if (not $nr_tests) {
+    print "ok\n";
+    exit (0);
+}
+
+# Run the test object on all test texts.
+my $results = $r->test(\@all_tests);
+
+# Output using the template, if a template was supplied.
+if ($tt) {
+   $tt->process ($tfile ? $tfile : \*TEMPLATE, $results) || print STDERR $tt->error();
+   exit (0);
+}
+
+# If we're outputting to stdout and just one test was specified, then output
+# its test result (either the full data parse, or "didn't parse") and quit.
+if ($nr_tests == 1) {
+    if ($results->{result}->[0]->{status}) {
+        print $results->{result}->[0]->{parse};
+        exit (0);
+    } else {
+        print "Input did not parse.\n";
+        exit (1);
+    }
+}
+
+# If we're outputting to stdout and multiple tests were specified,
+# and "-f" is specified, then print a table of results. (This obviously
+# works best for single-line test strings.)
+if ($ARGV{'-f'}) {
+    for (my $i=0; $i<$nr_tests; $i++) {
+        print $results->{result}->[$i]->{status} ? 'ok  - ' : 'bad - ';
+        print $all_tests[$i];
+        print "\n";
+    }
+    
+# But if "-f" wasn't specified, then just print a count of tests and good results.
+} else {
+    my $good = 0;
+    for (my $i=0; $i<$nr_tests; $i++) {
+        $good++ if $results->{result}->[$i]->{status};
+    }
+    print "$nr_tests tests run, $good passed.\n";
+}
+
+__TEMPLATE__
+<pre class="grammar">[% grammar | html %]</pre>
+[% IF status %]
+Marpa version [% ver %].<br/>
+[% FOREACH r = result %]
+Test case:
+<pre class="test">[% r.test | html %]</pre>
+[% IF r.status %]
+<pre class="parse">[% r.parse | html %]</pre>
+[% ELSE %]
+<i>Did not parse.</i>
+[% END %]
+[% END %]
+[% ELSE %]
+Marpa version [% ver %] says:
+<pre class="error">[% error | html %]</pre>
+[% END %]
+
+__END__
+
+=head1 NAME
+
+marpa-test - Test Marpa grammars during development
+
+=head1 VERSION
+
+Version 0.02
+
+=head1 OPTIONS
+
+=over
+
+=item -g <grammar>
+
+A file containing the grammar to be tested (- for stdin)
+
+=for Euclid:
+   grammar.default: '-'
+   
+=item -i <input>
+
+A file containing one or more input texts (- for stdin)
+
+=item -s <separator>
+
+A separator for multiple test texts ('n' to make each line a separate test)
+
+=item -t <template>
+
+A template for the output; if not specified, will write some sensible things.
+(See documentation for MarpaX::Tester for the data structure passed to the
+template.)
+
+=item --html
+
+If specified (and no template file is specified), will use a default HTML
+template embedded in the utility to format the output.
+
+=item -f
+
+Force ok/bad output table for multiple test inputs; otherwise will just return
+a count of good/bad parses.
+
+=item <test>...
+
+Any strings supplied on the command line will be parsed individually.
+   
+=back
+
+=head1 AUTHOR
+
+Michael Roberts (michael@vivtek.com)
+
+=head1 DESCRIPTION
+
+B<marpa-test> reads in a Marpa grammar and optionally some test text, and tests the grammar against
+the texts, generating a useful report if desired. It can thus be used both for testing grammars
+during development and for presenting the results of key explanatory input.
+
+=cut

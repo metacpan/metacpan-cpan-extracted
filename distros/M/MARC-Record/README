@@ -1,0 +1,68 @@
+MARC::Record and its family
+===========================
+
+SYNOPSIS
+
+The MARC::* series of modules create a simple object-oriented 
+abstraction of MARC record handling.  The files are:
+
+MARC::Doc::Tutorial
+    A tutorial explaining how to use MARC::Record.
+
+MARC::Record
+    The core class for representing a single MARC record.
+
+MARC::Field
+    Another core class for representing a single field in a record.
+
+MARC::Batch
+    The basic object for access to a batch of one or more MARC records.
+
+MARC::File
+    Base class for the MARC file.
+
+MARC::File::USMARC
+MARC::File::MicroLIF
+    Subclasses of MARC::File specific to the USMARC and MicroLIF formats
+
+MARC::Lint
+    Extension to check MARC records for validity.
+    
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+MARC::Record now requires a perl version >= 5.8.2 for processing unicode
+correctly.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001-2013 by contributors:
+
+2001-2007 Andy Lester <marc@petdance.com>
+2002-2007 Ed Summers <ehs@pobox.net>
+2003-2005 Eric Lease Morgan <emorgan@nd.edu>
+2003 Morbus Iff
+2004-2005 Bryan Baldus
+2004 Mark Jordan
+2007 Mike Rylander
+2007 Dan Scott
+2009 Bill Dueber
+2010-2013 Galen Charlton <gmcharlt@gmail.com>
+2010 Frédéric Demians <f.demians@tamil.fr>
+2010 Dan Wells
+2010 Alex Arnaud <alex.arnaud@biblibre.com>
+2010 Colin Campbell <colin.campbell@ptfs-europe.com>
+2013 Robin Sheat <robin@catalyst.net.nz>
+
+This software is free software and may be distributed under the same
+terms as Perl itself .

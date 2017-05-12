@@ -1,0 +1,106 @@
+Mail::Mbox::MessageParser - A fast and simple mbox folder reader
+
+Mail::Mbox::MessageParser is a feature-poor but very fast mbox parser. It uses
+the best of two strategies for parsing a mailbox: either using cached folder
+information or highly optimized Perl.
+
+
+MODULE DEPENDENCIES
+
+To use this module, you will need to install:
+
+- FileHandle::Unget
+- Storable: required if you want to use caching
+- bzip2(1): required if you want to use bzip and bzip2 support
+- bzip(1): required if you want to use bzip support
+
+To test this module, you will need to install:
+
+- Test::More
+
+
+INSTALLATION
+
+To install this package, change to the directory where you unarchived this
+distribution and type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+You can install this package into a non-default location by appending one of
+the following to the "perl Makefile.PL" command:
+
+- "PREFIX=/installation/path" (for installation into a custom location),
+- "INSTALLDIRS=site" (for installation into site-specific Perl directories)
+- "INSTALLDIRS=perl" (for installation into standard Perl directories).
+
+You will be prompted for program locations. You can suppress these prompts by
+appending the path to one or more external programs to the "perl Makefile.PL"
+command. For example, "GZIP=/gnu/bin/gzip BZIP= BZIP2=/bin/bzip2" would set
+values for all but one program.  "BZIP=" disables compression support and
+prevents interactive execution.  (NOTE: These values are not validated as they
+are in the interactive query.)
+
+On Windows, the GNUWin project has Windows ports of many GNU tools. (Get
+"CoreUtils" to get diff and cat.)
+
+If you make the installation into your own directory, then remember that you
+must tell perl where to search for modules before trying to 'use' them. For
+example:
+
+  use lib '/home/userid/lib';
+  use Mail::Mbox::MessageParser;
+
+If make test fails, please see the INSTALLATION PROBLEMS section below.
+
+
+INSTALLATION PROBLEMS
+
+If "make test" fails, run
+
+  make test TEST_VERBOSE=1
+
+and see which test(s) are failing. Please email, to the address below, the
+*.testoutput and *.testoutput.diff files for the test.
+
+For other bugs, see the section REPORTING BUGS below.
+
+
+DOCUMENTATION
+
+Just "perldoc Mail::Mbox::MessageParser". After installation on Unix systems,
+you can also do "man Mail::Mbox::MessageParser". If you are interested in the
+Cache, or Perl implementations, you can do the same for
+Mail::Mbox::MessageParser::Cache and Mail::Mbox::MessageParser::Perl.
+
+
+RESOURCES
+
+The CPAN Page:
+http://search.cpan.org/dist/Mail-Mbox-MessageParser/
+
+The Google Code page:
+http://code.google.com/p/mail-mbox-messageparser/
+
+Bug and feature tracking:
+http://rt.cpan.org/Public/Dist/Display.html?Name=Mail-Mbox-MessageParser
+
+When reporting a bug, please attach the output files noted above. If the bug
+is related to processing of a particular mailbox, try to trim the mailbox to
+the smallest set of emails that still exhibit the problem.  Then use the
+"anonymize_mailbox" program that comes with the distribution to remove any
+sensitive information, and attach the mailbox to the bug report.
+
+
+COPYRIGHT
+
+Copyright (c) 1998-Sep 1 2000 Broc Seib. Copyright (c) Sep 1 2000-2004 David
+Coppit. All rights reserved, save those granted by the license. See the file
+LICENSE for licensing terms.
+
+
+AUTHOR
+
+David Coppit <david@coppit.org>

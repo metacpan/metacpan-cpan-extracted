@@ -1,0 +1,62 @@
+{
+   "abstract" : "approximate a number with a rational number",
+   "author" : [
+      "Diab Jerius  E<lt>djerius@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4203",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-Rational-Approx",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "0",
+            "MooX::Types::MooseLike::Numeric" : "0",
+            "POSIX" : "0",
+            "Params::Validate" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Math::Trig" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Math::Rational::Approx" : {
+         "file" : "lib/Math/Rational/Approx.pm",
+         "version" : "0.02"
+      },
+      "Math::Rational::Approx::ContFrac" : {
+         "file" : "lib/Math/Rational/Approx/ContFrac.pm",
+         "version" : "0.01"
+      },
+      "Math::Rational::Approx::MaxD" : {
+         "file" : "lib/Math/Rational/Approx/MaxD.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/djerius/math-rational-approx"
+      }
+   },
+   "version" : "0.02"
+}

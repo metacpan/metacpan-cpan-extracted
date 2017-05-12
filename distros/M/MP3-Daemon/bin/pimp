@@ -1,0 +1,426 @@
+#!/usr/bin/perl -w
+# This is Pip's Intergallactive Moosex Plaqueluster  (PIMP)  v0.1
+#  I need to lern how to perldoc. =)
+#  Sorry I'm not an elegant coder.  I try but it just ends up werking ugly.
+#		Please email me fixes, thots, helps...  -Pip@BinQ.org
+
+use strict;
+use Audio::Play::MPG123;
+use Term::ReadKey;	# make a <STDIN> version to take tokens w/o ReadKey
+		# look @ sysread for keys too
+
+my $plyr = "";
+my $dext = ".plf";	#Dfalt PlaqueLust File-extension  
+my $dfpl = "Dfalt" . $dext; my $svpl = ""; my $tmpl = ""; my $lend = "";
+my @lust = (); my @nrpl = (); my @rnpl = (); my @urpl = (); my @song = ();
+my $mypl = \@nrpl; # arrayref to be repointed to @rnpl if $optn{rand}
+my @attz = ('name', 'arti', 'titl', 'leng', 'kbit', 'freq', 'rvol', 'wate');
+my @argz = @ARGV; my $char = ""; my $stat = ""; my $fram = ""; my $frml = "";
+my @temp = (); my $lfrm = ""; my $mixf = "chngmixr"; # || "aumix"
+my $argu = ""; my @subz = (); my $sarg = ""; my $top = 2.0; my $bot = 4.0; #2/8?
+my $volu = ""; my $pvol = ""; my $bvol = ""; my $curs = 0;  my $delt = 0;
+if (!$plyr && @argz) { 
+	$plyr = `ps ax`;
+	if ($plyr =~ /\smpg123\s/i) { die "MPG123 process already running!  Can't connect!!!"; }
+	else { $plyr = new Audio::Play::MPG123; }
+}
+if (!@argz) { push(@argz,"h"); push(@argz,"x"); } # Help && eXit if no argz 
+my %optn = ('loop' => 1, 'dela' => 0, 'rand' => 0, 'uniq' => 7);
+	# Options: LoopPL?, Delete song from PL after play?, Do RandRoll?
+my %hotk = ('[' => "r4", 	']' => "f4", 	'_' => "v-2", 	'+' => "v+2");
+	# HotKeys: these single keys map to their submitted params... extend this!
+
+sub GrabVolu() {
+	my $sets = `$mixf -q`; # this was for aumix but hopefully werks w/ chngmixr
+	if ($sets =~ /^vol (\d+),.*?\npcm (\d+),/) { $volu = $1; $pvol = $2; }
+	unless ($bvol =~ /^\d+$/) { $bvol = $volu; }
+	return;
+}
+
+sub RsetRand() {
+	my %uniq = (); @rnpl = ();
+	foreach (@nrpl) { $uniq{$_}++; } # load into hash to ensure unique indices
+	@urpl = keys(%uniq);
+	return;
+}
+
+sub SeedRand() {
+	if (@urpl) {
+		my $nsng = rand(@urpl);		
+		push(@rnpl, $urpl[$nsng]);
+		splice(@urpl, $nsng, 1);		
+	}
+	return;
+}
+
+# I don't thinq this line below werks as advertised =(.  What's wrong?
+$SIG{INT} = sub { ReadMode(0); exit(0); };	# restore normal reads if Ctrl-C
+ReadMode(4);
+GrabVolu();
+while ($argu !~ /^-?(x|q|exit)$/i) {	
+	if (@argz) { $argu = shift(@argz); }
+	elsif (($char = ReadKey(-1)) || ($char ne "")) {
+		if ($char eq "\n") { $argu = $sarg; $sarg = ""; }
+		elsif ($hotk{$char} && $sarg eq "") { $argu = "$hotk{$char}"; $char = ""; }
+#		elsif (ascii($char) == 32) { chop($sarg); $char = ""; }	# for BkSpc
+		else { print "$char"; $sarg .= $char; $char = ""; }
+	} else { 
+		$argu = ""; 
+		if ($plyr) { 
+			$plyr->poll(0); 
+			if ($stat ne $plyr->state) {
+				$stat = $plyr->state;
+				unless ($stat || $curs < 0) { unshift(@argz, "n"); }
+			}
+			if ($fram ne $plyr->{frame}->[0]) { 
+				$fram = $plyr->{frame}->[0]; 
+				$frml = $plyr->{frame}->[1];
+				$lfrm = $fram + $frml;
+#				print "$fram,$frml";	# gets here statfreq uently
+			} 
+		}
+	}
+#Vol					PCM|Relative, +/- volume (%?) from actual
+	if ($argu =~ /^-?v([pPrR]?)([-+]?)(\d*)(\%)?/i) {
+		@subz = ( $1, $2, $3, $4 );
+		if ($subz[1] && !$subz[2]) { $subz[2] = 1; }
+		$tmpl = "$subz[1]$subz[2]";
+		if ($subz[0] =~ /r/i) { 
+			if ($subz[1]) {	$tmpl =~ s/\+//; $lust[${$mypl}[$curs]]->{'rvol'} += $tmpl; }
+			else {	$lust[${$mypl}[$curs]]->{'rvol'} = $subz[2]; }
+			$volu = $bvol;
+			unless ($lust[${$mypl}[$curs]]->{'rvol'} =~ /^\d+$/) {
+				$lust[${$mypl}[$curs]]->{'rvol'} = 100;
+			}
+			$volu = int($volu*$lust[${$mypl}[$curs]]->{'rvol'}/100); 
+			system("$mixf -v$volu");
+		} elsif ($subz[0] =~ /p/i) { system("$mixf -p$subz[1]$subz[2]"); }# Chng Pcm vol (was -wXXX for aumix)
+		else { system("$mixf -v$subz[1]$subz[2]"); }			# Chng norm vol
+		GrabVolu();
+#Next/Last					song#|title match (leave copy?) (# of copies?)
+	} elsif ($argu =~ /^-?([nNlL])(\d+|\/[^\/]+\/)?m?(c?)(\d*)/i) {
+		@subz = ( $1, $2, $3, $4 );
+		if ($subz[1] ne "") { 
+			if ($subz[1] =~ /^\/([^\/]+)\/$/) { 
+				unless ($subz[3]) { $subz[3] = 1; } #Dfalt add just 1 time
+				$subz[4] = $1;
+				for (my $i=0;$i<scalar(@$mypl);$i++) { 
+					if ($lust[${$mypl}[$i]]->{'name'} =~ /$subz[4]/i) { 
+						$lend = ${$mypl}[$i];	# if !cp, rm found
+						unless ($subz[2] || $optn{'rand'}) { 
+							splice(@{$mypl},$i,1); 
+							if ($curs >= $i) { $curs--; } 
+						}
+						while ($subz[3]--) { 
+							if ($optn{'rand'}) { 
+								if ($lend != ${$mypl}[$i]) { 
+									push(@urpl, ${$mypl}[$i]);
+								}
+								splice(@{$mypl},$i,1,pop(@{$mypl})); 
+							}
+							splice(@{$mypl},$curs+1,0,$lend); 
+						}
+					  last;
+					}
+				}
+				if ($optn{'rand'} && $subz[3]) {
+					if ($subz[3] > $optn{'uniq'}) { $subz[3] = $optn{'uniq'}; }
+					for (my $i=0;$i<@urpl;$i++) { 
+						if ($lust[$urpl[$i]]->{'name'} =~ /$subz[4]/i) { 
+							$lend = $urpl[$i];	# if !cp, rm found
+							splice(@urpl,$i,1);
+							while ($subz[3]--) { 
+								push(@urpl,pop(@{$mypl})); 
+								splice(@{$mypl},$curs+1,0,$lend); 
+							}
+						  last;
+						}
+					}
+				}
+			} elsif ($subz[1] =~ /^\d+$/ && !$optn{'rand'}) { 
+				$lend = ${$mypl}[$subz[1]];	# if !cp, rm found
+				unless ($subz[2]) { splice(@{$mypl},$subz[1],1); if ($curs >= $subz[1]) { $curs--; } }
+				unless ($subz[3]) { $subz[3] = 1; } #Dfalt add 1 time
+				while ($subz[3]--) { splice(@{$mypl},$curs+1,0,$lend); }
+			}
+			$delt = 0; 
+		} else { $delt = 1; }
+		if ($subz[0] =~ /l/i) { $delt *= -1; }
+		if ($optn{'rand'} && $subz[1] eq "") {
+			if ($subz[0] =~ /l/i) {	unshift(@rnpl, pop(@rnpl)); }
+			else { push(@urpl, shift(@rnpl)); SeedRand(); }
+		} else {
+			$curs += $delt; 
+			if ($optn{loop} && $curs >= $mypl) 	{ $curs = 0; } 
+			if ($optn{loop} && $curs < 0) 		{ $curs = scalar(@$mypl)-1; } 
+		}
+		if ($delt) { unshift(@argz, "p$curs"); }
+#sTatus	Frames,framesLeft,songNumber,PlaqueLust,Percentplayed,Songname,VolumeofPcm,globalVolume
+	} elsif ($argu =~ /^-?t(f|l|t|n|rpl|pl|p|sp|sl|st|s|vp|v|ol|od|or|ou)?(\d*)-?(\d*)/i) {	# sTatus
+		@subz = ( $1, $2, $3 );
+		if ($subz[0]) {
+			if ($subz[0] =~ /^f/i) { print "F:$fram "; }	# cur frame (plyd)
+			if ($subz[0] =~ /^l/i) { print "L:$frml "; }	# frms left
+			if ($subz[0] =~ /^t/i) { print "T:$lfrm "; }	# frms totl
+			if ($subz[0] =~ /^n/i) { print "N:$curs "; }	# cur song #
+			if ($subz[0] =~ /^rpl/i) { # add range option
+				print "RPL:"; 
+				for(my $i=0;$i<@rnpl;$i++) { 
+					print "$i:"; 
+					if ($curs == $i) { print "*NowPlaying*"; } 
+					print "$lust[$rnpl[$i]]->{'name'}\n"; # print lust (| more)?
+				} 
+			} elsif ($subz[0] =~ /^pl/i) { # add range option
+				print "PL:\n"; 
+				for(my $i=0;$i<scalar(@$mypl);$i++) { 
+					$subz[8] = $lust[${$mypl}[$i]]->{'name'};
+					$subz[8] =~ s!^.*/!!; # $subz[8] =~ s!^.*?/mp3/!!i;
+					printf "%2d:", $i;
+					if ($curs != $i) { print " "; }	else { print "*"; }
+					printf "%-76.76s", $subz[8]; # print lust (| more)?
+					print "\n";
+				  last if $i > 31; # safety measure in case it runs away
+				} 
+			} elsif ($subz[0] =~ /^p/i) { 
+				printf "P:%05.2f\% ", ($fram/$lfrm) * 100; # % of song plyd
+			}
+			if ($subz[0] =~ /^sp/i) { # secs plyd
+				print "SP:", $plyr->{frame}->[2], " "; 
+			} elsif ($subz[0] =~ /^sl/i) { # secs left
+				print "SL:", $plyr->{frame}->[3], " "; 
+			} elsif ($subz[0] =~ /^st/i) { # secs totl
+				print "ST:", $plyr->{frame}->[2]+$plyr->{frame}->[3], " ";
+			} elsif ($subz[0] =~ /^s/i) { 
+				print "S:$lust[${$mypl}[$curs]]->{'name'} "; # cur song name
+			}
+			if ($subz[0] =~ /^vp/i){ print "VP:$pvol "; }	# cur volume PCM
+			elsif ($subz[0] =~ /^v/i) { print "V:$volu "; }	# cur global vol
+			if ($subz[0] =~ /^ol/i) { # option Loop?
+				print "OL:$optn{loop} ";
+			} elsif ($subz[0] =~ /^od/i) { # option Delete after play?
+				print "OD:$optn{dela} ";
+			} elsif ($subz[0] =~ /^or/i) { # option Random rotation?
+				print "OR:$optn{rand} ";
+			} elsif ($subz[0] =~ /^ou/i) { # option Unique threshold
+				print "OU:$optn{uniq} ";
+			}
+			# serch Frame, curPL Number, Progress%, Song, Vol
+			#  add SecsLong, SecsRemain, FrmsRemain
+		} else {
+			print "Status: ", $plyr->stat, ", Volu: $volu, PVol: $pvol, LustSize: ", scalar(@$mypl), "\n";
+#			print "Stats2: ", $plyr->{frame}->[2], ",", $plyr->{frame}->[3], ","; 
+#			print $plyr->{frame}->[4], ",", $plyr->{frame}->[5], "\n"; 
+		}
+#PlaqueLust	SaveLoadAppendInsert PLfile, Order (!)?Alpha/Numeric, Filt (!)?match, Randomize
+	} elsif ($argu =~ /^-?pl(s|l|a|i\d+:|o|f|r)?(!)?(.*)/i) { #Dfalt: Status: PL name, size, duration, etc.
+		@subz = ( $1, $2, $3 );
+	#Save current PL to either specified file || last loaded $svpl || Dfalt if none
+		if ($subz[0] =~ /s/i) {	# no spaces yet!  spaced filenames are stupid!
+			if ($subz[2]) { $svpl = $subz[2]; } 
+			unless ($svpl) { $svpl = $dfpl; }
+			unless ($svpl =~ /\..+$/) { $svpl .= $dext; }	#Dfalt ext if none
+			open LUST, ">$svpl" || warn "Can't save PL file: $svpl!!!\n";
+			for (my $i=0;$i<@nrpl;$i++) {
+				foreach (@attz) { print LUST "$lust[$nrpl[$i]]->{$_}:";	}
+				print LUST "\n";
+			}
+			close LUST;
+		} elsif ($subz[0] =~ /(l|a|i(\d+):)/i) {
+			$subz[3] = $2; $tmpl = $subz[2];
+			if ($tmpl && !-f $tmpl) { $tmpl .= $dext; }
+			unless ($tmpl && -f $tmpl) { $tmpl = $dfpl; }
+			if ($tmpl && -f $tmpl) {
+				if ($subz[0] =~ /l/i) {	@lust = (); @nrpl = (); }
+				open LUST, "<$tmpl" || warn "Can't open PL file: $tmpl!!!\n";
+				while (<LUST>) {
+					chomp; @temp = split /:/, $_;
+					@song = ( "$temp[0]" ); shift(@temp);
+					while (!-f $song[0] && @temp) { $song[0] .= ":" . shift(@temp); }
+					push(@song, @temp); 
+					if (-f $song[0]) {
+						$lend = @lust;
+						for(my $andx=0;$andx<@attz;$andx++) {
+							$lust[$lend]->{$attz[$andx]} = "$song[$andx]";
+						}
+						if (@nrpl && $subz[3] && $subz[3] >= 0 && $subz[3] < @nrpl) {
+							splice(@nrpl,$subz[3],0,$lend); $subz[3]++;
+						} else { push(@nrpl, $lend); }
+					}
+				}
+				close LUST;
+				if ($subz[0] =~ /l/i) { 
+					unshift(@argz, "p$curs"); 
+					if (-f $tmpl) { $svpl = $tmpl; }
+				}
+				if (!-f $svpl && -f $tmpl) { $svpl = $tmpl; }
+			}
+	#Randomize NoRmalPlaqueLust	
+		} elsif ($subz[0] =~ /r/i) {	#fisher_yates_shuf Cookbook P.121
+			for(my $i=@nrpl;--$i; ) {	# w/ slight modification for 
+				my $j = int rand($i);	# array values xchng
+				next if $i == $j;		# to werk
+				($nrpl[$i],$nrpl[$j]) = ($nrpl[$j],$nrpl[$i]);
+			}
+		}
+#Play/Pause					song#|title match
+	} elsif ($argu =~ /^-?p(\d+|\/[^\/]+\/)?(i)?/i) {
+		@subz = ( $1, $2 );
+		if ($subz[0] ne "") { 
+			if ($subz[0] =~ /^\/([^\/]+)\/$/) { 
+				$subz[8] = $1;
+				for (my $i=0;$i<scalar(@$mypl);$i++) { 
+					if ($lust[${$mypl}[$i]]->{'name'} =~ /$subz[8]/ || 
+	($subz[1] eq "i" && $lust[${$mypl}[$i]]->{'name'} =~ /$subz[8]/i)) {
+						$curs = $i;
+						$plyr->load($lust[${$mypl}[$curs]]->{'name'});
+						$volu = $bvol;
+						unless ($lust[${$mypl}[$curs]]->{'rvol'} =~ /^\d+$/) {
+							$lust[${$mypl}[$curs]]->{'rvol'} = 100;
+						}
+						$volu = int($volu*$lust[${$mypl}[$curs]]->{'rvol'}/100); 
+						unshift(@argz, "v$volu");
+						if ($plyr->tpf) { $plyr->statfreq($top/$bot/$plyr->tpf); }
+#						if ($plyr->tpf) { $plyr->statfreq($plyr->tpf); }
+						else { $plyr->statfreq(1); }						 
+						$i = scalar(@$mypl);
+					}
+				}
+			} elsif ($subz[0] =~ /^\d+$/ && $subz[0] >= 0 && $subz[0] < scalar(@$mypl)) { 
+				$curs = $subz[0]; 
+				$plyr->load($lust[${$mypl}[$curs]]->{'name'});
+				$volu = $bvol;
+				unless ($lust[${$mypl}[$curs]]->{'rvol'} =~ /^\d+$/) {
+					$lust[${$mypl}[$curs]]->{'rvol'} = 100;
+				}
+				$volu = int($volu*$lust[${$mypl}[$curs]]->{'rvol'}/100); 
+				unshift(@argz, "v$volu");
+				if ($plyr->tpf) { $plyr->statfreq(7/8/$plyr->tpf); }
+				else { $plyr->statfreq(1); }
+			}
+		} else {
+			if ($plyr->state) { $plyr->pause(); }
+			else { unshift(@argz, "p0"); }
+		}
+#Stop		
+	} elsif ($argu =~ /^-?s/i && $plyr->state) { $plyr->stop(); $curs = -1;
+#Ffwd/Rwnd					by Frame? +/- # (secs Dfalt) | fastPlay x(/y)
+	} elsif ($argu =~ /^-?(f|r)(f|p)?([-+]?)(\d+)?(\%|\/\d+)?/i && $plyr->state == 2) { 
+		@subz = ( $1, $2, $3, $4, $5 );
+		if ($subz[1] =~ /p/i) {	# FastPlay!
+		} else {
+			if ($subz[3]) { $delt = $subz[3]; }
+			elsif ($subz[1] =~ /f/i) { $delt = 1000; }	# either chng 1k frms
+			else { $delt = 2; }							#  || 2secs @ a time
+			if ($subz[0] =~ /r/i) { $delt *= -1; }
+			if ($subz[2] eq "-")  { $delt *= -1; }
+			if ($subz[1] =~ /f/i) { $fram += $delt; }
+			else { $fram += ( $delt / $plyr->tpf ); }
+			if ($fram < 1) { $fram = 1; }
+			elsif ($fram > $lfrm) { $fram = $lfrm; }
+			$plyr->jump($fram);
+		}
+#Jump	NextLastBeginMiddleEnd ofPL, Ffwd,Rwnd,Head,Tail of CurrentSong		
+#	Note: Jump should just wrap others... basically a handy mnemonic for other
+#		separate commands
+	} elsif ($argu =~ /^-?j(n|l|b|m|e|f|r|h|t)?(\d+|\/[^\/]+\/i?)?/i) { 	# Jump
+		@subz = ( $1, $2 );
+		if ($subz[0] =~ /n/i) { unshift(@argz, "n"); }
+		elsif ($subz[0] =~ /l/i) { unshift(@argz, "l"); }
+		elsif ($subz[0] =~ /b/i) { $curs = 0; unshift(@argz, "p$curs"); }
+		elsif ($subz[0] =~ /m/i) { $curs = int(scalar(@$mypl) / 2); unshift(@argz, "p$curs"); }		
+		elsif ($subz[0] =~ /e/i) { $curs = $#lust; unshift(@argz, "p$curs"); }		
+		elsif ($subz[0] =~ /f/i) { unshift(@argz, "f"); }		
+		elsif ($subz[0] =~ /r/i) { unshift(@argz, "r"); }
+		elsif ($subz[0] =~ /h/i) { unshift(@argz, "p$curs"); }
+		elsif ($subz[0] =~ /t/i) { unshift(@argz, "ff$frml"); }
+		else { unshift(@argz, "p$subz[1]"); }
+#Add file(s) to PL @ position NextLastBeginMiddleEnd# Recursive?:? file|dir|/?/
+	} elsif ($argu =~ /^-?a(n|l|b|m|e|\d+)(r?):?(.*)/i) { 	# Add
+# mainly glob a file || directory -Recursive? to append to PL	
+#  er readdir?
+#Del file(s) from PL @ position # | matching (global?)  ,offset# | -until#
+	} elsif ($argu =~ /^-?d(\d+(,)?|\/[^\/]+\/(g|i)*)([-+]?)(\d*)/i) {	#Del
+		@subz = ( $1, $2, $3, $4, $5 );
+		if ($subz[0] =~ /^(\d+)/) {
+			$subz[0] = $1; 
+			if ($subz[1] eq ",") { $tmpl = $subz[3] . $subz[4]; }
+			elsif ($subz[3] eq "-") { $tmpl = $subz[4] - $subz[0]; if ($tmpl < 0) { $tmpl *= -1; $subz[0] = $subz[4]; } }
+			else { $tmpl = 1; }
+			splice(@{$mypl}, $subz[0], $tmpl);
+		} elsif ($subz[0] =~ /^\/([^\/]+)\//) {
+			$subz[0] = $1;
+			for (my $i=0;$i<scalar(@$mypl);$i++) {
+				if (($subz[2] =~ /i/i && $lust[${$mypl}[$i]]->{'name'} =~ /$subz[0]/i) ||
+					($lust[${$mypl}[$i]]->{'name'} =~ /$subz[0]/)) {
+					splice(@{$mypl}, $i, 1);
+				}
+				unless ($subz[2] =~ /g/i) { $i = scalar(@$mypl); }
+			}
+		} else { splice(@{$mypl}, $curs, 1); if ($curs) { $curs--; } }
+#Options: flagtoggles:Loop,Deleteafterplay,Randomroller
+	} elsif ($argu =~ /^-?o(l|d|r|u\d+)/i) {
+		@subz = ( $1 );
+		if ($subz[0] =~ /l/i) { $optn{'loop'} ^= 1; }
+		elsif ($subz[0] =~ /d/i) { $optn{'dela'} ^= 1; }
+		elsif ($subz[0] =~ /r/i) { 
+			$optn{'rand'} ^= 1; 
+			if ($optn{'rand'}) {
+				RsetRand();
+				if (!$optn{'uniq'} || $#urpl < (3*$optn{'uniq'})) {
+					print "!ERROR! Unique threshold: $optn{'uniq'} must be greater than zero ",
+							"&& less than 1/4th of the currently loaded PL size!  Resetting to 1...\n";
+print $#urpl, " ", int($#urpl/4), "\n";
+					$optn{'uniq'} = 1;
+				}
+				while (@urpl && $#rnpl < (2*$optn{'uniq'})) { SeedRand(); }
+				$curs = $optn{'uniq'};
+				$mypl = \@rnpl;
+			} else {
+				push(@urpl, @rnpl);
+				@rnpl = ();
+				$curs = 0;
+				$mypl = \@nrpl;
+			}
+			unshift(@argz, "p$curs"); 
+		} elsif ($subz[0] =~ /u(\d+)/i) { 
+			if ($1 && $1 <= int(@nrpl/4)) { $optn{'uniq'} = $1; }
+			else { print "!ERROR! Unique threshold: $1 must be greater than zero ",
+							"&& less than 1/4th of the currently loaded PL size!  Resetting to 1...\n";
+print scalar(@nrpl), " ", int(@nrpl/4), "\n";
+					$optn{'uniq'} = 1;
+			}
+		}
+	} elsif ($argu =~ /^-?-?h(elp)?/i) {
+		print "Pip's Intergallactive Moosex Plaqueluster (Pip'sIMP [pimp]) Help:            \n";
+		print " -h[elp]          this Help text, -(x|q|exit)         eXit pimp              \n";
+		print " -v[(p|r)][+|-]<volume#>       set Volume (Pcm|Relative/song) to rel/abs vol#\n";
+		print " -(n|l)(<song#>|/titlematch/)[c] set Next/Last song as # or titlematch [copy]\n";
+		print " -t(f|l|t|n|pl|p|sp|sl|st|s|vp|v) sTatus Frmz,Left,Totl,songNum,PlaqueLust,  \n";
+		print "            Percentplayed,SecsPlayed,SecsLeft,SecsTotl,Songname,VolPcm,Volume\n";
+		print " -pl(s|l|a|i<index#>:)[(o|f|r)][!][(a|n|/match/)]<PLfilename.plf> PlaqueLust \n";
+		print "   Save,Load,Append,Ins<#>: Order,Filter,Rndmize [Not]AlphaNumeric/match/ PLF\n";
+		print "         *NOTE*  only -pl(s|l|a|i#:)<PLfilename.plf> werk so far!            \n";
+		print " -p(<song#>|/titlematch/)    Play/Pause PLsong# or first matching title      \n";
+		print " -s                          Stop                                            \n";
+		print " -(f|r)(f|p)[+|-]<amount#>[\%][/<fastPlaydivisor#>]        Fastfwd/Rewind in \n";
+		print "       Frames(seconds are Dfalt) by +/- amount or fastPlay +/- amount/divisor\n";
+		print " -j(n|l|b|m|e|f|r|h|t|song#|/titlematch/)        Jump to Next,Last,Beginning,\n";
+		print "      Middle,End,Ffwd,Rwnd,Head,Tail,Song# or ffwd/rwnd secs,next title match\n";
+		print " -a(n|l|b|m|e|position#)[r:](<filename.mp3>|<mp3Directory>)   Add file(s) to \n";
+		print "    current PL @ Nxt,Lst,Bgn,Mdl,End,Pos# Recurse mp3Dir or just add file.mp3\n";
+		print " -o(l|d|r|u<threshold#>)    Options (toggles) Loop?,Delete song from PL after\n";
+		print "     playing,start Random rotation     set Unique thresh# for random rotation\n";
+		print "\n";
+		print " To Get Started Try           `echo /path/to/MyFavorite.mp3 > MyFirstPL.plf`;\n";
+		print "                              `pimp -pllMyFirstPL.plf`;\n";
+		print "  You can also directly load playlists created with mms.\n";
+	}
+# Yiqs!  CPU usage was 96% with no sleeping in here!  Now it's only 2.9%  =)
+#	sleep(($top-1)/$bot); # sleep() doesn't werk for non-whole seconds! =(
+	select undef, undef, undef, (($top-1)/$bot); # but select does!
+#if ($argu) { print "Argu: $argu, ";	}
+}
+
+#$plyr->poll(1) until $plyr->state == 0;
+
+ReadMode(0);	# Restore normal Reads b4 exit

@@ -1,0 +1,35 @@
+---
+abstract: 'Map::Metro map for Brussels'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Map-Metro-Plugin-Map-Brussels
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+provides:
+  Map::Metro::Plugin::Map::Brussels:
+    file: lib/Map/Metro/Plugin/Map/Brussels.pm
+    version: '0.1001'
+requires:
+  Map::Metro: '0.2206'
+  Moose::Role: '2.0000'
+  perl: '5.014000'
+resources:
+  bugtracker: https://github.com/Csson/p5-Map-Metro-Brussels/issues
+  homepage: https://metacpan.org/release/Map-Metro-Plugin-Map-Brussels
+  repository: https://github.com/Csson/p5-Map-Metro-Brussels.git
+version: '0.1001'

@@ -1,0 +1,34 @@
+libmodule-build-ikiwiki-perl (0.0.6) unstable; urgency=low
+
+  * Fixed minor bugs.
+  * Add a little script for convert POD sources into Markdown sources.
+    Incomplete yet.
+  * Add a Perl::Critic rc file.
+
+ -- Victor Moral <victor@taquiones.net>  Mon, 07 Apr 2008 11:36:56 +0200
+
+libmodule-build-ikiwiki-perl (0.0.5) unstable; urgency=low
+
+  * Add the new action fakeinstall to the package.
+  * Fix a bug with the install directory in the templates and css files.
+
+ -- Victor Moral <victor@taquiones.net>  Tue, 01 Apr 2008 11:02:40 +0200
+
+libmodule-build-ikiwiki-perl (0.0.4) unstable; urgency=low
+
+  * Change the package synopsis and description.
+
+ -- Victor Moral <victor@taquiones.net>  Mon, 31 Mar 2008 19:10:13 +0200
+
+libmodule-build-ikiwiki-perl (0.0.3) unstable; urgency=low
+
+  * Added debian packaging files.
+  * Minor corrections in the documentation.
+
+ -- Victor Moral <victor@taquiones.net>  Mon, 31 Mar 2008 14:34:47 +0200
+
+libmodule-build-ikiwiki-perl (0.0.2) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Victor Moral <victor@taquiones.net>  Mon, 31 Mar 2008 12:32:21 +0200

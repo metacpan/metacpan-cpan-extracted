@@ -1,0 +1,99 @@
+GPC.pm -- A perl5 interface to Alan Murta's gpc library.
+
+ABSTRACT:
+
+This is a autoloadable interface module for gpc (*), a popular library
+for polygon clipping operations.  With this library you can perform
+DIFFERENCE, INTERSECTION, XOR and UNION operations on polygons.
+
+* (C) 1997-1999, Advanced Interfaces Group,
+University of Manchester.
+
+
+For full information on usage, see the accompanying man and html
+documentation and http://www.cs.man.ac.uk/aig/staff/alan/software/
+
+COPYRIGHT INFO
+
+The GPC.pm interface is copyright 2002 Danny Van de Pol.  It is
+covered by the Perl "Artistic License", which allows for free usage
+and redistribution.  See the Artistic License in the Perl source
+package for details.
+
+THE LATEST VERSION IS 1.04
+
+INSTALLATION:
+
+Read these instructions all the way through before you start!
+
+this is not guaranteed.
+
+3.  Unpack the tar file:
+
+	zcat GPC-1.XX.tar.gz | tar xvf -
+
+    (Where "XX" is the most recent revision number.)  This will create
+    the directory GPC-1.XX.
+
+4.  To compile GPC.pm on a system that supports dynamic linking:
+
+	a.  cd GPC-1.XX
+	b.  perl MakefilePL
+	c.  make
+        d.  make test (optional)
+	e.  make html (optional)
+	f.  make install
+
+    This will create GPC.pm, its HTML manual page, and install GPC into
+    the system-wide Perl library directory.  You'll need root
+    privileges to do the install step.  If you don't have them, see below.
+
+IF YOU RUN INTO PROBLEMS
+
+Some versions of Unix and Unix-like systems such as Linux ship with an
+incomplete version of the Perl distribution.  If you get warnings such
+as "Module ExtUtils::MakeMaker not found", you may have such a
+system.  Your only option is to obtain the full Perl distribution and
+reinstall it.
+
+If you are trying to compile and link GPC on a Windows or Macintosh
+machine and fail, please verify that you are able to build the Perl
+distribution from source code.  If you can't do that, then you don't
+have the compiler/linker/make tools required for building Perl
+modules.
+
+If you have problems and can't solve it on your own, post a message to
+the newsgroup "comp.lang.perl.modules".  There are some systems that
+require obscure compiler and linker options in order to compile
+correctly, and unfortunately I have a limited number of systems at my
+disposal.  You're much more likely to get correct answers from the
+gurus on the newsgroup than from myself.
+
+FREQUENTLY ASKED QUESTIONS
+
+BUG REPORTS
+
+Feel free to contact me via e-mail, subject to the caveats below.
+Provide the version numbers of GPC, Perl, make and model of your
+operating system, and make and model of your Web server, if
+appropriate.  Provide a small script that demonstrates the bug.
+
+Do NOT contact me for issues involving compilation failures on
+Windows, VMS, or Macintosh systems.  I do not have any such systems on
+hand, and cannot help you out.
+
+WHAT'S NEW IN 1.XX
+
+ACKNOWLEDGEMENTS:
+
+UPDATES:
+
+The current version of GPC can be found at:
+
+   http://www.cpan.org
+
+AUTHOR:
+
+Danny Van de Pol
+daniel.van_de_pol@alcatel.be
+http://www.alcatel.be

@@ -1,0 +1,23 @@
+Revision history for Mojo-Zabbix-APP
+
+
+0.05    2017-03-27/18
+
+* some fixes for support zabbix 3.0
+
+0.04    2016-11-30/18
+* pod erro fix
+
+0.03    2016-10-26/18
+
+* getItem() bug fox: return all hosts items when hosts not exist.
+
+0.02    2016-10-21/15
+
+* Add caching for get even and host request,speed up the process. 
+* Options some request parameters.
+
+0.01    2016-10-20/19
+       
+* First version, released on an unsuspecting world.
+

@@ -1,0 +1,47 @@
+Preferred Install: Use CPAN to get dependencies installed, 
+and then use git checkout (same tagged version as CPAN if you wish) 
+for running instances.
+
+With that in mind here is an install approach:
+
+PREREQUISITES: 
+* mongodb
+* git
+
+STEP 1: Copy mojito.conf to mojito_local.conf (in lib/Mojito/conf/ directory)
+  REASON: When you checkout from git again mojito_local.conf will not be overwritten, 
+          thus custom configs are preserved.
+
+STEP 2: Edit mojito_local.conf
+
+* set static_url path (e.g. apache/nginx create an alias to the location of files/
+  from your Mojito checkout
+* set git repo to a path where the owner of the mojito web app process can write (www-data?)
+
+STEP 3: Run:  perl -Ilib script/add_user.pl
+  REASON: add a user (or more) to the authentication database (mojito.users collection).
+          These users will be able to login and make edits.  In, addition, their info
+          will be used in the git commits (user, email).
+
+STEP 4: Choose which web framework(s) you want to run Mojito under.  The choices are:
+* Web::Simple
+* Dancer
+* Mojo
+* Tatsumaki
+
+See app/ for the different app versions.  You will need to install the frameworks you choose
+before you can run Mojtio. e.g. say you want to run Mojito using Tatsumaki, then in order to 
+run: 
+    app/tatsumaki.psgi
+   
+you first need to install Tatsumaki: 
+    cpanm Tatsumaki
+
+Same goes for Web::Simple, Dancer and Mojolicious Frameworks.
+
+
+STEP 5: Fire up the app of choice
+
+    plackup -Ilib -s Starman app/mojito.pl
+
+

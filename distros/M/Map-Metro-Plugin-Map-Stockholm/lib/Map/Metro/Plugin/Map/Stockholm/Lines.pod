@@ -1,0 +1,312 @@
+
+# PODNAME: Map::Metro::Plugin::Map::Stockholm::Lines
+# ABSTRACT: Lines and stations in the Stockholm map
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Map::Metro::Plugin::Map::Stockholm::Lines - Lines and stations in the Stockholm map
+
+=head1 VERSION
+
+Version 0.1971, released 2016-01-27.
+
+=head1 LINES
+
+=head2 Blue line: Hjulsta → Kungsträdgården [T10]
+
+=for HTML <div style="background-color: #1c388c; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Hjulsta
+    Tensta
+    Rinkeby
+    Rissne
+    Duvbo
+    Sundbybergs centrum  (L22)
+    Solna strand
+    Huvudsta
+    Västra skogen        (T11)
+    Stadshagen           (T11)
+    Fridhemsplan         (T11, T17, T18, T19)
+    Rådhuset             (T11)
+    T-Centralen          (T11, T13, T14, T17, T18, T19) [Sergels torg: L7]
+    Kungsträdgården      (L7, T11)
+
+=head2 Blue line: Akalla → Kungsträdgården [T11]
+
+=for HTML <div style="background-color: #1c388c; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Akalla
+    Husby
+    Kista
+    Hallonbergen
+    Näckrosen
+    Solna centrum    (L22)
+    Västra skogen    (T10)
+    Stadshagen       (T10)
+    Fridhemsplan     (T10, T17, T18, T19)
+    Rådhuset         (T10)
+    T-Centralen      (T10, T13, T14, T17, T18, T19) [Sergels torg: L7]
+    Kungsträdgården  (L7, T10)
+
+=head2 Red line: Norsborg → Ropsten [T13]
+
+=for HTML <div style="background-color: #f15e25; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Norsborg
+    Hallunda
+    Alby
+    Fittja
+    Masmo
+    Vårby gård
+    Vårberg
+    Skärholmen
+    Sätra
+    Bredäng
+    Mälarhöjden
+    Axelsberg
+    Örnsberg
+    Aspudden
+    Liljeholmen     (L22, T14)
+    Hornstull       (T14)
+    Zinkensdamm     (T14)
+    Mariatorget     (T14)
+    Slussen         (T14, T17, T18, T19)
+    Gamla stan      (T14, T17, T18, T19)
+    T-Centralen     (T10, T11, T14, T17, T18, T19) [Sergels torg: L7]
+    Östermalmstorg  (T14)
+    Karlaplan
+    Gärdet
+    Ropsten
+
+=head2 Red line: Fruängen → Mörby centrum [T14]
+
+=for HTML <div style="background-color: #f15e25; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Fruängen
+    Västertorp
+    Hägerstensåsen
+    Telefonplan
+    Midsommarkransen
+    Liljeholmen         (L22, T13)
+    Hornstull           (T13)
+    Zinkensdamm         (T13)
+    Mariatorget         (T13)
+    Slussen             (T13, T17, T18, T19)
+    Gamla stan          (T13, T17, T18, T19)
+    T-Centralen         (T10, T11, T13, T17, T18, T19) [Sergels torg: L7]
+    Östermalmstorg      (T13)
+    Stadion
+    Tekniska högskolan
+    Universitetet
+    Bergshamra
+    Danderyds sjukhus
+    Mörby centrum
+
+=head2 Green line: Skarpnäck → Åkeshov [T17]
+
+=for HTML <div style="background-color: #79c142; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Skarpnäck
+    Bagarmossen
+    Kärrtorp
+    Björkhagen
+    Hammarbyhöjden
+    Skärmarbrink      (T18)
+    Gullmarsplan      (L22, T18, T19)
+    Skanstull         (T18, T19)
+    Medborgarplatsen  (T18, T19)
+    Slussen           (T13, T14, T18, T19)
+    Gamla stan        (T13, T14, T18, T19)
+    T-Centralen       (T10, T11, T13, T14, T18, T19) [Sergels torg: L7]
+    Hötorget          (T18, T19)
+    Rådmansgatan      (T18, T19)
+    Odenplan          (T18, T19)
+    S:t Eriksplan     (T18, T19)
+    Fridhemsplan      (T10, T11, T18, T19)
+    Thorildsplan      (T18, T19)
+    Kristineberg      (T18, T19)
+    Alvik             (L12, L22, L22, T18, T19)
+    Stora mossen      (T19)
+    Abrahamsberg      (T19)
+    Brommaplan        (T19)
+    Åkeshov           (T19)
+
+=head2 Green line: Alvik → Farsta strand [T18]
+
+=for HTML <div style="background-color: #79c142; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Alvik             (L12, L22, L22, T17, T19)
+    Kristineberg      (T17, T19)
+    Thorildsplan      (T17, T19)
+    Fridhemsplan      (T10, T11, T17, T19)
+    S:t Eriksplan     (T17, T19)
+    Odenplan          (T17, T19)
+    Rådmansgatan      (T17, T19)
+    Hötorget          (T17, T19)
+    T-Centralen       (T10, T11, T13, T14, T17, T19) [Sergels torg: L7]
+    Gamla stan        (T13, T14, T17, T19)
+    Slussen           (T13, T14, T17, T19)
+    Medborgarplatsen  (T17, T19)
+    Skanstull         (T17, T19)
+    Gullmarsplan      (L22, T17, T19)
+    Skärmarbrink      (T17)
+    Blåsut
+    Sandsborg
+    Skogskyrkogården
+    Tallkrogen
+    Gubbängen
+    Hökarängen
+    Farsta
+    Farsta strand
+
+=head2 Green line: Hagsätra → Hässelby strand [T19]
+
+=for HTML <div style="background-color: #79c142; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Hagsätra
+    Rågsved
+    Högdalen
+    Bandhagen
+    Stureby
+    Svedmyra
+    Sockenplan
+    Enskede gård
+    Globen            (L22)
+    Gullmarsplan      (L22, T17, T18)
+    Skanstull         (T17, T18)
+    Medborgarplatsen  (T17, T18)
+    Slussen           (T13, T14, T17, T18)
+    Gamla stan        (T13, T14, T17, T18)
+    T-Centralen       (T10, T11, T13, T14, T17, T18) [Sergels torg: L7]
+    Hötorget          (T17, T18)
+    Rådmansgatan      (T17, T18)
+    Odenplan          (T17, T18)
+    S:t Eriksplan     (T17, T18)
+    Fridhemsplan      (T10, T11, T17, T18)
+    Thorildsplan      (T17, T18)
+    Kristineberg      (T17, T18)
+    Alvik             (L12, L22, L22, T17, T18)
+    Stora mossen      (T17)
+    Abrahamsberg      (T17)
+    Brommaplan        (T17)
+    Åkeshov           (T17)
+    Ängbyplan
+    Islandstorget
+    Blackeberg
+    Råcksta
+    Vällingby
+    Johannelund
+    Hässelby gård
+    Hässelby strand
+
+=head2 Spårväg City: Sergels torg → Bellmansro [L7]
+
+=for HTML <div style="background-color: #00bfff; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Sergels torg     [T-Centralen: T10, T11, T17, T18, T19, T13, T14]
+    Kungsträdgården  (T10, T11)
+    Nybroplan
+    Styrmansgatan
+    Djurgårdsbron
+    Nordiska muséet
+    Gröna Lund
+    Skansen
+    Djurgårdsskolan
+    Waldemarsudde
+    Bellmansro
+
+=head2 Nockebybanan: Alvik → Nockeby [L12]
+
+=for HTML <div style="background-color: #bbbbbb; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Alvik           (L22, L22, T17, T18, T19)
+    Alléparken
+    Klövervägen
+    Smedslätten
+    Ålstensgatan
+    Ålstens gård
+    Höglandstorget
+    Olovslund
+    Nockeby torg
+    Nockeby
+
+=head2 Tvärbanan: Alvik → Solna station [L22]
+
+=for HTML <div style="background-color: #888888; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Alvik                (L12, L22, T17, T18, T19)
+    Johannesfred
+    Norra Ulvsunda
+    Karlsbodavägen
+    Bällsta bro
+    Sundbybergs centrum  (T10)
+    Solna Business Park
+    Solna centrum        (T11)
+    Solna station
+
+=head2 Tvärbanan: Alvik → Sickla udde [L22]
+
+=for HTML <div style="background-color: #888888; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Alvik           (L12, L22, T17, T18, T19)
+    Alviks strand
+    Stora Essingen
+    Gröndal
+    Trekanten
+    Liljeholmen     (T13, T14)
+    Årstadal
+    Årstaberg
+    Årstafältet
+    Valla torg
+    Linde
+    Globen          (T19)
+    Gullmarsplan    (T17, T18, T19)
+    Mårtensdal
+    Luma
+    Sickla kaj
+    Sickla udde
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Map::Metro::Plugin::Map::Stockholm>
+
+=item *
+
+L<Task::MapMetro::Maps>
+
+=item *
+
+L<Map::Metro>
+
+=back
+
+=head1 SOURCE
+
+L<https://github.com/Csson/p5-Map-Metro-Plugin-Map-Stockholm>
+
+=head1 HOMEPAGE
+
+L<https://metacpan.org/release/Map-Metro-Plugin-Map-Stockholm>
+
+=head1 AUTHOR
+
+Erik Carlsson <info@code301.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Erik Carlsson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,130 @@
+NAME
+    MongoDBx::KeyValue - Use MongoDB as if it were a key-value store.
+
+VERSION
+    version 0.001001
+
+SYNOPSIS
+            use MongoDBx::KeyValue;
+
+            my $mkv = MongoDBx::KeyValue->new(kvdb => 'my_key_value_database', %opts);
+                    # 'kvdb' is required, other options are passed to MongoDB::Connection->new()
+
+            $mkv->set('cache', 'index.html', '<html><head><title>Index</title></head><body>Index</body></html>');
+
+            my $index = $mkv->get('cache', 'index.html');
+            print $index; # prints '<html><head><title>Index</title></head><body>Index</body></html>'
+
+DESCRIPTION
+    MongoDBx::KeyValue is a very simple module for easy usage of MongoDB as
+    a key-value store (similar to Redis, Riak or Memcached).
+
+    The interface is very simple: you *set* the values of keys and *get* the
+    values of keys. Every key-value pair is stored in a bucket, which is
+    really just a MongoDB collection (the "bucket" terminology is used
+    merely for resemblance with other key-value stores), so the same key can
+    exist, with possibly different values, in multiple buckets.
+
+    To get the value of a key, just pass the "get()" method the name of the
+    bucket and the key. If it is not found, "undef" is returned. To set the
+    value for a key, just provide the "set()" method with the name of the
+    bucket, the key and the value. If the key already exists in the bucket,
+    its value will be replaced.
+
+    The value for a key can be anything that MongoDB supports, including
+    simple scalars (strings, numbers, etc.), hash or array references, and
+    whatever else MongoDB natively supports such as DateTime objects. While
+    no checking is made for keys, you probably should only use scalars for
+    them.
+
+    Every key-value pair is stored in the database as a document with two
+    attributes: "_id", which holds the key; and "value", which holds the
+    value.
+
+CLASS METHODS
+  new( %opts )
+    Creates a new instance of this module and connects to the MongoDB
+    server. The only required option is 'kvdb', which should hold the name
+    of the database to use for the key-value store. All other options will
+    be passed to "MongoDB::Connection->new()", so take a look at
+    "ATTRIBUTES" in MongoDB::Connection for a list of all supported options.
+
+OBJECT METHODS
+  get( $bucket, $key )
+    Attempts to find the value for the key $key in the bucket named $bucket.
+    Returns "undef" if not found.
+
+  set( $bucket, $key, $value )
+    Sets the value for the key named $key inside the bucket named $bucket.
+    If the key already exists, its value will be replaced with the new one.
+
+    It's probably better for keys to be scalars, but values can be anything,
+    including hash-refs, array-refs and whatever MongoDB can store natively
+    (take a look at MongoDB::DataTypes for more info).
+
+  db()
+    Returns the MongoDB::Database object of the key-value store.
+
+  bucket( $bucket_name )
+    All this really does is return a MongoDB::Collection object for the
+    collection named $bucket_name. Use it if you need MongoDB collection
+    objects for some reason.
+
+DIAGNOSTICS
+    This module generates the following errors:
+
+    *   "You must provide the name of the key-value database to use (as
+        parameter 'kvdb')."
+
+        This error will be issued by the "new()" method if you don't provide
+        it with the 'kvdb' parameter, which should hold the name of the
+        database to use as the key-value store.
+
+DEPENDENCIES
+    This module only depends on MongoDB.
+
+INCOMPATIBILITIES
+    None reported.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to
+    "bug-MongoDBx-KeyValue@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MongoDBx-KeyValue>.
+
+AUTHOR
+    Ido Perlmuter <ido at ido50 dot net>
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2011, Ido Perlmuter "ido at ido50 dot net".
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either version 5.8.1 or any later
+    version. See perlartistic and perlgpl.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

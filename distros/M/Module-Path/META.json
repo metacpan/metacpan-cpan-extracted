@@ -1,0 +1,54 @@
+{
+   "abstract" : "get the full path to a locally installed module",
+   "author" : [
+      "Neil Bowers <neilb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Module-Path",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Devel::FindPerl" : "0",
+            "File::Spec::Functions" : "0",
+            "FindBin" : "0.05",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilbowers/Module-Path",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilbowers/Module-Path.git",
+         "web" : "https://github.com/neilbowers/Module-Path"
+      }
+   },
+   "version" : "0.19"
+}
+

@@ -1,0 +1,54 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use MIDI::Simple::Drummer::Rock;
+
+# "Is there a drummer in the house?"
+my $d = MIDI::Simple::Drummer::Rock->new(
+    -bpm     => shift || 100,
+    -volume  => shift || 100,
+    -phrases => shift || 8,
+    -file    => "$0.mid",
+);
+
+# Declare beat and fill variables for later use.
+my ($beat, $fill) = (0, 0);
+
+# Declare a selection of beat names to use.
+my @rotate = qw( 2.1 2.2 2.4 );
+
+# Get 'er started.
+$d->count_in;
+
+# Choose a beat and-or fill.
+for my $p (1 .. $d->phrases) {
+    # Beat 2.3 every other phrase.
+    if($p % 2 > 0) {
+        $beat = $d->beat(-name => 2.3, -fill => $fill);
+        $beat = $d->beat(-name => 2.3);
+    }
+    # Otherwise rotate the beat.
+    else {
+        # Choose a random beat name from the selection above.
+        $beat = $d->beat(-name => (@rotate)[int(rand @rotate)]);
+        # Play an exciting fill (chosen at random without a -name).
+        $fill = $d->fill(-last => $fill);
+    }
+}
+
+# Add and play a custom ending fill.
+$d->patterns('end fill' => \&fin);
+$d->fill(-name => 'end');
+#fin($d); # <- Perfectly reasonable but use the API:
+
+# Write out the MIDI file.
+$d->write;
+
+# Declare the end fill.
+sub fin {
+    my $d = shift;
+    $d->accent;
+    # Crash and kick, simultaneously.
+    $d->note('qn', $d->strike('Crash Cymbal 1', $d->name_of('kick')));
+}

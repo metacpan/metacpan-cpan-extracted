@@ -1,0 +1,161 @@
+<HTML>
+<HEAD>
+<TITLE>MPE::CIvar - Perl extension for CI variables and JCWs on MPE/ix</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+<!--
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#export">EXPORT</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+-->
+<!-- INDEX END -->
+
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>MPE::CIvar - Perl extension for CI variables and JCWs on MPE/ix</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use MPE::CIvar ':all';</PRE>
+<PRE>
+  $acct = hpcigetvar(&quot;HPACCOUNT&quot;);</PRE>
+<PRE>
+  hpciputvar(&quot;TEMPVAR&quot;, 1);
+  hpciputvar(&quot;TEMPVAR&quot;, hpcigetvar(&quot;TEMPVAR&quot;)+1);
+  $hold = hpcigetvar(&quot;TEMPVAR&quot;);
+  hpcideletevar(&quot;TEMPVAR&quot;);
+  print &quot;tempvar value was $hold\n&quot;;
+  setjcw(32768);
+  $jcw = getjcw();
+  $ci = findjcw(&quot;CIERROR&quot;);
+  putjcw(&quot;CIERROR&quot;, 0);</PRE>
+<PRE>
+  hpcicommand(&quot;build TOOOLONGNAME.PUB,invaliddomain&quot;, undef, undef, 2);
+  if ($CIVAR{HPCIERR}) {
+    print &quot;Error message: $CIVAR{HPCIERRMSG}\n&quot;;
+  }</PRE>
+<PRE>
+  hpcicmds(&quot;purge larry&quot;, 
+           &quot;build larry;rec=-80,,f,ascii&quot;,
+           &quot;file input=larry,old&quot;,
+           &quot;run darryl.pub&quot;)
+    or die &quot;Error on cmd: '$MPE::CIvar::lastcmd': $CIVAR{HPCIERRMSG}\n&quot;;</PRE>
+<PRE>
+  $CIVAR{HPPATH} .= &quot;,PERL.PUB&quot;;  # append PERL.PUB to HPPATH</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Access to the MPE/iX intrinsic functions:</P>
+<PRE>
+     setjcw, getjcw
+     putjcw, findjcw
+     hpciputvar, hpcigetvar
+     hpcideletevar
+     hpcicommand</PRE>
+<P>See the MPE/iX documentation at <A HREF="http://docs.hp.com/mpeix/all/">http://docs.hp.com/mpeix/all/</A>
+Specifically relevant for this module are:</P>
+<PRE>
+   MPE/iX Intrinsics Reference Manual
+   Command Interpreter Access and Variables Programmer's Guide
+   Interprocess Communications Programmer's Guide</PRE>
+<P>You may also access the CI variables through the tied hash, %CIVAR.
+This is analogous to %ENV but currently does not support 'each' or
+'keys'.</P>
+<DL>
+<DT><STRONG><A NAME="item_setjcw"><CODE>setjcw(VALUE)</CODE></A></STRONG><BR>
+<DD>
+Sets the jcw JCW to the value VALUE (a 16-bit unsigned integer).  Note
+that setting JCW to a value of 32768 or greater indicates that the
+program terminated in an error state and may cause a batch job to
+terminate.
+<P></P>
+<DT><STRONG><A NAME="item_getjcw"><CODE>getjcw()</CODE></A></STRONG><BR>
+<DD>
+Returns the value of the jcw JCW.
+<P></P>
+<DT><STRONG><A NAME="item_putjcw">putjcw($name, VALUE)</A></STRONG><BR>
+<DD>
+Sets the jcw $name to the value VALUE (a 16-bit unsigned integer).
+The function putjcw will return 0 on success, an error code on failure.
+<P></P>
+<DT><STRONG><A NAME="item_findjcw"><CODE>findjcw($name)</CODE></A></STRONG><BR>
+<DD>
+Returns the value of the jcw $name.
+<P></P>
+<DT><STRONG><A NAME="item_hpcigetvar"><CODE>hpcigetvar($name)</CODE></A></STRONG><BR>
+<DD>
+Returns the value of the CI variable $name.  This function will return
+'undef' if the variable does not exist.  A boolean variable will be
+returned as 0 or 1.
+<P></P>
+<DT><STRONG><A NAME="item_hpciputvar">hpciputvar($name, VALUE)</A></STRONG><BR>
+<DD>
+Sets the CI variable $name to VALUE.  If VALUE is an integer it will be
+put as an integer value.  If not, hpciputvar will try to interpret as a
+boolean or just put it as a string.
+The function hpciputvar will return 0 on success, an error code on failure.
+<P></P>
+<DT><STRONG><A NAME="item_hpcideletevar"><CODE>hpcideletevar($name)</CODE></A></STRONG><BR>
+<DD>
+Deletes the CI variable $name.  It will return 0 on success,
+an error code on failure.
+<P></P>
+<DT><STRONG><A NAME="item_%CIVAR">%CIVAR</A></STRONG><BR>
+<DD>
+A hash tied to the CI variables.  The follow are equivalent:
+<PRE>
+   $CIVAR{$name}         hpcigetvar($name)</PRE>
+<PRE>
+   $CIVAR{$name}=VALUE   hpciputvar($name, value)</PRE>
+<PRE>
+   delete $CIVAR{$name}  hpcideletevar($name)</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_hpcicommand">hpcicommand($command [, $cmderr [, $parmnum [,$msglevel]]])</A></STRONG><BR>
+<DD>
+Calls intrinsic <CODE>HPCICOMMAND</CODE> with the command string.  The other arguments
+are optional.  A value of 0 will be returned on success, otherwise an error
+value will be returned and assigned to $cmderr if a variable is passed
+as the second argument.  You can set $msglevel to 1 to suppress warnings
+and set it to 2 to suppress errors as well as warnings.  For example,
+<PRE>
+   hpcicommand($command, undef, undef, 2);</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_hpcicmds">hpcicmds( @cmdlist )</A></STRONG><BR>
+<DD>
+Calls <A HREF="#item_hpcicommand"><CODE>hpcicommand</CODE></A> for each string in <CODE>@cmdlist</CODE>.  It will stop
+processing the list on an error, but not a warning.  You can set
+the <CODE>msglevel</CODE> (see above) by assigning to <CODE>$MPE::CIvar::msglevel</CODE>
+before calling <A HREF="#item_hpcicmds"><CODE>hpcicmds</CODE></A>.  You can see the last command 
+executed by looking at <CODE>$MPE::CIvar::lastcmd</CODE> and any error in
+<CODE>$MPE::CIvar::cmderr</CODE>.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="export">EXPORT</A></H1>
+<P>None by default.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Ken Hirsch &lt;<EM><A HREF="mailto:kenhirsch@myself.com">kenhirsch@myself.com</A></EM>&gt;</P>
+<P>This module may be used and distributed on the same terms as Perl.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>perl(1).</P>
+
+</BODY>
+
+</HTML>

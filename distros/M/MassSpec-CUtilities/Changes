@@ -1,0 +1,12 @@
+Revision history for Perl extension MassSpec::CUtilities.
+
+0.01  Fri May 13 17:08:36 2005
+	- original version; created by h2xs 1.22 with options
+		-Oxan MassSpec::CUtilities CUtilities.h
+0.02  Fri May 13 17:48:36 2005
+	- added more documentation
+0.03  Fri May 27 15:48:36 2005
+	- made bitstring handing much more thread-safe
+0.04  Wed June 1 09:48:36 2005
+	- added binarySearchSpectrum
+

@@ -1,0 +1,73 @@
+NAME
+    Mojolicious::Plugin::LeakTracker - Helps you track down memory leaks in
+    your code
+
+VERSION
+    version 1.00
+
+SYNOPSIS
+        $app->plugin('leak_tracker', \%options);
+
+NAME
+    Mojolicious::Plugin::LeakTracker - Helps you track down memory leaks and
+    circular references in your Mojolicious app
+
+PLUGIN OPTIONS
+  ignore_mode
+    When this is set to a true value, modes are ignored. By default the
+    plugin will not install it's hooks or set up the tracking environment if
+    you are in production mode. Setting ignore_mode to a true value will
+    make the plugin run in production mode regardless.
+
+  loglevel
+    Can be set to any valid log method name applicable to $app->log (e.g.
+    debug to log using $app->log->debug). By default set to 'debug' for
+    development mode, and 'info' for production mode. Here as a way to
+    override the default behaviour.
+
+INTERPRETING THE RESULTS
+    At the beginning of each transaction (the "after_build_tx" hook), an
+    event handler is attached to the "request" and "finish" events that the
+    transaction emits. Tracking of leaks is done between these two stages.
+
+    If a transaction finishes, and there are still live objects present,
+    this is reported in the app log. Each live object's class, package,
+    file, and size are dumped, as well as a cycle report; the cycle report
+    lists circular references.
+
+    Note that this plugin is not a magic CSI bullet that will point you
+    straight to the source of a leak, but it is a way to get a better idea
+    of where to look and what may potentially be causing them.
+
+KNOWN ISSUES
+    *   This plugin was smacked together in a hurry, and has a lot of
+        dead/loose/useless code floating around in it.
+
+    *   Cyclic references may be falsely reported for modules that implement
+        their own cyclic-reference-busting logic for when they are
+        destroyed; also things like caching, and lazy-loaded objects may
+        cause a false report.
+
+AUTHOR
+    Ben van Staveren "<madcat@cpan.org">
+
+BUG REPORTING/CONTRIBUTING
+    Please report any bugs or feature requests through the web interface at
+    <https://github.com/benvanstaveren/Mojolicious-Plugin-LeakTracker/issues
+    >. You can fork my Git repository at
+    <https://github.com/benvanstaveren/Mojolicious-Plugin-LeakTracker/> if
+    you want to make changes or supply me with patches.
+
+ACKNOWLEDGMENTS
+    Based in part on Catalyst::Plugin::LeakTracker, with some additional
+    beating to make it fit Mojolicious' request handling.
+
+AUTHOR
+    Ben van Staveren <madcat@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Ben van Staveren.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,29 @@
+Version history for Perl distribution Module-Inspector
+
+1.05 Fri 16 Nov 2007
+	- No functional changes
+	- Moving to a production version
+	- Upgrading to Module::Install 0.77
+	- Upgrading bundled author tests
+	- Removing -w from tests
+	- Correcting tests to account for version.pm changes
+	- Updating Module::Math::Depends dependency
+
+0.04 Mon  2 Oct 2006
+	- Factored out the dist location and extraction to Module::Extract
+	  (needed to reuse the same functionality for Module::P4P)
+	- Otherwise unchanged from 0.03
+
+0.03 Mon 25 Sep 2006
+	- Updating the YAML::Tiny dependency to 0.11
+        - Return an empty Module::Math::Depends (not HASH)
+          when either dist_requires or dist_build_requires is null
+
+0.02 Sun 25 Sep 2006
+        - Added support for MANIFEST files
+	- Documented the main methods
+	- Added dist_name, dist_version, dist_requires, dist_build_requires
+	  and dist_depends methods.
+
+0.01 Sat 24 Sep 2006
+        - Initial Version

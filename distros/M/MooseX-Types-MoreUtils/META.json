@@ -1,0 +1,84 @@
+{
+   "abstract" : "utility methods to apply to Moose type constraints",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.142690",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Types-MoreUtils",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "B::Hooks::Parser" : "0",
+            "Moose" : "2.0600"
+         },
+         "requires" : {
+            "List::Util" : "1.29",
+            "perl" : "5.008001"
+         },
+         "suggests" : {
+            "MooseX::Types" : "0",
+            "Types::Standard" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Moose" : "2.0600"
+         },
+         "requires" : {
+            "Test::Modern" : "0"
+         },
+         "suggests" : {
+            "MooseX::Types" : "0",
+            "Types::Standard" : "1.000000"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::Types::MoreUtils" : {
+         "file" : "lib/MooseX/Types/MoreUtils.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Types-MoreUtils"
+      },
+      "homepage" : "https://metacpan.org/release/MooseX-Types-MoreUtils",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-moosex-types-moreutils.git",
+         "web" : "https://github.com/tobyink/p5-moosex-types-moreutils"
+      },
+      "x_IRC" : "irc://irc.perl.org/#moose",
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/MooseX-Types-MoreUtils/project"
+   },
+   "version" : "0.002"
+}

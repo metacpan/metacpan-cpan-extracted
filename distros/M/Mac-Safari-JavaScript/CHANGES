@@ -1,0 +1,33 @@
+Revision history for perl module Mac::Safari::JavaScript
+
+1.04 2012-02-22
+
+  - Fix for Safari Version 5.1.3 (7534.53.10) RT#66150
+
+1.03 2011-07-18
+
+  - Re-release with fixed manifest and missing inc file (double oops with sprinkles on top)
+  - Fixed minor pod typo
+  - Thanks to Ranguard (Leo Lapworth) for identifying these issues
+  - Improved test coverage (Now 100% across the board)
+  - Forced safari to open 'about:blank' before running the tests in order to ensure crazy JS on random pages do not break tests.
+
+1.02 2011-07-12
+
+  - Re-release with fixed manifest and missing module (oooops)
+
+1.01 2011-07-11
+
+ - Fix to error handling (didn't work when you threw errors by hand from JS)
+ - Exception objects now always evaluate to true in boolean context
+ - Exception objects stringifcation now falls back (meaning you can use it with eq et al without casting)
+ - More information pulled up into the Mac::Safari::JavaScript::Exception object
+
+1.00 2011-06-13
+
+ - Introduced Error Handling
+ - Introduced Parameter Passing
+
+0.01 2011-02-28
+
+  - Initial Release

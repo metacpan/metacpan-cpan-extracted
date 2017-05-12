@@ -1,0 +1,36 @@
+Maptastic.pm version 1.01
+~~~~~~~~~~~~~~~~~~~~~~~~~
+This module provides `mapcar', `mapcaru' `mapeach'; the first of these
+functions has been known to the LISP community for some time, albeit
+with widely differing behaviour.
+
+map_each is a version of map for hashes.  There are also some other
+similar mappy functions, like `filter'
+
+There are also iterator versions of all these functions, as well as
+several built-ins.  The support is not completed, however I felt that
+the partial pieces in this module should be released anyway.  Patches
+to implement the remaining functionality more than welcome.
+
+This module is to be considered in an alpha stage of interface for the
+next few months.  If there are no major objections, the interface will
+be set in stone after that time.  Please, provide feedback to say
+whether you liked the interface or not.
+
+Changes
+^^^^^^^
+See the Changelog file included with the distribution.
+
+Installation
+^^^^^^^^^^^^
+To install this module, issue the following commands:
+
+   perl ./Makefile.PL
+   make test
+   make install
+
+Copyright and License information
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Copyright (c) 2003-2005, Sam Vilain <samv@cpan.org>.  All rights
+reserved.  This program is free software; you may use it and/or
+distribute it under the same terms as Perl itself.

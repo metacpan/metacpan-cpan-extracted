@@ -1,0 +1,52 @@
+graph Perl {
+	graph [compound=1, concentrate=1, mindist="0.1", rankdir=LR, sep="0.1", smoothing=triangle, splines=spline];
+	node [label="\N", shape=record, style=dotted];
+	edge [minlen=1];
+	subgraph cluster_1 {
+		graph [rankdir=TD,
+			label="MetaPOD::"];
+		subgraph cluster_2 {
+			graph [label="MetaPOD::Format::JSON::"];
+			"MetaPOD::Format::JSON::Decoder::v1" [label="{{<port1> role}|<port2> MetaPOD::Format::JSON::Decoder::v1}", shape=Mrecord, style=solid, color="#15b01a", fontsize=7, height="0.1"];
+			"MetaPOD::Format::JSON::PostCheck::v1" [label="{{<port1> role}|<port2> MetaPOD::Format::JSON::PostCheck::v1}", shape=Mrecord, style=solid, color="#15b01a", fontsize=7, height="0.1"];
+			"MetaPOD::Format::JSON::does::v1" [label="{{<port1> role}|<port2> MetaPOD::Format::JSON::does::v1}", shape=Mrecord, style=solid, color="#15b01a", fontsize=7, height="0.1"];
+			"MetaPOD::Format::JSON::inherits::v1" [label="{{<port1> role}|<port2> MetaPOD::Format::JSON::inherits::v1}", shape=Mrecord, style=solid, color="#15b01a", fontsize=7, height="0.1"];
+			"MetaPOD::Format::JSON::interface::v1_1" [label="{{<port1> role}|<port2> MetaPOD::Format::JSON::interface::v1_1}", shape=Mrecord, style=solid, color="#15b01a", fontsize=7, height="0.1"];
+			"MetaPOD::Format::JSON::namespace::v1" [label="{{<port1> role}|<port2> MetaPOD::Format::JSON::namespace::v1}", shape=Mrecord, style=solid, color="#15b01a", fontsize=7, height="0.1"];
+			"MetaPOD::Format::JSON::v1" [label="{{<port1> single_class}|<port2> MetaPOD::Format::JSON::v1}", shape=Mrecord, style=solid, color="#0343df", fontsize=7, height="0.1"];
+			"MetaPOD::Format::JSON::v1_1" [label="{{<port1> single_class}|<port2> MetaPOD::Format::JSON::v1_1}", shape=Mrecord, style=solid, color="#0343df", fontsize=7, height="0.1"];
+			"MetaPOD::Format::JSON::Decoder::v1" -- "MetaPOD::Format::JSON::v1" [arrowhead=open, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, label="consumed by", tailclip=1, weight=1];
+			"MetaPOD::Format::JSON::PostCheck::v1" -- "MetaPOD::Format::JSON::v1" [arrowhead=open, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, label="consumed by", tailclip=1, weight=1];
+			"MetaPOD::Format::JSON::does::v1" -- "MetaPOD::Format::JSON::v1" [arrowhead=open, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, label="consumed by", tailclip=1, weight=1];
+			"MetaPOD::Format::JSON::inherits::v1" -- "MetaPOD::Format::JSON::v1" [arrowhead=open, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, label="consumed by", tailclip=1, weight=1];
+			"MetaPOD::Format::JSON::namespace::v1" -- "MetaPOD::Format::JSON::v1" [arrowhead=open, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, label="consumed by", tailclip=1, weight=1];
+			"MetaPOD::Format::JSON::v1" -- "MetaPOD::Format::JSON::v1_1" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", tailclip=1, weight=100];
+			"MetaPOD::Format::JSON::interface::v1_1" -- "MetaPOD::Format::JSON::v1_1" [arrowhead=open, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, label="consumed by", tailclip=1, weight=1];
+		}
+		"MetaPOD::Assembler" [label="{{<port1> class}|<port2> MetaPOD::Assembler}", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+		"MetaPOD::Exception" [label="{{<port1> class}|<port2> MetaPOD::Exception}", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+		"MetaPOD::Exception::Decode::Data" [label="{{<port1> class}|<port2> MetaPOD::Exception::Decode::Data}", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+		"MetaPOD::Extractor" [label="{{<port1> class}|<port2> MetaPOD::Extractor}", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+		"MetaPOD::Format::JSON" [label="{{<port1> single_class}|<port2> MetaPOD::Format::JSON}", shape=Mrecord, style=solid, color="#0343df", fontsize=7, height="0.1"];
+		"MetaPOD::JSON" [label="<port1> MetaPOD::JSON"];
+		"MetaPOD::Result" [label="{{<port1> class}|<port2> MetaPOD::Result}", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+		"MetaPOD::Role::Format" [label="{{<port1> role}|<port2> MetaPOD::Role::Format}", shape=Mrecord, style=solid, color="#15b01a", fontsize=7, height="0.1"];
+		"MetaPOD::Spec" [label="<port1> MetaPOD::Spec"];
+		"MetaPOD::Role::Format" -- "MetaPOD::Format::JSON" [arrowhead=open, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, label="consumed by", tailclip=1, weight=1];
+		"MetaPOD::Exception" -- "MetaPOD::Exception::Decode::Data" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", tailclip=1, weight=100];
+	}
+	subgraph cluster_3 {
+		graph [rankdir=TD,
+			label="MetaPOD::Format::JSON::"];
+	}
+	MetaPOD [label="<port1> MetaPOD"];
+	"Moo::Object" [label="<port1> Moo::Object"];
+	"Pod::Eventual" [label="<port1> Pod::Eventual"];
+	"Throwable::Error" [label="<port1> Throwable::Error"];
+	"Moo::Object" -- "MetaPOD::Assembler" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", tailclip=1, weight=100];
+	"Throwable::Error" -- "MetaPOD::Exception" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", tailclip=1, weight=100];
+	"Pod::Eventual" -- "MetaPOD::Extractor" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", tailclip=1, weight=100];
+	"Moo::Object" -- "MetaPOD::Result" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", tailclip=1, weight=100];
+	"Moo::Object" -- "MetaPOD::Format::JSON" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", tailclip=1, weight=100];
+	"Moo::Object" -- "MetaPOD::Format::JSON::v1" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", tailclip=1, weight=100];
+}

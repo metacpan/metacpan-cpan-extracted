@@ -1,0 +1,34 @@
+---
+abstract: 'routines for musical canon construction'
+author:
+  - 'Jeremy Mates <jmates@cpan.org>'
+build_requires:
+  Test::Most: '0'
+  strict: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+  strict: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Music-Canon
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  List::Util: '0'
+  Moo: '0'
+  Music::AtonalUtil: '0'
+  Music::PitchNum: '0'
+  Music::Scales: '0'
+  Scalar::Util: '0'
+  namespace::clean: '0'
+  strict: '0'
+resources:
+  repository: git://github.com/thrig/Music-Canon.git
+version: '2.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,10 @@
+Revision history for Math-DWT
+
+0.01	2016-06-29
+	First version.
+
+0.02	2016-06-29
+	Fixed versioning on Wavelet modules; fixed dwt array output option.
+
+0.021	2016-06-29
+	Fixed versioning for real, this time.

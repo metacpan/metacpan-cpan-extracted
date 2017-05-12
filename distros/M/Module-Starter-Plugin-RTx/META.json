@@ -1,0 +1,38 @@
+{
+   "abstract" : "Module::Starter for RT extensions",
+   "author" : [
+      "sunnavy <sunnavy@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Module-Starter-Plugin-RTx",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Module::Install::RTx" : 0,
+            "Module::Starter" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/sunnavy/module-starter-plugin-rtx.git"
+      }
+   },
+   "version" : "0.02"
+}
+

@@ -1,0 +1,31 @@
+Revision history for MooseX-amine
+
+0.6       2015-03-13 09:42:31-07:00 America/Los_Angeles
+
+        * Fix failing test (Pete Houston)
+
+0.5       2015-03-01 21:03:52-08:00 America/Los_Angeles
+
+        * Add Changes file (Pete Houston)
+        * Update dist.ini for Kwalitee (Pete Houston)
+        * Update tests to improve coverage (Pete Houston)
+
+0.4 Tue Aug 12 23:23:06 2014 -0500
+
+        * Remove smartmatch usage
+        * Fix precedence issue with return
+        * Update dist.ini
+        * Update Dancer syntax
+
+0.3 Thu Apr 14 09:21:00 2011 -0400
+
+        * New utility - lists delegation targets for native traits. (Idea from RJBS on #moose.)
+        * Start tracking applied traits.
+        * Skip things that start with a dot when building file list
+        * Dial logging down to 'warning'
+        * Handle being called with path name
+        * Sort tree
+        * Print out default attr when constrait is undef
+        * Add constraint-less attribute to tests
+        * Depend on Moose 2.000
+

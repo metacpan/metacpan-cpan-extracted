@@ -1,0 +1,38 @@
+Revision history for Perl module MathML::Entities
+
+0.17 Wed Nov 18 01:55:00 2009
+    - Bring up-to-date with
+      XML Entity definitions for Characters
+      (W3C Working Draft 17 November 2009)
+      http://www.w3.org/TR/2009/WD-xml-entity-names-20091117/
+
+0.16 Fri Sep 25 17:55:00 2009
+    - Convert HTML5 uppercase versions of
+      XML's "safe five" entities to their
+      lowercase equivalents. This is surely
+      more useful than expanding them.
+
+0.15 Fri Sep 25 13:17:00 2009
+    - Bring up-to-date with Editor's copy of
+      XML Entity definitions for Characters
+      (W3C Working Draft 13 September 2009)
+      http://www.w3.org/2003/entities/2007doc/overview.html
+
+0.14 Thu Sep 24 15:43:00 2009
+    - Revise some entity mappings to bring up-to-date with
+      http://www.w3.org/TR/2008/WD-xml-entity-names-20080721/
+
+0.13 Wed Nov 30 15:25:00 2005
+	- Duplicate (incorrect) mapping for &hearts; removed.
+          (hat tip: ShisslerP@cadmus.com)
+
+0.12 Tue Nov 22 16:45:00 2005
+	- Made %ENTITIES a global hash, so that users can access it
+	  as $MathML::Entities::Entities
+	  (hat tip: Ian.Stuart@ed.ac.uk)
+
+0.11 Tue Jan 11 09:22:06 2005
+	- original version; created by ExtUtils::ModuleMaker 0.32
+        - First public release
+
+

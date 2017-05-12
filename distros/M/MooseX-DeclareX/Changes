@@ -1,0 +1,50 @@
+MooseX-DeclareX
+===============
+
+Created:      2012-08-20
+Home page:    <https://metacpan.org/release/MooseX-DeclareX>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-DeclareX>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.009	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.008	2013-07-03
+
+ [ Bug Fixes ]
+ - Get `has` handling to work properly for MooseX::DeclareX::MethodPrefix.
+
+0.007	2013-06-28
+
+ - Updated: Fix hash key randomization issues.
+ - Updated: Remove use of smart match.
+
+0.006	2012-09-03
+
+ - Added: Inject imports into classes.
+
+0.005	2012-08-25	Preikestolen
+
+ - Added: MooseX::Types injection into classes.
+ - Added: Some handy constants for attribute definition.
+
+0.004	2012-08-24
+
+ [ Bug Fixes ]
+ - Get MooseX::Declare relative-package-naming feature working. (The
+   'namespace' keyword is still not working.)
+
+0.003	2012-08-22
+
+ [ Packaging ]
+ - Split out abstract class functionality.
+ - Split out method privacy functionality.
+
+0.002	2012-08-21
+
+ [ Packaging ]
+ - Add dep on Throwable::Error.
+
+0.001	2012-08-21	Initial release

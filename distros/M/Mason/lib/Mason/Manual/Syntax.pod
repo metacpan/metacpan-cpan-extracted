@@ -1,0 +1,399 @@
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Mason::Manual::Syntax - Mason component syntax reference
+
+=head1 DESCRIPTION
+
+A reference for all the syntax that can be used in components.
+
+=head1 SUBSTITUTION TAGS
+
+=head2 <% I<expr> %>
+
+Blocks of the form C<< <% expr %> >> are replaced with the result of evaluating
+C<expr> as a Perl expression in scalar context.
+
+    Hello, <% $name %>! The current time is <% scalar(localtime) %>.
+
+Whitespace after '<%' and before '%>' is required. This gives us a little
+leeway in implementing variations on this tag in the future - it also just
+looks better.
+
+=head2 <% I<expr> | I<filter>,I<filter>... %>
+
+A filter list may appear after a << | >> character in a substitution,
+containing one or more names separated by commas. The names are as filter
+methods on the current component class. The filters are applied to the result
+before it is output.
+
+    <% $content | NoBlankLines,Trim %>
+
+See L<Mason::Manual::Filters> for more information on filters.
+
+=head1 PERL LINES
+
+=head2 %-lines
+
+Lines beginning with a single '%' are treated as Perl. The '%' must be followed
+by at least one whitespace character.
+
+    <ul>
+    % foreach my $item (@items) {
+    <li><% $item %></li>
+    % }
+    </ul>
+
+    % if ($.logged_in) {
+    <div class="welcome">
+       Welcome, <% $.username %>.
+    </div>
+    % }
+    % else {
+    <a href="/login">Click here to log in</a>
+    % }
+
+=head1 UNNAMED BLOCKS
+
+Blocks that do not take a name argument.
+
+=head2 <%class>
+
+Contains Perl code code that executes once when the component is loaded, in the
+main body of the class outside of any methods. This is the place to use
+modules, declare attributes, and do other things on a class level.
+
+   <%class>
+   </%class>
+
+=head2 <%doc>
+
+Text in this section is treated as a comment and ignored.
+
+    <%doc>
+    Name: foo.mc
+    Purpose: ...
+    </%doc>
+
+=head2 <%flags>
+
+Specifies flags that affect the compilation of the component. Each flag is
+listed one per line in C<< key => value >> form.
+
+    <%flags>
+    extends => '/foo/bar'
+    </%flags>
+
+The C<< <%flags> >> block is extracted in a special first pass through the
+component, so that it can affect the remainder of the compilation.
+
+The built-in flags are:
+
+=over
+
+=item extends
+
+Declares the component's superclass (another component). The path may be
+absolute as shown above, or relative to the component's path. This is the only
+way to declare the component's superclass; using an C<< extends >> keyword
+directly will not work reliably. If not provided, the component's superclass is
+determined automatically via L<autobase components|Tutorial/Autobase
+components>.
+
+=back
+
+Plugins may implement additional flags.
+
+=head2 <%init>
+
+Contains Perl code that is executed at the beginning of the current method.
+Equivalent to a C<< <%perl> >> section at the top of the method.
+
+   <%init>
+   my $article = MyApp::Article->find($.article_id);
+   my $title = $article->title;
+   </%init>
+
+=head2 <%perl>
+
+Contains Perl code that is executed in place. The return value, if any, is
+discarded.  May appear anywhere in the text and any number of times.
+
+   <%perl>
+   my $article = MyApp::Article->find($.article_id);
+   my $title = $article->title;
+   </%perl>
+
+=head2 <%text>
+
+Text in this section is printed as-is with all Mason syntax ignored.
+
+    <%text>
+    % This is an example of a Perl line.
+    <% This is an example of an expression block. %>
+    </%text>
+
+This works for almost everything, but doesn't let you output C<< </%text> >>
+itself! When all else fails, use L<print|Mason::Request/print>:
+
+    % $m->print('The tags are <%text> and </%text>.');
+
+=head1 NAMED BLOCKS
+
+Blocks that take a name argument.
+
+=head2 <%method I<name> I<params>>
+
+Creates a new method with the specified I<name> and I<params>.  Uses
+L<Method::Signatures::Simple|Method::Signatures::Simple> underneath, so
+C<$self> and any other declared parameters are automatically shifted off of
+C<@_>.
+
+   <%method greet ($name, $color)>
+   <div style="color: <% $color %>">
+      Hello, <% $name %>!
+   </div>
+   </%method>
+
+=head2 <%after I<name>>
+
+=head2 <%augment I<name>>
+
+=head2 <%around I<name>>
+
+=head2 <%before I<name>>
+
+=head2 <%override I<name>>
+
+Modifies a content-producing method with the specified I<name>. See
+L<Moose::Manual::MethodModifiers> for a description of each modifier.
+
+C<$self> is automatically shifted off for the body of C<< <%after> >>, C<<
+<%augment> >>, C<< <%before> >> and C< <%override> >. C<$orig> and C<$self> are
+automatically shifted off for the body of C<< <%around> >>.
+
+    <%after render>
+       <% # Add analytics line after everything has rendered %>
+       <& /shared/google_analytics_line.mi &>
+    </%after>
+
+    <%augment wrap>
+      <html>
+        <body>
+          <% inner() %>
+        </body>
+      </html>
+    </%augment>
+
+    <%around navbar>
+      <div class="navbar_special">
+        <% $self->$orig() %>
+      </div>
+    </%around>
+
+    <%override navbar>
+      <% super() %>
+      <a href="extra">extra</a>
+    </%override>
+
+=head2 <%filter I<name> I<params>>
+
+Creates a filter method with the specified I<name> and I<params>. Works just
+like a C<< <%method> >> block, except that you can call C<< $yield->() >> to
+generate the original content. e.g.
+
+    <%filter Row ($class)>
+    <tr class="<% $class %>">
+    % foreach my $item (split(/\s/, $yield->())) {
+       <td><% $item %></td>
+    % }
+    </tr>
+    </%filter>
+
+    % $.Row('std') {{
+    First Second Third
+    % }}
+
+generates
+
+    <tr class="std">
+      <td>First</td>
+      <td>Second</td>
+      <td>Third</td>
+    </tr>
+
+See L<Mason::Manual::Filters> for more information on filters.
+
+=head1 CALLING COMPONENTS
+
+=head2 <& I<path>, I<args> &>
+
+    <& /path/to/comp.mi, name=>value, ... &>
+
+I<path> is an absolute or relative component path. If the latter, it is
+considered relative to the location of the current component. I<args> is a list
+of one or more name/value pairs.
+
+The path may be a literal string (quotes optional) or a Perl expression that
+evaluates to a string. To eliminate the need for quotes in most cases, Mason
+employs some magic parsing: If the first character is one of C<[\w/\.]>,
+comp_path is assumed to be a literal string running up to the first comma or
+&>. Otherwise, comp_path is evaluated as an expression.
+
+Here are some examples:
+
+    # relative component paths
+    <& topimage.mi &>
+    <& tools/searchbox.mi &>
+
+    # absolute component path
+    <& /shared/masthead.mi, color=>'salmon' &>
+
+    # this component path MUST have quotes because it contains a comma
+    <& "sugar,eggs.mi", mix=>1 &>
+
+    # variable component path
+    <& $comp &>
+
+    # variable component and attributes
+    <& $comp, %args &>
+
+    # you can use arbitrary expression for component path, but it cannot
+    # begin with a letter or number; delimit with () to remedy this
+    <& (int(rand(2)) ? 'thiscomp.mi' : 'thatcomp.mi'), id=>123 &>
+
+You can also call components with the L<comp|Mason::Request/comp> and
+L<scomp|Mason::Request/scomp> methods.
+
+=head1 COMMENTS
+
+=head2 <% # comment... %>
+
+A C<< <% %> >> tag is considered a comment if all of its lines are either
+whitespace, or begin with a '#' optionally preceded by whitespace. For example,
+
+    <% # This is a single-line comment %>
+
+    <%
+       # This is a
+       # multi-line comment
+    %>
+
+=head2 % # comment
+
+Because a line beginning with C<%> is treated as Perl, C<% #> automatically
+works as a comment. However we prefer the C<< <% # comment %> >> form over C<<
+% # >>, because it stands out a little more as a comment and because it is more
+flexible with regards to preceding whitespace.
+
+=head2 % if (0) { }
+
+Anything between these two lines
+
+   % if (0) {
+   ...
+   % }
+
+will be skipped by Mason, including component calls.  While we don't recomend
+this for comments per se, it is a useful notation for "commenting out" code
+that you don't want to run.
+
+=head2 HTML/XML/... comments
+
+HTML and other markup languages will have their own comment markers, for
+example C<< <!-- --> >>. Note two important differences with these comments
+versus the above comments:
+
+=over
+
+=item *
+
+They will be sent to the client and appear in the source of the page.
+
+=item *
+
+They do not block component calls and other code from running, so don't try to
+use them to comment out code!
+
+   <!-- Oops, the code below will still run
+      <& /shared/expensive.mhtml &>
+   -->
+
+=back
+
+=head1 WHITESPACE AND NEWLINES
+
+=head2 Newlines between blocks
+
+Mason will ignore a single newline between blocks, so that you can space them
+nicely.  Additional newlines beyond that will be displayed.
+
+   <%class>
+   ...
+   </%class>
+                     <-- ignored
+   <%method foo>
+   ...
+   </%method>
+                     <-- ignored
+                     <-- displayed
+   <%method bar>
+   ...
+   </%method>
+
+=head2 Backslash at end of line
+
+A backslash (\) at the end of a line suppresses the newline. In HTML
+components, this is mostly useful for fixed width areas like C<< <pre> >> tags,
+since browsers ignore white space for the most part. An example:
+
+    <pre>
+    foo
+    % if (1) {
+    bar
+    % }
+    baz
+    </pre>
+
+outputs
+
+    foo
+    bar
+    baz
+
+because of the newlines on lines 2 and 4. (Lines 3 and 5 do not generate a
+newline because the entire line is taken by Perl.) To suppress the newlines:
+
+    <pre>
+    foo\
+    % if (1) {
+    bar\
+    % }
+    baz
+    </pre>
+
+which prints
+
+    foobarbaz
+
+=head1 SEE ALSO
+
+L<Mason|Mason>
+
+=head1 AUTHOR
+
+Jonathan Swartz <swartz@pobox.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Jonathan Swartz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

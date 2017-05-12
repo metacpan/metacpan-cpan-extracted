@@ -1,0 +1,41 @@
+Changes
+examples/README
+INSTALL.SKIP
+lib/Module/Release.pm
+lib/Module/Release/FTP.pm
+lib/Module/Release/Kwalitee.pm
+lib/Module/Release/MANIFEST.pm
+lib/Module/Release/PAUSE.pm
+lib/Module/Release/Prereq.pm
+lib/Module/Release/SVN.pm
+lib/Module/Release/WebUpload/Mojo.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+script/release
+t/abstract.t
+t/compile.t
+t/defaults.t
+t/dist_version.t
+t/kwalitee/check_kwalitee.t
+t/lib/setup_common.pl
+t/load.t
+t/make_targets.t
+t/manifest.t
+t/mixins.t
+t/new.t
+t/no_releaserc_can_die.t
+t/output.t
+t/perls.t
+t/pod.t
+t/pod_coverage.t
+t/run.t
+t/test_manifest
+t/touch-utime-fails.t
+t/touch.t
+t/without.t
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

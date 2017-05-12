@@ -1,0 +1,72 @@
+2013-06-22  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Released version 1.0.1
+
+	* Fixed mrsclient (an error with older Perls)
+
+2013-06-19  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Released version 1.0.0
+
+2013-06-04  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Fixes for MRS version 6 (see details in the docs by perldoc).
+
+2013-05-25  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Started working on version 1.0.0
+
+2012-03-13  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Released version 0.600100
+
+	* Added dependency on the minimal version (2.26) of the
+	  XML::Compile::SOAP11 module.
+
+	* Fixed links in the documentation; Client.pod is now part of the
+	  Client.pm (in the distributed package)
+
+	* Fixed warnings issued by Perl::critic
+	  (such as "return undef;" => "return;").
+
+	* Distribution/packaging moved under Dist::Zilla.
+
+2010-06-28  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Released version 0.60
+
+	* Added xformat option for the HTML output.
+
+	* Updated documentation.
+
+2010-03-15  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Fixed option -i when used together with -f option (in mrsclient)
+
+2010-03-09  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Released version.53
+
+	* Fixed queries using prefixes separated by a colon (such as
+	os:human)
+
+2010-03-02  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Released version 0.52 - uploaded to CPAN
+
+	* Added tests
+
+	* Fixed setting hosts and endpoints
+
+2010-02-22  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Released version 0.5
+
+2010-02-21  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Added implementation of methods invoking Blast and Clustal.
+
+2010-02-13  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Released version 0.01
+

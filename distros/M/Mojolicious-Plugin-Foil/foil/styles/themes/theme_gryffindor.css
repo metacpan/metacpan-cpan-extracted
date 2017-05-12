@@ -1,0 +1,125 @@
+/* ================================================================== */
+/* THEME: Gryffindor
+ */
+/* ================================================================== */
+/* THEME: Gryffindor - fonts
+ */
+/* ------------------------------------------------------------------ */
+/* Fonts */
+h1, h2, h3, h4 {
+  font-family: hancock, black, "lucida calligraphy", Merced, sans-serif;
+  color: black;
+}
+
+/* ================================================================== */
+/* ICONS - light on dark
+ * Nav arrows with transparent backgrounds
+ */
+.side nav li > ul {
+  list-style-image: url(nav_white.png);
+}
+
+/* ================================================================== */
+/* General */
+.verge, header,
+footer,
+.side, .fancy {
+  color: #ebe0e0;
+  background: #660000;
+  border-color: #330000;
+}
+
+header,
+footer,
+.side {
+  background-image: url(gryf_red1.jpg);
+}
+
+body {
+  color: #333300;
+  background: #f2f2aa;
+}
+
+a:link {
+  color: #1a3300;
+}
+
+a:visited {
+  color: #663300;
+}
+
+header a:link,
+footer a:link,
+.side a:link,
+.verge a:link,
+header a:link,
+footer a:link,
+.side a:link,
+.fancy a:link {
+  color: #f7f76e;
+}
+
+header a:visited,
+footer a:visited,
+.side a:visited,
+.verge a:visited,
+header a:visited,
+footer a:visited,
+.side a:visited,
+.fancy a:visited {
+  color: #f7b36e;
+}
+
+.fancy {
+  color: #ebe0e0;
+  background-image: url("gryf_red1.jpg");
+  border: 5px double #a50d0d;
+  padding: 0;
+}
+.fancy li {
+  padding: 0.5em;
+  margin: 5px;
+  border: 5px solid #a50d0d;
+  background-color: #660000;
+  background: linear-gradient(#660000, #1a0006);
+}
+.fancy li a:link {
+  color: #a3f5cc;
+}
+.fancy li a:visited {
+  color: #ccf5a3;
+}
+
+.button, input[type=submit], header nav a,
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: #ebe4e0;
+  border-color: #333300;
+  background-color: #552200;
+}
+
+.button a:link, input[type=submit] a:link, header nav a a:link,
+header nav .selflink a:link,
+header nav em a:link,
+header nav .current a a:link, a.button:link, header nav a:link {
+  color: #ebe4e0;
+}
+
+.button a:visited, input[type=submit] a:visited, header nav a a:visited,
+header nav .selflink a:visited,
+header nav em a:visited,
+header nav .current a a:visited, a.button:visited, header nav a:visited {
+  color: #abf5a3;
+}
+
+header nav li {
+  border-color: #226622;
+}
+
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: #bb0055;
+  background-color: #669933;
+}

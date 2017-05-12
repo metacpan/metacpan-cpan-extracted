@@ -1,0 +1,26 @@
+Revision history for Mail-SpamAssassin-Plugin-AttachmentPresent
+
+1.05    2017/03/01
+        Fix attachment filename detection/parsing where a filename is only
+        present in Content-Disposition header.
+        
+1.04    2016/09/09
+        Fix attachment filename detection/parsing in filenames with wide chars
+        This adds a dependency on Encode::MIME::Header
+        
+1.03    2016/09/01
+        Fix attachment filename detection/parsing (encoded filenames)
+        Made package CPAN ready
+        
+1.02    2016/07/07
+        Fix attachment filename detection/parsing
+        In some cases the filename would not be detected correctly
+        
+1.01    2016/05/27
+        Make production ready
+        attachmentpresent_file_count now includes zip files and install was fixed
+        
+1.00    2016/03/31
+        First version
+        Supports attachmentpresent_archive_count and attachmentpresent_file_count
+

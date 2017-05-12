@@ -1,0 +1,32 @@
+---
+abstract: 'performs Neo-Riemann operations on set classes'
+author:
+  - 'Jeremy Mates <jmates@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.142690'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Music-NeoRiemannianTonnetz
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  List::Util: '0'
+  Scalar::Util: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Try::Tiny: '0'
+  perl: '5.01'
+resources:
+  homepage: http://github.com/thrig/Music-NeoRiemannianTonnetz
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/thrig/Music-NeoRiemannianTonnetz
+version: '0.27'

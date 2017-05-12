@@ -1,0 +1,15 @@
+mp3cut *		T_mp3cut
+
+INPUT
+
+T_mp3cut
+	if (!(
+           SvROK ($arg)
+           && SvOBJECT (SvRV ($arg))
+           && sv_derived_from ($arg, \"MP3::Cut::Gapless::XS\")
+        ))
+          croak (\"object is not of type MP3::Cut::Gapless::XS\");
+        /**/
+        $var = (mp3cut *)SvPVX (SvRV ($arg));
+
+

@@ -1,0 +1,164 @@
+#!/usr/bin/perl
+
+# module to build
+require './recurse2txt';
+require './lib/Math/Base/Convert/Bases.pm';	# pointer to all standard bases
+
+# will update the Bitmaps module version below
+#
+my $VERSION = do { my @r = (q$Revision: 0.02 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r };
+
+my $bases = Math::Base::Convert->_bases;
+
+my %base2;
+my %dmaps;
+my @xmaps = (\%dmaps);
+
+# make lookup bit maps - there are two kinds
+#
+# 1) for generic in 'xmaps' of the form "bit pattern" => "decimal value"
+#
+# 2) for specific in 'dmaps' of the form "bit pattern" => "base character"
+#
+# i.e.
+#
+# case 1)
+# %bmap4 = ( # base 16 translation table
+#        '0000'  =>  0,  
+#        '0001'  =>  1,  
+#        '0010'  =>  2,  
+#        '0011'  =>  3,  
+#        '0100'  =>  4,  
+#        '0101'  =>  5,  
+#        '0110'  =>  6,  
+#        '0111'  =>  7,  
+#        '1000'  =>  8,  
+#        '1001'  =>  9,  
+#        '1010'  =>  10, 
+#        '1011'  =>  11, 
+#        '1100'  =>  12,
+#        '1101'  =>  13,
+#        '1110'  =>  14, 
+#        '1111'  =>  15, 
+#);
+#
+# case 2)
+#%dmap4 = ( # heX - base 16 translation table
+#        '0000'  =>  0,  
+#        '0001'  =>  1,  
+#        '0010'  =>  2,  
+#        '0011'  =>  3,  
+#        '0100'  =>  4,  
+#        '0101'  =>  5,  
+#        '0110'  =>  6,  
+#        '0111'  =>  7,  
+#        '1000'  =>  8,  
+#        '1001'  =>  9,  
+#        '1010'  =>  'a', 
+#        '1011'  =>  'b', 
+#        '1100'  =>  'c',
+#        '1101'  =>  'd',
+#        '1110'  =>  'e', 
+#        '1111'  =>  'f', 
+#);
+#
+my $mapbits = sub {
+  my($bits,$val) = @_;
+  my $bp = length($bits);
+
+# 0, binary, hex not mapped
+  return if $bp == 4 ||			# hex is direct
+	    $bp == 1;			# binary maps directly from value
+  $xmaps[$bp]->{$bits} = $val;		# build generic translation maps
+  return if $bp == 3;			# octal maps from standard lookup, numeric
+  if (exists $base2{$bp}) {		# standard base present with this base power?
+    foreach(0..$#{$base2{$bp}}) {
+      my $bnam = $base2{$bp}->[$_];
+      $dmaps{$bnam}->{$bits} = $bases->{$bnam}->[$val];
+    }
+  }
+};
+
+# create a hash of all standard power 2 bases where the key
+# points to a list of bases associated with each power of 2
+#
+foreach (sort keys %$bases) {
+  my $len = @{$bases->{$_}};
+  unless ($len & $len -1) {	# isnotp2
+    my $bp = int(log($len)/log(2) +0.5);
+    if (exists $base2{$bp}) {
+      push @{$base2{$bp}}, $_;
+    } else {
+      $base2{$bp} = [$_];
+    }
+  }
+}
+
+# create an 8 bit wide binary map of the range 0..255
+#
+foreach (0..255) {
+  my $p = pack('c',$_);
+  my $bits = unpack('B*',$p);
+  my @bits = $bits;
+  while ($bits =~ s/^0// && length($bits)) {
+    push @bits, $bits;
+  }
+  foreach $bits (@bits) {
+    $mapbits->($bits,$_);
+  }
+}  
+
+my $moduletxt = q|#!/usr/bin/perl -w
+
+package Math::Base::Convert::Bitmaps;
+
+use vars qw($VERSION);
+
+$VERSION = '|. $VERSION .q|';
+
+# created by Makefile.PL |. scalar localtime(). q|
+#
+# Do not edit this package, 
+#
+# edit the 'bitmaps' file in the source directory instead
+#
+# Why is this module here? The tables in this module
+# load from the disk and order of magnitude faster than
+# they can be created by perl at run time.
+#
+
+$VAR = |. (Dumper(\@xmaps))[0] .q|
+__END__
+
+=head1 NAME
+
+Math::Base::Convert::Bitmaps - pregenerated bit pattern to base power of 2 translation tables
+
+This package contains no documentation
+
+=head1 AUTHOR
+
+Michael Robinton, michael@bizsystems.com
+
+=head1 COPYRIGHT
+
+Copyright 2012-2015, Michael Robinton
+
+This program is free software; you may redistribute it and/or modify it
+under the same terms as Perl itself.   
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
+
+1;
+|;
+
+open (F,'>lib/Math/Base/Convert/Bitmaps.pm') or return 0;
+select F;
+$| = 1;
+print F $moduletxt;
+close F;
+1;

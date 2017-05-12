@@ -1,0 +1,85 @@
+# NAME
+
+Module::Install::Template - Treat module source code as a template
+
+# SYNOPSIS
+
+    # in C<Makefile.PL>:
+
+    process_templates(
+        first_year => 2007,
+        rest_from  => "$ENV{HOME}/.mitlib/standard_pod",
+        start_tag  => '{%',
+        end_tag    => '%}',
+    );
+
+# DESCRIPTION
+
+This module, if used in the `Makefile.PL` as shown in the synopsis, treats
+module source code files as templates and processes them with the [Template](http://search.cpan.org/perldoc?Template)
+Toolkit during `make` time.
+
+That is, `lib/` is expected to contain templates, and `blib/lib/` will
+contain the resulting files as processed by the Template Toolkit.
+
+This only happens on the author's side. The end-user will not notice any of
+it.
+
+This module provides one subroutine: `process_templates()`. It takes named
+arguments. Of these, `start_tag` and `end_tag` are treated specially and
+used for the template's start and end tag definitions. `rest_from` instructs
+this module to look for distribution attributes (`version`, `perl_version`,
+`author`, `license`, `abstract`) that haven't been set yet in the given
+file.
+
+For example, you might have some standard POD template that you use in all
+your modules - standard stuff like installation, availability, author,
+copyright notices and so on. You could have that in the special directory
+`~/.mitlib` (`mit` here stands for 'Module::Install::Template'). Because
+of that, the Module::Install directive `all_from` won't work properly.
+With `rest_from` you can instruct this module to take the remaining
+distribution attributes from your standard template.
+
+The Makefile had to be slightly patched so that `make dist` still works -
+normally `make dist` takes files from `lib/`, but here these are the
+templates. We are interested in the finished files, so we override the
+relevant Makefile portions to use `blib/lib/` instead.
+
+This documentation is somewhat lacking - I'll try to improve it.
+
+Because of the `Makefile` munging, this module might not work for
+distributions that use XS or SWIG.
+
+# TAGS
+
+If you talk about this module in blogs, on L<delicious.com> or anywhere else,
+please use the `moduleinstalltemplate` tag.
+
+# BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+`bug-module-install-template@rt.cpan.org`, or through the web interface at
+<http://rt.cpan.org>.
+
+# INSTALLATION
+
+See perlmodinstall for information and options on installing Perl modules.
+
+# AVAILABILITY
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a CPAN
+site near you. Or see <http://search.cpan.org/dist/Module-Install-Template/>.
+
+# AUTHOR
+
+Marcel Gr&uuml;nauer, `<marcel@cpan.org>`
+
+# COPYRIGHT AND LICENSE
+
+Copyright 2007-2009 by Marcel Gr&uuml;nauer
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

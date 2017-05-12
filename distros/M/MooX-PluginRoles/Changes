@@ -1,0 +1,7 @@
+Revision history for MooX-PluginRoles
+
+0.02  2016-03-05 08:58:52 EST
+        - require Moo >= 1.007000, to avoid recursion in wrapped constructors
+
+0.01  2016-03-04 10:15:14 EST
+        - Initial release

@@ -1,0 +1,36 @@
+#!/usr/bin/perl -w
+
+# This is a CGI-BIN script, invoked by a web server when a SOAP based
+# request comes, dispatching requests to the appropriate module
+# (BioMoby web service).
+#
+# The DISPATCH_TABLE (with the names of available services) is loaded
+# in the run-time from a separate file (whose default name is
+# SERVICES_TABLE - but it can be specified in the configuration file).
+#
+# It includes some hard-coded paths - they were added during the
+# installation time (by running scripts/install.pl script).
+#
+# $Id: MobyServer.cgi.template,v 1.3 2008/02/21 00:12:55 kawas Exp $
+# Contact: Martin Senger <martin.senger@gmail.com>
+# ---------------------------------------------------------------
+
+use strict;
+
+use SOAP::Transport::HTTP;
+
+# --- established in the install.pl time
+use lib '@PMOSES_HOME@';
+use lib '@GENERATED_DIR@';
+use lib '@SERVICES_DIR@';
+
+# --- list of all services served by this script
+use vars qw ( $DISPATCH_TABLE );
+require "@SERVICES_TABLE@";
+
+# --- accept request and call wanted service
+my $x = new SOAP::Transport::HTTP::CGI;
+$x->dispatch_with ($DISPATCH_TABLE);
+$x->handle;
+
+__END__

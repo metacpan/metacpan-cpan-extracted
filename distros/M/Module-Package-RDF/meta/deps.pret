@@ -1,0 +1,32 @@
+@prefix : <http://ontologi.es/doap-deps#> .
+
+`Module-Package-RDF`
+	:runtime-requirement [ :on "Module::Package 0.30"^^:CpanId ];
+	:runtime-requirement [ :on "Module::Install 1.04"^^:CpanId ];
+	:runtime-requirement [ :on "Module::Install::RDF 0.009"^^:CpanId ];
+	:runtime-requirement [ :on "Module::Install::DOAP 0.006"^^:CpanId ];
+	:runtime-requirement [ :on "Module::Install::Copyright 0.009"^^:CpanId ];
+	:runtime-requirement [ :on "Module::Install::Credits 0.009"^^:CpanId ];
+	:runtime-requirement [ :on "Module::Install::DOAPChangeSets 0.206"^^:CpanId ];
+	:runtime-requirement [ :on "Module::Install::AutoLicense 0.08"^^:CpanId ];
+	:runtime-requirement [ :on "Module::Install::ReadmeFromPod 0.12"^^:CpanId ];
+	:runtime-requirement [ :on "Module::Install::AutoManifest"^^:CpanId ];
+	:runtime-requirement [ :on "Module::Install::TrustMetaYml 0.003"^^:CpanId ];
+	:runtime-requirement [ :on "Module::Install::AutoInstall 0"^^:CpanId ];
+	:runtime-requirement [ :on "RDF::Trine 0.135"^^:CpanId ];
+	:runtime-requirement [ :on "RDF::TriN3 0.201"^^:CpanId ];
+	:runtime-requirement [ :on "Log::Log4perl"^^:CpanId ];
+	:runtime-requirement [ :on "URI::Escape"^^:CpanId ];
+	:runtime-requirement [ :on "Software::License"^^:CpanId ];
+	:runtime-requirement [ :on "IO::All"^^:CpanId ];
+	:runtime-requirement [ :on "Text::Template"^^:CpanId ];
+	:runtime-requirement [ :on "DateTime"^^:CpanId ];
+	:runtime-requirement [ :on "Test::Pod"^^:CpanId ];
+	:runtime-requirement [ :on "Test::Pod::Coverage"^^:CpanId ];
+	:runtime-requirement [ :on "Test::RDF::DOAP::Version 0.007"^^:CpanId ];
+	:runtime-requirement [ :on "Getopt::Long"^^:CpanId ];
+	:runtime-requirement [ :on "Getopt::ArgvFile"^^:CpanId ];
+	:runtime-requirement [ :on "File::HomeDir"^^:CpanId ];
+	:runtime-requirement [ :on "URI::file 4.0"^^:CpanId ];
+	:test-requirement [ :on "Test::More 0.96"^^:CpanId ].
+

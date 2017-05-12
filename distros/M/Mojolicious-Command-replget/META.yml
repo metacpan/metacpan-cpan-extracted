@@ -1,0 +1,26 @@
+---
+abstract: 'Mojolicious get command in a REPL'
+author:
+  - 'Stefan Adams <s1037989@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Command-replget
+provides:
+  Mojolicious::Command::nopaste:
+    file: lib/Mojolicious/Command/replget.pm
+    version: '0.01'
+requires:
+  Mojolicious: '4.0'
+resources:
+  bugtracker: https://github.com/s1037989/Mojolicious-Command-replget/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/s1037989/Mojolicious-Command-replget
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

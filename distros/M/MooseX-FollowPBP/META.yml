@@ -1,0 +1,21 @@
+---
+abstract: 'Name your accessors get_foo() and set_foo()'
+author:
+  - 'Dave Rolsky <autarch@urth.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-FollowPBP
+requires:
+  Moose: 1.16
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooseX-FollowPBP
+  repository: git://git.moose.perl.org/MooseX-FollowPBP.git
+version: 0.05

@@ -1,0 +1,11 @@
+1.161190  2016-04-27 18:30:47-07:00 America/Los_Angeles
+    - Added global named capture
+    - Add behaviour for ARRAY/HASH message/match input
+1.160090  2016-01-08 17:11:34-08:00 America/Los_Angeles
+    - Added proper handling of JSON::PP::Boolean datatypes
+1.132270  2013-08-14 17:46:11 PST8PDT
+    - Moved to Dist::Zilla
+0.3 Wed Mar 20 18:41:01 PDT 2013
+    - Added github references
+0.2 Earlier
+    - First release

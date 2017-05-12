@@ -1,0 +1,54 @@
+#!perl
+
+# PODNAME: markdown2pod
+# ABSTRACT: markdown2pod - convert Markdown text to Pod
+
+use strict;
+use warnings;
+use Markdown::Pod::script;
+
+unless (caller) {
+    my $app = Markdown::Pod::script->new;
+    $app->parse_options(@ARGV);
+    $app->doit or exit(1);
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+markdown2pod - markdown2pod - convert Markdown text to Pod
+
+=head1 VERSION
+
+version 0.006
+
+=head1 SYNOPSIS
+
+    markdown2pod readme.mkd
+    markdown2pod readme.mkd > readme.html
+    markdown2pod < readme.mkd > readme.html
+    cat readme.mkd | markdown2pod > readme.html
+
+=head1 DESCRIPTION
+
+This script converts Markdown to POD.
+If you want to convert Markdown in your perl source code,
+then check L<Markdown::Pod> module.
+
+=head1 AUTHOR
+
+김도형 - Keedi Kim <keedi@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Keedi Kim.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,134 @@
+=head1 NAME
+
+MojoMojo::Prefs - info on MojoMojo configurable preferences
+
+MojoMojo has a number of preferences that can be set in "Site settings"
+(C</.admin>). If values are not set in the database, they are read from
+F<mojomojo.conf>, or default values are used.
+
+=head2 admins
+
+Login names of users with admin privileges.
+
+Default: 'admin'.
+
+=head2 name
+
+Site name.
+
+Default: 'MojoMojo'.
+
+=head2 main_formatter
+
+Specify which formatter to use as the main text formatter. The two options
+so far ares L<Markdown|MojoMojo::Formatter::Markdown> and
+L<Textile|MojoMojo::Formatter::Textile>, with Markdown being default thanks to
+its versatility. For a comparison between the two, see
+L<http://mojomojo.org/documentation/cheatsheet>.
+
+=head2 open_registration
+
+Controld whether user registration is available.
+
+Default: false.
+
+=head2 anonymous_user
+
+If set, users are allowed to post anonymously, and the edit will be
+shown with the username set in this option.
+
+=head2 restricted_user
+
+If set to a true value, normal users are restricted to editing pages
+inside their user space (the subpages of C</username>). Admin users can edit
+the entire site.
+
+Default: false.
+
+=head2 enforce_login
+
+If set, users are forced to login before performing any action.
+
+Default: false.
+
+=head2 check_permission_on_view
+
+If set, permissions to view are checked on view and search.
+
+Default: is false.
+
+=head2 create_allowed, delete_allowed, edit_allowed, view_allowed, attachment_allowed
+
+If true, anonymous users can create, delete, edit, view, and manipulate
+attachments, respectively.
+
+Defaults: true.
+
+=head2 entropy
+
+Random string used to generate secret keys for mail verification and such.
+
+=head2 disable_search
+
+If set, will use Google for site search. Currently highly recommended because
+KinoSearch consumes 100% CPU (see L<http://github.com/marcusramberg/mojomojo/issues#issue/32>).
+
+=head2 use_captcha
+
+Control CAPTCHA for new user registration and anonymous edits.
+
+Default: false.
+
+=head2 theme
+
+Name of the active theme.
+
+Default: 'default'.
+
+=head2 cache_permission_data
+
+If set, permissions are cached.
+
+Default: true.
+
+=head2 default_lang
+
+Set the default language used for:
+
+=over 4
+
+=item * roles and the 'admin' username when creating the database
+
+=item * whenever no language is set via the UI and one is needed to
+display site text and navigation links, configure CAPTCHA, output
+language-specific plugin text etc.
+
+=back
+
+Currently supported values are:
+
+=over
+
+=item * "en" - English
+
+=item * "de" - German
+
+=item * "fr" - French
+
+=item * "ja" - Japanese
+
+=item * "no" - Norwegian
+
+=item * "ca" - Catalan
+
+=item * "es" - Spanish
+
+=item * "pl" - Polish
+
+=item * "ru" - Russian
+
+=back
+
+Default: "en"
+
+=cut

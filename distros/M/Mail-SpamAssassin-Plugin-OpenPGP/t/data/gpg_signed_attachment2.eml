@@ -1,0 +1,71 @@
+Return-Path: <dave@brondsema.net>
+Delivered-To: user0009-dave@brondsema.net
+Received: (qmail 2158 invoked by uid 0); 21 Mar 2005 00:54:11 -0000
+Received: from unknown (HELO ?192.168.1.101?) (user0009@68.22.152.170)
+  by 0 with SMTP; 21 Mar 2005 00:54:11 -0000
+Message-ID: <423E1B07.6090600@brondsema.net>
+Date: Sun, 20 Mar 2005 19:53:27 -0500
+From: Dave Brondsema <dave@brondsema.net>
+User-Agent: Mozilla Thunderbird 1.0 (X11/20041206)
+X-Accept-Language: en-us, en
+MIME-Version: 1.0
+To: Dave Brondsema <dave@brondsema.net>
+Subject: simple att
+X-Enigmail-Version: 0.90.0.0
+X-Enigmail-Supports: pgp-inline, pgp-mime
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enig228FB9AFCEA198874DF67B92"
+X-Spam-Checker-Version: SpamAssassin 3.0.2 (2004-11-16) on ferrari
+X-Spam-Level: 
+X-Spam-Status: No, score=0.0 required=4.0 tests=none autolearn=failed 
+	version=3.0.2
+
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enig228FB9AFCEA198874DF67B92
+Content-Type: multipart/mixed;
+ boundary="------------080505050201080003020000"
+
+This is a multi-part message in MIME format.
+--------------080505050201080003020000
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+
+
+some regular body here
+
+--
+Dave Brondsema : dave@brondsema.net
+http://www.splike.com : programming
+http://csx.calvin.edu : student org
+http://www.brondsema.net : personal
+
+--------------080505050201080003020000
+Content-Type: text/plain;
+ name="test.txt"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline;
+ filename="test.txt"
+
+line one
+line two
+line three
+
+--------------080505050201080003020000--
+
+--------------enig228FB9AFCEA198874DF67B92
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.0 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+
+iD8DBQFCPhsJVvBSb5uzznARAjJPAKC+Tm6TEtW3HfxXWmuCGEsTrwJd1ACgtBr/
+074ApmZ4mPzkEXvrtP8Q/1s=
+=4/si
+-----END PGP SIGNATURE-----
+
+--------------enig228FB9AFCEA198874DF67B92--
+

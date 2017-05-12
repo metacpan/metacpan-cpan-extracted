@@ -1,0 +1,356 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Message::Head::FieldGroup - a sub set of fields in a header
+
+=head1 INHERITANCE
+
+ Mail::Message::Head::FieldGroup
+   is a Mail::Reporter
+
+ Mail::Message::Head::FieldGroup is extended by
+   Mail::Message::Head::ListGroup
+   Mail::Message::Head::ResentGroup
+   Mail::Message::Head::SpamGroup
+
+=head1 SYNOPSIS
+
+Never instantiated directly.
+
+=head1 DESCRIPTION
+
+Some fields have a combined meaning: a set of fields which represent
+one intermediate step during the transport of the message (a
+I<resent group>, implemented in L<Mail::Message::Head::ResentGroup|Mail::Message::Head::ResentGroup>), 
+fields added by mailing list software (implemented in
+L<Mail::Message::Head::ListGroup|Mail::Message::Head::ListGroup>), or fields added by Spam detection
+related software (implemented by L<Mail::Message::Head::SpamGroup|Mail::Message::Head::SpamGroup>).
+Each set of fields can be extracted or added as group with objects
+which are based on the implementation in this class.
+
+Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Reporter|Mail::Reporter/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<clone>()
+
+Make a copy of this object.  The collected fieldnames are copied and the
+list type information.  No deep copy is made for the header: this is
+only copied as reference.
+
+=item $obj-E<gt>B<from>($head|$message)
+
+Create a group of fields based on the specified $message or message $head.
+This may return one or more of the objects, which depends on the
+type of group.  Mailing list fields are all stored in one object,
+where resent and spam groups can appear more than once.
+
+=item $obj-E<gt>B<implementedTypes>()
+
+=item Mail::Message::Head::FieldGroup-E<gt>B<implementedTypes>()
+
+Returns a list of strings containing all possible return values for
+L<type()|Mail::Message::Head::FieldGroup/"Access to the header">.
+
+=item Mail::Message::Head::FieldGroup-E<gt>B<new>($fields, %options)
+
+Construct an object which maintains one set of header $fields.  The
+$fields may be specified as C<Mail::Message::Field> objects or as key-value
+pairs.  The %options and $fields (as key-value pair) can be mixed: they are
+distinguished by their name, where the fields always start with a capital.
+The field objects must aways lead the %options.
+
+ -Option  --Defined in     --Default
+  head                       undef
+  log       Mail::Reporter   'WARNINGS'
+  software                   undef
+  trace     Mail::Reporter   'WARNINGS'
+  type                       undef
+  version                    undef
+
+=over 2
+
+=item head => HEAD
+
+The header HEAD object is used to store the grouped fields in.
+If no header is specified, a L<Mail::Message::Head::Partial|Mail::Message::Head::Partial> is created
+for you.  If you wish to scan the existing fields in a header, then use
+the L<from()|Mail::Message::Head::FieldGroup/"Constructors"> method.
+
+=item log => LEVEL
+
+=item software => STRING
+
+Name of the software which produced the fields.
+
+=item trace => LEVEL
+
+=item type => STRING
+
+Group name for the fields.  Often the same, or close
+to the same STRING, as the C<software> option contains.
+
+=item version => STRING
+
+Version number for the software which produced the fields.
+
+=back
+
+=back
+
+=head2 The header
+
+=over 4
+
+=item $obj-E<gt>B<add>( <$field, $value> | $object )
+
+Add a field to the header, using the field group.  When the field group
+is already attached to a real message header, it will appear in that
+one as well as being registed in this set.  If no header is defined,
+the field only appears internally.
+
+example: adding a field to a detached list group
+
+ my $this = Mail::Message::Head::ListGroup->new(...);
+ $this->add('List-Id' => 'mailbox');
+ $msg->addListGroup($this);
+ $msg->send;
+
+example: adding a field to an attached list group
+
+ my $lg = Mail::Message::Head::ListGroup->from($msg);
+ $lg->add('List-Id' => 'mailbox');
+
+=item $obj-E<gt>B<addFields>( [$fieldnames] )
+
+Add some $fieldnames to the set.
+
+=item $obj-E<gt>B<attach>($head)
+
+Add a group of fields to a message $head.  The fields will be cloned(!)
+into the header, so that the field group object can be used again.
+
+example: attaching a list group to a message
+
+ my $lg = Mail::Message::Head::ListGroup->new(...);
+ $lg->attach($msg->head);
+ $msg->head->addListGroup($lg);   # same
+
+ $msg->head->addSpamGroup($sg);   # also implemented with attach
+
+=item $obj-E<gt>B<delete>()
+
+Remove all the header lines which are combined in this fields group,
+from the header.
+
+=item $obj-E<gt>B<fieldNames>()
+
+Return the names of the fields which are used in this group.
+
+=item $obj-E<gt>B<fields>()
+
+Return the fields which are defined for this group.
+
+=item $obj-E<gt>B<head>()
+
+Returns the header object, which includes these fields.
+
+=back
+
+=head2 Access to the header
+
+=over 4
+
+=item $obj-E<gt>B<software>()
+
+Returns the name of the software as is defined in the headers.  The may
+be slightly different from the return value of L<type()|Mail::Message::Head::FieldGroup/"Access to the header">, but usually
+not too different.
+
+=item $obj-E<gt>B<type>()
+
+Returns an abstract name for the field group; which software is
+controling it.  C<undef> is returned in case the type is not known.
+Valid names are group type dependent: see the applicable manual
+pages.  A list of all types can be retrieved with L<implementedTypes()|Mail::Message::Head::FieldGroup/"Constructors">.
+
+=item $obj-E<gt>B<version>()
+
+Returns the version number of the software used to produce the fields.
+Some kinds of software do leave such a trace, other cases will return
+C<undef>
+
+=back
+
+=head2 Internals
+
+=over 4
+
+=item $obj-E<gt>B<collectFields>( [$name] )
+
+Scan the header for fields which are usually contained in field group
+with the specified $name.  For mailinglist groups, you can not specify
+a $name: only one set of headers will be found (all headers are considered
+to be produced by exactly one package of mailinglist software).
+
+This method is automatically called when a field group is
+constructed via L<from()|Mail::Message::Head::FieldGroup/"Constructors"> on an existing header or message.
+
+Returned are the names of the list header fields found, in scalar
+context the amount of fields.  An empty list/zero indicates that there
+was no group to be found.
+
+Please warn the author of MailBox if you see that to few
+or too many fields are included.
+
+=item $obj-E<gt>B<detected>($type, $software, $version)
+
+Sets the values for the field group type, software, and version,
+prossibly to C<undef>.
+
+=back
+
+=head2 Error handling
+
+Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
+ 
+=over 4
+
+=item $obj-E<gt>B<AUTOLOAD>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<addReport>($object)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+=item Mail::Message::Head::FieldGroup-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<details>()
+
+Produce information about the detected/created field group, which may be
+helpful during debugging.  A nicely formatted string is returned.
+
+=item $obj-E<gt>B<errors>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<log>( [$level, [$strings]] )
+
+=item Mail::Message::Head::FieldGroup-E<gt>B<log>( [$level, [$strings]] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logPriority>($level)
+
+=item Mail::Message::Head::FieldGroup-E<gt>B<logPriority>($level)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<notImplemented>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<print>( [$fh] )
+
+Print the group to the specified $fh or GLOB.  This is probably only
+useful for debugging purposed.  The output defaults to the selected file
+handle.
+
+=item $obj-E<gt>B<report>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<reportAll>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<trace>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<warnings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=back
+
+=head2 Cleanup
+
+Extends L<"Cleanup" in Mail::Reporter|Mail::Reporter/"Cleanup">.
+ 
+=over 4
+
+=item $obj-E<gt>B<DESTROY>()
+
+Inherited, see L<Mail::Reporter/"Cleanup">
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Message distribution version 3.000,
+built on February 02, 2017.
+
+Do not forget to read
+L</Mail::Box-Overview>,
+L</Mail::Box-Cookbook>, and
+L</Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L</Mail::Message>,
+L</Mail::Box>,
+L</Mail::Box::IMAP4>,
+L</Mail::Box::POP3>,
+L</Mail::Box::Parser::C>,
+L</Mail::Box::Dbx> (unpublished),
+L</Mail::Transport>,
+L</Object::Realize::Later>, and
+L</User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

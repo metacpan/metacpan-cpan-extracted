@@ -1,0 +1,21 @@
+---
+abstract: 'Automatically add debugging output with a role'
+author:
+  - 'Dave Houston <dhouston@cpan.org>'
+build_requires:
+  Moose: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200014, CPAN::Meta::Converter version 2.101610'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Role-Debugger
+requires:
+  Data::Dumper: 0
+  Log::Dispatch: 0
+  MooseX::Role::Parameterized: 0
+version: 1.112680

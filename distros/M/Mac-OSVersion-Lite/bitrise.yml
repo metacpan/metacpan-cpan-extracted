@@ -1,0 +1,52 @@
+---
+format_version: 1.1.0
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+app:
+  envs:
+  - BITRISE_PROJECT_PATH: MyProject.xcworkspace
+    opts:
+      is_expand: false
+  - BITRISE_SCHEME: MyProject
+    opts:
+      is_expand: false
+trigger_map:
+- pattern: "*"
+  is_pull_request_allowed: true
+  workflow: primary
+workflows:
+  primary:
+    steps:
+    - activate-ssh-key@3.1.0:
+        title: Activate App SSH key
+        inputs:
+        - ssh_key_save_path: "$HOME/.ssh/steplib_ssh_step_id_rsa"
+    - git-clone@3.2.0: {}
+    - script@1.1.0:
+        inputs:
+        - content: |-
+            #!/bin/bash
+
+            set -xe
+
+            # machine
+            perl --version
+            curl -L https://cpanmin.us | perl - --sudo App::cpanminus
+            cpanm --version
+
+            # dependencies
+            sudo cpanm --quiet --installdeps --notest .
+
+            # test
+            prove -r xt t
+    - slack@2.1.0:
+        inputs:
+        - webhook_url: "$SLACK_WEBHOOK_URL"
+        - channel: "$SLACK_CHANNEL_NAME"
+        - message: |-
+            Success:  ${GIT_CLONE_COMMIT_COMMITER_NAME}'s build (<$BITRISE_BUILD_URL|#$BITRISE_BUILD_NUMBER>; push in $BITRISE_GIT_BRANCH)
+            - $GIT_CLONE_COMMIT_MESSAGE_SUBJECT (commit by $GIT_CLONE_COMMIT_AUTHOR_NAME)
+        - message_on_error: |-
+            Failed:  ${GIT_CLONE_COMMIT_COMMITER_NAME}'s build (<$BITRISE_BUILD_URL|#$BITRISE_BUILD_NUMBER>; push in $BITRISE_GIT_BRANCH)
+            - $GIT_CLONE_COMMIT_MESSAGE_SUBJECT (commit by $GIT_CLONE_COMMIT_AUTHOR_NAME)
+        - icon_url: https://bitrise-public-content-production.s3.amazonaws.com/slack/bitrise-slack-icon-128.png
+        - icon_url_on_error: https://bitrise-public-content-production.s3.amazonaws.com/slack/bitrise-slack-error-icon-128.png

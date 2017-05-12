@@ -1,0 +1,24 @@
+2.00      2015-07-26 14:33:45CEST+0200 Europe/Paris
+
+0.15      2014-01-30 16:36:27 Europe/Amsterdam
+
+   * fix doc
+   * fix oo
+
+0.14      2014-01-30 15:54:36 Europe/Amsterdam
+
+   * fixed typo
+
+0.13      2014-01-30 15:05:41 Europe/Amsterdam
+
+0.12      2014-01-30 09:12:53 Europe/Amsterdam
+
+   * better implementation by leont
+
+0.11      2014-01-24 21:08:41 Europe/Amsterdam
+
+   * fix Moo::Role::Lax
+
+0.10      2014-01-24 15:33:41 Europe/Amsterdam
+
+   * Initial version

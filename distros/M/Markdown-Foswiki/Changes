@@ -1,0 +1,9 @@
+Revision history for Perl extension Markdown::Foswiki
+
+0.04 	Fri Aug  3 19:27:00 2012
+	- Added indent detecting
+	- fixed heading detecting
+
+0.01    Wed Aug  1 22:48:13 2012
+        - original version
+

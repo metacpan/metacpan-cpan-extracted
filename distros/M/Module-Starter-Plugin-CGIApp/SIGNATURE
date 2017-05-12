@@ -1,0 +1,115 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a6ca9cd87d294560a80b7a47e1acc98ecee6a8b7 Build.PL
+SHA1 40dac8b88dfca1f4874d5879b52e090b055117e6 Changes
+SHA1 ce3f985435aece820b9be0e5217610895abe646b LICENSE
+SHA1 c242b56bd57ae3cd2eaeff7cd3d31e018706f8a0 MANIFEST
+SHA1 9d10f94124fcae34e9a7500cde4565a11be1621e MANIFEST.SKIP
+SHA1 439b3e5eef8f193bc8b295db6fb445ec83a9a4e8 META.json
+SHA1 c22e028e5ffad812e991aed97695bf69f919bd8c META.yml
+SHA1 8e6d588032d41595ece90004c31fba7bd6795fa7 Makefile.PL
+SHA1 993eec9e69dcb520922a7e1e7e1330f1b926b5b8 README
+SHA1 5259a3b84f7a4dc8ea541c13644ddc47588867b9 lib/Module/Starter/Plugin/CGIApp.pm
+SHA1 6ca6aced83f25d942129c0e69d0b4dd21fe5ddfa script/cgiapp-starter
+SHA1 cfbb033f0a37cc1e8542404a01b6e25483c79416 script/titanium-starter
+SHA1 8a0a63e135ba8bcbab4744aab395fe27faf537a7 share/default/00-signature.t
+SHA1 8c405c914b61c6171da873e4260c9634dbc8d76e share/default/01-load.t
+SHA1 f2deb3547161a1882fc024b19edd9ce3d502b068 share/default/Build.PL
+SHA1 91087ccb4525b5af4d168f946c7bb7878abb2ea2 share/default/Changes
+SHA1 2c5849241c482428e23801305486b9651de8baa7 share/default/LICENSE
+SHA1 80de39ff12248eb03cdc3a1d0701a66d94cd43fe share/default/MANIFEST
+SHA1 b1e0b8ac5a4d3f5d21c5d8608f4cca5fc140bdcc share/default/MANIFEST.SKIP
+SHA1 3b4a87109f774d03d534eae3a8678a8ec4da3ebe share/default/MI_Makefile.PL
+SHA1 0bf9519ecfe6c4d52c10a6332aae9b7e1ec87e85 share/default/Makefile.PL
+SHA1 ca6d9165583303ab4cefbf2016a7cda7df94d8b1 share/default/Module.pm
+SHA1 f7f208f403ce4acbaa51ec24b0278459cf6b87db share/default/README
+SHA1 96c92e8b0be1f3873dcd037e2b5be2a6b79f5e0d share/default/boilerplate.t
+SHA1 09a588879d1ca697c1fb6276984555c93b2adbe2 share/default/perl-critic.xt
+SHA1 f51a18380d49d3c6c29e05cd1dfc25efa6239ab0 share/default/perlcriticrc
+SHA1 d713fd862edafbecfccb2153603cad4273746f5b share/default/pod-coverage.xt
+SHA1 8a96ca5f326b34853dbb19b6dcf1c68f05d14ddb share/default/pod.xt
+SHA1 d63e698e19b436569a4bb12343e59f9d85d34cc2 share/default/runmode1.html
+SHA1 62569bc0b39f50facdc9ff28b03af784fda3e603 share/default/server.pl
+SHA1 97d2351c07af35ebd047968d8925b2a579e667a0 share/default/test-app.t
+SHA1 8a0a63e135ba8bcbab4744aab395fe27faf537a7 share/titanium/00-signature.t
+SHA1 8c405c914b61c6171da873e4260c9634dbc8d76e share/titanium/01-load.t
+SHA1 3fef494bd07a12fcbde6b6dbf47a64fad3c2b644 share/titanium/Build.PL
+SHA1 91087ccb4525b5af4d168f946c7bb7878abb2ea2 share/titanium/Changes
+SHA1 2c5849241c482428e23801305486b9651de8baa7 share/titanium/LICENSE
+SHA1 80de39ff12248eb03cdc3a1d0701a66d94cd43fe share/titanium/MANIFEST
+SHA1 b1e0b8ac5a4d3f5d21c5d8608f4cca5fc140bdcc share/titanium/MANIFEST.SKIP
+SHA1 e4015682ce1c6fc90e7ac8a3a9d8950ecaa091f8 share/titanium/MI_Makefile.PL
+SHA1 c74fb4268cc2be2c56e0f66e84185f935b13e367 share/titanium/Makefile.PL
+SHA1 ed55fac92a4da155378aa1f879e78dad97fdb9cf share/titanium/Module.pm
+SHA1 1155e5ca34f948b53cbd1d6f0901ac7ad4270902 share/titanium/README
+SHA1 96c92e8b0be1f3873dcd037e2b5be2a6b79f5e0d share/titanium/boilerplate.t
+SHA1 09a588879d1ca697c1fb6276984555c93b2adbe2 share/titanium/perl-critic.xt
+SHA1 f51a18380d49d3c6c29e05cd1dfc25efa6239ab0 share/titanium/perlcriticrc
+SHA1 d713fd862edafbecfccb2153603cad4273746f5b share/titanium/pod-coverage.xt
+SHA1 8a96ca5f326b34853dbb19b6dcf1c68f05d14ddb share/titanium/pod.xt
+SHA1 d63e698e19b436569a4bb12343e59f9d85d34cc2 share/titanium/runmode1.html
+SHA1 62569bc0b39f50facdc9ff28b03af784fda3e603 share/titanium/server.pl
+SHA1 97d2351c07af35ebd047968d8925b2a579e667a0 share/titanium/test-app.t
+SHA1 ca1a0209441579bee93838d71e4cd9e24f8dd902 t/00-signature.t
+SHA1 d766ad7320334c1280ab24f6c8ac51fb64031d40 t/01-load.t
+SHA1 900da08cf6dd1cdce2465c91147450d0f5971c7c t/common.pm
+SHA1 19f69513bc6e68333125967647dbb31a851fae59 t/eumm/MANIFEST
+SHA1 afc544ce1d32dbb171d6a529152885d9bccc5248 t/eumm/Makefile.PL
+SHA1 f6ba525ca859444b94e53b55b9bb86554c75adf5 t/eumm/README
+SHA1 abe76c767641ac56f0a1e79f6e7c3fa264f52d1c t/eumm/t/boilerplate.t
+SHA1 24b61c542fb84aa072f96b565c9dd379ea5f7c29 t/expected/Changes
+SHA1 e3569e482a26ad33b319dae4e515fbddc5993ef0 t/expected/LICENSE
+SHA1 b1e0b8ac5a4d3f5d21c5d8608f4cca5fc140bdcc t/expected/MANIFEST.SKIP
+SHA1 0aca80bf7eb75087b9ae8c9563cbb0f6c0a8d261 t/expected/lib/Foo/Bar.pm
+SHA1 dd544a6a552a4ad19ec3591d0d3193decd753e23 t/expected/lib/Foo/Baz.pm
+SHA1 98a53f79544711343be3d2a24ef17ceb722958ab t/expected/server.pl
+SHA1 d63e698e19b436569a4bb12343e59f9d85d34cc2 t/expected/share/templates/runmode1.html
+SHA1 8a0a63e135ba8bcbab4744aab395fe27faf537a7 t/expected/t/00-signature.t
+SHA1 effd90546b0bd152ffae6988cfd6e6c1f9a52436 t/expected/t/01-load.t
+SHA1 81913d3ec76c7c225a1fd9d604097fc471a79a6e t/expected/t/test-app.t
+SHA1 b858cb282617fb0956d960215c8e84d1ccf909c6 t/expected/t/www/PUT.STATIC.CONTENT.HERE
+SHA1 25409424b2fb12a85d4b7063195a2d4042e79314 t/expected/xt/perl-critic.t
+SHA1 f51a18380d49d3c6c29e05cd1dfc25efa6239ab0 t/expected/xt/perlcriticrc
+SHA1 d713fd862edafbecfccb2153603cad4273746f5b t/expected/xt/pod-coverage.t
+SHA1 8a96ca5f326b34853dbb19b6dcf1c68f05d14ddb t/expected/xt/pod.t
+SHA1 08dc31e52c4bf5ed29cd083134c152e457a2a686 t/extutils-makemaker.t
+SHA1 3538acda10538075f49d4597738b5a336ac894d4 t/mb/Build.PL
+SHA1 936db2a8177218e2dc75c110b66ac6624cd68d0c t/mb/MANIFEST
+SHA1 ca9e4671972189d3024a65248f69bc20a0ab9861 t/mb/README
+SHA1 d9343608d8651382dbfe03275d7d63d43d86793b t/mb/t/boilerplate.t
+SHA1 19f69513bc6e68333125967647dbb31a851fae59 t/mi/MANIFEST
+SHA1 e94e11975b58787610556d5b6f74da75419b8ba7 t/mi/Makefile.PL
+SHA1 f6ba525ca859444b94e53b55b9bb86554c75adf5 t/mi/README
+SHA1 abe76c767641ac56f0a1e79f6e7c3fa264f52d1c t/mi/t/boilerplate.t
+SHA1 5f51feea37852a2d858469da395fb254808a4acd t/module-build.t
+SHA1 8124b54339dce05e47bc2b25fd40566b818017c1 t/module-install.t
+SHA1 f086b69d330de12bce56a9fa8b65ca4d4da70ad3 xt/distmanifest.t
+SHA1 42f220463b607d72e86f9297e767591a68a1da4a xt/hasversion.t
+SHA1 76e878f3aa3044f37fede07af01c5ef6e2ce730d xt/kwalitee.t
+SHA1 5f59fbc20e0125b835550c698a694b97df09c3dc xt/meta.t
+SHA1 7c77fe425347bc7d8504853e27e3d5218457ae12 xt/minimumversion.t
+SHA1 e64c16d09c2b7821f3110fa33fd5930b97decfad xt/perl-critic.t
+SHA1 f51a18380d49d3c6c29e05cd1dfc25efa6239ab0 xt/perlcriticrc
+SHA1 d713fd862edafbecfccb2153603cad4273746f5b xt/pod-coverage.t
+SHA1 8a96ca5f326b34853dbb19b6dcf1c68f05d14ddb xt/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlX+ePAACgkQIN9eM6kfjrq4MwCgx7paeAFnQImZuAIUPoEzjReS
+FLgAn2BR/dOlhcDqUDsv3Fd/syqm+d0b
+=vv3M
+-----END PGP SIGNATURE-----

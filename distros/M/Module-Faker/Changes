@@ -1,0 +1,67 @@
+Revision history for Module-Faker
+
+0.017     2014-09-01 08:57:25-04:00 America/New_York
+        - fix a bug with dist-to-pkg name conversion (thanks, Randy Stauner)
+
+0.016     2013-11-05 22:13:08 America/New_York
+        - require a newer CPAN::Meta
+
+0.015     2013-10-22 18:53:18 America/New_York
+          [THIS MIGHT BREAK YOUR CODE]
+        - Adds META.json and CPAN::META::Spec v2 support (thanks, David
+          Golden!)  If you were using ->provides to get objects, you should now
+          use ->packages instead.
+
+0.014     2013-04-29 08:00:05 America/New_York
+          like 0.013, but with the promised change!
+
+0.013     2013-04-29 07:58:54 America/New_York
+          drop // use to continue to support 5.8.8 (thank Jeffrey Ryan
+          Thalhammer for this one!)
+
+0.012     2012-10-22 17:38:27 America/New_York
+          allow the mtime to be set via extra info (thanks, Moritz Onken!)
+
+0.011     2012-09-05 09:11:21 America/New_York
+          add a VERSION to ::Module, add abstracts
+
+0.010     2012-09-03 21:38:01 America/New_York
+          encode append content to UTF-8 before appending it (thanks, Randy
+          Stauner!)
+
+0.009     2011-04-25 10:57:47 America/New_York
+          allow content to be appended to arbitrary files (thanks, Moritz
+          Onken!)
+
+0.008     2011-04-18 11:02:50 Europe/Amsterdam
+          .dist files can be used to populate entirely from distnameinfo
+
+0.007     2011-04-16 18:02:12 Europe/Amsterdam
+          "Faker" key in meta files is now "X_Module_Faker"
+
+          build fake dists from .json files, too
+
+0.006     2008-04-08
+          if source meta has "requires" put them in PREREQ_PM in Makefile.PL
+            (thanks, HDP, for bugfix)
+
+0.005     2008-03-20
+          add (possibly to-be-renamed) Faker.order key to provides
+
+0.004     2008-03-15
+          add omitted_files option (and test)
+          add some documentation
+          crank up the Moose prereq number to support ArrayRef[Foo]
+
+0.003     2008-03-14
+          renamed from ExtUtils-FakeMaker; MSCHWERN notes that ExtUtils is
+          basically a misunderstood and deprecated namespace
+
+0.002     2008-03-13
+          support perl 5.8
+          apparently my employers want to be able to use this code that I wrote
+          for work! ha!
+
+0.001     2008-03-13
+          first revision, basically no documentation or tests, but hey! at
+          least I got it out the door

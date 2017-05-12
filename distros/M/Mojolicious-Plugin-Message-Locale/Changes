@@ -1,0 +1,8 @@
+Revision history for Mojolicious Plugin Mojolicious-Plugin-Message-Locale
+
+0.01
+        First version.
+0.02
+        I forgot to specify the encoding of pod
+0.03
+        Add the PREREQ_PM to Manifest.PL

@@ -1,0 +1,58 @@
+{
+   "abstract" : "Basic HTTP Auth Helper Plus",
+   "author" : [
+      "Brad Robertson <blr@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-BasicAuthPlus",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Mojo::ByteStream" : "0",
+            "Mojo::IOLoop" : "0",
+            "Mojolicious::Lite" : "0",
+            "Test::Mojo" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::Simple::LDAP" : "0",
+            "Authen::Simple::Passwd" : "0",
+            "Authen::Simple::Password" : "0",
+            "Mojolicious" : "1.4",
+            "Test::More" : "0",
+            "perl" : "5.006001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/stregone/mojolicious-plugin-basicauthplus/issues"
+      },
+      "repository" : {
+         "url" : "http://github.com/stregone/mojolicious-plugin-basicauthplus"
+      }
+   },
+   "version" : "v0.10.2"
+}

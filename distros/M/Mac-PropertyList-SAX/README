@@ -1,0 +1,45 @@
+Mac-PropertyList-SAX
+
+This file describes Mac::PropertyList::SAX, which extends Mac::PropertyList,
+using a "real" XML parser from XML::SAX::ParserFactory to speed up processing
+of large files (small files may suffer a reduction in performance due to the
+overhead of invoking the parser).
+
+See the module POD and Mac::PropertyList for more information.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Mac::PropertyList::SAX
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Mac-PropertyList-SAX
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mac-PropertyList-SAX
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Mac-PropertyList-SAX
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Mac-PropertyList-SAX
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Darren M. Kulp
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

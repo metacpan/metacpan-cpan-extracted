@@ -1,0 +1,25 @@
+---
+abstract: "Implementations of Fortran's sign() and log10()."
+author:
+  - 'J. A. R. Williams'
+  - 'John M. Gamble <jgamble@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4203, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Fortran
+provides:
+  Math::Fortran:
+    file: lib/Math/Fortran.pm
+    version: '0.03'
+requires:
+  perl: v5.8.3
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.03'

@@ -1,0 +1,42 @@
+---
+name: Module-Release-CSJEWELL
+version: 0.101
+author:
+  - 'Curtis Jewell <CSJewell@cpan.org>'
+abstract: Plugins for Module::Release.
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Module-Release-CSJEWELL
+  homepage: http://csjewell.comyr.com/perl/
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/Module-Release-CSJEWELL/
+build_requires:
+  Test::More: 0.61
+requires:
+  Archive::Tar: 1.52
+  Module::Release: 2.05
+  Net::Twitter: 3.04006
+  parent: 0.221
+  perl: 5.008001
+configure_requires:
+  Module::Build: 0.33
+provides:
+  Module::Release::CSJEWELL:
+    file: lib/Module/Release/CSJEWELL.pm
+    version: 0.101
+  Module::Release::OpenRepository:
+    file: lib/Module/Release/OpenRepository.pm
+    version: 0.101
+  Module::Release::PermissionFix:
+    file: lib/Module/Release/PermissionFix.pm
+    version: 0.101
+  Module::Release::Twitter:
+    file: lib/Module/Release/Twitter.pm
+    version: 0.101
+  Module::Release::UploadOwnSite:
+    file: lib/Module/Release/UploadOwnSite.pm
+    version: 0.101
+generated_by: Module::Build version 0.34
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

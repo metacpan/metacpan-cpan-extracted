@@ -1,0 +1,27 @@
+WARNING: These tests should not be run in production.
+
+Note that these tests were created to aid development and to test my
+assumptions, so there might be a few things here (why and how) that do not make
+any sense.
+
+The MySQL::Replication::Server::GetQuery.t test script currently runs on
+binlogs generated on my machine so it's not helpful to anyone else at the
+moment. In the future I plan to automate creating test binlogs using
+MySQL::Sandbox so that multiple versions of MySQL can be tested without the
+contortions that I currently have to do in order to recreate them:
+
+  - stop MySQL
+	- set MySQL's log_bin to /tmp/test-bin.log
+	- remove the old binlog in binlogs/
+	- touch /tmp/test-bin.000032 so the next will be test-bin.000033
+	- restart MySQL
+	- import binlogs/get_query_test.sql
+	- copy /tmp/test-bin.00003[345] to binlogs/
+	- run make to recreate the binlog index
+	- update positions and timestamps in
+		- MySQL::Replication::Server::GetQuery.t 
+		- MySQL::Replication::Test.pl
+
+That last step is tedious. Adding "print Dumper( $Self )" in
+MySQL::Replication::Server::GetQuery::BinlogReadHandler() will help you find
+the positions you're looking for.

@@ -1,0 +1,48 @@
+{
+   "abstract" : "MySQL migration tool for Mojolicious",
+   "author" : [
+      "Alexey Likhatskiy <likhatskiy\@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Command-migration",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::mysql" : "0",
+            "DBI" : "0",
+            "Getopt::Long" : "0",
+            "Mojolicious" : "4",
+            "SQL::Translator" : "0",
+            "SQL::Translator::Diff" : "0",
+            "Test::Simple" : "0.44",
+            "common::sense" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : 0.15
+}

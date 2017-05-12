@@ -1,0 +1,8 @@
+Revision history for Perl extension Mojo::Plugin::PetalTinyRenderer
+
+0.05      2015-06-15 14:31:12+02:00 Europe/Copenhagen
+	- Fix some confusing error messages.
+0.04      2014-09-19 13:25:56+02:00 Europe/Copenhagen
+        - If installed, use XML::Validate to give a better error-message if Petal::Tiny blows up.
+0.03      2014-07-31 16:07:15+02:00 Europe/Copenhagen
+        - Added support for Mojo::Collection every place Petal::Tiny expressions expect an array-ref

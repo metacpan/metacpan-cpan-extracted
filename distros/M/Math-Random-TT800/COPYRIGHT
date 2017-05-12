@@ -1,0 +1,11 @@
+
+Orginal C implementation of the tt800 was published by M. Matsumoto
+<matumoto@math.keio.ac.jp>. 
+
+This Perl extension was written by Otmar Lendl (lendl@cosy.sbg.ac.at)
+for the Perl Journal.
+
+Copyright (c) 1997 by Otmar Lendl (Perl and XS code). All rights
+reserved. This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

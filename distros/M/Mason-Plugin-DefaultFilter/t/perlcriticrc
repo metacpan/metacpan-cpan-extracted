@@ -1,0 +1,38 @@
+severity = 1
+verbose  = 9
+
+[Documentation::PodSpelling]
+stop_words = Clouse QQ plugin JavaScript
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | AUTHOR | COPYRIGHT AND LICENSE
+
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+private_name_regex = _(?!build_)\w+
+
+[Subroutines::RequireArgUnpacking]
+allow_delegation_to = next::method
+short_subroutine_statements = 2
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Mason::PluginRole
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Mason::PluginRole
+
+[Variables::ProhibitPackageVars]
+packages = Text::Wrap
+
+[Variables::ProhibitPunctuationVars]
+allow = $@ $!
+
+[-CodeLayout::ProhibitParensWithBuiltins]
+[-CodeLayout::RequireTidyCode]
+[-Documentation::RequirePodAtEnd]
+[-Miscellanea::RequireRcsKeywords]
+[-Moose::RequireCleanNamespace]
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireLineBoundaryMatching]
+[-Subroutines::ProhibitBuiltinHomonyms]
+[-ValuesAndExpressions::ProhibitEscapedCharacters]

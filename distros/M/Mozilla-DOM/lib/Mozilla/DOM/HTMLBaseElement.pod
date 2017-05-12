@@ -1,0 +1,66 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLBaseElement
+
+=for object Mozilla::DOM::HTMLBaseElement
+
+Mozilla::DOM::HTMLBaseElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLBaseElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLBaseElement interface is the interface to a [X]HTML
+ * base element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLBaseElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $href = $htmlbaseelement->B<GetHref>()
+
+=head2 $target = $htmlbaseelement->B<GetTarget>()
+
+=head2 $htmlbaseelement->B<SetHref>($href)
+
+=over
+
+=over
+
+=item * $href (string)
+
+=back
+
+=back
+
+=head2 $htmlbaseelement->B<SetTarget>($target)
+
+=over
+
+=over
+
+=item * $target (string)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

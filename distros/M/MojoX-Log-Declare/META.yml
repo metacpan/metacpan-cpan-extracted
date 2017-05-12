@@ -1,0 +1,26 @@
+---
+abstract: 'Integrate Log::Declare with Mojolicious'
+author:
+  - 'Companies House <chgovuk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.92, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MojoX-Log-Declare
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  Log::Declare: 0.03
+  Mojolicious: 4.68
+resources:
+  repository: https://github.com/companieshouse/MojoX-Log-Declare
+version: 0.03

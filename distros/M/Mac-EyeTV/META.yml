@@ -1,0 +1,25 @@
+---
+name: Mac-EyeTV
+version: 0.30
+author:
+  - Leon Brocard <acme@astray.com>.
+abstract: Interface to the Elgato EyeTV Digital Video Recorder
+license: perl
+requires:
+  Class::Accessor::Fast: 0
+  DateTime: 0
+  DateTime::Format::Strptime: 0
+  Mac::AppleScript: 0
+  Mac::Glue: 0
+  URI::file: 0
+provides:
+  Mac::EyeTV:
+    file: lib/Mac/EyeTV.pm
+    version: 0.30
+  Mac::EyeTV::Channel:
+    file: lib/Mac/EyeTV/Channel.pm
+  Mac::EyeTV::Programme:
+    file: lib/Mac/EyeTV/Programme.pm
+  Mac::EyeTV::Recording:
+    file: lib/Mac/EyeTV/Recording.pm
+generated_by: Module::Build version 0.2611

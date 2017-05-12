@@ -1,0 +1,10 @@
+Revision history for MySQL-mycrud
+
+0.01    2012-11-15
+        First version, released on Ubuntu server 9.10
+
+0.02    2014-05-20
+        Get rid of the default arguments for new() method
+
+0.03    2014-05-20
+        set PrintError => 0 when making connection

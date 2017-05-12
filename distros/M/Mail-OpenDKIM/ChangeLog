@@ -1,0 +1,70 @@
+2015-08-28  Matthew Seaman <m.seaman@infracaninophile.co.uk>
+
+	* typemap: remove now unused policy-related types.
+	* lib/Mail/OpenDKIM.pm: new version 4203
+
+2015-08-26  Matthew Seaman <m.seaman@infracaninophile.co.uk>
+
+	* Import sources into a GitHub repo and add various meta-data
+	links to the new repo
+	* Strip out SVN replacable tokens.  Set $VERSION manually
+	* New version: 4202
+
+2015-08-13  Matthew Seaman <m.seaman@infracaninophile.co.uk>
+
+	* OpenDKIM.xs Remove wrappers around library functions not present
+	in libopendkim.so 2.10
+	* lib/Mail/OpenDKIM.pm Remove functions no longer supported in
+	libopendkim.  Import all the constants from dkim.h
+
+2014-01-22  Vivek Khera  <vivek@khera.org>
+
+	* OpenDKIM.xs: trace down and squash some core dumps with FreeBSD
+	10.0 clang compiler.
+
+2014-01-15  Vick Khera  <vivek@khera.org>
+
+	* OpenDKIM.xs: some compilers complain about return without value
+	on non-void functions so always return a value.
+
+2013-06-18  Vick Khera  <vivek@khera.org>
+
+	* OpenDKIM.xs: char ** pointers break in 5.16, use char *& in
+	  function _dkim_diffheaders().
+	* Makefile.PL: -O2 causes _dkim_ohdrs() to segfault with perl 5.16
+	  and gcc 4.2.1 on FreeBSD 9.1, so build instead with -O0.
+
+2013-02-28  Vick Khera  <vivek@khera.org>
+
+	* OpenDKIM.xs: dkim_get_msgdate function seems to not be in 2.7
+	  either, cannot tell if it is in 2.6 so just disabling it if
+	  older than 2.7.
+
+2013-02-28  Vick Khera  <vivek@khera.org>
+
+	* lib/Mail/OpenDKIM.pm: updated to support OpenDKIM 2.8.0 API,
+	  keeping backwards compatibility with 2.7 API.
+
+2012-03-14  Vick Khera  <vivek@khera.org>
+
+	* lib/Mail/OpenDKIM.pm: updated for OpenDKIM 2.5.0 API; this is
+	  not backwards compatible with older OpenDKIM
+
+2011-06-16  Nigel Horne <nigel@mailermailer.com>
+	* fix tests that fail with OpenDKIM2.4.0
+	* Makefile.PL: added better (i.e. fatal) test to check that the
+		OpenDKIM library has been installed
+
+2011-05-24  Vivek Khera  <vivek@mailermailer.com>
+
+	* lib/Mail/OpenDKIM/Signer.pm fix incompatibility with mod_perl,
+	which does not run INIT blocks.  Do dkim_init on first call to
+	sign() method.
+
+2011-05-18  Vivek Khera  <vivek@mailermailer.com>
+
+	* lib/Mail/OpenDKIM/Signer.pm make dkim object a singleton.
+
+2011-04-27  Nigel Horne  <nigel@mailermailer.com>
+
+	* OpenDKIM Initial Release version 3186

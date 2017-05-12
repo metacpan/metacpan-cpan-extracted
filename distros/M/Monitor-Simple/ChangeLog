@@ -1,0 +1,83 @@
+2013-06-08  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.2.8 released.
+
+	* Fixed tests (some where depending on the order of keys in a
+	hash).
+
+2013-06-03  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.2.7 released.
+
+	* Fixed some tests in order to work under Windows (patches
+	contributed by GWS@cpan.org).
+
+	* Version 0.2.6 released.
+
+	* Moved to the GitHub repository => bugtracker changed
+
+
+2012-04-07  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.2.5 released
+
+	* Updated distribution (more release and author tests).
+
+	* Fixed testing of external plugins (avoiding the case where the
+	invoking perl differs from the default one).
+
+2011-11-16  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.2.4 released
+
+	* Fixed (hopefully finally) the parallel access to the report
+	files in outputters
+
+2011-10-26  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Fixed /usr/bin/perl to /usr/bin/env perl in plugins and
+	notifiers.
+
+2011-10-25  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Temporary version 0.2.3 released.
+
+	* Fixed some tests.
+
+2011-10-24  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Temporary version 0.2.2 released.
+
+	* Removing the failing tests.
+
+	* Playing with locking, closing and DESTROY in Output.pm.
+
+2011-10-23  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.2.1 released
+
+2011-10-11  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Fixed mandatory arguments for check_services().
+
+	* Fixed passing filters as a hashref to check_services().
+
+	* Fixed closing output files in outputters in time; adding there
+	also autoflushing.
+
+2011-10-10  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Fixed small bugs in Config.pm and Notifier.pm.
+
+	* Added tests.
+
+	* Fixed sending more emails from a single notifier.
+
+2011-10-08  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Added timeout option for check-prg.pl plugin.
+
+2011-09-26  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.1.0 released
+

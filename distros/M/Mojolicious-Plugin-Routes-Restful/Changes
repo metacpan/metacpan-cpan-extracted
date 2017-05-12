@@ -1,0 +1,17 @@
+Revsion History for Mojolicious::Plugin::Routes::Restful
+
+0.01 Initial kick at the can. 
+
+0.02 Bug Fixes 
+    #2 RETREIVE should be RETRIEVE, From: Dave Baker, Fix: John scoles 
+    #3 PRIFIX should be PREFIX, From: William Lindley (https://github.com/lindleyw)  Fix: John Scoles
+    #4 Pod Cleanup, From William Lindley (https://github.com/lindleyw)  Fix: William Lindley
+    #5 Test Commented out, From: John Scoles Fix: John Scoles
+    #6 Extend Test Suite, From Aristotle Fix: John Scoles
+    #8 Found bug on review had 'resource' ranther than 'RESOURCE' in code
+     
+0.03 Bug Fixes 
+    Fix for parent stash overwriteing child stash values Fix: John Scoles
+    New "ROUTE" Directive Fix: John Scoles
+    POD fix 'Via' to 'VIA' Fix: John Scoles
+    Bug fix for API UPDATE directive Fix: John Scoles

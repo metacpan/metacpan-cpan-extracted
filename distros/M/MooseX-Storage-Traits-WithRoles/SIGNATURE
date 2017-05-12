@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2af763a5116a8c87a64428d569bfaaede2bfadaa AUTHOR_PLEDGE
+SHA1 9a812fe29bc93b52667932a46c5f7246a95e4fd3 CONTRIBUTORS
+SHA1 87670a91440633140fadafab906db525fc72c6e7 Changes
+SHA1 03aac3c82fffba41271df679177033d8eb36b274 INSTALL
+SHA1 5b807b764a3d24ce4f99fc96878cfe82bcc03288 LICENSE
+SHA1 7c6464c376c81f21e4110fd3cf08f72a816f9d3b MANIFEST
+SHA1 4620c53837708877f37097e5f17e9366a751ebbc META.json
+SHA1 b75737d1b1ffd90335a8fce3c71e39651a59ff21 META.yml
+SHA1 9d3cee8add32dea29e10fd5947c39a729aa781ab Makefile.PL
+SHA1 add1adb925d25c00371e73023ab535ad33f2bed8 README
+SHA1 f5a11c58cdd9fa0f4bbc820ba2ef998a9c23bdd6 README.mkdn
+SHA1 b4b68ecb1b17493bddaa348d05cf670bb6a65f24 cpanfile
+SHA1 74b6b5852b0e55e4b89bc733ae4572c6c034ab8c doap.xml
+SHA1 a671e4c2b8241c24ffcd8e2db1cf8bf68f4ede25 lib/MooseX/Storage/Base/SerializedClass.pm
+SHA1 996ad28973bf494df707861fc3acda1eab5503b3 lib/MooseX/Storage/Engine/Trait/WithRoles.pm
+SHA1 30f18dd6dddb247e34c581803b6079d97fba39be lib/MooseX/Storage/Traits/WithRoles.pm
+SHA1 3ece890e1ef85939d3b1de0be231be58b071b6d6 t/00-compile.t
+SHA1 210f0b1ea7feda45d70adca307148699eacc8f5d t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 068173830f048deecc69c79902fa92a002d76fc1 t/pack-roles.t
+SHA1 287452bd802908e443ba57da2920932141aa3710 t/parameterized_roles.t
+SHA1 f34f3dd716b4a697254c3bc0b7edb0fe11d66e27 t/superclass_roles.t
+SHA1 80ab1faf5d8174920b60461bf8c11e2225861f42 xt/release/pause-permissions.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlaYQwwACgkQ34Hwf+GwC4yQZgCgxdtPhY3TWdFPnxj32kkaaVVt
+fFcAoNboTcosy0ENkxfaJJqRXqqCbdeo
+=CF9I
+-----END PGP SIGNATURE-----

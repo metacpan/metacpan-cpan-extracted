@@ -1,0 +1,36 @@
+NAME
+
+    Module::ThirdParty - Provide information for 3rd party modules (outside CPAN)
+
+
+DESCRIPTION
+
+    This distribution includes a module and a command that permit to know 
+    whether a module, otherwise unknown to the CPAN, is in fact to be 
+    installed from a third party software provider. 
+
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    Alternatively, to install with Module::Build, you can use the 
+    following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2005, 2006, 2007, 2008 Sébastien Aperghis-Tramoni
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.

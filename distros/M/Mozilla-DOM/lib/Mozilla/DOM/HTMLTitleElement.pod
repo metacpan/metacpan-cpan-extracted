@@ -1,0 +1,52 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLTitleElement
+
+=for object Mozilla::DOM::HTMLTitleElement
+
+Mozilla::DOM::HTMLTitleElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLTitleElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLTitleElement interface is the interface to a [X]HTML
+ * title element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLTitleElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $text = $htmltitleelement->B<GetText>()
+
+=head2 $htmltitleelement->B<SetText>($text)
+
+=over
+
+=over
+
+=item * $text (string)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

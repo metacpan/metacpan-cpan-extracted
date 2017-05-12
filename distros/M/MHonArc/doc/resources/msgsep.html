@@ -1,0 +1,150 @@
+<html>
+<head>
+<title>MHonArc Resources: MSGSEP</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="msgprefix.html">MSGPREFIX</a>]</td><td><nobr>[<a href="../resources.html#msgsep">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="multipg.html">MULTIPG</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>MSGSEP</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p>
+<code>M2H_MSGSEP=</code><var>Perl-regexp</var>
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p>
+<code>&lt;MSGSEP&gt;<br></code>
+<var>Perl-regexp</var><br>
+<code>&lt;/MSGSEP&gt;<br></code>
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p>
+<code>-msgsep </code><var>Perl-regexp</var>
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>MSGSEP defines the Perl regular expression that represents the
+message separator for mailbox files.  </p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<pre>
+^From 
+</pre>
+
+<p><strong>Note</strong>: There is a space character after
+"<code>From</code>".
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>Some MTAs do not escape lines that start with "<tt>From </tt>".
+This will cause <em>MHonArc</em> to split a message into separate
+messages since it will treat the line as a message separator
+(if <em>MHonArc</em> is processing a mailbox file).  One
+way to help avoid this problem is to set the MSGSEP resource to
+a more specific regular expression.  For example:
+</p>
+
+<pre>
+<b>&lt;MSGSEP></b>
+^From \S+\s+\S+\s+\S+\s+\d+\s+\d+:\d+:\d+\s+\d+
+<b>&lt;/MSGSEP></b>
+</pre>
+
+<p>or</p>
+
+<pre>
+<b>&lt;MSGSEP></b>
+^From\s+(?:"[^"]+"<!--
+-->&#64;<!--
+-->\S+|\S+)\s+\S+\s+\S+\s+\d+\s+\d+:\d+:\d+\s+\d+
+<b>&lt;/MSGSEP></b>
+</pre>
+
+<p>The second version deals with some systems that have quoted
+local parts in the address listed in the separator.
+</p>
+
+<p>It is still possible to get bogus splitting if a message
+contains a line that matches the regexp.
+Therefore, you may
+want to activate the <a href="conlen.html">CONLEN</a> resource,
+if applicable.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>1.0
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+<a href="conlen.html">CONLEN</a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="msgprefix.html">MSGPREFIX</a>]</td><td><nobr>[<a href="../resources.html#msgsep">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="multipg.html">MULTIPG</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2003/10/06 22:04:18 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"><strong>MHonArc</strong></a><br>
+Copyright &#169; 1997-1998, <a href="http://www.earlhood.com/">Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org">mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

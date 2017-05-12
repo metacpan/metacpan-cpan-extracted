@@ -1,0 +1,27 @@
+---
+abstract: 'Mailchimp V2 API'
+author:
+  - 'Lenz Gschwendtner <lenz@springtimesoft.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mail-Chimp2
+requires:
+  Data::Dump: 0
+  Getopt::Long: 0
+  Mouse: 0
+  Text::CSV: 0
+  Web::API: 0
+  perl: 5.012
+  strict: 0
+resources:
+  bugtracker: https://github.com/norbu09/Mail-Chimp2/issues
+  homepage: https://github.com/norbu09/Mail-Chimp2/wiki
+  repository: git://github.com/norbu09/Mail-Chimp2.git
+version: 0.5

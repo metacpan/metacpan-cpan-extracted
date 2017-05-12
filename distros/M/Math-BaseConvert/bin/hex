@@ -1,0 +1,4 @@
+#!/usr/bin/perl
+# 45UBvZt - hex (CoNVert decimal string parameter to hexadecimal) as part of the Math::BaseConvert package
+use strict; use warnings; use Math::BaseConvert qw(hex);
+my $numb = shift; die("USAGE: `hex <DecimalNumberStringToConvertToHexadecimal>`\n") if(!defined($numb) || $numb =~ /^-+[h\?]/i); print(hex($numb));

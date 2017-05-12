@@ -1,0 +1,18 @@
+digraph Perl
+{
+graph [ rankdir="TB" ]
+node [ shape="oval" ]
+edge [ color="grey" ]
+"node.1" [ label="n 1" ]
+"50" [ color="invis" label="" shape="point" width="0" ]
+"" [ label="n 2" ]
+"node.3" [ label="n 3" ]
+"57" [ color="invis" label="" shape="point" width="0" ]
+"43" [ color="invis" label="" shape="point" width="0" ]
+"node.1" -> "50" [ label="e 1" ]
+"50" -> "" [ label="e 2" ]
+"" -> "node.3" [ label="e 3" ]
+"node.3" -> "57" [ label="e 4" ]
+"57" -> "" [ label="e 5" ]
+"" -> "43" [ label="e 6" ]
+}

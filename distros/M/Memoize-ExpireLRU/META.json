@@ -1,0 +1,49 @@
+{
+   "abstract" : "Expiry plug-in for Memoize that adds LRU cache expiration",
+   "author" : [
+      "Brent B. Powers <Powers@B2Pi.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Memoize-ExpireLRU",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AutoLoader" : "0",
+            "Carp" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Memoize" : "0",
+            "vars" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/Memoize-ExpireLRU",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/Memoize-ExpireLRU.git",
+         "web" : "https://github.com/neilb/Memoize-ExpireLRU"
+      }
+   },
+   "version" : "0.56"
+}
+

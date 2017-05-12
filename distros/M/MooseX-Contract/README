@@ -1,0 +1,92 @@
+MooseX-Contract
+
++---------+
+| WARNING |
++---------+
+
+This module should be considered EXPERIMENTAL and should not be used in
+critical applications unless you're willing to deal with all the typical
+bugs that young, under-tested software has to offer!
+
++----------+
+| SYNOPSIS |
++----------+
+
+This module provides "Design by Contract" functionality using Moose
+method hooks.
+
+For example, in your Moose-built class:
+
+	package MyEvenInt;
+
+    use MooseX::Contract; # imports Moose for you!
+	use Moose::Util::TypeConstraints;
+
+	my $even_int = subtype 'Int', where { $_ % 2 == 0 };
+
+	invariant assert { shift->{value} % 2 == 0 } '$self->{value} must be an even integer';
+
+	has value => (
+		is       => 'rw',
+		isa      => $even_int,
+		required => 1,
+		default  => 0
+	);
+
+	contract 'add'
+		=> accepts [ $even_int ]
+		=> returns void;
+	sub add {
+		my $self = shift;
+		my $incr = shift;
+		$self->{value} += $incr;
+		return;
+	}
+
+	contract 'get_multiple'
+		=> accepts ['Int'],
+		=> returns [$even_int];
+	sub get_multiple {
+		return shift->{value} * shift;
+	}
+
+	no MooseX::Contract;
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc MooseX::Contract
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooseX-Contract
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/MooseX-Contract
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/MooseX-Contract
+
+    Search CPAN
+        http://search.cpan.org/dist/MooseX-Contract/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Brian Phillips
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

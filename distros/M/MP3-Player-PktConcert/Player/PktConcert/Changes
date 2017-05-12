@@ -1,0 +1,6 @@
+Revision history for Perl extension MP3::Player::PktConcert.
+
+0.01  Fri Jan 11 11:32:09 2002
+	- original version; created by h2xs 1.21 with options
+		-On MP3::Player::PktConcert ./MP3/Player/PktConcert/libipc/src/libipkc.h
+

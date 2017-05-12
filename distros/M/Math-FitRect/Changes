@@ -1,0 +1,15 @@
+Revision history for Perl extension Math::FitRect.
+
+0.04      2011-06-28
+ - Fix some typos.
+
+0.03      2010-06-23
+ - Use Dist::Zilla to build distro.
+ - Fix up documentation, code, and test to be a bit more modern.
+
+0.02
+ - Documentation fixes.
+
+0.01  Fri Mar 18 2005
+ - First version.
+

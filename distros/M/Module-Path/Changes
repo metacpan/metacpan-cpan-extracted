@@ -1,0 +1,115 @@
+Revision history for Perl module Module::Path
+
+0.19 2015-03-16 NEILB
+    - Added [MetaJSON] to dist.ini, so META.json will go into the distribution,
+      as well as META.yml. Thanks to Lucas Kanashiro.
+    - Dropped the -r test on directories, as we only actually need -d and -x.
+      Thanks to Lucas Kanashiro.
+
+0.18 2014-12-17
+    - RIBASUSHI++ reminded me that to be a usable directory in @INC we need
+      to check -d && -r && -x.
+
+0.17 2014-12-17
+    - Fixed RT#96433: ignore directories in @INC which don't exist.
+      Apologies to ETHER++ for over-thinking this one,
+      and taking so long to fix it.
+
+0.16 2014-12-13
+    - Added TODO.md with an initial todo list for the module
+
+0.15 2014-10-14
+    - Doing a foreach $dir (@INC) and then resolving symblinks on $dir
+      was changing the entries in @INC. HAARG++ for pull request with fix.
+    - Changed author email address to be my CPAN email address.
+
+0.14 2014-08-16
+    - Added Travis config, using cpanfile and cpanm to ensure all dependencies
+      are installed before running tests with prove.
+      Thanks to DAGOLDEN.
+    - Improved the first paragraph of DESCRIPTION, so search results give
+      a better summary of the module.
+
+0.13 2014-02-22
+    - Looks like in some rare circumstances, Cwd::abs_path() can croak,
+      so now we wrap that in eval { } and deal accordingly.
+
+0.12 2014-02-19
+    - We now fully resolve symlinks in @INC paths. The previous 'fix'
+      for Debian broke the tests on FreeBSD.
+      Thanks to Géraud Continsouzas, and Daniel Lintott for help testing.
+
+0.11_03 2014-02-18
+    - Another place where we need to worry about getting undef.
+
+0.11_02 2014-02-18
+    - Wasn't handling the case where abs_path() returns undef,
+      which it does if a symlink "goes nowhere".
+
+0.11_01 2014-02-18
+    - The testsuite fix in 0.11 caused a breakage on FreeBSD,
+      where a directory path contains a symlink that wasn't
+      the final directory. So now module_path() fully resolves
+      all symlinks in the path, using Cwd::abs_path().
+
+0.11 2014-02-17
+    - Testsuite now uses Cwd::abs_path() on paths from %INC,
+      to cope with synlinks in @INC directories.
+      This was causing test failures on Debian(-based) systems.
+      Thanks to Daniel Lintott and Erez Schatz for reporting
+      and testing proposed fix.
+
+0.10_01 2014-02-16
+    - Developer release with the change that made it into
+      0.11, above.
+
+0.10 2014-02-04
+    - mpath can display paths for multiple modules (Ahmad Syaltut)
+    - specified min perl version 5.6.0
+
+0.09_01 2013-08-21
+    - If a directory in @INC is a symlink, return the linked-to directory
+      in the path. Problem report and patch from Sharl Morlaroll
+      https://github.com/neilbowers/Module-Path/issues/4
+
+0.09 2013-01-20
+    - You can now pass partial module paths, in the format
+      used as the keys in %INC. Suggested by Steven Haryanto.
+
+0.08 2012-10-18
+    - t/03-mpath.t: now used Devel::FindPerl to get path to perl,
+      instead of $^X. Thanks to LeonT.
+    - should be quoting the path to the mpath binary in t/03-mpath.t
+      Thanks to Graham Knop (haarg).
+
+0.07 2012-09-24
+    - Made the repository path a link in the pod (Olivier Mengué)
+    - Updated pod to refer to review of this and similar modules.
+      Nudged by Olivier Mengué.
+
+0.06 2012-09-18
+    - should check $? after running backticks in t/03-mpath.t,
+      to ensure process exited cleanly.
+
+0.05 2012-09-18
+    - Added lightweight mpath script, which just calls module_path()
+      Made path to script portable, thanks to help from kentnl and leont.
+      Ugh, test could be run with a different perl than mpath.
+      More help, from leont, ether and haarg.
+
+0.04 2012-08-30
+    - github repo was specified wrongly in dist.int (Olivier Mengué)
+
+0.03 2012-08-27
+    - Directory separator should be / and not \ on MSWin32.
+      Thanks to kmx for helping me identify the issue.
+
+0.02 2012-08-26
+    - bugfix in initialisation of separator (Tom Molesworth)
+    - Added github repo to metadata and documentation
+    - SEE ALSO now covers all modules I'm aware of that provide
+      the same functionality
+
+0.01 2012-08-20
+    - initial release of module
+

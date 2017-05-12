@@ -1,0 +1,11 @@
+
+0.03    2014-06-11
+  - Require at least Mojolicious 5.07(formerly 4.82) in order to utilize deserialize and serialize callbacks in
+    Mojolicious::Sessions.
+
+0.02    2014-06-11
+  - Tests work on 5.10.1 and 5.12.4 now.
+  - Check compressed size to be bigger than one byte
+
+0.01    2014-06-11
+        First version, released on an unsuspecting world.

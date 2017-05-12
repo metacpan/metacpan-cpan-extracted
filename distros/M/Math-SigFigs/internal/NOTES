@@ -1,0 +1,34 @@
+#########################################################################
+Before every release, spellcheck the documents:
+
+   internal/langpod
+
+   for i in `find lib -type f -name \*.pod` ;do
+      pod2text $i > $i.txt
+      ispell -p internal/module.isp $i.txt
+      rm -f $i.txt $i.txt.bak
+   done
+
+#########################################################################
+Update the copyright
+
+   y=`date '+%Y'`
+   for i in `find . -type f | egrep -v '.svn' | xargs egrep -l 'Copyright \(c\) ....\-.... Sullivan Beck'` ;do
+     sed -e "s,\(Copyright (c) ....\)\-.... \(Sullivan Beck\),\1-$y \2," $i > z
+     mv z $i
+   done
+
+#########################################################################
+Update the Changes doc with the date. Then update internal/VERSION
+to include the new version.
+
+#########################################################################
+Make sure that the test suite covers everything
+
+   . ../0
+   cover -delete
+   cover -test
+       # make sure everything is 100%
+   cover -delete
+   make distclean
+

@@ -1,0 +1,36 @@
+---
+abstract: 'A plugin for mango document model called Mandel.'
+author:
+  - 'Huo Linhe <huolinhe@berrygenomics.com>'
+build_requires:
+  Mandel::Document: '0'
+  Module::Build: '0.28'
+  Mojolicious::Lite: '0'
+  Test::Mojo: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '1.00'
+  lib: '0'
+  strict: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.033, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Mandel
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Modern::Perl: '0'
+  Mojo::Base: '0'
+  Mojo::Loader: '0'
+version: 0.1.1

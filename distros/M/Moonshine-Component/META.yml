@@ -1,0 +1,41 @@
+---
+abstract: 'HTML Component base.'
+author:
+  - 'Robert Acock <thisusedtobeanemail>'
+build_requires:
+  Moonshine::Element: '0.11'
+  Moonshine::Magic: '0.07'
+  Moonshine::Test: '0.14'
+  Moonshine::Util: '0.06'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Moonshine-Component
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Moonshine::Component:
+    file: lib/Moonshine/Component.pm
+    version: '0.07'
+requires:
+  Moonshine::Element: '0.11'
+  Moonshine::Magic: '0.07'
+  Params::Validate: '1.26'
+  Ref::Util: '0.113'
+  UNIVERSAL::Object: '0.04'
+  feature: '0'
+  perl: '5.01'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/ThisUsedToBeAnEmail/Moonshine-Component.git
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

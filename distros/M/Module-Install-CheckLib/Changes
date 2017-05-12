@@ -1,0 +1,22 @@
+Changelog for Module-Install-CheckLib
+=====================================
+
+0.12  Fri Feb 17 13:40:55 GMT 2017
+  - Handle perls without dot in @INC
+
+0.10  Thu Apr 21 11:02:00 BST 2016
+  - Add support for run_checks_in_author_mode feature
+    contributed by Salva
+
+0.08  Wed Aug 25 15:00:00 BST 2010
+  - Update prereqs for Module::Install and Devel::CheckLib
+
+0.06  Thu Apr 29 13:07:43 BST 2010
+  - tests runnable in parallel now, reported by
+    Florian Ragwitz
+
+0.04  Mon Jan 18 11:31:12 GMT 2010
+  - Added assertlibs
+
+0.02	Mon Apr 27 21:43:50 BST 2009
+	- Initial public release

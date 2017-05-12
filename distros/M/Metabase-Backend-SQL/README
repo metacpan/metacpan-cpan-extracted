@@ -1,0 +1,106 @@
+NAME
+    Metabase::Backend::SQL - Metabase backend role for SQL-based backends
+
+VERSION
+    version 1.001
+
+SYNOPSIS
+      # SQLite
+
+      require Metabase::Archive::SQLite;
+      require Metabase::Index::SQLite;
+
+      my $archive = Metabase::Archive::SQLite->new(
+        filename => $sqlite_file,
+      );
+
+      my $index = Metabase::Index::SQLite->new(
+        filename => $sqlite_file,
+      );
+
+      # PostgreSQL
+
+      use Metabase::Archive::PostgreSQL;
+      use Metabase::Index::PostgreSQL;
+
+      my $archive = Metabase::Archive::PostgreSQL->new(
+        db_name => "cpantesters",
+        db_user => "johndoe",
+        db_pass => "PaSsWoRd",
+      );
+
+      my $index = Metabase::Index::PostgreSQL->new(
+        db_name => "cpantesters",
+        db_user => "johndoe",
+        db_pass => "PaSsWoRd",
+      );
+
+DESCRIPTION
+    This distribution contains implementations of Metabase::Archive and
+    Metabase::Index using SQL databases. >See Metabase::Backend::SQLite or
+    Metabase::Backend::PostgreSQL for details about specific
+    implementations.
+
+    The main module, itself, is merely a Moose role that provides common
+    attributes for all the SQL-based Metabase backends. It is not intended
+    to be used directly by end-users.
+
+ATTRIBUTES
+  dsn
+    Database connection string
+
+  db_user
+    Database username
+
+  db_pass
+    Database password
+
+  db_type
+    SQL::Translator sub-type for a given database. E.g. "SQLite" or
+    "PostgreSQL".
+
+  dbis
+    DBIx::Simple class connected to the database
+
+  schema
+    SQL::Translator::Schema class
+
+REQUIRED METHODS
+    The following builders must be provided by consuming classes.
+
+      _build_dsn        # a DSN string for DBI
+      _build_db_user    # a username for DBI
+      _build_db_pass    # a password for DBI
+      _build_db_type    # a SQL::Translator type for the DB vendor
+
+    The following method must be provided to modify the output of
+    SQL::Translator::Diff to fix up any dialect quirks
+
+      _fixup_sql_diff
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/metabase-backend-sql/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/metabase-backend-sql>
+
+      git clone https://github.com/dagolden/metabase-backend-sql.git
+
+AUTHORS
+    *   David Golden <dagolden@cpan.org>
+
+    *   Leon Brocard <acme@astray.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2011 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

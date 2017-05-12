@@ -1,0 +1,13 @@
+0.03 2009-07-12
+    Coderef attribute curriers now have complete control over the final
+        argument list. The interface changed as well to go from least specific
+        specializations to most specific.
+    Fix new warnings due to no accessors
+
+0.02 2009-05-17
+     The "default" values can be code references now. Since they get the
+        parameter lists, this greatly increases expressive power. See
+        t/007-smart-has.t for an example.
+     Allow more fine-grained control over building an exporter for composition
+         with Moose::Exporter and other exporters.
+

@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Mail-SpamFilter.t
+lib/Mail/SpamFilter.pm
+bin/isspam
+bin/notspam
+bin/spamcheck

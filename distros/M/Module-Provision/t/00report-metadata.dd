@@ -1,0 +1,67 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Module::Build' => '0.4004',
+                                    'version' => '0.88'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'Module::Build' => '0.4004',
+                                        'version' => '0.88'
+                                      }
+                      },
+       'runtime' => {
+                      'requires' => {
+                                      'CPAN::Meta' => '2.150005',
+                                      'CPAN::Uploader' => '0.103004',
+                                      'Class::Null' => '2.110730',
+                                      'Class::Usul' => 'v0.73.0',
+                                      'Config::Tiny' => '2.22',
+                                      'Date::Format' => '2.24',
+                                      'Dist::Zilla' => '5.037',
+                                      'Dist::Zilla::Plugin::AbstractFromPOD' => 'v0.3.0',
+                                      'Dist::Zilla::Plugin::LicenseFromModule' => '0.05',
+                                      'Dist::Zilla::Plugin::ManifestInRoot' => 'v0.13.0',
+                                      'Dist::Zilla::Plugin::Meta::Dynamic::Config' => '0.04',
+                                      'Dist::Zilla::Plugin::ModuleBuild::Custom' => '4.26',
+                                      'Dist::Zilla::Plugin::ReadmeAnyFromPod' => '0.150250',
+                                      'Dist::Zilla::Plugin::Signature' => '1.100930',
+                                      'Dist::Zilla::Plugin::Test::ReportMetadata' => 'v0.4.0',
+                                      'Dist::Zilla::Plugin::VersionFromModule' => '0.08',
+                                      'File::DataClass' => 'v0.68.0',
+                                      'File::ShareDir' => '1.102',
+                                      'HTTP::Message' => '6.06',
+                                      'LWP' => '6.13',
+                                      'LWP::Protocol::https' => '0',
+                                      'Module::Metadata' => '1.000011',
+                                      'Moo' => '2.000001',
+                                      'Perl::Version' => '1.013',
+                                      'Pod::Eventual' => '0.094001',
+                                      'Software::License' => '0.103010',
+                                      'Template' => '2.26',
+                                      'Test::Requires' => '0.08',
+                                      'Try::Tiny' => '0.22',
+                                      'Type::Tiny' => '1.000004',
+                                      'Unexpected' => 'v0.43.0',
+                                      'local::lib' => '2.000014',
+                                      'namespace::autoclean' => '0.26',
+                                      'perl' => '5.010001'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'File::Spec' => '0',
+                                   'Module::Build' => '0.4004',
+                                   'Module::Metadata' => '1.000011',
+                                   'Sys::Hostname' => '0',
+                                   'Test::Requires' => '0.08',
+                                   'version' => '0.88'
+                                 }
+                 }
+     };
+  $x;
+ }

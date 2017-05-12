@@ -1,0 +1,25 @@
+Math/FresnelZone version 0.03
+=============================
+
+This module calculates the fresnel zone radius for a given distance and frequency.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl -MCPAN -e 'install Math::FresnelZone;'
+
+or
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Daniel Muey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

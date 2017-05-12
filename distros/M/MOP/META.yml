@@ -1,0 +1,31 @@
+---
+abstract: 'A Meta Object Protocol for Perl 5'
+author:
+  - 'Stevan Little <stevan@cpan.org>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MOP
+requires:
+  B: '0'
+  Carp: '0'
+  Scalar::Util: '0'
+  Sub::Name: '0'
+  Symbol: '0'
+  UNIVERSAL::Object: '0.09'
+  attributes: '0'
+  mro: '0'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/stevan/p5-MOP/issues
+  repository: https://github.com/stevan/p5-MOP.git
+version: '0.06'
+x_serialization_backend: 'YAML::Tiny version 1.70'

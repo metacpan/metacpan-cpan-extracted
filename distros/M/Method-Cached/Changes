@@ -1,0 +1,26 @@
+Revision history for Perl extension Method::Cached
+
+0.051   Mon, 17 Aug 2009 12:11:05 +0900
+        - The manager is made to put the management of cache
+        - The name of parameter passed when domain is set is changed:
+            storage_class ==> class
+            storage_args  ==> args
+
+0.045_1 Tue, 23 Dec 2008 23:48:48 +0900
+        - provisional correspondence for mod_perl
+
+0.040   Thu, 27 Nov 2008 14:24:44 +0900
+        - change concerning generation rule of key
+
+0.030   Wed, 26 Nov 2008 16:08:06 +0900
+        - added method of deleting cache
+        - parameter of hash is supported
+
+0.020   Fri, 31 Oct 2008 15:59:35 +0900
+        - first release
+
+0.0199  Wed, 08 Oct 2008 10:49:27 +0900
+        - change in composition of module
+
+0.01    Tue, 30 Sep 2008 18:07:39 +9000
+        - original version

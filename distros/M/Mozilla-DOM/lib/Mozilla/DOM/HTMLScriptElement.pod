@@ -1,0 +1,136 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLScriptElement
+
+=for object Mozilla::DOM::HTMLScriptElement
+
+Mozilla::DOM::HTMLScriptElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLScriptElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLScriptElement interface is the interface to a [X]HTML
+ * script element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLScriptElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $charset = $htmlscriptelement->B<GetCharset>()
+
+=head2 $bool = $htmlscriptelement->B<GetDefer>()
+
+=head2 $event = $htmlscriptelement->B<GetEvent>()
+
+=head2 $htmlfor = $htmlscriptelement->B<GetHtmlFor>()
+
+=head2 $src = $htmlscriptelement->B<GetSrc>()
+
+=head2 $text = $htmlscriptelement->B<GetText>()
+
+=head2 $type = $htmlscriptelement->B<GetType>()
+
+=head2 $htmlscriptelement->B<SetCharset>($charset)
+
+=over
+
+=over
+
+=item * $charset (string)
+
+=back
+
+=back
+
+=head2 $htmlscriptelement->B<SetDefer>($defer)
+
+=over
+
+=over
+
+=item * $defer (boolean)
+
+=back
+
+=back
+
+=head2 $htmlscriptelement->B<SetEvent>($event)
+
+=over
+
+=over
+
+=item * $event (string)
+
+=back
+
+=back
+
+=head2 $htmlscriptelement->B<SetHtmlFor>($htmlfor)
+
+=over
+
+=over
+
+=item * $htmlfor (string)
+
+=back
+
+=back
+
+=head2 $htmlscriptelement->B<SetSrc>($src)
+
+=over
+
+=over
+
+=item * $src (string)
+
+=back
+
+=back
+
+=head2 $htmlscriptelement->B<SetText>($text)
+
+=over
+
+=over
+
+=item * $text (string)
+
+=back
+
+=back
+
+=head2 $htmlscriptelement->B<SetType>($type)
+
+=over
+
+=over
+
+=item * $type (string)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

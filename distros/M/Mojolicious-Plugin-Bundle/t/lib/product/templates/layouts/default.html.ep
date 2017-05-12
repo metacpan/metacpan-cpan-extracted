@@ -1,0 +1,16 @@
+<html>
+    <head>
+     <title>
+     	  Welcome
+     </title>
+    <%= javascript_include_tag 'biolib' %>	
+    <%= javascript_include_tag 'fun' %>	
+    <script src="<%= javascript_path '/javascripts/custom/jumper' %>"
+       type="text/javascript"></script>
+    <%= stylesheet_link_tag 'biostyle' %>	
+    <%= stylesheet_link_tag 'monkey' %>	
+    <link href="<%= stylesheet_path '/stylesheets/custom/jumbo' %>"
+       type="text/css" media="screen" rel="stylesheet"/>
+    </head>
+    <body><%== content %></body>
+</html>

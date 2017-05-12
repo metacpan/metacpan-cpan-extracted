@@ -1,0 +1,22 @@
+Build.PL
+Changes
+INSTALL
+lib/Math/Prime/XS.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+ppport.h
+README
+t/00-load.t
+t/functions.t
+t/isprime-vs-sieve.t
+t/pod-coverage.t
+t/pod.t
+XS.xs
+devel/cmpthese.pl
+devel/isprime-speed.pl
+devel/boolean-speed.pl
+devel/cmpthese.pl
+xt/isprime-oeis.t
+META.json
+SIGNATURE    Added here by Module::Build

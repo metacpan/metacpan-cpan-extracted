@@ -1,0 +1,32 @@
+Revision history for Perl extension Math::Symbolic::Custom::Pattern.
+
+2.01  Sun May 26 11:15 2013
+  - Move POD tests to author tests.
+  - POD encoding fixes.
+
+2.00  Sun Jan 27 19:56 2008
+  - Added commutative matching. Requires Math::Symbolic 0.510.
+
+1.21  Tue Dec 30 18:32 2006
+  - Replaced use constant { FOO => 1, BAR => 2 }; with separate use
+    constant expressions. The extended syntax might have caused trouble
+    with pre 5.8 perls. (If you are affected. UPGRADE!)
+
+1.20  Tue Dec 12 16:27 2006
+  - Added to_string() method.
+
+1.11  Sun Jan 15 18:23 2006
+  - Added Clone to the list of dependencies.
+  - Upgraded Math::Symbolic version.
+
+1.10  Wed Oct 12 22:32 2005
+  - Now using Module::Build.
+  - Now match() returns meta information on how the tree matched.
+
+1.02  Thu Sep  9 21:47 2005
+  - Added license info to META.yml
+  - Fixed trouble with Math::Symbolic version requirement.
+  - Bumped Math::Symbolic requirement to 0.162
+
+1.00  Thu Sep  9 21:47 2005
+  - original version as uploaded to CPAN

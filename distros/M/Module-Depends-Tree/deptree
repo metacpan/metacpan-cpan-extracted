@@ -1,0 +1,93 @@
+#!/usr/bin/perl
+
+# Builds a dependency tree of all the modules passed on the command
+# line.  Caches the fetched tarballs so you don't have to keep
+# refetching over and over.  I just run it against my minicpan mirror,
+# but you can make $mirror be any CPAN mirror.
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Module::Depends::Tree;
+use ExtUtils::Command qw( mkpath );
+
+$Module::Depends::Tree::workdir = '/tmp/deptree';
+$Module::Depends::Tree::mirror  = 'file://Users/andy/minicpan';
+
+my %options = (
+    'workdir:s' => \$Module::Depends::Tree::workdir,
+    'mirror:s' =>  \$Module::Depends::Tree::mirror,
+    'help' => sub { die '--workdir and --mirror are the only two options now' },
+);
+GetOptions( %options ) or die "deptree --help for options.\n";
+
+MAKE_TEMP: {
+    local @ARGV = ( $Module::Depends::Tree::workdir );
+    mkpath;
+}
+
+MAIN: {
+    my @topdeps;
+
+    print 'Dependency tree created ', scalar localtime, "\n";
+    print "Created with Module::Depends::Tree $Module::Depends::Tree::VERSION\n";
+
+    print join( ' ', '$', $0, @ARGV ), "\n\n";
+
+    for my $arg ( @ARGV ) {
+        if ( $arg =~ /\.yaml$/ ) { # Load the deps in the yaml file
+            require YAML;
+            my $stats = YAML::LoadFile( $arg );
+            push @topdeps, sort keys %$stats;
+        }
+        elsif ( $arg =~ /-(.+)/ ) { # Remove the module from the deps list
+            my $module = $1;
+            @topdeps = grep { $_ ne $module } @topdeps;
+        }
+        else { # Add it to the deps
+            $arg =~ s/^\+//; # Allow a plus sign for orthagonality
+            push @topdeps, $arg;
+        }
+    }
+    @topdeps = sort grep { !$Module::Depends::Tree::skippers{$_} } @topdeps;
+    if ( !@topdeps ) {
+        die "Must specify a list of modules\n";
+    }
+
+    Module::Depends::Tree::process_queue( @topdeps );
+
+    # Now dump the table
+    for my $module ( @topdeps ) {
+        Module::Depends::Tree::print_deps( 0, $module, () );
+        print "\n";
+    }
+
+
+    print "\nNumber of times each module is used\n";
+    dump_frequency_hash( \%Module::Depends::Tree::used );
+    print "\n", scalar keys %Module::Depends::Tree::used, " total modules\n\n";
+
+    my $packages = \%Module::Depends::Tree::packages;
+    for my $package ( sort keys %$packages ) {
+        print $package, "\n";
+        for my $module ( sort @{$packages->{$package}} ) {
+            print "    $module\n";
+        }
+    }
+    print "\n", scalar keys %$packages, " total packages\n\n";
+} # MAIN
+
+sub dump_frequency_hash {
+    my $hash = shift;
+
+    for my $key ( sort keys %$hash ) {
+        my $n = $hash->{$key};
+        if ( $n > 1 ) {
+            printf( "%3d %s\n", $n, $key );
+        }
+        else {
+            printf( "    %s\n", $key );
+        }
+    }
+}

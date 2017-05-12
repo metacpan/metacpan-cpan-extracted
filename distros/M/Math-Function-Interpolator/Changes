@@ -1,0 +1,28 @@
+Revision history for Math-Function-Interpolator
+
+1.01      2017-02-15 07:07:42+00:00 UTC
+        switch to dzil
+
+0.08    23/06/2014
+        Removed Moose, Moo uses and made pure old style object oriented
+
+0.07    19/06/2014
+        Makefile improved, added required modules
+
+0.06    18/06/2014
+        More intense test added to check module
+
+0.05    15/06/2014
+        method closest_three_points exported, could be usefull for the Mathmatician
+
+0.04    14/06/2014
+        CPAN fail test improved
+
+0.03    12/06/2014
+        Big fix, unwanted typo
+
+0.02    12/06/2014
+        POD Coverage.
+
+0.01    10/06/2014
+        First version, released on an unsuspecting world.

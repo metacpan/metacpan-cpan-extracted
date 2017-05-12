@@ -1,0 +1,82 @@
+# PODNAME: MarpaX::ESLIF::Value::Interface
+
+# ABSTRACT: MarpaX::ESLIF's value interface
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+MarpaX::ESLIF::Value::Interface - MarpaX::ESLIF's value interface
+
+=head1 VERSION
+
+version 2.0.4
+
+=head1 DESCRIPTION
+
+Value interface is a list of methods that are required by MarpaX::ESLIF at run-time to perform valuation. It has to be an object instance, referenced with C<$valueInterface> below.
+
+=head1 METHODS
+
+=over
+
+=item $valueInterface->isWithHighRankOnly()
+
+Returns the rank order preference.
+
+When the interface returns true, only the choices with the highest rank are kept. This method is used at valuation instance creation step only.
+
+=item $valueInterface->isWithOrderByRank()
+
+Returns the rank order preference.
+
+Orders the parse tree values by their rank value. This method is used at valuation instance creation step only.
+
+=item $valueInterface->isWithAmbiguous()
+
+Returns the ambiguity acceptance.
+
+Accept ambiguous parse tree. This method is used at valuation instance creation step only.
+
+=item $valueInterface->isWithNull()
+
+Returns the null acceptance.
+
+Accept a null parse tree value (e.g. when the start rule is not complete). This method is used at valuation instance creation step only.
+
+=item $valueInterface->maxParses()
+
+Returns the maximum number of wanted parses, 0 for all parse trees.
+
+A very ambiguous parsing can provide a lot of parse tree values, it is possible to reduce such number, at the cost of not having all the valuation possibilities. This method is used at valuation instance creation step only.
+
+=item $valueInterface->setResult($result)
+
+Store the parsing result.
+
+When valuation is successful, marpaESLIF is using this callback.
+
+=item $valueInterface->getResult()
+
+Returns the parsing result.
+
+marpaESLIF is not using this method per-se, but it is nevertheless required to ensure the interface coherency v.s. the C<getResult()> required method.
+
+=back
+
+=head1 AUTHOR
+
+Jean-Damien Durand <jeandamiendurand@free.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Jean-Damien Durand.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

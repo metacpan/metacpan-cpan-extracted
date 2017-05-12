@@ -1,0 +1,30 @@
+---
+abstract: 'Attributes with aliases for constructor arguments.'
+author:
+  - 'Paul Driver, C<< <frodwith at cpan.org> >>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build::Tiny: 0.023
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.2, Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-MultiInitArg
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Moose: 0
+resources:
+  bugtracker: https://github.com/frodwith/MooseX-MultiInitArg/issues
+  homepage: https://github.com/frodwith/MooseX-MultiInitArg
+  repository: https://github.com/frodwith/MooseX-MultiInitArg.git
+version: 0.02

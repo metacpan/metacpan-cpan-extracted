@@ -1,0 +1,22 @@
+Revision history for Perl module Mail::Chimp
+
+0.50
+  - Add wrappers for all list related methods (Drew)
+  - Switch to Moose (Drew)
+  - Various bugfixes and tweaks (Guatam Dey)
+  - Add support for v1.2 of the API (Ask)
+  - Require api_version to be specified to new() to make
+    upgrades easier / more reliable (Ask)
+  - Add support for providing an api key instead of username
+    and password (Ask Bjørn Hansen).
+  - Begin creating wrapper methods for common API commands
+    
+0.12 April 11, 2009
+  - Add more flexibility for API version (Drew Taylor)
+
+0.11 March 15, 2009
+  - First public release
+
+0.01 Wed Mar 11 06:45:44 2009
+    - original version; created by ExtUtils::ModuleMaker 0.51
+

@@ -1,0 +1,17 @@
+See the git repository. Otherwise, of note:
+
+ * 2.02 ruminations on melodic inversions as seen in actual composition,
+   boilerplate foo, license perl -> artistic 2, remove fatal warnings
+   from tests.
+
+ * 2.00 boy howdy breaking interface changes in transition to Moo, stateless
+   design (and therefore fewer troublesome reset_* methods), a modal_hook to
+   handle modal_map exceptions, and modal_map improvements as transposition was
+   not fully aware of all the gears necessary for when the input or output
+   tonics are not modulus zero. Etc.
+
+   set_scale_intervals( 'input'   ->  set_modal_scale_in(
+   set_scale_intervals( 'output'  ->  set_modal_scale_out(
+
+ * 1.00 introduced breaking changes to modal_map, which previously did not
+   really support transpositions at all. Sorry.

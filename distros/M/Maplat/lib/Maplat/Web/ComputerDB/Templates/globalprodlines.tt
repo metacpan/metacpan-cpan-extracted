@@ -1,0 +1,55 @@
+[% IF statustext %]
+<p align="center">
+    <div class="[% statuscolor %]">[% tr.tr(statustext) %]</div>
+</p>
+[% END %]
+<p align="center">
+    <table class="data" id="MainDataTable">
+        <tr class="tabheader">
+                <th>[% tr.tr("Line") %]</th>
+                <th>[% tr.tr("Description") %]</th>
+                <th>[% tr.tr("Active") %]</th>
+                <th></th>
+                <th></th>
+        </tr>
+        [% FOREACH line IN lines %]
+        <form name="cclines_[% line.line_id %]" method="post" action="[% webpath %]">
+        <tr>
+                <td>
+                    <input type="hidden" name="line_id" value="[% line.line_id %]">
+                    <input type="text" name="newline_id" value="[% line.line_id %]">
+                </td>
+                <td><input type="text" name="description" size="30" maxLength="60" value="[% line.description %]"></td>
+                <td><input type="checkbox" name="is_active"
+                [% IF line.is_active %]
+                checked="checked"
+                [% END %]
+                ></td>
+                <td>
+                        <input type="hidden" name="coordinates" size="15" maxLength="60" value="[% line.coords %]">
+                        <input type="hidden" name="mode" value="changeline" id="mode_[% line.line_id %]">
+                        <input type="submit" value="[% tr.tr("Change") %]">
+                </td>
+                <td>
+                    <input type="submit" value="[% tr.tr("Delete") %]" onClick="return confirmDeleteLine('cclines_[% line.line_id %]', 'mode_[% line.line_id %]');">
+                </td>
+        </tr>
+        </form>
+        [% END %]
+        <form name="cclines_new" method="post" action="[% webpath %]">
+        <tr>
+                <td><input type="text" name="line_id" value=""></td>
+                <td><input type="text" name="description" size="30" maxLength="60" value=""></td>
+                <td><input type="checkbox" name="is_active"></td>
+                <td>
+                        <input type="hidden" name="coordinates" size="15" maxLength="60" value="">
+                        <input type="hidden" name="mode" value="createline">
+                        <input type="submit" value="[% tr.tr("Create") %]">
+                </td>
+                <td></td>
+        </tr>
+        </form>
+    </table>
+    
+    
+</p>

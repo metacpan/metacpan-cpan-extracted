@@ -1,0 +1,157 @@
+NAME
+     Memory::Process - Perl class to determine actual memory usage.
+
+SYNOPSIS
+     use Memory::Process;
+     my $m = Memory::Process->new(%params);
+     $m->dump;
+     $m->record($message, $pid);
+     $m->reset;
+     my @report = $m->report;
+     my $report = $m->report;
+     $m->state;
+
+METHODS
+    "new(%params)"
+             Constructor.
+
+    "dump()"
+             Print report to STDERR.
+             Returns return value of print().
+
+    "record([$message, $pid])"
+             Set record.
+             If message not set, use ''.
+             Returns undef.
+
+    "report()"
+             Get report.
+             In scalar context returns string with report.
+             In array context returns array of report lines.
+             First line is title.
+
+    "reset()"
+             Reset records.
+             Returns undef.
+
+    "state()"
+             Get internal state.
+             Each state item consists from:
+             - timestamp (in seconds since epoch)
+             - message (from record())
+             - virtual memory size (in kB)
+             - resident set size (in kB)
+             - shared memory size (in kB)
+             - text size (in kB)
+             - data and stack size (in kB)
+             Returns reference to array with state items.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Memory::Process;
+
+     # Object.
+     my $m = Memory::Process->new;
+
+     # Example process.
+     $m->record("Before my big method");
+     my $var = ('foo' x 100);
+     sleep 1;
+     $m->record("After my big method");
+     sleep 1;
+     $m->record("End");
+
+     # Print report.
+     print $m->report."\n";
+
+     # Output like:
+     #   time    vsz (  diff)    rss (  diff) shared (  diff)   code (  diff)   data (  diff)
+     #      1  19120 (     0)   2464 (     0)   1824 (     0)      8 (     0)   1056 (     0) After my big method
+     #      2  19120 (     0)   2464 (     0)   1824 (     0)      8 (     0)   1056 (     0) End
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Data::Printer;
+     use Memory::Process;
+
+     # Object.
+     my $m = Memory::Process->new;
+
+     # Example process.
+     $m->record("Before my big method");
+     my $var = ('foo' x 100);
+     sleep 1;
+     $m->record("After my big method");
+     sleep 1;
+     $m->record("End");
+
+     # Print report.
+     my $state_ar = $m->state;
+
+     # Dump out.
+     p $state_ar;
+
+     # Output like:
+     # \ [
+     #     [0] [
+     #         [0] 1445941214,
+     #         [1] "Before my big method",
+     #         [2] 33712,
+     #         [3] 7956,
+     #         [4] 3876,
+     #         [5] 8,
+     #         [6] 4564
+     #     ],
+     #     [1] [
+     #         [0] 1445941215,
+     #         [1] "After my big method",
+     #         [2] 33712,
+     #         [3] 7956,
+     #         [4] 3876,
+     #         [5] 8,
+     #         [6] 4564
+     #     ],
+     #     [2] [
+     #         [0] 1445941216,
+     #         [1] "End",
+     #         [2] 33712,
+     #         [3] 7956,
+     #         [4] 3876,
+     #         [5] 8,
+     #         [6] 4564
+     #     ]
+     # ]
+
+DEPENDENCIES
+    Memory::Usage, Readonly.
+
+SEE ALSO
+    Memory::Stats
+        Memory Usage Consumption of your process
+
+    Memory::Usage
+        Tools to determine actual memory usage
+
+REPOSITORY
+    <https://github.com/tupinek/Memory-Process>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz/>
+
+LICENSE AND COPYRIGHT
+     © 2014-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.04
+

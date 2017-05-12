@@ -1,0 +1,26 @@
+CHANGES
+	Release Name: 0.4101 2010-08-16
+		*	Updated to use new method system
+
+		*	POD Changes
+
+	Release Name: 0.4001 2010-07-27
+		*	Started using git and github
+
+		*	Normalized version accross plugins.
+
+		*	POD Changes
+
+		*	Revised Testing
+
+		*	Added cabability methods.
+
+	Release Name: 0.30 2008-02-23
+		* 	Fixed prereq for Music::Tag
+
+	Release Name: 0.29 2008-02-22
+		* 	Kwalitee / pod imporvments
+
+	Release Name: 0.28 2008-02-11
+		* 	Split from Music::Tag
+

@@ -1,0 +1,89 @@
+{
+   "abstract" : "Database Migrations",
+   "author" : [
+      "Chris Reinhardt <crein@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Monorail",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Clone" : "0",
+            "DBIx::Class" : "0",
+            "DBIx::Class::Schema" : "0",
+            "Data::Dumper" : "0",
+            "File::Path" : "0",
+            "File::Slurper" : "0",
+            "Graph" : "0",
+            "List::Compare" : "0",
+            "List::Util" : "0",
+            "Module::Find" : "0",
+            "Module::Runtime" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Path::Class" : "0",
+            "SQL::Translator" : "0",
+            "SQL::Translator::Diff" : "0",
+            "SQL::Translator::Parser::DBIx::Class" : "0",
+            "SQL::Translator::Producer::PostgreSQL" : "0",
+            "SQL::Translator::Schema" : "0",
+            "SQL::Translator::Schema::Constraint" : "0",
+            "SQL::Translator::Schema::Field" : "0",
+            "SQL::Translator::Schema::Index" : "0",
+            "SQL::Translator::Schema::Table" : "0",
+            "SQL::Translator::Schema::View" : "0",
+            "SQL::Translator::Utils" : "0",
+            "Text::MicroTemplate" : "0",
+            "Text::MicroTemplate::DataSection" : "0",
+            "UUID::Tiny" : "0",
+            "base" : "0",
+            "namespace::autoclean" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "DBIx::Class::Core" : "0",
+            "FindBin" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::Spec" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/ctriv/perl-Monorail",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ctriv/perl-Monorail.git",
+         "web" : "https://github.com/ctriv/perl-Monorail"
+      }
+   },
+   "version" : "0.4",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

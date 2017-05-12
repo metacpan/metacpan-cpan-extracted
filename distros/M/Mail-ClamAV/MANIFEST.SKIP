@@ -1,0 +1,7 @@
+\.svn
+Makefile$
+config\.pl
+tags
+\.old$
+\.bak$
+\.t(?:ar\.)?gz$

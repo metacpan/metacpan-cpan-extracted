@@ -1,0 +1,16 @@
+RELEASING
+
+Change version number in lib/Monitoring/Plugin.pm and lib/Monitoring/Plugin/Functions.pm
+Add date to Changes file
+git commit
+
+perl Makefile.PL
+make
+make test
+make dist
+
+Upload file to CPAN
+
+Send announcement to announce@monitoring-plugins.org, help@monitoring-plugins.org and
+devel@monitoring-plugins.org
+Add news item to https://monitoring-plugins.org

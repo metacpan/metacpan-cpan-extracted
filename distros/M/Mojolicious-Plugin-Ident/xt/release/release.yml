@@ -1,0 +1,11 @@
+---
+pod_spelling_system:
+  stopwords:
+    - ident
+    - remote's
+    - TCP
+
+pod_coverage:
+  private:
+    - Mojolicious::Plugin::Ident::Response#remote_address
+    - Mojolicious::Plugin::Ident#register

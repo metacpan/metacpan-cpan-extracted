@@ -1,0 +1,25 @@
+---
+abstract: 'Migrate MBX mailboxes to Maildir'
+author:
+  - 'Xan Tronix <xan@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.94, CPAN::Meta::Converter version 2.140640'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mail-MBX
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Time::Local: '0'
+resources:
+  Type: git
+  Url: git://github.com/xantronix/Mail-Dir-MBX.git
+  Web: https://github.com/xantronix/Mail-Dir-MBX
+version: '0.01'

@@ -1,0 +1,27 @@
+---
+abstract: 'Expired and auto rebuilded attributes in Moose objects'
+author:
+  - 'Perlover <perlover@perlover.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-ExpiredAttribute
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 2.1204
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/Perlover/MooseX-ExpiredAttribute.git
+version: 0.023

@@ -1,0 +1,3 @@
+<a href="[% c.uri_for('attachment',att.id,'view').replace ('.+//.+?/','/') %]" >
+  <img src="[% c.uri_for('attachment',att.id,'thumb').replace ('.+//.+?/','/') %]" />
+</a>

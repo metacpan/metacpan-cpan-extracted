@@ -1,0 +1,62 @@
+{
+   "abstract" : "lift expression evaluation to compile time",
+   "author" : [
+      "Andrew Main (Zefram) <zefram@fysh.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Memoize-Lift",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Devel::CallParser" : "0.001",
+            "ExtUtils::CBuilder" : "0.15",
+            "IO::File" : "1.03",
+            "Module::Build" : 0,
+            "Test::More" : 0,
+            "perl" : "5.013008",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0,
+            "perl" : "5.013008",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::CallParser" : "0.001",
+            "Exporter" : 0,
+            "XSLoader" : 0,
+            "parent" : 0,
+            "perl" : "5.013008",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Memoize::Lift" : {
+         "file" : "lib/Memoize/Lift.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.000"
+}

@@ -1,0 +1,65 @@
+Name
+    Math::Permute::Partitions - Generate all the permutations of a
+    partitioned list.
+
+Synopsis
+     use Math::Permute::Partitions;
+
+     permutePartitions {$a .= "@_\n"} [1,2], [3,4];
+
+     # 1 2 3 4
+     # 1 2 4 3
+     # 2 1 3 4
+     # 2 1 4 3
+
+Description
+    Generate all the permutations of a partitioned list using the standard
+    Perl metaphor.
+
+    "permutePartitions()" returns the number of permutations in both scalar
+    and array context.
+
+    "permutePartitions()" is written in 100% Pure Perl.
+
+Export
+    The "permutePartitions()" function is exported.
+
+Installation
+    Standard Module::Build process for building and installing modules:
+
+      perl Build.PL
+      ./Build
+      ./Build test
+      ./Build install
+
+    Or, if you're on a platform (like DOS or Windows) that doesn't require
+    the "./" notation, you can do this:
+
+      perl Build.PL
+      Build
+      Build test
+      Build install
+
+Author
+    PhilipRBrenan@appaapps.com
+
+    http://www.appaapps.com
+
+Acknowledgements
+    Based on an idea from Philipp Rumpf
+
+See Also
+    Math::Cartesian::Product
+    Math::Disarrange::List
+    Math::Permute::List
+    Math::Permute::Lists
+    Math::Subsets::List
+    Algorithm::Permute
+    Algorithm::FastPermute
+
+Copyright
+    Copyright (c) 2015 Philip R Brenan.
+
+    This module is free software. It may be used, redistributed and/or
+    modified under the same terms as Perl itself.
+

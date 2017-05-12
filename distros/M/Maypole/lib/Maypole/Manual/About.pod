@@ -1,0 +1,313 @@
+
+=head1 NAME
+
+Maypole::Manual::About - Introduction to Maypole
+
+=head1 DESCRIPTION
+
+This chapter serves as a gentle introduction to Maypole and setting up
+Maypole applications. We look at what Maypole is, how to get it up and
+running, and how to start thinking about building Maypole applications.
+
+=head2 What is Maypole?
+
+Presumably you have some idea of what Maypole is all about, or otherwise
+you wouldn't be reading this manual. But Maypole is good at many
+different things, and you may have accidentally focussed on one aspect
+of Maypole while missing the big picture.
+
+For instance, you may know that Maypole is extremely good at putting web
+front-ends onto databases. This is true, but it's only a part of what
+Maypole does. You may have heard that Maypole is a web application
+framework, which is true, but it doesn't mean very much. There are a
+huge number of things that Maypole can do, because it's very much a
+blank slate. You can make it do what you will. In this manual, we'll be
+making it act as a front-end to a database, as a social network site, as
+an intranet portal, and many other things besides. It is a framework.
+
+I like to think that Maypole is a way of going from a URL to a method
+call to some output. If you have a URL like C</product/order/12>,
+Maypole is a way of having it load up product number 12, call an
+C<order> method, and produce a page about what it's just done. The
+reason Maypole is such a big deal is because it does all this for you.
+You no longer have to care about your web server. You hardly have to
+care about your database. You don't have to care about templating
+modules, parsing CGI parameters, or anything else. You only need to care
+about business logic, and the business logic in this instance is how you
+C<order> a product, and what you need to display about it once you've
+done so. This is what programming should be: only caring about the work
+that distinguishes one program from another.
+
+It does this using a technique called MVC for web applications.
+
+=head2 What is MVC for web applications?
+
+Maypole was originally called C<Apache::MVC>, reflecting its basis in
+the Model-View-Controller design pattern. (I had to change it firstly
+because Maypole isn't tied to Apache, and secondly because
+C<Apache::MVC> is a really dull name.) It's the same design pattern that
+forms the foundation of similar projects in other languages, such as
+Java's Struts framework.
+
+This design pattern is found primarily in graphical applications; the
+idea is that you have a Model class which represents and manipulates
+your data, a View class which is responsible for displaying that data to
+the user, and a Controller class which controls the other classes in
+response to events triggered by the user. This analogy doesn't
+correspond precisely to a web-based application, but we can take an
+important principle from it. As Template Toolkit author Andy Wardley explains:
+
+    What the MVC-for-the-web crowd are really trying to achieve is a clear
+    separation of concerns.  Put your database code in one place, your 
+    application code in another, your presentation code in a third place.  
+    That way, you can chop and change different elements at will,
+    hopefully without affecting the other parts (depending on how well your
+    concerns are separated, of course).  This is common sense and good practice.
+    MVC achieves this separation of concerns as a by-product of clearly 
+    separating inputs (controls) and outputs (views). 
+
+This is what Maypole does. It has a number of database drivers, a number
+of front-end drivers and a number of templating presentation drivers.
+In common cases, Maypole provides precisely what you need for all of
+these areas, and you get to concentrate on writing just the business
+logic of your application. This is one of the reasons why Maypole lets
+you develop so rapidly: because most of the time, you don't need to do
+any development at all.
+
+
+=head2 The Beer Database example
+
+Throughout this manual, we're going to be referring back to a particular
+application so that we can give concrete examples for the concepts we're
+talking about. We could say "C<related_accessors> returns a list of
+accessors which can be called to return a list of objects in a has-a
+relationship to the original", or we could say "if we call
+C<related_accessors> while viewing a C<brewery>, it returns C<beers>,
+because we can call C<beers> on a C<brewery> object to get a list of
+that brewery's beers." 
+
+Because Maypole is all about beer. If you look carefully, you can
+probably see men playing cricket on the village green. The first
+ever Maypole application was written to help me keep track of the many
+different ales available in my area - their styles, their tastes, their
+breweries, prices and so on. Then the more I thought about it, the more
+I thought it was a particularly good data model for demonstrating
+different kinds of database relationships.
+
+We have a C<brewery> table, which has several C<beer>s. We'll call this
+a has-many relationship. The beers each have a C<style>; styles are
+stored in a separate table, so C<beer> has-a C<style>. Beers are in
+several pubs and a pub has several beers, so beers and pubs are in a
+many-to-many relationship. We use a link table called C<handpump> to
+relate pubs to beers.
+
+All in all, this gives us a schema like the following:
+
+    create table brewery (
+        id int not null auto_increment primary key,
+        name varchar(30),
+        url varchar(50),
+        notes text
+    );
+
+    create table beer (
+        id int not null auto_increment primary key,
+        brewery integer,
+        style integer, 
+        name varchar(30),
+        url varchar(120),
+        score integer(2),
+        price varchar(12),
+        abv varchar(10),
+        notes text
+    );
+
+    create table handpump (
+        id int not null auto_increment primary key,
+        beer integer,
+        pub integer
+    );
+
+    create table pub (
+        id int not null auto_increment primary key,
+        name varchar(60),
+        url varchar(120),
+        notes text
+    );
+
+    create table style (
+        id int not null auto_increment primary key,
+        name varchar(60),
+        notes text
+    );
+
+If you have C<DBD::SQLite> available, then a database like this will
+be created when Maypole was installed. Let's now see how to set it up
+with a web interface.
+
+=head2 Setting up Maypole
+
+The first thing we need for a Maypole interface to a database is to
+have a database. If you don't have one, now would be a good time to
+create one, using the schema above. If you're creating a database
+by hand, don't forget to grant permissions for your Apache server to
+access it as well as yourself (typically a user name like C<www-data>
+or C<wwwrun>).
+
+The next thing we need is a module which is going to do all the work.
+Thankfully, it doesn't need to do B<all> the work itself. It's going to be a 
+subclass of C<Maypole> or a Maypole front-end like C<Apache::MVC>. 
+It roughly corresponds to the controller in an MVC design, and is
+also referred to as the driver, handler or request.
+
+Here's the driver class for our beer database application. We're not
+going to go into much detail about it here; we'll do that in the
+L<Beer Database|Maypole::Manual::Beer> chapter.
+For now, simply admire its brevity, as you realise this is all the code
+you need to write for a simple database front-end:
+
+    package BeerDB;
+    use Maypole::Application;
+    BeerDB->setup("dbi:SQLite:t/beerdb.db");
+    BeerDB->config->uri_base("http://localhost/beerdb");
+    BeerDB->config->template_root("/path/to/templates");
+    BeerDB->config->rows_per_page(10);
+    BeerDB->config->display_tables([qw[beer brewery pub style]]);
+    BeerDB::Brewery->untaint_columns( printable => [qw/name notes url/] );
+    BeerDB::Style->untaint_columns( printable => [qw/name notes/] );
+    BeerDB::Beer->untaint_columns(
+        printable => [qw/abv name price notes/],
+        integer => [qw/style brewery score/],
+        date => [ qw/date/],
+    );
+
+    use Class::DBI::Loader::Relationship;
+    BeerDB->config->{loader}->relationship($_) for (
+        "a brewery produces beers",
+        "a style defines beers",
+        "a pub has beers on handpumps");
+    1;
+
+There's a version of this program in the F<examples/> directory in the Maypole
+files that you downloaded in the F<~root/.cpan/> build area.
+This defines the C<BeerDB> application.
+To set it up as a mod_perl handler, just tell the Apache configuration
+about it:
+
+    <Location /beerdb>
+        SetHandler perl-script
+        PerlHandler BeerDB
+    </Location>
+
+To use it as a CGI script, put it in your F<cgi-bin> directory,
+together with a small file called F<beer.cgi>:
+
+    #!/usr/bin/perl
+    use strict;
+    use warnings;
+    use BeerDB;
+    BeerDB->run();
+
+and change one line in C<BeerDB.pm>:
+
+    BeerDB->config->uri_base("http://localhost/cgi-bin/beer.cgi");
+
+And now we need some templates. As we'll see in the chapter on
+L<views|Maypole::Manual::View>, there are several types of template.
+We're going to copy
+the whole lot from the F<templates/> directory of the Maypole source
+package into the F</beerdb> directory under our web root.
+Make the C<template_root> in C<BeerDB> agree with your path.
+
+And that's it. We should now be able to go to C<http://localhost/beerdb/>
+or C<http://localhost/cgi-bin/beer.cgi/>
+and see a menu of things to browse; C<http://localhost/beerdb/beer/list>
+will give a list of beers. There might not be any yet. There's a box
+that lets you add them.
+
+If you have any problems getting to this point, you might want to look at
+L<http://maypole.perl.org>. There's a FAQ and a link to a mailing
+list.
+
+Play about with the site. Add some beers. Maybe go out and buy some beers
+to review if you need some inspiration. Don't be ill on my carpet.
+
+=head2 Phases of a Maypole request
+
+Now you should have a feel for what Maypole can do. The important thing
+to know at this point is that this is by no means B<all> that Maypole
+can do. What you've seen in the beer database example is all that Maypole
+can do if you don't customize it at all.
+
+Remember that, for instance, we don't ever tell Maypole what tables our
+database has, or what columns each table has. We don't tell Maypole what
+those tables should be called or how to display them. We don't tell Maypole
+what to do - that we want to list, search, edit and delete beers and breweries.
+Maypole just works that out for itself. We can customize it and have Maypole
+do all sorts of interesting things with our database, and most of the rest
+of this manual will be about how to do that.
+
+In order to do that, we need to look at what Maypole's actually doing.
+Here's a quick overview, there's more detail in the
+L<Workflow|Maypole::Manual::Workflow> chapter.
+
+As mentioned, Maypole is responsible for turning a URL into an object, a
+method call, and some templated output.
+
+=for html
+Here's a handy diagram to explain how it does that:
+
+=for html
+<IMG SRC="maypole_process2.png">
+
+Maypole's process revolves around the concept of the Maypole request
+object. This is a little like Apache's request object, but at a much
+higher level - in fact, in C<mod_perl>-based Maypole front-ends, the
+Apache request object is incorporated in the Maypole request object. All
+that Maypole does is gradually flesh out this object until it contains
+something in the C<output> member, and then it is dispatched back to the
+front-end for output.
+
+So to start with, we take the Apache request (or CGI object, or other
+way of isolating what's going on) and break it down. For instance, we
+turn the URL C</beer/view/1> into
+
+    {
+        table => "beer",
+        action => "view",
+        args => [ 1 ]
+    }
+
+Then Maypole will check that C<beer> is a real table, and find the class
+that models it. It also checks whether or not we're allowed to call the
+C<view> method over the network:
+
+    {
+        table => "beer",
+        action => "view",
+        args => [ 1 ],
+        model_class => "BeerDB::Beer"
+    }
+
+Then there's a user-defined authentication method, which by default just
+lets us do anything. Now we hand over to the model class, which loads up
+the object, and decides what template we want to use:
+
+    {
+        table => "beer",
+        action => "view",
+        args => [ ],
+        objects => [ BeerDB::Beer->retrieve(1) ],
+        model_class => "BeerDB::Beer",
+        template => "view"
+    }
+
+Then it calls C<BeerDB::Beer-E<gt>view>, passing in the request object
+as a parameter, and passes the whole lot to the view class for templating.
+In the next two chapters, we'll look at how Maypole's default model and
+view classes generally do what you want them to do.
+
+=head2 Links
+
+L<Contents|Maypole::Manual>,
+Next L<Maypole Model Classes|Maypole::Manual::Model>

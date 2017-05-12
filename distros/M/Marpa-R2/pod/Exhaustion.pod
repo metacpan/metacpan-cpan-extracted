@@ -1,0 +1,328 @@
+# Copyright 2015 Jeffrey Kegler
+# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# redistribute it and/or modify it under the terms of the GNU Lesser
+# General Public License as published by the Free Software Foundation,
+# either version 3 of the License, or (at your option) any later version.
+#
+# Marpa::R2 is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser
+# General Public License along with Marpa::R2.  If not, see
+# http://www.gnu.org/licenses/.
+
+=head1 Name
+
+Marpa::R2::Exhaustion - Parse exhaustion in the SLIF
+
+=head1 About this document
+
+This page is part of the reference documents for the recognizer objects
+of Marpa's SLIF (Scanless interface).
+It contains a detailed discussion of parse exhaustion.
+
+
+=head1 Exhaustion
+
+At bottom, B<parse exhaustion> is a simple concept.
+The recognizer may reach a point where there is
+simply no way to continue successfully.
+Regardless of what it reads next,
+the parse will fail.
+When this happens, the parse is said to be B<exhausted>.
+
+Some users have confused parse exhaustion with parse failure.
+But other users have confused parse exhaustion with parse success.
+That is because,
+for a particular grammar,
+there can be a strong association between parse exhaustion
+and parse success,
+but the strong association can go either way.
+Grammars can be either exhaustion-loving or exhaustion-hating.
+B<Both> kinds of grammar are very common in
+practical application.
+
+=head1 Hate and love
+
+In an B<exhaustion-hating> application,
+parse exhaustion is typically parse failure.
+C programs, Perl scripts and most programming languages
+are exhaustion-hating applications.
+If a C program is well-formed,
+it is always possible to read more input.
+The same is true of a Perl program that does not have a C<__DATA__> section.
+
+In an B<exhaustion-loving> applications
+parse exhaustion means parse success.
+A toy example of an exhaustion-loving
+application is the language consisting of balanced parentheses.
+When the parentheses come into perfect balance the parse is exhausted,
+because any further input would unbalance the brackets.
+And the parse succeeds when the parentheses come into perfect balance.
+Exhaustion means success.
+
+Any language which balances start and end indicators will tend to
+be exhaustion-loving.
+HTML and XML, with their start and end tags, can be seen
+as exhaustion-loving languages.
+
+For many languages, it's not strictly love or hate.
+I mentioned Perl's C<__DATA__> as a complication in a
+basically exhaustion-hating language.
+It is possible for a language to be
+exhaustion-loving at some points
+and exhaustion-hating at others.
+We can call those languages B<exhaustion-conflicted>.
+
+=head1 Reading methods
+
+The methods that may encounter parse exhaustion are those
+that read input:
+L<read()|Marpa::R2::Scanless::R/"read()">,
+L<resume()|Marpa::R2::Scanless::R/"resume()">,
+L<lexeme_complete()|Marpa::R2::Scanless::R/"lexeme_complete()">,
+and L<lexeme_read()|Marpa::R2::Scanless::R/"lexeme_read()">.
+These are also, and not by coincidence, the event-triggering methods.
+In this document, we will call them the B<reading methods>.
+
+=head1 Synchronous and asynchronous parse exhaustion
+
+Intuitively, parse exhaustion is B<synchonous> if it
+occurs at a location where control would return to
+the user anyway, and asynchronous otherwise.
+More precisely,
+we say that parse exhaustion is B<synchronous>
+if it occurs at a point when control
+would normally return from SLIF to the application,
+due to either
+
+=over 4
+
+=item * 
+
+the parse reaching end of string (EOS), or
+
+=item *
+
+the occurrence of
+a parse event other than an exhaustion event.
+
+=back
+
+Marpa can be set up so that an event occurs on
+asynchronous exhaustion.
+Note that in The definition above
+the occurrence of an exhaustion event
+does not makes the parse exhaustion synchronous.
+This wording is chosen to avoid a paradox.
+If a parse exhaustion event could made exhaustion synchronous,
+then it B<should not> occur, because parse exhaustion events
+only occur on asynchronous parse exhaustion.
+But if the parse exhaustion event did not occur,
+then the parse exhaustion would be asynchronous, so that
+then a parse exhaustion event B<should> occur.
+
+In this document, an B<exhaustion location> is
+a location at which parse exhaustion occurs.
+
+=head1 Handling parse exhaustion
+
+How parse exhaustion is handled depends on the setting
+of the
+L<SLIF's C<exhaustion> recognizer
+setting|Marpa::R2::Scanless::R/"exhaustion">.
+The value of this may be "C<fatal>" or
+"C<event>".
+("C<fatal>" is the default.)
+
+Synchronous parse exhaustion is always ignored,
+regardless of the recognizer setting.
+No exhaustion event is triggered by synchronous
+parse exhaustion.
+
+If the C<exhaustion> setting is "C<fatal>",
+asynchronous parse exhaustion is thrown
+as a fatal error.
+If the C<exhaustion> setting is "C<event>",
+then an
+L<exhaustion event|Marpa::R2::Event/"Exhaustion events">
+is triggered, returning control to the application.
+This is treated by the
+triggering method as a successful return.
+
+Note that the
+L<lexeme_complete()|Marpa::R2::Scanless::R/"lexeme_complete()">,
+and L<lexeme_read()|Marpa::R2::Scanless::R/"lexeme_read()">,
+always ignore
+parse exhaustion,
+regardless of the C<exhaustion> recognizer setting.
+This is because these methods
+read input only at a single location,
+so that every parse exhaustion is synchronous.
+
+=head1 Detecting parse exhaustion
+
+The return value of
+a reading method
+does not indicate whether exhaustion occurred or not.
+In most cases, you will either know
+from the the context whether the parse is exhausted,
+or you will not care.
+But what if you do not know and do care?
+
+Those applications that want to know whether
+a parse is exhausted or not
+can directly query
+parse exhaustion status
+with
+the L<C<exhausted()> method|Marpa::R2::Scanless::R/"exhausted()">.
+Even when L<parse exhaustion events|Marpa::R2::Event/"Exhaustion events">
+are enabled,
+using the C<exhausted()> method is the preferred method for detecting exhaustion,
+because it reports both asynchronous and synchronous parse exhaustion.
+Exhaustion events only trigger in cases of asynchronous parse exhaustion.
+
+=head1 Exhaustion-conflicted
+
+Exhaustion-conflicted applications are those which cannot be
+called exhaustion-loving or exhaustion-hating.
+This may be because their behavior is a combination of the two.
+But it may also be because the application's behavior is not known --
+for example, while developing an application, it's convenient
+to assume that it is exhaustion-conflicted.
+
+The SLIF's behavior for exhaustion-conflicted applications has to be aimed
+at a "lowest common denominator".
+It is also a good idea for a default to be a lowest common
+denominator and,
+by default,
+the SLIF assumes that an application
+is exhausted-conflicted.
+In fact,
+the default behavior on parse exhaustion
+usually works well enough
+that it does not need customizing.
+
+For a typical application without events, end of parse (EOP)
+is end of string (EOS).
+In this case exhaustion before EOS is a fatal error,
+which is usually what is desired.
+On return due to EOS,
+unless the application checks,
+it will not know whether exhaustion occurred, but usually
+it does not care.
+If the application does care, it can
+L<check for exhaustion explicitly|/"Detecting parse exhaustion">.
+
+If the application uses events to signal EOP,
+the case is much the same.
+On return due to an event,
+the application will not know if exhaustion occurred,
+but usually
+it will not care.
+If the application does care, it can
+L<check for exhaustion explicitly|/"Detecting parse exhaustion">.
+
+If the application uses events for other purposes,
+an event may "hide" exhaustion, so that it is not
+thrown as an error.
+Typically, an application will soon attempt to continue
+the reading of input,
+and when it does there will be a fatal
+error.
+An application which wants to know about exhaustion immediately,
+either to "fast fail" or for other reasons,
+can
+L<check for exhaustion explicitly|/"Detecting parse exhaustion">
+every time an event triggers.
+
+=head2 Exhaustion-loving
+
+For an exhaustion-loving application,
+what was said for exhaustion-conflicted applications
+applies without change.
+Applications that consider it important to confirm
+that exhaustion did occur at EOP can
+L<check for exhaustion explicitly|/"Detecting parse exhaustion">
+
+Some applications go beyond being exhaustion-loving,
+and want to use exhaustion to signal the EOP.
+These exhaustion-sensing applications are
+L<discussed below|/"Exhaustion-sensing">.
+
+=head2 Exhaustion-hating
+
+Exhaustion-hating applications are handled reasonably
+by the default behavior.
+Asynchronous exhaustion will be a fatal error.
+Synchronous exhaustion
+will cause failure at the next read,
+unless it happens at EOP.
+By default, exhaustion at EOP will go unreported
+but if an application really is exhaustion-hating,
+the parse will fail,
+and parse failure will certainly show up
+when the application tries to evaluate the parse.
+
+Exhaustion-hating applications, if they want to be stricter
+than this,
+can check for exhaustion explicitly whenever
+a reading method returns.
+A possible annoyance is that, depending where it happens,
+exhaustion may also cause the reading method to throw an exception.
+Applications which want more orthogonality in their exhaustion handling
+can enable exhaustion events,
+which will prevent exceptions being thrown due to parse exhaustion.
+
+=head1 Exhaustion-sensing
+
+Sometimes an application, rather than read
+an entire input,
+wants to find the longest occurrence starting at some location.
+(Lexers are typically applications of this kind.)
+Looking for exhaustion is one way to try to implement this
+kind of "longest acceptable input stream" search.
+But exhaustion-sensing is not necessarily the best way,
+or even a good way,
+to find the "longest parse".
+Exhaustion may not happen until after last successful parse --
+sometimes not until long after it.
+Completion parse events may be a cleaner way to deal with this.
+
+Applications which do want to use parse exhaustion as part of
+a strategy for finding the EOP
+can set the
+L<SLIF's C<exhaustion> recognizer setting|Marpa::R2::Scanless::R/"exhaustion">
+to "C<event>", so that a parse event occurs at parse exhaustion.
+When the event-triggering method returns, the application
+can then
+L<check for exhaustion explicitly|/"Detecting parse exhaustion">.
+
+=head1 Copyright and License
+
+=for Marpa::R2::Display
+ignore: 1
+
+  Copyright 2015 Jeffrey Kegler
+  This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+  redistribute it and/or modify it under the terms of the GNU Lesser
+  General Public License as published by the Free Software Foundation,
+  either version 3 of the License, or (at your option) any later version.
+
+  Marpa::R2 is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser
+  General Public License along with Marpa::R2.  If not, see
+  http://www.gnu.org/licenses/.
+
+=for Marpa::R2::Display::End
+
+=cut
+
+# vim: expandtab shiftwidth=4:
+

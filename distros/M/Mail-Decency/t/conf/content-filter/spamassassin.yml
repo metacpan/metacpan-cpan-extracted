@@ -1,0 +1,10 @@
+---
+
+disable: 0
+
+# cmd_check: '/usr/share/crm114/mailreaver.crm -u %user%'
+# cmd_learn_spam: '/usr/bin/bogofilter --user-config-file %user% -s -I %file%'
+# cmd_unlearn_spam: '/usr/bin/bogofilter --user-config-file %user% -N -I %file%'
+# cmd_learn_ham: '/usr/bin/bogofilter --user-config-file %user% -n -I %file%'
+# cmd_unlearn_ham: '/usr/bin/bogofilter --user-config-file %user% -S -I %file%'
+

@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 46f4344783183218735fb95235daa6bb8285177b Build.PL
+SHA1 efc402bedce9a1b28d5b451e9ab2fa70bb7c40f8 CONTRIBUTORS
+SHA1 10962c49c88897e5b0a07765e9cc7c630214d098 Changes
+SHA1 4a5871f916adaf6e49f2a2c64223bbddd3c6e5f5 LICENSE
+SHA1 07d7fae4e7675088d8ce3e68e6e5165bc198d495 MANIFEST
+SHA1 3151dbab26e5e87977b753d3fb1ef59d93b7bd8d META.yml
+SHA1 f5321d14848d7ed960c61c2230972e4f93b0e404 README
+SHA1 9fa4c5fb279294b254e2ef983d49ee44ab108a8c cpanfile
+SHA1 e8586ad191687f3587f1cb2e875aba69b00d9158 lib/Moove.pm
+SHA1 1aa22866215fb8bb0211939910115fb62be8c96b perlcritic.rc
+SHA1 e5fc2e8cb9c8a41f94d2bb053952a5578389fdcf t/Bar1.pm
+SHA1 614af2a791b68f9e2489d6b3beaba73e1ebb68ea t/Bar2.pm
+SHA1 e94e45b77866474009fa53aa14faef0834998d2c t/Foo1.pm
+SHA1 9ab0989fe043f74a5c0a5c8ac44c5576281f0315 t/Foo2.pm
+SHA1 c4c817d8643053cd982b0da4d73887f835dc90e1 t/FooBar.pm
+SHA1 33422dcdbbfd1d017267b63b870586ba130dcdb0 t/TryCatch.pm
+SHA1 238b21f04fc849d759b743345b689ad010dea9f0 t/TryCatch/typelib.pm
+SHA1 c538f719822737c8f386d10349c3f727a5eb052e t/TryCatchAuto.pm
+SHA1 3e6e19289daa664b53e9b206a3e09ed958dca72b t/all.t
+SHA1 6f27afac9b9119ce34f4e07d5ad512e0f8d62034 t/author-critic.t
+SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 a7372360e35fd3a409b1e76648dfe9bfbb11c759 t/redefined.t
+SHA1 c8bea5269f9b69e31cfb52404e7afb4732d03df6 t/release-cpan-changes.t
+SHA1 34d2345dcc0326f8f9468c27dd05464aba3547da t/release-kwalitee.t
+SHA1 c133159ed2a7ae3d860fd3e05ffe99940e6aecce t/trycatch-auto.t
+SHA1 edfdf05500397f21725ef880f7ca526f8b54f8ce t/trycatch.t
+SHA1 a2034e42b2aea10ecdea641e2e6858cb4359df5f t/types.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEi9t3cAotPnrNMeBAlXN4zDiQ2igFAlkLCJoACgkQlXN4zDiQ
+2ii7EhAAjfSPDwxdQ4ZOaBsEXFtMgHTY9XgWKF8ESn3fFs+Ryo2pFQqMDnfF6BrW
+v0beeaug1sC+7nP+DdJSNBTVYUEQhTatJUmc90mnxCpNXABIzqgFWTJqOClc8qki
+r/waX7wQ0ZL+CEjTr/v/aL2Dg11PvxKItE2rqG2YfuxA3fH04vGq5YVqXUF2Wi5/
++ZMk/e/WThNR7vb2A63pu0yMh3E24UpbUeNCLP0bU29iyBuL7UPUqK9FNIYrm+/G
+81la8Z5oL7ertr9UCrHei/PKrxwvqPS02TI/kASY/0pK3qEGpx6UkzWexTA7c9Vx
+6XvIFMYKAzP1Y4zgQQQ9LVpqaUjYIetZjAyH6V8UNqTuie977/+9Z00QqYGZF6Lu
+lVTzcLLS4Bq/Y6nnk1rezFTQPxuQwWqdfQ65/LueXBAXybRMHJo4ofVxovBGGMeA
+97l73YAyVcFSBHwoKJGh0Nv3LRh+abDv3RmTHg/Zh2fzMfDvTWyJU2kLgOwcfzBA
+phiP37weiwzvSyGfITRUOWW3HnnvDshRQ+VamjzNe2SD6YWfgb4qEEwGPlPxiUhS
+mIHynialuvXh3mQyn/OtMRPYDB6tlSpcmIioxHcHl27tdiiYxYu3GN3N3By9Ke8b
+iqqgHeGX2PGmxr9TagWp/6To2gpRjHFsCC4OEgjNDZwk4AdBIaw=
+=OKkU
+-----END PGP SIGNATURE-----

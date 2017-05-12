@@ -1,0 +1,51 @@
+Changes
+=======
+0.0106 - 3 Jun 2015
+    * Added compatibility to Cache::FileCache
+
+0.0105 - 3 Jun 2015
+    * Made compatible to Moose 'Class::MOP::load_class is deprecated'
+    * Fixed syntax errors in 'MooseX::WithCache::Backend::Cache::Memcached
+
+0.01002 - 19 Jul 2010
+    * Use parameterized roles in t/03_chi.t
+    * Minor housecleaning
+
+0.01001 - 18 Sep 2009
+    * Stupid typo caused with_cache() to not work for backward compatibility
+
+0.01000 - 15 Sep 2009
+    * Bump version number
+
+0.00999_04 - 14 Sep 2009
+    * Implement backwarnds compatible with_cache() method
+
+0.00999_03 - 03 Sep 2009
+    * Allow coercing from hash to Cache::Memcached objects
+
+0.00999_02 - 20 Aug 2009
+    * Makefile.PL tweaks.
+
+0.00999_01 - 17 Aug 2009
+    * Use MooseX::Role::Parameterized.
+    * This breaks compatibility, if you were digging through WithCache's
+      internal API
+
+0.00005 - 21 Jul 2009
+    * Allow other types of memcached clients
+
+0.00004 - 18 Mar 2009
+    * Grr, forgot to update MANIFEST
+
+0.00003 - 17 Mar 2009
+    * Add FastMmap backend (Taro Funaki)
+    * Implement get_multi
+
+0.00002 - 16 Jan 2009
+    * Refactor backend so that it doesn't hold wasteful attributes.
+    * Add CHI backend.
+    * Attribute key_generator is now called cache_key_generator
+    * Much better test coverage.
+
+0.00001 - 16 Oct 2008
+    * Initial release

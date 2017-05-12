@@ -1,0 +1,15 @@
+Revision history for MasonX::Request::ExtendedCompRoot
+======================================================
+
+0.04	2017/04/16
+Surprised to discover people actually using it
+
+0.03	2004/02/18
+Number updated to keep in step with MasonX::Request::ExtendedCompRoot::WithApacheSession
+
+0.02	2004/02/17
+Added basic tests to keep module testers happy.
+
+0.01	2004/02/17
+
+

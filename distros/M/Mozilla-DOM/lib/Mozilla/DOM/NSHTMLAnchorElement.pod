@@ -1,0 +1,190 @@
+=head1 NAME
+
+Mozilla::DOM::NSHTMLAnchorElement
+
+=for object Mozilla::DOM::NSHTMLAnchorElement
+
+Mozilla::DOM::NSHTMLAnchorElement is a wrapper around an instance of Mozilla's
+nsIDOMNSHTMLAnchorElement interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::NSHTMLAnchorElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $protocol = $nshtmlanchorelement->B<GetProtocol>()
+
+Output:
+
+=over
+
+=item $protocol (string)
+
+=back
+
+=head2 $nshtmlanchorelement->B<SetProtocol>($protocol)
+
+Input:
+
+=over
+
+=item $aProtocol (string)
+
+=back
+
+=head2 $host = $nshtmlanchorelement->B<GetHost>()
+
+Output:
+
+=over
+
+=item $host (string)
+
+=back
+
+=head2 $nshtmlanchorelement->B<SetHost>($host)
+
+Input:
+
+=over
+
+=item $aHost (string)
+
+=back
+
+=head2 $hostname = $nshtmlanchorelement->B<GetHostname>()
+
+Output:
+
+=over
+
+=item $hostname (string)
+
+=back
+
+=head2 $nshtmlanchorelement->B<SetHostname>($hostname)
+
+Input:
+
+=over
+
+=item $aHostname (string)
+
+=back
+
+=head2 $pathname = $nshtmlanchorelement->B<GetPathname>()
+
+Output:
+
+=over
+
+=item $pathname (string)
+
+=back
+
+=head2 $nshtmlanchorelement->B<SetPathname>($pathname)
+
+Input:
+
+=over
+
+=item $aPathname (string)
+
+=back
+
+=head2 $search = $nshtmlanchorelement->B<GetSearch>()
+
+Output:
+
+=over
+
+=item $search (string)
+
+=back
+
+=head2 $nshtmlanchorelement->B<SetSearch>($search)
+
+Input:
+
+=over
+
+=item $aSearch (string)
+
+=back
+
+=head2 $port = $nshtmlanchorelement->B<GetPort>()
+
+Output:
+
+=over
+
+=item $port (string)
+
+=back
+
+=head2 $nshtmlanchorelement->B<SetPort>($port)
+
+Input:
+
+=over
+
+=item $aPort (string)
+
+=back
+
+=head2 $hash = $nshtmlanchorelement->B<GetHash>()
+
+Output:
+
+=over
+
+=item $hash (string)
+
+=back
+
+=head2 $nshtmlanchorelement->B<SetHash>($hash)
+
+Input:
+
+=over
+
+=item $aHash (string)
+
+=back
+
+=head2 $text = $nshtmlanchorelement->B<GetText>()
+
+Output:
+
+=over
+
+=item $text (string)
+
+=back
+
+=head2 $retval = $nshtmlanchorelement->B<ToString>()
+
+Output:
+
+=over
+
+=item $retval (string)
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

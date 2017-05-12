@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Mhash.pm
+Mhash.xs
+Makefile.PL
+test.pl

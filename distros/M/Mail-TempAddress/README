@@ -1,0 +1,120 @@
+Mail::TempAddress
+-----------------
+
+Mail::TempAddress is a set of modules for creating and using temporary e-mail
+addresses.  They're intended to be simple and easy to use.  They're not
+increadably featureful, but they work pretty well.
+
+Why would you want a temporary e-mail address?
+
+Suppose you need to contact a person or a company for a simple question or
+concern.  You may be purchasing something online, for example.  While it's
+important to be able to send and receive messages, you may not want to reveal
+your one true e-mail address.
+
+Create a temporary e-mail address and use that instead.  Mail::TempAddress will
+not reveal your actual e-mail address to a third party -- and a temporary
+address can expire when you decide you've had enough.
+
+INSTALLATION
+------------
+
+If you've already used CPAN or CPANPLUS to install this, great!  If not, you'll
+need to install some other dependencies.
+
+First, run the Build.PL file to create the Build program.  Then install as
+normal:
+
+    $ perl Build.PL
+    $ perl ./Build
+    $ perl ./Build test
+    $ sudo perl ./Build install
+
+All of the tests should pass.  If not, please send the complete diagnostic
+output to the author and we'll try to fix the bugs.  This should work on any
+Unix system and probably elsewhere, but portability depends on several other
+components.
+
+To use this program, you'll have to do a bit of configuration on your mail
+server.  Here's how we did it.  This may not be the optimal installation, but
+it works.
+
+If you have better ideas (or ideas for other MTAs such as Sendmail, Qmail, and
+Exim, please send them along).
+
+    1. Create a new subdomain, such as tempmail.example.com.  This must be
+    globally visible.
+
+    2. Create a new user with a home directory.  "tempmail" is a good name.
+
+    3. Configure all mail to the subdomain to be delivered to a filter program.
+
+    In Postfix, this meant adding a new transport.  You can do this by adding
+    one line to /etc/postfix/transport/:
+
+        tempmail.example.com    tempmail:
+
+    two lines to /etc/postfix/virtual:
+
+        tempmail.example.com    virtual
+        @tempmail.example.com    tempmail@tempmail.example.com
+
+    and, possibly, several lines to /etc/postfix/master.cf.  The first defines
+    delivery to the new tempmail transport:
+
+        tempmail    unix    -    n    n    -    -    pipe \
+            flags=FQ.    user=tempmail    argv=/home/tempmail/bin/tempmail.pl
+
+    (This line was broken to fit in 80 columns; you might need to follow local
+    formatting conventions.)
+
+    If you don't already use transport maps, you'll likely have to load them.
+    Again edit /etc/postfix/master.cf to add an entry:
+
+        transport_maps = hash:/etc/postfix/transport
+
+    Finally, if you aren't already using virtual domains, add this line to
+    /etc/postfix/master.cf:
+
+        virtual_maps = hash:/etc/postfix/virtual
+
+    You'll have to rehash the configuration files; check the Postfix
+    documentation.  (Hey, you should be checking this against the docs anyway.)
+
+    4. Create a subdirectory under /home/tempmail/ to store temporary address
+    files.  'addresses' is a good name.  Also create the 'bin' directory where
+    the filter will live.
+
+    5. Create the filter program.  This is a good start:
+
+        #/usr/bin/perl -w
+
+        use File::Spec;
+        use Mail::TempAddress;
+
+        my $address_dir = File::Spec->catfile( $ENV{HOME}, 'addresses' );
+        my $mta         = Mail::TempAddress->new( $address_dir )
+
+        $mta->process();
+
+    6. Double-check your mail server settings and restart your mail server.
+    There is no warranty at this point.
+
+USAGE
+-----
+
+    $ perldoc Mail::TempAddress
+
+BUGS
+----
+
+None known.  The general TODO list lives in the POD of Mail::TempAddress.
+
+LICENSE, COPYRIGHT, and CREDITS
+-------------------------------
+
+Copyright (c) 2003 - 2009 chromatic.  Some rights reserved.  You may use,
+modify, and distribute this module under the same terms as Perl 5.10 itself.
+
+This software would not have been possible without the inspiration of Simon
+Cozens' Mail::Audit and the practical experience of writing Mail::SimpleList.

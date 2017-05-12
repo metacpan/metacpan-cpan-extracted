@@ -1,0 +1,104 @@
+NAME
+    Mail::ExpandAliases - Expand aliases from /etc/aliases files
+
+SYNOPSIS
+      use Mail::ExpandAliases;
+
+      my $ma = Mail::ExpandAliases->new("/etc/aliases");
+      my @list = $ma->expand("listname");
+
+DESCRIPTION
+    I've looked for software to expand aliases from an alias file for a
+    while, but have never found anything adequate. In this day and age, few
+    public SMTP servers support EXPN, which makes alias expansion
+    problematic. This module, and the accompanying "expand-alias" script,
+    attempts to address that deficiency.
+
+USAGE
+    Mail::ExpandAliases is an object oriented module, with a constructor
+    named "new":
+
+      my $ma = Mail::ExpandAliases->new("/etc/mail/aliases");
+
+    "new" takes the filename of an aliases file; if not supplied, or if the
+    file specified does not exist or is not readable, Mail::ExpandAliases
+    will look in a predetermined set of default locations and use the first
+    one found. See the section on "ALIAS FILE LOCATIONS", below, for details
+    on this search path and how to modify it.
+
+    Lookups are made using the "expand" method:
+
+      @aliases = $ma->expand("listname");
+
+    "expand" returns a list of expanded addresses, sorted alphabetically.
+    These expanded addresses are also expanded, whenever possible.
+
+    A non-expandible alias (no entry in the aliases file) expands to itself,
+    i.e., does not expand.
+
+    In scalar context, "expand" returns a reference to a list.
+
+    Note that Mail::ExpandAliases provides read-only access to the alias
+    file. If you are looking for read access, see Mail::Alias, which is a
+    more general interface to alias files.
+
+    Mail::ExpandAliases make a resonable attempt to handle aliases the way
+    "sendmail" does, including loop detection and support for escaped named.
+    See chapter 24, "Aliases", in *Sendmail*
+    (<http://www.oreilly.com/catalog/sendmail/>) for full details about this
+    process.
+
+ALIAS FILE LOCATIONS
+    Paths to the aliases file can be added globally at compile time:
+
+      use Mail::ExpandAliases qw(/etc/exim/aliases);
+
+    Alias file locations can also be specified to instances when they are
+    constructed:
+
+      my $ma = Mail::ExpandAliases->new("/etc/exim/aliases");
+
+    Alias file locations are stored in the package global
+    @POSSIBLE_ALIAS_FILES, which can be assigned to directly if you're not
+    impressed with encapsulation:
+
+      @Mail::ExpandAliases::POSSIBLE_ALIAS_FILES = ("/etc/aliases");
+
+    By default, @POSSIBLE_ALIAS_FILES contains /etc/aliases,
+    /etc/mail/aliases, /etc/postfix/aliases, and /etc/exim/aliases. If your
+    alias file is ones of these, the filename can be omitted from the
+    constructor; Mail::ExpandAliases will look in @POSSIBLE_ALIAS_FILES
+    until it finds a file that exists.
+
+    Note that it is not (necessarily) an error if none of these files
+    exists. An alias file can be added by passing a filename to the init()
+    method:
+
+      my $ma = Mail::ExpandAliases->new();
+
+      # Write a temporary aliases file in /tmp/aliases-$<
+      $ma->init("/tmp/aliases-$<");
+
+    Calling expand before setting an alias file will, of course, produce no
+    useful expansions.
+
+    If the constructor is called with the name of a file that exists but
+    cannot be opened, Mail::ExpandAliases will die with an error detailing
+    the problem.
+
+BUGS / SHORTCOMINGS
+    If you were telnet mailhost 25, and the server had EXPN turned on, then
+    sendmail would read a user's .forward file. This software cannot do
+    that, and makes no attempt to. Only the invoking user's .forward file
+    should be readable (if any other user's .forward file was readable,
+    sendmail would not read it, making this feature useless), and the
+    invoking user should not need this module to read their own .forward
+    file.
+
+    Any other shortcomings, bugs, errors, or generally related complaints
+    and requests should be reported via the appropriate queue at
+    <http://rt.cpan.org/>.
+
+AUTHOR
+    darren chamberlain <darren@cpan.org>
+

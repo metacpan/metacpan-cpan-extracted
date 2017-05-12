@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/MIME-Base64-URLSafe.t
+lib/MIME/Base64/URLSafe.pm
+META.yml                                 Module meta-data (added by MakeMaker)

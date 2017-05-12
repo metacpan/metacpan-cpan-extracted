@@ -1,0 +1,26 @@
+Revision history for MooX::Aliases
+
+0.001006 - 2015-02-01
+  - name alias methods to avoid them getting autocleaned or detected by
+    Test::CleanNamespaces (RT#101814)
+
+0.001005 - 2015-01-06
+  - fix +attribute overrides
+  - fix multi-attribute definitions
+
+0.001004 - 2014-12-09
+  - remove synopsis test, as it is redundant and annoying to test
+
+0.001003 - 2014-12-07
+  - fix aliases being added in +attribute overrides (GH#1)
+
+0.001002 - 2014-08-16
+  - fix compatibility with perl 5.6
+  - list perl prerequisite in metadata
+  - include correct developer prerequisites
+
+0.001001 - 2014-05-25
+  - fix compatibility with namespace::clean
+
+0.001000 - 2013-05-02
+  - initial release

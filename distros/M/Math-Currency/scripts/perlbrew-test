@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+. $HOME/perl5/perlbrew/etc/bashrc
+
+# test this dist against every installed perlbrew perl on the local machine.
+
+for ver in $(perlbrew list | grep -E 'perl-[0-9.]+$' | sed -e 's/^\*//'); do
+    perlbrew use $ver
+    perlbrew lib delete @math-currency >/dev/null 2>&1
+    perlbrew lib create @math-currency >/dev/null 2>&1
+    perlbrew use @math-currency
+
+    echo "===============> $ver@math-currency <==============="
+
+    # if LEGACY_BIGINT is set, install v1.99 of BigInt.  This is to ensure we
+    # are compatible with older Math::BigInt and Math::BigFloat
+    if [ "$LEGACY_BIGINT" ]; then
+        cpanm -q FLORA/Math-BigInt-1.99.tar.gz
+    fi
+
+    cpanm -q --installdeps .
+
+    # add release-testing modules
+    cpanm --notest -q Test::Pod Test::Pod::Coverage Pod::Coverage::TrustPod Module::Signature
+
+    [ -f Makefile ] && make distclean >/dev/null
+    perl Makefile.PL
+    make test AUTHOR_TESTING=1 RELEASE_TESTING=1 TEST_SIGNATURE=1
+
+    sleep 3
+
+    perlbrew use $ver
+    perlbrew lib delete @math-currency >/dev/null 2>&1
+
+    echo ""
+done

@@ -1,0 +1,25 @@
+Merge/HashRef version 0.01
+==========================
+
+Read the POD with the module for usage instructions.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+5.8.0 is needed, as it relies on Exporter::Simple
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Stray Toaster
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

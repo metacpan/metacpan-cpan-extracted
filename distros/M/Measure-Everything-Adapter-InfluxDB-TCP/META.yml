@@ -1,0 +1,28 @@
+---
+abstract: 'Send stats to Influx via TCP using Telegraf'
+author:
+  - 'Thomas Klausner <domm@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Measure-Everything-Adapter-InfluxDB-TCP
+requires:
+  IO::Socket::INET: '0'
+  InfluxDB::LineProtocol: '0'
+  Log::Any: '0'
+  Measure::Everything::Adapter::Base: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+resources: {}
+version: '1.003'
+x_serialization_backend: 'YAML::Tiny version 1.69'

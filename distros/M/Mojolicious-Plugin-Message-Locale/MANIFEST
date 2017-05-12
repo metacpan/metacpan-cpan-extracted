@@ -1,0 +1,13 @@
+Changes
+lib/Mojolicious/Plugin/Message/Locale.pm
+Makefile.PL
+MANIFEST			This list of files
+t/000_use.t
+t/001_message_locale.t
+t/002_locale_is_ja.t
+t/003_locale_file.t
+t/004_default_message.t
+t/locale.conf
+t/other_locale.conf
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

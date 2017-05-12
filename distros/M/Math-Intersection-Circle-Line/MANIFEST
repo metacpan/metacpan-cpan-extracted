@@ -1,0 +1,7 @@
+Build.PL
+lib/Math/Intersection/Circle/Line.pm
+MANIFEST			This list of files
+t/test.t
+README
+META.yml
+META.json

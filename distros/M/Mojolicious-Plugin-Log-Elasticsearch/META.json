@@ -1,0 +1,43 @@
+{
+   "abstract" : "Mojolicious Plugin to log requests to an Elasticsearch instance",
+   "author" : [
+      "Justin Hawkins <justin@eatmorecode.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-Log-Elasticsearch",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "4.63"
+         },
+         "suggests" : {
+            "Geo::IP" : "1.45"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/EatMoreCode/Mojolicious-Plugin-Log-Elasticsearch",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/EatMoreCode/Mojolicious-Plugin-Log-Elasticsearch.git",
+         "web" : "https://github.com/EatMoreCode/Mojolicious-Plugin-Log-Elasticsearch"
+      }
+   },
+   "version" : "1.162530",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0214"
+}
+

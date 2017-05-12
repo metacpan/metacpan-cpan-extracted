@@ -1,0 +1,43 @@
+# NAME
+
+MooseX::Attribute::Handles::Expand - Expands '\*' in handle functions with the attribute name
+
+# VERSION
+
+version 0.0.3
+
+# SYNOPSIS
+
+    package Foo;
+    use Moose;
+    use MooseX::Attribute::Handles::Expand;
+
+    has [ qw/ bar baz / ] => (
+        traits => [ 'Array' ],
+        default => sub { [] },
+        handles => {
+            'size_*' => 'count',
+        },
+    );
+
+
+    my $foo = Foo->new;
+    ...;
+    print $foo->size_bar;
+    print $foo->size_baz;
+
+# DESCRIPTION
+
+Grooms the name of delegated methods in the handles and expands all
+instances of `*` into the attribute name.
+
+# AUTHOR
+
+Yanick Champoux <yanick@babyl.dyndns.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

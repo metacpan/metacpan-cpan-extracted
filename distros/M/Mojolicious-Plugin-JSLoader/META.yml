@@ -1,0 +1,23 @@
+---
+abstract: 'move js loading to the end of the document'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-JSLoader
+requires:
+  HTML::ParseBrowser: '1.06'
+  Mojolicious: '4.71'
+  version: '0.77'
+resources:
+  bugtracker: http://github.com/reneeb/Mojolicious-Plugin-JSLoader/issues
+  homepage: http://github.com/reneeb/Mojolicious-Plugin-JSLoader
+  repository: http://github.com/reneeb/Mojolicious-Plugin-JSLoader.git
+version: '0.06'

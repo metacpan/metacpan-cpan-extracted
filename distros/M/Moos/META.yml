@@ -1,0 +1,32 @@
+---
+abstract: 'Moo s{imple,peedy,ingle}'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Moos
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+    - example
+recommends:
+  Class::XSAccessor: '1.07'
+  Role::Tiny: '1.002000'
+  Sub::Identify: '0.04'
+requires:
+  MRO::Compat: '0'
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/ingydotnet/moos-pm/issues
+  homepage: https://github.com/ingydotnet/moos-pm
+  repository: https://github.com/ingydotnet/moos-pm.git
+version: '0.30'

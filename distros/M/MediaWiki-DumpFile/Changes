@@ -1,0 +1,100 @@
+Revision history for MediaWiki-DumpFile
+
+0.2.2 July 22, 2013
+  * Fixed bug #69983 "type map failed for varbinary"
+  * Included transparant support for compressed XML and SQL files
+  * Applied patch by CHOCOLATE per bug #85143
+
+0.2.1
+  * No longer enforces version checking of the XML document schema by default
+    but it remains as an option
+
+0.2.0
+  * No longer depends on XML::CompactTree::XS but does recommend it.
+    Just install it via CPAN and it will be used automatically to make things faster. 
+  * Fast mode is here! ::Pages, ::FastPages, and ::Compat::Pages can 
+    all be very fast by giving up support for everything besides
+    titles and the text contents of the first entry in the dump file. 
+  * Resolved bug #63453 "categories() does not work in MediaWiki::DumpFile::Compat"
+  * MediaWiki::DumpFile::Compat did not perform caching on methods like Parse::MediaWikiDump did
+    also from bug #63453
+  * Added in formal error messages for a few events, most notably when
+    the page dump version changes to an unknown one. Now the user is
+    directed to our documentation where there is explicit instructions
+    on how to report a bug and override the case where it will not run
+    with an environment variable
+  * Added the XML benchmarking suite I created to study XML processing speeds
+    to distro; hopefully more people will be interested in the shootout. 
+  * Ported over documentation from Parse::MediaWikiDump giving ::Compat
+    full documentation in this module as well. 
+  * ::Compat::page now uses optimized regex caching and compilation 
+
+0.1.8
+  * Resolved bug #58107 "MediaWiki::DumpFile::SQL, not all dumps have LOCK"
+
+0.1.7
+  * Added current_byte() and size() method to ::Pages
+  * Documented bug #56843 in ::Compat
+
+0.1.6
+  * API changes in XML::TreePuller
+  * Added some missing deps to Makefile.PL
+
+0.1.5
+  * Made the CPAN indexer unhappy with me
+
+0.1.3
+  * Added in compatibility with Parse::MediaWikiDump via
+    MediaWiki::DumpFile::Compat
+
+0.1.2
+  * Fixed bug #55758 - When calling subroutine comment ($revision->comment), 
+    it throws null pointer exception.
+  * Added check to constructor for ::Pages to complain if the input
+    specified as a file is not really in the file system
+
+0.1.1
+  * Split off MediaWiki::DumpFile::XML into XML::TreePuller
+    and made it available on CPAN
+  * Removed LIMITATIONS section of MediaWiki::DumpFile 
+    documentation
+
+0.0.10
+  * Fixed bug in subclassing of pages object
+    to handle version 0.4 dump files
+  * Fixed incorrect dependencies listed in 
+    Makefile.PL
+
+0.0.9
+  * Added support for dump files with versions
+    less than 3 and for versions equal to
+    0.4 with support for the redirect
+    feature of the 0.4 dump file
+  * Refactored interface to ::XML
+    and getting it ready to be split
+    off to its own CPAN module
+  * Changed the constructor class
+    to require the parsing modules
+    when the methods are invoked
+    instead of use()ing them
+    when the module is loaded. 
+
+0.0.8
+  * Added minor method to ::Pages::Revision
+  * Created ::Pages::Revision::Contributor
+
+0.0.7
+  * Added MediaWiki::DumpFile::FastPages - twice
+    as fast as MediaWiki::DumpFile::Pages but
+    with limited features.
+  * Improved documentation for MediaWiki::DumpFile::Pages
+
+0.0.6	
+  * Remembered to start listing changes
+  * Implemented a method to get the contents of
+    the create_table statement in ::SQL per bug 
+    #53371
+
+0.0.1    
+  * First version, released on an unsuspecting world.
+

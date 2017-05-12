@@ -1,0 +1,21 @@
+Revision history for Perl extension MooseX::Types::NetAddr::IP.
+
+0.7
+    - replaced Class::Load with Module::Runtime (Caleb Cushing)
+
+0.6
+    - added Class::Load v0.2 to PREREQ_PM to fix test failures under strawberry perl (Caleb Cushing)
+
+0.05
+    - prevent loading NetAddr::IP in consumed module until used (Caleb Cushing)
+
+0.04
+    - fixed some typos in the pod
+    - added tests for NetAddrIPv4/6 ArrayRef coercions
+0.03
+    - refactoring
+0.02  
+    - removed regexp validation
+0.01 
+    - original version; created by h2xs 1.23 
+

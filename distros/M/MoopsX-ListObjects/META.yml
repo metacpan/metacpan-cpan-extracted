@@ -1,0 +1,26 @@
+---
+abstract: 'Use Moops with List::Objects::WithUtils'
+author:
+  - 'Jon Portnoy <avenj@cobaltirc.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MoopsX-ListObjects
+requires:
+  List::Objects::Types: 0.006
+  List::Objects::WithUtils: 2
+  Moops: 0.020
+  Type::Library: 0
+  Type::Utils: 0
+  Types::Standard: 0
+  parent: 0
+resources:
+  repository: git://github.com/avenj/moopsx-listobjects.git
+version: 0.003001

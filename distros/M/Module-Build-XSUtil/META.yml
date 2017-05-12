@@ -1,0 +1,54 @@
+---
+abstract: 'A Module::Build class for building XS modules'
+author:
+  - ':'
+build_requires:
+  Capture::Tiny: '0'
+  Cwd::Guard: '0'
+  File::Copy::Recursive: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.4005'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Build-XSUtil
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Module::Build::XSUtil:
+    file: lib/Module/Build/XSUtil.pm
+    version: '0.16'
+requires:
+  Devel::CheckCompiler: '0'
+  Devel::PPPort: '0'
+  Exporter: '0'
+  ExtUtils::CBuilder: '0'
+  File::Basename: '0'
+  File::Path: '0'
+  XSLoader: '0'
+  parent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/hideo55/Module-Build-XSUtil/issues
+  homepage: https://github.com/hideo55/Module-Build-XSUtil
+  repository: git://github.com/hideo55/Module-Build-XSUtil.git
+version: '0.16'
+x_contributors:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+  - 'Vincent Pit <perl@profvince.com>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Hideaki Ohno <hide.o.j55@gmail.com>'

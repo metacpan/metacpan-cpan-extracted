@@ -1,0 +1,10 @@
+t/testlib.pl
+t/10_search_more.t
+t/09_search.t
+t/11_search_more.t
+t/13_intensive_runs.pl
+t/premade_data.db
+lib/Metadata/DB/Search.pm
+MANIFEST
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

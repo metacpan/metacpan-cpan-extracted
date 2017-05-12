@@ -1,0 +1,32 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 6cbda217d570c627473091d930a7d1413abf35da CHANGES
+SHA1 1e4c17267dfdfb0372f13e1edc5fe93e103b3ca7 MANIFEST
+SHA1 9912a23116a49db076274db72d9062f69fadd295 META.yml
+SHA1 0206e8d03a1caf125d179c6c3cf79cc5535a88fb Makefile.PL
+SHA1 e32ace9ad4af498cd7524453589ceebe773dd6cb README
+SHA1 1bc345ee0ef09b680df7c0fcd0f411029c255e8c lib/Math/Interpolate.pm
+SHA1 6716fffeea93cbc759ec48202fa75d3129dcb050 lib/Math/IntervalSearch.pm
+SHA1 00bd22920d1eba9f95f6857fb0c0e84137f1e37b t/01interval.t
+SHA1 bb20658eb002bf4193c907f6076ae072e198d475 t/02interp.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (GNU/Linux)
+
+iEYEARECAAYFAlKAGqcACgkQxXIjJtpWHZHQWgCgjeIBJV6NuhJjMnGl20dh/JgO
+z1YAn1Jai6WUQOhtRs8lWmqVg4CFe0oq
+=zyOS
+-----END PGP SIGNATURE-----

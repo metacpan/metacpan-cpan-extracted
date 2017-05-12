@@ -1,0 +1,12 @@
+README
+MANIFEST
+Changes
+Makefile.PL
+lib/MooseX/Lists.pm
+t/01-load.t
+t/02-syntax.t
+t/03-list.t
+t/04-accessors.t
+t/98_pod.t
+t/99_pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

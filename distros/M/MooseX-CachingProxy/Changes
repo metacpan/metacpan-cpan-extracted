@@ -1,0 +1,9 @@
+Revision history for MooseX::CachingProxy
+
+0.002 2015-02-10T00:35:36Z
+
+    * Just the tiniest bit of a switch over to minilla for package management   
+
+0.001 Sun Apr 29 00:52:06 BST 2012
+
+    * Initial release

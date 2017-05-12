@@ -1,0 +1,41 @@
+Module-Checkstyle
+
+DESCRIPTION
+
+Module::Checkstyle is a tool similar to checkstyle L<http://checkstyle.sourceforge.net> for Java.
+
+It allows you to validate that your code confirms to a set of guidelines checking various things
+such as indentation, naming, whitespace, complexity and so forth.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+GETTING STARTED
+
+Next you probablly want to create your own configuration file. By default Module::Checkstyle will
+use ~/.module-checkstyle/config if it exists. To read how to write your config-file type
+"perldoc Module::Checkstyle::Config" at your command prompt. There is also a sample config you can
+start out with in this distribution. 
+
+DEPENDENCIES
+
+Module::Checkstyle requires the following modules to work:
+
+    PPI 1.000 or later
+    File::Find::Rule
+    Readonly
+    Module::Pluggable
+    File::Spec
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, Claes Jacobsson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

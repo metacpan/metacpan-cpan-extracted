@@ -1,0 +1,8 @@
+local
+.git
+carton.lock
+blib
+.rock.yml
+.carton
+MooseX-Role-REST-Consumer-*
+MANIFEST.bak

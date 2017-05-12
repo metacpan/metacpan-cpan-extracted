@@ -1,0 +1,27 @@
+This is Perl module MouseX::Types.
+
+INSTALLATION
+
+MouseX::Types installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan MouseX::Types
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+MouseX::Types documentation is available as in POD. So you can do:
+
+    % perldoc MouseX::Types
+
+to read the documentation online with your favorite pager.
+
+Kazuhiro Osawa

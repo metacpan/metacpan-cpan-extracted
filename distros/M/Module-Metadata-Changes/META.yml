@@ -1,0 +1,47 @@
+---
+abstract: 'Manage machine-readable Changes/CHANGES/Changelog.ini files'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001002'
+  Test::Pod: '1.51'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Metadata-Changes
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Config::IniFiles: '2.88'
+  DateTime: '0.66'
+  DateTime::Format::HTTP: '0.42'
+  DateTime::Format::Strptime: '1.73'
+  DateTime::Format::W3CDTF: '0.06'
+  File::Slurper: '0.008'
+  File::chdir: '0.101'
+  Getopt::Long: '0'
+  HTML::Entities::Interpolate: '1.06'
+  HTML::Template: '2.95'
+  Moo: '2.000002'
+  Pod::Usage: '0'
+  Try::Tiny: '0.24'
+  Types::Standard: '1.000005'
+  feature: '0'
+  lib: '0'
+  strict: '0'
+  version: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Module::Metadata::Changes
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/Module-Metadata-Changes.git
+version: '2.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,90 @@
+Revision history for Perl extension Module::Locate
+
+1.80 2015-10-25 NEILB
+    - Switched to Dist::Zilla
+    - Updated github repo URL after changing my github username
+
+1.79 2014-04-01
+    - Don't muck with %INC RT#30523.
+    - Get directory separator handling right(er).
+
+1.78_01 2014-03-31
+    - mod_to_path() now always uses '/' as directory separator;
+      this problem was noted by DAGOLDEN in RT#30523. Added a small
+      testsuite for mod_to_path(), so that CPAN Testers can confirm
+      correct behaviour on Windows.
+    - Removed the Global and Cache options. Checked all the dists using
+      this module on CPAN. Only one was using Global, but not relying on
+      the odd quirk of that. Hence the developer release first.
+    - Sorted out the confusion between when to use '/' and when not,
+      in locate().
+
+1.78 2013-12-16
+    - Added MIN_PERL_VERSION to Makefile.PL, as previous attempt
+      to add min perl version to metadata failed. I really should
+      switch all my dists to Dist::Zilla!
+
+1.77 2013-12-15
+    - Added 'use 5.8.8' to specify minimum version of Perl.
+      This should give Module-Locate a clean bill of health on CPANTS
+    - Added 'warnings' as a prereq in Makefile.PL
+
+1.76 2013-08-15
+    - Added in "use warnings" after looking at CPANTS
+
+1.75 2013-08-14
+    - Fixed an operator precedence bug in is_mod_loaded()
+      RT#87204: report and fix from Reini Urban
+
+1.74 2013-07-20
+    - Added license metadata to Makefile.PL and to the pod
+
+1.73 2013-07-20
+    - Fixed up dates in this file to satisfy CPAN::Changes::Spec
+    - Removed version number from README
+    - Made the repository URL in the pod a link
+
+1.72 2012-09-24
+    - Updated SEE ALSO to include link to review of modules
+      for getting the path of a module.
+
+1.71 2012-09-17
+    - Added github repository to documentation
+    - Updated Makefile.PL with prereqs and github repository info
+    - Updated this file to follow conventions in CPAN::Changes::Spec
+    - minor updates to documentation to improve clarity
+    - added App::Module::Locate to SEE ALSO
+    - first release by NEILB (thanks to Dan for co-maint)
+
+1.7 2005-07-02
+    - "locate" now also accepts filenames
+    - added "mod_to_path" function
+    - dropped Module::Build and warnings dependencies
+    - dropped Changes section from module POD
+
+1.6 2005-05-19
+    - fixed failing Win32 tests (thanks barbie!)
+
+1.5 2004-01-07
+    - added the ubiquitous "Makefile.PL" (thanks "Module::Build"!)
+
+1.4 2003-12-15
+    - now backward compatible with 5.00503
+
+1.3 2003-11-25
+    - Tidied up POD.
+    - "acks_like_fh()" now tests plain globs i.e "*FH"
+
+1.2 2003-11-25
+    - No longer "croak()"s when "locate()" fails to find the module (which is
+      much nicer and is consistent with the documentation).
+    - "Build.PL" should now play nice with "CPAN" installs
+
+1.1 2003-11-07
+    - fixed "$PkgRe" to be functional
+    - added "is_mod_loaded()" and "is_pkg_loaded()" functions
+    - added ':all' "import()" option
+    - hopefully fixed b0rken CPAN make process ...
+
+1.0 2003-09-23
+    - Initial release

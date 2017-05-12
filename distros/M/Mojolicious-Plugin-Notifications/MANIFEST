@@ -1,0 +1,32 @@
+lib/Mojolicious/Plugin/Notifications.pm
+lib/Mojolicious/Plugin/Notifications/Engine.pm
+lib/Mojolicious/Plugin/Notifications/Assets.pm
+lib/Mojolicious/Plugin/Notifications/Humane.pm
+lib/Mojolicious/Plugin/Notifications/Humane/humane/bigbox.css
+lib/Mojolicious/Plugin/Notifications/Humane/humane/boldlight.css
+lib/Mojolicious/Plugin/Notifications/Humane/humane/flatty.css
+lib/Mojolicious/Plugin/Notifications/Humane/humane/humane.min.js
+lib/Mojolicious/Plugin/Notifications/Humane/humane/jackedup.css
+lib/Mojolicious/Plugin/Notifications/Humane/humane/libnotify.css
+lib/Mojolicious/Plugin/Notifications/Humane/humane/original.css
+lib/Mojolicious/Plugin/Notifications/Humane/humane/readme.md
+lib/Mojolicious/Plugin/Notifications/Alertify.pm
+lib/Mojolicious/Plugin/Notifications/Alertify/alertify/alertify.bootstrap.css
+lib/Mojolicious/Plugin/Notifications/Alertify/alertify/alertify.core.css
+lib/Mojolicious/Plugin/Notifications/Alertify/alertify/alertify.default.css
+lib/Mojolicious/Plugin/Notifications/Alertify/alertify/alertify.min.js
+lib/Mojolicious/Plugin/Notifications/HTML.pm
+lib/Mojolicious/Plugin/Notifications/JSON.pm
+t/notifications.t
+t/notifications-alertify.t
+t/notifications-humane.t
+t/notifications-json.t
+t/notifications-mix.t
+t/notifications-plugin.t
+t/Plugin/MyEngine.pm
+Changes
+MANIFEST
+LICENSE
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

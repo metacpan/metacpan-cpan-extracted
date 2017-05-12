@@ -1,0 +1,10 @@
+--- #YAML:1.0
+name: Maypole-Plugin-Authentication-UserSessionCookie
+version: 1.8
+author:
+  - Simon Cozens, C<simon@cpan.org>
+Maintained by Marcus Ramberg, C<marcus@thefeed.no>
+abstract: Track sessions and,
+optionally, users
+license: perl
+generated_by: Module::Build version 0.2611, without YAML.pm

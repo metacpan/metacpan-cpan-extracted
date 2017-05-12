@@ -1,0 +1,27 @@
+---
+abstract: 'Auth against OAuth2 APIs'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-OAuth2
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::Socket::SSL: '1.94'
+  Mojolicious: '6.0'
+resources:
+  bugtracker: https://github.com/marcusramberg/Mojolicious-Plugin-OAuth2/issues
+  homepage: https://github.com/marcusramberg/Mojolicious-Plugin-OAuth2
+  repository: https://github.com/marcusramberg/Mojolicious-Plugin-OAuth2.git
+version: '1.53'

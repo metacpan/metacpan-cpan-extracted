@@ -1,0 +1,6 @@
+Revision history for Perl extension Math::RngStream.
+
+0.01  Tue Jul  8 13:58:11 2008
+	- original version; created by h2xs 1.23 with options
+		-An Math::RngStream /home/salva/include/RngStream.h
+

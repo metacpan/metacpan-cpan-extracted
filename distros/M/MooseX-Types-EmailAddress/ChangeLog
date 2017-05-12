@@ -1,0 +1,37 @@
+2013-04-03  SVN: new release
+
+	* Release: 1.1.2
+
+2013-04-03 13:35  squinney@INF.ED.AC.UK
+
+	* MooseX-Types-EmailAddress.spec, lcfg.yml: Added pod to specfile
+	  files list
+
+2013-04-03 13:34  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: MooseX-Types-EmailAddress release: 1.1.1
+
+2013-04-03 13:34  squinney@INF.ED.AC.UK
+
+	* lib/MooseX/Types/EmailAddress.pm.in: Added perl docs
+
+2012-08-22 13:36  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: MooseX-Types-EmailAddress release: 1.1.0
+
+2012-08-22 13:35  squinney@INF.ED.AC.UK
+
+	* MooseX-Types-EmailAddress.spec, lcfg.yml: Commented out docs for
+	  now as there aren't any
+
+2012-08-22 13:35  squinney@INF.ED.AC.UK
+
+	* t/00use.t: Added basic compilation test
+
+2012-08-22 13:27  squinney@INF.ED.AC.UK
+
+	* ., Build.PL.in, ChangeLog, MANIFEST, MANIFEST.SKIP, META.yml.in,
+	  Makefile.PL, MooseX-Types-EmailAddress.spec, lcfg.yml, lib,
+	  lib/MooseX, lib/MooseX/Types,
+	  lib/MooseX/Types/EmailAddress.pm.in, t: first packaging
+

@@ -1,0 +1,90 @@
+README for Mail::Thread::Arc 0.22
+
+=head1 NAME
+
+Mail::Thread::Arc - Generates a Thread Arc reperesentation of a thread
+
+=head1 SYNOPSIS
+
+ my $threader = Mail::Thread->new( @messages );
+ my $arc = Mail::Thread::Arc->new;
+
+ $threader->thread;
+
+ my $i;
+ for my $thread ($threader->rootset) {
+     ++$i;
+     my $svg = $arc->render( $thread );
+     write_file( "thread_$i.svg", $svg->xmlify );
+ }
+
+
+=head1 DEPENDENCIES
+
+This module has external dependencies on the following modules:
+
+ Class::Accessor::Chained
+ Date::Parse
+ Mail::Thread	2.41
+ SVG
+ Test::More
+
+=head1 INSTALLATION
+
+ perl Build.PL
+ perl Build test
+
+and if all goes well
+
+ perl Build install
+
+=head1 HISTORY
+
+What changed over the last 3 revisions
+
+=over
+
+=item 0.22	Wednesday, 16th February, 2005
+
+	Add make_link method (Simon Wistow)
+	Some javascript doodlings to highlight message paths
+
+
+=item 0.21	Thursday, 11th December, 2003
+
+	Note in the deps that we need Mail::Thread 2.41 (I released a
+	broken thing as	Mail::Thread 2.4, for I am a fool)
+
+	Use the inherited ->new
+
+
+=item 0.20	Thursday, 11th December, 2003
+
+	Added in maximum_arc_height, plus a link to some sample output.
+
+	Switched the order of drawing (arcs first, messages after) -
+	fixes a small cosmetic glitch.
+	
+=back
+
+=head1 AUTHOR
+
+Richard Clamp <richardc@unixbeard.net>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003 Richard Clamp.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<ReMail|http://www.research.ibm.com/remail/>, the IBM Research
+project that implements Thread Arcs.
+
+L<http://unixbeard.net/~richardc/mta/> - some sample output, alongside
+.pngs created with batik-rasteriser.
+
+L<Mail::Thread>, L<Mail::Thread::Chronological>, L<SVG>
+

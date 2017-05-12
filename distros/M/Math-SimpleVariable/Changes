@@ -1,0 +1,15 @@
+Revision history for Perl extension Math::SimpleVariable.
+
+0.03  Wed Oct 31 13:32:52 MET 2001
+
+	- added the README file
+
+0.02  Wed Jul 18 14:55:00 METDST 2001
+
+	- first CPAN release
+
+0.01  Tue Apr 10 11:30:05 2001
+
+	- original version; created by h2xs 1.20 with options
+		-A -X -n Math::SimpleVariable
+

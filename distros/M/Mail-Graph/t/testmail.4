@@ -1,0 +1,16 @@
+From sample@example.com  Tue Oct 27 18:38:52 1998
+Received: from mail.forwarder-example.com by mail.example.com (8.9.1/8.6.12) with SMTP id 12345678 for <anotheruser@example.com>; Tue, 27 Oct 1998 18:38:51 -0500 (EST)
+Received: from barfel by mail.invalidforward-example.com (8.9.1/8.6.12) with SMTP id 12345678 for <foo@forwarder-example.com>; Tue, 27 Oct 1998 18:38:51 -0500 (EST)
+From: forged@example.com
+Date: Tue, 27 Oct 1998 09:52:14 +0100 (CET)
+Message-Id: <199810270852.12345567@example.com>
+To: <forged@example.com>
+Subject: Sorry...
+X-Loop-Detect: 1
+X-Spamblock: caught by rule dummy@
+
+BODY: This message contains no received line by a valid forwarder, and no
+X-Envelope-To, so we use the From: line (before trying anyother received).
+
+SHOULD-BE: 'sample@example.com', 'example.com'
+

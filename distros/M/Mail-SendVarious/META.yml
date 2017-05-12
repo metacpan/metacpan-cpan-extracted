@@ -1,0 +1,33 @@
+--- #YAML:1.0
+name:               Mail-SendVarious
+version:            0.4
+abstract:           Send mail via SMTP, fall back to sendmail
+author:
+    - David Muir Sharnoff <cpan@dave.sharnoff.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    autodie:             0
+    File::Slurp:         0
+    List::Util:          0
+    Net::SMTP::Receive:  0
+    Test::Deep:          0
+    Test::More:          0
+    Test::SharedFork:    0
+    Time::HiRes:         0
+    YAML:                0
+requires:
+    IO::Pipe:   0
+    Net::SMTP:  0
+resources:
+    repository:  http://github.com/muir/Mail-SendVarious
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

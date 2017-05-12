@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/Method/Declarative.pm
+MANIFEST
+META.yml
+README
+t/001_load.t
+t/002_seq.t
+Todo

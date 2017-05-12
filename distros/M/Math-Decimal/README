@@ -1,0 +1,64 @@
+NAME
+
+Math::Decimal - arithmetic in decimal
+
+DESCRIPTION
+
+This module performs basic arithmetic with arbitrary-precision numbers
+expressed in decimal in ordinary Perl strings.  The numbers can be
+arbitrarily large, and can involve arbitrarily small fractions, and
+all results are exact.  This differs from Perl's standard arithmetic,
+which is limited-precision binary (floating point) arithmetic.  However,
+because Perl performs implicit conversions between strings and numbers,
+using decimal in the string form, it is extremely easy to exchange values
+between this module and Perl's native arithmetic.
+
+Although Perl's scalars have space to store a number directly, that is
+not used here.  This module operates only on the string part of scalars,
+ignoring the Perlish numerics entirely.  It is not confused by dualvars
+(scalars with independent string and number values).
+
+Numbers are represented in strings in a simple format, consisting of
+optional sign, one or more integer digits, then optionally a dot (for
+the decimal point) and one or more fractional digits.  All representable
+numbers have infinitely many acceptable representations (by adding leading
+and trailing zero digits).  The functions of this module consistently
+return numbers in their shortest possible form.
+
+This module is intended for situations where exact numeric behaviour
+is important, and Perl's default arithmetic is inadequate because
+fractions or large numbers are involved, but the arithmetic makes up
+only a small part of the program's behaviour.  In those situations, it
+is convenient that the functions here operate directly on strings that
+are useful elsewhere in the program.  If arithmetic is a large part of
+the program, it will probably be better to use specialised (non-string)
+numeric object types, such as those of Math::GMP.  These objects are less
+convenient for interoperation, but arithmetic with them is more efficient.
+
+If you need to represent arbitrary (non-decimal) fractions exactly,
+such as 1/3, then this module is not suitable.  In that case you need a
+general rational arithmetic module, such as Math::BigRat.  Be prepared
+to pay a large performance penalty for it.
+
+Most of this module is implemented in XS, with a pure Perl backup version
+for systems that can't handle XS.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2009, 2010, 2011 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,28 @@
+Revision history for Perl extension Math::Assistant.
+
+0.05 2013-01-05
+	- Replaced algorithm of the subroutines Det() to new MORE FASTER algorithm.
+	- Now the Det() is more than 600 times faster and Solve_Det() more than 600*(n+1) times.
+	- Added new subroutine test_matrix().
+	- Added option {'int' => 1} for subroutines Det() & Solve_Det().
+	- Added some tests, examples into documentation.
+	- README revised.
+	- Refused to use Algorithm::Combinatorics
+
+0.0417 2012-12-11
+	- Fixed problem Math-BigInt for Perl 17.5.x
+	- Added some tests.
+
+0.04  2011-04-15
+	- Added exception handling for some subroutine.
+
+0.03  2010-01-10
+	- Added option {eq => 'row|column'} for subroutine Solve_Det().
+	- Bug fixed in subroutine Rank() and Gaussian_elimination().
+	- README revised.
+	- Added some examples into documentation.
+
+0.02  2010-01-04T10:12:35+02:00
+	- original version; created by h2xs 1.23 with options
+		-XAn Math::Assistant.
+	- First version.

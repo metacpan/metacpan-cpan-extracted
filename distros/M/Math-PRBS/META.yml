@@ -1,0 +1,50 @@
+---
+abstract: 'Generate Pseudorandom Binary Sequences using an Iterator-based Linear Feedback Shift Register'
+author:
+  - 'Peter C. jones <petercj AT cpan.org>'
+build_requires:
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.86'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.86'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - 'Pseudorandom Binary Sequence'
+  - PRBS
+  - 'Linear Feedback Shift Register'
+  - LFSR
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-PRBS
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Math::PRBS:
+    file: lib/Math/PRBS.pm
+    version: v0.2.0
+requires:
+  Carp: '0'
+  Exporter: '5.57'
+  perl: '5.006000'
+  strict: '0'
+  version: '0.77'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/pryrt/Math-PRBS/issues
+  repository: https://github.com/pryrt/Math-PRBS.git
+version: v0.002
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

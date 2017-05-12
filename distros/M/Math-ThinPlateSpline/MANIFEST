@@ -1,0 +1,20 @@
+Build.PL
+buildtools/synchronize.pl
+Changes
+lib/Math/ThinPlateSpline.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+src/linalg3d.cc
+src/linalg3d.h
+src/ludecomposition.h
+src/myinit.h
+src/ppport.h
+src/ThinPlateSpline.cc
+src/ThinPlateSpline.h
+src/TPSException.h
+t/01basic.t
+xsp/my.map
+xsp/ThinPlateSpline.xsp
+META.json

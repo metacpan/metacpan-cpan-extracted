@@ -1,0 +1,44 @@
+{
+   "abstract" : "Regexp Capture Filter For Message::Passing",
+   "author" : [
+      "chenryn <rao.chenlin@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Message-Passing-Filter-Regexp",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Tiny" : "0",
+            "JSON::Types" : "0",
+            "Message::Passing" : "0.11",
+            "Regexp::Log" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.05"
+}

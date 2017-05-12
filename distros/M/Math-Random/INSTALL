@@ -1,0 +1,19 @@
+Beginning with version 0.68, two versions of the phrtsd routine are
+available. If you want the new version, run 'perl Makefile.PL' as
+usual. If you want the original version, run:
+
+   perl Makefile.PL phrtsd_orig
+
+The original version, which is the same as the phrtsd routine in the
+original Fortran library, generates the same seed numbers for all
+permutations of the same characters. For instance, 'abc', 'bca',
+and 'cab' will all generate the same seeds. Some users find this
+behavior surprising. Also, when Math::Random is loaded, it sets the
+seeds from scalar(localtime), which will be a string like
+'Mon Jun 26 15:45:12 2006'. Nine seconds later, however,
+'Mon Jun 26 15:45:21 2006' will generate the very same seeds.
+
+The new version uses an entirely different algorithm that will
+generate different seeds for such strings. This should be suitable
+for most applications, but the original version is still available
+for those who need to reproduce the behavior of the Fortran randlib.

@@ -1,0 +1,18 @@
+Changes
+INSTALL
+lib/Monit/HTTP.pm
+Makefile.PL
+MANIFEST
+MANIFEST.bak
+MANIFEST.SKIP
+mm
+mm.conf.yml
+README
+t/00-load.t
+t/05-error-localhost.t
+t/05-nulls.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+TODO
+META.yml                                 Module meta-data (added by MakeMaker)

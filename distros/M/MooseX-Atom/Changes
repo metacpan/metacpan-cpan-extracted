@@ -1,0 +1,9 @@
+Changes for Perl extension MooseX-Atom
+
+0.02 Tue  3 Aug 2010
+	- Processing of with delayed until last to allow the has
+	  statements to have created required methods before role
+	  compliance checks get done.
+
+0.01 Mon  2 Aug 2010
+	- Creating the initial release

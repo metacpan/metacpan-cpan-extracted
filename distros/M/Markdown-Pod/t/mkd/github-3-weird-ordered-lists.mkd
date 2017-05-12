@@ -1,0 +1,9 @@
+1. This should be understood as an ordered list.
+1. The output numbers should increase, even though every written number is "1".
+1. That's just how Markdown is!
+
+Here's a paragraph just to break things up.
+
+042. This should also be understood as an ordered list.
+6. The numbers should increase, starting from 1, even though the written numbers are weird.
+10. That's again just how Markdown is!

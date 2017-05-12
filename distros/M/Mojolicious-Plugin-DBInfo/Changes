@@ -1,0 +1,8 @@
+Revision history for Mojolicious::Plugin::DBInfo.
+
+0.002  2015-05-29 08:03:25 CEST
+       - improved tests and spelling
+
+0.001  2015-03-31 13:37:50 CEST
+       - initial version
+

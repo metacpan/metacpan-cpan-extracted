@@ -1,0 +1,14 @@
+0.04 Thu Dec 25 00:15:52 PST 2014
+ - Update Meta
+
+0.03 Thu Dec 18 11:15:52 PST 2014
+ - Refactor common logic into Inline::Module
+
+0.02 Wed Dec 17 15:06:29 PST 2014
+ - First working version
+ - Handles Inline compilation and distdir
+ - autostub not working
+
+0.01 Mon Dec 15 22:48:52 EST 2014
+ - Initial release
+

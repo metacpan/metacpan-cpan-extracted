@@ -1,0 +1,18 @@
+Changes
+examples/sample.pl
+LICENSE
+lib/Mojolicious/Plugin/BasicAuthPlus.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.pod
+t/00-load.t
+t/auth-ldap.t
+t/auth.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+test.passwd
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,14 @@
+mpq_t *		MPQ
+mpz_t *		MPZ
+mpf_t * 	MPF
+mpfr_t *	MPFR
+
+INPUT
+MPQ
+            $var = INT2PTR($type, SvIVX(SvRV($arg)))
+MPZ
+            $var = INT2PTR($type, SvIVX(SvRV($arg)))
+MPF
+            $var = INT2PTR($type, SvIVX(SvRV($arg)))
+MPFR
+            $var = INT2PTR($type, SvIVX(SvRV($arg)))

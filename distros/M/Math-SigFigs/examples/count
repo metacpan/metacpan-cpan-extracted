@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+use Math::SigFigs;
+
+@i = qw(240  240.  241  0240  0.03  0  0.0);
+@x = qw(2    3     3    2     1     0  0  );
+
+print "Count the number of significant figures....\n\n";
+
+print "N\tgot\texpected\n\n";
+for($i=0; $i<=$#i; $i++) {
+   $n = $i[$i];
+   $x = $x[$i];
+   $g = CountSigFigs($n);
+   print "$n\t$g\t$x\n";
+}

@@ -1,0 +1,8 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/MathML/Entities.pm
+t/conversions.t
+Makefile.PL

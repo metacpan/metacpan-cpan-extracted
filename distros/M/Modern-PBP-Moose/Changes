@@ -1,0 +1,34 @@
+Revision history for Modern-PBP-Moose (formerly Perl::Modern::Moose / PBP-Moose)
+================================================================================
+
+1.000  Mon 15.Dez.2015 - 14:30
+       Initial CPAN release.
+
+1.002  Don 17.Dez.2015 - 20:45
+       Correction of the make-Scripts
+       Makefile.P
+       Build.PL
+
+1.003  Fri 18.Dez.2015 - 19:00
+       Correction of the make-Scripts
+       Makefile.P
+       Build.PL
+
+1.004  Sam 19.Dez.2015 - 14:00
+       Supplements in POD and README
+
+1.005  Son 20.Dez.2015 - 14:00
+       Minimum version of Perl in
+       Makefile.PL
+       Build.PL
+
+1.100  Sam 13.Feb.2016 - 18:03
+       - shifted modules in the namespace PBP
+       - Replaces getter / setter Method by 'get _... / set _...'
+
+1.101  Son 14.Feb.2016 - 14:17
+       Correcting the dependencies in 'Build.PL' and 'Makefile.PL'
+
+1.200  Son 14.Feb.2016 - 15:35
+       shifted modules in the namespace Modern::PBP
+       (after note from Dave Rolsky)

@@ -1,0 +1,292 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Box-Index - list of all extended documentation
+
+=head1 DESCRIPTION
+
+All methods defined by MailBox are documented, but you still need to
+get a grip on the large picture: the relations between the modules
+and the methods.  These larger explanations are included in the
+DETAILS of the manual pages, and listed here below.  Of course, each
+page has a DESCRIPTION section as well, which tells some bare necessities
+about the module.
+
+Only the HTML version of this manual page will list the sections.
+
+=begin html
+
+<ol>
+<li><strong><a name="general">General</a> sources of information</strong>
+  <ul>
+  <li>MailBox distribution overview (M<Mail::Box-Overview>)
+  <li>MailBox simple recepies (M<Mail::Box-Cookbook>)
+  </ul>
+
+<li><strong><a name="messages">Messages</a></strong> (M<Mail::Message>)<br />
+      See separate entries on header, body, fields
+      and construction in this index below.
+  <ul>
+  <li>L<Mail::Message/Structure of a Message>
+      <ul>
+      <li>L<Mail::Message/The header> 
+      <li>L<Mail::Message/The body> 
+      </ul>
+  <li>Coercing messages
+  <li>L<Mail::Message/Message object implementation>
+  <li>L<Mail::Message/Message class implementation>
+  </ul>
+
+<li><strong><a name="headers">Message headers</a></strong> (M<Mail::Message::Head>)
+  <ul>
+  <li>L<Mail::Message::Head/Ordered header fields>
+  <li>L<Mail::Message::Head/Subsets of header fields>
+  <li>L<Mail::Message::Head/Head class implementation>
+  </ul>
+
+<li><strong><a name="fields">Message header fields</a></strong> (M<Mail::Message::Field>)
+  <ul>
+  <li>L<Mail::Message::Field/Field syntax>
+      <ul>
+      <li>L<Mail::Message::Field/Folding fields>
+      <li>L<Mail::Message::Field/Structured fields>
+      <li>L<Mail::Message::Field/Comments in fields>
+      </ul>
+  <li>L<Mail::Message::Field/Getting a field>
+      <ul>
+      <li>L<Mail::Message::Field/Using get() field>
+      <li>L<Mail::Message::Field/Using study() field>
+      <li>L<Mail::Message::Field/Using resent groups> (M<Mail::Message::Head::ResentGroup>)
+      <li>L<Mail::Message::Head::ListGroup/Mailing list fields>
+      <li>L<Mail::Message::Head::SpamGroup/Spam fighting fields>
+      </ul>
+  <li>L<Mail::Message::Field/The field's data>
+      <ul>
+      <li>L<Mail::Message::Field/Access to the field>
+      <li>L<Mail::Message::Field/Using simplified field access>
+      <li>L<Mail::Message::Field/Specifying field data>
+      </ul>
+  <li>L<Mail::Message::Field/Field class implementation>
+  </ul>
+
+<li><strong><a name="bodies">Message bodies</a></strong> (M<Mail::Message::Body>)
+  <ul>
+  <li>L<Mail::Message::Body/Access to the body>
+  <li>Body meta information
+      <ul>
+      <li>Content types (L<MIME::Types>)
+      <li>Content transfer encoding (M<Mail::Message::TransferEnc>)
+      </ul>
+  <li>Multipart bodies (M<Mail::Message::Body::Multipart>)
+  <li>Nested (encapsulated) messages (M<Mail::Message::Body::Nested>)
+  <li>L<Mail::Message::Body/Body class implementation>
+      <ul>
+      <li>L<Mail::Message::Body/Data collector bodies>
+      <li>L<Mail::Message::Body/Complex bodies>
+      <li>L<Mail::Message::Body/Character encoding PERL>
+      </ul>
+  </ul>
+
+<li><strong><a name="labels">Message labels</a></strong>
+  <ul>
+  <li>L<Mail::Message/Labels> (M<Mail::Message>)
+      <ul>
+      <li>L<Mail::Message/Predefined labels> (M<Mail::Message>)
+      <li>Storing labels folder dependent
+      <li>L<Mail::Box::Maildir::Message/Flags in filename> (M<Mail::Box::Maildir::Message>)
+      <li>L<Mail::Message/Status and X-Status fields> (MBOX and POP3)
+      <li>L<Mail::Box::MH::Message/The .mh_sequences file> (M<Mail::Box::MH::Labels>)
+      <li>L<Mail::Box::IMAP4::Message/IMAP protocol flags> (M<Mail::Box::IMAP4::Message>)
+      <li>L<Mail::Box::IMAP4::Message/Other labels> (IMAP4)
+      <li>L<Mail::Box::IMAP4::Message/Caching labels> (IMAP4)
+
+      </ul>
+  </ul>
+
+<li><strong><a name="process">Message processing</a></strong>
+  <ul>
+  <li>Reading a message (M<Mail::Message::Construct::Read>)
+  <li>L<Mail::Message::Construct::Build/Building a message>
+      (M<Mail::Message::Construct::Build>)
+  <li>Reply to a message (M<Mail::Message::Construct::Reply>)
+  <li>L<Mail::Message::Construct::Forward/Creating a forward>
+      (M<Mail::Message::Construct::Forward>)
+  <li>Bounce a message (M<Mail::Message::Construct::Bounce>)
+  <li>L<Mail::Message::Construct::Rebuild/Rebuilding a message>
+      (M<Mail::Message::Construct::Rebuild>)
+  <li>Convert messages
+      <ul>
+      <li>To and from M<Mail::Internet> objects (M<Mail::Message::Convert::MailInternet>)
+      <li>To and from M<MIME::Entity> objects(M<Mail::Message::Convert::MimeEntity>)
+      <li>Into HTML (M<Mail::Message::Convert::Html>)
+      </ul>
+  <li>Convert body contents
+      <ul>
+      <li>From HTML to PostScript (M<Mail::Message::Convert::HtmlFormatPS>)
+      <li>From HTML into plain text (M<Mail::Message::Convert::HtmlFormatText>)
+      <li>Beautify text (M<Mail::Message::Convert::TextAutoformat>)
+      </ul>
+  </ul>
+
+<li><strong><a name="folders">Folders</a></strong> (M<Mail::Box>)
+      See separate section for type specifics below.
+  <ul>
+  <li>Folder managers
+      <ul>
+      <li>L<Mail::Box::Manager/Managing open folders> (M<Mail::Box::Manager>)
+      <li>L<Mail::Box::Manager/Managing a user> (M<Mail::Box::Manage::User>)
+      </ul>
+  <li>Folder types (M<Mail::Box>)
+      <ul>
+      <li>L<Mail::Box/Different kinds of folders>
+      <li>L<Mail::Box/Available folder types>
+      <li>L<Mail::Box/Folder class implementation>
+      </ul>
+  <li>L<Mail::Box::Tie::ARRAY/Folder tied as array> (M<Mail::Box::Tie::ARRAY>)
+      <ul>
+      <li>L<Mail::Box::Tie::ARRAY/Limitations>
+      </ul>
+  <li>Folder tied as hash (M<Mail::Box::Tie::HASH>)
+  <li>Folder locking (M<Mail::Box::Locker>)
+  <li>Searching folders (M<Mail::Box::Search>)
+      <ul>
+      <li>scan header and body (M<Mail::Box::Search::Grep>)
+      <li>check for spam (M<Mail::Box::Search::SpamAssassin>) 
+      </ul>
+  <li>Managing messages located in folders (Mail::Box::Message)
+  </ul>
+
+<li><strong><a name="ftypes">Folder types</a></strong>
+  <ul>
+  <li>DBX folders (M<Mail::Box::Dbx>, read only)
+      <ul>
+      <li>L<Mail::Box::Dbx/How DBX folders work>
+      <li>L<Mail::Box::Dbx/This implementation>
+      <li>L<Mail::Box::Dbx/Converting DBX folders to MBOX>
+      </ul>
+  <li>IMAP4 folders (M<Mail::Box::IMAP4>)
+      <ul>
+      <li>L<Mail::Box::IMAP4/How IMAP4 folders work>
+      </ul>
+  <li>MAILDIR folders (M<Mail::Box::Maildir>)
+      <ul>
+      <li>L<Mail::Box::Maildir/How MAILDIR folders work>
+      </ul>
+  <li>MBOX folders (M<Mail::Box::Mbox>)
+      <ul>
+      <li>L<Mail::Box::Mbox/How MBOX folders work>
+      <li>L<Mail::Box::Mbox/Simulation of sub-folders>
+      </ul>
+  <li>MH folders (M<Mail::Box::MH>)
+      <ul>
+      <li>L<Mail::Box::MH/How MH folders work>
+      <li>L<Mail::Box::MH/This implementation>
+      <li>L<Mail::Box::MH/An index-file>
+      </ul>
+  <li>POP3 folders (M<Mail::Box::POP3>)
+      <ul>
+      <li>L<Mail::Box::POP3/How POP3 folders work>
+      <li>L<Mail::Box::POP3/This implementation>
+      </ul>
+  </ul>
+
+<li><strong><a name="threads">Discussion threads</a></strong>
+  <ul>
+  <li>The thread manager (M<Mail::Box::Thread::Manager>)
+      <ul>
+      <li>L<Mail::Box::Thread::Manager/Maintaining threads>
+      <li>L<Mail::Box::Thread::Manager/Delayed thread detection>
+      </ul>
+  <li>The thread node (M<Mail::Box::Thread::Node>)
+  </ul>
+
+<li><strong><a name="send">Transmitting messages</a></strong> (M<Mail::Transport>)
+  <ul>
+  <li>Sending (M<Mail::Transport::Send>)
+      <ul>
+      <li>Via Exim (M<Mail::Transport::Exim>)
+      <li>Via Mailx (M<Mail::Transport::Mailx>)
+      <li>Via Qmail (M<Mail::Transport::Qmail>)
+      <li>Via Sendmail or Postfix (M<Mail::Transport::Sendmail>)
+      <li>Via raw SMTP (M<Mail::Transport::SMTP>)
+      </ul>
+  <li>Receiving (M<Mail::Transport::Receive>)
+      <ul>
+      <li>Via POP3 (M<Mail::Transport::POP3>)
+      </ul>
+  <li>Bi-directional
+      <ul>
+      <li>Via IMAP4 (M<Mail::Transport::IMAP4>)
+      </ul>
+  </ul>
+
+<li><strong><a name="perform">Performance</a></strong>
+  <ul>
+  <li>Quality over performance
+  <li>Weak references
+  <li>Reducing memory consumption
+      <ul>
+      <li>Lazy extraction
+      <li>Picking the optimal body class
+      <li>L<Mail::Message::Head::Partial/Reducing the header size>
+          (M<Mail::Message::Head::Partial>)
+      <li>
+      </ul>
+  <li>Destructing messages (M<Mail::Box::Message::Destructed>)
+  </ul>
+<li><strong>Additional modules</strong>
+  <ul>
+  <li>Extensions
+      <ul>
+      <li>M<Mail::Box::Parser::C>, a faster parser
+      <li>L<HTML::FromMail|http://perl.overmeer.net/html-from-mail/html/>,
+          webmail applications builder
+      </ul>
+  <li>Helper modules
+      <ul>
+      <li>L<MIME::Types|http://perl.overmeer.net/mimetypes/html/>
+      <li>L<Object::Realize::Later>
+      <li>L<User::Identity|http://perl.overmeer.net/userid/html/>
+      </ul>
+  </ul>
+</ol>
+
+=end html
+
+=head1 SEE ALSO
+
+This module is part of Mail-Box distribution version 3.002,
+built on March 31, 2017.
+
+Do not forget to read
+L<Mail::Box-Overview>,
+L<Mail::Box-Cookbook>, and
+L<Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L<Mail::Message>,
+L<Mail::Box>,
+L<Mail::Box::IMAP4>,
+L<Mail::Box::POP3>,
+L<Mail::Box::Parser::C>,
+L<Mail::Box::Dbx> (unpublished),
+L<Mail::Transport>,
+L<Object::Realize::Later>, and
+L<User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

@@ -1,0 +1,40 @@
+<!-- Created by MP3::CreateInlayCard -->
+<html>
+<head>
+<style>
+BODY, P, TD {
+	font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 10px;
+	}
+	
+#holder {
+    position: absolute;       width: 12cm;      height: 12cm; 
+    border: 1px dashed gray;
+}
+
+H1 {
+    font-size: 16px;  font-weight: bold;
+}
+</style>
+<title><tmpl_var name="artist"> - <tmpl_var name="album"></title>
+</head>
+<body>
+<div id="holder">
+
+<h1><tmpl_var name="artist"> - <tmpl_var name="album"></h1>
+
+<table width="100%" cellspacing="2">
+
+<tmpl_loop name="tracks">
+    <tr>
+	<td><tmpl_var name="track"></td>
+	<td><tmpl_var name="title"></td>
+	<td><tmpl_var name="artist"></td>
+	<td><tmpl_var name="length"></td>
+    </tr>
+</tmpl_loop>
+
+</table>
+
+</body>
+</html>
+

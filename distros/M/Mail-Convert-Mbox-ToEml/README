@@ -1,0 +1,6 @@
+
+Mail-Convert-Mbox-ToEml is a Module to convert MBox mail files from Mozilla and
+Co to Outlook Express single .eml which can be imported to Outlook and Outlook
+Express.  I could only test MBox files from Mozilla on WindowsXP and Win2k.
+
+For more information, read the included (POD) documentation.

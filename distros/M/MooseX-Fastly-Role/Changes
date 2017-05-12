@@ -1,0 +1,11 @@
+Revision history for Perl module MooseX::Fastly::Role:
+
+0.03 Mon 16 Jan 2017 21:20:20 GMT
+    - Add cdn_api() to get Net::Fastly back
+    - Add cdn_services() back to get Net::Fastly::Services
+
+0.02 Fri 18 Nov 2016 00:35:24 GMT
+	- Drop Net:Fastly and make calls directly
+
+0.01 Sat  3 Sep 2016 20:48:51 BST
+	- Initial release

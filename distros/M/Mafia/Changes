@@ -1,0 +1,30 @@
+Revision history for Perl extension Mafia.
+
+0.001005 2017-04-29T20:03+01:00
+ - Fix tests on Perl < 5.14
+
+0.001004 2017-04-22T14:12+01:00
+ - Tests require recent version of File::Spec::Functions
+ - Drop perl version requirement to 5.10.1
+
+0.001003 2017-04-08T20:30+03:00
+ - Use absolute paths in tests. This fixes the tests on 5.26+,
+   where @INC no longer contains '.'
+ - Add perlcritic release tests and make code perlcritic-clean
+
+0.001002 2015-08-15T23:15+03:00
+ - Don't push/shift on array references (fixes test failures on 5.23)
+ - Don't use given/when and smartmatch (since they are experimental)
+ - Don't depend on non-core modules (that is, File::Slurp)
+ - Reduce Perl dependency to 5.10.1
+
+0.001001 2014-08-17T00:18+03:00
+ - CPAN Day cleanup release
+ - Update Changes to follow CPAN::Changes::Spec
+ - Set POD encoding to utf-8
+ - Reindent code, tests, Makefile.PL
+ - Disable dynamic_config and enable SIGN
+ - Disable smartmatch warnings
+
+0.001 2013-08-26T23:07:19+03:00
+ - Initial release

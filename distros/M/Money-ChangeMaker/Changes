@@ -1,0 +1,15 @@
+Change file for Money::ChangeMaker
+Avi Finkel <avi@finkel.org>
+
+Version 0.1 : 7/23/02 00:54
+
+   No changes -- initial release
+
+Version 0.2 : 5/30/06 21:39
+
+   Added money sets for Australia and Europe
+	 Reorganized test code
+
+Version 0.3 : 8/22/07 01:57
+
+	 Fixing makefile to do new dependency tracking

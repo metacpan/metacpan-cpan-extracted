@@ -1,0 +1,10 @@
+Revision history for Perl extension Math::SymbolicX::Statistics::Distributions
+
+1.02  Mon May 22 12:32 2006
+	- Added Boltzmann, Fermi and Bose distributions
+
+1.01  Wed Jul 20 19:31 2005
+	- corrected packaging problem
+
+1.00  Wed Jul 20 15:35 2005
+	- original version as uploaded to CPAN

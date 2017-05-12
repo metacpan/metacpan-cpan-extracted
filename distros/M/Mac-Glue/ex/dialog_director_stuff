@@ -1,0 +1,34 @@
+#!perl -w
+use Mac::Glue ':all';
+$f = new Mac::Glue 'Finder';
+
+my $dialog = {
+    size => [260, 95],
+    contents => [
+        {
+            class   => 'push button',
+            bounds  => [190, 65, 250, 85],
+            name    => 'OK',
+            enabled => 3
+        }, {
+            class   => 'push button',
+            bounds  => [110, 65, 170, 85],
+            name    => 'Cancel'
+        }, {
+            class   => 'password field',
+            bounds  => [10, 36, 250, 36 + 16],
+            name_bounds => [10, 10, 250, 26],
+            name    => 'Enter Password:',
+            value   => ''
+        }
+    ],
+    timeout_after => 60,
+};
+
+my @results = $f->dd_auto_dialog($dialog, grayscale => 1);
+die $^E if $^E;  # check error
+
+# password field is field 2, OK button is field 0
+print $results[0] ? $results[2] : 'canceled';
+
+__END__

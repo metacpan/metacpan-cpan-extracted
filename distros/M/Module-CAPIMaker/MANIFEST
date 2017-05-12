@@ -1,0 +1,14 @@
+Changes
+examples/c_api.decl
+lib/Module/CAPIMaker.pm
+lib/Module/CAPIMaker/Template/C_API_H.pm
+lib/Module/CAPIMaker/Template/Module_C.pm
+lib/Module/CAPIMaker/Template/Module_H.pm
+lib/Module/CAPIMaker/Template/Sample_XS.pm
+bin/make_perl_module_c_api
+Makefile.PL
+MANIFEST
+README
+t/Module-CAPIMaker.t
+t/pods.t
+META.yml                                 Module meta-data (added by MakeMaker)

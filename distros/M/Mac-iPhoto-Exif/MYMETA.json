@@ -1,0 +1,66 @@
+{
+   "abstract" : "Write iPhoto meta data to Exif",
+   "author" : [
+      "Maroš Kollár"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mac-iPhoto-Exif",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "Encode" : "0",
+            "File::Copy" : "0",
+            "Image::ExifTool" : "0",
+            "Image::ExifTool::Location" : "0",
+            "Moose" : "0.94",
+            "MooseX::Getopt" : "0",
+            "Path::Class" : "0",
+            "Scalar::Util" : "0",
+            "Term::ANSIColor" : "0",
+            "Unicode::Normalize" : "0",
+            "XML::LibXML" : "0",
+            "perl" : "5.010",
+            "version" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/maros/Mac-iPhoto-Exif.git"
+      }
+   },
+   "version" : "1.000"
+}

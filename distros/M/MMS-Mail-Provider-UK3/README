@@ -1,0 +1,62 @@
+NAME
+    MMS::Mail::Provider::UK3 - This provides a class for parsing an
+    MMS::Mail::Message object that has been sent via the UK 3 network.
+
+VERSION
+    Version 0.02
+
+SYNOPSIS
+    This class provides a parse method for parsing an MMS::Mail::Message
+    object into an MMS::Mail::Message::Parsed object for MMS messages sent
+    from the UK 3 network.
+
+METHODS
+    The following are the top-level methods of the MMS::Mail::Parser::UK3
+    class.
+
+  Constructor
+    "new()"
+        Return a new MMS::Mail::Provider::UK3 object.
+
+  Regular Methods
+    "parse" MMS::Mail::Message
+        The "parse" method is called as an instance method. It parses the
+        MMS::Mail::Message object and returns an MMS::Mail::Message::Parsed
+        object.
+
+AUTHOR
+    Rob Lee, "<robl at robl.co.uk>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-mms-mail-provider-uk3
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MMS-Mail-Provider-UK3>.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc MMS::Mail::Provider::UK3
+
+    You can also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/MMS-Mail-Provider-UK3>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/MMS-Mail-Provider-UK3>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=MMS-Mail-Provider-UK3>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/MMS-Mail-Provider-UK3>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2006 Rob Lee, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

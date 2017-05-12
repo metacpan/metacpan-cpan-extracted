@@ -1,0 +1,3 @@
+[% pdf.prFont('Helvetica-Bold') %]
+[% pdf.prFontSize(20) %]
+[% pdf.prText(100,100,'Hello, World!') %]

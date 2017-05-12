@@ -1,0 +1,79 @@
+Revision history for Message-Stack
+
+0.22 Aug 6 2011
+  - Fix bug in reset_* methods that violated type constraints if no messages
+    survived the reset. (Tomohiro Hosaka)
+
+0.21 Jul 8 2011
+  - Use GPHAT dzil bundle
+  - Add reset_* methods (holophrastic)
+  - Convert to Dist::Zilla and Pod::Weaver
+
+0.19    Feb 6, 2010
+  - Rename id to msgid, but use MooseX::Aliases and such to provide backcompat
+
+0.18    Nov 10, 2010
+  - Document reset method
+
+0.17    Jul 14, 2010
+  - Remove "parser" classes in favor of using Message::Stack::Parser::*
+
+0.16    March 8, 2010
+  - Fix typo in Message::Stack::Message POD (uwe)
+
+0.15    March 8, 2010
+  - Fix typo in Message::Stack::Message (uwe)
+
+0.14    February 24, 2010
+  - Remove dependency on MooseX::AttributeHelpers in favor of native
+    traits. (arcanez)
+  - Remove dependency on Check::ISA in favor of is_$type methods created by
+    MooseX::Types. (arcanez)
+  - Add first and last methods so I don't have to type so much. (gphat)
+  - Remove _find method, no idea why it was there. (gphat)
+
+0.13
+  - Have Data::Verifier pass the original value of invalid fields as an arrayref
+    to params
+
+0.12
+  - Modify DataVerifier and FormValidator parsers to set level to error
+
+0.11
+  - Use MooseX::Storage::Deferred
+
+0.10
+  - Add JSON::Any dep
+
+0.09
+  - Add params to Message class.
+
+0.08
+  - More POD fixes
+
+0.07
+  - POD fixes
+
+0.06
+  - Document messages method
+
+0.05
+  - Use Message::Stack::Message in Message::Stack (reported by Kevin Smith)
+  - Fix POD typos related to search (reported by Kevin Smith)
+
+0.04
+  - Rename all "has_for_" methods to "has_"
+
+0.03
+  - Remove "get_message_" prefix from all methods that had it
+  - Add MooseX::Storage so stack can be serialized easily
+  - Add DataVerifier and FormValidator consumers
+
+0.02
+  - Rename add_to_messages.  Now it's just add
+  - Rewrite finder methods
+  - Add predicates for Message attributes
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,7 @@
+
+WARNING!
+
+If you modify these files for your web site, I suggest that you 
+move all to a new directory and modify the directory paths for
+all files in the configuration array in "cannibal.cgi" so that 
+future updates do no overwrite your modified files.

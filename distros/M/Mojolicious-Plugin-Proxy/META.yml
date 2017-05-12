@@ -1,0 +1,28 @@
+---
+abstract: 'Proxy requests'
+author:
+  - 'Marcus Ramberg<mramberg@cpan.org>'
+build_requires: {}
+configure_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Proxy
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  Mojolicious: '0'
+  perl: '5.008007'
+resources:
+  MailingList: http://groups.google.com/group/mojolicious
+  bugtracker: http://github.com/marcusramberg/mojolicious-plugin-proxy/issues
+  homepage: http://marcus.nordaaker.com
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/marcusramberg/mojolicious-plugin-proxy
+version: '0.6'

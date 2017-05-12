@@ -1,0 +1,71 @@
+NAME
+    Markdown::Pod - Convert Markdown to POD
+
+VERSION
+    version 0.006
+
+SYNOPSIS
+        use Markdown::Pod;
+    
+        my $m2p = Markdown::Pod->new;
+        my $pod = $m2p->markdown_to_pod(
+            markdown => $markdown,
+        );
+
+DESCRIPTION
+    This module parses Markdown text and return POD text. It uses Markdent
+    module to parse Markdown. Due to POD doesn't support blockquoted HTML
+    tag, so quoted text of Markdown will not be handled properly. Quoted
+    text will be converted to POD verbatim section.
+
+ATTRIBUTES
+  markdown
+    markdown text
+
+  encoding
+    encoding to use. Available type of encoding is same as Encode module.
+
+METHODS
+  new
+    create Markdown::Pod object
+
+  markdown_to_pod
+    convert markdown text to POD text
+
+SEE ALSO
+    *   Markdent
+
+    *   Pod::Markdown
+
+    *   Text::MultiMarkdown, Text::Markdown
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/keedi/Markdown-Pod/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/keedi/Markdown-Pod>
+
+      git clone https://github.com/keedi/Markdown-Pod.git
+
+AUTHOR
+    김도형 - Keedi Kim <keedi@cpan.org>
+
+CONTRIBUTORS
+    *   Andrew Speer (ASPEER) <andrew@webdyne.org>
+
+    *   Jason McIntosh (JMAC) <jmac@jmac.org>
+
+    *   Zakariyya Mughal (ZMUGHAL) <zmughal@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2015 by Keedi Kim.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

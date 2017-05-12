@@ -1,0 +1,67 @@
+From: TC-RU RIPN mail processor <nobody@ripn.net>
+To: reg@reg.ru
+Message-ID: <20080724151354.215019.TESTREGRU2-REG-RIPN.0.ANS@whois.ripn.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=KOI8-R
+Content-Transfer-Encoding: 8bit
+Precedence: bulk
+Subject: TC.DNS.20080724151354.215019:TESTREGRU2-REG-RIPN:0 (Re: 20080724151353.125859 :: UPDATEru)
+
+Dear Colleague,
+
+Here are results of  processing your  request:
+
+> From:    reg@reg.ru
+> Subject: 20080724151353.125859 :: UPDATEru
+> Date:    Thu, 24 Jul 2008 15:13:53 +0400
+> Msg-Id:  
+
+
+> lang: EN
+> action: UPDATE
+> passwd: abracada
+> 
+> #[DOMAIN TEMPLATE]#
+> 
+> domain: air.ru
+> registrar: TESTREGRU1-REG-RIPN
+> 
+Authentication failed. - FATAL ERROR !
+Access to object is denied!
+There are FATAL ERRORS in request, object is not processed
+
+> #[DOMAIN TEMPLATE]#
+> 
+> domain: upanishadixxx21.ru
+Object 'UPANISHADIXXX21.RU' not found - FATAL ERROR !
+> registrar: TESTREGRU1-REG-RIPN
+> sex170004536_74323.ru
+unrecognized statment - line ignored
+There are FATAL ERRORS in request, object is not processed
+
+
+> #[DOMAIN TEMPLATE]#
+> 
+> domain: trax007.ru
+> registrar: TESTREGRU1-REG-RIPN
+> upanishadi.ru
+unrecognized statment - line ignored
+Too many warnings (max. 2) - FATAL ERROR !
+> #[DOMAIN TEMPLATE]#
+> 
+> domain: don22200.ru
+> registrar: TESTREGRU1-REG-RIPN
+> sex.ru
+> #[TEMPLATES END]#
+
+
+Your current request counter: .
+You may send us 120 in this hour.
+
+
+
+Thank you,
+TC mail processor.
+Thu Jul 24 15:13:55 2008 Moscow, Russia.
+
+

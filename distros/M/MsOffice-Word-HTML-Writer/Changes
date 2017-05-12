@@ -1,0 +1,38 @@
+Revision history for MsOffice-Word-HTML-Writer
+
+1.03 05.04.2013
+  - new argument 'prevent_html_encoding' for the quote() method
+  - save_as() method returns the generated filename
+
+1.02 23.11.2013
+  - #90737 : new 'page_numbers' arg for create_section(new_page=>)
+  - avoid warnings when the MIME type is unknown
+
+1.01 29.09.2011
+  - new 'left'/'right' args for page_break() and create_section(new_page=>)
+
+1.00 13.08.2011
+  - doc updates
+  - bumped to 1.0 and removed the claim that it was "experimental"
+
+0.07 06.01.2011
+  - no "soft line breaks" in MIME encode_qp() -- see RT 63716
+
+0.06 28.07.2010
+  - new arg for new(): WordDocument properties
+
+0.05 14.05.2010
+  - better handling of MsWord fields, and new method quote()
+
+0.04 04.06.2009
+  - fixes on CRLF line endings when generating from Unix
+
+0.03 05.01.2009
+  - forgot Mime::Types in prereq
+
+0.02 01.01.2009
+  - Oops, already some bugs (bad calls to Params::Validate)
+
+0.01 01.01.2009
+  - Initial release
+

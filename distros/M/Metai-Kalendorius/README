@@ -1,0 +1,23 @@
+NAME
+
+Metai::Kalendorius - Lithuanian calendar.
+
+DESCRIPTION
+
+This module provides subroutines that return Lithuanian day-names/zodiac name/time of year name/month name/day name, based on date.
+Each of those can be returned in utf-8 (default) encoding and "www" type (f.e. Vai&#154;vilas).
+
+INSTALLATION
+
+	perl Makefile.PL ("perl Makefile.PL LIB=/www/example.com/lib" in case of user restrictions.)
+	make
+	make test
+	make install
+
+AUTHOR
+
+Algirdas R. <algirdas@perl.lt>
+
+COPYRIGHT
+
+Copyleft Algirdas R. <algirdas@perl.lt>

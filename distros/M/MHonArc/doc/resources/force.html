@@ -1,0 +1,155 @@
+<html>
+<head>
+<title>MHonArc Resources: FORCE</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="foluplitxt.html">FOLUPLITXT</a>]</td><td><nobr>[<a href="../resources.html#force">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="fromfields.html">FROMFIELDS</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>FORCE</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p>
+<code>-force</code>
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>FORCE causes MHonArc to override the lock on
+the archive and perform the operations requested.
+</p>
+
+<p>When MHonArc processes an archive, it locks the
+archive so other MHonArc processes do not try
+to modify the archive at the same time.  However, if
+MHonArc abnormally terminates, the lock may not
+be released, causing all future MHonArc processes
+to fail in performing any archive operations.  If
+you get a message from MHonArc that it cannot
+lock an archive, and you know the archive is not in use
+by another MHonArc process, use the FORCE resource.
+</p>
+
+<table border=0 cellpadding=4>
+<tr valign=top>
+<td><strong>NOTE</strong></td>
+<td><p>The alternative approach is to manually remove the
+lockfile (see <a href="lockfile.html">LOCKFILE</a>).
+</p>
+</td>
+</tr>
+</table>
+
+<p>The FORCE option should be used with care to avoid
+archive corruption.  FORCE is active only for the current
+MHonArc process.
+</p>
+
+<table border=0 cellpadding=4>
+<tr valign=top>
+<td><strong><font color="red">WARNING</font></strong></td>
+<td><p>Having two, or more, MHonArc processes
+processing the same archive with FORCE enabled can lead to
+archive corruption.
+</p>
+</td>
+</tr>
+</table>
+
+<p>MHonArc will still try to perform a normal lock before forcing the issue.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>None.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>1.2.2
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+<a href="lockdelay.html">LOCKDELAY</a>,
+<a href="lockfile.html">LOCKFILE</a>,
+<a href="locktries.html">LOCKTRIES</a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="foluplitxt.html">FOLUPLITXT</a>]</td><td><nobr>[<a href="../resources.html#force">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="fromfields.html">FROMFIELDS</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2003/10/06 22:04:17 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"
+><strong>MHonArc</strong></a><br>
+Copyright &#169; 1997-1998, <a href="http://www.earlhood.com/"
+>Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org"
+>mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

@@ -1,0 +1,387 @@
+<HTML>
+<HEAD>
+<TITLE>0.79 - Simple platform independent mailer</TITLE>
+<LINK REV="made" HREF="mailto:root@net1.alma.ch">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+    <LI><A HREF="#name">NAME</A></LI>
+    <LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+    <LI><A HREF="#description">DESCRIPTION</A></LI>
+    <LI><A HREF="#installation">INSTALLATION</A></LI>
+    <LI><A HREF="#features">FEATURES</A></LI>
+    <LI><A HREF="#limitations">LIMITATIONS</A></LI>
+    <LI><A HREF="#configuration">CONFIGURATION</A></LI>
+    <LI><A HREF="#details">DETAILS</A></LI>
+    <UL>
+
+        <LI><A HREF="#sendmail()"><CODE>sendmail()</CODE></A></LI>
+        <LI><A HREF="#mail::sendmail::time_to_date()">Mail::Sendmail::time_to_date()</A></LI>
+        <LI><A HREF="#$mail::sendmail::error">$Mail::Sendmail::error</A></LI>
+        <LI><A HREF="#$mail::sendmail::log">$Mail::Sendmail::log</A></LI>
+        <LI><A HREF="#$mail::sendmail::address_rx">$Mail::Sendmail::address_rx</A></LI>
+        <LI><A HREF="#%mail::sendmail::mailcfg">%Mail::Sendmail::mailcfg</A></LI>
+        <LI><A HREF="#$mail::sendmail::version">$Mail::Sendmail::VERSION</A></LI>
+        <LI><A HREF="#configuration variables from previous versions">Configuration variables from previous versions</A></LI>
+    </UL>
+
+    <LI><A HREF="#another example">ANOTHER EXAMPLE</A></LI>
+    <LI><A HREF="#changes">CHANGES</A></LI>
+    <LI><A HREF="#author">AUTHOR</A></LI>
+    <LI><A HREF="#notes">NOTES</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Mail::Sendmail v. 0.79 - Simple platform independent mailer</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Mail::Sendmail;</PRE>
+<PRE>
+  %mail = ( To      =&gt; 'you@there.com',
+            From    =&gt; 'me@here.com',
+            Message =&gt; &quot;This is a very short message&quot;
+           );</PRE>
+<PRE>
+  sendmail(%mail) or die $Mail::Sendmail::error;</PRE>
+<PRE>
+  print &quot;OK. Log says:\n&quot;, $Mail::Sendmail::log;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Simple platform independent e-mail from your perl script. Only requires
+Perl 5 and a network connection.</P>
+<P>Mail::Sendmail contains mainly &amp;sendmail, which takes a hash with the
+message to send and sends it. It is intended to be very easy to setup and
+use. See also <A HREF="#features">FEATURES</A> below.</P>
+<P>
+<HR>
+<H1><A NAME="installation">INSTALLATION</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_Best">Best</A></STRONG><BR>
+<DD>
+<CODE>perl -MCPAN -e &quot;install Mail::Sendmail&quot;</CODE>
+<P></P>
+<DT><STRONG><A NAME="item_Traditional">Traditional</A></STRONG><BR>
+<DD>
+<PRE>
+    perl Makefile.PL
+    make
+    make test
+    make install</PRE>
+<DT><STRONG><A NAME="item_Manual">Manual</A></STRONG><BR>
+<DD>
+Copy Sendmail.pm to Mail/ in your Perl lib directory.
+<PRE>
+    (eg. c:\Perl\site\lib\Mail\
+     or  /usr/lib/perl5/site_perl/Mail/
+     or whatever it is on your system.
+     They are listed when you type C&lt; perl -V &gt;)</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_ActivePerl%27s_PPM">ActivePerl's PPM</A></STRONG><BR>
+<DD>
+ppm install --location=http://alma.ch/perl/ppm Mail-Sendmail
+<P>But this way you don't get a chance to have a look at other files (Changes,
+Todo, test.pl, ...).</P>
+<P></P></DL>
+<P>At the top of Sendmail.pm, set your default SMTP server(s), unless you specify
+it with each message, or want to use the default (localhost).</P>
+<P>Install MIME::QuotedPrint. This is not required but strongly recommended.</P>
+<P>
+<HR>
+<H1><A NAME="features">FEATURES</A></H1>
+<P>Automatic time zone detection, Date: header, MIME quoted-printable encoding
+(if MIME::QuotedPrint installed), all of which can be overridden.</P>
+<P>Bcc: and Cc: support.</P>
+<P>Allows real names in From:, To: and Cc: fields</P>
+<P>Doesn't send an X-Mailer: header (unless you do), and allows you to send any
+<CODE>header(s)</CODE> you want.</P>
+<P>Configurable retries and use of alternate servers if your mail server is
+down</P>
+<P>Good plain text error reporting</P>
+<P>
+<HR>
+<H1><A NAME="limitations">LIMITATIONS</A></H1>
+<P>Headers are not encoded, even if they have accented characters.</P>
+<P>No suport for the SMTP AUTH extension.</P>
+<P>Since the whole message is in memory, it's not suitable for
+sending very big attached files.</P>
+<P>The SMTP server has to be set manually in Sendmail.pm or in your script,
+unless you have a mail server on localhost.</P>
+<P>Doesn't work on OpenVMS, I was told. Cannot test this myself.</P>
+<P>
+<HR>
+<H1><A NAME="configuration">CONFIGURATION</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_server">Default SMTP <CODE>server(s)</CODE></A></STRONG><BR>
+<DD>
+This is probably all you want to configure. It is usually done through
+<EM>$mailcfg{smtp}</EM>, which you can edit at the top of the Sendmail.pm file.
+This is a reference to a list of SMTP servers. You can also set it from
+your script:
+<P><CODE>unshift @{$Mail::Sendmail::mailcfg{'smtp'}} , 'my.mail.server';</CODE></P>
+<P>Alternatively, you can specify the server in the <EM>%mail</EM> hash you send
+from your script, which will do the same thing:</P>
+<P><CODE>$mail{smtp} = 'my.mail.server';</CODE></P>
+<P>A future version will (hopefully) try to set useful defaults for you
+during the Makefile.PL.</P>
+<P></P>
+<DT><STRONG><A NAME="item_Other_configuration_settings">Other configuration settings</A></STRONG><BR>
+<DD>
+See <EM>%mailcfg</EM> under <A HREF="#details">DETAILS</A> below for other configuration options.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="details">DETAILS</A></H1>
+<P>
+<H2><A NAME="sendmail()"><CODE>sendmail()</CODE></A></H2>
+<P>sendmail is the only thing exported to your namespace by default</P>
+<P><CODE>sendmail(%mail) || print &quot;Error sending mail: $Mail::Sendmail::error\n&quot;;</CODE></P>
+<P>It takes a hash containing the full message, with keys for all headers,
+body, and optionally for another non-default SMTP server and/or port.</P>
+<P>It returns 1 on success or 0 on error, and rewrites
+<CODE>$Mail::Sendmail::error</CODE> and <CODE>$Mail::Sendmail::log</CODE>.</P>
+<P>Keys are NOT case-sensitive.</P>
+<P>The colon after headers is not necessary.</P>
+<P>The Body part key can be called 'Body', 'Message' or 'Text'.</P>
+<P>The SMTP server key can be called 'Smtp' or 'Server'. If the connection to
+this one fails, the other ones in <A HREF="#item_%24mailcfg%7Bsmtp%7D"><CODE>$mailcfg{smtp}</CODE></A> will still be tried.</P>
+<P>The following headers are added unless you specify them yourself:</P>
+<PRE>
+    Mime-Version: 1.0
+    Content-Type: 'text/plain; charset=&quot;iso-8859-1&quot;'</PRE>
+<PRE>
+    Content-Transfer-Encoding: quoted-printable
+    or (if MIME::QuotedPrint not installed)
+    Content-Transfer-Encoding: 8bit</PRE>
+<PRE>
+    Date: [string returned by time_to_date()]</PRE>
+<P>If you wish to use an envelope sender address different than the
+From: address, set <CODE>$mail{Sender}</CODE> in your %mail hash.</P>
+<P>The following are not exported by default, but you can still access them
+with their full name, or request their export on the use line like in:
+<CODE>use Mail::Sendmail qw(sendmail $address_rx time_to_date);</CODE></P>
+<P>
+<H2><A NAME="mail::sendmail::time_to_date()">Mail::Sendmail::time_to_date()</A></H2>
+<P>convert time ( as from <CODE>time()</CODE> ) to an RFC 822 compliant string for the
+Date header. See also <A HREF="#%mail::sendmail::mailcfg">%Mail::Sendmail::mailcfg</A>.</P>
+<P>
+<H2><A NAME="$mail::sendmail::error">$Mail::Sendmail::error</A></H2>
+<P>When you don't run with the <STRONG>-w</STRONG> flag, the module sends no errors to
+STDERR, but puts anything it has to complain about in here. You should
+probably always check if it says something.</P>
+<P>
+<H2><A NAME="$mail::sendmail::log">$Mail::Sendmail::log</A></H2>
+<P>A summary that you could write to a log file after each send</P>
+<P>
+<H2><A NAME="$mail::sendmail::address_rx">$Mail::Sendmail::address_rx</A></H2>
+<P>A handy regex to recognize e-mail addresses.</P>
+<P>A correct regex for valid e-mail addresses was written by one of the judges
+in the obfuscated Perl contest... :-) It is quite big. This one is an
+attempt to a reasonable compromise, and should accept all real-world
+internet style addresses. The domain part is required and comments or
+characters that would need to be quoted are not supported.</P>
+<PRE>
+  Example:
+    $rx = $Mail::Sendmail::address_rx;
+    if (/$rx/) {
+      $address=$1;
+      $user=$2;
+      $domain=$3;
+    }</PRE>
+<P>
+<H2><A NAME="%mail::sendmail::mailcfg">%Mail::Sendmail::mailcfg</A></H2>
+<P>This hash contains all configuration options. You normally edit it once (if
+ever) in Sendmail.pm and forget about it, but you could also access it from
+your scripts. For readability, I'll assume you have imported it
+(with something like <CODE>use Mail::Sendmail qw(sendmail %mailcfg)</CODE>).</P>
+<P>The keys are not case-sensitive: they are all converted to lowercase before
+use. Writing <CODE>$mailcfg{Port} = 2525;</CODE> is OK: the default $mailcfg{port}
+(25) will be deleted and replaced with your new value of 2525.</P>
+<DL>
+<DT><STRONG><A NAME="item_%24mailcfg%7Bsmtp%7D">$mailcfg{smtp}</A></STRONG><BR>
+<DD>
+<CODE>$mailcfg{smtp} = [qw(localhost my.other.mail.server)];</CODE>
+<P>This is a reference to a list of smtp servers, so if your main server is
+down, the module tries the next one. If one of your servers uses a special
+port, add it to the server name with a colon in front, to override the
+default port (like in my.special.server:2525).</P>
+<P>Default: localhost.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24mailcfg%7Bfrom%7D">$mailcfg{from}</A></STRONG><BR>
+<DD>
+<CODE>$mailcfg{from} = 'Mailing script me@mydomain.com';</CODE>
+<P>From address used if you don't supply one in your script. Should not be of
+type 'user@localhost' since that may not be valid on the recipient's
+host.</P>
+<P>Default: undefined.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24mailcfg%7Bmime%7D">$mailcfg{mime}</A></STRONG><BR>
+<DD>
+<CODE>$mailcfg{mime} = 1;</CODE>
+<P>Set this to 0 if you don't want any automatic MIME encoding. You normally
+don't need this, the module should 'Do the right thing' anyway.</P>
+<P>Default: 1;</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24mailcfg%7Bretries%7D">$mailcfg{retries}</A></STRONG><BR>
+<DD>
+<CODE>$mailcfg{retries} = 1;</CODE>
+<P>How many times should the connection to the same SMTP server be retried in
+case of a failure.</P>
+<P>Default: 1;</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24mailcfg%7Bdelay%7D">$mailcfg{delay}</A></STRONG><BR>
+<DD>
+<CODE>$mailcfg{delay} = 1;</CODE>
+<P>Number of seconds to wait between retries. This delay also happens before
+trying the next server in the list, if the retries for the current server
+have been exhausted. For CGI scripts, you want few retries and short delays
+to return with a results page before the http connection times out. For
+unattended scripts, you may want to use many retries and long delays to
+have a good chance of your mail being sent even with temporary failures on
+your network.</P>
+<P>Default: 1 (second);</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24mailcfg%7Btz%7D">$mailcfg{tz}</A></STRONG><BR>
+<DD>
+<CODE>$mailcfg{tz} = '+0800';</CODE>
+<P>Normally, your time zone is set automatically, from the difference between
+<CODE>time()</CODE> and <CODE>gmtime()</CODE>. This allows you to override automatic detection
+in cases where your system is confused (such as some Win32 systems in zones
+which do not use daylight savings time: see Microsoft KB article Q148681)</P>
+<P>Default: undefined (automatic detection at run-time).</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24mailcfg%7Bport%7D">$mailcfg{port}</A></STRONG><BR>
+<DD>
+<CODE>$mailcfg{port} = 25;</CODE>
+<P>Port used when none is specified in the server name.</P>
+<P>Default: 25.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%24mailcfg%7Bdebug%7D">$mailcfg{debug}</A></STRONG><BR>
+<DD>
+<CODE>$mailcfg{debug} = 0;</CODE>
+<P>Prints stuff to STDERR. Current maximum is 6, which prints the whole SMTP
+session, except data exceeding 500 bytes.</P>
+<P>Default: 0;</P>
+<P></P></DL>
+<P>
+<H2><A NAME="$mail::sendmail::version">$Mail::Sendmail::VERSION</A></H2>
+<P>The package version number (you can not import this one)</P>
+<P>
+<H2><A NAME="configuration variables from previous versions">Configuration variables from previous versions</A></H2>
+<P>The following global variables were used in version 0.74 for configuration.
+As from version 0.78_1, they are not supported anymore.
+Use the <EM>%mailcfg</EM> hash if you need to access the configuration
+from your scripts.</P>
+<DL>
+<DT><STRONG><A NAME="item_%24Mail%3A%3ASendmail%3A%3Adefault_smtp_server">$Mail::Sendmail::default_smtp_server</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24Mail%3A%3ASendmail%3A%3Adefault_smtp_port">$Mail::Sendmail::default_smtp_port</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24Mail%3A%3ASendmail%3A%3Adefault_sender">$Mail::Sendmail::default_sender</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24Mail%3A%3ASendmail%3A%3ATZ">$Mail::Sendmail::TZ</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24Mail%3A%3ASendmail%3A%3Aconnect_retries">$Mail::Sendmail::connect_retries</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24Mail%3A%3ASendmail%3A%3Aretry_delay">$Mail::Sendmail::retry_delay</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%24Mail%3A%3ASendmail%3A%3Ause_MIME">$Mail::Sendmail::use_MIME</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<HR>
+<H1><A NAME="another example">ANOTHER EXAMPLE</A></H1>
+<PRE>
+  use Mail::Sendmail;</PRE>
+<PRE>
+  print &quot;Testing Mail::Sendmail version $Mail::Sendmail::VERSION\n&quot;;
+  print &quot;Default server: $Mail::Sendmail::mailcfg{smtp}-&gt;[0]\n&quot;;
+  print &quot;Default sender: $Mail::Sendmail::mailcfg{from}\n&quot;;</PRE>
+<PRE>
+  %mail = (
+      #To      =&gt; 'No to field this time, only Bcc and Cc',
+      #From    =&gt; 'not needed, use default',
+      Bcc     =&gt; 'Someone &lt;him@there.com&gt;, Someone else her@there.com',
+      # only addresses are extracted from Bcc, real names disregarded
+      Cc      =&gt; 'Yet someone else &lt;xz@whatever.com&gt;',
+      # Cc will appear in the header. (Bcc will not)
+      Subject =&gt; 'Test message',
+      'X-Mailer' =&gt; &quot;Mail::Sendmail version $Mail::Sendmail::VERSION&quot;,
+  );</PRE>
+<PRE>
+  $mail{Smtp} = 'special_server.for-this-message-only.domain.com';
+  $mail{'X-custom'} = 'My custom additionnal header';
+  $mail{'mESSaGE : '} = &quot;The message key looks terrible, but works.&quot;;
+  # cheat on the date:
+  $mail{Date} = Mail::Sendmail::time_to_date( time() - 86400 );</PRE>
+<PRE>
+  if (sendmail %mail) { print &quot;Mail sent OK.\n&quot; }
+  else { print &quot;Error sending mail: $Mail::Sendmail::error \n&quot; }</PRE>
+<PRE>
+  print &quot;\n\$Mail::Sendmail::log says:\n&quot;, $Mail::Sendmail::log;
+</PRE>
+<PRE>
+
+Also see <A HREF="http://alma.ch/perl/Mail-Sendmail-FAQ.html">http://alma.ch/perl/Mail-Sendmail-FAQ.html</A> for examples
+of HTML mail and sending attachments.</PRE>
+<P>
+<HR>
+<H1><A NAME="changes">CHANGES</A></H1>
+<P>Main changes since version 0.78:</P>
+<P>Added ``/'' (\x2F) as a valid character in mailbox part.</P>
+<P>Removed old configuration variables which are not used anymore
+since version 0.74.</P>
+<P>Added support for different envelope sender (through <CODE>$mail{Sender}</CODE>)</P>
+<P>Changed case of headers: first character after ``-'' also uppercased</P>
+<P>Support for multi-line server responses</P>
+<P>Localized $\ and $_</P>
+<P>Some internal rewrites and documentation updates</P>
+<P>Fixed old bug of dot as 76th character on line disappearing.</P>
+<P>Fixed very old bug where port number was not extracted from
+stuff like 'my.server:2525'.</P>
+<P>Fixed time_to_date bug with negative half-hour zones (only Newfoundland?)</P>
+<P>Added seconds to date string</P>
+<P>Now uses Sys::Hostname to get the hostname for HELO. (This may break the
+module on some very old Win32 Perls where Sys::Hostname was broken)</P>
+<P>Enable full session output for debugging</P>
+<P>See the <EM>Changes</EM> file for the full history. If you don't have it
+because you installed through PPM, you can also find the latest
+one on <EM><A HREF="http://alma.ch/perl/scripts/Sendmail/Changes">http://alma.ch/perl/scripts/Sendmail/Changes</A></EM>.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Milivoj Ivkovic &lt;mi\x40alma.ch&gt; (``\x40'' is ``@'' of course)</P>
+<P>
+<HR>
+<H1><A NAME="notes">NOTES</A></H1>
+<P>MIME::QuotedPrint is used by default on every message if available. It
+allows reliable sending of accented characters, and also takes care of
+too long lines (which can happen in HTML mails). It is available in the
+MIME-Base64 package at <A HREF="http://www.perl.com/CPAN/modules/by-module/MIME/">http://www.perl.com/CPAN/modules/by-module/MIME/</A> or
+through PPM.</P>
+<P>Look at <A HREF="http://alma.ch/perl/Mail-Sendmail-FAQ.html">http://alma.ch/perl/Mail-Sendmail-FAQ.html</A> for additional
+info (CGI, examples of sending attachments, HTML mail etc...)</P>
+<P>You can use this module freely. (Someone complained this is too vague.
+So, more precisely: do whatever you want with it, but be warned that
+terrible things will happen to you if you use it badly, like for sending
+spam, or ...?)</P>
+<P>Thanks to the many users who sent me feedback, bug reports, suggestions, etc.
+And please excuse me if I forgot to answer your mail. I am not always reliabe
+in answering mail. I intend to set up a mailing list soon.</P>
+<P>Last revision: 06.02.2003. Latest version should be available on
+CPAN: <EM><A HREF="http://www.cpan.org/modules/by-authors/id/M/MI/MIVKOVIC/">http://www.cpan.org/modules/by-authors/id/M/MI/MIVKOVIC/</A></EM>.</P>
+
+</BODY>
+
+</HTML>

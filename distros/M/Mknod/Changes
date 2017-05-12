@@ -1,0 +1,9 @@
+Revision history for Perl extension Mknod.
+
+0.02  Tue Jun 17 19:37:04 2003
+    - tested, off to CPAN
+
+0.01  Sun Jun 15 20:35:31 2003
+	- original version; created by h2xs 1.22 with options
+		-A -n Mknod
+

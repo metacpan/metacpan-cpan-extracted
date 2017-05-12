@@ -1,0 +1,90 @@
+# -*- Makefile -*-
+#
+#    Copyright 2000, 2001, 2002, 2003 Laurent Wacrenier
+#
+#    This file is part of PLL libmdq.
+#
+#    PLL libmdq is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU Lesser Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    PLL libmdq is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Lesser Public License for more details.
+#
+#    You should have received a copy of the GNU Lesser Public License
+#    along with PLL libmdq; if not, write to the Free Software
+#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# $Id: Makefile.in,v 1.8 2005/01/31 17:38:06 lwa Exp $
+
+prefix=@prefix@
+sysconfdir=@sysconfdir@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+datadir=@datadir@
+libexecdir=@libexecdir@
+bindir=@bindir@
+mandir=@mandir@
+
+INSTALL=@INSTALL@
+INSTALL_PROGRAM=@INSTALL_PROGRAM@
+INSTALL_DATA=@INSTALL_DATA@
+INSTALL_SCRIPT=@INSTALL_SCRIPT@
+
+CC=@CC@
+CPPFLAGS=@CPPFLAGS@
+
+OBJS=mdq.o
+
+all:: Makefile libmdq.a
+
+libmdq.a:: ${OBJS}
+	ar srlc libmdq.a ${OBJS}	   
+
+mdq.o: mdq.c mdq.h config.h
+
+install:: all mdq.x
+	${INSTALL_DATA} libmdq.a ${libdir}/
+	${INSTALL_DATA} mdq.3 ${mandir}/man3/mdq.3
+	${INSTALL_DATA} mdq.x ${mandir}/man3/mdq_open.3
+	${INSTALL_DATA} mdq.x ${mandir}/man3/mdq_close.3
+	${INSTALL_DATA} mdq.x ${mandir}/man3/mdq_add.3
+	${INSTALL_DATA} mdq.x ${mandir}/man3/mdq_test.3
+	${INSTALL_DATA} mdq.x ${mandir}/man3/mdq_get.3
+	${INSTALL_DATA} mdq.h ${includedir}/mdq.h
+
+mdq.x::
+	echo .so man3/mdq.3 > mdq.x
+
+mdq.h: mdq.h.in config.status
+	./config.status --file=mdq.h
+
+Makefile: Makefile.in config.status
+	./config.status --file=Makefile
+
+config.h: config.h.in
+	./config.status --header=config.h
+
+#config.h.in: ???
+
+configure: configure.in
+	autoheader
+	autoconf
+
+config.status: configure
+	./config.status --recheck
+
+clean::
+	rm -f *.o *.a mdq.x
+	rm -f ktrace.out *.core core
+	rm -f config.cache config.log configure.lineno *~
+	rm -rf autom4te.cache
+	rm -f *.da *.bb *.bbg *.gcov
+
+distclean:: clean
+	rm -f Makefile config.status config.h
+	rm -f mdq.h 

@@ -1,0 +1,47 @@
+---
+abstract: 'Not Even A (Web Application) Framework'
+author:
+  - 'Konstantin S. Uvarin <khedin@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  Test::More: '0.87'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MVC-Neaf
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI: '0'
+  Carp: '0'
+  Data::Dumper: '0'
+  Digest::MD5: '0'
+  Digest::SHA: '0'
+  Encode: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  Getopt::Long: '0'
+  HTTP::Headers: '0'
+  JSON: '0'
+  MIME::Base64: '0'
+  Module::Load: '0'
+  Plack::Request: '0'
+  Scalar::Util: '0'
+  Sys::Hostname: '0'
+  Template: '0'
+  Time::HiRes: '0'
+  URI::Escape: '0'
+  overload: '0'
+  parent: '0'
+  perl: '5.008'
+version: 0.17
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

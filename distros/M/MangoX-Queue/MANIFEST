@@ -1,0 +1,23 @@
+lib/MangoX/Queue.pm
+lib/MangoX/Queue/Delay.pm
+lib/MangoX/Queue/Job.pm
+lib/MangoX/Queue/Plugin/Statsd.pm
+lib/MangoX/Queue/Tutorial.pod
+t/capped.t
+t/consume.t
+t/dequeue.t
+t/enqueue.t
+t/events.t
+t/fetch.t
+t/plugin.t
+t/requeue.t
+t/retries.t
+t/statsd.t
+t/watch.t
+t/update.t
+README.pod
+Makefile.PL
+MANIFEST
+Changes
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

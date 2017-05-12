@@ -1,0 +1,23 @@
+Revision history for Perl extension MPE::File
+
+0.01  Mon Dec 17 19:36:40 2001
+        - original version; created by h2xs 1.20 with options
+                -A -n MPE::File
+0.02  Wed Dec 19 2001
+        - fixed fgetkeyinfo
+
+0.03  Wed Jan 21 2002
+        - fixed iowait, added mpe_fileno, lastwaitfilenum
+
+0.04  Wed Jan 25 2002
+	added print and printf methods
+	added mpeprint(), printop, printopreply functions
+        - changed writerec and fcontrol so that constants
+          can be passed where appropriate
+
+0.05  Wed Dec 18 2002
+	Fixed minor bug in flabelinfo
+	  return () instead of undef on error
+
+0.06  Wed Dec 18 2002
+	Make @itemerror a global variable

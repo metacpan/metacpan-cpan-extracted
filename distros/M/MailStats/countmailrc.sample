@@ -1,0 +1,10 @@
+# Put your list of mailboxes here as shown below
+#
+#mailbox = /home/sdague/mail/afterstep
+#mailbox = /home/sdague/mail/apache
+#mailbox = /home/sdague/mail/as-users
+#mailbox = /var/spool/mail/sdague
+
+# If you want a custom message put it here
+#
+#message = %% mbox %% \t %% count %%\n

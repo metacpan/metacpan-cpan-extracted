@@ -1,0 +1,121 @@
+#!/usr/bin/env perl
+#
+# A rhythm generator.
+
+use 5.10.0;
+use Getopt::Long qw(GetOptions);
+use MIDI;
+use Music::RecRhythm;
+
+my $Default_Pitch = 60;
+my @Pitches;
+
+GetOptions(
+    'duration|d=s' => \my $Flag_Duration,
+    'file|f=s'     => \my $Flag_MIDI_File,
+    'help|h|?'     => \&emit_help,
+    'pitches=s'    => \my $Flag_Pitches,
+    'repeat|r=i'   => \my $Flag_Repeats,
+    'silent=s'     => \my $Flag_Silent_Tracks,
+    'tempo=i'      => \my $Flag_Tempo,
+    'ticks=i'      => \my $Flag_Ticks,
+) or exit 64;
+
+my @sets;
+
+for my $arg (@ARGV) {
+    push @sets, Music::RecRhythm->new( set => [ integers_from($arg) ] );
+    $sets[-2]->next( $sets[-1] ) if @sets > 1;
+}
+if ($Flag_Pitches) {
+    @Pitches = integers_from($Flag_Pitches);
+}
+if ($Flag_Silent_Tracks) {
+    for my $n ( integers_from($Flag_Silent_Tracks) ) {
+        $sets[$n]->is_silent(1);
+    }
+}
+$Flag_Duration ||= 96;
+$Flag_MIDI_File //= 'out.midi';
+$Flag_Repeats ||= 1;
+$Flag_Tempo   ||= 500000;
+$Flag_Ticks   ||= 384;
+
+warn sprintf "info: beatfactor=%d levels=%d\n",
+  map { $sets[0]->$_ } qw/beatfactor levels/;
+
+my @MIDI_Tracks =
+  map { new_track_on_the_block() } 1 .. $sets[0]->audible_levels;
+my @Track_Durations;
+
+# though it may be more efficient to merely duplicate the MIDI events
+# directly rather than recursing multiple times...
+for my $repeatnum ( 1 .. $Flag_Repeats ) {
+    $sets[0]->recurse( \&call_me_midi );
+}
+
+my $opus = MIDI::Opus->new( { ticks => $Flag_Ticks, tracks => \@MIDI_Tracks } );
+$opus->write_to_file($Flag_MIDI_File);
+
+sub call_me_midi {
+    my ( $rset, $param ) = @_;
+    $Track_Durations[ $param->{audible_level} ] += $param->{duration};
+    play_note(
+        $MIDI_Tracks[ $param->{audible_level} ],
+        {   chan  => $param->{audible_level},
+            dur   => int( $param->{duration} * $Flag_Duration ),
+            pitch => $Pitches[ $param->{audible_level} ] // $Default_Pitch,
+        }
+    );
+}
+
+sub emit_help {
+    warn <<"END_OF_HELP";
+Usage $0 [options] set1 [set2 ...]
+
+Sets should be comprised of sequences of positive integers, with
+subsequent sets being automatically linked to the previous set.
+
+Options include:
+
+  --duration=d    Multiplicative factor for all MIDI durations.
+                  Default: 96. May need to be fiddled with depending on
+                  the rhythm sets, etc.
+  --file=f        Output file, otherwise 'out.midi' by default.
+  --pitches=p,..  What pitch to use in what recursion level. Default: 60.
+  --repeat=r      How many times to repeat the recursion. Default: once.
+  --silent=s,..   What sets to silence, where 0 indicates the first set
+                  listed on the command line, etc.
+  --tempo=t       MIDI tempo. Default 500000.
+  --ticks=t       MIDI ticks. Deafult 384.
+
+Example: four levels of the standard pattern with the first three
+silenced at a somewhat quicker pace than default:
+
+  $0 --duration=32 --silent=0,1,2 \
+    2,2,1,2,2,2,1 2,2,1,2,2,2,1 2,2,1,2,2,2,1 2,2,1,2,2,2,1
+
+END_OF_HELP
+
+    exit 64;
+}
+
+sub integers_from {
+    my ($str) = @_;
+    $str =~ m/(\d+)/ag;
+}
+
+sub new_track_on_the_block {
+    my $track = MIDI::Track->new;
+    $track->new_event( 'set_tempo', 0, $Flag_Tempo );
+    $track->new_event( 'patch_change', 0, 0, 0 );
+    return $track;
+}
+
+sub play_note {
+    my ( $track, $param ) = @_;
+    $param->{chan} //= 0;
+    $param->{velo} //= 100;
+    $track->new_event( 'note_on', 0, map { $param->{$_} } qw/chan pitch velo/ );
+    $track->new_event( 'note_off', map( { $param->{$_} } qw/dur chan pitch/ ), 0 );
+}

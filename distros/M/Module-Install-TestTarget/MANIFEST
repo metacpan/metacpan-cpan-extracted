@@ -1,0 +1,24 @@
+Changes
+lib/Module/Install/TestTarget.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00_compile.t
+t/default_make_test/with_extra_tests.t
+t/test_target/alias.t
+t/test_target/env.t
+t/test_target/includes.t
+t/test_target/insert_on_finalize.t
+t/test_target/insert_on_prepare.t
+t/test_target/load_modules.t
+t/test_target/run_on_finalize.t
+t/test_target/run_on_prepare.t
+t/test_target/tests.t
+t/Util.pm
+xt/01_podspell.t
+xt/02_pod.t
+xt/03_pod-coverage.t
+xt/04_perlcritic.t
+xt/perlcriticrc
+META.json                                Module JSON meta-data (added by MakeMaker)

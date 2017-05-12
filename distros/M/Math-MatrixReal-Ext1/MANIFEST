@@ -1,0 +1,6 @@
+Changes -- change log
+Ext1.pm -- the module code
+MANIFEST -- this file
+Makefile.PL -- type "perl Makefile.PL" to get a Makefile
+test.pl -- test script for "make test"
+doc_test/doc_test.pl -- test of the code in the documentation

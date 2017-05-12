@@ -1,0 +1,27 @@
+---
+abstract: 'MooX::Role::Parameterized - roles with composition parameters'
+author:
+  - 'Tiago Peczenyj <tiago.peczenyj@gmail.com>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.132661'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooX-Role-Parameterized
+requires:
+  Carp: 0
+  List::MoreUtils: 0
+  Module::Runtime: 0
+  Moo: 0
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/peczenyj/MooX-Role-Parameterized/issues
+  homepage: https://github.com/peczenyj/MooX-Role-Parameterized
+  repository: git://github.com/peczenyj/MooX-Role-Parameterized.git
+version: 0.082

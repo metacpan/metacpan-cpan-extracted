@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Math/EllipticCurve/Prime.pm
+lib/Math/EllipticCurve/Prime/Point.pm
+t/01-point-mul.t
+t/02-point-ops.t
+t/03-parameters.t
+t/04-serialization.t
+t/05-rfc5903.t
+t/data/nisttv

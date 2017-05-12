@@ -1,0 +1,26 @@
+Changelog for Module-Packaged-Generator
+
+1.111930  2011-07-12 16:50:25 Europe/Paris
+ - loosen minimum perl version requirement
+
+1.111890  2011-07-08 11:30:52 Europe/Paris
+ - possibility to specify path to database file
+ - possibility to override driver name
+ - better log handling: possibility to be quiet or verbose
+ - refresh mageia & mandriva synthesises before populating db
+ - cpan index always refreshed before populating db
+ - better encapsulation
+
+1.111040  2011-04-14 12:54:36 Europe/Paris
+ - new driver for mageia linux
+ - speed improvements: no autocommit, using parse::cpan::packages::fast
+
+1.100240  2010-01-24 12:18:18 Europe/Paris
+ - moving logic in script where it belongs, instead of bloated create_db()
+
+1.100091  2010-01-09 12:18:42 Europe/Paris
+ - using a module abstraction
+ - fetching & recording cpan dist name
+
+1.100090  2010-01-09 11:00:30 Europe/Paris
+ - initial release

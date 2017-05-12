@@ -1,0 +1,102 @@
+##-*- Mode: Change-Log; indent-width:8; -*-
+##
+## Change Log for Perl module Moot (formerly moot-perl)
+
+v2.0.13 Wed, 24 Feb 2016 09:01:15 +0100 moocow
+	* added CONFIGURE_REQUIRES to fix RT bug #112321
+
+v2.0.12 Mon, 22 Feb 2016 15:48:01 +0100 moocow
+	* fixed missing PREREQ_PM for Alien::Moot
+
+v2.0.11 Mon, 22 Feb 2016 14:41:57 +0100 moocow
+	* use new Alien::Moot for c++ library dependency
+
+v2.0.10_006 Fri, 25 Sep 2015 13:14:14 +0200 moocow
+	* renamed distribution to 'Moot' for CPAN-friendliness
+
+v2.0.10_005 2014-04-16  moocow
+	* added moot-scan.perl : moot TokenReader debugging
+	* updated to 2.0.10_005 to jive with C++ package
+
+v2.0.10_004 2013-12-18  moocow
+	* TokenReader.pm,TokenWriter.pm: moot/perl fixes
+	* updated to 2.0.10_004 to stay in sync with trunk
+
+v2.0.10_003 2013-12-06  moocow
+	* waste: improved handling of negative mode selectors (e.g. -N)
+	* updated perl bindings
+	  - added Moot::Waste::Annotator class
+	  - updated Moot::TokPP to use Moot::Waste::Annotator
+
+v2.0.10_002 2013-12-02  moocow
+	* fixed wasteScanner choking on long
+	  utf-8-encoded characters (e.g. U+1D1A3 : MUSICAL SYMBOL ORNAMENT STROKE-9
+	  : \xf0\x9d\x86\xa3 in bach_versuch02_1762
+	  - wasteScanner should now handle even non-utf8 more or less gracefully
+
+v2.0.10_001 2013-11-28  moocow
+	* v2.0.10-1: workaround for probability underflow error propagation in mootHMM::tag_stream()
+	  - once underflowed, no more differentiation was made, since no
+	  nodes qualified as flushable until EOF
+	  - workaround flushes nodes whenever 'unsafe' probabilities (<-1e37) are encountered
+	* encoding tweaks for Moot::TokPP::analyze_buffer()
+	* tokpp improvements / fixes
+	* fixed to jive with kmw's wasteLexer changes
+	* wasteTrainWriter: basically working, but links are being dropped (scanner bug)
+	* waste training prototype in testme.perl
+	* added Moot::TokPP, moot-tokpp.perl : drop-in
+	  replacement for dwds_tomasotath tokenizer-supplied
+	  pseudo-morphology
+	* documented Waste::Lexer::dehyphenate()
+	* make distcheck fixes
+	* got Moot::Waste::Decoder working, including buffer-level access
+	* added Waste::Decoder to perl
+	* Waste::Lexer seems working
+	  - including get/set on underlying scanner, using lexer->tr_data to hold an SV
+	* removed WasteLexerPerl class
+	  - was WIP for simultaneous support of both standalone and embedded wasteLexicon objects, now abandoned
+	* Waste::Lexicon : now only accessible via Waste::Lexer
+	  - avoids ref-counting madness for embedded objects
+	* added TokenReader, TokenWriter hierarchy wrappers
+	  - WIP on wasteLexer, wasteLexicon
+	* wrapped wasteTokenScanner as Moot::Waste::Scanner
+	* added scanner,lexer type constants (why? they're not actually _used_ ... we should probably remove them again)
+	* wrapper uses PerlIO layer
+	* TokenReader bugfixes (check for null tr_istream in from_filename()
+
+v2.0.9_002 2013-10-22  moocow
+	* added re2c_ucl.py (re2c char-class generator)
+	* added wasteScannerScan.* templates for waste generation
+	* added moot(lookup|merge)-(lex|123).perl to MANIFEST
+	* added mootlookup-lex.perl
+	* fixes for weird DynaLoader bug on perl v5.14 / 32-bit i686 / debian wheezy
+	  if CCFLAGS is set in Makefile.PL
+	  - strangely, x86_64 machine was unaffected
+	  - bad: Linux plato 3.2.0-4-686-pae #1 SMP Debian 3.2.41-2 i686 GNU/Linux
+	* added command-line utils mootmerge*.perl
+	* updated version for 2.0.9-2
+
+v2.0.9_001 2012-03-19  moocow
+	* updated perl wrappers
+
+v0.02 2012-02-29  moocow
+	* replace correspondce email in perl/ subdir
+	* added some debugging-type lookup functions
+	* fixed moot doc bug
+
+v0.01 2011-05-04  moocow
+	* MANIFEST (for dist)
+	* hacks for perl 5.10.0 (e.g. kaskade)
+	* added verbosity levels
+	* added utf8=TRUE parameter to HMM::Dyn::tag_sentence
+	* added HMM accessors: n_tags, n_toks, n_classes
+	* added 'utf8' option to HMM::tag_sentence
+	  - use perl utf8 encoded strings (default=true)
+	  - transparently decodes/encodes as necessary, assumes model data is utf8-encoded
+	  - works best if using perl utf8-encoding internally (e.g. as cab does)
+	  - fails if tag_sentence() flag is set for a utf8-encoded byte-string with perl utf8 flag UN-set (double-encoding)
+	* typemap: looks like dyn stuff is working
+	* a smidgeon of documentation
+	* got HMM::tag_sentence() working on perl structures
+	* started work on raw xs bindings for moot... urgh
+

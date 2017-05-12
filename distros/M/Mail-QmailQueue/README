@@ -1,0 +1,58 @@
+NAME
+    Mail::QmailQueue - Perl extension to operate qmail-queue directry
+
+SYNOPSIS
+      use Mail::QmailQueue;
+      use Mime::Lite;
+
+      # generate mail.
+      my $mime = MIME::Lite->new(
+                                 ...
+                                );
+
+      # send mail via qmail-queue.
+      my $qmail = Mail::QmailQueue->new;
+      $qmail->sender($ENV{USER});
+      $qmail->recipient('postmaster@foo.bar');
+      $qmail->data($mime->as_string);
+      $qmail->send;
+
+DESCRIPTION
+    This module operate qmail-queue directly, so, you can send mail more
+    faster than the case where SMTP is used.
+
+CONSTRUTOR
+    new(QMAIL_QUEUE)
+        construtor for Mail::QmailQueue object. QMAIL_QUEUE is location of
+        qmail-queue program (default /var/qmail/bin/qmail-queue)
+
+METHODS
+    sender(ADDRESS)
+        set sender's mail address.
+
+    mail(ADDRESS)
+        Synonym for sender.
+
+    recipient(ADDRESS [,ADDRESS, [...]])
+        set recipient's mail address.
+
+    to(ADDRESS [,ADDRESS, [...]])
+        Synonym for recipient.
+
+    data(DATA)
+        set mail message. (including header.)
+
+    send
+        send mail.
+
+AUTHOR
+    IKEBE Tomohiro <ikebe@edge.co.jp>
+
+SEE ALSO
+    qmail. http://cr.yp.to/qmail.html qmail-queue man page.
+
+COPYRIGHT
+    Copyright(C) 2001 IKEBE Tomohiro All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+

@@ -1,0 +1,66 @@
+NAME
+    Math::SymbolicX::Calculator::Interface::Shell - A Calculator Shell
+
+SYNOPSIS
+      # simplest form of usage:
+      use Math::SymbolicX::Calculator::Interface::Shell;
+      my $shell = Math::SymbolicX::Calculator::Interface::Shell->new();
+      $shell->run();
+
+DESCRIPTION
+    This module implements a shell interface to the
+    Math::SymbolicX::Calculator.
+
+METHODS
+  new
+    Returns a new shell application object. Call the "run()" method on it to
+    run the application.
+
+    Optional parameters: (default in parenthesis)
+
+      calc => a Math::SymbolicX::Calculator object to use
+      input_handle => a file handle to read from (\*STDIN)
+      prompt => the prompt string to use ('~> ')
+      continued_prompt => prompt string to use for continued lines ('>> ')
+      app_name => the name of the application ('Symbolic Calculator Shell')
+
+  run
+    Runs the main loop of the shell.
+
+  calc
+    Returns the Calculator object of this Shell.
+
+  exit_hook
+    Call this before stopping the shell. It runs all cleanup actions such as
+    those needed for a possible persistance.
+
+    This method doesn't actually kill your script, but returns after doing
+    the cleanup.
+
+  error
+    Used to issue a warning to the user. First argument must be an error
+    message to display.
+
+  get_expression
+    Reads a new expression from the input handle. An expression ends in a
+    semicolon followed by a newline.
+
+    Used internally by the run loop. Probably not that useful outside of
+    that.
+
+    Returns the expression or the empty list on error.
+
+  _parse_command
+    Parses generic commands such as exit and print.
+
+    This might change. (Name and implementation)
+
+    First argument: Expression to parse.
+
+    FIXME: Document what this does or refactor
+
+  _generic_out
+    Generic output routine: Print Formulas and messages alike
+
+    FIXME: Subject to change and refactoring.
+

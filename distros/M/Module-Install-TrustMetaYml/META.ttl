@@ -1,0 +1,125 @@
+@prefix cpan:  <http://purl.org/NET/cpan-uri/person/> .
+@prefix cpant: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix dcs:   <http://ontologi.es/doap-changeset#> .
+@prefix dist:  <http://purl.org/NET/cpan-uri/dist/Module-Install-TrustMetaYml/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix nfo:   <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+dist:project
+	a                 doap:Project;
+	doap:name         "Module-Install-TrustMetaYml";
+	cpant:perl_version_from [
+		a nfo:FileDataObject;
+		a nfo:SourceCode;
+		rdfs:label "Module::Install::TrustMetaYml";
+		nfo:fileName "lib/Module/Install/TrustMetaYml.pm";
+		nfo:programmingLanguage "Perl";
+	];
+	cpant:readme_from [
+		a nfo:FileDataObject;
+		a nfo:SourceCode;
+		rdfs:label "Module::Install::TrustMetaYml";
+		nfo:fileName "lib/Module/Install/TrustMetaYml.pm";
+		nfo:programmingLanguage "Perl";
+	];
+	cpant:requires    "YAML::Tiny"^^cpant:dsWithoutVersion;
+	cpant:version_from [
+		a nfo:FileDataObject;
+		a nfo:SourceCode;
+		rdfs:label "Module::Install::TrustMetaYml";
+		nfo:fileName "lib/Module/Install/TrustMetaYml.pm";
+		nfo:programmingLanguage "Perl";
+	];
+	dc:contributor    cpan:tobyink;
+	doap:bug-database <http://rt.cpan.org/Dist/Display.html?Queue=Module-Install-TrustMetaYml>;
+	doap:created      "2011-10-04"^^xsd:date;
+	doap:developer    cpan:tobyink;
+	doap:download-page <https://metacpan.org/release/Module-Install-TrustMetaYml>;
+	doap:helper       cpan:bingos;
+	doap:helper       cpan:flora;
+	doap:helper       cpan:ingy;
+	doap:homepage     <https://metacpan.org/release/Module-Install-TrustMetaYml>;
+	doap:license      <http://dev.perl.org/licenses/>;
+	doap:maintainer   cpan:tobyink;
+	doap:programming-language "Perl";
+	doap:release      dist:v_0-001;
+	doap:release      dist:v_0-002;
+	doap:release      dist:v_0-003;
+	doap:repository   [
+		a doap:HgRepository;
+		doap:browse <https://bitbucket.org/tobyink/p5-module-install-trustmetayml>;
+	];
+	doap:shortdesc    "trusts META.yml list of dependencies".
+
+dist:v_0-001
+	a                 doap:Version;
+	rdfs:label        "Initial release";
+	dc:identifier     "Module-Install-TrustMetaYml-0.001"^^xsd:string;
+	dc:issued         "2011-10-06"^^xsd:date;
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-TrustMetaYml-0.001.tar.gz>;
+	doap:revision     "0.001"^^xsd:string.
+
+dist:v_0-002
+	a                 doap:Version;
+	dc:identifier     "Module-Install-TrustMetaYml-0.002"^^xsd:string;
+	dc:issued         "2012-07-05"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Change;
+			rdfs:label "Reduce list of dependencies.";
+		];
+		dcs:item [
+			a dcs:Change;
+			rdfs:label "Support Perls prior to 5.8.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-TrustMetaYml-0.002.tar.gz>;
+	doap:revision     "0.002"^^xsd:string.
+
+dist:v_0-003
+	a                 doap:Version;
+	dc:identifier     "Module-Install-TrustMetaYml-0.003"^^xsd:string;
+	dc:issued         "2013-03-20"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Change;
+			rdfs:label "No need to bundle Scalar::Util in 'inc' directory.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-TrustMetaYml-0.003.tar.gz>;
+	doap:revision     "0.003"^^xsd:string.
+
+cpan:bingos
+	a                 foaf:Person;
+	foaf:name         "Chris Williams";
+	foaf:nick         "BINGOS";
+	foaf:page         <https://metacpan.org/author/BINGOS>.
+
+cpan:flora
+	a                 foaf:Person;
+	foaf:name         "Florian Ragwitz";
+	foaf:nick         "FLORA";
+	foaf:page         <https://metacpan.org/author/FLORA>.
+
+cpan:ingy
+	a                 foaf:Person;
+	foaf:name         "Ingy d\u00F6t Net";
+	foaf:nick         "INGY";
+	foaf:page         <https://metacpan.org/author/INGY>.
+
+cpan:tobyink
+	a                 foaf:Person;
+	foaf:name         "Toby Inkster";
+	foaf:nick         "TOBYINK";
+	foaf:page         <https://metacpan.org/author/TOBYINK>.
+
+<http://dev.perl.org/licenses/>
+	dc:title          "the same terms as the perl 5 programming language system itself".
+

@@ -1,0 +1,46 @@
+THIS MODULE IS OFFICIALLY UNSUPPORTED.
+
+Please move on to DKIM like a responsible Internet user.  I have.
+
+I will leave this module here on CPAN for a while, just in case someone
+has grown to depend on it.  It is apparent that DK will not be the way
+of the future. Thus, it is time to put this module to ground before it
+causes any further harm.
+
+Thanks for your support,
+Anthony
+
+PS: Don't get a CPAN email address if you can avoid it. Muchos spam.
+
+----
+
+Yuck, I hate writing documentation.  You get what you pay for, though.  I
+intend to do a full documentation set starting with version 0.80.
+
+Starting with version 0.79, the canonifiers are much more conformant to the
+DomainKeys draft. Mail::DomainKeys now passes the DomainKeys canonifier
+torture tests available here:
+
+http://sourceforge.net/project/showfiles.php?group_id=107680&package_id=148819
+
+Be aware that DomainKeys is going out of fashion; it appears that DKIM may
+be its successor. It's still up in the air, though, as far as I can tell.
+
+Installation is ala mode:
+
+perl Makefile.PL
+make
+make test
+make install
+
+Please send bug reports to <anthonyu@cpan.org>.  Sign them with DomainKeys
+if possible. :)  Please include the version numbers of the following
+modules:
+
+Crypt::OpenSSL::RSA
+Mail::Address
+MIME::Base64
+Net::DNS
+Text::Wrap
+
+Thanks!

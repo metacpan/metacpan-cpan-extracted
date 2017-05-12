@@ -1,0 +1,101 @@
+=head1 NAME
+
+Mad::Mapper::Guides::Tutorial - How to use Mad::Mapper in your application
+
+=head1 OVERVIEW
+
+This tutorial will give a short intro to how you can use L<Mad::Mapper> in
+your application.
+
+=head1 TUTORIAL
+
+=head2 Create a model
+
+The snippet below is enough to define a model. A model should contain all
+the columns that you want to map to your table. In many cases you don't
+need to define a L<table|Mad::Mapper/table>, since it is automatically
+created from the last part of the package name.
+
+  # name your model
+  package MyApp::Model::User;
+
+  # import all the helpers from Mad::Mapper
+  use Mad::Mapper -base;
+
+  # columns become accessors, just like you would define with "has"
+  col id => undef;
+  col email => '';
+
+See also L<Mad::Mapper::Guides::Custom> if you want more control.
+
+=head2 Application code
+
+The code below shows how you can use the models in a L<Mojolicious::Lite>
+application. The example connects to postrgres using L<Mojo::Pg>, but you
+can also use L<Mojo::SQLite> or L<Mojo::mysql>.
+
+  use Mojolicious::Lite;
+  use Mojo::Pg;
+
+  # create a database object from either Mojo::Pg,
+  # Mojo::SQLite or Mojo::mysql
+  my $pg = Mojo::Pg->new;
+
+  # create a helper method which makes it easy to
+  # access your models
+  helper model => sub {
+    my $c = shift;
+    my $model = "MyApp::Model::" .shift;
+    Mojo::Loader::load_class($model);
+    return $model->new(db => $pg->db, @_);
+  };
+
+  # render a user profile page
+  get "/profile" => sub {
+    my $c    = shift;
+    my $user = $c->model(User => id => $c->session("uid"));
+
+    $c->delay(
+      sub {
+        my ($delay) = @_;
+        $user->load($delay->begin);
+      },
+      sub {
+        my ($delay, $err) = @_;
+        return $c->render_exception($err) if $err;
+        return $c->render(user => $user);
+      },
+    );
+  };
+
+  # update the MyApp::Model::User model
+  post "/profile" => sub {
+    my $c    = shift;
+    my $user = $c->model(User => id => $c->session("uid"));
+
+    $c->delay(
+      sub {
+        my ($delay) = @_;
+        $user->email($c->param("email"));
+        $user->save($delay->begin);
+      },
+      sub {
+        my ($delay, $err) = @_;
+        return $c->render_exception($err) if $err;
+        return $c->render(user => $user);
+      },
+    );
+  };
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014-2016, Jan Henning Thorsen
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License version 2.0.
+
+=head1 AUTHOR
+
+Jan Henning Thorsen - C<jhthorsen@cpan.org>
+
+=cut

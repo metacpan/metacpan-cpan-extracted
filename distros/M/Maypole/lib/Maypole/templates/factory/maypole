@@ -1,0 +1,7 @@
+<!-- boxes -->
+<div style='position:absolute;top:220px;left:130px;border-bottom-width:260px;border-right-width:370px;' class='deco1'>&nbsp;</div>
+<div style='position:absolute;top:260px;left:190px;border-bottom-width:170px;border-right-width:530px;' class='deco2'>&nbsp;</div>
+<div style='position:absolute;top:240px;left:220px;border-bottom-width:340px;border-right-width:440px;' class='deco4'>&nbsp;</div>
+<div style='position:absolute;top:160px;left:330px;border-bottom-width:160px;border-right-width:280px;' class='deco1'>&nbsp;</div>
+<div style='position:absolute;top:190px;left:290px;border-bottom-width:430px;border-right-width:130px;' class='deco2'>&nbsp;</div>
+<!-- end of boxes -->

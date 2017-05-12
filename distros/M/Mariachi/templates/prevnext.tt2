@@ -1,0 +1,26 @@
+<div class="threads">
+[% IF container.parent && container.parent.message %]
+[% SET parent = container.parent.message %]
+<strong>In reply to:</strong>
+<div class="thread">
+<ul>
+<li><a href="[% base %][% parent.filename %]">[% parent.subject | html %]<a/><br/>
+<small>[% parent.from | html%] <i>[% date.format(child.epoch_date) %]</i></small><br/></li>
+</ul>
+</div>
+[% END %]
+
+
+[% IF container.children %]
+<strong>Follow ups:</strong></br>
+<div class="thread">
+<ul>
+[% FOREACH temp = container.children %]
+[% SET child = temp.message %]
+<li><a href="[% base %][% child.filename %]">[% child.subject | html %]</a><br/>
+<small>[% child.from | html %] <i>[% date.format(child.epoch_date) %]</i></small><br/></li>
+[% END %]
+</ul>
+</div>
+[% END %]
+</div>

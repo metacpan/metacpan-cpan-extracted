@@ -1,0 +1,33 @@
+Perl documentation:
+===================
+
+pod2man lib/MOSES/MOBY/Data/Object.pm | nroff -man | less
+---
+pods2html --index='Perl MoSeS Documentation' ~/moby-live/Perl/MOSES-MOBY/lib ~/moby-live/Perl/MOSES-MOBY/perldoc/
+---
+http://search.cpan.org/~iwalz/Pod2html/lib/Pod/2/html.pm
+----
+cpan> install Pod::Tree 
+----
+* Code documentation
+  - (c) notice everywhere
+  - move pod doc to the end
+  - finish pod doc
+  - system for generating HTML pages from pod docs
+
+
+Hacks:
+======
+
+perl -I/home/senger/books/perl_hacks_examples/know_thy_code/trace_all_used_modules/lib -MDevel::TraceUse ../scripts/local-cache.pl -t Regex
+
+Misc:
+=====
+
+Black-listed:
+
+Service: bioserv.rpbs.jussieu.fr        HBonds
+        generated
+
+------------- EXCEPTION MOBY::Exception -------------
+MSG: In method MOBY::Job::fr::jussieu::rpbs::bioserv::HBondsBase::MISSING_ARTICLE_NAME_IN_OUTPUT: Trying to set 'MOBY::Data::text_formatted' but 'MOBY::Data::HBond_Pair' is expected.

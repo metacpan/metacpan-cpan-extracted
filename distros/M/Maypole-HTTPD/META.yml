@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name: Maypole-HTTPD
+version: 0.1
+author:
+  - |-
+    Marcus Ramberg, E<lt>marcus@thefeed.no<gt>
+    Based on Simon Cozens' original implementation.
+abstract: Stand alone HTTPD for running Maypole Applications
+license: perl
+requires:
+  HTTP::Server::Simple: 0.02
+  HTTP::Server::Simple::Static: 0.01
+  Maypole: 2.06
+provides:
+  Maypole::HTTPD:
+    file: lib/Maypole/HTTPD.pm
+    version: 0.1
+  Maypole::HTTPD::Frontend:
+    file: lib/Maypole/HTTPD/Frontend.pm
+generated_by: Module::Build version 0.25

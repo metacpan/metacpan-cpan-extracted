@@ -1,0 +1,28 @@
+---
+abstract: 'A parser for MS2 files, commonly used in mass spectrometry based proteomics projects.'
+author:
+  - 'Felipe da Veiga Leprevost <leprevost@cpan.org>'
+build_requires:
+  Moose: '0'
+  Test::More: '0'
+  namespace::autoclean: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MS2-Parser
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.006'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=MS2-Parser
+  homepage: https://github.com/Leprevost/MS2-Parser
+  repository: https://github.com/Leprevost/MS2-Parser.git
+version: '0.062'

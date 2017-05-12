@@ -1,0 +1,68 @@
+:default ::= action => ::first
+
+lexeme default = latm => 1 action => [name,value]
+
+json         ::= hash
+               | array
+
+hash       ::= ('{') <hash pairs> ('}') action => [name,value]
+
+<hash pairs>      ::= pair* separator => <comma> action => [values]
+
+pair         ::= string (':') value action => [values]
+
+value        ::= string
+               | hash
+               | number
+               | array
+               | true
+               | false
+               | null
+
+true ::= 'true' action => [name]
+false ::= 'false' action => [name]
+null ::= 'null' action => [name]
+
+array        ::= ('[') elements (']') action => [name,values]
+
+elements     ::= value* action => [values] separator => <comma>
+
+number         ~ int
+               | int frac
+               | int exp
+               | int frac exp
+
+int            ~ digits
+               | '-' digits
+
+digits         ~ [\d]+
+
+frac           ~ '.' digits
+
+exp            ~ e digits
+
+e              ~ 'e'
+               | 'e+'
+               | 'e-'
+               | 'E'
+               | 'E+'
+               | 'E-'
+
+# This cheats -- it recognizers a superset of legal JSON strings.
+# The bad ones can sorted out later, as desired
+
+string ::= (quote) <string contents> (quote) action => [name,values]
+<string contents> ::=  <string piece>* action => [values]
+<string piece> ::= <easy string> | <escaped char> | <hex char>
+<escaped char> ::= ('\') <any char>
+
+quote ~ ["]
+<easy string> ~ [^"\\]*
+<hex char> ~ '\' 'u' <hex digit> <hex digit> <hex digit> <hex digit>
+<hex digit> ~ [0-9A-Fa-f]
+<any char> ~ [\d\D]
+
+comma          ~ ','
+
+:discard       ~ whitespace
+whitespace     ~ [\s]+

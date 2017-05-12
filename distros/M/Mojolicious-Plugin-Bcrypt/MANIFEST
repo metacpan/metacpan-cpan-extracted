@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Mojolicious/Plugin/Bcrypt.pm
+t/00-load.t
+t/10-logic.t
+t/20-spelling.t
+t/release-pod-syntax.t

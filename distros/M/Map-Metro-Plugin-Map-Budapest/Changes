@@ -1,0 +1,17 @@
+Revision history for Map-Metro-Plugin-Map-Budapest
+
+0.1001 2015-03-23T17:35:40Z CET
+ [Enhancements]
+ - Remove 'map_version' method. No longer used.
+
+ [Meta]
+ - iller.yaml replaces iller.ini (generates dist/weaver.ini).
+ - Added Travis-ci integration.
+
+ [Requirements]
+ - Changed required Perl version from 5.14 to 5.16 since that is what
+   Map::Metro requires.
+
+0.1000 2015-01-08T21:45:29Z CET
+ - Initial release
+

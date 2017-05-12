@@ -1,0 +1,25 @@
+---
+abstract: 'Create MaxMind DB from text file'
+author:
+  - 'Chen Gang <yikuyiku.com@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.9, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MaxMind-DB-Writer-FromTextFile
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  MaxMind::DB::Reader: 0.050005
+  MaxMind::DB::Reader::XS: 0.060004
+  MaxMind::DB::Writer: 0
+  Net::Works::Network: 0.16
+version: 0.02

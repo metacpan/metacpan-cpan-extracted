@@ -1,0 +1,7 @@
+Revision history for Perl extension Model3D::Poser::GetStringRes.
+
+0.01  Fri Jun 26 02:31:28 2009
+	- original version; created by h2xs 1.23 with options
+		-XA -n Model3D::Poser::GetStringRes
+1.00  fri Jun 26 03:05:00 2009
+        - Replaced h2xs generated with actual module and appended POD

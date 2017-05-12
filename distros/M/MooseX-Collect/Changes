@@ -1,0 +1,17 @@
+version 0.92 (2011-02-11):
+
+    - POD improvements
+    - little refactoring
+    - new tests
+
+version 0.91 (2011-02-06):
+
+    - collection methods now work correctly when inherited
+      by subclasses
+    - provider methods are now called as object methods
+    - fixed POD glitches
+    - added CAVEATS and INHERITANCE sections to the POD
+
+version 0.90 (2011-02-01):
+
+    - new

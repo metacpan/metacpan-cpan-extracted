@@ -1,0 +1,26 @@
+0.05
+ - Yet another attempt to have the Makefile.PL successfully weed out deficient
+   dragonfly and netbsd cpan-tester systems.(Probably won't succeed, but should
+   hopefully provide some diagnostics that will lead to a solution.)
+
+0.04
+ - Alter testing done in Makefile.PL to try and weed out deficient dragonfly and
+   BSD cpan-tester systems.
+
+0.03
+ - If compiler is gcc-3.x.x (or earlier) "exit 0;" in the Makefile.PL.
+ - Another fix to test 1 in new.t.
+ - Makefile.PL now runs some compiler checks - and then takes appropriate action.
+ - Add nnumflag(), set_nnum() and clear_nnum() functions. Also start using the perl
+   API function looks_like_number() to detect non-numeric strings.
+ - Change default output prec.
+
+0.02
+ - Try to detect if references to "cpow" or "catanhl" will not be resolved - and
+   abort the build if this problem is found to exist. (This enables us to avoid
+   some FAIL reports from cpan-testers.)
+ - Rewrite tests 4 and 5 in t/overload_string.t so that they don't register a fail
+   if the libc bug that thinks nan**0 is NaN (instead of the correct '1') is present.
+
+0.01
+ - First release to CPAN as a separate entity. (Formerly part of Math::Complex_C.)

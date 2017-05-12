@@ -1,0 +1,37 @@
+---
+abstract: 'Runkeeper OAuth Plugin for Mojolicious::Plugin::Web::Auth'
+author:
+  - 'Olaf Alders <olaf@wundercounter.com>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Web-Auth-Site-Runkeeper
+no_index:
+  directory:
+    - examples
+    - t
+    - xt
+requires:
+  Mojo::Base: '0'
+  Mojolicious::Plugin::Web::Auth: '0.12'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/oalders/Mojolicious-Plugin-Web-Auth-Site-Runkeeper/issues
+  homepage: https://github.com/oalders/mojolicious-plugin-web-auth-site-runkeeper
+  repository: https://github.com/oalders/mojolicious-plugin-web-auth-site-runkeeper.git
+version: '0.000001'
+x_contributors:
+  - 'Olaf Alders <olaf@wundersolutions.com>'

@@ -1,0 +1,46 @@
+Mojolicious-Command-generate-bootstrap version 0.01
+===================================================
+
+This is just an easy mojo-Command-Extension to easily deploy the Twitter Bootstrap Library
+into your Mojolicious-App.
+
+Bundled with this Module is Version 2.3.0 of the Twitter Bootstrap Library.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+USAGE
+
+chdir into your Mojolicious App and run:
+   mojo generate bootstrap
+
+This will unwrap following files into your $APPHOME:
+
+   $APPHOME/public/css/bootstrap.min.css
+   $APPHOME/public/js/bootstrap.min.js
+   $APPHOME/public/img/glyphicons-halflings.png
+   $APPHOME/public/img/glyphicons-halflings-white.png
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Mojolicious 3.11
+
+COPYRIGHT AND LICENCE
+
+Bootstrap Library Copyright 2013 by Twitter under the Apache License 2.0 (http://twitter.github.com/bootstrap/)
+
+Mojolicious::Command::generate::bootstrap Copyright 2013 by Sven Eppler (cpan@sveneppler.de)
+
+This program is free software; you can redistribute it and/or modify it under the terms of either: the GNU General Public License as published by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+

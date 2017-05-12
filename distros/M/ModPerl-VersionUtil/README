@@ -1,0 +1,57 @@
+NAME
+    ModPerl::VersionUtil - Make it easier to investigate your mod_perl
+    version.
+
+SYNOPSIS
+      use ModPerl::VersionUtil;
+
+      if (ModPerl::VersionUtil->is_mp) {
+        print "It's running under mod_perl.";
+        print "mod_perl version: " . ModPerl::VersionUtil->mp_version_string;
+      }
+
+      if (ModPerl::VersionUtil->is_mp2) {
+        require Apache2 ();
+        require Apache2::RequestRec();
+        require Apache2::RequestIO ();
+      } elsif (ModPerl::VersionUtil->is_mp19) {
+        require Apache2;
+        require Apache::RequestRec();
+        require Apache::RequestIO ();
+      } elsif (ModPerl::VersionUtil->is_mp1) {
+        require Apache;
+      }
+
+DESCRIPTION
+    This module helps you to investigate your mod_perl version easily.
+
+METHODS
+    is_mp
+        Returns true if your application is running under mod_perl.
+
+    is_mp1
+        Returns true if your mod_perl version is 1.0.
+
+    is_mp19
+        Returns true if your mod_perl version is 1.9 which is incompatible
+        with 2.0.
+
+    is_mp20
+        Returns true if your mod_perl version is 2.0 or higher.
+
+    mp_version
+        Returns your mod_perl version as number. (e.g. '1.99920')
+
+    mp_version_string
+        Returns your mod_perl version as string. (e.g. '1.999.20')
+
+AUTHOR
+        Naoya Ito, <naoya@bloghackers.net>
+
+        Some codes are borrowed from the Catalyst web application framework
+        which can handle any versions of mod_perl elegantly.
+
+COPYRIGHT AND LICENSE
+        This library is free software; you can redistribute it and/or modify
+        it under the same terms as Perl itself.
+

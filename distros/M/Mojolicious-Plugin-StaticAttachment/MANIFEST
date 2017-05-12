@@ -1,0 +1,14 @@
+Changes
+lib/Mojolicious/Plugin/StaticAttachment.pm
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/main.t
+t/public/sample.txt
+t/public/образец.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

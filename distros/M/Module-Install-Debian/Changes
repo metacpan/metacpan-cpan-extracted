@@ -1,0 +1,4 @@
+This file documents the revision history for Perl module Module::Install::Debian.
+
+0.030	2010-09-29
+		- RT#61666 removed ._Debian.pm from distribution

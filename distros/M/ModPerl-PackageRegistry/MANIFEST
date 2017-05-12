@@ -1,0 +1,22 @@
+Changes
+lib/ModPerl/PackageRegistry.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/conf/extra.last.conf.in
+t/htdocs/test/package-registry/bad/exists.txt
+t/htdocs/test/package-registry/default/exists.txt
+t/htdocs/test/package-registry/good/static.txt
+t/htdocs/test/package-registry/indexed-methods/exists.txt
+t/htdocs/test/package-registry/indexed-methods/sub/exists.txt
+t/htdocs/test/package-registry/unrelated/exists.txt
+t/ModPerl-PackageRegistry.t
+t/TEST
+t/TEST.PL
+t/tlib/TestCommon/LogDiff.pm
+t/tlib/TestRegistry/pages/buggy.pm
+t/tlib/TestRegistry/pages/good.pm
+t/tlib/TestRegistry/pages/index.pm
+t/tlib/TestRegistry/pages/nohandler.pm
+t/tlib/TestRegistry/pages/sub/index.pm

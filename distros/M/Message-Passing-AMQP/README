@@ -1,0 +1,36 @@
+NAME
+    Message::Passing::AMQP - input and output message-pass messages via
+    AMQP.
+
+SYNOPSIS
+        # Terminal 1:
+        $ message-pass --input STDIN --output AMQP --output_options '{"exchange_name":"test","hostname":"127.0.0.1","username":"guest","password":"guest"}'
+        {"data":{"some":"data"},"@metadata":"value"}
+
+        # Terminal 2:
+        $ message-pass --output STDOUT --input AMQP --input_options '{"queue_name":"test","exchange_name":"test","hostname":"127.0.0.1","username":"guest","password":"guest"}'
+        {"data":{"some":"data"},"@metadata":"value"}
+
+DESCRIPTION
+    An AMQP adaptor for Message::Passing for speaking to AMQP servers, for
+    example RabbitMQ <http://www.rabbitmq.com/> or QPID.
+
+PROTOCOL VERSION
+    This adaptor supports all versions of the AMQP protocol supported by
+    AnyEvent::RabbitMQ.
+
+SEE ALSO
+    Message::Passing::Output::AMQP
+    Message::Passing::Input::AMQP
+    Message::Passing
+    AnyEvent::RabbitMQ
+
+AUTHOR
+    Tomas (t0m) Doran <bobtfish@bobtfish.net>
+
+COPYRIGHT
+    Copyright The above mentioned AUTHOR 2012.
+
+LICENSE
+    GNU Library General Public License, Version 2.1
+

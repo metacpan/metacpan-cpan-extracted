@@ -1,0 +1,23 @@
+Revision history for MooseX-Role-XMLRPC-Client
+
+0.05 Mon Apr  2 2012
+- properly quote 'xt' in Makefile.PL (RT#76231)
+- fix cookie_jar predicates -- was always being created as has_cookie_jar,
+  regardless of the parameterized name
+
+0.04 Fri May  1 2009
+- enable auto_provides in Makefile.PL
+
+0.03 Mon Apr 27 2009
+- add Crypt::SSLeay as a test_requires
+- allow NO_NET_TESTS to be set to skip any/all tests that require net access
+
+0.02 Sat Apr 25 2009
+- clean up our error/fault handlers
+- add a live test
+- add xt/release/no_smart_comments.t
+- add repository meta info to Makefile.PL
+
+0.01    
+- First version, released on an unsuspecting world.
+

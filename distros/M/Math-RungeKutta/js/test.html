@@ -1,0 +1,111 @@
+<HTML><HEAD><TITLE>Testing RungeKutta.js</TITLE>
+<SCRIPT type="text/javascript" src="RungeKutta.js"> </SCRIPT>
+</HEAD><BODY BGCOLOR="#FFFFFF"><A NAME="top"><HR></A>
+<H1>Testing RungeKutta.js</H1>
+<TABLE WIDTH="50%" ALIGN="center">
+<SCRIPT type="text/javascript">
+var func_evals = 0;
+var i_test     = 0;
+var n_failed   = 0;
+var n_passed   = 0;
+function ok (bool, str) {
+	if (bool) {
+		document.write("<TR><TD>"+str+"</TD><TD>Passed</TD></TR>\n");
+	} else {
+		document.write("<TR><TD>"+str+"</TD><TD><B>FAILED</B></TD></TR>\n");
+	}
+}
+var dydt = function (t, y) {
+	var dydt_arr = new Array(2);
+	dydt_arr[0] = y[1];
+	dydt_arr[1] = 0.0 - y[0];
+	func_evals++;
+	return dydt_arr;
+}
+var twopi = 2.0 * 3.141592653589;
+var passmark0 = new Object;
+	passmark0["rk2"]=0.2;
+	passmark0["rk4"]=.0004;
+	passmark0["rk4_classical"]=.0015;
+	passmark0["rk4_ralston"]=.0015;
+	passmark0["epsilon"]=.0001;
+	passmark0["errors"]=.0003;
+var passmark1 = new Object;
+	passmark1["rk2"]=0.04;
+	passmark1["rk4"]=.00004;
+	passmark1["rk4_classical"]=.0006;
+	passmark1["rk4_ralston"]=.0006;
+	passmark1["epsilon"]=.00001;
+	passmark1["errors"]=.00001;
+var tmp;  // Array of return vaules
+
+//foreach $algorithm ('rk2','rk4','rk4_classical','rk4_ralston') {
+
+i_test++; n = 16; dt = twopi/n; var y = new Array(2); y = [0,1]; t = 0;
+for (var i = 1 ; i<=n ; i++) {
+	tmp = rk2( y, dydt, t, dt );
+	t=tmp[0]; y=tmp[1];
+}
+var err0 = Math.abs(y[0]); var err1 = Math.abs(y[1]-1.0);
+ok((err0 < passmark0["rk2"] && err1 < passmark1["rk2"]), "rk2");
+
+i_test++; y = [0,1]; t = 0;
+for (var i = 1 ; i<=n ; i++) {
+	tmp = rk4( y, dydt, t, dt );
+	t=tmp[0]; y=tmp[1];
+}
+var err0 = Math.abs(y[0]); var err1 = Math.abs(y[1]-1.0);
+ok((err0 < passmark0["rk4"] && err1 < passmark1["rk4"]), "rk4");
+
+i_test++; y = [0,1]; t = 0;
+for (var i = 1 ; i<=n ; i++) {
+	tmp = rk4_classical( y, dydt, t, dt );
+	t=tmp[0]; y=tmp[1];
+}
+var err0 = Math.abs(y[0]); var err1 = Math.abs(y[1]-1.0);
+ok((err0 < passmark0["rk4_classical"] && err1 < passmark1["rk4_classical"]), "rk4_classical");
+
+i_test++; y = [0,1]; t = 0;
+for (var i = 1 ; i<=n ; i++) {
+	tmp = rk4_ralston( y, dydt, t, dt );
+	t=tmp[0]; y=tmp[1];
+}
+var err0 = Math.abs(y[0]); var err1 = Math.abs(y[1]-1.0);
+ok((err0 < passmark0["rk4_ralston"] && err1 < passmark1["rk4_ralston"]), "rk4_ralston");
+
+//}
+
+//algorithm = 'rk4_auto';
+var t_midpoint; var y_midpoint = new Array();
+MODE: for (modeindex in ['epsilon','errors']) {
+	var mode = ['epsilon','errors'][modeindex];
+	i_test++;
+	var y = [0,1]; t=0; dt = 0.1;
+	var i = 0;
+	var epsilon;
+	if (mode == 'epsilon') { epsilon = 0.0001;
+	} else { var errors = [.01, 0.0001]; epsilon = errors;
+	}
+	func_evals = 0;
+	while (t+dt < twopi) {
+		i++;
+		tmp = rk4_auto( y, dydt, t, dt, epsilon );
+		t=tmp[0]; dt=tmp[1]; y=tmp[2];
+		tmp = rk4_auto_midpoint();
+		t_midpoint=tmp[0]; y_midpoint=tmp[1];
+		if (func_evals > 500) {
+			ok(false, "rk4_auto("+mode+") failed, "+func_evals+" func evals");
+			continue MODE;
+		}
+	}
+	i++; dt = twopi-t;
+	tmp = rk4( y, dydt, t, dt );
+	t=tmp[0]; y=tmp[1];
+	var err0 = Math.abs(y[0]); var err1 = Math.abs(y[1]-1.0);
+	ok ((err0 < passmark0[mode] && err1 < passmark1[mode]),
+	"rk4_auto("+mode+")");
+}
+</SCRIPT>
+</TABLE>
+
+<HR></BODY></HTML>

@@ -1,0 +1,41 @@
+2012-12-09  John Peacock  <john.peacock@havurah-software.org>
+
+	* .hgtags:
+	Tagging version 'v0.0.2' using shipit.
+	[92e5f1b96764] [tip]
+
+	* lib/Module/Starter/XSimple.pm:
+	Make shipit happy
+	[8ced741e014f] [v0.0.2]
+
+2012-12-02  John Peacock  <john.peacock@havurah-software.org>
+
+	* Build.PL:
+	Make Module::Build happy
+	[e24e5fa398e7]
+
+	* Build.PL, Changes, MANIFEST, META.yml:
+	Dynamically generated files
+	[ede0f32e32f8]
+
+2012-11-29  John Peacock  <john.peacock@havurah-software.org>
+
+	* .shipit:
+	Add shipit config
+	[5da6d917e73e]
+
+	* .hgignore, Build.PL, lib/Module/Starter/XSimple.pm:
+	Apply patch from NGLENN. Resolves
+	https://rt.cpan.org/Ticket/Display.html?id=81304
+	[d923e54d5ae9]
+
+	* .hgtags:
+	Added tag v0.0.1 for changeset 8026fcd5a5b7
+	[abe60765e93c]
+
+	* .hgignore, Build.PL, Changes, MANIFEST, MANIFEST.SKIP, META.yml,
+	README, lib/Module/Starter/XSimple.pm, t/00.load.t, t/pod-
+	coverage.t, t/pod.t:
+	Checkin old version to new Mercurial repo
+	[8026fcd5a5b7] [v0.0.1]
+

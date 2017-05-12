@@ -1,0 +1,121 @@
+Revision history for Perl extension Mail::POPRelay.
+
+0.01  Fri Feb  9 09:12:51 2001
+	TODO
+		- specific documentation on a per module basis
+	DONE
+		- original version created
+			`- ipop3d compatibility
+			`- cleanup script
+			`- poprelay module
+			`- daemon agent
+
+
+0.02  Mon Feb 12 08:15:04 PST 2001
+	TODO
+		- config file for all options
+		- specific documentation on a per module basis
+	DONE
+		- cvs repository changes
+
+
+0.03 Thu Feb 15 19:51:49 PST 2001
+	TODO
+		- config file for all options
+		- specific documentation on a per module basis
+	DONE
+		- many random bug fixes
+		- renamed binary to make more sense
+		- added init script
+
+
+0.04 Mon Feb 26 11:55:29 PST 2001
+	TODO
+		- config file for all options
+		- no sendmail specific
+	DONE
+		- specific documentation on a per module basis
+
+
+0.1.5 Sun Apr 15 23:01:47 PDT 2001
+	TODO
+		- config file for all options
+	DONE
+		- specific documentation on a per module basis
+		- no sendmail specific
+		- fixed funny versioning
+		- released to public ;)
+
+
+0.1.6 Tue Apr 24 12:07:17 PDT 2001
+	TODO
+		- config file for all options
+		- relay database support
+	DONE
+		- optionally restart mail server
+		- added documentation
+		- fixed code ref bug in signal handler (thanks John!)
+
+
+0.1.7 Wed Aug 22 12:27:35 PDT 2001
+	TODO
+		- config file for all options
+		- minimize resources
+	DONE
+		- File::Tail support
+			`- fixed zombied tail processes
+		- relay database support
+		- added more complete documentation
+
+
+1.0.0 Tue Nov 13 17:19:28 PST 2001
+	TODO
+		- config file for all options
+		- minimize resources
+	DONE
+		- poprelay_ipop3d now offers better support
+		- added poprelay_vpopd agent
+		- added more complete documentation
+
+	
+1.0.1 Fri Dec 28 23:39:48 PST 2001
+	TODO
+		- config file for all options
+		- minimize resources
+	DONE
+		- Added version information for all modules (per CPAN)
+		- Fixed misspelling
+	
+
+2.0.0 Mon Jan 21 21:21:53 PST 2002
+	TODO
+		- Separate directory for documentation
+		- Add more agents and config files (can't ever have too many!)
+	DONE
+		- Sending HUP to daemon reloads the config-file
+		- More abstract database creation and format methods
+		- Separate config files for various Unix distributions
+		- More efficient run time
+		- Revamped all forms of documentation
+		- Easier setup
+		- Better mail server support
+		- Improved init script for Redhat based distributions
+	
+
+2.0.1 Wed Mar 27 21:41:44 PST 2002
+	TODO
+		- Separate directory for documentation
+		- Add more agents and config files (can't ever have too many!)
+	DONE
+		- Fixed a race condition in Daemon.pm where relaying information 
+		  could have been lost  (thanks Mike!)
+
+
+2.2.1 Mon Aug 19 18:23:01 PDT 2002
+	TODO
+		- Separate directory for documentation
+		- Add more agents and config files (can't ever have too many!)
+	DONE
+		- Added support for Qpopper and Suse (thanks Sven-Oliver!)
+
+$Id: Changes,v 1.2 2002/08/20 01:25:37 keith Exp $

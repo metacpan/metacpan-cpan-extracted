@@ -1,0 +1,85 @@
+{
+   "abstract" : "Recursion-proof attribute triggers that fire on any initialize, set, or clear operation.",
+   "author" : [
+      "Todd Lorenz <trlorenz@hotmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-OmniTrigger",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Hash::Util::FieldHash" : 0,
+            "Moose" : "2.02",
+            "namespace::autoclean" : 0
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::OmniTrigger" : {
+         "file" : "lib/MooseX/OmniTrigger.pm",
+         "version" : "0.06"
+      },
+      "MooseX::OmniTrigger::MetaRole::AppToClass" : {
+         "file" : "lib/MooseX/OmniTrigger.pm",
+         "version" : 0
+      },
+      "MooseX::OmniTrigger::MetaRole::AppToRole" : {
+         "file" : "lib/MooseX/OmniTrigger.pm",
+         "version" : 0
+      },
+      "MooseX::OmniTrigger::MetaRole::Attribute" : {
+         "file" : "lib/MooseX/OmniTrigger.pm",
+         "version" : 0
+      },
+      "MooseX::OmniTrigger::MetaRole::Class" : {
+         "file" : "lib/MooseX/OmniTrigger.pm",
+         "version" : 0
+      },
+      "MooseX::OmniTrigger::MetaRole::Composite" : {
+         "file" : "lib/MooseX/OmniTrigger.pm",
+         "version" : 0
+      },
+      "MooseX::OmniTrigger::MetaRole::Instance" : {
+         "file" : "lib/MooseX/OmniTrigger.pm",
+         "version" : 0
+      },
+      "MooseX::OmniTrigger::MetaRole::Method::Accessor::Native::Writer" : {
+         "file" : "lib/MooseX/OmniTrigger.pm",
+         "version" : 0
+      },
+      "MooseX::OmniTrigger::MetaRole::Role" : {
+         "file" : "lib/MooseX/OmniTrigger.pm",
+         "version" : 0
+      },
+      "MooseX::OmniTrigger::State" : {
+         "file" : "lib/MooseX/OmniTrigger.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.06"
+}

@@ -1,0 +1,6 @@
+<div id="addnew">
+<fieldset>
+<legend>Add a new [% mclass.moniker %]</legend>
+[% request.as_form( 'addnew' ).render %]
+</fieldset>
+</div>

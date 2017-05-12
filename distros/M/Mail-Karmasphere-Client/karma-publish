@@ -1,0 +1,225 @@
+#!/usr/bin/perl
+
+# documentation: http://my.karmasphere.com/devzone/karmapublish
+# 
+# XXX todo: query the website somehow for $feed and figure
+# out if the $format we were given is compatible with the
+# karma_live.feed.idtype value.  we need to sanitycheck.  at
+# present sanitychecking is done by the server.
+# 
+#  EXAMPLE RUN
+# 
+#   20070223-20:00:46 mengwong@newyears-wired:~/src/Mail-Karmasphere-Client/trunk% perl -Mlib=lib ./karma-publish --feed=test.ip4 --feed=test.domain --format=ECO.ECO --file=$HOME/share/karma/source/dnswl.eco.de --debug --action=parse --username=x --password=y
+#   ...
+#   after two requires, $class=Mail::Karmasphere::Parser::ECO::ECO
+#   test.ip4: 213.30.253.65
+#   test.ip4: 213.30.253.67
+#   test.ip4: ...
+#   test.domain: mail.inxmail.de
+#   test.domain: mail2.inxmail.de
+#   test.domain: inxmx1.inxserver.de
+#   test.domain: ...
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Data::Dumper;
+use Mail::Karmasphere::Publisher;
+use Carp;
+use File::Temp qw(tempfile);
+use Lingua::EN::Inflect qw(PL PL_N);
+
+my ($file, $format);
+my $URL = 'http://my.karmasphere.com/app/account/feed/feed_data';
+my ($url, $user, $pass, @feeds, @out, $htuser, $htpass);
+my $action = 'upload';
+my ($debug);
+
+my $result = GetOptions(
+	"file=s"		=> \$file,
+	"format=s"		=> \$format,
+	"url=s"			=> \$url,
+	"username=s"	=> \$user,
+	"password=s"	=> \$pass,
+	"htuser=s"	    => \$htuser,
+	"htpass=s"	    => \$htpass,
+	"feed=s"		=> \@feeds,
+	"out=s"			=> \@out,
+	"action=s"		=> \$action,
+	"debug"			=> \$debug,
+);
+
+if (!$result){
+	print << "EOH";
+Usage: $0 --file=<file> --format=<format>
+	--feed=<keyname> [--feed=<keyname> ...]
+	 --out=<keyname>  [--out=<keyname> ...]
+     --action=(parse|parse-out|upload)
+	 --username=<username> --password=<password>
+	[--htuser=<username> --htpass=<password>]
+	[--url=http://my.karmasphere.com/app/account/feed/feed_data]
+
+Example:
+  Upload an IP4 address feed:
+    $0 --file=myfile.list --feed=my.feed --action=upload --username=my --password=secret
+
+  For the username and password, use what you use to sign in to the website.
+EOH
+	exit 1;
+}
+
+if ($action eq "parse-out" and @out != @feeds) {
+	die "karma-publish: for --action=parse-out, you must define one --out for every --feed specified\n";
+}
+
+@feeds = split(/,/,join(',',@feeds));
+
+my %format = map { split } <<EOFORMAT;
+rbl.simpleip	    Mail::Karmasphere::Parser::RBL::SimpleIP
+rbl.url	       	    Mail::Karmasphere::Parser::RBL::URL
+rbl.domain          Mail::Karmasphere::Parser::RBL::Domain
+rbl.mixed           Mail::Karmasphere::Parser::RBL::Mixed
+simple.iplist       Mail::Karmasphere::Parser::Simple::IPList
+simple.urllist      Mail::Karmasphere::Parser::Simple::URLList
+simple.domainlist   Mail::Karmasphere::Parser::Simple::DomainList
+simple.emaillist    Mail::Karmasphere::Parser::Simple::EmailList
+score.ip            Mail::Karmasphere::Parser::Score::IP4
+score.domain        Mail::Karmasphere::Parser::Score::Domain
+score.email         Mail::Karmasphere::Parser::Score::Email
+score.url           Mail::Karmasphere::Parser::Score::URL
+EOFORMAT
+
+unless ($format) {
+	die "Command line argument --format is required.";
+}
+my $class = $format{$format};
+unless ($class) {
+	carp "first require: requiring $format\n" if $debug;
+	eval qq{ require $format };
+	if ($@ =~ /^Can't locate/) { }
+	elsif ($@) { carp "first require: $@" if $debug; }
+	else { $class = $format; }
+}
+unless ($class) {
+	my $name = "Mail::Karmasphere::Parser::$format";
+	$name =~ s/[-\.\/]/::/g;
+	carp "second require: requiring $name\n" if $debug;
+	eval qq{ require $name };
+	if ($@ =~ /^Can't locate/) { }
+	elsif ($@) { carp "second require: $@" if $debug; }
+	else { $class = $name; }
+}
+
+print STDERR "after two requires, \$class=$class\n" if $debug;
+
+unless ($class) {
+	die "Could not guess parser class from $format";
+}
+
+unless (defined $file) {
+	die "Command line argument --file is required.";
+}
+unless (-e $file) {
+	die "File $file not found.";
+}
+
+my $publisher = new Mail::Karmasphere::Publisher();
+
+my @streams;
+eval qq(require $class); # XXX: whoops, we totally violate object encapsulation.
+if (@feeds != (@streams = $class->_streams)) {
+	die "$class produces @{[scalar @streams]} @{[PL(q(stream), scalar @streams)]} (@streams);"
+		. " you provided @{[scalar @feeds]} --feed @{[PL(q(argument), scalar @feeds)]}."
+		. " Please provide @{[scalar @streams]}. Order matters.\n";
+}
+
+my %outfiles;
+
+@outfiles{@feeds} = (@out
+					 ? (map { [ IO::File->new($_, "w+") || (die "unable to open outfile $_: $!"),
+								$_ ]
+								}
+						@out)
+					 : (map { [ tempfile("karma-publish.$$.$_.XXXXXX",
+										 DIR => "/tmp") ] }
+						@feeds)) ;
+
+# the parser separates the input $file into one file per stream
+$publisher->parse($file,
+				  $class,
+				  [ map { $outfiles{$_}->[1] } @feeds ],
+				  );
+
+my $exitcode = 0;
+
+foreach my $feed (@feeds) {
+  my ($fh, $filename) = @{$outfiles{$feed}};
+
+  if ($action eq 'parse') {
+	  print feed_prefix($feed, <$fh>);
+  } elsif ($action eq 'parse-out') {
+	  print "$feed has been parsed to $filename\n";
+  } elsif ($action eq 'upload') {
+    my %params = ( user => $user,
+				   pass => $pass,
+				   url  => ($url || $URL),
+				   feed => $feed,
+				 );
+
+    use Data::Dumper;
+    print Dumper(\%params) if $debug;
+
+    $params{htuser} = $htuser if defined $htuser;
+    $params{htpass} = $htpass if defined $htpass;
+
+	my $response = $publisher->publish($filename,
+									   $class,
+									   \%params,
+									  );
+
+	#
+	# confirm that the upload worked.
+	#
+
+	if ($response->is_redirect) {
+		if ($debug) {
+			print "$feed: uploaded successfully.\n";
+		}
+	}
+	else {
+		print "$feed: upload was not successful.\n";
+		$exitcode++;
+		if ($response->as_string =~ /There was an error/) {
+			print feed_prefix($feed, $response->as_string =~ /There was an error:.*?<pre>.*?{(.*?)}/s);
+		}
+		else {
+			if ($debug) {
+				print STDERR $response->as_string;
+			} else {
+				print STDERR "run again with --debug to see the full error dump\n";
+			}
+		}
+		# 
+		# There was an error:
+		# 
+		# <pre>
+		# $VAR1 = {
+		#           'feed_id' => 'invalid: failed constraint \'object_exists\''
+		#         };
+		# 
+		# </pre>
+		#         </div>
+		# 
+	}
+
+  } else {
+	die "Unknown action $action";
+  }
+}
+
+exit $exitcode;
+
+sub feed_prefix {
+	my $prefix = shift;
+	return map { "$prefix: $_\n" } map { split /\n/ } @_;
+}

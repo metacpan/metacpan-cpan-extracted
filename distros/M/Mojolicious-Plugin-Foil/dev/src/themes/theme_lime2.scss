@@ -1,0 +1,62 @@
+/* ================================================================== */
+/* THEME: Lime2
+ */
+@import 'functions';
+@import 'fonts_teal';
+@import 'icon_dark_on_light';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: hsl(90, 70%, 20%);
+$verge-fg: set-fg($verge-bg);
+$verge-border: hsl(90, 100%, 20%);
+$verge-grad: adjust-hue(lighten($verge-bg, 10%), -20);
+$button-bg: adjust-hue(darken($verge-bg, 10%), 5);
+$button-fg: set-fg($button-bg);
+$button-border: $verge-border;
+$main-bg: desaturate(lighten($verge-bg, 40%), 15%);
+$main-fg: set-fg($main-bg);
+$curr-bg: $main-bg;
+$link-fg: set-link($main-bg);
+$link-visited: set-visited($main-bg);
+$verge-link-fg: set-link($verge-bg);
+$verge-link-visited: set-visited($verge-bg);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+}
+
+header,
+footer {
+    @extend .verge;
+    background: linear-gradient($verge-grad, $verge-bg);
+}
+
+.side {
+    @extend .verge;
+    background: linear-gradient(to right, $verge-bg, $verge-grad);
+}
+
+body {
+	color: $main-fg;
+	background: $main-bg;
+}
+
+@include many-links($link-fg, $link-visited, $verge-link-fg, $verge-link-visited);
+@include fancy($verge-fg, $verge-bg, "silver3.jpg");
+@include make-buttons;
+
+header nav li {
+	border-color: $button-border;
+}
+header nav .selflink,
+header nav em,
+header nav .current a {
+	background-color: $curr-bg;
+}
+

@@ -1,0 +1,24 @@
+[ ]  qr{} most regexps.
+[ ]  each page should be an object (maybe..  $page->parse! w00t!)
+[ ]  Profiles in .webmailrc or something - select with easability!
+[ ]  Allow attachments when sending mail.
+[ ]  Semi-permanent caching (similar to a browser, for example).
+[?]  Configuration files -- "profiles"
+[ ]  Address book functionality & such.
+[ ]  allow dumping of original 'text' to a file.
+[ ]  allow removal of Yahoo banners, ads etc.
+[x]  proxy support
+[ ]  allow selection of messages by date, regexp in subject, etc.
+[ ]  search-and-collect (by subject or other header, or body)
+[?]  Allow formats other than mbox (Content-Length, maybe)
+[ ]  Integration into local MDA (to allow procmail interaction, e.g.) - no,
+this can be done by piping the output through procmail - add some stuff,
+perhaps a 'recipes' section in the README..
+[ ]  Dump X messages to file before continuing (i.e. don't store all 800
+messages in memory!)
+[x]  'Empty' link (for trash etc)
+[ ]  should be able to set tracing before creating object (well, before
+logging in! (i.e. in new())
+[ ]  Add 'trace level' parameter to Yahoo::debug() (removes unsightly "if $self->trace > X")
+[ ]  Search facility
+

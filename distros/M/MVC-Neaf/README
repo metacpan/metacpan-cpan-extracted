@@ -1,0 +1,49 @@
+MVC-Neaf
+
+MVC::Neaf [ni:f] stands for Not Even An (MVC) Framework.
+
+It allows to build simple web apps followin simple rules.
+
+See README.md
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc MVC::Neaf
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=MVC-Neaf
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/MVC-Neaf
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/MVC-Neaf
+
+    Search CPAN
+        http://search.cpan.org/dist/MVC-Neaf/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2016 Konstantin S. Uvarin
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

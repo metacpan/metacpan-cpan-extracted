@@ -1,0 +1,17 @@
+Modern/Open.pm
+Changes
+Makefile.PL
+pMakefile.PL
+MANIFEST
+README
+META.yml
+Test/Simply.pm
+t/001_open.t
+t/002_open.t
+t/003_open.t
+t/004_open.t
+t/005_opendir.t
+t/006_sysopen.t
+t/007_pipe.t
+t/008_socket.t
+t/009_accept.t

@@ -1,0 +1,10 @@
+--- #YAML:1.0
+name:     Math-Zap
+version:  1.07
+abstract: Draw 3D objects in 2D
+license:  perl
+distribution_type: module
+requires:
+recommends:
+build_requires:
+dynamic_config: 0

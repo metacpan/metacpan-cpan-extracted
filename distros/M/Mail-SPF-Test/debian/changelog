@@ -1,0 +1,13 @@
+mail-spf-test-perl (1.001) unstable; urgency=low
+
+  * Depends: libyaml-perl (>= 0.50) (was unversioned), as the required OO
+    infrastructure was introduced only then.
+
+ -- Julian Mehnle <julian@mehnle.net>  Wed, 30 May 2007 20:27:17 +0000
+
+mail-spf-test-perl (1.000) unstable; urgency=low
+
+  * Initial release.
+
+ -- Julian Mehnle <julian@mehnle.net>  Sat, 23 Dec 2006 20:00:00 +0000
+

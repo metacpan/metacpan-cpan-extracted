@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+eg/gladiator.pl
+lib/Memory/Leak/Hunter.pm
+t/01-gladiator.t
+t/02-gladi.t

@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e4c638b95b48bc3cd9bdf0ff7e78816674415019 AUTHOR_PLEDGE
+SHA1 f4f136746d24419394114e40722c9660a2e88c6e Changes
+SHA1 66a57d55bd710560d49144b2ba4b3b0a1138c8a6 INSTALL
+SHA1 5b807b764a3d24ce4f99fc96878cfe82bcc03288 LICENSE
+SHA1 7ebb1769fe79d5ab88a41795eff2cc632b504e0c MANIFEST
+SHA1 8acb75fc59dc8379825ad660991c65cdb3347aea META.json
+SHA1 b26c50a30585d93870647d417475d00cab4d876b META.yml
+SHA1 5eeae1f7fe3af8b5237633577b4300bc930f0247 Makefile.PL
+SHA1 f006832a9a8b6423adc8cc02ae400a1f0d6a5308 README.mkdn
+SHA1 d16a634f16f48d64ce1d57ac87e32246cc9b5bf9 cpanfile
+SHA1 8e20c2413b565b56dafd39c225e9305439786ccd doap.xml
+SHA1 20f7b12421eb5f67e92c54b0ad2ee4f2c7859f36 lib/MsgPack/Decoder.pm
+SHA1 d76eeedf1b39afdb5cac93320ab03ac51b7190ca lib/MsgPack/Encoder.pm
+SHA1 1f22c105c15edff2d7075c53eba8089f3f160150 lib/MsgPack/RPC.pm
+SHA1 b7452f4a5ddea0b4dcf9ebee8b36471e592e560f lib/MsgPack/RPC/Message.pm
+SHA1 ceecceabc1ebc2b6d5d414024cde52cead16f4f6 lib/MsgPack/RPC/Message/Request.pm
+SHA1 da6451f80ae48215b39622525759e6da9c4ddcf5 lib/MsgPack/Type/Boolean.pm
+SHA1 2afb6dc6b1fd9ae154a1ce47d90c4e9ca91591ae lib/MsgPack/Type/Ext.pm
+SHA1 d1c67e18ba3eb6fbf66f8ce75d9b36a6b239fbac t/00-compile.t
+SHA1 a450dfb9f3e4ef680fd4f28bbcf1d6beee33a7e5 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 8d0ee6eb1ccc7d6ba9786e085d1bb66385d1df93 t/decode.t
+SHA1 8b2bb6efb60598ce90cc31e24803621823b3a7f7 t/encode.t
+SHA1 c03f7f15bc36b3a9f593b86f320ca20974d45da3 t/encoding-decoding.t
+SHA1 4310c85fd4f3320e02f328699e65e9b210d211b5 t/rpc.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAljJwZ4ACgkQ34Hwf+GwC4wbjQCeK3vPDnSX1yi8bVb515HYhkIN
+iOYAnjxh8GRCCeN0YmyFl0nlnpylDN4r
+=KHpq
+-----END PGP SIGNATURE-----

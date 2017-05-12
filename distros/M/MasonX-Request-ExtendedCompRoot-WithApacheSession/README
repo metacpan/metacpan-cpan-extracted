@@ -1,0 +1,30 @@
+MasonX::Request::ExtendedCompRoot::WithApacheSession version 0.03
+=================================================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+The following file will be installed in your perl lib:
+
+MasonX/Request/ExtendedCompRoot/WithApacheSession.pm
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  MasonX::Request::ExtendedCompRoot 0.03
+  MasonX::Request::WithApacheSession 0.24
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Alex Robinson <cpan[@]alex.cloudband.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

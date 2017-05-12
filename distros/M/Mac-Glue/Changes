@@ -1,0 +1,495 @@
+* v1.30, Wednesday, January 3, 2007
+
+   Dynamically load application's scripting additions before sending event.
+
+* v1.28, Wednesday, November 8, 2006
+
+   Another endian fix, this time for UTF conversions (see comment in Glue.pm
+   for details).  (Jelte Liebrand)
+
+   Fixed prereq for Mac::AppleEvents::Simple.
+
+* v1.27, Tuesday, July 6, 2006
+
+   Endian fix for typeLongDateTime.
+
+* v1.26, Monday, June 19, 2006
+
+   Small endian fix for Intel (you must upgrade to Mac-Carbon-0.75 if using
+   Intel).
+
+   Add app_process() method to return the application_process object from
+   System Events (convenience method).
+
+   Some fixes for more accurate type resolution.
+
+   Improved documentation and eliminated a spurious warning.
+
+* v1.25, Monday, May 15, 2005
+
+   Fix up some of recent fixes in Mac::AETE::App, which broke certain older apps
+   OSAXes.
+
+   Fix gluemac to get proper app path when recreating glues.
+
+   Add new browsers_open_window example.
+
+* v1.24, Sunday, May 14, 2005
+
+   Rewrite Mac::AETE::App to use OSAGetAppTerminology for retrieving aete data.
+   Requires update to Mac::Carbon 0.74 (which includes Mac::OSA 1.05).
+
+   Fix some older bugs with legacy apps which have no app signature.
+
+* v1.23, Saturday, February 19, 2005
+
+   Make default MODE kAECanSwitchLayer instead of kAECanInteract | kAECanSwitchLayer,
+   as this appears to be the default that AppleScript uses.
+
+   Give proper warnings for when files to be glue'd do not exist.  (Kim Helliwell, Ken Williams)
+
+   Make a test fail if scripting additions or dialect were not created.  (Chris Devers)
+
+* v1.22, Monday, December 6, 2004
+
+   local()ize $MacPerl::Target in Mac::Glue::Common. (Alan Olsen)
+
+   Fix bundle targetting under Jaguar. (Ken Williams)
+
+* v1.21, Tuesday, June 8, 2004
+
+   Make launching work better for bundles. (wren argetlahm)
+
+   Minor little fixes.
+
+   No longer create glue for DiskImageMounter (wasn't really useful,
+   and often failed).
+
+* v1.20, Tuesday, May 19, 2004
+
+   Added more robust handling of bundle ID targetting, including making it
+   the default (requires Mac::AppleEvents::Simple 1.13); make SWITCH and
+   launch() work with bundle ID targets.
+
+   Allow creation of glues for non-scriptable apps (which can still
+   support a limited vocabulary, such as open()).
+
+   Create glues for Image Events.app and DiskImageMounter.app by default,
+   in addition to System Events.app.
+
+   Allow use of glue events with names like Can, Obj, Prop, Launch, Version.
+
+   Finally ported glueedit to Mac OS X, which allows modification of glues.
+
+
+* v1.19, Tuesday, March 23, 2004
+
+   Made arrayrefs work better in some cases, e.g.:
+   
+   	$glue->obj(file => \@files)->open;
+
+* v1.18, Sunday, March 21, 2004
+
+   Cleaned up.
+
+* v1.17, Wednesday, February 18, 2004
+
+   Added option to target by PID, explicit option to target by bundle ID;
+   cleaned up docs. (has)
+
+   Only allow data type to be set to typeUnicodeText if Encode is available.
+
+   Don't include BOM in UTF-16 data (use big-endian instead).  (Bill Birkett)
+
+   Fix documentation on ERRORS handler, and handling of error description.
+   Add error code (e.g., "errAEDescNotFound").  Add an optional default
+   ERRORS handler (setting it to a value of 1).
+
+   Added typeLongDateTime (convert to/from Mac OS); added Time::Epoch.
+   (Lars Eggert)
+
+   Make AE records guess better at types.
+
+   Export %MacErrors in addition to $MacError.
+
+   No longer use Mac::Path::Util; we only used the module to convert from Unix
+   to Mac paths, and we sucked those few lines we needed from it into
+   Mac::Files.
+
+   Fix incorrect printing of some debugging information when debugging was not on.
+
+   Fix some spurious warnings.
+
+   Make folder class work like file in %AE_PUT.
+
+   Added getdata() method to fetch the data in a returned AEObjDesc (see docs).
+
+
+* v1.16, Wednesday, November 19, 2003
+
+   There's a bug in perl 5.8.0-5.8.2 whereby -- depending on how your perl
+   is compiled -- the value of $^E (see the Mac::Glue docs for details)
+   is modified when accessed.  This patch helps minimize the effect, so
+   at least the value is reliable right after a Mac::Glue event call.
+   This change makes the value of $^E more reliable even without the bug
+   in perl.
+
+   The problem still exists in using Mac::Errors and probably other code.
+   It will be fixed in perl 5.8.3 and later.  Here's a patch to your perl
+   if you want to fix it locally:
+   
+   http://nntp.x.perl.org/group/perl.perl5.porters/85393
+
+
+* v1.15, Tuesday, November 18, 2003
+
+   Make "set" event look at direct object's type instead of defaulting
+   to guessing between plain numeric/text (should be less need for
+   param_type() now).
+
+   Make guesses for numeric/text also check for floats.
+
+   Where there are multiple types for something, get the first one we
+   know how to deal with.
+
+   Add more numeric types.
+
+   Fix typeUnicodeText to automatically encode text to UTF-16 as
+   expexted (if Encode module is available).
+
+* v1.14, Friday, October 31, 2003
+
+   Added support for remote Apple events under Mac OS X.  Example:
+
+	my $glue = Mac::Glue->new('Finder',
+	    eppc => 'Finder', 'mac.example.com'
+	);
+
+   Fixed proper preparation of the data with the right data type when using
+   param_type().
+
+* v1.13, September 2, 2003
+
+   Removed Memoize.  The speed gains were exceptionally modest, and some
+   bugs popped up resulting from adding it.  It could be added back at
+   some point, but it would need to be done more carefully, and right
+   now the benefits don't justify the cost in time to get it done properly.
+
+   Cleanup/bug fixes for Mac::AETE::App in finding/opening applications
+   and fetching the application names.
+
+   Added a VERSION key to the glues (the version of the application),
+   and a version() method.
+
+   Added -c flag to gluemac to check to see if application version matches
+   the versions stored in the installed glues ($glue->version eq
+   $glue->{VERSION}).
+
+   Added -r flag to gluemac to re-create installed application glues
+   (with -c, only re-creates those with differing versions).  It's
+   recommended that users run gluemac -r to update glues with new
+   VERSION key and fixed APPNAME key.
+
+* v1.12, August 27, 2003
+
+   Added Memoize to speed up some methods and functions.
+
+   Changed $ENV{MACGLUEDIR} to $MACGLUEDIR.  $ENV{MACGLUEDIR} will still
+   initialize $MACGLUEDIR, but in some cases, %ENV gets wiped, so we don't
+   want to rely on it.  (Lloyd Butler)
+
+   Even if you get a reply back in Mac::AETE::App, that doesn't mean the
+   data is good, so do a check on it and give a better error message.
+   (Ian Cabell)
+
+   Cleaned up ex/address_book.
+
+   Added ex/itunes.
+
+* v1.11, May 22, 2003
+
+   Added super-cool feature for calling event methods on object
+   specifier record objects (like $track->play).  See
+   "Shortcuts for object specifier records" in the docs for
+   more information.
+
+   Updated some of the examples to use this new feature.
+
+   Read-only flag in PODs was reversed.  It is recommended to re-create
+   all your glues, or just realize that "read-only" means it is writable,
+   and no note means it is read-only, in your old docs.  Or change them
+   all by hand.
+
+   Fixed minor paths bug in call to Mac::Path::Util.  Require
+   more recent version of said module.
+
+   Added t/pod.t.
+
+
+* v1.10, May 13, 2003
+
+   Major update for Mac OS X support.
+
+   Added various path handling/coercion for Mac OS X.
+
+   Added support for making glues on Mac OS X, with bundles and apps
+   without creator IDs.
+
+   Added support for targetting apps without creator IDs (they are
+   launched, then targetted by PSN).
+
+   Use $MacError instead of $^E ($^E still works in MacPerl scripts).
+
+   Added APPNAME key to glue objects, with name of the application.
+
+   Added fun debugging junk with "_print_aes" object hash key.
+
+   Refactored some code for scripts, moved out to Mac::Glue::Common.
+
+   Command-line-ized the "droplets" in scripts/.
+
+   Renamed and reorganized example scripts in ex/.
+   
+
+* v1.02, May 7, 2002
+
+   Skip directories when opening dialect/OSAX glues.
+
+
+* v1.01, January 15, 2002
+
+   Clean up a bit for 5.6.
+
+   Add ADDRESS method.
+
+   Add checking for enumerators and classes.
+
+   Make error handler work as hashref parameter list.
+
+   Change license to be that of Perl.
+
+
+* v1.00, September 12, 2000
+
+   Added error handling via ERRORS parameter / method.
+
+   General cleanup, additional examples.
+
+
+* v0.58, November 16, 1999
+
+   Change all of the classes to have Mac:: at the beginning of them
+   (except for ones that originate elsewhere, like AEDesc, et al).
+
+   Added Mac::AEParamType and param_type.
+
+   If a parameter expects an AE object specifier record, and is not passed
+   one, then it guesses the type and sets it to either typeChar or
+   typeInteger.
+
+   Made the conversion of keys into English names recursive with lists,
+   in addition to records (i.e., lists can contain multiple records).
+
+
+* v0.57, November 2, 1999
+
+   Added conversion of keys in returned records back into the "English"
+   names.
+
+   Records containing "class" parameter are coerced into descriptors
+   of that class (i.e., { name => 'foo', class => 'disk' }).
+
+   Added support for events over TCP/IP (Mac OS 9 required).
+
+   Note: if Keychain Access is used in Mac OS 9, the login() method may
+   no longer be required for accessing of remote machines.
+
+   Fixed bug in can() method; also changed how can() calls AUTOLOAD().
+
+   Added code for experimental callback stuff, undocumented,
+   subject to change, and probably does not even work.
+
+   Changed _get_name to _get_id, created new _get_name.
+
+   Updated dialect creation code for Mac OS 9 (aeut is now stored in
+   the AppleScript extension instead of a dialect file, but for
+   Mac::Glue is still stored in the dialects folder.  Instead
+   of being called English, it will likely be called AppleScript.
+   You should delete (or archive) old dialect glues manually.
+
+
+* v0.56, September 10, 1999
+
+   If plural class is used (i.e., files for file), and the following
+   value is not an AE* object, then it will become "every 'class'".
+   (Jeff Lowrey)
+
+   Added more documentation about using AEObjDesc objects.  (Jeff Lowrey)
+
+
+* v0.55, September 2, 1999
+
+   Added extra arguments to new() to accept alternate targets.  PPC ports,
+   PSNs, and paths are explicitly accepted now.  (Paths are first launched,
+   then the PSN is found ... aliases won't work properly as paths.)
+
+   Added login() class method to tell MacPerl to try logging in
+   with specified username and password.  Requires "Login As"
+   OSAX from the GTQ Scripting Library.
+
+
+* v0.51, September 1, 1999
+
+   Changed ordering of search in _find_event.
+
+   Fixed doc problems in Mac::AETE::Format::Glue: inheritance
+   classes are named, and optional parameters are properly
+   denoted.
+
+
+* v0.50, July 12, 1999
+
+   Added g* constants in addition to glue* constants.  Use whichever
+   you like, but I will use g* for everything.  If you don't want the
+   g* constants, because they conflict with something, use the
+   ":long" and ":longall" import tags instead of ":glue" and ":all".
+
+   Gone to beta!  Woo!
+
+
+* v0.31, June 22, 1999
+
+   Fixed bug that only found class names instead of class and property
+   names in creation of object specifier records.
+
+   Fixed bug which changed directories on initialization, and didn't change
+   it back.
+
+   Allow case-insensitive parameter names.
+
+
+* v0.30, June 16, 1999
+
+   Changed function names: glueInsertion() is now location(),
+   glueRange() is now range().
+
+   Added whose() function.
+
+   Added can() method which correctly finds available events.
+
+   Made special parameters, formerly with leading underscore and lowercase,
+   to all uppercase with no underscore (i.e., _retobj is now RETOBJ).
+
+   Added "of" and "in" as synonyms for "property" in obj() method calls.
+
+   Put AEObjDesc back in!  Will use in the future, maybe, to use objects
+   as targets for events.
+
+   Return all descriptors from obj() and prop(), and all objects
+   returned from events, as AEObjDesc objects.
+
+   Added glueTrue and glueFalse constants.
+
+   Tried again to suppress warnings during initial scripting additions and
+   dialect creation.
+
+   Tons of internal cleaning up.
+
+
+* v0.26, June 7, 1999
+
+   Made choice of serializer for glue more intelligent: FreezeThaw
+   automatically picked for CFM68K, Storable for PPC.
+
+   Updated Mac::AppleEvents and Mac::Memory, fixed more bugs and
+   added constants.  Fixed bug in AutoSplit.
+
+   Added glueInsertion(), glueRange(), and glueNull().
+
+   Completely removed AEObjDesc package, which existed to support
+   destruction of descriptors.  Use global hash now to keep track
+   of descriptors to destroy (Mac::AppleEvents::Simple).  So
+   all descriptors returned from obj() and prop() and others are
+   AEDesc objects.
+
+   Changed ordering of items in creating object specifiers in
+   _do_obj to match AppleScript, so comparing to Capture AE
+   output would be easier.
+
+   Put %AE_PUT back in Mac::Glue and left %AE_GET in
+   Mac::AppleEvents::Simple.
+
+   Switched DOBJ => { PARAM1 => DATA1 } to DOBJ => PARAM1 => DATA1
+   in event calls.
+
+   Always default to wait for reply and no timeout if unspecified by user.
+
+   Return useful errors in $^E.
+
+   Accept and return nested arrays/lists and hashes/records.
+
+   Call events and pass classes / properties case-insensitively.
+
+   Other miscellaneous changes.  Some cleaning up.
+
+
+* v0.25, May 30, 1999
+
+   Add serializer option.
+
+   Updates to Mac::Memory and Mac::AppleEvents and Mac::AppleEvents::Simple.
+
+   Added constants for absolute and relative positions.
+
+   Added enum().
+
+   Put o() and p() back as obj() and prop().
+
+   Other miscellaneous changes.  Lots of cleaning up.
+
+
+* v0.20, May 22, 1999
+
+   Complete rewrite.  Too many changes to bother mentioning, because
+   I am lazy.
+
+
+* v0.09, October 13, 1998
+
+   Added ability to use properties.  These are called with the p() method:
+
+      $obj->get( $obj->p('label_index', item => 'HD') );
+
+   which is equivalent to:
+
+      $obj->get( $obj->o(property => 'label_index', item => 'HD') );
+
+
+* v0.08, October 10, 1998
+
+   Unreleased.
+
+   Significant cleanup of module, in large part unfinished changes from
+   last version.
+
+   No longer doing error checking for whether lists are allowed or objects
+   are allowed, because these are sometimes wrong or undetectable.  Also,
+   will not raise exception on a missing required parameter, but will warn
+   if -w is on.
+
+   obj_form is exported from the glue modules, and all of the functions
+   and constant from Mac::AppleEvents can be imported from a glue module
+   with the ":all" tag:
+
+      use Mac::Glue::SomeApp qw(:all);
+
+
+* v0.07, September 30, 1998
+
+   More documentation and bugfixes.  Having serious problems with
+   AEObjDesc::DESTROY.
+
+
+* v0.06, September 29, 1998
+
+   Whole bunches of changes.  Note that glues made under 0.05 no longer work.

@@ -1,0 +1,34 @@
+MooseX-Traits-SetScalarByRef version 0.01
+=========================================
+
+This module provides a method to hold a variable reference as value
+of a Moose Attribute.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Moose v2.0604
+  Moose::Util::TypeConstraints v2.0604
+  ExtUtils::MakeMaker v6.6302
+  Test::More v0.98
+  Scalar::Util v1.27
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by Alex Becker
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

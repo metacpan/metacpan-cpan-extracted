@@ -1,0 +1,58 @@
+{
+   "abstract" : "Interface to http://webservice.rakuten.de/documentation",
+   "author" : [
+      "Marco Pessotto <melmothx@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Marketplace-Rakuten",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "DateTime::Format::ISO8601" : "0",
+            "HTTP::Tiny" : "0.014",
+            "Moo" : "0",
+            "MooX::Types::MooseLike" : "0",
+            "XML::LibXML::Simple" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/interchange/Marketplace-Rakuten.git/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/interchange/Marketplace-Rakuten.git"
+      },
+      "x_IRC" : "irc://irc.freenode.net/#interchange"
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

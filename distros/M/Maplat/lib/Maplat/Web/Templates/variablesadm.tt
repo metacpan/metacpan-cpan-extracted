@@ -1,0 +1,53 @@
+<p align="center">
+    <table class="data" align="center" id="MainDataTable">
+        <tr class="tabheader">
+            <th>[% tr.tr("Variable") %]</th>
+            <th>[% tr.tr("Value") %]</th>
+            <th></th>
+            <th></th>
+        </tr>
+        [% FOREACH var IN variables %]
+            <form name="setvariable_[% var.name %]" method="post" action="[% PostLink %]">
+                <tr>
+                    <td>
+                        <input type="hidden" name="varname" value="[% var.name %]">
+                        [% var.name %]
+                    </td>
+                    <td>
+                        <input type="text" name="varvalue" value="[% var.value %]">
+                    </td>
+
+                    <td>
+                        <input type="hidden" name="mode" value="setvalue">
+                        <input type="submit" value="[% tr.tr("Change") %]">
+                    </td>
+                </form>
+                <form name="delvariable_[% var.name %]" method="post" action="[% PostLink %]">
+                    <td>
+                        <input type="hidden" name="varname" value="[% var.name %]">
+                        <input type="hidden" name="mode" value="delvalue">
+                        <input type="submit" value="[% tr.tr("Delete") %]">
+                    </td>
+                </tr>
+            </form>
+        [% END %]
+        <form name="reload_all" method="post" action="[% PostLink %]">
+            <tr>
+                <td>Reload</td>
+                <td>All cached values</td>
+                <td>
+                    <input type="hidden" name="mode" value="reload">
+                    <input type="submit" value="[% tr.tr("Reload") %]">
+                </td>
+                <td></td>
+            </tr>
+        </form>
+        <tr>
+            <td colspan="4">
+                <b>Warning:</b> All input values are<br>
+                copied to their respective modules<br>
+                <i>without</i> checks!
+            </td>
+        </tr>
+    </table>
+</p>

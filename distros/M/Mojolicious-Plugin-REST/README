@@ -1,0 +1,241 @@
+NAME
+
+    Mojolicious::Plugin::REST - Mojolicious Plugin for RESTful operations
+
+VERSION
+
+    version 0.006
+
+SYNOPSIS
+
+        # In Mojolicious Application
+        $self->plugin( 'REST' => { prefix => 'api', version => 'v1' } );
+    
+        $routes->rest_routes( name => 'Account' );
+    
+        # Installs following routes:
+    
+        # /api/v1/accounts             ....  GET     "Account::list_account()"    ^/api/v1/accounts(?:\.([^/]+)$)?
+        # /api/v1/accounts             ....  POST    "Account::create_account()"  ^/api/v1/accounts(?:\.([^/]+)$)?
+        # /api/v1/accounts/:accountId  ....  DELETE  "Account::delete_account()"  ^/api/v1/accounts/([^\/\.]+)(?:\.([^/]+)$)?
+        # /api/v1/accounts/:accountId  ....  GET     "Account::read_account()"    ^/api/v1/accounts/([^\/\.]+)(?:\.([^/]+)$)?
+        # /api/v1/accounts/:accountId  ....  PUT     "Account::update_account()"  ^/api/v1/accounts/([^\/\.]+)(?:\.([^/]+)$)?
+    
+    
+        $routes->rest_routes( name => 'Feature', under => 'Account' );
+    
+        # Installs following routes:
+    
+        # /api/v1/accounts/:accountId/features             B...  *       "Account::chained()"                 ^/api/v1/accounts/([^\/\.]+)/features
+        #   +/                                             ....  GET     "Feature::list_account_feature()"    ^(?:\.([^/]+)$)?
+        # /api/v1/accounts/:accountId/features             B...  *       "Account::chained()"                 ^/api/v1/accounts/([^\/\.]+)/features
+        #   +/                                             ....  POST    "Feature::create_account_feature()"  ^(?:\.([^/]+)$)?
+        # /api/v1/accounts/:accountId/features/:featureId  B...  *       "Account::chained()"                 ^/api/v1/accounts/([^\/\.]+)/features/([^\/\.]+)
+        #   +/                                             ....  DELETE  "Feature::delete_account_feature()"  ^(?:\.([^/]+)$)?
+        # /api/v1/accounts/:accountId/features/:featureId  B...  *       "Account::chained()"                 ^/api/v1/accounts/([^\/\.]+)/features/([^\/\.]+)
+        #   +/                                             ....  GET     "Feature::read_account_feature()"    ^(?:\.([^/]+)$)?
+        # /api/v1/accounts/:accountId/features/:featureId  B...  *       "Account::chained()"                 ^/api/v1/accounts/([^\/\.]+)/features/([^\/\.]+)
+        #   +/                                             ....  PUT     "Feature::update_account_feature()"  ^(?:\.([^/]+)$)?
+    
+    
+        $routes->rest_routes( name => 'Product', under => 'Account', types => [qw(ftp ssh)] );
+    
+        # Installs following routes:
+    
+        # /api/v1/accounts/:accountId/products      B...  *       "Account::chained()"                      ^/api/v1/accounts/([^\/\.]+)/products
+        #   +/                                      ....  GET     "Product::list_account_product()"         ^(?:\.([^/]+)$)?
+        # /api/v1/accounts/:accountId/products      B...  *       "Account::chained()"                      ^/api/v1/accounts/([^\/\.]+)/products
+        #   +/                                      ....  POST    "Product::create_account_product()"       ^(?:\.([^/]+)$)?
+        # /api/v1/accounts/:accountId/products/ftp  B...  *       "Account::chained()"                      ^/api/v1/accounts/([^\/\.]+)/products/ftp
+        #   +/                                      ....  DELETE  "Product::Ftp::delete_account_product()"  ^(?:\.([^/]+)$)?
+        # /api/v1/accounts/:accountId/products/ssh  B...  *       "Account::chained()"                      ^/api/v1/accounts/([^\/\.]+)/products/ssh
+        #   +/                                      ....  DELETE  "Product::Ssh::delete_account_product()"  ^(?:\.([^/]+)$)?
+        # /api/v1/accounts/:accountId/products/ftp  B...  *       "Account::chained()"                      ^/api/v1/accounts/([^\/\.]+)/products/ftp
+        #   +/                                      ....  GET     "Product::Ftp::read_account_product()"    ^(?:\.([^/]+)$)?
+        # /api/v1/accounts/:accountId/products/ssh  B...  *       "Account::chained()"                      ^/api/v1/accounts/([^\/\.]+)/products/ssh
+        #   +/                                      ....  GET     "Product::Ssh::read_account_product()"    ^(?:\.([^/]+)$)?
+        # /api/v1/accounts/:accountId/products/ftp  B...  *       "Account::chained()"                      ^/api/v1/accounts/([^\/\.]+)/products/ftp
+        #   +/                                      ....  PUT     "Product::Ftp::update_account_product()"  ^(?:\.([^/]+)$)?
+        # /api/v1/accounts/:accountId/products/ssh  B...  *       "Account::chained()"                      ^/api/v1/accounts/([^\/\.]+)/products/ssh
+        #   +/                                      ....  PUT     "Product::Ssh::update_account_product()"  ^(?:\.([^/]+)$)?
+
+DESCRIPTION
+
+    Mojolicious::Plugin::REST adds various helpers for REST
+    <http://en.wikipedia.org/wiki/Representational_state_transfer>ful CRUD
+    <http://en.wikipedia.org/wiki/Create,_read,_update_and_delete>
+    operations via HTTP
+    <http://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol> to your
+    mojolicious application.
+
+    As much as possible, it tries to follow RESTful API Design
+    <https://blog.apigee.com/detail/restful_api_design> principles from
+    Apigee.
+
+    Used in conjuction with Mojolicious::Controller::REST, this module
+    makes building RESTful application a breeze.
+
+    This module is inspired from Mojolicious::Plugin::RESTRoutes.
+
+WARNING
+
+    This module is still under development, and it's possible that things
+    may change between releases without warning or deprecations.
+
+MOJOLICIOUS HELPERS
+
+ rest_routes
+
+    A routes shortcut to easily add RESTful routes for a resource and
+    associations.
+
+MOJOLICIOUS HOOKS
+
+    This module installs an before_render application hook, which gurantees
+    JSON output.
+
+    Refer Mojolicious::Controller::REST documentation for output format.
+
+    Hook installation can be disabled by passing hook => 0 in plugin
+    options. For Example:
+
+        $self->plugin( 'REST', prefix => 'api', version => 'v1', hook => 0 );
+
+OPTIONS
+
+    Following options can be used to control route creation:
+
+    methods
+
+      This option can be used to control which methods are created for
+      declared rest_route. Each character in the value of this option,
+      determined if corresponding route will be created or ommited. For
+      Example:
+
+          $routes->rest_routes( name => 'Account', methods => 'crudl' );
+
+      This will install all the rest routes, value 'crudl' signifies:
+
+          c - create
+          r - read
+          u - update
+          d - delete
+          l - list.
+
+      Only methods whose first character is mentioned in the value for this
+      option will be created. For Example:
+
+          $routes->rest_routes( name => 'Account', methods => 'crd' );
+
+      This will install only create, read and delete routes as below:
+
+          # /api/v1/accounts             ....  POST    "Account::create_account()"  ^/api/v1/accounts(?:\.([^/]+)$)?
+          # /api/v1/accounts/:accountId  ....  DELETE  "Account::delete_account()"  ^/api/v1/accounts/([^\/\.]+)(?:\.([^/]+)$)?
+          # /api/v1/accounts/:accountId  ....  GET     "Account::read_account()"    ^/api/v1/accounts/([^\/\.]+)(?:\.([^/]+)$)?
+
+      option value 'crd' signifies, c - create, r - read, d - delete
+
+      Old readonly behaviour can thus be achieved using:
+
+          $routes->rest_routes( name => 'Account', methods => 'cl' );
+
+      This will install only create and list routes as below:
+
+          # /api/v1/accounts  ....  GET   "Account::list_account()"    ^/api/v1/accounts(?:\.([^/]+)$)?
+          # /api/v1/accounts  ....  POST  "Account::create_account()"  ^/api/v1/accounts(?:\.([^/]+)$)?
+
+    name
+
+      The name of the resource, e.g. 'User'. This name will be used to
+      build the route url as well as the controller name.
+
+    controller
+
+      By default, resource name will be converted to CamelCase controller
+      name. You can change it by providing controller name.
+
+      If customized, this options needs a full namespace of the controller
+      class.
+
+    under
+
+      This option can be used for associations. If present, url's for named
+      resource will be created under given under resource. The actions
+      created, will be bridged under 'method_chained' method of given under
+      resouce. For Example:
+
+          $routes->rest_routes( name => 'Feature', under => 'Account' );
+      
+          # will create following routes, where routes for feature are bridged under Account::chained()
+      
+          # /api/v1/accounts/:accountId/features             B...  *       "Account::chained()"                 ^/api/v1/accounts/([^\/\.]+)/features
+          #   +/                                             ....  GET     "Feature::list_account_feature()"    ^(?:\.([^/]+)$)?
+          # /api/v1/accounts/:accountId/features             B...  *       "Account::chained()"                 ^/api/v1/accounts/([^\/\.]+)/features
+          #   +/                                             ....  POST    "Feature::create_account_feature()"  ^(?:\.([^/]+)$)?
+          # /api/v1/accounts/:accountId/features/:featureId  B...  *       "Account::chained()"                 ^/api/v1/accounts/([^\/\.]+)/features/([^\/\.]+)
+          #   +/                                             ....  DELETE  "Feature::delete_account_feature()"  ^(?:\.([^/]+)$)?
+          # /api/v1/accounts/:accountId/features/:featureId  B...  *       "Account::chained()"                 ^/api/v1/accounts/([^\/\.]+)/features/([^\/\.]+)
+          #   +/                                             ....  GET     "Feature::read_account_feature()"    ^(?:\.([^/]+)$)?
+          # /api/v1/accounts/:accountId/features/:featureId  B...  *       "Account::chained()"                 ^/api/v1/accounts/([^\/\.]+)/features/([^\/\.]+)
+          #   +/                                             ....  PUT     "Feature::update_account_feature()"  ^(?:\.([^/]+)$)?
+
+      Note that, The actual bridge code needs to return a true value or the
+      dispatch chain will be broken. Please refer Mojolicious Bridges
+      Documentation
+      <https://metacpan.org/pod/Mojolicious::Guides::Routing#Bridges> for
+      more information on bridges in Mojolicious.
+
+    types
+
+      This option can be used to specify types of resources available in
+      application.
+
+PLUGIN OPTIONS
+
+    method_chained
+
+      If present, this value will be used as a method name for chained
+      methods in route bridges.
+
+    prefix
+
+      If present, this value will be added as prefix to all routes created.
+
+    version
+
+      If present, this value will be added as prefix to all routes created
+      but after prefix.
+
+    htt2crud
+
+      If present, given HTTP to CRUD mapping will be used to determine
+      method names. Default mapping:
+
+          {
+              collection => {
+                  get  => 'list',
+                  post => 'create',
+              },
+      
+              resource => {
+                  get    => 'read',
+                  put    => 'update',
+                  delete => 'delete'
+              }
+          }
+
+AUTHOR
+
+    Abhishek Shende <abhishekisnot@gmail.com>
+
+CONTRIBUTOR
+
+    Vincent HETRU <vincent.hetru@13pass.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Abhishek Shende.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

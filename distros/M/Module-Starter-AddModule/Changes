@@ -1,0 +1,26 @@
+0.10_01 - Tue Jan  5 17:58:25 2010
+	* The initial release
+
+1.05 - Fri Jan  3 13:41:43 2014
+	* Get rid of MYMETA
+
+1.04 - Fri Aug  2 20:43:44 2013
+	* Add an example from the command line (GitHub issue #1)
+
+1.03 - Tue Nov 20 02:12:07 2012
+	* Fixed small typo in synopsis
+	* Added encoding to Pod
+
+1.02 - Sat Jul 28 17:36:19 2012
+	* Hide Module::Starter::Smart from PAUSE
+
+1.01 - Tue May  8 20:37:50 2012
+	* First stable release
+
+0.10_04 - Sun Nov  6 10:17:55 2011
+	* Document basedir
+
+0.10_02 - Wed Jan  6 11:37:02 2010
+	* I really need to fix my local Test::Prereq so I catch
+	those prereqs :)
+

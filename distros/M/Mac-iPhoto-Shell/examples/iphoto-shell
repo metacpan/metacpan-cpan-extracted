@@ -1,0 +1,5 @@
+#!/usr/bin/perl
+
+use Mac::iPhoto::Shell;
+
+Mac::iPhoto::Shell->run;

@@ -1,0 +1,181 @@
+1.50    Fri. Jan. 15, 2016
+
+        [THINGS THAT MAY BREAK YOUR CODE]
+		
+        - Updated Lint::DATA section with Update No. 21 (September 2015)
+        - Updated _check_article with the exceptions: 'Lo que' and 'Lo cual'
+		- Updated check_020 to account for version numbering changes in Business::ISBN (should work for versions greater than '2.009')
+		
+1.49    Wed. July 1, 2015
+
+        [THINGS THAT MAY BREAK YOUR CODE]
+		
+        - Updated Lint::DATA section with Update No. 19 (October 2014) through Update No. 20 (April 2015)
+
+1.48    Sun. July 20, 2014
+
+		- Updated Synopsis example to account for repeatable 250 (and added example of non-repeatable field using 040).
+
+        [THINGS THAT MAY BREAK YOUR CODE]
+		
+        - Updated Lint::DATA section with Update No. 17 (Sept. 2013) through Update No. 18 (April 2014)
+
+1.47    Mon Sept. 1, 2013
+
+        [THINGS THAT MAY BREAK YOUR CODE]
+
+        - Updated Lint::DATA section with Update No. 15 (Sept. 2012) through Update No. 16 (April 2013)
+        - Revised wording in check_245 ending punctuation to account for LC Policy Statement (for RDA records), matching LCRI, for always ending 245 with a period.
+
+1.46    Mon Sept. 3, 2012
+
+        [THINGS THAT MAY BREAK YOUR CODE]
+
+        - Updated MARC::Lint::CodeData with most recent version.
+
+
+1.45    Sat June 30, 2012
+
+        [THINGS THAT MAY BREAK YOUR CODE]
+        
+        - Updated Lint::DATA section with Update No. 10 (Oct. 2009) through Update No. 14 (Apr. 2012)
+        - Updated _check_article with the exceptions: 'A & ', 'L is '
+
+1.44    Sat August 29, 2009
+
+        - Updated TODO section with item about verfication of 008 presence and length.
+
+        [THINGS THAT MAY BREAK YOUR CODE]
+
+        - Updated _check_article with the exceptions: 'A to ', 'A isn\'t '
+        - Updated Lint::DATA section with Update No. 8 (Oct. 2007) 
+        - Updated Lint::DATA section with Update No. 9 (Oct. 2008) 
+
+        - Updated MARC::Lint::CodeData with most recent version.
+
+1.43    Wed October 3 19:36:00 CDT 2007
+
+        [THINGS THAT MAY BREAK YOUR CODE]
+
+        - Updated Lint::DATA section with Update No. 7 (Oct. 2006)
+        
+        - MARC::Lint is incompatibile with Business::ISBN versions 2.00-2.02_01.
+        Business::ISBN versions below 2 and 2.02_02 or above should work.
+
+        - Updated check_record's treatment of 880 fields. Now if the tagno is
+        880, check_record attempts to look at subfield 6 for the linked tagno
+        and uses that as the basis for the tagno to be checked.
+
+        - Updated _check_article to account for 880, using subfield 6 linked
+        tagno instead.
+        - Updated _check_article to account for articles followed parentheses,
+        apostrophes and/or quotes. Also related bug fixes for counting
+        punctuation around the article.
+
+        - For subfield 6, it should always be the 1st subfield according to MARC
+        21 specifications, so check_245 has been updated to account for subfield
+        6 being 1st, rather than requiring subfield a to be 1st.
+
+        - Added new test, test880and6.t for 880 field and for subfield 6.
+
+        - Added TODO concerning subfield 9. This subfield is not officially
+        allowed in MARC, since it is locally defined. Some way needs to be made
+        to allow messages/warnings about this subfield to be turned off.
+
+        - Added TODO concerning subfield 8. This subfield could be the 1st or
+        2nd subfield, so the code that checks for the 1st few subfields
+        (check_245, check_250) should take that into account.
+
+        - Updated MARC::Lint::CodeData with most recent version.
+
+1.42    Mon June 19 18:28:00 CDT 2006
+
+        [THINGS THAT MAY BREAK YOUR CODE]
+
+        - Fixed bug that allowed subfield R due to the way tag repeatability is set.
+
+        - Removed META.yml from MANIFEST
+        - Updated MARC::Lint::CodeData with most recent version
+        - Updated Lint::DATA section with Update No. 6 (Oct. 2005)
+        - Updated etc/ecbdlist.html to Update No. 6 (Oct. 2005)
+
+
+1.41    Wed Sept 21 17:49:00 CDT 2005
+        [THINGS THAT MAY BREAK YOUR CODE]
+        - updated DATA to incorporate MARC update 5 (Oct. 2004)
+
+        - check_245( $field ) updated:
+         - Makes sure $a exists (and is first subfield).
+         - Warns if last character of field is not a period
+         -- Follows LCRI 1.0C, Nov. 2003 rather than MARC21 rule
+         - Verifies that $c is preceded by / (space-/)
+         - Verifies that initials in $c are not spaced
+         - Verifies that $b is preceded by :;= (space-colon, space-semicolon,
+         space-equals)
+         - Verifies that $h is not preceded by space unless it is dash-space
+         - Verifies that data of $h is enclosed in square brackets
+         - Verifies that $n is preceded by . (period)
+         -- As part of that, looks for no-space period, or dash-space-period
+         (for replaced elipses)
+         - Verifies that $p is preceded by , (no-space-comma) when following $n
+         and . (period) when following other subfields.
+         - Performs rudimentary check of 245 2nd indicator vs. 1st word of 245$a
+         (for manual verification). This could use some reworking, and was
+         developed based on a predominantly English collection. Uses the
+         internal _check_article( $field ) method.
+
+        - added _check_article( $field ) internal method for comparing
+         nonfiling indicator against first word of title field
+        - added check245.t to test the new check_245 functionality
+
+        - updated lint.t to use File::Spec for path to camel.usmarc
+        - removed updir usage so 'make test' works properly
+
+        [ENHANCEMENTS]
+        - added check for subfield delimiters in fields lower than 010
+         - updated lint.t and camel.usmarc with a test for this new code
+
+        - added check_020( $field ):
+         - uses Business::ISBN to validate 020$a and 020$z ISBNs. The current
+         version needs work for ISBN-13 checking. Uses an internal sub,
+         _isbn13_check_digit($ean) to validate 13 digit ISBNs, based on code in
+         Business::ISBN. Checking of subfield z needs work (it is currently
+         written for nonstandard practice).
+
+        - added check020.t to test the new check_020 method
+        
+        - added check_041( $field ):
+         - warns if subfields are not evenly divisible by 3 unless second
+         indicator is 7
+         (future implementation would ensure that each subfield is exactly 3
+         characters unless ind2 is 7--since subfields are now repeatable. This
+         is not implemented here due to the large number of records needing to
+         be corrected.).
+         - validates against the MARC Code List for Languages
+         (L<http://www.loc.gov/marc/>) using the MARC::Lint::CodeData data pack
+         
+        - added check_043( $field )
+         - warns if each subfield a is not exactly 7 characters.
+         - validates each code against the MARC code list for Geographic Areas
+         (L<http://www.loc.gov/marc/>) using the MARC::Lint::CodeData data pack
+
+        - added check041043.t to test the new check_041 and check_043 methods
+
+        - check_record() now accepts any isa( 'MARC::Record' ).
+
+        - _check_article() no longer trips a Perl warning if an indicator
+          has a non-numeric value.
+        
+        - _check_article() updated with exceptions for 'a posteriori' and 'a priori'
+        
+        -Replaced indenting tabs with 4 spaces
+        
+        -marclint utility updated to report errors encountered while translating raw MARC records into MARC::Record objects.
+        
+1.40    Mon Dec 20 14:01:53 CST 2004
+        - added DATA for tags 001-008
+        - updated DATA to incorporate update 4 (Oct. 2003)
+        - corrected errors in the DATA section
+
+1.39    Thu Dec 16 20:25:41 CST 2004
+        - initial baseline release after separation from MARC::Record proper

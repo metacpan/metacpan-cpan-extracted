@@ -1,0 +1,11 @@
+Revision history for Mail-Milter-Authentication-Smime
+
+1.1.1   2017-04-14
+        - Added metrics gathering
+
+1.0.3   2016-03-07
+        - Release to CPAN
+
+1.0.2   2016-02-17
+        - Initial Release
+

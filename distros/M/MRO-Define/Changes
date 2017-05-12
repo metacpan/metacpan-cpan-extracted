@@ -1,0 +1,7 @@
+0.02  Wed, 04 Sep 2013 14:34:49 -0400
+  * Fix test warnings.
+  * Convert to Dist::Zilla.
+  * Make things utf8 safe (Brian Frasier).
+
+0.01  Mon, 25 May 2009 19:32:21 +0200
+  * Initial release.

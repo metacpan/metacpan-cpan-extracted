@@ -1,0 +1,52 @@
+{
+   "abstract" : "run blocking functions asynchronously by forking",
+   "author" : [
+      "Joel Berger <joel.a.berger@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-IOLoop-ForkCall",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Pipely" : "0",
+            "Mojolicious" : "5.08",
+            "Perl::OSType" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojo::IOLoop::ForkCall" : {
+         "file" : "lib/Mojo/IOLoop/ForkCall.pm",
+         "version" : "0.17"
+      },
+      "Mojolicious::Plugin::ForkCall" : {
+         "file" : "lib/Mojolicious/Plugin/ForkCall.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jberger/Mojo-IOLoop-ForkCall/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/jberger/Mojo-IOLoop-ForkCall"
+      }
+   },
+   "version" : "0.17"
+}

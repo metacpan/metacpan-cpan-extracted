@@ -1,0 +1,35 @@
+---
+abstract: 'Tidy Perl code in Mason templates'
+author:
+  - 'Jonathan Swartz <swartz@pobox.com>'
+build_requires:
+  Test::Class::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200008, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mason-Tidy
+no_index:
+  directory:
+    - lib/Mason/Tidy/t
+    - lib/Mason/Tidy/Test
+  file:
+    - lib/Mason/Tidy/Util.pm
+requires:
+  Capture::Tiny: 0
+  File::Slurp: 0
+  File::Temp: 0
+  Getopt::Long: 0
+  IPC::System::Simple: 0
+  Method::Signatures::Simple: 1.02
+  Moo: 0.0091010
+  Perl::Tidy: 0
+  Pod::Usage: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mason-Tidy
+  repository: git://github.com/jonswar/perl-mason-tidy.git
+version: 2.57

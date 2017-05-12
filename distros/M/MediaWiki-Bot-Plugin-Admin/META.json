@@ -1,0 +1,68 @@
+{
+   "abstract" : "A plugin to MediaWiki::Bot providing admin functions",
+   "author" : [
+      "Dan Collins <en.wp.2t47@gmail.com>",
+      "Mike.lifeguard <mike.lifeguard@gmail.com>",
+      "patch and bug report contributors"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300012, CPAN::Meta::Converter version 2.120900",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MediaWiki-Bot-Plugin-Admin",
+   "no_index" : {
+      "directory" : [
+         "corpus"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "List::Compare" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "MediaWiki::Bot" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/MediaWiki-Bot/MediaWiki-Bot-Plugin-Admin/issues"
+      },
+      "homepage" : "https://metacpan.org/module/MediaWiki::Bot::Plugin::Admin",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/MediaWiki-Bot/MediaWiki-Bot-Plugin-Admin.git",
+         "web" : "https://github.com/MediaWiki-Bot/MediaWiki-Bot-Plugin-Admin"
+      }
+   },
+   "version" : "3.004000"
+}
+

@@ -1,0 +1,11 @@
+SEE ALSO
+
+    Module::FatPack for a similar module which uses fatpacking technique
+    instead of datapacking.
+
+    App::depak for more options e.g. use various tracing methods, etc.
+
+    Data::Section::Seekable, the format used for the data section
+
+    datapack-modules, CLI for datapack_modules.
+

@@ -1,0 +1,9 @@
+name = "Mojolicious-Plugin-BModel"
+badges = ["travis"]
+authority="cpan:BCDE"
+readme_from="lib/Mojolicious/Plugin/BModel.pm"
+abstract="Catalyst-like models in Mojolicious"
+license="perl_5"
+
+module_maker="ModuleBuildTiny"
+

@@ -1,0 +1,29 @@
+commit dad429b6703784731a2a0a4ebfaeffeb52308c30
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Thu Feb 18 19:44:35 2016 +0000
+
+    remove distro package
+
+commit 0b31196e48c965e8ded3b740780218cd8d21881f
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Thu Feb 18 19:40:04 2016 +0000
+
+    pod tweaks
+
+commit 828cf198d2e7af32126830ac66dd7948136a2b72
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Thu Feb 18 19:33:59 2016 +0000
+
+    README.pod is symlink to target module
+
+commit 0a0e8bd0b252c4d6a74c17374c2cdabec5f248b4
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Thu Feb 18 19:27:39 2016 +0000
+
+    make clean
+
+commit 2970786172ab6aeaac9daf8e9cd45009875df5ff
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Thu Feb 18 19:15:20 2016 +0000
+
+    init

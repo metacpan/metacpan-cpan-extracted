@@ -1,0 +1,126 @@
+Revision history for Perl extension MooseX-Singleton
+
+0.30      2016-11-23 04:46:06Z
+    - move repository to github Moose organization
+    - properly declare test prereqs
+
+0.29 2011-12-08
+    - Fix warnings_once.t to not die if Test::NoWarnings isn't installed (Kaare)
+
+0.28 2011-12-05
+    - Fix RT Bug #46086, "name used only once" (Thanks chisel for the patch and
+      the test)
+
+0.27 2011-05-19
+    - Fix 006-cooperative.t - this test requires MooseX::StrictConstructor
+      0.16+ to pass with Moose 2.00+. Reported by Alexandr Ciornii. RT
+      #67965. (Dave Rolsky)
+
+0.26 2011-02-26
+    - This module will now work with Moose 1.9900+, but it still works with
+      older Moose as well. (Dave Rolsky)
+
+    - The test suite now uses Test::Fatal instead of Test::Exception. (Karen
+      Etheridge)
+
+0.25 2010-08-22
+    - Fixes for latest Moose. (Dave Rolsky)
+
+0.24 2010-07-15
+    - Require Moose 0.94+. (Dave Rolsky)
+
+0.23 2010-07-15
+    - Use modern Moose APIs to avoid warnings from the next Moose. (Dave
+      Rolsky)
+
+0.22 2009-12-25
+    - The ->initialize method was both broken and undocumented. RT
+      #51260. (Dave Rolsky)
+    - Updated docs to encourage use of ->instance and ->initialize, and
+      discourage calling ->new directly. Doing so may be deprecated in a
+      future release. (Dave Rolsky)
+
+0.21 2009-09-12
+    - Various modules in this class were trying to load the old pre-0.20
+      classes, which have all been renamed. Tests passed if you had 0.19 or
+      earlier installed, but failed for fresh installations. (Dave Rolsky)
+
+0.20 2009-09-11
+    - Converted this extension to use roles rather than metaclass
+      subclasses. This means it will cooperate with other extensions on CPAN,
+      like MooseX::StrictConstructor, etc. (Dave Rolsky)
+
+0.19 2009-07-09
+    - Remove ambiguity about copyright holder (Sartak)
+
+0.18 2009-06-21
+    - Changes to work Moose 0.82 (Dave Rolsky)
+
+0.17 2009-04-24
+    - Add ClassName->_clear_instance. (hdp)
+
+0.16 2009-04-24
+    - Changes to keep constructor inlining working with latest Moose &
+      Class::MOP. This module will still work with any Moose from 0.74
+      on up.
+
+0.15 2009-04-07
+    - Fixed to work with Moose 0.73_01
+
+    - When an object was implicitly constructed by calling
+      ClassName->attribute, it skipped the BUILD and BUILDARGS defined
+      for a class. Report and test from Josh in RT #42690. (Dave
+      Rolsky)
+
+0.14 2009-01-22
+    - Converted to use new method generation helpers in the most
+      recent Moose (0.65) and Class::MOP (Dave Rolsky)
+
+0.13 2008-12-08
+    - Fixed to work with Moose 0.63
+
+0.12 2008-09-20
+    - Fixed to work with Moose 0.58
+
+0.11 2008-09-05
+    - Fixed to work with Moose 0.57. Fixes RT #39013. Reported by Jon Swartz (Dave Rolsky)
+
+0.10 2008-09-01
+    - No code changes, just a stable release to go with Moose 0.56 release (Dave Rolsky)
+
+0.09_02 2008-08-22
+    - bumped the Moose dependency to 0.55_01 (Dave Rolsky)
+
+0.09_01 2008-08-21
+    - fixes to work with the latest dev release of Moose - 0.55_01 (Dave Rolsky)
+
+0.09 2008-06-27
+    - fix immutability to work with Moose 0.51 (Dave Rolsky)
+
+0.08 2008-05-24
+    - fix make_immutable keyword in test (Sartak)
+    - immutable singleton objects did not call triggers in the constructor (Dave Rolsky)
+    - fix immutability to actually work with modern Moose 0.41+ (Dave Rolsky)
+
+0.07 2008-03-07
+    - bump Moose dep to 0.37 because that's when we got make_immutable (Sartak)
+
+0.06 2008-03-05
+    - singleton objects were broken when made_immutable (Dave Rolsky)
+
+0.05 2008-02-03
+    - avoid re-BUILD-ing existing singleton objects (rjbs)
+
+0.04 2008-01-27
+    - exception when ->new called with args and instance already init'd (rjbs)
+    - added ->initialize method to remove any ambiguity with ->new (rjbs)
+
+0.03 2007-12-16
+    - reimplementation as a metaclass (Sartak)
+    - initial CPAN release
+
+0.02 2007-12-16
+    - instance and new are really the same, cleanup (Sartak)
+
+0.01 2007-04-20
+    - initial implementation as a role (Debolaz)

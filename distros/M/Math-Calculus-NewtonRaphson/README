@@ -1,0 +1,44 @@
+Math/Calculus/NewtonRaphson version 0.01
+========================================
+
+This module takes an algebraic expression, parses it and then
+uses the Newton Raphson method to solve the it. The Newton
+Raphson method relies on the fact that the expression you pass
+in evaluates to zero where there is a solution. That is, to
+solve:-
+
+x^2 = 5
+
+You would need to pass in:-
+
+x^2 - 5
+
+It understands expressions containing any of the operators +, -,
+*, / and ^ (raise to power), bracketed expressions to enable
+correct precedence and the functions ln, exp, sin, cos, tan, sec,
+cosec, cot, sinh, cosh, tanh, sech, cosech, coth, asin, acos,
+atan, asinh, acosh and atanh.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Math::Calculus::Expression
+  Math::Calculus::Differentiate
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004, 2005 Jonathan Worthington
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

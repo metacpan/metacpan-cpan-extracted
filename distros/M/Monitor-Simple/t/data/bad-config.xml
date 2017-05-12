@@ -1,0 +1,28 @@
+<smon>
+
+  <general>
+    <plugins-dir></plugins-dir>
+    <notifiers-dir></notifiers-dir>
+
+    <notifier missing-command="script1"/>
+
+  </general>
+
+  <services>
+
+    <service missing-id="date" name="Current timestamp">
+    </service>
+
+    <service id="A" name="Letter A">
+      <plugin missing-command="check-A.pl"/>
+      <notifier missing-command="scriptA"/>
+    </service>
+
+    <service id="B" name="Letter B">
+      <plugin command="check-A.pl"/>
+      <plugin command="check-B.pl"/>
+    </service>
+
+  </services>
+
+</smon>

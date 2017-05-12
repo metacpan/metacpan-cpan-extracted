@@ -1,0 +1,5 @@
+--- #YAML:1.0
+name: Email-Infinite
+abstract: please make it stop
+X_Module_Faker:
+  cpan_author: RJBS

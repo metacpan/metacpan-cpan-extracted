@@ -1,0 +1,4 @@
+0.002000 2010-02-28 17:00EST
+ - Make array references coerce to a list of outputs for Logger
+0.001000 2010-02-26 07:30EST
+ - Initial release

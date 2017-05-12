@@ -1,0 +1,27 @@
+---
+name: MooseX-Types-EmailAddress
+version: 1.1.2
+author:
+  - 'Stephen Quinney <squinney@inf.ed.ac.uk>'
+abstract: Valid email address type constraints for Moose
+license: gpl
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+build_requires:
+  Test::More: 0
+requires:
+  Email::Address: 0
+  Email::Valid: 0
+  Moose: 1.15
+  MooseX::Types: 0.22
+  perl: v5.6.1
+configure_requires:
+  Module::Build: 0.35
+provides:
+  MooseX::Types::EmailAddress:
+    file: lib/MooseX/Types/EmailAddress.pm
+    version: v1.1.2
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

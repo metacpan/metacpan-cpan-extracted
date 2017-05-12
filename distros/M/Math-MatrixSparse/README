@@ -1,0 +1,61 @@
+Math/MatrixSparse version 0.01
+==============================
+
+Math::MatrixSparse 
+
+VERSION 
+
+0.01  INITIAL RELEASE
+
+SYNOPSIS
+
+Math::MatrixSparse is a module implementing naive sparse matrices.  Its
+syntax is designed to partially overlap with Math::MatrixReal where
+possible and reasonable.
+
+Basic matrix operations are present, including addition, subtraction,
+scalar multiplication, matrix multiplication, transposition,
+and exponentiation.
+
+Three methods of solving systems iteratively are available, including
+Jacobi, Gauss-Seidel, and Symmetric Over-Relaxation. 
+
+Real-valued matrices can be read from files in the Matrix Market and
+Harwell Boeing formats, and written in the Matrix Market format. In
+addition, they can be read from a given string.
+
+Certain special types of matrices are understood, but not optimized
+for, such as upper and lower triangular, diagonal, symmetric,
+skew-symmetric, positive, negative, and pattern.  Methods are
+available to determine the properties of a given matrix.
+
+Individual rows, columns, and diagonals of matrices can be obtained,
+as can the upper and lower triangular, symmetric, skew symmetric,
+positive and negative portions.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules besides those that come with 
+Perl.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Jacob C. Kesinger (kesinger@math.ttu.edu)
+
+This module is distributed under the same terms as perl, i.e.
+Math::MatrixSparse may be copied only under the terms of either the
+Artistic License or the GNU General Public License, which may be found
+in the Perl 5 source kit.
+
+
+

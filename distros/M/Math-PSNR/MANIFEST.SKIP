@@ -1,0 +1,13 @@
+.git/
+.DS_Store
+^.gitignore$
+^.shipit$
+^MYMETA\.yml$
+^MYMETA\.json$
+\.bak$
+_build/
+^Build$
+blib/
+example/comp_color.jpg
+example/orig_color.jpg
+example/img_psnr_rgb.pl

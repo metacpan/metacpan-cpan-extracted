@@ -1,0 +1,66 @@
+NAME
+    MooX::Types::MooseLike::DateTime - a DateTime type for Moo
+
+SYNOPSIS
+      package Person;
+
+      use Moo;
+      use DateTime;
+      use MooX::Types::MooseLike::DateTime qw/DateAndTime/;
+
+      has birthdate => (
+        isa     => DateAndTime,
+        is      => 'ro',
+        default => sub { DateTime->today }
+      );
+
+TYPES
+  DateAndTime
+    A DateTime object.
+
+  DateTime
+    A DateTime object. Exactly the same as the DateAndTime type. If using
+    this type and the DateTime module in your package, you'll have to alias
+    DateTime to something else.
+
+      package Person;
+
+      use Moo;
+      use MooX::Types::MooseLike::DateTime qw/DateTime/;
+      use aliased 'DateTime' => 'DT';
+
+      has birthdate => (
+        isa     => DateTime,
+        is      => 'ro',
+        default => sub { DT->today }
+      );
+
+TIPS
+    Coercion
+        use DateTime::Format::Strptime;
+        use Scalar::Util qw/blessed/;
+
+        has birthdate => (
+          isa     => DateAndTime,
+          is      => 'ro',
+          default => sub { DateTime->today },
+          coerce  => sub {
+              (blessed($_[0]) and (blessed($_[0]) eq 'DateTime'))
+            ? $_[0]
+            : DateTime::Format::Strptime->new(pattern => '%F %T')->parse_datetime($_[0])
+          }
+        );
+
+AUTHOR
+    Luke Triantafyllidis <ltriant@cpan.org>
+
+REPOSITORY
+    <https://github.com/ltriant/MooX-Types-MooseLike-DateTime>
+
+SEE ALSO
+    MooX::Types::MooseLike, DateTime
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

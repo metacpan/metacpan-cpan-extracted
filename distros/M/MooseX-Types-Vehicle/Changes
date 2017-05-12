@@ -1,0 +1,14 @@
+Revision history for MooseX-Types-Vehicle
+
+0.03    2012-11-07
+	Inlined the coercion (maybe this saves a subcall?)
+	The inlining makes it test pod tests too
+
+0.02    2012-10-15
+	Doc fixes
+	impliment 10th digit check for 'U', 'Z' and '0'
+	Another test in Moose for actual OO implimentation
+
+0.01    2012-10-15
+	Released initial version
+

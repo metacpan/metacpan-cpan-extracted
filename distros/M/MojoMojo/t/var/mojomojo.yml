@@ -1,0 +1,31 @@
+---
+Model::DBIC:
+  connect_info:
+    - dbi:SQLite:t/var/mojomojo.db
+    - ''
+    - ''
+View::Email:
+  sender:
+    mailer: Test
+allowed:
+  src:
+    - youtube.com
+    - youporn.org
+    - iusethis.com
+attachment_dir: __path_to(t/var/uploads)__
+name: MojoMojo Test Suite
+permissions:
+  admin_role_name: Admins
+  anonymous_allowed: 1
+  anonymous_user_name: anonymouscoward
+  attachment_allowed: 0
+  cache_permission_data: 1
+  check_permission_on_view: 1
+  create_allowed: 1
+  delete_allowed: 0
+  edit_allowed: 1
+  enforce_login: 0
+  role_members: role_members
+  user_field_name: login
+  view_allowed: 1
+system_mail: admin@localhost

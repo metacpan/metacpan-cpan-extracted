@@ -1,0 +1,22 @@
+## TODO list for Math::AnyNum
+
+# Add the following methods:
+
+    exp2  [?]
+    exp10 [?]
+
+# Add the following conversion methods:
+
+    as_rat   [?]
+    in_base  [?]
+
+# Add the following comparison methods:
+
+    acmp
+
+# Add the following functions (maybe):
+
+    max
+    min
+    sum
+    product

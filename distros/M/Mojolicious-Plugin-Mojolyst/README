@@ -1,0 +1,38 @@
+NAME
+    Mojolicious::Plugin::Mojolyst - Mojolicious::Lite syntax in a full
+    Mojolicious app.
+
+SYNOPSIS
+      # Mojolicious
+      $self->plugin('Mojolyst' => {controllers => 'MyApp::Controller'});
+
+      # Mojolicious::Lite
+      plugin 'Mojolyst' => {controllers => 'MyApp::Controller'};
+
+      # In your MyApp::Controller controller
+      package MyApp::Controller::Foo;
+      use Mojolicious::Lite;
+
+      get '/' => {text => 'Welcome to Mojolyst!'};
+
+      1;
+
+DESCRIPTION
+    Mojolicious::Plugin::Mojolyst is a Mojolicious plugin to hijack the
+    Mojolicious router and turn it into a more Catalyst-ish decentralized
+    one.
+
+METHODS
+    Mojolicious::Plugin::Mojolyst inherits all methods from
+    Mojolicious::Plugin and implements the following new ones.
+
+  register
+      $plugin->register(Mojolicious->new);
+
+    Register plugin in Mojolicious application.
+
+SEE ALSO
+    Mojolicious, Mojolicious::Guides, <http://mojolicious.org>,
+    <http://blog.mojolicious.org/post/157278582436/mojolicious-hack-of-the-d
+    ay-mojolyst>.
+

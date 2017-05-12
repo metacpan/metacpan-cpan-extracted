@@ -1,0 +1,7 @@
+#!/bin/sh
+#
+# shell script 'rc.honeypot'
+#
+# edit this to suit your system
+
+/etc/rc.d/rc.honeypot.pl $*

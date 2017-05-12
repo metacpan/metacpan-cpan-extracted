@@ -1,0 +1,33 @@
+Music::AtonalUtil - routines for atonal composition and analysis
+
+To install this module, use CPAN, for example:
+
+  cpan Music::AtonalUtil
+
+
+For the source code:
+
+http://github.com/thrig/Music-AtonalUtil
+
+This can be built and installed by running:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+
+Run perldoc(1) on Music::AtonalUtil for documentation.
+
+
+DEPENDENCIES
+
+Some knowledge of atonality may well benefit the user. See Makefile.PL for
+module dependencies.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012-2016 Jeremy Mates
+
+This module is free software; you can redistribute it and/or modify it
+under the Artistic License (2.0).

@@ -1,0 +1,13 @@
+Changes
+example/01-moosex-traits-setscalarbyref-example.pl
+example/02-moosex-traits-setscalarbyref-example-with-Tk.pl
+lib/MooseX/Traits/SetScalarByRef.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load-MooseX-Traits-SetScalarByRef.t
+t/01-ref-address-should-be-kept.t
+t/02-pod.t
+t/03-pod-coverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,173 @@
+Revision history for Map::Tube::Barcelona
+
+0.42  Fri Mar 17 15:45:00 2017
+      - Upgraded to use Test::Map::Tube v0.25.
+
+0.41  Fri Mar 10 09:55:00 2017
+      - Upgraded to use Map::Tube v3.28.
+
+0.40  Mon Feb 13 13:10:00 2017
+      - Upgraded to use Map::Tube v3.22.
+      - Upgraded to use Test::Map::Tube v0.23.
+
+0.39  Mon Oct 24 10:35:00 2016
+      - Upgraded to use Map::Tube v3.21.
+      - Upgraded to use Test::Map::Tube v0.17.
+
+0.38  Thu Aug 18 10:20:00 2016
+      - Upgraded to use Map::Tube v3.18.
+
+0.37  Sat Jun 25 18:50:00 2016
+      - Upgraded to use Map::Tube v3.15 to address the CPAN Tester Fail Report:
+        http://www.cpantesters.org/cpan/report/0689e7ae-38a5-11e6-a16d-92a790c50306
+
+0.36  Sun Jun 12 03:30:00 2016
+      - Added section "SEE ALSO" to the pod document.
+      - Added more information about Map::Tube::CLI.
+      - Updated README file.
+
+0.35  Wed Jun 01 10:10:00 2016
+      - Added missing modules for load unit tests.
+
+0.34  Sun Apr 17 18:05:00 2016
+      - Fixed issue RT #113826 (raised by SREZIC).
+
+0.33  Sat Apr 16 15:30:00 2016
+      - Consolidated routes testing functions using method ok_map_routes().
+
+0.32  Sun Apr 10 12:30:00 2016
+      - Upgraded to use Map::Tube v3.12.
+      - Cleaned up package for Line L7.
+      - Updated link-up station details.
+
+0.31  Mon Mar 28 23:20:00 2016
+      - Updated test scripts (t/meta-json.t and t/meta-yml.t).
+      - Updated copyright year information.
+
+0.30  Wed Feb 24 16:10:00 2016
+      - Added unit tests for Line L2, Line L5 and Line L11.
+
+0.29  Sun Feb 21 04:15:00 2016
+      - Added Line L2 data to the map file.
+      - Added Line L5 data to the map file.
+
+0.28  Tue Feb 16 11:10:00 2016
+      - Added Line L6 data to the map file.
+      - Added Line L7 data to the map file.
+      - Added unit test t/L6.t for the line L6.
+      - Added unit test t/L7.t for the line L7.
+
+0.27  Tue Feb 09 17:30:00 2016
+      - Fixed typo in the pod document of Map::Tube::Barcelona.
+
+0.26  Tue Feb 09 17:15:00 2016
+      - Added Line L1 data to the map file.
+      - Added Line L9 data to the map file.
+      - Added Line L10 data to the map file.
+      - Added unit test t/map.t for map validation.
+      - Added unit test t/L1.t for the line L1.
+      - Added unit test t/L3.t for the line L3.
+      - Added unit test t/L9.t for the newly added line L9.
+      - Added unit test t/L10.t for the newly added line L10.
+
+0.25  Tue Sep 22 10:25:00 2015
+      - Upgraded to use Map::Tube v3.01.
+
+0.24  Mon Sep 14 10:50:00 2015
+      - Added package to list metro stations for L8 Line.
+      - Updated pod document for Map::Tube::Barcelona about the above changes.
+
+0.23  Thu Jul 23 12:00:00 2015
+      - Upgraded to use Map::Tube v3.00.
+
+0.22  Wed Jul 22 12:00:00 2015
+      - Added unit test L8.t for the newly added line L8.
+
+0.21  Sun May 31 23:20:00 2015
+      - Added Line L8 data to the map file.
+
+0.20  Fri Feb 27 16:50:00 2015
+      - Upgraded to use Map::Tube v2.87.
+      - Added File::ShareDir::Install as configure requires in the Makefile.PL file.
+      - Added Barcelona Metro Map.
+      - General pod changes.
+
+0.19  Sun Feb 08 08:35:00 2015
+      - Fixed the pod document of L3 Line NOTE section where one of the link was broken.
+
+0.18  Sun Feb 08 02:05:00 2015
+      - Fixed pod document and added the missing line "=end html".
+
+0.17  Sat Feb 07 23:20:00 2015
+      - Upgraded to use Map::Tube v2.78.
+      - Added map image for L3, L4 and L11 Barcelona Metro lines.
+      - Added section "MAP" to all pod documents of Map::Tube::Barcelona::Line::* family.
+      - Documented method as_image() in the pod of Map::Tube::Barcelona.
+      - Added lines information to the map data xml.
+      - Assigned name to the map in the xml data.
+
+0.16  Thu Jan 15 13:00:00 2015
+      - Upgraded to use Map::Tube v2.63.
+
+0.15  Tue Jan 13 15:35:10 2015
+      - Tidied up unit test scripts.
+
+0.14  Tue Jan 13 14:50:00 2015
+      - Upgraded to use Map::Tube v2.62.
+
+0.13  Fri Jan 09 14:45:20 2015
+      - Upgraded to use Map::Tube v2.61 as it brings in new fix and feature.
+
+0.12  Wed Jan 07 12:40:20 2015
+      - Upgraded to use Map::Tube v2.60 as it brings in new fix and feature.
+      - Updated Makefile.PL to generate the key 'provides' for META file correctly.
+      - Added unit test to test META files.
+      - Added LICENSE file.
+      - Updated Copyright year information.
+
+0.11  Tue Dec 23 22:40:20 2014
+      - Updated section "TODO" and removed L4 Line.
+      - Corrected typo in L4 Line package.
+
+0.10  Tue Dec 23 20:30:40 2014
+      - Added package to list metro stations for L4 Line.
+      - Updated pod document for Map::Tube::Barcelona about the above changes.
+
+0.09  Mon Dec 22 13:35:40 2014
+      - Added package to list metro stations for L11 Line.
+      - Updated pod document for Map::Tube::Barcelona about the above changes.
+
+0.08  Sun Dec 21 20:11:20 2014
+      - Upgraded to use Map::Tube v2.46.
+      - Added package to list metro stations for L3 Line.
+      - Updated pod document for Map::Tube::Barcelona about the above changes.
+      - Corrected line information of stations "Diagonal" and "Passeig de Gràcia" in the xml data.
+
+0.07  Sat Dec 07 11:25:10 2014
+      - Upgraded to use Map::Tube v2.34 to keep it up to date.
+
+0.06  Fri Dec 05 20:11:10 2014
+      - Upgraded to use Map::Tube v2.33 as it brings in new fix and feature.
+      - Fixed the test data.
+      - Updated unit test to reflect the changes in Map::Tube v2.33.
+
+0.05  Fri Dec 05 10:50:10 2014
+      - Updated the description of method get_shortest_route().
+
+0.04  Thu Dec 04 20:40:10 2014
+      - Updated unit test to make use of new class provided by Map::Tube role.
+      - Updated description of method get_shortest_route() in the pod documemt.
+
+0.03  Wed Dec 03 21:28:10 2014
+      - Upgraded to use Map::Tube v2.31 as it brings case insensitive station name lookup.
+      - Added test case for case insensitive station name.
+      - Removed SIGNATURE file.
+      - Fixed map data for line L4.
+
+0.02  Sun Nov 30 12:08:01 2014
+      - Upgraded to use Map::Tube v2.27 as it brings in new fix and feature.
+      - Tidied up the line name for the routes L3, L4 and L11.
+      - Added test script for Line L4.
+
+0.01  Tue Nov 18 21:00:01 2014
+      - First version, released.

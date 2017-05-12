@@ -1,0 +1,5 @@
+-- add POD
+
+-- write in parallel to two hosts.
+   * extend server protocol to tell it two hosts already have the right copy,
+     not just one

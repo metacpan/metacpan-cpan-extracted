@@ -1,0 +1,9 @@
+The following list is not up to date:
+
+* Add some way to not die on the attempt to modify (silently dropping the
+  modify)
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

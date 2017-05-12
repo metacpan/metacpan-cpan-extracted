@@ -1,0 +1,44 @@
+---
+abstract: 'MogileFS (distributed filesystem) server'
+author:
+  - 'Brad Fitzpatrick <brad@danga.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.76, CPAN::Meta::Converter version 2.132510'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MogileFS-Server
+no_index:
+  directory:
+    - t
+    - inc
+  package:
+    - ProcessHandle
+    - TrackerHandle
+    - MogstoredHandle
+    - MogPath
+    - Mgd
+requires:
+  DBI: 0
+  Danga::Socket: 1.56
+  Getopt::Long: 0
+  IO::AIO: 0
+  MogileFS::Client: 0
+  Net::Netmask: 0
+  Perlbal: 1.79
+  Symbol: 0
+  Sys::Syscall: 0.22
+  Sys::Syslog: 0
+  Test::More: 0.88
+  fields: 0
+resources:
+  MailingList: http://groups.google.com/group/mogile
+  bugtracker: http://code.google.com/p/mogilefs/issues/list
+  homepage: http://www.mogilefs.org
+  repository: git://github.com/mogilefs/MogileFS-Server.git
+version: 2.72

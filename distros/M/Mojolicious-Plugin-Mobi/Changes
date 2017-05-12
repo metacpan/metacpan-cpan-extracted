@@ -1,0 +1,14 @@
+This file documents the revision history for Mojolicious-Plugin-Mobi.
+
+0.4     2013-11-17 00:00:00
+        - Tests requires Mojolicious 4.50
+
+0.3     2013-11-13 00:00:00
+        - UserAgent fix in tests
+
+0.2     2011-12-21 00:00:00
+        - Added condition for controller over method: (mobile=>1)
+        - More unit tests in t/
+
+0.1     2011-12-19 00:00:00
+        - First public version 

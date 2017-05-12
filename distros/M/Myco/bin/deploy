@@ -1,0 +1,76 @@
+#!/usr/local/bin/perl -w
+
+use warnings;
+use strict;
+use Getopt::Std;
+use FindBin qw($Bin);
+use Carp;
+
+# Figure out wher to find the test classes.
+use lib "$Bin/../classes";
+
+# Name of script that adds indices
+use constant MKINDICES => 'deploy_indices';
+
+$SIG{__DIE__} = \&Carp::confess;
+
+$SIG{__WARN__} = sub {
+    print STDERR "##################################################################\n";
+    &Carp::cluck;
+    print "\n";
+};
+
+our ($opt_d, $opt_u, $opt_p, $opt_h, $opt_T, $opt_D);
+BEGIN {
+    getopts('d:u:p:hTD:');
+    $ENV{TANGRAM_TRACE} = $opt_T ? 1 : 0;
+}
+
+usage() if $opt_h;
+
+# Load needed classes.
+require Tangram;
+require DBI;
+require Myco;
+
+my $db = $opt_d || $ENV{PGDATABASE} || getpwuid $>;
+my $user = $opt_u || $ENV{PGUSER} || getpwuid $>;
+my $pass = $opt_p || $ENV{PGPASSWORD} || '';
+DBI->trace($opt_D || 0);
+
+my $dbh = DBI->connect("dbi:Pg:dbname=$db", $user, $pass);
+unless (Myco::Schema->schema) {
+    Myco::Schema::mkschema();
+}
+# Deploy it!
+{
+    local $SIG{__WARN__} = sub {}; # ignore warnings please
+    eval { Tangram::Relational->deploy(Myco::Schema->schema, $dbh); };
+    print $@ ? "exception while deploying database:\n\n $@\n"
+             :"Database Deployed!\nNow try running the testrun script\n"
+}
+
+$dbh->disconnect;
+
+sub usage {
+    my $prog = substr($0, rindex($0, '/')+1);
+
+    print qq{
+Usage: $prog [options]
+
+Supported Options:
+  -d Database name. Defaults to PGDATABASE environment variable or, failing
+     that, to the name of the current user.
+  -u Database user login. Defaults to PGUSER environment variable or, failing
+     that, to the name of the current user.
+  -p Database user password. Defaults to PGPASSWORD environment variable or,
+     failing that, to an empty string.
+  -D Enable DBI trace. Supply a value between 0 and 9 depending on how much
+     trace information you want. See the DBI man page for more information.
+     Disabled (0) by default.
+  -T Enable Tangram trace. Off by default.
+  -h Display this usage message and exit.
+
+};
+    exit;
+}

@@ -1,0 +1,32 @@
+---
+abstract: "An interface to mailchimp.com's RESTful Web API v3 using WEB::API"
+author:
+  - 'Josh Lavin <digory@cpan.org>'
+build_requires:
+  Digest::MD5: '0'
+  JSON: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mail-Chimp3
+requires:
+  Moo: '0'
+  Types::Standard: '0'
+  Web::API: '0'
+  namespace::autoclean: '0.16'
+  perl: '5.010001'
+  strictures: '2'
+resources:
+  bugtracker: https://github.com/jdigory/p5-Mail-Chimp3/issues
+  homepage: http://metacpan.org/release/Mail-Chimp3/
+  repository: git://github.com/jdigory/p5-Mail-Chimp3.git
+version: '0.04'
+x_serialization_backend: 'YAML::Tiny version 1.69'

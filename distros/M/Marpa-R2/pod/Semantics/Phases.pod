@@ -1,0 +1,405 @@
+# Copyright 2015 Jeffrey Kegler
+# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# redistribute it and/or modify it under the terms of the GNU Lesser
+# General Public License as published by the Free Software Foundation,
+# either version 3 of the License, or (at your option) any later version.
+#
+# Marpa::R2 is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser
+# General Public License along with Marpa::R2.  If not, see
+# http://www.gnu.org/licenses/.
+
+=head1 NAME
+
+Marpa::R2::Semantics::Phases - SLIF recognizer phases
+
+=head1 About this document
+
+This document describes in detail the sequence of events
+in the SLIF recognizer.
+It serves two purposes.
+
+=over 4
+
+=item *
+
+It describes the sequence of events
+in the SLIF recognizer
+in fuller detail
+than the other documents do.
+
+=item *
+
+It describes the use of more than one parse series.
+
+=back
+
+Full detail of the sequence of events
+inside the SLIF recognizer
+is not usually necessary.
+Applications usually
+find that things "just work".
+But some application B<do> depend on the details.
+These include
+
+=over 4
+
+=item *
+
+applications which make unusual use of side effects in the semantics; and
+
+=item *
+
+applications which alter their symbol tables at runtime.
+
+=back
+
+The semantics has two different modes,
+one of which is deprecated.
+If the SLIF recognizer is created from a grammar
+which uses the SLIF grammar's
+L<C<action_object>|Marpa::R2::Scanless::G/"action_object">
+setting,
+the SLIF's semantics will be in "legacy" mode.
+Otherwise, the SLIF's semantics will be
+in "standard" mode.
+
+Legacy mode is deprecated and should not be used in new
+applications.
+It is documented in L<its own section|/"Legacy mode">.
+Unless otherwise specified,
+the other sections of this document assume
+that "standard" mode is in use.
+
+=head1 Parse trees and parse series
+
+Because Marpa allows ambiguous parsing,
+each parse can produce a
+a series of zero or more parse trees,
+-- a B<parse series>.
+Each parse tree has its own parse result.
+Because the parse may fail,
+there may be zero parse
+trees in a parse series.
+Because a parse may be ambiguous,
+there may be more than one parse tree
+in a parse series.
+
+The SLIF allows the recognizer to
+be run several times on the same
+virtual input stream.
+Each of these runs is a separate B<parse series>.
+Most applications use only
+one parse series.
+
+The call to the
+L<SLIF recognizer's C<read()>
+method|Marpa::R2::Scanless::R/"read()">
+is the
+start of the first parse series.
+The first parse series continues until there is
+a call to the
+L<C<series_restart()>
+method|Marpa::R2::Scanless::R/"series_restart()">
+or until the recognizer is destroyed.
+Each call of the C<series_restart()> method
+starts a new parse series.
+
+Few applications need to use more than
+a single parse series.
+But they are useful in some specialized
+applications.
+Starting a new parse series allows the applications
+to change some settings
+and to extend the input.
+Specifically,
+
+=over 4
+
+=item *
+
+Once input is read into a SLIF recognizer's
+virtual input stream, it is there for the life of the recognizer.
+It cannot be "unread".
+But during the Reading Phase of a new parse series,
+a recognizer can extend the virtual input stream,
+using the recognizer's 
+L<C<resume()> method|Marpa::R2::Scanless::R/"resume()">.
+
+=item *
+
+Within a parse series,
+the semantics package cannot change.
+But you can specify a new semantics package
+after starting a new parse series.
+
+=item *
+
+Certain other SLIF recognizer settings can be
+changed
+after starting a new parse series.
+These include the SLIF recognizer's
+L<C<end> setting|Marpa::R2::Scanless::R/"end">.
+For details, see
+L<Marpa::R2::Scanless::R/"Recognizer settings">.
+
+=back
+
+=head1 SLIF recognizer phases
+
+A SLIF recognizer is always in one of three phases:
+
+=over 4
+
+=item * The Initial Phase;
+
+=item * a Reading Phase; or
+
+=item * an Evaluation Phase.
+
+=back
+
+In these documents,
+phase and subphase names are capitalized
+for clarity.
+
+Reading and Evaluation Phases
+are always part of a parse series.
+The Initial Phase is never part of any parse series.
+
+=head1 The Initial Phase
+
+The B<Initial Phase> of a SLIF recognizer
+begins when the recognizer is created with the
+a call of the L<C<new()>|Marpa::R2::Scanless::R/"Constructor"> method.
+It ends when
+the L<C<read()>|Marpa::R2::Scanless::R/"read()"> method
+is called.
+It will also end, of course, if
+the recognizer is destroyed,
+but most applications will want to
+continue into the next phases.
+
+There is always exactly one Initial Phase for
+every recognizer.
+The Initial Phase is not part of any parse series.
+Very little can happen in the Initial Phase,
+but it is possible to change some recognizer settings
+using the L<C<set()>|Marpa::R2::Scanless::R/"set()"> method.
+
+=head1 The Reading Phase
+
+The Reading Phase starts
+when a parse series starts,
+that is,
+with either a call to the
+L<C<read()>
+method|Marpa::R2::Scanless::R/"read()">
+or a call to the
+L<C<series_restart()>
+method|Marpa::R2::Scanless::R/"series_restart()">.
+The Reading Phase ends when the first of the following occurs:
+
+=over 4
+
+=item *
+
+The recognizer is destroyed.
+
+=item *
+
+A new parse series is begun
+by calling the C<series_restart()> method.
+This and the previous case are unusual.
+Applications almost always
+want to continue the parse series into the Evaluation Phase.
+
+=item * The C<value()> method is called for this SLIF recognizer.
+This is the most common case.
+
+=back
+
+The C<read()> method can be called only once for a SLIF recognizer.
+But, while a Reading Phase continues,
+the C<resume()> method may be called multiple times to continue reading
+input.
+The C<resume()> method should only be called except during the
+Reading Phase of a parse series.
+
+A Reading Phase is always part of a parse series.
+There is always exactly one Reading Phase for every parse series.
+
+=head1 The Evaluation Phase
+
+The Evaluation Phase begins with a recognizer's first call
+to the SLIF's C<value()> method.
+It ends when the recognizer is destroyed,
+or when
+the SLIF's C<series_restart()> method
+is called for that recognizer.
+If a parse series ends before the C<value()> method is
+called, there is no Evaluation Phase.
+
+The L<C<value()>|Marpa::R2::Scanless::R/"value()"> method
+may be called more than once during the Evaluation Phase.
+The second and later calls of
+the L<C<value()>|Marpa::R2::Scanless::R/"value()"> method will return
+the result of the next parse tree, if there is one.
+When there are no more parse trees,
+the L<C<value()>|Marpa::R2::Scanless::R/"value()"> method will return
+a Perl C<undef>.
+
+If you call
+the L<C<resume()>|Marpa::R2::Scanless::R/"resume()"> method
+during an Evaluation Phase,
+the behavior of
+Marpa::R2
+is not defined.
+You should not do this.
+
+When it occurs, an Evaluation Phase is always part of a parse series.
+But the Evaluation Phase is optional --
+a parse series may end without entering into an Evalution Phase.
+
+The Evaluation Phase has two subphases:
+
+=over 4
+
+=item * 
+
+The Parse Tree Setup Subphase.
+
+=item *
+
+The Parse Tree Traveral Subphase.
+
+=back
+
+B<Node Evaluation Time>
+is the Tree Traversal Subphase, as seen from the point of view of
+each rule node.  It is not a separate phase.
+
+=head1 Parse Tree Setup Subphase
+
+The Parse Tree Setup Subphase
+occurs during during the first call
+to the C<value()> method of every series.
+In the Parse Tree Setup Subphase, the following happens:
+
+=over 4
+
+=item *
+
+The per-parse argument is created.
+If a per-parse constructor was found,
+it is run at this point, and the per-parse argument is
+its return value.
+
+=item *
+
+All action names are resolved to
+actions --
+Perl scalars
+or rule evaluation closures.
+The rule evaluation closures are not called in the Parse Tree Setup Subphase.
+They will be called later,
+in the Parse Tree Traversal Subphase.
+
+=back
+
+Exactly one Parse Tree Setup Subphase occurs
+for each parse tree.
+
+=head1 Parse Tree Traversal Subphase
+
+During the Parse Tree Traversal Subphase,
+the rule evaluation closures are called.
+
+=head1 Legacy mode
+
+If the SLIF recognizer is created from a grammar
+which uses the
+L<C<action_object>|Marpa::R2::Scanless::G/"action_object">
+SLIF grammar setting,
+the SLIF recognizer will be in "legacy" mode.
+Legacy mode is deprecated.
+It is documented here only for the support of legacy
+applications.
+
+In legacy mode,
+there is an additional evaluation subphase,
+the Parse Series Setup Subphase,
+and tasks performed in standard mode
+by the Parse Tree Setup Subphase
+are split between the two subphases.
+
+The Parse Series Setup Subphase
+occurs just before
+the Parse Tree Setup Subphase,
+in the first C<value> method call
+of B<the first> parse series.
+It is important to emphasize that
+the Parse Series Setup Subphase
+occurs B<only in the first parse series>.
+
+In legacy mode,
+the only task performed by
+the Parse Tree Setup Phase is creation
+of the per-parse argument.
+Action resolution
+is performed in the 
+the Parse Series Setup Phase.
+
+One practical implication
+of this is that,
+in legacy mode,
+the semantics package cannot be changed
+by starting a new parse series.
+Both are decided once and for all
+in the Parse Series Setup Subphase,
+and
+the Parse Series Setup Subphase
+occurs only once during the life
+cycle of a SLIF recognizer.
+
+The precise timing of semantics
+operations is affected by the
+changes described above.
+These changed timings, in turn,
+may affect applications that rely on side
+effects of the semantics.
+
+=head1 Copyright and License
+
+=for Marpa::R2::Display
+ignore: 1
+
+  Copyright 2015 Jeffrey Kegler
+  This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+  redistribute it and/or modify it under the terms of the GNU Lesser
+  General Public License as published by the Free Software Foundation,
+  either version 3 of the License, or (at your option) any later version.
+
+  Marpa::R2 is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser
+  General Public License along with Marpa::R2.  If not, see
+  http://www.gnu.org/licenses/.
+
+=for Marpa::R2::Display::End
+
+=cut
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

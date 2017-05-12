@@ -1,0 +1,176 @@
+0.44 2009-06-30
+    - Use bare option to some attributes to quiet warnings from newer Moose
+
+0.43 2009-06-15
+    - Add deprecation notice
+    - Add inline_constructor => 0 to various classes that define their own
+      constructors
+
+0.42 2008-06-27
+    - Add export methods back to Named and Positional
+0.41 2008-05-29
+    - Fix borked test coverage due to accidental include of methods, no
+      real change.
+0.40 2008-05-29
+    - Preliminary support for compiled signatures that
+      will in many cases yield a *significant* performance
+      improvement. See the documentation for more
+      information.
+    - Requirements for various prerequisites lowered. Thanks
+      to Max Kanat-Alexander for testing.
+
+    * MooseX::Method
+      - Declaring methods without coderefs inside roles
+        will now make this role require a fully declared
+        method in the class the role is merged into.
+        When stevan gets around to adding the proper hooks,
+        it will also be possible to specify required
+        signatures.
+      - You can now do 'no MooseX::Method' to unimport the
+        symbols imported by MooseX::Method.
+
+    * MooseX::Meta::(Parameter|Signature)
+      - These are now roles, but think of them like abstract
+        classes. They specify the API for implementing
+        parameters and signatures. The old parameter class
+        has been renamed to...
+
+    * MooseX::Meta::Parameter::Moose
+      - The old MooseX::Meta::Parameter.
+
+    * MooseX::Meta::(Parameter|Signature)::Compiled
+      - Roles for the compiling API.
+
+    - Pass package and method names to wrap(), per changes to Class::MOP (gphat)
+
+    - And probably lotsa other stuff.
+
+0.39 Wed. August 1, 2007
+    * MooseX::Meta::Parameter
+      - Moved some checks from runtime to compiletime,
+        which means performance improvements.
+      - Support for union types (See Moose docs)
+      - Support for specifying classnames as types.
+
+    * MooseX::Meta::Method::Signature
+      - Added methods for reading the signature.
+
+    * MooseX::Method::Exception
+      - New class for improved exception handling. The
+        new exception handling is currently only used
+        internally and will not affect users.
+
+0.37 Wed. July 18, 2007
+    * MooseX::Meta::Parameter
+    * MooseX::Meta::Signature::Named
+    * MooseX::Meta::Signature::Positional
+    * MooseX::Meta::Signature::Combined
+      - Added a method to export the internal data.
+
+    * MooseX::Method
+      - Made it easier to set default attributes with
+        a default_attr function. It's basically just sugar
+        for the old way so the old way will still work just
+        fine.
+
+0.36 Wed. July 18, 2007
+    - More documentation.
+    - Also, fixed documentation so a certain person's
+      installation won't throw errors.
+
+0.35 Tue. July 17, 2007
+    * MooseX::Method
+      - Removed noconfess in favour of simply using croak
+        which gives you pretty much the same effect.
+        Huzzahs to mst.
+
+0.34 Tue. July 17, 2007
+    - New internal error handling scheme, error messages
+      will look slightly different.
+
+    * MooseX::Method
+      - You may now specify the "noconfess" attribute to
+        remove the backtrace on validation error.
+
+    * MooseX::Meta::Signature::Semi
+      - Now known as...
+
+    * MooseX::Meta::Signature::Combined
+      - Which doesn't cause as much noise in my head.
+        The keyword "semi" will continue to work for now,
+        but will probably be removed sometime after
+        version 1.0. More than likely, I'll add some noisy
+        warnings to it at 1.0.
+
+0.32 Thu. July 12, 2007
+    - Shiny new test suite!
+
+    * MooseX::Method
+      - Actually mention in the documentation that
+        signatures now are optional.
+      - Moose does no longer need to be explicitly used,
+        although it's still used as before under the
+        hood.
+
+0.31 Fri. July 9, 2007
+    * MooseX::Method
+      - Will now initialize a metaclass if none
+        is found instead of throwing an error.
+      - Signatures are now optional.
+
+0.30 Fri. July 6, 2007
+    - Improved documentation.
+
+0.29 Thu. July 5, 2007
+    * MooseX::Meta::Signature
+      - This is no longer a role. It just feels better
+        that signatures isa ::Signature.
+    * MooseX::Meta::Signature::Semi
+      - Combined positional and named syntax.
+
+0.22 Tue. May 1, 2007
+    !! NEW SYNTAX !!
+
+    * MooseX::Method
+      - New syntax.
+
+    * MooseX::Meta::Signature
+      - This is now a role.
+
+0.20 Tue. May 1, 2007
+    - Documentation stuff.
+
+    * MooseX::Method
+      - Add support for attributes.
+      - Remove _dispatch_wrapper support, no longer
+        neccesary.
+
+0.18 Tue. May 1, 2007
+    * MooseX::Method
+      - Document a problem with roles.
+      - Make Devel::Cover and MooseX::Method play
+        nice together. :-)
+
+0.17 Mon. April 30, 2007
+    - 100% test coverage again.
+    - Rethink the way names are specified to errors.
+    - Fix various bugs.
+
+0.16 Mon. April 30, 2007
+    - Changed to Module::Install.
+    - Documentation updates.
+
+    * MooseX::Method
+      - Let user supply a signature object.
+      - Support a _dispatch_wrapper method that
+        gets called if present in place of the
+        actual method called.
+
+    * MooseX::Meta::Parameter
+      - Add support for roles.
+      - Report parameter name/position in error
+        messages.
+
+    * MooseX::Meta::Signature::(Named|Positional)
+      - Supply name to parameter object.
+

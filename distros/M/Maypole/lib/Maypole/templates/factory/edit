@@ -1,0 +1,70 @@
+[%#
+
+=head1 edit
+
+This is the edit page. It edits the passed-in object, by displaying a
+form similar to L<addnew> but with the current values filled in.
+
+=cut
+
+#%]
+[% PROCESS macros %]
+[% INCLUDE header %]
+[% INCLUDE title %]
+
+[% IF request.action == 'edit' %]
+[% INCLUDE navbar %]
+[% END %]
+
+[% IF object %]
+<div id="title">Edit a [% classmetadata.moniker %]</div>
+<form action="[% base %]/[% object.table %]/do_edit/[% object.id %]" method="post">
+<fieldset>
+<legend>Edit [% object.name %]</legend>
+   [% FOR col = classmetadata.columns;
+    NEXT IF col == "id" OR col == classmetadata.table _ "_id";
+    SET col_label = classmetadata.colnames.$col; %]
+    <label><span class="field"> [% col_label %] </span> [% object.to_field(col).as_XML %]</label>
+    [% IF errors.$col; 
+       '<span class="error">'; errors.$col;'</span>';
+    ELSIF  errors.$col_label; 
+       '<span class="error">'; errors.$col_label;'</span>';
+    END;
+    END %]
+    <input type="submit" name="edit" value="edit"/>
+    <input type="hidden" name="__form_id" value="[% request.make_random_id %]">
+    </fieldset></form>
+    
+[% ELSE %]
+
+<div id="addnew">
+<form method="post" action="[% base %]/[% classmetadata.table %]/do_edit/">
+<fieldset>
+<legend>Add a new [% classmetadata.moniker %]</legend>
+    [% FOR col = classmetadata.columns %]
+        [% NEXT IF col == "id" %]
+            <label><span class="field">[% classmetadata.colnames.$col %]</span>
+            [% 
+            SET elem = classmetadata.cgi.$col.clone;
+            IF request.action == 'do_edit';
+                IF elem.tag == "textarea";
+                    elem = elem.push_content(request.param(col));
+                ELSE;
+                    elem.attr("value", request.param(col));
+                END;
+            END;
+            elem.as_XML; %]
+	    </label>
+        [% IF errors.$col %]
+           <span class="error">[% errors.$col | html  %]</span>
+        [% END %]
+
+    [% END; %]
+    <input type="submit" name="create" value="create" />
+    <input type="hidden" name="__form_id" value="[% request.make_random_id %]" />
+</fieldset>
+</form>
+</div>
+
+[% END %]
+[% INCLUDE footer %]

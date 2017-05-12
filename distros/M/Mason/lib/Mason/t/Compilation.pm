@@ -1,0 +1,31 @@
+package Mason::t::Compilation;
+$Mason::t::Compilation::VERSION = '2.24';
+use Test::Class::Most parent => 'Mason::Test::Class';
+
+sub test_pure_perl : Tests {
+    my $self = shift;
+
+    my $std =
+      sub { my $num = shift; sprintf( 'method main () { my $foo = %s; print $foo; }', $num ) };
+
+    $self->add_comp( path => '/print1.pl', src => $std->(53) );
+    $self->test_comp(
+        path   => '/top1.mp',
+        src    => 'method main () { $m->comp("/print1.pl") }',
+        expect => $std->(53),
+    );
+
+    $self->setup_interp( pure_perl_extensions => ['.pl'] );
+    $self->add_comp( path => '/print2.pl', src => $std->(54) );
+    $self->test_comp( path => '/top2.mp', src => '<& print2.pl &>', expect => '54' );
+
+    $self->setup_interp( pure_perl_extensions => [] );
+    $self->add_comp( path => '/print3.pl', src => $std->(55) );
+    $self->test_comp(
+        path   => '/top3.mp',
+        src    => '<& print3.pl &>',
+        expect => $std->(55),
+    );
+}
+
+1;

@@ -1,0 +1,4 @@
+#!/usr/bin/perl
+# 43SBPRK - choo created by Pip Stuart <Pip@CPAN.Org> to calculate n choose m as part of the Math::BaseConvert package
+use strict; use warnings; use Math::BaseConvert qw(choo);
+my $ennn = shift; my $emmm = shift; die "USAGE: `choo n m` to calculate  n choose m\n" unless(defined($ennn) && defined($emmm)); print choo($ennn, $emmm);

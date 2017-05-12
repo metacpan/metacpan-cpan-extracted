@@ -1,0 +1,32 @@
+---
+abstract: 'Non-blocking signal handler'
+author:
+  - 'Shoichi Kaji <skaji@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-IOLoop-Signal
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Mojolicious: '7.11'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/skaji/Mojo-IOLoop-Signal/issues
+  homepage: https://github.com/skaji/Mojo-IOLoop-Signal
+  repository: https://github.com/skaji/Mojo-IOLoop-Signal.git
+version: '0.001'
+x_serialization_backend: 'YAML::Tiny version 1.69'
+x_static_install: '1'

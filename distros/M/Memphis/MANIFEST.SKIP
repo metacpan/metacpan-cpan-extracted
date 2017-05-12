@@ -1,0 +1,9 @@
+^xs/.*\.[co]$
+^.*\.bs$
+^.*\.tar\.gz$
+^build/
+^\.git/
+^\.gitignore$
+^blib/
+^Makefile([.]old)?$
+^pm_to_blib$

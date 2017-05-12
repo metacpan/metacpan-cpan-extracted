@@ -1,0 +1,37 @@
+Date: Mon, 3 Apr 2000 08:25:55 +0200
+From: Mark Overmeer <markov@ATComputing.nl>
+To: Carl Knoos <cknoos@atg.com>
+Subject: Re: Problem resizing images through perl script
+Message-ID: <20000403082555.B11537@atcmpg.ATComputing.nl>
+References: <20000331170117.B2095@atcmpg.ATComputing.nl> <NDBBJJFDMKFOAIFBEPPJIEOCCBAA.cknoos@atg.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+X-Mailer: Mutt 1.0pre4i
+In-Reply-To: <NDBBJJFDMKFOAIFBEPPJIEOCCBAA.cknoos@atg.com>; from cknoos@atg.com on Sat, Apr 01, 2000 at 03:40:32PM -0500
+Status: RO
+Content-Length: 1046
+Lines: 23
+
+* Carl Knoos (cknoos@atg.com) [000401 22:42]:
+> ld.so.1: /usr/local/bin/mogrify: fatal: libttf.so.2: open failed: No such
+> file or directory
+
+Typical for installing ImageMagick binaries: they are precompiled on a
+system with a long list of shared-libs.  IM is very powerful, so there
+are many libs.  While starting, the libs are contacted.
+   Search for a libttf.so : you may not have it, have the wrong version
+or just a lacking link. ttf = True Type Fonts, and the lib is available
+at freetype.org.
+
+> I've asked the company that I rent space from to install
+> PerlMagick on the box, hopefully I won't have all these
+> problems if they do.
+
+Compatibility between all those libs and apps will continue to haunt us.
+-- 
+               MarkOv       %-]
+
+------------------------------------------------------------------------
+drs Mark A.C.J. Overmeer                           markov@ATComputing.nl
+AT Computing, UNIX Training and Consultancy    http://www.ATComputing.nl
+http://www.dhp.nl/~markov/                         http://satfoto.dhp.nl

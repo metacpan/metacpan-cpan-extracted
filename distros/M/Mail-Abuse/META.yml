@@ -1,0 +1,32 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Mail-Abuse
+version:      1.026
+version_from: lib/Mail/Abuse.pm
+installdirs:  site
+requires:
+    Date::Manip:                   0
+    Date::Parse:                   0
+    DBD::CSV:                      0
+    DBI:                           1.48
+    Digest::MD5:                   0
+    File::Find:                    0
+    File::Path:                    0
+    File::Spec:                    0
+    HTML::Parser:                  0
+    IO::File:                      0
+    Mail::Mailer:                  0
+    MIME::Entity:                  0
+    MIME::Parser:                  0
+    Net::POP3:                     2.23
+    NetAddr::IP:                   3
+    Params::Validate:              0
+    PerlIO::gzip:                  0
+    Storable:                      0
+    Test::More:                    0
+    Text::CSV_XS:                  0
+    Tie::NetAddr::IP:              1.51
+    WWW::Mechanize:                0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

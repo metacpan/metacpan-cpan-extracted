@@ -1,0 +1,18 @@
+Changes
+example/poc.pl
+example/poc_own_fft.pl
+lib/Math/PhaseOnlyCorrelation.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00.load.t
+t/01.zero_fill_array.t
+t/02.adjust_array_length.t
+t/03.get_zero_array.t
+t/04.test_poc_without_fft.t
+t/05.test_poc.t
+xt/perlcritic.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

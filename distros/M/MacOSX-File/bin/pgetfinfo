@@ -1,0 +1,146 @@
+#!/usr/local/bin/perl
+#
+# $Id: pgetfinfo,v 0.70 2005/08/09 15:47:00 dankogai Exp $
+#
+
+use strict;
+use MacOSX::File::Constants;
+use MacOSX::File::Spec;
+use MacOSX::File::Info;
+use POSIX qw(strftime);
+
+our %Opt;
+
+while (my $arg = shift @ARGV){
+    $arg =~ /^-/o or unshift @ARGV, $arg and last;
+    $Opt{ substr($arg, 1, 1) } = substr($arg, 2) || 1;
+}
+
+my $path = shift or help();
+my $finfo = getfinfo($path);
+$finfo or die "Error Opening $path: error $MacOSX::File::OSErr\n";
+
+my $fmt = "%m/%d/%Y %H:%M:%S";
+my $type = $finfo->type;
+my $creator = $finfo->creator;
+my $flags = $finfo->flags;
+my $ctime = strftime($fmt, localtime($finfo->ctime));
+my $mtime = strftime($fmt, localtime($finfo->mtime));
+my $dirorfile = $finfo->nodeFlags & kFSNodeIsDirectoryMask ?
+    "directory" : "file";
+my $fullpath = path2spec($path)->path;
+
+
+# file and creator might be nonexistent
+if ($Opt{t}){ $type and print "$type\n";  exit; }
+if ($Opt{c}){ $creator and print "$creator\n"; exit;}
+# while dates are not
+if ($Opt{d}){ print "$ctime\n" ; exit; }
+if ($Opt{m}){ print "$mtime\n" ; exit; }
+# handle -a
+if ($Opt{a}){
+    if ($Opt{a} =~ /[avbstclinmed]/io){
+	my $check = 0;
+	for my $l (qw/a v b s t c l i n m e d/){
+	    index($flags , uc($l)) >= 0 and $check = 1 and last;
+	}
+	print $check;
+    }else{
+	print $flags;
+    }
+    print "\n"; exit;
+}
+
+# no switches
+
+    print <<"EOT";
+$dirorfile: $fullpath
+type:       '$type'
+creator:    '$creator'
+attributes: $flags
+created:    $ctime
+modified:   $mtime
+EOT
+exit;
+
+
+sub help{
+    use File::Basename;
+    my $iam = basename($0);
+    print << "EOT";
+$0 [-a[<attrib-letter>] | -t | -c | -d | -m] <path>
+EOT
+exit;
+}
+1;
+__END__
+=head1 NAME
+
+pgetfinfo -- GetFileInfo, implemented as perl script
+
+=head1 SYNOPSIS
+
+pgetfinfo [-a[<attrib-letter>] | -t | -c | -d | -m] <path>
+
+=head1 DESCRIPTION
+
+When no switch is set, all avaible information on the path specified
+is printed to STDOUT.
+
+=item -a [<attrib-letter>]
+
+Prints attributes only.  When no attrib-letter is specified, it prints
+all attributes.  If spefifed, it prints "1" if any one the attribute
+is set or "0" otherwise.
+
+Attrib-letters are as follows;
+
+  A   Alias file
+  V   Invisible*
+  B   Bundle
+  S   System (name locked)
+  T   Stationary
+  C   Custom icon*
+  L   Locked
+  I   Inited*
+  N   No INIT resources
+  M   Shared (can run multiple times)
+  E   Hidden extension*
+  D   Desktop*
+
+Note: Options/attributes marked with an asterisk (*) are allowed with folders
+
+=item -t
+
+prints file type only
+
+=item -c
+
+prints file creator only.
+
+=item -d
+
+prints creation date only
+
+=item -m
+
+prints modification date only
+
+
+
+=head1 AUTHOR
+
+Dan Kogai <dankogai@dan.co.jp>
+
+=head1 SEE ALSO
+
+L<File::Copy>
+L</Developer/Tools/GetFileInfo>
+L</Developer/Tools/SetFile>
+
+=head1 COPYRIGHT
+
+Copyright 2002-2005 Dan Kogai <dankogai@dan.co.jp>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.

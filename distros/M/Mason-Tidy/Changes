@@ -1,0 +1,62 @@
+Revision history for Mason-Tidy
+
+** denotes an incompatible change
+
+2.57  Oct 7, 2012
+
+- Fix misclassification of % at beginning of lines inside sections or tags
+- Fix <%text> blocks
+- Fix here-docs in <%perl> sections
+- Don't mandate final newline; this can affect component output
+- Add --version (Nic Wolff)
+- Print each filename as it is processed (Shane McCarron)
+
+2.56  Oct 1, 2012
+
+- Blank %-lines: Don't add an extra space, and don't remove (Pedro Melo)
+- Fix handling of empty or nearly empty components and methods
+- Handle <&| &> tags
+
+2.55  Sep 30, 2012
+
+- Remove undeclared dependency on IPC::Run3
+
+2.54  Sep 30, 2012
+
+- Add required option -m/--mason-version, as a few syntactic elements like "% }}" must be
+  treated differently between versions (Shane McCarron)
+- Support environment variable MASONTIDY_OPT
+- Move implementation of bin/masontidy to Mason::Tidy::App
+- Don't tidy lines starting with % in <%args> and other special sections (Nic Wolff)
+- Don't lose final newline (Giovanni Pensa)
+- Add --pipe option (Mark Grimes)
+- Don't initially indent blank lines in a code block (Mark Grimes)
+
+2.53  Sep 20, 2012
+
+- Tidy <%perl> blocks and %-lines together (Shane McCarron)
+- Indent <%perl> blocks initially by 2 spaces, others by 0 by default
+- Use default perltidy settings (4 space indentation) for %-lines
+- Handle non-<%perl> blocks even when tags are not on their own lines
+- Fix --perltidy-tag-argv
+
+2.52  Sep 15, 2012
+
+- Add missing dependencies Capture::Tiny, File::Temp, IPC::System::Simple
+
+2.51  Sep 14, 2012
+
+- Fix various bugs in CLI
+- Use --noprofile in tests so that user's .perltidyrc doesn't break tests (Pedro Melo)
+- Add get_options to parse argv outside CLI
+- Add Test::Class::Most dependency
+
+2.50  Sep 12, 2012
+
+- Increase version number to avoid indexing problems w/old Mason 2 distributions
+- Declare --perltidy-argv, etc., to take a string value
+
+0.01  Sep 12, 2012
+
+- Initial version
+

@@ -1,0 +1,103 @@
+README for Mariachi 0.52
+
+=head1 NAME
+
+Mariachi - all dancing mail archive generator
+
+
+=head1 DEPENDENCIES
+
+This module has external dependencies on the following modules:
+
+ AppConfig	1.55
+ Class::Accessor
+ Date::Parse
+ Email::Find
+ Email::Folder	0.5
+ Email::Thread
+ File::Basename
+ File::Copy
+ File::Find::Rule
+ File::Path
+ Mail::Thread	2.2
+ Mail::Thread::Chronological	1.22
+ Memoize
+ Module::Build	0.18
+ Storable
+ Template
+ Template::Plugin::Page
+ Text::Original
+ Time::HiRes
+ URI::Find::Schemeless::Stricter
+ perl	5.006
+
+=head1 INSTALLATION
+
+ perl Build.PL
+ perl Build test
+
+and if all goes well
+
+ perl Build install
+
+=head1 HISTORY
+
+What changed over the last 3 revisions
+
+=over
+
+=item 0.52	Wednesday 3rd December, 2003
+
+	Now we depend on perl 5.6.  This makes some of the code a bit cleaner.
+
+	Cosmetic tweaks to the base templates.
+
+	--reverse commandline option, to put the root threads into
+	their natural order.
+	
+
+
+=item 0.51    Tuesday 2nd September, 2003
+
+	Template tweaks - apply the anonymising mariachi filter to subject
+	lines
+
+	Correct a MANIFEST booboo and ship templates/css.tt2
+
+
+
+=item 0.50    Friday 29th August, 2003
+
+	Split some code out into Text::Original
+
+	Added a --class option to allow dynamic selection of the main class
+        from the command line.
+
+        Split some of the default templates up.
+
+
+=back
+
+=head1 AUTHORS
+
+This code was written as part of the Siesta project and includes code
+from:
+
+Richard Clamp <richardc@unixbeard.net>
+
+Simon Wistow <simon@thegestalt.org>
+
+Tom Insam <tom@jerakeen.org>
+
+Mark Fowler <mark@twoshortplanks.com>
+
+More information about the Siesta project can be found online at
+http://siesta.unixbeard.net/
+
+=head1 COPYRIGHT
+
+Copyright 2003 The Siesta Project
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

@@ -1,0 +1,31 @@
+---
+abstract: 'Str type parameterizable by length.'
+author:
+  - 'Chris Andrews <chris@nodnol.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Exception: 0
+  Test::More: 0.88
+  Test::NoWarnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Types-Varchar
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 0
+  MooseX::Types: 0
+  MooseX::Types::Parameterizable: 0.07
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/chrisa/moosex-types-varchar.git
+version: 0.05

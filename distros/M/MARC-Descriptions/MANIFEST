@@ -1,0 +1,14 @@
+Changes
+lib/MARC/Descriptions.pm
+lib/MARC/Descriptions/Data.pm
+pl/hmm.pl
+Makefile.PL
+MANIFEST
+README
+t/00_use.t
+t/01_version.t
+t/02_type.t
+t/03_get.t
+t/04_no_set.t
+TODO
+META.yml                                Module meta-data (added by MakeMaker)

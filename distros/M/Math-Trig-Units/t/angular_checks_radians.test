@@ -1,0 +1,122 @@
+use Math::Trig::Radian qw(dsin dcos tan sec csc cot asin acos atan asec acsc acot sinh cosh tanh sech csch coth asinh acosh atanh asech acsch acoth deg_to_rad rad_to_deg);
+
+$pi = 3.1415926535897932384626433832795028841971693993751058209;
+my $twelth = $pi/12;
+
+### POSITIVE ANGULAR CHECKS ###
+
+for (  $i = 0; $i<=2*$pi; $i+=$twelth ) {
+    printf "sin %.4f %5f\tinverted %.4f\n", $i, dsin($i), asin(dsin($i)), "\n";
+}
+
+print "\n\n";
+for (  $i = 0; $i<=2*$pi; $i+=$twelth ) {
+    printf "cos %.4f %5f\tinverted %.4f\n", $i, dcos($i), acos(dcos($i)), "\n";
+}
+
+print "\n\n";
+for (  $i = 0; $i<=2*$pi; $i+=$twelth ) {
+    printf "tan %.4f %5f\tinverted %.4f\n", $i, tan($i), atan(tan($i)), "\n";
+}
+
+print "\n\n";
+for (  $i = 0; $i<=2*$pi; $i+=$twelth ) {
+    printf "sec %.4f %5f\tinverted %.4f\n", $i, sec($i), asec(sec($i)), "\n";
+}
+
+print "\n\n";
+for (  $i = 0; $i<=2*$pi; $i+=$twelth ) {
+    printf "csc %.4f %5f\tinverted %.4f\n", $i, csc($i), acsc(csc($i)), "\n";
+}
+
+print "\n\n";
+for (  $i = 0; $i<=2*$pi; $i+=$twelth ) {
+    printf "cot %.4f %5f\tinverted %.4f\n", $i, cot($i), acot(cot($i)), "\n";
+}
+
+print "\n\n";
+for (  $i = 0; $i<=2*$pi; $i+=$twelth ) {
+    printf "sinh %.4f %5f\tinverted %.4f\n", $i, sinh($i), asinh(sinh($i)), "\n";
+}
+print "\n\n";
+for (  $i = 0; $i<=2*$pi; $i+=$twelth ) {
+    printf "cosh %.4f %5f\tinverted %.4f\n", $i, cosh($i), acosh(cosh($i)), "\n";
+}
+print "\n\n";
+for (  $i = 0; $i<=2*$pi; $i+=$twelth ) {
+    printf "tanh %.4f %5f\tinverted %.4f\n", $i, tanh($i), atanh(tanh($i)), "\n";
+}
+
+print "\n\n";
+for (  $i = 0; $i<=2*$pi; $i+=$twelth ) {
+    printf "sech %.4f %5f\tinverted %.4f\n", $i, sech($i), asech(sech($i)), "\n";
+}
+
+print "\n\n";
+for (  $i = 0; $i<=2*$pi; $i+=$twelth ) {
+    printf "csch %.4f %5f\tinverted %.4f\n", $i, csch($i), acsch(csch($i)), "\n";
+}
+
+print "\n\n";
+for (  $i = 0; $i<=2*$pi; $i+=$twelth ) {
+    printf "coth %.4f %5f\tinverted %.4f\n", $i, coth($i), acoth(coth($i)), "\n";
+}
+
+#### NEGATIVE ANGULAR CHECKS ###
+print "\n\n";
+for (  $i = 0; $i>=-2*$pi; $i-=$twelth ) {
+    printf "sin %.4f %5f\tinverted %.4f\n", $i, dsin($i), asin(dsin($i)), "\n";
+}
+
+print "\n\n";
+for (  $i = 0; $i>=-2*$pi; $i-=$twelth ) {
+    printf "cos %.4f %5f\tinverted %.4f\n", $i, dcos($i), acos(dcos($i)), "\n";
+}
+
+print "\n\n";
+for (  $i = 0; $i>=-2*$pi; $i-=$twelth ) {
+    printf "tan %.4f %5f\tinverted %.4f\n", $i, tan($i), atan(tan($i)), "\n";
+}
+
+print "\n\n";
+for (  $i = 0; $i>=-2*$pi; $i-=$twelth ) {
+    printf "sec %.4f %5f\tinverted %.4f\n", $i, sec($i), asec(sec($i)), "\n";
+}
+
+print "\n\n";
+for (  $i = 0; $i>=-2*$pi; $i-=$twelth ) {
+    printf "csc %.4f %5f\tinverted %.4f\n", $i, csc($i), acsc(csc($i)), "\n";
+}
+
+print "\n\n";
+for (  $i = 0; $i>=-2*$pi; $i-=$twelth ) {
+    printf "cot %.4f %5f\tinverted %.4f\n", $i, cot($i), acot(cot($i)), "\n";
+}
+
+print "\n\n";
+for (  $i = 0; $i>=-2*$pi; $i-=$twelth ) {
+    printf "sinh %.4f %5f\tinverted %.4f\n", $i, sinh($i), asinh(sinh($i)), "\n";
+}
+print "\n\n";
+for (  $i = 0; $i>=-2*$pi; $i-=$twelth ) {
+    printf "cosh %.4f %5f\tinverted %.4f\n", $i, cosh($i), acosh(cosh($i)), "\n";
+}
+print "\n\n";
+for (  $i = 0; $i>=-2*$pi; $i-=$twelth ) {
+    printf "tanh %.4f %5f\tinverted %.4f\n", $i, tanh($i), atanh(tanh($i)), "\n";
+}
+
+print "\n\n";
+for (  $i = 0; $i>=-2*$pi; $i-=$twelth ) {
+    printf "sech %.4f %5f\tinverted %.4f\n", $i, sech($i), asech(sech($i)), "\n";
+}
+
+print "\n\n";
+for (  $i = 0; $i>=-2*$pi; $i-=$twelth ) {
+    printf "csch %.4f %5f\tinverted %.4f\n", $i, csch($i), acsch(csch($i)), "\n";
+}
+
+print "\n\n";
+for (  $i = 0; $i>=-2*$pi; $i-=$twelth ) {
+    printf "coth %.4f %5f\tinverted %.4f\n", $i, coth($i), acoth(coth($i)), "\n";
+}

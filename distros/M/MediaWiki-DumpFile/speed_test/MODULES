@@ -1,0 +1,16 @@
+YAML
+Parse::MediaWikiDump
+XML::LibXML
+XML::Parser
+XML::SAX
+XML::SAX::ExpatXS
+XML::SAX::Expat
+XML::Twig
+XML::Bare
+HTML::Entities
+XML::CompactTree::XS
+XML::CompactTree
+XML::LibXML::SAX::ChunkParser
+XML::Parser
+XML::Records
+XML::Rules

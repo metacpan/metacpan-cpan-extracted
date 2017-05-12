@@ -1,0 +1,6 @@
+name = "Module-Build-Pluggable-XSUtil"
+# badges = ["travis"]
+authority="cpan:TOKUHIROM"
+
+module_maker="ModuleBuildTiny"
+

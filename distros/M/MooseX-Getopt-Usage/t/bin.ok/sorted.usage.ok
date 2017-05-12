@@ -1,0 +1,10 @@
+Usage:
+    sorted.pl [OPTIONS]
+
+Options:
+     -a                - Str. 
+     -b                - Str. 
+     -c                - Str. 
+     --help -? --usage - Bool. Display the usage message and exit
+     --man             - Bool. Display man page
+

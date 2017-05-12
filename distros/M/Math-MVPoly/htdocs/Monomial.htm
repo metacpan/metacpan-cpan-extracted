@@ -1,0 +1,160 @@
+<HTML>
+<HEAD>
+<TITLE>Monomial - Perl module implmenting an algebraic monomial</TITLE>
+<LINK REV="made" HREF="mailto:bguarrac@hotmail.com">
+</HEAD>
+
+<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#NAME">NAME</A>
+	<LI><A HREF="#DESCRIPTION">DESCRIPTION</A>
+	<LI><A HREF="#AUTHOR">AUTHOR</A>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="NAME">NAME</A></H1>
+<P>
+Monomial - Perl module implmenting an algebraic monomial
+
+<P>
+<HR>
+<H1><A NAME="DESCRIPTION">DESCRIPTION</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new</A></STRONG><DD>
+<P>
+Return a reference to a new Monomial object.
+
+<p>
+
+<DT><STRONG><A NAME="item_copy">copy OBJREF</A></STRONG><DD>
+<P>
+Perform a deep copy of the object referred to by OBJREF.
+
+<p>
+
+<DT><STRONG><A NAME="item_coefficient">coefficient VALUE</A></STRONG><DD>
+<p>
+
+<DT><STRONG>coefficient</STRONG><DD>
+<P>
+Retrieve the value of the coefficient. If a value is passed, it is assigned
+as the new value.
+
+<p>
+
+<DT><STRONG><A NAME="item_variables">variables</A></STRONG><DD>
+<DT><STRONG>variables HASH</STRONG><DD>
+<P>
+Retrieve the value of the variables hash. If a value is passed, it is
+assigned as the new value.
+
+<p>
+
+<DT><STRONG><A NAME="item_varOrder">varOrder</A></STRONG><DD>
+<DT><STRONG>varOrder ARRAYREF</STRONG><DD>
+<P>
+Retrieve the value of the variable ordering array reference. If a value is
+passed, it is assigned as the new value.
+
+<p>
+
+<DT><STRONG><A NAME="item_fromString">fromString STRING</A></STRONG><DD>
+<P>
+Construct the state of the object from an expression.
+
+<p>
+
+<DT><STRONG><A NAME="item_toString">toString</A></STRONG><DD>
+<P>
+Build an algebraic expression string representing the monomial.
+
+<p>
+
+<DT><STRONG><A NAME="item_getSignature">getSignature</A></STRONG><DD>
+<P>
+Create a signature for a monomial such that any two monomials with the same
+exponents have the same signature.
+
+<p>
+
+<DT><STRONG><A NAME="item_getTotalDegree">getTotalDegree</A></STRONG><DD>
+<P>
+Get the sum the exponents for each variable in the monomial.
+
+<p>
+
+<DT><STRONG><A NAME="item_canDivide">canDivide OBJREF</A></STRONG><DD>
+<P>
+Determine if the input monomial can divide this monomial.
+
+<p>
+
+<DT><STRONG><A NAME="item_add">add OBJREF</A></STRONG><DD>
+<P>
+Add this monial to the input monomial and return the sum.
+
+<p>
+
+<DT><STRONG><A NAME="item_divide">divide OBJREF</A></STRONG><DD>
+<P>
+Divide this monomial by the input monomial and return the quotient.
+
+<p>
+
+<DT><STRONG><A NAME="item_mult">mult OBJREF</A></STRONG><DD>
+<P>
+Multiply this monomial by the input monomial and return the product.
+
+<p>
+
+<DT><STRONG><A NAME="item_coeff_to_ND">coeff_to_ND</A></STRONG><DD>
+<P>
+Constructs an array containing the numerator and denominator of the
+coefficient.
+
+<p>
+
+<DT><STRONG><A NAME="item_coeff_from_ND">coeff_from_ND ARRAYREF</A></STRONG><DD>
+<P>
+Given an array ref containing numerator and denominator, this method builds
+the coefficient from the numerator and denominator passed in. The
+coefficient will be a string if the ratio is non-integer, otherwise it will
+be reduced to the integer and be a scalar.
+
+<p>
+
+<DT><STRONG><A NAME="item_reduceCoefficient">reduceCoefficient</A></STRONG><DD>
+<P>
+Determines if the coefficient can be simplified to a simpler (smaller)
+numerator/denominator pair.
+
+<p>
+
+<DT><STRONG><A NAME="item_reduceVariables">reduceVariables</A></STRONG><DD>
+<P>
+Determines if any variables can be removed from the monomials based on
+exponent values.
+
+<p>
+
+<DT><STRONG><A NAME="item_getLCM">getLCM OBJREF</A></STRONG><DD>
+<P>
+Given a monomial, determine the LCM of this monomial with the input
+monomial and return it.
+
+</DL>
+<P>
+<HR>
+<H1><A NAME="AUTHOR">AUTHOR</A></H1>
+<P>
+Brian Guarraci &lt;<A
+HREF="mailto:bguarrac@hotmail.com">bguarrac@hotmail.com</A>&gt;
+</BODY>
+
+</HTML>

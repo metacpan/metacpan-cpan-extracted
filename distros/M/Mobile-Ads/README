@@ -1,0 +1,32 @@
+Mobile::Ads - Interface various Mobile Ads serving sites
+======================================================================
+
+DOCUMENTAION
+
+For a detailed documentation see the man page:
+
+   man Mobile::Ads
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   XML::LibXML
+   LWP::UserAgent
+   HTTP::Request::Common
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Thanos Chatziathanassiou
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

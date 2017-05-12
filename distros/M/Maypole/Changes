@@ -1,0 +1,420 @@
+This file documents the revision history for Perl extension Maypole.
+For information about current developments and future releases, see:
+    http://maypole.perl.org/?TheRoadmap
+
+
+
+2.13 April 2008
+SVN Revision
+
+Bug Fixes :
+   DBD::SQLite no longer required by Makefile.PL
+   CGI handler now produces response for fatal error (bug 29981)
+   Fix to link macro
+   Fix to redirect_request in Apache::MVC
+   Fix to mime detection by file extension
+   Fixed MODIFY_CODE_ATTRIBUTES and FETCH_CODE_ATTRIBUTES to work with mod_perl threaded model 
+     - Patch from Ben Hutchings http://rt.cpan.org/Public/Bug/Display.html?id=29984
+   fixes for bug 29982 Inconsistency between examples and tutorial (patch from Ben Hutchings)
+   fixed apache_mvc.t to work with Apache2 (bug #29979 patch from Ben Hutchings)
+   added post_chomp as default option for TT view
+
+Improvements :
+   link macro now takes a target argument, and has slightly better pod
+
+2.121 29 August 2007
+
+SVN revision 581
+
+Bug Fixes :
+   Apache::Request is fetched with a new object instead of instance if request options are provided
+   additional, request_options and view_options attributes of Maypole::Config are initialised with hashref
+   do_delete action now has exported attribute in ::Model::CDBI::Base
+   Fixed links in flox to cookbook (bug 22899)
+   Applied change from bug 14565
+
+2.12  22 June 2007 
+
+SVN revision 573
+
+Bug Fixes :
+   Fixed some db_colinfo test bugs
+   Fixed typo in edit form template
+   AsForm fixes to stringification _to_select
+   made DFV and FromCGI warn instead of die on unexpected cgi params
+   small improvements to some factory templates
+   fix to path handling in mod_perl and CGI when location ends in /
+   fixed template path ordering so i.e. /tablename/list is used before /list when provided with a tablename
+   fixed template path with array refs
+   fix to template being reset from path in plain templates (i.e. where no model), may affect those relying on the bug ( bug 23722 )
+   fix to display_line macro in factory templates (bug 22920)
+   fix to correct problem with LocationMatch and regex based Location directives in apache config.
+   fix to redirect_request
+   Fixed typo in _do_update_or_create (bug 26495)
+
+
+API additions and enhancements :
+   new Class::DBI::DFV based model
+   New config method : additional, for stashing additional info, especially from additional_data method
+   new warn method in maypole/request class/object, over-ridden by Apache::MVC, etc or own driver
+   new build_form_elements attribute for Maypole request and Maypole::Config, set it to 0 to avoid building cgi form if you don't need it
+   added CGI params to TT error template
+   improvements to factory templates
+   added search_columns method to base cdbi model class, provides display_columns unless over-ridden
+   added new hook - preprocess_location
+   added new attribute to Maypole::Config - request_options
+   improved pager template macro
+
+
+Internal additions and enhancements :
+   Inheritence simpler and nicer and less hacked
+   add_model_superclass method moves @ISA munging into the model
+   new test to check everything compiles
+   Model inheritance re-organised
+
+2.111 Mon 30 April 2007
+   - forked - see 2.111 changelog
+
+2.11 Mon 31 July 2006
+
+SVN revision 519
+
+Deprecated:
+    Directly accessing the attributes of the request object, or the parameters 
+    in $r->params, or anything else, is DEPRECATED and likely to break in future 
+    releases. Be good, and use proper method calls.
+
+    Maypole no longer uses Class::DBI::AsForm, instead Maypole::Model::CDBI::AsForm
+    has replaced it.
+
+    $config->{$table}{required_cols} is deprecated, please use $class->required_columns instead
+
+
+Incompatible API changes:
+    Maypole
+	 - is_applicable() deprecated for is_model_applicable(). is_applicable is
+         an alias for is_model_applicable now.
+    Maypole::Constants
+	 - ERROR constant now 500, previously -1 (bug #18901)
+    Maypole::Model
+	- delete and search actions are now deprecated - use do_search and do_delete
+	  instead
+    Maypole::View
+	- table name rather than moniker is used to find templates
+
+API additions and enhancements:
+    Maypole::Application:
+    	- -Init flag (wishlist 14123)
+        - recognises Maypole::HTTPD and installs Maypole::HTTPD::Frontend
+            as its frontend
+    Maypole::Headers:
+    	add() alias to push() (wishlist 14142)
+    Maypole:
+        - get_session() method (no-op)
+        - get_user() method (no-op)
+        - get_session() is called during handler_guts() before authenticate()
+        - new preprocess_path() method added and called by parse_path(), 
+	        parse_path() will leave any properties set by preprocess_path() in 
+            place
+        - start_request_hook() added
+        - status() attribute added (though only used by start_request_hook() 
+            so far)
+        - setup() split into setup(), setup_model(), and load_model_subclass()
+        - added new path processing methods for ssl and default table/action
+        - added make_path() 
+        - added make_uri()
+	- improved exception handling
+	- now uses File::MMagic::XS to guess mime type of output unless already set
+	- new component method provides Maypole::Component functionality
+	- new object method gets/sets first/only object in objects
+     Maypole::Model
+	- do_delete, do_search in place of delete/search actions
+     Maypole::View::TT:
+	- new report_error method
+	- new embedded error report page in __DATA__
+     Templates:
+        - Improved pager macro/include
+	- Improved factory templates
+        - added the status() attribute, although it's not used in many places 
+            yet
+	- Changed factory edit/view to use object instead of objects
+     Maypole::Model::CDBI
+	- improved error messages in do_edit action
+        - new required_columns mutator method
+        - new column_required accessor method
+
+Bug fixes:
+    Fix to cgi_maypole.t (bug 11346)
+    Fix to TT error reporting (bug 13991)
+    Template xhtml validation (bug 13975)
+    Apache2 fixes in Apache::MVC (bug 13888)
+    Fixed inheritance issues in Mp::Application - Mp::App now manipulates the 
+        caller's @ISA directly, and doesn't inject itself into the chain (bugs 
+        12923 & 14120)
+    Improved Template error reporting (14133)
+    Maypole::Session::generate_unique_id() now returns the id (bug 14124)
+    Moved ar accessor to Apache::MVC (bug 14014)
+    Refactored core to support further development in 2.11 and onwards
+    Fixed related_class() method (bug 14566)
+    Added a cgi() attribute in Maypole::CGI
+    Factory templates now less vulnerable to XSS (bug 16659)
+    Reduced risk of XSS in factory templates (bug 16659)
+    model search/delete methods in model and subclassing the cdbi mode (bug 16661)
+    fixed problems with stringify_self and untaint missing ignore columns (bug 15678)
+    fixed Maypole::Model::CDBI::Plain to JustWork(TM) with plain CDBI Classes (bug 16977)
+    some silent death scenarios resolved
+	Now initializes template_args, stash, parmas, objects and others to correct data type. (bug 15147)
+
+Documentation:
+    Fix to documentation for CGI::Maypole (bug 7263)
+    Simplified Net::Amazon example (bug 14073)
+    Numerous major and minor updates to docs.
+    Renamed Maypole::Manual::Request to Maypole::Manual::Cookbook
+	Added Maypole::Manual::Install, with material removed from 
+	    Maypole::Manual::About
+	Added Maypole::Manual::Inheritance
+	Added Maypole::Manual::Terminology
+        - updated Maypole::Manual::View
+        - updated Maypole::View:TT
+    Examples of fancy forms and templates using new features
+
+Requirements:
+   HTTP::Body now required
+   CGI::Untaint >= 1.26 now required rather than >= 0
+
+
+2.10 Tue 19 Jul 2005
+    Multiple Template Paths added ( http://rt.cpan.org/NoAuth/Bug.html?id=13447 )
+    Small fix to templates/factory/frontpage ( http://rt.cpan.org/NoAuth/Bug.html?id=11236 )
+    MasonX support in Maypole::Application ( https://rt.cpan.org/NoAuth/Bug.html?id=12383 )
+    Maypole::Model::CDBI::Plain / Maypole Config issue ( http://rt.cpan.org/NoAuth/Bug.html?id=11530 )
+    Repeat Submission detection support ( Bug #6500 )
+    Fix to setup_database in Maypole::Model::CDBI ( Bug #12384 )
+    Fix to plugin to allow Maypole::Plugin::Config::YAML to work
+    Fix to Maypole::Model::CDBI order sub from list
+    Improvement to primary display column using CDBI
+    Improved efficiency of finding stringified columns using new classmetadata field
+    Fixed BeerDB to untaint pub fields
+
+    Additional Requirements : Digest::MD5
+
+2.09  Mon Jan 25 22:00:00 2005
+    Fixes:
+    - Fixed plugin inheritance set up by Maypole::Application, added tests
+
+    Templates:
+    - factory/addnew will only prefill values when there's a row creation error
+
+
+2.08  Mon Jan 24 20:45:00 2005
+    - Added $r->config->template_extension() to set optional file extension
+      for templates (Dave Howorth)
+
+    Fixes:
+    - Maypole::Application adds plugin classes to caller's @ISA (Marcus Ramberg)
+    - FETCH_CODE_ATRIBUTES in M::M::Base should return an empty list if there
+      are no attributes
+    - M::M::CDBI will warn() about Class::DBI::FromCGI errors
+    
+
+2.07  Sun Jan 16 18:45:00 2005
+    (This version was not uploaded to CPAN)
+
+    Internal changes:
+    - Removed Maypole::Model->description. It didn't work as expected and
+      clashed with 'description' columns in the database
+
+    Fixes:
+    - Model->process() shouldn't set $r->objects() to a list with a single,
+      undefined element
+    - Fixed overriding $r->template_args->{classmetadata} in M::V::Base
+      (Thanks to Dave Howorth for spotting the mistake)
+    - #9473: Maypole::Model::CDBI->related_class (Thanks David Baird)
+    - #9434: M::M::CDBI->search generated "uninitialized value" warnings
+
+    Templates:
+    - The addnew template will attempt to prefill form fields with request
+      parameters
+    - edit template includes 'addnew' if there is no object to edit
+
+2.06  Wed Dec 29 01:30:00 2004
+    Fixes:
+    - Minor restructuring of the manual so search.cpan.org indexes it better
+    - #9129: Skip t/apache_mvc.t if Apache::Request isn't installed
+    
+
+2.05  Fri Dec 24 03:20:00 2004
+    - Revised and updated documentation. Many thanks to Dave Howorth for his
+      hard work and 120kb documentation patches.
+    - Added support for request and response HTTP headers with
+      $r->headers_in & $r->headers_out (Maypole::Headers)
+    - Support for compound primary keys for Maypole::Model::CDBI classes
+    - Template toolkit objects are configurable with M::Config->view_options
+    - Templating performance should be improved when running Maypole with
+      mod_perl since compiled templates remain in memory. CGI users can use
+      TT2's COMPILE_DIR or COMPILE_EXT options with
+      Maypole::Config->view_options to improve performance
+
+    Internal changes:
+    - Added a new override for the model: fetch_objects(). 
+    - 'classmetadata' template variables can now be overriden individually
+    - New unit tests for Maypole, CGI::Maypole, Maypole::Headers, and others.
+      More to come.
+
+    Fixes:
+    - Maypole::CLI is more tolerant of trailing slashes in the request/uri_base
+    - fixed a bug in CGI::Maypole::parse_location() (Dave Howorth)
+    - Also applied that fix to Apache::MVC (Marcus Ramberg)
+    - some fixes for Maypole::Config, Maypole::Model::Base and
+      Maypole::Model::CDBI::Plain (Dave Howorth)
+    - Documented adding new accessors to Maypole::Config
+    - Added Apache::RequestIO to Apache::MVC (michael#diaspora.gen.nz)
+    - Applied patch to fix length of utf8 documents.
+    - support compound primary keys in CDBI fetch_objects.
+    - Check if has_a actually points to a Maypole::Model (Dave Howorth)
+    - Make test suite work with DBD::SQLite2
+    - default search() action removes empty fields from search parameters
+    - #6622 - Maypole::Application will create a separate Maypole::Config for
+      each application (instead of the current workaround for multiple apps
+      under mod_perl)
+    - #7643 - improve M::V::Base's error() messages. prefix error with label,
+      and carp()
+    - #7651 - minor POD improvements in M::M::CDBI (Dave Howorth)
+    - #7834 - minor POD update in M::M::CDBI (Kevin Connor)
+    - #7917 - if do_edit fails for object creation, try again with the correct
+      template (addnew)
+    - #7930 - handle Class::DBI constraint failures in do_edit. 
+
+    Templates:
+    - add support for compound primary keys in factory templates
+      (Dagfinn Ilmari Mannsåker)
+    - Only show buttons for public actions.
+      (Dagfinn Ilmari Mannsåker)
+    - Split the meat of the view template off to a view_item macro.
+    - New login template
+    - Other assorted css/template fixes
+
+
+2.04  Tue Oct 27 14:00:00 2004
+    - fixed Apache::MVC version (Randal Schwartz)
+    - fixed template_args (Dave Howorth)
+    - new Maypole::Config documentation (Dave Howorth)
+    - Maypole::Model::Base::process() no more steals you the first
+      arg after fetching objects
+
+2.03  Tue Oct 26 13:00:00 2004
+    - increased version number of Apache::MVC
+    - fixed display_tables bug (Steve Simms)
+    - fixed templates, now again XHTML compliant
+    - documentation fix (Dave Howorth)
+    - only set charset for text/*
+
+2.02  Mon Oct 25 13:00:00 2004
+    - Fixed charset in http header.
+    - replaced action links with forms in factory templates
+
+2.01  Sun Oct 24 14:50:00 2004
+    - documentation fix to make t/03podcoverage happy
+
+2.0   Fri Oct 22 20:00:00 2004
+    - added parse_args() (Simon Flack)
+    - call additional_data() and authenticate() for plain templates
+    - merged Apache2::MVC (mod_perl2 support) into Apache::MVC
+    - added Maypole::Application universal front-end
+    - config parameter handling for Maypole::Model::CDBI
+    - $r->{query} is now deprecated, use $r->{params} for GET and POST
+    - fixed multiple value handling (Simon Flack)
+    - added exception handling (Simon Flack)
+    - fixed documentation bugs
+    - changed default documentencoding to utf8. Change with 
+      $r->config->{document_encoding}
+    - removed Maypole::View::Mason as it's distributed separately on CPAN.
+    - factory templates are now XHTML 1.1 compliant.
+    - made the config hash into -> Maypole::Config
+    - accessors for everything
+    - win32 support
+    - new documentation for Maypole.pm (Simon Flack)
+    - moved doc/*.pod to lib/Maypole/Manual
+    - added Maypole::Model::Base::is_public() to make it simple to overload
+      :Exported behavior
+    - added support for replacing use base qw/All My Modules/ with 
+      use Maypole::Application qw/Redirect AnotherPlugin/; note that this 
+      will only triggers with parameters to import, to preserve backwards
+      compability.
+    - fixed search ordering in Maypole::Model::CDBI and parameter
+      handling in CGI::Maypole (Dave Slack)
+    - sweet new factory templates (Danijel Milicevic)
+    - zero search fix (Dave Slack)
+
+1.7   Sat Jul 17 20:15:26 BST 2004
+    - Emergency release - we lost the "use Maypole::Constants" from
+      CLI.pm somehow
+
+1.6   Fri Jul 16 23:51:21 BST 2004
+    - Two very trivial fixes:
+    - Put ::Plain in the MANIFEST, so it actually ships this time
+    - Make CLI test == OK, not just true
+
+1.5   Mon Jun 21 14:36:54 BST 2004
+    - CLI mode correctly uses Constants module
+    - Template footers as well as headers (Markus Ramberg)
+    - Fix problems on failed object create (Jesse Sheidlower)
+    - Fix related() to deal with latest version of Class::DBI (Markus)
+    - Add sample CSS to distribution
+    - Maypole::Model::CDBI::Plain, for those who already have a CDBI set
+      of classes set up
+    - Friendlier errors when a template can't be found
+    - Don't authenticate without a model class
+    - #6569 Passing DBI options in setup() (Mickael Joanne)
+    - #6571 User-defined ok_tables: patch
+    - #6572 Makefile patch: require up-to-date CBDI::AsForm (Markus Ramberg)
+    - #6573 Set empty params to '' instead of undef (Jody Belka)
+    - #6617 Required cols patch in CDBI.pm (Jesse Sheidlower)
+
+1.4   Fri Apr 16 18:11:41 BST 2004
+    - Much, much more documentation
+    - CLI debugging mode
+    - CGI frontend (CGI::Maypole)
+    - Beginnings of a test suite
+    - Maypole::Constants module to remove dependency on Apache
+    - Refactoring of view classes to base/module-specific modules
+    - HTML::Mason view class
+    - Various small template bug fixes and enhancements
+
+1.3   Fri Mar 26 19:16:33 GMT 2004
+    - Fix serious order/CDBI::Page interaction bug.
+    - Die if model/view class can't be compiled.
+
+1.2   Thu Mar 25 12:35:21 GMT 2004
+    - Ensure safety when dereferencing any ->objects
+    - Support for the "frontpage" template
+    - Maypole itself no longer uses ->{ar}, which is now completely
+      refactored into the Apache::MVC class
+    - The beginnings of the documentation framework
+    - Support for paging and ordering in searches
+    - Stringify column changed from magic "name" to customizable
+      property
+    - Move BeerDB to ex/
+    - Fix SQLite dependency
+
+1.1   Wed Feb 25 10:29:25 GMT 2004
+    - Update CDBIL dependency
+    - Don't stringify to "name" if there isn't one
+    - Better support for authentication and template changes
+    - Full set of templates
+    - Allow passing of username and password to ->setup
+    - display_columns method
+
+1.0   Wed Feb 11 17:34:12 GMT 2004
+    - Renamed from Apache::MVC to Maypole.
+    - Clearer separation of model and view classes from controller
+    - Factoring out of Apache-specific code back into Apache::MVC
+
+0.2   Thu Feb  5 18:03:33 GMT 2004
+    - This release adds paging of list results and ordering by column
+      (ascending and descending)
+
+0.01  Thu Jan  8 15:50:17 2004
+	- original version; created by h2xs 1.22 with options
+		-AX -b 5.6.0 -n Apache::MVC
+

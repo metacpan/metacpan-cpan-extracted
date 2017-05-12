@@ -1,0 +1,34 @@
+---
+abstract: 'shadow attributes of contained objects'
+author:
+  - 'Smithsonian Astrophysical Observatory'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Moo: 0
+  Test::Deep: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooX-Attributes-Shadow
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Moo: 0
+  Moo::Role: 0
+  Params::Check: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Attributes-Shadow
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: https://bitbucket.org/djerius/moox-attributes-shadow
+version: 0.03

@@ -1,0 +1,42 @@
+
+The easiest way to install
+
+    perl -MCPAN -e 'install MP3::Daemon'
+
+But there's a caveat
+
+    You need to install a specially hacked up mpg123 that comes
+    with Audio::Play::MPG123 for the MP3::Daemon::* modules to
+    work optimally.
+    
+Public Service Announcement
+
+    If you've never used the CPAN shell before, here are a few
+    tips on getting it configured properly.  Certain older versions
+    of CPAN.pm would take the liberty of installing whole new versions
+    of the perl interpreter for you which is not something most people
+    want or need.  This behaviour can be prevented by taking the
+    following steps.
+
+    Type the text between the [ ].
+
+    O-> [perl -MCPAN -e 'shell']
+        |
+        `-> if it's your first time running this, you get to
+            answer a few simple questions.  Go ahead and do
+            this.  The defaults are sane. -.
+                                           |
+        if you are a debian user, <--------'
+        |  [o conf make_install_arg UNINST=1]
+        |
+        `-> [install CPAN]
+            |
+            `-> [reload CPAN]
+                |
+                `-> [install Bundle::CPAN]
+                    |
+                 ,--'  
+                 o
+                 +
+                 FINISHED
+

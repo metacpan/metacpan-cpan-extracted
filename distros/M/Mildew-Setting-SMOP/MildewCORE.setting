@@ -1,0 +1,686 @@
+my module MildewCORE;
+
+use adhoc-signatures;
+
+
+##HACK
+$LexicalPrelude{'&True'} := sub {::True}
+$LexicalPrelude{'&False'} := sub {::False}
+
+my knowhow int {
+    method ACCEPTS($thing) {
+        PRIMITIVES::ritest((|$thing),PRIMITIVES::SMOP_RI(2));
+    }
+}
+
+my sub return(|$capture) {
+    my $e = ::ControlExceptionReturn.new();
+    $e.capture = $capture;
+    $e.routine = CALLER::<&?ROUTINE>;
+    $e.throw;
+}
+
+
+
+
+############## Operators ##############
+
+# TODO change binds to sub definitions
+
+$LexicalPrelude{'&infix:+:(int,int)'} := sub ($a,$b) {
+    PRIMITIVES::int_add($a.FETCH,$b.FETCH);
+}
+
+$LexicalPrelude{'&infix:<:(int,int)'} := sub ($a,$b) {
+    PRIMITIVES::int_less($a.FETCH,$b.FETCH);
+}
+
+$LexicalPrelude{'&infix:-:(int,int)'} := sub ($a,$b) {
+    PRIMITIVES::int_substract($a.FETCH,$b.FETCH);
+}
+
+$LexicalPrelude{'&infix:==:(int,int)'} := sub ($a,$b) {
+    PRIMITIVES::int_equal($a.FETCH,$b.FETCH);
+}
+
+$LexicalPrelude{'&infix:~'} := sub (|$capture) {
+    my $i = 0;
+    my $str = '';
+    loop {
+        if &infix:<==>:(int,int)($i.FETCH,$capture.elems) {
+            return $str.FETCH;
+        } else {
+           $str = PRIMITIVES::idconst_concat($str.FETCH,$capture.positional($i.FETCH).FETCH.Str);
+           $i = &infix:<+>:(int,int)($i.FETCH,1);
+        }
+    }
+}
+$LexicalPrelude{'&infix:eq'} := sub ($a,$b) {
+    PRIMITIVES::idconst_eq($a.Str,$b.Str);
+}
+$LexicalPrelude{'&infix:ne'} := sub ($a,$b) {
+    if PRIMITIVES::idconst_eq($a.Str,$b.Str) {
+        False;
+    } else {
+        True;
+    }
+}
+$LexicalPrelude{'&postfix:++'} := sub ($a) {
+    $a = &infix:<+>:(int,int)($a,1);
+}
+$LexicalPrelude{'&prefix:++'} := sub ($a) {
+    my $old = $a;
+    $a = &infix:<+>:(int,int)($a,1);
+    $old;
+}
+
+############## RoleHOW ##############
+
+my sub copy_methods($dst,$src) {
+    map(sub ($key) {
+        $dst.^!methods{$key.FETCH} = $src.^!methods{$key.FETCH};
+    },$src.^!methods.keys);
+}
+my sub copy_does($dst,$src) {
+    my $i = 0;
+    loop {
+        if &infix:<==>:(int,int)($i,$src.^!does.elems) {
+            return;
+        } else {
+            $dst.^!does[$i.FETCH] = $src.^!does[$i.FETCH];
+            $i = &infix:<+>:(int,int)($i.FETCH,1);
+        }
+    }
+}
+my sub compose_role($obj,$role) {
+    $obj.^!does.push((|$role));
+    map(sub ($key) {
+        if $obj.^!methods{$key.FETCH} {
+            ::Exception.new.throw;
+        }
+        $obj.^add_method($key.FETCH,$role.^!methods{$key.FETCH}.FETCH);
+    },$role.^!methods.keys);
+}
+my knowhow RoleHOW {
+    method add_attribute($object, $privname, $attribute) {
+        $object.^!attributes{$privname.FETCH} = $attribute;
+    }
+    method compose_role($object, $role) {
+        compose_role($object,$role);
+    }
+    method add_method($object, $name, $code) {
+        $object.^!methods{$name.FETCH} = $code
+    }
+    method dispatch($object, $identifier, \$capture) {
+        if PRIMITIVES::idconst_eq($identifier.FETCH,'FETCH') {
+            # in item context, returns itself.
+            (|$object);
+        } else {
+            # Roles are not classes! so we're going to delegate this to a
+            # punned class that does this role. For now, we're going to pun a
+            # new class every time, then we'll think in some sort of caching.
+            my $punned;
+            if $object.^!instance_storage.exists('CACHED_PUNNED_CLASS') {
+                $punned = $object.^!instance_storage{'CACHED_PUNNED_CLASS'};
+            } else {
+                my $class = ::p6opaque.^!CREATE;
+                $class.^!how = ::PrototypeHOW;
+
+                #XXX is it right?
+                $class.^!who = $object.^!who;
+
+                $class.^!does.push((|$object));
+    #            $class.^compose_role(::LowObject);
+    #            $class.^compose_role($object);
+                copy_methods($class,::LowObject);
+                copy_methods($class,$object);
+                $punned = $class;
+                $object.^!instance_storage{'CACHED_PUNNED_CLASS'} = $class;
+            }
+            my $delegated = ::Scalar.new($capture.delegate($punned.FETCH));
+            return $punned.^dispatch($identifier.FETCH, (|$delegated));
+        }
+    }
+}
+my role LowObject {
+    method new() {
+        my $obj = ::p6opaque.^!CREATE;
+        $obj.^!how = self.^!how;
+        $obj.^!who = self.^!who;
+        copy_methods($obj,self);
+        copy_does($obj,self);
+        if $obj.^!methods{'BUILDALL'} {
+            $obj.BUILDALL;
+        }
+        $obj;
+    }
+    method ACCEPTS($obj) {
+        my $role = self.^!does[0];
+        my $does = False;
+        map(sub ($r) {
+            if PRIMITIVES::pointer_equal((|$role),(|$r)) {
+                $does = True;
+            } elsif self.ACCEPTS($r) {
+                $does = True;
+            }
+        },$obj.^!does);
+        $does;
+    }
+}
+
+############## basic subroutines ##############
+
+my sub map($expression,$values) {
+    my $i = 0;
+    my $ret = ::Array.new;
+    loop {
+        if &infix:<==>:(int,int)($i,$values.elems) {
+            return $ret;
+        } else {
+           $ret.push((|$expression($values[$i.FETCH])));
+           $i = &infix:<+>:(int,int)($i.FETCH,1);
+        }
+    }
+}
+
+my sub grep($expression,$values) {
+    my $i = 0;
+    my $ret = ::Array.new;
+    loop {
+        if &infix:<==>:(int,int)($i,$values.elems) {
+            return $ret;
+        } else {
+           if ($expression($values[$i.FETCH])) {
+              $ret.push($values[$i.FETCH].FETCH);
+           } else {
+           }
+           $i = &infix:<+>:(int,int)($i.FETCH,1);
+        }
+    }
+}
+
+my sub say(|$capture) {
+    my $i = 0;
+    loop {
+        if &infix:<==>:(int,int)($i,$capture.elems) {
+            $OUT.print("\n");
+            return;
+        } else {
+           $OUT.print($capture.positional($i.FETCH).Str);
+           $i = &infix:<+>:(int,int)($i.FETCH,1);
+        }
+    }
+}
+
+my sub print(|$capture) {
+    my $i = 0;
+    loop {
+        if &infix:<==>:(int,int)($i,$capture.elems) {
+            return;
+        } else {
+           $OUT.print($capture.positional($i.FETCH).Str);
+           $i = &infix:<+>:(int,int)($i.FETCH,1);
+        }
+    }
+}
+
+my sub not($thing) {
+    if $thing {
+        ::False;
+    } else {
+        ::True;
+    }
+}
+$LexicalPrelude{'&prefix:not'} := &not;
+$LexicalPrelude{'&prefix:!'} := &not;
+
+############## Signatures ##############
+
+my role ReadonlyWrapper {
+    has $.value;
+    method FETCH() {
+        (|$!value);
+    }
+    method STORE($value) {
+        ::Exception.new.throw;
+    }
+}
+
+my role Signature {
+    has $.params is rw;
+    method ACCEPTS(\$capture) {
+        my $i = 0;
+        my $named = 0;
+        my $ok = True;
+        {
+            map(sub ($param) {
+                if $param.ACCEPTS_param($capture,$i,$named) {
+                } else {
+                    ::Exception.new.throw;
+                }
+            },self.params);
+            CATCH {
+                $ok = False;
+            }
+        }
+
+        if &infix:<==>:(int,int)($i,$capture.elems) {
+            if &infix:<==>:(int,int)($named,$capture.named_count) {
+                $ok;
+            } else {
+                False;
+            }
+        } else {
+            False;
+        }
+    }
+    method BIND(\$capture,$scope) {
+        my $i = 0;
+        map(sub ($param) {
+            $param.BIND($scope,$capture,$i);
+        },self.params);
+    }
+    method BUILDALL() {
+        self.params = ::Array.new;
+    }
+    method compare($other) {
+        my $i = 0;
+
+        my $pos_self = grep(sub ($param) {::Positional.ACCEPTS($param.FETCH)},self.params);
+
+        my $pos_other = grep(sub ($param) {::Positional.ACCEPTS($param.FETCH)},$other.params);
+
+        if &infix:<==>:(int,int)($pos_self.elems,$pos_other.elems) {
+        } else {
+            return 0;
+        }
+        loop {
+            if &infix:<==>:(int,int)($i,$pos_self.elems) {
+                return 0;
+            } else {
+                my $cmp = $pos_self[$i.FETCH].compare($pos_other[$i.FETCH]);
+                if &infix:<==>:(int,int)($cmp,0) {
+                } else {
+                    return $cmp;
+                }
+                $i = &infix:<+>:(int,int)($i,1);
+            }
+        }
+    }
+    method perl() {
+        ":(" ~ self.params[0].perl ~ "...)";
+    }
+}
+
+
+my role Param {
+    has $.variable;
+    has $.default_value;
+    has $.type;
+    method BUILDALL() {
+        $.type = ::Any.new;
+    }
+    method register($sig) {
+        $sig.params.push((|self));
+    }
+}
+my role Positional {
+    Positional.^compose_role(::Param);
+    has $.name;
+    method BIND($scope,$capture,$i is ref) {
+        if $capture.named($.name.FETCH) {
+            if self.variable {
+                $scope{self.variable.FETCH} := self.wrap($capture.named($.name.FETCH));
+            }
+        } elsif &infix:<<<>>:(int,int)($i,$capture.elems) {
+            if self.variable {
+                $scope{self.variable.FETCH} := self.wrap($capture.positional($i.FETCH));
+            }
+            $i = &infix:<+>:(int,int)($i.FETCH,1);
+        } elsif self.default_value {
+            my $default_value = self.default_value;
+            if self.variable {
+                $scope{self.variable.FETCH} := self.wrap($default_value());
+            }
+        } else {
+            return False;
+        }
+        True;
+    }
+    method ACCEPTS_param($capture,$i is ref,$named is ref) {
+        if $capture.named($.name.FETCH) {
+            $named = &infix:<+>:(int,int)($named.FETCH,1);
+        } elsif &infix:<<<>>:(int,int)($i,$capture.elems) {
+            if $.type.ACCEPTS($capture.positional($i.FETCH)) {
+                $i = &infix:<+>:(int,int)($i,1);
+            } else {
+                return False;
+            }
+        } elsif self.default_value {
+            return True;
+        } else {
+            return False;
+        }
+        True;
+    }
+    method compare($other) {
+        if $other.type.ACCEPTS(self.type) {
+            if self.type.ACCEPTS($other.type) {
+                return 0;
+            } else {
+                return &infix:<->:(int,int)(0,1);
+            }
+        } else {
+            if self.type.ACCEPTS($other.type) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+    }
+}
+my role RefParam {
+    RefParam.^compose_role(::Positional);
+    method wrap($arg) {
+        $arg;
+    }
+}
+my role ReadonlyParam {
+    ReadonlyParam.^compose_role(::Positional);
+    method wrap($arg) {
+        my $wrapper = ReadonlyWrapper.new;
+        $wrapper.value = $arg;
+        $wrapper.^!is_container = 1;
+        $wrapper.FETCH;
+        (|$wrapper);
+    }
+    method perl() {
+        self.variable
+    }
+}
+
+my role NamedReadonlyParam {
+    NamedReadonlyParam.^compose_role(::Param);
+    has $.name;
+    method BIND($scope,$capture,$i) {
+        my $arg = $capture.named(self.name.FETCH);
+        my $wrapper = ReadonlyWrapper.new;
+        $wrapper.value = $arg;
+        $wrapper.^!is_container = 1;
+        $wrapper.FETCH;
+        $scope{self.variable.FETCH} := (|$wrapper);
+    }
+    method ACCEPTS_param($capture,$i is ref,$named is ref) {
+        if $capture.named($.name.FETCH) {
+            $named = &infix:<+>:(int,int)($named.FETCH,1);
+        }
+        True;
+    }
+}
+my role WholeCaptureParam {
+    has $.name;
+    WholeCaptureParam.^compose_role(::Param);
+    method ACCEPTS_param($capture,$i is ref,$named is ref) {
+        $i = $capture.elems;
+        $named = $capture.named_count;
+    }
+    method BIND($scope,$capture,$i) {
+        $scope{self.variable.FETCH} = $capture;
+    }
+}
+############## Exception ##############
+my role Exception {
+    method throw() {
+        my $interpreter = PRIMITIVES::get_interpreter;
+        my $current = $interpreter.continuation;
+        loop {
+            if ($current.back) {
+                $current = $current.back;
+                if ($current.catch) {
+                    $current.catch.postcircumfix:<( )>(::capture.new(self),:cc($current.back));
+                } else {
+                }
+            } else {
+                say "uncaught exception";
+                return;
+            }
+        }
+    }
+}
+
+############## Any ##############
+
+my role Any {
+    method ACCEPTS() {
+        True;
+    }
+}
+
+############## Multi ##############
+
+my role Multi {
+    has $.candidates;
+    has $.sorted_candidates is rw;
+
+    my sub qsort($array) {
+        if &infix:<==>:(int,int)($array.elems,0) {
+            ::Array.new;
+        } else {
+            my $partition = $array[0].signature;
+
+            my $left  = qsort(grep sub ($elem) {&infix:<==>:(int,int)($elem.signature.compare($partition),&infix:<->:(int,int)(0,1))},$array);
+            my $equal = grep(sub ($elem) {&infix:<==>:(int,int)($elem.signature.compare($partition),0)},$array);
+            my $right = qsort(grep sub ($elem) {&infix:<==>:(int,int)($elem.signature.compare($partition),1)},$array);
+    
+            my $result = ::Array.new;
+            map(sub ($x) {$result.push($x.FETCH)},$left);
+            map(sub ($x) {$result.push($x.FETCH)},$equal);
+            map(sub ($x) {$result.push($x.FETCH)},$right);
+            $result;
+        }
+    }
+    method postcircumfix:<( )>(\$capture, :$cc) {
+        my sub ACCEPTS($candidate) {
+            $candidate.signature.ACCEPTS((|$capture));
+        }
+        if self.sorted_candidates {
+        } else {
+
+            self.sorted_candidates = qsort(self.candidates);
+        }
+
+        my $candidates = grep &ACCEPTS,self.sorted_candidates;
+
+        if &infix:<==>:(int,int)($candidates.elems,1) {
+            $candidates[0].postcircumfix:<( )>((|$capture), :cc($cc.FETCH));
+        } elsif &infix:<==>:(int,int)($candidates.elems,0) {
+            say "signature mismatch failure";
+           ::Exception.new.throw;
+           #my $e = ::SignatureMismatchFailure.new();
+           #$e.multi = self;
+           #$e.capture = $capture;
+           #$e.throw;
+#
+        } elsif &infix:<==>:(int,int)($candidates[0].signature.compare($candidates[1].signature),&infix:<->:(int,int)(0,1)) {
+            $candidates[0].postcircumfix:<( )>((|$capture), :cc($cc.FETCH));
+        } else {
+            say "ambiguous dispatch";
+            say $candidates[0].signature.compare($candidates[1].signature);
+            ::Exception.new.throw;
+            #my $e = ::AmbiguousDispatchFailure.new();
+            #$e.multi = self;
+            #$e.capture = $capture;
+            #$e.candidates = $candidates;
+            #$e.throw;
+        }
+    }
+    method BUILDALL() {
+        self.candidates = ::Array.new;
+    }
+    method get_outer_candidates($name,$scope) {
+        my $outer = $scope.outer;
+        loop {
+            if not($outer) { 
+                return
+            }
+            if $outer.exists((|$name)) {
+                my $i = 0;
+                my $multi = $outer.lookup((|$name));
+                map(sub ($candidate) {self.candidates.push((|$candidate))},$multi.candidates);
+                return;
+            } else {
+                if $outer.outer {
+                    $outer = $outer.outer;
+                } else {
+                    return;
+                }
+            }
+        }
+    }
+}
+
+############## fail ##############
+my role Failure {
+    has $.handled;
+    has $.exception;
+    method true() {
+        $.handled = True;
+        False;
+    }
+    method defined() {
+        $.handled = True;
+        False;
+    }
+    method FETCH() {
+        self;
+    }
+    method throw() {
+        $.exception.throw;
+    }
+    # UNKNOWN_METHOD is a spec def
+    method UNKNOWN_METHOD($identifier) {
+        $.exception.throw;
+    }
+}
+my role DollarBang {
+    has @.failures;
+    method cleanup() {
+        map(sub ($failure) {
+            if ($failure.handled) {
+            } else {
+                $failure.throw;
+            }
+        },self.failures);
+    }
+}
+my sub fail {
+    my $failure = Failure.new;
+    $failure.exception = ::Exception.new;
+    $failure;
+    my $e = ::ControlExceptionReturn.new();
+    $e.capture = $failure;
+    $e.routine = CALLER::<&?ROUTINE>;
+    $e.throw;
+}
+
+############## ModuleLoader ##############
+
+my role ModuleLoader {
+    has $.cache;
+    my $loader = ::MildewSOLoader.new;
+    method load($module) {
+        my $filename = self.resolve_filename($module);
+        if $.cache{$filename.FETCH} {
+        } else {
+            $.cache{$filename.FETCH} = $loader.load($filename.FETCH,$LexicalPrelude.FETCH);
+        }
+        $.cache{$filename.FETCH};
+    }
+    method resolve_filename($module) {
+        $module ~ '.mildew.so'
+    }
+    method BUILDALL() {
+        $.cache = ::Hash.new;
+    }
+}
+
+
+############## Perl5 interop ##############
+my knowhow EXTERNAL {
+    my $p5;
+    sub use_from_perl5($module) {
+        unless $p5 {
+            $p5 := ::P5Interpreter.new;
+        }
+        $p5.eval(PRIMITIVES::idconst_concat('use ',$module.FETCH));
+        $p5.eval(PRIMITIVES::idconst_concat(PRIMITIVES::idconst_concat("'",$module.FETCH),"'"));
+    }
+    sub eval_perl5($code) {
+        unless $p5 {
+            $p5 := ::P5Interpreter.new;
+        }
+        $p5.eval($code.FETCH.FETCH);
+    }
+}
+
+############## int ##############
+no adhoc-signatures;
+
+my role int {
+    method ACCEPTS($thing) {
+        PRIMITIVES::ritest((|$thing),PRIMITIVES::SMOP_RI(2));
+    }
+}
+
+my multi infix:<==>(int $a,int $b) {
+    &infix:<==>:(int,int)($a,$b);
+}
+
+my multi infix:<!=>(int $a,int $b) {
+    if &infix:<==>:(int,int)($a,$b) {
+        False;
+    } else {
+        True;
+    }
+}
+my multi infix:<+>(int $a,int $b) {
+    &infix:<+>:(int,int)($a,$b);
+}
+my multi infix:<->(int $a,int $b) {
+    &infix:<->:(int,int)($a,$b);
+}
+my multi prefix:<->(int $a) {
+    &infix:<->:(int,int)(0,$a);
+}
+
+#HACK we don't support such fancy multi names so we bind to $LexicalPrelude
+{
+#TODO fix multi infix:<\<> {...}
+my multi less(int $a,int $b) {
+    &infix:<<<>>:(int,int)($a,$b);
+}
+my multi more(int $a,int $b) {
+    if &infix:<<<>>:(int,int)($a,$b) {
+        False;
+    } elsif &infix:<==>:(int,int)($a,$b) {
+        False;
+    } else {
+        True;
+    }
+}
+#TODO fix multi infix:<\<> {...}
+my multi less_or_equal(int $a,int $b) {
+    &infix:<<<>>:(int,int)($a,$b) || &infix:<==>:(int,int)($a,$b);
+}
+my multi more_or_equal(int $a,int $b) {
+    not(&infix:<<<>>:(int,int)($a,$b));
+}
+
+$LexicalPrelude{'&infix:<='} := &less_or_equal;
+$LexicalPrelude{'&infix:>='} := &more_or_equal;
+$LexicalPrelude{'&infix:<'} := &less;
+$LexicalPrelude{'&infix:>'} := &more;
+
+}
+
+{YOU_ARE_HERE};

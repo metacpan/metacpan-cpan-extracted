@@ -1,0 +1,4 @@
+tell application "Finder"
+	set myDisks to every disk where startup is true
+	return name of item 1 of myDisks
+end tell

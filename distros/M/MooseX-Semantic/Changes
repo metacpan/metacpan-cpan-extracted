@@ -1,0 +1,14 @@
+0.005	2012-04-06
+    * Missing dependencies (MXR::Parametrized, Sort::Naturally)
+0.004   2012-03-31
+    * fixed some tests
+    * missing requirements
+0.003   2012-03-27
+    * Handling of models as attribute isa
+    * Role for Named Graphs
+    * Convenience Role for Import&Export&RdfType
+    * Basic support for MooseX::Types typedecorators in TypeConstraintWalker
+0.002   2011-12-27
+    * Fix build errors (missing dependencies)
+0.001   2011-12-23
+    * Initial release

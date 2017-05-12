@@ -1,0 +1,12 @@
+^t/log
+^Mail-SpamAssassin-Plugin-OpenPGP-
+^_build
+^Build$
+^blib
+~$
+\.bak$
+CVS
+\.svn
+^t/data/01_test_rules.cf$
+t/gpg-home/secring.gpg
+t/gpg-home/trustdb.gpg

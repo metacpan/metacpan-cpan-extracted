@@ -1,0 +1,99 @@
+v1.0.0    2016-08-04 11:01:52-05:00 America/Chicago
+    - Updated test suite to reflect new non-wildcarded .cy
+    - Added .il to test suite
+    - Updated bundled list to latest version (revision 3f3caef756b3).
+    - Whimsy: 1.0.0 release, hooray!
+
+v0.1.19   2014-07-23 10:54:13-05:00 America/Chicago
+    - Explicitly added IO::File build dependency (thanks whillipmoore).
+    - Updated bundled list to latest version (revision 131f3403a484).
+
+v0.1.18   2014-03-19 14:24:53-05:00 America/Chicago
+    - Fixed issue preventing suffixes with characters outside the ASCII range
+      from being added to the rule list.
+    - Corrected some factual errors in the POD.
+    - Updated bundled list to latest version (revision ba86f988fb17).
+
+v0.1.17   2014-01-28 16:26:34-06:00 America/Chicago
+    - Fixed another failure to match domain names according to RFC 1123
+      (thanks mbroadhead).
+    - Updated bundled list to latest version (revision a09fae6633f3).
+
+v0.1.16   2013-09-30 05:40:31 America/Chicago
+    - Updated bundled list to latest version (revision 06c405ba54b3).
+    - Updated tests to meet requirements of new list (thanks yaneti on
+      GitHub).
+
+v0.1.15   2013-05-18 19:12:39 America/Chicago
+    - Fixed a bug that was yielding incorrect results for some exception rules
+      (especially those governing jp and om).
+
+v0.1.14   2013-05-17 11:02:41 America/Chicago
+    - Updated bundled list to latest version (revision 481e9a3d1cf2).
+    - Cleaned up distribution, pruning dist.ini and perlcritic.rc.
+    - Change returns to have no argument in accordance with PBP.
+
+v0.1.13   2013-03-06 15:22:50 America/Chicago
+    - Made Build.PL safe to run multiple times (thanks wphillipmoore).
+
+v0.1.12   2013-02-20 11:34:41 America/Chicago
+    - Changed to return undef (instead of croaking) if a passed domain name is
+      not well-formed.
+    - Changed build script to always ask if the latest list should be downloaded
+      (still defaults to "N").
+    - Updated bundled list to latest version (revision 3af9909a49e4).
+
+v0.1.11   2013-01-16 17:05:57 America/Chicago
+    - Updated bundled list to latest version.
+
+v0.1.10   2012-10-08 21:39:28 America/Chicago
+    - Permitted domains to have a leading digit per RFC 1123.
+
+v0.1.9    2012-10-08 21:34:26 America/Chicago
+    - Removed dependency on Regexp::Common, as it is relying on a supersceded
+      RFC for its domain name regular expression.
+    - Updated bundled list to latest version (revision 12b5f4b2f299).
+
+v0.1.8    2012-08-29 14:06:38 America/Chicago
+    - Updated bundled list to latest version.
+    - Adjusted .jp tests to match new list rules.
+    - Abandoned awful lispish syntax experiment (sorry).
+    - Changed default for downloading new public suffix list on install to "no."
+
+v0.1.7    2012-06-28 08:46:41 America/Chicago
+    - Untabified.
+    - Readded excluded author/release tests.
+    - Updated bundled list to latest version.
+    - Changed license to MIT.
+
+v0.1.6    2012-03-31 17:28:34 America/Chicago
+    - Updated bundled list to latest version.
+
+v0.1.5    2012-03-19 14:57:20 America/Chicago
+    - Explicitly declared configure_requires module not added to core until
+      Perl v5.14.
+
+v0.1.4    2012-03-14 10:35:21 America/Chicago
+    - Remove undeclared core dependency; "parent" not added until Perl v5.10.1
+
+v0.1.3    2012-03-13 00:39:30 America/Chicago
+    - Gave up a little speed to validate well-formedness of domain.
+    - Via well-formedness validation, re-added croaking for domains with leading
+      dots.
+
+v0.1.2    2012-03-12 19:25:09 America/Chicago
+    - Algorithm optimized further-still.
+    - Removed rule causing a croak on domains with a leading dot.
+
+v0.1.1    2012-03-11 18:01:25 America/Chicago
+    - Double speed by using &lc instead of &idn_prep_name
+
+v0.1.0    2012-03-11 15:06:18 America/Chicago
+    - Fixed handling of exception rules.
+
+v0.0.2    2012-03-06 16:44:35 America/Chicago
+    - Added frivolous microptimizations.
+    - Promoted to full release.
+
+v0.0.1    2012-03-06 13:07:11 America/Chicago
+    - First version, released on an unsuspecting world.

@@ -1,0 +1,99 @@
+0.30 Tue Aug 19 16:28:24 PDT 2014
+ - Replace tabs with spaces
+
+0.29 Sat Aug 16 16:55:59 PDT 2014
+ - Change ' / ' to '/' in doc
+
+0.28 Sat Aug 16 11:41:39 PDT 2014
+ - Meta 0.0.2
+
+0.27 Fri Aug 15 23:22:04 PDT 2014
+ - Add =encoding to bin/remoos
+
+0.26 Fri Aug 15 19:48:46 PDT 2014
+ - Add t/000-require-modules.t
+
+0.25 Fri Aug  8 19:25:16 PDT 2014
+ - Fix swim errors
+
+0.24 Fri Aug  8 12:41:45 PDT 2014
+ - Switch hashbang to '#!/usr/bin/env perl'
+
+0.23 Sun Aug  3 23:27:27 PDT 2014
+ - Remove (c) from Copyright
+
+0.22 Sat Aug  2 16:10:51 PDT 2014
+ - Fix Copyright years.
+
+0.21 Wed Jul 30 15:54:19 PDT 2014
+ - Switch IRC to
+
+0.20 Wed Jul 16 23:18:13 PDT 2014
+ - Rename docs to .swim
+ - Fix Meta and add Contributing file
+
+0.19 Tue Jun 24 08:47:57 PDT 2014
+ - Add travis badge to doc
+
+0.18 Sat Jun 21 13:48:09 PDT 2014
+ - Fix test failures with patch from tobyink++
+
+0.17 Fri Jun 20 11:29:27 PDT 2014
+ - Fix test failures by prereqing Sub::Identify
+
+0.16 Thu Jun 19 12:04:24 PDT 2014
+ - Move to Zilla-Dist
+
+0.15 Mon Nov 26 09:00:46 PST 2012
+ - Fix https://rt.cpan.org/Ticket/Display.html?id=81314
+
+0.14 Mon Nov 26 08:40:02 PST 2012
+ - following patches from tobyink++
+ - provide ->meta->add_method which does Sub::Name trickery
+ - document and test Sub::Name-related stuff
+ - fix delegation to lazy-built attributes
+
+0.13 Tue Nov 13 11:51:44 PST 2012
+ - Support hashref of arguments in object construction.
+
+0.12 Mon Nov 12 11:36:48 PST 2012
+ - Doc tweak.
+
+0.11 Mon Nov  5 15:01:39 PST 2012
+ - Support Moos-Role.
+
+0.10 Sat Nov  3 16:18:00 PDT 2012
+ - Role support and doc from tobyink++
+
+0.09 Fri Oct 26 19:10:50 PDT 2012
+ - Ingy's evil twin.
+
+0.08 Fri Oct 26 18:41:07 PDT 2012
+ - perl -Moos
+
+0.07 Fri Oct 26 18:18:06 PDT 2012
+ - Apply tobyink++'s https://github.com/ingydotnet/moos-pm/pull/7
+ - Can has XS accessors now
+
+0.06 Thu Oct 25 16:51:29 PDT 2012
+ - Apply tobyink++'s patches for 'is', clearer, predicate, confess, blessed
+   and more.
+
+0.05 Thu Oct 25 12:44:58 PDT 2012
+ - Use Scalar::Util::blessed instead of ref
+ - Support `has foo => 42;`
+ - Update docs.
+
+0.04 Thu Oct 25 01:29:09 PDT 2012
+ - Rewrite based more closely on Moose implementation. doy++ helped me
+   figure things out.
+
+0.03 Sun Oct 21 23:36:33 PDT 2012
+ - Add more to docs. lukec++
+
+0.02 Sun Oct 21 17:33:58 PDT 2012
+ - Add features list to docs. sevvie++
+
+0.01 Sun Oct 21 17:08:57 PDT 2012
+ - Initial version.
+

@@ -1,0 +1,23 @@
+Revision history for MojoX-Auth-Simple
+
+0.04.03 20100210/12:58
+        Add dependencies to Makefile.PL for ExtUtils::MakeMaker.
+
+0.04.02 20100209/10:05
+        Fix syntax error in META.yml, missing ':' for package dependency.
+
+0.04.01 20100209/09:05
+        Rename meta.yaml to META.yml.
+
+0.04    20100208/13:18
+        Add meta.yaml to fix build on cpantesters, by providing dependencies.
+
+0.03    20100208/12:02
+        Correcting typos.
+
+0.02    20100203/12:02
+        First release. Please treat as alpha code.
+
+0.01    20100201/09:09
+        Intial development and testing.
+

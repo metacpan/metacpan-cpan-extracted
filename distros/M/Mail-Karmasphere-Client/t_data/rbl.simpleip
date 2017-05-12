@@ -1,0 +1,17 @@
+$SOA	86400	rbldns0.sorbs.net dns.isux.com 0 7200 7200 604800 3600
+$NS 86400 rbldns0.sorbs.net. rbldns1.sorbs.net. rbldns2.sorbs.net. rbldns3.sorbs.net. rbldns4.sorbs.net rbl1.oregonstate.edu. rbl2.oregonstate.edu. sorbs.bl.xs4all.nl. rbldns5.sorbs.net. rbldns6.sorbs.net.
+:127.0.0.8:Blocked by Admin Request See: http://www.sorbs.net/lookup.shtml?$
+$TTL 3600
+127.0.0.2
+$SOA	86400	rbldns0.sorbs.net dns.isux.com 0 7200 7200 604800 3600
+$NS 86400 rbldns0.sorbs.net. rbldns1.sorbs.net. rbldns2.sorbs.net. rbldns3.sorbs.net. rbldns4.sorbs.net rbl1.oregonstate.edu. rbl2.oregonstate.edu. sorbs.bl.xs4all.nl. rbldns5.sorbs.net. rbldns6.sorbs.net.
+:127.0.0.10:Dynamic IP Addresses See: http://www.sorbs.net/lookup.shtml?$
+$TTL 3600
+127.0.0.2
+0.214.192.0/19
+0.43.57.0/24
+0.43.58.0/24
+0.43.59.0/24
+!12.1.235.0/24
+12.10.110.0/25
+12.10.110.128/26

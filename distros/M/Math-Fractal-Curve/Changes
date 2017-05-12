@@ -1,0 +1,16 @@
+Revision history for Perl extension Math::Fractal::Curve.
+
+1.03  Sat Nov  4 23:02 2006
+    - This is just a distribution upgrade. Clear license, spec-conformant
+      META.yml, etc.
+
+1.02  Fri Apr  9 19:03:53 2003
+	- More and better examples.
+
+1.01  Tue Jul 28 16:07:40 2003
+	- Minor documentation fixes.
+
+1.00  Mon Jul 15 20:46:10 2003
+	- original version; created by h2xs 1.21 with options
+		-AX Math::FractalCurve
+

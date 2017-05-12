@@ -1,0 +1,440 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+our $VERSION = '2.02'; # VERSION
+# ABSTRACT: the mtpolicyd executable
+# PODNAME: mtpolicyd
+
+use Mail::MtPolicyd;
+
+Mail::MtPolicyd->run();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mtpolicyd - the mtpolicyd executable
+
+=head1 VERSION
+
+version 2.02
+
+=head1 DESCRIPTION
+
+mtpolicyd is a policy daemon for postfix access delegation.
+
+It can be configured to accept connections on several ports from a postfix mta.
+For each port a VirtualHost can be configured and for each VirtualHost several
+Plugins can be configured.
+
+For more info, mailing list, see: L<https://www.mtpolicyd.org>
+
+=head1 NAME
+
+mtpolicyd - a modular policy daemon for postfix
+
+=head1 EXAMPLE
+
+In postfix main.cf:
+
+  smtpd_recipient_restrictions = check_policy_service inet:127.0.0.1:12345
+
+In mtpolicyd.conf:
+
+  # listen on port 12345 (multiple ports can be separated by ',')
+  port="127.0.0.1:12345"
+
+  # defined host for this port
+  <VirtualHost 12345>
+    name=example_vhost
+    <Plugin spamhaus_bl>
+      module="RBL"
+      domain="sbl.spamhaus.org"
+      mode=reject
+    </Plugin>
+  </VirtualHost>
+
+This check will execute a simple RBL lookup against dbl.spamhaus.org.
+
+=head1 COMMANDLINE OPTIONS
+
+  mtpolicyd
+    [-h|--help]
+    [-c|--config=<file>]
+    [-f|--foreground]
+    [-l|--loglevel=<level>]
+    [-d|--dump_vhosts]
+
+=over
+
+=item -h --help
+
+Show available command line options.
+
+=item -c --config=<file> (default: /etc/mtpolicyd/mtpolicyd.conf)
+
+Specifiy the path to the configuration file.
+
+=item -f --foreground
+
+Do not fork to background and log to stdout.
+
+=item -l --loglevel=<level>
+
+Overwrite the log level specified in the configuration with the specified level.
+
+=item -d --dump_vhosts
+
+Parse VirtualHosts configuration, print it to stdout and exit.
+
+=back
+
+=head1 CONFIGURATION FILE
+
+The configuration file is implementend with L<Config::General> which allows apache style
+configuration files.
+
+mtpolicyd accepts global configuration parameters in the style:
+
+  key=value
+
+Comments begin with '#'.
+
+VirtualHosts must be configured with VirtualHost sections:
+
+  <VirtualHost <portnumber>>
+    name=<name of the vhost>
+  </VirtualHost>
+
+Each VirtualHost should contain at least on Plugin.
+
+  <VirtualHost <portnumber>>
+    name=<name of the vhost>
+    <Plugin <name of check> >
+      module = "<name of plugin>"
+      # plugin options
+      key=value
+    </Plugin>
+  </VirtualHost>
+
+For individual plugin configuration options see the man page of the plugin:
+
+  Mail::MtPolicyd::Plugin::<name of plugin>
+
+=head2 GLOBAL CONFIGURATION OPTIONS
+
+=over
+
+=item user
+
+user id to run as
+
+=item group
+
+group id to run as
+
+=item pid_file
+
+location of the pid file
+
+=item log_level
+
+Verbosity of logging: 0=>'err', 1=>'warning', 2=>'notice', 3=>'info', 4=>'debug'
+
+=item host
+
+ip address to bind to.
+
+=item port
+
+comma separated list of ports to listen on.
+
+=item min_servers (default: 4)
+
+The minimum number of client processes to start.
+
+=item min_spare_servers (default: 4)
+
+The minimum number of client processes that should hanging around idle
+and wait for new connections.
+
+If the number of free processes is below this threshold mtpolicyd will start
+to create new child processes.
+
+=item max_spare_servers (default: 12)
+
+The maximum number of idle processes.
+
+If the number of idle processes is over this threshold mtpolicyd will start
+to shutdown child processes.
+
+=item max_servers (default: 25)
+
+The absolute maximum number of child processes to start.
+
+=item max_requests (default: 1000)
+
+=item max_keepalive (default: 0)
+
+Number of requests after that mtpolicyd closes the connection
+or no limit if set to zero.
+
+Should be the same value as smtpd_policy_service_reuse_count_limit (postfix >2.12)
+in postfix/smtpd configuration.
+
+=item vhost_by_policy_context (default: 0)
+
+Select VirtualHost by 'policy_context' request field.
+
+The policy_context will be matched against the 'name' field of the VirtualHost.
+
+For example in postfix main.cf use advanced syntax:
+
+  check_policy_service { inet:localhost:12345, policy_context=reputation }
+  ...
+  check_policy_service { inet:localhost:12345, policy_context=accounting }
+
+In mtpolicyd.conf:
+
+  port="127.0.0.1:12345" # only 1 port
+  vhost_by_policy_context=1
+  <VirtualHost 12345>
+    name=reputation
+    ... plugins ...
+  </VirtualHost>
+
+  <VirtualHost 12345>
+    name=accounting
+    ... plugins ...
+  </VirtualHost>
+
+The policy_context feature will be available in postfix 3.1 and later.
+
+If you just need small differentiations consider using the L<Mail::MtPolicyd::Plugin::Condition>
+plugin to match against plugin_context field.
+
+=item request_timeout
+
+Maximum total time for one request.
+
+=back
+
+=head1 CONFIGURE CONNECTIONS
+
+mtpolicyd has a global per process connection pool.
+
+Connections could be registered within the connection pool using a <Connection>
+block within the configuration. You must at least specify the name of the connection
+and the module for the connection type.
+
+  <Connection [name of connection]>
+    module = "[connection type]"
+    # ... addditional parameters
+  </Connection>
+
+Connection modules may require additional parameters.
+
+Currently supported connection modules:
+
+=over
+
+=item Sql
+
+Perl DBI based connections for SQL databases.
+
+L<Mail::MtPolicyd::Connection::Sql>
+
+=item Memcached
+
+Connection to a memcached server/cluster.
+
+L<Mail::MtPolicyd::Connection::Memcached>
+
+=item Ldap
+
+Connection to an LDAP directory server.
+
+L<Mail::MtPolicyd::Connection::Ldap>
+
+=back
+
+=head1 SESSION MANAGEMENT
+
+mtpolicyd implements session managemend to cache data across
+different checks for requests with the same instance id.
+
+mtpolicy is able to generate a session for each mail passed to it and store it within the
+session cache.
+The attached session information will be available to all following plugins across
+child processes, virtual hosts and ports.
+
+Plugins will use this session information to cache lookup etc. across multiple requests
+for the same mail. Postfix will send a query for each recipient and for each configured
+check_policy_service call.
+
+To enable the SessionCache specify a <SessionCache> block within your configuration:
+
+  <SessionCache>
+    module = "Memcached"
+    expire = "300"
+    lock_wait=50
+    lock_max_retry=50
+    lock_timeout=10
+  </SessionCache>
+
+The example requires that a connection of type "Memcached" and the name
+"memcached" is configured within the connection pool.
+For details read L<Mail::MtPolicyd::SessionCache::Memcached>.
+
+As of version 2.00 it is possible to implement different session caches.
+
+Currently there are 2 session cache modules:
+
+=over
+
+=item L<Mail::MtPolicyd::SessionCache::Memcached>
+
+=item L<Mail::MtPolicyd::SessionCache::Redis>
+
+=back
+
+=head1 PROCESSING OF REQUEST
+
+The policy daemon will process all plugins in the order they appear in the configuration file.
+It will stop as soon as a plugin returns an action and will return this action to the MTA.
+
+=head1 SCORING
+
+Most plugins can be configured to not return an action if the performed check matched.
+
+For example the RBL module could be set to passive mode and instead a score could be applied
+to the request:
+
+  <Plugin spamhaus>
+    module = "RBL"
+    mode = "passive"
+    domain="zen.spamhaus.org"
+    score=5
+  </Plugin>
+
+Check the documentation of the plugin for certain score/mode parameters.
+Plugin may provide more than one mode/score parameters if the do several checks.
+
+Now if you configure more than one RBL check the score will add up.
+Later an action can be taken based on the score.
+The ScoreAction plugin will return an action based on the score
+and the AddScoreHeader plugin will prepend the score as a header to the mail:
+
+  <Plugin ScoreReject>
+    module = "ScoreAction"
+    threshold = 15
+    action = "reject sender ip %IP% is blocked (score=%SCORE%%SCORE_DETAIL%)"
+  </Plugin>
+  <Plugin ScoreTag>
+    module = "AddScoreHeader"
+    spam_score=5
+  </Plugin>
+
+=head1 UPGRADING
+
+=head2 FROM 1.x to 2.x
+
+With mtpolicyd 2.x configuration of connections and session cache has been changed.
+
+=head3 Database Connections
+
+In mtpolicyd 2.00 the connections defined globaly in the configuration file
+have been replaced by a dynamic connection pool.
+
+The global options db_* ldap_* and memcached_* have been removed.
+
+Instead connections are registred within a connection pool.
+
+You can define them using <Connection> blocks:
+
+  <Connection myconn>
+    module = "<adapter>"
+    # parameter = "value"
+    # ...
+  </Connection>
+
+In mtpolicyd 1.x:
+
+  db_dsn=DBI:mysql:mtpolicyd
+  db_user=mtpolicyd
+  db_password=secret
+
+In mtpolicyd 2.x:
+
+  <Connection db>
+     dsn = "DBI:mysql:mtpolicyd"
+     user = "mtpolicyd"
+     password = "secret"
+  </Connection>
+
+All SQL modules will by default use the connection registred as "db".
+
+See modules in Mail::MtPolicyd::Connection::* for available connection adapters.
+
+=head3 Session Cache
+
+Starting with mtpolicyd 2.x it is possible to use other session caches then memcached.
+
+The global session_* parameters have been removed.
+
+Instead the session cache is defined by a <SessionCache> block:
+
+  <SessionCache>
+    module = "<module>"
+    # parameter = "value"
+    # ...
+  </SessionCache>
+
+A memcached session cache in mtpolicyd v1.x:
+
+  memcached_servers="127.0.0.1:11211"
+
+  session_lock_wait=50
+  session_lock_max_retry=50
+  session_lock_timeout=10
+
+In mtpolicyd 2.x:
+
+  <Connection memcached>
+    servers = "127.0.0.1:11211"
+  </Connection>
+
+  <SessionCache>
+    module = "Memcached"
+    # defaults to connection "memcached"
+    # memcached = "memcached"
+    lock_wait = "50"
+    lock_max_retry = "50"
+    lock_timeout = "10"
+  </SessionCache>
+
+If no <SessionCache> is defined it will default to the
+dummy session cache module "None".
+
+See modules in Mail::MtPolicyd::SessionCache::* for available session
+cache modules.
+
+=head1 AUTHOR
+
+Markus Benning <ich@markusbenning.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014 by Markus Benning <ich@markusbenning.de>.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991
+
+=cut

@@ -1,0 +1,67 @@
+version 0.003; 2011-09-14
+
+  * bugfix: in XS version of dec_sub(), correct the special-case handling
+    of subtraction from zero, which was giving output with the wrong sign
+
+  * change usage of Params::Classify functions to take advantage of
+    custom ops in Params::Classify 0.012
+
+  * in XS, use newSVpvs() wherever appropriate
+
+  * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation
+    of unintended prototypes
+
+  * in t/setup_pp.pl, avoid a warning that occurs if XSLoader::load()
+    is given no arguments, which is now a valid usage
+
+  * jump through hoops to avoid compiler warnings
+
+  * correct dynamic_config setting to 0
+
+  * include META.json in distribution
+
+  * add MYMETA.json to .cvsignore
+
+version 0.002; 2010-08-20
+
+  * in dec_cmp and dec_sgn, return strings that have been numerified,
+    to work around perl bug #69384 (affecting Perls prior to 5.11.0)
+    where unnumerified strings are rejected by the sort operator
+
+  * port to Perl 5.11, supporting new first-class regexp objects in
+    type checking
+
+  * in documentation, correct summary of dec_cmp's parameters
+
+  * in documentation, more consistent italicisation of parameter names
+
+  * in XS, use PERL_NO_GET_CONTEXT for efficiency
+
+  * check for required Perl version at runtime
+
+  * use full stricture in test suite
+
+  * also test POD coverage of pure Perl implementation
+
+  * make XS code const clean for gcc -Wwrite-strings
+
+  * in Build.PL, explicitly set needs_compiler to avoid bogus
+    auto-dependency on ExtUtils::CBuilder
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.001; 2009-05-14
+
+  * bugfix: division/rounding misparsed inputs with magnitude less than
+    one and so gave grossly incorrect results
+
+  * don't bother with variant input forms in t/rndiv.t, where both
+    implementations cleanly canonicalise all inputs
+
+version 0.000; 2009-05-13
+
+  * initial released version

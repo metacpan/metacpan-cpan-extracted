@@ -1,0 +1,4 @@
+#!/usr/bin/perl
+# 45UBsRN - dec (CoNVert hexadecimal string parameter to decimal) as part of the Math::BaseConvert package
+use strict; use warnings; use Math::BaseConvert qw(dec);
+my $numb = shift; die("USAGE: `dec <HexadecimalNumberStringToConvertToDecimal>`\n") if(!defined($numb) || $numb =~ /^-+[h\?]/i); print(dec($numb));

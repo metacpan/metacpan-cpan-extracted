@@ -1,0 +1,6 @@
+Revision history for Perl extension MP3::M3U.
+
+0.01  Sun Jun 17 01:05:57 2001
+	- original version; created by h2xs 1.20 with options
+		-XO MP3::M3U
+

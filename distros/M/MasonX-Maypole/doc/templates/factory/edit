@@ -1,0 +1,60 @@
+<%doc>
+
+=head1 edit
+
+This is the edit page. It edits the passed-in object, by displaying a
+form similar to L<addnew> but with the current values filled in.
+
+=cut
+
+</%doc>
+
+<div id="title">Edit a <% $classmetadata->{moniker} %></div>
+
+% foreach my $item ( @$objects ) {
+% $item ||= $classmetadata->{name}; # after a create error, $item == undef
+<& .formtag, item => $item &>
+
+<fieldset>
+<& .legend, item => $item &>
+% foreach my $col ( @{ $classmetadata->{columns} } ) {
+% next if $col eq "id";
+<label><span class="field"><% $classmetadata->{colnames}->{ $col } %>:</span></label>
+<% $item->to_field( $col )->as_XML %>
+% if ( $errors->{ $col } ) {
+<span class="error"><% $errors->{ $col } %></span>
+% }
+% }
+<br /><input type="submit" name="edit" value="edit" />
+</fieldset>
+
+</form>
+
+% }
+
+<%init>
+    # this gets exported via template_args if there was an error in do_edit
+    our $errors;
+</%init>
+
+<%def .formtag>
+<%args>
+    $item
+</%args>
+% if ( ref $item ) {
+<form action="<% $base %>/<% $item->table %>/do_edit/<% $item->id %>/" method="post">
+% } else {
+<form method="post" action="<% $base %>/<% $classmetadata->{table} %>/do_edit/">
+% }
+</%def>
+
+<%def .legend>
+<%args>
+    $item
+</%args>
+% if ( ref $item ) {
+<legend>Edit <% $item->get( $item->stringify_column ) %></legend>
+% } else {
+<legend>Add a new <% $classmetadata->{moniker} %></legend>
+% }
+</%def>

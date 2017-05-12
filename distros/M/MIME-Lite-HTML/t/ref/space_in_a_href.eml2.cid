@@ -1,0 +1,78 @@
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset=iso-8859-1
+
+Subject: Mail in HTML with images
+To: MIME-Lite@alianwebserver.com
+From: MIME-Lite@alianwebserver.com
+X-Mailer: MIME::Lite::HTML 1.24
+
+<html>
+<head>
+<title></title>
+<style type=3D"text/css">
+<!--
+body {=0D
+  margin: 2em 1em 2em 70px;=0D
+  font-family: sans-serif;=0D
+  color: black;=0D
+  background: white;=0D
+  background-position: top left;=0D
+  background-attachment: fixed;=0D
+  background-repeat: no-repeat;=0D
+}=0D
+=0D
+th, td { /* ns 4 */=0D
+  font-family: sans-serif;=0D
+}=0D
+=0D
+h1, h2, h3, h4, h5, h6 { text-align: left }=0D
+h1, h2, h3 { color: #005A9C }=0D
+h1 { font: 150% sans-serif }=0D
+h2 { font: 130% sans-serif }=0D
+h3 { font: 110% sans-serif }=0D
+h4 { font: bold 100% sans-serif }=0D
+h5 { font: italic 100% sans-serif }=0D
+
+-->
+</style>
+
+<link REV=3D"made"  href=3D"mailto:alian@alianwebserver.com">
+<body>
+<h1>Alianet Network</h1>
+
+<h2>Intranet</h2>
+<ol>
+  <li>  <a href =3D  "http://alianwebserver.alianet">Alianwebserver</a>  </=
+li>
+  <li>  <a href =3D"http://1001cartes.alianet">1001 Cartes</a></li>
+  <li>  <a href=3D "http://mp3.alianet">Mp3</a> </li>
+  <li>  <a href=3D "http://docs.alianet">Documentation</a></li>
+  <li>  <a href =3D"http://validator.alianet">Validator HTML</a></li>
+  <li>  <a href=3D"file:///ldap">Annuaire LDAP</a></li>
+  <li>  <a href=3D"file:///phpMyAdmin">Administration Mysql</a></li>
+  <li>  <a href=3D"http://saturne.alianet/mod-perl/circa/admin.cgi">Adminis=
+tration Circa</a></li>
+  <li>  <a href=3D"file:///mod-perl/cvsweb.cgi/">Developpement / cvsweb.cgi=
+</a></li>
+  <li>  <a href=3D"http://saturne.alianet/cgi-bin/parserSyslog.cgi">Syslog<=
+/a></li>
+</ol>
+
+<h2>Internet</h2>
+<ol>
+  <li>  <a href=3D"http://www.alianwebserver.com">Alianwebserver</a></li>
+  <li>  <a href=3D"http://www.1001cartes.com">1001 Cartes</a></li>
+  <li>  <a href=3D"http://www.comclick.com">Publicit&eacute; Alianwebserver=
+</a></li>=20
+  <li>  <a href=3D"http://www.alianwebserver.com/stats/">Stats Alianwebserv=
+er</a></li>
+  <li>  <a href=3D"http://www.yahoo.fr">Yahoo</a></li>
+  <li>  <a href=3D"http://www.jeuxvideo.com">JeuxVideo.com</a></li>
+  <li>  <a href=3D"http://www.google.com">Google</a></li>
+  <li>  <a href=3D"http://www.lejour.com">Le jour</a></li>
+</ol>
+
+</ol>
+</body>
+</html>

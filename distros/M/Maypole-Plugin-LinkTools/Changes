@@ -1,0 +1,12 @@
+Revision history for Maypole-Plugin-LinkTools
+
+0.21    Mon  Sept 26, 2005 11:20
+        - if a label is missing, don't die, issue a warning and replace it with '...'
+
+0.2     - Tues Aug 16, 2005 21:00
+        - Dave Howorth implemented support for accepting arguments from TT templates, 
+            and provided tests 
+
+0.1     - Fri Aug 12, 2005 17:25
+        First version, released on an unsuspecting world.
+

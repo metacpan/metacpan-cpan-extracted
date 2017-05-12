@@ -1,0 +1,6 @@
+Revision history for Perl extension MooseX::Types::GTIN.
+
+0.01  Thu Dec 15 11:54:18 2011
+	- original version; created by h2xs 1.23 with options
+		-X MooseX::Types::GTIN
+

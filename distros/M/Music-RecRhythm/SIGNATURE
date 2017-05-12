@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c850a4699bbdd9e09155f236925c9264a8cf374f Changes
+SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
+SHA1 a90de8da54b621cf0f1fe70b8f6734fbfd981f2c MANIFEST
+SHA1 d2a73f0af4d490ebb4c31385566ae84ac8c6b8b3 META.json
+SHA1 acaa4025a29eeb3e77d5a0fff7d0f315a75e62ca META.yml
+SHA1 fb955fda5c3d01e61701f07138546e96af10b513 Makefile.PL
+SHA1 90d033bd936bf008fd5ab1dfc9f05b2ab35f5e40 README
+SHA1 06bcd6f232700de8b38f504b439117ab042a52ff eg/rhythm2midi
+SHA1 4be6f36db5f290d3e615814050e09d920ae5723c lib/Music/RecRhythm.pm
+SHA1 ac64c81024ffa1dcad625c89f3b6b665cc387efe t/00-load.t
+SHA1 e4378a580ff37841f6398d7f92e4eb767e5e4bae t/100-basics.t
+SHA1 660cfa076560f4d80b67b9537143939073ff0cf5 t/200-recursion-see-recursion.t
+SHA1 c60f09c0926b1985f827af557c4c134cac0c971e t/pod-coverage.t
+SHA1 1215435630077ec0943874b332374ded9ae7fb47 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJXiU4pAAoJEKSYBH5dablggmUH/1jUH+tRABJcj0jo+vPyfrPx
+GjvUYTIaetN8dqrx/rvvBiP5GtXOhERCmIErZwC/islVctl+wvz/64qc/SowcMjl
+UaDiUwTujVWezuUc84kVcNLMTtTLEcONa1hZZ5+Os05hjtv4zE7x7QFPQJ7axrMp
+TSHgpBvDBebyqJd+wNPgEB/1Cw/CxkzV1cWy1DeVPl+vw1gX4XMVRfO81y4CSHmw
+QVN46HWnBu8F1AgE6AYT1CVg1bkWkSNN9HpkK1wEHC4cGQVCh7/OALGzdzUmWuJO
+ToOwRtvxUqTQU/g0lpszofYcdtwQo5X7aW2M8ixTzqeC0XBNMuTJIg63JqSiPgA=
+=wt0y
+-----END PGP SIGNATURE-----

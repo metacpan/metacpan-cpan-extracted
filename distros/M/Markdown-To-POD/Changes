@@ -1,0 +1,40 @@
+Revision history for Markdown-To-POD
+
+0.06    2016-09-27 (PERLANCAR)
+
+	- Aside from pm:, also replace autolink with pod: scheme with
+	  L<...>.
+
+
+0.05    2016-09-26 (PERLANCAR)
+
+	- Replace autolinks <pm:Foo::Bar> with L<Foo::Bar>, <prog:cpanm> with
+	  L<cpanm>, and <http://foo> with L<http://foo>.
+
+	- [Bugfix] Fix encoding email address.
+
+
+0.04    2014-07-27 (SHARYANTO)
+
+        - [Bugfix] Don't escape < and > to E<lt> and E<gt> in code blocks (POD
+          verbatim).
+
+
+0.03    2014-07-22 (SHARYANTO)
+
+        - [Bugfix] Disable HTML entities escaping for <, >, &. Enable escaping <
+          to E<lt> & > to E<gt>.
+
+
+0.02    2014-07-21 (SHARYANTO)
+
+        - Add a basic test.
+
+        [INCOMPATIBLE CHANGES]
+
+        - Change function name markdown() to markdown_to_pod().
+
+
+0.01    2014-07-20 (SHARYANTO)
+
+        - First release.

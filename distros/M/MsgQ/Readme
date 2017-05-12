@@ -1,0 +1,182 @@
+MQ version 1.01
+===========================
+Need Perl 5.6.1 or later.  Only tested fully on Win98, Win2000. Tested and works on Linux but
+			   not fully tested.
+
+
+COPYRIGHT AND LICENCE
+---------------------
+
+You may distribute this work under the terms of either the GNU General
+Public License or the Artistic License, as specified in perl's README
+file.
+
+Copyright © 2002   Peter Tschipper
+
+
+Description
+-----------
+
+A guaranteed delivery messaging system using send and receive queues.  This is useful
+for asyncronously communicating between applications or simply to deliver information 
+from one location to another in a safe way.  For instance you could use it to monitor
+data step information coming in from several telephone switches that live in different NT domains
+and then generate CGI/HTML reports on the fly from the centrally gathered data.
+
+Send queues can read messages from a socket or from files that are dropped in the "Message_files"
+folder.  Messages once read in by the send queue will then be either sent to the receive 
+queue or, if the receive queue is currently unavailable, stored for later delivery.  If the 
+network or any system fails and is then restarted, each message and only
+one copy of each message is guaranteed to arrive at the correct destination (receive queue).
+
+You can run multiple send or receive queues on the same machine and you can also have multiple 
+send queues that send messages all to the same receive queue.
+
+Setting up Send and Receive queues
+----------------------------------
+Send queues and receive queues can be easily setup with just three lines of code and a config file.
+See the examples "sendq.pl" and "receiveq.pl" contained in this distribution. The only
+thing that will change if you want create different queues is the path to the config
+file which is passed to the "start_queue()" method. And of course the contents of the config files
+will be slightly different for each queue. See section on config files.
+
+Once the code is written you can then install the queue as a service using the "srvany.exe" tool
+found in the NT resource kit.
+
+Testing the queues
+------------------
+You can get a send and receive queue up and running quickly by just
+launching the "send.pl" and "receive.pl" scripts included in this
+distribution.  Once they are both running then you can send data through
+the system by running the "test_newline.pl" script.  You should immediately
+start seeing data coming through to the receive queue.  A folder will be created
+called "c:/perlmq" and in that folder will be two folders "ReceiveQueue1" and "SendQueue1".
+If you look in the "ReceiveQueue1" folder there will be a "Message_Files" folder.  It is in
+the "Message_Files" folder that you will find text files that contain the tranmitted messages.
+
+As an experiment you can kill the receive queue process while messages are being sent.  What
+will happen is that any new messages will now be stored in the "c:/PerlMQ/SendQueue1/Message_Files"
+folder.  After a while launch the receive queue process again and you can see how the send queue is 
+drained of pending messages.  You can also put any text file in the "c:/PerlMQ/SendQueue1/Message_Files"
+folder and whatch it get transmitted to the receive queue - NOTE: each line in a file is considered
+a separate message and will be assigned it's own unique key to distinguish it from all other
+messages.
+
+Unique keys
+-----------
+
+Each message that is sent from a send queue to a receive queue will have a unique key
+inserted at the beginning of the message followed by a "\t" character.  This unique key
+is nessessary to ensure that no duplicate messages are sent and it's also a way of 
+tracking when and where the messages came from because the key is a string composed of the time
+the message was sent as well as from what host and what queue they originated from.
+
+Receive queue message files
+---------------------------
+
+The receive queue will store incoming messages in the "/Receive_queue/Message_files"
+folder.  The message files are created in accordance with the "STORAGE" config file setting.
+This setting determines whether a new storage file is created Monthly, Daily, Hourly, Minutely etc.
+Once the messages are in the files they are considered to have been successfully delivered.
+It is up to the developer to then take those delivered message files and take whatever
+further actions are nessessary, such as: creating HTML reports; dumping the data into a database; etc...
+
+Setting up the queue monitoring
+-------------------------------
+Queue monitoring is easy with the QueueMonitor.pm module.  All you have to do is
+setup your config file for each queue (port, host, and message type) . See the 
+QueueMonitor.conf supplied in thid distribution.  You can also run the QueueMonitor.pl 
+which will print out the status off all queues every 10 seconds.  Currently you can
+only monitor the send queues and the only status you can get is if the queue is up/down
+and the number of messages files that have not been delivered yet (if there are message
+files you can be pretty sure the receive queue is down).  
+
+The most important thing to remember when setting up your config file is to choose the right 
+message type.  This must be the same as that defined in the SendQueue.conf.  If the send queue
+is reading from the socket using REC_SEP=\n then that's what you need to define in your QueueMonitor.conf
+for that queue. On the other hand if the send queue is reading messages using a LENGTH=4 then
+that's what you need to define in your QueueMonitor.conf for that queue.
+
+
+Config Files
+------------
+
+Each send and receive queue has an associated config file.  You can name the files anthing that you
+want since the path to those files are passed as parameters upon starting up the queue, however,
+in this distribution you will find them named as SendQueue.conf and ReceiveQueue.conf.  Both files
+in this distribution  are setup in such a way that they should work as is if the send and receive queue
+are invoked on the same machine however in order to get them to work on different machines or 
+have multiple queues running on one machine then you've got to make some changes. If you look
+in the config files the entries are fairly self explanitory however there are a few
+items to keep in mind:
+
+
+	SendQueue.conf
+	-------------
+
+	The only item that needs explanation are the REC_SEP and LENGTH values.  These values
+	define how any incoming messages are formatted when they are read from the send queue 
+	socket.  Incoming messages can use either a record separator (REC_SEP) or a message 
+	length header (LENGTH) but not both defined at the same time. 
+
+	Record separators are usually newlines (\n) 
+	however you can use any sequence of non-escaped characters that you wish.  Some 
+	escaped characters, such as, \n, \c, \a etc. are supported.  For a complete listing of 
+	supported escape characters see the SendQueue.conf.
+
+	If your incoming  messages have length headers then you want to use the LENGTH value.  
+	This value will typically be assigned the number 4 and will indicate that the 
+	message length header is four bytes, or in other words, the first four bytes of each 
+	message will contain the length, in bytes, of the remaining message that follows.
+	LENGTH can be set to any integer value but generally 4 is the norm.
+
+	ReceiveQueue.conf
+	----------------
+	For each receive queue you have to select a unique RECEIVE_QUEUE_PORT and MESSAGE_FILES
+	path.  The only item that needs explanation is the STORAGE type.  The STORAGE type defines 
+	what filenames are given to the stored message files.  For instance if STORAGE=D then
+	a new message file will be created every day and be of the format "YYYYMMDD.txt". If 
+	STORAGE=MIN then a new message file will be created every minute and be of the 
+	format "YYYYMMDDHHMI.txt". If STORAGE=U then each message will be placed in a unique 
+	file and the name of the file will be the "key" of that message.  See the 
+	ReceiveQueue.conf for a more complete list of available formats.
+
+
+Things to watch out for - warnings/limitations
+----------------------------------------------
+- Of course, remember to make sure your port assignments are correct.
+- If you are using the QueueMonitor or want to your send queue to read messages from a socket make sure you are using the right record 
+  separator or message length.
+- Don't forget...Message files are not secure and can in some cases be read or deleted by others.
+
+Things that are coming
+----------------------
+- Use of more generic message addresses like "recipient.queue1@host" rather than having hard coded receive queue ports.
+- An application interface or module that will allow the user to put messages into the queue
+  or take messages out of the queue.
+- Triggers for messages that are received.
+- Automatic message forwarding
+- Message queues that use a MySQL database to store messages.  This will allow for better security.
+- Message Encryption?
+
+
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+
+DEPENDENCIES
+------------
+
+These modules requires perl 5.6.1 
+
+
+

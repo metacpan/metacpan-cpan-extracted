@@ -1,0 +1,120 @@
+MooX-Struct
+===========
+
+Created:      2012-10-04
+Home page:    <https://metacpan.org/release/MooX-Struct>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Struct>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.014	2017-01-31
+
+ [ Bug Fixes ]
+ - Work with Data::Printer 0.36.
+   Graham Knop++
+   <https://github.com/tobyink/p5-moox-struct/pull/2>
+   <https://github.com/tobyink/p5-moox-struct/pull/3>
+
+0.013	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.012	2013-05-18
+
+ [ Bug Fixes ]
+ - Stop relying on hash order to pass t/14trace.t.
+
+0.011	2013-05-12
+
+ [ Documentation ]
+ - Add CAVEATS section to documentation.
+   Chris Prather++
+   <https://rt.cpan.org/Ticket/Display.html?id=84278>
+
+0.010	2012-12-21	100% Devel::Cover coverage!
+
+ [ Bug Fixes ]
+ - Passing objects overloading hash dereference to the constructor was
+   supposed to be supported; now it actually works.
+ - Processing flags in EXTEND method could cause infinite loop.
+ - Usage with Data::Printer was causing an exception related to prototypes.
+
+ [ Other ]
+ - Added: Many new test cases.
+
+0.009	2012-12-18
+
+ [ Bug Fixes ]
+ - Fix an internal issue in MooX::Struct::Processor, whereby it would
+   ignore attributes inherited from the default base class when building
+   the FIELDS method.
+
+ [ Packaging ]
+ - Moar test cases.
+
+ [ Other ]
+ - Attributes inherited from roles are no longer included in FIELDS.
+ - Moo-style constructor is no longer strict. (This may change back!)
+
+0.008	2012-12-17
+
+ [ Documentation ]
+ - Add pod to test suite.
+
+ [ Other ]
+ - Added: Provide '-class' feature (currently tested for but not
+   documented).
+
+0.007	2012-10-28
+
+ - Added: Allow namespace::clean behaviour to be avoided via a '-retain'
+   flag.
+
+0.006	2012-10-09
+
+ [ Bug Fixes ]
+ - Fix minor pod syntax error.
+
+ [ Other ]
+ - Added: Allow structs to consume roles using '-with' option.
+ - Added: Bundle MooX::Struct::Util.
+ - Added: New experimental method 'EXTEND'.
+ - Constructor is now strict; it will croak if passed hash keys it doesn't
+   recognise.
+ - Removed: Dropped 'object_id' alias for 'OBJECT_ID'.
+
+0.005	2012-10-08
+
+ - Added: New method 'CLONE'.
+ - Added: New method 'FIELDS'.
+ - Added: New method 'TO_HASH'.
+ - Added: New method 'TO_STRING'.
+ - Added: New method 'TYPE'.
+ - Added: Overload a lot of operations on structs.
+ - Added: Provide Point[$x,$y] style constructor.
+ - Added: Special Data::Printer support.
+ - The 'object_id' method is now called 'OBJECT_ID'.
+
+0.004	2012-10-07
+
+ [ Bug Fixes ]
+ - Workaround strange closure bug in Perl < 5.14.
+   Fixes RT#80043.
+   <https://rt.cpan.org/Ticket/Display.html?id=80043>
+
+0.003	2012-10-05
+
+ [ Bug Fixes ]
+ - Broken and undocumented sigils feature is now working, documented and
+   tested.
+
+ [ Other ]
+ - Added: New bang postfix sigil, indicating a required attribute.
+ - The '-isa' feature for setting superclasses is now called '-extends'.
+
+0.002	2012-10-05
+
+ [ Packaging ]
+ - List dependencies.
+
+0.001	2012-10-04	Initial release

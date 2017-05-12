@@ -1,0 +1,81 @@
+{
+   "abstract" : "Mojolicious + http://materializecss.com/",
+   "author" : [
+      "mudler <mudler@dark-lab.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Materialize",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojo::Base" : "0",
+            "Mojolicious::Plugin::AssetPack" : "0",
+            "Mojolicious::Plugin::AssetPack::Backcompat" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Mojolicious" : "0",
+            "Test::Mojo" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::Materialize" : {
+         "file" : "lib/Mojolicious/Plugin/Materialize.pm",
+         "version" : "0.9770"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mudler/Mojolicious-Plugin-Materialize/issues"
+      },
+      "homepage" : "https://github.com/mudler/Mojolicious-Plugin-Materialize",
+      "repository" : {
+         "url" : "git://github.com/mudler/Mojolicious-Plugin-Materialize.git",
+         "web" : "https://github.com/mudler/Mojolicious-Plugin-Materialize"
+      }
+   },
+   "version" : "0.9770",
+   "x_authority" : "cpan:MUDLER",
+   "x_contributors" : [
+      "mudler <mudler@sabayon.org>"
+   ]
+}

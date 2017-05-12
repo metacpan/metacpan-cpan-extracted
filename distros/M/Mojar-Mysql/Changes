@@ -1,0 +1,60 @@
+2.132 2017-05-04
+  - Add selectall_lookup (Connector).
+  - Make small improvements to quiesce (Connector).
+  - Make engine_status work on more versions (Connector).
+
+2.121 2017-01-24
+  - Add quiesce (Connector).
+  - Fix error message (Replication).
+  - Make FindRangeSize overwritable (Util).
+
+2.111 2014-11-27
+  - Accept all DBD::mysql ("mysql_") options (Connector).
+
+2.102 2014-09-17
+  - Fix use bug (Replication).
+  - Add documentation (Replication).
+  - Add basic tests (Replication).
+  - Update travis config.
+
+2.091 2014-07-10
+  - Add new package (Replication).
+  - Make names more consistent, s/process/thread/ (Connector,Replication).
+
+2.081 2014-07-06
+  - Add connection (Connector).
+
+2.073 2014-07-02
+  - Add find_monotonic_first (Util).
+  - Add documentation (Util).
+  - Fix documentation (Connector).
+
+2.063 2014-02-11
+  - Rename selectall_hashref -> selectall_arrayref_hashrefs (Connector).
+  - Fix docn typo (Connector).
+
+2.051 2014-02-09
+  - Add engine_status (Connector).
+  - Fix dsn to allow omitting schema name (Connector).
+  - Add trap for (re)use params being different (Connector).
+  - Change implementation of Defaults to use singleton object (Connector).
+
+2.042 2014-02-03
+  - Remove :sql_types (Connector).
+  - Improve documentation (showed usage of helpers).
+  - Improve documentation (tried to make more readable).
+  - Fix Makefile.PL.
+  - Fix name of dsn_to_dump (Connector).
+
+2.034 2013-01-01
+  - Major overhaul and rename (Connector).
+  - Add documentation (Connector).
+  - Revise some defaults (Connector).
+  - Improve documentation (Connector).
+  - Add travis support.
+  - Modify dsn to support omitting schema name (Connector).
+  - Tweak meta files.
+  - Fix POD bug (Connector).
+  - Improve documentation (Connector).
+  - Tweak travis env.
+  - Reinstate missing licence file.

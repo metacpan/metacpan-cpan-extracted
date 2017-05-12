@@ -1,0 +1,58 @@
+NAME
+    MooseX::Types::Locale::Currency - Moose Types related to Locale Currency
+
+VERSION
+    version 0.001005
+
+SYNOPSIS
+            {
+                    package My::Object;
+                    use Moose;
+                    use MooseX::Types::Locale::Currency qw( CurrencyCode );
+
+                    has currency_code => (
+                            is => 'ro',
+                            isa => CurrencyCode,
+                    );
+                    __PACKAGE__->meta->make_immutable;
+            }
+
+            my $obj = My::Object->new({
+                    currency_code => 'usd'
+            });
+
+DESCRIPTION
+    This module provides the "CurrencyCode" type.
+
+TYPES
+    *   "CurrencyCode"
+
+        Base Type: "enum"
+
+        will validate the the 3 character string passed to it is in the list
+        of "all_currency_codes"
+
+        Enabling coercion will allow you to input the ISO 4217 Numeric
+        currency code and will convert it into the 3 Alpha character
+        currency code.
+
+SEE ALSO
+    *   Locale::Currency
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/xenoterracide/moosex-types-locale-currency/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Caleb Cushing <xenoterracide@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by Caleb Cushing.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

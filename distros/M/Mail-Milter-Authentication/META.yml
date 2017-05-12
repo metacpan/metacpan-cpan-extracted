@@ -1,0 +1,60 @@
+---
+abstract: 'A Perl Mail Authentication Milter'
+author:
+  - 'Marc Bradshaw <marc@marcbradshaw.net>'
+  - 'Marc Bradshaw <marc@marcbradshaw.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::CheckManifest: 0
+  Test::File::Contents: 0
+  Test::More: 0
+  Test::Perl::Critic: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  Module::Install: 0
+  version: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mail-Milter-Authentication
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  Cwd: 0
+  Email::Date::Format: 0
+  Email::Simple: 0
+  English: 0
+  ExtUtils::Installed: 0
+  IO::Socket: 0
+  JSON: 0
+  List::MoreUtils: 0
+  MIME::Base64: 0
+  Mail::DKIM::Verifier: '0.39'
+  Mail::DMARC: '1.20160612'
+  Mail::SPF: 0
+  Module::Load: 0
+  Module::Loaded: 0
+  Net::DNS: 0
+  Net::IP: 0
+  Net::Server: 0
+  Net::Server::PreFork: 0
+  Pod::Usage: 0
+  Proc::ProcessTable: 0
+  Socket: 0
+  Sys::Hostname: 0
+  Sys::Syslog: 0
+  perl: 5.6.0
+resources:
+  bugtracker: https://github.com/fastmail/authentication_milter/issues/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/fastmail/authentication_milter/
+version: '1.001001'

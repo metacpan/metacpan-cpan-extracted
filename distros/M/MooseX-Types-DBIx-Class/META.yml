@@ -1,0 +1,23 @@
+---
+abstract: 'MooseX::Types for DBIx::Class objects'
+author:
+  - 'Oliver Charles <oliver@ocharles.org.uk>'
+  - 'Brian Phillips <bphillips@cpan.org>'
+build_requires:
+  DBD::SQLite: 0
+  SQL::Translator: 0.11006
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200012, CPAN::Meta::Converter version 2.101610'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Types-DBIx-Class
+requires:
+  DBIx::Class: 0
+  MooseX::Types: 0
+  MooseX::Types::Parameterizable: 0.07
+version: 0.05

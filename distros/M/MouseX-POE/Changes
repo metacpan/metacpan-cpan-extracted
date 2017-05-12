@@ -1,0 +1,98 @@
+==================================================
+Changes from 2010-03-31 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.216 at 2015-03-30 09:02:56 +0000
+------------------------------------------
+
+  Change: b89f15f0f0de392a485ac8825304db634a5b5ebc
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-03-30 10:02:56 +0000
+
+    Fix packaging and tests for v5.21.* 
+
+------------------------------------------
+version 0.214 at 2011-05-13 20:14:02 +0000
+------------------------------------------
+
+  Change: 92a8f0583600d6c8e639f4d5d5b57af4e409881d
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-05-13 21:14:02 +0000
+
+    Update prereqs to include MouseX::NativeTraits 
+
+------------------------------------------
+version 0.213 at 2011-05-13 18:39:30 +0000
+------------------------------------------
+
+  Change: 791f697e87a39c506ea647a9d61835dd68917429
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-05-13 19:39:30 +0000
+
+    Add Pod::Coverage exceptions 
+
+  Change: 9f35d7acded9b8d1f32ef1033284d358c8c2c01e
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-05-13 19:17:45 +0000
+
+    Amend the documentation to remove mention of MouseX::Declare 
+
+  Change: cffa338a3a035704fe11f979d08087c928166290
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-05-13 17:03:23 +0000
+
+    Update required version of POE 
+
+  Change: 2242c08b00511758866a03df44087ab7b4c7ffc7
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-05-13 17:01:39 +0000
+
+    Clean all the trailing whitespace 
+
+  Change: 65237817afb2a1683465b6ec34cd26ef6fa5b15f
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-05-13 16:51:20 +0000
+
+    No amount of threats can get MouseX::POE::Role to work. Skip the
+    tests for now. 
+
+  Change: 821f3ff7b796b0f5db714a9b59500dde3e3b3ee9
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-05-13 15:50:51 +0000
+
+    Close but no cigar 
+
+  Change: 077a0cdc7fc145fcd7d2e98901c9f6edd33eb7e5
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-04-28 16:41:45 +0000
+
+    More pain 
+
+  Change: a9dff6e6aa83f3ce5dca04e65539383e96044c1d
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-04-28 15:41:00 +0000
+
+    Oh my, I have spawned a monster. 
+
+  Change: 4bba14bd687c100d69fffaed2e2ba109090ba080
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-04-21 21:07:13 +0000
+
+    s/Moose/Mouse/g over lib/ 
+
+  Change: ff9d314fdd0184a635140571e48a10566f3e76ef
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-04-21 21:04:58 +0000
+
+    Update dist.ini 
+
+  Change: b08df009e4fdc602ac79258ff6d37206d7d93968
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-04-21 21:03:36 +0000
+
+    Start with a Moose and make it a Mouse 
+
+================
+End of releases.
+================

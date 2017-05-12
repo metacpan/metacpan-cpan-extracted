@@ -1,0 +1,234 @@
+#!/usr/bin/perl
+# msb
+#    The MySQL Sandbox
+#    Copyright (C) 2006-2017 Giuseppe Maxia
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+
+use strict;
+use warnings;
+use MySQL::Sandbox qw(runs_as_root);
+
+my $DEBUG = $MySQL::Sandbox::DEBUG;
+
+runs_as_root();
+
+my $msb = MySQL::Sandbox->new();
+
+my $version = shift
+    or get_help();
+
+my $group_prefix = '';
+my $tarball = '';
+
+if ( $version =~ /^[rm]$/) {
+    $group_prefix = $version;
+    $version = shift
+        or get_help();
+}
+
+$ENV{SANDBOX_HOME} = $ENV{SANDBOX_HOME} || "$ENV{HOME}/sandboxes";
+#unless ( -d $ENV{SANDBOX_HOME} ) {
+#    die "\$SANDBOX_HOME not found at $ENV{SANDBOX_HOME}\n";
+#}
+
+$version =~ s/\s*//g;
+
+if ($version =~ /(\d)\.(\d)\.(\d+).*tar\.gz$/) {
+    $tarball = $version;
+    $version = "$group_prefix$1.$2.$3";    
+    unless (-f $tarball) {
+        die "file not found $tarball\n";
+    }
+}
+
+if ( $version =~ /^(\d)\.(\d)\.(\d+)$/ ) { # install single
+    install_and_restart('single', $version, "$1$2$3");
+}
+elsif ( $version =~ /^(r|m)(\d)\.(\d)\.(\d+)$/ ) { # install group
+    my $group = $1;
+    my $simple_version = "$2$3$4";
+    my %groupsb = (
+        r   => 'replication',
+        m   => 'multiple',
+    );
+    install_and_restart( $groupsb{$group}, $version, $simple_version);
+}
+
+if ($version =~ /^r(\d+)$/i) { # replication
+    open_replication($1);
+}
+elsif ($version =~ /^m(\d+)$/i) { # multiple
+    open_multi($1);
+}
+elsif ($version =~ /^\d+$/) { #
+    open_single($version);
+}
+elsif (-d "$ENV{SANDBOX_HOME}/$version") {
+    open_single($version, "nosearch");
+}
+else {
+    # this should fail when the directory is not found
+}
+
+sub find_sb {
+    my ($prefix, $version) = @_;
+    my @dirs = glob ("$ENV{SANDBOX_HOME}/$prefix*");
+    $prefix =~ s/_//g;
+    for my $dir (@dirs) {
+        my $simple_dir = $dir;
+        $simple_dir =~ s{.*/}{};
+        $simple_dir =~ s/_//g;
+        if ("$prefix$version" eq $simple_dir) {
+            return $dir;
+        }
+    }
+    return;
+}
+
+sub open_single {
+    my ($version, $nosearch) = @_;
+    my $sb_dir = find_sb('msb', $version);
+    if ($nosearch) {
+        $sb_dir= "$ENV{SANDBOX_HOME}/$version";
+    }
+    else {
+        $sb_dir = find_sb('msb', $version);
+    }
+    if ($sb_dir) {
+        my ($pid) = glob("$sb_dir/data/*.pid");
+        unless ($pid) {
+            system "$sb_dir/start";
+        }
+        exec "$sb_dir/use", @ARGV;
+    }
+    else {
+        die "can't find a matching sandbox for $version\n";
+    }    
+}
+
+sub open_replication {
+    my ($version) = @_;
+    my $sb_dir = find_sb('rsandbox', $version);
+    # print "replication ($sb_dir)\n";
+    if ($sb_dir) {
+        my ($pid) = glob("$sb_dir/master/data/*.pid");
+        unless ($pid) {
+           system  "$sb_dir/start_all";
+        }
+        my $item = 'm';
+        if ($ARGV[0] =~ /^\d+$/ ) {
+            my $node = shift @ARGV;
+            $item = "s$node";
+        }
+        exec "$sb_dir/$item", @ARGV;
+    }
+    else {
+        die "can't find a matching sandbox for $version\n";
+    }    
+}
+
+sub open_multi {
+    my ($version) = @_;
+    my $sb_dir = find_sb('multi_msb', $version);
+    if ($sb_dir) {
+        my ($pid) = glob("$sb_dir/node1/data/*.pid");
+        unless ($pid) {
+            system "$sb_dir/start_all";
+        }
+        my $node = 1;
+        if ($ARGV[0] =~ /^\d+$/ ) {
+            $node = shift @ARGV;
+        }
+        exec "$sb_dir/n$node", @ARGV;
+    }
+    else {
+        die "can't find a matching sandbox for $version\n";
+    }    
+}
+
+sub get_help {
+    my ($msg) = @_;
+    if ($msg) {
+        print "**** $msg\n";
+    } 
+    print $msb->credits(); 
+    print "MySQL Sandbox shortcut\n",
+          "Invokes a single or group sandbox easily.\n",
+          "(It will start the sandbox if it is not active).\n",
+          "\n",
+          "Usage: msb [r|m]version [node] [options]\n",
+          #"\n",
+          "\tr -> replication\tm -> multiple\n",
+          "version could be a plain number to open a sandbox\n",
+          "or a dotted number, to install it if it doesn't exist\n",
+          "or the full path to a tarball\n",
+          "\t[node] is used for r|m\n",
+          "\t[options] are what you would pass to the sandbox app\n";
+    print "Examples:\n",
+          "msb 5135\n",
+          "# runs \$SANDBOX_HOME/msb_5_1_35/use\n",
+          "\n",
+          "msb 5.1.35\n",
+          "# runs make_sandbox 5.1.35 and \$SANDBOX_HOME/msb_5_1_35/use\n",
+          "\n",
+          "msb r5135\n",
+          "# runs \$SANDBOX_HOME/rsandbox_5_1_35/m\n",
+          "\n",
+          "msb r5.1.35\n",
+          "# runs make_replication_sandbox 5.1.35 and \$SANDBOX_HOME/msb_5_1_35/use\n",
+          "\n";
+    exit 1;
+}
+
+sub install_and_restart {
+    my ($application, $version, $simple_version) = @_;
+    my $cmd;
+    my $prefix = '';
+    if ($version =~ /^([rm])/) {
+        $prefix = $1;
+        $version =~ s/^[rm]//;
+    }
+    my $uversion = $version;
+    $uversion =~ s/\./_/g;
+    my $run_installer = 1;
+    if ($application eq 'single') {
+        $cmd =  'make_sandbox ' . ($tarball || $version) . ' -- --no_confirm';
+        if ( -d "$ENV{SANDBOX_HOME}/msb_$uversion") {
+            $run_installer = 0;
+        }
+    }
+    elsif ($application eq 'replication') {
+        $cmd =  'make_replication_sandbox ' . ($tarball || $version);
+        if ( -d "$ENV{SANDBOX_HOME}/rsandbox_$uversion") {
+            $run_installer = 0;
+        }
+    }
+    elsif ($application eq 'multiple') {
+        $cmd =  'make_multiple_sandbox ' . ($tarball || $version);
+        if ( -d "$ENV{SANDBOX_HOME}/multi_msb_$uversion") {
+            $run_installer = 0;
+        }
+    }
+    else {
+        die "unknown applicationn $application\n";
+    }
+    if ($run_installer) {
+        print "EXECUTING $cmd\n" if $DEBUG;
+        my $result = system($cmd);
+        if ($result) {
+            die "installation error ($!)\n";
+        }
+    }
+    exec $0, "$prefix$simple_version", @ARGV; 
+}

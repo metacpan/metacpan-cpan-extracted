@@ -1,0 +1,21 @@
+Revision history for Memoize-Memcached
+
+0.04    2014-02-25
+
+Minor changes to avoid deprecation warnings in 5.12+
+
+0.03    2009-01-25
+
+Minor bug-fix to a test.
+
+
+0.02    2008-10-12
+
+Re-arranged some of the function and method calls.
+
+Additional documentation.
+
+
+0.01    2008-10-11
+
+Initial release.

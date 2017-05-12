@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+eg/demo.pl
+lib/Mojolicious/Plugin/SPNEGO.pm
+t/01basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

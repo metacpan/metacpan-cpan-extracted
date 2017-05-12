@@ -1,0 +1,24 @@
+bin/MySQLReplicationClient.pl
+bin/MySQLReplicationServer.pl
+lib/MySQL/Replication.pm
+lib/MySQL/Replication/Client.pm
+lib/MySQL/Replication/Command.pm
+lib/MySQL/Replication/Server.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t-development-only/binlogs/get_query_test.sql
+t-development-only/binlogs/test-bin.000033
+t-development-only/binlogs/test-bin.000034
+t-development-only/binlogs/test-bin.000035
+t-development-only/Makefile
+t-development-only/MySQL::Replication::Client::ExecuteQueries.t
+t-development-only/MySQL::Replication::Client::GetQueries.t
+t-development-only/MySQL::Replication::Client::new.t
+t-development-only/MySQL::Replication::Client::RequestQueries.t
+t-development-only/MySQL::Replication::Server::GetQuery.t
+t-development-only/MySQL::Replication::Server::new.t
+t-development-only/MySQL::Replication::Tests.pl
+t-development-only/README
+META.yml                                 Module meta-data (added by MakeMaker)

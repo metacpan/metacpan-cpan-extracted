@@ -1,0 +1,11 @@
+Changelog for Mojolicious-Plugin-AutoSecrets
+
+0.002 2017-04-27T16:17:04
+ - Switch to Mojo::File slurp for >7.31.  Fixes #1 (Meredith Howard)
+
+0.001 2016-11-05T19:39:10Z
+ - add initial Changes and readme (Meredith Howard)
+ - dist improvement (Meredith Howard)
+ - let's get an automatic readme (Meredith Howard)
+ - pod touchups (Meredith Howard)
+ - Initial commit (Meredith Howard)

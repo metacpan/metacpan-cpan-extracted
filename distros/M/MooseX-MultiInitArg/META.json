@@ -1,0 +1,62 @@
+{
+   "abstract" : "Attributes with aliases for constructor arguments.",
+   "author" : [
+      "Paul Driver, C<< <frodwith at cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.2, Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-MultiInitArg",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.023"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/frodwith/MooseX-MultiInitArg/issues"
+      },
+      "homepage" : "https://github.com/frodwith/MooseX-MultiInitArg",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/frodwith/MooseX-MultiInitArg.git",
+         "web" : "https://github.com/frodwith/MooseX-MultiInitArg"
+      }
+   },
+   "version" : "0.02"
+}
+

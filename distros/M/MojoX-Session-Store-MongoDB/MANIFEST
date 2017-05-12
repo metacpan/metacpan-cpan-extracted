@@ -1,0 +1,7 @@
+Changes
+lib/MojoX/Session/Store/MongoDB.pm
+Makefile.PL
+MANIFEST
+README
+t/mongodb.t
+META.yml                                 Module meta-data (added by MakeMaker)

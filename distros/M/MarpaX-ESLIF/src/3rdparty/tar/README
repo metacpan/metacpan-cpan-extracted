@@ -1,0 +1,19 @@
+Even if ExternalProject_Add() have the notion of PATCH step, patch itself is not built-in into CMAKE.
+This is why a pre-patched version of PCRE2 is created by hand outside of the build process.
+
+This has to be done in a UNIX shell.
+Tarballs must be in the .tar.gz format.
+It is ASSUMED that all tarballs extracts first and only a top directory, because patch is applied with the p1 option.
+
+Usage is:
+
+patchit source dest patchdir
+
+where:
+- source is assume to refer to a file source.tar.gz that exist.
+- dest will be created as dest.tar.gz, and have to be known to CMakeLists.txt + CMakeObjects.PL
+- patchdir contains a list of patches, executed in alphabetic order
+
+Example:
+
+3rdparty/tar/patchit 3rdparty/tar/pcre2-10.23.tar.gz 3rdparty/tar/pcre2-10.23-patched.tar.gz 3rdparty/tar/pcre2-10.23.patchdir

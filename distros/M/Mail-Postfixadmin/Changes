@@ -1,0 +1,6 @@
+Revision history for Perl extension Mail::Postfixadmin.
+
+0.01  Sun Sep 18 15:37:35 2011
+	- original version; created by h2xs 1.23 with options
+		-X -n Mail::Postfixadmin
+

@@ -1,0 +1,132 @@
+#! /bin/sh -e
+# $Id: make-dist,v 1.1 2003/11/24 14:52:04 lwa Exp $
+
+PWD=$(pwd)
+PROGRAM=${PWD##*/}
+VERSION=$(cat VERSION)
+
+FTP_SERVER=upload.sourceforge.net
+FTP_DIRECTORY=/incoming
+FTP_PASS=${LOGNAME}@
+FTP_USER=anonymous
+
+CP="cp -p"
+
+mkmanifest1() {
+    ignore=
+    test -f .cvsignore && ignore=$(cat .cvsignore)
+    for file in *
+      do
+      test -f "$file" || continue
+      case $file in               
+	  .*)    continue;;
+	  *.tmp) continue;;
+	  *.old|*.rej|*.bak|*.bak|*.so|*.Z) continue;;
+	  *.a|*.o|*~|*.core|core|*.orig) continue;;
+	  MANIFEST*) continue;;
+      esac
+
+      for i in $ignore
+	do
+	case $file in 
+	    $i) file= ;;
+	esac
+	test "x${file}" = x && break
+      done
+      test "x${file}" != x && echo "$file"
+    done
+}
+
+mkmanifest() {
+    dir=${1:-.}
+    test -f MANIFEST || continue
+    echo "build MANIFEST in $dir"
+    mkmanifest1 > MANIFEST.tmp
+    if ! diff MANIFEST MANIFEST.tmp
+	then
+	mv MANIFEST.tmp MANIFEST
+    else
+	rm MANIFEST.tmp
+    fi
+    
+    for subdir in *
+    do 
+      if test -f ${subdir}/MANIFEST
+	  then
+	  (cd ${subdir} && mkmanifest "$dir/$subdir")
+	  fi
+    done
+}
+
+
+mkcpr() {
+    dst=$1
+    for file in $(awk '{print $1}' MANIFEST)
+      do
+      ${CP} ${file} ${dst}/${file}
+    done
+    for dir in *
+    do
+      if test -f ${dir}/MANIFEST
+	  then 
+	  (
+	      mkdir ${dst}/${dir}
+	      cd ${dir} &&
+	      mkcpr ../${dst}/${dir}
+	  )
+      fi
+    done
+}
+
+mkpkg () {
+    pkgname="${PROGRAM}-${VERSION}"
+    echo "Create package $pkgname"
+    mkdir $pkgname
+    
+    mkcpr $pkgname
+
+    tar cf - $pkgname | gzip -9 > $pkgname.tar.gz
+    rm -rf $pkgname
+    ls -l $pkgname.tar.gz
+}
+
+
+
+mkxfer() {
+  ftp -nv << EOT
+open ${FTP_SERVER}
+user ${FTP_USER} ${FTP_PASS}
+cd ${FTP_DIRECTORY}
+binary
+put ${PROGRAM}-${VERSION}.tar.gz
+quit
+EOT
+}
+
+args=`getopt mxp $*`
+if test $? != 0
+then
+  echo usage make-dist [-m][-p][-x] >&2
+  exit;
+fi
+
+set -- $args
+
+do_manifest=
+do_pkg=
+do_xfer=
+
+for i
+do
+  case $i in 
+      -m) do_manifest=1;;
+      -p) do_pkg=1;;
+      -x) do_xfer=1;;
+  esac
+done
+
+test x$do_manifest$do_xfer = x && do_pkg=1
+
+test x$do_manifest != x && mkmanifest
+test x$do_pkg != x && mkpkg
+test x$do_xfer != x && mkxfer

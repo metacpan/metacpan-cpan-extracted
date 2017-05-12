@@ -1,0 +1,28 @@
+---
+abstract: 'build Mac OS X bundles for Perl scripts'
+author:
+  - 'Mattia Barbon <mbarbon@cpan.org>'
+build_requires:
+  Capture::Tiny: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mac-QuickBundle
+provides:
+  Mac::QuickBundle:
+    file: lib/Mac/QuickBundle.pm
+    version: 0.03
+requires:
+  Config::IniFiles: 0
+  File::Slurp: 0
+  Module::Build: 0.28
+  Module::ScanDeps: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/mbarbon/mac-quickbundle
+version: 0.03

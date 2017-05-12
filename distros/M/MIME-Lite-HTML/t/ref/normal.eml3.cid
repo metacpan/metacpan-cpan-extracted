@@ -1,0 +1,345 @@
+MIME-Version: 1.0
+Content-Transfer-Encoding: binary
+Content-Type: multipart/alternative; boundary="alian-mime-lite-html"
+
+Subject: Mail in HTML with images
+To: MIME-Lite@alianwebserver.com
+From: MIME-Lite@alianwebserver.com
+X-Mailer: MIME::Lite::HTML 1.24
+
+This is a multi-part message in MIME format.
+
+--alian-mime-lite-html
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+
+
+
+
+		Automated Testing of Perl5 Interpreter for NetWare.
+
+
+
+A set of Standard Unit Test Scripts to test all the functionalities of 
+Perl5 Interpreter are available along with the CPAN download. They are 
+all located under 't' folder. These include sub-folders under 't' such 
+as: 'base', 'cmd', 'comp', 'io', lib', 'op', 'pod', 'pragma' and 'run'. 
+Each of these sub-folders contain few test scripts ('.t' files) under 
+them.
+
+Executing these test scripts on NetWare can be automated as per the 
+following:
+
+1. Generate automated scripts like 'base.pl', 'cmd.pl', 'comp.pl', 'io.pl',
+'lib.pl', 'op.pl', 'pod.pl', 'pragma.pl', 'run.pl' that execute all the
+test scripts ('.t' files) under the corresponding folder.
+
+For example, 'base.pl' to test all the scripts 
+              under 'sys:\perl\scripts\t\base' folder,
+             'comp.pl' to test all the scripts 
+              under 'sys:\perl\scripts\t\comp' folder and so on.
+
+2. Generate an automated script, 'nwauto.pl' that executes all the above 
+mentioned '.pl' automated scripts, thus in turn executing all the '.t' 
+scripts.
+
+The script, 'NWScripts.pl' available under the 'NetWare\t' folder of the 
+CPAN download, is written to generate these automated scripts when 
+executed on a NetWare server. It generates 'base.pl', 'cmd.pl', 'comp.pl',
+'io.pl', 'lib.pl', 'op.pl', 'pod.pl', 'pragma.pl', 'run.pl' and also 
+'nwauto.pl' by including all the corresponding '.t' scripts in them in 
+backtick operators.
+
+For example, all the scripts that are under 't\base' folder will be 
+entered in 'base.pl' and so on. 'nwauto.pl' includes all these '.pl' 
+scripts like 'base.pl', 'comp.pl' etc.
+
+
+Perform the following steps to execute the automated scripts:
+
+1. Map your NetWare server to "i:"
+
+2. After complete build (building both interpreter and all extensions)
+of Perl for NetWare, execute "nmake nwinstall" in the 'NetWare' folder
+of the CPAN download. This installs all the library files, perl modules,
+the '.pl' files under 'NetWare\t' folder and all the '.t' scripts
+under 't' folder, all in appropriate folders onto your server.
+
+3. Execute the command  "perl t\NWModify.pl"  on the console command 
+prompt of your server. This script replaces
+
+     "@INC = " with "unshift @INC, "  and
+     "push @INC, " with "unshift @INC, "
+
+from all the scripts under 'sys:\perl\scripts\t' folder.
+
+This is done to include the correct path for libraries into the scripts 
+when executed on NetWare. If this is not done, some of the scripts will 
+not get executed since they cannot locate the corresponding libraries.
+
+4. Execute the command  "perl t\NWScripts.pl"  on the console command 
+prompt to generate the automated scripts mentioned above 
+under the 'sys:\perl\scripts\t' folder.
+
+5. Execute the command  "perl t\nwauto.pl"  on the server console command 
+prompt. This runs all the standard test scripts. If you desire to 
+redirect or save the results into a file, say 'nwauto.txt', then the 
+console command to execute is:  "perl t\nwauto.pl > nwauto.txt".
+
+6. If you wish to execute only a certain set of scripts, then run the 
+corresponding '.pl' file. For example, if you wish to execute only the 
+'lib' scripts, then execute 'lib.pl' through the server console command, 
+"perl t\lib.pl'. To redirect the results into a file, the console command
+ is, "perl t\lib.pl > lib.txt".
+
+
+
+Known Issues:
+
+The following scripts are commented out in the corresponding autoscript:
+
+1. 'openpid.t' in 'sys:\perl\scripts\t\io.pl' script
+   Reason:
+     This either hangs or abends the server when executing through auto 
+     scripts. When run individually, the script execution goes through 
+     fine.
+
+2. 'argv.t' in 'sys:\perl\scripts\t\io.pl' script
+   Reason:
+     This either hangs or abends the server when executing through auto 
+     scripts. When run individually, the script execution goes through 
+     fine.
+
+3. 'filehandle.t' in 'sys:\perl\scripts\t\lib.pl' script
+   Reason:
+     This hangs in the last test case where it uses FileHandle::Pipe 
+     whether run individually or through an auto script.
+
+
+--alian-mime-lite-html
+MIME-Version: 1.0
+Content-Type: multipart/related; boundary="alian-mime-lite-html"
+
+
+This is a multi-part message in MIME format.
+
+--alian-mime-lite-html
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset=iso-8859-1
+
+
+<html>
+<head>
+<title></title>
+<style type=3D"text/css">
+<!--
+body {=0D
+  margin: 2em 1em 2em 70px;=0D
+  font-family: sans-serif;=0D
+  color: black;=0D
+  background: white;=0D
+  background-position: top left;=0D
+  background-attachment: fixed;=0D
+  background-repeat: no-repeat;=0D
+}=0D
+=0D
+th, td { /* ns 4 */=0D
+  font-family: sans-serif;=0D
+}=0D
+=0D
+h1, h2, h3, h4, h5, h6 { text-align: left }=0D
+h1, h2, h3 { color: #005A9C }=0D
+h1 { font: 150% sans-serif }=0D
+h2 { font: 130% sans-serif }=0D
+h3 { font: 110% sans-serif }=0D
+h4 { font: bold 100% sans-serif }=0D
+h5 { font: italic 100% sans-serif }=0D
+
+-->
+</style>
+
+<link REV=3D"made"  href=3D"mailto:alian@alianwebserver.com">
+<body>
+
+<!-- file:///var/tmp/mime-lite-html-tests/docs/acceuil.js -->
+<script   type=3D"text/javascript">
+<!--
+var edito =3D "24//06//2002";=0D
+edito +=3D"";=0D
+=0D
+// edito +=3D "Une nouvelle page d'acceuil pour 1001cartes, notre site de c=
+artes virtuelles... ";=0D
+//edito +=3D " La f=EAte d'HALLOWEEN est pass=E9e, mais les enfants restent=
+ dans l'ambiance encore toutes les vacances... ";=0D
+edito +=3D " L'=E9t=E9 est l=E0, il fait chaud, et c'est bient=F4t les vaca=
+nces ! N'oubliez pas d'envoyer une carte postale... ";=0D
+=0D
+function verifieUrl()=0D
+  {=0D
+  if (parent.document.location!=3Dthis.document.location)  =0D
+    {parent.document.location=3Dthis.document.location;}=0D
+  }=0D
+// Fonction de scroll dans la barre des status=0D
+function scrollit_r2l(seed)=0D
+{=0D
+  verifieUrl();=0D
+        var m1  =3Dedito;=0D
+        var msg=3Dm1;=0D
+        var out =3D " ";=0D
+        var c   =3D 1;=0D
+        if (seed > 100) =0D
+          {=0D
+                seed--;=0D
+                var cmd=3D"scrollit_r2l(" + seed + ")";=0D
+                timerTwo=3Dwindow.setTimeout(cmd,50);=0D
+              }=0D
+        else if (seed <=3D 100 && seed > 0) =0D
+                {=0D
+                for (c=3D0 ; c < seed ; c++) {out+=3D" ";}=0D
+                out+=3Dmsg;=0D
+                seed--;=0D
+                var cmd=3D"scrollit_r2l(" + seed + ")";=0D
+                    window.status=3Dout;=0D
+                timerTwo=3Dwindow.setTimeout(cmd,50);=0D
+             }=0D
+       else if (seed <=3D 0) =0D
+    {=0D
+                if (-seed < msg.length) =0D
+      {=0D
+                        out+=3Dmsg.substring(-seed,msg.length);=0D
+                        seed--;=0D
+                        var cmd=3D"scrollit_r2l(" + seed + ")";=0D
+                        window.status=3Dout;=0D
+                        timerTwo=3Dwindow.setTimeout(cmd,50);=0D
+                  }=0D
+                else =0D
+          {=0D
+         window.status=3D" ";=0D
+                        timerTwo=3Dwindow.setTimeout("scrollit_r2l(100)",50=
+);=0D
+                  }=0D
+          }=0D
+  }=0D
+=0D
+function checkMoteur(theForm)=0D
+{=0D
+=0D
+  if (theForm.MOT_CLEF.value =3D=3D "")=0D
+  {=0D
+    alert("Vous devez donnez des mots-clefs pour effectuer votre recherche =
+.");=0D
+    theForm.MOT_CLEF.focus();=0D
+    return (false);=0D
+  }=0D
+=0D
+  if (theForm.MOT_CLEF.value.length < 2)=0D
+  {=0D
+    alert("Tapez au moins 2 caract=E8res pour que votre recherche soit pert=
+inente .");=0D
+    theForm.MOT_CLEF.focus();=0D
+    return (false);=0D
+  }=0D
+  return (true);=0D
+}=0D
+=0D
+function checkMail(theForm)=0D
+{=0D
+=0D
+  if (theForm.mail.value =3D=3D "<Votre adresse Mail>")=0D
+  {=0D
+    alert("Vous devez donnez votre adresse Mail.");=0D
+    theForm.mail.focus();=0D
+    return (false);=0D
+  }=0D
+=0D
+  if (theForm.mail.value.length < 5)=0D
+  {=0D
+    alert("Tapez au moins 5 caractres dans le champ \"mail\".");=0D
+    theForm.mail.focus();=0D
+    return (false);=0D
+  }=0D
+=0D
+  if (theForm.mail.value.length > 30)=0D
+  {=0D
+    alert("Tapez au plus 30 caractres dans le champ \"mail\".");=0D
+    theForm.mail.focus();=0D
+    return (false);=0D
+  }=0D
+  return (true);=0D
+}=0D
+function banner(msg,ctrlwidth)=0D
+  {=0D
+  document.write ('<APPLET CODE=3Dscroll WIDTH=3D400 HEIGHT=3D16>');=0D
+  document.write ('<PARAM NAME=3DTEXT VALUE=3D"$' + edito + '$">');=0D
+  document.write ('<PARAM NAME=3DSPEED VALUE=3Dfast></APPLET>');  =0D
+  }=0D
+
+-->
+</script>
+
+	<h1>Alianet Network</h1>
+	<img  src=3D"cid:57374732f646f63732f696d672f736f6d6d616972652e676966@MIME-=
+Lite-HTML-1.24" alt=3D"Alian" border=3D"0">
+<h2>Intranet</h2>
+<ol>
+  <li>  <a href=3D"http://alianwebserver.alianet">Alianwebserver</a>  </li>
+  <li>  <a href=3D"http://1001cartes.alianet">1001 Cartes</a></li>
+  <li>  <a href=3D"http://mp3.alianet">Mp3</a> </li>
+  <li>  <a href=3D"http://docs.alianet">Documentation</a></li>
+  <li>  <a href=3D"javascript:alert('http://validator.alianet');">Validator=
+ HTML</a></li>
+  <li>  <a href=3D"file:///ldap">Annuaire LDAP</a></li>
+  <li>  <a href=3D"file:///phpMyAdmin">Administration Mysql</a></li>
+  <li>  <a href=3D"http://saturne.alianet/mod-perl/circa/admin.cgi">Adminis=
+tration Circa</a></li>
+  <li>  <a href=3D"file:///mod-perl/cvsweb.cgi/">Developpement / cvsweb.cgi=
+</a></li>
+  <li>  <a href=3D"http://saturne.alianet/cgi-bin/parserSyslog.cgi">Syslog<=
+/a></li>
+</ol>
+
+<h2>Internet</h2>
+<ol>
+  <li>  <a href=3D"http://www.alianwebserver.com">Alianwebserver</a></li>
+  <li>  <a href=3D"http://www.1001cartes.com">1001 Cartes</a></li>
+  <li>  <a href=3D"http://www.comclick.com">Publicit&eacute; Alianwebserver=
+</a></li>=20
+  <li>  <a href=3D"http://www.alianwebserver.com/stats/">Stats Alianwebserv=
+er</a></li>
+  <li>  <a href=3D"http://www.yahoo.fr">Yahoo</a></li>
+  <li>  <a href=3D"http://www.jeuxvideo.com">JeuxVideo.com</a></li>
+  <li>  <a href=3D"http://www.google.com">Google</a></li>
+  <li>  <a href=3D"http://www.lejour.com">Le jour</a></li>
+</ol>
+
+</ol>
+</body>
+</html>
+
+--alian-mime-lite-html
+MIME-Version: 1.0
+Content-Id: <57374732f646f63732f696d672f736f6d6d616972652e676966@MIME-Lite-HTML-1.24>
+Content-Transfer-Encoding: base64
+Content-Type: image/gif
+
+
+R0lGODlhMgAyANX/AP///9b//87//8b//8bv773n57X//7Xv77XW1q3//63OzqXGxpzv75zGxpy1
+tZT3/5StrYylpYT3/3v3/3uUlHP3/3OMjGulpWuEhGNzc1qMjFpra1JjY8DAwEpjY0pSUjlKSjk5
+OTFCQik5OSEpKRghIRgYGADn9wDe7wDO3gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAB0ALAAAAAAyADIAQAb/wI5w
+SCwaj8ikcslsOlUAg3RKraqcz4B2y+16v2BwInXtqMLotDowGJfPWozqE8A4Ao5RQEVYkOoYe31/
+GIF0GYEiC4IBGRANHhpkQiqVlpeYmZqbnJZYn6ChoqBnKaanqKmqKKytrKqwp29rtLVsbpRaDhwY
+ELZqKgVfbZNmAcIFi1p9BL/HBQTCXwQNBbij2Nna29zZnZfdRlAn5OXm5+Zl23DO7V3X7O7tAsSz
+8vL1uffz+cYLJc0Q7KPV78wCgXUscLCg5Y9BEYD2BFgAsRCCiokWwQFBIcCBC8XiDazVL5zJkyhT
+qlzJsqXLl0OgAJhJsyZNdSehTJDwoILPwJ8+H0yoMKEoznUAXCldujRTiG+ZciWYSrWq1atYqW7J
+OjWkLQMjtcALu2aAWbNjydKil1atGrZe3b4tKLds27ph6BYwoQWEWmld4NojUULBMkQhEPxTUIIC
+BhIKFjd+bHhDBhEKCoRY8C8DCQIcMoBg4LVZAAQlIijScsZgiIiuIzqIsCHQZokBIArOteCDAwcg
+opFwYEeBCgUYTCgAAcLB8eTLQRinAOIDagwLjp82QWJ0XLxgdhsDH74kTCVBAAA7
+
+--alian-mime-lite-html--
+
+
+--alian-mime-lite-html--
+

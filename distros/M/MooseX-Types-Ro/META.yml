@@ -1,0 +1,29 @@
+---
+abstract: 'Moose type constraints for read-only containers'
+author:
+  - 'Dagfinn Ilmari Manns©ker <ilmari@ilmari.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.92'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Types-Ro
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Internals: 1.1
+  MooseX::Types: 0
+  namespace::autoclean: 0
+resources:
+  homepage: http://github.com/ilmari/moosex-types-ro/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ilmari/moosex-types-ro.git
+version: 0.002

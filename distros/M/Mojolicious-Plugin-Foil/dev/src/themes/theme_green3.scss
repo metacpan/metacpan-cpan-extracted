@@ -1,0 +1,64 @@
+/* ================================================================== */
+/* THEME: Green3
+ */
+@import 'functions';
+@import 'fonts_green3';
+@import 'icon_light_on_dark';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: #47853e;
+$verge-fg: set-fg($verge-bg);
+$verge-border: #005500;
+$button-bg: adjust-hue($verge-bg, 20);
+$button-fg: set-fg($button-bg);
+$button-border: #003300;
+$main-bg: #8ccb83;
+$main-fg: set-fg($main-bg);
+$link-fg: set-link($main-bg);
+$link-visited: set-visited($main-bg);
+$verge-link-fg: set-link($verge-bg);
+$verge-link-visited: set-visited($verge-bg);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+}
+
+header,
+footer {
+	@extend .verge;
+	background-image: url(green3h.jpg);
+}
+
+.side {
+	@extend .verge;
+	background-image: url(green3.jpg);
+}
+
+body {
+	color: $main-fg;
+	background: $main-bg;
+}
+
+@include many-links($link-fg, $link-visited, $verge-link-fg, $verge-link-visited);
+@include fancy($verge-fg, $verge-bg, "green3.jpg");
+@include make-buttons;
+
+header nav li {
+	border-color: #116611;
+}
+header nav .selflink,
+header nav em,
+header nav .current a {
+	background-color: #66cc66;
+	color: #003333;
+}
+header nav a:visited {
+	color: #003333;
+}
+

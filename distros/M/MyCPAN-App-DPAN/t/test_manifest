@@ -1,0 +1,9 @@
+load.t
+compile.t
+pod.t
+pod_coverage.t
+indexer.t
+app/dpan.t
+get_latest_module_reports.t
+create_index_files.t
+../xt/dpan-corpus.t

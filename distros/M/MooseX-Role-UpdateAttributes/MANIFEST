@@ -1,0 +1,10 @@
+Build.PL
+lib/MooseX/Role/UpdateAttributes.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/basic.t
+t/pod.t
+t/pod_coverage.t
+META.yml
+META.json

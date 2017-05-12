@@ -1,0 +1,15 @@
+::Fast,store,retrieve,delete,inc/dec,flush,version,nowait
+MATCH_OK,,,,,T,,T
+MATCH_STORED,T,,,,,,T
+MATCH_NOT_STORED,F,,,,,,T
+MATCH_EXISTS,F,,,,,,T
+MATCH_NOT_FOUND,F,,F,"""""",,,T
+MATCH_DELETED,,,T,,,,T
+MATCH_VERSION,,,,,,T,T
+NO_MATCH,,,,,,,
+MATCH_VALUE,,,,,,,
+MATCH_END,,T,,,,,
+MATCH_STAT,,,,,,,
+MATCH_ERROR,,,,,,,
+MATCH_CLIENT_ERROR,,,,,,,
+MATCH_SERVER_ERROR,,,,,,,

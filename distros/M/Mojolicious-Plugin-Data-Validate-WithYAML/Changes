@@ -1,0 +1,20 @@
+Change history for Mojolicious::Plugin::Data::Validate::WithYAML
+================================================================
+
+0.04  2013-10-27
+
+      * use VersionFromModule
+
+0.03  2013-10-24
+
+      * use PodWeaver
+      * set MetaResources
+
+0.02  2013-10-24
+
+      * added helper for "fieldinfo"      
+
+0.01  2013-10-15
+
+      initial version
+

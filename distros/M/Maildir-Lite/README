@@ -1,0 +1,56 @@
+Maildir-Lite 
+
+This is a simple and very lite implementation of Maildir as specified 
+by D. J. Bernstein at L<http://cr.yp.to/proto/maildir.html>
+
+This module provide the user with a simple interface to reading and writing 
+email messages to maildir folders. Some additional useful features are also 
+supported (e.g. support for additional subdirecties and user defined actions 
+for the maildir flags).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+        
+TESTING
+
+For 'make test' to succeed you need 'Test::Files' in addition to 'Test::More'.
+Download the package or install it with:
+
+   perl -MCPAN -e 'install Test::Files'
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Maildir::Lite
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Maildir-Lite
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Maildir-Lite
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Maildir-Lite
+
+    Search CPAN
+        http://search.cpan.org/dist/Maildir-Lite
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Deian Stefan
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

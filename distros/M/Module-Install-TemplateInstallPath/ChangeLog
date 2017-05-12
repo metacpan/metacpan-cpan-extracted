@@ -1,0 +1,46 @@
+2011-04-11 11:00 -0400  djerius  <djerius@cfa.harvard.edu>  (e779e66830f7 [tip])
+
+	* t/00_makefile.pl:
+	fix platform specific directory path
+
+2011-04-07 13:54 -0400  djerius  <djerius@cfa.harvard.edu>  (6516bd49f372)
+
+	* .hgtags:
+	Added tag 0.02 for changeset ee40ca750b38
+
+2011-04-07 13:52 -0400  djerius  <djerius@cfa.harvard.edu>  (ee40ca750b38 [0.02])
+
+	* ChangeLog, Changes, lib/Module/Install/TemplateInstallPath.pm:
+	update version and log for release
+
+2011-04-07 13:49 -0400  djerius  <djerius@cfa.harvard.edu>  (e1d678333aad)
+
+	* Makefile.PL, t/template.t:
+	fix tests on platforms with no prior installation of Module::Install
+
+2011-04-07 13:48 -0400  djerius  <djerius@cfa.harvard.edu>  (8c00dca941e6)
+
+	* MANIFEST.SKIP:
+	ignore more files
+
+2011-03-30 15:25 -0400  djerius  <djerius@cfa.harvard.edu>  (32c58343671d)
+
+	* .hgtags: new file.
+	* .hgtags:
+	Added tag 0.01 for changeset 5298ee85801d
+
+2011-03-30 15:25 -0400  djerius  <djerius@cfa.harvard.edu>  (5298ee85801d [0.01])
+
+	* ChangeLog:
+	update log
+
+2011-03-30 15:21 -0400  djerius  <djerius@cfa.harvard.edu>  (833c19eea180)
+
+	* ChangeLog, Changes, MANIFEST.SKIP, Makefile.PL, README,
+	lib/Module/Install/TemplateInstallPath.pm, t/00_makefile.pl,
+	t/template.t: new file.
+	* ChangeLog, Changes, MANIFEST.SKIP, Makefile.PL, README,
+	lib/Module/Install/TemplateInstallPath.pm, t/00_makefile.pl,
+	t/template.t:
+	initial release
+

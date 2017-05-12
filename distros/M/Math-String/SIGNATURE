@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f6faa7ce15f863934760762548a57c421d62720d BUGS
+SHA1 71c87d598e528300ee7bde9463920408b7527a59 CHANGES
+SHA1 20acec234ebbcf4fd9a89e5712e7a4db67ca36e0 CREDITS
+SHA1 1478a9491db7843cc30982149743f24b03c1900f INSTALL
+SHA1 d6a6c30ee6d9ba6b9afab8bbf6a25e1b23c744e0 LICENSE
+SHA1 4013a48b8e73f9395c7178777763ac717dcc48dc MANIFEST
+SHA1 6733752387a4228a325ac0e1bbb71620f215855f MANIFEST.SKIP
+SHA1 182155692c0d796071080ee5bcb1b4219be6dded META.json
+SHA1 147cefb7df669bfd13aa4bd3d9f81675ba32f2c7 META.yml
+SHA1 d179edfad76d2b0f492dcf6f37cf69117de406ec Makefile.PL
+SHA1 fa23172f6c9445f82d09680a2f7d42ea386b36e2 NEW
+SHA1 71aa07adda03523c48781ca46ecda9b6a9099e4f README
+SHA1 59e6bfe9b64c0792ab001f67a44b015c1503a2fa TODO
+SHA1 eafe439df1c73009221b7ab085ae425b64dc37b7 bench/size.pl
+SHA1 2ce39ffd94e02042e7b96477ecd6011724ed4874 bench/str_cache.pl
+SHA1 502d7fd7bf23642117a82d1c130ae6efc20328b2 lib/Math/String.pm
+SHA1 9031e4e21fb981be907469befcd82f353fe276b1 lib/Math/String/Charset.pm
+SHA1 ea3b71bc072a7961a10df3a3dbb1d1da128de577 lib/Math/String/Charset/Grouped.pm
+SHA1 24c42d5104b84c8455fb42a37f9ae2f5bef464fa lib/Math/String/Charset/Nested.pm
+SHA1 61b627927592d718a5718982f5ef7e22a0eb00fe lib/Math/String/Sequence.pm
+SHA1 fcfd56dc29f506f3885285c8a67b0a9052e4a541 t/sequence.t
+SHA1 2602b1dee5e1206ee7327ebe014196b643f9d358 t/setgpm.t
+SHA1 97a53c5f2f57fd7c27cfcb82d024a3fcaa33cdd7 t/setnpm.t
+SHA1 dac149e37a6855c4cd50d914acafd3a12cccc832 t/setspm.t
+SHA1 0d43f47d1095ca500ca339c2a20c857561b34b1f t/stringpm.t
+SHA1 b02dd87168080e3a04de15653bad5195687da832 t/study.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYki0mAAoJEGcmPl2fr166HIIIALi9TpooW3mgHG03JEFUPsLg
+nhWPJGzLs+VK0Ho8G5iYEYOYicOKsh96txOhXKWNOcEjQ0Mo6cF0Trb5fs58UwlP
+CRK+Vq9hqRUoUdsXQLPSrwW6Gc1pMLMBUhmWKAV0nfNWO40wNcTXkp7PnCIrRF2B
+X195qvp/kY7RF3dOvuUOEcplsMwARaxLoUbJiPyBN8B/SrE+YrW7auAZsjJD7r4r
+0TNmCGSZdob9sOU1fYm3UkYdooOWT7wn40Vld/uijRwhZgGSGepkyLBwnumb1IFJ
+RVRWAVRXcCLpl2wSUZ+rQk1aR8H2AuFfVl7Iu4ihH1iFF/E2USTacFHtrRWrfB0=
+=/IHc
+-----END PGP SIGNATURE-----

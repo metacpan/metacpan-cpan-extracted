@@ -1,0 +1,32 @@
+=head1 INSTALLATION
+
+These are the installation instructions for MIME::Detect.
+
+The module releases are hosted on CPAN. The module
+can be installed:
+
+=over
+
+=item latest release from CPAN
+
+  cpan MIME::Detect
+
+or
+
+  cpanm MIME::Detect
+
+=item directly, as the latest development files
+
+ cpanm git://github.com/Corion/mime-detect.git
+
+=item manually cloninig the repository:
+
+ git clone git://github.com/Corion/mime-detect.git
+ cd MIME_Detect
+ perl Makefile.PL
+ make
+ make test
+ make install
+
+=back
+

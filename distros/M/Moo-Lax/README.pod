@@ -1,0 +1,42 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Moo::Lax - Loads Moo without turning warnings to fatal.
+
+=head1 SYNOPSIS
+
+  # instead of use Moo;
+  use Moo::Lax;
+
+=head1 DESCRIPTION
+
+By default Moo turns all warnings to fatal warnings. C<Moo::Lax> is exactly the
+same as C<Moo>, except that it doesn't turn all warnings to fatal warnings in
+the calling module.
+
+=head1 CONTRIBUTORS
+
+=over
+
+=item *
+
+Leon Timmermans
+
+=back
+
+=head1 AUTHOR
+
+Damien Krotkine <dams@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014 by Damien Krotkine.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

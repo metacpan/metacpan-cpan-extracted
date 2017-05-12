@@ -1,0 +1,40 @@
+TYPEMAP
+Math_Fractal_Julia *	O_JULIA
+
+INPUT
+
+# If the perl argument is a blessed reference cast it to a
+# Math_Fractal_Julia *.  If the argument is "Math::Fractal::Julia" or
+# the name of a class derived from Math::Fractal::Julia use the default
+# julia struct.
+O_JULIA
+    if (SvROK($arg)) {
+        if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG)) {
+            $var = ($type)SvIV((SV *)SvRV($arg));
+        } else {
+            Perl_croak(aTHX_ \"%s -- %s is not a blessed SV reference\",
+                \"${Package}::$func_name()\", \"$var\");
+            XSRETURN_UNDEF;
+        }
+    } else if (SvPOK($arg)) {
+        if (sv_derived_from($arg, \"$Package\")) {
+            /* julia is defined in Julia.xs */
+            $var = &julia;
+        } else {
+            Perl_croak(aTHX_ \"%s -- %s is not derived from %s\",
+                \"${Package}::$func_name()\", \"$var\", \"$Package\");
+            XSRETURN_UNDEF;
+        }
+    } else {
+        Perl_croak(aTHX_ \"%s -- %s is not the correct type\",
+            \"${Package}::$func_name()\", \"$var\");
+        XSRETURN_UNDEF;
+    }
+
+OUTPUT
+
+# The Perl object is blessed into "CLASS", which should be a char *
+# having the name of the package for the blessing.
+O_JULIA
+    sv_setref_pv($arg, CLASS, (void *)$var);
+

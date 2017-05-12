@@ -1,0 +1,6 @@
+%$
+\.(bak|old|gz)$
+\b(pm_to_blib|Makefile)$
+\.tar\.
+\bblib\b
+\bcleanup\b

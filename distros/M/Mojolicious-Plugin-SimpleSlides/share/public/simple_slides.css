@@ -1,0 +1,61 @@
+body {
+  margin: 20px;
+  background-color: lightBlue;
+}
+
+#main {
+  padding-bottom: 15px;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+span.ppi-code, pre.code-line {
+  min-width: 0;
+  margin: 2px;
+  padding: 6px;
+  border-radius: 5px;
+}
+
+pre.code-line {
+  background-color: #F8F8F8;
+}
+
+.center {
+  text-align: center;
+}
+
+.columns-wrapper {
+  display: table;
+  width: 100%;
+}
+
+.columns {
+  display: table-row;
+}
+
+.columns > .column {
+  display: table-cell;
+  padding: 5px;
+}
+
+.nav {
+  position: fixed; 
+  width: 100%; 
+  bottom: 15px;
+}
+
+.nav .nav-item {
+  padding: 5px;
+  background-color: #F8F8F8;
+  border-radius: 4px;
+  border: 1pt solid darkGray;
+  display: inline-block;
+}
+
+.nav a {
+  color: black;
+  text-decoration: none;
+}

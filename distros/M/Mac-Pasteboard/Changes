@@ -1,0 +1,90 @@
+0.009		2017-03-23	T. R. Wyant
+    Move bin/pbtool to script/pbtool
+
+    Use test compile to find MacTypes.h.  I was previously explicitly
+    testing for it in /usr/include/, but apparently it can live
+    elsewhere and still be used.
+
+    Eliminate unused variables in pbl.c.
+
+    Ditch 'use base'.
+
+    Impose minimum Perl of 5.6.2.
+
+    Add Makefile targets authortest, testcover.
+
+    Document script editor name change in eg/README.
+
+0.008		2016-01-15	T. R. Wyant
+  Clean up unused variables
+
+0.007_01	2016-01-07	T. R. Wyant
+  Install pbtool by default.
+
+  Add GitHub repository to metadata.
+
+0.007		2014-03-08	T. R. Wyant
+   No changes since 0.006_02.
+
+0.006_02	2014-03-02	T. R. Wyant
+   Notify users of intent to remove the configuration prompt (about
+     installing pbtool) and simply install it by default. The -y and -n
+     options will remain, with their present function.
+
+0.006_01	2014-03-01	T. R. Wyant
+  Serialize access of tests to clipboard. This involves an increase in
+    the required version of Test::More, to 0.96.
+
+0.006		2013-11-18	T. R. Wyant
+  No changes since 0.005_01.
+
+0.005_01	2013-11-16	T. R. Wyant
+  Fix compile errors under Xcode 5.0.2.
+
+0.005		2013-05-11	T. R. Wyant
+  No changes since 0.004_01.
+
+0.004_01	2013-04-28	T. R. Wyant
+  Clean up compile warnings in XS code. The most significant change here
+    is a correction in the size of the pasteboard flavor flags, from
+    'unsigned long' to 'unsigned int' (or equivalent).
+  Add metnods default_flavor() (to override the hard-wired default) and
+    encode() (to encode data to and decode data from the UTF flavors).
+  Add subtroutines pbflavor(), pbflavor_find(), pbencode(), and
+    pbencode_find() to do the same thing for the convenience
+    subroutines.
+  Support pbflavor() and pbencode() in bin/pbtool.
+  Support specifying the output encoding in bin/pbtool.
+  Have the pbtool script dump the flavor flags in hex.
+
+0.004		2012-01-07	T. R. Wyant
+  Make Changes file Test::CPAN::Changes compliant. Add author test
+    xt/author/changes.t to be sure it stays that way.
+  Attempt to address the fact that Mac::Errors is optional, but the
+    Cpants Kwalitee Game thinks it is required.
+
+0.003		2011-12-14	T. R. Wyant
+  Production version number. No other changes since 0.002_91.
+
+0.002_91	2011-12-04	T. R. Wyant
+  Document the fact that Mac::Pasteboard does not (yet) support the Mac
+    OS 10.6 Snow Leopard functionality of placing more than one item on
+    a pasteboard. Also document a workaround if the user is trying to
+    write a droplet.
+  Skip rather than fail when t/basic.t gets an error that indicates that
+    we are forbidden to access the pasteboard. Enhance the skip message
+    to include 'ssh session' as a possible reason for this.
+
+0.002_90	2011-11-28	T. R. Wyant
+  Converted to Perl-Foundation-recommended copyright and license.
+  Dependencies now include _all_ modules, including core.
+  Test::More 0.88 required for testing.
+  Do author tests with Module::Build 'authortest' target. Move the
+    author tests to xt/author/.
+
+0.002		2008-03-31	T. R. Wyant
+  Have Build.PL die if $^O ne 'darwin'.
+  Update Mac::Pasteboard version. No other changes to Mac::Pasteboard.
+
+0.001		2008-03-01	T. R. Wyant
+  Initial production release.

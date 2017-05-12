@@ -1,0 +1,38 @@
+---
+abstract: 'MongoDB backend for Minion'
+author:
+  - 'Andrey Khozov <avkhozov@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Minion-Backend-MongoDB
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Minion::Backend::MongoDB:
+    file: lib/Minion/Backend/MongoDB.pm
+    version: '0.97'
+requires:
+  Minion: '1.15'
+  MongoDB: '0'
+resources:
+  bugtracker: https://github.com/avkhozov/Minion-Backend-MongoDB/issues
+  homepage: https://github.com/avkhozov/Minion-Backend-MongoDB
+  repository: git://github.com/avkhozov/Minion-Backend-MongoDB.git
+version: '0.97'
+x_authority: cpan:AVKHOZOV

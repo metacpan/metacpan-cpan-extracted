@@ -1,0 +1,85 @@
+{
+   "abstract" : "Fast JSON::XS handler for Mojolicious::Renderer",
+   "author" : [
+      "yowcow <yowcow@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MojoX-Renderer-JSON-XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::XS" : "0",
+            "Mojolicious" : "4.0",
+            "parent" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Pretty" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MojoX::Renderer::JSON::XS" : {
+         "file" : "lib/MojoX/Renderer/JSON/XS.pm",
+         "version" : "0.07"
+      },
+      "Mojolicious::Plugin::JSON::XS" : {
+         "file" : "lib/Mojolicious/Plugin/JSON/XS.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yowcow/MojoX-Renderer-JSON-XS/issues"
+      },
+      "homepage" : "https://github.com/yowcow/MojoX-Renderer-JSON-XS",
+      "repository" : {
+         "url" : "git://github.com/yowcow/MojoX-Renderer-JSON-XS.git",
+         "web" : "https://github.com/yowcow/MojoX-Renderer-JSON-XS"
+      }
+   },
+   "version" : "0.07",
+   "x_contributors" : [
+      "Stig Palmquist <stig@stig.io>",
+      "yowcow <yowcow@gmail.com>",
+      "Yoko OYAMA <yowcow@users.noreply.github.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

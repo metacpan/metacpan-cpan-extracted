@@ -1,0 +1,39 @@
+TYPEMAP
+
+OPENDMARC_STATUS_T	T_IV
+OPENDMARC_LIB_T * O_OBJECT
+DMARC_POLICY_T * T_PTROBJ
+u_char * T_PV
+u_char ** T_OBJECT
+int * T_OPAQUE
+
+INPUT
+
+O_OBJECT
+	if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	else{
+		warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+		XSRETURN_UNDEF;
+	}
+
+T_OBJECT
+	if( SvROK($arg) )
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	else{
+		warn( \"${Package}::$func_name() -- $var is not an SV reference\" );
+		XSRETURN_UNDEF;
+	}
+
+
+OUTPUT
+
+# The Perl object is blessed into 'CLASS', which should be a
+# char* having the name of the package for the blessing.
+O_OBJECT
+	sv_setref_pv( $arg, CLASS, (void*)$var );
+
+T_OBJECT
+	sv_setref_pv( $arg, Nullch, (void*)$var );
+
+

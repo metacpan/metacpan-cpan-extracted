@@ -1,0 +1,50 @@
+Revision history for Perl extension Map::Tube::Berlin.
+
+0.14  2016-06-22
+	- no code changes; just use Test::Map::Tube exclusively
+	  (change provided by manwar)
+
+0.13  2016-06-22
+	- no code changes; just updated tests for Map::Tube 3.13
+
+0.12
+	- no code changes; just updated/added tests and add map name to xml data
+	  <https://github.com/eserte/Map-Tube-Berlin/pull/1>
+	  Minimum required Map::Tube version is now 3.11
+
+0.11
+	- another test fix, for Map::Tube 3.06 (see RT #107752)
+
+0.10
+	- no code change, just a test fix for Map::Tube 3.05
+
+0.09
+	- line colors (provided by GWS, RT #103106)
+	- link Spandau and Rathaus Spandau
+
+0.08
+	- support other_link feature (changing between
+	  Wilmersdorfer Str. and Charlottenburg) --- this
+	  feature requires Map::Tube 2.89 (not forced)
+
+0.07
+	- test fix
+
+0.06
+	- map fix (Alexanderplatz neighbors, problem reported
+	  by Gisbert W. Selke)
+
+0.05
+	- increase Map::Tube prereq version
+
+0.04
+	- case insensitive node names work with Map::Tube 2.31
+
+0.03
+	- case insensitive node names don't work
+
+0.02
+	- test fix for older Map::Tube versions
+
+0.01
+	- initial release

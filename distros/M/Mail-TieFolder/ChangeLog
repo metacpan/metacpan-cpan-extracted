@@ -1,0 +1,22 @@
+2001-01-21 09:28  stevegt
+
+	* ChangeLog, TieFolder.pm: more documentation
+
+2001-01-20 16:42  stevegt
+
+	* ChangeLog, Changes, MANIFEST: CPAN release v0.01
+
+2001-01-20 16:27  stevegt
+
+	* TieFolder.pm, t/hash.t, t/supported.t, t/test.t,
+	t/Mail/TieFolder/baddummy.pm, t/Mail/TieFolder/dummy.pm: first
+	working version, tested with Mail::TieFolder:mh
+
+2001-01-19 16:30  stevegt
+
+	* Changes, test.pl, t/test.t: convert to ./t dir
+
+2001-01-19 16:26  stevegt
+
+	* Changes, MANIFEST, Makefile.PL, TieFolder.pm, test.pl: initial
+

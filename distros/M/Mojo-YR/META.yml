@@ -1,0 +1,27 @@
+---
+abstract: 'Get weather information from yr.no'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  Test::More: '0.90'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-YR
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '4.30'
+resources:
+  bugtracker: https://github.com/jhthorsen/mojo-yr/issues
+  homepage: https://metacpan.org/release/Mojo-YR
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/jhthorsen/mojo-yr.git
+version: '0.06'

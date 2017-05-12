@@ -1,0 +1,69 @@
+Metabrik::Repository
+====================
+
+   To know more: http://www.metabrik.org/blog/
+
+INSTALLATION
+
+   To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+   This module requires these other programs and modules:
+
+   A. For Debian-based systems
+
+   apt-get
+   sudo
+   mercurial
+   less
+   cpanminus
+   libreadline-dev
+   build-essential
+
+   B. For FreeBSD systems
+
+   pkg
+   security/sudo
+   devel/mercurial
+   devel/p5-App-cpanminus
+
+   C. For CentOS systems
+
+   yum
+   sudo
+   mercurial
+   less
+   perl-App-cpanminus
+   readline-devel
+   gcc
+
+   D. For Mac OS X systems
+
+   port
+   mercurial
+   readline
+   p5-app-cpanminus
+
+   Z. And for all systems
+
+   Perl v5.6.1
+   Metabrik
+   IPC::Run3
+   File::Copy
+   File::Path
+   File::Spec
+   POSIX
+
+COPYRIGHT AND LICENSE
+
+   Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+
+   You may distribute this module under the terms of The BSD 3-Clause License.
+   See LICENSE file in the source distribution archive.
+

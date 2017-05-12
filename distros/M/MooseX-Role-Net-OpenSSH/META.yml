@@ -1,0 +1,56 @@
+---
+abstract: 'A Moose role that provides a Net::OpenSSH Object'
+author:
+  - 'Theodore Robert Campbell Jr <trcjr@cpan.org>'
+build_requires:
+  Devel::Cover::Report::Clover: 0
+  Dist::Zilla::App::Command::cover: 0
+  ExtUtils::MakeMaker: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  List::Util: 0
+  Moose: 0
+  Test::Class::Load: 0
+  Test::Class::Most: 0
+  Test::MockObject::Extends: 0
+  Test::More: 0
+  Test::Most: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.131490'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Role-Net-OpenSSH
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  MooseX::Role::Net::OpenSSH:
+    file: lib/MooseX/Role/Net/OpenSSH.pm
+    version: 0.001
+requires:
+  Data::Dumper: 0
+  Moose::Role: 0
+  Net::OpenSSH: 0
+  namespace::clean: 0
+  perl: 5.006
+resources:
+  bugtracker: https://github.com/trcjr/MooseX-Role-Net-OpenSSH/issues
+  homepage: https://github.com/trcjr/MooseX-Role-Net-OpenSSH
+  repository: https://github.com/trcjr/MooseX-Role-Net-OpenSSH.git
+version: 0.001
+x_authority: cpan:TRCJR
+x_contributors:
+  - 'Theodore Robert Campbell Jr <trcjr@stupidfoot.com>'

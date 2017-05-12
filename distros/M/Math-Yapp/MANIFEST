@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/001_Constructor.t
+t/002_Arithmetic.t
+t/003_Transforms.t
+t/004_Interpolation.t
+t/005_Solutions.t
+t/006_InnerProduct.t
+t/Math-Yapp.t
+lib/Math/Yapp.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

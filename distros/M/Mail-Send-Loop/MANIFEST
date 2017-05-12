@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Mail-Send-Loop.t
+lib/Mail/Send/Loop.pm
+test1.pl
+test2.pl
+test3.pl
+test_emails/cpan_banner.png
+test_emails/mail.eml
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,8 @@
+Revision history for Perl extension Method::Destructor
+
+0.02 Sat Mar 28 12:45:44 2009
+	- use magic for meta data, instead of an element of symbol tables
+	- fix (apparently) memory leak in mro_compat.h
+
+0.01 Mon Mar  9 19:53:18 2009
+	- original version; created by Module::Setup

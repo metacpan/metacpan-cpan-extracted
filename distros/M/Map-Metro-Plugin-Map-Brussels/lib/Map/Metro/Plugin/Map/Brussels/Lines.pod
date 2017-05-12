@@ -1,0 +1,174 @@
+
+# PODNAME: Map::Metro::Plugin::Map::Brussels::Lines
+# ABSTRACT: Lines and stations in the Brussels map
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Map::Metro::Plugin::Map::Brussels::Lines - Lines and stations in the Brussels map
+
+=head1 VERSION
+
+Version 0.1001, released 2015-02-03.
+
+=head1 LINES
+
+=head2 Line 1: Gare de l'Ouest → Stockel [L1]
+
+=for HTML <div style="background-color: #b92c92; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Gare de l'Ouest      (L2, L5, L6)
+    Beekkant             (L2, L5, L6)
+    Étangs Noirs         (L5)
+    Comte de Flandre     (L5)
+    Sainte-Catherine     (L5)
+    De Brouckère         (L5, T3)
+    Gare Centrale        (L5)
+    Parc                 (L5)
+    Arts-Loi             (L2, L5, L6)
+    Maelbeek             (L5)
+    Schuman              (L5)
+    Mérode               (L5)
+    Montgomery
+    Joséphine-Charlotte
+    Gribaumont
+    Tomberg
+    Roodebeek
+    Vandervelde
+    Alma
+    Crainhem
+    Stockel
+
+=head2 Line 2: Osseghem → Arts-Loi [L2]
+
+=for HTML <div style="background-color: #ff8306; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Osseghem            (L6)
+    Beekkant            (L1, L5, L6)
+    Gare de l'Ouest     (L1, L5, L6)
+    Delacroix           (L6)
+    Clemenceau          (L6)
+    Gare du Midi        (L6, T3)
+    Porte de Hal        (L6, T3)
+    Hôtel des Monnaies  (L6)
+    Louise              (L6)
+    Porte de Namur      (L6)
+    Trône               (L6)
+    Arts-Loi            (L1, L5, L6)
+
+=head2 Line 3: Albert → Gare du Nord [T3]
+
+=for HTML <div style="background-color: #c3cf21; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Albert
+    Horta
+    Parvis de Saint-Gilles
+    Porte de Hal            (L2, L6)
+    Gare du Midi            (L2, L6)
+    Lemonnier
+    Anneessens
+    Bourse
+    De Brouckère            (L1, L5)
+    Rogier                  (L2, L6)
+    Gare du Nord
+
+=head2 Line 5: Erasme → Herrmann-Debroux [L5]
+
+=for HTML <div style="background-color: #fcb814; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Erasme
+    Eddy Merckx
+    CERIA
+    La Roue
+    Bizet
+    Veeweyde
+    Saint-Guidon
+    Aumale
+    Jacques Brel
+    Gare de l'Ouest   (L1, L2, L6)
+    Beekkant          (L1, L2, L6)
+    Étangs Noirs      (L1)
+    Comte de Flandre  (L1)
+    Sainte-Catherine  (L1)
+    De Brouckère      (L1, T3)
+    Gare Centrale     (L1)
+    Parc              (L1)
+    Arts-Loi          (L1, L2, L6)
+    Maelbeek          (L1)
+    Schuman           (L1)
+    Mérode            (L1)
+    Thieffry
+    Pétillon
+    Hankar
+    Delta
+    Beaulieu
+    Demey
+    Herrmann-Debroux
+
+=head2 Line 6: Roi Baudouin → Trône [L6]
+
+=for HTML <div style="background-color: #0080b3; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Roi Baudouin
+    Heysel
+    Houba-Brugmann
+    Stuyvenbergh
+    Bockstael
+    Pannenhuis
+    Belgica
+    Simonis             (L2) [Elisabeth: L2, L6]
+    Osseghem            (L2)
+    Beekkant            (L1, L2, L5)
+    Gare de l'Ouest     (L1, L2, L5)
+    Delacroix           (L2)
+    Clemenceau          (L2)
+    Gare du Midi        (L2, T3)
+    Porte de Hal        (L2, T3)
+    Hôtel des Monnaies  (L2)
+    Louise              (L2)
+    Porte de Namur      (L2)
+    Trône               (L2)
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Map::Metro::Plugin::Map::Brussels>
+
+=item *
+
+L<Task::MapMetro::Maps>
+
+=item *
+
+L<Map::Metro>
+
+=back
+
+=head1 SOURCE
+
+L<https://github.com/Csson/p5-Map-Metro-Brussels>
+
+=head1 HOMEPAGE
+
+L<https://metacpan.org/release/Map-Metro-Plugin-Map-Brussels>
+
+=head1 AUTHOR
+
+Erik Carlsson <info@code301.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Erik Carlsson <info@code301.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

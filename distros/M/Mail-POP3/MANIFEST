@@ -1,0 +1,36 @@
+Changes
+README
+README-v2.21
+MANIFEST
+Makefile.PL
+TODO
+t/mailfolder.t
+t/pop3comms.t
+t/testcommon.pl
+t/webscrape.t
+lib/Mail/POP3.pm
+lib/Mail/POP3/Server.pm
+lib/Mail/POP3/Daemon.pm
+lib/Mail/POP3/Folder/maildir.pm
+lib/Mail/POP3/Folder/mbox.pm
+lib/Mail/POP3/Folder/mbox/parse_to_disk.pm
+lib/Mail/POP3/Folder/webscrape.pm
+lib/Mail/POP3/Security/Connection.pm
+lib/Mail/POP3/Security/User.pm
+scripts/Makefile.PL
+scripts/installscript
+scripts/webscrape
+scripts/testp3
+scripts/mailbox-test
+scripts/mpopd.PL
+scripts/mpopdctl.PL
+scripts/mpopdstats.PL
+scripts/update-conf.PL
+conf/getpass.conf
+conf/jobserve.conf
+conf/mpopd.conf
+conf/mpopd_allow_deny
+conf/mpopd_trusted
+conf/second.conf
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

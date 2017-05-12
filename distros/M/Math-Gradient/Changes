@@ -1,0 +1,19 @@
+Revision history for Perl extension Math::Gradient.
+
+0.04  Fri Oct 24 16:41:44 2003
+	- still getting used to this PAUSE thing... i forgot
+		to up the version number for 0.03... sorry :-/
+
+0.03  Fri Oct 24 16:24:20 2003
+	- fixed spurious "use 5.008;" in Makefile.PL
+		(cpan #4205)
+	- fixed date for version 0.02 in ChangeLog :-)
+
+0.02  Thu Oct 23 12:02:38 2003
+	- fixed a few bits in the documentation, got rid
+		of requirement for perl 5.8.0
+
+0.01  Tue Oct 21 11:47:09 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n Math::Gradient
+

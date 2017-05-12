@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Examples</title>
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    </head>
+
+    <body>
+        <div class="container">
+            
+
+<p>An ordinary button, with applied shortcuts:</p>
+<pre>%= button &#39;The example 5&#39; =&gt; large, warning</pre>
+<pre>&lt;button class=&quot;btn btn-lg btn-warning&quot; type=&quot;button&quot;&gt;The example 5&lt;/button&gt;</pre>
+<div>    <button class="btn btn-lg btn-warning" type="button">The example 5</button></div>
+<hr />
+<p>With a url the button turns into a link:</p>
+<pre>%= button &#39;The example 1&#39; =&gt; [&#39;http://www.example.com/&#39;], small</pre>
+<pre>&lt;a class=&quot;btn btn-default btn-sm&quot; href=&quot;http://www.example.com/&quot;&gt;The example 1&lt;/a&gt;</pre>
+<div>    <a class="btn btn-default btn-sm" href="http://www.example.com/">The example 1</a></div>
+<hr />
+<p>A submit button for use in forms. It overrides the build-in submit_button helper:</p>
+<pre>%= submit_button &#39;Save 2&#39;, primary</pre>
+<pre>&lt;button class=&quot;btn btn-primary&quot; type=&quot;submit&quot;&gt;Save 2&lt;/button&gt;</pre>
+<div>    <button class="btn btn-primary" type="submit">Save 2</button></div>
+<hr />
+<pre>%= submit_button &#39;Save 2&#39;, primary, disabled</pre>
+<pre>&lt;button class=&quot;btn btn-primary&quot; disabled=&quot;disabled&quot; type=&quot;submit&quot;&gt;Save 2&lt;/button&gt;</pre>
+<div>    <button class="btn btn-primary" disabled="disabled" type="submit">Save 2</button></div>
+<hr />
+<pre>%= button &#39;The example 2&#39; =&gt; [url_for]</pre>
+<pre>&lt;a class=&quot;btn btn-default&quot; href=&quot;/button_1_50&quot;&gt;The example 2&lt;/a&gt;</pre>
+<div>    <a class="btn btn-default" href="/button_1_50">The example 2</a></div>
+<hr />
+<pre>%= button &#39;The example 3&#39; =&gt; [&#39;panel_1&#39;]</pre>
+<pre>&lt;a class=&quot;btn btn-default&quot; href=&quot;panel_1&quot;&gt;The example 3&lt;/a&gt;</pre>
+<div>    <a class="btn btn-default" href="panel_1">The example 3</a></div>
+<hr />
+<pre>%= button &#39;The example 4&#39;</pre>
+<pre>&lt;button class=&quot;btn btn-default&quot; type=&quot;button&quot;&gt;The example 4&lt;/button&gt;</pre>
+<div>    <button class="btn btn-default" type="button">The example 4</button></div>
+<hr />
+<pre>%= button [url_for], disabled, begin
+   The Example 6
+%  end</pre>
+<pre>&lt;a class=&quot;btn btn-default disabled&quot; href=&quot;/button_1_76&quot;&gt; The Example 6 &lt;/a&gt;</pre>
+<div>    <a class="btn btn-default disabled" href="/button_1_76"> The Example 6 </a></div>
+<hr />
+<pre>%= submit_button &#39;Save 1&#39;</pre>
+<pre>&lt;button class=&quot;btn btn-default&quot; type=&quot;submit&quot;&gt;Save 1&lt;/button&gt;</pre>
+<div>    <button class="btn btn-default" type="submit">Save 1</button></div>
+<hr />
+<pre>%= button &#39;Loop&#39;, active</pre>
+<pre>&lt;button class=&quot;active btn btn-default&quot; type=&quot;button&quot;&gt;Loop&lt;/button&gt;</pre>
+<div>    <button class="active btn btn-default" type="button">Loop</button></div>
+<hr />
+<pre>%= button &#39;Loop&#39;, block</pre>
+<pre>&lt;button class=&quot;block btn btn-default&quot; type=&quot;button&quot;&gt;Loop&lt;/button&gt;</pre>
+<div>    <button class="block btn btn-default" type="button">Loop</button></div>
+        </div>
+        <pre style="background-color: #fff; border-width: 0px;">
+
+
+
+        </pre>
+    </body>
+</html>

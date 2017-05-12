@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/01basic.t
+t/02application.t
+lib/MacPerl/AppleScript.pm
+SIGNATURE    Added here by Module::Build

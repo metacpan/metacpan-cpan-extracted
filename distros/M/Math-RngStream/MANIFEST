@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+RngStream.xs
+t/Math-RngStream.t
+t/pods.t
+typemap
+lib/Math/RngStream.pm
+META.yml                                 Module meta-data (added by MakeMaker)

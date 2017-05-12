@@ -1,0 +1,93 @@
+This file contains all the changes and bugfixes from the original version of
+BigInt/BigFloat to the rewritten one. For what has changed in the latest
+version see NEW and for a complete list of changes see the file CHANGES.
+
+v1.82:
+
+ general:
+  + It is subsequent faster than the original in many places
+    + Use more than 16 bit at a time, greater BASELEN for 64 bit systems
+    + overload for things like +=
+    + special operations like binc()
+    + many optimizations and shortcuts in normal operations
+    + Can use Math::BigInt lib => 'name'; for Pari, GMP, Bit::Vector or others
+  + regression test suite greatly enhanced to cover more problematic cases
+  + added example scripts (prime.pl, bigprimes.pl, hailstone.pl)
+  + documentation fixed and greatly enhanced
+  + BigInt is sub-classable with very little effort, see M::S or M::BF
+  + subclasses of Math::BigInt know all the same methods, so that you can call
+    $x->some_method() without having to know which type of class $x is
+  + added infinity handling
+  + much better NaN handling
+ caveats:
+  + bstr() and stringify now drop the leading '+' (to make overloaded cmp work
+    as expected when cmp'aring to scalars and other objects (read: bugfix)
+  + due to the dropping of '+' the string sort order has changed. It is now
+    compatible to the way perl sorts it's strings.
+  + spaces are no longer allowed in a number (but may precede or follow it)
+  !! You can always make a subclass and change all these things quite easily !!
+ input:
+  + underscores are now valid between any two digits (in hex/binary input, too)
+  + integers of the form 1E2, 1.23E2, 2.00 etc now valid for BigInt.pm, too
+  + hexadecimal numbers of the form 0xabcdefABCDEF0123456789
+  + binary numbers of the form 0b01010101101000001000100101
+  + octal numbers can be input via from_oct()
+ output:
+  + as_hex(), as_bin() and as_oct() for easier conversation between bases
+ bugs and buglets fixed over Mark's original:
+  + 0**0 gave NaN instead of 1
+  + -1**y gave -1 instead of +1 for even y
+  + fsqrt() gave slightly wrong results (like for fsqrt(9))
+  + +x/0 is now +inf, -x/0 is -inf (both were NaN), as well as other inf cases
+  + mod/div for negative numbers were incompatible to Perl's way
+  + added P. Prymmer's OS/390 '/1e5 vs *1e-5' patch w/o the performance snag
+  + incorporated all the patches to the core modules by John Peacock
+  + BigFloat::bxxx() works as well as BigFloat::fxxx()
+  + Math::BigInt->new(10) / Math::BigFloat->new(2) returned NaN (ditto for
+    other subclasses of Math::BigInt)
+  + $a = new Math::BigInt; creates now a +0, while "" still gives a NaN
+    This suppresses all warnings on undef arguments. Wether this is better...
+  + import() would always use "Math::BigInt" and clash with Exporter
+  + use Math::BigInt qw(bneg); $a = bneg('1234'); etc did not work at all
+  + $x->xxx() now modifies $x in all cases of modifiers and actually returns
+    the same $x (e.g. not a plain scalar or a different reference). All
+    testing routines leave $x alone. bpow(), bmod(), fround(), ffround() etc
+    were broken in this regard.
+ accuracy and precision:
+  + there is now support for both accuracy (significant digits) and precision
+    (fixed number of digits after decimal point), which by default is off
+  + objects/numbers now can have a local accuracy/precision
+ internal fixes:
+  + uses a blessed hash ref instead scalar ref (easier subclassable)
+  + my instead of local
+  + use strict and -w
+  + s/$[/0/ (after all, $[ = 1; in main does not effect this package)
+  + $# partially removed ($#y is scalar @y -1, $#$y is scalar @$y-1 - ugh!)
+  + added LICENSE section and file
+ new stuff:
+  + MBF: :constant works now
+  + MBI: :constant picks up binary and hexadecimal constants
+  + brsft()/blsft() also can do other bases than 2
+  + bacmp (acmp), because needed for more efficient add()
+  + bzero(), bnan(), bone(), binf()
+  + binc(), bdec(), bfac()
+  + is_zero(), is_nan(), is_one(), is_odd(), is_even(), is_inf(), is_int()
+  + digit(), length(), copy()
+  + as_number() (alias: as_int()), as_hex(), as_bin()
+  + is_positive(), is_negative() (alias: is_pos() and is_neg())
+  + mantissa(), exponent(), parts(), sign()
+  + bgcd() accepts now lists, blcm() (also accepts lists)
+  + flog()/blog() for overloading of log()
+  + fexp()/bexp() for overloading of exp()
+  + round(accuracy,precision,mode) round to accuracy/precision using mode
+  + MBF: fpow(), fmod(), fdiv() in list context (Thanx J. Peacock)
+  + fpow() can now handle non-integer arguments, like in fpow(2.1 ** 0.2)
+  + MBI: bsqrt()
+  + bmodpow(), bmodinv() (Thanx John Borwick)
+  + bfloor(), bceil(), broot()
+  + CORE cos()/sin()/exp()/atan2() now work when passed BigInts or BigFloats
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

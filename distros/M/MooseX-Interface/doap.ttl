@@ -1,0 +1,172 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-Interface/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "Class::Load"^^doap-deps:CpanId ], [ doap-deps:on "Moose 2.00"^^doap-deps:CpanId ], [
+		doap-deps:on "namespace::clean 0.19"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [ doap-deps:on "Test::Exception"^^doap-deps:CpanId ], [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Interface>;
+	doap:created         "2012-08-21"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/MooseX-Interface>;
+	doap:homepage        <https://metacpan.org/release/MooseX-Interface>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "MooseX-Interface";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooseX-Interface/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooseX-Interface/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooseX-Interface/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooseX-Interface/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooseX-Interface/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooseX-Interface/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooseX-Interface/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooseX-Interface/v_0-008>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-moosex-interface>;
+	];
+	doap:shortdesc       "Java-style interfaces for Moose".
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-Interface/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "MooseX-Interface-0.001"^^xsd:string;
+	dc:issued            "2012-08-21"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-Interface-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-Interface/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "MooseX-Interface-0.002"^^xsd:string;
+	dc:issued            "2012-08-22"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Make test cases work in pre-5.014 versions of Perl.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Interfaces may now provide embedded test cases.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-Interface-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-Interface/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "MooseX-Interface-0.003"^^xsd:string;
+	dc:issued            "2012-08-22"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Add MooseX::Interface::Tutorial.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Check parent interface test cases too when testing implementations.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-Interface-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-Interface/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "MooseX-Interface-0.004"^^xsd:string;
+	dc:issued            "2012-08-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Allow `requires` to be a passed method signatures for the required methods.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-Interface-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-Interface/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "MooseX-Interface-0.005"^^xsd:string;
+	dc:issued            "2012-10-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Replace B::Hooks::* usage with Hook::AfterRuntime.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Include test case for method signatures.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Replace Contextual::Return usage with a custom overloaded class.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Test cases embedded within interfaces now have a better (albeit still undocumented) introspection API.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-Interface-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-Interface/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "MooseX-Interface-0.006"^^xsd:string;
+	dc:issued            "2012-10-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Drop Hook::AfterRuntime magic, and introduce 'one' function instead.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Rename a bunch of internal classes.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Clean up interface integrity checking code.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document internals.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-Interface-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-Interface/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "MooseX-Interface-0.007"^^xsd:string;
+	dc:issued            "2013-06-28"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Drop usage of smartmatch.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-Interface-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-Interface/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "MooseX-Interface-0.008"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-Interface-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

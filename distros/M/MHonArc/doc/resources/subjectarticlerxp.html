@@ -1,0 +1,134 @@
+<html>
+<head>
+<title>MHonArc Resources: SUBJECTARTICLERXP</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="stdout.html">STDOUT</a>]</td><td><nobr>[<a href="../resources.html#subjectarticlerxp">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="subjectbegin.html">SUBJECTBEGIN</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>SUBJECTARTICLERXP</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p>
+<code>M2H_SUBJECTARTICLERXP=</code><var>perl_regex</var>
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p>
+<code>&lt;SUBJECTARTICLERXP&gt;</code><br>
+<var>perl_regex</var><br>
+<code>&lt;/SUBJECTARTICLERXP&gt;</code><br>
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p>
+<code>-subjectarticlerxp <var>perl_regex</var></code>
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>SUBJECTARTICLERXP defines the Perl regular expression matching
+leading articles (eg: "the", "a", "an") in subject text.
+</p>
+
+<p>SUBJECTARTICLERXP is used by MHonArc for sorting.
+The regex defined is used in <b><tt>s///</tt></b>
+operation with the case-insensitive modifier.
+The regex should be anchored to the beginning of the string.
+</p>
+
+<p>The SUBJECTARTICLERXP is normally changed to suit a particular
+locale.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<pre>
+^(the|a|an)\s+
+</pre>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>If you are archiving French message, the following setting
+maybe appropriate:
+</p>
+<pre>
+<b>&lt;SubjectArticleRxp&gt;</b>
+^l(es|e|a)\s+
+<b>&lt;/SubjectArticleRxp&gt;</b>
+</pre>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>2.2.0
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+<a href="subjectreplyrxp.html">SUBJECTREPLYRXP</a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="stdout.html">STDOUT</a>]</td><td><nobr>[<a href="../resources.html#subjectarticlerxp">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="subjectbegin.html">SUBJECTBEGIN</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2003/10/06 22:04:20 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"
+><strong>MHonArc</strong></a><br>
+Copyright &#169; 1998, <a href="http://www.earlhood.com/"
+>Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org"
+>mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

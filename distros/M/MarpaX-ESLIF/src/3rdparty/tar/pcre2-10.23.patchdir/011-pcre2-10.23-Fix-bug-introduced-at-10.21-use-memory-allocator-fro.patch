@@ -1,0 +1,79 @@
+From 51b522c0120d061f54317f8a1cede05328c97aca Mon Sep 17 00:00:00 2001
+From: ph10 <ph10@6239d852-aaf2-0410-a92c-79f79f948069>
+Date: Sat, 25 Mar 2017 15:19:49 +0000
+Subject: [PATCH] Fix bug introduced at 10.21: use memory allocator from the
+ pattern if no context is supplied to pcre2_match().
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Ported to 10.23:
+
+commit 1b7e16d584f0560dd84d2a3260cf08e1a86cccc1
+Author: ph10 <ph10@6239d852-aaf2-0410-a92c-79f79f948069>
+Date:   Sat Mar 25 15:19:49 2017 +0000
+
+    Fix bug introduced at 10.21: use memory allocator from the pattern if no
+    context is supplied to pcre2_match().
+
+    git-svn-id: svn://vcs.exim.org/pcre2/code/trunk@707 6239d852-aaf2-0410-a92c-
+79f79f948069
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ src/pcre2_match.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/src/pcre2_match.c b/src/pcre2_match.c
+index 78a9bac..52bb843 100644
+--- a/src/pcre2_match.c
++++ b/src/pcre2_match.c
+@@ -6518,11 +6518,6 @@ options |= (re->flags & FF) / ((FF & (~FF+1)) / (OO & (~OO+1)));
+ #undef FF
+ #undef OO
+ 
+-/* A NULL match context means "use a default context" */
+-
+-if (mcontext == NULL)
+-  mcontext = (pcre2_match_context *)(&PRIV(default_match_context));
+-
+ /* These two settings are used in the code for checking a UTF string that
+ follows immediately afterwards. Other values in the mb block are used only
+ during interpretive pcre_match() processing, not when the JIT support is in
+@@ -6590,7 +6585,7 @@ if (utf && (options & PCRE2_NO_UTF_CHECK) == 0)
+ /* It is an error to set an offset limit without setting the flag at compile
+ time. */
+ 
+-if (mcontext->offset_limit != PCRE2_UNSET &&
++if (mcontext != NULL && mcontext->offset_limit != PCRE2_UNSET &&
+      (re->overall_options & PCRE2_USE_OFFSET_LIMIT) == 0)
+   return PCRE2_ERROR_BADOFFSETLIMIT;
+ 
+@@ -6609,7 +6604,15 @@ if (re->executable_jit != NULL && (options & ~PUBLIC_JIT_MATCH_OPTIONS) == 0)
+   }
+ #endif
+ 
+-/* Carry on with non-JIT matching. */
++/* Carry on with non-JIT matching. A NULL match context means "use a default
++context", but we take the memory control functions from the pattern. */
++
++if (mcontext == NULL)
++  {
++  mcontext = (pcre2_match_context *)(&PRIV(default_match_context));
++  mb->memctl = re->memctl;
++  }
++else mb->memctl = mcontext->memctl;
+ 
+ anchored = ((re->overall_options | options) & PCRE2_ANCHORED) != 0;
+ firstline = (re->overall_options & PCRE2_FIRSTLINE) != 0;
+@@ -6621,7 +6624,6 @@ bumpalong_limit =  (mcontext->offset_limit == PCRE2_UNSET)?
+ 
+ mb->callout = mcontext->callout;
+ mb->callout_data = mcontext->callout_data;
+-mb->memctl = mcontext->memctl;
+ #ifdef HEAP_MATCH_RECURSE
+ mb->stack_memctl = mcontext->stack_memctl;
+ #endif
+-- 
+2.7.4
+

@@ -1,0 +1,63 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+my $symbol = undef;
+my $code = undef;
+my @descs = ();
+my $in_item = 0;
+
+require "../lib/Errors.pm";
+
+while(<>)
+	{
+    s/[\012\015]*$//;
+    s/\#.*$//;
+    if( /^\s*$/ || /^=back$/ || /^=over 4$/ || /^=cut$/) {}
+    elsif( /^=item (.*)$/ )
+		{
+		print_symbol($symbol,$code,@descs);
+			$symbol = $1;
+		$code = undef;
+		@descs = ();
+		}
+    elsif (/^=head[12] (.*)$/)
+		{
+		print_symbol($symbol,$code,@descs);
+		$symbol = undef;
+		$code = undef;
+		@descs = ();
+			print "$1\n";
+		}
+    elsif (/^sub [^ ]+ { (.*) }$/)
+		{
+			$code = $1;
+		$code =~ s/^-//;
+		}
+    elsif (!/^\s*(.*?)\s*$/)
+    {
+        die("unprocessed line: $_")
+    }
+    elsif (defined($symbol))
+    {
+	push(@descs,$1);
+    }
+    else
+    {
+	my $desc = $1;
+	$desc =~ s/^See also //;
+	print "  $desc\n";
+    }
+	}
+
+
+sub print_symbol
+	{
+    my ($symbol, $code, @descs) = @_;
+    return if (!defined($symbol));
+    print "    $symbol $code\n".join('',map("      $_\n",@descs))
+	if (defined($symbol));
+	}
+
+
+print_symbol($symbol,$code,@descs);

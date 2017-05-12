@@ -1,0 +1,668 @@
+Revision history for Map::Tube
+
+3.28  2017-03-06T11:20:00+00:00
+      - Fixed error handling in the method Map::Tube::get_map_data().
+
+3.27  2017-02-24T10:50:00+00:00
+      - Added required attribute checks.
+
+3.26  2017-02-21T13:35:00+00:00
+      - Removed dependency on JSON::Parse.
+      - Added new method to_perl() to the helper package Map::Tube::Utils.
+      - Refactored script map-data-converter to make use of newly created method to_perl().
+
+3.25  2017-02-20T11:55:00+00:00
+      - Removed dependency on XML::Simple.
+      - Refactored script map-data-converter to workout with XML::Twig when creating xml file.
+
+3.24  2017-02-19T07:25:00+00:00
+      - Added dependency on MooX::Options v4.023.
+      - Added dependency on Map::Tube::Exceptions v3.11.
+      - Refactored script map-data-converter to handle error appropriately.
+
+3.23  2017-02-16T16:00:00+00:00
+      - Added script map-data-converter.
+      - Documented supported map data format.
+
+3.22  2017-02-07T15:50:00+00:00
+      - Added support for map data in JSON format as well. XML is still the default format.
+      - Added test for bad map data.
+      - Updated dependency on Map::Tube::Exception v3.09.
+      - Updated optional minimum dependency on Test::Map::Tube v0.22.
+
+3.21  2016-10-10T09:45:00+00:00
+      - Added validation for line color.
+      - Updated dependency on Map::Tube::Exception v3.08.
+
+3.20  2016-10-04T12:00:00+00:00
+      - Added missing pre-reqs Type::Tiny and File::Share.
+      - Added some more attribute types 'Table', 'Tables', 'NodeMap' and 'LineMap'.
+
+3.19  2016-10-03T09:40:00+00:00
+      - Added attribute type class 'Map::Tube::Types'.
+
+3.18  2016-07-30T10:30:00+00:00
+      - Documented method ok_map_routes().
+
+3.17  2016-07-11T09:45:00+00:00
+      - Added unit test (t/map.t).
+
+3.16  2016-07-03T03:25:00+00:00
+      - Addressed issue raised in the CPAN Tester Report.
+        http://www.cpantesters.org/cpan/report/297cf692-3f1d-11e6-a514-8183992ad5f0
+
+3.15  2016-06-24T10:30:00+00:00
+      - Added explicit dependency on XML::Parser v2.23 to address the CPAN Tester FAIL report:
+        http://www.cpantesters.org/cpan/report/059a00cc-38a5-11e6-a16d-92a790c50306
+
+3.14  2016-06-20T11:20:00+00:00
+      - Updated unit test meta-json.t and meta-yml.t to check consistent version correctly.
+
+3.13  2016-06-14T10:45:00+00:00
+      - Propose fix to handle standard line and other link appropriately.
+      - Updated copyright year information.
+
+3.12  2015-10-30T10:25:00+00:00
+      - Upgraded to use Map::Tube::Exception v3.06.
+      - Added missing plugin handler properly using AUTOLOAD.
+
+3.11  2015-10-23T14:20:00+00:00
+      - Ordered lines attached to station RT# 107745.
+      - Updated 'Changes' log history.
+
+3.10  2015-10-22T18:40:00+00:00
+      - Fixed the side effects of fix for RT# 107745.
+
+3.09  2015-10-20T11:40:00+00:00
+      - Proposed solution to RT# 107745.
+
+3.08  2015-10-19T12:00:00+00:00
+      - Updated pod document about map functional validation provided by Test::Map::Tube v0.09.
+      - Updated exception error message in the method Map::Tube::Line::add_station().
+
+3.07  2015-10-18T12:15:00+00:00
+      - Added new method _xml_data() to the package Map::Tube.
+      - Updated method get_line_by_id() to fixed the warning.
+      - Updated method _init_map() to make use of new method _xml_data().
+      - Updated pod document about method name(), earlier it was documented as get_name().
+
+3.06  2015-10-15T11:50:00+00:00
+      - Removed the minimum version requirements from 'overload' and 'Throwable'.
+      - Removed redundant exception handling code.
+      - Made exception error message consistent.
+      - Fix comparison of line IDs, thanks to Michal Spacek.
+
+3.05  2015-10-14T12:55:00+00:00
+      - Import the missing exceptions (Map::Tube::Exception::InvalidLineId and Map::Tube::Exception::MissingLineId).
+      - Upgraded to use Map::Tube::Exception v3.05.
+
+3.04  2015-10-14T10:25:00+00:00
+      - Patched issue RT# 107752.
+
+3.03  2015-10-13T13:00:00+00:00
+      - Updated method get_stations() in the package Map::Tube, to check if the
+        line name is defined before applying uc() and raise exception accordingly.
+      - Also updated pod document slightly for the method get_stations().
+
+3.02  2015-10-10T08:35:00+00:00
+      - Replaced XML::Simple with XML::Twig, long pending task, as XML::Simple
+        can't cope with unicode characters under XML::SAX v0.99 as reported by
+        the report below:
+        http://www.cpantesters.org/cpan/report/968a3680-6e00-11e5-aa10-096acfe82091
+
+3.01  2015-09-17T10:25:00+00:00
+      - Removed local package Map::Tube::Exception.
+      - Removed local package Map::Tube::Error.
+      - Updated to use new external package Map::Tube::Exception::*.
+
+3.00  2015-04-01T10:10:00+00:00
+      - Proposed solution for issue RT: #103169 subject to feedbacks.
+      - Added section "SYNOPSIS" to the pod document of packages Map::Tube::Node and Map::Tube::Line.
+      - Added section "CONSTRUCTOR" to the pod document of package Map::Tube::Node.
+
+2.99  2015-03-30T10:35:00+01:00
+      - Updated method get_node_by_id() to check if the given node id is defined.
+      - Updated private method _init_map) to check if the node id is duplicate.
+
+2.98  2015-03-29T17:35:00+01:00
+      - Proposed solution for issue RT: #103168 subject to feedbacks.
+
+2.97  2015-03-27T20:30:00+01:00
+      - Updated method Map::Tube::Route::preferred() to return an object of type L<Map::Tube::Route>.
+
+2.96  2015-03-27T12:00:00+01:00
+      - Added the following methods to the package Map::Tube.
+        - get_line_by_id()
+        - get_line_by_name()
+
+2.95  2015-03-26T11:05:00+01:00
+      - Proposed solution for issue RT: #103103 subject to feedbacks.
+
+2.94  2015-03-24T11:35:00+01:00
+      - Tidied up pod document in general.
+
+2.93  2015-03-22T22:00:00+01:00
+      - Updated method get_lines() in the package Map::Tube to filter out other links.
+
+2.92  2015-03-22T11:45:00+01:00
+      - Documented new plugin Map::Tube::Plugin::Formatter in the package Map::Tube.
+
+2.91  2015-03-22T11:05:00+01:00
+      - Added section "SYNOPSIS" to the package Map::Tube.
+
+2.90  2015-03-22T09:45:00+01:00
+      - Added new method preferred() to the package Map::Tube::Route.
+
+2.89  2015-03-15T17:15:00+01:00
+      - Proposed solution for issue RT: #102438 subject to feedbacks.
+
+2.88  2015-03-10T12:20:00+01:00
+      - Added new package Map::Tube::Utils.
+      - Updated unit test t/00-load.t to load the new package.
+      - Updated Map::Tube::Pluggable to set the max_depth to 4.
+
+2.87  2015-02-22T17:45:00+01:00
+      - Tidied up the pod document.
+
+2.86  2015-02-20T16:05:00+01:00
+      - Removed call to method _validate_map_data() at the point of object creation,
+        instead it would now be validated at the build time if you have Test::Map::Tube
+        installed.
+
+2.85  2015-02-18T17:25:00+01:00
+      - Fixed the nasty regex bug in the method Map::Tube::_get_shortest_route(), issue
+        raised by Map::Tube::Beijing (author Gisbert W. Selke).
+
+2.84  2015-02-17T17:25:00+01:00
+      - Documented plugin Map::Tube::Plugin::FuzzyFind by Gisbert W. Selke in the pod document of Map::Tube.
+
+2.83  2015-02-12T23:20:00+01:00
+      - Fixed the typo in class description of Map::Tube::Error and Map::Tube::Exception.
+
+2.82  2015-02-12T17:50:00+01:00
+      - Documented method get_name() in the pod document of Map::Tube.
+      - Tidied up description of some other methods as well in the pod document.
+
+2.81  2015-02-12T13:05:00+01:00
+      - Tidied up pod document, in general.
+      - Optimised method Map::Tube::_format().
+
+2.80  2015-02-10T11:55:00+01:00
+      - Updated pod document of Map::Tube regarding the plugin Map::Tube::Plugin::Graph.
+
+2.79  2015-02-09T22:55:00+01:00
+      - Refactored the plugin integration code as conceived by Gisbert W. Selke.
+
+2.78  2015-02-05T17:30:00+01:00
+      - Updated method Map::Tube::as_image() the way it gets graph plugin and process it.
+
+2.77  2015-01-27T16:30:00+01:00
+      - Ongoing improvement work on method get_shortest_route().
+
+2.76  2015-01-27T13:13:00+01:00
+      - Further improvement to the method get_shortest_route(), down to 17 wallclock seconds.
+
+2.75  2015-01-26T17:15:00+01:00
+      - Improved performance from 33 wallclock seconds to 25 wallclock seconds for method get_shortest_route()
+        as recent changes to data validation was adding the load.
+
+2.74  2015-01-25T08:15:00+01:00
+      - Making use of Map::Tube::Exception instead of die to be consistent as raised by GWS.
+
+2.73  2015-01-25T02:55:00+01:00
+      - Cherry picked commit from the pull request from TUPINEK to the method Map::Tube::_init_map().
+
+2.72  2015-01-23T20:45:00+01:00
+      - Merged pull request from Michal Špaček regarding fix to the method Map::Tube::Node::as_string().
+
+2.71  2015-01-23T16:45:00+01:00
+      - Patched for issue RT: 101703.
+
+2.70  2015-01-22T16:40:00+01:00
+      - Updated method _init_map() to read xml data for detailed line information if available.
+      - Updated package Map::Tube::Line and added attribute 'id'.
+      - Updated package Map::Tube::Line and made attribute 'color' readwrite.
+
+2.69  2015-01-21T20:30:00+01:00
+      - Tidied up the pod document for Map::Tube::Pluggable.
+
+2.68  2015-01-20T20:25:00+01:00
+      - Improved error handling in the method as_image().
+      - Updated test script 00-load.t.
+
+2.67  2015-01-20T10:35:00+01:00
+      - Patched for issue RT: 101627.
+
+2.66  2015-01-20T00:20:00+01:00
+      - Using Module::Pluggable to lookup and process Map::Tube::Plugin::Graph
+        instead of using eval {};
+
+2.65  2015-01-19T16:20:00+01:00
+      - Added map data validation code provided by Gisbert W. Selke.
+
+2.64  2015-01-18T23:30:00+01:00
+      - Added method as_image() to return base64 encoded string of Line image
+        with the help of Map::Tube::Plugin::Graph.
+      - Added new error codes related to the above method.
+
+2.63  2015-01-14T21:10:00+01:00
+      - Added "SEE ALSO" section to the pod document of the package Map::Tube.
+
+2.62  2015-01-13T14:30:00+01:00
+      - Added missing 'use strict; use warnings;' to change.t script.
+      - Added missing 'use 5.006;' line to meta-json.t, meta-yml.t and change.t scripts.
+
+2.61  2015-01-07T12:50:20+01:00
+      - Tidied up the test scripts meta-yml.t and meta-json.t.
+
+2.60  2015-01-06T17:40:20+01:00
+      - Oops forgot to update Changes file.
+
+2.59  2015-01-06T17:30:20+01:00
+      - Tidied up the LICENSE file.
+
+2.58  2015-01-06T17:10:20+01:00
+      - Tidied up the MANIFEST.SKIP file.
+
+2.57  2015-01-03T10:30:00+01:00
+      - Updated unit test meta-yml.t and meta-json.t to check the version of modules
+        in the 'provides' list agains the distribution version.
+
+2.56  2015-01-03T09:50:00+01:00
+      - Explicitly assign version to the provides list in the Makefile.PL.
+
+2.55  2015-01-03T09:30:00+01:00
+      - Updated Makefile.PL to generate the key 'provides' for META file correctly.
+      - Added unit test to test META files.
+
+2.54  2015-01-03T00:25:00+01:00
+      - The recent package ExtUtils-MakeMaker-7.05_05 now generates the following files missing in MANIFEST:
+        - _eumm/Map-Tube.ppd
+        - _eumm/META_new.json
+        - _eumm/META_new.yml
+        as reported by CPANTESTER as below:
+        http://www.cpantesters.org/cpan/report/7d977ff4-9271-11e4-95d4-59833a6893cb
+      - Added the above files in the MANIFEST.SKIP file.
+
+2.53  2015-01-02T23:15:00+01:00
+      - Added missing package Map::Tube::Line to the 'provides' key in the Makefile.PL file.
+
+2.52  2015-01-02T10:30:00+01:00
+      - Updated Changes file according to CPAN::Changes::Spec package.
+      - Added unit test changes.t file.
+      - Defined $AUTHORITY in all the packages of the distribution.
+      - Added LICENSE file.
+      - Updated Copyright year information.
+
+2.51  2015-01-01T18:40:00+01:00
+      - Tidied up pod document for method get_stations() in the package Map::Tube.
+
+2.50  2015-01-01T10:15:00+01:00
+      - Updated method get_shortest_route() to stay on the same line as much
+        as possible unless it is expensive in terms of stoppage.
+
+2.49  2014-12-31T10:40:00+01:00
+      - Improved the performance of method get_shortest_route() slightly.
+
+2.48  2014-12-30T13:00:00+01:00
+      - Documented public method defined in the package Map::Tube.
+      - Tidied up code in general.
+
+2.47  2014-12-29T20:30:30+01:00
+      - Applied request RT: 101190.
+
+2.46  2014-12-19T00:47:30+01:00
+      - Removed redundant code from the methods get_shortest_route() and _get_shortest_route().
+      - Minor cosmetics changes to some of the pod documents.
+
+2.45  2014-12-18T17:08:10+01:00
+      - Fixed invalid pod tag in the section "DESCRIPTION" of the package Map::Tube::Error.
+      - Added section "DESCRIPTION" to the package Map::Tube::Exception.
+      - Updated description of the method Map::Tube::get_stations in the package Map::Tube.
+      - Updated section "DESCRIPTION" of the package Map::Tube::Table.
+
+2.44  2014-12-18T15:18:10+01:00
+      - Added new package Map::Tube::Line to hold map line information.
+      - Updated method Map::Tube::get_lines() to return ref to a list of objects of type Map::Tube::Line.
+
+2.43  2014-12-18T12:00:10+01:00
+      - Added two new methods get_lines() and get_stations($line) to the package Map::Tube (RT: 100971).
+      - Added new error codes to the package Map::Tube::Error.
+
+2.42  2014-12-08T14:48:20+01:00
+      - Added 'provides' key to the Makefile.PL file.
+
+2.41  2014-12-07T19:50:20+01:00
+      - Tidied up pod document of the package Map::Tube.
+
+2.40  2014-12-07T19:15:20+01:00
+      - Added new attribute 'name' to package Map::Tube to hold the map name. [RT: 100771]
+
+2.39  2014-12-07T17:45:20+01:00
+      - Removed dependency on 'Encode' from Makefile.PL as it is no longer required.
+
+2.38  2014-12-07T17:20:20+01:00
+      - Removed the new attribute 'utf8' from Map::Tube and Map::Tube::Node as it was causing
+        more trouble for end user than any help as added in v2.36.
+
+2.37  2014-12-07T16:38:20+01:00
+      - Removed 'use utf8;' line from all the packages of the distribution Map-Tube.
+
+2.36  2014-12-07T14:15:00+01:00
+      - Added new attribute 'utf8' to Map::Tube which default to true.
+      - Also added new mandatory attribute 'utf8' which inherits the setting of 'utf8' attribute of Map::Tube.
+      - Now utf8 encode/decode happens depending on this new attribute.
+
+2.35  2014-12-07T11:45:00+01:00
+      - Updated method Map::Tube::get_shortest_route() to decode (utf8) the station names.
+      - Updated method Map::Tube::Node::to_string() to encode (utf8) the response.
+      - Marked method Map::Tube::get_all_routes() as EXPERIMENTAL.
+      - Added package Encode as pre-requisite in the Makefile.PL file.
+      - Updated pod document to reflect the change in behaviour of the two methods
+        Map::Tube::get_shortest_route() and Map::Tube::get_all_routes().
+
+2.34  2014-12-05T21:19:00+01:00
+      - Fixed the pod tag for method link() in the package Map::Tube::Node.
+
+2.33  2014-12-05T19:36:00+01:00
+      - Tidied up the pod document of Map::Tube and removed "NOTE".
+      - Corrected the pod tag for "METHODS" and method id() in the package Map::Tube::Node.
+      - Added section "DESCRIPTION" in the package Map::Tube::Table.
+      - Corrected the pod tag for method nodes() in the package Map::Tube::Route.
+
+2.32  2014-12-05T15:30:00+01:00
+      - Made all the attributes of class Map::Tube::Node as required mandatory.
+      - Documented all methods exposed by class Map::Tube::Node.
+      - Made attribute 'id' as required mandatory for class Map::Tube::Table.
+      - Added two attributes 'from' and 'to' to the class Map::Tube::Route.
+      - Made all attributes as required mandatory for class Map::Tube::Route.
+      - Made slight improvement to the method get_shortest_route() and get_all_routes().
+      - Documented the method get_all_routes().
+
+2.31  2014-12-03T21:00:00+01:00
+      - Added the feature to accept case insensitive station name.
+      - Also added Map::Tube::Berlin to the list of package taking the role Map::Tube.
+
+2.30  2014-12-03T14:40:00+01:00
+      - Fixed the performance issue raised in the ticket RT: 100677.
+      - Updated pod document about the methods exposed by the Map::Tube.
+
+2.29  2014-12-03T00:40:00+01:00
+      - Cosmetics changes to the pod document of package Map::Tube.
+
+2.28  2014-12-02T22:02:00+01:00
+      - Added method validate_map_data() to the package Map::Tube, to validate the map data.
+        Post loading map data, it checks if all the nodes are defined and throw error if found
+        any missing.
+      - Removed SIGNATURE file from the distribution.
+
+2.27  2014-11-30T11:19:10+01:00
+      - Refactored code in a big way to be more OO style.
+      - Added new package Map::Tube::Table to represent table in the map.
+      - Added new method Map::Tube::get_routes() to get all possible routes between two nodes.
+      - Updated method Map::Tube::get_shortest_route() to return list of objects of type Map::Tube::Node.
+      - Updated method Map::Tube::Node::to_string() to return the node line along with the name.
+
+2.26  2014-08-30T02:45:00+01:00
+      - Added key "META_MERGE" key on condition (ExUtils::MakeMake->VERSION(6.46).
+
+2.25  2014-08-16T10:22:18+01:00
+      - Added section "REPOSITORY" to the pod document.
+      - Added key "META_MERGE" to Makefile.PL file.
+
+2.24  2014-08-08T23:38:09+01:00
+      - Removed Build.PL script.
+      - Tidied up README file.
+
+2.23  2014-07-25T16:48:13+01:00
+      - Streamlined version to all modules
+      - Minor cosmetic changes
+
+2.22  2014-07-07T20:41:00+01:00
+      - Added 'namespace::clean' as pre-requisite to Build.PL and Makefile.PL
+
+2.21  2014-07-06T04:10:09+01:00
+      - Tidied up the pod documemt
+
+2.20  2014-07-05T22:13:15+01:00
+      - Complete revamp of the original Map::Tube. Converted into Role (Moo).
+
+2.19  2011-03-28T13:14:15+01:00
+      - Updated Copyright information.
+
+2.18  2011-03-09T18:44:17+01:00
+      - Changed the description of the module slightly.
+
+2.17  2011-03-02T11:43:20+01:00
+      - Removed "-T" from the first line of 00-load.t, pod.t, manifest.t
+        and 00-signature.t. It appears to me that Mac OS X doesn't like it,
+        for some reason.
+
+2.16  2011-03-02T10:22:19+01:00
+      - Cleaned up Makefile.PL as CPAN Testers have complained about it.
+
+2.15  2011-02-28T12:17:00+01:00
+      - Removed "create_makefile_pl" from the Build.PL
+      - Arranged Makefile.PL as it's no longer be auto built.
+
+2.14  2011-02-28T11:49:10+01:00
+      - Added DISCLAIMER section to the pod.
+
+2.13  2011-02-04T18:55:43+01:00
+      - Added MYMETA.json to MANIFEST.SKIP as some CPAN Testers not happy on GNU/Linux
+        OS Version 2.6.32-2-amd64, Perl version (5.13.2, 5.13.6, 5.13.7, 5.13.8, 5.13.9,
+        5.8.9) as reported on Friday, 4th February 2011 (6.13pm) UK TIME.
+
+2.12  2011-02-04T16:46:59+01:00
+      - Corrected the year part of last release in the 'Changes' file.
+      - Also fixed the pod for method show_map_chart() as it was generating incorrect
+        html on install.
+
+2.11  2011-02-04T15:40:21+01:00
+      - Now allows multiple spaces if node's name consists of two or more words and
+        fix it automatically for user.
+      - Now trims any space at the beginning and at the end of node's name.
+      - Added unit test test-case-21.t for the above changes.
+      - Updated pod for method get_shortest_route() to reflect aboove changes.
+      - Updated pod for method show_map_chart() to show output as well in this case.
+      - Added test case in the test-case-00.t about testing node's definition after
+        setting node mappings.
+
+2.10  2010-12-06T18:33:46+01:00
+      - Renamed key _follow to _follow_me.
+      - Renamed key _element to _nodes.
+      - Renamed key _node to _mappings.
+      - Renamed key _line to _lines.
+      - Renamed method get_name() to get_node_name().
+      - Renamed method get_element to get_nodes().
+      - Renamed method set_lines() to set_node_lines().
+      - Renamed method get_lines() to get_node_lines().
+      - Renamed method set_node() to set_node_mappings().
+      - Renamed method get_node() to get_node_mappings().
+      - Renamed method set_default_node() to set_default_node_definitions().
+      - Renamed method init() to load_node_mappings().
+      - Renamed method load_element() to load_nodes().
+      - Renamed method load_line() to load_node_lines().
+      - Renamed method upcase_element_name() to upcase_node_names().
+      - Renamed internal method _initialize() to _init().
+      - Renamed internal method _initialize_table() to _init_table().
+      - Updated internal method _get_next_node(), _sanity_check() and _process_node()
+        to reflect the above changes.
+      - Updated the unit test test-case-00.t, test-case-14.t and test-case-20.t to
+        reflect the above changes.
+      - Updated pod to reflect the above changes.
+
+2.09  2010-12-03T19:07:21+01:00
+      - Added to setup line information for user defined nodes.
+      - Added to check the line information irrespective of whether following the line or not.
+      - Updated pod for method set_node() regarding mapping checks.
+      - Minor changes to the error message thrown during data checks.
+      - Modified method load_method() to be able to load user data.
+      - Added unit test for missing map information.
+
+2.08  2010-11-26T09:48:59+01:00
+      - Updated pod for method init().
+
+2.07  2010-11-25T18:43:19+01:00
+      - Updated pod for method upcase_element_name().
+
+2.06  2010-11-24T09:40:11+01:00
+      - Added SIGNATURE to the distribution.
+      - Added unit test for SIGNATURE file.
+
+2.05  2010-11-24T09:04:05+01:00
+      - Removed all internal methods detail from the pod.
+
+2.04  2010-11-23T16:03:25+01:00
+      - Removed test for boilerplate.
+      - Method get_next_node() is now turned into internal method _get_next_node().
+      - Method sanity_check() is now turned into internal method _sanity_check().
+
+2.03  2010-11-19T10:13:49+01:00
+      - Removed the constraint on node code to be a string. Now node code can
+        be a STRING or NUMBER.
+      - Added unit test test-case-20.t to test this new feature.
+      - Added internal method _is_same().
+      - Added internal method _is_number().
+      - Updated pod about the change in behaviour of node code.
+
+2.02  2010-11-12T09:42:39+01:00
+      - Added Metropolitan line fast train mapping.
+      - Fixed the missing mapping between HOH and M09.
+      - Added unit test test-case-18.t and test-case-19.t for the mapping.
+
+2.01  2010-11-10T16:30:51+01:00
+      - Added Overground line data.
+      - Added unit test case for Overground line data.
+      - Fixed unit test test-case-03.t, test-case-04.t, test-case-07.t and test-case-08.t
+        with regard to addition of more data.
+      - Updated pod regarding Overground line data.
+
+2.0   2010-11-10T13:22:09+01:00
+      - Added DLR line data.
+      - Added unit test for DLR line data.
+
+1.9   2010-11-10T09:46:11+01:00
+      - Removed the debug parameter from the constructor.
+      - By default debug is turned off.
+      - Removed unit test to validate the debug parameter for constructor.
+      - Added method set_debug() to control the debug flag.
+
+1.8   2010-11-10T09:27:57+01:00
+      - Added Waterloo & City line data.
+      - Fixed method _process_node() for silly bug.
+      - Added unit test for Waterloo & City line data.
+      - Fixed unit test test-case-05.t and test-case-06.t with regard to addition of more data.
+
+1.7   2010-11-09T16:01:29+01:00
+      - Updated pod about the "Famous Software Award" given by Download.FamousWhy.com.
+
+1.6   2010-11-09T13:40:28+01:00
+      - Added MANIFEST.SKIP to the MANIFEST file.
+      - Factor out the initilization functionality into a seperate method.
+      - Added example to the method get_next_node() in the pod.
+      - Added example to the method get_tube_lines() in the pod.
+      - Added data validation to the method set_line().
+      - Added new method sanity_check() to the sanity check on the data.
+      - Corrected the node code for Holborn.
+      - Remove invalid node code P28.
+      - Corrected map definition for node code M22.
+      - Added map definition for node code M21, KSG, WBM and ESQ.
+      - Fixed map definition for KCS, missing ESQ from the list.
+      - Changed the structure of Line information.
+
+1.5   2010-11-05T16:54:11+01:00
+      - Added boilerplate.t to the MANIFEST.
+      - Renamed the unit test case appropriately.
+      - Modified manifest.t to test MANIFEST everytime.
+      - Added Tube line definitions.
+      - Added the ability to define line definitions for user node.
+      - Now get_shortest_route() dump the time taken to find the shortest route.
+      - Added get_next_node(), which checks wether to follow the line or not.
+      - Added follow_me(), to enable the follow tube line switch. However it's not documented.
+      - Added get_tube_lines() to return the lines list of given node.
+      - Added get_line() to return the line informations.
+      - Added set_line() to allow user to define their own line informations.
+      - Added load_line() to load the default line informations.
+      - Modified Build.PL and Makefile.PL to include Time::HiRes as requirement.
+      NOTE: Follow line functionality is not yet fully functional.
+
+1.4   2010-11-02T18:06:15+01:00
+      - Validate the parameter passed to the constructor.
+      - Added unit test to validate the parameter passed to the constructor.
+      - Fixed the example code in the pod.
+      - Added example for method get_name() in the pod.
+      - Added example for method init(), load_element() and upcase_element_name() in the pod.
+
+1.3   2010-11-02T15:31:22+01:00
+      - Major changes to the method _process_node().
+      - Added example to each method defined in the pod.
+      - POD for method show_map_chart() arranged correctly.
+      - Added unit test to validate code passed to get_name().
+
+1.2   2010-11-01T09:45:41+01:00
+      - Renamed method _get_name() to get_name() and made it public.
+      - Added method set_default_node() to override the user defined node.
+      - Minor data cleanup.
+
+1.1   2010-10-29T16:30:04+01:00
+      - Fixed the pod regarding method name for get_node() and get_element().
+      - Added unit test for method set_node().
+
+1.0   2010-10-29T12:03:43+01:00
+      - Made the lookup case insensitive.
+      - Added ability to define user own node mapping.
+      - Added unit test for case insensitive lookup.
+      - Added unit test for user defined mapping.
+
+0.09  2010-10-29T09:38:10+01:00
+      - Added Picadilly line data.
+      - Added unit test for Picadilly line data.
+      - Corrected spelling of Oxford Circus.
+      - Corrected spelling of King's Cross St. Pancras.
+
+0.08  2010-10-28T18:04:35+01:00
+      - Added Northern line data.
+      - Added unit test for Northern line data.
+      - Fixed the unit test test-case-05.t
+      - Fixed the unit test test-case-06.t with regard to addition of more data.
+      - Fixed the node code for few members of Bakerloo, Central, Jubilee and Victoria line.
+      - Fixed the mapping of Bakerloo, Central, Jubilee and Victoria line.
+      - Fixed some of the junction mapping as well as added new junction mapping.
+
+0.07  2010-10-28T15:53:19+01:00
+      - Added Metropolitan line data.
+      - Added unit test for Metropolitan line data.
+      - Fixed the test-case-09.t with regard to addition of more data.
+
+0.06  2010-10-28T10:51:01+01:00
+      - Removed the test code from the pod.
+      - Added DESCRIPTION to the pod as suggesed by Peter Makholm.
+      - Removed the 'sleep' from get_shortest_route() as suggested by Peter Makholm.
+      - Added Readonly as pre-requisite in the Build.PL to make CPAN Testers happy.
+      - Added Module::Build v0.36 as pre-requisite to get intalldeps options during build.
+      - Updated README regarding pre-requisite installation.
+
+0.05  2010-10-27T15:55:29+01:00
+      - Added District line data.
+      - Added Hammersmith & City line data.
+      - Fixed Central line data as Fairlop and Hainault both had the same node code.
+      - Added method get_node() and get_element() to the Tube::Map module.
+      - Fixed the unit test test-case-03.t with regard to addition of more data.
+
+0.04  2010-10-27T11:03:34+01:00
+      - Added node validations.
+      - Added unit test for validation functionality.
+      - Changed the signature of few methods defined in Map::Tube.
+      - Updated the unit test to reflect the changes in the method signature.
+      - Updated the perldoc for Map::Tube.
+      - Updated the perldoc for Map::Tube::Node.
+
+0.03  2010-10-26T16:29:11+01:00
+      - Added Circle line data.
+
+0.02  2010-10-26T11:08:21+01:00
+      - Added Central line data.
+
+0.01  2010-10-25T14:30:11+01:00
+      - Module Created.

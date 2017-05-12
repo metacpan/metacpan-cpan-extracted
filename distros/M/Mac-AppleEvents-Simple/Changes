@@ -1,0 +1,233 @@
+* v1.18, Thursday, July 6, 2006
+
+   Endian fix for typeLongDateTime.
+
+* v1.17, Tuesday, May 3, 2005
+
+   In Tiger, apparently, AECountItems() now returns true for some "lists"
+   it didn't return true for before, such as typeObjectSpecifierRecord, and
+   our code falsely assumed it would return false.
+
+* v1.16, Saturday, February 19, 2005
+
+   Switch during launch if we are launching anyway.  More efficient.
+
+* v1.15, Monday, December 7, 2004
+
+   warn, don't die, if app path cannot be found, because we might
+   succeed anyway (if LaunchServices DB not updated for some reason,
+   and app is open).
+
+* v1.14, Tuesday, June 8, 2004
+
+   Use Mac::Apps::Launch once again for launching apps.
+
+* v1.13, Tuesday, May 18, 2004
+
+   Handle launching and $SWITCHing of applications by bundle ID
+   (previously only worked for app signatures).
+
+* v1.12, Monday, May 10, 2004
+
+   Eliminate a bunch of memory leaks, where we didn't dipose of AEDescs
+   or Handles.
+
+   No longer automatically populate EVENT and REPLY keys with AEPrint results.
+   We fixed the memory leak in it, I think, but it was still an awful lot of
+   data to lug around for no good reason.
+
+* v1.11, Wednesday, February 18, 2004
+
+   Added typeComp (coerce to float).
+
+   Added typeLongDateTime (convert to/from Mac OS); added Time::Epoch.
+   (Lars Eggert)
+
+* v1.10, Wednesday, November 19, 2003
+
+   Fixed $^E bug in perl 5.8.x (and make $^E handling more robust).
+
+   Changed pack_pid() to use actual PID instead of converting to PSN,
+   using typeKernelProcessID instead of typeProcessSerialNumber.
+
+
+* v1.09, Sunday, November 2, 2003
+
+   Oops, spelled URI "URL" in Makefile.PL.
+
+
+* v1.08, Friday, October 31, 2003
+
+   Added pack_eppc_x() for creating a target to an application on
+   a remote computer, for Mac OS X.  Basic syntax:
+   
+       $target = pack_eppc_x('Finder', 'mac.example.com');
+
+
+* v1.07, Wednesday, October 29, 2003
+
+   Fixed qdrt to put elements in correct order.
+
+
+* v1.06, Tuesday, June 24, 2003
+
+   Checked that $ENUMREC is defined.
+
+
+* v1.05, Thursday, May 22, 2003
+
+   Added typeLongDateTime to AE_GET.
+
+   Used Mac::Errors for internal errors.
+
+   Added t/pod.t.
+
+
+* v1.04, Monday, May 12, 2003
+
+   Fix a test, update Makefile.PL.
+
+
+* v1.03, Monday, April 14, 2003
+
+   Updated tests and notes, and require more recent Mac::Carbon,
+   for Mac OS X support.
+
+   Added pack_pid, to target applications by PID instead of signature,
+   PPC location, or PSN (Mac OS X only).
+   
+
+* v1.02, Tuesday, May 7, 2002
+
+   Fix typo in Makefile.PL.
+
+
+* v1.01, Monday, January 14, 2002
+
+   Make _getdata smarter.
+
+   Added utxt coercion to text.  Catch errors in coercion.
+
+   Change license to be that of Perl.
+
+
+* v1.00, Monday, September 11, 2000
+
+   Added handle_event function.
+
+   Use cluck from the Carp module if available if $WARN is greater
+   than 1 (fall back to carp if cluck not available).
+
+
+* v0.81, Tuesday, November 2, 1999
+
+   Added requirement for Mac::AppleEvents version 1.22
+   (included in distribution).
+
+   Added type method.
+
+   Added EPPC addressing (Apple events over TCP/IP).  Seems to work
+   as well as the PPC addressing.  Requires Mac OS 9.  Added
+   pack_eppc.
+
+
+* v0.80, Friday, September 10, 1999
+
+   Added PPC port addressing.  Still experimental, as I am working largely
+   off empirical observation, rather than specs.  Added pack_ppc.
+   (Cameron Ashby <cameron@evolution.com>)
+
+   Added pack_psn to simply get a PSN into a long double.
+
+
+* v0.72, Wednesday, September 1, 1999
+
+   Fixed bug in _event_error that did not return proper value,
+   or clear $^E properly.  (Francis Clarke <F.Clarke@swansea.ac.uk>)
+
+
+* v0.71, Tuesday, June 8, 1999
+
+   Added $DEBUG global.  Will be used more.
+
+   Added some coercions so certain types will be returned as typeChar
+   from the get method.
+
+
+* v0.70, Friday, June 4, 1999
+
+   Removed deprecated ae_send function.  Use send_event instead.
+
+   Removed deprecated get_text function.  Not needed anymore, use get
+   method instead.
+
+   Cleaned up stuff.
+
+   Improved error handling.  Will return on first error.  See docs above
+   for more information.
+
+   Made $Mac::AppleEvents::Simple::SWITCH 0 by default instead of 1.
+
+   Added global %DESCS to save AEDescs for disposal later.
+
+
+* v0.65, May 30, 1999
+
+   No longer return entire desc from get if direct object not supplied.
+
+   Error number put in $^E if supplied.
+
+   Added a bunch of stuff to %AE_GET.
+
+   get method now automatically unpacks nested AE records and AE lists into
+   perl hash and array references.
+
+
+* v0.61, May 1, 1999
+
+   Made default timeout kNoTimeOut.
+
+   Changed use of REPLY for parameter to AESend to GETREPLY.
+   REPLY was already in use, D'oh!
+
+
+* v0.60, January 28, 1999
+
+   Added get and data methods.
+
+
+* v0.52, September 30, 1998
+
+   Re-upload, sigh.
+
+
+* v0.51, September 29, 1998
+
+   Fixed problems accepting parameters in send_event.  Sped up
+   switching routine significantly.
+
+
+* v0.50, September 16, 1998
+
+   Only LaunchApps when sending event now if $SWITCH is nonzero or
+   app is not already running.
+
+   Added warnings for event errors if present and if $^W is nonzero.
+   Only works if event errors use standard keywords errs or errn.
+
+
+* v0.10, June 2, 1998
+
+   Changed new to build_event, and ae_send to send_event.
+
+   Made default AESend parameters overridable via send_event.
+
+
+* v0.03, June 1, 1998
+
+   Added $SWITCH global var to override making target app go to front.
+
+
+* v0.02, May 19, 1998
+
+   Here goes ...

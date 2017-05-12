@@ -1,0 +1,9 @@
+ [
+    {
+        "label" : "Name",
+        "type" : "radio",
+        "name" : "type",
+        "show_value" : 1,
+        "data" : ["internal", "external" ]
+    }
+ ]

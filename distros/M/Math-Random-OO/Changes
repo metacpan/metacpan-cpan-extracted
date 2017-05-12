@@ -1,0 +1,56 @@
+Revision history for Perl module Math::Random::OO
+
+0.22      2013-06-09 15:07:27 America/New_York
+
+    - Removed useless voodoo math [RT#85314]
+    - Fixed test bug with negative seeds [RT#86002]
+    - Converted to Dist::Zilla
+    - Changed license to Apache 2
+    - Changed bugtracker
+
+0.21 Sat May  2 07:40:03 EDT 2009
+    - Fixed major seed() bug (RT#45630)
+
+0.20 Fri Jul 21 08:00:34 EDT 2006
+    - Cleaned up pod coverage test
+
+0.19 Fri Jul 21 07:00:34 EDT 2006
+    - Whee!  Added back pod/coverage tests in a sane way.
+
+0.18 Fri Dec 16 13:20:26 EST 2005
+    - really remove Test::Exception as a dependency
+
+0.17 Thu Dec 15 01:39:14 EST 2005
+    - added missing Class::Accessor::Fast dependency to Build.PL
+    - removed Test::Exception and Attribute::Util dependencies from
+      tests and code
+
+0.16 Mon Aug  1 11:10:28 EDT 2005
+    - build_requires moved to requires to work around CPANPLUS bug
+
+0.15 Thu Jun  9 15:59:11 EDT 2005
+    - removed pod/podcoverage/distribution tests to minimize dependencies
+
+0.14 Tue Jun  7 18:10:09 EDT 2005
+    - fixed dependencies in Build.PL
+    - changed Makefile compatibility
+
+0.13 Wed Mar  9 06:30:16 EST 2005
+    - added pod and pod coverage testing
+
+0.12 Wed Feb  2 22:50:30 EST 2005
+    - fixed test suite for new version of Test::MockRandom
+    - improved test coverage
+
+0.11 Tue Jan  4 07:20:38 EST 2005
+    - Fixed POD for better hyperlinking on CPAN
+    - Refactored tests
+    - Added Test::Distribution to automated tests (but not required
+      for users)
+    - Replaced Test::Float with Test::Number::Delta
+
+0.10 Tue Dec 28 12:22:04 EST 2004
+    - initial public release
+
+0.01 Tue Dec 14 13:36:52 2004
+	- original version; created by ExtUtils::ModuleMaker::TT

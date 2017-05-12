@@ -1,0 +1,13 @@
+ [
+    {
+        "label" : "Name",
+        "type" : "text",
+        "name" : "name"
+    },
+    {
+        "label" : "Country",
+        "type" : "select",
+        "name" : "country",
+        "data" : [ "au" ]
+    }
+ ]

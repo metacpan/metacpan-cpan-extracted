@@ -1,0 +1,14 @@
+---
+doctype: dist
+
+header:
+  name: Map-Metro-Plugin-Map-Gothenburg
+
+plugins:
+  - +config: Author::CSSON::MapMetro
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON

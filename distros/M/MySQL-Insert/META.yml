@@ -1,0 +1,23 @@
+---
+abstract: 'extended inserts for MySQL via DBI'
+author:
+  - 'Walery Studennikov <despair@cpan.org>'
+build_requires:
+  DBI: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MySQL-Insert
+provides:
+  MySQL::Insert:
+    file: lib/MySQL/Insert.pm
+    version: 0.06
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.06

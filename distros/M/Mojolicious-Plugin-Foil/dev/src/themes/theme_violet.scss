@@ -1,0 +1,65 @@
+/* ================================================================== */
+/* THEME: Violet
+ */
+@import 'functions';
+@import 'fonts_violet';
+@import 'icon_dark_on_light';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: #694b88;
+$verge-fg: set-fg($verge-bg);
+$verge-border: #472966;
+$button-bg: #967acc;
+$button-fg: set-fg($button-bg);
+$button-visited: set-visited($button-bg);
+$button-border: #472966;
+$main-bg: #aaaadd;
+$main-fg: set-fg($main-bg);
+$link-fg: set-link($main-bg);
+$link-visited: set-visited($main-bg);
+$verge-link-fg: set-link($verge-bg);
+$verge-link-visited: set-visited($verge-bg);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+}
+
+header,
+footer {
+	@extend .verge;
+	background-image: url(vioblue2.jpg);
+}
+
+.side {
+	@extend .verge;
+	background-image: url(vioblue1.jpg);
+}
+
+body {
+	color: $main-fg;
+	background: $main-bg;
+}
+
+@include many-links($link-fg, $link-visited, $verge-link-fg, $verge-link-visited);
+@include fancy($verge-fg, $verge-bg, "vioblue1.jpg");
+@include make-buttons;
+
+header nav a:visited {
+    color: $button-visited;
+}
+header nav li {
+	border-color: #472966;
+}
+header nav .selflink,
+header nav em,
+header nav .current a {
+	color: black;
+	background-color: #aaaadd;
+}
+

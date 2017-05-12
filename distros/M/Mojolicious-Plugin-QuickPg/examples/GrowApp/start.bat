@@ -1,0 +1,1 @@
+morbo script/my_app

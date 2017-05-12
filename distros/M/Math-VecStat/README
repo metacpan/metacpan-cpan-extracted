@@ -1,0 +1,25 @@
+Perl Module Math::VecStat - 0.05
+
+Some basic statistics on vectors (min,max,average,....).
+
+     Copyright (c) 1995,1996,1997 John A.R. Williams
+     Copyright (c) 2000 Andrea Spinelli
+     All rights reserved.
+     This program is free software; you can redistribute it and/or
+     modify it under the same terms as Perl itself.
+
+To install, unzip and untar the archive. In the directory created type
+
+	perl Makefile.PL
+	make install
+
+To execute tests:
+
+	perl Makefile.PL
+	make test
+
+Documentation is in the module file and will be added onto
+perllocal.pod as usual.
+
+You may contact Andrea Spinelli, who is currently maintaining
+the archive, at spinellia@acm.org

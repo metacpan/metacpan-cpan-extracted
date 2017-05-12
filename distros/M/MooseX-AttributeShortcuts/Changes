@@ -1,0 +1,143 @@
+Revision history for MooseX-AttributeShortcuts
+
+0.029     2017-05-08 22:53:18 CDT-0500
+	* Redo a number of tests, to improve coverage and deal with the IMPENDING
+	  DOOM of . in @INC
+	* Add a "history" note referencing lazy_build
+	* Additional metaclass/trait application tests
+	* Add a 'trigger_method' attribute, to stash away the expected name of the
+	  method our generated trigger will call in the associated class
+	* Use List::Util instead of List::AllUtils+List::MoreUtils (thanks,
+	  ether! #15)
+	* Clarify some points in the documentation (thanks, Olaf! #10)
+
+0.028     2015-04-07 20:45:00 PDT-0700
+	* 0.028.  *le sigh*
+
+0.027_02  2015-04-07 20:43:17 PDT-0700
+	* Moose 1.14 is now the minimum supported Moose.
+
+0.027_01  2015-03-28 22:02:17 PDT-0700
+	* Break out our $_process_options into more... succinct... methods.
+	* Add Moo-style type constraints.
+
+0.027     2015-03-10 19:27:06 PDT-0700
+	* Stop using autobox, after relentless persecution by The Cabal ;)
+	* Push out our warnings for those using undocumented bits, as we haven't
+	  released a non-dev/trial version in *ages*
+
+0.026-TRIAL  2014-12-02 19:52:59 PST-0800
+	* Keep our comments dumb, even in tests. (thanks, @haarg!)
+
+0.025-TRIAL  2014-05-22 12:51:25 PDT-0700
+	* This is a TRIAL release, as I'm not entirely sure of the wisdom and
+	  implementation of the following.
+	* Allow for the creation of additional associated methods by hijacking the
+	  delegation system, a la native traits: handles => { ... => sub { ... } }
+
+0.024     2014-05-02 12:50:57 PDT-0700
+	* Make the undocumented isa_* options "deprecated" ...which seems like
+	  better karma than no warning, as people really shouldn't be using these
+	  anyways, but better nice than to have it done to me someday :)
+
+0.023     2014-04-04 21:23:33 PDT-0700
+	* Add isa_instance_of attribute option.
+
+0.022     2013-09-29 00:08:39 PDT-0700
+	* No code changes -- released with refreshed test suite
+
+0.021     2013-09-08 23:32:09 PDT-0700
+	* Drop MXCPA entirely, and incorporate the subtyping functionality
+
+0.020_01  2013-08-26 13:33:44 PDT-0700
+	* Keep MXCPA quiet, for now.  This is evil (hence the dev release), but
+	  should keep things status-quo until we properly integrate MXCPA
+	  functionality into MXAS proper.
+
+0.020     2013-08-19 21:51:02 PDT-0700
+	* Bump CoercePerAttribute version requirement to 1.000 and update docs
+
+0.019     2013-04-20 21:50:05 PDT-0700
+	* Better support inline subtyping and coercions (people who are inclined
+	  to shoot themselves in their foot will do it regardless)
+	* Additional tests for coercions
+
+0.018     2013-01-09 10:20:25 PST8PDT
+	* ~~ TRIAL ~~
+	* If a constraint coderef is given and coercion is requested, we now copy
+	  the parent type's coercions to the anonymous child type.
+	* Better document the constraint option and how it interacts with simple
+	  coercion.
+
+0.017     2012-10-28 20:53:52 PST8PDT
+	* make actually make classes immutable during tests
+	* add initial primitive anonymous inline subtyping support; this needs to
+	  be evaluated with the outstanding pull request (issue #6) but I need
+	  this Right Now
+
+0.016     2012-09-08 21:41:38 America/Los_Angeles
+	* provide for "negative shortcuts" for clearer and predicate, but don't
+	  document for the moment
+
+0.015     2012-08-26 11:48:29 America/Los_Angeles
+	* add 'builder => sub { ... }' shortcut [gh #4]
+
+0.014     2012-08-16 17:26:09 America/Los_Angeles
+	* explictly test for definedness rather than truthiness when determining
+	  if someone has also specified a default along with is => lazy
+
+0.013     2012-07-15 22:11:37 America/Los_Angeles
+	* Restore tests lost from (d11e67a) -- no functional / code changes!
+
+0.012     2012-05-02 11:02:10 America/Los_Angeles
+	* TRIAL/dev release
+	* Don't try to guess what sort of metaclass we need; just die if we don't
+	  have one
+	* Misc cleanups
+
+0.011     2012-04-30 13:41:05 America/Los_Angeles
+	* TRIAL/dev release
+	* Handle the no-metaclass case in our init_meta()
+
+0.010     2012-04-06 18:25:42 America/Los_Angeles
+	* Minor doc updates; no functional changes from 0.009 (TRIAL)
+
+0.009     2012-03-26 23:46:58 America/Los_Angeles
+	* Drop 'init_arg => undef' from our 'ro => "lazy"' shortcut.  This was
+	  done in coordination with the author of Moo, based on consistently
+	  surprised user feedback.
+
+0.008     2012-01-10 23:05:34 America/Los_Angeles
+	* Prebuild our roles, for better caching (and fewer warnings, at least)
+
+0.007     2012-01-10 17:30:57 America/Los_Angeles
+	* Allow default to be also be specified when is => lazy
+
+0.006     2011-10-27 10:15:07 America/Los_Angeles
+	* We now handle "trigger => 1", as well
+	* All our tests are wrapped in Test::Moose::with_immutable(),
+	  just to make sure that we immutablize properly
+
+0.005     2011-08-18 20:54:02 America/Los_Angeles
+    * handle attribute extension/cloning, for realz this time
+    * we now handle the case of attributes defined in roles by properly
+      applying our trait to the applied_attribute metaclass
+
+0.004     2011-08-02 23:44:20 America/Los_Angeles
+    * add lazy_build => 'private'
+    * our laziness was being ignored when an attribute defined in one class
+      was being extended/cloned in another class -- this could not stand
+
+0.003     2011-07-03 16:40:19 America/Los_Angeles
+    * handle predicate => 1, clearer => 1 as well
+
+0.002     2011-03-30 23:43:11 America/Los_Angeles
+    * Convert our trait to a parameterized role, to allow for different
+      build and writer prefixes (e.g. '_set_' vs '_')
+    * Cause 'is => "lazy"' to behave the way it does in Moo
+    * Change the default writer prefix from _ to _set_; it was pointed out
+      that this is the expected way to do things (and makes more sense,
+      really).
+
+0.001     2011-03-27 08:12:11 America/Los_Angeles
+    * initial release

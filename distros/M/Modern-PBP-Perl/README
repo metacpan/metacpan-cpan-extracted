@@ -1,0 +1,69 @@
+Modern-PBP-Perl version 1.240
+================================================================================
+Loading all the features of the current Perl version installed, or the specified
+version of Perl. The corresponding warnings are deactivated. If a version of
+
+Perl is specified, this must be less than or equal to that is installed. Should
+one or more features not be activated or a warning will remain active,
+this may
+be given on the version (the minus or plus sign is optional). In addition, the
+pragma 'strict', 'version' and 'warnings'  will be imported as well as the
+alternatives for the special variables (use English) transferred in the calling
+package. By default, the variables 'MATCH', 'PREMATCH' and 'POST MATCH' not
+accepted. However, these can be aktivieret by specifying '+match_vars'.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+SYNOPSIS
+   use Modern::PBP::Perl;
+   or
+   use Modern::PBP::Perl qw{5.20};
+   or
+   use Modern::PBP::Perl qw{-switch lexical_subs}
+   or
+   use Modern::PBP::Perl qw{5.22 -switch +match_vars}
+   or
+   use Modern::PBP::Perl qw{-switch 5.14 + match_vars}
+
+DEPENDENCIES
+
+The following pragmas and modules are required:
+
+   - feature
+   - mro
+   - strict
+   - version
+   - warnings
+   - Carp
+   - English
+   - Exporter
+   - IO::File
+   - IO::Handle
+   - Perl::Version
+
+INCOMPATIBILITIES
+
+The module works with Perl version 5.12, 5.14, 5.16, 5.18, 5.20, 5.22 and 5.24.
+Developers Perl versions are not supported.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015, 2016 Juergen von Brietzke
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

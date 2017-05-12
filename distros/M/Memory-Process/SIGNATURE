@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 66b8d89ef91561260547efbcdbd795118e1d5856 Changes
+SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE
+SHA1 813ef1b072104f9cc05599c461b1de448bacd1dc MANIFEST
+SHA1 f76f7e415e821d30277be0efa61b15c6c6918173 META.yml
+SHA1 0ff77fc6c1042a067e74b760dac90f6bdb4af50d Makefile.PL
+SHA1 fa8744e2071730629bdefdeb0acf824c1a6fa314 Process.pm
+SHA1 8bf58a5295770a1aca67afc9b42ff7f226a9ab83 README
+SHA1 ecfc0d51618c16a124e1d98eaa2a42e3673c029f examples/ex1.pl
+SHA1 10c7eaae0dc894dd13c2ec604cf3d6327c887b06 examples/ex2.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 a0d933d6762fc2690d746e647abea58f7d59edb8 t/Memory-Process/01-use.t
+SHA1 fddccb74fc1aff2f95f69aad38445d856474dde4 t/Memory-Process/02-version.t
+SHA1 7333e8d4e7f74b378becd108ed03e683c07e7d55 t/Memory-Process/03-new.t
+SHA1 b1f84e192ec0c2af15d9b089848ce1c811ea8f44 t/Memory-Process/04-dump.t
+SHA1 7d0201111de48ce975b4eb66862b3e2ad19d2e95 t/Memory-Process/05-record.t
+SHA1 8e3164613beab3d49f5c7a0ad26dba0855b7e2eb t/Memory-Process/06-report.t
+SHA1 3d3a6bebe5a69a3c57aadabe5812028098c7e6bf t/Memory-Process/07-reset.t
+SHA1 982478cca409b09e2e75ae483120dad1f13c7274 t/Memory-Process/08-state.t
+SHA1 6d69a2e85b779df414201cf7fe910e0e1941357a xt/Memory-Process/01-pod_coverage.t
+SHA1 2e840a8fedef311e0f72ca3e2d4ae08bd3c98b06 xt/Memory-Process/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWMm25AAoJEJe+XXKaIuTliHAIAKqRUw+Y0uGPSVEtr5LDf4gW
+AcmvU3zmBlnoFr0/AjRdmpcnfkqTcvDokt/3enhXm5YgtNkKZC/IDMVFHSqv9ejn
+MbkvW5syheVAxxmCHRGAgxInnmcrgr3hsDXA8OdLqeoULrWdzRlF8gtp0Tekwrys
+sEUxmjHZTpzA8l1iwXFYUcVsU5xsNkczvW5qf+miy9vCFy7SZbvL2rUR4o8/0XkY
+zIMoi5V/h57sImtyMhigkxx0dXWTxKqalKc3jQAOwxA1nl0cxCCeP0vL9eennMRN
+Hks2DUFnpr69nQXXAjFEWLk9AXgiW/hTnHriOuMPxY1288ZLL17lTLoZ0yvUK7g=
+=txxd
+-----END PGP SIGNATURE-----

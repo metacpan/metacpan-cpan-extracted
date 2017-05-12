@@ -1,0 +1,14 @@
+Revision history for MooseX-NewDefaults
+
+0.004     2012-09-24 22:33:44 PST8PDT
+	* -- no code changes --
+	* correct synopsis (Two should extend One) [mateu]
+	* drop some pod PodWeaver now builds for us
+
+0.003     2011-11-15 14:44:55 America/Los_Angeles
+	* only documentation updates
+
+0.002     2011-10-27 10:52:28 America/Los_Angeles
+	* no change from 0.001, except we're not marked as TRIAL anymore
+
+0.001     2011-10-14 00:13:54 America/Los_Angeles

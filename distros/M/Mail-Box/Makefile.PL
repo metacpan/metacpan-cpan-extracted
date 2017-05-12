@@ -1,0 +1,100 @@
+use ExtUtils::MakeMaker;
+
+require 5.010;
+
+use IO::Handle;
+
+my $VERSION = '3.002';
+
+my %prereq =
+ ( Carp           => 0
+ , Cwd            => 0
+ , Date::Parse    => 0
+ , Devel::GlobalDestruction => 0.09
+ , Errno          => 0
+ , Fcntl          => 0
+ , File::Basename => 0
+ , File::Spec     => 0.7
+ , File::Compare  => 0
+ , File::Copy     => 0
+ , File::Remove   => 0.20
+ , IO::Scalar     => 0
+ , Mail::Message  => 3.0
+ , Mail::Transport => 3.0
+ , Object::Realize::Later => 0.19
+ , POSIX          => 0
+ , Scalar::Util   => 1.13
+ , Sys::Hostname  => 0.0
+ , Test::More     => 0.47
+
+# Currently, it seems to be wise not to depend on these
+#   Mail::SpamAssassin    split-off?
+#   File::FcntLock
+
+# Split-off distributions which are probably not often used, but have
+# many dependencies
+#   Mail::Box::IMAP4
+#   Mail::Box::POP3
+ );
+
+
+my @errors;
+foreach my $module (sort keys %prereq)
+{   my $reqversion = $prereq{$module};
+    eval "require $module";
+
+    if($@ && $@ =~ m/^Can't locate /)
+    {   print "    $module is not yet installed\n" }
+    elsif($@)
+    {   print "    $module produced an error:\n$@";
+        push @errors, $module;
+    }
+    elsif($module->VERSION < $reqversion)
+    {   print "    $module version ",$module->VERSION
+            , " is outdated; requires $reqversion\n";
+    }
+    else
+    {   print "    $module version ",$module->VERSION
+            , " is ok (required is $reqversion)\n";
+    }
+}
+
+if($errors)
+{   die <<'FIX';
+*** ERROR! You have to install @errors manually,
+*** before you can retry to install MailBox.
+FIX
+    exit 1;
+}
+
+WriteMakefile
+ ( NAME       => 'Mail::Box'
+ , VERSION    => $VERSION
+ , AUTHOR     => 'Mark Overmeer'
+ , ABSTRACT   => 'E-mail handling'
+ , PREREQ_PM  => \%prereq
+ , LICENSE    => 'perl'
+ );
+
+### used by oodist during production of distribution
+sub MY::postamble { <<'__POSTAMBLE' }
+
+# for DIST
+RAWDIR          = ../public_html/mailbox/raw
+DISTDIR         = ../public_html/mailbox/source
+
+LICENSE         = artistic
+EXTENDS         = ../UserIdentity:../MimeTypes:../ORL:../MailTools2:../MailBoxC:../MailMessage:../MailTransport:../MailIMAP:../MailPOP:../MailDbx
+
+# for POD
+FIRST_YEAR      = 2001
+EMAIL           = perl@overmeer.net
+WEBSITE         = http://perl.overmeer.net/mailbox/
+PODTAIL         = ../MailBox-shared-podtail
+
+# for HTML
+HTML_OUTPUT     = ../public_html/mailbox/html
+HTML_DOCROOT    = /mailbox/html
+HTML_PACKAGE    = ../public_html/mailbox/htmlpkg
+
+__POSTAMBLE

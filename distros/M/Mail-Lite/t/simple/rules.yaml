@@ -1,0 +1,81 @@
+---
+-
+    id: rfc822
+    weight: 0
+    last: 1
+    match:
+        - from: support@registry.su
+        - to:   support@reg.ru
+        - subj: '^Sometestmessage$'
+    processors:
+        - processor: split_msg
+          begin: "#\[START OF MESSAGE\]\n"
+          separator: "#\[START OF MESSAGE\]\n"
+          end: "#\[END OF MESSAGE]\n"
+          emulate: 0
+        - processor: parse_rfc822
+-
+    id: music
+    weight: 0
+    last: 1
+    match:
+        - from: support@yanes.su
+        - to:   support@reg.ru
+        - subj: '^Sometestmessage about musicians'
+    processors:
+        - processor: split_msg
+          begin:     "#\[MESSAGE FOLLOWS\]\n\n"
+          separator: "#\[ANOTHER MESSAGE FOLLOWS\]\n\n"
+          end:       "#\[END OF MESSAGES\]\n"
+          emulate: 0
+        - processor: chain
+-
+    id: _music.sub
+    processors:
+        - processor: parse_rfc822
+-
+    id: regexp
+    last: 1
+    match:
+        - from: support@yanes.ru 
+        - to:   support@reg.ru
+        - subj: 
+            OR:
+               - preved
+               - [ musicians, hashes ]
+        - body:
+            - 'HERE'
+            -
+              NOT:
+                NOT:
+                    NOT:
+                        NOT: 'HERE'
+    processors:
+        - processor: regexp
+          regexps:
+            test=~first,once: '(.*)'
+            test2=~second,once: '(.*)'
+            hithere=~body: 'you are lucky:(.*)'
+            byethere=~body: 'you are unlucky:(.*)'
+-
+    id: logwatch.ok
+    last: 1
+    match:
+        - subj: 
+            OR:
+               - 'Show must go on'
+               - 
+                 - Logwatch
+                 - testdomain.com
+                 - '\(Linux\)'
+                 - { NOT: 'preved' }
+    processors:
+        - processor: stub
+-
+    id: ym.reestr
+    last: 1
+    match:
+        - from: cpp@paycash.ru
+        - subj: 'ÐÅÅÑÒÐ ÏËÀÒÅÆÅÉ Â ÎÎÎ \"Ðåãèñòðàòîð'
+    processors:
+        - processor: stub

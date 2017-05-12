@@ -1,0 +1,323 @@
+NAME
+    Moos - Moo s{imple,peedy,ingle}
+
+SYNOPSIS
+        package Foos;
+        use Moos;
+
+        extends 'Boos';
+        with 'Cloos';
+
+        has this => ();
+        has that => 42;
+        has other => (
+            builder => 'build_other',
+            lazy => 1,
+        );
+
+        sub BUILD {
+            my $self = shift;
+            # build, build, build
+        }
+
+        sub BUILDARGS {
+            my ($self, @args) = @_;
+            # munge, munge, munge
+            return {%munged_args};
+        }
+
+DESCRIPTION
+    Moos completes the M to Moose sequence of Perl OO modules.
+
+    This one is pure Perl, single file and mostly Moose compatible (for what
+    it does). Moos has no non-core dependencies, but certain features
+    (roles, debugging functions, legacy Perl support) do require additional
+    modules. If you steer away from those features, you don't need those
+    additional modules.
+
+FEATURES
+    Here's a quick list of the Moose compatible features that are supported
+    by Moos.
+
+  strict/warnings
+    Turns on "strict" and "warnings" for you.
+
+  Helpful exports
+    The ever useful "blessed" (from Scalar::Util) and "confess" (from Carp)
+    are exported to your namespace.
+
+  extends
+    For inheritance. "Moos::Object" is the default base class.
+
+        package MyClass;
+        extends 'MyBaseClass';
+
+    Supports multiple inheritance, by allowing multiple classes on a single
+    invocation.
+
+  with
+    Moos can consume roles using the "with" keyword. Using this feature
+    requires Role::Tiny to be installed.
+
+        with 'ThisClass', 'ThatClass';
+
+  has
+    Accessor generator. Supports the "is", "default", "build", "lazy",
+    "clearer", "predicate", "required", "handles" and "trigger" options,
+    described below. The supported options are about the same as Moose.
+    Other arguments (e.g. "isa" and "coerce") are currently ignored.
+
+        has this => ();
+
+    NOTE: Class::XSAccessor will be used for simple accessors if it is
+    installed. This can be disabled by setting $Moos::CAN_HAZ_XS to false or
+    by setting the PERL_MOOS_XS_DISABLE to true.
+
+    is  Specify which type of attribute accessor to provide. The default is
+        "rw", a read-write accessor. Read-only "ro" accessors are also
+        supported.
+
+            has this => ( is => "ro" );
+            has 'this';                   # read-write
+            has that => ();               # read-write
+
+        Unlike Moose, Moos cannot generate differently named getters and
+        setters. If you want your setter named something different (e.g. a
+        private method), then you could do something like:
+
+            has this => ( is => 'ro' );
+            sub _set_this { $_[0]{this} = $_[1] }
+
+    required
+        Require that a value for the attribute be provided to the
+        constructor or generated during object construction.
+
+            has this => ( required => 1 );
+
+    lazy
+        Don't generate defaults during object construction.
+
+            has this => ( builder => '_build_this', lazy => 1 );
+
+    trigger
+        A coderef which will be called when the attribute is assigned to via
+        a method call or the constructor. (But not when an attribute is
+        implicitly given a value via a default or builder.) The coderef is
+        called with the instance as the first parameter, the new value as
+        the second parameter, and the old value (if any) as the third
+        parameter.
+
+            has age => ( trigger => sub {
+                croak "non-numeric age" unless looks_like_number($_[1]);
+            } );
+
+        Triggers can be used to emulate Moose's type constraints, coercion
+        and weakened reference features, but if you find yourself doing this
+        frequently then you should consider upgrading to Moo or Moose.
+
+    handles
+        Delegated method calls.
+
+            has wheels => (handles => [qw/ roll /]);
+
+        This accepts a hashref or arrayref, but not the other possibilities
+        offered by Moose.
+
+    builder
+        Specify the method name to generate a default value.
+
+            has this => ( builder => '_build_this' );
+            has that => ( builder => 1 );  # accept default name for method
+
+    default
+        Specify the sub to generate a default value.
+
+            has this => ( default => sub { 42 } );
+
+        Moos provides a shortcut for specifying the default. If the number
+        of arguments (after the name) is an odd number, then the first
+        argument is the default. The following forms are valid:
+
+            has a => 42;
+            has b => 'string' => (lazy => 1);
+            has c => {};
+            has d => [1, 2, 3, 4];
+
+        These all result in creating a Moos "default" argument. If the
+        default is an array or hash reference, a shallow copy is made.
+
+    clearer
+        Creates a clearer method.
+
+            has this => ( clearer => "clear_this" );
+            has that => ( clearer => 1 );  # accept default name for method
+
+    predicate
+        Creates a predicate method, which can be used to check if the
+        attribute is set or unset.
+
+            has this => ( predicate => "has_this" );
+            has that => ( predicate => 1 );  # accept default name for method
+
+  Class and Object Methods
+    new A constructor class method.
+
+            my $object = MyClass->new(this => 'nice', that => 2);
+
+    BUILD
+        Custom object construction. If you define BUILD, it is passed the
+        value of the new object during construction. You can modify the
+        object. Any value you return is ignored.
+
+            sub BUILD { my $self = shift; ... }
+
+    BUILDARGS
+        Custom constructor argument processing. If you define BUILDARGS, you
+        can control how the constructor's arguments are built into the
+        object hashref.
+
+            sub BUILDARGS { my ($class, @args) = @_; ... }
+
+    dump
+        Returns a textual dump of the object.
+
+    meta
+        Returns a Moos::Meta::Class object for the class. This has a very
+        limited subset of Moose::Meta::Class' functionality, including
+        implementations of the following methods: "name",
+        "attribute_metaclass", "add_attribute", "add_method",
+        "superclasses", "linearized_isa", "new_object",
+        "get_all_attributes", "get_attribute" and "find_attribute_by_name".
+
+        The attribute introspection methods return Moos::Meta::Attribute
+        objects which provide a very limited subset of
+        Moose::Meta::Attribute's functionality, including implementations of
+        the following methods: "name", "associated_class", "predicate",
+        "clearer", "default", "builder", "trigger", "required", "lazy" and
+        "documentation".
+
+    does/DOES
+        Methods to check whether the class*object performs a particular
+        role. The methods differ in that "does" checks roles only in the
+        Moose*Moo/Role::Tiny sense; "DOES" also takes into account
+        UNIVERSAL::DOES.
+
+  Roles
+    If you need roles, then Moos classes have experimental support for
+    Role::Tiny, Moo::Role and Moose::Role roles. (Moos provides a "with"
+    command that uses Role::Tiny to do the work.)
+
+        {
+            package Local::Class;
+            use Moos;
+            with "Local::Role";
+            ...;
+        }
+
+    Limitations: Note that Moo and Moose each allow type constraints for
+    attributes; Moos does not. This means that if you compose, say, a
+    Moose::Role into a Moos class, you end up with a strange situation where
+    the accessor methods will enforce type constraints (because they were
+    generated by Moose) but the constructor will not (because it is
+    inherited from Moos::Object).
+
+    See also Moos::Role.
+
+  Method Modifiers
+    If you need method modifiers, then try Class::Method::Modifiers.
+
+  Development Options
+    Moos has a couple of builtin dev options. They are controlled by
+    environment variables.
+
+    PERL_MOOS_ACCESSOR_CALLS
+        By setting this environment variable, Moos will warn everytime an
+        accessor method is called.
+
+    PERL_MOOS_XXX
+        By setting the environment variable, Moos will export the XXX
+        debugging keywords.
+
+WHENCE MOOS
+    I(ngy) created Moos during Pegex development. Pegex uses a clone of Moos
+    called Pegex::Base. (Moos ships with a commandline utility called
+    "remoos" that does this cloning.)
+
+    Pegex is a parser framework and needs to be fast. While looking into
+    speed issues I noted that accessor calling was the biggest hit. I tried
+    all the various Mo* solutions and Mouse was the fastest.
+
+    I was happy until I remembered that Mouse uses XS, and for various
+    reasons this broke my toolchain (TestML, Module::Install, etc).
+
+    So I made a single module/file Moose clone and it worked out well. I've
+    shared Pegex::Base as Moos in case any other projects want it.
+
+    Later on, Toby Inkster added a bunch of low-cost but very handy features
+    from Moose.
+
+    The name Moos was chosen because it was the only name left between M and
+    Moose. (Thus adding to the epic confusion that we embrace as Perl
+    Mongers! :)
+
+ON SPEED
+    In the end, I got Pegex to run even faster with Moos than it originally
+    did with Mouse. I'll tell you my secret...
+
+    Accessors *(usually)* do not need to be method calls.
+
+    Replace these:
+
+        my $foo = $self->foo;
+        $self->foo($foo);
+
+    with:
+
+        my $foo = $self->{foo};
+        $self->{foo} = $foo;
+
+    And your code will be faster (and a bit uglier).
+
+    The only time that you need to call an accessor method is when you are
+    accessing a property and it might invoke a "lazy" "builder", "default"
+    or "trigger" method. Otherwise you are just wasting time. At least with
+    the minimal feature set offered by Moos.
+
+    The PERL_MOOS_ACCESSOR_CALLS feature described above is for finding
+    these method calls.
+
+    Note that third parties can still use your module's accessor methods
+    like they would expect to.
+
+    I'm sure I've missed some subtleties, and would be glad to hear
+    opinions, but in the meantime I'm happy that my code is faster and pure
+    Perl.
+
+SEE ALSO
+    *   M
+
+    *   Mo
+
+    *   Moo
+
+    *   Moos
+
+    *   Moose
+
+    *   Mouse
+
+    *   Mousse
+
+AUTHORS
+    Ingy döt Net <ingy@cpan.org>
+
+    Toby Inkster <tobyink@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2012-2014. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

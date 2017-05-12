@@ -1,0 +1,51 @@
+#! /usr/bin/perl
+
+use strict;
+use warnings;
+use Socket;
+use IO::Socket;
+use IO::Select;
+use Getopt::Long;
+
+my $sock = new IO::Socket::UNIX(
+	Peer		=> "/tmp/karmad",
+		)
+	or die "Failed to create socket: $!";
+print $sock <<"EOQ";
+client_address=127.0.0.2
+sender=fred\@nowhere.net
+helo=nowhere.net
+queue_id=$$
+
+EOQ
+while (<$sock>) {
+	print;
+}
+
+__END__
+
+=head1 NAME
+
+karmac - Test client for L<karmad>
+
+=head1 DESCRIPTION
+
+This is a trivial test client for the included L<karmad> daemon.
+It emulates postfix or exim sending a query to the daemon. See the
+source code for more details.
+
+=head1 SEE ALSO
+
+L<Mail::Karmasphere::Client>
+L<Mail::Karmasphere::Query>
+L<Mail::Karmasphere::Response>
+http://www.karmasphere.com/
+
+=head1 COPYRIGHT
+
+Copyright (c) 2005 Shevek, Karmasphere. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

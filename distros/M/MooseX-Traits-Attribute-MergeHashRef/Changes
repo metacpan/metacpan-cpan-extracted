@@ -1,0 +1,5 @@
+1.002 - 2011-03-14
+    - fixed compat with Moose 2
+
+1.001 - 2010-02-19
+    - fixed clearer attribute

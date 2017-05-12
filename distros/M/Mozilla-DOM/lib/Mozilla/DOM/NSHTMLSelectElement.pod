@@ -1,0 +1,66 @@
+=head1 NAME
+
+Mozilla::DOM::NSHTMLSelectElement
+
+=for object Mozilla::DOM::NSHTMLSelectElement
+
+Mozilla::DOM::NSHTMLSelectElement is a wrapper around an instance of Mozilla's
+nsIDOMNSHTMLSelectElement interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::NSHTMLSelectElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $retval = $nshtmlselectelement->B<Item>($index)
+
+Input:
+
+=over
+
+=item $index (int)
+
+=back
+
+Output:
+
+=over
+
+=item $retval (Mozilla::DOM::Node)
+
+=back
+
+=head2 $retval = $nshtmlselectelement->B<NamedItem>($name)
+
+Input:
+
+=over
+
+=item $name (string)
+
+=back
+
+Output:
+
+=over
+
+=item $retval (Mozilla::DOM::Node)
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

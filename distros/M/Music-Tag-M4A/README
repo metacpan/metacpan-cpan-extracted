@@ -1,0 +1,43 @@
+Music::Tag::M4A version 0.26
+============================
+
+Music::Tag::M4A is a plugin module for M4A files to gather information
+about music files from M4A headers.
+
+Note:  As of version 0.28, Music-Tag is distributed as seperate packages.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   MP4::Info
+   Audio::M4P::QuickTime
+
+NOTE
+
+Write support is dangerous for M4A files.  It will work fine with Music::Tag and other
+applications, but will not work with iTunes.  If you use iTunes (and if you are using
+quicktime containers for aac files, you likely are...), then don't change the tags.
+
+TEST FILES
+
+Are based on the sample file for Audio::M4P.  For testing only.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Edward J. Allen III
+ealleniii _at_ cpan _dot_ org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+

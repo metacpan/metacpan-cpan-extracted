@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX Sorry for small description. I'll make a better info soon. XXXXX#
+name:         MySQL-Backup
+version:      0.04
+version_from: lib/MySQL/Backup.pm
+installdirs:  site
+requires:
+    DBI:              0
+    DBD::mysql:       0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21
+license: perl

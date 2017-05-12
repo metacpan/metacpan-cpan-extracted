@@ -1,0 +1,6 @@
+lib/MojoX/JSON/XS.pm
+README.pod
+Makefile.PL
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

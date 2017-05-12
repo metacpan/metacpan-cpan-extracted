@@ -1,0 +1,72 @@
+Revision history for Perl module Math::Random::MT::Perl
+
+1.15 2015-11-27
+   - Bugfix: should not ignore seed value of 0 (reported by Maxim Tyukov)
+   - Exclude MYMETA files from tarball (#108108, reported by Alexandr Ciornii)
+
+1.14 2015-10-19
+   - Stricter Kwalitee directory testing (#107821, reported by Slaven Rezić)
+   - Moved some non-essential tests to xt/ (#101282, reported by Slaven Rezić)
+
+1.13 2013-10-30
+    - Changes file as per CPAN::Changes::Spec (#88672, patch by Neil Bowers)
+
+1.12 2013-09-14
+    - Improvement of unit tests, restored some as author-side only (#88637)
+
+1.11 2013-05-31
+    - Improvement of unit tests
+
+1.10 2012-08-06
+    - made set_seed() return the seed, as does Math::Random::MT
+    - migrated test suite to Test::More and Test::Number::Delta
+
+1.09 2012-06-04
+    - added the irand() function to draw random integers, as in Math::Random::MT
+
+1.08 2012-05-28
+    - synchronised the autoseeding mechanism with that of Math::Random::MT that
+      is more elegant and portable
+
+1.07 2012-01-19
+    - synchronised the autoseeding mechanism with that of Math::Random::MT
+
+1.06 2009-09-04
+    - added ability to automatically and rapidly generate different seeds and
+      return it to allow the generation of identical random number series
+
+1.05 Tues June 3 2008
+    - new build process mostly kwalitee specified test metrics and fixes
+
+1.04 2008-05-24
+    - are we there yet? apparently not. fix breakage on BSD with perl 5.005
+      where use of "our" is deprecated caused total failure.
+    - minor documentation fixes
+    - added benchmark.pl to validate.pl in /t for comparing performance to
+      Math::Random::MT. you can only run them if you can install both versions
+      and if you can do that you don't really need this module!
+
+1.03 2008-05-24
+    - patched test files to limit floating point to 12 sig figures and avoid
+      spurious test failures on 64 bit systems which return longer floating
+      point numbers that 32 bit builds (18 digits vs 15).with underlying
+      integers from 0..2**32-1 there are actually only 10 sig figs.
+    - reversed the ok(expected,got) test format acquired from
+      Math::Random::MTto the correct ok(got,expected) order so the test
+      failures read correctly.
+
+1.02 2008-05-23
+    - implemented & 0xffffffff where required to constrain integers to
+      32 bits on 64 bit systems. thanks to almut from perlmonks for the
+      testing and the solution.
+
+1.01  Thur May 22 2008
+    - implemented array of seeds to complete compatability with C version
+    - added script validate.pl to /t which "proves" output identical to C
+      where proves means produces the same output over > 10e8 runs
+    - added extra test to 5.t that demonstrated an issue with array laver
+
+1.00 2008-05-20 17:03:16
+    - original version; created by h2xs 1.23 with options
+        -AX Math::Random::MT::Perl
+

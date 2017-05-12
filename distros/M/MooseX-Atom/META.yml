@@ -1,0 +1,30 @@
+---
+abstract: 'Non-immutable classes are silly. Lets fix that.'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: MooseX::Atom
+name: MooseX-Atom
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Moose: 1.08
+  perl: 5.8.5
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/MooseX-Atom
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/MooseX-Atom
+version: 0.02

@@ -1,0 +1,186 @@
+1.07
+ - Fix typo in overload_add diagnostic message that was segfaulting on amd64-freebsd.
+   Thanks to Slaven Rezic.
+
+1.06
+ - Replace SvUV/SvIV/SvNV with svUVX/SvIVX/SvNVX where appropriate. (In typemap, too.)
+ - Replace (throughout) the "SvNOK(b)" condition with "SvNOK(b) && !SvPOK(b)".
+ - Add support for nvtype=double -DDEBUGGING perls
+ - Bring __float128 support into line with Math::MPFR
+
+1.05
+ - Corrections to README and Makefile.PL regarding _Complex types handling
+ - Rewrite new()
+ - Add __float128 handling iff nvtype is __float128 && mpfr library supports __float128
+ - Add Rmpc_set_NV and Rmpc_set_NV_NV functions.
+ - Rename Rmpc_get_dc and Rmpc_get_ldc to Rmpc_get_DC and Rmpc_get_LDC (resp).
+ - Add Rmpc_get_F128C.
+ - Specify EU-MM-6.58 as prerequisite in Makefile.PL. (Current CPAN::Reporter has problems
+   with earlier versions of EU::MM on cygwin, perl-5.14.x. Thanks Peter Acklam.)
+ - Replace SvUV/SvIV/SvNV with SvUVX/SvIVX/SvNVX where appropriate
+
+1.04
+ - Fix for replacement of Math::Complex_C::Long by Math::Complex_C::L
+
+1.03
+ - No longer define USE_64_BIT_INT if ivtype is 'long'.
+ - Rename USE_64_BIT_INT #define to MATH_MPC_NEED_LONG_LONG_INT
+ - Make version 3.23 of Math::MPFR a pre-requisite.
+
+1.02
+ - _has_inttypes() no longer checks for whether USE_LONG_DOUBLE is defined.
+   (Was harmless ... but didn't make much sense.)
+ - Define PERL_NO_GET_CONTEXT.
+ - Tweak to Math::MPC::gmp_v().
+ - Add metadata to Makefile.PL.
+
+1.01
+ - Alter the way that strEQ gets hold of HvNAME(SvSTASH(SvRV(sv))) - so that -Wall
+   doesn't emit "null argument" warnings. (Thanks Daniel Kahn Gillmor.)
+ - Alter test 5 of t/complex_c.t to accommodate version 0.07 (and later) of
+   Math::Complex_C.
+
+1.00
+ - Add Rmpc_log10, Rmpc_mul2si and Rmpc-div_2si (new in 1.0.0)
+ - Accommodate namechange of mpc_mul_2exp and mpc_div_2exp to mpc_mul_2ui
+   and mpc_div_2ui (respectively) in mpc-1.0.0.
+ - Rewrite the detecting of availability of double _Complex and long double _Complex
+   types by looking for _Complex_I instead of _MPC_H_HAVE_COMPLEX (in line with
+   the way mpc.h currently does it).
+
+0.93
+ - Remove 'not' from overloads. Apparently achieved nothing anyway, and 5.16
+   warns that it's invalid.
+
+0.92
+ - The default rounding mode and default precision globals are now thread-safe.
+   Consequently at least 5.008008 is required.
+
+0.91
+ - overload_equiv and overload_not_equiv weren't correctly handling the
+   case where the NV is a NaN. (Add tests in mpc_overload.t.)
+
+0.90
+ - Add Rmpc_sin_cos, Rmpc_set_dc, Rmpc_set_ldc, Rmpc_get_dc, Rmpc_get_ldc
+   (new in mpc-0.9).
+ - Add documentation of gmp_v and mpfr_v (previously missed).
+ - In the documentation, elaborate on the way that Rmpc_get-version() and
+   MPC_VERSION & friends determine their values. (Thanks Vincent Lefevre.)
+ - In MPC.xs change mpfr_v() to return mpfr_get_version() instead of
+   MPC_VERSION_STRING.
+ - In t/aab_basic.t print out the mpfr and mpc library versions from
+   the libraries, instead of from the headers (as had been the case)
+ - Some of the croak() messages in MPC.xs finished with "\n" - which
+   has now been removed from those messages.
+ - Releases of the MPC library (after 0.8.2) will require gmp-4.3.2
+   and mpfr-2.4.2. README and Makefile.PL have now been changed.
+
+0.83
+ - Add some warn() statements to t/bool.t, to try and see why test 2
+   fails - as reported by one of the cpan-testers. (That done, I
+   received an email from Jean-Louis Morel, with a patch that fixes
+   the issue ... I'll retain t/bool.t in its modified state.)
+ - Patch overload_not, overload_not_equiv and overload_equiv (in
+   MPC.xs) so that NaNs do not get passed on to the MPC comparison
+   functions (as this is something forbidden by the documentation).
+   Thanks to Jean-Louis Morel.
+
+0.82
+ - Implement '#include <inttypes.h>'. (Should have been done for 0.81.)
+   See https://rt.cpan.org/Ticket/Display.html?id=58564
+
+0.81
+ - Change the overload_string() and _get_str() functions to match the
+   formatting provided by mpc_out_str().
+ - Fix the signed zero problem with overloaded mul and div operations,
+   and add t/signed_zero.t as a check. Thanks Paul Zimmerman and
+   Philippe Theveny.
+ - Add Rmpc_mul_sj, Rmpc_mul_ld, Rmpc_mul_d, Rmpc_div_sj, Rmpc_sj_div,
+   Rmpc_div_ld, Rmpc_ld_div, Rmpc_div_d and Rmpc_d_div. These simply
+   wrap the the XSubs created to fix the signed zero anomaly (above).
+
+0.80
+ - Requires version 0.8 of the mpc library.
+ - Add Rmpc_asin, Rmpc_acos, Rmpc_atan, Rmpc_asinh, Rmpc_acosh and
+   Rmpc_atanh (new in mpc-0.8).
+ - Add Rmpc_pow_d, Rmpc_pow_ld, Rmpc_pow_si, Rmpc_pow_ui, Rmpc_pow_z
+   and Rmpc_pow_fr (new in mpc-0.8).
+ - Add overloaded atan2 function.
+
+0.70
+ - Requires version 0.7 of the mpc library. (Change to MPC_SET_X_Y.)
+ - Remove Rmpc_random and Rmpc_random2 (as the functions that they
+   wrap have been removed in mpc-0.7. (And remove t/mpc_random.t.)
+ - Add Rmpc_pow, Rmpc_set_nan and Rmpc_swap (new in mpc-0.7).
+ - Overload the ** and **= operators.
+ - Improve the efficiency of some of the overload routines by
+   eliminating the need to use a temporary mpfr object (using the
+   already existing *mpc_t_obj instead).
+ - Remove the rounding arg from RMPC_RE() and RMPC_IM() as it does
+   nothing, anyway.
+
+0.60
+ - Requires version 0.6 of the mpc library.
+ - Now a complete range of Rmpc_set_*_* functions (where '*' can be any
+   one of 'ui', 'si', 'd', 'uj', 'sj', 'ld', 'f', 'q', 'z' and 'fr').
+ - Add Rmpc_set_z, Rmpc_set_q, Rmpc_set_f and Rmpc_set_fr.
+ - Add Rmpc_set_z_z, Rmpc_set_q_q and Rmpc_set_f_f.
+ - In keeping with changes to the mpc library, all of the Rmpc_init*
+   functions have been removed except for Rmpc_init2 and Rmpc_init3
+   (and their "_nobless" forms).
+ - mpc-0.60 has removed mpc_get_default_prec and mpc_set_default_prec.
+   Rmpc_get_default_prec and Rmpc_set_default_prec remain (but the
+   former has changed to return 0 if default real and imaginary
+   precisions are different. With earlier versions, real and imaginary
+   default precisions were always the same, but this is no longer the
+   case). Rmpc_get_default_prec2 and Rmpc_set_default_prec2 have now
+   been added. The former returns an array of 2 values(real,
+   imaginary) and the latter requires 2 arguments (real, imaginary).
+ - The overload_copy sub now preserves the precision of the copied object
+   (instead of assigning default precision as was previously the case).
+ - Rmpc_get_str now wraps mpc_get_str (available in 0.6). The (pure perl)
+   sub that was formerly "Rmpc_get_str" has been renamed "_get_str".
+   The "overload_string" sub is unchanged.
+ - Add Rmpc_set_uj, Rmpc_set_sj and Rmpc_set_ld (available in mpc-0.6).
+ - Add Rmpc_strtoc and Rmpc_set_str (available in 0.6), and add set_str.t
+   test script.
+
+0.52
+ - Requires version 0.5.2 of the mpc library.
+ - Add MPC_VERSION, MPC_VERSION_NUM and Rmpc_get_version.
+
+0.51
+ - Requires version 0.5.1 of the mpc library.
+ - Add MPC_VERSION_STRING, MPC_VERSION_MAJOR, MPC_VERSION_MINOR
+   and MPC_VERSION_PATCHLEVEL.
+ - Replace pre-existing Rmpc_set_fr_fr with a function that wraps
+   the mpc_set_fr_fr function (which became available in 0.5.1)
+ - Add Rmpc_real, Rmpc_imag, Rmpc_arg, Rmpc_proj (new in 0.5.1)
+
+0.50
+ - Requires version 0.50 of the mpc library.
+ - Add Rmpc_log, Rmpc_cos, Rmpc_tan, Rmpc_sinh, Rmpc_cosh, and
+   Rmpc_tanh - all of which became available with mpc-0.5.
+ - Add log and cos overloading.
+ - Remove (the need for) INLINE.h
+ - Add mpfr_v and gmp_v functions (not exported).
+ - mpc_out_str changed with mpc-0.5. The tests in out_str1.t and
+   out_str2.t were changed accordingly.
+ - Bring Rmpc_get_str in line with the changed formatting of
+   mpc_out_str that occurred with mpc-0.5.
+
+0.46
+ - Add overloading of 'bool'.
+ - Change Rmpc_out_str and Rmpc_inp_str to allow use of streams other
+   than STDOUT and STDIN.
+ - For compatibility with my other MPFR/GMP based perl modules, add
+   TRmpc_out_str and TRmpc_inp_str (which, for Math::MPC only, are
+   aliased to Rmpc_out_str and Rmpc_inp_str respectively).
+ - Change 'Rmpc_get_prec' return to match 'mpc_get_prec' (which is a new
+   inclusion in mpc-0.4.6).
+ - Add 'Rmpc_get_prec2' and 'Rmpc_sin' (new in mpc-0.4.6).
+ - Remove the tests in the Makefile.PL that test for the presence of
+   a suitable compiler, GMP library, MPFR library and MPC library.
+
+0.45
+ - First release

@@ -1,0 +1,688 @@
+#!/usr/local/bin/perl
+
+=head1 NAME
+
+pbtool - Manipulate Mac OS X pasteboards/clipboards.
+
+=head1 SYNOPSIS
+
+ $ pbtool
+ pbtool> paste
+ Flags = 0 (kPasteboardFlavorNoFlags)
+ Able was I ere I saw Elba.
+ pbtool> clear
+ pbtool> copy "Madam, I'm Adam."
+ pbtool> exit
+
+=head1 OPTIONS
+
+I<Pbtool> takes the following options:
+
+B<-binary>
+
+This option specifies that no end-of-line translation is done on output.
+Despite its name, it should be fine for text. To turn this off, specify
+-nobinary.
+
+The default is -binary.
+
+B<-echo>
+
+This option specifies that input is echoed to standard error. To turn
+this off, specify -noecho.
+
+The default is -noecho.
+
+B<-id=n>
+
+This option specifies the pasteboard item ID to be used for I<copy> and
+I<paste>, as an unsigned integer. To specify no item id (which in fact
+causes I<copy> to use item ID 1, and I<paste> to use the last item that
+contains the desired flavor), specify -noid.
+
+The default is -noid.
+
+=head1 DETAILS
+
+I<Pbtool> is a Perl script that acts as a wrapper for Mac::Pasteboard.
+Most functions of the package are available through the script, and it
+adds a couple on its own account. The commands in general operate on the
+current pasteboard, which initially is the system clipboard. Commands
+also exist for changing the script's notion of the current pasteboard.
+
+Input is from standard in, using Term::ReadLine if that is available and
+the input is a terminal.
+
+Blank input lines and input lines whose first non-blank character is '#'
+are ignored. Any lines left are broken into tokens on spaces, though
+quoted text is kept together. Text::ParseWords does the heavy lifting
+here.
+
+Some input tokens are interpreted based on their leading characters, as
+follows.
+
+Tokens beginning with '<<'  are taken to specify 'here documents'. The
+remainder of the token specifies the string that ends the here document,
+which consists of all lines of the input following the 'here document'
+specification up to but not including the string that specifies its end.
+The 'here document' replaces the token that specifies it. If multiple
+here documents are specified on an input line, they are taken out of the
+input in left-to-right order.
+
+Tokens beginning with '<' are taken to specify an input file, whose name
+is the rest of the token. The file is read, and its contents replace the
+token.
+
+Tokens beginning with '>' or '>>' are taken to specify an output file,
+whose name is the rest of the token. Output of the command goes to that
+file, which is opened for appending if the token begins with '>>', or
+for output if it begins with '>'. The token is removed from the list of
+tokens passed to the command.
+
+The actual commands are:
+
+=cut
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use IO::File;
+use Mac::Pasteboard qw{:const};
+use Text::ParseWords;
+
+BEGIN {
+    eval {require YAML; YAML->import ('Dump'); 1} or
+    eval {require Data::Dumper; *Dump = \&Data::Dumper::Dumper; 1} or
+    die "Neither YAML nor Data::Dumper available.\n";
+}
+
+our $VERSION = '0.009';
+our $ALPHA_VERSION = $VERSION;
+$VERSION =~ s/_//g;
+
+my %opt = (
+    binary => 1,
+    echo => 0,
+    id => undef,
+);
+
+# We hold on to this filehandle for the duration.
+open (my $binout, '>&', \*STDOUT)	## no critic (RequireBriefOpen)
+    or die "Failed to duplicate STDOUT: $!\n";
+binmode ($binout)
+    or die "Failed to put \$binout into binmode: $!\n";
+
+my $optexitval = 1;
+
+_options (@ARGV);
+
+$optexitval = 'NOEXIT';
+
+if (-t) {
+    warn <<eod;
+
+pbtool $ALPHA_VERSION based on Mac::Pasteboard $Mac::Pasteboard::ALPHA_VERSION
+eod
+    if (eval {require Term::ReadLine}) {
+	warn "using Term::ReadLine $Term::ReadLine::VERSION\n";
+	my $rl = Term::ReadLine->new ('Pasteboard Tool');
+	*_read_contin = sub {$rl->readline ($_[0] || '-> ')};
+    } else {
+	*_read_contin = sub {print STDERR $_[0] || '-> '; <STDIN>};
+    }
+    warn <<'EOD';
+Copyright (C) 2008, 2011-2017 Thomas R. Wyant, III.
+See documentation for license.
+
+EOD
+} else {
+    *_read_contin = sub {<STDIN>};
+}
+sub _readline {return _read_contin ('pbtool> ')}
+
+while (defined ($_ = _readline ())) {
+    chomp;
+    $opt{echo} and warn $_, "\n";
+    s/^\s+//;
+    $_ or next;
+    substr ($_, 0, 1) eq '#' and next;
+    eval {
+	my ($cmd, @args) = _parse_tokens (quotewords ('\s+', 0, $_));
+	$cmd !~ m/ \A _ /smx
+	    and my $code = __PACKAGE__->can( $cmd )
+	    or die "No such command as '$cmd'.\n";
+	$code->(@args);
+	1;
+    } or warn $@;
+}
+-t and print "\n";
+
+my $pb;
+
+=head2 clear [name]
+
+This command clears the current pasteboard. If a name is given, the
+named pasteboard becomes the current pasteboard, and it is cleared. If
+no name is given and there is no current pasteboard, the system
+clipboard becomes the current pasteboard and is cleared.
+
+=cut
+
+sub clear {
+    $pb or create (@_);
+    $pb->clear ();
+    return;
+}
+
+=head2 copy data [flavor [flags]]
+
+This command copies the given data to the current pasteboard as the
+given flavor and the given flavor flags. The flavor flags default to 0,
+and the flavor to 'com.apple.traditional-mac-plain-text'. If there is no
+current pasteboard the system clipboard becomes the current pasteboard,
+but you get an error anyway because you do not own it at this point, not
+having cleared it.
+
+If the I<id> setting is set to a number, your data is copied to the item
+with that ID. If it is set to undef, it is copied to item id 1.
+
+=cut
+
+sub copy {
+    $pb or create ();
+    $pb->copy (@_);
+    return;
+}
+
+=head2 create [name]
+
+The named pasteboard is created if necessary, and becomes the current
+pasteboard. If no name is specified, you get the system clipboard, named
+'com.apple.pasteboard.clipboard'.
+
+=cut
+
+{
+    my %cache;
+    sub create {
+	my $name = defined $_[0] ? $_[0] : kPasteboardClipboard;
+	$pb = $cache{$name} ||= Mac::Pasteboard->new (
+	    $name, id => $opt{id});
+	return;
+    }
+}
+
+=head2 dump
+
+This command copies the current pasteboard object to standard out in
+Data::Dumper format.
+
+=cut
+
+sub dump {	## no critic (ProhibitBuiltinHomonyms)
+    $pb or create ();
+    use Data::Dumper;
+    print Dumper ($pb);
+    return;
+}
+
+=head2 exit
+
+This command causes the script to exit. End-of-file also has this
+effect.
+
+=cut
+
+sub exit {	## no critic (ProhibitBuiltinHomonyms)
+    CORE::exit;
+}
+
+=head2 encode
+
+This command displays whether data are encoded onto and decoded from the
+pasteboard. If an argument is passed, it becomes the new setting. The
+arguments are by convention C<1> to encode, and C<0> not to encode,
+though the value of this setting is interpreted in its Perl Boolean
+sense.
+
+Note that this only affects certain flavors of data.
+
+=cut
+
+sub encode {
+    my ( $encode ) = @_;
+    $pb or create();
+    print $pb->get( 'encode' ), "\n";
+    defined $encode
+	and $pb->set( encode => $encode );
+    return;
+}
+
+=head2 flavor
+
+This command displays the name of the current default flavor. If an
+argument is passed, this becomes the new default flavor.
+
+=cut
+
+sub flavor {
+    my ( $flavor ) = @_;
+    $pb or create();
+    print $pb->get( 'default_flavor' ), "\n";
+    defined $flavor
+	and $pb->set( default_flavor => $flavor );
+    return;
+}
+
+=head2 flavors [conforms_to]
+
+This command dumps the flavors of data present on the clipboard which
+conform to the given flavor, If no conforming flavor is given, all
+flavors are dumped. If the I<id> is defined, only data from that
+pasteboard item are dumped. The output is in YAML if module B<YAML>
+can be loaded, or in B<Data::Dumper> format if that module can be
+loaded.  Either way, what you actually get is an array of anonymous
+hashes. Each hash has the following keys:
+
+ flag_names: a reference to a list of the names of the flags set;
+ flags: the flavor flags;
+ flavor: the name of the flavor;
+ tags: the tags associated with the flavor, if any;
+ id: the ID of the pasteboard item the flavor came from.
+
+The tags hash will contain zero or more of the following keys:
+
+ extension: the preferred file name extension for the flavor;
+ mime: the preferred MIME type for the flavor;
+ os: the preferred 4-byte Mac OS document type for the flavor;
+ pboard: the preferred NSPBoard type for the flavor.
+
+See
+L<http://developer.apple.com/documentation/Carbon/Conceptual/understanding_utis/>
+for the concept of conformance. As a trivial example,
+
+ pbtool> flavors public.text
+
+gets you all the flavors which the system understands as conforming to
+the 'public.text' flavor. This is not quite the same as all text data;
+ad-hoc flavors may contain text, but if the flavors are not known to the
+system to conform to public.text or some subflavor thereof, you will not
+see them.
+
+=cut
+
+
+my %flavor_tags;
+
+sub flavors {
+    my @args = @_;
+    $pb or create();
+    my @flavors = $pb->flavors( @args );
+    _expand_flavors( $pb, @flavors );
+    print Dump( \@flavors );
+    return;
+}
+
+=head2 help
+
+This command displays the documentation for pbtool.
+
+=cut
+
+sub help {
+    _usage (2);
+    return;
+}
+
+=head2 name
+
+This command displays the name of the current pasteboard. If there is no
+current pasteboard, the system clipboard is made the current pasteboard,
+and its name is displayed.
+
+=cut
+
+sub name {
+    $pb or create ();
+    print $pb->get ('name'), "\n";
+    return;
+}
+
+=head2 opt
+
+This command displays the options currently in effect. If it has any
+arguments, they are interpreted as options, with the leading '-' on the
+option name being required. The given options (if any) are set, and the
+modified values are displayed. For example (assuming all defaults are
+still in effect):
+
+ pbtool> opt -nobinary -id 2
+ opt -nobinary -noecho -id=2
+
+=cut
+
+{
+    my ($boolean, %fmtr);
+    BEGIN {
+	$boolean = sub {$opt{$_[0]} ? $_[0] : 'no' . $_[0]};
+	%fmtr = (
+	    binary => $boolean,
+	    echo => $boolean,
+	    id => sub {defined $_[1] ? "$_[0]=$_[1]" : 'no' . $_[0]},
+	);
+    }
+    sub opt {
+	@_ and _options (@_);
+	print join (' ', 'opt', map {'-' . $fmtr{$_}->($_, $opt{$_})}
+	    sort keys %fmtr), "\n";
+	return;
+    }
+}
+
+=head2 output (encoding)
+
+This command displays the encoding used for non-binary output to
+standard out. If no encoding has been specified, the display will be
+C<'none'>.
+
+If an argument is specified, it becomes the new encoding. Specifying
+C<'none'> as the new encoding removes the the encoding, if any.
+
+=cut
+
+sub output {
+    my ( $new_encoding ) = @_;
+    my @layers = PerlIO::get_layers( STDOUT, output => 1 );
+    my $old_encoding;
+    foreach ( @layers ) {
+	m/ \A encoding [(] ( .* ) [)] \z /smx
+	    or next;
+	$old_encoding = $1;
+	last;
+    }
+    print defined $old_encoding ? "$old_encoding\n" : "none\n";
+    if ( defined $new_encoding && $new_encoding ne '' ) {
+	defined $old_encoding
+	    and binmode STDOUT, ':pop';
+	$new_encoding ne 'none'
+	    and binmode STDOUT, ":encoding($new_encoding)";
+    }
+    return;
+}
+
+=head2 paste [flavor]
+
+This command retrieves the given flavor from the current pasteboard and
+copies it to standard out. The default flavor is
+'com.apple.traditional-mac-plain-text'. The flavor flags are written to
+standard error. If no pasteboard is current, the system pasteboard is
+made current. If the I<id> setting is undef, the last occurrence of the
+desired flavor (if any) is returned; otherwise the flavor is returned
+from the item whose ID is the given I<id>.
+
+=cut
+
+sub paste {
+    my @args = @_;
+    $pb or create ();
+    my ($data, $flags) = $pb->paste (@args);
+    print STDERR "Flags = $flags (",
+	scalar $pb->flavor_flag_names ($flags), ")\n";
+    print $data;
+    substr ($data, -1, 1) eq "\n" or print "\n";
+    return;
+}
+
+=head2 paste_all [conforms_to]
+
+This command displays all data on the current pasteboard conforming to
+the given flavor. If no flavor is given, all flavors are displayed. If
+the I<id> is set, only data from the corresponding item are displayed.
+
+The output is the same as for L<flavors|/flavors>, but in addition the
+'data' key holds the actual data. If there is no current clipboard, the
+system pasteboard is made the current clipboard.
+
+See
+L<http://developer.apple.com/documentation/Carbon/Conceptual/understanding_utis/index.html>
+for the concept of conformance.
+
+=cut
+
+sub paste_all {
+    my @args = @_;
+    $pb or create ();
+    my @flavors = $pb->paste_all( @args );
+    _expand_flavors( $pb, @flavors );
+    print Dump( \@flavors );
+    return;
+}
+
+=head2 pbpaste
+
+This command is equivalent to I<paste>, but always uses the system
+clipboard.
+
+=cut
+
+sub pbpaste {
+    my @args = @_;
+    my ($data, $flags) = Mac::Pasteboard::pbpaste (@args);
+    defined $data or die "No data found\n";
+    print STDERR "Flags = $flags (",
+	scalar Mac::Pasteboard::flavor_flag_names ($flags), ")\n";
+    print $data;
+    substr ($data, -1, 1) eq "\n" or print "\n";
+    return;
+}
+
+=head2 status [value]
+
+This command displays the current status setting of the current
+pasteboard, optionally setting it first to the given value.  If there is
+no current pasteboard, the system clipboard is made the current
+pasteboard, and its status is displayed.
+
+=cut
+
+sub status {
+    my @args = @_;
+    $pb or create ();
+    @args and $pb->set (status => $args[0]);
+    print $pb->get ('status'), "\n";
+    return;
+}
+
+=head2 synch [name]
+
+This command synchronizes with the current pasteboard. If a name is
+given, that pasteboard is made the current pasteboard, and it is
+synchronized. If there is no current pasteboard and no name is given,
+the system clipboard is made the current pasteboard.
+
+The synchronization flags returned by the operation are written to
+standard out.
+
+=cut
+
+sub synch {
+    my @args = @_;
+    (!$pb || @args) and create (@args);
+    my $flags = $pb->synch ();
+    print STDERR "Flags = $flags (",
+        scalar $pb->synch_flag_names ($flags), ")\n";
+    return;
+}
+
+=head2 unique
+
+This command creates a pasteboard with a unique name. Under Mac OS 10.4
+and above, this name is available via the 'name' command.
+
+=cut
+
+sub unique {
+    return $pb = Mac::Pasteboard->new (
+	kPasteboardUniqueName, id => $opt{id});
+}
+
+########################################################################
+#
+#	Utility subroutines
+#
+#	_expand_flavors( $pb, @flavors );
+#
+#	This subroutine takes as its arguments a pasteboard object and
+#	some flavor data returned by flavors(). The data are expanded
+#	for display. Nothing is returned.
+#
+
+sub _expand_flavors {
+    my ( $pb, @flavors ) = @_;
+    foreach my $flav ( @flavors ) {
+	$flav->{flag_names} = [
+	    $pb->flavor_flag_names( $flav->{flags} ) ];
+	$flav->{tags} = $flavor_tags{$flav->{flavor}} ||=
+	    $pb->flavor_tags( $flav->{flavor} );
+	$flav->{flags} = sprintf '0x%x', $flav->{flags};
+    }
+    return;
+}
+
+#
+#	(@tokens) = _parse_tokens (quotewords ('\s+', 0, $_));
+#
+#	This subroutine processes tokens.
+#
+
+sub _parse_tokens {
+    my @tokens = @_;
+    # Perl::Critic extends Perl Best Practices here. The latter merely
+    # forbids single-arg selects for the purpose of setting autoflush.
+    if ($opt{binary}) {
+	select $binout;	## no critic (ProhibitOneArgSelect)
+    } else {
+	select STDOUT;	## no critic (ProhibitOneArgSelect)
+    }
+    my @rslt;
+    foreach (@tokens) {
+	if (m/^<<(.*)/) {
+	    my $eod = $1;
+	    my $token = '';
+	    local $_;
+	    while (defined ($_ = _read_contin ("$eod> "))) {
+		chomp;
+		$_ eq $eod and last;
+		$token .= $_ . "\n";
+	    }
+	    defined $_
+		or die <<eod;
+End-of-file without finding end of here document '$eod'
+eod
+	    push @rslt, $token;
+	} elsif (m/^<(.*)/) {
+	    my $fn = $1;
+	    my $fh = IO::File->new($fn, '<')
+		or die "Failed to open $fn: $!\n";
+	    local $/ = undef;
+	    push @rslt, scalar <$fh>;
+	} elsif (m/^(>{1,2})(.*)/) {
+	    my ($flg, $fn) = ($1, $2);
+	    my $fh = IO::File->new($fn, $flg)
+		or die "Failed to open $fn: $!\n";
+	    $opt{binary} and binmode ($fh);
+	    # Perl::Critic extends Perl Best Practices here. The latter
+	    # merely forbids single-arg selects for the purpose of
+	    # setting autoflush.
+	    select $fh;	## no critic (ProhibitOneArgSelect)
+	} else {
+	    push @rslt, $_;
+	}
+    }
+    return @rslt;
+}
+
+#	@args = _options (@args);
+#
+#	This subroutine feeds its input to GetOptions. Anything left
+#	over is assumed to be the name of a clipboard to make current.
+#	An error results in the display of a brief error message.
+
+sub _options {
+    local @ARGV = @_;
+    GetOptions (\%opt, qw{binary! echo! id=i}, noid => sub {$opt{id} = undef})
+	or die _usage (1);
+    $pb and $pb->set (id => $opt{id});
+    @ARGV and create (shift @ARGV);
+    return @ARGV;
+}
+
+#	_usage ($verbosity, $exitval)
+#
+#	This subroutine displays the usage text to the desired
+#	verbosity. If Pod::Usage can be loaded, that module is used.
+#	Otherwise a verbosity < 2 gets you a short help message, and
+#	verbosity >= 2 gets you a message recommending the installation
+#	of Pod::Help.
+
+BEGIN {
+    if (eval {require Pod::Usage; 1}) {
+	*_usage = sub {
+	    my ($verbosity, $exitval) = @_;
+	    defined $exitval
+		or $exitval = $verbosity > 1 ? 'NOEXIT' : $optexitval;
+	    Pod::Usage::pod2usage (
+		-verbose => $verbosity,
+		-exitval => $exitval,
+	    );
+	};
+    } else {
+	*_usage = sub {
+	    my ($verbosity, $exitval) = @_;
+	    defined $exitval
+		or $exitval = $verbosity > 1 ? 'NOEXIT' : $optexitval;
+	    die $verbosity > 1 ? <<eod : <<eod;
+Please install Pod::Usage to get help.
+eod
+
+pbtool - Manipulate Mac OS X pasteboards.
+
+usage: pbtool [options] [pasteboard_name]
+
+where the options are:
+  -binary
+    for binary output (-nobinary reverses this);
+  -echo
+    to have commands echoed to standard error (-noecho reverses this);
+  -id=n
+    to set the desired pasteboard ID (-noid sets it to undef).
+eod
+	};
+    }
+}
+
+=head1 BUGS
+
+Bugs can be reported to the author by mail, or through
+L<http://rt.cpan.org/>.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III (F<wyant at cpan dot org>)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2008, 2011-2017 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

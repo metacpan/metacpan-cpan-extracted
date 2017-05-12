@@ -1,0 +1,8 @@
+Revision history for Perl extension Math::Business::Stochastic.
+
+0.01  Feb 10 2008
+	- original version; created by h2xs 1.23 with options
+		-AX -n Math::Business::Stochastic
+
+0.03  Feb 11 2008
+	- first release; ported from private project

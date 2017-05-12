@@ -1,0 +1,87 @@
+---
+abstract: 'Standalone, extensible Perl module installer'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Harness: '3.13'
+  Test::More: '0.86'
+  autodie: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  YAML::Tiny: '1.33'
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.18'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Install
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  Archive::Zip: '1.37'
+  File::HomeDir: '1'
+  JSON: '2.9'
+  LWP::Simple: '6.00'
+  LWP::UserAgent: '6.05'
+  PAR::Dist: '0.29'
+requires:
+  Devel::PPPort: '3.16'
+  ExtUtils::Install: '1.52'
+  ExtUtils::MakeMaker: '6.59'
+  ExtUtils::ParseXS: '2.19'
+  File::Path: 0
+  File::Remove: '1.42'
+  File::Spec: '3.28'
+  Module::Build: '0.29'
+  Module::CoreList: '2.17'
+  Module::ScanDeps: '1.09'
+  Parse::CPAN::Meta: '1.4413'
+  YAML::Tiny: '1.38'
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/Perl-Toolchain-Gang/Module-Install.git
+version: '1.18'
+x_contributors:
+  - 'Adam Kennedy <adam@ali.as>'
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+  - 'Alexandr Ciornii <alexchorny@gmail.com>'
+  - "Chris 'BinGOs' Williams <chris@bingosnet.co.uk>"
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Paul Fenwick <pjf@perltraining.com.au>'
+  - 'bowtie <bowtie@cpan.org>'
+  - 'Matt S Trout <dbix-class@trout.me.uk>'
+  - 'Dan Book <grinnz@grinnz.com>'
+  - 'Alberto Simoes <ambs@cpan.org>'
+  - 'Christian Walde <walde.christian@googlemail.com>'
+  - 'Ricardo Signes <rjbs@cpan.org>'
+  - 'Ingy <ingy@ingy.net>'
+  - 'Hans Dieter Pearcey <hdp@cpan.org>'
+  - 'Avar Arnfjord Bjarmason <avarab@gmail.com>'
+  - 'Curtis Jewell <csjewell@cpan.org>'
+  - 'Graham Knop <haarg@haarg.org>'
+  - 'Olivier Mengue <dolmen@cpan.org>'
+  - 'Rafael Kitover <rkitover@gmail.com>'
+  - 'gregor herrmann <gregoa@debian.org>'
+  - 'Alex Vandiver <github@chmrr.net>'
+  - 'Ash Berlin <ash_github@firemirror.com>'
+  - 'Craig A. Berry <craigberry@mac.com>'
+  - 'Dan Brook <dbrook@venda.com>'
+  - 'David Golden <dagolden@cpan.org>'
+  - 'Gabor Szabo <szabgab@gmail.com>'
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Joshua ben Jore <twists@gmail.com>'
+  - 'Kang-min Liu <gugod@gugod.org>'
+  - 'Kent Fredric <kentfredric@gmail.com>'
+  - 'Leo Lapworth <leo@cuckoo.org>'
+  - 'Marcel Grunauer <hanekomu@gmail.com>'
+  - 'Peter Rabbitson <ribasushi@cpan.org>'
+  - 'Thomas Sibley <tsibley@cpan.org>'
+  - 'Tokuhiro Matsuno <tokuhirom@cpan.org>'
+  - 'Tom Wyant <wyant@cpan.org>'

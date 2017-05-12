@@ -1,0 +1,8 @@
+Changes
+lib/MooseX/MutatorAttributes.pm
+Makefile.PL
+MANIFEST
+README
+t/00-works.t
+t/01_set_only_rw_attr.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,13 @@
+blib
+bdbaccess
+bdbaccess.pod
+c_version.h
+config.db
+\.bs
+CTest.c
+CTest.o
+\.tar\.gz$
+tmp
+\.o
+Makefile
+Makefile.old

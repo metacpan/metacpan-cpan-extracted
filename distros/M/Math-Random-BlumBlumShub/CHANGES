@@ -1,0 +1,35 @@
+ - 0.06
+   Replace SvIV with SvIVX in typemap.
+   Remove dXSARGS declaration from autocorrelation_20000(). It's not needed and it
+    results in an assertion failure with -DDEBUGGING perls.
+
+ - 0.05
+   Makefile.PL - Replace the Math::GMP PREREQ_PM with Math::GMPz (and save 20 minutes
+                 on the install-time).
+   t/bbs.t - improve efficiency of Math::GMPz tests by allocating full number of
+             bits to $bitstream & $bitstream_20000 at time of creation. (Rmpz_init2)
+
+ - 0.04
+   Rewrite a small section of the bbs() XS code to gain a significant boost in
+   performance. (Thanks Dana Jacobsen.)
+
+ - 0.03
+   Fix error in t/bbs.t
+
+ - 0.02
+   Add metadata to Makefile.PL
+
+   Add autocorrelation_20000 test.
+
+   Add autocorrelation test.
+
+   The poker test appended 0's to the *end* of the bitstring (to compensate for
+    missing leading 0's). Change it so that 0's are added to the *beginning* of
+    the string, as is strictly correct ... in case it matters.
+
+   Fix bug in runs test.
+
+   Add warning (that provides additional info) to longrun test when it fails.
+
+ - 0.01
+   First release

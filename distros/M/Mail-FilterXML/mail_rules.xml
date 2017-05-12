@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<MailAuditor>
+	<Config logfile="/tmp/maillog" junkfolder="JUNK" />
+	<Rule type="from" content="ebs@nersp.nerdc.ufl.edu" folder="inbox" action_cmd="/bin/echo" action_params="'crap from #from#' > /tmp/test.log" />
+	<Rule type="from" content="linkages@ufl.edu" folder="poo" />
+
+	<Rule type="from" content="joe@fuck.com" folder="inbox">
+            <action action_cmd="/usr/bin/X11/xmessage" action_params="-center -timeout 1 'New message from #from# concerning #subject#'" />
+            <action action_cmd="/bin/echo" action_params="'New message from #from# concerning #subject#' >> /tmp/test.log" />
+        </Rule>
+</MailAuditor>

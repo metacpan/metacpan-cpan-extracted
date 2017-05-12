@@ -1,0 +1,27 @@
+---
+abstract: "Deal with a \"stack\" of messages"
+author:
+  - 'Cory G Watson <gphat@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Message-Stack
+requires:
+  Carp: 0
+  Moose: 0
+  MooseX::Aliases: 0
+  MooseX::Storage: 0
+  MooseX::Storage::Deferred: 0
+  MooseX::Types: 0
+  MooseX::Types::Moose: 0
+resources:
+  homepage: http://github.com/gphat/message-stack
+  repository: http://github.com/gphat/message-stack
+version: 0.22

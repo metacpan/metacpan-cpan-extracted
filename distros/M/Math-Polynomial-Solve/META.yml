@@ -1,0 +1,42 @@
+---
+abstract: 'Find the roots of polynomial equations'
+author:
+  - 'John M. Gamble <jgamble@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.4'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Polynomial-Solve
+provides:
+  Math::Polynomial::Solve:
+    file: lib/Math/Polynomial/Solve.pm
+    version: '2.75'
+requires:
+  Math::Complex: '1.36'
+  Math::Utils: '1.06'
+  perl: v5.10.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jgamble/Math-Polynomial-Solve.git
+version: '2.75'
+x_keyword:
+  - math
+  - polynomial
+  - quadratic
+  - cubic
+  - quartic
+  - matrix
+  - companion-matrix
+  - Sturm
+  - Nickalls
+  - Ferrari
+  - Laguerre
+  - Hessenberg
+  - Newton-Raphson
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

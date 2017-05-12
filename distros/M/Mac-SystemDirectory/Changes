@@ -1,0 +1,31 @@
+Revision history for Perl extension Mac::SystemDirectory.
+0.06 2011-02-12 16:00
+    - Detect correct target Mac OS version in tests (cross-compilation), patch by Mark Dootson (RT #65573)
+
+0.05 2011-02-02 11:00
+    - Use correct macros on Mac OS X 10.5 and 10.5, reported by Mark Dootson (RT #65366)
+
+0.04 2009-10-12 11:00
+    - Fix compilation, perl defines I_POLL which causes a conflict with OpenTransportProtocol.h
+    - Silence "bool" redefined warnings
+
+0.03 2009-10-04 19:40
+    - Fixed lddlflags, reported by zts.
+
+0.02 2009-10-02 18:01
+    - Added HomeDirectory()
+    - Added TemporaryDirectory()
+    - Added more tests
+
+0.02_02 2009-10-01 17:02
+    - Use Module::Install
+    - Cleanup POD
+
+0.02_01 2009-10-01 10:22
+    - Added support for DomainMask
+    - Added support for returning multiple directories
+
+0.01  2009-09-30 23:22
+    - original version; created by h2xs 1.23 with options
+        -A -b 5.6.0 --skip-ppport -c -n Mac::SystemDirectory
+

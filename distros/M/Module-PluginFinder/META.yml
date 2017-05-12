@@ -1,0 +1,26 @@
+---
+name: Module-PluginFinder
+version: 0.04
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+abstract: |-
+  automatically choose the most appropriate plugin
+  module.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Module::Pluggable::Object: 0
+build_requires:
+  File::Spec: 0
+  Test::Exception: 0
+  Test::More: 0
+  Test::Warn: 0
+provides:
+  Module::PluginFinder:
+    file: lib/Module/PluginFinder.pm
+    version: 0.04
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

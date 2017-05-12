@@ -1,0 +1,28 @@
+---
+abstract: 'Mojolicious plugin for automatic include javascript and stylesheet by controller/action path.'
+author:
+  - 'Roman V. Nikolaev <rshadow@rambler.ru>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-ContextResources
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '5.54'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/dr-co/mojolicious-plugin-contex_resources/issues
+  homepage: https://github.com/dr-co/mojolicious-plugin-contex_resources
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com:dr-co/mojolicious-plugin-contex_resources.git
+version: '0.01'

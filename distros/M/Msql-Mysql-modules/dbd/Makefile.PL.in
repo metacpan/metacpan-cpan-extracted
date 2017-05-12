@@ -1,0 +1,81 @@
+# -*- perl -*-
+
+use strict;
+use ExtUtils::MakeMaker ();
+use Config ();
+use DBI::DBD ();
+use lib "../lib";
+
+require DBD::~~dbd_driver~~::Install::Config;
+
+use vars qw($cfg);
+$cfg = $DBD::~~dbd_driver~~::Install::Config::configuration;
+if (!$cfg) {
+    die "Missing driver configuration";
+}
+
+my @pl_files = (%{$cfg->{'files'}});
+if ($cfg->{'install_nodbd'}) {
+    push(@pl_files, (%{$cfg->{'files_nodbd'}}));
+}
+
+
+my %hash = %{$cfg->{'makemaker'}};
+$hash{'NAME'} = 'DBD::' . $cfg->{'dbd_driver'};
+$hash{'PL_FILES'} = { @pl_files };
+$hash{'OBJECT'} = '$(O_FILES)';
+$hash{'VERSION'} = $cfg->{'dbd_version'};
+$hash{'clean'} = { 'FILES' => '*.xsi' };
+$hash{'CAPI'} = 'TRUE'
+    if ($ExtUtils::MakeMaker::VERSION >= 5.43
+	&&  $Config::Config{'archname'} =~ /-object\b/i);
+ExtUtils::MakeMaker::WriteMakefile(%hash);
+
+
+package MY;
+
+sub libscan {
+    my($self, $path) = @_;
+    ($path =~ /(Install\.pm|,v|~)$/) ? undef : $path;
+}
+
+sub processPL {
+    my($self) = shift;
+    my @output;
+    my $cfg = "../lib/DBD/~~dbd_driver~~/Install/Config.pm";
+    my($from, $to);
+    while (($from, $to) = each %{$self->{'PL_FILES'}}) {
+	$from = "../$from";
+	if ($to =~ /^~~dbd_driver~~\//) {
+	    $to =~ s/^~~dbd_driver~~\///;
+	} else {
+	    $to = "../$to";
+	}
+	push(@output, <<"PART");
+pm_to_blib: $to
+
+$to: $from
+	\$(PERL) -I\$(INST_ARCHLIB) -I\$(INST_LIB) -I\$(PERL_ARCHLIB) \\
+		-I\$(PERL_LIB) -I../lib -MExtUtils::PerlPP \\
+		-e "ppp('$from', '$to', '$cfg')"
+
+PART
+    }
+    join "", @output;
+}
+
+
+sub postamble { "\n" . DBI::DBD::dbd_postamble(@_) };
+
+
+sub const_loadlibs {
+    my $self = shift;
+    my $str = $self->SUPER::const_loadlibs(@_);
+    if (my $el = $::cfg->{'static_libs'}) {
+        $str =~ s/((?:EXTRALIBS|LDLOADLIBS)\s+=\s+)/$1$el /sg;
+    }
+    if (my $fl = $::cfg->{'final_libs'}) {
+        $str =~ s/((?:EXTRALIBS|LDLOADLIBS)\s+=\s+.*?)(\r?\n)/$1 $fl$2/sg;
+    }
+    $str;
+}

@@ -1,0 +1,86 @@
+{
+   "abstract" : "Catalyst-like models in Mojolicious",
+   "author" : [
+      "Alexander Ruzhnikov."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-BModel",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Find" : "0",
+            "Mojo::Loader" : "0",
+            "Mojolicious" : "6.0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Path" : "0",
+            "FindBin" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::BModel::Base" : {
+         "file" : "lib/Mojolicious/BModel/Base.pm",
+         "version" : "0.09"
+      },
+      "Mojolicious::Plugin::BModel" : {
+         "file" : "lib/Mojolicious/Plugin/BModel.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ruzhnikov/Mojolicious-Plugin-BModel/issues"
+      },
+      "homepage" : "https://github.com/ruzhnikov/Mojolicious-Plugin-BModel",
+      "repository" : {
+         "url" : "git://github.com/ruzhnikov/Mojolicious-Plugin-BModel.git",
+         "web" : "https://github.com/ruzhnikov/Mojolicious-Plugin-BModel"
+      }
+   },
+   "version" : "0.09",
+   "x_authority" : "cpan:BCDE",
+   "x_contributors" : [
+      "Alexander Ruzhnikov <ruzhnikov85@gmail.com>"
+   ]
+}

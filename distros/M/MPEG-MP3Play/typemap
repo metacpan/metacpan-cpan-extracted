@@ -1,0 +1,27 @@
+XA_EqualizerInfo *				T_PTROBJ
+const XA_OutputFilter *				T_PTROBJ
+const XA_OutputModule *				T_PTROBJ
+const void *					T_PTROBJ
+void **						T_PTROBJ
+XA_Control *					T_PTROBJ
+XA_Message *					T_PTROBJ
+XA_MessagePtr *					T_PTROBJ
+const unsigned char *				T_PTROBJ
+XA_InputModuleQuery *				T_PTROBJ
+XA_DecoderInfo **				T_PTROBJ
+XA_OutputModuleQuery *				T_PTROBJ
+const char *					T_PTROBJ
+char **						T_PTROBJ
+void ( * callback ) ( void * client, XA_OutputFilterNode * node )T_PTROBJ
+XA_EnvironmentCallback				T_PTROBJ
+XA_ControlProcedure				T_PTROBJ
+XA_DecoderInfo *				T_PTROBJ
+const XA_Message *				T_PTROBJ
+XA_EventForwarderProcedure			T_PTROBJ
+const XA_TimeCode *				T_PTROBJ
+XA_OutputControl *				T_PTROBJ
+float						T_PTROBJ
+void ( * callback ) ( void * client, XA_InputFilterNode * node )T_PTROBJ
+long *						T_PTROBJ
+const XA_InputFilter *				T_PTROBJ
+const XA_InputModule *				T_PTROBJ

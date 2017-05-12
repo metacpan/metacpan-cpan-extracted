@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Module/Util.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+scripts/pm_which
+t/01..module.t
+t/99..pod.t
+t/data/NS/One.pm
+t/data/NS2/One.pm
+t/more/01..validate_all_cpan.t
+META.json

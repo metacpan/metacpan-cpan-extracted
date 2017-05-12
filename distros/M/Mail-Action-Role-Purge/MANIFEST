@@ -1,0 +1,15 @@
+bin/mail_simplelist_purge.pl
+bin/mail_tempaddress_purge.pl
+Build.PL
+ChangeLog
+lib/Mail/Action/Role/Purge.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01_use.t
+t/02_purge.t
+t/03_script_mta.t
+t/04_script_msl.t
+t/05_pod.t
+t/06_roles.t

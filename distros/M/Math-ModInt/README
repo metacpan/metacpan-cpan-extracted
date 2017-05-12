@@ -1,0 +1,38 @@
+Math-ModInt version 0.011
+=========================
+
+Math::ModInt is a Perl class providing modular integer arithmetic
+with overloaded Perl operators.  Its objects represent integer
+residue classes.
+
+Math::ModInt::ChineseRemainder adds functionality to find intersections
+of residue classes.
+
+Math::ModInt::Event allows to customize how errors involving
+Math::ModInt objects are reported.
+
+INSTALLATION
+
+To install the modules of this distribution type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This distribution requires these other modules and libraries:
+
+  perl version 5.6.0 or higher
+  overload                             (usually bundled with perl)
+  Math::BigInt version 1.991 or higher (usually bundled with perl)
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2009-2015 by Martin Becker.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.0 or,
+at your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,40 @@
+.travis.yml
+bin/tables
+CHANGES
+lib/Mojolicious/Plugin/Tables.pm
+lib/Mojolicious/Plugin/Tables/Controller/Auth.pm
+lib/Mojolicious/Plugin/Tables/Controller/Tables.pm
+lib/Mojolicious/Plugin/Tables/Model.pm
+lib/Mojolicious/Plugin/Tables/Model/Row.pm
+lib/Mojolicious/Plugin/Tables/resources/public/css/tables.css
+lib/Mojolicious/Plugin/Tables/resources/public/favicon.ico
+lib/Mojolicious/Plugin/Tables/resources/public/img/missing.jpg
+lib/Mojolicious/Plugin/Tables/resources/public/img/reliant-robin.jpg
+lib/Mojolicious/Plugin/Tables/resources/public/img/tables.png
+lib/Mojolicious/Plugin/Tables/resources/public/index.html
+lib/Mojolicious/Plugin/Tables/resources/public/js/tables.js
+lib/Mojolicious/Plugin/Tables/resources/templates/exception.json.ep
+lib/Mojolicious/Plugin/Tables/resources/templates/exception.production.html.ep
+lib/Mojolicious/Plugin/Tables/resources/templates/layouts/tables.html.ep
+lib/Mojolicious/Plugin/Tables/resources/templates/not_found.json.ep
+lib/Mojolicious/Plugin/Tables/resources/templates/not_found.production.html.ep
+lib/Mojolicious/Plugin/Tables/resources/templates/tables/dml.html.ep
+lib/Mojolicious/Plugin/Tables/resources/templates/tables/edit.html.ep
+lib/Mojolicious/Plugin/Tables/resources/templates/tables/page.html.ep
+lib/Mojolicious/Plugin/Tables/resources/templates/tables/view.html.ep
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+Mojolicious-Plugin-Tables-0.06.tar.gz
+README.md
+t/00basic.t
+t/01template_override.t
+t/02json.t
+t/blah/lib/Blah.pm
+t/blah/script/blah
+t/blah/t/basic.t
+t/blah/templates/track/layouts/tables.html.ep
+t/blah/templates/track/tables/view.html.ep
+t/example.db
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

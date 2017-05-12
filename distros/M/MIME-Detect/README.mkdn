@@ -1,0 +1,143 @@
+# NAME
+
+MIME::Detect - MIME file type identification
+
+# SYNOPSIS
+
+    my $mime = MIME::Detect->new();
+
+    for my $file (@ARGV) {
+      print sprintf "%s: %s\n", $file, $_->mime_type
+          for $mime->mime_types($file);
+    };
+
+# METHODS
+
+## `MIME::Detect->new( ... )`
+
+    my $mime = MIME::Detect->new();
+
+Creates a new instance and reads the database distributed with this module.
+
+    my $mime = MIME::Detect->new(
+        files => [
+            '/usr/share/freedesktop.org/mimeinfo.xml',
+            't/mimeinfo.xml',
+        ],
+    );
+
+## `$mime->read_database %options`
+
+    $mime->read_database(
+        xml => MIME::Detect::FreeDesktopOrgDB->get_xml,
+        files => [
+            'mymime/mymime.xml',
+            '/usr/share/freedesktop.org/mime.xml',
+        ],
+    );
+
+If you want rules in addition to the default
+database included with the distribution, you can load the rules from another file.
+Passing in multiple filenames will join the multiple
+databases. Duplicate file type definitions will not be detected
+and will be returned as duplicates.
+
+The rules will be sorted according to the priority specified in the database
+file(s).
+
+By default, the XML database stored alongside
+[MIME::Detect::FreeDesktopOrgDB](https://metacpan.org/pod/MIME::Detect::FreeDesktopOrgDB)
+will be loaded after all custom files have been loaded.
+To pass in a different fallback database, either pass in a reference
+to the XML string or the name of a package that has an `get_xml` subroutine.
+
+To prevent loading the default database, pass undef
+for the `xml` key.
+
+## `$mime->mime_types`
+
+    my @types = $mime->mime_types( 'some/file' );
+    for( @types ) {
+        print $type->mime_type, "\n";
+    };
+
+Returns the list of MIME types according to their priority.
+The first type is the most likely. The returned objects
+are of type [MIME::Detect::Type](https://metacpan.org/pod/MIME::Detect::Type).
+
+## `$mime->mime_type`
+
+    my $type = $mime->mime_type( 'some/file' );
+    print $type->mime_type, "\n"
+        if $type;
+
+Returns the most likely type of a file as [MIME::Detect::Type](https://metacpan.org/pod/MIME::Detect::Type). Returns
+`undef` if no file type can be determined.
+
+## `$mime->mime_types_from_name`
+
+    my $type = $mime->mime_types_from_name( 'some/file.ext' );
+    print $type->mime_type, "\n"
+        if $type;
+
+Returns the list of MIME types for a file name based on the extension
+according to their priority.
+The first type is the most likely. The returned objects
+are of type [MIME::Detect::Type](https://metacpan.org/pod/MIME::Detect::Type).
+
+## `$mime->mime_type_from_name`
+
+    my $type = $mime->mime_type_from_name( 'some/file.ext' );
+    print $type->mime_type, "\n"
+        if $type;
+
+Returns the most likely type of a file name as [MIME::Detect::Type](https://metacpan.org/pod/MIME::Detect::Type). Returns
+`undef` if no file type can be determined.
+
+# SEE ALSO
+
+[https://www.freedesktop.org/wiki/Software/shared-mime-info/](https://www.freedesktop.org/wiki/Software/shared-mime-info/) - the website
+where the XML file is distributed
+
+[File::MimeInfo](https://metacpan.org/pod/File::MimeInfo) - module to read your locally installed and converted MIME database
+
+[File::LibMagic](https://metacpan.org/pod/File::LibMagic) - if you can install `libmagic` and the appropriate `magic` files
+
+[File::MMagic](https://metacpan.org/pod/File::MMagic) - if you have the appropriate `magic` files
+
+[File::MMagic::XS](https://metacpan.org/pod/File::MMagic::XS) - if you have the appropriate `magic` files but want more speed
+
+[File::Type](https://metacpan.org/pod/File::Type) - inlines its database, unsupported since 2004?
+
+[File::Type::WebImages](https://metacpan.org/pod/File::Type::WebImages) - if you're only interested in determining whether
+a file is an image or not
+
+[MIME::Types](https://metacpan.org/pod/MIME::Types) - for extension-based detection
+
+# REPOSITORY
+
+The public repository of this module is 
+[http://github.com/Corion/mime-detect](http://github.com/Corion/mime-detect).
+
+# SUPPORT
+
+The public support forum of this module is
+[https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+[https://rt.cpan.org/Public/Dist/Display.html?Name=MIME-Detect](https://rt.cpan.org/Public/Dist/Display.html?Name=MIME-Detect)
+or via mail to [mime-detect-Bugs@rt.cpan.org](https://metacpan.org/pod/mime-detect-Bugs@rt.cpan.org).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2015-2016 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 635ba7c544ce6815070b5428777426ead1059774 Changes
+SHA1 bc4c20714960c2d3d6b873d80595bd08fb196460 MANIFEST
+SHA1 cbe5576a5990a0cc9e5f94cba963ad9c6e8df14b MANIFEST.SKIP
+SHA1 a0420044230a1dc8ba7565ba16f71865f04393e5 META.json
+SHA1 001e8ea5a68dcb763f2e423fb55674e7c7d01977 META.yml
+SHA1 d4f64aa056ae083847943465e6877a7620062733 Makefile.PL
+SHA1 9bb939251f1a1d3222f93dfbebdf3c6f1ad9d1b6 README
+SHA1 58a8dcaf3c3971ef1d633cfefd66385bc49db726 lib/Map/Tube/Beijing.pm
+SHA1 dae139c4b8e300f0f6f460b90f4587cdc541b00a share/beijing-map.xml
+SHA1 477a8d6c3b617923b46bc19320114eb2531a8488 t/00-load.t
+SHA1 5f883aa9285accd864a4c31510cc843502ced090 t/01-xml.t
+SHA1 0258625a6aa3fbf9c87a8d47d59ab497d1f0eaf3 t/02-xml.t
+SHA1 1628dcbd9da5e2c30d5e6d0e04522dcfeef7bdc5 t/03-map.t
+SHA1 5c5948089be2475bb8eed8485adfcbcd0334b0ef t/04-routes-chin.t
+SHA1 0f95b4a1641bc178a91640ba19c6175150094a02 t/05-routes-pinyin.t
+SHA1 4b98b347e51e58fdba54df88a1433f31d42c4ddd t/10-manifest.t
+SHA1 aa07c10dc5ceee32859d70d041da14170ba8b64e t/11-meta-json.t
+SHA1 f459935137070966b68d797c33b6dc7ec94a23e5 t/12-meta-yml.t
+SHA1 84c3ca896da7aba91fee0b1e91039b5b957c1d2f t/13-version.t
+SHA1 474fdb6d74e630fada8c0d9c5473ebe8ac423820 t/14-signature.t
+SHA1 a572bbed348e70b106f01fa02fee8b8edd6735d5 t/20-pod.t
+SHA1 002defae63966c10014e08e983be1f291e7ea62b t/21-changes.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlTnHAYACgkQGcmBoRH2MYbzMACdGKpARvAee6uCPTI4wYQEvDOQ
+VpwAnj9yuDeIVp3+SIfUxvYNJbznN6d1
+=j/aJ
+-----END PGP SIGNATURE-----

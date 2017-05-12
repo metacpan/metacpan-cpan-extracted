@@ -1,0 +1,7 @@
+ChangeLog
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Mrequire.pm
+t/mrequire.t

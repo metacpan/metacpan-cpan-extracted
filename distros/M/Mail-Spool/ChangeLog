@@ -1,0 +1,11 @@
+2001-12-07  '0.50'  Paul T Seamons  <paul@seamons.com>
+
+	* Updated to all OO methods and added Perldoc.  Placing
+	version at .50 because the system has been in operation
+	for several months.
+
+2001-11-26  '0.00'  Paul T Seamons  <paul@seamons.com>
+
+	* Initial add to cvs.  At this point, internal version of
+	Mail::Spool has been running on our servers for two months.
+

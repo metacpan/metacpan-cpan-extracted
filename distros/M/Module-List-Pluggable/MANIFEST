@@ -1,0 +1,22 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Module-List-Pluggable.t
+lib/Module/List/Pluggable.pm
+t/dat/lib/Clash/Stub/Plugins/Alpha.pm
+t/dat/lib/Clash/Stub/Plugins/Beta.pm
+t/dat/lib/Clash/Stub/Plugins/Epsilon.pm
+t/dat/lib/Clash/Stub/Plugins/Gamma.pm
+t/dat/lib/DummyPlugins/SomeSubs.pm
+t/dat/lib/DummyProject/Modulular/Stuff.pm
+t/dat/lib/Nada/Nuttin.pm
+t/dat/lib/Nada.pm
+t/dat/lib/Nada/Zero.pm
+t/dat/lib/Nada/Zip/Bupkes.pm
+t/dat/lib/Nada/Zip.pm
+t/dat/lib/Tree/Limb/Broken.pm
+t/dat/lib/Tree/Limb/Healthy.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+
+

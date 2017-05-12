@@ -1,0 +1,9 @@
+Revision history for MooseX::Types::Tkx
+================================================================================
+
+1.000  Mit 17.Feb.2016 - 21:15
+       Initial CPAN release.
+
+1.010  Don 18.Feb.2016 - 11:37
+       removes alerts from Moose
+

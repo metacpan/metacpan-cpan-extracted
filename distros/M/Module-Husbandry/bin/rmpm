@@ -1,0 +1,22 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+
+use Module::Husbandry qw( rmpm parse_cli );
+
+rmpm parse_cli \@ARGV, {
+    param_count => "1..",
+    examples    => <<'END_EXAMPLES',
+%p Foo::Bar           ## Remove lib/Foo/Bar.pm and t/Foo-Bar.t
+                      ## and warn about other references to it.
+%p lib/Foo/Bar.pm     ## same as above.
+%p lib/Foo/Bar.pod    ## Create lib/Foo/Bar.pod only
+
+%p Foo::Bar Foo::Bar  ## as above, but for multiple modules
+END_EXAMPLES
+
+    description  => <<'END_DESCRIPTION',
+Creates .pm, .pod and .t files from templates and rebuilds the
+Makefile.  Does not (yet) update MANIFEST, do that manually.
+END_DESCRIPTION
+};

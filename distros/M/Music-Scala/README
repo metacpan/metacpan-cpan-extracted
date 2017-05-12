@@ -1,0 +1,32 @@
+Music::Scala - Scala scale support for Perl
+
+To install this module, use CPAN, for example:
+
+  cpan Music::Scala
+
+For the source code, see:
+
+http://github.com/thrig/Music-Scala
+
+This can be built and installed by running:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Run perldoc(1) on Music::Scala for more documentation.
+
+DEPENDENCIES
+
+Some knowledge of music theory, notably scales, tuning, and temperaments.
+
+http://www.huygens-fokker.org/scala/ and in particular
+http://www.huygens-fokker.org/docs/scales.zip will likely be of some use.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013-2015 by Jeremy Mates
+
+This module is free software; you can redistribute it and/or modify it
+under the Artistic License (2.0).

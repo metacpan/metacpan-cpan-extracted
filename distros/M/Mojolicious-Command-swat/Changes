@@ -1,0 +1,14 @@
+# 0.0.5 2015-11-18
+
+* compatible with the latest version of swat 
+* write hostname
+* use File::Path::mkpath instead of mkdir to recursively create a directories
+
+# 0.0.4
+
+* Makefile.PL - use Module::Install instead of ExtUtils::MakeMaker
+
+# 0.0.3
+
+* --force option is implimented 
+

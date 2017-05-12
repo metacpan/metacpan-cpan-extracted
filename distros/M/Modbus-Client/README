@@ -1,0 +1,7 @@
+This module provides a basic Modbus client for reading from and writing to
+various ModBus slaves using RTU or ASCII modes.  If you have a serial device
+(that uses RS-232 or RS-485), this module will work for you.  It also supports
+the notion of a ether-to-serial converter, like the Lantronix or Digi devices.
+
+Note that this module does NOT support TCP/Modbus (see Protocol::Modbus for a
+more complex but more complete interface).

@@ -1,0 +1,85 @@
+NAME
+    Mojolicious::Plugin::Surveil - Surveil user actions
+
+VERSION
+    0.01
+
+DESCRIPTION
+    Mojolicious::Plugin::Surveil is a plugin which allow you to see every
+    event a user trigger on your web page. It is meant as a debug tool for
+    seeing events, even if the browser does not have a JavaScript console.
+
+    Note: With great power, comes great responsibility.
+
+    CAVEAT: The JavaScript that is injected require WebSocket in the browser
+    to run. The surveil events are attached to the "body" element, so any
+    other event that prevent events from bubbling will not emit this to the
+    WebSocket resource.
+
+SYNOPSIS
+    Use default logging:
+
+      use Mojolicious::Lite;
+      plugin "surveil";
+      app->start;
+
+    Use custom route:
+
+      use Mojolicious::Lite;
+      use Mojo::JSON "j";
+
+      plugin surveil => { path => "/surveil" };
+
+      websocket "/surveil" => sub {
+        my $c = shift;
+
+        $c->on(message => sub {
+          my ($c, $action) = @_;
+          warn "User event: $action\n";
+        });
+      };
+
+      app->start;
+
+CONFIG
+    This plugin can take the following config params:
+
+    *   enable_param = "..."
+
+        Used to specify a query parameter to be part of the URL to enable
+        surveil.
+
+        Default is not to require any query parameter.
+
+    *   events = [...]
+
+        The events that should be reported back over the WebSocket.
+
+        Defaults to click, touchstart, touchcancel and touchend. (The
+        default list is EXPERIMENTAL).
+
+    *   path = "...";
+
+        The path to the WebSocket route.
+
+        Defaults to "/mojolicious/plugin/surveil". Emitting the "path"
+        parameter will also add a default WebSocket route which simply log
+        with "debug" the action that was taken. (The format of the logging
+        is EXPERIMENTAL)
+
+METHODS
+  register
+      $self->register($app, $config);
+
+    Used to add an "after_render" hook into the application which adds a
+    JavaScript to every HTML document.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014, Jan Henning Thorsen
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+AUTHOR
+    Jan Henning Thorsen - "jhthorsen@cpan.org"
+

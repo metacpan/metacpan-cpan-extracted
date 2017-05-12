@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Mojolicious/Plugin/Renderer/WithoutCache.pm
+lib/Mojolicious/Plugin/Renderer/WithoutCache/Cache.pm
+minil.toml
+t/00-load.t
+t/10-cache.t
+t/20-plugin.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml
+MANIFEST

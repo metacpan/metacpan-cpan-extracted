@@ -1,0 +1,35 @@
+The scripts in this directory update ../lib/Errors.pm. They are driven
+by make, though there is no actual compilation going on; it was just
+easier to write it this way. The update happens in the following
+steps:
+
+1) header.txt and footer.txt are extracted from the current Errors.pm
+2) The errors listed in the current Errors.pm are extracted into
+   errors-old.dat (see depodify-errors).
+3) Google is used to search the Apple Developer's web pages for any
+   pages mentioning "result codes". This list of pages is placed in
+   online-sources.dat (see download-sources).
+4) The pages listed in online-sources.dat are downloaded and parsed
+   into errors-online.dat (see download-errors).
+5) The errors listed in errors-old.dat and errors-online.dat are
+   combined into errors.dat. Conflicts are resolved by consulting
+   errors-exceptions.dat (which is created by hand). If any unresolved
+   conflicts are detected, the process aborts here with suggestions about
+   what to add to errors-exceptions.dat (see combine-errors).
+6) The errors listed in errors.dat are formatted as part of a POD
+   document called errors.txt (see podify-errors).
+7) header.txt, errors.txt, and footer.txt are combined into
+   Errors.pm.new.
+
+Of course, all you really need to do is:
+
+cd src
+make update
+mv ../lib/Errors.pm.new ../lib/Errors.pm
+
+And you're on your way.
+
+-- Sal
+smile.
+
+

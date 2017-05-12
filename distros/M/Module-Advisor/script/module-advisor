@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Module::Advisor;
+
+Module::Advisor->new()->check();
+
+__END__
+
+=head1 NAME
+
+module-advisor - check locally installed modules for any known issues
+
+=head1 SYNOPSIS
+
+  module-advisor
+
+=head1 DESCRIPTION
+
+B<module-advisor> is a minimal script around around L<Module::Advisor>,
+which does all the checking. The script doesn't take any options:
+
+  % module-advisor
+  [BUG] Plack 0.9020 < 0.9982: sanity check to remove newlines from headers
+
+=head1 SEE ALSO
+
+L<Module::Advisor>
+
+=head1 AUTHOR
+
+Tokuhiro Matsuno E<lt>tokuhirom AAJKLFJEF@ GMAIL COME<gt>
+
+=head1 LICENSE
+
+Copyright (C) Tokuhiro Matsuno
+
+This library is free software;
+you can redistribute it and/or modify it under the same terms as Perl itself.
+

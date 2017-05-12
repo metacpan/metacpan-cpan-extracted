@@ -1,0 +1,13 @@
+The module MPE::CIvar provides access from Perl to the following MPE/iX
+system functions:
+
+     setjcw, getjcw
+     putjcw, findjcw
+     hpciputvar, hpcigetvar
+     hpcideletevar
+     hpcicommand
+
+This module is specific to the operating system MPE/iX.   It has been
+tested under version 6.0 of the OS.
+
+Ken Hirsch <kenhirsch@myself.com>

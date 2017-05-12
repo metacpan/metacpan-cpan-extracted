@@ -1,0 +1,128 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Server - Base class for email servers in MailBox
+
+=head1 INHERITANCE
+
+ Mail::Server
+   is a Mail::Reporter
+
+ Mail::Server is extended by
+   Mail::Server::IMAP4
+
+=head1 SYNOPSIS
+
+ my $server = Mail::Server::IMAP4->new($msg);
+ my $server = Mail::Server::POP3->new($msg);
+
+=head1 DESCRIPTION
+
+This module is a place-holder, logical in the class hierarchy.  On the
+moment, no full server has been implemented, but some parts of IMAP4
+exist.
+
+Servers:
+
+=over 4
+
+=item * L<Mail::Server::IMAP4|Mail::Server::IMAP4>
+
+Partial IMAP4 implementation.
+
+=back
+
+Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Reporter|Mail::Reporter/"METHODS">.
+ 
+=head1 DETAILS
+
+# This file contains parts which could be used for doc
+
+* Labels
+
+Labels are flags which come with a message.  Usually: old, seen, replied,
+flagged, and trashed.
+
+The folder-types differ how they store label information.  Mbox folders
+use the Status and X-Status fields, MH folders keep a seperate labels
+file called .mh_sequences, and Maildir folders put the labels in the
+name of the file.
+
+Keeping the labels right is quite complicated.  The `[X-]Status' header
+lines are only immediately updated with Mbox messages which will cause
+them to be written.  Those lines are ignored for MH and Maildir, however
+updated when a new version of such a message has to be written to
+file.
+
+The reason behind the MH/Maildir way of storing labels is pure
+performance: labels are often needed.  Opening each message to see
+how the labels are set is cheap for Mbox, which has to read the whole
+folder on opening anyway, but terribly expensive for directory
+origanized folders (as MH and Maildir) which need to take every
+single message from a separate file.
+
+Often used labels:
+  draft     to be transmitted
+  trashed   to be deleted
+  flagged   selected
+  current   last used
+  replied   a reponse message was constructed
+  seen      handled by the user
+  old       existence of message seen by user in the previous opening
+            of the folder.
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Box distribution version 3.002,
+built on March 31, 2017.
+
+Do not forget to read
+L<Mail::Box-Overview>,
+L<Mail::Box-Cookbook>, and
+L<Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L<Mail::Message>,
+L<Mail::Box>,
+L<Mail::Box::IMAP4>,
+L<Mail::Box::POP3>,
+L<Mail::Box::Parser::C>,
+L<Mail::Box::Dbx> (unpublished),
+L<Mail::Transport>,
+L<Object::Realize::Later>, and
+L<User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

@@ -1,0 +1,92 @@
+---
+-
+  - rusu.response.new
+  -
+    - domain: oretest1.ru
+      error_code: "Object 'ORETEST1.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail
+    - domain: oretest14.ru
+      error_code: "Object 'ORETEST14.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail
+    - domain: oretest11.ru
+      error_code: "Object 'ORETEST11.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail
+    - domain: oretest2.ru
+      error_code: "Object 'ORETEST2.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail
+    - domain: oretest17.ru
+      error_code: "Object 'ORETEST17.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail
+    - domain: oretest15.ru
+      error_code: "Object 'ORETEST15.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail
+    - domain: oretest8.ru
+      error_code: "Object 'ORETEST8.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail
+    - domain: oretest7.ru
+      error_code: "Object 'ORETEST7.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail
+    - domain: oretest10.ru
+      error_code: "Object 'ORETEST10.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail
+    - domain: oretest20.ru
+      error_code: "Object 'ORETEST20.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail
+    - domain: oretest5.ru
+      error_code: "Object 'ORETEST5.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail
+    - domain: oretest9.ru
+      error_code: "Object 'ORETEST9.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail
+    - domain: oretest22.ru
+      error_code: "Object 'ORETEST22.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail
+    - domain: oretest6.ru
+      error_code: "Object 'ORETEST6.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail
+    - domain: oretest18.ru
+      error_code: "Object 'ORETEST18.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail
+    - domain: oretest4.ru
+      error_code: "Object 'ORETEST4.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail
+    - domain: oretest3.ru
+      error_code: "Object 'ORETEST3.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail
+    - domain: oretest21.ru
+      error_code: "Object 'ORETEST21.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail
+    - domain: oretest19.ru
+      error_code: "Object 'ORETEST19.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail
+    - domain: oretest13.ru
+      error_code: "Object 'ORETEST13.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail
+    - domain: oretest12.ru
+      error_code: "Object 'ORETEST12.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail
+    - domain: oretest16.ru
+      error_code: 'Too many templates in request (max. ) - FATAL ERROR !'
+      req_id: 20080724155913.194387
+      rule_id: rusu.response.new.fail

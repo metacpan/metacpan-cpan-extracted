@@ -1,0 +1,40 @@
+---
+abstract: 'Arbitrary size precision for integers, rationals and floating-point numbers.'
+author:
+  - 'Daniel Șuteu <trizenx@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-BigNum
+provides:
+  Math::BigNum:
+    file: lib/Math/BigNum.pm
+    version: '0.20'
+  Math::BigNum::Inf:
+    file: lib/Math/BigNum/Inf.pm
+    version: '0.20'
+  Math::BigNum::Nan:
+    file: lib/Math/BigNum/Nan.pm
+    version: '0.20'
+requires:
+  Carp: '0'
+  Class::Multimethods: '0'
+  Math::GMPq: '0.41'
+  Math::GMPz: '0.39'
+  Math::MPFR: '3.29'
+  POSIX: '0'
+  perl: v5.14.0
+resources:
+  bugtracker: https://github.com/trizen/Math-BigNum/issues
+  homepage: https://github.com/trizen/Math-BigNum
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: https://github.com/trizen/Math-BigNum
+version: '0.20'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

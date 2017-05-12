@@ -1,0 +1,48 @@
+MKDoc::Apache_Cache - Speedup Apache::Registry scripts 
+======================================================
+
+MKDoc::Apache_Cache is a drop in replacement for Apache::Registry. It is very
+configurable so that you can define precisely what you want to cache, under
+which circumstances and for how long.
+
+MKDoc::Apache_Cache is an ideal solution if you have an Apache::Registry script
+which produces near-static pages and has a few annoying bottlenecks which could
+do with some caching.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Or better, use CPAN.pm
+
+
+DEPENDENCIES
+
+  Apache              => 1.20
+  MKDoc::Control_List => 0.1
+  Cache::Cache        => 1.01
+  Test::More          => 0.47
+
+
+MISCELLEANOUS
+
+  Want to help us open-source MKDoc?
+  Join the MKDoc-Modules community!
+
+  http://lists.webarch.co.uk/mailman/listinfo/mkdoc-modules
+ 
+
+COPYRIGHT AND LICENCE
+
+  This module free software and is distributed under the
+  same license as Perl itself.
+
+  Copyright (C) 2003 MKDoc Holdings Ltd.
+
+  Author: Jean-Michel Hiver

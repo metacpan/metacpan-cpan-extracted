@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name: Maypole-Virtual-Application
+version: 0.01
+author:
+  - David Baird <cpan@riverside-cms.co.uk>
+abstract: create multiple Maypole apps on the fly
+license: perl
+requires:
+  Maypole::Application: 2.1
+  Test::More: 0
+provides:
+  Maypole::Virtual::Application:
+    file: lib/Maypole/Virtual/Application.pm
+    version: 0.01
+generated_by: Module::Build version 0.2609

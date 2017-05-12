@@ -1,0 +1,199 @@
+Revision history for Perl extension Makefile::Parser.
+
+0.216 2014-11-18
+* fixed test failures in pod.t. thanks Olof Johansson for the patch.
+* fixed test failures in simplemake.t with Gnu make 3.82.
+* fixed warnings while running the build/test system. thanks Alberto
+  Simões for the report.
+
+0.215 2011-08-18
+* fixed RT #41595: makesimple error: Can't locate object method
+  "last_element" via package "MDOM::Token::Whitespace". thanks
+  raleighr3 and jean.
+
+0.214 2011-08-18
+* fixed a bug when dealing with trailing backslashes in variable
+  values. this fixed RT #69319: Error parsing line continuations.
+  thanks Marcelo.
+
+0.213 2011-08-17
+* applied the patch from Philip Allison and fixed a bug
+  regarding clearing initial set makefile variables before
+  parsing makefiles.
+
+0.212 2011-08-17
+* Updated the author name, author email address, and code repository in the documentation.
+* Updated the bundled Module::Install to the latest version, 1.01.
+
+0.211 2008-03-16
+* Added pointer to Makefile::DOM to Makefile::Parser's POD.
+
+0.210 2008-03-16
+* Added support for multiple single-colon rules to Makefile::Parser.
+* Added support for multiple double-colon rules to Makefile::parser.
+
+0.209 2008-03-12
+* Calling external GNU make via "make" rather than "/usr/bin/env make".
+
+0.208 2008-03-10
+* Added $VERSION to Makefile::AST and Makefile::AST::Evaluator.
+* Always calling '/usr/bin/env make' in makesimple.
+
+0.207 2008-03-10
+* Added POD for Makefile::AST.
+* Added POD for Makefile::AST::Evaluator.
+* Added POD for pgmake-db.
+
+0.206 2008-03-10
+* Added POD for Makefile::Parser::GmakeDB.
+* Added POD for the makesimple script.
+* Added pointers for the GmakeDB parser to Makefile::Parser's POD.
+
+0.205 2008-03-10
+* Removed bogus debugging code from the makesimple script.
+* Fixed the test suite a bit.
+
+0.204 2008-03-08
+* Added missing external dependencies to Makefile.PL
+
+0.203 2008-03-08
+* Added File::Slurp to Makefile.PL
+
+0.202 2008-03-08
+* Added missing dependencies to Makefile.PL
+* updated inc/ using the latest Module::Install
+
+0.201 2008-03-08
+* Added t/lib from the mdom repos.
+
+0.20 2008-03-07
+* added Makefile::Parser::GmakeDB and Makefile::AST
+
+0.17 2007-03-16
+* added support for the builtins 'error', 'warning', and 'info'
+
+0.16 2007-03-16
+* the parser now removes comments in variable assignments
+* added support for the following GNU make builtin functions:
+** if
+** and
+** or
+** shell
+** foreach
+
+* removed /r from Parsre.pm
+* added support for the shell function
+* degraded the version of Test::More that Makefile::Parser requires
+
+0.15 2007-03-14
+* fixed the "too-many-args" issue
+* added support for the following GNU make makefile builtin functions:
+** word
+** wordlist
+** words
+** firstword
+** lastword
+** dir
+** notdir
+** suffix
+** basename
+** addprefix
+** join
+** wildcard
+** realpath
+** abspath
+* added _split_args method to do proper function arugment splitting
+* refactored the second half of _process_refs out to _solve_refs_in_tokens
+* merged the code of _check_func_args into _split_args
+* _split_args now splits func arguments lazily
+* updated the POD to reflect recent changes
+
+0.14 2007-03-10
+* added some more POD to plmake
+
+0.13 2007-03-10
+* minor POD fixes: C<< ... >> and SVN repos URL
+
+0.12 2007-03-10
+* added the C<prereqs> method to Makefile::Parser
+* added POD accordingly (deprecated C<depends>)
+* explaned the current status and plans for this module in the POD
+* checked in a naive "make" command-line utility "plmake" which uses Makefile::Parser
+* added basic support for commands after ';' in rules
+* added a second optional argument to the C<parse> method so as to pass initial variable settings to the parser
+* updated plmake to pass %ENV and variables specified on the command-line to the parser
+* forced to use "/bin/sh" in run_commands
+* implemented GNU make function 'subst', 'patsubst', 'strip', 'findstring', 'filter', 'filter-out' and 'sort'.
+* implemented the Substitution References in GNU makefiles, for example, $(objects:.o=.c)
+* fixed a bug regarding single-letter variable expansion
+
+0.11 10/17/2005
+* User-defined variable names are defined as /\w+/
+* GNUMake's variable expansion sytax
+        ${FOO}
+  is now supported. Guretz++
+* Add support for variable definition sytax
+        FOO := blah blah blah
+* Expand $@ in commands as expected
+* Optimize the parser effectively by following Guretz Maxim's
+  enlightening suggestion. Guretz++
+
+0.10 10/16/2005
+* Update the version number to 0.10
+* Fix the platform-specific tests, stripped CR from test files,
+  and test both against Cygwin and Win32. Slaven++
+
+0.09 10/15/2005
+* Fix a stupid bug in Parser.pm. The order of the two suffixes is
+  inverted accidentally.
+* Update the POD document, implementation, and tests accordingly.
+
+0.08 10/10/2005
+* Make Makefile::Parser->parse to raise syntax errors under strict mode
+* Add full support for implicit pattern rules:
+    %.o : %.c
+        $(CC) -c $<
+  The order of the implicit rules is not significant. Whee!
+* Add more tests for pattern rules, expand $< and $* as expected, and clean up
+  the stderr output.
+* Add support for implicit suffix rules:
+    .c.o:
+        $(CC) -c $<
+  Currently .SUFFIXES is a no-op. So suffix rules will be applied to any 
+  suffix-like targets.
+  Internally the parser converts the suffix rules to pattern
+  rules, thus saving me a lot of coding.
+
+0.07 10/5/2005
+* Host this module to a SVN repository at OSSF
+* Add sections "Syntax Supported" and "TODO" to POD doc
+
+0.06 10/5/2005
+* Add string-ify overloading to the Makefile::Target class
+* Use tar+gzip to compress the distribution.
+
+0.05 10/1/2005
+* Add support for the syntax ^\
+
+0.04 9/30/2005
+* Fix some issues in the POD doc
+
+0.03 9/30/2005
+* Force the user to call the ->parse method after he/she constructs every Makefile::Parser object.
+  That is to say, the constructor of the Makefile::Parser class won't call ->parse internally
+  from now on.
+* Add error checking code and corresponding tests for Parser objects which has never parsed anything.
+* Add support of default target to the ->target method of the Makefile::Parser class.
+* Add method ->roots to the Makefile::Parser class which returns the "root targets" for the
+  Makefile.
+* Use Devel::Cover to check the code coverage.
+* Use Test::Pod to check the validity of the POD docs
+* Use Test::Pod::Coverage to check the integrity of POD docs
+
+0.02 9/25/2005
+* Fix a bug in the SYNOPSIS of the POD doc.
+* Add many other stuff to the POD doc too.
+
+0.01  Sat Sep 24 10:22:01 2005
+* original version; created by h2xs 1.23 with options
+        -XA -b 5.6.1 Makefile::Parser

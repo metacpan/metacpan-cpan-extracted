@@ -1,0 +1,35 @@
+[% IF statustext %]
+<p align="center">
+    <div class="[% statuscolor %]">[% tr.tr(statustext) %]</div>
+</p>
+[% END %]
+<p align="center">
+    <table class="data" align="center" id="MainDataTable">
+        <tr class="tabheader">
+            <th>[% tr.tr("Reporttime") %]</th>
+            <th>[% tr.tr("Type") %]</th>
+            <th>[% tr.tr("Description") %]</th>
+            <th></th>
+        </tr>
+        [% FOREACH error IN errors %]
+            <form name="error_[% error.error_id %]" method="post" action="[% PostLink %]">
+                <tr>
+                    <td>
+                        <input type="hidden" name="error_id" value="[% error.error_id %]">
+                        [% error.reporttime %]
+                    </td>
+                    <td>
+                        <img src="/pics/[% error.error_image %]" alt="[% error.error_type %]">
+                    </td>
+                    <td>
+                        [% error.description %]
+                    </td>
+                    <td>
+                        <input type="hidden" name="mode" value="ackerror">
+                        <input type="submit" value="[% tr.tr("ACK") %]">
+                    </td>
+                </tr>
+            </form>
+        [% END %]
+    </table>
+</p>

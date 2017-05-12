@@ -1,0 +1,68 @@
+NAME
+    MojoX::Session::Store::MongoDB - MongoDB Store for MojoX::Session
+
+SYNOPSIS
+        my $session = MojoX::Session->new(
+            tx        => $tx,
+            store     => MojoX::Session::Store::MongoDB->new({
+                host => '127.0.0.1',
+                port => 27017,
+                database   => 'some_app',
+                collection => 'sessions',
+            }),
+            transport => MojoX::Session::Transport::Cookie->new,
+        );
+
+        # see doc for MojoX::Session
+
+DESCRIPTION
+    MojoX::Session::Store::MongoDB is a store for MojoX::Session that stores
+    a session in a MongoDB database.
+
+ATTRIBUTES
+    MojoX::Session::Store::MongoDB implements the following attributes.
+
+  "mongodb"
+        my $db = $store->mongodb;
+
+    Get and set MongoDB::Database object.
+
+  "mongodb_coll"
+        my $collection = $store->mongodb_coll;
+
+    Get and set MongoDB::Collection object.
+
+METHODS
+    MojoX::Session::Store::MongoDB inherits all methods from
+    MojoX::Session::Store.
+
+  "new"
+    "new" uses the database and collection parameters for the database name
+    and the collection name respectively. All other parameters are passed to
+    "MongoDB::Connection-"new()>.
+
+  "create"
+    Insert session to MongoDB.
+
+  "update"
+    Update session in MongoDB.
+
+  "load"
+    Load session from MongoDB.
+
+  "delete"
+    Delete session from MongoDB.
+
+CONTRIBUTE
+    git repository etc at
+    <http://github.com/abh/MojoX-Session-Store-MongoDB>.
+
+AUTHOR
+    Ask Bjørn Hansen <ask@develooper.com>
+
+COPYRIGHT
+    Copyright (C) 2009 Ask Bjørn Hansen and Develooper LLC.
+
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl 5.10.
+

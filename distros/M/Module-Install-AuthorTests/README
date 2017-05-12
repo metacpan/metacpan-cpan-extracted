@@ -1,0 +1,4 @@
+
+This is a Module::Install plugin to run some tests only when testing as the
+author.  See the POD for more information.
+

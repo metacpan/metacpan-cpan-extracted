@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+#
+# Accepts note names and produces what Music::NeoRiemannianTonnetz
+# thinks the "normalized form" of those notes is.
+
+use strict;
+use warnings;
+use feature qw/say/;
+
+use Music::LilyPondUtil         ();
+use Music::NeoRiemannianTonnetz ();
+
+die "Usage: $0 c e g\n" if !@ARGV;
+
+my $lyu = Music::LilyPondUtil->new;
+my $nrt = Music::NeoRiemannianTonnetz->new;
+
+say scalar $nrt->normalize( $lyu->notes2pitches(@ARGV) );

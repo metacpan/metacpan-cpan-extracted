@@ -1,0 +1,42 @@
+CHANGES
+-------
+0.09 Mon Aug 18 13:59:55 CDT 2014
+    - Updated min Net::Ping version to 2.31 (28 Jun 2003): the first version
+        available that supports the time subroutine.
+    - Remove ping test of localhost before ping has been mocked.
+    - Add some diagnostics to t/01-ping.t.
+
+0.08 Thu Aug 14 12:04:12 CDT 2014
+    - Added META.yml and META.json back after accidentally removing them in 
+        0.07.
+    - Corrected MANIFEST.
+ 
+0.07 Thu Aug 14 11:42:24 CDT 2014
+    - Add min Perl version to Mock::Net::Ping and Makefile.PL.
+    - Removed .gitignore from MANIFEST.
+ 
+0.06 Wed Aug 13 11:16:05 CDT 2014
+    - Add Test::Exception as a build requirement to Makefile.PL. Oops!
+
+0.05 Mon Aug 11 13:23:55 CDT 2014
+    - Fix documentation of ping to better explain the elapsed time value.
+    - Updated Makefile.PL to link to Github repo.
+
+0.04 Fri Aug  8 16:06:46 CDT 2014
+    - Fix how $timeout is used.
+    - Add additional test to t/01-ping.t and improve how the elapsed time
+        is being tested. (100% coverage)
+    - Added 'use Carp'. Oops!
+    
+0.03  Thu Aug  7 10:43:02 CDT 2014
+    - Correct elapsed time tests in t/01-ping.t. Net::Ping versions before 
+        2.41 used CORE::time() by default.
+
+0.02  Wed Aug  6 12:05:29 CDT 2014
+    - Updated to return success for all localhost and private addresses.
+    - Updated tests.
+    - Updated documentation (slightly).
+
+0.01  Tue Aug  5 16:13:44 CDT 2014
+    - First release.
+

@@ -1,0 +1,77 @@
+---
+version: 0.15
+date:    Sun Jun  5 03:25:06 EST 2011
+changes:
+- Fix install bug.
+---
+version: 0.14
+date:    Wed Jun  1 15:04:30 EST 2011
+changes:
+- Build on Mouse-0.93
+---
+version: 0.13
+date:    Sat May  7 21:55:48 EST 2011
+changes:
+- Build on Mouse-0.92
+---
+version: 0.12
+date:    Sat Nov 13 19:45:13 PST 2010
+changes:
+- Build on Mouse-0.87
+- Fix bugs in using without Module::Install (with tests!)
+- Fixed bugs in Mousse::Maker
+- Documented Mousse::Maker
+- Removed overzealous Makefile.PL mousser
+- Renamed foo.t to meaningful name -> module-install.t
+
+---
+version: 0.11
+date:    Tue Oct  5 23:05:23 PDT 2010
+changes:
+- Build on Mouse-0.80
+---
+version: 0.10
+date:    Sat Sep 18 07:13:52 PDT 2010
+changes:
+- Update docs
+---
+version: 0.07
+date:    Fri Sep 17 15:35:53 PDT 2010
+changes:
+- Build on new Mouse-0.70
+- Add manifest_skip and readme_from to Makefile.PL
+- Updated docs
+---
+version: 0.06
+date:    Thu Sep  9 17:57:44 PDT 2010
+changes:
+- use Mouse v0.65
+- Change admin to is_admin in M::I::Mousse
+- Fix doc
+---
+version: 0.05
+date:    Tue Aug 31 19:14:54 PDT 2010
+changes:
+- t/foo.t failed without Module::Install
+---
+version: 0.04
+date:    Tue Aug 31 08:50:47 PDT 2010
+changes:
+- Fun doc change per ilmari++
+---
+version: 0.03
+date:    Sun Aug 29 18:41:20 PDT 2010
+changes:
+- Fixed another bootstrapping issue in Makefile.PL.
+  Made dist with 'use_mousse_dev'.
+---
+version: 0.02
+date:    Sun Aug 29 18:41:20 PDT 2010
+changes:
+- Fixed bootstrapping issue in Makefile.PL. Makefile.PL failed to find
+  Mousse::Maker.
+---
+version: 0.01
+date:    Thu Aug 26 06:35:25 PDT 2010
+changes:
+- Initial version.

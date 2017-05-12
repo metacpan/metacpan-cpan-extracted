@@ -1,0 +1,4 @@
+name = "Mojo-PgX-Cursor"
+badges = ["travis"]
+module_maker="ModuleBuildTiny"
+tag_format="v%v"

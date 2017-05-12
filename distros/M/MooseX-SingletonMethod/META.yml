@@ -1,0 +1,26 @@
+---
+name: MooseX-SingletonMethod
+version: 0.03
+author:
+  - 'Barry Walsh <draegtun@cpan.org>'
+abstract: Moose with Singleton Method facility.
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooseX-SingletonMethod
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/draegtun/MooseX-SingletonMethod/tree/master
+build_requires:
+  Moose: 0
+  Moose::Role: 0
+  Test::More: 0
+provides:
+  MooseX::SingletonMethod:
+    file: lib/MooseX/SingletonMethod.pm
+    version: 0.03
+  MooseX::SingletonMethod::Role:
+    file: lib/MooseX/SingletonMethod/Role.pm
+    version: 0.03
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

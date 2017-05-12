@@ -1,0 +1,13 @@
+---
+load_config_file: __path_to(root/forms/defaults.yml)__
+id: register    
+
+elements:
+  - type: Text
+    name: body
+    label_loc: Comment body
+    constraints:
+      - Required
+  - type: Submit
+    name: submit
+    value_loc: Register

@@ -1,0 +1,265 @@
+=head1 NAME
+
+Mozilla::DOM::Selection
+
+=for object Mozilla::DOM::Selection
+
+Mozilla::DOM::Selection is a wrapper around an instance of Mozilla's
+nsISelection interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+ * Interface for manipulating and querying the current selected range
+ * of nodes within the document.
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::Selection->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $selection->B<AddRange>($range)
+
+=over
+
+=over
+
+=item * $range (Mozilla::DOM::Range)
+
+=back
+
+     * Adds a range to the current selection.
+
+=back
+
+=head2 $selection->B<Collapse>($parentNode, $offset)
+
+=over
+
+=over
+
+=item * $parentNode (Mozilla::DOM::Node)
+
+=item * $offset (integer (long))
+
+=back
+
+     * Collapses the selection to a single point, at the specified offset
+     * in the given DOM node. When the selection is collapsed, and the content
+     * is focused and editable, the caret will blink there.
+     *
+     * @param parentNode      The given dom node where the selection will be set
+     * @param offset          Where in given dom node to place the selection
+                              (the offset into the given node)
+
+=back
+
+=head2 $selection->B<CollapseToStart>()
+
+=over
+
+     * Collapses the whole selection to a single point at the start
+     * of the current selection (irrespective of direction).  If content
+     * is focused and editable, the caret will blink there.
+
+=back
+
+=head2 $selection->B<CollapseToEnd>()
+
+=over
+
+     * Collapses the whole selection to a single point at the end
+     * of the current selection (irrespective of direction).  If content
+     * is focused and editable, the caret will blink there.
+
+=back
+
+=head2 $bool = $selection->B<ContainsNode>($node, $entirelyContained)
+
+=over
+
+=over
+
+=item * $node (Mozilla::DOM::Node)
+
+=item * $entirelyContained (boolean)
+
+=back
+
+     * The value of entirelyContained determines the detail of the search to determine if
+     * the selection contains the node.  If entirelyContained is set to PR_TRUE, t
+     * or false if
+     *
+     * @param node      The node where the selection will be extended to
+     * @param entirelyContained Whether
+
+=back
+
+=head2 $selection->B<DeleteFromDocument>()
+
+=over
+
+     * Deletes this selection from document the nodes belong to.
+
+=back
+
+=head2 $selection->B<Extend>($parentNode, $offset)
+
+=over
+
+=over
+
+=item * $parentNode (Mozilla::DOM::Node)
+
+=item * $offset (integer (long))
+
+=back
+
+     * Extends the selection by moving the focus to the specified node and offset,
+     * preserving the anchor postion.  The new selection end result will always
+     * be from the anchor to the new focus, regardless of direction.
+     *
+     * @param parentNode      The node where the selection will be extended to
+     * @param offset          Where in node to place the offset in the new focused node
+
+=back
+
+=head2 $node = $selection->B<GetAnchorNode>()
+
+=over
+
+     * The node representing one end of the selection.
+
+=back
+
+=head2 $offset = $selection->B<GetAnchorOffset>()
+
+=over
+
+     * The offset within the (text) node where the selection begins.
+
+=back
+
+=head2 $node = $selection->B<GetFocusNode>()
+
+=over
+
+     * The node with keyboard focus.
+
+=back
+
+=head2 $offset = $selection->B<GetFocusOffset>()
+
+=over
+
+     * The offset within the (text) node where focus starts.
+
+=back
+
+=head2 $bool = $selection->B<GetIsCollapsed>()
+
+=over
+
+     * Indicates if the selection is collapsed or not.
+
+=back
+
+=head2 $range = $selection->B<GetRangeAt>($index)
+
+=over
+
+=over
+
+=item * $index (integer (long))
+
+=back
+
+     * Returns the range at the specified index.
+
+=back
+
+=head2 $count = $selection->B<GetRangeCount>()
+
+=over
+
+     * Returns the number of ranges in the selection.
+
+=back
+
+=head2 $selection->B<RemoveAllRanges>()
+
+=over
+
+     * Removes all ranges from the current selection.
+
+=back
+
+=head2 $selection->B<RemoveRange>($range)
+
+=over
+
+=over
+
+=item * $range (Mozilla::DOM::Range)
+
+=back
+
+     * Removes a range from the current selection.
+
+=back
+
+=head2 $selection->B<SelectAllChildren>($parentnode)
+
+=over
+
+=over
+
+=item * $parentNode (Mozilla::DOM::Node)
+
+=back
+
+     * Adds all children of the specified node to the selection.
+     *
+     * @param parentNode  the parent of the children to be added to the selection.
+
+=back
+
+=head2 $selection->B<SelectionLanguageChange>($langRTL)
+
+=over
+
+=over
+
+=item * $langRTL (boolean)
+
+=back
+
+     * Modifies the cursor Bidi level after a change in keyboard direction
+     *
+     * @param langRTL is PR_TRUE if the new language is right-to-left or
+     *                PR_FALSE if the new language is left-to-right.
+
+=back
+
+=head2 $str = $selection->B<ToString>()
+
+=over
+
+Returns the whole selection into a plain text string.
+Note: only the text, not the markup. (DAMN!)
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

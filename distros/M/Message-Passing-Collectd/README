@@ -1,0 +1,24 @@
+NAME
+    Message::Passing::Collectd - a suite of adaptors between
+    Message::Passing and collectd.
+
+DESCRIPTION
+    This package is a placeholder for adaptors between Message::Passing and
+    collectd <http://collectd.org>.
+
+    Please see Collectd::Plugin::Write::Message::Passing for emitting
+    metrics data and Collectd::Plugin::Read::Message::Passing for reading
+    metrics data
+
+NOTE
+    The adaptors in this plugin are currently experimental, and have only
+    been tested with the ZeroMQ transport.
+
+AUTHOR
+    Tomas Doran (t0m) "<bobtfish@bobtfish.net>"
+
+COPYRIGHT & LICENSE
+    Copyright 2012 the above author.
+
+    Licensed under the same terms a perl itself.
+

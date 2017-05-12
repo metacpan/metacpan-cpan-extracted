@@ -1,0 +1,52 @@
+{
+   "abstract" : "Fork a process and read/write from it",
+   "author" : [
+      "Jan Henning Thorsen <jhthorsen@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-IOLoop-ReadWriteFork",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Pty" : "1.10",
+            "Mojolicious" : "4.30"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jhthorsen/mojo-ioloop-readwritefork/issues"
+      },
+      "homepage" : "https://github.com/jhthorsen/mojo-ioloop-readwritefork",
+      "repository" : {
+         "url" : "https://github.com/jhthorsen/mojo-ioloop-readwritefork.git"
+      }
+   },
+   "version" : "0.23",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

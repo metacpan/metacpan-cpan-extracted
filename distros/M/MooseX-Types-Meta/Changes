@@ -1,0 +1,10 @@
+Revision history for MooseX-Types-Meta
+
+0.02      2015-11-11 03:48:49Z
+  - fix ParameterizableRole to work with changes made to
+    MooseX::Role::Parameterized 1.03 (RT#108685)
+  - make types available as fully-qualified names (e.g.
+    MooseX::Types::Meta::Class), as well as imports
+
+0.01      2010-05-20 21:10:46Z
+  - Initial release.

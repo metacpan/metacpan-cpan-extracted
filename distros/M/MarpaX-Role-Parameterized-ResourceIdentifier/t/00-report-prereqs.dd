@@ -1,0 +1,84 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => '5.010'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'English' => '0',
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Pod::Wordlist' => '0',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::CPAN::Meta::JSON' => '0.16',
+                                      'Test::EOL' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::Mojibake' => '0',
+                                      'Test::More' => '0.96',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Pod::LinkCheck' => '0',
+                                      'Test::Spelling' => '0.12',
+                                      'Test::Synopsis' => '0',
+                                      'Test::Version' => '1'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Class::Method::Modifiers' => '0',
+                                      'Data::Dumper' => '0',
+                                      'Data::Printer' => '0.36',
+                                      'Encode' => '2.21',
+                                      'Import::Into' => '0',
+                                      'Marpa::R2' => '0',
+                                      'MarpaX::RFC::RFC3629' => '0',
+                                      'Module::Find' => '0',
+                                      'Module::Runtime' => '0',
+                                      'Moo' => '0',
+                                      'Moo::Role' => '0',
+                                      'MooX::HandlesVia' => '0',
+                                      'MooX::Role::Logger' => '0',
+                                      'MooX::Role::Parameterized' => '0',
+                                      'MooX::Singleton' => '0',
+                                      'MooX::Struct' => '0',
+                                      'Net::IDN::Encode' => '0',
+                                      'Role::Tiny' => '0',
+                                      'Scalar::Util' => '0',
+                                      'Term::ANSIColor' => '0',
+                                      'Try::Tiny' => '0',
+                                      'Type::Library' => '0',
+                                      'Type::Params' => '0',
+                                      'Type::Utils' => '0',
+                                      'Types::Encodings' => '0',
+                                      'Types::Standard' => '0',
+                                      'Types::TypeTiny' => '0',
+                                      'Unicode::Normalize' => '0',
+                                      'constant' => '0',
+                                      'overload' => '0',
+                                      'perl' => '5.010',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Temp' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0',
+                                   'blib' => '1.01',
+                                   'perl' => '5.010'
+                                 }
+                 }
+     };
+  $x;
+ }

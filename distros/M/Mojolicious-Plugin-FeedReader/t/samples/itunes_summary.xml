@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+		xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+	xmlns:media="http://search.yahoo.com/mrss/"
+>
+
+<channel>
+	<title>the memory palace</title>
+	<atom:link href="http://thememorypalace.us/feed/" rel="self" type="application/rss+xml" />
+	<link>http://thememorypalace.us</link>
+	<description></description>
+	<lastBuildDate>Fri, 20 Sep 2013 20:50:21 +0000</lastBuildDate>
+	<language>en</language>
+	<sy:updatePeriod>hourly</sy:updatePeriod>
+	<sy:updateFrequency>1</sy:updateFrequency>
+	<generator>http://wordpress.org/?v=3.0.1</generator>
+	<copyright>Copyright &#xA9; the memory palace 2013 </copyright>
+	<managingEditor>natedimeo@gmail.com (the memory palace)</managingEditor>
+	<webMaster>natedimeo@gmail.com (the memory palace)</webMaster>
+	<ttl>1440</ttl>
+	<image>
+		<url>http://thememorypalace.us/wp-content/uploads/2009/08/the-memory-palace-for-itunes-with-tex144.jpg</url>
+		<title>the memory palace</title>
+		<link>http://thememorypalace.us</link>
+		<width>144</width>
+		<height>144</height>
+	</image>
+	<itunes:subtitle></itunes:subtitle>
+	<itunes:summary></itunes:summary>
+	<itunes:keywords></itunes:keywords>
+	<itunes:category text="Society &#38; Culture" />
+	<itunes:author>the memory palace</itunes:author>
+	<itunes:owner>
+		<itunes:name>the memory palace</itunes:name>
+		<itunes:email>natedimeo@gmail.com</itunes:email>
+	</itunes:owner>
+	<itunes:block>no</itunes:block>
+	<itunes:explicit>no</itunes:explicit>
+	<itunes:image href="http://thememorypalace.us/wp-content/uploads/2009/08/the-memory-palace-for-itunes-with-tex144.jpg" />
+		<item>
+		<title>The Rush of the River and the Roar of the Falls</title>
+		<link>http://thememorypalace.us/2013/09/the-rush-of-the-river-and-the-roar-of-the-falls/</link>
+		<comments>http://thememorypalace.us/2013/09/the-rush-of-the-river-and-the-roar-of-the-falls/#comments</comments>
+		<pubDate>Fri, 20 Sep 2013 20:50:21 +0000</pubDate>
+		<dc:creator>admin</dc:creator>
+				<category><![CDATA[Episodes]]></category>
+		<category><![CDATA[Music, Footnotes & Ephemera]]></category>
+		<category><![CDATA[19th century]]></category>
+		<category><![CDATA[Canada]]></category>
+		<category><![CDATA[new york]]></category>
+		<category><![CDATA[niagara falls]]></category>
+
+		<guid isPermaLink="false">http://thememorypalace.us/?p=1036</guid>
+		<description><![CDATA[this is a <b>test</b>]]></description>
+			<content:encoded><![CDATA[<p>This is more of the same</p>
+]]></content:encoded>
+			<wfw:commentRss>http://thememorypalace.us/2013/09/the-rush-of-the-river-and-the-roar-of-the-falls/feed/</wfw:commentRss>
+		<slash:comments>2</slash:comments>
+			<enclosure url="http://thememorypalace.us/wp-content/uploads/Rush%20and%20Roar.mp3" length="1" type="audio/mpeg" />
+		<itunes:duration>0:03:57</itunes:duration>
+		<itunes:subtitle>There are two pieces of music in this: one is a tweaked loop from &#8220;To Here Knows When&#8221; by MBV. The other is &#8220;Stereo Music for Acoustic Guitar, Bucla Music Box 100, HP Model 236 Oscillator, Electric Guitars, and Computer &#8211; Par[...]</itunes:subtitle>
+		<itunes:summary>This is for &8220;itunes sake&8221;. </itunes:summary>
+		<itunes:keywords>Episodes</itunes:keywords>
+		<itunes:author>natedimeo@gmail.com</itunes:author>
+		<itunes:explicit>no</itunes:explicit>
+		<itunes:block>no</itunes:block>
+	</item>
+		<item>
+		<title>O, How We Danced</title>
+		<link>http://thememorypalace.us/2013/07/o-how-we-danced/</link>
+		<comments>http://thememorypalace.us/2013/07/o-how-we-danced/#comments</comments>
+		<pubDate>Tue, 30 Jul 2013 17:20:14 +0000</pubDate>
+		<dc:creator>admin</dc:creator>
+				<category><![CDATA[Episodes]]></category>
+		<category><![CDATA[Music, Footnotes & Ephemera]]></category>
+		<category><![CDATA[1920's]]></category>
+		<category><![CDATA[20th Century]]></category>
+		<category><![CDATA[Audobon Ballroom]]></category>
+		<category><![CDATA[Dance Marathons]]></category>
+		<category><![CDATA[Dancing]]></category>
+		<category><![CDATA[Entertainment]]></category>
+		<category><![CDATA[Flappers]]></category>
+		<category><![CDATA[Harlem]]></category>
+		<category><![CDATA[new jersey]]></category>
+		<category><![CDATA[Prohibition]]></category>
+
+		<guid isPermaLink="false">http://thememorypalace.us/?p=1028</guid>
+		<description><![CDATA[First song is a guy named Eric Parking playing, apparently, a transcription by Billy Mayerl of a tune called &#8220;Imaginary Foxtrot.&#8221; Next up is actually &#8220;We Found Love (In a Hopeless Place),&#8221; slowed way the hell down. Next (and last) &#8230; <a href="http://thememorypalace.us/2013/07/o-how-we-danced/">Continue reading <span class="meta-nav">&#8594;</span></a>]]></description>
+			<content:encoded><![CDATA[<p>First song is a guy named Eric Parking playing, apparently, a transcription by Billy Mayerl of a tune called &#8220;Imaginary Foxtrot.&#8221;<br />
+Next up is actually &#8220;We Found Love (In a Hopeless Place),&#8221; slowed way the hell down.  Next (and last) is &#8220;Snookered&#8221; by Dan Deacon.  There&#8217;s also snippets of &#8220;We Danced&#8221; by pavement and &#8220;Thunder Road&#8221; by Bruce Springsteen. </p>
+<p>(I also did a r<a href="https://soundcloud.com/thememorypalace/o-how-we-danced-with-miley">emix of the episode</a>. Because I run things; things don&#8217;t run I)</p>
+]]></content:encoded>
+			<wfw:commentRss>http://thememorypalace.us/2013/07/o-how-we-danced/feed/</wfw:commentRss>
+		<slash:comments>8</slash:comments>
+			<enclosure url="http://thememorypalace.us/wp-content/uploads/O%20How%20We%20Danced.mp3" length="1" type="audio/mpeg" />
+		<itunes:duration>0:04:49</itunes:duration>
+		<itunes:subtitle>First song is a guy named Eric Parking playing, apparently, a transcription by Billy Mayerl of a tune called &#8220;Imaginary Foxtrot.&#8221;
+Next up is actually &#8220;We Found Love (In a Hopeless Place),&#8221; slowed way the hell down.  Next (and[...]</itunes:subtitle>
+		<itunes:summary>First song is a guy named Eric Parking playing, apparently, a transcription by Billy Mayerl of a tune called &#8220;Imaginary Foxtrot.&#8221;
+Next up is actually &#8220;We Found Love (In a Hopeless Place),&#8221; slowed way the hell down.  Next (and last) is &#8220;Snookered&#8221; by Dan Deacon.  There&#8217;s also snippets of &#8220;We Danced&#8221; by pavement and &#8220;Thunder Road&#8221; by Bruce Springsteen. 
+(I also did a remix of the episode. Because I run things; things don&#8217;t run I)</itunes:summary>
+		<itunes:keywords>Episodes</itunes:keywords>
+		<itunes:author>natedimeo@gmail.com</itunes:author>
+		<itunes:explicit>no</itunes:explicit>
+		<itunes:block>no</itunes:block>
+	</item>
+	</channel>
+</rss>

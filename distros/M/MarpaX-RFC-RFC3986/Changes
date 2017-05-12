@@ -1,0 +1,15 @@
+Changelog for MarpaX-RFC-RFC3986
+
+0.002 2015-09-20T07:44:26
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - More about ZoneId in the POD
+ - RFC/RFC3986.pm: Added ipv4address and reg_name
+ - Kavorka style for method signature in POD
+
+0.001 2015-09-19T21:24:15Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Changes/META.json/README.pod for the 1st release...
+ - t/utitest.pl: add is_absolute test
+ - xtest
+ - xtest dist.ini
+ - Initial commit

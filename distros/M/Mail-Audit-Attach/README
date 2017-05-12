@@ -1,0 +1,18 @@
+Mail::Audit::Attach - Mail::Audit plugin for attachment handling.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002-2010 Christian Renz <crenz@web42.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

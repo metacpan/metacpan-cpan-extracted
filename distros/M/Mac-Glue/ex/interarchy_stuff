@@ -1,0 +1,29 @@
+#!perl -w
+use strict;
+use File::Spec::Functions;
+use Mac::Glue ':glue';
+use Mac::Files;
+
+my $a = new Mac::Glue 'Interarchy'; #'Anarchie';
+
+$a->activate;
+$a->settransfermode(enum('tmautomatic'));
+
+my $file = catfile(
+	FindFolder(kOnSystemDisk, kDesktopFolderType),
+	"projects-2.html"
+);
+
+my $err = $a->webfetch(
+    # putting "$file" instead of "$a->obj(file => $file)"
+    # makes Mac::Glue try to resolve it as an alias instead,
+    # which is not what we want
+
+    $a->obj(file => $file),
+    url => 'http://projects.pudge.net/'
+
+);
+
+die "Error: $err" if $err;
+
+__END__

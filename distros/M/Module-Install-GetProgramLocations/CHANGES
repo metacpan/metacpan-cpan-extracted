@@ -1,0 +1,68 @@
+Version 0.3008: May 2 2015
+- Prevent CPAN from indexing private-lib
+- Add Module::Install requirement
+- Fix Windows incompatibilities
+
+Version 0.3007: Mon Apr 20 2015
+- Clarify licensing terms
+- Move verbose testing to a private module, and implement it in a way that
+  doesn't require editing the Makefile after it is generated.
+- Fix bug in exported version check functions.
+
+Version 0.3006: Sun Apr 12 2015
+- Enable verbose testing for CPAN-testers
+- Consolidate issue tracking at rt.cpan.org
+
+Version 0.3005: Sat Apr 4 2015
+- Make versions.t more compatible with automated testing.
+  http://www.cpantesters.org/cpan/report/68d7c01e-cbb5-11e0-bec0-ac2a27da4c1c
+
+Version 0.3004: Sun Mar 22 2015
+- Moved code to github
+- Added POD test
+
+Version 0.3003: Sun Jul 20 2008
+- Fixed copy error in readme URLs
+- Added validation of fetch code references
+
+Version 0.3002: Mon Jul 14 2008
+- Updated to the latest version of Module::Install
+- Removed auto-install for better compatibility with CPAN and others
+- Renamed methods to match Module::Install style
+
+Version 0.3001: Mon Jun 6 2005
+- Fixed a bug in program type reporting
+
+Version 0.3000: Sun Feb 6 2005
+- Changed the semantics of non-interactive mode so that it always converts
+  relative program names to absolute and validates them.
+- Removed Get_GNU_Grep_Version and others. (Just use Get_GNU_Version instead.)
+- Checks that the user provides an argname now.
+- Improved the documentation
+
+Version 0.2000: Tue Dec 21 2004
+- Fixed version numbers, which were incompatible with some modules. (Thanks to
+  Tassilo von Parseval <tassilo.von.parseval@rwth-aachen.de> for the bug
+  report)
+- Program locations are taken from %Config if they exist
+- Added some new version functions (GNU make and g++)
+- Improved dialogs so that they show which version(s) of the program that
+  we're looking for.
+- Added a feature to force the use of an invalid program, if the user
+  specifies it twice in a row. This will prevent infinite loops in automated
+  testing. (Thanks to Barbie <barbie@missbarbell.co.uk> for bug report)
+
+Version 0.10.2:
+- Fixed a bug where the default program would not be tried if the value from
+  %Config failed.
+- Fixed a bug in the documentation about including the module, and fixed the
+  Get_...Version functions so that they will be automatically and implicitly
+  invoked by Module::Install
+
+Version 0.10.1: Thu Sep 16 2004
+- Fixed broken dependency specification in Makefile.PL
+- Fixed auto-import of dependencies for this extension
+
+Version 0.10.0: Wed Sep 15 2004
+- Initial version, ported from Mail::Mbox::MessageParser's old Makefile.PL.
+  Support for full path deduction and version checking.

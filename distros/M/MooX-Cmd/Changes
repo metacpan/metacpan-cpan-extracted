@@ -1,0 +1,119 @@
+Revision history for Perl module MooX::Cmd
+
+0.015 2015-05-29
+    - fix breaking tests on Win32 due stacked Capture::Tiny::_capture_tee
+      (thanks Alexandr Ciornii for reporting)
+
+0.014 2015-05-27
+    - switching from IO::TieCombine to stacked Capture::Tiny in
+      MooX::Cmd::Tester to avoid breaking commands in test (only)
+      when relying on fileno of STD{OUT,ERR}
+
+0.013 2015-03-04
+    - fix repository path's (reported by haarg)
+    - fix ConfigFromFile test for Moose
+
+0.012 2015-03-03
+    - add support for MooX::ConfigFromFile (0.006+)
+    - improve initialization by using List::MoreUtils combo-functions
+      instead of puzzling with List::Util
+    - improve test coverage
+
+0.011 2014-12-03
+    - apply clean Perl::Tidy rules to avoid mixed spaces/tabs and other
+      settings
+    - add version number to MooX::Cmd::Tester
+    - allow overriding protected constructor when renaming public one
+
+0.010 2014-12-02
+    - switch distribution tooling from Dist::Zilla to ExtUtils::MakeMaker
+    - Added Changes file with content based on git log according to
+      CPAN::Changes::Spec (Neil Bowers)
+    - Apply typo fixes for documentation from David Steinbrunner
+    - Sven Schober provided heavily improved description
+
+0.009 2014-02-08
+    - Apply submitted fix for RT#91481 - without test ..
+    - fix RT#91500 - incorrect execute_return if ...
+      The implication was wrong, indeed - but the effort was increadible.
+      Testing sucks :P
+    - distinguish between test_cmd and test_cmd_ok
+    - after chained constructor, we can use getters
+    - add missing prereqs
+
+
+0.008 2013-11-13
+    - groundwork for testing with Mo(o(se))
+    - add THANKS section
+    - final test for MooX::Options 3.99
+    - eliminate hidden/private __moox_cmd_chain param
+    - massively increase test coverage
+
+
+0.007 2013-11-07
+    - improve test coverage of MooX::Cmd::Role
+    - 100% test coverage of MooX::Cmd
+    - add some documentation for MooX::Cmd::Tester
+    - ignore editor temp files and backup files
+    - enhance and fix tests
+    - Adopt basic tests using tester API
+    - steal some code from App::Cmd::Tester and adopt
+      Basic test infrastructure ... needs fine tuning, but first steps
+      are done that way.
+    - BAIL_OUT when unable to load MooX::Cmd
+      No further testing possible nor reasonable
+
+
+0.006001 2013-11-06
+    - remove superfluous "my" causing undef command_name
+
+
+0.006 2013-11-05
+    - Merge github.com:rehsack/MooX-Cmd
+
+
+0.005 2013-11-05
+    - Merge github.com:Getty/p5-moox-cmd into rehsack
+    - correct content of command_name attribute
+    - Merge github.com:Getty/p5-moox-cmd
+
+
+0.004 2013-11-02
+    - New travis config
+    - Add some comfort as primary author desires
+      To avoid scaring users the Getty wants some improved examples and an
+      accessor for last cmd in chain.
+    - Add some samples to role
+      author wants ('examples') x INT_MAX - unfortunately he gets only one
+    - Move initialization to MooX::Cmd::Role
+    - Improve documentation
+    - Allow Class->new_with_cmd->execute(...)
+    - Move initialization sequence for cmd into role
+      As discussed with primary author, a role having all neat information about
+      the cmd state in attributes is smarter that passing arguments ...
+    - Simplify loading commands to avoid stack frames
+    - Remove trailing \t
+    - Some safety first checks and minor optimizations
+    - Allow commands show available neighbours/children
+    - Merge github.com:Getty/p5-moox-cmd
+    - Merge pull request #2 from yanick/master
+      only load commands if used
+    - Bump Module::Pluggable version to stop 5.18 from
+      whining and let it work smoothly on blead
+
+
+0.003 2013-04-20
+    - Switched to Author::GETTY, added .travis.yml
+    - Don't load commands unless they are used
+      This should make things much more zippy if we have
+      more than a handful of commands.
+
+
+0.002 2012-05-07
+    - Added requirement for Package::Stash
+    - Added documentation (hope it works ;) as told hehe) and use of Package::Stash
+
+
+0.001 2012-02-10
+    - First release to CPAN
+

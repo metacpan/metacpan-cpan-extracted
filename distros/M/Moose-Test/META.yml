@@ -1,0 +1,21 @@
+--- 
+abstract: A Test Runner for the Moose test suite
+author: 
+  - Stevan Little <stevan.little@iinteractive.com>
+build_requires: 
+  Mouse: 0
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.70
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Moose-Test
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Path::Class: 0
+version: 0.01

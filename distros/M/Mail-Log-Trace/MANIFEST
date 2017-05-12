@@ -1,0 +1,18 @@
+Build.PL
+lib/Mail/Log/Trace.pm
+lib/Mail/Log/Trace/Postfix.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/001_load.t
+t/020_set_and_get.t
+t/030_general_parsing.t
+t/040_Basic_Trace.t
+t/999_POD.t
+t/data/log
+t/data/log.gz
+t/data/log2
+t/data/log_bad.gz
+Todo

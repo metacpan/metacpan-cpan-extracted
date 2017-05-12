@@ -1,0 +1,31 @@
+---
+abstract: 'Tools for creating Meta objects to track custom metrics.'
+author:
+  - 'Chad Granum <exodist7@gmail.com>'
+build_requires:
+  Fennec::Lite: ''
+  Test::Exception: ''
+  Test::More: ''
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Meta-Builder
+provides:
+  Meta::Builder:
+    file: lib/Meta/Builder.pm
+    version: 0.003
+  Meta::Builder::Base:
+    file: lib/Meta/Builder/Base.pm
+  Meta::Builder::Util:
+    file: lib/Meta/Builder/Util.pm
+requires:
+  Carp: 0
+resources:
+  bugtracker: http://github.com/exodist/Meta-Builder/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/exodist/Meta-Builder
+version: 0.003

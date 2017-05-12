@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7007720f8aa38c1984c87b560c4437650b3512ad .cvsignore
+SHA1 e3ff30f0984a1e479f541a00955caa819bd3e695 Build.PL
+SHA1 22dc7e14d195893362e63e272c00ba04362ed049 Changes
+SHA1 4c1b77393093f573c95bf43f6221eb0a0cbec2da MANIFEST
+SHA1 9e683c3d6361882892ce336c20af1a441f49aa56 META.json
+SHA1 135848e6e48c46928e40085c89970f723aab3ce5 META.yml
+SHA1 647d7ed4dd1e6ceb5dcd24b78c908b9e5829b6f5 Makefile.PL
+SHA1 694639c73ba2d39ea573e9048f80677cadbcef70 README
+SHA1 330c99e2691b6982701c8473f3c9c9cc1de4b419 lib/Memoize/.cvsignore
+SHA1 98d6ee4d7aad3b13e2ab0984d3606eca6569058e lib/Memoize/Lift.pm
+SHA1 09b48005b27081364c12adaedf63621560206ac5 lib/Memoize/Lift.xs
+SHA1 74173ac4d22e5c093af0bef562c3088376b407ff t/bad_syntax.t
+SHA1 914fdf6be442d7c22408b6ad9761521167c905ba t/basic.t
+SHA1 83510fff0eb0ba0e19664581f5466079aa6e36a5 t/context.t
+SHA1 87be538cee695a05d2988ef04329037bccc81f01 t/exception.t
+SHA1 1b791d7667822e20437958e678130f166d453e05 t/hint_in.t
+SHA1 81478285046ee94763765e1060fff09ec172394b t/lex_in.t
+SHA1 d19fa01face74b0575ed78ef6f9e2af8e91b04fc t/lex_out.t
+SHA1 2cde76763add53cbd6f481f4c2fe3f9b272247b6 t/list.t
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA1 cfd5d4946d6f58590c0ebde8066ab75fe4f8dfe5 t/precedence.t
+SHA1 cd4c2a2256e898ef796b88db6265aae1469cfb4c t/struct.t
+SHA1 a38079439f08c2bd5cdf4eb24b13ca26a5147b56 t/undef.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk3iscYACgkQOV9mt2VyAVEJagCfSN5MAo9V0PO2TaZ856dRkbQ1
+KVwAniPCPVPPLUfaEpHJr4IHsYjQGnV5
+=Ay1d
+-----END PGP SIGNATURE-----

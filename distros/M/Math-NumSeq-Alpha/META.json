@@ -1,0 +1,65 @@
+{
+   "abstract" : "Alphabetical number sequences.",
+   "author" : [
+      "Kevin Ryde <user42_kevin@yahoo.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-NumSeq-Alpha",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "devel",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Lingua::Any::Numbers" : "0",
+            "Lingua::EN::Numbers" : "0",
+            "List::Util" : "0",
+            "Math::NumSeq" : "0",
+            "Math::NumSeq::Base::IterateIth" : "0",
+            "Math::NumSeq::OEIS::Catalogue::Plugin" : "0",
+            "constant" : "1.02",
+            "constant::defer" : "1",
+            "perl" : "5.004"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test" : "0"
+         },
+         "suggests" : {
+            "Data::Float" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://user42.tuxfamily.org/math-numseq/index.html",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl.html"
+      ]
+   },
+   "version" : "3"
+}

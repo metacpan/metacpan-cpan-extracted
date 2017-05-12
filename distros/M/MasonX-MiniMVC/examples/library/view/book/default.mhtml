@@ -1,0 +1,17 @@
+<h1>Default book view</h1>
+
+<p>
+You didn't choose a book to view.
+</p>
+
+<p>
+<a href="view/42">View a sample book</a>
+</p>
+
+<p>
+<a href="search/">Search by form</a>
+</p>
+
+<p>
+<a href="search/J%20Smith/Big%20Book%20of%20Jokes">Search by URL</a>
+</p>

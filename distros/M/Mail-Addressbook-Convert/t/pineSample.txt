@@ -1,0 +1,8 @@
+aba	aalast1, abfirst	a@bom.com
+jhd1	Davidson1, Joe	jhd@radix.net
+jhd2	Davidson2, Joe	jdavidson@interguru.com
+jhd-2	Davidson2a, Joe	j.davidson@ieee.org
+jhd3	Davidson3, Joe	jdavidson@interguru.com
+list1	List Number 1	(jdavidson@interguru.com,jhd1,jhd2)
+list2	List Number 2	(jhd1,jhd2,list1)
+

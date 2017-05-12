@@ -1,0 +1,18 @@
+TYPEMAP
+int * T_INTP
+double * T_DOUBLEP
+double2D * T_DOUBLEPP
+
+INPUT
+T_INTP
+        $var = ($type)pack1D($arg,'i')
+T_DOUBLEP
+        $var = ($type)pack1D($arg,'d')
+T_DOUBLEPP
+        $var = ($type)pack2D($arg,'d')
+
+OUTPUT
+T_INTP
+        unpack1D((SV*)$arg, (void *)$var, 'i', 0);
+T_DOUBLEP
+        unpack1D((SV*)$arg, (void *)$var, 'd', 0);

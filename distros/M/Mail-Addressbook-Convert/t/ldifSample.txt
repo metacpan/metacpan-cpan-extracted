@@ -1,0 +1,71 @@
+__DATA__
+dn: cn=A JHD Test,mail=jhd@radix.net
+cn: A JHD Test
+givenname: A JHD Test
+objectclass: top
+objectclass: person
+description: test diescription
+mail: jhd@radix.net
+homephone: 301 777 9994
+xnavnickname: aaa
+xnavusehtmlmail: FALSE
+xnavusecallpointserver: TRUE
+
+dn: cn=Aaron Spacemuseum,mail=aaron@noplace.com
+cn: Aaron Spacemuseum
+givenname: Aaron Spacemuseum
+objectclass: top
+objectclass: person
+description: These are notes for test
+locality: Silver Spring
+st: MD
+mail: aaron@noplace.com
+title: President
+streetaddress: 1101 Dublin Drive
+postalcode: 20102
+telephonenumber: 301 555 1212
+facsimiletelephonenumber: 301 555 7777 
+homephone: 301 777 9994
+o: Company Name
+xnavnickname: aspacemus
+xnavusehtmlmail: FALSE
+xnavusecallpointserver: TRUE
+
+dn: cn=Alisa Car,mail=acar@noplace.siwash.edu
+cn: Alisa Car
+givenname: Alisa Car
+objectclass: top
+objectclass: person
+telephonenumber: 301 555 1212
+mail: acar@noplace.siwash.edu
+xnavnickname: acar
+xnavusehtmlmail: FALSE
+xnavusecallpointserver: TRUE
+
+dn: cn=Ben Dover,mail=devrep1@nowhere.com
+cn: Ben Dover
+givenname: Ben Dover
+objectclass: top
+objectclass: person
+mail: devrep1@nowhere.com
+xnavnickname: bdover
+xnavusehtmlmail: FALSE
+xnavusecallpointserver: TRUE
+
+dn: cn=list1
+cn: list1
+objectclass: top
+objectclass: groupOfNames
+member: cn=Ben Dover,mail=devrep1@nowhere.com
+member: cn=Alisa Car,mail=acar@noplace.siwash.edu
+member: cn=list2
+xnavnickname: list1
+
+
+dn: cn=list2
+cn: list2
+objectclass: top
+objectclass: groupOfNames
+member: cn=Alisa Car,mail=acar@noplace.siwash.edu
+member: cn=Ben Dover,mail=devrep1@nowhere.com
+xnavnickname: list2

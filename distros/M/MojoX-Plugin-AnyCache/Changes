@@ -1,0 +1,19 @@
+Revision history for Perl module MojoX::Plugin::AnyCache
+
+0.04 2014-06-06
+ - Fix bug #3 (again)
+ - Fix bug #7 (again)
+
+0.03 2014-05-25
+ - Fix bug #7 in MessagePack serialiser
+ - Fix bug #3 in Backend serialiser loading
+ - Fix bug #5 (fails with perls < 5.14)
+
+0.02 2014-04-10
+ - Add incr, decr, del and ttl commands
+ - Fix asynchronous Memcached support
+ - Add TTL command emulation for Memcached
+
+0.01 2014-04-07
+ - first release
+

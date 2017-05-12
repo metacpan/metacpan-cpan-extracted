@@ -1,0 +1,58 @@
+/* ================================================================== */
+/* THEME: Cloud
+ */
+@import 'functions';
+@import 'fonts_cloud';
+@import 'icon_dark_on_light';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: hsl(220,50,70);
+$verge-fg: set-fg($verge-bg);
+$verge-border: navy;
+$main-bg: hsl(220,50,70);
+$main-fg: set-fg($main-bg);
+$button-bg: darken($main-bg, 10);
+$button-fg: set-link($button-bg);
+$button-border: navy;
+$link-fg: set-link($main-bg);
+$link-visited: set-visited($main-bg);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+    border-radius: 1em;
+    border-width: 2px;
+}
+
+header,
+footer,
+.side {
+	@extend .verge;
+	background-image: url(cloud_h.jpg);
+}
+
+body {
+    color: $main-fg;
+    background-color: $main-bg;
+    background-image: url(cloud_main.jpg);
+}
+
+@include some-links($link-fg, $link-visited);
+@include fancy($verge-fg, $verge-bg, "cloud_h.jpg");
+@include make-buttons;
+
+header nav li {
+	border-color: #555588;
+}
+header nav .selflink,
+header nav em,
+header nav .current a {
+	color: navy;
+}
+
+

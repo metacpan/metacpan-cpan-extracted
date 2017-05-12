@@ -1,0 +1,58 @@
+Revision history for MKDoc::Text::Structured
+
+0.83 Fri Aug 19 17:15:00 2005
+    - fix for <pre> indenting bug when first line is more indented than second
+    - method to insert spaces into long words
+    - strip mailto: when linking and displaying email addresses
+    - documented MKDoc::Text::Structured::Inline
+    - wrap smilies in CSS classes
+    - Added support for <a rel="nofollow" href="...
+    - Added basic text2xhtml command line tool
+
+0.82 Thu Mar 31 13:45:00 2005
+    - fixed failure to change " to &quot; bug
+
+0.81 Wed Mar 30 15:00:00 2005
+    - removed defunct email address
+    - Documented entity substitution
+    - Test and fix for URI surrounded by <> bug
+    - Added support for substituting entities without tagging
+
+0.8 Thu Jul 22 17:51:30 2004
+    - Fixed Bruno's broken trailing spaces patch ;-)
+    - Changed <pre> to NOT do any inline stuff
+    - Added a lot of automagic niceties
+    - Fixed plenty of bugs
+
+0.7 Sun Jul 18 20:33:11 2004
+    - Applied Bruno's trailing spaces killing patch
+
+0.6 Mon Jul 12 16:54:01 2004
+    - Added DOS + Mac garbled carriage return stripping
+
+0.5 Sun Jul 11 18:00:25 2004
+    - Re-wrote the parsing engine, now clean and robust
+    - Re-did the entire test suite
+    - Re-vamped docs
+    - This is like a new module! :-)
+
+0.4 Fri Jul  9 17:33:06 2004
+    - Fixed some blockquote issues
+    - Removed support for definition lists
+    - Changed list support to EtText list module
+
+0.3 Tue Feb 17 12:19:41 2004
+    - Fixed somehow broken nested lists
+    - Fixed unordered list / strong issues
+    - Fixed definition lists
+
+0.2 Sat Jan 31 13:24:02 2004
+    - Added support for nested lists
+    - Added support for <h1>
+    - Added support for <blockquote>
+    - Added support for <pre>
+    - Added support for definition lists
+    - Updated documentation
+
+0.1 Fri Jan 30 12:02:03 2004
+    - Initial release

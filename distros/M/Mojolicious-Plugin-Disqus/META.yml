@@ -1,0 +1,25 @@
+---
+abstract: 'Interface with Disqus comments from your Mojolicious app'
+author:
+  - 'Ben van Staveren <madcat@cpan.org>'
+build_requires:
+  Module::Build: 0.38
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-Disqus
+requires:
+  Mojo::Base: 0
+  Net::Disqus: 0
+resources:
+  bugtracker: https://github.com/benvanstaveren/Mojolicious-Plugin-Disqus/issues
+  homepage: http://search.cpan.org/dist/Mojolicious-Plugin-Disqus/
+  repository: git://github.com/benvanstaveren/Mojolicious-Plugin-Disqus.git
+version: 1.22

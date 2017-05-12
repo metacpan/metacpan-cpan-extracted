@@ -1,0 +1,10 @@
+Usage:
+    errors.pl [OPTIONS]
+
+Options:
+     --help -? --usage   - Bool. Display the usage message and exit
+     --man               - Bool. Display man page
+     --verbose           - Bool. 
+     --doom              - Int. 
+     --missile_launchers - OnOffAuto. Default=auto.
+

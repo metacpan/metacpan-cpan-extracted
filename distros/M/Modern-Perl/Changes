@@ -1,0 +1,69 @@
+Revision history for Modern::Perl
+
+1.20170117 2017-01-16 20:37:12-08:00 America/Los_Angeles
+    - cleaned up test suite
+    - fixed Perl 5.25 failures (RT #114690)
+
+1.20170116 2017-01-16 08:46:50-08:00 America/Los_Angeles
+    - updated for 2017 release
+    - maybe 2016 should have supported 5.22, but given how long I waited... oops
+    - improved documentation about reexporting (RT #109076)
+
+1.20161229 2016-12-28 16:02:17-08:00 America/Los_Angeles
+    - improved VERSION numbering (Gryphon Shafer, GH #5)
+
+1.20161005 2016-10-05 09:38:21-07:00 America/Los_Angeles
+    - updated for 2016 release (Gryphon Shafer)
+    - added support for 5.24
+
+1.20150127 2015-01-26 23:21:44-08:00 America/Los_Angeles
+    - updated for 2015 release (Elmer Quintanilla)
+    - added support for 5.20
+
+1.20140107 2014-01-07 15:35:42 America/Los_Angeles
+    - updated for 2014 release
+    - added support for 5.18
+
+1.20121103 2012-11-03 13:30:26 America/Los_Angeles
+    - fixed VERSION( undef ) (Peter Vereshagin, RT #80304)
+    - fixed POD encoding error (Norbert E. Grüner, RT #80468)
+
+1.20120521 2012-05-21 15:58:59 America/Los_Angeles
+    - added Perl 5.16 support
+
+1.20120130 2012-01-30 11:38:08 America/Los_Angeles
+    - fixed t/year_imports.t for 5.10 (ANDK and sprout again)
+
+1.20120126 2012-01-25 22:15:50 America/Los_Angeles
+    - fixed t/regressions.t for 5.10
+
+1.20120123 2012-01-23 10:16:10 America/Los_Angeles
+    - made raw numbers work in import
+
+1.20120119 2012-01-19 15:01:10 America/Los_Angeles
+    - fixed for Perl 5.15.5 and later (ANDK and sprout)
+
+1.20120106 2012-01-05 16:26:09 America/Los_Angeles
+    - loaded IO::File/IO::Handle to allow methods on lexical filehandles
+    - added unimporting
+    - removed use of autodie; moved it to a distribution prerequisite
+    - enabled unicode_strings by default when your Perl supports it
+
+1.20120105 2012-01-04 21:01:10 America/Los_Angeles
+    - migrated to Dist::Zilla
+    - added autodie dependency/import
+
+1.03    Wed Feb 18 00:40:40 UTC 2009
+    - removed duplicate use lines (Damien Learns Perl)
+    - fixed (hopefully) v-string warnings (Damien, David Moreno)
+    - enabled C3 MRO (Evan Carroll)
+
+1.02    Tue Jan 27 03:44:29 UTC 2009
+    - removed the current need for B::Hooks::Parser (suggested by chocolateboy)
+
+1.01    Tue Jan 27 01:11:48 UTC 2009
+    - fixed a documentation typo reported by Vasily Chekalkin
+    - added caveats to the documentation per bug report from Ben Hengst
+
+1.00    Mon Jan 26 22:41:28 UTC 2009
+    - First version, released on an unsuspecting world.

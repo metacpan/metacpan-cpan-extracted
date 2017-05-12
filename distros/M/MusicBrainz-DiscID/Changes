@@ -1,0 +1,11 @@
+Revision history for libdiscid perl bindings
+
+0.03  Wed 23 Sep 2009 22:07:22 BST
+  - Corrections to synopsis from Adam Sj¿gren
+
+0.02  Wed 27 May 2009 23:19:11 BST
+  - Proper tests
+  - Added support for put method
+
+0.01  Wed May 27 16:21:52 BST 2009
+	- First release

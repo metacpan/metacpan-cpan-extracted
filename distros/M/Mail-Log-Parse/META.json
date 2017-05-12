@@ -1,0 +1,68 @@
+{
+   "abstract" : "Parse and return info in maillogs.",
+   "author" : [
+      "Daniel Staal - <DStaal@usa.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mail-Log-Parse",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "Test::Exception" : "0",
+            "Test::Warn" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42",
+            "Module::Metadata" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "IO::File" : "0",
+            "Mail::Log::Exceptions" : "0",
+            "Memoize" : "0",
+            "Scalar::Util" : "0",
+            "Time::Local" : "0",
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "Mail::Log::Parse" : {
+         "file" : "lib/Mail/Log/Parse.pm",
+         "version" : "1.0402"
+      },
+      "Mail::Log::Parse::Postfix" : {
+         "file" : "lib/Mail/Log/Parse/Postfix.pm",
+         "version" : "1.0501"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.0402",
+   "x_optional_features" : {
+      "compressed_files" : {
+         "description" : "Allows work with compressed files.",
+         "requires" : {
+            "File::Temp" : "0.17",
+            "IO::Uncompress::AnyUncompress" : 0
+         }
+      }
+   }
+}

@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/MooseX/RW.pm
+lib/MooseX/RW/Reader.pm
+lib/MooseX/RW/Reader/File.pm
+lib/MooseX/RW/Writer.pm
+lib/MooseX/RW/Writer/File.pm
+t/00-compile.t
+weaver.ini

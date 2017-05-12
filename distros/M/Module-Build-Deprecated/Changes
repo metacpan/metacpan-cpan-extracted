@@ -1,0 +1,19 @@
+Revision history for Module-Build-Deprecated
+
+0.4210    2014-08-19 20:33:51+02:00 Europe/Amsterdam
+          Fix POD issue (Graham Knop)
+
+0.4209    2014-08-16 13:57:23+02:00 Europe/Amsterdam
+          Reenable PodWeaver
+
+0.4208    2014-08-16 13:40:23+02:00 Europe/Amsterdam
+          Release without a provides in meta, hopefully this will index
+
+0.4207    2014-08-16 13:32:57+02:00 Europe/Amsterdam
+          Retry of previous release
+
+0.002     2014-08-16 13:29:21+02:00 Europe/Amsterdam
+          Now with an indexable version
+
+0.001     2014-08-16 13:18:50+02:00 Europe/Amsterdam
+          First release separate from Module::Build

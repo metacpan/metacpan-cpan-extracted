@@ -1,0 +1,16 @@
+DKIM-Signature: a=rsa-sha1; c=simple; d=messiah.edu; h=received:received:from:to:subject:date:message-id; q=dns; s=selector1; b=zOgUMbToWrXAfWb1U0Ybe9SvD18ydan8niTN4r9YMuKnxzzRCg+uhqBYLp2NXZaLuajYfaBCgDTiJ5rCY3nqmxAqyNnvWnMBehuM05/oLvwkXFiZfYl5JgYY0ZyuBc0lhj1XaELAfHt3LAgCT/xAZyWiVWpfMUrE5cZTrVT7zUs=
+Received: from x.y.test
+   by example.net
+   via TCP
+   with ESMTP
+   id ABC12345
+   for <mary@example.net>;  21 Nov 1997 10:05:43 -0600
+Received: from machine.example by x.y.test; 21 Nov 1997 10:01:22 -0600
+Invalid header
+From: Jason Long <jlong@messiah.edu>
+To: Nobody <nobody@messiah.edu>
+Subject: dkim test
+Date: Wed, 7 Dec 2005 09:11:00 -0500
+Message-ID: <20051207091100@test.messiah.edu>
+
+This is a test

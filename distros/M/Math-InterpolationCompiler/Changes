@@ -1,0 +1,7 @@
+Version 0.002
+ - Points can now be an arrayref of scalars with x/y as odd/even elements.
+ - Added exportable function 'linear_clamp_fn' and 'linear_extrapolate_fn'.
+ - Exceptions from 'beyond_domain => die' mode now use Carp instead of die.
+
+Version 0.001
+ - initial release

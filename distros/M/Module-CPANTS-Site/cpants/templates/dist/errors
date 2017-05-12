@@ -1,0 +1,17 @@
+[% INCLUDE 'dist/intro' %]
+
+
+<table>
+[% e = dist.error %]
+[% FOREACH c IN e.columns.sort %]
+[% NEXT IF c == 'id' %]
+<tr>
+    <td valign="top"><b>[% c %]</b></td>
+    <td valign="top">
+    [% e.$c.replace("\n+","<br>") %]
+    </td>
+</tr>
+[% END %]
+</table>
+
+

@@ -1,0 +1,6 @@
+2013-11-13 niumang <yiming.jin@live.com> (1.1)
+  * fixed problem with inherit non-Momo style class
+  * add support for perl 5.8x and check perl version 
+  * fixed bug of inherit class of Mojo
+  * fix bug of warnings for sub redefined
+

@@ -1,0 +1,61 @@
+{
+   "abstract" : "construct prereq parameters of Module::Build from cpanfile",
+   "author" : [
+      "Toshio Ito <toshioito@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Module-Build-Prereqs-FromCPANfile",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "eg",
+         "inc"
+      ],
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Module::Build" : "0.4004"
+         },
+         "requires" : {
+            "CPAN::Meta::Prereqs" : "2.132830",
+            "Exporter" : "0",
+            "Module::CPANfile" : "1.0000",
+            "version" : "0.80"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/debug-ito/Module-Build-Prereqs-FromCPANfile/issues"
+      },
+      "repository" : {
+         "url" : "git://github.com/debug-ito/Module-Build-Prereqs-FromCPANfile.git",
+         "web" : "https://github.com/debug-ito/Module-Build-Prereqs-FromCPANfile"
+      }
+   },
+   "version" : "0.02"
+}

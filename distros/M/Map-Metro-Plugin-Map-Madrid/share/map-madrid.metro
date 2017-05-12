@@ -1,0 +1,628 @@
+--stations
+
+# L6 Circular
+Cuatro Caminos
+Nuevos Ministerios
+República Argentina
+Avenida de América
+Diego de León
+Manuel Becerra
+O'Donnell
+Sainz de Baranda
+Conde de Casal
+Pacífico
+Méndez Álvaro
+Arganzuela-Planetario
+Legazpi
+Usera
+Plaza Elíptica
+Opañel
+Oporto
+Carpetana
+Laguna
+Lucero
+Alto de Extremadura
+Puerta del Ángel
+Príncipe Pío
+Argüelles
+Moncloa
+Ciudad Universitaria
+Metropolitano
+Guzmán el Bueno
+
+# L10
+Hospital Infanta Sofía
+Reyes Católicos
+Baunatal
+Manuel de Falla
+Marqués de la Valdavia
+La Moraleja
+La Granja
+Ronda de la Comunicación
+Las Tablas
+Montecarmelo
+Tres Olivos
+Fuencarral
+Begoña
+Chamartín
+Plaza de Castilla
+Cuzco
+Santiago Bernabéu
+Nuevos Ministerios
+Gregorio Marañón
+Alonso Martínez
+Tribunal
+Plaza de España
+Príncipe Pío
+Lago
+Batán
+Casa de Campo
+Colonia Jardín
+Aviación Española
+Cuatro Vientos
+Joaquín Vilumbrales
+Puerta del Sur
+
+# L5
+Alameda de Osuna
+El Capricho
+Canillejas
+Torre Arias
+Suanzes
+Ciudad Lineal
+Pueblo Nuevo
+Quintana
+El Carmen
+Ventas
+Diego de León
+Núñez de Balboa
+Rubén Darío
+Alonso Martínez
+Chueca
+Gran Vía
+Callao
+Ópera
+La Latina
+Puerta de Toledo
+Acacias
+Pirámides
+Marqués de Vadillo
+Urgel
+Oporto
+Vista Alegre
+Carabanchel
+Eugenia de Montijo
+Aluche
+Empalme
+Campamento
+Casa de Campo
+
+# Line 12
+Puerta del Sur
+Parque Lisboa
+Alcorcón Central
+Parque Oeste
+Universidad Rey J. Carlos
+Móstoles Central
+Pradillo
+Hospital de Móstoles
+Manuela Malasaña
+Loranca
+Hospital de Fuenlabrada
+Parque Europa
+Fuenlabrada Central
+Parque de los Estados
+Arroyo Culebro
+Conservatorio
+Alonso de Mendoza
+Getafe Central
+Juan de la Cierva
+El Casar
+Los Espartales
+El Bercial
+El Carrascal
+Julián Besteiro
+Casa del Reloj
+Hospital Severo Ochoa
+Leganés Central
+San Nicasio
+
+# Line 11
+Plaza Elíptica
+Abrantes
+Pan Bendito
+San Francisco
+Carabanchel Alto
+La Peseta
+La Fortuna
+
+# Line 3
+Moncloa
+Argüelles
+Ventura Rodríguez
+Plaza de España
+Callao
+Sol
+Lavapiés
+Embajadores
+Palos de la Frontera
+Delicias
+Legazpi
+Almendrales
+Hospital 12 de Octubre
+San Fermín-Orcasur
+Ciudad de los Ángeles
+Villaverde Bajo-Cruce
+San Cristóbal
+Villaverde Alto
+
+# Line 1
+Pinar de Chamartín
+Bambú
+Chamartín
+Plaza de Castilla
+Valdeacederas
+Tetuán
+Estrecho
+Alvarado
+Cuatro Caminos
+Ríos Rosas
+Iglesia
+Bilbao
+Tribunal
+Gran Vía
+Sol
+Tirso de Molina
+Antón Martín
+Atocha
+Atocha Renfe
+Menéndez Pelayo
+Pacífico
+Puente de Vallecas
+Nueva Numancia
+Portazgo
+Buenos Aires
+Alto del Arenal
+Miguel Hernández
+Sierra de Guadalupe
+Villa de Vallecas
+Congosto
+La Gavia
+Las Suertes
+Valdecarros
+
+# Line 4
+Pinar de Chamartín
+Manoteras
+Hortaleza
+Parque de Santa María
+San Lorenzo
+Mar de Cristal
+Canillas
+Esperanza
+Arturo Soria
+Avenida de la Paz
+Alfonso XIII
+Prosperidad
+Avenida de América
+Diego de León
+Lista
+Goya
+Velázquez
+Serrano
+Colón
+Alonso Martínez
+Bilbao
+San Bernardo
+Argüelles
+
+# Line 2
+Las Rosas
+Avenida de Guadalajara
+Alsacia
+La Almudena
+La Elipa
+Ventas
+Manuel Becerra
+Goya
+Príncipe de Vergara
+Retiro
+Banco de España
+Sevilla
+Sol
+Ópera
+Santo Domingo
+Noviciado
+San Bernardo
+Quevedo
+Canal
+Cuatro Caminos
+
+# Line 7
+Pitis
+Lacoma
+Avenida de la Ilustración
+Peñagrande
+Antonio Machado
+Valdezarza
+Francos Rodríguez
+Guzmán el Bueno
+Islas Filipinas
+Canal
+Alonso Cano
+Gregorio Marañón
+Avenida de América
+Cartagena
+Parque de las Avenidas
+Barrio de la Concepción
+Pueblo Nuevo
+Ascao
+García Noblejas
+Simancas
+San Blas
+Las Musas
+Estadio Olímpico
+Barrio del Puerto
+Coslada Central
+La Rambla
+San Fernando
+Jarama
+Henares
+Hospital del Henares
+
+# Line 8
+Nuevos Ministerios
+Colombia
+Pinar del Rey
+Mar de Cristal
+Campo de las Naciones
+Aeropuerto T1-T2-T3
+Barajas
+Aeropuerto T4
+
+# Line 9
+Mirasierra
+Herrera Oria
+Barrio del Pilar
+Ventilla
+Plaza de Castilla
+Duque de Pastrana
+Pío XII
+Colombia
+Concha Espina
+Cruz del Rayo
+Avenida de América
+Núñez de Balboa
+Príncipe de Vergara
+Ibiza
+Sainz de Baranda
+Estrella
+Vinateros
+Artilleros
+Pavones
+Valdebernardo
+Vicálvaro
+San Cipriano
+Puerta de Arganda
+Rivas-Urbanizaciones
+Rivas Futura
+Rivas Vaciamadrid
+La Poveda
+Arganda del Rey
+
+
+--lines
+M1|M1|Line 1|color:#4c96bd,width:7
+M2|M2|Line 2|color:#ff0000,width:7
+M3|M3|Line 3|color:#ffbf00,width:7
+M4|M4|Line 4|color:#7f151d,width:7
+M5|M5|Line 5|color:#7fc31c,width:7
+M6|M6|Line 6|color:#999999,width:7
+M7a|M7 A|Line 7 A|color:#fe9929,width:7
+M7b|M7 B|Line 7 B|color:#fe9929,width:7
+M8|M8|Line 8|color:#f65c9b,width:7
+M9a|M9 A|Line 9 A|color:#98027e,width:7
+M9b|M9 B|Line 9 B|color:#98027e,width:7
+M10a|M10 A|Line 10 A|color:#0f218b,width:7
+M10b|M10 B|Line 10 B|color:#0f218b,width:7
+M11|M11|Line 11|color:#006d2c,width:7
+M12|M12|Line 12|color:#919100,width:7
+R|R|Ramal|color:#cccccc,width:10
+
+--transfers
+Acacias|Embajadores
+Noviciado|Plaza de España
+
+--segments
+
+# Line 6
+M6|Cuatro Caminos|Nuevos Ministerios
+M6|Nuevos Ministerios|República Argentina
+M6|República Argentina|Avenida de América
+M6|Avenida de América|Diego de León
+M6|Diego de León|Manuel Becerra
+M6|Manuel Becerra|O'Donnell
+M6|O'Donnell|Sainz de Baranda
+M6|Sainz de Baranda|Conde de Casal
+M6|Conde de Casal|Pacífico
+M6|Pacífico|Méndez Álvaro
+M6|Méndez Álvaro|Arganzuela-Planetario
+M6|Arganzuela-Planetario|Legazpi
+M6|Legazpi|Usera
+M6|Usera|Plaza Elíptica
+M6|Plaza Elíptica|Opañel
+M6|Opañel|Oporto
+M6|Oporto|Carpetana
+M6|Carpetana|Laguna
+M6|Laguna|Lucero
+M6|Lucero|Alto de Extremadura
+M6|Alto de Extremadura|Puerta del Ángel
+M6|Puerta del Ángel|Príncipe Pío
+M6|Príncipe Pío|Argüelles
+M6|Argüelles|Moncloa
+M6|Moncloa|Ciudad Universitaria
+M6|Ciudad Universitaria|Metropolitano
+M6|Metropolitano|Guzmán el Bueno
+M6|Guzmán el Bueno|Cuatro Caminos
+
+M10b|Hospital Infanta Sofía|Reyes Católicos
+M10b|Reyes Católicos|Baunatal
+M10b|Baunatal|Manuel de Falla
+M10b|Manuel de Falla|Marqués de la Valdavia
+M10b|Marqués de la Valdavia|La Moraleja
+M10b|La Moraleja|La Granja
+M10b|La Granja|Ronda de la Comunicación
+M10b|Ronda de la Comunicación|Las Tablas
+M10b|Las Tablas|Montecarmelo
+M10b|Montecarmelo|Tres Olivos
+
+M10a|Tres Olivos|Fuencarral
+M10a|Fuencarral|Begoña
+M10a|Begoña|Chamartín
+M10a|Chamartín|Plaza de Castilla
+M10a|Plaza de Castilla|Cuzco
+M10a|Cuzco|Santiago Bernabéu
+M10a|Santiago Bernabéu|Nuevos Ministerios
+M10a|Nuevos Ministerios|Gregorio Marañón
+M10a|Gregorio Marañón|Alonso Martínez
+M10a|Alonso Martínez|Tribunal
+M10a|Tribunal|Plaza de España
+M10a|Plaza de España|Príncipe Pío
+M10a|Príncipe Pío|Lago
+M10a|Lago|Batán
+M10a|Batán|Casa de Campo
+M10a|Casa de Campo|Colonia Jardín
+M10a|Colonia Jardín|Aviación Española
+M10a|Aviación Española|Cuatro Vientos
+M10a|Cuatro Vientos|Joaquín Vilumbrales
+M10a|Joaquín Vilumbrales|Puerta del Sur
+
+M5|Alameda de Osuna|El Capricho
+M5|El Capricho|Canillejas
+M5|Canillejas|Torre Arias
+M5|Torre Arias|Suanzes
+M5|Suanzes|Ciudad Lineal
+M5|Ciudad Lineal|Pueblo Nuevo
+M5|Pueblo Nuevo|Quintana
+M5|Quintana|El Carmen
+M5|El Carmen|Ventas
+M5|Ventas|Diego de León
+M5|Diego de León|Núñez de Balboa
+M5|Núñez de Balboa|Rubén Darío
+M5|Rubén Darío|Alonso Martínez
+M5|Alonso Martínez|Chueca
+M5|Chueca|Gran Vía
+M5|Gran Vía|Callao
+M5|Callao|Ópera
+M5|Ópera|La Latina
+M5|La Latina|Puerta de Toledo
+M5|Puerta de Toledo|Acacias
+M5|Acacias|Pirámides
+M5|Pirámides|Marqués de Vadillo
+M5|Marqués de Vadillo|Urgel
+M5|Urgel|Oporto
+M5|Oporto|Vista Alegre
+M5|Vista Alegre|Carabanchel
+M5|Carabanchel|Eugenia de Montijo
+M5|Eugenia de Montijo|Aluche
+M5|Aluche|Empalme
+M5|Empalme|Campamento
+M5|Campamento|Casa de Campo
+
+M12|Puerta del Sur|Parque Lisboa
+M12|Parque Lisboa|Alcorcón Central
+M12|Alcorcón Central|Parque Oeste
+M12|Parque Oeste|Universidad Rey J. Carlos
+M12|Universidad Rey J. Carlos|Móstoles Central
+M12|Móstoles Central|Pradillo
+M12|Pradillo|Hospital de Móstoles
+M12|Hospital de Móstoles|Manuela Malasaña
+M12|Manuela Malasaña|Loranca
+M12|Loranca|Hospital de Fuenlabrada
+M12|Hospital de Fuenlabrada|Parque Europa
+M12|Parque Europa|Fuenlabrada Central
+M12|Fuenlabrada Central|Parque de los Estados
+M12|Parque de los Estados|Arroyo Culebro
+M12|Arroyo Culebro|Conservatorio
+M12|Conservatorio|Alonso de Mendoza
+M12|Alonso de Mendoza|Getafe Central
+M12|Getafe Central|Juan de la Cierva
+M12|Juan de la Cierva|El Casar
+M12|El Casar|Los Espartales
+M12|Los Espartales|El Bercial
+M12|El Bercial|El Carrascal
+M12|El Carrascal|Julián Besteiro
+M12|Julián Besteiro|Casa del Reloj
+M12|Casa del Reloj|Hospital Severo Ochoa
+M12|Hospital Severo Ochoa|Leganés Central
+M12|Leganés Central|San Nicasio
+M12|San Nicasio|Puerta del Sur
+
+M11|Plaza Elíptica|Abrantes
+M11|Abrantes|Pan Bendito
+M11|Pan Bendito|San Francisco
+M11|San Francisco|Carabanchel Alto
+M11|Carabanchel Alto|La Peseta
+M11|La Peseta|La Fortuna
+
+M3|Moncloa|Argüelles
+M3|Argüelles|Ventura Rodríguez
+M3|Ventura Rodríguez|Plaza de España
+M3|Plaza de España|Callao
+M3|Callao|Sol
+M3|Sol|Lavapiés
+M3|Lavapiés|Embajadores
+M3|Embajadores|Palos de la Frontera
+M3|Palos de la Frontera|Delicias
+M3|Delicias|Legazpi
+M3|Legazpi|Almendrales
+M3|Almendrales|Hospital 12 de Octubre
+M3|Hospital 12 de Octubre|San Fermín-Orcasur
+M3|San Fermín-Orcasur|Ciudad de los Ángeles
+M3|Ciudad de los Ángeles|Villaverde Bajo-Cruce
+M3|Villaverde Bajo-Cruce|San Cristóbal
+M3|San Cristóbal|Villaverde Alto
+
+R|Ópera|Príncipe Pío
+
+M1|Pinar de Chamartín|Bambú
+M1|Bambú|Chamartín
+M1|Chamartín|Plaza de Castilla
+M1|Plaza de Castilla|Valdeacederas
+M1|Valdeacederas|Tetuán
+M1|Tetuán|Estrecho
+M1|Estrecho|Alvarado
+M1|Alvarado|Cuatro Caminos
+M1|Cuatro Caminos|Ríos Rosas
+M1|Ríos Rosas|Iglesia
+M1|Iglesia|Bilbao
+M1|Bilbao|Tribunal
+M1|Tribunal|Gran Vía
+M1|Gran Vía|Sol
+M1|Sol|Tirso de Molina
+M1|Tirso de Molina|Antón Martín
+M1|Antón Martín|Atocha
+M1|Atocha|Atocha Renfe
+M1|Atocha Renfe|Menéndez Pelayo
+M1|Menéndez Pelayo|Pacífico
+M1|Pacífico|Puente de Vallecas
+M1|Puente de Vallecas|Nueva Numancia
+M1|Nueva Numancia|Portazgo
+M1|Portazgo|Buenos Aires
+M1|Buenos Aires|Alto del Arenal
+M1|Alto del Arenal|Miguel Hernández
+M1|Miguel Hernández|Sierra de Guadalupe
+M1|Sierra de Guadalupe|Villa de Vallecas
+M1|Villa de Vallecas|Congosto
+M1|Congosto|La Gavia
+M1|La Gavia|Las Suertes
+M1|Las Suertes|Valdecarros
+
+M4|Pinar de Chamartín|Manoteras
+M4|Manoteras|Hortaleza
+M4|Hortaleza|Parque de Santa María
+M4|Parque de Santa María|San Lorenzo
+M4|San Lorenzo|Mar de Cristal
+M4|Mar de Cristal|Canillas
+M4|Canillas|Esperanza
+M4|Esperanza|Arturo Soria
+M4|Arturo Soria|Avenida de la Paz
+M4|Avenida de la Paz|Alfonso XIII
+M4|Alfonso XIII|Prosperidad
+M4|Prosperidad|Avenida de América
+M4|Avenida de América|Diego de León
+M4|Diego de León|Lista
+M4|Lista|Goya
+M4|Goya|Velázquez
+M4|Velázquez|Serrano
+M4|Serrano|Colón
+M4|Colón|Alonso Martínez
+M4|Alonso Martínez|Bilbao
+M4|Bilbao|San Bernardo
+M4|San Bernardo|Argüelles
+
+M2|Las Rosas|Avenida de Guadalajara
+M2|Avenida de Guadalajara|Alsacia
+M2|Alsacia|La Almudena
+M2|La Almudena|La Elipa
+M2|La Elipa|Ventas
+M2|Ventas|Manuel Becerra
+M2|Manuel Becerra|Goya
+M2|Goya|Príncipe de Vergara
+M2|Príncipe de Vergara|Retiro
+M2|Retiro|Banco de España
+M2|Banco de España|Sevilla
+M2|Sevilla|Sol
+M2|Sol|Ópera
+M2|Ópera|Santo Domingo
+M2|Santo Domingo|Noviciado
+M2|Noviciado|San Bernardo
+M2|San Bernardo|Quevedo
+M2|Quevedo|Canal
+M2|Canal|Cuatro Caminos
+
+M7a|Pitis|Lacoma
+M7a|Lacoma|Avenida de la Ilustración
+M7a|Avenida de la Ilustración|Peñagrande
+M7a|Peñagrande|Antonio Machado
+M7a|Antonio Machado|Valdezarza
+M7a|Valdezarza|Francos Rodríguez
+M7a|Francos Rodríguez|Guzmán el Bueno
+M7a|Guzmán el Bueno|Islas Filipinas
+M7a|Islas Filipinas|Canal
+M7a|Canal|Alonso Cano
+M7a|Alonso Cano|Gregorio Marañón
+M7a|Gregorio Marañón|Avenida de América
+M7a|Avenida de América|Cartagena
+M7a|Cartagena|Parque de las Avenidas
+M7a|Parque de las Avenidas|Barrio de la Concepción
+M7a|Barrio de la Concepción|Pueblo Nuevo
+M7a|Pueblo Nuevo|Ascao
+M7a|Ascao|García Noblejas
+M7a|García Noblejas|Simancas
+M7a|Simancas|San Blas
+M7a|San Blas|Las Musas
+M7a|Las Musas|Estadio Olímpico
+M7b|Estadio Olímpico|Barrio del Puerto
+M7b|Barrio del Puerto|Coslada Central
+M7b|Coslada Central|La Rambla
+M7b|La Rambla|San Fernando
+M7b|San Fernando|Jarama
+M7b|Jarama|Henares
+M7b|Henares|Hospital del Henares
+
+M8|Nuevos Ministerios|Colombia
+M8|Colombia|Pinar del Rey
+M8|Pinar del Rey|Mar de Cristal
+M8|Mar de Cristal|Campo de las Naciones
+M8|Campo de las Naciones|Aeropuerto T1-T2-T3
+M8|Aeropuerto T1-T2-T3|Barajas
+M8|Barajas|Aeropuerto T4
+
+M9a|Mirasierra|Herrera Oria
+M9a|Herrera Oria|Barrio del Pilar
+M9a|Barrio del Pilar|Ventilla
+M9a|Ventilla|Plaza de Castilla
+M9a|Plaza de Castilla|Duque de Pastrana
+M9a|Duque de Pastrana|Pío XII
+M9a|Pío XII|Colombia
+M9a|Colombia|Concha Espina
+M9a|Concha Espina|Cruz del Rayo
+M9a|Cruz del Rayo|Avenida de América
+M9a|Avenida de América|Núñez de Balboa
+M9a|Núñez de Balboa|Príncipe de Vergara
+M9a|Príncipe de Vergara|Ibiza
+M9a|Ibiza|Sainz de Baranda
+M9a|Sainz de Baranda|Estrella
+M9a|Estrella|Vinateros
+M9a|Vinateros|Artilleros
+M9a|Artilleros|Pavones
+M9a|Pavones|Valdebernardo
+M9a|Valdebernardo|Vicálvaro
+M9a|Vicálvaro|San Cipriano
+M9a|San Cipriano|Puerta de Arganda
+M9b|Puerta de Arganda|Rivas-Urbanizaciones
+M9b|Rivas-Urbanizaciones|Rivas Futura
+M9b|Rivas Futura|Rivas Vaciamadrid
+M9b|Rivas Vaciamadrid|La Poveda
+M9b|La Poveda|Arganda del Rey

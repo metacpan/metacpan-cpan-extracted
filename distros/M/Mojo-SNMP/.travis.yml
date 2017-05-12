@@ -1,0 +1,15 @@
+language: perl
+perl:
+  - "5.20"
+  - "5.16"
+  - "5.10"
+env:
+  - "HARNESS_OPTIONS=j1 TEST_POD=1 LIVE_TEST=1 TEST_MEMORY=1"
+before_install:
+  - "sudo apt-get update"
+  - "sudo apt-get install snmpd"
+install:
+  - "cpanm -n Test::Pod Test::Pod::Coverage Crypt::DES Digest::HMAC Digest::SHA1 Test::Memory::Cycle"
+  - "cpanm -n --installdeps ."
+notifications:
+  email: false

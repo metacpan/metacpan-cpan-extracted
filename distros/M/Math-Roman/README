@@ -1,0 +1,17 @@
+Math::Roman - calc with Roman numbers
+
+(C) ..--- ----- ----- .---- by - . .-.. ... .-.-.-  All rights reserved.
+
+This needs the new versions of Math::BigInt and Math::BigFloat, as they are
+on CPAN as 'Math::BigInt' or in Perl newer than v5.7.1.
+
+To test, untar, unzip and then run
+
+	perl Makefile.PL
+	make
+	make test
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

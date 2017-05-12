@@ -1,0 +1,24 @@
+Revision history for Mojolicious-Plugin-SizeLimit
+
+0.005   2015-10-18
+        - Test fix due to incompatible changes in Mojolicious 6.15
+          commit fe2d4f5, reported by Slaven Rezic.
+        - Write name and version at start with $app->log->info().
+
+0.004   2015-07-16
+        - Avoid closures where possible.
+        - NetBSD is explicitly unsupported.
+
+0.003   2015-05-01
+        - Fix abstract.
+        - Better diagnostics w/ memory usage, pid and process lifetime.
+        - Run check_size() at the very beginning of plugin and tests.
+
+0.002   2015-04-29
+        - Improve documentation.
+        - Fix error message.
+        - Add verboser test output in failure case.
+        - Add attribute report_level.
+
+0.001   2015-04-23
+        First version, released on an unsuspecting world.

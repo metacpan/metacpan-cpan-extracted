@@ -1,0 +1,237 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use IO::File;
+use Pod::Usage;
+use File::Find;
+use File::Path;
+use File::Spec;
+use Getopt::Std;
+use NetAddr::IP;
+use PerlIO::gzip;
+
+use Storable qw/fd_retrieve/;
+
+our $VERSION = do { my @r = (q$Revision: 1.1 $ =~ /\d+/g); sprintf " %d."."%03d" x $#r, @r };
+
+=pod
+
+=head1 NAME
+
+serial2plain - Convert abuse reports from serialized to plain format
+
+=head1 SYNOPSIS
+
+    serial2plain [-h] [-o path] path ...
+
+=cut
+
+    ;
+use vars qw/ 
+    $opt_h $opt_o
+    /;
+
+getopts('ho:');
+
+pod2usage(verbose => 1,
+	  message => 'Missing required option -o',
+	 ) unless $opt_o;
+
+=pod
+
+=head1 DESCRIPTION
+
+C<serial2plain> recurses through the paths given in the command line,
+looking for abuse reports stored by L<Mail::Abuse::Processor::Store>
+in B<serialized> mode. Any reports found, will be "stripped", that is,
+all the data structures accompaining the abuse reports will be
+removed, leaving only the text of the abuse report and its original
+headers.
+
+The resulting stripped report will be placed in an equivalent location
+under the path specified in the mandatory B<-o> option. Access times
+and file ownership will be preserved, so as not to break existing
+expiration schemes.
+
+As is, this tool is helpful for migrating from a scenario employing
+the B<serialized> storage mode, to the B<plain> storage mode, thus
+saving space.
+
+Note that this process losses information. All the recovered incidents
+and other meta-data accompanying the abuse report will be discarded in
+the process. Usually, you'll want to insure that this information is
+being kept elsewhere, such as in a database through the use of modules
+such as L<Mail::Abuse::Processor::ArchiveDBI>.
+
+=over
+
+=item B<-h>
+
+Causes this documentation to be produced.
+
+=cut
+    ;
+
+pod2usage(verbose => 2) if $opt_h;
+
+=pod
+
+=item B<-o path>
+
+Specifies where to place the stripped abuse reports. The required
+paths will be created if they does not exist.
+
+=cut
+
+				# All modules under Mail::Abuse will be
+				# use()d automagically
+
+our @used = ();
+
+find
+    (
+     {
+	 follow		=> 1,
+	 follow_skip	=> 2,
+	 no_chdir	=> 1,
+	 wanted		=> sub
+	 {
+	     return unless $File::Find::name =~ m!/Mail/Abuse\W!;
+	     return unless $File::Find::name =~ s!\.pm$!!;
+
+	     my $ext = substr($File::Find::name, index($File::Find::name, 
+						       'Mail/Abuse'));
+	     $ext =~ s!/!::!g;
+	     
+	     return if grep { $_ eq $ext } @used;
+
+	     eval "use $ext";
+	     push @used, $ext unless $@;
+	 },
+     }, @INC
+     );
+
+# Perform the file conversion
+sub convert
+{
+    my $s = $File::Find::name;
+
+    return unless -f $s;
+    my ($atime, $mtime) = (stat($s))[8,9];
+
+    my $d = File::Spec->catfile($opt_o, $s);
+    my $p = (File::Spec->splitpath($d))[1];
+
+    # warn "$s -> $p\n";
+
+    if ($p)
+    {
+	eval { mkpath($p) };
+	if ($@)
+	{
+	    warn "Failed to create path $p for $d: $@\n";
+	    return;
+	}
+    }
+    else
+    {
+	warn "Bad path for $d. Skipping.\n";
+	return;
+    }
+
+    if (-f $d)
+    {
+	warn "Skipping $s: $d already exists and won't overwrite\n";
+	return;
+    }
+
+    my $fh = new IO::File $s, "<:gzip(autopop)";
+    unless ($fh)
+    {
+	warn "Failed to open $s: $!\n";
+	return;
+    }
+
+    my $rep;
+    eval { $rep = fd_retrieve($fh) };
+
+    if ($@)
+    {
+	warn "Failed to retrieve report $s: $@\n";
+	return;
+    }
+
+    unless ($rep)
+    {
+	warn "Failed to read report $s: $!\n";
+	return;
+    }
+
+    $fh->close;
+
+    $fh = new IO::File $d, ">:gzip";
+    unless ($fh)
+    {
+	warn "Failed to create $d: $!\n";
+	return;
+    }
+
+    print $fh ${$rep->text};
+
+    $fh->close;
+    utime $atime, $mtime, $d;
+}
+
+find
+    (
+     {
+	 follow		=> 1,
+	 follow_skip	=> 2,
+	 no_chdir	=> 1,
+	 wanted		=> \&convert,
+     }, @ARGV
+    );
+
+
+__END__
+
+=pod
+
+=back
+
+=head1 HISTORY
+
+  $Log: serial2plain,v $
+  Revision 1.1  2005/12/02 21:31:52  lem
+  Added initial version of serial2plain. This version is useful for
+  migrating existing abuse report repositories. You can invoke it as in
+
+    $ cd old-rep
+    $ serial2plain -o new-rep .
+
+  And the abuse reports will be happily transferred. Some preliminary
+  benchmarks suggest very significant space savings by using the
+  plain-gz format instead of the serialized format, although this will
+  change from installation to installation.
+
+
+=head1 LICENSE AND WARRANTY
+
+This code and all accompanying software comes with NO WARRANTY. You
+use it at your own risk.
+
+This code and all accompanying software can be used freely under the
+same terms as Perl itself.
+
+=head1 AUTHOR
+
+Luis E. Muñoz <luismunoz@cpan.org>
+
+=head1 SEE ALSO
+
+perl(1), C<Mail::Abuse>.
+
+=cut
+

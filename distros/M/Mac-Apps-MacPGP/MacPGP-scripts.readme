@@ -1,0 +1,74 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+
+February 9, 1997
+
+These scripts and extensions are examples of what can be done with
+MacPGP.pm.  Programs that can be accessed through AppleEvents (e.g.,
+YA-NewsWatcher) or an extension interface (e.g., BBEdit) can use
+MacPGP.pm to encrypt/decrypt/sign.
+
+The files are in a .sit.hqx archive.  Stuffit Expander or a similar
+program must be used to retrieve the files from the archive.
+
+
+NOTES:
+
+    *The encrypt scripts/extensions will bring up a MacPGP dialog box
+allowing you to choose recipients, one at a time.  Choose "OK" after
+each recipient.  When you are done, click "Cancel" and the data will
+be encrypted to all the recipients selected.
+
+    *NewsWatcher differentiates between articles (non-editable posts,
+usually by someone other than you) and messages (new, editable posts by
+you).  So the Verify script will only work on articles and the Encrypt/
+ClearSign scripts will only work on messages.
+
+    *You could --and maybe should -- change some of the options in some
+of the scripts to suit your needs.  For example, Droplets:Encrypt.pl
+doesn't have the MacBinzarize option on, so most Mac files will not be
+successfully encrypted.  But by setting $read='macb', the file will be
+MacBinzarized first.
+
+    *The BBEdit extensions require the BBEdit.pm module (and if you want
+to edit them, the MacPerl BBEdit Extension), available at the MacPerl
+FTP sites.  Also, I haven't been able to get these extensions to Undo
+properly.  When I do, I'll update them.
+
+    *I tried to write a script for Eudora Pro 3.0, but the AE handling
+was really screwy ... rather than spend my time on it, I figure the
+Clipboard scripts will suffice.
+
+    *If you have OtherMenu, I highly recommend putting the script folder
+in your OtherMenu folder.  With Glidel, you can also use Drag-n-Drop
+with OtherMenu.
+
+
+BBEdit Extensions/MacPGP-ClearSign      ClearSign front window/selection
+BBEdit Extensions/MacPGP-Decrypt        Decrypt front window/selection
+BBEdit Extensions/MacPGP-Encrypt        Encrypt front window/selection
+Clipboard/ClearSign.pl                  ClearSign clipboard
+Clipboard/Decrypt.pl                    Decrypt/Verify clipboard
+Clipboard/Encrypt.pl                    Encrypt clipboard
+Clipboard/Extract.pl                    Extract default user's key
+Droplets/Decrypt.pl                     Decrypt encrypted file
+Droplets/Encrypt.pl                     Encrypt file
+YA-NewsWatcher/ClearSign.pl             ClearSign message text
+YA-NewsWatcher/Encrypt.pl               Encrypt message text
+YA-NewsWatcher/Verify.pl                Verify article signature
+
+#================================================================
+Chris Nandor                                      pudge@pobox.com
+PGP Key 1024/B76E72AD                           http://pudge.net/
+Keyfingerprint = 08 24 09 0B CE 73 CA 10  1F F7 7F 13 81 80 B6 B6
+
+
+-----BEGIN PGP SIGNATURE-----
+Version: 2.6.3
+Charset: mac
+
+iQCVAwUBMv5zBShcZja3bnKtAQGbjgP+P2/VoGT2L5QSKxNSfNNZS/icuaAyqnc4
+cg2b4iU/mRZYbzfQgpcUl5yEX1lPwlCLpAuheKrSTyvrzhGBdK8c8YiZ/dlbitCj
++1051ZfJNk/l802cJZbfYtXfsuPsRUZHkzwYBwQ/rc8OO7HjvTk+y3Z7Yfq8MxHY
+YFVIhUZAJ14=
+=BdJO
+-----END PGP SIGNATURE-----

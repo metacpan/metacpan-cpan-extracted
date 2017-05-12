@@ -1,0 +1,30 @@
+---
+abstract: 'A Module::Install extension to detect whether we are being tested by CPAN Testers.'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  Capture::Tiny: 0.05
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.17'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Install-AutomatedTester
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Module::Install: 0.85
+  perl: 5.6.0
+resources:
+  homepage: https://github.com/bingos/module-install-automatedtester/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/bingos/module-install-automatedtester.git
+version: '0.04'

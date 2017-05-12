@@ -1,0 +1,10 @@
+Revision history for MooseX-Getopt-Explicit
+
+0.03 November 02 2015
+    - Mark dist as deprecated in the metadata and the abstract
+
+0.02 June 23 2012
+     - Tell people to use MooseX::Getopt::Strict instead.
+
+0.01 June 22 2012
+     - Initial release.

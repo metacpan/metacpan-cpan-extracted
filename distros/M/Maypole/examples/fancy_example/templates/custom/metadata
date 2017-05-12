@@ -1,0 +1,5 @@
+<h3> Class::DBI meta info for [% classmetadata.name %] </h3> 
+[%
+   USE this = Class(classmetadata.name);
+   USE Dumper; Dumper.dump(this.meta_info);
+%]

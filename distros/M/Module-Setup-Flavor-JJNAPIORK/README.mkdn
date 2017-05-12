@@ -1,0 +1,26 @@
+# NAME
+
+Module::Setup::Flavor::JJNAPIORK - How I use Module::Setup
+
+# SYNOPSIS
+
+    module-setup --flavor-class=JJNAPIORK MyApp
+
+# DESCRIPTION
+
+This is a custom flavor for using [Module::Setup](http://search.cpan.org/perldoc?Module::Setup) so that I can just build
+a default project skeleton that comes out reasonable close to the way I expect
+it to be.  That way I can avoid copying files around from an existing good
+module or running `module-setup` and then having to delete and massage a lot
+of things.
+
+# AUTHOR
+
+John Napiorkowski ` <<jjnapiork@cpan.org`> >
+
+# COPYRIGHT & LICENSE
+
+Copyright 2011, John Napiorkowski
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

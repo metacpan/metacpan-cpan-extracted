@@ -1,0 +1,59 @@
+The following list is not up to date:
+
+See also various .pm files.
+
+General:
+ * Copy on write (helps for $x = -$x; cases etc) (seems to make it slower :/
+ * run config() and die_on_nan() tests under Subclass.pm
+
+Math::BigFloat:
+ * finish upgrading and downgrading
+ * ! bround()/bfround(): some bugs may lurk in there
+ * accuracy() & precision() maybe not finished (bnorm() in every op, testcases)
+ * do not reduce numbers in new(), rather do it in anything that outputs it
+   like bsstr(), bstr(), mantissa(), exponent() and parts(). Reducing the
+   number after each op is slow with a binary core math lib like BitVect.
+ * add bfract() that returns just the fractional part?
+ * tests for frsft() and flsft() with $n != 2
+ * blog() is still quite slow for non-integer results. See if we can reuse the
+   integer calculation somehow
+ * finish broot() by using different algorithm
+
+Math::BigInt:
+ * finish 'upgrade'
+ * remove rounding overhead when no rounding is done, e.g. no $object has A nor
+   P and neither of bround(), bround(), accuracy() or precision() was called
+ * bround() is only used by MBF for -$scale = -$len, anyway. POD is wrong for
+   this, too
+ * overload of cos()/sin()/exp()/atan2() is too DWIM (should return BigInt or
+   BigFloat, not scalar) - also document it
+ * +5 % 0 or -5 % 0 == NaN (should it be something else?)
+ * certain shortcuts returning bzero(), bone() etc may not set the requested
+   rounding parameters, so that $x->foo($y,$a,$p,$r) may return $x without a
+   set $a or $p, thus failing later on:
+
+        use Test;
+        BEGIN { plan tests => 1; }
+        use Math::BigInt;
+        $x = Math::BigInt->bone();
+        $x->bsqrt(3,0,'odd');           # $x = 0, but _a is not 3!
+        ok ($x + '12345','12300');      # fails (12346 instead of 12300)
+
+   The shortcuts in code that return $x->bzero() or similar things need to
+   do $x->bzero($a,$p); and this needs tests.
+   Update: Should now work for most things. Check for completeness.
+
+Given the fact that we are be able to plug-in a much faster core-lib, the
+following are pretty much ultra-low-priority:
+
+Math::BigInt::Calc:
+ * look at div() for more speed (I have the hunch that the general _div()
+   routine does way too much work for normal div (e.g. when we don't need
+   the reminder). A simplified version could take care of this.
+ * alternative mul() method using shifts
+ * implement in Calc (and GMP etc) to calculate band(), bior(), bxor() for
+   negative inputs (_signed_or() etc)
+ * _root() doesn't scale too well
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!

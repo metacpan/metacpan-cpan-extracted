@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+dist.ini
+lib/Mason/Plugin/DefaultFilter.pm
+lib/Mason/Plugin/DefaultFilter/Compilation.pm
+lib/Mason/Plugin/DefaultFilter/Interp.pm
+t/DefaultFilter.t
+t/perlcriticrc
+t/tests/DefaultFilter.pm

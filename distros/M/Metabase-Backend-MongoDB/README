@@ -1,0 +1,86 @@
+NAME
+    Metabase::Backend::MongoDB - Metabase backend implemented using MongoDB
+
+VERSION
+    version 1.000
+
+SYNOPSIS
+      use Metabase::Index::MongoDB;
+
+      Metabase::Index::MongoDB->new(
+        host    => 'mongodb://localhost:27017',
+        db_name => 'my_metabase',
+      );
+
+      use Metabase::Archive::MongoDB;
+
+      Metabase::Archive::MongoDB->new(
+        host    => 'mongodb://localhost:27017',
+        db_name => 'my_metabase',
+      );
+
+DESCRIPTION
+    This distribution provides a backend for Metabase using MongoDB. There
+    are two modules included, Metabase::Index::MongoDB and
+    Metabase::Archive::MongoDB. They can be used separately or together (see
+    Metabase::Librarian for details).
+
+    The Metabase::Backend::MongoDB module is a Moose::Role that provides
+    common attributes and private helpers and is not intended to be used
+    directly.
+
+    Common attributes are described further below.
+
+ATTRIBUTES
+  host
+    A MongoDB connection string. Defaults to 'mongodb://localhost:27017'.
+
+  db_name
+    A database name. Defaults to 'metabase'. To avoid collision with other
+    Metabase data on the same MongoDB server, users should always explicitly
+    set this to a unique name for a given Metabase installation.
+
+  collection_name
+    A collection name for the archive or table. Defaults to 'metabase_index'
+    or 'metabase_archive'. As long as the "db_name" is unique, these
+    defaults should be safe to use for most purposes.
+
+  username
+    A username for MongoDB authentication. By default, no username is used.
+
+  password
+    A password for MongoDB authentication. By default, no password is used.
+
+METHODS
+  connection
+    This returns the MongoDB::Connection object that is created when the
+    object is instantiated.
+
+  coll
+    This returns the MongoDB::Collection object containing the index or
+    archive data.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Metabase-Backend-Mongo
+    DB>. You will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/metabase-backend-mongodb>
+
+      git clone https://github.com/dagolden/metabase-backend-mongodb.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2011 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

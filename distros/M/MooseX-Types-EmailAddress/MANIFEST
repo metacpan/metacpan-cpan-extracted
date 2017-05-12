@@ -1,0 +1,9 @@
+Build.PL
+ChangeLog
+lcfg.yml
+lib/MooseX/Types/EmailAddress.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+MooseX-Types-EmailAddress.spec
+Makefile.PL
+META.yml

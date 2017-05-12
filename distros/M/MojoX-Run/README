@@ -1,0 +1,87 @@
+MojoX-Run
+
+SYNOPSIS
+
+ # create executor object
+ # NOTE: new *ALWAYS* returns singleton object!
+ my $executor = MojoX::Run->new()
+ 
+ # simple usage
+ my $pid = $executor->spawn(
+ 	cmd => "ping -W 2 -c 5 host.example.org",
+ 	exit_cb => sub {
+ 		my ($pid, $res) = @_;
+ 		print "Ping finished with exit status $res->{exit_val}.\n";
+ 		print "\tSTDOUT:\n$res->{stdout}\n";
+ 		print "\tSTDERR:\n$res->{stderr}\n";
+ 	}
+ );
+ # check for injuries
+ unless ($pid) {
+ 	print "Command startup failed: ", $executor->error(), "\n";
+ }
+ 
+ # more complex example...
+ my $pid2 = $executor->spawn(
+ 	cmd => 'ping host.example.org',
+ 	stdin_cb => sub {
+ 		my ($pid, $chunk) = @_;
+ 		print "STDOUT $pid: '$chunk'\n"
+ 	},
+ 	# ignore stderr
+ 	stderr_cb => sub {},
+ 	exit_cb => sub {
+ 		my ($pid, $res) = @_;
+ 		print "Process $res->{cmd} [pid: $pid] finished after $res->{time_duration_exec} second(s).\n";
+ 		print "Exit status: $res->{exit_status}";
+ 		print " by signal $res->{exit_signal}" if ($res->{exit_signal});
+ 		print "with coredump " if ($res->{exit_core});
+ 		print "\n";
+ 	}
+ );
+
+ # even fancier usage: spawn coderef
+ my $pid3 = $executor->spawn(
+ 	cmd => sub {
+ 		for (my $i = 0; $i < 10; $i++) {
+ 			if (rand() > 0.5) {
+ 				print STDERR rand(), "\n"
+ 			} else {
+ 				print rand(), "\n";
+ 			}
+ 			sleep int(rand(10));
+ 		}
+ 		exit (rand() > 0.5) ? 0 : 1;
+ 	},
+ 	exit_cb => {
+ 		print "Sub exited with $res->{exit_status}, STDOUT: $res->{stdout}\n";
+ 	},
+ );
+
+See perldoc MojoX::Run for complete instructions.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc MojoX::Run
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 "Brane F. Gracnar"
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

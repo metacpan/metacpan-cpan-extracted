@@ -1,0 +1,263 @@
+
+3.05  2017-03-12
+  - Improved from_string method in Mojo::Pg with search_path support.
+
+3.04  2017-03-08
+  - Fixed array reference handling in queries generated with SQL::Abstract.
+
+3.03  2017-03-07
+  - Added reset method to Mojo::Pg::PubSub.
+
+3.02  2017-02-18
+  - Fixed quoting bugs in queries generated with SQL::Abstract.
+
+3.01  2017-02-12
+  - Fixed bug in examples where migrations would not be handled correctly.
+
+3.0  2017-02-11
+  - Added support for generating queries with SQL::Abstract.
+  - Added abstract attribute to Mojo::Pg.
+  - Added delete, insert, select and update methods to Mojo::Pg::Database.
+
+2.35  2017-01-11
+  - Updated for Mojolicious 7.15.
+
+2.34  2017-01-02
+  - Removed with_temp_schema method from Mojo::Pg.
+
+2.33  2017-01-01
+  - Fixed a few fork-safety bugs in Mojo::Pg.
+
+2.32  2017-01-01
+  - Added with_temp_schema method to Mojo::Pg.
+
+2.31  2016-10-09
+  - Improved from_string method in Mojo::Pg to accept the "postgres://" scheme
+    as well. (polettix)
+  - Improved examples to use new Mojolicious 7.12 features.
+
+2.30  2016-09-02
+  - Improved query method in Mojo::Pg::Database to allow binding of specific
+    DBD::Pg data types to placeholders.
+
+2.29  2016-08-10
+  - Added database_class attribute to Mojo::Pg.
+  - Added results_class attribute to Mojo::Pg::Database.
+  - Fixed a few fork-safety bugs and memory leaks in Mojo::Pg::PubSub.
+
+2.28  2016-06-14
+  - Updated for Mojolicious 6.65.
+
+2.27  2016-05-21
+  - Improved query method in Mojo::Pg::Database to include caller information in
+    error messages.
+
+2.26  2016-04-25
+  - Improved expand performance slightly.
+
+2.25  2016-03-26
+  - Added support for encoding and decoding of JSON notifications.
+  - Added json method to Mojo::Pg::PubSub.
+
+2.24  2016-03-23
+  - Fixed copyright notice.
+
+2.23  2016-02-13
+  - Improved tables method in Mojo::Pg::Database to list all tables and views
+    that are visible to the current user and not internal.
+
+2.22  2016-02-13
+  - Fixed bug where views would be included in the list of table names.
+
+2.21  2016-02-13
+  - Added tables method to Mojo::Pg::Database.
+
+2.20  2016-02-12
+  - Fixed schema bugs in tests.
+
+2.19  2016-02-12
+  - Improved tests to use custom schemas.
+
+2.18  2016-01-23
+  - Added auto_migrate attribute to Mojo::Pg.
+  - Updated example applications.
+
+2.17  2016-01-03
+  - Updated links to Mojolicious website.
+
+2.16  2015-11-25
+  - Added finish method to Mojo::Pg::Results.
+
+2.15  2015-10-30
+  - Improved Mojo::Pg::Migrations to detect if the currently active version is
+    greater than the latest version.
+
+2.14  2015-10-25
+  - Improved unlisten method in Mojo::Pg::PubSub with support for removing all
+    subscribers of a channel at once.
+
+2.13  2015-10-23
+  - Added search_path attribute to Mojo::Pg.
+
+2.12  2015-10-05
+  - Updated example applications.
+
+2.11  2015-09-29
+  - Improved notification performance slightly.
+
+2.10  2015-09-16
+  - Updated DBD::Pg requirement to 3.5.1 due to certain JSON features not
+    working with older versions.
+
+2.09  2015-08-29
+  - Fixed Makefile.PL to be compliant with version 2 of the CPAN distribution
+    metadata specification.
+
+2.08  2015-08-14
+  - Improved support for long-lived Mojo::Pg::Results objects. (Grinnz, sri)
+
+2.07  2015-06-17
+  - Fixed a few JSON encoding and decoding issues.
+
+2.06  2015-06-07
+  - Fixed bug in Mojo::Pg::Database where sequential non-blocking queries would
+    not work correctly.
+
+2.05  2015-04-06
+  - Fixed bug in Mojo::Pg::Migrations where migrations would sometimes be
+    executed in the wrong order.
+
+2.04  2015-04-05
+  - Fixed bug in Mojo::Pg::Migrations where the latest version could not always
+    be determined correctly. (Hernan Lopes)
+
+2.03  2015-04-02
+  - Updated example applications.
+
+2.02  2015-03-30
+  - Improved fork-safety of Mojo::Pg::PubSub.
+
+2.01  2015-03-25
+  - Fixed bug where Perl would close the DBD::Pg file descriptor unexpectedly.
+
+2.0  2015-03-25
+  - Removed support for sequential non-blocking queries, because they are
+    currently incompatible with DBD::Pg.
+  - Removed max_statements attribute from Mojo::Pg.
+  - Removed db attribute from Mojo::Pg::Results.
+  - Removed backlog method from Mojo::Pg::Database.
+  - Removed deprecated do method from Mojo::Pg::Database.
+  - Improved performance by using prepare_cached from DBI to cache statement
+    handles.
+
+1.17  2015-03-20
+  - Improved Mojo::Pg::Migrations to make no changes to the database when
+    checking the currently active version.
+
+1.16  2015-03-18
+  - Added max_statements attribute to Mojo::Pg.
+  - Added db attribute to Mojo::Pg::Results.
+  - Improved performance for many different queries significantly with a
+    statement handle cache.
+
+1.15  2015-03-17
+  - Improved portability of some tests.
+
+1.14  2015-03-12
+  - Fixed bug where non-blocking queries could get lost after the database
+    connection got closed unexpectedly.
+
+1.13  2015-03-11
+  - Improved notify performance significantly.
+
+1.12  2015-03-09
+  - Fixed Mojo::Pg::Migrations to handle UTF-8 encoded files correctly.
+
+1.11  2015-03-04
+  - Removed experimental status from Mojo::Pg::PubSub.
+  - Removed experimental status from pubsub attribute in Mojo::Pg.
+
+1.10  2015-02-20
+  - Updated for Mojolicious 5.81.
+
+1.09  2015-02-15
+  - Added EXPERIMENTAL module Mojo::Pg::PubSub.
+  - Added EXPERIMENTAL pubsub attribute to Mojo::Pg.
+  - Improved fork-safety by activating AutoInactiveDestroy by default.
+
+1.08  2015-02-12
+  - Deprecated Mojo::Pg::Database::do in favor of Mojo::Pg::Database::query.
+
+1.07  2015-01-03
+  - Added support for encoding and decoding of JSON values.
+  - Added expand method to Mojo::Pg::Results.
+
+1.06  2014-12-28
+  - Added dollar_only method to Mojo::Pg::Database.
+
+1.05  2014-12-27
+  - Improved Mojo::Pg::Migrations to create a mojo_migrations table with
+    stricter constraints.
+
+1.04  2014-12-22
+  - Improved all methods not to use question marks in queries.
+
+1.03  2014-12-21
+  - Fixed bug where Perl would close the DBD::Pg file descriptor after it had
+    been used with the event loop.
+
+1.02  2014-11-22
+  - Improved performance for many different queries significantly by
+    deactivating pg_server_prepare by default.
+
+1.01  2014-11-20
+  - Improved documentation.
+
+1.0  2014-11-19
+  - Removed experimental status from distribution.
+
+0.11  2014-11-13
+  - Added pid method to Mojo::Pg::Database.
+  - Added close event to Mojo::Pg::Database.
+
+0.10  2014-11-12
+  - Removed dbh attribute from Mojo::Pg::Transaction.
+  - Added db attribute to Mojo::Pg::Transaction.
+  - Fixed bug where notifications did not get delivered immediately to the
+    process that sent them.
+
+0.09  2014-11-02
+  - Updated Mojolicious requirement to 5.57.
+
+0.08  2014-10-13
+  - Changed default data source name in Mojo::Pg to allow more DBD::Pg
+    environment variables to work correctly.
+  - Improved Mojo::Pg to allow service names in connection strings.
+
+0.07  2014-10-13
+  - Removed commit and rollback methods from Mojo::Pg::Database.
+  - Added Mojo::Pg::Transaction.
+  - Added connection event to Mojo::Pg.
+
+0.06  2014-10-12
+  - Added notify method to Mojo::Pg::Database.
+
+0.05  2014-10-11
+  - Updated Mojolicious requirement to 5.49 to ensure migrations in the DATA
+    section are not served as static files.
+
+0.04  2014-10-10
+  - Added support for migrations.
+  - Added Mojo::Pg::Migrations.
+  - Added migrations attribute to Mojo::Pg.
+
+0.03  2014-10-06
+  - Improved non-blocking queries to be able to introspect the statement
+    handle.
+
+0.02  2014-10-03
+  - Added support for PostgreSQL connection strings.
+  - Added from_string method to Mojo::Pg.
+
+0.01  2014-10-03
+  - First release.

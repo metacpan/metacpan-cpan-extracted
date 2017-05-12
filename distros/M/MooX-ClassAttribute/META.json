@@ -1,0 +1,112 @@
+{
+   "abstract" : "declare class attributes Moose-style... but without Moose",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.142690",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooX-ClassAttribute",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "recommends" : {
+            "CPAN::Meta::Requirements" : "2.000"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0"
+         }
+      },
+      "runtime" : {
+         "conflicts" : {
+            "Moo" : "== 1.001000",
+            "MooseX::ClassAttribute" : "<= 0.26"
+         },
+         "requires" : {
+            "Exporter::Shiny" : "0",
+            "Moo" : "1.000000",
+            "Role::Tiny" : "1.000000",
+            "perl" : "5.008000"
+         }
+      }
+   },
+   "provides" : {
+      "Method::Generate::ClassAccessor" : {
+         "file" : "lib/Method/Generate/ClassAccessor.pm",
+         "version" : "0.011"
+      },
+      "MooX::CaptainHook" : {
+         "file" : "lib/MooX/CaptainHook.pm",
+         "version" : "0.011"
+      },
+      "MooX::CaptainHook::HandleMoose::Hack" : {
+         "file" : "lib/MooX/CaptainHook.pm",
+         "version" : "0.011"
+      },
+      "MooX::CaptainHook::OnApplication" : {
+         "file" : "lib/MooX/CaptainHook.pm",
+         "version" : "0.011"
+      },
+      "MooX::CaptainHook::OnApplication::Moose" : {
+         "file" : "lib/MooX/CaptainHook.pm",
+         "version" : "0.011"
+      },
+      "MooX::CaptainHook::OnInflation" : {
+         "file" : "lib/MooX/CaptainHook.pm",
+         "version" : "0.011"
+      },
+      "MooX::ClassAttribute" : {
+         "file" : "lib/MooX/ClassAttribute.pm",
+         "version" : "0.011"
+      },
+      "MooX::ClassAttribute::HandleMoose" : {
+         "file" : "lib/MooX/ClassAttribute/HandleMoose.pm",
+         "version" : "0.011"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=MooX-ClassAttribute"
+      },
+      "homepage" : "https://metacpan.org/release/MooX-ClassAttribute",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-moox-classattribute.git",
+         "web" : "https://github.com/tobyink/p5-moox-classattribute"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/MooX-ClassAttribute/project"
+   },
+   "version" : "0.011",
+   "x_breaks" : {
+      "Moo" : "== 1.001000",
+      "MooseX::ClassAttribute" : "<= 0.26"
+   },
+   "x_contributors" : [
+      "Dinis Rebolo (DREBOLO) <drebolo@cpan.org>"
+   ]
+}

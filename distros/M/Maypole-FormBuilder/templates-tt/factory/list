@@ -1,0 +1,78 @@
+[% INCLUDE header %]
+<h2>[% IF request.action ==  'do_search' %]Search results[% END %][% request.model_class.plural_moniker %]</h2>
+
+[% listview = request.listviewmode | format("%sview") %]
+
+<p class="subheading">
+[% other = request.listviewmode == 'editlist' ? 'navigable' : 'editable' %]
+[% request.link(table = model_class.table,
+        action =  "switchlistmode",
+        label =  "Switch to $other list view"
+)
+%]
+</p>
+
+[% INCLUDE pager %]
+[% INCLUDE $listview %]
+[% INCLUDE addnew %]
+[% INCLUDE search %]
+    
+[%#
+ # The columns and fields rendered in .listview     are set here (list_columns + list_fields).
+ # The columns and fields rendered in .editlistview are set in setup_form_mode, editlist mode
+ #        (list_columns + list_fields in the default model MP::FB::Model).
+ #
+%]
+
+[% BLOCK listview %]
+[% PERL %]
+    my $request = $stash->get('request');
+    my $callback = sub 
+    {
+        my ( $object ) = @_;
+        
+        return  $request->as_form( 'edit_button',   entity => $object )->render,
+                $request->as_form( 'delete_button', entity => $object )->render;
+    };
+
+    my @data = $request->tabulate( with_colnames => 1, 
+                                   callback      => $callback, 
+                                   fields        => [ $request->model_class->list_columns, 
+                                                      $request->model_class->list_fields
+                                                      ],
+                                   );
+    
+    # 2 extra columns in the header row to accommodate the edit/delete buttons
+    push @{ $data[0] }, ( '', '' );
+    $stash->set('data', \@data);
+[% END %]
+[%# quick_table will populate the table with list_columns by default %]
+<div class="NavListTable">[% request.quick_table( labels = 'T' ).render( data ) %]</div>
+[% END %]
+
+[% BLOCK editlistview %]
+[% forms = request.as_forms( 'editlist' ) %]
+[% names = request.model_class.column_names %]
+<div class="FormListTable">
+<table border="0">
+<tr>
+[% dummy_form = forms.0 || request.model_class.as_form(  mode = 'editlist' ) %]
+[% PERL %]
+my %names = $stash->get('names');
+my $dummy_form = $stash->get('dummy_form');
+foreach my $field ( grep { $_->type ne 'hidden' } $dummy_form->fields ) {
+   print "<th>";
+   print ($names{ $field } || ucfirst( $field ));
+   print "</th>";
+}
+[% END %]
+<th colspan="5">Actions</th>
+</tr>
+[% FOREACH form IN forms %]
+ [% request.render_form_as_row(form ) %]
+[% END %]
+
+</table>
+</div>
+[% END %]
+[% INCLUDE footer %]

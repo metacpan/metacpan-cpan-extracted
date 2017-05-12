@@ -1,0 +1,22 @@
+---
+
+disable: 0
+
+
+# list of addresses
+addresses:
+    # all incoming mails to those recipients go directly to the blacklist
+    - some@address.tld
+
+# list of domains used for building the blacklist
+domains:
+    
+    # all incoming mails for this recipient domain
+    - spamlover.tld
+    
+    # use the whoe domain, but some real existing users
+    -
+        domain: somedomain.tld
+        exceptions:
+            - iamok
+

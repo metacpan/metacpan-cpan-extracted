@@ -1,0 +1,173 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.000006
+
+1.000005 2017-03-01T04:15:00Z
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - perl 5.006
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+1.000004 2014-08-15T22:10:31Z
+
+1.000003 2014-08-07T11:02:32Z
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - Scalar::Util
+ - version 0.77
+
+1.000002 2014-07-18T23:34:10Z
+ [Added / test requires]
+ - File::Spec
+ - Scalar::Util
+
+ [Changed / test requires]
+ - version 0 → 0.77
+
+1.000001 2014-06-10T05:18:46Z
+
+1.000000 2014-01-30T19:43:03Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+
+ [Added / runtime requires]
+ - Sub::Exporter::Progressive
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - List::Util
+ - namespace::clean
+ - version
+
+ [Changed / test requires]
+ - Test::More 1.001002 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4202
+
+ [Removed / configure requires]
+ - Module::Build 0.4202
+
+ [Removed / runtime requires]
+ - Sub::Exporter
+
+ [Removed / test requires]
+ - Moose
+ - MooseX::Types::Moose
+ - namespace::autoclean
+
+0.05070422 2013-11-20T08:32:12Z
+ [Added / test requires]
+ - lib
+
+ [Changed / build requires]
+ - Module::Build 0.4002 → 0.4202
+
+ [Changed / configure requires]
+ - Module::Build 0.4002 → 0.4202
+
+ [Changed / test requires]
+ - Test::More 0.98 → 1.001002
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.05070421 2012-08-03T10:25:23Z
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4002
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4002
+
+ [Changed / test requires]
+ - Test::More 0.88 → 0.98
+
+0.05070420 2012-02-03T03:33:11Z
+ [Added / runtime requires]
+ - perl 5.006
+ - strict
+ - warnings
+
+ [Removed / test requires]
+ - English
+
+0.05070419 2011-04-07T02:03:19Z
+
+0.05055616 2010-11-13T23:43:43Z
+ [Added / test requires]
+ - Test::Fatal
+
+ [Removed / test requires]
+ - FindBin
+ - Test::Exception
+
+0.05046611 2010-08-16T18:30:39Z
+ [Added / test requires]
+ - English
+ - MooseX::Types::Moose
+
+0.05044303 2010-07-24T10:03:50Z
+ [Added / test requires]
+ - File::Find
+ - File::Temp
+ - FindBin
+ - Moose
+ - Test::Exception
+ - Test::More 0.88
+ - namespace::autoclean
+
+ [Changed / build requires]
+ - Module::Build 0.35 → 0.3601
+
+ [Changed / configure requires]
+ - Module::Build 0.35 → 0.3601
+
+ [Removed / runtime requires]
+ - Moose 0.84
+ - MooseX::Types 0.10
+ - MooseX::Types::Moose
+ - Test::Exception
+ - Test::More
+ - namespace::autoclean
+
+0.0405 2009-12-04T09:20:43Z
+ [Added / build requires]
+ - Module::Build 0.35
+
+ [Added / configure requires]
+ - Module::Build 0.35
+
+ [Added / runtime requires]
+ - MooseX::Types 0.10
+
+ [Removed / runtime requires]
+ - Find::Lib
+ - Test::use::ok
+
+0.0404 2009-07-06T03:34:10Z
+ [Added / runtime requires]
+ - Carp
+ - Find::Lib
+ - Moose 0.84
+ - MooseX::Types::Moose
+ - Sub::Exporter
+ - Test::Exception
+ - Test::More
+ - Test::use::ok
+ - namespace::autoclean
+
+0.0403 2009-06-30T13:56:07Z
+
+0.0402 2009-06-29T19:43:05Z
+
+0.0401 2009-06-29T18:16:51Z

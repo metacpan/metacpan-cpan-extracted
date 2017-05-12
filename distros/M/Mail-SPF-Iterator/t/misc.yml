@@ -1,0 +1,116 @@
+---
+description: various other tests
+tests:
+  spf-by-cname:
+    description: >-
+      TXT/SPF records can be referenced through CNAME
+    comment: >-
+      The SPF Lookup returns a CNAME and the SPF record
+    spec: ""
+    helo: mail.example.net
+    host: 1.2.3.5
+    mailfrom: user@example.net
+    result: pass
+  p-in-exp-mod:
+    description: >-
+      %{p} in exp= modifier
+    spec: ""
+    helo: mail.example.net
+    host: 1.2.3.5
+    mailfrom: user@example1.net
+    explanation: forbidden for one.two.three.five.example.net
+    result: fail
+  sender-id:
+    description: >-
+      no SPF record but SenderID
+    spec: ""
+    helo: mail.example.net
+    host: 1.2.3.5
+    mailfrom: user@example2.net
+    result: pass
+  sender-id-pick-mfrom1:
+    description: >-
+      SenderID with mfrom and pra, pick mfrom
+    spec: ""
+    helo: mail.example.net
+    host: 1.2.3.5
+    mailfrom: user@example3.net
+    result: pass
+  sender-id-pick-mfrom2:
+    description: >-
+      SenderID with mfrom and pra, pick mfrom
+    spec: ""
+    helo: mail.example.net
+    host: 1.2.3.5
+    mailfrom: user@example4.net
+    result: fail
+  sender-id-pick-spf:
+    description: >-
+      SenderID with mfrom and SPF, pick SPF
+    spec: ""
+    helo: mail.example.net
+    host: 1.2.3.5
+    mailfrom: user@example5.net
+    result: pass
+  domain-dots-at-end:
+    description: >-
+      multiple dots at end of domain name are illegal
+    spec: "4.3/1"
+    helo: mail.example.net
+    host: 1.2.3.5
+    mailfrom: user@example5.net....
+    result: none
+  ptr-cname:
+    description: >-
+      PTR record is CNAME to PTR record
+    spec: ""
+    helo: mail.example.net
+    host: 2.3.4.5
+    mailfrom: user@example6.net
+    result: pass
+  second-include:
+    description: >-
+      second include matches
+    spec: ""
+    helo: mail.example.net
+    host: 3.4.5.6
+    mailfrom: user@example7.net
+    result: pass
+zonedata:
+  example.net:
+    - CNAME: example.com
+  example.com:
+    - SPF:  v=spf1 ip4:1.2.3.5 -all
+  example1.net:
+    - SPF:  v=spf1 -ip4:1.2.3.5 all exp=%{p4r}.explain.example1.net
+  5.3.2.1.in-addr.arpa:
+    - PTR: one.two.three.five.example.net
+  one.two.three.five.example.net:
+    - A: 1.2.3.5
+  five.three.two.one.explain.example1.net:
+    - TXT: forbidden for %{p}
+  unknown.explain.example1.net:
+    - TXT: bad message for %{p}
+  example2.net:
+    - SPF:  spf2.0/pra,mfrom ip4:1.2.3.5 -all
+  example3.net:
+    - SPF:  spf2.0/pra -ip4:1.2.3.5 all
+    - SPF:  spf2.0/mfrom ip4:1.2.3.5 -all
+  example4.net:
+    - SPF:  spf2.0/mfrom -ip4:1.2.3.5 all
+    - SPF:  spf2.0/pra ip4:1.2.3.5 -all
+  example5.net:
+    - SPF:  spf2.0/mfrom -ip4:1.2.3.5 all
+    - SPF:  v=spf1 ip4:1.2.3.5 -all
+  example6.net:
+    - SPF:  v=spf1 ptr:friend.example6.net -all
+  5.4.3.2.in-addr.arpa:
+    - CNAME: two.three.four.five.example.net
+  two.three.four.five.example.net:
+    - PTR: friend.example6.net
+  friend.example6.net:
+    - A: 2.3.4.5
+  example7.net:
+    - SPF: v=spf1 include:example.com include:example8.net -all
+  example8.net: 
+    - SPF: v=spf1 ip4:2.3.4.5 ip4:3.4.5.6 -all

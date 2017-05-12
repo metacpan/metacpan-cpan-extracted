@@ -1,0 +1,39 @@
+---
+abstract: 'Create a table of contents from markdown'
+author:
+  - '@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.64
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Markdown-TOC
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Markdown::TOC:
+    file: lib/Markdown/TOC.pm
+    version: 0.01
+requires:
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/imago-storm/Markdown-TOC/issues
+  homepage: https://github.com/imago-storm/Markdown-TOC
+  repository: git://github.com/imago-storm/Markdown-TOC.git
+version: 0.01
+x_authority: cpan:IMAGO
+x_contributors:
+  - 'Polina Shubina <925043@gmail.com>'

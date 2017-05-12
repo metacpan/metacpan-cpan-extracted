@@ -1,0 +1,44 @@
+0.012     2016-06-30 17:44:11 EDT
+  - Enable canonical option for all backends to match Mojo::JSON behavior in Mojolicious 6.58+
+
+0.011     2016-06-02 14:15:24 EDT
+  - escape_slash option will now be enabled if the backend is JSON::PP or Cpanel::JSON::XS >= 3.0206
+  - Fix tests to handle trailing .0 added to NV ("numeric non-integer") by Cpanel::JSON::XS >= 3.0214
+
+0.010     2015-12-02 14:54:33 EST
+  - Update tests for blessed reference stringification in Cpanel::JSON::XS 3.0207
+
+0.009     2015-09-06 17:32:56 EDT
+  - Change installer to Module::Build::Tiny
+  - Better examples in synopsis for use with morbo and hypnotoad
+
+0.008     2015-07-13 20:25:16 EDT
+  - Update distribution metadata
+
+0.007     2014-12-14 16:49:55-05:00 America/New_York
+  - Added Cpanel::JSON::XS 3.0112 to recommended prereqs
+  - Enabled new Cpanel::JSON::XS stringify_infnan option where supported
+
+0.006     2014-12-12 10:21:25-05:00 America/New_York
+  - Preload JSON booleans for true and false subs
+  - Updated tests and documentation for Cpanel::JSON::XS 3.0108
+    - inf and nan encoding
+    - upgraded number encoding
+    - removed doc section on boolean stringification differences
+
+0.005     2014-12-09 18:05:21-05:00 America/New_York
+  - Enable allow_unknown option
+  - Update docs regarding handling of unblessed references
+  - Restore tests related to scalar references
+
+0.004     2014-12-05 12:30:04-05:00 America/New_York
+  - Removed Test::Without::Module testing dependency
+
+0.003     2014-11-30 22:53:18-05:00 America/New_York
+  - Cleaned up tests and imports
+
+0.002     2014-11-30 18:52:20-05:00 America/New_York
+  - Improved testing for JSON::XS and JSON::PP
+
+0.001     2014-11-30 02:27:46-05:00 America/New_York
+  - First release

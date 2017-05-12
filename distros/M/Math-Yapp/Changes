@@ -1,0 +1,44 @@
+Revision history for Perl extension Math::Yapp.
+
+1.01  Wed Apr 17 23:46:36 2013
+    - original version; created by h2xs 1.23 with options
+        -XA -n Math::Yapp
+
+    This is the first release.  No changes to report.
+
+1.02  Sun Oct 06 23:33:28 2013 
+      Successfully released to CPAN a couple of days ago and finally
+      managed to see what the POD looks like.  YIKES!  This inspired
+      two modifications:
+      - Immediately set to correcting typos and unclear remarks in the POD.
+        (I doubt it's perfect now.)
+      - Added method Yapp_negate_roots(), which produces a polynomial whose
+        roots are the negatives of the given polynomial.  (I hadn't realized
+        that omission until I read the POD.)
+
+1.03  Mon Oct 14 11:20:12 2013 
+      - Commented out [use Math::BigFLoat;] and the call to
+        Math::BigFLoat->accuracy() in the BEGIN block.  This because the
+        BUGS section of Math::Complex warns me not attempt to use BigFloat.
+        I left these stantements in there as comments as a reminder that I
+        need to do something about the accuracy; 64 (or 80?)-bit floats
+        don't quite cut it for polynomials above degree 8.
+
+        Yes, this leaves a no-op BEGIN block.  But who knows what I'll come
+        up with in a future release?
+
+1.05  Fri Dec 26, 2014 10:59:50 AM
+      - Fixed minor error in Interpolation testing module that raise
+        compiler warnings.
+      - Added code for Hermite interpolation test to use 6-points,
+        instead of only 4 points, when running in a 64-bit environment.
+        Note that at 7 points the rounding errors become too gross to
+        pass muster.
+      - Added method "YinnerProd", an innner product function,
+        overloaded by the . operator.
+
+1.06  Fri, May 15, 2015 11:36:55 AM
+      - Completed more on innr-product space issues
+      - Added complete documentation on inner-product space functionality,
+        including a mea-culpa on what I have ot yet done
+----

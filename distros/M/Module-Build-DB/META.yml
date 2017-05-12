@@ -1,0 +1,42 @@
+---
+abstract: 'Build, configure, and test database-backed applications'
+author:
+  - 'David E. Wheeler <david@justatheory.com>'
+build_requires:
+  Module::Build: 0.36
+  Test::More: 0.70
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Build-DB
+provides:
+  Module::Build::DB:
+    file: lib/Module/Build/DB.pm
+    version: 0.10
+  Module::Build::DBD::Pg:
+    file: lib/Module/Build/DBD/Pg.pm
+    version: 0.10
+  Module::Build::DBD::SQLite:
+    file: lib/Module/Build/DBD/SQLite.pm
+    version: 0.10
+  Module::Build::DBD::mysql:
+    file: lib/Module/Build/DBD/mysql.pm
+    version: 0.10
+recommends:
+  Test::Pod: 1.41
+  Test::Pod::Coverage: 1.06
+requires:
+  Config::Any: 0.17
+  DBI: 1.43
+  Module::Build: 0.34
+  TAP::Harness: 3.13
+resources:
+  bugtracker: http://github.com/theory/module-build-pg/issues/
+  homepage: http://search.cpan.org/dist/Module-Build-DB/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/theory/module-build-pg/tree/
+version: 0.10

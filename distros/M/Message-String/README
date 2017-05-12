@@ -1,0 +1,838 @@
+NAME
+    Message::String - A pragma to declare and organise messaging.
+
+VERSION
+    version 0.1.9
+
+SYNOPSIS
+    This module helps you organise, identify, define and use messaging
+    specific to an application or message domain.
+
+  Using the pragma to define message strings
+    The pragma's package name may be used directly:
+            # Declare a single message
+            use Message::String INF_GREETING => "Hello, World!";
+    
+            # Declare multiple messages
+            use Message::String {
+                INF_GREETING  => "I am completely operational, " .
+                                 "and all my circuits are functioning perfectly.",
+                RSP_DO_WHAT   => "What would you have me do?\n",
+                NTC_FAULT     => "I've just picked up a fault in the %s unit.",
+                CRT_NO_CAN_DO => "I'm sorry, %s. I'm afraid I can't do that",
+            };
+
+    Or, after loading the module, the "message" alias may be used:
+            # Load the module
+            use Message::String;
+
+            # Declare a single message
+            use message INF_GREETING => "Hello, World!";
+
+            # Declare multiple messages
+            use message {
+                INF_GREETING  => "I am completely operational, " .
+                                 "and all my circuits are functioning perfectly.",
+                RSP_DO_WHAT   => "What would you have me do?\n",
+                NTC_FAULT     => "I've just picked up a fault in the %s unit.",
+                CRT_NO_CAN_DO => "I'm sorry, %s. I'm afraid I can't do that",
+            };
+
+        (Note: the "message" pragma may be favoured in future examples.)
+
+  Using message strings in your application
+    Using message strings in your code is really easy, and you have choice
+    about how to do so:
+
+    Example 1
+            # Ah, the joyless tedium that is composing strings using constants...
+            $name = "Dave";
+            print INF_GREETING, "\n";
+            print RSP_DO_WHAT;
+            chomp(my $response = <STDIN>);
+            if ($response =~ /Open the pod bay doors/i) 
+            {
+                die sprintf(CRT_NO_CAN_DO, $name);
+            }
+            printf NTC_FAULT . "\n", 'AE-35';
+
+        Using messages this way can sometimes be useful but, on this
+        occasion, aptly demonstrates why constants get a bad rap. This
+        pattern of usage works fine, though you could just have easily used
+        the "constant" pragma, or one of the alternatives.
+
+    Example 2
+            $name = 'Dave';
+            INF_GREETING;                   # Display greeting (stdout)
+            RSP_DO_WHAT;                    # Prompt for response (stdout/stdin)
+            if ( /Open the pod bay doors/ ) # Check response; trying $_ but
+            {                               # RSP_DO_WHAT->response works, too!
+                CRT_NO_CAN_DO($name);       # Throw hissy fit (Carp::croak)
+            }
+            NTC_FAULT('AE-35');             # Issue innocuous notice (stderr)
+
+    "Message::String" objects take care of things like printing info
+    messages to stdout; printing response messages to stdout, and gathering
+    input from STDIN; putting notices on stderr, and throwing exceptions for
+    critical errors. They do all the ancillary work so you don't have to;
+    hiding away oft used sprinklings that make code noisy.
+
+  Exporting message strings to other packages
+    It is also possible to have a module export its messages for use by
+    other packages. By including "EXPORT" or "EXPORT_OK" in the argument
+    list, before your messages are listed, you can be sure that your package
+    will export your symbols one way or the other.
+
+    The examples below show how to export using "EXPORT" and "EXPORT_OK";
+    they also demonstrate how to define messages using less onerous string
+    catalogues and, when doing so, how to split longer messages in order to
+    keep the lengths of your lines manageable:
+
+    Example 1
+            package My::App::Messages;
+            use Message::String EXPORT => << 'EOF';
+            INF_GREETING  I am completely operational,
+            ...           and all my circuits are functioning perfectly.
+            RSP_DO_WHAT   What would you have me do?\n
+            NTC_FAULT     I've just picked up a fault in the %s unit.
+            CRT_NO_CAN_DO I'm sorry, %s. I'm afraid I can't do that
+            EOF
+            1;
+
+            # Meanwhile, back at main::
+            use My::App::Messages;                  # No choice. We get everything!
+
+    Example 2
+            package My::App::Messages;
+            use Message::String EXPORT_OK => << 'EOF';
+            INF_GREETING  I am completely operational,
+            ...           and all my circuits are functioning perfectly.
+            RSP_DO_WHAT   What would you have me do?\n
+            NTC_FAULT     I've just picked up a fault in the %s unit.
+            CRT_NO_CAN_DO I'm sorry, %s. I'm afraid I can't do that
+            EOF
+            1;
+
+            # Meanwhile, back at main::
+            use My::App::Messages 'INF_GREETING';   # Import what we need
+
+        (Note: you were probably astute enough to notice that, despite the
+        HEREDOC marker being enclosed in single quotes, there is a "\n" at
+        the end of one of the message definitions. This isn't an error; the
+        message formatter will deal with that.)
+
+        It is also possible to place messages in one or more groups by
+        including the group tags in the argument list, before the messages
+        are defined. Group tags *must* start with a colon (":").
+
+    Example 3
+            package My::App::Messages;
+            use My::App::Messages;
+            use message ':MESSAGES' => {
+                INF_GREETING  => "I am completely operational, " .
+                                 "and all my circuits are functioning perfectly.",
+                RSP_DO_WHAT   => "What would you have me do?\n",
+                NTC_FAULT     => "I've just picked up a fault in the %s unit.",
+            };
+            use message ':MESSAGES', ':ERRORS' => {
+                CRT_NO_CAN_DO => "I'm sorry, %s. I'm afraid I can't do that",
+            };
+            1;
+
+            # Meanwhile, back at main::
+            use My::App::Messages ':ERRORS';    # Import the errors
+            use My::App::Messages ':MESSAGE';   # Import everything
+
+    Tagging messages causes your module's %EXPORT_TAGS hash to be updated,
+    with tagged messages also being added to your module's @EXPORT_OK array.
+
+    There is no expectation that you will make your package a descendant of
+    the "Exporter" class. Provided you aren't working in the "main::"
+    namespace then the calling package will be made a subclass of "Exporter"
+    automatically, as soon as it becomes clear that it is necessary.
+
+  Recap of the highlights
+    This brief introduction demonstrates, hopefully, that as well as being
+    able to function like constants, message strings are way more
+    sophisticated than constants.
+
+    Perhaps your Little Grey Cells have also helped you make a few important
+    deductions:
+
+    *   That the name not only identifies, but characterises a message.
+
+    *   That different types of message exist.
+
+    *   That handling is influenced by a message's type.
+
+    *   That messages are simple text, or they may be parameterised.
+
+    You possibly have more questions. Certainly, there is more to the story
+    and these are just the highlights. The module is described in greater
+    detail below.
+
+DESCRIPTION
+    The "Message::String" pragma and its alias ("message") are aimed at the
+    programmer who wishes to organise, identify, define, use (or make
+    available for use) message strings specific to an application or other
+    message domain. "Message::String" objects are not unlike constants, in
+    fact, they may even be used like constants; they're just a smidge more
+    helpful.
+
+    Much of a script's lifetime is spent saying stuff, asking for stuff,
+    maybe even complaining about stuff; but, most important of all, they
+    have to do meaningful stuff, good stuff, the stuff they were designed to
+    do.
+
+    The trouble with saying, asking for, and complaining about stuff is the
+    epic amount of repeated stuff that needs to be done just to do that kind
+    of stuff. And that kind of stuff is like visual white noise when it's
+    gets in the way of understanding and following a script's flow.
+
+    We factor out repetetive code into reusable subroutines, web content
+    into templates, but we do nothing about our script's messaging. Putting
+    up with broken strings, quotes, spots and commas liberally peppered
+    around the place as we compose and recompose strings doesn't seem to
+    bother us.
+
+    What if we could organise our application's messaging in a way that kept
+    all of that noise out of the way? A way that allowed us to access
+    messages using mnemonics but have useful, sensible and standard things
+    happen when we do so. This module attempts to provide the tooling to do
+    just that.
+
+METHODS
+    "Message::String" objects are created and injected into the symbol table
+    during Perl's compilation phase so that they are accessible at runtime.
+    Once the import method has done its job there is very little that may be
+    done to meaningfully alter the identity, purpose or destiny of messages.
+
+    A large majority of this module's methods, including constructors, are
+    therefore notionally and conventionally protected. There are, however, a
+    small number of public methods worth covering in this document.
+
+  Public Methods
+   import
+        message->import();
+        message->import( @options, @message_group, ... );
+        message->import( @options, \%message_group, ... );
+        message->import( @options, \@message_group, ... );
+        message->import( @options, $message_group, ... );
+
+    The "import" method is invoked at compile-time, whenever a "use message"
+    or "use Message::String" directive is encountered. It processes any
+    options and creates any requested messages, injecting message symbols
+    into the caller's symbol table.
+
+    Options
+
+    "EXPORT"
+        Ensures that the caller's @EXPORT list includes the names of
+        messages defined in the following group.
+
+            # Have the caller mandate that these messages be imported:
+            #
+            use message EXPORT => { ... };
+
+    "EXPORT_OK"
+        Ensures that the caller's @EXPORT_OK list includes the names of
+        messages defined in the following group. The explicit use of
+        "EXPORT_OK" is not necessary when tag groups are being used and its
+        use is implied.
+
+            # Have the caller make these messages importable individually and
+            # upon request:
+            #
+            use message EXPORT_OK => { ... };
+
+    ":*EXPORT-TAG*"
+        One or more export tags may be listed, specifying that the following
+        group of messages is to be added to the listed tag group(s). Any
+        necessary updates to the caller's %EXPORT_TAGS hash and @EXPORT_OK
+        array are made. The explicit use of "EXPORT_OK" is unnecessary since
+        its use is implied.
+
+        Tags may be listed separately or together in the same string.
+        Regardless of how they are presented, each tag must start with a
+        colon (":").
+
+            # Grouping messages with a single tag:
+            #
+            use message ':FOO' => { ... };
+
+            # Four valid ways to group messages with multiple tags:
+            #
+            use message ':FOO',':BAR' => { ... };
+            use message ':FOO, :BAR' => { ... };
+            use message ':FOO :BAR' => { ... };
+            use message ':FOO:BAR' => { ... };
+
+            # Gilding-the-lily; not wrong, but not necessary:
+            #
+            use message ':FOO', EXPORT_OK => { ... };
+
+    Tag groups and other export options have no effect if the calling
+    package is "main::".
+
+    If the calling package hasn't already been declared a subclass of
+    "Exporter" then the "Exporter" package is loaded and the caller's @ISA
+    array will be updated to include it as the first element.
+
+    (To do: I should try to make this work with "Sub::Exporter".)
+
+    Defining Messages
+
+    A message is comprised of two tokens:
+
+    The Message Identifier
+        The message id should contain no whitespace characters, consist only
+        of upper- and/or lowercase letters, digits, the underscore, and be
+        valid as a Perl subroutine name. The id should *ideally* be unique;
+        at the very least, it must be unique to the package in which it is
+        defined.
+
+        As well as naming a message, the message id is also used to
+        determine the message type and severity. Try to organise your
+        message catalogues using descriptive and consistent naming and type
+        conventions.
+
+        (Read the section about "MESSAGE TYPES" to see how typing works.)
+
+    The Message Template
+        The template is the text part of the message. It could be a simple
+        string, or it could be a "sprintf" format complete with one or more
+        parameter placeholders. A message may accept arguments, in which
+        case "sprintf" will merge the argument values with the template to
+        produce the final output.
+
+    Messages are defined in groups of one or more key-value pairs, and the
+    "import" method is quite flexible about how they are presented for
+    processing.
+
+    As a flat list of key-value pairs.
+            use message 
+                INF_GREETING  => "I am completely operational, " .
+                                 "and all my circuits are functioning perfectly.",
+                RSP_DO_WHAT   => "What would you have me do?\n",
+                NTC_FAULT     => "I've just picked up a fault in the %s unit.",
+                CRT_NO_CAN_DO => "I'm sorry, %s. I'm afraid I can't do that";
+
+    As an anonymous hash, or hash reference.
+            use message { 
+                INF_GREETING  => "I am completely operational, " .
+                                 "and all my circuits are functioning perfectly.",
+                RSP_DO_WHAT   => "What would you have me do?\n",
+                NTC_FAULT     => "I've just picked up a fault in the %s unit.",
+                CRT_NO_CAN_DO => "I'm sorry, %s. I'm afraid I can't do that",
+            };
+
+    As an anonymous array, or array reference.
+            use message [ 
+                INF_GREETING  => "I am completely operational, " .
+                                 "and all my circuits are functioning perfectly.",
+                RSP_DO_WHAT   => "What would you have me do?\n",
+                NTC_FAULT     => "I've just picked up a fault in the %s unit.",
+                CRT_NO_CAN_DO => "I'm sorry, %s. I'm afraid I can't do that",
+            ];
+
+    As a string (perhaps using a HEREDOC).
+            use message << 'EOF';
+            INF_GREETING  I am completely operational,
+            ...           and all my circuits are functioning perfectly.
+            RSP_DO_WHAT   What would you have me do?\n
+            NTC_FAULT     I've just picked up a fault in the %s unit.
+            CRT_NO_CAN_DO I'm sorry, %s. I'm afraid I can't do that
+            EOF
+
+        When defining messages in this way, longer templates may be
+        broken-up (as shown on the third line of the example above) by
+        placing one or more dots (".") where a message id would normally
+        appear. This forces the text fragment on the right to be appended to
+        the template above, separated by a single space. Similarly, the
+        addition symbol ("+") may be used in place of dot(s) if a newline is
+        desired as the separator. This is particularly helpful when using
+        PerlTidy and shorter line lengths.
+
+    Multiple sets of export options and message groups may be added to the
+    same import method's argument list:
+
+        use message ':MESSAGES, :MISC' => (
+            INF_GREETING  => "I am completely operational, " .
+                             "and all my circuits are functioning perfectly.",
+            RSP_DO_WHAT   => "What would you have me do?\n",
+        ), ':MESSAGES, :NOTICES' => (
+            NTC_FAULT     => "I've just picked up a fault in the %s unit.",
+        ), ':MESSAGES, :ERRORS' => (
+            CRT_NO_CAN_DO => "I'm sorry, %s. I'm afraid I can't do that",
+        );
+
+    When a message group has been processed any export related options that
+    are currently in force will be reset; no further messages will be marked
+    as exportable until a new set of export options and messages is added to
+    the same directive.
+
+    Pay attention when defining messages as simple lists of key-value pairs,
+    as any new export option(s) will punctuate a list of messages up to that
+    point and they will be processed as a complete group.
+
+    The message parser will also substitute the following escape sequences
+    with the correct character shown in parentheses:
+
+    *   "\n" (newline)
+
+    *   "\r" (linefeed)
+
+    *   "\t" (tab)
+
+    *   "\a" (bell)
+
+    *   "\s" (space)
+
+   id
+        MESSAGE_ID->id;
+
+    Gets the message's identifier.
+
+   level
+        MESSAGE_ID->level( $severity_int );
+        MESSAGE_ID->level( $long_or_short_type_str );
+        $severity_int = MESSAGE_ID->level;
+
+    Sets or gets a message's severity level.
+
+    The severity level is always returned as an integer value, while it may
+    be set using an integer value or a type code (long or short) with the
+    desired value.
+
+    Example
+            # Give my notice a higher severity, equivalent to a warning.
+
+            NTC_FAULT->level(4);
+            NTC_FAULT->level('W');
+            NTC_FAULT->level('WARNING');
+
+    (See "MESSAGE TYPES" for more informtion about typing.)
+
+   output
+        $formatted_message_str = MESSAGE_ID->output;
+
+    Returns the formatted text produced last time a particular message was
+    used, or it returnd "undef" if the message hasn't yet been issued. The
+    message's "output" value would also include the values of any parameters
+    passed to the message.
+
+    Example
+            # Package in which messages are defined.
+            #
+            package My::App::MsgRepo;
+            use Message::String EXPORT_OK => {
+                NTC_FAULT => 'I've just picked up a fault in the %s unit.',
+            };
+
+            1;
+
+            # Package in which messages are required.
+            #
+            use My::App::MsgRepo qw/NTC_FAULT/;
+            use Test::More;
+
+            NTC_FAULT('AE-35');     # The message is issued...
+
+            # Some time later...
+            diag NTC_FAULT->output; # What was the last reported fault again?
+
+            # Output:
+            # I've just picked up a fault in the AE-35 unit.
+
+   readmode
+        MESSAGE_ID->readmode( $io_stty_sttymode_str );
+        $io_stty_sttymode_str = MESSAGE_ID->readmode;
+
+    Uses "IO::Stty" to set any special terminal driver modes when getting
+    the response from "STDIN". The terminal driver mode will be restored to
+    its normal state after the input has completed for the message.
+
+    This method is intended for use with Type R (Response) messages,
+    specifically to switch off TTY echoing for password entry. You should,
+    however, never need to use explicitly if the text *"password"* is
+    contained within the message's template, as its use is implied.
+
+    Example
+            RSP_MESSAGE->readmode('-echo');
+
+   response
+        $response_str = MESSAGE_ID->response;
+
+    Returns the input given in response to the message last time it was
+    used, or it returns "undef" if the message hasn't yet been isssued.
+
+    The "response" accessor is only useful with Type R (Response) messages.
+
+    Example
+            # Package in which messages are defined.
+            #
+            package My::App::MsgRepo;
+            use Message::String EXPORT_OK => {
+                INF_GREETING => 'Welcome to the machine.',
+                RSP_USERNAME => 'Username: ',
+                RSP_PASSWORD => 'Password: ',
+            };
+
+            # Since RSP_PASSWORD is a response and contains the word "password",
+            # the response is not echoed to the TTY.
+            #
+            # RSP_PASSWORD->readmode('noecho') is implied.
+
+            1;
+
+            # Package in which messages are required.
+            #
+            use My::App::MsgRepo qw/INF_GREETING RSP_USERNAME RSP_PASSWORD/;
+            use DBI;
+
+            INF_GREETING;       # Pleasantries
+            RSP_USERNAME;       # Prompt for and fetch username
+            RSP_PASSWORD;       # Prompt for and fetch password
+
+            $dbh = DBI->connect( 'dbi:mysql:test;host=127.0.0.1',
+                RSP_USERNAME->response, RSP_PASSWORD->response )
+              or die $DBI::errstr;
+
+   severity
+        MESSAGE_ID->severity( $severity_int );
+        MESSAGE_ID->severity( $long_or_short_type_str );
+        $severity_int = MESSAGE_ID->severity;
+
+    (An alias for the "level" method.)
+
+   template
+        MESSAGE_ID->template( $format_or_text_str );
+        $format_or_text_str = MESSAGE_ID->template;
+
+    Sets or gets the message template. The template may be a plain string of
+    text, or it may be a "sprintf" format containing parameter placeholders.
+
+    Example
+            # Redefine our message templates.
+
+            INF_GREETING->template('Ich bin völlig funktionsfähig, und alle meine '
+                . 'Schaltungen sind perfekt funktioniert.');
+            CRT_NO_CAN_DO->template('Tut mir leid, %s. Ich fürchte, ich kann das '
+                . 'nicht tun.');
+    
+            # Some time later...
+    
+            INF_GREETING;
+            CRT_NO_CAN_DO('Dave');
+
+   to_string
+        $output_or_template_str = MESSAGE_ID->to_string;
+
+    Gets the string value of the message. If the message has been issued
+    then you get the message output, complete with any message parameter
+    values. If the message has not yet been issued then the message template
+    is returned.
+
+    Message objects overload the stringification operator ("") and it is
+    this method that will be called whenever the string value of a message
+    is required.
+
+    Example
+            print INF_GREETING->to_string . "\n"; 
+    
+            # Or, embrace your inner lazy:
+
+            print INF_GREETING . "\n";
+
+   type
+        MESSAGE_ID->type( $long_or_short_type_str );
+        $short_type_str = MESSAGE_ID->type;
+
+    Gets or sets a message's type characteristics, which includes its
+    severity level.
+
+    Example
+            # Check my message's type
+
+            $code = NTC_FAULT->type;    # Returns "N"
+
+            # Have my notice behave more like a warning.
+
+            NTC_FAULT->type('W');
+            NTC_FAULT->type('WARNING');
+
+   verbosity
+        MESSAGE_ID->type( $severity_int );
+        MESSAGE_ID->type( $long_or_short_type_str );
+        $severity_int = MESSAGE_ID->verbosity;
+
+    Gets or sets the level above which messages will not be issued. Messages
+    above this level may still be generated and their values are still
+    usable, but they are silenced.
+
+    *You cannot set the verbosity level to a value lower than a standard
+    Type E (Error) message.*
+
+    Example
+            # Only issue Alert, Critical, Error and Warning messages.
+
+            message->verbosity('WARNING');  # Or ...
+            message->verbosity('W');        # Or ...
+            message->verbosity(4);
+
+   overloaded ""
+        $output_or_template_str = MESSAGE_ID;
+
+    Message objects overload Perl's *stringify* operator, calling the
+    "to_string" method.
+
+MESSAGE TYPES
+    Messages come in nine great flavours, each identified by a single-letter
+    type code. A message's type represents the severity of the condition
+    that would cause the message to be issued:
+
+   Type Codes
+        Type  Alt   Level /   Type
+        Code  Type  Priority  Description
+        ----  ----  --------  ---------------------
+        A     ALT      1      Alert
+        C     CRT      2      Critical
+        E     ERR      3      Error
+        W     WRN      4      Warning
+        N     NTC      5      Notice
+        I     INF      6      Info
+        D     DEB      7      Debug (or diagnostic)
+        R     RSP      1      Response
+        M     MSG      6      General message
+
+  How messages are assigned a type
+    When a message is defined an attempt is made to discern its type by
+    examining it for a series of clues in the message's identifier:
+
+    Step 1: check for a suffix matching "/:([DRAWNMICE])$/"
+        The *type override* suffix spoils the fun by removing absolutely all
+        of the guesswork from the process of assigning type characteristics.
+        It is kind of ugly but removes absolutely all ambiguity. It is
+        somewhat special in that it does not form part of the message's
+        identifier, which is great if you have to temporarily re-type a
+        message but don't want to hunt down and change every occurrence of
+        its use.
+
+        This suffix is a great substitute for limited imaginative faculties
+        when naming messages.
+
+    Step 2: check for a suffix matching "/[_\d]([WINDCREAM])$/"
+        This step, like the following three steps, uses information embedded
+        within the identifier to determine the type of the message. Since
+        message ids are meant to be mnemonic, at least some attempt should
+        be made by message authors to convey purpose and meaning in their
+        choice of id.
+
+    Step 3: check for a prefix matching "/^([RANCIDMEW])[_\d]/"
+    Step 4: check for a suffix matching "/(*ALTERNATION*)$/", where the
+    alternation set is comprised of long type codes (see "Long Type Codes").
+    Step 5: check for a prefix matching "/^(*ALTERNATION*)/", where the
+    alternation set is comprised of long type codes (see "Long Type Codes").
+    Step 6: as a last resort the message is characterised as Type-M (General
+    Message).
+
+   Long Type Codes
+    In addition to single-letter type codes, some longer aliases may under
+    some circumstances be used in their stead. This can and does make some
+    statements a little less cryptic.
+
+    We can use one of this package's protected methods ("_types_by_alias")
+    to not only list the type code aliases but also reveal type code
+    equivalence:
+
+        use Test::More;
+        use Data::Dumper::Concise;
+        use Message::String;
+    
+        diag Dumper( { message->_types_by_alias } );
+    
+        # {
+        #   ALERT => "A",
+        #   ALR => "A",
+        #   ALT => "A",
+        #   CRIT => "C",
+        #   CRITICAL => "C",
+        #   CRT => "C",
+        #   DEB => "D",
+        #   DEBUG => "D",
+        #   DGN => "D",
+        #   DIAGNOSTIC => "D",
+        #   ERR => "E",
+        #   ERROR => "E",
+        #   FATAL => "C",
+        #   FTL => "C",
+        #   INF => "I",
+        #   INFO => "I",
+        #   INP => "R",
+        #   INPUT => "R",
+        #   MESSAGE => "M",
+        #   MISC => "M",
+        #   MSC => "M",
+        #   MSG => "M",
+        #   NOT => "N",
+        #   NOTICE => "N",
+        #   NTC => "N",
+        #   OTH => "M",
+        #   OTHER => "M",
+        #   OTR => "M",
+        #   PRM => "R",
+        #   PROMPT => "R",
+        #   RES => "R",
+        #   RESPONSE => "R",
+        #   RSP => "R",
+        #   WARN => "W",
+        #   WARNING => "W",
+        #   WNG => "W",
+        #   WRN => "W"
+        # }
+
+  Changing a message's type
+    Under exceptional conditions it may be necessary to alter a message's
+    type, and this may be achieved in one of three ways:
+
+    1. *Permanently,* by choosing a more suitable identifier.
+        This is the cleanest way to make such a permanent change, and has
+        only one disadvantage: you must hunt down code that uses the old
+        identifier and change it. Fortunately, "grep" is our friend and
+        constants are easy to track down.
+
+    2. *Semi-permanently,* by using a type-override suffix.
+            # Change NTC_FAULT from being a notice to a response, so that it 
+            # blocks for input. We may still use the "NTC_FAULT" identifier.
+
+            use message << 'EOF';
+            NTC_FAULT:R   I've just picked up a fault in the %s unit.
+            EOF
+
+        Find the original definition and append the type-override suffix,
+        which must match regular expression "/:[CREWMANID]$/", obviously
+        being careful to choose the correct type code. This has a cosmetic
+        advantage in that the suffix will be effective but not be part of
+        the the id. The disadvantage is that this can render any forgotten
+        changes invisible, so don't forget to change it back when you're
+        done.
+
+    3. *Temporarily,* at runtime, using the message's "type" mutator:
+            # I'm debugging an application and want to temporarily change
+            # a message named APP234I to be a response so that, when it displays,
+            # it blocks waiting for input -
+    
+            APP234I->type('R');         # Or, ...
+            APP234I->type('RSP');       # Possibly much clearer, or ...
+            APP234I->type('RESPONSE');  # Clearer still
+
+WHISTLES, BELLS & OTHER DOODADS
+  Customising message output
+    Examples shown below operate on a pragma level, which affects all
+    messages.
+
+    Any particular message may override any of these settings simply by
+    replacing "message" with "*MESSAGE_ID*".
+
+   Embedding timestamps
+        # Get or set the default timestamp format
+        $strftime_format_strn = message->_default_timestamp_format;
+        message->_default_timestamp_format($strftime_format_str);
+    
+        # Don't embed time data in messages of specified type
+        message->_type_timestamp($type_str, '');
+
+        # Embed time data in messages of specified type, using default format
+        message->_type_timestamp($type_str, 1);
+    
+        # Embed time data in messages of specified type, using specified format
+        message->_type_timestamp($type_str, $strftime_format_str);
+
+        # Don't Embed time data in ANY message types.
+        message->_type_timestamp('');
+
+        # Embed time data in ALL message types, using default format
+        message->_type_timestamp(1);
+
+   Embedding type information
+        # Embed no additional type info in messages of a type
+        message->_type_tlc($type_str, '');
+
+        # Embed additional type info in messages of a type (3-letters max)
+        message->_type_tlc($type_str, $three_letter_code_str);
+
+        # Example
+        message->_type_tlc('I', 'INF');
+
+   Embedding the message id
+        # Embed or don't embed message ids in a type of message 
+        message->_type_id($type_str, $bool);
+    
+        # Embed or don't embed message ids in all types of message 
+        message->_type_id($bool);
+
+REPOSITORY
+    * <https://github.com/cpanic/Message-String>
+
+    * <http://search.cpan.org/dist/Message-String/lib/Message/String.pm>
+
+BUGS
+    Please report any bugs or feature requests to "bug-message-string at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Message-String>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Message::String
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Message-String>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Message-String>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Message-String>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Message-String/>
+
+ACKNOWLEDGEMENTS
+    Standing as we all do from time to time on the shoulders of giants:
+
+    Dave Rolsky*, et al.*
+        For DateTime
+
+    Graham Barr*, et al.*
+        For Scalar::Util and Sub::Util
+
+    Jens Reshack*, et al.*
+        For List::MoreUtils.
+
+    Austin Schutz & Todd Rinaldo
+        For IO::Stty.
+
+    Ray Finch
+        For Clone
+
+    Robert Sedlacek*, et al.*
+        For namespace::clean
+
+AUTHOR
+    Iain Campbell <cpanic@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2015 by Iain Campbell.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

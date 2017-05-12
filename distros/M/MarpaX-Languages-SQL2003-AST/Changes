@@ -1,0 +1,73 @@
+Changelog for MarpaX-Languages-SQL2003-AST
+
+0.005 2014-12-15T18:14:38
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - xt
+ - bin/sql2003ast: fix when file is -
+ - Fix sub-grammars for strings where inner is empty
+ - Removed production <embedded SQL host program>, assuming all host
+   programs start with EXEC SQL
+ - Allow balanced parenthesis in generic host identifier
+ - A More generic host identifier
+ - bin/sql2003ast: POD spelling error
+
+0.004 2014-12-14T15:30:23Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.004
+ - POD dev+
+ - POD dev+
+ - POD dev+
+ - bin/sql2003toxml -> bin/sql2003ast + more POD
+ - Call Marpas native parse() method unless $ENV{TEST_DEBUG}
+ - More tests
+ - Revisit Host identifiers
+ - qualified asterisk dev+
+
+0.003 2014-12-13T21:15:36Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.003
+ - t/all_tests.c: commented trace_terminals
+ - Period causes trouble
+ - XML::LibXML and UTF8 flag
+
+0.002 2014-12-13T12:51:45Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.002
+ - schema name fixes
+ - bin/sql2003toxml
+ - For release
+ - t/all_tests.t: re-enable full statements tests
+
+0.001 2014-12-13T11:18:46Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Signed Numeric Literal reversal
+ - Remove temporary <000> test
+ - Signed numeric literals
+ - Character String Literal: dev+
+ - National Character String: dev+
+ - General Literal: t+
+ - Do not say that multiplier is a <token>
+ - AST/Actions.pm: renamed _unicodeValue to
+   _unicodeDelimitedIdentifierValue
+ - AST/Actions.pm: removed a bad comment
+ - Unicde Delimited Identifier fix v.s. separator
+ - UESCAPE post-processing
+ - etc/bnf2marpa.pl: action semantic
+ - Actions: subclassing dev+
+ - Large Object Length
+ - dev+
+ - dev+
+ - dev+
+ - String Literal: dev+
+ - t+
+ - SQL2003/AST.pm: parse -> _parse_debug for my private usage
+ - t/all_tests.t: removed trace_terminals
+ - Quoted String Literal fixed
+ - dev+
+ - Packaging: dev+
+ - SQL2003/AST.pm: fix lexeme generated name
+ - etc/bnf2marpa.pl: fix lexeme generated name
+ - Preparation
+ - Dist::Zilla configuration
+ - .git configuration
+

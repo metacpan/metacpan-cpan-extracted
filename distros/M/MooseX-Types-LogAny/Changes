@@ -1,0 +1,14 @@
+Revision history for MooseX-Types-LogAny
+
+0.001003  2015-02-10
+	- try to fix cpantesters failing tests
+
+0.001002  2015-02-08
+	- deprecate module
+	- fix module for Log::Any 1.03
+
+0.001001  2013-05-02
+	- correct dependency version of Perl and Class::Load
+
+0.001000  2013-04-09
+	- initial release

@@ -1,0 +1,16 @@
+lib/Mojolicious/Plugin/MailException.pm
+Makefile.PL
+MANIFEST
+README
+t/010-tplugun.t
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/libmojolicious-plugin-mailexception-perl.docs
+debian/rules
+debian/source/format
+debian/watch
+Changes
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

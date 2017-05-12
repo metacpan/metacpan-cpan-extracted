@@ -1,0 +1,8 @@
+Revision history for Perl extension Math::GMatrix.
+
+0.1   Wed Feb  4 09:33:55 2004
+	- original version; created by h2xs 1.21 with options
+		-X -n Math::GMatrix
+0.2   Wed Feb  5 10:45:55 2004
+	- added docs and test script
+

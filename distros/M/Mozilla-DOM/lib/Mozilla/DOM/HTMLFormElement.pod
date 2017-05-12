@@ -1,0 +1,149 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLFormElement
+
+=for object Mozilla::DOM::HTMLFormElement
+
+Mozilla::DOM::HTMLFormElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLFormElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLFormElement interface is the interface to a [X]HTML
+ * form element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLFormElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $acceptcharset = $htmlformelement->B<GetAcceptCharset>()
+
+=head2 $htmlformelement->B<SetAcceptCharset>($acceptcharset)
+
+=over
+
+=over
+
+=item * $acceptcharset (string)
+
+=back
+
+=back
+
+=head2 $action = $htmlformelement->B<GetAction>()
+
+=over
+
+=back
+
+=head2 $htmlformelement->B<SetAction>($action)
+
+=over
+
+=over
+
+=item * $action (string)
+
+=back
+
+=back
+
+=head2 $enctype = $htmlformelement->B<GetEnctype>()
+
+=head2 $htmlformelement->B<SetEnctype>($enctype)
+
+=over
+
+=over
+
+=item * $enctype (string)
+
+=back
+
+=back
+
+=head2 $method = $htmlformelement->B<GetMethod>()
+
+=head2 $htmlformelement->B<SetMethod>($method)
+
+=over
+
+=over
+
+=item * $method (string)
+
+=back
+
+=back
+
+=head2 $name = $htmlformelement->B<GetName>()
+
+=head2 $htmlformelement->B<SetName>($name)
+
+=over
+
+=over
+
+=item * $name (string)
+
+=back
+
+=back
+
+=head2 $target = $htmlformelement->B<GetTarget>()
+
+=head2 $htmlformelement->B<SetTarget>($target)
+
+=over
+
+=over
+
+=item * $target (string)
+
+=back
+
+=back
+
+=head2 $elements = $htmlformelement->B<GetElements>()
+
+$elements is a L<Mozilla::DOM::HTMLCollection|Mozilla::DOM::HTMLCollection>.
+
+In list context, returns a list of L<Mozilla::DOM::Node|Mozilla::DOM::Node>.
+(See DOM 2 HTML spec.) I'm guessing you can QueryInterface this to
+HTMLElement, but I leave that to you:
+
+  $iid = Mozilla::DOM::HTMLElement->GetIID;
+  $htmlelement = $node->QueryInterface($iid);
+
+=head2 $length = $htmlformelement->B<GetLength>()
+
+Number of elements returned by GetElements.
+
+=head2 $htmlformelement->B<Reset>()
+
+Reset inputs to their default values.
+
+=head2 $htmlformelement->B<Submit>()
+
+Submits the <form>, but doesn't trigger the onSubmit event.
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

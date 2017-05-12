@@ -1,0 +1,173 @@
+Revision history for Perl extension MIME::Explode.
+
+0.39  Sun Jun 26 21:21:26 WEST 2011
+	- Internal changes in XS file. The global variable "na" has changed
+	  to "PL_na" and the "sv_undef" variable to "PL_sv_undef".
+	  Thanks to Pascal Terjan for the patch.
+
+0.38  Mon Jun  5 15:05:22 WEST 2006
+	- Several serious memory leaks were fixed.
+	  Thanks to Bryan Henderson <bryanh@giraffe-data.com>
+
+0.37  Tue Oct 26 19:23:34 WEST 2004
+	- The deep recursion on subroutine "MIME::Explode::_parse" has
+	  been fixed.
+
+0.36  Thu Jul 29 14:11:04 WEST 2004
+	- Updated the XS _rfc822_base64 function.
+	- A bug in XS exp_decode_content function was fixed (spaces and
+	  new lines in base64 encoding lines dont stop more the decoding
+	  process).
+
+0.35  Fri May 28 17:28:19 WEST 2004
+	- A "init" private method was added to create a directory if
+	  the keyword "output_dir" is given.
+	- The "clean_all" method were also added to clean the "output_dir"
+	  directory.
+	- The default value of keyword "mkdir" has been set to octal
+	  value "0755".
+	- A small bugfix has been applied to the "documentation" (pod).
+
+0.34  Tue May 25 20:02:30 WEST 2004
+	- This version fixes a bug in "uu" decode function.
+
+0.33  Tue May 25 12:01:32 WEST 2004
+	- New keywords ("content_types" and "types_action") have been
+	  added to the constructor function.
+	- Internal changes in XS file.
+	- The documentation has been updated.
+
+0.32  Sat May 22 16:37:38 WEST 2004
+	- This release adds support to detect the mime type "image/bmp".
+	- Small code cleanup.
+
+0.31  Thu May  6 18:44:57 WEST 2004
+	- This version fixes a bug in header parser when it finds a line
+	  only with spaces. The parser don't treat it as the end of header
+	  any more.
+
+0.30  Mon May  3 15:07:22 WEST 2004
+	- The problem with points in headers has been fixed.
+
+0.29  Tue Jan 27 16:47:42 WET 2004
+	- Now in multipart messages, incomplete headers are discarded.
+
+0.28  Tue Nov  4 17:10:28 WET 2003
+	- This version fixes another "bug" in base64 decoding function 
+	  when the encoded lines have spaces in end.
+
+0.27  Tue Sep  9 14:27:24 WEST 2003
+	- The problem in file attachments names without quotations
+	  marks has been fixed.
+
+0.26  Fri Sep  5 15:54:23 WEST 2003
+	- This version fixes a bug in file attachments with semicolons in
+	  their names.
+
+0.25  Tue Aug  5 19:40:10 WEST 2003
+	- The problem with tabs in headers has been fixed
+
+0.24  Fri Jun 20 14:43:49 WEST 2003
+	- This version fixes a bug that caused failures when filename have 
+	  only spaces.
+
+0.23  Mon Jun 16 13:36:35 WEST 2003
+	- Use of uninitialized value in internal _parse function has been
+	  fixed.
+	- Code cleanup.
+
+0.22  Tue May  6 10:36:39 WEST 2003
+	- A problem when decoding quoted-printable subjects was fixed.
+
+0.21  Tue Apr 22 19:15:21 WEST 2003
+	- Fixed another "bug" in base64 decoding function.
+	  Thanks to Alexey Flegontov <flegontov@mosinfo.ru>
+
+0.20  Thu Apr 10 15:34:42 WEST 2003
+	- Segmentation fault in base64 decoding function have been fixed.
+
+0.19  Mon Mar 17 17:25:23 WET 2003
+	- This release fixes the bug where reading a mailbox without new 
+	  line between end of message and mailbox line separator.
+
+0.18  Tue Feb 25 10:46:27 WET 2003
+	- now, the line with "unistd.h" is not included in win32
+
+0.17  Mon Feb 24 14:32:25 WET 2003
+	- a problem with "$_" perl global variable has been fixed with 
+	  local()
+
+0.16  Mon Feb 10 12:23:59 WET 2003
+	- fixed a "bug" in messages with "message/rfc822" content type
+
+0.15  Mon Dec 23 19:08:28 WET 2002
+	- a problem with uuencoded messages without "end" termination has
+	  been fixed.
+
+0.14  Fri Dec 13 15:42:54 WET 2002
+	- fix for fgets to avoid occasional core dump in RedHat 8.0.
+	  The fgets function was replaced with perl sv_gets function.
+
+0.13  Mon Dec  9 16:38:51 WET 2002
+	- the problem with quoted-printable messages without boundary 
+	  termination has been fixed.
+
+0.12  Mon Nov 25 13:31:54 WET 2002
+	- fixed another "problem" when a mailboxes with a message without
+	  boundary termination is parsed.
+	- new test mailbox hash been added to testmsg directory
+
+0.11  Mon Nov 18 11:49:13 WET 2002
+	- lots of minor bugs was fixed.
+	- the functions tell and seek has been removed because not work
+	  with STDIN filehandle.
+	- new test messages has been added to testmsg directory
+
+0.10  Thu Nov 14 15:17:53 WET 2002
+	- fixed a "bug" in messages with false boundary termination.
+	- the problem with spaces in header names was fixed.
+
+0.09  Thu Aug 29 17:33:18 WEST 2002
+	- corrected obvious text error in README and Explode.pm files
+	  Thanks to Helena Gomes <hpgomes@mail.pt>
+
+0.08  Tue Aug 27 12:49:29 WEST 2002
+	- fixed another "bug" with number of parsed messages
+
+0.07  Sat Aug 24 17:12:02 WEST 2002
+	- fixed the problem with number of parsed messages in "nmsg"
+	  method
+	- fixed a "bug" in documentation
+
+0.06  Fri Aug 23 13:00:53 WEST 2002
+	- fixed the problem with the wrong headers
+	  (1: X-Mailer: Microsoft Outlook Express 5.50.4522.1200)
+	- the problem with messages from "Mac" without "--boundary--"
+	  string as fixed
+	- added "nmsgs" method
+	- some bugs were fixed
+	- code cleanup in "explode.pl" example script
+	- updated the documentation
+
+0.05  Tue Aug 20 11:26:14 WEST 2002
+	- fixed the problem with rfc822_qprint and rfc822_base64 functions
+	- added new file to testmsgs directory
+
+0.04  Sat Aug  3 16:08:39 WEST 2002
+	- documentation update
+	- added "decode_subject" keyword to "new" method
+	- minor changes in example/explode.pl script
+
+0.03  Wed Jul 31 12:29:34 WEST 2002
+	- minor bugfixes in Explode.xs
+	- now, decode quoted-printable files
+	- fixed the problem with file names
+	- the problems resulting from running scripts in taint mode (-T)
+	  was resolved.
+
+0.02  Sat Jul 27 15:15:40 WEST 2002
+	- code cleanup
+	- now, "x-received" header is acceded via array reference
+
+0.01  Sat Jul 20 17:40:18 WEST 2002
+	- original version; created by h2xs 1.19

@@ -1,0 +1,125 @@
+NAME
+    Module::Build::Debian - Module::Build extension to build .deb packages
+    using "dh-make-perl".
+
+VERSION
+    This document describes Module::Build::Debian version 1.0.0.
+
+SYNOPSIS
+        # In your Module::Build subclass:
+
+            # We use eval because we only want the feature if
+            # Module::Build::Debian is actually installed.
+            BEGIN {
+                eval 'use Module::Build::Debian';
+            }
+
+        # Then, you can use Build.PL to create a debian package of the module: 
+    
+            $ perl Build.PL
+    
+            $ ./Build debian
+    
+            $ ./Build debianclean
+
+DESCRIPTION
+    This is a "Module::Build" extension that simplifies building Debian .deb
+    packages using "dh-make-perl". To use it, all you have to do is use the
+    module in your Module::Build subclass.
+
+Module::Build COMMANDS
+  "./Build debian"
+    Builds the a debian package of the module using "dh-make-perl". An
+    error-message is printed If <dh-make-perl> is not installed.
+
+  "./Build debianclean"
+    Removes temporary-files and history files created by "dh-make-perl"
+    after a "./Build debian".
+
+SUBROUTINES/METHODS
+  INSTANCE METHODS
+   "ACTION_debian()"
+    This is the method that is executed when you run "./Build debian".
+
+   "ACTION_debianclean()"
+    This is the method that is executed when you run "./Build debianclean".
+
+DIAGNOSTICS
+  "Can't find dh-make-perl (%s): $s.""
+    Apparently, "dh-make-perl" is missing from your system.
+
+    You can install "dh-make-perl" with apt-get:
+
+        sudo apt-get install dh-make-perl
+
+CONFIGURATION AND ENVIRONMENT
+  ENVIRONMENT VARIABLES
+    By default it fetches the author's name and e-mail address from the POD
+    of the module, but you can also set name and email with the following
+    environment variables:
+
+   "DEBFULLNAME"
+    The debian package author's full name.
+
+   "DEBEMAIL"
+    The debian package author's e-mail address.
+
+DEPENDENCIES
+    * Module::Build
+    * version
+
+INCOMPATIBILITIES
+    None known.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to
+    "bug-module-build-debian@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
+
+SEE ALSO
+    * dh-make-perl
+        Program to create debian packages out of perl module-distributions
+        using "Module::Build" or "ExtUtils::MakeMaker".
+
+    * Module::Build
+        The Module::Build perldoc documentation.
+
+    * Module::Build::Cookbook
+        The Module::Build cookbook.
+
+AUTHOR
+    Ask Solem, "ask@0x61736b.net".
+
+LICENSE AND COPYRIGHT
+    Copyright (c), 2007 Ask Solem "ask@0x61736b.net".
+
+    All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.6 or, at
+    your option, any later version of Perl 5 you may have available.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

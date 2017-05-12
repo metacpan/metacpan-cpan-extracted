@@ -1,0 +1,67 @@
+Revision history for Module-CoreList-More
+
+0.08    2016-02-17 (PERLANCAR)
+
+        - No functional changes.
+
+        - Some code refactoring.
+
+        - More wantarray test cases for first_release [fecundf].
+
+
+0.07    2015-05-07 (PERLANCAR)
+
+        - Add our version of removed_from & removed_from_by_date (which are
+          faster than Module::CoreList's version).
+
+        - [Bugfix] first_release() & first_release_by_date() were returning
+          (undef) instead of empty list in list context when the result is
+          negative.
+
+
+0.06    2015-05-06 (PERLANCAR)
+
+        - [Bugfix] Make our own %delta from Module::CoreList's (our version is
+          "linearized" so we can now correctly iterate %delta by sorted key),
+          also make our own %released [GH-3].
+
+        - Add our version of first_release & first_release_by_date (which are
+          faster than Module::CoreList's version).
+
+        - Incorporate version number cleanup and refactoring work by
+          github:fecundf to remove duplicate code. This is an ongoing work. I
+          expect to factor out common code as we add more functions.
+
+
+0.05    2015-04-23 (PERLANCAR)
+
+	- Workaround to turn off version->parse warning when encountering
+	  version strings with trailing space e.g. '1.15 ' in
+	  %Module::CoreList::delta.
+
+	- bench: Label our is_core() with MCM->is_core to be less
+	  ambiguous.
+
+	- Reformat bench so result is not too wide.
+
+
+0.04    2015-04-14 (PERLANCAR)
+
+        - Add is_core(), list_core_modules().
+
+
+0.03    2015-04-14 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Add Benchmark section showing benchmark result.
+
+
+0.02    2015-04-14 (PERLANCAR)
+
+	- Add function: list_still_core_modules.
+
+
+0.01     2015-04-11 (PERLANCAR)
+
+         - First release.

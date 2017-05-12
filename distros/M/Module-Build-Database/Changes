@@ -1,0 +1,98 @@
+Revision history for Module-Build-Database
+
+0.57   Tue Mar 24 21:04:25 EDT 2015
+       Fixes for test failures. 
+
+0.56   Mon Mar 23 21:45:37 EDT 2015
+       Removed unused dependency, fixed pod template
+
+0.55   Sun Oct 19 15:53:18 EDT 2014
+       Put $VERSION everywhere to fix issues with cpan and old MBD versions
+
+0.54   Sun Oct 19 15:32:25 EDT 2014
+       Made dbdist use base_data.sql
+
+0.53   Mon Jun  9 11:13:42 EDT 2014
+       scratch database options (gollis)
+
+0.52   Thu May 29 12:27:59 MDT 2014
+       Fixed bug from last release.
+
+0.51   Wed May 21 12:27:25 MDT 2014
+       Leave temp files for errors (gollis)
+       Fixes for 9.3 (bduggan)
+       Fixes for travis (gollis + bduggan)
+
+0.50   Sun Aug 25 08:34:08 EDT 2013
+       Updated min perl version
+
+0.49   Sat Aug 17 12:35:08 EDT 2013
+       plperl, multiple schemas, docs (gollis)
+
+0.48   Tue Jul 30 08:27:25 EDT 2013
+       Languages option for postgres (gollis)
+
+0.47   Fri Jul 12 09:15:20 EDT 2013
+       Renamed post_initdb to after_create,
+       and run it for a fresh install.
+
+0.46   Tue Jun 25 12:04:20 EDT 2013
+       put it back (gollis)
+
+0.45   Tue Jun 25 07:51:08 EDT 2013
+       removed use of File::Which
+
+0.44   Mon Jun 24 10:03:30 EDT 2013
+       fixed dependencies
+
+0.43   Sun Jun 23 08:17:26 EDT 2013
+       deps, ubuntu compatibility (gollis)
+
+0.42   Fri Jun 14 14:20:21 EDT 2013
+       added post_initdb
+
+0.41   Fri Jun 14 14:19:48 EDT 2013
+       added append_to_conf
+
+0.40   Mon Feb 25 09:00:56 EST 2013
+       Documentation fixups (gollis)
+
+0.39   Fri Oct 26 09:52:24 EDT 2012
+       no silent_mode in postgres 9.2 (gollis)
+
+0.38   Tue Oct 16 15:20:07 EDT 2012
+       fix for --install_path (gollis)
+
+0.37   Tue Oct 16 14:58:56 EDT 2012
+       dbplant fixes
+
+0.36   Fri Sep 21 12:03:24 EDT 2012
+       dbplant
+       strip schema name in alter statements
+
+0.35   Wed Sep 12 12:06:28 EDT 2012
+       Use pg_ctl instead of postgres executable.
+
+0.34   Wed Sep 12 08:05:37 EDT 2012
+       Skip tests when run as root.
+
+0.33   Mon Aug 27 10:52:34 EDT 2012
+       Improved prerequisite list.
+
+0.32   Wed Aug 22 10:40:06 EDT 2012
+       More test improvements.
+
+0.31    Mon Aug 20 17:09:07 EDT 2012
+        Check for unix domain socket instead
+        of using postgres log to see if the
+        server has started.
+
+0.30    Sat Aug 18 19:05:16 EDT 2012
+        Improved tests.
+
+0.29    Fri Aug 17 10:12:47 EDT 2012
+        Improved SQLite support.
+
+0.28    Thu Aug 16 12:50:42 EDT 2012
+        First release.
+

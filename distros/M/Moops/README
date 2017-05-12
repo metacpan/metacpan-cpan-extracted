@@ -1,0 +1,608 @@
+NAME
+    Moops - Moops Object-Oriented Programming Sugar
+
+SYNOPSIS
+       use Moops;
+   
+       role NamedThing {
+          has name => (is => "ro", isa => Str);
+       }
+   
+       class Person with NamedThing;
+   
+       class Company with NamedThing;
+   
+       class Employee extends Person {
+          has job_title => (is => "rwp", isa => Str);
+          has employer  => (is => "rwp", isa => InstanceOf["Company"]);
+      
+          method change_job ( Object $employer, Str $title ) {
+             $self->_set_job_title($title);
+             $self->_set_employer($employer);
+          }
+      
+          method promote ( Str $title ) {
+             $self->_set_job_title($title);
+          }
+       }
+
+STATUS
+    Unstable.
+
+    Until version 1.000, stuff might change, but not without good reason.
+
+  Planned Changes
+    *   Support for using Function::Parameters to handle method signatures is
+        likely to be dropped.
+
+    *   Parameterized class and parameterized role support is planned.
+
+    *   The internals for parsing `class`, `role`, `namespace`, and `library`
+        may change to use Parse::Keyword rather than Keyword::Simple. This
+        will likely break any extensions that rely on subclassing or adding
+        traits to the Moops::Parser or Moops::Keyword classes.
+
+DESCRIPTION
+    Moops is sugar for declaring and using roles and classes in Perl.
+
+    The syntax is inspired by MooseX::Declare, and Stevan Little's
+    p5-mop-redux project (which is in turn partly inspired by Perl 6).
+
+    Moops has fewer than half of the dependencies as MooseX::Declare, loads in
+    about 25% of the time, and the classes built with it run significantly
+    faster. Moops does not use Devel::Declare, instead using Perl's pluggable
+    keyword API; *this requires Perl 5.14 or above*.
+
+    Moops uses Moo to build classes and roles by default, but allows you to
+    use Moose if you desire. (And Mouse experimentally.)
+
+  Classes
+    The `class` keyword declares a class:
+
+       class Foo {
+          # ...
+       }
+
+    A version number can be provided:
+
+       class Foo 1.2 {
+          # ...
+       }
+
+    If no version is provided, your class' $VERSION variable is set to the
+    empty string; this helps the package be seen by Class::Load.
+
+    If your class extends an existing class through inheritance, or consumes
+    one or more roles, these can also be provided when declaring the class.
+
+       class Foo::Bar 1.2 extends Foo 1.1 with Magic::Monkeys {
+          # ...
+       }
+
+    If you use Moops within a package other than `main`, then package names
+    used within the declaration are "qualified" by that outer package, unless
+    they contain "::". So for example:
+
+       package Quux;
+       use Moops;
+   
+       class Foo { }       # declares Quux::Foo
+   
+       class Xyzzy::Foo    # declares Xyzzy::Foo
+          extends Foo { }  # ... extending Quux::Foo
+   
+       class ::Baz { }     # declares Baz
+
+    If you wish to use Moose or Mouse instead of Moo; include that in the
+    declaration:
+
+       class Foo using Moose {
+          # ...
+       }
+
+    It's also possible to create classes `using Tiny` (Class::Tiny), but
+    there's probably little point in it, because Moops uses Moo internally, so
+    the more capable Moo is already loaded and in memory.
+
+    (The `using` option is exempt from the package qualification rules
+    mentioned earlier.)
+
+    Moops uses MooseX::MungeHas in your classes so that the `has` keyword
+    supports some Moo-specific features, even when you're using Moose or
+    Mouse. Specifically, it supports `is => 'rwp'`, `is => 'lazy'`, `builder
+    => 1`, `clearer => 1`, `predicate => 1`, and `trigger => 1`. If you're
+    using Moo, the MooX::late extension is enabled too, which allows
+    Moose-isms in Moo too. With the combination of these features, there
+    should be very little difference between Moo, Mouse and Moose `has`
+    keywords.
+
+    Moops uses Lexical::Accessor to provide you with private (lexical)
+    attributes - that is, attributes accessed via a coderef method in a
+    lexical variable.
+
+       class Foo {
+          lexical_has foo => (
+             isa      => Int,
+             accessor => \(my $_foo),
+             default  => 0,
+          );
+          method increment_foo () {
+             $self->$_foo( 1 + $self->$_foo );
+          }
+          method get_foo () {
+             return $self->$_foo;
+          }
+       }
+   
+       my $x = Foo->new;
+       $x->increment_foo();     # ok
+       say $x->get_foo();       # says "1"
+       $x->$_foo(42);           # dies; $_foo does not exist in this scope
+
+    Moose classes are automatically accelerated using MooseX::XSAccessor if
+    it's installed.
+
+    Note that it is possible to declare a class with an empty body; use a
+    trailing semicolon.
+
+       class Employee extends Person with Employment;
+
+    If using Moose or Mouse, classes are automatically made immutable.
+
+    namespace::autoclean is automatically used in all classes.
+
+    Between the class declaration and its body, Attribute::Handlers-style
+    attributes may be provided:
+
+       class Person :mutable {
+          # ...
+       }
+   
+       class Employee extends Person with Employment :mutable;
+
+    The following attributes are defined for classes:
+
+    *   `:assertions` - enables assertion checking (see below)
+
+    *   `:dirty` - suppresses namespace::autoclean
+
+    *   `:fp` - use Function::Parameters instead of Kavorka
+
+    *   `:mutable` - suppresses making Moose classes immutable
+
+    *   `:ro` - make attributes declared with `has` default to 'ro'
+
+    *   `:rw` - make attributes declared with `has` default to 'rw'
+
+    *   `:rwp` - make attributes declared with `has` default to 'rwp'
+
+  Roles
+    Roles can be declared similarly to classes, but using the `role` keyword.
+
+       role Stringable
+          using Moose     # we know you meant Moose::Role
+       {
+          # ...
+       }
+
+    Roles do not support the `extends` option.
+
+    Roles can be declared to be `using` Moo, Moose, Mouse or Tiny. (Note that
+    if you're mixing and matching role frameworks, there are limitations to
+    which class builders can consume which roles. Mouse is generally the least
+    compatible; Moo and Moose classes should be able to consume each others'
+    roles; Moo can also consume Role::Tiny roles.)
+
+    If roles use Moo, the MooX::late extension is enabled.
+
+    namespace::autoclean is automatically used in all roles.
+
+    Roles take similar Attribute::Handlers-style attributes to classes, but
+    don't support `:mutable`.
+
+   A note on consuming roles
+    In a standard:
+
+       class MyClass with MyRole {
+          ...;
+       }
+
+    You should note that role composition is delayed to happen at the *end* of
+    the class declaration. This is usually what you want.
+
+    However the interaction between method modifiers and roles is complex, and
+    *sometimes* you'll want the role to be applied to the class part-way
+    through the declaration. In this case you can use a `with` statement
+    *inside* the class declaration:
+
+       class MyClass {
+          ...;
+          with "MyRole";
+          ...;
+       }
+
+  Namespaces
+    The `namespace` keyword works as above, but declares a package without any
+    class-specific or role-specific semantics.
+
+       namespace Utils {
+          # ...
+       }
+
+    namespace::autoclean is not automatically used in namespaces.
+
+    Attribute::Handlers-style attributes are supported for namespaces, but
+    most of the built-in attributes make any sense without class/role
+    semantics. (`:assertions` does.) Traits written as Moops extensions may
+    support namespaces.
+
+  Functions and Methods
+    Moops uses Kavorka to declare functions and methods within classes and
+    roles. Kavorka provides the `fun` and `method` keywords.
+
+       class Person {
+          use Scalar::Util 'refaddr';
+      
+          has name => (is => 'rwp');    # Moo attribute
+      
+          method change_name ( Str $newname ) {
+             $self->_set_name( $newname )
+                unless $newname eq 'Princess Consuela Banana-Hammock';
+          }
+      
+          fun is_same_as ( Object $x, Object $y ) {
+             refaddr($x) == refaddr($y)
+          }
+       }
+   
+       my $phoebe = Person->new(name => 'Phoebe');
+       my $ursula = Person->new(name => 'Ursula');
+   
+       Person::is_same_as($phoebe, $ursula);   # false
+
+    Note function signatures use type constraints from Types::Standard;
+    MooseX::Types and MouseX::Types type constraints should also work,
+    *provided you use their full names, including their package*.
+
+    The `is_same_as` function above could have been written as a class method
+    like this:
+
+       class Person {
+          # ...
+          method is_same_as ( $class: Object $x, Object $y ) {
+             refaddr($x) == refaddr($y)
+          }
+       }
+   
+       # ...
+       Person->is_same_as($phoebe, $ursula);   # false
+
+    The `method` keyword is not provided within packages declared using
+    `namespace`; only within classes and roles.
+
+    See also Kavorka::Manual::Methods and Kavorka::Manual::Functions.
+
+    Within Moose classes and roles, the MooseX::KavorkaInfo module is loaded,
+    to allow access to method signatures via the meta object protocol. (This
+    is currently broken for `around` method modifiers.)
+
+    In Moops prior to 0.025, Function::Parameters was used instead of Kavorka.
+    If you wish to continue to use Function::Parameters in a class you can use
+    the `:fp` attribute:
+
+       class Person :fp {
+          ...;
+       }
+
+    Or to do so for all classes in a lexical scope:
+
+       use Moops function_parameters_everywhere => 1;
+       class Person {
+          ...;
+       }
+
+    Or the environment variable `MOOPS_FUNCTION_PARAMETERS_EVERYWHERE` can be
+    set to true to enable it globally, but this feature is likely to be
+    removed eventually.
+
+  Method Modifiers
+    Within classes and roles, `before`, `after` and `around` keywords are
+    provided for declaring method modifiers. These use the same syntax as
+    `method`.
+
+    If your class or role is using Moose or Mouse, then you also get `augment`
+    and `override` keywords.
+
+    See also Kavorka::Manual::MethodModifiers.
+
+  Multi Methods
+    Moops uses Kavorka to implement multi subs and multi methods.
+
+    See also Kavorka::Manual::MultiSubs.
+
+  Type Constraints
+    The Types::Standard type constraints are exported to each package declared
+    using Moops. This allows the standard type constraints to be used as
+    barewords.
+
+    Type constraints can be used in attribute definitions (`isa`) and method
+    signatures. Because Types::Standard is based on Type::Tiny, the same type
+    constraints may be used whether you build your classes and roles with Moo,
+    Moose our Mouse.
+
+    Alternative libraries can be imported using the `types` option; a la:
+
+       class Document types Types::XSD::Lite {
+          has title => (is => 'rw', isa => NormalizedString);
+       }
+
+    Note that if an alternative type constraint library is imported, then
+    Types::Standard is *not* automatically loaded, and needs to be listed
+    explicitly:
+
+       class Document types Types::Standard, Types::XSD::Lite {
+          # ...
+       }
+
+    Type libraries built with Type::Library, MooseX::Types and MouseX::Types
+    should all work.
+
+    Bear in mind that type constraints from, say, a MooseX::Types library
+    won't be usable in, say, Moo attribute definitions. However, it's possible
+    to wrap them with Type::Tiny, and make them usable:
+
+       class Foo types MooseX::Types::Common::Numeric using Moo {
+          use Types::TypeTiny qw( to_TypeTiny );
+      
+          has favourite_number => (
+             is  => 'rwp',
+             isa => to_TypeTiny(PositiveInt)
+          );
+       }
+
+  Type Libraries
+    You can use the `library` keyword to declare a new type library:
+
+       library MyTypes
+          extends Types::Standard
+          declares EmptyString, NonEmptyString {
+      
+          declare EmptyString,
+             as Str,
+             where { length($_) == 0 };
+      
+          declare NonEmptyString,
+             as Str,
+             where { length($_) > 0 };
+       }
+   
+       class StringChecker types MyTypes {
+          method check ( Str $foo ) {
+             return "empty" if EmptyString->check($foo);
+             return "non-empty" if NonEmptyString->check($foo);
+             return "impossible?!";
+          }
+       }
+
+    Libraries declared this way can extend existing type libraries written
+    with Type::Library, MooseX::Types or MouseX::Types.
+
+    Note that this also provides a solution to the previously mentioned
+    problem of using MooseX::Types type libraries in Moo classes:
+
+       library MyWrapper
+          extends MooseX::Types::Common::Numeric;
+   
+       class Foo types MyWrapper using Moo {
+          has favourite_number => (
+             is  => 'rwp',
+             isa => PositiveInt,
+          );
+       }
+
+  Constants
+    The useful constants `true` and `false` are imported into all declared
+    packages. (Within classes and roles, namespace::autoclean will later
+    remove them from the symbol table, so they don't form part of your
+    package's API.) These constants can help make attribute declarations more
+    readable.
+
+       has name => (is => 'ro', isa => Str, required => true);
+
+    Further constants can be declared using the `define` keyword (see
+    PerlX::Define):
+
+       namespace Maths {
+          define PI = 3.2;
+       }
+
+    Constants declared this way will *not* be swept away by
+    namespace::autoclean, and are considered part of your package's API.
+
+  Assertions
+    Declared packages can contain assertions (see PerlX::Assert). These are
+    normally optimized away at compile time, but you can force them to be
+    checked using the `:assertions` attribute.
+
+       class Foo {
+          assert(false);    # not checked; optimized away
+       }
+   
+       class Bar :assertions {
+          assert(false);    # checked; fails; throws exception
+       }
+
+  More Sugar
+    strict and FATAL warnings are imported into all declared packages. However
+    the `uninitialized`, `void`, `once` and `numeric` warning categories are
+    explicitly excluded, as are any warnings categories added to Perl after
+    version 5.14.
+
+    Perl 5.14 features, including the `state` and `say` keywords, and sane
+    Unicode string handling are imported into all declared packages.
+
+    Try::Tiny is imported into all declared packages.
+
+    Scalar::Util's `blessed` and Carp's `confess` are imported into all
+    declared packages.
+
+  Outer Sugar
+    The "outer" package, where the `use Moops` statement appears also gets a
+    little sugar: strict, the same warnings as "inner" packages, and Perl 5.14
+    features are all switched on.
+
+    true is loaded, so you don't need to do this at the end of your file:
+
+       1;
+
+  Custom Sugar
+    It is possible to inject other functions into all inner packages using:
+
+       use Moops imports => [
+          'List::Util'      => [qw( first reduce )],
+          'List::MoreUtils' => [qw( any all none )],
+       ];
+
+    This is by far the easiest way to extend Moops with project-specific
+    extras.
+
+    There is a shortcut for injecting strictures into all inner packages:
+
+       use Moops -strict;
+
+EXTENDING
+    Moops is written to hopefully be fairly extensible.
+
+  Extending Moops via imports
+    The easiest way to extend Moops is to inject additional imports into the
+    inner packages using the technique outlined in "Custom Sugar" above. You
+    can wrap all that up in a module:
+
+       package MoopsX::Lists;
+       use base 'Moops';
+       use List::Util ();
+       use List::MoreUtils ();
+   
+       sub import {
+          my ($class, %opts) = @_;
+      
+          push @{ $opts{imports} ||= [] }, (
+             'List::Util'      => [qw( first reduce )],
+             'List::MoreUtils' => [qw( any all none )],
+          );
+      
+          $class->SUPER::import(%opts);
+       }
+   
+       1;
+
+    Now people can do `use MoopsX::Lists` instead of `use Moops`.
+
+  Extending Moops via keyword traits
+    Roles in the `Moops::TraitFor::Keyword` namespace are automatically loaded
+    and applied to keyword objects when a corresponding
+    Attribute::Handlers-style attribute is seen.
+
+    For examples extending Moops this way, see the
+    Moops::TraitFor::Keyword::dirty, Moops::TraitFor::Keyword::mutable,
+    Moops::TraitFor::Keyword::ro, Moops::TraitFor::Keyword::rw and
+    Moops::TraitFor::Keyword::rwp traits.
+
+  Extending Moops via parser traits
+    For more complex needs, you can create a trait which will be applied to
+    Moops::Parser.
+
+    Parser traits might want to override:
+
+    *   The `keywords` class method, which returns the list of keywords the
+        parser can handle.
+
+    *   The `class_for_keyword` object method, which returns the name of a
+        subclass of Moops::Keyword which will be used for translating the
+        result of parsing the keyword into a string using Perl's built-in
+        syntax.
+
+    Hopefully you'll be able to avoid overriding the `parse` method itself, as
+    it has a slightly messy API.
+
+    Your `class_for_keyword` subclass can either be a direct subclass of
+    Moops::Keyword, or of Moops::Keyword::Class or Moops::Keyword::Role.
+
+    The keyword subclass might want to override:
+
+    *   The `known_relationships` class method, which returns a list of valid
+        inter-package relationships such as `extends` and `using` for the
+        current keyword.
+
+    *   The `qualify_relationship` class method, which, when given the name of
+        an inter-package relationship, indicates whether it should be
+        subjected to package qualification rules (like `extends` and `with`
+        are, but `using` is not).
+
+    *   The `version_relationship` class method, which, when given the name of
+        an inter-package relationship, indicates whether it should accept a
+        version number.
+
+    *   The `generate_package_setup` object method which returns a list of
+        strings to inject into the package.
+
+    *   The `arguments_for_function_parameters` object method which is used by
+        the default `generate_package_setup` method to set up the arguments to
+        be passed to Function::Parameters.
+
+    *   The `check_prerequisites` method which performs certain pre-flight
+        checks and may throw an exception.
+
+    Hopefully you'll be able to avoid overriding the `generate_code` method.
+
+    You can apply your trait using:
+
+       use Moops traits => [
+          'Moops::TraitFor::Parser::FooKeyword',
+          'Moops::TraitFor::Parser::BarKeyword',
+       ];
+
+BUGS
+    Please report any other bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Moops>.
+
+SUPPORT
+    IRC: support is available through in the *#moops* channel on irc.perl.org
+    <http://www.irc.perl.org/channels.html>.
+
+    For general Moose/Moo queries which don't seem to be related to Moops'
+    syntactic sugar, your question may be answered more quickly in the
+    *#moose* channel.
+
+    Web: if you ask a question on PerlMonks in Seekers of Perl Wisdom
+    <http://www.perlmonks.org/?node_id=479> with "Moops" in the subject line,
+    it should be answered pretty quickly.
+
+    There is a moops tag <http://stackoverflow.com/questions/tagged/moops> on
+    StackOverflow.
+
+SEE ALSO
+    Similar: MooseX::Declare, <https://github.com/stevan/p5-mop-redux>.
+
+    Main functionality exposed by this module: Moo/MooX::late, Kavorka,
+    Try::Tiny, Types::Standard, namespace::autoclean, true, PerlX::Assert.
+
+    Internals fueled by: Keyword::Simple, Module::Runtime, Import::Into,
+    Attribute::Handlers.
+
+    <http://en.wikipedia.org/wiki/The_Bubble_Boy_(Seinfeld)>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013-2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

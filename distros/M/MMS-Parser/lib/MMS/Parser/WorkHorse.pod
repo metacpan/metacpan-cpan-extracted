@@ -1,0 +1,42 @@
+=head1 NAME
+
+MMS::Parser::WorkHorse - what's behind MMS::Parser
+
+=head1 VERSION
+
+Refer to L<MMS::Parser>'s version.
+
+=head1 SYNOPSIS
+
+	use MMS::Parser::WorkHorse;
+   my $parser = MMS::Parser::WorkHorse->new();
+
+=head1 DESCRIPTION
+
+This module is what's behind MMS::Parser. It provides a L<new> method that
+lets you get a parser, which is B<exactly> what L<MMS::Parser::create>
+does:
+
+   my $parser = MMS::Parser->create();
+
+You shouldn't need to use this module directly.
+
+=head1 SUBROUTINES/METHODS
+
+The parser you get with the C<new> method below will be a
+L<Parse::RecDescent> parser, refer to this module's documentation
+for the additional methods.
+
+=over
+
+=item C<< my $parser = MMS::Parser->new(); >>
+
+Get a new parser (which is a L<Parse::RecDescent> parser).
+
+=back
+
+=head1 LICENCE AND COPYRIGHT
+
+See L<MMS::Parser>.
+
+=cut

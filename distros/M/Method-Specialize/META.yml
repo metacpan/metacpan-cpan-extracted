@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Method-Specialize
+version:             0.01
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Class::MethodCache:            0.02
+    namespace::clean:              0.08
+    Sub::Name:                     0.04
+    Test::use::ok:                 0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,171 @@
+# -*-c-*-
+#
+# $Id: 53MQINQMP-v7,v 36.3 2012/09/26 16:10:07 jettisu Exp $
+#
+# (c) 2009-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+SV*
+MQINQMP(Hconn,Hmsg,InqPropOpts,Name,PropDesc,Type,Length,CompCode,Reason)
+        MQHCONN Hconn
+        MQHMSG  Hmsg
+        SV     *InqPropOpts
+        SV     *Name
+        MQPD    PropDesc;
+        MQLONG  Type
+        MQLONG  Length
+        MQLONG  CompCode = NO_INIT
+        MQLONG  Reason = NO_INIT
+
+    PREINIT:
+        MQIMPO   inq_opts = {MQIMPO_DEFAULT};
+        MQCHARV  name = {MQCHARV_DEFAULT};
+        MQCHARV  name_dft = {MQPROP_INQUIRE_ALL};
+        MQLONG   data_len;
+        PMQBYTE  buffer = NULL;
+        MQBYTE   returned_name[MQ_MAX_PROPERTY_NAME_LENGTH];
+
+    CODE:
+        CompCode = MQCC_FAILED;
+        Reason = MQRC_UNEXPECTED_ERROR;
+        sv_setiv(ST(7),(IV)CompCode);
+        sv_setiv(ST(8),(IV)Reason);
+
+        /*
+         * We have to handle the InqPropOpts manually; contrary to the
+         * docs, it's an input/output parameter, and we need
+         * to allocate memory for the ReturnedName field and
+         * want to ignore some of the fields (reserved) on return.
+         */
+        if (!SvROK(InqPropOpts))
+            croak("Reference expected for parameter InqPropOpts");
+        if (hv_exists((HV*)SvRV(InqPropOpts),"Version",7))
+            inq_opts.Version = SvIV(*(hv_fetch((HV*)SvRV(InqPropOpts),
+                                               "Version",7,0)));
+        if (hv_exists((HV*)SvRV(InqPropOpts),"Options",7))
+            inq_opts.Options = SvIV(*(hv_fetch((HV*)SvRV(InqPropOpts),
+                                               "Options",7,0)));
+        if (hv_exists((HV*)SvRV(InqPropOpts),"RequestedEncoding",17))
+            inq_opts.RequestedEncoding = SvIV(*(hv_fetch((HV*)SvRV(InqPropOpts),
+                                                         "RequestedEncoding",17,0)));
+        if (hv_exists((HV*)SvRV(InqPropOpts),"RequestedCCSID",14))
+            inq_opts.RequestedCCSID = SvIV(*(hv_fetch((HV*)SvRV(InqPropOpts),
+                                                      "RequestedCCSID",14,0)));
+        inq_opts.ReturnedName.VSPtr = returned_name;
+        inq_opts.ReturnedName.VSBufSize = MQ_MAX_PROPERTY_NAME_LENGTH;
+        inq_opts.ReturnedName.VSCCSID = MQCCSI_APPL; /* Maybe UTF-8 */
+
+        /* Convert name from scalar to MCHARV, with INQUIRE_ALL as default */
+        if (SvPOK(Name)) {
+            char   *val;
+            STRLEN  len;
+
+            val = SvPV(Name, len);
+            if (len) {
+                name.VSPtr = val;
+                name.VSLength = len;
+                name.VSOffset = 0;
+                name.VSBufSize  = 0;
+                name.VSCCSID = MQCCSI_APPL; /* Maybe UTF-8 */
+            } else {
+                memcpy((char *)&name,&name_dft, sizeof(name));
+            }
+        } else {
+            croak("MQINQMP parameter 'Name' is not a string\n");
+        }
+
+        if ((buffer = (PMQBYTE)malloc(Length)) == NULL) {
+            warn("Unable to allocate buffer memory in MQINQMP!\n");
+            XSRETURN_EMPTY;
+        }
+        MQINQMP(Hconn,Hmsg,&inq_opts,&name,&PropDesc,&Type,Length,buffer,&data_len,&CompCode,&Reason);
+
+        /* Add the retun value fields from the InqPropOpts back to the hash */
+        hv_store((HV*)SvRV(InqPropOpts),"ReturnedEncoding",16,
+                 (newSViv(inq_opts.ReturnedEncoding)),0);
+        hv_store((HV*)SvRV(InqPropOpts),"ReturnedCCSID",13,
+                 (newSViv(inq_opts.ReturnedCCSID)),0);
+        if (inq_opts.ReturnedName.VSLength) {
+            STRLEN len;
+
+            if (inq_opts.ReturnedName.VSLength == MQVS_NULL_TERMINATED) {
+                len = strlen((const char *)returned_name);
+            } else {
+                len = inq_opts.ReturnedName.VSLength;
+            }
+            hv_store((HV*)SvRV(InqPropOpts),"ReturnedName",12,
+                     (newSVpv((const char *)returned_name,len)),0);
+        }
+        if (inq_opts.TypeString[0]) {
+            STRLEN len = mqstrnlen(inq_opts.TypeString, 8);
+            hv_store((HV*)SvRV(InqPropOpts),"TypeString",10,
+                     (newSVpv(inq_opts.TypeString, len)),0);
+        }
+
+        /* Handle the returned value, assuming MQCC_OK */
+        if (CompCode == MQCC_OK) {
+            /* Convert value, based on declared type*/
+            switch(Type) {
+            case MQTYPE_BOOLEAN: /* 4 bytes */
+                RETVAL = newSViv(*(PMQLONG)buffer);
+                break;
+            case MQTYPE_BYTE_STRING: /* zero size allowed */
+            case MQTYPE_STRING: /* zero size allowed */
+                if (data_len) {
+                    /* FIXME: test zero size does the right thing */
+                    RETVAL = newSVpvn((const char *)buffer,(data_len < Length ? data_len : Length));
+                } else {
+                    /* Return undef for zero-length strings and byte strings */
+                    RETVAL = newSV(0);
+                }
+                break;
+            case MQTYPE_INT8: /* 1 byte */
+                RETVAL = newSViv(*(PMQINT8)buffer);
+                break;
+            case MQTYPE_INT16: /* 2 bytes */
+                RETVAL = newSViv(*(PMQINT16)buffer);
+                break;
+            case MQTYPE_INT32: /* 4 bytes */
+                RETVAL = newSViv(*(PMQINT32)buffer);
+                break;
+            case MQTYPE_INT64: /* 8 bytes */
+                if (sizeof(IV) >= 8) {
+                    RETVAL = newSViv((IV)*(PMQINT64)buffer);
+                } else {
+                    /* On systems with 32-bit IV, return a string */
+                    char   printed_number[32];
+                    STRLEN len;
+
+                    sprintf(printed_number, "%" PRIdLEAST64, *(PMQINT64)buffer);
+                    len = strlen((const char *)printed_number);
+                    RETVAL = newSVpvn(printed_number,len);
+                }
+                break;
+            case MQTYPE_FLOAT32: /* 4 bytes */
+                RETVAL = newSVnv(*(PMQFLOAT32)buffer);
+                break;
+            case MQTYPE_FLOAT64: /* 8 bytes */
+                RETVAL = newSVnv(*(PMQFLOAT64)buffer);
+                break;
+            case MQTYPE_NULL: /* Must be zero bytes */
+                RETVAL = newSV(0);
+                break;
+            default:
+                croak("MQINQMP return value 'Type' has unexpected value '%d'\n",
+                      Type);
+            }
+        } else {
+            RETVAL = newSV(0);
+        } /* End if: MQCC_OK */
+
+        Length = data_len;
+        free(buffer);
+    OUTPUT:
+        RETVAL
+        PropDesc
+        Type
+        Length
+        CompCode
+        Reason
+

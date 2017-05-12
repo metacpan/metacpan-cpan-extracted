@@ -1,0 +1,492 @@
+20170211    Feb 11 13:38:39 PST 2017
+    Promoted to full release
+
+20160608.0051_002   Wed Jun  8 00:51:42 PDT 2016
+    New Features
+    * Can now put prototypes in front of signatures
+      (provides compatibility with sigs in 5.20)
+      [RT/93336, github #99/#127] (thanks brummett)
+
+20160516.2032_001   Mon May 16 20:32:59 PDT 2016
+    New Features
+    * Can now use bare sigils as placeholders
+      (provides compatibility with sigs in 5.20)
+      [RT/93334, github #100/#126] (thanks brummett)
+
+20160315    Tue Mar 15 16:21:33 PDT 2016
+    Promoted to full release
+
+20160310.2049_001   Thu Mar 10 20:49:00 PST 2016
+    Docs
+    * Fix broken link in POD
+      [github #120] (thanks Manwar)
+
+    Distribution Fixes
+    * Generate README from POD
+      [github #122/#123/#124] (thanks jluis)
+    * Silence bogus Kwalitee failure
+      [github #121] (thanks jluis)
+
+20151120.1519_001   Fri Nov 20 15:19:44 PST 2015
+    Bug Fixes
+    * Fix missing semi-colon
+      [github #118] (thanks joenio)
+
+    Distribution Fixes
+    * Bump required version of Lexical::SealRequireHints to fix RT #93759
+      [github #119] (thanks chorny)
+
+20141021    Tue Oct 21 02:11:29 PDT 2014
+    Promoted to full release
+
+20140920.1910_001   Sat Sep 20 19:10:06 PDT 2014
+    New Features
+    * Can now specify an alternate name for invocant (besides `$self`)
+      [github #82] (thanks Hercynium)
+
+    Bug Fixes
+    * Correct parse error on multi-line default values
+      [github #106]
+    * Using a required param after an optional one now a compile error
+      [github #108]
+
+20140806.0226_001   Wed Aug  6 02:26:36 PDT 2014
+    Bug Fixes
+    * Correct parse error when invocant is preceded by a space
+    * Fix bug where undef which should trigger default fails typecheck
+      [github #102]
+
+    Distribution Fixes
+    * Remove dependency on experimental (breaks 5.8 compat)
+      [github #97]
+
+    Misc
+    * Refactor signature parsing into its own class
+      [github #96]
+
+20140224    Mon Feb 24 14:25:43 PST 2014
+    Promoted to full release
+
+20140220.0106_001   Thu Feb 20 01:14:54 PST 2014
+    Distribution Fixes
+    * Remove dependency on Devel::Pragma
+      [github #91], and fixes [github #41]
+
+    Docs
+    * Document which features require Data::Alias and Const::Fast
+      [github #90]
+
+20131010    Thu Oct 10 00:57:41 PDT 2013
+    Promoted to full release
+
+20131007.0002_002   Mon Oct  7 00:02:30 PDT 2013
+    Distribution Fixes
+    * Fixed failing test in 5.10.0
+      (uncovered by CPAN Testers)
+
+20131004.0159_001   Fri Oct  4 01:59:55 PDT 2013
+    Bug Fixes
+    * Removed experimental smartmatch warnings
+    * Don't require Data::Alias for named params unless you have to
+      [github #71]
+
+    Docs
+    * Updated close parend problem to include quotes and a workaround
+      [rt.cpan.org 85925]
+    * Fixed some typos (thanks dsteinbrunner)
+      [github #88]
+
+    Distribution Fixes
+    * Fixed repo link in metadata (thanks dsteinbrunner)
+      [github #87]
+
+20130505    May  5 21:17:45 PDT 2013
+    Promoted to full release
+
+20130427.0031_001   Sat Apr 27 00:31:04 PDT 2013
+    Distribution Fixes
+    * Add M::S::Parameter to MANIFEST
+      [github #76]
+    * Change representation of Infinity to work on Win32
+      [github #75]
+
+    Bug Fixes
+    * Fixed obscure bug where an eval in Method::Signatures wouldn't be
+      skipped when carp'ing (i.e. in carp_location_for())
+      [github #72]
+
+    Misc
+    * Rearranged so signature is now an object
+      [github #30]
+    * Add hook for Travis CI
+      [github #78]
+
+    Docs
+    * Found and fixed missing parend
+
+20130222    Feb 22 21:10:10 PST 2013
+    Promoted to full release
+
+20130218.1447_001   Mon Feb 18 14:47:28 PST 2013
+    Distribution Fixes
+    * Fixed stray detritus in MANIFEST.
+    * Somehow my last-minute fix to the new error handler test didn't
+      make it in; this will fix "Can't locate Moose.pm" errors.
+
+20130216.1729_001   Sat Feb 16 17:29:45 PST 2013
+    New Features
+    * Handling of run-time errors (default: die) is now overridable by
+      subclasses via signature_error_handler().
+      [github #54]
+
+    Bug Fixes
+    * Data::Alias is only loaded when needed avoiding a threads + eval bug
+      in most cases and improving compile time performance.
+      [rt.cpan.org 82922, github #62]
+
+
+20121219.0033_001   Wed Dec 19 00:33:58 PST 2012
+    New Features
+    * Can now have aliased named parameters.
+      [github #57]
+
+    Bug Fixes
+    * Compile-time errors now reporting proper line numbers.
+      [github #61]
+
+    Docs
+    * Minor clarifications here and there.
+    * Clarified what doesn't work in Perl 5.8.
+    * Added Function::Parameters to See Also section.
+    * Updated copyright.
+
+20121201    Sat Dec  1 01:59:44 PST 2012
+    Promoted to full release
+
+20121128.2139_001   Wed Nov 28 21:39:16 PST 2012
+    Bug Fixes
+    * Trailing commas on parameter lists are now ok.
+      [rt.cpan.org 81364]
+
+    Misc
+    * Failure to parse parameters will now produce a more useful error.
+
+    Distribution Fixes
+    * Fixed test failing on 5.10.0 as per github #59.
+    * Fixed subtests failing on Test::More's prior to 0.96.
+
+
+20121108.0047_001    Thu Nov  8 00:47:15 PST 2012
+    New Features
+    * remove dependency on Devel::BeginLift
+      [github #39]
+
+    Bug Fixes
+    * Default condition of `when {}' now interpreted as
+      `when { $_ ~~ {} }' (avoids parse error).
+      [github #60]
+
+20121025.2315_001    Thu Oct 25 23:15:20 PDT 2012
+    New Features
+    * can now use `when' to specify default conditions
+      [github #48]
+    * can use `//=' as a shortcut for `when undef'
+      [github #45]
+    * can now provide `where' constraints in addition to
+      (or instead of) a type
+      [github #7]
+    * can now use `...' to disable further argument checking
+      [github #49]
+    * can now specify more than one alternative in type unions
+      [github #55]
+    * can now nest parameterized types
+
+    Incompatible Changes
+    * can no longer use both `\' and `:'
+      (didn't work anyway)
+
+    Optimizations
+    * better signature parsing using PPI
+      [github #11]
+
+    Docs
+    * documented all new features
+    * new ASCI-art breakdown of signature syntax
+    * minor tweaks and corrections
+
+20120523    May 23 16:36:04 PDT 2012
+    Distribution Fixes
+    * Fixed META.json
+
+20120517    Thu May 17 20:14:34 PDT 2012
+    Promoted to full release
+
+20120514.0117_001   Mon May 14 01:17:38 PDT 2012
+    Distribution Fixes
+    * Added version number to Method::Signatures::Modifiers.
+
+
+20111125    Fri Nov 25 01:15:50 PST 2011
+    Optimizations
+    * Type checks significantly faster.  40% faster with Mouse.
+      20% faster with Moose. [github #42]
+
+    Distribution Fixes
+    * Added Test::Exception as a build requirement [github #43]
+    * Added Moose as a recommended module (with version number)
+
+
+20111020  Thu Oct 20 17:00:29 PDT 2011
+    Promoted to full release
+
+20111017.2055_002  Mon Oct 17 20:55:09 PDT 2011
+    Bug Fix
+    * Move inject_if_block code back to MSM [github #40]
+
+20110927.2305_001  Tue Sep 27 23:05:02 PDT 2011
+    Bug Fix
+    * Remove spurious error for modifiers in roles [github #36]
+
+
+20110923.1726  Fri Sep 23 17:27:47 PDT 2011
+    Distribution Fixes
+    * 20110923 had a bad signature file because gpg is broken on my laptop.
+      Releasing without a signature.  1 aM n0t A hax0r!!!1!1!
+
+
+20110923  Fri Sep 23 16:13:46 PDT 2011  [It Takes All Types]
+    Incompatible Changes
+    * Slurpy parameters (@foo and %bar) now must come at the end.
+    * Slurpy parameters cannot be named, they must be positional.
+    * Slurpy parameters are now optional by default. [github #21]
+    * The empty signature takes no arguments. [github #26]
+    * No signature implies the empty signature and takes no arguments.
+      [github #26]
+
+    New Features
+    * Now checking if there are too many arguments. [github #23]
+    * Run-time errors are now class methods, so subclasses can override them.
+    * Method::Signatures::Modifiers allows you to use Method::Signatures
+      with MooseX::Declare and apply method modifiers like before, after
+      and around. [Buddy Burden] [github #14]
+    * compile_at_BEGIN option controls if "method" and "func" are compiled
+      like normal statements or early like "sub". [github #8]
+
+    Bug Fixes
+    * Now depending on a version of Devel::Declare that works with
+      5.13 and up. [github #10]
+    * Now depending on a known good version of Mouse. [github #17]
+    * Improved error messages reporting from the right position in the
+      user's code. [Buddy Burden]
+    * Comments in the signature fixed. [Buddy Burden] [github #13]
+    * Passing in too many positional parameters now generates an error.
+      [github #23]
+    * Fixed a case where we'd eat compilation errors. [github #16]
+    * Optional parameters will no longer fail type checks if they're not
+      passed in. [github #12]
+    * Depending on a new version of Devel::Declare that works with perl
+      5.13 and up. [github #10]
+    * Fix some cases where a compile time error will show up as an error
+      inside PPI.
+
+    Docs
+    * Many grammar fixes and prose improvements [Noirin Plunkett] [github #25]
+    * Slurpy parameters are clearly documented
+    * The rules if a parameter is required or optional are more clear
+    * Clarify that func() has no invocant [github #32]
+    * Mention METHOD_SIGNATURES_DEBUG environment variable for debugging.
+      [github #32]
+    * Documented the "debug" option.
+    * Documented issues with 5.8 and compile_at_BEGIN. [github #8] [github #22]
+
+    Test Fixes
+    * Tests will no longer fail because 5.10.0 and down report
+      different errors on compilation failure. [github #18]
+    * Tests will no longer fail on 5.8. [github #22]
+
+
+20110324.1600_001  Thu, 24 Mar 2011 16:00:38 +1100
+    Bug Fix
+    * Declare dependency on Any::Moose [github #9]
+
+
+20110322.0027_001  Tue, 22 Mar 2011 00:27:00 +1100
+    New Features
+    * Added support for Perl 6 style type syntax backed by Any::Moose
+      (barefootcoder) [github #3]
+
+    Test Fixes
+    * t/syntax_errors.t would fail on some versions of Perl because
+      we wouldn't get the expected error message out of eval.
+      [github #4]
+
+
+20110216.1153_001  Wed, 16 Feb 2011 11:35:05 +1100
+    New Features
+    * Data::Alias is no longer optional.  It's been fixed and is now
+      maintained.  Aliasing will now always work.
+
+    Misc
+    * Use Const::Fast to implement read only arguments.  This avoids the
+      optional Readonly::XS to make it fast.
+
+
+20100730  Fri Jul 30 12:54:20 PDT 2010
+    New Features
+    * Added func() to handle functions.
+
+    Incompatible Changes
+    * Data::Alias is now optional.  This is because it does not work in 5.12
+      and there's no fix in sight.  If you want to use aliasing in your
+      distribution it will have to depend on Data::Alias itself.
+
+    Docs
+    * Updated the SEE ALSO
+    * Removed the assertion that no checks are done on the signature
+
+
+20090620  Sat Jun 20 01:26:59 PDT 2009
+    Performance
+    * Load PPI on demand to reduce load time (needed by perl5i)
+
+    Other
+    * Separated signature translation between methods and subroutines
+      (needed by perl5i)
+
+
+20081028  Tue Oct 28 00:45:48 PDT 2008
+    New Features
+    * Two or more slurpy parameters (ie. @foo or %bar) in a signature is
+      an error.
+
+    Bug Fixes
+    * The debugger now works, thanks to an upgrade in Devel::Declare.
+    * methods are now declared at compile time, like regular subs.
+
+    Other
+    * Added some simple example files.
+
+
+20081021.1911  Tue Oct 21 19:11:47 PDT 2008
+    Test Fixes
+    * Used a new feature of Test::Builder, upgrade dependency.
+
+
+20081021  Tue Oct 21 01:43:24 PDT 2008
+    New Features
+    * Checks for unspecified arguments
+    * Almost anything can be used as a default.
+
+    Bug Fixes
+    * A default value with a comma in it is properly parsed.
+    * Default values can now be any literal, even wacky things like q,Hi!,
+    * The closing paren of a signature can now be on its own line.
+    * The closing paren and the opening block can be on the same line.
+
+    New Docs
+    * Documented differences from Perl 6
+
+
+20081008  Wed Oct  8 09:48:33 EDT 2008
+    New Features
+    * Named parameters have some basic compile-time error checks for illegal signatures.
+
+    New Docs
+    * Document restritions on named parameters.
+
+
+20081007  Tue Oct  7 23:27:19 EDT 2008
+    New Features
+    * Added named parameters.
+
+    Docs
+    * Some documentation on what is not allowed, even if we don't
+      yet check for it.
+    * More thanks!
+    * Add an example and comparision with regular Perl
+    * Add some debugging tips
+
+
+20081006  Mon Oct  6 02:24:36 EDT 2008
+    New Features
+    * Implemented "is alias", "is ro", "is rw" and "is copy".
+    * Multiple traits supported "is copy is rw"
+    * Implemented ! and ? (required and optional arguments)
+
+    Bug Fixes
+    * Stole some code from MooseX::Method::Signatures to make attributes
+      parse better.  (thanks to Florian Ragwitz)
+
+    Other
+    - Repository moved to github.
+    - Changing to ISO date versions.
+
+
+0.11  Sat Sep 27 16:47:51 EDT 2008
+    New Features
+    * Added the "$arg!" required syntax (currently does nothing)
+    * Attributes now work (thanks to mst)
+
+    New Docs
+    - Documented how to set a trait and a default
+    * Document that earlier params may be used in defaults.
+    * Document that @_ is left intact
+    * Clarify aliased ref behavior
+    * Document anonymous methods
+
+    Bug Fixes
+    * Protect against complicated default expressions
+
+
+0.10  Sun Sep 21 20:04:41 PDT 2008
+    New Features
+    * Added "$class:" change the invocant a la Perl 6.
+    * Added "$arg = EXPR" to set defaults.
+    * Added "$arg?" optional param syntax (currently does nothing)
+    * Added "$arg is foo" param traits (currently does nothing)
+    * Expose a way to play with the prototype handler.
+
+    Doc Fixes
+    - Change "prototype" to "signature" to avoid confusion with Perl's
+      built in prototypes.
+
+
+0.05  Sun Sep 21 15:17:16 PDT 2008
+    Bug Fixes
+    * methods now get the right name in caller(), not "Class::__ANON__".
+    * The \@foo prototype no longer has a performance hit
+    * Closures now work with \@foo
+      (All the above thanks to Matthijs van Duin and his Sub::Name and
+       Data::Alias)
+
+    Test Fixes
+    * Not rigorously checking the bitmask and hints flags from caller() as
+      their behavior is undefined.  This fixes the 5.10 test failures.
+
+
+0.04  Sun Sep 21 13:52:29 PDT 2008
+    New Features
+    * A \@foo protototype allows you to use a reference as a regular var
+
+    New Docs
+    * Documented the @_ prototype
+
+
+0.03  Sun Sep 21 00:57:32 PDT 2008
+    New Features
+    * Eliminate the need of the trailing semicolon
+
+    New Bugs
+    * The debugger and one-liners are broken
+
+    New Docs
+    * Better prototype docs
+
+
+0.02  Wed Dec 26 02:07:26 PST 2007
+    Doc Fix
+    * Forgot the "use Method::Signatures" in the SYNOPSIS
+
+
+0.01  Wed Dec 26 01:55:33 PST 2007
+    It works!

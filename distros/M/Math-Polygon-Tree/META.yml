@@ -1,0 +1,30 @@
+---
+abstract: "fast check if point is inside polygon\r"
+author:
+  - 'liosha <liosha@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Polygon-Tree
+requires:
+  Carp: '0'
+  Exporter: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Math::Geometry::Planar::GPC::PolygonXS: '0'
+  POSIX: '0'
+  base: '0'
+  perl: '5.010'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/liosha/math-polygon-tree.git
+version: '0.08'

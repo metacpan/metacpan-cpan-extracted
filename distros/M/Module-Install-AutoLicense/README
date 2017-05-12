@@ -1,0 +1,59 @@
+NAME
+    Module::Install::AutoLicense - A Module::Install extension to
+    automagically generate LICENSE files
+
+SYNOPSIS
+      # In Makefile.PL
+
+      use inc::Module::Install;
+      author 'Vestan Pants';
+      license 'perl';
+      auto_license;
+
+    An appropriate "LICENSE" file will be generated for your distribution.
+
+DESCRIPTION
+    Module::Install::AutoLicense is a Module::Install extension that
+    generates a "LICENSE" file automatically whenever the author runs
+    "Makefile.PL". On the user side it does nothing.
+
+    When "make distclean" is invoked by the author, the "LICENSE" is
+    removed.
+
+    The appropriate license to determined from the meta provided with the
+    "license" command and the holder of the license from the "author"
+    command.
+
+    Software::License is used to generate the "LICENSE" file.
+
+COMMANDS
+    This plugin adds the following Module::Install command:
+
+    "auto_license"
+        Does nothing on the user-side. On the author-side it will generate a
+        "LICENSE" file according to the previously supplied "license"
+        command. The "holder" of the license is determined from the "author"
+        meta or may be specified using the "holder" parameter.
+
+          auto_license( holder => 'Vestan Pants and Ivor Biggun' );
+
+        It is important to note that the "auto_license" must follow "author"
+        and "license" commands in the "Makefile.PL" ( as demonstrated in the
+        SYNOPSIS above ), otherwise the meta these commands provide will be
+        unavailable to "auto_license". Call it a feature.
+
+AUTHOR
+    Chris "BinGOs" Williams
+
+LICENSE
+    Copyright © Chris Williams
+
+    This module may be used, modified, and distributed under the same terms
+    as Perl itself. Please see the license that came with your Perl
+    distribution for details.
+
+SEE ALSO
+    Module::Install
+
+    Software::License
+

@@ -1,0 +1,23 @@
+Revision history for MooseX-SetOnce
+
+0.200002  2013-10-05 09:10:57 America/New_York
+          add a test for the bugfix in 0.200001 (thanks, Karen Etheridge)
+
+0.200001  2011-10-06 19:04:51 America/New_York
+          bugfixes for accessors in subclasses (thanks, Karen Etheridge and
+          Jesse Luehrs!)
+
+0.200000  2011-04-06 22:06:48 America/New_York
+          more Moose 2.x bugfixes and tests (thanks Jesse Luehrs!)
+
+0.100473  2011-02-27 13:26:52 America/New_York
+          compatibile with Moose 2.x (thanks, APOCAL and Jesse Luehrs!)
+
+0.100472  2010-11-03 16:14:19 America/New_York
+          include attribute name in error message
+
+0.100471  2010-02-16 13:30:57 America/New_York
+          correct dist name (oops!  thanks for noticing, mst)
+
+0.100470  2010-02-16 12:29:18 America/New_York
+          first release

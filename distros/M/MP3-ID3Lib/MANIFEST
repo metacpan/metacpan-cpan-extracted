@@ -1,0 +1,12 @@
+CHANGES
+ID3Lib.pm
+ID3Lib.xs
+ID3Lib/Frame.pm
+MANIFEST			This list of files
+Makefile.PL
+README
+ppport.h
+t/simple.t
+test1.mp3
+test2.mp3
+typemap

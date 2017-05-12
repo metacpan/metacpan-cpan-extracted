@@ -1,0 +1,14 @@
+--- 
+abstract: generic object matching based on attributes and methods
+author: 
+  - Jesse Luehrs <doy at tozt dot net>
+generated_by: Dist::Zilla::Plugin::MetaYaml version 1.003
+license: perl
+name: MooseX-Role-Matcher
+requires: 
+  List::MoreUtils: 0
+  List::Util: 0
+  MooseX::Role::Parameterized: 0.03
+  Test::Deep: 0
+  Test::More: 0
+version: 0.05

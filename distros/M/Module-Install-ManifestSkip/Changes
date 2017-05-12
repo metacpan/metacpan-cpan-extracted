@@ -1,0 +1,49 @@
+0.24 Sat Aug 16 11:36:21 PDT 2014
+ - Meta 0.0.2
+
+0.23 Fri Aug 15 18:49:16 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.22 Wed Jul 30 15:50:47 PDT 2014
+ - Switch IRC to
+
+0.21 Thu Jul 24 23:23:34 PDT 2014
+ - Switch to Zilla-Dist
+
+0.20 Sun Sep 25 04:18:45 CEST 2011
+ - Require minimum perl 5.8.1
+ - https://rt.cpan.org/Public/Bug/Display.html?id=71155
+
+0.19 Sun Jun  5 02:27:37 EST 2011
+ - Use Module::Manifest::Skip for content.
+
+0.18 Wed Jun  1 19:56:48 EST 2011
+ - Add 'clean' support for MANIFEST.SKIP files that never change.
+
+0.17 Mon May 30 20:33:44 EST 2011
+ - Rerelease with Module::Package 0.17
+ - Add ^xt/ to skips
+
+0.16 Mon May 30 00:52:46 EST 2011
+ - Change to Module::Package
+
+0.15 Tue May 17 22:52:08 EST 2011
+ - Stardoc
+ - Package
+ - add .devel-local
+
+0.14 Mon Sep 20 09:52:31 PDT 2010
+ - refactored tests
+ - changed message
+
+0.12 Wed Sep 15 09:40:52 PDT 2010
+ - jnap++ found and fixed a bug from his last patch
+
+0.11 Tue Sep 14 16:36:08 PDT 2010
+ - Added some additional skips for MAC OSX, emac backups and komodo. Thanks
+   to John Napiorkowski, for this addition.
+ - Added 'readme_from' to Makefile.PL
+
+0.10 Fri Sep 10 10:35:31 PDT 2010
+ - Initial version.
+

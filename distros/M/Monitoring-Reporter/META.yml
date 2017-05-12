@@ -1,0 +1,47 @@
+---
+abstract: 'Monitoring dashboard'
+author:
+  - 'Dominik Schulz <dominik.schulz@gauner.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  File::ShareDir::Install: 0.03
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.005, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Monitoring-Reporter
+requires:
+  Cache::MemoryCache: 0
+  Config::Yak: 0
+  Config::Yak::LazyConfig: 0
+  Config::Yak::RequiredConfig: 0
+  DBI: 0
+  Data::Dumper: 0
+  File::ShareDir: 0
+  IO::Socket::INET: 0
+  Log::Tree: 0
+  Log::Tree::Logger: 0
+  Log::Tree::RequiredLogger: 0
+  Module::Pluggable: 0
+  Monitoring::Livestatus: 0
+  Moose: 0
+  MooseX::App::Cmd: 0
+  MooseX::App::Cmd::Command: 0
+  Plack::Builder: 0
+  Plack::Loader: 0
+  Plack::Request: 0
+  Template: 0
+  Try::Tiny: 0
+  feature: 0
+  lib: 0
+  mro: 0
+  namespace::autoclean: 0
+  perl: 5.010_000
+  strict: 0
+  warnings: 0
+version: 0.01
+x_authority: cpan:TEX

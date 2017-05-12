@@ -1,0 +1,11 @@
+ [
+    {
+        "label" : "Name",
+        "type" : "text",
+        "validation" : {
+            "like" : { "args" : [ "es" ], "msg" : "text must contain 'es'" },
+            "size" : { "args" : [ 2, 5 ], "msg" : "length must be between 2 and 5 chars" }
+        },
+        "name" : "name"
+    }
+ ]

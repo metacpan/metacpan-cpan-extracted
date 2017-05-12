@@ -1,0 +1,5844 @@
+chunk
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat
+functioncall
+prefixexp
+var
+Name
+print
+args
+String
+double quoted string
+"testing syntax"
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+Number
+2
+^
+exponent
+Number
+3
+^
+exponent
+Number
+2
+==
+exp
+exp
+Number
+2
+^
+exponent
+(
+exp
+exp
+Number
+3
+^
+exponent
+Number
+2
+)
+)
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+Number
+2
+^
+exponent
+Number
+3
+*
+exp
+Number
+4
+==
+exp
+exp
+(
+exp
+exp
+Number
+2
+^
+exponent
+Number
+3
+)
+*
+exp
+Number
+4
+)
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+Number
+2
+^
+exponent
+Number
+-2
+==
+exp
+exp
+Number
+1
+/
+exp
+Number
+4
+keyword and
+and
+exp
+exp
+exp
+Number
+-2
+^
+exponent
+-
+exponent
+Number
+-2
+==
+exp
+-
+exp
+-
+exp
+Number
+-4
+)
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+keyword not
+not
+exp
+keyword nil
+nil
+keyword and
+and
+exp
+Number
+2
+keyword and
+and
+exp
+keyword not
+not
+exp
+(
+exp
+exp
+exp
+Number
+2
+>
+exp
+Number
+3
+keyword or
+or
+exp
+exp
+Number
+3
+<
+exp
+Number
+2
+)
+)
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+Number
+-3
+-
+exp
+Number
+1
+-
+exp
+Number
+5
+==
+exp
+exp
+exp
+Number
+0
++
+exp
+Number
+0
+-
+exp
+Number
+9
+)
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+exp
+Number
+-2
+^
+exponent
+Number
+2
+==
+exp
+Number
+-4
+keyword and
+and
+exp
+exp
+exp
+(
+exp
+Number
+-2
+)
+^
+exponent
+Number
+2
+==
+exp
+Number
+4
+keyword and
+and
+exp
+exp
+exp
+exp
+exp
+Number
+2
+*
+exp
+Number
+2
+-
+exp
+Number
+3
+-
+exp
+Number
+1
+==
+exp
+Number
+0
+)
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+exp
+Number
+2
+*
+exp
+Number
+1
++
+exp
+exp
+Number
+3
+/
+exp
+Number
+3
+==
+exp
+Number
+3
+keyword and
+and
+exp
+exp
+exp
+exp
+Number
+1
++
+exp
+Number
+2
+..
+exp
+exp
+Number
+3
+*
+exp
+Number
+1
+==
+exp
+String
+double quoted string
+"33"
+)
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+keyword not
+not
+exp
+(
+exp
+exp
+exp
+Number
+2
++
+exp
+Number
+1
+>
+exp
+exp
+Number
+3
+*
+exp
+Number
+1
+)
+keyword and
+and
+exp
+exp
+exp
+String
+double quoted string
+"a"
+..
+exp
+String
+double quoted string
+"b"
+>
+exp
+String
+double quoted string
+"a"
+)
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+keyword not
+not
+exp
+(
+exp
+exp
+(
+exp
+exp
+keyword true
+true
+keyword or
+or
+exp
+keyword false
+false
+)
+keyword and
+and
+exp
+keyword nil
+nil
+)
+)
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+keyword true
+true
+keyword or
+or
+exp
+exp
+keyword false
+false
+keyword and
+and
+exp
+keyword nil
+nil
+)
+stat
+keyword local
+local
+namelist
+Name
+a
+Name
+b
+optional namelist initialization
+=
+explist
+exp
+Number
+1
+exp
+keyword nil
+nil
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+-
+exp
+(
+exp
+exp
+Number
+1
+keyword or
+or
+exp
+Number
+2
+)
+==
+exp
+Number
+-1
+keyword and
+and
+exp
+exp
+exp
+(
+exp
+exp
+Number
+1
+keyword and
+and
+exp
+Number
+2
+)
++
+exp
+(
+exp
+exp
+Number
+-1.25
+keyword or
+or
+exp
+Number
+-4
+)
+==
+exp
+Number
+0.75
+)
+;
+stat
+varlist
+var
+Name
+x
+=
+explist
+exp
+(
+exp
+exp
+exp
+exp
+(
+exp
+exp
+var
+Name
+b
+keyword or
+or
+exp
+var
+Name
+a
+)
++
+exp
+Number
+1
+==
+exp
+Number
+2
+keyword and
+and
+exp
+exp
+exp
+(
+exp
+exp
+Number
+10
+keyword or
+or
+exp
+var
+Name
+a
+)
++
+exp
+Number
+1
+==
+exp
+Number
+11
+)
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+var
+Name
+x
+)
+;
+stat
+varlist
+var
+Name
+x
+=
+explist
+exp
+(
+exp
+exp
+exp
+(
+exp
+exp
+(
+exp
+exp
+Number
+2
+<
+exp
+Number
+3
+)
+keyword or
+or
+exp
+Number
+1
+)
+==
+exp
+keyword true
+true
+keyword and
+and
+exp
+exp
+(
+exp
+exp
+exp
+Number
+2
+<
+exp
+Number
+3
+keyword and
+and
+exp
+Number
+4
+)
+==
+exp
+Number
+4
+)
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+var
+Name
+x
+)
+;
+stat
+varlist
+var
+Name
+x
+var
+Name
+y
+=
+explist
+exp
+Number
+1
+exp
+Number
+2
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+(
+exp
+exp
+var
+Name
+x
+>
+exp
+var
+Name
+y
+)
+keyword and
+and
+exp
+var
+Name
+x
+keyword or
+or
+exp
+exp
+var
+Name
+y
+==
+exp
+Number
+2
+)
+;
+stat
+varlist
+var
+Name
+x
+var
+Name
+y
+=
+explist
+exp
+Number
+2
+exp
+Number
+1
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+(
+exp
+exp
+var
+Name
+x
+>
+exp
+var
+Name
+y
+)
+keyword and
+and
+exp
+var
+Name
+x
+keyword or
+or
+exp
+exp
+var
+Name
+y
+==
+exp
+Number
+2
+)
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+Number
+1234567890
+==
+exp
+exp
+var
+Name
+tonumber
+args
+(
+optional explist
+explist
+exp
+String
+single quoted string
+'1234567890'
+)
+keyword and
+and
+exp
+exp
+exp
+Number
+1234567890
++
+exp
+Number
+1
+==
+exp
+Number
+1234567891
+)
+stat
+keyword repeat
+repeat
+block
+undef
+keyword until
+until
+exp
+Number
+1
+;
+stat
+keyword repeat
+repeat
+block
+undef
+keyword until
+until
+exp
+keyword true
+true
+;
+stat
+keyword while
+while
+exp
+keyword false
+false
+keyword do
+do
+block
+undef
+keyword end
+end
+;
+stat
+keyword while
+while
+exp
+keyword nil
+nil
+keyword do
+do
+block
+undef
+keyword end
+end
+;
+stat
+keyword do
+do
+block
+chunk
+stat list
+stat list
+stat
+keyword local
+local
+namelist
+Name
+a
+optional namelist initialization
+;
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+f
+optional colon name element
+funcbody
+(
+optional parlist
+namelist
+Name
+x
+)
+block
+chunk
+stat list
+stat list
+stat list
+stat
+varlist
+var
+Name
+x
+=
+explist
+exp
+tableconstructor
+{
+fieldlist
+field
+Name
+a
+=
+exp
+Number
+1
+}
+;
+stat
+varlist
+var
+Name
+x
+=
+explist
+exp
+tableconstructor
+{
+fieldlist
+field
+Name
+x
+=
+exp
+Number
+1
+}
+;
+stat
+varlist
+var
+Name
+x
+=
+explist
+exp
+tableconstructor
+{
+fieldlist
+field
+Name
+G
+=
+exp
+Number
+1
+}
+keyword end
+end
+keyword end
+end
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+f
+optional colon name element
+funcbody
+(
+optional parlist
+namelist
+Name
+i
+)
+block
+chunk
+stat list
+stat list
+stat
+keyword if
+if
+exp
+exp
+exp
+var
+Name
+type
+args
+(
+optional explist
+explist
+exp
+var
+Name
+i
+)
+~=
+exp
+String
+single quoted string
+'number'
+keyword then
+then
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+var
+Name
+i
+exp
+String
+single quoted string
+'jojo'
+;
+elseif sequence
+optional else block
+keyword end
+end
+;
+stat
+keyword if
+if
+exp
+exp
+var
+Name
+i
+>
+exp
+Number
+0
+keyword then
+then
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+var
+Name
+i
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+exp
+var
+Name
+i
+-
+exp
+Number
+1
+)
+;
+elseif sequence
+optional else block
+keyword end
+end
+;
+keyword end
+end
+stat
+varlist
+var
+Name
+x
+=
+explist
+exp
+tableconstructor
+{
+fieldlist
+field
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+3
+)
+field
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+5
+)
+field
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+10
+)
+}
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+exp
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+Number
+1
+]
+==
+exp
+Number
+3
+keyword and
+and
+exp
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+Number
+2
+]
+==
+exp
+Number
+5
+keyword and
+and
+exp
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+Number
+3
+]
+==
+exp
+Number
+10
+keyword and
+and
+exp
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+Number
+4
+]
+==
+exp
+Number
+9
+keyword and
+and
+exp
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+Number
+12
+]
+==
+exp
+Number
+1
+)
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+keyword nil
+nil
+]
+==
+exp
+keyword nil
+nil
+)
+stat
+varlist
+var
+Name
+x
+=
+explist
+exp
+tableconstructor
+{
+fieldlist
+field
+exp
+exp
+var
+Name
+f
+args
+String
+single quoted string
+'alo'
+field
+exp
+exp
+var
+Name
+f
+args
+String
+single quoted string
+'xixi'
+field
+exp
+keyword nil
+nil
+}
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+Number
+1
+]
+==
+exp
+String
+single quoted string
+'alo'
+keyword and
+and
+exp
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+Number
+2
+]
+==
+exp
+String
+single quoted string
+'xixi'
+keyword and
+and
+exp
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+Number
+3
+]
+==
+exp
+keyword nil
+nil
+)
+;
+stat
+varlist
+var
+Name
+x
+=
+explist
+exp
+tableconstructor
+{
+fieldlist
+field
+exp
+exp
+exp
+var
+Name
+f
+args
+String
+single quoted string
+'alo'
+..
+exp
+String
+single quoted string
+'xixi'
+}
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+Number
+1
+]
+==
+exp
+String
+single quoted string
+'aloxixi'
+)
+stat
+varlist
+var
+Name
+x
+=
+explist
+exp
+tableconstructor
+{
+fieldlist
+field
+exp
+exp
+var
+Name
+f
+args
+tableconstructor
+{
+}
+}
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+Number
+2
+]
+==
+exp
+String
+single quoted string
+'jojo'
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+type
+args
+(
+optional explist
+explist
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+Number
+1
+]
+)
+==
+exp
+String
+single quoted string
+'table'
+)
+stat
+keyword local
+local
+namelist
+Name
+f
+optional namelist initialization
+=
+explist
+exp
+function
+keyword function
+function
+funcbody
+(
+optional parlist
+namelist
+Name
+i
+)
+block
+chunk
+stat list
+stat
+keyword if
+if
+exp
+exp
+var
+Name
+i
+<
+exp
+Number
+10
+keyword then
+then
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+String
+single quoted string
+'a'
+;
+elseif sequence
+elseif sequence
+elseif sequence
+elseif block
+keyword elseif
+elseif
+exp
+exp
+var
+Name
+i
+<
+exp
+Number
+20
+keyword then
+then
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+String
+single quoted string
+'b'
+;
+elseif block
+keyword elseif
+elseif
+exp
+exp
+var
+Name
+i
+<
+exp
+Number
+30
+keyword then
+then
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+String
+single quoted string
+'c'
+;
+optional else block
+keyword end
+end
+;
+keyword end
+end
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+3
+)
+==
+exp
+String
+single quoted string
+'a'
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+12
+)
+==
+exp
+String
+single quoted string
+'b'
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+26
+)
+==
+exp
+String
+single quoted string
+'c'
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+100
+)
+==
+exp
+keyword nil
+nil
+)
+stat
+keyword for
+for
+Name
+i
+=
+exp
+Number
+1
+,
+exp
+Number
+1000
+keyword do
+do
+block
+chunk
+laststat
+keyword break
+break
+;
+keyword end
+end
+;
+stat
+varlist
+var
+Name
+n
+=
+explist
+exp
+Number
+100
+;
+stat
+varlist
+var
+Name
+i
+=
+explist
+exp
+Number
+3
+;
+stat
+varlist
+var
+Name
+t
+=
+explist
+exp
+tableconstructor
+{
+}
+;
+stat
+varlist
+var
+Name
+a
+=
+explist
+exp
+keyword nil
+nil
+stat
+keyword while
+while
+exp
+keyword not
+not
+exp
+var
+Name
+a
+keyword do
+do
+block
+chunk
+stat list
+stat list
+stat
+varlist
+var
+Name
+a
+=
+explist
+exp
+Number
+0
+;
+stat
+keyword for
+for
+Name
+i
+=
+exp
+Number
+1
+,
+exp
+var
+Name
+n
+keyword do
+do
+block
+chunk
+stat list
+stat
+keyword for
+for
+Name
+i
+=
+exp
+var
+Name
+i
+,
+exp
+Number
+1
+,
+exp
+Number
+-1
+keyword do
+do
+block
+chunk
+stat list
+stat list
+stat
+varlist
+var
+Name
+a
+=
+explist
+exp
+exp
+var
+Name
+a
++
+exp
+Number
+1
+;
+stat
+varlist
+var
+prefixexp
+var
+Name
+t
+[
+exp
+var
+Name
+i
+]
+=
+explist
+exp
+Number
+1
+;
+keyword end
+end
+;
+keyword end
+end
+;
+keyword end
+end
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+var
+Name
+a
+==
+exp
+exp
+exp
+var
+Name
+n
+*
+exp
+(
+exp
+exp
+var
+Name
+n
++
+exp
+Number
+1
+)
+/
+exp
+Number
+2
+keyword and
+and
+exp
+exp
+var
+Name
+i
+==
+exp
+Number
+3
+)
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+var
+prefixexp
+var
+Name
+t
+[
+exp
+Number
+1
+]
+keyword and
+and
+exp
+var
+prefixexp
+var
+Name
+t
+[
+exp
+var
+Name
+n
+]
+keyword and
+and
+exp
+keyword not
+not
+exp
+var
+prefixexp
+var
+Name
+t
+[
+exp
+Number
+0
+]
+keyword and
+and
+exp
+keyword not
+not
+exp
+var
+prefixexp
+var
+Name
+t
+[
+exp
+exp
+var
+Name
+n
++
+exp
+Number
+1
+]
+)
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+f
+optional colon name element
+funcbody
+(
+optional parlist
+namelist
+Name
+b
+)
+block
+chunk
+stat list
+stat list
+stat
+keyword local
+local
+namelist
+Name
+x
+optional namelist initialization
+=
+explist
+exp
+Number
+1
+;
+stat
+keyword repeat
+repeat
+block
+chunk
+stat list
+stat list
+stat
+keyword local
+local
+namelist
+Name
+a
+optional namelist initialization
+;
+stat
+keyword if
+if
+exp
+exp
+var
+Name
+b
+==
+exp
+Number
+1
+keyword then
+then
+block
+chunk
+stat list
+stat list
+stat
+keyword local
+local
+namelist
+Name
+b
+optional namelist initialization
+=
+explist
+exp
+Number
+1
+;
+stat
+varlist
+var
+Name
+x
+=
+explist
+exp
+Number
+10
+;
+laststat
+keyword break
+break
+elseif sequence
+elseif sequence
+elseif sequence
+elseif block
+keyword elseif
+elseif
+exp
+exp
+var
+Name
+b
+==
+exp
+Number
+2
+keyword then
+then
+block
+chunk
+stat list
+stat
+varlist
+var
+Name
+x
+=
+explist
+exp
+Number
+20
+;
+laststat
+keyword break
+break
+;
+elseif block
+keyword elseif
+elseif
+exp
+exp
+var
+Name
+b
+==
+exp
+Number
+3
+keyword then
+then
+block
+chunk
+stat list
+stat
+varlist
+var
+Name
+x
+=
+explist
+exp
+Number
+30
+;
+optional else block
+keyword else
+else
+block
+chunk
+stat list
+stat list
+stat
+keyword local
+local
+namelist
+Name
+a
+Name
+b
+Name
+c
+Name
+d
+optional namelist initialization
+=
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+math
+.
+Name
+sin
+args
+(
+optional explist
+explist
+exp
+Number
+1
+)
+;
+stat
+varlist
+var
+Name
+x
+=
+explist
+exp
+exp
+var
+Name
+x
++
+exp
+Number
+1
+;
+keyword end
+end
+keyword until
+until
+exp
+exp
+var
+Name
+x
+>=
+exp
+Number
+12
+;
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+var
+Name
+x
+;
+keyword end
+end
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+1
+)
+==
+exp
+Number
+10
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+2
+)
+==
+exp
+Number
+20
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+3
+)
+==
+exp
+Number
+30
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+4
+)
+==
+exp
+Number
+12
+)
+stat
+keyword local
+local
+namelist
+Name
+f
+optional namelist initialization
+=
+explist
+exp
+function
+keyword function
+function
+funcbody
+(
+optional parlist
+namelist
+Name
+i
+)
+block
+chunk
+stat list
+stat
+keyword if
+if
+exp
+exp
+var
+Name
+i
+<
+exp
+Number
+10
+keyword then
+then
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+String
+single quoted string
+'a'
+elseif sequence
+elseif sequence
+elseif sequence
+elseif block
+keyword elseif
+elseif
+exp
+exp
+var
+Name
+i
+<
+exp
+Number
+20
+keyword then
+then
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+String
+single quoted string
+'b'
+elseif block
+keyword elseif
+elseif
+exp
+exp
+var
+Name
+i
+<
+exp
+Number
+30
+keyword then
+then
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+String
+single quoted string
+'c'
+optional else block
+keyword else
+else
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+Number
+8
+keyword end
+end
+keyword end
+end
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+3
+)
+==
+exp
+String
+single quoted string
+'a'
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+12
+)
+==
+exp
+String
+single quoted string
+'b'
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+26
+)
+==
+exp
+String
+single quoted string
+'c'
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+100
+)
+==
+exp
+Number
+8
+)
+stat
+keyword local
+local
+namelist
+Name
+a
+Name
+b
+optional namelist initialization
+=
+explist
+exp
+keyword nil
+nil
+exp
+Number
+23
+stat
+varlist
+var
+Name
+x
+=
+explist
+exp
+tableconstructor
+{
+fieldlist
+field
+exp
+exp
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+100
+)
+*
+exp
+Number
+2
++
+exp
+Number
+3
+keyword or
+or
+exp
+var
+Name
+a
+field
+exp
+exp
+var
+Name
+a
+keyword or
+or
+exp
+exp
+var
+Name
+b
++
+exp
+Number
+2
+}
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+Number
+1
+]
+==
+exp
+Number
+19
+keyword and
+and
+exp
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+Number
+2
+]
+==
+exp
+Number
+25
+)
+stat
+varlist
+var
+Name
+x
+=
+explist
+exp
+tableconstructor
+{
+fieldlist
+field
+Name
+f
+=
+exp
+exp
+exp
+Number
+2
++
+exp
+Number
+3
+keyword or
+or
+exp
+var
+Name
+a
+field
+Name
+a
+=
+exp
+exp
+var
+Name
+b
++
+exp
+Number
+2
+}
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+var
+prefixexp
+var
+Name
+x
+.
+Name
+f
+==
+exp
+Number
+5
+keyword and
+and
+exp
+exp
+var
+prefixexp
+var
+Name
+x
+.
+Name
+a
+==
+exp
+Number
+25
+)
+stat
+varlist
+var
+Name
+a
+=
+explist
+exp
+tableconstructor
+{
+fieldlist
+field
+Name
+y
+=
+exp
+Number
+1
+}
+stat
+varlist
+var
+Name
+x
+=
+explist
+exp
+tableconstructor
+{
+fieldlist
+field
+exp
+var
+prefixexp
+var
+Name
+a
+.
+Name
+y
+}
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+Number
+1
+]
+==
+exp
+Number
+1
+)
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+f
+optional colon name element
+funcbody
+(
+optional parlist
+namelist
+Name
+i
+)
+block
+chunk
+stat list
+stat
+keyword while
+while
+exp
+Number
+1
+keyword do
+do
+block
+chunk
+stat list
+stat
+keyword if
+if
+exp
+exp
+var
+Name
+i
+>
+exp
+Number
+0
+keyword then
+then
+block
+chunk
+stat list
+stat
+varlist
+var
+Name
+i
+=
+explist
+exp
+exp
+var
+Name
+i
+-
+exp
+Number
+1
+;
+elseif sequence
+optional else block
+keyword else
+else
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+;
+keyword end
+end
+;
+keyword end
+end
+;
+keyword end
+end
+;
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+g
+optional colon name element
+funcbody
+(
+optional parlist
+namelist
+Name
+i
+)
+block
+chunk
+stat list
+stat
+keyword while
+while
+exp
+Number
+1
+keyword do
+do
+block
+chunk
+stat list
+stat
+keyword if
+if
+exp
+exp
+var
+Name
+i
+>
+exp
+Number
+0
+keyword then
+then
+block
+chunk
+stat list
+stat
+varlist
+var
+Name
+i
+=
+explist
+exp
+exp
+var
+Name
+i
+-
+exp
+Number
+1
+elseif sequence
+optional else block
+keyword else
+else
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+keyword end
+end
+keyword end
+end
+keyword end
+end
+stat
+functioncall
+prefixexp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+10
+)
+;
+stat
+functioncall
+prefixexp
+var
+Name
+g
+args
+(
+optional explist
+explist
+exp
+Number
+10
+)
+;
+stat
+keyword do
+do
+block
+chunk
+stat list
+stat list
+stat list
+stat list
+stat list
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+f
+optional colon name element
+funcbody
+(
+optional parlist
+)
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+Number
+1
+exp
+Number
+2
+exp
+Number
+3
+;
+keyword end
+end
+stat
+keyword local
+local
+namelist
+Name
+a
+Name
+b
+Name
+c
+optional namelist initialization
+=
+explist
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+)
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+var
+Name
+a
+==
+exp
+Number
+1
+keyword and
+and
+exp
+exp
+var
+Name
+b
+==
+exp
+Number
+2
+keyword and
+and
+exp
+exp
+var
+Name
+c
+==
+exp
+Number
+3
+)
+stat
+varlist
+var
+Name
+a
+var
+Name
+b
+var
+Name
+c
+=
+explist
+exp
+(
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+)
+)
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+var
+Name
+a
+==
+exp
+Number
+1
+keyword and
+and
+exp
+exp
+var
+Name
+b
+==
+exp
+keyword nil
+nil
+keyword and
+and
+exp
+exp
+var
+Name
+c
+==
+exp
+keyword nil
+nil
+)
+keyword end
+end
+stat
+keyword local
+local
+namelist
+Name
+a
+Name
+b
+optional namelist initialization
+=
+explist
+exp
+exp
+Number
+3
+keyword and
+and
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+)
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+var
+Name
+a
+==
+exp
+Number
+1
+keyword and
+and
+exp
+exp
+var
+Name
+b
+==
+exp
+keyword nil
+nil
+)
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+g
+optional colon name element
+funcbody
+(
+optional parlist
+)
+block
+chunk
+stat list
+stat
+functioncall
+prefixexp
+var
+Name
+f
+args
+(
+optional explist
+)
+;
+laststat
+keyword return
+return
+optional explist
+;
+keyword end
+end
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+var
+Name
+g
+args
+(
+optional explist
+)
+==
+exp
+keyword nil
+nil
+)
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+g
+optional colon name element
+funcbody
+(
+optional parlist
+)
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+exp
+keyword nil
+nil
+keyword or
+or
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+)
+keyword end
+end
+stat
+varlist
+var
+Name
+a
+var
+Name
+b
+=
+explist
+exp
+exp
+var
+Name
+g
+args
+(
+optional explist
+)
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+var
+Name
+a
+==
+exp
+Number
+1
+keyword and
+and
+exp
+exp
+var
+Name
+b
+==
+exp
+keyword nil
+nil
+)
+stat
+functioncall
+prefixexp
+var
+Name
+print
+args
+String
+single quoted string
+'+'
+;
+stat
+varlist
+var
+Name
+f
+=
+explist
+exp
+String
+multiline string
+[[
+return function ( a , b , c , d , e )
+  local x = a >= b or c or ( d and e ) or nil
+  return x
+end , { a = 1 , b = 2 >= 1 , } or { 1 };
+]]
+stat
+varlist
+var
+Name
+f
+=
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+string
+.
+Name
+gsub
+args
+(
+optional explist
+explist
+exp
+var
+Name
+f
+exp
+String
+double quoted string
+"%s+"
+exp
+String
+double quoted string
+"\n"
+)
+;
+stat
+varlist
+var
+Name
+f
+var
+Name
+a
+=
+explist
+exp
+exp
+exp
+var
+Name
+loadstring
+args
+(
+optional explist
+explist
+exp
+var
+Name
+f
+)
+args
+(
+optional explist
+)
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+var
+prefixexp
+var
+Name
+a
+.
+Name
+a
+==
+exp
+Number
+1
+keyword and
+and
+exp
+var
+prefixexp
+var
+Name
+a
+.
+Name
+b
+)
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+g
+optional colon name element
+funcbody
+(
+optional parlist
+namelist
+Name
+a
+Name
+b
+Name
+c
+Name
+d
+Name
+e
+)
+block
+chunk
+stat list
+stat
+keyword if
+if
+exp
+keyword not
+not
+exp
+(
+exp
+exp
+exp
+exp
+exp
+var
+Name
+a
+>=
+exp
+var
+Name
+b
+keyword or
+or
+exp
+var
+Name
+c
+keyword or
+or
+exp
+exp
+var
+Name
+d
+keyword and
+and
+exp
+var
+Name
+e
+keyword or
+or
+exp
+keyword nil
+nil
+)
+keyword then
+then
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+Number
+0
+;
+elseif sequence
+optional else block
+keyword else
+else
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+Number
+1
+;
+keyword end
+end
+;
+keyword end
+end
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+h
+optional colon name element
+funcbody
+(
+optional parlist
+namelist
+Name
+a
+Name
+b
+Name
+c
+Name
+d
+Name
+e
+)
+block
+chunk
+stat list
+stat
+keyword while
+while
+exp
+(
+exp
+exp
+exp
+exp
+exp
+var
+Name
+a
+>=
+exp
+var
+Name
+b
+keyword or
+or
+exp
+var
+Name
+c
+keyword or
+or
+exp
+(
+exp
+exp
+var
+Name
+d
+keyword and
+and
+exp
+var
+Name
+e
+)
+keyword or
+or
+exp
+keyword nil
+nil
+)
+keyword do
+do
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+Number
+1
+;
+keyword end
+end
+;
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+Number
+0
+;
+keyword end
+end
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+2
+exp
+Number
+1
+)
+==
+exp
+keyword true
+true
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+g
+args
+(
+optional explist
+explist
+exp
+Number
+2
+exp
+Number
+1
+)
+==
+exp
+Number
+1
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+h
+args
+(
+optional explist
+explist
+exp
+Number
+2
+exp
+Number
+1
+)
+==
+exp
+Number
+1
+)
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+1
+exp
+Number
+2
+exp
+String
+single quoted string
+'a'
+)
+==
+exp
+String
+single quoted string
+'a'
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+g
+args
+(
+optional explist
+explist
+exp
+Number
+1
+exp
+Number
+2
+exp
+String
+single quoted string
+'a'
+)
+==
+exp
+Number
+1
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+h
+args
+(
+optional explist
+explist
+exp
+Number
+1
+exp
+Number
+2
+exp
+String
+single quoted string
+'a'
+)
+==
+exp
+Number
+1
+)
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+1
+exp
+Number
+2
+exp
+String
+single quoted string
+'a'
+)
+~=
+exp
+keyword nil
+nil
+exp
+String
+double quoted string
+""
+)
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+1
+exp
+Number
+2
+exp
+String
+single quoted string
+'a'
+)
+==
+exp
+String
+single quoted string
+'a'
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+g
+args
+(
+optional explist
+explist
+exp
+Number
+1
+exp
+Number
+2
+exp
+String
+single quoted string
+'a'
+)
+==
+exp
+Number
+1
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+h
+args
+(
+optional explist
+explist
+exp
+Number
+1
+exp
+Number
+2
+exp
+String
+single quoted string
+'a'
+)
+==
+exp
+Number
+1
+)
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+1
+exp
+Number
+2
+exp
+keyword nil
+nil
+exp
+Number
+1
+exp
+String
+single quoted string
+'x'
+)
+==
+exp
+String
+single quoted string
+'x'
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+g
+args
+(
+optional explist
+explist
+exp
+Number
+1
+exp
+Number
+2
+exp
+keyword nil
+nil
+exp
+Number
+1
+exp
+String
+single quoted string
+'x'
+)
+==
+exp
+Number
+1
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+h
+args
+(
+optional explist
+explist
+exp
+Number
+1
+exp
+Number
+2
+exp
+keyword nil
+nil
+exp
+Number
+1
+exp
+String
+single quoted string
+'x'
+)
+==
+exp
+Number
+1
+)
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+1
+exp
+Number
+2
+exp
+keyword nil
+nil
+exp
+keyword nil
+nil
+exp
+String
+single quoted string
+'x'
+)
+==
+exp
+keyword nil
+nil
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+g
+args
+(
+optional explist
+explist
+exp
+Number
+1
+exp
+Number
+2
+exp
+keyword nil
+nil
+exp
+keyword nil
+nil
+exp
+String
+single quoted string
+'x'
+)
+==
+exp
+Number
+0
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+h
+args
+(
+optional explist
+explist
+exp
+Number
+1
+exp
+Number
+2
+exp
+keyword nil
+nil
+exp
+keyword nil
+nil
+exp
+String
+single quoted string
+'x'
+)
+==
+exp
+Number
+0
+)
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+Number
+1
+exp
+Number
+2
+exp
+keyword nil
+nil
+exp
+Number
+1
+exp
+keyword nil
+nil
+)
+==
+exp
+keyword nil
+nil
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+g
+args
+(
+optional explist
+explist
+exp
+Number
+1
+exp
+Number
+2
+exp
+keyword nil
+nil
+exp
+Number
+1
+exp
+keyword nil
+nil
+)
+==
+exp
+Number
+0
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+h
+args
+(
+optional explist
+explist
+exp
+Number
+1
+exp
+Number
+2
+exp
+keyword nil
+nil
+exp
+Number
+1
+exp
+keyword nil
+nil
+)
+==
+exp
+Number
+0
+)
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+Number
+1
+keyword and
+and
+exp
+exp
+exp
+Number
+2
+<
+exp
+Number
+3
+==
+exp
+keyword true
+true
+keyword and
+and
+exp
+exp
+Number
+2
+<
+exp
+Number
+3
+keyword and
+and
+exp
+exp
+exp
+String
+single quoted string
+'a'
+<
+exp
+String
+single quoted string
+'b'
+==
+exp
+keyword true
+true
+)
+stat
+varlist
+var
+Name
+x
+=
+explist
+exp
+exp
+exp
+Number
+2
+<
+exp
+Number
+3
+keyword and
+and
+exp
+keyword not
+not
+exp
+Number
+3
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+var
+Name
+x
+==
+exp
+keyword false
+false
+)
+stat
+varlist
+var
+Name
+x
+=
+explist
+exp
+exp
+exp
+Number
+2
+<
+exp
+Number
+1
+keyword or
+or
+exp
+(
+exp
+exp
+exp
+Number
+2
+>
+exp
+Number
+1
+keyword and
+and
+exp
+String
+single quoted string
+'a'
+)
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+var
+Name
+x
+==
+exp
+String
+single quoted string
+'a'
+)
+stat
+keyword do
+do
+block
+chunk
+stat list
+stat list
+stat list
+stat
+keyword local
+local
+namelist
+Name
+a
+optional namelist initialization
+;
+stat
+keyword if
+if
+exp
+keyword nil
+nil
+keyword then
+then
+block
+chunk
+stat list
+stat
+varlist
+var
+Name
+a
+=
+explist
+exp
+Number
+1
+;
+elseif sequence
+optional else block
+keyword else
+else
+block
+chunk
+stat list
+stat
+varlist
+var
+Name
+a
+=
+explist
+exp
+Number
+2
+;
+keyword end
+end
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+var
+Name
+a
+==
+exp
+Number
+2
+)
+keyword end
+end
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+F
+optional colon name element
+funcbody
+(
+optional parlist
+namelist
+Name
+a
+)
+block
+chunk
+stat list
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+var
+prefixexp
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+debug
+.
+Name
+getinfo
+args
+(
+optional explist
+explist
+exp
+Number
+1
+exp
+String
+double quoted string
+"n"
+)
+.
+Name
+name
+==
+exp
+String
+single quoted string
+'F'
+)
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+var
+Name
+a
+exp
+Number
+2
+exp
+Number
+3
+keyword end
+end
+stat
+varlist
+var
+Name
+a
+var
+Name
+b
+=
+explist
+exp
+exp
+exp
+var
+Name
+F
+args
+(
+optional explist
+explist
+exp
+Number
+1
+)
+~=
+exp
+keyword nil
+nil
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+var
+Name
+a
+==
+exp
+keyword true
+true
+keyword and
+and
+exp
+exp
+var
+Name
+b
+==
+exp
+keyword nil
+nil
+)
+;
+stat
+varlist
+var
+Name
+a
+var
+Name
+b
+=
+explist
+exp
+exp
+exp
+var
+Name
+F
+args
+(
+optional explist
+explist
+exp
+keyword nil
+nil
+)
+==
+exp
+keyword nil
+nil
+;
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+var
+Name
+a
+==
+exp
+keyword true
+true
+keyword and
+and
+exp
+exp
+var
+Name
+b
+==
+exp
+keyword nil
+nil
+)
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+ID
+optional colon name element
+funcbody
+(
+optional parlist
+namelist
+Name
+x
+)
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+var
+Name
+x
+keyword end
+end
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+f
+optional colon name element
+funcbody
+(
+optional parlist
+namelist
+Name
+t
+Name
+i
+)
+block
+chunk
+stat list
+stat list
+stat list
+stat
+keyword local
+local
+namelist
+Name
+b
+optional namelist initialization
+=
+explist
+exp
+var
+prefixexp
+var
+Name
+t
+.
+Name
+n
+stat
+keyword local
+local
+namelist
+Name
+res
+optional namelist initialization
+=
+explist
+exp
+exp
+exp
+var
+prefixexp
+var
+Name
+math
+.
+Name
+mod
+args
+(
+optional explist
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+math
+.
+Name
+floor
+args
+(
+optional explist
+explist
+exp
+exp
+var
+Name
+i
+/
+exp
+var
+Name
+c
+)
+exp
+var
+Name
+b
+)
++
+exp
+Number
+1
+stat
+varlist
+var
+Name
+c
+=
+explist
+exp
+exp
+var
+Name
+c
+*
+exp
+var
+Name
+b
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+var
+prefixexp
+var
+Name
+t
+[
+exp
+var
+Name
+res
+]
+keyword end
+end
+stat
+keyword local
+local
+namelist
+Name
+arg
+optional namelist initialization
+=
+explist
+exp
+tableconstructor
+{
+fieldlist
+field
+exp
+String
+double quoted string
+" ( 1 < 2 ) "
+field
+exp
+String
+double quoted string
+" ( 1 >= 2 ) "
+field
+exp
+String
+double quoted string
+" F ( ) "
+field
+exp
+String
+double quoted string
+"  nil "
+field
+Name
+n
+=
+exp
+Number
+4
+}
+stat
+keyword local
+local
+namelist
+Name
+op
+optional namelist initialization
+=
+explist
+exp
+tableconstructor
+{
+fieldlist
+field
+exp
+String
+double quoted string
+" and "
+field
+exp
+String
+double quoted string
+" or "
+field
+exp
+String
+double quoted string
+" == "
+field
+exp
+String
+double quoted string
+" ~= "
+field
+Name
+n
+=
+exp
+Number
+4
+}
+stat
+keyword local
+local
+namelist
+Name
+neg
+optional namelist initialization
+=
+explist
+exp
+tableconstructor
+{
+fieldlist
+field
+exp
+String
+double quoted string
+" "
+field
+exp
+String
+double quoted string
+" not "
+field
+Name
+n
+=
+exp
+Number
+2
+}
+stat
+keyword local
+local
+namelist
+Name
+i
+optional namelist initialization
+=
+explist
+exp
+Number
+0
+stat
+keyword repeat
+repeat
+block
+chunk
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat
+varlist
+var
+Name
+c
+=
+explist
+exp
+Number
+1
+stat
+keyword local
+local
+namelist
+Name
+s
+optional namelist initialization
+=
+explist
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+var
+Name
+neg
+exp
+var
+Name
+i
+)
+..
+exp
+exp
+String
+single quoted string
+'ID('
+..
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+var
+Name
+neg
+exp
+var
+Name
+i
+)
+..
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+var
+Name
+arg
+exp
+var
+Name
+i
+)
+..
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+var
+Name
+op
+exp
+var
+Name
+i
+)
+..
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+var
+Name
+neg
+exp
+var
+Name
+i
+)
+..
+exp
+exp
+String
+single quoted string
+'ID('
+..
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+var
+Name
+arg
+exp
+var
+Name
+i
+)
+..
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+var
+Name
+op
+exp
+var
+Name
+i
+)
+..
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+var
+Name
+neg
+exp
+var
+Name
+i
+)
+..
+exp
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+var
+Name
+arg
+exp
+var
+Name
+i
+)
+..
+exp
+String
+single quoted string
+'))'
+stat
+keyword local
+local
+namelist
+Name
+s1
+optional namelist initialization
+=
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+string
+.
+Name
+gsub
+args
+(
+optional explist
+explist
+exp
+var
+Name
+s
+exp
+String
+single quoted string
+'ID'
+exp
+String
+single quoted string
+''
+)
+stat
+varlist
+var
+Name
+K
+var
+Name
+X
+var
+Name
+NX
+var
+Name
+WX1
+var
+Name
+WX2
+=
+explist
+exp
+keyword nil
+nil
+stat
+varlist
+var
+Name
+s
+=
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+string
+.
+Name
+format
+args
+(
+optional explist
+explist
+exp
+String
+multiline string
+[[
+      local a = %s
+      local b = not %s
+      K = b
+      local xxx; 
+      if %s then X = a  else X = b end
+      if %s then NX = b  else NX = a end
+      while %s do WX1 = a; break end
+      while %s do WX2 = a; break end
+      repeat if (%s) then break end; assert(b)  until not(%s)
+  ]]
+exp
+var
+Name
+s1
+exp
+var
+Name
+s
+exp
+var
+Name
+s1
+exp
+var
+Name
+s
+exp
+var
+Name
+s1
+exp
+var
+Name
+s
+exp
+var
+Name
+s1
+exp
+var
+Name
+s
+exp
+var
+Name
+s
+)
+stat
+functioncall
+prefixexp
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+var
+Name
+loadstring
+args
+(
+optional explist
+explist
+exp
+var
+Name
+s
+)
+)
+args
+(
+optional explist
+)
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+exp
+var
+Name
+X
+keyword and
+and
+exp
+keyword not
+not
+exp
+var
+Name
+NX
+keyword and
+and
+exp
+exp
+keyword not
+not
+exp
+var
+Name
+WX1
+==
+exp
+var
+Name
+K
+keyword and
+and
+exp
+exp
+keyword not
+not
+exp
+var
+Name
+WX2
+==
+exp
+var
+Name
+K
+)
+stat
+keyword if
+if
+exp
+exp
+exp
+var
+prefixexp
+var
+Name
+math
+.
+Name
+mod
+args
+(
+optional explist
+explist
+exp
+var
+Name
+i
+exp
+Number
+4000
+)
+==
+exp
+Number
+0
+keyword then
+then
+block
+chunk
+stat list
+stat
+functioncall
+prefixexp
+var
+Name
+print
+args
+(
+optional explist
+explist
+exp
+String
+single quoted string
+'+'
+)
+elseif sequence
+optional else block
+keyword end
+end
+stat
+varlist
+var
+Name
+i
+=
+explist
+exp
+exp
+var
+Name
+i
++
+exp
+Number
+1
+keyword until
+until
+exp
+exp
+var
+Name
+i
+==
+exp
+var
+Name
+c
+stat
+functioncall
+prefixexp
+var
+Name
+print
+args
+String
+single quoted string
+'OK'

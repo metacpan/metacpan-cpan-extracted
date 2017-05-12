@@ -1,0 +1,24 @@
+
+0.06  2015-01-10 17:04:00 EST
+    - Change log entry for the next version
+
+v0.05 2015-01-10
+
+    6378f19 bump version to 0.05
+    4921cb4 Additional README.md formatting tweaks, for gh index page
+    0d99bf3 Attempts to fix formatting issues in README.md for gh wiki markup
+    b3a29f3 fix syntax in renee's patch, all tests pass again.
+    4c1b049 Adds Mojolicious to dependencies for carton install
+    bbcd2dd Merge branch 'patch-1' of https://github.com/reneeb/Mojolicious-Plugin-ConfigSimple
+    77dcbfb use lib cpanfile's local path, add Mojolicious to deps
+    a2c0403 Don't rely on the order of stanzas
+    8df96b1 Bumps version to 0.04
+    b6d12bc Adds perldoc to README, copyright notice to perldoc
+    1a40e4d v0.03 -- wantarray returns $app->config, and $cfg
+    21c2771 Adds README and LICENSE to MANIFEST
+    f4e744c Add build artifacts to .gitignore
+    35ff60d Adds acknowledgements to README.md
+    0473816 Merge branch 'master' of https://github.com/hesco/Mojolicious-Plugin-ConfigSimple
+    f322f3f Initial commit
+    7428ffd Version 0.01 Mojolicious::Plugin::ConfigSimple
+

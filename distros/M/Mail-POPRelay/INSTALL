@@ -1,0 +1,63 @@
+
+Mobile POP Relay Control - Install
+
+SYNOPSIS
+	o Generate the Makefile
+		$ perl Makefile.PL
+
+	o Run make
+		$ make
+
+	o Run install
+		$ make install
+
+	o Run test
+		$ make test
+
+	o Install the poprealyd_cleanup script
+		$ perldoc /usr/bin/poprelayd_cleanup
+
+	o Chooose a config file in the ./conf directory
+
+	o Run an agent
+	
+		a. Run one of the provided agents
+			$ /usr/bin/poprelay_ipop3d config-file
+			- or -
+			$ /usr/bin/poprelay_qpopper config-file
+			- or -
+			$ /usr/bin/poprelay_vpopd config-file
+
+			Note: Some modification of the supplied config files may be required
+			      to precisely match your configuration.  Please edit them accordingly.
+			      Furthermore, sending a HUP signal to a running agent will force
+			      it to reload its config-file.
+
+		b. Create an agent if no existing agent currently supports your POP server
+			$ perldoc Mail::POPRelay
+
+		   Send all newly created agents and config files to the author for incorporation into 
+		   the next release.
+
+	o Install an init script
+
+		a. For Redhat based systems:
+
+			$ edit ./bin/poprelayd
+			$ cp ./bin/poprelayd /etc/init.d/
+
+		b. For other systems:
+
+			An init script is not currently provided.
+			Please create your own and feel free to send it for
+			incorporation into the next release.
+
+	o Create appropriate symlinks in your rc directories for 
+	  kill and start modes or use `chkconfig'
+
+
+AUTHOR
+	Keith Hoerling <keith@hoerling.com>
+
+
+$Id: INSTALL,v 1.2 2002/08/20 01:25:37 keith Exp $

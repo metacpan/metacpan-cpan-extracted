@@ -1,0 +1,77 @@
+{
+   "abstract" : "proved the needed bits to be a HTML-Grabber",
+   "author" : [
+      "Theodore Robert Campbell Jr <trcjr@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300021, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Role-HTML-Grabber",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "HTML::Grabber" : "0",
+            "MooseX::AttributeShortcuts" : "0",
+            "MooseX::Role::Parameterized" : "0",
+            "MooseX::Types::Moose" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Moose" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::Role::HTML::Grabber" : {
+         "file" : "lib/MooseX/Role/HTML/Grabber.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-MooseX-Role-HTML-Grabber@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Role-HTML-Grabber"
+      },
+      "homepage" : "https://metacpan.org/release/MooseX-Role-HTML-Grabber",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/trcjr/moosex-role-html-grabber.git",
+         "web" : "https://github.com/trcjr/moosex-role-html-grabber"
+      }
+   },
+   "version" : "0.002"
+}
+

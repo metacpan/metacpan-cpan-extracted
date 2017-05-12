@@ -1,0 +1,79 @@
+<script language="javascript">
+    function openMainWindow (Adresse) {
+      var MainWindow = window.open (Adresse, "mywindow","menubar=0,resizable=1,location=0,toolbar=0,scrollbars=1,width=900,height=800,statusbar=1");
+      MainWindow.focus();
+      self.close();
+      return false;
+    }
+    
+    function setChipcardMode () {
+        var modeField = document.getElementById("mode");
+        if(modeField) {
+            modeField.value = "chipcard";
+        }
+        return true;
+    }
+</script>
+<form name="login" method="post" action="[% PostLink %]">
+    <table class="data" align="center" id="MainDataTable">
+        <tr class="tabheader">
+            <th colspan="2">
+                <div class="infotext">[% tr.tr("Authentification") %]</div>
+            </th>
+        </tr>
+        <tr>
+            <td align="right">[% tr.tr("Name") %]:</td>
+            <td align="left">
+                <input type="text" name="username" size="30" value="[% username %]" maxLength=40 size=20>
+            </td>
+        </tr>
+        <tr>
+            <td align="right">[% tr.tr("Password") %]:</td>
+            <td align="left">
+                <input type="password" name="password" size="30" id="password" value="[% password %]">
+                <input type="hidden" name="mode" id="mode" value="username">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">&nbsp;</td>
+        </tr>
+        [% IF statustext %]
+            <tr>
+                <td colspan="2">&nbsp;</td>
+            </tr>
+            <tr class="tabheader">
+                <th colspan="2">
+                    <div class="infotext">Status</div>
+                </th>
+            </tr>
+            <tr>
+                <th colspan="2">
+                    <div class="[% statuscolor %]">[% tr.tr(statustext) %]</div>
+                </th>
+            </tr>
+        [% END %]
+        <tr>
+            <td colspan="2" align="center">
+                <input type="submit" value="[% tr.tr("Login") %]">
+                <input type="reset" value="[% tr.tr("Reset") %]">
+                <input type="submit" value="[% tr.tr("Chipcard login") %]" onClick="return setChipcardMode();">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <a href="" onClick="return openMainWindow('[% PostLink %]');">[% tr.tr("Make me an application") %]</a>
+            </td>
+        </tr>
+    </table>
+
+    <script type="text/javascript">
+        // <![CDATA[
+        // Currently not implemented
+        $(function() {
+        //    $("#password").hashmask();
+        });
+        // ]]>
+    </script
+
+</form>
+

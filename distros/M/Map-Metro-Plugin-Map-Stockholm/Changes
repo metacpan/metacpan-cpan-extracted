@@ -1,0 +1,75 @@
+Revision history for Map-Metro-Plugin-Map-Stockholm
+
+0.1971 2016-01-27T00:00:11Z UTC
+ [Other Changes]
+ - Rebuilt with current dzil plugins in
+   Dist::Iller::Config::Author::CSSON(::MapMetro).
+ - Be consistent with required Perl version.
+
+0.1970 2015-01-23T18:03:21Z CET
+ [Documentation]
+ - Improved visualization.
+ - Added detailed line documentation.
+ - Rebuilt with Podweaver.
+
+0.1969 2015-01-03T13:28:09Z CET
+ [Bug Fixes]
+ - The green lines had skipped Fridhemsplan.
+
+0.1968 2015-01-03T11:56:29Z CET
+ [Enhancements]
+ - Added Nockebybanan and Tvärbanan tram lines.
+
+0.1967 2015-01-03T00:06:59Z CET
+ [Enhancements]
+ - Added colors to the lines
+ - Includes graphviz generated image of the network
+
+ [Meta]
+ - Bumped Map::Metro requirement to 0.2000.
+
+0.1966 2014-12-30T22:33:31Z CET
+ [Enhancements]
+ - Adapted to Map::Metro 0.1900 map api.
+
+ [Meta]
+ - Bumped required Map::Metro to 0.1900.
+ - Moose::Role is a prereq.
+ - Lowered required Perl version to 5.14.
+
+0.1965 2014-12-13T19:14:34Z CET
+ [Enhancements]
+ - Adapted to new improved one-way segment syntax. (Bumps Map::Metro req to
+   0.1800)
+ - Renamed Vreten to Solna strand (Vreten kept as a search name)
+
+0.1964 2014-12-13T02:17:59Z CET
+ [Enhancements]
+ - Uses the new uni-direction option in segments to correctly only allow
+   travel on the end of the L7 in this direction: Djurgårdsskolan ->
+   Waldemarsudde -> Bellmansro -> Djurgårdsskolan, that is, travel is
+   impossible Bellmansro -> Waldemarsudde (the line ends in a loop  with
+   two stations, all trams travel in the same direction).
+
+0.1963 2014-12-12T23:58:36Z CET
+ [API Changes]
+ - Adaped to new map plugin api (bumped Map::Metro requirement to 0.1700)
+
+0.1962 2014-12-12T13:31:17Z CET
+ [Bug Fixes]
+ - Required wrong version of Map::Metro
+
+0.1961 2014-12-12T02:33:40Z CET
+ [Documentation]
+ - Minimize description so that the Map::Metro documentation is canonical.
+
+ [Enhancements]
+ - Adapted to new Map::Metro api (do bumped requirement to 0.6000).
+
+0.1960 2014-12-11T15:40:51Z CET
+ [Enhancements]
+ - Have a package, get indexed
+
+0.1950 2014-12-10T20:04:12Z CET
+ - Initial release
+

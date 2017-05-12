@@ -1,0 +1,30 @@
+Maypole::View::Mason version 0.1
+=====================================================
+
+This module provides a View for Maypole using the HTML::Mason
+module. See the perldoc for usage instructions. factory templates
+for this view are provided in the 'templates' directory of the 
+distribution.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Maypole
+  HTML::Mason
+
+COPYRIGHT AND LICENCE
+
+This distribution is licensed under the same terms as perl itself.
+
+Copyright (C) 2004 Marcus Ramberg
+

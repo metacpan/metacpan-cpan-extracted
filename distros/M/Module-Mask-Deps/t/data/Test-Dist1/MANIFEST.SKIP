@@ -1,0 +1,16 @@
+^_build
+^Build$
+^Makefile$
+^TODO$
+^blib
+~$
+\.(?:bak|tmp)$
+^MANIFEST\.SKIP$
+CVS
+\.svn
+\.[^/]*\.sw[a-z]
+^[^/]*\.tar\.gz
+^cover_db/
+^spikes/
+^pm_to_blib$
+^debian

@@ -1,0 +1,30 @@
+---
+abstract: 'Looking up module information / loading at runtime'
+author:
+  - 'Jos Boumans <kane[at]cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Load-Conditional
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Locale::Maketext::Simple: '0'
+  Module::CoreList: '2.22'
+  Module::Load: '0.28'
+  Module::Metadata: '1.000005'
+  Params::Check: '0'
+  version: '0.69'
+resources:
+  repository: https://github.com/jib/module-load-conditional
+version: '0.68'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

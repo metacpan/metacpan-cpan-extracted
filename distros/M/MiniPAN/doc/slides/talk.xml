@@ -1,0 +1,49 @@
+<presentation>
+	<title>MiniPan</title>
+	<subtitle>A minimalistic CPAN for the iPhone brought to you in LOLspeak...</subtitle>
+	<author>Tobias Kirschstein</author>
+	<email>mail@lev.geek.nz</email>
+
+	<slide>
+		<title>iz anothr goddamn CPAN modwel?</title>
+		<image>minipan.jpg</image>
+		<bullet>akshully iz another module installa</bullet>
+		<bullet>designed 2 b used on systemz wif limited RAMz0rs (like eifouns)</bullet>
+		<bullet>iz NOT a fully feedshurd riplacement of CPAN! (not even close)</bullet>
+	</slide>
+
+	<slide>
+		<title>and ai did tis why? (teh problemz)</title>
+		<image>cpan.jpg</image>
+		<bullet>started pawting perl to eifoun OS, sumuon was fasta :(</bullet>
+		<bullet>but uat iz perl wifout modwels?</bullet>
+		<bullet>default CPAN installa likez 2 eat teh RAMz</bullet>
+		<bullet>but limited RAMz0rs on eifoun (128 MB on a 3gee)</bullet>
+		<bullet>teh compiled binary haz 2 b signed bfoa exekushon (XS modwels)</bullet>
+		<bullet>inishally? was just a meanz 2 an and</bullet>
+		<bullet>bcause ai can!</bullet>
+	</slide>
+
+	<slide>
+		<title>teh feedshurs man!</title>
+		<bullet>can haz dependency resolving</bullet>
+		<bullet>can haz soupoad foa ./Build.pl and ./Makefile.pl</bullet>
+		<bullet>can also bild dah XS modwels wif oun gcc wroppa</bullet>
+	</slide>
+
+	<slide>
+		<title>i can haz?</title>
+		<bullet>iz packaged in dah jailbreaked installa (cydia)</bullet>
+		<bullet>iz also on CPAN of kors: http://search.cpan.org/~lev/</bullet>
+		<notes>
+			Cydia repository foa perl and MiniPAN hosted bai coredev.nl
+			thx 2 Marc Olzheim's foa tis
+		</notes>
+	</slide>
+
+	<slide>
+		<title>endz</title>
+		<bullet>foa moa informashun si:</bullet>
+		<code syntax="perl"><![CDATA[perldoc MiniPan]]></code>
+	</slide>
+</presentation>

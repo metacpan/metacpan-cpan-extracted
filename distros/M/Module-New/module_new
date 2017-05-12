@@ -1,0 +1,35 @@
+#!perl
+
+use strict;
+use warnings;
+use Module::New;
+
+Module::New->dispatch;
+
+__END__
+
+=head1 NAME
+
+module_new - a helper script to make it easier to write modules
+
+  From the shell/command line:
+
+  > module_new dist Dist-Name
+  > cd Dist-Name/trunk
+  > module_new file Dist::Name::Plugin
+  > module_new file t/dist_test.t --edit
+  > module_new manifest --force
+  > module_new help
+
+=head1 AUTHOR
+
+Kenichi Ishigaki, E<lt>ishigaki at cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2007-2009 by Kenichi Ishigaki.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

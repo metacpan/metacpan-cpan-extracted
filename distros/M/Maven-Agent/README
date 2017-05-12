@@ -1,0 +1,108 @@
+NAME
+
+    Maven::Agent - A base agent for working with maven
+
+VERSION
+
+    version 1.14
+
+SYNOPSIS
+
+        use Maven::Agent;
+    
+        my $agent = Maven::Agent->new();
+
+    Or if you need to configure your own LWP
+
+        my $lwp = LWP::UserAgent->new();
+        $lwp->env_proxy();
+        my $agent = Maven::Agent->new(agent => $lwp);
+    
+        my $maybe_artifact = $agent->resolve(
+            'javax.servlet:servlet-api:2.5');
+        if ($maybe_artifact) {
+            # use it
+        }
+    
+        my $artifact = $agent->resolve_or_die(
+            'javax.servlet:servlet-api:2.5');
+    
+        my $servlet_api_jar = $agent->download('javax.servlet:servlet-api:2.5');
+    
+        $agent->download('javax.servlet:servlet-api:2.5',
+            to => '/path/to/some/directory');
+
+DESCRIPTION
+
+    The default agents for working with Maven artifacts.
+
+CONSTRUCTORS
+
+ new([%options])
+
+    Creates a new agent. %options is passed through to "new([%options])" in
+    Maven::Maven.
+
+METHODS
+
+ download($artifact, [%options])
+
+    Downloads $artifact and returns the path to the downloaded file. The
+    current options are:
+
+    to
+
+      The path to download the artifact to. If the path is a directory, the
+      download filename will be artifactId.packaging. Defaults to a
+      temporary location. If it is the temporary location, the type of the
+      return value is actually a blessed object that overrides the ""
+      operator so that it behaves like a string path. This allows the
+      temporary file to be cleaned up when the object goes out of scope.
+
+ get_maven
+
+    Returns the Maven::Maven object.
+
+ is_local($artifact)
+
+    Returns a truthy value if $artifact is found in the local repository.
+    This method expects $artifact to have already been resolved.
+
+ resolve($artifact, [%parts])
+
+    Will attempt to resolve $artifact. $artifact can be either an instance
+    of Maven::Artifact or a coordinate string of the form
+    groupId:artifactId[:packaging[:classifier]]:version
+    <https://maven.apache.org/pom.html#Maven_Coordinates> If resolution was
+    successful, a new Maven::Artifact will be returned with its uri set.
+    Otherwise, undef will be returned. If %parts are supplied, their values
+    will be used to override the corresponding values in $artifact before
+    resolution is attempted.
+
+ resolve_or_die($artifact)
+
+    Calls resolve, and, if resolution was successful, the new $artifact
+    will be returned, otherwise, croak will be called.
+
+AUTHOR
+
+    Lucas Theisen <lucastheisen@pastdev.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Lucas Theisen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * Maven::MvnAgent
+
+      * Maven::Artifact
+
+      * Maven::Maven
+

@@ -1,0 +1,183 @@
+#!perl
+use strict;
+use warnings;
+
+package continuoushist;
+our $VERSION = '1.05';
+use Getopt::Long qw(GetOptions);
+use Term::Size ();
+use Pod::Usage qw(pod2usage);
+use Math::SimpleHisto::XS;
+use Math::SimpleHisto::XS::CLI qw(:all);
+use Term::ANSIScreen qw(:color :cursor :screen);
+
+GetOptions(
+  my $opt = {},
+  'sort',
+  'width|w=i',
+  'numeric-format|nf=s',
+  'style=s',
+  'log',
+
+  'nostats',
+  'min=f',
+  'max=f',
+  'nbins=i',
+  'desc=s',
+  'xw',
+  'cumulative',
+  'stepsize=i',
+  #'dump_as_input|dump-as-input|dumpasinput|d',
+  #'rebin=i', # ???
+
+  'man',
+  'help|h',
+);
+
+pod2usage({-verbose => 2}) if $opt->{man};
+pod2usage({-verbose => 0}) if $opt->{help};
+
+my @missing = grep !defined($opt->{$_}), qw(min max);
+if (@missing) {
+  pod2usage({-verbose => 0, -msg => "Mandatory options missing: '"
+                                    . join("', '", map "--$_", @missing) . "'"});
+}
+
+=pod
+
+=head1 NAME
+
+continuoushist - simple text histograms -- updating as data comes in
+
+=head1 SYNOPSIS
+
+  generator | continuoushist [--sort] [--width=<ncols>] [--style=<ident>]
+                             [--numeric-format|nf=<printf format>]
+                             [--nostats] [--timestamp|ts] [--xw]
+                             [--stepsize=X] [--log] [--cumulative]
+                             [--nbins=X] --min=X --max=X
+
+Reads whitespace-separated numbers from STDIN, generates a
+histogram, and continuously re-renders an ASCII histogram
+in your terminal as
+it keeps reading data. Consider it a combination of the C<histify>
+and the C<drawasciihist> tools. You may want to read up on those
+separately before continuing with this.
+
+Histogram boundaries need to be specified using the --min and
+--max options. The number of bins defaults to the height of your
+terminal.
+
+Using --desc=<type> adds an extra column to the output before the
+histogram content (separated by a tab) that can be any one of:
+The bin "number", the bin "center", the "left" bin boundary,
+the "right" bin boundary, or the bin "range" (lower and upper
+boundary separated by a comma).
+
+The --xw option will cause continuoushist to read alternating X values
+and weights instead of just X values from STDIN.
+
+The --cumulative option causes continuoushist to display the
+cumulative histogram of the input.
+
+The output histogram width is determined automatically from your
+terminal size, if any. Otherwise assumes 80 columns. You can set the
+width explicitly using --width=ncols. The --sort option sorts
+the bins by content instead of input order.
+
+If the --numeric-format option is present, then the actual numeric
+value is included in the histogram using the given C<printf> format.
+For positive integers, you would use C<--nf='%u'>, for signed integers,
+use C<--nf='%i'> and for fixed precision floats, you can use something
+like C<--nf='%.2f'>.
+
+You can choose the character to be used for drawing histograms with the
+C<--style=[character]> option. The characters '-', '=', '~' are special
+cased to use an arrow-like appearance.
+
+The --timestamp option will case bin descriptions to be passed
+through C<localtime()> to convert from Unix timestamps to
+human-readable time strings.
+
+The --log option draws the histogram on a logarithmic scale.
+The --nostats option supresses output of the header line.
+
+=cut
+
+
+# Get CLI options
+if ($opt->{dump_as_input} and grep exists($opt->{$_}), qw(xw max min nbins)) {
+  pod2usage({
+    -exitval => 1,
+    -verbose => 0,
+    -message => '--dump-as-input is not compatible with the --xw, --max, --min, or --nbins options'
+  });
+}
+
+$opt->{"show-numeric"} = defined($opt->{"numeric-format"});
+$opt->{"numeric-format"} = $opt->{"show-numeric"} ? $opt->{"numeric-format"} : "%.2f";
+
+my $styledef = intuit_ascii_style($opt->{style});
+$opt->{style} = $styledef;
+$opt->{stats} = !$opt->{nostats};
+$opt->{nbins} = ( intuit_output_size(\*STDOUT) )[1] - ($opt->{stats} ? 2 : 1) if not $opt->{nbins} and not $opt->{dump_as_input};
+$opt->{stepsize} ||= 1;
+
+my $hist = Math::SimpleHisto::XS->new(
+  nbins => $opt->{nbins},
+  min => $opt->{min},
+  max => $opt->{max},
+);
+
+my $desc = lc($opt->{desc}||'');
+my $cumulative = $opt->{cumulative};
+cls();
+while (1) {
+  locate(1,1);
+
+  #if ($opt->{dump_as_input}) {
+  #  $hist = histogram_from_dumps_fh(\*STDIN);
+  #}
+  # else {
+  histogram_from_fh($opt, \*STDIN, $hist);
+  #}
+
+  my $draw_hist = $hist;
+  if ($cumulative) {
+    $draw_hist = $hist->cumulative();
+  }
+
+  my @rows;
+  if ($desc eq '' or $desc eq 'none') {
+    my $content = $draw_hist->all_bin_contents;
+    @rows = map [$_+1, $content->[$_]], 0..$#$content;
+  }
+  elsif ($desc =~ /^(?:center|number|left|right|range)$/) {
+    my $content = $draw_hist->all_bin_contents;
+    my $descriptions;
+    if    ($desc eq 'center') { $descriptions = $draw_hist->bin_centers; }
+    elsif ($desc eq 'number') { $descriptions = [0..$draw_hist->nbins-1]; }
+    elsif ($desc eq 'left')   { $descriptions = $draw_hist->bin_lower_boundaries; }
+    elsif ($desc eq 'right')  { $descriptions = $draw_hist->bin_upper_boundaries; }
+    elsif ($desc eq 'range')  { $descriptions = [ map $draw_hist->bin_lower_boundary($_).",".$draw_hist->bin_upper_boundary($_), 0..($draw_hist->nbins-1) ] }
+
+    @rows = map [$descriptions->[$_], $content->[$_]], 0..($draw_hist->nbins-1);
+  }
+  else {
+    die "Invalid description mode";
+  }
+  #use Data::Dumper;
+  #warn Dumper \@rows;
+
+  print_hist_stats(\*STDOUT, $hist, $opt) if $opt->{stats};
+
+  # The drawing code would use this as a drawing max min/max setting
+  local $opt->{min};
+  local $opt->{max};
+
+  draw_ascii_histogram(
+    \*STDOUT,
+    \@rows,
+    $opt
+  );
+}

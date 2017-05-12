@@ -1,0 +1,17 @@
+######################################################################
+Revision history for Perl extension Module::Rename
+
+0.04 (2013/07/27)
+   (ms) [rt.cpan.org #87172] Applied changes by Jim Cochrane to add a -g 
+        switch, which uses "git mv" instead of mv. Added various fixes and 
+        test cases.
+
+0.03 (2005/04/09)
+   (ms) Added sandbox/eg to MANIFEST to fix installation problem
+
+0.02 (2005/03/28)
+   (ms) Replace "Foo/Bar" in files just like "Foo::Bar".
+   (ms) Replace pm files outside the regular dir structure.
+
+0.01 (2005/03/27)
+   (ms) Where it all began.

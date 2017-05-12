@@ -1,0 +1,35 @@
+Revision history for MooseX-Role-Validatable
+
+0.09      2017-02-27 08:26:54+00:00 UTC
+        - switch to dzil
+
+0.09  2014-10-15 12:55:43 CST
+        - remove no use requirements
+
+0.08  2014-10-15 11:56:55 CST
+        - remove t/moo.t
+
+0.07  2014-10-15 11:46:52 CST
+        - remove MooX-*
+
+0.06  2014-10-15 11:43:39 CST
+        - POD fix
+        - pass the perltidy and perlcritic
+
+0.05  2014-10-08 17:28:27 CST
+        - mv main module to MooseX-Role-Validatable
+
+0.04  2014-10-08 13:02:00 CST
+        - when we call meta->get_all_method_names, we still need Moose as requirement
+            (so that actually should be just MooseX-Role-)
+        - add new MooseX-Role-Validatable
+        - we'll deprecated MooX-Role-Validatable in next few release
+
+0.03  2014-09-27 15:09:07 CST
+        - scalar on @ instead of direct context issue
+
+0.02  2014-09-27 14:24:17 CST
+        - changes for old version of Moo and Moose
+
+0.01  2014-09-27 13:12:19 CST
+        - Initial release

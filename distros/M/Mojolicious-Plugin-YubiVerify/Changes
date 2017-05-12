@@ -1,0 +1,23 @@
+Revision history for Mojolicious-Plugin-YubiVerify
+
+0.06	2015-11-27
+	Add META.yml and META.json.
+
+0.05	2015-01-12
+	Replace render_text(...) with render(text => ...) in docs.
+	Replace Mojo::IOLoop->new->generate_port with Mojo::IOLoop->new->server->generate_port.
+	Thanks to Renée Bäcker (http://www.perl-services.de/) for reporting.
+
+0.04	2014-05-22
+	secret() was removed in new Mojolicious - don't set custom secret in test script.
+
+0.03	2011-11-16
+	Obtain YubiKey key id by removing last 32 chars, rather than taking first 12.
+
+0.02	2011-11-12
+	Forgot String::Random.
+	Corrected number of tests.
+
+0.01    2011-11-12
+        First version, released on an unsuspecting world.
+

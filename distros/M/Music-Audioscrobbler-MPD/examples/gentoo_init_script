@@ -1,0 +1,18 @@
+#!/sbin/runscript
+
+depend() {
+	need net
+	use mpd
+}
+
+start () {
+	ebegin "Starting Music::Audioscrobbler::MPD"
+	/usr/bin/musicmpdscrobble --daemonize --pidfile=/var/run/musicmpdscrobble.pid
+	eend $?
+}
+
+stop () {
+	ebegin "Stopping Music::Audioscrobbler::MPD"
+	/usr/bin/musicmpdscrobble --kill --pidfile=/var/run/musicmpdscrobble.pid
+	eend $?
+}

@@ -1,0 +1,642 @@
+{
+   "leader" : "02179cas  2200553 a 45e0",
+   "fields" : [
+      {
+         "001" : "913380"
+      },
+      {
+         "005" : "20030124101153.0"
+      },
+      {
+         "008" : "751101c19479999dcuuu1m      f0   a0eng  "
+      },
+      {
+         "010" : {
+            "subfields" : [
+               {
+                  "a" : "   52002169 "
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "035" : {
+            "subfields" : [
+               {
+                  "a" : "(OCoLC)ocm01768314"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "035" : {
+            "subfields" : [
+               {
+                  "9" : "ADZ9243AM"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "035" : {
+            "subfields" : [
+               {
+                  "a" : "913380"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "040" : {
+            "subfields" : [
+               {
+                  "a" : "DLC"
+               },
+               {
+                  "c" : "MUL"
+               },
+               {
+                  "d" : "COO"
+               },
+               {
+                  "d" : "NSD"
+               },
+               {
+                  "d" : "DLC"
+               },
+               {
+                  "d" : "GPO"
+               },
+               {
+                  "d" : "NST"
+               },
+               {
+                  "d" : "DLC"
+               },
+               {
+                  "d" : "RCS"
+               },
+               {
+                  "d" : "GPO"
+               },
+               {
+                  "d" : "AIP"
+               },
+               {
+                  "d" : "OCL"
+               },
+               {
+                  "d" : "NSD"
+               },
+               {
+                  "d" : "OCL"
+               },
+               {
+                  "d" : "IUL"
+               },
+               {
+                  "d" : "HUL"
+               },
+               {
+                  "d" : "NST"
+               },
+               {
+                  "d" : "IUL"
+               },
+               {
+                  "d" : "HUL"
+               },
+               {
+                  "d" : "NST"
+               },
+               {
+                  "d" : "MYG"
+               },
+               {
+                  "d" : "SYS"
+               },
+               {
+                  "d" : "TXA"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "016" : {
+            "subfields" : [
+               {
+                  "a" : "C56643000"
+               },
+               {
+                  "2" : "DNLM"
+               }
+            ],
+            "ind1" : "7",
+            "ind2" : " "
+         }
+      },
+      {
+         "019" : {
+            "subfields" : [
+               {
+                  "a" : "2260037"
+               },
+               {
+                  "a" : "2260038"
+               },
+               {
+                  "a" : "5087003"
+               },
+               {
+                  "a" : "853216"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "022" : {
+            "subfields" : [
+               {
+                  "a" : "0363-6836"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "035" : {
+            "subfields" : [
+               {
+                  "a" : "0755033"
+               },
+               {
+                  "b" : "MULS"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "042" : {
+            "subfields" : [
+               {
+                  "a" : "nsdp"
+               },
+               {
+                  "a" : "lc"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "043" : {
+            "subfields" : [
+               {
+                  "a" : "n-us---"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "050" : {
+            "subfields" : [
+               {
+                  "a" : "HA195"
+               },
+               {
+                  "b" : ".A53"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : "0"
+         }
+      },
+      {
+         "060" : {
+            "subfields" : [
+               {
+                  "a" : "W2 A B9CU"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "074" : {
+            "subfields" : [
+               {
+                  "a" : "0142-C-01"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "082" : {
+            "subfields" : [
+               {
+                  "a" : "312.9"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "086" : {
+            "subfields" : [
+               {
+                  "a" : "C 56.218:P-20/"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "086" : {
+            "subfields" : [
+               {
+                  "a" : "C 3.186:P-20/"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "049" : {
+            "subfields" : [
+               {
+                  "a" : "TXAM"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "210" : {
+            "subfields" : [
+               {
+                  "a" : "Curr. popul. rep., Ser. P-20, Popul. char."
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "222" : {
+            "subfields" : [
+               {
+                  "a" : "Current population reports. Series P-20, Population characteristics"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : "0"
+         }
+      },
+      {
+         "245" : {
+            "subfields" : [
+               {
+                  "a" : "Current population reports."
+               },
+               {
+                  "n" : "Series P-20,"
+               },
+               {
+                  "p" : "Population characteristics."
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : "0"
+         }
+      },
+      {
+         "246" : {
+            "subfields" : [
+               {
+                  "a" : "Population characteristics"
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : "0"
+         }
+      },
+      {
+         "260" : {
+            "subfields" : [
+               {
+                  "a" : "[Washington, D.C.] :"
+               },
+               {
+                  "b" : "U.S. Dept. of Commerce, Bureau of the Census :"
+               },
+               {
+                  "b" : "For sale by the Supt. of Docs., U.S. G.P.O.,"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "265" : {
+            "subfields" : [
+               {
+                  "a" : "Supt. of Docs., U.S. Govt. Print. Off., Washington, DC 20402"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "300" : {
+            "subfields" : [
+               {
+                  "a" : "v. :"
+               },
+               {
+                  "b" : "ill., maps ;"
+               },
+               {
+                  "c" : "27 cm."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "362" : {
+            "subfields" : [
+               {
+                  "a" : "Began with No. 1."
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : " "
+         }
+      },
+      {
+         "500" : {
+            "subfields" : [
+               {
+                  "a" : "Description based on: No. 352."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "500" : {
+            "subfields" : [
+               {
+                  "a" : "Prior to January 1976 issues were classified C 56.218:P-20/(nos.)"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "510" : {
+            "subfields" : [
+               {
+                  "a" : "Population index"
+               },
+               {
+                  "x" : "0032-4701"
+               }
+            ],
+            "ind1" : "2",
+            "ind2" : " "
+         }
+      },
+      {
+         "510" : {
+            "subfields" : [
+               {
+                  "a" : "American statistics index"
+               },
+               {
+                  "x" : "0091-1658"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "530" : {
+            "subfields" : [
+               {
+                  "a" : "Some issues also available online via the World Wide Web, in PDF format."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "651" : {
+            "subfields" : [
+               {
+                  "a" : "United States"
+               },
+               {
+                  "x" : "Population"
+               },
+               {
+                  "v" : "Statistics"
+               },
+               {
+                  "v" : "Periodicals."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : "0"
+         }
+      },
+      {
+         "710" : {
+            "subfields" : [
+               {
+                  "a" : "United States."
+               },
+               {
+                  "b" : "Bureau of the Census."
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : " "
+         }
+      },
+      {
+         "740" : {
+            "subfields" : [
+               {
+                  "a" : "Population-special subjects."
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "780" : {
+            "subfields" : [
+               {
+                  "t" : "Current population reports. Series P-27, Farm population"
+               },
+               {
+                  "x" : "1048-6283"
+               },
+               {
+                  "w" : "(DLC)sf 87037999"
+               },
+               {
+                  "w" : "(OCoLC)7226532"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : "5"
+         }
+      },
+      {
+         "850" : {
+            "subfields" : [
+               {
+                  "a" : "AU"
+               },
+               {
+                  "a" : "DLC"
+               },
+               {
+                  "a" : "InU"
+               },
+               {
+                  "a" : "MH-KG"
+               },
+               {
+                  "a" : "MH-PA"
+               },
+               {
+                  "a" : "MH-SR"
+               },
+               {
+                  "a" : "MdU"
+               },
+               {
+                  "a" : "PU-W"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "856" : {
+            "subfields" : [
+               {
+                  "u" : "http://www.census.gov/mp/www/pub/pop/mspop01.html"
+               }
+            ],
+            "ind1" : "4",
+            "ind2" : "1"
+         }
+      },
+      {
+         "891" : {
+            "subfields" : [
+               {
+                  "9" : "853"
+               },
+               {
+                  "8" : "1"
+               },
+               {
+                  "a" : "no."
+               },
+               {
+                  "i" : "(year)"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : "3"
+         }
+      },
+      {
+         "891" : {
+            "subfields" : [
+               {
+                  "9" : "863"
+               },
+               {
+                  "8" : "1"
+               },
+               {
+                  "a" : "<324>-"
+               },
+               {
+                  "i" : "<1978>-"
+               },
+               {
+                  "x" : "provisional"
+               }
+            ],
+            "ind1" : "4",
+            "ind2" : "0"
+         }
+      },
+      {
+         "936" : {
+            "subfields" : [
+               {
+                  "a" : "No. 404 (Nov. 1985) LIC"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "994" : {
+            "subfields" : [
+               {
+                  "a" : "E0"
+               },
+               {
+                  "b" : "TXA"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      }
+   ]
+}

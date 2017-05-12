@@ -1,0 +1,77 @@
+# Math::MatrixReal
+
+NxN Real Matrices in Perl
+
+[![Build Status](https://secure.travis-ci.org/leto/math--matrixreal.png)](http://travis-ci.org/leto/math--matrixreal)
+
+Report bugs and submit patches at http://github.com/leto/math--matrixreal
+
+Perl version 5.003 or higher capable of "overloading" (overload.pm).
+
+## What does it do:
+
+### Math::MatrixReal - Matrix of Reals
+
+Implements the data type "matrix of reals" (and consequently also
+"vector of reals") which can be used almost like any other basic
+Perl type thanks to OPERATOR OVERLOADING, i.e.,
+
+    $A       = $matrix1 * $matrix2;
+    $B       = $A ** 2;
+    $C       = $A + 2*B;
+    $D       = $C - $B/2;
+    $inverse = $C ** -1;
+    $inverse = 1/$C;
+
+does what you would like it to do.
+
+Also features many important operations and methods: matrix norm,
+matrix transposition, matrix inverse, determinant of a matrix, order
+and numerical condition of a matrix, scalar product of vectors, vector
+product of vectors, vector length, projection of row and column vectors,
+a comfortable way for reading in a matrix from a file, the keyboard or
+your code, and many more.
+
+Allows to solve linear equation systems using an efficient algorithm
+known as "L-R-decomposition" and several approximative (iterative) methods.
+
+Features an implementation of Kleene's algorithm to compute the minimal
+costs for all paths in a graph with weighted edges (the "weights" being
+the costs associated with each edge).
+
+Allows to solve the eigensystem of a real symmetric matrix, using
+Householder transformation and QL decomposition.
+
+## Installation Instructions
+
+Since Math::MatrixReal 2.03, Module::Build is used for the build process, but
+a Makefile.PL is still generated for older installations. If you do not have
+Module::Build, please read the OLD_README file.
+
+The build and install Math::MatrixReal run the commands
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+## Version history:
+
+See the CHANGES file.
+
+## Credits:
+
+See the CREDITS file.
+
+## Copyright
+
+    1996-1997 by Steffen Beyer.
+
+    1999 by Rodolphe Ortalo.
+
+    2001-2013 by Jonathan "Duke" Leto.
+
+All rights reserved.
+
+This package is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

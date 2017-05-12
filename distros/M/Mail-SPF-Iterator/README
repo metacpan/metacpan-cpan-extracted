@@ -1,0 +1,11 @@
+This module provides lookup of SPF records including support for SenderID.
+It's thought as an alternative to Mail::SPF in cases, where you don't want to
+block waiting for the SPF response but instead want to continue doing other
+stuff or doing multiple SPF in parallel w/o using multiple threads or processes.
+See perldoc of Mail::SPF::Iterator for more details.
+
+THANKS:
+- Thanks for http://www.genua.de to let me publish and maintain this module at
+  CPAN.
+- Thanks for http://www.openspf.org for providing the useful test suite.
+- Special thanks to grunk for a good code review.

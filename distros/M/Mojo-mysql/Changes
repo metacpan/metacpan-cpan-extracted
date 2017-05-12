@@ -1,0 +1,90 @@
+Revision history for perl distribution Mojo-mysql
+
+1.01 2017-03-25T08:24:29+0100
+ - Add strict_mode() method and constructor #29
+
+1.00 2017-02-12T18:30:58+0100
+ - Add support for generating queries with SQL::Abstract
+ - Add abstract attribute to Mojo::Pg
+ - Add delete, insert, select and update methods to Mojo::Pg::Database
+ - Add database_class attribute to Mojo::mysql
+ - Add results_class attribute to Mojo::mysql::Database
+ - Improved contextual caller information in query error messages
+ - Compatible with Mojolicious 7.18
+
+0.14 2016-02-15T14:06:24+0100
+ - Add Mojo::mysql::auto_migrate
+
+0.13 2016-01-27T21:05:37+0100
+ - Remove deprecrated do() method
+ - Add finish() to Mojo::mysql::Results
+ - Fix bug where non-blocking queries could get lost after the database
+   connection got closed unexpectedly
+   https://github.com/kraih/mojo-pg/commit/2165b8e1131f2a5044ec2aae1c0ba8a00232b7c8
+ - Improved Mojo::mysql::Migrations to detect if the currently active version
+   is greater than the latest version.
+   https://github.com/kraih/mojo-pg/commit/92bc312e725042b748950b9c61319d0256d0004a
+
+0.12 2015-05-02T17:55:13Z
+ - Added module Mojo::mysql::PubSub.
+ - Added pubsub attribute to Mojo::mysql.
+
+0.11 2015-04-06T03:38:31Z
+ - Fixed bug in Mojo::mysql::Migrations where migrations would sometimes be
+   executed in the wrong order.
+
+0.10 2015-04-05T23:32:03Z
+ - Fixed bug in Mojo::mysql::Migrations where the latest version could not
+   always be determined correctly. (Hernan Lopes)
+ - Updated blog example application from Mojo::Pg
+
+0.09 2015-03-29T18:29:35Z
+ - Fixed Mojo::mysql::Migrations to allow delimiter in comments and quoted
+   strings
+ - delimiter support in Mojo::mysql::Migrations, allows creation of stored
+   procedures and triggers in migration scripts
+ - 'quote' and 'quote_id' methods in Mojo::mysql::Database
+
+0.08 2015-03-24T13:14:32Z
+ - blog example from Mojo::Pg
+ - better examples in POD
+ - Improved Mojo::mysql::Migrations to make no changes to the database when
+   checking the currently active version.
+ - Fixed Mojo::mysql::Migrations to handle UTF-8 encoded files correctly
+
+0.07 2015-03-09T13:34:31Z
+ - Deprecated Mojo::mysql::Database::do in favour of
+   Mojo::mysql::Database::query as in Mojo::Pg
+ - Some new methods in Mojo::mysql::Result eliminating need to access sth
+ - bugfix in Mojo::mysql::Migrations with trailing whitespace after last
+   semicolon
+
+0.06 2015-02-25T17:31:24Z
+ - OO Mojo::Loader API is deprecated in Mojolicious 5.81
+
+0.05 2015-01-22T00:14:11Z
+ - Do not cache statement handles in Mojo::mysql::Database.
+ - Synced changes from Mojo::Pg
+ - utf8 enabled by default
+
+0.04 2015-01-02T12:15:26Z
+ - Add support for migrations #3 Contributor: Curt Hochwender
+ - Add Mojo::mysql::Migrations.
+ - Add migrations attribute to Mojo::msyql
+ - Add db attribute to Mojo::mysql::Transaction.
+ - Fix bug where Perl would close the DBD::mysql file descriptor after it
+   had been used with the event loop.
+ - Remove dbh attribute from Mojo::mysql::Transaction
+ - Updated Mojolicious requirement to 5.49 to ensure migrations in the DATA
+   section are not served as static files
+
+0.03 2014-10-13T13:39:59Z
+ - Removed commit and rollback methods from Mojo::mysql::Database.
+ - Added Mojo::mysql::Transaction.
+
+0.02 2014-10-12T18:14:33Z
+ - Force mysql_auto_reconnect = 0 to avoid nasty reconnect bugs under some
+   environments. https://metacpan.org/pod/DBD::mysql#mysql_auto_reconnect
+
+0.01 2014-10-11T17:34:05Z
+ - First release.

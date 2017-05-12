@@ -1,0 +1,59 @@
+{
+   "abstract" : "Mojolicious plugin validator for GET/POST data.",
+   "author" : [
+      "Dmitry E. Oboukhov <unera@debian.org>,",
+      "Roman V. Nikolaev <rshadow@rambler.ru>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Vparam",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "DateTime::Format::DateParse" : "0",
+            "List::MoreUtils" : "0",
+            "Mail::RFC822::Address" : "0",
+            "Mojolicious" : "0",
+            "Test::Compile" : "0",
+            "Test::More" : "0",
+            "XML::LibXML" : "0",
+            "perl" : "5.010000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dr-co/libmojolicious-plugin-vparam-perl/issues"
+      },
+      "homepage" : "https://github.com/dr-co/libmojolicious-plugin-vparam-perl",
+      "repository" : {
+         "url" : "https://github.com/dr-co/libmojolicious-plugin-vparam-perl"
+      }
+   },
+   "version" : "2.07"
+}

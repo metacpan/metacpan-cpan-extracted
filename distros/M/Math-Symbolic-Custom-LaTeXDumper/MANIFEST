@@ -1,0 +1,17 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Math/Symbolic/Custom/LaTeXDumper.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01compile.t
+t/02bugs.t
+xt/00pod.t
+xt/00podcover.t

@@ -1,0 +1,36 @@
+<%args>
+</%args>
+
+<%doc>
+
+=head1 edit
+
+This is the edit page. It edits the passed-in object, by displaying a
+form similar to L<add_new> but with the current values filled in.
+
+</%doc>
+
+<& header, %ARGS &>
+
+%foreach my $item (@$objects) {
+%   my $string = $item->stringify_column;
+<form action="<% $base %>/<% $item->table %>/do_edit/<% 
+    $item->id %>" method="post">
+  <fieldset>
+    <legend> Edit <% $item->$string %></legend>
+%foreach my $col (@{$classmetadata->{columns}}) {
+%   next if $col eq "id";
+        <label><span class="field"><% 
+	$classmetadata->{colnames}->{$col}%>:</span>
+           <%$item->to_field($col)->as_HTML%>
+        </label>
+%        if ($request->{template_args}->{errors}->{$col}) {
+            <span class="error"> <%$request->{template_args}->{errors}->{$col}%> </font>
+%        }
+%}
+     <input type="submit" name="edit" value="save">
+   </fieldset>
+</form>
+%}
+
+<& footer, %ARGS &>

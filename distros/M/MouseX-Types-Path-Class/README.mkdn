@@ -1,0 +1,93 @@
+# NAME
+
+MouseX::Types::Path::Class - A Path::Class type library for Mouse
+
+# SYNOPSIS
+
+## CLASS TYPES
+
+    package MyApp;
+    use Mouse;
+    use MouseX::Types::Path::Class;
+
+    has 'dir' => (
+        is       => 'ro',
+        isa      => 'Path::Class::Dir',
+        required => 1,
+        coerce   => 1,
+    );
+
+    has 'file' => (
+        is       => 'ro',
+        isa      => 'Path::Class::File',
+        required => 1,
+        coerce   => 1,
+    );
+
+## CUSTOM TYPES
+
+    package MyApp;
+    use Mouse;
+    use MouseX::Types::Path::Class qw(Dir File);
+
+    has 'dir' => (
+        is       => 'ro',
+        isa      => Dir,
+        required => 1,
+        coerce   => 1,
+    );
+
+    has 'file' => (
+        is       => 'ro',
+        isa      => File,
+        required => 1,
+        coerce   => 1,
+    );
+
+# DESCRIPTION
+
+MouseX::Types::Path::Class creates common [Mouse](http://search.cpan.org/perldoc?Mouse) types,
+coercions and option specifications useful for dealing
+with [Path::Class](http://search.cpan.org/perldoc?Path::Class) objects as [Mouse](http://search.cpan.org/perldoc?Mouse) attributes.
+
+Coercions (see [Mouse::Util::TypeConstraints](http://search.cpan.org/perldoc?Mouse::Util::TypeConstraints)) are made
+from both `Str` and `ArrayRef` to both [Path::Class::Dir](http://search.cpan.org/perldoc?Path::Class::Dir) and
+[Path::Class::File](http://search.cpan.org/perldoc?Path::Class::File) objects.
+If you have [MouseX::Getopt](http://search.cpan.org/perldoc?MouseX::Getopt) installed,
+the Getopt option type ("=s") will be added for both
+[Path::Class::Dir](http://search.cpan.org/perldoc?Path::Class::Dir) and [Path::Class::File](http://search.cpan.org/perldoc?Path::Class::File).
+
+# TYPES
+
+## Dir
+
+A [Path::Class::Dir](http://search.cpan.org/perldoc?Path::Class::Dir) class type.
+
+Coerces from `Str` and `ArrayRef` via ["new" in Path::Class::Dir](http://search.cpan.org/perldoc?Path::Class::Dir#new).
+
+## File
+
+A [Path::Class::File](http://search.cpan.org/perldoc?Path::Class::File) class type.
+
+Coerces from `Str` and `ArrayRef` via ["new" in Path::Class::File](http://search.cpan.org/perldoc?Path::Class::File#new).
+
+# AUTHOR
+
+NAKAGAWA Masaki <masaki@cpan.org>
+
+# THANKS TO
+
+["AUTHOR" in MooseX::Types::Path::Class](http://search.cpan.org/perldoc?MooseX::Types::Path::Class#AUTHOR)
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+# SEE ALSO
+
+[Mouse](http://search.cpan.org/perldoc?Mouse), [MouseX::Types](http://search.cpan.org/perldoc?MouseX::Types),
+
+[Path::Class](http://search.cpan.org/perldoc?Path::Class),
+
+[MooseX::Types::Path::Class](http://search.cpan.org/perldoc?MooseX::Types::Path::Class)

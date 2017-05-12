@@ -1,0 +1,8 @@
+Revision history for Mail-IMAPTalk-MailCache
+
+0.0.1	2010-02-20/06:00
+		-Now uses peek to get the headers.
+
+0.0.0	2009-07-06/12:30
+        -Initial release.
+

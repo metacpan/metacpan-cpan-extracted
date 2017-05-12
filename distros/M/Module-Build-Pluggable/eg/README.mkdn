@@ -1,0 +1,7 @@
+# SYNOPSIS
+
+    # Here is code
+
+# SEE ALSO
+
+[Acme::Hidek](http://search.cpan.org/perldoc?Acme::Hidek)

@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 8d268790097b5a85aaf71b52eff5113d54e1e8fa COPYRIGHT
+SHA1 0ad7d008b15a7ff0409d5482c6430cbd084fd06e CREDITS
+SHA1 fa5cab7eb140e461c9fc2eba9833d7adaa4b22c0 Changes
+SHA1 11f9e802209b6051237857029df435cca7fd190b INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 2aa50479d84da60384bed45b9fbf907f5dbb501a MANIFEST
+SHA1 bdd7fc6be2b60d6872e70a7193b3ea1a377f71a0 META.json
+SHA1 d69e0fd20613e360592cbfa3b5b086d54deb6c5b META.yml
+SHA1 00c23bdff5acbad5dc29f30ffad327463a79c5c6 Makefile.PL
+SHA1 0ff081e05e108a5c168f3d8f86ba169948372061 README
+SHA1 17c0fc1832dd20e7483268f7769412b325dbe406 dist.ini
+SHA1 7a304cd66ab61d1eafed8a7dea3484ed04c6ea34 doap.ttl
+SHA1 a3cc81397d66026d99241285d782ca30b66dfafd lib/MooX/Traits.pm
+SHA1 f6134f07787ae86d82c1ec4a9721e9f3f2907706 lib/MooX/Traits/Util.pm
+SHA1 370b3c37cf8098397528244d9da20855de32b9f4 t/01basic.t
+SHA1 b11948927058ea0c45ae48c2d2cd1e962f89d561 t/02packagevariant.t
+SHA1 f13af5d89420320e2a2912830998ca44a76ff2d0 t/03roletiny.t
+SHA1 15673794dc290d70e70f1f25a4dbb31e1ed0a5db t/04onebyone.t
+SHA1 8bc56f3829a35c427a109df636a3a3aa09e462a4 t/from-moosex-traits/basic.t
+SHA1 e5ec359ed8ce1969544addbf368b6ad9c12c59ac t/from-moosex-traits/class.t
+SHA1 36391e32c7c9b7a316aa402a20234bc89e34e89e t/from-moosex-traits/parameterized.t
+SHA1 47038a93283b1cc62a75aaaa52a5f22ff13cc2fc t/from-moosex-traits/subclass.t
+SHA1 cd9531b27260e9061e737fde05bd251b72d84a31 t/from-moosex-traits/with-traits.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQYUZEACgkQzr+BKGoqfTmongCgqbC6yHx0vugYbDL2hyJNzA5t
+KJsAnREEL/VLw+/cInf93a7xeU6pbN0B
+=u4V1
+-----END PGP SIGNATURE-----

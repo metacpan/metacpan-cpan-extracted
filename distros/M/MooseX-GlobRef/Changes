@@ -1,0 +1,91 @@
+------------------------------------------------------------------------
+0.0701 | Piotr Roszatycki <dexter@debian.org> | 2010-09-23
+
+Fixes:
+
+* Fixed old Moose::Util::MetaRole API deprecation.
+
+Changes:
+
+* Requires Moose >= 0.94.
+
+------------------------------------------------------------------------
+0.07 | Piotr Roszatycki <dexter@debian.org> | 2009-02-27
+
+Changes:
+
+* Package is renamed to MooseX::GlobRef and reimplemented as a role.
+
+* MooseX::GlobRef::Role::Meta::Instance:
+  * New method "clone_instance".
+  * Method "inline_create_instance" returns a do {} block.
+
+------------------------------------------------------------------------
+0.06 | Piotr Roszatycki <dexter@debian.org> | 2009-02-12
+
+Changes:
+
+* Now works "use metaclass 'MooseX::GlobRef::Meta::Class'".
+* Use simpler "*$self->{attr}" syntax for accessing attributes stored in hash
+  slot of glob reference.
+* Tests are refactored and build requires Test::Unit::Lite >= 0.12.
+
+------------------------------------------------------------------------
+0.05 | Piotr Roszatycki <dexter@debian.org> | 2009-01-31
+
+* Attributes are stored in hash slot of glob reference.  Previously they were
+  stored in hash reference pointed by scalar slot of glob reference.
+
+------------------------------------------------------------------------
+0.04 | Piotr Roszatycki <dexter@debian.org> | 2008-12-30
+
+* Cannot be implemented as class trait.
+
+------------------------------------------------------------------------
+0.03 | Piotr Roszatycki <dexter@debian.org> | 2008-12-09
+
+New:
+
+* Implemented also as class trait:
+
+  package My::Class;
+  use Moose -traits => 'GlobRef';
+
+Changes:
+
+* Requires Moose >= 0.56 because of class trait.
+* Requires parent module instead base.
+* Build requires Test::Assert.
+
+------------------------------------------------------------------------
+0.0203 | Piotr Roszatycki <dexter@debian.org> | 2008-04-09
+
+* Works with the latest Moose::make_immutable method.
+
+------------------------------------------------------------------------
+0.0202 | Piotr Roszatycki <dexter@debian.org> | 2007-11-03
+
+Fixes:
+
+* Do not use Exception::Base for tests.
+
+------------------------------------------------------------------------
+0.0201 | Piotr Roszatycki <dexter@debian.org> | 2007-11-01
+
+* Build requires Test::Unit::Lite >= 0.07.
+
+------------------------------------------------------------------------
+0.02 | Piotr Roszatycki <dexter@debian.org> | 2007-10-03
+
+* New overridden methods: deinitialize_slot, is_slot_initialized,
+  weaken_slot_value.
+* New test units.
+* Fix version number for MooseX::GlobRef::Meta::Instance module.
+* Build README with Module::Build.
+
+------------------------------------------------------------------------
+0.01 | Piotr Roszatycki <dexter@debian.org> | 2007-09-27
+
+* First CPAN release.
+
+------------------------------------------------------------------------

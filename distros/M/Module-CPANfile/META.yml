@@ -1,0 +1,48 @@
+---
+abstract: 'Parse cpanfile'
+author:
+  - 'Tatsuhiko Miyagawa'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-CPANfile
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+recommends:
+  Pod::Usage: '0'
+requires:
+  CPAN::Meta: '2.12091'
+  CPAN::Meta::Prereqs: '2.12091'
+  JSON::PP: '2.27300'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/miyagawa/cpanfile/issues
+  homepage: https://github.com/miyagawa/cpanfile
+  repository: https://github.com/miyagawa/cpanfile.git
+version: '1.1002'
+x_contributors:
+  - 'Atsushi Kato <ktat@cpan.org>'
+  - 'David Golden <dagolden@cpan.org>'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Dylan William Hardison <dylan@hardison.net>'
+  - 'Gregory Oschwald <oschwald@gmail.com>'
+  - 'grtodd <gtodd@iciti.ca>'
+  - 'ikasam_a <masaki.nakagawa@gmail.com>'
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+  - 'Masahiro Honma <hiratara@cpan.org>'
+  - 'Michiel Beijen <michiel.beijen@gmail.com>'
+  - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'

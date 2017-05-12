@@ -1,0 +1,26 @@
+---
+abstract: 'Signature sugar for your Mojolicious controller actions'
+author:
+  - 'Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.007'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.009, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Kavorka
+provides:
+  Mojolicious::Plugin::Kavorka:
+    file: lib/Mojolicious/Plugin/Kavorka.pm
+    version: '0.01'
+requires:
+  Kavorka: '0'
+  Mojolicious: '6.0'
+resources:
+  bugtracker: http://github.com/jberger/Mojolicious-Plugin-Kavorka/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jberger/Mojolicious-Plugin-Kavorka
+version: '0.01'

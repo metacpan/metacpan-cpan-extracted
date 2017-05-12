@@ -1,0 +1,161 @@
+#-*-perl-*-
+#
+# $Id: Responses.in,v 37.5 2012/09/26 16:15:27 jettisu Exp $
+#
+# (c) 1999-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+package MQSeries::Command::PCF;
+
+%Responses =
+  (
+   Error				=> [ "Error",				$ResponseParameters{Error} ],
+   None					=> [ &MQCMD_NONE,			$ResponseParameters{Error} ],
+
+   ChangeAuthInfo			=> [ &MQCMD_CHANGE_AUTH_INFO,		$ResponseParameters{AuthInfo} ],
+   ChangeCFStruc			=> [ &MQCMD_CHANGE_CF_STRUC,		$ResponseParameters{CFStruc} ],
+   # NOTE: ChangeCFStruct is for backwards compatibility with pre-1.24 MQSC
+   ChangeCFStruct			=> [ &MQCMD_CHANGE_CF_STRUC,		$ResponseParameters{CFStruct} ],
+   ChangeChannel			=> [ &MQCMD_CHANGE_CHANNEL,		$ResponseParameters{Channel} ],
+   ChangeChannelListener		=> [ &MQCMD_CHANGE_LISTENER,		$ResponseParameters{Listener} ],
+   ChangeComminfo			=> [ &MQCMD_CHANGE_COMM_INFO,		$ResponseParameters{Comminfo} ],
+   ChangeNamelist			=> [ &MQCMD_CHANGE_NAMELIST,		$ResponseParameters{Namelist} ],
+   ChangeProcess			=> [ &MQCMD_CHANGE_PROCESS,		$ResponseParameters{Process} ],
+   ChangeQueue				=> [ &MQCMD_CHANGE_Q,			$ResponseParameters{Queue} ],
+   ChangeQueueManager			=> [ &MQCMD_CHANGE_Q_MGR,		$ResponseParameters{QueueManager} ],
+   ChangeService			=> [ &MQCMD_CHANGE_SERVICE,		$ResponseParameters{Service} ],
+   ChangeStorageClass			=> [ &MQCMD_CHANGE_STG_CLASS,		$ResponseParameters{StorageClass} ],
+   ChangeSubscription			=> [ &MQCMD_CHANGE_SUBSCRIPTION,	$ResponseParameters{Subscription} ],
+   ChangeTopic				=> [ &MQCMD_CHANGE_TOPIC,		$ResponseParameters{Topic} ],
+
+   ClearQueue				=> [ &MQCMD_CLEAR_Q,			$ResponseParameters{Queue} ],
+
+   CopyAuthInfo				=> [ &MQCMD_COPY_AUTH_INFO,		$ResponseParameters{AuthInfo} ],
+   CopyChannel				=> [ &MQCMD_COPY_CHANNEL,		$ResponseParameters{Channel} ],
+   CopyChannelListener			=> [ &MQCMD_COPY_LISTENER,		$ResponseParameters{Listener} ],
+   CopyComminfo				=> [ &MQCMD_COPY_COMM_INFO,		$ResponseParameters{Comminfo} ],
+   CopyNamelist				=> [ &MQCMD_COPY_NAMELIST,		$ResponseParameters{Namelist} ],
+   CopyProcess				=> [ &MQCMD_COPY_PROCESS,		$ResponseParameters{Process} ],
+   CopyQueue				=> [ &MQCMD_COPY_Q,			$ResponseParameters{Queue} ],
+   CopyService				=> [ &MQCMD_COPY_SERVICE,		$ResponseParameters{Service} ],
+   CopyStorageClass			=> [ &MQCMD_COPY_STG_CLASS,		$ResponseParameters{StorageClass} ],
+   CopySubscription			=> [ &MQCMD_COPY_SUBSCRIPTION,		$ResponseParameters{Subscription} ],
+   CopyTopic				=> [ &MQCMD_COPY_TOPIC,			$ResponseParameters{Topic} ],
+
+   CreateAuthInfo			=> [ &MQCMD_CREATE_AUTH_INFO,		$ResponseParameters{AuthInfo} ],
+   CreateCFStruc			=> [ &MQCMD_CREATE_CF_STRUC,		$ResponseParameters{CFStruc} ],
+   # NOTE: ChangeCFStruct is for backwards compatibility with pre-1.24 MQSC
+   CreateCFStruct			=> [ &MQCMD_CREATE_CF_STRUC,		$ResponseParameters{CFStruct} ],
+   CreateChannel			=> [ &MQCMD_CREATE_CHANNEL,		$ResponseParameters{Channel} ],
+   CreateChannelListener		       => [ &MQCMD_CREATE_LISTENER,	       $ResponseParameters{Listener} ],
+   CreateComminfo			=> [ &MQCMD_CREATE_COMM_INFO,		$ResponseParameters{Comminfo} ],
+   CreateNamelist			=> [ &MQCMD_CREATE_NAMELIST,		$ResponseParameters{Namelist} ],
+   CreateProcess			=> [ &MQCMD_CREATE_PROCESS,		$ResponseParameters{Process} ],
+   CreateQueue				=> [ &MQCMD_CREATE_Q,			$ResponseParameters{Queue} ],
+   CreateService			=> [ &MQCMD_CREATE_SERVICE,		$ResponseParameters{Service} ],
+   CreateStorageClass			=> [ &MQCMD_CREATE_STG_CLASS,		$ResponseParameters{StorageClass} ],
+   CreateSubscription			=> [ &MQCMD_CREATE_SUBSCRIPTION,	$ResponseParameters{Subscription} ],
+   CreateTopic				=> [ &MQCMD_CREATE_TOPIC,		$ResponseParameters{Topic} ],
+
+   DeleteAuthInfo			=> [ &MQCMD_DELETE_AUTH_INFO,		$ResponseParameters{AuthInfo} ],
+   DeleteAuthorityRecord		=> [ &MQCMD_DELETE_AUTH_REC,		$ResponseParameters{AuthorityRecord} ],
+   DeleteCFStruc			=> [ &MQCMD_DELETE_CF_STRUC,		$ResponseParameters{CFStruc} ],
+   # NOTE: ChangeCFStruct is for backwards compatibility with pre-1.24 MQSC
+   DeleteCFStruct			=> [ &MQCMD_DELETE_CF_STRUC,		$ResponseParameters{CFStruct} ],
+   DeleteChannel			=> [ &MQCMD_DELETE_CHANNEL,		$ResponseParameters{Channel} ],
+   DeleteChannelListener		       => [ &MQCMD_DELETE_LISTENER,	       $ResponseParameters{Listener}],
+   DeleteComminfo			=> [ &MQCMD_DELETE_COMM_INFO,		$ResponseParameters{Comminfo} ],
+   DeleteNamelist			=> [ &MQCMD_DELETE_NAMELIST,		$ResponseParameters{Namelist} ],
+   DeleteProcess			=> [ &MQCMD_DELETE_PROCESS,		$ResponseParameters{Process} ],
+   DeleteQueue				=> [ &MQCMD_DELETE_Q,			$ResponseParameters{Queue} ],
+   DeleteService			=> [ &MQCMD_DELETE_SERVICE,		$ResponseParameters{Service} ],
+   DeleteStorageClass			=> [ &MQCMD_DELETE_STG_CLASS,		$ResponseParameters{StorageClass} ],
+   DeleteSubscription			=> [ &MQCMD_DELETE_SUBSCRIPTION,	$ResponseParameters{Subscription} ],
+   DeleteTopic				=> [ &MQCMD_DELETE_TOPIC,		$ResponseParameters{Topic} ],
+
+   Escape				=> [ &MQCMD_ESCAPE,			$ResponseParameters{Escape} ],
+
+   InquireAuthInfo			=> [ &MQCMD_INQUIRE_AUTH_INFO,		$ResponseParameters{AuthInfo} ],
+   InquireAuthInfoNames			=> [ &MQCMD_INQUIRE_AUTH_INFO_NAMES,	$ResponseParameters{AuthInfo} ],
+   InquireAuthorityRecords		=> [ &MQCMD_INQUIRE_AUTH_RECS,		$ResponseParameters{AuthorityRecord} ],
+   InquireAuthorityService		=> [ &MQCMD_INQUIRE_AUTH_SERVICE,	$ResponseParameters{AuthorityService} ],
+   InquireCFStruc			=> [ &MQCMD_INQUIRE_CF_STRUC,		$ResponseParameters{CFStruc} ],
+   InquireCFStrucNames			=> [ &MQCMD_INQUIRE_CF_STRUC_NAMES,	$ResponseParameters{CFStruc} ],
+   InquireCFStrucStatus			=> [ &MQCMD_INQUIRE_CF_STRUC_STATUS,	$ResponseParameters{CFStruc} ],
+   # NOTE: InquireCFStruct is for backwards compatibility with pre-1.24 MQSC
+   InquireCFStruct			=> [ &MQCMD_INQUIRE_CF_STRUC,		$ResponseParameters{CFStruct} ],
+   InquireCFStructNames			=> [ &MQCMD_INQUIRE_CF_STRUC_NAMES,	$ResponseParameters{CFStruct} ],
+   InquireChannel			=> [ &MQCMD_INQUIRE_CHANNEL,		$ResponseParameters{Channel} ],
+   InquireChlAuthRecs			=> [ &MQCMD_INQUIRE_CHLAUTH_RECS,	$ResponseParameters{ChlAuthRec} ],
+   InquireChannelInitiator		=> [ &MQCMD_INQUIRE_CHANNEL_INIT,	$ResponseParameters{ChannelInitiator} ],
+   InquireComminfo			=> [ &MQCMD_INQUIRE_COMM_INFO,		$ResponseParameters{Comminfo} ],
+   InquireChannelNames			=> [ &MQCMD_INQUIRE_CHANNEL_NAMES,	$ResponseParameters{Channel} ],
+   InquireChannelStatus			=> [ &MQCMD_INQUIRE_CHANNEL_STATUS,	$ResponseParameters{ChannelStatus} ],
+   InquireConnection			=> [ &MQCMD_INQUIRE_CONNECTION,		$ResponseParameters{Connection} ],
+   InquireClusterQueueManager		=> [ &MQCMD_INQUIRE_CLUSTER_Q_MGR,	$ResponseParameters{Cluster} ],
+   InquireChannelListener		=> [ &MQCMD_INQUIRE_LISTENER,		$ResponseParameters{Listener} ],
+   InquireChannelListenerStatus		=> [ &MQCMD_INQUIRE_LISTENER_STATUS,	$ResponseParameters{ListenerStatus} ],
+   InquireEntityAuthority		=> [ &MQCMD_INQUIRE_ENTITY_AUTH,	$ResponseParameters{AuthorityRecord} ],
+   InquireGroup				=> [ &MQCMD_INQUIRE_QSG,		$ResponseParameters{QSharingGroup} ],
+   InquireLog				=> [ &MQCMD_INQUIRE_LOG,		$ResponseParameters{Log} ],
+   InquireNamelist			=> [ &MQCMD_INQUIRE_NAMELIST,		$ResponseParameters{Namelist} ],
+   InquireNamelistNames			=> [ &MQCMD_INQUIRE_NAMELIST_NAMES,	$ResponseParameters{Namelist} ],
+   InquireProcess			=> [ &MQCMD_INQUIRE_PROCESS,		$ResponseParameters{Process} ],
+   InquireProcessNames			=> [ &MQCMD_INQUIRE_PROCESS_NAMES,	$ResponseParameters{Process} ],
+   InquirePubSubStatus			=> [ &MQCMD_INQUIRE_PUBSUB_STATUS,	$ResponseParameters{PubSubStatus} ],
+   InquireQueue				=> [ &MQCMD_INQUIRE_Q,			$ResponseParameters{Queue} ],
+   InquireQueueManager			=> [ &MQCMD_INQUIRE_Q_MGR,		$ResponseParameters{QueueManager} ],
+   InquireQueueManagerStatus		=> [ &MQCMD_INQUIRE_Q_MGR_STATUS,	$ResponseParameters{QueueManagerStatus} ],
+   InquireQueueNames			=> [ &MQCMD_INQUIRE_Q_NAMES,		$ResponseParameters{Queue} ],
+   InquireQueueStatus			=> [ &MQCMD_INQUIRE_Q_STATUS,		$ResponseParameters{QueueStatus} ],
+   InquireSecurity			=> [ &MQCMD_INQUIRE_SECURITY,		$ResponseParameters{InquireSecurity} ],
+   InquireService			=> [ &MQCMD_INQUIRE_SERVICE,		$ResponseParameters{Service} ],
+   InquireServiceStatus			=> [ &MQCMD_INQUIRE_SERVICE_STATUS,	$ResponseParameters{ServiceStatus} ],
+   InquireStorageClass			=> [ &MQCMD_INQUIRE_STG_CLASS,		$ResponseParameters{StorageClass} ],
+   InquireStorageClassNames		=> [ &MQCMD_INQUIRE_STG_CLASS_NAMES,	$ResponseParameters{StorageClass} ],
+   InquireSubscription			=> [ &MQCMD_INQUIRE_SUBSCRIPTION,	$ResponseParameters{Subscription} ],
+   InquireSubscriptionStatus		=> [ &MQCMD_INQUIRE_SUB_STATUS,		$ResponseParameters{SubscriptionStatus} ],
+   InquireSystem			=> [ &MQCMD_INQUIRE_SYSTEM,		$ResponseParameters{InquireSystem} ],
+   InquireTopic				=> [ &MQCMD_INQUIRE_TOPIC,		$ResponseParameters{Topic} ],
+   InquireTopicNames			=> [ &MQCMD_INQUIRE_TOPIC_NAMES,	$ResponseParameters{Topic} ],
+   InquireTopicStatus			=> [ &MQCMD_INQUIRE_TOPIC_STATUS,	$ResponseParameters{TopicStatus} ],
+   InquireUsage				=> [ &MQCMD_INQUIRE_USAGE,		$ResponseParameters{InquireUsage} ],
+
+   PingChannel				=> [ &MQCMD_PING_CHANNEL,		$ResponseParameters{Channel} ],
+   PingQueueManager			=> [ &MQCMD_PING_Q_MGR,			$ResponseParameters{QueueManager} ],
+
+   RefreshCluster			=> [ &MQCMD_REFRESH_CLUSTER,		$ResponseParameters{Cluster} ],
+   RefreshSecurity			=> [ &MQCMD_REFRESH_SECURITY,		$ResponseParameters{RefreshSecurity} ],
+
+   ResetChannel				=> [ &MQCMD_RESET_CHANNEL,		$ResponseParameters{Channel} ],
+   ResetQueueStatistics			=> [ &MQCMD_RESET_Q_STATS,		$ResponseParameters{Queue} ],
+
+   ResolveChannel			=> [ &MQCMD_RESOLVE_CHANNEL,		$ResponseParameters{Channel} ],
+
+   ReverifySecurity			=> [ &MQCMD_REVERIFY_SECURITY,		$ResponseParameters{ReverifySecurity} ],
+
+   SetAuthorityRecord			=> [ &MQCMD_SET_AUTH_REC,		$ResponseParameters{AuthorityRecord} ],
+   SetChlAuthRec			=> [ &MQCMD_SET_CHLAUTH_REC,		$ResponseParameters{ChlAuthRec} ],
+
+
+   StartChannel				=> [ &MQCMD_START_CHANNEL,		$ResponseParameters{Channel} ],
+   StartChannelInitiator		=> [ &MQCMD_START_CHANNEL_INIT,		$ResponseParameters{Channel} ],
+   StartChannelListener			=> [ &MQCMD_START_CHANNEL_LISTENER,	$ResponseParameters{Listener} ],
+   StartService				=> [ &MQCMD_START_SERVICE,		$ResponseParameters{Service} ],
+
+   StopChannel				=> [ &MQCMD_STOP_CHANNEL,		$ResponseParameters{Channel} ],
+   StopChannelInitiator			=> [ &MQCMD_STOP_CHANNEL_INIT,		$ResponseParameters{Channel} ],
+   StopChannelListener			=> [ &MQCMD_STOP_CHANNEL_LISTENER,	$ResponseParameters{Listener} ],
+   StopConnection			=> [ &MQCMD_STOP_CONNECTION,		$ResponseParameters{Connection} ],
+   StopService				=> [ &MQCMD_STOP_SERVICE,		$ResponseParameters{Service} ],
+
+   #
+   # Morgan Stanley extensions
+   #
+   InquireAuthority			=> [ &MQCMDE_INQUIRE_AUTHORITY,		$ResponseParameters{MorganAuthority} ],
+   ChangeAuthority			=> [ &MQCMDE_CHANGE_AUTHORITY,		$ResponseParameters{MorganAuthority} ],
+
+  );
+
+1;

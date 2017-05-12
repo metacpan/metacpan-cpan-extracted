@@ -1,0 +1,13 @@
+ChangeLog
+Introduce.pod
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+bin/benchmark.pl
+dist.ini
+lib/Momo.pm
+lib/Momo/Role.pm
+t/oop.t

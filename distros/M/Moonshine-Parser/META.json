@@ -1,0 +1,61 @@
+{
+   "abstract" : "Parsed ",
+   "author" : [
+      "Robert Acock <thisusedtobeanemail@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Moonshine-Parser",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Moonshine::Test" : "0.13",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Parser" : "3.72",
+            "Moonshine::Element" : "0.09",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Moonshine::Parser" : {
+         "file" : "lib/Moonshine/Parser.pm",
+         "version" : "0.05"
+      },
+      "Moonshine::Parser::HTML" : {
+         "file" : "lib/Moonshine/Parser/HTML.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/Moonshine-Parser.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/Moonshine-Parser"
+      }
+   },
+   "version" : "0.05"
+}

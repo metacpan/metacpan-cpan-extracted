@@ -1,0 +1,39 @@
+---
+abstract: 'Giving an easy Moo style way to make command organized CLI apps'
+author:
+  - 'Jens Rehsack <rehsack@cpan.org>'
+  - 'Torsten Raudssus <torsten@raudss.us>'
+build_requires:
+  Capture::Tiny: '0'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-Cmd
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  List::MoreUtils: '0.406'
+  Module::Pluggable: '4.8'
+  Module::Runtime: '0'
+  Moo: '0.009013'
+  Package::Stash: '0.33'
+  Params::Util: '0.37'
+  Regexp::Common: '2011121001'
+  Scalar::Util: '0'
+  Text::ParseWords: '0'
+  perl: v5.8.1
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Cmd
+  homepage: https://metacpan.org/release/MooX-Cmd
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com:Getty/p5-moox-cmd.git
+version: '0.015'

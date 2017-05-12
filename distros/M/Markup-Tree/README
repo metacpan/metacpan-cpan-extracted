@@ -1,0 +1,262 @@
+NAME
+    Markup::Tree - Unified way to easily access XML or HTML markup locally
+    or remotly.
+
+SYNOPSIS
+            use Markup::Tree;
+
+            my @preserve = qw(pre style script code);
+
+            my $tree = Markup::Tree->new ( markup => 'html', no_squash_whitespace => \@preserve,
+                                            no_indent => \@preserve );
+
+            $tree->parse_file('http://lackluster.tzo.com:1024');
+
+            $tree->save_as('ltzo.com.xml', 'xml');
+
+            # or
+
+            my $tree = Markup::Tree->new ( markup => 'xml', no_squash_whitespace => \@preserve,
+                                            no_indent => \@preserve );
+
+            $tree->parse_file('http://lackluster.tzo.com:1024/index.php.xml');
+
+            $tree->foreach_node(\&start, \&end);
+
+DESCRIPTION
+    I wanted a module to allow one to access either XML or HTML input,
+    locally or remotely, easily transform it, and save it as HTML or XML (or
+    some user-defined format). So I quit whining and wrote one. It's not
+    100% finished, but it's a good start and the groundwork for the
+    Markup::Content module.
+
+CONVENTIONS
+    I will be reopening certain terms to save myself keystrokes and you
+    confusion (or does that just create confusion?).
+
+    FILE
+        When I mention FILE, what I really mean is either a local or
+        remotely mounted file "(i.e - /home/bprudent/this_xml_file.xml)", an
+        already opened filehandle, or a remote file location of which
+        LWP::Simple's get is capable of, well, getting.
+
+        Note that if you pass an open filehandle to a method that wants to
+        read from it, you should open it for reading, and if the method
+        wants to write to it, you should open it for writing. Also, we
+        cannot write to a remote location (at least, the functionality does
+        not exist in this module to do so) so please don't pass a remote
+        location to a method that wants to write something (such as the
+        save_as method).
+
+    pi  I see alot of people using pi or (p)rocessing (i)nstruction to mean
+        a local procressing directive. I am using here and in "TreeNode" to
+        mean also server-side instructions, which are often found in the
+        wild. Please remember that you will not see these from a remote URL.
+
+ARGUMENTS
+    These are the arguments you can specify upon instantiation. In most
+    cases you can also set them yourself after you have an object of this
+    class via $tree->{'the_option'} = $whatever.
+
+    markup
+        Valid options are 'xml' or 'html'. This just specifies which parser
+        to use. I would like to, in the future, add more parsers to this
+        list. The default is 'html', which is much more forgiving.
+
+    parser_options
+        This parameters requests an anonymous hash with parser-specific
+        options. If you specified 'xml' for markup then the "parser_options"
+        argument will be passed to XML::Parser. Otherwise it will go to
+        HTML::TreeBuilder.
+
+    no_squash_whitespace
+        There are three modes to this argument:
+
+        mode 0
+            Squash all whitespace. This is the default mode.
+
+        mode 1
+            Set "no_squash_whitespace" to a true value to keep the tree as
+            close to the original document as possible.
+
+        mode 2
+            Set "no_squash_whitespace" to an anonymous array containing
+            tagnames of which you want to preserve. This is handy when
+            re-creating or transforming HTML documents containing
+            pre-formatted text, such as "script", "style", "pre", or,
+            sometimes, "code". It is also wise to include the fabricated
+            tag, pi. This is the tag that is made up when either <% or <? is
+            encountered, except when within quotes. See Also
+            Markup::TreeNode for a bit more on this.
+
+        Example:
+
+                my $tree = Markup::Tree->new ( no_squash_whitespace => [qw(script style pre code)] );
+
+    no_indent
+        It's all in the name. This value affects only (as of now) the
+        save_as method. Again, there are three operating modes:
+
+        mode 0
+            Leave indentation on. This is the default mode.
+
+        mode 1
+            Setting "no_indent" to a true value will never indent.
+
+        mode 2
+            Set "no_indent" to an anonymous array containing tagnames of
+            which you want to not indent. This is normally the same value as
+            no_squash_whitespace.
+
+METHODS
+    get_node (description)
+        Arguments:
+
+        description
+            Description must be one of the following: "first", "last",
+            "start", "end", "copy-of", "copy", "copy_of", or "root".
+
+            first
+                Causes the method to return the first node in the tree, not
+                including the "root" node. This is the first actual element
+                found in the markup source.
+
+            last
+                Causes the method to return the last node in the tree.
+
+            start
+                An alias for "first".
+
+            end An alias for "last".
+
+            copy-of
+                Returns a copy of the entire tree. This allows you to have
+                two copies in memory. One that you can chop to bits and
+                another that you can preserve.
+
+            copy
+                An alias for "copy-of".
+
+            copy_of
+                An alias for "copy-of".
+
+            root
+                Causes the method to return the root node. This is
+                equivalant to $tree->tree.
+
+        Example:
+
+                my $first_node = $tree->get_node('first');
+                print "The first node in the tree is a ".$first_node->{'tagname'}." node.\n";
+
+    parse_file (FILE)
+        Arguments:
+
+        FILE to be parsed
+
+        Example:
+
+                $tree->parse_file ('http://lackluster.tzo.com:1024');
+                # or
+                $tree->parse_file (\*INPUT);
+                # or
+                $tree->parse_file ('/home/lackluster/public_html/index.html');
+
+        Returns: a refrence to the parser so that you can say things like
+
+                $tree = Markup::Tree->new()->parse_file('noname.html');
+
+        Note that this will close the file(handle).
+
+    parse (DATA)
+        Just the same as HTML or XML ::Parse's parse method. Pass in markup
+        data. For HTML you will need to call eof().
+
+        Returns: a refrence to the parser
+
+    eof ( )
+        Signals the end of HTML markup. Calling eof on XML data will not
+        generate an error, it just won't do anything.
+
+        Returns: a refrence to the parser
+
+    save_as (FILE [, type])
+        Saves the tree to FILE as type, if specified.
+
+        Arguments:
+
+        FILE
+            This is the filename or handle to write the information in. If
+            this argument is textual, the method will try to guess, based on
+            the file extension, the second argument if not present.
+
+        type
+            Valid values are 'html' or 'xml'. Will also accept 'xhtml'.
+            Default is 'html'.
+
+        Example: $tree->save_as
+        ('/home/lackluster/public_html/transformed.html.xml', 'xml');
+
+    foreach_node (start_CODE [, end_CODE] [, start_from])
+        Loops through each node in the syntax tree, calling "start_CODE"
+        and, if present, end_CODE. This method makes looping through the
+        tree really quite simple and lends itself well to saving files to
+        your own format.
+
+        Arguments:
+
+        start_CODE
+            This CODE ref will be called when a node is encounted and before
+            its children have been processed. A Markup::TreeNode element
+            will be passed to your sub.
+
+        end_CODE
+            If this parameter is present, then the CODE ref will be called
+            after a node is encountered and after its children have been
+            processed. If end_CODE is not a CODE ref, but instead a
+            Markup::TreeNode, the method will interpret "end_CODE" as
+            "start_from".
+
+        start_from
+            Instead of looping over the whole tree, this value can be a
+            Markup::TreeNode start point. (See "BUGS" section)
+
+            Example: $tree->foreach_node( sub { my $node = shift();
+            indent($node->{'level'}); print $node->{'tagname'}."\n"; }, sub
+            { my $node = shift(); indent($node->{'level'}); print
+            $node->{'tagname'}."\n"; } );
+
+        RETURN VALUES MATTER!
+
+        Returning a false value will end the iterations and cause the method
+        to return. Return true to keep processing.
+
+    copy_of
+        Returns a copy, not a reference, of the tree.
+
+CAVEATS
+    This module isn't really the best for people who don't often use markup.
+    It requires quite a few modules (I actually feed bad about the module
+    requirements), and "HTML::TreeBuilder" or "XML::Parser" is probably a
+    better choice for most things you want to do. On the upside, if you
+    already have these modules, it is a comparativly easy way to use markup.
+
+BUGS || UNFINISHED
+    "Wide character in print" warnings are abound. I haven't taken the time
+    to look into this. Something about UNICODE?
+
+    The "foreach_node" method doesn't behave properly when passed the
+    start_from parameter. That's what I thought, at least. The behaviour may
+    work for you in your situation. Just know that it may change in the
+    future unless anyone requests otherwise.
+
+    Please inform me of other bugs.
+
+SEE ALSO
+    Markup::TreeNode, XML::Parser, HTML::TreeBuilder, LWP::Simple
+
+AUTHOR
+    BPrudent (Brandon Prudent)
+
+    Email: xlacklusterx@hotmail.com
+

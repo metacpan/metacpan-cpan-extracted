@@ -1,0 +1,90 @@
+{
+   "abstract" : "add code smell to your Moose attributes",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.015, CPAN::Meta::Converter version 2.120921",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-FunkyAttributes",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter::Shiny" : "0",
+            "Hash::FieldHash" : "0",
+            "Moose" : "2.00",
+            "aliased" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::Moose" : "0",
+            "Test::More" : "0.96",
+            "thanks" : "0.001"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::FunkyAttributes" : {
+         "file" : "lib/MooseX/FunkyAttributes.pm",
+         "version" : "0.003"
+      },
+      "MooseX::FunkyAttributes::Meta::Accessor" : {
+         "file" : "lib/MooseX/FunkyAttributes/Meta/Accessor.pm",
+         "version" : "0.003"
+      },
+      "MooseX::FunkyAttributes::Role::Attribute" : {
+         "file" : "lib/MooseX/FunkyAttributes/Role/Attribute.pm",
+         "version" : "0.003"
+      },
+      "MooseX::FunkyAttributes::Role::Attribute::Delegated" : {
+         "file" : "lib/MooseX/FunkyAttributes/Role/Attribute/Delegated.pm",
+         "version" : "0.003"
+      },
+      "MooseX::FunkyAttributes::Role::Attribute::InsideOut" : {
+         "file" : "lib/MooseX/FunkyAttributes/Role/Attribute/InsideOut.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/MooseX-FunkyAttributes/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=MooseX-FunkyAttributes"
+      },
+      "homepage" : "https://metacpan.org/release/MooseX-FunkyAttributes",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-moosex-funkyattributes.git",
+         "web" : "https://github.com/tobyink/p5-moosex-funkyattributes"
+      }
+   },
+   "version" : "0.003"
+}

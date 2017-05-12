@@ -1,0 +1,58 @@
+Math::LP::Solve is a wrapper for the functions in the lp_solve library for
+solving linear programs, which is written by Michel Berkelaar. 
+The source code of this library is available at ftp://ftp.ics.ele.tue.nl/pub/lp_solve/
+Math::LP::Solve 3.03 is based on the latest version lp_solve 3.2.
+
+INSTALLATION
+
+Download lp_solve_3.2.tar.gz and untar it in the Math-LP-Solve-* directory,
+then compile the library (which requires some tweaking of the Makefile).
+Consult the lp_solve documentation if any help is needed here. 
+
+IMPORTANT: make sure the lp_solve library is compiled for position independent
+           code (e.g. by including -fPIC in the CFLAGS for gcc).
+
+If you already have a compiled version of the library, it suffices to
+make a directory lp_solve_3.0 and copy liblpk.a and all .h files to it.
+
+Alternatively, the whole download - extraction - compilation sequence
+is performed automatically if the needed files are not found. This may
+fail at some step however, whereafter you'll need to revert to the manual
+method.
+
+In short, the standard sequence for installing Perl extensions should
+do the job:
+
+	% perl Makefile.PL
+	% make
+	% make test
+	% make install
+
+Automatic compilation of the lp_solve library is attempted in the first
+of these steps.
+
+If you do not have write access to the Perl libraries, it is still possible
+to install it in a separate location with absolute pathname <dir> using the
+following sequence:
+
+	% perl Makefile.PL PREFIX=<dir> LIB=<dir>/lib/perl5
+	% make
+	% make test
+	% make pure_install
+
+Do not forget to include <dir>/lib/perl5 in your PERL5LIB search path 
+to use the extension in this case.
+
+AUTHOR
+
+The Perl extension Math::LP::Solve to the lp_solve library is written
+by Wim Verhaegen <wimv@cpan.org>.
+
+COPYRIGHT
+
+Copyright(c) 2000-2001 Wim Verhaegen. All rights reserved. 
+This program is free software; you can redistribute
+and/or modify it under the same terms as Perl itself.
+
+Consult the lp_solve documentation for copyright information on
+the lp_solve library.

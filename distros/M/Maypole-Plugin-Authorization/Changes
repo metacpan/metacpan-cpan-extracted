@@ -1,0 +1,31 @@
+Revision history for Perl extension Maypole::Plugin::Authorization.
+
+0.01  2004-xx-xx	Original unreleased version.
+
+0.02  2005-01-12	First release to Maypole mailing list.
+       (http://lists.netthink.co.uk/pipermail/maypole/2005-January/001314.html)
+
+0.03  2005-01-28	Released new version to Maypole list with
+			get_authorized_* modified to make them work and
+			accept arguments, and improved docs
+
+0.04  2005-01-28	Improved error checking at start of
+			get_authorized_classes and get_authorized_methods
+			(thanks to Josef Chladek). Released as patches on
+			Maypole mailing list.
+
+0.05  2005-02-07	Improved error handling in authorize. Completed
+			test cases. First release to CPAN.
+
+0.06  2005-08-20	Improved docs suggested by Kieren Diment.
+
+0.07  2005-08-20	Added config options from Peter Speltz.
+
+0.08  2005-08-22	Added user_class default from Kieren Diment
+
+0.09  2005-08-22	Default {} if no config->auth
+
+0.10  2005-08-24	Allow entity other than model_class as requested
+			by Kieren Diment & Peter Speltz
+
+

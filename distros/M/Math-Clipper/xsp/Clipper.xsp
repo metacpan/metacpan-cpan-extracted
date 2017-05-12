@@ -1,0 +1,290 @@
+
+
+%module{Math::Clipper};
+%package{Math::Clipper};
+
+%{
+#include <myinit.h>
+
+PROTOTYPES: DISABLE
+
+IV
+_constant()
+  ALIAS:
+    CT_INTERSECTION = ctIntersection
+    CT_UNION = ctUnion
+    CT_DIFFERENCE = ctDifference
+    CT_XOR = ctXor
+    PT_SUBJECT = ptSubject
+    PT_CLIP = ptClip
+    PFT_EVENODD = pftEvenOdd
+    PFT_NONZERO = pftNonZero
+    PFT_POSITIVE = pftPositive
+    PFT_NEGATIVE = pftNegative
+    JT_MITER = jtMiter
+    JT_ROUND = jtRound
+    JT_SQUARE = jtSquare
+  CODE:
+    RETVAL = ix;
+  OUTPUT: RETVAL
+
+%}
+
+%name{Math::Clipper}
+class Clipper {
+  Clipper();
+  ~Clipper();
+
+%{
+ClipperLib::Polygons*
+execute(THIS, clipType, subjFillType = pftEvenOdd, clipFillType = pftEvenOdd)
+    Clipper* THIS
+    ClipType clipType
+    PolyFillType subjFillType
+    PolyFillType clipFillType
+  CODE:
+    RETVAL = new ClipperLib::Polygons();
+    THIS->Execute(clipType, *RETVAL, subjFillType, clipFillType);
+  OUTPUT:
+    RETVAL
+
+ExPolygons*
+ex_execute(THIS, clipType, subjFillType = pftEvenOdd, clipFillType = pftEvenOdd)
+    Clipper* THIS
+    ClipType clipType
+    PolyFillType subjFillType
+    PolyFillType clipFillType
+  CODE:
+    PolyTree* polytree = new ClipperLib::PolyTree();
+    THIS->Execute(clipType, *polytree, subjFillType, clipFillType);
+    RETVAL = new ExPolygons();
+    PolyTreeToExPolygons(*polytree, *RETVAL);
+    delete polytree;
+  OUTPUT:
+    RETVAL
+
+ClipperLib::PolyTree*
+pt_execute(THIS, clipType, subjFillType = pftEvenOdd, clipFillType = pftEvenOdd)
+    Clipper* THIS
+    ClipType clipType
+    PolyFillType subjFillType
+    PolyFillType clipFillType
+  CODE:
+    RETVAL = new ClipperLib::PolyTree();
+    THIS->Execute(clipType, *RETVAL, subjFillType, clipFillType);
+  OUTPUT:
+    RETVAL
+%}
+
+// No longer in v4.X
+//  %name{get_force_orientation}
+//    bool ForceOrientation();
+//  %name{set_force_orientation}
+//    void ForceOrientation(bool value);
+
+// We don't expose this since we save the PolyType stuff entirely that way!
+//  %name{add_polygon}
+//    void AddPolygon(const Polygon &pg, PolyType polyType);
+
+%{
+
+void
+add_subject_polygon(self, poly)
+    Clipper* self
+    ClipperLib::Polygon* poly
+  PPCODE:
+    self->AddPolygon(*poly, ptSubject);
+    delete poly;
+
+void
+add_clip_polygon(self, poly)
+    Clipper* self
+    ClipperLib::Polygon* poly
+  PPCODE:
+    self->AddPolygon(*poly, ptClip);
+    delete poly;
+
+void
+add_subject_polygons(self, polys)
+    Clipper* self
+    ClipperLib::Polygons* polys
+  PPCODE:
+    self->AddPolygons(*polys, ptSubject);
+    delete polys;
+
+void
+add_clip_polygons(self, polys)
+    Clipper* self
+    ClipperLib::Polygons* polys
+  PPCODE:
+    self->AddPolygons(*polys, ptClip);
+    delete polys;
+
+double
+orientation(polygon)
+    ClipperLib::Polygon* polygon
+  CODE:
+    RETVAL = ClipperLib::Orientation(*polygon);
+    delete polygon;
+  OUTPUT: RETVAL
+
+double
+area(polygon)
+    ClipperLib::Polygon* polygon
+  CODE:
+    RETVAL = ClipperLib::Area(*polygon);
+    delete polygon;
+  OUTPUT: RETVAL
+
+ClipperLib::Polygons*
+_offset(polygons, delta, jointype, MiterLimit)
+    ClipperLib::Polygons* polygons
+    const float delta
+    JoinType jointype
+    const double MiterLimit
+  CODE:
+    RETVAL = new ClipperLib::Polygons();
+    ClipperLib::OffsetPolygons(*polygons, *RETVAL, delta, jointype, MiterLimit);
+    delete polygons;
+  OUTPUT:
+    RETVAL
+
+ClipperLib::Polygons*
+int_offset(polygons, delta, scale, jointype, MiterLimit)
+    ClipperLib::Polygons* polygons
+    const float delta
+    const double scale
+    JoinType jointype
+    const double MiterLimit
+  CODE:
+    RETVAL = _int_offset(polygons, delta, scale, jointype, MiterLimit);
+    delete polygons;
+  OUTPUT:
+    RETVAL
+
+ClipperLib::Polygons*
+int_offset2(polygons, delta1, delta2, scale, jointype, MiterLimit)
+    ClipperLib::Polygons* polygons
+    const float delta1
+    const float delta2
+    const double scale
+    JoinType jointype
+    const double MiterLimit
+  CODE:
+    // scale
+    _scale_polygons(polygons, scale);
+    
+    // perform first offset
+    ClipperLib::Polygons* offset1 = new ClipperLib::Polygons();
+    ClipperLib::OffsetPolygons(*polygons, *offset1, (delta1*scale), jointype, MiterLimit);
+    
+    // perform second offset
+    RETVAL = new ClipperLib::Polygons();
+    ClipperLib::OffsetPolygons(*offset1, *RETVAL, (delta2*scale), jointype, MiterLimit);
+    
+    // unscale
+    _scale_polygons(RETVAL, 1/scale);
+    
+    // cleanup
+    delete offset1;
+    delete polygons;
+  OUTPUT:
+    RETVAL
+
+ExPolygons*
+ex_int_offset(polygons, delta, scale, jointype, MiterLimit)
+    ClipperLib::Polygons* polygons
+    const float delta
+    const double scale
+    JoinType jointype
+    const double MiterLimit
+  CODE:
+    Clipper clpr;
+    clpr.Clear();
+    ClipperLib::Polygons* offset = _int_offset(polygons, delta, scale, jointype, MiterLimit);
+    clpr.AddPolygons(*offset, ptSubject);
+    PolyTree* polytree = new ClipperLib::PolyTree();
+    clpr.Execute(ctUnion, *polytree, pftEvenOdd, pftEvenOdd);  // offset results work with both EvenOdd and NonZero
+    
+    RETVAL = new ExPolygons();
+    PolyTreeToExPolygons(*polytree, *RETVAL);
+    
+    // cleanup
+    delete polygons;
+    delete offset;
+    delete polytree;
+  OUTPUT:
+    RETVAL
+
+ExPolygons*
+ex_int_offset2(polygons, delta1, delta2, scale, jointype, MiterLimit)
+    ClipperLib::Polygons* polygons
+    const float delta1
+    const float delta2
+    const double scale
+    JoinType jointype
+    const double MiterLimit
+  CODE:
+    // scale
+    _scale_polygons(polygons, scale);
+    
+    // perform first offset
+    ClipperLib::Polygons* offset1 = new ClipperLib::Polygons();
+    ClipperLib::OffsetPolygons(*polygons, *offset1, (delta1*scale), jointype, MiterLimit);
+    
+    // perform second offset
+    ClipperLib::Polygons* offset2 = new ClipperLib::Polygons();
+    ClipperLib::OffsetPolygons(*offset1, *offset2, (delta2*scale), jointype, MiterLimit);
+    
+    // unscale
+    _scale_polygons(offset2, 1/scale);
+    
+    // perform UNION
+    Clipper clpr;
+    clpr.Clear();
+    clpr.AddPolygons(*offset2, ptSubject);
+    PolyTree* polytree = new ClipperLib::PolyTree();
+    clpr.Execute(ctUnion, *polytree, pftEvenOdd, pftEvenOdd);  // offset results work with both EvenOdd and NonZero
+    
+    // convert result to ExPolygons
+    RETVAL = new ExPolygons();
+    PolyTreeToExPolygons(*polytree, *RETVAL);
+    
+    // cleanup
+    delete polygons;
+    delete offset1;
+    delete offset2;
+    delete polytree;
+  OUTPUT:
+    RETVAL
+
+ClipperLib::Polygons*
+simplify_polygon(polygon, fillType)
+    ClipperLib::Polygon* polygon
+    PolyFillType fillType
+  CODE:
+    RETVAL = new ClipperLib::Polygons();
+    ClipperLib::SimplifyPolygon(*polygon, *RETVAL, fillType);
+    delete polygon;
+  OUTPUT:
+    RETVAL
+
+ClipperLib::Polygons*
+simplify_polygons(polygons, fillType)
+    ClipperLib::Polygons* polygons
+    PolyFillType fillType
+  CODE:
+    RETVAL = new ClipperLib::Polygons();
+    ClipperLib::SimplifyPolygons(*polygons, *RETVAL, fillType);
+    delete polygons;
+  OUTPUT:
+    RETVAL
+%}
+
+  %name{clear}
+    void Clear();
+
+};
+
+
+

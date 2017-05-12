@@ -1,0 +1,17 @@
+This is the Debian package for the Mail-SPF-Query CPAN distribution, which is
+available from <http://search.cpan.org/dist/Mail-SPF-Query>.
+
+The Debian package was initially created by Chip Salzenberg <chip@pobox.com>
+and then adopted by Julian Mehnle <julian@mehnle.net> through the pkg-perl
+Alioth project.
+
+The upstream author is Meng Weng Wong <mengwong+spf@pobox.com>.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself, that is under the terms of either the GNU General Public
+License (version 2 or later) or the Artistic License.
+
+On Debian GNU/Linux systems, the complete text of these licenses can be found
+in these files:
+  /usr/share/common-licenses/GPL-2
+  /usr/share/common-licenses/Artistic

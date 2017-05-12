@@ -1,0 +1,796 @@
+                             Muldis::D::Manual
+                                  Changes
+---------------------------------------------------------------------------
+
+2010-07-24
+
+    * Muldis::D::Manual version 0.9.0 is released on CPAN as
+    Muldis-D-Manual-0.9.0.tar.gz.
+
+    * (CD.pod)  Updated the example code, in all 3 dialects, such that all
+    type and constraint declarations have been consolidated into a topology
+    that much more closely resembles their most likely direct SQL database
+    counterparts.  This is effectively just a code refactor as the
+    structure of all actual database data/relvars didn't change at all.
+    Firstly, the root database type now has the empty string as its
+    declared name, as if it was effectively built-in to the depot
+    scaffholding rather than being a normal user-defined type.  Secondly,
+    the definition of each relvar is now effectively built-in to it.  The
+    effective name of the relation type for each relvar is now lowercased
+    and so identical to the name of its relvar, and the tuple type plus
+    primary key that help define the relation type are now nested into the
+    latter, meaning that the relation type now declares a subdepot with the
+    same name as its relvar and the triple are nested beneath that
+    subdepot, with the relvar having an empty-string name.  All of the
+    now-nested tuple types and primary keys have been renamed to just "T"
+    and "pk" respectively, and so all relation type defs now have a more
+    uniform format.  Where applicable, any surrogate keys of relation types
+    had also become nested under the latter, but their declared names
+    didn't change.  The subset constraints were not renamed or nested,
+    staying as they were.  No routines were changed at all.
+
+    * (CD.pod, Muldis_D_PDAFP_200807_updated.xul)  Corresponding to changes
+    introduced in Muldis D spec v0.135.0:  Update all code examples with
+    postcircumfix op invocations to excise the [$,%,@] sigils leading the
+    circumfix parts, such as "@:{...}" rather than "Relation:{...}".
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.135.0 for PTMD_STD:  Update the keywords list to
+    remove all 12 Latin-letter keywords denoting sub/superset tests.
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.136.0 for PTMD_STD:  Update the syntax coloring
+    patterns and function-search pattern considering changes to the syntax
+    of code comments and how string literals treat whitespace.
+
+    * (CD.pod, Muldis_D_PDAFP_200807_updated.xul, TemporalExtras.pod)
+    Corresponding to changes introduced in Muldis D spec v0.136.0 for
+    PTMD_STD:  Update all code examples with not-as-value comments to add
+    nested backtick delimiters, remove per-line delims from block comments.
+
+    * (Muldis_D_PDAFP_200807_updated.xul)  Corresponding to changes
+    introduced in Muldis D spec v0.136.0 for PTMD_STD:  Update all code
+    examples with cardinality prefix op to rename it to "#" from "r#".
+
+    * (Muldis_D_PDAFP_200807_updated.xul)  Corresponding to changes
+    introduced in Muldis D spec v0.137.0 for PTMD_STD:  Update all code
+    examples with symbolic prefix ops to remove now-optional whitespace.
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.137.0 for PTMD_STD:  Update the keywords list to
+    consolidate/rename the keywords denoting membership-tests like "in".
+
+2010-07-13
+
+    * Muldis::D::Manual version 0.8.0 is released on CPAN as
+    Muldis-D-Manual-0.8.0.tar.gz.
+
+    * (BBEdit_LM_Muldis_D.plist)  Fixed an omission in the function-search
+    pattern so that it now finds subdepot declarations also.
+
+    * (TemporalExtras.pod)  Corresponding to changes introduced in Muldis D
+    spec v0.131.0:  Updated the temporal types' documentation to reflect
+    that the core type "Single" was renamed to "Just".
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.132.0 for PTMD_STD:  Updates to the function-search
+    pattern and to the syntax coloring patterns for text, comment strings
+    to reflect that a string may now contain the same literal char as is
+    used to delimit that string, but only when backslash-escaped.
+
+    * (CD.pod, Muldis_D_PDAFP_200807_updated.xul)  Corresponding to changes
+    introduced in Muldis D spec v0.133.0:  Update all code examples with
+    collection value literals/selectors to use their new terser variant
+    formats, such as "@:{...}" rather than "Relation:{...}".
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.134.0 for PTMD_STD:  Updates to the syntax coloring
+    patterns for num, blob literals to support [b,o,d,x] radix specifiers.
+
+    * (Muldis_D_PDAFP_200807_updated.xul, TemporalExtras.pod)
+    Corresponding to changes introduced in Muldis D spec v0.134.0:  Update
+    all code examples with num, blob literals to use their new [b,o,d,x]
+    variant formats, or to reflect Perls' terser native literal formats.
+
+2010-06-20
+
+    * Muldis::D::Manual version 0.7.0 is released on CPAN as
+    Muldis-D-Manual-0.7.0.tar.gz.
+
+    * (Manual.pm, README)  Updated the list of email forums focusing on
+    Muldis D and its implementations, first to add a 4th list
+    muldis-d-language, and second to update all 4 lists' descriptions.
+
+    * (Muldis_D_PDAFP_200807_updated.xul)  Minor terminology change.
+
+    * (TemporalExtras.pod)  Updated all system-defined routine
+    documentation so that the illustrative declarations of each now just
+    have the unqualified routine names, same as the real declarations
+    would, rather than being fully-qualified; the level-2 heading for each
+    routine description already has the latter.
+
+    * (CD.pod)  Corresponding to changes introduced in Muldis D spec
+    v0.130.0 for PTMD_STD:  Update all code examples using shorthand syntax
+    for "foo=>foo" that looked like ">foo" to instead look like "=>foo".
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.130.0 for PTMD_STD:  Update the keywords list to
+    remove all 6 single-Latin-letter keywords: x, d, t, r, s, v.
+
+    * (CD.pod, TemporalExtras.pod, Muldis_D_PDAFP_200807_updated.xul)
+    Corresponding to changes introduced in Muldis D spec v0.130.0 for
+    PTMD_STD:  Update all code examples or routine documentation to excise
+    the "$" sigils, which are no longer used to mark data-entities.
+
+2010-05-18
+
+    * Muldis::D::Manual version 0.6.1 is released on CPAN as
+    Muldis-D-Manual-0.6.1.tar.gz.
+
+    * (Manual.pm, README, Makefile.PL)  Updated any instances of
+    "http://mm.DarrenDuncan.net/mailman/listinfo" so that they are fully
+    lower-cased, because the mixed case version doesn't work with some web
+    browsers; browsers that don't automatically convert it to lowercase get
+    a "There currently are no publically-advertised mailman lists" message.
+
+    * (BBEdit_LM_Muldis_D.plist)  Fixed a fossil where in release 0.6.0 the
+    keywords list should have included these 5 additional or renamed items
+    (re MD v0.129.0) but didn't: "determinant-attrs", "dependent-attrs",
+    "map-function", "is-updateable", "and-provides-its-default".
+
+2010-05-16
+
+    * Muldis::D::Manual version 0.6.0 is released on CPAN as
+    Muldis-D-Manual-0.6.0.tar.gz.
+
+    * (CD.pod)  Fixed a design error in the example code where it assumed
+    that exactly one tuple would result from some queries, when in fact
+    zero tuples might result instead.
+
+    * (CD.pod)  Fixed example code to add a try/catch block around the
+    record insertion code, to gracefully deal and display a message if the
+    insertion failed due to duplicate titles/etc constraint violation.
+
+    * (TemporalExtras.pod)  Renamed the 3 "Date and Time Literals" pod
+    sub-sections to add unique prefixes so that navigation links work.
+
+    * (CD.pod)  Add 2 more copies of the example code, one for each of the
+    2 Muldis D Perl-STD dialects.  But while the PTMD_STD dialect's copy of
+    the example is complete, the HDMD_Perl6_STD and HDMD_Perl5_STD
+    dialects' copies of the example are each missing the bodies of 13
+    routines, and have just the headings/signatures for those 13; the
+    HDMD_Perl6_STD and HDMD_Perl5_STD dialects' copies of the example are
+    otherwise complete, having the complete definitions of 7 routines, and
+    all of the type definitions, constraints, scaffolding, and data.  The
+    PTMD_STD copy is, in any event, the most terse and readable, especially
+    for routine definitions; the routines that are complete in the 2
+    Perl-STD copies should constitute a representative subset, such that
+    one should be able to infer the missing routine bodies easily enough
+    through comparison with the complete PTMD_STD copy; but the other
+    routines might also be made complete later if the rationale exists.
+
+2010-05-12
+
+    * Muldis::D::Manual version 0.5.0 is released on CPAN as
+    Muldis-D-Manual-0.5.0.tar.gz.
+
+    * Added new file "lib/Muldis/D/Manual/CD.pod" which features example
+    code that demonstrates a very basic CD database, which consists of a
+    schema definition having relvars to store data and routines to fetch or
+    update that data, and it includes some sample data.  For users that are
+    better served with a complete example than a spec, this should do it.
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.129.0 for PTMD_STD:  Added "compose" to keywords list.
+
+2010-05-11
+
+    * Muldis::D::Manual version 0.4.0 is released on CPAN as
+    Muldis-D-Manual-0.4.0.tar.gz.
+
+    * Added new file "lib/Muldis/D/Manual/TemporalExtras.pod" which houses
+    all the substantial material that was purged from the "Muldis D
+    Temporal Extension" and related parts of the Muldis D language spec as
+    of its release 0.121.0, with the intent to be moved to the Muldis D
+    Manual for use as a resource when implementing non-mixin temporal types
+    and non-virtual temporal operators in Muldis D in the future,
+    especially if those would be by third parties as user-def materials.
+
+2010-05-11
+
+    * Muldis::D::Manual version 0.3.0 is released on CPAN as
+    Muldis-D-Manual-0.3.0.tar.gz.
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.111.0 for PTMD_STD:  Updates to the syntax coloring
+    patterns and function-search pattern concerning segmentation of long
+    stringy value literals; the patterns are simplified because now even a
+    segmented string still just has a single pair of quotes around the
+    whole literal, rather than a pair of quotes around each segment.
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.112.0 for PTMD_STD:  Updates to the keywords list and
+    function-search pattern concerning that the "mixin-type" keyword has
+    been added.
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.112.0 for PTMD_STD:  Updates to the keywords list
+    concerning the "date_time" SSE was renamed to "temporal".
+
+    * (Input_Method_Muldis_D.cin)  Corresponding to changes introduced in
+    Muldis D spec v0.112.0 for PTMD_STD:  Renamed several chardef keys to
+    match the renames of the set membership testing operators; the 4 keys
+    "[|n][i|h]mem" were renamed to "[|n][in|has]", respectively.
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.113.0 for PTMD_STD:  Updates to the syntax coloring
+    patterns concerning the "RatRoundMeth" type being renamed to
+    "RoundMeth", and 2 of its values being renamed, and 2 values added.
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.113.0 for PTMD_STD:  Updates to syntax coloring
+    patterns that correspond to some optional whitespace in value literals,
+    which is now prohibited except as an "unspace".
+
+    * (Muldis_D_PDAFP_200807_updated.xul)  Corresponding to changes
+    introduced in Muldis D spec v0.115.0:  Update several descriptions and
+    code examples to reflect the addition of the "recipe" 4th main routine
+    kind, and the reduction of what a "procedure" can directly do.  Also
+    purged the slides talking about "inner routines", which haven't existed
+    for awhile; they were marked w rewrite-TODOs, but removal is simpler.
+
+    * (Input_Method_Muldis_D.cin)  Corresponding to changes introduced in
+    Muldis D spec v0.115.0 for PTMD_STD:  Removed 4 chardefs that
+    associated the math op chars [*+-%] with the relational ops [∩∪∖∆].
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.116.0 for PTMD_STD:  Updates to the syntax coloring
+    patterns concerning that the "Singleton" domain-union type, and its 2
+    singleton-type values "-Inf", "Inf" (and "-∞", "∞") have been added.
+
+    * (Input_Method_Muldis_D.cin)  Corresponding to changes introduced in
+    Muldis D spec v0.116.0 for PTMD_STD:  Added chardef for "∞" character.
+
+    * (Muldis_D_PDAFP_200807_updated.xul)  Corresponding to changes
+    introduced in Muldis D spec v0.117.0:  Added a note to
+    reflect no one writes "lex" anymore; that namespace now just a concept.
+
+    * (Muldis_D_PDAFP_200807_updated.xul)  Corresponding to changes
+    introduced in Muldis D spec v0.118.0 for PTMD_STD:  Update to code
+    examples to reflect that most math op spec-syn were renamed or merged.
+
+    * (Muldis_D_PDAFP_200807_updated.xul)  Corresponding to changes
+    introduced in Muldis D spec v0.120.0:  Update to code example to
+    reflect use of new mixin temporal type and virtual system-service.
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.121.0 for PTMD_STD:  Updates to the syntax coloring
+    patterns and keywords list concerning that the temporal standard syntax
+    extension has been completely removed from the grammar, as part of the
+    purge of all non-mixin temporal types and all non-virtual temporal
+    routines from the language; removed the 'temporal' keyword and the
+    syntax coloring patterns for "TAI[Instant|Duration]",
+    "[UTC|Float][Instant|DateTime|Date|Time", "UTCDuration".
+
+    * (Muldis_D_PDAFP_200807_updated.xul)  Corresponding to changes
+    introduced in Muldis D spec v0.122.0 and v0.124.0 for PTMD_STD:  Update
+    to code example to reflect that concrete syntax for material
+    references, and for routine embedding, both such as are used for
+    higher-order functions, is now finalized.
+
+    * (BBEdit_LM_Muldis_D.plist)  Many additions to the keywords list and
+    function-search pattern, some corresponding to changes in multiple past
+    Muldis D spec versions, and some relating to plans of uspecced syntax.
+
+2010-03-01
+
+    * Muldis::D::Manual version 0.2.0 is released on CPAN as
+    Muldis-D-Manual-0.2.0.tar.gz.
+
+    * (Muldis_D_PDAFP_200807_updated.xul)  Corresponding to changes
+    introduced in Muldis D spec v0.101.0:  Update a description to reflect
+    that many s-d materials were moved from Muldis D extensions to core.
+
+    * (Muldis_D_PDAFP_200807_updated.xul)  Corresponding to changes
+    introduced in Muldis D spec v0.102.0:  Update a description to reflect
+    that the 2 top-level namespaces "dep", "sdp" replaced with the 1 "nlx".
+
+    * (Muldis_D_PDAFP_200807_updated.xul)  Corresponding to changes
+    introduced in Muldis D spec v0.103.0 for PTMD_STD:  Update to code
+    example to abbreviate "&p_count => $p_count" to "&$>p_count".
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.103.0 for PTMD_STD:  Updates to the keywords list
+    concerning the list-valued standard_syntax_extensions pragma was added.
+
+    * (Muldis_D_PDAFP_200807_updated.xul)  Corresponding to changes
+    introduced in Muldis D spec v0.104.0:  Add a description to reflect
+    that the 1 new top-level namespace "rtn" was added.
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.105.0 for PTMD_STD:  Updates to the keywords list and
+    function-search pattern concerning that the "union-type" keyword has
+    been renamed to "domain-type" and the "nonscalar-type" keyword has been
+    split into the 2 "tuple-type" and "relation-type".
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.107.0 for PTMD_STD:  Updates to the keywords list and
+    the syntax coloring patterns concerning single-value literals or
+    enumeration value names to rename them all so that they are now
+    capitalized like type names rather than all lowercase; for examples,
+    "nothing" and "half_even" were renamed to "Nothing" and "HalfEven".
+
+    * (Muldis_D_PDAFP_200807_updated.xul)  Corresponding to changes
+    introduced in Muldis D spec v0.107.0 for PTMD_STD:  Update to code
+    examples to rename any "true" value literals to "True".
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.109.0 for PTMD_STD:  Updates to syntax coloring
+    patterns to remove the special "String" value literal format, as the
+    standard grammars no longer have "String"-specific value node kinds.
+
+    * (Muldis_D_PDAFP_200807_updated.xul)  Corresponding to changes
+    introduced in Muldis D spec v0.110.0:  Update descriptions to reflect
+    that "Int" now is the sole scalar primitive type and has no possreps.
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.110.0 for PTMD_STD:  Updates to the keywords list
+    concerning the 2-valued op_char_repertoire pragma was added.
+
+    * (Input_Method_Muldis_D.cin)  Corresponding to changes introduced in
+    Muldis D spec v0.110.0 for PTMD_STD:  Renamed several chardef keys to
+    more closely match the PTMD_STD-defined ASCII alternatives for Unicode
+    symbols for functions that test set membership or sub/superset
+    relationships; for example, the key for the char ∈ is now "imem" rather
+    than "ismem".  The increased consistency resulting from this change
+    should make the keys for the chars easier to remember.
+
+    * Incremented all copyright year range-ends to 2010.
+
+2009-11-09
+
+    * Muldis::D::Manual version 0.1.1 is released on CPAN as
+    Muldis-D-Manual-0.1.1.tar.gz.
+
+    * Updated all author references to change Darren Duncan's stated email
+    address from "perl@DarrenDuncan.net" to "darren@DarrenDuncan.net".
+
+2009-10-27
+
+    * Muldis::D::Manual version 0.1.0 is released on CPAN as
+    Muldis-D-Manual-0.1.0.tar.gz.
+
+    * Updated the README file to indicate that this distribution now has 2
+    public Git repositories, one on GitHub.com and one on utsl.gen.nz.
+
+    * (Makefile.PL, Manual.pm, Muldis_D_Manual_00_Compile.t)  Updated the
+    distro so that normal users only need the most minimal dependencies
+    reasonably possible, meaning it now only requires Perl 5.6.0+ rather
+    than 5.8.1+, and it requires no modules at all that weren't bundled
+    with 5.6.0+.  This seemed appropriate since the distro is
+    documentation-only and doesn't have any normal code to run, just POD to
+    render (on the other hand, that POD is UTF-8).  Updated the test file,
+    which exists just to make generic CPAN build and testing facilities
+    happy, to use "Test" rather than "Test::More" since that's all Perl
+    5.6.0 bundled.  Also updated the Makefile.PL (and META.yml) to add
+    "resources" urls.
+
+    * (Muldis_D_PDAFP_200807_updated.xul)  Corresponding to changes
+    introduced in Muldis D spec v0.93.0 for PTMD_STD:  Updates to code
+    examples to remove most expression-delimiting parenthesis because they
+    are no longer mandatory.
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.94.0 for PTMD_STD:  Updates to syntax coloring
+    patterns that correspond to whitespace, which has increased strictness.
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.95.0 for PTMD_STD:  Updates to syntax coloring
+    patterns that correspond to code comments; now there are 2 distinct
+    patterns, 1 "#" delimited for not-as-value comments, which is the
+    "Comment Pattern", and 1 "`" delimited for as-value Comment literals,
+    which is part of the "String Pattern".
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.95.0 for PTMD_STD:  Updates to the keywords list and
+    function-search pattern concerning that all multi-word keywords now
+    have words separated by dashes rather than whitespace or underscores.
+
+    * (BBEdit_LM_Muldis_D.plist)  Corresponding to changes introduced in
+    Muldis D spec v0.96.0 for PTMD_STD:  Updates to the keywords list
+    concerning the 4-valued catalog_abstraction_level pragma was added.
+
+    * (Muldis_D_PDAFP_200807_updated.xul)  Corresponding to changes
+    introduced in Muldis D spec v0.96.1 for PTMD_STD:  Updates to code
+    examples to reflect param types now appearing to the right of param
+    names rather than to the left, and now with a colon between the pair.
+
+    * Updated the Changes file to copy into it (with trimming if needed)
+    all the Changes file items from the Muldis-D and Muldis-Rosetta/DB
+    distributions that described history of the files that were moved from
+    that distribution into this Muldis-D-Manual distribution.  In all,
+    Changes file items were imported from the Changes report for 24
+    Muldis-D distribution releases, whose version numbers are listed here
+    from newest to oldest: 0.91.0 (2009-09-21), 0.90.0, 0.88.0, 0.87.0,
+    0.86.0, 0.83.0, 0.82.0, 0.80.0, 0.79.1, 0.79.0, 0.76.1, 0.76.0, 0.75.0,
+    0.74.0, 0.73.0, 0.72.0, 0.68.0, 0.67.0, 0.65.0, 0.63.0, 0.43.0, 0.42.0,
+    0.41.0, 0.40.0 (2008-07-08).  In all, Changes file items were imported
+    from the Changes report for 3 Muldis-Rosetta/DB distribution releases,
+    whose version numbers are listed here from newest to oldest: 0.8.0
+    (2008-08-02), 0.7.0, 0.6.1 (2008-03-10).  Besides all of the above, a
+    single additional Changes file item was imported from the "Rosetta"
+    distribution version 0.720.0/0.720000 (2006-02-01).
+
+2009-09-26
+
+    * Muldis::D::Manual version 0.0.0 is released on CPAN as
+    Muldis-D-Manual-0.0.0.tar.gz.
+
+    * This is the first release of the Muldis-D-Manual distribution, and
+    the first release of any distribution to contain Perl 5 modules named
+    Muldis::D::Manual::\w+.
+
+    * This is the initial file manifest:
+
+        archives/Muldis_D_PDAFP_200807_lt.xul
+        archives/Muldis_D_PDAFP_200807_sa.xul
+        archives/Muldis_D_PDAFP_200807_updated.xul
+        archives/OSCON2005LightningTalk.txt
+        archives/OSCON2008SessionProposal.txt
+        archives/README
+        archives/takahashi.css
+        archives/takahashi.js
+        Changes
+        INSTALL
+        lib/Muldis/D/Manual.pm
+        LICENSE/GPL
+        Makefile.PL
+        MANIFEST
+        MANIFEST.SKIP
+        README
+        t/Muldis_D_Manual_00_Compile.t
+        TODO
+        util/BBEdit_LM_Muldis_D.plist
+        util/Input_Method_Muldis_D.cin
+        util/README
+
+    * The file lib/Muldis/D/Manual.pm is the main one that was newly
+    created for the Muldis-D-Manual distro, and introduces the distro.
+
+    * All of the 11 files in the archives/ and util/ folders, except the 1
+    OSCON2005LightningTalk.txt, have been transferred here from the
+    Muldis-D distribution with no significant changes, where they had been
+    supplementary files and not part of the language spec proper; so from
+    now on, the Muldis-D documentation would just contain the Muldis D spec
+    proper and any supplementary material would live in Muldis-D-Manual.
+    The 1 was transferred here from the Muldis-Rosetta distribution, where
+    it constituted the entire archives/ folder.
+
+2009-09-21
+
+    * Muldis::D version 0.91.0 is released on CPAN as
+    Muldis-D-0.91.0.tar.gz.
+
+    * (BBEdit_LM_Muldis_D.plist)  Updates corresp to recent spec changes.
+
+2009-09-19
+
+    * Muldis::D version 0.90.0 is released on CPAN as
+    Muldis-D-0.90.0.tar.gz.
+
+    * (Muldis_D_PDAFP_200807_updated.xul)  Upd corres to recent spec chgs.
+
+2009-09-12
+
+    * Muldis::D version 0.88.0 is released on CPAN as
+    Muldis-D-0.88.0.tar.gz.
+
+    * (Muldis_D_PDAFP_200807_updated.xul, BBEdit_LM_Muldis_D.plist)
+    Updates corresponding to recent spec changes.
+
+2009-09-03
+
+    * Muldis::D version 0.87.0 is released on CPAN as
+    Muldis-D-0.87.0.tar.gz.
+
+    * (Muldis_D_PDAFP_200807_updated.xul)  Updates corresponding to recent
+    spec changes.
+
+2009-09-02
+
+    * Muldis::D version 0.86.0 is released on CPAN as
+    Muldis-D-0.86.0.tar.gz.
+
+    * (Input_Method_Muldis_D.cin)  Fixed fossils from v0.85.0 re '!' usage.
+
+    * (Input_Method_Muldis_D.cin)  Removed "<>" as an alternate concrete
+    syntax for "≠"; now only "!=" is an alternate.
+
+    * (Muldis_D_PDAFP_200807_updated.xul)  In accordance with the latest
+    Perl 6 spec (an update on 2009.08.29), updated the HDMD_Perl6_STD code
+    examples to reflect that you now use "/" to select a Perl 6 "Rat" in
+    terms of 2 "Int", where you used to use "div" to do that.
+
+2009-08-20
+
+    * Muldis::D version 0.83.0 is released on CPAN as
+    Muldis-D-0.83.0.tar.gz.
+
+    * (BBEdit_LM_Muldis_D.plist)  Updates corresp to recent spec changes.
+
+2009-07-27
+
+    * Muldis::D version 0.82.0 is released on CPAN as
+    Muldis-D-0.82.0.tar.gz.
+
+    * (Muldis_D_PDAFP_200807_updated.xul)  Other small updates corresp to
+    recent spec changes.
+
+2009-07-06
+
+    * Muldis::D version 0.80.0 is released on CPAN as
+    Muldis-D-0.80.0.tar.gz.
+
+    * (BBEdit_LM_Muldis_D.plist, Input_Method_Muldis_D.cin)  Various minor
+    updates and fixes.
+
+2009-06-16
+
+    * Muldis::D version 0.79.1 is released on CPAN as
+    Muldis-D-0.79.1.tar.gz.
+
+    * Forked the slideshow "archives/Muldis_D_PDAFP_200807_sa.xul" into
+    itself, which remains unchanged, and the new file
+    "archives/Muldis_D_PDAFP_200807_updated.xul", which has been modified
+    just enough to bring it into compliance with all the Muldis D spec
+    changes made since release 0.43.0 (when "_sa" was frozen).  The most
+    significant improvements in "_updated" is that all the concrete Muldis
+    D code examples were rewritten into ones with the same semantics but
+    that are actual semi-specced Muldis D code rather than pseudo-code;
+    especially prominant is that the new code's size is 80-90% smaller than
+    before, and in the examples comparing Muldis D to SQL, the Muldis D
+    code was generally just half the size of the SQL code, so being less
+    verbose than SQL rather than more.  And so, from now on,
+    "Muldis_D_PDAFP_200807_updated.xul" will continue to be updated with
+    each Muldis D release when it otherwise becomes incorrect, and so it
+    should remain one of the best introduction materials to Muldis D.
+
+2009-06-13
+
+    * Muldis::D version 0.79.0 is released on CPAN as
+    Muldis-D-0.79.0.tar.gz.
+
+    * (BBEdit_LM_Muldis_D.plist)  Added special literal
+    syntax to the "Tuple" and "Relation" node kinds, similar to what exists
+    for "Maybe", so the plain barewords "d0", "d0c0", "d0c1" are now
+    nonscalar GCVLs by themselves, like "nothing" or "∅" are.  Note that
+    this feature is in PTMD_STD alone; the Perl-STD dialects don't have it.
+
+    * (BBEdit_LM_Muldis_D.plist)  Various minor updates and fixes.
+
+2009-06-04
+
+    * Muldis::D version 0.76.1 is released on CPAN as
+    Muldis-D-0.76.1.tar.gz.
+
+    * (BBEdit_LM_Muldis_D.plist)  Missed a few updates in the last release.
+
+2009-06-04
+
+    * Muldis::D version 0.76.0 is released on CPAN as
+    Muldis-D-0.76.0.tar.gz.
+
+    * (BBEdit_LM_Muldis_D.plist)  Updates corresp to recent spec changes.
+
+2009-05-28
+
+    * Muldis::D version 0.75.0 is released on CPAN as
+    Muldis-D-0.75.0.tar.gz.
+
+    * (BBEdit_LM_Muldis_D.plist)  Updates corresp to recent spec changes.
+
+2009-05-27
+
+    * Muldis::D version 0.74.0 is released on CPAN as
+    Muldis-D-0.74.0.tar.gz.
+
+    * Added new file "util/Input_Method_Muldis_D.cin" which is the first
+    cut of a generic-format "input method" plugin, that can be installed
+    as-is under various operating systems including Mac OS X 10.5, whose
+    use should make it much easier to type the various trans-ASCII symbols
+    that the Muldis D concrete syntaxes allow you to use for operators/etc.
+    Of course, you might already have some other "input method" tool to use
+    already that helps with mathematical/etc symbols so the one bundled
+    with the Muldis D spec may be redundant; but otherwise it should help.
+    To use it in Mac OS X, simply drop it in your "~/Library/Input Methods"
+    and log out plus log in and enable it in the "International" System
+    Preference panel.  Also updated "util/README" about this file.
+
+    * (BBEdit_LM_Muldis_D.plist)  Updates corresp to recent spec changes.
+
+2009-05-19
+
+    * Muldis::D version 0.73.0 is released on CPAN as
+    Muldis-D-0.73.0.tar.gz.
+
+    * (BBEdit_LM_Muldis_D.plist)  Updates corresp to recent spec changes.
+
+2009-05-15
+
+    * Muldis::D version 0.72.0 is released on CPAN as
+    Muldis-D-0.72.0.tar.gz.
+
+    * (BBEdit_LM_Muldis_D.plist)  Other minor updates.
+
+2009-05-06
+
+    * Muldis::D version 0.68.0 is released on CPAN as
+    Muldis-D-0.68.0.tar.gz.
+
+    * Updated any references in BBEdit_LM_Muldis_D.plist to reflect that
+    the Muldis D dialects/grammar "PTMD_Tiny" was renamed to "PTMD_STD".
+
+2009-05-04
+
+    * Muldis::D version 0.67.0 is released on CPAN as
+    Muldis-D-0.67.0.tar.gz.
+
+    * (BBEdit_LM_Muldis_D.plist)  Updated this file to the latest grammar.
+
+2009-04-22
+
+    * Muldis::D version 0.65.0 is released on CPAN as
+    Muldis-D-0.65.0.tar.gz.
+
+    * (BBEdit_LM_Muldis_D.plist)  Partially rewrote this file, mainly the
+    syntax coloring regexes, to be cleaner and to reflect the previous
+    PTMD_Tiny change items.  Also, Name/NameChain/DeclNameChain literals
+    are no longer colored at all, since in general they should be treated
+    consistently as identifiers.  Also, the "value kind" barewords,
+    essentially all the unqualified main type names, are no longer colored
+    as language keywords, as they should be treated consistently with
+    either type or routine invocation names.
+
+    * (BBEdit_LM_Muldis_D.plist)  Made several additions corresponding to
+    anticipated PTMD_Tiny grammar that is yet to be codified in the spec.
+    Rewrote the routine scanning pattern to look for
+    "[inner_]?[function|updater|procedure]" rather than "[name|'name'] \s*
+    => \s* Name:".  Added a couple dozen new keywords to the syntax
+    colorer, including both the routine makers and a bunch of possible
+    infix operators that are actually sugar over normal prefix operators.
+
+2009-04-02
+
+    * Muldis::D version 0.63.0 is released on CPAN as
+    Muldis-D-0.63.0.tar.gz.
+
+    * Added new file "util/BBEdit_LM_Muldis_D.plist" which is the first cut
+    of a Codeless Language Module for the BBEdit text editor for Mac OS X
+    that empowers BBEdit to syntax color and function scan code written in
+    the PTMD_Tiny dialect of Muldis D.  Also added the support file
+    "util/README" which explains the CLM further.  The new CLM is only as
+    complete as the language spec itself, and mainly what it is the most
+    complete about is syntax coloring Muldis D value literals.  Also
+    updated the README file to refer to the "util/" and "archives/" dirs.
+    While not exactly its intended use, you can get a taste of the CLM
+    working by opening the PTMD_Tiny.pod file in BBEdit with the CLM
+    installed and look at the various code examples in the POD file.
+
+2008-08-02
+
+    * Muldis Rosetta version 0.8.0 for Perl 5 is released on CPAN as
+    Muldis-Rosetta-0.8.0.tar.gz.
+
+    * The file archives/OSCON2008SessionProposal.txt was moved from the
+    Muldis Rosetta version control / distribution to the Muldis D one.
+
+2008-07-29
+
+    * Muldis::D version 0.43.0 is released on CPAN as
+    Muldis-D-0.43.0.tar.gz.
+
+    * Savagely chopped the Live Talk version of the Muldis_D_PDAFP_200807
+    slideshow to remove all the content text, keeping just the section
+    headings, a handful of bullets, and all but one of the code samples.
+    There should be no doubt whatsoever now that the presenter isn't
+    reading the slides; also, this result is more like the actual Takahashi
+    format that the XUL software is designed for; also, it now should be
+    easier to fit into the allowed time.  This was presented at OSCON on
+    July 23.  Then the Stand Alone version had its end updated to format
+    like the rest of the SA slideshow.  And so following this, this
+    2-version 2008 July slideshow is now frozen into the archives.
+
+    * The file archives/OSCON2008SessionProposal.txt was moved from the
+    Muldis Rosetta version control / distribution to the Muldis D one.
+
+2008-07-21
+
+    * Muldis::D version 0.42.0 is released on CPAN as
+    Muldis-D-0.42.0.tar.gz.
+
+    * Edited and trimmed the slideshow "archives/Muldis_D_PDAFP_200807.xul"
+    substantially, removing about 30% of its size.  The changes were
+    inspired largely by feedback from several sources on the version in
+    release 0.41.0.  The cuts mainly were about removing "boring" parts
+    like introductives and less interesting or common features; also many
+    parts were edited to say the same thing in substantially fewer words;
+    all in all, this was just fat trimming and the result shouldn't lack
+    anything useful that was in the previous one.  This new version would
+    barely fit in 45 minutes if read aloud, but it is in fact now intended
+    as the paper for download, so people not at a live talk based on this
+    can still get all the material.  There was also some reordering, and a
+    bit of additions near the front to make it easier to know early what
+    the talk and the project is about.
+
+    * Forked said slideshow into a "_sa" (Stand Alone) and "_lt" (Live
+    Talk) version, the former being the version for viewing on its own, or
+    use as speaker's notes, and the latter for actual display during the
+    talk.  The live version changes the quasi-sentences of the stand alone
+    to bullet points and less text.  This was presented at PDXPug PGDay on
+    July 20th.
+
+    * Partly due to feedback gotten at the OSCON speakers' workshop on July
+    21, the talk will be redone again, using a different presentation tool,
+    and making the live version have very little content so it differs
+    greatly from what is spoken, this all in preparation for July 23.
+
+2008-07-15
+
+    * Muldis::D version 0.41.0 is released on CPAN as
+    Muldis-D-0.41.0.tar.gz.
+
+    * Rewrote the slideshow "archives/Muldis_D_PDAFP_200807.xul" so it has
+    more appropriate content, and is a better length.  While this version
+    should be complete on talking about Muldis D, it still lacks anything
+    on Muldis Rosetta, which should end up about 10% of the size, except
+    that there are internal todo notes on this.  And next I'll need to chop
+    down the size of the new version so it can be presented in about 45
+    minutes, for which I'll solicit advice.  That cut version should be in
+    a near future subsequent release.
+
+2008-07-08
+
+    * Muldis::D version 0.40.0 is released on CPAN as
+    Muldis-D-0.40.0.tar.gz.
+
+    * Added new file "archives/Muldis_D_PDAFP_200807.xul" which is the very
+    rough first draft of the slideshow for the 2008 July talk "Muldis D -
+    Portable Databases At Full Power".  This talk is created for giving at
+    OSCON 2008, and it is also being given at several other events in 2008
+    July.  Following a practice presentation on 2008 July 8th, which used
+    the (first half of) this exact file (except new postscript first
+    screen), it was decided to completely rewrite the slideshow with
+    different content.  Meanwhile this version is now being released on
+    CPAN for posterity.  The next CPAN release of Muldis D will not have
+    this version, rather its replacement.  This talk is a XUL file and it
+    requires Mozilla Firefox to run (or you can read its text in a text
+    editor).  Also added the 2 support files "archives/takahashi.(css|js)"
+    plus the file "archives/README".
+
+2008-04-12
+
+    * Muldis Rosetta version 0.7.0 for Perl 5 is released on CPAN as
+    Muldis-Rosetta-0.7.0.tar.gz.
+
+    * Minor update to the file archives/OSCON2008SessionProposal.txt which
+    reflects that the proposal was accepted; the talk will be given Jul 23.
+    Also retconned the file to use current names, urls of Muldis D|Rosetta;
+    the copy on the OSCON website will likewise be updated if possible.
+
+2008-03-10
+
+    * Muldis DB version 0.6.1 for Perl 5 is released on CPAN as
+    Muldis-DB-0.6.1.tar.gz.
+
+    * Added new file archives/OSCON2008SessionProposal.txt which is a copy
+    of a proposal to give a talk on Muldis D + DB at OSCON 2008 (it can
+    also be given elsewhere); this is likely the most succinct description
+    yet of what the projects are and why one would want to use them.
+
+2006-02-01
+
+    * Rosetta Release 0.720.0/0.720000 (SVN r1203).
+
+    * Added new file docs/OSCON2005LightningTalk.txt, which has the
+    pristine text for a lightning talk I gave, and outlined in 5 minutes
+    what at-that-time Rosetta was and was to be.

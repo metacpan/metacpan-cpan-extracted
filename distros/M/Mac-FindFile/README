@@ -1,0 +1,73 @@
+Mac-FindFile
+
+This module allows you to search a Mac hard drive or volume using the native FSCatalogSearch API. This API, not related to the Mac's Spotlight system, does a fast search through the file system's indexed catalog, and can search an entire hard drive in seconds (as opposed to several minutes for a directory walk such as File::Find).
+
+    use Mac::FindFile;
+
+    Mac::FindFile::find("png", "/");
+
+
+Because the search output can be quite large, it is written to a fixed location ("/tmp/mac_findfile_output.txt") so that it can be managed more easily. The file can be read into memory, or loaded more quickly with a module such as Tie::File. 
+
+     use Tie::File;
+     my @searchoutput;
+     tie @searchoutput, 'Tie::File', '/tmp/mac_findfile_output.txt' or die; 
+
+     foreach (@searchoutput) {
+     print "this item is $_\n";
+     }
+
+     untie @searchoutput;
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Mac::FindFile
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mac-FindFile
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Mac-FindFile
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Mac-FindFile
+
+    Search CPAN
+        http://search.cpan.org/dist/Mac-FindFile/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2015 Kevin Walzer
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+

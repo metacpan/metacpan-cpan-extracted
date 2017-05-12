@@ -1,0 +1,24 @@
+<%args>
+$object
+</%args>
+<%doc>
+=head2 view_related
+
+This takes an object, and looks up the C<related_accessors>; this should
+give a list of accessors that can be called to get a list of related
+objects. It then displays a title for that accessor, (i.e. "Beers" for a
+brewery) calls the accesor, and displays a list of the results. 
+
+=cut
+
+</%doc>
+
+%foreach my $accessor (@{$classmetadata->{related_accessors}}) {
+        <h3>  <%ucfirst($accessor)%> </h3>
+        <ul id="vlist">
+%   foreach my $thing ($object->$accessor) {
+            <li><& maybe_link_view, %ARGS, item=>$thing &></li>
+%    }
+        </ul>
+%}
+

@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+MSP.pm
+README
+t/01-syntax.t
+t/06-compiler.t
+t/09-component.t
+t/13-errors.t
+t/02-sections.t
+t/09a-comp_content.t
+t/11-inherit.t
+

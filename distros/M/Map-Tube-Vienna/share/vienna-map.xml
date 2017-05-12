@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- https://de.wikipedia.org/wiki/U-Bahn_Wien -->
+<tube name="U-Bahn Wien">
+  <lines>
+    <line id="U1" name="U-Bahn-Linie U1" color="red"/>
+    <line id="U2" name="U-Bahn-Linie U2" color="magenta"/>
+    <line id="U3" name="U-Bahn-Linie U3" color="orange"/>
+    <line id="U4" name="U-Bahn-Linie U4" color="green"/>
+    <line id="U6" name="U-Bahn-Linie U6" color="brown"/>
+  </lines>
+  <stations>
+
+    <!-- https://de.wikipedia.org/wiki/U-Bahnlinie_1_(Wien) -->
+    <station id="1-01" name="Reumannplatz" line="U1:1" link="1-02"/>
+    <station id="1-02" name="Keplerplatz" line="U1:2" link="1-01,1-03"/>
+    <station id="1-03" name="Südtiroler Platz-Hauptbahnhof" line="U1:3" link="1-02,1-04"/>
+    <station id="1-04" name="Taubstummengasse" line="U1:4" link="1-03,1-05"/>
+    <station id="1-05" name="Karlsplatz" line="U1:5" link="1-04,1-06" other_link="Tunnel:2-20,Tunnel:4-12"/>
+    <station id="1-06" name="Stephansplatz" line="U1:6" link="1-05,1-07" other_link="Tunnel:3-11"/>
+    <station id="1-07" name="Schwedenplatz" line="U1:7" link="1-06,1-08" other_link="Tunnel:4-15"/>
+    <station id="1-08" name="Nestroyplatz" line="U1:8" link="1-07,1-09"/>
+    <station id="1-09" name="Praterstern" line="U1:9" link="1-08,1-10" other_link="Tunnel:2-13"/>
+    <station id="1-10" name="Vorgartenstraße" line="U1:10" link="1-09,1-11"/>
+    <station id="1-11" name="Donauinsel" line="U1:11" link="1-10,1-12"/>
+    <station id="1-12" name="Kaisermühlen" line="U1:12" link="1-11,1-13"/>
+    <station id="1-13" name="Alte Donau" line="U1:13" link="1-12,1-14"/>
+    <station id="1-14" name="Kagran" line="U1:14" link="1-13,1-15"/>
+    <station id="1-15" name="Kagraner Platz" line="U1:15" link="1-14,1-16"/>
+    <station id="1-16" name="Rennbahnweg" line="U1:16" link="1-15,1-17"/>
+    <station id="1-17" name="Aderklaaer Straße" line="U1:17" link="1-16,1-18"/>
+    <station id="1-18" name="Großfeldsiedlung" line="U1:18" link="1-17,1-19"/>
+    <station id="1-19" name="Leopoldau" line="U1:19" link="1-18"/>
+
+    <!-- https://de.wikipedia.org/wiki/U-Bahnlinie_2_(Wien) -->
+    <station id="2-01" name="Seestadt" line="U2:1" link="2-02"/>
+    <station id="2-02" name="Aspern Nord" line="U2:2" link="2-01,2-03"/>
+    <station id="2-03" name="Hausfeldstraße" line="U2:3" link="2-02,2-04"/>
+    <station id="2-04" name="Aspernstraße" line="U2:4" link="2-03,2-05"/>
+    <station id="2-05" name="Donauspital" line="U2:5" link="2-04,2-06"/>
+    <station id="2-06" name="Hardeggasse" line="U2:6" link="2-05,2-07"/>
+    <station id="2-07" name="Stadlau" line="U2:7" link="2-06,2-08"/>
+    <station id="2-08" name="Donaustadtbrücke" line="U2:8" link="2-07,2-09"/>
+    <station id="2-09" name="Donaumarina" line="U2:9" link="2-08,2-10"/>
+    <station id="2-10" name="Stadion" line="U2:10" link="2-09,2-11"/>
+    <station id="2-11" name="Krieau" line="U2:11" link="2-10,2-12"/>
+    <station id="2-12" name="Messe-Prater" line="U2:12" link="2-11,2-13"/>
+    <station id="2-13" name="Praterstern" line="U2:13" link="2-12,2-14" other_link="Tunnel:1-09"/>
+    <station id="2-14" name="Taborstraße" line="U2:14" link="2-13,2-15"/>
+    <station id="2-15" name="Schottenring" line="U2:15" link="2-14,2-16" other_link="Tunnel:4-16"/>
+    <station id="2-16" name="Schottentor" line="U2:16" link="2-15,2-17"/>
+    <station id="2-17" name="Rathaus" line="U2:17" link="2-16,2-18"/>
+    <station id="2-18" name="Volkstheater" line="U2:18" link="2-17,2-19" other_link="Tunnel:3-09"/>
+    <station id="2-19" name="Museumsquartier" line="U2:19" link="2-18,2-20"/>
+    <station id="2-20" name="Karlsplatz" line="U2:20" link="2-19" other_link="Tunnel:1-05,Tunnel:4-12"/>
+
+    <!-- https://de.wikipedia.org/wiki/U-Bahnlinie_3_(Wien) -->
+    <station id="3-01" name="Ottakring" line="U3:1" link="3-02"/>
+    <station id="3-02" name="Kendlerstraße" line="U3:2" link="3-01,3-03"/>
+    <station id="3-03" name="Hütteldorfer Straße" line="U3:3" link="3-02,3-04"/>
+    <station id="3-04" name="Johnstraße" line="U3:4" link="3-03,3-05"/>
+    <station id="3-05" name="Schweglerstraße" line="U3:5" link="3-04,3-06"/>
+    <station id="3-06" name="Westbahnhof" line="U3:6" link="3-05,3-07" other_link="Tunnel:6-11"/>
+    <station id="3-07" name="Zieglergasse" line="U3:7" link="3-06,3-08"/>
+    <station id="3-08" name="Neubaugasse" line="U3:8" link="3-07,3-09"/>
+    <station id="3-09" name="Volkstheater" line="U3:9" link="3-08,3-10" other_link="Tunnel:2-18"/>
+    <station id="3-10" name="Herrengasse" line="U3:10" link="3-09,3-11"/>
+    <station id="3-11" name="Stephansplatz" line="U3:11" link="3-10,3-12" other_link="Tunnel:1-06"/>
+    <station id="3-12" name="Stubentor" line="U3:12" link="3-11,3-13"/>
+    <station id="3-13" name="Landstraße" line="U3:13" link="3-12,3-14" other_link="Tunnel:4-14"/>
+    <station id="3-14" name="Rochusgasse" line="U3:14" link="3-13,3-15"/>
+    <station id="3-15" name="Kardinal-Nagl-Platz" line="U3:15" link="3-14,3-16"/>
+    <station id="3-16" name="Schlachthausgasse" line="U3:16" link="3-15,3-17"/>
+    <station id="3-17" name="Erdberg" line="U3:17" link="3-16,3-18"/>
+    <station id="3-18" name="Gasometer" line="U3:18" link="3-17,3-19"/>
+    <station id="3-19" name="Zippererstraße" line="U3:19" link="3-18,3-20"/>
+    <station id="3-20" name="Enkplatz" line="U3:20" link="3-19,3-21"/>
+    <station id="3-21" name="Simmering" line="U3:21" link="3-20"/>
+
+    <!-- https://de.wikipedia.org/wiki/U-Bahnlinie_4_(Wien) -->
+    <station id="4-01" name="Hütteldorf" line="U4:1" link="4-02"/>
+    <station id="4-02" name="Ober St. Veit" line="U4:2" link="4-01,4-03"/>
+    <station id="4-03" name="Unter St. Veit" line="U4:3" link="4-02,4-04"/>
+    <station id="4-04" name="Braunschweiggasse" line="U4:4" link="4-03,4-05"/>
+    <station id="4-05" name="Hietzing" line="U4:5" link="4-04,4-06"/>
+    <station id="4-06" name="Schönbrunn" line="U4:6" link="4-05,4-07"/>
+    <station id="4-07" name="Meidling Hauptstraße" line="U4:7" link="4-06,4-08"/>
+    <station id="4-08" name="Längenfeldgasse" line="U4:8" link="4-07,4-09" other_link="Tunnel:6-09"/>
+    <station id="4-09" name="Margaretengürtel" line="U4:9" link="4-08,4-10"/>
+    <station id="4-10" name="Pilgramgasse" line="U4:10" link="4-09,4-11"/>
+    <station id="4-11" name="Kettenbrückengasse" line="U4:11" link="4-10,4-12"/>
+    <station id="4-12" name="Karlsplatz" line="U4:12" link="4-11,4-13" other_link="Tunnel:1-05,Tunnel:2-20"/>
+    <station id="4-13" name="Stadtpark" line="U4:13" link="4-12,4-14"/>
+    <station id="4-14" name="Landstraße" line="U4:14" link="4-13,4-15" other_link="Tunnel:3-13"/>
+    <station id="4-15" name="Schwedenplatz" line="U4:15" link="4-14,4-16" other_link="Tunnel:1-07"/>
+    <station id="4-16" name="Schottenring" line="U4:16" link="4-15,4-17" other_link="Tunnel:2-15"/>
+    <station id="4-17" name="Roßauer Lände" line="U4:17" link="4-16,4-18"/>
+    <station id="4-18" name="Friedensbrücke" line="U4:18" link="4-17,4-19"/>
+    <station id="4-19" name="Spittelau" line="U4:19" link="4-18,4-20" other_link="Tunnel:6-19"/>
+    <station id="4-20" name="Heiligenstadt" line="U4:20" link="4-19"/>
+
+    <!-- https://de.wikipedia.org/wiki/U-Bahnlinie_6_(Wien) -->
+    <station id="6-01" name="Siebenhirten" line="U6:1" link="6-02"/>
+    <station id="6-02" name="Perfektastraße" line="U6:2" link="6-01,6-03"/>
+    <station id="6-03" name="Erlaaer Straße" line="U6:3" link="6-02,6-04"/>
+    <station id="6-04" name="Alterlaa" line="U6:4" link="6-03,6-05"/>
+    <station id="6-05" name="Am Schöpfwerk" line="U6:5" link="6-04,6-06"/>
+    <station id="6-06" name="Tscherttegasse" line="U6:6" link="6-05,6-07"/>
+    <station id="6-07" name="Bahnhof Meidling" line="U6:7" link="6-06,6-08"/>
+    <station id="6-08" name="Niederhofstraße" line="U6:8" link="6-07,6-09"/>
+    <station id="6-09" name="Längenfeldgasse" line="U6:9" link="6-08,6-10" other_link="Tunnel:4-08"/>
+    <station id="6-10" name="Gumpendorfer Straße" line="U6:10" link="6-09,6-11"/>
+    <station id="6-11" name="Westbahnhof" line="U6:11" link="6-10,6-12" other_link="Tunnel:3-06"/>
+    <station id="6-12" name="Burggasse-Stadthalle" line="U6:12" link="6-11,6-13"/>
+    <station id="6-13" name="Thaliastraße" line="U6:13" link="6-12,6-14"/>
+    <station id="6-14" name="Josefstädter Straße" line="U6:14" link="6-13,6-15"/>
+    <station id="6-15" name="Alser Straße" line="U6:15" link="6-14,6-16"/>
+    <station id="6-16" name="Michelbeuern-AKH" line="U6:16" link="6-15,6-17"/>
+    <station id="6-17" name="Währinger Straße-Volksoper" line="U6:17" link="6-16,6-18"/>
+    <station id="6-18" name="Nußdorfer Straße" line="U6:18" link="6-17,6-19"/>
+    <station id="6-19" name="Spittelau" line="U6:19" link="6-18,6-20" other_link="Tunnel:4-19"/>
+    <station id="6-20" name="Jägerstraße" line="U6:20" link="6-19,6-21"/>
+    <station id="6-21" name="Dresdner Straße" line="U6:21" link="6-20,6-22"/>
+    <station id="6-22" name="Handelskai" line="U6:22" link="6-21,6-23"/>
+    <station id="6-23" name="Neue Donau" line="U6:23" link="6-22,6-24"/>
+    <station id="6-24" name="Floridsdorf" line="U6:24" link="6-23"/>
+  </stations>
+</tube>

@@ -1,0 +1,25 @@
+Revision history for Perl extension Moose-Policy
+
+0.05 Sun. Nov. 21, 2010
+    - This distribution has been deprecated for a long time. This release
+      makes it official. Note that this module no longer even passes its tests
+      with recent versions of Moose.
+
+0.04 Sun. Nov. 29, 2009
+    - Fix a couple of POD typos.
+    - Fix test warnings on new Moose versions.
+
+0.03 Sat. April 14th, 2007
+    - changing it to use the Class::MOP::is_class_loaded
+      and Class::MOP::load_class instead.
+    - fixed the metaclass loading to work with newer
+      versions of Class::MOP
+
+0.02 Sun. Nov. 5, 2006
+    - We removed UNIVERSAL::require in Moose recently, and
+      this module was breaking beacuse of that. It is now
+      fixed.
+
+0.01 Wed. Aug. 9, 2006
+    - module created by Stevan Little and Eric Willhelm,
+      with input form Matt Trout and the #moose crew.

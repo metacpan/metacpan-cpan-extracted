@@ -1,0 +1,46 @@
+This is a simple "Hello World" example on how to
+use the maplat framework.
+
+This is basically the same as the "helloworld" example. The main
+difference is, this example includes an additional script (build.pl) to compile
+webgui and worker with ActiveState's perlapp. It also provides a simple
+windows service script (compiled with perlsvc) to run as windows service which
+starts and stops the workers and the webgui.
+
+WARNING: Due to various possible bugs, this might not work at all. At least on
+one of the tests, maplat_svc turned into a fork-bomb and crashed the computer.
+
+There are also two *.manifest files included. These are required on windows, so
+the PostgreSQL driver DBD::Pg can be loaded.
+
+
+
+To get up and running, you have to do only a few more steps:
+
+*) Compile the programs (this assumes the PDK binaries are in your PATH):
+> perl build.pl webgui worker svc
+
+*) Edit configs\svc.xml and correct the paths (must be absolute paths to the
+location where you installed the files).
+
+*) Install the windows service (path to its config file must also be absolute;
+command must be run with Administrator privileges)
+
+maplat_svc.exe --install --config="C:\full\path\to\configs\svc.xml"
+
+*) Optionally edit the service settings (you may want to automatically start
+the service at windows startup and/or run it as different user):
+> services.msc
+
+*) Start the service
+net start MaplatSVC
+
+
+When you had enough:
+
+*) Stop the service
+net stop MaplatSVC
+
+*) Uninstall
+maplat_svc.exe --remove
+

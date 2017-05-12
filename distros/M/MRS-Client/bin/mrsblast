@@ -1,0 +1,223 @@
+#!/usr/bin/env perl
+#
+#   Usage: ./mrsblast -h
+#
+#   martin.senger@gmail.com
+#   February 2010
+#
+# ABSTRACT: program running BLAST using the MRS Retrieval System
+# PODNAME: MRS::Client
+#-----------------------------------------------------------------------------
+use warnings;
+use strict;
+
+our $VERSION = '1.0.1'; # VERSION
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../lib/perl5";
+use MRS::Client;
+
+sub say { print @_, "\n"; }
+
+sub get_usage {
+    return <<"END_OF_USAGE";
+Usage:
+   mrsblast [options] -d <databank> -i <fasta_file>
+
+where
+   "fasta_file" is a file with one or more protein sequences
+                in FASTA format, and
+   "databank" is a databank ID to search against
+
+where 'options' are:
+   -e <endpoint>  URL of the MRS blast service
+   -S <name>      service name of the MRS blast service
+   -H <hostname>  endpoint host (with standard ports)
+   -V <5|6>       version of the MRS service
+   -E             show what endpoint and service name are used
+
+   Parameters for Blast run:
+   -c <float>     e-value cutoff (default 10.0)
+   -w <size>      word size (default 3)
+   -b <matrix>    scoring matrix (default BLOSUM62)
+   -a <cost>      gap opening cost (default 11)
+   -z <cost>      gap extension cost (default 1)
+   -F             do NOT apply low complexity filter
+   -g             do NOT perform gapped alignment
+   -m <maxhits>   maximum number of returned hits
+   -q <query>     MRS boolean query to limit the search space
+   -P             do not run Blast; only show parameters
+
+   Parameters for exploring Blast run/results:
+   -J             start Blast but do not wait for it; print
+                  the Job Id that can be used later (-j option)
+   -j <job-ID>    use this job ID (do not run a new Blast)
+   -t             how often (in seconds) to poll for results
+                  (default 10; not used when -J or -j)
+   -s             show Blast run status (only with -j)
+   -r             show results (only with -j)
+   -R             forget/remove/clear the job (only with -j)
+
+   By default, the results are shown as hits with titles and
+   scores. It can be changed by -x (making and XML output) or by -N
+   (showing only statistics) or by -f (showing full results):
+   -x <output>    create XML <output> file with results
+   -N             do NOT show hits, only Blast statistics
+   -f             show full results (hits anh HSPs)
+
+   -h             this help
+   -v             show version
+
+END_OF_USAGE
+}
+
+# be prepare for command-line options/arguments
+my @all_args = @ARGV;
+use Getopt::Std;
+
+use vars qw/ $opt_h $opt_v /;                       # general
+use vars qw/ $opt_e $opt_S $opt_H $opt_E /;         # endpoints
+use vars qw/ $opt_d $opt_i $opt_c $opt_w /;         # blats run
+use vars qw/ $opt_b $opt_a $opt_z $opt_F $opt_g $opt_q /;
+use vars qw/ $opt_m $opt_q $opt_P $opt_J $opt_j /;  # results,status
+use vars qw/ $opt_t $opt_s $opt_x $opt_N $opt_f $opt_p $opt_r $opt_R/;
+use vars qw/ $opt_V /;
+my $switches = 'abcdeHijmpqSwVxz';   # switches taking an argument
+getopt ($switches);
+
+# help wanted?
+if ($opt_h or @all_args == 0) {
+    print get_usage;
+    exit 0;
+}
+
+# print version and exit
+if ($opt_v) {
+    ## no critic
+    no strict;    # because the $VERSION will be added only when
+    no warnings;  # the distribution is fully built up
+    print "$0 using MRS::Client version $MRS::Client::VERSION\n";
+    exit(0);
+}
+
+# use UTF8 for output
+binmode STDOUT, ":encoding(UTF-8)";
+
+sub print_results {
+    my $job = shift;
+    my $format;
+    if    ($opt_N) { $format = MRS::BlastOutputFormat->STATS; }
+    elsif ($opt_x) { $format = MRS::BlastOutputFormat->XML; }
+    elsif ($opt_f) { $format = MRS::BlastOutputFormat->FULL; }
+    else {           $format = MRS::BlastOutputFormat->HITS; }
+    my $results = $job->results ($format);
+    return unless $results;
+    if ($opt_x) {
+        # write results to a file
+        open my $xml, '>', $opt_x
+            or die "Cannot create file '" . $opt_x . "': $!\n";
+        print $xml $results;
+        close $xml;
+    } else {
+        print $results;
+    }
+}
+
+# create the main worker
+my @args = ();
+push (@args, blast_url => $opt_e) if defined $opt_e;
+push (@args, host => $opt_H) if defined $opt_H;
+push (@args, blast_service => $opt_S) if defined $opt_S;
+push (@args, mrs_version => $opt_V) if defined $opt_V;
+our $client = MRS::Client->new (@args);
+
+# print environment (where to find server, etc.)
+if (defined $opt_E) {
+    say 'Blast URL:            ' . $client->blast_url       if $client->blast_url;;
+    say 'Blast service name:   ' . $client->blast_service   if $client->blast_service;
+    say 'Blast WSDL:           ' . $client->blast_wsdl      if $client->blast_wsdl;
+}
+
+# collect parameters for a blast run
+my @run_args = ();
+push (@run_args, db => $opt_d) if $opt_d;
+push (@run_args, filter => 0) if $opt_F;
+push (@run_args, gapped => 0) if $opt_g;
+push (@run_args, expect => $opt_c) if defined $opt_c;
+push (@run_args, word_size => $opt_w) if defined $opt_w;
+push (@run_args, matrix => $opt_b) if $opt_b;
+push (@run_args, open_cost => $opt_a) if defined $opt_a;
+push (@run_args, extend_cost => $opt_z) if defined $opt_z;
+push (@run_args, query => $opt_q) if $opt_q;
+push (@run_args, max_hits => $opt_m) if defined $opt_m;
+push (@run_args, program => $opt_p) if $opt_p;
+push (@run_args, fasta_file => $opt_i) if $opt_i;
+
+# show run parameters (including default values)
+if ($opt_P) {
+    my $job = MRS::Client::Blast::Job->_new (client => $client);
+    print $job->_set_parameters (@run_args);
+}
+
+# play with an existing job ID
+if ($opt_j) {
+    my $job = $client->blast->job ($opt_j, @run_args);
+    if ($opt_s) {
+        say 'Status: ' . $job->status;
+    }
+    if ($opt_r or $opt_x or $opt_f or $opt_N) {
+        print_results ($job);
+    }
+    if ($opt_R) {
+        $client->blast->remove_job ($opt_j);
+        say 'Job removed: ' . $opt_j;
+    }
+}
+
+# real run
+if (not $opt_P and not $opt_j) {
+    my $sleep = ($opt_t or 10);
+    $sleep = 10 unless $sleep =~ /^[+-]?\d+$/;
+
+    my $job = $client->blast->run (@run_args);
+    print STDERR 'JOB ID: ' . $job->id . ' [' . $job->status . "]\n";
+    print $job;
+
+    unless ($opt_J) {
+        while (not $job->completed) {
+            print STDERR 'Waiting for ' . $sleep . ' seconds... [status: ' . $job->status . "]\n";
+            sleep $sleep;
+        }
+        say $job->error if $job->failed;
+        print_results ($job);
+    }
+}
+
+
+
+=pod
+
+=head1 NAME
+
+MRS::Client - program running BLAST using the MRS Retrieval System
+
+=head1 VERSION
+
+version 1.0.1
+
+=head1 AUTHOR
+
+Martin Senger <martin.senger@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Martin Senger, CBRC - KAUST (Computational Biology Research Center - King Abdullah University of Science and Technology) All Rights Reserved..
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+
+__END__

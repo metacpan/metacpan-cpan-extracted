@@ -1,0 +1,29 @@
+NAME
+    MetaPOD::Format::JSON - Reference implementation of a "JSON" based
+    MetaPOD Format
+
+VERSION
+    version 0.3.0
+
+SYNOPSIS
+    This is the reference implementation of "MetaPOD::JSON"
+
+METHODS
+  "supported_versions"
+    The versions this module supports
+
+        returns qw( v1.0.0 v1.1.0 )
+
+  "add_segment"
+    See "::Role::Format" for the specification of the "add_segment" method.
+
+AUTHOR
+    Kent Fredric <kentfredric@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Kent Fredric
+    <kentfredric@gmail.com>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

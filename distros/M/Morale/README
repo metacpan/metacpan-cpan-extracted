@@ -1,0 +1,97 @@
+Morale.pm README
+1999-06-27
+Gregor N. Purdy
+
+
+INTRODUTION
+
+This module is used to manage morale files and tkmorale is a graphical
+interface to individual morale setting and group morale calculation.
+The underlying idea is that the members of a group of people can
+reflect their current individual morale levels and then anyone in the
+group can get a feeling of the overall group morale.
+
+A history of the idea is available by running perldoc Morale. This
+also includes some aspects of the original implementation not yet
+present in this implementation, such as the ability to have your
+personal morale actually be (semi-) private.
+
+Thanks to E. Denning ``Denny'' Dahl for the original idea and the
+historical writeup present in the documentation. I first heard of the idea
+while having dinner with Denny at the Deerfield, Illinois Macaroni Grille
+on 1999-04-28.
+
+
+INSTALLATION
+
+The following standard sequence of actions will build, test, and install
+Morale.pm and the tkmorale program:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If you want to install them to a different location, then use the PREFIX=
+option to the first command. For instance, to install Morale.pm into
+~/lib/perl5/.../ and tkmorale into ~/bin/, use the following command to
+replace the first command above:
+
+    perl Makefile.PL PREFIX=~
+
+
+USAGE
+
+After installation, simply have each user run tkmorale, stand back, and watch
+what happens!
+
+The documentation may be viewed by running:
+
+	perldoc Morale
+
+
+FUTURE
+
+In addition to matching more closely the specification laid out in the
+historical note in the documentation of Morale.pm, the following are
+some additional ideas from my notes of 1999-04-30:
+
+	Scan the password database, grabbing users and groups. Check ~user/.morale,
+	~user/.plan (?) for morale info. Make sure it is between 0 and 100, if it
+	is set. Allow messages, too? Also, /var/morale/users/user.
+
+	Make sure the file is owned by the user, and writable only by the user.
+	If there is to be a master summarizer, and you want the have the users make
+	their morale files only readable by themselves, too (for anonymity), then
+	the summarizer would have to run as root.
+
+	The summarizer could be a deamon that runs periodically and writes various
+	reports (/var/morale/reports/*): total, total by group, %responding, %illegal
+	response, response age. Use groups to differentiate, e.g., staff vs. management
+	morale.
+
+	/var/morale/config: users to skip (like root and app users like oracle), and
+	groups, too. List of morale categories.
+
+	Morale in general, and/or morale by categories (projects)?
+
+	libmorale.a, so that other programs, not necessarily perl-based, can access
+	morale info? Then, build Morale.pm on top of it, and build non-tk non-perl
+	interfaces, like a base x windows, or gtk or qt version of the gui. Some of
+	these would be great projects for interested parties to contribute to the
+	package.
+
+And, finally, from my notes of 1999-06-11:
+
+	The Perl Cookbook, page 564 gives a technique for dealing with /etc/passwd
+	vs. ypcat passwd switching for processing the password database for user
+	information.
+
+
+COPYRIGHT
+
+Copyright (C) 1999-2001 Gregor N. Purdy. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

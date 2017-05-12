@@ -1,0 +1,27 @@
+---
+abstract: 'Support setting base in frontend proxy'
+author:
+  - 'Marcus Ramberg <marcus.ramberg@gmail.com>'
+build_requires:
+  Test::More: '0.90'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-RequestBase
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '6.00'
+resources:
+  bugtracker: https://github.com/marcusramberg/Mojolicious-Plugin-RequestBase/issues
+  homepage: https://github.com/marcusramberg/Mojolicious-Plugin-RequestBase
+  repository: https://github.com/marcusramberg/Mojolicious-Plugin-RequestBase.git
+version: '0.3'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,25 @@
+Revision history for Perl extension MooX::PluginKit.
+
+0.03 2017-01-30
+
+ - Added default_class to has_pluggable_object.
+ - The limitation of not being able to use class_arg and class_builder in
+   has_pluggable_object has been removed.
+ - Added has_pluggable_class.
+ - Update the main documentation to be less fanciful and more useful.
+ - Fix a potential memory leak.
+ - Support roles in plugin_applies_to.
+
+0.02 2017-01-24
+
+ - Add ways to dynamically determine the base class in has_pluggable_object.
+ - Fix a potential memory leak cause by references in a closure.
+ - Better BUILDARGS support in consumers.
+ - Always create a plugin_factory object even if there are no plugins.
+ - Automatically load base classes if they are not already.
+ - Fix a bug where plugin metadata was being forgotten.
+
+0.01 2016-05-20
+
+ - First version.
+

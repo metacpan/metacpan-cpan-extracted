@@ -1,0 +1,56 @@
+
+                        MIDI::Realtime
+
+MIDI::Realtime is a Perl module that allows you to write directly
+to a MIDI device.  Enhancements are planned to allow it to read
+MIDI too, among other things.
+
+See http://www.slab.org/void/music/ for an example of how I'm 
+using this module.  MIDI::Realtime is a simple piece of code, but 
+it provides wide scope for experimentation with music and sounds.
+I'm having a lot of fun with it, anyway :)
+
+PREREQUISITES
+
+This is new software.  I have only tested it with OSS/Free, under
+GNU/Linux (redhat 6.0 and 6.1).  I'm very interested to hear of 
+any more success stories.
+
+It requires sys/soundcard.ph to be present.
+
+INSTALLATION
+
+You install MIDI::Realtime, as you would install any perl module 
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of MIDI::Realtime in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL LIB=~/perl
+  
+DOCUMENTATION
+
+See perldoc MIDI::Realtime for description of the methods within, and
+a couple of simple examples of their use.
+
+SUPPORT
+
+Please send all ideas, suggestions and warm praise to alex@slab.org .
+
+AVAILABILITY
+
+The latest version of Realtime::MIDI is available from the 
+Comprehensive Perl Archive Network (CPAN).  Visit 
+<http://www.perl.com/CPAN/> to find a CPAN site near you.
+
+COPYRIGHT
+
+Copyright (c) 1999 Alex McLean.  All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

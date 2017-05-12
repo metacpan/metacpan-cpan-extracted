@@ -1,0 +1,47 @@
+[% colcount = 3 %]
+<p align="center">
+    <form name="selectcomputer_[% computer.computer_name %]" method="post" action="[% webpath %]" id="MainFilterForm">
+        <table class="data" id="MainFilterTable">
+            <thead>
+                <tr class="tabheader">
+                    <th filter-type='ddl'>[% tr.tr("Prodline") %]</th>
+                    <th>[% tr.tr("Hostname") %]</th>
+                    <th>[% tr.tr("Description") %]</th>
+                    [% FOREACH Company IN AvailCompanies %]
+                        <th>[% Company.company_name %]</th>
+                    [% END %]
+                </tr>
+            </thead>
+    
+            <tbody>
+                [% FOREACH computer IN AvailComputers %]    
+                    <tr>
+                        <td>[% computer.line_id %]</td>
+                        <td>[% computer.computer_name %]</td>
+                        <td>[% computer.description %]</td>
+                        [% FOREACH eright IN computer.rights %]
+                            [% colcount = colcount + 1 %]
+                            <td>
+                                <input type="checkbox" name="vnc_[% computer.computer_name %]_[% eright.company %]" value="1"
+                                    [% IF eright.val == "1" %]
+                                        checked
+                                    [% END %]
+                                >
+                            </td>
+                        [% END %]
+                    </tr>
+                [% END %]
+            </tbody>
+
+            <tfoot>
+                <tr>
+                    <td colspan="[% colcount %]" align="center">
+                        <input type="hidden" name="mode" value="save">
+                        <input type="submit" value="[% tr.tr("Save") %]">
+                    </td>
+                </tr>
+            </tfoot>
+
+        </table>
+    </form>
+</p>

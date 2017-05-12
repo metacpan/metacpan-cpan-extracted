@@ -1,0 +1,19 @@
+GNUpod.pm
+MANIFEST
+README
+TODO
+LICENSE
+Makefile.PL
+GNUpod/Utils.pm
+GNUpod/iTunesDBread.pm
+GNUpod/iTunesDBwrite.pm
+t/00general.t
+t/01gnupod.t
+t/02itunes.t
+t/03files.t
+t/crazy.xml
+t/test.mp3
+t/accented.mp3
+t/test.xml
+t/comp.itunes
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,9 @@
+[%# set up pagination %]
+[% thispage = again || 1 ; nextpage = thispage + 1 %]
+[% USE page = Page(content.size, perpage, thispage) %] 
+[% IF thispage >= page.last_page ; 
+	set_again(0) ; 
+   ELSE ; 
+	set_again(nextpage) ; 
+   END %]
+[% set_file( mariachi.nthpage( thispage, spool ) ) %]

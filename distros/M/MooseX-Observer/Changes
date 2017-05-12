@@ -1,0 +1,37 @@
+0.010     2012-08-17 01:23:12 Europe/Berlin
+
+* Dist::Zilla::Plugin::GitHub::Meta extracts correct Metainfos now
+
+0.009     2012-07-14 00:50:51 Europe/Berlin
+
+* Removed Dist::Zilla::Plugin::AutoPrereqs because of false positives
+
+0.008     2012-07-14 00:20:40 Europe/Berlin
+
+* allow application of MooseX::Observer::Role::Observable to a role
+* big thanks to xenoterracide, who did the implementation, along with tests
+
+0.007     2012-03-12 21:43:34 Europe/Berlin
+
+* another false Prereq removed :\
+
+0.006     2011-12-17 21:39:15 Europe/Berlin
+
+* just testing whether Dist::Zilla::Plugin::Twitter works
+
+0.005     2011-12-17 21:30:35 Europe/Berlin
+
+* false Prereq removed
+
+0.004     2011-12-17 21:12:04 Europe/Berlin
+
+* right distname established
+
+0.003     2011-12-17 20:59:18 Europe/Berlin
+
+* wrong distname deprecation
+
+0.002     2011-12-17 20:52:03 Europe/Berlin
+
+* initial Implementation
+* tests

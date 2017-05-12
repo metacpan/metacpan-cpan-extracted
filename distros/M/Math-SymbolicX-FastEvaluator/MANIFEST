@@ -1,0 +1,21 @@
+Changes
+eg/low_level_xs_interface.pl
+eg/manual_testing/fun.cc
+eg/manual_testing/Makefile
+Evaluator.cc
+Evaluator.h
+Expression.cc
+Expression.h
+FastEvaluator.xs
+lib/Math/Symbolic/Custom/DumpToFastEval.pm
+lib/Math/SymbolicX/FastEvaluator.pm
+lib/Math/SymbolicX/FastEvaluator/Expression.pm
+lib/Math/SymbolicX/FastEvaluator/Op.pm
+Makefile.PL
+MANIFEST			This list of files
+perlobject.map
+ppport.h
+README
+t/Math-SymbolicX-FastEvaluator.t
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,9 @@
+Changes
+example/multidrop
+lib/Mail/Postfix/Postdrop.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

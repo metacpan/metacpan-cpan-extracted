@@ -1,0 +1,70 @@
+---
+abstract: 'MessagePack RPC client'
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Approx: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MsgPack-RPC
+provides:
+  MsgPack::Decoder:
+    file: lib/MsgPack/Decoder.pm
+    version: v1.0.1
+  MsgPack::Encoder:
+    file: lib/MsgPack/Encoder.pm
+    version: v1.0.1
+  MsgPack::RPC:
+    file: lib/MsgPack/RPC.pm
+    version: v1.0.1
+  MsgPack::RPC::Message:
+    file: lib/MsgPack/RPC/Message.pm
+    version: v1.0.1
+  MsgPack::RPC::Message::Request:
+    file: lib/MsgPack/RPC/Message/Request.pm
+    version: v1.0.1
+  MsgPack::Type::Boolean:
+    file: lib/MsgPack/Type/Boolean.pm
+    version: v1.0.1
+  MsgPack::Type::Ext:
+    file: lib/MsgPack/Type/Ext.pm
+    version: v1.0.1
+requires:
+  Beam::Emitter: '0'
+  Beam::Event: '0'
+  Data::Printer: '0'
+  Exporter::Tiny: '0'
+  IO::Socket::INET: '0'
+  IO::Socket::UNIX: '0'
+  List::AllUtils: '0'
+  Moose: '0'
+  MooseX::NonMoose: '0'
+  MooseX::Role::Loggable: '0'
+  Promises: '0'
+  Type::Tiny: '0'
+  Types::Standard: '0'
+  experimental: '0'
+  overload: '0'
+  perl: v5.20.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/MsgPack-RPC/issues
+  homepage: https://github.com/yanick/MsgPack-RPC
+  repository: https://github.com/yanick/MsgPack-RPC.git
+version: 1.0.1
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK

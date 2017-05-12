@@ -1,0 +1,37 @@
+---
+abstract: 'Module::Install style syntax for Module::Build'
+author:
+  - 'Curtis Jewell <csjewell@cpan.org>'
+build_requires:
+  Capture::Tiny: 0.06
+  Module::Build: 0.31
+  Test::Compile: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.31
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Build-Functions
+provides:
+  Module::Build::Functions:
+    file: lib/Module/Build/Functions.pm
+    version: 0.04
+  Module::Build::Functions::DSL:
+    file: lib/Module/Build/Functions/DSL.pm
+    version: 0.04
+  inc::Module::Build::Functions:
+    file: lib/inc/Module/Build/Functions.pm
+    version: 0.04
+  inc::Module::Build::Functions::DSL:
+    file: lib/inc/Module/Build/Functions/DSL.pm
+    version: 0.04
+requires:
+  File::Slurp: 0
+  Module::Build: 0.07
+  perl: 5.00503
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

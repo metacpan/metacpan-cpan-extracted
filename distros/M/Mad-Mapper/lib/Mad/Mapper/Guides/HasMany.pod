@@ -1,0 +1,94 @@
+=head1 NAME
+
+Mad::Mapper::Guides::HasMany - "Has many" relationship
+
+=head1 OVERVIEW
+
+This guide will show how to define and use a "has many" relationship.
+
+=head1 GUIDE
+
+=head2 Define a relationship
+
+  package MyApp::Model::User;
+  use Mad::Mapper -base;
+
+  # define a primary key
+  pk id => undef;
+
+  # define a relationship
+  has_many groups => "MyApp::Model::Group", "id_user";
+
+The code above describes that the "id_user" column in the "groups"
+table should reference back to the "id" (primary key) column in
+the "users" table.
+
+=head2 Automatically defined methods
+
+The "groups" relationship defined above will generate two methods:
+C<groups()> and C<add_group()>. The first is to get all the group
+rows and the latter is to add a new group row.
+
+=head2 Usage
+
+  my $user = MyApp::Model::User->new(db => $pg->db, id => 42);
+
+Need to create a C<$user> object first. After that we can retrieve
+groups and/or add groups.
+
+  # sync
+  my $groups = $user->groups;
+
+  # async
+  Mojo::IOLoop->delay(
+    sub {
+      my ($delay) = @_;
+      $self->groups($delay->begin);
+    },
+    sub {
+      my ($delay, $err, $groups) = @_;
+    },
+  );
+
+C<$groups> is a L<Mojo::Collection> of C<MyApp::Model::Group> objects.
+
+  # add_group() is a sync method
+  $group = $self->add_group(\%constructor_args);
+  
+  # save() can be called sync and async.
+  $group->save;
+
+C<add_group> will just create a new C<MyApp::Model::Group> object. You
+need to insert that object as a separate step.
+
+=head1 Custom query
+
+You can define your own query:
+
+  has_many groups_sorted => "MyApp::Model::Group";
+
+  sub _has_many_groups_sorted_sql {
+    my ($self, $related_class, @extra) = @_;
+
+    return $related_class->expand_sql(
+      "SELECT %pc FROM %t WHERE user_id=? order by name", $self->id
+    );
+  }
+
+Note above that C<@extra> is any extra arguments passed on to
+the method:
+
+  $user->groups_sorted("extra", "args");
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014-2016, Jan Henning Thorsen
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License version 2.0.
+
+=head1 AUTHOR
+
+Jan Henning Thorsen - C<jhthorsen@cpan.org>
+
+=cut

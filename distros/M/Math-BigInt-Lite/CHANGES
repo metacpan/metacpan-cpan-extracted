@@ -1,0 +1,177 @@
+2017-03-01 v0.17 pjacklam
+
+ * Improve the logic in blog() to determine how to call objectify(). The old,
+   simpler logic didn't handle an undefined base correctly.
+
+ * Fix bexp() which was objectifying one argument too many.
+
+2015-11-30 v0.16 pjacklam
+
+ * Use ExtUtils::MakeMaker rather than Module::Install in Makefile.PL
+
+ * Add from_bin(), from_oct(), and from_hex().
+
+ * Add test files t/from_bin-mbl.t, t/from_oct-mbl.t, and t/from_hex-mbl.t.
+
+ * Remove INSTALL file. The information is in the README file.
+
+ * Correct minor errors in README file.
+
+ * Update the BUGS file.
+
+ * Explicitly set required version of Math::BigInt in Math/BigInt/Lite.pm.
+
+ * Remove author information in LICENSE file.
+
+ * Inform that the TODO file is not up to date.
+
+ * CHANGES now has same formatting as the other Math::BigInt-related
+   distributions.
+
+ * Remove unused variables in Math/BigInt/Lite.pm.
+
+2015-11-25 v0.15 pjacklam
+
+ * POD nits
+
+ * Remove trailing whitespace.
+
+ * Consistent indentation in POD.
+
+ * Reorder change entries into chronological order.
+
+ * Better use of the functionality in Test::More.
+
+ * Sync test files with the Math-BigInt distribution.
+
+ * Correct method bdiv() to do floored division.
+
+ * Add method btdiv().
+
+ * Remove Math::BigRat as a requirement. We don't use it.
+
+ * Update required version of Math::BigInt to 1.999801.
+
+ * Change required version of Test::More to 0.47.
+
+ * Code reformatting.
+
+ * Update files NEW, README, and TODO.
+
+2010-09-14 v0.14 rafl (3202 tests)
+
+ * Add a test for a blog() failure caused by a Math::BigInt bug
+
+ * Depend on Math::BigInt 1.94 to fix the above failure
+
+2010-09-10 v0.13 rafl (3200 tests)
+
+ * Fix tests with Math::BigInt >= 1.90 and depend on it.
+
+2007-05-27 v0.12 Tels (3194 tests)
+
+ * add round-mode "common"
+
+ * add support for bexp() and bnok()
+
+ * tests from Math::BigInt v1.86
+
+ * require Math::BigInt v1.86
+
+ * require Math::BigRat v0.19
+
+ * bundle and use Module::Install
+
+ * add POD tests
+
+2004-01-06 v0.11 Tels (2879 tests)
+
+ * fix perl -Mbignum -le 'print 10->blog()' (did die with error)
+
+ * added method broot(), bmodpow() and bmodinv()
+
+ * streamlined overload code and some of the no-op operations
+
+ * tests from Math::BigInt v1.68
+
+ * fixed a bug in brsft() (used $x,$x instead of $x,$y)
+
+ * fixed is_one() to handle sign parameter
+
+2002-06-05 v0.10 Tels
+
+ * fixed bug in bfac() that appeared with BigInt v1.57
+
+ * export_ok objectify for "use Math::BigFloat with => 'Math::BigInt::Lite'"
+
+ * fake HASH read accesses to sign (Math::BigInt::Lite->new(12)->{sign} works)
+   (Thanx to Benjamin Goldstein for the trick!)
+
+ * test that Math::BigFloat with Math::BigInt::Lite really works
+
+2002-0?-?? v0.09 Tels
+
+ * ?
+
+2002-03-25 v0.08 Tels
+
+ * config() was missing
+
+ * fixed isa() (we arent a BigInt, nor a BigFloat nor a BigRat)
+
+ * ficed bdiv() to upgrade when Math::BigInt upgrade is set
+
+2002-03-17 v0.07 Tels
+
+ * upgrade_2: separate version for mul
+
+ * stray new() calls to $class->new()
+
+ * routines now use _upgrade_x() to check params and overflow
+
+ * round() works now
+
+2002-03-15 v0.06 Tels
+
+ * passes all tests, yeah!
+
+ * tie accuracy/precision/round_mode to BigInt's vars
+
+ * upgrade_2: handle $class->badd(4,5) style calls
+
+ * assorted fixes all over the place
+
+2002-03-17 v0.05 Tels
+
+ * as_number() does no longer upgrade Lite's to BigInt
+
+ * fixed a bug in mul
+
+ * bgcd() and blcm() work now by handing their work to BigInt
+
+ * fixed bneg(), babs() and bnot() to return $x (and not to leave -0)
+
+ * bigintpm.t fails 66/2181 tests
+
+2002-03-08 v0.04 Tels
+
+ * digt/length work now
+
+ * bigintpm.t fails 118/2166 tests
+
+2002-03-06 v0.03 Tels
+
+ * bigintpm.t fails 313 tests
+
+2002-03-06 v0.02 Tels
+
+ * bigintpm.t tests runs trough, but fails 545 tests
+
+2002-03-05 v0.01 Tels
+
+ * first release
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

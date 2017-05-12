@@ -1,0 +1,220 @@
+Mail-Webmail-Gmail version 1.09
+===============================
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+lib qw(lib)
+LWP::UserAgent
+HTTP::Headers
+HTTP::Cookies
+HTTP::Request::Common
+Crypt::SSLeay
+Exporter
+
+COPYRIGHT AND LICENSE
+
+Copyright 2005-2006, Allen Holman.  All rights reserved.  
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+CONTACT INFO
+
+Address bug reports and comments to: mincus \at cpan \. org.  Or through
+AIM at mincus c03.
+
+Please visit http://code.mincus.com for other projects that I am working on.
+
+When sending bug reports, please provide the version of Gmail.pm, the version of
+Perl and the name and version of the operating system you are using. 
+
+SAMPLE USAGE
+
+    my ( $gmail ) = Mail::Webmail::Gmail->new( 
+            username => 'username', password => 'password', );
+
+    ### Test Sending Message ####
+    my $msgid = $gmail->send_message( to => 'testuser@test.com', subject => time(), msgbody => 'Test' );
+    print "Msgid: $msgid\n";
+    if ( $msgid ) {
+        if ( $gmail->error() ) {
+            print $gmail->error_msg();
+        } else {
+            ### Create new label ###
+            my $test_label = "tl_" . time();
+            $gmail->edit_labels( label => $test_label, action => 'create' );
+            if ( $gmail->error() ) {
+                print $gmail->error_msg();
+            } else {
+                ### Add this label to our new message ###
+                $gmail->edit_labels( label => $test_label, action => 'add', 'msgid' => $msgid );
+                if ( $gmail->error() ) {
+                    print $gmail->error_msg();
+                } else {
+                    print "Added label: $test_label to message $msgid\n";
+                }
+            }
+        }
+    }
+    ###
+
+    ### Move message to trash ###
+    my $msgid = $gmail->send_message( to => 'testuser@test.com', subject => "del_" . time(), msgbody => 'Test Delete' );
+    if ( $gmail->error() ) {
+        print $gmail->error_msg();
+    } else {
+        $gmail->delete_message( msgid => $msgid, del_message => 0 );
+        if ( $gmail->error() ) {
+            print $gmail->error_msg();
+        } else {
+            print "MSG: $msgid moved to trash\n";
+        }
+    }
+    ###
+
+    ### Delete all SPAM folder messages ###
+    my $messages = $gmail->get_messages( label => $Mail::Webmail::Gmail::FOLDERS{ 'SPAM' } );
+    if ( @{ $messages } ) {
+        my @msgids;
+        foreach ( @{ $messages } ) {
+            push( @msgids, $_->{ 'id' } );
+        }
+        $gmail->delete_message( msgid => \@msgids, search => 'spam', del_message => 1 );
+        if ( $gmail->error() ) {
+            print $gmail->error_msg();
+        } else {
+            print "Deleted " . @msgids . " Messages\n";
+        }
+    }
+    ###
+
+    ### Print out all user defined labels
+    my @labels = $gmail->get_labels();
+    foreach ( @labels ) {
+        print "Label: '" . $_ . "'\n";
+    }
+    ###
+
+    ### Prints out new messages attached to the first label
+    my @labels = $gmail->get_labels();
+
+    my $messages = $gmail->get_messages( label => $labels[0] );
+
+    if ( defined( $messages ) ) {
+        foreach ( @{ $messages } ) {
+            if ( $_->{ 'new' } ) {
+                print "Subject: " . $_->{ 'subject' } . " / Blurb: " . $_->{ 'blurb' } . "\n";
+            }
+        }
+    }
+    ###
+
+    ### Prints out all attachments
+    my $messages = $gmail->get_messages();
+
+    foreach ( @{ $messages } ) {
+        my $email = $gmail->get_indv_email( msg => $_ );
+        if ( defined( $email->{ $_->{ 'id' } }->{ 'attachments' } ) ) {
+            foreach ( @{ $email->{ $_->{ 'id' } }->{ 'attachments' } } ) {
+                print ${ $gmail->get_attachment( attachment => $_ ) } . "\n";
+                if ( $gmail->error() ) {
+                    print $gmail->error_msg();
+                }
+            }
+        }
+    }
+    ###
+
+    ### Prints out the vendor link from Ads attached to a message
+    my $messages = $gmail->get_messages( label => $Mail::Webmail::Gmail::FOLDERS{ 'INBOX' } );
+
+    foreach ( @{ $messages } ) {
+        print "ID: " . $_->{ 'id' } . "\n";
+        my %email = %{ $gmail->get_indv_email( msg => $_ ) };
+        if ( $email{ $_->{ 'id' } }->{ 'ads' } ) {
+            my $ads;
+            foreach $ads ( @{ $email{ $_->{ 'id' } }->{ 'ads' } } ) {
+                print " - AD LINK: $ads->{vendor_link}\n";
+            }
+        }
+    }
+    ###
+
+    ### Shows different ways to look through your email
+    my $messages = $gmail->get_messages();
+
+    print "By folder\n";
+    foreach ( keys %Mail::Webmail::Gmail::FOLDERS ) {
+        print "KEY: $_\n";
+        my $messages = $gmail->get_messages( label => $Mail::Webmail::Gmail::FOLDERS{ $_ } );
+        print "\t$_:\n";
+        if ( @{ $messages } ) {
+            foreach ( @{ $messages } ) {
+                print "\t\t$_->{ 'subject' }\n";
+            }
+        }
+    }
+
+    print "By label\n";
+    foreach ( $gmail->get_labels() ) {
+        $messages = $gmail->get_messages( label => $_ );
+        print "\t$_:\n";
+        if ( defined( $messages ) ) {
+            if ( @{ $messages } ) {
+                foreach ( @{ $messages } ) {
+                    print "\t\t$_->{ 'subject' }\n";
+                }
+            }
+        }
+    }
+
+    print "All (Note: the All folder skips trash)";
+    $messages = $gmail->get_messages();
+    if ( @{ $messages } ) {
+        foreach ( @{ $messages } ) {
+            print "\t\t$_->{ 'subject' }\n";
+        }
+    }
+    ###
+
+    ### Update preferences
+        if ( $gmail->update_prefs( signature => 'Test Sig.', max_page_size => 100 ) ) {
+            print "Preferences Updated.\n";
+        } else {
+            print "Unable to update preferences.\n";
+        }
+    ###
+
+    ### Show all contact email addresses
+    my ( @contacts ) = @{ $gmail->get_contacts() };
+    foreach ( @contacts ) {
+        print $_->{ 'email' } . "\n";
+    }
+    ###
+
+    ### Print out space remaining in mailbox
+    my $remaining = $gmail->size_usage();
+    print "Remaining: '" . $remaining . "'\n";
+    ###

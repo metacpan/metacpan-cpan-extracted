@@ -1,0 +1,38 @@
+
+ Math::Matrix::MaybeGSL Changes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+0.007  2014-12-28
+
+    * Added as_list method (thanks to Ivan Baidakou).
+    * Added det method (thanks to Ivan Baidakou).
+
+0.006  2014-08-27
+
+    * Added isGSL method to check if running under GSL.
+    * dist.ini with reference to repo (thanks to Gabor Szabo).
+
+0.005  2014-08-22
+
+    * Added read/write methods.
+
+0.004  2014-08-17
+
+    * Fixed multiplication overload.
+    * Added further tests on multiplication.
+
+0.003  2014-08-17
+
+    * Added PkgVersion dzil plugin to add change to module file.
+
+0.002  2014-08-16
+
+    * Added a Changes file.
+
+0.001  2014-08-16
+
+	* First working version with constructors:
+	    new / new_from_cols / new_from_rows
+	  and methods
+	    assign, element, vconcat, hconcat, max, min,
+	    each and dim.

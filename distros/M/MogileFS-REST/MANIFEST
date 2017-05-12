@@ -1,0 +1,11 @@
+.gitignore
+app.psgi
+Changes
+lib/MogileFS/REST.pm
+lib/MogileFS/REST/DumbLogger.pm
+Makefile.PL
+MANIFEST
+README
+t/002_index_route.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

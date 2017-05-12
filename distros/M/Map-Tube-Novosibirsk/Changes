@@ -1,0 +1,18 @@
+0.03 2015-10-16T11:41:32+02:00
+ - Add lines to XML document.
+ - Improve description for get_lines() in doc.
+ - Update to Map::Tube 3.06.
+
+0.02 2015-10-07T16:39:38+02:00
+ - Add EXAMPLE4 to doc.
+ - Add <?xml> header to XML document.
+ - Add 04-map.t test.
+ - Add get_line_by_id() and get_line_by_name() methods to doc.
+ - Add tests for get_node_by_id() and get_node_by_name() methods.
+ - Move author tests to xt/ directory.
+ - Rewrite SEE ALSO section to new style.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years to 2015.
+
+0.01 2015-01-01T00:38:31+01:00
+ - First version

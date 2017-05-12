@@ -1,0 +1,48 @@
+Copyright 2010, 2011, 2012 Kevin Ryde
+
+This file is part of Math-Aronson.
+
+Math-Aronson is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+Math-Aronson is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You can get a copy of the GNU General Public License online at
+<http://www.gnu.org/licenses/>.
+
+
+
+
+Version 9, June 2012
+    - tests fix optional weaken ExtraBits
+
+Version 8, May 2012
+    - NumSeq fix i_start and value=undef
+
+Version 7, September 2011
+    - some NumSeq oeis_anum() bits
+
+Version 6, August 2011
+    - Math::NumSeq tie-in
+
+Version 5, February 2011
+    - fixes for perl 5.6 and earlier
+
+Version 4, October 2010
+    - new lying option
+    - allow lang=>undef as default English
+
+Version 3, September 2010
+    - test manifest only as an author test
+
+Version 2, September 2010
+    - letter option affect default initial_string
+
+Version 1, August 2010
+    - the first version
+

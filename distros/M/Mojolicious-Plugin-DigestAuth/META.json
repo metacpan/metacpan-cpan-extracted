@@ -1,0 +1,49 @@
+{
+   "abstract" : "HTTP Digest Authentication for Mojolicious",
+   "author" : [
+      "Skye Shaw <sshaw AT lucas.cis.temple.edu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-DigestAuth",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "2.20"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/sshaw/Mojolicious-Plugin-DigestAuth/issues"
+      },
+      "repository" : {
+         "url" : "http://github.com/sshaw/Mojolicious-Plugin-DigestAuth"
+      }
+   },
+   "version" : "0.09"
+}

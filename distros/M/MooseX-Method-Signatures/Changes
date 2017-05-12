@@ -1,0 +1,264 @@
+Revision history for MooseX-Method-Signatures
+
+0.49      2015-10-07 01:07:44Z
+  - added x_deprecated to metadata
+
+0.48      2014-09-20 17:46:45Z
+  - fix tests that fail on altered warning messages in perl 5.21.4 (see perl
+    RT#121638)
+
+0.47      2013-12-14 19:06:59Z
+  - update configure_requires checking in Makefile.PL, add CONTRIBUTING file
+
+0.46      2013-10-02 00:40:37Z
+  - re-release with fixed compile test
+
+0.45      2013-09-12 03:06:25Z
+  - removed use of deprecated Class::MOP::load_class
+  - documentation reference added, pointing to the WARNING section in
+    MooseX::Declare, regarding future utility of this module
+  - repository migrated to the github moose organization
+
+0.44      2012-11-24 21:17:02Z
+  - Fix broken test in 5.17.6, where hash ordering is now randomized
+    (RT#81388, Karen Etheridge)
+
+0.43      2012-05-21 00:34:04Z
+  - Bump dependency on MooseX::Types to 0.35 to resolve issues with recent
+    MooseX::Types releases.
+
+0.42      2012-04-23 18:08:19Z
+  - Mark failing test due to Eval::Closure/Devel::Declare issues as TODO until
+    things are fixed, to at least allow recent versions to install without
+    errors.
+
+0.41      2012-03-11 17:05:27Z
+  - Add explicit dependency on Eval::Closure, in an effort to get more
+    diagnostics from failing cpantesters reports.  No functionality changes.
+
+0.40      2012-03-10 17:03:51Z
+  - Loosen a regexp in a test, to handle the new format emitted by Carp 1.25.
+
+0.39      2012-03-10 00:54:18Z
+  - The test suite now uses Test::Fatal instead of Test::Exception (Karen
+    Etheridge).
+  - Bump dependency on MooseX::Types::Structured to 0.24, which contains
+    more detailed error messages as well as some performance enhancements.
+
+0.38      2012-03-09 23:43:07Z
+  - Require B::Hooks::EndOfScope 0.10 and Module::Runtime 0.012, fixing various
+    perl 5.8 breakages.
+
+0.37      2011-09-12 09:35:29Z
+  - Don't look in the stash for traits or types that contain :: (Jesse Luehrs).
+
+0.36      2010-08-31 21:36:19Z
+  - Avoid deprecation warnings from new Moose version by depending on
+    MooseX::LazyRequire 0.06 (Jeremy Carman).
+
+0.35      2010-07-19 03:50:08Z
+  - Updated to avoid warnings from Moose 1.09 (Dave Rolsky).
+  - Switch from Module::Install to Dist::Zilla.
+
+0.34      2010-06-08 17:00:00Z
+  - Provides a version of reify that replaces the original version and
+    now finally CatalystX::Declare and MooseX::MultiMethods work.
+
+0.33      2010-06-01 16:47:34Z
+  - CatalystX::Declare seems to create a method object without a code
+    reference at all.
+
+0.32      2010-06-01 16:47:34Z
+  - Detect usage of old MXMS::Meta::Method API and retro-compatibilize.
+
+0.31      2010-06-01 16:47:34Z
+  - Add support for "does" as a trait declarator
+  - Compatibilize MXMS::Meta::Method signature with Class::MOP::Method
+    so other traits can apply customizations to the actual body of the
+    method.
+
+0.30      2010-02-04 01:41:36Z
+  - Make Any instead of Defined the default type constraint.
+  - Add tests for coercing optional named parameters (Cory Watson).
+    + Make those tests pass by depending on
+      MooseX::Types::Structured 0.20.
+  - Make sure Text::Balanced doesn't screw up our data.
+
+0.29      2009-10-15 21:27:08Z
+  - Fix regression introduced in 0.28.
+    Validation for methods without named arguments wasn't strict enough
+    anymore. Passing too many arguments hasn't been rejected. Thanks
+    Justin Hunter for finding this.
+
+0.28      2009-10-08 23:28:02Z
+  - Fix default values for named arguments.
+
+0.27      2009-09-22 12:30:23Z
+  - Depend on MooseX::LazyRequire 0.04 to avoid fail on version 0.03, which has
+    been broken by recent Moose versions (Closes RT#49903) (Maik Hentsche).
+
+0.26      2009-09-08 18:14:01Z
+  - Rebuilt dist to include missing files
+
+0.25      2009-09-07 21:03:03Z
+  - Remove scary ALPHA disclaimer from POD
+  - Depend on Test::More 0.88 for done_testing
+
+0.24      2009-08-31 17:04:14Z
+  - Rename the meta method's clone method to reify. clone already had a special
+    meaning for methods in role applications to classes.
+
+0.23      2009-08-27 20:22:40Z
+  - Bump Moose dependency to 0.89. This avoids test failures on some older
+    Moose versions.
+
+0.22      2009-08-27 13:29:25Z
+  - Provide sane closure behaviour for anonymous methods.
+  - Add tests for the above (Sebastian Willert).
+  - Depend on MooseX::Types 0.19, as 0.18 made us blow up spectacularly.
+
+0.21      2009-08-18 06:45:48Z
+  - Add tests for using aliased.pm for type aliases (Steffen Schwigon).
+  - Depend on the latest PMS to get type alias resolving.
+
+0.20      2009-08-17 10:11:32Z
+  - Make the meta method's parsed_signature public.
+  - Use MooseX::LazyRequire's new interface and depend on 0.03.
+
+0.19      2009-08-14 09:23:42Z
+  - Move method redefinition warnings to the method application hook so it's
+    easy to override.
+
+0.18      2009-08-14 00:24:41Z
+  - Depend on Devel::Declare 0.005011. This avoids "->method" and "method =>"
+    being misinterpreted sometimes.
+
+0.17      2009-08-13 06:37:31Z
+  - Implement method traits (Cory Watson).
+  - Properly test list placeholders.
+  - Document the right syntax for return value type constraints.
+  - Use namespace::autoclean instead of namespace::clean.
+  - Let the signature default to (@) if none is given.
+  - Don't require the package attribute when a pre-built context is passed
+    in.
+  - Depend on a recent Parse::Method::Signatures to make sure we will work
+    with new PPIs and have the right MooseX::Traits version.
+  - Fix doc typo (arcanez).
+  - Split out context from self so that we may pass in an arbitrary context
+    (nperez).
+  - Enable passing a context and also a coderef to use to apply the method
+    once constructed (for deferred method modifier application in MXD)
+    (nperez).
+  - Enable MXMS to work with multiple different declarators and prototype
+    injections (nperez).
+  - Change from using Devel::Declare::MethodInstaller::Simple to
+    ::Context::Simple since strip_attrs was moved down there (nperez).
+
+0.16      2009-05-01 06:03:44Z
+  - Bump prereq to Types::Structured to avoid warnings on new Moose versions.
+  - Make sure the method keyword is "tight" enough, so
+    "@methods = (method { }, method { });" works.
+  - Implement non-scalar parameters.
+  - Updated documentation.
+  - Fix a couple of POD nits (Matt Kraai).
+
+0.15      2009-04-13 02:32:25Z
+  - Use MooseX::Meta::TypeConstraint::ForceCoercion instead of forcing coercion
+    manually on validation to make reusing the method type constraints easier.
+
+0.14      2009-04-08 01:45:50Z
+  - Depend on MooseX::Types::Structured 0.11. 0.10 had a bug which caused
+    validation to always fail.
+
+0.13      2009-03-28 13:04:36Z
+  - Fix bug with namespace::clean and MooseX::Types. (Ash Berlin)
+  - Rename methods to remove __ANON__ from callstack.
+  - Port to using 'from_namespace' from Parse::Method::Signatures 1.003003.
+  - Ensure errors from type constraints are reporting from the right place.
+  - Now warns if you try to refdefine a method.
+  - Return values can now be enforced by using
+
+      method foo ($x) returns (ArrayRef) { }
+
+    This will be documented in the pod once we are happy with the exact
+    behaviour. See t/return_value.t for examples for now.
+  - Depend upon Parse::Method::Signatures 1.003004 for better error reporting
+  - Fix a bug in methods with attributes on perl 5.8.7
+  - Fix bug in location of errors with older Mooses
+  - Bump minium Moose dep to 0.63
+
+0.12      2009-03-04 02:05:19Z
+  - Implement and test scalar placeholder values.
+  - Eval default value so reference and string defaults work as expected.
+  - Make the testsuite less noisy.
+
+0.11      2009-03-03 02:27:00Z
+  - Use MooseX::Types introspection capabilities instead of blindly executing
+    functions in other pakages.
+  - Stop mentioning the deprecated MX::Method, as requested by its author.
+  - Fix and test reporting of compile-time error message (Ash Berlin).
+  - Small stylistic whitespace changes in the docs.
+  - Test that optional params really are optional (Rhesa Rozendaal).
+  - Added test for hashref default values (Rhesa Rozendaal).
+  - Testing that eval works with semicolon insertion (Hakim Cassimally).
+
+0.10      2009-02-28 18:04:02Z
+  - Mention all contributors.
+  - Update copyright notice for 2009.
+  - Refer to Method::Signatures::Simple.
+  - Move most of the actual functionality into the method metaclass.
+  - Allow adding methods with signature validation without the
+    Devel::Declare sugar.
+  - Allow method names to be quoted strings with possible variable
+    interpolations.
+
+0.09      2009-02-23 07:07:47Z
+  - Port to MX::Types::Structured.
+    + Much more useful error messages, including backtraces.
+    + Don't pass undef for parameters now actual value was provided for.
+  - Require a Defined value, not a simple Value when no type constraints are
+    given.
+  - Add more tests. Improve existing tests.
+
+0.08      2009-02-22 01:15:40Z
+  - Don't depend on Readonly in the tests.
+  - Allow parameters to be coerced using the coerce trait.
+
+0.07      2009-02-21 19:31:47Z
+  - Tests for anon methods.
+  - Use B::Hooks::EndOfScope instead of Scope::Guard and %^H.
+  - Add TODO test for using exported types in signatures.
+  - Port from Perl6::Signature to Parse::Method::Signatures.
+  - Port to Devel::Declare::MethodInstaller::Simple.
+  - Support for MX::Types.
+  - Use a custom method metaclass.
+  - Doc patch to mention interaction with Moose::Role (Jonathan Scott Duff).
+  - Add more tests for eval and various signatures (Kent Fredric).
+  - TODO test for sane error messages with files and line numbers (Rhesa Rozendaal).
+  - Don't confuse people with the lack of "use Moose" in SYSOPSIS (Ricardo SIGNES).
+  - Add information for repo and bugtracker in META.yml (Yanick Champoux).
+  - Explain interaction with Role's 'require' (Yanick Champoux).
+
+0.06      2008-10-14 03:43:35Z
+  - Use Moose meta methods instead of just coderefs.
+  - Add a setup_for method to set up the method keyword for something different
+    than the caller().
+
+0.05      2008-10-12 01:49:03Z
+  - Depend on Devel::Declare 0.002000.
+  - Make named arguments work as expected and add more tests.
+
+0.04      2008-10-01 23:07:00Z
+  - Depend on Perl6::Signature 0.03.
+    This is the first version to implement Foo|Bar $x correctly.
+  - Minor documentation improvement.
+
+0.03      2008-09-28 11:37:39Z
+  - Support attributes.
+  - Fixed documentation typo.
+
+0.02      2008-09-24 06:47:17Z
+  - Properly specify prereqs.
+
+0.01      2008-09-24 06:39:22Z
+  - Initial release.

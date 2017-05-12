@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+plmo - Perl module overview
+
+=head1 SYNOPSIS
+
+    plmo [options] Module::Name Module::Name2
+    
+        --text               text output (default)
+        --hide-methods       do not print out the list of methods
+        --graph $filename    generate graph
+        --graph-type $type   graph type (png|svg|ps|gif|dia|...) see `man dot`
+        --recursive          graph recursive
+        --filter             regexp to filter out modules that will be considered
+
+=head1 DESCRIPTION
+
+See L<Module::Overview>.
+
+=cut
+
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use Module::Overview;
+
+our $VERSION = '0.01';
+
+exit main();
+
+sub main {
+    my $help;
+    my $recursive;
+    my $recursion_filter;
+    my $hide_methods;
+    my $text_out;
+    my $graph_out;
+    my $graph_type = 'png';
+    GetOptions(
+        'help|h'        => \$help,
+        'recursive|r'   => \$recursive,
+        'filter|b=s'    => \$recursion_filter,
+        'hide-methods'  => \$hide_methods,
+        'text|t'        => \$text_out,
+        'graph|g=s'     => \$graph_out,
+        'graph_type=s'  => \$graph_type,
+    ) or pod2usage;
+    pod2usage if $help;
+    
+    my $sniff_class = shift @ARGV;   
+    pod2usage if not $sniff_class;
+    
+    $text_out = 1
+        if not ( $graph_out or $text_out );
+    
+    my $mo = Module::Overview->new({
+        module_name      => $sniff_class,
+        recursive        => $recursive,
+        recursion_filter => $recursion_filter,
+        hide_methods     => $hide_methods,
+    });
+    
+    print $mo->text_simpletable
+        if $text_out;
+
+    if ($graph_out) {
+        my $graph = $mo->graph;
+        foreach my $module_name (@ARGV) {
+            $mo->graph($module_name, $graph);
+        }
+        open my $DOT, '|dot -T'.$graph_type.' -o '.$graph_out or die ("Cannot open pipe to dot: $!");
+        print $DOT $graph->as_graphviz;
+        close $DOT;
+    }
+
+    return 0;
+}

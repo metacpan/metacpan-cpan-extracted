@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name: Module-Release-Extras
+version: 0.10
+author:
+  - Nik Clayton <nik@FreeBSD.org>
+abstract: additional functionality for Module::Release
+license: perl
+requires:
+  Module::Release: 0.23
+  URI: 1.30
+provides:
+  Module::Release::Extras:
+    file: lib/Module/Release/Extras.pm
+    version: 0.10
+  Module::Release::ModuleBuild:
+    file: lib/Module/Release/ModuleBuild.pm
+  Module::Release::NIKC:
+    file: lib/Module/Release/NIKC.pm
+  Module::Release::Subversion:
+    file: lib/Module/Release/Subversion.pm
+    version: 0.10
+generated_by: Module::Build version 0.25_01

@@ -1,0 +1,18 @@
+Revision history for Math-Function-Roots
+
+0.01    Feb 20th, 2005
+        First version, released on an unsuspecting world.
+
+0.04	Feb 25th, 2005
+	Corrected documentation on how sub references may be passed
+
+0.06    Sep 21th, 2006
+	Included additional testing of the algorithms.
+
+0.061	March 25th, 2008
+	Clean up test code to prevent CPAN smoke test errors.
+
+0.63	March 26th, 2008
+	Removed reference to Data::Dumper::Simple
+	Fixed parameter handling bug in find() function
+		This function is still not fully working

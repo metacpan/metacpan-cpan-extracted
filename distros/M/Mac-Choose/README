@@ -1,0 +1,75 @@
+NAME
+    Mac::Choose - make a choice with the choose command line util
+
+SYNOPSIS
+       use Mac::Choose qw(choose);
+       my $color = choose qw(
+              red
+              orange
+              yellow
+              green
+              blue
+              indigo
+              violet
+       ) or die "User canceled selection";
+
+DESCRIPTION
+    "choose" is a commercial commandline utility for OS X from Tiny Robot
+    Software that shows a simple fuzzy-matching GUI for selecting from one
+    of several options.
+
+       http://tinyrobotsoftware.com/choose/
+
+    This module is a really really thin wrapper around it that handles
+    installing the command line utility and provides a function to do the
+    shelling out to "choose" via IPC::Open2.
+
+    While installing this module installs a copy of choose, if you continue
+    to use this code beyond the time unlimited trial you should purchase a
+    license from Tiny Robot Software
+
+      https://sites.fastspring.com/tinyrobotsoftware/instant/choose
+
+  Function
+    This module exports one function on request, or you can call it fully
+    qualified.
+
+    choose @possibilities
+        Shows the GUI allowing the user to pick from the possibilities.
+        Returns the selected option, or undef if the user canceled the
+        selection (by hitting ESC / clicking outside the dialog.)
+
+  Configuring
+    This module uses the copy of "choose" distributed with the module
+    distribution by default. If you've installed "choose" somewhere else and
+    you want to use that, you can use the $Mac::Choose: :executable_path to
+    override the path to the executable.
+
+       local $Mac::Choose::executable_path = "/stuff/bin/choose";
+       my $char = choose "Buffy","Willow","Xander","Tara","Oz";
+
+BUGS
+    Bugs (and requests for new features) can be reported though the CPAN RT
+    system: <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Mac-Choose>
+
+    Alternatively, you can simply fork this project on github and send me
+    pull requests. Please see <http://github.com/2shortplanks/Mac-Choose>
+
+AUTHOR
+    Written by Mark Fowler <mark@twoshortplanks.com>
+
+COPYRIGHT
+    Copyright Mark Fowler 2014. All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The choose command line utility itself is copyright Tiny Robot Software.
+    Neither Mark Fowler nor this Perl library is associated with the choose
+    command line utility or Tiny Robot Software (though Tiny Robot Software
+    did give permission for choose to be distributed with this module when
+    asked.)
+
+SEE ALSO
+    <http://tinyrobotsoftware.com/choose/>
+

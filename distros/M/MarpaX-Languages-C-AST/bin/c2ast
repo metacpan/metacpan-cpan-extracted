@@ -1,0 +1,687 @@
+#!perl
+use strict;
+use warnings FATAL => 'all';
+use diagnostics;
+
+use Carp qw/croak/;
+use Config;
+use Data::Dumper;
+use File::Basename qw/basename dirname/;
+use File::Copy qw/copy/;
+use File::Slurp qw/read_file/;
+use File::Spec;
+use File::Temp qw/tempdir/;
+use Getopt::Long;
+use IO::Handle;
+use IO::String;
+use IPC::Run qw/run/;
+use Log::Any qw/$log/;
+use Log::Any::Adapter;
+use Log::Log4perl qw/:easy/;
+use MarpaX::Languages::C::AST;
+use POSIX qw/EXIT_FAILURE EXIT_SUCCESS/;
+use Pod::Usage;
+use Term::ProgressBar;
+use MarpaX::Languages::C::AST::Util::Data::Find;
+use Scalar::Util qw/blessed/;
+use XML::LibXML;
+
+autoflush STDOUT 1;
+
+# ABSTRACT: C source analysis
+
+our $VERSION = '0.47'; # VERSION
+
+# PODNAME: c2ast
+
+my $help = 0;
+my @cpp = ();
+my $cppfile = '';
+my $cppdup = '';
+my @lexeme = ();
+my $progress = 0;
+my @check = ();
+my $dump = 0;
+my $dumpfile = '';
+my $allowAmbiguity = 0;
+my $loglevel = 'WARN';
+my $logstderr = 0;
+my $lazy = 0;
+my @typedef = ();
+my @enum = ();
+my $nocpp = 0;
+my $start = '';
+
+Getopt::Long::Configure("pass_through");
+GetOptions ('help!' => \$help,
+            'cpp=s' => \@cpp,
+            'cppfile=s' => \$cppfile,
+            'lazy!' => \$lazy,
+            'start=s' => \$start,
+            'typedef=s' => \@typedef,
+            'enum=s' => \@enum,
+            'cppdup=s' => \$cppdup,
+            'lexeme=s' => \@lexeme,
+            'progress!' => \$progress,
+            'check=s' => \@check,
+            'dump!' => \$dump,
+            'nocpp!' => \$nocpp,
+            'dumpfile=s' => \$dumpfile,
+            'allowAmbiguity!' => \$allowAmbiguity,
+            'loglevel=s' => \$loglevel,
+            'debug' => sub { $loglevel = 'DEBUG' },
+            'info' => sub { $loglevel = 'INFO' },
+            'warn' => sub { $loglevel = 'WARN' },
+            'error' => sub { $loglevel = 'ERROR' },
+            'fatal' => sub { $loglevel = 'FATAL' },
+            'trace' => sub { $loglevel = 'TRACE' },
+            'logstderr!' => \$logstderr);
+
+@typedef = grep {$_ && "$_"} split(/,/, join(',', @typedef));
+@enum = grep {$_ && "$_"} split(/,/, join(',', @enum));
+
+# ----
+# Init
+# ----
+my $defaultLog4perlConf = <<DEFAULT_LOG4PERL_CONF;
+log4perl.rootLogger              = $loglevel, Screen
+log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
+log4perl.appender.Screen.stderr  = $logstderr
+log4perl.appender.Screen.layout  = PatternLayout
+log4perl.appender.Screen.layout.ConversionPattern = %d %-5p %6P %m{chomp}%n
+DEFAULT_LOG4PERL_CONF
+Log::Log4perl::init(\$defaultLog4perlConf);
+Log::Any::Adapter->set('Log4perl');
+
+if ($help || ! @ARGV) {
+  my $pod = do {local $/; <DATA>};
+  my $podfh = IO::String->new($pod);
+  pod2usage(-verbose => 2, -noperldoc => 1, -input => $podfh, -exitval => $help ? EXIT_SUCCESS : EXIT_FAILURE);
+}
+
+my $preprocessedOutput;
+if (! $nocpp) {
+    @cpp = ('cpp') if (! @cpp);
+    # ---------------------------------------------------------------
+    # Run the preprocessor: any unknown option is passed as-is to cpp
+    # ---------------------------------------------------------------
+    my @cmd = (@cpp, @ARGV);
+    $log->infof('Executing preprocessor, command: %s', join(' ', @cmd));
+    run(\@cmd, \*STDIN, \$preprocessedOutput);
+    if ($cppdup) {
+      my $fh;
+      $log->infof('Saving preprocessor output to file: %s', $cppdup);
+      if (! open($fh, '>', $cppdup)) {
+        warn "Cannot open $cppdup, $!\n";
+      } else {
+        print $fh $preprocessedOutput;
+        if (! close($fh)) {
+          warn "Cannot close $cppdup, $!\n";
+        }
+      }
+    }
+} else {
+    my ($readfh, $what, $name);
+    if ($ARGV[-1] eq '-') {
+      ($readfh, $what, $name) = (\*STDIN, 'handle', 'STDIN');
+    } else {
+      ($readfh, $what, $name) = ($ARGV[-1], 'file', $ARGV[-1]);
+    }
+    $log->infof('Reading preprocessor output from %s: %s', $what, $name);
+    $preprocessedOutput = read_file($readfh);
+}
+# -----------------
+# Callback argument
+# -----------------
+my %lexemeCallbackHash = (file => File::Spec->canonpath($cppfile),
+                          lexeme => {},
+                          internalLexeme => {},
+                          progress => undef,
+                          position2line => {},
+                          next_progress => 0,
+                          allfiles => {});
+
+my %check = ();
+map {++$check{$_}} @check;
+if (exists($check{reservedNames})) {
+    # Force IDENTIFIER internal survey
+    $lexemeCallbackHash{internalLexeme}->{IDENTIFIER} = 1;
+}
+
+if ($progress) {
+  #
+  # Number of lines, for Text::ProgressBar
+  #
+  $lexemeCallbackHash{nbLines} = ($preprocessedOutput =~tr/\n/\n/ + ! $preprocessedOutput =~ /\n\z/);
+  $lexemeCallbackHash{progress} = Term::ProgressBar->new({name  => $ARGV[-1],
+                                                          count => $lexemeCallbackHash{nbLines},
+                                                          remove => 1,
+                                                          ETA => 'linear'});
+  $lexemeCallbackHash{progress}->minor(0);
+}
+
+# -------
+# Parse C
+# -------
+map {++$lexemeCallbackHash{lexeme}->{$_}} @lexeme;
+my %cAstOptions = (lexemeCallback => [ \&lexemeCallback, \%lexemeCallbackHash ], logInfo => \@lexeme, lazy => $lazy, typedef => \@typedef, enum => \@enum, start => $start);
+$log->infof('Instanciating MarpaX::Languages::C::AST');
+my $cAstObject = MarpaX::Languages::C::AST->new(%cAstOptions);
+$log->infof('Parsing input');
+my $bless = $cAstObject->parse(\$preprocessedOutput);
+if ($progress) {
+    if ($lexemeCallbackHash{nbLines} > $lexemeCallbackHash{next_progress}) {
+      $lexemeCallbackHash{progress}->update($lexemeCallbackHash{nbLines});
+    }
+}
+
+# --------------
+# Postprocessing
+# --------------
+
+# ----
+# Dump
+# ----
+my $value;
+my $isAmbiguous = 0;
+if ($dump || $dumpfile || %check) {
+  $log->infof('Getting AST');
+  $value = $cAstObject->value($allowAmbiguity);
+  my $bless = $allowAmbiguity ? $value->[0] : $value;
+
+  if (%check) {
+    $log->infof('Doing checks on AST: %s', join(', ', keys %check));
+    check(\%check, \%lexemeCallbackHash, $bless);
+  }
+
+  if ($dump || $dumpfile) {
+    $log->infof('Calling Dumper() on the AST');
+    my $dumped = Dumper($value);
+    if ($dump) {
+      $log->infof('Printing dumped AST on STDOUT');
+      print $dumped;
+    }
+    if ($dumpfile) {
+      $log->infof('Printing dumped AST to file: %s', $dumpfile);
+      my $fh;
+      if (! open($fh, '>', $dumpfile)) {
+        warn "Cannot open $dumpfile, $!\n";
+      } else {
+        print $fh $dumped;
+        if (! close($fh)) {
+          warn "Cannot close $dumpfile, $!\n";
+        }
+      }
+    }
+  }
+}
+
+exit(EXIT_SUCCESS);
+
+# --------------------------------------------------------------------------------------
+
+sub check {
+    my ($checkp, $lexemeCallbackHashp, $bless) = @_;
+
+    if (exists($checkp->{reservedNames})) {
+      checkreservedNames($lexemeCallbackHashp, $bless);
+    }
+
+}
+
+# --------------------------------------------------------------------------------------
+
+sub checkreservedNames {
+    my ($lexemeCallbackHashp, $bless) = @_;
+
+    #
+    ## Apply GNU rules on every directDeclaratorIdentifier with a position
+    ## that matches that ones in the cpp filename
+    #
+
+    my %check = (
+                 qr/^E[\dA-Z]/             => 'Names beginning with a capital \'E\' followed by a digit or uppercase letter may be used for additional error code names',
+                 qr/^(?:is|to)[a-z]/       => 'Names that begin with either \'is\' or \'to\' followed by a lowercase letter may be used for additional character testing and conversion functions.',
+                 qr/^LC_[A-Z]/             => 'Names that begin with \'LC_\' followed by an uppercase letter may be used for additional macros specifying locale attributes',
+                 qr/^(?:sin|cos|tan|sincos|csin|ccos|ctan|asin|acos|atan|atan2|casin|cacos|catan|exp|exp2|exp10|log|log10|log2|logb|ilogb|pow|sqrt|cbrt|hypot|expm1|log1p|cexp|clog|clog10|csqrt|cpow|sinh|cosh|tanh|csinh|ccosh|ctanh|asinh|acosh|atanh|casinh|cacosh|catanh|erf|erfc|lgamma|gamma|tgamma|j0|j1|jn|y0|y1|yn)[fl]$/                => 'Names of all existing mathematics functions suffixed with \'f\' or \'l\' are reserved for corresponding functions that operate on float and long double arguments, respectively',
+                 qr/^SIG[A-Z]/             => 'Names that begin with \'SIG\' followed by an uppercase letter are reserved for additional signal names',
+                 qr/^SIG_[A-Z]/            => 'Names that begin with \'SIG_\' followed by an uppercase letter are reserved for additional signal actions',
+                 qr/^(?:str|mem|wcs)[a-z]/ => 'Names beginning with \'str\', \'mem\', or \'wcs\' followed by a lowercase letter are reserved for additional string and array functions',
+                 qr/_t$/                   => 'Names that end with \'_t\' are reserved for additional type names'
+    );
+
+    if (grep {basename($_) eq 'dirent.h'} keys %{$lexemeCallbackHashp->{allfiles}}) {
+      $check{qr/^d_/}      =  'The header file dirent.h reserves names prefixed with \'d_\'';
+    }
+    if (grep {basename($_) eq 'fcntl.h'} keys %{$lexemeCallbackHashp->{allfiles}}) {
+      $check{qr/^[lFOS]_/} =  'The header file fcntl.h reserves names prefixed with \'l_\', \'F_\', \'O_\', and \'S_\'';
+    }
+    if (grep {basename($_) eq 'grp.h'} keys %{$lexemeCallbackHashp->{allfiles}}) {
+      $check{qr/^gr_/}     =  'The header file grp.h reserves names prefixed with \'gr_\'';
+    }
+    if (grep {basename($_) eq 'limits.h'} keys %{$lexemeCallbackHashp->{allfiles}}) {
+      $check{qr/_MAX$/}    =  'The header file limits.h reserves names suffixed with \'_MAX\'';
+    }
+    if (grep {basename($_) eq 'pwd.h'} keys %{$lexemeCallbackHashp->{allfiles}}) {
+      $check{qr/^pw_/}      =  'The header file pwd.h reserves names prefixed with \'pw_\'';
+    }
+    if (grep {basename($_) eq 'signal.h'} keys %{$lexemeCallbackHashp->{allfiles}}) {
+      $check{qr/^(?:ssa|SA)_/}  =  'The header file signal.h reserves names prefixed with \'sa_\' and \'SA_\'';
+    }
+    if (grep {basename(dirname($_)) eq 'sys' && basename($_) eq 'stat.h'} keys %{$lexemeCallbackHashp->{allfiles}}) {
+        $check{qr/^(?:st|S)_/}      =  'The header file sys/stat.h reserves names prefixed with \'st_\' and \'S_\'';
+    }
+    if (grep {basename(dirname($_)) eq 'sys' && basename($_) eq 'times.h'} keys %{$lexemeCallbackHashp->{allfiles}}) {
+        $check{qr/^tms_/}      =  'The header file sys/times.h reserves names prefixed with \'tms_\'';
+    }
+    if (grep {basename($_) eq 'termios.h'} keys %{$lexemeCallbackHashp->{allfiles}}) {
+        $check{qr/^(?:c_|V|I|O|TC|B\d)/}      =  'The header file termios.h reserves names prefixed with \'c_\', \'V\', \'I\', \'O\', and \'TC\'; and names prefixed with \'B\' followed by a digit';
+    }
+
+    MarpaX::Languages::C::AST::Util::Data::Find->new(
+        wanted => sub { my $o = shift;
+                        my $class = blessed($o) || '';
+                        return ($class eq 'C::AST::directDeclaratorIdentifier');
+        },
+        callback => sub { my ($lexemeCallbackHashp, $o) = @_;
+                          #
+                          # By definition, the "value" of directDeclaratorIdentifier is
+                          # the IDENTIFIER lexeme value: [start,length,values]
+                          #
+                          my $position = $o->[0]->[0];
+                          if (exists($lexemeCallbackHashp->{position2line}->{$position})) {
+                              my $name = $o->[0]->[2];
+                              my $line = $lexemeCallbackHashp->{position2line}->{$position};
+
+                              my $tryToAlign = sprintf('%s(%d)', $lexemeCallbackHashp->{curfile}, $line);
+
+                              while (my ($re, $string) = each %check) {
+                                  if ($name =~ $re) {
+                                      printf STDERR "%-*s %s: %s\n", $lexemeCallbackHashp->{tryToAlignMax}, $tryToAlign, $name, $string;
+                                  }
+                              }
+                          }
+        },
+        callbackArgs => [ $lexemeCallbackHashp ],
+        )->process(${$bless});
+}
+
+# --------------------------------------------------------------------------------------
+
+sub lexemeCallback {
+    my ($lexemeCallbackHashp, $lexemeHashp) = @_;
+
+    if (defined($lexemeCallbackHashp->{progress}) && defined($lexemeHashp->{line})) {
+      if ($lexemeHashp->{line} >= $lexemeCallbackHashp->{next_progress}) {
+        $lexemeCallbackHashp->{next_progress} = $lexemeCallbackHashp->{progress}->update($lexemeHashp->{line});
+      }
+    }
+
+    #
+    # We wait until the first #line information: this will give the name of current file
+    #
+    if ($lexemeHashp->{name} eq 'PREPROCESSOR_LINE_DIRECTIVE') {
+        if ($lexemeHashp->{value} =~ /([\d]+)\s*\"([^\"]+)\"/) {
+            $lexemeCallbackHashp->{curline} = substr($lexemeHashp->{value}, $-[1], $+[1] - $-[1]);
+            $lexemeCallbackHashp->{curline_real} = $lexemeHashp->{line};
+            $lexemeCallbackHashp->{curfile} = File::Spec->canonpath(substr($lexemeHashp->{value}, $-[2], $+[2] - $-[2]));
+            $lexemeCallbackHashp->{allfiles}->{$lexemeCallbackHashp->{curfile}}++;
+            if (! $lexemeCallbackHashp->{file}) {
+                $lexemeCallbackHashp->{file} = File::Spec->canonpath($lexemeCallbackHashp->{curfile});
+            }
+            if (! defined($lexemeCallbackHashp->{tryToAlignMax})) {
+                $lexemeCallbackHashp->{tryToAlignMax} = length(sprintf('%s(%d)', $lexemeCallbackHashp->{file}, 1000000)); # a pretty good max -;
+            }
+        }
+        #
+        # This is an internal lexeme, no problem to change a bit the value. For instance, remove
+        # \s if any.
+        #
+        $lexemeHashp->{value} =~ s/^\s*//g;
+        $lexemeHashp->{value} =~ s/\s*$//g;
+        $lexemeHashp->{value} =~ s/\n/\\n/g;
+    }
+
+    if (exists($lexemeCallbackHashp->{lexeme}->{$lexemeHashp->{name}}) ||
+        exists($lexemeCallbackHashp->{internalLexeme}->{$lexemeHashp->{name}})) {
+
+        if (defined($lexemeCallbackHashp->{file}) &&
+            defined($lexemeCallbackHashp->{curfile}) &&
+            $lexemeCallbackHashp->{file} eq $lexemeCallbackHashp->{curfile}) {
+            my $line = $lexemeCallbackHashp->{curline} + ($lexemeHashp->{line} - $lexemeCallbackHashp->{curline_real} - 1);
+            $lexemeCallbackHashp->{position2line}->{$lexemeHashp->{start}} = $line;
+            if (exists($lexemeCallbackHashp->{lexeme}->{$lexemeHashp->{name}})) {
+                my $tryToAlign = sprintf('%s(%d)', $lexemeCallbackHashp->{file}, $line);
+                printf "%-*s %-30s %s\n", $lexemeCallbackHashp->{tryToAlignMax}, $tryToAlign, $lexemeHashp->{name}, $lexemeHashp->{value};
+            }
+        }
+    }
+}
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+c2ast - C source analysis
+
+=head1 VERSION
+
+version 0.47
+
+=head1 SYNOPSIS
+
+ c2ast [options] [file ...]
+
+ Options:
+   --help               Brief help message
+   --cpp <argument>     cpp executable. Default is 'cpp'.
+   --cppfile <filename> The name of the file being preprocessed.
+   --cppdup <filename>  Save the preprocessed output to this filename.
+   --lexeme <lexeme>    Lexemes of interest.
+   --progress           Progress bar with ETA information.
+   --check <checkName>  Perform some hardcoded checks on the code.
+   --dump               Dump parse tree value on STDOUT.
+   --dumpfile <file>    Dump parse tree value to this named file.
+   --allowAmbiguity     Allow more than a single parse tree value.
+   --loglevel <level>   A level that has to be meaningful for Log::Log4perl, typically DEBUG, INFO, WARN, ERROR, FATAL or TRACE.
+   --logstderr          Logs to stderr or not.
+
+ Aliased options:
+   --debug              Alias to --loglevel DEBUG
+   --info               Alias to --loglevel INFO
+   --warn               Alias to --loglevel WARN
+   --error              Alias to --loglevel ERROR
+   --fatal              Alias to --loglevel FATAL
+   --trace              Alias to --loglevel TRACE
+
+ Advanced options:
+   --lazy               Instruct the parser to try all alternatives on typedef/enum/identifier
+   --typedef <typedef>  Comma separated list of known typedefs
+   --enum <enums>       Comma separated list of known enums
+   --start <startRule>  Start rule in the grammar.
+   --nocpp              Do not preprocess input file, but take it as is.
+
+If file is '-' it is assumed to refer to STDIN handle.
+
+=head1 DESCRIPTION
+
+This script will use Marpa::R2 to analyse the file given in argument.
+
+=over
+
+=item A first phase will always call the preprocessor, so you need to have one on your machine. Default is 'cpp', and be overwriten on the command-line.
+
+=item Then the output of the preprocessor goes through a lexing phase, using an 2011 ISO ANSI C compliant grammar.
+
+=item Finally, if you ask via the command-line to have a dump of the parse tree value(s), or to perform some checks on the your code, the parse tree is evaluated.
+
+=back
+
+Say --help on the command-line to have the full list of options, and examples.
+
+=head1 NAME
+
+c2ast - C source code transformation to AST and eventual check of C Programming Best Practices
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+This help
+
+=item B<--cpp argument>
+
+cpp executable. Default is 'cpp'.
+
+If your setup requires additional option, then you should repeat this option.
+For example: your cpp setup is "cl -E". Then you say:
+
+ --cpp cl --cpp -E
+
+Take care: it has been observed that "cpp" output could be different than "compiler -E".
+If c2ast complains and the output manifestly reports something that has not been
+preprocessed corrected, then retry with: --cpp your_compiler --cpp your_compiler_option
+
+This has been observed on Darwin for instance, where one have to say:
+
+--cpp gcc --cpp -E
+
+=item B<--cppfile filename>
+
+The name of the file being preprocessed.  Usually this option is not necessary.  By
+default this is the main file being pre-processed, as indicated by the first preprocessor
+line directive.  (Preprocessor line directives start are lines starting with '#line'.)
+For the --lexeme tracing phase or the --check phase, c2ast includes only the information
+that is relevant to the lexemes contained in the "cppfile".
+
+One circumstance where this option is necessary if when the C files are not the source
+files, but were generated by another program.  For example, the input file might be named
+'generated.c', but the actual source, from which 'generated.c' was generated, might be
+in a file named 'source.c'.  If convention is being followed, 'generated.c' will contain
+lines of the form, to indicate which portions of the code originally came from 'source.c'.
+
+  # line xxx "source.c"
+
+You can tell c2ast to analyze the code originally from "source.c", as indicated by the
+preprocessor line directives, with the option
+
+ --cppfile "source.c"
+
+=item B<--cppdup filename>
+
+Save the preprocessed output to this filename. Only useful for debugging c2ast.
+
+=item B<--lexeme lexeme>
+
+Lexemes of interest. Look to the grammar to have the exhaustive list.
+In practice, only IDENTIFIER, TYPEDEF_NAME, ENUMERATION_CONSTANT and STRING_LITERAL_UNIT are useful.
+An internal lexeme, not generated by Marpa itself also exist: PREPROCESSOR_LINE_DIRECTIVE.
+This option must be repeated for every lexeme of interest.
+Giving a value __ALL__ will make all lexemes candidates for logging.
+The output will go to STDOUT.
+
+=item B<--progress>
+
+Progress bar with ETA information. The "name" associated with the progress bar will the last
+of the arguments unknown to c2ast. So it is quite strongly suggested to always end your
+command-line with the file you want to analyse.
+
+=item B<--check checkName>
+
+Perform some hardcoded checks on the code. Supported values for checkName are:
+
+=over
+
+=item reservedNames
+
+Check IDENTIFIER lexemes v.s. Gnu recommended list of Reserved Names [1].
+
+=back
+
+Any check that is not ok will print on STDERR.
+
+=item B<--dump>
+
+Dump parse tree value on STDOUT.
+
+=item B<--dumpfile file>
+
+Dump parse tree value to this named file.
+
+Take care: dumping the parse tree value can hog your memory and CPU. This will not
+be c2ast fault, but the module used to do the dump (currently, Data::Dumper).
+
+=item B<--allowAmbiguity>
+
+Default is to allow a single parse tree value. Nevertheless, if the grammar in use by
+c2ast has a hole, use this option to allow multiple parse tree values. In case of multiple
+parse tree values, only the first one will be used in the check phase (option --check).
+
+=item B<--loglevel level>
+
+A level that has to be meaningful for Log::Log4perl, typically DEBUG, INFO, WARN, ERROR, FATAL or TRACE.
+Default is WARN.
+
+Note that tracing Marpa library itself is possible, but only using environment variable MARPA_TRACE /and/ saying --loglevel TRACE.
+
+In case of trouble, typical debugging phases c2ast are:
+--loglevel INFO
+then:
+--loglevel DEBUG
+then:
+--loglevel TRACE
+
+=item B<--debug>
+
+Shortcut for --loglevel DEBUG
+
+=item B<--info>
+
+Shortcut for --loglevel INFO
+
+=item B<--warn>
+
+Shortcut for --loglevel WARN
+
+=item B<--error>
+
+Shortcut for --loglevel ERROR
+
+=item B<--fatal>
+
+Shortcut for --loglevel FATAL
+
+=item B<--trace>
+
+Shortcut for --loglevel TRACE
+
+=item B<--logstderr>
+
+Logs to stderr or not. Default is $logstderr.
+
+=item B<--lazy>
+
+Instruct the parser to try all alternatives on typedef/enum/identifier. Please refer to L<MarpaX::Languages::C::AST> documentation for its new() method. Default is a false value.
+
+=item B<--typedef typedefs>
+
+Comma separated list of known typedefs. Please refer to L<MarpaX::Languages::C::AST> documentation for its new() method. Default is an empty list.
+
+=item B<--enum enums>
+
+Comma separated list of known enums. Please refer to L<MarpaX::Languages::C::AST> documentation for its new() method. Default is an empty list.
+
+=item B<--start startRule>
+
+Start rule in the grammar. This requires knowledge of the C grammar itself. Default is an empty string.
+
+=item B<--nocpp>
+
+Do not preprocess input file, but take it as is. When this option is used, --lazy is highly recommended, and input file I<must> be the last argument. It is highly probable that the input will not parse nevertheless, as soon as it contains constructs that deviate too much from the C grammar. Default is a false value.
+
+For example:
+
+  #include <sys/types.h>
+  #include <sys/stat.h>
+  #include <unistd.h>
+  int func1(size_t size) {
+  }
+
+will never be parsed without cpp, i.e.:
+
+ c2ast --nocpp /tmp/test.c
+
+because of size_t. But the lazy option will make it work, because size_t will be injected as an acceptable alternative for TYPEDEF_NAME and IDENTIFIER:
+
+ c2ast --nocpp --lazy /tmp/test.c
+
+If you run with the DEBUG loglevel, you will see an explanation of the successful parsing:
+
+ c2ast --nocpp --lazy --loglevel DEBUG /tmp/test.c
+ ./..
+ DEBUG  13370 [parseIsTypedef] "size_t" at scope 1 is a typedef? no
+ DEBUG  13370 [parseIsEnum] "size_t" is an enum at scope 1? no
+ DEBUG  13256 [_doPauseBeforeLexeme] Pushed alternative TYPEDEF_NAME "size_t"
+ DEBUG  13256 [_doPauseBeforeLexeme] Failed alternative ENUMERATION_CONSTANT "size_t"
+ DEBUG  13256 [_doPauseBeforeLexeme] Pushed alternative IDENTIFIER "size_t"
+
+Here you see clearly that lazy option tried TYPEDEF_NAME, ENUMERATION_CONSTANT and IDENTIFIER. The grammar natively rejected ENUMERATION_CONSTANT because this is not expected at this stage. A hint on typedef, useless here, would have nevertheless prevented lazy mode to try to push the ENUMERATION_CONSTANT alternative:
+
+ c2ast --nocpp --lazy --loglevel DEBUG --typedef size_t /tmp/test.c
+ ./..
+ DEBUG  13378 [parseIsTypedef] "size_t" at scope 1 is a typedef? yes
+ DEBUG  13378 [_doPauseBeforeLexeme] Pushed alternative TYPEDEF_NAME "size_t"
+ DEBUG  13378 [_doPauseBeforeLexeme] Pushed alternative IDENTIFIER "size_t"
+
+But doing a wrong hint, saying size_t is an enum will imply a parse failure, because ENUMERATION_CONSTANT is not expected at this stage, and even if IDENTIFIER is possible, the rest of the input source is invalidating it:
+
+ c2ast --nocpp --lazy --loglevel DEBUG --enum size_t /tmp/test.c
+ ./..
+ DEBUG  13384 [parseIsTypedef] "size_t" at scope 1 is a typedef? no
+ DEBUG  13384 [parseIsEnum] "size_t" is an enum at scope 1? yes
+ DEBUG  13384 [_doPauseBeforeLexeme] Failed alternative ENUMERATION_CONSTANT "size_t"
+ DEBUG  13384 [_doPauseBeforeLexeme] Pushed alternative IDENTIFIER "size_t"
+  ./..
+ FATAL  13384 Error in SLIF parse: No lexemes accepted at line 5, column 18
+   Rejected lexeme #0: Lexer "L0"; ENUMERATION_CONSTANT; value="size"; length = 4
+   Rejected lexeme #1: Lexer "L0"; TYPEDEF_NAME; value="size"; length = 4
+   Rejected lexeme #2: Lexer "L0"; IDENTIFIER; value="size"; length = 4
+   Rejected lexeme #3: Lexer "L0"; IDENTIFIER_UNAMBIGUOUS; value="size"; length = 4
+ * String before error: /stat.h>\n#include <unistd.h>\n\nint func1(size_t\s
+ * The error was at line 5, column 18, and at character 0x0073 's', ...
+ * here: size) {\n}\n\n
+ Marpa::R2 exception at lib/MarpaX/Languages/C/AST/Impl.pm line 107.
+ Last position:
+ line:column 5:11 (Unicode newline count) 5:11 (\n count)
+ int func1(size_t size) {
+ ----------^
+
+In conclusion, the options --nocpp and --lazy, even with --typedef or --enum hints, should be rarelly be used, unless your engine is prepared to hand over failure.
+
+=back
+
+Any option not documented upper will be considered as a cpp option, and sent to the underlying the cpp program. A restriction is that the filename must be the last argument.
+
+=head1 EXAMPLES
+
+Examples:
+
+ c2ast                   -D MYDEFINE1 -D MYDEFINE2 -I       /tmp/myIncludeDir            /tmp/myfile.c
+
+ c2ast                   -D MYDEFINE1 -D MYDEFINE2 -I       /tmp/myIncludeDir            /tmp/myfile.c --lexeme IDENTIFIER --lexeme TYPEDEF_NAME
+
+ c2ast --cpp cl --cpp -E -D MYDEFINE1 -D MYDEFINE2 -I C:/Windows/myIncludeDir C:/Windows/Temp/myfile.c
+
+ c2ast                   -D MYDEFINE1 -D MYDEFINE2 -I       /tmp/myIncludeDir            /tmp/myfile.c --progress --check reservedNames
+
+Less typical usage:
+
+ c2ast -I libmarpa_build --cpp gcc --cpp -E --cppfile ./marpa.w  --progress --check reservedNames libmarpa_build/marpa.c
+
+=head1 SEE ALSO
+
+L<Reserved Names - The GNU C Library|http://www.gnu.org/software/libc/manual/html_node/Reserved-Names.html>
+
+L<MarpaX::Languages::C::AST>
+
+=head1 AUTHOR
+
+Jean-Damien Durand <jeandamiendurand@free.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Jean-Damien Durand.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+__END__
+
+# --------------------------------------------------------------------------------------
+

@@ -1,0 +1,98 @@
+package Mardent::Dialect::Theory;
+
+=pod
+
+=head1 NAME
+
+Markdent::Dialect::Theory - Markdown extensions proposed by David Wheeler (aka Theory)
+
+=head1 SYNOPSIS
+
+  use Markdent::Parser;
+
+  my $parser = Markdent::Parser->new( dialects => 'Theory', handler => ... );
+
+=head1 DESCRIPTION
+
+The Theory roles add parsing for Markdown extensions proposed by David Wheeler
+(aka Theory). See
+L<http://justatheory.com/computers/markup/markdown-table-rfc.html> and
+L<http://justatheory.com/computers/markup/modest-markdown-proposal.html> for
+details.
+
+=head2 DEVIATIONS
+
+The dialect differs from David Wheeler's proposals in a few ways. Most of
+these deviations were discussed with David Wheeler and included with his
+approval.
+
+=over 4
+
+=item
+
+The header's "marker" row can use "+====+" as well as "+----+":
+
+  | Header 1 | Header 2 |
+  +==========+==========+
+  | Body 1   | Body 2   |
+
+=item
+
+The table does not require a header:
+
+  | Body 1 | Body 2 |
+  | Body 3 | Body 4 |
+
+=item
+
+You can include a header marker at the beginning and/or end of the table. This
+matches how MySQL outputs tables from its CLI tool.
+
+  +------+-------------+------------------------------+--------+
+  | id   | name        | description                  | price  |
+  +------+-------------+------------------------------+--------+
+  |    1 | gizmo       | Takes care of the doohickies |   1.99 |
+  |    2 | doodad      | Collects *gizmos*            |  23.80 |
+  |   10 | dojigger    | Foo                          | 102.98 |
+  | 1024 | thingamabob | Self-explanatory, no?        |   0.99 |
+  +------+-------------+------------------------------+--------+
+
+=item
+
+Currently it just does tables, not definition lists. This will be fixed in a
+future release.
+
+=item
+
+Table continuation lines are expected to have the same number of cells as the
+line being continued. In other words, this doesn't work:
+
+ | cell1 | cell2     |
+         : continues
+
+Instead, you must write this:
+
+ | cell1 | cell2     |
+ :       : continues :
+
+This is not an approved deviation, and may be corrected in a future release if
+I can figure out how to do so (patches welcome).
+
+=back
+
+=head1 BUGS
+
+See L<Markdent> for bug reporting details.
+
+=head1 AUTHOR
+
+Dave Rolsky, E<lt>autarch@urth.orgE<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2009-2012 Dave Rolsky, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

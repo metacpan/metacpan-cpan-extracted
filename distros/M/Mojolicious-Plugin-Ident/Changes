@@ -1,0 +1,45 @@
+Revision history for Mojolicious::Plugin::Ident
+
+0.31      2015-02-28 10:42:10 -0500
+  - Mojo 6.x compat
+
+0.30      2013-09-02 09:52:17 -0400
+  - Mojolicious 4.28 compatability
+
+0.29      2013-05-17 12:04:57 America/New_York
+  - Mojolicious 4.0 compatability
+
+0.28      2013-02-09 18:53:06 America/New_York
+  - rm dep base
+
+0.27      2013-02-09 09:55:14 America/New_York
+  - compat with AnyEvent::Ident 0.04
+
+0.26      2013-01-19 09:00:51 America/New_York
+  - Make EV (not AE) a prereq (non-blocking mode does
+    not work with other event loops)
+  - documentation updates
+
+0.25      2013-01-17 13:06:44 America/New_York
+  - Make AE a prereq (non-blocking mode does
+    not work with AnyEvent::Loop)
+
+0.24      2013-01-17 12:43:09 America/New_York
+  - Add additional diagnostics to non_blocking test
+
+0.23      2013-01-17 12:00:39 America/New_York
+  - Make M::P::I::Response inherit from AE::I::Response
+    in order to simplify the interface and make non-blocking
+    more like blocking mode
+
+0.22      2013-01-15 11:49:31 America/New_York
+  - Migrate from Net::Ident to AnyEvent::Ident
+
+0.21      2012-11-29 12:15:36 America/New_York
+  - remove extra deps
+
+0.2       2012-10-02 15:32:10 America/New_York
+  - fix $VERSION so that it is not undef
+
+0.1       2012-09-07 12:14:02 America/New_York
+  - initial version

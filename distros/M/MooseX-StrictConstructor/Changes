@@ -1,0 +1,137 @@
+0.21     2017-02-09
+
+- The last release accidentally added Moo as a hard prereq when it's only
+  needed for testing. Patched by Karen Etheride (GH #4).
+
+
+0.20     2017-02-09
+
+- Repository has moved to the GitHub Moose organization
+
+- Added support for __no_BUILD__ as a constructor argument to skip calling any
+  BUILD subs (used internally by modules like Moo that have their own
+  implementation of calling BUILD). Reported and patched by Karen Etheridge
+  (RT#120124, GH #1).
+
+
+0.19     2012-01-17
+
+- The 0.17 release broke compatibility with pre-2.0 versions of Moose.
+
+
+0.18     2012-01-10
+
+- A small internal tweak which prevents the MooseX::ClassCompositor tests from
+  failing.
+
+
+0.17     2012-01-04
+
+- Added a small optimization for an immutable constructor when used with Moose
+  2.00+. The list of valid attributes is only generated once, rather than each
+  time the constructor is run. Reported by Chip Salzenberg. RT #73664.
+
+
+0.16     2011-04-22
+
+- Don't wrap BUILDALL, since this breaks if the object doesn't inherit from
+  Moose::Object (doy).
+
+
+0.15     2011-04-13
+
+- The fix in 0.14 only worked with Moose 2.0, causing failures with earlier
+  versions.
+
+
+0.14     2011-04-13
+
+- Using extends caused strictness to be lost. Fixed by Karen Etheridge.
+
+
+0.13     2011-02-22
+
+- This release provides forward compatibility with Moose 1.99+. It will still
+  work with Moose 1.23 as well. Most of the work was done by Jesse Luehrs.
+
+
+0.12     2010-10-29
+
+- Switched tests to use Test::Fatal instead of Test::Exception.
+
+
+0.11     2010-09-09
+
+- Added a missing test dep on Test::Exception. Reported by Phillip Moore. RT
+  #61205.
+
+
+0.10     2010-07-16
+
+- Ignore __INSTANCE__ when passed to the constructor. Patch by Jesse
+  Luehrs. RT #59236.
+
+- All init args are quoted in the inlined constructor.
+
+
+0.09     2010-07-14
+
+- Use modern Moose APIs, to avoid warnings with the next Moose release.
+
+
+0.08     2009-04-07
+
+- Make this module work with Moose 0.73_01+.
+
+
+0.07     2008-09-01
+
+- No code changes, just a stable release for Moose 0.56.
+
+
+0.06_02  2008-08-30
+
+* This module no longer exports Moose's sugar. Just use Moose instead.
+
+- Various doc fixes to reflect changes since 0.06.
+
+
+0.06_01  2008-08-30
+
+- Rewrote this distro's functionality as roles to take advantage of
+  Moose::Util::MetaRole. Less code, plays better with other
+  extensions.
+
+
+0.06     2008-06-27
+
+- Changes to the immutable bits to work with the latest Moose (0.51).
+
+
+0.05     2008-04-18
+
+- The fix in 0.04 only worked for non-immutable classes.
+
+
+0.04     2008-04-18
+
+- This module did not respect the init_arg attribute setting, and used
+  the attribute name instead. Reported by Matt Trout. RT #34507.
+
+
+0.03     2007-11-20
+
+- Require Moose 0.26, since that's first version to offer init_meta(),
+  apparently.
+
+
+0.02     2007-11-15
+
+- Moose was missing from the prereq list. Reported by Slaven Rezic.
+
+- Version 0.01 did not work after a class was made immutable.
+
+
+0.01     2007-11-14
+
+- First version, released on an unsuspecting world.

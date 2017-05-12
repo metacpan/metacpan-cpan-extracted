@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+
+use strict;
+use Mail::POPRelay::Daemon;
+
+
+# main
+# ---------
+my $popDaemon = new Mail::POPRelay::Daemon(
+	$ARGV[0],
+	{ mailLogRegExp => 'popper\[\d+\]: Stats: (\w+) .*\ (\d+\.\d+\.\d+\.\d+)', }
+  # example relay: Aug 19 21:13:50 p15103778 popper[25444]: Stats: tester 0 0 0 0 p50831609.dip.t-dialin.net 80.131.22.9 [pop_updt.c:228]
+  # example relay denied: Aug 19 23:42:24 p15103778 popper[27787]: tester2 at p50831609.dip.t-dialin.net (80.131.22.9): -ERR [AUTH] Password supplied for "tester2" is incorrect. [pop_pass.c:1188]
+);
+
+
+=head1 NAME
+
+poprelay_qpopper - Agent for Qpopper
+
+
+=head1 SYNOPSIS
+
+./poprelay_qpopper config-file
+
+
+=head1 DESCRIPTION
+
+This agent is suitable for working with the Qpopper POP daemon.
+
+Make sure to specify the correct config-file for your server configuration.
+Subtle modifications may be necessary in the config-file depending on your
+server configuration.
+
+
+=head1 DIAGNOSTICS
+
+croak().  Will write to syslog eventually.
+
+
+=head1 AUTHOR
+
+Sven-Oliver Stietzel <dev@netshake.de>
+
+
+=head1 SEE ALSO
+
+Mail::POPRelay::Daemon(3pm), Mail::POPRelay(3pm), poprelay_cleanup(1p).
+
+=cut
+
+# $Id: poprelay_qpopper,v 1.1 2002/08/20 01:25:39 keith Exp $

@@ -1,0 +1,180 @@
+0.46
+ - Rewrite tests in t/index_bug.t to avoid crashes owing to memory constraints
+
+0.45
+ - Add _is_infstring() for use with overloaded comparison operators (==, !=, >, >=, <, <=, <=>)
+ - Corrections made to memory allocation for string buffers in GMPz.xs. (Version 0.44 has been
+   over-allocating by a factor of more than 3.)
+ - Broaden overload_pow and overload_pow_eq to accommodate Math::GMPz objects whose value fit into
+   unsigned long int.
+ - Add documentation of Rmpz_rootrem. (Thanks trizen.)
+ - Catch the case (gmp-6 and earlier only) where the index passed to mpz_clrbit, mpz_setbit
+   mpz_combit, mpz_tstbit, mpz_scan0 or mpz_scan1 is greater than ULONG_MAX.
+ - Create separate GMPz.pod
+
+
+0.44
+ - Remove gmp_version (library) function from Math::GMPz::V. (Math::GMPz::V is
+   supposed to *not* include any library functions.)
+ - Replace SvUV/SvIV/SvNV with SvUVX/SvIVX/SvNVX where appropriate. (In typemap, too.)
+ - Remove the private function _Rmpz_init_set_ld, which has been replaced with the
+   public function Rmpz_init_set_NV.
+ - Also add Rmpz_set_NV, Rmpz_set_IV, Rmpz_get_IV, Rmpz_fits_IV and Rmpz_fits_UV.
+ - Rmpz_init_set_d, Rmpz_set_d now throw an error if the supplied double is a NaN or
+   an Inf. (As do Rmpz_init_set_NV and Rmpz_set_NV when the supplied NV is Inf/NaN.)
+   The gmp library does not accept Inf/Nan arguments - and it's better to have Math::GMPz
+   present a meaningful error message than to have the gmp library dump core.
+ - Accommodate __float128 nvtype.
+ - Add Rmpz_cmp_NV.
+ - Replace the condition "if(SvNOK(x))" with "if(SvNOK(x) && !SvPOK(x))".
+   See https://github.com/sisyphus/math-gmpz/issues/1 (Thanks trizen.)
+
+0.43
+ - Overload operations with Math::BigInt objects, and allow new() to accept a
+   Math::BigInt object.
+
+0.42
+ - PREREQ_PM => {'Exporter' => '5.58'} to avoid test failures on pre perl-5.8.4
+   (Thanks Peter Acklam)
+
+0.41
+ - Add overloading of comparison operators with Math::GMPq objects - gmp-6.1.0
+   and later. (Uses mpq_cmp_z function.)
+
+0.40
+ - Define mp_bitcnt_t to unsigned long int in GMPz.xs if version is less than 5.0.0
+ - Add autocorrelation and autocorrelation_20000 (neither of which is documented
+   or exported)
+ - No longer define USE_64_BIT_INT if ivtype is 'long'.
+ - Rename USE_64_BIT_INT #define to MATH_GMPZ_NEED_LONG_LONG_INT
+
+0.39
+ - Add metadata to Makefile.PL
+ - Add Rmpz_bin_si, as suggested by Dana Jacobsen. (Added even though the gmp
+   library provides only mpz_bin_ui and mpz_bin_uiui.)
+ - Tweaks to Math::GMPz::gmp_v() and Math::GMPz::V::gmp_v()
+ - Fix bug in Rruns function.
+
+0.38
+ - Alter wrap_gmp_sprintf and wrap_gmp_snprintf to take an extra arg (length of
+   buffer to which we write).
+ - Remove Rmpz_sprintf_ret and Rmpz_snprintf_ret. (These now seem pointless in
+   view of the changes to wrap_gmp_sprintf and wrap_gmp_snprintf.)
+ - Add Math::GMPz::__GNU_MP_RELEASE.
+ - Alter V.xs to accommodate the possibility that the global constant gmp_version
+   has not been set in gmp.h. I've assumed this can only happen if the gmp
+   library version is earlier than 4.0.0. (The gmp ChangeLog indicates that this
+   is so.)
+ - No longer include inttypes.h on the basis of USE_LONG_DOUBLE being defined.
+   (Was harmless ... but didn't make much sense.)
+ - Define PERL_NO_GET_CONTEXT (in XS code).
+
+0.37
+ - Alter test 3i in new.t to allow for the possibility that perl has been bult
+   with -Duselongdouble.
+ - Remove some of the undocumented (cruddy & irrelevant) functions from GMPz.xs,
+   and remove t/supp1.t and t/supp2.t (which tested those functions).
+ - Alter the way that strEQ gets hold of HvNAME(SvSTASH(SvRV(sv))) - so that -Wall
+   doesn't emit "null argument" warnings. (Thanks Daniel Kahn Gillmor.)
+
+0.36
+ - Add Rmpz_2fac_ui, Rmpz_mfac_uiui and Rmpz_primorial_ui (all new in gmp-5.1.0).
+
+0.35
+ - Add Math::GMPz::V
+ - Add cross-class overloading (with Math::MPFR objects only).
+
+0.34
+ - Fix error in Rmpz_gcd_ui. (Should've been returning SV*. Thanks Dana Jacobsen.)
+ - Create the NULL mpz_t ($Math::GMPz::NULL)
+
+0.33
+ - Remove 'not' from overloads. Apparently achieved nothing anyway, and 5.16
+   warns that it's invalid.
+
+0.32
+ - Add Rmpz_powm_sec (gmp-5 only, and not available when building against mpir).
+ - In the documentation, elaborate on the way that Math::GMPz::get_v() and
+   __GNU_MP_VERSION & friends determine their values. (Thanks Vincent Lefevre.)
+ - Add Rmpz_div, Rmpz_divmod, Rmpz_div_ui, Rmpz_divmod_ui,
+   Rmpz_div_2exp and Rmpz_mod_2exp.
+
+0.31
+ - Fix Random.xs so that it compiles with gmp-4 (not just gmp-5).
+   Thanks Rob Kuo (https://rt.cpan.org/Ticket/Display.html?id=58501)
+
+0.29
+ - Add proper coverage of random functions
+ - Add Rmpz_snprintf and Rmpz_snprintf_ret
+ - If there's no variable to be formatted, Rmpz_(f/s)printf no longer
+   need to be supplied with a dummy variable.
+ - Some buggy tests in printf.t hopefully fixed.
+
+0.28
+ Requires gmp-4.2.0 or later.
+ In response to bug http://rt.cpan.org/Ticket/Display.html?id=46499:
+ - Amendment to Makefile.PL wrt 'long long' and 'long double' support.
+ - Remove reliance on $Config{use64bitint} in t/new.t and t/out_str.t
+ - Add some MAC OS X notes to README and fix some typos.
+
+ In response to bug http://rt.cpan.org/Ticket/Display.html?id=46603
+ - In Rmpz_get_d_2exp, change data type of 'exp' from unsigned to signed.
+
+ In response to bug http://rt.cpan.org/Ticket/Display.html?id=46604
+ - Fix ___GMP__CC() and ___GMP_CFLAGS() so that they return undef
+   if __GMP_CC and __GMP_CFLAGS are not defined by the gmp library.
+
+ Thanks, Bob Kuo and Jonathan Leto.
+
+0.27
+ - Requires gmp-4.2.3 or later
+ - Remove (the need for) INLINE.h
+ - Change Rmpz_sprintf to return the number of characters written.
+ - Change Rmpz_sizeinbase and Rmpz_size to return unsigned longs instead
+   of signed long ints.
+ - Add __GNU_MP_VERSION, __GNU_MP_VERSION_MINOR, __GNU_MP_VERSION_PATCHLEVEL,
+   __GMP_CC and __GMP_CFLAGS
+ - Change Rmpz_scan0 and Rmpz_scan1 to return unsigned long. (Returning a
+   signed long int was wrong.)
+ - Change Rmpz_printf() so that, like its fprintf and sprintf counterparts,
+   it formats only one variable at a time.
+ - Fix bug in Rmpz_init_set_str (and Rmpz_init_set_str_nobless) that led to
+   a segfault if string was invalid (ie if mpz_init_set_str() returned true).
+
+0.26
+ - Add Rmpz_fprintf, Rmpz_sprintf and Rmpz_sprintf_ret.
+ - Add Rmpz_out_raw and Rmpz_inp_raw.
+
+0.24
+ - Add TRmpz_out_str and TRmpz_inp_str.
+ - Rmpz_out_str now takes an optional (leading) string argument - a
+   string that will be prepended to the mpz_out_str() output.
+ - Remove the tests in the Makefile.PL that test for the presence of
+   a suitable compiler and GMP library.
+ - Remove the "homegrown" primes and supplementary functions from the
+   list of exportable functions. (They don't really belong here.) Also
+   remove the documentation pertaining to these functions from the POD.
+   This is done in preparation for the eventual removal of these
+   functions from Math::GMPz. For the time being, however, these
+   functions are still available via their fully-qualified names - and
+   they're still being tested in the test suite.
+
+0.22
+ - Rewrite new()
+ - Rmpz_out_str() now takes an optional third argument - a string that
+   will be appended to the mpz_out_str() output. Also stdout is
+   fflush()'d each time Rmpfr_out_str() is called.
+ - The overload functions and new() can now handle a long double value
+   correctly
+
+0.21
+ - Add "Name" section to the pod
+ - Remove 'Makefile.old' from the source. (Doh !!)
+
+0.20
+ - First CPAN release
+ - No longer assign Exporter and DynaLoader to @Math::GMPz::ISA.
+ - Add support for use64bitint
+ - add new() function/method to facilitate initialization/assignment
+
+

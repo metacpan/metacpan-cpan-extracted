@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+
+use 5.01;
+use strict;
+use warnings;
+use version; our $VERSION = qv( '0.6' );
+
+use English qw( -no_match_vars );
+
+my $message_file = $ARGV[ 0 ]; my $change_file = 'Changes';
+
+if (-f $change_file) {
+   open my $in, '<', $message_file
+      or die "Path ${message_file} cannot open: ${OS_ERROR}";
+
+   my $message; { local $RS = undef; $message = <$in> }; close $in;
+
+   if (length $message < 3) {
+      open $in, '<', $change_file
+         or die "File ${change_file} cannot open: ${OS_ERROR}";
+
+      my $changes; { local $RS = undef; $changes = <$in> }; close $in;
+      my ($entry) = $changes =~ m{ [\n][\n] (.*?) [\n][\n] }msx;
+
+      $message = (map    { s{ \A [ \t]+ [\-] \s* }{}mx; $_ }
+                  grep   { m{ \A [ \t]             }mx     }
+                  split    m{    [\n]              }mx,
+                            ($entry || ' - Updated'))[ 0 ];
+   }
+
+   $message = substr $message, 0, 53;
+
+   open my $out, '>', $message_file
+      or die "Path ${message_file} cannot open: ${OS_ERROR}";
+   print {$out} $message; close $out;
+}
+
+exit 0;

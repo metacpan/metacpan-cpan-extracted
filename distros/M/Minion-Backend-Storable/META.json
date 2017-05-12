@@ -1,0 +1,58 @@
+{
+   "abstract" : "File backend for Minion",
+   "author" : [
+      "Nic Sandfield <niczero@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Minion-Backend-Storable",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "test"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.3"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Minion" : "5",
+            "Mojolicious" : "6.3",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/niczero/minion-backend-storable/issues"
+      },
+      "homepage" : "https://niczero.github.io",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/niczero/minion-backend-storable.git"
+      },
+      "x_IRC" : "irc://irc.perl.org/#mojo"
+   },
+   "version" : 5.083,
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

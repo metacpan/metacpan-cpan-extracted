@@ -1,0 +1,2 @@
+# Named node with attributes, with spaces. OK.
+   [ node.1 ] {  label  :  Flight Path from Melbourne to London  }

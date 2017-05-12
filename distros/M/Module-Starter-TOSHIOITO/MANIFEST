@@ -1,0 +1,12 @@
+Build.PL
+Changes
+cpanfile
+lib/Module/Starter/TOSHIOITO.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+xt/generated_files.t
+xt/manifest.t
+xt/pod.t
+META.yml
+META.json

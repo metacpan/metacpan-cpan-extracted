@@ -1,0 +1,17 @@
+Changes
+lib/Mojolicious/Plugin/AppCacheManifest.pm
+Makefile.PL
+MANIFEST
+README
+t/000_load.t
+t/010_random.t
+t/020_examples.t
+t/lib/MojoAppCacheTest.pm
+t/public/example-0-offline-legacy.appcache
+t/public/example-1a.appcache
+t/public/example-1b.appcache
+t/public/example-2-absolute.appcache
+t/public/example-3-fallback.appcache
+t/public/random.appcache
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

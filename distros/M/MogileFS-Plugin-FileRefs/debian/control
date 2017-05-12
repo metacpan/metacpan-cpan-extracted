@@ -1,0 +1,18 @@
+Source: libmogilefs-plugin-filerefs-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 7)
+Build-Depends-Indep: perl, libmogilefs-server-perl, libtest-exception-perl
+Maintainer: Dave Lambley <davel@state51.co.uk>
+Standards-Version: 3.8.3
+Homepage: http://search.cpan.org/dist/MogileFS-Plugin-FileRefs/
+
+Package: libmogilefs-plugin-filerefs-perl
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}, libmogilefs-server-perl
+Description: MogileFS extension
+ MogileFS::Plugin::FileRefs provides MogileFS with additional functionality to
+ keep track of multiple uses of an individual dkey. This may be useful for
+ implementing de-duplication in your application.
+ .
+ This description was automagically extracted from the module by dh-make-perl.

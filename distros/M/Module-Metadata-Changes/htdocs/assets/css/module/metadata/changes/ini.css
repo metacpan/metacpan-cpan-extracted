@@ -1,0 +1,22 @@
+.ini_deploy
+{
+color: red;
+text-align: left;
+}
+
+.ini_heading
+{
+color: #80c0ff;
+text-align: center;
+}
+
+.ini_td
+{
+text-align: left;
+}
+
+.ini_th
+{
+font-weight: normal;
+text-align: left;
+}

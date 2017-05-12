@@ -1,0 +1,9 @@
+---
+-
+  - rusu.notify
+  -
+    - '* reg-till':
+        - 24.07.2008
+        - 24.07.2009
+      domain: ORETEST1.RU
+      rule_id: rusu.notify.updated

@@ -1,0 +1,99 @@
+Revision history for Mastodon::Client
+
+0.010     2017-05-08 00:15:59+01:00 Europe/London
+
+  * Fixes:
+    * Added AutoPrereq plugin for automatic dependency detection
+
+0.009     2017-05-06 23:50:20+01:00 Europe/London
+
+  * New:
+    * Added tidyall tests
+  * Changes:
+    * Switch to JSON::MaybeXS
+    * Use Class::Load to programmatically load classes
+    * Improved robustness of stream parsing
+    * Simplified method to perform requests
+  * Fixes:
+    * Fixed syntax errors in POD
+    * Fixed a missing import in Application entities
+    * Reblog status method no longer calls DELETE
+
+0.008     2017-04-22 02:45:33+01:00 Europe/London
+
+  * New:
+    * Added documentation for entity and listener objects
+    * Status and Account objects have some convenience methods
+  * Changes:
+    * Re-wrote Mastodon::Listener to use AnyEvent::HTTP
+    * Added more attributes to Mastodon::Listener, making it more
+      usable as a standalone class
+  * Fixes:
+    * Fixed an issue with entity coercions, that could cause some
+      tests to fail
+    * TCP tests are skipped if unable to establish a connection
+    * Added more missing dependencies
+    * Never coerce server responses for app registration
+
+0.007     2017-04-18 16:12:15+01:00 Europe/London
+
+  * Fixes:
+    * Corrected list of provided packages (fixed broken release)
+    * Add readme to distribution
+
+0.006     2017-04-18 02:28:45+01:00 Europe/London
+
+  * New:
+    * Added tests for more methods
+    * Entity objects have experimental method shortcuts
+  * Fixes:
+    * Some of the GET methods did not correctly parse arguments
+  * Changes:
+    * The `uri` attribute for Status entities is not of type URI
+
+0.005     2017-04-17 15:20:15+01:00 Europe/London
+
+  * Fixes:
+    * Fixed wrong links in POD
+
+0.004     2017-04-17 15:14:15+01:00 Europe/London
+
+  * New:
+    * Added some tests for GET requests, using Test::TCP
+    * Added an example script to dump responses to GET requests,
+      mainly for debug
+  * Fixes:
+    * Corrected some inconsistencies in the method signatures
+      with what was documented
+    * Do not try to coerce non-entity responses (ie. from OAuth2 flow)
+    * Respect the value of coerce_entities in more methods
+  * Changes:
+    * The `authorized` attribute is now never undefined
+
+0.003     2017-04-17 00:12:15+01:00 Europe/London
+
+  * New:
+    * Added Travis CI configuration
+  * Fixes:
+    * Added some missing dependencies to dist.ini
+
+0.002     2017-04-16 23:06:52+01:00 Europe/London
+
+  * New:
+    * Added convenience methods for all API endpoints
+    * Added a `coerce_entities` option to turn JSON responses from
+      Mastodon into Perl objects
+    * Added more tests (suite is still far from complete!)
+    * Added methods for sending DELETE and PATCH requests
+    * Added this change log. :)
+    * Several changes to dist.ini add repository data, META.json, etc.
+    * Added documentation
+  * Changes:
+    * Interface of `timeline()` and `stream()` methods now more
+      closely mirrors that of the rest of the distribution
+  * Fixes:
+    * Fixed several issues with passing arguments to requst functions
+
+0.001
+
+  * Initial release

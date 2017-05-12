@@ -1,0 +1,1 @@
+abc<perl>print join('', qw(d e f))</perl>g<perl>my $foo="foo"; $main::bar = "bar"</perl>

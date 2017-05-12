@@ -1,0 +1,61 @@
+Thread:       qx_broken_on_Win98_second_thread
+Message:      001_0002_0011
+From:         Greg Marlinson <lang@some.web.address.com>
+Text:
+
+On Tue, 10 Feb 2004, Tobias Heinrich wrote:
+
+> Works fine, once you know what the difference between system and qx is (read
+> "perldoc -f system" and "perldoc perlop" [search for `STRING` in the later
+> one]). 
+
+Thanks. Here tooo,
+
+the right results. Trying that with system
+
+That's interesting. That first line must be coming out as STDERR
+and the O is STDOUT, I think. There is no error in 
+
+An error message about mistaken specification of directory.
+
+-- 
+Greg Marlinson, Taiwan
+
+--__--__--
+
+Thread:       qx_broken_on_Win98_second_thread
+Message:      001_0002_0012
+From:         Greg Marlinson <lang@some.web.address.com>
+Text:
+
+Looking up the docs for system,
+
+           The return value is the exit status of the program as returned
+           by the "wait" call. To get the actual exit value shift right by
+           eight (see below). See also "exec". This is *not* what you want
+           to use to capture the output from a command, for that you should
+           use merely backticks or "qx//", as described in "`STRING`" in
+           perlop. Return value of -1 indicates a failure to start the
+           program (inspect $! for the reason).
+
+I always interpreted that passage to mean it was optional, which one 
+you used, if you were only interested in the output!
+
+For qx//
+
+   qx/STRING/
+   `STRING`
+           A string which is (possibly) interpolated and then executed as a
+           system command with "/bin/sh" or its equivalent. Shell
+           wildcards, pipes, and redirections will be honored. The
+           collected standard output of the command is returned; standard
+           error is unaffected. 
+
+What does that unaffected mean? The same thing happens to it as any
+error message the program generates?
+
+-- 
+Greg Marlinson, Taiwan
+
+--__--__--
+

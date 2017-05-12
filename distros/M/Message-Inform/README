@@ -1,0 +1,159 @@
+NAME
+    Message::Inform - Intelligently distribute messages over time
+
+SYNOPSIS
+        use Message::Inform;
+
+        sub a1 {
+            my %args = @_;
+            #$args{message}
+            #$args{action}
+            #$args{inform_instance}
+            #$args{inform_instance_name}
+            #$args{interval_time}
+        }
+        my $inform = Message::Inform->new;
+        $inform->config({
+            informs => [
+                {   inform_name => 'i1',
+                    match => { x => 'y' },
+                    close_match => { x => 'y', level => 'OK' },
+                    instance => ' specials/"i1:$message->{a}"',
+                    intervals => {
+                        '0' => [    #right away
+                            {   action_type => 'open',
+                                action_name => 'a1',
+                            },{ action_type => 'close',
+                                action_name => 'a1',
+                            }
+                        ],
+                        '2' => [   #2 seconds
+                            {   action_type => 'open',
+                                action_name => 'a1',
+                            },{ action_type => 'intermediate',
+                                action_name => 'a1',
+                            }
+                        ],
+                    }
+                }
+            ],
+            action_map => {
+                a1 => 'main::a1',
+            },
+        });
+
+        $inform->message({x => 'y', a => 'b'});
+        #main::a1() calls with this message immediately.
+        for (1..4) {
+            $inform->message();
+            sleep 1;
+        }
+        #main::a1() calls with the previous message as an 'open' in 2
+        #seconds
+        $inform->message({x => 'y', a => 'b', something => 'else'});
+        #main::a1() immediately calls as an 'intermediate'
+        $inform->message({x => 'y', a => 'b', level => 'OK'});
+        #main::a1() immediately calls as a 'close'
+
+DESCRIPTION
+    This module obviously has some 'deep' and 'subtle' behaviour; this 0.1
+    release won't describe that, but future releases certainly will.
+
+SUBROUTINES/METHODS
+  new(state => $previous_state)
+    Typical constructor. Pass in the output from get_state() to resume
+    operations as they were at that time.
+
+  config($config)
+    Set initial config or update running config at any time.
+
+  get_message_configs($message)
+    Returns all of the merged configs that will apply to the passed in
+    message.
+
+  get_relevant_informs($message)
+    Returns all of the informs that would apply to the passed in message.
+
+  message($message)
+    Send a message into Inform. This can be called with no arguments to
+    trigger timed Inform fires if there's no other messages to be sent.
+
+  get_state()
+    Called with no argument, this returns the necessary state to be passed
+    into a future constructor. The module will then continue to function in
+    exactly the same state as it was when get_state() was called.
+
+  fire_action($message, $action)
+    This might not want to be a public method, but it is for now.
+
+AUTHOR
+    Dana M. Diederich, "diederich@gmail.com"
+
+BUGS
+    Please report any bugs or feature requests through
+    <https://github.com/dana/perl-Message-Inform/issues>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Message::Inform
+
+    You can also look for information at:
+
+    *   Report bugs here:
+
+        <https://github.com/dana/perl-Message-Inform/issues>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Message-Inform>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Message-Inform>
+
+    *   Search CPAN
+
+        <https://metacpan.org/module/Message::Inform>
+
+LICENSE AND COPYRIGHT
+    Copyright 2013 Dana M. Diederich.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a copy
+    of the full license at:
+
+    <http://www.perlfoundation.org/artistic_license_2_0>
+
+    Any use, modification, and distribution of the Standard or Modified
+    Versions is governed by this Artistic License. By using, modifying or
+    distributing the Package, you accept this license. Do not use, modify,
+    or distribute the Package, if you do not accept this license.
+
+    If your Modified Version has been derived from a Modified Version made
+    by someone other than you, you are nevertheless required to ensure that
+    your Modified Version complies with the requirements of this license.
+
+    This license does not grant you the right to use any trademark, service
+    mark, tradename, or logo of the Copyright Holder.
+
+    This license includes the non-exclusive, worldwide, free-of-charge
+    patent license to make, have made, use, offer to sell, sell, import and
+    otherwise transfer the Package with respect to any patent claims
+    licensable by the Copyright Holder that are necessarily infringed by the
+    Package. If you institute patent litigation (including a cross-claim or
+    counterclaim) against any party alleging that the Package constitutes
+    direct or contributory patent infringement, then this Artistic License
+    to you shall terminate on the date that such litigation is filed.
+
+    Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+    AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+    THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+    PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+    YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+    CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

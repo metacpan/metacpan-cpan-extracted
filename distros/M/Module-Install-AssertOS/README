@@ -1,0 +1,54 @@
+NAME
+    Module::Install::AssertOS - A Module::Install extension to require that
+    we are running on a particular OS
+
+SYNOPSIS
+      # In Makefile.PL
+
+      use inc::Module::Install;
+      assertos qw(Linux FreeBSD Cygwin);
+
+    The Makefile.PL will die unless the platform the code is running on is
+    Linux, FreeBSD or Cygwin.
+
+DESCRIPTION
+    Module::Install::AssertOS is a Module::Install extension that integrates
+    Devel::AssertOS so that CPAN authors may easily stipulate which
+    particular OS environments their distributions may be built and
+    installed on.
+
+    The author specifies which OS or OS families are supported. The
+    necessary Devel::AssertOS files are copied to the "inc/" directory along
+    with the Module::Install files.
+
+    On the module user side, the bundled "inc/" Devel::AssertOS determines
+    whether the current environment is supported or not and will die
+    accordingly.
+
+COMMANDS
+    This plugin adds the following Module::Install command:
+
+    "assertos"
+        Requires a list of OS or OS families that you wish to support. Check
+        with Devel::CheckOS and Devel::CheckOS::Families for more details of
+        what you may specify.
+
+AUTHOR
+    Chris "BinGOs" Williams
+
+    Based on use-devel-assertos by David Cantrell
+
+LICENSE
+    Copyright © Chris Williams and David Cantrell
+
+    This module may be used, modified, and distributed under the same terms
+    as Perl itself. Please see the license that came with your Perl
+    distribution for details.
+
+SEE ALSO
+    Module::Install
+
+    Devel::AssertOS
+
+    Devel::CheckOS
+

@@ -1,0 +1,12 @@
+Revision history for Perl extension MP3::Mplib.
+
+0.02 Sun Mar  7 10:38:47 CET 2004
+	- update of mplib to 1.0.1 by 
+	  Alex Izvorski (izv AT dslextreme DOT com,
+	  thanks!
+	- shut up a few warnings on 'make test'
+	
+0.01  Sat Oct  5 10:35:51 2002
+	- original version; created by h2xs 1.21 with options
+		-O -n MP3::Mplib mplib.h
+

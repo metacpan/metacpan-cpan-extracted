@@ -1,0 +1,36 @@
+---
+abstract: 'Recursively scan Perl code for dependencies'
+author:
+  - 'Audrey Tang <cpan@audreyt.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+  Test::Requires: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-ScanDeps
+no_index:
+  directory:
+    - t
+    - inc
+  package:
+    - Module::ScanDeps::Cache
+    - Module::ScanDeps::DataFeed
+requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  Getopt::Long: '0'
+  Module::Metadata: '0'
+  Text::ParseWords: '0'
+  perl: '5.008001'
+  version: '0'
+resources:
+  repository: git://github.com/rschupp/Module-ScanDeps.git
+version: '1.23'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

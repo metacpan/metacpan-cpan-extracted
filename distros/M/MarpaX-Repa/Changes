@@ -1,0 +1,13 @@
+0.11 2017-03-25
+
+    * new option 'complete' in lexer
+
+0.10 2014-03-19
+
+    * INCOMPATIBLE CHANGE: recognizer is now argument in
+      recognize method
+    * longest_expected option for lexer - longest acceptable tokens matching
+    * check option for tokens
+    * do_rule_list action
+    * more documentation
+    * bump Marpa version, test fail with older

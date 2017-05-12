@@ -1,0 +1,34 @@
+Math-Gauss version 0.01
+=======================
+
+This module provides, for the Gaussian probability distribution:
+- the probability density
+- the cumulative distribution function
+- the inverse of the cumulative distribution function
+in one convenient bundle.
+
+The emphasis is on simplicity and portability (pure Perl!), with
+"good enough" accuracy in the results.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+No dependencies on other modules.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Philipp K. Janert
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

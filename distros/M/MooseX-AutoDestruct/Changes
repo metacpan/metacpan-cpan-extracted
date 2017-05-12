@@ -1,0 +1,51 @@
+Changes for MooseX::AutoDestruct
+
+0.009     2011-11-06 19:49:57 America/Los_Angeles
+
+0.008     2011-09-28 18:37:39 America/Los_Angeles
+	* We were using a hardcoded '$_[0]' at some points in our inline code
+	  generator, when we shouldn't have.  Fixed.
+	* The test suite now runs all tests against mutable test classes, then
+  	  again against immutable test classes.
+    * Switch no smart-comments tests to DZ::Plugin::NoSmartCommentsTests
+
+0.007     2011-03-12 20:47:06 America/Los_Angeles
+    * Switch over to Dist::Zilla
+    * Ensure V1Traits has the main module loaded so the inline packages
+      are present
+
+0.006 - Mon  7 Mar 2011
+    * Make sure all our packages have a $VERSION -- not having this was
+      causing problems with the CPAN indexer.
+
+0.005 - Mon  7 Mar 2011
+    * We now suppport Moose v2 (whenever it comes out :))  The traits were
+      refactored into versioned traits, and the register_implementation()
+      function was made smarter to deal with this as well.
+
+0.004 - Sun Aug 15 2010
+	* AutoDestruct now uses the generated clearer method, if we have one,
+	  rather than clearing inline.  (This should allow clearer wrappers to
+	  work as expected.)
+
+0.003 - Mon Jul 19 2010
+	* Fix inline clearing code; add tests
+	* Skip meta tests at the moment (not written/ready)
+
+0.002 - Fri Jul 16 2010
+	* add very basic (and redundant) builder tests
+	* make the test suite a touch quieter
+	* first non-developer release!
+
+0.001_03 - Thu Jul  8 2010
+	* Remove an errant requires
+	* Doc improvements
+
+0.001_02 - Tue Jul  6 2010
+	* Additional tests exercising the attribute from the meta side of things
+	* Correct how enforce_doomsday() was calling doomsday() (namely, now it
+	  passes the instance to doomsday() like it should
+
+0.001_01 - Sun Jul  4 2010
+	* Initial release -- marked as developer, as we need more tests!
+

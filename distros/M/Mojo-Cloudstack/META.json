@@ -1,0 +1,61 @@
+{
+   "abstract" : "API Request and class generator for Apache Cloudstack",
+   "author" : [
+      "Holger Rupprecht <holger.rupprecht@gmx.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-Cloudstack",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0",
+            "Test::Exception" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::HMAC_SHA1" : "1.03",
+            "File::HomeDir" : "0",
+            "IO::Socket::SSL" : "2.020",
+            "Mojolicious" : "0",
+            "URI::Encode" : "0",
+            "URL::Encode" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojo::Cloudstack" : {
+         "file" : "lib/Mojo/Cloudstack.pm",
+         "version" : "0.07"
+      },
+      "Mojo::Cloudstack::Api" : {
+         "file" : "lib/Mojo/Cloudstack/Api.pm"
+      },
+      "Mojo::Cloudstack::Base" : {
+         "file" : "lib/Mojo/Cloudstack/Base.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ]
+   },
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

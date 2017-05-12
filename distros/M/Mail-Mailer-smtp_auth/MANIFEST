@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/Mail/Mailer/smtp_auth.pm
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/pod.t
+Makefile.PL

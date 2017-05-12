@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d703c145554a9e854f8b261167222571c9dce48c BUGS
+SHA1 3acf03cc856f66ec70a6295b9a3235e93b78d942 CHANGES
+SHA1 d6a6c30ee6d9ba6b9afab8bbf6a25e1b23c744e0 LICENSE
+SHA1 5b5afe134deec12484b6b68c3430b2eb161824d8 MANIFEST
+SHA1 3e58fb1b7236099b34895ffdd7efcc69d7e4f5e0 META.json
+SHA1 e1a30d2adad4234e6579d8bc1210b70115904f9b META.yml
+SHA1 af4ce6304976e7072ba703647a453789ddb379a3 Makefile.PL
+SHA1 fa23172f6c9445f82d09680a2f7d42ea386b36e2 NEW
+SHA1 01bbea795f48c9579ec299907c8d437c89b11375 README
+SHA1 69e12df66dcf597d4927452d7181c0b201edde3b TODO
+SHA1 699ef882e398be99f8df4c02318c064aa69b9722 lib/Math/Roman.pm
+SHA1 04f5e2d65c08653450db029d8efb3ac425e5edd0 t/romanpm.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYkcS/AAoJEGcmPl2fr166Ct0H/3+/KthfhpaYuP8mArdBpQQ+
+0HU/NEK1jB+RDCMoAneU4S45WcXOtNPdTUamz4euJdKmaQ4cwsY94TgIGs8yEazy
+uBg6hlljTD5mgMhC8pLhTe1sORUVd1MG9iejVpqzGTk5bdqrmB3OcP0rcTA35swM
+wxINXXK21VEluaPXAB0Ggick0pAQTpPy6/U4w42RnMSa4rtsk+Vym4lwQ+6gdmTI
+jEFfyvYS9usjy82rZyahJDVJcqGUJQVy0xNxE/WMAHNa7GGTgcwbiRaLF97JlhOn
+kKYHFdVaZ9Wmgpq/YhbLlv+o+R5ufT6uL0q6eCeSt6akKtPzR3WinOkLdaiqkFw=
+=N9cT
+-----END PGP SIGNATURE-----

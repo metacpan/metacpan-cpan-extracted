@@ -1,0 +1,193 @@
+#!/usr/bin/perl -w
+
+use warnings;
+use strict;
+
+use Getopt::Compact;
+use IO::Handle;
+use Module::Load;
+
+=head1 NAME
+ 
+mcbain2pod - Generate a POD file for a McBain API
+
+=head1 SYNOPSIS
+
+	# in the command line
+	$ mcbain2pod -o myapi.pod MyAPI
+ 
+=head1 DESCRIPTION
+
+C<mcbain2pod> is a simple command line utility to automatically generate documentation
+in POD format for a L<McBain> API.
+
+This is pretty simply at the moment, it will describe basic usage of your API, and
+will list all routes and methods defined by the API (in all its topics, not just
+the root one), using the description given to them during definition (if any),
+and list the parameters they except to receive.
+
+Usage is simply, just give the script the package name of your API. The script will
+try to find it in C<@INC>, which you can manipulate using the C<-I> switch (see L</"OPTIONS">).
+
+=head1 OPTIONS
+
+=head2 -I, --include
+
+Specify a directory for C<@INC> where to search for the API
+
+=head2 -o, -output
+
+Print the generated POD into the specified file instead of to standard output
+
+=head2 -h, --help
+
+Display usage information
+
+=cut
+
+my $go = Getopt::Compact->new(
+	args => 'module',
+	struct => [
+		[[qw/I include/], 'specify @INC directory', ':s'],
+		[[qw/o output/], 'output pod to file instead of STDOUT', ':s']
+	]
+);
+
+unless (scalar @ARGV) {
+	print $go->usage;
+	exit 1;
+}
+
+my $opts = $go->opts;
+
+if ($opts->{include}) {
+	push(@INC, $opts->{include});
+}
+
+if ($opts->{output}) {
+	open(OUTPUT, '>', $opts->{output})
+		|| die "Can't open $opts->{output}: $!";
+	STDOUT->fdopen(\*OUTPUT, 'w')
+		|| die "Can't redirect output: $!";
+}
+
+binmode STDOUT, ':encoding(utf8)';
+
+my $api = $ARGV[0];
+
+# okay, try to load that API
+load $api;
+
+# is this really a McBain API?
+die "$api is not a McBain API"
+	unless exists $McBain::INFO{$api};
+
+print "=encoding utf8
+
+=head1 NAME
+
+$api
+
+=head1 USAGE
+
+You can use the $api API in several ways, the easiest being directly
+from Perl code. See L<McBain::Directly> for more information.
+
+A simple example:
+
+	use $api;
+
+	my \$result = $api->call('GET:/some_route', \%params);
+
+You can also load $api as a RESTful web service (with L<McBain::WithPSGI>),
+as a Gearman worker (with L<McBain::WithGearmanXS>), and possibly other
+C<McBain::With*> modules available from CPAN.
+
+=head1 ROUTES
+
+The following routes are provided by this API:
+
+";
+
+my $routes = $McBain::INFO{$api};
+
+foreach my $route (sort keys %$routes) {
+	foreach my $method (sort keys %{$routes->{$route}}) {
+		my $opts = $routes->{$route}->{$method};
+		print "=head2 $method $route\n\n";
+		if ($opts->{description}) {
+			print "$opts->{description}\n\n";
+		} else {
+			print "No description provided\n\n";
+		}
+		if ($opts->{params}) {
+			print "Expects the following parameters:\n\n=over\n\n";
+			foreach my $param (sort keys %{$opts->{params}}) {
+				print "=item * B<$param>: ", join(', ', keys %{$opts->{params}->{$param}}), "\n\n";
+			}
+			print "=back\n\n";
+		}
+	}
+}
+
+print "=cut\n";
+
+=head1 SEE ALSO
+
+L<McBain>
+
+=head1 BUGS AND LIMITATIONS
+
+Please report any bugs or feature requests to
+C<bug-McBain@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=McBain>.
+ 
+=head1 SUPPORT
+ 
+You can find documentation for this module by invoking it with
+the C<-h> switch:
+ 
+	mcbain2pod -h
+ 
+=head1 AUTHOR
+ 
+Ido Perlmuter <ido@ido50.net>
+ 
+=head1 LICENSE AND COPYRIGHT
+ 
+Copyright (c) 2013, Ido Perlmuter C<< ido@ido50.net >>.
+ 
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself, either version
+5.8.1 or any later version. See L<perlartistic|perlartistic>
+and L<perlgpl|perlgpl>.
+ 
+The full text of the license can be found in the
+LICENSE file included with this module.
+ 
+=head1 DISCLAIMER OF WARRANTY
+ 
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+ 
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+ 
+=cut
+
+__END__

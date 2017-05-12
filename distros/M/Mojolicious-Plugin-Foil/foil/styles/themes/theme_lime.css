@@ -1,0 +1,105 @@
+/* ================================================================== */
+/* THEME: Lime
+ */
+/* ================================================================== */
+/* THEME: Teal - fonts
+ */
+/* ------------------------------------------------------------------ */
+/* Fonts */
+h1, h2, h3, h4 {
+  font-family: Arabia, verdana, helvetica, arial, sans-serif;
+  font-weight: normal;
+  color: black;
+}
+
+/* ================================================================== */
+/* ICONS - dark on light
+ * Nav arrows with transparent backgrounds
+ */
+.side nav li > ul {
+  list-style-image: url(nav_black.png);
+}
+
+/* ================================================================== */
+/* General */
+.verge, header,
+footer, .side, .fancy {
+  color: #1a3300;
+  background: #82c144;
+  border-color: #336600;
+}
+
+header,
+footer {
+  background: linear-gradient(#b4cd6a, #82c144);
+}
+
+.side {
+  background: linear-gradient(to right, #82c144, #b4cd6a);
+}
+
+body {
+  color: #1a3300;
+  background: #9cbe79;
+}
+
+a:link {
+  color: #003300;
+}
+
+a:visited {
+  color: #333300;
+}
+
+.fancy {
+  color: #1a3300;
+  background-image: url("silver3.jpg");
+  border: 5px double #4f7e20;
+  padding: 0;
+}
+.fancy li {
+  padding: 0.5em;
+  margin: 5px;
+  border: 5px solid #4f7e20;
+  background-color: #82c144;
+  background: linear-gradient(#82c144, #738a2e);
+}
+.fancy li a:link {
+  color: #003300;
+}
+.fancy li a:visited {
+  color: #333300;
+}
+
+.button, input[type=submit], header nav a,
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: #e4ebe0;
+  border-color: #336600;
+  background-color: #427728;
+}
+
+.button a:link, input[type=submit] a:link, header nav a a:link,
+header nav .selflink a:link,
+header nav em a:link,
+header nav .current a a:link, a.button:link, header nav a:link {
+  color: #e4ebe0;
+}
+
+.button a:visited, input[type=submit] a:visited, header nav a a:visited,
+header nav .selflink a:visited,
+header nav em a:visited,
+header nav .current a a:visited, a.button:visited, header nav a:visited {
+  color: #e0f76e;
+}
+
+header nav li {
+  border-color: #336600;
+}
+
+header nav .selflink,
+header nav em,
+header nav .current a {
+  background-color: #9cbe79;
+}

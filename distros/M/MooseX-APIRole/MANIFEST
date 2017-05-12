@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/MooseX/APIRole.pm
+lib/MooseX/APIRole/Internals.pm
+lib/MooseX/APIRole/Meta.pm
+t/basic.t
+t/internals/class_role.t
+t/internals/role_role.t
+t/release-pod-syntax.t

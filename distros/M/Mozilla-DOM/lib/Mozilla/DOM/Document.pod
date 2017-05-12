@@ -1,0 +1,239 @@
+=head1 NAME
+
+Mozilla::DOM::Document
+
+=for object Mozilla::DOM::Document
+
+Mozilla::DOM::Document is a wrapper around an instance of Mozilla's
+nsIDOMDocument interface. This inherits from
+L<Mozilla::DOM::Node|Mozilla::DOM::Node>.
+
+ * The nsIDOMDocument interface represents the entire HTML or XML document.
+ * Conceptually, it is the root of the document tree, and provides the
+ * primary access to the document's data.
+ * Since elements, text nodes, comments, processing instructions, etc.
+ * cannot exist outside the context of a Document, the nsIDOMDocument
+ * interface also contains the factory methods needed to create these
+ * objects.
+ *
+ * For more information on this interface please see
+ * L<http:E<sol>E<sol>www.w3.orgE<sol>TRE<sol>DOM-Level-2-CoreE<sol>>
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::Document->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $node = $document->B<CreateAttribute>($name)
+
+=over
+
+=over
+
+=item * $name (string)
+
+=back
+
+=back
+
+=head2 $attr = $document->B<CreateAttributeNS>($namespaceURI, $qualifiedName)
+
+=over
+
+=over
+
+=item * $namespaceURI (string)
+
+=item * $qualifiedName (string)
+
+=back
+
+=back
+
+=head2 $node = $document->B<CreateCDATASection>($text)
+
+=over
+
+=over
+
+=item * $data (string)
+
+=back
+
+=back
+
+=head2 $node = $document->B<CreateComment>($text)
+
+=over
+
+=over
+
+=item * $data (string)
+
+=back
+
+=back
+
+=head2 $doc_fragment = $document->B<CreateDocumentFragment>()
+
+=over
+
+=back
+
+=head2 $element = $document->B<CreateElement>($tagname)
+
+=over
+
+=over
+
+=item * $tagname (string)
+
+=back
+
+=back
+
+=head2 $element = $document->B<CreateElementNS>($namespaceURI, $qualifiedName)
+
+=over
+
+=over
+
+=item * $namespaceURI (string)
+
+=item * $qualifiedName (string)
+
+=back
+
+=back
+
+=head2 $node = $document->B<CreateEntityReference>($name)
+
+=over
+
+=over
+
+=item * $name (string)
+
+=back
+
+=back
+
+=head2 $node = $node = $document->B<CreateProcessingInstruction>($target, $text)
+
+=over
+
+=over
+
+=item * $target (string)
+
+=item * $data (string)
+
+=back
+
+=back
+
+=head2 $textnode = $document->B<CreateTextNode>($text)
+
+=over
+
+=over
+
+=item * $data (string)
+
+=back
+
+=back
+
+=head2 $document_type = $document->B<GetDoctype>()
+
+=over
+
+=back
+
+=head2 $element = $document->B<GetDocumentElement>()
+
+=over
+
+=back
+
+=head2 $element = $document->B<GetElementById>($elementId)
+
+=over
+
+=over
+
+=item * $elementId (string)
+
+=back
+
+=back
+
+=head2 $domlist = $document->B<GetElementsByTagName>($tagname)
+
+In scalar context, returns a L<Mozilla::DOM::NodeList|Mozilla::DOM::NodeList>.
+In list context, returns a list of L<Mozilla::DOM::Element|Mozilla::DOM::Element>s.
+
+=over
+
+=over
+
+=item * $tagname (string)
+
+=back
+
+=back
+
+=head2 $element = $document->B<GetElementsByTagNameNS>($namespaceURI, $localName)
+
+In scalar context, returns a L<Mozilla::DOM::NodeList|Mozilla::DOM::NodeList>.
+In list context, returns a list of L<Mozilla::DOM::Element|Mozilla::DOM::Element>s.
+
+=over
+
+=over
+
+=item * $namespaceURI (string)
+
+=item * $localName (string)
+
+=back
+
+=back
+
+=head2 $dom_implementation = $document->B<GetImplementation>()
+
+=over
+
+=back
+
+=head2 $document->B<ImportNode>($node, $deep)
+
+=over
+
+=over
+
+=item * $importedNode (Mozilla::DOM::Node)
+
+=item * $deep (boolean)
+
+=back
+
+$deep = boolean
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

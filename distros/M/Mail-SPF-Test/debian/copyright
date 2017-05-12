@@ -1,0 +1,9 @@
+This is the Debian package for Mail::SPF::Test, which is available from
+<http://search.cpan.org/dist/Mail-SPF-Test>.
+
+(C) 2006 Julian Mehnle <julian@mehnle.net>.  Julian Mehnle is the upstream
+author as well as the maintainer of the Debian package.
+
+This is free software; you may use, modify, and distribute it under the terms
+of the BSD license.  On Debian systems, the complete text of the BSD license
+can be found here: /usr/share/common-licenses/BSD

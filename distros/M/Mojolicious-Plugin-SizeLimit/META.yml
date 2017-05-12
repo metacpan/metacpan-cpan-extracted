@@ -1,0 +1,35 @@
+---
+abstract: 'Terminate workers that grow too large'
+author:
+  - 'Bernhard Graf <graf@cpan.org>'
+build_requires:
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  IO::Socket::INET: '0'
+  Linux::Smaps: '0'
+  Mojolicious: '5.80'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-SizeLimit
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Linux::Smaps: '0'
+  Mojolicious: '5.80'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/augensalat/mojolicious-plugin-sizelimit/issues
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/augensalat/mojolicious-plugin-sizelimit.git
+version: '0.005'

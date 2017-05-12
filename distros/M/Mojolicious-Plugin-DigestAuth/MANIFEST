@@ -1,0 +1,21 @@
+Changes
+INSTALL.SKIP
+lib/Mojolicious/Plugin/DigestAuth.pm
+lib/Mojolicious/Plugin/DigestAuth/DB.pm
+lib/Mojolicious/Plugin/DigestAuth/RequestHandler.pm
+lib/Mojolicious/Plugin/DigestAuth/Util.pm
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/00db.t
+t/01options.t
+t/02digest_auth.t
+t/03url.t
+t/bad_htdigest
+t/good_htdigest
+t/nonce.t
+t/route.t
+t/support_broken_browsers.t
+t/TestHelper.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

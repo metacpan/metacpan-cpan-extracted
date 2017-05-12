@@ -1,0 +1,13 @@
+#include <stdio.h>
+
+int main(void) {
+#ifdef __GNUC__
+ if(__GNUC__ < 4) printf("gcc is too old: version %u.%u.%u\n", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+ else printf("gcc version (%u.%u.%u) is ok\n", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+#else
+ printf("not gcc\n");
+#endif
+
+ return 0;
+}
+

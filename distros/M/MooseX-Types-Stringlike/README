@@ -1,0 +1,96 @@
+NAME
+    MooseX::Types::Stringlike - Moose type constraints for strings or
+    string-like objects
+
+VERSION
+    version 0.003
+
+SYNOPSIS
+      package Foo;
+      use Moose;
+      use MooseX::Types::Stringlike qw/Stringlike Stringable ArrayRefOfStringlike ArrayRefOfStringable/;
+
+      has path => (
+        is => 'ro',
+        isa => Stringlike,
+        coerce => 1
+      );
+
+      has stringable_object => (
+        is => 'ro',
+        isa => Stringable,
+      );
+
+      has paths => (
+        is => 'ro',
+        isa => ArrayRefOfStringlike,
+        coerce => 1
+      );
+
+      has stringable_objects => (
+        is => 'ro',
+        isa => ArrayRefOfStringable,
+      );
+
+DESCRIPTION
+    This module provides a more general version of the "Str" type. If
+    coercions are enabled, it will accepts objects that overload
+    stringification and coerces them into strings.
+
+SUBTYPES
+    This module uses MooseX::Types to define the following subtypes.
+
+  Stringlike
+    "Stringlike" is a subtype of "Str". It can coerce "Stringable" objects
+    into a string.
+
+  Stringable
+    "Stringable" is a subtype of "Object" where the object has overloaded
+    stringification.
+
+  ArrayRefOfStringlike
+    "ArrayRefStringlike" is a subtype of "ArrayRef[Str]". It can coerce
+    "ArrayRefOfStringable" objects into an arrayref of strings.
+
+  ArrayRefOfStringable
+    "ArrayRefOfStringable" is a subtype of "ArrayRef[Object]" where the
+    objects have overloaded stringification.
+
+SEE ALSO
+    *   Moose::Manual::Types
+
+    *   MooseX::Types
+
+    *   MooseX::Types::Moose
+
+ACKNOWLEDGMENTS
+    Thank you to Dagfinn Ilmari Mannsåker for the idea on IRC that led to
+    this module.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/MooseX-Types-Stringlike/issues>. You will
+    be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/MooseX-Types-Stringlike>
+
+      git clone https://github.com/dagolden/MooseX-Types-Stringlike.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTOR
+    Karen Etheridge <ether@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

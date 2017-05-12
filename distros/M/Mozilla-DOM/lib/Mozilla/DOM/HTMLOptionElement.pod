@@ -1,0 +1,114 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLOptionElement
+
+=for object Mozilla::DOM::HTMLOptionElement
+
+Mozilla::DOM::HTMLOptionElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLOptionElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLOptionElement interface is the interface to a [X]HTML
+ * option element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLOptionElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $bool = $htmloptionelement->B<GetDefaultSelected>()
+
+=head2 $bool = $htmloptionelement->B<GetDisabled>()
+
+=head2 $form = $htmloptionelement->B<GetForm>()
+
+=head2 $index = $htmloptionelement->B<GetIndex>()
+
+=head2 $label = $htmloptionelement->B<GetLabel>()
+
+=head2 $bool = $htmloptionelement->B<GetSelected>()
+
+=head2 $text = $htmloptionelement->B<GetText>()
+
+=head2 $value = $htmloptionelement->B<GetValue>()
+
+=head2 $htmloptionelement->B<SetDefaultSelected>($defaultselected)
+
+=over
+
+=over
+
+=item * $defaultselected (boolean)
+
+=back
+
+=back
+
+=head2 $htmloptionelement->B<SetDisabled>($disabled)
+
+=over
+
+=over
+
+=item * $disabled (boolean)
+
+=back
+
+=back
+
+=head2 $htmloptionelement->B<SetLabel>($label)
+
+=over
+
+=over
+
+=item * $label (string)
+
+=back
+
+=back
+
+=head2 $htmloptionelement->B<SetSelected>($selected)
+
+=over
+
+=over
+
+=item * $selected (boolean)
+
+=back
+
+=back
+
+=head2 $htmloptionelement->B<SetValue>($value)
+
+=over
+
+=over
+
+=item * $value (string)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

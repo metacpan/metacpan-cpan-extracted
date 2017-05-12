@@ -1,0 +1,59 @@
+Revision history for Mojolicious-Plugin-WriteExcel (formerly known as
+MojoX-Renderer-WriteExcel)
+
+2.05 2015-02-28T06:38:01Z
+        Use reply->exception helper, thanks to Bryan Paxton
+        Bump Mojo requirement to 5.73 per above
+
+2.04 2014-12-10T07:48:21Z
+        Require Mojo 4.0 or newer, Closes #2
+
+2.03 2014-12-08T10:05:37Z
+        Remove use of Mojo::IOLoop for test, Closes #1
+        Switch build to Minilla
+
+2.02    2013-08-17
+        Fix output format to work on newer Mojo
+        Switch build to Dist::Milla
+
+2.01    2011-07-14
+        Bring some docs back
+
+2.00    2011-07-08
+        MojoX::Renderer::WriteExcel is deprecated
+
+1.11    2011-05-18
+        Update for Mojo 1.22
+        fix releast-renderer.t
+
+1.0     2011-01-14
+        Depend on Mojo 0.999930
+        Add extra tests
+        Add render_xls helper
+
+0.41    2010-09-09
+        Versioning fix; no code change
+
+0.4     2010-09-08
+        Add column width enhancement, thanks to Brian Dowling
+        <bdowling-dev@simplicity.net>
+
+0.032   2010-07-06
+        Add more tests for coverage
+
+0.031   2010-06-30
+        Add Test::Mojo to prerequisites; no code change
+
+0.03    2010-06-29
+        Delete encoding key in options hash
+        Add a test
+        Add plugin to simplify usage
+        Use Dist::Zilla to manage dist release
+
+0.02    2010-06-26
+        Don't encode output to string
+        Add example app
+
+0.01    2010-06-26
+        First version, released on an unsuspecting world.
+

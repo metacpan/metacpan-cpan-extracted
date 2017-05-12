@@ -1,0 +1,13 @@
+Revision history for MooX-ValidateSubs
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.06    14/03/2017
+        - Count correctly
+        - Kind of fix optional, so [ [Str], [Str, 1], [Str, 1] ] (logical) actually works.
+        - Replace (shift,shift,shift,shift) with @_ in _validate_sub.]
+
+0.09    16/03/2017
+        - Fix a couple of typos in the pod.
+        - Add some extra tests for around.

@@ -1,0 +1,223 @@
+
+Revision history for Perl suite MIDI-Perl
+
+        
+                                Time-stamp: "2013-02-01 15:40:53 conklin"
+
+2012-11-19  Darrell Conklin  conklin@cpan.org
+
+	* Release 0.83
+
+	* fixed GM patch 45 incorrect name: "Orchestral Strings"->"Pizzicato Strings"
+
+	* added more explanatory error message in Opus.pm (track_count)
+
+	* added a track->skyline() function
+	
+2010-12-23  Darrell Conklin  conklin@cpan.org
+
+	* fixed typo in %Lengths hash in Simple.pm
+
+2010-02-14  Darrell Conklin  conklin@cpan.org
+
+	* maintainer -- DC has taken over as maintainer.  Thanks to SB for
+	his excellent module.
+
+	* Release 0.82
+	
+	* bug fix in Score.pm where events_r_to_score_r would destructively modify events
+
+	* bug fix in Score.pm, when presented with two simultaneous events
+	with the same note/channel, which led to unpredictable durations
+	of score events, sometimes negative.
+	
+	* added grid quantization (to Opus, and Score)
+
+2005-01-29  Sean M. Burke  sburke@cpan.org
+
+	* Release 0.81 -- maintenance release.
+
+	* No Perl changes -- just doc tweaks mostly.
+	
+	* Rearranged the dist's contents to be more modern-like.
+
+	* Of course, more cowbell.
+	
+	
+2002-08-21  Sean M. Burke  sburke@cpan.org
+
+	* Release 0.80 -- just a docfix release, basically
+
+	* Removing the out-dated Filespec.pod file.
+
+	* To work around vstrings in Perl 5.6 (etc), MIDI::Simple volume
+	specifications can now be expressed as V64 (etc), whereas
+	previously you could only do v64.
+	Bumping MIDI::SImple version up to 0.80.
+	
+	
+2000-08-21  Sean M. Burke  sburke@cpan.org
+
+	* Release 0.79
+
+	* Bungled the Makefile on the previous release!  This time should work.
+	
+2000-08-21  Sean M. Burke  sburke@cpan.org
+
+	* Release 0.78
+
+	* Fixed odd bug in MIDI::Score that would prematurely terminate a
+	pending note on one channel if you started (or ended) a note with
+	the same note number on a different channel.
+
+	New logic assumes (safely, I think) that you can only have one
+	note at a time per note-number per channel.  (I.e., you can't
+	start a C5 on channel 3, wait a second, start another C5 on
+	channel 3, and have them both going at the same time.  I think
+	that if you start a C5 on channel 3, then start another, the
+	second will implicitly end the first.  Please do email me if you
+	think this is non-standard behavior for a sequencer.)
+	
+2000-05-20  Sean M. Burke  sburke@cpan.org
+
+	* Release 0.77
+
+	* Fixing an incidental bug in MIDI::Simple (which surfaces only
+	in Perl 5.6, apparently).  Thanks to Matt Burt (m.burt@bcs.org.uk)
+	for finding the bug, as well as noting the fix.
+
+	* Changed MIDI::Score::score_r_to_events_r and
+	MIDI::Score::events_r_to_score_r (which were useful only in list
+	context previously) to do something useful (and rather intuitive)
+	in scalar context.
+	
+	
+2000-05-14  Sean M. Burke  sburke@cpan.org
+
+	* Release 0.76
+
+        * Noting my new email address.
+	
+	* MIDI::_dump_quote() was a bit over-broad in what string values
+	it considered numbers (i.e., what things it didn't have to put
+	quotes around).  I've changed it to leave only integers unquoted.
+	This shouldn't make any difference really, since if ever any Perl
+	code (whether in MIDI-Perl or elsewhere) needs to treat a
+	stringified numeral (whether integer or not) as a numeric value,
+	conversion is automatic.  Anyhow, almost all (absolutely all?) of
+	the actual numeric arguments to MIDI::Event events are integers.
+
+
+2000-03-05  Sean M. Burke  sburke@netadventure.net
+
+	* Release 0.75
+
+	* ChangeLog now goes recent-to-old, not old-to-recent
+
+	* Changes in this version were mostly made in August 1999, but
+	just never released:
+
+	* A few optimizations to Event.pm's loops.
+
+	* Opus.pm now does a little more sanity-checking, to avoid
+	attempting reads of insane sizes, such as might be attempted in
+	the case of parsing a mangled file.
+
+1999-05-13  Sean M. Burke  sburke@netadventure.net
+
+	* Release 0.74
+
+	* Just made a few things friendlier to people using perl -w
+	(warnings)
+
+	* Did ya see my article on MIDI-Perl in /The Perl Journal/ #14?
+	See www.tpj.com for back issues, or email me -- I might
+	have it in some sort of electronic format.
+
+1999-01-10  Sean M. Burke  sburke@netadventure.net
+
+	* Release 0.73
+
+	* Just some changes to the docs:
+	Changed the MIDI homepage URL.
+	Added the Langston reference.
+
+1998-11-09  Sean M. Burke  sburke@netadventure.net
+
+	* Release 0.72
+
+	* Shigeaki Kobayashi <xxkoby@pep.ne.jp> pointed out a bug in
+	MIDI::Opus's $opus->draw that was making it always ignore its
+	options hashref.  Fixed.
+	
+	* More carps/croaks instead of warn/dies.
+
+1998-11-04  Sean M. Burke  sburke@netadventure.net
+
+	* Release 0.71
+
+	* Docs for MIDI::Simple are more complete now.
+	
+	* An obscure bit of note_map's behavior changed.
+	But you'd never know, because this is the first version
+	that ever documented note_map at all.
+
+	* Added relative octave specs: o_d3, o_u3.
+
+1998-10-18  Sean M. Burke  sburke@netadventure.net
+
+	* Release 0.70
+	
+	* Some stupid typos in MIDI.pm fixed.
+
+	* MIDI::Simple greatly expanded and changed.  Almost
+	a total rewrite, in fact -- too many changes to explain.
+	Docs are feeble, tho.
+
+	* More modules use strict now.
+
+1998-08-16  Sean M. Burke  sburke@netadventure.net
+
+        * Release 0.62: Hooboy! Third release in a 24-hour period!
+	This time to fix a lame big in MIDI::Score.
+
+1998-08-16  Sean M. Burke  sburke@netadventure.net
+
+	* Release 0.61: Feh.  Forgot to re-comment out the debug code
+	in MIDI::Simple
+
+1998-08-16  Sean M. Burke  sburke@netadventure.net
+
+	* Release 0.60: 
+	Subtly destructive bug in MIDI::_dump_quote fixed.
+	
+	MIDI::Event::copy_structure didn't work; fixed.
+	
+	%MIDI::note2number and %MIDI::note2number were named backwards --
+	note2number actually mapped numbers to notes, and number2note
+	mapped notes to numbers.  It made no sense, so I reversed it.
+
+	Ditto patch2number and number2patch!  What was I thinking?
+
+	Typos in %MIDI::note2number fixed.  All the A#'s were "A#" instead
+	of "A#3" or whatever.  I also changed the "#" for sharp to "s",
+	giving, e.g., "As3" instead of "A#3".  This gives a representation
+	compatable with MIDI::Simple's notation.  But note that
+	%MIDI::note2number doesn't contain all of the possible ways
+	MIDI::Simple could let you represent a note -- just a
+	(semi-quirky) subset of them.
+	
+	New module MIDI::Simple.
+	
+	Added MIDI::Event:: score subs, to support draw() and
+	MIDI::Simple.
+	
+	Added MIDI::Opus::draw and supporting subs.
+
+1998-08-14  Sean M. Burke  sburke@netadventure.net
+
+	* Release 0.52:  makefile fix.  chimes example in MIDI.pm
+
+1998-08-13  Sean M. Burke  sburke@netadventure.net
+
+	* Release 0.51:  First CPAN release.  Get it while it's hot!

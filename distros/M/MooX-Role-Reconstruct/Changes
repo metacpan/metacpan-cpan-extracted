@@ -1,0 +1,7 @@
+Revision history for Perl module MooX::Role::Reconstruct
+
+v0.1.2 2014-11-02
+    - added missing dependencies to Makefile.PL
+
+v0.1_1 2014-11-02
+    - original version

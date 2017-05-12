@@ -1,0 +1,49 @@
+0.09
+ - Fix bungled NV_IS_FLOAT128 code in Rmpfi_set_NV, Rmpfi_get_NV and overload_equiv.
+
+0.08
+ - Amend typedef of __float128 alignment (Windows only)
+ - Replace SvUV/SvIV/SvNV with SvUVX/SvIVX/SvNVX where appropriate. (In typemap, too.)
+ - Alter NV overloading - replace the condition (SvNOK(b)) with (SvNOK(b) && !SvPOK(b))
+ - Add Rmpfi_set_NV and Rmpfi_get_NV.
+
+0.07
+ - Further tweaks for builds where nvtype is __float128
+
+0.06
+ - Accommodate $Config{nvtype} eq __float128
+ - No longer define USE_64_BIT_INT if ivtype is 'long'.
+ - Rename USE_64_BIT_INT #define to MATH_MPFI_NEED_LONG_LONG_INT
+ - Define IVSIZE_BITS if MATH_MPFI_NEED_LONG_LONG_INT has been defined.
+ - Version 3.23 of Math::MPFR now a pre-requisite.
+
+0.05
+ - Alter the way that strEQ gets hold of HvNAME(SvSTASH(SvRV(sv))) - so that -Wall
+    doesn't emit "null argument" warnings. (Thanks Daniel Kahn Gillmor.)
+ - _has_inttypes() no longer checks for whether USE_LONG_DOUBLE is defined.
+   (Was harmless ... but didn't make much sense.)
+ - Define PERL_NO_GET_CONTEXT
+ - Tweak to Math::MPFI::gmp_v()
+ - Add metadata to Makefile.PL
+
+0.04
+ - Fix t/tls.t
+
+0.03
+ - Remove 'not' from overloads. Apparently achieved nothing anyway, and 5.16
+   warns that it's invalid.
+ - Add MPFI_VERSION_MAJOR, MPFI_VERSION_MAJOR, MPFI_VERSION_PATCHLEVEL
+   and MPFI_VERSION_STRING (mpfi-1.5.1 and later only).
+ - In aab_basic.t, check that library and header versions match
+   (mpfi-1.5.1 and later only).
+
+0.02
+ - Add documentation of gmp_v and mpfr_v (previously missed).
+ - In aab_basic.t print out the mpfr and mpc library versions being
+   used, as reported by the library in use.
+ - In MPFI.xs change mpfr_v() to return the library version instead
+   of the mpfr header version (as had previously been the case).
+ - Minor doc fix.
+
+0.01
+ - First release.

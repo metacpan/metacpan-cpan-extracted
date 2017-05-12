@@ -1,0 +1,70 @@
+{
+   "abstract" : "Simple Log::Dispatch replacement of Mojo::Log",
+   "author" : [
+      "Gryphon Shafer <gryphon@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MojoX-Log-Dispatch-Simple",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojo::Base" : "0",
+            "Mojo::Util" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Log::Dispatch" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gryphonshafer/MojoX-Log-Dispatch-Simple/issues"
+      },
+      "homepage" : "https://github.com/gryphonshafer/MojoX-Log-Dispatch-Simple",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gryphonshafer/MojoX-Log-Dispatch-Simple.git",
+         "web" : "https://github.com/gryphonshafer/MojoX-Log-Dispatch-Simple"
+      }
+   },
+   "version" : "1.05"
+}
+

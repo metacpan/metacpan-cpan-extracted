@@ -1,0 +1,15 @@
+0.004 Sun, 12 Apr 2009 20:44:02 -0400
+
+  - Rename in tests, too
+
+0.003 Fri, 10 Apr 2009 19:16:47 -0400
+
+  - Rename the distribution and module
+
+0.002 Thu, 09 Apr 2009 17:18:15 -0400
+
+  - Allow secret parameter for turning off 'requires'
+
+0.001 Sat, 04 Apr 2009 00:28:42 -0400
+
+  - First release

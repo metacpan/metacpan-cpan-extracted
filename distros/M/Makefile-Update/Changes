@@ -1,0 +1,18 @@
+Revision history for Perl module Makefile::Update.
+
+0.3	2015-10-03T22:12:51Z
+
+  * [Makefile] Support lists of files with different extensions (e.g. .c/.cpp).
+  * Allow defining variables in terms of other variables.
+  * Added changelog.
+  * Correct meta-information in the module description.
+
+0.2	2014-12-28T03:12:34Z
+
+  * Added support for updating makefiles and older MSVC++ project files.
+  * Initial CPAN release.
+
+0.1	2014-05-30T23:59:53Z
+
+  * Implements updating MSBuild project files.
+  * Initial release as part of wxWidgets project.

@@ -1,0 +1,101 @@
+From a96183f8281c6e8b0a42c5a05146a96f9540b673 Mon Sep 17 00:00:00 2001
+From: ph10 <ph10@6239d852-aaf2-0410-a92c-79f79f948069>
+Date: Wed, 22 Mar 2017 15:12:06 +0000
+Subject: [PATCH] Fix misbehaving DFA match for possessively repeated character
+ class (Bugzilla 2086).
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Ported to 10.23:
+
+commit 46399965f23c3efc1197823d1cd54084b27d9174
+Author: ph10 <ph10@6239d852-aaf2-0410-a92c-79f79f948069>
+Date:   Wed Mar 22 15:12:06 2017 +0000
+
+    Fix misbehaving DFA match for possessively repeated character class (Bugzilla
+    2086).
+
+    git-svn-id: svn://vcs.exim.org/pcre2/code/trunk@698 6239d852-aaf2-0410-a92c-79f79f948069
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ src/pcre2_dfa_match.c | 10 ++++++----
+ testdata/testinput6   |  3 +++
+ testdata/testoutput6  |  4 ++++
+ 3 files changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/src/pcre2_dfa_match.c b/src/pcre2_dfa_match.c
+index c909d61..519a147 100644
+--- a/src/pcre2_dfa_match.c
++++ b/src/pcre2_dfa_match.c
+@@ -544,7 +544,7 @@ for (;;)
+   BOOL partial_newline = FALSE;
+   BOOL could_continue = reset_could_continue;
+   reset_could_continue = FALSE;
+-
++  
+   if (ptr > mb->last_used_ptr) mb->last_used_ptr = ptr;
+ 
+   /* Make the new state list into the active state list and empty the
+@@ -597,7 +597,7 @@ for (;;)
+     int state_offset = current_state->offset;
+     int rrc;
+     int count;
+-
++    
+     /* A negative offset is a special case meaning "hold off going to this
+     (negated) state until the number of characters in the data field have
+     been skipped". If the could_continue flag was passed over from a previous
+@@ -633,7 +633,7 @@ for (;;)
+ 
+     code = start_code + state_offset;
+     codevalue = *code;
+-
++    
+     /* If this opcode inspects a character, but we are at the end of the
+     subject, remember the fact for use when testing for a partial match. */
+ 
+@@ -2539,11 +2539,13 @@ for (;;)
+           if (isinclass)
+             {
+             int max = (int)GET2(ecode, 1 + IMM2_SIZE);
+-            if (*ecode == OP_CRPOSRANGE)
++
++            if (*ecode == OP_CRPOSRANGE && count >= (int)GET2(ecode, 1))
+               {
+               active_count--;           /* Remove non-match possibility */
+               next_active_state--;
+               }
++
+             if (++count >= max && max != 0)   /* Max 0 => no limit */
+               { ADD_NEW(next_state_offset + 1 + 2 * IMM2_SIZE, 0); }
+             else
+diff --git a/testdata/testinput6 b/testdata/testinput6
+index ee6cd1b..be9b767 100644
+--- a/testdata/testinput6
++++ b/testdata/testinput6
+@@ -4886,4 +4886,7 @@
+ \= Expect recursion limit exceeded
+     a[00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]
+ 
++/(02-)?[0-9]{3}-[0-9]{3}/
++    02-123-123
++
+ # End of testinput6
+diff --git a/testdata/testoutput6 b/testdata/testoutput6
+index 62f2674..2930acc 100644
+--- a/testdata/testoutput6
++++ b/testdata/testoutput6
+@@ -7687,4 +7687,8 @@ No match
+     a[00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]
+ Failed: error -53: recursion limit exceeded
+ 
++/(02-)?[0-9]{3}-[0-9]{3}/
++    02-123-123
++ 0: 02-123-123
++
+ # End of testinput6
+-- 
+2.7.4
+

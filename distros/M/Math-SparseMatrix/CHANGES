@@ -1,0 +1,14 @@
+Revision history for Perl extension Math::SparseMatrix.
+
+0.03  Sun Apr 06, 2008
+	- remove garbage Math-SparseMatrix-0.02 directory
+
+0.02  Mon Mar 24, 2008 
+	- relax Perl requirements to 5.6.2
+	- update Makefile.PL to better support META.yml
+	- modified SparseMatrix.pm so README can be generated from it
+
+0.01  Sun Jun 18 18:54:21 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Math::SparseMatrix
+

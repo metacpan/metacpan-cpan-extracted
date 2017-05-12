@@ -1,0 +1,12 @@
+Revision history for Perl extension Method::Alias
+
+1.03 Sat 15 Jul 2006
+	- Moving from old CVS to new SVN Open Repository
+	- Cleaning up test scripts
+	- Upgrading to Module::Install 0.63
+
+0.02 Tue Feb 15 2005
+	- Removing braindead Build.PL
+
+0.01  Wed Dec 22 2004
+	- Created the initial implementation

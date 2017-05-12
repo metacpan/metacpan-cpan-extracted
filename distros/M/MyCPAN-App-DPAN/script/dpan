@@ -1,0 +1,319 @@
+#!/usr/local/bin/perl
+
+use MyCPAN::App::DPAN 1.25;
+
+our $VERSION = '1.28';
+
+if( grep /^-?-h(elp)?$/, @ARGV ) {	
+	require Pod::Usage;
+	
+	Pod::Usage::pod2usage(
+		-exitval => 0
+		);
+	}
+elsif( grep /^-?-v(ersion)?$/, @ARGV )
+	{
+	print "dpan $VERSION using MyCPAN::App::DPAN ", 
+		MyCPAN::App::DPAN->VERSION, "\n";
+	
+	exit 0;	
+	}
+
+$ENV{MYCPAN_LOG4PERL_FILE} = $ENV{DPAN_LOG4PERL_FILE} 
+	if defined $ENV{DPAN_LOG4PERL_FILE};
+	
+my $application = MyCPAN::App::DPAN->activate( @ARGV );
+
+my $reporter = $application->get_coordinator->get_reporter;
+
+$reporter->final_words if eval { $reporter->can( 'final_words' ) };
+
+$application->activate_end;
+
+exit( 0 );
+
+=pod
+
+=head1 NAME
+
+dpan - create a DarkPAN from directories
+
+=head1 SYNOPSIS
+
+	# from the command line
+	prompt> dpan [-l log4perl.config] [-f config] [directory [directory2]]
+
+	# get some help
+	prompt> dpan -h
+	prompt> dpan --help
+	
+=head1 DESCRIPTION
+
+The C<dpan> script takes a list of directories, indexes any Perl distributions
+it finds, and creates the PAUSE index files from what it finds. Afterward, you
+should be able to point a CPAN tool at the directory and install the 
+distributions normally.
+
+If you don't specify any directories, it works with the current working
+directory.
+
+At the end, C<dpan> creates a F<modules> directory in the first directory 
+(or the current working directory) and creates the F<02package.details.txt.gz>
+and F<03modlist.data.gz>.
+
+=head2 Command-line processing
+
+=over 4
+
+=item -f config_file
+
+=item -l log4perl_config_file
+
+The path to the log4perl configuration file. You can also set this
+with the <DPAN_LOG4PERL_FILE> environment variable or the C<log4perl_file>
+configuration directive.
+
+=back
+
+=head2 Configuration options
+
+If you don't specify these values in a configuation file, C<dpan> will
+use its defaults.
+
+=over 4
+
+=item alarm
+
+The maximum amount of time allowed to index a distribution, in seconds.
+
+Default: 15
+
+=item backpan_dir
+
+The directory that has the distributions to archive. Remember, this is a
+subclass of MyCPAN::Indexer::App::BackPAN, so don't worry too much about
+the directive name.
+
+Default: the current working directory
+
+=item copy_bad_dists
+
+If set to a true value, copy bad distributions to the named directory
+so you can inspect them later.
+
+Default: 0
+
+=item dispatcher_class 
+
+The Perl class to use as the dispatching class. It has to at least
+provide a run method. See C<MyCPAN::Indexer::Tutorial> for details
+on dispatching classes.
+
+Default: MyCPAN::Indexer::Dispatch::Serial
+
+=item extra_reports_dir
+
+You can specify another directory that contains pre-indexed reports. C<dpan>
+will add these reports to its queue to create F<02packages.details.txt.gz>.
+So far, C<dpan> doesn't check that these reports correspond to any files 
+in the repository and could cause the checks against F<02packages.details.txt.gz>
+to fail.
+
+You probably want to use this as a way to inject information about 
+distributions that you skipped with C<skip_dists_regexes>.
+
+=item fresh_start
+
+Delete the report directory before indexing. This cleans out all previous
+work, so you need to save that on your own. You can also set this with
+the C<DPAN_FRESH_START> environment variable.
+
+Default: 0
+
+=item ignore_packages
+
+You can tell DPAN to ignore some namespaces. The indexer may still record
+them, but they won't show up in F<02packages.details.txt.gz>. It's a 
+space-separated list of exact package names
+
+Default: main MY MM DB bytes DynaLoader
+
+=item indexer_class 
+
+The Perl class to use as the indexing class. It has to at least
+provide a run method. See C<MyCPAN::Indexer::Tutorial> for details
+on indexing classes.
+
+Default: MyCPAN::App::DPAN::Indexer
+
+=item indexer_id
+
+Give yourself a name so people who who ran C<dpan>.
+
+Default: Joe Example <joe@example.com>
+
+=item interface_class 
+
+The Perl class to use as the interface class. It has to at least
+provide a run method. See C<MyCPAN::Indexer::Tutorial> for details
+on interface classes.
+
+Default: MyCPAN::Indexer::Interface::Text
+
+=item log4perl_file
+
+The path to the log4perl configuration file. You can also set this with
+the <-l> switch or the C<DPAN_LOG4PERL_FILE> environment variable.
+
+=item organize_dists
+
+Take all of the distributions C<dpan> finds and put the into a PAUSE-like
+structure under F<authors/id/D/DP/DPAN>. You can change the author ID with
+the C<pause_id> directive.
+
+Default: 0
+
+=item parallel_jobs
+
+The number of parallel jobs to run. This only matters for dispatcher
+classes that can do more than one thing at a time.
+
+Default: 1
+
+=item pause_id
+
+The author ID to use if organize_dists is set to a true value. 
+
+Default: DPAN
+
+=item queue_class MyCPAN::Indexer::SomeOtherQueue
+
+The Perl class to use as the queue class. It has to at least
+provide a run method. See C<MyCPAN::Indexer::Tutorial> for details
+on queue classes.
+
+Default: MyCPAN::Indexer::SkipQueue
+
+=item reporter_class  
+
+The Perl class to use as the reporter class. It has to at least
+provide a run method. See C<MyCPAN::Indexer::Tutorial> for details
+on reporter classes.
+
+Default: MyCPAN::App::DPAN::Reporter::Minimal
+
+=item report_dir
+
+Where to store the distribution reports.
+
+Default: a directory named F<indexer_reports> in the current working directory
+	
+=item retry_errors
+
+Try to index a distribution even if it was previously tried and
+had an error. This depends on previous reports being in C<report_dir>,
+so if you don't set that configuration directive, it won't matter.
+
+Default: 1
+
+=item skip_dists_regexes
+
+You can specify a list of whitespace-separated regexes for C<dpan> to
+use to filter the queue of distributions to index. You probably want
+to use this to skip very large distributions. You can have a pre-made
+index report by setting C<extra_reports_dir>.
+
+This is only supported by C<MyCPAN::Indexer::SkipQueue>.
+
+Default: null
+
+=item skip_perl
+
+When set to a true value, C<skip_perl> cause C<dpan> to ignore distributions
+that match C</^(strawberry-?)perl-/>, since these can take a long time to 
+index. You can have a pre-made index report by setting C<extra_reports_dir>.
+
+This is only supported by C<MyCPAN::Indexer::SkipQueue>.
+
+Default: 0
+
+=item system_id macbookpro
+
+Give the indexing system a name, just to identify the machine.
+
+Default: 'an unnamed machine'
+
+=item temp_dir
+
+Where to unpack the dists or create any temporary files.
+
+Default: a temp directory in the current working directory
+
+=item worker_class    
+
+The Perl class to use as the worker class. It has to at least
+provide a run method. See C<MyCPAN::Indexer::Tutorial> for details
+on worker classes.
+
+Default: MyCPAN::Indexer::Worker
+
+=back
+
+=head1 LOG4PERL
+
+You can set the Log4perl levels on each of the components
+separately:
+
+	log4perl.rootLogger               =    FATAL, Null
+	
+	log4perl.logger.backpan_indexer   =    DEBUG, File
+	
+	log4perl.logger.Indexer           =    DEBUG, File
+	log4perl.logger.Worker            =    DEBUG, File
+	
+	log4perl.logger.Interface         =    DEBUG, File
+	
+	log4perl.logger.Dispatcher        =    DEBUG, File
+	log4perl.logger.Queue             =    DEBUG, File
+	
+	log4perl.logger.Reporter          =    DEBUG, File
+
+=head1 ENVIRONMENT VARIABLES
+
+=over 4
+
+=item DPAN_FRESH_START
+
+Delete the report directory before indexing. This cleans out all previous
+work, so you need to save that on your own. You can also set this with
+the C<fresh_start> configuration directive.
+
+=item DPAN_LOG4PERL_FILE
+
+The path to the log4perl configuration file. You can also set this with
+the <-l> switch of the C<log4perl_file> configuration directive.
+
+=back
+
+=head1 SEE ALSO
+
+MyCPAN::Indexer, MyCPAN::Indexer::DPAN
+
+=head1 SOURCE AVAILABILITY
+
+This code is in Github:
+
+      git://github.com/briandfoy/mycpan-indexer.git
+      git://github.com/briandfoy/mycpan--app--dpan.git
+
+=head1 AUTHOR
+
+brian d foy, C<< <bdfoy@cpan.org> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2008-2009, brian d foy, All Rights Reserved.
+
+You may redistribute this under the same terms as Perl itself.
+
+=cut

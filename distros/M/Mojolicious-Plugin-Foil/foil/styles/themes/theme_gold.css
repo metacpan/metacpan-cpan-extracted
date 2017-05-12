@@ -1,0 +1,128 @@
+/* ================================================================== */
+/* THEME: Gold
+ */
+/* ================================================================== */
+/* THEME: Gold - fonts
+ */
+/* ------------------------------------------------------------------ */
+/* Fonts */
+h1, h2, h3, h4 {
+  font-family: galleria, FancyPants, BravoEngraved, serif;
+  font-weight: normal;
+  color: black;
+}
+
+/* ================================================================== */
+/* ICONS - dark on light
+ * Nav arrows with transparent backgrounds
+ */
+.side nav li > ul {
+  list-style-image: url(nav_black.png);
+}
+
+/* ================================================================== */
+/* General */
+.verge, header,
+footer, .side, .fancy {
+  color: #332400;
+  background: #e9ab1c;
+  border-color: #754c0e;
+}
+
+header,
+footer {
+  background-image: url(gold_h.jpg);
+}
+
+.side {
+  background-image: url(gold_side.jpg);
+}
+
+body {
+  color: #332b00;
+  background: #f2e6aa;
+}
+
+a:link {
+  color: #223300;
+}
+
+a:visited {
+  color: #662200;
+}
+
+header a:link,
+footer a:link,
+.side a:link,
+.verge a:link,
+header a:link,
+footer a:link,
+.side a:link,
+.fancy a:link {
+  color: #293300;
+}
+
+header a:visited,
+footer a:visited,
+.side a:visited,
+.verge a:visited,
+header a:visited,
+footer a:visited,
+.side a:visited,
+.fancy a:visited {
+  color: #661400;
+}
+
+.fancy {
+  color: #332400;
+  background-image: url("wood3.jpg");
+  border: 5px double #986c06;
+  padding: 0;
+}
+.fancy li {
+  padding: 0.5em;
+  margin: 5px;
+  border: 5px solid #986c06;
+  background-color: #e9ab1c;
+  background: linear-gradient(#e9ab1c, #a75411);
+}
+.fancy li a:link {
+  color: #293300;
+}
+.fancy li a:visited {
+  color: #661400;
+}
+
+.button, input[type=submit], header nav a,
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: #332500;
+  border-color: #754c0e;
+  background-color: #e6c05c;
+}
+
+.button a:link, input[type=submit] a:link, header nav a a:link,
+header nav .selflink a:link,
+header nav em a:link,
+header nav .current a a:link, a.button:link, header nav a:link {
+  color: #332500;
+}
+
+.button a:visited, input[type=submit] a:visited, header nav a a:visited,
+header nav .selflink a:visited,
+header nav em a:visited,
+header nav .current a a:visited, a.button:visited, header nav a:visited {
+  color: #661700;
+}
+
+header nav li {
+  border-color: #865d1f;
+}
+
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: #333300;
+  background-color: #f2e6aa;
+}

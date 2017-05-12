@@ -1,0 +1,17 @@
+cpanfile
+dist.ini
+cpanfile.snapshot
+local
+.DS_Store
+.includepath
+blib
+Build
+_build
+pm_to_blib
+cover_db
+.svn
+.git
+.project
+MANIFEST.bak
+Makefile.old
+Makefile$

@@ -1,0 +1,9 @@
+Delete a list of IP addresses from this database:<br>
+<blockquote>
+<font size="-1">paste a list &quot;IP [<i>comments</i>...]&quot; <b>timeout</b> will be ignored;<br>
+<form name="delist" action="" method=POST>
+<textarea name=remove rows=25 cols=40 wrap=off></textarea>
+<input type=hidden name=page value=delist><p>
+<font size="+2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><input type=submit value="DELETE LIST">
+</form>
+</blockquote>

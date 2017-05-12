@@ -1,0 +1,78 @@
+NAME
+    tt - Preprocess Perl code with Template Toolkit and Module::Compile.
+
+SYNOPSIS
+            use tt ( subs => [qw/foo bar gorch/] );
+
+            [% FOREACH subname IN subs %]
+            sub [% subname %] {
+                    warn "Hi, i'm [% subname %]";
+            }
+            [% END %]
+
+            no tt;
+
+DESCRIPTION
+    This module uses Module::Compile to help you generate Perl code without
+    using BEGIN/eval tricks and reducing readability, but without having to
+    repeat yourself either.
+
+CONFIGURATION
+    To configure Template either subclass this module and override
+    "default_tt_config", or pass parameters in the "use tt" line.
+
+    Note that due to the way Module::Compile works you must put all the
+    variables on one use line.
+
+    For example:
+
+            use tt INCLUDE_PATH => "/foo";
+
+    The default configuration values are:
+
+                    INTERPOLATE        => 0,
+                    EVAL_PERL          => 1,
+                    INCLUDE_PATH       => [ @INC ],
+                    LOAD_PERL          => 1,
+                    DEBUG              => "undef",
+
+    This provides a default that is slightly more suitable for templating
+    code than normal TT defaults. DEBUG_UNDEF ensures that no undef
+    variables are interpolated, INTERPOLATE being off ensures that perl
+    variables aren't treated as TT variables by accident, and the other
+    options allow for a more permissive use of features.
+
+VARIABLES
+    Like configuration parameters, you may pass variables on the "use tt"
+    line.
+
+    Variables and configuration options are destingushed - anything that is
+    all upper case in the use line is considered configuration.
+
+    A probably better way to declare variables is simply in the template
+    itself:
+
+            [% foo = "bar" %]
+
+CAVEATS
+    Due to Module::Compile's semantics the use line is actually fudged and
+    string-evaled by this module, so it might break and you can't refer to
+    lexicals.
+
+TODO
+    Add all sorts of useful variables about the package that the template is
+    processing, the file and line numbers, etc.
+
+    Currently Module::Compile doesn't provide enough facilities for this.
+
+SEE ALSO
+    Template, Module::Compile, Filter::Simple
+
+AUTHOR
+    Yuval Kogman <nothingmuch@woobling.org>
+
+COPYRIGHT & LICENSE
+            Copyright (c) 2006 the aforementioned authors. All rights
+            reserved. This program is free software; you can redistribute
+            it and/or modify it under the same terms as Perl itself.
+

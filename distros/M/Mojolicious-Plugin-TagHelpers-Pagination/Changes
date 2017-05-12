@@ -1,0 +1,20 @@
+0.06 2015-08-28
+        - Fixed bug for prefinal current pages.
+
+0.05 2014-11-11
+        - Added unknown page amount feature.
+
+0.04 2014-09-22
+        - Fixed critical escaping bug in URLs.
+
+0.03 2014-09-22
+        - Improved documentation.
+	- Log errors properly.
+
+0.02 2014-09-22
+        - Improved tests.
+	- Respond more gracefully to malformed input.
+
+0.01 2014-04-06
+        - Initial submission to GitHub.
+        - Initial submission to CPAN.

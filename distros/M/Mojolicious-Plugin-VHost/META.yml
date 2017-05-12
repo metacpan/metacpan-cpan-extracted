@@ -1,0 +1,17 @@
+---
+abstract: 'Mojolicious Plugin that adds VirtualHosts'
+author:
+  - 'Brian Medley <bpmedley@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-VHost
+requires:
+  Mojolicious: 0
+version: 0.04

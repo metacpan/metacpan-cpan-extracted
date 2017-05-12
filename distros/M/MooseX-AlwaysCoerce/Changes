@@ -1,0 +1,80 @@
+Revision history for MooseX-AlwaysCoerce
+
+0.23      2016-02-16 04:29:21Z
+    - update some distribution tooling
+
+0.22      2015-08-16 03:04:21Z
+    - update some distribution tooling
+
+0.21      2013-11-30 18:13:01Z
+    - re-release to fix compile test
+
+0.20      2013-09-17 01:32:52Z
+    - fixed bad test plan
+
+0.19      2013-09-17 01:29:18Z
+    - warnings tests bypassed during installation
+    - repository has moved to the GitHub Moose organization
+
+0.18      2012-10-13 23:57:07Z
+    - added missing prerequisite declaration
+    - added lots more metadata; kwalitee should be improved
+
+0.17  2012-06-01 17:52:39Z
+    - conversion to Dist::Zilla
+
+0.16  2011-03-16
+    - bump minimum required Package::Stash and namespace::autoclean versions
+      in dependencies, to reduce invalid cpantesters reports. (The toolchain
+      already reports on conflicting Package::Stash, but not everything
+      is catching that.)
+
+0.15  2011-03-14
+    - bump minimum required MooseX::ClassAttribute version in dependencies, to
+      ensure compatibility with the upcoming Moose 2.0 release.
+
+0.14  2011-03-08
+    - add support within roles, using the new applied_attribute feature
+      available in Moose 1.99/2.0 (doy)
+
+0.13  2011-03-07
+    - fixed class attribute and parameterized role TODO tests to work again
+      with the latest MooseX::Role::Parameterized (Karen Etheridge)
+    - converted tests to Test::Fatal (Karen Etheridge)
+
+0.12  2010-10-08 12:14:54 PDT
+    - ...and again.
+
+0.11  2010-10-08 12:05:42 PDT
+    - fix mangled distribution tarball (Karen Etheridge)
+
+0.10  2010-10-08 10:03:53 PDT
+    - avoid giving class attributes to the metaclass, which was triggering an
+      edge case bug in metaclass compat (Jesse Luehrs)
+
+0.09  2010-08-05 03:42:07
+    - support attributes without isa, correctly
+
+0.08  2010-08-05 03:14:37
+    - make a test safer
+
+0.07  2010-08-05 03:10:12
+    - support class_has with no isa (Karen Etheridge)
+
+0.06  2010-07-28 00:58:50
+    - Use modern Moose APIs, to avoid warnings with Moose 1.09 (Karen Etheridge)
+
+0.05  2010-07-13 00:05:10
+    - support types without coercion (Schwern)
+
+0.04  2010-03-06 05:28:01
+    - remove t/00-load.t (was failing)
+
+0.03  2009-06-16 17:50:12
+    - make coerce => 0 work for class_has
+
+0.02  2009-06-16 17:23:29
+    - rewritten using metaroles, the Moose way
+
+0.01  2009-06-15 22:18:34
+    - releasing...

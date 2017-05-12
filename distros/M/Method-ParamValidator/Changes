@@ -1,0 +1,32 @@
+Revision history for Method::ParamValidator
+
+0.10   Fri May 05 11:25:00 2017
+       - Added support to field, can now have more than one value,
+         issue #2, raised against WWW::Google::Places.
+
+0.09   Tue Mar 28 12:35:00 2017
+       - Tidied up test scripts and removed "-T" switch.
+
+0.08   Sun Mar 26 03:15:00 2017
+       - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.07   Sat Mar 25 12:55:00 2017
+       - Added key 'provides' to the Makefile.PL script.
+
+0.06   Wed Dec 30 01:00:00 2015
+       - Attempted to fix the test failure reported by CPAN Testers.
+
+0.05   Thu Dec 10 10:40:00 2015
+       - Fixed inconsistent versions.
+
+0.04   Wed Dec 09 10:40:00 2015
+       - Fixed code in the pod section "SYNOPSIS" of the package Method::ParamValidator.
+
+0.03   Tue Dec 08 10:35:00 2015
+       - Fixed issue RT: 110111 raised by SREZIC.
+
+0.02   Mon Dec 07 11:10:00 2015
+       - Fixed issue RT: 110110 raised by SREZIC.
+
+0.01   Sun Dec 06 02:15:00 2015
+       - Module Created.

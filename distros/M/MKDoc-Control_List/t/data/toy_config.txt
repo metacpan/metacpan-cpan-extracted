@@ -1,0 +1,11 @@
+CONDITION always_true    "true"
+CONDITION isa_boy        $Current_Child eq "Davey";
+CONDITION isa_girl       $Current_Child eq "Deanna";
+
+RET_VALUE generic_toy    default()
+RET_VALUE boy_toy        "Galaxy Warrior"
+RET_VALUE girl_toy       "Doll"
+
+RULE boy_toy        WHEN isa_boy
+RULE girl_toy       WHEN isa_girl
+RULE generic_toy    WHEN always_true

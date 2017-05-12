@@ -1,0 +1,13 @@
+Revision history for Perl extension Meschach.
+
+0.01  Mon Oct 14 01:24:58 1996
+	- original version; created by h2xs 1.16
+
+
+0.03 <= 0.01 						December 2nd 1996
+  - Adapted to PDL-1.04 (and 0.03).
+  - Minor internal changes 
+  - Minor additions :
+
+    lucond(), qrcond()
+  	documentation for qrsolve(), qrfac_() and qrsolve_();

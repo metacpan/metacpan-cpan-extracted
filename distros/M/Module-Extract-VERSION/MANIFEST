@@ -1,0 +1,25 @@
+Changes
+corpus/Dotted_5_12.pm
+corpus/Dotted_5_14_braces.pm
+corpus/Easy.pm
+corpus/Easy_5_12.pm
+corpus/Easy_5_14_braces.pm
+corpus/RCSKeywords.pm
+corpus/ToTk.pm
+corpus/Underscore.pm
+examples/placeholder.pl
+INSTALL.SKIP
+lib/Module/Extract/VERSION.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+t/corpus.t
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/test_manifest
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

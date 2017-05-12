@@ -1,0 +1,28 @@
+Mojolicious-Plugin-YubiVerify
+
+Verify YubiKey one time passwords. The module implements the
+YubiKey Validation Protocol version 2.0.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Mojolicious::Plugin::YubiVerify
+
+LICENSE AND COPYRIGHT
+
+Copyright (c) Kirill Miazine
+
+This software is distributed under an ISC-style license, please see
+http://km.krot.org/code/license.txt for details.

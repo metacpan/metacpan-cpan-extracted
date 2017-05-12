@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Math/Orthonormalize.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00pod.t
+t/00podcover.t
+t/01scalarp.t
+t/02normalize.t
+t/03scale.t
+t/04orthogonalize.t
+t/05orthonormalize.t
+SIGNATURE    Added here by Module::Build

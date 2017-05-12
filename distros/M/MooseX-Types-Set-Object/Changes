@@ -1,0 +1,18 @@
+Revision history for MooseX-Types-Set-Object
+
+0.05      2015-08-16 02:08:15Z
+          - update some distribution tooling
+
+0.04      2014-01-11 19:28:18Z
+          - fixed tests that now break in Moose 2.1200
+          - document the global nature of this type
+          - repository moved to https://github.com/moose/MooseX-Types-Set-Object
+
+0.03      2010-12-01 18:42:04Z
+          - Make coercions to ArrayRef work (Closes RT#60604) (Florian Ragwitz).
+          - The test suite now uses Test::Fatal instead of Test::Exception (Karen
+            Etheridge).
+
+0.02      2008-06-26
+
+0.01      2008-01-09

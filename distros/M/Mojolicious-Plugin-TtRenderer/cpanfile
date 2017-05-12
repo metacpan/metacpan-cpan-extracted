@@ -1,0 +1,34 @@
+requires "Mojolicious" => "6.33";
+requires "POSIX" => "0";
+requires "Template" => "2.18";
+requires "Template::Provider" => "0";
+requires "perl" => "5.010001";
+recommends "EV" => "0";
+
+on 'test' => sub {
+  requires "Test::More" => "0.94";
+  requires "perl" => "5.010001";
+};
+
+on 'test' => sub {
+  recommends "EV" => "0";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+  requires "perl" => "5.010001";
+};
+
+on 'develop' => sub {
+  requires "Test::CPAN::Changes" => "0";
+  requires "Test::EOL" => "0";
+  requires "Test::Fixme" => "0.07";
+  requires "Test::More" => "0.94";
+  requires "Test::NoTabs" => "0";
+  requires "Test::Pod" => "0";
+  requires "Test::Pod::Coverage" => "0";
+  requires "Test::Pod::Spelling::CommonMistakes" => "0";
+  requires "Test::Spelling" => "0";
+  requires "Test::Strict" => "0";
+  requires "YAML" => "0";
+};

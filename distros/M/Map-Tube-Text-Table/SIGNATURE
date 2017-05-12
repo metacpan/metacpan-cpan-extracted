@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 03addd0ab7dd687cc23d1ef0518aa15454a884fb Changes
+SHA1 882221895a73bad18eb9f16a0ce523a968a932c1 LICENSE.artistic_2
+SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE.bsd
+SHA1 f53723a847251ecf51cefc849d693b9d3da1d189 MANIFEST
+SHA1 3b41edffddd1d3e37a153c27c1d94bb06fe14728 META.yml
+SHA1 c5486098eada860fd02e168335413e5492065e5b Makefile.PL
+SHA1 df57dc0645629e95362716b988af36ee95e573bd README
+SHA1 55d9ee52e13a1b4d1df313a4ad7f3bd6370312c6 Table.pm
+SHA1 83c47271d8144b49e157f5a1ecf7b5e753711fb9 Table/Utils.pm
+SHA1 b8187eef0a03bda59b543f50997e8b63f1b9ed68 examples/ex1.pl
+SHA1 d9cc154fe3dc781b5da5c235f5504c52074a40c0 examples/ex2.pl
+SHA1 d2664c57b65686abbfbbe1e71229761625be4922 inc/Module/Install.pm
+SHA1 da41a8d9904f7b409b49a5f6c338d3eb305a2b4b inc/Module/Install/Base.pm
+SHA1 0db0afe19cd298abba248fa089e5525bd5ab3ab6 inc/Module/Install/Can.pm
+SHA1 e7152bfd5ca67d0e33f96d09c59d600bca5c1f15 inc/Module/Install/Fetch.pm
+SHA1 29ee1cb0dc262b00983e3a2f5cf00b538dff5069 inc/Module/Install/Makefile.pm
+SHA1 e963f80cfe255f16e55067d1feb6841cff3ed2fe inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 65a1f09af1f4f9e47a98b6b45667c328b1b2f9c0 inc/Module/Install/Win32.pm
+SHA1 f191c49475b3f51775180cd4f7e41e3bdab7f85a inc/Module/Install/WriteAll.pm
+SHA1 b8a5565b1ddd75d3978fae732c3a3791b1805341 t/Map-Tube-Text-Table-Utils/00-use.t
+SHA1 86aebc88e77c184093218833a2a4702e49189b6a t/Map-Tube-Text-Table-Utils/01-version.t
+SHA1 bbfa91f90af9bd8a2c241e3029426702ac8718e2 t/Map-Tube-Text-Table-Utils/02-pod_coverage.t
+SHA1 c22cb53244a3503d6a0112f0cb1ae824e9eaab8e t/Map-Tube-Text-Table-Utils/03-pod.t
+SHA1 f9b0dd6ef0bca39a519ab864eb9b82c6b63b3344 t/Map-Tube-Text-Table/00-use.t
+SHA1 8675f3d415cf23828703716494635eae71ba7b60 t/Map-Tube-Text-Table/01-version.t
+SHA1 728bf7a18477b3e4256e5355bf632e199549c1f7 t/Map-Tube-Text-Table/02-pod_coverage.t
+SHA1 c032b60dc6c8a0775782bb78ab7ebbbdacefd6ed t/Map-Tube-Text-Table/03-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJUw9l9AAoJEJe+XXKaIuTlUGAIAJvIr3B5S+WaHavpHLAuGN+C
+TPUvyiT0L70sIWZRRlTKBI5/Wz2aOsImJsGXcKNCPheks7ZLfzSU/5lWnc2g0Wnd
+ajGvsWh0arsdxDrovwQIBFDkFaZMO3oUxAcTaG/5EKQph4LeUP4fS4gLu8Stv27e
+cXlCIiMbPuyCeB+WnywBkfnoUBPCPkh2AWquvYOPMQzJ5qQUOnVosqitWmpb+Pk5
+qihmXQYhvEJacH0EgB5bStNu72+VA5Q5FFqanReiO+2InFUc/JpTOqKtzISLblqJ
+7fBrREL2ENBQibvztfWnN+sm/B9vcUSeN0obbAd8kZxAch+axaUIh1rVU/NvKxE=
+=9BYu
+-----END PGP SIGNATURE-----

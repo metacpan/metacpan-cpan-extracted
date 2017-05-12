@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet title="XSL_formatting" type="text/xsl" href="/include/xsl/podcast.xsl"?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+ <channel>
+  <title>MP3::PodcastFetch</title>
+  <link>http://www.perl.org/channel</link>
+  <description>MP3::PodcastFetch test channel</description>
+  <copyright>Copyright 2006 Lincoln D. Stein</copyright>
+   <author>Lincoln D. Stein</author>
+  <item>
+   <title>Test File 1</title>
+   <description>Test File 1 Description</description>
+   <pubDate>Fri, 29 Dec 2006 00:39:56 EST</pubDate>
+   <link>http://www.perl.org/item/1</link>
+   <guid>http://www.perl.org/item/1</guid>
+   <itunes:duration>0:00:03</itunes:duration>
+   <enclosure url="$PATH/test1.mp3" type="audio/mpeg"/>
+  </item>
+  <item>
+   <title>Test File 2</title>
+   <description>Test File 2 Description</description>
+   <pubDate>Sun Dec 31 17:59:22 EST 2006</pubDate>
+   <link>http://www.perl.org/item/2</link>
+   <guid>http://www.perl.org/item/2</guid>
+   <itunes:duration>0:00:03</itunes:duration>
+   <enclosure url="$PATH/test2.mp3" type="audio/mpeg"/>
+  </item>
+  <item>
+   <title>Test File 3</title>
+   <description>Test File 3 Description</description>
+   <pubDate>Sun Dec 31 15:59:22 EST 2006</pubDate>
+   <link>http://www.perl.org/item/3</link>
+   <guid>http://www.perl.org/item/3</guid>
+   <itunes:duration>0:00:03</itunes:duration>
+   <enclosure url="$PATH/test%203.mp3" type="audio/mpeg"/>
+  </item>
+ </channel>
+</rss>

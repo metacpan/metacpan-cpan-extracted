@@ -1,0 +1,38 @@
+% layout "$controller/common", title => "Tables in $database";
+
+%= stylesheet begin
+  ul {
+    margin-left: 8px;
+    font-size: 150%;
+    list-style-type: circle;
+  }
+
+  li {
+    margin-bottom: 6px;
+  }
+
+% end
+
+<h2>Tables in <i><%= $database %></i> (<%= @$tables %>)</h2>
+<table>
+  % for (my $i = 0; $i < @$tables; $i += 3) {
+    <tr>
+      % for my $k (0 .. 2) {
+        <td>
+          <a href="<%= url_for("/$prefix/table")->query(database => $database, table => $tables->[$i + $k]) %>">
+            <%= $tables->[$i + $k] %>
+          </a>
+        </td>
+      % }
+    </tr>
+  % }
+</table>
+
+<h2>Utilities</h2>
+<ul>
+  % for my $utility (@$utilities) {
+    % my $path = $utility->{path};
+    % my $title = $utility->{title};
+    <li><a href="<%= url_for("/$prefix/$path")->query(database => $database) %>"><%= $title %></a></li>
+  % }
+</ul>

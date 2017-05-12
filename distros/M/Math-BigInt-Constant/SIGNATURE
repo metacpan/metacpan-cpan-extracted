@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2535a0febc79a440c1ca6e04c3ec09a84d864517 BUGS
+SHA1 74cf20f614995663de849cb9f1ce88dcf743aad9 CHANGES
+SHA1 d7c83d8f89b92a3262a01eb2778d39402e77263a LICENSE
+SHA1 95d8219fce7624cd772f9360d7e756f9649057c3 MANIFEST
+SHA1 f3f9df53b4697273b11c69abc1d623b241d2d8f1 MANIFEST.SKIP
+SHA1 92d9289628e6e24d4dc1683b17a1136ab854b89b META.json
+SHA1 215dd4e8062a0f469ba0740c1e9622d03399e4d0 META.yml
+SHA1 f39b2e9ec36f26de62f18f8de3969cc96506f067 Makefile.PL
+SHA1 8994a5192aa5e8dfb16e3d677ceeb153b5f8e524 README
+SHA1 7c54b4adf98d9ff0508658d01b033cb920777b62 TODO
+SHA1 68dda47ea864d5f4a4c8027cf559313b1bc8d06f lib/Math/BigFloat/Constant.pm
+SHA1 abbfa3490f761a5ddf1bd51acdadf931ad6682fb lib/Math/BigInt/Constant.pm
+SHA1 533330fa71d4b34b04dace6214b9268465381284 t/bigfltcpm.t
+SHA1 f8c3a962de7f9e0a2c9bb65923c6eb8fbe1c8b0d t/bigintcpm.t
+SHA1 b2ed9206ca5b69ec3b8bbf850bf4b6dfde518e7e t/pod.t
+SHA1 64047fe3071a84704879dd29745668a729dc89d2 t/pod_cov.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYSUr6AAoJEGcmPl2fr166edYH/13fg9HCDwuDkjItzVALzd0q
+RdqKj4FY4R53Aqy8eGZxUjIYnDYM67O/omjLY9YkDUOCX+5eM3U9jm3oi3pgQmrI
+cYuQIHgjdbj70FHqyRFAWqMb5/fFNdn5neWYiGivhvv0dpDLXolxAsnQ2U+TEFaF
+aP7Ko1vw7iq+i1zyRlQs7Zc5kzU269jlmGZa7aBokFIM0I2bxjbMNfRF/LQL12SD
+ZHAIV84FXLYPjxSAL8sALeFF/P07HZ/1xX+oaoX79/WcNzZM7GZmO3duQ4PSV6qO
+sLPvCyqgIAQMAqPCuNSFt+6v0LYNpKkGcOwRIqYBFfrOHpigeBeN6aJfFC64TQo=
+=EAZH
+-----END PGP SIGNATURE-----

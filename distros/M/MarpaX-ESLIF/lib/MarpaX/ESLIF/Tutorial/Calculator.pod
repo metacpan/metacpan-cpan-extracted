@@ -1,0 +1,629 @@
+# PODNAME: MarpaX::ESLIF::Tutorial::Calculator
+
+# ABSTRACT: MarpaX::ESLIF Calculator Tutorial
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+MarpaX::ESLIF::Tutorial::Calculator - MarpaX::ESLIF Calculator Tutorial
+
+=head1 VERSION
+
+version 2.0.4
+
+=head1 DESCRIPTION
+
+This documentation is giving a tutorial with a calculator as example. The reader might want first to read the L<MarpaX::ESLIF::BNF> specification.
+
+=head2 STARTUP
+
+First we get an ESLIF instance, we use the L<Log::Any::Adapter::Stderr> implementation for logging:
+
+  package main;
+  use strict;
+  use diagnostics;
+  use Log::Any qw/$log/;
+  use Log::Any::Adapter qw/Stderr/;
+  use MarpaX::ESLIF;
+
+  my $eslif = MarpaX::ESLIF->new($log);
+
+=head2 Direct result with the grammar's parse() method
+
+=head3 Basic grammar
+
+Grammar will support parenthesis, and the C<**>, C<*>, C</>, C<+>, C<-> operators:
+
+  my $grammar_v1 = q{
+  Expression ::=
+      /[\d]+/
+      | '(' Expression ')'              assoc => group
+     ||     Expression '**' Expression  assoc => right
+     ||     Expression  '*' Expression
+      |     Expression  '/' Expression
+     ||     Expression  '+' Expression
+      |     Expression  '-' Expression
+  };
+
+Compiling the grammar is done with:
+
+  my $eslifGrammar = MarpaX::ESLIF::Grammar->new($eslif, $grammar_v1);
+
+The C<::=> mean this is the top-level grammar. It could have be writen as C<:[0]:=>.
+
+The C<||> loosen separator is a shortcut for grouping rules, Together with the associativity adverbs, the grammar listed upper is stricly equivalent to this traditional BNF form:
+
+  Expression   ::= Expression_0
+  Expression_0 ::= Expression_1
+  Expression_1 ::= Expression_2
+  Expression_2 ::= Expression_3
+  Expression_3 ::= /[\d]+/
+  Expression_3 ::= '(' Expression_0 ')'
+  Expression_2 ::= Expression_3 '**' Expression_2
+  Expression_1 ::= Expression_1 '*' Expression_2
+  Expression_1 ::= Expression_1 '/' Expression_2
+  Expression_0 ::= Expression_0 '+' Expression_1
+  Expression_0 ::= Expression_0 '-' Expression_1
+
+With I<no associativity>, this would have been equivalent to:
+
+  Expression   ::= Expression_0
+  Expression_0 ::= Expression_1
+  Expression_1 ::= Expression_2
+  Expression_2 ::= Expression_3
+  Expression_3 ::= /[\d]+/
+  Expression_3 ::= '(' Expression_3 ')'
+  Expression_2 ::= Expression_2 '**' Expression_3
+  Expression_1 ::= Expression_1 '*' Expression_2
+  Expression_1 ::= Expression_1 '/' Expression_2
+  Expression_0 ::= Expression_0 '+' Expression_1
+  Expression_0 ::= Expression_0 '-' Expression_1
+
+You can see the impact of group associativity in the C<Expression_3> rule, and the impact of right associativity in the C<Expression_2> rule.
+
+Since internally, a pure BNF implementation is in use, the use of the C<||> loosen operator is indeed forcing the engine to act as if you would have writen in traditional BNF, this can be seen by asking for a dump of the grammar:
+
+  #print $eslifGrammar->show;
+
+One can already try to parse some input. Neverthless, to do so, MarpaX::ESLIF imposes to have a I<recognizer> and a I<valuator> instances:
+
+=over
+
+=item Recognizer interface
+
+A recognizer must provide the following methods: C<read>, C<isEof>, C<isCharacterStream>, C<encoding>, C<data>, C<isWithDisableThreshold>, C<isWithExhaustion>, C<isWithNewline> and C<isWithTrack>. We will instanciate a recognizer for a string;
+
+  package MyRecognizer;
+  use strict;
+  use diagnostics;
+  #
+  # Constructor
+  #
+  sub new {
+    my ($pkg, $string) = @_;
+    open my $fh, "<", \$string;
+    bless { data => undef, fh => $fh }, $pkg
+  }
+
+C<read> returns a true value if data was read, C<isEof> returns a true value if EOF is reached, C<isCharacterStream> returns a true value if this the last data is composed of characters, C<encoding> return the encoding if known, C<data> returns the data, C<isWithDisableThreshold> switches off a hardcoded internal warning when grammar seems to have problems -; C<isWithExhaustion> enables exhaustion event, C<isWithNewline> enables newline counting for error reporting, and C<isWithTrack> enables absolute position tracking if you plan to use one of the lastCompletedOffset(), lastCompletedLength() or lastCompletedLocation() recognizer methods:
+
+  #
+  # Required methods
+  #
+  sub read                   {
+                               my ($self) = @_;   # read data
+                               defined($self->{data} = readline($self->{fh}))
+                             }
+  sub isEof                  {  eof shift->{fh} } # End of data ?
+  sub isCharacterStream      {                1 } # Character stream ?
+  sub encoding               {                  } # Encoding ?
+  sub data                   {    shift->{data} } # data
+  sub isWithDisableThreshold {                0 } # Disable threshold warning ?
+  sub isWithExhaustion       {                0 } # Exhaustion event ?
+  sub isWithNewline          {                1 } # Newline count ?
+  sub isWithTrack            {                0 } # Absolute position tracking ?
+
+=item Valuator interface
+
+A valuator must be an object that can do: C<isWithHighRankOnly>, C<isWithOrderByRank>, C<isWithAmbiguous>, C<isWithNull>, C<maxParses>, C<getResult> and C<setResult>:
+
+  package MyValue;
+  use strict;
+  use diagnostics;
+  #
+  # Constructor
+  #
+  sub new { bless { result => undef}, shift }
+
+C<isWithHighRankOnly> select only rules that have the highest eventual C<rank> adverb, C<isWithOrderByRank> orders by rank, C<isWithAmbiguous> allows ambiguous parse tree value (i.e. there is more than one value), C<isWithNull> allows a null parse, C<maxParses> gives the maximum number of wanted parse tree values (C<0> means unlimited), and for every value iteration, there are a getters and a setter on the result: C<getResult> and C<setResult>, respectively.
+
+  #
+  # Required methods
+  #
+  sub isWithHighRankOnly { 1 }  # When there is the rank adverb: highest ranks only ?
+  sub isWithOrderByRank  { 1 }  # When there is the rank adverb: order by rank ?
+  sub isWithAmbiguous    { 0 }  # Allow ambiguous parse ?
+  sub isWithNull         { 0 }  # Allow null parse ?
+  sub maxParses          { 0 }  # Maximum number of parse tree values
+  #
+  # ... result getter and setter
+  #
+  sub getResult          { my ($self) = @_; $self->{result} }
+  sub setResult          { my ($self, $result) = @_; $self->{result} = $result }
+
+=back
+
+=head3 Immediate parsing
+
+So far, so good. The default actions for symbols and rules is always to concatenate token that was read automatically. Characters are always interpreted in B<UTF-8> encoding, regardless of the original encoding. So we expect the output of parsing e.g. C<(1+2)*3> to be... C<(1+2)*3>:
+
+  package main;
+
+  my $input = '(1+2)*3';
+  my $eslifRecognizerInterface = MyRecognizer->new($input);
+  my $eslifValueInterface = MyValue->new();
+
+  my $result = $eslifGrammar->parse($eslifRecognizerInterface, $eslifValueInterface) ? $eslifValueInterface->getResult : '??';
+  printf "Default parse tree value of $input: %s\n", $result;
+  # Default parse tree value of (1+2)*3: (1+2)*3
+
+We used the C<parse()> method of the grammar, a short-hand version of parsing that I<does not allow interaction not any event>.
+
+Note that C<::concat> will also happily concatenate alternatives pushed by the end-user, then it is the Perl's "stringification" of the alternative that is taken, I<as-is>, i.e. as an array of bytes regardless of any encoding. Up to the end user to eventually make sure this is UTF-8 compatible (and it is the case by default in Perl).
+
+=head3 Grammar and C<:discard> symbol
+
+Usually, input is likey to have newlines, spaces, etc... we introduce as many. :discard symbols as wanted, for example to discard spaces, C-like and perl comments:
+
+  my $grammar_v2 = $grammar_v1 . q{
+  :discard ::= /[\s]+/
+  :discard ::= /(?:(?:(?:\/\/)(?:[^\n]*)(?:\n|\z))|(?:(?:\/\*)(?:(?:[^\*]+|\*(?!\/))*)(?:\*\/)))/
+  :discard ::= /#[^\n]*(?:\n|\z)/
+  };
+  $eslifGrammar = MarpaX::ESLIF::Grammar->new($eslif, $grammar_v2);
+
+We test it on an input that have things to discard, i.e.:
+
+  $input = q{( /* C comment */1+2)
+  # perl comment
+  *3};
+  $eslifRecognizerInterface = MyRecognizer->new($input);
+  $eslifValueInterface = MyValue->new();
+  $result = $eslifGrammar->parse($eslifRecognizerInterface, $eslifValueInterface) ? $eslifValueInterface->getResult : '??';
+  printf "Default parse tree value of $input: %s\n", $result;
+  # Default parse tree value of ( /* C comment */1+2)
+  # # perl comment
+  # *3: (1+2)*3
+
+The output is the same: C<:discard> rules have skipped everything non-accepted by the grammar, but declared with C<:discard> definitions.
+
+You will have noticed that regular expressions are allowed, and MarpaX::ESLIF arranges with the case when there is a match but the stream is not finished. For instance, reading character by character would produce the B<same> result:
+
+  package MyRecognizer;
+  no warnings 'redefine';
+  sub read                   {
+                               my ($self) = @_;   # read data
+                               CORE::read($self->{fh}, $self->{data}, 1) ? 1 : 0
+                             }
+
+Though please note that reading character per character, which means very few bytes per very few bytes without encoding information, can drive to a false encoding guess from MarpaX::ESLIF. In such a case, you can help the engine by giving the encoding of the latest chunk of data:
+
+  #package MyRecognizer;
+  #no warnings 'redefine';
+  #sub encoding               { 'ASCII' } # Encoding ?
+
+=head3 Grammar and actions
+
+Obviously we want the calculator to be able to perform the arithmetic: taking advantage that perl will always convert when necessary depending on the context, we do not need to have an action on C</[\d]+/>, just action on the expression with the operators:
+
+  package main;
+  my $grammar_v3 = q{
+  Expression ::=
+      /[\d]+/
+      | '(' Expression ')'              assoc => group action => ::copy[1]
+     ||     Expression '**' Expression  assoc => right action => do_pow
+     ||     Expression  '*' Expression                 action => do_mul
+      |     Expression  '/' Expression                 action => do_div
+     ||     Expression  '+' Expression                 action => do_plus
+      |     Expression  '-' Expression                 action => do_minus
+      :discard ::= /[\s]+/
+  };
+  $eslifGrammar = MarpaX::ESLIF::Grammar->new($eslif, $grammar_v3);
+
+The actions must be implemented in the valuator interface, otherwise parsing will well with something like:
+
+  # Can't locate object method "do_plus" via package "MyValue" at ...
+
+=over
+
+=item Grammar actions
+
+The special action C<::copy[1]> is clear: take the RHS number C<1> (first is at indice C<0>) and copy its value.
+The actions are trivial:
+
+  package MyValue;
+  sub do_pow   { my ($self, $left, $op, $right) = @_; $left**$right }
+  sub do_mul   { my ($self, $left, $op, $right) = @_; $left*$right }
+  sub do_div   { my ($self, $left, $op, $right) = @_; $left/$right }
+  sub do_plus  { my ($self, $left, $op, $right) = @_; $left+$right }
+  sub do_minus { my ($self, $left, $op, $right) = @_; $left-$right }
+
+  package main;
+  $input = q{(1 + 2) * 3};
+  $eslifRecognizerInterface = MyRecognizer->new($input);
+  $eslifValueInterface = MyValue->new();
+  $result = $eslifGrammar->parse($eslifRecognizerInterface, $eslifValueInterface) ? $eslifValueInterface->getResult : '??';
+  printf "Default parse tree value of $input: %s\n", $result;
+  # Default parse tree value of (1 + 2) * 3: 9
+
+=item Error output
+
+Any error is automatically sent to the logger with the I<error> logging level, for example with an unparsable input:
+
+  $input = q{(1 + 2) * 3 + ( ab};
+  # Remember that we are using the 'read-one-character-per-character' implementation
+  $eslifRecognizerInterface = MyRecognizer->new($input);
+  $eslifValueInterface = MyValue->new();
+  $eslifGrammar->parse($eslifRecognizerInterface, $eslifValueInterface);
+
+would produce:
+
+  --------------------------------------------
+  Recognizer failure. Current state:
+  [P1@9..9] Expression[0] ::= . Expression[1]
+  [P2@9..9] Expression[1] ::= . Expression[2]
+  [P3@9..9] Expression[2] ::= . Expression[3]
+  [P4@9..9] Expression[3] ::= . /[\d]+/
+  [P5@9..9] Expression[3] ::= . '('
+  [P5@9..9]                   Expression[0]
+  [P5@9..9]                   ')'
+  [P6@9..9] Expression[2] ::= . Expression[3]
+  [P6@9..9]                   '**'
+  [P6@9..9]                   Expression[2]
+  [P7@9..9] Expression[1] ::= . Expression[1]
+  [P7@9..9]                   '*'
+  [P7@9..9]                   Expression[2]
+  [P8@9..9] Expression[1] ::= . Expression[1]
+  [P8@9..9]                   '/'
+  [P8@9..9]                   Expression[2]
+  [P9@9..9] Expression[0] ::= . Expression[0]
+  [P9@9..9]                   '+'
+  [P9@9..9]                   Expression[1]
+  [P10@9..9] Expression[0] ::= . Expression[0]
+  [P10@9..9]                   '-'
+  [P10@9..9]                   Expression[1]
+  [R5@8..9] Expression[3] ::= '('
+  [R5@8..9]                   . Expression[0]
+  [R5@8..9]                   ')'
+  --------------------------------------------
+  Expected terminal: /[\d]+/
+  Expected terminal: '('
+  --------------------------------------------
+  UTF-8 converted data before the failure (16 bytes)
+  0x000000: 28 31 20 2b 20 32 29 20 2a 20 33 20 2b 20 28 20 (1 + 2) * 3 + ( 
+  --------------------------------------------
+  <<<<<< RECOGNIZER FAILURE AFTER LINE No 1 COLUMN No 16, HERE: >>>>>>
+  --------------------------------------------
+  UTF-8 converted data after the failure (1 bytes)
+  0x000000: 61                                              a               
+  --------------------------------------------
+
+This the I<default> behaviour: parsing failure always outputs:
+
+=over
+
+=item the position in the grammar
+
+=item the expected I<lexemes> (i.e. terminals)
+
+=item an hexadecimal dump before and after the failure
+
+=over
+
+=item In case of a character stream, dump is the UTF-8 representation of the input
+
+=item In case of a binary stream, dump is the exact representation of the input
+
+=back
+
+=back
+
+=back
+
+=head2 Interaction with parsing
+
+Grammar's parse() method is great for an immediate valuation. This nevertheless imposes that no interaction is possible while parsing the input, and this include any notion of event (any eventual event in the grammar is switched off automatically - we come back later on the events).
+
+Events are possible on both terminals (aka the lexemes) and rules.
+
+=head3 General structure of interaction
+
+This is always starting with an MarpaX::ESLIF::Recognizer's instance C<scan()> method, that can be called only once in a recognizer's lifetime, and only at its very beginning. It is rarelly needed to have the very early events, this is why this C<scan()> method have an optional scalar argument that, when it is a true value, enables the initial events:
+
+  $input = q{(1 + 2) * 3};
+  # Our usual ESLIF Recognizer interface
+  $eslifRecognizerInterface = MyRecognizer->new($input);
+  # ESLIF Recognizer engine
+  my $eslifRecognizer = MarpaX::ESLIF::Recognizer->new($eslifGrammar, $eslifRecognizerInterface);
+  #
+  # Start scanning the input, we want initial events here
+  #
+  $eslifRecognizer->scan(1);
+
+C<scan()> can stop if there is an error, or if the parsing ended, or if there are events. To check for events you use the recognizer's C<events()> method, that return a reference to an array of hashes:
+
+  my $eventsRef = $eslifRecognizer->events();
+  use Data::Dumper;
+  print "Events are scan():\n" . Dumper($eventsRef);
+
+Events remain untouched until you C<resume()> the parsing, or interact with a method that can produce new events.
+
+There are two major event scopes: grammar events, and lexeme events.
+
+=head4 Grammar events
+
+These events are on symbols or parse status, and generated directly by the marpa parser engine. The syntax in MarpaX::ESLIF BNF is: C<event event_name = event_type symbol>, for example:
+
+  my $grammar_v4 = $grammar_v3 . q{
+    event ^Expression = predicted Expression
+    };
+  $eslifGrammar = MarpaX::ESLIF::Grammar->new($eslif, $grammar_v4);
+  $eslifRecognizer = MarpaX::ESLIF::Recognizer->new($eslifGrammar, $eslifRecognizerInterface);
+  $eslifRecognizer->scan(1);
+  $eventsRef = $eslifRecognizer->events();
+  print "Events after scan():\n" . Dumper($eventsRef);
+
+will produce:
+
+  Events after scan():
+  $VAR1 = [
+            {
+              'symbol' => 'Expression',
+              'event' => '^Expression',
+              'type' => 4
+            }
+          ];
+
+and this is because we started the recognizer with the very initial events: C<$eslifRecognizer->scan(1)>, and indeed, the grammar start with the symbol C<Expression>, we asked for the eventual prediction event and named it C<^Expression>. The C<type> is always one of the values listed in L<MarpaX::ESLIF::Event::Type>. For instance, C<4> is the value for the prediction event type:
+
+  use MarpaX::ESLIF::Event::Type;
+  printf "MARPAESLIF_EVENTTYPE_PREDICTED is: %d\n", MarpaX::ESLIF::Event::Type->MARPAESLIF_EVENTTYPE_PREDICTED; # 4
+
+Before resuming you have to check if you I<can> resume, leading to the typical loop:
+
+  scan()
+  if (canContinue()) {
+    do {
+      resume()
+    } while (canContinue())
+  }
+
+In the example below we take care to I<disable> the initial event otherwise the loop would never end...: resume would retrigger the C<^Expression> event forever. Instead let's have a completion C<Expression$> event (having only grammar completion events makes always possible to resume at current position):
+
+  my $grammar_v5 = $grammar_v4 . q{
+    event Expression$ = completed Expression
+    };
+  $eslifGrammar = MarpaX::ESLIF::Grammar->new($eslif, $grammar_v5);
+  $eslifRecognizer = MarpaX::ESLIF::Recognizer->new($eslifGrammar, $eslifRecognizerInterface);
+  #
+  # Always start with scan()
+  # ------------------------
+  $eslifRecognizer->scan(1);
+  print "Events after scan():\n" . Dumper($eslifRecognizer->events());
+  $eslifRecognizer->eventOnOff('Expression', [ MarpaX::ESLIF::Event::Type->MARPAESLIF_EVENTTYPE_PREDICTED ], 0);
+  #
+  # -------------------------------
+  # Always check if we can continue
+  # -------------------------------
+  if ($eslifRecognizer->isCanContinue) {
+    do {
+      #
+      # resume() optional parameter is a number of BYTES.
+      # Because we stopped with initial event ^Expression, it is okay in this specific case
+      # and this specific grammar to resume() without changing the position, since we switched off
+      # the only possible initial event ^Expression
+      #
+      $eslifRecognizer->resume();
+      print "Events after resume():\n" . Dumper($eslifRecognizer->events());
+    } while ($eslifRecognizer->isCanContinue)
+  };
+
+  Output is:
+
+  Events after scan():
+  $VAR1 = [
+            {
+              'event' => '^Expression',
+              'symbol' => 'Expression',
+              'type' => 4
+            }
+          ];
+  Events after resume():
+  $VAR1 = [
+            {
+              'type' => 1,
+              'event' => 'Expression$',
+              'symbol' => 'Expression'
+            }
+          ];
+  Events after resume():
+  $VAR1 = [
+            {
+              'type' => 1,
+              'event' => 'Expression$',
+              'symbol' => 'Expression'
+            }
+          ];
+  Events after resume():
+  $VAR1 = [
+            {
+              'symbol' => 'Expression',
+              'event' => 'Expression$',
+              'type' => 1
+            }
+          ];
+
+Grammar events also include the nulled symbols and the exhaustion. Nulled events are for nulling symbols, exhaustion is when parsing is exhausted (i.e. it I<cannot> accept input any more). For the later, the end-user always have exhaustion information event without the exhaustion event using the C<isExhausted()> recognizer method. A grammar with nulled symbol could be:
+
+  Expression ::=
+                 /[\d]+/
+               | '(' NulledSymbol Expression ')' assoc => group action => ::copy[1]
+              ||     Expression '**' Expression  assoc => right action => do_pow
+              ||     Expression  '*' Expression                 action => do_mul
+               |     Expression  '/' Expression                 action => do_div
+              ||     Expression  '+' Expression                 action => do_plus
+               |     Expression  '-' Expression                 action => do_minus
+  NulledSymbol ::=
+  :discard ::= /[\s]+/
+  event Expression$ = completed Expression
+  event NulledSymbol[] = nulled NulledSymbol
+
+=head4 Scanner events
+
+Scanner events are not generating by the grammar itself, but by the recognizer, and they always concern the lexemes: parsing can be paused before a lexeme is I<seen>, or after it has been I<seen> (though not yet commited). Pauses after a lexeme is seen can always be simulated with a nulled grammar event, in contrary to pauses before a lexeme is seen. The syntax is always:
+
+  :lexeme ::= lexemeSymbol pause => before event => eventName
+
+or
+
+  :lexeme ::= lexemeSymbol pause => after event => eventName
+
+For example:
+
+  Expression ::=
+                 /[\d]+/
+               | LPAREN Expression RPAREN           assoc => group action => ::copy[1]
+              ||        Expression '**' Expression  assoc => right action => do_pow
+              ||        Expression  '*' Expression                 action => do_mul
+               |        Expression  '/' Expression                 action => do_div
+              ||        Expression  '+' Expression                 action => do_plus
+               |        Expression  '-' Expression                 action => do_minus
+  :discard ::= /[\s]+/
+  event Expression$ = completed Expression
+  LPAREN ~ '('
+  RPAREN ~ ')'
+  :lexeme ::= LPAREN pause => after event => LPAREN$
+  :lexeme ::= RPAREN pause => after event => RPAREN$
+
+=head3 Injecting user-defined values in the parse tree
+
+At any time where the control is given back to the user, user-defined perl values, that can be I<anything>, can be injected. The most common method is:
+
+  $eslifRecognizer->lexemeRead(symbolName, perlValue, lengthInBytes, grammarLength)
+
+C<grammarLength> is optional and default to C<1>, this is the number of symbols spanned, and should be rarelly of use... On the other hand, C<lengthInBytes> is required, but C<may be zero> (when it is zero you are really injecting things I<without> moving the internal pointers).
+Please note that when this is a stream of characters, you have to think in terms of UTF-8 encoding for the number of bytes.
+
+Since injecting values is possible only for lexemes, it is often practical to require a pause information from the recognizer with the method:
+
+  $eslifRecognizer->lexemeLastPause(symbolName)
+
+which will return a perl's string for the last paused information for lexeme C<symbolName>, or C<undef> if there is none. The number of C<bytes> in this string is the relevant thing here.
+
+User can also I<try> lexemes, using:
+
+  $eslifRecognizer->lexemeTry(symbolName)
+
+and get the trial paused information with:
+
+  $eslifRecognizer->lexemeLastTry(symbolName)
+
+For example, we will change in the C<(1 + 2) * 3> every number by the itself powered by by C<>, so that the input becomes on-the-fly: C<(1**2 + 2**2) * 3**2> in the next section with valuation:
+
+=head3 Valuation
+
+You have to create a valuator that is using your valuation interface: C<MarpaX::ESLIF::Value->new($eslifRecognizer, $eslifValueInterface)> and loop on the C<value()> method until it returns false.
+
+  my $grammar_v8 = q{
+  Expression ::=
+                 NUMBER
+               | '(' Expression ')'              assoc => group action => ::copy[1]
+              ||     Expression  POW Expression  assoc => right action => do_pow
+              ||     Expression  '*' Expression                 action => do_mul
+               |     Expression  '/' Expression                 action => do_div
+              ||     Expression  '+' Expression                 action => do_plus
+               |     Expression  '-' Expression                 action => do_minus
+  :discard ::= /[\s]+/
+  :lexeme ::= NUMBER pause => before event => ^NUMBER
+  NUMBER     ~ /[\d]+/
+  POW        ~ '**'
+  };
+  printf "Grammar:%s\n", $grammar_v8;
+  $eslifGrammar = MarpaX::ESLIF::Grammar->new($eslif, $grammar_v8);
+  $eslifRecognizerInterface = MyRecognizer->new($input);
+  $eslifRecognizer = MarpaX::ESLIF::Recognizer->new($eslifGrammar, $eslifRecognizerInterface);
+  $eslifRecognizer->scan();
+  if ($eslifRecognizer->isCanContinue) {
+    do {
+      my $alreadyResumed = 0;
+      foreach (@{$eslifRecognizer->events()}) {
+        if ($_->{event}) {   # Can be undef for exhaustion
+          if ($_->{event} eq '^NUMBER') {
+            my $lastPause = $eslifRecognizer->lexemeLastPause($_->{symbol});
+            printf "Pause before event %s for symbol %s: \"%s\"\n", $_->{event}, $_->{symbol}, $lastPause;
+            # ------------------------------
+            # We replace NUMBER by NUMBER*10
+            # ------------------------------
+            $eslifRecognizer->lexemeRead('NUMBER', $lastPause, 0);
+            $eslifRecognizer->lexemeRead('POW', '**', 0);
+            $eslifRecognizer->lexemeRead('NUMBER', '2', 0);
+            # -------------------------------------------
+            # We say to resume exactly where NUMBER ended
+            # -------------------------------------------
+            $eslifRecognizer->resume(bytes::length($lastPause));
+            $alreadyResumed = 1;
+            last
+          }
+        }
+      }
+      $eslifRecognizer->resume() unless $alreadyResumed
+    } while ($eslifRecognizer->isCanContinue)
+  }
+  my $eslifValueInterface = MyValue->new();
+  my $eslifValue = MarpaX::ESLIF::Value->new($eslifRecognizer, $eslifValueInterface);
+  while ($eslifValue->value()) {
+    #
+    # (1**2 + 2**2) * 3**2 = 45
+    #
+    printf "======> %s\n", $eslifValueInterface->getResult;
+  }
+
+You may rememember that we said that the default value for a rule is always to concatenate the input and the alternatives stringification. And indeed, if we remove all the actions from the grammar above, it will try to concatenate all the lexemes and alternatives together, that would leave to this output:
+
+  (1**2+2**2)*3**2
+
+This is a neat way to remove automatically C<:discard> rules from the input -;
+
+You have to notice also that I<nothing> obliges you to inject a alternative value that would be of the same length of what I<should> be in the input. For instance, injecting the string C<*ANYTHING*> for the C<POW> token:
+
+          $eslifRecognizer->lexemeRead('POW', '*ANYTHING*', 0);
+
+would result in this stringification:
+
+  (1*ANYTHING*2+2*ANYTHING*2)*3*ANYTHING*2
+
+=head1 NOTES
+
+All the examples above are adapted from L<Marpa::R2's Semantics|https://metacpan.org/pod/distribution/Marpa-R2/pod/Semantics.pod> documentation.
+
+=head1 SEE ALSO
+
+L<MarpaX::ESLIF>
+
+=head1 AUTHOR
+
+Jean-Damien Durand <jeandamiendurand@free.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Jean-Damien Durand.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,20 @@
+CHANGES
+MANIFEST			This list of files
+MANIFEST.SKIP
+Makefile.PL
+README
+TODO
+bin/cppm
+bin/mvpm
+bin/newpm
+bin/newpmbin
+bin/newpmdist
+bin/rmpm
+lib/Module/Husbandry.pm
+newpm_example_dir/Template.pm
+newpm_example_dir/Template.t
+newpm_example_dir/skel/CHANGES
+newpm_example_dir/skel/MANIFEST.SKIP
+newpm_example_dir/skel/Makefile.PL
+t/Module-Husbandry.t
+try_it

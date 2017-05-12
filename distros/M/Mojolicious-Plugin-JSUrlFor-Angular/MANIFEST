@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/Mojolicious/Plugin/JSUrlFor/Angular.pm
+lib/Mojolicious/Command/generate/js_url_for_angular.pm
+t/generate_command.t
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

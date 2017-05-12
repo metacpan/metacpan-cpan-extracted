@@ -1,0 +1,153 @@
+# -*- cperl -*-
+
+%%
+
+tarefas    : tarefa tarefas   { +[ $_[1], @{$_[2]} ] }
+           | tarefa           { +[ $_[1] ] }
+           | PERL             {  eval ( "package main; $_[1] " );
+                                 die($@) if $@;
+                                 [ { perl => $_[1]} ]}
+           ;
+
+tarefa     : nome ':' dependencias '(' tempo ')' nrcpus comandos {
+                +{
+					rule => $_[1],
+					depend_on => $_[3],
+ 					walltime => $_[5],
+					action => $_[8],
+					cpus => $_[7],
+                }
+           }
+           ;
+
+nrcpus     : '[' NR ']' { return $_[2] }
+           |            { return 0 }
+           ;
+
+nome       : ID       { +{ id => $_[1] } }
+           | ID vars  { +{ id => $_[1], vars => $_[2] } }
+           ;
+
+vars       : VAR '.' vars  { +[ $_[1], @{$_[3]} ] }
+           | VAR           { +[ $_[1] ] }
+           ;
+
+dependencias: nome dependencias { +[ $_[1], @{$_[2]} ] }
+            |                   { +[] }
+            ;
+
+tempo       : TIME    { $_[1] }
+            ;
+
+comandos    : comando          { +[$_[1]] }
+            | comandos comando { +[ @{$_[1]}, $_[2]] }
+            ;
+
+comando     : comandoShell  { $_[1] }
+            | comandoPerl   { $_[1] }
+            | atribuicaoSet { $_[1] }
+            ;
+
+comandoShell: CMD     { +{ shell => $_[1] } }
+            ;
+
+comandoPerl: PRL      { +{ perl => $_[1] } }
+           ;
+
+atribuicaoSet: ATRIBCMD          { $_[1] }
+             | ATRIBPRL          { $_[1] }
+             ;
+
+%%
+
+use Text::Balanced qw ( extract_codeblock);
+
+use Data::Dumper;
+
+my $File;
+
+sub parseFile {
+  my $self = shift;
+  my $file = shift || undef;
+  my $p = new Makefile::Parallel::Grammar();
+  init_lex($file);
+  $p->YYParse( yylex   => \&yylex,
+	       yyerror => \&yyerror);
+}
+
+sub yyerror {
+  if ($_[0]->YYCurtok) {
+    printf STDERR ('Error: a "%s" (%s) was found where %s was expected '."\n",
+		   $_[0]->YYCurtok, $_[0]->YYCurval, $_[0]->YYExpect);
+    printf STDERR "Remaining file:\n$File"
+  } else {
+    print  STDERR "Expecting one of ",join(", ",$_[0]->YYExpect),"\n";
+  }
+}
+
+
+sub init_lex{
+  my $file = shift;
+  local $/;
+  undef $/;
+
+  if ($file) {
+    open F, $file or die "$!";
+    $File = <F>;
+    close F;
+  } else {
+    $File = <>
+  }
+
+  $File.="\n";
+}
+
+sub yylex{
+  my $aux1;
+  my $aux2;
+  my $ID = qr/[a-zA-Z][a-zA-Z0-9-]*/;
+
+  for($File){
+    # Advance spaces and comments and expand ID=def
+    1 while (s!^( |\n|\#.*)!!g  or
+             s!^($ID)\s*=\s*(.*)!$aux1=$1;$aux2=$2;""!e  
+                   &&  s/\$$aux1\b/$aux2/g );
+
+    # EOF
+    return ("","") if $_ eq "";
+
+    # Tokens
+
+    s!^($ID)!!                         and return ("ID", $1);
+    s!^(\$[a-zA-Z])!!                  and return ("VAR", $1);
+    s!^((\d+:)+\d+)!!                  and return ("TIME", $1);
+    s!^(\d+)!!                         and return ("NR", $1);
+    s!^([\[\]:\(\)\.])!!               and return ($1, $1);
+
+    # UGLY but works for now
+    ###s!^\t([A-Za-z])\s*<-\s*sub\{\s*([^\n]+)\s*\}!!  and return ("ATRIBPRL", +{def=>$1,asPerl=>$2});
+    if(s!^\t([A-Za-z])\s*<-\s*sub\s*(?=\{)!!){ 
+        ($b,$_)=extract_codeblock($_,"{}");
+        return ("ATRIBPRL", +{def=>$1,asPerl=>$b});
+    }
+    if(s!^\t([A-Za-z])\s*<-\s*(?=\{)!!){ 
+        ($b,$_)=extract_codeblock($_,"{}");
+        return ("ATRIBPRL", +{def=>$1,asPerl=>$b});
+    }
+    s!^\t([A-Za-z])\s*<-\s*([^\n]+)!!  and return ("ATRIBCMD", +{def=>$1,asShell=>$2});
+
+     ##  s!^\t\s*sub\{\s*([^\n]+)\s*\}\n!!  and return ("PRL", $1);
+    if( s!^\t\s*sub\s*(?=\{)!!){ 
+        ($b,$_)=extract_codeblock($_,"{}");
+        return ("PRL", $b);
+    }
+    if( s!^\t\s*(?=\{)!!){ 
+        ($b,$_)=extract_codeblock($_,"{}");
+        return ("PRL", $b);
+    }
+    s!^\t\s*([^\n]+)\n!!               and return ("CMD", $1);
+    s!^\%\%(.*)!!s                     and return ("PERL", $1);
+
+    print STDERR "Unexpected symbols: '$File'\n" ;
+  }
+}

@@ -1,0 +1,4 @@
+tell application "iTunes"
+	set myFile to alias "Otter:Users:brian:Dev:MacOSX:iTunes:mp3:The_Wee_Kirkcudbright_Centipede.mp3"
+	set myTrack to add myFile
+end tell

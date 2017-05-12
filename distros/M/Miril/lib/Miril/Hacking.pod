@@ -1,0 +1,164 @@
+=head1 NAME
+
+Miril::Hacking - Miril Developer's Guide
+
+=head1 ABOUT
+
+This documents provides an overview of how Miril works under the hood and makes it easier for developers to start hacking.
+
+=head1 ARCHITECTURE
+
+=head2 Framework
+
+Miril uses L<CGI::Application> as its base framework.
+
+=head2 Configuration
+
+Miril currently allows configuration only in XML format, but other formats will probably be added in the future. The required parser will probably be guessed from the extension of the configuration file.
+
+Currently the configuration file is processed by L<Miril::Config>. It adds some defaults and simplifies some data structures. It returns a configuration object, which is a L<Data::AsObject> hashref. L<XML::TreePP> is used for parsing XML, since it is lightweight and pure perl.
+
+The configuration format does not follow a specific structure, and new elements may be freely added when needed by third-party Miril plugins.
+
+=head2 Authentication and user management
+
+L<CGI::Application::Plugin::Authentication> is used to authenticate users. The generic driver is used with a custom verification callback provided by L<Miril::UserManager::XMLTPP>.
+
+A special file (or a databse) is used to manage users and their passwords. A module in the C<Miril::UserManager> namespace takes care of reading data from the users file and updating it when necessary. Currently the only L<Miril::UserManager::XMLTPP> exists, providing an interface to a users file in XML format.
+
+A user management module for Miril must provide the following interface:
+
+=over
+
+=item new
+
+A constructor
+
+=item verification_callback
+
+Returns a reference to a subroutine used to authenticate the user. The subroutine should accept two arguments - a username and a password, and should return the username if the authentication was successful, and C<undef> otherwise.
+
+=item get_user
+
+Accepts a username as its argument and returns an object containing all user data.
+
+=item set_user
+
+Accepts a user object as its argument and updates the data about this user in the configuration file (or creates a new entry if no such user exist yet).
+
+=item delete_user 
+
+Accepts a username as its argument and attempts to delete this user from the configuration file.
+
+=item encrypt
+
+Receives a plain-text password as its argument and returns its encrypted representation.
+
+=back
+
+The user object has the following structure:
+
+=over
+
+=item username
+
+The username used for logging into Miril.
+
+=item name
+
+The real name of the user or any other desicriptive text.
+
+=item password
+
+The user's password.
+
+=item email
+
+The user's email.
+
+=back
+
+=head2 The user interface
+
+Miril uses L<HTML::Template> to generate its user interface. The actual templates are embedded in L<Miril::Theme::Flashyweb> and L<Miril::Theme::Flashyweb::Stylesheet>. The C<load_tmpl> method in L<Miril::Util> loads the requested template. The theming system is designed to be extensible, and support for using different themes and templating engines is planned. 
+
+=head2 Model (storage)
+
+Miril can store its data in plain text files or in a database (database support is not implemented yet). A class in the C<Miril::Model> namespace takes care of all functions related to reading and writing data. Its interface is as follows:
+
+=over
+
+=item new
+
+Constructor.
+
+=item get_post
+
+Receives as its argument the ID of a post, and returns a post object.
+
+=item get_posts
+
+Optionally receives as an argument search criteria provided as a hash (e.g. "title", "author", "status", etc.) and returns all matching posts. If no arguments are supplied, returns a list of all posts.
+
+=item save
+
+Receives as its argument a post object, and updates it or creates it in the database.
+
+=item delete
+
+Receives as its argument the ID of a post, and deletes it from the database.
+
+=back
+
+The contents of the post object is described in L<Miril::Manual>.
+
+Currently only L<Miril::Model::File::XMLTPP> is availabe. It writes the body of posts to individual files named as their respective post ID. Metadata for all posts is written in a separate file, C<data.xml>. Plans are to refactor this class so that metadata for each post is written in the same file as the post itself, and C<data.xml> acts only as a cache for metadata.
+
+=head2 View (templating systems)
+
+A view for Miril is a templating engine used to publish data from its database to html. It is the templating language used by Miril users to create the templates for their website, and it may be different from the templating language used to display Miril's user interface theme. Currently Miril supports L<HTML::Template> and L<Text::Template> views. A view must inherit from L<Miril::View::Abstract> and provide a single method: C<load>. This method receives two named arguments: C<name> and C<params>. C<name> is the name of the requested template, as specified for each post and list type in the Miril configuration file. C<params> is a hashref with variables to be passed on to the templates (normally these will be C<$post> for ordinary posts and C<$posts> for lists).
+
+=head2 Filters
+
+Filters convert text in various formats (e.g. Markdown, Textile, etc.) to HTML. Filters reside in the C<Miril::Filter> namespace.
+
+=head2 The Miril object
+
+Miril passes a copy of the miril object to the constructor of each plugin class (that means models, views, filters, etc.). It is used primarily to get to the config object and to the error processing function (see below).
+
+=head2 Utility functions
+
+The L<Miril::Util> package provides a bunch of uitility functions for Miril.
+
+=head1 CODING GUIDELINES
+
+=head2 Object-oriented programming
+
+Miril currently does not use any specific object-oriented programming framework. Properties are set via direct access to the members of the underlying hashref. Accessor methods are defined at the end of each class.
+
+=head2 Exception handling
+
+Miril currently uses L<Try::Tiny> for exception handling. Plans are to start using L<autodie> in the near future as well.
+
+Miril uses a special error handling mechanism provided by the C<process_error> method of the miril object. It is meant to be used inside of a C<catch> clause instead of C<warn> or C<die>. It receives three arguments: a user-friendly error message, the actual error message as provided by C<$!> (or C<$_> when using L<Try::Tiny>), and an optional third boolean argument specifying whether the error is to be treated as fatal or not. Using this functionality, whenever errors occur Miril will present them in a nicely formatted list within the Miril user interface, so as not to scare the end user. 
+
+All of Miril's error related functions are defined in L<Miril::Error>.
+
+=head2 Dependencies
+
+The goal of Miril is to be as lightweight on dependencies as possible, without reinventing the wheel. At some point in the future, I would like to be able to ship Miril, along with all of its dependencies, either as a single file, or as modules in a L<local::lib> that can simply be uzipped and used. So all core Miril depndencies should be pure perl and consist of as few files as possible. Many of the modules Miril uses have been choses precisely because they match these criteria (L<CGI::Application>, L<HTML::Template>, L<XML::TreePP>, etc.).
+
+=head1 AUTHOR
+
+Peter Shangov, C<< <pshangov at yahoo.com> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2009 Peter Shangov.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

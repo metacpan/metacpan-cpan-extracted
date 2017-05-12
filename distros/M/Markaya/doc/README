@@ -1,0 +1,12 @@
+html:
+  - head:
+    - title: README First
+  - body:
+    - p: >
+        All documents for Markaya is written in Markaya format. You
+        can compile them into HTML format by using this command
+        (replace doc/README to other demended files):
+
+    - pre: |
+        perl perl/Markaya/bin/markaya < doc/README
+

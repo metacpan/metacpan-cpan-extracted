@@ -1,0 +1,15 @@
+The following people have made contributions to Mozilla::Mechanize.
+Please email me (slanning@cpan.org) if I've omitted someone or
+otherwise made a mistake.
+
+Scott Lanning
+muppet (of the gtk2-perl team)
+Uwe Voelker
+Sébastien Aperghis-Tramoni
+
+
+Mozilla::Mechanize was ported (and copied) from
+Win32::IE::Mechanize, by Abe Timmerman.
+
+Win32::IE::Mechanize was in turn ported from
+WWW::Mechanize, by Andy Lester.

@@ -1,0 +1,19 @@
+
+# Example site description file
+
+   top  1.txt  bottom  1.html  # Builds 1.html
+  top  2.txt  bottom  2.html    # Builds 2.html
+top  3.txt  bottom  3.html  # Builds 3.html
+
+# As you can see, comments can go just about anywhere,
+# the lines don't have to be very neat, and
+# text doesn't have to start at the beginning of a line.
+# The first line need not be the first line of the file.
+# When you run the module, it makes 1.html, 2.html, and 3.html.
+# Each .html file is built by concatenating the ealier files
+# mentioned on its line, in the order mentioned.
+# Comments, obviously, start with the sharp character,
+# just as they do in most 'nix configuration files.
+# You've read the README file already, right?
+
+

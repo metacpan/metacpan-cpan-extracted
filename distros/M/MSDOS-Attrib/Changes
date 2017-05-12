@@ -1,0 +1,44 @@
+Revision history for Perl extension MSDOS::Attrib.
+
+1.06   2014-09-06
+	- no functional changes
+	- release tests moved to xt/
+
+1.05   2012-03-21
+	- no functional changes
+	- now built with Dist::Zilla (includes v2 META.json)
+	- repository now publicly available on GitHub
+
+1.04   2008-05-03
+	- no functional changes
+	- check for supported OS in Build.PL
+	- minor clean up to documentation
+
+1.03   2007-03-03
+	- build fixes for Cygwin
+	- fixed pod-coverage.t
+	- updated my email address
+
+1.02   2007-02-18
+	- use XSLoader if available
+	- create all constants at startup
+	- updated my email address
+	- use Module::Build
+
+1.01   1998-10-25
+	- updated my email address
+
+1.00   1997-09-13
+	- added Win32 support to OS2::Attrib and renamed to MSDOS::Attrib.
+
+Revision history for Perl extension OS2::Attrib.
+
+1.00   1997-02-26
+	- end of beta period (no significant changes)
+
+0.002  1996-10-17
+	- renamed functions to match Perl style guide
+	- first public beta release
+
+0.001  1996-10-16
+	- original version; created by h2xs 1.16

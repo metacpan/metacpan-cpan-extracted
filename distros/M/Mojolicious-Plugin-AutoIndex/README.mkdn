@@ -1,0 +1,47 @@
+# NAME
+
+Mojolicious::Plugin::AutoIndex - Mojolicious plugin for autoindex function at static resource
+
+# VERSION
+
+version 0.0006
+
+# SYNOPSIS
+
+This Plugin works just sames Nginx's autoindex directive, which will detect index file in a directory when your request is a directory.
+
+    # use plugin
+    $self->plugin('AutoIndex' => { index => [qw/index.html index.htm index.txt/] });
+
+    # then:::
+
+    # view http://www.example.com/dira/
+    # mojolicious will detect whether /dira is an static file
+    # if found, it will render its conent
+
+    # in use this Plugin, if requst URI ends with a slash : '/',
+    # we will automatically append the index page to its path,
+    # for example, in above request URI , mojolicious will detect
+    # dira/index.html instead.
+
+# DESCRIPTION
+
+## OPTIONS
+
+- index
+
+    index files will used to detect as index page, for example:
+
+        plugin 'AutoIndex => { index => [qw/index.html/] }
+
+# AUTHOR
+
+ChinaXing(陈云星) <chen.yack@gmail.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by ChinaXing(陈云星).
+
+This is free software, licensed under:
+
+    The (three-clause) BSD License

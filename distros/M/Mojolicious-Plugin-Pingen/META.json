@@ -1,0 +1,56 @@
+{
+   "abstract" : "Easily submit your documents to pingen for printing and mailing",
+   "author" : [
+      "Tobias Oetiker <tobi@oetiker.ch>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Pingen",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t",
+         "setup"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Socket::SSL" : "0",
+            "Mojolicious" : "6.0",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/oetiker/mojolicious-plugin-pingen/issues"
+      },
+      "license" : [
+         "http://opensource.org/licenses/GPL-3.0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/oetiker/mojolicious-plugin-pingen"
+      }
+   },
+   "version" : "v0.2.3"
+}

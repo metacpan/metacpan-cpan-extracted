@@ -1,0 +1,17 @@
+Revision history for MooseX-AttributeDocumented
+
+0.1003 2015-01-18T00:03:46Z CET
+ [Requirements]
+ - Added Test::Warnings as a test prereq.
+
+0.1002 2015-01-13T16:36:04Z CET
+ [Bug Fixes]
+ - Fixed a 'subroutine redefined' warning.
+
+0.1001 2015-01-13T00:05:40Z CET
+ [Bug Fixes]
+ - Removed 'documentation', since it already exists. Fixes #1.
+
+0.1000 2015-01-12T22:43:59Z CET
+ - Initial release
+

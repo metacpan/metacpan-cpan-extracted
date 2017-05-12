@@ -1,0 +1,24 @@
+# Copyright (c) 2012, cPanel, Inc.
+# All rights reserved.
+# http://cpanel.net/
+#
+# This is free software; you can redistribute it and/or modify it under the same
+# terms as Perl itself.  See the LICENSE file for further details.
+
+# Basic system aliases -- these MUST be present.
+MAILER-DAEMON:  postmaster
+postmaster:	root
+site_blackhole: /dev/null
+
+root:	cpanelqa
+
+majordomo:	"|/usr/lib/majordomo/wrapper majordomo"
+foolist: "|/usr/lib/majordomo/wrapper resend -l foolist -h cpanelqatesting.net foolist-outgoing"
+foolist-outgoing: :include:/var/lib/majordomo/lists/foolist
+foolist-list: :include:/var/lib/majordomo/lists/foolist
+owner-foolist: erin@cpanel.net
+foolist-owner: erin@cpanel.net
+foolist-approval: erin@cpanel.net
+foolist-request: "|/usr/lib/majordomo/wrapper majordomo -l foolist"
+cat-example: "|/bin/test -v \"one two\""
+*: ":fail: No such person at this address"

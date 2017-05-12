@@ -1,0 +1,20 @@
+Revision history for Mojolicious-Plugin-ProRenderer
+
+0.40    08 Janyary 2013
+        Module moved to Mojolicious plugins
+
+Revision history for MojoX-Renderer-HTP
+
+0.032	01 October 2009
+		Fixed Description
+
+0.031   30 September 2009
+		Changed according to changes in Mojo (v.0.991251)
+		from 18 August 2009
+
+0.021   02 August 2009
+        Fixed Dependencies
+
+0.01    01 August 2009
+        First version, released on an unsuspecting world.        
+

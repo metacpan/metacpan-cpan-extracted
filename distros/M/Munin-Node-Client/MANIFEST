@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Munin-Node-Client.t
+lib/Munin/Node/Client.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,569 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://mrs.cmbi.ru.nl/mrsws/search" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns="http://mrs.cmbi.ru.nl/mrsws/search" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+ <wsdl:types>
+  <xsd:schema targetNamespace="http://mrs.cmbi.ru.nl/mrsws/search" xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+   <xsd:simpleType name="Algorithm">
+    <xsd:restriction base="xsd:string">
+     <xsd:enumeration value="Vector"/>
+     <xsd:enumeration value="Dice"/>
+     <xsd:enumeration value="Jaccard"/>
+    </xsd:restriction>
+   </xsd:simpleType>
+   <xsd:complexType name="BooleanQuery">
+    <xsd:sequence>
+     <xsd:element name="operation" type="ns:BooleanQueryOperation" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="index" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="value" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="leafs" type="ns:BooleanQuery" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+   </xsd:complexType>
+   <xsd:simpleType name="BooleanQueryOperation">
+    <xsd:restriction base="xsd:string">
+     <xsd:enumeration value="CONTAINS"/>
+     <xsd:enumeration value="LT"/>
+     <xsd:enumeration value="LE"/>
+     <xsd:enumeration value="EQ"/>
+     <xsd:enumeration value="GT"/>
+     <xsd:enumeration value="GE"/>
+     <xsd:enumeration value="UNION"/>
+     <xsd:enumeration value="INTERSECTION"/>
+     <xsd:enumeration value="NOT"/>
+     <xsd:enumeration value="ADJACENT"/>
+     <xsd:enumeration value="CONTAINSSTRING"/>
+    </xsd:restriction>
+   </xsd:simpleType>
+   <xsd:element name="ClusterDocuments">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="db" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="ids" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="ClusterDocumentsResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="similarity" type="xsd:float" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="children" type="ns:N10WSSearchNS7ClusterE" minOccurs="0" maxOccurs="unbounded"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="CompareDocuments">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="db" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="doc_a" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="doc_b" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="CompareDocumentsResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="similarity" type="xsd:float" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="Cooccurrence">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="db" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="ids" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="idf_cutoff" type="xsd:float" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="resultoffset" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="maxresultcount" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="CooccurrenceResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="terms" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="Count">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="db" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="booleanquery" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="CountResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="response" type="xsd:unsignedInt" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:complexType name="DatabankInfo">
+    <xsd:sequence>
+     <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="url" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="script" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="blastable" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="files" type="ns:FileInfo" minOccurs="0" maxOccurs="unbounded"/>
+     <xsd:element name="links" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+   </xsd:complexType>
+   <xsd:complexType name="FileInfo">
+    <xsd:sequence>
+     <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="uuid" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="version" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="path" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="modificationDate" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="entries" type="xsd:unsignedInt" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="fileSize" type="xsd:unsignedLong" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="rawDataSize" type="xsd:unsignedLong" minOccurs="1" maxOccurs="1"/>
+    </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="Find">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="db" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="queryterms" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="algorithm" type="ns:Algorithm" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="alltermsrequired" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="booleanfilter" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="resultoffset" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="maxresultcount" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="FindBoolean">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="db" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="query" type="ns:BooleanQuery" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="resultoffset" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="maxresultcount" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="FindResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="response" type="ns:FindResult" minOccurs="0" maxOccurs="unbounded"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:complexType name="FindResult">
+    <xsd:sequence>
+     <xsd:element name="db" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="count" type="xsd:unsignedInt" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="hits" type="ns:Hit" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="FindSimilar">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="db" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="algorithm" type="ns:Algorithm" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="resultoffset" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="maxresultcount" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:simpleType name="Format">
+    <xsd:restriction base="xsd:string">
+     <xsd:enumeration value="plain"/>
+     <xsd:enumeration value="title"/>
+     <xsd:enumeration value="html"/>
+     <xsd:enumeration value="fasta"/>
+     <xsd:enumeration value="sequence"/>
+    </xsd:restriction>
+   </xsd:simpleType>
+   <xsd:element name="GetDatabankInfo">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="db" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="GetDatabankInfoResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="info" type="ns:DatabankInfo" minOccurs="0" maxOccurs="unbounded"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="GetEntry">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="db" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="format" type="ns:Format" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="GetEntryResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="entry" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="GetIndices">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="db" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="GetIndicesResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="indices" type="ns:Index" minOccurs="0" maxOccurs="unbounded"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="GetLinked">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="db" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="linkedDatabank" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="resultoffset" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="maxresultcount" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="GetMetaData">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="db" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="meta" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="GetMetaDataResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="data" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:complexType name="Hit">
+    <xsd:sequence>
+     <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="score" type="xsd:float" minOccurs="1" maxOccurs="1"/>
+    </xsd:sequence>
+   </xsd:complexType>
+   <xsd:complexType name="Index">
+    <xsd:sequence>
+     <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="description" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="count" type="xsd:unsignedInt" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="type" type="ns:IndexType" minOccurs="1" maxOccurs="1"/>
+    </xsd:sequence>
+   </xsd:complexType>
+   <xsd:simpleType name="IndexType">
+    <xsd:restriction base="xsd:string">
+     <xsd:enumeration value="Unique"/>
+     <xsd:enumeration value="FullText"/>
+     <xsd:enumeration value="Number"/>
+     <xsd:enumeration value="Date"/>
+    </xsd:restriction>
+   </xsd:simpleType>
+   <xsd:complexType name="N10WSSearchNS7ClusterE">
+    <xsd:sequence>
+     <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="similarity" type="xsd:float" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="children" type="ns:N10WSSearchNS7ClusterE" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+   </xsd:complexType>
+   <xsd:element name="SpellCheck">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="db" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="queryterm" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="SpellCheckResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="suggestions" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="SuggestSearchTerms">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="db" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="queryterm" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="SuggestSearchTermsResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="suggestions" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+  </xsd:schema>
+ </wsdl:types>
+ <wsdl:message name="ClusterDocumentsRequestMessage">
+  <wsdl:part name="parameters" element="ns:ClusterDocuments"/>
+ </wsdl:message>
+ <wsdl:message name="ClusterDocumentsResponseMessage">
+  <wsdl:part name="parameters" element="ns:ClusterDocumentsResponse"/>
+ </wsdl:message>
+ <wsdl:message name="CompareDocumentsRequestMessage">
+  <wsdl:part name="parameters" element="ns:CompareDocuments"/>
+ </wsdl:message>
+ <wsdl:message name="CompareDocumentsResponseMessage">
+  <wsdl:part name="parameters" element="ns:CompareDocumentsResponse"/>
+ </wsdl:message>
+ <wsdl:message name="CooccurrenceRequestMessage">
+  <wsdl:part name="parameters" element="ns:Cooccurrence"/>
+ </wsdl:message>
+ <wsdl:message name="CooccurrenceResponseMessage">
+  <wsdl:part name="parameters" element="ns:CooccurrenceResponse"/>
+ </wsdl:message>
+ <wsdl:message name="CountRequestMessage">
+  <wsdl:part name="parameters" element="ns:Count"/>
+ </wsdl:message>
+ <wsdl:message name="CountResponseMessage">
+  <wsdl:part name="parameters" element="ns:CountResponse"/>
+ </wsdl:message>
+ <wsdl:message name="FindBooleanRequestMessage">
+  <wsdl:part name="parameters" element="ns:FindBoolean"/>
+ </wsdl:message>
+ <wsdl:message name="FindRequestMessage">
+  <wsdl:part name="parameters" element="ns:Find"/>
+ </wsdl:message>
+ <wsdl:message name="FindResponseMessage">
+  <wsdl:part name="parameters" element="ns:FindResponse"/>
+ </wsdl:message>
+ <wsdl:message name="FindSimilarRequestMessage">
+  <wsdl:part name="parameters" element="ns:FindSimilar"/>
+ </wsdl:message>
+ <wsdl:message name="GetDatabankInfoRequestMessage">
+  <wsdl:part name="parameters" element="ns:GetDatabankInfo"/>
+ </wsdl:message>
+ <wsdl:message name="GetDatabankInfoResponseMessage">
+  <wsdl:part name="parameters" element="ns:GetDatabankInfoResponse"/>
+ </wsdl:message>
+ <wsdl:message name="GetEntryRequestMessage">
+  <wsdl:part name="parameters" element="ns:GetEntry"/>
+ </wsdl:message>
+ <wsdl:message name="GetEntryResponseMessage">
+  <wsdl:part name="parameters" element="ns:GetEntryResponse"/>
+ </wsdl:message>
+ <wsdl:message name="GetIndicesRequestMessage">
+  <wsdl:part name="parameters" element="ns:GetIndices"/>
+ </wsdl:message>
+ <wsdl:message name="GetIndicesResponseMessage">
+  <wsdl:part name="parameters" element="ns:GetIndicesResponse"/>
+ </wsdl:message>
+ <wsdl:message name="GetLinkedRequestMessage">
+  <wsdl:part name="parameters" element="ns:GetLinked"/>
+ </wsdl:message>
+ <wsdl:message name="GetMetaDataRequestMessage">
+  <wsdl:part name="parameters" element="ns:GetMetaData"/>
+ </wsdl:message>
+ <wsdl:message name="GetMetaDataResponseMessage">
+  <wsdl:part name="parameters" element="ns:GetMetaDataResponse"/>
+ </wsdl:message>
+ <wsdl:message name="SpellCheckRequestMessage">
+  <wsdl:part name="parameters" element="ns:SpellCheck"/>
+ </wsdl:message>
+ <wsdl:message name="SpellCheckResponseMessage">
+  <wsdl:part name="parameters" element="ns:SpellCheckResponse"/>
+ </wsdl:message>
+ <wsdl:message name="SuggestSearchTermsRequestMessage">
+  <wsdl:part name="parameters" element="ns:SuggestSearchTerms"/>
+ </wsdl:message>
+ <wsdl:message name="SuggestSearchTermsResponseMessage">
+  <wsdl:part name="parameters" element="ns:SuggestSearchTermsResponse"/>
+ </wsdl:message>
+ <wsdl:portType name="mrsws_searchPortType">
+  <wsdl:operation name="GetDatabankInfo">
+   <wsdl:input message="ns:GetDatabankInfoRequestMessage"/>
+   <wsdl:output message="ns:GetDatabankInfoResponseMessage"/>
+  </wsdl:operation>
+  <wsdl:operation name="GetEntry">
+   <wsdl:input message="ns:GetEntryRequestMessage"/>
+   <wsdl:output message="ns:GetEntryResponseMessage"/>
+  </wsdl:operation>
+  <wsdl:operation name="GetMetaData">
+   <wsdl:input message="ns:GetMetaDataRequestMessage"/>
+   <wsdl:output message="ns:GetMetaDataResponseMessage"/>
+  </wsdl:operation>
+  <wsdl:operation name="GetIndices">
+   <wsdl:input message="ns:GetIndicesRequestMessage"/>
+   <wsdl:output message="ns:GetIndicesResponseMessage"/>
+  </wsdl:operation>
+  <wsdl:operation name="Find">
+   <wsdl:input message="ns:FindRequestMessage"/>
+   <wsdl:output message="ns:FindResponseMessage"/>
+  </wsdl:operation>
+  <wsdl:operation name="FindBoolean">
+   <wsdl:input message="ns:FindBooleanRequestMessage"/>
+   <wsdl:output message="ns:FindResponseMessage"/>
+  </wsdl:operation>
+  <wsdl:operation name="FindSimilar">
+   <wsdl:input message="ns:FindSimilarRequestMessage"/>
+   <wsdl:output message="ns:FindResponseMessage"/>
+  </wsdl:operation>
+  <wsdl:operation name="GetLinked">
+   <wsdl:input message="ns:GetLinkedRequestMessage"/>
+   <wsdl:output message="ns:FindResponseMessage"/>
+  </wsdl:operation>
+  <wsdl:operation name="Count">
+   <wsdl:input message="ns:CountRequestMessage"/>
+   <wsdl:output message="ns:CountResponseMessage"/>
+  </wsdl:operation>
+  <wsdl:operation name="Cooccurrence">
+   <wsdl:input message="ns:CooccurrenceRequestMessage"/>
+   <wsdl:output message="ns:CooccurrenceResponseMessage"/>
+  </wsdl:operation>
+  <wsdl:operation name="SpellCheck">
+   <wsdl:input message="ns:SpellCheckRequestMessage"/>
+   <wsdl:output message="ns:SpellCheckResponseMessage"/>
+  </wsdl:operation>
+  <wsdl:operation name="SuggestSearchTerms">
+   <wsdl:input message="ns:SuggestSearchTermsRequestMessage"/>
+   <wsdl:output message="ns:SuggestSearchTermsResponseMessage"/>
+  </wsdl:operation>
+  <wsdl:operation name="CompareDocuments">
+   <wsdl:input message="ns:CompareDocumentsRequestMessage"/>
+   <wsdl:output message="ns:CompareDocumentsResponseMessage"/>
+  </wsdl:operation>
+  <wsdl:operation name="ClusterDocuments">
+   <wsdl:input message="ns:ClusterDocumentsRequestMessage"/>
+   <wsdl:output message="ns:ClusterDocumentsResponseMessage"/>
+  </wsdl:operation>
+ </wsdl:portType>
+ <wsdl:binding name="mrsws_search" type="ns:mrsws_searchPortType">
+  <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+  <wsdl:operation name="GetDatabankInfo">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="GetEntry">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="GetMetaData">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="GetIndices">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="Find">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="FindBoolean">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="FindSimilar">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="GetLinked">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="Count">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="Cooccurrence">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="SpellCheck">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="SuggestSearchTerms">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="CompareDocuments">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="ClusterDocuments">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+ </wsdl:binding>
+ <wsdl:service name="${SERVICE}">
+  <wsdl:port name="mrsws_search" binding="ns:mrsws_search">
+   <soap:address location="${LOCATION}"/>
+  </wsdl:port>
+ </wsdl:service>
+</wsdl:definitions>

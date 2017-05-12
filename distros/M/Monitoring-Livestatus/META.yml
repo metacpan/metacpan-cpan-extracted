@@ -1,0 +1,36 @@
+---
+abstract: 'Perl API for check_mk livestatus to access runtime data from Nagios and Icinga'
+author:
+  - 'Sven Nierlein, 2009-present, <sven@nierlein.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Monitoring-Livestatus
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Digest::MD5: 0
+  Encode: 0
+  IO::Socket::INET: 0
+  IO::Socket::UNIX: 0
+  JSON::XS: 0
+  Test::More: '0.87'
+  perl: 5.6.0
+  utf8: 0
+resources:
+  bugtracker: http://github.com/sni/Monitoring-Livestatus/issues
+  homepage: http://search.cpan.org/dist/Monitoring-Livestatus/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/sni/Monitoring-Livestatus
+version: '0.78'

@@ -1,0 +1,10 @@
+Revision history for Math-EWMA
+
+0.03	2015-05-20
+	- Fix PREREQ_PM in Makefile
+ 
+0.02	2015-05-19
+	- Fix tests with irrational floats
+
+0.01	2015-05-12
+	- First release

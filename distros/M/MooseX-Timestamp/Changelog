@@ -1,0 +1,36 @@
+2010-07-20  Sam Vilain  <sam@vilain.net>
+
+	* MooseX::Timestamp 0.07
+	* Timestamp to TimestampTZ coerce rule now assumes local time, not
+	  UTC.
+	* All functions now support high-resolution timestamps.
+
+2010-07-06  Sam Vilain  <sam@vilain.net>
+
+	* MooseX::Timestamp 0.06
+	* use epochtz function in TimestampTZ coerce rule to avoid losing
+	  timezone of passed-in values
+
+2008-08-11  Sam Vilain  <sam@vilain.net>
+
+	* MooseX::Timestamp 0.05
+	* add epochtz function
+
+2007-12-12  Sam Vilain  <sam@vilain.net>
+
+	* MooseX::Timestamp 0.04
+	* Fix zone() function for offsets negative of GMT
+	* Rely yet again less on POSIX::strftime() in the test suite
+	* Fix another bad test.
+
+2007-12-12  Sam Vilain  <sam@vilain.net>
+
+	* MooseX::Timestamp 0.03
+	* fix tests for non-GNU/non-Olson strftime()
+
+2007-12-09  Sam Vilain  <sam@vilain.net>
+
+	* MooseX::Timestamp 0.02
+	* prove that Int -> time_t doesn't call epoch()
+	* allow time_t attributes to coerce from 'marginal' timestamps
+

@@ -1,0 +1,23 @@
+Changes
+lib/Map/Tube/Beijing.pm
+Makefile.PL
+MANIFEST                                 This list of files
+MANIFEST.SKIP
+README
+share/beijing-map.xml
+t/00-load.t
+t/01-xml.t
+t/02-xml.t
+t/03-map.t
+t/04-routes-chin.t
+t/05-routes-pinyin.t
+t/10-manifest.t
+t/11-meta-json.t
+t/12-meta-yml.t
+t/13-version.t
+t/14-signature.t
+t/20-pod.t
+t/21-changes.t
+SIGNATURE
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

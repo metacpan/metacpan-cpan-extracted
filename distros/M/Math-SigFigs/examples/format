@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+
+use Math::SigFigs;
+
+@i = qw(2400  2400  2400  2400   2400    141  141  0.039  0.039  9.9  9.9  9.9);
+@n = qw(1     2     3     4      5       2    3    1      2      1    2    3  );
+@x = qw(2000  2400  2400  2400.  2400.0  140  141. 0.04   0.039  10   9.9  9.90);
+
+print "Formatting a number to a number of significant figures....\n\n";
+
+print "N\tn\tgot\texpected\n\n";
+for($i=0; $i<=$#i; $i++) {
+   $N = $i[$i];
+   $n = $n[$i];
+   $x = $x[$i];
+   $g = FormatSigFigs($N,$n);
+   print "$N\t$n\t$g\t$x\n";
+}

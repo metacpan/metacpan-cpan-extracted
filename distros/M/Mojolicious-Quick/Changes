@@ -1,0 +1,9 @@
+0.002     2015-09-08 13:05:11-05:00 America/Chicago
+
+- rewrite_url defaults to 1. Updated documentation to note that anything you
+  can do with this module, you can also do with straight Mojolicious / 
+  Mojolicious::Lite
+
+0.001     2015-09-08 11:13:11-05:00 America/Chicago
+
+- Initial revision

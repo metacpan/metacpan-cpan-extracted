@@ -1,0 +1,203 @@
+#!/usr/bin/perl
+#############################################################################
+## wpbl helper script
+## Copyright (C) 2004  Martin Ward  http://www.cse.dmu.ac.uk/~mward/
+## Email: martin@gkc.org.uk
+##
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation; either version 2 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#############################################################################
+#
+# Append an IP to the WPBL log with the tag "good" or "spam"
+#
+# Usage: wpbl -send  OR  wpbl [spam|good] < msg
+#
+# With no spam/good argument the script checks for an X-Spam-Votes: header.
+#
+# The "-send" option rotates the log, summarises it
+# and sends it to WPBL_URL via curl
+#
+# Format of summary is:
+# IP<tab>goodcount<tab>spamcount
+#
+
+use strict;
+use warnings;
+
+sub summarise();
+sub rotate($);
+
+umask 077;
+
+(my $myname = $0) =~ s|(.*/)*||;	# strip path component from name
+my $Usage = "Usage: wpbl -send  OR  wpbl [spam|good] < msg\n";
+# Check for zero or one arguments:
+die $Usage unless (@ARGV == 0) || (@ARGV == 1);
+
+my $HOME = $ENV{'HOME'} || $ENV{'LOGDIR'} ||
+		(getpwuid($<))[7] || die "You're homeless!\n";
+
+my $base = "$HOME/.wpbl";
+my $exclude = "$base/data/exclude";
+my $log = "$base/log";
+my $auth = "$base/data/auth";
+my $url = "http://wpbl.pc9.org/cgi-bin/wpbl-submit.cgi";
+my $request = "$base/data/request";
+my $levels = 9; # Number of backup log and request files to keep
+
+if (@ARGV && ($ARGV[0] eq "-send")) {
+  # Rotate logfile, summarise and upload
+  summarise();
+  exit(0);
+}
+
+my ($spam, $good);
+if (@ARGV && ($ARGV[0] eq "spam")) {
+  $spam = 1;
+  shift;
+}
+if (@ARGV && ($ARGV[0] eq "good")) {
+  $good = 1;
+  shift;
+}
+
+die $Usage if @ARGV;
+
+# Compute a regexp of IPs to exclude:
+my $excl_pat = "";
+
+open(EX, $exclude) or die "Can't read $exclude: $!\n";
+while (<EX>) {
+  chomp;
+  s/#.*$//;
+  next unless /\S/;
+  s/\s+//g;
+  s/\./\\./g;
+  $excl_pat .= "$_|";
+}
+# Remove trailing |
+$excl_pat =~ s/\|$//;
+$excl_pat = "^($excl_pat)";
+
+
+# Slurp message from STDIN:
+undef $/;
+$_ = <STDIN>;
+
+# Trim body if present:
+s/\n\n.*/\n/s;
+
+# Join broken header lines:
+s/\n[ \t]+/ /g;
+
+# Get list of IPs in Received lines:
+my @ips = /\nReceived:.*?\[(\d+\.\d+\.\d+\.\d+)\]/g;
+
+# Delete exclusions:
+@ips = grep { !/$excl_pat/ } @ips;
+
+# Check that we found an IP (could be a local email):
+
+exit(0) unless @ips;
+
+open(LOG, ">>$log") or die "Can't write to $log: $!\n";
+if ($spam) {
+  print LOG "spam $ips[0]\n";
+} elsif ($good) {
+  print LOG "good $ips[0]\n";
+} elsif (/\nX-.*-MailScanner: Found to be infected/) {
+  # Headers indicate a virus:
+  print LOG "spam $ips[0]\n";
+} elsif (/\nX-Spam-Votes: [456789]/) {
+  # Headers indicate a spam:
+  print LOG "spam $ips[0]\n";
+} elsif (/\nX-Spam-Votes: 0/) {
+  # Headers indicate a good message:
+  print LOG "good $ips[0]\n";
+} else {
+  # Headers are inconclusive: ignore this message
+}
+close(LOG);
+
+exit(0);
+
+
+sub summarise() {
+  # Wait until the log file is at least 400 bytes
+  # (which corresponds to about 21 records
+  # and therefore about 20 unique IP addresses):
+  return unless -s $log >= 400;
+  system "$HOME/bin/mylogrotate", $log;
+  system "$HOME/bin/mylogrotate", $request;
+  my %total = ();
+  open(IN, "$log.1") or die "Can't read log.1: $!\n";
+  while(<IN>) {
+    if (/^spam (\S+)/) {
+      $total{$1}{spam}++;
+    } elsif (/^good (\S+)/) {
+      $total{$1}{good}++;
+    }
+  }
+  close(IN);
+  my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime;
+  $year += 1900; # $year is the number of years since 1900
+  $mon += 1;     # Months are numbered 0-11
+  my $name = sprintf("%04i%02i%02i%02i%02i%02i", $year, $mon, $mday, $hour, $min, $sec);
+  # Get password:
+  my ($user, $pass);
+  open(IN, $auth) or die "Can't read $auth: $!\n";
+  while (<IN>) {
+    if (/^(\S+)\s+(\S+)/) {
+      $user = $1;
+      $pass = $2;
+    }
+  }
+  die "No user or password found in $auth!\n" unless $user;
+  open(OUT, ">$request") or die "Can't write to $request: $!\n";
+  print OUT "auth $user $pass\n";
+  print OUT "proto 1\n";
+  print OUT "file $name\n";
+  foreach my $ip (keys %total) {
+    $total{$ip}{$_} ||= 0 for (qw(good spam));
+    print OUT "$ip\t$total{$ip}{good}\t$total{$ip}{spam}\n";
+  }
+  print OUT "exit\n";
+  close(OUT);
+
+  # Use -s -S for silent mode but showing errors:
+  my $result = `gzip < $request | curl -s -S --data-binary \@- $url`;
+  return if $result =~ /success/;
+  return if $result =~ /^\s*$/;
+
+  # Upload failed
+  print "$myname: There was an error uploading the data in request.$name:\n$result";
+  rename($request, "$request.$name");
+
+}
+
+
+# Rotate the given file, eg: log becomes log.1,
+# log.1 becomes log.2 up to $levels levels:
+
+sub rotate($) {
+  my ($file) = @_;
+  next unless (-s $file);
+  foreach my $ext (reverse(1..$levels-1)) {
+    next unless (-s "$file.$ext");
+    my $new = $ext + 1;
+    rename("$file.$ext", "$file.$new");
+  }
+  rename("$file", "$file.1");
+}
+

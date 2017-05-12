@@ -1,0 +1,13 @@
+name: MasonX-Profiler
+version: 0.06
+abstract: Mason per-component profiler
+author: Autrijus Tang <autrijus@autrijus.org>
+license: perl
+distribution_type: module
+requires:
+  HTML::Mason: 0
+  Time::HiRes: 0
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.33

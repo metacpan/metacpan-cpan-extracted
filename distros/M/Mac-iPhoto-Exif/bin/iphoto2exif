@@ -1,0 +1,66 @@
+#!/perl
+use Mac::iPhoto::Exif::Commandline;
+
+
+use I18N::Langinfo qw(langinfo CODESET);
+my $codeset = langinfo(CODESET);
+
+use Encode qw(decode);
+@ARGV = map { decode $codeset, $_ } @ARGV;
+
+my $cmd = Mac::iPhoto::Exif::Commandline->new_with_options;
+$cmd->run;
+
+=head1 NAME
+
+iphoto2exif - Write iPhoto meta data to Exif via command-line
+
+=head1 USAGE
+
+ iphoto2exif [options]
+
+=head1 OPTIONS
+
+=head2 directory
+
+Limit operation to one or more directories
+
+=head2 exclude
+
+Exclude one or more directories
+
+=head2 iphoto_album
+
+Path to the iPhoto AlbumData.xml database
+
+=head2 loglevel
+
+Be more/less verbose. Accepted loglevels are : debug, info, warn and error
+
+=head2 changetime
+
+Change file create time according to exif timestamps
+
+Default: true
+
+=head2 backup
+
+Backup changed filed
+
+Default: false
+
+=head2 force
+
+Force update without backup 
+
+Default: false
+
+=head2 dryrun
+
+Do not alter files, just log actions 
+
+Default: false
+
+=head2 help, usage, ?
+
+Show help

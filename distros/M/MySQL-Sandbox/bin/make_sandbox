@@ -1,0 +1,356 @@
+#!/usr/bin/perl 
+# make_sandbox
+#    The MySQL Sandbox
+#    Copyright (C) 2006-2017 Giuseppe Maxia
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+
+use strict;
+use warnings;
+# use Data::Dumper;
+use English qw( -no_match_vars ); 
+use MySQL::Sandbox qw( runs_as_root sbinstr exists_in_path);
+use Getopt::Long ;
+ 
+
+my $default_binary_base = $ENV{SANDBOX_BINARY} || ($ENV{HOME} . '/opt/mysql');
+unless ( -d  $default_binary_base ) {
+    $default_binary_base = '/opt/mysql';
+}
+my $binary_base = $ENV{'BINARY_BASE'} || $default_binary_base;
+
+my @prefixes = ('mysql', 'percona', 'mariadb');
+my $default_prefix= 'mysql';
+my %options = (
+   export_binaries => 0,
+   add_prefix	   => '', 
+
+);
+
+my $msb = MySQL::Sandbox->new();
+
+runs_as_root();
+
+
+GetOptions(
+    export_binaries => \$options{export_binaries},
+    'add_prefix=s'  => \$options{add_prefix},
+    # 'c|comment=s@'   => \$options{comments} ,
+    'help'          => \$options{help},
+) or get_help('+++');
+
+get_help() if $options{help};
+
+my $where_to_install = shift
+    or get_help("Binary tarball or expanded tarball directory needed\n");
+
+
+my $version;
+
+my ($major, $minor, $release);
+
+if ($where_to_install =~ s{^(URL|WEB|GET|FETCH):}{}i)
+{
+    if ( exists_in_path("make_sandbox_from_url"))
+    {
+        if (@ARGV)
+        {
+            exec ( "make_sandbox_from_url", $where_to_install, '--',  @ARGV) ;
+        }
+        else
+        {
+            exec ( "make_sandbox_from_url", $where_to_install) ;
+        }
+    }
+    elsif ( $where_to_install =~ m{^https://})
+    {
+        die "URL requested, but make_sandbox_from_url not found in PATH"
+    }
+}
+
+$where_to_install =~ s{ / \s* $ }{}x;
+
+$where_to_install =~ s/^\s*\~/$ENV{HOME}/x;
+
+if ( $where_to_install =~ m{\.\./}) # it is a tricky path
+{
+    die "relative paths must not contain '../' \n";
+}
+
+
+# explicit current directory relative path 
+if  ( ((-f $where_to_install)             # the file exists
+      and ( $where_to_install =~ m{^\./}) # it identifies the current directory
+      )
+    ) {
+    $where_to_install =~ s[^\./][$ENV{PWD}/] ;
+    unless ( ( -f $where_to_install) or (-d $where_to_install) ) {
+        die "file not found in current directory ($where_to_install)\n";
+    }
+}
+
+# relative path 
+if  ( (( (-f $where_to_install)  or ( -d $where_to_install))  # the file exists
+      and ( $where_to_install !~ m{^/})   # it is not an absolute path 
+      )
+    ) {
+    $where_to_install = $ENV{PWD} . '/' . $where_to_install;
+    unless ( ( -f $where_to_install) or (-d $where_to_install) ) {
+        die "file not found in current directory ($where_to_install)\n";
+    }
+}
+
+my $prefix_regex = join('|', @prefixes );
+$prefix_regex = qr/(?:$prefix_regex)/i;
+
+#my $ignore_leading_number = 0;
+sub basename
+{
+    my ($path) = @_;
+    $path =~ s{.*/}{};
+    $path;
+}
+
+my $barename = basename($where_to_install);
+if ($barename =~ /^\d+\..*\.tar\.gz/)
+{
+    # $ignore_leading_number = 1;
+    if ($barename eq $where_to_install)
+    {
+        $where_to_install="$ENV{PWD}/$barename"; 
+    }
+}
+
+# current directory
+if  ( $where_to_install =~ m{^(?:\d+\.)?$prefix_regex\D+\d+\.\d+\.\d+.*\.tar\.gz$ }x ) { 
+    $where_to_install = $ENV{PWD} . '/' . $where_to_install;
+    unless ( -f $where_to_install ) {
+        die "file not found in current directory ($where_to_install)\n";
+    }
+}
+
+# bare version directory under $HOME/opt/bin
+if  ( $where_to_install =~ /^(?:[-_a-zAZ]+)?(\d+)\.(\d+)\.(\d+)/x ) { 
+    ($major, $minor, $release) =  ($1, $2, $3);
+    $version = $where_to_install;
+}
+# absolute version directory
+elsif  ( $where_to_install =~ m{^(/.+)/(\d+)\.(\d+)\.(\d+)$}x ) { 
+    ($binary_base, $major, $minor, $release) =  ($1, $2, $3, $4);
+    $version = "$major.$minor.$release";
+    unless ( -d $where_to_install ) {
+        die "directory not found ($where_to_install)\n";
+    }
+}
+
+# absolute version directory with prefix
+elsif  (( -d "$ENV{SANDBOX_BINARY}/$where_to_install") && ($where_to_install =~ m{(\d+)\.(\d+)\.(\d+)$}x )) { 
+    ($binary_base, $major, $minor, $release) =  ($ENV{SANDBOX_BINARY}, $1, $2, $3, $4);
+    $version = "$major.$minor.$release";
+}
+
+# absolute version directory
+elsif  ( $where_to_install =~ m{^(/.+)/.*(\d+)\.(\d+)\.(\d+)$}x ) { 
+    ($binary_base, $major, $minor, $release) =  ($1, $2, $3, $4);
+    # print ">>$binary_base, $major, $minor, $release\n"; exit;
+    $version = "$major.$minor.$release";
+    unless ( -d $where_to_install ) {
+        die "directory not found ($where_to_install)\n";
+    }
+}
+
+# full path to tarball
+elsif  ( $where_to_install =~ m{^(/.+)/(?:\d+\.)?($prefix_regex\D+(\d+)\.(\d+)\.(\d+)[^/]*)\.tar\.gz$ }x ) { 
+    my $new_dir;
+    unless ( -f $where_to_install ) {
+        die "tarball file not found ($where_to_install)\n";
+    }
+    ($binary_base, $new_dir, $major, $minor, $release) =  ($1, $2, $3, $4, $5);
+    print "unpacking $where_to_install\n";
+    $version = "$major.$minor.$release";
+    my $tar_executable='no_such_program';
+    my $full_new_dir = "$binary_base/$options{add_prefix}$version";
+    if ( -d $full_new_dir ) {
+        $where_to_install = $full_new_dir;
+    }
+    else {
+        my $original_dir = $ENV{PWD};
+        my @recognized_tar_executables = qw(gtar gnutar bsdtar);
+        my $which_tar;
+        my $tar_found = 0;
+        for my $tar_exec (@recognized_tar_executables) {
+            $which_tar = exists_in_path($tar_exec);
+            if ((!$which_tar) or ($which_tar =~ /^no/i)) {
+                next
+            }
+            else {
+                $tar_found = 1; last
+            }
+        }
+        unless ($tar_found ) {
+            $which_tar = exists_in_path( 'tar' );
+            if ((!$which_tar) or ($which_tar =~ /^no/i)) {
+                $which_tar = undef;
+            }
+        }
+        if ($which_tar) {
+            chomp $which_tar;
+            $tar_executable = $which_tar;
+            my $tar_version = qx($tar_executable --version)
+                or die "can't find tar program\n";
+            unless ($tar_version =~ /(?:bsdtar|gnu\s+tar)/i) {
+                die "this version of tar is not supported\n";
+            }
+        }
+        else {
+            die "tar program not found\n";
+        }
+        chdir $binary_base 
+            or die "can't change directory to $binary_base\n";
+        my $tar_file = $where_to_install;
+        $tar_file =~ s{^.*/}{};
+        my $result = system("gunzip -c $tar_file | $tar_executable -xf -");
+        if ($result) {
+            die "error unpacking $tar_file ($!)\n";
+        }
+        my $new_name = $options{add_prefix} . $version;
+        if ($options{export_binaries} && ( -d $default_binary_base)) {
+            $new_name = "$default_binary_base/$options{add_prefix}$version";
+            if ( -d $new_name) {
+                warn "can't export to $binary_base. Directory $version already exists!\n";
+                $new_name = $options{add_prefix}  . $version;
+            }
+            else {
+                $full_new_dir = $new_name;
+                $binary_base = $default_binary_base;
+            }
+        }
+        my $rename_result = system "mv  $new_dir $new_name";
+        if ($rename_result) {
+            die "can't rename $new_dir to $new_name";
+        }
+        # in case it is a debug build
+        if (-f "$new_name/bin/mysqld-debug" && ! -f "$new_name/bin/mysqld") {
+            system "cd $new_name/bin && ln -s mysqld-debug mysqld";
+        }
+        # some versions of Perl and OS can't perform a rename across file systems
+        # Bug #504789
+        #rename $new_dir, $new_name
+        #    or die "can't rename $new_dir to $new_name";
+
+        system "chmod -R ogu+r $new_name "; # Not sandbox related.
+                                            # It is needed if the user wants 
+                                            # to run the test suite
+
+        $where_to_install = $full_new_dir;
+        chdir $original_dir;
+    }
+}
+# not a full path
+elsif ($where_to_install =~ m{[^/].*\.tar\.gz$} ) {
+    print "<$where_to_install>\n";
+    get_help( "You must enter a full path to the tarball. Relative paths are not supported.\n");
+}
+# not a tarball
+elsif ($where_to_install =~ m{^/.*(?<!\.tar\.gz)$} ) {
+    get_help( "Not a tarball ($where_to_install).\n"
+            . "Accepted paramethers are: {VERSION|tarball_full_name} [options].\n");
+}
+# nothing was recognized. Print help
+else {
+    get_help("Failed to parse arguments\n");
+}
+
+sub get_help {
+    my ($msg) = @_;
+    print $msb->credits(), "\n"; 
+    if ($msg) {
+        my $len = length($msg);
+        $len = 80 if $len > 80;
+        print '*' x $len, "\n",
+              $msg,
+              '*' x $len, "\n";
+    }
+    print <<SYNTAX;
+usage: ./make_sandbox full_version [options] {VERSION|tarball_full_name} -- [more options]
+or   : ./make_sandbox GET:short_version -- [options]
+
+  --export_binaries    exports the new binary to $binary_base
+  --add_prefix=NAME    add given prefix to renamed tarball directory
+
+Additionally, you can pass any option accepted by "low_level_make_sandbox" after '--'
+SYNTAX
+
+    print "You should provide either a version from '$binary_base' \n",
+          "or an absolute path to the tarball to extract.\n",
+          "See ./low_level_make_sandbox --help for more detail\n";
+    print "full_version should be provided as #.#.#\n";
+    print "short_version should be provided as #.#\n";
+    exit ($msg ? 1 : 0);
+    #print q{-} x 50, "\n";
+    #exec "$install_dir/low_level_make_sandbox --help ";
+}
+
+my ($bare_basedir) = (split /\//, $where_to_install)[-1];
+
+# print "<$bare_basedir>\n";exit;
+
+unless ( -d $binary_base ) {
+    die "$binary_base does not exist\n";
+}
+
+my @supported_versions = @{ MySQL::Sandbox::supported_versions() };
+
+my $simple_version = "$major.$minor";
+
+unless ( grep { $simple_version eq $_ } @supported_versions) {
+    die "unsupported version $simple_version\n";
+}
+
+if ($release < 10) {
+    $release = '0' . $release;
+}
+
+my $port = ($major . $minor. $release) ;
+
+if ($port < 1024) {
+    $port .= '0';
+}
+
+if ( -d "$binary_base/$bare_basedir" ) {
+
+    my $text_version = $version;
+    # $text_version =~ tr/./_/d; ## no critic
+    $text_version =~ s/\./_/g; 
+    my @install_options = (
+                "--basedir=$binary_base/$bare_basedir", 
+                "--sandbox_directory=msb_$options{add_prefix}$text_version",
+                "--install_version=$simple_version",
+                "--sandbox_port=$port",
+                "--no_ver_after_name",
+                @ARGV
+            );
+    if ($major >=4) {
+        push(@install_options, qq(--my_clause=log-error=msandbox.err));
+    }
+    unless (grep {$_ eq '--no_show'} @install_options) {
+        print "Executing low_level_make_sandbox ", join( " \\\n\t", @install_options ), "\n";
+    }
+    sbinstr( " low_level_make_sandbox called with params <"
+            . join(";", @install_options) . ">");
+    exec "low_level_make_sandbox", @install_options;
+}
+else {
+    die "there is no $bare_basedir directory under $binary_base\n";
+}
+

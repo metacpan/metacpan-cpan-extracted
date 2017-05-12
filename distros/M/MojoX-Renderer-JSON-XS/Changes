@@ -1,0 +1,33 @@
+Revision history for Perl extension MojoX-Renderer-JSON-XS
+
+0.07 2016-03-09T07:11:04Z
+
+    - Mojolicious >= 4.0 since there's incompatibility in Mojo::Exception
+
+0.06 2016-03-01T11:39:59Z
+
+    - Fix a test on JSON generation from Mojo::Exception (Slaven Rezić)
+
+0.05 2015-10-05T07:33:54Z
+
+    - Patch Mojo::Exception to have method "TO_JSON" since exception is converted into
+      Mojo::Exception object in Mojolicious App
+
+0.04 2014-09-22T10:05:10Z
+
+    - Run tests on Perl version 5.10-5.20
+    - Prettified tests with Test::Pretty
+
+0.03 2014-02-06T07:48:26Z
+
+    - Added utf8 and convert_blessed flags to module to make it resemble Mojo::JSON a bit more. (stigtsp)
+    - Now requires perl 5.10
+
+0.02 2013-10-02T04:37:59Z
+
+    - a bit of performance improvement
+
+0.01 2013-10-01T12:21:51Z
+
+    - original version
+

@@ -1,0 +1,28 @@
+Revision history for Perl extension Math::Random::Xorshift.
+
+0.05  2010-12-22
+    - No changes. Just bumped version number.
+
+0.04_02  2010-10-14
+    - Added Test::More 0.88+, supports done_testing(), to test_require
+      dependencies.
+
+0.04_01  2010-09-14
+    - Fixed to support Windows compiler (Not tested since I don't have the
+      platform. Send me report please.)
+    - Use Perl's "bool" typedef instead of C99's.
+
+0.04  2010-06-18
+    - OMG I had same mistake again and found it out after uploading to PAUSE...
+      This is just a documentation fix so there's no feature improvements.
+
+0.03  2010-06-18
+    - Fixed documentation mistake;
+      My email address noted in AUTHOR section was wrong...
+
+0.02  2010-06-18
+    - Added "-std=c99" compiler option.
+    - Removed "inline" keyword.
+
+0.01  2010-06-13
+    - Original version.

@@ -1,0 +1,9 @@
+Revision history for MojoX::UserAgent
+
+0.21    2009-08-20
+        - POD and Makefile.PL fixes
+        - tag: release-0.21
+
+0.20    2009-08-19
+        - First publicly released version
+        - Tag: release-0.20

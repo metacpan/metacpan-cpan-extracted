@@ -1,0 +1,22 @@
+Revision history for Mojolicious::Plugin::ValidateTiny
+
+0.01
+        First version, released on an unsuspecting world.
+
+0.02
+        Added "skip" config option
+
+0.03
+        Better docs
+
+0.04
+        Added "on_errror" option
+        Recreating HTML::Lint object on each request because it does not reset own state
+
+0.05
+        Upgrade to HTML::Lint 2.26
+        Disable smartmatch warning
+        Split tests into subtests
+
+0.06
+        Fi experimental smartmatch warning

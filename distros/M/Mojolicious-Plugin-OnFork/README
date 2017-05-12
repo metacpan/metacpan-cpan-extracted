@@ -1,0 +1,53 @@
+NAME
+    Mojolicious::Plugin::OnFork - Do Something Whenever a Worker Starts
+
+VERSION
+    Version 0.006
+
+SYNOPSIS
+      # Mojolicious
+      $self->plugin('OnFork' => sub { srand })
+        if $ENV{HYPNOTOAD_APP};
+
+      # Mojolicious::Lite
+      plugin OnFork => sub { srand }
+        if $ENV{HYPNOTOAD_APP};
+
+DESCRIPTION
+    Mojolicious::Plugin::OnFork is a plugin to easily define code, that is
+    executed whenever a new worker process of the web server forks.
+
+    All this plugin actually does is
+
+      Mojo::IOLoop->timer(0 => $code)
+
+    The motivation for this plugin was, that hypnotoad does not guarantee
+    to call srand() after a fork(), so worker processes might all get the
+    same sequence of "random" numbers from rand().
+
+    Starting with Mojolicious 5.76 "srand" is actually called after a
+    fork, but this fact is not officially documented and according to the
+    author can be removed in the future without any previous notice.
+
+    As a consequence depending on the Mojolicious version and for this
+    use case "srand" might be called twice after a worker starts.
+
+METHODS
+    Mojolicious::Plugin::OnFork inherits all methods from
+    Mojolicious::Plugin and implements the following new ones.
+
+  "register"
+    Register plugin hooks in Mojolicious application.
+
+SEE ALSO
+    Mojolicious, <https://github.com/kraih/mojo/issues/402>.
+
+AUTHOR
+    Bernhard Graf <graf(a)cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2012 - 2017 Bernhard Graf
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

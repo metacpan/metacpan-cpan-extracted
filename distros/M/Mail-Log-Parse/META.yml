@@ -1,0 +1,42 @@
+---
+abstract: 'Parse and return info in maillogs.'
+author:
+  - 'Daniel Staal - <DStaal@usa.net>'
+build_requires:
+  Module::Build: '0'
+  Test::Exception: '0'
+  Test::Warn: '0'
+configure_requires:
+  Module::Build: '0.42'
+  Module::Metadata: '0'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mail-Log-Parse
+provides:
+  Mail::Log::Parse:
+    file: lib/Mail/Log/Parse.pm
+    version: '1.0402'
+  Mail::Log::Parse::Postfix:
+    file: lib/Mail/Log/Parse/Postfix.pm
+    version: '1.0501'
+requires:
+  File::Basename: '0'
+  IO::File: '0'
+  Mail::Log::Exceptions: '0'
+  Memoize: '0'
+  Scalar::Util: '0'
+  Time::Local: '0'
+  perl: v5.6.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.0402'
+x_optional_features:
+  compressed_files:
+    description: 'Allows work with compressed files.'
+    requires:
+      File::Temp: '0.17'
+      IO::Uncompress::AnyUncompress: 0

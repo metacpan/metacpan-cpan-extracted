@@ -1,0 +1,7 @@
+Revision history for Perl extension Mail-OpenRelay-Simple.
+
+0.02  Thu Jul 20 12:30:08 2006
+	- add Class::Accessor::Fast in PREREQ_PM
+
+0.01  Tue Mar 14 11:09:53 2006
+	- first release 

@@ -1,0 +1,27 @@
+Build.PL
+Changes
+lib/Module/Build/Kwalitee.pm
+lib/Module/Build/Kwalitee/000compile.t
+lib/Module/Build/Kwalitee/001pragmas.t
+lib/Module/Build/Kwalitee/003pod.t
+lib/Module/Build/Kwalitee/004uselib.t
+lib/Module/Build/Kwalitee/Stub.pm
+MANIFEST			This list of files
+NINJA
+t/build.t
+t/mbk.t
+tests/fail_compile/Build.PL
+tests/fail_compile/lib/MBKFail.pm
+tests/fail_compilebin/Build.PL
+tests/fail_compilebin/failing
+tests/fail_pod/Build.PL
+tests/fail_pod/lib/MBKFail.pm
+tests/fail_pragmas/Build.PL
+tests/fail_pragmas/lib/MBKFail.pm
+tests/fail_uselib/Build.PL
+tests/fail_uselib/lib/MBKFail.pm
+tests/fail_uselib/t/foo.t
+META.yml
+Makefile.PL
+README
+mbk/Module/Build/Kwalitee.pm

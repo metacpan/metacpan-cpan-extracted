@@ -1,0 +1,27 @@
+bench/size.pl
+bench/str_cache.pl
+BUGS
+CHANGES
+CREDITS
+INSTALL
+lib/Math/String.pm
+lib/Math/String/Charset.pm
+lib/Math/String/Charset/Grouped.pm
+lib/Math/String/Charset/Nested.pm
+lib/Math/String/Sequence.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+NEW
+README
+t/sequence.t
+t/setgpm.t
+t/setnpm.t
+t/setspm.t
+t/stringpm.t
+t/study.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

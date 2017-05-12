@@ -1,0 +1,147 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Module::Provision;
+
+exit Module::Provision->new_with_options( nodebug => 1 )->run;
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+module-provision - Create new Perl distributions
+
+=head1 SYNOPSIS
+
+=over 3
+
+=item B<module-provision> B<dist> I<Your::Distribution>
+
+Creates a new distribution with a C<git> repository and a
+L<Module::Build> toolchain
+
+=item B<module-provision> B<-H> | B<-h> I<method> | B<-h> | B<-?>
+
+Display man page / method help / option descriptions / usage strings
+
+=item B<module-provision> B<list_methods>
+
+Lists the methods available in this program
+
+=back
+
+=head1 DESCRIPTION
+
+Create Perl distributions with VCS and Module::Build toolchain
+
+=head1 REQUIRED ARGUMENTS
+
+=over 3
+
+=item I<Your::Distribution>
+
+The package name of the new distribution to create
+
+=back
+
+=head1 OPTIONS
+
+=over 3
+
+=item B<-c> I<method>
+
+Name of method to call. Required, can be first non option argument
+
+=item B<-D        >
+
+Turn debugging on. Prompts if interactive
+
+=item B<--encoding>
+
+Decodes/encodes input/output using the value. Defaults to C<UTF-8>
+
+=item B<-h        >
+
+Uses Pod::Usage to describe the program usage options
+
+=item B<-H        >
+
+Uses Pod::Man to display the program documentation. Pipes through C<nroff>
+
+=item B<--home    >
+
+Directory containing the configuration file
+
+=item B<-L        >
+
+Loads the specified language message catalogue
+
+=item B<-n        >
+
+Do not prompt for debugging
+
+=item B<-o        >
+
+Zero, one or more key/value pairs passed to the method call
+
+=item B<-q        >
+
+Quiet the display of information messages
+
+=item B<-V        >
+
+Displays the version number of the program class
+
+=back
+
+=head1 DIAGNOSTICS
+
+Prints errors to C<stderr>
+
+=head1 EXIT STATUS
+
+Returns zero on success, non zero on failure
+
+=head1 CONFIGURATION
+
+Uses the constructor's C<appclass> attribute to locate a configuration file
+
+=head1 DEPENDENCIES
+
+=over 3
+
+=item L<Module::Provision>
+
+=back
+
+=head1 INCOMPATIBILITIES
+
+None
+
+=head1 BUGS AND LIMITATIONS
+
+Send reports to address below
+
+=head1 AUTHOR
+
+Peter Flanigan, C<< <pjfl@cpan.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2017 Peter Flanigan
+
+This is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+# Local Variables:
+# mode: perl
+# tab-width: 3
+# End:

@@ -1,0 +1,29 @@
+Changes
+lib/Map/Tube/London.pm
+lib/Map/Tube/London/Line/Bakerloo.pm
+lib/Map/Tube/London/Line/Central.pm
+lib/Map/Tube/London/Line/Circle.pm
+lib/Map/Tube/London/Line/District.pm
+lib/Map/Tube/London/Line/DLR.pm
+lib/Map/Tube/London/Line/HammersmithCity.pm
+lib/Map/Tube/London/Line/Jubilee.pm
+lib/Map/Tube/London/Line/Metropolitan.pm
+lib/Map/Tube/London/Line/Northern.pm
+lib/Map/Tube/London/Line/Overground.pm
+lib/Map/Tube/London/Line/Piccadilly.pm
+lib/Map/Tube/London/Line/Victoria.pm
+lib/Map/Tube/London/Line/WaterlooCity.pm
+share/london-map.json
+Makefile.PL
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/manifest.t
+t/pod.t
+t/meta-yml.t
+t/meta-json.t
+t/map-tube-london.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

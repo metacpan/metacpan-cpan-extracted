@@ -1,0 +1,25 @@
+arithmetic
+
+scalar algebra
+vector algebra
+geometric algebra
+
+euclidean geometry
+affine geometry
+FOO geometry
+projective geometry
+
+trigonometry
+
+discrete math
+
+probability
+statistics
+
+scalar calculus
+vector calculus
+geometric calculus
+
+scalar differential equations
+vector differential equations
+geometric differential equations

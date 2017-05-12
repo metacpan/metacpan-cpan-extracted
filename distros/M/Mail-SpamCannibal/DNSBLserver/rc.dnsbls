@@ -1,0 +1,353 @@
+#!/usr/bin/perl -w
+
+eval 'exec $perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+my $perl = '/usr/bin/perl';
+
+#
+# rc.dnsbls version 0.12, 11-16-08
+#
+# Copyright 2003 - 2006, Michael Robinton <michael@bizsystems.com>
+# rc.dnsbls is free software; you can redistribute it and/or 
+# modify it under the terms of the GPL software license.
+#
+use strict;
+use IPTables::IPv4::DBTarpit::Inst qw(hard_fail);
+use IPTables::IPv4::DBTarpit::Tools qw(inet_aton);
+use Mail::SpamCannibal::ScriptSupport qw(
+	valid127
+	doINCLUDE
+);
+use Net::DNS::ToolKit qw(ttlAlpha2Num);
+
+my $CONFIG;
+# you can override the installation configuration variables by
+# editing the configuration file 'config/dnsbls.conf' in the
+# SpamCannibal home directory
+#
+# Set the SpamCannibal home directory if it is not
+# what is found in Mail::SpamCannibal::SiteConfig
+#
+# $CONFIG->{SPAMCANNIBAL_HOME} = '/usr/local/spamcannibal';
+
+###########################################################################
+############## NO MORE CONFIGURABLE ITEMS BEYOND THIS POINT ###############
+###########################################################################
+
+my $DEBUG;	# set true to print command instead of executing
+		# same as 'rc.dnsbls debug'
+
+# how long to wait for stop on restart (in seconds)
+use constant MAX_RESTART_WAIT => 10;
+
+if ($CONFIG && exists $CONFIG->{SPAMCANNIBAL_HOME}) {
+    $CONFIG->{SPMCNBL_DAEMON_DIR} = $CONFIG->{SPAMCANNIBAL_HOME} .'/bin';
+} else {
+    require Mail::SpamCannibal::SiteConfig;
+    $CONFIG = new Mail::SpamCannibal::SiteConfig;
+}
+
+my $DNSBLS = $CONFIG->{SPAMCANNIBAL_HOME}. '/config/dnsbls.conf';
+
+hard_fail('could not find dnsbls configuration file')
+	unless -e $DNSBLS;
+
+
+exit 1 if eval q|system($perl, '-w', $DNSBLS)|;
+
+$DNSBLS = doINCLUDE($DNSBLS);
+
+# host & ns are tested seperately
+my @required = qw(
+	block
+	127.0.0.2
+);
+
+my $thereis = sub {
+  my $var = shift;
+  exists $DNSBLS->{"$var"} && defined $DNSBLS->{"$var"};
+};
+
+foreach(@required) {
+  hard_fail("could not find required parameter '$_' in the configuration file")
+	unless &$thereis($_);
+}
+hard_fail("could not find either 'host' or 'ns' in the configuration file")
+	unless &$thereis('host') or &$thereis('ns');
+
+my $daemon	= 'dnsbls';
+my $daemonX	= $CONFIG->{SPMCNBL_DAEMON_DIR} .'/'. $daemon;
+
+# process parameters in desired order, environment variables first
+#
+
+$CONFIG->{SPMCNBL_ENVIRONMENT} = $DNSBLS->{environment}
+	if &$thereis('environment');
+my $pid_file	= $CONFIG->{SPMCNBL_ENVIRONMENT} .'/'. $daemon .'.pid';
+
+hard_fail("startup blocked by DB watcher process")
+	if -e $CONFIG->{SPMCNBL_ENVIRONMENT} .'/'. 'blockedBYwatcher';
+
+$CONFIG->{SPMCNBL_DB_TARPIT} = $DNSBLS->{tarpit}
+	if &$thereis('tarpit');
+
+$CONFIG->{SPMCNBL_DB_CONTRIB} = $DNSBLS->{contrib}
+	if &$thereis('contrib');
+
+$CONFIG->{SPMCNBL_DB_EVIDENCE} = $DNSBLS->{evidence}
+	if &$thereis('evidence');
+
+my $execmd = $daemonX .' -r '. $CONFIG->{SPMCNBL_ENVIRONMENT};
+
+$execmd .= ' -i ' . $CONFIG->{SPMCNBL_DB_TARPIT};
+$execmd .= ' -j ' . $CONFIG->{SPMCNBL_DB_CONTRIB};
+$execmd .= ' -k ' . $CONFIG->{SPMCNBL_DB_EVIDENCE};
+
+my $addcmd = sub {
+  my($oparm,$option) = @_;
+  $execmd .= ' '. $option .' '. $DNSBLS->{"$oparm"}
+	if &$thereis($oparm);
+};
+
+&$addcmd('zonename', '-z');
+&$addcmd('contact', '-c');
+&$addcmd('port', '-p');
+
+my $addtime = sub {
+  my($oparm,$option) = @_;
+  $execmd .= ' '. $option .' '. ttlAlpha2Num($DNSBLS->{"$oparm"})
+	if &$thereis($oparm);
+};
+
+&$addtime('neg_cache', '-s');
+&$addtime('refresh', '-u');
+&$addtime('retry', '-y');
+&$addtime('expire', '-x');
+&$addtime('minimum', '-t');
+
+$execmd .= ' -e "' . $DNSBLS->{'127.0.0.2'} .'"';	# required
+$execmd .= ' -b' if &$thereis('block') && $DNSBLS->{block};
+$execmd .= ' -l' if &$thereis('log') && $DNSBLS->{verbose};
+$execmd .= ' -v' if &$thereis('verbose') && $DNSBLS->{log};
+
+# process NS records
+@_ = keys %{$DNSBLS->{host}};
+push @_, keys %{$DNSBLS->{ns}};
+hard_fail('no nameservers found')
+	unless @_;
+foreach(@_) {
+  my $key;
+  if ($DNSBLS->{host} && $DNSBLS->{host}->{"$_"}) {
+    $key = 'host';
+    $execmd .= ' -N '. $_;
+  } else {
+    $key = 'ns';
+    $execmd .= ' -n '. $_;
+  }
+  # add IP address(s) if it is present
+
+  if ($DNSBLS->{$key}->{"$_"}) {
+    my $ipref = (ref $DNSBLS->{$key}->{"$_"})
+	? $DNSBLS->{$key}->{"$_"}
+	: [$DNSBLS->{$key}->{"$_"}];
+    foreach(@$ipref) {
+      $execmd .= ' -a '. $_;
+    }
+  }
+}
+# process MX records
+if (&$thereis('mx')) {
+  @_ = keys %{$DNSBLS->{mx}}
+} else {
+  @_ = ();
+}
+foreach(@_) {
+  $execmd .= ' -n '. $_;
+  # add priority
+  hard_fail('malformed MX entry in config/dbsbls.conf')
+	unless ref $DNSBLS->{mx}->{"$_"} eq 'ARRAY'
+	&& $DNSBLS->{mx}->{"$_"}->[0] =~ /[1-9]/
+	&& $DNSBLS->{mx}->{"$_"}->[0] !~ /\D/;
+  $execmd .= ' -m '. $DNSBLS->{mx}->{"$_"}->[0];
+  # add IP address if it is present
+
+  if ($DNSBLS->{mx}->{"$_"}->[1]) {	# is there at least one IP?
+    foreach my $ipp (1..$#{$DNSBLS->{mx}->{"$_"}}) {
+      $execmd .= ' -a '. $DNSBLS->{mx}->{"$_"}->[$ipp];
+    }
+  }
+}
+
+if (&$thereis('response')) {	# if test response codes are needed
+  my %default = (
+	dbhome	=> $CONFIG->{SPMCNBL_ENVIRONMENT},
+	dbfile	=> $CONFIG->{SPMCNBL_DB_TARPIT},
+	txtfile	=> $CONFIG->{SPMCNBL_DB_CONTRIB},
+	umask	=> $CONFIG->{SPAMCANNIBAL_UMASK},
+  );
+
+  my $tool = new IPTables::IPv4::DBTarpit::Tools(%default);
+
+  $DNSBLS->{response}->{'127.0.0.2'} = $DNSBLS->{'127.0.0.2'};
+  foreach(keys %{$DNSBLS->{response}}) {
+    next unless $_ eq valid127($_) || $_ eq '127.0.0.2';
+    my $ip = inet_aton($_);
+    my $err = $DNSBLS->{response}->{$_} || "Text response for $_";
+    my $rsp = $ip;
+    my $now = time;
+    my $zon = (&$thereis('zonename')) ? $DNSBLS->{zonename} : 'localhost';
+    my $record = pack("a4 x A* x a4 x N x A* x A*",$ip,$err,$rsp,$now,$zon);
+# Add tarpit record unless it exists. Preserve time tags for other uses
+    $tool->touch($CONFIG->{SPMCNBL_DB_TARPIT},$ip)
+	unless $tool->get($CONFIG->{SPMCNBL_DB_TARPIT},$ip);
+    $tool->put($CONFIG->{SPMCNBL_DB_CONTRIB},$ip,$record);
+  }
+  $tool->closedb;
+}
+
+=pod
+
+=head1 NAME
+
+rc.dnsbls - dnsbls controller
+
+=head1 SYNOPSIS
+
+  rc.dnsbls start
+  rc.dnsbls stop
+  rc.dnsbls restart
+  rc.dnsbls help
+  rc.dnsbls debug
+
+=head1 DESCRIPTION
+
+This script controls the dnsbls daemon.
+
+  rc.dnsbls start	- start the dnsbls daemon
+  rc.dnsbls start -T	- show configuration and exit
+
+  rc.dnsbls stop	- stop the dnsbls daemon
+
+  rc.dnsbls restart	- stop then start the daemon
+
+  rc.dnsbls help	- print help and exit
+
+  rc.dnsbls debug	- show command line string
+
+=head1 AUTHOR
+
+Michael Robinton <michael@bizsystems.com>
+
+=head1 COPYRIGHT
+
+Copyright 2003, Michael Robinton <michael@bizsystems.com>
+This script is free software; you can redistribute it and/or
+modify it under the terms of the GPL software license.
+
+=cut
+
+die <<EOF unless -e $daemonX && -x $daemonX;
+###############################################################
+
+  Can not find $daemon daemon. Please check your installation
+
+###############################################################
+EOF
+
+$| = 1;
+# get status
+my $running = 0;
+my $pid = 0;
+if (-e $pid_file) {
+    open(P,$pid_file);
+    $pid = <P>;
+    close P;
+    chomp $pid;
+    if ($pid and kill(0, $pid)) {
+        $running = 1;
+    }
+}
+
+my $command = shift @ARGV || '';
+
+if ($command eq 'start') {
+    do_start();
+}
+elsif ($command eq 'stop') {
+    exit do_stop();
+}
+elsif ($command eq 'restart') {
+    do_stop();
+    for my $wait (0..MAX_RESTART_WAIT()) {
+	last unless $running;
+	$running = (kill(0, $pid));
+    	print '.';
+	sleep 1;
+    }
+    exit 1 if $running;
+    do_start();
+}
+elsif ($command =~ 'help') {
+    usage();
+}
+elsif ($command =~ 'debug') {
+    $DEBUG = 1;
+    do_start();
+}
+
+usage("\nUNKNOWN command\n");
+
+sub do_stop {
+    unless ($running) {
+	print "$command $daemon not running\n";
+    }
+    elsif (kill 15, $pid) {
+	print "$command $daemon stopping\n";
+	return 0;
+    } else {
+	print "$command $daemon could not be stopped\n";
+    }
+    return 1;
+}
+
+sub do_start {
+    my $extra = $_[0] || '';
+    my @extra = @ARGV;
+    if ($extra) {
+	unshift @extra, @_;
+    }
+    $extra = join ' ', @extra if @extra;
+    $extra = ' '. $extra if $extra;
+    if ($running) {
+	print "$command: $daemon pid ($pid) already running\n";
+    }
+    elsif ($DEBUG) {
+        print $execmd, $extra, "\n";
+    }
+    elsif (system($execmd . $extra)) {
+	print "$command: $daemon could not be started\n";
+	exit 1;
+    }
+    exit 0;
+}
+
+sub usage {
+  my $msg = $_[0] || '';
+  print $msg, q|
+  This script controls the dnsbls daemon.
+
+  rc.dnsbls start       - start the dnsbls daemon
+  rc.dnsbls start -T    - show configuration and exit
+
+  rc.dnsbls stop        - stop the dnsbls daemon
+
+  rc.dnsbls restart     - stop then start the daemon
+
+  rc.dnsbls help        - print help and exit
+ 
+  rc.dnsbls debug       - show command line string
+
+|;
+  exit 0;
+}

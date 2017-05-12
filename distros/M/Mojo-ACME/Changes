@@ -1,0 +1,35 @@
+Revision history for Perl module Mojo-ACME
+
+0.09 2017-02-12
+  - Fix deprecated use of Mojo::Util slurp|spurt
+    - Bump dependence of Mojolicious to 7.15
+  - Improve handling of multiple names in certs
+    - Remove callback from new_authz
+    - Remove callbacks attribute from ChallengeServer
+
+0.08 2016-11-21
+  - Fix error when generating a cert with multiple domains (pink_mist++)
+
+0.07 2016-09-18
+  - Show error codes and details (nickandrew++)
+
+0.06 2016-08-26
+  - Fix a timing bug introduced in 0.05 (pink_mist++)
+
+0.05 2016-08-16
+  - Update the LE agreement url
+  - Fix a few timing bugs
+
+0.04 2016-05-17
+  - Updated the default intermediate letsencrypt cert to X3
+  - Rename the (formerly undocumented) plugin option cas to authorities
+
+0.03 2016-03-10
+  - Added minimum dependency versions to a few deps
+
+0.02 2016-03-09
+  - Added caching of received nonces
+
+0.01 2016-03-09
+  - Initial release
+

@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+#
+# Use to audit a particular context function, most likely with some
+# sort of statistical tool.
+#
+#   perl auditcontext | r-fu histogram - out.pdf; open out.pdf
+
+use 5.10.0;
+use warnings;
+use strict;
+
+my $TRIALS = 1e5;
+
+use Music::VoiceGen;
+my $voice = Music::VoiceGen->new(
+    contextfn => sub {
+        my ( $choice, $mrd, $count ) = @_;
+        if ( CORE::rand( $count + ( $count - 1 ) / 2 ) < 1 ) {
+            $choice = $mrd->rand;
+        }
+        return $choice, 0;
+    },
+    MAX_CONTEXT => 3,
+    possibles   => {
+        "a.b.c" => { 1 => 100 },
+        "b.c"   => { 2 => 100 },
+        "c"     => { 3 => 100 },
+    },
+);
+
+for my $trialn ( 1 .. $TRIALS ) {
+    $voice->context( [qw/a b c/] );
+    print $voice->rand(), "\n";
+}

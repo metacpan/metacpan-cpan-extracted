@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 b6a93b06c38d2b895683b78350383df2ecddc055 COPYRIGHT
+SHA1 2723fdbf1ba4115b4fddd9de5ba80af9adcac19b CREDITS
+SHA1 94b9ba908179951e27686c0511777a6a72e478a2 Changes
+SHA1 ff566cb198f30c6c980bbedc6605f1b73eb36a13 INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 1e51830c3d7ea00a187a9e6b2ea39b9b06530089 MANIFEST
+SHA1 5a36ff647c7f8742c4f64eba9304527f91739af4 META.json
+SHA1 5e9f43686968ac1653a5929099d2b7f1c9fac687 META.yml
+SHA1 1088a9c19ae0b1511624859cfe25d15a7699aeaa Makefile.PL
+SHA1 6238d3dc0ed93bf83b3b5732b349d9eddfb54d37 README
+SHA1 c04ac05ff2d1c61050b6f363d241abade170952d dist.ini
+SHA1 d2dcd6c34b54fbe14e8ce141d5a68165c7ad15d0 doap.ttl
+SHA1 81604bc74183fa95bb107f40992bc6ce8a2cdd6a lib/MooX/ObjectBuilder.pm
+SHA1 48b5f695b8259988a2fd24b55c6b7258b1d08968 t/01basic.t
+SHA1 ef55e9054798176bf5ca0662dc519ca5ff499a16 t/02head.t
+SHA1 55ec93d2cdc72b6476b6572ae7afdefa7dab9091 t/10-attrib-in-hash.t
+SHA1 2e546c8ff953ab8c1dc0e8b1f499f656419856a2 t/11-attrib-in-array.t
+SHA1 3e9975cad14feb3df8be8e0e4875e976109d0364 t/12-class-as-code.t
+SHA1 2594f9bee71456d007a226b50355fa6a7cdf912f t/20-non-moo-object.t
+SHA1 a66710994568b9bae9949300c5b08bfe2efd275b t/21-arbitrary-class-sub.t
+SHA1 253bc587e30a47606f6bb700b1ae8c91775a3fe8 t/30-edge-cases.t
+SHA1 1ea345d8f6955698adc095708649267c7c39e6a0 t/40-construct-instance.t
+SHA1 a02ce9201f1b9491324116b2987bf453fe17b840 t/lib/TestUtils.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlONzpYACgkQzr+BKGoqfTm/bgCgkQMlzyk6o4e6Tzcw8B+r+94A
+kssAoKV23vXf6/Jotwl45ePjs/Ubk66R
+=jE8c
+-----END PGP SIGNATURE-----

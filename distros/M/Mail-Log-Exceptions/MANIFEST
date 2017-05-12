@@ -1,0 +1,10 @@
+Build.PL
+lib/Mail/Log/Exceptions.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/001_load.t
+t/002_basic.t
+Todo

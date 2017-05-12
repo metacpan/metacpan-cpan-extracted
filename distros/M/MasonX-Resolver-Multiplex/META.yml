@@ -1,0 +1,21 @@
+--- 
+abstract: multiplex several Resolver objects
+author: 
+  - Hans Dieter Pearcey <hdp@pobox.com>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: MasonX-Resolver-Multiplex
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  HTML::Mason: 1.30
+  Moose: 0
+version: 0.001

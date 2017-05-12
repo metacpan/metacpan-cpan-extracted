@@ -1,0 +1,30 @@
+---
+abstract: 'DEPRECATED Create a presentation using Mojolicious'
+author:
+  - 'Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.018, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-SimpleSlides
+provides:
+  Mojolicious::Plugin::SimpleSlides:
+    file: lib/Mojolicious/Plugin/SimpleSlides.pm
+    version: '0.06'
+requires:
+  File::Share: '0'
+  Mojolicious: '6.0'
+  perl: '5.010'
+resources:
+  bugtracker: http://github.com/jberger/Mojolicious-Plugin-SimpleSlides/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jberger/Mojolicious-Plugin-SimpleSlides
+version: '0.06'
+x_deprecated: 1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,25 @@
+Changes
+lib/MooX/Role/Reconstruct.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-use_role.t
+t/02-override_init_arg.t
+t/03-keep_init_arg.t
+t/04-unaltered_new.t
+t/subclasses/01-use_role.t
+t/subclasses/02-override_init_arg.t
+t/subclasses/03-keep_init_arg.t
+t/subclasses/04-unaltered_new.t
+t/subclasses/05-in_subclass_only.t
+t/subclasses/06-in_parent_only.t
+Todo
+xt/boilerplate.t
+xt/manifest.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

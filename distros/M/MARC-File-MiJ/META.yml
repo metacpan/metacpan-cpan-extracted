@@ -1,0 +1,30 @@
+---
+abstract: 'Read newline-delimited marc-in-json files'
+author:
+  - 'Bill Dueber <dueberb@umich.edu>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4001, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MARC-File-MiJ
+provides:
+  MARC::File::MiJ:
+    file: lib/MARC/File/MiJ.pm
+    version: 0.04
+  MARC::Record::MiJ:
+    file: lib/MARC/Record/MiJ.pm
+    version: 0.04
+requires:
+  JSON: 0
+  MARC::File: 0
+  MARC::Record: 0
+  ex::monkeypatched: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

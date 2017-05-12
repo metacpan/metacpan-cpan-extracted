@@ -1,0 +1,41 @@
+---
+abstract: 'syntactic sugar to complement "has"'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+  - 'TOBYINK <tobyink@cpan.org>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.61'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Moose::Meta::Class::__ANON__::SERIAL::7 version , CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-hasn-t
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  MooseX::hasn::t:
+    file: lib/MooseX/hasn/t.pm
+    version: '0.003'
+requires:
+  Moose: '2.00'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/MooseX-hasn-t/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=MooseX-hasn-t
+  homepage: https://metacpan.org/release/MooseX-hasn-t
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-moosex-hasn-t.git
+version: '0.003'
+x_contributors:
+  - TOBYINK

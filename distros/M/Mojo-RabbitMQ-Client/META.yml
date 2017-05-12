@@ -1,0 +1,59 @@
+---
+abstract: 'Mojo::IOLoop based RabbitMQ client'
+author:
+  - '-2017, Sebastian Podjasek and others'
+build_requires:
+  Test::Exception: '0.43'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.6, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-RabbitMQ-Client
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Mojo::RabbitMQ::Client:
+    file: lib/Mojo/RabbitMQ/Client.pm
+    version: v0.0.9
+  Mojo::RabbitMQ::Client::Channel:
+    file: lib/Mojo/RabbitMQ/Client/Channel.pm
+  Mojo::RabbitMQ::Client::Consumer:
+    file: lib/Mojo/RabbitMQ/Client/Consumer.pm
+  Mojo::RabbitMQ::Client::LocalQueue:
+    file: lib/Mojo/RabbitMQ/Client/LocalQueue.pm
+  Mojo::RabbitMQ::Client::Method:
+    file: lib/Mojo/RabbitMQ/Client/Method.pm
+  Mojo::RabbitMQ::Client::Method::Publish:
+    file: lib/Mojo/RabbitMQ/Client/Method/Publish.pm
+  Mojo::RabbitMQ::Client::Publisher:
+    file: lib/Mojo/RabbitMQ/Client/Publisher.pm
+requires:
+  File::ShareDir: '0'
+  List::Util: '1.33'
+  Mojolicious: '6.10'
+  Net::AMQP: '0.06'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/inway/mojo-rabbitmq-client/issues
+  homepage: https://github.com/inway/mojo-rabbitmq-client
+  repository: git://github.com/inway/mojo-rabbitmq-client.git
+version: 0.0.9
+x_contributors:
+  - 'Vidar Tyldum <vidar@tyldum.com>'
+  - 'Stephan Kulow <coolo@suse.de>'
+  - 'Richard Lippmann <lippmann@findus-internet-opac.de>'
+  - 'Sebastian Podjasek <sebastian@podjasek.pl>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

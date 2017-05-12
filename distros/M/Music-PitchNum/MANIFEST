@@ -1,0 +1,24 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+SIGNATURE
+eg/word2notes
+lib/Music/PitchNum.pm
+lib/Music/PitchNum/ABC.pm
+lib/Music/PitchNum/ASPN.pm
+lib/Music/PitchNum/Dutch.pm
+lib/Music/PitchNum/German.pm
+t/00-load.t
+t/Music-PitchNum-ABC.t
+t/Music-PitchNum-ASPN.t
+t/Music-PitchNum-Dutch.t
+t/Music-PitchNum-German.t
+t/Music-PitchNum.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,13 @@
+
+===== ChangeLog of Mail::Box::IMAP4 version 3.*
+
+version 3.001: Thu  2 Feb 16:02:23 CET 2017
+
+	Fixes:
+	- repair unclean packaging
+
+version 3.000: Thu  2 Feb 15:47:09 CET 2017
+
+	Changes:
+	- split-off from Mail::Box
+	- supports perl from 5.10 (was 5.8.5)

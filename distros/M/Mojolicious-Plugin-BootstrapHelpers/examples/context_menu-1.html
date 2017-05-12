@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Examples</title>
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    </head>
+
+    <body>
+        <div class="container">
+            
+
+<pre>    &lt;%= context_menu id =&gt; &#39;my-context-menu&#39;, items =&gt; [
+            [&#39;Item 1&#39;, [&#39;item1&#39;] ],
+            [&#39;Item 2&#39;, [&#39;item2&#39;] ],
+            [],
+            [&#39;Item 3&#39;, [&#39;item3&#39;] ]
+         ] %&gt;
+&lt;/div&gt;</pre>
+<pre>&lt;ul class=&quot;dropdown-menu&quot; id=&quot;my-context-menu&quot;&gt;
+    &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item1&quot; tabindex=&quot;-1&quot;&gt;Item 1&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item2&quot; tabindex=&quot;-1&quot;&gt;Item 2&lt;/a&gt;&lt;/li&gt;
+    &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item3&quot; tabindex=&quot;-1&quot;&gt;Item 3&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</pre>
+<div>    <ul class="dropdown-menu" id="my-context-menu">        <li><a class="menuitem" href="item1" tabindex="-1">Item 1</a></li>        <li><a class="menuitem" href="item2" tabindex="-1">Item 2</a></li>        <li class="divider"></li>        <li><a class="menuitem" href="item3" tabindex="-1">Item 3</a></li>    </ul></div>
+        </div>
+        <pre style="background-color: #fff; border-width: 0px;">
+
+
+
+        </pre>
+    </body>
+</html>

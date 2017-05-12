@@ -1,0 +1,45 @@
+NAME
+    MooseX::DeclareX::Plugin::singleton - shiny syntax for MooseX::Singleton
+
+SYNOPSIS
+     class Logger is singleton
+     {
+        method log ($str) {
+           ...;
+        }
+     }
+ 
+     Logger->instance->log("here we are!");
+
+DESCRIPTION
+    This distribution extends MooseX::DeclareX with a new plugin:
+
+    `is singleton`
+        Marks a class as a singleton, providing `instance` and `initialize`
+        methods as per MooseX::Singleton.
+
+BUGS
+    Known issue: you may occasionally get errors about inlining the
+    constructor.
+
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-DeclareX-Plugin-singlet
+    on>.
+
+SEE ALSO
+    MooseX::DeclareX, MooseX::Singleton.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

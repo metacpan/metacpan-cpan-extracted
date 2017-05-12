@@ -1,0 +1,9 @@
+# Dzil build directories
+/Mojolicious-Plugin-RESTful*
+[._][Bb]uild/
+release*
+# Temp files
+*.bak$
+*.swp$
+.gitnxtver_cache
+

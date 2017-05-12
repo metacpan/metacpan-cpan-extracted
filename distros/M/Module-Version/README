@@ -1,0 +1,70 @@
+NAME
+    Module::Version - Get module versions
+
+VERSION
+    Version 0.12
+
+SYNOPSIS
+    This module fetches the version of any other module.
+
+    It comes with a CLI program "mversion" which does the same.
+
+        use Module::Version 'get_version';
+
+        print get_version('Search::GIN'), "\n";
+
+    Or using "mversion":
+
+        $ mversion Search::GIN
+        0.04
+
+        $ mversion Doesnt::Exist
+        Warning: module 'Doesnt::Exist' does not seem to be installed.
+
+        $ mversion --quiet Doesnt::Exist
+        (no output)
+
+        $ mversion --full Search::GIN Moose
+        Search::GIN 0.04
+        Moose 1.01
+
+        $ mversion --input modules.txt
+        Search::GIN 0.04
+        Data::Collector 0.03
+        Moose 1.01
+
+EXPORT
+  get_version
+    "get_version" will be exported if explicitly specified.
+
+        use Module::Version 'get_version';
+
+    Nothing is exported by default.
+
+SUBROUTINES/METHODS
+  get_version
+    Accepts a module name and fetches the version of the module.
+
+    If the module doesn't exist, returns undef.
+
+AUTHOR
+    Sawyer X, "<xsawyerx at cpan.org>"
+
+BUGS
+    Please report bugs and other issues on the bugtracker:
+
+    <http://github.com/xsawyerx/module-version/issues>
+
+SUPPORT
+    This module sports 100% test coverage, but in case you have more issues,
+    please see *BUGS* above.
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Sawyer X.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,22 @@
+Revision history for Perl extension Math::Fractal::DLA.
+
+0.21  Sun Jan  9 18:00:00 2005
+        - Removed a bug in setBaseColor that prevented the module to set the colors correctly
+        - Added an inherit flag in the Mason example files
+        - Included the Log::SimpleLog module
+        - Renamed ErrorExit to exitOnError
+        - Added support for Module::Build
+        - Added a basic test file
+        - Added an example script that can be configured with a XML file
+
+0.20  Fri Oct 11 00:01:00 2002
+	- moved the different types in own modules (eg sub explode => Explode.pm)
+	- better log handling
+	- using croak instead of die
+	- added hash parameters to the methods with multiple parameters
+	- performance improvement in Explode-mode
+
+0.10  Sun Jun  9 20:00:00 2002
+	- original version
+
+

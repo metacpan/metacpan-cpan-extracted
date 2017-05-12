@@ -1,0 +1,91 @@
+NAME
+    Module::Start - The Simple/Flexible Way to Create New Modules
+
+SYNOPSIS
+    From the command line:
+
+        > # start a Catalyst plugin
+        > module-start Catalyst::Model::Funky catalyst
+        You don't appear to have module-start configured.
+        Would you like to do that now? [Yn] y
+        What is your full name? Jimmy James
+        What is your email address? jj@example.com
+        Can I configure module-start in /home/jj/.module-start? [Yn] y
+        Creating /home/jj/.module-start
+        Changing to directory /home/jj/.module-start
+        Creating ./config
+        Installing Default Flavor
+        Creating ./templates/basic
+        *Error* No flavor 'catalyst' found in /home/jj/.module-start/templates/
+        Please install or create a 'catalyst' flavor and try again
+        Exiting...
+        > cpan Module::Start::Flavor::Catalyst
+        ... (cpan installs Module::Start::Flavor::Catalyst) ...
+        > module-start -install Module::Start::Flavor::Catalyst
+        Installing Flavor 'catalyst'
+        Changing to directory /home/jj/.module-start
+        Creating ./templates/catalyst
+        Module::Start::Flavor::Catalyst successfully installed
+        > module-start Catalyst::Model::Funky catalyst
+        Creating module distribution Catalyst-Model-Funky
+        Changing to directory Catalyst-Model-Funky
+        Using 'catalyst' flavor templates
+        Creating Makefile.PL
+        Creating Changes
+        Creating lib/Catalyst/Model/Funky.pm
+        Creating t/00_load.t
+        Creating README
+        Creating MANIFEST
+        Catalyst-Model-Funky successfully started
+
+    later...
+
+        > cd Catalyst-Model-Funky
+        > module-start Catalyst::Model::Funky::Boss catalyst
+        Using 'catalyst' flavor templates
+        Creating lib/Catalyst/Model/Funkier.pm
+
+DESCRIPTION
+    If you are like me, when you think of a new idea, you want to get
+    started asap. If you are even more like me, your projects come in all
+    sorts of flavors. In other words, different types of projects need
+    different types of starting files. Within Perl, you have pure perl
+    modules, XS modules, Inline modules, Kwiki modules, Catalyst modules,
+    Jifty modules, Plagger modules, and on and on. You also might have JSAN
+    modules, Ruby modules, Python modules and PHP modules to write.
+
+    Module::Start creates a new module distribution (or any other imaginable
+    set of project files) in a simple straightforward way. All the
+    boilerplate files come from a set of templates.
+
+CONFIGURATION
+    All the configuration info is either stored in ~/.module-start/config,
+    inferred from your environment, or prompted for.
+
+    "module-start" will automatically configure itself the first time you
+    run it. If you want to reconfigure it later, run:
+
+        module-start -setup
+
+    You are encouraged to edit the contents of the "module-start" base
+    directory. To change basic configure information, edit the "config"
+    file. To change or edit template flavors, edit the content of the
+    "template" directory. Each subdirectory defines a new flavor. You can
+    set the default flavor in the "config" file.
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2006. Ingy döt Net. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See [http://www.perl.com/perl/misc/Artistic.html]
+
+    _____[ config
+    ]_________________________________________________________________
+    author_full_name: [% author_full_name %] author_email_address: [%
+    author_email_address %]
+

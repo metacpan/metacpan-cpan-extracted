@@ -1,0 +1,46 @@
+---
+abstract: 'Add basic Log::Log4perl logging to a MooseX::App application as a role.'
+author:
+  - 'John Dexter '
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v1.0.0, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-App-Role-Log4perl
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MooseX::App::Role::Log4perl:
+    file: lib/MooseX/App/Role/Log4perl.pm
+    version: '0.03'
+requires:
+  Log::Log4perl: '0'
+  Log::Log4perl::Appender::File: '0'
+  Log::Log4perl::Appender::Screen: '0'
+  Moose::Role: '0'
+  MooseX::App::Role: '0'
+  perl: '5.010000'
+resources:
+  bugtracker: https://github.com/PsyDefect/MX-App-Role-Log4perl/issues
+  homepage: https://github.com/PsyDefect/MX-App-Role-Log4perl
+  repository: https://github.com/PsyDefect/MX-App-Role-Log4perl.git
+version: '0.03'
+x_contributors:
+  - 'John Dexter <John.Dexter@mercer.com>'
+  - 'PsyDefect <john.dexter@psydefect.com>'

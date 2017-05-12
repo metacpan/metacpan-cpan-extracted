@@ -1,0 +1,94 @@
+If you're not running MacPerl, this module is not for you.  I plan on 
+adding netatalk support in a future release, but until then, this is only 
+useful on MacOS using MacPerl.
+
+
+SYNOPSIS
+
+    use Mac::Conversions qw(binhex debinhex macbinary demacbinary macb2hex hex2macb);
+    $converter = Mac::Conversions->new;
+
+    $converter->binhex("path:to:MacPerl");
+    $converter->debinhex("path:to:MacPerl.hqx");
+
+    $converter->macbinary("path:to:Shuck");
+    $converter->demacbinary("path:to:Shuck.bin");
+
+    $converter->macb2hex("path:to:MacPerl.hqx");
+    $converter->hex2macb("path:to:MacPerl.bin");
+
+DESCRIPTION
+
+Mac::Conversions is a class implementing converters for the types of file 
+encoding/decoding routinely done when using MacOS. All of these rely on the 
+presence of the Convert::BinHex module, and Mac::Conversions will not run 
+if Convert::BinHex is not installed.
+
+The conversions are:
+
+	binhex($path)
+
+		Take the native Macintosh file pointed to by $path and 
+		create a BinHex file in the same folder.  If the native 
+		Macintosh file is named "name", the BinHex file is named 
+		"name.hqx", unless "name.hqx" already exists.  Then binhex 
+		will attempt to find a unique name by inserting integers in 
+		the name, "name.0.hqx", "name.1.hqx", etc.
+
+	debinhex($path)
+
+		Take the BinHex file pointed to by $path and decode it to 
+		reconstruct the native Macintosh file.  The name of the 
+		file will be that encoded into the BinHex file if a file of 
+		that name doesn't exist.  Otherwise, a unique name will be 
+		constructed by adding integers after the name.
+
+	macbinary($path)
+
+		Take the native Macintosh file pointed to by $path and 
+		create a MacBinaryII file.  The name of the MacBinary file 
+		will be "name.bin" if the native file is called "name", but 
+		macbinary will try to find a unique name in the same way 
+		that binhex does if a file "name.bin" already exists.
+
+	demacbinary($path)
+
+		The MacBinary II file pointed to by $path will be decoded 
+		to a native Macintosh file.  The name of the file will be 
+		that encoded into the MacBinary file, except a unique name 
+		will be constructed if a file of that name already exists.
+
+	hex2macb($path)
+
+		The BinHex file $path is converted to a MacBinary file.  
+		The name will be "name.bin", where name is the name of the 
+		file encoded in the BinHex file, with the usual caveat.
+
+	macb2hex($path)
+
+		The MacBinary II file $path is converted to BinHex.
+
+	new
+
+		The constructor for the class.  If new is called with Debug 
+		=> 1
+
+		$c = Mac::Conversions->new(Debug => 1);
+
+		then semi-useful debugging information will be printed to 
+		standard output.  If Remove => 1 is set, then the original 
+		BinHex or MacBinary (but never a native Mac file) will be 
+		unlinked.  (Note this means that it doesn't simply get 
+		moved to the Trash but disappears forever.)
+
+SEE ALSO
+
+See the documentation for Convert::BinHex, where all the heavy lifting is 
+really done.
+
+COPYRIGHT
+
+  Copyright 1999, Paul J. Schinder <mailto:schinder@pobox.com>
+
+This library is free software; you can redistribute it and/or modify it 
+under the same terms as Perl itself.

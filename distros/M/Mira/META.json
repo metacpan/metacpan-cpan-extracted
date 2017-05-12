@@ -1,0 +1,72 @@
+{
+   "abstract" : "multiple website content management framework",
+   "author" : [
+      "Kiavash"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mira",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Cmd" : "0",
+            "CGI" : "0",
+            "DateTime" : "0",
+            "Encode::Locale" : "0",
+            "File::Copy::Recursive" : "0",
+            "File::ShareDir" : "0",
+            "HTML::BBCode" : "2.06",
+            "HTTP::Date" : "0",
+            "HTTP::Server::Simple" : "0",
+            "LWP::MediaTypes" : "0",
+            "Markup::Unified" : "0",
+            "Template" : "0",
+            "Text::Markdown" : "v1.0.31",
+            "Text::MultiMarkdown" : "v1.0.34",
+            "Text::Textile" : "2.12",
+            "URI::Escape" : "0",
+            "YAML" : "0",
+            "perl" : "5.012"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kiamazi/mira.git",
+         "web" : "https://github.com/kiamazi/mira"
+      }
+   },
+   "version" : "v00.07.47",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

@@ -1,0 +1,183 @@
+WARNING
+    MIME-AltWords requires MIME::Base64 and MIME::QuotedPrint.  It will work
+    with versions as old as 2.20, but some tests (when you do "make test")
+    will fail for MIME::QuotedPrint older than 3.03.
+
+NAME
+    MIME::AltWords - properly deal with RFC-1522 encoded words
+
+SYNOPSIS
+    The Perl module MIME::AltWords is recommended for encoding and decoding
+    MIME words (such as "=?ISO-8859-2?Q?_=E1ll_e=E1r?=") found in e-mail
+    message headers (mostly Subject, From and To).
+
+    MIME::AltWords is similar to MIME::Words in MIME::Tools, but it provides
+    an alternate implementation that follows the MIME specification more
+    carefully, and it is actually compatible with existing mail software
+    (tested with Mutt, Pine, JavaMail and OpenWebmail). MIME::AltWords
+    extends the functionality of MIME::Words (version 5.420) by adding more
+    functions and more options to existing functions. The original interface
+    is changed in an upward-compatible way.
+
+    Before reading further, you should see MIME::Tools to make sure that you
+    understand where this module fits into the grand scheme of things. Go
+    on, do it now. I'll wait.
+
+    Ready? Ok...
+
+        use MIME::AltWords qw(:all);   
+     
+        ### Decode the string into another string, forgetting the charsets:
+        $decoded = decode_mimewords(
+              'To: =?ISO-8859-1?Q?Keld_J=F8rn_Simonsen?= <keld@dkuug.dk>',
+              );
+    
+        ### Split string into array of decoded [DATA,CHARSET] pairs:
+        @decoded = decode_mimewords(
+              'To: =?ISO-8859-1?Q?Keld_J=F8rn_Simonsen?= <keld@dkuug.dk>',
+              );
+     
+        ### Encode a single unsafe word:
+        $encoded = encode_mimeword("\xABFran\xE7ois\xBB");
+    
+        ### Encode a string, trying to find the unsafe words inside it: 
+        $encoded = encode_mimewords("Me and \xABFran\xE7ois\xBB in town");
+
+DESCRIPTION
+    Fellow Americans, you probably won't know what the hell this module is
+    for. Europeans, Russians, et al, you probably do. ":-)".
+
+    For example, here's a valid MIME header you might get:
+
+          From: =?US-ASCII?Q?Keith_Moore?= <moore@cs.utk.edu>
+          To: =?ISO-8859-1?Q?Keld_J=F8rn_Simonsen?= <keld@dkuug.dk>
+          CC: =?ISO-8859-1?Q?Andr=E9_?= Pirard <PIRARD@vm1.ulg.ac.be>
+          Subject: =?ISO-8859-1?B?SWYgeW91IGNhbiByZWFkIHRoaXMgeW8=?=
+           =?ISO-8859-2?B?dSB1bmRlcnN0YW5kIHRoZSBleGFtcGxlLg==?=
+           =?US-ASCII?Q?.._cool!?=
+
+    The fields basically decode to (sorry, I can only approximate the Latin
+    characters with 7 bit sequences /o and 'e):
+
+          From: Keith Moore <moore@cs.utk.edu>
+          To: Keld J/orn Simonsen <keld@dkuug.dk>
+          CC: Andr'e  Pirard <PIRARD@vm1.ulg.ac.be>
+          Subject: If you can read this you understand the example... cool!
+
+PUBLIC INTERFACE
+    encode_mimewords RAW, [OPTS]
+        *Function.* Given a RAW string, try to find and encode all "unsafe"
+        sequences of characters:
+
+            ### Encode a string with some unsafe "words":
+            $encoded = encode_mimewords("Me and \xABFran\xE7ois\xBB");
+
+        Returns the encoded string. Any arguments past the RAW string are
+        taken to define a hash of options:
+
+        Charset
+            Encode all unsafe stuff with this charset. Default is
+            'ISO-8859-1', a.k.a. "Latin-1".
+
+        Encoding
+            The encoding to use, "q" or "b". The default is "q".
+
+        Field
+            Name of the mail field this string will be used in. *Currently
+            ignored.*
+
+        Note: this is a stable, tested, widely compatible solution. Strict
+        compliance with RFC-1522 (regarding the use of encoded words in
+        message headers), however, was not proven, but strings returned by
+        this function work properly and identically with Mutt, Pine,
+        JavaMail and OpenWebmail. The recommended way is to use this
+        function instead of "encode_mimeword()" or "encode_mimewords" in
+        MIME::Words.
+
+    encode_mimeword RAW, [ENCODING], [CHARSET]
+        *Function.* Encode a single RAW "word" that has unsafe characters.
+        The "word" will be encoded in its entirety.
+
+            ### Encode "<<Franc,ois>>":
+            $encoded = encode_mimeword("\xABFran\xE7ois\xBB");
+
+        You may specify the ENCODING ("Q" or "B"), which defaults to "Q".
+        You may specify the CHARSET, which defaults to "iso-8859-1".
+
+    decode_mimewords ENCODED, [OPTS...]
+        *Function.* Go through the string looking for RFC-1522-style "Q"
+        (quoted-printable, sort of) or "B" (base64) encoding, and decode
+        them.
+
+        In an array context, splits the ENCODED string into a list of
+        decoded "[DATA, CHARSET]" pairs, and returns that list. Unencoded
+        data are returned in a 1-element array "[DATA]", giving an effective
+        CHARSET of "undef".
+
+            $enc = '=?ISO-8859-1?Q?Keld_J=F8rn_Simonsen?= <keld@dkuug.dk>';
+            foreach (decode_mimewords($enc)) {
+                print "", ($_[1] || 'US-ASCII'), ": ", $_[0], "\n";
+            }
+
+        In a scalar context, joins the "data" elements of the above list
+        together, and returns that. *Note: this is not information-lossy,*
+        it sanitizes the returned string to use a specific, single charset,
+        either specified using the "Charset" option, or autodetecting one
+        (ISO-8859-1, ISO-8859-2 or UTF-8) which can accomodate all
+        characters. In case of charset autodetection,
+        "get_best_decode_charset(ENCODED)" can be used to query the charset
+        autodetected.
+
+        You might want to see "unmime" in MIME::WordDecoder as an alternate
+        of MIME::AltWords::encode_mimewords.
+
+        In the event of a syntax error, $@ will be set to a description of
+        the error, but parsing will continue as best as possible (so as to
+        get *something* back when decoding headers). $@ will be false if no
+        error was detected.
+
+        Any arguments past the ENCODED string are taken to define a hash of
+        options:
+
+        Field
+            Name of the mail field this string came from. *Currently
+            ignored.*
+
+NOTES
+    Exports its principle functions by default, in keeping with MIME::Base64
+    and MIME::QuotedPrint.
+
+    Doesn't depend on MIME::Words or MIME::Tools. All the shared code is
+    copied to MIME::AltWords0, which is bundled.
+
+    See also <http://www.szszi.hu/wiki/Sympa4Patches> for the previous
+    version of MIME::AltWords integrated into the Sympa 4 mailing list
+    software.
+
+AUTHOR
+    MIME::AltWords was written by Péter Szabó (pts@fazekas.hu) in 2006,
+    and it has been uploaded to CPAN on 2006-09-27.
+
+    MIME::AltWords uses code from MIME::Words (in the file
+    "lib/MIME/AltWords0.pm") and it uses documentation from MIME::Words (in
+    the files "lib/MIME/AltWords0.pm" and "lib/MIME/AltWords.pm").
+
+    Here is the original author and copyright information for MIME::Words.
+
+    Eryq (eryq@zeegee.com), ZeeGee Software Inc (http://www.zeegee.com).
+    David F. Skoll (dfs@roaringpenguin.com) http://www.roaringpenguin.com
+
+    All rights reserved. This program is free software; you can redistribute
+    it and/or modify it under the same terms as Perl itself.
+
+    Thanks also to...
+
+          Kent Boortz        For providing the idea, and the baseline 
+                             RFC-1522-decoding code!
+          KJJ at PrimeNet    For requesting that this be split into
+                             its own module.
+          Stephane Barizien  For reporting a nasty bug.
+
+VERSION
+    See $VERSION in "lib/MIME/AltWords.pm" .
+

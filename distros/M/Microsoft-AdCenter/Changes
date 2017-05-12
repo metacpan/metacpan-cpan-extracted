@@ -1,0 +1,72 @@
+Revision history for Microsoft-AdCenter
+
+6.01    31 May 2010
+        Initial release for Microsoft adCenter API Version 6
+
+6.02    21 June 2010
+        Bug fixes
+        Ticket 58281 - ReportRequest type not set in SubmitGenerateReport
+        Ticket 58425 - _deserialize_complex_type still called when response object body is empty
+        Ticket 58455 - Empty Bid elements are not returned from _serialize_argument
+
+7.01    16 July 2010
+        Updates for Microsoft adCenter API Version 7
+
+7.02    07 October 2010
+        Updates for the September 24, 2010 release of V7
+
+7.03    29 Octobar 2010
+        New automatic retry feature (experimental)
+
+7.04    01 November 2010
+        Misc bug fixes in SOAP request generation logic
+
+7.05    04 November 2010
+        Bug fix: Ampersands are double-encoded
+
+7.06    12 November 2010
+        Enhancement: New 500 error added to the regex and also documented the new retry class
+
+7.07    18 November 2010
+        Bug fix: Memory leak in Microsoft::AdCenter::Service::_invoke
+
+7.08    14 December 2010
+        Enhancement: Add support for auto-retry on "500 write failed"
+
+8.01    16 May 2011
+        Fundamental changes to the way the service clients are organized
+        Added adCenter API Version 8 services
+        Updated V7::CampaignManagementService and V7::ReportingService according to the latest WSDL
+        Removed V7::SecureDataManagementService as it is not listed in MSDN anymore
+
+8.02    30 July 2011
+        Added V8::CampaignManagementService and V8::CustomerManagementService
+
+8.03    29 August 2011
+        Added V8::CustomerBillingService, V8::NotificationService and V8::ReportingService
+
+8.04    25 October 2011
+        Optimize request size
+
+8.05    1 November 2011
+        Updated various services according to the latest WSDLs
+
+8.06    10 February 2012
+        Updated various services according to the latest WSDLs
+
+8.07    03 March 2012
+        Updated various services according to the latest WSDLs
+
+8.08    05 April 2012
+        Updated various services according to the latest WSDLs
+        Added support for retrying on CallRateExceeded error
+
+8.09    16 July 2012
+        Updated various services according to the latest WSDLs
+
+8.10    30 August 2012
+        Added V8::BulkService
+        Updated various services according to the latest WSDLs
+
+8.10    11 September 2012
+        Updated various services according to the latest WSDLs

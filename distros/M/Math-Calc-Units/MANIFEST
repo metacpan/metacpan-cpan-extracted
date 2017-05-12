@@ -1,0 +1,26 @@
+Artistic.html
+COPYING
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+t/main.t
+t/pod.t
+Units/Compute.pm
+Units/Convert.pm
+Units/Grammar.pm
+Units/Grammar.y
+Units/Rank.pm
+Units/Convert/Base.pm
+Units/Convert/Base2Metric.pm
+Units/Convert/Byte.pm
+Units/Convert/Combo.pm
+Units/Convert/Distance.pm
+Units/Convert/Metric.pm
+Units/Convert/Multi.pm
+Units/Convert/Time.pm
+Units/Convert/Date.pm
+Units.pm
+script/ucalc
+META.yml                                 Module meta-data (added by MakeMaker)

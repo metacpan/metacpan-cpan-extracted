@@ -1,0 +1,9 @@
+examples/sample.pl
+lib/Mock/Person/SV.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/001_module_loader.t
+t/002_generate_person.t
+t/003_pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,134 @@
+libmojolicious-plugin-mailexception-perl (0.20-1) unstable; urgency=medium
+
+  * Update for latest mojolicious, Debian FTBFS, closes: 825541.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sun, 05 Jun 2016 13:33:41 +0300
+
+libmojolicious-plugin-mailexception-perl (0.19-1) unstable; urgency=medium
+
+  * Some fixes for Mojo v.5, closes: #765004
+    thanks to Stephan Jauernick <stephan@stejau.de>.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Fri, 17 Oct 2014 23:44:06 +0400
+
+libmojolicious-plugin-mailexception-perl (0.18-1) unstable; urgency=low
+
+  * User can add different tags for exceptions.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 06 Nov 2013 11:29:05 +0400
+
+libmojolicious-plugin-mailexception-perl (0.17-1) unstable; urgency=low
+
+  * New release, closes: #713231
+   - New Mojo uses render(text => $text) instead reder_text($text).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sat, 17 Aug 2013 12:09:17 +0400
+
+libmojolicious-plugin-mailexception-perl (0.16-1) unstable; urgency=low
+
+  * Works properly if client's application redefines $SIG{__DIE__}, too.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sun, 24 Mar 2013 00:24:49 +0400
+
+libmojolicious-plugin-mailexception-perl (0.15-1) unstable; urgency=low
+
+  * use CORE::die instead die (try to localize modperl's segfaults).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 20 Mar 2013 02:30:07 +0400
+
+libmojolicious-plugin-mailexception-perl (0.14-1) unstable; urgency=low
+
+  * Plugin doesn't catch transitional exceptions.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 19 Mar 2013 17:44:25 +0400
+
+libmojolicious-plugin-mailexception-perl (0.12-1) unstable; urgency=low
+
+  * $SIG{__DIE__} doesn't modify original exception.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Thu, 14 Mar 2013 02:47:37 +0400
+
+libmojolicious-plugin-mailexception-perl (0.11-2) unstable; urgency=low
+
+  * Add Roman V. Nikolaev to uploaders list.
+  * Upload last fixes into Debian.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sun, 10 Feb 2013 22:36:04 +0400
+
+libmojolicious-plugin-mailexception-perl (0.11-1) nowtaxi; urgency=low
+
+  * Don`t catch eval exception.
+
+ -- Roman V. Nikolaev <rshadow@rambler.ru>  Sat, 09 Feb 2013 15:27:40 +0400
+
+libmojolicious-plugin-mailexception-perl (0.10-1) nowtaxi; urgency=low
+
+  * Fix exception catching if exception is object.
+
+ -- Roman V. Nikolaev <rshadow@rambler.ru>  Sat, 09 Feb 2013 15:16:22 +0400
+
+libmojolicious-plugin-mailexception-perl (0.09-2) unstable; urgency=low
+
+  * New release to debian, fix build-depends by ftp-master's review.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Thu, 10 Jan 2013 16:23:09 +0400
+
+libmojolicious-plugin-mailexception-perl (0.09-1) nowtaxi; urgency=low
+
+  * Some perldoc fixes.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 08 Jan 2013 16:54:39 +0400
+
+libmojolicious-plugin-mailexception-perl (0.08-1) nowtaxi; urgency=low
+
+  * Add information about vcs/homepage into Makefile.PL.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 07 Jan 2013 02:58:16 +0400
+
+libmojolicious-plugin-mailexception-perl (0.07-1) nowtaxi; urgency=low
+
+  * Fix 'uninitialized value' warning, thanks to Renée Bäcker
+   for bugreport https://rt.cpan.org/Ticket/Display.html?id=82528. 
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 07 Jan 2013 02:46:08 +0400
+
+libmojolicious-plugin-mailexception-perl (0.06-1) nowtaxi; urgency=low
+
+  * The module can really use perl 5.8.8, thanks to Renée Bäcker
+    for bugreport https://rt.cpan.org/Ticket/Display.html?id=82527.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 07 Jan 2013 01:51:50 +0400
+
+libmojolicious-plugin-mailexception-perl (0.05-1) nowtaxi; urgency=low
+
+  * New release (if Mojo has already prepared exception object the plugin
+    wont update the exception).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Fri, 04 Jan 2013 15:46:25 +0400
+
+libmojolicious-plugin-mailexception-perl (0.04-1) nowtaxi; urgency=low
+
+  * New release (uses Mojo::Exception->new properly).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Thu, 03 Jan 2013 01:20:46 +0400
+
+libmojolicious-plugin-mailexception-perl (0.03-2) nowtaxi; urgency=low
+
+  * New release (lines_after can be absent).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sat, 22 Dec 2012 19:04:28 +0400
+
+libmojolicious-plugin-mailexception-perl (0.02-1) unstable; urgency=low
+
+  * New release
+    * drop Changes, uses debian/changelog instead,
+    * update documentation
+  * Upload module to debian, closes: 696226
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 18 Dec 2012 15:30:02 +0400
+
+libmojolicious-plugin-mailexception-perl (0.01-1) nowtaxi; urgency=low
+
+  * Initial Release.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 18 Dec 2012 15:07:49 +0400

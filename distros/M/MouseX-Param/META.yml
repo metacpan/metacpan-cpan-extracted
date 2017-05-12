@@ -1,0 +1,26 @@
+---
+abstract: 'A Mouse role for manipulating params'
+author:
+  - 'NAKAGAWA Masaki <masaki@cpan.org>'
+build_requires:
+  Test::Deep: 0
+  Test::More: 0
+  ok: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MouseX-Param
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Filter::Util::Call: 0
+  Mouse: 0.14
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

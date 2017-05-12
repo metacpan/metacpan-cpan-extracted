@@ -1,0 +1,100 @@
+{
+   "abstract" : "shiny syntax for MooseX::Privacy",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::7 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-DeclareX-Privacy",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MooseX::DeclareX" : "0.008",
+            "MooseX::Privacy" : "0.05"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::DeclareX::Plugin::private" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/private.pm",
+         "version" : "0.006"
+      },
+      "MooseX::DeclareX::Plugin::private::Parser" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/private.pm",
+         "version" : "0.006"
+      },
+      "MooseX::DeclareX::Plugin::private::Role" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/private.pm",
+         "version" : "0.006"
+      },
+      "MooseX::DeclareX::Plugin::protected" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/protected.pm",
+         "version" : "0.006"
+      },
+      "MooseX::DeclareX::Plugin::protected::Parser" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/protected.pm",
+         "version" : "0.006"
+      },
+      "MooseX::DeclareX::Plugin::protected::Role" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/protected.pm",
+         "version" : "0.006"
+      },
+      "MooseX::DeclareX::Plugin::public" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/public.pm",
+         "version" : "0.006"
+      },
+      "MooseX::DeclareX::Plugin::public::Parser" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/public.pm",
+         "version" : "0.006"
+      },
+      "MooseX::DeclareX::Plugin::public::Role" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/public.pm",
+         "version" : "0.006"
+      },
+      "MooseX::DeclareX::Privacy" : {
+         "file" : "lib/MooseX/DeclareX/Privacy.pm",
+         "version" : "0.006"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX-Privacy/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=MooseX-DeclareX-Privacy"
+      },
+      "homepage" : "https://metacpan.org/release/MooseX-DeclareX-Privacy",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.006"
+}

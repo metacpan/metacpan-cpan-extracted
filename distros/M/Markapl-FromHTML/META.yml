@@ -1,0 +1,23 @@
+---
+abstract: 'Convert HTML to Markapl Perl code.'
+author:
+  - 'Kang-min Liu  C<< <gugod@gugod.org> >>'
+build_requires:
+  Test::More: 0.42
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Markapl::FromHTML
+name: Markapl-FromHTML
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  HTML::PullParser: 0
+  Rubyish: 0.31
+  perl: 5.8.0
+version: 0.03

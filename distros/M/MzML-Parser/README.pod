@@ -1,0 +1,102 @@
+=head1 NAME
+
+MzML::Parser - A Perl parser for the mzML data format.
+
+=head1 SYNOPSIS
+
+Quick summary of what the module does.
+
+Perhaps a little code snippet.
+
+    my $p = MzML::Parser->new();
+    my $res = $p->parse("miape_sample.mzML");
+    ...
+
+=head1 DESCRIPTION
+
+From 2005-2008 there has existed two separate XML formats for encoding raw spectrometer output: mzData developed by the PSI and mzXML developed at the Seattle Proteome Center at the Institute for Systems Biology. It was recognized that the existence of two separate formats for essentially the same thing generated confusion and required extra programming effort. Therefore the PSI, with full participation by ISB, has developed a new format by taking the best aspects of each of the precursor formats to form a single one. It is intended to replace the previous two formats. This new format was originally given a working name of dataXML. The final name is mzML. The first specification was published in June 2008. This format was officially released at the 2008 American Society for Mass Spectrometry Meeting, and is since then relatively stable with very few updates. On 1 June 2009, mzML 1.1.0 was released.
+
+The parser will transform the mzML file into a completely structured set of objects, according to the 1.1.0 specification published in L<http://www.peptideatlas.org/tmp/mzML1.1.0.html>.
+
+=head2 Object Structure
+
+In order to acces the information organized deeply into the nested structure, i suggest to you to use the module Data::Printer. The future versions of this module will have accessors methods to more specifically access some of the information inside the object.
+
+THis is an example of how the object is organized:
+
+	MzML::Registry  {
+	    Parents       Moose::Object
+	    public methods (11) : cvlist, dataProcessingList, fileDescription, instrumentConfigurationList, meta, mzML, referenceableParamGroupList, run, sampleList, scanSettingsList, softwareList
+	    private methods (0)
+	    internals: {
+		cvlist                        MzML::CvList,
+		dataProcessingList            MzML::DataProcessingList,
+		fileDescription               MzML::FileDescription,
+		instrumentConfigurationList   MzML::InstrumentConfigurationList,
+		mzML                          MzML::MzML,
+		referenceableParamGroupList   MzML::ReferenceableParamGroupList,
+		run                           MzML::Run,
+		sampleList                    MzML::SampleList,
+		scanSettingsList              MzML::ScanSettingsList,
+		softwareList                  MzML::SoftwareList
+	    }
+	}
+
+
+=head1 AUTHOR
+
+Felipe da Veiga Leprevost, C<< <leprevost at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-mzml-parser at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MzML-Parser>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc MzML::Parser
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=MzML-Parser>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/MzML-Parser>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/MzML-Parser>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/MzML-Parser/>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2014 Felipe da Veiga Leprevost.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+

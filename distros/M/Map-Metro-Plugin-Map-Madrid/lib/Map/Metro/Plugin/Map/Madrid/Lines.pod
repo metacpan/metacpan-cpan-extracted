@@ -1,0 +1,403 @@
+
+# PODNAME: Map::Metro::Plugin::Map::Madrid::Lines
+# ABSTRACT: Lines and stations in the Madrid map
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Map::Metro::Plugin::Map::Madrid::Lines - Lines and stations in the Madrid map
+
+=head1 VERSION
+
+Version 0.1001, released 2015-03-20.
+
+=head1 LINES
+
+=head2 Line 1: Pinar de Chamartín → Valdecarros [M1]
+
+=for HTML <div style="background-color: #4c96bd; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Pinar de Chamartín   (M4)
+    Bambú
+    Chamartín            (M10 A)
+    Plaza de Castilla    (M10 A, M9 A)
+    Valdeacederas
+    Tetuán
+    Estrecho
+    Alvarado
+    Cuatro Caminos       (M2, M6)
+    Ríos Rosas
+    Iglesia
+    Bilbao               (M4)
+    Tribunal             (M10 A)
+    Gran Vía             (M5)
+    Sol                  (M2, M3)
+    Tirso de Molina
+    Antón Martín
+    Atocha
+    Atocha Renfe
+    Menéndez Pelayo
+    Pacífico             (M6)
+    Puente de Vallecas
+    Nueva Numancia
+    Portazgo
+    Buenos Aires
+    Alto del Arenal
+    Miguel Hernández
+    Sierra de Guadalupe
+    Villa de Vallecas
+    Congosto
+    La Gavia
+    Las Suertes
+    Valdecarros
+
+=head2 Line 2: Cuatro Caminos → Las Rosas [M2]
+
+=for HTML <div style="background-color: #ff0000; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Cuatro Caminos          (M1, M6)
+    Canal                   (M7 A)
+    Quevedo
+    San Bernardo            (M4)
+    Noviciado               [Plaza de España: M10 A, M3]
+    Santo Domingo
+    Ópera                   (M5, R)
+    Sol                     (M1, M3)
+    Sevilla
+    Banco de España
+    Retiro
+    Príncipe de Vergara     (M9 A)
+    Goya                    (M4)
+    Manuel Becerra          (M6)
+    Ventas                  (M5)
+    La Elipa
+    La Almudena
+    Alsacia
+    Avenida de Guadalajara
+    Las Rosas
+
+=head2 Line 3: Moncloa → Villaverde Alto [M3]
+
+=for HTML <div style="background-color: #ffbf00; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Moncloa                 (M6)
+    Argüelles               (M4, M6)
+    Ventura Rodríguez
+    Plaza de España         (M10 A) [Noviciado: M2]
+    Callao                  (M5)
+    Sol                     (M1, M2)
+    Lavapiés
+    Embajadores             [Acacias: M5]
+    Palos de la Frontera
+    Delicias
+    Legazpi                 (M6)
+    Almendrales
+    Hospital 12 de Octubre
+    San Fermín-Orcasur
+    Ciudad de los Ángeles
+    Villaverde Bajo-Cruce
+    San Cristóbal
+    Villaverde Alto
+
+=head2 Line 4: Argüelles → Pinar de Chamartín [M4]
+
+=for HTML <div style="background-color: #7f151d; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Argüelles              (M3, M6)
+    San Bernardo           (M2)
+    Bilbao                 (M1)
+    Alonso Martínez        (M10 A, M5)
+    Colón
+    Serrano
+    Velázquez
+    Goya                   (M2)
+    Lista
+    Diego de León          (M5, M6)
+    Avenida de América     (M6, M7 A, M9 A)
+    Prosperidad
+    Alfonso XIII
+    Avenida de la Paz
+    Arturo Soria
+    Esperanza
+    Canillas
+    Mar de Cristal         (M8)
+    San Lorenzo
+    Parque de Santa María
+    Hortaleza
+    Manoteras
+    Pinar de Chamartín     (M1)
+
+=head2 Line 5: Alameda de Osuna → Casa de Campo [M5]
+
+=for HTML <div style="background-color: #7fc31c; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Alameda de Osuna
+    El Capricho
+    Canillejas
+    Torre Arias
+    Suanzes
+    Ciudad Lineal
+    Pueblo Nuevo        (M7 A)
+    Quintana
+    El Carmen
+    Ventas              (M2)
+    Diego de León       (M4, M6)
+    Núñez de Balboa     (M9 A)
+    Rubén Darío
+    Alonso Martínez     (M10 A, M4)
+    Chueca
+    Gran Vía            (M1)
+    Callao              (M3)
+    Ópera               (M2, R)
+    La Latina
+    Puerta de Toledo
+    Acacias             [Embajadores: M3]
+    Pirámides
+    Marqués de Vadillo
+    Urgel
+    Oporto              (M6)
+    Vista Alegre
+    Carabanchel
+    Eugenia de Montijo
+    Aluche
+    Empalme
+    Campamento
+    Casa de Campo       (M10 A)
+
+=head2 Line 6: Cuatro Caminos → Plaza Elíptica [M6]
+
+=for HTML <div style="background-color: #999999; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Cuatro Caminos         (M1, M2)
+    Nuevos Ministerios     (M10 A, M8)
+    República Argentina
+    Avenida de América     (M4, M7 A, M9 A)
+    Diego de León          (M4, M5)
+    Manuel Becerra         (M2)
+    O'Donnell
+    Sainz de Baranda       (M9 A)
+    Conde de Casal
+    Pacífico               (M1)
+    Méndez Álvaro
+    Arganzuela-Planetario
+    Legazpi                (M3)
+    Usera
+    Plaza Elíptica         (M11)
+
+=head2 Line 7 A: Estadio Olímpico → Pitis [M7 A]
+
+=for HTML <div style="background-color: #fe9929; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Estadio Olímpico           (M7 B)
+    Las Musas
+    San Blas
+    Simancas
+    García Noblejas
+    Ascao
+    Pueblo Nuevo               (M5)
+    Barrio de la Concepción
+    Parque de las Avenidas
+    Cartagena
+    Avenida de América         (M4, M6, M9 A)
+    Gregorio Marañón           (M10 A)
+    Alonso Cano
+    Canal                      (M2)
+    Islas Filipinas
+    Guzmán el Bueno            (M6)
+    Francos Rodríguez
+    Valdezarza
+    Antonio Machado
+    Peñagrande
+    Avenida de la Ilustración
+    Lacoma
+    Pitis
+
+=head2 Line 7 B: Estadio Olímpico → Hospital del Henares [M7 B]
+
+=for HTML <div style="background-color: #fe9929; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Estadio Olímpico      (M7 A)
+    Barrio del Puerto
+    Coslada Central
+    La Rambla
+    San Fernando
+    Jarama
+    Henares
+    Hospital del Henares
+
+=head2 Line 8: Aeropuerto T4 → Nuevos Ministerios [M8]
+
+=for HTML <div style="background-color: #f65c9b; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Aeropuerto T4
+    Barajas
+    Aeropuerto T1-T2-T3
+    Campo de las Naciones
+    Mar de Cristal         (M4)
+    Pinar del Rey
+    Colombia               (M9 A)
+    Nuevos Ministerios     (M10 A, M6)
+
+=head2 Line 9 A: Mirasierra → Puerta de Arganda [M9 A]
+
+=for HTML <div style="background-color: #98027e; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Mirasierra
+    Herrera Oria
+    Barrio del Pilar
+    Ventilla
+    Plaza de Castilla    (M1, M10 A)
+    Duque de Pastrana
+    Pío XII
+    Colombia             (M8)
+    Concha Espina
+    Cruz del Rayo
+    Avenida de América   (M4, M6, M7 A)
+    Núñez de Balboa      (M5)
+    Príncipe de Vergara  (M2)
+    Ibiza
+    Sainz de Baranda     (M6)
+    Estrella
+    Vinateros
+    Artilleros
+    Pavones
+    Valdebernardo
+    Vicálvaro
+    San Cipriano
+    Puerta de Arganda    (M9 B)
+
+=head2 Line 9 B: Arganda del Rey → Puerta de Arganda [M9 B]
+
+=for HTML <div style="background-color: #98027e; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Arganda del Rey
+    La Poveda
+    Rivas Vaciamadrid
+    Rivas Futura
+    Rivas-Urbanizaciones
+    Puerta de Arganda     (M9 A)
+
+=head2 Line 10 A: Puerta del Sur → Tres Olivos [M10 A]
+
+=for HTML <div style="background-color: #0f218b; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Puerta del Sur       (M12)
+    Joaquín Vilumbrales
+    Cuatro Vientos
+    Aviación Española
+    Colonia Jardín
+    Casa de Campo        (M5)
+    Batán
+    Lago
+    Príncipe Pío         (M6, R)
+    Plaza de España      (M3) [Noviciado: M2]
+    Tribunal             (M1)
+    Alonso Martínez      (M4, M5)
+    Gregorio Marañón     (M7 A)
+    Nuevos Ministerios   (M6, M8)
+    Santiago Bernabéu
+    Cuzco
+    Plaza de Castilla    (M1, M9 A)
+    Chamartín            (M1)
+    Begoña
+    Fuencarral
+    Tres Olivos          (M10 B)
+
+=head2 Line 10 B: Hospital Infanta Sofía → Tres Olivos [M10 B]
+
+=for HTML <div style="background-color: #0f218b; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Hospital Infanta Sofía
+    Reyes Católicos
+    Baunatal
+    Manuel de Falla
+    Marqués de la Valdavia
+    La Moraleja
+    La Granja
+    Ronda de la Comunicación
+    Las Tablas
+    Montecarmelo
+    Tres Olivos               (M10 A)
+
+=head2 Line 11: La Fortuna → Plaza Elíptica [M11]
+
+=for HTML <div style="background-color: #006d2c; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    La Fortuna
+    La Peseta
+    Carabanchel Alto
+    San Francisco
+    Pan Bendito
+    Abrantes
+    Plaza Elíptica    (M6)
+
+=head2 Line 12: Parque Lisboa → Conservatorio [M12]
+
+=for HTML <div style="background-color: #919100; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Parque Lisboa
+    Alcorcón Central
+    Parque Oeste
+    Universidad Rey J. Carlos
+    Móstoles Central
+    Pradillo
+    Hospital de Móstoles
+    Manuela Malasaña
+    Loranca
+    Hospital de Fuenlabrada
+    Parque Europa
+    Fuenlabrada Central
+    Parque de los Estados
+    Arroyo Culebro
+    Conservatorio
+
+=head2 Ramal: Príncipe Pío → Ópera [R]
+
+=for HTML <div style="background-color: #cccccc; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Príncipe Pío  (M10 A, M6)
+    Ópera         (M2, M5)
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Map::Metro::Plugin::Map::Madrid>
+
+=item *
+
+L<Task::MapMetro::Maps>
+
+=item *
+
+L<Map::Metro>
+
+=back
+
+=head1 SOURCE
+
+L<https://github.com/Csson/p5-Map-Metro-Madrid>
+
+=head1 HOMEPAGE
+
+L<https://metacpan.org/release/Map-Metro-Plugin-Map-Madrid>
+
+=head1 AUTHOR
+
+Erik Carlsson <info@code301.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Erik Carlsson <info@code301.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,35 @@
+% my $p = shift;
+{
+  "info" :
+  {
+    "name" : "<%= $p->{class} %>",
+
+    "summary" : "<%= $p->{class} %> web app",
+    "description" : "A generic Qooxdoo Mojolicious demo app.",
+
+    "homepage" : "https://github.com/oetiker/qx-mojo-app",
+
+    "license" : "???",
+    "authors" :
+    [
+      {
+        "name" : "<%= "$p->{fullName} ($p->{userName})" %>",
+        "email" : "<%= $p->{email} %>"
+      }
+    ],
+
+    "version" : "#VERSION#",
+    "qooxdoo-versions": ["4.0"]
+  },
+
+  "provides" :
+  {
+    "namespace"   : "<%= $p->{name} %>",
+    "encoding"    : "utf-8",
+    "class"       : "source/class",
+    "resource"    : "source/resource",
+    "translation" : "source/translation",
+    "type"        : "application"
+  }
+}
+

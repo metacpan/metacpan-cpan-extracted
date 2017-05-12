@@ -1,0 +1,17 @@
+Revision history for Perl extension Mail::IMAPFolderSearch.
+
+0.01  Sat Dec 27, 2003
+	- original version
+
+0.02 Wed Aug 25, 2004
+	- minor bugfix
+		o Bug reported by Warwick Allison that narrowing down
+		  search to particular folders wasn't working.  Default
+		  search of ALL folders was occuring.
+		
+		o Discovered that folders with spaces in their names
+		  would cause problems when populating folder list
+		  with getFolders
+
+0.03 Fri Sep 17, 2004
+	- took out a left over debugging statement, oops

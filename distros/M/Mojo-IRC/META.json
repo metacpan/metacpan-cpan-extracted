@@ -1,0 +1,55 @@
+{
+   "abstract" : "IRC Client for the Mojo IOLoop",
+   "author" : [
+      "Jan Henning Thorsen <jhthorsen@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-IRC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IRC::Utils" : "0.12",
+            "List::Util" : "1.33",
+            "Mojolicious" : "7.18",
+            "Parse::IRC" : "1.20",
+            "Unicode::UTF8" : "0.59"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jhthorsen/mojo-irc/issues"
+      },
+      "homepage" : "https://github.com/jhthorsen/mojo-irc",
+      "repository" : {
+         "url" : "https://github.com/jhthorsen/mojo-irc.git"
+      }
+   },
+   "version" : "0.44",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

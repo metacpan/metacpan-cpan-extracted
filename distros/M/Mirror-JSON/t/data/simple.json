@@ -1,0 +1,11 @@
+{
+	"name" : "Comprehensive C Archive Network",
+	"uri" : "http://ccan.ali.as/",
+	"timestamp" : "2007-01-15T21:17:52Z",
+	"benchmark" : "benchmark/random100k.txt",
+	"mirrors" : [
+		{
+			"uri" : "http://ccan2.ali.as/"
+		}
+	]
+}

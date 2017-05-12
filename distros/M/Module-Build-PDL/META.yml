@@ -1,0 +1,22 @@
+---
+name: Module-Build-PDL
+version: 0.0.3
+author:
+  - 'David Mertens <dcmertens.perl@gmail.com>'
+abstract: A Module::Build class for building PDL projects.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Module::Build: 0
+  PDL: 0
+  Test::More: 0
+  version: 0
+provides:
+  Module::Build::PDL:
+    file: lib/Module/Build/PDL.pm
+    version: 0.0.3
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

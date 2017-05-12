@@ -1,0 +1,110 @@
+Revision history for Module-FatPack
+
+0.16    2016-12-29 (PERLANCAR)
+
+	- [Bugfix] Fix Rinci metadata to make line prefix defaults to '#'
+	  when --pm is specified.
+
+
+0.15    2016-12-28 (PERLANCAR)
+
+	- [Bugfix] Avoid perl redefine warning.
+
+	- [Bugfix] Make sure embedded source code ends with newline.
+
+	- Add some tests.
+
+
+0.14    2016-12-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Fix expressing follow-spec prereq relationship with
+	  x_spec.
+
+
+0.13    2016-12-27 (PERLANCAR)
+
+	- [Bugfix] Fix operator precedence.
+
+
+0.12    2016-12-27 (PERLANCAR)
+
+	- Add options: --pm, --line-prefix, --put-hook-at-the-end,
+	  --add-begin-block.
+
+
+0.11    2016-12-11 (PERLANCAR)
+
+	- Tweak Rinci metadata for nicer CLI.
+
+	- Fix module regex (subpackages are allowed to begin with a digit).
+
+
+0.10    2016-02-09 (PERLANCAR)
+
+	- No functional changes.
+
+        - Add example.
+
+
+0.09    2015-10-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Update mentioned module App::fatten (has been renamed to
+	  App::depak).
+
+
+0.08    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.07    2015-07-03 (PERLANCAR)
+
+	- Accept Foo/Bar.pm or Foo::Bar syntax in module_names &
+	  module_srcs.
+
+
+0.06    2015-06-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Use stripper args from PERLANCAR::AppUtil::PerlStripper to remove
+	  duplication.
+
+
+0.05    2015-06-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention fatpack-modules script.
+
+
+0.04    2015-06-12 (PERLANCAR)
+
+	- Add options 'preamble' and 'postamble'.
+
+
+0.03     2015-06-12 (PERLANCAR)
+
+         - No functional changes.
+
+         - Minor fix to Rinci metadata
+
+
+0.02     2015-06-12 (PERLANCAR)
+
+         - Add option 'assume_strict'.
+
+         - Tweak Rinci metadata.
+
+
+0.01     2015-06-11 (PERLANCAR)
+
+         - First release.

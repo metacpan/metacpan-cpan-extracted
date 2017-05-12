@@ -1,0 +1,387 @@
+@prefix bugs:  <http://ontologi.es/doap-bugs#> .
+@prefix cpan:  <http://purl.org/NET/cpan-uri/person/> .
+@prefix cpant: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix dcs:   <http://ontologi.es/doap-changeset#> .
+@prefix deps:  <http://ontologi.es/doap-deps#> .
+@prefix dist:  <http://purl.org/NET/cpan-uri/dist/Module-Package-RDF/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix nfo:   <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+dist:project
+	a                 doap:Project;
+	doap:name         "Module-Package-RDF";
+	cpant:install_script [ a nfo:FileDataObject; nfo:fileName "bin/mkdist" ];
+	cpant:perl_version_from [
+		a nfo:FileDataObject;
+		a nfo:SourceCode;
+		rdfs:label "Module::Package::RDF";
+		nfo:fileName "lib/Module/Package/RDF.pm";
+		nfo:programmingLanguage "Perl";
+	];
+	cpant:readme_from [
+		a nfo:FileDataObject;
+		a nfo:SourceCode;
+		rdfs:label "Module::Package::RDF";
+		nfo:fileName "lib/Module/Package/RDF.pm";
+		nfo:programmingLanguage "Perl";
+	];
+	cpant:version_from [
+		a nfo:FileDataObject;
+		a nfo:SourceCode;
+		rdfs:label "Module::Package::RDF";
+		nfo:fileName "lib/Module/Package/RDF.pm";
+		nfo:programmingLanguage "Perl";
+	];
+	dc:contributor    cpan:tobyink;
+	deps:runtime-requirement [ deps:on "Module::Package 0.30"^^deps:CpanId ];
+	deps:runtime-requirement [ deps:on "Module::Install 1.04"^^deps:CpanId ];
+	deps:runtime-requirement [
+		deps:on "Module::Install::RDF 0.009"^^deps:CpanId;
+	];
+	deps:runtime-requirement [
+		deps:on "Module::Install::DOAP 0.006"^^deps:CpanId;
+	];
+	deps:runtime-requirement [
+		deps:on "Module::Install::Copyright 0.009"^^deps:CpanId;
+	];
+	deps:runtime-requirement [
+		deps:on "Module::Install::Credits 0.009"^^deps:CpanId;
+	];
+	deps:runtime-requirement [
+		deps:on "Module::Install::DOAPChangeSets 0.206"^^deps:CpanId;
+	];
+	deps:runtime-requirement [
+		deps:on "Module::Install::AutoLicense 0.08"^^deps:CpanId;
+	];
+	deps:runtime-requirement [
+		deps:on "Module::Install::ReadmeFromPod 0.12"^^deps:CpanId;
+	];
+	deps:runtime-requirement [
+		deps:on "Module::Install::AutoManifest"^^deps:CpanId;
+	];
+	deps:runtime-requirement [
+		deps:on "Module::Install::TrustMetaYml 0.003"^^deps:CpanId;
+	];
+	deps:runtime-requirement [
+		deps:on "Module::Install::AutoInstall 0"^^deps:CpanId;
+	];
+	deps:runtime-requirement [ deps:on "RDF::Trine 0.135"^^deps:CpanId ];
+	deps:runtime-requirement [ deps:on "RDF::TriN3 0.201"^^deps:CpanId ];
+	deps:runtime-requirement [ deps:on "Log::Log4perl"^^deps:CpanId ];
+	deps:runtime-requirement [ deps:on "URI::Escape"^^deps:CpanId ];
+	deps:runtime-requirement [ deps:on "Software::License"^^deps:CpanId ];
+	deps:runtime-requirement [ deps:on "IO::All"^^deps:CpanId ];
+	deps:runtime-requirement [ deps:on "Text::Template"^^deps:CpanId ];
+	deps:runtime-requirement [ deps:on "DateTime"^^deps:CpanId ];
+	deps:runtime-requirement [ deps:on "Test::Pod"^^deps:CpanId ];
+	deps:runtime-requirement [ deps:on "Test::Pod::Coverage"^^deps:CpanId ];
+	deps:runtime-requirement [
+		deps:on "Test::RDF::DOAP::Version 0.007"^^deps:CpanId;
+	];
+	deps:runtime-requirement [ deps:on "Getopt::Long"^^deps:CpanId ];
+	deps:runtime-requirement [ deps:on "Getopt::ArgvFile"^^deps:CpanId ];
+	deps:runtime-requirement [ deps:on "File::HomeDir"^^deps:CpanId ];
+	deps:runtime-requirement [ deps:on "URI::file 4.0"^^deps:CpanId ];
+	deps:test-requirement [ deps:on "Test::More 0.96"^^deps:CpanId ];
+	doap:bug-database <http://rt.cpan.org/Dist/Display.html?Queue=Module-Package-RDF>;
+	doap:category     [ rdfs:label "RDF" ];
+	doap:category     [ rdfs:label "Semantic Web" ];
+	doap:category     [ rdfs:label "CPAN" ];
+	doap:category     [ rdfs:label "Packaging" ];
+	doap:category     [ rdfs:label "Install" ];
+	doap:category     [ rdfs:label "Perl" ];
+	doap:created      "2011-10-01"^^xsd:date;
+	doap:developer    <http://tobyinkster.co.uk/#i>;
+	doap:documenter   <http://tobyinkster.co.uk/#i>;
+	doap:download-page <https://metacpan.org/release/Module-Package-RDF>;
+	doap:homepage     <https://metacpan.org/release/Module-Package-RDF>;
+	doap:license      <http://dev.perl.org/licenses/>;
+	doap:maintainer   <http://tobyinkster.co.uk/#i>;
+	doap:programming-language "Perl";
+	doap:release      dist:v_0-001;
+	doap:release      dist:v_0-002;
+	doap:release      dist:v_0-003;
+	doap:release      dist:v_0-004;
+	doap:release      dist:v_0-005;
+	doap:release      dist:v_0-006;
+	doap:release      dist:v_0-007;
+	doap:release      dist:v_0-008;
+	doap:release      dist:v_0-009;
+	doap:release      dist:v_0-010;
+	doap:release      dist:v_0-011;
+	doap:release      dist:v_0-012;
+	doap:release      dist:v_0-013;
+	doap:release      dist:v_0-014;
+	doap:repository   [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-module-package-rdf>;
+	];
+	doap:shortdesc    "drive your distribution with RDF"@en;
+	doap:tester       <http://tobyinkster.co.uk/#i>.
+
+dist:v_0-001
+	a                 doap:Version;
+	rdfs:label        "Initial release";
+	dc:issued         "2011-10-01"^^xsd:date;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.001.tar.gz>;
+	doap:revision     "0.001"^^xsd:string.
+
+dist:v_0-002
+	a                 doap:Version;
+	dc:issued         "2011-10-03"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "Include mkdist script and Module::Package::RDF::Create."@en;
+		];
+		dcs:versus dist:v_0-001;
+	];
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.002.tar.gz>;
+	doap:revision     "0.002"^^xsd:string.
+
+dist:v_0-003
+	a                 doap:Version;
+	dc:issued         "2011-10-06"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Bugfix;
+			rdfs:label "Module::Package::Dist::RDF::standard uses Meta::Install::TrustMetaYml - this resolves some dependency issues with resultant packages."@en;
+		];
+		dcs:item [
+			a dcs:Bugfix;
+			rdfs:label "Prevent Module::Package::RDF::Create's pod and the template module's pod from getting muddled."@en;
+		];
+		dcs:item [
+			a dcs:Update;
+			rdfs:label "Generated modules now default to using perl 5.010."@en;
+		];
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "Generated modules will include $AUTHORITY variables."@en;
+		];
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "Generated modules will include SYNOPSIS in pod."@en;
+		];
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "Generated modules will include DISCLAIMER OF WARRANTIES in pod."@en;
+		];
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "Module::Package::Dist::RDF::standard to run code at user end."@en;
+		];
+		dcs:item [
+			a dcs:Update;
+			rdfs:label "use Module::Package 0.30"@en;
+		];
+		dcs:versus dist:v_0-002;
+	];
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.003.tar.gz>;
+	doap:revision     "0.003"^^xsd:string.
+
+dist:v_0-004
+	a                 doap:Version;
+	dc:issued         "2011-11-21"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Bugfix;
+			rdfs:label "Module::Package::RDF::Create now handles '--use boolean' and '--use autodie' specially."@en;
+		];
+		dcs:item [
+			a dcs:Documentation;
+			rdfs:label "The 'mkdist' functionality should be split into a different release."@en;
+		];
+		dcs:item [ a dcs:Regression; rdfs:label "use parent"@en ];
+		dcs:versus dist:v_0-003;
+	];
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.004.tar.gz>;
+	doap:revision     "0.004"^^xsd:string.
+
+dist:v_0-005
+	a                 doap:Version;
+	dc:issued         "2011-12-03"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [ a dcs:Bugfix; rdfs:label "use base"@en ];
+		dcs:item [
+			a dcs:Documentation;
+			rdfs:label "add 'NAME' section";
+		];
+		dcs:item [
+			a dcs:Documentation;
+			rdfs:label "add 'DISCLAIMER OF WARRANTIES' section";
+		];
+		dcs:versus dist:v_0-004;
+	];
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.005.tar.gz>;
+	doap:revision     "0.005"^^xsd:string.
+
+dist:v_0-006
+	a                 doap:Version;
+	dc:issued         "2012-07-04"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Update;
+			rdfs:label "mkdist now creates Pretdsl instead of Turtle."@en;
+		];
+		dcs:item [
+			rdfs:label "Module::Package::RDF::Create is now App::mkdist."@en;
+		];
+		dcs:item [
+			rdfs:label "The ':standard' bit of 'RDF:standard' is now optional."@en;
+		];
+		dcs:versus dist:v_0-005;
+	];
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.006.tar.gz>;
+	doap:revision     "0.006"^^xsd:string.
+
+dist:v_0-007
+	a                 doap:Version;
+	rdfs:label        "Bond, James Bond";
+	dc:issued         "2012-07-05"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Packaging;
+			a dcs:Update;
+			rdfs:label "Bump versions of some dependencies."@en;
+		];
+		dcs:versus dist:v_0-006;
+	];
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.007.tar.gz>;
+	doap:revision     "0.007"^^xsd:string.
+
+dist:v_0-008
+	a                 doap:Version;
+	dc:issued         "2012-07-05"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Bugfix;
+			rdfs:label "Get t/01basic.t working again."@en;
+		];
+		dcs:versus dist:v_0-007;
+	];
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.008.tar.gz>;
+	doap:revision     "0.008"^^xsd:string.
+
+dist:v_0-009
+	a                 doap:Version;
+	dc:issued         "2012-09-25"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			rdfs:label "App::mkdist now pulls author tests from ~/perl5/xt rather than producing hard-coded ones."@en;
+		];
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "Module::Install::StandardDocuments."@en;
+		];
+		dcs:item [
+			rdfs:label "bin/mkdist now sports a --package_flavour option."@en;
+		];
+		dcs:versus dist:v_0-008;
+	];
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.009.tar.gz>;
+	doap:revision     "0.009"^^xsd:string.
+
+dist:v_0-010
+	a                 doap:Version;
+	dc:identifier     "Module-Package-RDF-0.010"^^xsd:string;
+	dc:issued         "2013-03-11"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Change;
+			rdfs:label "use Module::Install::Copyright";
+		];
+		dcs:item [
+			a dcs:Bugfix;
+			rdfs:label "Avoid auto-deps thingy from picking up Module::Install::StandardDocuments as a dep - it's bundled";
+			dcs:fixes <http://purl.org/NET/cpan-uri/rt/ticket/82158>;
+			dcs:thanks cpan:chorny;
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.010.tar.gz>;
+	doap:revision     "0.010"^^xsd:string.
+
+dist:v_0-011
+	a                 doap:Version;
+	dc:identifier     "Module-Package-RDF-0.011"^^xsd:string;
+	dc:issued         "2013-03-16"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Change;
+			rdfs:label "use Module::Install::RDF's new write_meta_ttl feature";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.011.tar.gz>;
+	doap:revision     "0.011"^^xsd:string.
+
+dist:v_0-012
+	a                 doap:Version;
+	dc:identifier     "Module-Package-RDF-0.012"^^xsd:string;
+	dc:issued         "2013-03-19"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "use Module::Install::Changes";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.012.tar.gz>;
+	doap:revision     "0.012"^^xsd:string.
+
+dist:v_0-013
+	a                 doap:Version;
+	dc:identifier     "Module-Package-RDF-0.013"^^xsd:string;
+	dc:issued         "2013-03-19"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Update;
+			rdfs:label "Bump versions of several dependencies.";
+		];
+		dcs:item [
+			a dcs:Update;
+			rdfs:label "Switch to doap-deps vocab for expressing project dependencies (mkdist).";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.013.tar.gz>;
+	doap:revision     "0.013"^^xsd:string.
+
+dist:v_0-014
+	a                 doap:Version;
+	dc:identifier     "Module-Package-RDF-0.014"^^xsd:string;
+	dc:issued         "2013-03-19"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Bugfix;
+			rdfs:label "use Module::Install::DOAP 0.006.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.014.tar.gz>;
+	doap:revision     "0.014"^^xsd:string.
+
+cpan:chorny
+	a                 foaf:Person;
+	foaf:nick         "CHORNY";
+	foaf:page         <https://metacpan.org/author/CHORNY>.
+
+<http://tobyinkster.co.uk/#i>
+	a                 foaf:Person;
+	foaf:name         "Toby Inkster";
+	foaf:homepage     <http://tobyinkster.co.uk/>;
+	foaf:mbox         <mailto:tobyink@cpan.org>;
+	foaf:page         <https://metacpan.org/author/TOBYINK>;
+	owl:sameAs        cpan:tobyink.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/82158>
+	a                 bugs:Issue;
+	bugs:id           "82158"^^xsd:string;
+	bugs:page         <https://rt.cpan.org/Ticket/Display.html?id=82158>.
+

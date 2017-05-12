@@ -1,0 +1,27 @@
+This directory contains a variety of example scripts using the
+Mail::Folder module.
+
+* from.pl
+
+A simple variant of from(1).  It does minimal command-line processing.
+You will probably notice that it is considerable slower then from(1)
+or frm(1L).
+
+* getpop.pl
+
+A simple pop slurper based on Net::POP3.  It doesn't do anything fancy
+like use a config file or store the password in encrypted form, but it
+actually works.  If you use it, make sure you use the appropriate
+permissions on the executable.  I might get around to adding more
+secure storage of the configuration information at some later date.
+Contact me if you would like to add that feature yourself - I'll
+probably incorporate your chages into the base.
+
+* xmailfolder.pl
+
+A Mail User Agent (MUA) using the Tk perl modules.  This is REAL raw
+right now.  It's bloated, slow, and a bad example of pTk code -
+hopefully that will change.  It started life as something to use to
+flesh out the design of MailFolder, but will eventually become a
+decent MUA, with MIME and everything.  A future version of xmailfolder
+will be alot different than this trivial example, and will rock.

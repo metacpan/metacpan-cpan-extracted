@@ -1,0 +1,50 @@
+{
+   "abstract" : "Pure-Perl non-blocking I/O MySQL Connector",
+   "author" : [
+      "Svetoslav Naydenov <harryl@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-MySQL5",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.90"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "6.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/harry-bix/mojo-mysql5/issues"
+      },
+      "homepage" : "https://github.com/harry-bix/mojo-mysql5",
+      "repository" : {
+         "url" : "https://github.com/harry-bix/mojo-MySQL5.git"
+      }
+   },
+   "version" : "0.09"
+}

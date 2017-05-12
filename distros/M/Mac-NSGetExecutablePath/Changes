@@ -1,0 +1,17 @@
+Revision history for Mac-NSGetExecutablePath
+
+0.03    2013-08-24 20:00 UTC
+        This is a maintenance release. The code contains no functional change.
+        Satisfied users of version 0.02 can skip this update.
+        + Tst : Author tests are no longer bundled with this distribution.
+                They are only made available to authors in the git repository.
+
+0.02    2012-11-02 00:55 UTC
+        + Fix : NSGetExecutablePath() no longer leaks its return value.
+        + Tst : t/93-pod-spelling.t does not crash anymore on perl 5.12 and
+                below.
+                Thanks Slaven Rezic for debugging this.
+
+0.01    2012-10-29 19:55 UTC
+        First version, released on an unsuspecting world.
+

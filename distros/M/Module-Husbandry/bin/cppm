@@ -1,0 +1,36 @@
+#!/usr/local/bin/perl -w
+
+use Module::Husbandry qw( parse_cli cppm );
+
+cppm parse_cli \@ARGV, {
+    param_count  => 2,
+    "-r|--recurse"
+         => "Recursively copy all modules under <from> to be under <to> (TODO)",
+    examples => <<END_USAGE,
+%p From::Module       To::Module        # Use module names
+%p lib/From/Module.pm lib/To/Module.pm  # or paths from main project dir
+%p lib/From/Module.pm To::Module        # or mix and match
+%p -r From            To                # move dir tree
+%p -r lib/From        lib/To            # move dir tree
+END_USAGE
+    description => <<END_DESCRIPTION
+Copies one or more modules and test scripts.
+
+TODO: The "or more" part (the -r option).
+
+TODO: Generate patch files for backups to make rollback easier.
+
+TODO: Generate patch files instead of acting, to allow a user to
+edit the patch file to determine what not to change by deleting or
+altering chunks.
+
+Limitations
+
+Does not remove newly empty directories.
+
+Will misfire when handed source module names that match other
+words in the source files:  cppm a b would also change all
+occurences of the word "a" in all files under ., for instance.
+
+END_DESCRIPTION
+};

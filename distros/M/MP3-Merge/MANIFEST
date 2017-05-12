@@ -1,0 +1,7 @@
+Makefile.PL
+MANIFEST
+README
+t/MP3-Merge.t
+lib/MP3/Merge.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

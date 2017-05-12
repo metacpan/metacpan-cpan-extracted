@@ -1,0 +1,12 @@
+Changes
+examples/sine_smoothing.pl
+FFTW.xs
+lib/Math/FFTW.pm
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/00pod.t
+t/00podcover.t
+t/01basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

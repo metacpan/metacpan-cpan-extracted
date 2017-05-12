@@ -1,0 +1,22 @@
+Revision history for Perl module Math::Pandigital
+
+0.04 2013-01-16
+  - Migrated object system from Any::Moose to Moo with MooX::Types::MooseLike
+  - Corrected a mistake in the POD (unary pandigitals use '1' as the marker).
+  - Added tests for META.* files.
+
+0.03 2012-11-28
+  - Fixed a typo in the POD's SYNOPSIS code.
+
+0.02 2012-11-27
+  - The zero attribute is now zeroless, and the Boolean sense has been reversed.
+  - Better handling of unary base: 1 is now the permissible digit, not 0.
+  - Explicitly croak if base is set to 1, and zeroless is not set.
+    (Makes no sense to allow '0': the only digit in unary is '1').
+  - Test coverage is now 100%.
+  - POD fixes.
+  - Minor optimizations and code simplifications resulting from profiling
+    for the general case.
+
+0.01 2012-11-26
+  - Initial release to CPAN.

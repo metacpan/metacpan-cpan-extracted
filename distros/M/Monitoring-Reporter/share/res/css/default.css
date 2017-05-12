@@ -1,0 +1,258 @@
+/* http://www.zurb.com/article/221/css3-animation-will-rock-your-world
+ * part I
+ */
+@-webkit-keyframes pulse {
+  from {
+    -webkit-transform: scale(1.0);
+    opacity: 1.0;
+  }
+  50% {
+    -webkit-transform: scale(1.2);
+    opacity: 0.9;
+  }
+  to { 
+    -webkit-transform: scale(1.0);
+    opacity: 1.0;
+  }
+}
+/* see http://mislav.uniqpath.com/2010/04/targeted-css/ */
+@media all{
+  body{
+    font:15px Arial, Helvetica, sans-serif;
+    margin:0;
+    background:#fff;
+    width:100%;
+    color:#000;
+  }
+  .allgreen {
+    background: yellow;
+    font: 40px Arial;
+    font-weight: bold;
+    width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .smiley {
+    font: 600px Arial;
+  }
+  .lastupdate {
+    width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /*
+   * http://www.barelyfitz.com/screencast/html-training/css/positioning/
+   */
+  .trigger {
+    background-color: lightgrey;
+    color:#000;
+    border-bottom:1px solid #f6f6f6;
+    border-top:1px solid #f6f6f6;
+    position: relative;
+    height: 60px;
+    /*
+     * white-space: nowarp and overflow: hidden are importatnt to
+     * prevent the elements of the trigger div from wrapping and wrecking
+     * the layout
+     */
+    white-space: nowrap;
+    overflow: hidden;
+    
+    -webkit-box-shadow: inset 0 6px 6px -6px rgba(0,0,0,0.75),
+			               inset 0 -6px 6px -6px rgba(0,0,0,0.75);
+    -moz-box-shadow:    inset 0 6px 6px -6px rgba(0,0,0,0.75),
+		                  inset 0 -6px 6px -6px rgba(0,0,0,0.75);
+    -ms-box-shadow:     inset 0 6px 6px -6px rgba(0,0,0,0.75),
+			               inset 0 -6px 6px -6px rgba(0,0,0,0.75);
+    -o-box-shadow:      inset 0 6px 6px -6px rgba(0,0,0,0.75),
+			               inset 0 -6px 6px -6px rgba(0,0,0,0.75);
+    box-shadow:         inset 0 6px 6px -6px rgba(0,0,0,0.75),
+			               inset 0 -6px 6px -6px rgba(0,0,0,0.75);
+   background-size: 40px 40px;
+  }
+  .trigger > div {
+    margin: 10px;
+  }
+  .trigger > .field {
+    float: left;
+    margin: 5px;
+    padding: 5px;
+    white-space: nowrap;
+    display: inline-block;
+  }
+  .trigger > .severity {
+    width: 100px;
+    height: 15px;
+    border: 0.12em solid black;
+    font-weight: bold;
+    margin: 5px;
+    padding: 5px;
+    color: #000;
+  }
+  .trigger > .host {
+    font-weight: normal;
+  }
+  .trigger > .name {
+    font-weight: bold;
+  }
+  .trigger > .time {
+    font-style: italic;
+  }
+  .trigger > .icon {
+  }
+  .trigger > .button {
+  }
+  .trigger > .clear {
+    clear: both;
+  }
+  .trigger > .details {
+    margin-left: 10px;
+    font-size: 0.95em;
+  }
+  .disaster {
+    background:red;
+    color:#fff;
+    /* to set icon */
+  }
+  .disaster > .severity {
+    background: none repeat scroll 0 0 red;
+    border-color: darkred;
+    /* http://www.zurb.com/article/221/css3-animation-will-rock-your-world
+     * part II
+     */
+    opacity: 1.0;
+    -webkit-animation: pulse 0.5s infinite; 
+    -moz-animation: pulse 0.5s infinite; 
+    -ms-animation: pulse 0.5s infinite; 
+    -o-animation: pulse 0.5s infinite; 
+    animation: pulse 0.5s infinite; 
+  }
+  .high {
+    background:#ffcdcd;
+    color:#000;
+  }
+  .high > .severity {
+    background: none repeat scroll 0 0 red;
+    border-color: darkred;
+    text-shadow:  0    1px  0 #fff,
+		  0    -1px 0 #fff,
+		  1px  0    0 #fff,
+		  -1px 0    0 #fff;
+  }
+  .average {
+    background:#ffeecd;
+    color:#000;
+  }
+  .warning {
+    background:#fffecd;
+    color:#000;
+  }
+  .warning > .severity {
+    background: none repeat scroll 0 0 yellow;
+    border-color: orange;
+  }
+  .information {
+    background:#ddffcd;
+    color:#000;
+  }
+  .information > .severity {
+    background: none repeat scroll 0 0 lightgreen;
+    border-color: darkgreen;
+  }
+  .nc {
+    background: grey;
+    color: #fff;
+  }
+  .acknowledged {
+   background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(221,255,205,.5) 35px, rgba(221,255,205,.5) 70px);
+   !important;
+  }
+  .icon .acked {
+   background-position: 0px 0px;
+   background-image: url(../img/sprite.png);
+   width: 16px;
+   height: 16px;
+  }
+  .icon .noack {
+   background-position: 0px -16px;
+   background-image: url(../img/sprite.png);
+   width: 16px;
+   height: 16px;
+  }
+}
+/* for TV screens */
+@media all and (min-width: 1600px) {
+  body {
+    font-size: 30px;
+  }
+  .trigger {
+    height: 55px;
+  }
+  .trigger > .clear {
+    clear: none;
+  }
+  .trigger > .field {
+    float: none;
+  }
+  .trigger > .severity {
+    width: 155px;
+    padding: 1px;
+    margin: 5px;
+    height: 30px;
+  }
+  .trigger > .host {
+    width: 400px;
+  }
+  .trigger > .name {
+    width: 1100px;
+  }
+  .trigger > .details {
+    display: none;
+  }
+}
+@media all and (max-width: 1024px) {
+  /* default size */
+}
+@media all and (max-width: 960px) {
+  body{
+    font-size: 12px;
+  }
+  .trigger > .severity {
+    width: 80px;
+    height: 10px;
+  }
+  .trigger > div {
+    margin: 1px;
+  }
+}
+@media all and (max-width: 780px) {
+  .trigger > .field {
+    margin: 2px;
+    padding: 2px;
+    float: none;
+  }
+  .trigger {
+    height: 25px;
+    border-bottom: none;
+  }
+  .trigger > .details {
+    display: none;
+  }
+  .trigger > .severity {
+    width: 60px;
+    height: 10px;
+  }
+}
+@media all and (max-width: 504px) {
+  .severity { display:none; }
+  body {
+    font-size:11px;
+  }
+}
+@media all and (max-width: 320px) {
+}
+@media all
+  and (min-device-width: 768px)
+  and (max-device-width: 1024px) {
+}

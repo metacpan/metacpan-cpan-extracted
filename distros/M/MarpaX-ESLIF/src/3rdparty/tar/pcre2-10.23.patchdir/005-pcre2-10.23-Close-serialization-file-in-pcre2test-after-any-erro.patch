@@ -1,0 +1,51 @@
+From 23f3fd65eb57bdaa03701177bbd2043a08a3299e Mon Sep 17 00:00:00 2001
+From: ph10 <ph10@6239d852-aaf2-0410-a92c-79f79f948069>
+Date: Tue, 21 Mar 2017 16:18:54 +0000
+Subject: [PATCH] Close serialization file in pcre2test after any error.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+git-svn-id: svn://vcs.exim.org/pcre2/code/trunk@692 6239d852-aaf2-0410-a92c-79f79f948069
+
+Petr Písař: Ported to 10.32.
+
+diff --git a/src/pcre2test.c b/src/pcre2test.c
+index 39eedbe..b6d3ec9 100644
+--- a/src/pcre2test.c
++++ b/src/pcre2test.c
+@@ -4456,6 +4456,7 @@ switch(cmd)
+   if (rc < 0)
+     {
+     serial_error(rc, "Serialization");
++    fclose(f); 
+     break;
+     }
+ 
+@@ -4469,6 +4470,7 @@ switch(cmd)
+   if (fwrite(serial, 1, serial_size, f) != serial_size)
+     {
+     fprintf(outfile, "** Wrong return from fwrite()\n");
++    fclose(f); 
+     return PR_ABEND;
+     }
+ 
+@@ -4496,6 +4498,7 @@ switch(cmd)
+     {
+     fprintf(outfile, "** Failed to get memory (size %lu) for #load\n",
+       (unsigned long int)serial_size);
++    fclose(f);   
+     return PR_ABEND;
+     }
+ 
+@@ -4503,6 +4506,7 @@ switch(cmd)
+     {
+     fprintf(outfile, "** Wrong return from fread()\n");
+     free(serial);
++    fclose(f); 
+     return PR_ABEND;
+     }
+   fclose(f);
+-- 
+2.7.4
+

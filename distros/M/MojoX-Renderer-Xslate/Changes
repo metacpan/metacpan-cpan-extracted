@@ -1,0 +1,46 @@
+Revision history for MojoX-Renderer-Xslate
+
+0.13
+    - Ensure compatibility with Mojolicious >= 7.14 (GH #7, takkyuuplayer)
+
+0.12  Wed Apr 27 07:47:31 UTC 2016
+    - Restore compatibility with Mojolicious <= 6.32
+      (thanks, CPAN Testers)
+
+0.11  Tue Apr 26 08:48:45 UTC 2016
+    - Can now be used as default handler for Mojolicious renderer
+      without inadvertently modifying HTTP status codes when optional
+      error templates are unavailable. (GH #6; HJANSEN)
+
+0.10  Mon Mar 16 18:46:27 UTC 2015
+    - Fixed for another deprecated API.
+    - Documentation fixes.  (RT #94530)
+
+0.09  Thu Jun  6 03:34:47 UTC 2013
+    - Fixed exception handling. (GH #4; RT #84324)
+
+0.08  Fri Jul  6 20:39:25 UTC 2012
+    - Updated to handle another backwards-incompatible API change. (ISHIGAKI)
+
+0.07  Thu Mar 29 06:44:45 UTC 2012
+    - Used valid version of Mojolicious.
+
+0.06  Thu Mar 29 06:36:16 UTC 2012
+    - Required newer version of Mojolicious.
+
+0.05  Wed Mar 28 07:52:55 UTC 2012
+    - Updated to use newer method instead of deprecated method. (GARU)
+
+0.04  Sat Dec  4 12:29:27 UTC 2010
+    - Updated test to reflect that a 500 error can produce either an error
+      string or no content, depending upon the environment or prereq
+      versions.
+
+0.03  Fri Dec  3 19:28:43 UTC 2010
+    - Updated test case to accomodate change in Xslate.
+
+0.02  Wed Nov  3 10:17:09 UTC 2010
+    - Added support for __DATA__ sections by default. (GFUJI)
+
+0.01  Sun Aug 15 20:37:52 UTC 2010
+    - Initial distribution.

@@ -1,0 +1,25 @@
+Markapl-FromHTML
+
+This module coverts HTML to Markapl Perl code.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+HTML::PullParser, Rubyish
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, Kang-min Liu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

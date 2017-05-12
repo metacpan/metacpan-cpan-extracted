@@ -1,0 +1,306 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/MooX-late/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-recommendation [
+		doap-deps:on "MooX::HandlesVia 0.001004"^^doap-deps:CpanId;
+	];
+	doap-deps:runtime-requirement [ doap-deps:on "Moo 1.006000"^^doap-deps:CpanId ], [
+		doap-deps:on "Type::Utils 1.000001"^^doap-deps:CpanId;
+	];
+	doap-deps:runtime-suggestion [ doap-deps:on "MooX"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [
+		doap-deps:on "Test::Requires 0.06"^^doap-deps:CpanId;
+	], [ doap-deps:on "Test::Fatal 0.010"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=MooX-late>;
+	doap:created         "2012-11-30"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/MooX-late>;
+	doap:homepage        <https://metacpan.org/release/MooX-late>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "MooX-late";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-008>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-009>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-010>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-011>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-012>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-013>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-014>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-015>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-moox-late>;
+	];
+	doap:shortdesc       "easily translate Moose code to Moo".
+
+<http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "MooX-late-0.001"^^xsd:string;
+	dc:issued            "2012-12-01"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-late-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "MooX-late-0.002"^^xsd:string;
+	dc:issued            "2012-12-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "use re 'eval' on Perl 5.8 to fix regexp compilation problem";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-late-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "MooX-late-0.003"^^xsd:string;
+	dc:issued            "2012-12-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Inflation of type constraints to Moose.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Use MooX::Types::MooseLike::Base for type checks.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "General refactoring of type constraint code.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-late-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "MooX-late-0.004"^^xsd:string;
+	dc:issued            "2012-12-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Issue warnings when type constraint cannot be interpreted correctly. Warning is not issued at the time the attribute is built, but the first time the type constraint is checked against. Don't attempt to inflate these type constraints when Moose is loaded.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-late-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "MooX-late-0.005"^^xsd:string;
+	dc:issued            "2012-12-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Bump required version of Moo to 1.000004.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document test suite.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Cope with has \\@attributes => (...).";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-late-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "MooX-late-0.006"^^xsd:string;
+	dc:issued            "2012-12-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Skip t/02inflation.t if no MooX::Types::MooseLike::Base.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-late-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "MooX-late-0.007"^^xsd:string;
+	dc:issued            "2012-12-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Link to MooX::HandlesVia on github.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Documentation for use with Moo::Role.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/shlomif>;
+			rdfs:seeAlso <https://bitbucket.org/tobyink/p5-moox-late/pull-request/1/-/diff>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-late-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "MooX-late-0.008"^^xsd:string;
+	dc:issued            "2013-03-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Minor documentation updates.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Make MooX::Types::MooseLike::Base a required dependency (was optional).";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-late-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-009>
+	a                    doap:Version;
+	dc:identifier        "MooX-late-0.009"^^xsd:string;
+	dc:issued            "2013-04-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Switch from MooX::Types::MooseLike::Base to Types::Standard.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-late-0.009.tar.gz>;
+	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-010>
+	a                    doap:Version;
+	dc:identifier        "MooX-late-0.010"^^xsd:string;
+	dc:issued            "2013-04-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix support for Maybe[`a] type constraint. (It was being interpreted as an object blessed into package 'Maybe'.)";
+			doap-changeset:fixes [
+				doap-bugs:affects <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-009>;
+				doap-bugs:reporter <http://purl.org/NET/cpan-uri/person/shlomif>;
+			];
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/shlomif>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-late-0.010.tar.gz>;
+	doap:revision        "0.010"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-011>
+	a                    doap:Version;
+	dc:identifier        "MooX-late-0.011"^^xsd:string;
+	dc:issued            "2013-04-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix support for class types.";
+			doap-changeset:fixes [
+				doap-bugs:affects <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-009>, <http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-010>;
+				doap-bugs:reporter <http://purl.org/NET/cpan-uri/person/shlomif>;
+			];
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/shlomif>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-late-0.011.tar.gz>;
+	doap:revision        "0.011"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-012>
+	a                    doap:Version;
+	dc:identifier        "MooX-late-0.012"^^xsd:string;
+	dc:issued            "2013-06-28"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Use Type::Registry/Type::Parser to translate strings to type constraint expressions.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-late-0.012.tar.gz>;
+	doap:revision        "0.012"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-013>
+	a                    doap:Version;
+	dc:identifier        "MooX-late-0.013"^^xsd:string;
+	dc:issued            "2013-07-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Use Type::Utils::dwim_type to translate strings to type constraint expressions.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Support Moose attribute traits using MooX::HandlesVia.";
+		], [
+			a doap-changeset:Removal;
+			rdfs:label "Retire support for non-reference attribute defaults because Moo now does this natively.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-late-0.013.tar.gz>;
+	doap:revision        "0.013"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-014>
+	a                    doap:Version;
+	dc:identifier        "MooX-late-0.014"^^xsd:string;
+	dc:issued            "2013-07-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Support `coerce => 1` for Type::Tiny type constraints and those providing a similar API.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-late-0.014.tar.gz>;
+	doap:revision        "0.014"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-late/v_0-015>
+	a                    doap:Version;
+	dc:identifier        "MooX-late-0.015"^^xsd:string;
+	dc:issued            "2013-08-18"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Make the list of stuff this module does more concise.";
+		], [
+			a doap-changeset:Removal;
+			rdfs:label "Drop support for `coerce => 1` because Moo 1.006000 supports this natively now.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Depend on Type::Utils 1.000001.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Depend on Moo 1.006000.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Improve test cases for class type constraints.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-late-0.015.tar.gz>;
+	doap:revision        "0.015"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/shlomif>
+	a                    foaf:Person;
+	foaf:nick            "SHLOMIF";
+	foaf:page            <https://metacpan.org/author/SHLOMIF>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

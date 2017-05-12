@@ -1,0 +1,27 @@
+---
+abstract: 'Plugin to Module::Build to add author tests'
+author:
+  - 'Diab Jerius E<lt>djeriuss@cpan.orgE<gt>'
+build_requires:
+  Test::Module::Build::Pluggable: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.007'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.010, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Build-Pluggable-AuthorTests
+provides:
+  Module::Build::Pluggable::AuthorTests:
+    file: lib/Module/Build/Pluggable/AuthorTests.pm
+    version: '0.01'
+requires:
+  Module::Build::Pluggable: '0'
+resources:
+  license: http://www.gnu.org/licenses/gpl-3.0.html
+  repository: https://github.com/djerius/module-build-pluggable-authortests
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

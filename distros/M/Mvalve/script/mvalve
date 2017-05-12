@@ -1,0 +1,6 @@
+#!/usr/local/bin/perl
+use strict;
+use Mvalve::CLI::Mvalve;
+
+my $app = Mvalve::CLI::Mvalve->new;
+$app->run;

@@ -1,0 +1,35 @@
+Revision history for Math-Vec
+
+1.01 2007-05-30
+
+  * bugfix #25373 "Imaginary numbers from InnerAngle()"
+
+  * bugfix #26925 "compatibility Makefile.PL writes no Makefile"
+
+0.04 2006-06-04
+
+  * test 03 workaround for Exporter.pm transient bug
+
+  * Exporter rework
+
+  * fixed nit in compatibility Makefile.PL
+
+0.03 2006-01-07
+
+  * Setup to run clean under 'use warnings'.
+
+  * Added overloading and :terse functions.
+
+  * More tests.
+
+0.02 2006-01-04
+
+  * Fixed incorrect DotProduct() (thanks to Nao-Yuki Tanabe.)
+
+  * Added length != 0 check to Comp()
+
+0.01
+
+  * First Public Release
+
+# vim:ts=2:sw=2:et:sta

@@ -1,0 +1,65 @@
+#!/usr/bin/make -f
+
+SOURCE_PACKAGE = mail-spf-test-perl
+PACKAGE = $(shell dh_listpackages)
+
+ifndef PERL
+    PERL = /usr/bin/perl
+endif
+
+TMP = $(CURDIR)/debian/tmp
+
+BUILD = ./Build
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+	$(PERL) Build.PL installdirs=vendor
+	$(BUILD)
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	[ ! -f $(BUILD) ] || $(BUILD) distclean
+	dh_clean build-stamp install-stamp
+
+install: install-stamp
+install-stamp: build-stamp
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	
+	$(BUILD) test
+	$(BUILD) install destdir=$(TMP)
+	
+	touch install-stamp
+
+# Build architecture-independent files here:
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	
+	dh_install --sourcedir=$(TMP)
+	dh_installdirs
+	dh_installdocs -A README TODO
+	dh_installchangelogs CHANGES
+	dh_installexamples examples/*
+	#dh_installman
+	dh_link
+	
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_perl
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+# Build architecture-dependent files here:
+binary-arch:
+	# Nothing to do.
+
+binary: binary-indep binary-arch
+
+.PHONY: build clean binary-indep binary-arch binary install

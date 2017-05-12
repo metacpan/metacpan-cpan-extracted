@@ -1,0 +1,88 @@
+NAME
+    MooseX::LvalueAttribute - lvalue attributes for Moose
+
+SYNOPSIS
+       package MyThing;
+   
+       use Moose;
+       use MooseX::LvalueAttribute;
+   
+       has name => (
+          traits      => ['Lvalue'],
+          is          => 'rw',
+          isa         => 'Str',
+          required    => 1,
+       );
+   
+       has size => (
+          traits      => ['Lvalue'],
+          is          => 'rw',
+          isa         => 'Int',
+          default     => 0,
+       );
+   
+       package main;
+   
+       my $thing = MyThing->new(name => 'Foo');
+   
+       $thing->name = "Bar";
+       print $thing->name;   # Bar
+   
+       $thing->size++;
+       print $thing->size;   # 1
+
+DESCRIPTION
+    This package provides a Moose attribute trait that provides Lvalue
+    accessors. Which means that instead of writing:
+
+       $thing->name("Foo");
+
+    You can use the more natural looking:
+
+       $thing->name = "Foo";
+
+    For details of Lvalue implementation in Perl, please see:
+    <http://perldoc.perl.org/perlsub.html#Lvalue-subroutines>
+
+    Type constraints and coercions still work for lvalue attributes. Triggers
+    still fire. Everything should just work. (Unless it doesn't.)
+
+    You can optionally import a constants called `lvalue` that expands to the
+    full name of the attribute trait, allowing:
+
+       use MooseX::LvalueAttribute 'lvalue';
+   
+       has name => (
+          traits      => [ lvalue ],
+          is          => 'rw',
+          isa         => 'Str',
+          required    => 1,
+       );
+
+    This may allow Moose to compile your attribute very, very, slightly
+    faster, but the main advantage is aesthetic.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-LvalueAttribute>.
+
+SEE ALSO
+    MooX::LvalueAttribute, Object::Tiny::Lvalue.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+    Based on work by Christopher Brown, `<cbrown at opendatagroup.com>`
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013-2014 by Toby Inkster; 2008 by
+    Christopher Brown.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

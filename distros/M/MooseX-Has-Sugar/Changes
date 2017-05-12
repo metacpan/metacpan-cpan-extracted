@@ -1,0 +1,306 @@
+Revision history for MooseX-Has-Sugar
+
+1.000006 2017-03-03T14:34:56Z b1b879e
+ - No Changes since 1.000005, non-trial release
+
+1.000005 2017-03-01T04:15:00Z 41847c1
+ - Minor doc restructuring
+
+ [Bugfix]
+ - Regenerate compile tests to avoid .-in-@INC issues
+ - Closes https://github.com/kentnl/MooseX-Has-Sugar/issues/2
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000004, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +15 ↑4 -3 (recommends: +1, suggests: ↑2)
+ - test: +1 ↓1 (recommends: ↑1 ↓1)
+
+1.000004 2014-08-15T22:10:31Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - metadata updates.
+ - whitespace adjustment
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000003, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑1)
+
+ [Metadata]
+ - Add 1x contributor to x_contributors.
+
+ [Misc]
+ - Source POD moved down to produce less whitespace at the top of generated source.
+
+1.000003 2014-08-07T11:02:32Z
+ [00 Trivial]
+ - Test::ReportPrereqs updated to be less fragile.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000002, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: (suggests: ↑1)
+ - test: -4 (recommends: ↑1 -2)
+
+1.000002 2014-07-18T23:34:10Z
+ [00 Minor]
+ - Misc packaging cleanups
+ - Test coverage improved.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000001, see misc/*.deps* for details
+ - develop: (suggests: ↑2)
+ - test: +2 ↑1 (recommends: +1)
+
+1.000001 2014-06-10T05:18:46Z
+ [00 Trivial]
+ - Packaging changes
+ - dist.ini cannonicalisation.
+ - perlcritic.rc normalisation.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - configure: (recommends: ↑1)
+ - develop: +3 -3 (suggests: +2 -1)
+ - test: (recommends: ↑2)
+
+1.000000 2014-01-30T19:43:03Z
+ [00 Major Release]
+ - Many far reaching changes in packaging.
+ - Very little visible user interface change.
+ - Very serious dependency side changes to reduce aggregate dependency weight ( and install time ).
+ - 40 aggregate deps on 5.8 vs the previous releases 65.
+ - 7  aggregate deps on 5.19 vs the previous releases 38.
+
+ [01 Depecated stuff is deprecated]
+ - 5 Years really aught to be enough for people to notice a deprecation notice.
+ - so things I marked as deprecated before Dec 4 2009, are now gone.
+
+ [02 Exporter Switched to Sub::Exporter::Progressive]
+ - This is only possible due to nuking the deprecated behavior.
+ - This overall will reduce dependency weight for fresh installs using MXHS
+ - If you need advanced behaviour, please install Sub::Exporter yourself, and Sub::Exporter::Progressive will be happy
+   with proxying.
+
+ [03 Toolkit switched to EUMM]
+ - Toolkit was moved to EUMM.
+ - Toolkit related dependency ramping has been eliminated in favour of ramping recommendatons instead.
+ - This should substantially reduce dependency weight on fresh perls.
+
+ [04 namespace::clean is in use instead of namespace::autoclean]
+ - Mostly, because the latter hard depends on Moose.
+
+ [05 Moosy inference removed from hard dependency path]
+ - Moose is no longer a "hard" testing dependency.
+ - MooseX::Types::Moose is no longer a hard testing dependency.
+ - Both dependencies exist for integration tests for Moose.
+ - which are probably irrelevant to you if you're not using Moose.
+ - but MooseX::Has::Sugar is really just a fancy package of constants, which can work on either Moose or Moo
+ - so depending on Moose to support a Moo project is bad.
+ - so thats fixed now. ☺
+
+ [06 More recommendations]
+ - As referenced in above sections, more heavy focus is moving towards "recommended" deps. Recommended deps are very
+   useful, and they may give you better test coverage, or better features, or better bug resilience, but they're not
+   really things you want to force people who use your code to install.
+ - So `recommended` deps are declared to help you get the best bang for your buck
+ - While giving people who only want "acceptable standards, but now" a faster installpath.
+ - use cpanm --with-recommended or something.
+
+ [07 Versioning Scheme]
+ - x.\d{8} was getting really boring and hard to read.
+ - so x.\d{6} is now the standard.
+ - this sort of regressive mantissa length change is only acceptable in conjunction with the major increment, because
+   1.x is unambiguously larger than 0.x in every western number system I've ever seen, with the exception of Date
+   Formats, which nobody at all agrees upon anyway.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.05070422, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +9 ↑1 -9
+ - runtime: +1 -1
+ - test: +5 ↓1 -3 (recommends: +6)
+
+0.05070422 2013-11-20T08:32:12Z
+ [00 Maint release]
+
+ [Dependencies::Noteworthy]
+ - Upgrade Module::Build to 0.4202
+ - Upgrade Test::More 0.98 to 1.001002
+ - drop File::Find
+ - drop File::Temp
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.05070421, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +50 -1 (recommends: -1, suggests: +1 -1)
+ - test: +1 ↑1 -2
+
+ [Documentation]
+ - Update © Year
+ - Specify doc encoding.
+
+ [Meta]
+ - Bug tracker to github issues
+
+ [Packaging]
+ - Use test_requires with new MB
+
+ [Tests]
+ - Switch to Test::Compile::PerFile
+ - Update ReportVersions::Tiny test
+ - Update CPAN::Changes test
+ - Update Kwalitee test
+
+0.05070421 2012-08-03T10:25:23Z
+ [Bugs]
+ - Fixed use of a Test::Builder method that is going away. Thanks to Schwern for reporting and providing the patch.
+
+ [Dependencies::Noteworthy]
+ - Upgrade Module::Build to 0.4002
+ - Upgrade Test::More to 0.98
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.05070420, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: (recommends: ↑1, suggests: ↑1)
+ - test: ↑1
+
+ [TODO]
+ - Thinking of adding Moo support of some kind, but Moo is notedly different. Esp: lazy/lazy_build.
+ - I considered making a Moo-style-for-Moose version, but then considered that implementing 'lazy' would have to know
+   what the attribute was called to set the respective Moose builder value, so that is Too Hard.
+ - Please, if you're reading this and have suggestions/feedback, feel free to hit me up on IRC =).
+
+0.05070420 2012-02-03T03:33:11Z
+ - Maintenance/Packaging release.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.05070419, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: +3
+ - test: -1
+
+ [Internals]
+ - All namespaces provide $AUTHORITY
+ - $VERSION moved to outside of BEGIN
+
+ [Packaging]
+ - Update LICENSE ( Year, Address, Indentation )
+ - Extra Tests moved to xt/
+ - Git URI's moved to https://
+ - Export x_authority
+ - Git based versions instead of auto incrementing relative versions.
+
+0.05070419 2011-04-07T02:03:19Z
+ - Maintainence only release. No external changes.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.05055616, see misc/*.deps* for details
+ - develop: +1 -1 (recommends: +1 -1, suggests: +1 -1)
+
+ [Packaging]
+ - Moved to @Author::KENTNL
+ - update gitignore and perlcritic rules.
+ - ship perltidyrc
+ - Normalize Changes.
+
+ [Tests]
+ - Add CPAN::Changes test
+ - Remove portability test
+
+0.05055616 2010-11-13T23:43:43Z
+ - Replaced Test::Exceptions with Test::Fatal
+ - Removed FindBin in tests.
+ - Core Tests now 5% faster!.
+
+ [Dependencies::Noteworthy]
+ - use Test::Fatal instead of Test::Exception
+ - drop use of FindBin
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.05046611, see misc/*.deps* for details
+ - develop: +1 (recommends: +1, suggests: +1)
+ - test: +1 -2
+
+0.05046611 2010-08-16T18:30:39Z
+ - Improved docs and tests for Saccharin. ( Alexandr Ciornii / chorny )
+ - Eradicated excess in xt/.
+
+ [Dependencies::Noteworthy]
+ - tests require MooseX::Types::Moose
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.05044303, see misc/*.deps* for details
+ - test: +2
+
+0.05044303 2010-07-24T10:03:50Z
+ - Migrate to @KENTNL Dzil.
+ - Rework t/ dirs.
+ - Drop depend on MX::Types in tests.
+ - Drop accidental dep on Test::Kwalitee
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.0405, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - runtime: -6
+ - test: +7
+
+0.0405 2009-12-04T09:20:43Z
+ - Toolkit upgrade & rebuild.
+ - Testsuite cleanup.
+ - Documentation overhaul with ::Weaver
+ - Dropped :allattrs from MXHS as its identical to :default
+ - Tests drop Find::Lib;
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.0404, see misc/*.deps* for details
+ - build: +1
+ - configure: +1
+ - runtime: +1 -2
+
+0.0404 2009-07-06T03:34:10Z
+ - Added Saccharin, experimental sugars.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.0403, see misc/*.deps* for details
+ - runtime: +9
+
+0.0403 2009-06-30T13:56:07Z
+ - Using Dist::Zilla's handy author-tests feature
+ - Revised Docmentation a little to be more correct
+
+0.0402 2009-06-29T19:43:05Z
+ - Fixed missing META.yml in Dzil build
+
+0.0401 2009-06-29T18:16:51Z
+ - Fixed Dep on Moose Test.
+ - Moved to Dist::Zilla.
+ - Loads of edits for change
+
+0.0400 2009-06-28T00:53:52Z
+ - Improved Test cases
+ - Improved meta dependency advertising
+ - added 'bare' keyword.
+
+0.0300 2009-05-29T16:22:57Z
+ - export group :is/-is moved to ::Minimal.
+ - MX::H::S::Minimal exports by default
+ - MX::H::Sugar exports all list-flavours by default.
+ - MX::H::Sugar croaks if group :is is requested.
+ - Test/Documentation updated.
+
+0.0200 2009-05-16T21:38:31Z
+ - Fixed META.yml
+ - Added weak_ref, coerce and auto_deref to -attrs
+ - Added collision detection to complain if you use it wrong.
+ - Removed Constant Folding based subs, too pesky at present.
+ - Added A bunch of tests.
+
+0.0100 2009-05-15T09:18:30Z
+ - First version.

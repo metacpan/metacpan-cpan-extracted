@@ -1,0 +1,97 @@
+Received: from ns.ATComputing.nl (ns.ATComputing.nl [195.108.229.25])
+	by atcmpg.ATComputing.nl (8.9.0/8.9.0) with ESMTP id TAA14579
+	for <markov@ATComputing.nl>; Thu, 30 Mar 2000 19:09:10 +0200 (MET DST)
+Received: (from nobody@localhost)
+	by ns.ATComputing.nl (8.8.8/8.8.8) id TAA31447
+	for <markov@ATComputing.nl>; Thu, 30 Mar 2000 19:09:10 +0200
+Received: from viper.oldcity.dca.net(216.158.38.4) by ns.ATComputing.nl via smap (V2.1)
+	id xma031440; Thu, 30 Mar 00 19:08:51 +0200
+Received: from unca-don.wizards.dupont.com ([204.183.81.133])
+	by viper.oldcity.dca.net (8.9.3/8.9.3/DCANET) with ESMTP id MAA10121;
+	Thu, 30 Mar 2000 12:04:52 -0500
+Received: (from majordomo@localhost)
+	by unca-don.wizards.dupont.com (8.9.3/8.9.3) id LAA03360
+	for magick-outgoing; Thu, 30 Mar 2000 11:44:20 -0500 (EST)
+X-Authentication-Warning: unca-don.wizards.dupont.com: majordomo set sender to owner-magick@wizards.dupont.com using -f
+Message-ID: <8100014B48DAD111AA4100805F9F3FC903A0E75D@host60.corbis.com>
+From: Bill Radcliffe <BillR@corbis.com>
+To: "'Ivo'" <ivo.penzar@infolink-software.com>, magick@wizards.dupont.com,
+        tiff@olympiakos.com
+Subject: RE: jpeg2000 question
+Date: Thu, 30 Mar 2000 08:46:50 -0800
+MIME-Version: 1.0
+X-Mailer: Internet Mail Service (5.5.2448.0)
+Sender: owner-magick@wizards.dupont.com
+Precedence: bulk
+Reply-To: Bill Radcliffe <BillR@corbis.com>
+Content-Type: text/plain
+Status: RO
+Content-Length: 2759
+Lines: 66
+
+I worked on the definition of the JP2 file format.  The situation with
+JPEG2000 is not at all like JPEG.
+
+You should know is that JP2 is a very simple wrapper around the formal
+JPEG2000 "codestream". It was based on the Quicktime idea of "atoms". This
+simple idea is that you have a tag and a length followed by the "stuff". You
+know what the "stuff" is based on the tag type. You can also nest these
+atoms to build more complex structures.
+
+JP2 is a very simple set of these atoms, most of which are optional. You
+could write a program to implement this in about 15 minutes.  The "hard"
+part of JP2 is the "codestream". This is the encoded JPEG2000 data. Good
+luck on that. We don't have a freely available reference implementation at
+this point because nobody has signed up to do it. There was an effort
+underway by the same group that did the JPEG-LS implementation. This was
+given to the public domain..
+
+http://spmg.ece.ubc.ca/research/jpeg/jpeg_ls/jpegls.html
+
+They actually had an implementation of JPEG2000 on their website but pulled
+it off:
+
+http://www.ece.ubc.ca/~mdadams/jasper/
+
+Apparently, they decided to sell out and try to charge for it instead of
+providing it to the public domain. We all know how well that is going to
+work. When are people going to learn that you can't make money selling
+compression software? It's not a business - its just an enabler.
+
+My opinion is that without a "Tom Lane" type signing up to make a free
+implementation available, JPEG2000 is doomed. You just don't get real
+interoperability from a paper spec. We know this.
+
+The good news is that the Digital Imaging Group (DIG) has a project underway
+to do this. The bad news is that it has not yet started. And so we wait :-)
+
+> -----Original Message-----
+> From:	Ivo [SMTP:ivo.penzar@infolink-software.com]
+> Sent:	Thursday, March 30, 2000 1:37 AM
+> To:	magick@wizards.dupont.com; tiff@olympiakos.com
+> Subject:	jpeg2000 question
+> 
+> Does anybody know of some repository of jp2 (jpeg2000, to be approved by
+> ISO/ITU-T by the end of this year) and/or a tool to write (some sort of)
+> those images.
+> 
+> Thanks,
+> Ivo
+> 
+> 
+> 
+> ***********************************************************************
+> To remove yourself from this mailing list, send mail to:
+> 	majordomo@wizards.dupont.com
+> 
+> Include the following command in the body of your message:
+> 	unsubscribe magick
+> ***********************************************************************
+
+***********************************************************************
+To remove yourself from this mailing list, send mail to:
+	majordomo@wizards.dupont.com
+
+Include the following command in the body of your message:
+	unsubscribe magick
+***********************************************************************

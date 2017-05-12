@@ -1,0 +1,49 @@
+---
+abstract: 'Moo role for issuing commands, with debug support, and signal handling'
+author:
+  - 'Eddie Ash <eddie+cpan@ashfamily.net>'
+build_requires:
+  Cwd: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Log::Any::Adapter: '0'
+  Test::CleanNamespaces: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-Ipc-Cmd
+requires:
+  IPC::Run3: '0'
+  List::Util: '1.33'
+  Moo: '0'
+  Moo::Role: '0'
+  MooX::Log::Any: '0'
+  MooX::Options: '0'
+  POSIX: '0'
+  Throwable::Error: '0'
+  Type::Params: '0'
+  Types::Standard: '0'
+  constant: '0'
+  feature: '0'
+  namespace::autoclean: '0'
+  overload: '0'
+resources:
+  bugtracker: https://github.com/cazador481/MooX-Ipc-Cmd/issues
+  homepage: https://github.com/cazador481/MooX-Ipc-Cmd
+  repository: https://github.com/cazador481/MooX-Ipc-Cmd.git
+version: 1.2.1
+x_contributors:
+  - 'Slaven Rezic <eserte@users.noreply.github.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

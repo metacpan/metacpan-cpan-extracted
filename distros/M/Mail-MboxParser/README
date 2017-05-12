@@ -1,0 +1,42 @@
+Mail::MboxParser is a module for working with UNIX-flavoured mailboxes.
+This document describes version 0.55.
+
+Its purpose is to _easily_ extract messages from a mailbox with _simple_ 
+access to header fields, body and MIME-parts.  It is particularly easy to 
+deal with any kind of attached files. See the supplied store_att.pl script 
+for an example. 
+
+Prerequisites:
+--------------
+
+    + MIME::Tools (probably >= 5.0)
+    + MIME::QuotedPrint (don't know which version)
+    
+    optional:
+    + Mail::Mbox::MessageParser (highly recommended but not necessary)
+    + URI::Find if you want to use Mail::MboxParser::Mail::Body->extract_urls
+    + Encode (standard module for >= perl5.8.0)
+
+Installation:
+-------------
+
+Un'tar xfz' the module and 'cd' into the new directory 
+Mail-MboxParser-$VERSION.
+
+Then install:
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Win-users having an 'nmake' installed can also do the above, given the
+fact they replace 'make' with 'nmake' in the above list.
+
+Contact:
+--------
+Bugs, feature requests, questions, comments etc. should be directly 
+mailed to me.
+
+Tassilo v. Parseval
+<tassilo.von.parseval@rwth-aachen.de>
+

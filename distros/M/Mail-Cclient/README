@@ -1,0 +1,75 @@
+		     Perl Mail::Cclient module, Version 1.1
+
+		Copyright (c) 1998, 1999, 2000, Malcolm Beattie
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of either:
+
+	a) the GNU General Public License as published by the Free
+	Software Foundation; either version 1, or (at your option) any
+	later version, or
+
+	b) the "Artistic License" which comes with this kit.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
+    the GNU General Public License or the Artistic License for more details.
+
+    You should have received a copy of the Artistic License with this kit,
+    in the file named "Artistic".  If not, you can get one from the Perl
+    distribution. You should also have received a copy of the GNU General
+    Public License, in the file named "Copying". If not, you can get one
+    from the Perl distribution or else write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+DESCRIPTION
+
+Mail::Cclient gives access to mailboxes in many different formats
+(including remote IMAP folders) via the c-client API. The c-client
+library is the core library used by Pine and the University of
+Washington IMAP daemon (written by Mark Crispin).
+
+INSTALLATION
+
+Install the University of Washington imapd source distribution
+(e.g. version imap-2000) and build at least the c-client library
+(c-client/c-client.a). The home site for the UW imapd is
+    ftp://ftp.cac.washington.edu/mail/imap-2000.tar.Z
+
+If your platform needs any additional LIBS entries, edit Makefile.PL
+and add them. Do
+    perl Makefile.PL CCLIENT_DIR=/path/to/c-client
+where /path/to/c-client is the pathname of the directory which contains
+the c-client.a archive library which you have just built. If you want
+to add any additional MakeMaker options then add them after the
+CCLIENT_DIR=... argument, not before.
+
+This process needs to extract all object files from the c-client.a
+archive into the current directory. This is for the sake of those
+platforms which require an explicit list of object files for creating
+shared objects rather than a mix of .o and .a files. If the extraction
+succeeds, it will say so and you can carry on and do
+
+    make
+
+If the extraction failed for some reason, you will have to do that
+part yourself and then replace that part of MakeMaker with a simple
+assignment to @objects of the object files in your c-client.a.
+
+Once the extension has been built, you can do
+
+    make install
+
+to complete the installation.
+
+DOCUMENTATION
+
+Cclient.pm includes fairly complete documentation which the
+build/installation process will turn into a man page. You may also
+want to read the $CCLIENT_DIR/docs/Internal.doc which documents the
+underlying c-client library. However, that documentation is at odds
+with the actual code in a few places.
+
+Malcolm Beattie
+31 Oct 2000

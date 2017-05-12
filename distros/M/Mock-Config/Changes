@@ -1,0 +1,11 @@
+Revision history for Mock-Config
+
+0.03    2016-04-18 14:09:42 rurban
+        Remove prereq on XSConfig (bulk88)
+
+0.02    2016-02-28 18:35:44 rurban
+        Fixed for PP Config
+
+0.01    2016-02-28 13:03:09 rurban
+        First version, taken from cperl Test-Harness/t/NoFork.pm code
+

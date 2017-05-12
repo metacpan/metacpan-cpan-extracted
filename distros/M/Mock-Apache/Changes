@@ -1,0 +1,34 @@
+Revision history for Perl extension Mock::Apache.
+
+0.09  2013-11-20
+        - add @EXPORT_TAGS to Apache::Util in emulation
+
+0.08  2013-11-01
+        - split out emulation code into Mock::Apache::Emulation
+        - split out mock client code into Mock::Apache::RmoteClient
+
+0.07  2013-10-31
+        - switch Makefile.PL to use Module::Install
+        - add author test
+        - fix bug in $r->status_line($newval)
+
+0.06  2013-10-31
+        - output from handlers is now captured
+        - basic handling of status/content-type/content-length
+        - new unit tests added
+
+0.05  2013-10-30
+        - expanded implementation
+
+0.04  2013-10-29
+        - expanded implementation
+
+0.03  2013-10-28
+        - expanded implementation
+
+0.02  Tue Oct 15 16:40:00 2013
+        - Added meta-information to suppress PAUSE indexing of
+          Apache::* namespaces
+
+0.01  Tue Oct 15 07:30:05 2013
+        - Original version, poached from Apache::FakeRequest.

@@ -1,0 +1,202 @@
+@prefix cpan:  <http://purl.org/NET/cpan-uri/person/> .
+@prefix cpant: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix dcs:   <http://ontologi.es/doap-changeset#> .
+@prefix dist:  <http://purl.org/NET/cpan-uri/dist/Module-Install-Copyright/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix nfo:   <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+dist:project
+	a                 doap:Project;
+	doap:name         "Module-Install-Copyright";
+	cpant:perl_version_from [
+		a nfo:FileDataObject;
+		a nfo:SourceCode;
+		rdfs:label "Module::Install::Copyright";
+		nfo:fileName "lib/Module/Install/Copyright.pm";
+		nfo:programmingLanguage "Perl";
+	];
+	cpant:readme_from [
+		a nfo:FileDataObject;
+		a nfo:SourceCode;
+		rdfs:label "Module::Install::Copyright";
+		nfo:fileName "lib/Module/Install/Copyright.pm";
+		nfo:programmingLanguage "Perl";
+	];
+	cpant:requires    "List::MoreUtils"^^cpant:dsWithoutVersion;
+	cpant:requires    "Module::Install::Admin::RDF"^^cpant:dsWithoutVersion;
+	cpant:requires    "Module::Install::Contributors"^^cpant:dsWithoutVersion;
+	cpant:requires    "Module::Manifest"^^cpant:dsWithoutVersion;
+	cpant:requires    "MooX::Struct"^^cpant:dsWithoutVersion;
+	cpant:requires    "Path::Class"^^cpant:dsWithoutVersion;
+	cpant:requires    "Software::License"^^cpant:dsWithoutVersion;
+	cpant:test_requires "Test::More 0.61"^^cpant:dsWithVersion;
+	cpant:version_from [
+		a nfo:FileDataObject;
+		a nfo:SourceCode;
+		rdfs:label "Module::Install::Copyright";
+		nfo:fileName "lib/Module/Install/Copyright.pm";
+		nfo:programmingLanguage "Perl";
+	];
+	dc:contributor    cpan:tobyink;
+	doap:bug-database <http://rt.cpan.org/Dist/Display.html?Queue=Module-Install-Copyright>;
+	doap:created      "2012-12-04"^^xsd:date;
+	doap:developer    cpan:tobyink;
+	doap:download-page <https://metacpan.org/release/Module-Install-Copyright>;
+	doap:helper       cpan:jonass;
+	doap:homepage     <https://metacpan.org/release/Module-Install-Copyright>;
+	doap:license      <http://dev.perl.org/licenses/>;
+	doap:maintainer   cpan:tobyink;
+	doap:programming-language "Perl";
+	doap:release      dist:v_0-001;
+	doap:release      dist:v_0-002;
+	doap:release      dist:v_0-003;
+	doap:release      dist:v_0-004;
+	doap:release      dist:v_0-005;
+	doap:release      dist:v_0-006;
+	doap:release      dist:v_0-007;
+	doap:release      dist:v_0-008;
+	doap:release      dist:v_0-009;
+	doap:shortdesc    "package a COPYRIGHT file with a distribution".
+
+dist:v_0-001
+	a                 doap:Version;
+	rdfs:label        "Initial release";
+	dc:identifier     "Module-Install-Copyright-0.001"^^xsd:string;
+	dc:issued         "2012-12-04"^^xsd:date;
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-Copyright-0.001.tar.gz>;
+	doap:revision     "0.001"^^xsd:string.
+
+dist:v_0-002
+	a                 doap:Version;
+	dc:identifier     "Module-Install-Copyright-0.002"^^xsd:string;
+	dc:issued         "2013-01-21"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Change;
+			rdfs:label "Drop Debian::Copyright dependency; serialize Debian copyright format ourselves; we can do a better job!";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-Copyright-0.002.tar.gz>;
+	doap:revision     "0.002"^^xsd:string.
+
+dist:v_0-003
+	a                 doap:Version;
+	dc:identifier     "Module-Install-Copyright-0.003"^^xsd:string;
+	dc:issued         "2013-01-22"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Bugfix;
+			rdfs:label "Underscores in stanza properties are now properly replaced with hyphens.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-Copyright-0.003.tar.gz>;
+	doap:revision     "0.003"^^xsd:string.
+
+dist:v_0-004
+	a                 doap:Version;
+	dc:identifier     "Module-Install-Copyright-0.004"^^xsd:string;
+	dc:issued         "2013-03-19"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "Module::Install::Credits.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-Copyright-0.004.tar.gz>;
+	doap:revision     "0.004"^^xsd:string.
+
+dist:v_0-005
+	a                 doap:Version;
+	dc:identifier     "Module-Install-Copyright-0.005"^^xsd:string;
+	dc:issued         "2013-03-20"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Change;
+			rdfs:label "Ensure CREDITS file is UTF-8 encoded.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-Copyright-0.005.tar.gz>;
+	doap:revision     "0.005"^^xsd:string.
+
+dist:v_0-006
+	a                 doap:Version;
+	dc:identifier     "Module-Install-Copyright-0.006"^^xsd:string;
+	dc:issued         "2013-03-24"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Change;
+			rdfs:label "Module::Install::Credits now adds 'x_contributors' key to META.yml.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-Copyright-0.006.tar.gz>;
+	doap:revision     "0.006"^^xsd:string.
+
+dist:v_0-007
+	a                 doap:Version;
+	rdfs:label        "Bond; James Bond";
+	dc:identifier     "Module-Install-Copyright-0.007"^^xsd:string;
+	dc:issued         "2013-04-14"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Change;
+			rdfs:label "Only list contributors in 'x_contributors', not thanked people.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-Copyright-0.007.tar.gz>;
+	doap:revision     "0.007"^^xsd:string.
+
+dist:v_0-008
+	a                 doap:Version;
+	dc:identifier     "Module-Install-Copyright-0.008"^^xsd:string;
+	dc:issued         "2013-05-01"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Bugfix;
+			rdfs:label "Fix auto-generated CPAN e-mail addresses in CREDITS file.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-Copyright-0.008.tar.gz>;
+	doap:revision     "0.008"^^xsd:string.
+
+dist:v_0-009
+	a                 doap:Version;
+	dc:identifier     "Module-Install-Copyright-0.009"^^xsd:string;
+	dc:issued         "2013-05-03"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Change;
+			rdfs:label "Don't include 'mailto:' in x_contributors for META.yml; MetaCPAN doesn't seem to like it.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-Copyright-0.009.tar.gz>;
+	doap:revision     "0.009"^^xsd:string.
+
+cpan:jonass
+	a                 foaf:Person;
+	foaf:name         "Jonas Smedegaard";
+	foaf:nick         "JONASS";
+	foaf:page         <https://metacpan.org/author/JONASS>.
+
+cpan:tobyink
+	a                 foaf:Person;
+	foaf:name         "Toby Inkster";
+	foaf:mbox         <mailto:tobyink@cpan.org>;
+	foaf:nick         "TOBYINK";
+	foaf:page         <https://metacpan.org/author/TOBYINK>.
+
+<http://dev.perl.org/licenses/>
+	dc:title          "the same terms as the perl 5 programming language system itself".
+

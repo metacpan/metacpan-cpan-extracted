@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 61c8c386d35c714da45a5a3330748761f345f762 Changes
+SHA1 33bb294737d878e1e1cabe8f489b17b5a13acf53 INSTALL
+SHA1 514760f01d379ad532c49a196f1c6f7912b65556 LICENSE
+SHA1 b6e00064cb42730ca039bda34912fb17a114e308 MANIFEST
+SHA1 c089256010bad2ee27951694212fbda6cb45c1ce META.json
+SHA1 28470045f99f896fa95949cf387ee6b40c3cb987 META.yml
+SHA1 4f95c85f77f4c19e103cf1fdbdb42b6fee757af3 Makefile.PL
+SHA1 6b0ce20dedb26e7cef208c0e175b0e5c84379a9a README
+SHA1 7bda4fe612927ef4b5bf32a6c3f6cdf525b4b85e dist.ini
+SHA1 260a93f32ac30e12b8711716b22e57cc3de25b50 lib/MooseX/NewDefaults.pm
+SHA1 c1a66adcd02e6272c0749c0527934a3aa483e8f7 lib/MooseX/NewDefaults/Magic.pm
+SHA1 b323d012237302b53e437b42d430d855675aa696 t/00-compile.t
+SHA1 f489466381695d0c0da4e37ff9e5e54b553d93d7 t/000-report-versions-tiny.t
+SHA1 946b724d3c51dc813302e63732c388aa5848c8cd t/01-sanity.t
+SHA1 543c317efe8e5f2d060941d1c53d609e2dce7a90 t/author-pod-spell.t
+SHA1 6828d99607cc4178da8940d5409afc61c5b6c176 t/basic.t
+SHA1 aad6346b36761215dd295bb4d7e051db0c3b1442 t/methodtacular.t
+SHA1 1b9d746894048f9848586553a057c6f3ac119a0c t/non-coderef.t
+SHA1 9c3627ff37f4fd5bddc34bf46cf3359eaf76a060 t/release-consistent-version.t
+SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
+SHA1 3e758201d428c5a4046b314ff7d2f928d6653d78 t/release-has-version.t
+SHA1 caedadb009edf92216f5fa54a8457a9ab93900eb t/release-no-smart-comments.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 a117e40b55e794556463b3cbbd7a2677cf781d2f t/release-pod-coverage.t
+SHA1 c72ad2d65f59b119e928e39a4d641dbdd3faa275 t/release-pod-syntax.t
+SHA1 afcefb78fd995244d56843a2f7b213c7ec65bc46 t/release-portability.t
+SHA1 c33ed354e092b306495473e3b5b6b922cc542d5b t/sugar.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQEcBAEBAgAGBQJQYUI8AAoJEOd5N1CvIgQkEM4IALzuQB16o4TiU5jr3DgcqbPz
+8CYOlO/Ecf7imfualV82tD8eu6VeeklWQS7mvMJFiyy5yKHt4wUSdGiH6NwwtzaE
+F8sTOMF6hMoqYRSPytxZzFXhz16BHqr2nn7f9tLif5rUPPPfi/ixGC5uIWchDaRB
+Q6AWywBtQHWj8B6UGNp7PM/ArcezGIcW71kMPwNMoTYQe6xoq8bkf4FHSNVGuRm5
+HNKamYjiXMzazQ6qvFSYOPwafh1zpgdx04qb8y5yOw+UOku0MyFuN9zQSHH+aK/8
+y7+Xc3VgaDpq8STXHD0BkmetvGFQl6eEABLaqWEwhzfSVGwD2pwxENs7LLCZBbk=
+=0+4Q
+-----END PGP SIGNATURE-----

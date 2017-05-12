@@ -1,0 +1,507 @@
+---
+-   # изменения в реестре
+    id: rusu.notify
+    weight: 0
+    last: 1
+    match:
+        - from: 'nobody@(?:ripn.net|registry.su)'
+            #OR: [ 'nobody@ripn.net', 'nobody@registry.su' ]
+        - OR:
+           - x_filename: 'NFY.*UPDATED'
+           - NOT: { x_filename: ~ }
+        - subject: 'Notification of (FID|RIPN) [dD]atabase changes?'
+    processors:
+        - processor: chain
+-   # новый объект
+    id: _rusu.notify.new_object
+    weight: 0
+    match:
+        body: 'New object created'
+    processors:
+        - processor: filter
+          filters:
+            - '(?s).*New object created:'
+            - '(?s)Thank [yY]ou.*'
+        - processor: regexp
+          regexps:
+              $1=~body: '([\w_-]+):\s*(.+)'
+        - processor: last
+-   # новый объект
+    id: _rusu.notify.deleted
+    weight: 2
+    match:
+        body:
+            - '\n(PREVIOUS OBJECT|Объект):\s*\n'
+            - '\n(DELETED|УДАЛЕН)\s*\n'
+    processors:
+        - processor: regexp
+          regexps:
+              domain=~body: 'domain:\s*(.+)'
+        - processor: last
+-   # перенос к нам инициирован
+    id: _rusu.notify.transfer_in_started
+    weight: 1
+    match:
+        body:
+            - '\n(REPLACED BY|Заменен на):\s*\n'
+            - '\n(PREVIOUS OBJECT|Объект):\s*\n'
+            - '\n\s{0,2}domain:\s+(.+?)\n'
+            - '\n\+ reg\-ch:\s+(TEST)?REG(?:[12]|RU)\d?-[\w-]+\n' # для тестов
+    processors:
+        - processor: filter
+          filters:
+          # оставляем только текст после "REPLACED BY", то есть на что заменён
+            - '(?s).*(REPLACED BY|Заменен на):'
+            - '(?s)Thank you.*'
+            - [ 'registrar', 'transfer_from' ]
+            - [ '\+ reg\-ch', 'transfer_to'  ]
+        - processor: regexp
+          regexps:
+            $1=~body: '\s*(.+?):\s*(.+)'
+        - processor: last
+-   # перенос закончен (от нас или к нам)
+    id: _rusu.notify.transfer_finished
+    weight: 1
+    match:
+        body:
+          - '\n(REPLACED BY|Заменен на):\s*\n'
+          - '\n(PREVIOUS OBJECT|Объект):\s*\n'
+          - '\n\s{0,2}domain:\s+(.+?)\n'
+          - '\n\* registrar:\s+[\w-]+\n'
+          - '\n\- reg\-ch:\s+[\w\-]+\n'
+    processors:
+        - processor: filter
+          filters:
+            - '(?s).*(PREVIOUS OBJECT|Объект):'
+            - '(?s)(REPLACED BY|Заменен на):.*'
+            - [ '(?m)^\* registrar', 'transfered_from' ]
+            - [ '(?m)^\- reg\-ch', 'transfered_to' ]
+        - processor: regexp
+          regexps:
+            $1=~body: '\s*(.+?):\s*(.+)'
+        - processor: last
+-   # новый объект
+    id: _rusu.notify.updated
+    weight: 1.5
+    match:
+       body:
+          - '(?:PREVIOUS OBJECT|Объект)'
+          - '(?:REPLACED BY|Заменен на)'
+    processors:
+        - processor: regexp
+          regexps:
+            domain=~body,once: 'domain:\s*(.+)'
+            req_id=~subject: 'Re: ([\d\.]+)'
+            $1=~body: '(?m-s)^([*+]\s+.+?):\s+(.+)$'
+        - processor: last
+-   # нет денег
+    id: _rusu.notify.nomoney
+    weight: 2
+    match:
+       body: 'Not enough money for new domain'
+    processors:
+        - processor: last
+-   # список доменов за месяц
+    id: rusu.domains_report
+    weight: 10
+    match:
+        - from:
+            OR: [ 'nobody@ripn.net', 'nobody@registry.su' ]
+        - OR:
+           - x_filename: 'NFY.*TCSTAT'
+           - NOT: { x_filename: ~ }
+        - subject: 'Domain report for'
+    processors:
+        - processor: regexp
+          regexps:
+            date=~subject,once: 'for ([-\w\d]+)'
+            subject=~subject,once: '(.*)'
+            total=~body,once: 'Итого (\d+) шт'
+            sum=~body,once: 'на сумму (\d+\.\d+) руб'
+            body=~body,once: '(?s)(.*)'
+        - processor: last
+-   # системные уведомления
+    id: rusu.registry.notify
+    weight: 7
+    last: 1
+    match:
+        - from:
+            OR: [ 'nobody@ripn.net', 'nobody@registry.su' ]
+        - OR:
+           - x_filename: 'NFY.*(TCSF|NOMON|NEWMONEY|REGCREDIT|REGSPEED)'
+           - NOT: { x_filename: ~ }
+        - subject: 'TC-[SR]U'
+    processors:
+        - processor: chain
+-   # удалили объект
+    id: _rusu.registry.notify.deleted_text
+    match:
+        - body:
+          - 'Срок регистрации домена\s*[-\w\d\.]+\s*закончился.'
+    processors:
+        - processor: regexp
+          regexps:
+            domain=~body: 'регистрации домена ([-\w\d\.]+)'
+        - processor: last
+-   # отчёт о деньгах пришёл
+    id: _rusu.registry.notify.nomon
+    match:
+      subject: 'Баланс лицевого сч[её]та договора (?:59/TC-REG|6/SU-REG)'
+    processors:
+        - processor: regexp
+          regexps:
+            debet=~body: 'в наличии средств: ([\d\.]+) руб'
+            credit=~body: 'Установлено кредитов: ([\d\.]+) руб'
+            available=~body: 'Доступно для использования: ([\d\.]+) руб'
+        - processor: last
+-   # отчёт о пополнении счёта
+    id: _rusu.registry.notify.newmoney
+    match:
+      subject: 'Зачислены средства в размере'
+    processors:
+        - processor: regexp
+          regexps:
+            newmoney=~subject: 'в размере ([\d\.]+) руб'
+        - processor: last
+-   # отчёт об изменении кредита
+    id: _rusu.registry.notify.regcredit
+    match:
+      subject: 'Установлен месячный кредит в размере'
+    processors:
+        - processor: regexp
+          regexps:
+            regcredit=~subject: 'в размере ([\d\.]+) руб'
+        - processor: last
+#Subject: TC-RU: Скорость доступа в ТЦ для REGRU-REG-RIPN - 450 заявок/час.
+-   # скорость доступа поменяли
+    id: _rusu.registry.notify.regspeed
+    match:
+      subject: 'Скорость доступа в ТЦ для REGRU-REG-RIPN'
+    processors:
+        - processor: regexp
+          regexps:
+            regspeed=~subject: 'REGRU-REG-RIPN - (\d+) заявок/час'
+        - processor: last
+-  # ответ на action: NEW
+    id: rusu.response.new
+    weight: 2
+    match:
+        - from:
+            OR: [ 'nobody@ripn.net', 'nobody@registry.su' ]
+        - OR:
+            - x_filename: 'ANS'
+            - NOT: { x_filename:  ~ }
+        - body:
+           - 'Dear Colleague'
+           - '(?i)action:\s*NEW'
+    processors:
+        - processor: filter
+          filters:
+            - [ '(?s)> #\[TEMPLATES END\]#.*', "> #[TEMPLATES END]#\n" ]
+        - processor: split_msg
+          begin: '(?si)action:\s*NEW[^#]*#\[DOMAIN TEMPLATE\]#'
+          separator: '> #\[DOMAIN TEMPLATE\]#'
+          end: '> #\[TEMPLATES END\]#'
+          emulate: 0
+        - processor: chain
+- # всё плохо
+    id: _rusu.response.new.fail
+    match:
+        body: 'FATAL ERROR|Not enough money for new domain|Credit balance low'
+    processors:
+        - processor: filter
+          filters:
+            #- '(?s).*#\[DOMAIN TEMPLATE]\#'
+            - '.*FATAL ERRORS.*'
+        - processor: regexp
+          regexps:
+             error_code=~body:   '(?m)^(?!>).+'
+             domain=~body:       '>\s*domain:\s*(.+)'
+             req_id=~subject:    'Re: ([\d\.]+)'
+
+- # всё хорошо
+    id: _rusu.response.new.ok
+    weight: -1
+    match:
+        body: 'New object created'
+    processors:
+        - processor: regexp
+          regexps:
+            domain=~body: '>\s*domain:\s*(.+)'
+            req_id=~subject: 'Re: ([\d\.]+)'
+-
+    id: rusu.response.update
+    weight: 1
+    match:
+       - from:
+            OR: [ 'nobody@ripn.net', 'nobody@registry.su' ]
+       - OR:
+           - x_filename: 'ANS'
+           - NOT: { x_filename: ~ }
+       - body:
+           - 'Dear Colleague'
+           - '(?i)action:\s*UPDATE'
+    processors:
+        - processor: filter
+          filters:
+            - [ '(?s)> #\[TEMPLATES END\]#.*', "> #[TEMPLATES END]#\n" ]
+        - processor: split_msg
+          begin: '(?si)action:\s*UPDATE[^#]*#\[DOMAIN TEMPLATE\]#'
+          separator: '> #\[DOMAIN TEMPLATE\]#'
+          end: '> #\[TEMPLATES END\]#'
+          emulate: 0
+        - processor: chain
+-
+    id: _rusu.response.update.ok
+    match:
+        body:
+            #- '\n(PREVIOUS OBJECT|Объект):\n'
+            #- '\n(DELETED|УДАЛЕН)\n'
+            - '(PREVIOUS OBJECT|Объект)'
+            - '(REPLACED BY|Заменен на)'
+    processors:
+        - processor: regexp
+          regexps:
+            domain=~body: '>\s*domain:\s*(.+)'
+            req_id=~subject: 'Re: ([\d\.]+)'
+            $1=~body: '(?m-s)^[*+]\s+(.+?):\s+(.+)$'
+-
+    id: _rusu.response.update.fail
+    weight: 1
+    match:
+        body: 'FATAL ERROR'
+    processors:
+        - processor: filter
+          filters:
+            #- '(?s).*#\[DOMAIN TEMPLATE]\#'
+            - '.*FATAL ERRORS.*'
+        - processor: regexp
+          regexps:
+             error_code=~body:   '(?m)^(?!>).+'
+             domain=~body:       '>\s*domain:\s*(.+)'
+             req_id=~subject:    'Re: ([\d\.]+)'
+-
+    id: rusu.response.delete
+    weight: 5
+    match:
+       - from:
+            OR: [ 'nobody@ripn.net', 'nobody@registry.su' ]
+       - OR:
+           - x_filename: 'ANS'
+           - NOT: { x_filename: ~ }
+       - body:
+           - 'Dear Colleague'
+           - 'action:\s*DELETE'
+    processors:
+        - processor: filter
+          filters:
+            - [ '(?s)> #\[TEMPLATES END\]#.*', "> #[TEMPLATES END]#\n" ]
+        - processor: split_msg
+          begin: '(?s)action:\s*DELETE[^#]*#\[DOMAIN TEMPLATE\]#'
+          separator: '> #\[DOMAIN TEMPLATE\]#'
+          end: '> #\[TEMPLATES END\]#'
+          emulate: 0
+        - processor: chain
+-
+    id: _rusu.response.delete.ok
+    match:
+        body:
+            - '\n(?:PREVIOUS OBJECT|Объект):\n'
+            - '\n(?:DELETED|Удал[её]н)\n'
+    processors:
+        - processor: regexp
+          regexps:
+            domain=~body: '>\s*domain:\s*(.+)'
+            req_id=~subject: 'Re: ([\d\.]+)'
+            $1=~body: '(?m-s)^[*+]\s+(.+?):\s+(.+)$'
+-
+    id: _rusu.response.delete.fail
+    match:
+        body: 'FATAL ERROR'
+    processors:
+        - processor: filter
+          filters:
+            #- '(?s).*#\[DOMAIN TEMPLATE]\#'
+            - '.*FATAL ERRORS.*'
+        - processor: regexp
+          regexps:
+             error_code=~body:   '(?m)^(?!>).+'
+             domain=~body:       '>\s*domain:\s*(.+)'
+             req_id=~subject:    'Re: ([\d\.]+)'
+-
+    id: rusu.response.renew
+    weight: 3
+    match:
+        - from:
+            OR: [ 'nobody@ripn.net', 'nobody@registry.su' ]
+        - OR:
+           - x_filename: 'ANS'
+           - NOT: { x_filename:  ~ }
+        - body:
+           - 'Dear Colleague'
+           - '(?i)action:\s*PROLONG'
+    processors:
+        - processor: filter
+          filters:
+            - [ '(?s)> #\[TEMPLATES END\]#.*', "> #[TEMPLATES END]#\n" ]
+        - processor: split_msg
+          begin: '(?si)action:\s*PROLONG[^#]*#\[DOMAIN TEMPLATE\]#'
+          separator: '> #\[DOMAIN TEMPLATE\]#'
+          end: '> #\[TEMPLATES END\]#'
+          emulate: 0
+        - processor: chain
+-
+    id: _rusu.response.renew.ok
+    match:
+        body:
+            - '(PREVIOUS OBJECT|Объект)'
+            - '(REPLACED BY|Заменен на)'
+    processors:
+        - processor: regexp
+          regexps:
+            domain=~body: '>\s*domain:\s*(.+)'
+            req_id=~subject: 'Re: ([\d\.]+)'
+            reg_till=~body: '(?m-s)^[*]\s+reg-till:\s+(.+)$'
+-
+    id: _rusu.response.renew.fail
+    weight: 1
+    match:
+        body: 'FATAL ERROR|Not enough money for new domain|Credit balance low'
+    processors:
+        - processor: filter
+          filters:
+            #- '(?s).*#\[DOMAIN TEMPLATE]\#'
+            - '.*FATAL ERRORS.*'
+        - processor: regexp
+          regexps:
+             error_code=~body:   '(?m)^(?!>).+'
+             domain=~body:       '>\s*domain:\s*(.+)'
+             req_id=~subject:    'Re: ([\d\.]+)'
+-
+    id: rusu.get_response
+    weight: 4
+    match:
+       - from:
+            OR: [ 'nobody@ripn.net', 'nobody@registry.su' ]
+       - OR:
+           - x_filename: 'ANS'
+           - NOT: { x_filename: ~ }
+       - body:
+#           - 'Information on object'
+           - 'action:\s*GET'
+    processors:
+      - processor: split_msg
+        begin:  '> #\[(?:DOMAIN|REGISTRAR) TEMPLATE\]#\n'
+        separator:  '> #\[(?:DOMAIN|REGISTRAR) TEMPLATE\]#\n'
+        end:    '> #\[TEMPLATES END\]#\n\n'
+        #emulate: 1
+      - processor: chain
+-
+    id: _rusu.get_response.ok
+    match:
+        body: 'Information on object'
+    processors:
+        - processor: filter
+          filters:
+            - '(?m).*Information on object.*\n\n'
+        - processor: regexp
+          regexps:
+            req_id=~subject: 'Re: ([\d\.]+)'
+            $1=~body: '(?m-s)^\s*([^\n>].+?):\s+(.+)$'
+-
+    id: _rusu.get_response.fail
+    match:
+        body: 'FATAL ERROR'
+    processors:
+        - processor: filter
+          filters:
+            #- '(?s).*#\[DOMAIN TEMPLATE]\#'
+            - '.*FATAL ERRORS.*'
+        - processor: regexp
+          regexps:
+             error_code=~body:   '(?m)^(?!>).+'
+             domain=~body:       '>\s*domain:\s*(.+)'
+             req_id=~subject:    'Re: ([\d\.]+)'
+-   # неавторизованный доступ
+    id: rusu.authfailed
+    weight: 9
+    last: 1
+    match:
+        - from:
+            OR: [ 'nobody@ripn.net', 'nobody@registry.su' ]
+        - OR:
+           - x_filename: 'AUTH.*AUTHFAILED'
+           - NOT: { x_filename: ~ }
+        - OR:
+           - message_id: 'AUTH.*AUTHFAILED'
+           - body: 'FID database access authentication violation'
+           - body: '(?s)попытке неавторизованного\nдоступа'
+    processors:
+        - processor: regexp
+          regexps:
+            authfailed=~subject: '(?s)(.*)'
+        - processor: last
+- # ошибка в запросе
+    id: rusu.ansfailed
+    weight: 9
+    last: 1
+    match:
+        - from:
+            OR: [ 'nobody@ripn.net', 'nobody@registry.su' ]
+        - OR:
+           - x_filename: 'ANS.*ANSFAILED'
+           - NOT: { x_filename: ~ }
+        - OR:
+           - message_id: 'ANS.*ANSFAILED'
+           - body: 'We are sorry to disappoint You'
+    processors:
+        - processor: regexp
+          regexps:
+            req_id=~subject: 'Request ([\d.]+)\:'
+        - processor: last
+#-   # слишком много запросов за час
+#    id: rusu.requests_limit
+#    last: 1
+#    match:
+#        - from:
+#            OR: [ 'nobody@ripn.net', 'nobody@registry.su' ]
+#        - body:
+#            - 'Your request is not processed'
+#            - 'maximum requests per hour limit'
+##        - OR:
+##           - x_filename: 'AUTH.*AUTHFAILED'
+##           - NOT: { x_filename: ~ }
+##        - message_id: 'AUTH.*AUTHFAILED'
+#    processors:
+#        - processor: last
+-
+  id: gtld.transfer_finished
+  match:
+    from: automail@resellerclub.com
+    to: reg@reg.ru
+    subj: '^Transfer Request.*Completed'
+  processors:
+    - processor: regexp
+      regexps:
+          domain=~body: '(?i)Domain Name: ([\-a-z0-9\.]+)'
+          order_id=~body: '(?i)Order ID: (\d+)'
+- # Перенос от нас в пределах DirectI
+  id: gtld.moveout_finished
+  match:
+    from: automail@resellerclub.com
+    to: reg@reg.ru
+    subj: 'Completed: [\-a-z0-9\.]+ moved to another Account'
+  processors:
+    - processor: regexp
+      regexps:
+          domain=~subject: 'Completed: ([\-a-z0-9\.]+)'
+- # Перенос от нас за DirectI
+  id: gtld.transout_finished
+  match:
+    from: automail@resellerclub.com
+    to: reg@reg.ru
+    subj: 'Completed: [\-a-z0-9\.]+ transferred away to'
+  processors:
+    - processor: regexp
+      regexps:
+          domain=~subject: 'Completed: ([\-a-z0-9\.]+)'

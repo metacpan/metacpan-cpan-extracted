@@ -1,0 +1,161 @@
+=head1 NAME
+
+Math::PartialOrder::Std -
+standard iterative class for partial orders (datatype hierarchies).
+
+=head1 SYNOPSIS
+
+  use Math::PartialOrder::Std;
+
+  # ... any Math::PartialOrder::Base method
+
+=head1 REQUIRES
+
+Math::PartialOrder, Carp, Exporter
+
+=head1 DESCRIPTION
+
+Math::PartialOrder::Std is a Math::PartialOrder::Base implementation for
+rooted finite partial orders (datatype hierarchies) which uses
+hash-references to store and
+manipulate hierarchy information.  The hashrefs used have keys
+which are C<eq> to their values.
+
+Math::PartialOrder::Std inherits from Math::PartialOrder::Base,
+and implements all required methods described in
+L<Math::PartialOrder::Base>.
+
+=head1 METHODS
+
+=pod
+
+=head2 Construction & Initialization
+
+=over 4
+
+=item * C<new( {root=E<gt>$r} )>
+
+Creates and returns a new Math::PartialOrder::Std object rooted at
+$r, which defaults to 'BOTTOM'.
+
+=pod
+
+=back
+
+
+=head2 Additional Hierarchy Methods
+
+=over 4
+
+=item * C<_ancestors($type)>
+
+Returns the ancestors of $type as a hash reference.
+
+
+=pod
+
+=item * C<_descendants($type)>
+
+Returns the descendants of $type as a hash reference.
+
+=pod
+
+
+=item * C<_minimize(\%hash)>
+
+Destructively minimizes the values of the hash-reference \%hash.
+Returns \%hash.
+
+=pod
+
+=item * C<_maximize(\%hash)>
+
+Destructively maximizes the values of the hash-reference \%hash.
+Returns \%hash.
+
+
+=pod
+
+=back
+
+
+
+
+=head2 Hierarchy Maintainence: Low-level Accessors/Manipulators
+
+=over 4
+
+=item * C<_types()>
+
+Returns the hashref whose values represent all of the types
+in the hierarchy.
+
+=pod
+
+=item * C<_root(), _root($r)>
+
+Get/set the root of the hierarchy.
+
+=pod
+
+=item * C<_parents()>, C<_parents($type)>
+
+With no arguments, returns a reference to a hash keyed by type
+whose values are hashrefs representing the parents of the keying type.
+
+With one argument, returns the hashref representing the parents
+of $type.
+
+=pod
+
+=item * C<_children()>, C<_children($type)>
+
+With no arguments, returns a reference to a hash keyed by type
+whose values are hashrefs representing the children of the keying type.
+
+With one argument, returns the hashref representing the children
+of $type.
+
+=pod
+
+=item * C<_attributes()>, C<_attributes($type)>, C<_attributes($type, $hashref)>
+
+With no arguments, returns a reference to a hash of attribute-hashes
+keyed by type.  With one argument, returns a reference to the
+attributes for $type.  With 2 arguments, sets the attributes for $type
+to $hashref.
+
+=pod
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+perl by Larry Wall.
+
+Usage of hash-references as sets draws heavily on
+Jarkko Hietaniemi's Set::Scalar module.
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>jurish@ling.uni-potsdam.deE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001, Bryan Jurish.  All rights reserved.
+
+This package is free software.  You may redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+perl(1).
+Math::PartialOrder(3pm).
+Math::PartialOrder::Base(3pm).
+Math::PartialOrder::Caching(3pm).
+Math::PartialOrder::LRUCaching(3pm).
+Math::PartialOrder::CMasked(3pm).
+Math::PartialOrder::CEnum(3pm).
+Math::PartialOrder::Loader(3pm).
+Set::Scalar(3pm).
+

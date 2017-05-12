@@ -1,0 +1,45 @@
+Mac-MotionSensor version 0.02
+=============================
+
+Provides an interface to the accelerometer available in mac laptops via UniMotion
+
+CREDIT
+
+Thanks to those responsible for the unimotion framework:
+
+http://unimotion.sourceforge.net/
+
+This module simply adds a perl interface.
+
+ISSUES
+
+Known not to work under x86_64, its an issue with the UniMotion library.
+
+However on Mac OS X 10.6 it *will* build under system perl 5.8.9.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  xCode must be installed.
+
+http://developer.apple.com/technologies/tools/xcode.html 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Robin Edwards
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+UniMotion its self is licensed under the LGPL.

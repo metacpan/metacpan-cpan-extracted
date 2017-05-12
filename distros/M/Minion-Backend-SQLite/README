@@ -1,0 +1,510 @@
+NAME
+
+    Minion::Backend::SQLite - SQLite backend for Minion job queue
+
+SYNOPSIS
+
+      use Minion::Backend::SQLite;
+      my $backend = Minion::Backend::SQLite->new('sqlite:test.db');
+    
+      # Minion
+      use Minion;
+      my $minion = Minion->new(SQLite => 'sqlite:test.db');
+    
+      # Mojolicious::Lite (via Mojolicious::Plugin::Minion)
+      plugin Minion => { SQLite => 'sqlite:test.db' };
+
+DESCRIPTION
+
+    Minion::Backend::SQLite is a backend for Minion based on Mojo::SQLite.
+    All necessary tables will be created automatically with a set of
+    migrations named minion. If no connection string or :temp: is provided,
+    the database will be created in a temporary directory.
+
+ATTRIBUTES
+
+    Minion::Backend::SQLite inherits all attributes from Minion::Backend
+    and implements the following new ones.
+
+ sqlite
+
+      my $sqlite = $backend->sqlite;
+      $backend   = $backend->sqlite(Mojo::SQLite->new);
+
+    Mojo::SQLite object used to store all data.
+
+METHODS
+
+    Minion::Backend::SQLite inherits all methods from Minion::Backend and
+    implements the following new ones.
+
+ new
+
+      my $backend = Minion::Backend::SQLite->new;
+      my $backend = Minion::Backend::SQLite->new(':temp:');
+      my $backend = Minion::Backend::SQLite->new('sqlite:test.db');
+      my $backend = Minion::Backend::SQLite->new->tap(sub { $_->sqlite->from_filename('C:\\foo\\bar.db') });
+
+    Construct a new Minion::Backend::SQLite object.
+
+ broadcast
+
+      my $bool = $backend->broadcast('some_command');
+      my $bool = $backend->broadcast('some_command', [@args]);
+      my $bool = $backend->broadcast('some_command', [@args], [$id1, $id2, $id3]);
+
+    Broadcast remote control command to one or more workers.
+
+ dequeue
+
+      my $job_info = $backend->dequeue($worker_id, 0.5);
+      my $job_info = $backend->dequeue($worker_id, 0.5, {queues => ['important']});
+
+    Wait a given amount of time in seconds for a job, dequeue it and
+    transition from inactive to active state, or return undef if queues
+    were empty.
+
+    These options are currently available:
+
+    queues
+
+        queues => ['important']
+
+      One or more queues to dequeue jobs from, defaults to default.
+
+    These fields are currently available:
+
+    args
+
+        args => ['foo', 'bar']
+
+      Job arguments.
+
+    id
+
+        id => '10023'
+
+      Job ID.
+
+    retries
+
+        retries => 3
+
+      Number of times job has been retried.
+
+    task
+
+        task => 'foo'
+
+      Task name.
+
+ enqueue
+
+      my $job_id = $backend->enqueue('foo');
+      my $job_id = $backend->enqueue(foo => [@args]);
+      my $job_id = $backend->enqueue(foo => [@args] => {priority => 1});
+
+    Enqueue a new job with inactive state.
+
+    These options are currently available:
+
+    attempts
+
+        attempts => 25
+
+      Number of times performing this job will be attempted, with a delay
+      based on "backoff" in Minion after the first attempt, defaults to 1.
+
+    delay
+
+        delay => 10
+
+      Delay job for this many seconds (from now).
+
+    parents
+
+        parents => [$id1, $id2, $id3]
+
+      One or more existing jobs this job depends on, and that need to have
+      transitioned to the state finished before it can be processed.
+
+    priority
+
+        priority => 5
+
+      Job priority, defaults to 0. Jobs with a higher priority get
+      performed first.
+
+    queue
+
+        queue => 'important'
+
+      Queue to put job in, defaults to default.
+
+ fail_job
+
+      my $bool = $backend->fail_job($job_id, $retries);
+      my $bool = $backend->fail_job($job_id, $retries, 'Something went wrong!');
+      my $bool = $backend->fail_job(
+        $job_id, $retries, {msg => 'Something went wrong!'});
+
+    Transition from active to failed state, and if there are attempts
+    remaining, transition back to inactive with an exponentially increasing
+    delay based on "backoff" in Minion.
+
+ finish_job
+
+      my $bool = $backend->finish_job($job_id, $retries);
+      my $bool = $backend->finish_job($job_id, $retries, 'All went well!');
+      my $bool = $backend->finish_job($job_id, $retries, {msg => 'All went well!'});
+
+    Transition from active to finished state.
+
+ job_info
+
+      my $job_info = $backend->job_info($job_id);
+
+    Get information about a job, or return undef if job does not exist.
+
+      # Check job state
+      my $state = $backend->job_info($job_id)->{state};
+    
+      # Get job result
+      my $result = $backend->job_info($job_id)->{result};
+
+    These fields are currently available:
+
+    args
+
+        args => ['foo', 'bar']
+
+      Job arguments.
+
+    attempts
+
+        attempts => 25
+
+      Number of times performing this job will be attempted.
+
+    children
+
+        children => ['10026', '10027', '10028']
+
+      Jobs depending on this job.
+
+    created
+
+        created => 784111777
+
+      Epoch time job was created.
+
+    delayed
+
+        delayed => 784111777
+
+      Epoch time job was delayed to.
+
+    finished
+
+        finished => 784111777
+
+      Epoch time job was finished.
+
+    parents
+
+        parents => ['10023', '10024', '10025']
+
+      Jobs this job depends on.
+
+    priority
+
+        priority => 3
+
+      Job priority.
+
+    queue
+
+        queue => 'important'
+
+      Queue name.
+
+    result
+
+        result => 'All went well!'
+
+      Job result.
+
+    retried
+
+        retried => 784111777
+
+      Epoch time job has been retried.
+
+    retries
+
+        retries => 3
+
+      Number of times job has been retried.
+
+    started
+
+        started => 784111777
+
+      Epoch time job was started.
+
+    state
+
+        state => 'inactive'
+
+      Current job state, usually active, failed, finished or inactive.
+
+    task
+
+        task => 'foo'
+
+      Task name.
+
+    worker
+
+        worker => '154'
+
+      Id of worker that is processing the job.
+
+ list_jobs
+
+      my $batch = $backend->list_jobs($offset, $limit);
+      my $batch = $backend->list_jobs($offset, $limit, {state => 'inactive'});
+
+    Returns the same information as "job_info" but in batches.
+
+    These options are currently available:
+
+    queue
+
+        queue => 'important'
+
+      List only jobs in this queue.
+
+    state
+
+        state => 'inactive'
+
+      List only jobs in this state.
+
+    task
+
+        task => 'test'
+
+      List only jobs for this task.
+
+ list_workers
+
+      my $batch = $backend->list_workers($offset, $limit);
+
+    Returns the same information as "worker_info" but in batches.
+
+ receive
+
+      my $commands = $backend->receive($worker_id);
+
+    Receive remote control commands for worker.
+
+ register_worker
+
+      my $worker_id = $backend->register_worker;
+      my $worker_id = $backend->register_worker($worker_id);
+      my $worker_id = $backend->register_worker(
+        $worker_id, {status => {queues => ['default', 'important']}});
+
+    Register worker or send heartbeat to show that this worker is still
+    alive.
+
+    These options are currently available:
+
+    status
+
+        status => {queues => ['default', 'important']}
+
+      Hash reference with whatever status information the worker would like
+      to share.
+
+ remove_job
+
+      my $bool = $backend->remove_job($job_id);
+
+    Remove failed, finished or inactive job from queue.
+
+ repair
+
+      $backend->repair;
+
+    Repair worker registry and job queue if necessary.
+
+ reset
+
+      $backend->reset;
+
+    Reset job queue.
+
+ retry_job
+
+      my $bool = $backend->retry_job($job_id, $retries);
+      my $bool = $backend->retry_job($job_id, $retries, {delay => 10});
+
+    Transition job back to inactive state, already inactive jobs may also
+    be retried to change options.
+
+    These options are currently available:
+
+    delay
+
+        delay => 10
+
+      Delay job for this many seconds (from now).
+
+    priority
+
+        priority => 5
+
+      Job priority.
+
+    queue
+
+        queue => 'important'
+
+      Queue to put job in.
+
+ stats
+
+      my $stats = $backend->stats;
+
+    Get statistics for jobs and workers.
+
+    These fields are currently available:
+
+    active_jobs
+
+        active_jobs => 100
+
+      Number of jobs in active state.
+
+    active_workers
+
+        active_workers => 100
+
+      Number of workers that are currently processing a job.
+
+    delayed_jobs
+
+        delayed_jobs => 100
+
+      Number of jobs in inactive state that are scheduled to run at
+      specific time in the future or have unresolved dependencies. Note
+      that this field is EXPERIMENTAL and might change without warning!
+
+    enqueued_jobs
+
+        enqueued_jobs => 100000
+
+      Rough estimate of how many jobs have ever been enqueued. Note that
+      this field is EXPERIMENTAL and might change without warning!
+
+    failed_jobs
+
+        failed_jobs => 100
+
+      Number of jobs in failed state.
+
+    finished_jobs
+
+        finished_jobs => 100
+
+      Number of jobs in finished state.
+
+    inactive_jobs
+
+        inactive_jobs => 100
+
+      Number of jobs in inactive state.
+
+    inactive_workers
+
+        inactive_workers => 100
+
+      Number of workers that are currently not processing a job.
+
+ unregister_worker
+
+      $backend->unregister_worker($worker_id);
+
+    Unregister worker.
+
+ worker_info
+
+      my $worker_info = $backend->worker_info($worker_id);
+
+    Get information about a worker, or return undef if worker does not
+    exist.
+
+      # Check worker host
+      my $host = $backend->worker_info($worker_id)->{host};
+
+    These fields are currently available:
+
+    host
+
+        host => 'localhost'
+
+      Worker host.
+
+    jobs
+
+        jobs => ['10023', '10024', '10025', '10029']
+
+      Ids of jobs the worker is currently processing.
+
+    notified
+
+        notified => 784111777
+
+      Epoch time worker sent the last heartbeat.
+
+    pid
+
+        pid => 12345
+
+      Process id of worker.
+
+    started
+
+        started => 784111777
+
+      Epoch time worker was started.
+
+    status
+
+        status => {queues => ['default', 'important']}
+
+      Hash reference with whatever status information the worker would like
+      to share.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2015 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Minion, Mojo::SQLite
+

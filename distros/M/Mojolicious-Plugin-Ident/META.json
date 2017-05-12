@@ -1,0 +1,67 @@
+{
+   "abstract" : "Mojolicious plugin to interact with a remote ident service",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Ident",
+   "no_index" : {
+      "directory" : [
+         "example"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "v5.10.0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "EV" : "0"
+         },
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::Ident" : "0.04",
+            "EV" : "0",
+            "Mojolicious" : "5.73",
+            "perl" : "v5.10.0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "EV" : "0"
+         },
+         "requires" : {
+            "AnyEvent::Ident" : "0.04",
+            "Mojolicious::Lite" : "0",
+            "Test::Mojo" : "0",
+            "Test::More" : "0.94",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/Mojolicious-Plugin-Ident/issues"
+      },
+      "homepage" : "http://perl.wdlabs.com/Mojolicious-Plugin-Ident",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/Mojolicious-Plugin-Ident.git",
+         "web" : "https://github.com/plicease/Mojolicious-Plugin-Ident"
+      }
+   },
+   "version" : "0.31"
+}
+

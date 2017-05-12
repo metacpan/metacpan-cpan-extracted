@@ -1,0 +1,19 @@
+[% RETURN UNLESS object.hasa_columns %]
+[% labels = config.table_labels %]
+
+<div class="fleft">
+
+[% FOREACH related_accessor IN object.hasa_columns %]
+[% accessor_name = related_accessor.name %]
+[% related = object.$accessor_name %] 
+[% table = related.table %]
+<fieldset>
+<legend>[% labels.$table  %] for [% object.moniker %]: [% object %]</legend>
+[% request.as_form( 'edit_all_has_a', 
+	entity =   related, 
+	mode_args =  { parent =  object } ).render 
+%]
+</fieldset>
+[% END %]
+
+</div>

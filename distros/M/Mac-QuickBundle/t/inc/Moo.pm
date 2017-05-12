@@ -1,0 +1,3 @@
+package Moo;
+
+1;

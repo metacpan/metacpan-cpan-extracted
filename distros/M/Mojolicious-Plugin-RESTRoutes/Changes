@@ -1,0 +1,56 @@
+Revision history for perl module Mojolicious-Plugin-RESTRoutes
+
+1.0.0 2017-01-19
+ [REVISION]
+ - Log controller name in camelized form
+
+0.010012 2015-03-09
+ [+ENHANCEMENTS]
+ - New parameter "route" allows to specify route component string (to
+   overwrite default of using english plural form of "name")
+ - Test code for new parameter "route"
+
+ [BUG FIXES]
+ - remove unneccessary runtime dependencies
+ - Documentation talked about prefix /api/ which was not use in doc
+   examples
+ - Mojolicious 6: replaced ->bridge() with ->under()
+ - Mojolicious 6: Obviously the ways to specify the controller name are
+   different now
+
+0.010011 2015-01-23
+ [+ENHANCEMENTS]
+ - Route parameters are now fed into a stash entry "fm.ids"
+
+ [DOCUMENTATION]
+ - More detailed usage doc
+
+0.010010 2014-04-10
+ [DOCUMENTATION]
+ - added another missing entry into this changelog ;-)
+
+0.010009 2014-04-09
+ [DOCUMENTATION]
+ - added two missing entries into this changelog
+
+0.010008 2014-04-09
+ [BUG FIXES]
+ - #90860: Removed "use MojoX::Log::Log4perl;" from 10_basic.t (thanks to
+   dsteinbrunner)
+ - #87336: Failed with perls < 5.14 (thanks to ANDK)
+
+ [DOCUMENTATION]
+ - fixed some spelling and words
+
+ [REVISION]
+ - turned "info" logging into "debug" logging
+
+0.010007 2014-04-09
+ [REVISION]
+ - now using my own Dist::Zilla plugin bundle @Author::MAXHQ
+ - updated to work with newest Mojolicious (replaced "$self->secret" with
+   "$self->secrets")
+
+0.0100065 2013-06-26
+ [REVISION]
+ - initial CPAN release

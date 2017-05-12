@@ -1,0 +1,196 @@
+Revision history for Module-Starter-Plugin-CGIApp
+
+
+0.44    Sun Sep 20 05:09:32 EDT 2015
+
+        *sigh* git screwup means some of the metadata might not actually match
+        what's in the package.  Uploading a new version just to be sure.
+
+0.43    Sun Sep 20 04:43:35 EDT 2015
+
+        Internal:
+        ---------
+
+        Fixed to work with newer versions of Module-Starter. RT #101984, #66240
+
+        Added dependency on Module::Starter >= 1.70
+
+        In Created distributions:
+        -------------------------
+
+        t/boilerplate.t is added to MANIFEST.
+
+        More work still needs to be done for Module-Starter parity...
+
+0.42	Wed May 16 19:17:15 EDT 2012
+
+        Internal:
+        ---------
+
+        The license of this module is "Same as Perl" which somewhere along
+        the line I thought meant GPL 2+/Artistic 2+ when actually it is
+        GPL 1+/Artistic 1+.  This is now fixed in all the relevant places.
+
+        In Created distributions:
+        -------------------------
+
+        The same license confusion occurred here too.  Fixed.
+
+0.41    Thu May 10 23:54:01 EDT 2012
+
+        Internal:
+        ---------
+
+        Forgot to mention File::ShareDir as a dependency.
+
+        While I'm at it, I normalized the format of copyright statements
+        everywhere and updated the copyright year of this distro to 2012.
+
+0.40    Thu May 10 22:58:23 EDT 2012
+
+        Internal:
+        ---------
+
+        Breakage caused by newer versions of Module::Starter (RT#71734) has
+        been fixed.
+
+        Module has been updated to use the latest features of Module::Starter.
+
+        Author tests have been moved into xt directory and brought up to
+        current best practices.
+
+        Templates have been moved into a share directory using File::ShareDir.
+
+        Templates have been improved in various minor ways.
+
+        In Created distributions:
+        -------------------------
+
+        Author tests are brought up to current best practices and now go into
+        the xt directory so they don't have to be run by end users.
+
+        Templates go into a shared directory using File::ShareDir instead
+        of the old method of putting them in @INC
+
+        Instead of pgp.mit.edu, t/00-signature.t will now use
+        pool.sks-keyservers.net for key queries.
+
+        MANIFEST.SKIP will also skip .git
+
+0.30    Sat Mar  6 22:54:25 EST 2010
+        cgiapp-starter and titanium-starter had got broken during the last
+        release due to an errant local and were unable to find the default
+        template directory. They should work correctly now.
+
+        t/boilerplate.t in generated dists had got broken during the last
+        set of updates.  It should work correctly now.  It will now also
+        check that you do not have a boilerplate abstract in your buildscript.
+
+        Previously there was support for a generated dist with multiple
+        modules but it didn't really work.  Now it does.  This justifies
+        a bump in the version number I think.
+
+        The RT address in generated modules (for bug reporting) is based on
+        the distro name instead of the module name now.
+
+0.22    Thu Mar  4 01:52:09 EST 2010
+        t/00-signature.t was wrong in the module and generated dists.
+        Now it will only be carried out if the envvar TEST_SIGNATURE is set.
+
+        Unneeded dependencies deleted from the build scripts in the module
+        and generated dists.
+
+        README in the module and generated dists updated to reflect these
+        changes.
+
+0.21    Wed Mar  3 15:28:02 EST 2010
+        Fixed test failures on Windows (and possibly other platforms with
+        disgusting perverted non-unixy line endings.)  Thanks csjewell,
+        jdb, and samuraijack on #win32@irc.perl.org and almut, ambrus, and
+        banesong on Perl Monks for their help in solving these problems.
+        
+        Upped the recommended perl version to 5.008.
+
+0.20    Sun Feb 28 14:02:44 EST 2010
+        t/test-app.t in generated dists now passes an object to $mech->app
+        to match what is done is server.pl
+        
+        Tests in generated dists now follow Test::XT recommendations.
+        
+        If the license of a generated dist is 'perl', the license blurb in
+        the module and README explicitly mentions GPL+Artistic instead of
+        just 'same as perl'.  A LICENSE file is added to the dist where you
+        can put the license terms.
+
+        Hopefully the problem with Build mistakenly trying to run the 
+        Makefile.PLs from templates is resolved.
+
+        Revamped test suite should be more comprehensive than before.  In
+        line with Test::XT recommendations, test relevant to the author
+        only, will be skipped unless envvar RELEASE_TESTING=1.  See README.
+
+0.10    Thu Jan 15 21:12:55 EST 2009
+        Added a placeholder file in t/www in generated distributions as the
+        empty directory was causing error messages.
+        
+        More build fixes for Windows.  I think I actually have got it right
+        this time.  One problem remains.  Tests will fail if the directory 
+        path to where you have unpacked the module has spaces anywhere in it.
+        What's up with that?
+        
+        Ensured that MANIFEST in generated distributions always uses / as the
+        directory seperator regardless of operating system.
+
+        Added some entries to MANIFEST.SKIP in generated distributions to
+        stop the signature test from failing under Windows.
+        
+        Thanks to Ron Savage and Cosimo Streppone from the cgiapp list and
+        ikegami, cdarke, and andreas1234567 on Perl Monks for their help in 
+        solving Windows issues.
+        
+0.08    Fri Jan  9 18:24:07 EST 2009
+        This version just has changes to the build process which hopefully
+        will make it work better under Windows.
+
+0.07    Mon Jan  5 17:24:30 EST 2009
+        No longer build depends on Test::Builder.
+        
+        By popular demand, templates use $self instead of $c.
+        
+        Distributions now include a directory, t/www for static files.
+        server.pl has been updated to use it.
+        
+        Some fixes to tests so the module will build correctly on Windows
+        thanks to David Scott <leapingfrog@yahoo.com>
+
+        Some extra documentation for building on Windows added.
+
+        HELP WANTED: despite my best efforts, I am not sure this module is 
+        working correctly under Windows.  If you find problems, please
+        submit a bug report, or even better, a fix.
+
+0.05    Thu Sep 18 22:24:00 EDT 2008
+        Added cgiapp_starter script thanks to Mark Stosberg 
+        <mark@summersault.com>
+        
+        Building with Module::Install and ExtUtils::MakeMaker should work 
+        properly now.
+        
+        Added some tests so we can check if the modules we are building are 
+        actually complete.
+
+        Removed cvsignore from the default templates.
+        
+        Generated distributions will now include a CGI::Application::Server 
+        script to use as a development server.
+
+        Generated distributions no longer require Test::Builder.
+        
+        Added a set of templates that use Titanium instead of CGI::Application.
+        Also added titanium-starter which works like cgiapp-starter but uses 
+        the Titanium templates.
+        
+0.01    Sun Mar 23 02:18:51 EDT 2008
+        First version, released on an unsuspecting world.
+        Creating modules that use ExtUtils::MakeMaker or Module::Install
+        is probably buggy.  Please send bug reports and patches.

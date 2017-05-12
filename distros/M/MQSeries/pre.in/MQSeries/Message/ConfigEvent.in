@@ -1,0 +1,91 @@
+#-*-perl-*-
+#
+# $Id: ConfigEvent.in,v 33.4 2012/09/26 16:15:31 jettisu Exp $
+#
+# (c) 2002-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+package MQSeries::Message::ConfigEvent;
+
+%ResponseParameters = 
+  (
+   #
+   # These are unqiue for PCF v2 events
+   #
+   &MQBACF_EVENT_ACCOUNTING_TOKEN       => 'EventAccountingToken',
+   &MQCACF_EVENT_APPL_IDENTITY          => 'EventApplIdentity',
+   &MQCACF_EVENT_APPL_NAME              => 'EventApplName',
+   &MQCACF_EVENT_APPL_ORIGIN            => 'EventApplOrigin',
+   &MQIACF_EVENT_APPL_TYPE              => 'EventApplType',
+   &MQIACF_EVENT_ORIGIN                 => 'EventOrigin',
+   &MQCACF_EVENT_Q_MGR                  => 'EventQMgr',  
+   &MQCACF_EVENT_USER_ID                => 'EventUserid',
+
+   #
+   # This is necesary to translate the object type, so we can
+   # look up most keys in PCF command structures.
+   #
+   &MQIACF_OBJECT_TYPE                  => 'ObjectType', 
+
+   #
+   # The below do not have PCF command equivalents on Unix.  We might
+   # want to add them to the PCF response parameter tables...
+   #
+   &MQCA_ALTERATION_DATE                => 'AlterationDate',
+   &MQCA_ALTERATION_TIME                => 'AlterationTime',
+   &MQCA_CF_STRUC_DESC                  => 'CFStructDesc',
+   &MQCA_CF_STRUC_NAME                  => 'CFStructName',
+   &MQCA_IGQ_USER_ID                    => 'IntraGroupUser',
+   &MQCA_QSG_NAME                       => 'QSharingGroupName',
+   &MQCA_STORAGE_CLASS                  => 'StorageClassName',
+
+   &MQIA_CF_LEVEL                       => 'CFStructLevel',
+   &MQIA_CF_RECOVER                     => 'Recovery',
+   &MQIA_EXPIRY_INTERVAL                => 'ExpiryInterval',
+   &MQIA_IGQ_PUT_AUTHORITY              => 'IntraGroupAuthority',
+   &MQIA_INDEX_TYPE                     => 'IndexType',
+   &MQIA_INTRA_GROUP_QUEUING            => 'IntraGroupQueueing',
+   &MQIA_PAGESET_ID                     => 'PageSetId',
+   &MQIA_QSG_DISP                       => 'QSharingGroupDisposition',
+   &MQIA_SSL_TASKS                      => 'SSLTasks',
+   &MQCA_XCF_GROUP_NAME                 => 'XCFGroupName',
+   &MQCA_XCF_MEMBER_NAME                => 'XCFMemberName',
+
+   &MQIACH_KEEP_ALIVE_INTERVAL          => 'KeepAliveInterval',
+  );
+
+
+#
+# We only include enums that we either need to get the object type, or
+# that would not be included in the normal PCF command set.
+#
+%ResponseEnums =
+  (
+
+   EventOrigin =>
+   { 
+    &MQEVO_CONSOLE      => "MQEVO_CONSOLE - Console",
+    &MQEVO_INIT         => "MQEVO_INIT - Initialization input data set",
+    &MQEVO_INTERNAL     => "MQEVO_INTERNAL - Directly by queue manager",
+    &MQEVO_MQSET        => "MQEVO_MQSET - MQSET call",
+    &MQEVO_MSG          => "MQEVO_MSG - Message on SYSTEM.COMMAND.INPUT",
+    &MQEVO_OTHER        => "MQEVO_OTHER - Other",
+   },
+
+   ObjectType =>
+   {
+    &MQOT_AUTH_INFO     => "AuthInfo",
+    &MQOT_CF_STRUC      => "CFStruct",
+    &MQOT_CHANNEL       => "Channel",
+    &MQOT_NAMELIST      => "Namelist",
+    &MQOT_PROCESS       => "Process",
+    &MQOT_Q             => "Queue",
+    &MQOT_Q_MGR         => "QueueManager",
+    &MQOT_STORAGE_CLASS => "StorageClass",
+   },
+
+  );
+
+
+1;

@@ -1,0 +1,5 @@
+TODO list for Perl module Mail::Log::Exceptions
+
+- Write enough of a 'stub' that Exception::Class isn't technically required.
+- Write tests for the above.
+

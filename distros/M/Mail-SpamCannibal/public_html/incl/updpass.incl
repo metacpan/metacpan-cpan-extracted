@@ -1,0 +1,36 @@
+<center>
+<form name=UpdPass action="" method=POST>
+<table border=0>
+<tr><td>
+<font size="-1">User Name:</font><br>
+<input type=text name=newuser>
+</td><td rowspan=5>If admin management is enabled:
+<p>
+A new admin can be added by entering<br>
+a new admin name with <b>new password</b>.<br>
+Entering any text as <b>old password</b><br>
+(<i>Enter Password</i>) will force complex<br>
+validation of the new password, otherwise<br>
+leave it blank for no complexity checking.
+<p>
+An admin may be deleted by entering<br>
+the user name with blank passwords.
+</td></tr>
+<tr><td>
+<font size="-1">Enter Password:</font><br>
+<input type=password name=oldpasswd><br>&nbsp;</td></tr>
+<tr><td>
+<font size="-1">New Password:</font><br>
+<input type=password name=passwd></td></tr>
+<tr><td>
+<font size="-1">Repeat Password:</font><br>
+<input type=password name=passwd2></td></tr>
+<tr><td align=center>
+<input type=submit value=UPDATE onClick="document.UpdPass.action = location.pathname;"></td></tr>
+</table>
+<input type=hidden name=page value=usrupd>
+</form>
+</center>
+<script language=javascript1.1>
+document.UpdPass.oldpasswd.focus();
+</script>

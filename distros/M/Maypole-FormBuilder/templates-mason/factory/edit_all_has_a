@@ -1,0 +1,19 @@
+% return unless $object->hasa_columns;
+% my $labels = $config->table_labels;
+
+<div class="fleft">
+
+% foreach my $related_accessor ( map { $_->name } $object->hasa_columns ) {
+% my $related = $object->$related_accessor; 
+
+<fieldset>
+<legend><% $labels->{ $related->table } %> for <% $object->moniker %>: <% $object %></legend>
+<% $request->as_form( 'edit_all_has_a', entity => $related, mode_args => { parent => $object } )->render %>
+</fieldset>
+% }
+
+</div>
+
+<%args>
+    $object
+</%args>

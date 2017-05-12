@@ -1,0 +1,49 @@
+---
+abstract: 'mod_perl2 Web Application Framework'
+author:
+  - 'Sergey Lepenkov (Serz Minus) <minus@serzik.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.6
+  Test::More: 0.94
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.96, CPAN::Meta::Converter version 2.120921'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MPMinus
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  DBI: 0
+  Data::Dumper: 0
+requires:
+  Apache::DBI: 1.11
+  Archive::Extract: 0.6
+  CGI: 3.6
+  CTK: 1.12
+  Config::General: 2.5
+  Digest: 1.16
+  Digest::MD5: 2.36
+  ExtUtils::Manifest: 1.58
+  File::Copy: 2.09
+  File::Copy::Recursive: 0.38
+  File::Temp: 0.22
+  MIME::Lite: 3
+  Perl::OSType: 1
+  TemplateM: 3.03
+  Text::SimpleTable: 2.03
+  Try::Tiny: 0.07
+  URI: 1.5
+  YAML: 0.73
+  mod_perl2: 2
+  perl: 5.008001
+resources:
+  homepage: http://www.serzik.com
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: http://svn.serzik.com/MPMinus/trunk
+version: 1.20

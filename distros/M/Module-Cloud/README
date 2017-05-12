@@ -1,0 +1,57 @@
+NAME
+    Module::Cloud - Generates a tag cloud for modules used in given code
+
+VERSION
+    version 1.100861
+
+SYNOPSIS
+      use Module::Cloud;
+      my @dirs = qw(foo bar baz);
+      my $clouder = Module::Cloud->new(dir => \@dirs);
+      my $cloud = $clouder->get_cloud;  # returns an HTML::TagCloud object
+      print $cloud->html_and_css;
+
+DESCRIPTION
+    This class traverses the given directories, searches for perl code,
+    extracts the modules used by this code and generates a HTML::TagCloud
+    object that gives an impression of how often each module is used.
+
+METHODS
+  get_cloud
+      my $cloud = $clouder->get_cloud;
+
+    Traverses the directories set on the "dir" accessor and searches for
+    files containing perl code. For each such file, the modules it uses are
+    extracted. From this data a HTML::TagCloud object is created and
+    returned. The more often a module is used the bigger it will appear in
+    the tag cloud.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Module-Cloud>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see <http://search.cpan.org/dist/Module-Cloud/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Module-Cloud/>. Instead of sending patches,
+    please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2007 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,89 @@
+
+<div class="container-fluid">
+    <div class="row">
+
+        <div class="col-md-6">
+
+            <p>A message bus is a many-to-many message pattern. Requesting a
+            WebSocket from the URL <code>/bus/fry</code> joins the peer-to-peer
+            message bus topic <code>fry</code>. All peers joined to the same
+            topic will receive all the messages published to that topic by
+            other peers.</p>
+
+        </div>
+
+        <div class="col-md-6">
+
+            <p>Open another browser window to see messages pass between
+            windows.</p>
+
+        </div>
+
+    </div>
+    <div class="row">
+
+        <div class="col-md-6">
+            <h2>Peer 1</h2>
+            <p>Type in a topic and a message and press Enter to send to that
+            topic.</p>
+
+            <form id="peer-1-form" class="peer-form">
+                <div id="peer-1-topic-field" class="form-group has-feedback">
+                    <label for="peer-1-topic">Topic: </label>
+                    <div class="input-group">
+                        <span class="input-group-addon">/bus/</span>
+                        <input type="text" id="peer-1-topic" class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message: </label>
+                    <div class="input-group">
+                        <input type="text" id="peer-1-message" class="form-control" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary">Send</button>
+                        </span>
+                    </div>
+                </div>
+            </form>
+            <div id="peer-1-log" class="log"></div>
+        </div>
+
+        <div class="col-md-6">
+            <h2>Peer 2</h2>
+            <p>Type in a topic and a message and press Enter to send to that
+            topic.</p>
+
+            <form id="peer-2-form" class="peer-form">
+                <div id="peer-2-topic-field" class="form-group has-feedback">
+                    <label for="peer-2-topic">Topic: </label>
+                    <div class="input-group">
+                        <span class="input-group-addon">/bus/</span>
+                        <input type="text" id="peer-2-topic" class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message: </label>
+                    <div class="input-group">
+                        <input type="text" id="peer-2-message" class="form-control" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary">Send</button>
+                        </span>
+                    </div>
+                </div>
+            </form>
+            <div id="peer-2-log" class="log"></div>
+        </div>
+
+    </div>
+</div>
+
+%= javascript begin
+
+    $(function(){
+        $( '.peer-form' ).on( 'submit', function ( e ) {
+            var id = e.target.id.substr( 0, 6 );
+            connect_recv( e, id, '<%= url_for( 'bus' )->path %>' );
+        } );
+    });
+
+% end

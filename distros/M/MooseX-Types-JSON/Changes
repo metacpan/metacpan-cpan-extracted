@@ -1,0 +1,23 @@
+Revision history for MooseX::Types::JSON;
+
+1.00   2014-08-22
+       - bump version to 1.00
+
+0.06   2014-08-19
+       - add JSON Prereq as AutoPrereqs does not find it
+
+0.05   2014-08-18
+       - work around namespace problems in older perls ( < 5.18.0 )
+
+0.04   2014-08-16
+       - dropped dependency on JSON::XS
+
+0.03   2014-01-05
+       - convert distribution to use Dist::Zilla
+       - Add type coercions (patch from SHUFF)
+
+0.02   2009-10-25
+       - Fix whitespace in pod
+
+0.01   2009-10-25
+       - Initial release

@@ -1,0 +1,15 @@
+---
+
+exclusions:
+    
+    modules:
+        
+        Honeypot:
+            sender_domain:
+                - senderdont.tld
+            recipient_domain:
+                - recipientdont.tld
+    
+    file: exclusions.txt
+    
+    database: 1

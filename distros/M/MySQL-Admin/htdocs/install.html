@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Install</title>
+<script type="text/javascript" src="javascript/cms.js" charset="utf-8"></script>
+<link href="style/mysql/mysql_admin.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" charset="utf-8">
+//<!--
+// defaultAction ='news';
+m_blogin = false;
+function initInstaller()
+{
+  requestURI('cgi-bin/install.pl','Install','Install');
+}
+//-->
+</script>
+<style>
+.install{
+  padding:3%;
+  text-align:center;
+  background-color:rgba(255,255,255,0.4);
+  vertical-align:top;
+  overflow: auto;
+  -webkit-border-bottom-left-radius:15px;  
+  -webkit-border-bottom-right-radius:15px;
+  -moz-border-bottom-left-radius:15px;  
+  -moz-border-bottom-right-radius:15px;
+  border-bottom-left-radius:15px;  
+  border-bottom-right-radius:15px;
+}
+</style>
+</head>
+<body onload="initInstaller()" style="padding:5%">
+<div class="ShowTables">
+<div style="text-align:left;padding:1%;padding-left: 1%;border-bottom:1px solid black;">
+<img onclick="location.href='index.html';" src="images/logo.png" alt="MySQL-Admin" style="cursor:pointer"/>
+</div>
+Username and Passwort will be set through Installation.
+<div id="errorMessage"></div>
+<div id="content" class="install"></div>
+</div>
+<div class="popup" id="popup" style="display:none;">
+<div id="popupContent1" class="popupContent1" align="right">
+<div class="popupCaption">
+<div id="popupTitle" class="popupTitle" style="float:left"></div>
+<div id="closeButton" class="closeButton">X</div>
+</div>
+<div id="popupContent" class="popupContent"></div>
+</div>
+</div>
+</div>
+</body>
+</html>

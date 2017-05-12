@@ -1,0 +1,25 @@
+Version 1.05: 
+       - public source moved to https://github.com/lstein/MP3-PodcastFetch
+       - add patch for adding ability to override channel directories,
+          per https://rt.cpan.org/Public/Bug/Display.html?id=70873
+       - add patch for url-decoding downloaded files, as per RT 
+	  https://rt.cpan.org/Public/Bug/Display.html?id=56306
+       - add patch to fix perldoc rendering as per RT 
+          https://rt.cpan.org/Public/Bug/Display.html?id=70872
+   
+Version 1.04:
+	- Patch from Igor Okunev to add callbacks that execute right after
+	a file is created or deleted.
+	
+Version 1.03:
+	- Patch from Thierry Walrant to provide support for proxy
+	settings from environment variables.
+
+Version 1.02: Wed Jan 31 16:26:31 CET 2007
+	- Added a missing duration() method to
+	MP3::PodcastFetch::Feed::Channel to prevent crashing on RSS
+	feeds with an <itunes:duration> tag.
+
+Version 1.01: January 2, 2007
+	- First released version.
+

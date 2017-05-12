@@ -1,0 +1,13 @@
+# to generate a manifest run:
+#   perl -e 'use ExtUtils::Manifest qw(mkmanifest); mkmanifest();'
+.*.cvsignore
+.~
+.*.old
+.*.bak
+.*Makefile$
+.*CVS
+.*\.#
+.svn
+pm_to_blib
+.*.tar.gz
+DOCUMENTATION.sh

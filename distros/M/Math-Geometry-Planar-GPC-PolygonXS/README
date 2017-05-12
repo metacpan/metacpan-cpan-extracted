@@ -1,0 +1,116 @@
+NAME
+    Math::Geometry::Planar::GPC::Polygon - OO wrapper to gpc library
+
+Status
+    Successfully used in minor production use under perl 5.6.1 and 5.8.3.
+    Your mileage may vary (see NO WARRANTY.)
+
+AUTHOR
+      Eric L. Wilhelm
+      ewilhelm at sbcglobal dot net
+      http://pages.sbcglobal.net/mycroft/
+
+Copyright
+    Copyright 2004 Eric L. Wilhelm
+
+License
+    This module and its C source code (functions.c) are distributed under
+    the same terms as Perl. See the Perl source package for details.
+
+    You may use this software under one of the following licenses:
+
+      (1) GNU General Public License
+        (found at http://www.gnu.org/copyleft/gpl.html)
+      (2) Artistic License
+        (found at http://www.perl.com/pub/language/misc/Artistic.html)
+
+    The General Polygon Clipping library (gpc.c and gpc.h) is distributed as
+    "free for non-commercial use". See gpc.c for details. A copy of these
+    files has been included with this distribution strictly for convenience
+    purposes, but YOU ARE RESPONSIBLE FOR ADHERING TO BOTH THE GPC LICENSE
+    AND THE LICENSE OF THIS MODULE. Note that the C library is authored by
+    Alan Murta.
+
+    You may want to check the GPC home page for a more current version:
+
+      http://www.cs.man.ac.uk/aig/staff/alan/software/
+
+Portability
+    This module successfully compiles on i386 and solaris architectures
+    according to the cpan testers results. Hopefully, versions after 0.04
+    will work on WIN32. I don't have any non-linux machines, so feel free to
+    send patches.
+
+NO WARRANTY
+    This code comes with ABSOLUTELY NO WARRANTY of any kind.
+
+Changes
+      0.01 - First public release.
+      0.02 - Added API documentation.
+      0.03 - Fix to allocation error.
+             Possibly Fixed WIN32 compile problem?
+      0.04 - Twiddling with WIN32 compile problem (last try)
+      0.05 - Corrected license statements.
+
+Constructors
+  new
+    Traditional constructor, returns a blessed reference to the underlying C
+    struct.
+
+      use Math::Geometry::Planar::GPC::Polygon;
+      my $gpc = Math::Geometry::Planar::GPC::Polygon->new();
+
+  new_gpc
+    An optionally imported constructor, for those of you who don't like to
+    type so much.
+
+      use Math::Geometry::Planar::GPC::Polygon qw(new_gpc);
+      my $gpc = new_gpc();
+
+Bound Functions
+    These are the functions provide by the Inline-C code. See functions.c in
+    the source package for intimate details.
+
+  from_file
+    Loads a from a file into your gpc object. See the GPC library
+    documentation for details.
+
+      $gpc->from_file($filename, $want_hole);
+
+  to_file
+    Writes to a file.
+
+      $gpc->to_file($filename, $want_hole);
+
+  clip_to
+    Clips the $gpc object to the $othergpc object.
+
+    $action may be any of the following:
+
+      INTERSECT
+      DIFFERENCE
+      UNION
+
+      $gpc->clip_to($othergpc, $action);
+
+    Be wary. This interface may need to change.
+
+  add_polygon
+    Adds a polygon to the gpc object. @points is a list of array references
+    which describe the point of the polygon. $hole is 1 or 0 (0 to not add a
+    hole.)
+
+      $gpc->add_polygon(\@points, $hole);
+
+  get_polygons
+    Gets the polygons from the gpc object. I'm not sure how to tell you if
+    they are holes or not. @pgons will be a list of refs to lists of refs.
+
+      @pgons = $gpc->get_polygons();
+
+Helper Functions
+    Pure-perl implementation from here down.
+
+  as_string
+      $gpc->as_string();
+

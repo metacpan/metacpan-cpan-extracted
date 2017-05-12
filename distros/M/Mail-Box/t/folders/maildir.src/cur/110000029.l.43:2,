@@ -1,0 +1,77 @@
+Received: from ns.ATComputing.nl (ns.ATComputing.nl [195.108.229.25])
+	by atcmpg.ATComputing.nl (8.9.0/8.9.0) with ESMTP id QAA28389
+	for <markov@ATComputing.nl>; Mon, 3 Jul 2000 16:12:41 +0200 (MET DST)
+Received: (from nobody@localhost)
+	by ns.ATComputing.nl (8.8.8/8.8.8) id QAA05092
+	for <markov@ATComputing.nl>; Mon, 3 Jul 2000 16:12:40 +0200
+Received: from mustang.oldcity.dca.net(216.158.38.3) by ns.ATComputing.nl via smap (V2.1)
+	id xma005088; Mon, 3 Jul 00 16:12:32 +0200
+Received: from unca-don.wizards.dupont.com ([204.183.81.133])
+	by mustang.oldcity.dca.net (8.9.3/8.9.3/DCANET) with ESMTP id KAA12560;
+	Mon, 3 Jul 2000 10:12:03 -0400
+Received: (from majordomo@localhost)
+	by unca-don.wizards.dupont.com (8.9.3/8.9.3) id KAA20768
+	for magick-outgoing; Mon, 3 Jul 2000 10:01:07 -0400 (EDT)
+X-Authentication-Warning: unca-don.wizards.dupont.com: majordomo set sender to owner-magick@wizards.dupont.com using -f
+Message-ID: <395BACF9.CFA6970@interak.com>
+Date: Thu, 29 Jun 2000 12:09:30 -0800
+From: Marc Grober <marc@interak.com>
+X-Mailer: Mozilla 4.61 [en] (X11; I; UnixWare 5 i386)
+MIME-Version: 1.0
+To: magick@wizards.dupont.com
+Subject: printing solution for UW 7.1
+Content-Transfer-Encoding: 7bit
+Sender: owner-magick@wizards.dupont.com
+Precedence: bulk
+Reply-To: Marc Grober <marc@interak.com>
+Content-Type: text/plain; charset=us-ascii
+Status: RO
+Content-Length: 1500
+Lines: 46
+
+Under unixware to print from displayt to an HP laserjet (usual command
+to print postscript being
+lp -dhpraw -Tpostscript),  I changed the delegates.mgk file (which I
+found in /usr/local/share/Magick as installed from the SCO skunkware CD)
+from
+
+ps<=print
+       /usr/bin/lp -c -s %i
+
+to
+
+ps<=print
+        /usr/bin/lp -dhpraw -c -s -Tpostscript %i
+
+and  it appears everything is working.  The -c make an immediate copy
+and feeds it to the spooler and without it you get an error message
+(below) which my guess is is a bit misleading in that I have to assume
+that what is really happening is that without the -c IM is not passing
+anything to the spooler........
+
+******************************************************************************
+
+Subject: Status of lp request hpraw-347
+
+        Your request hpraw-347 destined for hpraw
+        encountered an error during filtering.
+
+        Reason for failure:
+
+        UX:lp:   ERROR: Cannot read the file "/tmp/hacienda.jpg".
+        TO FIX: See if it still exists and is readable, or
+                consult your system administrator.
+
+
+I have tried this with jpegs, gifs etc and in quite a number of
+locations
+Placed the -c -s back in
+
+
+***********************************************************************
+To remove yourself from this mailing list, send mail to:
+	majordomo@wizards.dupont.com
+
+Include the following command in the body of your message:
+	unsubscribe magick
+***********************************************************************

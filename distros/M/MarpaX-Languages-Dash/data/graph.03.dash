@@ -1,0 +1,11 @@
+# Juxtapositioned edges (with and without commas). OK.
+[node.1] {label: "n 1"}
+-> {label: 'e 1'}
+-> {label: e 2}
+[] {label: n 2}
+-> {label  :  e 3}
+[node.3] {label: "n 3"}
+-> {label: 'e 4'},
+-> {label: e 5}
+[] {label: n 2}
+-> {label  :  e 6}

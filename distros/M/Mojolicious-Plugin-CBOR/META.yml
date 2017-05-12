@@ -1,0 +1,26 @@
+---
+abstract: 'render a CBOR response with Mojolicious'
+author:
+  - 'Konstantin Cherednichenko <dshadow@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '6.46'
+  File::FindLib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-CBOR
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CBOR::XS: '1.25'
+  Mojolicious: '5.31'
+resources:
+  repository: http://github.com/dshadow/mojolicious-plugin-cbor
+version: '0.04'

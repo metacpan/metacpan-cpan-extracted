@@ -1,0 +1,206 @@
+chunk
+stat list
+stat
+keyword while
+while
+exp
+Number
+1
+keyword do
+do
+block
+chunk
+stat list
+stat list
+stat list
+stat list
+stat
+keyword local
+local
+namelist
+Name
+s
+optional namelist initialization
+=
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+read
+args
+(
+optional explist
+)
+stat
+keyword if
+if
+exp
+exp
+var
+Name
+s
+==
+exp
+keyword nil
+nil
+keyword then
+then
+block
+chunk
+laststat
+keyword break
+break
+elseif sequence
+optional else block
+keyword end
+end
+stat
+keyword local
+local
+namelist
+Name
+ok
+Name
+_
+Name
+l
+Name
+op
+Name
+g
+optional namelist initialization
+=
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+string
+.
+Name
+find
+args
+(
+optional explist
+explist
+exp
+var
+Name
+s
+exp
+String
+double quoted string
+"%[%-?(%d*)%]%s*([GS])ETGLOBAL.-;%s+(.*)$"
+)
+stat
+keyword if
+if
+exp
+var
+Name
+ok
+keyword then
+then
+block
+chunk
+stat list
+stat list
+stat
+keyword if
+if
+exp
+exp
+var
+Name
+op
+==
+exp
+String
+double quoted string
+"S"
+keyword then
+then
+block
+chunk
+stat list
+stat
+varlist
+var
+Name
+op
+=
+explist
+exp
+String
+double quoted string
+"*"
+elseif sequence
+optional else block
+keyword else
+else
+block
+chunk
+stat list
+stat
+varlist
+var
+Name
+op
+=
+explist
+exp
+String
+double quoted string
+""
+keyword end
+end
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+var
+Name
+g
+exp
+String
+double quoted string
+"\t"
+exp
+var
+Name
+l
+exp
+var
+Name
+op
+exp
+String
+double quoted string
+"\n"
+)
+elseif sequence
+optional else block
+keyword end
+end
+keyword end
+end

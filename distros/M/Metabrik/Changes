@@ -1,0 +1,227 @@
+Revision history for Perl extension Metabrik.
+
+1.26.0 Sat  4 Feb 17:27:20 CET 2017
+   - new: metabrik: brik_preinit_no_checks and brik_init_no_checks Commands
+
+1.25.1 Fri  4 Nov 07:14:33 CET 2016
+   - update: core::context: print reused Brik as info in reuse Command
+   - update: core::shell: capture_mode turned off by default:
+             it makes users uncertain of what is happening when executing external commands.
+
+1.25.0 Tue 11 Oct 19:03:53 CEST 2016
+   - bugfix: brik::tool update feature broke. We had to update version for that.
+
+1.24.1 Sat  8 Oct 16:02:36 CEST 2016
+   - bugfix: documentation for new cmd and full_pwd Commands in core::shell
+
+1.24.0 Thu  6 Oct 19:10:40 CEST 2016
+   - feature: metabrik: make local repository takes precedence over system repositories
+
+1.23.1 N/A
+   - bugfix: metabrik: add default repository to %INC so users can use it
+   - bugfix: core::context: check validity of %INC entries before reloading in reuse Command
+   - bugfix: core::shell: check an alias exists before trying to display it
+
+1.23.0 Tue  4 Oct 06:53:06 CEST 2016
+   - feature: core::shell: capture_mode new Attribute, default to true.
+              Captures every external Commands output by default.
+   - feature: core::shell: full_pwd new Command.
+              Returns the full path to current working directory.
+   - bugfix: core::context: sets $USE variable on use when a Brik requires dependencies
+   - bugfix: core::shell: handles correctly the exit Command so it returns a code number
+   - bugfix: core::global: sets repository Attribute default value
+   - bugfix: core::global: creates directories for default Attributes 
+             homedir, datadir and repository
+
+1.22.0 Fri Apr 15 18:09:26 CEST 2016
+   - feature: core::log: allow_log_override Attribute to allow overriding default log Brik
+              Turned off by default to avoid messing with logging.
+   - feature: core::log: caller_info_prefix, caller_verbose_prefix, ..., caller_debug_prefix 
+              Attributes to prefix log messages by Brik name (or not).
+   - bugfix: core::context: do initialize core::context from within new_brik_run Command
+   - new: core::log: message Command
+
+1.21.2 N/A
+   - bugfix: Metabrik: preinit and check_use_properties to be run only one time per Brik
+
+1.21.1 Wed Mar  2 07:46:01 CET 2016
+   - bugfix: core::shell: $HOME set to /tmp if not defined
+   - bugfix: core::log: must preinit before init for default Attributes values to be properly set
+   - bugfix: metabrik: checks properties and default Attribute values in brik_preinit:
+             $self->datadir can now be used from within brik_use_properties()
+
+1.21.0 Fri Feb  5 07:50:14 CET 2016
+   - feature: core::shell: ps1 Attribute to customize prompt (limited)
+   - bugfix: core::shell: run_run Command to call execute Command from shell::history and not 
+             exec Command
+   - update: core::log: brik_preinit() moved from Repository log::* so replacing a log Brik
+             by another one becomes transparent for users.
+   - update: Metabrik: more checks and verbose on Brik creation failure (when new() calls fail)
+
+1.20.5 Fri Jan 29 18:57:06 CET 2016
+   - bugfix: Metabrik: brik_help_run_empty_array_arg Command to check if Argument is an ARRAY
+
+1.20.4 Tue Jan 26 21:01:10 CET 2016
+   - update: metabrik: do not prefix help strings with Brik name nor Command name when user 
+             fails to use a Command the right wat
+   - bugfix: core::shell: display Brik name and Command name when user calls the help Command
+
+1.20.3 Tue Jan 19 14:17:32 CET 2016
+   - bugfix: makes logging to STDOUT unbuffered by default when using core::log
+
+1.20.2 Wed Jan 13 18:41:49 CET 2016
+   - bugfix: now truly disable all code to rewrite aliases to complete command: broken with 
+             Term::ReadLine::Gnu >= 1.27
+             And put alias_completion Attribute to 0 by default.
+
+1.20.1 Tue Jan 12 20:18:55 CET 2016
+   - bugfix: disabled code to rewrite aliases to complete command: broken with 
+             Term::ReadLine::Gnu >= 1.27
+
+1.20.0 Sat Jan  2 18:49:52 CET 2016
+   - FEATURE: core::context: allow one-liners with a Brik Command. Example:
+     perl -MMetabrik::Core::Context -e 'Metabrik::Core::Context->new_brik_run("client::dns", "mx_lookup", "gmail.com")'
+   - FEATURE: core::context: allow to pass Code, ARRAY or HASH as Argument to set Command
+   - FEATURE: core::global: repository Attribute to store default Briks repository
+   - FEATURE: easy update: thanks to brik::tool from Repository
+   - FEATURE: pod: most of the documentation is written
+   - FEATURE: Metabrik: need_packages and need_services Properties to easy installation of 
+              needed packages and services to start.
+   - UPDATE: Metabrik: only core::* Briks now, all others moved to Repository
+   - UPDATE: Metabrik: brik_preinit, brik_init and brik_fini are now official Commands
+   - new: Metabrik: brik_help_run_undef_arg, brik_help_run_invalid_arg, brik_help_run_empty_array_arg, brik_help_run_file_not_found, brik_help_set_undef_arg, brik_help_run_must_be_root and brik_help_run_directory_not_found Commands
+   - new: perl::module: use_test Attribute to activate test on module installation
+   - new: Metabrik: brik_checks and brik_help_run_must_be_root Commands
+   - new: Metabrik: new_no_checks, new_from_brik_no_checks and new_from_brik_init_no_checks methods
+   - update: perl::module: install correctly supports ARRAY of modules to install
+   - bugfix: shell::rc, shell::script: add a trailing whitespace on multilines
+   - bugfix: core::shell: when a / was in a command line, it was not interpreted as Perl code
+   - bugfix: core::shell: correctly complete ~ in path when using cd Command
+   - bugfix: core::shell: put args between double-quotes when needed (like for cd Command)
+
+1.11 Sun Nov 22 17:46:43 CET 2015
+   - FEATURE: core::shell: auto prefix by run if entered command is a used Brik
+              example:          perl::module install Class::Gomor
+              is equivalent to: run perl::module install Class::Gomor
+   - FEATURE: Metabrik: brik_author and brik_license Commands and Properties
+   - FEATURE: Metabrik: auto tagging of Briks based on Repository, Category and Name
+   - FEATURE: Metabrik: optional_modules and optional_binaries Properties.
+              Also added brik_has_binary and brik_has_module Commands.
+   - new: core::context: get_used Command to return a reference to a used Brik
+   - new: brik::search: command Command to search a Brik by existing Commands
+   - bugfix: shell::script: allow blank lines and comments
+   - bugfix: core::shell: correctly stop a run Command on SIGINT
+   - bugfix: Metabrik: return error and not info on bad usage for some brik_has_* Commands
+   - bugfix: Metabrik: correctly call brik_fini on core::context exiting
+
+1.10 Tue Oct 27 20:13:36 CET 2015
+   - FEATURE: core::context: allows to pass complex structs arguments to run and set Commands
+     Example: run network::arp scan $info->{subnet}
+   - FEATURE: core::context: allows also to execute Perl code within an Argument of a 
+     run Command
+     Example: run client::dns ptr_lookup "[ map { @$_ } values %$RUN ]"
+   - FEATURE: core::shell: allows to complete aliases (can be disabled via
+     aliases_completion Attribute
+   - FEATURE: shell::command: use_sudo Attribute to launch sudo on executing external command
+   - FEATURE: shell::command: file globbing enabled with capture Command
+   - UPDATE: moved attributes_default() from brik_use_properties to brik_properties when 
+     there is no need to use $self. It allows instanciated Attributes inheritage to work.
+   - UPDATE: shell::command: do not print STDERR when using capture Command when there is no 
+     STDERR string captured.
+   - new: shell::command: execute Command to use capture_mode Attribute to launch either 
+     capture or system Command
+   - bugfix: core::context: save_state to use Metabrik brik_attributes Command to correctly 
+     retrieve all Brik Attributes even those inherited
+   - bugfix: core::shell: display error on chdir() failure
+   - bugfix: core::shell: escapes " character when executing a multiline Perl/Metabrik Code
+             example:
+             my $test = 'root'
+             for (0..1) {
+                'run shell::command system "ls /$test"'
+             }
+   - bugfix: Metabrik: error checking within new_from_brik_init Command
+   - bugfix: Metabrik: logging correctly on class calls to _log_*()
+
+1.09 N/A
+   - FEATURE: core::shell/core::context: supports passing Perl code directly as Commands
+              Arguments. Example: run database::sqlite create MyTable "[ qw(field1 field2) ]"
+   - RENAME: core::shell: help_show_brik_attributes => help_show_base_attributes
+   - RENAME: core::shell: help_show_brik_commands => help_show_base_commands
+   - RENAME: core::shell: comp_show_brik_attributes => comp_show_base_attributes
+   - RENAME: core::shell: comp_show_brik_commands => comp_show_base_commands
+   - UPDATE: core::shell: rework of help/completion scheme
+   - UPDATE: core::shell: help Command rewritten to show help for Metabrik only (not Term:Shell)
+   - bugfix: core::shell: use unique match to run Commands
+   - bugfix: shell::command: correctly check return value from system Command for errors
+   - new: core::shell: get_help/comp_attributes and get_help/comp_commands Commands
+   - new: Metabrik: brik_base_attributes, brik_inherited_attributes, brik_own_attributes Commands
+   - new: Metabrik: brik_base_commands, brik_inherited_commands, brik_own_commands Commands
+
+1.08 Thu Mar 19 06:48:34 CET 2015
+   - FEATURE: core::shell: run executable commands found in PATH through system Command
+   - UPDATE: shell::command: now use IPC::Run3 to capture shell commands output
+   - update: shell::command: system Command now returns $? on success
+   - update: Metabrik: display every missing items from brik_require_*_check() before erroring
+   - update: new dependance on IPC::Run3
+
+1.07 Sun Mar  8 17:52:37 CET 2015
+   - bugfix: shell::history: correctly writes $* variables when calling history Commands
+   - new: shell::rc: create an alias to make it easy to switch to root from Shell
+   - new: brik::search and perl::module Briks integrated in main distribution
+   - remove: no more metabrik-cpanm, enforce use of standard cpanm
+
+1.06 Fri Feb 27 07:17:59 CET 2015
+   - bugfix: shell::command: go trough PATH to find a cmd to run (like less PAGER)
+   - bugfix: core::shell: on SIGINT handling, now allows to break multiline and run Commands
+   - bugfix: core::shell: allow user to get out of multiline mode by hitting Ctrl+C
+   - bugfix: core::shell: better management of Metabrik Commands in multiline mode
+   => you can put Metabrik Commands within single quotes anywhere
+   - update: shell::script: load Command can take an optional file parameter
+   - update: metabrik, shell::rc/script, core::shell: easier handling of rc file loading
+   - new: metabrik: --script-rc argument to load a specific rc file for scripts
+
+1.05 Tue Feb 10 08:01:53 CET 2015
+   - FEATURE: core::shell: multiline mode do not require lines to end with `\' anymore
+   - FEATURE: core::shell: Metabrik commands are directly translated to Perl code
+              => Note: no alias support for now, only set, get, run and use are handled
+   - bugfix: shell::command: check for error code from `` call
+   - bugfix: Metabrik: do not override default Attributes with brik_use_properties
+             if already set by brik_properties
+   - bugfix: Metabrik: correctly prints help Command details when overriden by subclass
+   - new: Metabrik: brik_preinit() creates a datadir directory per Brik 
+          if datadir property exists.
+   - update: Metabrik: default directory is set to $HOME/metabrik i/o /tmp
+
+1.04 Sun Jan  4 13:07:56 CET 2015
+   - bugfix: core::context: don't overwrite $RUN when run Command fails
+   - bugfix: core::shell: help Command must not overwrite $RUN variable
+   - bugfix: core::log: error Command must return undef, this is the error status
+   - new: Metabrik: new_from_brik_init() base method
+   - copyright: update to 2015
+
+1.03 Sat Dec 20 17:48:44 CET 2014
+   - bugfix: shell::script: return proper values from run cmds
+   - bugfix: shell::script: disable SIGINT when running a script
+   - update: core::shell: always complete Briks on use, even when Brik is already used
+   - new: core::global: exit_on_sigint Attribute, for use in scripts
+   - new: core::shell: help_show_inherited and comp_show_inherited Attributes to 
+          respectively show inherited Attributes on help Commands and show inherited 
+          Attributes when using completion
+   - new: bin/metabrik: will load .metabrik_script_rc (if exists) when executing a script
+
+1.02 Sun Nov 30 12:28:07 CET 2014
+   - bugfix: bin/metabrik: document --script option
+   - bugfix: core::context: brik_init on first run only when it is not a base class Command
+   - new: metabrik: new_from_brik() method
+
+1.01 Sat Nov 22 17:05:46 CET 2014
+   - UPDATE: brik_init: sets init_done Attribute only on success, must be called by subclass at the end
+   - bugfix: metabrik: fix inheritance of Briks properties over class hierarchy, like setting default Attributes
+   - bugfix: core::context: correctly stops run Commands in case brik_init has failed
+   - bugfix: core::context: fix save_state and restore_state Commands return value on success
+   - bugfix: core::shell: correctly handle current working directory
+   - new: core::shell: pwd Command
+
+1.00 Sun Nov 16 17:07:12 CET 2014
+   - first public release
+

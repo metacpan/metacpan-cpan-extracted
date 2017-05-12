@@ -1,0 +1,54 @@
+---
+abstract: 'PSGI/Plack server with event driven connection manager, preforking workers'
+author:
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+build_requires:
+  LWP::UserAgent: '0'
+  Plack::Test::Suite: '0'
+  Test::More: '0.98'
+  Test::TCP: '2.00'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v1.0.0, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Monoceros
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Monoceros:
+    file: lib/Monoceros.pm
+    version: '0.27'
+  Monoceros::Server:
+    file: lib/Monoceros/Server.pm
+  Plack::Handler::Monoceros:
+    file: lib/Plack/Handler/Monoceros.pm
+  Plack::Middleware::MonocerosStatus:
+    file: lib/Plack/Middleware/MonocerosStatus.pm
+requires:
+  AnyEvent: '7.04'
+  IO::FDPass: '1.0'
+  Net::CIDR::Lite: '0'
+  POSIX::getpeername: '0'
+  Parallel::Prefork: '0.14'
+  Plack: '1.0023'
+  Starlet: '0.18'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/kazeburo/Monoceros/issues
+  homepage: https://github.com/kazeburo/Monoceros
+  repository: git://github.com/kazeburo/Monoceros.git
+version: '0.27'

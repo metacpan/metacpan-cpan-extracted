@@ -1,0 +1,80 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLBaseFontElement
+
+=for object Mozilla::DOM::HTMLBaseFontElement
+
+Mozilla::DOM::HTMLBaseFontElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLBaseFontElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLBaseFontElement interface is the interface to a
+ * [X]HTML basefont element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLBaseFontElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $color = $htmlbasefontelement->B<GetColor>()
+
+=head2 $face = $htmlbasefontelement->B<GetFace>()
+
+=head2 $size = $htmlbasefontelement->B<GetSize>()
+
+=head2 $htmlbasefontelement->B<SetColor>($color)
+
+=over
+
+=over
+
+=item * $color (string)
+
+=back
+
+=back
+
+=head2 $htmlbasefontelement->B<SetFace>($face)
+
+=over
+
+=over
+
+=item * $face (string)
+
+=back
+
+=back
+
+=head2 $htmlbasefontelement->B<SetSize>($size)
+
+=over
+
+=over
+
+=item * $size (integer (long))
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

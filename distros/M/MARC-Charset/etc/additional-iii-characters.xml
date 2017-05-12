@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<codeTables>
+        <codeTable name="East Asian" number="9">
+                <characterSet name="Chinese, Japanese, Korean (EACC)" ISOcode="31">
+                        <grouping name="III additional characters" date="Apri 15, 2008" number="9.9">
+                                <note>
+                                        <p>This table contains non-standard character mappings used by the Innovative
+                                           Interfaces, Inc. (III) ILS to represent such things as smart quotation marks
+                                           in MARC-8.
+                                        </p>   
+                                        <p>FIXME: This list is based on comparing MARC-8 records extracted from a III Millennium
+                                           database with their presentation in the III OPAC.  Consequently, this list is
+                                           incomplete - corrections or a pointer to public documentation of these characters
+                                           would be gratefully accepted.
+                                        </p>   
+                                </note>
+                                <code>
+                                        <marc>21203D</marc>
+                                        <ucs>2026</ucs>
+                                        <utf-8>E280A6</utf-8>
+                                        <name>HORIZONTAL ELLIPSIS</name>
+                                </code>
+                                <code>
+                                        <marc>212040</marc>
+                                        <ucs>201C</ucs>
+                                        <utf-8>E2809C</utf-8>
+                                        <name>LEFT DOUBLE QUOTATION MARK</name>
+                                </code>
+                                <code>
+                                        <marc>7F2014</marc>
+                                        <ucs>2014</ucs>
+                                        <utf-8>E28094</utf-8>
+                                        <name>EM DASH</name>
+                                </code>
+                                <code>
+                                        <marc>7F2019</marc>
+                                        <ucs>2019</ucs>
+                                        <utf-8>E28099</utf-8>
+                                        <name>RIGHT SINGLE QUOTATION MARK</name>
+                                </code>
+                                <code>
+                                        <marc>7F2020</marc>
+                                        <ucs>201D</ucs>
+                                        <utf-8>E2809D</utf-8>
+                                        <name>RIGHT DOUBLE QUOTATION MARK</name>
+                                </code>
+                                <code>
+                                        <marc>7F2122</marc>
+                                        <ucs>2122</ucs>
+                                        <utf-8>E284A2</utf-8>
+                                        <name>TRADE MARK SIGN</name>
+                                </code>
+                        </grouping>
+                </characterSet>
+        </codeTable>
+</codeTables>

@@ -1,0 +1,21 @@
+NAME
+    Message::Passing::Syslog - input and output messages from/to Syslog.
+
+SYNOPSIS
+        message-pass --input Syslog --input_options '{"port":"5140"}' --output STDOUT
+
+        message-pass --input STDIN --output Syslog --output_options '{"hostname":"127.0.0.1","port":"5140"}'
+
+DESCRIPTION
+    Provides a syslogd server and client for either TCP or UDP syslog.
+
+SEE ALSO
+    Message::Passing::Input::Syslog
+    Message::Passing::Output::Syslog
+
+AUTHOR and COPYRIGHT
+    Tomas Doran
+
+LICENSE
+    Same terms as perl itself.
+

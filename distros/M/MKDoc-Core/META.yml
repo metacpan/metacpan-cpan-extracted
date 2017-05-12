@@ -1,0 +1,19 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         MKDoc-Core
+version:      0.91
+version_from: lib/MKDoc/Core.pm
+installdirs:  site
+requires:
+    Apache:                        1.27
+    Cache::Cache:                  1.02
+    Digest::MD5:                   2.33
+    File::Touch:                   0.01
+    HTTP::Date:                    1.46
+    Petal:                         2.02
+    Scalar::Util:                  1.07
+    Test::More:                    0.47
+    URI:                           1.30
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

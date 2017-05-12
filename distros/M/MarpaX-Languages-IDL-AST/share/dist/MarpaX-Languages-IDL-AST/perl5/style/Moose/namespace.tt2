@@ -1,0 +1,47 @@
+[%~ IF (moosexTypesPerScope.$identifier.keys.size > 0) ~%]
+  [%~ usePerScope.$identifier.unshift("MooseX::Types -declare => [qw/\n" _ moosexTypesPerScope.$identifier.keys.sort.join("\n") _ "\n/]") ~%]
+[%~ END ~%]
+[%~ IF (moosexTypesMoosePerScope.$identifier.keys.size > 0) ~%]
+  [%~ usePerScope.$identifier.unshift('MooseX::Types::Moose qw/' _ moosexTypesMoosePerScope.$identifier.keys.sort.join(' ') _ '/') ~%]
+[%~ END ~%]
+[%~ IF (moosexParamsValidatePerScope.$identifier != 0) ~%]
+  [%~ usePerScope.$identifier.unshift('MooseX::Params::Validate qw/pos_validated_list/') ~%]
+[%~ END ~%]
+[%~ IF (moosexTypesStructuredPerScope.$identifier.keys.size > 0) ~%]
+  [%~ usePerScope.$identifier.unshift('MooseX::Types::Structured qw/' _ moosexTypesStructuredPerScope.$identifier.keys.sort.join(' ') _ '/') ~%]
+[%~ END ~%]
+[%~ IF (namespaceTypePerscope.$identifier == 'class' || namespaceTypePerscope.$identifier == 'role') ~%]
+package [% identifier %] {
+  use [% (namespaceTypePerscope.$identifier == 'class') ? 'Moose' : 'Moose::Role' %];
+  use MRO::Compat;
+  use namespace::sweep;
+  [%~ # Every package is independant, this is why we have to redo the import ~%]
+  [%~ # We explicitly do that only inside a perl package, in order not to pollute main ~%]
+  [%~ IF (rememberImports.size > 0) ~%]
+    use Class::Load qw/load_class/;
+    BEGIN {
+    [%~ FOREACH import IN rememberImports ~%]
+      [%~ importType = import.0 ~%]
+      [%~ importValue = import.1 ~%]
+      [%~ # In our case, the same method pplies to scopedName and stringliteral (which are possible values or importType) ~%]
+     load_class([% importValue %]);
+    }
+    [%~ END ~%]
+  [%~ END ~%]
+[%~ END ~%]
+[%~ FOREACH use IN usePerScope.$identifier ~%]
+  use [% use %];
+[%~ END ~%]
+
+[% content %]
+[%~ IF (withPerScope.$identifier.size > 0) ~%]
+
+  with [% withPerScope.$identifier.sort.join(', ') %];
+[%~ END ~%]
+[%~ IF (namespaceTypePerscope.$identifier == 'class') ~%];
+
+  __PACKAGE__->meta->make_immutable;
+[%~ END ~%]
+[%~ IF (namespaceTypePerscope.$identifier == 'class' || namespaceTypePerscope.$identifier == 'role') ~%]
+};
+[%~ END ~%]

@@ -1,0 +1,56 @@
+---
+abstract: 'List of Mailing Lists Manager'
+author:
+  - unknown
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142060'
+keywords:
+  - E-mail
+  - 'mailing lists'
+  - 'mailing list'
+  - HTML
+  - manager
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mail-LMLM
+provides:
+  Mail::LMLM:
+    file: lib/Mail/LMLM.pm
+    version: '0.6804'
+  Mail::LMLM::Object:
+    file: lib/Mail/LMLM/Object.pm
+  Mail::LMLM::Render:
+    file: lib/Mail/LMLM/Render.pm
+  Mail::LMLM::Render::HTML:
+    file: lib/Mail/LMLM/Render/HTML.pm
+  Mail::LMLM::Types::Base:
+    file: lib/Mail/LMLM/Types/Base.pm
+  Mail::LMLM::Types::Egroups:
+    file: lib/Mail/LMLM/Types/Egroups.pm
+  Mail::LMLM::Types::Ezmlm:
+    file: lib/Mail/LMLM/Types/Ezmlm.pm
+  Mail::LMLM::Types::GoogleGroups:
+    file: lib/Mail/LMLM/Types/GoogleGroups.pm
+  Mail::LMLM::Types::Listar:
+    file: lib/Mail/LMLM/Types/Listar.pm
+  Mail::LMLM::Types::Listserv:
+    file: lib/Mail/LMLM/Types/Listserv.pm
+  Mail::LMLM::Types::Mailman:
+    file: lib/Mail/LMLM/Types/Mailman.pm
+  Mail::LMLM::Types::Majordomo:
+    file: lib/Mail/LMLM/Types/Majordomo.pm
+requires:
+  perl: '5.008'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: http://bitbucket.org/shlomif/perl-mail-lmlm/overview
+version: '0.6804'

@@ -1,0 +1,96 @@
+# digest.data
+# as of 2/22/04:  being adapted for 
+# changes to pw32u digest format
+use Cwd;
+
+$makefile_workdir = cwd();
+$topdir = "$makefile_workdir/t/samples";
+
+%digest_structure = (
+    pbml =>    {
+         grep_formula               => '\[PBML\]',
+#         pattern_target             => '.*\s(\d+)\.txt$',
+         pattern_target             => '.*_(\d+)\.txt$',
+         topics_intro               => 'Topics in this digest:',
+         # next 2 elements' values must be double-quoted
+         post_topics_delimiter      => "________________________________________________________________________\n________________________________________________________________________\n\n",
+         source_msg_delimiter       => "________________________________________________________________________\n________________________________________________________________________\n\n",
+         message_style_flag         => '^Message:\s+(\d+)$',
+         from_style_flag            => '^\s+From:\s+(.+)$',
+         org_style_flag             => undef,
+         to_style_flag              => undef,
+         cc_style_flag              => undef,
+         subject_style_flag         => '^Subject:\s+(.+)$',
+         date_style_flag            => '^\s+Date:\s+(.+)$',
+         reply_to_style_flag        => undef,
+         MIME_cleanup_flag          => 0,
+       },
+    pw32u =>   {
+#         grep_formula               => 'Perl-Win32-Users Digest',
+#         pattern_target             => '.*Vol\s(\d+),\sIssue\s(\d+)\.txt$',
+         grep_formula               => 'Perl-Win32-Users_Digest',
+         pattern_target             => '.*Vol_(\d+),_Issue_(\d+)\.txt$',
+         topics_intro               => 'Today\'s Topics:',
+         # next 2 elements' value must' be double-quoted
+         post_topics_delimiter      => "----------------------------------------------------------------------\n\n",
+         source_msg_delimiter       => "------------------------------\n\n",
+         message_style_flag         => '^Message:\s+(\d+)$',
+         from_style_flag            => '^From:\s+(.+)$',
+         org_style_flag             => '^Organization:\s+(.+)$',
+         to_style_flag              => '^To:\s+(.+)$',
+         cc_style_flag              => '^CC:\s+(.+)$',
+         subject_style_flag         => '^Subject:\s+(.+)$',
+         date_style_flag            => '^Date:\s+(.+)$',
+         reply_to_style_flag        => '^Reply-To:\s+(.+)$',
+         MIME_cleanup_flag          => 1,
+       },
+);
+
+%digest_output_format = (
+    pbml =>    {
+         title                      => 'Perl Beginner',
+         dir_digest                 => "$topdir/pbml",
+         dir_threads                => "$topdir/pbml/Threads",
+         dir_archive_top            => "$topdir/pbml/Threads/archive",
+         archived_today             => "$topdir/pbml/archived_today.txt",
+         de_archived_today          => "$topdir/pbml/de_archived_today.txt",
+         deleted_today              => "$topdir/pbml/deleted_today.txt",
+         digests_log                => "$topdir/pbml/digests_log.txt",
+         digests_read               => "$topdir/pbml/digests_read.txt",
+         todays_topics              => "$topdir/pbml/todays_topics.txt",
+         mimelog                    => "$topdir/pbml/mimelog.txt",
+         id_format                  => 'sprintf("%05d",$1)',
+         output_id_format           => 'sprintf("%04d",$1)',
+         MIME_cleanup_log_flag      => 0,
+         # next element's value's value must be double-quoted
+#         thread_msg_delimiter       => "_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_\n_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*_\n\n\n",
+         thread_msg_delimiter       => "_X_X_X_X_X_X_X_X_X_X_\n_X_X_X_X_X_X_X_X_X_X_\n\n\n",
+         archive_kill_trigger       => 1,
+         archive_kill_days          => 14,
+         digests_read_flag          => 1,
+         archive_config             => 0,
+       },
+    pw32u =>   {
+         title                      => 'Perl-Win32-Users',
+         dir_digest                 => "$topdir/pw32u",
+         dir_threads                => "$topdir/pw32u/Threads",
+         dir_archive_top            => "$topdir/pw32u/Threads/archive",
+         archived_today             => "$topdir/pw32u/archived_today.txt",
+         de_archived_today          => "$topdir/pw32u/de_archived_today.txt",
+         deleted_today              => "$topdir/pw32u/deleted_today.txt",
+         digests_log                => "$topdir/pw32u/digests_log.txt",
+         digests_read               => "$topdir/pw32u/digests_read.txt",
+         todays_topics              => "$topdir/pw32u/todays_topics.txt",
+         mimelog                    => "$topdir/pw32u/mimelog.txt",
+         id_format                  => 'sprintf("%03d",$1) . \'_\' . sprintf("%04d",$2)',
+         output_id_format           => 'sprintf("%04d",$1)',
+         MIME_cleanup_log_flag      => 1,
+         # next element's value must be double-quoted
+         thread_msg_delimiter       => "--__--__--\n\n",
+         archive_kill_trigger       => 1,
+         archive_kill_days          => 14,
+         digests_read_flag          => 1,
+         archive_config             => 0,
+       },
+);
+

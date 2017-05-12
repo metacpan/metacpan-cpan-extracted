@@ -1,0 +1,6 @@
+#!/usr/bin/env perl
+# vim:et:sts=4:sws=4:sw=4
+use FindBin '$Bin';
+use lib "$Bin/lib";
+use MyApp;
+MyApp->new_with_command->run;

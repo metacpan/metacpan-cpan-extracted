@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title><% $ARGS{title} %></title>
+  <link rel="stylesheet" href="style.css" type="text/css" />
+  <link rel="top"        href="index.html" />
+  <link rel="previous"   href="<% $ARGS{previous} %>" />
+  <link rel="next"       href="<% $ARGS{next} %>" />
+  <script type="text/javascript" src="space_next.js"></script>
+</head>
+<body>
+
+  <h1><% $ARGS{title} %></h1>
+
+  <ul id="toc">
+% foreach my $item (@{$ARGS{toc}}) {
+    <li><a href="<% $item->{filename} %>"><% $item->{title} %></a></li>
+% }
+  </ul>
+
+<div id="nav">\
+<a
+  id="nav-prev" title="Previous Slide" href="<% $ARGS{previous} %>"><img
+  src="images/nav_prev.png" alt="Previous" /></a>\
+<a
+  id="nav-toc"  title="Table of Contents" href="toc.html"><img
+  src="images/nav_toc.png" alt="Table of Contents" /></a>\
+<a
+  id="nav-next" title="Next Slide" href="<% $ARGS{next} %>"><img
+  src="images/nav_next.png" alt="Next" /></a>\
+</div>
+
+</body>
+</html>

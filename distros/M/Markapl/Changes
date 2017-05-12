@@ -1,0 +1,54 @@
+# -*- yaml -*-
+# Revision history for Markapl
+
+0.14:
+  - properly encode attribute values to entities.
+  - Allow passing undef as attribute value to generate value-less attributes in HTML.
+
+0.13:
+  - Allow extra [-:\.] case in id & class according to SGML basic types. by gslin++
+
+0.12:
+  - Minor mantainence updates.
+
+0.11:
+  - Several elements now produce outputs without closing tags as they are supposed to be.
+  
+0.10:
+  - Small refactoring
+
+0.09:
+  - Increase the compatibility with Jifty::Web::PageRegion
+
+0.08:
+  - A maintainance release for the compatibility with JiftyX::Markapl
+  - documentation fixes from dbrunton++ and rafl++
+  - various internal fixes from douglashunter++
+
+0.07:
+  - Tag blocks do not need to have semi-colon at the end from now. 
+
+0.06:
+  - Improved the code to pass attribute with interpolate variables.
+  - Less dependencies
+
+0.05:
+  - allow passing variables to render.
+  - implement package-specific template stash
+
+0.04:
+  - even more code refactoring.
+  - list html4 tags in Markapl::Tags
+  - Add several very useful helpers
+
+0.03:
+  - element attribute values can now contains variables.
+
+0.02:
+  - mostly just code refactoing
+  - documentation 
+  - add 'template' funtion that defines template sub but can be named like "/foo.html" as in Template::Declare.
+
+0.01:
+  - Initial release.
+

@@ -1,0 +1,18 @@
+0.2.4 2016-08-22
+  - make it work on old perls too
+
+0.2.3 2016-08-22
+  - documentation update
+
+0.2.2 2016-08-22
+  - documentation update
+
+0.2.1 2016-08-21
+  - documentation update
+
+0.2.0 2016-08-21
+  - documentation update
+  - auth_success_callback is no called auth_success_cb
+
+0.1.0 2016-08-21
+  - first public release

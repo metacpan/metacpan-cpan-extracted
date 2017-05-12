@@ -1,0 +1,14 @@
+Consider using the year as a salt in the hash secret.
+
+Find out about case sensitivity in various MTAs.
+
+Find out about the 64 character limit in various MTAs.
+
+Database cleaning of old addresses.
+
+Clean up s/// and m// tests in Guarded.pm and Shortcut.pm
+	- modify strings at sensible times.
+
+Update documentation.
+
+Twat check to make sure that secret isn't a hashref or something.

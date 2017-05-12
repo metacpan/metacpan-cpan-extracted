@@ -1,0 +1,160 @@
+// Useful Sass functions
+
+@function set-fg($colour) {
+    @if (lightness($colour) > 50) {
+        @if (saturation($colour) < 5 ) {
+            @return #111111; // Lighter background, return dark
+        } @else {
+            @return hsl(hue($colour), 100%, 10%);
+        }
+    } @else {
+        @if (saturation($colour) < 5 ) {
+            @return #eeeeee; // Darker background, return light
+        } @else {
+            @return hsl(hue($colour), 20%, 90%);
+        }
+    }
+}
+
+// Since the normal fg colour is the same hue as the bg
+// we want the link hue to be a bit different
+// so offset it by 30 degrees away from the red
+// Note that yellow and green appear lighter than other colours
+// so they need to be adjusted
+// And I don't like pink, so light red will have to be adjusted
+@function set-a-link-colour($colour,$adjust-hue) {
+    $newcolour: $colour;
+    @if (lightness($colour) > 50) {
+        @if (saturation($colour) < 5 ) {
+            @return hsl(270 + $adjust-hue, 100%, 20%);
+        } @else {
+            @if (hue($colour) < 180) {
+                $newcolour: hsl(hue($colour) + $adjust_hue, 100%, 20%);
+            } @else {
+                $newcolour: hsl(hue($colour) - $adjust_hue, 100%, 20%);
+            }
+            @if (hue($newcolour) >= 60 and hue($newcolour) <=120)
+            {
+                $newcolour: darken($newcolour, 10%);
+            }
+            @return $newcolour;
+        }
+    } @else {
+        @if (saturation($colour) < 5 ) {
+            @return hsl(240 + $adjust-hue, 30%, 90%);
+        } @else {
+            @if (hue($colour) < 180) {
+                $newcolour: hsl(hue($colour) + $adjust_hue, 80%, 80%);
+            } @else {
+                $newcolour: hsl(hue($colour) - $adjust_hue, 80%, 80%);
+            }
+            @if (hue($newcolour) >= 55 and hue($newcolour) <=120)
+            {
+                $newcolour: hsl(hue($newcolour), 90%, 70%);
+            }
+            @if (hue($newcolour) >= 330 or hue($newcolour) <= 30)
+            {
+                $newcolour: adjust-hue($newcolour, 120);
+            }
+            @return $newcolour;
+        }
+    }
+}
+
+@function set-link($colour) {
+    @return set-a-link-colour($colour, 30);
+}
+
+// with a "visited" link, we want it to move towards the red
+@function set-visited($colour) {
+    @return set-a-link-colour($colour, (-30));
+}
+
+@mixin some-links($fg-l, $fg-v) {
+    a:link {
+        color: $fg-l;
+    }
+    a:visited {
+        color: $fg-v;
+    }
+}
+
+@mixin many-links($l1, $v1, $l2, $v2) {
+    @include some-links($l1, $v1);
+    header a:link,
+    footer a:link,
+    .side a:link,
+    .verge a:link {
+        color: $l2;
+    }
+    header a:visited,
+    footer a:visited,
+    .side a:visited,
+    .verge a:visited {
+        color: $v2;
+    }
+}
+
+// ================================================================== 
+
+@mixin fancy($fg, $bg, $bg-img) {
+    $bd: $fg;
+    $bg-grad: adjust-hue(darken($bg, 15%), -15);
+
+    @if (lightness($bg) < 50) {
+        $bd: desaturate(lighten($bg, 15%), 15%);
+    } @else {
+        $bd: saturate(darken($bg, 20%), 10%);
+    }
+
+    @if (saturation($bg) < 5 ) {
+        $bg-grad: darken($bg, 15%);
+        $bd: $fg;
+    } 
+    .fancy {
+        @extend .verge;
+        color: $fg;
+        background-image: url($bg-img);
+        border: 5px double $bd;
+        padding: 0;
+        li {
+            padding: 0.5em;
+            margin: 5px;
+            border: 5px solid $bd;
+            background-color: $bg;
+            background: linear-gradient($bg, $bg-grad);
+            a:link {
+                color: set-link($bg);
+            }
+            a:visited {
+                color: set-visited($bg);
+            }
+        }
+    }
+}
+
+// ================================================================== 
+
+@mixin make-buttons {
+
+    .button {
+        color: $button-fg;
+        border-color: $button-border;
+        background-color: $button-bg;
+    }
+    .button a:link, a.button:link {
+        color: $button-fg;
+    }
+    .button a:visited, a.button:visited {
+        color: set-visited($button-bg);
+    }
+    input[type=submit] {
+        @extend .button;
+    }
+    header nav a,
+    header nav .selflink,
+    header nav em,
+    header nav .current a {
+        @extend .button;
+    }
+}

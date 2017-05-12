@@ -1,0 +1,4 @@
+TYPEMAP
+uint32_t	T_UV
+char const *	T_PV
+sysret		T_SYSRET

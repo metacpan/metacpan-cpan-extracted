@@ -1,0 +1,34 @@
+Revision history for Mason-Plugin-RouterSimple
+
+** denotes an incompatible change
+
+0.07  Oct 8, 2012
+
+- Define attributes for hash keys following route in addition to captures (Kamil N)
+- Fix 'Can't locate object method "allow_path_info"' error when hitting a path with
+  path_info on a component with no route or path_info
+
+0.06  Aug 11, 2012
+
+- Replace %% with <%class> syntax
+
+0.05  Jul 2, 2011
+
+- Add required is=>'ro' now that PluginRole does not automate it
+
+0.04  Apr 5, 2011
+
+- Fix case where component has no route
+
+0.03  Mar 10, 2011
+
+- Use new Mason 2.05 default file extensions (.mc)
+
+0.02  Feb 25, 2011
+
+- Add Router::Simple dependency
+
+0.01  Feb 24, 2011
+
+- Initial version
+

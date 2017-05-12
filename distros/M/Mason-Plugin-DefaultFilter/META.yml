@@ -1,0 +1,24 @@
+---
+abstract: 'Automatically apply filters to substitution tags'
+author:
+  - 'Stephen Clouse <stephenclouse@gmail.com>'
+build_requires:
+  Test::Class::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120530'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mason-Plugin-DefaultFilter
+no_index:
+  directory:
+    - lib/Mason/Plugin/DefaultFilter
+requires:
+  Mason: 2.00
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mason-Plugin-DefaultFilter
+  repository: git://github.com/StephenClouse/perl-mason-plugin-defaultfilter.git
+version: 0.003

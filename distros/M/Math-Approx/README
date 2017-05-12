@@ -1,0 +1,76 @@
+NAME
+    Math::Approx
+
+METHODS
+  new (constructor)
+        Math::Approx->new(\&poly, $degree, %data);
+
+    If the first argument to the constructor is a CODE reference, this is
+    used as the function to iterate over the data. Such a function must take
+    two arguments: The *degree* and the *x* value.
+
+    For interpolation with plain polynomials *poly* can be defined as:
+
+            sub poly {
+                my($n,$x) = @_;
+                return $x ** $n;
+            }
+
+    If the first argument in the constructor is a FALSE value instead of a
+    CODE reference, then the above plain polynomial *poly* is used as the
+    iterator function.
+
+    The second argument is the maximum degree which should be used for
+    interpolation. Degrees start with 0.
+
+    The rest of the arguments are treated as pairs of x and y samples which
+    should be approximated.
+
+    The constructor returns a Math::Approx reference.
+
+  approx
+            $approximation->approx(17);
+
+    The method returns the approximated y value for the x value given as
+    argument.
+
+  fit
+            $approximation->fit;
+
+    Returns the medim square error for the data points.
+
+  plot
+            $approximation->plot("tmp/app");
+
+    Prints all data pairs and the corresponding approximation pairs into the
+    filename given as argument. The output is suitable for usage with
+    gnuplot(1).
+
+  print
+            $approximation->print;
+
+    Prints information about the approximation on *STDOUT*
+
+EXAMPLE
+            use Math::Approx;
+        
+            sub poly {
+                my($n,$x) = @_;
+                return $x ** $n;
+            }
+        
+            for (1..20) {
+                $x{$_} = sin($_/10)*cos($_/30)+0.3*rand;
+            }
+        
+            $a = new Math::Approx (\&poly, 5, %x);
+            $a->print;
+            $a->plot("math-approx-demo.out");
+            print "Fit: ", $a->fit, "\n";
+
+SEE ALSO
+    gnuplot(1).
+
+AUTHOR
+    Ulrich Pfeifer <pfeifer@wait.de>
+

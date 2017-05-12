@@ -1,0 +1,15 @@
+Revision history for Perl extension Math::Fleximal.
+
+0.01  Sun Apr 15 05:10:50 2001
+	- original version; created by h2xs 1.19
+0.03  Mon Apr 16 19:35:46 EDT 2001
+        - add improved code from PerlMonks
+0.04  Fri Sep 26 21:30:00 PDT 2003
+	- add warnings fix from Eric Clark
+	- switch to Module::Build
+0.05  Sat Sep 27 22:30:00 PDT 2003
+	- Fix permissioning problem with Module::Build
+	- add META.yml
+0.06  Sat Apr  9 23:25 PDT 2005
+        - Change email.
+	- Switch Module::Build from passthrough to traditional.

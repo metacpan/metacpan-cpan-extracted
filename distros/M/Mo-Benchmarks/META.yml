@@ -1,0 +1,29 @@
+---
+abstract: 'Benchmarks for Moose Family Modules'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Mo::Benchmarks
+name: Mo-Benchmarks
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Mouse: 0.93
+  MouseX::App::Cmd: 0.08
+  perl: 5.10.0
+resources:
+  homepage: http://github.com/ingydotnet/mo-benchmarks-pm/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ingydotnet/mo-benchmarks-pm.git
+version: 0.10

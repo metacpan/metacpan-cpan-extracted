@@ -1,0 +1,81 @@
+{
+   "abstract" : "Serve static files from document root with directory index",
+   "author" : [
+      "hayajo <hayajo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Directory",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "7.15",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::Directory" : {
+         "file" : "lib/Mojolicious/Plugin/Directory.pm",
+         "version" : "0.14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hayajo/Mojolicious-Plugin-Directory/issues"
+      },
+      "homepage" : "https://github.com/hayajo/Mojolicious-Plugin-Directory",
+      "repository" : {
+         "url" : "git://github.com/hayajo/Mojolicious-Plugin-Directory.git",
+         "web" : "https://github.com/hayajo/Mojolicious-Plugin-Directory"
+      }
+   },
+   "version" : "0.14",
+   "x_contributors" : [
+      "ChinaXing(陈云星) <chen.yack@gmail.com>",
+      "Renee <reb@perl-services.de>",
+      "今井隼人 <imai.h@imaihayato-no-MacBook-Pro.local>",
+      "hayajo <hayato.imai@gmail.com>",
+      "hayato imai <hayato@MBP2014MID.local>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

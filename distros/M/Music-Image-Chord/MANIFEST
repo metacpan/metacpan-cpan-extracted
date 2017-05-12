@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Music-Image-Chord.t
+lib/Music/Image/Chord.pm
+META.yml                                 Module meta-data (added by MakeMaker)

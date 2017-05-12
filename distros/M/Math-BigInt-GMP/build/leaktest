@@ -1,0 +1,3 @@
+#!/bin/sh
+
+valgrind --leak-check=yes perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t

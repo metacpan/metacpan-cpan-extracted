@@ -1,0 +1,11 @@
+=head1 Build.PL files installer
+
+customise location, place value as default into a tiny generated 
+stub - probably from mariachi.PL, or Mariachi::Config
+
+=head1 website/usage docs
+
+an install guide.  maybe some PRish bumf benchmarking it in comparison
+with mhonarc/pipermail.  a logo.  how to install with your existing
+mailman system.  finished templates
+

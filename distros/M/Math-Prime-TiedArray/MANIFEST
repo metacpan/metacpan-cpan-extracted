@@ -1,0 +1,17 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Math/Prime/TiedArray.pm
+t/00-load.t
+t/10-tie.t
+t/20-precompute.t
+t/30-array-ops.t
+t/40-incremental.t
+t/50-extending.t
+t/60-exceptions.t
+t/70-cache.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

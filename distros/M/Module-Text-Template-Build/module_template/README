@@ -1,0 +1,17 @@
+{{$MODULE_NAME}}
+{{'=' x length $MODULE_NAME}}
+
+'{{$MODULE_DESCRIPTION}}'
+
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/memcached.t
+t/strict.t
+lib/MojoX/Session/Store/Memcached.pm

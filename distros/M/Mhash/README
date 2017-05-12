@@ -1,0 +1,74 @@
+                         Mhash 0.90
+               Copyright (c) 2000, Frey Kuo
+
+------------------------------------------------------------------------
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the Artistic License, a copy of which can be
+    found with perl.
+
+  THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+  EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DAMAGES RESULTING FROM
+  THE USE OF THIS SOFTWARE.                      
+------------------------------------------------------------------------
+
+       *** This is beta software -- use at your own risk ***
+
+This is Mhash, an XS-based perl interface to the popular mhash hash library.
+
+This is an perl interface to the Mhash hash library, which provides a 
+uniform interface to a large number of hash algorithms 
+(also known as "one-way" algorithms).  These algorithms can be used to 
+compute checksums, message digests, and other signatures. Mhash support 
+HMAC generation (a mechanism for message authentication using
+cryptographic hash functions, and is described in RFC2104). HMAC can be 
+used to create message digests using a secret key, so that these message 
+digests cannot be regenerated (or replaced) by someone else.  At the time 
+of writing this, the library supports the algorithms: SHA1, GOST, HAVAL, 
+MD5, RIPEMD160, TIGER, and CRC32 checksums.
+
+Prerequisites
+--------------
+
+In addition to this module, you must install the mhash library. 
+Please download and install the latest mhash-x.x.x.tar.gz at
+ftp://mhash.sourceforge.net/dl/.  As of this writing, the latest is 
+mhash-0.8.3.tar.gz.  
+
+Additional information about the mhash library can be found at
+http://mhash.sourceforge.net.
+
+The MHASH library MUST be found in your library path when using this 
+module.  In Linux, libmhash is defaultly installed in /usr/local/lib 
+-- in this case, be sure that the /usr/local/lib path is in your 
+/etc/ld.so.conf.  Don't forget to run /sbin/ldconfig to update your 
+linker cache after mhash library installation!
+
+Installing Mhash
+-----------------
+
+standard issue:
+
+	1. perl Makefile.PL
+	2. make
+	3. make test
+	4. make install
+
+
+Notes & Caveats
+-----------------
+
+I have only tested this module with Linux only.  I would imagine it will
+work on *BSD systems also, as long as libmhash is in your library search
+path.  Please report any other successful OS/Platform combinations to me.
+Thanks.
+
+There may be bugs; please report them to the below address.  I would like 
+feedback from users of this module - I may change some things around 
+depending on how people plan on using this module.  Constructive criticism 
+always welcome from seasoned perl module writers.
+
+Report bugs/comments to:
+
+kero@3SHEEP.COM

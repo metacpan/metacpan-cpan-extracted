@@ -1,0 +1,70 @@
+{
+   "abstract" : "Fuse binding for MogileFS",
+   "author" : [
+      "Daniel Frett <daniel.frett@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MogileFS-Client-Fuse",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Fuse" : "0.11",
+            "MRO::Compat" : "0",
+            "MogileFS::Client::FilePaths" : "0",
+            "Params::Validate" : "0",
+            "Scalar::Util" : "0",
+            "threads::shared" : "1.21"
+         }
+      }
+   },
+   "provides" : {
+      "MogileFS::Client::Fuse" : {
+         "file" : "lib/MogileFS/Client/Fuse.pm",
+         "version" : "0.05"
+      },
+      "MogileFS::Client::Fuse::BufferedFile" : {
+         "file" : "lib/MogileFS/Client/Fuse/BufferedFile.pm",
+         "version" : "0.05"
+      },
+      "MogileFS::Client::Fuse::Constants" : {
+         "file" : "lib/MogileFS/Client/Fuse/Constants.pm",
+         "version" : "0.05"
+      },
+      "MogileFS::Client::Fuse::File" : {
+         "file" : "lib/MogileFS/Client/Fuse/File.pm",
+         "version" : "0.05"
+      },
+      "MogileFS::Client::Fuse::FilePaths" : {
+         "file" : "lib/MogileFS/Client/Fuse/FilePaths.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/BSD-3-Clause"
+      ],
+      "repository" : {
+         "url" : "https://github.com/frett/MogileFS-Fuse"
+      }
+   },
+   "version" : "0.05"
+}

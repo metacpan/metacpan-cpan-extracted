@@ -1,0 +1,21 @@
+Revision history for Music-Duration
+
+0.0301    2014-08-30 09:33:39-04:00 America/New_York
+    - Improved abstract
+    - Fixed POD
+
+0.03      2013-12-24 01:24:45 America/Los_Angeles
+    - Enabled fractional length assignment.
+
+0.0201    2013-11-19 06:19:11 America/Los_Angeles
+    - Fixed github link in dist.ini.
+
+0.02      2013-02-05 19:30:37 America/Los_Angeles
+    - Removed MIDI-Perl computational typo fix after resolving.
+    - Made tests for each added duration.
+
+0.01 2012.11.06
+    - Added to and corrected MIDI::Simple::Length.
+
+0.00_1 2012.11.5
+    - Unleashed by Dist::Zilla!

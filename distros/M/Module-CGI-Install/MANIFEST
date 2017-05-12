@@ -1,0 +1,27 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Module/CGI/Install.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+script/cgi_install
+t/01_compile.t
+t/02_main.t
+t/03_static.t
+t/04_cgi.t
+t/05_install.t
+t/97_meta.t
+t/98_pod.t
+t/99_pmv.t
+t/data/cgi_dir/placeholder
+t/data/cgi_mock/cgicapture
+t/data/static_dir/placeholder

@@ -1,0 +1,61 @@
+{
+   "abstract" : "DEPRECATED Create a presentation using Mojolicious",
+   "author" : [
+      "Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.018",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-SimpleSlides",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.018"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Share" : "0",
+            "Mojolicious" : "6.0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::SimpleSlides" : {
+         "file" : "lib/Mojolicious/Plugin/SimpleSlides.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jberger/Mojolicious-Plugin-SimpleSlides/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jberger/Mojolicious-Plugin-SimpleSlides"
+      }
+   },
+   "version" : "0.06",
+   "x_deprecated" : 1,
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

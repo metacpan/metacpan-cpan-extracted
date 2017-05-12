@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/Module/Build/Mojolicious.pm
+lib/Mojolicious/Plugin/InstallablePaths.pm
+MANIFEST			This list of files
+t/build.t
+t/lib/MyTest/App.pm
+t/lib/MyTest/App/files/public/test.html
+t/myblib/lib/auto/share/dist/MyTest-App/public/test.html
+t/myblib/lib/MyTest/App.pm
+t/plugin.t
+t/plugin_module_not_loaded.t
+t/plugin_myblib.t
+t/test_app.t
+t/test_app_myblib.t
+META.yml
+META.json

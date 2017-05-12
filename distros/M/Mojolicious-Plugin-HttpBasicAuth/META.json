@@ -1,0 +1,70 @@
+{
+   "abstract" : "Http-Basic-Authentication implementation for Mojolicious",
+   "author" : [
+      "Patrick Grämer <pgraemer@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.032, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-HttpBasicAuth",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.14",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "4.57",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Mojolicious" : "4.57",
+            "Test::Mojo" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pgraemer/Mojolicious-Plugin-HttpBasicAuth/issues"
+      },
+      "homepage" : "https://github.com/pgraemer/Mojolicious-Plugin-HttpBasicAuth",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pgraemer/Mojolicious-Plugin-HttpBasicAuth.git",
+         "web" : "https://github.com/pgraemer/Mojolicious-Plugin-HttpBasicAuth"
+      }
+   },
+   "version" : "0.12",
+   "x_contributors" : [
+      "Markus Michel <mmichel@cpan.org>",
+      "Michal Sedlák <sedlakmichal@gmail.com>"
+   ]
+}
+

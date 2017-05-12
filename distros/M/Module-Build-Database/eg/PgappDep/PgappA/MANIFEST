@@ -1,0 +1,7 @@
+Build.PL
+db/dist/base.sql
+db/dist/base_data.sql
+db/dist/patches_applied.txt
+db/patches/0010_init.sql
+lib/PgappA.pm
+MANIFEST			This list of files

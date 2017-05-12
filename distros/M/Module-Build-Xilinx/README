@@ -1,0 +1,362 @@
+NAME
+    Module::Build::Xilinx - Perl module to create, build, simulate and
+    program a Xilinx FPGA development board using Xilinx ISE Webpack from
+    the commandline by leveraging Xilinx ISE's Tcl interface.
+
+VERSION
+    0.13
+
+SYNOPSIS
+      use strict;
+      use warnings;
+      use Module::Build::Xilinx;
+
+      my $build = Module::Build::Xilinx->new(
+            dist_name => 'fpgasample',
+            dist_version => '0.13',
+            dist_author => 'Vikas N Kumar <vikas@cpan.org>',
+            dist_abstract => 'This is a test',
+            proj_params => {
+                family => 'spartan3a',
+                device => 'xc3s700a',
+                package => 'fg484',
+                speed => -4,
+                language => 'VHDL', # can be Verilog as well
+            },
+            tcl_script => 'program.tcl',
+            #... more parameters if necessary ...
+      );
+      $build->create_build_script;
+      # this creates the file Build which when run will create program.tcl  
+
+      ## On the command line
+      ## to setup the Xilinx ISE project file
+      $ ./Build psetup
+      ## to build the project and create the Xilinx bitstream
+      $ ./Build pbuild
+      ## to simulate the testbench
+      $ ./Build simulate
+      ## to view the results of the testbench simulation as a waveform
+      $ ./Build view
+      ## to program the Xilinx development board
+      $ ./Build program --device=/dev/ttyUSB0
+      ## to clean the project file in case the user wants to remove HDL sources
+      $ ./Build pclean
+
+DESCRIPTION
+  WHAT DOES THE MODULE DO ?
+    Xilinx ISE Webpack allows for commandline project creation, management,
+    build/compile, run, simulation and programming of the device as well.
+    However, Xilinx ISE Webpack only supports Tcl scripts using their custom
+    `xtclsh' program.
+
+    To ease writing of this Tcl script, this module has been written that
+    adds Perl niceties provided by Module::Build along with some custom
+    requirements for the Xilinx ISE Webpack software. The Tcl script
+    template is generic but we modify it to add the HDL (VHDL/Verilog) files
+    that are appropriate for the build that we would like to do.
+
+    In versions 0.01 and 0.02 of this module, we generated a Tcl script for
+    the project titled `blib/program.tcl' which the user had to invoke as
+    follows to continue using it further.
+
+        $ xtclsh program.tcl -help
+
+    However, version 0.03 onwards we let Perl do this for us using various
+    actions as in ACTIONS. However, the method as in version 0.01 and 0.02
+    is still supported but as below:
+
+        $ xtclsh blib/program.tcl -help
+
+    This allows Module::Build::Xilinx to handle various other things such as
+    OS-specific code, handling of failures and similar in Perl instead of
+    doing it in Tcl.
+
+  ACTIONS
+    New actions have been added and some default actions have been modified.
+    The actions that need the Xilinx program `xtclsh' to control the Xilinx
+    ISE project file are `psetup', `pbuild' and `pclean'. The other actions
+    are using Xilinx ISE software but are written in perl instead of Tcl.
+    However, the generated Tcl script will also have the same actions
+    written in Tcl in case the user wants to use Tcl as per the versions of
+    Module::Build::Xilinx before 0.04.
+
+    `build'
+        This default action not only executes the default steps as per
+        Module::Build but also find the HDL (VHDL/Verilog) sources, creates
+        the Tcl script and finds the Xilinx ISE install for later use by
+        other actions. The recommended way to run it is this:
+
+            $ ./Build
+
+    `psetup'
+        This action creates the Xilinx ISE project file and adds the other
+        HDL (VHDL/Verilog) sources to it for both the bitstream and the
+        testbench. The recommended way to run it is:
+
+            $ ./Build psetup
+
+        This internally finds the `xtclsh' program and executes the
+        following command:
+
+            $ xtclsh blib/program.tcl -setup
+
+    `pbuild'
+        This action builds the Xilinx ISE project file and creates the
+        bitstream file in the `blib' directory. The recommended way to run
+        it is:
+
+            $ ./Build pbuild
+
+        This internally finds the `xtclsh' program and executes the
+        following command:
+
+            $ xtclsh blib/program.tcl -build
+
+    `pclean'
+        This action cleans the Xilinx ISE project file and removes all the
+        existing HDL (VHDL/Verilog) sources from it. This is useful if the
+        user wants to remove files but not properties from a Xilinx ISE
+        project. The recommended way to run it is:
+
+            $ ./Build pclean
+
+        This internally finds the `xtclsh' program and executes the
+        following command:
+
+            $ xtclsh blib/program.tcl -clean
+
+    `simulate'
+        This action creates the testbench executable and runs it. The
+        recommended way to run it is:
+
+            $ ./Build simulate
+
+        This will run all the testbenches located in the `lib/', `src/',
+        `tb/' or `t/' directories. The user may have more than one
+        testbench. To run a specific testbench the user needs to use the
+        `--sim_files' option.
+
+            $ ./Build simulate --sim_files=tb/sim1_tb.vhd
+            $ ./Build simulate --sim_files=tb/sim2_tb.vhd
+
+        This action does not use the generated Tcl script. It will warn the
+        user if the `pbuild' action has not been run but will not run it for
+        the user since that may take hours for very complex FPGA cores.
+
+    `test'
+        This is the same as the above `simulate' action. This over-rides the
+        default Module::Build action.
+
+            $ ./Build test --sim_files=tb/sim1_tb.vhd
+
+    `view'
+        This action runs the ISimGui from Xilinx to view the
+        output/waveforms of the simulation run through the `simulate' action
+        above. For each test bench, the ISimGui will be run one after the
+        other if no specific testbench is mentioned using `--sim_files'.
+
+        The recommended way to run it is as below for viewing all the
+        testbench outputs one by one.
+
+            $ ./Build view
+
+        The user may have more than one testbench outupt. To run a specific
+        testbench the user needs to use the `--sim_files' option.
+
+            $ ./Build view --sim_files=tb/sim1_tb.vhd
+            $ ./Build view --sim_files=tb/sim2_tb.vhd
+
+        This action does not use the generated Tcl script.
+
+    `program [--device=DEVICE]'
+        This action programs the bitstream onto the device given by the
+        `--device=DEVICE' commandline option. This commandline option is
+        optional for the programming to work. It will try to program each
+        bitstream one by one if there are multiple. The recommended way to
+        run it is:
+
+            $ ./Build program --device=/dev/my_device
+
+        or if you want Xilinx iMPACT to guess which device to program to,
+
+            $ ./Build program
+
+        This action does not use the generated Tcl script.
+
+  METHODS
+    new(%options)
+        The `new()' function is similar to Module::Build except for the fact
+        that it supports some extra properties described below.
+
+  THE PROPERTIES SUPPORTED
+    `dist_name'
+        The name of the project. This is also available as the property
+        `proj_name'.
+
+    `proj_name'
+        The name of the project. Is a read-only property and is set equal to
+        the value of `dist_name'.
+
+    `proj_ext'
+        The extension of the Xilinx ISE Webpack project file. By default it
+        is `.xise'. We have this just in case the extension changes in the
+        future.
+
+    `proj_params'
+        A hash reference of project parameters necessary to define the
+        development board or the device for which we are creating the build.
+        It has multiple keys defined below:
+
+        `family'
+                The family of the FPGA such as spartan3a, spartan6 etc.
+                Refer ISE Webpack's documentation for more information.
+
+        `device'
+                The name of the FPGA chip such as xc3s700a, xc3s1400a etc.
+
+        `speed' The speed of the FPGA chip as noted in the chip's
+                documentation. The speed can be a negative number. The word
+                'speed' is a misnomer here but that is what Xilinx uses.
+
+        `package'
+                The package type of the FPGA chip which is either fg484 or
+                fg400 or fg256 etc.
+
+        `language'
+                The language supported in the project is VHDL or Verilog or
+                N/A which is the default. The N/A option allows the Xilinx
+                ISE to determine what to do on its own.
+
+        `devboard'
+                The development board that we plan to build for to leverage
+                ISE Webpack's internal files for the board. For example,
+                "Spartan-3A Starter Kit". The default is "None Specified".
+
+    `testbench'
+        A hash-reference of testbench parameters for each testbench. A
+        project may have multiple testbenches for the same set of sources.
+        To handle that scenario, different testbench executables need to be
+        creating mapping the correct HDL (VHDL/Verilog) source to the
+        correct executable. If the user uses parameters that are not the
+        default as per Module::Build::Xilinx this property needs to be set.
+
+        To facilitate this we need to provide a hash-reference like shown
+        below. The keys in the hash-reference are optional and will be
+        automatically set if not provided.
+
+            my $b = Module::Build::Xilinx->new(
+                    ## ...
+                    testbench => {
+                        'tb/test1_tb.vhd' => {
+                            toplevel => 'test1_tb',
+                        },
+                        'tb/test2_tb.vhd' => {
+                            toplevel => 'test2_tb',
+                            srclib => 'mylib',
+                        },
+                        ## the below are also the defaults
+                        'tb/test3_tb.vhd' => {
+                            toplevel => 'testbench',
+                            srclib => 'work',
+                            wdb => 'test3_tb.wdb',
+                            exe => 'test3_tb.exe',
+                            prj => 'test3_tb.prj',
+                            cmd => 'test3_tb.cmd',
+                        },
+                    },
+                    ## ...
+                    );
+
+        `toplevel'
+                The top-level name of the entity for the testbench. Default
+                is *testbench*. This name generally varies from user to user
+                as they have different coding preferences.
+
+        `srclib'
+                The name of the local source library that the source files
+                will be considered a part of in the test bench. Default is
+                *work*. The testbench code will refer to the units under
+                test by using this value as a namespace. If the user is
+                using something else apart from *work* they should set this
+                parameter.
+
+        `prj'   The name of the testbench internal project file. Default is
+                *$filename.prj* where `$filename' is the name of the
+                testbench HDL (VHDL/Verilog) source file without the
+                extension. Unless you really want to, this is automatically
+                set by Module::Build::Xilinx and it is better to leave it
+                that way.
+
+        `exe'   The name of the testbench executable file that is created.
+                Default is *$filename.exe* where `$filename' is the name of
+                the testbench HDL (VHDL/Verilog) source file without the
+                extension. Unless you really want to, this is automatically
+                set by Module::Build::Xilinx and it is better to leave it
+                that way.
+
+        `cmd'   The filename in which commands to the simulator software
+                will be written to. Default is *$filename.cmd* where
+                `$filename' is the name of the testbench HDL (VHDL/Verilog)
+                source file without the extension. Unless you really want
+                to, this is automatically set by Module::Build::Xilinx and
+                it is better to leave it that way.
+
+        `wdb'   The testbench debugger file to which data will be written to
+                by the simulation software. Default is *$filename.wdb* where
+                `$filename' is the name of the testbench HDL (VHDL/Verilog)
+                source file without the extension. Unless you really want
+                to, this is automatically set by Module::Build::Xilinx and
+                it is better to leave it that way.
+
+    `tcl_script'
+        The name of the Tcl script to create for the user. Default is
+        `program.tcl'.
+
+    `xilinx'
+        The path to the Xilinx ISE installation that looks like this
+        `/opt/Xilinx/13.4/' on Linux or `C:\Xilinx\13.2\' on Windows. The
+        user can also set the `$ENV{XILINX}' variable to point to this path
+        to override the existing values in or found by Build.PL.
+
+        If not provided, Module::Build::Xilinx automatically finds the
+        installed Xilinx on the system by looking in common areas such as
+        `/usr', `/opt', `/usr/local' and the user's home directory on Linux
+        and in `C:\Xilinx', `C:\Program Files', `C:\Program Files (x86)' and
+        the user's home direcotry on Windows.
+
+    `source_files'
+        This array reference of files that are not present in `lib/' or
+        `src/' of the current directory to be added to the source. This is
+        useful for adding source files from other projects. NOTE: Maybe
+        should be called *extra_source_files*.
+
+    `testbench_files'
+        This array reference of files that are not present in `lib/',
+        `src/', `tb/' or `t/' of the current directory to be added to the
+        source. This is useful for adding testbench files from other
+        projects. NOTE: Maybe should be called *extra_testbench_files*.
+
+  EXAMPLES
+    There is one example present in `share/example/' directory that
+    demonstrates a simple D-Flipflop circuit using VHDL and can be used to
+    see how to write and build FPGA code using Module::Build::Xilinx.
+
+  EXPORT
+    None by default since this is an Object Oriented API.
+
+SEE ALSO
+    App::mbxilinx, mbxilinx
+
+AUTHOR
+    Vikas Kumar, <vikas@cpan.org>
+
+CONTACT
+    Find me on IRC: *#hardware* on irc: as user name vicash.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014 by Vikas Kumar
+
+    This library is under the MIT license. Please refer the LICENSE file for
+    more information provided with the distribution.
+

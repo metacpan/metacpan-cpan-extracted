@@ -1,0 +1,6 @@
+Revision history for Perl extension Module::Check_Args.
+
+1.1   Sat Nov  4 13:38:48 2000
+	- original version; created by h2xs 1.1.1.4 with options
+		-XA -n Module::Check_Args
+

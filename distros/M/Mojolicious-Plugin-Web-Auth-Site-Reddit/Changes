@@ -1,0 +1,16 @@
+Revision history for Mojolicious-Plugin-Web-Auth-Site-Reddit
+
+0.000004  2017-02-12 13:05:27-05:00 America/Toronto
+    - Fixes access_token_url in SYNOPSIS.
+
+0.000003  2017-01-22 22:06:00-05:00 America/Toronto
+    - Example script has been moved to bin/reddit-oauth.
+    - reddit-oauth now displays refresh_token as part of web output.
+    - Docs added to show how to get a refresh_token.
+
+0.000002  2017-01-15 23:37:36-05:00 America/Toronto
+    - Docs now make clear which URLs user needs to provide.
+    - user_info is now fetched as part of auth process.
+
+0.000001  2017-01-15 20:48:54-05:00 America/Toronto
+    - Initial release.

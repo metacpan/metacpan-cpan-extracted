@@ -1,0 +1,9 @@
+Revision history for Math-VarRate
+
+0.100000  2013-09-28 21:51:28 America/New_York
+          allow non-zero starting values
+          change input validation to work with bigfloats
+          update bugtracker
+
+0.091310  2009-05-11
+          first revision

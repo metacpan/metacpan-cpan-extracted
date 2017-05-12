@@ -1,0 +1,170 @@
+NAME
+----
+
+    MooseX::Log::Log4perl - A Logging Role for Moose based on Log::Log4perl
+
+SYNOPSIS
+--------
+
+        package MyApp;
+        use Moose;
+
+        with 'MooseX::Log::Log4perl';
+
+        sub something {
+            my ($self) = @_;
+            $self->log->debug("started bar");    ### logs with default class catergory "MyApp"
+            ...
+            $self->log('special')->info('bar');  ### logs with category "special"
+            ...
+            $self->log('.special')->info('bar'); ### logs with category "MyApp.special"
+            $self->log('::special')->info('bar');### logs with category "MyApp.special"
+        }
+
+DESCRIPTION
+-----------
+
+A logging role building a very lightweight wrapper to Log::Log4perl for
+use with your Moose or Moo classes. The initialization of the Log4perl
+instance must be performed prior to logging the first log message.
+Otherwise the default initialization will happen, probably not doing the
+things you expect.
+
+For compatibility the "logger" attribute can be accessed to use a common
+interface for application logging.
+
+Using the logger within a class is as simple as consuming a role:
+
+    package MyClass;
+    use Moose;
+    with 'MooseX::Log::Log4perl';
+
+    sub dummy {
+        my $self = shift;
+        $self->log->info("Dummy log entry");
+    }
+
+The logger needs to be setup before using the logger, which could happen
+in the main application:
+
+    package main;
+    use Log::Log4perl qw(:easy);
+    use MyClass;
+
+    BEGIN { Log::Log4perl->easy_init() };
+
+    my $myclass = MyClass->new();
+    $myclass->log->info("In my class"); # Access the log of the object
+    $myclass->dummy;                    # Will log "Dummy log entry"
+
+EVEN SIMPLER USE
+----------------
+
+For simple logging needs use MooseX::Log::Log4perl::Easy to directly add
+log_<level> methods to your class instance.
+
+    $self->log_info("Dummy");
+
+USING WITH MOO INSTEAD OF MOOSE
+-------------------------------
+
+As this module is using Moo, you can use it with Moo instead of Moose too.
+This will allow to simple use it as documented above in a Moo based application,
+like shown in the example below:
+
+This is your class consuming the MooseX::Log::Log4perl role.
+
+    package MyCat;
+    use Moo;
+
+    with 'MooseX::Log::Log4perl';
+
+    sub catch_it {
+        my $self = shift;
+        $self->log->debug("Say Miau");
+    }
+
+Which can be simply used in your main application then.
+
+    package main;
+    use MyCat;
+    use Log::Log4perl qw(:easy);
+    BEGIN { Log::Log4perl->easy_init() };
+
+    my $log = Log::Log4perl->get_logger();
+    $log->info("Application startup...");
+    MyCat->new()->catch_it();   ### Will log "Dummy dodo"
+
+ACCESSORS
+---------
+
+### logger
+
+The "logger" attribute holds the Log::Log4perl object that implements all
+logging methods for the defined log levels, such as "debug" or "error". As
+this method is defined also in other logging roles/systems like
+MooseX::Log::LogDispatch this can be thought of as a common logging
+interface.
+
+    package MyApp::View::JSON;
+
+    extends 'MyApp::View';
+    with 'MooseX:Log::Log4perl';
+
+    sub bar {
+      $self->logger->info("Everything fine so far");    # logs a info message
+      $self->logger->debug("Something is fishy here");  # logs a debug message
+    }
+
+### log([$category])
+
+Basically the same as logger, but also allowing to change the log category
+for this log message. If the category starts with a "+", we pre-pend the
+current class (what would have been the category if you didn't specify
+one).
+
+     if ($myapp->log->is_debug()) {
+         $myapp->log->debug("Woot"); # category is class myapp
+     }
+     $myapp->log("TempCat")->info("Foobar"); # category TempCat
+     $myapp->log->info("Grumble"); # category class again myapp
+     $myapp->log(".TempCat")->info("Foobar"); # category myapp.TempCat
+     $myapp->log("::TempCat")->info("Foobar"); # category myapp.TempCat
+
+SEE ALSO
+--------
+
+Log::Log4perl, Moose, Moo, MooX::Log::Any, MooX::Role::Logger
+
+BUGS AND LIMITATIONS
+--------------------
+
+Please report any issues at <https://github.com/lammel/moosex-log-log4perl>
+
+Or come bother us in "#moose" on "irc.perl.org".
+
+AUTHOR
+-------
+
+Roland Lammel <lammel@cpan.org>
+
+Inspired by the work by Chris Prather <perigrin@cpan.org> and Ash Berlin
+<ash@cpan.org> on MooseX::LogDispatch
+
+CONTRIBUTORS
+------------
+
+In alphabetical order:
+
+* abraxxa for Any::Moose deprectation
+* Michael Schilli <m@perlmeister.com> for Log::Log4perl and interface suggestions
+* omega for catgory prefix support
+* Tim Bunce <TIMB@cpan.org> for corrections in the MooseX::Log::Log4perl::Easy module.
+
+LICENSE AND COPYRIGHT
+---------------------
+
+Copyright (c) 2008-2016, Roland Lammel <lammel@cpan.org>, http://www.quikit.at
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. See perlartistic.

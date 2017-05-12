@@ -1,0 +1,2 @@
+% $m->print(ref $ARGS{result} ? $ARGS{result}->($m) : $ARGS{result});
+% return 200;

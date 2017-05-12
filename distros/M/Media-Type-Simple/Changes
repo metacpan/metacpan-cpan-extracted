@@ -1,0 +1,100 @@
+Revision history for Media-Type-Simple
+
+v0.31.0  2015-01-10
+  [Documentation]
+  - Corrected is_ext() usage in POD  [Russell Jenkins].
+
+  - Minor updates to POD.
+
+  [Bug Fixes]
+  - Fixed RT 66513 [Russell Jenkins].
+
+  [Enhancements]
+  - Use Storable's dclone instead of freeze/thaw.
+
+  [Other Changes]
+  - Fixed license in Makefile.PL to make CPANTS happy.
+
+  - Test::NoWarnings is replaced by Test::Warnings, and is optional
+    (and only used for author testing).
+
+  - Removed minimum version of version, since some toolchains get
+    confused by this.
+
+  - Removed redundant test of module load.
+
+  - Minor tweaks to test scripts.
+
+v0.30.6  2014-06-18
+  [Documentation]
+  - Added missing requirements to POD and README.
+
+  [Other Changes]
+  - Minor changes to tests.
+
+  - Uses Exporter::Lite instead of Sub::Exporter.
+
+v0.30.4  2014-06-17
+  [Documentation]
+  - Corrected typo in Changes.
+
+  - Minor changes to POD.
+
+  [Other Changes]
+  - Added test for RT #46475.
+
+  - Added missing dependency as per RT #96393 [Martin McGrath].
+
+  - Fixed typo of git repo URL in Makefile.PL [Martin McGrath].
+
+
+v0.30.2  2014-06-05
+
+  - Fixed missing prerequisite.
+
+v0.30.1  2014-06-05
+  [Compatability Changes]
+  - Changed to use tuple versioning.
+
+  - Requires Perl v5.10.0.
+
+  [Bug Fixes]
+  - Fix for RT #46475 by installing data file with the distribution.
+
+  [Documentation]
+  - Changes conform to CPAN::Meta::Changes spec.
+
+  - Removed INSTALLATION and VERSION sections from POD.
+
+  - Corrected typos in POD.
+
+  [Other Changes]
+  - Removed QA tests from the distro but keep them in the git repo.
+
+  - Uses Module::Install for the Makefile.PL.
+
+0.03  2009-03-25
+
+  - removed MIME::Type::Simple stub.
+
+  - minor updates of documentation.
+
+  - minor updates to MIME types.
+
+0.02  2009-01-26
+
+  - Renamed to Media::Type::Simple.
+
+  - Changed distro to Makemaker-based since Module::Build cannot.
+
+  - handle locally-scoped package declarations.
+
+  - Additional documentation (mostly internal).
+
+  - Removed undocumented or oo-only methods from default exports.
+
+  - Changes to MIME types, esp. removed those w/out extensions.
+
+0.01  2009-01-22
+
+  - First version of MIME::Type::Simple.

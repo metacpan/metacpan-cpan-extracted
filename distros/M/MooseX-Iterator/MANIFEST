@@ -1,0 +1,21 @@
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/MooseX/Iterator.pm
+lib/MooseX/Iterator/Array.pm
+lib/MooseX/Iterator/Hash.pm
+lib/MooseX/Iterator/Meta/Iterable.pm
+lib/MooseX/Iterator/Role.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/00.load.t
+t/01.basic.array.t
+t/02.meta.array.t
+t/03.basic.hash.t
+t/04.meta.hash.t

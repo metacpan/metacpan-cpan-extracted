@@ -1,0 +1,98 @@
+NAME
+    Mojo::Cloudflare - Talk with the Cloudflare API using Mojo::UserAgent
+
+VERSION
+    0.04
+
+DESCRIPTION
+    Mojo::Cloudflare is an (async) client for the CloudFlare API
+    <http://www.cloudflare.com/docs/client-api.html>.
+
+SYNOPSIS
+      use Mojo::Cloudflare;
+      my $cf = Mojo::Cloudflare->new(
+                 email => 'sample@example.com',
+                 key => '8afbe6dea02407989af4dd4c97bb6e25',
+                 zone => 'example.com',
+               );
+
+      # add a record
+      $cf->record({
+        content => 'mojolicio.us',
+        name => 'direct.example.pm',
+        type => 'CNAME',
+      })->save;
+
+      # retrieve and update records
+      for my $record ($cf->records->all) {
+        warn $record->name;
+        $record->ttl(1)->save; # update a record
+      }
+
+      # update a record
+      $cf->record({
+        content => 'mojolicio.us',
+        id => 'some_id_fom_cloudflare', # <-- cause update instead of insert
+        name => 'direct.example.pm',
+        type => 'CNAME',
+      })->save;
+
+ATTRIBUTES
+  api_url
+    Holds the endpoint where we communicate. Default is
+    <https://www.cloudflare.com/api_json.html>.
+
+  email
+      $str = $self->email;
+      $self = $self->email($str);
+
+    The e-mail address associated with the API key.
+
+  key
+      $str = $self->key;
+      $self = $self->key($str);
+
+    This is the API key made available on your Account page.
+
+  zone
+      $str = $self->zone;
+      $self = $self->zone($str);
+
+    The zone (domain) to act on.
+
+METHODS
+  add_record
+    Will be deprecated. Use "save" in Mojo::Cloudflare::Record instead.
+
+  delete_record
+    Will be deprecated. Use "delete" in Mojo::Cloudflare::Record instead.
+
+  edit_record
+    Will be deprecated. Use "save" in Mojo::Cloudflare::Record instead.
+
+  record
+      $record_obj = $self->record(\%record_construction_args);
+
+    Returns a Mojo::Cloudflare::Record object.
+
+  records
+      $records_obj = $self->records($offset);
+      $self = $self->records($offset, sub {
+                my($self, $err, $records_obj) = @_;
+              });
+
+    Used to retrieve Mojo::Cloudflare::Record objects. The return value will
+    be a Mojo::Cloudflare::RecordSet object.
+
+    $offset is optional and defaults to "all", which will retrieve all the
+    DNS records instead of the limit of 180 set by CloudFlare.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014, Jan Henning Thorsen
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+AUTHOR
+    Jan Henning Thorsen - "jhthorsen@cpan.org"
+

@@ -1,0 +1,28 @@
+Module to calculate Mandelbrot Fractals
+
+First: you need to install Module::Signature, if you haven't already.
+
+Then get my key (http://bloodgate.com/tels.asc) and unwrap this package, then
+verify the contents by:
+
+	cpansign --verify
+
+If the signature is valid, proceed. If the signature is B<NOT> valid, do 
+B<NOT> proceed. Your system might get compromies. Please inform me ASAP.
+
+When the signature was okay:
+
+	perl Makefile.PL
+	make
+	make test
+	sudo make install
+
+If not all tests passed, please inform me.
+
+This module is used by an example inside the SDL::App::FPS package, make sure
+you check it out to see the Mandelbrot Fractal in action :)
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

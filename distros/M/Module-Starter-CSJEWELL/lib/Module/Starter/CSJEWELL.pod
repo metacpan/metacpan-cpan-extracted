@@ -1,0 +1,275 @@
+=pod
+
+=begin readme text
+
+Module::Starter::CSJEWELL version 0.100
+
+=end readme
+
+=for readme stop
+
+=head1 NAME
+
+Module::Starter::CSJEWELL - Create a module like CSJEWELL does it.
+
+=head1 VERSION
+
+This document describes Module::Starter::CSJEWELL version 0.200
+
+=begin readme
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+This method of installation will still require a current version of Module::Build 
+if it is not already installed.
+    
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+=end readme
+
+=for readme stop
+
+=head1 SYNOPSIS
+
+    # In your  ~/.module-starter/config file...
+
+    author:  <Your Name>
+    email:   <your@email.addr>
+    plugins: Module::Starter::CSJEWELL
+    template_dir: </some/absolute/path/name>
+
+    # Then on the command-line...
+
+    > module-starter --module=Your::New::Module
+
+    # Or, if you're lazy, like any good Perl programmer...
+
+    > perl -MModule::Starter::CSJEWELL=setup
+
+
+=head1 DESCRIPTION
+
+This module implements a simple approach to creating modules and their support
+files, based on the Module::Starter approach. Module::Starter needs to be
+installed before this module can be used.
+
+When used as a Module::Starter plugin, this module allows you to specify a
+simple directory of templates which are filled in with module-specific
+information, and thereafter form the basis of your new module.
+
+=head1 INTERFACE 
+
+Thsi module simply acts as a plugin for Module::Starter. So it uses the same
+command-line interface as that module.
+
+The template files it is to use are specified in your Module::Starter
+C<config> file, by adding a C<template_dir> configuration variable that
+gives the full path name of the directory in which you want to put
+the templates.
+
+The easiest way to set up this C<config> file, the associated directory, and
+the necessary template files is to type:
+
+    > perl -MModule::Starter::CSJEWELL=setup
+
+on the command line. You will then be asked for your name, email address, and
+the full path name of the directory where you want to keep the templates,
+after which they will be created and installed.
+
+Then you can create a new module by typing:
+
+    > module-starter --module=Your::New::Module
+
+
+=head2 Template format
+
+The templates are plain files named:
+
+        Build.PL
+        Changes
+        Module.pm
+        t/whatever_you_like.t
+
+The C<Module.pm> file is the template for the C<.pm> file for your module. Any
+files in the C<t/> subdirectory become the templates for the testing files of
+your module. All the remaining files are templates for the distribution files
+of the same names.
+
+In those files, the following placeholders are replaced by the appropriate
+information specific to the file:
+
+=over
+
+=item <AUTHOR>
+
+The nominated author. Taken from the C<author> setting in
+your Module::Starter C<config> file.
+
+=item <BUILD INSTRUCTIONS>
+
+Makefile or Module::Build instructions. Computed automatically according to
+the C<builder> setting in your Module::Starter C<config> file.
+
+=item <DATE>
+
+The current date (as returned by C<localtime>). Computed automagically
+
+=item <DISTRO>
+
+The name of the complete module distribution. Computed automatically from the
+name of the module.
+
+=item <EMAIL>
+
+Where to send feedback. Taken from the C<email> setting in
+your Module::Starter C<config> file.
+
+=item <LICENSE>
+
+The licence under which the module is released. Taken from the C<license>
+setting in your Module::Starter C<config> file.
+
+=item <MAIN MODULE>
+
+The name of the main module of the distribution.
+
+=item <MAIN PM FILE>
+
+The name of the C<.pm> file for the main module.
+
+=item <MODULE NAME>
+
+The name of the current module being created within the distribution.
+
+=item <RT NAME>
+
+The name to use for bug reports to the RT system.
+That is:
+
+    Please report any bugs or feature requests to
+    bug-<RT NAME>@rt.cpan.org>
+
+=item <YEAR>
+
+The current year. Computed automatically
+
+=back
+
+
+=head1 DIAGNOSTICS
+
+=over
+
+=item C<< Can't find directory that holds Module::Starter::CSJEWELL templates >>
+
+You did not tell Module::Starter::CSJEWELL where your templates are stored.
+You need a 'template_dir' specification. Typically this would go in
+your ~/.module-starter/config file. Something like:
+
+    template_dir: /users/you/.module-starter/Templates
+
+
+=item C<< Can't access Module::Starter::CSJEWELL template directory >>
+
+You specified a 'template_dir', but the path didn't lead to a readable
+directory.
+
+
+=item C<< The template: %s isn't in the template directory (%s) >>
+
+One of the required templates was missing from the template directory 
+you specified.
+
+=item C<< The template: %s isn't readable in the template directory (%s) >>
+
+One of the templates in the template directory you specified was not readable.
+
+=item C<< Unknown placeholder <%s> in %s >>
+
+One of the templates in the template directory contained a replacement item
+that wasn't a known piece of information.
+
+=back
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+See the documentation for C<Module::Starter> and C<module-starter>.
+
+=for readme continue
+
+=head1 DEPENDENCIES
+
+Requires the C<Module::Starter> module.
+
+=for readme stop
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Bugs should be reported via: 
+
+1) The CPAN bug tracker at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Module-Starter-CSJEWELL>
+if you have an account there.
+
+2) Email to E<lt>bug-Module-Starter-CSJEWELL@rt.cpan.orgE<gt> if you do not.
+
+=head1 AUTHOR
+
+Curtis Jewell  C<< <CSJewell@cpan.org> >>
+
+=for readme continue
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2009-2010, Curtis Jewell C<< <CSJewell@cpan.org> >>. 
+All rights reserved.
+
+Based on L<Module::Starter::PBP|Module::Starter::PBP>, Copyright (c) 2005, 
+Damian Conway C<< <DCONWAY@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=for readme stop
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+=cut

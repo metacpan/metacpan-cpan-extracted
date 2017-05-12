@@ -1,0 +1,48 @@
+Mail-RoundTrip
+
+Mail-RoundTrip provides a basic framework for doing "round-trip" mail validation
+where a user of a service is sent an email with a link to click, or is expected
+to reply to the email, as a condition for activating a service.  Such validates
+not only that the email is valid (a test for which there are better tools 
+already available) but also that it exists and that the purported user actually
+has access to it.  As such it is useful as a way to cut down spam during 
+registration and much more.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Mail::RoundTrip
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mail-RoundTrip
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Mail-RoundTrip
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Mail-RoundTrip
+
+    Search CPAN
+        http://search.cpan.org/dist/Mail-RoundTrip/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Chris Travers
+
+This program is released under the following license: BSD
+

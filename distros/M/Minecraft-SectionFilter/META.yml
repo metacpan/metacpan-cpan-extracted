@@ -1,0 +1,36 @@
+---
+abstract: 'Strip/Process magical § characters from minecraft'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0.9501'
+  perl: '5.010'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Minecraft-SectionFilter
+provides:
+  Minecraft::SectionFilter:
+    file: lib/Minecraft/SectionFilter.pm
+    version: '0.003003'
+requires:
+  Carp: '0'
+  Sub::Exporter::Progressive: '0'
+  Term::ANSIColor: '4.00'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Minecraft-SectionFilter/issues
+  homepage: https://github.com/kentnl/Minecraft-SectionFilter
+  repository: https://github.com/kentnl/Minecraft-SectionFilter.git
+version: '0.003003'

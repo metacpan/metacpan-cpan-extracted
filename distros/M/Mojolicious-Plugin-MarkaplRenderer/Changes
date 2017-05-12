@@ -1,0 +1,5 @@
+0.2.0	March 24, 2011
+	- Don't use Encode.
+
+0.1.0	March 24, 2011
+	- Initial release.

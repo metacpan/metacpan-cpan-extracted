@@ -1,0 +1,29 @@
+This is the perl5 MP3::ID3v1Tag module.
+
+
+To install this module you will need access rights to the perl
+install action on your system, as it overwrites your currently installed
+version of MP3::ID3v1Tag, but not the older MPEG::ID3v1Tag.
+
+This distribution relies upon the IO modules, which is avaliable from CPAN. 
+This module is included in the IO package by Graham Barr.
+
+If you do not have the required modules, you will see a warning when 
+the Makefile is built.
+
+To build and install this module type:
+
+ perl Makefile.PL
+ make
+ make install
+
+For an OOP perl module that reads ID3v2 tags, please see Matt DiMeo's
+MPEG::ID3v2Tag package.
+
+If you have any issues with this module, feel free to relay them to me.
+I am not actively developing on this anymore, but do plan on making
+bug fix releases. Any patches for features or bug fixes will be appreciated.
+
+Sander van Zoest <svanzoest@cpan.org>
+
+$Id: README,v 2.7 2000/06/27 09:30:53 sander Exp $

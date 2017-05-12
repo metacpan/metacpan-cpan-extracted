@@ -1,0 +1,14 @@
+Changes
+LICENSE
+META.json
+Makefile.PL
+README.md
+cpanfile
+lib/Mojolicious/Plugin/Angular/MaterialDesign.pm
+lib/Mojolicious/Plugin/Angular/MaterialDesign/css/angular-material.min.css
+lib/Mojolicious/Plugin/Angular/MaterialDesign/js/angular-material.min.js
+minil.toml
+t/00_compile.t
+t/01-include.t
+META.yml
+MANIFEST

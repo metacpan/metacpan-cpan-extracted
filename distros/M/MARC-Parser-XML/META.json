@@ -1,0 +1,71 @@
+{
+   "abstract" : "Parser for MARC XML records",
+   "author" : [
+      "Johann Rolschewski <jorol@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.16, Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MARC-Parser-XML",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Code::TidyAll" : "0",
+            "Dist::Milla" : "v1.0.16",
+            "Perl::Tidy" : "0",
+            "Test::Code::TidyAll" : "0.20",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Text::Diff" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "XML::LibXML::Reader" : "0",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jorol/MARC-Parser-XML/issues"
+      },
+      "homepage" : "https://github.com/jorol/MARC-Parser-XML",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jorol/MARC-Parser-XML.git",
+         "web" : "https://github.com/jorol/MARC-Parser-XML"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

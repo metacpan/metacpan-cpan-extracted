@@ -1,0 +1,33 @@
+CHANGES
+	Release Name: 0.4101 2010-08-16
+		*	Updated to use new method system
+
+		*	POD Changes
+
+	Release Name: 0.4001 2010-07-27
+		*	Started using git and github
+
+		*	Normalized version accross plugins.
+
+		*	POD Changes
+
+		*	Revised Testing
+
+	Release Name: 0.35 2010-05-14
+		* 	Updated to work with Ogg::Vorbis::Header::PurePerl to fix bug 43789
+
+	Release Name: 0.33 2008-02-23
+		* 	Removed write from test 
+
+	Release Name: 0.32
+		* 	Added Music::Tag prereq (was incorrect!)
+
+	Release Name: 0.31
+		* 	pod improvments
+
+	Release Name: 0.30 
+		* 	Kwalitee and pod improvments
+
+	Release Name: 0.29 2008-02-11
+		* 	Fixed type-o in synapsis (OGG was ogg)
+		* 	Now requires Music::Tag .29  

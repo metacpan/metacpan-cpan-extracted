@@ -1,0 +1,28 @@
+Changes
+Makefile.PL
+MANIFEST
+INSTALL
+README
+
+## -- classes --
+lib/Math/Matlab.pm
+lib/Math/Matlab/Local.pm
+lib/Math/Matlab/Pool.pm
+lib/Math/Matlab/Remote.pm
+lib/Math/Matlab/Server.pm
+
+## -- test scripts --
+t/01_local.t
+t/02_pool.t
+t/03_remote_server.t
+t/existing.m
+t/mwd0/foo.m
+t/mwd1/foo.m
+t/mwd2/foo.m
+
+## -- server test files --
+server.config
+server/foo.m
+server/test/foo.m
+server/test/remote/foo.m
+META.yml                                 Module meta-data (added by MakeMaker)

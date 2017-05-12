@@ -1,0 +1,14 @@
+Base64.pm	Bootstrap implementation of MIME::Base64
+Base64.xs	Encoder and decoder written in C
+Changes		What's new
+MANIFEST	This file
+Makefile.PL	Writes the Makefile
+QuotedPrint.pm  Bootstrap implementation of MIME::QuotedPrint
+README		Please do!
+t/bad-sv.t
+t/base64.t	Test that it works
+t/length.t
+t/quoted-print.t
+t/unicode.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

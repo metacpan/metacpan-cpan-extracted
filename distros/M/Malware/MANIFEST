@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Malware.t
+lib/Malware.pm
+lib/Malware/Parser/NormanSandBoxLive.pm
+lib/Malware/Win32.pm
+META.yml                                 Module meta-data (added by MakeMaker)

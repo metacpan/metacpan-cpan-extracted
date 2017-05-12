@@ -1,0 +1,9 @@
+
+Math::RPN - Reverse Polish Calculator
+
+Standard installation:
+
+perl Makefile.PL
+make
+make test
+make install

@@ -1,0 +1,83 @@
+#!/usr/local/bin/perl
+# Repeatedly train a message with dspam until it gets it right!
+# Usage: dspam-train [spam|ok] [file]
+#
+
+use strict;
+use warnings;
+use Mail::SpamFilter ':all';
+
+(my $myname = $0) =~ s|(.*/)*||;	# strip path component from name
+my $Usage = "Usage: $myname [spam|ok] [file]\n";
+# Check one or more arguments:
+die $Usage if ($#ARGV < 0);
+
+my $HOME = $ENV{'HOME'} || $ENV{'LOGDIR'} ||
+                (getpwuid($<))[7] || die "You're homeless!\n";
+my $USER = $ENV{'USER'} || getlogin ||
+                (getpwuid($<))[0] || die "You're nameless!\n";
+
+my $opts = "--user $USER --mode=teft --stdout";
+
+my $V = 0;
+if (@ARGV && $ARGV[0] eq "-v") {
+  $V = 1;
+  shift;
+}
+my $type = shift;
+my $result;
+my $class;
+if ($type eq "spam") {
+  $result = qq["Spam"];
+  $class = "spam";
+} elsif (($type eq "good") || ($type eq "notspam") || ($type eq "ok")) {
+  $result = qq["Innocent"];
+  $class = "innocent";
+}
+
+if (@ARGV && $ARGV[0] eq "x" && -f "$HOME/Documents/x") {
+  $ARGV[0] = "$HOME/Documents/x";
+}
+
+# Slurp message from command line or STDIN:
+undef $/;
+my $msg = <>;
+die unless defined($msg);
+
+$msg =~ s/\nX-Spam-Votes:.*//;
+
+my ($tags, $header, $body) = extract_spam_headers($msg);
+
+# Add the signature for retraining:
+#$header .= "$1\n" if $$tags{dspam} && ($$tags{dspam} =~ /(X-DSPAM-Signature: .*)/);
+
+$msg =  $header . $body;
+
+foreach my $i (1..10) {
+  print "Reporting message as $class...\n" if $V;
+  # source=error isn't finding the signature?
+  if (0 && ($header =~ /X-DSPAM-Signature/)) {
+    open(OUT, "|dspam $opts --source=error --class=$class")
+      or die "dspam failed: $!\n";
+  } else {
+    open(OUT, "|dspam $opts --source=inoculation --class=$class")
+      or die "dspam failed: $!\n";
+  }
+  print OUT $msg;
+  close(OUT) or die "close failed: $!\n";
+  print "Testing...\n" if $V;
+  # Test if the inoculation succeeded:
+  unless(open(IN, "-|")) {
+    open(OUT, "|dspam $opts --classify")
+      or die "Can't run dspam $opts --classify: $!\n";
+    print OUT $msg;
+    close(OUT);
+    exit(0);
+  }
+  my $output = join("", <IN>);
+  close(IN);
+  print $output if $V;
+  last if $output =~ /$result/;
+  print "Retrying...\n if $V";
+}
+

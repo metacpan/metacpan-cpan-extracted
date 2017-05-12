@@ -1,0 +1,629 @@
+Revision history for Perl extension MARC::Record.
+
+2.0.6 Tue Oct 22 16:17:06 UTC 2013
+        [ENHANCEMENTS]
+        - MARC::Field->as_string() now accepts an optional second
+          parameter to specify the delimiter to use between
+          subfields. (Tomas Cohen Arazi)
+        - MARC::Field->delete_subfield() can now accept a regexp
+          to specify the subfields to remove.  For example, to
+          remove all numeric subfields, one can say:
+
+          $field->delete_subfield(code => qr/\d/);
+
+          (Jason Stephenson)
+        [FIXES]
+        - the warnings pragma is now used throughout MARC::Record
+        - $field->as_string('0') now returns the contents of
+          subfield $0 rather than the contents of all of the
+          subfields in the field.
+        - RT#88421: add newline after printing warnings
+          (Jason Stephenson)
+        - RT#85804: fix spelling glitch (Gregor Herrmann)
+
+2.0.5 Mon Feb 11 20:39:10 PST 2013
+        - fix use of qw(...) in test case so that module passes
+          tests with Perl 5.17.x.
+
+2.0.4 Sat Feb  9 19:01:47 PST 2013
+        [ENHANCEMENTS]
+        - add MARC::Field->set_indicator($indpos, $indval), a mutator
+          for indicators
+        - add MARC::Field->set_tag to allow tags to be renamed
+          (Robin Sheat)
+        - delete_subfield(), if given a single subfield label as its
+          argument, will delete all instances of the specified
+          subfield, increasing its DWIM factor
+        - improved POD for MARC::Field->delete_subfield()
+        [FIXES]
+        - RT#70346: delete_subfield() no longer clears entire field if
+          arguments are badly formatted
+        - croak if invalid arguments are passed to delete_subfield()
+        - fix error in tutorial (thanks to Tom Burton-West for the
+          catch)
+        - RT#76990: emit leader of correct length even if record longer
+          than 99,999 octets (Julian Maurice)
+        - RT#67094: croak with correct error if attempting to create
+          MARC::Field sans subfields
+        - corrected POD for indicator() method
+        - move tag validity check to new class method,
+          is_valid_tag($tagno)
+        - move indicator validity check to new class method,
+          is_valid_indicator($indval)
+        - have MARC::Record pass perlcritic --gentle (mostly)
+        - remove function prototypes
+          (see http://www.perlmonks.org/?node_id=861966)
+
+2.0.3 Fri Jan 14 17:50:12 EST 2011
+        - RT#62296: fix crash when dealing with record bigger than
+          99999 bytes (Alex Arnaud)
+        - test cases for MARC::Field->subfields()
+        - RT#61198: let subfields return an empty array on control
+          fields (Colin Campbell)
+
+2.0.2 Tue May  4 13:04:07 EDT 2010
+        - RT#57180: put back and expanded copyright statement in README
+          at Debian request
+        - set license element in META.yml
+
+2.0.1 Sat May  1 15:59:54 EDT 2010
+        [ENHANCEMENTS]
+        - improve support for subclassing MARC::Field (Dan Wells)
+        - RT#55993: MARC::Record->insert_fields_after can now insert 
+          after last field in record (Frédéric Demians)
+        - added methods to MARC::Field to allow a (class-level) list of 
+          fields that should be considered control fields in addition 
+          to 001-009. Includes test t/extra_controlfields.t, and 
+          supports alphabetic characters in the tag labels.  The new 
+          methods are
+               allow_controlfield_tags
+               disallow_controlfield_tags
+               is_controlfield_tag
+          (Bill Dueber)
+        - added MARC::Record::delete_fields() and t/delete-field.t 
+          (Ed Summers)
+        - documentation improvements (Mike Rylander and Dan Scott)
+        - baked in minimum Perl version required: 5.8.2
+
+2.0
+        [THINGS THAT MAY BREAK YOUR CODE]
+        - Perl 5.8.2 required for utf8 handling
+
+        [ENHANCEMENTS]
+        - removed dead utf8 handling code
+        - added MARC::File::Encode wrapper around Encode module since
+          Encode exports encode() by default which conflicts with existing
+          MARC::File::Encode::encode (yuck).
+        - added MARC::Record::encoding() for getting/setting record encoding
+        - modified t/utf8.t to unconditionally do tests since a modern
+          perl will now be required.
+        - Added --hex switch to marcdump, which dumps the record in
+          hexadecimal.  The offsets are in decimal so that you can match
+          them up to values in the leader.  The offset is reset to 0
+          when we're past the directory so that you can match up the data
+          with the offsets in the directory.
+        - docfixes in Record.pm (thanks Todd Holbrook)
+        - added MARC::Field->delete_subfields
+
+1.39_02 Tue Dec 21 09:29:45 CST 2004
+
+        [THINGS THAT MAY BREAK YOUR CODE]
+        - Removed the ability to call new from an instance of MARC::Record
+          or MARC::Field.  Any place where you might have code like:
+
+              my $rec = MARC::Record->new();
+              ...
+              my $another = $rec->new();
+
+          will have to be changed to:
+
+              my $rec = MARC::Record->new();
+              ...
+              my $class = ref( $rec );
+              my $another = $class->new();
+
+          or:
+
+              my $rec = MARC::Record->new();
+              ...
+              my $another = MARC::Record->new();
+        - Removed MARC::Lint and the marclint utility to a separate
+          package on CPAN.
+        - MARC::Doc::Tutorial.pod updated to reflect the change.
+        - Fixed t/50.batch.t to use File::Spec in the MicroLIF section
+        - Other tests in t/ also use File::Spec to specify paths
+
+        - MARC::File::USMARC ignores \x1a, the DOS end-of-file character,
+        between records and at the end of files.
+        - Added corresponding tests dosEOF.t, cameleof.usmarc, and
+        sample1eof.usmarc.
+
+        [FIXES]
+        - Clarified docs on the interface to field(), and fixed problem
+          whereby in scalar context if no match was found we were
+          returning an empty list instead of undef.  Strictly speaking,
+          this is an interface change, but in practice anyone making this
+          call in a scalar context was going to get 0, which if used as
+          a MARC::Field would bomb.  We therefore don't expect the change
+          to affect anything that wasn't already blowing up.
+
+        - Fixed the doc and example for MARC::Field::subfields() so that
+          they match the behavior of the function, namely returning a list
+          rather than a list ref.
+
+        - Fixed behavior of MARC::Batch::next() to not reset warnings
+          on the MARC::Record object that it returns. Also added test to 
+          t/75.warnings.t
+
+        - Added code to MARC::MicroLIF::decode() to change line endings to those
+        of the platform before decoding the passed-in string. Also added test to
+        t/81.decode.t
+
+        - Turned off utf8 handling until it can safely be done without 
+          converting all MARC data to utf8.
+
+        - Made marcdump respect --noquiet as documented.
+
+        [ENHANCEMENTS]
+        - added MARC::Field::delete_subfields() and tests to t/67.subfield.t
+
+        - Added tests to make sure that MARC::Record::leader() adds warnings
+          if called as a setter with data that isn't the right length.
+
+        - Added explicit tests for convenience function behavior (title(),
+          edition(), etc.) when there's no data.
+
+        - Added test to verify insert_fields_before() behavior when the
+          field to insert before isn't in the record.
+
+        - Added tests to MARC::Field::indicator() to make sure that when
+          called on a control field the return is undef.
+
+1.39_01 Mon Jul 26 11:48:33 PDT 2004
+
+        [ENHANCEMENTS]
+        - Support for UTF8 in Perls >= 5.8.1. When using a utf8 friendly Perl
+          all file streams will be opened in utf8 mode, and the bytes pragma
+          will be used to create and use direcotry byte offsets. 
+
+        - Added MARC::File::Utils which contains utf8 safe functions.
+
+        - marcdump now sets STDOUT to utf8 if it is able to.
+
+        - t/utf8.t is no longer skipped.
+
+        - removed redundant record length check in MARC::File::USMARC::_next()
+          and adjusted tests in t/75.warnings.t
+
+        - All tests run under -T.
+
+1.38    March 16th, 2004
+
+        [ENHANCEMENTS]
+        - Performance tweak on MARC::Field->is_control_field() since it
+          gets called a lot when cloning records.
+        - Performance tweak on MARC::Field->as_string(), since it gets
+          called all the time.
+
+
+1.36    March 9th, 2004
+
+        [THINGS THAT MAY BREAK YOUR CODE]
+        - Renamed MARC::Field->is_control_tag() to is_control_field().
+
+        [FIXES]
+        - fixed SYNOPSIS in MARC::Batch to use constructor. Thanks Ed Sperr
+          New England College of Optometry.
+        - fixed reference to the tutorial in README. Thanks Stephen Graham,
+          London Business School.
+        - marcdump and marclint didn't recognize the -v flag.
+        - calls to MARC::Field::subfield() on a control field (tag < 010 ) 
+          will cause a fatal error, with a friendly message telling you 
+          to use data(). Similarly a call to data() on a field >= 010
+          will result in a friendly error telling you to use subfield().
+          Previously a warning was generated, and MARC::Field continued
+          along only to barf when it was unable to find an array ref in 
+          $self->{ _subfields }.
+
+        [ENHANCEMENTS]
+        - Finished documentation on all modules.  Updated t/pod-coverage.t
+          to keep us in line.
+
+1.34    December 16th, 2003
+        [ENHANCEMENTS]
+        - modified MARC::File::in() to allow passing in filehandles instead
+          of a filename. Useful in situations where you might have data
+          compressed on disk, and want to read from a decompression pipe.
+          This effects MARC::Batch of course as well, which has had its
+          documentation updated. 
+        - added t/85.fh.t to test new filehandle passing
+        - Incorrect filetypes passed in to the MARC::Batch constructor
+          now croak instead of die, so you can see where in your code it
+          was called.
+
+        [FIXES]
+        - etc/specs modified to correctly parse LCs docs to get the 250 $b 
+          properly. Thanks Bryan Baldus at Quality Books.
+        - new Lint.pm with 250 $b.
+        - MARC::Field now leaves alphabetic indicators as they are instead
+          of squashing to a space. Added test of new functionailty. Thanks 
+          Leif Andersson from Stockholms Universitet.
+        - MARC::File::USMARC no longer checks the validity of indicators
+          but leaves that up to MARC::Field (instead of having the check
+          twice).
+        - In MARC::Batch, the 'warn' elements weren't quoted.
+        - warnings_on and strict_on should now be respected.
+
+1.33    November 24th, 2003
+        MARC::Record should now run on Perls back to 5.00503!
+
+        [FIXES]
+        - fixed behavior in MARC::File::USMARC which was causing 
+          MARC::File::next() to return a partial record when the record
+          lacked a proper end of directory byte. RT #4474. Added regression
+          test t/82.baddir.t.
+        - we now warn on improper 010 tag access, not croak.
+        - fixed t/80.alphatag to test new MARC::Field::data() behavior
+        - doc fix to insert_field_grouped()
+        - tons of fixes and additions to MARC::Doc::Tutorial
+
+        [INTERNALS]
+        - Moved pl/ to bin/
+        - Split out the sfdocs stuff from Makefile.PL to bin/makesfdocs
+
+1.32    November 5th, 2003
+        [ENHANCEMENTS]
+        - added insert_ordered_fields(), thanks Leif Andersson.
+
+1.31    October 16th, 2003
+        [FIXES]
+        - set_leader_lengths() will now also set other MARC21 leader defaults.
+          Postitions 10-11, 20-23. For details on the defaults see:
+          http://www.loc.gov/marc/bibliographic/ecbdldrd.html 
+        - MARC::Batch::next() now accepts a filter function.
+        - Fixed an incorrect instruction in MARC::File::MicroLIF.
+        - marclint actually counts the number of records now.
+
+        [DOCUMENTATION]
+        - Added sample usage for insert_grouped_fields()
+        - Added example about subfield v to x conversion to tutorial.
+        - Documentation fix for MARC::Field::new().
+        - Fixed useage of MARC::Record::append_fields() in example 17
+          of the Tutorial.
+        - Added TODO test for utf8 handling (utf8.t)
+        - Fixed doc bug in MARC::File::USMARC (#2937)
+
+1.30    There is no 1.30.  We skipped a number.
+
+1.29    June 05, 2003   
+        [ENHANCEMENTS]
+        - MARC::Field::subfield() will return a list of all subfield
+          data when called in a list context...and only the first when
+          called in a scalar context. Also added a test 67.subfield.t
+          to test new functionality.
+
+1.28    May 23, 2003
+        [FIXES]
+        - Fixed MARC::Lint::check_record()'s checking for multiple 1XX tags.
+
+        - Fixed the docs for MARC::Lint and what errors it says it catches.
+
+1.27    May 22, 2003
+        [ENHANCMENTS]
+        - MARC::Field::update() by default will append any subfields which do
+          not exist in the record to the end of the field. Added tests to test
+          the new functionality to 60.update.t
+
+        [FIXES]
+        - Updated MARC::Lint to use the latest field/subfield designations from
+          the Library of Congress.  The data for MARC::Lint is now
+          automatically generated from the LC webpage.  Thanks to Colin
+          Campbell of Sirsi for the program that does the translation.
+
+        - removed MARC::Lint check_260() since a subfield c is not 
+          mandatory (see RT #1565).
+
+1.26    May 8, 2003
+        [FIXES]
+        - Removed the "use warnings" in the couple of files that used it.
+          This obviates the need for the pre5006.patch file.
+
+        - Fixed some warnings for undefs.  These only turned up because
+          Test::Harness now has warnings turned on.
+
+1.25    April 22, 2003
+        NO CHANGES.  Just compensating for upload problems.
+
+1.24    April 22, 2003
+        [ENHANCEMENTS]
+        - expanded documentation for MARC::Field::as_string()
+
+        [FIX]
+        - modified MARC::File::USMARC to silently ignore any
+          combination of nulls, spaces, CRs, and LFs between
+          records.  (They're not allowed to be there, but some
+          vendors put them there anyway.)  With this change in
+          place you will now get the complete record--if the
+          inter-record garbage is the only problem--rather than
+          a record with (usually) zero fields.
+
+1.23    March 30, 2003
+        [FIX]
+        - removed t/85.utf8.t since it did not work
+        - removed bytes pragma usage since there is no feasible way to 
+          get MARC::Record to properly handle utf8 while it is using 
+          substr() so heavily. substr() uses character lengths, and 
+          directory positions measure lengths in bytes.
+        - updated pre5006.patch to only remove warnings pragma
+
+1.22    March 23, 2003
+        - added t/85.utf8.t to test record lengths work when utf8 data
+          is present in a record (regression test for RT #2165)
+        - warnings and bytes pragmas are now explicit
+        - added patch for removing warnings and bytes pragmas for Perl 
+          versions < 5.006
+        - updated README to include information about the patch
+        [FIX]
+        - removed warnings pragma from MARC/File/USMARC.pm and 
+          MARC/File/MicroLIF.pm since with warnings on, they generate quite 
+          a few warnings. These are mainly thrown by substr() when 
+          working with invalid MARC data.
+
+1.21    March 14, 2003
+        [ENHANCEMENTS]
+        - MARC::File::MicroLIF now reads the MicroLIF header from
+          the input file and makes it available via the header()
+          call.  If there is no header in the file, header()
+          will return undef.  Because the header is now taken
+          care of when the file is opened, 
+          MARC::File::MicroLIF::decode no longer supports skipping 
+          the file header.
+        - MARC:File::MicroLIF::decode now detects fields that
+          have no subfields (other than 001-009) rather than
+          passing them through to MARC::Field which croak()s.
+          When such a tag is encountered it is thrown away and
+          a warning added to the MARC::Record, rather than
+          allowing MARC::Field to croak().
+        - Updated data files used to test MARC::File::MicroLIF
+          so that they have a header.
+
+        [FIXES]
+        - MARC:File::MicroLIF now supports input files with any
+          type of line ending--\x0d, \x0a, or \x0d\0a.  A file no
+          longer has to have created on a system with compatible
+          line endings.
+        - Fixed invalid assumption in MARC::File::MicroLIF that
+          the MicroLIF header is supposed to begin with 'HDR'.
+
+1.20    February 26, 2003
+        [FIXES]
+        - Removed $VERSION from all modules except for MARC::Record
+          itself.
+        - Fixed a $VERSION problem in MARC::Record that prevented CPAN
+          from indexing the module correctly.
+        - Added more tests to the .t files.
+
+1.18    February 16, 2003
+        [ENHANCEMENTS]
+        - when MARC::Batch::no_strict() will allow you to read in 
+          records with invalid record lengths.
+        [FIXES]
+        - Changes to MARC::File::USMARC->decode() to fix the
+          rt.cpan.org bug #2017, "MARC::File::USMARC assumes 
+          that fields apper in directory order".
+        - Stricter checking on MARC directory entries.
+
+1.17    January 29, 2003
+        [ENHANCEMENTS]
+        - Added optional subfield string to MARC::Field::as_string().
+        - Added tag-based filtering on the USMARC constructors and 
+          passthru support for this in MARC::File::next().  Now you can 
+          select which tags get put into your MARC record, and not have
+          to pay the processing costs for fields you're going to ignore.
+        - title_proper() now returns the _a, _n and _p from the 245 in
+          whatever order they happen to appear.  Thanks to Anne Highsmith
+          for the change and the test data.
+        - Minor speed tweaks when checking for tags < 010
+        - Made the POD checking in t/99.pod.t work better.  Eventually I
+          need to make the same changes into Test::Pod.
+
+1.16    January 28, 2003
+        [ENHANCEMENTS]
+        - title() and author() now return empty strings, rather than
+          "<No XXX found>"
+        - Added title_proper(), edition() and publication_date()
+          convenience methods to MARC::Record.
+        - Added more unit tests.
+
+        [FIXES]
+        - marcdump utility will not output LDR when running under --field 
+          option, unless the LDR is specifically asked for.
+
+1.15    December 8, 2002
+        [FIXES]
+        - Ignores and warns about any completely empty subfields (i.e. not
+          even any indicators)
+        - MARC::File::USMARC::decode and MARC::File::MicroLIF::decode needed to
+          be able to be called in a variety of ways: $obj->decode(), 
+          MARC::File::MicroLIF->decode() and MARC::File::MicroLIF::decode()
+          Added t/081.decode.t to make sure things are shipshape.
+
+1.14    November 27, 2002
+        [FIXES]
+        - Fixed bug in MARC::File::USMARC that was set off by failure of 
+          t/75.warnings.t under ActivePerl and CygWin.
+
+1.13    November 26, 2002 
+        [ENHANCEMENTS]
+        - Moved new_from_usmarc() docs & code up right after new() to 
+          be more prominent. Thanks to Chris Biemesderfer for pointing this 
+          out.
+        - Added Chris Biemesderfer's section to the tutorial which 
+          discusses using MARC::Record with Net::Z3950.
+        - Yet another overhaul to MARC::Batch to allow for error trapping. 
+          Added the warnings_on() warnings_off() methods to turn on/off 
+          warnings on STDERR. Also added strict_on() and strict_off() to 
+          change the behavior of next() when an error is encountered.
+          Thanks to Rob Fox of Notre Dame for providing guidance on the type
+          of behavior that is really needed when batch processing.
+        - Added new tests for the improved handling of errors in MARC::Batch.
+        - Added new warnings and strict methods to MARC::Doc::Tutorial, also
+          added more use of MARC::Batch instead of using MARC::File directly.
+        - Improved docs on some functions to explicitly says what gets
+          returned from each function.
+
+1.12    October 9, 2002 
+        [ENHANCEMENTS]
+        - Makefile.PL will now generate PDF and HTML documentation for 
+          Sourceforge when asked to.
+        - Added a test for insert_field_grouped()
+        - Added subject heading example to Tutorial
+        - Fixed typo in docs for MARC::Record::append_fields()
+        - Added code (and tests) for allowing users to specify alphanumeric
+          tags. This is little used, but it's in the spec, and someone asked
+          for it (Notre Dame). Edits were to MARC::Field and to a lesser
+          extent MARC::Record.
+
+1.11    September 10, 2002
+        [ENHANCEMENTS]
+        - Added a 99.pod.t to check pod
+        - insert_fields_before(), insert_fields_after(), appned_fields(),
+          and insert_grouped_fields() now call croak() instead of _gripe
+          in order to help MARC::Record users to locate where their call 
+          is failing. Thanks to Jackie Shieh for pointing this out.
+        - MARC::Batch is now fault tolerant, in that it will store 
+          warnings about file format problems, but will not bomb out. 
+          The method MARC::Batch::warnings() can be used to get info
+          about what went wrong while reading a record, and users can
+          determine what to do. Thanks to Betsy Earl for solidifying the
+          need for this.
+
+1.10    August 30, 2002
+        [ENHANCEMENTS]
+        - Now runs under Perl 5.005.  All you people who have older Perls can
+          now share in the joy that is MARC::Record.
+        - Added warnings() and _warn methods to MARC::Batch, MARC::File to 
+          support warning collection and reporting.
+        - Added use bytes to MARC::File::USMARC so that calls to length() will
+          return actual bytes rather than characters if Unicode characters are
+          found in the data.  This only works if you're using 5.6.0+.
+
+        [FIXES]
+        - Modified MARC::File::USMARC::_next() to slurp in a record using
+          local $/ = 0x1D, rather than reading record length and then calling
+          read(). This will allow recovery from invalid leaders in batch 
+          reading. 
+
+1.00    July 3, 2002
+        - _gripe() fires off warnings instead of dying silently.
+        - MARC::File::USMARC no longer creates an error if it's and the
+          end of a file when it tries to next().
+        - Tests use the isa_ok() function to be more stringent in checking
+          return values from functions.
+
+0.94    June 10, 2002
+        - Added $MARC::Record::DEBUG
+        - Added --debug flag to marcdump to enable $MARC::Record::DEBUG
+        - Added 'Validation' section to MARC::Doc::Tutorial
+        - Added append_fields(), insert_fields_after(), 
+          insert_fields_before() and deprecated add_fields()
+        - Added test of new methods (t/60.insert.t)
+        - Updated MARC::Doc::Tutorial to reflect change in add_fields()
+
+0.93    May 21, 2002
+        - Added update() and replace_with() methods to MARC::Field
+        - Added more stuff to MARC::Doc::Tutorial
+        - Added MARC::Doc::Tutorial
+        - Changed method call description for as_usmarc() in MARC::Record.
+        - Removed IDEA for cloning in MARC::Record docs since it's been done.
+
+0.92    April 2, 2002
+        - Fixed marclint to use the new MARC::File object
+        - Added MARC::Record::new_from_usmarc() for backward compatibility.
+        This is in addition to the MARC::Record::as_usmarc() function.
+
+0.91    April 2, 2002
+        - Fixed a bad build: MARC::Batch wasn't included in the tarball.
+
+        - marcdump now takes a --lif parm to be able to dump MicroLIF
+        records.
+
+0.90    April 1, 2002
+        - Alpha version of what will become MARC::Record 1.00.
+
+        - MAJOR infrastructure changes.  Scripts WILL break.
+
+        - The file-handling has been removed from the MARC::Record class
+        and moved into its own MARC::File::* set of classes.
+
+        - First rudimentary MARC::Batch functionality.  This will make
+        it easy to handle bunches of files at once without having to
+        muck with what file you're on.
+
+        - Now fully embracing all the glory of 5.6+ Perl, such as the
+        "our" keyword and $fh filehandles.
+
+0.15    March 19, 2002
+        - Added clone() methods for MARC::Field and MARC::Record, so
+        you can make a copy of an existing record.  Plus, this acts
+        as a filter to create records that are subsets of another.
+        
+        - Added selective printing of fields in marcdump.  Now you
+        can do something like this:
+
+            marcdump myfile.marc --field=245 --field=1XX
+
+        and only get back the title and author fields
+
+0.14    March 7, 2002
+        - Added skip_from_file() to read and ignore a record.  It's the
+        same as next_from_file(), without the overhead of the parsing.
+
+0.13    November 18, 2001
+        - MARC::Lint now squawks if there are inappropriate control
+          characters in the data.
+
+0.12    November 13, 2001
+        - new_from_microlif() now allows underscores that are embedded in a
+          subfield, and ignores any HDR line that gets passed to it.
+
+0.11    November 12, 2001
+        - Added inbound microlif support.
+        - Added lif2marc program.
+
+0.10    September 27, 2001
+        - Correctly updates the base address in the leader.  Thanks to
+        Tim Wentz (twentz@mc.net) for finding & fixing.
+
+0.09    August 9, 2001
+        - Updated rules from "Understanding MARC" book.
+        - Added delete_field() method.
+
+0.08    May 25, 2001
+        - Added MARC::Record::title and ::author methods
+        - Added the marclint program.
+        - Added the rest of the rules for the 5XX tags forward.
+        - Made the modules compatible with Perl 5.004.  The exception
+          is MARC::Lint, which requires 5.005 because of the qr//
+          operator.
+        - as_string() methods now return raw strings, without any special
+          formatting.  To get the formatted strings from versions <=0.07,
+          use as_formatted().
+
+0.07    May 22, 2001
+        - Added the rudimentary MARC::Lint module.
+        - Added parms to marcdump program
+
+0.06    May 16, 2001
+        - Added marcdump program as demo and actual useful code
+
+0.05    May 16, 2001
+        - Created t/camel.t as the basis for a test suite. 
+        - Removed the MARC::Field::subfields() method
+        - Documentation cleanup.
+
+0.04    May 15, 2001
+        - Sped up the MARC::Record and MARC::Field constructors about 30%.
+
+0.01    Apr 20, 2001
+        - First version.

@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<config>
+
+    <language name="Russian" code="rus" />
+    <script name="Cyrillic" code="(N" orientation="r" />
+
+    <detrans-fields>
+        <field tag="100">
+            <subfield code="a" />
+            <subfield code="q" />
+            <subfield code="d" copy="true" />
+        </field>
+    </detrans-fields>
+
+    <detrans-fields>
+        <field tag="440">
+            <subfield code="a" />
+            <subfield code="p" />
+            <subfield code="n" copy="true" />
+            <subfield code="v" copy="true" />
+        </field>
+    </detrans-fields>
+    
+    <rule>
+        <roman> Russia</roman>
+        <marc escape="(N"> rOSSIQ</marc>
+    </rule>
+    <rule>
+        <roman> </roman>
+        <marc escape="(N"> </marc>
+    </rule>
+    <rule>
+        <roman>!</roman>
+        <marc escape="(N">!</marc>
+    </rule>
+    <rule>
+        <roman>"</roman>
+        <marc escape="(N">"</marc>
+    </rule>
+    <rule>
+        <roman>#</roman>
+        <marc escape="(N">#</marc>
+    </rule>
+    <rule>
+        <roman>$</roman>
+        <marc escape="(N">$</marc>
+    </rule>
+    <rule>
+        <roman>%</roman>
+        <marc escape="(N">%</marc>
+    </rule>
+    <rule>
+        <roman>&amp;</roman>
+        <marc escape="(N"></marc>
+    </rule>
+    <rule>
+        <roman>'</roman>
+        <marc escape="(N">'</marc>
+    </rule>
+    <rule>
+        <roman>(</roman>
+        <marc escape="(N">(</marc>
+    </rule>
+    <rule>
+        <roman>)</roman>
+        <marc escape="(N">)</marc>
+    </rule>
+    <rule>
+        <roman>*</roman>
+        <marc escape="(N">*</marc>
+    </rule>
+    <rule>
+        <roman>+</roman>
+        <marc escape="(N">+</marc>
+    </rule>
+    <rule>
+        <roman>,</roman>
+        <marc escape="(N">,</marc>
+    </rule>
+    <rule>
+        <roman>-</roman>
+        <marc escape="(N">-</marc>
+    </rule>
+    <rule>
+        <roman>.</roman>
+        <marc escape="(N">.</marc>
+    </rule>
+    <rule>
+        <roman>/</roman>
+        <marc escape="(N">/</marc>
+    </rule>
+    <rule>
+        <roman>0</roman>
+        <marc escape="(N">0</marc>
+    </rule>
+    <rule>
+        <roman>1</roman>
+        <marc escape="(N">1</marc>
+    </rule>
+    <rule>
+        <roman>2</roman>
+        <marc escape="(N">2</marc>
+    </rule>
+    <rule>
+        <roman>3</roman>
+        <marc escape="(N">3</marc>
+    </rule>
+    <rule>
+        <roman>4</roman>
+        <marc escape="(N">4</marc>
+    </rule>
+    <rule>
+        <roman>5</roman>
+        <marc escape="(N">5</marc>
+    </rule>
+    <rule>
+        <roman>6</roman>
+        <marc escape="(N">6</marc>
+    </rule>
+    <rule>
+        <roman>7</roman>
+        <marc escape="(N">7</marc>
+    </rule>
+    <rule>
+        <roman>8</roman>
+        <marc escape="(N">8</marc>
+    </rule>
+    <rule>
+        <roman>9</roman>
+        <marc escape="(N">9</marc>
+    </rule>
+    <rule>
+        <roman>:</roman>
+        <marc escape="(N">:</marc>
+    </rule>
+    <rule>
+        <roman>;</roman>
+        <marc escape="(N">;</marc>
+    </rule>
+    <rule>
+        <roman>&amp;lt;</roman>
+        <marc escape="(N"></marc>
+    </rule>
+    <rule>
+        <roman>=</roman>
+        <marc escape="(N">=</marc>
+    </rule>
+    <rule>
+        <roman>&amp;gt;</roman>
+        <marc escape="(N"></marc>
+    </rule>
+    <rule>
+        <roman>?</roman>
+        <marc escape="(N">?</marc>
+    </rule>
+    <rule>
+        <roman>@</roman>
+        <marc escape="(N">@</marc>
+    </rule>
+    <rule>
+        <roman>A</roman>
+        <marc escape="(N">a</marc>
+    </rule>
+    <rule>
+        <roman>B</roman>
+        <marc escape="(N">b</marc>
+    </rule>
+    <rule>
+        <roman>Ch</roman>
+        <marc escape="(N">~</marc>
+    </rule>
+    <rule>
+        <roman>D</roman>
+        <marc escape="(N">d</marc>
+    </rule>
+    <rule>
+        <roman>E</roman>
+        <marc escape="(N">e</marc>
+    </rule>
+    <rule>
+        <roman>F</roman>
+        <marc escape="(N">f</marc>
+    </rule>
+    <rule>
+        <roman>G</roman>
+        <marc escape="(N">g</marc>
+    </rule>
+    <rule>
+        <roman>I</roman>
+        <marc escape="(N">i</marc>
+    </rule>
+    <rule>
+        <roman>Kh</roman>
+        <marc escape="(N">h</marc>
+    </rule>
+    <rule>
+        <roman>K</roman>
+        <marc escape="(N">k</marc>
+    </rule>
+    <rule>
+        <roman>L</roman>
+        <marc escape="(N">l</marc>
+    </rule>
+    <rule>
+        <roman>M</roman>
+        <marc escape="(N">m</marc>
+    </rule>
+    <rule position="initial">
+        <roman>M</roman>
+        <marc escape="(N">x</marc>
+    </rule>
+    <rule>
+        <roman>N</roman>
+        <marc escape="(N">n</marc>
+    </rule>
+    <rule>
+        <roman>O</roman>
+        <marc escape="(N">o</marc>
+    </rule>
+    <rule>
+        <roman>P</roman>
+        <marc escape="(N">p</marc>
+    </rule>
+    <rule>
+        <roman>R</roman>
+        <marc escape="(N">r</marc>
+    </rule>
+    <rule>
+        <roman>Short stories</roman>
+        <marc escape="(N">pOWESTI I RASSKAZY</marc>
+    </rule>
+    <rule>
+        <roman>Shch</roman>
+        <marc escape="(N">}</marc>
+    </rule>
+    <rule>
+        <roman>Sh</roman>
+        <marc escape="(N">{</marc>
+    </rule>
+    <rule>
+        <roman>S</roman>
+        <marc escape="(N">s</marc>
+    </rule>
+    <rule>
+        <roman>T</roman>
+        <marc escape="(N">t</marc>
+    </rule>
+    <rule>
+        <roman>U</roman>
+        <marc escape="(N">u</marc>
+    </rule>
+    <rule>
+        <roman>V</roman>
+        <marc escape="(N">w</marc>
+    </rule>
+    <rule>
+        <roman>Y</roman>
+        <marc escape="(N">y</marc>
+    </rule>
+    <rule>
+        <roman>Zh</roman>
+        <marc escape="(N">v</marc>
+    </rule>
+    <rule>
+        <roman>Z</roman>
+        <marc escape="(N">z</marc>
+    </rule>
+    <rule>
+        <roman>\</roman>
+        <marc escape="(N">\</marc>
+    </rule>
+    <rule>
+        <roman>^</roman>
+        <marc escape="(N">^</marc>
+    </rule>
+    <rule>
+        <roman>_</roman>
+        <marc escape="(N">_</marc>
+    </rule>
+    <rule>
+        <roman>`</roman>
+        <marc escape="(N">`</marc>
+    </rule>
+    <rule>
+        <roman>a</roman>
+        <marc escape="(N">A</marc>
+    </rule>
+    <rule>
+        <roman>b</roman>
+        <marc escape="(N">B</marc>
+    </rule>
+    <rule>
+        <roman>ch</roman>
+        <marc escape="(N">^</marc>
+    </rule>
+    <rule>
+        <roman>cow</roman>
+        <marc escape="(N">KWA</marc>
+    </rule>
+    <rule>
+        <roman>d</roman>
+        <marc escape="(N">D</marc>
+    </rule>
+    <rule>
+        <roman>e</roman>
+        <marc escape="(N">E</marc>
+    </rule>
+    <rule>
+        <roman>f</roman>
+        <marc escape="(N">F</marc>
+    </rule>
+    <rule>
+        <roman>g</roman>
+        <marc escape="(N">G</marc>
+    </rule>
+    <rule>
+        <roman>i</roman>
+        <marc escape="(N">I</marc>
+    </rule>
+    <rule>
+        <roman>kh</roman>
+        <marc escape="(N">H</marc>
+    </rule>
+    <rule>
+        <roman>k</roman>
+        <marc escape="(N">K</marc>
+    </rule>
+    <rule>
+        <roman>l</roman>
+        <marc escape="(N">L</marc>
+    </rule>
+    <rule>
+        <roman>m</roman>
+        <marc escape="(N">M</marc>
+    </rule>
+    <rule>
+        <roman>n</roman>
+        <marc escape="(N">N</marc>
+    </rule>
+    <rule>
+        <roman>o</roman>
+        <marc escape="(N">O</marc>
+    </rule>
+    <rule>
+        <roman>p</roman>
+        <marc escape="(N">P</marc>
+    </rule>
+    <rule>
+        <roman>r</roman>
+        <marc escape="(N">R</marc>
+    </rule>
+    <rule>
+        <roman>shch</roman>
+        <marc escape="(N">]</marc>
+    </rule>
+    <rule>
+        <roman>sh</roman>
+        <marc escape="(N">[</marc>
+    </rule>
+    <rule>
+        <roman>s</roman>
+        <marc escape="(N">S</marc>
+    </rule>
+    <rule>
+        <roman>t</roman>
+        <marc escape="(N">T</marc>
+    </rule>
+    <rule>
+        <roman>u</roman>
+        <marc escape="(N">U</marc>
+    </rule>
+    <rule>
+        <roman>v</roman>
+        <marc escape="(N">W</marc>
+    </rule>
+    <rule>
+        <roman>y</roman>
+        <marc escape="(N">Y</marc>
+    </rule>
+    <rule>
+        <roman>zh</roman>
+        <marc escape="(N">V</marc>
+    </rule>
+    <rule>
+        <roman>z</roman>
+        <marc escape="(N">Z</marc>
+    </rule>
+    <rule>
+        <roman>{</roman>
+        <marc escape="(N">{</marc>
+    </rule>
+    <rule>
+        <roman>|</roman>
+        <marc escape="(N">|</marc>
+    </rule>
+    <rule>
+        <roman>}</roman>
+        <marc escape="(N">}</marc>
+    </rule>
+    <rule>
+        <roman>~</roman>
+        <marc escape="(N">~</marc>
+    </rule>
+    <rule>
+        <roman>§</roman>
+        <marc escape="(N">X</marc>
+    </rule>
+    <rule>
+        <roman>·</roman>
+        <marc escape="(Q">ß</marc>
+    </rule>
+    <rule>
+        <roman>åI</roman>
+        <marc escape="(N">I</marc>
+    </rule>
+    <rule>
+        <roman>åi</roman>
+        <marc escape="(N">i</marc>
+    </rule>
+    <rule>
+        <roman>æI</roman>
+        <marc escape="(N">j</marc>
+    </rule>
+    <rule>
+        <roman>æi</roman>
+        <marc escape="(N">J</marc>
+    </rule>
+    <rule>
+        <roman>çE</roman>
+        <marc escape="(N">|</marc>
+    </rule>
+    <rule>
+        <roman>çe</roman>
+        <marc escape="(N">\</marc>
+    </rule>
+    <rule>
+        <roman>èE</roman>
+        <marc escape="(N">(Qd(N</marc>
+    </rule>
+    <rule>
+        <roman>èe</roman>
+        <marc escape="(N">(QD(N</marc>
+    </rule>
+    <rule>
+        <roman>ëTìS</roman>
+        <marc escape="(N">c</marc>
+    </rule>
+    <rule>
+        <roman>ëtìs</roman>
+        <marc escape="(N">C</marc>
+    </rule>
+    <rule>
+        <roman>ëIìU</roman>
+        <marc escape="(N">`</marc>
+    </rule>
+    <rule>
+        <roman>ëiìu</roman>
+        <marc escape="(N">@</marc>
+    </rule>
+    <rule>
+        <roman>ëIìA</roman>
+        <marc escape="(N">q</marc>
+    </rule>
+    <rule>
+        <roman>ëiìa</roman>
+        <marc escape="(N">Q</marc>
+    </rule>
+    <rule>
+        <roman>ëIìE</roman>
+        <marc escape="(N"></marc>
+    </rule>
+    <rule>
+        <roman>ëiìe</roman>
+        <marc escape="(N"></marc>
+    </rule>
+
+    <name>
+        <roman>$aNicholas $bI, $cEmperor of Russia, $d1796-1855</roman>
+        <marc>$a^ESC(NnIKOLAJ^ESCs, $bI, $c^ESC(NiMPERATOR^ESCs ^ESC(NwSEROSSIJSKIJ^ESCs, $d1796-1855</marc>
+    </name>
+
+</config>

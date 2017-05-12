@@ -1,0 +1,167 @@
+#!/usr/bin/perl5
+#
+# mq_cleanq - Clear a queue without administrative authority
+#
+# (c) 2009-2012 Morgan Stanley & Co. Incorporated
+#
+# $Id: mq_clearq,v 33.4 2012/09/26 16:15:21 jettisu Exp $
+#
+
+use Carp;
+use Getopt::Long;
+
+use MQSeries qw(:functions);
+use MQSeries::Message;
+use MQSeries::Queue;
+use MQSeries::QueueManager;
+
+use strict;
+use warnings;
+
+$| = 1;
+
+#
+# Process command-line arguments
+#
+# - qmgr (required)
+# - qname (required)
+#
+my %args;
+GetOptions(\%args, qw(qmgr=s qname=s debug!)) ||
+  die "$0: Error parsing \@ARGV\n";
+
+foreach my $req (qw(qmgr qname)) {
+    die "required parameter '-$req' missing\n" unless ($args{$req});
+}
+
+#
+# Connect to the queue manager
+#
+my $qmgr_name = $args{'qmgr'};
+my $qmgr = MQSeries::QueueManager::->
+  new('QueueManager' => $qmgr_name,
+      'AutoConnect'  => 0,
+     ) ||
+  confess "Cannot create queue manager object";
+
+$qmgr->Connect() ||
+  confess("Unable to connect to queue manager\n" .
+          "CompCode => " . $qmgr->CompCode() . "\n" .
+          "Reason => " . $qmgr->Reason() . "\n");
+
+print "Connected to queue manager [$qmgr_name]\n" if ($args{debug});
+
+#
+# Open queue for input
+#
+my $qname = $args{'qname'};
+my $get_queue = MQSeries::Queue::->
+  new('QueueManager' => $qmgr,
+      'Queue'        => $qname,
+      'Mode'         => 'input',
+      'AutoOpen'     => 0,
+     ) ||
+  confess "Cannot create queue object";
+
+$get_queue->Open() ||
+  confess "Cannot open queue [$qmgr_name/$qname] for Input: " .
+  $get_queue->Reason() . " (" .
+  MQReasonToText($get_queue->Reason()) . ")";
+
+print "Opened queue: [$qmgr_name/$qname] for INPUT\n"
+  if ($args{debug});
+
+#
+# Main loop starts...
+#
+my $count = 0;
+while (1) {
+    #
+    # The trick to decent performance here is that we:
+    # - (a) set the message buffer length to zero
+    # - (b) allow truncated messages to e retrieved
+    # - (c) don't do syncpoint
+    #
+    my $msg = MQSeries::Message->new(BufferLength => 0);
+    my $rc = $get_queue->
+      Get(Message    => $msg,
+          GetMsgOpts =>
+          {
+           Options   => (
+                         MQSeries::MQGMO_ACCEPT_TRUNCATED_MSG |
+                         MQSeries::MQGMO_FAIL_IF_QUIESCING |
+			 MQSeries::MQGMO_NO_SYNCPOINT
+                        ),
+          },
+         );
+
+    last if ($get_queue->Reason() == MQSeries::MQRC_NO_MSG_AVAILABLE);
+
+    if ($get_queue->Reason() != MQSeries::MQRC_NONE &&
+        $get_queue->Reason() != MQSeries::MQRC_TRUNCATED_MSG_ACCEPTED) {
+        die "Could not get message: reason " . $get_queue->Reason() .
+          " (" . MQReasonToText($get_queue->Reason()) . ")\n";
+    }
+
+    #
+    # Increase count, print dot every 100 messages, newline every 8000
+    #
+    $count++;
+    print "." if ($count % 100 == 0);
+    print "\n" if ($count % 8000 == 0);
+}
+print "\nDeleted $count messages\n";
+
+
+__END__
+
+=head1 NAME
+
+mq_clearq -- Utility to delete all messages from a queue
+
+=head1 SYNOPSIS
+
+mq_clearq -qmgr "queue manager"
+          -qname "queue name"
+        [ -debug | -nodebug ]
+
+=head1 DESCRIPTION
+
+C<mq_clearq> is a utility to delete all messages from an
+application-specific queue.  This should only be used in exceptional
+circumstances: if you don not care about your messages, you should be
+using non-peristent expiring messages, or avoid MQ altogether.
+
+MQ administrators can clear a queue more quickly with MQSC or PCF
+commands.  This script allows non-admin users, who just have message
+get authority on a queue, to get rid of the messages.
+
+While C<mq_clearq> is running, it prints a dot for every 100 messages
+it removes from the queue.  Typically message deletion speed using the
+MQ client (TCP/IP) API is about 200 messages per second.
+
+=head1 OPTIONS
+
+C<mq_clearq> has two required options: C<-qmgr> and C<-qname>.
+
+=head2 -qmgr "queue manager name"
+
+The name of the queue manager containing the application-specific
+queue.  Only Unix queue managers are supported, and this utility
+refuses to run against production queue managers.
+
+=head2 -qname "queue name"
+
+The name of the AppName-specific queue.
+
+=head1 AUTHOR
+
+Hildo Biersma
+
+=head1 SEE ALSO
+
+MQSeries(3)
+
+=cut
+
+

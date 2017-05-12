@@ -1,0 +1,14 @@
+Revision history for Moonshine-Util
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02    30/01/2017
+        A little pod and add - elide
+
+0.03    04/02/2017
+        switch to Exporter::Shiny - @Export - join_class, append_str, prepend_str.
+
+0.06    21/02/2017
+        export - valid_attributes_for_tag('div').
+

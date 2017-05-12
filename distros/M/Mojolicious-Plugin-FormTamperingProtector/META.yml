@@ -1,0 +1,24 @@
+---
+abstract: FormTamperingProtector
+author:
+  - 'Sugama Keita <sugama@jamadam.com>'
+build_requires:
+  Test::More: '0.47'
+  Test::UseAllModules: '0.10'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-FormTamperingProtector
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '6.38'
+resources: {}
+version: '0.03'

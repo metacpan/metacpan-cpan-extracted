@@ -1,0 +1,23 @@
+% layout 'default';
+<h2><%= $message %></h2>
+<a href="<%== url_for %>">click here</a>
+to reload the page 
+<%= image_tag 'bioimage.png' %>
+<%= image_tag 'mojolicious-black.png' %>
+<a id='size' href='/product'>
+  <%= image_tag 'mojolicious-black.png',  size => 10 %>
+</a>
+
+<a id='options' href='/product'>
+  <%= image_tag 'mojolicious-black.png', width => 10, class => 'mojo',  border => '1',  id=> 'foo' %>
+</a>
+
+<a id='custom' 
+  href="<%= image_path '/images/custom/mojolicious-box.png' %>">
+</a>
+
+<a id='withttp' 
+  href="<%= image_path 'http://images/mojolicious-black.png' %>">
+</a>
+  
+

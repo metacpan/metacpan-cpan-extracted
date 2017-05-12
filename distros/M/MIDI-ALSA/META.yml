@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec-current.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         MIDI-ALSA
+version:      1.22
+version_from: ALSA.pm
+installdirs:  site
+license:      perl
+distribution_type: module
+requires:
+  perl: ">= 5.006001"
+build_requires:
+  Test::Simple: 0
+generated_by: /usr/bin/vim

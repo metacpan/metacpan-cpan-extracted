@@ -1,0 +1,17 @@
+Graham Barr <Graham.Barr@tiuk.ti.com>
+    + this would be much harder to write if MailTools didn't already
+      exist
+Cary Evans <c.evans@clear.net.nz>
+    + provided very good feedback on first pass at the maildir interface
+    + wrote File::Sync
+Chris Faylor <cgf@bbc.com>
+    + first person to be brave enough to write an MUA in Mail::Folder
+    + suggestions and bug reports
+Nick Ing-Simmons <nik@tiuk.ti.com>
+    + several suggestions and bug reports
+Andreas Koenig <andreas.koenig@franz.ww.tu-berlin.de>
+    + reminded me of the need for synth_envelope_from and provided the code
+    + suggested I make register_folder_interface implicit
+    + suggestions and bug reports
+Nathan V. Patwardhan
+    + suggestions for simplifying the method interface

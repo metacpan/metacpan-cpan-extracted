@@ -1,0 +1,109 @@
+# Copyright 2015 Jeffrey Kegler
+# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# redistribute it and/or modify it under the terms of the GNU Lesser
+# General Public License as published by the Free Software Foundation,
+# either version 3 of the License, or (at your option) any later version.
+#
+# Marpa::R2 is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser
+# General Public License along with Marpa::R2.  If not, see
+# http://www.gnu.org/licenses/.
+
+# Temporary
+^ada[.]before$
+^sl_ada[.]t$
+^meta_to_asf[.]pl$
+^marpa-problem[.]pl$
+^code[.]errs$
+^dist[.]errs$
+^modulo_AHFA[.]out$
+^bracket.t$
+^discard.t$
+^sl_evsyn2.t$
+
+# Permanent
+
+# LC_ALL=C sort
+etc/libmarpa_basestamp_create[.]pl$
+etc/libmarpa_timestamp[.]pl$
+/[.]gdb_history$
+/[.]gitignore$
+/errs$
+/junk$
+[.]DS_Store$
+[/]nogit_
+\.la$
+\.lo$
+\.o$
+\.pdf$
+\.swp$
+\.tar.gz$
+\/\.git\/
+^notes\/
+^Build$
+^MANIFEST\.SKIP$
+^MYMETA.json$
+^MYMETA.yml$
+^Makefile$
+^Marpa-R2-\d+.\d{3}_\d{3}/
+^Marpa-R2-\d+.\d{6}/
+^TOUCH$
+^[.]gdb_history$
+^[.]gdbinit$
+^[.]gitattributes$
+^[.]inputrc$
+^\.git\/
+^\.gitignore$
+^\_build\/
+^author.t/all.errs$
+^author.t/critic.errs$
+^author.t/critic.list$
+^author.t/display.errs$
+^author.t/perlcritic.errs$
+^author.t/tidy.errs$
+^blib/
+^blib_shared/
+^engine/cf/LIBMARPA_MODE$
+^engine/stage/
+^dovg[.]log$
+^errs$
+^etc/track[.]list
+^hide/
+^experiments/
+^html/Build$
+^html/MANIFEST\.SKIP$
+^html/MYMETA.yml$
+^html/Marpa-HTML-0.\d{3}_\d{3}/
+^html/Marpa-HTML-0.\d{6}/
+^html/_build
+^html/author.t/all.errs$
+^html/author.t/display.errs$
+^html/author.t/perlcritic.errs$
+^html/blib
+^html/errs$
+^html/inc/save/
+^html/junk$
+^html/sandbox/
+^inc/proof/.*[.]lyx[~]$
+^junk$
+^lib/Marpa/.*\.xsh
+^lib/Marpa/R2/Installed.pm$
+^lib/Marpa/R2/Version.pm$
+^lib/Marpa/R2/meta/metag[-]g[123456789][.]pl
+^lib/Marpa/R2/meta/metag[.]pl
+^lib/Marpa/R2\.c
+^lib/Marpa/R2\.xs
+^libmarpa_build/
+^nogit
+^nogit/
+^nytprof/
+^nytprof[.]out$
+^pod/Semantics/Order[.]pod[.]save$
+^pod2htmd.tmp
+^pod2htmi.tmp
+^pperl/Marpa/R2/Perl/Installed[.]pm$
+^pperl/Marpa/R2/Perl/Version[.]pm$

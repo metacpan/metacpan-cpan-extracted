@@ -1,0 +1,34 @@
+MasonX::Request::ExtendedCompRoot version 0.04
+==============================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+The following files will be installed in your perl lib:
+
+MasonX/Request/ExtendedCompRoot.pm
+MasonX/Resolver/ExtendedCompRoot.pm
+MasonX/Interp/ExtendedCompRoot.pm
+MasonX/Lexer/ExtendedCompRoot.pm
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  HTML::Mason 1.37
+
+It probably runs under 1.16, but Mason has already gone well beyond that so you should be using the latest version.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2017 Alex Robinson <cpan[@]alex.cloudband.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

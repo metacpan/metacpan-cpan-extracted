@@ -1,0 +1,384 @@
+Revision history for MooseX-Getopt
+
+0.71      2016-06-19 04:08:13Z
+ - private attributes (i.e., lead "_) with a public init_arg now work.
+
+0.70      2016-05-10 20:32:32Z
+ - In 0.69, an undefined init_arg would cause warnings and exception.
+   Attributes with an undefined init_arg are now ignored. (thanks, Greg
+   Oschwald! -- PR #7)
+
+0.69      2016-04-22 11:27:12Z
+ - attributes' "init_arg" settings are now respected when retrieving command
+   line options (thanks, Olaf Alders! -- PR#6)
+
+0.68      2015-03-04 18:16:30Z
+ - fix tests that look for the wrong prereqs (0.67)
+
+0.67      2015-02-28 04:37:19Z
+ - remove argv from passed-through buildargs if no argv attribute exists, to
+   mollify MooseX::StrictConstructor (RT#101938, Jose Luis Martinez)
+
+0.66      2015-01-28 02:05:54Z
+ - fix tests for formatting changes in Getopt::Long::Descriptive 0.099
+   (RT#101724)
+
+0.65      2014-08-06 06:09:04Z
+ - re-release to remove README.pod from shipped dist
+
+0.64      2014-08-02 17:35:20Z
+ - bump required version of Getopt::Long::Descriptive to avoid an infinite
+   loop problem (thanks, Bram!)
+
+0.63      2014-03-25 16:37:58Z
+ - fix test prereq on Test::Warnings (thanks, omega!)
+
+0.62      2014-03-07 05:44:01Z
+ - fix test that assumes option parsing is case-insensitive, which is no
+   longer true with Getopt::Long::Descriptive 0.097
+
+0.61      2014-02-11 06:30:14Z
+ - fix potentially-broken check-breaks test when a conflicting module fails to
+   compile
+
+0.60      2014-02-10 02:21:05Z
+ - avoid failing an optional test when YAML is not installed
+
+0.59      2013-11-30 19:02:01Z
+ - re-release to fix compile test
+
+0.58      2013-09-13 16:57:41Z
+ - remove use of deprecated $Config::Any::YAML::NO_YAML_XS_WARNING in tests
+ - warnings tests bypassed during installation
+ - author metadata moved to contributors
+
+0.57      2013-09-07 21:29:05Z
+ - spelling fixes (RT#87780, David Steinbrunner)
+ - removed use of deprecated Class::MOP::load_class
+ - repository migrated from shadowcat to the github moose organization
+
+0.56      2013-02-15 21:13:18Z
+ - depend on newest Path::Tiny, to regain 5.8.x compatibility (gone since
+   v0.52)
+
+0.55      2013-02-12 18:02:55Z
+ - fix broken tests on win32 with file comparisons
+
+0.54      2013-02-10 00:25:32Z
+ - fix broken tests on win32 with file comparisons
+ - allow configfiles called "0"
+ - support more mechanisms for overriding default configfile
+ - when using in conjunction with MooseX::ConfigFromFile, configfile value now
+   properly passed to new()
+
+0.53      2013-02-05 17:59:00Z
+ - properly indicate optional dependency in tests using
+   MooseX::ConfigFromFile
+
+0.52      2013-02-03 03:01:25Z
+ - tests converted from using Path::Class to Path::Tiny
+
+0.51      2013-01-27 17:38:11Z
+ - missing test prereqs now declared (thanks for the automated reports, David
+   Cantrell!)
+
+0.50      2012-12-27 08:20:56Z
+ - unbreak Catalyst::Runtime tests (etc) by keeping _getopt_full_usage in the
+   callstack. (RT#82249)
+
+0.49      2012-12-26 18:13:41Z
+ - silence a warning in tests if the user does not have YAML::XS installed
+   (thanks for the report, Getty!)
+ - fix off-by-one issues in test plans if optional requirements are not met
+
+0.48      2012-12-24 02:08:04Z
+ - documentation and tests amended to prefer usage of 'trait' over 'metaclass'
+   as much as possible
+ - print_usage_text() exposed as a public method, to make it easier for
+   consuming classes to modify the behaviour when usage text is printed
+
+0.47      2012-08-30 23:37:59Z
+ - re-release to remove double $VERSION declarations
+
+0.46      2012-08-30 22:17:28Z
+ - -h is also treated as a --help option
+
+0.45      2012-05-13 16:49:58Z
+ - use Path::Class in test to avoid test failures on MSWin32 with filename
+   construction
+
+0.44      2012-05-11 17:44:48Z
+ - now respecting value of configfile passed to the constructor, when used in
+   conjunction with MooseX::ConfigFromFile. (Karen Etheridge)
+
+0.43      2012-04-29 16:35:52Z
+ - re-release as non-trial.
+
+0.42      2012-04-15 16:13:05Z (TRIAL RELEASE)
+ - reformatted the Changes file, with the help of CPAN::Changes, to something
+   a little more standard.
+ - more release-only tests added
+
+0.41      2012-04-15 01:36:00Z (TRIAL RELEASE)
+ - Now bails with exit status 0, rather than dying, when printing
+   requested --usage/--help information (usage printed via invalid arguments
+   will still die, however). (Karen Etheridge)
+
+0.40      2012-04-13
+ - Fix tests when MooseX::ConfigFromFile is installed, with
+   Getopt::Long::Descriptive >= 0.091. RT#76287
+ - Pod fix from debian. Salvatore Bonaccorso <carnil@debian.org> RT#74681
+ - Spelling fix from debian. Jonathan Yu <jawnsy@cpan.org> RT#74681
+
+0.39      2012-02-03
+ - Fix argument parsing in process_argv when used with ConfigFromFile so
+   that -v can be used as expected, rather than being grabbed as --version
+
+0.38      2011-12-23
+ - More documentation on Getopt::Long settings and how they alter this
+   role's behaviour, in particular with regards to extra_argv capturing.
+   (Karen Etheridge)
+
+0.37      2011-03-30
+ - Fix missing dependency. (RT#67077)
+
+0.36      2011-03-29
+ - Fix dist.ini 'Prereq' into 'Prereqs' (Damien Krotkine)
+ - MooseX::Getopt::GLD
+   - change it to a MooseX::Role::Parameterized, so that it accepts
+     'getopt_conf' parameter (Damien Krotkine)
+
+0.35      2011-02-09
+ - Fix missed change from Test::Exception to Test::Fatal
+
+0.34      2011-02-08
+ - The test suite now uses Test::Fatal instead of Test::Exception. (Karen
+   Etheridge)
+ - Move most of new_with_options logic into separate publically accessible
+   process_argv method, so that arg processing can be done without actually
+   creating object (Jonathan Swartz)
+
+0.33      2010-08-26
+ - Remove Test::Most from newly added test (RT#60766)
+
+0.32      2010-08-26
+ - Fix handling of Union types (RT#58417)
+
+0.31      2010-07-07
+ - Fix issue causing tests to fail if MooseX::SimpleConfig isn't installed.
+
+0.30      2010-07-06
+ - MooseX::Getopt::Basic
+   - uses attribute insertion order when determining the order in which
+     options are documented in the usage (e.g. in $obj->usage->text). (Karen
+     Etheridge)
+
+ - MooseX::Getopt::Basic
+   - store the usage object to the usage attr (RT#58715)
+   - properly checks whether the *option* --help, --usage, or --? were used,
+     rather than the attribute 'help', 'usage' or '?' were set
+ - MooseX::Getopt::GLD
+   - add the usage attribute for storing the Getopt::Long::Descriptive::Usage
+     object, and the help attribute for storing --help, --usage and --? state
+ (RT#47865, RT#56783, RT#52474).  (Karen Etheridge)
+
+ - MooseX::Getopt::Basic
+   - Disable auto_help config in Getopt::Long, to avoid calling into pod2usage
+     when the --help option is used while MooseX::ConfigFromFile is in use
+     (the intent is just to fetch the value of the configfile option)
+     (RT#57683). (Karen Etheridge)
+
+0.29      2010-06-15
+ - Fix repository metadata. Thanks Robert Bohne for noticing!
+
+0.28      2010-06-05
+ - MooseX::Getopt::Strict
+   - Make it work with Getopt attribute traits in addition to attribute
+     metaclasses.
+ - Switch from Module::Install to Dist::Zilla.
+
+0.27      2010-02-10
+ - Makefile.PL
+   - Bump dependency to Getopt::Long::Descriptive to 0.081 in an attempt to
+     avoid test failures.
+ - MooseX::Getopt::Dashes
+   - Document that using a cmd_flag argument to attributes can be used to
+     override the tr/_/-/ replacement ::Dashes does on attribute names
+
+0.26      2009-12-10
+ - MooseX::Getopt::Basic
+   - Fix bug with attribute names containing upper case letters.
+ - Test suite
+   - Add t/106_no_ignore_case.t for testing the compatibility with
+     no_ignore_case
+
+0.25      2009-11-26
+ - MooseX::Getopt
+   - Split out the warnings and the exception from Getopt so that they can be
+     overridden.
+  - Split out calling ->die on Getopt::Long::Descriptive::Usage so that it can
+    be overridden.
+   - Properly split roles as promised in 0.22.
+
+0.24      2009-10-23
+ - MooseX::Getopt
+   - Fix bug with mixed case attribute names (MAROS)
+
+0.23      2009-10-02
+ - MooseX::Getopt
+   - Allow the config file to return a code ref which is called to return the
+     config file location (Gordon Irving)
+
+0.22      2009-09-05
+ - Require GLD 0.077 for RT#49427 as some versions are broken
+ - MooseX::Getopt
+   - Split into MooseX::Getopt::Basic (without the G::L::Descriptive support)
+     and MooseX::Getopt::GLD.
+ - Tests
+   - Ensure author tests get run when in author mode.
+
+0.21      2009-08-27
+ - MooseX::Getopt
+   - Enable and document the argv parameter to the constructor.
+   - Applied patches in RT43200 and RT43255
+   - Applied patch from RT#47766 to not die if SimpleConfig cannot find the
+     default config file name.
+
+0.20      2009-07-09
+ - fix MANIFEST.SKIP to avoid double-packaging
+
+0.19      2009-07-08
+ - MooseX::Getopt
+   - Fix Getopt config spec for --configfile (t0m)
+   - Add support for --usage/--help/--? (drew@drewtaylor.com)
+   - Fix new_with_options to accept a hashref (DOUGDUDE@cpan.org)
+ - Tests
+   - Fix warning from tests with new Moose (t0m)
+   - Fix tests on Win32 from RT#44909 (taro-nishino)
+
+0.18      2009-04-09
+ - MooseX::Getopt::Dashes
+   - New module, for converting undercores to dashes (ilmari)
+
+0.17      2009-04-08
+ - MooseX::Getopt
+   - work with latest Moose (hdp)
+   - unify module version numbers with dist version (hdp)
+
+0.16      2009-02-17
+ - Tests
+   - run pod tests only if RELEASE_TESTING env var is set
+
+0.15      2008-07-26
+ - MooseX::Getopt::OptionTypeMap
+   - Accept type constraint objects in the type mapping, not just names
+
+0.14      2008-07-10
+ - MooseX::Getopt::OptionTypeMap
+   - Change 'Float' which doesn't exist to 'Num' which does (perigrin)
+ - MooseX::Getopt
+   - removed the default handling with Getopt::Long::Descriptive as it would
+     override constructor parameters and that was bad. Besides, Moose will
+     just DWIM on this anyway. (stevan)
+     - added test for it (stevan)
+ - Tests
+   - fixed Getopt::Long::Descriptive specific tests to only run if
+     Getopt::Long::Descriptive is there (stevan)
+
+0.13      2008-05-24
+ - MooseX::Getopt
+   - Commandline option shouldn't be required in the case that the given
+     "required" attribute has been loaded from config (MooseX::ConfigFromFile)
+   - Support for MooseX::ConfigFromFile shouldn't require that role be added
+     at the same level as Getopt.
+   - fixed miscapitalization of NoGetopt in the docs
+   - added links to the traits in the docs
+ - converted to Module::Install instead of Module::Build
+
+0.12      2008-03-14
+ - updated copyright dates
+ - upped the Moose dependency to support the custom metaclass traits
+ - added Getopt::Long::Descriptive as an optional dependency
+ - MooseX::Getopt MooseX::Getopt::Meta::Attribute
+   MooseX::Getopt::Meta::Attribute::Trait
+   MooseX::Getopt::Meta::Attribute::NoGetopt
+   MooseX::Getopt::Meta::Attribute::Trait::NoGetopt
+   - added support for custom metaclass traits
+     - added tests for this
+
+0.11      2008-01-27
+ - MooseX::Getopt
+   - Commandline option shouldn't be required in the case that the given
+     "required" attribute has a default or a builder method.
+
+0.10      2008-01-23
+ - MooseX::Getopt
+   - Support default configfile attribute when used with
+     MooseX::ConfigFromFile-based roles
+
+0.09      2008-01-22
+ - MooseX::Getopt
+   - Use Getopt::Long::Descriptive if it's available
+
+0.08      2007-12-08
+ - MooseX::Getopt
+   - Added support for configfile loading via MooseX::ConfigFromFile-based
+     roles with the -configfile commandline option.
+
+0.07      2007-12-04
+ - MooseX::Getopt::Meta::Attribute::NoGetopt
+   - fixed miscapitalization of NoGetopt in the docs
+
+0.06      2007-11-23
+ - MooseX::Getopt
+   - refactored &new_with_option some so that this will work better with other
+     Getopt modules (nuffin)
+ - MooseX::Getopt::Strict
+   - version of MooseX::Getopt which requires you to specify which attributes
+     you want processed explicity
+     - added tests for this
+ - MooseX::Getopt::Meta::Attribute::NoGetopt
+   - a custom meta-attribute which can be used to specify that an attribute
+     should not be processed
+     - added tests for this
+
+0.05      2007-07-03
+ - MooseX::Getopt::OptionTypeMap
+   - added some checks to make sure that the type constraints are found
+     properly and to give better diagnostics
+
+0.04      2007-06-26
+ - MooseX::Getopt::OptionTypeMap
+   - Added support for subtype constraint inference from parent types
+     - added tests and docs for this
+ - MooseX::Getopt
+   - Added extra_argv attribute
+     - added tests and docs for this
+   - We now unmangle the Getopt::Long-mangled @ARGV
+     - added tests and docs for this
+   - We now throw an exception from new_with_options if Getopt fails due to
+     bad arguments.
+     - added tests and docs for this
+
+0.03      2007-05-02
+ - downgraded the Getopt version requirement to 2.35 as per RT #26844
+ - adding blblack to the authors list
+ - MooseX::Getopt
+   - doc update to show simple way to of excluding an attribute, but not
+     having accessors with underscores (thanks to Zaba on #moose for this)
+ - MooseX::Getopt::Meta::Attribute
+   - tightening up the type constraint in the cmd_alias coercion to only
+     accept strings
+
+0.02      2007-04-06
+ - MooseX::Getopt
+   - added the ARGV attribute (thanks to blblack)
+     - added tests and docs for this
+ - MooseX::Getopt::Meta::Attribute
+   - added the cmd_aliases attribute (thanks to blblack)
+     - added tests and docs for this
+   - added support for Moose 0.19's custom attribute metaclass alias registry.
+     - added tests and docs for this
+
+0.01      2007-03-09
+ - module released to CPAN

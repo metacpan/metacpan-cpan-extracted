@@ -1,0 +1,136 @@
+[% IF statustext %]
+<p align="center">
+    <div class="[% statuscolor %]">[% tr.tr(statustext) %]</div>
+</p>
+[% END %]
+
+<style type="text/css">
+    #sortable1, #sortable2 { list-style-type: none; margin: 0; padding: 0; float: left; margin-right: 10px; }
+    #sortable1 li, #sortable2 li { margin: 0 5px 5px 5px; padding: 5px; font-size: 1.2em; width: 120px; }
+</style>
+<script type="text/javascript">
+    $(function() {
+        $("#sortable1, #sortable2").sortable({
+            connectWith: '.connectedSortable'
+        }).disableSelection();
+    });
+    
+</script>
+
+
+<form id="power_reportedit" method="post" action="[% CardEdit %]">
+<p align="center">
+
+    <table class="data" id="MainDataTable">
+        <tr class="tabheader">
+            <th>[% tr.tr("Key") %]</th>
+            <th>[% tr.tr("Value") %]</th>
+        </tr>
+        
+            <tr>
+                <td>[% tr.tr("Report name") %]</td>
+                <td>
+                    [% IF ReportID != "" %]
+                        <input type="text" name="report_name" size="15" maxlength="60" value="[% report_name %]">
+                    [% ELSE %]
+                        <i>No report selected</i>&nbsp;&nbsp;
+                    [% END %]
+                    <a class="bodylink" href="[% ReportSelect %]">Select...</a>
+                </td>
+            </tr>
+
+        [% IF ReportID != "" %]
+            <tr>
+                <td>[% tr.tr("Device type") %]</td>
+                <td>
+                    <select name="device_type">
+                        <option value="USV"
+                        [% IF device_type == "USV" %]
+                            selected
+                        [% END %]
+                        >USV</option>
+                        <option value="PAC3200"
+                        [% IF device_type == "PAC3200" %]
+                            selected
+                        [% END %]
+                        >PAC3200</option>
+                        <option value="RBS"
+                        [% IF device_type == "RBS" %]
+                            selected
+                        [% END %]
+                        >RBS</option>
+                        <option value="EMCTIME"
+                        [% IF device_type == "EMCTIME" %]
+                            selected
+                        [% END %]
+                        >EMC Time</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>[% tr.tr("Title") %]</td>
+                <td>
+                    <input type="text" name="report_title" size="30" maxLength="60" value="[% report_title %]">
+                </td>
+            </tr>
+            <tr>
+                <td>[% tr.tr("Description") %]</td>
+                <td>
+                    <input type="text" name="description" size="30" maxLength="60" value="[% description %]">
+                </td>
+            </tr>
+
+        [% END %]
+    </table>
+</p>
+
+<script>
+    function serializeSortableList(listID, inputID) {
+        var listElems = $(listID).sortable('toArray');
+        var listString = listElems.join(";");
+        var modeElem = document.getElementById(inputID);
+        modeElem.value = listString;
+        return false;
+    }
+</script>
+
+[% IF ReportID != "" %]
+<p align="center">
+    <table class="data" id="HelperTable1">
+        <tr class="tabheader">
+            <th>[% tr.tr("Active Graphs") %]</th>
+            <th>[% tr.tr("Available Graphs") %]</th>
+        </tr>
+        <tr>
+            <td valign="top">
+                <ul id="sortable1" class="connectedSortable" border="1">
+                    [% FOREACH Item IN ActiveItems %]
+                        <li id="[% Item.graph_name %]" class="olditem"><b>[% Item.graph_name %]</b><br>[% Item.title %]</li>
+                    [% END %]
+                    <li id="__pc_1" class="placeholder"></li>
+                </ul>
+                <input type="hidden" id="graph_order" name="graph_order">
+            </td>
+            <td valign="top">
+                <ul id="sortable2" class="connectedSortable" border="1">
+                    [% FOREACH Item IN AvailItems %]
+                        <li id="[% Item.graph_name %]" class="newitem"><b>[% Item.graph_name %]</b><br>[% Item.title %]</li>
+                    [% END %]
+                    <li id="__pc_2" class="placeholder"></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <input type="hidden" name="reportid" value="[% ReportID %]">
+                <input type="hidden" name="mode" id="usereditmode" value="[% EditMode %]">
+                <!--<input type="reset" value="Reset">&nbsp;-->
+                <input type="submit" value="[% tr.tr("Update") %]" onClick="return serializeList('#sortable1', 'graph_order');">&nbsp;
+                <input type="submit" value="[% tr.tr("Delete") %]" onClick="return confirmDeleteReport('power_reportedit', 'usereditmode');">
+            </td>
+        </tr>
+    </table>    
+</p>
+[% END %]
+
+</form>

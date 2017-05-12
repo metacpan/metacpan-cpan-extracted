@@ -1,0 +1,39 @@
+Revision history for MooseX-Types-Path-Class
+
+0.09      2016-06-08 01:05:14Z
+    - made MooseX::Getopt an optional dependency again (broken in 0.07)
+
+0.08      2015-08-16 02:05:52Z
+    - update some distribution tooling
+
+0.07      2015-07-03 18:10:13Z
+    - canonical repository changed to
+      https://github.com/moose/MooseX-Types-Path-Class
+    - added META.json and other modern tooling
+
+0.06    2012-03-28
+    - added SEE ALSO section in pod
+    - converted git repo to Dist::Zilla
+
+0.05    2008-10-21
+    - use class_type()
+    - made MooseX::Getopt an optional dependency (RT#39327)
+    - pod updates
+    - made Dir and File subtypes of Path::Class::*
+
+0.04    2007-11-29
+    - fixed test on MSWin32 (cpantesters++)
+
+0.03    2007-11-28
+    - refactored a bit (less code now)
+    - use Module::Install instead of Module::Build
+    - minor pod and test tweaks
+
+0.02    2007-08-27
+    - pod update
+    - attempted fixes for cpantesters reports
+
+0.01    2007-08-09
+    - renamed from MooseX::Path::Class to MooseX::Types::Path::Class
+    - Initial creation in SVN Tue Jul 17 2007
+

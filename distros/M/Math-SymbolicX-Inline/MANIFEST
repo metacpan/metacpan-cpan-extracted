@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/Math/SymbolicX/Inline.pm
+MANIFEST			This list of files
+README
+t/00pod.t
+t/00podcover.t
+t/01basic.t
+t/02examples.t
+Makefile.PL
+META.yml

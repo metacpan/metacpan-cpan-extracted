@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+test.pl
+sample.cfg.file
+sample.server.file
+migration.guide.txt
+Bulkmail.pm
+Bulkmail/Object.pm
+Bulkmail/Server.pm
+Bulkmail/DummyServer.pm
+Bulkmail/Dynamic.pm

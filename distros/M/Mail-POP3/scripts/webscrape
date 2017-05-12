@@ -1,0 +1,96 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+
+use Mail::POP3;
+use HTTP::Request::Common;
+use Data::Dumper;
+
+{
+  # in case DEBUG set to 1...
+  package Mail::POP3::Folder::webscrape;
+  our $DEBUG;
+  sub to_file {
+      my $file = shift;
+      local *FH;
+      open FH, '>', $file;
+      binmode FH;
+      print FH @_;
+  }
+  sub from_file {
+      local ($/, *FH);
+      my $file = shift;
+      die "open($file): $!\n" unless open FH, $file;
+      binmode FH;
+      <FH>;
+  }
+}
+
+my $USAGE = "Usage: $0 <conf-file> <user> <password>\n";
+my $FQDN = 'localhost'; # mailbox_args arg
+
+my $conf = shift @ARGV;
+die $USAGE unless $conf and -f $conf;
+my $config = do $conf or die "Read $conf failed: $@\n";
+my $user = shift @ARGV or die $USAGE;
+my $pass = shift @ARGV or die $USAGE;
+
+my @args = $config->{mailbox_args}->($config, $user, $FQDN);
+my $class = $config->{mailbox_class};
+Mail::POP3::Server::load_class($class);
+
+$Mail::POP3::Folder::webscrape::DEBUG = 0;
+
+my $o = $class->new($user, $pass, @args);
+# no more OO after this - but uses knowledge of internal structure
+
+print "Getting first listing.\n";
+my ($list_html, $list_url) = Mail::POP3::Folder::webscrape::get_fill_submit(
+    $o->{CJAR},
+    $o->{STARTURL},
+    $o->{FIELDS},
+);
+
+print "In list...\n";
+my $list_data = Mail::POP3::Folder::webscrape::list_parse($list_html, $list_url, $o->{LISTRE});
+
+my @items;
+while (1) {
+    my @theseitems = @{ $list_data->{itemurls} };
+    push @items, @theseitems;
+    print
+        "on page $list_data->{pageno} of $list_data->{num_pages}, got ",
+        scalar(@theseitems),
+        " items.\n",
+        ;
+    last if $list_data->{pageno} >= $list_data->{num_pages};
+last if $list_data->{pageno} >= 2;
+    print "Getting list...";
+    ($list_html, $list_url) = Mail::POP3::Folder::webscrape::redirect_cookie_loop(
+        $o->{CJAR}, GET($list_data->{nextlink}), 
+    );
+    $list_data = Mail::POP3::Folder::webscrape::list_parse($list_html, $list_url, $o->{LISTRE});
+}
+
+#use Data::Dumper; print Dumper(get_one($items[0])); exit;
+
+print get_one($items[0]);
+
+sub get_one {
+    my ($item) = @_;
+print "Getting item $item...\n";
+    my $request = GET($item);
+    $request->header('referer', $list_url);
+    my ($one_html, $one_url) = Mail::POP3::Folder::webscrape::redirect_cookie_loop($o->{CJAR}, $request);
+    my $id = $o->{ITEMURL2ID}->($one_url);
+    my $itemdata = Mail::POP3::Folder::webscrape::one_parse(
+	$one_html,
+	$o->{ITEMRE},
+	$o->{ITEMPOSTPRO},
+    );
+#use Data::Dumper; print Dumper($itemdata); exit;
+    $o->{ITEMFORMAT}->(
+	$itemdata,
+	$id,
+    );
+}

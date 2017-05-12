@@ -1,0 +1,25 @@
+#!perl
+
+use strict;
+use warnings;
+
+use MasonX::MiniMVC::Installer;
+
+MasonX::MiniMVC::Installer->install(@ARGV);
+
+=head1 NAME
+
+minimvc-install -- install a basic MasonX::MiniMVC application
+
+=head1 SYNOPSIS
+
+    minimvc-install MyApp
+
+=head1 DESCRIPTION
+
+If you want to build an application using MasonX::MiniMVC, this is the
+simplest way.  Just type "minimvc-install MyApp", replacing "MyApp" with
+the name of your application, and a directory structure will be built
+for you.
+
+=cut

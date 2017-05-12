@@ -1,0 +1,30 @@
+---
+abstract: 'Verify YubiKey one time passwords.'
+author:
+  - 'Kirill Miazine <km@krot.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-YubiVerify
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Digest::HMAC_SHA1: '0'
+  List::Util: '0'
+  MIME::Base64: '0'
+  Mojo::UserAgent: '0'
+  Mojolicious::Plugin: '0'
+  String::Random: '0'
+  Test::More: '0'
+  URI::Escape: '0'
+version: '0.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

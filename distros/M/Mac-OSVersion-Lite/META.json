@@ -1,0 +1,89 @@
+{
+   "abstract" : "It's the lightweight version object for Mac OS X",
+   "author" : [
+      "Pine Mizune"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.7",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mac-OSVersion-Lite",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CPAN::Uploader" : "0.103013",
+            "Minilla" : "v3.0.1",
+            "Software::License::MIT" : "0.103011",
+            "Test::CPAN::Meta" : "0.25",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.05",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.4.0",
+            "Version::Next" : "1.000"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Perl::Critic" : "1.125",
+            "Test::Deep" : "0.117",
+            "Test::Deep::Matcher" : "0.01",
+            "Test::Exception" : "0.40",
+            "Test::Mock::Cmd" : "0.7",
+            "Test::Mock::Guard" : "0.10",
+            "Test::MockObject" : "1.20150527",
+            "Test::More" : "1.001014",
+            "Test::Perl::Critic" : "1.03"
+         }
+      }
+   },
+   "provides" : {
+      "Mac::OSVersion::Lite" : {
+         "file" : "lib/Mac/OSVersion/Lite.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pine/p5-Mac-OSVersion-Lite/issues"
+      },
+      "homepage" : "https://github.com/pine/p5-Mac-OSVersion-Lite",
+      "repository" : {
+         "url" : "git://github.com/pine/p5-Mac-OSVersion-Lite.git",
+         "web" : "https://github.com/pine/p5-Mac-OSVersion-Lite"
+      }
+   },
+   "version" : "0.06",
+   "x_authority" : "cpan:PINE",
+   "x_contributors" : [
+      "Pine Mizune <pinemz@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

@@ -1,0 +1,52 @@
+MKDoc::XML - MKDoc XML stuff
+============================
+
+MKDoc::XML is a suite of low level XML processing modules which comprises:
+
+* An XML tokenizer
+* An XML tree builder
+* A configurable XML markup stripper
+* A configurable XML markup tagger
+* An XML entity encoder
+* An XML entity decoder
+* An HTML-Only entity decoder
+* An XML Dumper / Undumper
+
+Typically, in MKDoc the stripper is used to remove unwanted presentational
+markup while the tagger adds structural markup such as <abbr> tag or automatically
+hyperlinks expressions so that MKDoc users don't have to know about <a> tag syntax.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Or better, use CPAN.pm
+
+
+DEPENDENCIES
+
+  none.
+
+
+MISCELLEANOUS
+
+  Want to help us open-source MKDoc?
+  Join the MKDoc-Modules community!
+
+  http://lists.webarch.co.uk/mailman/listinfo/mkdoc-modules
+ 
+
+COPYRIGHT AND LICENCE
+
+  This module free software and is distributed under the
+  same license as Perl itself.
+
+  Copyright (C) 2003 MKDoc Holdings Ltd.
+
+  Author: Jean-Michel Hiver

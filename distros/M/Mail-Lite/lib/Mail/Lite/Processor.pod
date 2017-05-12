@@ -1,0 +1,200 @@
+#
+#===============================================================================
+#
+#         FILE:  Processor.pod
+#
+#  DESCRIPTION:  Processor documentation
+#
+#       AUTHOR:  Pavel Boldin (), <davinchi@cpan.org>
+#      COMPANY:  
+#      CREATED:  09.05.2009 03:44:24 MSD
+#     REVISION:  ---
+#===============================================================================
+
+
+=head1 NAME
+
+Mail::Lite::Processor -- processing (identifying, parsing, extracting data from) mail-like message (also Jabber and so on)
+
+
+=head1 SYNOPSIS
+
+    use Data::Dumper;
+    use Mail::Lite::Processor;
+
+    my $message = new Mail::Lite::Message( do { local $/; <DATA> } );
+
+    my $processor = new Mail::Lite::Processor(
+	rules => [
+	    {
+		id => 'fail',
+		match => [ 
+		    {
+			subject => 'FAILED'
+		    }
+		]
+	    },
+	    {
+		id => 'success',
+		match => [ 
+		    {
+			subject => 'SUCCESS'
+		    }
+		],
+		processors => [
+		    {
+			processor => 'regexp',
+			regexps   => {
+			    'status=~body,once' => 'Status: (.*)',
+			},
+		    }
+		]
+	    },
+	],
+    );
+
+    $processor->process(
+	message => $message,
+	handler => sub { warn Dumper \@_ },
+    );
+
+    __DATA__
+    From test@cpan.org
+    Subject: SUCCESS
+
+
+    Status: all your base are belong to us
+
+    __END__
+
+
+=head1 DESCRIPTION
+
+=head2 Common
+
+A lot of data comes in mails, so you just have to read them and parse.
+
+In order to automate the process of identifying mails and fetching some data was created this module. One can use it to parse mails from various bots, standarterized (and not) responces and so on. Author uses it primary for parsing mails from RU TLD registry.
+
+=head2 Format of rules
+
+Processing of message is done by list of rules. Each rule have implicit internal processor -- 'match', which is checks if message fits to this rule. If so, then a list of 'processors' is executed. After that user-supported handler is called with results from all these processors. Note that by default all the matched rules are treated and copy of message is processed with each of them. You can change this behaviour by specifiyng 'last' in rule specification.
+
+As sometimes there is info about many objects in single message, there is way to split and then identify and parse parts independently. See L<Mail::Lite::Processor::Split>, L<Mail::Lite::Processor::Chain>.
+
+
+=head2 Processors
+
+For further info about:
+
+=over 2
+
+=item * matching processor see L<Mail::Lite::Processor::Match>
+
+=item * regexp processor see L<Mail::Lite::Processor::Regexp>
+
+=item * split_msg processor see L<Mail::Lite::Processor::SplitMsg>
+
+=item * parse_rfc822 processor see L<Mail::Lite::Processor::ParseRfc822>
+
+=item * chain processor see L<Mail::Lite::Processor::Chain>
+
+=item * filter processor see L<Mail::Lite::Processor::Filter>
+
+=item * stub processor see L<Mail::Lite::Processor::Stub>
+
+=back
+
+
+=head1 SUBROUTINES/METHODS
+
+An object of this class represents instance of processor which maintains it own set of rules for processing.
+
+=over 4
+
+=item new( rules => [ ... ], handler => sub { ... }, debug => [ 0 | 1 ] )
+
+
+Create new processor instance with I<rules> arrayref, which will call I<handler> sub for each processed message. Optionally you can set I<debug> level.
+
+=item $processor->process( message => [ text or Mail::Lite::Message instance ], handler => sub { ... } )
+
+Process I<message> within this processor, call I<handler>.
+
+=item Mail::Lite::Processor->process( rules => [ ... ], message => [ text or Mail::Lite::Message instance ], handler => sub { ... } )
+
+Same as above, but create instance for given rules.
+
+=back
+
+=head1 DIAGNOSTICS
+
+A list of every error and warning message that the module can generate
+(even the ones that will "never happen"), with a full explanation of each
+problem, one or more likely causes, and any suggested remedies.
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+A full explanation of any configuration system(s) used by the module,
+including the names and locations of any configuration files, and the
+meaning of any environment variables or properties that can be set. These
+descriptions must also include details of any configuration language used.
+
+
+=head1 DEPENDENCIES
+
+A list of all the other modules that this module relies upon, including any
+restrictions on versions, and an indication whether these required modules are
+part of the standard Perl distribution, part of the module's distribution,
+or must be installed separately.
+
+
+=head1 INCOMPATIBILITIES
+
+A list of any modules that this module cannot be used in conjunction with.
+This may be due to name conflicts in the interface, or competition for
+system or program resources, or due to internal limitations of Perl
+(for example, many modules that use source code filters are mutually
+incompatible).
+
+
+=head1 BUGS AND LIMITATIONS
+
+A list of known problems with the module, together with some indication
+whether they are likely to be fixed in an upcoming release.
+
+Also a list of restrictions on the features the module does provide:
+data types that cannot be handled, performance issues and the circumstances
+in which they may arise, practical limitations on the size of data sets,
+special cases that are not (yet) handled, etc.
+
+The initial template usually just has:
+
+There are no known bugs in this module.
+Please report problems to <Maintainer name(s)>  (<contact address>)
+Patches are welcome.
+
+=head1 AUTHOR
+
+Pavel Boldin  (davinchi@cpan.org)
+
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2009  (davinchi@cpan.org). All rights reserved.
+
+Followed by whatever licence you wish to release it under.
+For Perl code that is often just:
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See perldoc perlartistic.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
+
+
+

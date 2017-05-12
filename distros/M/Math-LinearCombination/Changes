@@ -1,0 +1,18 @@
+Revision history for Perl extension Math::LinearCombination.
+
+0.03  Wed Oct 31 13:55:04 MET 2001
+
+	- extended the documentation
+
+	- made the installation of Math::SimpleVariable mandatory in
+	  order to be able to run all tests. However, the choice of 
+	  variable type is still free, as explained in the documentation.
+
+0.02  Wed Jul 18 14:49:26 METDST 2001
+
+	- First release for CPAN
+
+0.01  Fri Apr  6 17:38:36 2001
+	- original version; created by h2xs 1.20 with options
+		-A -X -n Math::LinearCombination
+

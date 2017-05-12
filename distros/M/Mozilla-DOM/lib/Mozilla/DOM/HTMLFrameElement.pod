@@ -1,0 +1,152 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLFrameElement
+
+=for object Mozilla::DOM::HTMLFrameElement
+
+Mozilla::DOM::HTMLFrameElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLFrameElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLFrameElement interface is the interface to a [X]HTML
+ * frame element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLFrameElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $contentdocument = $htmlframeelement->B<GetContentDocument>()
+
+=head2 $frameborder = $htmlframeelement->B<GetFrameBorder>()
+
+=head2 $longdesc = $htmlframeelement->B<GetLongDesc>()
+
+=head2 $marginheight = $htmlframeelement->B<GetMarginHeight>()
+
+=head2 $marginwidth = $htmlframeelement->B<GetMarginWidth>()
+
+=head2 $name = $htmlframeelement->B<GetName>()
+
+=head2 $bool = $htmlframeelement->B<GetNoResize>()
+
+=head2 $scrolling = $htmlframeelement->B<GetScrolling>()
+
+=head2 $src = $htmlframeelement->B<GetSrc>()
+
+=head2 $htmlframeelement->B<SetFrameBorder>($frameborder)
+
+=over
+
+=over
+
+=item * $frameborder (string)
+
+=back
+
+=back
+
+=head2 $htmlframeelement->B<SetLongDesc>($longdesc)
+
+=over
+
+=over
+
+=item * $longdesc (string)
+
+=back
+
+=back
+
+=head2 $htmlframeelement->B<SetMarginHeight>($marginheight)
+
+=over
+
+=over
+
+=item * $marginheight (string)
+
+=back
+
+=back
+
+=head2 $htmlframeelement->B<SetMarginWidth>($marginwidth)
+
+=over
+
+=over
+
+=item * $marginwidth (string)
+
+=back
+
+=back
+
+=head2 $htmlframeelement->B<SetName>($name)
+
+=over
+
+=over
+
+=item * $name (string)
+
+=back
+
+=back
+
+=head2 $htmlframeelement->B<SetNoResize>($noresize)
+
+=over
+
+=over
+
+=item * $noresize (boolean)
+
+=back
+
+=back
+
+=head2 $htmlframeelement->B<SetScrolling>($scrolling)
+
+=over
+
+=over
+
+=item * $scrolling (string)
+
+=back
+
+=back
+
+=head2 $htmlframeelement->B<SetSrc>($src)
+
+=over
+
+=over
+
+=item * $src (string)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

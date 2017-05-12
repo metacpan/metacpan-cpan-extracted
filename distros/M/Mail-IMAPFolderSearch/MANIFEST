@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+INSTALL
+README
+Makefile.PL
+IMAPFolderSearch.pm
+t/imaptest.t

@@ -1,0 +1,30 @@
+Revision history for Module-AnyEvent-Helper
+
+v0.0.5    2012-11-12 22:44:19 Asia/Tokyo
+    [Functional change]
+        * Add guard for the case the 2nd argument of bind_scalar/bind_array is not a condition variable.
+    [Non-functional changes]
+        * Avoid each ARRAY to loosen minimum perl requirement.
+        * Avoid use base Exporter to loosen minimum perl requirement.
+
+v0.0.4    2012-11-10 14:02:04 Asia/Tokyo
+    [Module::AnyEvent::Helper]
+        * Add `-exclude' option on strip_async_all().
+        * Add exception transfer support.
+        * Enable to call fuctions as class methods.
+    [Module::AnyEvent::Helper::Filter]
+        * Enable to specify array-context function.
+    [Module::AnyEvent::Helper::PPI::Transform]
+        * Export some functions to help implementing additional transformer.
+
+v0.0.3    2012-11-06 00:14:23 Asia/Tokyo
+    * Check other valid usages of bareword in strict mode.
+    * Add additional transformer support.
+    * Permit spaces between word and parameter list and add support of prior -> chains.
+    * Type check before reference equality comparison to avoid misuse of string.
+
+v0.0.2    2012-10-31 08:20:03 Asia/Tokyo
+    * Add -replace_func and -delete_func options in filter.
+
+v0.0.1    2012-10-19 00:26:51 Asia/Tokyo
+    * Initial release.

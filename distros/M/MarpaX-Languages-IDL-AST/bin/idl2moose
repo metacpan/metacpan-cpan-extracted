@@ -1,0 +1,149 @@
+#!perl
+use strict;
+use warnings FATAL => 'all';
+use diagnostics;
+use MarpaX::Languages::IDL::AST;
+use Getopt::Long;
+use Pod::Usage;
+use POSIX qw/EXIT_FAILURE EXIT_SUCCESS/;
+use IO::String;
+use File::BOM qw/open_bom/;
+use Encode;
+
+# ABSTRACT: IDL to perl's Moose translation
+
+our $VERSION = '0.007'; # VERSION
+
+# PODNAME: idl2moose
+
+my $help = 0;
+my $input = undef;
+my $encoding_input = undef;
+my $encoding_output = undef;
+my $output = undef;
+my $nativeFloat = 1;
+my $bom_output = 1;
+
+# -------
+# Options
+# -------
+GetOptions ('help!' => \$help,
+
+            'input=s' => \$input,
+            'encoding_input|ei=s' => \$encoding_input,
+
+            'output=s' => \$output,
+            'encoding_output|eo=s' => \$encoding_output,
+            'bom_output|bo!' => \$bom_output,
+
+            'nativeFloat!' => \$nativeFloat);
+
+if ($help || ! $input) {
+    my $pod = do {local $/; <DATA>};
+    my $podfh = IO::String->new($pod);
+    pod2usage(-verbose => 2, -noperldoc => 1, -input => $podfh, -exitval => $help ? EXIT_SUCCESS : EXIT_FAILURE);
+}
+
+# --------------------------------------------------------
+# Read input, eventually with BOM and encoding as fallback
+# --------------------------------------------------------
+my $fh;
+if (defined($encoding_input)) {
+    open_bom($fh, $input, ':$encoding_input');  # Will respect BOM if any, fallback to encoding_input, croak on failure
+} else {
+    open($fh, '<:via(File::BOM)', $input) || die "Cannot open $input, $!";
+}
+my $data = do { local $/; <$fh> };
+close($fh) || warn "Failed to close $input, $!";
+
+# ----------
+# Get result
+# ----------
+my $result = MarpaX::Languages::IDL::AST->new->parse(\$data)->generate->output;
+
+# ----------------------------------------
+# Output, eventually with encoding and BOM
+# ----------------------------------------
+$encoding_output //= $encoding_input;
+my $encoding = '';
+$encoding .= ":raw:encoding($encoding_output)" if (defined($encoding_output)); # :raw removes the CRLF mess
+$encoding .= ":via(File::BOM)"                 if ($bom_output);               # BOM ?
+if ($output) {
+    open(my $fh, ">$encoding", $output) || die "Cannot open $output, $!";
+    print $fh $result;
+    close($fh) || warn "Cannot close $output";
+} else {
+    if ($encoding) {
+        binmode(STDOUT, $encoding) || die "Cannot set encoding $encoding_output on STDOUT";
+    }
+    print STDOUT $result;
+}
+
+exit(EXIT_SUCCESS);
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+idl2moose - IDL to perl's Moose translation
+
+=head1 VERSION
+
+version 0.007
+
+=head1 AUTHOR
+
+Jean-Damien Durand <jeandamiendurand@free.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Jean-Damien Durand.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+__DATA__
+
+# --------------------------------------------------------------------------------------
+
+=head1 NAME
+
+idl2moose - IDL to perl's Moose translation
+
+=head1 SYNOPSIS
+
+ idl2moose [options]
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+This help
+
+=item B<--input <filename>>
+
+Input IDL filename.
+
+=item B<--output <filename>>
+
+Output filename. Default to STDOUT.
+
+=item B<--nativeFloat>
+
+Use of native floats. A false value will force Math::BigFloat. Default to a true value.
+
+=back
+
+=head1 EXAMPLES
+
+ idl2moose -i dom.idl > dom.pm
+
+=head1 SEE ALSO
+
+L<MarpaX::Languages::IDL::AST>

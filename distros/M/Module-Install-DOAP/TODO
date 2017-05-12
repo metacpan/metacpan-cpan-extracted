@@ -1,0 +1,2 @@
+- Document which parts of DOAP, and which extension vocabularies this module uses, and how that's mapped to META.yml, etc.
+- Look at a better way of representing dependencies.

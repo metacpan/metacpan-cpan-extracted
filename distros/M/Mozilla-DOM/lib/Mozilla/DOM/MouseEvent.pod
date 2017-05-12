@@ -1,0 +1,199 @@
+=head1 NAME
+
+Mozilla::DOM::MouseEvent
+
+=head1 DESCRIPTION
+
+The second argument of GtkMozEmbed's dom_mouse_* signal handlers will be a
+Mozilla::DOM::MouseEvent object, which is a wrapper around an instance
+of Mozilla's nsIDOMMouseEvent interface. This inherits from
+L<UIEvent|Mozilla::DOM::UIEvent>.
+
+ * The nsIDOMMouseEvent interface is the datatype for all mouse events
+ * in the Document Object Model.
+ *
+ * For more information on this interface please see
+ * L<http:E<sol>E<sol>www.w3.orgE<sol>TRE<sol>DOM-Level-2-EventsE<sol>>
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::MouseEvent->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=for apidoc Mozilla::DOM::MouseEvent::GetRelatedTarget
+
+=for signature $target = $event->GetRelatedTarget
+
+Gets an L<EventTarget|Mozilla::DOM::EventTarget>,
+but I don't know what's "related" about it since I didn't
+find any documentation.
+
+=head1 METHODS
+
+=head2 $bool = $event->B<GetAltKey>
+
+=over
+
+This function returns true if the Alt key was held down
+when the mouse event occured. (Note: I found this to not
+be strictly true.)
+
+=back
+
+=head2 $button = $event->B<GetButton>
+
+=over
+
+This function gets a number representing which mouse button was pressed.
+With three-button mice: left button = 0, middle button = 1, and
+right button = 2. (With two-button mice, there is no middle button,
+and with one-button mice there is only a left button.)
+
+Note: this is only valid for L<Gtk2::MozEmbed::main/dom_mouse_click> events.
+
+=back
+
+=head2 $x = $event->B<GetClientX>
+
+=over
+
+This function gets the X coordinate where the mouse was clicked on the
+client, i.e. the Gtk2::MozEmbed window. X = 0 is at the left and
+increases to the right.
+
+Note: this number might be negative on L<Gtk2::MozEmbed::main/dom_mouse_out>
+events when the mouse leaves the Gtk2::MozEmbed widget but hasn't left the
+application window.
+
+=back
+
+=head2 $y = $event->B<GetClientY>
+
+=over
+
+This function gets the Y coordinate where the mouse was clicked on the
+client, i.e. the Gtk2::MozEmbed window. Y = 0 is at the top and increases
+downward.
+
+Note: this number might be negative on L<Gtk2::MozEmbed::main/dom_mouse_out>
+events when the mouse leaves the Gtk2::MozEmbed widget but hasn't left the
+application window.
+
+=back
+
+=head2 $bool = $event->B<GetCtrlKey>
+
+=over
+
+This function returns true if the Ctrl key was held down
+when the mouse event occured.
+
+=back
+
+=head2 $bool = $event->B<GetMetaKey>
+
+=over
+
+This function returns true if the Meta key was held down
+when the mouse event occured.
+
+=back
+
+=head2 $x = $event->B<GetScreenX>
+
+=over
+
+This function gets the X coordinate where the mouse was clicked
+on the screen, i.e. your desktop. X = 0 is at the left and increases
+to the right.
+
+=back
+
+=head2 $y = $event->B<GetScreenY>
+
+=over
+
+This function gets the Y coordinate where the mouse was clicked
+on the screen, i.e. your desktop. Y = 0 is at the top and increases
+downward.
+
+=back
+
+=head2 $bool = $event->B<GetShiftKey>
+
+=over
+
+This function returns true if the Shift key was held down
+when the mouse event occured.
+
+
+=back
+
+=head2 eventtarget = $event->B<GetTarget>
+
+=over
+
+=back
+
+=head2 $event->B<InitMouseEvent>($eventType, $canbubble, $cancelable, $detail, $screenx, $screeny, $clientx, $clienty, $ctrlkey, $altkey, $shiftkey, $metakey, $button, $target)
+
+=over
+
+=over
+
+=item * $eventtype (string)
+
+=item * $canbubble (boolean)
+
+=item * $cancelable (boolean)
+
+=item * $detail (integer (long))
+
+=item * $screenx (integer (long))
+
+=item * $screeny (integer (long))
+
+=item * $clientx (integer (long))
+
+=item * $clienty (integer (long))
+
+=item * $ctrlkey (boolean)
+
+=item * $altkey (boolean)
+
+=item * $shiftkey (boolean)
+
+=item * $metakey (boolean)
+
+=item * $button (integer (short))
+
+=item * $target (Mozilla::DOM::EventTarget)
+
+=back
+
+See L<Event::InitEvent|Mozilla::DOM::Event::InitEvent> for more
+information. This method is basically the same as L<InitUIEvent>,
+but with nine (ten normally) extra arguments. (!)
+(XXX: add docs for args)
+
+Note: I don't see how you can Create or QueryInterface an AbstractView,
+and trying to pass in C<0> or C<undef> was just causing a segfault,
+so I've omitted what would normally be the 4th argument of this method.
+If someone can explain why you'd need it and how you'd use it,
+then I can put it back in.
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>,
+section 1.6.2 of the DOM level 2 specification
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut

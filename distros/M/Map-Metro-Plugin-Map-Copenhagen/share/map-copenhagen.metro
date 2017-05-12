@@ -1,0 +1,56 @@
+--stations
+Vanløse
+Flintholm
+Lindevang
+Fasanvej
+Frederiksberg
+Forum
+Nørreport
+Kongens Nytorv
+Christianshavn
+
+Islands Brygge
+DR Byen
+Sundby
+Bella Center
+Ørestad
+Vestamager
+
+Amagerbro
+Lergravsparken
+Øresund
+Amager Strand
+Femøren
+Kastrup
+Lufthavnen
+
+--transfers
+
+--lines
+M1|M1|M1|color:#397c5d,width:8
+M2|M2|M2|color:#e8c929,width:8
+
+--segments
+M1,M2|Vanløse|Flintholm
+M1,M2|Flintholm|Lindevang
+M1,M2|Lindevang|Fasanvej
+M1,M2|Fasanvej|Frederiksberg
+M1,M2|Frederiksberg|Forum
+M1,M2|Forum|Nørreport
+M1,M2|Nørreport|Kongens Nytorv
+M1,M2|Kongens Nytorv|Christianshavn
+
+M1|Christianshavn|Islands Brygge
+M1|Islands Brygge|DR Byen
+M1|DR Byen|Sundby
+M1|Sundby|Bella Center
+M1|Bella Center|Ørestad
+M1|Ørestad|Vestamager
+
+M2|Christianshavn|Amagerbro
+M2|Amagerbro|Lergravsparken
+M2|Lergravsparken|Øresund
+M2|Øresund|Amager Strand
+M2|Amager Strand|Femøren
+M2|Femøren|Kastrup
+M2|Kastrup|Lufthavnen

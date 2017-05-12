@@ -1,0 +1,10 @@
+# Insert here the acl rules.
+#
+# [allow|deny] mime/type from [address|domain|subscribers|any]
+#
+
+allow text/html from hdias@aesbuc.pt
+allow text/any from @perl.org
+deny application/any from .com
+allow any/any from subscribers
+deny any/any from any

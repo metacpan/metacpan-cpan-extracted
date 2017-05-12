@@ -1,0 +1,56 @@
+Revision history for Modern-PBP-Perl (formerly Perl-Modern-Perl / PBP-Perl)
+================================================================================
+
+1.000  Mon 14.Dez.2015 - 20:15
+       Initial CPAN release.
+
+1.002  Don 17.Dez.2015 - 20:30
+       Correction of the make-Scripts
+       Makefile.PL
+       Build.PL
+
+1.003  Fri 18.Dez.2015 - 19:00
+       Changed determine the current version of Perl.
+
+1.004  Sam 19.Dez.2015 - 15:00
+       Correcting the discharge of warnings.
+
+1.005  Sam 19.Dez.2015 - 20:26
+       Error message for developer version of Perl added.
+
+1.006  Son 20.Dez.2015 - 14:00
+       Minimum version of Perl in
+       Makefile.PL
+       Build.PL
+
+1.007  Mon 21.Dez.2015 - 18:00
+       Exclusion from development version of Perl in Makefile.PL and Build.PL
+       shifted.
+       (SREZIC : #110394: About not supporting bleadperl)
+
+1.010  Mon 25.Jan.2016 - 16:00
+       Import of special variables (use English), IO::File and IO::Handle
+
+1.011  Mit 27.Jan.2016 - 12:00
+       Small fixes when importing the features
+
+1.012  Mit 27.Jan.2016 - 15:00
+       Version number must no longer come first
+
+1.013  Mit 27.Jan.2016 - 17:21
+       Code now corresponds to the Perl Best Practice and Perltidy rules -
+       defined by JVBSOFT and KV Berlin
+
+1.100  Fri 12.Feb.2016 - 21:00
+       shifted modules in the namespace PBP
+
+1.101  Sam 13.Feb.2016 - 13:06
+       Comments now in English
+
+1.200  Son 14.Feb.2016 - 15:15
+       shifted modules in the namespace Modern::PBP
+       (after note from Dave Rolsky)
+
+1.240  Mon 17.Jun.2016 - 14:12
+       Support for perl 5.24
+

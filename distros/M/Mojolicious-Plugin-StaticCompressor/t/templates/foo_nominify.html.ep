@@ -1,0 +1,1 @@
+<%= js_nominify '/js/foo.js' %>

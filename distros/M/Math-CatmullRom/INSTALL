@@ -1,0 +1,24 @@
+
+N A Rantor <wiggly@wiggly.org>
+
+August 2003
+
+------------------------------------------
+
+Like most Lazy perl programmers I use MakeMaker, so try:
+
+bash$ perl Makefile.PL
+bash$ make
+bash$ make test
+bash$ make install
+
+And if you have trouble then e-mail me.
+
+------------------------------------------
+
+This is a pure-perl implementation of Catmull-Rom splines.
+
+Catmull-Rom splines are much like Bezier curves except the curve they plot
+is guaranteed to pass through the control points rather than just be
+attracted by them.
+

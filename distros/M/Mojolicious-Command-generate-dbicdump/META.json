@@ -1,0 +1,51 @@
+{
+   "abstract" : "dbicdump your Mojo app schema",
+   "author" : [
+      "Alister West <alister@alisterwest.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Command-generate-dbicdump",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Pod::Readme" : 0,
+            "Pod::Select" : 0
+         },
+         "requires" : {
+            "DBIx::Class::Schema::Loader" : 0,
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Command::generate::dbicdump" : {
+         "file" : "lib/Mojolicious/Command/generate/dbicdump.pm",
+         "version" : "v0.1.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.1.1"
+}

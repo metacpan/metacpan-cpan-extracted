@@ -1,0 +1,53 @@
+---
+abstract: 'make simple lightweight record-like structures that make sounds like cows'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.61'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-Struct
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  MooX::Struct:
+    file: lib/MooX/Struct.pm
+    version: '0.014'
+  MooX::Struct::Processor:
+    file: lib/MooX/Struct.pm
+    version: '0.014'
+  MooX::Struct::Util:
+    file: lib/MooX/Struct/Util.pm
+    version: '0.014'
+requires:
+  B::Hooks::EndOfScope: '0'
+  Data::OptList: '0'
+  Moo: '1.000000'
+  Object::ID: '0'
+  Scalar::Does: '0'
+  Sub::Install: '0'
+  namespace::clean: '0'
+  perl: '5.008'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/MooX-Struct/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=MooX-Struct
+  homepage: https://metacpan.org/release/MooX-Struct
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-moox-struct.git
+version: '0.014'
+x_contributors:
+  - NOBODY
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

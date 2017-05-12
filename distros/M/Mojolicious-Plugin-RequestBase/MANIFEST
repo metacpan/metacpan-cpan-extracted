@@ -1,0 +1,16 @@
+.perltidyrc
+.ship.conf
+.travis.yml
+Changes
+cpanfile
+lib/Mojolicious/Plugin/RequestBase.pm
+Makefile.PL
+MANIFEST			This list of files
+Mojolicious-Plugin-RequestBase-0.3/META.json
+Mojolicious-Plugin-RequestBase-0.3/META.yml
+README
+README.pod
+t/00-basic.t
+t/basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

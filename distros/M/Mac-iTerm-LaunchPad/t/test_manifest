@@ -1,0 +1,5 @@
+# $Id: test_manifest 2056 2007-01-20 00:37:44Z comdog $
+load.t
+pod.t
+pod_coverage.t
+prereq.t

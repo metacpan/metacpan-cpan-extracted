@@ -1,0 +1,231 @@
+NAME
+    Mojolicious::Plugin::StripePayment - Make payments using stripe.com
+
+VERSION
+    0.03
+
+DESCRIPTION
+    Mojolicious::Plugin::StripePayment is a plugin for the Mojolicious web
+    framework which allow you to do payments using <https://stripe.com>.
+
+    This module is EXPERIMENTAL. The API can change at any time. Let me know
+    if you are using it.
+
+SYNOPSIS
+  Simple API
+      use Mojolicious::Lite;
+      plugin StripePayment => { secret => $ENV{SUPER_SECRET_STRIPE_KEY} };
+
+      # Need this form data:
+      # amount=100&stripeToken=tok_123
+      post '/charge' => sub {
+        my $c = shift;
+        $c->delay(
+          sub { $c->stripe->create_charge({}, shift->begin) },
+          sub {
+            my ($delay, $err, $res) = @_;
+            return $c->reply->exception($err) if $err;
+            return $c->render(text => 'Charge created!');
+          },
+        );
+      };
+
+  With local database
+      use Mojolicious::Lite;
+
+      plugin StripePayment => {
+        secret  => $ENV{SUPER_SECRET_STRIPE_KEY},
+        auto_capture => 0, # need to disable auto capture of payments
+      };
+
+      my $pg = Mojo::Pg->new;
+
+      # Need this form data:
+      # amount=100&stripeToken=tok_123
+      post '/charge' => sub {
+        my $c = shift;
+        $c->delay(
+          sub { $c->stripe->create_charge({}, shift->begin) },
+          sub {
+            my ($delay, $err, $charge) = @_;
+            die $err if $err;
+            $delay->pass($charge);
+            $pg->db->query(
+              "INSERT INTO payments (id, uid, amount, status) (?, ?, ?)",
+              $charge->{id}, $c->session("uid"), $c->param("amount"), "created"
+              $delay->begin
+            );
+          },
+          sub {
+            my ($delay, $charge, $err, $res) = @_;
+            die $err if $err;
+            $c->stripe->capture_charge($charge, $delay->begin);
+          },
+          sub {
+            my ($delay, $charge) = @_;
+            die $err if $err;
+            $pg->query(
+              "UPDATE payments SET status=? WHERE id=?",
+              "captured", $charge->{id},
+              $delay->begin
+            );
+          },
+          sub {
+            my ($delay, $err, $res) = @_;
+            $c->app->log->error($err) if $err;
+            $c->render(text => "Payment captured.");
+          },
+        );
+      };
+
+  Testing mode
+      use Mojolicious::Lite;
+
+      plugin StripePayment => { mocked => 1 };
+
+    Setting "mocked" will enable this plugin to work without an actual
+    connection to stripe.com. This is done by replicating the behavior of
+    Stripe. This is especially useful when writing unit tests.
+
+    The following routes will be added to your application to mimic Stripe:
+
+    *   POST /mocked/stripe-payment/charges
+
+    *   POST /mocked/stripe-payment/charges/:id/capture
+
+    *   GET /mocked/stripe-payment/charges/:id
+
+ATTRIBUTES
+  auto_capture
+      $bool = $self->auto_capture; # default true
+
+    Whether or not to immediately capture the charge. When false, the charge
+    issues an authorization (or pre-authorization), and will need to be
+    captured later.
+
+    This is useful if you want to update your local database with
+    information regarding the charge.
+
+  base_url
+      $str = $self->base_url;
+
+    This is the location to Stripe payment solution. Will be set to
+    <https://api.stripe.com/v1>.
+
+  pub_key
+      $str = $self->pub_key;
+
+    The value for public API key. Available in the Stripe admin gui.
+
+  currency_code
+      $str = $self->currency_code;
+
+    The currency code, following ISO 4217. Default is "USD".
+
+  secret
+      $str = $self->secret;
+
+    The value for the private API key. Available in the Stripe admin gui.
+
+HELPERS
+  stripe.capture_charge
+      $c->stripe->capture_charge(\%args, sub { my ($c, $err, $json) = @_; });
+
+    Used to capture a payment from a previously created charge object.
+
+    $err is a string describing the error. Will be empty string on success.
+    $json is a charge object. See
+    <https://stripe.com/docs/api/curl#capture_charge> for more details.
+
+    %args need to contain "id", but can also contain any of amount,
+    application_fee, receipt_email and/or statement_descriptor.
+
+  stripe.create_charge
+      $c->stripe->create_charge(\%args, sub { my ($c, $err, $json) = @_; });
+
+    Used to create a charge object.
+
+    $err is a string describing the error. Will be empty string on success.
+    $json is a charge object. See
+    <https://stripe.com/docs/api/curl#create_charge> for more details.
+
+    %args can have any of...
+
+    *   amount
+
+        This value is required. Default to "amount" from "param" in
+        Mojolicious::Controller.
+
+    *   application_fee
+
+        See <https://stripe.com/docs/api/curl#create_charge>.
+
+    *   capture
+
+        Defaults to "auto_capture".
+
+    *   description
+
+        Defaults to "description" from "param" in Mojolicious::Controller.
+
+    *   currency
+
+        Defaults to "currency_code".
+
+    *   customer
+
+        See <https://stripe.com/docs/api/curl#create_charge>.
+
+    *   receipt_email
+
+        Default to "stripeEmail" from "param" in Mojolicious::Controller.
+
+    *   statement_descriptor
+
+        See <https://stripe.com/docs/api/curl#create_charge>.
+
+    *   source
+
+        This value is required. Alias: "token".
+
+        Defaults to "stripeToken" from "param" in Mojolicious::Controller.
+
+  stripe.pub_key
+      $str = $c->stripe->pub_key;
+
+    Useful for client side JavaScript. See als
+    <https://stripe.com/docs/tutorials/checkout>.
+
+  stripe.retrieve_charge
+      $c->stripe->retrieve_charge({id => $str}, sub { my ($c, $err, $json) = @_; });
+
+    Used to retrieve a charge object.
+
+    $err is a string describing the error. Will be empty string on success.
+    $json is a charge object. See
+    <https://stripe.com/docs/api/curl#charge_object> for more details.
+
+METHODS
+  register
+      $app->plugin(StripePayment => \%config);
+
+    Called when registering this plugin in the main Mojolicious application.
+
+SEE ALSO
+    *   Overview
+
+        <https://stripe.com/docs>
+
+    *   API
+
+        <https://stripe.com/docs/api>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014, Jan Henning Thorsen
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+AUTHOR
+    Jan Henning Thorsen - "jhthorsen@cpan.org"
+

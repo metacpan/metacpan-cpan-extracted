@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<title>Text</title>
+<script>
+
+function on_change(e) {
+	alert("changed with " + e.currentTarget.value);
+}
+
+function on_ta_change(e) {
+	alert("textarea changed with " + e.currentTarget.value);
+}
+
+function on_load() {
+	var element = document.getElementById("it");
+	element.addEventListener("change", on_change, false);
+
+	var textarea = document.getElementById("ta");
+	textarea.addEventListener("blur", on_ta_change, false);
+}
+
+window.addEventListener("load", on_load, false);
+</script>
+</head>
+<body>
+<input type="text" id="it" value="44" />
+<textarea id="ta">
+Text Area
+</textarea>
+</body>
+</html>

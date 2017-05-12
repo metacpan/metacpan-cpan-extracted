@@ -1,0 +1,5 @@
+   6  1
+
+(((Langur, Baboon), Human), Rat, (Cow, Horse));  [biological tree]
+
+(((Rat, Horse), Human), Baboon, (Cow, Langur));  [gene tree]

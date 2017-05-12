@@ -1,0 +1,115 @@
+<h1>Kwalitee</h1>
+
+<h3>What's "Kwalitee", anyway?</h3>
+
+<p>I'll hand the micropohone over to Schwern (or rather: I'll copy'n'paste from his <a href="http://schwern.org/~schwern/talks/CPANTS/">old CPANTS slides</a>):
+
+<pre>
+  What is a good module? That's hard to say.
+  
+  What is good code? That's also hard to say.
+  
+  "Quality" is not a well-defined term in computing ... and especially not Perl.
+
+  One man's Thing of Beauty is another's man's Evil Hack
+  
+  Since we can't define quality, how do we write a program to assure it?
+</pre>
+  
+<p>Schwern decided to cleverly avoid this problem by not testing for quality but for Kwalitee: It looks like quality, it sounds like quality, but it's not quite quality.</p>
+
+<h3>Kwalitee Indicators Overview</h3>
+
+<p><b>Available Kwalitee: [% mck.available_kwalitee %] (including optional metrics: [% mck.total_kwalitee %])</b></p>
+
+<p>If you want to discuss Kwalitee indicators or suggest new ones, please use the <a href="http://lists.cpan.org/showlist.cgi?name=perl-qa">perl-qa</a> list.</p>
+
+[% as_hash = mck.get_indicators_hash %]
+
+
+<p><b>Core Indicators</b></p>
+<ul id="indicators">
+[% FOREACH k IN mck.get_indicators('core').sort('name') %]
+<li><a href="#[% k.name %]">[% k.name %]</a></li>
+[% END%]
+</ul>
+
+<p><b>Optional Indicators</b></p>
+<ul id="indicators">
+[% FOREACH k IN mck.get_indicators('optional').sort('name') %]
+<li><a href="#[% k.name %]">[% k.name %]</a></li>
+[% END%]
+</ul>
+
+[% IF show_experimental %]
+<p><b>Experimental Indicators</b></p>
+<ul id="indicators">
+[% FOREACH k IN mck.get_indicators('experimental').sort('name') %]
+<li><a href="#[% k.name %]">[% k.name %]</a></li>
+[% END%]
+</ul>
+
+[% END %]
+
+<h3>Kwalitee Indicators</h3>
+
+<h4>Core Indicators</h4>
+
+<dl>
+[% FOREACH k IN mck.get_indicators('core').sort('name') %]
+
+<dt><a name="[% k.name %]"></a>[% k.name %] [% k.fake %] </dt>
+<dd>
+[% IF k.aggregating %]
+<b>Aggregate of:</b> [% k.aggregating.join(', ') %]<br>
+[% END %]
+<b>Shortcoming:</b> [% k.error %]<br>
+<b>Remedy:</b> [% k.remedy %]<br>
+<b>Defined in:</b> [% k.defined_in %]<br>
+<a href="/dist/complying?metric=[% k.name %]">Show complying dists</a> | 
+<a href="/dist/shortcoming?metric=[% k.name %]">Show failing dists</a>
+</dd>
+
+[% END %]
+</dl>
+
+<h4>Optional Indicators</h4>
+<dl>
+[% FOREACH k IN mck.get_indicators('optional').sort('name') %]
+
+<dt><a name="[% k.name %]"></a>[% k.name %] [% k.fake %]</dt>
+<dd>
+[% IF k.aggregating %]
+<b>Aggregate of:</b> [% k.aggregating.join(', ') %]<br>
+[% END %]
+<b>Shortcoming:</b> [% k.error %]<br>
+<b>Remedy:</b> [% k.remedy %]<br>
+<b>Defined in:</b> [% k.defined_in %]<br>
+<a href="/dist/complying?metric=[% k.name %]">Show complying dists</a> | 
+<a href="/dist/shortcoming?metric=[% k.name %]">Show failing dists</a>
+</dd>
+
+[% END %]
+</dl>
+
+[% IF show_experimental %]
+<h4>Experimental Indicators</h4>
+<dl>
+[% FOREACH k IN mck.get_indicators('experimental').sort('name') %]
+
+<dt><a name="[% k.name %]"></a>[% k.name %] [% k.fake %]</dt>
+<dd>
+[% IF k.aggregating %]
+<b>Aggregate of:</b> [% k.aggregating.join(', ') %]<br>
+[% END %]
+<b>Shortcoming:</b> [% k.error %]<br>
+<b>Remedy:</b> [% k.remedy %]<br>
+<b>Defined in:</b> [% k.defined_in %]<br>
+<a href="/dist/complying?metric=[% k.name %]">Show complying dists</a> | 
+<a href="/dist/shortcoming?metric=[% k.name %]">Show failing dists</a>
+</dd>
+
+[% END %]
+</dl>
+[% END %]
+

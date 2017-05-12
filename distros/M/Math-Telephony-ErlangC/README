@@ -1,0 +1,45 @@
+Math-Telephony-ErlangC version 1.0.0
+
+This module contains various functions to deal with Erlang C calculations.
+
+The Erlang C model allows dimensioning the number of servers in a
+M/M/S/inf/inf model (Kendall notation):
+
+- The input process is Markovian (Poisson in this case)
+- The serving process is Markovian (ditto)
+- There are S servers
+- The wait line is infinite (pure wait, no loss, no renounce)
+- The input population is infinite
+
+INSTALLATION
+
+The best thing to do is install via cpan.
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+This module requires Math::Telephony::ErlangB, at least version 0.05
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2007, Flavio Poletti
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

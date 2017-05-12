@@ -1,0 +1,60 @@
+---
+doctype: dist
+
+header:
+  name: Mojolicious-Plugin-DbicSchemaViewer
+
+prereqs:
+  runtime:
+    requires:
+     - perl: 5.020000
+     - Mojolicious: 6.00
+     - File::ShareDir
+     - File::HomeDir
+     - Path::Tiny
+     - Data::Dump::Streamer
+     - Safe::Isa
+     - Syntax::Feature::Qi
+     - String::Stomp: 0.0102
+     - String::Random
+     - experimental
+     - DateTime::Tiny: 1.06
+     - Mojolicious::Plugin::BootstrapHelpers: 0.0201
+     - DBIx::Class::Visualizer
+     - PerlX::Maybe
+     - DBIx::Class::Visualizer: 0.0200
+
+  test:
+    requires:
+     - Test::More
+     - Test::Mojo
+     - Test::Deep
+     - DBIx::Class
+
+plugins:
+  - +config: Author::CSSON
+
+  - +extend_plugin: TravisYML
+    perl_version: 5.20
+    sudo: 1
+    post_before_install:
+     - sudo apt-get update -qq
+     - sudo apt-get install -y graphviz
+    pre_install:
+     - cpanm GraphViz2
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+  - +remove_plugin: Splint
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+config: Author::CSSON
+always:
+ - /Mojolicious-Plugin-DbicSchemaViewer-*

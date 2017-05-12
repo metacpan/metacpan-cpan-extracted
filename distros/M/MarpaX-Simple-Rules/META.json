@@ -1,0 +1,41 @@
+{
+   "abstract" : "Simple definition language for rules",
+   "author" : [
+      "Peter Stuifzand E<lt>peter@stuifzand.euE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MarpaX-Simple-Rules",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Marpa::XS" : "1.0"
+         }
+      }
+   },
+   "provides" : {
+      "MarpaX::Simple::Rules" : {
+         "file" : "lib/MarpaX/Simple/Rules.pm",
+         "version" : "v0.2.7"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.2.7"
+}

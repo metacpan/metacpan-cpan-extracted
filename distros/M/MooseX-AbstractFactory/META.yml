@@ -1,0 +1,46 @@
+---
+abstract: 'AbstractFactory behaviour as a Moose extension'
+author:
+  - 'Mike Whitaker <mike@altrion.org>'
+  - 'Caleb Cushing <xenoterracide@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Spec::Functions: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  List::Util: '0'
+  Test::Fatal: '0'
+  Test::Moose: '0'
+  Test::More: '0'
+  perl: '5.006'
+  version: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-AbstractFactory
+no_index:
+  file:
+    - perlcritic.rc
+requires:
+  Module::Runtime: '0'
+  Moose: '0'
+  Moose::Autobox: '0'
+  Moose::Exporter: '0'
+  Moose::Meta::Class: '0'
+  Moose::Role: '0'
+  Try::Tiny: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/fleetfootmike/MX-AbstractFactory/issues
+  homepage: http://search.cpan.org/dist/MooseX-AbstractFactory/
+  repository: git://github.com/fleetfootmike/MX-AbstractFactory.git
+version: '0.004003'
+x_contributors:
+  - 'Zoffix Znet <cpan@zoffix.com>'

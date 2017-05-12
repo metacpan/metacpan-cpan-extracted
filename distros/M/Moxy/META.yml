@@ -1,0 +1,51 @@
+---
+abstract: 'Mobile web development proxy'
+author:
+  - 'Kan Fushihara'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Base: 0
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Moxy
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  Encode::Detect: 1
+  HTML::Scrubber: 1.04
+  HTML::StripScripts: 1.04
+  HTML::StripScripts::Parser: 1.02
+requires:
+  Class::Accessor: 0
+  Class::Component: 0.17
+  Encode::JP::Mobile: 0.25
+  HTML::ReplacePictogramMobileJp: 0.06
+  HTML::Tree: 3.23
+  HTML::TreeBuilder::XPath: 0.09
+  HTTP::Cookies: 0
+  HTTP::MobileAttribute: 0.13
+  HTTP::Session: 0.41
+  Params::Validate: 0.91
+  Path::Class: 0
+  Plack: 0.9032
+  Plack::Middleware::ReverseProxy: 0.05
+  Template: 2.19
+  Test::More: 0.98
+  UNIVERSAL::require: 0.11
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/kan/moxy.git
+version: 0.70

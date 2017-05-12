@@ -1,0 +1,4 @@
+<p align="center">
+&nbsp;<br>
+<div class="infotext">[% tr.tr("You have logged out.") %]</class>
+</p>

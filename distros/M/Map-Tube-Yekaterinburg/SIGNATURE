@@ -1,0 +1,63 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a9455514535ccb54f62d73178aa355cd74e1a547 Changes
+SHA1 882221895a73bad18eb9f16a0ce523a968a932c1 LICENSE.artistic_2
+SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE.bsd
+SHA1 1e326aca8d3974bd61673763dd5b184160e46a1d MANIFEST
+SHA1 cd8a9541d0f2f6e2ceb9a884152b477313716e4a META.yml
+SHA1 8ae3081219c45a135a905e43e729c78e7a06f10a Makefile.PL
+SHA1 6de83d13c983198e4e7acb20332d95c4935031c8 README
+SHA1 1d747249413698375f81f2c3d65581653be06787 Yekaterinburg.pm
+SHA1 594e1d4152ee562dbed3449e0da8bfea584f19c1 examples/ex1.pl
+SHA1 d9a35143ea4c163872447d9347b3b4cef2897b8c examples/ex2.pl
+SHA1 acfe6cfe0a0f1d543a1f229da5bf112adabcbf2e examples/ex3.pl
+SHA1 054c0ce7c8de44416dbf1bb143df2bd3288570d8 examples/ex4.pl
+SHA1 dd90b4c11f4236b97d8f005123579621b95fc6c8 images/ex3.png
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 42de62df31eaf796d8bfd49a11fdc9cff1b50b74 inc/Module/Install/Share.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 a00c57c31a87511d50bfcc83c1d5a1b372604fef share/yekaterinburg-map.xml
+SHA1 694e3b9533ca50c0f98a3c46b11561090752f300 t/Map-Tube-Yekaterinburg/01-use.t
+SHA1 30bc8697f0b6e437d0a1fc70d5ca035c68146fdc t/Map-Tube-Yekaterinburg/02-version.t
+SHA1 61d340ad69fb1ca1f135c995a3c6b62dcda17997 t/Map-Tube-Yekaterinburg/03-map.t
+SHA1 c2d6786ace6443adc18a37d8387697f95d2ecccf t/Map-Tube-Yekaterinburg/04-get_node_by_id.t
+SHA1 bcc6bd8721c38841f1fb8b66a2653132ad344b9d t/Map-Tube-Yekaterinburg/05-get_node_by_name.t
+SHA1 5d4faeb8a3780ba94658b4c14e5db2493a33ac1a t/Map-Tube-Yekaterinburg/06-get_shortest_route.t
+SHA1 044e30bff31b17d8bd7aa816f5666750972149b2 t/Map-Tube-Yekaterinburg/07-name.t
+SHA1 1f3ae3e0e14a53d30411ac2c65fe87eb747fc34e t/Map-Tube-Yekaterinburg/08-xml.t
+SHA1 1df489e8ad6f26f96fd7e06922522ab4ccd61043 xt/Map-Tube-Yekaterinburg/01-pod_coverage.t
+SHA1 1de9669901410ac871668e28d72954e5fca463f9 xt/Map-Tube-Yekaterinburg/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWIMofAAoJEJe+XXKaIuTl2JoIAK/WT2GhsNQpzYApmAjdtSNW
+Z84hI8EVVCXm45uA+eNGdcc+XDk46jqR3fSzSUYVf+C1QIfY1V6D0f024bHNPYOH
+OT/a1SNM80YosNsV7BylWCirJXCxJNM0BzOhetXqo3axx7MsC2Ff1YWdEcafIpcz
+KH0RoOmy4hbtNuxZmjppn23GrAtoJ+1/tqvkl4kkmXwwnU7u11FTw0X0J/CZQUk/
+JWVn4nV8AzWRFX8u2NGLRyyCuO6KvDMsdW5cuN9CTAk348Dbzl9MQ+6qveC8cyfZ
+vbS05zCymf8ioEq+hBH0D26u63d91Y85+zOgntFbiYntMTwmQc8rWTT1spvselM=
+=4Y1d
+-----END PGP SIGNATURE-----

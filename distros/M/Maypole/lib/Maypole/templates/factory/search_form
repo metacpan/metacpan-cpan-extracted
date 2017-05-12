@@ -1,0 +1,20 @@
+
+<!-- ### Search component ### -->
+
+<div id="search">
+<form method="get" action="[% base %]/[% classmetadata.moniker %]/do_search/">
+<fieldset>
+<legend>Search</legend>
+[% USE search_class = Class request.model_class; %]
+[% FOR col = search_class.search_columns() %]
+  <label>
+     <span class="field">[% classmetadata.colnames.$col; %]</span>
+     [% SET element = classmetadata.cgi.$col; element.as_XML; %]
+  </label>
+[% END; %]
+<input type="submit" name="search" value="search"/>
+</fieldset>
+</form>
+</div>
+
+<!-- # Search end -->

@@ -1,0 +1,77 @@
+0.3.0
+ [Added / runtime requires]
+ - MetaPOD::Exception::Decode::Data
+ - MetaPOD::Role::Format
+
+ [Added / test requires]
+ - MetaPOD::Assembler
+ - MetaPOD::Extractor
+ - MetaPOD::Result
+
+ [Changed / build requires]
+ - Module::Build 0.4007 → 0.4202
+
+ [Changed / configure requires]
+ - Module::Build 0.4007 → 0.4202
+
+ [Changed / test requires]
+ - Test::More 0.98 → 1.001002
+
+ [Removed / runtime requires]
+ - Data::Dump
+ - List::AllUtils
+ - Module::Runtime
+ - Pod::Eventual
+ - Throwable::Error
+
+ [Removed / test requires]
+ - File::Spec
+ - IO::Handle
+ - IPC::Open3
+
+0.2.4 2013-09-26T06:34:05Z
+ [Added / test requires]
+ - File::Spec
+
+0.2.3 2013-08-31T03:01:20Z
+ [Added / test requires]
+ - IO::Handle
+ - IPC::Open3
+
+ [Removed / test requires]
+ - Capture::Tiny
+ - blib
+
+0.2.2 2013-08-01T19:06:05Z
+ [Added / runtime requires]
+ - Throwable::Error
+ - Try::Tiny
+
+ [Added / test requires]
+ - Capture::Tiny
+ - blib
+
+ [Changed / build requires]
+ - Module::Build 0.4005 → 0.4007
+
+ [Changed / configure requires]
+ - Module::Build 0.4005 → 0.4007
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.2.1 2013-06-07T15:41:59Z
+
+0.2.0 2013-06-07T12:49:29Z
+
+0.1.3 2013-06-02T08:27:59Z
+
+0.1.2 2013-06-02T07:12:28Z
+ [Changed / runtime requires]
+ - Moo 0 → 1.000008
+
+0.1.1 2013-05-31T16:02:34Z
+ [Added / test requires]
+ - Path::Iterator::Rule
+

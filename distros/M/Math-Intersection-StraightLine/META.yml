@@ -1,0 +1,19 @@
+---
+abstract: 'Calculate intersection point for two lines'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.142690'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Intersection-StraightLine
+resources:
+  bugtracker: http://github.com/reneeb/Math-Intersection-StraightLine/issues
+  homepage: http://github.com/reneeb/Math-Intersection-StraightLine
+  repository: http://github.com/reneeb/Math-Intersection-StraightLine.git
+version: '0.05'

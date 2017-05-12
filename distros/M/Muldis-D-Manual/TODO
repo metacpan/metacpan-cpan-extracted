@@ -1,0 +1,63 @@
+                             Muldis::D::Manual
+                                   TODO
+---------------------------------------------------------------------------
+
+Following is a summary of things that still need doing.  It is specific to
+the Muldis D language and implementations manual distribution only, and
+doesn't talk about things that would go in other distributions.
+
+The following list is loosely ordered by priority, but list items may
+actually be addressed in a different order.  There is no specific time
+table for these items; they are simply to be done "as soon as possible".
+
+* Generally speaking, make a new release to CPAN once every week, assuming
+the progress is non-trivial, so there are regular public snapshots with
+nicely rendered documentation.
+
+* IN PROGRESS ...
+Start this distribution, which collects miscellaneous and large
+documentation associated with the Muldis D language but isn't part of the
+spec itself, with the main focus on showing reams of Muldis D example code
+or how-tos or comparisons with SQL etc.  A main reason to be separate is so
+that examples can be updated and expanded at a natural pace without having
+to increment the language spec version number in the process, and to keep
+the actual spec distro slimmer.  When this distro is started,
+its initial content can include updated versions of what was in archives/
+of the spec distro, along with copies of static historical versions and
+announcements etc.  Early Muldis D examples to write should focus on tasks
+that are difficult to do in SQL that are easier in Muldis D.  For example
+recursive operations (note, SQL has the term "Common Table Expressions" to
+mean the WITH clause), such as something genealogy or a nested hierarchy of
+locations with points of interest in them.  Also the examples in David
+Fetter's FOSDEM 2009 talk (see
+http://wiki.postgresql.org/images/c/c1/Trees_and_More_FOSDEM_2009.pdf )
+would be good examples to translate to Muldis D.  Also implement the
+common standby that Perl ORM docs like to use, about artist/song/album/etc,
+and maybe look at the Songbird database format.  Or perhaps among the top
+of the list for new examples should be a Muldis D implementation of Hugh
+Darwen's course assignment "CS252 - Fundamentals of Relational Databases -
+Module Assignment 2007" at the University of Warwick, described as "Your
+task is to design a relational database to record information concerning
+personal bank accounts: details about the customers holding these accounts
+and details of individual payments of money into and out of these
+accounts."  Maybe that actually will be the best first non-trivial example,
+since it was designed with some strengths of D languages vs SQL in mind.
+In general just the PTMD_STD dialect will be used for all examples, though
+in some cases parallel examples in a HDMD_PerlN_STD dialect may be used.
+Side note: Postgres 8.4 is apparently the first version of Pg to have CTE.
+See also the entire database constraint set from the example database in
+the book "Applied Mathematics for Database Professionals" (which SIRA_PRISE
+is stated to enforce efficiently). Including stuff like "Every trainer
+should be giving trainings in the location of his own department for at
+least half of the total time that he is giving trainings." and "You can
+only be assigned as a trainer for some course if either you have been
+employed for over a year or else you have yourself attended another session
+of that same course, and the trainer who gave that session that you
+attended attends as a participant the training you give." (which the book
+labeled the "pièce de résistance").
+Note: Pg 8.5 as of Week-of2009Oct10 now has named argument syntax: "Support
+use of function argument names to identify which actual arguments match
+which function parameters.  The syntax uses AS, for example funcname(value
+AS arg1, anothervalue AS arg2).  Pavel Stehule."
+
+* Whatever else needs doing, such as, fixing bugs.

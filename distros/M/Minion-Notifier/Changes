@@ -1,0 +1,21 @@
+Revision history for Perl module Minion::Notifier
+
+0.06 2017-03-06
+  - Fix a bug in the postgres transport
+
+0.05 2016-04-10
+  - Emit events related to enqueuing and dequeuing of jobs
+  - Bump Minion dependency to 5.03
+
+0.04 2016-01-04
+  - Allow redis notifier to wait for the nonblocking publish to be sent
+
+0.03 2015-12-09
+  - Fix websocket test (require Mercury 0.003 for bus endpoint; correctly this time) (srezic++)
+
+0.02 2015-12-09
+  - Fix websocket test (require Mercury 0.003 for bus endpoint) (srezic++)
+
+0.01 2015-12-09
+  - Initial release
+

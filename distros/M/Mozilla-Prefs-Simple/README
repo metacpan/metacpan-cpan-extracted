@@ -1,0 +1,36 @@
+NAME
+    Mozilla::Prefs::Simple - Manipulate Mozilla preferences
+
+SYNOPSIS
+      use Mozilla::Prefs::Simple;
+
+      my $p = new Mozilla::Prefs::Simple('prefs.js');
+
+      $p->set_pref("browser.blink_allowed", "true");
+      $p->set_pref("general.useragent.locale", "\"en-US\"");
+
+      if ($p->get_pref("mailnews.reply_header_type") == 2) {
+        ...
+      }
+
+      $p->save_file('prefs.js');
+
+DESCRIPTION
+    This is a no-frills module for reading and writing Mozilla preference
+    files.
+
+    More details can be found in the module documentation.
+
+AUTHOR
+    Robert Rothenberg, `<rrwo at cpan.org>'
+
+BUGS
+    Please report bugs to
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Mozilla-Prefs-Simple.
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Robert Rothenberg, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

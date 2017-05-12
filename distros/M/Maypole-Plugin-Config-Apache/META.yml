@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: Maypole-Plugin-Config-Apache
+version: 0.21
+author:
+  - David Baird <cpan@riverside-cms.co.uk>
+abstract: read config settings from httpd.conf
+license: perl
+requires:
+  NEXT: 0
+  Test::Exception: 0
+  Test::More: 0
+provides:
+  Maypole::Plugin::Config::Apache:
+    file: lib/Maypole/Plugin/Config/Apache.pm
+    version: 0.21
+generated_by: Module::Build version 0.2609

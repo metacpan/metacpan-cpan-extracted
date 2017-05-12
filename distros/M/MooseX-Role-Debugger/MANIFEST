@@ -1,0 +1,15 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+debug.log
+debug_Testclass3.log
+dist.ini
+lib/MooseX/Role/Debugger.pm
+t/inc/TestClass1.pm
+t/inc/TestClass2.pm
+t/inc/TestClass3.pm
+t/inc/TestClass4.pm
+t/inc/TestClass5.pm
+t/main.t

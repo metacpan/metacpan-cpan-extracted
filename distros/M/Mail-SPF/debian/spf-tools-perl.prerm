@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+mode=$1
+
+source_package=mail-spf-perl
+
+case "$mode" in
+  remove )
+    update-alternatives --remove spfquery /usr/bin/spfquery.$source_package
+    update-alternatives --remove spfd     /usr/sbin/spfd.$source_package
+    ;;
+esac
+
+#DEBHELPER#

@@ -1,0 +1,51 @@
+NAME
+    Module::Install::TrustMetaYml - trusts META.yml list of dependencies
+
+SYNOPSIS
+    In Makefile.PL:
+
+            trust_meta_yml;
+
+DESCRIPTION
+    CPAN doesn't trust "META.yml"'s list of dependencies for a module.
+    Instead it expects "Makefile.PL" run on the computer the package is
+    being installed upon to generate its own list of dependencies (called
+    "MYMETA.yml" or "MYMETA.json").
+
+    This module is a Module::Install plugin that generates "MYMETA.yml" by
+    simply passing through the dependencies from "META.yml".
+
+    It does nothing when run from the module author's development copy.
+
+    The module defines two functions which are aliases for each other:
+
+    "trust_meta_yml"
+    "trust_meta_yaml"
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Module-Install-TrustMetaYml>
+    .
+
+SEE ALSO
+    Module::Install, Module::Package::RDF.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+CREDITS
+    Thanks to Chris Williams (BINGOS), Ingy döt Net (INGY) and Florian
+    Ragwitz (FLORA) for explaining the role of "MYMETA.json", and helping me
+    figure out why mine weren't working.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2011-2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

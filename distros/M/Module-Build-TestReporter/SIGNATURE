@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.44.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 08d95b6192b5b086b3e6dcedd7dd99d2b1c39e41 Build.PL
+SHA1 9275b242db2a4c8d2068adc930e3e6d83fd6f2de MANIFEST
+SHA1 5d40239e25d12683ab8ebb599f9a608da6b3d501 MANIFEST.SKIP
+SHA1 3b61fad3b271b5625eceb502e0a74cbb29adc750 META.yml
+SHA1 b229dd155e0fa75abd64721a62e8e6e4d69e9689 Makefile.PL
+SHA1 0a89b9649f44f7fd952716e2ff5d6a603955c888 README
+SHA1 79a844f211b692b8da8c5105ee2d7baff9f5d6cc lib/Module/Build/TestReporter.pm
+SHA1 f35a25f9883738be60f36b3ec2d0aeae9e2a9608 t/0-signature.t
+SHA1 85885f10514da885cf69d63c0d3bc8beebf36d4b t/base.t
+SHA1 6af83964871102d1ed7d72942f58910bb20eaa88 t/fake_tests/fail.t
+SHA1 17013ef25edc384d97016e9ad6a0dbae59d457e5 t/fake_tests/pass.t
+SHA1 645938b5e88aaf2810927d5ac8fc3f20b1bdbc54 t/inherit.t
+SHA1 b9815cc7dff29b17205817c00c85aa33735e3fb7 t/override.t
+SHA1 f96ef08db73245d83c691538aba21de8d4aaeaab t/try_prereqs.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFCsMm+Bd8Wn1wI6cQRAnHzAKCKGly8I63NGYNV3KIJeFFQ7tbrZgCbBUzS
+IRuNMYiAR687aCA6dnAHyd4=
+=l+hi
+-----END PGP SIGNATURE-----

@@ -1,0 +1,19 @@
+Revision history for Perl extension Math::Trig::Units.
+
+0.01  Mon Dec 23 14:09:47 2002
+    - original version; created by h2xs 1.21 with options
+        -X Math::Trig::Degree
+
+0.02 Tue Dec 24
+    - modified code to generate a base class Math::Trig::Units
+      with subclasses Math::Trig::Radian, Math::Trig::Degree and
+      Math::Trig::Gradian
+
+0.03 Fri Dec 27
+    - removed hard coded value for pi and substituted atan2(1,1)*4 which
+      imporves accuracy.
+    - deleted kludge approx and zero functions as a result of above change
+    - thanks to Tom Anderson
+    - changed default units to radians as Math::Trig::Units will likely be
+      renamed Math::Trig
+

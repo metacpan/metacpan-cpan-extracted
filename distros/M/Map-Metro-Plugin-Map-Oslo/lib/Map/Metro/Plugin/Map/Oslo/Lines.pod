@@ -1,0 +1,235 @@
+
+# PODNAME: Map::Metro::Plugin::Map::Oslo::Lines
+# ABSTRACT: Lines and stations in the Oslo map
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Map::Metro::Plugin::Map::Oslo::Lines - Lines and stations in the Oslo map
+
+=head1 VERSION
+
+Version 0.1104, released 2016-01-24.
+
+=head1 LINES
+
+=head2 Purple line: Frognerseteren → Helsfyr [Line 1]
+
+=for HTML <div style="background-color: #7b88b3; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Frognerseteren
+    Voksenkollen
+    Lillevann
+    Skogen
+    Voksenlia
+    Holmenkollen
+    Besserud
+    Midtstuen
+    Skådalen
+    Vettakollen
+    Gråkammen
+    Slemdal
+    Ris
+    Gaustad
+    Vinderen
+    Steinerud
+    Frøen
+    Majorstuen        (Line 2, Line 3, Line 4, Line 5, Line 6)
+    Nationaltheatret  (Line 2, Line 3, Line 4, Line 5, Line 6)
+    Stortinget        (Line 2, Line 3, Line 4, Line 5, Line 6)
+    Jernbanetorget    (Line 2, Line 3, Line 4, Line 5, Line 6)
+    Grønland          (Line 2, Line 3, Line 4, Line 5, Line 6)
+    Tøyen             (Line 2, Line 3, Line 4, Line 5, Line 6)
+    Ensjø             (Line 2, Line 3, Line 4)
+    Helsfyr           (Line 2, Line 3, Line 4)
+
+=head2 Light blue line: Avløs → Ellingsrudåsen [Line 2]
+
+=for HTML <div style="background-color: #00add9; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Avløs
+    Haslum
+    Gjønnes
+    Bekkestua
+    Ringstabekk
+    Jar
+    Bjørnsletta
+    Åsjordet
+    Ullemåsen
+    Montebello
+    Smestad           (Line 5)
+    Borgen            (Line 5)
+    Majorstuen        (Line 1, Line 3, Line 4, Line 5, Line 6)
+    Nationaltheatret  (Line 1, Line 3, Line 4, Line 5, Line 6)
+    Stortinget        (Line 1, Line 3, Line 4, Line 5, Line 6)
+    Jernbanetorget    (Line 1, Line 3, Line 4, Line 5, Line 6)
+    Grønland          (Line 1, Line 3, Line 4, Line 5, Line 6)
+    Tøyen             (Line 1, Line 3, Line 4, Line 5, Line 6)
+    Ensjø             (Line 1, Line 3, Line 4)
+    Helsfyr           (Line 1, Line 3, Line 4)
+    Brynsereng        (Line 3, Line 4)
+    Hellerud          (Line 3)
+    Tveita
+    Haugerud
+    Trosterud
+    Lindeberg
+    Furuset
+    Ellingsrudåsen
+
+=head2 Yellow line: Mortensrud → Storo [Line 3]
+
+=for HTML <div style="background-color: #ef9e45; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Mortensrud
+    Skullerud
+    Bogerud
+    Bøler
+    Ulsrud
+    Oppsal
+    Skøyenåsen
+    Godlia
+    Hellerud          (Line 2)
+    Brynsereng        (Line 2, Line 4)
+    Helsfyr           (Line 1, Line 2, Line 4)
+    Ensjø             (Line 1, Line 2, Line 4)
+    Tøyen             (Line 1, Line 2, Line 4, Line 5, Line 6)
+    Grønland          (Line 1, Line 2, Line 4, Line 5, Line 6)
+    Jernbanetorget    (Line 1, Line 2, Line 4, Line 5, Line 6)
+    Stortinget        (Line 1, Line 2, Line 4, Line 5, Line 6)
+    Nationaltheatret  (Line 1, Line 2, Line 4, Line 5, Line 6)
+    Majorstuen        (Line 1, Line 2, Line 4, Line 5, Line 6)
+    Blindern          (Line 4, Line 6)
+    Forskningsparken  (Line 4, Line 6)
+    Ullevål stadion   (Line 4, Line 6)
+    Nydalen           (Line 4)
+    Storo             (Line 4, Line 6)
+
+=head2 Dark blue line: Bergkrystallen → Storo [Line 4]
+
+=for HTML <div style="background-color: #004c8a; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Bergkrystallen
+    Munkelia
+    Lambertseter
+    Karlsrud
+    Brattlikollen
+    Ryen
+    Manglerud
+    Høyenhall
+    Brynsereng        (Line 2, Line 3)
+    Helsfyr           (Line 1, Line 2, Line 3)
+    Ensjø             (Line 1, Line 2, Line 3)
+    Tøyen             (Line 1, Line 2, Line 3, Line 5, Line 6)
+    Grønland          (Line 1, Line 2, Line 3, Line 5, Line 6)
+    Jernbanetorget    (Line 1, Line 2, Line 3, Line 5, Line 6)
+    Stortinget        (Line 1, Line 2, Line 3, Line 5, Line 6)
+    Nationaltheatret  (Line 1, Line 2, Line 3, Line 5, Line 6)
+    Majorstuen        (Line 1, Line 2, Line 3, Line 5, Line 6)
+    Blindern          (Line 3, Line 6)
+    Forskningsparken  (Line 3, Line 6)
+    Ullevål stadion   (Line 3, Line 6)
+    Nydalen           (Line 3)
+    Storo             (Line 3, Line 6)
+
+=head2 Orange line: Vestli → Østerås [Line 5]
+
+=for HTML <div style="background-color: #e55c35; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Vestli
+    Stovner
+    Rommen
+    Romsås
+    Grorud
+    Ammerud
+    Kalbakken
+    Rødtvet
+    Veitvet
+    Linderud
+    Vollebekk
+    Risløkka
+    Økern
+    Hasle
+    Carl Berners plass  (Line 6)
+    Tøyen               (Line 1, Line 2, Line 3, Line 4, Line 6)
+    Grønland            (Line 1, Line 2, Line 3, Line 4, Line 6)
+    Jernbanetorget      (Line 1, Line 2, Line 3, Line 4, Line 6)
+    Stortinget          (Line 1, Line 2, Line 3, Line 4, Line 6)
+    Nationaltheatret    (Line 1, Line 2, Line 3, Line 4, Line 6)
+    Majorstuen          (Line 1, Line 2, Line 3, Line 4, Line 6)
+    Borgen              (Line 2)
+    Smestad             (Line 2)
+    Makrellbekken
+    Holmen
+    Hovseter
+    Røa
+    Ekraveien
+    Eiksmarka
+    Lijordet
+    Østerås
+
+=head2 Green line: Sognsvann → Storo [Line 6]
+
+=for HTML <div style="background-color: #3cae55; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Sognsvann
+    Kringsjå
+    Holstein
+    Østhorn
+    Tåsen
+    Berg
+    Ullevål stadion     (Line 3, Line 4)
+    Forskningsparken    (Line 3, Line 4)
+    Blindern            (Line 3, Line 4)
+    Majorstuen          (Line 1, Line 2, Line 3, Line 4, Line 5)
+    Nationaltheatret    (Line 1, Line 2, Line 3, Line 4, Line 5)
+    Stortinget          (Line 1, Line 2, Line 3, Line 4, Line 5)
+    Jernbanetorget      (Line 1, Line 2, Line 3, Line 4, Line 5)
+    Grønland            (Line 1, Line 2, Line 3, Line 4, Line 5)
+    Tøyen               (Line 1, Line 2, Line 3, Line 4, Line 5)
+    Carl Berners plass  (Line 5)
+    Sinsen
+    Storo               (Line 3, Line 4)
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Map::Metro::Plugin::Map::Oslo>
+
+=item *
+
+L<Task::MapMetro::Maps>
+
+=item *
+
+L<Map::Metro>
+
+=back
+
+=head1 SOURCE
+
+L<https://github.com/Csson/p5-Map-Metro-Oslo>
+
+=head1 HOMEPAGE
+
+L<https://metacpan.org/release/Map-Metro-Plugin-Map-Oslo>
+
+=head1 AUTHOR
+
+Erik Carlsson <info@code301.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Erik Carlsson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

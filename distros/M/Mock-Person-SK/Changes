@@ -1,0 +1,20 @@
+0.04 2015-10-27T11:29:17+01:00
+ - Fix comment (thanks Mohammad S Anwar).
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.03 2014-08-14T07:27:48+02:00
+ - Add 'readme_from' directive to Makefile.PL.
+ - Add minimal Perl version.
+ - Fix LICENSE file.
+ - Update Module::Install to 1.10 version.
+
+0.02 2013-09-21
+ - Fix doc spelling.
+ - Rewrite Changes file to CPAN::Changes::SPEC format.
+
+0.01 2013-07-26
+ - First version.

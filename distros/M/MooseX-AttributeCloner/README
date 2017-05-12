@@ -1,0 +1,18 @@
+MooseX::AttributeCloner
+
+The purpose of this Role is to take all the attributes which have values in the current class,
+and populate them directly into a new class object. The purpose of which is that if you have data
+inputted on the command line that needs to propagate through to later class objects, you shouldn't
+need to do the following
+
+
+my $oNewClass = New::Class->new({
+  attr1 => $self->attr1,
+  attr2 => $self->attr2,
+...
+});
+
+Which is going to get, quite frankly, tedious in the extreme. Particularly when you have more 2 class
+objects in your chain.
+
+Current released version - tag v0.23

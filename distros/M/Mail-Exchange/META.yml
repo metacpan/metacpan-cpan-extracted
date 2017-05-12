@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Mail-Exchange
+version:            0.04
+abstract:           Read and write Outlook .msg files
+author:
+    - Guntram Blohm (gbl@bso2001.com)
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Email::Address:     1.892
+    OLE::Storage_Lite:  0.19
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

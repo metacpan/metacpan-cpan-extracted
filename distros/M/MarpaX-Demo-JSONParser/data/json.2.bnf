@@ -1,0 +1,64 @@
+:default     ::= action => ::array
+
+lexeme default = latm => 1
+
+:start       ::= json
+
+json         ::= object action => ::first
+               | array action => ::first
+
+object       ::= ('{') members ('}') bless => hash
+
+members      ::= pair*                 separator => <comma>
+
+pair         ::= string (':') value
+
+value        ::= string action => ::first
+               | object action => ::first
+               | number action => ::first
+               | array action => ::first
+               | 'true' bless => true
+               | 'false' bless => false
+               | 'null' action => ::undef
+
+
+array        ::= ('[' ']')
+               | ('[') elements (']') action => ::first
+
+elements     ::= value+                separator => <comma>
+
+number         ~ int
+               | int frac
+               | int exp
+               | int frac exp
+
+int            ~ digits
+               | '-' digits
+
+digits         ~ [\d]+
+
+frac           ~ '.' digits
+
+exp            ~ e digits
+
+e              ~ 'e'
+               | 'e+'
+               | 'e-'
+               | 'E'
+               | 'E+'
+               | 'E-'
+
+string ::= <string lexeme> bless => string
+
+<string lexeme> ~ quote <string contents> quote
+# This cheats -- it recognizers a superset of legal JSON strings.
+# The bad ones can sorted out later, as desired
+quote ~ ["]
+<string contents> ~ <string char>*
+<string char> ~ [^"\\] | '\' <any char>
+<any char> ~ [\d\D]
+
+comma          ~ ','
+
+:discard       ~ whitespace
+whitespace     ~ [\s]+

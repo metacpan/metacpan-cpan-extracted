@@ -1,0 +1,27 @@
+This is Perl module Markdown::Foswiki.
+
+INSTALLATION
+
+Markdown::Foswiki installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Markdown::Foswiki
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Markdown::Foswiki documentation is available as in POD. So you can do:
+
+    % perldoc Markdown::Foswiki
+
+to read the documentation online with your favorite pager.
+
+J.W. Han (skyend)

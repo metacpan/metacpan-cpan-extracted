@@ -1,0 +1,32 @@
+0.009     2015-06-05 20:04:26 EDT
+  - For consistency with other reactors, POE can no longer be used to start or
+    stop the event loop, but sessions are no longer destroyed when the reactor
+    is stopped.
+  - The reactor now stops when it has no more active watchers, regardless of
+    external POE sessions.
+
+0.008     2015-04-27 18:43:21 EDT
+  - Support sequential next_tick
+
+0.007     2015-03-21 15:25:31-04:00 America/New_York
+  - Updated again and watch methods to croak on inactive watchers
+
+0.006     2015-02-23 13:47:45-05:00 America/New_York
+  - Remove deprecated is_readable method from tests
+  - Set default Mojo::Reactor
+  - Add hypnotoad example to synopsis
+
+0.005     2015-02-02 19:52:24-05:00 America/New_York
+  - Load POE before Mojo::Reactor to avoid event loop issues
+
+0.004     2015-02-01 14:23:42-05:00 America/New_York
+  - Subclass Mojo::Reactor instead of Mojo::Reactor::Poll
+
+0.003     2015-01-27 12:13:35-05:00 America/New_York
+  - Handle object destruction with reset instead of signal
+
+0.002     2015-01-09 19:02:59-05:00 America/New_York
+  - Better handling of recurring timers
+
+0.001     2015-01-02 14:04:37-05:00 America/New_York
+  - First release

@@ -1,0 +1,190 @@
+digraph cmintester {
+	graph [rankdir=BT,
+		ratio=auto
+	];
+	node [fillcolor="#ffff99",
+		fontname=Arial,
+		fontsize=10,
+		label="\N",
+		shape=box,
+		style=filled
+	];
+	edge [color=red];
+	cmintester	 [label=cmintester,
+		shape=plaintext];
+	pat_cover	 [label=pat_cover,
+		shape=plaintext];
+	pat_cover -> cmintester	 [style=dashed];
+	node1	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="perl pat_cover.pl ...\l",
+		shape=note];
+	node1 -> pat_cover	 [style=dashed];
+	node2	 [label="t\\cpat_cover.ast.t"];
+	node2 -> cmintester	 [style=dashed];
+	node3	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="echo $ast ...\lastt -o ...\ldel t\\tmp\l",
+		shape=note];
+	node3 -> node2;
+	node4	 [label="coptest.tt"];
+	node4 -> node3;
+	node20	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="echo $ast ...\lastt -o ...\ldel t\\tmp\l",
+		shape=note];
+	node4 -> node20;
+	node31	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="echo $ast ...\lastt -o ...\ldel t\\tmp\l",
+		shape=note];
+	node4 -> node31;
+	node5	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="tpage --define ...\l",
+		shape=note];
+	node5 -> node4;
+	node6	 [label="optest.tt.tt"];
+	node6 -> node5;
+	node7	 [label="t\\pat_cover.ast.ast"];
+	node7 -> node3;
+	node8	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="perl asm2ast.pl ...\l",
+		shape=note];
+	node8 -> node7;
+	node9	 [label="t\\pat_cover.ast.asm"];
+	node9 -> node8;
+	node10	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="perl bin2asm.pl ...\l",
+		shape=note];
+	node10 -> node9;
+	node11	 [label="t\\pat_cover.ast.bin"];
+	node11 -> node10;
+	node12	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="hex2bin.exe t\\pat_cover.ast.hex ...\l",
+		shape=note];
+	node12 -> node11;
+	node13	 [label="t\\pat_cover.ast.hex"];
+	node13 -> node12;
+	node14	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="perl ast2hex.pl ...\l",
+		shape=note];
+	node14 -> node13;
+	node15	 [URL=pat_cover_ast,
+		fillcolor="#ccff99",
+		label="pat_cover.ast"];
+	node15 -> node14;
+	node16	 [label="t\\cpat_cover.t"];
+	node16 -> cmintester	 [style=dashed];
+	node17	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="tpage --define ...\l",
+		shape=note];
+	node17 -> node16;
+	node18	 [label="t\\pat_cover.t.tt"];
+	node18 -> node17;
+	node19	 [label="t\\cmy_perl.exe.t"];
+	node19 -> cmintester	 [style=dashed];
+	node20 -> node19;
+	node21	 [label="t\\my_perl.exe.ast"];
+	node21 -> node20;
+	node22	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="perl asm2ast.pl ...\l",
+		shape=note];
+	node22 -> node21;
+	node23	 [label="t\\my_perl.exe.asm"];
+	node23 -> node22;
+	node24	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="perl bin2asm.pl ...\l",
+		shape=note];
+	node24 -> node23;
+	node25	 [label="t\\my_perl.exe.bin"];
+	node25 -> node24;
+	node26	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="hex2bin.exe t\\my_perl.exe.hex ...\l",
+		shape=note];
+	node26 -> node25;
+	node27	 [label="t\\my_perl.exe.hex"];
+	node27 -> node26;
+	node28	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="perl exe2hex.pl ...\l",
+		shape=note];
+	node28 -> node27;
+	node29	 [label="my_perl.exe"];
+	node29 -> node28;
+	node30	 [label="t\\ctypes.cod.t"];
+	node30 -> cmintester	 [style=dashed];
+	node31 -> node30;
+	node32	 [label="t\\types.cod.ast"];
+	node32 -> node31;
+	node33	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="perl cod2ast.pl ...\l",
+		shape=note];
+	node33 -> node32;
+	node34	 [label="types.cod"];
+	node34 -> node33;
+	node35	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="cl /nologo ...\ldel types.obj\l",
+		shape=note];
+	node35 -> node34;
+	node36	 [label="types.c"];
+	node36 -> node35;
+	node37	 [label="t\\cidu.t"];
+	node37 -> cmintester	 [style=dashed];
+	node38	 [label="t\\copname.t"];
+	node38 -> cmintester	 [style=dashed];
+	node39	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="tpage --define ...\l",
+		shape=note];
+	node39 -> node38;
+	node40	 [label="t\\opname.t.tt"];
+	node40 -> node39;
+	node41	 [label="t\\cerror.t"];
+	node41 -> cmintester	 [style=dashed];
+	node42	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="tpage --define ...\l",
+		shape=note];
+	node42 -> node41;
+	node43	 [label="t\\error.t.tt"];
+	node43 -> node42;
+	node44	 [label="t\\coperand.t"];
+	node44 -> cmintester	 [style=dashed];
+	node45	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="echo $ast ...\lastt -o ...\ldel t\\tmp\l",
+		shape=note];
+	node45 -> node44;
+	node46	 [label="t\\operand.t.tt"];
+	node46 -> node45;
+}

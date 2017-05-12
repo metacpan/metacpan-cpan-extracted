@@ -1,0 +1,33 @@
+Revision history for MojoX-DirectoryListing
+
+0.01    2013-09-08
+	Initial release
+
+0.02	2013-09-09
+	Fix _mk_fileserver function to respond with correct content-type.
+	Skip forbidden tests on MSWin32
+
+0.03	2013-09-11
+	Support user specified style/stylesheets for output
+
+0.04	2013-09-12
+	Support for user specified header and footer.
+	Include icons to the left of directory listing indicating file type
+	when the  show-icon => 1  option is provided.
+
+0.05	2013-11-23
+	test fix, pod updates
+
+0.06	2016-11-28
+	fix links for sorting the directory listing
+	cygwin test fix
+
+0.07	2016-12-02
+	fix mysterious placeholder bug that affects some older systems
+
+0.08	2016-12-04
+	additional tests to validate that test file hierarchy is correct
+
+0.09	2017-01-08
+	bug fixes
+

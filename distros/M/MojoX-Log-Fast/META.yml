@@ -1,0 +1,37 @@
+---
+abstract: 'Log::Fast for Mojolicious'
+author:
+  - 'Alex Efros <powerman@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MojoX-Log-Fast
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  MojoX::Log::Fast:
+    file: lib/MojoX/Log/Fast.pm
+    version: v1.0.0
+requires:
+  Log::Fast: '0'
+  Mojo::Base: '0'
+  Mojolicious: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/powerman/perl-MojoX-Log-Fast/issues
+  homepage: https://github.com/powerman/perl-MojoX-Log-Fast
+  repository: https://github.com/powerman/perl-MojoX-Log-Fast.git
+version: v1.0.0

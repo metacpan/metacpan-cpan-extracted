@@ -1,0 +1,288 @@
+chunk
+stat list
+stat
+keyword for
+for
+Name
+c0
+=
+exp
+Number
+-20
+,
+exp
+exp
+Number
+50
+-
+exp
+Number
+1
+,
+exp
+Number
+10
+keyword do
+do
+block
+chunk
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+"C "
+)
+stat
+keyword for
+for
+Name
+c
+=
+exp
+var
+Name
+c0
+,
+exp
+exp
+exp
+var
+Name
+c0
++
+exp
+Number
+10
+-
+exp
+Number
+1
+keyword do
+do
+block
+chunk
+stat list
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+string
+.
+Name
+format
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+"%3.0f "
+exp
+var
+Name
+c
+)
+)
+keyword end
+end
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+"\n"
+)
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+"F "
+)
+stat
+keyword for
+for
+Name
+c
+=
+exp
+var
+Name
+c0
+,
+exp
+exp
+exp
+var
+Name
+c0
++
+exp
+Number
+10
+-
+exp
+Number
+1
+keyword do
+do
+block
+chunk
+stat list
+stat list
+stat
+varlist
+var
+Name
+f
+=
+explist
+exp
+exp
+exp
+(
+exp
+exp
+Number
+9
+/
+exp
+Number
+5
+)
+*
+exp
+var
+Name
+c
++
+exp
+Number
+32
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+string
+.
+Name
+format
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+"%3.0f "
+exp
+var
+Name
+f
+)
+)
+keyword end
+end
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+"\n\n"
+)
+keyword end
+end

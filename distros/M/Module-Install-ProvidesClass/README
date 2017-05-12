@@ -1,0 +1,33 @@
+NAME
+    Module::Install::ProvidesClass - provides detection in META.yml for
+    'class' keyword
+
+SYNOPSIS
+     use inc::Module::Install 0.79;
+
+     all_from 'lib/My/Module/Which/Uses/MooseXDeclare';
+
+     auto_provides_class;
+     WriteAll;
+
+DESCRIPTION
+    This class is designed to populate the "provides" field of META.yml
+    files so that the CPAN indexer will pay attention to the existance of
+    your classes, rather than blithely ignoring them.
+
+    The version parsing is basically the same as what M::I's
+    "->version_form" does, so should hopefully work as well as it does.
+
+    Currently we only support 'class' as the keyword to look for. This will
+    certainly need changing to be configurable since MooseX::Declare allows
+    "role" as a keyword to create role classes.
+
+SEE ALSO
+    MooseX::Declare
+
+AUTHOR
+    Ash Berlin "<ash@cpan.org>"
+
+LICENSE
+    Licensed under the same terms as Perl itself.
+

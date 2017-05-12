@@ -1,0 +1,17 @@
+TYPEMAP
+MarpaX_ESLIF            T_PTROBJ_SPECIAL
+MarpaX_ESLIF_Grammar    T_PTROBJ_SPECIAL
+MarpaX_ESLIF_Recognizer T_PTROBJ_SPECIAL
+MarpaX_ESLIF_Value      T_PTROBJ_SPECIAL
+
+INPUT
+T_PTROBJ_SPECIAL
+    if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/_/::/g; \$ntt}\")) {
+        $var = INT2PTR($type, SvIV((SV*)SvRV($arg)));
+    } else {
+        croak(\"$var is not of type ${(my $ntt=$ntype)=~s/_/::/g; \$ntt}\");
+    }
+
+OUTPUT
+T_PTROBJ_SPECIAL
+    sv_setref_iv($arg, \"${(my $ntt=$ntype)=~s/_/::/g; \$ntt}\", PTR2IV($var));

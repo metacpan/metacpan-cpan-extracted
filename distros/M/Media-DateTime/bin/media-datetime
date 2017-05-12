@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+
+# ABSTRACT: Script to demostrate Media::DateTime; prints creation DateTime
+# PODNAME: media-datetime
+
+use strict;
+use warnings;
+
+use Media::DateTime;
+use DateTime;
+
+my $dater = Media::DateTime->new();
+
+for my $file (@ARGV) {
+    my $dt = $dater->datetime($file) or die "couldn't date: $file\n";
+    printf "%s: %s\n", $dt, $file;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+media-datetime - Script to demostrate Media::DateTime; prints creation DateTime
+
+=head1 AUTHOR
+
+Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

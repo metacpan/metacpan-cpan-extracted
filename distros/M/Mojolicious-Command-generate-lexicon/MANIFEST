@@ -1,0 +1,22 @@
+Changes
+lib/Mojolicious/Command/generate/lexicon.pm
+lib/MojoX/I18N/Lexemes.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+Mojolicious-Command-generate-lexicon-0.997/META.json
+Mojolicious-Command-generate-lexicon-0.997/META.yml
+t/lib/Lexemes.pm
+t/lib/Lexemes/I18N.pm
+t/lib/Lexemes/I18N/es.pm.orig
+t/lib/Lexemes/I18N/es.pm.quote
+t/lib/TestEnv.pm
+t/mojolicious-command-generate-lex-saved.t
+t/mojolicious-command-generate-lexicon-quote.t
+t/mojolicious-command-generate-lexicon.t
+t/mojox-i18n-lexemes.t
+t/pod.t
+t/templates/test-quote.html.ep
+t/templates/test.html.ep
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,3 @@
+
+* Sample does not generate last_x_days.
+* Sample crashes with divide-by-zero in GD::Graph

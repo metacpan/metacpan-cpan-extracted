@@ -1,0 +1,26 @@
+<%args>
+$item
+</%args>
+<%doc>
+=head2 maybe_link_view
+
+C<maybe_link_view> takes something returned from the database - either
+some ordinary data, or an object in a related class expanded by a
+has-a relationship. If it is an object, it constructs a link to the view
+command for that object. Otherwise, it just displays the data.
+
+=cut
+
+</%doc>
+
+%    if (ref $item) { # It's an object, i.e. a has-a
+<& macros/link, base       => $base,
+         table      => $item->table, 
+         command    => "view", 
+	 config	    => $config,
+         additional => $item->id, 
+         label      => $item &>
+%    } else {
+        <%$item%>
+%}
+

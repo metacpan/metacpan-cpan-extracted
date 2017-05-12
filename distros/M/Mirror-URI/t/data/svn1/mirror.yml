@@ -1,0 +1,7 @@
+---
+version: 1.0
+name: SVN Test Repository
+master: http://svn.ali.as/cpan/trunk/Mirror-URI/t/data/svn1/
+timestamp: 2008-09-05T21:17:52Z
+mirrors:
+  - http://svn.ali.as/cpan/trunk/Mirror-URI/t/data/svn2/

@@ -1,0 +1,76 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLOptionsCollection
+
+=for object Mozilla::DOM::HTMLOptionsCollection
+
+Mozilla::DOM::HTMLOptionsCollection is a wrapper around an instance of Mozilla's
+nsIDOMHTMLOptionsCollection interface. This class inherits from
+L<nsISupports|Mozilla::DOM::nsISupports>.
+
+ * The nsIDOMHTMLOptionsCollection interface is the interface to a
+ * collection of [X]HTML option elements.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLOptionsCollection->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $length = $htmloptionscollection->B<GetLength>()
+
+=head2 $retval = $htmloptionscollection->B<Item>($index)
+
+=over
+
+=over
+
+=item * $index (integer (long))
+
+=back
+
+=back
+
+=head2 $retval = $htmloptionscollection->B<NamedItem>($name)
+
+=over
+
+=over
+
+=item * $name (string)
+
+=back
+
+=back
+
+=head2 $htmloptionscollection->B<SetLength>($length)
+
+=over
+
+=over
+
+=item * $length (integer (long))
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

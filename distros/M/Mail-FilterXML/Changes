@@ -1,0 +1,16 @@
+Revision history for Perl extension Mail::FilterXML.
+
+0.1  Mon Jul 24 18:59:26 2000
+	- Converted from script to module.
+
+0.2  Tue Oct 17 15:00:51 2000
+	- added filtering based on subject - ebs
+	- Added action_cmd and action_params attributes to Rules - ebs
+	- added mapping of Mail::Audit attributes into #var# in action_params - ebs
+		#from# = Mail::Audit->from
+		#to# = Mail::Audit->to
+		#subject# = Mail::Audit->subject
+
+0.3  Wed Mar 13 01:17:34 2002
+	- added the ability to have multiple actions per rule. - ebs
+        - minor documentation changes (mm)

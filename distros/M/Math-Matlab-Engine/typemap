@@ -1,0 +1,14 @@
+TYPEMAP
+Engine *			ENG_OBJ
+const char *			T_PV
+double *			T_PV
+
+INPUT
+ENG_OBJ
+	{
+	$var = ($type) SvIV((SV*)SvRV($arg));
+	}
+
+OUTPUT
+ENG_OBJ
+	sv_setref_pv($arg, CLASS, (void*) $var);

@@ -1,0 +1,246 @@
+
+
+Mail::POP3Server/mpopd v2.21 README, 19 March 2001
+
+	The mpopd wrapper script and Mail::POP3Server combined provide
+	a configurable POP3 server that runs either as a stand-alone
+	daemon or an inetd service.
+
+	I may often refer to mpopd as the server rather than Mail::POP3Server.
+	The module version has been largely motivated by a desire to get mpopd
+	onto CPAN so that it is widely available. There is also a mini-website
+	dedicate to mpopd at:
+	http://mpopd.fredo.co.uk/
+
+	mpopd is being made available in the hope that it may prove
+	useful, mainly to people with a decent understanding of how
+	POP3, and MDA's/LDA's (Mail Delivery Agents) work, and who
+	like to do things in Perl.
+
+	v2.21 Turned the whole thing into a module with a wrapper:
+			Mail::POP3Server and mpopd
+	v2.20 tightened up command reading (uses eval'ed alarm and getc())
+	v2.19 reduced globals to mainly config items
+	v2.18 fixed potentially nasty command read
+	v2.17 02/03/01 mpopd version 2.17 was the first public release.
+
+
+WARNING:
+
+	Although mpopd, in various guises, has been used since 1998 in
+	several production environments controlled by us (FREDO) it has
+	not been systematically tested yet by any third party.
+	Please make sure you set-up and test mpopd in a non-critical
+	environment before trying it out on real mailboxes. The mpopd_test
+	script provided is there to aid in checking your setup's ability
+	to open, lock, parse, restore and release mailboxes at short intervals.
+	I recommend that you run several instances of mpopd_test on the same
+	mailbox and gadually reduce the connect-interval from 1 to 0.2 seconds.
+	You will need to have the:
+
+	Time::HiRes
+
+	module installed to be able to use mpopd_test.
+
+	mpopd is provided as-is with no warranty for any particular
+	purpose whatsoever. You use it entirely at your own risk.
+
+
+COPYRIGHT:
+
+	Copyright (c) Mark Tiramani 1998-2001 <markjt@fredo.co.uk>.
+	All rights reserved. This program is free software; you can
+	redistribute it and/or modify it under the same terms as Perl itself.
+
+DISCLAIMER:
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+	See the Artistic License for more details.
+
+
+PREREQUISITES:
+
+	Either, a local MDA that understands <username>.lock
+	file locking (e.g. procmail), or a local MDA that uses
+	the Qmail-style maildir message store.
+
+COREQUISITES:
+
+	The following module may be required for some systems
+	when using crypt-MD5-hashed passwords:
+
+	Crypt::PasswdMD5
+
+	You will need the following module if you wish to use
+	PAM authentication:
+
+	Authen::PAM
+
+	You will need the following module if you wish to use
+	the mpopd_test script:
+
+	Time::HiRes
+
+	mpopd has been tested on Linux 2.0.35 with Perl 5.005_3
+	and on several later versions up to 2.2.18 / 5.6.0
+
+	The PAM authentication has only been tested on Linux 2.2.18,
+	Perl 5.6.0, Linux-PAM-0.74 and Authen-PAM-0.11
+
+
+INSTALLATION:
+
+	Installation is simplist when done as the root/super user.
+
+	1) Read and edit the mpopd.conf configuration file to suite
+	your system. mpopd.conf is read once by each child process
+	when mpopd is run in daemon mode. Each child process is one-off
+	and handles only one client connection before exiting.
+
+	IMPORTANT:
+	If you intend to run mpopd as a daemon you may well need to
+	edit the two files:
+
+	mpopd_trusted
+	mpopd_allow_deny
+
+	These are used to enforce host-, network-based access rules.
+	Reverse address lookups are performed on all clients unless
+	they match one of those listed in mpopd_trusted.
+
+	Although by default mpopd expects to find the mpopd.conf file in:
+	/usr/local/mpopd
+	it could be placed anywhere you like.
+
+	NOTE:
+	As distributed mpopd is set up to use Berkeley mbox type
+	mailboxes, /etc/shadow authentication and disk-based mailbox
+	parsing (mbox parsed-out into individual temporary message
+	files).
+
+	Read the 'User authentication' section in mpopd.conf if you want
+	to set-up hostname-based mailspool dirs and/or virtual users.
+
+	To use PAM authentication you will need to uncomment the
+	use Authen::PAM;
+	line in the CONFIG section in mpopd itself, and you must have
+	a current version of Authen::PAM installed of course .
+
+	To use crypt-MD5 passwords you may need to uncomment
+	use Crypt::PasswdMD5;
+	after installing Crypt::PasswdMD5. Slackware 7.x does not
+	require this but I don't know what system might so the
+	functionality is built in to mpopd and mpopd.conf.
+
+
+	2)
+
+	As root, execute:
+
+	perl Makefile.PL
+
+	You will then be asked for installation paths and preferred text
+	editor, and if these are answered the Makefile will be created.
+	The mpopd and mpopdctl scripts will have your chosen paths inserted
+	and placed in the chosen locations.
+
+	3)
+
+	Execute:
+
+	make
+	make install
+
+	(There is currently no test script or 'make test')
+
+	This places the main POP3Server module in perl5/Mail/ and
+	creates the Mail::POP3Server, mpopdctl and mpopd_test manpages.
+
+	If the installation is successful all files should be in place
+	with appropriate configuration paths etc. where necessary.
+
+	mpopd will try and create all other spool, log and temp
+	directories as and when they are needed.
+
+
+RUNNING mpopd:
+
+	To run mpopd as a daemon I recommend you use mpopdctl:
+
+	mpopdctl
+	is a utility to help start, stop, restart, refresh, tell
+	mpopd to re-read its config file and to edit the config file.
+
+	A man page will be available for mpopdctl if you followed the
+	installation procedure described above.
+
+
+	To run mpopd under inetd:
+
+	Place a line like the following in inetd.conf:
+
+	pop3 stream tcp nowait root /usr/sbin/tcpd /usr/bin/mpop
+
+	The /etc/services file must have an entry similar to this:
+
+	pop3      110/tcp
+
+
+	If you want to test mpopd on some dummy mailboxes to see how
+	it behaves use:
+
+	mpopd_test
+
+	The installation should create a brief manpage:
+
+	man mpopd_test
+
+
+DOCUMENTATION:
+
+	Until better documentation is ready:
+
+	To learn more about mpopd and its configuration you will have
+	to read the mpopd.conf configuration file.
+
+	Also try:
+
+	man mpopd
+	or
+	man Mail::POP3Server
+
+	and:
+
+	man mpopdctl
+
+	to get a bit more info on how mpopd can be configured and run.
+
+
+KNOWN BUGS:
+
+	The octet count sent does not always strictly match the actual
+	number sent (hasn't presented a problem in any email client I
+	know of and allows for a bit of a short-cut).
+
+TODO:
+
+	Testing by someone other than myself, particularly of all
+	aspects of mailbox integrity and security against external
+	attacks and exploits.
+
+	Per-user mailbox-type configuration (soon).
+
+	Mail::POP3Server will be gradually cleaned up and made more
+	flexible in its range of authentication, virtual-user
+	handling and mailbox format.
+
+
+Suggestions for improvements, enhancements etc. are
+welcomed.
+
+Mark Tiramani
+markjt@fredo.co.uk
+
+

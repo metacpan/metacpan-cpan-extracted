@@ -1,0 +1,98 @@
+Common:
+ - don't "die" on PRINT or CLOSE, find better ways to report the error
+
+DKIM-Signature:
+ - allow version tag (DONE)
+ - accept q=dns/txt (DONE)
+ - method to set/get "z" tag
+
+DKIM Public Key Records:
+ - enforce t=s option (if present)
+ - provide method for caller to get (to check the "testing" flag)
+
+Verifier:
+ - verify multiple signatures (ietf05 6.1) (DONE)
+ - check that From header is signed (ietf05 6.1.1)
+ - check public key "granularity" (DONE)
+ - handle no response from first DNS server listed in resolv.conf
+   (currently it goes to the second server after 5 seconds,
+   but it does this for EVERY signature, so this will badly affect
+   overall throughput)
+ - **minor bug**- when Debug_Canonicalization=1 on a message with
+   multiple signatures, the canonicalized output is recorded multiple times.
+   Probably only the first valid signature should receive the
+   Debug_Canonicalization option
+ - provide semi-standard mechanism to report results of verification
+   (including what, if any, of header.from and header.sender can be trusted)
+ - provide mechanism in the API to run the DNS lookups in parallel with
+   other processing (e.g. the SpamAssassin plugin would want to start the
+   DNS queries as early as possible, but continue processing other aspects
+   of the message while waiting for the DNS queries to complete).
+   Net::DNS::Async may be useful here.
+
+Policy:
+ - make it possible to determine explicit vs implicit default policy (DONE)
+ - lookup BOTH draft-allman-dkim-ssp policy AND rfc4870(historical) policy
+   (DONE)
+ - this will probably be: lookup allman policy, and if not found, then try
+   rfc4870(historical) policy (REJECTED)
+
+Signer:
+ - allow DomainKeys signatures without using a policy object
+ - allow adding chained signatures in one pass
+   (e.g. allow adding a DomainKeys signature, and a DKIM signature,
+   with the new DKIM signature signing the new DomainKeys signature) (REJECTED)
+ - allow creation of i= and x= tags (DONE)
+ - allow creation of l=, t=, and z= tags
+ - do header-wrapping to signature before signing (DONE)
+ - allow signer policy to change which private key is used
+
+Testing (some of this may already be implemented):
+ - test public key errors:
+   - DNS timeout
+   - SERVFAIL
+   - syntax error in public key record
+ - test DNS timeout for signing policy
+ - test key records composed of fragmented TXT records
+ - test signature options:
+   - unspecified query type
+   - query type of "dns/"
+   - bad query type (DONE)
+   - bad algorithm (DONE)
+   - unspecified algorithm
+   - bad canonicalization
+   - unspecified canonicalization
+   - test presence of version tag in signature
+ - IMPORTANT- allow `make test' to work when DNS is not available
+ - test various components of verifying, so better diagnostics can be
+   made when the verify.t script reports a bunch of unexplained failures
+ - test absense of h= tag in DKIM signature
+ - test use of non-ASCII characters in header names and h= tag
+
+Possible issues in base-10 draft:
+ - 6.1.2 - check g= tag of public key against i= tag of signature (DONE)
+ - 6.1.2 - check h= tag of public key against a= tag of signature (DONE)
+ - 3.5 - t= tag, create it when signing messages, check it when verifying
+ - 3.5 - x= tag, create it when signing messages
+               - check it when verifying (DONE)
+ - 5.4 - allow better control of which headers to sign
+ - 5.5 - recommended headers to sign and NOT to sign (DONE)
+ - 3.3.1 - what's an RSA exponent?
+ - 6.1.1 - configurable list of unacceptable signing domains,
+       e.g. "com" and "co.uk"
+
+Possible issues in RFC 4871:
+ - 3.6.1 - g= should be case-sensitive (see 3.2 "tag values must be
+   processed as case sensitive unless...", and 3.6.1, "g=", which does
+   NOT mention case-sensitivity)
+ - 3.6.1 - g= tag using irregular characters
+ - 3.5 - i= tag, should allow quoted-printable encoding
+ - 3.5 - i= tag, internationalized domains?
+ - 3.5 - l= tag, what happens if the number is REALLY big,
+   or doesn't contain a number?
+ - 3.5 - q= tag, should skip signature if subtype is not "txt"
+   (I think I do this, but do other verifiers?)
+    - rationale- if a dns/foo type comes out, then it will be WRONG
+      to lookup the txt record
+ - 3.2 - "if a tag name does occur more than once, the entire tag-list
+         is invalid"

@@ -1,0 +1,7 @@
+Revision history for Perl extension Module-Pluggable-Loader
+
+1.100860  2010-03-27 13:03:59 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.01  Mon 2010.02.08 15:59:13 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

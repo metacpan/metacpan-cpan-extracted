@@ -1,0 +1,3 @@
+^MANIFEST\.
+\bCVS\b
+^blib/

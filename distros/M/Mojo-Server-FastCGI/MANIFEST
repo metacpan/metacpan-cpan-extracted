@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Mojo/Server/FastCGI.pm
+lib/Mojolicious/Command/fastcgi.pm
+t/mojo/apache_fastcgi.t
+t/mojo/fastcgi.t

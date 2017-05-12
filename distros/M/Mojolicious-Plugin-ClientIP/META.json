@@ -1,0 +1,77 @@
+{
+   "abstract" : "Get client's IP address from X-Forwarded-For",
+   "author" : [
+      "ziguzagu <ziguzagu@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-ClientIP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::ClientIP" : {
+         "file" : "lib/Mojolicious/Plugin/ClientIP.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sixapart/Mojolicious-Plugin-ClientIP/issues"
+      },
+      "homepage" : "https://github.com/sixapart/Mojolicious-Plugin-ClientIP",
+      "repository" : {
+         "url" : "git://github.com/sixapart/Mojolicious-Plugin-ClientIP.git",
+         "web" : "https://github.com/sixapart/Mojolicious-Plugin-ClientIP"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:SIXAPART",
+   "x_contributors" : [
+      "ziguzagu <ziguzagu@gmail.com>"
+   ]
+}

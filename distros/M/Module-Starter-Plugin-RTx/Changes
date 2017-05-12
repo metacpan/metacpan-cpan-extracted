@@ -1,0 +1,11 @@
+Revision history for Beagle
+
+0.02   2011-10-24 11:44:26 CST
+
+    add README.pod linking to main module instead of a duplicated README
+      ( github will be happy about this too )
+
+0.01   2011-07-20 11:01:12 CST
+
+    Initial release.
+

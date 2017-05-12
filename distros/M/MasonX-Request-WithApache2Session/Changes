@@ -1,0 +1,18 @@
+Revision history for Perl extension MasonX::Request::WithApache2Session.
+
+0.04  Mon Mar 22 00:31:28 HST 2004
+        - Version updated to match MasonX::Apache2Handler.
+
+0.03  March 2004
+        - Skipped.
+
+0.02  Februrary 2004
+        - Skipped.
+
+0.02  Tue Jan 27 18:36:39 2004
+	- Name change from MasonX::Request::WithApacheSession2 to
+	  MasonX::Request::WithApache2Session.
+	- Added latest changes in
+	  MasonX::Request::WithApacheSession-0.25 ( the orig module
+	  was based on 0.24 ).
+

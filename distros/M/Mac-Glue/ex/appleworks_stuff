@@ -1,0 +1,31 @@
+#!perl -w
+use strict;
+use Mac::Glue ':glue';
+
+# do cool stuff
+my $aw = new Mac::Glue 'AppleWorks';
+my $text = $aw->prop(text_body => document => 1);
+
+$aw->activate;
+$aw->make(new => 'document', at => location('front'));
+die $^E if $^E;
+
+$text->set(to => "the quick brown fox jumped over the perl lazy programmers.");
+die $^E if $^E;
+sleep(2);
+
+$text->obj(word => 8)->move(
+    to => location( after => $text->obj(word => 9) )
+);
+die $^E if $^E;
+
+printf("word contains 'e', begins with 'p', does not end with 's': %s\n",
+    $text->obj(
+        words => whose(AND =>
+            [it => contains => 'e'], [it => begins_with => 'p'],
+            [NOT => [it => ends_with => 's']]
+        )
+    )->get
+);
+
+__END__

@@ -1,0 +1,69 @@
+Mojolicious::Plugin::SimpleSession is simple sessions for Mojolicious apps. 
+No configuration, no database, no non-core dependencies. 
+
+Sessions last one hour, but are 'rejuvinated' each request. Session data is
+stored on disk, in your systems temporary directory. Old data is automatically
+culled.
+
+In the "handler" subroutine of your Mojolicious application, add:
+
+    $self−>plugin('simple_session');
+
+That’s it!
+
+Inside your application, you can now reference a hashref called 'session' in
+the stash, like this:
+
+    my $count = $self->stash->{session}->{count};
+
+    $count++;
+    $self->stash->{session}->{count} = $count;
+
+Session data is preserved across requests for this user (identified by their
+cookie).
+
+If you need to be able to control expiry, use a database store, or
+basically do anything more intelligent with your sessions, you probably
+want to look at Mojolicious::Plugin::Session.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Mojolicious::Plugin::SimpleSession
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mojolicious-Plugin-SimpleSession
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Mojolicious-Plugin-SimpleSession
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Mojolicious-Plugin-SimpleSession
+
+    Search CPAN
+        http://search.cpan.org/dist/Mojolicious-Plugin-SimpleSession/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Justin Hawkins
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

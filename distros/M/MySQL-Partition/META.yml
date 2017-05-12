@@ -1,0 +1,49 @@
+---
+abstract: 'Utility for MySQL partitioning'
+author:
+  - 'Songmu <y.songmu@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Test::mysqld: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.0, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MySQL-Partition
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MySQL::Partition:
+    file: lib/MySQL/Partition.pm
+    version: '0.05'
+  MySQL::Partition::Handle:
+    file: lib/MySQL/Partition/Handle.pm
+  MySQL::Partition::Type::List:
+    file: lib/MySQL/Partition/Type/List.pm
+  MySQL::Partition::Type::Range:
+    file: lib/MySQL/Partition/Type/Range.pm
+requires:
+  Class::Accessor::Lite: '0'
+  Module::Load: '0'
+  parent: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/Songmu/p5-MySQL-Partition/issues
+  homepage: https://github.com/Songmu/p5-MySQL-Partition
+  repository: git://github.com/Songmu/p5-MySQL-Partition.git
+version: '0.05'
+x_authority: cpan:SONGMU
+x_contributors:
+  - 'Ichinose Shogo <shogo82148@gmail.com>'

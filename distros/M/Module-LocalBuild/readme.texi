@@ -1,0 +1,93 @@
+\input texinfo @c -*-texinfo-*-
+@c %**start of header
+@setfilename readme.info
+@settitle Perl Module::LocalBuild Installation
+@c %**end of header
+
+@c DESCRIPTION: TexInfo: DOCUMENT source run through texinfo to produce README file
+@c Use 'make README' to produce the output file
+
+@node Top, Copyright, (dir), (dir)
+
+This is the Module::LocalBuild Perl Package.
+
+@menu
+* Copyright::
+* Summary::
+* Module::LocalBuild::
+* Obtaining Distribution::
+* Supported Systems::
+* Installation::
+@end menu
+
+@node Copyright, Summary, Top, Top
+@section Copyright
+
+This package is Copyright 2001-2010 by Wilson Snyder @email{wsnyder@@wsnyder.org}.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of either the GNU Lesser General Public License
+Version 3 or the Perl Artistic License Version 2.0.
+
+This code is provided with no warranty of any kind, and is used entirely at
+your own risk.
+
+@node Summary, Obtaining Distribution, Copyright, Top
+@section Summary
+
+Module::LocalBuild is used to call 'perl Makefile.PL' and friends on
+packages in a local working copy of a source code repository.  This
+allows people to have local copies of Perl modules, and edit them at
+will without having to worry about when to compile them.
+
+It also allows the same sources to be simultaneously built and
+maintained under different operating systems.
+
+For more details see Module::LocalBuild manpage, and the t/30_locaboot.t
+test which calls the example t/localboot.pl boot script.
+
+@node Obtaining Distribution, Supported Systems, Summary, Top
+@section Obtaining Distribution
+
+Log-Detect is part of the L<http://www.veripool.org/> free EDA
+software tool suite.  The latest version is available from
+@uref{http://www.perl.org/CPAN/}, and from
+@uref{http://www.veripool.org/}.
+
+Download the latest package from that site, and decompress.
+@samp{gunzip Log-Detect_version.tar.gz ; tar xvf Log-Detect_version.tar}
+
+@node Supported Systems, Installation, Obtaining Distribution, Top
+@section Supported Systems
+
+This version of Module::LocalBuild has been built and tested on:
+
+@itemize @bullet
+@item i386-linux
+@end itemize
+
+It should run on any system with Perl5.
+
+@node Installation,  , Supported Systems, Top
+@section Installation
+
+@enumerate
+@item
+@code{cd} to the directory containing this README notice.
+
+@item
+Type @samp{perl Makefile.PL} to configure Module::LocalBuild for your system.
+
+@item
+Type @samp{make} to compile Module::LocalBuild.
+
+@item
+Type @samp{make test} to check the compilation.
+
+@item
+Type @samp{make install} to install the programs and any data files and
+documentation.
+
+@end enumerate
+
+

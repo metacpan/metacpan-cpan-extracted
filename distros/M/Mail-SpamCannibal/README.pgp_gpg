@@ -1,0 +1,8 @@
+
+passphrase for secret key is 'TEST'
+
+Keyrings are RSA, created by pgp-2.6.2g 
+
+install pgp or gpg on your system and edit the 
+executableTestPath.conf file to include the
+path to the executable.

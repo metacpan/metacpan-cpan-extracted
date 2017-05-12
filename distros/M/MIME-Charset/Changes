@@ -1,0 +1,237 @@
+Revision history for Perl module MIME::Charset.
+
+1.012.2  2017-04-11  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Fix: Perl >= 5.26: Makefile.PL cannot use inc::Module::Install.
+
+1.012.1  2017-04-07  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Fix: CPAN RT #116459: Remove "." from @INC when loading modules.
+      A workaround for CVE-2016-1238.
+
+1.012  2015-03-28  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * CPAN RT #100839: Malformed JSON in META.json.
+
+1.011.3  2014-12-10  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Use "eval 'require ...'" to import optional encoding modules.
+      Overridden $SIG{__DIE__} can pass "eval 'use ...'".
+    * Replace META.yml with META.json.
+
+1.011.2  2014-11-27  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Added module CPAN to configure_require for inc::Test::AutoInstall.
+    * Added POD2::Base to recommended feature.
+    * Fix: wrong prototype for _resolve_S().
+    * Move repository to github.
+
+1.011.1 2013-10-07  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Fix: "shift_jis-2004" did not depend on Encode::JISX0213 but
+      Encode::ShiftJIS2004.
+    * Chg: Added gb18030 to extended mapping of GB2312.
+    * Updated inc::Module::Install to version 1.01.
+
+1.011.0 2013-09-26  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Use Encode::JISX0213 instead of Encode::JIS2K which was not
+      fully implemented.
+    * Added support for iso-2022-jp-2 and JIS X 0213 encodings.
+    * Reformat Changes file to suit to CPAN::Changes::Spec.
+
+1.010.1 2013-08-25  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * No new features.
+    * CPAN RT #86917: Invalid META.
+    * Move Japanese documentation under POD2::JA.
+
+1.010 2013-04-09  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Fix: UTF-16 & UTF-32 encoders are died by the texts without BOM.
+    * Added a test #6 and some cases to test #4.
+    * Changed layout of distribution.
+
+1.009.3 2012-12-30  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * No new features.
+    * CPAN RT #77715: Spelling mistake in documentation.
+    * Bug on CPAN site: cannot render PODs including "=item" with
+      non-ASCII.
+
+1.009.2 2012-06-02  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Fix: detect_7bit_charset(): if charset was unknown, returns undef
+      instead of "US-ASCII".
+    * COPYING: Updated the address of FSF.
+
+1.009.1 2011-06-09  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Chg: Workaround for aliasing on TIS-620 that is treated as
+      ISO-8859-11 by Encode.
+      And added WINDOWS-874 as EXTENDED map of TIS-620.
+    * Imp: Result of _find_encoder() will be cached.
+    * Imp/Chg: 'S' encoding will be resolved numerically, without comparing
+      actually encoded lengths.
+    * Added informations for WINDOWS-125[03-8].
+    * Added some cases to test #4.
+
+1.009 2011-06-08  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * withdrawn.
+
+1.008.2 2011-05-28  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Bug Fix: Body transfer-encoding profile "S" did not work properly,
+      and profile for UTF-8 was NOT really updated.
+
+1.008.1 2011-02-19  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Chg: Workaround for CPAN RT #65796: Deep recursion error finding
+      invalid charset.  Limit length of charset name upto 75.
+    * Imp: Supports Unicode/multibyte on Perl 5.7.3 (experimental).
+    * Perl 5.7.3 & 5.8.3:
+      avoid ``Useless use of a constant in void context'' warnings.
+    * Doc: small fixes.
+
+1.008 2009-10-19  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Imp: support for iso-8859-6-[ei], iso-8859-8-[ei].  cf. report by
+      Hanne Moa on Sympa bug #6385 at <http://sourcesup.cru.fr/>.
+    * Imp: support for iso-8859-16.
+    * Imp: Allow body transfer-encoding profile "S".
+    * Chg: Default body transfer-encoding for UTF-8 from "B" to "S".
+    * Doc: Some fixes. New section "Incompatible changes".
+    * Fix: META.yml: optional_features is not hashref but arrayref.
+      Thanks SREZIC@CPAN.
+
+1.007.1 2009-06-16  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Changes:
+      - eucJP-ascii and its 7-bit counterpart was chosen instead of
+        eucJP-ms, as latter will occasionally break standardized mappings.
+        Shift-encoding counterpart hasn't been implemented yet.
+    * Fix: Skip all pod tests on pre-UTF8 Perl.
+
+1.007 2009-05-17  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * not really released.
+
+1.007_02 2009-05-12  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Charset/CP932.pm: Supports extended mappings for
+      ISO-2022-JP/EUC-JP by those of eucJP-ms, as CP51932 mungles
+      accented latin characters and ISO-2022-JP-1 does not support
+      NEC/IBM extended mappings.
+
+1.007_01 2009-05-11  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Supports Perl 5.8.0.
+    * New function: detect_7bit_charset().
+    * Bundle inc::Module::Install.
+    * Corrected META.yml & PODs.  Removed duplicated docs.
+
+1.006.2 2008-04-17  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * bug fixes only; no new features.
+    * Bug Fix: Perl >= 5.8.1: CPAN RT #34909: Test failures.
+    * Bug Fix: Perl >= 5.10.0: CPAN RT #35070: HZ words are
+      encoded as US-ASCII; added workaround for CPAN RT #35120.
+    * Fix: Perl 5.11.0: Suppress ``Use of uninitialized value
+      within @_ in uc'' warnings.
+    * JA_JP.pod: Clarify distinction between ``符号化'' (on
+      charset) and ``エンコード'' (on encoding).
+
+1.006 2008-04-12  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Workarounds for ``US-ASCII transformation'' charsets
+      i.e. HZ-GB-2312 (RFC1842) and UTF-7 (RFC 2152).
+    * Added tests.
+
+1.005 2008-04-07  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * _enclen_Q(): Restrict characters in encoded-word
+      according to RFC 2047 section 5 (3).
+    * New method dup().
+    * body_encode() / header_encode(): Fix determination of
+      US-ASCII: Works on pre-Encode environments.
+
+1.004 2008-03-30  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Added ESTI GSM 03.38 which won't be used for MIME
+      messages (experimental).
+    * _Compat.pm: resolve_alias(): real aliasing taken from
+      Encode module.
+    * Numeric values are allowed for ``Replacement'' options.
+    * Added tests for aliases (some MIME preferred names only).
+    * Bug Fix: Perl <=5.005: our is ``withdrawn''.
+
+1.002 2008-03-20  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * New method undecode().
+    * encoder(): added argument to set instance.
+    * Cleanup PODs.
+
+1.001 2008-03-15  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Bug fix: Detect7bit options have no effect by OO method
+      (1.000).
+    * Change: now new() returns an object when CHARSET is not
+      specified.
+    * New methods: as_string(), decode(), decoder(), encode()
+      and encoder().
+    * New feature: "Mapping" option to choose extended
+      mappings or strict ones.  Default is "EXTENDED", while
+      as of 1.000, only "STANDARD" mappings are available.
+    * New feature: configuration file to override module
+      defaults. See "Configuration File" section.
+
+1.000 2008-03-04  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Added OOP methods (non-OOP functions may be deprecated
+      in near future).
+
+0.044 2006-12-08  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Fix on 'UTF-8-STRICT', new canonical name of 'UTF-8' by 
+      Encode module (approximately 2.14).
+
+0.043 2006-11-16  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * No changes on codes.
+    * Change of Charset-ja_JP.pod (former Charset/ja_JP.pod).
+    * Charset.pm: Added information of development version.
+
+0.042 2006-10-22  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Added ja_JP pod.
+
+0.04.1 2006-10-17  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Bug fix: Handle wide characters exactly.
+
+0.04 2006-10-13  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Supports Perl 5.005 or later.
+      Unicode/multibyte handling will be enabled on Perl 5.8.1 or later.
+      USE_ENCODE flag was introduced.
+    * decode_mimewords(): Added 'Charset' option.
+
+0.03 2006-10-09  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * New function: encoded_header_len.
+    * body_encode()/header_encode(): fallback to US-ASCII if possible.
+    * Documentation: definitions of ``charset'' & ``encoding''.
+    * Typos on Encode::FB_*.
+    * More test cases.
+
+0.02 2006-10-07  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Fix exports.
+    * Typo on GPL version.
+    * Added synopsis.
+    * Other typos.
+
+0.01 2006-10-06  Hatuka*nezumi - IKEDA Soji  <hatuka(at)nezumi.nu>
+
+    * Initial CPAN upload.

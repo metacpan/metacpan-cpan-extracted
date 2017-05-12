@@ -1,0 +1,11 @@
+Changes
+lib/Math/CMA.pm
+Makefile.PL
+MANIFEST
+README
+t/00basic.t
+t/01simple.t
+t/98podsyn.t
+t/99podcov.t
+eg/smooth.pl
+META.yml                                 Module meta-data (added by MakeMaker)

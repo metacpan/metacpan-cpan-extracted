@@ -1,0 +1,257 @@
+NAME
+    MasonX::Request::WithApacheSession - Add a session to the Mason Request
+    object
+
+SYNOPSIS
+    In your httpd.conf file:
+
+      PerlSetVar  MasonRequestClass            MasonX::Request::WithApacheSession
+      PerlSetVar  MasonSessionCookieDomain     .example.com
+      PerlSetVar  MasonSessionClass            Apache::Session::File
+      PerlSetVar  MasonSessionDirectory        /tmp/sessions/data
+      PerlSetVar  MasonSessionLockDirectory    /tmp/sessions/locks
+
+    Or when creating an ApacheHandler object:
+
+      my $ah =
+          HTML::Mason::ApacheHandler->new
+              ( request_class => 'MasonX::Request::WithApacheSession',
+                session_cookie_domain  => '.example.com',
+                session_class          => 'Apache::Session::File',
+                session_directory      => '/tmp/sessions/data',
+                session_lock_directory => '/tmp/sessions/locks',
+              );
+
+    In a component:
+
+      $m->session->{foo} = 1;
+      if ( $m->session->{bar}{baz} > 1 ) { ... }
+
+DESCRIPTION
+    This module integrates "Apache::Session" into Mason by adding methods to
+    the Mason Request object available in all Mason components.
+
+    Any subrequests created by a request share the same session.
+
+USAGE
+    To use this module you need to tell Mason to use this class for
+    requests. This can be done in one of two ways. If you are configuring
+    Mason via your httpd.conf file, simply add this:
+
+      PerlSetVar  MasonRequestClass  MasonX::Request::WithApacheSession
+
+    If you are using a handler.pl file, simply add this parameter to the
+    parameters given to the ApacheHandler constructor:
+
+      request_class => 'MasonX::Request::WithApacheSession'
+
+METHODS
+    This class adds two methods to the Request object.
+
+    * session
+        This method returns a hash tied to the "Apache::Session" class.
+
+    * delete_session
+        This method deletes the existing session from persistent storage. If
+        you are using the built-in cookie mechanism, it also deletes the
+        cookie in the browser.
+
+CONFIGURATION
+    This module accepts quite a number of parameters, most of which are
+    simply passed through to "Apache::Session". For this reason, you are
+    advised to familiarize yourself with the "Apache::Session" documentation
+    before attempting to configure this module.
+
+  Generic Parameters
+    * session_class / MasonSessionClass => class name
+        The name of the "Apache::Session" subclass you would like to use.
+
+        This module will load this class for you if necessary.
+
+        This parameter is required.
+
+    * session_always_write / MasonSessionAlwaysWrite => boolean
+        If this is true, then this module will ensure that "Apache::Session"
+        writes the session. If it is false, the default "Apache::Session"
+        behavior is used instead.
+
+        This defaults to true.
+
+    * session_allow_invalid_id / MasonSessionAllowInvalidId => boolean
+        If this is true, an attempt to create a session with a session id
+        that does not exist in the session storage will be ignored, and a
+        new session will be created instead. If it is false, a
+        "HTML::Mason::Exception::NonExistentSessionID" exception will be
+        thrown instead.
+
+        This defaults to true.
+
+  Cookie-Related Parameters
+    * session_use_cookie / MasonSessionUseCookie => boolean
+        If true, then this module will use "Apache::Cookie" to set and read
+        cookies that contain the session id.
+
+        The cookie will be set again every time the client accesses a Mason
+        component unless the "session_cookie_resend" parameter is false.
+
+    * session_cookie_name / MasonSessionCookieName => name
+        This is the name of the cookie that this module will set. This
+        defaults to "MasonX-Request-WithApacheSession-cookie". Corresponds
+        to the "Apache::Cookie" "-name" constructor parameter.
+
+    * session_cookie_expires / MasonSessionCookieExpires => expiration
+        How long before the cookie expires. This defaults to 1 day, "+1d".
+        Corresponds to the "-expires" parameter.
+
+    * session_cookie_domain / MasonSessionCookieDomain => domain
+        This corresponds to the "-domain" parameter. If not given this will
+        not be set as part of the cookie.
+
+        If it is undefined, then no "-domain" parameter will be given.
+
+    * session_cookie_path / MasonSessionCookiePath => path
+        Corresponds to the "-path" parameter. It defaults to "/".
+
+    * session_cookie_secure / MasonSessionCookieSecure => boolean
+        Corresponds to the "-secure" parameter. It defaults to false.
+
+    * session_cookie_resend / MasonSessionCookieResend => boolean
+        By default, this parameter is true, and the cookie will be sent for
+        *every request*. If it is false, then the cookie will only be sent
+        when the session is *created*. This is important as resending the
+        cookie has the effect of updating the expiration time.
+
+  URL-Related Parameters
+    * session_args_param / MasonSessionArgsParam => name
+        If set, then this module will first look for the session id in the
+        query string or POST parameter with the specified name.
+
+        If you are also using cookies, then the module checks in the request
+        arguments *first*, and then it checks for a cookie.
+
+        The session id is available from "$m->session->{_session_id}".
+
+  Apache::Session-related Parameters
+    These parameters are simply passed through to "Apache::Session".
+
+    * session_data_source / MasonSessionDataSource => DSN
+        Corresponds to the "DataSource" parameter given to the DBI-related
+        session modules.
+
+    * session_user_name / MasonSessionUserName => user name
+        Corresponds to the "UserName" parameter given to the DBI-related
+        session modules.
+
+    * session_password / MasonSessionPassword => password
+        Corresponds to the "Password" parameter given to the DBI-related
+        session modules.
+
+    * session_handle => DBI handle
+        Corresponds to the "Handle" parameter given to the DBI-related
+        session modules. This cannot be set via the httpd.conf file, because
+        it needs to be an *actual Perl variable*, not the *name* of that
+        variable.
+
+    * session_lock_data_source / MasonSessionLockDataSource => DSN
+        Corresponds to the "LockDataSource" parameter given to
+        "Apache::Session::MySQL".
+
+    * session_lock_user_name / MasonSessionLockUserName => user name
+        Corresponds to the "LockUserName" parameter given to
+        "Apache::Session::MySQL".
+
+    * session_lock_password / MasonSessionLockPassword => password
+        Corresponds to the "LockPassword" parameter given to
+        "Apache::Session::MySQL".
+
+    * session_lock_handle => DBI handle
+        Corresponds to the "LockHandle" parameter given to the DBI-related
+        session modules. As with the "session_handle" parameter, this cannot
+        be set via the httpd.conf file.
+
+    * session_commit / MasonSessionCommit => boolean
+        Corresponds to the "Commit" parameter given to the DBI-related
+        session modules.
+
+    * session_transaction / MasonSessionTransaction => boolean
+        Corresponds to the "Transaction" parameter.
+
+    * session_directory / MasonSessionDirectory => directory
+        Corresponds to the "Directory" parameter given to
+        "Apache::Session::File".
+
+    * session_lock_directory / MasonSessionLockDirectory => directory
+        Corresponds to the "LockDirectory" parameter given to
+        "Apache::Session::File".
+
+    * session_file_name / MasonSessionFileName => file name
+        Corresponds to the "FileName" parameter given to
+        "Apache::Session::DB_File".
+
+    * session_store / MasonSessionStore => class
+        Corresponds to the "Store" parameter given to
+        "Apache::Session::Flex".
+
+    * session_lock / MasonSessionLock => class
+        Corresponds to the "Lock" parameter given to
+        "Apache::Session::Flex".
+
+    * session_generate / MasonSessionGenerate => class
+        Corresponds to the "Generate" parameter given to
+        "Apache::Session::Flex".
+
+    * session_serialize / MasonSessionSerialize => class
+        Corresponds to the "Serialize" parameter given to
+        "Apache::Session::Flex".
+
+    * session_textsize / MasonSessionTextsize => size
+        Corresponds to the "textsize" parameter given to
+        "Apache::Session::Sybase".
+
+    * session_long_read_len / MasonSessionLongReadLen => size
+        Corresponds to the "LongReadLen" parameter given to
+        "Apache::Session::MySQL".
+
+    * session_n_sems / MasonSessionNSems => number
+        Corresponds to the "NSems" parameter given to
+        "Apache::Session::Lock::Semaphore".
+
+    * session_semaphore_key / MasonSessionSemaphoreKey => key
+        Corresponds to the "SemaphoreKey" parameter given to
+        "Apache::Session::Lock::Semaphore".
+
+    * session_mod_usertrack_cookie_name / MasonSessionModUsertrackCookieName
+    => name
+        Corresponds to the "ModUsertrackCookieName" parameter given to
+        "Apache::Session::Generate::ModUsertrack".
+
+    * session_save_path / MasonSessionSavePath => path
+        Corresponds to the "SavePath" parameter given to
+        "Apache::Session::PHP".
+
+HOW COOKIES ARE HANDLED
+    When run under the ApacheHandler module, this module attempts to first
+    use "Apache::Cookie" for cookie-handling. Otherwise it uses
+    "CGI::Cookie" as a fallback.
+
+    If it ends up using "CGI::Cookie" then it can only set cookies if it is
+    running under either the ApacheHandler or the CGIHandler module.
+    Otherwise, the "MasonX::Request::WithApacheSession" request object has
+    no way to get to an object which can take the headers. In other words,
+    if there's no $r, there's nothing with which to set headers.
+
+SUPPORT
+    As can be seen by the number of parameters above, "Apache::Session" has
+    way too many possibilities for me to test all of them. This means there
+    are almost certainly bugs.
+
+    Bug reports and requests for help should be sent to the mason-users
+    list. See http://www.masonhq.com/resources/mailing_lists.html for more
+    details.
+
+AUTHOR
+    Dave Rolsky, <autarch@urth.org>
+
+SEE ALSO
+    HTML::Mason
+

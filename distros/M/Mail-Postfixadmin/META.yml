@@ -1,0 +1,29 @@
+---
+abstract: 'Interfere with a Postfixadmin mail system'
+author:
+  - 'Avi Greenbury <bigreds@cpan.org>'
+dynamic_config: 0
+generated_by: 'Avi Greenbury'
+license: freebsd
+meta-spec:
+  version: 2
+name: Mail-Postfixadmin
+release_status: testing
+version: 0.20130624
+no_index:
+  directory:
+    - t
+prereqs:
+  runtime:
+	  requires:
+      DBI: 0
+      Crypt::PasswdMD5: 0
+      Carp: 0
+provides:
+  Mail::Postfixadmin:
+    file: lib/Mail/Postfixadmin.pm
+    version: 0.20130624
+resources:
+  bugtracker: https://github.com/BigRedS/Mail-Postfixadmin/issues
+  homepage: https://github.com/BigRedS/Mail-Postfixadmin/
+  repository: https://github.com/BigRedS/Mail-Postfixadmin.git

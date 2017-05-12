@@ -1,0 +1,32 @@
+[%#
+
+=for doc
+
+The C<view> template takes some objects (usually just one) from
+C<objects> and displays the object's properties in a table. 
+
+=cut
+
+#%]
+[% PROCESS macros %]
+[% INCLUDE header %]
+[% view_item(object); %]
+[%#
+
+=for doc
+
+The C<view> template also displays a list of other objects related to the first
+one via C<has_many> style relationships; this is done by calling the
+C<related_accessors> method - see L<Model/related_accessors> - to return
+a list of has-many accessors. Next it calls each of those accessors, and
+displays the results in a table.
+
+#%]
+    <br /><a href="[%base%]/[%object.table%]/list">Back to listing</a>
+[% view_related(object); %]
+    
+[%
+    button(object, "edit");
+    button(object, "delete");
+%]
+[% INCLUDE footer %]

@@ -1,0 +1,15 @@
+lib/Metadata/DB/File.pm
+lib/Metadata/DB/File/Indexer.pm
+lib/Metadata/DB/File/Base.pm
+lib/Metadata/DB/File/Search.pm
+t/99_cleanup.t
+t/00_minimal.t
+t/22_Search_0.t
+t/11_Metadata_DB_File_Indexer.t
+t/12_Metadata_DB_File_Indexer_test2.t
+t/04_make_metadata_entries_and_check_associations.t
+t/test.pl
+t/01_make_entries_and_check_that_they_are_there.t
+MANIFEST
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,7 @@
+Revision history for Perl extension MySQL::Handler
+See the pod for MySQL for more revision details.
+
+1.8  Feb 2006
+        Initial release based on Postgres::Handler
+        by Lance P. Cleveland, Charleston Software Associates
+

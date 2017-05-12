@@ -1,0 +1,17 @@
+bin/mbxilinx
+Build.PL
+ChangeLog
+lib/App/mbxilinx.pm
+lib/Module/Build/Xilinx.pm
+lib/Module/Build/Xilinx.pod
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+share/example/Build.PL
+share/example/build.yml
+share/example/src/dflipflop.vhd
+share/example/tb/dff_tb.vhd
+t/00_use.t
+t/01_app.t

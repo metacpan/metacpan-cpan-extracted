@@ -1,0 +1,301 @@
+=head1 NAME
+
+Mozilla::DOM::Range
+
+=for object Mozilla::DOM::Range
+
+Mozilla::DOM::Range is a wrapper around an instance of Mozilla's
+nsIDOMRange interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+ * The nsIDOMRange interface is an interface to a DOM range object.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-Traversal-Range/
+
+The constants START_TO_START, START_TO_END, END_TO_END, and END_TO_START
+are available for the "how" argument to CompareBoundaryPoints.
+You can export them all with C<use Mozilla::DOM::Range qw(:how)>
+or export them individually.
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::Range->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $node = $range->B<GetStartContainer>()
+
+* Node within which the Range begins
+
+=head2 $offset = $range->B<GetStartOffset>()
+
+* Offset within the starting node of the Range.
+
+=head2 $node = $range->B<GetEndContainer>()
+
+Node within which the Range ends
+
+=head2 $offset = $range->B<GetEndOffset>()
+
+Offset within the ending node of the Range.
+
+=head2 $range->B<SetStart>($node, $offset)
+
+Sets the attributes describing the start of the Range.
+
+=over
+
+=over
+
+=item * $refNode (Mozilla::DOM::Node)
+
+The refNode value. This parameter must be different from null.
+
+=item * $offset (integer (long))
+
+The startOffset value.
+
+=back
+
+=back
+
+=head2 $range->B<SetStartBefore>($node)
+
+Sets the start position to be before a node
+
+=over
+
+=over
+
+=item * $refNode (Mozilla::DOM::Node)
+
+=back
+
+=back
+
+=head2 $range->B<SetStartAfter>($node)
+
+Sets the start position to be after a node
+
+=over
+
+=over
+
+=item * $refNode (Mozilla::DOM::Node)
+
+=back
+
+=back
+
+=head2 $range->B<SetEnd>($node, $offset)
+
+Sets the attributes describing the end of a Range.
+
+=over
+
+=over
+
+=item * $refNode (Mozilla::DOM::Node)
+
+The refNode value. This parameter must be different from null.
+
+=item * $offset (integer (long))
+
+The endOffset value.
+
+=back
+
+=back
+
+=head2 $range->B<SetEndBefore>($node)
+
+Sets the end position to be before a node.
+
+=over
+
+=over
+
+=item * $refNode (Mozilla::DOM::Node)
+
+=back
+
+=back
+
+=head2 $range->B<SetEndAfter>($node)
+
+Sets the end of a Range to be after a node
+
+=over
+
+=over
+
+=item * $refNode (Mozilla::DOM::Node)
+
+=back
+
+=back
+
+=head2 $range->B<Collapse>($toStart)
+
+Collapse a Range onto one of its boundary-points
+
+=over
+
+=over
+
+=item * $toStart (boolean)
+
+If TRUE, collapses the Range onto its start; if FALSE, collapses it onto its end.
+
+=back
+
+=back
+
+=head2 $bool = $range->B<GetCollapsed>()
+
+=over
+
+=back
+
+=head2 $range->B<SelectNode>($refNode)
+
+Select a node and its contents
+
+=over
+
+=over
+
+=item * $refNode (Mozilla::DOM::Node)
+
+=back
+
+=back
+
+=head2 $range->B<SelectNodeContents>($node)
+
+Select the contents within a node (i.e. don't include the tags)
+
+=over
+
+=over
+
+=item * $refNode (Mozilla::DOM::Node)
+
+=back
+
+=back
+
+=head2 $num = $range->B<CompareBoundaryPoints>($how, $sourceRange)
+
+Compare the boundary-points of two Ranges in a document.
+
+=over
+
+=over
+
+=item * $how (integer (short))
+
+A code representing the type of comparison (which boundary point of
+the source range to which boundary point of the range): START_TO_START,
+START_TO_END, END_TO_END, END_TO_START.
+
+=item * $sourceRange (Mozilla::DOM::Range)
+
+The Range on which this current Range is compared to.
+
+=back
+
+=back
+
+Returns -1, 0 or 1 depending on whether the corresponding boundary-point
+of the Range is respectively before, equal to, or after the corresponding
+boundary-point of sourceRange.
+
+=head2 $range->B<DeleteContents>()
+
+Removes the contents of a Range from the containing document or document
+fragment without returning a reference to the removed content.
+
+=head2 $documentfragment = $range->B<ExtractContents>()
+
+Moves the contents of a Range from the containing document or document
+fragment to a new DocumentFragment.
+
+=head2 $documentfragment = $range->B<CloneContents>()
+
+Duplicates the contents of a Range
+
+=head2 $range->B<InsertNode>($node)
+
+
+Inserts a node into the Document or DocumentFragment at the start of the Range.
+If the container is a Text node, this will be split at the start of the Range
+(as if the Text node's splitText method was performed at the insertion point)
+and the insertion will occur between the two resulting Text nodes.
+Adjacent Text nodes will not be automatically merged. If the node
+to be inserted is a DocumentFragment node, the children will be
+inserted rather than the DocumentFragment node itself.
+
+=over
+
+=over
+
+=item * $newNode (Mozilla::DOM::Node)
+
+The node to insert at the start of the Range
+
+=back
+
+=back
+
+=head2 $range->B<SurroundContents>($newParentNode)
+
+Reparents the contents of the Range to the given node and inserts
+the node at the position of the start of the Range.
+
+=over
+
+=over
+
+=item * $newParent (Mozilla::DOM::Node)
+
+=back
+
+=back
+
+=head2 $range->B<CloneRange>($range)
+
+Produces a new Range whose boundary-points are equal to the
+boundary-points of the Range.
+
+=head2 $node = $range->B<GetCommonAncestorContainer>()
+
+The deepest common ancestor container of the Range's two boundary-points.
+
+=head2 $str = $range->B<ToString>()
+
+Returns the contents of a Range as a string. This string contains
+only the data characters, not any markup.
+
+=head2 $range->B<Detach>()
+
+Called to indicate that the Range is no longer in use and that the
+implementation may relinquish any resources associated with this Range.
+Subsequent calls to any methods or attribute getters on this Range
+will result in a DOMException being thrown with an error code of INVALID_STATE_ERR.
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

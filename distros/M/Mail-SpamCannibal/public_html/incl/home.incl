@@ -1,0 +1,144 @@
+<font size="+1">Welcome to the SpamCannibal</font>
+<p>
+<img src=images/protect1.gif width=127 height=38 align=left hspace=5>
+SpamCannibal blocks spam at the origination server and can be configured to 
+block DoS attacks.
+<br clear=left>&nbsp;
+<br>
+SpamCannibal uses a continually updated database containing the 
+IP addresses of spam or DoS servers and blocks
+their ability to connect using a TCP/IP tarpit,
+<p>
+SpamCannibal's TCP/IP tarpit stops spam by telling the spam server to send
+very small packets. SpamCannibal then causes the spam server to retry sending 
+over and over - ideally bringing the spam server to a virtual halt for a 
+long time or perhaps indefinitely. SpamCannibal blocks spam at the source 
+by preventing the spam server from delivering the messages from its currently 
+running MTA process. This effectively eliminates the network traffic to your 
+site because the spam never leaves the origination server. This same
+strategy works equally well when SpamCannibal's tarpit daemon is configured
+to defend against DoS attacks.
+<p>
+Widely deployed, SpamCannibal can help eliminate spam from the internet.
+If enough threads on a spam server are captured, one of three things
+happens: 
+
+<ol>
+<li>Good - the spam server runs slow and can't send out much spam to anyone
+else, (If a thread is handling a bulk email list when it is captured, then
+the entire list hangs.) 
+<li>Better - the spam server crashes and doesn't send out any spam, 
+<li>Best - every time a spam server starts, its process threads are quickly
+captured by a community of cannibals and it never manages to send out any
+spam.
+</ol>
+ 
+<p>
+<font size="+1">SpamCannibal Benefits</font>
+<ol>
+<li>SpamCannibal can block spam email from entering your local network. 
+This eliminates wasting time sorting through spam and keeps spam from wasting your network
+bandwidth.
+<br>
+<li>A community of SpamCannibals can eat the spammers for breakfast, lunch,
+and dinner.
+With enough sites running SpamCannibal, the community of cannibals can block
+spam directly
+at the multiple spam sources.  Since SpamCannibal sports has its own DNSBL, a
+community of cannibals can easily share the workload of spreading the
+identity spammer IP addresses. 
+This helps everyone and can reduce the overload on the network caused by spam.
+<br>
+<li>Once you have SpamCannibal running, you can begin to forget about
+spam.  Once enough sites are running Spam Cannibal, everyone can begin to forget
+about spam.
+</ol>
+
+
+<font size="+1">SpamCannibal is Free</font>
+<p>
+SpamCannibal is a free software toolkit to help stop DoS attacks, UBE (Unsolicited Bulk
+Email), UCE (Unsolicited Commercial Email), and other spam from reaching
+your network and your mail servers.  SpamCannibal
+is published under the GNU General Public License and is available for
+download from CPAN.
+For specific download instructions and links, click the <a
+href="#top">Download</a> link.
+<p>
+
+
+<font size="+1">Using SpamCannibal</font>
+<p>
+SpamCannibal does not identify spam.  SpamCannibal uses a list of identified
+spam sources (IP
+addresses) to know what to block. SpamCannibal's network module continuously
+adds the IP address of incoming connections to its database. From this
+list, there are three ways to obtain a list of
+spam sources:
+<ol>
+<li>Read the spam email that you receive to identify spam sources, and
+simply mail the
+offending spam to the SpamCannibal mail filter robot which will dutifully
+strip out the sending
+mail server host address and add it to SpamCannibal's tarpit database.
+<li>Use a remote DNSBL to screen SpamCannibal's archive database of IP
+connection addresses. SpamCannibal's BLcheck.pl
+script does this for you automatically when run periodically from a cron
+job.
+<li>Setup an automated email filter to identify spam sources from the spam
+email that you receive. Use SpamCannibal's tools to add these spam addresses
+to the tarpit database. Extensive Perl tools are provided with the SpamCannibal distribution to
+facilitate this.
+</ol>
+
+<font size="+1">SpamCannibal is Efficient</font>
+<p>
+SpamCannibal runs more than fast enough on a Linux 486 PC and uses very
+little network bandwidth (because it is mostly ignoring connections). The SpamCannibal
+tarpit daemon is stateless and consumes very few resources on its host and very little
+bandwidth (1/2 byte per second per thread on average).
+<p>
+
+<font size="+1">Who are Potential SpamCannibal Users?</font>
+<ol>
+<li>Anyone running Linux and a mail server.
+
+<li>If a few large ISPs were to install SpamCannibal, spam would rapidly
+vanish.
+
+<li>If internet router makers were to incorporate SpamCannibal into their
+router software, spam would cease to exist.
+
+<li>If network administrators were to install SpamCannibal (plus a suitable
+spam filter) to protect their email servers, then spam would be banned from their networks.
+
+<li>If security services were to install SpamCannibal, then ...
+
+<li>You! If you are interested in helping to stop spam, read more about how
+it works in the <a hrev="#top">FAQ</a>.
+</ol>
+
+
+<font size="+1">If you think that you are being blocked...</font>
+<p>
+The ONLY way you can get into SpamCannibal's database is by sending spam or
+virus ladened email to our mail servers!
+<p>
+SpamCannibal does not block email access except for IP addresses and ranges
+that have sent or relayed what we believe to be spam or other unsolicited
+email directly to our email servers.  SpamCannibal uses its database to
+block access by IP addresses ONLY for its own mail servers, however, the
+database we use for that purpose is freely available for anyone to look at
+and use as they see fit.
+<p>
+If you have been referred to this site because you appear to be blocked by
+some third party, speak to the administrators of the third party site you are trying to contact.
+<p>
+SpamCannibal does not scan remote hosts or otherwise test remote sites. The
+ONLY way you can get into SpamCannibal's database is by sending unsolicited
+email to our servers!
+<p>
+If you believe your IP address is in SpamCannibal's database, click the
+<a href="#top">Lookup IP</a> link to find out why.  To find out who owns a particular IP address, 
+click the <a href="#top">Whois IP</a> link.
+<hr>

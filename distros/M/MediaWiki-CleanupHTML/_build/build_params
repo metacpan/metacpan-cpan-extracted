@@ -1,0 +1,146 @@
+do{ my $x = [
+       {
+         'ARGV' => []
+       },
+       {},
+       {
+         'has_config_data' => undef,
+         'build_class' => 'Module::Build',
+         'destdir' => undef,
+         'allow_pureperl' => 0,
+         'xs_files' => undef,
+         'magic_number' => undef,
+         'dist_version_from' => 'lib/MediaWiki/CleanupHTML.pm',
+         'release_status' => 'stable',
+         'meta_add' => {},
+         'prefix' => undef,
+         'use_tap_harness' => 0,
+         'dist_name' => 'MediaWiki-CleanupHTML',
+         'requires' => {
+                         'perl' => '5.006'
+                       },
+         'base_dir' => '/home/shlomif/progs/perl/cpan/MediaWiki/CleanupHTML/hg/MediaWiki-CleanupHTML',
+         'install_path' => {},
+         'pm_files' => undef,
+         'extra_linker_flags' => [],
+         'recurse_into' => [],
+         'configure_requires' => {
+                                   'Module::Build' => '0.39'
+                                 },
+         'prefix_relpaths' => {},
+         'use_rcfile' => 1,
+         'license' => 'mit',
+         'pollute' => undef,
+         'dist_suffix' => undef,
+         'build_script' => 'Build',
+         'quiet' => undef,
+         'needs_compiler' => '',
+         'debug' => undef,
+         'dist_abstract' => undef,
+         'mymetafile' => 'MYMETA.yml',
+         'prereq_action_types' => [
+                                    'requires',
+                                    'build_requires',
+                                    'test_requires',
+                                    'conflicts',
+                                    'recommends'
+                                  ],
+         'scripts' => undef,
+         'install_base_relpaths' => {},
+         'extra_manify_args' => undef,
+         'blib' => 'blib',
+         'bundle_inc' => [],
+         'install_base' => undef,
+         'module_name' => 'MediaWiki::CleanupHTML',
+         'allow_mb_mismatch' => 0,
+         'script_files' => undef,
+         'extra_compiler_flags' => [],
+         'bundle_inc_preload' => [],
+         'build_requires' => {
+                               'Test::More' => 0,
+                               'Scalar::Util' => 0,
+                               'HTML::TreeBuilder::XPath' => 0
+                             },
+         'include_dirs' => [],
+         'tap_harness_args' => {},
+         'libdoc_dirs' => [
+                            'blib/lib',
+                            'blib/arch'
+                          ],
+         'verbose' => undef,
+         'pureperl_only' => 0,
+         'dist_version' => 'v0.0.2',
+         'mb_version' => '0.421',
+         'c_source' => undef,
+         'create_readme' => undef,
+         'orig_dir' => '/home/shlomif/progs/perl/cpan/MediaWiki/CleanupHTML/hg/MediaWiki-CleanupHTML',
+         'install_sets' => {},
+         'sign' => undef,
+         'config' => undef,
+         'create_packlist' => 1,
+         'cpan_client' => 'cpan',
+         'mymetafile2' => 'MYMETA.json',
+         'meta_merge' => {},
+         'program_name' => undef,
+         'recursive_test_files' => undef,
+         'create_license' => undef,
+         'metafile2' => 'META.json',
+         'build_bat' => 0,
+         'build_elements' => [
+                               'PL',
+                               'support',
+                               'pm',
+                               'xs',
+                               'share_dir',
+                               'pod',
+                               'script'
+                             ],
+         'test_files' => undef,
+         'test_file_exts' => [
+                               '.t'
+                             ],
+         'metafile' => 'META.yml',
+         'html_css' => '',
+         'PL_files' => undef,
+         'original_prefix' => {},
+         'dist_author' => [
+                            'Shlomi Fish <shlomif@cpan.org>'
+                          ],
+         'bindoc_dirs' => [
+                            'blib/script'
+                          ],
+         'create_makefile_pl' => 'traditional',
+         'pod_files' => undef,
+         'autosplit' => undef,
+         'recommends' => {},
+         '_added_to_INC' => [
+                              '/home/shlomif/apps/perl/modules/lib/perl5/site_perl/5.20.1/x86_64-linux-thread-multi',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/site_perl/5.20.1',
+                              '/home/shlomif/apps/perl/modules/lib/site_perl/5.20.1',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/5.20.1/x86_64-linux-thread-multi',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/5.20.1',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/site_perl/5.20.0/x86_64-linux-thread-multi',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/site_perl/5.20.0',
+                              '/home/shlomif/apps/perl/modules/lib/site_perl/5.20.0',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/5.20.0',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/site_perl/5.18.2/x86_64-linux-thread-multi',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/site_perl/5.18.2',
+                              '/home/shlomif/apps/perl/modules/lib/site_perl/5.18.2',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/5.18.2',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/site_perl/5.18.1',
+                              '/home/shlomif/apps/perl/modules/lib/site_perl/5.18.1',
+                              '/home/shlomif/apps/perl/modules/lib/perl5/5.18.1'
+                            ],
+         'config_dir' => '_build',
+         'auto_configure_requires' => 1,
+         'perl' => '/usr/bin/perl5.20.1',
+         'dynamic_config' => 1,
+         'test_requires' => {},
+         'get_options' => {},
+         'share_dir' => undef,
+         'installdirs' => 'site',
+         'conflicts' => {},
+         'debugger' => undef
+       }
+     ];
+$x; }

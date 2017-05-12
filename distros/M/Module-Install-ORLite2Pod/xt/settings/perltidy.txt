@@ -1,0 +1,42 @@
+--backup-and-modify-in-place
+--warning-output
+--maximum-line-length=76
+--indent-columns=4
+--entab-leading-whitespace=4
+# --check-syntax
+# -perl-syntax-check-flags=-c
+--continuation-indentation=2
+--outdent-long-quotes
+--outdent-long-lines
+--outdent-labels
+--paren-tightness=1
+--square-bracket-tightness=1
+--block-brace-tightness=1
+--space-for-semicolon
+--add-semicolons
+--delete-semicolons
+--indent-spaced-block-comments
+--minimum-space-to-comment=3
+--fixed-position-side-comment=40
+--closing-side-comments
+--closing-side-comment-interval=12
+--static-block-comments
+# --static-block-comment-prefix=^#{2,}[^\s#]
+--static-side-comments
+--format-skipping
+--cuddled-else
+--no-opening-brace-on-new-line
+--vertical-tightness=1
+--stack-opening-tokens
+--stack-closing-tokens
+--maximum-fields-per-table=8
+--comma-arrow-breakpoints=0
+--blanks-before-comments
+--blanks-before-subs
+--blanks-before-blocks
+--long-block-line-count=4
+--maximum-consecutive-blank-lines=5
+
+
+
+

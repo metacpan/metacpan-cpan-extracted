@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tube name="Pražské metro">
+  <lines>
+    <line id="A" name="Linka A" color="green"/>
+    <line id="B" name="Linka B" color="yellow"/>
+    <line id="C" name="Linka C" color="red"/>
+  </lines>
+  <stations>
+    <!-- https://cs.wikipedia.org/wiki/A_(linka_metra_v_Praze) -->
+    <station id="A01" name="Nemocnice Motol" line="Linka A" link="A02"/>
+    <station id="A02" name="Petřiny" line="Linka A" link="A01,A03"/>
+    <station id="A03" name="Nádraží Veleslavín" line="Linka A" link="A02,A04"/>
+    <station id="A04" name="Bořislavka" line="Linka A" link="A03,A05"/>
+    <station id="A05" name="Dejvická" line="Linka A" link="A04,A06"/>
+    <station id="A06" name="Hradčanská" line="Linka A" link="A05,A07"/>
+    <station id="A07" name="Malostranská" line="Linka A" link="A06,A08"/>
+    <station id="A08" name="Staroměstská" line="Linka A" link="A07,A09"/>
+    <station id="A09" name="Můstek" line="Linka A" link="A08,A10" other_link="Tunnel:B13"/>
+    <station id="A10" name="Muzeum" line="Linka A" link="A09,A11" other_link="Tunnel:C10"/>
+    <station id="A11" name="Náměstí Míru" line="Linka A" link="A10,A12"/>
+    <station id="A12" name="Jiřího z Poděbrad" line="Linka A" link="A11,A13"/>
+    <station id="A13" name="Flora" line="Linka A" link="A12,A14"/>
+    <station id="A14" name="Želivského" line="Linka A" link="A13,A15"/>
+    <station id="A15" name="Strašnická" line="Linka A" link="A14,A16"/>
+    <station id="A16" name="Skalka" line="Linka A" link="A15,A17"/>
+    <station id="A17" name="Depo Hostivař" line="Linka A" link="A16"/>
+
+    <!-- https://cs.wikipedia.org/wiki/B_(linka_metra_v_Praze) -->
+    <station id="B01" name="Zličín" line="Linka B" link="B02"/>
+    <station id="B02" name="Stodůlky" line="Linka B" link="B01,B03"/>
+    <station id="B03" name="Luka" line="Linka B" link="B02,B04"/>
+    <station id="B04" name="Lužiny" line="Linka B" link="B03,B05"/>
+    <station id="B05" name="Hůrka" line="Linka B" link="B04,B06"/>
+    <station id="B06" name="Nové Butovice" line="Linka B" link="B05,B07"/>
+    <station id="B07" name="Jinonice" line="Linka B" link="B06,B08"/>
+    <station id="B08" name="Radlická" line="Linka B" link="B07,B09"/>
+    <station id="B09" name="Smíchovské nádraží" line="Linka B" link="B08,B10"/>
+    <station id="B10" name="Anděl" line="Linka B" link="B09,B11"/>
+    <station id="B11" name="Karlovo náměstí" line="Linka B" link="B10,B12"/>
+    <station id="B12" name="Národní třída" line="Linka B" link="B11,B13"/>
+    <station id="B13" name="Můstek" line="Linka B" link="B12,B14" other_link="Tunnel:A05"/>
+    <station id="B14" name="Náměstí Republiky" line="Linka B" link="B13,B15"/>
+    <station id="B15" name="Florenc" line="Linka B" link="B14,B16" other_link="Tunnel:C08"/>
+    <station id="B16" name="Křižíkova" line="Linka B" link="B15,B17"/>
+    <station id="B17" name="Invalidovna" line="Linka B" link="B16,B18"/>
+    <station id="B18" name="Palmovka" line="Linka B" link="B17,B19"/>
+    <station id="B19" name="Českomoravská" line="Linka B" link="B18,B20"/>
+    <station id="B20" name="Vysočanská" line="Linka B" link="B19,B21"/>
+    <station id="B21" name="Kolbenova" line="Linka B" link="B20,B22"/>
+    <station id="B22" name="Hloubětín" line="Linka B" link="B21,B23"/>
+    <station id="B23" name="Rajská zahrada" line="Linka B" link="B22,B24"/>
+    <station id="B24" name="Černý Most" line="Linka B" link="B23"/>
+
+    <!-- https://cs.wikipedia.org/wiki/C_(linka_metra_v_Praze) -->
+    <station id="C01" name="Letňany" line="Linka C" link="C02"/>
+    <station id="C02" name="Prosek" line="Linka C" link="C01,C03"/>
+    <station id="C03" name="Střížkov" line="Linka C" link="C02,C04"/>
+    <station id="C04" name="Ládví" line="Linka C" link="C03,C05"/>
+    <station id="C05" name="Kobylisy" line="Linka C" link="C04,C06"/>
+    <station id="C06" name="Nádraží Holešovice" line="Linka C" link="C05,C07"/>
+    <station id="C07" name="Vltavská" line="Linka C" link="C06,C08"/>
+    <station id="C08" name="Florenc" line="Linka C" link="C07,C09" other_link="Tunnel:B15"/>
+    <station id="C09" name="Hlavní nádraží" line="Linka C" link="C08,C10"/>
+    <station id="C10" name="Muzeum" line="Linka C" link="C09,C11" other_link="Tunnel:A06"/>
+    <station id="C11" name="I. P. Pavlova" line="Linka C" link="C10,C12"/>
+    <station id="C12" name="Vyšehrad" line="Linka C" link="C11,C13"/>
+    <station id="C13" name="Pražského povstání" line="Linka C" link="C12,C14"/>
+    <station id="C14" name="Pankrác" line="Linka C" link="C13,C15"/>
+    <station id="C15" name="Budějovická" line="Linka C" link="C14,C16"/>
+    <station id="C16" name="Kačerov" line="Linka C" link="C15,C17"/>
+    <station id="C17" name="Roztyly" line="Linka C" link="C16,C18"/>
+    <station id="C18" name="Chodov" line="Linka C" link="C17,C19"/>
+    <station id="C19" name="Opatov" line="Linka C" link="C18,C20"/>
+    <station id="C20" name="Háje" line="Linka C" link="C19"/>
+  </stations>
+</tube>

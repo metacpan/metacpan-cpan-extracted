@@ -1,0 +1,43 @@
+Revision history for MooX-ConfigFromFile
+
+0.007	2015-04-27
+    - separate loading and merging of configfile content
+    - ensure order of multiple loaded config files
+    - add support for merging deep structures in config files
+    - eval all test-libraries to be aware of mistakes
+
+0.006	2015-03-04
+    - add rough support for multiple prefixes
+    - fix incorrect meta-data and incomplete handling of newer eumm features
+    - improve test coverage
+    - simplify some code to avoid useless conditions
+    - add new tests for MooX::Cmd and MooX::Options integration
+    - introduce import setting for config_identifier (consumed attribute
+      from MooX::File::ConfigDir)
+    - bump copyright year to 2015
+
+0.005	2014-12-01
+    - Update Makefile.PL for up-to-date resources and requirements spec
+    - consolidate Synopsis in main pod
+    - move from README to README.md
+    - improve author tests before releasing
+
+0.004	2014-10-28
+    - add ability for options to importer of MooX::ConfigFromFile
+    - add option to have a singleton config (loaded once).
+    - improve documentation
+    - harmonize tests
+
+0.003	2014-08-02
+    - fix links in documentation to fix RT#97429 (thanks abraxxa for
+      reporting)
+    - switch to ExtUtils::MakeMaker - it better maintained these days
+
+0.002	2013-09-27
+    - improve documentation
+    - add test to verify we're working on Moose, too
+    - ensure we're only $with->() for classes, not roles
+    - add a Build.PL auto_feature for author test requires
+
+0.001	2013-09-26
+    - First version, released on an unsuspecting world.

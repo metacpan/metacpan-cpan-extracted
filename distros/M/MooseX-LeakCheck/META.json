@@ -1,0 +1,61 @@
+{
+   "abstract" : "Check for leaky attributes",
+   "author" : [
+      "Chad Granum <exodist7@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-LeakCheck",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.71"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : 0,
+            "Scalar::Util" : 0
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::LeakCheck" : {
+         "file" : "lib/MooseX/LeakCheck.pm",
+         "version" : "0.003"
+      },
+      "MooseX::LeakCheck::Attribute" : {
+         "file" : "lib/MooseX/LeakCheck/Attribute.pm",
+         "version" : 0
+      },
+      "MooseX::LeakCheck::Base" : {
+         "file" : "lib/MooseX/LeakCheck/Base.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/exodist/MooseX-LeakCheck/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/exodist/MooseX-LeakCheck"
+      }
+   },
+   "version" : "0.003"
+}

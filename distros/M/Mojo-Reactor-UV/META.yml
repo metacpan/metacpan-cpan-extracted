@@ -1,0 +1,31 @@
+---
+abstract: 'UV backend for Mojo::Reactor'
+author:
+  - 'Dan Book <dbook@cpan.org>'
+build_requires:
+  IO::Socket::INET: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-Reactor-UV
+provides:
+  Mojo::Reactor::UV:
+    file: lib/Mojo/Reactor/UV.pm
+    version: '0.001'
+requires:
+  Carp: '0'
+  Mojolicious: '6.0'
+  Scalar::Util: '0'
+  UV: '0.23'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/Grinnz/Mojo-Reactor-UV/issues
+  homepage: https://github.com/Grinnz/Mojo-Reactor-UV
+  repository: https://github.com/Grinnz/Mojo-Reactor-UV.git
+version: '0.001'

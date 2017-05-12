@@ -1,0 +1,412 @@
+=for html <a href="https://travis-ci.org/jddurand/c-genericStack"><img src="https://travis-ci.org/jddurand/c-genericStack.svg?branch=master" alt="Travis CI build status" height="18"></a> <a href="https://badge.fury.io/gh/jddurand%2Fc-genericStack"><img src="https://badge.fury.io/gh/jddurand%2Fc-genericStack.svg" alt="GitHub version" height="18"></a> <a href="http://opensource.org/licenses/MIT" rel="nofollow noreferrer"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License MIT" height="18"></a>
+
+=head1 NAME
+
+genericStack - generic stack interface
+
+=head1 DESCRIPTION
+
+genericStack is a set of macros to manage a stack. It is is generic in the sense that it is not restricted to one type of variable. It is recommended to always use valid C identifiers in these macros.
+
+=head1 SYNOPSIS
+
+  #include <genericStack.h>
+
+  genericStack_t myStack, *myStackp;
+
+  /* The generic stack can be on the stack */
+  myStackp = &myStack;
+  GENERICSTACK_INIT(myStackp);
+  /* ... */
+  GENERICSTACK_RESET(myStackp);
+
+  /* ... or on the heap */
+  GENERICSTACK_NEW(myStackp);
+  /* ... */
+  GENERICSTACK_FREE(myStackp);
+
+=head1 MACROS
+
+=head2 GENERICSTACK_INIT(stackName)
+
+Initialize a stack pointer that is on the stack. Memory will be released with GENERICSTACK_RESET(stackName).
+
+=head2 GENERICSTACK_INIT_SIZED(stackName, wantedSize)
+
+Create an empty stack referenced with the name C<stackName> itself on the stack, though pre-allocating room for C<wantedSize> elements>. The stack will also automatically grow if user if putting an element beyond C<wantedSize>.
+
+=head2 GENERICSTACK_NEW(stackName)
+
+Create an empty stack referenced with the name C<stackName>. The stack will automatically grow if needed.
+
+=head2 GENERICSTACK_NEW_SIZED(stackName, wantedSize)
+
+Create an empty stack referenced with the name C<stackName>, though pre-allocating room for C<wantedSize> elements>. The stack will also automatically grow if user if putting an element beyond C<wantedSize>.
+
+=head2 GENERICSTACK_SET_XXX(stackName, var, index)
+
+Set an entry in stack C<stackName>, at index C<index> (numbering start 0), using the result of the expression C<var>. XXX is meant to be a C datatype or an array (the later being nothing else but a PTR associated to a length), i.e. the exact list of macros is:
+
+=over
+
+=item GENERICSTACK_SET_CHAR
+
+Set C<var> expression result, explicitely typecasted into a C<char>.
+
+=item GENERICSTACK_SET_SHORT
+
+Set C<var> expression result, explicitely typecasted into a C<short>.
+
+=item GENERICSTACK_SET_INT
+
+Set C<var> expression result, explicitely typecasted into an C<int>.
+
+=item GENERICSTACK_SET_LONG
+
+Set C<var> expression result, explicitely typecasted into a C<long>.
+
+=item GENERICSTACK_SET_FLOAT
+
+Set C<var> expression result, explicitely typecasted into a C<float>.
+
+=item GENERICSTACK_SET_DOUBLE
+
+Set C<var> expression result, explicitely typecasted into a C<double>.
+
+=item GENERICSTACK_SET_PTR
+
+Set C<var> expression result, explicitely typecasted into a C<void *>.
+
+=item GENERICSTACK_SET_ARRAY
+
+Set C<var>, that is an internal structure containing both a pointer and a length to fully describe an array.
+
+=item GENERICSTACK_SET_ARRAYP
+
+Set C<*var>, that is an internal structure containing both a pointer and a length to fully describe an array.
+
+=back
+
+C99 datatypes (see NOTES) may be available via:
+
+=over
+
+=item GENERICSTACK_SET_LONG_LONG
+
+Set C<var> expression result, explicitely typecasted into a C<long long>.
+
+=item GENERICSTACK_SET__BOOL
+
+Set C<var> expression result, explicitely typecasted into a C<_Bool>.
+
+=item GENERICSTACK_SET_FLOAT__COMPLEX
+
+Set C<var> expression result, explicitely typecasted into a C<float _Complex>.
+
+=item GENERICSTACK_SET_DOUBLE__COMPLEX
+
+Set C<var> expression result, explicitely typecasted into a C<double _Complex>.
+
+=item GENERICSTACK_SET_LONG_DOUBLE__COMPLEX
+
+Set C<var> expression result, explicitely typecasted into a C<long double _Complex>.
+
+=back
+
+Custom datatype (see NOTES) is available via:
+
+=over
+
+=item GENERICSTACK_SET_CUSTOM
+
+Set C<var> expression result, explicitely typecasted into a C<GENERICSTACK_CUSTOM>.
+
+=item GENERICSTACK_SET_CUSTOMP
+
+Set C<*var> expression result, explicitely typecasted into a C<GENERICSTACK_CUSTOM>.
+
+=back
+
+=head2 GENERICSTACK_SET_NA(stackName, index)
+
+Specific macro that removes any association at position C<index>.
+
+=head2 GENERICSTACK_GET_XXX(stackName, index)
+
+Get an entry in stack C<stackName>, at index C<index> (numbering start 0). The data type of the entry is left as-is, letting the compiler do type promotion, and eventually warn. XXX is meant to be a C datatype, an array, or an array pointer, i.e. the exact list of macros is:
+
+=over
+
+=item GENERICSTACK_GET_CHAR
+
+=item GENERICSTACK_GET_SHORT
+
+=item GENERICSTACK_GET_INT
+
+=item GENERICSTACK_GET_LONG
+
+=item GENERICSTACK_GET_FLOAT
+
+=item GENERICSTACK_GET_DOUBLE
+
+=item GENERICSTACK_GET_PTR
+
+=item GENERICSTACK_GET_ARRAY
+
+=item GENERICSTACK_GET_ARRAYP
+
+Returns a I<pointer> to the array element.
+
+=back
+
+C99 datatypes (see NOTES) may be available via:
+
+=over
+
+=item GENERICSTACK_GET_LONG_LONG
+
+=item GENERICSTACK_GET__BOOL
+
+=item GENERICSTACK_GET_FLOAT__COMPLEX
+
+=item GENERICSTACK_GET_DOUBLE__COMPLEX
+
+=item GENERICSTACK_GET_LONG_DOUBLE__COMPLEX
+
+=back
+
+Custom datatype (see NOTES) may be available via:
+
+=over
+
+=item GENERICSTACK_GET_CUSTOM
+
+=item GENERICSTACK_GET_CUSTOMP
+
+=back
+
+=head2 GENERICSTACK_PUSH_XXX(stackName, var)
+
+This is an interface on top of <GENERICSTACK_SET_XXX>, that it automatically pushing data on the stack, the later will increase if needed.
+
+=head2 GENERICSTACK_POP_XXX(stackName)
+
+This is an interface on top of <GENERICSTACK_GET_XXX>, that it automatically popping data from the stack (i.e. retreive the last argument, and (artificially) reduce the generic stack size.
+
+=head2 GENERICSTACK_IS_XXX(stackName, index)
+
+Check if item at indice C<index> is of type <XXX>, and returns a true or false value.
+
+=head2 GENERICSTACK_FREE(stackName)
+
+Releases a stack that is on the heap.
+
+=head2 GENERICSTACK_RESET(stackName)
+
+Releases a stack that is on the stack.
+
+=head2 GENERICSTACK_ERROR(stackName)
+
+Return a true value if there is an error. Should be called after every call to:
+
+=head2 GENERICSTACK_INITIAL_LENGTH(stackName)
+
+Return the number of available items always available.
+
+=head2 GENERICSTACK_HEAP_LENGTH(stackName)
+
+Return the number of available items allocated on the heap.
+
+=head2 GENERICSTACK_LENGTH(stackName)
+
+Return the total number of available items.
+
+=head2 GENERICSTACK_USED(stackName)
+
+Return the total used items. This can be used as l-value, the effect is to pretend that the stack is empty I<without> releasing internal memory, the later will be reused if necessary. If you believe that the internal size of the stack (in particular the memory allocated on the heap) fit the whole lifetime of the stack, this is by far more effcient than doing sequences of FREE (or RESET) followed by NEW (or INIT, respectively).
+
+=head2 GENERICSTACK_DUMP(stackName)
+
+Handy macro that dump the stack on stderr.
+
+=over
+
+=back
+
+=head2 GENERICSTACK_ERROR_RESET(stackName)
+
+Reset error to a false value.
+
+=head2 GENERICSTACK_SWITCH(stackName, i1, i2)
+
+Switches items at positions C<i1> and C<i2>.
+
+=head2 GENERICSTACKITEMTYPE(stackName, index)
+
+Returns the type of the item at position C<index> within stack C<stackName>.
+
+=head2 GENERICSTACKITEMTYPE_XXX
+
+Convenient enum associating a value to the item type C<XXX>, for example:
+
+=over
+
+=item GENERICSTACKITEMTYPE_NA
+
+is the value C<0>
+
+=item GENERICSTACKITEMTYPE_CHAR
+
+is the value C<1>
+
+=back
+
+and so on.
+
+=head2 GENERICSTACKITEMTYPE2TYPE_XXX
+
+Generates a basic C type from the item type C<XXX>, for example:
+
+=over
+
+=item GENERICSTACKITEMTYPE2TYPE_CHAR
+
+generates C<char>
+
+=item GENERICSTACKITEMTYPE2TYPE_SHORT
+
+generates C<short>
+
+=back
+
+and so on.
+
+=head1 ARRAY
+
+An array is a special case of PTR, associated to a length. Internally, it is represented with the typedef C<genericStackItemTypeArray_t>:
+
+  typedef struct genericStackItemTypeArray {
+    void *p;
+    size_t lengthl;
+  } genericStackItemTypeArray_t;
+
+nevertheless, the convenient macros should be used:
+
+=over
+
+=item GENERICSTACKITEMTYPE2TYPE_ARRAY
+
+The array type.
+
+=item GENERICSTACK_ARRAY_PTR(a)
+
+Pointer associated to the array. Can be an l-value.
+
+=item GENERICSTACK_ARRAYP_PTR(a)
+
+Idem, except that C<a> is now a I<pointer> to the array structure.
+
+=item GENERICSTACK_ARRAY_LENGTH(a)
+
+Length associated to the array. Can be an l-value.
+
+=item GENERICSTACK_ARRAYP_LENGTH(a)
+
+Idem, except that C<a> is now a I<pointer> to the array structure.
+
+=back
+
+=head1 NOTES
+
+=over
+
+=item ARRAY and ARRAYP interfaces
+
+Whenever ARRAYP interface exist, it means its argument is a I<pointer> to the array internal structure. That is, for example:
+
+  *GENERICSTACK_GET_ARRAYP(stackName, indice)
+
+and
+
+  GENERICSTACK_GET_ARRAY(stackName, indice)
+
+will return the same information.
+
+There is no GENERICSTACK_POP_ARRAYP, because when popped, the structure describing an array leave only in user-space, no more within the generic stack.
+
+=item C99 datatypes
+
+C99 data types are all available if the C<GENERICSTACK_C99> macro is defined. Otherwise, partial support of C99 from the compiler support is handled like this:
+
+=item Usage
+
+This genericStack should fit ok for small up to medium size stacks, not I<huge> stacks because of its internal usage of an array instead of a linked list. The later implementation is not that hard, but left as an exercise to the reader.
+
+=item Memory management
+
+The default is:
+
+=over
+
+=item a PUSH always increases the stack size if necessary
+
+=item a POP  always decreases the stack size if possible
+
+=item a SET  always increases the stack size if necessary
+
+=item a GET  never changes stack size
+
+=back
+
+=item Constants driving the stack
+
+=over
+
+=item GENERICSTACK_DEFAULT_LENGTH
+
+Minimum number of items that are always available. If necessary the stack will use the heap for increase. Default value is 128.
+
+=item GENERICSTACK_ZERO_INT_IS_NOT_ZERO_BYTES
+
+You should set this only if your system is not using only zero bytes to describe the integer nummber 0. Not defined by default.
+
+=item GENERICSTACK_HAVE_LONG_LONG
+
+If this #define is a true value, then C<long long> is supported.
+
+=item GENERICSTACK_HAVE__BOOL
+
+If this #define is a true value, then C<_Bool> is supported.
+
+=item GENERICSTACK_HAVE__COMPLEX
+
+If this #define is a true value, then C<float _Complex>, C<double _Complex> and C<long double _Complex> are supported.
+
+=item GENERICSTACK_HAVE_CUSTOM
+
+If this #define is a true value, then C<GENERICSTACK_CUSTOM> custom type, that has to be defined prior to the include of C<genericStack.h>, is supported, 
+
+=item GENERICSTACK_CUSTOM
+
+If this #define is a true value, this must be a valid datatype, then C<GENERICSTACK_HAVE_CUSTOM> is automatically set to a true value. Example:
+
+  typedef struct myStruct {
+    short isstring;
+    union {
+      int   i;
+      char *s;
+    } u;
+  } myStruct_t;
+
+  #define GENERICSTACK_CUSTOM myStruct_t
+  #include <genericStack.h>
+
+The C<GENERICSTACK_GET_CUSTOMP> macro is in particulary very convenient if you want to work with the data directly in the stack.
+
+=back
+
+=item Sequence points
+
+This generic stack implementation supports indices that are I<expressions>. The side-effect is that it is recommended to not use more than one generic stack macro on the same stack in statements where the order of execution is undefined. Basically, this mean: use one generic stack macro at a time for a given stack.
+
+=back

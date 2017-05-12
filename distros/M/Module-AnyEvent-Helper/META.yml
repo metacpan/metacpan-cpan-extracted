@@ -1,0 +1,27 @@
+---
+abstract: 'Helper module to make other modules AnyEvent-friendly'
+author:
+  - 'Yasutaka ATARASHI <yakex@cpan.org>'
+build_requires:
+  Test::Exception: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-AnyEvent-Helper
+requires:
+  AnyEvent: 0
+  Filter::PPI::Transform: 0
+  Filter::Simple: 0
+  PPI: 0
+  PPI::Transform::Sequence: 0
+  Scalar::Util: 0
+  Try::Tiny: 0
+  filtered: v0.0.4
+  parent: 0
+  perl: 5.006
+version: v0.0.5

@@ -1,0 +1,20 @@
+TYPEMAP
+char *        O_CHAR
+MMDB_s *      T_OPAQUE
+
+INPUT
+
+# this is just here because a O_CHAR input is required to compile,
+# should be same as if O_CHAR wasn't defined
+O_CHAR
+        $var = ($type)SvPVbyte_nolen ($arg)
+
+OUTPUT
+
+# prevent memory leaks with malloc'ed returned char * strings
+O_CHAR
+    if($var != NULL) {
+        $arg = newSVpv($var, strlen($var));
+        free($var);
+        sv_2mortal($arg);
+   }

@@ -1,0 +1,83 @@
+ Count  Type        Name                  Value
+     1  tag         svg                   open
+     2  attribute   height                5.25cm
+     3  attribute   version               1.1
+     4  raw         viewBox               0 0 1200 400
+     5  integer     1                     0
+     6  integer     2                     0
+     7  float       3                     1200
+     8  float       4                     400
+     9  attribute   width                 12cm
+    10  attribute   xmlns                 http://www.w3.org/2000/svg
+    11  tag         title                 open
+    12  content     title                 Example arcs01 - arc commands in path data
+    13  tag         title                 close
+    14  tag         desc                  open
+    15  content     desc                  Picture of a pie chart with two pie wedges
+    16  tag         desc                  close
+    17  tag         rect                  open
+    18  attribute   fill                  none
+    19  attribute   height                398
+    20  attribute   stroke                blue
+    21  attribute   stroke-width          1
+    22  attribute   width                 1198
+    23  attribute   x                     1
+    24  attribute   y                     1
+    25  content     rect                  
+    26  tag         rect                  close
+    27  tag         path                  open
+    28  raw         d                     M300,200 h-150 a150,150 0 1,0 150,-150 z
+    29  command     M                     -
+    30  float       1                     300
+    31  float       2                     200
+    32  command     h                     -
+    33  float       1                     -150
+    34  command     a                     -
+    35  float       1                     150
+    36  float       2                     150
+    37  integer     3                     0
+    38  boolean     4                     1
+    39  boolean     5                     0
+    40  float       6                     150
+    41  float       7                     -150
+    42  command     z                     -
+    43  attribute   fill                  red
+    44  attribute   stroke                blue
+    45  attribute   stroke-width          5
+    46  content     path                  
+    47  tag         path                  close
+    48  tag         path                  open
+    49  raw         d                     M275,175 v-150 a150,150 0 0,0 -150,150 h 100 200 v 99 66 33 z
+    50  command     M                     -
+    51  float       1                     275
+    52  float       2                     175
+    53  command     v                     -
+    54  float       1                     -150
+    55  command     a                     -
+    56  float       1                     150
+    57  float       2                     150
+    58  integer     3                     0
+    59  boolean     4                     0
+    60  boolean     5                     0
+    61  float       6                     -150
+    62  float       7                     150
+    63  command     h                     -
+    64  float       1                     100
+    65  float       2                     200
+    66  command     v                     -
+    67  float       1                     99
+    68  float       2                     66
+    69  float       3                     33
+    70  command     z                     -
+    71  attribute   fill                  yellow
+    72  attribute   stroke                blue
+    73  attribute   stroke-width          5
+    74  content     path                  
+    75  tag         path                  close
+    76  content     svg                   
+  
+  
+  
+  
+  
+    77  tag         svg                   close

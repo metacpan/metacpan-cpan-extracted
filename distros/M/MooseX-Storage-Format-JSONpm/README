@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution MooseX-Storage-Format-JSONpm,
+version 0.093093:
+
+  a format role for MooseX::Storage using JSON.pm
+
+This software is copyright (c) 2013 by Ricardo SIGNES.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

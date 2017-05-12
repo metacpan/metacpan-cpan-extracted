@@ -1,0 +1,27 @@
+Revision history for Math-KullbackLeibler-Discrete
+
+0.07    2014-08-30
+        - Distribution based on Dist::Zilla.
+        - Added METACPAN metadata.
+
+0.06    2013-12-16
+        - Thanks to Jeremy Seideman for finding out a stupid bug.
+	  Copy and Paste is Evil!
+
+0.05    2013-03-12
+        - Different Perl implementations give different error messages.
+
+0.04    2013-03-11
+        - Fix prerequisites.
+
+0.03    2013-03-09
+        - Fix Changelog order (oops!)
+        - Make code faster
+
+0.02    2013-03-08
+        - Add epsilon option to set smoothing amount.
+
+0.01    2013-08-08
+        First version, released on an unsuspecting world.
+        - includes kl function is basic implementation.
+        - need further testing.

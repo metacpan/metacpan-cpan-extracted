@@ -1,0 +1,23 @@
+Revision history for Map::Tube::Cookbook
+
+0.08  Thu Apr 06 23:50:00 2017
+      - Updated copyright year information.
+
+0.07  Fri Mar 24 12:50:00 2017
+      - Tidied up test scripts and removed "-T" switch.
+
+0.05  Thu Mar 02 10:10:00 2017
+      - Updated pod with reference to Map::Tube v3.22.
+
+0.04  Sat Oct 08 10:25:00 2016
+      - Updated copyright year information.
+
+0.03  Mon Nov 16 10:50:00 2015
+      - Added key 'provides' to the Makefile.PL script.
+      - Added pre-requisite to the Makefile.PL script.
+
+0.02  Sat Oct 31 11:15:00 2015
+      - Fixed typo in the pod document.
+
+0.01  Sat Oct 31 11:00:00 2015
+      - Module Created.

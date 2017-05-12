@@ -1,0 +1,24 @@
+---
+abstract: 'The Mersenne Twister PRNG'
+author:
+  - 'Abhijit Menon-Sen'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Random-MT
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0'
+  Test::Number::Delta: '0'
+version: '1.17'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

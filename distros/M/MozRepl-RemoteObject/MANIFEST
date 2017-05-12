@@ -1,0 +1,47 @@
+.gitignore
+Changes
+lib/MozRepl/AnyEvent.pm
+lib/MozRepl/Plugin/JSON2.pm
+lib/MozRepl/RemoteObject.pm
+lib/MozRepl/RemoteObject/Methods.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/00-load.t
+t/01-appversion.t
+t/01-array.t
+t/01-backend-anyevent-timer.t
+t/01-backend-anyevent.t
+t/01-callback-overhead.t
+t/01-callback.t
+t/01-constant.t
+t/01-dive.t
+t/01-expr-anyevent.t
+t/01-expr.t
+t/01-hash.t
+t/01-invoke.t
+t/01-multiline-string.t
+t/01-object.t
+t/01-queue.t
+t/01-release-action.t
+t/02-multiple-instances.t
+t/02-repl.t
+t/02-synopsis.t
+t/03-unicode.t
+t/04-looong-input.t
+t/05-callback-parameter.t
+t/10-xul-hud.t
+t/10-xul-hud.xul
+t/11-memleak-callback.t
+t/11-memleak-constant.t
+t/11-memleak-declare.t
+t/11-memleak.t
+t/99-changes.t
+t/99-manifest.t
+t/99-pod.t
+t/99-todo.t
+t/99-unix-text.t
+t/99-versions.t
+t/sync-callbacks.html
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

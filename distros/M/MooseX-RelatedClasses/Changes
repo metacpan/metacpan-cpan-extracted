@@ -1,0 +1,45 @@
+Revision history for MooseX-RelatedClasses
+
+0.011     2017-04-03 20:39:14 CDT-0500
+	* Prevent our exported sugar from becoming role methods
+
+0.010     2015-04-10 17:07:11 PDT-0700
+	* no code changes, just squish an errant Smart::Comments in a test
+
+0.009     2014-05-14 00:51:43 PDT-0700
+	* add related_namespace() sugar
+	* fix some inaccurate code in SYNOPSIS
+
+0.008     2013-11-11 00:38:34 PST-0800
+	* allow the name/names parameter to related_class(es) to be omitted
+	  (github #1 -- Kulag)
+
+0.007     2013-08-22 19:35:05 PDT-0700
+	* bump MXAS requirement to ensure we're using the latest coercion syntax
+	* ensure we pass type names, not instances, now
+
+0.006     2013-07-12 00:04:42 CDT-0500
+	* document the related_class() and related_class() sugar helpers
+	* much doc/pod restructuring
+
+0.005     2013-05-09 16:38:09 PDT-0700
+	* add custom camelization feature -- tested, but not documented yet.
+
+0.004     2013-04-22 21:08:28 PDT-0700
+	* add constraint checking to ensure that our classes, as stored, are
+	  actually related to the original related class
+
+0.003     2013-04-19 22:38:58 PDT-0700
+	* add support for "private" related classes
+
+0.002     2012-11-03 23:29:48 PST8PDT
+	* add support for "blank" namespaces, that is, the ability to specify
+	  arbitrary classes as "related"
+	* add support for "all_in_namespace" option (that is, every package found
+	  under that namespace is set up with related class attributes).
+	* Add some initial documentation
+
+0.001     2012-10-29 11:28:54 PST8PDT
+	* initial release
+	* basic parameterized role is in place; this should remain stable even as
+	  we enhance. (That's the plan, at any rate)

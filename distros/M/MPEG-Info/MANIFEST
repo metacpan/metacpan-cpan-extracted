@@ -1,0 +1,12 @@
+Changes
+Info.pm
+MANIFEST
+Makefile.PL
+eg/random.m2v
+eg/meow.mp3
+eg/starstrp.mp2
+eg/t.mpg
+t/MPEG.t
+Info/Audio.pm
+Info/Video.pm
+Info/Constants.pm

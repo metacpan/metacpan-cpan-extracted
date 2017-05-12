@@ -1,0 +1,7 @@
+------
+ TODO
+------
+
+* Find a good API for the metaclasses.
+  - Specifically, a good way to traverse parameters.
+

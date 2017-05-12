@@ -1,0 +1,402 @@
+
+/* ---------------------------------------------- main sectors */
+
+html {
+    padding-right: 0px;
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    font-family: sans-serif;
+    padding: 0;
+    margin: 0;
+    background-color: <% $page_bg %>;
+}
+
+.content {
+    padding: 12px 30px;
+}
+
+
+/* ---------------------------------------------- links */
+
+a {
+    text-decoration: none;
+    color: <% $link %>;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: <% $link_hover %>;
+}
+
+#navcontainer a, #navcontainer a:hover {
+    color: <% $header_link %>;
+}
+
+h1 a, h1 a:hover, h2 a, h2 a:hover, h3 a, hs a:hover, h4 a, h4 a:hover {
+    color: <% $header_link %>;
+}
+
+th a, th a:hover {
+    color: <% $header_link %>;
+}
+
+/* ---------------------------------------------- headings */
+
+h1, h2, h3 {
+    width: 100%;
+    height: 18px;
+    margin-top: 10px;
+    border-bottom: 1px solid <% $underline %>;
+    text-align: left;
+    padding-bottom: 5px;
+}
+
+h1 { font-size: 1.2em }
+h2 { font-size: 1em }
+h3 { font-size: 0.9em }
+
+p.subheading {
+    font-size: 80%;
+    margin: 0;
+    margin-top: -8px;
+}
+
+
+/* ---------------------------------------------- tables */
+
+table {
+    background-color: <% $table_bg %>;
+    border: 1px solid <% $border_light %>;
+    margin-top: 5px;
+}
+
+th {
+    
+    border-bottom: 1px solid <% $border %>; 
+    font: bold 12px Verdana, sans-serif;
+    padding: 2px 4px;
+}
+
+td { 
+    font: 12px Verdana, sans-serif; 
+    background-color: <% $bg_light %>;
+}
+
+.FormListTable table, .NavListTable table {
+    width: 100%;
+}
+
+.FormListTable table td  {
+    text-align: center;
+}
+
+.ViewTable th {
+    text-align: right;
+    border-bottom: 0;
+}
+
+
+/* ---------------------------------------------- maypole thingy */
+
+.deco1 {
+    font-size: 0px;
+    z-index:1;
+    border:0px;
+    border-style:solid;
+    border-color:#4d6d99;
+    background-color:#4d6d99;
+}
+
+.deco2 {
+    z-index:2;
+    border:0px;
+    border-style:solid;
+    border-color:#627ea5;
+    background-color:#627ea5;
+}
+
+
+.deco3 {
+    z-index:3;
+    border:0px;
+    border-style:solid;
+    border-color:#7d95b5;
+    background-color:#7d95b5;
+}
+
+.deco4 {
+    z-index:4;
+    border:0px;
+    border-style:solid;
+    border-color:#d0d8e4;
+    background-color:#d0d8e4;
+}
+
+
+/* ---------------------------------------------- navbar */
+
+#navlist {
+    padding: 3px 0;
+    margin-left: 0;
+    margin-top:3em;
+    border-bottom: 1px solid <% $nav_border %>;
+    font: bold 12px Verdana, sans-serif;
+}
+
+#navlist li {
+    list-style: none;
+    margin: 0;
+    display: inline;
+}
+
+#navlist li a {
+    padding: 3px 0.5em;
+    margin-left: 3px;
+    border: 1px solid <% $nav_border %>;
+    border-bottom: none;
+    background: <% $nav_bg %>;
+    text-decoration: none;
+}
+
+#navlist li a:link { color: <% $nav_text %>; }
+
+#navlist li a:hover {
+    color: <% $nav_text_hover %>;
+    background: <% $nav_bg_hover %>;
+    border-top: 4px solid <% $nav_border_top_hover %>;
+    border-color: <% $nav_border_hover %>;
+}
+
+#navlist #active a {
+    background: <% $nav_active_bg %>;
+    border-bottom: 1px solid <% $nav_active_bg %>;
+    border-top: 4px solid;
+}
+
+
+/* ---------------------------------------------- view_related */
+
+#vlist {
+    padding: 0 1px 1px;
+    margin-left: 0;
+    font: bold 12px Verdana, sans-serif;
+    background: gray;
+    width: 13em;
+}
+
+#vlist li {
+    list-style: none;
+    margin: 0;
+    border-top: 1px solid gray;
+    text-align: left;
+}
+
+#vlist li a {
+    display: block;
+    padding: 0.25em 0.5em 0.25em 0.75em;
+    border-left: 1em solid #7d95b5;
+    background: #d0d8e4;
+    text-decoration: none;
+}
+
+#vlist li a:hover {
+    border-color: #227;
+}
+
+
+/* ---------------------------------------------- pager */
+
+.pager {
+    font: 11px Arial, Helvetica, sans-serif;
+    text-align: center;
+    border: solid 1px #e2e2e2;
+    border-left: 0;
+    border-right: 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin: 0px;
+    background-color: #f3f6f8;
+}
+
+.pager a {
+    padding: 2px 6px;
+    border: solid 1px #ddd;
+    background: #fff;
+    text-decoration: none;
+}
+
+.pager a:visited {
+    padding: 2px 6px;
+    border: solid 1px #ddd;
+    background: #fff;
+    text-decoration: none;
+}
+
+.pager .current-page {
+    padding: 2px 6px;
+    font-weight: bold;
+    vertical-align: top;
+}
+
+.pager a:hover {
+    color: #fff;
+    background: #7d95b5;
+    border-color: #036;
+    text-decoration: none;
+}
+
+
+/* ---------------------------------------------- fieldsets */
+
+fieldset {
+    margin-top: 1em;
+    padding: 1em;
+    background-color: <% $fset_bg %>;
+    font:80%/1 sans-serif;
+    border:1px solid <% $border_light %>;
+}
+
+legend {
+    padding: 0.2em 0.5em;
+    background-color: <% $legend_bg %>;
+    border:1px solid <% $border %>; /* #aaa; */
+    font-size: 90%;
+    text-align: right;
+}
+
+
+#addnew, #search {
+    width: 50%;
+    float: left;
+}
+
+.addto {
+    border: 1px solid <% $border %>;
+    padding: 1em;
+    margin-bottom: 1em;
+}
+
+.fleft {
+    float: left;
+    border: 1px solid <% $border %>;
+    padding: 1em;
+    margin-bottom: 1em;
+    margin-right: 0.5em;
+    width: 45%;
+}
+
+
+
+/* ---------------------------------------------- forms */
+
+form {
+    display: inline;
+}
+
+input {
+    border: 2px solid <% $border %>;
+    padding: 2px 4px;
+    font-family: sans-serif;
+    font-size: 12px;
+    color: <% $input_text %>;
+    background-color: <% $input_bg %>;
+    height: 16px;
+}
+
+input[type=text] {
+    width: 136px;
+}
+
+input[type=submit], input[type=reset] {
+    width: 60px;
+    background-color: <% $button_bg %>;
+    padding: 0 0 0 0;
+    margin-right: 4px;
+    border: 1px solid <% $border %>;
+}
+
+input:hover[type=submit], input:hover[type=reset] {
+    color: #fff;
+    background-color: <% $button_hover_bg %>;
+}
+
+input.ReadOnly, input.Disabled {
+    background-color: <% $greyed_out %>;
+}
+
+input.InvisibleDummy {
+    border: 0;
+    background-color: <% $bg_light %>;
+}
+
+
+textarea {
+    width: 200px;
+    font-family: sans-serif;
+    font-size: 12px;
+    color: <% $input_text %>;
+    padding: 2px 4px;
+    background-color: <% $input_bg %>;
+}
+
+select {
+    /*height: 16px;*/
+    width: 140px;
+    font-family: sans-serif;
+    font-size: 12px;
+    color: <% $input_text %>;
+    border: 2px solid <% $border %>;
+    padding: 0px;
+    background-color: <% $input_bg %>;
+}
+
+
+<%init>
+    $r->content_type( 'text/css' );
+    
+    my $underline       = '#ddf';  
+    my $border          = '#7d95b5';
+    my $border_light    = '#ddd';       # e.g. fieldset
+    
+    my $input_text      = '#2E415A';
+    my $input_bg        = '#ffe';
+    
+    my $greyed_out      = '#eee';
+    
+    my $header_link     = '#225';
+    
+    my $link            = 'blue'; # '#225';
+    my $link_hover      = 'blue'; # '#222';
+    
+    my $bg_light        = '#f3f6f8';   
+    my $bg_dark         = '#b5cadc';    # e.g. nav tabs
+    my $page_bg         = $bg_light;
+    my $table_bg        = 'white';
+    my $fset_bg         = 'white';
+    my $legend_bg       = $fset_bg;
+    my $button_bg       = 'white';
+    my $button_hover_bg = $border;
+    
+    my $nav_active_bg       = 'white';
+    my $nav_border          = '#778';
+    my $nav_text            = '#448';
+    my $nav_bg              = '#b5cadc';
+    my $nav_text_hover      = '#000';
+    my $nav_bg_hover        = '#eef';
+    my $nav_border_top_hover = '#7d95b5';
+    my $nav_border_hover    = '#227';
+    
+    # pager
+    
+    # vlist
+    
+    # deco
+
+</%init>
+
+<%flags>
+    inherit => undef
+</%flags>

@@ -1,0 +1,130 @@
+
+# PODNAME: Map::Metro::Plugin::Map::Budapest::Lines
+# ABSTRACT: Lines and stations in the Budapest map
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Map::Metro::Plugin::Map::Budapest::Lines - Lines and stations in the Budapest map
+
+=head1 VERSION
+
+Version 0.1001, released 2015-03-23.
+
+=head1 LINES
+
+=head2 Line 1: Mexikói út → Vörösmarty tér [M1]
+
+=for HTML <div style="background-color: #fff004; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Mexikói út
+    Széchenyi fürdő
+    Hősök tere
+    Bajza utca
+    Kodály körönd
+    Vörösmarty utca
+    Oktogon
+    Opera
+    Bajcsy-Zsilinszky út
+    Deák Ferenc tér       (M2, M3)
+    Vörösmarty tér
+
+=head2 Line 2: Déli pályaudvar → Örs vezér tere [M2]
+
+=for HTML <div style="background-color: #eb2128; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Déli pályaudvar
+    Széll Kálmán tér
+    Batthyány tér
+    Kossuth tér
+    Deák Ferenc tér        (M1, M3)
+    Astoria
+    Blaha Lujza tér
+    Keleti pályaudvar      (M4)
+    Puskás Ferenc Stadion
+    Pillangó utca
+    Örs vezér tere
+
+=head2 Line 3: Kőbánya-Kispest → Újpest-Központ [M3]
+
+=for HTML <div style="background-color: #31348f; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Kőbánya-Kispest
+    Határ út
+    Pöttyös utca
+    Ecseri út
+    Népliget
+    Nagyvárad tér
+    Klinikák
+    Corvin-negyed
+    Kálvin tér          (M4)
+    Ferenciek tere
+    Deák Ferenc tér     (M1, M2)
+    Arany János utca
+    Nyugati pályaudvar
+    Lehel tér
+    Dózsa György út
+    Árpád híd
+    Forgách utca
+    Gyöngyösi utca
+    Újpest-Városkapu
+    Újpest-Központ
+
+=head2 Line 4: Kelenföld vasútállomás → Keleti pályaudvar [M4]
+
+=for HTML <div style="background-color: #04a351; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Kelenföld vasútállomás
+    Bikás park
+    Újbuda-központ
+    Móricz Zsigmond körtér ent
+    Szent Gellért tér
+    Fővám tér
+    Kálvin tér                  (M3)
+    Rákóczi tér
+    II. János Pál pápa tér
+    Keleti pályaudvar           (M2)
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Map::Metro::Plugin::Map::Budapest>
+
+=item *
+
+L<Task::MapMetro::Maps>
+
+=item *
+
+L<Map::Metro>
+
+=back
+
+=head1 SOURCE
+
+L<https://github.com/Csson/p5-Map-Metro-Budapest>
+
+=head1 HOMEPAGE
+
+L<https://metacpan.org/release/Map-Metro-Plugin-Map-Budapest>
+
+=head1 AUTHOR
+
+Erik Carlsson <info@code301.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Erik Carlsson <info@code301.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,254 @@
+#!/usr/bin/perl
+
+package PerftestAWL;
+
+# ABSTRACT: preformance test for AWL PersistentAddrList implementations
+# VERSION
+
+=head1 Description
+
+The perftest-awl program is a tool for performance testing of AWL
+address list implementations.
+
+=head1 Command Usage
+
+  usage: perftest-awl [-?mnprs] [long options...]
+        -? --usage --help    Prints this usage information.
+        -m --module          name of the AddrList module to test
+        --module_prefix      prefix for the module
+        -p --processes       number of parallel processes to use
+        -n --num_entries     number of entries to add scores
+        -r --repeat          how often to repeat the test
+        -s --score           score added to each entry
+
+=head1 Example
+
+To test the RedisAddrList run:
+
+  $ ./perftest-awl -m RedisAddrList
+  initializing...
+  starting 5 workers...
+  updating scores... 10000x in 3.26s (3063.8/s)
+  updating scores... 10000x in 1.79s (5579.1/s)
+  updating scores... 10000x in 1.85s (5418.6/s)
+  updating scores... 10000x in 1.85s (5392.4/s)
+  updating scores... 10000x in 1.87s (5361.5/s)
+  updating scores... 10000x in 1.77s (5654.8/s)
+  updating scores... 10000x in 1.80s (5556.8/s)
+  updating scores... 10000x in 1.88s (5307.1/s)
+  updating scores... 10000x in 1.84s (5443.4/s)
+  updating scores... 10000x in 1.78s (5604.8/s)
+  cleaning up...
+
+If you want to test file based address list dont forget to
+change to the user owning the files:
+
+  $ su -
+  Password:
+  # su -s /bin/bash - amavis
+  $ ./perftest-awl -m DBBasedAddrList
+  initializing...
+  starting 5 workers...
+  updating scores... 10000x in 31.53s (317.2/s)
+  updating scores... 10000x in 0.77s (12982.2/s)
+  updating scores... 10000x in 0.77s (12972.6/s)
+  updating scores... 10000x in 0.78s (12875.8/s)
+  updating scores... 10000x in 0.78s (12828.5/s)
+  updating scores... 10000x in 0.83s (12021.1/s)
+  updating scores... 10000x in 0.82s (12241.0/s)
+  updating scores... 10000x in 0.80s (12507.5/s)
+  updating scores... 10000x in 0.79s (12604.5/s)
+  updating scores... 10000x in 0.78s (12871.1/s)
+  cleaning up...
+
+=cut
+
+use Moose;
+with 'MooseX::Getopt';
+
+use Time::HiRes qw( gettimeofday tv_interval );
+use Mail::SpamAssassin;
+
+use IPC::QWorker;
+use IPC::QWorker::WorkUnit;
+
+has 'module' => ( is => 'ro', isa => 'Str', required => 1,
+	documentation => 'name of the AddrList module to test',
+	traits => [ 'Getopt' ],
+	cmd_aliases => 'm',
+);
+has 'module_prefix' => (
+	is => 'ro', isa => 'Str', default => 'Mail::SpamAssassin::',
+	documentation => 'prefix for the module',
+	traits => [ 'Getopt' ],
+);
+
+has '_module_name' => ( is => 'ro', isa => 'Str', lazy => 1,
+	default => sub {
+		my $self = shift;
+		return( $self->module_prefix.$self->module );
+	}
+);
+
+has '_addrlist' => ( is => 'ro', isa => 'Mail::SpamAssassin::PersistentAddrList', lazy => 1,
+	default => sub {
+		my $self = shift;
+		my $code = "require ".$self->_module_name;
+		eval $code;
+		if( $@ ) {
+			die('could not load AWL AddrList module '.$@);
+		}
+		my $module = $self->_module_name;
+		my $list = "$module"->new;
+		return( $list );
+	},
+);
+
+has '_sa' => (
+	is => 'ro', lazy => 1,
+	default => sub {
+		my $self = shift;
+		my $sa = Mail::SpamAssassin->new;
+		$sa->init(1);
+		return $sa;
+	},
+);
+
+has 'processes' => (
+	is => 'ro', isa => 'Int', default => 5,
+	documentation => 'number of parallel processes to use',
+	cmd_aliases => 'p',
+	traits => [ 'Getopt' ],
+);
+
+has 'num_entries' => (
+	is => 'ro', isa => 'Int', default => 10000,
+	documentation => 'number of entries to add scores',
+	cmd_aliases => 'n',
+	traits => [ 'Getopt' ],
+);
+
+has 'repeat' => (
+	is => 'ro', isa => 'Int', default => 10,
+	documentation => 'how often to repeat the test',
+	cmd_aliases => 'r',
+	traits => [ 'Getopt' ],
+);
+
+has 'score' => (
+	is => 'ro', isa => 'Int', default => 1,
+	documentation => 'score added to each entry',
+	cmd_aliases => 's',
+	traits => [ 'Getopt' ],
+);
+
+has '_addr' => ( is => 'ro', isa => 'ArrayRef[Str]', lazy => 1,
+	default => sub {
+		my $self = shift;
+		my @e;
+		for( my $i = 0 ; $i < $self->num_entries ; $i++ ) {
+			push( @e, 'preftest-awl-'.$i)
+		}
+		return \@e;
+	},
+);
+
+has '_queue' => (
+	is => 'ro', isa => 'IPC::QWorker', lazy => 1,
+	default => sub {
+		my $self = shift;
+		my $q = IPC::QWorker->new;
+		print "starting ".$self->processes." workers...\n";
+		$q->create_workers( $self->processes,
+			_init => sub {
+				my $ctx = shift;
+				$ctx->{'checker'} = $self->_addrlist->new_checker($self->_sa);
+				return;
+			},
+			'add_score' => sub {
+				my $ctx = shift;
+				my $addr = shift;
+				my $entry = $ctx->{'checker'}->get_addr_entry( $addr );
+				$ctx->{'checker'}->add_score($entry, $self->score );
+				return;
+			},
+			'cleanup' => sub {
+				my $ctx = shift;
+				my $addr = shift;
+				my $entry = $ctx->{'checker'}->get_addr_entry( $addr );
+				$ctx->{'checker'}->remove_entry($entry);
+			},
+		);
+		return $q;
+	},
+);
+
+sub add_all_scores {
+	my $self = shift;
+	
+	foreach my $addr ( @{$self->_addr} ) {
+		$self->_queue->push_queue( IPC::QWorker::WorkUnit->new(
+			cmd => 'add_score',
+			params => $addr,
+		) );
+	}
+
+	my $start_add = [gettimeofday];
+	print "updating scores..";
+
+	$self->_queue->process_queue;
+	$self->_queue->flush_queue;
+
+	my $finished_add = [gettimeofday];
+	print ". ".$self->_interval_stats( $self->num_entries, $start_add, $finished_add)."\n";
+
+	return;
+}
+
+sub cleanup {
+	my $self = shift;
+	
+	foreach my $addr ( @{$self->_addr} ) {
+		$self->_queue->push_queue( IPC::QWorker::WorkUnit->new(
+			cmd => 'cleanup',
+			params => $addr,
+		) );
+	}
+	$self->_queue->process_queue;
+	$self->_queue->flush_queue;
+
+	return;
+}
+
+sub _interval_stats {
+	my ( $self, $count, $start, $end ) = @_;
+	my $elapsed = tv_interval( $start, $end );
+	my $per_sec = $count / $elapsed;
+	return sprintf("%ix in %.2fs (%.1f/s)",
+		$count, $elapsed, $per_sec );
+}
+
+sub run {
+	my $self = shift;
+	$| = 1;
+	print "initializing...\n";
+	$self->_queue;
+	$self->_addr;
+
+	for( my $i = 0 ; $i < $self->repeat ; $i++ ) {
+		$self->add_all_scores;
+	}
+
+	print "cleaning up...\n";
+	$self->cleanup;
+
+	$self->_queue->stop_workers;
+
+	return;
+}
+
+package main;
+
+my $pt = PerftestAWL->new_with_options;
+$pt->run;
+

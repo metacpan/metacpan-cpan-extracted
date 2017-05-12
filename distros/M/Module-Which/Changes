@@ -1,0 +1,121 @@
+Revision history for Perl module Module::Which
+
+0.05 2015-11-10 NEILB
+    - Updated github repo URL after changing my github username
+    - Added [MetaJSON] to dist.ini so META.json is included in releases
+
+0.04 2014-06-26 NEILB
+    - bin/which_pm didn't have a $VERSION, which was causing a warning.
+      It now uses the $VERSION from Module::Which. Thanks to FERREIRA :-)
+
+0.03 2014-06-24 NEILB
+    - Fixed the SYNOPSIS to show working code, and the two types of result
+      data you can get from which(). RT#16332
+    - Clarify in the doc that the return data includes the path to the module.
+    - Added github repo to doc.
+    - Switched to Dist::Zilla
+    - Reformatted this file as per CPAN::Changes::Spec
+    - Removed Module::Downgrade, as only aiming to support 5.6+
+
+0.0207 2008-03-05 FERREIRA
+    - mention Module::Finder in SEE ALSO
+    - recommends Term::Size::Any instead of Term::Size
+    - hacked up support for "which_pm perl"
+    - TODO: document that "which_pm perl" works
+
+0.0206 2007-11-20 FERREIRA
+    - no code change
+    - fixed packaging issues
+
+0.0205 2006-05-21 FERREIRA
+    - BUG FIX: in CPAN RT #16332, Jeff Tanner 
+      noticed that the synopsis code didn't work. 
+      Indeed, &which was using "return => 'ARRAY'" 
+      as default instead of "return => 'HASH'"
+
+0.0204 2006-05-21 FERREIRA
+    - Term::Size is recommended
+    - when determining terminal size, non-tty STDOUT
+      prevents truncation
+    - if possible, terminal width is retrieved with
+      the help of Term::Size
+
+0.02_03 2005-12-27 FERREIRA
+    - new switch -I for specifying the library paths
+    - correspoding changes to Module::Which
+    - new switch -w for specifying terminal width
+
+0.02_02 2005-12-08 FERREIRA
+    - module versions are obtained via MM->parse_file
+      after using EE::MM
+
+0.02_01 2005-10-28 FERREIRA
+    - now which_pm uses String::Truncate when file paths
+      are too long (instead of simple truncate)
+    - documented bug about wrong versions when multiple
+      instances are found in library path
+
+0.02 2005-10-10 FERREIRA
+    - just the same as 0.01_05
+    - it's a shame: the only purpose of this
+      release it to raise my kwalitee to 16.0
+      as development versions aren't counted
+
+0.01_05 2005-07-27 FERREIRA
+    - added a "--p5p" option to which_pm so that Config-related
+      paths can be shown
+    - wrote tests for the previously introduced modules
+    - wrote Module::Which::P5Path to make Config-related
+      translations: like "/usr/lib/perl5/Module/Which.pm" to
+      '${sitelib}/Module/Which.pm'
+
+0.01_04 2005-06-22 FERREIRA
+    - file path was include in the information about
+      a Perl module 'which_pm' gives
+    - replaced "t/Module-Which.t" with "t/001basic.t"
+      which uses the mock modules under "t/tlib" to test
+    - the bug of not being able to find multiple installed
+      versions of a module with an exact pattern like 'YAML'
+      is gone with the use of Module::Which::List
+    - subcategories are now written DBD:: instead of DBD::*
+    - replaced Module::Find dependency by a new module
+      Module::Which::List which allows me to recover
+      the module path
+    - option --version reports a sensible program name with
+      "basename($0)"
+    - added --version option to which_pm with corresponding docs 
+
+0.01_03 2005-06-21 FERREIRA
+    - improved a bit the output of 'which_pm' by finding
+      out the maximum length of a module name before printing
+    - temporarily, "META.yml" will not be automatically
+      updated by MakeMaker (so that the correct license is set)
+    - "bin/which_pm.PL" renamed to "bin/which_pm"
+    - added "t/003pod.t" to test POD for errors 
+      (when Test::Pod 1.00 is there)
+    - completed documentation of Data::Hash::Transform
+      which was truncated and buggy
+
+0.01_02 2005-06-16 FERREIRA
+    - options '--verbose' and '--quiet' supported by now
+    - use of Getopt::Long and Pod::Usage in which_pm.pl
+    - bug in Module::Which documented
+    - test script for Data::Hash::Transform: "t/002hash.t"
+    - code for converting from an array of hashes to hash of hashes
+      moved to Data::Hash::Transform
+
+0.01_01 2005-06-15 FERREIRA
+    - experimental code to downgrade the source
+      code to 5.005
+    - which_pm is not verbose by default anymore:
+      set environment variable WHICH_PM_VERBOSE 
+    - options to customize which() behavior:
+      'return' and 'verbose'
+    - which() now returns an array ref by default
+      and optionally a hash ref
+    - added reference to existing CPAN modules 
+
+0.01 2005-06-14 FERREIRA
+    - first release to CPAN
+    - created by h2xs 1.23 with options -AX -n Module::Which
+

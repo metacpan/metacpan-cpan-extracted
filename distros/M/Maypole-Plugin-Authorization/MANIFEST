@@ -1,0 +1,20 @@
+Changes
+ex/beer_d_b.sql
+ex/BeerDB.pm
+lib/Maypole/Plugin/Authorization.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/01-basic-standalone-tests.t
+t/02-basic-tests-with-maypole.t
+t/03-config.t
+t/beerdb.db
+t/BeerDB.pm
+t/beerdb.sql
+t/templates/custom/classes
+t/templates/custom/frontpage
+t/templates/custom/list
+t/templates/custom/methods
+t/templates/custom/no_permission
+t/templates/custom/view

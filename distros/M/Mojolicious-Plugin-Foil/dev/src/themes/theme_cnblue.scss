@@ -1,0 +1,53 @@
+/* ================================================================== */
+/* THEME: Corner-blue
+ */
+@import 'functions';
+@import 'fonts_cnblue';
+@import 'icon_dark_on_light';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: #c6d9ef;
+$verge-fg: set-fg($verge-bg);
+$verge-border: navy;
+$main-bg: #bacaec;
+$main-fg: set-fg($main-bg);
+$button-bg: #9999ff;
+$button-fg: set-fg($button-bg);
+$button-border: navy;
+$link-fg: set-link($main-bg);
+$link-visited: set-visited($main-bg);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+}
+header,
+footer,
+.side {
+	@extend .verge;
+	background: $verge-bg url(cnblue_h.jpg) fixed no-repeat;
+}
+
+body {
+	color: $main-fg;
+	background: $main-bg url(cnblue_main.jpg) fixed no-repeat;
+}
+
+@include some-links($link-fg, $link-visited);
+@include fancy($verge-fg, $verge-bg, "cloud_main.jpg");
+@include make-buttons;
+
+header nav li {
+	border-color: #555588;
+}
+header nav .selflink,
+header nav em,
+header nav .current a {
+	color: navy;
+}
+

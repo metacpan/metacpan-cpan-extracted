@@ -1,0 +1,26 @@
+Math::Business::BlackScholes - Black-Scholes option price model functions
+
+Copyright (c) 2002-2008 Anders Johnson. All rights reserved. This program is
+free software; you can redistribute it and/or modify it under the same terms
+as Perl itself. The author categorically disclaims any liability for this
+software.
+
+Requires the Math::CDF module.
+
+This is a standard perl module. To install:
+
+  % perl -MCPAN -e 'install Math::CDF'
+  % perl Makefile.PL  # optionally "perl Makefile.PL PREFIX=/...", etc.
+  % make
+  % make test
+  % make install
+
+Version	Date		Notes
+-------	----		-----
+0.01	2/2/2002	First Release (as Math::Business::BlackSch)
+0.02	8/9/2002	Renamed to Math::Business::BlackScholes
+0.03	10/29/2002	Added historical_volatility() and implied_volatility*()
+0.04	5/15/2003	_implied_volatility() convergence fixes
+0.05	5/30/2003	Even more convergence fixes
+0.06	1/27/2004	Deal with undefined $d1 values
+1.01	12/29/2008	Add support for discrete dividends

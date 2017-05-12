@@ -1,0 +1,53 @@
+{
+   "abstract" : "Simple DOM parser for Makefiles",
+   "author" : [
+      "Yichun \"agentzh\" Zhang (章亦春) <agentzh@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.131490",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Makefile-DOM",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Clone" : "0.18",
+            "Filter::Util::Call" : "0",
+            "List::MoreUtils" : "0.21",
+            "Params::Util" : "0.22",
+            "perl" : "5.006001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/agentzh/makefile-dom-pm"
+      }
+   },
+   "version" : "0.008"
+}

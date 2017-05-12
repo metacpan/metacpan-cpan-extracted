@@ -1,0 +1,312 @@
+From london.pm-admin@london.pm.org Sat Mar  1 13:51:44 2003
+Return-Path: <london.pm-admin@london.pm.org>
+Received: from pop3.demon.co.uk
+	by localhost with POP3 (fetchmail-6.2.1)
+	for richardc@localhost (single-drop); Sat, 01 Mar 2003 13:51:44 +0000 (GMT)
+Received: from punt-2.mail.demon.net by mailstore for richardc@mirth.demon.co.uk
+          id 1046477935:20:04275:7; Sat, 01 Mar 2003 00:18:55 GMT
+Received: from penderel.state51.co.uk ([193.82.57.128]) by punt-2.mail.demon.net
+           id aa2002979; 1 Mar 2003 0:18 GMT
+Received: from localhost ([127.0.0.1] helo=penderel.state51.co.uk)
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 18oudn-000563-00; Sat, 01 Mar 2003 00:14:11 +0000
+Received: from theproject.fierypit.org ([217.10.129.148])
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 18oucw-00055d-00
+	for <london.pm@london.pm.org>; Sat, 01 Mar 2003 00:13:18 +0000
+Received: from bob (helo=localhost)
+	by theproject.fierypit.org with local-esmtp (Exim 3.36 #1)
+	id 18ougI-0007Qc-00
+	for london.pm@london.pm.org; Sat, 01 Mar 2003 00:16:46 +0000
+From: Bob Walker <bob@randomness.org.uk>
+X-X-Sender: bob@theproject.fierypit.org
+To: london.pm@london.pm.org
+Subject: Re: spamassassin
+In-Reply-To: <200302282323.h1SNN4o15987@rszemeti.demon.co.uk>
+Message-ID: <Pine.GSO.4.50.0303010015230.21567-100000@theproject.fierypit.org>
+References: <20030228174141.GA12360@plough.barnyard.co.uk>
+ <20030228202957.GA12579@plough.barnyard.co.uk>
+ <Pine.GSO.4.50.0302282233040.21567-100000@theproject.fierypit.org>
+ <200302282323.h1SNN4o15987@rszemeti.demon.co.uk>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Sender: london.pm-admin@london.pm.org
+Errors-To: london.pm-admin@london.pm.org
+X-BeenThere: london.pm@london.pm.org
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+Reply-To: london.pm@london.pm.org
+List-Help: <mailto:london.pm-request@london.pm.org?subject=help>
+List-Post: <mailto:london.pm@london.pm.org>
+List-Subscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=subscribe>
+List-Id: London.pm Perl M[ou]ngers <london.pm.london.pm.org>
+List-Unsubscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=unsubscribe>
+List-Archive: <http://london.pm.org/pipermail/london.pm/>
+X-Original-Date: Sat, 1 Mar 2003 00:16:46 +0000 (GMT)
+Date: Sat, 1 Mar 2003 00:16:46 +0000 (GMT)
+Status: RO
+Content-Length: 1208
+
+On Fri, 28 Feb 2003, Robin Szemeti wrote:
+
+> On Friday 28 February 2003 22:34, Bob Walker wrote:
+> > On Fri, 28 Feb 2003, David Cantrell wrote:
+> > > I'd forgotten about running stuff out of inittab though - I don't often
+> > > go delving in there.  It's a bit of a nasty hack though.
+>
+> I saved forgetting abut innittab by not knowing about it in the first place :)
+>
+> > you could always do it with DJB's deamontools. which checks to make sure
+> > things are runnign and if not starts them.
+>
+> ooh .. wild guess .. (ive not seen that particular peice of DJB crackware) ..
+> mmm it will need a /daemontools directory (as in a new directory in / ) the
+> config files are in /var, the binaries too. the there will be some lock
+> files, they could be anywhere .. there will be no man pages (except on the
+> net, that way they are never out of date, but may not match your software) ...
+>
+> am I close?
+
+yep. som eo fhis tuff is quite nice though. and yes he does have slight
+quirks. Im led to belive he doesnt comment his code either.
+
+>
+>
+
+-- 
+Bob Walker
+http://www.randomness.org.uk/
+Help! Mutated Tigers from the Antartic are invading Outer Mongolia.
+Send the Mashed Bunnies of Perpignan to defeat them.
+
+
+From london.pm-admin@london.pm.org Sat Mar  1 13:51:46 2003
+Return-Path: <london.pm-admin@london.pm.org>
+Received: from pop3.demon.co.uk
+	by localhost with POP3 (fetchmail-6.2.1)
+	for richardc@localhost (single-drop); Sat, 01 Mar 2003 13:51:46 +0000 (GMT)
+Received: from punt-2.mail.demon.net by mailstore for richardc@mirth.demon.co.uk
+          id 1046483429:20:10963:20; Sat, 01 Mar 2003 01:50:29 GMT
+Received: from penderel.state51.co.uk ([193.82.57.128]) by punt-2.mail.demon.net
+           id aa2010747; 1 Mar 2003 1:50 GMT
+Received: from localhost ([127.0.0.1] helo=penderel.state51.co.uk)
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 18ow0A-0005iA-00; Sat, 01 Mar 2003 01:41:22 +0000
+Received: from anchor-post-35.mail.demon.net ([194.217.242.85])
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 18ovzM-0005hi-00
+	for <london.pm@london.pm.org>; Sat, 01 Mar 2003 01:40:32 +0000
+Received: from rszemeti.demon.co.uk ([158.152.98.107])
+	by anchor-post-35.mail.demon.net with esmtp (Exim 3.36 #2)
+	id 18ow2i-0003A2-0Z
+	for london.pm@london.pm.org; Sat, 01 Mar 2003 01:44:00 +0000
+Received: from localhost (localhost [[UNIX: localhost]])
+	by rszemeti.demon.co.uk (8.11.6/8.11.2) id h211hvD16626
+	for london.pm@london.pm.org; Sat, 1 Mar 2003 01:43:57 GMT
+Message-Id: <200303010143.h211hvD16626@rszemeti.demon.co.uk>
+Content-Type: text/plain;
+  charset="iso-8859-1"
+From: Robin Szemeti <robin@rszemeti.demon.co.uk>
+Organization: home
+To: london.pm@london.pm.org
+Subject: Re: spamassassin
+X-Mailer: KMail [version 1.3.1]
+References: <20030228174141.GA12360@plough.barnyard.co.uk> <200302282323.h1SNN4o15987@rszemeti.demon.co.uk> <Pine.GSO.4.50.0303010015230.21567-100000@theproject.fierypit.org>
+In-Reply-To: <Pine.GSO.4.50.0303010015230.21567-100000@theproject.fierypit.org>
+X-No-Archive: No
+X-Mail-Archiver: Aardvark Platinum V2.03 ( with XML parse tree options )
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Sender: london.pm-admin@london.pm.org
+Errors-To: london.pm-admin@london.pm.org
+X-BeenThere: london.pm@london.pm.org
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+Reply-To: london.pm@london.pm.org
+X-Reply-To: robin@redpoint.org.uk
+List-Help: <mailto:london.pm-request@london.pm.org?subject=help>
+List-Post: <mailto:london.pm@london.pm.org>
+List-Subscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=subscribe>
+List-Id: London.pm Perl M[ou]ngers <london.pm.london.pm.org>
+List-Unsubscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=unsubscribe>
+List-Archive: <http://london.pm.org/pipermail/london.pm/>
+X-Original-Date: Sat, 1 Mar 2003 01:43:56 +0000
+Date: Sat, 1 Mar 2003 01:43:56 +0000
+Status: RO
+Content-Length: 478
+
+On Saturday 01 March 2003 00:16, Bob Walker wrote:
+> On Fri, 28 Feb 2003, Robin Szemeti wrote:
+> > am I close?
+>
+> yep. som eo fhis tuff is quite nice though. and yes he does have slight
+> quirks. Im led to belive he doesnt comment his code either.
+
+oh for sure .. qmail works well etc etc ... the only things I find odd are 
+his layout .. new dirs in / whenever he feels like it ... binaries in /var 
+etc .. weirdass stuff .. but yes .. it *does* work well
+
+-- 
+Robin Szemeti
+
+
+From london.pm-admin@london.pm.org Sat Mar  1 13:51:43 2003
+Return-Path: <london.pm-admin@london.pm.org>
+Received: from pop3.demon.co.uk
+	by localhost with POP3 (fetchmail-6.2.1)
+	for richardc@localhost (single-drop); Sat, 01 Mar 2003 13:51:43 +0000 (GMT)
+Received: from punt-1.mail.demon.net by mailstore for richardc@mirth.demon.co.uk
+          id 1046514550:10:05020:11; Sat, 01 Mar 2003 10:29:10 GMT
+Received: from penderel.state51.co.uk ([193.82.57.128]) by punt-1.mail.demon.net
+           id aa1004775; 1 Mar 2003 10:28 GMT
+Received: from localhost ([127.0.0.1] helo=penderel.state51.co.uk)
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 18p4B5-0000g6-00; Sat, 01 Mar 2003 10:25:11 +0000
+Received: from colon.colondot.net ([193.201.200.70] ident=mailnull)
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 18p4AG-0000fa-00
+	for <london.pm@london.pm.org>; Sat, 01 Mar 2003 10:24:20 +0000
+Received: from mbm by colon.colondot.net with local (Exim 4.10)
+	id 18p4Dc-000HiF-00
+	for london.pm@london.pm.org; Sat, 01 Mar 2003 10:27:48 +0000
+From: Lusercop <`the.lusercop'@lusercop.net>
+To: london.pm@london.pm.org
+Subject: Re: spamassassin
+Message-ID: <20030301102748.GC67225@colon.colondot.net>
+References: <20030228174141.GA12360@plough.barnyard.co.uk> <20030228202957.GA12579@plough.barnyard.co.uk> <Pine.GSO.4.50.0302282233040.21567-100000@theproject.fierypit.org> <200302282323.h1SNN4o15987@rszemeti.demon.co.uk> <Pine.GSO.4.50.0303010015230.21567-100000@theproject.fierypit.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Pine.GSO.4.50.0303010015230.21567-100000@theproject.fierypit.org>
+User-Agent: Mutt/1.4i
+Organization: Lusercop
+Mail-Copies-To: never
+Sender: london.pm-admin@london.pm.org
+Errors-To: london.pm-admin@london.pm.org
+X-BeenThere: london.pm@london.pm.org
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+Reply-To: london.pm@london.pm.org
+List-Help: <mailto:london.pm-request@london.pm.org?subject=help>
+List-Post: <mailto:london.pm@london.pm.org>
+List-Subscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=subscribe>
+List-Id: London.pm Perl M[ou]ngers <london.pm.london.pm.org>
+List-Unsubscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=unsubscribe>
+List-Archive: <http://london.pm.org/pipermail/london.pm/>
+X-Original-Date: Sat, 1 Mar 2003 10:27:48 +0000
+Date: Sat, 1 Mar 2003 10:27:48 +0000
+Status: RO
+Content-Length: 3117
+
+On Sat, Mar 01, 2003 at 12:16:46AM +0000, Bob Walker wrote:
+> yep. som eo fhis tuff is quite nice though. and yes he does have slight
+> quirks. Im led to belive he doesnt comment his code either.
+
+(qmail-1.03/datetime.c)
+| void datetime_tai(dt,t)
+| struct datetime *dt;
+| datetime_sec t;
+| {
+|   int day;
+|   int tod;
+|   int year;
+|   int yday;
+|   int wday;
+|   int mon;
+|  
+|   tod = t % 86400;
+|   day = t / 86400;
+|   if (tod < 0) { tod += 86400; --day; }
+|  
+|   dt->hour = tod / 3600;
+|   tod %= 3600;
+|   dt->min = tod / 60;
+|   dt->sec = tod % 60;
+|  
+|   wday = (day + 4) % 7; if (wday < 0) wday += 7;
+|   dt->wday = wday;
+|  
+|   day -= 11017;
+|   /* day 0 is march 1, 2000 */
+
+First comment
+
+|   year = 5 + day / 146097;
+|   day = day % 146097; if (day < 0) { day += 146097; --year; }
+|   /* from now on, day is nonnegative */
+
+Second comment
+
+|   year *= 4;
+|   if (day == 146096) { year += 3; day = 36524; }
+|   else { year += day / 36524; day %= 36524; }
+|   year *= 25;
+|   year += day / 1461;
+|   day %= 1461;
+|   year *= 4;
+|   yday = (day < 306);
+|   if (day == 1460) { year += 3; day = 365; }
+|   else { year += day / 365; day %= 365; }
+|   yday += day;
+|  
+|   day *= 10;
+|   mon = (day + 5) / 306;
+|   day = day + 5 - 306 * mon;
+|   day /= 10;
+|   if (mon >= 10) { yday -= 306; ++year; mon -= 10; }
+|   else { yday += 59; mon += 2; }
+|  
+|   dt->yday = yday;
+|   dt->year = year - 1900;
+|   dt->mon = mon;
+|   dt->mday = day + 1;
+| }
+
+So 2 comments and at least 12 unique unobvious undocumented constants.
+
+(qmail-1.03/qmail-send.c) has lots of:
+| /* this file is too long ----------------------------------------- xxxxx */
+
+which is really helpful. But of course, the main code is self-documenting:
+| void fnmake_info(id) unsigned long id; { fn.len = fmtqfn(fn.s,"info/",id,1); }
+| void fnmake_todo(id) unsigned long id; { fn.len = fmtqfn(fn.s,"todo/",id,0); }
+| void fnmake_mess(id) unsigned long id; { fn.len = fmtqfn(fn.s,"mess/",id,1); }
+| void fnmake_foop(id) unsigned long id; { fn.len = fmtqfn(fn.s,"foop/",id,0); }
+
+and then we see:
+| /* 1 if by land, 2 if by sea, 0 if out of memory. not allowed to barf. */
+| /* may trash recip. must set up rwline, between a T and a \0. */
+| int rewrite(recip)
+| char *recip;
+
+In (qmail-1.03/qmail-qmtpd.c):
+|       while (len > 0) { /* XXX: could speed this up, obviously */
+|         substdio_get(&ssin,&ch,1);
+|         --len;
+|         qmail_put(&qq,&ch,1);
+|       }
+
+Obviously? With his random functions it's not obvious at all.
+
+That's enough of the *worst* things I've found. Most of it is completely
+uncommented, and the source is scattered in loads of little files with a
+single function in them. There are man pages though.
+
+I'd also like to bring your attention to a quote by Tony Finch:
+| <fanf2> what kind of dickwit writes install scripts in C?
+| <fanf2> oh djb *sigh*
+
+Unfortunately I can't find all the "/* I hate NFS */" comments, and I
+suspect they might be in ezmlm rather than qmail. Rest assured that I
+like the code for ezmlm just as much as I like the code for qmail.
+
+-- 
+Lusercop.net - LARTing Lusers everywhere since 2002
+
+

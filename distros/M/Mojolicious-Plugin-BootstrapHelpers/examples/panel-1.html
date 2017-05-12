@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Examples</title>
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    </head>
+
+    <body>
+        <div class="container">
+            
+
+<p>The class is set to <code>.panel-default</code>, by default:</p>
+<pre>%= panel</pre>
+<pre>&lt;div class=&quot;panel panel-default&quot;&gt;
+    &lt;div class=&quot;panel-body&quot;&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="panel panel-default">        <div class="panel-body">        </div>    </div></div>
+<hr />
+<p>If you want a panel without title, set the title to <code>undef</code>:</p>
+<pre>%= panel undef ,=&gt; begin
+    &lt;p&gt;A short text.&lt;/p&gt;
+%  end</pre>
+<pre>&lt;div class=&quot;panel panel-default&quot;&gt;
+    &lt;div class=&quot;panel-body&quot;&gt;
+        &lt;p&gt;A short text.&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="panel panel-default">        <div class="panel-body">            <p>A short text.</p>        </div>    </div></div>
+<hr />
+<pre>&lt;%= panel &#39;The Header&#39;, -header =&gt; [
+                        buttongroup =&gt; [buttons =&gt; [
+                            [&#39;Click me&#39;, [&#39;#&#39;], data =&gt; { holder =&gt; &#39;claw&#39;}],
+                            [&#39;Tap-tap&#39;, [&#39;#&#39;], caret, items =&gt; [
+                                [&#39;Me too&#39;, [&#39;#&#39;]]
+                            ]],
+                        ]]] =&gt; begin %&gt;
+    &lt;p&gt;A short text.&lt;/p&gt;
+%  end</pre>
+<pre>&lt;div class=&quot;panel panel-default&quot;&gt;
+    &lt;div class=&quot;panel-heading&quot;&gt;
+        &lt;h3 class=&quot;panel-title&quot;&gt;
+            &lt;div class=&quot;btn-group pull-right&quot;&gt;
+                &lt;a class=&quot;btn btn-default&quot; data-holder=&quot;claw&quot; href=&quot;#&quot;&gt;Click me&lt;/a&gt;
+                &lt;div class=&quot;btn-group&quot;&gt;
+                    &lt;a type=&quot;button&quot; href=&quot;#&quot; data-toggle=&quot;dropdown&quot; class=&quot;btn btn-default dropdown-toggle&quot;&gt;Tap-tap &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;&lt;/a&gt;
+                    &lt;ul class=&quot;dropdown-menu&quot;&gt;
+                        &lt;li&gt;&lt;a tabindex=&quot;-1&quot; href=&quot;#&quot; class=&quot;menuitem&quot;&gt;Me too&lt;/a&gt;&lt;/li&gt;
+                    &lt;/ul&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;The Header&lt;/h3&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;panel-body&quot;&gt;
+        &lt;p&gt;A short text.&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="panel panel-default">        <div class="panel-heading">            <h3 class="panel-title">                <div class="btn-group pull-right">                    <a class="btn btn-default" data-holder="claw" href="#">Click me</a>                    <div class="btn-group">                        <a type="button" href="#" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Tap-tap <span class="caret"></span></a>                        <ul class="dropdown-menu">                            <li><a tabindex="-1" href="#" class="menuitem">Me too</a></li>                        </ul>                    </div>                </div>The Header</h3>        </div>        <div class="panel-body">            <p>A short text.</p>        </div>    </div></div>
+<hr />
+<p>A <code>success</code> panel with a header:</p>
+<pre>%= panel &#39;Panel 5&#39;, success, begin
+    &lt;p&gt;A short text.&lt;/p&gt;
+%  end</pre>
+<pre>&lt;div class=&quot;panel panel-success&quot;&gt;
+    &lt;div class=&quot;panel-heading&quot;&gt;
+        &lt;h3 class=&quot;panel-title&quot;&gt;Panel 5&lt;/h3&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;panel-body&quot;&gt;
+        &lt;p&gt;A short text.&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="panel panel-success">        <div class="panel-heading">            <h3 class="panel-title">Panel 5</h3>        </div>        <div class="panel-body">            <p>A short text.</p>        </div>    </div></div>
+        </div>
+        <pre style="background-color: #fff; border-width: 0px;">
+
+
+
+        </pre>
+    </body>
+</html>

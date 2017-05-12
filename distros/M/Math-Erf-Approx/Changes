@@ -1,0 +1,14 @@
+Math-Erf-Approx
+===============
+
+Created:      2012-05-31
+Home page:    <https://metacpan.org/release/Math-Erf-Approx>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Math-Erf-Approx>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.002	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.001	2012-05-31	Initial release

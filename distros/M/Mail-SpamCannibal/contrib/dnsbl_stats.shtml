@@ -1,0 +1,87 @@
+<html>
+<title>Spam Statistics - DNSBL Hits</title>
+</head>
+<body bgcolor="#ffffcc">
+<table cellpadding=5 border=2><tr align=center>
+<td><a href="http://www.spamcannibal.org/spam_report.cgi">East MX STATS</a></td>
+<td><a href="http://west.spamcannibal.org/spam_report.cgi">West MX STATS</a></td></tr>
+
+<tr align=center><td colspan=2>Spam Statistics - DNSBL Hits - <i><a
+href="#explanation">explanation</a></i></td></tr>
+
+<tr valign=top><td><pre>
+&nbsp;&nbsp;SpamCannibal additions
+<!--#include file="blcheck_stats.txt" -->
+</pre></td>
+
+<td><pre>
+&nbsp;&nbsp;SpamCannibal additions
+<!--#include file="ns3_blcheck_stats.txt" -->
+</pre></td></tr>
+
+<tr valign=top><td><pre>
+&nbsp;&nbsp;MTA rejects (Net::DNSBL::MultiDaemon)
+<!--#include file="mdstats.txt" -->
+</pre></td>
+
+<td><pre>
+&nbsp;&nbsp;MTA rejects (Net::DNSBL::MultiDaemon)
+<!--#include file="ns3_mdstats.txt" -->
+</pre></td></tr>
+
+<tr valign=top><td><pre>
+&nbsp;&nbsp;Passed msg disposition (mimedefang)
+<!--#include file="sc_mdf_stats.txt" -->
+</pre></td>
+
+<td><pre>
+&nbsp;&nbsp;Passed msg disposition (mimedefang)
+<!--#include file="ns3_sc_mdf_stats.txt" -->
+</pre></td></tr>
+
+</table>
+<p>
+<a name="explanation"></a>
+<font size=+1><B>Spam Statistics Explained</b></font>
+<p>
+<b>SpamCannibal additions</b> - are the count of IP addresses that have been
+registered by the SpamCannibal daemon the FIRST TIME they are seen as they
+reach the application layer (mail daemon) and subsequently entered into the tarpit
+by the cron job that generates these counts (SC additions). Multiple
+connections from the same IP address are not counted.
+WhiteList and Passed counts are for each message that is transported to the 
+application level (mail daemon) on a repeating basis. Counts
+shown for various DNSBL, BlackList, and CountryCode entries represent only
+the first contact from a single IP address. Once an IP is entered into the
+tarpit, it is not possible for it to reach the application level and be
+counted since the connection to that host is blocked at the IP socket
+transport level.
+<p>
+<b>MTA rejects</b> - are similar to above except that it is possible for some
+rejected IP addresses to be counted multiple times between the time of first
+contact and the time the cron job runs the script for SpamCannibal
+additions. There is a count for each rDNS query made by the local MTA. For
+example, if the spam/virus host sends a burst of messages during this time
+window, then each message will be counted as it reaches the application layer. On
+this pair of mail host, the excess count runs about 4% with the cron job
+running every 20 minutes. Once the IP address has been added to the
+SpamCannibal tarpit, it is no longer possible for the application layer to
+see or count connection attempts for a host.
+<p>
+<b>Passed msg disposition</b> - these messages are further
+filtered at this site by mimedefang and spamassassin to tag/remove
+suspicious messages that have not been removed by virtue of listing in a
+public DNSBL or the SpamCannibal database. The disposition is shown in the
+last table. bad_hostname, bogus_hello, dynamic_IP, and invalid_recip messages are refused
+(<i>bounced</i>) by the MTA. All other counted dispositions are forwarded to the SPAM account for
+inspection and possible manual addition to the SpamCannibal database.
+Messages not intercepted by filtering are delivered to the designated
+receipient.
+<p>
+<b>Note</b>: additional messages may be rejected by the MTA's built in checks and
+anti-relay provisions. Not all <b>Passed</b> messages that are not accounted
+for in msg disposition are delivered to a receipient.
+<center>
+ -----------
+</body>
+</html>

@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:                M3-ServerView
+version:             0.04
+abstract:            Perl extension for communicating with M3 ServerView
+license:             perl
+author:              
+    - Martin Wilderoth <marwil@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    HTML::Parser:                  3.28
+    HTTP::Request:                 0
+    LWP::UserAgent:                0
+    Object::Tiny:                  0
+    Scalar::Util:                  0
+    Test::Exception:               0
+    Test::More:                    0
+    Time::HiRes:                   0
+    Time::Local:                   0
+    URI:                           0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

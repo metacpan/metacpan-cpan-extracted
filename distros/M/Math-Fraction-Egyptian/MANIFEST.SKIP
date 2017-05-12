@@ -1,0 +1,8 @@
+blib/
+.gitignore
+.git/
+Makefile$
+.bak$
+.old$
+pm_to_blib
+cover_db/

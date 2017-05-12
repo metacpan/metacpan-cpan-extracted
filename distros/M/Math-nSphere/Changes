@@ -1,0 +1,6 @@
+Revision history for Perl extension Math::nSphere.
+
+0.01  Tue Jun 21 12:43:14 2011
+	- original version; created by h2xs 1.23 with options
+		-AXn Math::nSphere
+

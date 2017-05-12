@@ -1,0 +1,35 @@
+Installation of Mail::IMAPFolderSearch
+
+Before getting started, make sure you have any required
+modules installed.
+
+Dependencies:
+	o IO::Socket
+	o IO::Socket::SSL
+
+	For 'make test' (optional):
+	o Term::ReadKey
+	o MIME::Base64
+
+
+
+1) perl Makefile.PL
+	
+	o Answer a few questions for make test.  This
+ 	  Includes providing credentials for an IMAP test 
+	  accounts.
+
+2) make
+
+3) make test (optional)
+
+4) make install
+
+5) rm -f imap.credentials
+	
+	o Reset the imap test account's password if
+	  there is any possibility it has been 
+	  compromised.
+
+
+12/27/2003   Brian Hodges <perl@pelemele.com>

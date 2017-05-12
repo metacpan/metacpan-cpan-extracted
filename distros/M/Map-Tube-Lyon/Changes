@@ -1,0 +1,29 @@
+Revision history for Perl extension Map::Tube::Lyon.
+
+0.07 2015-03-10
+  - fixed MANIFEST.SKIP and tests to cope with ExtUtils::MakeMaker 7.05+
+    (thanks to Slaven's tireless research)
+
+0.05 2015-02-25
+  - expanded tests
+  - expanded Makefile.pl (based on hints by Slaven -- thanks!)
+  - added more pod
+  - fixed permissions problem again (Thanks Slaven!)
+
+0.04 2015-02-24
+  - cleaned up Makefile.PL and test scripts
+  - use Test::Map::Tube
+  - bumped Map::Tube version required to 2.87
+
+0.03 2015-02-04
+  - added line colours
+  - modified t/03-xml.t for changed return value from Map::Tube 2.72
+  - bumped minimum Map::Tube version to 2.72
+  - fixed number of plans in t/01-xml.t
+  - explicitly cast output from nodes() method to hash reference in t/02-xml.t
+
+0.02 2015-01-22
+  - fixed permissions problem. Fixed character set problem in abstract / META files.
+
+0.01 2015-01-22
+  - initial release

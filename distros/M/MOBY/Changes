@@ -1,0 +1,192 @@
+Revision history for Perl extension MOBY.
+
+1.16
+    - fix: Newer Perl vesions are stricter on foreach constructions,
+      so this release fixes them in CommonSubs.pm
+1.15
+    - fix: There is a bug in CGI which only manifests when a server is 
+      behind more than one proxy. The bug effect is that virtual_host 
+      returns more than one host, separated by commas.
+      This fix avoids the bug just parsing the result of virtual_host method.
+1.14
+    - fix: dont make an un-necessary network call when instantiating
+      a MOBY::Client::OntologyServer object.
+1.13
+   - fix: no longer allow colons to be used in names for terms in
+          registerX methods.
+1.12
+    -  Updated CommonSubs to remove all hard coded entries for the
+       namespace prefix 'moby:'. In addition, all references to 
+       nodeName were replaced with localname so that element namespace 
+       prefixes are ignored since they dont really matter. 
+       Also, the localnames/prefixes are resolved to check the namespaceURI.
+
+1.11
+	-  Updated the Makefile.PL to handle some missing dependencies.
+       Changes
+	  *   Updated the RESOURCES script to better handle trailing slashes
+	      on Objects/, Namespaces, Services/
+	  *  Updated the regex expressions that are applied against terms
+	      when registering new nodes in the biomoby ontologies. 
+
+1.10
+    - Added a RESTful WSDL page to the installation. Basically, you do
+      a GET on BioMobyWSDL/authURI/servicename/ and a WSDL for that service
+      is returned. 
+      ** Thanks to José Manuel Rodríguez Carrasco ** 
+    - Updated _moby_getAttribute and _moby_getAttributeNode so that the
+      warning regarding unitialized value is no longer given when running
+      t/CommonSubs.t or using CommonSubs.pm.
+
+1.09
+    - Fixed bug where data types registered into registry could contain
+      illegal characters.
+    	* added some tests to Client-Central.t to test for this condition 
+    
+1.08
+    - Fixed META.yml in the distribution. Please refer to changes for 1.07.
+
+1.07
+    - Important: run the script moby-s-update-db once you have installed
+      this module if you have *upgraded* an existing installation.
+      
+	- Fix bug in CollectionArticle, SimpleInput, SecondaryArticle, and 
+	  SimpleArticle that caused objects created to have 'memory'.
+	- Updated the MOBY::Client::ServiceInstance module to reflect
+	  the fact that services can have >= 0 MobyUnitTests.
+	- In MOBY::RDF::Utils, fixed typo in the 
+	  ref ($self)  =~ m// statement
+	- In MOBY::RDF::Ontologies::Services, added a loop to go over
+	  the array of unit tests
+	- MOBY::RDF::Parsers::ServiceParser, added a loop to parse out 
+	  unit tests in those instances that more than one is defined, 
+	  and added code to parse out the datatype/namespace/servicetype 
+	  term from a uri/lsid.
+	- Added the function 'raw_execute' to MOBY::Async::Service to
+	  allow calling of services with raw XML similarly to the method
+	  in MOBY::Client::Service.
+	- Fixed typo in MOBY::Client::Service that refered to POST 
+	  services as category 'post' rather than 'cgi'
+	- updated service_unit_tester.pl to handle cgi/moby/moby-async
+	  services and to take into account that services can have >= 0
+	  unit tests.
+	- fixed bug in Central.pm that allowed you to register datatypes
+	  with similar articlenames to other members in the datatype.
+	- added cgi-async to category of services that registry understands.
+
+1.06
+    - Changes to makefile reflecting the cpan addition of wsrf.
+    - Added Boolean to the data sql dump file for initializing
+      a new registry.
+    - Added character encoding checks to the data kept in the
+      registry. All data used in the register* methods are
+      checked to be encoded in UTF-8
+    - Added $VERSION info for all the modules. Sorry if this
+      creates some initial confusion; The longer term gains
+      far exceed any short term disruptions.
+    - Cosmetic fixes in Service.pm and SimpleServer.pm.
+	- Fixed a bug in WSRF.pm related to temporal file location/creation
+	  introduced by a previous commit
+	- Bug fix related to asynchronous MOBY calls with empty mobyData elements. 
+	  MOBY::Async::SimpleServer uses serviceInputParser, which had the bug fixed.
+	- Added "no warnings 'redefine';" to MOBY::Async::WSRF to suppress redefinition
+	  warnings. 
+	- Added Unit test predicates to FETA.pm
+	- Created module that can be used to test Moby services. This module is
+	  MOBY::Client::MobyUnitTest. Methods for determining whether differences
+	  exist are complete. Currently, the method to obtain differences is 
+	  unfinished.
+	- Fixed the uri in the RDF returned in MobyMetadataResolver.pm when
+	  the resolver is attempting to let you know what the latest lsid is
+	  for the given entity.
+	- RDF for service instances now includes unit test information if unit
+	  test information is available for the service instance.
+	- fixed how references were created in MOBY::RDF::Ontologies::*
+	- added a unit testing script for services to the shared/cgi dir.
+    
+
+1.05
+
+	- Multiple bug fixes / additions to installer (thanks to Jason Stewart),
+	  as follows: 
+		Additions
+		* detecting root and giving a warning if not root
+		* creating apache file in conf.d/ if running apache2
+		* added apache defaults for debian/ubuntu systems
+		* added a couple longer messages to give people a heads up
+		  what is happening.
+		* changed many/most of the do {...} if pprompt() to 
+		  if (prompt()) {...}
+		* changed the big multi-line messages from multiple 
+		  say "..." to say <<EOT;
+		* re-indented most of the file - the whitespace was messed 
+		  up on Emacs22.
+
+
+		bug fixes
+		* the prompt menu for cloning the DB has a default of 'b' 
+		  in the prompt string, but no default in the actual call to
+		  prompt() so if the user didn't type anything they got an 
+		  ugly error
+		* in prompt_for_directory() switched the cases around for -e
+		  and -w otherwise -e wouldn't get triggered
+		* in config_file_from_template()  added an if defined $fh test
+		* added a chmod 644 to the mobycentral.config because it has
+		  the DB root password
+		* called die() if mysql wasn't detected
+	- fixed a bug in the service_tester.pl script that referenced $opt_c
+	  instead of $url. (thanks to Jason Stewart)
+	- prompt for a username/password for the registry to access the db.
+	  if the user doesnt exist, we add it. This helps us stay away from
+	  using the root password in the mobycentral.config file.
+	- Fixed bug in the service instance cache code. Services from service
+	  providers with other registered services was not updating itself
+	  correctly.
+	- isAlive information is removed from cached rdf because it made 
+	  absolutely no sense keeping it there.
+	- #'s converted to forward slashes so that the URIs are resolvable
+	- fixed a bug in Services.pm that caused the incorrect domain 
+	  name to be placed
+	- file MOBY-Server/t/MOBY.t removed because it was tesing a non-existant
+	  module
+	- fixed the installer script, username/password, root/root was hardcoded
+	- fixed a bug in MOBY::dbConfig that caused certain parameters to be
+	  ignored in the configuration file if a field was empty.
+	- added a caching script to be used by registry providers needing to
+	  update their cache. 
+	  For more information, run: 
+	      moby-s-caching.pl -h
+	  
+
+1.04
+	- fixed bug in MOBY::Client::Central::DUMP that resulted
+	  in an error ('Not an ARRAY reference at 
+	  MOBY/Client/Central.pm line 1927') being raised.
+	  Thanks to Pieter Neerincx for finding the bug and a
+	  solution.
+	  
+	- fixed bug that allowed service types to be registered 
+	  with empty ISA relationships.
+	
+	- MOBY::Config now only reads the config file once instead
+	  of numerous times.
+	
+	- Attempted fix of shared memory bugs with service_tester.pl
+	  Shared memory wasn't being recycled properly and led to the
+	  server running the script to run out of memory segments,
+	  causing the script to run, but not to produce any output. 
+	  
+	- MOBY WSRF implementation was not WSRF compliant in some 
+	  points, and the same happened with sample code. Both the 
+	  libraries and the generated WSDL have been fixed.
+	
+	- Added checks for those cases where RDF is wanted for a 
+	  particular ontology that is empty. Instead of dying, 
+	  we now return an empty document (as should be expected).
+	  
+	- Fixed a bug in the schema for secondary inputs. The schema
+	  was missing the column 'description'
+
+1.00
+	- CVS version of MOBY released to the world via CPAN!
+

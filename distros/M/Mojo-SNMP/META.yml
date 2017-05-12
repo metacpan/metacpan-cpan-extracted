@@ -1,0 +1,27 @@
+---
+abstract: 'Run SNMP requests with Mojo::IOLoop'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-SNMP
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '6.0'
+  Net::SNMP: '0'
+resources:
+  bugtracker: https://github.com/jhthorsen/mojo-snmp/issues
+  homepage: https://github.com/jhthorsen/mojo-snmp
+  repository: https://github.com/jhthorsen/mojo-snmp.git
+version: '0.12'

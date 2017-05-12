@@ -1,0 +1,267 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+# $Id: requester,v 1.4 2004/02/15 20:38:19 lem Exp $
+
+use IO::File;
+use Pod::Usage;
+use Getopt::Std;
+use NetAddr::IP;
+use Mail::Mailer;
+
+our $VERSION = do { my @r = (q$Revision: 1.4 $ =~ /\d+/g); sprintf " %d."."%03d" x $#r, @r };
+
+=pod
+
+=head1 NAME
+
+requester - Request additional information from sites with bad reporting practices
+
+=head1 SYNOPSIS
+
+    requester [-h] [-v] [-r relay] [-S separator] -s report-email -t template
+
+=head1 DESCRIPTION
+
+During your daily operation of the C<Mail::Abuse> system, you will
+find sites that have very poor reporting practices and tend to not
+send relevant information along with their complaints.
+
+One notable example is Hotmail, which sends a generic note that does
+not even include a timestamp or a specific reason for their
+complaint. This script, when used as part of an adequate pipeline, can
+automate the process of answering to known 'offenders', requesting
+additional information.
+
+The pipeline I use looks like:
+
+	find empty -mtime -1 -type f \
+          | xargs acat -R___END_OF_REPORT___ \
+	  | requester -t template -r relay -s abuse@mydomain 
+
+The following options are recognized:
+
+=over
+
+=item B<-h>
+
+Outputs this documentation.
+
+=item B<-v>
+
+Be verbose about progress.
+
+=item B<-r relay>
+
+The relay server to use in order to send the email message with the
+complaint and the evidence. Defaults to 'mail'.
+
+=item B<-s report-email>
+
+Specify the RFC-822 address that shoud be used as the sender of the
+send message. The message will be directed to an address that depends
+on the type of report that is answered to.
+
+=item B<-S separator>
+
+A string that is used to separate two different reports in the
+standard input. Defaults to C<___END_OF_REPORT___>.
+
+=item B<-t template>
+
+The template used to generate the email response. Within the template,
+the following substitutions can be provided:
+
+=over
+
+=item %IP%
+
+The IP address to which the original reporte referred, or C<[unknown]>.
+
+=item %Subject%
+
+The subject on the original complaint message or C<[unknown]>.
+
+=item %Reply%
+
+The address supplied as the sender in the command line.
+
+=item %Date%
+
+The contents of the C<Date:> header on the complaint report, or C<[unknown]>.
+
+=item %Sender%
+
+The sender of the complaint report, as taken from the C<From:>,
+C<Reply-To:> or C<Return-Path:> headers, respectively. Otherwise
+C<[unknown]>.
+
+=item %Report%
+
+The text of the original report.
+
+=back
+
+=cut
+
+    ;
+use vars qw/ $opt_r $opt_s $opt_S $opt_t $opt_h $opt_v /;
+
+getopts('hr:s:S:vt:');
+
+pod2usage(verbose => 2) if $opt_h;
+pod2usage(verbose => 1) unless $opt_s;
+pod2usage(verbose => 1) unless $opt_t and -f $opt_t;
+
+$opt_r = 'mail' unless $opt_r;
+$opt_S = '___END_OF_REPORT___' unless $opt_S;
+
+$/ = $opt_S;
+
+sub report ($$$)
+{
+    my $r_report	= shift;
+    my $destination	= shift;
+    my $r_flags		= shift;
+    
+    local $/ = undef;
+    my $fh = new IO::File $opt_t
+	or die "Failed to open template $opt_t: $!\n";
+    my $template = <$fh>;
+    $fh->close;
+
+				# Perform variable substitution
+    for my $k (keys %$r_flags)
+    {
+	$template =~ s/%$k%/$r_flags->{$k}/g;
+    }
+
+				# Substitute %Report%, which is a special 
+				# case for privacy issues...
+
+    my $text	= ($$r_report =~ /^(Date:.*)$/m) ? "| $1\n" : '';
+    $text	.= ($$r_report =~ /^(From:.*)$/m) ? "| $1\n" : '';
+    $text	.= ($$r_report =~ /^(To:.*)$/m) ? "| $1\n" : '';
+    $text	.= ($$r_report =~ /^(Subject:.*)$/m) ? "| $1\n" : '';
+    $text	.= "| \n";
+    $text	.= ($$r_report =~ /^\s*$ (.*)/msx) ? $1 : '| no body???';
+    
+    $text =~ s/^([^|])/| $1/gm;
+
+    $template =~ s/%Report%/$text/g;
+
+    my $m = new Mail::Mailer 'smtp', Server => $opt_r;
+    $m->open
+	(
+	 {
+	     From   	=> $opt_s,
+	     To		=> $destination,
+	     'X-Mailer'	=> 'Mail::Abuse/requester/' . $VERSION,
+	     Subject	=> 'Automated inquiry about your abuse complaint',
+	 });
+
+    print $m $template;
+    $m->close;
+    warn "requester: Sent template to $destination\n" if $opt_v;
+}
+				# Loop through each report fed to us...
+
+while (my $report = <>)
+{
+				# Discard blank lines at the start of the 
+				# report...
+
+    while ($report =~ s/^\s+//) {};
+    $report =~ s/$opt_S$//;
+    next unless length $report;
+				# MSN - Hotmail
+    if ($report =~ m/^Subject: .* is currently blocked by MSN Hotmail/m
+	and $report =~ m/Microsoft has determined that e-mail or other activity originating from/m
+	and $report =~ m/Your IP address may have been used to conduct/m)
+    {
+	warn "requester: Hotmail report matched\n" if $opt_v;
+
+				# Match required params
+
+	my $flags = { Reply => $opt_s };
+	$report =~ m/^Subject: \[([\d\.]+)\]/m 
+	    and $flags->{IP} = NetAddr::IP->new($1) || '[unknown]';
+	$report =~ m/^Date: (.*)/m 
+	    and $flags->{Date} = $1 || '[unknown]';
+	$report =~ m/^Subject: (.*)/m 
+	    and $flags->{Subject} = $1 || '[unknown]';
+	if ($report =~ m/^From: (.*)/m)
+	{
+	    $flags->{Sender} = $1;
+	}
+	elsif ($report =~ m/^Reply-To: (.*)/m)
+	{
+	    $flags->{Sender} = $1;
+	}
+	elsif ($report =~ m/^Return-Path: (.*)/m)
+	{
+	    $flags->{Sender} = $1;
+	}
+	else
+	{
+	    $flags->{Sender} = '[unknown]';
+	}
+
+	report \$report, 'nocmail@microsoft.com', $flags; 
+	
+    }
+    else
+    {
+	warn "requester: Skipping unknown report type\n" if $opt_v;
+    }
+}
+
+__END__
+
+=pod
+
+=back
+
+The complaint should be fed through C<STDIN>, as the output of C<acat>
+would.
+
+=head1 HISTORY
+
+$Log: requester,v $
+Revision 1.4  2004/02/15 20:38:19  lem
+Remove trailing whitespace from the report.
+Remove delimiter from end of report, if present.
+Do not process empty inputs.
+
+Revision 1.3  2004/02/15 20:22:07  lem
+Fixed typo in documentation
+
+Revision 1.2  2004/02/15 19:55:30  lem
+Fixed unmatched =back
+
+Revision 1.1  2004/02/15 19:36:45  lem
+Added bin/requester to the distribution. Currently supports reports from
+MSN Hotmail, which do not include evidence but are too important to simply
+miss
+
+
+=head1 LICENSE AND WARRANTY
+
+This code and all accompanying software comes with NO WARRANTY. You
+use it at your own risk.
+
+This code and all accompanying software can be used freely under the
+same terms as Perl itself.
+
+=head1 AUTHOR
+
+Luis E. Muñoz <luismunoz@cpan.org>
+
+=head1 SEE ALSO
+
+perl(1), C<acat(1)>, C<LWP::RobotUA(3)>
+
+=cut
+

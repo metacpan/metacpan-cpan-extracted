@@ -1,0 +1,27 @@
+---
+abstract: 'Serve static files from document root with directory index using Mojolicious templates'
+author:
+  - 'Andreas Guldstrand <andreas.guldstrand@gmail.com>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Directory-Stylish
+provides:
+  Mojolicious::Plugin::Directory::Stylish:
+    file: lib/Mojolicious/Plugin/Directory/Stylish.pm
+    version: '1.006'
+requires:
+  Mojolicious: '7.15'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/pink-mist/Mojolicious-Plugin-Directory-Stylish/issues
+  repository: git://github.com/pink-mist/Mojolicious-Plugin-Directory-Stylish.git
+version: '1.006'
+x_serialization_backend: 'YAML::Tiny version 1.69'

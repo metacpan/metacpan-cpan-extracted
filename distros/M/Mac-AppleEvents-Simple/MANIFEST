@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+Simple.pm
+t/pod.t
+t/simple.t

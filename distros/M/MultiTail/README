@@ -1,0 +1,303 @@
+NAME
+      MultiTail - Tail multiple files for Unix systems
+
+SYNOPSIS
+      use File::MultiTail;
+
+DESCRIPTION
+     This perl library uses perl5 objects to make it easy to
+     tail a dynamic list of files and match/except lines using full
+     regular expressions.
+
+    File::MultiTail;
+
+            will tail multiple files and return the records 
+            read to a Data Structure. The Data Structure can 
+            be processed by MultiTail functions
+
+    The files specified are processed in accordance with the
+    following rules:
+
+    Note: File devices and inode number uniquely identify each entry
+    in the UNIX filesystem. If the stat() command shows them to be
+    the same, then only one will be used. Windows NT filesystem NTFS
+    does not allow links so I don't check for links on NT.
+
+    (1) Files that exist at program start time will be positioned to
+    Object attribute "NumLines" before input.
+
+    (2) Files that become available subsequently will be read from
+    the beginning. Attribute ScanForFiles must be set to True (>=1)
+    for the option.
+
+    (3) If a file that has been selected as per rules 1 or 2 is
+    deleted or truncated input will continue until end-of-file is
+    reached before the file is closed.
+
+    (4) If a file is deleted and it is recreated it is treated as a
+    new file, will be read from the beginning
+
+    (5) To conserve file descriptors, files that are selected for
+    input are not actually opened until data is present beyond the
+    input point selected. For example, if a file exists when ptail
+    starts, ptail will determine the file mtime at that time and
+    only open the file when the mtime increases.
+
+        Note: mtime = Time when data was last modified. Changed by  the
+                      following functions: creat, mknod, pipe, utime,
+                      and write.
+
+    (6) If an opened file has not been updated for MultiTail Object
+    attribute "MaxAge" minutes it will be closed. It will be
+    reopened if it is later updated.
+
+    (7) Since MultiTail is OO you can alway change its attributes.
+    If you change the list of file to be tailed (Files attribute)
+    the attribute ScanForFiles will set to true and all dir and
+    files ilists will be check for new files.
+
+METHODS
+        new
+
+        Creating a new PTAIL object
+
+        $tail = File::MultiTail->new( OutputPrefix => 'tf',
+        RemoveDuplicate => $True, Files =>
+        ['/var/log','/var/adm/*.log'] );
+
+        Or
+
+        $tail = File::MultiTail->new; $tail-
+        >Files(['/var/log','/var/adm/*.log']); $tail-
+        >RemoveDuplicate($True);
+
+            class/object method takes arguments ( All have defaults )
+            and returning a reference to a newly created MultiTail object.
+
+            File     :  File attribute accepts file names that includes 
+                both explicit  file/dir  names  and  file/dir expressions.
+                Duplicate  file  paths  are rejected, along with non-duplicate 
+           names  that  resolve to  a  device/inode combination that is 
+                currently being read. NT file name must start with drive letter
+           or //
+         
+            Pattern  :  Arguments can be a file name or an array of patterns
+                Stores in object attribute  "LineArray" all lines
+                that contain the patterns
+                (Default is *)
+
+            ExceptPattern : Arguments can be a file name or an array of patterns
+                Stores in object attribute  "LineArray" all lines except
+                those that contain the patterns
+                (Default is *)
+
+            MaxAge  : Maximum time in minute that an open file will be held open
+                without an update.
+                (Default is 10 minute)
+
+            NumLines : Files that exist at MultiTail start time will have up to
+                NumLines lines from the end of file displayed. 
+                Similar to tail -NumLines.  
+                (Default is 10)
+
+            Fuction  : Reference to a function that will be run by the MultiTail
+                object.
+                MultiTail object will pass a ref array of all the lines read from
+                the files and passed through any filters you set in the object
+                         to the function.
+                0 = (Default) No Fuction
+
+            ScanForFiles : Maximum time in minute before Read will scan for new
+                                         files.
+                If you change the attribute "Files" with fuction update_attribute
+                the next Read will scan for new files.
+                0 = (Default) Off 
+
+            RemoveDuplicate : Removes all duplicate lines from LineArray
+                0 = (Default) Off
+                1 = On
+
+                : Turn Debuging messages on for MultiTail.pm.
+                0 = (Default) Off
+                1 = On
+
+            OutputPrefix : Determines the prefix applied to each output record.
+                Output records are store in MultiTail object attribute "LineArray"
+                The prefix is separated from the record by ': '.
+                Prefixes supported are:
+                               p  : path name of the input file
+                               f  : file name of the input file
+                               t  : time in HHMMSS
+                               tg : time in HHMMSS GMT
+                               pt : path and time
+                               ptg: path and time GMT
+                               ft : file and time
+                               ftg: file and time GMT
+                               tp : time and path
+                               tpg: time and path GMT
+                               tf : time and file
+                               tfg: time and file GMT
+                0 = (Default) No prefix
+                GMT = Greenwich time ZONE
+
+         Exit Codes
+
+                 1001 - MaxAge is less the zero
+                 1002 - NumLines is less the zero
+                 1003 - OutputPrefix must one ( )
+                 1004 - Pattern must is not a file or ARRAY
+                 1005 - ExceptPattern is not a file or ARRAY
+                 1006 - Debug is not 0 or 1
+                 1007 - ScanForFiles is less the zero
+                 1008 - RemoveDuplicate is not 0 or 1
+                 1009 - Function is not ref to fuction
+                 1010 - File attribute not set
+
+    read
+        Read all new data from file
+
+        $tail->read
+
+        Read all new date from tailed files and return new lines as
+        part of the Data Structure (MultiTail Object attribute
+        LineArray)
+
+    print
+        Print all line contained in MultiTail Object attribute
+        LineArray
+
+        $tail->print
+
+    update_attribute
+        Allow you to Update (Change) any MultiTail Object attribute
+
+        $tail->update_attribute( Files =>
+        ["/var/log","/var/adm","/home/nnysgm/logwatcher/foo*"],
+        ExceptPattern => /home/nnysgm/ExceptPattern.txt,
+        RemoveDuplicate => $True );
+
+        This changes the Files, ExceptPattern and RemoveDuplicate
+        attributes for the Object $tail.
+
+        New files will be scanned for during next Read if "Files"
+        attribute is changed.
+
+        Also you can use supplied methods to set attribute values.
+
+        $tail->RemoveDuplicate($True); $tail->NumLines(100);
+
+    version
+        Return version number on PTAIL package
+
+        $tail->version
+
+    debug
+        Toggle the debug switch for MultiTail package
+
+        $tail->debug
+
+                There are a number of  function in the MultiTail.pm module.
+                        
+                        o printstat :
+                                Print out stat output for each file.
+                        o printfilestates :
+                                Print out All file states. 
+                                (See note in MultiTail.pm for function OpenUpdateFiles)
+                        o printpat :
+                                Print out lines from pattern file array.
+                        o printexceptpat :
+                                Print out line from pattern file except array.
+
+    close_all_files
+        Closes all file that are being tailed
+
+        $tail->close_all_files
+
+EXAMPLE
+    1) use File::MultiTail;
+
+            $tail1=File::MultiTail->new (  OutputPrefix => "f", 
+                          Debug => "$True", 
+                          Files => ["/var/adm/messages"]
+            );
+
+            while(1) {
+                    $tail1->read;
+                    #
+                    $tail1->print;
+                    sleep 10;
+            }
+
+    $tail1=MultiTail->new : Create new ptail object
+
+    - Files => Tail file /var/adm/messages
+
+    - OutputPrefix => Prepend the name of the file beginning of each
+    line in object attribute "LineArray"
+
+    $tail1->read : Read all line from files
+
+    $tail1->print : Print all line in object attribute "LineArray";
+
+    2) use File::MultiTail;
+
+            $tail1=File::MultiTail->new (  OutputPrefix => "tf", 
+                          Pattern => "/home/nnysgm/logwatcher/pattern",
+                          ExceptPattern => "/home/nnysgm/logwatcher/epattern",
+                          Fuction = > \&want,
+                Files => ["/var/adm","/var/log/*.log"]
+            );
+
+            while(1) {
+                    $tail1->read;
+                    #
+                    $tail1->print;
+                    sleep 10;
+            }
+            
+            sub want {
+                            (your code .... );
+            }
+
+    $tail1=File::MultiTail->new : Create new ptail object
+
+    - OutputPrefix => Prepend the name of the file and time to the
+    beginning of each line in object attribute "LineArray"
+
+    - ExceptPattern => Stores in object attribute "LineArray" all
+    lines except those that contain the patterns from file
+    "epattern" - Pattern => Stores in object attribute "LineArray"
+    all lines that contain the patterns from file "pattern"
+
+    - Fuction => ref to a function that will be run by MultiTail
+    object. MultiTail object will pass a ref array to the function
+    of all the lines read from the file and passed through any
+    filters you set in the object.
+
+    - Files => Tail all files in dir /var/adm and all .log files dir
+    /var/log.
+
+    $tail1->read : Read all line from files
+
+    $tail1->print : Print all line in object attribute "LineArray";
+
+    3) use File::MultiTail; $tail=File::MultiTail->new;
+
+            $tail->OutputPrefix(tf);
+       $tail->Fuction(\&want);
+       $tail->Files(["/var/adm","/var/log/*.log"]);
+      
+       while(1) {
+          $tail1->read;
+       }
+                          
+       sub want {
+             (your code .... );
+       }         
+
+AUTHOR
+    Stephen Miano, stevem@esm.com
+
+SEE ALSO
+ 
+perl(1).

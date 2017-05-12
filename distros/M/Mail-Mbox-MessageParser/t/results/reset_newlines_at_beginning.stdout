@@ -1,0 +1,57 @@
+
+number: 1
+line: 2
+offset: 1
+bytes: 2382
+From dblank@comp.uark.edu  Wed Jul  1 13:17:17 1998
+Received: from aleve.media.mit.edu by hub.media.mit.edu; (5.65v3.2/1.1/06Jun95-8.2MPM)
+	id AA10324; Wed, 1 Jul 1998 13:17:17 -0400
+Received: from comp.uark.edu (root@comp.uark.edu [130.184.252.197])
+	by aleve.media.mit.edu (8.8.7/ML970927) with ESMTP id LAA00083
+	for <handyboard@media.mit.edu>; Wed, 1 Jul 1998 11:56:44 -0400 (EDT)
+Received: from comp.uark.edu (IDENT:dblank@dangermouse.uark.edu [130.184.201.233])
+	by comp.uark.edu (8.9.0/8.9.0) with ESMTP id KAA12202;
+	Wed, 1 Jul 1998 10:56:30 -0500 (CDT)
+Sender: dblank@comp.uark.edu
+Message-Id: <359A5C2E.202B4BA3@comp.uark.edu>
+Date: Wed, 01 Jul 1998 10:56:30 -0500
+From: Douglas Blank <dblank@comp.uark.edu>
+Organization: University of Arkansas, CS
+X-Mailer: Mozilla 4.04 [en] (X11; I; Linux 2.0.33 i686)
+Mime-Version: 1.0
+To: Aaron Edsinger <aarone@sirius.com>
+Cc: handy <handyboard@media.mit.edu>
+Subject: Re: Serial Interface
+References: <199807010601.XAA26862@mail3.sirius.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Aaron Edsinger wrote:
+ 
+> Hello,
+>         I've been having some problems using my HandyBoard to talk directly to my
+> PC via the serial interface.  I disable Interactive C and then Poke() and
+> Peek() as has been described on this list.  I  send short character strings
+> from my PC to the HandyBoard under Windows 95.  If I send strings longer
+> than 2 characters, it seems that some of the characters get lost. This
+> behavior seems to be affected by repositioning or slightly modifying the
+> code, suggesting perhaps a timing issue.
+
+Although there is the HEXMON program, I too, have been trying to do what
+you describe, and encountered the same problems. I found it to be a
+timing issue, and, through trial and error, have a found some settings
+that seem to work most of the time.
+
+My goal was to make C code that looked the same when compiled and run on
+the Host is the code that ran under IC. 
+
+I am including the host and HB programs here. If anyone knows of a
+better way of communicating, please let us know.
+
+-Doug Blank
+ 
+=====================================================================
+dblank@comp.uark.edu            Douglas Blank, University of Arkansas
+Assistant Professor                                  Computer Science
+==================== http://www.uark.edu/~dblank ====================
+

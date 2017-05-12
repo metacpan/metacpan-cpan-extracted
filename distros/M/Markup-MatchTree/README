@@ -1,0 +1,28 @@
+NAME
+    Markup::MatchTree - For building trees to be compared to
+    "Markup::Tree"s.
+
+SYNOPSIS
+            use Markup::MatchTree;
+
+            my $match_tree = Markup::MatchTree->new( no_squash_whitespace => \@same_as_I_used_for_Markup__Tree);
+            $match_tree->parse_file ('http://localhost/site_template.xml');
+
+DESCRIPTION
+    Most likely you won't need to use this module explicitly unless you are
+    doing some custom matching/parsing/extracting. Mainly this will be used
+    by the upcoming Markup::Content module.
+
+    See Markup::Tree for a description of the methods. The only difference
+    is "MatchTree" dosen't accpet "no_indent" as an argument.
+    "no_squash_whitespace" should be the same value that was used for
+    "Markup::Tree".
+
+SEE ALSO
+    Markup::Tree, Markup::TreeNode, Markup::MatchNode, Markup::Content
+
+AUTHOR
+    BPrudent (Brandon Prudent)
+
+    Email: xlacklusterx@hotmail.com
+

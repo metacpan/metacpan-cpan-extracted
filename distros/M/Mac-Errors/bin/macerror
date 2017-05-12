@@ -1,0 +1,40 @@
+#!/usr/bin/perl -w
+use strict;
+use Mac::Errors;
+
+=encoding utf8
+
+=head1 NAME
+
+macerror
+
+=head1 SYNOPSIS
+
+% macerror -23
+
+=head1 DESCRIPTION
+
+The macerror script translates Mac error numbers into their
+symbolic name and description.
+
+=head1 SEE ALSO
+
+L<Mac::Errors>
+
+=head1 AUTHOR
+
+Chris Nandor, pudge@pobox.com
+
+=head1 COPYRIGHT
+
+Copryright 2002, Chris Nandor, All rights reserved
+
+You may use this under the same terms as Perl itself.
+
+=cut
+
+my $error = shift @ARGV;
+my $err = $Mac::Errors::MacErrors{ $error } or die "Unknown error ($error)";
+printf <<'EOT', $err->number, $err->symbol, $err->description;
+Mac OS error %d (%s): %s
+EOT

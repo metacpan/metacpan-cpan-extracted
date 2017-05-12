@@ -1,0 +1,9 @@
+Changes
+README
+MANIFEST
+MRP/BaseClass.pm
+MRP/Interface.pm
+MRP/Introspection.pm
+MRP/Text.pm
+Makefile.PL
+test.pl

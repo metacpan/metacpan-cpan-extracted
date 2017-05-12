@@ -1,0 +1,34 @@
+Revision history for Perl extension Math::Int64::C_API::Sample.
+
+0.09  Oct 30, 2014
+        - add tests for sv_seti64 and sv_setu64
+
+0.08  Jul 20, 2012
+        - require Math::Int64 0.27_04
+        - update C API support files to latest version
+
+0.07  Jul 19, 2012
+        - require Math::Int64 0.27_03
+        - require C API interface version 2
+
+0.06  Jul 18, 2012
+        - updated to use latest Math::Int64 C API
+
+0.05  Jul 17, 2012
+        - updated to use latest Math::Int64 C API
+
+0.04  Jun 8, 2011
+        - add support for MinGW32 compiler on Windows
+
+0.03  May 31, 2011
+        - include ppport.h in perl_math_int64.c
+
+0.02  May 26, 2011
+        - add missing files to MANIFEST
+        - add some tests (those are really for Math::Int64 C API and
+          not for this sample module)
+
+0.01  Wed May 25 16:41:20 2011
+	- original version; created by h2xs 1.23 with options
+		-An Math::Int64::C_API::Sample
+

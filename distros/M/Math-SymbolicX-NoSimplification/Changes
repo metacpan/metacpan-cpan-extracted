@@ -1,0 +1,13 @@
+Revision history for Perl extension Math::SymbolicX::NoSimplification.
+
+1.01  Sun Nov  5 19:16 2006
+    - Packaging of previous distribution was broken.
+
+1.00  Sun Nov  5 19:04 2006
+    - 1.00 since this can be considered quite stable.
+    - Distribution upgrade: Clear license, spec-conformant META.yml, etc.
+
+0.01  Wed Jan 19 13:12 2005
+	- original version; created by h2xs 1.21 with options
+		-AX Math::SymbolicX::NoSimplification
+

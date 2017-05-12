@@ -1,0 +1,30 @@
+---
+abstract: 'generate monitoring configurations (nagios/icinga/shinken)'
+author:
+  - 'Sven Nierlein, <nierlein@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0.87
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: gpl3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Monitoring-Generator-TestConfig
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::Which: 0
+  perl: '5.005'
+resources:
+  bugtracker: https://github.com/sni/Monitoring-Generator-TestConfig/issues
+  homepage: https://github.com/sni/Monitoring-Generator-TestConfig
+  license: http://opensource.org/licenses/gpl-3.0.html
+  repository: https://github.com/sni/Monitoring-Generator-TestConfig
+version: '0.46'

@@ -1,0 +1,61 @@
+{
+   "abstract" : "routines for musical canon construction",
+   "author" : [
+      "Jeremy Mates <jmates@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Music-Canon",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.48",
+            "strict" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "0",
+            "Moo" : "0",
+            "Music::AtonalUtil" : "0",
+            "Music::PitchNum" : "0",
+            "Music::Scales" : "0",
+            "Scalar::Util" : "0",
+            "namespace::clean" : "0",
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0",
+            "strict" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/thrig/Music-Canon.git",
+         "web" : "https://github.com/thrig/Music-Canon"
+      }
+   },
+   "version" : "2.04",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

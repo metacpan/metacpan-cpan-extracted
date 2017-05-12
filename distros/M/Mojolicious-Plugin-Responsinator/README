@@ -1,0 +1,70 @@
+NAME
+    Mojolicious::Plugin::Responsinator - Simulate screen sizes
+
+VERSION
+    0.03
+
+DESCRIPTION
+    This module allow you to embed a given web page inside an iframe to see
+    how it would look on different screens.
+
+    This is probably just a module you want to use while developing, and not
+    bundle it with the final application. Example usage:
+
+      sub startup {
+        my $self = shift;
+        $self->plugin("responsinator") if $ENV{ENABLE_RESPONSINATOR};
+      }
+
+SYNOPSIS
+    You need to enable the plugin in your Mojolicious application:
+
+      use Mojolicious::Lite;
+      plugin "responsinator";
+      get "/" => sub { shift->render(text => "test\n") };
+      app->start;
+
+    Then from the browser, you can ask for an URL with the "_size" param to
+    embed a website inside an iframe. Example:
+
+      http://localhost:3000/some/path?_size=iphone          # iphone landscape
+      http://localhost:3000/some/path?_size=iphone:portrait # iphone portrait
+      http://localhost:3000/some/path?_size=100x400         # width: 100px; height: 400px
+
+PREDEFINED SIZES
+    You can replace "iphone" in the example above with any of the predefined
+    sizes below:
+
+    *   iphone
+
+    *   iphone-5
+
+    *   ipad
+
+    *   wildfire
+
+    *   nexus-4
+
+METHODS
+  register
+      $self->reqister($app, \%config);
+      $app->plugin(responsinator => \%config);
+
+    Will register an "around_dispatch" hook, which will trigger on the
+    "_size" query param. %config can contain:
+
+    *   param
+
+        Use this to specify another query param than the default "_size".
+
+COPYRIGHT
+  Images
+    The images are provided by the The Responsinator Team,
+    <http://www.responsinator.com>.
+
+  Code
+    The code is written by Jan Henning Thorsen, <http://thorsen.pm>.
+
+AUTHOR
+    Jan Henning Thorsen - "jhthorsen@cpan.org"
+

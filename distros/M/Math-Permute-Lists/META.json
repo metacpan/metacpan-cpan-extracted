@@ -1,0 +1,36 @@
+{
+   "abstract" : "Generate all the permutations of zero or more nested lists.",
+   "author" : [
+      "PhilipRBrenan@appaaps.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-Permute-Lists",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      }
+   },
+   "provides" : {
+      "Math::Permute::Lists" : {
+         "file" : "lib/Math/Permute/Lists.pm",
+         "version" : "1.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.001"
+}

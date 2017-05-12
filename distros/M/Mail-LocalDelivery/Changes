@@ -1,0 +1,44 @@
+Revision history for Mail-LocalDelivery
+
+0.305     2013-09-28 21:31:26 America/New_York
+          update bugtracker and repo, fix some stupid non-strict errors
+
+0.304     2007-07-14
+          import bugfix from Mail-Audit to allow tests to pass as root
+
+0.303     2007-02-26
+          fix prereqs
+
+0.303     2007-02-24
+0.302     2007-02-24
+          improve packaging kwalitee
+          reformat
+
+0.301     2006-08-01
+          a localdelivery is no longer a kind of Mail::Internet
+          added some very, very simple tests from Mail::Audit (finding bugs!)
+          use Email::Abstract to support more mail object types
+          standardize location of object guts
+          make debug behavior overrideable per object
+          make some internal routines into methods
+          don't include significant portions of sysexits.h
+          don't reimplement our own File::Path::mkpath
+          various bits of code cleanup
+
+0.21      Sun Jul 16 15:02:00 2006
+          clean up code just a bit
+          avoid calling methods what don't exist
+
+0.21      Sat Apr 03 11:44:00 2005
+          moved some things around
+          added pod.t and pod-coverage to the tests directory
+
+0.20      Mon Oct 25 16:21:00 2004
+          new maintainer
+          minor changes to the documentation
+          added META.yml
+
+0.10      Wed Jun  5 13:32:45 2002
+          original version; created by h2xs 1.21 with options
+            -XA -n Mail::LocalDelivery
+

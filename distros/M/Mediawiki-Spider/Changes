@@ -1,0 +1,6 @@
+Revision history for Perl extension Mediawiki::Spider.
+
+0.01  Wed Dec 13 22:26:00 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Mediawiki::Spider
+

@@ -1,0 +1,100 @@
+{
+   "abstract" : "handle IMAP4 folders with SSL",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mail-Box-IMAP4-SSL",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5.008",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.059",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Socket::SSL" : "1.12",
+            "Mail::Box::IMAP4" : "2.079",
+            "Mail::IMAPClient" : "3.02",
+            "Mail::Reporter" : "2.079",
+            "Mail::Transport::IMAP4" : "2.079",
+            "perl" : "5.006",
+            "strict" : "0",
+            "superclass" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Requirements" : "0"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0.86",
+            "File::Spec::Functions" : "0",
+            "IO::CaptureOutput" : "1.06",
+            "List::Util" : "0",
+            "Mail::Box::Manager" : "0",
+            "Probe::Perl" : "0.01",
+            "Proc::Background" : "1.08",
+            "Test::More" : "0.74"
+         }
+      }
+   },
+   "provides" : {
+      "Mail::Box::IMAP4::SSL" : {
+         "file" : "lib/Mail/Box/IMAP4/SSL.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dagolden/Mail-Box-IMAP4-SSL/issues"
+      },
+      "homepage" : "https://github.com/dagolden/Mail-Box-IMAP4-SSL",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/Mail-Box-IMAP4-SSL.git",
+         "web" : "https://github.com/dagolden/Mail-Box-IMAP4-SSL"
+      }
+   },
+   "version" : "0.03",
+   "x_authority" : "cpan:DAGOLDEN"
+}
+

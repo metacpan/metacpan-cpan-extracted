@@ -1,0 +1,8 @@
+Revision history for Perl module Mac::iPhoto::Exif
+
+1.01 Tue Jan 28 2014
+    - Dist housekeeping
+    - Fix for latest Moose
+    
+1.00 Thu Jan 06 2011
+    - Initial release

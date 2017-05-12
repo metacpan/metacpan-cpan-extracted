@@ -1,0 +1,17 @@
+0.03 2008-06-24
+
+    * tiny format adjustments
+    * replace action is not allowed when source and destination are equal
+    * docs update
+    * create a dir in a test to avoid false failures
+      thanks to Diab Jerius and cpan testers for kicking me
+
+0.02 2006-04-26
+
+    * changes for versions 0.02 are missing, sorry.
+
+0.01 2004-07-27
+
+    * original version
+
+

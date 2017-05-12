@@ -1,0 +1,41 @@
+---
+abstract: 'A Lua parser'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MarpaX-Languages-Lua-Parser
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::RenderAsTree: '1.03'
+  Data::Section::Simple: '0.07'
+  File::Spec: '3.4'
+  File::Temp: '0.2304'
+  Getopt::Long: '2.41'
+  Log::Handler: '0.84'
+  Marpa::R2: '3'
+  Moo: '2.000001'
+  Path::Tiny: '0.068'
+  Pod::Usage: '1.63'
+  Test::More: '1.001014'
+  Test::Pod: '1.48'
+  Types::Standard: '1.000005'
+  open: '0'
+  perl: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MarpaX-Languages-Lua-Parser
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: '1.04'

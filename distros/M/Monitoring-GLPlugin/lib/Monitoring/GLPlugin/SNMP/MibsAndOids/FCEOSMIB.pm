@@ -1,0 +1,82 @@
+package Monitoring::GLPlugin::SNMP::MibsAndOids::FCEOSMIB;
+
+$Monitoring::GLPlugin::SNMP::MibsAndOids::origin->{'FCEOS-MIB'} = {
+  url => '',
+  name => 'FCEOS-MIB',
+};
+
+$Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'FCEOS-MIB'} = {
+  'fcEosSysCurrentDate' => '1.3.6.1.4.1.289.2.1.1.2.1.1.0',
+  'fcEosSysBootDate' => '1.3.6.1.4.1.289.2.1.1.2.1.2.0',
+  'fcEosSysFirmwareVersion' => '1.3.6.1.4.1.289.2.1.1.2.1.3.0',
+  'fcEosSysTypeNum' => '1.3.6.1.4.1.289.2.1.1.2.1.4.0',
+  'fcEosSysModelNum' => '1.3.6.1.4.1.289.2.1.1.2.1.5.0',
+  'fcEosSysMfg' => '1.3.6.1.4.1.289.2.1.1.2.1.6.0',
+  'fcEosSysPlantOfMfg' => '1.3.6.1.4.1.289.2.1.1.2.1.7.0',
+  'fcEosSysEcLevel' => '1.3.6.1.4.1.289.2.1.1.2.1.8.0',
+  'fcEosSysSerialNum' => '1.3.6.1.4.1.289.2.1.1.2.1.9.0',
+  'fcEosSysOperStatus' => '1.3.6.1.4.1.289.2.1.1.2.1.10.0',
+  'fcEosSysOperStatusDefinition' => {
+    '1' => 'operational',
+    '2' => 'redundant-failure',
+    '3' => 'minor-failure',
+    '4' => 'major-failure',
+    '5' => 'not-operational',
+  },
+  'fcEosSysState' => '1.3.6.1.4.1.289.2.1.1.2.1.11.0',
+  'fcEosSysAdmStatus' => '1.3.6.1.4.1.289.2.1.1.2.1.12.0',
+  'fcEosSysConfigSpeed' => '1.3.6.1.4.1.289.2.1.1.2.1.13.0',
+  'fcEosSysOpenTrunking' => '1.3.6.1.4.1.289.2.1.1.2.1.14.0',
+  'fcEosFruTable' => '1.3.6.1.4.1.289.2.1.1.2.2.1',
+  'fcEosFruEntry' => '1.3.6.1.4.1.289.2.1.1.2.2.1.1',
+  'fcEosFruCode' => '1.3.6.1.4.1.289.2.1.1.2.2.1.1.1',
+  'fcEosFruCodeDefinition' => {
+    '1' => 'fru-bkplane',
+    '2' => 'fru-ctp',
+    '3' => 'fru-sbar',
+    '4' => 'fru-fan2',
+    '5' => 'fru-fan',
+    '6' => 'fru-power',
+    '7' => 'fru-reserved',
+    '8' => 'fru-glsl',
+    '9' => 'fru-gsml',
+    '10' => 'fru-gxxl',
+    '11' => 'fru-gsf1',
+    '12' => 'fru-gsf2',
+    '13' => 'fru-glsr',
+    '14' => 'fru-gsmr',
+    '15' => 'fru-gxxr',
+    '16' => 'fru-fint1',
+  },
+  'fcEosFruPosition' => '1.3.6.1.4.1.289.2.1.1.2.2.1.1.2',
+  'fcEosFruStatus' => '1.3.6.1.4.1.289.2.1.1.2.2.1.1.3',
+  'fcEosFruStatusDefinition' => {
+    '0' => 'unknown',
+    '1' => 'active',
+    '2' => 'backup',
+    '3' => 'update-busy',
+    '4' => 'failed',
+  },
+  'fcEosFruPartNumber' => '1.3.6.1.4.1.289.2.1.1.2.2.1.1.4',
+  'fcEosFruSerialNumber' => '1.3.6.1.4.1.289.2.1.1.2.2.1.1.5',
+  'fcEosFruPowerOnHours' => '1.3.6.1.4.1.289.2.1.1.2.2.1.1.6',
+  'fcEosFruTestDate' => '1.3.6.1.4.1.289.2.1.1.2.2.1.1.7',
+  'fcEosTATable' => '1.3.6.1.4.1.289.2.1.1.2.6.1',
+  'fcEosTAEntry' => '1.3.6.1.4.1.289.2.1.1.2.6.1.1',
+  'fcEosTAIndex' => '1.3.6.1.4.1.289.2.1.1.2.6.1.1.1',
+  'fcEosTAName' => '1.3.6.1.4.1.289.2.1.1.2.6.1.1.2',
+  'fcEosTAState' => '1.3.6.1.4.1.289.2.1.1.2.6.1.1.3',
+  'fcEosTAType' => '1.3.6.1.4.1.289.2.1.1.2.6.1.1.4',
+  'fcEosTAPortType' => '1.3.6.1.4.1.289.2.1.1.2.6.1.1.5',
+  'fcEosTAPortList' => '1.3.6.1.4.1.289.2.1.1.2.6.1.1.6',
+  'fcEosTAInterval' => '1.3.6.1.4.1.289.2.1.1.2.6.1.1.7',
+  'fcEosTATriggerValue' => '1.3.6.1.4.1.289.2.1.1.2.6.1.1.8',
+  'fcEosTTADirection' => '1.3.6.1.4.1.289.2.1.1.2.6.1.1.9',
+  'fcEosTTATriggerDuration' => '1.3.6.1.4.1.289.2.1.1.2.6.1.1.10',
+  'fcEosCTACounter' => '1.3.6.1.4.1.289.2.1.1.2.6.1.1.11',
+};
+
+
+1;
+
+__END__

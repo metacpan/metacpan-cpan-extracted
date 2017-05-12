@@ -1,0 +1,11 @@
+lib/MogileFS/Network.pm
+lib/MogileFS/Plugin/ZoneLocal.pm
+lib/MogileFS/ReplicationPolicy/HostsPerNetwork.pm
+lib/MogileFS/ReplicationPolicy/MultipleNetworks.pm
+Makefile.PL
+MANIFEST			This list of files
+t/hosts-per-zone-replpol.t
+t/multiple-networks-replpol.t
+t/network_zones.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

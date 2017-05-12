@@ -1,0 +1,50 @@
+Revision history for Perl extension Module::Build::Pluggable
+
+0.10 2013-05-07T08:44:27Z
+
+    - Suppress warnings in test case.
+
+0.09 2013-03-18T18:05:53
+
+    - Test::Module::Build::Pluggable: Added write_manifest() method.
+    - Test::Module::Build::Pluggable: run_build_script() method can handle arguments.
+
+0.08 2013-03-15T08:33:43
+
+    - Added add_around_action_modifier to M::B::P::Base
+      (tokuhirom)
+
+0.07 2013-03-11T19:00:02
+
+    - Added docs for Module::Build::Pluggable::GithubMeta
+
+0.06 2013-03-11T18:36:20
+
+    - Module::Build::Pluggable::GithubMeta
+      (tokuhirom)
+
+0.05
+
+    - do not add + prefix-ed modules to (build|configure)_requires automatically
+      (tokuhirom)
+    - added more documents and more explicit error messages.
+      (tokuhirom)
+
+0.04
+
+    - added HOOK_prepare phase
+    - Test::Module::Build::Pluggable#run_build_pl() accepts arguments as ARGV
+    - added Module::Build::Pluggable::Base#requires, Module::Build::Pluggable::Base::add_extra_compiler_flags
+    - added Test::Module::Build::Pluggable#write_plugin
+
+0.03
+
+    - remove ppport plugin from core
+
+0.02
+
+    - depend on perl 5.8
+    - added Test::Module::Build::Pluggable for testing
+
+0.01    Wed Oct 31 23:32:39 2012
+    - original version

@@ -1,0 +1,139 @@
+# German translations for MooX-Options package.
+# Copyright (C) 2015 celogeek <me@celogeek.com>
+# This file is distributed under the same license as the MooX-Options package.
+# Automatically generated, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: MooX-Options 4.009\n"
+"Report-Msgid-Bugs-To: me@celogeek.com\n"
+"POT-Creation-Date: 2015-05-01 13:45+0400\n"
+"PO-Revision-Date: 2015-05-01 13:46+0400\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ASCII\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.7.4\n"
+
+#: lib/MooX/Options.pm:102
+#, perl-brace-format
+msgid ""
+"Can't find the method <{needed_methods}> in <{target}> ! Ensure to load a "
+"Role::Tiny compatible module like Moo or Moose before using MooX::Options."
+msgstr ""
+"Kann die Methode <{needed_methods}> nicht in <{target}> finden! Stellen Sie "
+"sicher, dass ein Role::Tiny kompatibles Modul, wie Moo oder Moose geladen "
+"ist, bevor Sie MooX::Options benutzen."
+
+#: lib/MooX/Options.pm:147
+msgid "Please, don't use the option <with_config_from_file> into a role."
+msgstr ""
+"Bitte, komponieren Sie die Option <with_config_from_file> nicht in eine "
+"Rolle."
+
+#: lib/MooX/Options.pm:191
+#, perl-brace-format
+msgid ""
+"You cannot use an option with the name '{ban}', it is implied by MooX::"
+"Options"
+msgstr ""
+"Sie koennen eine Option mit Namen '{ban}' nicht einsetzen, da diese bereits "
+"von MooX::Options impliziert wird."
+
+#: lib/MooX/Options.pm:250
+msgid ""
+"Negativable params is not usable with non boolean value, don't pass format "
+"to use it !"
+msgstr ""
+"Ungueltige Formatspezifikation. Negierbare Parameter sind mit Bool'schen "
+"Werten nicht einsetzbar."
+
+#: lib/MooX/Options/Descriptive/Usage.pm:38
+#: lib/MooX/Options/Descriptive/Usage.pm:51
+msgid "String"
+msgstr "Zeichenkette"
+
+#: lib/MooX/Options/Descriptive/Usage.pm:39
+msgid "[Strings]"
+msgstr "[Zeichenketten]"
+
+#: lib/MooX/Options/Descriptive/Usage.pm:40
+msgid "Int"
+msgstr "Ganzzahl"
+
+#: lib/MooX/Options/Descriptive/Usage.pm:41
+msgid "[Ints]"
+msgstr "[Ganzzahlen]"
+
+#: lib/MooX/Options/Descriptive/Usage.pm:42
+msgid "Ext. Int"
+msgstr "Erw. Ganzzahl"
+
+#: lib/MooX/Options/Descriptive/Usage.pm:43
+msgid "[Ext. Ints]"
+msgstr "[Erw. Ganzzahl]"
+
+#: lib/MooX/Options/Descriptive/Usage.pm:44
+msgid "Real"
+msgstr "Reelle Zahl"
+
+#: lib/MooX/Options/Descriptive/Usage.pm:45
+msgid "[Reals]"
+msgstr "[Reelle Zahlen]"
+
+#: lib/MooX/Options/Descriptive/Usage.pm:52
+msgid "Array of Strings"
+msgstr "Array von Zeichenketten"
+
+#: lib/MooX/Options/Descriptive/Usage.pm:53
+msgid "Integer"
+msgstr "Ganzzahl"
+
+#: lib/MooX/Options/Descriptive/Usage.pm:54
+msgid "Array of Integers"
+msgstr ""
+
+#: lib/MooX/Options/Descriptive/Usage.pm:55
+msgid "Extended Integer"
+msgstr "Erweiterte Ganzzahl"
+
+#: lib/MooX/Options/Descriptive/Usage.pm:56
+msgid "Array of extended integers"
+msgstr ""
+
+#: lib/MooX/Options/Descriptive/Usage.pm:57
+msgid "Real number"
+msgstr "Reelle Zahl"
+
+#: lib/MooX/Options/Descriptive/Usage.pm:58
+msgid "Array of real numbers"
+msgstr ""
+
+#: lib/MooX/Options/Descriptive/Usage.pm:113
+msgid "SUB COMMANDS AVAILABLE: "
+msgstr "Unterkommandos verfuegbar"
+
+#: lib/MooX/Options/Descriptive/Usage.pm:211
+#: lib/MooX/Options/Descriptive/Usage.pm:250
+msgid "long options ..."
+msgstr "Langoptionen ..."
+
+#: lib/MooX/Options/Role.pm:314
+#, perl-format, perl-brace-format
+msgid "USAGE: {prog_name} %o"
+msgstr "Aufruf: {prog_name} %o"
+
+#: lib/MooX/Options/Role.pm:320
+msgid "show a short help message"
+msgstr "Ein kurzer Hilfetext"
+
+#: lib/MooX/Options/Role.pm:321
+msgid "show a help message"
+msgstr "Zeige einen Hilfetext"
+
+#: lib/MooX/Options/Role.pm:322
+msgid "show the manual"
+msgstr "Zeige das Handbuch"

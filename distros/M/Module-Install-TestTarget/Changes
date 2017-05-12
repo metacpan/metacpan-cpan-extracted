@@ -1,0 +1,55 @@
+Revision history for Perl extension Module::Install::TestTarget
+
+0.19    Sun Sep  4 15:53:16 2011
+        - fixed POD (issm++)
+
+0.18    Wed Mar 30 20:30:35 2011
+        - ignore case
+
+0.17    Wed Mar 30 20:24:13 2011
+        - maybe fixed dmake issue (reported by gfx++)
+
+0.16    Tue Jan  4 22:02:02 2011
+        - removed Module::Install::ExtendsMakeTest on this package
+
+0.15    Tue Nov 16 01:38:20 2010
+        - maybe fix failing test
+
+0.14    Wed Nov 10 20:55:47 2010
+        - add 'alias_for_author' option for author's test targets
+        - fix 'tests' option
+
+0.13    Sun Nov  7 15:08:45 2010
+        - fixed syntax error for run_on_finalize or insert_on_finalize.
+        - catch exeptions for run_on_prepare and run_on_finalize.
+
+0.12    Sat Nov  6 18:38:53 2010
+        - workaround for nmake (report by gfx)
+
+0.11    Sat Oct 23 14:12:37 2010
+        - fixed document typo for Module::Install::ExtendsMakeTest
+
+0.10    Fri Oct 22 23:46:58 2010
+        - renamed module name, and options (idea from lestrrat)
+        - write document (thanks lestrrat!)
+
+0.04    Tue Oct 19 03:14:13 2010
+        - oops! I forgot to fill in updated time on CHANGES
+
+0.03    Tue Oct 19 03:09:10 2010
+        - workaround problems with non-author environments (gfx)
+
+0.02    Sun Oct 17 14:56:14 2010
+        - release
+
+0.01_03 Fri Oct 15 02:42:46 2010
+        - changed Makefile.PL. not using inc::Module::Install
+
+0.01_02 Thu Oct 14 13:47:07 2010
+        - pakcing miss
+
+0.01_01 Tue Oct 12 19:55:47 2010
+        - dev release
+
+0.01  Tue Sep  7 02:34:25 2010
+        - original version

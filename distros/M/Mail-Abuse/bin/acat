@@ -1,0 +1,391 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use IO::File;
+use Pod::Usage;
+use File::Find;
+use File::Spec;
+use Getopt::Std;
+use NetAddr::IP;
+use PerlIO::gzip;
+use Data::Dumper;
+
+				# All modules under Mail::Abuse will be
+				# use()d automagically
+
+our @used = ();
+
+find
+    (
+     {
+	 follow		=> 1,
+	 follow_skip	=> 2,
+	 no_chdir	=> 1,
+	 wanted		=> sub
+	 {
+	     return unless $File::Find::name =~ m!/Mail/Abuse\W!;
+	     return unless $File::Find::name =~ s!\.pm$!!;
+
+	     my $ext = substr($File::Find::name, index($File::Find::name, 
+						       'Mail/Abuse'));
+	     $ext =~ s!/!::!g;
+	     
+	     return if grep { $_ eq $ext } @used;
+
+	     eval "use $ext";
+	     push @used, $ext unless $@;
+	 },
+     }, map { File::Spec->catdir($_, 'Mail', 'Abuse') } @INC
+     );
+
+use Storable qw/fd_retrieve/;
+
+our $VERSION = do { my @r = (q$Revision: 1.15 $ =~ /\d+/g); sprintf " %d."."%03d" x $#r, @r };
+
+=pod
+
+=head1 NAME
+
+acat - Dump an abuse report stored with Mail::Abuse::Processor::Store.pm
+
+=head1 SYNOPSIS
+
+    acat [-h] [-a] [-r] [-H header] [-R delimiter] [-i] [-d] [-m method] [-M method] [-s seconds]
+
+=cut
+
+    ;
+use vars qw/ 
+    $opt_a $opt_d $opt_H $opt_h $opt_i $opt_r $opt_R 
+    $opt_s $opt_m $opt_M
+    /;
+
+getopts('adH:him:M:rR:s:');
+
+=pod
+
+=head1 DESCRIPTION
+
+C<acat> ("abuse cat") dumps to its standard output the data stored in
+a Mail::Abuse::Report object that was stored with
+C<Mail::Abuse::Processor::Store> in the serialized modes.
+
+This is useful to build external scripts or to simply peruse the
+database of reports that is created by the C<Mail::Abuse> system.
+
+The format of the dump is controlled by the command line flags, as
+follows:
+
+=over
+
+=item B<-h>
+
+Causes this documentation to be produced.
+
+=cut
+    ;
+
+pod2usage(verbose => 2) if $opt_h;
+
+=pod
+
+=item B<-s seconds>
+
+Consider for processing only those incidents that have a date within
+the last B<-s seconds>. Defaults to 0, which causes all the incidents
+are to be processed.
+
+=item B<-a>
+
+This option causes all the information fields to be dumped.
+
+=cut
+
+    ;
+$opt_i = $opt_r = 1 if $opt_a;
+
+$opt_r = 1 unless $opt_H || $opt_i || $opt_d || $opt_m || $opt_M || $opt_R;
+$opt_r = undef if $opt_R;
+$opt_s = 0 if !defined $opt_s or $opt_s <= 0;
+
+for my $i (@ARGV)
+{
+    my $rep;
+    my $fh = new IO::File $i, "<:gzip(autopop)";
+
+    unless ($fh)
+    {
+	warn "Failed to open report file: $!\n";
+	next;
+    }
+
+    eval { $rep = fd_retrieve($fh) };
+
+    if ($@)
+    {
+	warn "Failed to retrieve: $@\n";
+    }
+
+    $fh->close;
+
+    unless ($rep)
+    {
+	warn "Failed to read report $i: $!\n";
+	next;
+    }
+
+=pod
+
+=item B<-H header>
+
+Dump the named headers from the original report. Multiple headers may
+be specified by separating them with a comma.
+
+=cut
+
+    if ($opt_H)
+    {
+	for my $h (split /,/, $opt_H)
+	{
+	    my $H = $rep->header();
+	    next unless $H;
+	    print "# $i $h\n";
+	    print "$h: ", $_, "\n" for grep { s/[\r\n]+/ /g } $H->get_all($h);
+	}
+    }
+
+=pod
+
+=item B<-i>
+
+Dump all the incidents parsed from the original report.
+
+=cut
+    ;
+
+    if ($opt_i)
+    {
+	my $count = 0;
+	for my $n (@{$rep->incidents})
+	{
+	    if (!$opt_s or $n->time >= time - $opt_s)
+	    {
+		my $text = "$n";
+		$text =~ s/\n/ /g;
+		print "$i: [$count] ", scalar localtime($n->time), ", $text\n";
+	    }
+	    ++$count;
+	}
+    }
+
+=pod
+
+=item B<-m method>
+
+Output a give value from the incidents in an abuse report, given its
+accessor method. Indirections are possible by using a dot instead of
+the arrow operator. The key 'key' from the hashref stored under
+accessor 'baz' would be referred to as B<baz.key>. The 5th element
+from an arrayref stored under accessor 'bar' would be referenced as
+B<bar.4>.
+
+Deeper nesting is possible by simply following the given
+syntax. Multiple keys can be dumped by separating them with ':'.
+
+=cut
+
+    if ($opt_m)
+    {
+	no strict 'refs';
+	my $count	= 0;
+	my $output;
+
+	for my $n (@{$rep->incidents})
+	{
+	    ++$count;
+
+	    next unless (!$opt_s or $n->time >= time - $opt_s);
+
+	    $output = "$i [$count]:";
+
+	    for my $spec (split /\:/, $opt_m)
+	    {
+		my @things	= split /\./, $spec;
+		my $method	= shift @things;
+
+		if (grep { $method eq $_ } $n->items)
+		{
+		    my $r = $n->$method;
+		    my @own = @things;
+		    while ($r and my $c = shift @own)
+		    {
+			if ($c =~ /^\d+$/)
+			{
+			    unless (ref $r eq 'ARRAY')
+			    {
+				warn "$i: Invalid type for $spec\n";
+				$r = undef;
+				last;
+			    }
+			    
+			    $r = $r->[$c];
+			}
+			elsif ($c)
+			{
+			    unless (ref $r eq 'HASH')
+			    {
+				warn "$i: Invalid type for $spec\n";
+				$r = undef;
+				last;
+			    }
+			    
+			    $r = $r->{$c};
+			}
+		    }
+
+		    unless (@own)
+		    {
+			if (defined $r)
+			{
+			    $output .= " $spec=$r";
+			}
+			else
+			{
+			    $output .= " $spec=undef";
+			}
+		    }
+		}
+	    }
+	    print $output, "\n";
+	}
+    }
+
+    if ($opt_M)
+    {
+	no strict 'refs';
+	my $output;
+
+	$output = "$i:";
+	my $r = $rep;
+
+	for my $spec (split /\:/, $opt_M)
+	{
+	    my @things	= split /\./, $spec;
+	    my $method	= shift @things;
+
+	    my $r = $r->$method;
+	    my @own = @things;
+	    while ($r and my $c = shift @own)
+	    {
+		if ($c =~ /^\d+$/)
+		{
+		    unless (ref $r eq 'ARRAY')
+		    {
+			warn "$i: Invalid type for $spec\n";
+			$r = undef;
+			last;
+		    }
+		    
+		    $r = $r->[$c];
+		}
+		elsif ($c)
+		{
+		    unless (ref $r eq 'HASH')
+		    {
+			warn "$i: Invalid type for $spec\n";
+			$r = undef;
+			last;
+		    }
+		    
+		    $r = $r->{$c};
+		}
+	    }
+
+	    unless (@own)
+	    {
+		if (defined $r)
+		{
+		    $output .= " $spec=$r";
+		}
+		else
+		{
+		    $output .= " $spec=undef";
+		}
+	    }
+	}
+	print $output, "\n";
+    }
+
+=pod
+
+=item B<-r>
+
+Dump the original abuse report, as was received. This is the default.
+
+=item B<-R delimiter>
+
+Just as B<-r>, but output the given delimiter after the original
+report. This is useful to work with L<Mail::Abuse::Reader::Stdin> to
+re-feed reports to L<abuso>.
+
+=cut
+    ;
+
+    if ($opt_r)
+    {
+	print $ {$rep->text}, "\n";
+    }
+    elsif ($opt_R)
+    {
+	print $ {$rep->text}, "\n", $opt_R, "\n";
+    }
+
+=pod
+
+=item B<-d>
+
+Dump the complete object using C<Data::Dumper>.
+
+=cut
+
+    ;
+    print Data::Dumper->Dump([$rep]) if $opt_d;
+}
+
+__END__
+
+=pod
+
+=back
+
+=head1 HISTORY
+
+=over
+
+=item Jun, 2003
+
+Begin working in the first version of the code, as a replacement of a
+more rudimentary proof of concept.
+
+=back
+
+=head1 LICENSE AND WARRANTY
+
+This code and all accompanying software comes with NO WARRANTY. You
+use it at your own risk.
+
+This code and all accompanying software can be used freely under the
+same terms as Perl itself.
+
+=head1 AUTHOR
+
+Luis E. Muñoz <luismunoz@cpan.org>
+
+=head1 SEE ALSO
+
+perl(1), C<Mail::Abuse>.
+
+=cut
+

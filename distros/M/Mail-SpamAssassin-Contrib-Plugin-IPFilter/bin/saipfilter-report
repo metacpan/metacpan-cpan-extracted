@@ -1,0 +1,191 @@
+#!/usr/bin/perl
+
+use strict;
+use DBI;
+use Redis;
+use Geo::IP;
+use Net::Whois::Proxy;
+use Math::Round qw(nearest round);
+use MIME::Base64 qw(encode_base64 decode_base64);
+
+my ($file, @data, %record, $t, $r, $d, @v, %config, $db, $time, %re, $geo, $whois);
+$geo = Geo::IP->open('/usr/local/share/GeoIP/GeoIPCity.dat', GEOIP_STANDARD);
+$whois = new Net::Whois::Proxy('debug'=>0);
+
+$|++;
+
+sub trim {
+	my $str = shift;
+	$str =~ s/(?:^[\r\n\t ]+)|(?:[\r\0]+)|(?:[\r\n\t ]+$)//g;
+	$str =~ s/^['"]//;
+	$str =~ s/[, \t]$//g;
+	$str =~ s/['"]$//;
+	$str =~ s/\\#/#/;
+	return $str;
+}
+
+sub find_bin {
+	my $path;
+	foreach $path (@{['/bin','/sbin','/usr/bin','/usr/sbin','/usr/local/bin','/usr/local/sbin']}){
+		return $path.'/'.$_[0] if (-e $path.'/'.$_[0]);
+	}
+}
+
+foreach $file (@INC){
+
+	if(-e $file.'/Mail/SpamAssassin/Contrib/Plugin/IPFilter.pm'){
+
+		open(FILE, $file.'/Mail/SpamAssassin/Contrib/Plugin/IPFilter.pm') || die "Could not open $file/Mail/SpamAssassin/Plugin/IPFilter.pm ($!)\n";
+		$d = $a = do { local $/; <FILE> };
+		close(FILE);
+		$a =~ s/^.*?sub[ \t]+compile\_regex//ism;
+		$a =~ s/\);.*$//sm;
+		map{ index($_,'=>')>0 && $_=~/^[ \t'"]*([^ \t'"]+)[ \t'"]*=>[ \t'"]*qr\/(.*)\/['" \t,]*$/ && ($re{trim($1)}=qr/$2/)} split("\n", trim($a));
+		$d =~ s/^.*?sub[ \t]+get\_config[ \t]*\{.*?return[ \t]*\{[ \t\r\n]*//ism;
+		$d =~ s/\};.*$//sm;
+		map{ $_=~/^[ \t'"]*([^ \t'"]+)[ \t'"]*=>[ \t'"]*(.*?)['" \t,]*$/ && ($config{trim($1)}=trim($2))} split("\n", trim($d));
+		last;
+	}
+}
+
+die("Mail::SpamAssassin::Contrib::Plugin::IPFilter not installed\n") if (1>keys %config);
+
+push @ARGV, '/etc/mail/spamassassin/local.cf' if(1>@ARGV);
+foreach $file (@ARGV){
+	$file = trim($file);
+	if(-e $file){
+		if(open(FILE, $file)){
+			map{$_=~/^[\t ]*ipfilter\_([^ \t]+)[ \t][ \t]*([^\n]+)(?:\n|$)/ && ($config{trim($1)}=trim($2))} <FILE>;
+			close(FILE);
+		}
+	}
+}
+
+$dbconnect_mysql::name = 'dbconnect_mysql';
+
+sub dbconnect{
+	my ($db,$h,$r,$conf);
+	$conf = shift;
+	if($conf->{db_type} eq 'redis'){
+		$conf->{db_port} = 6379 if(1>int($conf->{db_port}));
+
+		$db = length($conf->{db_auth})>0 ? Redis->new(server => $conf->{db_host}.':'.$conf->{db_port}, password => $conf->{db_auth}) : Redis->new(server => $conf->{db_host}.':'.$conf->{db_port});
+		return ($db=0) if (!$db->ping);
+	}elsif($conf->{db_type} eq 'mysql'){
+
+		fatal('Could not establish connection to mysql:'. $DBI::errstr) if (!($db = DBI->connect('DBI:mysql::'.(0<int($conf->{db_port})?'@'.$conf->{db_host}.':'.$conf->{db_port}:'localhost'), $conf->{db_user}, $conf->{db_auth}, {PrintError => 1})));
+
+		$db->{PrintError} = 0;
+		($db->do('create database if not exists '.$conf->{db_name}) && $db->do('use '.$conf->{db_name})) if (!$db->do('use '.$conf->{db_name}));
+		$db->do('create table if not exists `'.$conf->{db_name}.'`.`ent` (k varchar(128) NOT NULL,v TEXT NOT NULL,modified timestamp NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP, PRIMARY KEY (k(128))) ENGINE=InnoDB DEFAULT CHARSET=utf8') if(!$db->do('select 1 from '.$conf->{db_name}.'.ent limit 1'));
+		$db->{PrintError} = 1;
+		$db = sub { my $self = { db => $db }; bless $self, *dbconnect_mysql; return $self; }->();
+
+	}
+	return $db;
+}
+
+sub dbconnect_mysql::get {
+	my ($h,$r,$db);
+	$db = (shift)->{db};
+	#$k =~ tr/\x00-\x09\x0b\x0c\x0e-\x1f//d;
+	$h = $db->prepare(sprintf('select v from ent where k=%s limit 1', length($_[0]) >0 ? $db->quote($_[0]) : "''"));
+	$h->execute();
+	$r = $h->fetchrow_hashref('NAME_lc');
+	$h->finish();
+	return ((defined $r) && $r && ($r->{v})) ? $r->{v} : '';
+}
+
+sub dbconnect_mysql::keys {
+	my ($h,$db,@o,$v);
+	$db = (shift)->{db};
+	@o = ();
+	$v=shift;
+	$v=~s/\*/\%/g;
+	$h = $db->prepare(sprintf('select k from ent where k like %s limit 256000',length($v) >0 ? $db->quote($v) : "''"));
+	$h->execute();
+	map { push @o, $_->{k} } @{$h->fetchall_arrayref({})};
+	$h->finish();
+	return @o;
+}
+
+sub dbconnect_mysql::quit {
+	my $db = (shift)->{db};
+	$db->disconnect if($db);
+}
+
+$db = dbconnect(\%config);
+
+$time = time();
+print "\n".localtime()."\n";
+printf( '%-20.20s %-6.6s %-6.6s %-4.4s %-30.30s (%6.6s)', 'HOST', 'AVG', 'TOT', 'AMT', 'EXTRA', 'TIME');
+print "\n";
+
+foreach $d (sort @{[$db->keys($config{'db_name'}.'-*')]}){
+	$r = $db->get($d);
+
+	%record = $r =~ $re{'record'} ?  ('avg'=>$1, 'total'=>$2, 'amt'=>$3, 'time'=>$4, 'extra'=>$5) : ('avg'=>0, 'total'=>0, 'amt'=>0, 'time'=> ($r=~/^[0-9]+$/?$r:0), 'extra'=>$r);
+	$t = $time - $record{'time'};
+	if($t<60){
+		$t.='s';
+	}elsif($t<3600){
+		$t = nearest(0.01,$t/60).'m';
+	}elsif($t<86400){
+		$t = nearest(0.01,$t/3600).'h';
+	}else{
+		$t = nearest(0.01, $t/86400).'d';
+	}
+	$d =~ s/^$config{'db_name'}-//;
+	if($record{'extra'}=~/\@/){
+		@v = split('@',$record{'extra'});
+		$record{'extra'} = decode_base64(shift @v).'@'.join('@',@v);
+		printf( '%-18.18s %-6.6s %-6.6s %-4.4s %-35.35s (%6.6s @ %-11.11s)', $d, $record{'avg'}, $record{'total'}, $record{'amt'}, $record{'extra'}, $t, $record{'time'}  );
+	}elsif($d=~/\@/){
+    @v = split('@',$d);
+    $d = decode_base64(shift @v).'@'.join('@',@v);
+		printf( '%-18.18s %-6.6s %-6.6s %-4.4s %-35.35s (%6.6s @ %-11.11s)', $record{'extra'}.'*', $record{'avg'}, $record{'total'}, $record{'amt'}, $d, $t, $record{'time'}  );
+  }else{
+		printf( '%-18.18s %-6.6s %-6.6s %-4.4s %-35.35s (%6.6s @ %-11.11s)', $d, $record{'avg'}, $record{'total'}, $record{'amt'}, $record{'extra'}, $t, $record{'time'}  );
+	}
+	print "\n";
+}
+
+print "--\nExpiration:\n";
+foreach $d (sort @{[$db->keys($config{'db_name'}.';expires*')]}){
+
+	$r = $db->get($d);
+	$t = abs($time - int($r));
+  if($t<60){
+    $t.='s';
+  }elsif($t<3600){
+    $t = nearest(0.01,$t/60).'m';
+  }elsif($t<86400){
+    $t = nearest(0.01,$t/3600).'h';
+  }else{
+    $t = nearest(0.01, $t/86400).'d';
+  }
+
+	if($d=~/\-([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)(?:[^0-9]|$)/){
+		@v = ($1);
+		$t.=' ('.uc($v[1]).')' if(($r = $geo->record_by_addr($v[0])) && defined $r && defined $r->country_code && ($v[1]=$r->country_code));
+		if($r = $whois->whois($v[0])){
+			$t.=' ('.uc($1).')' if(!defined $v[1] && $r=~/country[ \t]*\:[ \t]*([^\r\n]+)[\r\n]/i);
+			$t.=' '.ucfirst(lc($1)) if($r=~/(?:(?:owner)|(?:descr))[ \t]*\:[ \t]*([^\r\n]+)[\r\n]/i);
+		}
+	}
+
+	print "\t$d => $t\n";
+}
+
+print "--\nNetworks:\n";
+foreach $d (sort @{[$db->keys($config{'db_name'}.';network*')]}){
+  $r = $db->get($d);
+  print "\t$d => $r\n";
+}
+$db->quit;
+
+print "--\nFilter:\n";
+$r = find_bin('iptables').' -L '.$config{'filter_name'}.' -n -v -x';
+print "$r\n";
+print `$r`;
+print "\n----------------------------------------------------------------------------------------------\n";

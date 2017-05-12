@@ -1,0 +1,320 @@
+Revision history for Perl extension Module::Starter
+
+1.72    Sat Mar 25 21:20:41 EDT 2017
+        * Stable release containing previous fixes
+
+1.71_01 Thu Mar 23 23:04:11 EDT 2017
+        * GH#51: drop use of Module::Build::Compat in Build.PL (Karen
+          Etheridge)
+        * GH#56: Fix generated syntax errors when using --fatalize (Dan Book)
+        * GH#57: Fix strange scoping issue in test on 5.8 (Dan Book)
+        * GH#58: Typo and doc fixes (Tordek)
+        * GH#59: Quote versions in generated Makefile.PL/Build.PL (Dan Book)
+        * GH#61: Fix version comparison in test (Dan Book)
+        * GH#63: Remove unneeded dependency Module::Install::AuthorTests (Dan
+          Book)
+        * GH#64: Replace usage of Path::Class with File::Spec (Dan Book)
+
+1.71    Fri Jan 30 13:28:31 2015
+        * GH #47: create_t breaks plugins. (David Pottage)
+
+1.70	Tue Jan 20 20:56:31 2015
+        * Change the url for issues from rt.cpan.org to GitHub (David Pottage)
+        * Added a missing module to prerequisites (David Pottage)
+        * Marked t/pod* test scripts as RELEASE_TESTING (David Pottage)
+        * Moved boilerplate test to xt/ directory (David Pottage)
+        * Added a --fatalize option to generate code where warnings are fatal
+          This changes the default behaviour, as fatal warnings are now considered
+          unwise for any public module that many others depend on.
+          See: http://blogs.perl.org/users/peter_rabbitson/2014/01/fatal-warnings-are-a-ticking-time-bomb-via-chromatic.html
+
+1.62    Sun Dec  8 11:49:21 2013
+        * Fix regexp in tests to stop failing on 5.8.x (Sawyer X).
+        * Fix FSF address in template block and tests (Brian Manning).
+        * Typo fixes (David Steinbrunner).
+
+1.61    Fri Dec  6 14:01:19 2013
+        * Stop getpwuid calls on Windows, instead prompt user for author.
+          (Martin McGrath)
+
+1.60    Thu Oct 25 20:29:50 2012
+        * Guess author from getpwuid if not provided (Hilko Bengen).
+        * Guess email from $ENV{'EMAIL'} if not provided (Hilko Bengen).
+
+1.59    Thu Oct 25 19:54:05 2012
+        * Skip POD tests unless RELEASE_TESTING environment is on.
+          (Alberto Simoes)
+
+1.58_03 Fri May 11 16:24:44 2012
+        -- Trying to clean up test failures. More to come.
+
+1.58_02 Wed Apr 25 12:53:34 2012
+        -- All changes in this release are by Brendan Byrd (SineSwiper).
+           Thank you! :)
+
+        Licenses:
+        * Add GPL3 licenses (fixes RT #72321).
+        * Add all other supported licenses, including Software::License
+          support (fixes RT #68634).
+
+        New Params:
+        * Make ignores_type an arrayref (closes Pull Request #8).
+        * Add new --ignores parameter (also repeatable).
+        * Add new --minperl parameter (Minimum Perl version).
+
+        File Creation:
+        * Fix MANIFEST.SKIP to skip creation of MANIFEST.
+        * Make all warnings FATAL in created .t/.pm files.
+        * Add config/build requires to Makefile/Build.PL.
+        * Bulk up Module::Install Makefile.PL.
+        * Fix ignores_guts to use different contents for MANIFEST.SKIP and
+          other ignore files.
+
+        test-dist.t Revamp:
+        * Complete refactor of test-dist.t to make it more standardized.
+        * Create new TestParseFile::parse_file_start method that handles
+          parsing of all current created file types (outside of .pm files).
+        * Use subtest for better organization.
+        * Add verification that existing files are there and no new surprise
+          files are not there.
+        * Add new mega-loop to "test all variations of everything" (uses 1%
+          sample size to keep test speed fast for average users).
+
+        * Use .gitignore and MANIFEST.SKIP.
+
+1.58_01
+
+        * Fix repository URL by Shlomi Fish (GH #7).
+
+1.58    Sat Jul  2 15:58:46 2011
+
+        * Added prereq on Path::Class (RT #68360).
+        * Doc fixes by Nicholas Bamber and Salvatore Bonaccorso (RT #68385).
+
+1.57    Tue Apr 12 11:07:01 IDT 2011
+
+        * No functional changes.
+        * Removing English from unnecessary tests that confuse a tester.
+
+1.56    Thu Apr  7 17:01:11 IDT 2011
+
+        * No functional changes, productionizing.
+
+1.55_01 Fri Jun 11 16:56:00 IDT 2010
+
+        Special thanks goes to Andy Lester, who has been, still is and
+            will remain an inspiration to many programmers, myself included.
+
+        [ENHANCEMENTS]
+        Added hooks for distribution building in App. Thanks to brian d foy.
+        MANIFEST is now created via the proper builder.
+        Kept create_MANIFEST to act as hook.
+        Added Apache license by pfig.
+
+        * [RT #53539] Refactoring, adding hooks, described above.
+        (Patch provided by brian d. foy)
+
+        * [RT #27304] Minimal version of perl (5.006)
+        (Patch provided by Alexandr Ciornii)
+
+        * [RT #53339] ::Simple uses the builder to create the MANIFEST
+
+        * Moved repository to Github
+
+        * Some more refactoring in Simple::create_builder()
+
+1.54    Tue Dec  8 09:11:00 CST 2009
+
+        This release could not have happened without Sawyer X.
+
+        [ENHANCEMENTS]
+        Added more exclusions.  Thanks to Olivier Mengué.
+
+        * [RT #45941] Correcting POD sections for Perl Critic (Sawyer X)
+
+        * [RT #13847] Bail out if load fails, minimum Test::Harness (Sawyer X)
+
+        * [RT #24110] Support for Test::CheckManifest + tests for it (Sawyer X)
+
+        * [RT #22648] Pod::Parser (Pod::Usage) >= 1.21 (Sawyer X)
+        (earliest Backpan version tested to work)
+
+        * [RT #48723] Add metadata to META.yml (Sawyer X)
+        (Patch provided by Olivier Mengué, thank you!)
+
+        * [RT #39397] Add option to create .gitignore (Sawyer X)
+
+
+1.52    Mon Jul 27 01:25:03 CDT 2009
+        * Support for more licenses.  Thanks to Shlomi Fish.
+
+        * Fix slashing problems for Windows.  Thanks Olivier Mengué.
+
+        * Complains about extra unparsed options to try to detect
+        problems that come out of misquoted variables. Thanks to Gunnar Wolf.
+
+        * The list of files to ignore is now called ignore.txt,
+        which you can turn into .cvsignore, .gitignore, MANIFEST.SKIP
+        or whatever.
+
+        * Handles authors with apostrophes in their names better.
+        Thanks to, not surprisingly, Dave O'Neill.
+
+        * Removed module requirements on Test::Pod and Test::Pod::Coverage
+        for Module::Starter to be built and installed.  However,
+        t/pod.t and t/pod-coverage.t do still both get created even
+        if either of their two main modules are not installed.
+
+
+1.50    Tue Oct 28 00:27:37 CDT 2008
+        * Added Perl Training Australia's getting-started.html
+
+        * Add license setting to default Makefile.PL output (Thanks, Gabor!)
+
+        * Fixed the RT link in the boilerplate. (Thanks, Shlomi)
+
+
+1.46    Fri Nov  9 18:36 America/New_York 2007
+        [ENHANCEMENTS]
+        * add Module::Install compat for ::Template plugin
+        * boilerplate.t no longer appears in default MANIFEST
+        * META.yml no longer appears in default MANIFEST
+
+        [FIXES]
+        * undo some bugs introduced by changing API of subclassable "guts"
+          methods
+        * remove some duplicated code
+
+1.46    Wed Oct 31 08:49 America/New_York 2007
+        * put nearly all of the module-starter program into a module (to test)
+        * add license to META.yml
+
+1.44    Sun Oct 11 19:09 America/New_York 2007
+        * no changes since 1.43_03
+
+1.43_03
+        [FIXES]
+        * pod-coverage.t includes Pod::Coverage version check
+        * Test::Pod and Test::Pod::Coverage are now requirements.
+            Thanks, David Golden.
+
+1.43_02 Wed Apr 25 09:37-Wed May 09 14:46 PDT 2007	<cjac@colliertech.org>
+        [ENHANCEMENTS]
+        * broke Module::Starter::Simple's README_guts and module_guts
+          methods into smaller, override-able pieces
+        * re-factored Module::Starter::Simple's build system; the
+          build metadata now lives in Module::Starter::BuildSet.  This
+          allows us access to the metadata from the test suite.  It
+          also makes it a bit easier to add supported builders.
+        * added a test Plugin module (based on Module::Starter::PBP)
+        * wrote a test suite for running module-starter
+        * wrote a test suite for Module::Starter::BuildSet
+        * modified the critic Makefile target to name the policy which
+          raised the violation
+        * Split most long lines (>80 chars) on whitespace
+
+        [FIXES]
+        * Ensured that perlcritic succeeds without errors or warnings
+        * Added perlcriticrc to the MANIFEST
+        * corrected build -> builder in module-starter --help docs
+
+1.43_01 Wed Mar 28 12:21:00 EDT 2007
+        [FIXES]
+        * Now properly reports on all files in --verbose mode.
+
+        [ENHANCEMENTS]
+        * Add support for Module::Install
+
+1.42    Wed Nov  9 11:25:10 CST 2005
+        [FIXES]
+        * Don't build Build.PL or Makefile.PL multiple times
+        * Move Test::More from require to build_require in Build.PL
+
+        [ENHANCEMENTS]
+        * Documentation now includes references to search.cpan, AnnoCPAN,
+          RT and CPAN Ratings.
+        * Email addresses are now obfuscated very basically as
+          "andy at petdance.com".
+        * Include boilerplate.t to notice unchanged boilerplate text
+        * Experimental new method to handle plugin loading
+
+1.40    Wed Jul  6 19:30:00 CDT 2005
+        [FIXES]
+        * Document --dir option to module-starter
+        * Proper escaping of $] and $^X
+        * Never use \ for path delimiters in {Makefile,Build}.PL
+        * Don't always completely ignore --license
+
+1.38    Wed Mar 16 20:28:00 CST 2005
+        [FIXES]
+        * Don't allow invalid module names
+
+1.36    Mon Mar  7 08:38:00 CST 2005
+        [FIXES]
+        * 00.load.t is now 00-load.t, so VMS and RiscOS folks can use it.
+        * Escape apostrophes in author name in Makefile.PL
+        * Add a link directly to this dist's queue in RT, not just to RT
+        * Don't set configdir to something in $HOME if it's undef
+
+1.34    Mon Sep 20 19:15:00 CDT 2004
+        [ENHANCEMENTS]
+        * module-starter now reads a config file
+
+1.30    Mon Aug 16 14:00:00 CDT 2004
+        [ENHANCEMENTS]
+        * Module::Starter is now merely a public interface to plugins
+        * Module::Starter::Simple, the old M::S is now a plugin
+        * Module::Starter::Plugin::Template added
+        * module-starter now shows usage if no parms are passed.
+        * The t/pod.t and t/pod-coverage.t files now use tainting,
+          and require the appropriate versions of Test::Pod and
+          Test::Pod::Coverage, respectively.
+
+1.22    Mon Jul 12 17:05:26 CDT 2004
+
+        [FIXES]
+        * Another fix to inline POD, to cope with brain damage in Pod::Parser
+
+1.20    Sun Jul 11 22:28:57 CDT 2004
+
+        [ENHANCEMENTS]
+        * Moved some data (distro, basedir) from parameters to object data
+        * Moved some data (rtname) from routine-local to parameter data
+        * Correted lies in POD regarding args to create_distro
+        * Every create_file method now calls a file_guts method to get
+          contents.
+        * All the quoted POD inline should now not render in perldoc.
+        * The module-build script now respects --class
+        * Minor refactoring of parameters to create_directory and _module
+        * Everything is now an overridable object method.  Thanks to
+          Ricardo Signes.
+        * Added verbose() method.
+        * Added progress() method so subclass can decide how progress
+          is reported.
+
+        All of the above is courtesy the diligent work of Ricard Signes.
+
+        [DOCUMENTATION]
+        * Large expansion of POD (Starter.pm and module-starter)
+
+
+1.00    Fri Jun 25 17:57:31 CDT 2004
+
+        [ENHANCEMENTS]
+        * Added a README file.  The README file is somewhat intelligently
+          constructed, too.
+        * Now you can specify both EU::MM and M::B as your builders,
+          so the module can have a double life.
+
+        Thanks to Sébastien Aperghis-Tramonifor the help.
+
+0.04    Mon Apr  5 20:45:58 CDT 2004
+
+        [ENHANCEMENTS]
+
+        * Added support for Module::Build.  Thanks, Randy Sims.
+
+
+0.02    Thu Feb 26 00:11:57 CST 2004
+
+        First real version, released on an unsuspecting world.

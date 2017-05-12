@@ -1,0 +1,5 @@
+I haven't written model classes here, but basically you would hook into
+your database using DBIx::Class, Class::DBI, or whatever you wanted.
+
+The example code in Library::Controller::* just kind of pretends that
+this model code exists.

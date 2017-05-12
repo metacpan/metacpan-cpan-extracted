@@ -1,0 +1,102 @@
+NAME
+    MooseX::Types::CreditCard - Moose Types related to Credit Cards
+
+VERSION
+    version 0.002003
+
+SYNOPSIS
+            {
+                    package My::CreditCard;
+                    use Moose;
+                    use MooseX::Types::CreditCard qw(
+                            CardNumber
+                            CardSecurityCode
+                            CardExpiration
+                    );
+
+                    has credit_card => (
+                            isa    => CardNumber,
+                            is     => 'ro',
+                            coerce => 1,
+                    );
+
+                    has cvv2 => (
+                            isa => CardSecurityCode,
+                            is  => 'ro',
+                    );
+
+                    has expiration => (
+                            isa    => CardExpiration,
+                            is     => 'ro',
+                            coerce => 1,
+                    );
+
+                    __PACKAGE__->meta->make_immutable;
+            }
+
+            my $obj = My::CreditCard->new({
+                    credit_card => '4111111111111111',
+                    cvv2        => '123',
+                    expiration  => { month => 10, year => 2013 },
+            });
+
+DESCRIPTION
+    This module provides types related to Credit Cards for weak validation.
+
+TYPES
+  CardNumber
+    Base Type: "Str"
+
+    It will validate that the number passed to it appears to be a valid
+    credit card number. Please note that this does not mean that the Credit
+    Card is actually valid, only that it appears to be by algorithms defined
+    in Business::CreditCard.
+
+    Enabling coerce will strip out any non "0-9" characters from a string
+    allowing for numbers like "4111-1111-1111-1111" to be passed.
+
+  CardSecurityCode
+    Base Type: "Str"
+
+    A Credit Card Security Code
+    <http://wikipedia.org/wiki/Card_security_code> is a 3 or 4 digit number.
+    This is also called CSC, CVV, CVC, and CID, depending on the issuing
+    vendor.
+
+  head2 CardExpiration
+    Base Type: "DateTime"
+
+    A Credit Card Expiration Date. It's a DateTime Object and checks to see
+    if the object is equal to the last day of the month, using the month and
+    year stored in the object.
+
+    Coerce allows you to create the DateTime object from a "HashRef" by
+    passing the keys "month" and "year".
+
+ACKNOWLEDGEMENTS
+    *   hostgator.com
+
+        For funding initial development
+
+SEE ALSO
+    *   Business::CreditCard
+
+    *   DateTime
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/xenoterracide/moosex-types-creditcard/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Caleb Cushing <xenoterracide@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by Caleb Cushing.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

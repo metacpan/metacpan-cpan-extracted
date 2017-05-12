@@ -1,0 +1,31 @@
+---
+abstract: 'Simple Mongo ORM for Perl'
+author:
+  - 'Naoto ISHIKAWA <toona at seesaa.co.jp>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MongoDBx-Tiny
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Class::Trigger: '0'
+  Data::Dumper: '0'
+  Digest::SHA: '0'
+  IO::File: '0'
+  MongoDB: '0'
+  Params::Validate: '0'
+  Scalar::Util: '0'
+  Test::More: '0'
+  Tie::IxHash: '0'
+version: '0.04'

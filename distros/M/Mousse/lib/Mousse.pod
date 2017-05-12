@@ -1,0 +1,141 @@
+=encoding utf-8
+
+=head1 NAME
+
+Mousse - A Light and Tasty Moose for CPAN Authors
+
+=head1 SYNOPSIS
+
+In your C<Makefile.PL>:
+
+    use inc::Module::Install;
+    name 'Chocolate';
+    use_mousse 'Chocolate::Mousse';
+
+then in C<lib/Chocolate/Jesus.pm>:
+
+    package Chocolate::Jesus;
+    use Chocolate::Mousse;
+
+    has 'soul', is => 'ro';
+
+and:
+
+    package Chocolate::Jeebus;
+    use Chocolate::Mousse;
+
+    extends 'Chocolate::Jesus';
+
+    has 'whiskers', is => 'rw';
+
+=head1 DESCRIPTION
+
+L<Mousse> is the easiest way to get L<Moose> support for your OO CPAN module.
+
+L<Mousse> adds B<NO> prerequisite dependencies to your CPAN module.
+
+L<Mousse> has the same performance qualities as the zippy L<Mouse::Tiny>.
+
+L<Mousse> is enabled by adding one line to your Makefile.PL.
+
+=head1 WHENCE MOUSSE?
+
+If you are a CPAN module author, you need to weigh the benefit of using
+L<Moose> against the startup performance hit and sizable module
+prerequisite dependency. Should your simple module even use OO? Should
+you force a Moose dependency on every other module or project that uses
+your module? Should roll your own OO code and pass up the robustness of
+Moose? These questions grate on the concious of many CPAN authors.
+
+No longer!
+
+You've probably heard of L<Mouse>. Mouse is a way to do all the core
+Moose functionality but without the performance costs. L<Mouse::Tiny>
+puts all the Mouse modules into one module, but you still have a
+dependency on Mouse::Tiny. One solution is to copy Mouse::Tiny as your
+own module's OO base. But then you have to repeat that every time a new
+Mouse version is released.
+
+Another solution is to use B<Mousse>! Mousse will remake your OO base
+module from the current version of Mousse have installed, every time you
+run C<perl Makefile.PL>.
+
+=head1 MOUSSE FEATURES AND ADVANTAGES
+
+=head2 Mousse IS Mouse
+
+To learn about the features of Mousse (i.e. your generated Mousse-based
+OO module), simply read L<Mouse>.
+
+Mousse is an exact copy of Mouse::*. It uses the same build process as
+Mouse::Tiny does, except that it names the resulting module whatever you
+want to call it. For example, if you use this line in your Makefile.PL:
+
+    use_mousse 'Foo::Widget::OO';
+
+then L<Mousse::Maker> will I<whip up> a C<lib/Foo/Widget/OO.pm> file for
+you from the Mousse.pm installed on your system.
+
+Alternatively, if you use I<this> line in your Makefile.PL:
+
+    use_mousse_dev 'Foo::Widget::OO';
+
+then L<Mousse::Maker> will create a C<lib/Foo/Widget/OO.pm> file for
+you from the I<Mouse> parts installed on your system.
+
+=head2 No Dependency Hell Issues
+
+When you distribute a module that uses Mousse for OO, you can be assured
+that you have coded and tested against the exact copy of Mousse that
+your users will be running with. When a Mousse related bug is found, you
+can simply ship a new copy of your code (with the repaired copy of
+Mousse) and be certain that nobody will be trampled by a wild Moose.
+
+=head2 Using Mousse without Module::Install
+
+If you don't use Module::Install for your Makefile.PL, or if you want to
+only update Mousse by hand, you can use this simple command:
+
+    perl -MMousse::Maker -e make_mousse 'Chocolate::Mousse' > lib/Chocolate/Mousse.pm
+
+=head2 You Can Use Mousse as a Prerequisite
+
+If you don't care about adding a dependency and you don't want to ship
+your own copy of Mousse, you can use it just like Mouse::Tiny.
+
+=head1 EXAMPLES
+
+L<Scalar::Random::PP> is an example of a CPAN module that uses Mousse.
+
+If you have a module to add here, let me know.
+
+=head1 RESOURCES
+
+CPAN: L<http://search.cpan.org/dist/Mousse/>
+
+GitHub: L<http://github.com/ingydotnet/mousse-pm>
+
+IRC: irc.perl.org#moose-dev
+
+=head1 CREDIT
+
+Thanks to Stevan Little for the movement that is L<Moose>.
+
+The guts of this module is pure, un(well slightly)adulterated L<Mouse>. 藤吾郎++
+
+Also, many thanks to Luke Closs' cat, Jeebus!
+
+=head1 AUTHOR
+
+Ingy döt Net <ingy@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2010, 2011. Ingy döt Net.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html
+
+=cut

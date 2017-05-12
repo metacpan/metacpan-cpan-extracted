@@ -1,0 +1,25 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Makefile/Parallel.pm
+lib/Makefile/Parallel/Grammar.yp
+lib/Makefile/Parallel/Scheduler.pm
+lib/Makefile/Parallel/Scheduler/Local.pm
+lib/Makefile/Parallel/Scheduler/PBS.pm
+t/00-load.t
+t/01-parser.t
+t/01-grammar.pmake
+t/pod-coverage.test
+t/pod.t
+
+examples/pmake
+examples/PMakefile.example
+examples/PMakefile.sequencial
+examples/PMakefile.pipeline
+examples/PMakefile.forks
+examples/PMakefile.dot
+t/02-grammar.pmake
+t/02-parser.t
+META.json                                Module JSON meta-data (added by MakeMaker)

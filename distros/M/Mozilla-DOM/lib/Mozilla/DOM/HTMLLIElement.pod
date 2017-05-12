@@ -1,0 +1,66 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLLIElement
+
+=for object Mozilla::DOM::HTMLLIElement
+
+Mozilla::DOM::HTMLLIElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLLIElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLLIElement interface is the interface to a [X]HTML li
+ * element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLLIElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $type = $htmllielement->B<GetType>()
+
+=head2 $value = $htmllielement->B<GetValue>()
+
+=head2 $htmllielement->B<SetType>($type)
+
+=over
+
+=over
+
+=item * $type (string)
+
+=back
+
+=back
+
+=head2 $htmllielement->B<SetValue>($value)
+
+=over
+
+=over
+
+=item * $value (integer (long))
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

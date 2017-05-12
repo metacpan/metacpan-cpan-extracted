@@ -1,0 +1,19 @@
+% return unless $object->hasa_columns;
+% my $labels = $config->table_labels;
+
+<div class="fleft">
+
+% foreach my $related_accessor ( map { $_->name } $object->hasa_columns ) {
+% my $related = $object->$related_accessor; 
+
+<div class="ViewTable">
+<h3><% $labels->{ $related->table } %></h3>
+<% $request->quick_table( vertical => 1, object => $related, labels => 'L' ) %>
+</div>
+% }
+
+</div>
+
+<%args>
+    $object
+</%args>

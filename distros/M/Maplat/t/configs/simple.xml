@@ -1,0 +1,141 @@
+<maplat>
+	<!-- displayed Application name -->
+	<appname>Maplat WebGui</appname>
+        <extraincpaths>./t</extraincpaths>
+	
+	<server>
+		<port>9500</port>
+		
+		<!-- do we want a forking server?
+			 This feature is still in beta, but it's
+			 much better whenever a client would otherwise
+			 block the server
+		-->
+		<forking>0</forking>
+
+		<usessl>0</usessl>
+	</server>
+
+	<!-- Template module -->
+	<module>
+		<modname>templates</modname>
+		<pm>TemplateCache</pm>
+		<options>
+			<view>
+				<path>Maplat/Web/Templates</path>
+				<base>/</base>
+			</view>
+			<!-- Layout-Template to use for complete pages -->
+			<layout>simplelayout</layout>
+		</options>
+	</module>
+
+	<!-- images and static files -->
+	<module>
+		<modname>images</modname>
+		<pm>StaticCache</pm>
+		<options>
+			<path>Maplat/Web/Images</path>
+			<webpath>/pics/</webpath>
+			<cache_control>max-age=3600, must-revalidate</cache_control>
+			<expires>+1h</expires>
+		</options>
+	</module>
+	<module>
+		<modname>static</modname>
+		<pm>StaticCache</pm>
+		<options>
+			<path>Maplat/Web/Static</path>
+			<webpath>/static/</webpath>
+			<cache_control>max-age=3600, must-revalidate</cache_control>
+			<expires>+1h</expires>
+		</options>
+	</module>
+
+	<!-- Memcache module (just handles the memcache instance variable) -->
+	<module>
+		<modname>memcache</modname>
+		<pm>MemCacheSim</pm>
+		<options>
+			<service>127.0.0.1:11211</service>
+			<namespace>MaplatMem</namespace>
+			<viewcommands>
+				<view>Maplat WebGui</view>
+				<view>Maplat Worker</view>
+				<view>MaplatAdm Worker</view>
+			</viewcommands>
+		</options>
+	</module>
+
+	<!-- Some default values for masks -->
+	<module>
+		<modname>defaultwebdata</modname>
+		<pm>StandardFields</pm>
+		<options>
+			<memcache>memcache</memcache>
+			<static>
+				<fields>
+					<toplink_width>140px</toplink_width>
+					
+					<!-- per host configuration -->
+					<hosts>
+						<W23is005a>
+							<!-- Display an info message when needed -->
+							<!--<header_message>Wartungsarbeiten - Es kann zu kurzen Ausfaellen kommen</header_message>-->
+						</W23is005a>
+						<WXPDEV>
+							<!-- Display an info message when needed -->
+							<header_message>Testsystem</header_message>
+						</WXPDEV>
+					</hosts>
+				</fields>
+			</static>
+			<memory>
+				<fields>
+					<WebGuiVersion>VERSION::Maplat WebGui</WebGuiVersion>
+					<WebGuiBuildNum>BUILD::Maplat WebGui</WebGuiBuildNum>
+					<WorkerVersion>VERSION::Maplat Worker</WorkerVersion>
+					<WorkerBuildNum>BUILD::Maplat Worker</WorkerBuildNum>
+					<AdmWorkerVersion>VERSION::MaplatAdm Worker</AdmWorkerVersion>
+					<AdmWorkerBuildNum>BUILD::MaplatAdm Worker</AdmWorkerBuildNum>
+				</fields>
+			</memory>
+		</options>
+	</module>
+
+	<!-- ************ local module example *******************-->
+	<module>
+		<modname>hello</modname>
+		<pm>HelloWorld</pm>
+		<options>
+		    <webpath>/helloworld/example</webpath>
+		    <pagetitle>Hello World</pagetitle>
+		</options>
+	</module>
+
+
+	<!-- Last Pre-Filter module: Set some default redirections -->
+	<module>
+		<modname>pathcorrection</modname>
+		<pm>PathRedirection</pm>
+		<options>
+			<redirect>
+				<source>/</source>
+				<destination>/helloworld/example</destination>
+				<statuscode>307</statuscode>
+				<statustext>Please use the helloworld module</statustext>
+			</redirect>
+		</options>
+	</module>
+
+	<module>
+		<modname>workarounds</modname>
+		<pm>BrowserWorkarounds</pm>
+		<options>
+			<pagetitle>Workarounds</pagetitle>
+		</options>
+	</module>
+
+</maplat>	
+	
+

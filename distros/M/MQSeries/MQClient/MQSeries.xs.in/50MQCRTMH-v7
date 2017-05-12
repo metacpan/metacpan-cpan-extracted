@@ -1,0 +1,21 @@
+# -*-c-*-
+#
+# $Id: 50MQCRTMH-v7,v 33.4 2012/09/26 16:10:07 jettisu Exp $
+#
+# (c) 2009-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+MQHMSG
+MQCRTMH(Hconn,CrtMsgHOpts,CompCode,Reason)
+        MQHCONN         Hconn
+        MQCMHO          CrtMsgHOpts
+        MQLONG          CompCode = NO_INIT
+        MQLONG          Reason = NO_INIT
+
+    CODE:
+        MQCRTMH(Hconn,&CrtMsgHOpts,&RETVAL,&CompCode,&Reason);
+    OUTPUT:
+        RETVAL
+        CompCode
+        Reason

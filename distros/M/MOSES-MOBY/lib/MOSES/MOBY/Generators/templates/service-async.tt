@@ -1,0 +1,67 @@
+#!/usr/bin/perl -w
+# This is a perl module representing an asynchronous biomoby service.
+# There is no need to edit this file, but you will need to implement
+# the file [% impl.package %]
+#
+# It includes some hard-coded paths - they were added during the
+# generate service call.
+#
+# $Id: service-async.tt,v 1.1 2008/08/25 16:27:28 kawas Exp $
+# ---------------------------------------------------------------
+[%# A template for an asynchronous biomoby service.
+    ===================================
+
+    Expected/recognized parameters:
+      obj         ... a service definition, type MOSES::MOBY::Def::Service
+-%]
+
+#-----------------------------------------------------------------
+# Authority:    [% obj.authority %]
+# Service name: [% obj.name %]
+# Generated:    [% USE Date (format = '%d-%b-%Y %H:%M:%S %Z') %][% Date.format %]
+# Contact: Martin Senger <martin.senger@gmail.com> or
+#          Edward Kawas <edward.kawas@gmail.com>
+#-----------------------------------------------------------------
+
+package [% impl.package %]Async;
+
+use strict;
+
+use FindBin qw( $Bin );
+use lib $Bin;
+
+use MOBY::Async::SimpleServer;
+use base qw(MOBY::Async::SimpleServer);
+use [% impl.package %];
+
+# how long before syncronous call times out (seconds)
+use constant TIMEOUT => 180; 
+
+# This environment variable must be set - it is used internally
+# by MOBY::Async::SimpleServer class
+$ENV{AUTHURI} = '[% obj.authority %]';
+
+# this is the callback routine that calls
+# [% impl.package %]->[% obj.name %]
+my $subroutine = sub {
+	my ($self, $data) = @_;
+	return [% impl.package %]->[% obj.name %]($data);
+};
+
+# This is the method which answers to synchronous requests
+sub [% obj.name %] {
+  my $self = shift @_;
+  # Here you can choose between sync or error
+  return $self->sync($subroutine, TIMEOUT, @_);
+  #return $self->error(@_);
+}
+
+# This is the method which answers to asynchronous requests
+sub [% obj.name %]_submit {
+  my $self = shift @_;
+  return $self->async($subroutine, @_);
+}
+
+1;
+
+__END__

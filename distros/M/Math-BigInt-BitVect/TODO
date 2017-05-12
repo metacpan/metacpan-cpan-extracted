@@ -1,0 +1,9 @@
+
+* check resizing, it's inefficient
+* add a _sqrt() and a _root() method to speed bsqrt() and broot() up
+* _fac() could use inlining of _mul() and _dec() to avoid the __resize calls
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

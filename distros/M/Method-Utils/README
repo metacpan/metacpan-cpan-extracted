@@ -1,0 +1,75 @@
+NAME
+    `Method::Utils' - functional-style utilities for method calls
+
+SYNOPSIS
+     use Method::Utils qw( maybe possibly inwardly );
+
+     $obj->${maybe "do_thing"}(@args);
+     # equivalent to
+     #   $obj->do_thing(@args) if defined $obj;
+
+     $obj->${possibly "do_another"}(@args);
+     # equivalent to
+     #   $obj->do_another(@args) if $obj->can( "do_another" );
+
+     $obj->${inwardly "do_all_these"}();
+     # invokes the method on every subclass in 'mro' order
+
+FUNCTIONS
+    All of the following functions are intended to be used as method call
+    modifiers. That is, they return a `SCALAR' reference to a `CODE'
+    reference which allows them to be used in the following syntax
+
+     $ball->${possibly "bounce"}( "10 metres" );
+
+    Since the returned double-reference can be dereferenced by `${ }' to
+    obtain the `CODE' reference directly, it can be used to create new
+    methods. For example:
+
+     *bounce_if_you_can = ${possibly "bounce"};
+
+    This is especially useful for creating methods in base classes which
+    distribute across all the classes in a class heirarchy; for example
+
+     *DESTROY = ${inwardly "COLLAPSE"};
+
+  maybe $method
+    Invokes the named method on the object or class, if one is provided, and
+    return what it returned. If invoked on `undef', returns `undef' in
+    scalar context or the empty list in list context.
+
+    `$method' here may also be a double-ref to a `CODE', such as returned by
+    the remaining utility functions given below. In this case, it will be
+    dereferenced automatically, allowing you to conveniently perform
+
+      $obj->${maybe possibly 'method'}( @args )
+
+  possibly $method
+    Invokes the named method on the object or class and return what it
+    returned, if it exists. If the method does not exist, returns `undef' in
+    scalar context or the empty list in list context.
+
+  inwardly $method
+  outwardly $method
+    Invokes the named method on the object or class for *every* class that
+    provides such a method in the `@ISA' heirarchy, not just the first one
+    that is found. `inwardly' searches all the classes in mro order, finding
+    the class itself first and then its superclasses. `outwardly' runs in
+    reverse, starting its search at the base-most superclass, searching
+    upward before finally ending at the class itself.
+
+TODO
+    *   Consider `hopefully $method', which would `eval{}'-wrap the call,
+        returning `undef'/empty if it failed.
+
+    *   Consider better ways to combine more of these. E.g. `hopefully
+        inwardly' would `eval{}'-wrap each subclass call. `inwardly' without
+        `possibly' would fail if no class provides the method.
+
+SEE ALSO
+    *   http://shadow.cat/blog/matt-s-trout/madness-with-methods/ - Madness
+        With Methods
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -1,0 +1,318 @@
+<smon>
+
+  <general>
+    <plugins-dir></plugins-dir>
+    <notifiers-dir></notifiers-dir>
+
+    <email-group id="watch-dogs">
+      <!-- <email>vladimir.bajic@kaust.edu.sa</email> -->
+      <email>martin.senger@gmail.com</email>
+      <email>aleksandar.radovanovic@kaust.edu.sa</email>
+    </email-group>
+
+    <email-group id="allan-services">
+      <email>martin.senger@gmail.com</email>
+      <email>allan.kamau@kaust.edu.sa</email>
+    </email-group>
+
+    <email-group id="ulf-services">
+      <email>martin.senger@gmail.com</email>
+      <email>ulf.schaefer@kaust.edu.sa</email>
+    </email-group>
+
+
+    <!-- NOTIFIER: store ALL results into a history file on a separate machine -->
+    <notifier command="copy-to-file" on="all" format="tsv">
+      <args>
+        <arg>-login</arg> <arg>sengerm@db.cbrc.kaust.edu.sa</arg>
+        <arg>-file</arg>  <arg>/home/sengerm/public_html/monitor/testing-cbrc-monitor-history.tsv</arg>
+      </args>
+    </notifier>
+
+    <!-- NOTIFIER: email ERRORS using an external mailer accessed by SSH -->
+    <notifier command="send-email-via-ssh" on="err" email-group="watch-dogs">
+      <args>
+        <arg>-login</arg>
+        <arg>senger@open-bio.org</arg>
+      </args>
+    </notifier>
+
+  </general>
+
+  <services>
+
+    <service id="cbrcpage" name="CBRC Application Main Page">
+      <description>Access to the CBRC Applications Main Page</description>
+      <plugin command="check-url.pl">
+        <head-test>
+          <url>http://cbrc.kaust.edu.sa/cbrcweb/home/applications.php</url>
+        </head-test>
+      </plugin>
+    </service>
+
+    <service id="destaf" name="CBRC DESTAF">
+      <description>Dragon Exploration System for Toxicants and Fertility</description>
+      <plugin command="check-post.pl">
+        <head-test>
+          <url>http://cbrc.kaust.edu.sa/destaf/SearchEntityPairs.php</url>
+        </head-test>
+        <post-test>
+          <url>http://cbrc.kaust.edu.sa/destaf/SearchEntityPairs.php</url>
+          <data><![CDATA[jobid=DESTAF_15_may_2011_paper_v2&SType=on&SearchKeywords=cholesterol&search=Search]]></data>
+          <response>
+            <content-type>text/html</content-type>
+          </response>
+        </post-test>
+      </plugin>
+    </service>
+
+    <service id="tcof" name="TcoF">
+      <description>Dragon database of transcription co-factors and transcription factor interacting proteins</description>
+      <ignore-general-notifiers />
+      <notifier command="send-email-via-ssh" on="err" email-group="ulf-services">
+        <args>
+          <arg>-login</arg>
+          <arg>senger@open-bio.org</arg>
+        </args>
+      </notifier>
+      <plugin command="check-post.pl">
+        <head-test>
+          <url>http://cbrc.kaust.edu.sa/tcof/index.php</url>
+        </head-test>
+        <post-test>
+          <url>http://cbrc.kaust.edu.sa/tcof/searchProteinByIdentifier.php</url>
+          <data><![CDATA[SearchKeywords=BRCA1_HUMAN&search=Search&searchType=unip_id]]></data>
+          <response>
+            <content-type>text/html</content-type>
+            <contains>P38398</contains>
+          </response>
+        </post-test>
+      </plugin>
+    </service>
+
+    <service id="dpore" name="dPORE-miRNA">
+      <description>Dragon database on Polymorphic Regulation of human miRNA genes</description>
+      <ignore-general-notifiers />
+      <notifier command="send-email-via-ssh" on="err" email-group="ulf-services">
+        <args>
+          <arg>-login</arg>
+          <arg>senger@open-bio.org</arg>
+        </args>
+      </notifier>
+      <plugin command="check-post.pl">
+        <head-test>
+          <url>http://cbrc.kaust.edu.sa/dpore/index.php</url>
+        </head-test>
+        <post-test>
+          <url>http://cbrc.kaust.edu.sa/dpore/MirnaSearch.php</url>
+          <data><![CDATA[SearchKeywords=hsa-mir-106a&search=Search]]></data>
+          <response>
+            <content-type>text/html</content-type>
+            <contains>microRNA found to match your query</contains>
+          </response>
+        </post-test>
+      </plugin>
+    </service>
+
+    <service id="hcvpro" name="HCVpro">
+      <description>Hepatitis C Virus Protein Interaction Database</description>
+      <ignore-general-notifiers />
+      <notifier command="send-email-via-ssh" on="err" email-group="ulf-services">
+        <args>
+          <arg>-login</arg>
+          <arg>senger@open-bio.org</arg>
+        </args>
+      </notifier>
+      <plugin command="check-post.pl">
+        <head-test>
+          <url>http://cbrc.kaust.edu.sa/hcvpro/index.php</url>
+        </head-test>
+        <post-test>
+          <url>http://cbrc.kaust.edu.sa/hcvpro/FullTextSearch.php</url>
+          <data><![CDATA[SearchKeywords=Vimentin&search=Search]]></data>
+          <response>
+            <content-type>text/html</content-type>
+            <contains>7431</contains>
+          </response>
+        </post-test>
+      </plugin>
+    </service>
+
+    <service id="ddm" name="Dragon Desert Masker">
+      <description>Transcription Initiation Desert Identification</description>
+      <ignore-general-notifiers />
+      <notifier command="send-email-via-ssh" on="err" email-group="ulf-services">
+        <args>
+          <arg>-login</arg>
+          <arg>senger@open-bio.org</arg>
+        </args>
+      </notifier>
+      <plugin command="check-url.pl">
+        <head-test>
+          <url>http://cbrc.kaust.edu.sa/ddm/index.php</url>
+        </head-test>
+      </plugin>
+    </service>
+
+    <service id="ddpc" name="Dragon Database of Genes Implicated in Prostate Cancer">
+      <description>Expert reviewed information summary about the genes implicated in prostate cancer</description>
+      <ignore-general-notifiers />
+      <notifier command="send-email-via-ssh" on="err" email-group="ulf-services">
+        <args>
+          <arg>-login</arg>
+          <arg>senger@open-bio.org</arg>
+        </args>
+      </notifier>
+      <plugin command="check-post.pl">
+        <head-test>
+          <url>http://cbrc.kaust.edu.sa/ddpc/index.php</url>
+        </head-test>
+        <post-test>
+          <url>http://cbrc.kaust.edu.sa/ddpc/multiplequery.php</url>
+          <data><![CDATA[evocAnatSysIDs[]=134&Query=++Query++]]></data>
+          <response>
+            <content-type>text/html</content-type>
+            <contains>IL8</contains>
+          </response>
+        </post-test>
+      </plugin>
+    </service>
+
+    <service id="hocomoco" name="Homo Sapiens Comprehensive Model Collection">
+      <description>Homo Sapiens Comprehensive Model Collection of transcription factor binding models</description>
+      <ignore-general-notifiers />
+      <notifier command="send-email-via-ssh" on="err" email-group="ulf-services">
+        <args>
+          <arg>-login</arg>
+          <arg>senger@open-bio.org</arg>
+        </args>
+      </notifier>
+      <plugin command="check-post.pl">
+        <head-test>
+          <url>http://cbrc.kaust.edu.sa/hocomoco/index.php</url>
+        </head-test>
+        <post-test>
+          <url>http://cbrc.kaust.edu.sa/hocomoco/viewPredefinedSet.php</url>
+          <data><![CDATA[predefinedSets=AD&search=View]]></data>
+          <response>
+            <content-type>text/html</content-type>
+            <contains>AP2A_f2</contains>
+          </response>
+        </post-test>
+      </plugin>
+    </service>
+
+    <service id="dps" name="Dragon PolyA Spotter">
+      <description>Prediction of the polyadenylation signals variants in genomic sequences</description>
+      <plugin command="check-url.pl">
+        <head-test>
+          <url>http://cbrc.kaust.edu.sa/dps/Capture.html</url>
+        </head-test>
+      </plugin>
+    </service>
+
+    <service id="dts" name="Dragon TIS Spotter">
+      <description>Searches for Translation Initiation Sites (TISs) in Arabidopsis genomic sequences</description>
+      <plugin command="check-url.pl">
+        <head-test>
+          <url>http://cbrc.kaust.edu.sa/dts/Capture.html</url>
+        </head-test>
+      </plugin>
+    </service>
+
+    <!-- Services accessible only FROM INSIDE KAUST -->
+
+    <service id="synonia" name="Synonia">
+      <description>Exploring synonyms in life-science datasets</description>
+      <plugin command="check-post.pl">
+        <head-test>
+          <url>http://www.cbrc.kaust.edu.sa/synonia/start</url>
+        </head-test>
+        <post-test>
+          <url>http://www.cbrc.kaust.edu.sa/synonia/ajax/getsynonyms</url>
+          <data><![CDATA[name=brca1&namespace=geneid&format=html]]></data>
+          <response>
+            <content-type>text/json</content-type>
+            <contains>BRCA1</contains>
+          </response>
+        </post-test>
+        <post-test>
+          <url>http://www.cbrc.kaust.edu.sa/synonia/ajax/getcount</url>
+          <data><![CDATA[namespace=geneid&action=table]]></data>
+          <response>
+            <content-type>text/json</content-type>
+            <contains>Alternate_name</contains>
+            <contains>Gene_Symbol</contains>
+          </response>
+        </post-test>
+      </plugin>
+    </service>
+
+    <service id="mrs-kaust" name="MRS at KAUST">
+      <plugin command="check-prg.pl">
+        <prg-test>
+          <program>mrsclient</program>
+          <timeout>5</timeout>
+          <args>
+            <arg>-H</arg> <arg>mrs.cbrc.kaust.edu.sa</arg>
+            <arg>-l</arg>
+          </args>
+          <stdout>
+            <contains>enzyme</contains>
+            <contains>gene</contains>
+            <contains>sprot</contains>
+          </stdout>
+        </prg-test>
+        <prg-test>
+          <program>mrsclient</program>
+          <timeout>5</timeout>
+          <args>
+            <arg>-H</arg> <arg>mrs.cbrc.kaust.edu.sa</arg>
+            <arg>-d</arg> <arg>sprot</arg>
+            <arg>-q</arg> <arg>canine</arg>
+            <arg>-c</arg>
+            <arg>-n</arg>
+            <arg></arg>
+          </args>
+          <stdout>
+            <is-integer/>
+          </stdout>
+        </prg-test>
+      </plugin>
+    </service>
+
+    <!-- See: http://nagiosplugins.org/man/check_ping -->
+    <service id="ping-git" name="Ping Git Repository">
+      <ignore-general-notifiers />
+      <plugin command="/home/senger/nagios-plugins/libexec/check_ping">
+        <args>
+          <arg>-H</arg> <arg>git.cbrc.kaust.edu.sa</arg>
+          <arg>-w</arg> <arg>1.5,90%</arg>
+          <arg>-c</arg> <arg>2.5,90%</arg>
+        </args>
+      </plugin>
+    </service>
+
+    <!-- Allan's WOS cron job -->
+    <service id="wos" name="Allan's cron WOS job">
+      <ignore-general-notifiers />
+      <notifier command="send-email-via-ssh" on="err" email-group="allan-services">
+        <args>
+          <arg>-login</arg>
+          <arg>senger@open-bio.org</arg>
+        </args>
+      </notifier>
+      <plugin command="check-prg.pl">
+        <prg-test>
+          <program>check-allan-date.pl</program>
+          <timeout>5</timeout>
+          <args>
+          </args>
+        </prg-test>
+      </plugin>
+    </service>
+    <!-- TO DO: Galaxy -->
+
+  </services>
+
+</smon>

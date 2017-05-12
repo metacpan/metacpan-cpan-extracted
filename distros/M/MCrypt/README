@@ -1,0 +1,74 @@
+                         MCrypt 0.92
+               Copyright (c) 2000, Frey Kuo
+
+------------------------------------------------------------------------
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the Artistic License, a copy of which can be
+    found with perl.
+
+  THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+  EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DAMAGES RESULTING FROM
+  THE USE OF THIS SOFTWARE.                      
+------------------------------------------------------------------------
+
+       *** This is beta software -- use at your own risk ***
+
+This is MCrypt, an XS-based perl interface to the popular mcrypt crypto
+library.
+
+MCrypt supports a wide variety of block algorithms such as DES, TripleDES,
+Blowfish (default), 3-WAY, SAFER-SK64, SAFER-SK128, TWOFISH, TEA, RC2,
+GOST, LOKI, SERPENT, CAST and RIJNDAEL in CBC, OFB, CFB and ECB cipher
+modes.
+
+
+Prerequisites
+--------------
+
+In addition to this module, you must install the libmcrypt library. 
+
+Please download and install the latest libmcrypt-2.2.x.tar.gz at
+ftp://argeas.cs-net.gr/pub/unix/mcrypt.  At the time of this writing, the
+latest 2.2.x release was 2.2.7.
+
+Additional information about the mcrypt library can be found at
+http://mcrypt.hellug.gr.
+
+The mcrypt library MUST be found in your library path when using
+this module.  In Linux, libmcrypt is defaultly installed in /usr/local/lib
+-- be sure that the /usr/local/lib path is in your /etc/ld.so.conf.
+
+
+Installing MCrypt
+-----------------
+
+standard issue:
+
+	1. perl Makefile.PL
+	2. make
+	3. make test
+	4. make install
+
+
+Notes & Caveats
+-----------------
+
+I have only tested this module with Linux only.  I would imagine it will
+work on *BSD systems also, as long as libmcrypt is in your library search
+path.  Please report any other successful OS/Platform combinations to me.
+Thanks.
+
+There may be bugs; please report them to the below address.  I would like 
+feedback from users of this module - I may change some things around 
+depending on how people plan on using this module.  Constructive criticism 
+always welcome from seasoned perl module writers.
+
+This interface is used with the 2.2.x tree of the mcrypt library ONLY!
+The newer 2.5.x API is not supported yet; I don't use it myself, but I may
+add it in if there is some demand.
+
+Report bugs to:
+
+kero@3SHEEP.COM

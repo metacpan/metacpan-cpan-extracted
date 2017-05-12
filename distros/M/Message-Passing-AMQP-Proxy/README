@@ -1,0 +1,21 @@
+NAME
+    Message::Passing::AMQP::Proxy
+
+SYNOPSIS
+        $ message-pass --input STDIN --output AMQP::Proxy --output_options '{"hostname":"127.0.0.1","username":"guest","password":"guest"}'
+        {"data":{"some":"data"},"@metadata":"value"}
+
+DESCRIPTION
+    An AMQP adaptor for Message::Passing, filtering JSON messages into
+    specified exchanges with specified routeing keys.
+
+    *   The exchange is specified by the @exchange field in the JSON data.
+
+    *   The routeing key is specified by the @rk field in the JSON data.
+
+AUTHOR
+    Dave Lambley, based on work by Tomas (t0m) Doran.
+
+LICENSE
+    GNU Affero General Public License, Version 3
+

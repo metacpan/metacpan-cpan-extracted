@@ -1,0 +1,61 @@
+dnl -*- shell-script-*-
+dnl
+dnl    Copyright 2000, 2001, 2002, 2003 Laurent Wacrenier
+dnl
+dnl  This file is part of PLL libmdq.
+dnl
+dnl  PLL libmdq is free software; you can redistribute it and/or modify
+dnl  it under the terms of the GNU Lesser Public License as published by
+dnl  the Free Software Foundation; either version 2 of the License, or
+dnl  (at your option) any later version.
+dnl
+dnl  PLL libmdq is distributed in the hope that it will be useful,
+dnl  but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+dnl  GNU Lesser Public License for more details.
+dnl
+dnl  You should have received a copy of the GNU Lesser Public License
+dnl  along with PLL libmdq; if not, write to the Free Software
+dnl  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+dnl
+dnl $Id: configure.in,v 1.7 2005/01/31 17:38:06 lwa Exp $
+dnl Process this file with autoconf to produce a configure script.
+
+define(VERSION, esyscmd([awk '{printf "%s", $0}' VERSION]))
+
+dnl old autoconf syntax
+dnl AC_INIT(deliver.c)
+AC_INIT(MDQ, VERSION, lwa@teaser.fr)
+
+AC_REVISION($Revision: 1.7 $)
+
+AC_CONFIG_HEADER(config.h)
+
+AC_PROG_CC
+case "$GCC" in 
+yes)  CPPFLAGS=-Wall ;;
+esac
+
+CPPFLAGS="$CPPFLAGS $CFLAGS"
+
+AC_PROG_INSTALL
+
+AC_HEADER_STDC
+
+AC_MSG_CHECKING([how to mark unused variables])
+AC_COMPILE_IFELSE(
+    [AC_LANG_SOURCE([[int a __attribute__ ((unused));]])],
+    [AC_DEFINE(UNUSED, [__attribute__((unused))], [Attribute to mark unused variables])],
+    [AC_DEFINE(UNUSED, [])])
+AC_MSG_RESULT([])
+
+
+MDQ_VERSION_MAJOR=`echo VERSION | awk -F. '{print $1}'`
+MDQ_VERSION_MINOR=`echo VERSION | awk -F. '{print $2}'`
+MDQ_VERSION=\"VERSION\"
+
+AC_SUBST(MDQ_VERSION_MAJOR)
+AC_SUBST(MDQ_VERSION_MINOR)
+AC_SUBST(MDQ_VERSION)
+
+AC_OUTPUT(Makefile mdq.h)

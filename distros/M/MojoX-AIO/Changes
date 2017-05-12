@@ -1,0 +1,22 @@
+
+Revision history for Perl extension MojoX::AIO
+
+0.06 Thu, Jan 23 2014
+    contribution from Olivier Duclos to work with recent mojolicious
+
+0.05 Mon, Jan 30 2011 20:57:00 PST
+    updated to work with newer versions of Mojolicious
+    with backward compat for previous versions
+
+0.04 Thu, Aug 18 2011 22:57:00 PST
+    updated to work with Mojolicious 1.65+
+
+0.03 Wed, Jul 13 2011 21:26:00 PST
+    -not released on cpan-
+
+0.02 Mon, Oct 25 2010 21:54:00 CDT
+    updated MojoX::AIO internals to not muck with Mojo internals
+    prereq on Mojolicious v0.999931, and IO::AIO v2
+
+0.01 Mon, Oct 25 2010 01:24:00 CDT
+    original version

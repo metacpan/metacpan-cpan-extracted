@@ -1,0 +1,120 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Mojolicious::Plugin::ShareHelpers - A Mojolicious Plugin for generate share urls, buttons and meta for Twitter, Facebook, VK, MyMailRU and Google Plus
+
+=head1 SYNOPSIS
+
+  # Mojolicious
+  $self->plugin('share_helpers');
+
+  # Mojolicious::Lite
+  plugin 'share_helpers';
+
+  # share urls:
+  <a href="<%== share_url 'twitter',   url => $url, text => $text, via => 'sharifulin' %>">Share to Twitter</a>
+  <a href="<%== share_url 'facebook',  url => $url, text => $text %>">Share to Facebook</a>
+  <a href="<%== share_url 'vkontakte', url => $url %>">Share to ВКонтакте</a>
+  <a href="<%== share_url 'mymailru',  url => $url %>">Share to Мой Мир</a>
+
+  # share buttons:
+  %== share_button 'twitter',   url => 'http://mojolicio.us', text => 'Viva la revolution!', via => 'sharifulin';
+  %== share_button 'facebook',  url => 'http://mojolicio.us', type => 'button_count', title => 'Share it';
+  %== share_button 'vkontakte', url => 'http://mojolicio.us', type => 'round', title => 'Save';
+  %== share_button 'mymailru',  url => 'http://mojolicio.us', type => 'button_count', title => 'Share to Мой Мир';
+  
+  # google plus button +1:
+  %== share_button 'google+', lang => 'ru'
+  %== share_button 'google+', noscript => 1, size => 'tall', url => 'http://mojolicio.us'
+  
+  # generate meta for share
+  %== share_meta title => 'Mojolicious', description => 'Viva la revolition!', url => 'http://mojolicio.us', image => 'http://mojolicious.org/webinabox.png'
+  %== share_meta title => 'Mojolicious', description => 'Viva la revolition!', url => 'http://mojolicio.us', image => 'http://mojolicious.org/webinabox.png', og => 1, fb_app_id => 1234567890, site_name => 'Site Name'
+  
+  # check share agent, it may returns string such as 'facebook' or 'twitter' or 'vkontakte' or empty string
+  %= is_share_agent
+
+=head1 DESCRIPTION
+
+L<Mojolicous::Plugin::ShareHelpers> is a plugin for generate share url, share button and share meta (Twitter, Facebook, VKontakte).
+
+Plugin adds a C<share_url>, C<share_button>, C<share_meta> and C<is_share_agent> helpers to L<Mojolicious>.
+
+=head1 SHARE API
+
+=over 5
+
+=item * Twitter Share L<http://dev.twitter.com/pages/tweet_button>
+
+=item * Facebook Share L<http://developers.facebook.com/docs/share>
+
+=item * VK Share L<http://vkontakte.ru/pages.php?act=share>
+
+=item * MyMailRU Share L<http://api.mail.ru/sites/plugins/share/extended/>
+
+=item * Google Plus L<http://code.google.com/intl/ru-RU/apis/+1button/>
+
+=back
+
+=head1 METHODS
+
+L<Mojolicious::Plugin::ShareHelpers> inherits all methods from
+L<Mojolicious::Plugin> and implements the following new ones.
+
+=head2 C<register>
+
+	$plugin->register;
+
+Register plugin hooks in L<Mojolicious> application.
+
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+
+=head1 AUTHOR
+
+Anatoly Sharifulin <sharifulin@gmail.com>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-mojolicious-plugin-sharehelpers at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.htMail?Queue=Mojolicious-plugin-sharehelpers>.  We will be notified, and then you'll
+automatically be notified of progress on your bug as we make changes.
+
+=over 5
+
+=item * Github
+
+L<http://github.com/sharifulin/Mojolicious-plugin-sharehelpers/tree/master>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.htMail?Dist=Mojolicious-plugin-sharehelpers>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Mojolicious-plugin-sharehelpers>
+
+=item * CPANTS: CPAN Testing Service
+
+L<http://cpants.perl.org/dist/overview/Mojolicious-plugin-sharehelpers>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Mojolicious-plugin-sharehelpers>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Mojolicious-plugin-sharehelpers>
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (C) 2010-2013 by Anatoly Sharifulin.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

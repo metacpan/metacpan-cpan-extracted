@@ -1,0 +1,58 @@
+# NAME
+
+MooseX::Role::Data::Verifier - Moose role for generating Data::Verifier profiles from Moose objects.
+
+# VERSION
+
+version 0.01
+
+# SYNOPSIS
+
+    package TestClass;
+    use Moose;
+  
+
+    with 'MooseX::Role::Data::Verifier';
+
+    has 'name' => (
+        is => 'rw',
+        isa => 'Str',
+        required => 1
+    );
+  
+
+    # ... elsewhere
+  
+
+    my $tc = TestClass->new;
+  
+
+    my $dv = Data::Verifier->new(
+        profile => $tc->get_verifier_profile
+    );
+  
+
+    $dv->verify(...); # Verify!
+
+# DESCRIPTION
+
+MooseX::Role::Data::Verifier provides a simple `get_verifier_profile` method
+that generates a profile suitable for Data::Verifier from a Moose object.
+
+# NOTES
+
+This module ignores anonymous type-constraints.  There's also no way to infer
+from the attribute that filters need to be used.  If you want to add filters,
+they can be applied globally or added afterward to the hashref returned by
+`get_verifier_profile`.
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Cold Hard Code, LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

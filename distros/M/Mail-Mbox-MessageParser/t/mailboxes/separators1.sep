@@ -1,0 +1,441 @@
+From kre@foo.com  Mon Aug  2 21:25:01 2004
+Return-path: <kre@foo.com>
+Received: from ausl1.central.foo.com [129.153.131.90]
+	by localhost with IMAP (fetchmail-5.8.0)
+	for willf@localhost (single-drop); Mon, 02 Aug 2004 21:25:00 -0500 (CDT)
+Received: from auail.central.foo.com by
+ ausail1.central.foo.com
+ (iPlanet Messaging Server 5.2 HotFix 1.24 (built Dec 19 2003))
+ id <0I1U00101M9HO3@aus1.central.foo.com>
+ (original mail from kruest@foo.com); Mon,
+ 02 Aug 2004 21:24:06 -0500 (CDT)
+Received: from centralm.Central.foo.com
+ (centr2brm.Central.foo.com [129.147.62.14])
+ by aus08-mail1.central.foo.com
+ (iPlanet Messaging Server 5.2 HotFix 1.24 (built Dec 19 2003))
+ with ESMTP id <0I1U00MWPMO68W@aus1.central.foo.com>; Mon,
+ 02 Aug 2004 21:24:06 -0500 (CDT)
+Received: from sunmbrm.Central.foo.com
+ (sunbrm.Central.foo.com [129.147.62.17])
+	by centralmail2brm.Central.foo.com (8.12.10+Sun/8.12.10/ENSMAIL,v2.2)
+ with ESMTP id i732O54F028775; Mon, 02 Aug 2004 20:24:05 -0600 (MDT)
+Received: from sfbaymail2sca.sfbay.foo.com
+ (sfbaymail2sca.SFBay.foo.com [129.145.155.42])	by sunmail1brm.Central.foo.com
+ (8.11.7p1+Sun/8.11.7/ENSMAIL,v2.2) with ESMTP id i732O2305999	for
+ <kre@foo.com>; Mon, 02 Aug 2004 20:24:02 -0600 (MDT)
+Received: from say.foo.com (Say.foo.com [129.146.85.91])
+	by sfbaymail2sca.sfbay.foo.com (8.12.10+Sun/8.12.10/ENSMAIL,v2.2)
+ with ESMTP id i732O2WG003448	for <kre@foo.com>; Mon,
+ 02 Aug 2004 19:24:02 -0700 (PDT)
+Received: from say.foo.com (localhost [127.0.0.1])
+	by say.foo.com (8.12.11+Sun/8.12.11) with ESMTP id i732LQGf011880	for
+ <kre@foo.com>; Mon, 02 Aug 2004 19:21:26 -0700 (PDT)
+Received: (from gtb@localhost)
+	by say.foo.com (8.12.11+Sun/8.12.11/Submit) id i732LCCk011879; Mon,
+ 02 Aug 2004 19:21:12 -0700 (PDT)
+Date: Mon, 02 Aug 2004 19:21:12 -0700
+From: Glonn <gob@foo.com>
+Subject: XXX XXXXXXXXXX XXXX XXXXXXX XXXXX
+To: XXX@XXX.XXX
+Message-id: <8tj8ycxvu5j.fsf@foo.com>
+MIME-version: 1.0
+Content-type: multipart/mixed; boundary="Boundary_(ID_/47deYIXfGxrPcOYhaLT6w)"
+User-Agent: Gnus/5.1006 (Gnus v5.10.6) XEmacs/21.5 (beets, usg-unix-v)
+X-Authentication-warning: say.foo.com: gob set sender to
+ gob@foo.com using -f
+Status: RO
+X-Status: A
+Content-Length: 43603
+Lines: 912
+
+
+--Boundary_(ID_/47deYIXfGxrPcOYhaLT6w)
+Content-type: TEXT/PLAIN
+
+
+X XXX XXX XXXXX XXX XXXXX XXXX XXXXXXXX.
+
+
+--Boundary_(ID_/47deYIXfGxrPcOYhaLT6w)
+Content-type: message/rfc822
+
+X-From-Line: root@maa.foo.com  Thu Jul 29 18:59:51 2004
+Received: from eilmpk.Eng.foo.com
+ (eil1mpk.Say.foo.com [129.146.11.21])
+	by jic.eng.foo.com (8.13.1.Beta0+Sun/8.13.0) with ESMTP id i6U1xpAp216754
+	for <gob@jurassic.Eng.foo.com>; Thu, 29 Jul 2004 18:59:51 -0700 (PDT)
+Received: from maa.foo.com (marda.SFBay.foo.com [129.146.168.238])
+	by eil1mpk.Eng.foo.com (8.12.10+Sun/8.12.10/ENSMAIL,v2.2)
+ with ESMTP id i6U1xowe004362	for <gob@eng.foo.com>; Thu,
+ 29 Jul 2004 18:59:50 -0700 (PDT)
+Received: from maa.foo.com (localhost [127.0.0.1])
+	by maa.foo.com (8.13.0+Sun/8.13.0) with ESMTP id i6U1whYx144847	for
+ <gtb@maa.foo.com>; Thu, 29 Jul 2004 18:58:44 -0700 (PDT)
+Received: (from root@localhost)
+	by maa.foo.com (8.13.0+Sun/8.13.0/Submit) id i6U1wh3E144844	for gtb;
+ Thu, 29 Jul 2004 18:58:43 -0700 (PDT)
+Date: Thu, 29 Jul 2004 18:58:43 -0700 (PDT)
+From: Super-User <root@maa.foo.com>
+Subject: preputback test results
+To: gob@maa.foo.com
+Message-id: <200407300158.i6U1wh3E144844@maa.foo.com>
+MIME-version: 1.0
+Content-type: TEXT/PLAIN
+Lines: 866
+Xref: mail.misc:65481
+
+XXXXXXXXX XXX: /XXX/XXX/XXXXXXXXX-XXX.XXXXXX.XXX
+XXXXXXXXX XXX XXXXXXX XX: XXX XXX XX XX:XX:XX XXX XXXX
+
+XXXX XXXX: XXXXX XXXXX X.XX XXXX-XXXX:XX/XX/XXXX XXXXX XXXXX XXXX,XXX-XXXXX-XXX
+XXXXXX XXXX XXXX: XXXXX XXXXXXX.XX X.XX XXXX-XXXX:XX/XX/XXXX XXXXX XXXXX XXXX,XXXXX-XXXX
+XXX XXXXXXXXX: /XXX/XXX/XXX/XXX
+XXX XXXXXXXXX XXXXXX: /XX/XXXX-XXXX
+XXXXXX XXXXXX XXXXXXXXX XXX
+XXXXXXX XXXXXX XXXXXXXXX XXX
+XXXXXX XXXX XXXXXXXX XXXXXXXX XXX
+$XXXXXX = /XXX/XXXX.XXXXX/XXXXXX/XXXXXXXX/XXXXXXXX/XXXX-XXXXX/XXX/XXXXX/XXXXXX
+
+XXXXXXX XX XXX XXX/XXXXXX/XXX/XXXXXX/XXXXXXX XXXXX ==========================
+
+
+XXX-XXXXXXX XXXX XXXXXXXX: XXX XXX XX XX:XX:XX XXX XXXX
+
+
+--Boundary_(ID_/47deYIXfGxrPcOYhaLT6w)--
+
+From klopp Mon Jan  5 08:50:15 +0100 2004
+X-VM-Message-Order:
+	(190 189 188 187 186 185 184 183 182 181 180 179 178 177 176
+	 175 174 173 172 171 170 169 168 167 166 165 164 163 162 161
+	 160 159 158 157 156 155 154 153 152 151 150 149 148 147 146
+	 145 144 143 142 141 140 139 138 137 136 135 134 133 132 131
+	 130 129 128 127 126 125 124 123 122 121 120 119 118 117 116
+	 115 114 113 112 111 110 109 108 107 106 105 104 103 102 101
+	 100 99 98 97 96 95 94 93 92 91 90 89 88 87 86
+	 85 84 83 82 81 80 79 78 77 76 75 74 73 72 71
+	 70 69 68 67 66 65 64 63 62 61 60 59 58 57 56
+	 55 54 53 52 51 50 49 48 47 46 45 44 43 42 41
+	 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26
+	 24 25 23 22 21 20 19 18 17 16 15 14 13 12 11
+	 10 9 8 7 6 5 4 3 2 1)
+X-VM-Summary-Format: "%n %*%a %-17.17F %-3.3m %2d %4l/%-5c %I\"%s\"\n"
+X-VM-Labels: nil
+X-VM-VHeader: ("Resent-" "From:" "Sender:" "To:" "Apparently-To:" "Cc:" "Subject:" "Date:") nil
+X-VM-Last-Modified: (16415 32825 917193)
+X-VM-IMAP-Retrieved: nil
+X-VM-POP-Retrieved: nil
+X-VM-Bookmark: 179
+X-VM-v5-Data: ([nil nil nil nil nil nil nil t nil]
+	["1438" "Monday" "5" "January" "2004" "08:50:15" "+0100" "=?iso-8859-1?Q?Fr=E9d=E9ric?= Klopp" "klopp@math.univ-paris13.fr" nil "49" #("Bonne annÅÈe et texte" 0 6 nil 6 11 (vm-coding iso-latin-1 vm-charset "iso-8859-1" vm-string t) 11 20 nil) "^From:" "n@filonov.pdmi.ras.ru, filonov@mph.phys.spbu.ru" "Nikolai Filonov, Nikolai Filonov" "1" "2004010508:50:15" nil (number " " mark "   E To: Nikolai Filon Jan  5   49/1438  " thread-indent "\"Bonne =?iso-8859-1?Q?ann=E9e?= et texte\"\n") nil nil nil nil nil nil]
+	nil)
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="NQWuVOReNt"
+Content-Transfer-Encoding: 8bit
+Message-ID: <16377.5943.822058.623137@omega.maison.fr>
+X-Mailer: VM 7.17-rfhacked under Emacs 21.2.93.1
+Reply-To: FréÈdéÈric Klopp <klopp@math.univ-paris13.fr>
+From: =?iso-8859-1?Q?Fr=E9d=E9ric?= Klopp <klopp@math.univ-paris13.fr>
+To: XXXXXXX XXXXXXX <X@XXXXXXX.XXXX.XXX.XX>, XXXXXXX XXXXXXX <XXXXXXX@XXX.XXXX.XXXX.XX>
+Subject: XXXXX =?XXX-XXXX-X?X?XXX=XXX?= XX XXXXX
+Date: Mon, 5 Jan 2004 08:50:15 +0100
+
+
+--NQWuVOReNt
+XXXXXXX-XXXX: XXXX/XXXXX; XXXXXXX=XXX-XXXX-X
+XXXXXXX-XXXXXXXXXXX: XXXXXXX XXXX XXXX
+XXXXXXX-XXXXXXXX-XXXXXXXX: XXXX
+
+XXXX XXXXXXX,
+	XXXX X'XXXXX, XX XX XXXXXXXX XXX XXËX XXXXX XXXÈX XXXX.
+
+	X'XX XXXX XXXXX XXXXX XX XX X'XX XXX XXXXXÈ XXXXX-XXXXX ‡
+	XXXXXXXX. XX-XXXXX XX XXXXXXXX XXXXXXX. XX XXXX XX XXXXXXXX,
+	XX XXXX X'XXXXXXX ‡ XX XXXXXXX XX XX XÈXXXXX XXX XXX XXXXXXXX
+	XXXXXX ; XXXX XX XXXXXXX, XXX XXXXXX-XX XX XXXXXXXXX
+	XXXXXXXXXXX
+	(XXXX://XXX.XXXXXXXXXX.XXX-XXXXXXXXX.XX/XXXXXXXXX/) ?
+	X'XXX XX XXXXXXX XÈXÈXXXXXXX, XX X'XX XX XXX XX XXXXX XX
+	X. XXXXXX, XX XXXXXXXXX XXX X XXXXXXXXÈ XXXX XXXXXX XX
+	XXXXXXXXXXX, XXX XXXXXÈ XXXX XX XXXXXXX XXXXXX.
+
+XXXXXÈX,
+	XXÈXÈXXX
+
+
+--NQWuVOReNt
+XXXXXXX-XXXX: XXXX/XXXXX; XXXXXXX=XX-XXXXX
+
+[XXXXXXX XXXXXXXXXXX/XXX]
+
+--NQWuVOReNt
+XXXXXXX-XXXX: XXXX/XXXXX; XXXXXXX=XX-XXXXX
+
+[XXXXXXX XXXXX XXXX]
+
+--NQWuVOReNt
+XXXXXXX-XXXX: XXXX/XXXXX; XXXXXXX=XXX-XXXX-X
+XXXXXXX-XXXXXXXXXXX: .XXXXXXXXX
+XXXXXXX-XXXXXXXX-XXXXXXXX: XXXX
+
+
+
+-- 
+--------------------------------------------------------------------------
+| XXÈXÈXXX XXXXX               |   XÈX: XX/X X XX XX XX XX (XXX./XXX.)	 |
+| XXXX, XXXXXXXX XXXXXÈX       |   XXX: XX/X X XX XX XX XX (XXX./XXX.)	 |
+| XXXXXXXXXÈ XXXXX-XXXX        |  		XXXXXXXX:                |
+| X-XXXXX XXXXXXXXXXXX, XXXXXX | XXXX://XXXX.XXXX.XXXX-XXXXXXX.XX/~XXXXX |
+--------------------------------------------------------------------------
+
+--NQWuVOReNt--
+
+From linux-kernel-owner+list0570=40paradise.net.nz-S1030369AbWAXIZ4@vger.kernel.org  Tue Jan 24 21:35:10 2006
+Return-Path: <linux-kernel-owner+list0570=40paradise.net.nz-S1030369AbWAXIZ4@vger.kernel.org>
+Delivered-To: list0570@paradise.net.nz
+X-Envelope-To: list0570@paradise.net.nz
+Received: (qmail 14733 invoked from network); 24 Jan 2006 08:26:49 -0000
+Received: from tclsnelb1-src-1.paradise.net.nz (HELO linda-5.paradise.net.nz) (203.96.152.172)
+  by internal-pop3-5.paradise.net.nz with SMTP; 24 Jan 2006 08:26:49 -0000
+Received: from smtp-3.paradise.net.nz
+ (tclsnelb1-src-1.paradise.net.nz [203.96.152.172]) by linda-5.paradise.net.nz
+ (Paradise.net.nz) with ESMTP id <0ITL0014V8SKLW@linda-5.paradise.net.nz> for
+ list0570@paradise.net.nz; Tue, 24 Jan 2006 21:26:47 +1300 (NZDT)
+Received: from vger.kernel.org (vger.kernel.org [209.132.176.167])
+	by smtp-3.paradise.net.nz (Postfix) with ESMTP id 2BEA2895B47	for
+ <list0570@paradise.net.nz>; Tue, 24 Jan 2006 21:26:41 +1300 (NZDT)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand	id
+ S1030369AbWAXIZ4 (ORCPT <rfc822;list0570@paradise.net.nz>); Tue,
+ 24 Jan 2006 03:25:56 -0500
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S932475AbWAXIZ4
+	(ORCPT <rfc822;linux-kernel-outgoing>); Tue, 24 Jan 2006 03:25:56 -0500
+Received: from relay.rost.ru ([80.254.111.11]:149 "EHLO relay.rost.ru")
+	by vger.kernel.org with ESMTP id S932466AbWAXIZ4
+ (ORCPT	<rfc822;linux-kernel@vger.kernel.org>); Tue, 24 Jan 2006 03:25:56 -0500
+Received: from pazke.donpac.ru ([80.254.111.9])	by smtp.donpac.ru with esmtps
+ on port 25 (TLSv1:AES256-SHA:256)	(Exim 4.42)	id 1F1JUk-0000A3-BW; Tue,
+ 24 Jan 2006 11:25:42 +0300
+Received: from pazke by pazke.donpac.ru with local (Exim 4.42)
+	id 1F1JUh-0005Oz-En; Tue, 24 Jan 2006 11:25:39 +0300
+Date: Tue, 24 Jan 2006 11:25:38 +0300
+From: Andrey Panin <pazke@donpac.ru>
+Subject: [PATCH] SIIG 8-port serial boards support
+Sender: linux-kernel-owner@vger.kernel.org
+To: Russell King <rmk@arm.linux.org.uk>
+Cc: linux-kernel@vger.kernel.org
+Mail-followup-to: Russell King <rmk@arm.linux.org.uk>,
+ linux-kernel@vger.kernel.org
+Message-id: <20060124082538.GB4855@pazke>
+MIME-version: 1.0
+Content-type: multipart/signed; boundary=ZwgA9U+XZDXt4+m+;
+ protocol="application/pgp-signature"; micalg=pgp-sha1
+Content-disposition: inline
+Precedence: bulk
+User-Agent: Mutt/1.5.11
+X-Uname: Linux 2.6.11-pazke i686
+X-Mailing-List: linux-kernel@vger.kernel.org
+Status: O
+Content-Length: 3826
+Lines: 122
+
+
+--ZwgA9U+XZDXt4+m+
+Content-Type: multipart/mixed; boundary="BwCQnh7xodEAoBMC"
+Content-Disposition: inline
+
+
+--BwCQnh7xodEAoBMC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+This patch (against 2.6.16-rc1) adds support for SIIG 8 port serial boards.
+Please consider applying.
+
+Best regards.
+
+--=20
+Andrey Panin		| Linux and UNIX system administrator
+pazke@donpac.ru		| PGP key: wwwkeys.pgp.net
+
+--BwCQnh7xodEAoBMC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename=patch-siig-8port-board
+Content-Transfer-Encoding: quoted-printable
+
+
+ drivers/serial/8250_pci.c |   25 ++++++++++++++++++++++++-
+ include/linux/pci_ids.h   |    3 +++
+ 2 files changed, 27 insertions(+), 1 deletion(-)
+
+diff -urdpNX /usr/share/dontdiff linux-2.6.16-rc1.vanilla/drivers/serial/82=
+50_pci.c linux-2.6.16-rc1/drivers/serial/8250_pci.c
+--- linux-2.6.16-rc1.vanilla/drivers/serial/8250_pci.c	2006-01-24 10:14:24.=
+000000000 +0300
++++ linux-2.6.16-rc1/drivers/serial/8250_pci.c	2006-01-24 10:16:56.00000000=
+0 +0300
+@@ -439,6 +439,20 @@ static int pci_siig_init(struct pci_dev=20
+ 	return -ENODEV;
+ }
+=20
++static int pci_siig_setup(struct serial_private *priv,
++			  struct pciserial_board *board,
++			  struct uart_port *port, int idx)
++{
++	unsigned int bar =3D FL_GET_BASE(board->flags) + idx, offset =3D 0;
++
++	if (idx > 3) {
++		bar =3D 4;
++		offset =3D (idx - 4) * 8;
++	}
++
++	return setup_port(priv, port, bar, offset, 0);
++}
++
+ /*
+  * Timedia has an explosion of boards, and to avoid the PCI table from
+  * growing *huge*, we use this function to collapse some 70 entries
+@@ -748,7 +762,7 @@ static struct pci_serial_quirk pci_seria
+ 		.subvendor	=3D PCI_ANY_ID,
+ 		.subdevice	=3D PCI_ANY_ID,
+ 		.init		=3D pci_siig_init,
+-		.setup		=3D pci_default_setup,
++		.setup		=3D pci_siig_setup,
+ 	},
+ 	/*
+ 	 * Titan cards
+@@ -2134,6 +2148,15 @@ static struct pci_device_id serial_pci_t
+ 	{	PCI_VENDOR_ID_SIIG, PCI_DEVICE_ID_SIIG_4S_20x_850,
+ 		PCI_ANY_ID, PCI_ANY_ID, 0, 0,
+ 		pbn_b0_bt_4_921600 },
++	{	PCI_VENDOR_ID_SIIG, PCI_DEVICE_ID_SIIG_8S_20x_550,
++		PCI_ANY_ID, PCI_ANY_ID, 0, 0,
++		pbn_b0_bt_8_921600 },
++	{	PCI_VENDOR_ID_SIIG, PCI_DEVICE_ID_SIIG_8S_20x_650,
++		PCI_ANY_ID, PCI_ANY_ID, 0, 0,
++		pbn_b0_bt_8_921600 },
++	{	PCI_VENDOR_ID_SIIG, PCI_DEVICE_ID_SIIG_8S_20x_850,
++		PCI_ANY_ID, PCI_ANY_ID, 0, 0,
++		pbn_b0_bt_8_921600 },
+=20
+ 	/*
+ 	 * Computone devices submitted by Doug McNash dmcnash@computone.com
+diff -urdpNX /usr/share/dontdiff linux-2.6.16-rc1.vanilla/include/linux/pci=
+_ids.h linux-2.6.16-rc1/include/linux/pci_ids.h
+--- linux-2.6.16-rc1.vanilla/include/linux/pci_ids.h	2006-01-24 10:14:51.00=
+0000000 +0300
++++ linux-2.6.16-rc1/include/linux/pci_ids.h	2006-01-24 10:16:56.000000000 =
++0300
+@@ -1677,6 +1677,9 @@
+ #define PCI_DEVICE_ID_SIIG_2S1P_20x_550	0x2060
+ #define PCI_DEVICE_ID_SIIG_2S1P_20x_650	0x2061
+ #define PCI_DEVICE_ID_SIIG_2S1P_20x_850	0x2062
++#define PCI_DEVICE_ID_SIIG_8S_20x_550	0x2080
++#define PCI_DEVICE_ID_SIIG_8S_20x_650	0x2081
++#define PCI_DEVICE_ID_SIIG_8S_20x_850	0x2082
+ #define PCI_SUBDEVICE_ID_SIIG_QUARTET_SERIAL	0x2050
+=20
+ #define PCI_VENDOR_ID_RADISYS		0x1331
+
+--BwCQnh7xodEAoBMC--
+
+--ZwgA9U+XZDXt4+m+
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFD1eSCPjHNUy6paxMRAulpAJ9cWL+qm5hBksgFyBJkcXvCveqxsACgpMEw
+XQTFjQ8wlR9Fx1kyc+a/NrU=
+=yUsm
+-----END PGP SIGNATURE-----
+
+--ZwgA9U+XZDXt4+m+--
+-
+To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Please read the FAQ at  http://www.tux.org/lkml/
+
+From suse-linux-return-368084-list0570=paradise.net.nz@suse.com  Tue Jan 24 21:35:10 2006
+Return-Path: <suse-linux-return-368084-list0570=paradise.net.nz@suse.com>
+Delivered-To: list0570@paradise.net.nz
+X-Envelope-To: list0570@paradise.net.nz
+Received: (qmail 28727 invoked from network); 24 Jan 2006 08:27:19 -0000
+Received: from tclsnelb1-src-1.paradise.net.nz (HELO linda-2.paradise.net.nz) (203.96.152.172)
+  by internal-pop3-4.paradise.net.nz with SMTP; 24 Jan 2006 08:27:19 -0000
+Received: from smtp-2.paradise.net.nz
+ (tclsnelb1-src-1.paradise.net.nz [203.96.152.172]) by linda-2.paradise.net.nz
+ (Paradise.net.nz) with ESMTP id <0ITL00JJ68TDNT@linda-2.paradise.net.nz> for
+ list0570@paradise.net.nz; Tue, 24 Jan 2006 21:27:15 +1300 (NZDT)
+Received: from lists.suse.com (lists.suse.de [195.135.221.131])
+	by smtp-2.paradise.net.nz (Postfix) with SMTP id 089C2262C3	for
+ <list0570@paradise.net.nz>; Tue, 24 Jan 2006 21:26:51 +1300 (NZDT)
+Received: (qmail 31695 invoked by alias); Tue, 24 Jan 2006 08:26:44 +0000
+Received: (qmail 31685 invoked from network); Tue, 24 Jan 2006 08:26:44 +0000
+Date: Tue, 24 Jan 2006 09:26:42 +0100
+From: Andre Tann <atann@gmx.net>
+Subject: Re: Cryptopartition mounten
+In-reply-to: <43D5024B.5030608@prostep.com>
+To: suse-linux@suse.com
+Message-id: <200601240926.42736@inter.netz>
+MIME-version: 1.0
+Content-type: text/plain; charset=iso-8859-15
+Content-transfer-encoding: 8BIT
+Content-disposition: inline
+Precedence: bulk
+Delivered-to: mailing list suse-linux@suse.com
+Mailing-List: contact suse-linux-help@suse.com; run by ezmlm
+User-Agent: KMail/1.8
+X-MIME-Notice: attachments may have been removed from this message
+X-Mailinglist: suse-linux
+X-Message-Number-for-archive: 368084
+X-Authenticated: #8948731
+X-Y-GMX-Trusted: 0
+X-Virus-Scanned: by amavisd-new at Relay2.suse.de
+X-Spam-Status: No, hits=-1.0 tagged_above=-20.0 required=5.0 tests=BAYES_05,
+ FORGED_RCVD_HELO
+X-Spam-Level:
+References: <200601231703.30662@inter.netz> <43D5024B.5030608@prostep.com>
+List-Post: <mailto:suse-linux@suse.com>
+List-Unsubscribe:
+ <mailto:suse-linux-unsubscribe-list0570=paradise.net.nz@suse.com>
+List-Help: <mailto:suse-linux-help@suse.com>
+Status: O
+Content-Length: 738
+Lines: 30
+
+Michael Behrens, Montag, 23. Januar 2006 17:20: 
+
+> Wenn du sowas bei der Installation anlegst, steht das in
+> /etc/cryptotab. Du kannst wahrscheinlich "/etc/init.d/boot.crypto
+> start" von Hand aufrufen.
+
+Stimmt, das kann man, und funktioniert auch.
+
+Wie m¸ﬂte ich mount aufrufen, wenn ich die Partition h‰ndisch 
+mounten wollte?
+
+
+
+> Sieht so aus, als ob das mit dem Timeout auch in boot.crypto
+> gemacht wird.
+
+Wird es, und habe ich auch schon nach meinen Vorstellungen ge‰ndert.
+
+Danke schonmal f¸r Deine Hilfe.
+
+-- 
+Andre Tann
+
+
+-- 
+Um die Liste abzubestellen, schicken Sie eine Mail an:
+    suse-linux-unsubscribe@suse.com
+Um eine Liste aller verfuegbaren Kommandos zu bekommen, schicken
+Sie eine Mail an: suse-linux-help@suse.com
+

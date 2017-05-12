@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+#****************************************#
+# WARNING DO NOT RUN WITH FAILING TESTS  #
+#****************************************#
+#
+# Runs all the tests in t/bin/*.pl and update their output files in t/bin.ok/
+# with the output, causing all tests to now pass.
+#
+
+TDIR="./t"
+
+for cmd in "$TDIR/bin/"*.pl; do
+    name=$(basename $cmd .pl)
+    echo Updating $cmd - $name
+    $cmd --help > "$TDIR/bin.ok/$name.usage.ok"
+    $cmd --man > "$TDIR/bin.ok/$name.man.ok"
+done

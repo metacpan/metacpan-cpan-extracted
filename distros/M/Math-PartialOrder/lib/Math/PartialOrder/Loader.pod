@@ -1,0 +1,877 @@
+=head1 NAME
+
+Math::PartialOrder::Loader -
+persistence and visualization for Math::PartialOrder objects.
+
+=head1 SYNOPSIS
+
+  use Math::PartialOrder::Loader;
+
+  #
+  # Package Variables
+  #
+  $Math::PartialOrder::Loader::BIN_COMPAT;         # compatibility flag
+
+  #
+  # Methods (added to Math::PartialOrder)
+  #
+  $h->from_perl_isa($class,descend=>$bool);    # import a perl class hierarchy
+
+  $h->load($file);                             # text-mode loading
+  $h->save($file);                             # text-mode loading
+
+  $g = $h->graphviz();                         # for graphical inspection
+
+  $h->store($file);                            # binary storage
+  $h->nstore($file);                           # binary storage, network order
+  $h->retrieve($file);                         # binary retrieval
+
+  $frozen = $h->freeze();                      # serialize to memory
+  $h->thaw($frozen);                           # ... and reinstate
+
+=head1 REQUIRES
+
+Math::PartialOrder, Carp, FileHandle, Exporter
+
+=head1 DESCRIPTION
+
+The Math::PartialOrder::Loader module provides subroutines for
+loading and saving of Math::PartialOrder objects.  It extends
+the package Math::PartialOrder.
+
+=head1 PACKAGE VARIABLES
+
+=over 4
+
+=item * C<$Math::PartialOrder::Loader::VERSION>
+
+The value of this variable is saved in the header-section of
+stored hierarchies.
+
+=item * C<$Math::PartialOrder::Loader::BIN_COMPAT>
+
+The minimum compatible loader-version.
+
+
+=item * C<$Math::PartialOrder::Loader::_tr_name>
+
+This exportable constant can be used as an array index
+on stored type-records to extract the type's string representation.
+
+=item * C<$Math::PartialOrder::Loader::_tr_parents>
+
+This exportable constant can be used as an array index
+on stored type-records to extract the reference to the type's
+`parents'-list.
+
+=item * C<$Math::PartialOrder::Loader::_tr_attrs>
+
+This exportable constant can be used as an array index
+on stored type-records to extract the string-representation
+of the type's `attributes' hash.
+
+=back
+
+The C<$_tr_*> variables are all exportable individually, and
+may be imported together by specifying the
+C<:trvars> tag to the C<use> directive.
+
+=cut
+
+
+#'
+
+=head1 METHODS
+
+The following methods are made available to (descendants) of
+Math::PartialOrder if you C<use> the Math::PartialOrder::Loader module.
+
+=cut
+
+##############################################################
+# Text Save
+###############################################################
+=pod
+
+=head2 Importing Perl Class Hierarchies
+
+Perl class hierarchies can be imported with the
+C<from_perl_isa()> method.
+
+=over 4
+
+=item * C<< from_perl_isa($class,descend=E<gt>$bool) >>
+
+Adds the perl class C<$class> as a type to the hierarchy,
+with the immediate parents specified by reading the
+current value of the C<@ISA> list for C<$class>.  If
+C<descend> is set to a true value (the default), this
+method will iterate through the C<@ISA> lists of the
+class's superclasses, its super-superclasses, etc.,
+until all (indirect) superclasses have been added to
+the hierarchy.  It is safe to call this method with
+C<< descent=E<gt>1 >> even on cyclic perl hierarchies.
+
+=back
+
+=cut
+
+#'
+##############################################################
+# Text Save
+###############################################################
+=pod
+
+=head2 Text-Mode Saving
+
+=over 4
+
+=item * C<$h-E<gt>save($file,\%opts);>
+
+Saves the hierarchy information to the text file $file, which
+may be either a filename (simple scalar) or an open
+filehandle.  \%opts is a hashref which may contain the
+following keys:
+
+  { gtsep => $string, }
+
+Returns a true value on success, C<undef> on failure.
+
+=over 4
+
+=item * The C<gtsep> Option
+
+Sets the parent/child-separator string.  Default is C<< E<gt> >>.
+
+=back
+
+=back
+
+=cut
+
+
+##############################################################
+# Text Load
+###############################################################
+=pod
+
+=head2 Text-Mode Loading
+
+=over 4
+
+=item * C<$h-E<gt>load($file,\%opts);>
+
+Loads hierarchy information from the text file $file, which may
+be either a $filename (simple scalar) or a filehandle.
+Returns the hierarchy.
+
+\%opts is hashref which containing some options for the
+load process, which are described in more detail below.
+
+Text mode loading assumes $fh is a filehandle to a text input
+stream with lines of the general form:
+
+  Type1[attr1:val1,...,attrN:valN]  >  Type2, Type3, ...
+
+Interpretation: "Type1" is added as a hierarchy type,
+where "Type1" occurs as a direct child of the
+types "Type2", "Type3", etc., which are added to the
+hierarchy under its root, if not already defined.  The type
+"Type1" is assigned attributes "attr1", ..., "attrN" with values
+"val1", ..., "valN" respectively.  Blank lines and comments
+(lines starting with '#') are ignored.
+
+For convenience, feature-declarations and supertype information
+may be places on separate lines, by omitting the
+C<< E<gt> >> on the 'attributes' line - thus, the above example is
+equivalent to the two lines:
+
+  Type1[attr1:val1,...,attrN:valN]
+
+  # ... other stuff ...
+
+  Type1 > Type2, Type3, ...
+
+=over 4
+
+=item * Options
+
+The C<load()> method recognizes the following options in
+\%opts:
+
+  { gtsep => $gtsep }
+
+=over 4
+
+=item * C<< gtsep =E<gt> $regexp >>
+
+For text-mode load, specifying this option alters the regular
+expression which separates types.  Default: C<< E<gt> >>.
+
+=back
+
+=back
+
+=back
+
+=cut
+
+
+
+##############################################################
+# Binary-Mode Storage
+###############################################################
+=pod
+
+=head2 Binary-Mode Storage
+
+=over 4
+
+=item * C<$h-E<gt>store($file)>, C<$h-E<gt>nstore($file)>
+
+Stores the hierarchy information to the file $file
+via C<Storable::store()> or C<Storable::nstore()>, respectively.
+$file may be either a filename (simple scalar) or a
+filehandle open for writing.
+
+This method is really just a wrapper for
+the C<Storable> routines and the (optional) instance-methods
+C<_store()> and C<_store_head()>, described below.
+
+=item * C<freeze()>, C<nfreeze()>.
+
+Serializes the hierarchy information to memory.  Returns a
+string representing the 'frozen' hierarchy.
+Really, just a wrapper for
+C<Storable::freeze> and C<_store()>.
+
+=item * C<< $h-E<gt>_store() >>
+
+This method returns a reference
+suitable for passing to C<Storable::store()> which
+represents the hierarchy information.
+
+See also:
+L<Binary-Mode Conventions>,
+L<User-Defined Storage>,
+L<User-Defined Retrieval>.
+
+=item * C<< $h-E<gt>_store_head() >>, C<< Math::PartialOrder-E<gt>_store_head() >>
+
+This method returns the header-hash for the hierarchy subclass.
+It may also be called as a class method.
+
+See also:
+L<Binary-Mode Conventions>,
+L<User-Defined Storage>,
+L<User-Defined Retrieval>.
+
+=back
+
+=cut
+
+##############################################################
+# Binary-Mode Retrieval
+###############################################################
+=pod
+
+=head2 Binary-Mode Retrieval
+
+=over 4
+
+=item * C<$h-E<gt>retrieve($file);>
+
+Retrieves the entire hierarchy from C<$file>, via
+C<Storable::retrieve_fd()>.  C<$file> may be
+either a filename (simple scalar) or filehandle
+opened for reading.  Returns the hierarchy on
+success, and C<undef> on failure.
+
+This method really just wraps C<Storable::retrieve($file)>
+and the
+(optional) instance-methods
+C<_retrieve_head()> and C<_retrieve()>,
+described below.
+
+=item * C<thaw($frozen)>
+
+Reinstates the 'frozen' the hierarchy-string '$frozen'.
+Really just a wrapper for C<Storable::thaw> and
+C<_retrieve()>.
+
+See also:
+L<Binary-Mode Conventions>,
+L<User-Defined Storage>,
+L<User-Defined Retrieval>.
+
+=item * C<< $h-E<gt>_retrieve_head(\%head) >>,
+C<< Math::PartialOrder-E<gt>_retrieve_head(\%head) >>
+
+This method returns the header-hash for the hierarchy subclass.
+It may also be called as a class method.  It should return
+C<undef> if no retrieval is possible given the information
+in \%head, and otherwise a boolean value indicating binary
+compatibility.
+
+See also:
+L<Binary-Mode Conventions>,
+L<User-Defined Storage>,
+L<User-Defined Retrieval>.
+
+
+=item * C<< $h-E<gt>_retrieve(\%retrieved) >>
+
+This method re-instates the hierarchy
+information encoded in C<\%retrieved>, which by
+default has the format described in L<Binary-Mode Conventions>.
+
+See also:
+L<Binary-Mode Conventions>,
+L<User-Defined Storage>,
+L<User-Defined Retrieval>.
+
+=back
+
+=cut
+
+##############################################################
+# Visualization with GraphViz
+###############################################################
+=pod
+
+=head2 Visualization
+
+Math::PartialOrder::Loader uses the C<GraphViz> module to allow
+visualization of hierarchy structure with the C<graphviz>
+tools.
+
+=over 4
+
+=item * C<$h-E<gt>graphviz(%opts);>
+
+Returns a new GraphViz object representing the hierarchy.
+%opts is a hash of keyword-arguments accepted by GraphViz::new,
+and additionally accepts the following keys:
+
+  (
+    label_node => \&nodelabel_sub,
+    nodelabel => $nodelabel_string
+  )
+
+The individual options are described below.
+
+=over 4
+
+=item * C<label_node>
+
+  label_node => \&nodelabel_sub
+
+Use C<\&nodelabel_sub> to label nodes.  The default labelling
+subroutine pays special attention to C<appr> values.
+C<\&nodelabel_sub> should be a code-reference to a subroutine
+which returns for each node that node's label.  It will be called
+as:
+
+   $label = &nodelabel_sub($h,$t,\%opts);
+
+where $h is the hierarchy instance, $t is the type for which a
+label-string should be returned, and \%opts is a reference to the
+hash passed to the C<graphviz> method.
+
+See Also:
+L<QuD::Approp>.
+
+=item * C<nodelabel>
+
+  nodelabel => $nodelabel_string
+
+Use $nodelabel as a template for labelling the types of the
+hierarchy as nodes in the graph.  $nodelabel may
+contain the special strings ':NAME:' and ':ATTRIBUTES:',
+which are replaced by the name of the type and a formatted
+string detailing the type's attributes, if any.  The default
+value is ':NAME:\n:ATTRIBUTES:'.
+
+This labelling convention only applies if no C<appr> information
+is present in the hierarchy.
+
+=back
+
+=back
+
+=cut
+
+
+#'
+##############################################################
+# Binary-Mode Conventions
+###############################################################
+=pod
+
+=head2 Binary-Mode Conventions
+
+The default low-level binary storage and retrieval methods
+assume the following format for stored hierarchies as
+hash-references:
+
+   { Head  => \%Headers,
+     Refs  => \%RefsByString,
+     Attrs => \%HierarchyAttributes,
+     Types => \@TypeRecs }
+
+The individual components of the default format are described
+in more detail below, for a stored hierarchy C<$h>.
+
+=over 4
+
+=cut
+
+
+#-----------------------------------------
+# Headers
+#-----------------------------------------
+=pod
+
+=item * B<Headers>
+
+C<\@Headers> contains the hierarchy headers, which
+is a hashref using the following format convention:
+
+  { Class => $ClassName,
+    Cversion => $ClassVersion,
+    Ccompat => \%BinCompatHash,
+    Hstring => "$HierarchyAsString",
+    Lversion => $LoaderVersion,
+    Lcompat => $MinLoaderVersion }
+
+Note that the high-level methods C<store()> and C<nstore()>
+extract the C<Head> field from the hierarchy-hash and store it
+first, for quick extraction.  The high-level method
+C<retrieve()> extracts the header information first, and
+only after some basic tests retrieves the rest of the
+stored information, re-integrating the headers into the
+\%retrieved-hash for ease of reference by user-defined
+methods.
+
+The individual components of the default header format are described
+in more detail below.
+
+=over 4
+
+=item * C<$LoaderVersion>
+
+$LoaderVersion is the value of
+C<$Math::PartialOrder::Loader::VERSION> for the
+storage procedure.
+
+=item * C<$MinLoaderVersion>
+
+$LoaderVersion is the value of
+C<$Math::PartialOrder::Loader::BIN_COMPAT> for the
+storage procedure.
+
+=item * C<$ClassName>
+
+$ClassName is the name of the Hierarchy subclass which
+created the stored representation.
+
+=item * C<$ClassVersion>
+
+$ClassVersion is the value of
+C<${"$ClassName"::VERSION}> for the storage procedure.
+
+=item * C<\%BinCompatHash>
+
+\%BinCompatHash is a hash for determining binary compatibility
+between various hierarchy implementations.
+See L<User-Defined Compatibility> for details.
+
+=item * C<"$HierarchyAsString">
+
+"$HierarchyAsString" is the string-representation of
+the hierarchy (C<"$h">) for the storage procedure.
+
+=back
+
+=cut
+
+
+
+#-----------------------------------------
+# Values
+#-----------------------------------------
+=pod
+
+=item * B<Nested References>
+
+\%RefsByString is a reference to a hash containing
+all known references nested in the hierarchy for
+the storage procedure.  The keys of this hash are
+the string representations of those references during
+the storage procedure, with (new and equivalent) references
+as their values.
+
+By default, the following values are indexed with
+\%RefsByString:
+
+=over 4
+
+=item 1.
+
+All types in the hierarchy,
+
+=item 2.
+
+The hierarchy-attributes hash, keyed by the storing hierarchy's
+string-representation, and
+
+=item 3.
+
+The type-attributes hashes for all types in the hierarchy.
+
+=back
+
+See Also:
+L<User-Defined Storage>,
+L<User-Defined Retrieval>.
+
+=cut
+
+#'
+
+#-----------------------------------------
+# Type Records
+#-----------------------------------------
+=pod
+
+=item * B<Type Records>
+
+\@TypeRecords is an
+array of type-records, which by default are array-references
+of the form:
+
+  ["$TypeName",
+   \@ParentNames,
+   "$AttributesName" ]
+
+The individual components of a type-record are described
+in more detail below.
+
+See also: L<User-Defined Storage>, L<User-Defined Retrieval>.
+
+=over 4
+
+=item * C<$TypeName>
+
+"$TypeName" is the string representation of the type,
+according to the storing hierarchy.
+
+=item  * C<\@ParentNames>
+
+\@ParentNames is an array
+of string representations of the type's immediate parents.
+
+=item * C<$AttributesName>
+
+"$AttributesName" is the string represenation of the
+type's attributes (a hashref), or possibly C<undef>.
+
+=back
+
+=back
+
+=cut
+
+
+
+
+#-----------------------------------------
+# User-Defined Storage
+#-----------------------------------------
+=pod
+
+=head2 User-Defined Storage
+
+Hierarchy subclasses may additionally define
+a number of instance-methods to store additional
+hierarchy information.  The return values of these
+methods are integrated into the default storage
+format, which allows compatibility between the binary-stored
+representations of hierarchies from differing
+subclasses.
+
+The instance methods recognized by the
+default implementation of C<_store()> are described
+below.
+
+See Also:
+L<Binary-Mode Conventions>.
+L<User-Defined Compatibility>.
+L<User-Defined Retrieval>.
+
+=over 4
+
+=item * _store_before()
+
+Called as: C<< $h-E<gt>_store_before(\%storeme) >>
+
+\%storeme is a hash-reference in the format
+described in L<Binary-Mode Conventions>.
+If defined, this method will be called before
+any type-records have been added to \%storeme.
+The 'Head' key should already exist and be
+filled with the proper header information.
+This method should destructively
+alter \%storeme as required.
+
+See also:
+L<_store_after()>,
+L<_retrieve_before()>,
+L<_retrieve_after()>.
+
+
+=item * _store_type()
+
+Called as: C<< $h-E<gt>_store_type(\@typerec,\%storeme) >>
+
+\@typerec is a type-record as described in
+L<Binary-Mode Conventions>, and \%storeme is
+as for C<_store_before()>.  This method will be called
+for each type after the type-record has been generated
+(and after nested references specific to that type
+have been added to \%storeme), and should destructively
+alter \@typerec and/or \%storeme as required.
+
+See also:
+L<_store_type()>
+L<_retrieve_type_before()>
+L<_retrieve_type()>
+L<_retrieve_type_after()>
+
+
+=item * _store_after()
+
+Called as: C<< $h-E<gt>_store_after(\%storeme) >>
+
+\%storeme is a hash-reference in the format
+described in L<Binary-Mode Conventions>.
+If defined, this method will be called after
+all type-records have been processed.
+It should destructively alter \%storeme as required.
+
+See also:
+L<_store_before()>,
+L<_retrieve_before()>,
+L<_retrieve_after()>.
+
+=back
+
+=cut
+
+#-----------------------------------------
+# User-Defined Compatibility
+#-----------------------------------------
+=pod
+
+=head2 User-Defined Compatibility
+
+Hierarchy subclasses may define a method
+C<_get_bin_compat()> to regulate the calling of user-defined
+retrieval methods.
+
+=over 4
+
+=item * C<_get_bin_compat()>
+
+Called as: C<< $h-E<gt>_get_bin_compat() >>
+
+If defined, this method should return a reference
+to a hash whose keys are class names and whose
+values (where defined) are the minimum versions
+of stored binary files generated by the respective
+classes which are to be considered binary-compatible.
+The default implementation returns an empty hash
+reference.  Versions are compared numerically by
+default.
+
+=back
+
+See Also:
+L<Binary-Mode Conventions>.
+L<User-Defined Storage>.
+L<User-Defined Retrieval>.
+
+=cut
+
+
+
+#-----------------------------------------
+# User-Defined Retrieval
+#-----------------------------------------
+=pod
+
+=head2 User-Defined Retrieval
+
+Hierarchy subclasses may additionally define
+a number of instance-methods to retrieve additional
+hierarchy information, if available.
+
+The instance methods recognized by the
+default implementation of C<_retrieve()> are described
+below.  Note that these methods will only be
+called if you also follow the conventions
+for user-defined compatibility, described in
+the preceeding section.
+
+See Also:
+L<Binary-Mode Conventions>,
+L<User-Defined Compatibility>,
+L<User-Defined Storage>.
+
+=over 4
+
+=item * _retrieve_before()
+
+Called as: C<< $h-E<gt>_retrieve_before(\%retrieved) >>
+
+\%retrieved is a hash-reference in the format
+described in L<Binary-Mode Conventions>.
+If defined, this method will be called before
+any type-records have processed.  It should
+perform whatever preliminary processing is
+necessary to retrieve the information in
+\%retrieved (such as clearing the hierarchy,
+which is not done by default).
+
+The default implementation simply clears the hierarchy.
+
+See also:
+L<_retrieve_after()>,
+L<_store_before()>,
+L<_store_after()>.
+
+=item * _retrieve_type_before()
+
+Called as: C<< $h-E<gt>_retrieve_type_before(\@typerec,\%retrieved) >>
+
+\@typerec is a type-record as described in
+L<Binary-Mode Conventions>, and \%retrieved is
+as for C<_retrieve_before()>.  If defined, this method will be called
+for each type-record, before calling
+C<_retrieve_type()> for that type-record.  It
+should perform whatever operations necessary to
+prepare the hierarchy (or the type-record) for
+the retrieval of the type-record.
+
+See also:
+L<_retrieve_type()>,
+L<_retrieve_type_after()>,
+L<_store_type()>.
+
+=item * _retrieve_type()
+
+Called as: C<< $h-E<gt>_retrieve_type(\@typerec,\%retrieved) >>
+
+Arguments are as for C<_retrieve_type_before()>.
+If defined,
+this method will be called to insert the type
+represented by \@typerec into the hierarchy.
+The default implementation is just a wrapper
+for the C<add()> and C<_attributes()> methods.
+
+See also:
+L<_retrieve_type_before()>,
+L<_retrieve_type_after()>,
+L<_store_type()>.
+
+=item * _retrieve_type_after()
+
+Called as: C<< $h-E<gt>_retrieve_type_after(\@typerec,\%retrieved) >>
+
+Arguments are as for C<_retrieve_type_before()>.
+If defined, this method will be called
+for each type-record, after having called
+C<_retrieve_type()> for that type-record.  It
+should perform whatever cleanup
+or update operations necessary to integrate the
+newly added type into the hierarchy.
+
+See also:
+L<_retrieve_type_before()>,
+L<_retrieve_type()>,
+L<_store_type()>.
+
+=item * _retrieve_after()
+
+Called as: C<< $h-E<gt>_retrieve_after(\%retrieved) >>
+
+\%retrieved is a hash-reference as for
+C<_retrieve_before()>.
+If defined, this method will be called after
+all type-records have been processed.
+It should perform whatever hierarchy-global
+operations necessary to update the newly
+retrieved hierarchy.
+
+See also:
+L<_retrieve_before()>,
+L<_store_before()>,
+L<_store_after()>.
+
+=back
+
+=cut
+
+
+#-----------------------------------------
+# Caveats
+#-----------------------------------------
+=pod
+
+=head1 CAVEATS
+
+Currently the C<Storable> module cannot handle
+C<CODE> references, so if you use them anywhere
+(as types or attribute-values) in a
+hierarchy you later store, you will have to re-insert
+them manually later.
+
+Users are also responsible for de- and re-composing
+any recursive data structures added to the hierarchy,
+with methods such as those described in
+L<User-Defined Retrieval>.
+
+=cut
+
+
+#-----------------------------------------
+# Footer
+#-----------------------------------------
+=pod
+
+=head1 ACKNOWLEDGEMENTS
+
+perl by Larry Wall.
+
+Storable module by  Raphael Manfredi E<lt>Raphael_Manfredi@pobox.comE<gt>.
+
+GraphViz module for perl by Leon Brocard E<lt>acme@astray.comE<gt>.
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>jurish@ling.uni-potsdam.deE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001, Bryan Jurish.  All rights reserved.
+
+This package is free software.  You may redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+perl(1).
+Math::PartialOrder(3pm).
+Storable(3pm).
+GraphViz(3pm).
+

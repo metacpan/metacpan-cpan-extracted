@@ -1,0 +1,72 @@
+---
+abstract: 'Metabase backend implemented using Amazon Web Services'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Metabase::Test::Archive: 0
+  Metabase::Test::Index: 0
+  Net::Amazon::Config: 0
+  Test::Deep: 0
+  Test::More: 0.92
+  Test::Routine: 0
+  Test::Routine::Util: 0
+  perl: 5.010
+  re: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120921'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Metabase-Backend-AWS
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Metabase::Archive::S3:
+    file: lib/Metabase/Archive/S3.pm
+    version: 1.000
+  Metabase::Backend::AWS:
+    file: lib/Metabase/Backend/AWS.pm
+    version: 1.000
+  Metabase::Index::SimpleDB:
+    file: lib/Metabase/Index/SimpleDB.pm
+    version: 1.000
+requires:
+  Carp: 0
+  Compress::Zlib: 2
+  Data::Dumper: 0
+  Data::GUID: 0
+  Data::Stream::Bulk::Callback: 0
+  Data::Stream::Bulk::Filter: 0.08
+  JSON: 2
+  List::AllUtils: 0
+  Metabase::Archive: 1
+  Metabase::Fact: 0
+  Metabase::Index: 1
+  Moose: 0
+  Moose::Role: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::Types::Path::Class: 0
+  Net::Amazon::S3: 0
+  Path::Class: 0
+  SimpleDB::Client: 0
+  Try::Tiny: 0
+  namespace::autoclean: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Metabase-Backend-AWS
+  homepage: https://github.com/dagolden/metabase-backend-aws
+  repository: https://github.com/dagolden/metabase-backend-aws.git
+version: 1.000

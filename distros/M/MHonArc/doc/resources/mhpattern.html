@@ -1,0 +1,129 @@
+<html>
+<head>
+<title>MHonArc Resources: MHPATTERN</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="maxsize.html">MAXSIZE</a>]</td><td><nobr>[<a href="../resources.html#mhpattern">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="mimealtprefs.html">MIMEALTPREFS</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>MHPATTERN</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p>
+<code>M2H_MHPATTERN=</code><var>Perl-regexp</var>
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p>
+<code>&lt;MHPATTERN&gt;<br></code>
+<var>Perl-regexp</var><br>
+<code>&lt;/MHPATTERN&gt;<br></code>
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p>
+<code>-mhpattern </code><var>Perl-regexp</var>
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>MHPATTERN defines the Perl regular expression to use for
+matching message files in an MH mail folder.  In general,
+MHPATTERN allows you to tell MHonArc which message files
+to read when a specified mail folder is a directory.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<pre>
+^\d+$
+</pre>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>The following example shows how you can tell MHonArc to
+process every non-dotfile in a directory:
+</p>
+
+<pre>
+    % <b>mhonarc -add -mhpattern '^[^\.]' msgdir</b>
+</pre>
+
+<p>Remember, each file in <code>msgdir</code> must be a single
+mail message.
+</p>
+
+<p>Be careful in that the regexp you define does
+not match "<code>.</code>" and "<code>..</code>".
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>2.0
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="maxsize.html">MAXSIZE</a>]</td><td><nobr>[<a href="../resources.html#mhpattern">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="mimealtprefs.html">MIMEALTPREFS</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2003/10/06 22:04:18 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"><strong>MHonArc</strong></a><br>
+Copyright &#169; 1997-1998, <a href="http://www.earlhood.com/">Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org">mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

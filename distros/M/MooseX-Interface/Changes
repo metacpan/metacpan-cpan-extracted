@@ -1,0 +1,60 @@
+MooseX-Interface
+================
+
+Created:      2012-08-21
+Home page:    <https://metacpan.org/release/MooseX-Interface>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Interface>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.008	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.007	2013-06-28
+
+ - Updated: Drop usage of smartmatch.
+
+0.006	2012-10-05
+
+ [ Documentation ]
+ - Document internals.
+
+ [ Other ]
+ - Clean up interface integrity checking code.
+ - Drop Hook::AfterRuntime magic, and introduce 'one' function instead.
+ - Rename a bunch of internal classes.
+
+0.005	2012-10-05
+
+ [ Packaging ]
+ - Include test case for method signatures.
+
+ [ Other ]
+ - Replace B::Hooks::* usage with Hook::AfterRuntime.
+ - Replace Contextual::Return usage with a custom overloaded class.
+ - Test cases embedded within interfaces now have a better (albeit still
+   undocumented) introspection API.
+
+0.004	2012-08-27
+
+ - Added: Allow `requires` to be a passed method signatures for the
+   required methods.
+
+0.003	2012-08-22
+
+ [ Documentation ]
+ - Add MooseX::Interface::Tutorial.
+
+ [ Other ]
+ - Check parent interface test cases too when testing implementations.
+
+0.002	2012-08-22
+
+ [ Packaging ]
+ - Make test cases work in pre-5.014 versions of Perl.
+
+ [ Other ]
+ - Added: Interfaces may now provide embedded test cases.
+
+0.001	2012-08-21	Initial release

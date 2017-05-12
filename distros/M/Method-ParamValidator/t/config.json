@@ -1,0 +1,19 @@
+{
+   "fields" : [
+       { "name" : "firstname", "format" : "s", "type": "Str" },
+       { "name" : "lastname",  "format" : "s", "type": "Str" },
+       { "name" : "age",       "format" : "d", "type": "Int" },
+       { "name" : "sex",       "format" : "s", "type": "Str", "source" : [ "m", "f" ]  },
+       { "name" : "location",  "format" : "s", "type": "Str", "source" : [ "UK", "USA" ] }
+   ],
+   "methods" : [
+       {
+           "name" : "add_user",
+           "fields" : { "firstname" : "1", "lastname" : "1", "age" : "1", "sex": "0", "location" : "0" }
+       },
+       {
+           "name" : "check_user",
+           "fields" : { "firstname": "1", "lastname" : "1" }
+       }
+   ]
+}

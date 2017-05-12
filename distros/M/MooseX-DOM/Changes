@@ -1,0 +1,22 @@
+Changes
+=======
+
+0.00004 - 12 Aug 2008
+  * Refactored the core accessor functionality into MooseX::DOM::Meta::LibXML.
+    Most of the generated accessors are now proxies to the meta class.
+    (This stuff may change as I understand MOP better)
+
+0.00003 - 11 Aug 2008
+  * Implement from_xml/from_file as alternate constructors
+  * Fix Makefile.PL dependencies
+
+0.00002 - 11 Aug 2008
+  * Implement unimport(), so you can do 'no MooseX::DOM'
+  * Implement has_dom_root
+  * Implement has_dom_content
+  * Automatically generate root node upon set(), if has_dom_root has been
+    prorperly declared.
+  * Refactor get/set operations so you can specify them at declaration time
+
+0.00001 - 08 Aug 2008
+  * Initial release

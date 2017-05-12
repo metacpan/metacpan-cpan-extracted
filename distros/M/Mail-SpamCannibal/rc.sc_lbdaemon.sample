@@ -1,0 +1,196 @@
+#!/usr/bin/perl
+#
+# rc.sc_lbdaemon
+# version 1.04, 2-9-04
+#
+# Copyright 2003 - 2004, Michael Robinton <michael@bizsystems.com>
+   
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+   
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+   
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+
+use strict;
+use Mail::SpamCannibal::LaBreaDaemon qw(daemon);
+
+#################### SET THESE FOR YOUR SITE ############
+my $config = {
+
+# path to the tarpit daemon
+#
+  'LaBrea'	=> '/usr/local/spamcannibal/bin/dbtarpit',
+
+# the port to listen on. REQUIRED 
+#
+  'd_port'	=> 8687,
+
+# the default interface for listen socket. REQUIRED
+#
+  'd_host'	=> 'localhost',
+
+# what hosts are allowed to connect, defaults to ALL
+#
+  'allowed'	=> 'localhost',
+
+# directory and path for pid file -- recommend dbtarpit environment directory
+#
+  'pid'		=> '/var/run/dbtarpit/sc_lbdaemon.pid',
+
+# directory and path for dameon cache -- recommend dbtarpit environment
+#
+  'cache'	=> '/var/run/dbtarpit/sc_lbdaemon.cache',
+
+# location/name of dbtarpit fifo
+#
+  'fifo'	=> '/var/run/dbtarpit/dbtplog',
+
+# maximum concurrent children, recommend 2 on slow hosts, default 5
+#  'kids'	=> 5,
+
+# cache file mask, default 033
+#  'umask'	=> 033,
+
+# time between forced culls of old threads in memory, default 600
+#  'cull'	=> 600,
+
+# number of recent threads to track
+#
+  'scanners'	=> 100,
+};  
+
+##################### END CONFIG #########################
+
+$| = 1;
+
+# how long to wait for stop on restart (in seconds)
+use constant MAX_RESTART_WAIT => 10;
+
+(my $pid_file = $config->{pid}) =~ m|[^/]+$|;
+my $pidpath = $`;	# post match
+
+die <<EOF if -e $pidpath. 'blockedBYwatcher';
+##############################################
+
+  startup blocked by DB watcher process
+
+##############################################
+EOF
+
+my $running = 0;
+my $pid = 0;
+if (-e $pid_file) {
+    open(P,$pid_file);
+    $pid = <P>;
+    close P;
+    chomp $pid;
+    if ($pid and kill(0, $pid)) {
+        $running = 1;
+    }
+}
+
+my $command = shift @ARGV;
+
+if ($command eq 'start') {
+    do_start();
+} 
+elsif ($command eq 'stop') {
+  exit do_stop();
+}
+elsif ($command eq 'restart') {
+    do_stop();
+    for my $wait (0..MAX_RESTART_WAIT()) {
+	last unless $running;
+        $running = (kill(0, $pid));
+        print '.';
+        sleep 1;
+    }
+    exit 1 if $running;
+    do_start();
+}
+elsif ($command =~ 'help') {
+    usage();
+}
+
+usage("\nUNKNOWN command\n");
+
+sub do_start {
+    daemon($config);
+    exit 0;
+}
+
+sub do_stop {
+    unless ($running) {
+        print "$command rc.sc_lbdaemon not running\n";
+    }
+    elsif (kill 15, $pid) {
+        print "$command rc.sc_lbdaemon stopping\n";
+        return 0;
+    } else {
+        print "$command rc.sc_lbdaemon could not be stopped\n";
+    }
+    return 1;
+}
+
+sub usage {
+  my $msg = $_[0] || '';
+  print $msg, q|
+  This script controls the rc.sc_lbdaemon daemon.
+
+  rc.sc_lbdaemon start   - start the sc_lbdaemon daemon
+
+  rc.sc_lbdaemon stop    - stop the sc_lbdaemon daemon
+
+  rc.sc_lbdaemon restart - stop then start the daemon
+
+  rc.sc_lbdaemon help    - print help and exit
+ 
+|;
+  exit 0;
+}
+
+=pod
+
+=head1 NAME
+
+rc.sc_lbdaemon - SpamCannibal statistics display
+
+=head1 SYNOPSIS
+
+  rc.sc_lbdaemon start
+  rc.sc_lbdaemon stop
+  rc.sc_lbdaemon restart
+  rc.sc_lbdaemon help
+
+=head1 DESCRIPTION
+
+This script controls the sc_lbdaemon.
+
+  rc.sc_lbdaemon start   - start the sc_lbdaemon daemon
+
+  rc.sc_lbdaemon stop    - stop the sc_lbdaemon daemon
+
+  rc.sc_lbdaemon restart - stop then start the daemon
+
+  rc.sc_lbdaemon help    - print help and exit
+
+=head1 AUTHOR
+
+Michael Robinton <michael@bizsystems.com>
+
+=head1 COPYRIGHT
+
+Copyright 2003 - 2004, Michael Robinton <michael@bizsystems.com>
+This script is free software; you can redistribute it and/or
+modify it under the terms of the GPL software license.
+
+=cut

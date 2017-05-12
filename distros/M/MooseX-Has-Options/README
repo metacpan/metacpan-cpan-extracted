@@ -1,0 +1,113 @@
+NAME
+    MooseX::Has::Options - Succinct options for Moose
+
+VERSION
+    version 0.003
+
+SYNOPSIS
+        use Moose;
+        use MooseX::Has::Options;
+
+        has 'some_attribute' => (
+            qw(:ro :required),
+            isa => 'Str',
+            ...
+        );
+
+        has 'another_attribute' => (
+            qw(:ro :lazy_build),
+            isa => 'Str',
+            ...
+        );
+
+DESCRIPTION
+    This module provides a succinct syntax for declaring options for Moose
+    attributes.
+
+USAGE
+  Declaring options
+    "MooseX::Has::Params" works by checking the arguments to "has" for
+    strings that look like options, i.e. alphanumeric strings preceded by a
+    colon, and replaces them with a hash whose keys are the names of the
+    options (sans the colon) and the values are 1's. Thus,
+
+        has 'some_attribute', ':required';
+
+    becomes:
+
+        has 'some_attribute', required => 1;
+
+    Options must come in the beginning of the argument list.
+    MooseX::Has::Options will stop searching for options after the first
+    alphanumeric string that does not start with a colon.
+
+    The default behaviour can be customised per attribute. For example, here
+    is how "ro", "rw" and "bare" work:
+
+        has 'some_attribute', ':ro';
+
+    becomes:
+
+        has 'some_attribute', is => 'ro';
+
+    See below for details.
+
+  Handlers
+    "MooseX::Has::Options" allows you to expand specific 'shortcut'
+    arguments to arbitrary values via the handler interface. A 'handler' is
+    a module in the MooseX::Has::Options::Handler namespace that provides a
+    "handler" function. The handler function should return a hash whose keys
+    are shortcut names, and the values are hashrefs with the values that the
+    respective shortcuts should be expanded to. In order to enable the
+    shortcuts supplied by a given handler you need to add it in the import
+    statement:
+
+        use MooseX::Has::Options qw(NativeTypes);
+
+        has 'some_attribute', qw(:ro :hash), default => sub {{ foo => bar }};
+
+    The following handlers ship with the default distribution:
+
+    *   MooseX::Has::Options::Handler::Accessors (included by default when
+        you import this module)
+
+    *   MooseX::Has::Options::Handler::NativeTypes
+
+    *   MooseX::Has::Options::Handler::NoInit
+
+IMPLEMENTATION DETAILS
+    "MooseX::Has::Options" hijacks the "has" function imported by Moose and
+    replaces it with one that understands the options syntax described
+    above. This is not an optimal solution, but the current implementation
+    of "Moose::Meta::Attribute" prevents this functionality from being
+    provided as a meta trait.
+
+DEPRECATED BEHAVIOUR
+    Previous versions of "MooseX::Has::Params" allowed you to specify during
+    import the name of the function too hook into, like so:
+
+        use HTML::FormHandler::Moose;
+        use MooseX::Has::Options qw(has_field);
+
+        has_field 'name' => (
+            qw(:required),
+            type => 'Text',
+        );
+
+    This behaviour is deprecated as of version 0.003 as this syntax is now
+    used for specifying handlers. If you need to hook into a different
+    function see the implementation of "MooseX::Has::Options::import()" and
+    "MooseX::Has::Options::import_into()".
+
+SEE ALSO
+    *   MooseX::Has::Sugar
+
+AUTHOR
+    Peter Shangov <pshangov@yahoo.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Peter Shangov.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

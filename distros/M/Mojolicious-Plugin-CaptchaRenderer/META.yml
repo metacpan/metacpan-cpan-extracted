@@ -1,0 +1,30 @@
+---
+abstract: 'captcha renderer for Mojolicious framework'
+author:
+  - 'Dmitry Konstantinov <konstantinov.dmitry@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+keywords:
+  - mojolicious
+  - captcha
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-CaptchaRenderer
+provides:
+  Mojolicious::Plugin::CaptchaRenderer:
+    file: lib/Mojolicious/Plugin/CaptchaRenderer.pm
+    version: 0.02
+requires:
+  File::Spec: 0
+  File::Temp: 0
+  Image::Magick: 0
+  Mojolicious: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/konstantinov/Mojolicious-Plugin-CaptchaRenderer.git
+version: 0.02

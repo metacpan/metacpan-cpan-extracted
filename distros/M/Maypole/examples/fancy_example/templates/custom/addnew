@@ -1,0 +1,24 @@
+[%#
+
+=head1 addnew
+
+This is the interface to adding a new instance of an object. (or a new
+row in the database, if you want to look at it that way) It displays a
+form containing a list of HTML components for each of the columns in the
+table.
+
+=cut
+
+#%]
+[% tbl = classmetadata.table; %]
+
+<div id="addnew">
+<form method="post" action="[% base %]/[% classmetadata.table %]/do_edit/">
+<fieldset>
+<legend>Add a new [% config.TABLES.$tbl.singular || tbl | ucfirst | replace('_',' '); %] </legend>
+	[% INCLUDE display_inputs; %]
+    <input type="submit" name="create" value="create" />
+    <input type="hidden" name="__form_id" value="[% request.make_random_id %]" />
+</fieldset>
+</form>
+</div>

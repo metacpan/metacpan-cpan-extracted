@@ -1,0 +1,10 @@
+MANIFEST
+Makefile.PL
+CHANGES
+README
+lib/Math/HashSum.pm
+t/lib/Test/Builder.pm
+t/lib/Test/More.pm
+t/lib/Test/Simple.pm
+t/Math-HashSum.t
+

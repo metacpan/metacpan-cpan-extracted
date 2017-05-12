@@ -1,0 +1,243 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+mogfiledebug -- Dump gobs of information about a FID
+
+=head1 SYNOPSIS
+
+    $ mogfiledebug --trackers=host --domain=foo --key=bar
+    $ mogfiledebug --trackers=host --fid=1234
+
+=head1 DESCRIPTION
+
+Utility for troubleshooting problemic files in a mogilefs cluster. Also useful
+for verification or testing new setups.
+
+Finds as much information about a file as it can. All of the paths, any queues
+it might be sitting in, etc. Will then test all of the paths, MD5 hash their
+contents, and check the file lengths. If you see errors about a FID in
+mogilefsd's logs plugging it through mogfiledebug should illuminate most of
+the potential issues.
+
+This is also useful information for posting to the mailing list, along with
+the error you had.
+
+=head1 OPTIONS
+
+=over
+
+=item --trackers=host1:7001,host2:7001
+
+Use these MogileFS trackers to negotiate with.
+
+=item --domain=<domain>
+
+Set the MogileFS domain to use.
+
+=item --key="<key>"
+
+The key to inspect. Can be an arbitrary string.
+
+=item --fid=<fid>
+
+A numeric fid to inspect. Provide this as an alternative to a domain/key
+combination.
+
+=item --paths=[print|stat|fetch]
+
+Whether to print, stat, or fetch each path.
+The default is to fetch (and checksum) the contents of all paths.
+
+=back
+
+=head1 AUTHOR
+
+Dormando E<lt>L<dormando@rydia.net>E<gt>
+
+=head1 BUGS
+
+None known. Could use more helpful prints, or a longer troubleshooting manual.
+
+=head1 LICENSE
+
+Licensed for use and redistribution under the same terms as Perl itself.
+
+=cut
+
+use strict;
+use warnings;
+
+use lib './lib';
+use MogileFS::Utils;
+use Digest::MD5;
+use LWP::UserAgent;
+
+my $util = MogileFS::Utils->new;
+my $usage = qq{--trackers=host --paths=action --domain=foo --key='/hello.jpg'
+If FID is known, but domain/key are not known:
+--trackers=host --fid=123456
+--paths=action, where action is 'print', 'stat', or 'fetch' (default)};
+my $c = $util->getopts($usage, qw/key=s fid=i paths=s/);
+
+$c->{paths} ||= "fetch";
+if ($c->{paths} !~ /\A(print|stat|fetch)\z/) {
+    print STDERR "$0 $usage\n";
+    exit 1;
+}
+
+my $arg;
+if ($c->{fid}) {
+	$c->{domain} ||= 'mogfiledebug-unset';
+	$arg = 'fid';
+} else {
+	$arg = 'key';
+}
+
+my $mogc = $util->client;
+my $details = $mogc->file_debug($arg => $c->{$arg});
+if ($mogc->errcode) {
+    die "Error fetching fid info: " . $mogc->errstr;
+}
+
+my %parts = ();
+my @paths = grep { $_ =~ m/^devpath_/ } keys %$details;
+while (my ($k, $v) = each %$details) {
+    next if $k =~ m/^devpath_/;
+    if ($k =~ s/^(\w+)_//) {
+        $parts{$1}->{$k} = $v;
+    }
+}
+
+# If no paths, print something about that.
+if (!@paths) {
+    print "No valid-ish paths found\n";
+} elsif ($c->{paths} eq 'print') {
+    print "Paths...\n";
+    for my $key (@paths) {
+        my $path = $details->{$key};
+        print " - ", $path, "\n";
+    }
+} elsif ($c->{paths} eq 'stat') {
+    my @results;
+    # For each actual path, check its file status
+    print "Checking status of paths...\n";
+    for my $key (@paths) {
+        my $path = $details->{$key};
+        push(@results, stat_path($path));
+    }
+    emit_results(0, \%parts, \@results);
+} elsif ($c->{paths} eq 'fetch') {
+    my @results;
+    # For each actual path, fetch and calculate the MD5SUM.
+    print "Fetching and summing paths...\n";
+    for my $key (@paths) {
+        my $path = $details->{$key};
+        push(@results, fetch_path($path));
+    }
+    emit_results(1, \%parts, \@results);
+}
+
+# print info from all of the queues. Raw is fine? failcount/etc.
+print "\nTempfile and/or queue rows...\n";
+my $found = 0;
+for my $type (qw/tempfile replqueue delqueue rebqueue fsckqueue/) {
+    my $part = $parts{$type};
+    next unless (defined $part);
+    $found++;
+    printf("- %12s\n", $type);
+    while (my ($k, $v) = each %$part) {
+        printf("  %20s: %20s\n", $k, $v);
+    }
+}
+print "none.\n" unless $found;
+
+# Print rest of file info like file_info
+if (my $fid = $parts{fid}) {
+    print "\n- File Row:\n";
+    for my $item (sort keys %$fid) {
+        printf("  %8s: %20s\n", $item, $fid->{$item});
+    }
+} else {
+    print qq{- ERROR: No file row was found!
+File may have been deleted or never closed.
+See above for any matching rows from tempfile or delqueue.
+};
+}
+
+if (my $devids = $details->{devids}) {
+    print "\n- Raw devids: ", $devids, "\n";
+}
+
+if (my $hash = $details->{checksum}) {
+    print "\n- Stored checksum: ", $hash, "\n";
+}
+
+sub fetch_path {
+    my $path = shift;
+    my $ua   = LWP::UserAgent->new;
+    my $ctx  = Digest::MD5->new;
+    $ua->timeout(10);
+    my %toret = (length => 0);
+
+    my $sum_up = sub {
+        $toret{length} += length($_[0]);
+        $ctx->add($_[0]);
+    };
+    my $res = $ua->get($path, ':content_cb' => $sum_up,
+        ':read_size_hint' => 32768);
+
+    $toret{hash}  = $ctx->hexdigest;
+    $toret{res}   = $res->status_line;
+    $toret{mtime} = $res->header("Last-Modified");
+    $toret{path}  = $path;
+    return \%toret;
+}
+
+sub stat_path {
+    my $path = shift;
+    my $ua   = LWP::UserAgent->new;
+    $ua->timeout(10);
+
+    my $res = $ua->head($path);
+
+    my %to_ret = (
+        res    => $res->status_line,
+        mtime  => $res->header("Last-Modified"),
+        length => $res->header("Content-Length"),
+        path   => $path,
+    );
+
+    return \%to_ret;
+}
+
+sub emit_results {
+    my ($need_hash, $parts, $results) = @_;
+
+    my $hash; # detect if hashes don't match
+    my $len = $parts->{fid}->{length};
+    print "No length, cannot verify content length" unless defined $len;
+    # No I don't have a good excuse for why this isn't one loop.
+    for my $res (@$results) {
+        print "\nResults for path: ", $res->{path}, "\n";
+        if ($res->{res} =~ /404/) {
+            print " - ERROR: File copy is missing: ", $res->{res}, "\n";
+            next;
+        }
+
+        if ($need_hash) {
+            $hash ||= $res->{hash};
+            if ($hash ne $res->{hash}) {
+                print " - ERROR: Hash does not match first path!\n";
+            }
+        }
+
+        if (defined $len && defined $res->{length} && $len != $res->{length}) {
+            print " - ERROR: Length does not match file row!\n";
+        }
+        print " - MD5 Hash: ", $res->{hash}, "\n" if $need_hash;
+        print " - Length: ", $res->{length}, "\n" if defined $res->{length};
+        print " - Last-Modified: ", $res->{mtime}, "\n" if defined $res->{mtime};
+        print " - HTTP result: ", $res->{res}, "\n";
+    }
+}

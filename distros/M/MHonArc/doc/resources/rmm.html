@@ -1,0 +1,155 @@
+<html>
+<head>
+<title>MHonArc Resources: RMM</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="reverse.html">REVERSE</a>]</td><td><nobr>[<a href="../resources.html#rmm">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="saveresources.html">SAVERESOURCES</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>RMM</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p>
+<code>-rmm </code><var>msgnum</var> ...<br>
+<code>-rmm </code><var>msgnum</var><code>-</code><var>msgnum</var> ...<br>
+<code>-rmm </code><var>msg-id</var> ...<br>
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>The RMM resource is activated by the <tt>-rmm</tt> command-line
+option.  When active, all non-option related arguments are treated
+as messages to delete from the archive.  Messages can be specified
+by a combination of message numbers, message number ranges, or message-ids.
+See <a href="#examples"><b>Examples</b></a> below.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>The following example specifies the messages to be deleted by
+individual message numbers.
+</p>
+<table border=1 width="100%"><tr><td><pre class="shell">
+prompt&gt; <b>mhonarc -rmm 24 28 39 48</b>
+Removing messages from ./maillist.html ...
+ 
+Writing mail ...
+Writing tmp/maillist.html ...
+Writing tmp/threads.html ...
+45 messages
+</pre></td></tr></table>
+
+<p>To delete message 15 and message 20 through 35, use the
+following:
+</p>
+<table border=1 width="100%"><tr><td><pre class="shell">
+prompt&gt; <b>mhonarc -rmm 15 20-35</b>
+</pre></td></tr></table>
+
+<p>In some cases, you may know the message-id of the message
+to delete and not the message number:
+</p>
+<table border=1 width="100%"><tr><td><pre class="shell">
+prompt&gt; <b>mhonarc -rmm 199802171800.KAA27647<!--
+-->&#64;<!--
+-->example.com</b>
+</pre></td></tr></table>
+<p>You can surround message-ids with <tt>&lt;&gt;</tt>'s, but you
+then may need to quote the arguments to prevent the shell interpreting
+them as I/O redirection.
+</p>
+
+<p>The following example shows how you can intermingle the various
+ways of specifying messages:
+</p>
+<table border=1 width="100%"><tr><td><pre class="shell">
+prompt&gt; <b>mhonarc -rmm 23-34 199802171800.KAA27647<!--
+-->&#64;<!--
+-->example.com 52</b>
+</pre></td></tr></table>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>1.1.0
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+<a href="outdir.html">OUTDIR</a>,
+<a href="scan.html">SCAN</a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="reverse.html">REVERSE</a>]</td><td><nobr>[<a href="../resources.html#rmm">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="saveresources.html">SAVERESOURCES</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2005/05/13 00:00:36 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"><strong>MHonArc</strong></a><br>
+Copyright &#169; 1997-1998, <a href="http://www.earlhood.com/">Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org">mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

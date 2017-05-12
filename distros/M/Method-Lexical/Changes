@@ -1,0 +1,55 @@
+Revision history for Perl extension Method::Lexical.
+
+0.30  Wed Jul 24 17:10:40 2013
+    - document the use of qualified/unqualified method names in option keys
+    - handle unqualified method names in option values
+    - minor code cleanup
+    - new tests:
+        - method_name_value.t
+        - module_autoload_fail.t
+
+0.24  Tue Jul 23 20:49:00 2013
+    - RT87218: fix failing tests in perl >= 5.17.5 (thanks, Toby Inkster)
+    - allow import args to be passed as a hashref
+    - update ppport.h to 3.20
+
+0.23  Sun Mar 13 16:27:33 2011
+    - add repository link
+
+0.22  Sun Mar 13 15:34:31 2011
+    - portability fix for perl 5.13 (thanks, Serguei Trouchelle)
+
+0.21  Thu Apr 8 03:18:04 2010
+    - compatibility fix for perl 5.12
+    - minor XS refactoring
+    - doc tweak
+    - update ppport.h
+
+0.20  Sun Feb 22 02:21:13 2009
+    - support AUTOLOAD methods
+        - added autoload.t
+    - added cache.t
+    - yet another metadata fix
+
+0.11  Fri Feb 20 13:27:12 2009
+    - fix OOM error (thanks, Andreas Koenig)
+
+0.10  Fri Feb 20 02:35:11 2009
+    - support fully-qualified method names and SUPER
+        - added fqname.t
+    - fix segfault when calling methods on unblessed references
+        - added fail.t
+    - refix META.yml
+
+0.04  Thu Feb 19 16:54:58 2009
+    - fix META.yml
+
+0.03  Mon Feb 16 01:14:21 2009
+    - Makefile.PL fix
+
+0.02  Sun Feb 15 08:47:30 2009
+    - documentation fixlets
+    - mro.h fix
+
+0.01  Sat Feb 14 21:07:12 2009
+    - original version; created by h2xs 1.23 with options -A --name=Method::Lexical

@@ -1,0 +1,64 @@
+Math::SigDig version 1.0
+========================
+
+
+                                  SigDig.pm
+                                 Version 1.0
+
+  What is it?
+  -----------
+
+  Math::SigDig is a module that provides methods to round a number to a
+  specified number of significant digits and count the number of significant
+  digits.  It allows you to edit numbers to a significant number of digits
+  (whether they include a decimal point or not).  In scientific endeavors, the
+  number of digits that are "significant" in the result of a calculation using
+  2 numbers is frequently the number of significant digits in the number with
+  the least number of significant digits (e.g. 2.0 * 232.12 = 464.24, where
+  464.24 is reduced to 2 significant digits: 460).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+CONTACT
+
+Correspondence can be sent to the author below directly.
+
+AUTHOR
+
+Robert W. Leach  
+Bioinformatics Group  
+Lewis Seigler Institute for Integrative Genomics  
+Princeton University  
+Princeton, NJ
+
+KNOWN ISSUES
+
+None
+
+COPYRIGHT AND LICENCE
+
+This software (Math::SigDig) and ancillary information (herein called
+"SOFTWARE") is free: you can redistribute it and/or modify it under the terms
+of the GNU General Public License as published by the Free Software Foundation,
+either version 3 of the License, or (at your option) any later version.
+
+This software is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <http://www.gnu.org/licenses/>.
+
+If SOFTWARE is modified to produce derivative works, such modified SOFTWARE
+should be clearly marked, so as not to confuse it with this version.

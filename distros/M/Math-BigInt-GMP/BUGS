@@ -1,0 +1,12 @@
+For an updated list of bugs, see
+
+  https://rt.cpan.org/Public/Dist/Display.html?Name=Math-BigInt-GMP
+
+The following list is not up to date:
+
+* Some problems with left/right shifting in base != 2 seem to occur
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

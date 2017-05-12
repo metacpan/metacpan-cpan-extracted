@@ -1,0 +1,689 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Box::File::Message - one message in a Mbox folder
+
+=head1 INHERITANCE
+
+ Mail::Box::File::Message
+   is a Mail::Box::Message
+   is a Mail::Message
+   is a Mail::Reporter
+
+ Mail::Box::File::Message is extended by
+   Mail::Box::Dbx::Message
+   Mail::Box::Mbox::Message
+
+=head1 SYNOPSIS
+
+ my $folder  = new Mail::Box::File folder => $ENV{MAIL}, ...;
+ my $message = $folder->message(0);
+
+=head1 DESCRIPTION
+
+Maintain one message in an file based folder, any L<Mail::Box::File|Mail::Box::File>
+extension.
+
+Extends L<"DESCRIPTION" in Mail::Box::Message|Mail::Box::Message/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Box::Message|Mail::Box::Message/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Mail::Box::Message|Mail::Box::Message/"Constructors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<clone>(%options)
+
+Inherited, see L<Mail::Message/"Constructors">
+
+=item Mail::Box::File::Message-E<gt>B<new>(%options)
+
+Messages in file-based folders use the following options for creation:
+
+ -Option    --Defined in        --Default
+  body        Mail::Message       undef
+  body_type   Mail::Box::Message  <from folder>
+  deleted     Mail::Message       <false>
+  field_type  Mail::Message       undef
+  folder      Mail::Box::Message  <required>
+  from_line                       undef
+  head        Mail::Message       undef
+  head_type   Mail::Message       Mail::Message::Head::Complete
+  labels      Mail::Message       {}
+  log         Mail::Reporter      'WARNINGS'
+  messageId   Mail::Message       undef
+  modified    Mail::Message       <false>
+  size        Mail::Box::Message  undef
+  trace       Mail::Reporter      'WARNINGS'
+  trusted     Mail::Message       <false>
+
+=over 2
+
+=item body => OBJECT
+
+=item body_type => CODE|CLASS
+
+=item deleted => BOOLEAN
+
+=item field_type => CLASS
+
+=item folder => FOLDER
+
+=item from_line => STRING
+
+The line which begins each message in the file. Some people detest
+this line, but this is just how things were invented...
+
+=item head => OBJECT
+
+=item head_type => CLASS
+
+=item labels => ARRAY|HASH
+
+=item log => LEVEL
+
+=item messageId => STRING
+
+=item modified => BOOLEAN
+
+=item size => INTEGER
+
+=item trace => LEVEL
+
+=item trusted => BOOLEAN
+
+=back
+
+=back
+
+=head2 Constructing a message
+
+Extends L<"Constructing a message" in Mail::Box::Message|Mail::Box::Message/"Constructing a message">.
+ 
+=over 4
+
+=item $obj-E<gt>B<bounce>( [<$rg_object|%options>] )
+
+Inherited, see L<Mail::Message::Construct::Bounce/"Constructing a message">
+
+=item Mail::Box::File::Message-E<gt>B<build>( [$message|$part|$body], $content )
+
+Inherited, see L<Mail::Message::Construct::Build/"Constructing a message">
+
+=item Mail::Box::File::Message-E<gt>B<buildFromBody>($body, [$head], $headers)
+
+Inherited, see L<Mail::Message::Construct::Build/"Constructing a message">
+
+=item $obj-E<gt>B<forward>(%options)
+
+Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
+
+=item $obj-E<gt>B<forwardAttach>(%options)
+
+Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
+
+=item $obj-E<gt>B<forwardEncapsulate>(%options)
+
+Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
+
+=item $obj-E<gt>B<forwardInline>(%options)
+
+Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
+
+=item $obj-E<gt>B<forwardNo>(%options)
+
+Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
+
+=item $obj-E<gt>B<forwardPostlude>()
+
+Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
+
+=item $obj-E<gt>B<forwardPrelude>()
+
+Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
+
+=item $obj-E<gt>B<forwardSubject>(STRING)
+
+Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
+
+=item Mail::Box::File::Message-E<gt>B<read>($fh|STRING|SCALAR|ARRAY, %options)
+
+Inherited, see L<Mail::Message::Construct::Read/"Constructing a message">
+
+=item $obj-E<gt>B<rebuild>(%options)
+
+Inherited, see L<Mail::Message::Construct::Rebuild/"Constructing a message">
+
+=item $obj-E<gt>B<reply>(%options)
+
+Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
+
+=item $obj-E<gt>B<replyPrelude>( [STRING|$field|$address|ARRAY-$of-$things] )
+
+Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
+
+=item $obj-E<gt>B<replySubject>(STRING)
+
+=item Mail::Box::File::Message-E<gt>B<replySubject>(STRING)
+
+Inherited, see L<Mail::Message::Construct::Reply/"Constructing a message">
+
+=back
+
+=head2 The message
+
+Extends L<"The message" in Mail::Box::Message|Mail::Box::Message/"The message">.
+ 
+=over 4
+
+=item $obj-E<gt>B<container>()
+
+Inherited, see L<Mail::Message/"The message">
+
+=item $obj-E<gt>B<copyTo>($folder, %options)
+
+Inherited, see L<Mail::Box::Message/"The message">
+
+=item $obj-E<gt>B<escapedBody>()
+
+Mbox folders contain multiple messages in one file, using a separator
+line to keep them apart.  Typically, these lines start with "From ".
+Lines within the message could interfere with this separator, and should
+therefore be translated.
+
+This method will return the escaped text of the body as reference.
+
+=item $obj-E<gt>B<folder>( [$folder] )
+
+Inherited, see L<Mail::Box::Message/"The message">
+
+=item $obj-E<gt>B<fromLine>( [$line] )
+
+Many people detest file-style folders because they store messages all in
+one file, where a line starting with C<From > leads the header.  If we
+receive a message from a file-based folder, we store that line.  If we write
+to such a file, but there is no such line stored, then we try to generate
+one.
+
+If $line is provided, then the starting line is set to this value.
+
+=item $obj-E<gt>B<isDummy>()
+
+Inherited, see L<Mail::Message/"The message">
+
+=item $obj-E<gt>B<isPart>()
+
+Inherited, see L<Mail::Message/"The message">
+
+=item $obj-E<gt>B<messageId>()
+
+Inherited, see L<Mail::Message/"The message">
+
+=item $obj-E<gt>B<moveTo>($folder, %options)
+
+Inherited, see L<Mail::Box::Message/"The message">
+
+=item $obj-E<gt>B<partNumber>()
+
+Inherited, see L<Mail::Message/"The message">
+
+=item $obj-E<gt>B<print>( [$fh] )
+
+Inherited, see L<Mail::Message/"The message">
+
+=item $obj-E<gt>B<send>( [$mailer], %options )
+
+Inherited, see L<Mail::Message/"The message">
+
+=item $obj-E<gt>B<seqnr>( [$integer] )
+
+Inherited, see L<Mail::Box::Message/"The message">
+
+=item $obj-E<gt>B<size>()
+
+Inherited, see L<Mail::Message/"The message">
+
+=item $obj-E<gt>B<toplevel>()
+
+Inherited, see L<Mail::Message/"The message">
+
+=item $obj-E<gt>B<write>( [$fh] )
+
+Write one message to a file handle.  It is the message including the
+leading 'From ' line and trailing blank.  The From-line may interfere
+with lines in the body: those lines are escaped with an extra '>'.
+
+example: 
+
+ $msg->write(\*FILE);    # print the message with encaps to FILE
+ $msg->write;            # message with encaps to selected filehandle
+ $msg->print(\*FILE);    # the message without encaps.
+
+=back
+
+=head2 The header
+
+Extends L<"The header" in Mail::Box::Message|Mail::Box::Message/"The header">.
+ 
+=over 4
+
+=item $obj-E<gt>B<bcc>()
+
+Inherited, see L<Mail::Message/"The header">
+
+=item $obj-E<gt>B<cc>()
+
+Inherited, see L<Mail::Message/"The header">
+
+=item $obj-E<gt>B<date>()
+
+Inherited, see L<Mail::Message/"The header">
+
+=item $obj-E<gt>B<destinations>()
+
+Inherited, see L<Mail::Message/"The header">
+
+=item $obj-E<gt>B<from>()
+
+Inherited, see L<Mail::Message/"The header">
+
+=item $obj-E<gt>B<get>($fieldname)
+
+Inherited, see L<Mail::Message/"The header">
+
+=item $obj-E<gt>B<guessTimestamp>()
+
+Inherited, see L<Mail::Message/"The header">
+
+=item $obj-E<gt>B<head>( [$head] )
+
+Inherited, see L<Mail::Message/"The header">
+
+=item $obj-E<gt>B<nrLines>()
+
+Inherited, see L<Mail::Message/"The header">
+
+=item $obj-E<gt>B<sender>()
+
+Inherited, see L<Mail::Message/"The header">
+
+=item $obj-E<gt>B<study>($fieldname)
+
+Inherited, see L<Mail::Message/"The header">
+
+=item $obj-E<gt>B<subject>()
+
+Inherited, see L<Mail::Message/"The header">
+
+=item $obj-E<gt>B<timestamp>()
+
+Inherited, see L<Mail::Message/"The header">
+
+=item $obj-E<gt>B<to>()
+
+Inherited, see L<Mail::Message/"The header">
+
+=back
+
+=head2 The body
+
+Extends L<"The body" in Mail::Box::Message|Mail::Box::Message/"The body">.
+ 
+=over 4
+
+=item $obj-E<gt>B<body>( [$body] )
+
+Inherited, see L<Mail::Message/"The body">
+
+=item $obj-E<gt>B<contentType>()
+
+Inherited, see L<Mail::Message/"The body">
+
+=item $obj-E<gt>B<decoded>(%options)
+
+Inherited, see L<Mail::Message/"The body">
+
+=item $obj-E<gt>B<encode>(%options)
+
+Inherited, see L<Mail::Message/"The body">
+
+=item $obj-E<gt>B<isMultipart>()
+
+Inherited, see L<Mail::Message/"The body">
+
+=item $obj-E<gt>B<isNested>()
+
+Inherited, see L<Mail::Message/"The body">
+
+=item $obj-E<gt>B<parts>( [<'ALL'|'ACTIVE'|'DELETED'|'RECURSE'|$filter>] )
+
+Inherited, see L<Mail::Message/"The body">
+
+=back
+
+=head2 Flags
+
+Extends L<"Flags" in Mail::Box::Message|Mail::Box::Message/"Flags">.
+ 
+=over 4
+
+=item $obj-E<gt>B<delete>()
+
+Inherited, see L<Mail::Message/"Flags">
+
+=item $obj-E<gt>B<deleted>( [BOOLEAN] )
+
+Inherited, see L<Mail::Message/"Flags">
+
+=item $obj-E<gt>B<isDeleted>()
+
+Inherited, see L<Mail::Message/"Flags">
+
+=item $obj-E<gt>B<isModified>()
+
+Inherited, see L<Mail::Message/"Flags">
+
+=item $obj-E<gt>B<label>($label|PAIRS)
+
+Inherited, see L<Mail::Message/"Flags">
+
+=item $obj-E<gt>B<labels>()
+
+Inherited, see L<Mail::Message/"Flags">
+
+=item $obj-E<gt>B<labelsToStatus>()
+
+Inherited, see L<Mail::Message/"Flags">
+
+=item $obj-E<gt>B<modified>( [BOOLEAN] )
+
+Inherited, see L<Mail::Message/"Flags">
+
+=item $obj-E<gt>B<statusToLabels>()
+
+Inherited, see L<Mail::Message/"Flags">
+
+=back
+
+=head2 The whole message as text
+
+Extends L<"The whole message as text" in Mail::Box::Message|Mail::Box::Message/"The whole message as text">.
+ 
+=over 4
+
+=item $obj-E<gt>B<file>()
+
+Inherited, see L<Mail::Message::Construct::Text/"The whole message as text">
+
+=item $obj-E<gt>B<lines>()
+
+Inherited, see L<Mail::Message::Construct::Text/"The whole message as text">
+
+=item $obj-E<gt>B<printStructure>( [$fh|undef],[$indent] )
+
+Inherited, see L<Mail::Message::Construct::Text/"The whole message as text">
+
+=item $obj-E<gt>B<string>()
+
+Inherited, see L<Mail::Message::Construct::Text/"The whole message as text">
+
+=back
+
+=head2 Internals
+
+Extends L<"Internals" in Mail::Box::Message|Mail::Box::Message/"Internals">.
+ 
+=over 4
+
+=item $obj-E<gt>B<clonedFrom>()
+
+Inherited, see L<Mail::Message/"Internals">
+
+=item Mail::Box::File::Message-E<gt>B<coerce>($message, %options)
+
+Inherited, see L<Mail::Message/"Internals">
+
+=item $obj-E<gt>B<diskDelete>()
+
+Inherited, see L<Mail::Box::Message/"Internals">
+
+=item $obj-E<gt>B<fileLocation>()
+
+Returns the location of the whole message including the from-line.  In
+LIST context, both begin and end are returned.  In SCALAR context, only
+the begin is passed back.
+
+=item $obj-E<gt>B<isDelayed>()
+
+Inherited, see L<Mail::Message/"Internals">
+
+=item $obj-E<gt>B<loadBody>()
+
+=item $obj-E<gt>B<moveLocation>($distance)
+
+The message is relocated in the file, being moved over $distance bytes.
+Setting a new location will update the according information in the header
+and body.
+
+=item $obj-E<gt>B<readBody>( $parser, $head, [$bodytype] )
+
+Inherited, see L<Mail::Box::Message/"Internals">
+
+=item $obj-E<gt>B<readFromParser>($parser)
+
+Read one message from a L<Mail::Box::File|Mail::Box::File> based folder, including the
+leading message separator.
+
+=item $obj-E<gt>B<readHead>( $parser, [$class] )
+
+Inherited, see L<Mail::Message/"Internals">
+
+=item $obj-E<gt>B<recursiveRebuildPart>($part, %options)
+
+Inherited, see L<Mail::Message::Construct::Rebuild/"Internals">
+
+=item $obj-E<gt>B<storeBody>($body)
+
+Inherited, see L<Mail::Message/"Internals">
+
+=item $obj-E<gt>B<takeMessageId>( [STRING] )
+
+Inherited, see L<Mail::Message/"Internals">
+
+=back
+
+=head2 Error handling
+
+Extends L<"Error handling" in Mail::Box::Message|Mail::Box::Message/"Error handling">.
+ 
+=over 4
+
+=item $obj-E<gt>B<AUTOLOAD>()
+
+Inherited, see L<Mail::Message::Construct/"METHODS">
+
+=item $obj-E<gt>B<addReport>($object)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+=item Mail::Box::File::Message-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<errors>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<log>( [$level, [$strings]] )
+
+=item Mail::Box::File::Message-E<gt>B<log>( [$level, [$strings]] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logPriority>($level)
+
+=item Mail::Box::File::Message-E<gt>B<logPriority>($level)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<notImplemented>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<report>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<reportAll>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<shortSize>( [$value] )
+
+=item Mail::Box::File::Message-E<gt>B<shortSize>( [$value] )
+
+Inherited, see L<Mail::Message/"Error handling">
+
+=item $obj-E<gt>B<shortString>()
+
+Inherited, see L<Mail::Message/"Error handling">
+
+=item $obj-E<gt>B<trace>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<warnings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=back
+
+=head2 Cleanup
+
+Extends L<"Cleanup" in Mail::Box::Message|Mail::Box::Message/"Cleanup">.
+ 
+=over 4
+
+=item $obj-E<gt>B<DESTROY>()
+
+Inherited, see L<Mail::Reporter/"Cleanup">
+
+=item $obj-E<gt>B<destruct>()
+
+Inherited, see L<Mail::Box::Message/"Cleanup">
+
+=back
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in Mail::Box::Message|Mail::Box::Message/"DETAILS">.
+ 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: Cannot coerce a $class object into a $class object
+
+=item Error: Cannot include forward source as $include.
+
+Unknown alternative for the L<forward(include)|Mail::Message::Construct::Forward/"Constructing a message">.  Valid choices are
+C<NO>, C<INLINE>, C<ATTACH>, and C<ENCAPSULATE>.
+
+=item Error: Cannot include reply source as $include.
+
+Unknown alternative for the C<include> option of L<reply()|Mail::Message::Construct::Reply/"Constructing a message">.  Valid
+choices are C<NO>, C<INLINE>, and C<ATTACH>.
+
+=item Error: Method bounce requires To, Cc, or Bcc
+
+The message L<bounce()|Mail::Message::Construct::Bounce/"Constructing a message"> method forwards a received message off to someone
+else without modification; you must specified it's new destination.
+If you have the urge not to specify any destination, you probably
+are looking for L<reply()|Mail::Message::Construct::Reply/"Constructing a message">. When you wish to modify the content, use
+L<forward()|Mail::Message::Construct::Forward/"Constructing a message">.
+
+=item Error: Method forwardAttach requires a preamble
+
+=item Error: Method forwardEncapsulate requires a preamble
+
+=item Error: No address to create forwarded to.
+
+If a forward message is created, a destination address must be specified.
+
+=item Error: No default mailer found to send message.
+
+The message L<send()|Mail::Message/"The message"> mechanism had not enough information to automatically
+find a mail transfer agent to sent this message.  Specify a mailer
+explicitly using the C<via> options.
+
+=item Error: No rebuild rule $name defined.
+
+=item Error: Only build() Mail::Message's; they are not in a folder yet
+
+You may wish to construct a message to be stored in a some kind
+of folder, but you need to do that in two steps.  First, create a
+normal L<Mail::Message|Mail::Message>, and then add it to the folder.  During this
+L<Mail::Box::addMessage()|Mail::Box/"The folder"> process, the message will get L<coerce()|Mail::Message/"Internals">-d
+into the right message type, adding storage information and the like.
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=item Error: Unable to read delayed body.
+
+=item Error: coercion starts with some object
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Box distribution version 3.002,
+built on March 31, 2017.
+
+Do not forget to read
+L<Mail::Box-Overview>,
+L<Mail::Box-Cookbook>, and
+L<Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L<Mail::Message>,
+L<Mail::Box>,
+L<Mail::Box::IMAP4>,
+L<Mail::Box::POP3>,
+L<Mail::Box::Parser::C>,
+L<Mail::Box::Dbx> (unpublished),
+L<Mail::Transport>,
+L<Object::Realize::Later>, and
+L<User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

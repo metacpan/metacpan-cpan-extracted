@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5af545c218bf29dd2f3c9202e292c2116254d035 Changes
+SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
+SHA1 980e97dcd4126d741eacf0f4ad7a644a471b944f MANIFEST
+SHA1 31e27255884b112fbd7ff6fc7c05a6c6507b6581 META.json
+SHA1 d1d64cab94928aefb3e150de5fb698d25695e228 META.yml
+SHA1 ba6bf25da11a818982cb13823c0b59e84f61439b Makefile.PL
+SHA1 06b68ea0ae6eddebc4fbe8782c618020a24d7283 README
+SHA1 5c513eb98b4fbe30d4db134572c82f17a3bb2502 eg/mcp-progressions
+SHA1 1d6f58c2d9e1f3e15c15602e50461e6b4f003d31 eg/mcp2ly
+SHA1 47c8ae6e9288577d5ac0c2a0d767cf2bee4b733e lib/Music/Chord/Positions.pm
+SHA1 6d77b148478dac705f2ce8ccc765e8e035f24add t/Music-Chord-Positions.t
+SHA1 c96d97f00bc5c45197752cba3413b1a0db41c2e1 t/Schoenberg.t
+SHA1 3ef65383d82f059f56f43236663119c01974decb t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJU0k97AAoJEDTEVWqwTuCUsvQIAKbxYe3gBlFBlguAG+I2aOP1
+2LLSF0Z4WJB93AcS9XwpXfnpja5JXNjW/VrAHD8qom+7XuFhh4mQBhrekDsycaAP
+tDNl0g68H57mn9kUPmuD81uyHYmoZ/MnJbrFfd8QrliH2ZRdf4Tcp2mfWUrMQs17
+Ah4WhFqrSmsiI4A0UTJNaoLhO4t9+zr6an0z9tKYDwm8mwzEtYxHbwkfq2nU9st+
+FvTHH5vnvaSR/Gjc4jZuzvEzsq2UG5DBityux4dbUQ3pe0N6CwfTnHc3U85hvk2T
+A1uNc6HyXAlTbLi8eXNe+lMZpvRb6MPw6vXvv1IanJqY/V49RIn85IVCf+8GNmU=
+=BkHr
+-----END PGP SIGNATURE-----

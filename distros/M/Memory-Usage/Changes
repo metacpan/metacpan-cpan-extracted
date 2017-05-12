@@ -1,0 +1,16 @@
+Revision history for Memory-Usage
+
+0.201   Wed, 07 Jul 2010 14:27:16 -0400	(dmo)
+
+	Extend recording of usage to consider shared, code, and data segments
+	in addition to rss and vsz.
+
+	Allow report() to take an optional PID, for monitoring other processes.
+
+0.200	Thu, 01 Apr 2010 13:17:10 -0400	(dmo)
+
+	Add state() and report() methods for retrieving data.
+
+0.100	Thu, 01 Apr 2010 10:48:36 -0400 (dmo)
+        First version, released on an unsuspecting world.
+

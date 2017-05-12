@@ -1,0 +1,17 @@
+MP4::File is a module that offers both read and write access to MP4
+files, while most (all?) other MP4 modules only offer read access.
+
+The module uses libmp4v2 for MP4 file manipulation, so make sure
+this is installed before trying to build MP4::File.
+
+The module is currently lacking more documentation and tests.
+
+I hacked this module because I needed to tag AAC files, and that's
+the only thing that can currently be done with MP4::File. However,
+there's a lot more that can be done using the underlying libmp4v2.
+So if anyone would like to take over and enhance this module, feel
+free to contact me.
+
+Copyright (c) 2008 Marcus Holland-Moritz. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

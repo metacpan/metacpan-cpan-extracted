@@ -1,0 +1,59 @@
+Math-Prime-TiedArray
+
+This is an implementation of a tied array of prime numbers.  The array can be
+treated as if it's infinite, as new primes will be calculated as they are
+needed.
+
+           use Math::Prime::TiedArray;
+
+           my @primes;
+           tie @primes, "Math::Prime::TiedArray";
+
+           # print the first 100 primes:
+           print join ", ", @primes[0..99];
+
+           # print the 200th prime:
+           print $primes[199];
+
+           # print all the primes smaller than 500
+           while ((my $prime = shift @primes) < 500) {
+             print "$prime, ";
+           }
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Math::Prime::TiedArray
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Math-Prime-TiedArray
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Prime-TiedArray
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Math-Prime-TiedArray
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Math-Prime-TiedArray
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Dan Boger
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

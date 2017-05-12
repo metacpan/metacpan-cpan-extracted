@@ -1,0 +1,46 @@
+{
+   "abstract" : "NetAddr::IP related types and coercions for Moose",
+   "author" : [
+      "Todd Caine <todd.caine@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Types-NetAddr-IP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Module::Runtime" : "0.014",
+            "Moose" : "0.41",
+            "MooseX::Types" : "0.19",
+            "NetAddr::IP" : "0",
+            "Test::Exception" : "0",
+            "namespace::clean" : "0.08"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.07"
+}

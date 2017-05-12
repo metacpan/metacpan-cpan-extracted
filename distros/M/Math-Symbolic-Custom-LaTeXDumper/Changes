@@ -1,0 +1,40 @@
+Revision history for Perl extension Math::Symbolic::Custom::LaTeXDumper
+
+0.208 Tue May 14 2013
+  - Move POD tests from t/ to xt/
+  - POD encoding fix (RT #85276, Andreas Koenig)
+
+0.207 Fri Jun 24 2011
+  - If generating TeX for something like
+    x * -1
+    we need to add parenthesis to the constant:
+    x * (-1)
+    While mathematically, the prefered way to print this
+    example would be -x, the expression itself is kept the same
+    by design. The same rule applies to unary minus operators
+    and negative constants within sums, differences, and products.
+
+0.206 Sun Jan  6 2008
+  - 0.205 distribution was broken.
+
+0.205 Sat Jan  5 2008
+  - Support for B_ARCTANGENT_TWO.
+  - Thus requiring Math::Symbolic 0.509.
+
+0.204 Wed Aug 30 2006
+  - Upgraded to Module::Install 0.64.
+  - Removed auto_install from Makefile.PL
+  - Removed SIGNATURE because Module::Signature is still broken
+
+0.203 Fri Jun  9 2006
+  - Upgraded to Module::Install 0.63.
+
+0.202 Fri Feb 17 13:33 2006
+  - Removed a few more unnecessary parenthesis in a special case of
+    exponentiation.
+  - Added the no_sqrt option and the sqrt converter.
+    By default foo^0.5 is converted to \sqrt{foo} now.
+
+0.201 Tue Feb 14 15:43 2006
+  - original version as uploaded to CPAN
+

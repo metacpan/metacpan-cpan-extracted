@@ -1,0 +1,20 @@
+This is Mac::AppleEvents::Simple.  It provides a more simplified interface
+to Mac::AppleEvents for building, sending, and receiving events, as well
+as for retrieving data from descriptors.
+
+This archive can always be obtained from:
+
+    http://sf.net/projects/pudge/
+    http://www.cpan.org/authors/id/CNANDOR/
+    http://www.cpan.org/modules/by-module/Mac/
+
+The project homepage is:
+
+    http://projects.pudge.net/
+
+Please let me know how well it does(n't) work, and any changes you'd 
+like to see.
+
+Copyright (c) 1998-2005 Chris Nandor.  All rights reserved.  This program
+is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.

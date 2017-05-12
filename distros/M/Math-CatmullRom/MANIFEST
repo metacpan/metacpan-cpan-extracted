@@ -1,0 +1,6 @@
+INSTALL
+MANIFEST
+Makefile.PL
+README
+lib/Math/CatmullRom.pm
+t/01basic.t

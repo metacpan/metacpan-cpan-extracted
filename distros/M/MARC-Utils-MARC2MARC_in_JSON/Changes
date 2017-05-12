@@ -1,0 +1,20 @@
+Revision history for Perl extension MARC::Utils::MARC2MARC_in_JSON.
+
+0.05 Thu Dec  8 09:29:47 EST 2011
+    - allow for passing file type to each_record()
+
+0.04 Sun Feb 13 09:39:10 EST 2011
+    - add test for file type 'object'
+
+0.03 Sat Feb 12 14:44:17 EST 2011
+    - add each_record for reading json files, with tests
+    - RFC: http://en.wikipedia.org/wiki/User:Baxter.brad/Drafts/JSON_Document_Streaming_Proposal
+
+0.02 Wed Feb  9 08:06:07 EST 2011
+    - add prerequisites
+    - set perl version to 5.8.2
+
+0.01 Tue Feb  8 14:48:17 2011
+    - original version; created by h2xs 1.23 with options
+        -AX --skip-exporter --use-new-tests -n MARC::Utils::MARC2MARC_in_JSON
+

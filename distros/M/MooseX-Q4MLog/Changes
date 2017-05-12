@@ -1,0 +1,9 @@
+Changes
+=======
+
+0.00002 - 17 Jul 2008
+  - Use Q4MLog::Logger, doh
+  - Fix BUILD
+
+0.00001 - 16 Jul 2008
+  - Initial release

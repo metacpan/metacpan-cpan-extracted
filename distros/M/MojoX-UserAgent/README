@@ -1,0 +1,47 @@
+MojoX::UserAgent
+
+An asynchronous HTTP user-agent implementation for the Mojo Web Framework.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+perl Makefile.PL
+make
+make test
+make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc MojoX::UserAgent
+
+This project is developed using Github.  You may find the very latest
+source here:
+
+    http://github.com/Acajou/mojox-useragent/tree/master
+
+You may create bug reports or feature requests here:
+
+    http://github.com/Acajou/mojox-useragent/issues
+
+You may also look for information on CPAN at:
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Math::Factoring
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Math::Factoring
+
+    Search CPAN
+        http://search.cpan.org/dist/Math::Factoring
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Pascal Gaudette
+
+Please consult the LICENSE file for information on this package's
+license.

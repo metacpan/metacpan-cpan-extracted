@@ -1,0 +1,81 @@
+NAME
+    Module::Math::Depends - Convenience object for manipulating module
+    dependencies
+
+DESCRIPTION
+    This is a small convenience module created originally as part of
+    Module::Inspector but released seperately, in the hope that people might
+    find it useful in other contexts.
+
+METHODS
+  new
+      my $deps = Module::Math::Depends->new;
+
+    Creates a new, empty, dependency set.
+
+  from_hash
+      my $deps = Module::Math::Depends->from_hash( \%modules );
+
+    Creates a new dependency set from a raw hashref of modules names and
+    versions.
+
+  add_module
+      $deps->add_module( 'My::Module' => '1.23' );
+
+    Adds a single module dependency to the set.
+
+    Returns true, or dies on error.
+
+  merge
+      $my_deps->merge( $your_deps );
+
+    The "merge" method takes another dependency set and merges it into the
+    current one, taking the highest version where both sets contain a
+    module.
+
+    Returns true or dies on error.
+
+  as_string
+      print $depends->as_string;
+
+    Converts the dependency set to a simple printable string.
+
+SUPPORT
+    This module is stored in an Open Repository at the following address.
+
+    <http://svn.ali.as/cpan/trunk/Module-Math-Depends>
+
+    Write access to the repository is made available automatically to any
+    published CPAN author, and to most other volunteers on request.
+
+    If you are able to submit your bug report in the form of new (failing)
+    unit tests, or can apply your fix directly instead of submitting a
+    patch, you are strongly encouraged to do so as the author currently
+    maintains over 100 modules and it can take some time to deal with
+    non-Critcal bug reports or patches.
+
+    This will guarentee that your issue will be addressed in the next
+    release of the module.
+
+    If you cannot provide a direct test or fix, or don't have time to do so,
+    then regular bug reports are still accepted and appreciated via the CPAN
+    bug tracker.
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Module-Math-Depends>
+
+    For other issues, for commercial enhancement or support, or to have your
+    write access enabled for the repository, contact the author at the email
+    address above.
+
+AUTHORS
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2006 - 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

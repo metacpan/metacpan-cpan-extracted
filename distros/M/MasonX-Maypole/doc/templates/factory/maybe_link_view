@@ -1,0 +1,27 @@
+<%doc>
+
+=head2 maybe_link_view
+
+C<maybe_link_view> takes something returned from the database - either
+some ordinary data, or an object in a related class expanded by a
+has-a relationship. If it is an object, it constructs a link to the view
+command for that object. Otherwise, it just displays the data.
+
+This tests whether or not the returned value is an object, and if so,
+creates a link to a page viewing that object; if not, it just displays
+the text as normal. The object is linked using its stringified name;
+by default this calls the C<name> method, or returns the object's ID
+if there is no C<name> method or other stringification method defined.
+
+</%doc>
+<%args>
+    $object
+</%args>
+% if ( UNIVERSAL::isa( $object, 'Maypole::Model::Base' ) ) { 
+<& link, table      => $object->table,
+         command    => "view",
+         additional => $object->id,
+         label      => $object &>
+% } else {
+<% $object %>
+% }

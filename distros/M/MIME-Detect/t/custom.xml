@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mime-info [
+  <!ELEMENT mime-info (mime-type)+>
+  <!ATTLIST mime-info xmlns CDATA #FIXED "http://www.freedesktop.org/standards/shared-mime-info">
+
+  <!ELEMENT mime-type (comment+, (acronym,expanded-acronym)? , (generic-icon? | glob | magic | treemagic | root-XML | alias | sub-class-of)*)>
+  <!ATTLIST mime-type type CDATA #REQUIRED>
+
+  <!-- a comment describing a document with the respective MIME type. Example: "WMV video" -->
+  <!ELEMENT comment (#PCDATA)>
+  <!ATTLIST comment xml:lang CDATA #IMPLIED>
+
+  <!-- a comment describing the respective unexpanded MIME type acronym. Example: "WMV" -->
+  <!ELEMENT acronym (#PCDATA)>
+  <!ATTLIST acronym xml:lang CDATA #IMPLIED>
+
+  <!-- a comment describing the respective expanded MIME type acronym. Example: "Windows Media Video" -->
+  <!ELEMENT expanded-acronym (#PCDATA)>
+  <!ATTLIST expanded-acronym xml:lang CDATA #IMPLIED>
+
+  <!-- a generic icon name as per the Icon Naming Specification, only required if computing
+  it from the mime-type would not work, See "generic-icon" in the Shared Mime Specification -->
+  <!ELEMENT generic-icon EMPTY>
+  <!ATTLIST generic-icon name (application-x-executable|audio-x-generic|font-x-generic|image-x-generic|package-x-generic|text-html|text-x-generic|text-x-generic-template|text-x-script|video-x-generic|x-office-address-book|x-office-calendar|x-office-document|x-office-presentation|x-office-spreadsheet) #IMPLIED>
+
+  <!ELEMENT glob EMPTY>
+  <!ATTLIST glob pattern CDATA #REQUIRED>
+  <!ATTLIST glob weight CDATA #IMPLIED>
+  <!ATTLIST glob case-sensitive CDATA #IMPLIED>
+
+  <!ELEMENT magic (match)+>
+  <!ATTLIST magic priority CDATA #IMPLIED>
+
+  <!ELEMENT match (match)*>
+  <!ATTLIST match offset CDATA #REQUIRED>
+  <!ATTLIST match type (string|big16|big32|little16|little32|host16|host32|byte) #REQUIRED>
+  <!ATTLIST match value CDATA #REQUIRED>
+  <!ATTLIST match mask CDATA #IMPLIED>
+
+  <!ELEMENT treemagic (treematch)+>
+  <!ATTLIST treemagic priority CDATA #IMPLIED>
+
+  <!ELEMENT treematch (treematch)*>
+  <!ATTLIST treematch path CDATA #REQUIRED>
+  <!ATTLIST treematch type (file|directory|link) #IMPLIED>
+  <!ATTLIST treematch match-case (true|false) #IMPLIED>
+  <!ATTLIST treematch executable (true|false) #IMPLIED>
+  <!ATTLIST treematch non-empty (true|false) #IMPLIED>
+  <!ATTLIST treematch mimetype CDATA #IMPLIED>
+
+  <!ELEMENT root-XML EMPTY>
+  <!ATTLIST root-XML namespaceURI CDATA #REQUIRED>
+  <!ATTLIST root-XML localName CDATA #REQUIRED>
+
+  <!ELEMENT alias EMPTY>
+  <!ATTLIST alias type CDATA #REQUIRED>
+
+  <!ELEMENT sub-class-of EMPTY>
+  <!ATTLIST sub-class-of type CDATA #REQUIRED>
+]>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-7z-custom">
+    <comment>7-zip archive</comment>
+    <comment xml:lang="ar">أرشيف 7-zip</comment>
+    <comment xml:lang="be@latin">Archiŭ 7-zip</comment>
+    <comment xml:lang="bg">Архив — 7-zip</comment>
+    <comment xml:lang="ca">arxiu 7-zip</comment>
+    <comment xml:lang="cs">archiv 7-zip</comment>
+    <comment xml:lang="da">7-zip-arkiv</comment>
+    <comment xml:lang="de">7zip-Archiv</comment>
+    <comment xml:lang="el">Συμπιεσμένο αρχείο 7-zip</comment>
+    <comment xml:lang="en_GB">7-zip archive</comment>
+    <comment xml:lang="eo">7z-arkivo</comment>
+    <comment xml:lang="es">archivador 7-zip</comment>
+    <comment xml:lang="eu">7-zip artxiboa</comment>
+    <comment xml:lang="fi">7-zip-arkisto</comment>
+    <comment xml:lang="fo">7-zip skjalasavn</comment>
+    <comment xml:lang="fr">archive 7-zip</comment>
+    <comment xml:lang="ga">cartlann 7-zip</comment>
+    <comment xml:lang="gl">arquivo 7-zip</comment>
+    <comment xml:lang="he">ארכיון 7-zip</comment>
+    <comment xml:lang="hr">7-zip arhiva</comment>
+    <comment xml:lang="hu">7-zip archívum</comment>
+    <comment xml:lang="ia">Archivo 7-zip</comment>
+    <comment xml:lang="id">Arsip 7-zip</comment>
+    <comment xml:lang="it">Archivio 7-zip</comment>
+    <comment xml:lang="ja">7-zip アーカイブ</comment>
+    <comment xml:lang="ka">7-zip არქივი</comment>
+    <comment xml:lang="kk">7-zip архиві</comment>
+    <comment xml:lang="ko">7-ZIP 압축 파일</comment>
+    <comment xml:lang="lt">7-zip archyvas</comment>
+    <comment xml:lang="lv">7-zip arhīvs</comment>
+    <comment xml:lang="nb">7-zip-arkiv</comment>
+    <comment xml:lang="nl">7-zip-archief</comment>
+    <comment xml:lang="nn">7-zip-arkiv</comment>
+    <comment xml:lang="pl">Archiwum 7-zip</comment>
+    <comment xml:lang="pt_BR">Pacote 7-zip</comment>
+    <comment xml:lang="ro">Arhivă 7-zip</comment>
+    <comment xml:lang="ru">архив 7-zip</comment>
+    <comment xml:lang="sk">Archív 7-zip</comment>
+    <comment xml:lang="sl">Datoteka arhiva 7-zip</comment>
+    <comment xml:lang="sq">Arkiv 7-zip</comment>
+    <comment xml:lang="sv">7-zip-arkiv</comment>
+    <comment xml:lang="tr">7-Zip arşivi</comment>
+    <comment xml:lang="uk">архів 7-zip</comment>
+    <comment xml:lang="vi">Kho nén 7-zip</comment>
+    <comment xml:lang="zh_CN">7-zip 归档文件</comment>
+    <comment xml:lang="zh_TW">7-zip 封存檔</comment>
+    <generic-icon name="package-x-generic"/>
+    <magic priority="90">
+      <match value="7z\274\257\047\034" type="string" offset="0"/>
+    </magic>
+    <glob pattern="*.7z"/>
+  </mime-type>
+  <mime-type type="application/x-7z-custom-low">
+    <comment>7-zip archive</comment>
+    <comment xml:lang="ar">أرشيف 7-zip</comment>
+    <comment xml:lang="be@latin">Archiŭ 7-zip</comment>
+    <comment xml:lang="bg">Архив — 7-zip</comment>
+    <comment xml:lang="ca">arxiu 7-zip</comment>
+    <comment xml:lang="cs">archiv 7-zip</comment>
+    <comment xml:lang="da">7-zip-arkiv</comment>
+    <comment xml:lang="de">7zip-Archiv</comment>
+    <comment xml:lang="el">Συμπιεσμένο αρχείο 7-zip</comment>
+    <comment xml:lang="en_GB">7-zip archive</comment>
+    <comment xml:lang="eo">7z-arkivo</comment>
+    <comment xml:lang="es">archivador 7-zip</comment>
+    <comment xml:lang="eu">7-zip artxiboa</comment>
+    <comment xml:lang="fi">7-zip-arkisto</comment>
+    <comment xml:lang="fo">7-zip skjalasavn</comment>
+    <comment xml:lang="fr">archive 7-zip</comment>
+    <comment xml:lang="ga">cartlann 7-zip</comment>
+    <comment xml:lang="gl">arquivo 7-zip</comment>
+    <comment xml:lang="he">ארכיון 7-zip</comment>
+    <comment xml:lang="hr">7-zip arhiva</comment>
+    <comment xml:lang="hu">7-zip archívum</comment>
+    <comment xml:lang="ia">Archivo 7-zip</comment>
+    <comment xml:lang="id">Arsip 7-zip</comment>
+    <comment xml:lang="it">Archivio 7-zip</comment>
+    <comment xml:lang="ja">7-zip アーカイブ</comment>
+    <comment xml:lang="ka">7-zip არქივი</comment>
+    <comment xml:lang="kk">7-zip архиві</comment>
+    <comment xml:lang="ko">7-ZIP 압축 파일</comment>
+    <comment xml:lang="lt">7-zip archyvas</comment>
+    <comment xml:lang="lv">7-zip arhīvs</comment>
+    <comment xml:lang="nb">7-zip-arkiv</comment>
+    <comment xml:lang="nl">7-zip-archief</comment>
+    <comment xml:lang="nn">7-zip-arkiv</comment>
+    <comment xml:lang="pl">Archiwum 7-zip</comment>
+    <comment xml:lang="pt_BR">Pacote 7-zip</comment>
+    <comment xml:lang="ro">Arhivă 7-zip</comment>
+    <comment xml:lang="ru">архив 7-zip</comment>
+    <comment xml:lang="sk">Archív 7-zip</comment>
+    <comment xml:lang="sl">Datoteka arhiva 7-zip</comment>
+    <comment xml:lang="sq">Arkiv 7-zip</comment>
+    <comment xml:lang="sv">7-zip-arkiv</comment>
+    <comment xml:lang="tr">7-Zip arşivi</comment>
+    <comment xml:lang="uk">архів 7-zip</comment>
+    <comment xml:lang="vi">Kho nén 7-zip</comment>
+    <comment xml:lang="zh_CN">7-zip 归档文件</comment>
+    <comment xml:lang="zh_TW">7-zip 封存檔</comment>
+    <generic-icon name="package-x-generic"/>
+    <magic priority="0">
+      <match value="7z\274\257\047\034" type="string" offset="0"/>
+    </magic>
+    <glob pattern="*.7z"/>
+  </mime-type></mime-info>

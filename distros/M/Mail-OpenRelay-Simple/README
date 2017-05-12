@@ -1,0 +1,27 @@
+Mail-OpenRelay-Simple version 0.01
+==================================
+
+This module permit to check if a mail server runs as an open relay.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Net::Telnet
+
+COPYRIGHT AND LICENSE
+
+You may distribute this module under the terms of the Artistic license.
+See Copying file in the source distribution archive.
+
+Copyright (c) 2006, Matteo Cantoni 
+

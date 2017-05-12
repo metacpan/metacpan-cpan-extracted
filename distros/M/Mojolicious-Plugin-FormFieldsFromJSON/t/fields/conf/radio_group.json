@@ -1,0 +1,14 @@
+ [
+    {
+        "label" : "Name",
+        "type" : "radio",
+        "name" : "type",
+        "data" : "internal"
+    },
+    {
+        "label" : "Name",
+        "type" : "radio",
+        "name" : "type",
+        "data" : "external"
+    }
+ ]

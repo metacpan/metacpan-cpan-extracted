@@ -1,0 +1,46 @@
+Music-Image-Chord version 0.06
+==============================
+
+Music::Image::Chord uses Imager to generate guitar chord tablature images,
+representing something approximating a standard 5-fret chord image. Along with
+the basic chord progressions ('c', 'Dm', 'g7'), you can construct your own
+chords.
+
+It displays the fingerings, open/closed strings and frettings, along with the
+name of the chord. The test file doesn't generate text because it's impossible
+to know in advance what fonts the client system has installed.
+
+The module also gives you control over the basic display parameters, such as the
+overall size of the image, fret sizes, optional crop marks, and width of the
+frets. It currently draws in black-and-white, as that will probably be the most
+common usage.
+
+The test file attempts to generate a .png file, but by changing the extension
+of the file it will generate any format that Imager is capable of.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Imager
+
+COPYRIGHT AND LICENCE
+
+Licensed under the Perl Artistic License
+
+Copyright (C) 2003 by Jeffrey Goff
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

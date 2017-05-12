@@ -1,0 +1,474 @@
+
+# PODNAME: Map::Metro::Plugin::Map::Gothenburg::Lines
+# ABSTRACT: Lines and stations in the Gothenburg map
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Map::Metro::Plugin::Map::Gothenburg::Lines - Lines and stations in the Gothenburg map
+
+=head1 VERSION
+
+Version 0.1004, released 2016-01-23.
+
+=head1 LINES
+
+=head2 Line 1: Opaltorget → Östra Sjukhuset [1]
+
+=for HTML <div style="background-color: #cccccc; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Opaltorget            (7)
+    Smaragdgatan          (7)
+    Briljantgatan         (7)
+    Frölunda Torg         (7, 8)
+    Positivgatan          (7, 8)
+    Musikvägen            (7, 8)
+    Nymilsgatan           (7, 8)
+    Lantmilsgatan         (7, 8)
+    Axel Dahlströms Torg  (2, 7, 8)
+    Marklandsgatan        (2, 3, 7, 8)
+    Botaniska Trädgården  (2, 7, 8)
+    Linnéplatsen          (2, 6)
+    Olivedalsgatan        (2, 6)
+    Prinsgatan            (6)
+    Järntorget            (3, 6, 9, 11)
+    Hagakyrkan            (3, 6, 9, 11)
+    Grönsakstorget        (2, 6, 9, 11)
+    Domkyrkan             (2, 6, 9, 11)
+    Brunnsparken          (2, 3, 4, 5, 6, 7, 9, 10, 11)
+    Centralstationen      (2, 3, 4, 7, 9, 11, 13)
+    Ullevi Norra          (3, 6, 8)
+    Svingeln              (3, 6, 8)
+    Olskrokstorget        (3, 6, 8)
+    Redbergsplatsen       (3, 6, 8)
+    Stockholmsgatan       (3)
+    Härlanda              (3)
+    Munkebäckstorget      (5)
+    Ättehögsgatan         (5)
+    Kaggeledstorget       (5)
+    Tingvallsvägen        (5)
+    Östra Sjukhuset       (5)
+
+=head2 Line 2: Axel Dahlströms Torg → Mölndal centrum [2]
+
+=for HTML <div style="background-color: #ffd938; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Axel Dahlströms Torg  (1, 7, 8)
+    Marklandsgatan        (1, 3, 7, 8)
+    Botaniska Trädgården  (1, 7, 8)
+    Linnéplatsen          (1, 6)
+    Olivedalsgatan        (1, 6)
+    Seminariegatan
+    Brunnsgatan
+    Handelshögskolan
+    Vasa Viktoriagatan    (3)
+    Vasaplatsen           (3, 7, 10)
+    Grönsakstorget        (1, 6, 9, 11)
+    Domkyrkan             (1, 6, 9, 11)
+    Brunnsparken          (1, 3, 4, 5, 6, 7, 9, 10, 11)
+    Centralstationen      (1, 3, 4, 7, 9, 11, 13)
+    Ullevi Södra          (6, 8, 13)
+    Scandinavium          (6, 8, 13)
+    Korsvägen             (4, 5, 6, 8, 13)
+    Getebergsäng          (4)
+    Almedal               (4)
+    Elisedal              (4)
+    Varbergsgatan         (4)
+    Lana                  (4)
+    Krokslätts torg       (4)
+    Krokslätts Fabriker   (4)
+    Lackarebäck           (4)
+    Mölndals sjukhus      (4)
+    Mölndal centrum       (4)
+
+=head2 Line 3: Marklandsgatan → Virginsgatan [3]
+
+=for HTML <div style="background-color: #007cc5; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Marklandsgatan       (1, 2, 7, 8)
+    Bokekullsgatan
+    Högsbogatan
+    Klintens Väg
+    Godhemsgatan         (11)
+    Mariaplan            (11)
+    Ostindiegatan        (9)
+    Vagnhallen Majorna   (9)
+    Jaegerdorffsplatsen  (9)
+    Chapmans Torg        (9)
+    Kaptensgatan         (9)
+    Stigbergstorget      (9, 11)
+    Masthuggstorget      (9, 11)
+    Järntorget           (1, 6, 9, 11)
+    Hagakyrkan           (1, 6, 9, 11)
+    Vasa Viktoriagatan   (2)
+    Vasaplatsen          (2, 7, 10)
+    Valand               (4, 5, 7, 10)
+    Kungsportsplatsen    (4, 5, 7, 10)
+    Brunnsparken         (1, 2, 4, 5, 6, 7, 9, 10, 11)
+    Centralstationen     (1, 2, 4, 7, 9, 11, 13)
+    Ullevi Norra         (1, 6, 8)
+    Svingeln             (1, 6, 8)
+    Olskrokstorget       (1, 6, 8)
+    Redbergsplatsen      (1, 6, 8)
+    Stockholmsgatan      (1)
+    Härlanda             (1)
+    Solrosgatan          (5)
+    Sanatoriegatan       (5)
+    Virginsgatan         (5)
+
+=head2 Line 4: Angered Centrum → Mölndal centrum [4]
+
+=for HTML <div style="background-color: #00a763; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Angered Centrum      (8, 9)
+    Storås               (8, 9)
+    Hammarkullen         (8, 9)
+    Hjällbo              (8, 9)
+    Gamlestadstorget     (6, 7, 8, 9, 11)
+    Centralstationen     (1, 2, 3, 7, 9, 11, 13)
+    Brunnsparken         (1, 2, 3, 5, 6, 7, 9, 10, 11)
+    Kungsportsplatsen    (3, 5, 7, 10)
+    Valand               (3, 5, 7, 10)
+    Berzeliigatan        (5)
+    Korsvägen            (2, 5, 6, 8, 13)
+    Getebergsäng         (2)
+    Almedal              (2)
+    Elisedal             (2)
+    Varbergsgatan        (2)
+    Lana                 (2)
+    Krokslätts torg      (2)
+    Krokslätts Fabriker  (2)
+    Lackarebäck          (2)
+    Mölndals sjukhus     (2)
+    Mölndal centrum      (2)
+
+=head2 Line 5: Varmfrontsgatan → Östra Sjukhuset [5]
+
+=for HTML <div style="background-color: #ff403a; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Varmfrontsgatan           (6)
+    Temperaturgatan           (6)
+    Väderilsgatan             (6, 10)
+    Friskväderstorget         (6, 10)
+    Önskevädersgatan          (6, 10)
+    Mildvädersgatan           (6, 10)
+    Vårväderstorget           (6, 10)
+    Sålöfjordsgatan           (6, 10)
+    Eketrägatan               (6, 10)
+    Gropegårdsgatan           (6, 10)
+    Rambergsvallen            (6, 10)
+    Wieselgrensplatsen        (6, 10, 13)
+    Vågmästareplatsen         (6, 10, 13)
+    Hjalmar Brantingsplatsen  (6, 10, 13)
+    Frihamnen                 (6, 10, 13)
+    Lilla Bommen              (10)
+    Brunnsparken              (1, 2, 3, 4, 6, 7, 9, 10, 11)
+    Kungsportsplatsen         (3, 4, 7, 10)
+    Valand                    (3, 4, 7, 10)
+    Berzeliigatan             (4)
+    Korsvägen                 (2, 4, 6, 8, 13)
+    Liseberg
+    S:t Sigfrids Plan
+    Bäckeliden
+    Ekmanska
+    Bögatan
+    Töpelsgatan
+    Welandergatan
+    Virginsgatan              (3)
+    Sanatoriegatan            (3)
+    Solrosgatan               (3)
+    Munkebäckstorget          (1)
+    Ättehögsgatan             (1)
+    Kaggeledstorget           (1)
+    Tingvallsvägen            (1)
+    Östra Sjukhuset           (1)
+
+=head2 Line 6: Aprilgatan → Varmfrontsgatan [6]
+
+=for HTML <div style="background-color: #ff9430; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Aprilgatan
+    Allhelgonakyrkan          (7, 11)
+    Kortedala torg            (7, 11)
+    Runstavsgatan             (7, 11)
+    Nymånegatan               (7, 11)
+    Beväringsgatan            (7, 11)
+    Kviberg                   (7, 11)
+    Bellevue                  (7, 11)
+    SKF                       (7, 11)
+    Gamlestadstorget          (4, 7, 8, 9, 11)
+    Ejdergatan                (8)
+    Redbergsplatsen           (1, 3, 8)
+    Olskrokstorget            (1, 3, 8)
+    Svingeln                  (1, 3, 8)
+    Ullevi Norra              (1, 3, 8)
+    Ullevi Södra              (2, 8, 13)
+    Scandinavium              (2, 8, 13)
+    Korsvägen                 (2, 4, 5, 8, 13)
+    Chalmers                  (7, 8, 10, 13)
+    Wavrinskys Plats          (7, 8, 10, 13)
+    Medicinaregatan           (7, 8, 13)
+    Salhgrenska Huvudentré    (7, 8, 13)
+    Linnéplatsen              (1, 2)
+    Olivedalsgatan            (1, 2)
+    Prinsgatan                (1)
+    Järntorget                (1, 3, 9, 11)
+    Hagakyrkan                (1, 3, 9, 11)
+    Grönsakstorget            (1, 2, 9, 11)
+    Domkyrkan                 (1, 2, 9, 11)
+    Brunnsparken              (1, 2, 3, 4, 5, 7, 9, 10, 11)
+    Nordstan                  (13)
+    Frihamnen                 (5, 10, 13)
+    Hjalmar Brantingsplatsen  (5, 10, 13)
+    Vågmästareplatsen         (5, 10, 13)
+    Wieselgrensplatsen        (5, 10, 13)
+    Rambergsvallen            (5, 10)
+    Gropegårdsgatan           (5, 10)
+    Eketrägatan               (5, 10)
+    Sålöfjordsgatan           (5, 10)
+    Vårväderstorget           (5, 10)
+    Mildvädersgatan           (5, 10)
+    Önskevädersgatan          (5, 10)
+    Friskväderstorget         (5, 10)
+    Väderilsgatan             (5, 10)
+    Temperaturgatan           (5)
+    Varmfrontsgatan           (5)
+
+=head2 Line 7: Komettorget → Opaltorget [7]
+
+=for HTML <div style="background-color: #a55311; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Komettorget             (11)
+    Rymdtorget              (11)
+    Teleskopgatan           (11)
+    Galileis Gata           (11)
+    Januarigatan            (11)
+    Allhelgonakyrkan        (6, 11)
+    Kortedala torg          (6, 11)
+    Runstavsgatan           (6, 11)
+    Nymånegatan             (6, 11)
+    Beväringsgatan          (6, 11)
+    Kviberg                 (6, 11)
+    Bellevue                (6, 11)
+    SKF                     (6, 11)
+    Gamlestadstorget        (4, 6, 8, 9, 11)
+    Centralstationen        (1, 2, 3, 4, 9, 11, 13)
+    Brunnsparken            (1, 2, 3, 4, 5, 6, 9, 10, 11)
+    Kungsportsplatsen       (3, 4, 5, 10)
+    Valand                  (3, 4, 5, 10)
+    Vasaplatsen             (2, 3, 10)
+    Kapellplatsen           (10)
+    Chalmers                (6, 8, 10, 13)
+    Wavrinskys Plats        (6, 8, 10, 13)
+    Medicinaregatan         (6, 8, 13)
+    Salhgrenska Huvudentré  (6, 8, 13)
+    Botaniska Trädgården    (1, 2, 8)
+    Marklandsgatan          (1, 2, 3, 8)
+    Axel Dahlströms Torg    (1, 2, 8)
+    Lantmilsgatan           (1, 8)
+    Nymilsgatan             (1, 8)
+    Musikvägen              (1, 8)
+    Positivgatan            (1, 8)
+    Frölunda Torg           (1, 8)
+    Briljantgatan           (1)
+    Smaragdgatan            (1)
+    Opaltorget              (1)
+
+=head2 Line 8: Angered Centrum → Frölunda Torg [8]
+
+=for HTML <div style="background-color: #a024a1; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Angered Centrum         (4, 9)
+    Storås                  (4, 9)
+    Hammarkullen            (4, 9)
+    Hjällbo                 (4, 9)
+    Gamlestadstorget        (4, 6, 7, 9, 11)
+    Ejdergatan              (6)
+    Redbergsplatsen         (1, 3, 6)
+    Olskrokstorget          (1, 3, 6)
+    Svingeln                (1, 3, 6)
+    Ullevi Norra            (1, 3, 6)
+    Ullevi Södra            (2, 6, 13)
+    Scandinavium            (2, 6, 13)
+    Korsvägen               (2, 4, 5, 6, 13)
+    Chalmers                (6, 7, 10, 13)
+    Wavrinskys Plats        (6, 7, 10, 13)
+    Medicinaregatan         (6, 7, 13)
+    Salhgrenska Huvudentré  (6, 7, 13)
+    Botaniska Trädgården    (1, 2, 7)
+    Marklandsgatan          (1, 2, 3, 7)
+    Axel Dahlströms Torg    (1, 2, 7)
+    Lantmilsgatan           (1, 7)
+    Nymilsgatan             (1, 7)
+    Musikvägen              (1, 7)
+    Positivgatan            (1, 7)
+    Frölunda Torg           (1, 7)
+
+=head2 Line 9: Angered Centrum → Kungssten [9]
+
+=for HTML <div style="background-color: #72d8f7; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Angered Centrum      (4, 8)
+    Storås               (4, 8)
+    Hammarkullen         (4, 8)
+    Hjällbo              (4, 8)
+    Gamlestadstorget     (4, 6, 7, 8, 11)
+    Centralstationen     (1, 2, 3, 4, 7, 11, 13)
+    Brunnsparken         (1, 2, 3, 4, 5, 6, 7, 10, 11)
+    Domkyrkan            (1, 2, 6, 11)
+    Grönsakstorget       (1, 2, 6, 11)
+    Hagakyrkan           (1, 3, 6, 11)
+    Järntorget           (1, 3, 6, 11)
+    Masthuggstorget      (3, 11)
+    Stigbergstorget      (3, 11)
+    Kaptensgatan         (3)
+    Chapmans Torg        (3)
+    Jaegerdorffsplatsen  (3)
+    Vagnhallen Majorna   (3)
+    Ostindiegatan        (3)
+    Sannaplan            (11)
+    Sandarna             (11)
+    Kungssten            (11)
+
+=head2 Line 10: Chalmers → Väderilsgatan [10]
+
+=for HTML <div style="background-color: #c6e091; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Chalmers                  (7, 8, 10, 13)
+    Wavrinskys Plats          (7, 8, 10, 13)
+    Medicinaregatan           (7, 8, 13)
+    Salhgrenska Huvudentré    (7, 8, 13)
+    Linnéplatsen              (1, 2)
+    Olivedalsgatan            (1, 2)
+    Prinsgatan                (1)
+    Järntorget                (1, 3, 9, 11)
+    Hagakyrkan                (1, 3, 9, 11)
+    Grönsakstorget            (1, 2, 9, 11)
+    Domkyrkan                 (1, 2, 9, 11)
+    Brunnsparken              (1, 2, 3, 4, 5, 7, 9, 10, 11)
+    Nordstan                  (13)
+    Frihamnen                 (5, 10, 13)
+    Hjalmar Brantingsplatsen  (5, 10, 13)
+    Vågmästareplatsen         (5, 10, 13)
+    Wieselgrensplatsen        (5, 10, 13)
+    Rambergsvallen            (5, 10)
+    Gropegårdsgatan           (5, 10)
+    Eketrägatan               (5, 10)
+    Sålöfjordsgatan           (5, 10)
+    Vårväderstorget           (5, 10)
+    Mildvädersgatan           (5, 10)
+    Önskevädersgatan          (5, 10)
+    Friskväderstorget         (5, 10)
+    Väderilsgatan             (5, 10)
+
+=head2 Line 11: Komettorget → Saltholmen [11]
+
+=for HTML <div style="background-color: #2b2e34; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Komettorget       (7)
+    Rymdtorget        (7)
+    Teleskopgatan     (7)
+    Galileis Gata     (7)
+    Januarigatan      (7)
+    Allhelgonakyrkan  (6, 7)
+    Kortedala torg    (6, 7)
+    Runstavsgatan     (6, 7)
+    Nymånegatan       (6, 7)
+    Beväringsgatan    (6, 7)
+    Kviberg           (6, 7)
+    Bellevue          (6, 7)
+    SKF               (6, 7)
+    Gamlestadstorget  (4, 6, 7, 8, 9)
+    Centralstationen  (1, 2, 3, 4, 7, 9, 13)
+    Brunnsparken      (1, 2, 3, 4, 5, 6, 7, 9, 10)
+    Domkyrkan         (1, 2, 6, 9)
+    Grönsakstorget    (1, 2, 6, 9)
+    Hagakyrkan        (1, 3, 6, 9)
+    Järntorget        (1, 3, 6, 9)
+    Masthuggstorget   (3, 9)
+    Stigbergstorget   (3, 9)
+    Fjällgatan
+    Majvallen
+    Ekedal
+    Godhemsgatan      (3)
+    Mariaplan         (3)
+    Sannaplan         (9)
+    Sandarna          (9)
+    Kungssten         (9)
+    Nya Varvsallén
+    Hagen
+    Tranered
+    Käringberget
+    Hinsholmen
+    Långedrag
+    Roddföreningen
+    Saltholmen
+
+=head2 Line 13: Ullevi Södra → Wieselgrensplatsen [13]
+
+=for HTML <div style="background-color: #ffcc9b; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Ullevi Södra              (2, 8, 13)
+    Scandinavium              (2, 8, 13)
+    Korsvägen                 (2, 4, 5, 8, 13)
+    Chalmers                  (7, 8, 10, 13)
+    Wavrinskys Plats          (7, 8, 10, 13)
+    Medicinaregatan           (7, 8, 13)
+    Salhgrenska Huvudentré    (7, 8, 13)
+    Linnéplatsen              (1, 2)
+    Olivedalsgatan            (1, 2)
+    Prinsgatan                (1)
+    Järntorget                (1, 3, 9, 11)
+    Hagakyrkan                (1, 3, 9, 11)
+    Grönsakstorget            (1, 2, 9, 11)
+    Domkyrkan                 (1, 2, 9, 11)
+    Brunnsparken              (1, 2, 3, 4, 5, 7, 9, 10, 11)
+    Nordstan                  (13)
+    Frihamnen                 (5, 10, 13)
+    Hjalmar Brantingsplatsen  (5, 10, 13)
+    Vågmästareplatsen         (5, 10, 13)
+    Wieselgrensplatsen        (5, 10, 13)
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Map::Metro::Plugin::Map::Gothenburg>
+
+=item *
+
+L<Task::MapMetro::Maps>
+
+=item *
+
+L<Map::Metro>
+
+=back
+
+=head1 SOURCE
+
+L<https://github.com/Csson/p5-Map-Metro-Gothenburg>
+
+=head1 HOMEPAGE
+
+L<https://metacpan.org/release/Map-Metro-Plugin-Map-Gothenburg>
+
+=head1 AUTHOR
+
+Erik Carlsson <info@code301.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Erik Carlsson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,33 @@
+---
+abstract: 'Pluggable POE event emitter role for cows'
+author:
+  - 'Jon Portnoy <avenj@cobaltirc.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooX-Role-POE-Emitter
+requires:
+  Carp: 0
+  Class::Method::Modifiers: 0
+  List::Objects::Types: 1
+  List::Objects::WithUtils: 2.007
+  Moo: 1.006
+  MooX::Role::Pluggable: 1
+  POE: 0
+  Scalar::Util: 0
+  Try::Tiny: 0
+  Type::Tiny: 1
+  perl: 5.010001
+  strictures: 2
+resources:
+  repository: git://github.com/avenj/moox-role-poe-emitter.git
+version: 1.001002

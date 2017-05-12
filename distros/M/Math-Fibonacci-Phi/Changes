@@ -1,0 +1,9 @@
+Revision history for Perl extension Math::Fibonacci::Phi.
+
+0.02  Fri Aug 26 18:35:00 2005
+        - fixed issue with VERSION() that conflicted with UNIVERSAL's VERSION functionality
+
+0.01  Fri Mar  4 08:29:57 2005
+	- original version; created by h2xs 1.22 with options
+		-AXc -n Math::Fibonacci::Phi
+

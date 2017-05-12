@@ -1,0 +1,92 @@
+# NAME
+
+Mojolicious::Plugin::DBICAdmin - Web interface for DBIx::Class Schema/ResultSource/ResultSet
+
+# VERSION
+
+version 0.0006
+
+# SYNOPSIS
+
+This Plugin just for Web master view/search their data in DB
+
+## Configure
+
+In Mojolicious App's `startup` method:
+
+    $self->plugin('DBICAdmin' =>   {
+                condition => 'login', # optional
+                stylesheet => '/dbic-admin-pure.css', #optional
+                # ... other configurations
+    });
+
+## Use
+
+    #start app and view the URI :
+    http://yourapp.domain/admin/dbic/
+
+# DESCRIPTION
+
+You will see it, when you open URI : ["admin/dbic/"](#admin/dbic/)
+
+## routes
+
+the Plugin set following routes :
+
+- `/admin/dbic/`
+
+    Index of the module's function
+
+- `/admin/dbic/search` and `/admin/dbic/search/:source`
+
+    Search DBIx::Class drivered database
+
+- `/admin/dbic/info` and `/admin/dbic/info/:source`
+
+    List Result Source Class's columns info
+
+- `/admin/dbic/list`
+
+    List Result source loaded by DBIx::Class
+
+## display style
+
+Plugin use [purecss](http://purecss.io/)
+
+you can use customed theme of purecss by pass config directive : `stylesheet="/dbic-admin-pure.css"`
+
+customlized theme of purecss must use name : `.pure-skin-dbic`
+
+where to coustom the theme ?
+
+[Here](http://yui.github.io/skinbuilder/?mode=pure)
+
+## config
+
+- page\_size
+
+    rows displayed per page
+
+- stylesheet
+
+    theme of the web page, should be the url of css file create by [YUI Skin Builder](http://yui.github.io/skinbuilder/?mode=pure)
+
+- condition
+
+    array or scalar if single of Mojolicious route condition used for access control
+
+# NAME
+
+DBICAdmin -  Web interface for DBIx::Class Schema/ResultSource/ResultSet
+
+# AUTHOR
+
+ChinaXing(陈云星) <chen.yack@gmail.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by ChinaXing(陈云星).
+
+This is free software, licensed under:
+
+    The (three-clause) BSD License

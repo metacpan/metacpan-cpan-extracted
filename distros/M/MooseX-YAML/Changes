@@ -1,0 +1,11 @@
+0.04
+    - specify explicit version dependency on MooseX::Blessed::Reconstruct
+
+0.03
+    - Sub::Exporter provides undef for the flags, check for existence instead
+
+0.02
+    - Add support for fully qualified functions (i.e. MooseX::YAML::Load)
+
+0.01
+    - Initial release

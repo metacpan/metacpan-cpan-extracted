@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+use Mojolicious::Lite;
+
+plugin 'AccessControl';
+
+get '/' => 'index';
+
+get '/only_local' => (
+    'access' => [
+        allow => '127.0.0.1',
+        allow => '192.168.182.0/24',
+        deny  => 'all',
+    ]
+) => 'local';
+
+get '/only_firefox' => (
+    'access' => [
+        allow => sub { $_[0]->req->headers->user_agent =~ /Firefox/ },
+        deny  => 'all'
+    ]
+) => 'firefox';
+
+app->start;
+__DATA__
+
+@@ index.html.ep
+% layout 'default';
+% title 'Welcome';
+Welcome to the Mojolicious real-time web framework!
+
+@@ local.html.ep
+% layout 'default';
+% title 'only_local';
+your address: <%= $self->tx->remote_address %>
+
+@@ firefox.html.ep
+% layout 'default';
+% title 'only_firefox';
+useragent: <%= $self->req->headers->user_agent %>
+
+@@ layouts/default.html.ep
+<!DOCTYPE html>
+<html>
+  <head><title><%= title %></title></head>
+  <body><%= content %></body>
+</html>

@@ -1,0 +1,62 @@
+{
+   "abstract" : "Mojolicious ♥ PostgreSQL",
+   "author" : [
+      "Sebastian Riedel <sri@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-Pg",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "examples",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::Pg" : "3.005001",
+            "Mojolicious" : "7.15",
+            "SQL::Abstract" : "1.81",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kraih/mojo-pg/issues"
+      },
+      "homepage" : "http://mojolicious.org",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kraih/mojo-pg.git",
+         "web" : "https://github.com/kraih/mojo-pg"
+      },
+      "x_IRC" : "irc://irc.perl.org/#mojo"
+   },
+   "version" : "3.05",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

@@ -1,0 +1,11 @@
+"jdavidson@interguru.com","Davidson2","Joe","jdavidson",
+"jhd@radix.net","Davidson1","Joe","jhd","comment1"
+"jhd@radix.net","Davidson3","Joe","jhd100","comment3"
+"jhd@radix.net","Davidson4","Joe","jhd101","comment4"
+"kingtut@noplace.edu","Tut","King","kingtut",
+"jhd101"," jhd101",,"listc",
+"queeenofsheba@kush.com"," queeenofsheba",,"queeenofsheba",
+"jhd,jdavidson,jhd100,listc,kingtut,queeenofsheba","everybody",,"everybody",
+"jhd,jdavidson","lista",,"lista",
+"jdavidson,listc","listb",,"listb",
+"jhd100,kingtut,queeenofsheba","notonanotherlist",,"notonanotherlist",

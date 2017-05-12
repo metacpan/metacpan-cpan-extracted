@@ -1,0 +1,33 @@
+Perl MOBY version 1.05
+======================
+
+This directory contains the Perl implementation of the MOBY
+Client/Server codebase.
+
+INSTALLATION
+
+To install *all* the general Perl MOBY libraries on your system, 
+type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+There are several dependencies used by the MOBY codebase
+that are not cleanly installed during the make install phase 
+of installation. 
+
+If you are having any problems automatically getting the dependencies 
+to install properly, please either try command line cpan or download
+each dependency independently and install them as per their installation
+instructions.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 BioMoby Developers Group (www.biomoby.org)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

@@ -1,0 +1,11 @@
+bin/threadkiller-clean-db.pl
+bin/threadkiller-kill-msgids.pl
+lib/Mail/ThreadKiller.pm
+Makefile.PL
+MANIFEST			This list of files
+Changes
+README
+t/test.t
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

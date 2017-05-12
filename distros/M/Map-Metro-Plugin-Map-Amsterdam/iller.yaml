@@ -1,0 +1,15 @@
+---
+doctype: dist
+
+header:
+  name: Map-Metro-Plugin-Map-Amsterdam
+
+plugins:
+  - +config: Author::CSSON::MapMetro
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+    splint: 0

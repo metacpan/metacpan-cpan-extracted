@@ -1,0 +1,21 @@
+Revision history for Perl extension Mac-OSVersion-Lite
+
+0.06 2017-04-09T17:37:28Z
+    - fix broken tests
+
+0.05 2016-12-25T07:28:28Z
+    - fix tests
+
+0.04 2016-10-16T12:45:52Z
+    - support sierra
+
+0.03 2016-05-06T20:12:35Z
+
+    - fix repository urls and badge urls
+
+0.02 2016-04-18T21:30:54Z
+    - fix auto detection version format
+
+0.01 2016-04-17T13:05:10Z
+    - original version
+

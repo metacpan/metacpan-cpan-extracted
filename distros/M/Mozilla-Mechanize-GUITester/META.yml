@@ -1,0 +1,31 @@
+--- #YAML:1.0
+name:               Mozilla-Mechanize-GUITester
+version:            0.23
+abstract:           Mozilla DHTML/Javascript testing
+author:
+    - Boris Sukholitko (boriss@gmail.com)
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Class::Accessor:      
+    IO::CaptureOutput:    
+    Mozilla::ConsoleService:  0.05
+    Mozilla::DOM:         0.21
+    Mozilla::DOM::ComputedStyle:  0.05
+    Mozilla::Mechanize:   
+    Mozilla::ObserverService:  0.03
+    Mozilla::PromptService:  0.05
+    Mozilla::SourceViewer:  0.06
+    X11::GUITest:         
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

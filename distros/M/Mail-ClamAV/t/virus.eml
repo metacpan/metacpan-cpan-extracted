@@ -1,0 +1,54 @@
+From sbeck@gossamer-threads.com Tue Feb 10 10:06:12 2004
+Subject: test email virus
+From: Scott Beck <sbeck@gossamer-threads.com>
+To: foo@bar.com
+Content-Type: multipart/mixed; boundary="=-oMbqAZoOnYS2QcTB17MR"
+X-Evolution-Account: sbeck@gossamer-threads.com
+X-Evolution-Format: text/plain
+Date: Tue, 10 Feb 2004 10:06:12 -0800
+Message-Id: <1076436372.19063.11.camel@sbeck.office.gossamer-threads.com>
+Mime-Version: 1.0
+X-Evolution: 00000008-0034
+
+
+--=-oMbqAZoOnYS2QcTB17MR
+Content-Type: multipart/alternative; boundary="=-objcZJl5gd6MKds+O2BS"
+
+
+--=-objcZJl5gd6MKds+O2BS
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+
+test virus
+
+--=-objcZJl5gd6MKds+O2BS
+Content-Type: text/html; charset=utf-8
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 TRANSITIONAL//EN">
+<HTML>
+<HEAD>
+  <META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=UTF-8">
+  <META NAME="GENERATOR" CONTENT="GtkHTML/3.0.9">
+</HEAD>
+<BODY>
+test virus
+</BODY>
+</HTML>
+
+--=-objcZJl5gd6MKds+O2BS--
+
+--=-oMbqAZoOnYS2QcTB17MR
+Content-Disposition: attachment; filename=eicarcom2.zip
+Content-Type: application/zip; name=eicarcom2.zip
+Content-Transfer-Encoding: base64
+
+UEsDBAoAAAAAADKs6yjRINsxuAAAALgAAAANAAAAZWljYXJfY29tLnppcFBLAwQKAAAAAADgmLgo
+PM9RaEQAAABEAAAACQAAAGVpY2FyLmNvbVg1TyFQJUBBUFs0XFBaWDU0KFBeKTdDQyk3fSRFSUNB
+Ui1TVEFOREFSRC1BTlRJVklSVVMtVEVTVC1GSUxFISRIK0gqUEsBAhQACgAAAAAA4Ji4KDzPUWhE
+AAAARAAAAAkAAAAAAAAAAQAgAP+BAAAAAGVpY2FyLmNvbVBLBQYAAAAAAQABADcAAABrAAAAAABQ
+SwECFAAKAAAAAAAyrOso0SDbMbgAAAC4AAAADQAAAAAAAAAAACAAtoEAAAAAZWljYXJfY29tLnpp
+cFBLBQYAAAAAAQABADsAAADjAAAAAAA=
+
+--=-oMbqAZoOnYS2QcTB17MR--
+
+

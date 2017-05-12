@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Music-Tag-Coveralia.t
+t/empty.flac
+t/perlcritic.t
+t/perlcriticrc
+lib/Music/Tag/Coveralia.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

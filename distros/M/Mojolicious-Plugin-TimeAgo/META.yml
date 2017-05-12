@@ -1,0 +1,27 @@
+---
+abstract: 'DateTime TimeAgo Mojolicious Plugin'
+author:
+  - 'Daniel Vinciguerra (DVINCI) <daniel.vinciguerra@bivee.com.br>'
+build_requires:
+  DateTime: 0
+  FindBin: 0
+  Mojolicious::Lite: 0
+  Test::Mojo: 0
+  Test::More: 0
+  lib: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-TimeAgo
+requires:
+  DateTimeX::Format::Ago: 0
+  Mojo::Base: 0
+version: 0.06

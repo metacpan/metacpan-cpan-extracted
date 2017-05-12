@@ -1,0 +1,30 @@
+Module::Mask changes document
+
+0.06 - Tue Jan  8 2013
+    - Fix tests to not rely on trailing full stop in Carp message
+
+0.05 - Fri Dec 14 2012
+    - Stop trying to match perl's native error message, it's about to change
+      in a way which won't be trivial to continue to support with backwards
+      compatibility.
+
+      Users who need the error message to match can override the message()
+      method to match their perl.
+
+0.04 - Sat Mar 03 2012
+    - Cope with Carp sometimes adding a full-stop to error messages.
+
+0.03 - Mon Jul 16 2007
+    - Added import() method to allow easier command-line masking
+
+0.02 - Fri Apr 28 2006
+    - Added module documentation
+
+    - Added message() method to allow overriding the message used when a module
+      is masked.
+
+    - Fixed the generated error message to be identical to perl's
+
+    - Added Changes and README
+
+0.01	initial version

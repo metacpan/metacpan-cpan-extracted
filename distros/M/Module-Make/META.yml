@@ -1,0 +1,16 @@
+abstract: The New Way To make Modules
+author: "Ingy d\xC3\xB6t Net <ingy@cpan.org>"
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Module-Make
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Class::Field: 0
+  IO::All: 0.37
+  XXX: 0
+  perl: 5.6.1
+version: 0.01

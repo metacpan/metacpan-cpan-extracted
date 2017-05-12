@@ -1,0 +1,65 @@
+The ideal test of the MegaDistro would be:
+
+Packaging System Requirements:
+	- Requires a valid installed perl distribution, from either the 5.6, or 5.8 branches or greater.
+	- Requires CPANPLUS-0.0562 (configured), as well as, Module-CoreList-2.02 .
+
+	The person creating the distributable binary would simply:
+
+		1. Download the current MegaDistro distribution
+		2. Run the system (with/without options)
+		(Optionally)* Specify version of perl
+		(Optionally)* Specify distro type
+		3. (if everything succeeds) A distribution-specific binary
+                   will be created (e.g. megadistro-0.20.i386.rpm)
+
+
+The outline of the internal processes of the system are as follows:
+
+	(when the system is initally run) <Step 2 - Above>
+	1. Read in configuration file (contains preset defaults)
+	2. Download all modules in module list
+	3. Unpack each module
+	4. Compile each module
+	5. Test each module
+	6. If the test was a success then the finished product is -
+           placed in a directory to be flagged for packaging later
+	7. Dynamically, automatically generate a package spec/ruleset - 
+           file for the  packagin system
+	8. SUCCESS! (distribution specific binary successfully built)
+
+
+The end result, being a platform-specific distributable binary; for example, 
+an ideal target that would benefit from this system would be an ISP, who would,
+instead of receiving a tons of frequent requests from their clients to install 
+many modules, can simply install the 'perl-megadistro.rpm', for their specific 
+distribution - hence, in this example, thus increasing the ISP's efficiency via 
+a simplistic method to install useful modules that their customers will want.
+
+Ideally, the 'MegaDistro [packager] system' will be maintained via 
+(a distribution-specific configuration file, as well as,)*** a module list.
+
+	(The distribution-specific configuration file, will contain version-specific, 
+	distribution-specific configuration values and settings, used in creating a binary; 
+	for example, whether the person packaging the distributable binary, wishes to package 
+	it using version 5.6.X or 5.8.X, and for what distribution/platform, debian, redhat, et al.)***
+
+	The module list, will contain a list of modules to packaged with perl to build the end-result, 
+	'megadistro binary'.
+	(Option: Have multiple lists/versions of this list, distributed with the packaging system, 
+		 for specific builds; e.g. a www, database, or java module list)
+
+
+
+
+* : Optional - If not explicitly specified, the system will default to, 
+    your current/newest working version of perl, and whatever your default 
+    distribution package type is (e.g. if you're on redhat, it will, 
+    by default, make an rpm; if you're on debian, it will make a deb pkg).
+    
+** : Current setup of the packaging system mandates that the packager have
+     root access; sudo access would be possible eventually, 
+     but is not currently [fully] supported.
+     
+*** : The current plan for the megadistro system may make this 
+      feature/requirepment optional or completely unnecessary.

@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Mail-IMAP2SMS
+version:            1.2
+abstract:           Perl extension for IMAP to SMS.
+author:
+    - Roy Crowder <rcrowder@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Email::Simple:        
+    Mail::Sendmail:       
+    Net::IMAP::Simple:    
+    Net::IMAP::Simple::SSL:  
+    Test::More:           
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Built with MooseX::App::Cmd::Command::BashComplete;
+
+main_t_COMMANDS='help commands bashcomplete testcommand'
+
+_main_t_macc_help() {
+    if [ $COMP_CWORD = 2 ]; then
+        _main_t_compreply "$main_t_COMMANDS"
+    else
+        COMPREPLY=()
+    fi
+}
+
+_main_t_macc_commands() {
+    COMPREPLY=()
+}
+
+_main_t_macc_bashcomplete() {
+    COMPREPLY=()
+}
+
+_main_t_macc_testcommand() {
+    _compreply "--foo --help"
+}
+
+
+_main_t_compreply() {
+    COMPREPLY=($(compgen -W "$1" -- ${COMP_WORDS[COMP_CWORD]}))
+}
+
+_main_t_macc() {
+    case $COMP_CWORD in
+        0)
+            ;;
+        1)
+            _main_t_compreply "$main_t_COMMANDS"
+            ;;
+        *)
+            eval _main_t_macc_${COMP_WORDS[1]}
+            
+    esac
+}
+
+complete -o default -F _main_t_macc main.t

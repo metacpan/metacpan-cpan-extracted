@@ -1,0 +1,143 @@
+=head1 NAME
+
+MIME::EcoEncode - MIME Encoding (Economical)
+
+=head1 SYNOPSIS
+
+ use MIME::EcoEncode;
+ $encoded = mime_eco($str, 'UTF-8');        # encode utf8 string
+ $encoded = mime_eco($str, 'UTF-8?B');      # ditto ("B" encoding)
+ $encoded = mime_eco($str, 'UTF-8?Q');      # ditto ("Q" encoding)
+ $encoded = mime_eco($str, 'UTF-8*XX');     # XX is RFC2231's language
+ $encoded = mime_eco($str, 'UTF-8*XX?B');   # ditto ("B" encoding)
+ $encoded = mime_eco($str, 'UTF-8*XX?Q');   # ditto ("Q" encoding)
+ $encoded = mime_eco($str, 'GB2312');       # encode euc-cn string
+ $encoded = mime_eco($str, 'EUC-KR');       # encode euc-kr string
+ $encoded = mime_eco($str, 'Big5');         # encode big5 string
+ $encoded = mime_eco($str, 'Shift_JIS');    # encode cp932 string
+ $encoded = mime_eco($str, 'ISO-2022-JP');  # encode 7bit-jis string
+ $encoded = mime_eco($str, $sbcs);          # $sbcs :
+                                            #   single-byte charset
+                                            #     (e.g. 'ISO-8859-1')
+
+ $decoded = mime_deco($encoded);            # decode encoded string
+                                            #   (for single charset)
+
+ ($decoded, $charset, $language)            # return array
+          = mime_deco($encoded);            #   (for single charset)
+
+ use Encode;
+ $decoded = mime_deco($encoded, \&cb);      # cb is callback subroutine
+                                            #   (for multiple charsets)
+
+ # Example of callback subroutine
+ sub cb {
+   my ($encoded_word, $charset, $language, $decoded_word) = @_;
+   encode_utf8(decode($charset, $decoded_word));
+ }
+
+=head1 DESCRIPTION
+
+This module implements RFC 2047 Mime Header Encoding.
+
+=head2 Options
+
+  $encoded = mime_eco($str, $charset, $lf, $bpl, $mode, $lss);
+               # $charset : 'UTF-8' / 'UTF-8?Q' / 'UTF-8*XX' /
+               #            'GB2312' / 'EUC-KR' / 'Big5' /
+               #            'Shift_JIS' / 'ISO-2022-JP' / ...
+               #            (default: 'UTF-8')
+               #              Note: "B" encoding is all defaults.
+               #                    The others are all encoded as
+               #                    single-byte string.
+               # $lf      : line feed (default: "\n")
+               # $bpl     : bytes per line (default: 76)
+               # $mode    : 0 : unstructured header (e.g. Subject)
+               #            1 : structured header (e.g. To, Cc, From)
+               #            2 : auto (Subject or Comments ? 0 : 1)
+               #            (default: 2)
+               # $lss     : length of security space (default: 25)
+
+=head2 Examples
+
+Ex1 - normal (structured header)
+
+  use MIME::EcoEncode;
+  my $str = "From: Sakura <sakura\@example.jp> (\xe6\xa1\x9c)\n";
+  print mime_eco($str);
+
+Ex1's output:
+
+  From: Sakura <sakura@example.jp> (=?UTF-8?B?5qGc?=)
+
+Ex2 - "Q" encoding + RFC2231's language
+
+  use MIME::EcoEncode;
+  my $str = "From: Sakura <sakura\@example.jp> (\xe6\xa1\x9c)\n";
+  print mime_eco($str, 'UTF-8*ja-JP?Q');
+
+Ex2's output:
+
+  From: Sakura <sakura@example.jp> (=?UTF-8*ja-JP?Q?=E6=A1=9C?=)
+
+Ex3 - continuous spaces
+
+  use MIME::EcoEncode;
+  my $str = "From: Sakura  <sakura\@example.jp>    (\xe6\xa1\x9c)\n";
+  print mime_eco($str);
+
+Ex3's output:
+
+  From: Sakura  <sakura@example.jp>    (=?UTF-8?B?5qGc?=)
+
+Ex4 - unstructured header (1)
+
+  use MIME::EcoEncode;
+  my $str = "Subject: Sakura (\xe6\xa1\x9c)\n";
+  print mime_eco($str);
+
+Ex4's output:
+
+  Subject: Sakura =?UTF-8?B?KOahnCk=?=
+
+Ex5 - unstructured header (2)
+
+  use MIME::EcoEncode;
+  my $str = "Subject: \xe6\xa1\x9c  Sakura\n";
+  print mime_eco($str);
+
+Ex5's output:
+
+  Subject: =?UTF-8?B?5qGc?=  Sakura
+
+Ex6 - 7bit-jis string
+
+  use Encode;
+  use MIME::EcoEncode;
+  my $str = "Subject: \xe6\xa1\x9c  Sakura\n";
+  print mime_eco(encode('7bit-jis', decode_utf8($str)), 'ISO-2022-JP');
+
+Ex6's output:
+
+  Subject: =?ISO-2022-JP?B?GyRCOnkbKEI=?=  Sakura
+
+=head1 SEE ALSO
+
+L<MIME::EcoEncode::Param>, L<MIME::EcoEncode::Fold>
+
+For more information, please visit F<http://www.nips.ac.jp/~murata/mimeeco/>
+
+=head1 AUTHOR
+
+MURATA Yasuhisa E<lt>murata@nips.ac.jpE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2011-2013 MURATA Yasuhisa
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,172 @@
+=head1 Module::Dependency README
+
+Overview
+--------
+
+This is a suite of modules (and a set of helper programs that you may use 
+if you wish) that allow you to investigate the dependencies between
+perl programs and modules. This is primarily aimed at the programmer/
+developer audience.
+
+Not just for modules
+--- ---- --- -------
+
+The system is split into two halves - gathering the data, and examining
+the data - so you are free to create a database (mentioned below) however
+you want based on whatever metrics you want and query that using the
+::Info and ::Grapher modules. Or you may choose to build your own tools
+for querying the database.
+
+In any case these modules work with heirarchies of many-to-many parent-child
+relationships, so if your data can be viewed like that maybe some of the
+code here could be useful.
+
+What are dependencies?
+---- --- -------------
+
+When your foo.pl program says 'use CGI;' that program /depends/ upon 
+CGI.pm - I'll refer to this as 'CGI is a child dependency of foo.pl',
+and similarly 'foo.pl is a parent dependency of CGI'. These modules
+work with all the parent and child dependencies between a collection
+of perl files that you specify.
+
+How does it work?
+--- ---- -- -----
+
+Basically the first thing you do is create a database by feeding a list
+of directories to Module::Dependency::Indexer::makeIndex()
+These directories are recursively searched using File::Find to examine
+all the .pl, .plx and .pm files. Parent and child dependencies are 
+stored, as are a few other bits of information. One database is created
+for all the files found in that run.
+
+Making the database is quite expensive so the idea is to create the
+database once, and use it many times. Typical values are 5-10 seconds to
+index a reasonably large site_perl directory. You can create many 
+different database files should you need to.
+
+You use functions in Module::Dependency::Info to get information out
+of the database.
+
+You use functions in Module::Dependency::Grapher to visualize the links
+between items. It can output in plain text, HTML fragment, PostScript,
+Encapsulated PostScript, SVG or any format your copy of GD supports.
+
+In using GD for output, the available output formats
+depend upon your local copy of GD, but PNG should be available on all
+installations. GIF and JPEG are also possible. This module can also
+produce basic plain text output and HTML fragment output.
+
+See the README.EXAMPLES file.
+
+The Grapher output is fast enough to use in a CGI application, even with
+a database containing many hundreds of items. It was written with the 
+intention of going on an intranet software engineers support site. A
+working CGI is included. See README.EXAMPLES.
+
+Installation
+------------
+
+Read the INSTALL file.
+
+You can probably get started using the programs bundled with this 
+package - see README.COMMANDS - so you don't have to write any code.
+
+For more advanced or specialist usages you'll want to know how to use the
+modules - see README.MODULES for that.
+
+For examples see the README.EXAMPLES file.
+
+Improvements
+------------
+
+Please tell me about any bugs you find, or any suggestions for
+improvements:
+
+http://rt.cpan.org/Public/Dist/Display.html?Name=Module-Dependency
+
+Copyright and License
+--------- --- -------
+
+This software is copyright 2001-2002 P Kent, and copyright 2006 Tim Bunce.
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+
+=head1 Bundled Commands
+
+This readme should give you an overview of the commands bundled with this
+distribution. Please see the README.MODULES file for more behind-the-scenes
+information. See the README for an overview.
+
+pmd_indexer.plx
+---------------
+
+Creates a database file holding dependency information for the source files in
+one or more directories. 
+
+pmd_dump.pl
+--------------
+
+Extracts information from the database and displays it on standard output.
+E.g. parent dependencies, child dependencies, actual filesystem path, all
+items indexed, etc.
+
+pmd_grapher.plx
+---------------
+
+Generates a graphical 'dependency tree'. It can map parent, child or both 
+directions of dependency, and it can be told which items to plot dependencies
+for (e.g. all the perl scripts, or a particular script or module). You may 
+wish to edit the bit near the top of the source to make it create the right 
+format of image.
+
+
+All these programs may be run with the -h option to get a usage message, and with 
+the -t option to get all the tracing messages so that you can see what's going on
+under the bonnet.
+
+examples/pmd_cgidepend.plx
+--------------------------
+
+An example CGI interface. You'll need to create a database before this will do 
+anything useful - use pmd_indexer.plx for that. You'll need to edit a few lines
+in this CGI - they are clearly marked near the top.
+
+Run it with no query string to get the help message. Takes these CGI params:
+go, embed, format, datafile, seed, allscripts, kind. See its POD for more detail.
+An example installation is at: http://www.selsyn.co.uk/depend.shtml
+
+=head1 Module::Dependency Modules
+
+This readme should give you an idea of what the modules actually do in this
+distribution.
+
+Module::Dependency::Indexer
+---------------------------
+
+This module takes care of creating the database file.
+
+Module::Dependency::Grapher
+---------------------------
+
+Uses GD to plot graphical dependency information. Can also produce simple
+plain text output, PostScript, SVG, or HTML fragment output.
+
+Module::Dependency::Info
+------------------------
+
+This module is used as the interface to query the database and get 
+information out.
+
+=head1 TODO
+
+ - make items be real objects with methods etc
+ - use overloading to stringify as key
+ - move some pmd_dump.pl subs into object methods
+
+ - abstract the Module::Dependency::Indexer more
+
+ - Look at using Graph::Easy
+
+=cut

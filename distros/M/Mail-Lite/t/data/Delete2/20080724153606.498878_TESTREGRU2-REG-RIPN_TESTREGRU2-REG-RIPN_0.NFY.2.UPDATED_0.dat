@@ -1,0 +1,6 @@
+---
+-
+  - rusu.notify
+  -
+    - domain: UPANISHADIXXX.RU
+      rule_id: rusu.notify.deleted

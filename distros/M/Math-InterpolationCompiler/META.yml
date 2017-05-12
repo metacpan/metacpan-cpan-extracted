@@ -1,0 +1,34 @@
+---
+abstract: 'Generate perl interpolation functions'
+author:
+  - 'Michael Conrad <mike@nrdvana.net>'
+build_requires:
+  Data::Dumper: '0'
+  Test::More: '1'
+  Try::Tiny: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-InterpolationCompiler
+provides:
+  Math::InterpolationCompiler:
+    file: lib/Math/InterpolationCompiler.pm
+    version: '0.002000'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Moo: '2'
+  Types::Standard: '1'
+  perl: '5.006001'
+resources:
+  bugtracker: https://github.com/silverdirk/perl-Math-InterpolationCompiler/issues
+  homepage: https://github.com/silverdirk/perl-Math-InterpolationCompiler
+  repository: git://github.com/silverdirk/perl-Math-InterpolationCompiler.git
+version: '0.002000'

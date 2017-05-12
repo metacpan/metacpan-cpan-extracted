@@ -1,0 +1,40 @@
+Revision history for MooseX-Types-DateTime-MoreCoercions
+
+0.15      2015-08-16 01:13:14Z
+        - bump namespace::clean prereq to guarantee needed Package::Stash
+          interfaces
+
+0.14      2014-08-06 06:04:21Z
+        - re-release to remove README.pod from shipped dist
+
+0.13      2014-07-30 14:23:01Z
+        - fixed t/00-report-prereqs.t when CPAN::Meta is not installed
+
+0.12      2014-07-21 14:51:38Z
+        - repository has moved to the GitHub Moose organization
+        - converted distribution packaging to Dist::Zilla, fixing mojibaked
+          META.yml (RT#90138)
+        - switch from using Test::Exception to Test::Fatal
+
+0.11    2012-12-11 12:33:01Z
+        - Require perl 5.8.3, as Moose does
+
+0.10    2012-07-30 10:18:54Z
+        - Remove unneeded check for DateTime::Format::DateManip from test
+        - Rebuild with Module::Install 1.06, to avoid depending on dev
+          release of EUMM (RT#77157)
+
+0.09    2012-03-06 23:58:14Z
+        - Use the introspection API to get MX:T:DateTime's coercions
+        - fix a spelling mistake (RT#73343)
+
+0.08    2011-12-12 13:18:23Z
+        - Require fixed MooseX::Types::DateTime version (RT#73192)
+        - Enforce version requirements at runtime (RT#73191)
+        - Add missing dependencies (RT#73190)
+
+0.07    2011-12-06 20:48:22Z
+        - Switch back to using MooseX::Types::DateTime
+        - Rename to more descriptive name
+
+(imported from MooseX-Types-DateTimeX)

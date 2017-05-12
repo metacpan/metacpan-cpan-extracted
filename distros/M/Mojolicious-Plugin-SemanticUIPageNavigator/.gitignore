@@ -1,0 +1,7 @@
+# Dzil build directorys
+/Mojolicious-Plugin-SemanticUIPageNavigator*
+[._][Bb]uild/
+release*
+*.bak$
+*.swp$
+.gitnxtver_cache

@@ -1,0 +1,299 @@
+#! /usr/bin/perl
+#########################################################################
+#        This Perl script is Copyright (c) 2011, Peter J Billam         #
+#                          www.pjb.com.au                               #
+#                                                                       #
+#     This script is free software; you can redistribute it and/or      #
+#            modify it under the same terms as Perl itself.             #
+#########################################################################
+# XXX should, by default, display elapsed time while playing,
+# mplayer displays on STDOUT (if stdout is a tty ?)
+# A: 249.3 (04:09.2) of 537.0 (08:57.0)  0.4% 
+# perhaps also spacebar, arrows and page-keys;
+# perhaps also channels, perhaps even the sounding notes ?;
+# therefore also a -q=quiet or -s=silent option
+my $Version       = '1.2';
+my $VersionDate   = '03nov2011';
+use open ':locale';
+
+my $OutputPort = '';
+while ($ARGV[$[] =~ /^-([a-z])/) {
+	if ($1 eq 'v')      { shift;
+		my $n = $0; $n =~ s{^.*/([^/]+)$}{$1};
+		print "$n version $Version $VersionDate\n";
+		exit 0;
+	} elsif ($1 eq 'p' or $1 eq 'o') { shift; $OutputPort = shift;
+	} else {
+		print "usage:\n";  my $synopsis = 0;
+		while (<DATA>) {
+			if (/^=head1 SYNOPSIS/)     { $synopsis = 1; next; }
+			if ($synopsis && /^=head1/) { last; }
+			if ($synopsis && /\S/)      { s/^\s*/   /; print $_; next; }
+		}
+		exit 0;
+	}
+}
+if (!$OutputPort) { $OutputPort = $ENV{'ALSA_OUTPUT_PORTS'}; }
+if (!$OutputPort) { die "-p not specified and ALSA_OUTPUT_PORTS not set\n"; }
+
+use Data::Dumper; $Data::Dumper::Indent = 0; $Data::Dumper::Sortkeys = 1;
+eval 'require MIDI'; if ($@) {
+    die "you'll need to install the MIDI-Perl module from www.cpan.org\n";
+}
+eval 'require MIDI::ALSA'; if ($@) {
+    die "you'll need to install the MIDI::ALSA module from www.cpan.org\n";
+}
+
+MIDI::ALSA::client("$0 MIDI::ALSA client", 0, 1, 1) or die "client failed";
+foreach my $cl_po (split /,/, $OutputPort) {
+	if (! MIDI::ALSA::connectto( 1, $cl_po )) {
+		die "can't connect to ALSA client $cl_po\n";
+	}
+}
+MIDI::ALSA::start() or die "start failed";
+
+my @score = file2ms_score($ARGV[$[]);
+# look for FF 09 events {'raw_meta_event', dtime, command(0-255), raw}
+# actually they appear as {'text_event_09', dtime, text}
+# and connect to their synths, in case they weren't specified in $OutputPort
+foreach my $is ($[+1..$#score) {
+	foreach my $ev_ref (@{$score[$is]}) {
+		my @event = @{$ev_ref};
+		if ($event[$[] eq 'text_event_09') {
+			my $text = $event[$[+2];
+			my ($cl,$po) = MIDI::ALSA::parse_address($text);
+			if (! $cl) {
+				warn "FF 09 event: can't find client $text\n";
+			} else {
+				# cheap handling of pre-existing connection
+				if (MIDI::ALSA::connectto(1,$cl,$po)) {
+					warn "FF 09 event: connecting to $text\n";
+				}
+			}
+			
+		}
+	}
+}
+foreach my $is ($[+1..$#score) {
+	my @cl_po = ();  # each track starts with this empty
+	foreach my $ev_ref (@{$score[$is]}) {
+		my @event = @{$ev_ref};
+		# detect FF 09 events and set alsa-destination-port accordingly
+		if ($event[$[] eq 'text_event_09') {
+			my $text = $event[$[+2];
+			@cl_po = MIDI::ALSA::parse_address($text);
+			# warn "text=$text cl_po=@cl_po\n";
+			next;
+		}
+		my @alsaevent = MIDI::ALSA::scoreevent2alsa(@event);
+		if (@cl_po) { $alsaevent[$[+6] = \@cl_po; }
+# Doesn't seem to work, although I think this is what aplaymidi does.
+# @cl_po is 128:0  but the doc reads more like every separate synth needs
+# a separate $id:$portnum connecting to it, and $alsaevent[$[+6] should be
+# set to the local end $id:$portnum, rather than the remote end 128:0
+		if (@alsaevent) { MIDI::ALSA::output(@alsaevent); }
+	}
+}
+MIDI::ALSA::syncoutput() or die "syncoutput failed";
+
+#-------------------- Decoding stuff from midisox_pl -------------------
+
+sub file2opus {
+	my $opus_ref;
+	if ($_[$[] eq '-') {
+		$opus_ref = MIDI::Opus->new({'from_handle' => *STDIN{IO}});
+	} elsif ($_[$[] =~ /^[a-z]+:\//) {
+		eval 'require LWP::Simple'; if ($@) {
+			die "you'll need to install libwww-perl from www.cpan.org\n";
+		}
+		$midi = LWP::Simple::get($_[$[]);
+		if (! defined $midi) { die "can't fetch $_[$[]\n"; }
+		open(P, '<', \$midi) or die "can't open FileHandle, need Perl5.8\n";
+		$opus_ref = MIDI::Opus->new({'from_handle' => *P{IO}});
+		close P;
+	} else {
+		$opus_ref = MIDI::Opus->new({'from_file' => $_[$[]});
+	}
+	# $opus_ref->dump({'dump_tracks'=>1});
+	my @my_opus = (${$opus_ref}{'ticks'},);
+	foreach my $track ($opus_ref->tracks) {
+		push @my_opus, $track->events_r;
+	}
+	# print "3:\n", Dumper(\@my_opus);
+	return @my_opus;
+}
+
+sub opus2score {  my ($ticks, @opus_tracks) = @_;
+	# print "opus2score: ticks=$ticks opus_tracks=@opus_tracks\n";
+	if (!@opus_tracks) {
+		return (1000,[],);
+	}
+	my @score = ($ticks,);
+	my @tracks = deepcopy(@opus_tracks); # couple of slices probably quicker...
+	# print "opus2score: tracks is ", Dumper(@tracks);
+	foreach my $opus_track_ref (@tracks) {
+		my $ticks_so_far = 0;
+		my @score_track = ();
+		my %chapitch2note_on_events = ();	# 4.4 XXX!!! Must be by Channel !!
+		foreach $opus_event_ref (@{$opus_track_ref}) {
+			my @opus_event = @{$opus_event_ref};
+			$ticks_so_far += $opus_event[1];
+			if ($opus_event[0] eq 'note_off'
+			 or ($opus_event[0] eq 'note_on' and $opus_event[4]==0)) { # YY
+				my $cha = $opus_event[2];
+				my $pitch = $opus_event[3];
+				my $key = $cha*128 + $pitch;
+				if ($chapitch2note_on_events{$key}) {
+					my $new_event_ref = shift @{$chapitch2note_on_events{$key}};
+					${$new_event_ref}[2] = $ticks_so_far - ${$new_event_ref}[1];
+					push @score_track, $new_event_ref;
+				} else {
+					warn("note_off without a note_on, cha=$cha pitch=$pitch")
+				}
+			} elsif ($opus_event[0] eq 'note_on') {
+				my $cha = $opus_event[2];  # 4.4
+				my $pitch = $opus_event[3];
+				my $new_event_ref = ['note', $ticks_so_far, 0,
+				 $cha, $pitch, $opus_event[4]];
+				my $key = $cha*128 + $pitch;
+				push @{$chapitch2note_on_events{$key}}, $new_event_ref;
+			} else {
+				$opus_event[1] = $ticks_so_far;
+				push @score_track, \@opus_event;
+			}
+		}
+		# check for unterminated notes, see: ~/lua/lib/MIDI.lua
+		while (my ($k1,$v1) = each %chapitch2note_on_events) {
+			foreach my $new_e_ref (@{$v1}) {
+				${$new_e_ref}[2] = $ticks_so_far - ${$new_e_ref}[1];
+				push @score_track, $new_e_ref;
+				warn("opus2score: note_on with no note_off cha="
+				 . ${$new_e_ref}[3] . ' pitch='
+				 . ${$new_e_ref}[4] . "; adding note_off at end\n");
+			}
+		}
+		push @score, \@score_track;
+	}
+
+	return @score;
+}
+
+sub file2score {
+	return opus2score(file2opus(midi));
+}
+
+sub file2ms_score {
+	#print "file2ms_score(@_)\n";
+	# return opus2score(to_millisecs(file2opus($_[$[])));
+	my @opus = file2opus($_[$[]);
+	my @ms = to_millisecs(@opus);
+	my @score = opus2score(@ms);
+	return @score;
+}
+
+#------------------------ Other Transformations ---------------------
+
+sub to_millisecs {
+	my @old_opus = @_;
+	if (!@old_opus) {
+		return (1000,[],);
+	}
+	my $old_tpq  = $_[$[];
+	my @new_opus = (1000,);
+	my $millisec_per_old_tick = 1000.0 / $old_tpq;  # float: will round later
+	$itrack = $[+1;
+	while ($itrack <= $#old_opus) {
+		my $millisec_so_far = 0.0;
+		my $previous_millisec_so_far = 0.0;
+		my @new_track = (['set_tempo',0,1000000],);  # new "crochet" is 1 sec
+		foreach my $old_event_ref (@{$old_opus[$itrack]}) {
+			my @old_event = @{$old_event_ref};
+			# print "to_millisecs: old_event = @old_event\n";
+			if ($old_event[0] eq 'note') {
+				die "to_millisecs needs an opus, not a score\n";
+			}
+			my @new_event = deepcopy(@old_event);  # copy.deepcopy ?
+			$millisec_so_far += ($millisec_per_old_tick * $old_event[1]);
+			$new_event[1] = round($millisec_so_far-$previous_millisec_so_far);
+			if ($old_event[0] eq 'set_tempo') {
+				$millisec_per_old_tick = $old_event[2] / (1000.0 * $old_tpq);
+			} else {
+				$previous_millisec_so_far = $millisec_so_far;
+				push @new_track, \@new_event;
+			}
+		}
+		push @new_opus, \@new_track;
+		$itrack += 1;
+	}
+	# print "to_millisecs new_opus = ", Dumper(\@new_opus);
+	return @new_opus;
+}
+
+sub round { my $x = $_[$[];
+	if ($x > 0.0) { return int ($x + 0.5); }
+	if ($x < 0.0) { return int ($x - 0.5); }
+	return 0;
+}
+
+sub deepcopy {
+	use Storable;
+	if (1 == @_ and ref($_[$[])) {
+		return Storable::dclone($_[$[]);
+	} else {
+		my $b_ref = Storable::dclone(\@_);
+		return @$b_ref;
+	}
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+apmid - rough aplaymidi work-alike, to demonstrate MIDI::ALSA
+
+=head1 SYNOPSIS
+
+ apmid -p 20:0,128 filename.mid
+
+=head1 DESCRIPTION
+
+This script is a rough aplaymidi work-alike, to demonstrate MIDI::ALSA
+
+=head1 OPTIONS
+
+=over 3
+
+=item I<-p 20:0,128:0>
+
+Plays to the ALSA clients 20 and 128;
+the default is the envronment variable ALSA_OUTPUT_PORTS
+
+=item I<-v>
+
+Prints version number.
+
+=back
+
+=head1 CHANGES
+
+ 20111103  1.2  use the new MIDI-ALSA 1.11 to handle portnames
+ 20111031  1.1  connects from multiple (comma-separated) ports
+ 20110310  1.0  first working version
+
+=head1 AUTHOR
+
+Peter J Billam   http://www.pjb.com.au/comp/contact.html
+
+=head1 CREDITS
+
+Based on
+
+=head1 SEE ALSO
+
+ http://www.pjb.com.au/
+ perl(1).
+
+=cut
+

@@ -1,0 +1,71 @@
+NAME
+    MooseX::AttributeTags - tag your Moose attributes
+
+SYNOPSIS
+       package User;
+   
+       use Moose;
+       use MooseX::Types::Moose 'Bool';
+       use MooseX::AttributeTags (
+          SerializationStyle => [
+             hidden => Bool,
+          ],
+       );
+   
+       has username => (
+          traits => [ SerializationStyle ],
+          is     => 'ro',
+          hidden => 0,
+       );
+   
+       has password => (
+          traits => [ SerializationStyle ],
+          is     => 'rw',
+          hidden => 1,
+       );
+
+DESCRIPTION
+    MooseX::AttributeTags is a factory for attribute traits. All the work is
+    done in the import method.
+
+  Methods
+    `import(@optlist)`
+        The option list is a list of trait names to create (which will be
+        exported to the caller package as constants).
+
+        Each trait name may be optionally followed by an arrayref of
+        attributes to be created within the trait. (In the SYNOPSIS, the
+        "SerializationStyle" trait gets an attribute called "hidden".)
+
+        Each attribute may be optionally followed by *one* of:
+
+        *   A coderef which provides a default value for the attribute.
+
+        *   A type constraint object (such as those provided by
+            Types::Standard or MooseX::Types; not a type constraint string) to
+            validate the attribute.
+
+        *   An arrayref or hashref providing options similar to those given to
+            Moose's `has` keyword.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-AttributeTags>.
+
+SEE ALSO
+    Moose.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013, 2017 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

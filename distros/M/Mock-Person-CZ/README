@@ -1,0 +1,182 @@
+NAME
+    Mock::Person::CZ - Generate random sets of Czech names.
+
+SYNOPSIS
+     use Mock::Person::CZ qw(first_male first_female last_male last_female
+             middle_male middle_female name);
+     my $first_male = first_male();
+     my $first_female = first_female();
+     my $last_male = last_male();
+     my $last_female = last_female();
+     my $middle_male = middle_male();
+     my $middle_female = middle_female();
+     my $name = name($sex);
+
+DESCRIPTION
+    Data for this module was found on these pages:
+
+    Last names
+        cz.wikipedia.org
+        <http://cs.wikipedia.org/wiki/Seznam_nej%C4%8Detn%C4%9Bj%C5%A1%C3%AD
+        ch_p%C5%99%C3%ADjmen%C3%AD_v_%C4%8Cesku>
+
+    Middle names
+        There's usually no distinction between a first and middle name in
+        the Czech Republic.
+
+    First names
+        cz.wikipedia.org - male names
+        <http://cs.wikipedia.org/wiki/Seznam_nej%C4%8Dast%C4%9Bj%C5%A1%C3%AD
+        ch_mu%C5%BEsk%C3%BDch_jmen_v_%C4%8Cesk%C3%A9_republice>,
+        cs.wikipedia.org - female names
+        <http://cs.wikipedia.org/wiki/Seznam_nej%C4%8Dast%C4%9Bj%C5%A1%C3%AD
+        ch_%C5%BEensk%C3%BDch_jmen_v_%C4%8Cesk%C3%A9_republice>.
+
+SUBROUTINES
+    "first_male()"
+            Returns random first name of male person.
+
+    "first_female()"
+            Returns random first name of female person.
+
+    "last_male()"
+            Returns random last name of male person.
+
+    "last_female()"
+            Returns random last name of female person.
+
+    "middle_male()"
+            Returns random middle name of male person.
+
+    "middle_female()"
+            Returns random middle name of female person.
+
+    "name([$sex])"
+            Recieves scalar with sex of the person ('male' or 'female') and
+            returns scalar with generated name. Default value of $sex
+            variable is 'male'.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Encode qw(encode_utf8);
+     use Mock::Person::CZ qw(name);
+
+     # Error.
+     print encode_utf8(name())."\n";
+
+     # Output like.
+     # Štefan Lukáš Šimek
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Encode qw(encode_utf8);
+     use Mock::Person::CZ;
+
+     # Get all last male names.
+     my @last_males = @Mock::Person::CZ::last_male;
+
+     # Print out.
+     print sort map { encode_utf8($_)."\n" } @last_males;
+
+     # Output:
+     # Bartoš
+     # Beneš
+     # Blažek
+     # Bláha
+     # Bureš
+     # Doležal
+     # Dostál
+     # Dušek
+     # Dvořák
+     # Fiala
+     # Havlíček
+     # Holub
+     # Horák
+     # Hrubý
+     # Hruška
+     # Hájek
+     # Janda
+     # Jelínek
+     # Kadlec
+     # Kolář
+     # Konečný
+     # Kopecký
+     # Kovář
+     # Kratochvíl
+     # Krejčí
+     # Král
+     # Kučera
+     # Kříž
+     # Liška
+     # Mach
+     # Malý
+     # Marek
+     # Mareš
+     # Matoušek
+     # Mašek
+     # Moravec
+     # Musil
+     # Müller
+     # Navrátil
+     # Nguyen
+     # Novotný
+     # Novák
+     # Němec
+     # Pavlík
+     # Pokorný
+     # Polák
+     # Pospíšil
+     # Procházka
+     # Růžička
+     # Sedláček
+     # Soukup
+     # Staněk
+     # Svoboda
+     # Sýkora
+     # Tichý
+     # Urban
+     # Valenta
+     # Vaněk
+     # Veselý
+     # Vlček
+     # Vávra
+     # Zeman
+     # Čech
+     # Čermák
+     # Černý
+     # Říha
+     # Ševčík
+     # Šimek
+     # Štěpánek
+     # Šťastný
+
+DEPENDENCIES
+    Exporter, Readonly.
+
+SEE ALSO
+    Task::Mock::Person
+        Install the Mock::Person modules.
+
+REPOSITORY
+    <https://github.com/tupinek/Mock-Person-CZ>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © Michal Špaček 2013-2015
+     BSD 2-Clause License
+
+VERSION
+    0.04
+

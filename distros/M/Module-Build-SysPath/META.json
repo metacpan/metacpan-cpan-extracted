@@ -1,0 +1,69 @@
+{
+   "abstract" : "install files to system folders according to FHS (or Sys::Path settings)",
+   "author" : [
+      "Jozef Kutej <jkutej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4202",
+   "keywords" : [
+      "system",
+      "paths",
+      "instalation",
+      "deployment",
+      "applications"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Module-Build-SysPath",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Find::Rule" : "0",
+            "File::Temp" : "0",
+            "Test::Compile" : "0.08",
+            "Test::Dirs" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3607"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "2.07",
+            "File::Spec" : "0",
+            "List::MoreUtils" : "0",
+            "Sys::Path" : "0.11",
+            "Text::Diff" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Module::Build::SysPath" : {
+         "file" : "lib/Module/Build/SysPath.pm",
+         "version" : "0.17"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jozef/Module-Build-SysPath/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/jozef/Module-Build-SysPath.git"
+      }
+   },
+   "version" : "0.17"
+}

@@ -1,0 +1,24 @@
+---
+abstract: 'Mojolicious plugin to generate DOM IDs and CSS class names from your ORM objects'
+author:
+  - 'Skye Shaw <sshaw AT lucas.cis.temple.edu>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-DomIdHelper
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: 2.20
+resources:
+  bugtracker: http://github.com/sshaw/Mojolicious-Plugin-DomIdHelper/issues
+version: 0.04

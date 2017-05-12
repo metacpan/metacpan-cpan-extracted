@@ -1,0 +1,55 @@
+0.10 Tue Dec  7 03:29:35 BRST 2010
+    - added Test::Exception as a build dependency
+
+0.09
+    - 'private' attributes ignored properly
+
+
+0.08 Tue Feb 12 03:29:31 GMT-3 2010
+    - Added README
+    - Explicitly using Carp::confess instead of relying on Moose exports
+
+0.07 Tue Feb  9 15:50:28 GMT 2010
+    - (somewhat belatedly) removed 'get_attribute_map' (deprecated in Moose 0.93)
+
+0.06 Tue Oct 13 15:22:06 BST 2009
+    - Attributes starting with '_' are ignored
+
+0.05 Tue Jun  2 17:27:38 BST 2009
+    - Added POD
+
+    - Added trait attribute: 'cmdopt_env'
+        - allow ENV variables to be set rather than command line params
+
+    - private: _attr_name_to_cmd_options()
+        - changed to _attr_to_cmd_options (i.e. attribute not attribute name)
+        to provide more flexibility
+
+0.04 Fri Dec  5 10:43:01 GMT 2008
+    - Updated MANIFEST
+    - Require IPC::Cmd => 0.42 (RT #41450)
+
+0.03 2008-10-22 19:17:00
+    - Added: attribute trait:
+        - lib/MooseX/Role/Cmd/Meta/Attribute/Trait.pm
+
+    - Added: tests and test/lib
+        - t/lib/Test/Cmd/Dir.pm
+        - t/lib/Test/Cmd/DirWithTraits.pm
+        - t/traits.t
+
+    - Changed: lib/MooseX/Role/Cmd.pm
+        - Added the attribute trait
+        - Added extra logic to decide how to call args '--verbose' or '-v'
+        - Can also use the CmdOpt trait to explicitly specify the prefix '-verbose'
+        - Added methods:
+            - cmd_args()
+            - _attr_name_to_cmd_options()
+
+0.02 2008-10-15 12:37:00
+        - fixed tests
+
+
+0.01  2007-12-10 21:20:00
+        - initial release
+

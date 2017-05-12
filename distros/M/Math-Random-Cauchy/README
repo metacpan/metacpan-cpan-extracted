@@ -1,0 +1,71 @@
+NAME
+    Math::Random::Cauchy - Random numbers following a Cauchy PDF
+
+SYNOPSIS
+      use Math::Random::Cauchy;
+      my $cauchy = Math::Random::Cauchy->new(
+        fwhm  => 1,  # the width (full width, half maximum), default==1
+        middle => 5, # the expectation value, default==0
+        random => 'rand', # use Perl's builtin (default)
+      );
+  
+      foreach (1..100) {
+          my $rnd = $cauchy->rand();
+          # ...
+      }
+  
+      # Use Math::Random::MT instead of bultin rand()
+      use Math::Random::MT;
+      my $mt = Math::Random::Mt->new($seed);
+      $cauchy = Math::Random::Cauchy->new(
+        random => sub { $mt->rand() };
+      );
+
+DESCRIPTION
+    This module transforms uniformly spaced random numbers into random
+    numbers that follow the Cauchy Probability Density Function (*PDF*).
+
+    A more general transformation method is implemented in
+    Math::Random::AcceptReject.
+
+    The algorithm is from Blobel et al as quoted in the *SEE ALSO* section
+    below.
+
+METHODS
+  new
+    Creates a new random number generator. Takes named arguments.
+
+    Optional parameters:
+
+      random: The random number generator. Defaults to using Perl's
+              rand() function. May be set to either 'rand' for the
+              default or a subroutine reference for custom random
+              number generators. Expected to return one or more(!)
+              random numbers per call.
+      fwhm:   Full width, half maximum. Defaults to 1.
+      middle: Expectation value for x. Defaults to 0.
+
+  rand
+    Returns the next random number of Cauchy PDF.
+
+SEE ALSO
+    Math::Random::MT, Math::Random, Math::Random::OO, Math::TrulyRandom,
+    Math::Random::AcceptReject
+
+    The examples in the examples/ subdirectory of this distribution.
+
+    The algorithm was taken from: (German)
+
+    Blobel, V., and Lohrmann, E. *Statistische und numerische Methoden der
+    Datenanalyse*. Stuttgart, Leipzig: Teubner, 1998
+
+AUTHOR
+    Steffen Mueller, <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2007 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.6 or, at your
+    option, any later version of Perl 5 you may have available.
+

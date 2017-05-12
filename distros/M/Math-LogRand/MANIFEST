@@ -1,0 +1,8 @@
+eg/eg.pl
+Changes
+lib/Math/LogRand.pm
+Makefile.PL
+MANIFEST
+t/test.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

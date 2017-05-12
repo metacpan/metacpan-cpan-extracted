@@ -1,0 +1,269 @@
+Revision history for Perl extension Monotone::AutomateStdio.
+
+1.10  Sat Apr 30 17:08:00 2016 Anthony Cooper <support@coosoft.plus.com>
+	- Changes made for Monotone version 1.10:
+	  - Added an erase_descendants() method.
+	  - The get_attributes() method now accepts an additional revision id
+	    when working outside of a workspace.
+	  - Updated documentation.
+	- The mtn_aif_version field inside the Monotone object now contains the
+	  full floating point version number of the automate stdio interface
+	  version.
+
+1.03  Sat Sep 07 18:58:00 2013 Anthony Cooper <support@coosoft.plus.com>
+	- Only prepend the database name with its full path when dealing with a
+	  disk based database and not a memory based one as used when
+	  connecting to remote databases.
+	- Renamed the dn_name field to the correct db_name. This means that any
+	  database names that are specified with a relative path correctly get
+	  converted to their absolute path name.
+	- All constructors now only honour <Class Name>->new() and not
+	  <Object>->new() as well. This makes the code cleaner and is less
+	  confusing to the caller as the object way of calling the constructor
+	  could be misinterpreted as some sort of clone method (which it
+	  isn't).
+	- The workspace name is now correctly used when throwing an invalid
+	  workspace exception.
+
+1.02  Sat Jan 28 17:25:00 2012 Anthony Cooper <support@coosoft.plus.com>
+	- The new_from_service() contructor now allows Monotone style URLs as
+	  well as <host>[:<port>] server names.
+	- Updated the documentation and corrected a few typos.
+
+1.01  Sat Jul 2 18:00:00 2011 Anthony Cooper <support@coosoft.plus.com>
+	- Removed tabs in the test script. Forgot to do this before.
+	- Be less stringent about UTF-8 convertion failures.
+	- Now quote versions. Helps with the automated distribution system.
+
+1.00  Sun Apr 17 19:40:00 2011 Anthony Cooper <support@coosoft.plus.com>
+	- For STRING_KEY_VALUE parsing I now pass the offset of the relevant RE
+	  subexpression as an extra argument to get_quoted_value() rather than
+	  the slicker but more hacky `local' approach taken before.
+	- Reviewed the use of assorted string parsing tokens in the key hashes
+	  so as to allow more multi-line quoted values.
+	- Upped the version to 1.00. :-)
+	- Got the library to work with mtn version 1.00, ran tests and updated
+	  the test results file. Basically when parsing db variables one must
+	  allow for multi-line values.
+	- Changes made for ticket 137:
+	  - Now periodically check to see if anything needs reading from mtn's
+	    STDERR and if there is data then read it until there is no more.
+	    This is to stop mtn grinding to a halt because it is blocking on a
+	    write to STDERR.
+	- Now switched for tabs in indentation to spaces. Seems to be the way
+	  to go now. This has been checked in on its own as it is a massive
+	  change to the code.
+	- Updated the documentation to reflect versions supported and use of
+	  SIGALRM.
+
+0.12  Sun Feb 20 11:00:00 2011 Anthony Cooper <support@coosoft.plus.com>
+	- Now always convert any database specified with a relative path into
+	  an absolute path so that any subsequent chdir(2) call doesn't stop
+	  the library from opening the specified database.
+	- Now call the flush() method after writing out an automate stdio
+	  command string when sending instructions to Monotone. This strictly
+	  speaking is not necessary as print() and printf() flush on newline
+	  but it is best to be explicit.
+	- Now use the OO style calling convention for IO handle style objects
+	  rather than the functional style that was used in some places.
+
+0.11  Tue Jan 4 18:47:00 2011 Anthony Cooper <support@coosoft.plus.com>
+	- Added the MTN_SELECTOR_OR_OPERATOR constant and the supporting
+	  logic. Monotone now has an or `|' operator that I missed off when
+	  doing the 0.99.1 development.
+
+0.10  Thu Nov 27 18:47:00 2010 Anthony Cooper <support@coosoft.plus.com>
+	- Made changes for 0.99.1 of Monotone, specifically:
+	  - Added the checkout(), drop_public_key(),
+	    get_extended_manifest_of(), get_file_size(), get_public_key(),
+	    log() and put_public_key() methods.
+	  - Renamed the genkey() method to generate_key() (the old name is now
+	    aliased to the new one).
+	  - The pull(), push() and sync() methods now support the --dry-run
+	    option, output information in the form of structured records and
+	    now only expect the URI style syntax for server end points.
+	  - Mtn startup options have been updated in light of the CLI switches
+	    revamp.
+	- The parse_kv_record() routine now supports fields that occur multiple
+	  times in an I/O stanza record. Also a new value type,
+	  STRING_AND_HEX_ID, has now been added.
+	- There are now no exceptions to using the parse_kv_record() routine
+	  for processing I/O stanza style records.
+	- Option parsing/expansion is now done in one place (inside the
+	  expand_options() routine.
+	- All birth fields are named birth as against birth_id.
+	- New objects are now only created if a unique id can be found for them
+	  first.
+	- Updated the POD documentation for the changes made for Monotone
+	  0.99.1.
+	- Updated mtn-tester to cope with the new Monotone 0.99.1 changes.
+	- Changed mtn-tester so that error messages returned by the
+	  get_error_message() method only get displayed if they are different
+	  from before (helps to minimise changes in the test output logs).
+	- Reformatted my statements slightly so as to be more consistent with
+	  other statements.
+	- Upped the version number to 0.10.
+
+0.09  Thu Aug 12 17:40:00 2010 Anthony Cooper <support@coosoft.plus.com>
+	- Added support for Monotone version 0.48 by adding the update()
+	  method.
+	- Made the the code that reads format 2 chunk headers slightly more
+	  efficient (avoids calling poll() more than it has to).
+	- Now recognise development versions of Monotone.
+	- Updated the documentation (and corrected a typo).
+	- Updated mtn-tester for Monotone version 0.48 and now added code to
+	  print out the return value from the get_error_message() method after
+	  each test.
+
+0.08  Sun May 23 10:00:00 2010 Anthony Cooper <support@coosoft.plus.com>
+	- The get_db_name() method now returns undef instead of ":memory:" when
+	  connecting to a network service.
+	- Added the get_service_name() method.
+	- Corrected a bug where retries on locked db caused exceptions to be
+	  thrown in the startup routine despite the retry handler successfully
+	  dealing with the situation and waiting until the db was unlocked.
+	- Now stop deep recursion from happening in the above situation.
+	- Improved the logic in error handling inside the startup routine so
+	  that the best error message is generated.
+	- Improved some exception messages and other minor code tidy-ups.
+	- Updates the documentation and corrected a few typos.
+
+0.07  Sat Feb 27 19:30:00 2010 Anthony Cooper <support@coosoft.plus.com>
+	- Added support for 0.46:
+	  - Added support for extracting the extra automate stdio data streams
+	    new in 0.46.
+	  - Added support for automate remote_stdio via the new_from_service()
+	    contructor.
+	  - Added the pull(), push() and sync() methods.
+	- Updated the POD documentation.
+	- Added a return statement to the end of all methods that don't return
+	  anything so that nothing can be accidentally leaked (Perl subroutines
+	  by default return the value of the last expression executed).
+	- Now use the getlines() method instead of <>.
+	- SIGPIPE is now ignored (caused the program to terminate when the mtn
+	  subprocess exited unexpectedly and this library was in the middle of
+	  sending it something).
+	- Stopped using abbreviated words in error messages.
+	- Rationalised the use of die() croaker() and carper() (some things
+	  were carping when they should have been croaking).
+	- Used the OO style of calling print() and printf() so that
+	  $this->{mtn_in} could be used directly.
+	- Short reads on reading data cause errors rather than a blocking read.
+	- Restructured some code in mtn_command_with_options() to be more
+	  logically grouped.
+	- Failure to read the new format header does not obscure potentially
+	  more helpful error messages.
+	- Get more consistent results (WRT irrelevant Data::Dumper related
+	  white space) if UTF-8 conversion is switched off.
+	- Switched over to custom Inside Out object design.
+	- The version numbers are not treated as floating point numbers.
+	- Made the convertion from UTF-8 into Perl's internal string format
+	  handle errors in a better way.
+	- Made the handling of the convert_to_utf8 flag a little bit more
+	  consistent with other such flags.
+	- Some code tidy ups.
+	- Added new tests for mtn version 0.46 and updated the test results
+	  with the corresponding output.
+	- Corrected some comments.
+
+0.06  Sat Nov 07 15:27:00 2009 Anthony Cooper <support@coosoft.plus.com>
+	- Updated library to take into account the changes made in Monotone
+	  0.45. This also includes the documentation. Changes include:
+	  - tags() and certs() now return a has as a key or signer rather than
+	    their name.
+	  - content_diff() now supports the --reverse and --with-headers
+	    options.
+	  - keys() now returns given_name and local_name instead of just name.
+	- Tested against a 0.45 database and also updated the test harness to
+	  reflect the above changes.
+	- Made the exception handling code more consistent and cleaner.
+	- Corrected the use of IO::Poll's mask method and added POLLHUP to the
+	  mask.
+	- Now much more explicit in handling the reaping of subprocesses and
+	  much more robust in the face of a subprocess that won't die.
+	- Now test for the presence of exceptions by using a simple boolean
+	  test.
+	- Now cope with open3() throwing exceptions whilst inside the child
+	  process.
+	- Now allow the --rcfile switch.
+	- Made other small consistency tidy ups.
+
+0.05  Fri Jun 05 17:49:00 2009 Anthony Cooper <support@coosoft.plus.com>
+	- Updated for Monotone version 0.44:
+	  - Added support for the w: selector (feature MTN_W_SELECTOR).
+	  - Modified the genkey() and keys() methods to cope with the common
+	    single hash as against separate private and public ones (feature
+	    MTN_COMMON_KEY_HASH).
+	- The type field has been dropped from the records returned by the
+	  keys() method. It wasn't really needed as only one field is sometimes
+	  not available.
+	- Updated mtn-tester so as to reduce avoidable churn in the test output
+	  and to also correctly deal with the data returned by the
+	  get_revision() method.
+	- Updated and tidied up the POD documentation to reflect the above
+	  changes.
+	- Now supports the conversion of UTF-8 data into and out of Perl's
+	  internal UTF-8 string format for data read in from and sent out to
+	  the mtn subprocess.
+	- Added a suppress_utf8_conversion() method for disabling the above
+	  conversion if so desired.
+
+0.04  Sun May 03 19:19:00 2009 Anthony Cooper <support@coosoft.plus.com>
+	- Updated for Monotone version 0.43, (added support for the m: and u:
+	  selectors).
+	- Corrected and simplified the `Have I got a class thingy as my first
+	  argument?' logic in light of issues encountered when I tried to
+	  derive from this class.
+	- Updated the test harness in light of previous interface changes and
+	  the fact that mtn revert is more noisy now (use the -quiet switch).
+	- Updated the POD documentation.
+	- Switched to the OO way of calling methods, more consistent.
+	- Renamed the can() method to supports() so as not to conflict with
+	  Perl's UNIVERSAL can() method.
+	- Renamed some of the capability constants so as to fit in more
+	  naturally with the method renamed above.
+
+0.03  Sun Feb 08 18:22:00 2009 Anthony Cooper <support@coosoft.plus.com>
+	- Switched all Perl scripts over to demanding Perl 5.8.5.
+	- Improved an error message (which was causing compilation to fail
+	  anyway).
+	- Added the $mtn->switch_to_ws_root() class method.
+	- Documented the above and under the NOTES section went into greater
+	  detail the issues surrounding using mtn inside workspaces.
+	- Changed the order of the Changes file (most recent first).
+	- Clarified some POD file text.
+
+0.02  Wed Jan 07 16:00:00 2009 Anthony Cooper <support@coosoft.plus.com>
+	- Updated to work with Monotone version 0.42 (added the
+	  $mtn->file_merge(), $mtn->lua() and $mtn->read_packets() methods and
+	  added support for the --no-workspace mtn command line switch).
+	- Added contributions and ideas from Thomas Keller:
+	  - Now have two constructors new_from_db() and new_from_ws(). The
+	    first is aliased to new() and does what the old constructor did.
+	    The second constructor uses the details from the specified
+	    workspace.
+	  - The databases are checked to see if they are Monotone SQLite v3
+	    databases before they are opened by the mtn subprocess.
+	  - The get_ws_path() method has been added.
+	  - The mtn subprocess is either started inside the root directory (if
+	    no workspace is being used) or in the top level directory inside
+	    the specified/current workspace. This helps avoid all sorts of
+	    confusion and weirdness with the mtn subprocess.
+	- Added the db_locked_condition_detected() method.
+	- Now support the NULL key type in parse_kv_record to allow for cases
+	  where there is a field key without a value.
+	- Revamped all of the regexp string extraction code to be more
+	  efficient.
+	- The $io_stanza_re regular expression now also extras the key name.
+	- Made an exception message more meaningful.
+	- mtn-tester has been updated to test the new features and now
+	  recreates the $mtn object after doing its initial tests so that any
+	  error messages are cleared out prior to the actual tests.
+	- Updated the documentation as a result of the new 0.42 features. I
+	  have included a new EXAMPLES section, which details some of the less
+	  obvious features, and an AUTHORS section. I have also revamped the
+	  RETURN VALUE section to make it more readable).
+
+0.01  Sun Nov 09 12:48:46 2008 Anthony Cooper <support@coosoft.plus.com>
+	- original version; created by h2xs 1.23 with options
+		-X -n Monotone::AutomateStdio

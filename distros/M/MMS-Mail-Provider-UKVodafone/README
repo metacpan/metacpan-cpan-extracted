@@ -1,0 +1,57 @@
+NAME
+    MMS::Mail::Provider::UKVodafone - This provides a class for parsing an
+    MMS::Mail::Message object that has been sent via the UK Vodafone
+    network.
+
+VERSION
+    Version 0.07
+
+SYNOPSIS
+    This class provides a parse method for parsing an MMS::Mail::Message
+    object into an MMS::Mail::Message::Parsed object for MMS messages sent
+    from the UK Vodafone network.
+
+METHODS
+    The following are the top-level methods of the
+    MMS::Mail::Parser::UKVodafone class.
+
+  Constructor
+    "new()"
+        Return a new MMS::Mail::Provider::UKVodafone object.
+
+  Regular Methods
+    "parse" MMS::Mail::Message
+        The "parse" method is called as an instance method. It parses the
+        MMS::Mail::Message object and returns an MMS::Mail::Message::Parsed
+        object.
+
+AUTHOR
+    Rob Lee, "<robl at robl.co.uk>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-mms-mail-provider-ukvodafone@rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MMS-Mail-Provider-UKVoda
+    fone>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+NOTES
+    Please read the Perl artistic license ('perldoc perlartistic') :
+
+    10. THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+ACKNOWLEDGEMENTS
+    As per usual this module is sprinkled with a little Deb magic.
+
+COPYRIGHT & LICENSE
+    Copyright 2005 Rob Lee, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    MMS::Mail::Message, MMS::Mail::Message::Parsed, MMS::Mail::Provider
+

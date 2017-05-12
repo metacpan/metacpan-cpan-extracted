@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tube name="Tokyo Subway">
+  <lines>
+    <line id="Asakusa"    name="Asakusa"    color="#F9429E" /> <!-- Rose        -->
+    <line id="Chiyoda"    name="Chiyoda"    color="#006400" /> <!-- Green       -->
+    <line id="Mita"       name="Mita"       color="#000080" /> <!-- Blue        -->
+    <line id="Shinjuku"   name="Shinjuku"   color="#006400" /> <!-- Leaf Green  -->
+    <line id="Hibiya"     name="Hibiya"     color="#AFAFAF" /> <!-- Silver      -->
+    <line id="Tōzai"      name="Tōzai"      color="#000080" /> <!-- Sky Blue    -->
+    <line id="Yūrakuchō"  name="Yūrakuchō"  color="#FFD700" /> <!-- Gold        -->
+    <line id="Hanzōmon"   name="Hanzōmon"   color="#551A8B" /> <!-- Purple      -->
+    <line id="Namboku"    name="Namboku"    color="#0E302F" /> <!-- Teal        -->
+    <line id="Fukutoshin" name="Fukutoshin" color="#550000" /> <!-- Brown       -->
+    <line id="Marunouchi" name="Marunouchi" color="#8B0000" /> <!-- Red         -->
+    <line id="Ginza"      name="Ginza"      color="#FF4F00" /> <!-- Orange      -->
+    <line id="Oedo"       name="Oedo"       color="#9b111e" /> <!-- Ruby        -->
+  </lines>
+
+  <stations>
+    <station id="A01" name="Nishi-magome"       line="Asakusa"    link="A02"/>
+    <station id="A02" name="Magome"             line="Asakusa"    link="A01,A03"/>
+    <station id="A03" name="Nakanobu"           line="Asakusa"    link="A02,A04"/>
+    <station id="A04" name="Togoshi"            line="Asakusa"    link="A03,A05"/>
+    <station id="A05" name="Gotanda"            line="Asakusa"    link="A04,A06"/>
+    <station id="A06" name="Takanawadai"        line="Asakusa"    link="A05,A07"/>
+    <station id="A07" name="Sengakuji"          line="Asakusa"    link="A06,A08,I04"/>
+    <station id="A08" name="Mita"               line="Asakusa"    link="A07,A09,E20,I03,N03,I05"/>
+    <station id="A09" name="Daimon"             line="Asakusa"    link="A08,A10,I04,G08"/>
+    <station id="A10" name="Shimbasi"           line="Asakusa"    link="A09,A11,E20,H09,G07,G09,H08,M16"/>
+    <station id="A11" name="Higashi-ginza"      line="Asakusa"    link="A10,A12,G08,G09,H08,M16"/>
+    <station id="A12" name="Takaracho"          line="Asakusa"    link="A11,A13,H09,G11,T10"/>
+    <station id="A13" name="Nihombashi"         line="Asakusa"    link="A12,A14,I09,C11,T09,M18,Z08,H12,T11,G12,Z09,H13,G10"/>
+    <station id="A14" name="Ningyocho"          line="Asakusa"    link="A13,A15,S09,G11,T10,H14,H12,T11"/>
+    <station id="A15" name="Bakuro-yokoyama"    line="Asakusa"    link="A14,A16,H13,S08,H15,S10"/>
+    <station id="A16" name="Asakusa bashi"      line="Asakusa"    link="A15,A17,S09,E11"/>
+    <station id="A17" name="Kuramae"            line="Asakusa"    link="A16,A18,E10,E12,G19"/>
+    <station id="A18" name="Asakusa"            line="Asakusa"    link="A17,A19,E11,G18"/>
+    <station id="A19" name="Honjo-azumabashi"   line="Asakusa"    link="A18,A20,Z14,G19"/>
+    <station id="A20" name="Oshiage"            line="Asakusa"    link="A19,Z13"/>
+
+    <station id="C01" name="Yoyogi-uehara"      line="Chiyoda"    link="C02"/>
+    <station id="C02" name="Yoyogi-koen"        line="Chiyoda"    link="C03,C01,F15"/>
+    <station id="C03" name="Meijie-jingumae"    line="Chiyoda"    link="C04,C02,F14,F16,Z01,G01,Z02,G02"/>
+    <station id="C04" name="Omote-sando"        line="Chiyoda"    link="C05,C03,F15,G03,Z01,F16,G01,E24,Z03"/>
+    <station id="C05" name="Nogizaka"           line="Chiyoda"    link="C06,C04,Z02,G02"/>
+    <station id="C06" name="Akasaka"            line="Chiyoda"    link="C07,C05,G06,N06,M14"/>
+    <station id="C07" name="Tameike-sanno"      line="Chiyoda"    link="C08,C06,M15,H06,G07,N05,G05,M13,N07,Z04,Y16"/>
+    <station id="C08" name="Kasumigaseki"       line="Chiyoda"    link="C09,C07,G06,N06,M14,M16,H08,G09,H05,H07,I08,Y18"/>
+    <station id="C09" name="Hibiya"             line="Chiyoda"    link="C10,C08,M15,H06,I07,I09,T09,M18,Z08,Y17,Y19"/>
+    <station id="C10" name="Nijubashimae"       line="Chiyoda"    link="C11,C09,I09,T09,M18,Z08,I08,H07"/>
+    <station id="C11" name="Otemachi"           line="Chiyoda"    link="C12,C10,G11,T10,A13,T08,S07,M19,S06,I10,Z07,I08,H07,M17,G12,Z09"/>
+    <station id="C12" name="Shin-ochanomizu"    line="Chiyoda"    link="C13,C11,S06,I10,Z07,S08,M20,I09,T09,M18,Z08"/>
+    <station id="C13" name="Yushima"            line="Chiyoda"    link="C14,C12,S07,M19"/>
+    <station id="C14" name="Nezu"               line="Chiyoda"    link="C15,C13"/>
+    <station id="C15" name="Sendagi"            line="Chiyoda"    link="C16,C14"/>
+    <station id="C16" name="Nishi-nippori"      line="Chiyoda"    link="C17,C15"/>
+    <station id="C17" name="Machiya"            line="Chiyoda"    link="C18,C16,H21"/>
+    <station id="C18" name="Kita-senju"         line="Chiyoda"    link="C19,C17"/>
+    <station id="C19" name="Ayase"              line="Chiyoda"    link="C20,C18,H21"/>
+    <station id="C20" name="Kita-ayase"         line="Chiyoda"    link="C19"/>
+
+    <station id="E10" name="Shin-okachimachi"   line="Oedo"       link="E11,A17"/>
+    <station id="E11" name="Kuramae"            line="Oedo"       link="E10,E12,A16,A18"/>
+    <station id="E12" name="Ryogoku"            line="Oedo"       link="E11,A17"/>
+    <station id="E20" name="Daimon"             line="Oedo"       link="A08,A10"/>
+    <station id="E24" name="Aoyama-itchome"     line="Oedo"       link="C04"/>
+
+    <station id="F14" name="Kita-sando"         line="Fukutoshin" link="F15,C03"/>
+    <station id="F15" name="Meijie-jingumae"    line="Fukutoshin" link="F14,F16,C02,C04"/>
+    <station id="F16" name="Shibuya"            line="Fukutoshin" link="F15,C03,C04"/>
+
+    <station id="G01" name="Shibuya"            line="Ginza"      link="G02,C03,C04"/>
+    <station id="G02" name="Omote-sando"        line="Ginza"      link="G01,G03,C03,C05"/>
+    <station id="G03" name="Gaiemmae"           line="Ginza"      link="G02,C04"/>
+    <station id="G05" name="Akasaka-mitsuke"    line="Ginza"      link="G06,C07"/>
+    <station id="G06" name="Tameike-sanno"      line="Ginza"      link="G05,G07,C06,C08"/>
+    <station id="G07" name="Toranomon"          line="Ginza"      link="G06,G08,C07,A10"/>
+    <station id="G08" name="Shimbasi"           line="Ginza"      link="G07,G09,A10"/>
+    <station id="G09" name="Ginza"              line="Ginza"      link="G08,A10,A09,C08"/>
+    <station id="G10" name="Kyobashi"           line="Ginza"      link="G09,G11,A13"/>
+    <station id="G11" name="Nihombashi"         line="Ginza"      link="G12,A13"/>
+    <station id="G12" name="Mitsukoshimae"      line="Ginza"      link="G11,A13,C11"/>
+    <station id="G18" name="Tawaramachi"        line="Ginza"      link="A18"/>
+    <station id="G19" name="Asakusa"            line="Ginza"      link="A17,A19"/>
+
+    <station id="H05" name="Kamiyacho"          line="Hibiya"     link="H06,C08"/>
+    <station id="H06" name="Kasumigaseki"       line="Hibiya"     link="H05,H07,C07,C09"/>
+    <station id="H07" name="Hibiya"             line="Hibiya"     link="H06,H08,C08,C10,C11"/>
+    <station id="H08" name="Ginza"              line="Hibiya"     link="H07,H09,C08,A10,A11"/>
+    <station id="H09" name="Higashi-ginza"      line="Hibiya"     link="H08,A10,A12"/>
+    <station id="H12" name="Kayabacho"          line="Hibiya"     link="H13,A13,A14"/>
+    <station id="H13" name="Ningyocho"          line="Hibiya"     link="H12,H14,A13,A15"/>
+    <station id="H14" name="Kodemmacho"         line="Hibiya"     link="H13,H15,A14"/>
+    <station id="H15" name="Akihabara"          line="Hibiya"     link="H14,A15"/>
+    <station id="H21" name="Kita-senju"         line="Hibiya"     link="C17,C19"/>
+
+    <station id="I03" name="Shirokane-takanawa" line="Mita"       link="I04,A08"/>
+    <station id="I04" name="Mita"               line="Mita"       link="I03,I05,A07,A09"/>
+    <station id="I05" name="Shibakoen"          line="Mita"       link="A08"/>
+    <station id="I07" name="Uchisaiwaicho"      line="Mita"       link="I08,C09"/>
+    <station id="I08" name="Hibiya"             line="Mita"       link="I07,I09"/>
+    <station id="I09" name="Otemachi"           line="Mita"       link="I08,I10"/>
+    <station id="I10" name="Jimbocho"           line="Mita"       link="I09,C11,C12"/>
+
+    <station id="M13" name="Akasaka-mitsuke"    line="Marunouchi" link="M14,C07"/>
+    <station id="M14" name="Tameike-sanno"      line="Marunouchi" link="M13,M15"/>
+    <station id="M15" name="Kasumigaseki"       line="Marunouchi" link="M14"/>
+    <station id="M16" name="Ginza"              line="Marunouchi" link="M14,M15,A10,A11,C08"/>
+    <station id="M17" name="Tokyo"              line="Marunouchi" link="C11,M18"/>
+    <station id="M18" name="Otemachi"           line="Marunouchi" link="M17,M19,A13"/>
+    <station id="M19" name="Shin-ochanomizu"    line="Marunouchi" link="M18,M20"/>
+    <station id="M20" name="Ochanomizu"         line="Marunouchi" link="M19,C12"/>
+
+    <station id="N03" name="Shirokane-takanawa" line="Namboku"    link="A08"/>
+    <station id="N05" name="Roppongi-itchome"   line="Namboku"    link="N06,C07"/>
+    <station id="N06" name="Tameike-sanno"      line="Namboku"    link="N05,N07,C06,C08"/>
+    <station id="N07" name="Akasaka-mitsuke"    line="Namboku"    link="N06,C07"/>
+
+    <station id="S06" name="Jimbocho"           line="Shinjuku"   link="S07,C11,C12"/>
+    <station id="S07" name="Shin-ochanomizu"    line="Shinjuku"   link="S06,S08,C12"/>
+    <station id="S08" name="Iwamotocho"         line="Shinjuku"   link="S07,S09,C12,A15"/>
+    <station id="S09" name="Bakuro-yokoyama"    line="Shinjuku"   link="S08,S10,A14,A16"/>
+    <station id="S10" name="Hamacho"            line="Shinjuku"   link="S09,A15"/>
+
+    <station id="T08" name="Takebashi"          line="Tōzai"      link="T09,C11"/>
+    <station id="T09" name="Otemachi"           line="Tōzai"      link="T08,T10,A13"/>
+    <station id="T10" name="Nihombashi"         line="Tōzai"      link="T09,T11"/>
+    <station id="T11" name="Kayabacho"          line="Tōzai"      link="T10,A13,A14"/>
+
+    <station id="Y16" name="Akasaka-mitsuke"    line="Yūrakuchō"  link="Y17,C07"/>
+    <station id="Y17" name="Sakuradamon"        line="Yūrakuchō"  link="Y16,Y18,C09"/>
+    <station id="Y18" name="Yurakucho"          line="Yūrakuchō"  link="Y17,Y19,C08"/>
+    <station id="Y19" name="Ginza-itchome"      line="Yūrakuchō"  link="Y18,C09"/>
+
+    <station id="Z01" name="Shibuya"            line="Hanzōmon"   link="Z02,C03,C04"/>
+    <station id="Z02" name="Omote-sando"        line="Hanzōmon"   link="Z01,C03,C05"/>
+    <station id="Z03" name="Aoyama-itchome"     line="Hanzōmon"   link="Z02,Z04,C04"/>
+    <station id="Z04" name="Akasaka-mitsuke"    line="Hanzōmon"   link="C07"/>
+    <station id="Z07" name="Jimbocho"           line="Hanzōmon"   link="Z08,C11,C12"/>
+    <station id="Z08" name="Omote-sando"        line="Hanzōmon"   link="Z07,Z09,C11,A13"/>
+    <station id="Z09" name="Mitsukoshimae"      line="Hanzōmon"   link="Z08,C11,A13"/>
+    <station id="Z13" name="Kinshicho"          line="Hanzōmon"   link="Z14,A20"/>
+    <station id="Z14" name="Oshiage"            line="Hanzōmon"   link="Z13,A19"/>
+
+  </stations>
+</tube>

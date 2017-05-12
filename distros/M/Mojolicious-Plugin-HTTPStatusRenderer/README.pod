@@ -1,0 +1,45 @@
+=head1 NAME
+
+Mojolicious::Plugin::HTTPStatusRenderer - HTTP status renderer plugin
+
+=head1 SYNOPSIS
+
+  # Mojolicious
+  $self->plugin('HTTPStatusRenderer');
+  
+  #Mojolicious::Lite
+  plugin 'HTTPStatusRenderer';
+  
+  # start daemon, and
+  # access http://<host>:<port>/httpstatus/
+
+=head1 DESCRIPTION
+
+L<Mojolicious::Plugin::HTTPStatusRenderer> is a renderer for novice Web Programmer, rawr!
+
+=head1 OPTIONS
+
+L<Mojolicious::Plugin::HTTPStatusRenderer> supports no options
+
+=head1 METHODS
+
+
+L<Mojolicious::Plugin::HTTPStatusRenderer> inherits all methods from L<Mojolicious::Plugin> and implements the following new ones
+
+=head2 register
+
+  my $route = $plugin->register(Mojolicious->new);
+
+=head1 SEE ALSO
+
+L<Mojoilcious>, L<Mojolicious::Guides>, L<http://mojolicio.us>, L<Mojolicious::Plugin::PODRenderer>, L<App::httpstatus>, L<http://blog.64p.org/entry/2013/02/21/121830>
+
+=head1 AUTHOR
+
+turugina E<lt>turugina@cpan.orgE<gt>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

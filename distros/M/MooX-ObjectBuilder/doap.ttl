@@ -1,0 +1,76 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/MooX-ObjectBuilder/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [
+		doap-deps:on "Dist::Inkt::Profile::TOBYINK"^^doap-deps:CpanId;
+	];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008"^^doap-deps:CpanId ], [
+		doap-deps:on "B::Hooks::EndOfScope"^^doap-deps:CpanId;
+	], [ doap-deps:on "Exporter::Shiny"^^doap-deps:CpanId ], [ doap-deps:on "Lexical::Accessor"^^doap-deps:CpanId ], [ doap-deps:on "Sub::Name"^^doap-deps:CpanId ], [
+		doap-deps:on "MooseX::ConstructInstance"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Warnings"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ], [ doap-deps:on "Moo"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=MooX-ObjectBuilder>;
+	doap:created         "2014-04-15"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/MooX-ObjectBuilder>;
+	doap:homepage        <https://metacpan.org/release/MooX-ObjectBuilder>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "MooX-ObjectBuilder";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-ObjectBuilder/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-ObjectBuilder/v_0-002>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-moox-objectbuilder>;
+	];
+	doap:shortdesc       "lazy construction of objects from extra init args";
+	doap:tester          <http://purl.org/NET/cpan-uri/person/torbjorn>.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-ObjectBuilder/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "MooX-ObjectBuilder-0.001"^^xsd:string;
+	dc:issued            "2014-04-16"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-ObjectBuilder-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-ObjectBuilder/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "MooX-ObjectBuilder-0.002"^^xsd:string;
+	dc:issued            "2014-06-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Integrate with MooseX::ConstructInstance.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-ObjectBuilder-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/person/torbjorn>
+	a                    foaf:Person;
+	foaf:name            "Torbjørn Lindahl";
+	foaf:nick            "TORBJORN";
+	foaf:page            <https://metacpan.org/author/TORBJORN>.
+

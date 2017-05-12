@@ -1,0 +1,130 @@
+/* ================================================================== */
+/* THEME: Burgundy
+ *
+ * This only defines fonts, colours and borders, not layout.
+ */
+/* ================================================================== */
+/* THEME: Burgundy - fonts
+ */
+/* ------------------------------------------------------------------ */
+/* Fonts */
+h1, h2, h3, h4 {
+  font-family: Merlin, verdana, helvetica, arial, sans-serif;
+  font-weight: normal;
+  color: black;
+}
+
+/* ================================================================== */
+/* ICONS - light on dark
+ * Nav arrows with transparent backgrounds
+ */
+.side nav li > ul {
+  list-style-image: url(nav_white.png);
+}
+
+/* ================================================================== */
+/* General */
+.verge, header,
+footer, .side, .fancy {
+  color: #ebe0e6;
+  background: #4d0026;
+  border-color: #330000;
+}
+
+header,
+footer {
+  background-image: url(burgundy_h.jpg);
+}
+
+.side {
+  background-image: url(burgundy_side.jpg);
+}
+
+body {
+  color: #111111;
+  background: #cccccc;
+}
+
+a:link {
+  color: #660066;
+}
+
+a:visited {
+  color: #000066;
+}
+
+header a:link,
+footer a:link,
+.side a:link,
+.verge a:link,
+header a:link,
+footer a:link,
+.side a:link,
+.fancy a:link {
+  color: #f5a3f5;
+}
+
+header a:visited,
+footer a:visited,
+.side a:visited,
+.verge a:visited,
+header a:visited,
+footer a:visited,
+.side a:visited,
+.fancy a:visited {
+  color: #a3f5a3;
+}
+
+.fancy {
+  color: #ebe0e6;
+  background-image: url("burgundy_side.jpg");
+  border: 5px double #8e0b4d;
+  padding: 0;
+}
+.fancy li {
+  padding: 0.5em;
+  margin: 5px;
+  border: 5px solid #8e0b4d;
+  background-color: #4d0026;
+  background: linear-gradient(#4d0026, black);
+}
+.fancy li a:link {
+  color: #f5a3f5;
+}
+.fancy li a:visited {
+  color: #a3f5a3;
+}
+
+.button, input[type=submit], header nav a,
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: #ebe0e6;
+  border-color: #330000;
+  background-color: #660033;
+}
+
+.button a:link, input[type=submit] a:link, header nav a a:link,
+header nav .selflink a:link,
+header nav em a:link,
+header nav .current a a:link, a.button:link, header nav a:link {
+  color: #ebe0e6;
+}
+
+.button a:visited, input[type=submit] a:visited, header nav a a:visited,
+header nav .selflink a:visited,
+header nav em a:visited,
+header nav .current a a:visited, a.button:visited, header nav a:visited {
+  color: #a3f5a3;
+}
+
+header nav li {
+  border-color: #226622;
+}
+
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: #bb0055;
+  background-color: #669933;
+}

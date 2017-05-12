@@ -1,0 +1,149 @@
+Revision history for Perl extension Math::NumberCruncher.
+
+5.00 05-Mar-2002 12:29:30 PM
+    - Added the following:
+        sin()
+        cos()
+        sqrt()
+        log()
+        exp()
+        PICONST()
+        Inverse()
+        km2miles()
+        miles2km()
+        CONSTANT()
+        Bernoulli()
+    - Made the following functions available for export: log(), exp(),
+      sqrt(), sin(), cos(), asin(), acos(), atan(), sec(), asec(),
+      csc(), acsc(), exsec(), cot(), acot(), vers(), covers(), hav().
+    - sqrt(), sin(), cos(), log(), and exp() were created and/or modified
+      to serve as drop-in replacements for their respective built-in
+      functions. Usage is the same, with the option of specifying the number
+      of desired decimal places.
+    - Completely overhauled the bulk of the included functions to allow
+      for the user to specify the number of desired decimal places. In 
+      some cases, it was not possible to maintain backwards compatability.
+      Please be certain to test your scripts with this version of 
+      Math::NumberCruncher thoroughly.
+
+4.05 Mon Jan 07 10:13:40 2002
+    - Added acsc()
+    - Added SIS(), which calculates a super-increasing sequence
+    - SIGNIFICANT optimization to Ln(), Exp(), Root2(), ECONST() and
+      related functions, thanks to Douglas Wilson. With his assistance,
+      managed to get a an improvement in ECONST() of 12,592% for less
+      than or equal to 500 decimal places. Seriously. Ln(), et al., showed
+      an improvement in excess of 100%.
+
+4.04 Wed Jan 02 12:09:44 2002
+    - Added Ln(), which calculates the natural log of a number
+      to a given number of decimal places.
+    - Added Exp(), which performs the inverse of Ln().
+    - Added Root2(), which calculates the N-th root of a given number 
+      using logarithms, rather than Newton's Method, which is what is
+      used in Root(). Root2() allows you to specify the number of decimal
+      places wanted. For particularly large number and/or roots, Root2()
+      is sometimes faster and/or more accurate.
+    - Made significant optimization to Root(). It is now more accurate and
+      substantially faster than v4.03. Thanks to the folks at perlmonks.org
+      for their input on the optimization.
+    - Modified SqrRoot() to use Root(), rather than separate code.
+    - Added PythagTriples() and PythagTriplesSeq().
+    - Special thanks to Douglas Wilson for allowing me to borrow his code
+      for Ln(), Exp(), Root2(), and the various other "behind-the-scenes" 
+      functions for same. Douglas's code is based on an algorithm described 
+      at http://www.geocities.com/zabrodskyvlada/aat/.
+
+4.03 Wed Dec 19 15:44:11 2001
+    - Fixed the Variance() test to allow for slight error tolerance.
+    - Added Root(), which calculates the N-th root of a given number.
+
+4.02 Mon Dec 17 11:49:18 2001
+    - Modified all routines that use square roots to use
+      the internal SqrRoot() function whenever possible, 
+      and included abs() to account for bad data.
+    - Added complete test suite for all functions.
+
+4.0  Wed Nov 21 16:21:43 2001
+    - Added OO interface. Will continue to support
+      funcitonal interface for backward compatibility.
+    - Added the following:
+        Eccentricity()
+        LatusRectum()
+        EllipseArea()
+        OrbitalVelocity()
+        SqrRoot()
+        asin()
+        acos()
+        atan()
+        acot()
+        asec()
+        sec()
+        csc()
+        exsec()
+        tan()
+        cot()
+        vers()
+        covers()
+        hav()
+
+3.0  Mon Jul 02 10:41:09 2001
+    - Fixed typo in Range()
+    - Added data verification prior to processing to all routines that 
+      got grumpy when insufficient/improper data was passed. (Thanks 
+      again to Ronald Blaschke, M.S.)
+    - Added DimensionlessSpeed_2()
+    - Added copyright info
+
+2.2  Wed Jun 27 14:54:05 2001
+    - Made minor change to Mean() and Range() to return undef on error. 
+      (Thanks to Ronald Blaschke, M.S.)
+    - Added the following:
+        RuleOf72()
+        CylinderVolume()
+        ConeVolume()
+        Deg2Rad()
+        Rad2Deg()
+        C2F()
+        F2C()
+        in2cm()
+        cm2in()
+        ft2m()
+        m2ft()
+        kg2lb()
+        lb2kg()
+        RelativeStride()
+        RelativeStride_2()
+        DimensionlessSpeed()
+        ActualSpeed()
+    - Added value of e out to 200 places.
+
+2.0  Mon Feb 12 11:50:58 2001
+    - Added many new features:
+        TriangleHeron()
+        PolygonPerimeter()
+        Clockwise()
+        InPolygon()
+        InTriangle()
+        BoundingBox_Points()
+        PolygonArea()
+        CircleArea()
+        Circumference()
+        SphereVolume()
+        SphereSurface()
+
+1.3  Sat Nov 25 17:18:44 2000
+    - Corrected error in Difference()
+      (Thanks to Rusty Thomas, Ph.D., for finding the error.)
+
+1.21 Tue Sep 19 08:57:51 2000
+    - Corrected typo in AllOf()
+      (Thanks to Wim Verhaegen for finding the error.)
+
+1.2  Mon Sep 18 13:24:43 2000
+    - Fixed minor error in Range()
+    - Added Predict(), for predicting value of Y, given slope, y-intercept, 
+      and proposed x value.
+
+1.1  Wed Aug 30 14:41:52 2000
+    - First public version

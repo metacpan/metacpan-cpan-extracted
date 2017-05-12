@@ -1,0 +1,26 @@
+Changes
+Dbx.pm
+Dbx.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+typemap
+t/0_pod.t
+t/0_pod_coverage.t
+t/1.t
+t/2.t
+t/3.t
+t/fixed.t
+t/test.dbx
+t/test1.dbx
+libdbx/Makefile.PL
+libdbx/common.h
+libdbx/define.h
+libdbx/libdbx.c
+libdbx/libdbx.h
+libdbx/timeconv.c
+libdbx/timeconv.h
+fallback/const-c.inc
+fallback/const-xs.inc
+META.yml                                 Module meta-data (added by MakeMaker)

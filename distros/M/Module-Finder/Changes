@@ -1,0 +1,26 @@
+Revision history for Module-Finder
+
+v0.1.5 2007-07-16
+
+  * include "educational" Makefile.PL (Fix your CPAN client!)
+
+v0.1.4 2007-07-13
+
+  * get the dependencies right (thanks McMadd)
+
+v0.1.3 2007-07-13
+
+  * kill Makefile.PL
+
+v0.1.2 2006-11-18
+
+  * win32 fixes
+
+v0.1.1 2006-11-18
+
+  * first public release
+
+See the source code repository for more detail.
+  http://scratchcomputing.com/svn/Module-Finder/trunk
+
+vim:ts=2:sw=2:et:sta

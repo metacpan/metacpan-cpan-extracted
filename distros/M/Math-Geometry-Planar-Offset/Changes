@@ -1,0 +1,24 @@
+Revision history for Math-Geometry-Planar-Offset
+
+1.05 2007-07-14
+
+  * Fixed silly Makefile.PL
+
+1.04 2006-05-21
+
+  * Build file restructure.
+  * Documentation.
+  * Added functionality/expect tests.
+
+1.03 2005-12-17
+
+  * Code cleanup
+
+1.02 2003-07-03
+
+  * First Public Release
+
+See the source code repository for more detail.
+  http://scratchcomputing.com/svn/Math-Geometry-Planar-Offset/trunk
+
+vim:ts=2:sw=2:et:sta

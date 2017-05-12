@@ -1,0 +1,337 @@
+	template: fill slots with data, control display flow, resume and extend common components
+	components: perform logic based on data and attributes or parameters
+		layout: components that manage other components
+			root-layout: top level layout associated with a window
+		widget: a stand alone compoent
+		layout-manager: helper for layout to arrange and control widget display
+		renderer: given a component, prepare it for viewing in a target viewer (like a browser)
+		themer: controls themeable aspects of components.
+		window: a container of components that manages display in a target view, such as a browersm,
+		     and it has context specific information about the target system.
+		     
+		     
+	registry/catalog: a list of local or remote components that is read by a 
+		layout manager to discover compontents
+	
+	template roles versus inheritance versus 'decorators', or includes, delegation
+		
+	basic.html
+	<html>
+		<head>
+			<title></title>
+		</head>
+		<body>
+			<h1></h1>
+			<p class='introduction'></p>
+			<h2 class='subtitle'></h2>
+			<p class='bodytext'></p>
+		</body>
+	</html>
+
+
+	template UI::Paragraph {
+
+		has 'text' => (
+			isa=>Str,
+		);
+
+
+	template UI::Paragraphs {
+
+		has 'paragraph_list' => (
+			isa=>ArrayRef[Paragraph]
+		);
+	
+	template UI::Section {
+
+		has 'subtitle' => ();
+
+		has 'paragraphs' => ();
+	
+	}
+
+	template UI::Sections {
+		use UI::xHTML qw(html div p);
+
+		has 'sections' => (
+			isa=>ArrayRef[Section]
+		);
+
+		method renders(ArrayRef[Str] $names) {
+		
+			html {
+				div first_dir {
+					@names->h1(Str $name) {
+						$name->html_clean->"{
+							The first name $name is special
+						}
+					}
+					my $last = @pops;
+					@names->p(Str $name) {
+							"My name is $name";
+						}
+					}
+				}
+			}
+		}
+		
+
+		h1 does Loop(@names) {
+			$h1->add_class('first')
+			  if $first;
+			$h1->add_class('last')
+			  if $last;
+			$h1->add_class('even')
+			  if $even;
+			$h1->add_class('odd')
+			  if $odd;
+			$h1->content($item);
+		}
+		
+		
+		
+		html {
+			body {
+				@paragraphs->p(Str $paragraph) {
+					$first->"{ The First $paragraph };
+					$body->"{ $paragraph };
+			}
+			
+			body mybody {
+				$self->paragraphs (Str $paragraph){
+					$body->content($....);
+				}	
+			}
+
+
+			body mybody {
+				p first_block {
+					$p->content($self->shift_paragraphs);
+					$self->first_block if $self->has_paragraphs; ## This or
+					$self->$method if $self->has_paragraphs; ## this also!
+				}
+					
+				p second_block {
+					if(my $paragraph = $self->shift_paragraphs) {
+						$p->content($paragraph);
+						$self->$method;
+					}
+				}
+				
+				p third_block(ArrayRef depends {}  $paragraphs default {$self->$paragraphs}) {
+						$p->content($paragraph->shift);
+						$self->$method($paragraphs);
+				}
+				
+				p forth_block does While($self->paragraphs) {
+					$p->content($self->shift_paragraphs);
+					
+					my $content = $self->shift_paragraphs;
+					content forth_block_content {
+						$content;
+					}
+					
+				}
+				
+				p fifth_block {
+					while($self->paragraphs) {
+						$p->content($self->shift_paragraphs);
+					}
+				}				
+			}
+
+			body mybody {
+				$self->paragraphs myloop(Str $paragraph) {
+					p {
+						$p->content($paragraph);
+					}
+				}	
+			}
+			
+			body mybody {
+				foreach my $paragraph ($self->paragraphs) {
+					my $p = p->content($paragraph);
+					$body->content($p);
+				}	
+			}
+
+			
+			$self->paragraphs {
+				$first { };
+				$even { }:
+				
+				$self->add_event_handler($first) {
+					$self->add_class('first');
+				}
+				
+				
+			}
+		}
+
+
+
+
+		method do_something {
+			## some sort of logic
+		}
+	}
+	
+	tag html {
+		tag body does Filter {
+			
+		}
+	}
+	
+	
+	template NewTemplate {
+		extends BasicTemplate;
+		attribute 'paragraphs' => (isa=>ArrayRef);
+		
+		overlay '//h1' {
+			$matched->create_or_append_attribute({class=>'ggg'});
+			$matched->insert_before->hr;
+			
+		}
+		
+		around first_dir {
+			t h1 {
+				'{This adds some stuff}
+			}
+			$self->$body;
+		}
+	
+	overlay addsomething {
+		
+		match('//h1') as fix_h1s {
+			$matched->create_or_append_attribute({class=>'ggg'});
+			$matched->insert_before->hr;		
+		}
+	
+	}
+	
+	template MyApp::UI::Basic {
+		extends '::RootWindow';
+		
+		has 'title' => ();
+
+		has 'introduction' => ();
+
+		has 'sections' => (isa=>Sections');
+
+
+		render_via Renderer::HTML->new(file=>'basic.html', 
+
+	}
+
+
+	template Hello with xHTML {
+
+		has 'title' => (
+			isa=>Str,
+			requires=>1,
+		);
+
+		has 'scripts' => (
+			isa=>ArrayRef[URL],
+			requires=>1,
+		);
+
+		html {
+			head does Meta {
+				title page_title :id('sss') {
+					$self->title;
+				}
+				foreach my $script ($self->scripts) {
+					script {
+						$tag->url($script);
+					}
+				}
+
+				$self->scripts->script {
+
+				}
+			}
+		}
+	}
+	
+	
+	template Hello {
+	
+		has 'title' => (
+			isa=>Str,
+			required=>1,
+		);
+
+		has 'paragraphs' => (
+			isa=>ArrayRef[Paragraph],
+			required=>1,
+		);
+
+		has 'scripts' => (
+			isa=>ArrayRef[URI],
+			required=>1,
+		);
+		
+		$class->root({},sub {
+			my $root = shift @_;
+			$root->push('html', sub {
+				my $html = shift @_;
+				$html->push(
+					'::MyHead' => {
+						title=>$self->title,
+						scripts=>$self->scripts,
+					}
+				);
+			});
+		});
+	
+	}
+	
+	template MyApp::UI::MyHead {
+	
+		has 'title' => (
+			isa=>Str,
+			required=>1,
+		);
+
+		has 'scripts' => (
+			isa=>ArrayRef[URI],
+			required=>1,
+		);
+		
+		$class->root('meta', sub {
+			$meta->push('title', sub {
+				$title->push('literal', sub {
+					$literal->value($self->title);
+				});
+			});
+			while($self->has_scripts) {
+				$class->push('script', sub {
+					$script->add_attribute('src', sub {
+						$src->value($self->shift_scripts);
+					});
+				});
+			}
+		});
+		
+	}
+
+		$class->$add_node('html', sub {
+		
+		});
+		$html->(sub 
+	});
+	
+	
+lit Stuff {
+	sdfsdf sdfsdf  sd f
+	sdfsdf  sdf  sdfsdf sd  sd fsd
+	fsdw qweqw qweq w  
+}
+
+sub Stuff {
+	my $test =
+
+
+
+

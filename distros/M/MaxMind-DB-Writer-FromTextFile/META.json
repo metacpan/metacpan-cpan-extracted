@@ -1,0 +1,44 @@
+{
+   "abstract" : "Create MaxMind DB from text file",
+   "author" : [
+      "Chen Gang <yikuyiku.com@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.9, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MaxMind-DB-Writer-FromTextFile",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MaxMind::DB::Reader" : "0.050005",
+            "MaxMind::DB::Reader::XS" : "0.060004",
+            "MaxMind::DB::Writer" : "0",
+            "Net::Works::Network" : "0.16"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02"
+}

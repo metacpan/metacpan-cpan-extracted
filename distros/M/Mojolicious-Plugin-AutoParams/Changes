@@ -1,0 +1,8 @@
+Revision history for Mojolicious-Plugin-AutoParams
+
+0.02    Mon Nov 10 17:27:26 EST 2014
+        Fixed tests on perl 5.16.
+
+0.01    Mon Nov 10 15:45:17 EST 2014
+        first release
+

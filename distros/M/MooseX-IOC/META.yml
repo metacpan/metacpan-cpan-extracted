@@ -1,0 +1,28 @@
+---
+name: MooseX-IOC
+version: 0.03
+author:
+  - 'Stevan Little E<lt>stevan@iinteractive.comE<gt>'
+abstract: Moose attributes with IOC integration
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  IOC: 0.29
+  Moose: 0.20
+build_requires:
+  Test::Exception: 0.21
+  Test::More: 0.62
+provides:
+  Moose::Meta::Attribute::Custom::IOC:
+    file: lib/MooseX/IOC/Meta/Attribute.pm
+  MooseX::IOC:
+    file: lib/MooseX/IOC.pm
+    version: 0.03
+  MooseX::IOC::Meta::Attribute:
+    file: lib/MooseX/IOC/Meta/Attribute.pm
+    version: 0.03
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

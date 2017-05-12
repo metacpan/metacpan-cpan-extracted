@@ -1,0 +1,26 @@
+---
+abstract: 'Expiry plug-in for Memoize that adds LRU cache expiration'
+author:
+  - 'Brent B. Powers <Powers@B2Pi.com>'
+build_requires:
+  Memoize: '0'
+  vars: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Memoize-ExpireLRU
+requires:
+  AutoLoader: '0'
+  Carp: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilb/Memoize-ExpireLRU
+  repository: https://github.com/neilb/Memoize-ExpireLRU.git
+version: '0.56'

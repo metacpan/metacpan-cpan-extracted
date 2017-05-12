@@ -1,0 +1,12 @@
+Revision history for Perl extension MouseX::Types::URI
+
+0.03
+        - require Mouse 0.40
+        - require MouseX::Types 0.02
+        - require MouseX::Types::Path::Class 0.06
+
+0.02
+        - use Mouse 0.15 and MouseX::Types 0.01
+
+0.01
+        - original version

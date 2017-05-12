@@ -1,0 +1,2 @@
+# Node with HTML-style entities in label. OK.
+[node.1] {color: pink; label: <<table border='1'><tr><td>HTML-style entities: &amp;, &lt;, &gt; and &quot; in label</td></tr></table>>; shape: rectangle}

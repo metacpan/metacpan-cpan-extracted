@@ -1,0 +1,91 @@
+{
+   "abstract" : "A Module::Build class for building XS modules",
+   "author" : [
+      ":"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Module-Build-XSUtil",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4005"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::CheckCompiler" : "0",
+            "Devel::PPPort" : "0",
+            "Exporter" : "0",
+            "ExtUtils::CBuilder" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "XSLoader" : "0",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Cwd::Guard" : "0",
+            "File::Copy::Recursive" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Module::Build::XSUtil" : {
+         "file" : "lib/Module/Build/XSUtil.pm",
+         "version" : "0.16"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hideo55/Module-Build-XSUtil/issues"
+      },
+      "homepage" : "https://github.com/hideo55/Module-Build-XSUtil",
+      "repository" : {
+         "url" : "git://github.com/hideo55/Module-Build-XSUtil.git",
+         "web" : "https://github.com/hideo55/Module-Build-XSUtil"
+      }
+   },
+   "version" : "0.16",
+   "x_contributors" : [
+      "tokuhirom <tokuhirom@gmail.com>",
+      "Vincent Pit <perl@profvince.com>",
+      "Syohei YOSHIDA <syohex@gmail.com>",
+      "Hideaki Ohno <hide.o.j55@gmail.com>"
+   ]
+}

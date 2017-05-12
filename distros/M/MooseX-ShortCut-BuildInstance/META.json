@@ -1,0 +1,99 @@
+{
+   "abstract" : "A shortcut to build Moose instances",
+   "author" : [
+      "Jed Lund <jandrew@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MooseX-ShortCut-BuildInstance",
+   "no_index" : {
+      "package" : [
+         "Anonymous::Shiras::Moose::Class",
+         "Identity",
+         "Mineral",
+         "Test::Class",
+         "Test::Role",
+         "Vegetable"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.04",
+            "Moose" : "2.1213"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Clone" : "0",
+            "Data::Dumper" : "0",
+            "Moose" : "2.1213",
+            "Moose::Exporter" : "0",
+            "Moose::Meta::Class" : "0",
+            "Moose::Util" : "0",
+            "MooseX::Types" : "0",
+            "MooseX::Types::Moose" : "0",
+            "MooseX::Types::Structured" : "0",
+            "lib" : "0",
+            "perl" : "5.010",
+            "utf8" : "0",
+            "version" : "0.77"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0.12",
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "DateTime" : "0",
+            "List::Util" : "1.33",
+            "Moose" : "2.1213",
+            "Moose::Exporter" : "0",
+            "Moose::Meta::Class" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util" : "0",
+            "MooseX::HasDefaults::RO" : "0",
+            "MooseX::StrictConstructor" : "0",
+            "Smart::Comments" : "0",
+            "Test::Moose" : "0",
+            "Test::Most" : "0",
+            "Type::Tiny" : "1.000",
+            "lib" : "0",
+            "version" : "0.77"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::ShortCut::BuildInstance" : {
+         "file" : "lib/MooseX/ShortCut/BuildInstance.pm",
+         "version" : "v1.44.2"
+      },
+      "MooseX::ShortCut::BuildInstance::Types" : {
+         "file" : "lib/MooseX/ShortCut/BuildInstance/Types.pm",
+         "version" : "v1.44.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jandrew/MooseX-ShortCut-BuildInstance/issues"
+      },
+      "homepage" : "https://github.com/jandrew/MooseX-ShortCut-BuildInstance",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jandrew/MooseX-ShortCut-BuildInstance.git",
+         "web" : "https://github.com/jandrew/MooseX-ShortCut-BuildInstance"
+      }
+   },
+   "version" : "v1.44.2",
+   "x_authority" : "cpan:JANDREW"
+}
+

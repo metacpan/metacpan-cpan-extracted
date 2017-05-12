@@ -1,0 +1,35 @@
+---
+abstract: 'RT extension installer'
+author:
+  - 'Best Practical Solutions'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.17'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Install-RTx
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  Module::Install::RTx:
+    file: lib/Module/Install/RTx.pm
+    version: '0.39'
+  Module::Install::RTx::Remove:
+    file: lib/Module/Install/RTx/Remove.pm
+  Module::Install::RTx::Runtime:
+    file: lib/Module/Install/RTx/Runtime.pm
+requires:
+  Module::Install::Admin: 0.4
+  Module::Install::ReadmeFromPod: 0
+  perl: 5.8.0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: '0.39'

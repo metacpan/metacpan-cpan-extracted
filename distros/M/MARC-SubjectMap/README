@@ -1,0 +1,50 @@
+MARC::SubjectMap
+
+MARC::SubjectMap is a set of modules and command line utilities for
+translating subject headings in your MARC data.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+HOWTO
+
+First you will need a batch of MARC records to generate a SubjectMap config 
+file using the subjmap-tmpl command line tool. You tell subjmap-tmpl what 
+subject fields you would like to be examined for translation, and it will 
+take a pass through your data and auto-generate your stubbed out 
+configuration:
+
+  subjmap-tmpl --in=marc.dat --out=config.xml --translate=650xyzv --copy=650aq 
+
+In this example the x, y, z, and v subfields of the MARC 650 field are extracted
+for translation. In addition the configuration will also include instructions
+to copy subfields a and q since they do not require translation.
+
+DEPENDENCIES
+
+    Test::More
+    Test::Exception
+    MARC::Record
+    Class::Accessor
+    XML::SAX
+    BerkeleyDB
+    Storable
+
+THANKYOUS
+
+This software was commissioned by Queens Borough Public Library who
+made its creation possible, and had the generosity to make the 
+software opensource. 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005,2010 Ed Summers
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

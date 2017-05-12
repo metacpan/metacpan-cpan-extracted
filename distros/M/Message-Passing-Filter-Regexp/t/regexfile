@@ -1,0 +1,15 @@
+# regexfile transfromed from Regexp::Log::Common
+[FORMAT]
+:default  = %host %rfc %authuser %date %request %status %bytes
+:common   = %host %rfc %authuser %date %request %status %bytes
+:extended = %host %rfc %authuser %date %request %status %bytes %referer %useragent
+[REGEXP]
+%host = (?#=host)\S+(?#!host)
+%rfc = (?#=rfc).*?(?#!rfc)
+%authuser = (?#=authuser).*?(?#!authuser)
+%date = (?#=date)\[(?#=ts)\d{2}\/\w{3}\/\d{4}(?::\d{2}){3} [-+]\d{4}(?#!ts)\](?#!date)
+%request = (?#=request)\"(?#=req).*?(?#!req)\"(?#!request)
+%status = (?#=status)\d+(?#!status)
+%bytes = (?#=bytes)-|\d+(?#!bytes)
+%referer = (?#=referer)\"(?#=ref).*?(?#!ref)\"(?#!referer)
+%useragent = (?#=useragent)\"(?#=ua).*?(?#!ua)\"(?#!useragent)

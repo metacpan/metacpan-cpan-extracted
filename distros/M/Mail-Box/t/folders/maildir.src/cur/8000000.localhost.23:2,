@@ -1,0 +1,68 @@
+Received: from ns.ATComputing.nl (ns.ATComputing.nl [195.108.229.25])
+	by atcmpg.ATComputing.nl (8.9.0/8.9.0) with ESMTP id WAA23694
+	for <markov@ATComputing.nl>; Wed, 9 Feb 2000 22:02:24 +0100 (MET)
+Received: (from nobody@localhost)
+	by ns.ATComputing.nl (8.8.8/8.8.8) id WAA01128
+	for <markov@ATComputing.nl>; Wed, 9 Feb 2000 22:02:24 +0100
+Received: from viper.oldcity.dca.net(216.158.38.4) by ns.ATComputing.nl via smap (V2.1)
+	id xma001126; Wed, 9 Feb 00 22:02:01 +0100
+Received: from unca-don.wizards.dupont.com ([204.183.81.133])
+	by viper.oldcity.dca.net (8.9.3/8.9.3/DCANET) with ESMTP id QAA21962;
+	Wed, 9 Feb 2000 16:00:43 -0500
+Received: (from majordomo@localhost)
+	by unca-don.wizards.dupont.com (8.9.3/8.9.3) id PAA29389
+	for magick-outgoing; Wed, 9 Feb 2000 15:38:42 -0500 (EST)
+X-Authentication-Warning: unca-don.wizards.dupont.com: majordomo set sender to owner-magick@wizards.dupont.com using -f
+Date: Wed, 9 Feb 2000 15:44:05 -0500
+From: William Park <parkw@better.net>
+To: Mark Sappol <Mark_Sappol@ipicorp.com>
+Cc: "magick@wizards.dupont.com" <magick@wizards.dupont.com>
+Subject: Re: File Conversion From HTML to PS and TIFF
+Message-ID: <20000209154405.C265@better.net>
+Mail-Followup-To: Mark Sappol <Mark_Sappol@ipicorp.com>,
+	"magick@wizards.dupont.com" <magick@wizards.dupont.com>
+References: <38A11D0E.A2064062@ipicorp.com>
+Mime-Version: 1.0
+X-Mailer: Mutt 1.0pre3i
+In-Reply-To: <38A11D0E.A2064062@ipicorp.com>
+Sender: owner-magick@wizards.dupont.com
+Precedence: bulk
+Reply-To: William Park <parkw@better.net>
+Content-Type: text/plain; charset=us-ascii
+Status: RO
+Content-Length: 1280
+Lines: 33
+
+On Wed, Feb 09, 2000 at 07:53:50AM +0000, Mark Sappol wrote:
+> I am new to this list so please forgive me if I am asking something that
+> has already been answered previously.  I did check the archives but too
+> no avail.
+> 
+> I need to create a postscript file from an HTML document.  I have no
+> problem here with the text but I do have a logo (gif file) on this
+> document which does not get converted.  How can I go about converting
+> the HTML documents I generate, along with any linked GIF images, to
+> PostScript, as well as at other times, to TIFF?
+> 
+> I would appreciate any feedback and help on this request.
+> 
+> Thanks in advance,
+> Mark
+
+You can convert .html to .ps using Netscape.  You can do this manually
+by clicking mouse, or through '-remote' command line option.  For
+example,
+    netscape -remote "openURL(http://sexybabes.for.you/)" \
+	     -remote "saveAs(xxx.ps, Postscript)"
+
+You can then convert .ps to .tiff like FAX program does.
+
+William
+
+***********************************************************************
+To remove yourself from this mailing list, send mail to:
+	majordomo@wizards.dupont.com
+
+Include the following command in the body of your message:
+	unsubscribe magick
+***********************************************************************

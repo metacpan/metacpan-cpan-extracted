@@ -1,0 +1,122 @@
+=head1 NAME
+
+MojoMojo::Installation - Installation instructions for MojoMojo
+
+=head1 INSTALLING MOJOMOJO
+
+=head2 Step 0
+
+Install MojoMojo's prerequisites. See L<http://mojomojo.org/documentation/installation>.
+
+=head2 Step 1 - install
+
+Install MojoMojo either using the cpan shell like this:
+
+    cpan MojoMojo
+
+or by downloading the tarball from L<http://search.cpan.org/dist/MojoMojo> and
+running perl Makefile.PL on it manually. If you do this, run
+
+    make installdeps 
+        
+to get all the required modules installed.
+
+=head2 Step 2 - configure
+
+C<mojomojo.conf> is the main configuration file and is in L<Config::General> format.
+
+First make sure your config file has a valid DSN for your database (You can use
+SQLite, MySQL or PostgreSQL - SQLite by default). The setting you change is in the
+C<connect_info> hash in the C<Model::DBIC> block.
+
+For instance, for MySQL:
+
+    dsn         dbi:mysql:database=mojomojo;host=localhost
+    user        db_user
+    password    db_password
+
+or for SQLite:
+
+    dsn         dbi:SQLite:__HOME__/db/sqlite/mojomojo.db
+    user        db_user
+    passwrd     db_password
+
+or for PostgreSQL:
+
+    dsn         dbi:Pg:dbname=mojomojo;host=localhost;port=5432
+    user        db_user
+    password    db_password
+
+For MySQL and PostgreSQL you want to create the database first (SQLite does this automatically)
+
+    create database mojomojo;
+    
+Once the DSN is setup, we "deploy" the schema and some initial data to the mojomojo database
+by running the following script:
+
+    ./script/mojomojo_spawn_db.pl
+
+This script has sane defaults for a test install, but you can override
+these. Run it with --help to see usage information.  
+
+
+=head2 Step 3 - launch
+
+MojoMojo is a Catalyst application and works with Catalyst's built-in
+web server, or with an external one.
+
+=head3 Using the Catalyst built-in server
+
+Catalyst includes a test server which can be started using:
+
+    ./script/mojomojo_server.pl -p 3000
+
+where 3000 is the port number and the default if no port is specified. Note
+that if you install it through the cpan shell, mojomojo_server will be found
+in your F<bin> directory.
+
+=head3 Using an external web server
+
+MojoMojo has been tested with Apache, lighttpd and nginx. If you need to make
+a choice, nginx and lighttpd are much lighter in terms of resource consumption,
+and faster at serving static files, while Apache is more popular and powerful.
+
+Comparison information can be found at WikiVs:
+
+=over 4
+
+=item * L<http://www.wikivs.com/wiki/Apache_vs_nginx>
+
+=item * L<http://www.wikivs.com/wiki/Lighttpd_vs_nginx>
+
+=item * L<http://www.wikivs.com/wiki/Apache_vs_Lighttpd>
+
+=back
+
+See L<http://mojomojo.org/documentation/deployment> for how to setup MojoMojo
+with various web servers.
+
+=head4 Set up Apache using either mod_perl or FastCGI.
+
+See
+http://search.cpan.org/dist/Catalyst/lib/Catalyst/Manual/Cookbook.pod#Using_FastCGI
+for further information on FastCGI, or you can look at L<Catalyst::Engine::Apache>
+for info on setting up Catalyst apps in Apache.
+
+If your server is connected to a http proxy you may need to add the following
+line to the main config block:
+
+    using_frontend_proxy 1
+
+=head2 Step 4 - login
+
+Login to your MojoMojo and change the admin password. The default login/pass is
+C<admin>/C<admin>.
+
+For troubleshooting, see L<http://mojomojo.org/troubleshooting>.
+
+=head2 Step 5 - create pages
+
+Create a new page.  Decide what URL you would like for the page then 
+browse to that URL.  You will then be asked to add content.  For example,
+if you want to create a page about food, go to /food.

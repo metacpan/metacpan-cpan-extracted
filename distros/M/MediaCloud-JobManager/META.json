@@ -1,0 +1,70 @@
+{
+   "abstract" : "Perl worker / client library for running jobs asynchronously",
+   "author" : [
+      "Linas Valiukas <lvaliukas@cyber.law.harvard.edu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MediaCloud-JobManager",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::githook_perltidy" : "v0.10.2",
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "DateTime" : "0",
+            "File::Slurp" : "0",
+            "File::Temp" : "0",
+            "IO::File" : "0",
+            "IO::Socket::INET" : "0",
+            "JSON" : "2.90",
+            "JSON::XS" : "3.02",
+            "Log::Log4perl" : "0",
+            "Modern::Perl" : "0",
+            "Moose" : "2.1005",
+            "Moose::Role" : "2.1005",
+            "MooseX::Singleton" : "0",
+            "Net::AMQP::RabbitMQ" : "2.100001",
+            "Proc::Background" : "0",
+            "Readonly" : "0",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::Strict" : "0",
+            "Tie::Cache" : "0",
+            "Time::HiRes" : "0",
+            "UUID::Tiny" : "1.04"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "x_Type" : "git",
+      "x_Url" : "git://github.com/berkmancenter/p5-MediaCloud-JobManager.git",
+      "x_Web" : "https://github.com/berkmancenter/p5-MediaCloud-JobManager"
+   },
+   "version" : "0.26",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

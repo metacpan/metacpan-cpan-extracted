@@ -1,0 +1,20 @@
+--- 
+abstract: Link Plugin for MozRepl
+author: Toru Yamaguchi <zigorou@cpan.org>
+distribution_type: module
+generated_by: Module::Install version 0.65
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: MozRepl-Plugin-LinkTools
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Carp::Clan: 5.8
+  JSON: 1.14
+  JSON::Any: 1.08
+  MozRepl: 0.04
+version: 0.01

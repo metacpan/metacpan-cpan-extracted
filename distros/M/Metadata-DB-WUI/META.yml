@@ -1,0 +1,24 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Metadata-DB-WUI
+version:      1.16
+version_from: lib/Metadata/DB/WUI.pm
+installdirs:  site
+requires:
+    CGI::Application:              4.0
+    CGI::Application::Plugin::AutoRunmode: 0.15
+    CGI::Application::Plugin::Feedback: 1.05
+    CGI::Application::Plugin::Forward: 1
+    CGI::Application::Plugin::Session: 1.02
+    CGI::Application::Plugin::TmplInnerOuter: 1.10
+    Cwd:                           3
+    DBD::mysql:                    3
+    File::MimeInfo:                0.15
+    LEOCHARRE::Class::Accessors:   1.12
+    LEOCHARRE::CLI:                1.09
+    LEOCHARRE::Database:           0
+    Metadata::DB:                  1.09
+    Test::Simple:                  0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

@@ -1,0 +1,17 @@
+.*
+!.gitignore
+blib*
+Makefile
+Makefile.old
+Makefile.PL
+Build
+Build.bat
+_build*
+*META.*
+pm_to_blib*
+*.tar.gz
+*.bak
+.lwpcookies
+cover_db
+pod2htm*.tmp
+MooseX-Types-Time-Piece-*

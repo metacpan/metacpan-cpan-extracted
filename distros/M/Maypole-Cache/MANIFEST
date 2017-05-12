@@ -1,0 +1,9 @@
+Cache.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+META.yml                                Module meta-data (added by MakeMaker)
+t/1.t
+t/beerdb.db
+t/ex/BeerCache.pm

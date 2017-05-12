@@ -1,0 +1,308 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Pod::Parser;
+
+our $VERSION = '0.0.2';
+
+our $indent_seq    =   ' ' x 4;            # spaces on every indent level
+
+
+convert( \*STDIN, \*STDOUT );
+
+sub convert {
+    my  ($in_file, $out_file)   =   @_;
+    my  $parser                 =   MyParser->new();
+
+    $parser->parse_from_filehandle( $in_file );
+
+    print $out_file $parser->_dump_as_mdwn();
+
+    return;
+}
+
+package MyParser;               ##Violates 'Modules::RequireFilenameMatchesPackage'
+use base qw(Pod::Parser);
+
+use Data::Dumper;
+
+sub new {
+    my  ($class,@params)    =   @_;
+    my  $self               =   $class->SUPER::new( @params );
+
+    if ($self) {
+        # add private data as a hash ...
+        $self->_private();
+    }
+
+    return $self;
+}
+
+sub _private {
+    my  $self   =   shift;
+
+    if (not exists $self->{_MyParser}) {
+        $self->{_MyParser} = {
+            Text        =>  [],     # final text
+            Indent      =>  0,      # list indent levels counter
+            ListType    =>  '-',    # character on every item
+            searching   =>  undef,  # what are we search ? (title, author, undef ...)
+            Title       =>  undef,  # Page title
+            Author      =>  undef,  # Page author
+        };
+    }
+
+    return $self->{_MyParser};
+}
+
+sub _dump_as_mdwn {
+    my  $parser     =   shift;
+    my  $data       =   $parser->_private();
+    my  $lines      =   $data->{Text};
+    my  @header     =   $parser->_build_mdwn_head();
+
+    return join("\n" x 2, @header, @{ $lines } );
+}
+
+sub _build_mdwn_head {
+    my  $parser     =   shift;
+    my  $data       =   $parser->_private();
+    my  $paragraph  =   '';
+
+    if (defined $data->{Title}) {
+        $paragraph .= sprintf '[[meta title="%s"]]', $data->{Title};
+    }
+
+    if (defined $data->{Author}) {
+        $paragraph .= "\n" . sprintf '[[meta author="%s"]]', $data->{Author};
+    }
+
+    return $paragraph;
+}
+
+sub _save {
+    my  ($parser, $text)  =   @_;
+    my  $data   =   $parser->_private();
+
+    $text = $parser->_indent_text( $text );
+
+    push @{ $data->{Text} }, $text;
+
+    return;
+}
+
+sub _indent_text {
+    my  ($parser, $text)    = @_;
+    my  $data               = $parser->_private();
+    my  $level              = $data->{Indent};
+    my  $indent             = undef;
+
+    if ($level > 0) {
+        $level --;
+    }
+    $indent = ' ' x ($level * 4);
+
+    my @lines = map { $indent . $_; } split(/\n/, $text);
+
+    return wantarray ? @lines : join("\n", @lines);
+}
+
+sub _clean_text {
+    my  $parser     =   shift;
+    my  $text       =   shift;
+    my  @trimmed    =   grep { $_; } split(/\n/, $text);
+
+    return wantarray ? @trimmed : join("\n", @trimmed);
+}
+
+sub command {
+    my ($parser, $command, $paragraph, $line_num) = @_;
+    my  $data   =   $parser->_private();
+
+    # cleaning the text
+    $paragraph = $parser->_clean_text( $paragraph );
+
+    # is it a header ? 
+    if ($command =~ m{head(\d)}xms) {
+        my  $level = $1;
+
+        # the headers never are indented 
+        $parser->_save( sprintf '%s %s', '#' x $level, $paragraph);
+
+        if ($level == 1) {
+            if ($paragraph =~ m{NAME}xmsi) {
+                $data->{searching} = 'title';
+            }
+            elsif ($paragraph =~ m{AUTHOR}xmsi) {
+                $data->{searching} = 'author';
+            }
+            else {
+                $data->{searching} = undef;
+            }
+        }
+    }
+    # opening a list ? 
+    elsif ($command =~ m{over}xms) {
+        # update indent level     
+        $data->{Indent} ++;
+    
+    # closing a list ?         
+    } elsif ($command =~ m{back}xms) {
+        # decrement indent level 
+        $data->{Indent} --;
+    }
+    elsif ($command =~ m{item}xms) {
+        $parser->_save( sprintf '%s %s', 
+                        $data->{ListType}, 
+                        $parser->interpolate($paragraph, $line_num) 
+                );
+    }                 
+
+    # ignore other commands
+    return;
+}
+
+sub verbatim {
+    my ($parser, $paragraph, $line_num) =   @_;
+
+    $parser->_save( $paragraph );
+}
+
+sub textblock {
+    my  ($parser, $paragraph, $line_num) = @_;
+    my  $data   =   $parser->_private();
+
+    # interpolate the paragraph for embebed sequences 
+    $paragraph = $parser->interpolate( $paragraph, $line_num );
+
+    # clean the empty lines
+    $paragraph = $parser->_clean_text( $paragraph );
+
+    # searching ?
+    if ($data->{searching}) {
+        if ($data->{searching} =~ m{title|author}xms) {
+            $data->{ucfirst $data->{searching}} = $paragraph;
+            $data->{searching} = undef;
+        }
+    }
+
+    # save the text
+    $parser->_save( $paragraph );
+}
+
+
+sub interior_sequence {
+    my  ($parser, $seq_command, $seq_argument, $pod_seq) = @_;
+    my  $data = $parser->_private();
+    my  %interiores = (
+        'I'     =>  sub { return '_'  . $_[1] . '_' },       # cursive
+        'B'     =>  sub { return '__' . $_[1] . '__' },     # bold
+        'C'     =>  sub { return '`'  . $_[1] . '`' },       # monospace
+        'F'     =>  sub { return '`'  . $_[1] . '`' },       # system path
+        'S'     =>  sub { return '`'  . $_[1] . '`' },       # code
+        'E'     =>  sub {
+                        my ($seq, $charname) = @_;
+
+                        return '<' if $charname eq 'lt';
+                        return '>' if $charname eq 'gt';
+                        return '|' if $charname eq 'verbar';
+                        return '/' if $charname eq 'sol';
+                        return $charname;
+                    },
+        'L'     =>  \&_resolv_link,
+    );
+
+    if (exists $interiores{$seq_command}) {
+        my $code = $interiores{$seq_command};
+
+        return $code->( $seq_command, $seq_argument, $pod_seq );
+    }
+    else {
+        return sprintf '%s<%s>', $seq_command, $seq_argument;
+    }
+}
+
+sub _resolv_link {
+    my  ($cmd, $arg, $pod_seq) = @_;
+
+    if ($arg =~ m{^http|ftp}xms) {
+        # direct link to a URL
+        return sprintf '<%s>', $arg;
+    }
+    else {
+        return sprintf '%s<%s>', $cmd, $arg;
+    }
+}
+
+1;
+__END__
+=head1 NAME
+
+pod2mdwn  - Convert POD text to Markdown 
+
+=head1 VERSION
+
+This documentation refers to pod2mdwn version 0.0.2.
+
+=head1 USAGE
+
+    $ pod2mdwn < Pod_File > Markdown_File
+
+=head1 DESCRIPTION
+
+This program uses L<Pod::Parser> for convert POD sources into Markdown sources.
+It can be considered as alpha software.
+
+=head1 DIAGNOSTICS
+
+The program yet raise any exceptions.
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+pod2mdwn no need any configuration or environment settings.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<Pod::Parser>
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+=over 
+
+=item * Don't create pure Markdown texts. 
+
+=item * The links to manpages are incompleted
+
+=back
+
+Please report problems to the author.
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Víctor Moral <victor@taquiones.net>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2008 "Víctor Moral" <victor@taquiones.net>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+

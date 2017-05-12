@@ -1,0 +1,28 @@
+Revision history for Module-Starter-Plugin-TT2
+
+0.125   2008-09-14
+        apply https://rt.cpan.org/Ticket/Display.html?id=15027
+
+0.124   2007-11-09
+        add default template for Module::Install
+
+0.123   2006-11-18
+        packaging improvements
+
+0.122   2006-11-14
+        packaging improvements
+        remove hard tabs in templates
+        change templates from starting at version 0.01 to 0.001
+
+0.121   2006-08-05
+        fix capitalization in module template file (rt 16737, thanks EWILHELM!)
+
+0.12    2004-10-19 22:55 EDT
+        included default templates in data section
+        added basic "usage" pod section
+
+0.10    2004-09-20 21:30 EDT
+        some bugs in templates fixed: too much escaping, wrong vars
+
+0.04    2004-08-19 10:50 EDT
+        Stable enough to use.

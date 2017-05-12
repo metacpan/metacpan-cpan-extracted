@@ -1,0 +1,86 @@
+==============================
+9999-99-99 99:99:99 +0000 HEAD
+==============================
+
+  commit 24aa36d6039bfc77696b71723fb0e810d1097821
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Wed Jun 22 19:29:37 2011 -0700
+  
+    Changed prereqs and changed composition_class_roles to be done with
+    around method modifier 
+
+================================
+2011-06-22 12:04:28 -0700 v0.004
+================================
+
+  commit 57d7f81c0c2f75848e128283408010fe537ef5de
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Wed Jun 22 12:04:28 2011 -0700
+  
+    Updated tests and added smartmatch test
+
+  commit e2220b92422fc9e08235a829f141759041d3a68a
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Wed Jun 22 11:52:36 2011 -0700
+  
+    Fixed missing apply-to-role in composite and added test 
+
+================================
+2011-06-19 09:27:10 -0700 v0.003
+================================
+
+  commit 2c3bbbaffbc8032be440383290a57a3991c556cb
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Sun Jun 19 09:27:10 2011 -0700
+  
+    Revised match_requires and match attribute detection routines.
+
+  commit 3a2a7500dacdd0b29f8765b3dc676e7e496b20c4
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Sat Jun 18 21:13:26 2011 -0700
+  
+    Add required_matches sugar and more tests
+
+  commit 5df4f29a4d55e4b0abd70dd4cf47a64bd2808d54
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Sat Jun 18 18:58:36 2011 -0700
+  
+    Debuging issues caused by addition of match_requires
+
+  commit aa29bdeb15b49b5fa8383c2a5752d8b1fee3f226
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Sat Jun 18 17:40:55 2011 -0700
+  
+    added option to require minimum number of matches
+
+  commit 042363096dfad3a6003b919f4ce502ae2d00d913
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Sat Jun 18 17:31:52 2011 -0700
+  
+    changed to using smartmatch
+
+  commit 80e21b140b65e6f6e517591f460c1fa0ee963488
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Sat Jun 18 16:34:37 2011 -0700
+  
+    Updated default for match_attrs to not assume trait applied 
+
+================================
+2011-06-18 15:09:10 -0700 v0.002
+================================
+
+  commit e0ca9e1e82d98314778c8f49ef416998262a09ad
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Sat Jun 18 15:06:29 2011 -0700
+  
+    Fixed distro name in dzil
+
+  commit e2e36fff3389e31b3e72b7997d6be760742753f0
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Sat Jun 18 14:57:49 2011 -0700
+  
+    New CPAN release of MooseX-Attribute-Unique - v0.001 
+
+===================================
+End of changes in the last 365 days
+===================================

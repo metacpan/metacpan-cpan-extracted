@@ -1,0 +1,41 @@
+Revision history for Map::Tube::Exception
+
+3.11  Sat Feb 18 11:40:00 2017
+      - Added exception for Unsupported Map Data Format.
+
+3.10  Fri Feb 17 14:20:00 2017
+      - Moved to dzil tool.
+
+3.09  Sun Feb 05 09:40:00 2017
+      - Added exception for Misssing Map Data.
+
+3.08  Sun Oct 09 08:30:00 2016
+      - Added exception for invalid color name.
+      - Added missing exceptions to the test script t/00-load.t.
+
+3.07  Fri Oct 07 16:55:00 2016
+      - Updated copyright year information.
+
+3.06  Thu Oct 29 09:55:00 2015
+      - Added exceptions for Misssing Plugin FuzzyFind and Missing Plugin Formatter.
+      - Removed the minimum version check for Throwable from Makefile.PL script.
+
+3.05  Wed Oct 14 12:50:00 2015
+      - Added exceptions for Invalid Line Id and Missing Line Id.
+
+3.04  Fri Oct 02 11:25:00 2015
+      - Added unit test for the all exceptions.
+
+3.03  Thu Sep 17 10:50:00 2015
+      - Removed duplicate entry from the MANIFEST file.
+
+3.02  Wed Sep 16 10:15:00 2015
+      - Added exceptions FoundUnsupportedObject, MissingSupportedObject and InvalidSupportedObject.
+
+3.01  Tue Sep 15 12:35:00 2015
+      - Bumped version as it is clashing with previous Map::Tube::Exception v3.00,
+        part of Map::Tube distribution.
+      - Added two new exceptions MissingSupportedMap and FoundUnsupportedMap.
+
+0.01  Tue Sep 15 10:40:00 2015
+      - First version, released.

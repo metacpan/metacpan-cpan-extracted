@@ -1,0 +1,83 @@
+=head1 NAME
+
+Mozilla::DOM::DOMImplementation
+
+=for object Mozilla::DOM::DOMImplementation
+
+Mozilla::DOM::DOMImplementation is a wrapper around an instance of Mozilla's
+nsIDOMDOMImplementation interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+ * The nsIDOMDOMImplementation interface provides a number of methods for
+ * performing operations that are independent of any particular instance
+ * of the document object model.
+ *
+ * For more information on this interface please see
+ * L<http:E<sol>E<sol>www.w3.orgE<sol>TRE<sol>DOM-Level-2-CoreE<sol>>
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::DOMImplementation->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $doc = $domimplementation->B<CreateDocument>($namespaceURI, $qualifiedName, $doctype)
+
+=over
+
+=over
+
+=item * $namespaceURI (string)
+
+=item * $qualifiedName (string)
+
+=item * $doctype (Mozilla::DOM::DocumentType)
+
+=back
+
+=back
+
+=head2 $documenttype = $domimplementation->B<CreateDocumentType>($qualifiedName, $publicId, $systemId)
+
+=over
+
+=over
+
+=item * $qualifiedName (string)
+
+=item * $publicId (string)
+
+=item * $systemId (string)
+
+=back
+
+=back
+
+=head2 $bool = $domimplementation->B<HasFeature>($feature, $version)
+
+=over
+
+=over
+
+=item * $feature (string)
+
+=item * $version (string)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

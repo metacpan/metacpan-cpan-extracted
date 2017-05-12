@@ -1,0 +1,57 @@
+{
+   "abstract" : "A websocket multiplexing layer for Mojolicious applications",
+   "author" : [
+      "Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.014",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Multiplex",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.014",
+            "Browser::Open" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "6.0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::Multiplex" : {
+         "file" : "lib/Mojolicious/Plugin/Multiplex.pm",
+         "version" : "0.02"
+      },
+      "Mojolicious::Plugin::Multiplex::Multiplexer" : {
+         "file" : "lib/Mojolicious/Plugin/Multiplex/Multiplexer.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jberger/Mojolicious-Plugin-Multiplex/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jberger/Mojolicious-Plugin-Multiplex"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

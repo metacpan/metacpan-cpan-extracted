@@ -1,0 +1,97 @@
+v2.01
+
+ * Fix test suite to try and accomodate older memcached versions.
+
+v2.00
+
+ * Fixed up a lot of documentation
+ * Profiling and tracing
+ * Micro-optimizd some bits of code.
+ * Fix {add,append,decr,incr,replace,set}_multi to follow
+   Cache::Memcached::Fast (where they originated)
+ * Update documentation.
+ * Internal architecture dramatically refactored.  Much cleaner
+   delineation of responsibilities among the classes and objects,
+   making it (IMHO) much easier to trace and understand.
+ * Fixed get_multi---we were expecting an arrayref of keys, rather
+   than an array, which is incompatible with other clients.
+ * Add profile script, as a beginning of an effort to profile the
+   client.
+
+v1.07
+
+ * Weaken some references to $self that appear in some anonymous
+   subroutines.  This lowers memory usage by ~ 5MB in one instance we
+   have.
+ * Make Memcache::Client::Connection objects responsible for their own
+   disconnection cleanup.
+
+v1.06
+
+ * Some general cleanups: documentation clarification, removing dead
+   or obsolete code, etc.
+ * Refactor compression to be separate from serialization
+ * Add JSON serialization (initial patch Kaare Rasmussen <kaare at
+   cpan dot com>)
+
+v1.05
+
+ * Add non-destructive retries (that is, preserve the queue of
+   requests) in the face of certain sorts of errors.
+
+v1.04
+
+ * Make some diagnostics more helpful
+ * Don't (knowingly) allow invalid requests
+ * Fix a couple of the binary protocol's methods that could have returned values from errors
+ * Rework testing to be much more robust
+ * General cleanup
+
+v1.03
+
+ * Silence our perlcritic warning.
+ * Add ->connect to try and establish all possible connections at
+   once.
+
+v1.02
+
+ * Finally (hopefully) get tests behaving properly in the face of no
+   memcached executable
+
+v1.01
+
+ * Fix nowait status on replace and set.
+ * Name some of our generated routines.
+
+v1.00
+
+ * Only warn about no route to return results for thing where the
+   results are the point: get, incr/decr, stats, version.
+ * Remove //= use which was making us incompatible with perl < 5.10.
+ * Always warn on socket errors.
+ * Minor cleanups.
+ * Now in production at high-volume site.
+
+v0.99
+
+ * Don't wait on CVs that we were given, rather than generated.
+ * Give a stacktrace when we have a potential no-CV-waiting problem.
+
+v0.98
+
+ * Be more consistent in how we invoke memcached in tests.
+ * Only do the server failure tests if FAIL_TEST is set.
+ * Allow setting of a preprocessor routine for normalization of keys.
+ * Fix various issues with _multi routines, add tests!
+
+v0.97
+
+ * Skip functional tests if memcached is not available.
+
+v0.96
+
+ * Remove unintended dependency on Test::Most.
+
+v0.95
+
+ * Initial public release.

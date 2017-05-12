@@ -1,0 +1,32 @@
+---
+abstract: 'some Moosish types and a type builder'
+author:
+  - 'mateu - Mateu X. Hunter (cpan:MATEU) <hunter@missoula.org>'
+build_requires:
+  Moo: '1.004002'
+  Test::Fatal: '0.003'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-Types-MooseLike
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  strictures: '2'
+requires:
+  Module::Runtime: '0.014'
+resources:
+  IRC: irc://irc.perl.org/#web-simple
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooX-Types-MooseLike
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/mateu/MooX-Types-MooseLike.git
+version: '0.29'
+x_authority: cpan:MATEU

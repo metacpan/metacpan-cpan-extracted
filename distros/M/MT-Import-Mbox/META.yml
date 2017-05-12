@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name: MT-Import-Mbox
+version: 1.01
+author:
+  - Aaron Straup Cope E<lt>ascope@cpan.orgE<gt>
+abstract: |-
+  import one or more mbox messages in to a Movable Type weblog
+license: perl
+requires:
+  Digest::MD5: ''
+  Email::Find: ''
+  Email::Folder: ''
+  Email::MIME: ''
+  File::Find::Rule: ''
+  File::Temp: ''
+  MT::Import::Base: '>= 1.01'
+build_requires:
+  Test::Simple: '>= 0.47'
+provides:
+  MT::Import::Mbox:
+    file: lib/MT/Import/Mbox.pm
+    version: 1.01
+generated_by: Module::Build version 0.2604

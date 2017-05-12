@@ -1,0 +1,24 @@
+--- !!perl/hash:LCFG::Build::PkgSpec 
+abstract: Valid email address type constraints for Moose
+author: 
+  - Stephen Quinney <squinney@inf.ed.ac.uk>
+base: ''
+build: 
+  gencmake: 0
+  remove_input_after_translate: 1
+  translate_before_pack: 1
+date: 03/04/13 13:35:32
+license: GPLv2
+name: MooseX-Types-EmailAddress
+orgident: org.lcfg
+platforms: 
+  - ScientificLinux6
+release: 1
+schema: 1
+translate: 
+  - "*.in"
+vcs: 
+  checkcommitted: 1
+  genchangelog: 1
+  logname: ChangeLog
+version: 1.1.2

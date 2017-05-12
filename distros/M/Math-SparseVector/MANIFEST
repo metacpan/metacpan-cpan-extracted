@@ -1,0 +1,8 @@
+Changes
+INSTALL
+Makefile.PL
+MANIFEST
+README
+t/Math-SparseVector.t
+lib/Math/SparseVector.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,47 @@
+---
+abstract: 'Fast JSON::XS handler for Mojolicious::Renderer'
+author:
+  - 'yowcow <yowcow@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+  Test::Pretty: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MojoX-Renderer-JSON-XS
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MojoX::Renderer::JSON::XS:
+    file: lib/MojoX/Renderer/JSON/XS.pm
+    version: '0.07'
+  Mojolicious::Plugin::JSON::XS:
+    file: lib/Mojolicious/Plugin/JSON/XS.pm
+requires:
+  JSON::XS: '0'
+  Mojolicious: '4.0'
+  parent: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/yowcow/MojoX-Renderer-JSON-XS/issues
+  homepage: https://github.com/yowcow/MojoX-Renderer-JSON-XS
+  repository: git://github.com/yowcow/MojoX-Renderer-JSON-XS.git
+version: '0.07'
+x_contributors:
+  - 'Stig Palmquist <stig@stig.io>'
+  - 'yowcow <yowcow@gmail.com>'
+  - 'Yoko OYAMA <yowcow@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,14 @@
+Changelog for Module-Install-NoAutomatedTesting
+===============================================
+
+0.08  Fri Feb 17 13:51:08 GMT 2017
+  - Handle perls without dot in @INC
+
+0.06	Tue Apr 28 11:57:50 BST 2009
+	- Removed the build_requires for Env::Sanctify, unneeded.
+
+0.04	Tue Apr 28 11:32:55 BST 2009
+	- Added a robust test case
+
+0.02	Tue Apr 28 00:14:40 BST 2009
+	- Initial public release

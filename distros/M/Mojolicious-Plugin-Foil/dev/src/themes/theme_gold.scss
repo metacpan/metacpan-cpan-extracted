@@ -1,0 +1,61 @@
+/* ================================================================== */
+/* THEME: Gold
+ */
+@import 'functions';
+@import 'fonts_gold';
+@import 'icon_dark_on_light';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: hsl(42,82%,51%);
+$verge-fg: set-fg($verge-bg);
+$verge-border: #754c0e;
+$button-bg: #e6c05c;
+$button-fg: set-fg($button-bg);
+$button-border: #754c0e;
+$main-bg: #f2e6aa;
+$main-fg: set-fg($main-bg);
+$link-fg: set-link($main-bg);
+$link-visited: set-visited($main-bg);
+$verge-link-fg: set-link($verge-bg);
+$verge-link-visited: set-visited($verge-bg);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+}
+
+header,
+footer {
+	@extend .verge;
+	background-image: url(gold_h.jpg);
+}
+
+.side {
+	@extend .verge;
+	background-image: url(gold_side.jpg);
+}
+
+body {
+	color: $main-fg;
+	background: $main-bg;
+}
+
+@include many-links($link-fg, $link-visited,$verge-link-fg,$verge-link-visited);
+@include fancy($verge-fg, $verge-bg, "wood3.jpg");
+@include make-buttons;
+
+header nav li {
+    	border-color: #865d1f;
+}
+header nav .selflink,
+header nav em,
+header nav .current a {
+	color: #333300;
+	background-color: #f2e6aa;
+}
+

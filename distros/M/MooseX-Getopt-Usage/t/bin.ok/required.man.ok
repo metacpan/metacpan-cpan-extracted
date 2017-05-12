@@ -1,0 +1,20 @@
+NAME
+    required - Test handling of required attr.
+
+SYNOPSIS
+    required.pl [OPTIONS]
+
+DESCRIPTION
+    In particular this tests the handling of --help and --man when we have
+    missing required options. These should generate usage without errors
+    about missing options.
+
+OPTIONS
+    --help -? --usage
+        Display the usage message and exit
+
+    --man
+        Display man page
+
+    --doom
+

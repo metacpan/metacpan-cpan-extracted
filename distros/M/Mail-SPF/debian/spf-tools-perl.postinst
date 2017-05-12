@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -e
+
+mode=$1
+
+source_package=mail-spf-perl
+
+case "$mode" in
+  configure )
+    prev_version=$2
+
+    update-alternatives --install /usr/bin/spfquery spfquery      /usr/bin/spfquery.$source_package 100 \
+        --slave /usr/share/man/man1/spfquery.1.gz   spfquery.1.gz /usr/share/man/man1/spfquery.$source_package.1p.gz
+    update-alternatives --install /usr/sbin/spfd    spfd          /usr/sbin/spfd.$source_package    100 \
+        --slave /usr/share/man/man8/spfd.8.gz       spfd.8.gz     /usr/share/man/man8/spfd.$source_package.8p.gz
+    ;;
+esac
+
+#DEBHELPER#

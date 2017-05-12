@@ -1,0 +1,51 @@
+Revision history for Perl extension Mojolicious-Plugin-BModel
+
+0.09 2016-03-18T19:23:56Z
+
+    - small improvement of description
+
+0.08 2015-09-26T08:49:21Z
+
+    - skipped new tests in MS Windows
+
+0.07 2015-09-19T08:43:08Z
+
+    - search modules of models has been modved into a separate method 'find_models'
+    - added tests for 'find_models'
+
+0.06 2015-05-21T19:08:08Z
+
+    - skipped part of tests for MS Windows
+
+0.05 2015-05-19T19:12:52Z
+
+    - removed the option 'use_base_model'
+
+0.04 2015-03-10T21:25:01Z
+
+    - Added compatibility with mojo 6.0
+
+0.03 2015-03-05T20:34:43Z
+
+    - simplification of the code + writing documentation with examples
+        * added module of basic model to this package
+        * remove the method generate_base_model
+        * remove the variable $BASE_MODEL
+        * added documentation and comments in code
+
+0.021 2015-03-03T19:59:41Z
+
+    - add a little description of the work
+
+0.012 2015-03-03T18:50:32Z
+
+    - small fix in Changes
+
+0.011 2015-03-03T18:48:38Z
+
+    - renamed to Mojolicious::Plugin::BModel because the name 'Mojolicious::Plugin::Model' already taken
+
+0.01 2015-03-03T18:31:37Z
+
+    - original version
+

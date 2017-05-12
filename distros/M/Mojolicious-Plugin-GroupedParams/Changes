@@ -1,0 +1,14 @@
+Revision history for Mojolicious-Plugin-GroupedParams
+
+0.04    2012-05-06
+        Added custom delimiters support ( koorchik )
+
+0.03    2012-01-20
+        Fixed warnings ( koorchik )
+
+0.02    2011-02-19
+        Changed depricated renderer->helper to app->helper
+
+0.01    2010-12-09
+        First version.
+

@@ -1,0 +1,41 @@
+---
+abstract: 'Reddit OAuth Plugin for Mojolicious::Plugin::Web::Auth'
+author:
+  - 'Olaf Alders <olaf@wundercounter.com>'
+build_requires:
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Web-Auth-Site-Reddit
+no_index:
+  directory:
+    - examples
+    - t
+    - xt
+requires:
+  Config::Pit: '0'
+  FindBin: '0'
+  MIME::Base64: '0'
+  Mojo::Base: '0'
+  Mojolicious::Lite: '0'
+  Mojolicious::Plugin::Web::Auth: '0.13'
+  URI::FromHash: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/oalders/mojolicious-plugin-web-auth-site-reddit/issues
+  homepage: https://github.com/oalders/mojolicious-plugin-web-auth-site-reddit
+  repository: https://github.com/oalders/mojolicious-plugin-web-auth-site-reddit.git
+version: '0.000004'
+x_contributors:
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

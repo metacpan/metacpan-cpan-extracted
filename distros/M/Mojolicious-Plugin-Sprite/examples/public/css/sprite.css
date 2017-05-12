@@ -1,0 +1,11 @@
+.spr-icons-small-add,.spr-icons-medium-cd,.spr-icons-medium-calender,.spr-icons-medium-chat,.spr-icons-medium-close,.spr-icons-medium-folder-open,.spr-icons-medium-forward,.spr-icons-medium-help,.spr-icons-medium-home,.bg-brick{background-image: url('/sprites/sprite.png?1376352016') !important;}
+.spr-icons-small-add{background-position:0px 0px !important;width:32px;height:32px;}
+.spr-icons-medium-cd{background-position:0px -32px !important;width:48px;height:48px;}
+.spr-icons-medium-calender{background-position:0px -80px !important;width:48px;height:48px;}
+.spr-icons-medium-chat{background-position:0px -128px !important;width:48px;height:48px;}
+.spr-icons-medium-close{background-position:0px -176px !important;width:48px;height:48px;}
+.spr-icons-medium-folder-open{background-position:0px -224px !important;width:48px;height:48px;}
+.spr-icons-medium-forward{background-position:0px -272px !important;width:48px;height:48px;}
+.spr-icons-medium-help{background-position:0px -320px !important;width:48px;height:48px;}
+.spr-icons-medium-home{background-position:0px -368px !important;width:48px;height:48px;}
+.bg-brick{background-position:0px -416px !important;background-repeat:repeat-x;}

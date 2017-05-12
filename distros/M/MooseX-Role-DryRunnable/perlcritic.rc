@@ -1,0 +1,5 @@
+[Modules::ProhibitModuleShebang]
+severity = gentle
+ 
+[Subroutines::ProhibitSubroutinePrototypes]
+severity = cruel

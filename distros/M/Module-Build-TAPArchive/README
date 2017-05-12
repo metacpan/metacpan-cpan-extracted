@@ -1,0 +1,69 @@
+NAME
+    Module::Build::TAPArchive - Extra build targets for creating TAP
+    archives
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+    Easily add support for extra build targets that create TAP archives of
+    the tests.
+
+    In your Build.PL
+
+        use Module::Builder::TAPArchive;
+        my $builder = Module::Builder::TAPArchive->new(
+            ...
+        );
+
+    Now you get these build targets
+
+        ]$ perl Build.PL
+        ]$ ./Build test_archive
+
+NEW TARGETS
+    The following build targets are provided:
+
+  test_archive
+    Create a TAP archive to the test run. This archive is placed at
+    test_archive.tar.gz in the current directory by default. You can
+    override this by specifying the "--archive_file" parameter.
+
+        ./Build test_archive --archive_file mytests.tar.gz
+
+AUTHOR
+    Michael Peters, "<mpeters at plusthree.com>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-module-build-taparchive at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Module-Build-TAPArchive>
+    . I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Module::Build::TAPArchive
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Module-Build-TAPArchive>
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/Module-Build-TAPArchive>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/Module-Build-TAPArchive>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/Module-Build-TAPArchive/>
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Michael Peters, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

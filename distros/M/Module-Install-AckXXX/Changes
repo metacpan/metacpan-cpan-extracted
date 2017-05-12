@@ -1,0 +1,56 @@
+0.27 Sat Aug 16 11:34:47 PDT 2014
+ - Meta 0.0.2
+
+0.26 Fri Aug 15 16:03:14 PDT 2014
+ - Add t/000-compile-modules.t
+ - CPAN Day 2014 - 21 Release Salute!
+
+0.25 Sun Aug  3 23:23:16 PDT 2014
+ - Remove (c) from Copyright
+
+0.24 Sun Aug  3 21:16:21 PDT 2014
+ - Forgot to actually undate the Meta file
+
+0.23 Sun Aug  3 21:14:07 PDT 2014
+ - Change IRC channel from ingy to pkg
+
+0.22 Wed Jul 30 15:48:52 PDT 2014
+ - Switch IRC to
+
+0.21 Thu Jul 24 22:40:19 PDT 2014
+ - Need to dep on Module::Install
+
+0.20 Thu Jul 24 10:14:52 PDT 2014
+ - Switch to Zilla::Dist
+
+0.19 Sat Sep 14 14:34:54 PDT 2013
+ - Support Ack 2
+
+0.18 Sun Sep 25 04:14:40 CEST 2011
+ - Minimum perl 5.8.1
+ - https://rt.cpan.org/Public/Bug/Display.html?id=71156
+
+0.17 Wed Jul 27 11:08:41 CDT 2011
+ - Allow XXX usage by modules that require it.
+
+0.16 Wed Jun  1 20:08:44 EST 2011
+ - Rerelease with Module::Package 0.19
+
+0.15 Mon May 30 20:37:21 EST 2011
+ - Rerelease with Module::Package 0.18
+
+0.14 Mon May 30 00:11:03 EST 2011
+ - Rerelease with Module::Package 0.16
+
+0.13 Sat May 28 16:45:30 EST 2011
+ - Rerelease with Module::Package 0.14
+
+0.12 Sat May 28 04:08:19 EST 2011
+ - Fixed mac os dist bug in 0.10
+
+0.11 Fri Sep 17 17:15:20 PDT 2010
+ - Fixed mac os dist bug in 0.10
+
+0.10 Tue Sep 14 17:18:47 PDT 2010
+ - initial release
+

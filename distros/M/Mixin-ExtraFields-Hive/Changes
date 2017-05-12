@@ -1,0 +1,24 @@
+Changelog for Mixin-ExtraFields-Hive
+
+0.007     2013-10-02 12:18:05 America/New_York
+          repackage to provide updated META data
+
+0.006     2011-10-18 14:07:12 America/New_York
+          repackage to provide unbroken META data
+
+0.005     2010-09-01
+          run the standard Data::Hive::Test suite
+
+          fix failures from the above: KEYS, and the *_ALL methods now work
+
+0.004     2010-08-31
+          updated for Data::Hive 1.001
+
+0.003     2007-04-02
+          add _delete_hive method (HDP)
+
+0.002     2007-01-03
+          add _empty_hive method
+
+0.001     2006-12-09
+          first release

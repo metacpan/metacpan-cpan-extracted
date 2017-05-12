@@ -1,0 +1,123 @@
+diff -Naur MP3-Info-1.23/Info.pm MP3-Info-1.23-E3/Info.pm
+--- MP3-Info-1.23/Info.pm	2007-07-26 14:16:33.000000000 -0700
++++ MP3-Info-1.23-E3/Info.pm	2007-10-14 12:40:11.970246264 -0700
+@@ -20,7 +20,8 @@
+ 	@t_bitrate @t_sampling_freq @frequency_tbl %v1_tag_fields
+ 	@v1_tag_names %v2_tag_names %v2_to_v1_names $AUTOLOAD
+ 	@mp3_info_fields %rva2_channel_types
+-	$debug_24 $debug_Tencoding
++	$debug_24 $debug_Tencoding 
++	$get_framelengths @t_frame_lengths @t_samples_per_frame 
+ );
+ 
+ @ISA = 'Exporter';
+@@ -110,7 +111,8 @@
+ 	my $tags = get_mp3tag($file) || { map { ($_ => undef) } @v1_tag_names };
+ 	my %self = (
+ 		FILE		=> $file,
+-		TRY_HARDER	=> 0
++		TRY_HARDER	=> 0,
++		GET_FRAME_LENGTHS => 0,
+ 	);
+ 
+ 	@self{@mp3_info_fields, @v1_tag_names, 'file'} = (
+@@ -1628,6 +1630,12 @@
+ 	my $vbr = _get_vbr($fh, $h, \$off);
+ 	
+ 	my $lame = _get_lame($fh, $h, \$off);
++
++	my $framelengths;
++	if ($get_framelengths) {
++		$framelengths = _get_frame_sizes($fh, $h);
++	}
++
+ 	
+ 	seek $fh, 0, SEEK_END;
+ 	$eof = tell $fh;
+@@ -1646,11 +1654,11 @@
+ 
+ 	$h->{size} = $eof - $off;
+ 
+-	return _get_info($h, $vbr, $lame);
++	return _get_info($h, $vbr, $lame, $framelengths);
+ }
+ 
+ sub _get_info {
+-	my($h, $vbr, $lame) = @_;
++	my($h, $vbr, $lame, $framelengths) = @_;
+ 	my $i;
+ 
+ 	# No bitrate or sample rate? Something's wrong.
+@@ -1699,10 +1707,14 @@
+ 	# should we just return if ! FRAMES?
+ 	$i->{FRAME_LENGTH}	= int($h->{size} / $i->{FRAMES}) if $i->{FRAMES};
+ 	$i->{FREQUENCY}		= $frequency_tbl[3 * $h->{IDR} + $h->{sampling_freq}];
++	$i->{FRAME_SIZE} = $h->{samples_per_frame};
+ 	
+ 	if ($lame) {
+ 		$i->{LAME} = $lame;
+ 	}
++	if ($framelengths) {
++		$i->{FRAME_LENGTHS} = $framelengths;
++	}
+ 
+ 	return $i;
+ }
+@@ -1724,7 +1736,13 @@
+ 
+ 	$h->{bitrate} = $t_bitrate[$h->{ID}][3 - $h->{layer}][$h->{bitrate_index}];
+ 	$h->{fs} = $t_sampling_freq[$h->{IDR}][$h->{sampling_freq}];
+-
++	if ($h->{fs}) {
++		$h->{frame_length} = int($t_frame_lengths[3 - $h->{layer}] * $h->{bitrate} * 1000/ $h->{fs} + $h->{padding_bit});
++	}
++	else {
++		$h->{frame_length} = undef;
++	}
++	$h->{samples_per_frame} = $t_samples_per_frame[$h->{version_index}][3 - $h->{layer}];
+ 	return $h;
+ }
+ 
+@@ -1847,6 +1865,25 @@
+ 	return \%lame;
+ }
+ 
++sub _get_frame_sizes {
++	my ($fh, $h) = @_;
++	my @frames = ();
++	push @frames, $h->{frame_length};
++	seek $fh, $h->{offset} + $h->{frame_length}, SEEK_SET;
++	my $size = $h->{frame_length};
++	while ($size) {
++		my $r = read($fh, my $byte, 4);
++		my $hd = _get_head($byte);
++		last unless (_is_mp3($hd)); 
++		push @frames, $hd->{frame_length}; 
++		$size = $hd->{frame_length};
++		seek $fh, $hd->{frame_length} - 4, SEEK_CUR;
++	}
++	return \@frames;
++}
++
++
++
+ # _get_v2head(file handle, start offset in file);
+ # The start offset can be used to check ID3v2 headers anywhere
+ # in the MP3 (eg for 'update' frames).
+@@ -2450,6 +2487,16 @@
+ 		[44100, 48000, 32000]
+ 	);
+ 
++	@t_frame_lengths = (12, 144, 144);
++
++	@t_samples_per_frame = (
++		[384, 1152, 1152 ],
++		[undef, undef, undef ], #reserved
++		[384, 1152, 576 ],
++		[384, 1152, 1152 ],
++	);
++	
++
+ 	@frequency_tbl = map { $_ ? eval "${_}e-3" : 0 }
+ 		map { @$_ } @t_sampling_freq;
+ 

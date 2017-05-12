@@ -1,0 +1,12 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Surname;Firstname;;;
+FN:First Second
+EMAIL;type=INTERNET;type=WORK;type=pref:email@domain.com
+TEL;type=WORK;type=pref:1231 23  1231
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+N:second sur;second first;;;
+FN:second full name
+END:VCARD

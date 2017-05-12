@@ -1,0 +1,12 @@
+0.04 Mon Feb 16 11:17:15 NOVT 2015
+- Using Mojo::URI for IDN
+- SMTP commands correction by RFC-5321
+
+0.03 Mon Sep 8 12:22:24 NOVT 2014
+- add IDN support
+
+0.02 Mon Aug 25 17:07:39 NOVT 2014
+- add cache for nslookup operation
+
+0.01 Fri Aug 22 13:59:18 NOVT 2014
+- original version;

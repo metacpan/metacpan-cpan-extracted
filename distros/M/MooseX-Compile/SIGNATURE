@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a7ed2adf80a830485c723767ce494ed0043a0a42 MANIFEST
+SHA1 ddb918d4e02cc06f4b9fe77adeca65403f8fdd56 MANIFEST.SKIP
+SHA1 eddc3c6d9b581d9d891b1367441de676eefe100b META.yml
+SHA1 274eb15ab0a10f6bd0a1848d818645089731711d Makefile.PL
+SHA1 dc35e69c652b302a367de53a377d1da978d19685 TODO
+SHA1 7112e2ba506aec283ec0f8f99dc18bb6e329996f benchmarks/load_times/class_accessor/Point.pm
+SHA1 2fabb738f397c3851d783a243739ac36b237954c benchmarks/load_times/class_accessor/Point3D.pm
+SHA1 b9bd8584dc241d79a748a6a1ab26dec80e6f5b7e benchmarks/load_times/compile.sh
+SHA1 0d1264c184133cd960c1096db86760d55b61655a benchmarks/load_times/load_times.pl
+SHA1 08b0a3d6c1c33e22d09842717777f8002ce29160 harness.pl
+SHA1 5b8c262a9584c7d864b7fb2679c2d9a60504647e lib/MooseX/Compile.pm
+SHA1 5160e1919007446c465a36523fbac1c13b847283 lib/MooseX/Compile/Base.pm
+SHA1 cdb42ce48cf490be2109e838750c0568fcfd216a lib/MooseX/Compile/Bootstrap.pm
+SHA1 a4d819321ca71154379f877e0efc29df754aae1c lib/MooseX/Compile/Compiler.pm
+SHA1 e78e07b8b0107a3f0b50500f6ad5e763fcc446af t/001_load.t
+SHA1 13830b6d78743f3d6f190cae1b95d93dfc8b3101 t/010_compiler.t
+SHA1 8627a9a4e5a933ef9c2256b3436abe1a8a0bde0f t/lib/Point.pm
+SHA1 20430d1f78f051d7d331e0d3ea95465aeaa1213a t/lib/Point3D.pm
+SHA1 fd266bedcd8acc08303ed08ca6fe55df1dbc17cf t/point.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFHlkTCVCwRwOvSdBgRAlfPAJ944SmD2J2cbyWBVl0bbpruyK45kwCfZNwz
+vNfkRJVcwDyeo3Co0Mvy2wg=
+=jyXS
+-----END PGP SIGNATURE-----

@@ -1,0 +1,37 @@
+#!/usr/local/bin/perl
+#
+# $Id: scan-log,v 1.2 2001/01/09 12:03:54 cmdjb Exp $
+#
+# Metadata::HTTP class example
+#
+# Copyright (C) 1997-2001 Dave Beckett - http://purl.org/net/dajobe/
+#
+# USAGE:
+#   scan-log <HTTP log file>
+#
+# Outputs lines that look like they came from robots.
+#
+
+require 5.004;
+
+use Metadata::HTTP;
+
+my $md=new Metadata::HTTP;
+
+my $count=0;
+while($md->read(\*STDIN)) {
+  my $is_a_robot=0;
+  $is_a_robot=1 if $md->get('request') =~ /robots\.txt/;
+  if (my $agent=$md->get('agent')) {
+    $is_a_robot=1 if $agent =~ /(?:scooter|slurp|robot|crawl|spider|ultraseek|ferret)/i;
+    next if $agent =~ /(?:link|valid|lint)/i;
+  }
+  next unless $is_a_robot;
+
+  #  print "elements: ",join(' ',$md->elements),"\n";
+  #  for my $el ($md->elements) {
+  #    print $el, ":'", $md->get($el), "'\n";
+  #  }
+
+  print $md->format;
+}

@@ -1,0 +1,10 @@
+Revision history for Perl extension MooX::Types::MooseLike::Email
+
+0.03
+        - Fixed a bug #82807
+
+0.02
+        - Modified a dependance of the MooX::Types::MooseLike
+
+0.01
+        - original version

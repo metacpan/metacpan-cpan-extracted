@@ -1,0 +1,4 @@
+name = "MySQL-Warmer"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

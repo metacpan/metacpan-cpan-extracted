@@ -1,0 +1,19 @@
+---
+name: Module-Replace
+version: 0.02
+author:
+  - 'Darin McBride <dmcbride@cpan.org>'
+abstract: Replace functionality in other modules
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+provides:
+  Module::Replace:
+    file: lib/Module/Replace.pm
+    version: 0.02
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

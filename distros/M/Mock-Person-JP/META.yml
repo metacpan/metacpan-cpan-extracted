@@ -1,0 +1,49 @@
+---
+abstract: 'Generate random sets of Japanese names'
+author:
+  - pawa.
+build_requires:
+  Test::Fatal: 0
+  Test::More: 0.99
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mock-Person-JP
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Mock::Person::JP:
+    file: lib/Mock/Person/JP.pm
+    version: 0.07
+  Mock::Person::JP::Person:
+    file: lib/Mock/Person/JP/Person.pm
+  Mock::Person::JP::Person::Name:
+    file: lib/Mock/Person/JP/Person/Name.pm
+requires:
+  Carp: 0
+  File::RandomLine: 0.20
+  File::ShareDir: 1.00
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/pawa-/Mock-Person-JP/issues
+  homepage: https://github.com/pawa-/Mock-Person-JP
+  repository: git://github.com/pawa-/Mock-Person-JP
+version: 0.07
+x_contributors:
+  - 'Ben Bullock <benkasminbullock@gmail.com>'
+  - 'pawa <pawa@pawafuru.com>'

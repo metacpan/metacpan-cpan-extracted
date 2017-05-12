@@ -1,0 +1,21 @@
+Revision history for Moove
+
+0.006 2017-05-04
+ - Ignore :: in class names
+
+0.005 2017-05-02
+ - Compatability with Function::Parameters v2
+
+0.004 2016-12-21
+ - Bug fix
+
+0.003 2016-12-21
+ - Auto-generation of class contraints
+
+0.002 2016-06-30
+ - Allow build for perl-5.14
+
+0.001 2016-02-01
+ - Initial release
+
+0.000 0000-00-00

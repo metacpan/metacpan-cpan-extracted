@@ -1,0 +1,18 @@
+Source: libmoosex-types-gtin-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 5.0.0)
+Build-Depends-Indep: perl (>= 5.10.1),
+    libmoose-perl,
+    libmoosex-types-perl,
+    libfile-spec-perl
+Maintainer: Dave Lambley <davel@state51.co.uk>
+Standards-Version: 3.7.2
+Homepage: http://search.cpan.org/~dlambley/MooseX-Types-GTIN/
+
+Package: libmoosex-types-gtin-perl
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends},
+    libmoose-perl,
+    libmoosex-types-perl
+Description: Moose types for UPCs, EANs and GTINs.

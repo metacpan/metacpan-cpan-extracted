@@ -1,0 +1,25 @@
+Revision history for Mojolicious-Command-generate-bootstrap_app
+
+0.07    2013-12-25
+        - Updated Bootstrap to 3.0.3
+        - Updated jQuery to 1.10.2
+        - Some Bugfixes
+
+0.06    2013-05-27
+        - Added jQuery to make JavaScript parts of Twitter Bootstrap work
+        - Improved migration management based on MOJO_MODE
+        - Improved configuration based on MOJO_MODE
+
+0.05    2013-05-26
+        - Added application controller
+        - Improved documentation
+
+0.04    2013-05-17
+        - Changed migration script to use config.yml
+        - Fixed missing username and password when creating DBIx::Connector object
+        - Improved documentation
+        - Added generator test, set APP_TESTING to enable it
+
+0.01    2013-02-21
+        - First release
+

@@ -1,0 +1,25 @@
+# $Header: /home/joe/.cvs/Msql-Mysql-modules/nodbd/typemap,v 1.1.1.1 1999/07/13 08:14:45 joe Exp $ 
+
+TYPEMAP
+my_dbh_t		T_DBH
+my_sth_t		T_STH
+s_charp			T_SCP
+
+INPUT
+T_DBH
+	if (sv_derived_from($arg, (char*) Package))
+	    $var = (HV*)SvRV($arg);
+	else
+	    croak(\"$var is not of type %s\", Package)
+
+T_STH
+	if (sv_derived_from($arg, (char*) StPackage))
+	    $var = (HV*)SvRV($arg);
+	else
+	    croak(\"$var is not of type %s\", StPackage)
+
+T_SCP
+	if (SvOK($arg))
+	    $var = (s_charp) SvPV($arg, na);
+	else
+	    $var = NULL

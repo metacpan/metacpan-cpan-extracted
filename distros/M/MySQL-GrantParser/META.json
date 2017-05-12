@@ -1,0 +1,78 @@
+{
+   "abstract" : "parse SHOW GRANTS and return as hash reference",
+   "author" : [
+      "HIROSE Masaaki <hirose31@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.035, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MySQL-GrantParser",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::scan_prereqs_cpanfile" : "0.09",
+            "Dist::Milla" : "v1.0.15",
+            "Pod::Wordlist" : "0",
+            "Test::Fixme" : "0",
+            "Test::Kwalitee" : "0",
+            "Test::Kwalitee::Extra" : "0",
+            "Test::More" : "0.96",
+            "Test::Pod" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "MySQL::GrantParser" : {
+         "file" : "lib/MySQL/GrantParser.pm",
+         "version" : "1.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hirose31/MySQL-GrantParser/issues"
+      },
+      "homepage" : "https://github.com/hirose31/MySQL-GrantParser",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hirose31/MySQL-GrantParser.git",
+         "web" : "https://github.com/hirose31/MySQL-GrantParser"
+      }
+   },
+   "version" : "1.003"
+}
+

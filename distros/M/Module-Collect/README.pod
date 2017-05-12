@@ -1,0 +1,90 @@
+=encoding utf8
+
+=head1 NAME
+
+Module::Collect - Collect sub-modules in directories
+
+=head1 SYNOPSIS
+
+  use Module::Collect;
+  my $collect = Module::Collect->new(
+      path     => '/foo/bar/plugins',
+      prefix   => 'MyApp::Plugin', # optional
+      pattern  => '*.pm',          # optional
+      multiple => 1,               # optional, see t/06_multiple.t
+  );
+
+  my @modules = @{ $collect->modules };
+  for my $module (@modules) {
+      print $module->path;    # package fuke oatg
+      print $module->package; # package name
+      $module->require;       # require package
+      my $obj = $module->new; # aliae for $module->package->new
+  }
+
+=head1 DESCRIPTION
+
+Module::Collect finds sub-modules, or plugins in directories.
+
+The following directory composition
+
+  $ ls -R t/plugins
+  t/plugins:
+  empty.pm  foo  foo.pm  pod.pm  withcomment.pm  withpod.pm
+
+  t/plugins/foo:
+  bar.pm  baz.plugin
+
+The following code is executed
+
+  use strict;
+  use warnings;
+  use Module::Collect;
+  use Perl6::Say;
+
+  my $c = Module::Collect->new( path => 't/plugins' );
+  for my $module (@{ $c->modules }) {
+      say $module->package . ', ', $module->path;
+      $module->require;
+  }
+
+results
+
+  MyApp::Foo, t/plugins/foo.pm
+  With::Comment, t/plugins/withcomment.pm
+  With::Pod, t/plugins/withpod.pm
+  MyApp::Foo::Bar, t/plugins/foo/bar.pm
+
+=head1 AUTHOR
+
+Kazuhiro Osawa E<lt>ko@yappo.ne.jpE<gt>
+
+lopnor
+
+gfx
+
+mattn
+
+=head1 INSPIRED BY
+
+L<Plagger>, L<Module::Pluggable>
+
+=head1 SEE ALSO
+
+L<Module::Collect::Package>
+
+=head1 REPOSITORY
+
+  git clone git://github.com/yappo/p5-Module-Collect.git
+
+Module::Collect is git repository is hosted at L<http://github.com/yappo/p5-Module-Collect>.
+patches and collaborators are welcome.
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=cut
+

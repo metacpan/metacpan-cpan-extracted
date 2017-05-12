@@ -1,0 +1,8 @@
+Makefile
+Makefile.old
+~$
+blib
+tmp
+\.gz$
+\.sav$
+\.yml$

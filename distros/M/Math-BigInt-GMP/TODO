@@ -1,0 +1,12 @@
+The following list is not up to date:
+
+* _lsft() and _rsft() could probably be a bit more optimized
+* move _log_int() to XS
+* _digit() should be in XS
+* _zeros() could be more optimized (divide by 1e5, check for == 0?)
+* replace all malloc() with New() and all free() with Savefree()?
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

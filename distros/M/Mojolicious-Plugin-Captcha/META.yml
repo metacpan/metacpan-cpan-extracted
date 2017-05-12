@@ -1,0 +1,24 @@
+---
+abstract: 'create and validate captcha for Mojolicious framework'
+author:
+  - 'zar <zar@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.141170'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Captcha
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  GD::SecurityImage: '0'
+  Mojolicious: '0'
+  Test::More: '0'
+version: '0.02'

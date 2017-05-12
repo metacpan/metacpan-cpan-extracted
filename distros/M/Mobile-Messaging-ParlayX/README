@@ -1,0 +1,32 @@
+Mobile::Messaging::ParlayX - Interface to SonyEricsson SMS/MMS Gateway
+======================================================================
+
+DOCUMENTAION
+
+For a detailed documentation see the man page:
+
+   man Mobile::Messaging::ParlayX
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   XML::LibXML
+   LWP::UserAgent
+   HTTP::Request
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Thanos Chatziathanassiou
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

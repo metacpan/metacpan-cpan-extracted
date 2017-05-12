@@ -1,0 +1,4 @@
+
+Mail::Audit::Razor is a plugin for Mail::Audit, providing integration with
+Vipul's Razor.
+

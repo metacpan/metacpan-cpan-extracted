@@ -1,0 +1,19 @@
+0.6    2014-06-08
+    - Updated for recent tx error hash change.
+    - Fixed bug tracker url.
+0.5    2013-12-20
+    - Fix private method call
+
+0.4    2011-12-30 22:16:00
+    - Support blocking mode for running outside of IOLoop.
+
+0.3    2011-05-11 11:30:005-11 
+    - Stop using deprecated method
+
+0.2    2010-12-14 09:01:00
+
+    - Update to use async fetching if available 
+
+0.1    2010-12-13 20:27:00
+
+    - Initial release

@@ -1,0 +1,283 @@
+=head1 NAME
+
+Maypole::Manual::Plugins - the Maypole Plugin API
+
+=head1 VERSION
+
+This version written for Maypole 2.10
+
+=head1 LOADING PLUGINS
+
+Plugins occupy the C<Maypole::Plugin::*> namespace on CPAN. At time of writing, 
+there are 16 plugin modules available - see 
+http://search.cpan.org/search?query=Maypole%3A%3APlugin&mode=module
+
+Plugins are loaded into a Maypole application by L<Maypole::Application>. For 
+instance, to add L<HTML::QuickTable> support to the BeerDB example application:
+
+   package BeerDB;
+   use strict;
+   use warnings;
+
+   use Maypole::Application( 'QuickTable' );
+
+Note that the leading C<Maypole::Plugin::*> is omitted.
+
+For some plugins, that's it. You probably have a bunch of new methods available 
+on your Maypole request objects - see the documentation for the plugin.
+
+For others, you will need to set configuration variables or customise other
+parts of the application. For instance, to add sessions to your application, you 
+can use L<Maypole::Plugin::Session>:
+
+   package BeerDB;
+   use strict;
+   use warnings;
+
+   use Maypole::Application( 'Session' );
+
+That's all, if you're willing to stick with the defaults 
+(L<Apache::Session::File> backend, session and lock files in C</tmp/sessions> 
+and C</tmp/sessionlock>). Otherwise, you need to supply some configuration:
+
+   __PACKAGE__->config->session( { class => "Apache::Session::Flex",
+                                   args  => {
+                                       Store     => 'DB_File',
+                                       Lock      => 'Null',
+                                       Generate  => 'MD5',
+                                       Serialize => 'Storable'
+                                       }
+                                   } );
+
+The plugin module is responsible for adding slots to L<Maypole::Config>, in this 
+case, the C<session> accessor.
+
+=head1 WRITING PLUGINS
+
+=head2 Modifying the Maypole request object
+
+Plugins are inserted into the C<@ISA> of the Maypole request object. So method 
+calls on the request object will first search the plugin classes, before looking 
+in L<Maypole>. Methods defined in the plugin are therefore directly available on 
+the request. That also goes for methods inherited by the plugin. I'm not aware
+of any plugins that currently inherit from another package, but there's no 
+reason not to.
+
+Note that if you need simple accessor methods on the request, you can add them 
+by saying
+
+   Maypole->mk_accessors( qw/ fee fi fo / );
+
+at the start of your plugin. Under mod_perl, you've just added these accessors 
+to B<all> Maypole applications on the server, even ones that do not use this 
+plugin. You could instead make the call inside the C<setup> method:
+
+   $r->mk_accessors( qw/ fee fi fo / );
+
+Now the accessors are only added to applications that use this plugin.
+
+=head2 Initialisation with C<setup>
+
+After loading plugins via L<Maypole::Application>, setting configuration 
+variables in calls to C<< __PACKAGE__->config->foo( 'bar' ) >>, and optionally 
+defining custom request methods, your application should call its C<setup> 
+method, generally including arguments for the database connection:
+
+   __PACKAGE__->setup( $dsn, $user, $pass, @more_args );
+
+All of these arguments will be passed to the C<setup_database> method of the 
+model class.
+
+C<Maypole::setup()> is responsible for loading the model class, calling the 
+C<setup_database> method on the model class, and making each table class in the 
+application inherit from the model. It is therefore recommended that you call 
+C<setup> B<after> setting up all your configuration options.
+
+Plugins can intercept the call to C<setup> to carry out their own 
+initialisation, as long as they propagate the call up through the hierarchy. A 
+common idiom for this is:
+
+   Maypole::Plugin::Foo;
+   use strict;
+   use warnings;
+
+   use NEXT;
+
+   sub setup
+   {
+       my $r = shift;
+
+       $r->NEXT::DISTINCT::setup(@_);
+
+       # Foo initialisation goes here
+       my $option = $r->config->foo_option;
+
+       # do something with $option
+   }
+
+L<NEXT> is a replacement for the built-in C<SUPER> syntax. C<SUPER> dispatches a 
+call to the superclass of the current package - B<but> it determines the 
+superclass at compile time. At that time, the superclass is something like 
+C<main::>. L<NEXT> does the superclass lookup at runtime, after 
+L<Maypole::Application> has inserted the plugin into the request class's 
+inheritance chain.
+
+The C<DISTINCT> modifier ensures each plugin's C<setup> method is only called 
+once, and protects against diamond inheritance. This may or may not be an issue 
+in your app - and if you always use the C<DISTINCT> syntax, it won't be.
+
+Notice that the C<setup> call is re-dispatched before running the plugin's own 
+initialisation code. This allows C<Maypole::setup()> to set up the database, 
+model, and table classes, before your plugin starts tweaking things.
+
+You can use the C<setup> method to load modules into the request class 
+namespace. L<Maypole::Plugin::I18N> has:
+
+   sub setup {
+       my $r = shift;
+       $r->NEXT::DISTINCT::setup(@_);
+       require Locale::Maketext::Simple;
+       import Locale::Maketext::Simple
+         Class  => $r,
+         Export => '_loc',
+         Path   => $r->config->lexicon;
+}
+
+Now the application namespace has a C<_loc> function (exported by 
+L<Locale::Maketext::Simple>), (plus C<lang> and C<maketext> methods inherited 
+from L<Maypole::Plugin::I18N>).
+
+=head3 More initialisation with C<init>
+
+L<Maypole> also defines an C<init> method. It
+pulls the name of the view class from the config, loads it, instantiates an 
+object in the view class, and sets this in the C<view_object> config slot.
+
+In CGI applications, C<init> is called at the start of every request.
+
+Under mod_perl, this method will only ever be called once per server child, at 
+the start of the first request after server startup. If instead, you call this 
+method in your application module (after the call to C<setup>), then the code 
+loaded by this call will be shared by all child servers.
+
+See B<Hacking the view> for a plugin that uses C<init>.
+
+=head2 Adding configuration
+
+The configuration object can be retrieved from the Maypole request object 
+(C<< $r->config >>) or as a class method on the application (e.g. 
+C<< BeerDB->config >>).
+
+If your plugin needs some custom configuration settings, you can add methods to 
+the config object by saying
+
+   Maypole::Config->mk_accessors( qw/ foo bar baz / );
+
+at the start of your plugin. In the application, after the 
+C<Maypole::Application> call, these methods will be available on the config 
+object.
+
+=head2 Modifying the Maypole model
+
+=over 4
+
+=item Replacing the model
+
+To load a different model, set 
+C<< __PACKAGE__->config->model( 'Custom::Model' ) >> in the application
+before calling C<setup>. You could instead set C<< $r->config->model >> before 
+re-dispatching the C<setup> call, but this is going to confuse and annoy your 
+users.
+
+=item Hacking the model
+
+B<CAVEAT>: the way I do this just seems dirty, so there must be a Better Way.
+
+L<Maypole::Plugin::FormBuilder> (part of the L<Maypole::FormBuilder> 
+distribution), in its C<setup> method, loads a custom pager class into the model 
+by saying
+
+   eval "package $model; use $pager";
+
+Yuk. Note that under mod_perl, you have just forced B<every> application using 
+C<$model> to also use C<$pager>.
+
+C<Maypole::Plugin::AutoUntaint::setup()> loads an extra method into the model by 
+saying
+
+   no strict 'refs';
+   *{"$model\::auto_untaint"} = \&Class::DBI::Plugin::AutoUntaint::auto_untaint;
+
+Yuk again. And again, under mod_perl, now every application using C<$model> has 
+an C<auto_untaint> method added to its model.
+
+Same plugin, next line has
+
+   eval "package $model; use Class::DBI::Plugin::Type";
+
+Same yuk, same mod_perl caveat.
+
+
+=back
+
+
+=head2 Modifying the Maypole view
+
+=over 4
+
+=item Replacing the view
+
+Again, just specify a different view in the application configuration.
+
+=item Hacking the view
+
+L<Maypole::Plugin::FormBuilder> intercepts the C<init> call to override the 
+C<vars> method in the view class. First it re-dispatches the C<init> call, which 
+will set up either a default view class and object, or those configured in the 
+application. Then it builds a new view class on-the-fly, and makes this new 
+class inherit from L<Maypole::FormBuilder::View> and from the original view 
+class. Finally it replaces the C<view> and C<view_object> in the application's 
+config object.
+
+   sub init
+   {
+       my ( $class ) = @_;
+
+       my $config = $class->config;
+
+       $class->NEXT::DISTINCT::init;
+
+       my $old_view = $class->config->view ||
+           die "Please configure a view in $class before calling init()";
+
+       my $virtual_view = "$class\::__::View";
+
+       eval <<VIEW;
+   package $virtual_view;
+   use base qw( Maypole::FormBuilder::View $old_view );
+   VIEW
+
+       die $@ if $@;
+
+       $config->view( $virtual_view );
+
+       $class->view_object( $virtual_view->new );
+   }
+
+
+There really must be a Better Way.
+
+=back
+
+=head1 AUTHOR
+
+David Baird, C<< <cpan@riverside-cms.co.uk> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2005 David Baird, All Rights Reserved.
+
+This text is free documentation; you can redistribute it and/or modify it
+under the same terms as the Perl documentation itself.
+
+=cut

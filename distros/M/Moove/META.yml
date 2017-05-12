@@ -1,0 +1,43 @@
+---
+abstract: 'functions and methods with parameter lists and type constraints'
+author:
+  - 'David Zurborg <zurborg@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0'
+  Test::Most: '0'
+  Type::Library: '0'
+  Types::Standard: '0'
+  perl: '5.014'
+configure_requires:
+  Module::Build: '0.28'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Moove
+requires:
+  Carp: '0'
+  Data::OptList: '0.109'
+  Function::Parameters: '1.0703'
+  Import::Into: '1.002004'
+  Syntax::Feature::Try: '1.003'
+  Type::Registry: '0'
+  Type::Tiny: '1.000006'
+  Type::Utils: '0'
+  constant: '0'
+  perl: '5.014'
+  strictures: '2'
+  syntax: '0'
+resources:
+  bugtracker: https://github.com/zurborg/libmoove-perl/issues
+  homepage: https://github.com/zurborg/libmoove-perl
+  repository: https://github.com/zurborg/libmoove-perl.git
+version: '0.006'
+x_contributors:
+  - 'David Zurborg <d.zurborg@vcare24.de>'
+  - 'Lukas Mai <l.mai@web.de>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,36 @@
+---
+abstract: 'Client to MikroTik RouterOS API'
+author:
+  - 'Martin Gojowsky, C<< <martin at gojowsky.de> >>'
+  - 'Martin Gojowsky <martin@gojowsky.de>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  Module::Install: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MikroTik-API
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Digest::MD5: 0
+  IO::Socket::INET: 0
+  IO::Socket::SSL: 0
+  Moose: 0
+  Time::Out: 0
+  namespace::autoclean: 0
+  perl: 5.6.0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=MikroTik-API
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: git://github.com/martin8883/MikroTik-API
+version: 1.0.4

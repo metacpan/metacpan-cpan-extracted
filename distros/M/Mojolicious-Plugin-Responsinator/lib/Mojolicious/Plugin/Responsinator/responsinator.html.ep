@@ -1,0 +1,49 @@
+% title "$identifier $orientation ($width X $height)";
+<html>
+<head>
+  <title><%= title %></title>
+  %= stylesheet '/responsinator/responsinator.css'
+</head>
+<body>
+  <div class="toolbar">
+    <select id="select_identifier">
+    % for my $id (qw( iphone iphone-5 ipad wildfire nexus-4 )) {
+      <option value="<%= $id %>"<%= $identifier eq $id ? ' selected="selected"' : '' %>><%= ucfirst $id %></option>
+    % }
+    </select>
+    <select id="select_orientation">
+      <option value="landscape"<%= $orientation eq "landscape" ? ' selected="selected"' : '' %>>Landscape</option>
+      <option value="portrait"<%= $orientation eq "portrait" ? ' selected="selected"' : '' %>>Portrait</option>
+    </select>
+  </div>
+  <div class="container">
+    <div class="device<%= $identifier =~ /^\d/ ? "" : " $identifier" %> <%= $orientation %>">
+      <div class="screen">
+        <iframe src="<%= $frame_url %>" style="<%= $width ? "width:$width;" : "" %><%= $height ? "height:$height;" : "" %>"></iframe>
+      </div>
+    </div>
+  </div>
+  <div class="credits">
+    Images from <%= link_to 'Responsinator', 'http://www.responsinator.com/' %>
+  </div>
+  %= javascript begin
+;(function(d, l) {
+  var param_name = '<%= $param_name %>';
+  var iframe = document.getElementsByTagName('iframe')[0];
+  var data = l.href.match(new RegExp(param_name + '=([^&]+)'))[1].split(':');
+  var go = function() { l.assign(l.href.replace(new RegExp(param_name + '=([^&]+)'), param_name + '=' + data.join(':'))); };
+  d.getElementById('select_identifier').onchange = function() { data[0] = this.value; go(); };
+  d.getElementById('select_orientation').onchange = function() { data[1] = this.value; go(); };
+
+  document.body.style.overflow = 'hidden';
+  var scrollbar_width = document.body.clientWidth;
+  document.body.style.overflow = 'scroll';
+  scrollbar_width -= document.body.clientWidth;
+  if(!scrollbar_width) scrollbar_width = document.body.offsetWidth - document.body.clientWidth;
+  document.body.style.overflow = '';
+  window.scrollbar_width = scrollbar_width;
+  iframe.style.width = iframe.offsetWidth + scrollbar_width + 'px';
+})(document, location);
+  % end
+</body>
+</html>

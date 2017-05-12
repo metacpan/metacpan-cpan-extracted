@@ -1,0 +1,21 @@
+---
+abstract: 'a simple download tool'
+author:
+  - '舌尖上的牛氓 <yiming.jin@live.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojo-Downloader
+requires:
+  AnyEvent: 0
+  Coro: 0
+  Mojo: 0
+  Momo: 0
+  YAML: 0
+version: 0.2

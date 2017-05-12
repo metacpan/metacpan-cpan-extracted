@@ -1,0 +1,6 @@
+Revision history for Mojolicious-Plugin-Disqus
+
+1.22      2011-04-25 15:33:11 Asia/Jakarta
+    Helper didn't pass the right data
+
+1.21      2011-04-25 05:01:59 Asia/Jakarta

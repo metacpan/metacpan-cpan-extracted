@@ -1,0 +1,13 @@
+History of user-visible changes for Math::BLAS.  -*- text -*-
+
+
+Version 1.01
+
+* Document Math::BLAS::PP.
+
+* Bug fixes.
+
+
+Version 1.00
+
+* Initial release.

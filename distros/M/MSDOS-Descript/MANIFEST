@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+inc/My_Build.pm
+lib/MSDOS/Descript.pm
+t/00-all_prereqs.t
+t/00-load.t
+t/10-descript.t
+t/sample.des
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t

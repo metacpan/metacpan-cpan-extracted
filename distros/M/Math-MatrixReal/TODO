@@ -1,0 +1,95 @@
+=============================
+  Package "Math-MatrixReal"
+=============================
+
+Plans for the future:
+---------------------
+ * Jonathan Leto ideas:
+
+Row echelon form
+Column echelon form
+Hard: Jordan form
+More examples in docs
+print as mathematica,scilab,other,...
+DONE:print as latex
+DONE:print as matlab
+DONE:make each,each_diag 1-based for consistency SOON
+t/basic.t should check results
+alphabetize section of docs
+
+$matrix->set_option( expand_on_assign => 1 );
+Pade' matrix exponential
+
+ * Steffen Beyer ideas:
+
+Define accurate test cases (which is not so trivial since results will
+depend on the local implementation of floating point arithmetics on
+a given machine!).
+
+Compute the characteristic polynom, orthogonal matrices, ...
+
+Deal with symmetric and with orthogonal matrices, multilinear functions, ...
+
+Create a module "Math::MatrixCplx" to deal with matrices of complex numbers...
+
+Deal with hermitian matrices, multilinear functions, ...
+
+
+ * Rodolphe Ortalo remarks and thoughts:
+
+Some restructuring/recoding ideas:
+
+ RO1- Wouldn't it be better to use a hash reference for MatrixReal
+objects? I feel $matrix->{ROWS} is much clearer than $matrix->[1],
+and it is probably as efficient. Do you have objections on such
+evolutions? This would probably be an important update...
+
+ RO2- Sparse matrix, Symetric matrix, (Tridiagonal, Permutation[1]?)
+Is it desirable to use special-hooks in MatrixReal objects,
+or would it better to use object-oriented inheritance?
+ * In the first case, maintainance may be difficult.
+ * In the second case, efficiency problems may arise (all value
+accesses should go through methods like ->element() and assign(),
+even for internal computation routines of the module...)
+I'd favour the second solution, but it would involve a big
+update of the existing methods (e.g. if we want MatrixReal
+->multiply() to work also on derived matrix classes).
+
+ RO3- Sparse matrix: use hash tables ($M->[0]{$i}{$j})? I personnally
+think that this would be general and simple. Real techniques for
+sparse matrix manipulation (e.g. Yale representation) are much
+better - but more difficult to use (especially as they are optimized
+for some operation like multiplication of a vector).
+Furthermore, it would be possible to use these matrix for other
+purposes rather efficiently (permutation matrix would be easy)
+and without worrying too much... (The last reason if probably
+the most important to me... :-)
+If we don't want too much maintainance problems, this is linked
+to RO4 - unfortunately...
+
+ RO4- Add ->get() and ->set() methods, that uses index value where
+(i,j) is in (0...n-1,0...m-1). ->element() and ->assign() use
+indexes variying in (1..n,1..m) and this involves two additional
+'++' operations. These may be costly (IF they are used heavily
+for computations of course).
+ ==> I tried! This has a VERY BAD impact on performance. It's
+probably unacceptable to add this method call. (Even a subroutine
+call is very costly.) Such modifications occur in the inner loop
+of all algorithms so it's very touchy of course to change these
+things. Well. I don't have an idea on this. Maybe future versions
+of Perl itself would be able to inline the call, and enable us
+to use such access methods.
+
+ RO5- The POD documentation deserves some more structuring. For
+example, sections for
+ - arithmetic ('+,-,*,/') operations,
+ - linear system solving,
+ - eigensystems,
+ - Kleene transformation, etc.
+
+UPDATE: working on it -- leto
+
+
+[1] What I mean by "permutation matrix" is a matrix where only a
+single element of each column (or each row) is non-zero, and that
+element is equal to 1. Such a matrix allow to 'shuffle axes' easily.

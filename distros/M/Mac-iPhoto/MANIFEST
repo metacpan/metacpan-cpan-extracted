@@ -1,0 +1,7 @@
+Changes
+LICENSING.txt
+MANIFEST			This list of files
+Makefile.PL
+README				Short Doc
+iPhoto.pm			Module
+print_album.pl			Small example of usage

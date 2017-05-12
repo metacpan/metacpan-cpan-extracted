@@ -1,0 +1,10 @@
+Revision history for MARC-Loader
+0.004 Fri August 26 10:29:00 EDT 2011
+    - add ability to define many controlfields with same field name
+0.003 Mon July 11 16:53:00 EDT 2011
+    - add ability to reorder fields and subfields in a chosen order
+0.002 Tue May 3 14:53:00 EDT 2011
+    - add support of controlfields
+    - add ability to define the record's leader
+    - add ability to reorder fields and subfields of each field in alphabetical order
+    - add ability to remove non-sorting characters

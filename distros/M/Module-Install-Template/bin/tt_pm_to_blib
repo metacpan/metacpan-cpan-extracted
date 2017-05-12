@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use Template;
+our $VERSION = '0.08';
+my $config_filename = shift;
+die "config filename?\n"
+  unless defined $config_filename && length $config_filename;
+open my $fh, '<', $config_filename or die "can't open $config_filename: $!\n";
+my $config;
+eval do { local $/; <$fh> };
+die $@ if $@;
+close $fh or die "can't close $config_filename: $!\n";
+my $template = Template->new($config->{template})
+  || die Template->error(), "\n";
+my $source = do { local $/; <> };
+my $vars = { %{ $config->{vars} }, SOURCE => $source, };
+$template->process(\$source, $vars)
+  || die $template->error();

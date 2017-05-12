@@ -1,0 +1,23 @@
+<html>
+<head>
+    <link href="[% base %]/css/maypole.css" type="text/css" rel="stylesheet" />
+</head>
+
+<body>
+<div id="content">
+<div id="title">
+    [% config.application_name || "A poorly configured Maypole application" %]
+</div>
+<div id="frontpage_list">
+<ul>
+[% FOR table = config.display_tables %]
+    <li>
+        <a href="[% base %]/[%table%]/list">List by [%table %]</a>
+    </li>	
+[% END %]
+</ul>
+</div>
+
+[% INCLUDE boxes %]
+
+[% INCLUDE footer %]

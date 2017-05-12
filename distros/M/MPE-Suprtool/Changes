@@ -1,0 +1,9 @@
+Revision history for Perl extension MPE::Suprtool.
+
+0.5   Mon Nov  5 15:54:55 2001
+	- original version; created by h2xs 1.20 with options
+		-cfn MPE::Suprtool
+0.51  Wed Nov 14 2001
+        - removed "use MPE::CIvar" from t/test.t
+	  (module not actually used, but caused test to fail
+	   for users who did not have it installed)

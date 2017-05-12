@@ -1,0 +1,24 @@
+Revision history for MozRepl
+
+0.06    2007/07/04 15:26
+        * Fixed setup_log() process in MozRepl.pm
+          Available using instanciate log class.
+
+0.05    2007/07/02 12:53
+        * Skip defined plugin method
+
+0.04    2007/05/23 13:51
+        * Switch json generate process from json.org to JSONstring
+
+0.03    2007/05/23 00:13
+        * Fixed for cygwin.
+          * At test scripts, using binmode on telnet under cygwin.
+          * Translate newline to space on input string under cygwin. (Temporary fix.)
+        * Switch from Carp to Carp::Clan
+
+0.02    2007/05/09 21:44
+        * Remove help() method from MozRepl::Plugin::Base
+        * Add correct pod to MozRepl::Plugin::Base
+
+0.01    2007/05/01 11:06
+        * First version.

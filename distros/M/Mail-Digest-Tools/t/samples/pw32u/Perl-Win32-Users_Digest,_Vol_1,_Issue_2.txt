@@ -1,0 +1,517 @@
+Send Perl-Win32-Users mailing list submissions to
+perl-win32-users@listserv.ActiveState.com
+
+To subscribe or unsubscribe via the World Wide Web, visit
+http://listserv.ActiveState.com/mailman/listinfo/perl-win32-users
+or, via email, send a message with subject or body 'help' to
+perl-win32-users-request@listserv.ActiveState.com
+
+You can reach the person managing the list at
+perl-win32-users-admin@listserv.ActiveState.com
+
+When replying, please edit your Subject line so it is more specific
+than "Re: Contents of Perl-Win32-Users digest..."
+
+
+Today's Topics:
+
+  1. RE: Net::SSH::Perl (skillman)
+  2. RE: Perl and delphi interaction query. (Lynn. Rickards)
+  3. RE: Net::SSH::Perl (skillman)
+  4. Re: Net::SSH::Perl (skillman)
+  5. Re: Net::SSH::Perl (Odysseus)
+  6. RE: Net::SSH::Perl (Armour, Mike)
+  7. qx// broken on Win98 (lang@some.web.address.com)
+  8. RE: qx// broken on Win98 (Tobias Heinrich)
+  9. Re: qx// broken on Win98 (Odysseus)
+ 10. Re: qx// broken on Win98 (Keith C. Dandelion)
+ 11. Re: qx// broken on Win98 (Greg Marlinson)
+ 12. Re: qx// broken on Win98 (Greg Marlinson)
+ 13. Re: Net::SSH::Perl (Odysseus)
+ 14. RE: Perl and delphi interaction query. (Baker Richard-qswi266)
+
+----------------------------------------------------------------------
+
+Message: 1
+Subject: RE: Net::SSH::Perl
+From: skillman <skillman@yahoo.com>
+Reply-To: skillman@yahoo.com
+To: John_Ramrod <john_Ramrod@some.web.address.com.com>
+Cc: perl-win32-users@listserv.ActiveState.com
+Date: Tue, 10 Feb 2004 12:54:56 -0500
+
+Dear folks,
+
+> Just out of curiosity, in what sense did you find Math::Pari
+> a PoC?
+> 
+> Did you have trouble building it? I did a quick web search,
+> and saw a couple of plaintive posts by people having trouble
+> building it on AIX. I'm just wondering in case I ever need to
+> use it.
+
+I could not get this (Math::Pari) to build on Win32 under Cygwin. It was
+a known bug when I did a net crawl to find out more info. Anyone any
+more information? Activestate don't supply the module either, so I was
+seeking to build under the latest Cygwin port / toolset instead.
+
+I had no problem building under Linux.
+
+Derek Jones.
+
+
+------------------------------
+
+Message: 2
+Reply-To: <lynn@some.web.address.com>
+From: "Lynn. Rickards" <lynn@some.web.address.com>
+To: "'Baker Richard-qswi266'" <Richard.Baker@some.web.address.com>,
+       <Perl-Win32-Users@listserv.ActiveState.com>
+Subject: RE: Perl and delphi interaction query.
+Date: Tue, 10 Feb 2004 15:34:22 -0500
+
+
+
+Can't help with delphi but in view of your analysis try using
+a .xpm image, which can be included in your script like so...
+
+$mw->Pixmap( 'myicon', -data => loadIcon());
+$mw->Icon( -image => 'myicon' );
+
+sub loadIcon
+{
+return <<'EOT';
+
+};
+EOT
+}
+
+HTH - Lynn.
+> 
+> It works perfectly under all circumstances.
+> 
+> I really want to use my icon, so does anyone know why it 
+> won't run when
+> fired off from delphi?
+
+
+
+------------------------------
+
+Message: 3
+Subject: RE: Net::SSH::Perl
+From: skillman <skillman@yahoo.com>
+Reply-To: skillman@yahoo.com
+To: "Armour, Mike" <marms@some.web.address.com>
+Cc: "'perl-win32-users@listserv.ActiveState.com'" <perl-win32-users@listserv.activestate.com>,
+       "'John Ramrod'" <john_Ramrod@some.web.address.com.com>
+Date: Tue, 10 Feb 2004 16:08:04 -0500
+
+Thanks Mike, I will have another go.
+
+> I successfully built it last night using "cpan" under Cygwin
+> on my WinXP-Pro system running the latest Cygwin updates.
+> I am using Cygwin's Perl 5.8.2-1 (the current version available).
+> Also, I may have required Cygwin's perl-libwin32 0.191-1
+> (the current version of this library) package. I am
+> using the most recent version of gcc and gnu make. Hope
+> this helps.
+
+Kind regards
+
+Derek.
+
+
+
+------------------------------
+
+Message: 4
+Subject: Re: Net::SSH::Perl
+From: skillman <skillman@yahoo.com>
+Reply-To: skillman@yahoo.com
+To: Odysseus <kalinabears@some.web.address.com>
+Cc: John_Ramrod <john_Ramrod@some.web.address.com.com>,
+       perl-win32-users@listserv.activestate.com
+Date: Tue, 10 Feb 2004 17:43:34 -0500
+
+Dear Rob,
+
+
+> Perl 5.6:
+> ppm install http://theoryx5.uwinnipeg.ca/ppmpackages/Math-Pari.ppd
+> 
+> Perl 5.8
+> ppm install http://theoryx5.uwinnipeg.ca/ppms/Math-Pari.ppd
+
+Aha! Thank you!
+
+Kind regards
+
+Derek.
+
+
+
+------------------------------
+
+Message: 5
+Date: Wed, 11 Feb 2004 09:21:00 +1100
+From: Odysseus <kalinabears@some.web.address.com>
+To: skillman@yahoo.com
+CC: John_Ramrod <john_Ramrod@some.web.address.com.com>,
+       perl-win32-users@listserv.activestate.com
+Subject: Re: Net::SSH::Perl
+
+skillman wrote:
+
+> 
+> I could not get this (Math::Pari) to build on Win32 under Cygwin. It was
+> a known bug when I did a net crawl to find out more info. Anyone any
+> more information? Activestate don't supply the module either, so I was
+> seeking to build under the latest Cygwin port / toolset instead.
+> 
+
+Perl 5.6:
+ppm install http://theoryx5.uwinnipeg.ca/ppmpackages/Math-Pari.ppd
+
+Perl 5.8
+ppm install http://theoryx5.uwinnipeg.ca/ppms/Math-Pari.ppd
+
+Cheers,
+Rob
+
+
+------------------------------
+
+Message: 6
+From: "Armour, Mike" <marms@some.web.address.com>
+To: "'Derek Jones'" <skillman@yahoo.com>
+cc: "'perl-win32-users@listserv.ActiveState.com'"
+<perl-win32-users@listserv.activestate.com>,
+       "'John Ramrod'" <john_ramrod@some.web.address.com.com>
+Subject: RE: Net::SSH::Perl
+Date: Tue, 10 Feb 2004 13:59:44 -0700
+
+Derek Jones [skillman@yahoo.com] wrote:
+> John Ramrod [john_Ramrod@some.web.address.com.com] wrote:
+> > Just out of curiosity, in what sense did you find Math::Pari
+> > a PoC?
+> > 
+> > Did you have trouble building it? I did a quick web search,
+> > and saw a couple of plaintive posts by people having trouble
+> > building it on AIX. I'm just wondering in case I ever need to
+> > use it.
+> 
+> I could not get this (Math::Pari) to build on Win32 under 
+> Cygwin. It was a known bug when I did a net crawl to find
+> out more info. Anyone any more information? Activestate
+> don't supply the module either, so I was seeking to build
+> under the latest Cygwin port / toolset instead.
+> 
+> I had no problem building under Linux.
+> 
+> Derek Jones.
+
+I successfully built it last night using "cpan" under Cygwin
+on my WinXP-Pro system running the latest Cygwin updates.
+I am using Cygwin's Perl 5.8.2-1 (the current version available).
+Also, I may have required Cygwin's perl-libwin32 0.191-1
+(the current version of this library) package. I am
+using the most recent version of gcc and gnu make. Hope
+this helps.
+
+--
+Mike Armour
+
+
+------------------------------
+
+Message: 7
+Date: Wed, 11 Feb 2004 11:07:52 +0800
+From: lang@some.web.address.com
+To: perl-win32-users@listserv.ActiveState.com
+Subject: qx// broken on Win98
+
+qw// seems to be
+broken when perl is built with GNU tools, and dmake on Win98.
+Or is it something wrong with my system?
+
+here it is from a bash shell:
+
+Here is some id:
+C:\s\home\greg>perl -v
+
+C:\perl\bin>.\perl -e "qx/cd/"
+
+C:\perl\bin>.\perl -e "system( q/cd/ )"
+C:\perl\bin
+
+What do you make of this?
+
+-- 
+Greg Marlinson, TAiwan
+
+------------------------------
+
+Message: 8
+Date: Tue, 10 Feb 2004 20:39:49 -0700
+From: Tobias Heinrich <thoellri@some.web.address.com>
+Subject: RE: qx// broken on Win98
+To: lang@some.web.address.com
+Cc: perl-win32-users@listserv.activestate.com
+
+Works fine, once you know what the difference between system and qx is (read
+"perldoc -f system" and "perldoc perlop" [search for `STRING` in the later
+one]). 
+
+(on FreeBSD):
+frisco% pwd
+/usr
+frisco% perl -v
+
+frisco% perl -e 'qx{pwd};'      
+frisco% perl -e 'print qx{pwd};'
+/usr
+frisco% 
+
+
+(on Windows XP):
+C:\>cd
+C:\
+
+Hope this helps
+ Tobias
+
+
+
+
+------------------------------
+
+Message: 9
+Date: Wed, 11 Feb 2004 14:58:16 +1100
+From: Odysseus <kalinabears@some.web.address.com>
+To: lang@some.web.address.com
+CC: perl-win32-users@listserv.ActiveState.com
+Subject: Re: qx// broken on Win98
+
+lang@some.web.address.com wrote:
+> qw// seems to be
+> broken when perl is built with GNU tools, and dmake on Win98.
+> Or is it something wrong with my system?
+> 
+> 	C:\cygwin\home\greg\smoke>cd
+> 	C:\cygwin\home\greg\smoke
+> 
+> 	C:\cygwin\home\greg\smoke>perl -e "qx/cd/"
+> 
+> 	C:\cygwin\home\greg\smoke>perl -e "system( q/cd/ )"
+> 	C:\cygwin\home\greg\smoke
+> 
+
+I get the same behaviour on Win2k, with both AS-built perl and 
+Mingw-built perl (cmd.exe shell).
+
+Should it be different ? (Not a rhetorical question ..... I don't know 
+the answer :-)
+
+Cheers,
+Rob
+
+
+
+------------------------------
+
+Message: 10
+From: "Keith C. Dandelion" <kcivey@some.web.address.com>
+To: perl-win32-users@listserv.activestate.com
+Date: Tue, 10 Feb 2004 23:22:39 -0500
+Subject: Re: qx// broken on Win98
+
+lang@some.web.address.com wrote:
+
+> 	C:\cygwin\home\greg\smoke>perl -e "qx/cd/"
+> 
+> 	C:\cygwin\home\greg\smoke>perl -e "system( q/cd/ )"
+> 	C:\cygwin\home\greg\smoke
+> 
+> here it is from a bash shell:
+> 
+> 	greg@momotaro ~/smoke
+> 	$ perl -e 'qx/pwd/'  
+> 
+> 	greg@momotaro ~/smoke
+> 	$ perl -e 'system( "pwd" )'
+> 	/home/greg/smoke
+
+And?  What is it that you think is wrong?  Have you read the 
+documentation for qx()?  It's not the same as system() -- it's 
+the same as backticks.
+
+It's not impossible for something to be broken in perl, but 
+whenever you suspect it is, remember that it's orders of 
+magnitude more likely that what's broken is your program or 
+your understanding of the situation.
+
+-- 
+Keith C. Dandelion <kcivey@some.web.address.com>
+Washington, DC
+
+
+------------------------------
+
+Message: 11
+Date: Wed, 11 Feb 2004 13:49:51 +0800
+From: Greg Marlinson <lang@some.web.address.com>
+To: perl-win32-users@listserv.ActiveState.com
+Subject: Re: qx// broken on Win98
+
+On Tue, 10 Feb 2004, Tobias Heinrich wrote:
+
+> Works fine, once you know what the difference between system and qx is (read
+> "perldoc -f system" and "perldoc perlop" [search for `STRING` in the later
+> one]). 
+
+Thanks. Here too,
+
+the right results. Trying that with system
+
+That's interesting. That first line must be coming out as STDERR
+and the O is STDOUT, I think. There is no error in 
+
+An error message about mistaken specification of directory.
+
+-- 
+Greg Marlinson, Taiwan
+
+
+------------------------------
+
+Message: 12
+Date: Wed, 11 Feb 2004 13:49:15 +0800
+From: Greg Marlinson <lang@some.web.address.com>
+To: perl-win32-users@listserv.ActiveState.com
+Subject: Re: qx// broken on Win98
+
+Looking up the docs for system,
+
+           The return value is the exit status of the program as returned
+           by the "wait" call. To get the actual exit value shift right by
+           eight (see below). See also "exec". This is *not* what you want
+           to use to capture the output from a command, for that you should
+           use merely backticks or "qx//", as described in "`STRING`" in
+           perlop. Return value of -1 indicates a failure to start the
+           program (inspect $! for the reason).
+
+I always interpreted that passage to mean it was optional, which one 
+you used, if you were only interested in the output!
+
+For qx//
+
+   qx/STRING/
+   `STRING`
+           A string which is (possibly) interpolated and then executed as a
+           system command with "/bin/sh" or its equivalent. Shell
+           wildcards, pipes, and redirections will be honored. The
+           collected standard output of the command is returned; standard
+           error is unaffected. 
+
+What does that unaffected mean? The same thing happens to it as any
+error message the program generates?
+
+
+-- 
+Greg Marlinson, Taiwan
+
+------------------------------
+
+Message: 13
+Date: Wed, 11 Feb 2004 09:46:12 +1100
+From: Odysseus <kalinabears@some.web.address.com>
+To: John_Ramrod <john_ramrod@some.web.address.com.com>
+CC: perl-win32-users@listserv.activestate.com
+Subject: Re: Net::SSH::Perl
+
+John_Ramrod wrote:
+> I'm only guessing, but wouldn't anything requiring Math::Pari
+> work as well with Math::BigInt::Calc instead?
+> 
+> Math::Pari, or native PARI, is used more by the mathematical
+> 'heavy mob' to do advanced number theoretic calculations, and
+> I'd have thought that using it just to multiply a few 128-bit
+> numbers or similar was like using a hammer to crack a nut
+> (unless tip-top performance is vital, which I suppose it
+> might be if one is encrypting a long data stream).
+> 
+
+More than likely it's something a little more complex than straight out 
+multiplication - perhaps a modular exponentiation - ie a calculation of 
+($x**$y)%$m, where $x, $y, and $m are big integers. And the numbers may 
+well be bigger than 128 bits. I think the current recommendations for 
+RSA encryption is a modulus of 2048 bits.
+
+I just did a comparison of M::BI, M::GMP, and M::Pari for a modular 
+exponentiation where $x, $y, and $m each comprised 300 decimal digits.
+
+M::BI took 27 seconds
+M::GMP took 0.01 seconds
+M::Pari took 0.40 seconds
+
+> Just out of curiosity, in what sense did you find Math::Pari
+> a PoC?
+> 
+> Did you have trouble building it? I did a quick web search,
+> and saw a couple of plaintive posts by people having trouble
+> building it on AIX. I'm just wondering in case I ever need to
+> use it.
+> 
+
+Perl 5.6:
+ppm install http://theoryx5.uwinnipeg.ca/ppmpackages/Math-Pari.ppd
+
+Perl 5.8
+ppm install http://theoryx5.uwinnipeg.ca/ppms/Math-Pari.ppd
+
+It builds easily on native win32 - but to do that you also need to 
+download the Pari-GP (or is it GP-Pari?) source. You don't need to do 
+anything with that source, btw - Math::Pari simply needs to be able to 
+find it at the build stage. Once Math::Pari is built, you can delete the 
+Pari-GP source if you want.
+
+Cheers,
+Rob
+
+
+------------------------------
+
+Message: 14
+From: Baker Richard-qswi266 <Richard.Baker@some.web.address.com>
+To: Perl-Win32-Users@listserv.ActiveState.com
+Subject: RE: Perl and delphi interaction query.
+Date: Wed, 11 Feb 2004 10:59:23 -0000
+
+Huge thanks to Lynn Rickards, who suggested embedding the image into the
+perl script.
+
+Just so that those wanting to do the same know how...
+
+$mw->Pixmap( 'myicon', -data => loadIcon());
+$mw->Icon( -image => 'myicon' );
+
+sub loadIcon
+{
+return <<'EOT';
+
+};
+EOT
+}
+
+------------------------------
+
+
+_______________________________________________
+Perl-Win32-Users mailing list
+Perl-Win32-Users@listserv.ActiveState.com
+To unsubscribe: http://listserv.ActiveState.com/mailman/mysubs
+
+
+End of Perl-Win32-Users Digest
+

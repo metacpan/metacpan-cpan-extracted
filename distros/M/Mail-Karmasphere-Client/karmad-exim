@@ -1,0 +1,595 @@
+#! /usr/bin/perl
+
+use strict;
+use warnings;
+use vars qw($PORT_DEFAULT);
+use Socket;
+use IO::Socket;
+use IO::Select;
+use Getopt::Long;
+use Mail::Karmasphere::Client qw(:all);
+use Unix::Syslog qw(:macros :subs);
+
+# 
+# TODO
+#   log to syslog separately
+# 
+
+$PORT_DEFAULT = 8555;
+
+sub usage {
+	print STDERR <<EOUSAGE;
+usage: karmad
+             [--username=foo --password=bar]
+             [--socket=/tmp/karmad]
+             [--server=query.karmasphere.com]
+             [--feedset=karmasphere.email-sender]
+             [--mta=postfix|EXIM]
+             [--action=PREPEND|reject]
+             [--syslog]
+EOUSAGE
+}
+
+my $help;
+my ($server, $user, $group, $port, $path, $login, $pass);
+my ($mta, $action, $verbose_header, $cutoff_fail, $cutoff_pass, $syslog);
+my $composite = "karmasphere.email-sender";
+my $sockaddr = "/tmp/karmad";
+my ($socketuser,$socketgroup,$socketmode);
+
+my $result = GetOptions(
+	"help"			=> \$help,
+	"socket=s"		=> \$sockaddr,
+	"socketuser=s"	=> \$socketuser,
+	"socketgroup=s"	=> \$socketgroup,
+	"socketmode=s"	=> \$socketmode,
+	"server=s"		=> \$server,
+	"feedset=s"		=> \$composite,
+	"user=s"		=> \$user,
+	"group=s"		=> \$group,
+	"username=s"	=> \$login,
+	"password=s"	=> \$pass,
+	"mta=s"			=> \$mta,
+	"action=s"		=> \$action,
+	"verbose-header" => \$verbose_header,
+	"verbose-headers" => \$verbose_header,
+	"cutoff-fail=i"   => \$cutoff_fail,
+	"cutoff-pass=i"   => \$cutoff_pass,
+	"syslog"		=> \$syslog,
+);
+
+$mta ||= "exim";
+$cutoff_pass = +300 if not defined $cutoff_pass;
+$cutoff_fail = -300 if not defined $cutoff_fail;
+
+if ($syslog) { $syslog = LOG_MAIL }
+
+openlog "karmad", LOG_PID, $syslog if $syslog;
+syslog (LOG_INFO, "starting. mta=%s server=%s feedset=%s action=%s", $mta, $server, $composite, $action) if $syslog;
+syslog (LOG_DEBUG, "starting. cutoff-fail=%s, cutoff-pass=%s, verbose-header=%s", $cutoff_fail, $cutoff_pass, $verbose_header) if $syslog;
+syslog (LOG_DEBUG, "starting. username=%s password=%s", $login, map { "x" x length($_) } $pass) if $syslog;
+
+if (!$result or $help) {
+	usage();
+	exit 0;
+}
+
+my @args;
+my $socktype;
+
+my $listen = undef;
+if ($sockaddr =~ /\D/) {
+	unlink($sockaddr) if -S $sockaddr;
+
+	$listen = new IO::Socket::UNIX(
+		Listen		=> 1,
+		Local		=> $sockaddr,
+			)
+		or die "Failed to create socket: $!";
+	my ($uid, $gid);
+
+	unless ($>) {
+		unless ($socketuser) {
+			$socketuser = 'nobody';
+		}
+		if ($socketuser =~ /\D/) {
+			$uid = getpwnam($socketuser)
+					or die "Socket user $socketuser not found: $!";
+		}
+		else {
+			$uid = $socketuser;
+		}
+
+		unless ($socketgroup) {
+			$socketgroup = 'nogroup';
+		}
+		if ($socketgroup =~ /\D/) {
+			$gid = getgrnam($socketgroup)
+					or die "Socket group $socketgroup not found: $!";
+		}
+		else {
+			$gid = $socketgroup;
+		}
+
+		chown($uid, $gid, $sockaddr)
+				or die "chown($socketuser=$uid, $socketgroup=$gid, $sockaddr) failed";
+	}
+	elsif ($socketuser or $socketgroup) {
+		warn "Cannot change socket owner as non-root.";
+	}
+
+	if (defined $socketmode) {
+		chmod(oct($socketmode), $sockaddr)
+				or die "chmod($socketmode, $sockaddr) failed";
+	}
+	syslog LOG_INFO, "listening on %s", $sockaddr if $syslog;
+
+}
+else {
+	$listen = new IO::Socket::INET(
+		Listen		=> 1,
+		# LocalAddr	=> "127.0.0.1",
+		LocalPort	=> $sockaddr,
+		ReuseAddr	=> 1
+			)
+		or die "Failed to create socket: $!";
+	syslog LOG_INFO, "listening on %s", $sockaddr if $syslog;
+}
+
+unless ($>) {
+	my ($uid, $gid);
+
+	unless ($group) {
+		$group = 'nobody';
+	}
+	if ($group =~ /\D/) {
+		$gid = getpwnam($group)
+				or die "Runtime group $group not found: $!";
+	}
+	else {
+		$gid = $group;
+	}
+	$( = $gid;
+	$) = $gid;
+	unless ($( == $gid and $) == $gid) {
+		die "Failed to change to group $group: $!\n";
+	}
+
+	unless ($user) {
+		$user = 'nobody';
+	}
+	if ($user =~ /\D/) {
+		$uid = getpwnam($user)
+				or die "Runtime user $user not found: $!";
+	}
+	else {
+		$uid = $user;
+	}
+	$< = $uid;
+	$> = $uid;
+	unless ($< == $uid and $> == $uid) {
+		die "Failed to change to user $user: $!\n";
+	}
+
+
+}
+elsif ($user or $group) {
+	warn "Cannot change to $user:$group not root.";
+}
+
+while (my $socket = $listen->accept()) {
+	if (fork) {
+		close $socket;
+		wait;
+		next;
+	}
+	elsif (fork) {
+		exit;
+	}
+
+	syslog LOG_INFO, "handling new connection" if $syslog;
+
+	my $fh = select($socket);
+	$| = 1;
+	select($fh);
+
+	my %in;
+
+	# Read the request.
+	while (<$socket>) {
+		chomp;
+		chomp;
+		last if /^$/;
+		my ($lhs, $rhs) = split(/\s*=\s*/, $_, 2);
+		$in{lc $lhs} = $rhs;
+	}
+
+	# Debugging.
+	for my $key (sort keys %in) {
+		print STDERR "$key = $in{$key}\n" if -t STDERR;
+		syslog LOG_DEBUG, "$key = $in{$key}" if $syslog;
+	}
+
+	my $query_id = join('-', 'karmad', time(), ($in{queue_id} || ()));
+
+	my $query = new Mail::Karmasphere::Query(
+		Composite	=> $composite,
+		Id => $query_id,
+	);
+
+	$query->identity($in{ip}, 					IDT_IP4_ADDRESS, "smtp.client-ip")				if exists $in{ip}; # backward compatibility
+	$query->identity($in{helo}, 				IDT_DOMAIN_NAME, "smtp.env.helo")				if exists $in{helo}; # backward compatibility
+	$query->identity($in{client_address}, 		IDT_IP4_ADDRESS, "smtp.client-ip")				if exists $in{client_address};
+	$query->identity($in{helo_name}, 			IDT_DOMAIN_NAME, "smtp.env.helo")				if exists $in{helo_name};
+	$query->identity($in{sender}, 				IDT_EMAIL_ADDRESS, "smtp.env.mail-from")		if exists $in{sender};
+	# Postfix only. Hope these are useful.
+	$query->identity($in{client_name}, 			IDT_DOMAIN_NAME, "a")							if exists $in{client_name};
+
+	my ($shost, $sport) = split(/:/, $server) if $server;
+	my %mkcargs = (
+		PeerHost	=> $shost,
+		PeerPort	=> $sport,
+		Principal	=> $login,
+		Credentials	=> $pass,
+	);
+	my $client = new Mail::Karmasphere::Client(%mkcargs);
+
+	print STDERR "sending query \"@{[$query->as_string]}\"\n" if -t STDERR;
+	syslog LOG_DEBUG, "sending query %s", $query->as_string if $syslog;
+	my $response = $client->ask($query);
+
+	respond(response  => $response,
+			socket    => $socket,
+			composite => $composite,
+			query     => $query,
+			);
+
+	close $socket;
+
+	exit;
+}
+
+### 
+### --------------------------------------------------------- respond dispatcher
+### 
+
+sub respond {
+	my %param     = @_;
+	my ($response, $socket, $composite, $query) = @param{qw(response socket composite query)};
+
+	if ($mta eq "postfix") { respond_postfix(@_); }
+	else                   { respond_generic(@_); }
+
+	if ($syslog)           { respond_syslog(@_); }
+}
+
+### 
+### --------------------------------------------------------- syslog
+### 
+
+sub respond_syslog {
+	my %param     = @_;
+	my ($response, $socket, $composite, $query) = @param{qw(response socket composite query)};
+
+	if (not $response) {
+		syslog LOG_DEBUG, "response: no response";
+	}
+	else {
+		my $value = $response->value($composite);
+		$value = 0 unless defined $value;
+		my $verdict = ($value > $cutoff_pass ? "pass" :
+					   $value < $cutoff_fail ? "fail" :
+					   "neutral");
+
+		my $data = $response->data($composite);
+		$data = '(null data)' unless defined $data;
+
+		syslog (LOG_DEBUG,
+				"response: verdict=%s score=%s comment=%s",
+				$verdict, $value, $data);
+		
+		syslog (LOG_DEBUG,
+				"response: query_id=%s identities=%s",
+				$query->id,
+				$query->identities_as_humanreadable_string,
+				);
+	}
+}
+
+### 
+### --------------------------------------------------------- MTA = exim or other
+### 
+
+sub respond_generic {
+	my %param     = @_;
+	my ($response, $socket, $composite) = @param{qw(response socket composite)};
+
+	if ($response) {
+		print STDERR $response->as_string if -t STDERR;
+		if ($response->error) {
+			print $socket "error=" . $response->message . "\n";
+		}
+		else {
+			my $value = $response->value($composite);
+			$value = 0 unless defined $value;
+			print $socket "value=", $value, "\n";
+			if ($value > $cutoff_pass) {
+				print $socket "opinion=good\n";
+			}
+			elsif ($value < -$cutoff_fail) {
+				print $socket "opinion=bad\n";
+			}
+			else {
+				print $socket "opinion=neutral\n";
+			}
+			my $data = $response->data($composite);
+			$data = '(null data)' unless defined $data;
+			print $socket "data=", $data, "\n";
+		}
+	}
+	else {
+		print STDERR "timeout\n" if -t STDERR;
+		print $socket "error=timeout\n";
+	}
+	print STDERR "\n" if -t STDERR;
+	print $socket "\n";
+}
+
+### 
+### --------------------------------------------------------- MTA = postfix
+### 
+
+sub respond_postfix {
+	my %param     = @_;
+	my ($response, $socket, $composite, $query) = @param{qw(response socket composite query)};
+
+	if (not $response) {
+		# In case of trouble the policy server must not send
+		# a reply. Instead the server must log a warning and
+		# disconnect. Postfix will retry the request at some
+		# later time.
+		# -- http://www.postfix.org/SMTPD_POLICY_README.html
+
+		print STDERR "timeout\n" if -t STDERR;
+		return;
+	}
+
+	print STDERR $response->as_string if -t STDERR;
+
+	if ($response->error) {
+		return;
+		# print $socket "error=" . $response->message . "\n";
+	}
+
+	my $data = $response->data($composite) || '(no comment)';
+
+	my $action = $action || "prepend";
+
+	my $value = $response->value($composite);
+	$value = 0 unless defined $value;
+	my $verdict = ($value > $cutoff_pass ? "pass" :
+				   $value < $cutoff_fail ? "fail" :
+				                           "neutral");
+
+	my @prepend_string = ("prepend",
+						  "X-Karma:",
+						  "verdict=$verdict",
+						  "score=$value",
+						  "comment=$data");
+
+	if ($verbose_header) {
+		splice(@prepend_string, -1, 0,
+			   "identities=" . $query->identities_as_humanreadable_string,
+			   "query_id=" . $query->id,
+			   );
+	}
+
+	my $prepend_string = join (" ", @prepend_string) . "\n";
+
+	if ($action eq "prepend")   {
+		print $socket "action=$prepend_string";
+	}
+	elsif ($action eq "reject") {
+		if ($verdict eq "pass") { print $socket "action=permit\n"; }
+		if ($verdict eq "fail") { print $socket "action=reject karma scored too low: $value ($data)\n"; }
+		else                    { print $socket "action=$prepend_string"; }
+	}
+	print $socket "\n";
+}
+
+__END__
+
+=head1 NAME
+
+karmad - Karmasphere daemon for postfix and exim
+
+=head1 DESCRIPTION
+
+This is a small daemon which listens on a Unix domain socket and
+interfaces between Postfix or Exim and L<Mail::Karmasphere::Client>.
+
+See the sample configuration and startup files in the eg/ directory
+of the source distribution for more information.
+
+=head1 COMMAND LINE PARAMETERS
+
+=over 12
+
+=item --mta
+
+Optional.
+
+If you're running postfix, set --mta=postfix and karmad will
+behave as an SMTPD policy daemon.
+
+If you're running exim, set --mta=exim and use the exim ACL
+provided with Mail::Karmasphere::Client.
+
+If not specified, defaults to C<exim>.
+
+=item --cutoff-pass
+=item --cutoff-fail
+
+Recommended.
+
+Scores below C<cutoff-fail> will turn into a "fail/reject".
+Scores above C<cutoff-pass> will turn into a "pass".  You
+should set these thresholds yourself: Karmasphere provides
+the score, but you decide policy.  If you do not, they will
+default to +300 and -300.
+
+=item --action
+
+Optional.
+
+If you're running postfix, you can set --action to one of
+C<prepend> (default) or C<reject>.  Prepend will prepend an
+X-Karma header.  Reject will cause any mail with a karma
+score below C<cutoff-fail> to be rejected.  Use this only if
+you are happy with the results you've observed.
+
+If not specified, defaults to C<prepend>.
+
+=item --verbose-header
+
+Optional.
+
+If you've set C<action> to C<prepend>, this flag will add
+two fields to the X-Karma header: C<identities> shows what
+was queried, and C<query_id> includes the timestamp and (if
+available) the MTA's queue ID.)  This is useful for
+debugging purposes: it allows one to replay the query.
+
+=item --username
+
+=item --password
+
+Optional.
+
+Query credentials for authenticated queries.  You only need
+to set this if you're querying a restricted feedset.  For
+more information, see
+L<http://www.karmasphere.com/devzone/client/configuration#credentials>
+
+=item --socket
+
+Where to listen.  Defaults to /tmp/karmad.  You probably
+don't need to set this.
+
+=item --server
+
+Hostname of the Karmasphere Query Server to connect to.
+Defaults to query.karmasphere.com.  You probably don't need
+to set this, unless you have set up a local query server, in
+which case you should be following the directions provided
+with that server.
+
+=item --feedset
+
+The name of the feedset you want to query.  Defaults to
+karmasphere.email-sender.  You probably don't need to set
+this.  
+
+=item --socketuser
+
+=item --socketgroup
+
+Who to listen as; defaults to 'nobody'.  The socket file
+will be chowned to this user and group.  You probably don't
+need to set this.
+
+=item --socketmode
+
+Mode to chmod the socket.  You probably don't need to set
+this.
+
+=item --user
+=item --group
+
+When running, setuid to this user and group.  Defaults to
+'nobody', 'nobody'.  You probably don't need to set this.
+
+=item --syslog
+
+Syslog verbosely to mail.info and mail.debug.
+
+=back
+
+=head1 OPERATIONAL USAGE
+
+Connect to the socket (default: /tmp/karmad) and send the
+following newline-terminated stanza:
+
+ client_address=192.0.2.1
+ helo_name=host.example.com
+ sender=localpart@example.com
+
+Each of the above lines is optional; you may omit whatever is unavailable.
+
+If all goes well, Karmad will return the following stanza:
+
+ value=NN
+ opinion=(good|bad|neutral)
+ data=.....
+
+"Value" is a number between -1000 and +1000.
+
+"Opinion" is one of good, bad, or neutral.  If the value is
+greater than 300, opinion is good.  If the value is less
+than -300, the opinion is bad.  If it's between, opinion is
+neutral.
+
+"Data" contains a brief explanation of how the verdict was reached.
+
+If an error occurs, Karmad will return:
+
+ error=...
+
+usually, something like
+
+ error=timeout
+ error=Incorrect user and/or password.
+
+=head1 HOW TO TEST THAT IT'S WORKING
+
+This section assumes you're running Postfix.
+
+ % ./karmad --mta=postfix --action=prepend --verbose-header
+
+Then, connect to it:
+
+ % perl -MIO::Socket::UNIX -le 'my $sock = IO::Socket::UNIX->new("/tmp/karmad"); print $sock "client_address=127.0.0.2\n\n"; print <$sock>;'
+
+You should get back something along the lines of:
+
+ prepend X-Karma verdict=fail score=-1000 identities=ip4=127.0.0.2=smtp.client-ip query_id=karmad-1206640966 comment=cymru.bogons: if-match(0) => return-bad(1.0)
+
+You should expect to see some STDERR from the karmad.
+
+The C<karmac> script does pretty much the same thing.
+
+If troubleshooting is necessary, use karmaclient to talk to
+Karmasphere directly, without going through karmad.  Then
+use karmac to talk to karmad.
+
+=head1 BUGS
+
+In the response, "opinion" might be more correctly termed "verdict".
+
+=head1 SEE ALSO
+
+L<Mail::Karmasphere::Client>
+L<Mail::Karmasphere::Query>
+L<Mail::Karmasphere::Response>
+L<karmaclient>
+http://www.karmasphere.com/
+http://www.postfix.org/SMTPD_POLICY_README.html
+
+=head1 COPYRIGHT
+
+Copyright (c) 2005 Shevek, Karmasphere. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

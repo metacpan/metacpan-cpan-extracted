@@ -1,0 +1,14 @@
+.shipit
+ignore.txt
+lib/MooseX/Storage/DBIC.pm
+lib/MooseX/Storage/DBIC/Basic.pm
+lib/MooseX/Storage/DBIC/Engine/Traits/Default.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/10-serialize.t
+t/manifest.t
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

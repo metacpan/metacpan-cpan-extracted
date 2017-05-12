@@ -1,0 +1,78 @@
+{
+   "abstract" : "Mathematics Perl, The Optimized Math Library Suite",
+   "author" : [
+      "Will Braswell <wbraswell@cpan.org>"
+   ],
+   "description" : "MathPerl is the high-performance math suite for the Perl 5 programming language, optimized using the RPerl compiler.",
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [
+      "mathperl",
+      "math",
+      "rperl",
+      "perl5",
+      "optimizing",
+      "compiler",
+      "optimize",
+      "compile"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MathPerl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "namespace" : [
+         "MathPerl::Test"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Meta" : "2.150005",
+            "ExtUtils::MakeMaker" : "7.04",
+            "RPerl" : "1.6",
+            "SDL" : "2.546",
+            "Test::CPAN::Changes" : "0.400002",
+            "Test::Exception" : "0.32",
+            "Test::Number::Delta" : "1.06",
+            "Time::HiRes" : "1.9726",
+            "perl" : "5.010000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=MathPerl"
+      },
+      "homepage" : "http://www.rperl.org",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/wbraswell/mathperl.git",
+         "web" : "https://github.com/wbraswell/mathperl"
+      }
+   },
+   "version" : "0.1",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

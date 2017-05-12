@@ -1,0 +1,34 @@
+# MANIFEST for Mail-Digest-Tools
+Changes
+MANIFEST
+Makefile.PL
+README
+Tools.pm
+t/01.t
+t/02.t
+t/03.t
+t/Test/_Test_MDT.pm
+t/samples/digest.data
+t/samples/pbml/[PBML]_Digest_Number_1.txt
+t/samples/pbml/[PBML]_Digest_Number_2.txt
+t/samples/pbml/[PBML]_Digest_Number_3.txt
+t/samples/pbml/archived_today.txt
+t/samples/pbml/digests_log.txt
+t/samples/pbml/digests_read.txt
+t/samples/pbml/todays_topics.txt
+t/samples/pw32u/Perl-Win32-Users_Digest,_Vol_1,_Issue_1.txt
+t/samples/pw32u/Perl-Win32-Users_Digest,_Vol_1,_Issue_2.txt
+t/samples/pw32u/archived_today.txt
+t/samples/pw32u/digests_log.txt
+t/samples/pw32u/digests_read.txt
+t/samples/pw32u/todays_topics.txt
+t/samples/pw32u/mimelog.txt
+t/consol/in/pbml/grep_over_multiple_lines_thank_you.thr.txt
+t/consol/in/pbml/grep_over_multiple_lines.thr.txt
+t/consol/in/pw32u/qx_broken_on_Win98.thr.txt
+t/consol/in/pw32u/qx_broken_on_Win98_second_thread.thr.txt
+t/needfix/pbml/Young_and_inexperienced.fix.thr.txt
+t/needfix/pbml/grep_over_multiple_lines.fix.thr.txt
+t/needfix/pw32u/Perl_and_delphi_interaction_query.fix.thr.txt
+t/needfix/pw32u/qx_broken_on_Win98.fix.thr.txt
+META.yml                                 Module meta-data (added by MakeMaker)

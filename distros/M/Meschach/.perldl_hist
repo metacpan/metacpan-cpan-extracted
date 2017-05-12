@@ -1,0 +1,50 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+lusolve()
+qrsolve()
+qrcond()
+do 'tests/testqr'
+p do 'tests/testqr'
+p do 'tests/testqr.pm'
+p do 'tests/testqr'
+p do 'tests/testqr.pm'

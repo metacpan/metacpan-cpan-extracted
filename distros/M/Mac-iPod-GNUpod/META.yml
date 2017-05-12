@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                Mac-iPod-GNUpod
+version:             1.24
+abstract:            Add and remove songs from your iPod; read and write
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Audio::Wav:                    0.04
+    File::Copy:                    2.05
+    File::Spec:                    0.85
+    File::Spec::Mac:               1.4
+    MP3::Info:                     1.02
+    MP4::Info:                     1.07
+    Unicode::String:               2.07
+    XML::Parser:                   2.33
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2

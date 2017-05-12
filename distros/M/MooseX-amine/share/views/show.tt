@@ -1,0 +1,111 @@
+<% USE Dumper %>
+<div style="padding: 10px">
+<% IF no_mex AND message %>
+  <p><% message %></p>
+<% ELSIF no_mex %>
+  <p>Select a file on the right</p>
+<% ELSE %>
+  <h1><% name %></h1>
+
+  <table border=1 cellpadding=5>
+    <caption>Attributes</caption>
+    <tr><td width="2px">&nbsp;</td><th>Name</th><th>Is</th><th>Isa</th><th>From</th></tr>
+    <% FOREACH attr IN mex.attributes.keys.sort %>
+    <tr>
+      <td><a href="#" onClick="$('#<% attr %>_meta_row').toggle();return false">X</a></td>
+      <td>
+        <% attr %>
+      </td>
+      <td><% IF mex.attributes.$attr.writer OR mex.attributes.$attr.accessor %>rw<% ELSE %>ro<% END %></td>
+      <td><% mex.attributes.$attr.meta.constraint OR '&nbsp;' %></td>
+      <td><a href="<% request.uri_base %>/_show/name/<% mex.attributes.$attr.from %>"><% mex.attributes.$attr.from %></a></td>
+    </tr>
+    <tr id="<% attr %>_meta_row" style="display:none">
+      <td colspan="5">
+        <pre class="sh_perl"><% Dumper.dump( mex.attributes.$attr ) %></pre>
+      </td>
+    </tr>
+    <% END %>
+  </table>
+
+  <table border=1 cellpadding=5 width="90%">
+    <caption>Methods</caption>
+    <tr><td width="2px">&nbsp;</td><th>Name</th><th>From</th></tr>
+    <% FOREACH method IN mex.methods.keys.sort %>
+    <tr>
+      <td><% IF mex.methods.$method.code %><a href="#" onClick="$('#<% method %>_code_row').toggle();return false">X</a> <% END %></td>
+      <td><% method %></td>
+      <td><a href="<% request.uri_base %>/_show/name/<% mex.methods.$method.from %>"><% mex.methods.$method.from %></a></td>
+    </tr>
+    <% IF mex.methods.$method.code %>
+    <tr id="<% method %>_code_row" style="display:none">
+      <td colspan=3>
+        <pre class="sh_perl"><% mex.methods.$method.code %></pre>
+      </td>
+    </tr>
+    <% END %>
+    <% END %>
+  </table>
+
+  <script type="text/javascript">
+    $(document).ready(function(){
+      var startingStyle = $.cookie('css') ? $.cookie('css') : '<% request.uri_base %>/css/sh_none.min.css';
+      $.fn.styleSwitch(startingStyle);
+      $("#styleswitch").val(startingStyle);
+      sh_highlightDocument();
+      $("#styleswitch").bind(($.browser.msie ? "click" : "change"), function() {
+        $.fn.styleSwitch($(this).val());
+      });
+    });
+  </script>
+  <div class="styleswitch">
+    syntax highlighting:
+    <select id="styleswitch">
+      <option value="<% request.uri_base %>/css/sh_none.min.css">no syntax highlighting</option>
+      <option value="<% request.uri_base %>/css/sh_acid.min.css">acid</option>
+      <option value="<% request.uri_base %>/css/sh_berries-dark.min.css">berries-dark</option>
+      <option value="<% request.uri_base %>/css/sh_berries-light.min.css">berries-light</option>
+      <option value="<% request.uri_base %>/css/sh_bipolar.min.css">bipolar</option>
+      <option value="<% request.uri_base %>/css/sh_blacknblue.min.css">blacknblue</option>
+      <option value="<% request.uri_base %>/css/sh_bright.min.css">bright</option>
+      <option value="<% request.uri_base %>/css/sh_contrast.min.css">contrast</option>
+      <option value="<% request.uri_base %>/css/sh_cpan.min.css">cpan</option>
+      <option value="<% request.uri_base %>/css/sh_darkblue.min.css">darkblue</option>
+      <option value="<% request.uri_base %>/css/sh_darkness.min.css">darkness</option>
+      <option value="<% request.uri_base %>/css/sh_desert.min.css">desert</option>
+      <option value="<% request.uri_base %>/css/sh_dull.min.css">dull</option>
+      <option value="<% request.uri_base %>/css/sh_easter.min.css">easter</option>
+      <option value="<% request.uri_base %>/css/sh_emacs.min.css">emacs</option>
+      <option value="<% request.uri_base %>/css/sh_golden.min.css">golden</option>
+      <option value="<% request.uri_base %>/css/sh_greenlcd.min.css">greenlcd</option>
+      <option value="<% request.uri_base %>/css/sh_ide-anjuta.min.css">ide-anjuta</option>
+      <option value="<% request.uri_base %>/css/sh_ide-codewarrior.min.css">ide-codewarrior</option>
+      <option value="<% request.uri_base %>/css/sh_ide-devcpp.min.css">ide-devcpp</option>
+      <option value="<% request.uri_base %>/css/sh_ide-eclipse.min.css">ide-eclipse</option>
+      <option value="<% request.uri_base %>/css/sh_ide-kdev.min.css">ide-kdev</option>
+      <option value="<% request.uri_base %>/css/sh_ide-msvcpp.min.css">ide-msvcpp</option>
+      <option value="<% request.uri_base %>/css/sh_kwrite.min.css">kwrite</option>
+      <option value="<% request.uri_base %>/css/sh_matlab.min.css">matlab</option>
+      <option value="<% request.uri_base %>/css/sh_navy.min.css">navy</option>
+      <option value="<% request.uri_base %>/css/sh_nedit.min.css">nedit</option>
+      <option value="<% request.uri_base %>/css/sh_neon.min.css">neon</option>
+      <option value="<% request.uri_base %>/css/sh_night.min.css">night</option>
+      <option value="<% request.uri_base %>/css/sh_pablo.min.css">pablo</option>
+      <option value="<% request.uri_base %>/css/sh_peachpuff.min.css">peachpuff</option>
+      <option value="<% request.uri_base %>/css/sh_print.min.css">print</option>
+      <option value="<% request.uri_base %>/css/sh_rand01.min.css">rand01</option>
+      <option value="<% request.uri_base %>/css/sh_style.min.css">style</option>
+      <option value="<% request.uri_base %>/css/sh_the.min.css">the</option>
+      <option value="<% request.uri_base %>/css/sh_typical.min.css">typical</option>
+      <option value="<% request.uri_base %>/css/sh_vampire.min.css">vampire</option>
+      <option value="<% request.uri_base %>/css/sh_vim-dark.min.css">vim-dark</option>
+      <option value="<% request.uri_base %>/css/sh_vim.min.css">vim</option>
+      <option value="<% request.uri_base %>/css/sh_whatis.min.css">whatis</option>
+      <option value="<% request.uri_base %>/css/sh_whitengrey.min.css">whitengrey</option>
+      <option value="<% request.uri_base %>/css/sh_zellner.min.css">zellner</option>
+    </select>
+  </div>
+  <div id="footer">Powered by <a href="http://perldancer.org/">Dancer</a> <% dancer_version %></div>
+
+</div>
+  <% END %>

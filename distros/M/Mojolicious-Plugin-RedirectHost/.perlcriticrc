@@ -1,0 +1,7 @@
+# We use Mojo::Base
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Mojo::Base
+
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Mojo::Base

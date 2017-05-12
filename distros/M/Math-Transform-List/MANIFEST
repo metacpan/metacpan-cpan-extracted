@@ -1,0 +1,10 @@
+lib/Math/Transform/List.pm
+Build.PL
+MANIFEST
+META.yml
+README
+CHANGES
+t/even.t
+t/symmetric.t
+t/test.t
+META.json

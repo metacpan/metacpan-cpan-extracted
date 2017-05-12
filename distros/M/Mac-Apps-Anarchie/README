@@ -1,0 +1,29 @@
+Monday, January 5, 1998
+
+This is Anarchie.pm 1.5, a Perl interface to Anarchie 2.01+, a popular
+Mac OS FTP client.
+
+REQUIREMENTS:
+*MacPerl 5.1.4r4+
+*Anarchie 2.01+ or a compatible version of Fetch.
+*Mac::Apps::Launch
+*You might have to give MacPerl an extra meg of memory, I've had some
+    problems with it quitting out on me.
+
+This archive can always be obtained from:
+
+    http://pudge.net/macperl/
+    http://perl.com/CPAN/authors/id/CNANDOR/
+    http://perl.com/CPAN/modules/by-module/Mac/
+
+The file is a tarred, gzipped file.  Use Stuffit Expander or a
+similar program to get at the archive.
+
+Please let me know how well it does(n't) work, and any changes you'd 
+like to see.
+
+--
+Chris Nandor               pudge@pobox.com           http://pudge.net/
+%PGPKey=('B76E72AD',[1024,'0824 090B CE73 CA10  1FF7 7F13 8180 B6B6'])
+#==                    MacPerl: Power and Ease                     ==#
+#==    Publishing Date: Early 1998. http://www.ptf.com/macperl/    ==#

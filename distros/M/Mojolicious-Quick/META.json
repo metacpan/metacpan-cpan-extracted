@@ -1,0 +1,60 @@
+{
+   "abstract" : "A quick way of generating a simple Mojolicious app.",
+   "author" : [
+      "Kit Peters <popefelix@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Quick",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Mojo::Base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "String::Random" : "0",
+            "Test::Mojo" : "0",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/popefelix/Mojolicious-Quick/issues"
+      },
+      "homepage" : "https://github.com/popefelix/Mojolicious-Quick",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/popefelix/Mojolicious-Quick.git",
+         "web" : "https://github.com/popefelix/Mojolicious-Quick"
+      }
+   },
+   "version" : "0.002"
+}
+

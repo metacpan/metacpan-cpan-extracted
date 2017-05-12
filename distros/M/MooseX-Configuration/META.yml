@@ -1,0 +1,30 @@
+---
+abstract: 'Define attributes which come from configuration files'
+author:
+  - 'Dave Rolsky <autarch@urth.org>'
+build_requires:
+  File::Temp: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.101670'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Configuration
+requires:
+  Config::INI: 0
+  List::AllUtils: 0
+  Moose: 0
+  MooseX::Types: 0
+  MooseX::Types::Path::Class: 0
+  Path::Class: 0
+  Text::Autoformat: 0
+  autodie: 0
+  namespace::autoclean: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooseX-Configuration
+  repository: http://hg.urth.org/hg/MooseX-Configuration
+version: 0.02

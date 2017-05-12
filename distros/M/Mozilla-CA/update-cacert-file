@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+my $CACERT_PEM_FILE = "lib/Mozilla/CA/cacert.pem";
+my $GIT_AUTHOR = 'Mozilla <mozilla@mozilla.org>';
+
+run ("./mk-ca-bundle.pl", $CACERT_PEM_FILE);
+
+system("git", "diff", "--exit-code", $CACERT_PEM_FILE) or exit;
+
+run("git", "add", $CACERT_PEM_FILE);
+
+my($y,$m,$d) = (gmtime)[5,4,3]; $y += 1900; $m++;
+my $ver = sprintf "%04d%02d%02d", $y, $m, $d;
+run("perl", "-pi", "-e", "s/(^our .VERSION = )'\\d+(.\\d+)?'/\$1'$ver'/", "lib/Mozilla/CA.pm");
+run("git", "add", "lib/Mozilla/CA.pm");
+
+run("git", "commit", "-m", "Update from Mozilla repository", "--author", $GIT_AUTHOR);
+exit;
+
+sub run {
+    my @argv = @_;
+    for (@argv) {
+	$_ = qq("$_") if /\s/;
+    }
+    print ">>> @argv\n";
+    system(@_);
+    die if $? != 0;
+}

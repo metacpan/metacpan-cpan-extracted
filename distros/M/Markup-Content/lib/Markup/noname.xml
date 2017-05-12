@@ -1,0 +1,63 @@
+<template>
+	<match element_type = "-->declaration" tagname = "-->declaration" text = "{!HTML 4\.0 Transitional!}" />
+	<match tagname = "html">
+		<match tagname = "head">
+			<match tagname = "title" options = "call_filter(title),ignore_children" />
+			<match tagname = "meta" _name = "smokeout" options = "optional" />
+			<match tagname = "script" _src = "{!header\.js!}" _type = "text/javascript" />
+		</match>
+		<match tagname = "body" options = "ignore_attrs">
+			<match tagname = "table" _cellspacing = "{!\d+!}" _cellpadding = "2" _width = "100%">
+				<match tagname = "tr">
+					<match tagname = "td" _valign = "top" _align = "center"
+						_width = "100%" _colspan = "2">
+						<match tagname = "a" _href = "link2.htm">
+							<match element_type = "-->text" options = "text_not_null" />
+						</match>
+					</match>
+				</match>
+				<match tagname = "tr">
+					<match tagname = "td" _valign = "top" _align = "center" _width = "50%">
+						<match tagname = "a" _href = "link2.htm">
+							<match element_type = "-->text" options = "text_not_null" />
+						</match>
+						<match tagname = "br" />
+						<match tagname = "a" _href = "link2.htm">
+							<match element_type = "-->text" options = "text_not_null" />
+						</match>
+					</match>
+					<match tagname = "td" _valign = "top" _align = "center" _width = "50%">
+						<match tagname = "a" _href = "link2.htm">
+							<match element_type = "-->text" options = "text_not_null" />
+						</match>
+					</match>
+				</match>
+			</match>
+
+			<match tagname = "p">
+				&amp;nbsp;
+			</match>
+
+			<match tagname = "div" _class = "{!fake!}">
+				<match tagname = "p">
+					<match element_type = "-->text" options = "text_not_null" />
+				</match>
+			</match>
+
+			<section tagname = "CONTENT" />
+
+			<match tagname = "p">
+				&amp;nbsp;
+			</match>
+
+			<match tagname = "div" _class = "{!fake!}">
+				<match tagname = "p">
+					<match element_type = "-->text" options = "text_not_null" />
+				</match>
+				<match tagname = "p">
+					<match element_type = "-->text" options = "text_not_null" />
+				</match>
+			</match>
+		</match>
+	</match>
+</template>

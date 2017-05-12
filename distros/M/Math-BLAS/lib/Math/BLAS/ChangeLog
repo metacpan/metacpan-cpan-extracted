@@ -1,0 +1,14 @@
+2011-04-16  Ralph Schleicher  <rs@ralph-schleicher.de>
+
+	* Legacy.pm (blas_nrm2): Rename to blas_dnrm2 (fix typo).
+
+2011-04-15  Ralph Schleicher  <rs@ralph-schleicher.de>
+
+	* Enum.pm: Specify POD encoding.
+	($VERSION): Version 1.01.
+
+	* Legacy.pm: Specify POD encoding.
+	($VERSION): Version 1.01.
+
+	* PP.pm: Add basic documentation.
+	($VERSION): Version 1.01.

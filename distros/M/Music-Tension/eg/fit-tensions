@@ -1,0 +1,70 @@
+#!/usr/bin/env perl
+#
+# Try to fit Plomp-Levelt consonance curves generated with random
+# amplitude profiles to Cope tension values.
+
+use strict;
+use warnings;
+
+use Getopt::Long qw/GetOptions/;
+use List::Util qw/max/;
+use Music::Tension::Cope;
+use Music::Tension::PlompLevelt;
+
+# register matters a great deal for P-L curves!
+my $start_pitch = 60;
+GetOptions( 'startpitch=i' => \$start_pitch );
+
+# this could be extended to two registers; beyond that, Cope uses the
+# same tension values (a -0.02 decrement on tension).
+my $end_pitch = $start_pitch + 12;
+
+my $mtc = Music::Tension::Cope->new;
+my @cope_tensions;
+
+for my $p ( $start_pitch .. $end_pitch ) {
+  push @cope_tensions, $mtc->pitches( $start_pitch, $p );
+}
+#$cope_tensions[5] = 0;    # KLUGE try ignoring perfect 4th
+
+my $best_fit     = ~0;
+my $best_profile = [];
+
+for my $ampcount ( 2 .. 12 ) {
+  for ( 1 .. 10_000 ) {
+    my @amp = map rand, 1 .. $ampcount;
+    my $mtp = Music::Tension::PlompLevelt->new(
+      amplitudes          => { rand => \@amp },
+      default_amp_profile => 'rand',
+    );
+
+    my @pl_tensions;
+    for my $p ( $start_pitch .. $end_pitch ) {
+      push @pl_tensions, $mtp->pitches( $start_pitch, $p );
+    }
+    #   $pl_tensions[5] = 0;    # KLUGE try ignoring perfect 4th
+
+    my $max = max @pl_tensions;
+    $_ /= $max for @pl_tensions;
+
+    my $fit = fit( \@cope_tensions, \@pl_tensions );
+    if ( $fit < $best_fit ) {
+      $best_fit     = $fit;
+      $best_profile = \@amp;
+    }
+  }
+}
+
+$_ = sprintf "%.3f", $_ for @$best_profile;
+$best_fit = sprintf "%.3f", $best_fit;
+print "best fit $best_fit with profile @$best_profile\n";
+
+sub fit {
+  my ( $a1, $a2 ) = @_;
+
+  my $sum;
+  for my $i ( 0 .. $#$a1 ) {
+    $sum += ( $a2->[$i] - $a1->[$i] )**2;
+  }
+  return $sum;
+}

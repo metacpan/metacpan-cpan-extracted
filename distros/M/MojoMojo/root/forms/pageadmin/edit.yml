@@ -1,0 +1,14 @@
+---
+load_config_file: __path_to(root/forms/defaults.yml)__
+
+elements:
+  - type: Textarea
+    name: body
+    label_loc: Page text
+    constraints:
+      - Required
+  - type: Text
+    name: creator
+    label_loc: creator
+  - type: Submit
+    name: submit

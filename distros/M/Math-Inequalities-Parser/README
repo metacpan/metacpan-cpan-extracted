@@ -1,0 +1,72 @@
+NAME
+    Math::Inequalities::Parser - Minimum and maximum values allowed by an
+    inequality.
+
+SYNOPSIS
+        use Math::Inequalities::Parser;
+    
+        my ($min, $max) = parse_inequality( ' 10 < n < 20 ' );
+        # $min = 11
+        # $max = 19
+
+DESCRIPTION
+    Tiny library for parsing integer maximum and minimum out when given an
+    arbitrary inequality.
+
+    Because getting this simple thing right was far harder than it looked,
+    and I never want to have to think about it again.
+
+FUNCTIONS
+  parse_inequality
+    Parses an inequality string and returns a list of two values, the
+    minimum and the maxium value that string will allow.
+
+TYPES OF INEQUALITY
+  VALUE
+    The simplest type, a single value, e.g. "42 = Min 42, Max 42".
+
+  n < VALUE
+    Maximum is VALUE - 1, Minimum is undefined, e.g. "n < 42 = Min undef,
+    Max 41".
+
+  n > VALUE
+    Minimum is VALUE +1, Maximum is undefined, e.g. "n > 42 = Min 43, Max
+    undef".
+
+  n <= VALUE
+    Maximum is VALUE, Minimum is undefined, e.g. "n < 42 = Min undef, Max
+    42".
+
+  n >= VALUE
+    Minimum is VALUE, Maximum is undefined, e.g. "n > 42 = Min 42, Max
+    undef".
+
+  Cases with VALUE, followed by N.
+    Handled as above, but with minimum and maximum reversed as expected.
+
+  VALUE1 < n < VALUE2
+    Minimum is VALUE1 + 1, maximum is VALUE2 - 1, e.g "42 < n < 200 = Min
+    43, Max 199".
+
+BUGS
+    Does not handle "VALUE1 <= n <= VALUE2" or similar. Patches welcome.
+    Does not complain at impossible "<VALUE1 < n < VALUE 2 "> combinations
+    (e.g. "5 < n < 4") which result in a higher minumum than the maxiumum.
+    Patches welcome.
+    Does not work with negative numbers. Patches welcome.
+    Always uses "n" as the number identifier, this should be configureable
+    at import time.
+    Uses Exporter (should use Sub::Exporter)
+    DOES NOT work with floating point numbers. I consider this a feature.
+
+AUTHORS
+    Tomas Doran (t0m) "<bobtfish@bobtfish.net>"
+
+    Dave Lambley
+
+COPYRIGHT & LICENSE
+    Copyright 2011 the above author(s).
+
+    This sofware is free software, and is licensed under the same terms as
+    perl itself.
+

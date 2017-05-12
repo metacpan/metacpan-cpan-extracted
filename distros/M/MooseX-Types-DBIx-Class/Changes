@@ -1,0 +1,34 @@
+Revision history for MooseX::Types::DBIx::Class
+
+0.05 Aug 22, 2011
+
+    * Add custom messages that provide more insight into why a value
+	  doesn't meet the type constraints requirements.
+
+0.04 Jun 29, 2010
+
+    * Previous version didn't have $VERSION defined in the package
+
+0.03 Jun 29, 2010
+
+    * Merged standard and parameterizable types into a single module
+      PLEASE NOTE: MooseX::Types::DBIx::Class::Parameterized has been
+                   merged with MooseX::Types::DBIx::Class and is no
+                   longer in the distribution.
+
+0.02 Jun 25, 2010
+
+    * Added parameterizable type constraints. Patch by Brian Phillips
+
+0.01.02 Jun 12, 2010
+
+    * Distribution fixes
+        - Added SQL::Translator to build requirements
+
+0.01 Jun 7, 2010
+
+    * Initial version, has types for:
+        - ResultSet
+        - ResultSource
+        - Row
+        - Schema

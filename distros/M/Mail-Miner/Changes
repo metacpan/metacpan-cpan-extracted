@@ -1,0 +1,139 @@
+2003-01-06 14:55  simon
+
+	* Miner/Assets.pm: [no log message]
+
+2003-01-06 14:54  simon
+
+	* MANIFEST, Miner.pm, t/mail-box.t: Further extract Miner and its
+	storage. Bump up to 2.3.
+
+2003-01-06 14:49  simon
+
+	* Miner/: Asset.pm, Assets.pm: Further separate storage from
+	mining.
+
+2003-01-04 00:13  simon
+
+	* Miner/Attachment.pm: ENOTMYDAY.
+
+2003-01-04 00:11  simon
+
+	* Miner/Attachment.pm: Oh that is *so* embarrassing.
+
+2003-01-02 08:39  simon
+
+	* Makefile.PL, Miner.pm, Miner/Mail.pm: Some fixes from Autrijus
+	Tang.
+
+2003-01-01 18:18  simon
+
+	* Changes, README: Oops.
+
+2003-01-01 18:17  simon
+
+	* Changes, Makefile.PL, Miner.pm, miner.sql, mm, mm_process,
+	test-message, Audit/Miner.pm, Miner/Asset.pm, Miner/Attachment.pm,
+	Miner/Config.pm, Miner/DBI.pm, Miner/Mail.pm,
+	Miner/Recogniser/Address.pm, Miner/Recogniser/Date.pm,
+	Miner/Recogniser/Keywords.pm, Miner/Recogniser/Phone.pm,
+	t/assets.t, t/mail-box.t: This is 2.1.
+
+2003-01-01 18:17  simon
+
+	* MANIFEST: Add missing files.
+
+2003-01-01 18:17  simon
+
+	* README: Correct documentation bug.
+
+2002-12-31 13:38  simon
+
+	* Changes, MANIFEST, Makefile.PL, Miner.pm, README, miner.sql, mm,
+	mm_process, test-message, Audit/Miner.pm, Miner/Asset.pm,
+	Miner/Attachment.pm, Miner/Config.pm, Miner/DBI.pm, Miner/Mail.pm,
+	Miner/Recogniser/Address.pm, Miner/Recogniser/Date.pm,
+	Miner/Recogniser/Keywords.pm, Miner/Recogniser/Phone.pm,
+	t/assets.t, t/mail-box.t: This is 2.0.
+
+2002-12-31 13:37  simon
+
+	* Makefile.PL, Miner.pm, Miner/Config.pm, Miner/DBI.pm: Final
+	tweaks and configuration setup.
+
+2002-12-31 13:30  simon
+
+	* Makefile.PL, Miner/Config.pm: A configurator, hopefully.
+
+2002-12-31 13:30  simon
+
+	* Miner/Recogniser/Date.pm: Weird bugs.
+
+2002-12-31 13:18  simon
+
+	* MANIFEST: Sort this bloody thing.
+
+2002-12-31 13:11  simon
+
+	* MANIFEST, Audit/Miner.pm: Mail::Audit plugin
+
+2002-12-31 13:08  simon
+
+	* MANIFEST, Miner/Mail.pm, Miner/Recogniser/Date.pm,
+	Miner/Recogniser/Keywords.pm: Dummy recogniser for tracking
+	time-of-day.
+
+2002-12-31 12:48  simon
+
+	* MANIFEST, Miner.pm, mm, test-message, Miner/Mail.pm,
+	Miner/Recogniser/Keywords.pm: This gets most of the command-line
+	stuff working.
+
+2002-12-31 11:44  simon
+
+	* Makefile.PL: Since we use magic has_a
+
+2002-12-30 21:45  simon
+
+	* Miner/: Asset.pm, DBI.pm: Remove some redundancies.
+
+2002-12-30 21:39  simon
+
+	* Miner/Mail.pm: Not needed right now.
+
+2002-12-30 21:11  simon
+
+	* Miner/Mail.pm: Searching works.
+
+2002-12-30 16:58  simon
+
+	* Miner/Recogniser/: Address.pm, Keywords.pm, Phone.pm: Add a
+	"keyword" for searching.
+
+2002-12-30 16:36  simon
+
+	* Makefile.PL, README, Miner/Mail.pm: Starting to add searching and
+	reporting functionality.
+
+2002-12-21 18:12  simon
+
+	* MANIFEST, Miner.pm, miner.sql, mm_process, Miner/Asset.pm,
+	Miner/Assets.pm, Miner/Attachment.pm, Miner/Attachments.pm,
+	Miner/DBI.pm, Miner/Mail.pm: Renaming, rewriting, etc.
+
+2002-12-18 14:17  simon
+
+	* Miner/Attachments.pm: Working on attachment handling.
+
+2002-12-18 13:56  simon
+
+	* MANIFEST, Miner.pm, miner.sql, Miner/Assets.pm,
+	Miner/Attachments.pm, t/assets.t, t/mail-box.t: Beginnings of a DBI
+	framework.
+
+2002-12-18 13:27  simon
+
+	* Changes, MANIFEST, Makefile.PL, Miner.pm, README, test-message,
+	Miner/Recogniser/Address.pm, Miner/Recogniser/Keywords.pm,
+	Miner/Recogniser/Phone.pm, t/assets.t, t/mail-box.t: Baby steps
+	towards 2.0
+

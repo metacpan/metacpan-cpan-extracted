@@ -1,0 +1,4 @@
+%$
+\.(o|c|bak|old|bs|gz)$
+\bblib\b
+\b(Makefile|pm_to_blib)$

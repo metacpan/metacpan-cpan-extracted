@@ -1,0 +1,12 @@
+Build.PL
+Changes
+Makefile.PL
+META.yml
+MANIFEST
+MANIFEST.SKIP
+README
+lib/MooseX/IOC.pm
+lib/MooseX/IOC/Meta/Attribute.pm
+t/000_load.t
+t/001_basic.t
+t/pod.t

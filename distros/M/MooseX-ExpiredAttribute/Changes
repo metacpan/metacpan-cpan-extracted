@@ -1,0 +1,20 @@
+Revision history for perl module MooseX::ExpiredAttribute
+
+0.023 2014-02-12
+    - Moose has the conflict with the Module::Runtime v0.014
+      By this reason tests of this module fail too
+      Here added 'requires' minimal version requirement of Moose (2.1204 current)
+
+0.022 2014-02-12
+    - Few doc fixes
+    - Added the required module 'Moose'
+
+0.021 2014-02-11
+    - Many small fixes (doc, git repo info, Changes file...)
+    - improved test - added second expired attribute in class.
+
+0.02 2014-02-11
+    - First public release
+
+0.01 2014-02-11
+    - First release but removed from public

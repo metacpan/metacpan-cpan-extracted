@@ -1,0 +1,47 @@
+1.03     2016-08-21
+
+- Fixed formatting of images in Pod on Metacpan to not exceed the width of the
+  browser window.
+
+
+1.02     2016-08-18
+
+- Removed ':all' from 'use autodie'. This requires IPC::System::Simple to
+  fatalize system and exec, but we're not actually calling those builtins.
+
+- Removed use of yadda operator (...) in subroutines. This only works with
+  newer versions of Perl.
+
+
+1.01     2016-08-17
+
+- Disable tests with older versions of MooseX::Role::Parameterized. Older
+  versions named generated roles differently, leading to spurious test
+  failures. Fixed by Mark Fowler.
+
+
+1.00     2016-08-17
+
+- Major reworking; Added pluggable renderers and PlantUML support. Added
+  method and attributes support for renderes that support it. Made GraphViz
+  graph not suck. Added ability to control output format from command
+  line. Implemented by Mark Fowler.
+
+
+0.03     2015-08-30
+
+- If a parameterized role consumed roles by calling "with" inside its role
+  block, the roles it consumed there were simply ignored when graphing. This
+  bug was reported by carthanc. I ended up fixing and testing this in a
+  somewhat different way than the code in GitHub PR #55.
+
+
+0.02     2015-07-20
+
+- When given a role name, the grapher would try to follows its superclasses,
+  which caused an exception. Reported by Mark Fowler.
+
+
+0.01     2015-07-18
+
+- First release upon an unsuspecting world.

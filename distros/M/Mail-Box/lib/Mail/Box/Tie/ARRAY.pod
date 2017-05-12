@@ -1,0 +1,175 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Box::Tie::ARRAY - access an existing message folder as array
+
+=head1 SYNOPSIS
+
+ use Mail::Box::Manager;
+ my $mgr    = Mail::Box::Manager->new;
+ my $folder = $mgr->open(folder => 'inbox');
+
+ use Mail::Box::Tie::ARRAY;
+ tie my(@inbox), 'Mail::Box::Tie::ARRAY', $folder;
+
+ # deprecated, but works too
+ use Mail::Box::Tie;
+ tie my(@inbox), 'Mail::Box::Tie', $folder;
+
+ foreach (@inbox) {print $_->short}
+ print $_->print foreach @inbox;
+ my $emails = @inbox;
+
+ print $inbox[3];
+ print scalar @inbox;
+ push @inbox, Mail::Box::Message->new(...);
+ delete $inbox[6];
+ print $inbox[0]->head->get('status');
+
+ my $folder = tied @inbox;
+ untie @inbox;
+
+=head1 DESCRIPTION
+
+Certainly when you look at a folder as a list of messages, it is logical to
+access the folder through an array.
+
+Not all operations on arrays are supported.  Actually, most functions which
+would reduce the size of the array are modified instead to mark messages for
+deletion.
+
+Examples what you I<cannot> do:
+
+ shift/unshift/pop/splice @inbox;
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item B<TIEARRAY>('Mail::Box::Tie::ARRAY', FOLDER)
+
+Create the tie on an existing folder.
+
+example: tie an array to a folder
+
+ my $mgr   = Mail::Box::Manager->new;
+ my $inbox = $mgr->new(folder => $ENV{MAIL});
+ tie my(@inbox), 'Mail::Box::Tie::Array', ref $inbox, $inbox;
+
+=back
+
+=head2 Tied Interface
+
+=over 4
+
+=item $obj-E<gt>B<DELETE>()
+
+Flag a message to be removed.  Be warned that the message stays in
+the folder, and is not removed before the folder is written.
+
+example: 
+
+ delete $inbox[5];
+ $inbox[5]->delete;   #same
+
+=item $obj-E<gt>B<FETCH>($index)
+
+Get the message which is at the indicated location in the list of
+messages contained in this folder.  Deleted messages will be returned
+as C<undef>.
+
+example: 
+
+ print $inbox[3];     # 4th message in the folder
+ print @inbox[3,0];   # 4th and first of the folder
+ print $inbox[-1];    # last message
+
+=item $obj-E<gt>B<FETCHSIZE>()
+
+Return the total number of messages in a folder.  This is called when
+the folder-array is used in scalar context, for instance.
+
+example: 
+
+ if(@inbox > 10)    # contains more than 10 messages?
+ my $nrmsgs = @inbox;
+
+=item $obj-E<gt>B<PUSH>(@messages)
+
+Add @messages to the end of the folder.
+
+example: 
+
+    push @inbox, $newmsg;
+
+=item $obj-E<gt>B<STORE>($index, $message)
+
+Random message replacement is not permitted --doing so would disturb threads
+etc.  An error occurs if you try to do this. The only thing which is allowed
+is to store a message at the first free index at the end of the folder (which
+is also achievable with L<PUSH()|Mail::Box::Tie::ARRAY/"Tied Interface">).
+
+example: 
+
+ $inbox[8] = $add;
+ $inbox[-1] = $add;
+ push @inbox, $add;
+
+=item $obj-E<gt>B<STORESIZE>($length)
+
+Sets all messages behind from $length to the end of folder to be deleted.
+
+=back
+
+=head1 DETAILS
+
+=head2 Folder tied as array
+
+=head3 Limitations
+
+This module implements C<TIEARRAY>, C<FETCH>, C<STORE>, C<FETCHSIZE>,
+C<STORESIZE>, C<DELETE>, C<PUSH>, and C<DESTROY>.
+
+This module does not implement all other methods as described in
+the Tie::Array documentation, because the real array of messages
+is not permitted to shrink or be mutilated.
+
+=head1 SEE ALSO
+
+This module is part of Mail-Box distribution version 3.002,
+built on March 31, 2017.
+
+Do not forget to read
+L<Mail::Box-Overview>,
+L<Mail::Box-Cookbook>, and
+L<Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L<Mail::Message>,
+L<Mail::Box>,
+L<Mail::Box::IMAP4>,
+L<Mail::Box::POP3>,
+L<Mail::Box::Parser::C>,
+L<Mail::Box::Dbx> (unpublished),
+L<Mail::Transport>,
+L<Object::Realize::Later>, and
+L<User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

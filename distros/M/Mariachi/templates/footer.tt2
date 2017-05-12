@@ -1,0 +1,4 @@
+<p>Generated at [% date.format %] by mariachi [% mariachi.VERSION %]</p>
+
+</body>
+</html>

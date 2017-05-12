@@ -1,0 +1,24 @@
+Changes
+lib/Math/StochasticProcess.pm
+lib/Math/StochasticProcess/Event.pm
+lib/Math/StochasticProcess/Event/Tuple.pm
+lib/Math/StochasticProcess/RandomVariable.pm
+Makefile.PL
+Build.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/boilerplate.t
+t/changes.t
+t/d6-a.t
+t/d6-b.t
+t/d6.t
+t/lib/LogDir.pm
+t/manifest.t
+t/perlcritic.t
+t/perlcriticrc
+t/pod-coverage.t
+t/pod.t
+t/podspell.t
+t/prereq.t

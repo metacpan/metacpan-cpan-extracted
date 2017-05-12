@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tube name="Glasgow tube">
+  <lines>
+    <line id="SPT" name="SPT" color="#68232E"/>
+  </lines>
+  <stations>
+    <station id="KB" name="Kelvinbridge"      line="SPT" link="SG,HH"/>
+    <station id="SG" name="St George's Cross" line="SPT" link="CC,KB"/>
+    <station id="CC" name="Cowcaddens"        line="SPT" link="BU,SG"/>
+    <station id="BU" name="Buchanan Street"   line="SPT" link="SE,CC"/>
+    <station id="SE" name="St Enoch"          line="SPT" link="BS,BU"/>
+    <station id="BS" name="Bridge Street"     line="SPT" link="WS,SE"/>
+    <station id="WS" name="West Street"       line="SPT" link="SR,BS"/>
+    <station id="SR" name="Shields Road"      line="SPT" link="KP,WS"/>
+    <station id="KP" name="Kinning Park"      line="SPT" link="CN,SR"/>
+    <station id="CN" name="Cessnock"          line="SPT" link="IB,KP"/>
+    <station id="IB" name="Ibrox"             line="SPT" link="GO,CN"/>
+    <station id="GO" name="Govan"             line="SPT" link="PA,IB"/>
+    <station id="PA" name="Partick"           line="SPT" link="KH,GO"/>
+    <station id="KH" name="Kelvinhall"        line="SPT" link="HH,PA"/>
+    <station id="HH" name="Hillhead"          line="SPT" link="KB,KH"/>
+  </stations>
+</tube>

@@ -1,0 +1,15 @@
+[%
+    admin_header = 1;
+    title = c.pref('name');
+    selected = 'configuration';
+    WRAPPER page/wrapper.tt;
+%]
+
+<div id="content">
+    <h1>[% loc('Site Configuration') %]</h1>
+    [% form %]
+    [% IF message %]
+    <h2>[% message %]</h2>
+    [% END %]
+</div>
+[% END # WRAPPER %]

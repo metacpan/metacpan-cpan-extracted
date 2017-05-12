@@ -1,0 +1,92 @@
+NAME
+    Mojolicious::Plugin::HTMLTemplateProRenderer - Mojolicious Plugin
+
+SYNOPSIS
+      # Mojolicious
+      $self->plugin('HTMLTemplateProRenderer');
+
+
+      # Mojolicious::Lite 
+      plugin 'HTMLTemplateProRenderer';
+
+      # Render HTML::Template::Pro handler and post 'utf8 => 1' option for next HTML::Template::Pro->new call
+      get '/' => sub{
+        my $self = shift;
+        $self->render('bender', handler => 'tmpl', tmpl_opts => {utf8 => 1});
+      }
+
+
+      # Set default options for all HTML::Template::Pro->new calls
+      plugin 'HTMLTemplateProRenderer', tmpl_opts => {blind_cache => 1, open_mode => '<:encoding(UTF-16)'};
+
+      # Set use of L<HTML::Template::Pro::Extension>
+      plugin 'HTMLTemplateProRenderer', tmpl_opts => {use_extension => 1};
+
+      # render inline L<HTML::Template::Pro::Extension> using SLASH_VAR extension
+      get '/slash_var' => sub {
+        my $self = shift;
+        $self->stash(foo => 'bar');
+        $self->render(inline => '<p><TMPL_VAR NAME="foo">this will be deleted</TMPL_VAR></p>',
+          handler => 'tmpl', plugins => ['SLASH_VAR']);
+      };
+
+      # render a loop
+      get '/' => sub {
+        my $self = shift;
+        my $test = [{row => 'First row'},{row => 'Second row'}];
+        $self->stash(loop => $test);
+        $self->render(inline => '<ul><TMPL_LOOP NAME="loop"><li><TMPL_VAR NAME="row"></li></TMPL_LOOP></ul>',
+          handler => 'tmpl');
+      };
+
+DESCRIPTION
+    Mojolicious::Plugin::HTMLTemplateProRenderer is a Mojolicious plugin to
+    use HTML::Template::Pro and HTML::Template::Pro::Extension modules in
+    your Mojo projects.
+
+    HTML::Template::Pro is a fast lightweight C/Perl+XS reimplementation of
+    HTML::Template (as of 2.9) and HTML::Template::Expr (as of 0.0.7). It is
+    not intended to be a complete replacement, but to be a fast
+    implementation of HTML::Template if you don't need querying, the
+    extended facility of HTML::Template.
+
+    Designed for heavy upload, resource limitations, abcence of mod_perl.
+
+    HTML::Template::Pro::Extension is a pluggable extension syntax module
+    for HTML::Template::Pro.
+
+METHODS
+    Mojolicious::Plugin::HTMLTemplateProRenderer inherits all methods from
+    Mojolicious::Plugin and implements the following new ones.
+
+  "register"
+      $plugin->register;
+
+    Register plugin in Mojolicious application.
+
+OPTIONS
+    These are options for Mojolicious::Plugin::HTMLTemplateProRenderer
+
+  "use_home_template"
+      $self->render('template', handler => 'tmpl',use_home_template => 1);
+
+    Templates are found starting from home base app path other than
+    home_app/templates path.
+
+  "use_extension"
+      $self->render('template', handler => 'tmpl',use_extension => 1, plugins => ['SLASH_VAR']
+
+    Enable use of HTML::Template::Pro::Extension and use of plugins.
+
+SEE ALSO
+    Mojolicious, Mojolicious::Guides, <http://mojolicio.us>.
+
+COPYRIGHT & LICENSE
+    Copyright 2014 Emiliano Bruni, all rights reserved.
+
+    Initially based on Mojolicious::Plugin::HTMLTemplateRenderer code which
+    is copyrighted by Bob Faist.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

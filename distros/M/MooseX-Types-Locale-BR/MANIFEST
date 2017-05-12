@@ -1,0 +1,10 @@
+Build.PL
+Changes
+ignore.txt
+lib/MooseX/Types/Locale/BR.pm
+MANIFEST
+README
+t/00-load.t
+t/01-test.t
+Makefile.PL
+META.yml

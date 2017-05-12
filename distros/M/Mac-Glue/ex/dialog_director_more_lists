@@ -1,0 +1,135 @@
+#!perl -w
+use Data::Dumper;
+use Mac::Files;
+use Mac::Glue ':all';
+use POSIX;
+use strict;
+
+my $order = 5;
+my $path = FindFolder(kOnSystemDisk, kFontsFolderType);
+my @list = get_files($path);
+my $nlist;
+
+my @sort = (
+	sub { lc $a->[0] cmp lc $b->[0] },
+	sub { $a->[1] <=> $b->[1] },
+	sub { $a->[2] <=> $b->[2] }
+);
+
+my $glue = new Mac::Glue 'Finder';
+$glue->activate;
+$glue->dd_install(
+	with_fonts => [{
+		name	=> 'Geneva',
+		size	=> 9
+	}, {}, {}, {}, {
+		style => enum('underline')
+	}],
+	grayscale => gTrue
+);
+die $^E if $^E;
+
+END {
+	$glue->dd_uninstall if $glue;
+	warn $^E if $^E;
+}
+
+my $dd = $glue->dd_make_dialog({
+	name		=> 'Sorted List Demo',
+	size		=> [370, 190],
+	style		=> enum('standard window'),
+	closeable	=> gTrue,
+	contents	=> [
+		{
+			class		=> 'list box',
+			contents	=> list_sort(\@list, $order - 5),
+			bounds		=> [8, 24, 362, 182],
+			column_widths	=> [140, 40, 80]
+		}, {
+			class		=> 'poly push button',
+			bounds		=> [12, 4, 38, 17]
+		}, {
+			class		=> 'poly push button',
+			bounds		=> [152, 4, 173, 17]
+		}, {
+			class		=> 'poly push button',
+			bounds		=> [192, 4, 214, 17]
+		}, {
+			class		=> 'static text',
+			contents	=> 'Name',
+			bounds		=> [12, 4, 38, 17],
+			font		=> 5
+		}, {
+			class		=> 'static text',
+			contents	=> 'Size',
+			bounds		=> [152, 4, 174, 17]
+		}, {
+			class		=> 'static text',
+			contents	=> 'Date',
+			bounds		=> [192, 4, 214, 17]
+		}
+	]
+});
+die $^E if $^E;
+
+while (1) {
+	my $i = $glue->dd_interact_with_user;
+	if ($i >= 2 && $i <= 4 && ($i + 3) != $order) {
+		$glue->dd_set(
+			$glue->prop(font => item => $order => dialog => 1),
+			to => 4
+		);
+		$order = $i + 3;
+		$glue->dd_set(
+			$glue->prop(font => item => $order, dialog => 1),
+			to => 5
+		);
+		$glue->dd_set(
+			$glue->prop(contents => item  => 1, dialog => 1),
+			to => list_sort(\@list, $order - 5)
+		);
+	} elsif ($i == -1) {
+		last;
+	}
+}
+
+my $item = $glue->dd_get( $glue->prop(value => item => 1 => $dd) ) - 1;
+warn $^E if $^E;
+
+for ([split /\t/, $nlist->[$item]]) {
+	print "You selected $_->[0], $_->[1]K, last modified $_->[2].\n";
+}
+
+
+sub get_time {
+	return $^T - ((-M $_[0]) * 86400);
+}
+
+sub get_size {
+	my $cat = FSpGetCatInfo($_[0]);
+	my $bytes = $cat->ioFlLgLen + $cat->ioFlRLgLen;
+	return int($bytes / 1024);
+}
+
+sub get_files {
+	local *PATH;
+	my $path = shift;
+	chdir $path or die $!;
+	opendir(PATH, $path) or die $!;
+
+	my @list = map {[
+		$_, get_size($_), get_time($_),
+		strftime("%A, %B %d, %Y", localtime(get_time($_))),
+	]} readdir PATH;
+
+	return @list;
+}
+
+sub list_sort {
+	my($list, $i) = @_;
+	$i = $i == 0 ? 0 : $i == 1 ? 1 : $i == 2 ? 2 : 0;
+	$nlist = [map { join "\t", @{$_}[0,1,3] } sort { &{$sort[$i]} } @$list];
+	return $nlist;
+}
+
+__END__

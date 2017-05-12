@@ -1,0 +1,23 @@
+X-Header-Lines: 6
+From: Paul Hoffman <nkuitse@nkuitse.com>
+To: Paul Hoffman <nkuitse@nkuitse.com>
+Subject: Testing 1, 2, 3
+Content-Type: multipart/alternative; boundary="BOUNDARY"
+Description: Message with two parts
+
+This is the preamble.
+--BOUNDARY
+X-Header-Lines: 3
+Content-Type: text/plain
+Description: Part 1
+
+This is the body of part 1.  Note the blank line at the end.
+
+--BOUNDARY
+X-Header-Lines: 3
+Content-Type: text/plain
+Description: Part 2
+
+This is the body of part 2.  Note the blank line at the end.
+
+--BOUNDARY--

@@ -1,0 +1,76 @@
+Revision history for Maypole-Plugin-QuickTable
+
+0.422   Mon  26 Sept, 2005 11:15
+        - better more compact output of multiple items in a table cell
+
+0.421   Fri  23 Sept, 2005 23:05
+        - more compact output of multiple items in a table cell
+
+0.42    Tues 20 Sept, 2005 09:50
+        - provide orderby_link() as a public method, factored out of 
+            _make_linked_headers() (Ron McClain). 
+
+0.41    Tues 23 August, 2005 12:00
+        - setup() dies if M::P::LinkTools isn't loaded (otherwise the error messages 
+            at runtime can be confusing/absent) (Dave Howorth)
+        - fix tabulate() for the case of a search returning no results - use $r->model_class 
+            instead of ref $objects[0]
+            
+0.4     Fri  12 Aug 2005, 17:30
+        - removed link-generating methods, and re-packaged in Maypole::Plugin::LinkTools
+        - added Maypole::Plugin::LinkTools as a dependency
+        - extracts field list from the object being processed, rather than the request's 
+            model class
+        - refactored header link generating code into a separate method
+
+0.322   Tues 9 Aug  2005, 1:20
+        - added use URI (spotted by Dave Howorth)
+
+0.321  Thur 4  Aug 2005, 17:10
+        - tabulate() now uses the plural_moniker() of related (i.e. has_many) fields 
+            when generating a heading for the field 
+
+0.32   Fri 22 July 2005, 23:00
+        - added a field_callback argument to tabulate() - see an example in the 
+            Maypole edit template
+
+0.31   Fri  22 July 2005, 00:50
+        - tabulate() now defaults to showing columns for display_columns + related. 
+        - tabulate now accepts objects as an optional *named* argument, and not as a required 
+            positional argument. If not supplied, defaults to $request->objects
+        - renamed _tabulate to _tabulate_object
+        - fixed excessive warnings from _tabulate_object if no stringify_column (still issues 
+            some warnings in debug mode)
+
+0.303  Thur 21 July 2005, 11:40
+        - um, now it stringifies *and returns* them
+
+0.302  Thur 21 July 2005, 10:00
+        - maybe_link_view was not handling non-Maypole objects properly - now 
+            it stringifies them
+
+0.301  Thur 21 July 2005, 09:45
+        - test if a Maypole::Model thing is an object or a class in maybe_link_view
+        - test definedness of $order_by before doing string comparison in tabulate
+
+0.3    Wed  20 July 2005, 12:00
+        - added code from Ron McClain to support clickable search-by column headers 
+        - empty has_many columns were not being rendered in listview (now they are 
+            rendered as an empty table cell, so keeping in sync with column headers)
+            because maybe_many_link_views() was returning an empty list when supplied 
+            with an empty list of values. Now it returns ''
+
+0.2    Wed  20 July 2005, 01:00
+        - added 'fields' argument to tabulate() - it was hard-wired to 
+            use display_columns
+            - fields defaults to display_columns + related (i.e. db columns plus has_many accessors)
+        - added maybe_many_link_views() method
+
+0.11   Fri  10 Jun 2005, 12:40
+        - POD fixes
+        - changed the location of quicktable_defaults. Now it's 
+            simply a Class::Data::Inheritable method on the model
+
+0.1    Thur  9 Jun 2005, 23:00
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,14 @@
+Revision history for MooX-VariantAttribute
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.05    19/03/2017
+        Fix the POD error.
+
+0.06    20/03/2017
+        - run can now accept - a method *name* (available to $self).
+        - Fix a bug - when the builder is a code reference.
+
+0.07    27/03/2017
+        - replace %cry with combine_keys

@@ -1,0 +1,45 @@
+---
+abstract: 'Mouse type constraints for Data::Monad'
+author:
+  - 'aereal <aereal@aereal.org>'
+build_requires:
+  Devel::Cover: '0'
+  Devel::Cover::Report::Coveralls: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MouseX-Types-Data-Monad
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MouseX::Types::Data::Monad:
+    file: lib/MouseX/Types/Data/Monad.pm
+    version: '0.01'
+  MouseX::Types::Data::Monad::Either:
+    file: lib/MouseX/Types/Data/Monad/Either.pm
+  MouseX::Types::Data::Monad::Maybe:
+    file: lib/MouseX/Types/Data/Monad/Maybe.pm
+requires:
+  Data::Monad: '0'
+  Mouse: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/aereal/MouseX-Types-Data-Monad/issues
+  homepage: https://github.com/aereal/MouseX-Types-Data-Monad
+  repository: git://github.com/aereal/MouseX-Types-Data-Monad.git
+version: '0.01'
+x_authority: cpan:AEREAL

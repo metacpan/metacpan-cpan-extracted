@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name: Append
+abstract: nothing to see here
+provides:
+  Provides::Inner:
+    file: lib/Provides/Inner.pm
+    version: 0.001
+  Provides::Inner::Util:
+    file: lib/Provides/Inner.pm
+X_Module_Faker:
+  append:
+    - file: lib/Provides/Inner.pm
+      content: "\n=head1 NAME\n\nAppend - here I am"
+    - file: t/foo.t
+      content: |
+        use Test::More;
+    - file: t/foo.t
+      content: "ok(1);"

@@ -1,0 +1,83 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Message::Wrapper::SpamAssassin - Connect a Mail::Message with Mail::SpamAssassin
+
+=head1 INHERITANCE
+
+ Mail::Message::Wrapper::SpamAssassin
+   is a Mail::SpamAssassin::Message
+
+=head1 SYNOPSIS
+
+ # WARNING: requires OLD SpamAssassion 2.x, not the new 3.x
+ # See Mail::Box::Search::SpamAssassin for the preferred interface
+ # However, it is possible to do:
+
+ my $msg    = ...;   # some Mail::Message object
+ my $sa     = Mail::Message::Wrapper::SpamAssassin->new($msg);
+ my $spam   = Mail::SpamAssassin->new;
+ my $status = $spam->check($sa);
+
+ $msg->label(spam => 1) if $status->is_spam;
+ $status->rewrite_mail;  # Adds spam lines to header
+
+=head1 DESCRIPTION
+
+WARNING: This module only works with the old version of SpamAssassin:
+version 2.x.  The newer 3.x releases have changed the way that messages
+are kept. Please contribute improved code.
+
+The C<Mail::Message::Wrapper::SpamAssassin> class --sorry for the
+long package name-- is a wrapper around Mail::SpamAssassin::Message, which
+is an interface to the spam checking software of Mail::SpamAssassin.
+
+=head1 METHODS
+
+=over 4
+
+=item Mail::Message::Wrapper::SpamAssassin-E<gt>B<new>($message, %options)
+
+Creates a wrapper around the $message.  The already present fields
+from a previous run of Spam::Assassin (or probably fake lines) are
+removed first.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Box distribution version 3.002,
+built on March 31, 2017.
+
+Do not forget to read
+L<Mail::Box-Overview>,
+L<Mail::Box-Cookbook>, and
+L<Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L<Mail::Message>,
+L<Mail::Box>,
+L<Mail::Box::IMAP4>,
+L<Mail::Box::POP3>,
+L<Mail::Box::Parser::C>,
+L<Mail::Box::Dbx> (unpublished),
+L<Mail::Transport>,
+L<Object::Realize::Later>, and
+L<User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

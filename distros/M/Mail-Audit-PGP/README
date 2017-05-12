@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Mail-Audit-PGP,
+version 1.702:
+
+  Mail::Audit plugin for PGP header fixing
+
+This software is copyright (c) 2003 by Simon Cozens.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

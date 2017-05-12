@@ -1,0 +1,15 @@
+Revision history for Math-SlideRule. Notable things I remember to put here,
+anyways. The git log may be more informative?
+
+1.03    10 does not usually belong to the zeroth exponent. Test::Most.
+
+1.00    May 2015
+        Maukeify Makefile.PL. Mandate POD tests, and add POD coverage tests.
+        Use actual log() distances in calculations via lookup table. Also,
+	sqrt() added.
+
+0.05    Mar 16thish 2014
+        Removed C/D attributes. Various other changes and mostly ruminations.
+
+0.01    Feb 11 2014 or so.
+        First version, released on an unsuspecting world.

@@ -1,0 +1,15 @@
+CHANGES
+lib/Module/Load.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01_Module-Load.t
+t/02_Module-Load.t
+t/to_load/config_file
+t/to_load/LoadIt.pm
+t/to_load/LoadMe.pl
+t/to_load/Must/Be/Loaded.pm
+t/to_load/TestModule.pm
+t/to_load/ToBeLoaded
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

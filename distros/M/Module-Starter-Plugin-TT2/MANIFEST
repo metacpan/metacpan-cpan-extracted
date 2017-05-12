@@ -1,0 +1,24 @@
+MANIFEST
+README
+Changes
+Makefile.PL
+
+lib/Module/Starter/Plugin/TT2.pm
+
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+
+templates/dir/00-load.t
+templates/dir/Build.PL
+templates/dir/Changes
+templates/dir/cvsignore
+templates/dir/Makefile.PL
+templates/dir/MANIFEST
+templates/dir/Module.pm
+templates/dir/pod-coverage.t
+templates/dir/pod.t
+templates/dir/README
+templates/inline
+LICENSE
+META.yml                                 Module meta-data (added by MakeMaker)

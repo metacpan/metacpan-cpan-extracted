@@ -1,0 +1,190 @@
+#!/usr/bin/perl
+
+use strict;
+
+#parse command line options
+use Getopt::Long;
+my %opt = (
+	'class'      => undef,
+	'daemonize'  => 0,
+	'domain'     => '',
+	'log'        => undef,
+	'loglevel'   => 1, # LOG_ERROR
+	'readonly'   => undef,
+	'trackers'   => [],
+	'threaded'   => 1,
+	'mountopts'  => [],
+	'mountpoint' => undef,
+);
+my $resp = GetOptions(
+	'class=s'     => \$opt{'class'},
+	'daemon'      => \$opt{'daemonize'},
+	'domain=s'    => \$opt{'domain'},
+	'log=s'       => \$opt{'log'},
+	'mountopt=s@' => \$opt{'mountopts'},
+	'readonly!'   => \$opt{'readonly'},
+	'threaded!'   => \$opt{'threaded'},
+	'tracker=s@'  => \$opt{'trackers'},
+	'verbose+'    => \$opt{'loglevel'},
+);
+$opt{'mountpoint'} = shift @ARGV if(@ARGV);
+
+#turn mountopts into a comma-separated list for Fuse
+$opt{'mountopts'} = join(',', @{$opt{'mountopts'}});
+
+#process any comma-separated trackers specified and set a default tracker if none were specified
+@{$opt{'trackers'}} = split(/,/, join(',', @{$opt{'trackers'}}));
+push @{$opt{'trackers'}}, '127.0.0.1:7001' if(!@{$opt{'trackers'}});
+
+#output usage if script was called incorrectly
+if(!$resp || !defined($opt{'mountpoint'})) {
+	exit 1;
+}
+
+#Rename the process for the process list
+$0 = $0 . ' [' . $opt{'mountpoint'} . ']';
+
+#daemonize if requested
+daemonize() if(delete $opt{'daemonize'});
+
+# redirect output to log file if specified
+if(defined($opt{'log'})) {
+	close(STDERR);
+	close(STDOUT);
+	open(STDERR, '>>', $opt{'log'});
+	open(STDOUT, '>>', $opt{'log'});
+	select STDERR; $| = 1;
+	select STDOUT; $| = 1;
+}
+
+# disable logging if running as daemon and not redirecting output
+$opt{'loglevel'} = -1 if($opt{'daemonize'} && !defined($opt{'log'})); # LOG_OFF
+
+#load threads only if threads are supported by the current perl
+if($opt{'threaded'}) {
+	require Config;
+	require threads if($Config::Config{'useithreads'});
+}
+
+#load MogileFS::Client::Fuse and mount the file system
+require MogileFS::Client::Fuse::FilePaths;
+my $mfs = MogileFS::Client::Fuse::FilePaths->new(%opt);
+$mfs->log(0, "Starting up MogileFS::Client::Fuse");
+$mfs->mount();
+$mfs->log(0, "Shutting down MogileFS::Client::Fuse");
+
+#function to daemonize this script
+#based on code from http://perlmonks.org/index.pl?node=144812 and MogileFS::Util::daemonize
+sub daemonize {
+	require POSIX;
+
+	#
+	# First-generation child.
+	#
+	my $child = fork;
+	exit 0 if($child);
+	POSIX::setsid();
+	close(STDIN);
+	close(STDOUT);
+	close(STDERR);
+	chdir('/');
+	umask(0);
+	$SIG{$_} = 'IGNORE' foreach(grep {exists $SIG{$_}} qw{TSTP TTIN TTOU});
+
+	#
+	# In case of SysV, re-spawn to avoid danger of re-acquiring a control
+	# terminal. Now the child is not a process group leader.
+	#
+	$SIG{'HUP'} = 'IGNORE';
+	my $child = fork;
+	exit 0 if($child);
+
+	return;
+}
+
+__END__
+
+=head1 NAME
+
+mount-mogilefs - FUSE client for MogileFS
+
+=head1 SYNOPSIS
+
+B<mount-mogilefs> [ I<options> ] I</mnt/point>
+
+=head1 DESCRIPTION
+
+B<mount-mogilefs> will mount the specified MogileFS filesystem at the specified
+location on your local filesystem.
+
+The following options are supported:
+
+=over
+
+=item B<--tracker> I<host:port>
+
+This option specifies a MogileFS tracker to connect to.
+
+This option can be specified multiple times to support redundant trackers.
+
+=item B<--domain> I<domain>
+
+This option specifies the MogileFS domain to mount locally.
+
+=item B<--class> I<name>
+
+This option specifies the MogileFS replication class to store new files using.
+
+=item B<--daemon>
+
+This option tells B<mount-mogilefs> to launch as a daemon in the background.
+
+=item B<--mountopt> I<option>
+
+This option is used to pass mount options to FUSE. A commonly used mount option
+is I<allow_other>.
+
+Multiple mount options can be specified by using this option multiple times.
+
+=item B<--readonly>
+
+This option will mount the MogileFS filesystem as read-only.
+
+Read-only is disabled by default.
+
+=item B<--threaded>
+
+This option will enable threads in B<MogileFS::Client::Fuse>.
+
+Threads are enabled by default, see B<--no-threaded> for disabling threads.
+
+=item B<--no-threaded>
+
+This option will disable threads in B<MogileFS::Client::Fuse>.
+
+=item B<--verbose>
+
+This option makes B<mount-mogilefs> verbose.
+
+Specifying this options multiple times increases the verbosity of
+B<mount-mogilefs>.
+
+=item B<--log> I<file>
+
+This option redirects STDOUT and STDERR to the specified file.
+
+=back
+
+=head1 AUTHOR
+
+Daniel Frett
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2011-2012 - Campus Crusade for Christ International
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut

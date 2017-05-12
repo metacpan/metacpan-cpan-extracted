@@ -1,0 +1,14 @@
+
+Installing MySQL-Log-ParseFilter requires only the usual steps:
+
+   tar xvfz MySQL-Log-ParseFilter-<version>.tar.gz
+   cd MySQL-Log-ParseFilter-<version>.tar.gz
+   perl Makefile.PL
+   make
+   make install
+
+To install everything to a directory other than the system default,
+such as your home directory, chanage the 3rd step above to:
+
+   perl Makefile.PL PREFIX=~
+

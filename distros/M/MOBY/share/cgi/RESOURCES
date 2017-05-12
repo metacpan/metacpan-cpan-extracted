@@ -1,0 +1,298 @@
+#!/usr/bin/perl -w
+#-----------------------------------------------------------------
+# RESOURCES
+# Author: Edward Kawas <edward.kawas@gmail.com>,
+# For copyright and disclaimer see below.
+#
+# $Id: RESOURCES,v 1.4 2009/08/28 14:15:57 kawas Exp $
+#
+# NOTES:
+# 	1. This script assumes that a BioMOBY registry is properly
+#	   installed and that SetEnv commands have been added to
+#      the servers environment (e.g. httpd.conf)
+#
+#	2. Caching is enabled by default and can be toggled by
+#      modifying $useCache [0=> disbled, 1=> enabled]
+#      Caching really speeds up RDF generation and is highly
+#      recomended
+#
+#   3. Caching requires that a cache dir be specified and
+#      that the directory is readable by the web server
+#      process. By default, the cache dir is set to '/tmp/'
+#-----------------------------------------------------------------
+
+# this is a 're-port' of the RESOURCES script from java back to perl
+
+use strict;
+use CGI qw/:standard/;
+use MOBY::RDF::Ontologies::Objects;
+use MOBY::RDF::Ontologies::ServiceTypes;
+use MOBY::RDF::Ontologies::Namespaces;
+use MOBY::RDF::Ontologies::Services;
+use MOBY::RDF::Ontologies::Cache::ServiceCache;
+use MOBY::RDF::Ontologies::Cache::ObjectCache;
+use MOBY::RDF::Ontologies::Cache::NamespaceCache;
+use MOBY::RDF::Ontologies::Cache::ServiceTypeCache;
+use MOBY::Config;
+
+use XML::LibXML;
+
+# your cache dir
+my $dir = MOBY::Config->new->{mobycentral}->{rdf_cache} || "/tmp/";
+
+# should we use caching?
+my $useCache = 1;
+
+my $url = url( -relative => 1, -path_info => 1 );
+$url =~ s/%([\da-f][\da-f])/chr( hex($1) )/egi;
+my $form = new CGI;
+
+if ( $url =~ m/^RESOURCES\/MOBY\-S\/Objects(\/[A-Za-z0-9_\-]+)?$/ ) {
+    my $byName = length( substr $1, 1) > 0 if $1;
+	do {
+		if ($useCache) {
+			my $x =
+			  MOBY::RDF::Ontologies::Cache::ObjectCache->new( cache => "$dir",
+			  );
+			$x = $x->get_rdf();
+			print $form->header('text/xml'), $x if $x;
+		} else {
+			my $x = MOBY::RDF::Ontologies::Objects->new;
+			$x = $x->createAll();
+			print $form->header('text/xml'), $x if $x;
+		}
+	} unless $byName;
+	do {
+		my $x = MOBY::RDF::Ontologies::Objects->new;
+		my $rdf = $x->createByName( { term => substr $1, 1 } );
+		print $form->header('text/xml'), $rdf if $rdf;
+	} if $byName;
+
+} elsif ( $url =~ m/^RESOURCES\/MOBY\-S\/Services(\/[A-Za-z0-9_\-]+)?$/ ) {
+	my $byName = length( substr $1, 1) > 0 if $1;
+	do {
+		if ($useCache) {
+			my $x =
+			  MOBY::RDF::Ontologies::Cache::ServiceTypeCache->new(
+															 cache => "$dir", );
+			$x = $x->get_rdf();
+			print $form->header('text/xml'), $x if $x;
+		} else {
+			my $x = MOBY::RDF::Ontologies::ServiceTypes->new;
+			$x = $x->createAll();
+			print $form->header('text/xml'), $x if $x;
+		}
+	} unless $byName;
+	do {
+		my $x = MOBY::RDF::Ontologies::ServiceTypes->new;
+		my $rdf = $x->createByName( { term => substr $1, 1 } );
+		print $form->header('text/xml'), $rdf if $rdf;
+	} if $byName;
+} elsif ( $url =~
+m/^RESOURCES\/MOBY\-S\/ServiceInstances(\/[A-Za-z0-9_\-.]*,[A-Za-z0-9_\-]*){1}$/
+  )
+{
+	my $string = $1 || "";
+	# remove the trailing forward slash
+	$string =~ s/^\///;
+	do {
+		my $x     = MOBY::RDF::Ontologies::Services->new;
+		my $sname = substr ($string, index($string, ',')+1);
+		my $prov  = substr ($string, 0, index($string, ','));
+
+		# get pretty printed RDF/XML for one service
+		$x = $x->findService(
+							  {
+								serviceName => $sname,
+								authURI     => $prov,
+								isAlive     => "yes"
+							  }
+		);
+		print $form->header('text/xml'), $x if $x;
+	} if $string;
+	
+	do {
+		print $form->header('text/html');
+		$form->start_html( -title => 'not MOBY-S', );
+		print h2( "not", "MOBY-S" );
+		print end_html;
+	} unless $string;
+	
+} elsif ( $url =~
+m/^RESOURCES\/MOBY\-S\/ServiceInstances(\/[A-Za-z0-9_\-.]+\/[A-Za-z0-9_\-]+)?$/
+  )
+{
+	my $string = $1 || "";
+	# remove the trailing forward slash
+	$string =~ s/^\///;
+	
+	do {
+		my $x;
+
+		# shall we use the cache?
+		if ($useCache) {
+			$x =
+			  MOBY::RDF::Ontologies::Cache::ServiceCache->new( cache => "$dir",
+			  );
+			$x = $x->get_rdf();
+
+		} else {
+
+			# no cache
+			$x = MOBY::RDF::Ontologies::Services->new;
+			$x = $x->findService();
+
+		}
+
+		# output the RDF generated
+		print $form->header('text/xml'), $x if $x;
+
+		# say not implemented if an error occurs
+		do {
+			print $form->header('text/html');
+			$form->start_html( -title => 'unavailable', );
+			print h2( "not", "implemented" );
+			print end_html;
+		} unless $x;
+	} unless $string;
+	do {
+		my $x     = MOBY::RDF::Ontologies::Services->new;
+		my $sname = substr ($string, index($string, '/')+1);
+		my $prov  = substr ($string, 0, index($string, '/'));
+
+		# get pretty printed RDF/XML for one service
+		$x = $x->findService(
+							  {
+								serviceName => $sname,
+								authURI     => $prov,
+								isAlive     => "yes"
+							  }
+		);
+		print $form->header('text/xml'), $x if $x;
+	} if $string;
+
+} elsif ( $url =~ m/^RESOURCES\/MOBY\-S\/Namespaces(\/[A-Za-z0-9_\-]+)?$/ ) {
+	my $byName = length( substr $1, 1) > 0 if $1;
+	do {
+		my $x = MOBY::RDF::Ontologies::Namespaces->new;
+		my $rdf = $x->createByName( { term => substr $1, 1 } );
+		print $form->header('text/xml'), $rdf if $rdf;
+	} if $byName;
+
+	do {
+        if ($useCache) {
+            my $x =
+              MOBY::RDF::Ontologies::Cache::NamespaceCache->new(
+                                                             cache => "$dir", );
+            $x = $x->get_rdf();
+            print $form->header('text/xml'), $x if $x;
+        } else {
+            my $x = MOBY::RDF::Ontologies::Namespaces->new;
+            $x = $x->createAll();
+            print $form->header('text/xml'), $x if $x;
+        }
+    } unless $byName;
+	
+} elsif ( $url =~ m/^RESOURCES\/MOBY\-S\/FULL$/ ) {
+	my $dom    = undef;
+	my $parser = XML::LibXML->new();
+
+	# print this right away, because this might take a long time ...
+	print $form->header('text/xml');
+	if ($useCache) {
+		my $x =
+		  MOBY::RDF::Ontologies::Cache::NamespaceCache->new( cache => "$dir", );
+		$x = $x->get_rdf();
+		do {
+			my $doc = $parser->parse_string($x);
+			$dom = $doc;
+
+		} if $x;
+		$x =
+		  MOBY::RDF::Ontologies::Cache::ServiceTypeCache->new( cache => "$dir",
+		  );
+		$x = $x->get_rdf();
+		do {
+			my $doc = $parser->parse_string($x);
+			_appendChildrenOfDOMToOtherDOM( $doc, \$dom ) if $dom;
+			$dom = $doc unless $dom;
+		} if $x;
+		$x = MOBY::RDF::Ontologies::Cache::ObjectCache->new( cache => "$dir", );
+		$x = $x->get_rdf();
+		do {
+			my $doc = $parser->parse_string($x);
+			_appendChildrenOfDOMToOtherDOM( $doc, \$dom ) if $dom;
+			$dom = $doc unless $dom;
+
+		} if $x;
+		$x =
+		  MOBY::RDF::Ontologies::Cache::ServiceCache->new( cache => "$dir", );
+		$x = $x->get_rdf();
+		do {
+			my $doc = $parser->parse_string($x);
+			_appendChildrenOfDOMToOtherDOM( $doc, \$dom ) if $dom;
+			$dom = $doc unless $dom;
+
+		} if $x;
+
+		# TODO append ServiceDescription too when complete
+		print $dom->toString if $dom;
+
+	} else {
+		my $x = MOBY::RDF::Ontologies::Namespaces->new;
+		$x = $x->createAll();
+		do {
+			my $doc = $parser->parse_string($x);
+			_appendChildrenOfDOMToOtherDOM( $doc, \$dom ) if $dom;
+			$dom = $doc unless $dom;
+		} if $x;
+		
+		$x = MOBY::RDF::Ontologies::Objects->new;
+		$x = $x->createAll();
+		do {
+			my $doc = $parser->parse_string($x);
+			_appendChildrenOfDOMToOtherDOM( $doc, \$dom ) if $dom;
+			$dom = $doc unless $dom;
+		} if $x;
+		
+		$x = MOBY::RDF::Ontologies::ServiceTypes->new;
+		$x = $x->createAll();
+		do {
+			my $doc = $parser->parse_string($x);
+			_appendChildrenOfDOMToOtherDOM( $doc, \$dom ) if $dom;
+			$dom = $doc unless $dom;
+		} if $x;
+		
+		$x = MOBY::RDF::Ontologies::Services->new;
+		$x = $x->findService();
+		do {
+			my $doc = $parser->parse_string($x);
+			_appendChildrenOfDOMToOtherDOM( $doc, \$dom ) if $dom;
+			$dom = $doc unless $dom;
+		} if $x;
+
+		# TODO append ServiceDescription too when complete
+		print $dom->toString if $dom;
+	}
+
+} elsif ( $url =~ m/^RESOURCES\/MOBY\-S\/ServiceDescription$/ ) {
+	print $form->header('text/html');
+	$form->start_html( -title => 'unavailable', );
+	print h2( "not", "implemented" );
+	print end_html;
+
+} else {
+
+	print $form->header('text/html');
+	$form->start_html( -title => 'not MOBY-S', );
+	print h2( "not", "MOBY-S" );
+	print end_html;
+}
+
+sub _appendChildrenOfDOMToOtherDOM {
+	my ( $dom, $other_dom ) = @_;
+	foreach my $service ( $dom->findnodes('/rdf:RDF/rdf:Description') ) {
+		$$other_dom->documentElement->appendChild($service);
+	}
+	return $other_dom;
+}

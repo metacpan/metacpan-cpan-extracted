@@ -1,0 +1,395 @@
+3.35
+ - In Makefile.PL define -DNV_IS_DOUBLE if appropriate (for use in math_mpfr_include.h as part of
+   fix for __float128 handling in nvtype=double DEBUGGING builds of perl).
+ - Tighten the conditions under which _win32_infnanstring() is called. (Now called only if OS is
+   MS Windows && $] < 5.022.)
+ - Add Rmpfr_round_nearest_away()
+ - Move POD from MPFR.pm to MPFR.pod
+
+3.34
+ - eval{} Rmpfr_z_sub in t/flags.t (test 23).
+ - Remove -DUSE_LONG_DOUBLE (from Makefile.PL).
+ - Add _is_infnanstring to MPFR.xs (for use with overloaded string operations).
+ - Add Rmpfr_cmp_NV.
+
+3.33
+ - Document Rmpfr_grandom as deprecated as of mpfr-3.2.0.
+ - Add the following functions which will be available when mpfr-3.2.0 (or higher) is installed:
+    Rmpfr_fmodquo, Rmpfr_fpif_export, Rmpfr_fpif_import, Rmpfr_flags_clear, Rmpfr_flags_set,
+    Rmpfr_flags_test, Rmpfr_flags_save, Rmpfr_flags_restore, Rmpfr_rint_roundeven, Rmpfr_roundeven,
+    Rmpfr_nrandom, Rmpfr_erandom, Rmpfr_fmma, Rmpfr_fmms, Rmpfr_log_ui and Rmpfr_gamma_inc
+ - Add support for IEEE 754 long doubles to bytes() function, and rewrite bytes() documentation.
+ - Remove library functions (gmp_v and Rmpfr_get_version) from Math::MPFR::V, as we don't want any
+    library functions in that module.
+ - Handle the setting of the NaN flag with mpfr_add/sub_ui/si functions for versions of mpfr (3.1.4
+    and earlier only). The bug should be fixed in later versions of mpfr.
+ - Replace SvNV/SvUV/SvIV with SvNVX/SvUVX/SvIVX where appropriate. (In typemap, too.)
+ - Add Rmpfr_buildopt_float128_p and Rmpfr_buildopt_sharedcache_p
+ - t/_1basic.t now ouptuts the values of the various (available) buildopt functions.
+
+3.32
+ - Corrections to fixes to t/DoubleDouble2.t and t/bytes.t. (Same problem existed with
+   some addtional architectures, too.)
+   Version 3.31 will be marked for removal to backpan.
+
+3.31
+ - Fixes to t/DoubleDouble2.t and t/bytes.t (which were failing on machines that had the
+   "double-double" type, but only when perl's nvtype was double).
+
+3.30
+ - Correction to the negative zero bug workaround in Rmpfr_fits_uintmax_p (which
+   had previously been returning false for (-0, MPFR_RNDD).
+ - Remove Rmpfr_set_str_binary and Rmpfr_print_binary. (Obsolete in mpfr library.)
+ - Fix t/LongDouble.t for change to Math::LongDouble output precision (ticket #111813)
+
+3.29
+ - Add _d_bytes XSub.
+ - Simplify demos/doubledouble.p
+ - Allow _d_bytes, _ld_bytes, and _f128_bytes to determine the base of
+   the given argument.
+ - Add _d_bytes_fr, _dd_bytes_fr, _ld_bytes_fr and _f128_bytes_fr
+ - Add bytes() function.
+ - Amend typedef of __float128 alignment (Windows only)
+ - Add Rmpfr_get_q (even though MPFR does not implement mpfr_get_q)
+ - define mp_bitcnt_t to unsigned long int for pre-gmp-5.0.0
+
+3.28
+ - Fix mistake in test 5 in t/bytes.t.
+
+3.27
+ - Replace mpfr_set_default_prec() calls in _ld_bytes and _f128_bytes with
+   appropriate mpfr_init2() calls.
+
+3.26
+ - Re-phrase misleading message in t/use64bitint.t. (Message implied
+   that absence of 'long long int' implied that ivsize was 32-bit.)
+ - Add Rmpfr_print_rnd_mode - previously missed.
+ - Rewrite rounding value check as CHECK_ROUNDING_VALUE macro
+ - Add _ld_bytes and _f128_bytes XSub (for use of Math::NV)
+
+3.25
+ - Catch the error of giving too large a "size" argument to mpfr_sum.t and add a
+   check for this to t/sum.t
+ - Amend the #definition of LNGAMMA_BUG to cater for the fact that mpfr-3.1.3
+   did *not* contain a fix for the lngamma bug.
+
+3.24
+ - Rename the Rgmp_randstate* functions to Rmpfr_randstate*, and move them into
+   their own (Math::MPFR::Random) module.
+ - Standardise numeric treatment of strings that contain non-numeric characters.
+   Add Math::MPFR::NNW and Math::MPFR::nnumflag() & friends.
+ - Correction to t/native_float128.t
+ - Use NVtoD64 to assign NV to Math::Decimal64 object in D64_LD.t - as
+   Math::Decimal64::new() is no longer capable of making that assignment.
+
+3.23
+ - Rename Rmpfr_get_decimal64, Rmpfr_set_decimal64, Rmpfr_get_float128 & Rmpfr_set_float128
+       to Rmpfr_get_DECIMAL64, Rmpfr_set_DECIMAL64, Rmpfr_get_FLOAT128 & Rmpfr_set_FLOAT128
+ - Provide Rmpfr_get_float128 & Rmpfr_set_float128 which pass the __float128 value as an NV
+ - Ensure that when casting an IV/NV to an mpfr_t, the mpfr_t has enough precision to
+   accurately represent the value.
+ - No longer define USE_64_BIT_INT if ivtype is 'long'. (Thus had to tweak some test files.)
+ - Rename USE_64_BIT_INT #define to MATH_MPFR_NEED_LONG_LONG_INT
+ - Define IVSIZE_BITS (in XS file) if MATH_MPFR_NEED_LONG_LONG_INT is defined - for use in
+   initialization of mpfr_t in some of the overload functions.
+ - Add FLOAT128_DIG
+
+3.22
+ - Add some metadata to Makefile.PL.
+ - Fix the LNGAMMA_BUG workaround in mpfr.c, and change test 69 in t/test1.t to
+   test for correct behaviour of mpfr_lngamma().
+ - Add Rmpfr_set_NV - and use it in new().
+ - Remove Rmpfr_sprintf_ret and Rmpfr_snprintf_ret.
+ - No longer include inttypes.h on the basis of USE_LONG_DOUBLE being defined.
+   (Was harmless ... but didn't make much sense.)
+ - Define PERL_NO_GET_CONTEXT.
+ - Tweaks to Math::MPFR::gmp_v() and Math::MPFR::V::gmp_v()
+
+3.21
+ - Fix errors in t/decimal64_conv.t
+
+3.19
+ - Rewrite _wrap_mpfr_sprintf(), _wrap_mpfr_snprintf(), _wrap_mpfr_sprintf_rnd()
+   and _wrap_mpfr_snprintf_rnd(). Their first arg has been changed from a char*
+   to an SV*, and they take an additional argument that specifies the size of
+   the buffer (1st arg) into which the resultant string is written.
+ - Change Rmpfr_sprintf_ret() and Rmpfr_snprintf_ret(). The first arg (buffer)
+   has been removed, and an additional argument that specifies the size of the
+   buffer into which the resultant string is written needs to be provided.
+ - Fix spelling error in doc. Thanks Salvatore Bonaccorso. (Ticket #89710)
+ - Add Rmpfr_set_float128 and Rmpfr_get_float128. These provide access to the
+   '__float128' data type (for compilers that support the type) via the
+   Math::Float128 module.
+ - Simplify querying of Decimal64 support in the mpfr library being used
+ - Add MPFR_DBL_DIG, MPFR_LDBL_DIG, mpfr_max_orig_len, mpfr_min_inter_prec,
+    mpfr_min_inter_base and mpfr_max_orig_base.
+ - Have lngamma(-0) be +Inf instead of NaN. (Bug in mpfr 3.1.2 and earlier.)
+
+3.18
+ - Depending upon the rounding mode values, the mpfr library may incorrectly return
+   false for mpfr_fits_u*_p(x) for -1.0 < x < 0.0 or for -0.5 < x <0.0. (This
+   should be fixed in versions of mpfr later than 3.1.2.)
+   Have the Rmpfr_fits_u*_p() functions return  correct result irrespective of the
+   version of mpfr being used - and have the Math:MPFR test suite test for this.
+ - The 'P' type specifier (precision) wasn't working correctly on big-endian machines
+   when mp_prec_t size is less than IV size. Add a prec_cast function to fix this.
+ - Add an _mp_sizes function (not exportable) that returns the sizes of mpfr_exp_t,
+   mpfr_prec_t and mpfr_rnd_t.
+ - Add Math::MPFR::_ivsize (not exportable).
+ - Add Math::MPFR::_nvsize (not exportable).
+ - Correct the Rmpfr_*printf functions so that they croak with an appropriate error
+   message if a rounding arg is supplied but the last arg is not a Math::MPFR object.
+
+3.17
+ - Apply patch to MPFR.xs from Daniel Kahn Gillmor that eliminates
+   "null argument where non-null required" warnings.
+ - Fix typo in croak() message in MPFR.xs (also caught by Daniel).
+
+3.16
+ - Add Rmpfr_set_LD() and Rmpfr_get_LD(). These provide access to the
+   'long double' data type (for perls whose nvtype is double) via the
+   Math::LongDouble module.
+
+3.15
+ - Add _Decimal64-mpfr_t conversion
+
+3.14
+ - Fix pod. (The '±' symbol was causing pod.t failures.) Also took care of
+   some other typos/oversights in the documentation.
+
+3.13
+ - Add Math::MPFR::V
+ - Add pre/post increment/decrement operations (overload_add and overload_inc)
+ - Allow (cross-class) overloading of basic math operations with Math::GMPz,
+   Math::GMPq and Math::GMPf objects.
+
+3.12
+ - Remove 'not' from overloads. Apparently achieved nothing anyway, and 5.16
+   warns that it's invalid.
+
+3.11
+ - Add t/tls.t and t/tls_flags.t (to test the thread local storage capabilities,
+   where applicable).
+3.10
+ - Add the following functions (conditional upon building against
+   mpfr-3.1.0 or later):
+   Rmpfr_set_divby0, Rmpfr_clear_divby0, Rmpfr_divby0_p, Rmpfr_buildopt_tune_case,
+   Rmpfr_frexp, Rmpfr_grandom, Rmpfr_z_sub, Rmpfr_buildopt_gmpinternals_p.
+ - Add Rgmp_randinit_mt.
+ - In Rmpfr_get_d_2exp and Rmpfr_get_ld_2exp, replace sv_setuv (was incorrect)
+   with sv_setiv.
+ - Replace New/Newz with Newx/Newxz on perls that support the new symbols (Newx/Newxz).
+3.02
+ - Rmpfr_min_prec now available only when building against mpfr-3.0.0 or later. (The
+   mpfr_min_prec function was not available until 3.0.0.)
+3.01
+ - Remove the (outdated) link to http://www.loria.fr/projets/mpfr/mpfr-current/mpfr.html
+   in the "DESCRIPTION" section of the documentation. (Thanks Hugh Myers.)
+ - In the documentation, elaborate on the way that Rmpfr_get-version() and
+   MPFR_VERSION & friends determine their values. (Thanks Vincent Lefevre.)
+ - Correct Rmpfr_min_prec(), and remove Rmpfr_max_prec().
+3.0
+ - Corresponding to release of mpfr-3.0.0. (Still needs only 2.4.0,
+   but 3.0.0 needed to take advantage of all features.)
+ - Add MPFR_* rounding modes (including MPFR_RNDA for builds against
+   mpfr-3.0.0)
+ - Add Rmpfr_buildopt_tls_p() and Rmpfr_buildopt_decimal_p() (mpfr-3.0.0 only)
+ - Add the following functions, specific to mpfr-3.0.0: Rmpfr_regular_p,
+   Rmpfr_set_zero, Rmpfr_digamma, Rmpfr_ai, Rmpfr_set_flt, Rmpfr_get_flt,
+   Rmpfr_urandom and Rmpfr_set_z_2exp.
+ - Add Rmpfr_get_z_2exp (mpfr_get_z_exp is now renamed to mpfr_get_z_2exp).
+ - Add gmp_randstate_t* to the Math::MPFR typemap.
+ - Change handling of NaNs (wrt overloaded comparison operators).
+   The overloaded spaceship operator now returns undef when NaNs are involved
+   (more in keeping with perl behaviour), and the erange flag is now
+   set whenever a comparison involving NaNs is performed (more in
+   keeping with the mpfr library behaviour). This is irrespective
+   of whether the NaN is a Math::MPFR object or a perl NV.
+   The other comparison operators now also set the erange flag when
+   a NaN is involved (for compatibility with the mpfr library).
+ - Add Rmpfr_snprintf and Rmpfr_snprintf_ret.
+ - Add Rmpfr_inits, Rmpfr_inits2 and Rmpfr_clears functions.
+ - The overload_copy sub now preserves the precision of the copied
+   object (instead of taking on default precision).
+2.03
+ - Needs version 2.4.0 (or later) of the mpfr library.
+ - Add the following functions (new in mpfr-2.4.0):
+   Rmpfr_add_d, Rmpfr_sub_d, Rmpfr_d_sub Rmpfr_mul_d, Rmpfr_div_d,
+   Rmpfr_d_div, Rmpfr_rec_sqrt, Rmpfr_sinh_cosh, Rmpfr_li2, Rmpfr_zeta_ui,
+   Rmpfr_modf, Rmpfr_fmod, Rmpfr_printf, Rmpfr_fprintf, Rmpfr_sprintf,
+   Rmpfr_sprintf_ret
+ - Fix overload_sqrt() so that it returns a NaN for negative operands
+   instead of croaking, as was originally the case.
+ - Remove (the need for) INLINE.h
+ - Add RMPFR_PREC_MIN and RMPFR_PREC_MAX.
+ - Add Rmpfr_sum, Rmpfr_get_d_2exp, Rmpfr_get_ld_2exp, Rmpfr_dim,
+   Rmpfr_fits_ushort_p, Rmpfr_fits_sshort_p, Rmpfr_fits_uint_p,
+   Rmpfr_fits_sint_p, Rmpfr_fits_uintmax_p, Rmpfr_fits_intmax_p,
+   Rmpfr_fits_IV_p, Rmpfr_fits_UV_p Rmpfr_add_si Rmpfr_get_UV
+   Rmpfr_get_IV Rmpfr_get_NV
+
+2.02
+ - Add TRmpfr_out_str/TRmpfr_inp_str (which wraps mpfr_out_str/mpfr_inp_str
+   more Truly than Rmpfr_out_str/Rmpfr_inp_str).
+ - Rmpfr_out_str now has the option to take a prefix string.
+ - Remove the tests in the Makefile.PL that test for the presence of
+   a suitable compiler, GMP library and MPFR library.
+
+2.01
+ - Needs version 2.3.0 (or later) of the mpfr library.
+ - Add Rmpfr_j0, Rmpfr_j1, Rmpfr_jn, Rmpfr_y0, Rmpfr_y1,
+   Rmpfr_yn, Rmpfr_lgamma, Rmpfr_remainder, Rmpfr_remquo,
+   Rmpfr_fms, Rmpfr_signbit, Rmpfr_setsign, and
+   Rmpfr_copysign(all new in 2.3.0). Add also Rmpfr_get_patches
+   (documented for the first time in 2.3.0).
+ - Add Rmpfr_init_set_ld.
+ - Add Rmpfr_deref2 to the list of exportable functions, and
+   document it's usage in the POD section.
+ - Rmpfr_deref2 now has the mpfr library allocate (and free) memory
+   for the mantissa.
+ - Add Rmpfr_hypot (previously missed).
+ - Rmpfr_out_str now takes an optional fifth argument (a string that
+   will be appended to the mpfr_out_str output). And the output
+   buffer is now flushed each time Rmpfr_out_str is called.
+ - Rewrite new() - to make it a little tidier.
+ - Add Rmpfr_set_uj and Rmpfr_set_uj_2exp to @EXPORT_TAGS. (Previously
+   overlooked.)
+ - Add Rmpfr_integer_string() - mainly to provide a simple means of
+   getting 'sj' and 'uj' values on a 64-bit perl where the MPFR
+   library does not support mpfr_get_uj and mpfr_get_sj functions -
+   which happens with libraries built with Microsoft Compilers.
+ - Fix the rendering of Inf and NaN values. (Now matches the
+   mpfr_out_str output for Inf and NaN.)
+ - Change the format returned by Rmpfr_get_str. (Hence the output of
+   Rmpfr_get_string and Math::MPFR::overload_string have changed
+   from earlier versions of Math::MPFR.)
+ - Fix some of the overloaded subroutines as regards their handling
+   of NaN.
+
+1.11
+ - Fix bug in Rmpfr_get_str. (Sometimes printed out one less digit
+   than it ought.)
+ - Remove mpfr.info from distribution. Refer instead to:
+   http://www.mpfr.org/mpfr-current/mpfr.html
+ - Have 'make clean' remove comp.exe, check.exe and version.exe.
+ - Add support for perls built with -Duselongdouble
+   (Rmpfr_*_ld functions, except Rmpfr_init_set_ld() which is not
+    available in unpatched 2.2.1).
+ - Add Rmpfr_cmp_d, Rmpfr_exp10 and the Rmpfr_*_uj functions (which
+   had somehow been earlier overlooked).
+ - Fix handling of unsigned long longs on perls built with -Duse64bitint.
+ - Allow assignment of mpz, mpq, and mpf types using new()
+
+1.10
+ - No longer assign Exporter and DynaLoader to @Math::MPFR::ISA.
+ - Add support for perls built with -Duse64bitint. This involved the
+   inclusion of the Rmpfr_set_sj, Rmpfr_set_sj_2exp and Rmpfr_get_sj
+   functions - as well as some alterations to the overload subs.
+
+1.09
+ - Changes to the format returned by Rmpfr_get_str and overload_string.
+ - Add a new() method/function for creation of mpfr_t objects.
+ - Fix Rmpfr_out_str() and Rmpfr_inp_str() - were segfaulting with
+   MS compilers.
+
+
+1.08
+ - As of this version, MPFR-2.2.x is required.
+ - Add new functions made available with the release of MPFR-2.2.0:
+   Rmpfr_set_overflow Rmpfr_set_underflow Rmpfr_set_inexflag
+   Rmpfr_set_erangeflag Rmpfr_set_nanflag Rmpfr_erfc Rmpfr_atan2
+   Rmpfr_pow_z Rmpfr_subnormalize Rmpfr_const_catalan Rmpfr_sec
+   Rmpfr_csc Rmpfr_cot Rmpfr_root Rmpfr_eint Rmpfr_get_f Rmpfr_sech
+   Rmpfr_csch Rmpfr_coth Rmpfr_lngamma RMPFR_VERSION_NUM
+ - Add constants (actually implemented as subroutines):
+   MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR
+   MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING
+ - Remove Rmpfr_add_one_ulp and Rmpfr_sub_one_ulp (no longer supported
+   by the MPFR library).
+ - Redefine '__gmpfr_default_rounding_mode' in MPFR.xs as it's no
+   longer in mpfr.h. (Been moved to mpfr-impl.h which I don't want to
+   include.)
+ - Rewrite of overload_atan2 - now that mpfr_atan2 is available in
+   MPFR-2.2.0. (Also fixes a bug in overload_atan2).
+
+1.07
+ - New() was allocating more memory than necessary in many instances.
+   Rewrote the XS code (in those instances) to fix that.
+ - Add Rmpfr_strtofr
+
+
+1.06
+ - Modify the Makefile.PL checks added in version 1.05 to cater for
+   those building with a Microsoft compiler
+ - Alter Rmpfr_set_str and Rmpfr_init_set_str so that a base of 0
+   can be specified - in which case the base is determined from the
+   input string
+ - Added the following functions:
+   Rmpfr_get_ui Rmpfr_get_si Rmpfr_fits_ulong_p Rmpfr_fits_slong_p
+ - Fix a bug in 'Rmpfr_deref2()' - used by 'overload_print()'
+ - Provide more complete testing with 4 new test files - namely
+   test4.t, trig.t, set_str.t and exceptions.t.
+
+
+1.05
+ - Add some checks to Makefile.PL to ensure that anyone trying to
+   build this module has an up-to-date MPFR library. This is mainly
+   an attempt to stop cpan testers who don't have an up-to-date MPFR
+   from testing the module and subsequently reporting "FAIL" or "NA".
+
+
+1.04
+ - Math::MPFR-1.04 to 1.07 require MPFR-2.1.x.
+ - Added the following functions, not available with versions earlier
+   than 2.1.0 :
+   Rmpfr_set_ui_2exp Rmpfr_set_si_2exp Rmpfr_get_z Rmpfr_si_sub
+   Rmpfr_sub_si Rmpfr_mul_si Rmpfr_si_div Rmpfr_div_si Rmpfr_sqr
+   Rmpfr_cmp_z Rmpfr_cmp_q Rmpfr_cmp_f Rmpfr_zero_p Rmpfr_free_cache
+   Rmpfr_get_version Rmpfr_get_emin_min Rmpfr_get_emin_max
+   Rmpfr_get_emax_min Rmpfr_get_emax_max Rmpfr_clear_erangeflag
+   Rmpfr_erangeflag_p Rmpfr_rint_round Rmpfr_rint_trunc
+   Rmpfr_rint_ceil Rmpfr_rint_floor
+
+1.03
+ - Replace 'SvROK()' with 'sv_isobject()' in the overload functions.
+ - Make 'get_refcnt()' and 'get_package_name()' non-exportable.
+
+1.02
+ - Make overloading work with strings.
+ - Add 'Rmpfr_dump'.
+ - Add 'Math::MPFR::gmp_v' (not exportable).
+
+1.01
+ - Eradicate segfault that was occurring when 'overload_add',
+   'overload_sub', 'overload_mul', 'overload_div' and 'overload_pow'
+   croaked due to invalid argument(s).
+
+0.07
+ - Replace 'Rmpfr_round_prec' with 'Rmpfr_prec_round' in keeping
+   with changes to the MPFR library.
+ - Remove 'Rmpfr_random' (deprecated).
+ - Add 'Rmpfr_cbrt', 'Rmpfr_cmpabs', ', 'Rmpfr_greater_p',
+   'Rmpfr_greaterequal_p', 'Rmpfr_less_p', 'Rmpfr_lessequal_p',
+   'Rmpfr_lessgreater_p', 'Rmpfr_equal_p', 'Rmpfr_unordered_p',
+   'Rmpfr_inp_str', 'Rmpfr_frac', 'Rmpfr_integer_p',
+   'Rmpfr_nexttoward', 'Rmpfr_nextabove', 'Rmpfr_next_below',
+   'Rmpfr_min', 'Rmpfr_max', 'Rmpfr_get_exp', 'Rmpfr_set_exp'
+   'Rgmp_randinit_default', 'Rgmp_randinit_lc_2exp',
+   'Rgmp_randinit_lc_2exp_size', 'Rgmp_randseed', 'Rgmp_randseed_ui',
+   'Rgmp_randclear'.
+ - Change module name from 'Math::GnuMPfr' to 'Math::MPFR'.
+
+0.06
+ - Add 'Rmpfr_gamma()', 'Rmpfr_zeta()', and 'Rmpfr_erf()'.
+ - Add overloading for 'atan2', 'cos', 'sin', 'log', 'exp', and 'int'.
+
+0.05
+ - Requires mpfr-2.0.3
+ - Add 'Rmpfr_out_str()'
+ - Add 'Rmpfr_get_default_rounding_mode()'
+ - Rename 'Rmpfr_set_str_raw()' to 'Rmpfr_set_str_binary()'
+   in keeping with changes to the MPFR library.
+ - Alter 'Rmpfr_check_range()' in keeping with change to
+   'mpfr_check_range()' in the MPFR library.
+ - Introduce operator overloading.
+

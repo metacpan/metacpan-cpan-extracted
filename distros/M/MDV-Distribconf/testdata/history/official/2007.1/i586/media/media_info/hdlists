@@ -1,0 +1,36 @@
+hdlist_main.cz	media/main/release	Main	(3400m)
+hdlist_main_updates.cz	media/main/updates	Main Updates	
+noauto:hdlist_main_testing.cz	media/main/testing	Main Testing	(3400m)
+noauto:hdlist_main_backports.cz	media/main/backports	Main Backports	(3400m)
+noauto:hdlist_debug_main.cz	media/debug_main/release	Main debug	
+noauto:hdlist_debug_main_updates.cz	media/debug_main/updates	Main Updates debug	
+noauto:hdlist_debug_main_testing.cz	media/debug_main/testing	Main Testing debug	
+noauto:hdlist_debug_main_backports.cz	media/debug_main/backports	Main Backports debug	
+noauto:hdlist_main.src.cz	media/../../SRPMS/main/release	Main Sources	
+noauto:hdlist_main_updates.src.cz	media/../../SRPMS/main/updates	Main Updates Sources	
+noauto:hdlist_main_testing.src.cz	media/../../SRPMS/main/testing	Main Testing Sources	
+noauto:hdlist_main_backports.src.cz	media/../../SRPMS/main/backports	Main Backports Sources	
+hdlist_contrib.cz	media/contrib/release	Contrib	(4300m)
+hdlist_contrib_updates.cz	media/contrib/updates	Contrib Updates	
+noauto:hdlist_contrib_testing.cz	media/contrib/testing	Contrib Testing	(4300m)
+noauto:hdlist_contrib_backports.cz	media/contrib/backports	Contrib Backports	(4300m)
+noauto:hdlist_debug_contrib.cz	media/debug_contrib/release	Contrib debug	
+noauto:hdlist_debug_contrib_updates.cz	media/debug_contrib/updates	Contrib Updates debug	
+noauto:hdlist_debug_contrib_testing.cz	media/debug_contrib/testing	Contrib Testing debug	
+noauto:hdlist_debug_contrib_backports.cz	media/debug_contrib/backports	Contrib Backports debug	
+noauto:hdlist_contrib.src.cz	media/../../SRPMS/contrib/release	Contrib Sources	
+noauto:hdlist_contrib_updates.src.cz	media/../../SRPMS/contrib/updates	Contrib Updates Sources	
+noauto:hdlist_contrib_testing.src.cz	media/../../SRPMS/contrib/testing	Contrib Testing Sources	
+noauto:hdlist_contrib_backports.src.cz	media/../../SRPMS/contrib/backports	Contrib Backports Sources	
+hdlist_non-free.cz	media/non-free/release	Non-free	
+hdlist_non-free_updates.cz	media/non-free/updates	Non-free Updates	
+noauto:hdlist_non-free_testing.cz	media/non-free/testing	Non-free Testing	
+noauto:hdlist_non-free_backports.cz	media/non-free/backports	Non-free Backports	
+noauto:hdlist_debug_non-free_release.cz	media/debug_non-free/release	debug_non-free_release	
+noauto:hdlist_debug_non-free_updates.cz	media/debug_non-free/updates	debug_non-free_updates	
+noauto:hdlist_debug_non-free_testing.cz	media/debug_non-free/testing	debug_non-free_testing	
+noauto:hdlist_debug_non-free_backports.cz	media/debug_non-free/backports	debug_non-free_backports	
+noauto:hdlist_non-free.src.cz	media/../../SRPMS/non-free/release	Non-free Sources	
+noauto:hdlist_non-free_updates.src.cz	media/../../SRPMS/non-free/updates	Non-free Updates Sources	
+noauto:hdlist_non-free_testing.src.cz	media/../../SRPMS/non-free/testing	Non-free Testing Sources	
+noauto:hdlist_non-free_backports.src.cz	media/../../SRPMS/non-free/backports	Non-free Backports Sources	

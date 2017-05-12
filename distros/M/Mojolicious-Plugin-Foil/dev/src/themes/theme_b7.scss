@@ -1,0 +1,75 @@
+/* ================================================================== */
+/* THEME: B7
+ * Colours for the "Blake's 7" style
+ * pale blue/mauve background, black fore
+ *
+ * This only defines fonts, colours and borders, not layout.
+ */
+@import 'functions';
+@import 'fonts_b7';
+@import 'icon_dark_on_light';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: #aaaadd;
+$verge-fg: set-fg($verge-bg);
+$verge-border: navy;
+$button-bg: darken($verge-bg, 15);
+$button-fg: set-link($button-bg);
+$button-border: navy;
+$main-bg: #cfcdf2;
+$main-fg: set-fg($main-bg);
+$link-fg: set-link($main-bg);
+$link-visited: set-visited($main-bg);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+    border-radius: 0;
+}
+
+.side,
+header,
+footer {
+    @extend .verge;
+    background-image: url(b7_h.jpg);
+    background-attachment: fixed;
+}
+
+#main-wrap {
+    @extend .verge;
+    color: $main-fg;
+    background: $main-bg;
+    border: solid 1px $verge-border;
+    box-shadow:rgba(0,0,0,0.8) 3px 3px 10px;
+    margin-top: 0.75em;
+    margin-bottom: 0.75em;
+}
+
+body {
+    background-color: #aaaadd;
+    background-image: url(b7_body.jpg);
+    background-attachment: fixed;
+}
+
+@include some-links($link-fg, $link-visited);
+@include fancy($verge-fg, $verge-bg, "b7_h.jpg");
+
+@include make-buttons;
+
+/* ------------------------------------*/
+/* MENUS: navbar */
+header nav li {
+	border-color: #555588;
+}
+header nav .selflink,
+header nav em,
+header nav .current a {
+	color: #660066;
+	background-color: $main-bg;
+}
+

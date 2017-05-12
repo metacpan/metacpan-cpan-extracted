@@ -1,0 +1,75 @@
+#
+# $Id: User.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+#
+# system::ubuntu::user Brik
+#
+package Metabrik::System::Ubuntu::User;
+use strict;
+use warnings;
+
+use base qw(Metabrik::Shell::Command Metabrik::System::Package);
+
+sub brik_properties {
+   return {
+      revision => '$Revision: f6ad8c136b19 $',
+      tags => [ qw(unstable manage management creation group create) ],
+      author => 'GomoR <GomoR[at]metabrik.org>',
+      license => 'http://opensource.org/licenses/BSD-3-Clause',
+      commands => {
+         install => [ ], # Inherited
+         create_user => [ qw(user) ],
+         add_user_to_group => [ qw(user group) ],
+      },
+      require_binaries => {
+         adduser => [ ],
+      },
+      need_packages => {
+         ubuntu => [ qw(adduser) ],
+         debian => [ qw(adduser) ],
+      },
+   };
+}
+
+sub create_user {
+   my $self = shift;
+   my ($user) = @_;
+
+   $self->brik_help_run_undef_arg('create_user', $user) or return;
+
+   my $cmd = "adduser $user";
+
+   return $self->sudo_execute($cmd);
+}
+
+sub add_user_to_group {
+   my $self = shift;
+   my ($user, $group) = @_;
+
+   $self->brik_help_run_undef_arg('add_user_to_group', $user) or return;
+   $self->brik_help_run_undef_arg('add_user_to_group', $group) or return;
+
+   my $cmd = "adduser $user $group";
+
+   return $self->sudo_execute($cmd);
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+Metabrik::System::Ubuntu::User - system::ubuntu::user Brik
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2014-2017, Patrice E<lt>GomoRE<gt> Auffret
+
+You may distribute this module under the terms of The BSD 3-Clause License.
+See LICENSE file in the source distribution archive.
+
+=head1 AUTHOR
+
+Patrice E<lt>GomoRE<gt> Auffret
+
+=cut

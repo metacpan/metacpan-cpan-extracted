@@ -1,0 +1,61 @@
+Mail::IMAPFolderSearch - Search multiple mail folders via a IMAP4rev1 server
+
+REQUIRES
+    IO::Socket, IO::Socket::SSL
+
+DESCRIPTION
+    Many e-mail clients such as PINE allow the user to search for a string
+    within a single folder. Mail::IMAPFolderSearch allows for scripting of
+    multiple string searches, spanning multiple mail folders. Results are
+    placed in a new folder allowing the user to use their existing mail
+    client to view matching messages. The results folder is named IMAPSearch
+    by default, but it is possible to specify a different name.
+
+AUTHOR
+        Brian Hodges <perl@pelemele.com>
+
+SEE ALSO
+        perl(1), IO::Socket, IO::Socket::SSL
+
+INSTALLATION of Mail::IMAPFolderSearch
+
+Before getting started, make sure you have any required
+modules installed.
+
+Dependencies:
+	o IO::Socket
+	o IO::Socket::SSL
+
+	For 'make test' (optional):
+	o Term::ReadKey
+	o MIME::Base64
+
+
+
+1) perl Makefile.PL
+	
+	o Answer a few questions for make test.  This
+ 	  Includes providing credentials for an IMAP test 
+	  accounts.
+
+2) make
+
+3) make test (optional)
+
+4) make install
+
+5) rm -f imap.credentials
+	
+	o Reset the imap test account's password if
+	  there is any possibility it has been 
+	  compromised.
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) Brian Hodges 2003
+	
+This software is licensed under the terms of the 'Artistic 
+License'. See 'perldoc perlartistic' for more information. 
+
+

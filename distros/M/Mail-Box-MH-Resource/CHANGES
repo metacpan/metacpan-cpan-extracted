@@ -1,0 +1,21 @@
+Revision history for Perl extension Mail::Box::Profile.
+
+0.06  Mon May 17 20:59:24 UTC 2004
+	- Now warnings safe, with real lemon
+
+0.05
+	- Fixed new to adhere to MH procedure for determining location
+	  of MH directoy in the filsystem (non-absolute MH values are
+	  relative to current directory, as inane as that may be)
+	- Fixed new to properly determine the location of files relative
+	  to MH Path
+	- Fixed new to consider filenames not starting with
+	  the OS's curdir designation from File::Spec (loathe MacOS)
+	  en lieu of ./
+
+0.04  Thu Mar  6 05:20:19 UTC 2003
+	- Added enum method
+	- Renamed to Mail::Box::MH::Resource
+	- Now inherits from and logs messages via Mail::Reporter
+	- new now defaults to MH Path component as the root for
+	  relative filenames that do not start with ./

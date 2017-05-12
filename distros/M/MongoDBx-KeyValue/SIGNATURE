@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 de0a46c2b1ff6af135581e0b420a1cd2389b918f Changes
+SHA1 83db992b34ddc059d5bd1127f724d8b6dfee3caa INSTALL
+SHA1 4fd10efcea7157e7d9c3a45e000c91119dcad1f7 LICENSE
+SHA1 b5e655c64766a8b9dffb92172f16bdeb4be34205 MANIFEST
+SHA1 564529462ac7f46fa4b3561ff81a2da117b31c77 MANIFEST.SKIP
+SHA1 9ce6adc4af4cd157560a84c3f142dec88f8b8e5d META.json
+SHA1 57ec7aa60be0140c4c2ac5213f4c58074fddbf2b META.yml
+SHA1 b5a22180bedce35401f97b495be14f63f1a9a3f1 Makefile.PL
+SHA1 3f6ff77e2dcbd8ef2660ce9f2fa8fe5a41a16ef1 README
+SHA1 0553f4c83ee4aa5e39838bf9bd936fb01273e2ea dist.ini
+SHA1 010aa5042a816fb0eb1981f96092d08c60b1ca76 lib/MongoDBx/KeyValue.pm
+SHA1 90e6fafd81a274a20ae57a6aea24cb1546a0c14c t/00-load.t
+SHA1 d8195ef93fa5514a3b3a75d243ca6ec1c6a5be6c t/01-simple.t
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+SHA1 9433c240fe590bc404ab68ff63984df763e347ed t/release-pod-coverage.t
+SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iF4EAREIAAYFAk3uLa8ACgkQa4OHQAFM10dc/wD/SqJqxSeoG1uYYchyZCkBet5r
+NZl+NrNw9LNyBtqbcVwA/2h3GHAa9V9CNDQypfeGXl9b6j+xG1Qm34a0fvgmsWEj
+=lpqQ
+-----END PGP SIGNATURE-----

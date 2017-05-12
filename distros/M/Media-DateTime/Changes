@@ -1,0 +1,38 @@
+Changes for Media::DateTime
+
+0.49 - Wed Sep 14 17:07:41 EDT 2016
+    * Fix to work with possible future DateTime versions that throw different
+      exceptions when parameters are invalid. Patch by Dave Rolsky.
+      GitHub PR #1.
+
+0.48 - Tue Mar 11 18:03:37 EDT 2014
+    * Adds version to JPEG.pm to make pause happy
+
+0.45 - Tue Mar 11 17:50:05 EDT 2014
+    * Fixes bug when the exif timestamp is invalid
+    * Converts back to a non-dzil distribution, continues cleanup
+    - Adds github repo
+    - Moves bug tracker to github
+    * Runs Perl::Tidy over everything
+
+0.42 2008-01-03 02:45  mgrimes
+
+    * .: updated svn:ignore
+    * ., META.yml, Makefile.PL: Minor updates
+    * Build.PL: Added Client::Lirc module
+      Updated the build_requires
+    * MANIFEST: Added file to manifest
+    * Build.PL, lib/Media/DateTime.pm, t/10-basic.t, t/11-noobj.t:
+      Updated tests to check for local timezone
+    * t/96-kwalitee.t, t/97-critic.t, t/98-pod.t, t/99-podcoverage.t,
+      t/perlcriticrc: Updated author tests
+    * MANIFEST, t/97-critic.t, t/98-pod.t, t/99-podcoverage.t,
+      t/perlcriticrc: Tweaking tests
+    * samples, samples/dates.pl: Added example script
+
+0.41 2006-10-04 23:43  mgrimes
+
+    * META.yml, TODO: Cleanup
+    * lib/Media/DateTime.pm: Updated the version
+    * t/97-critic.t: Fixed use -> eval so we don't blow up if Critic
+      isn't installed.

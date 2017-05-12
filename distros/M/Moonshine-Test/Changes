@@ -1,0 +1,43 @@
+Revision history for Moonshine-Test
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02    28/01/2017
+        fix BUILD_REQUIRES - Add Test::MockObject
+
+0.03    28/01/2017
+        is - undef
+
+0.04    29/01/2017
+        test true(1) or false(0)
+
+0.05    30/01/2017
+        Add tests for - undef, ref_key_scalar, ref_key_ref, ref_key_like, ref_index_scalar, ref_index_ref, ref_index_like
+
+0.06    01/02/2017
+        list_key_scalar - is - '' (requires key)
+        list_key_ref - is_deeply - [] or {} (requires key)
+        list_key_like - like - ''
+        list_index_scalar - is - '' (requires index)
+        list_index_ref - is_deeply - [] or {} (required index)
+        list_index_like - like - ''
+
+0.07    03/02/2017
+        moon_test( instance => $obj, instructions => [ ] )
+        
+0.08    03/02/2017
+        moon_test() 
+
+0.09    03/02/2017
+        Remove some debugging, add back the test that I've been fighting with all evening.
+        
+0.10    05/02/2017
+        Set MINIMUM_PERL_VERSION to 5.010.
+        
+0.12    05/03/2017
+        Adds - tests - ok and skip
+
+0.13    05/03/2017
+        Adds - tests - list_index_obj, ref_index_obj, count, count_ref
+

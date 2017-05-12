@@ -1,0 +1,313 @@
+=head1 August 15, 1997
+
+Completely rewritten DBD::mSQL, based on DBD::mysql
+
+=head1 July 9, 1997
+
+Emergency release because of random changes in the msql.h between
+beta7 and final release. Compiles now with all betas and with the
+final release.
+
+=head1 June 20, 1997
+
+Started work on the MsqlPerl/DBD::mSQL Integration project. In
+particular these are the goals:
+
+ - have _one_ top level Makefile.PL and install both Msql and DBD::mSQL
+
+ - have a perl standard test suite, expand the existing test suite
+
+ - structure the file layout, so we can fold together redundant code
+   (this is mainly the module Msql::Integrat)
+
+ - make DBD::mSQL work with DBI 0.84
+
+ - open a BUGs section in the manpage
+
+This release does not intend to actually fix bugs. It only fixes the
+connect method so users are able to continue to work with their
+applications. I'm not even starting to populate the Msql::Integrat
+module with code. The first release is just a letter of intent that
+tries to keep existing functionality in place.
+
+=head1 May 26, 1997
+
+Improved FAQ:
+
+    longer answer on msql-1 vs msql-2,
+
+    answer to the question "What am I doing wrong, I get: Can't call
+    method ... without a package or object reference"
+
+    Added a recent posting by Doug Wilson <doug@hurl.net> about the
+    icc method (Thanks, Doug!)
+
+=head1 April 26, 1997
+
+Improved a test for mSQL-2 to print better diagnostics.
+
+FAQ.html not generated anymore after pod2html has been broken for
+automated use in perl5.004.
+
+=head1 April 22, 1997
+
+Fixed test 61 for the NeXT (OS 3.2) which has its own atof function
+that translates "N/A" (actually any string matching /^[INSins]/) into
+NaN silently which caused test 61 to fail.
+
+=head1 March 22, 1997
+
+Added support for new data types in 2.0B5.
+
+Made MsqlPerl again compatible with perl5.002.
+
+Added getsequenceinfo method.
+
+Added getserverstats, but left it undocumented, as I expect that this
+API is not the final word on it.
+
+Added the four date/time conversion functions. unixtimetodate,
+unixtimetotime, datetounixtime, timetounixtime. The latter two do not
+work on my machine due to strptime. So I backed them out again. They
+can be activated by running
+
+    perl Makefile.PL DEFINE=-DHAVE_STRPTIME
+
+Introduced a small detection of which server we're running under in
+pmsql.
+
+=head1 March 20, 1997
+
+Applied patch from Hugo van der Sanden E<lt>hv@iii.co.ukE<gt> to
+support NULL in the quote method.
+
+Followed a suggestion by Vivek Khera to support a second parameter to
+the quote method.
+
+Updated the test suite because the mSQL-2.0B5 has new reserved words
+and I did in fact use "time" as a column name :-(
+
+=head1 December 21, 1996
+
+Improved documentation about mSQL-2.
+
+=head1 September 28, 1996
+
+Fixed a completion buglet again: "select * from table where <TAB>"
+resulted in table completion instead of field completion.
+
+=head1 September 8, 1996
+
+Fixed another completion buglet in pmsql (complete-table-or-field
+chose to query an inexistant statement handle in some cases).
+
+Msql::Statement now 'use strict' clean, except for the autoloader.
+
+Added my recent posting about 'insert' closures to the FAQ.
+
+Reformatted both Changes and FAQ (Hi, Doug!).
+
+As I'm one of the privileged people getting prereleases of Msql2, I
+have already added support for Msql2 into this release. Things are
+still subject to change, so I cannot make any promises. I left all the
+new features undocumented in case Bambi changes his mind about his
+intentions.
+
+Included the patch for the lost table bug.
+
+
+=head1 August 28, 1996
+
+Made Msql and Msql::Statement easier subclassable. Thanks to
+jake@vivid.com (Jake Donham) for the idea.
+
+
+=head1 July 29, 1996
+
+Made t/msql.t more strict in the sense that it may now be run in
+parallel.
+
+Added a test that checks for the "lost table" phenomenon.
+
+Assorted minor improvements to the test suite.
+
+
+=head1 July 9, 1996
+
+A few cleanups in the XS logic to reduce the code below 700 lines
+again.
+
+Added Msql->errmsg and Msql->quote (see man page)
+
+Fixed display of control characters in pmsql.
+
+Moved the ->as_string method into Msql/Statement.pm to make it
+accessible from anywhere.
+
+Improved test script to output query in more places in case of an
+error.
+
+=head1 July 1, 1996
+
+pmsql: hostname were truncated at the first dot mostly.
+
+pmsql: completion for drop table statement issued unnecessary warning.
+
+Msql.xs eliminated warning from the cc compiler on solaris 5
+
+Documented how to connect to a different than the default port in the
+manpage.
+
+Added gethostinfo, getserverinfo, and getprotoinfo as methods on the
+database handle.
+
+Added the admin API calls shutdown, creatdb, dropdb, reloadacls.
+
+Internally all constants are implemented in the standard uppercase
+subroutines way again. Lowercase is supported but not recommended. It
+was not a good idea to allow lowercase for caonstants too. It helps
+nobody and confuses others. But it's no big deal.  In the name of
+efficiency, write CHAR_TYPE, INT_TYPE, etc. again!
+
+Prepared a few things for msql 2.0, but don't support it yet, because
+it is broken on my development platform. The tests though, they should
+perform work for msql 2.0.
+
+
+=head1 June 7, 1996
+
+Improved pmsql's as_string method and documented it. Control
+characters and backslashes are escaped now.
+
+Improved the manpage wrt listfields. Added precanned reply to the FAQ.
+
+
+=head1 June 1, 1996
+
+Made all methods lowercase internally and ignore case to enable
+backwards compatibility.
+
+Added basic completion to the pmsql monitor.
+
+Added a fetchhash method. Benchmark in the FAQ.
+
+
+=head1 May 28, 1996
+
+Added pmsql(1), version 1.14 or so, which integrates relshow as a
+method. Deleted standalone relshow(1).
+
+Added prototypes just to get rid of the warning (method prototypes are
+ignored by perl 5.002 anyway).
+
+Added an example of ListFields usage to msql.t.
+
+Deleted the (anyway outcommented) Tie code in Msql.pm as it won't come
+back for sure.
+
+
+=head1 April 30, 1996
+
+Added a relshow(1) clone to the distribution just to have a sample
+program that actually does something.
+
+
+=head1 March 15, 1996
+
+Metadata access simplified: in array context a statement handle method
+does not return an array reference but the array itself.
+
+Non-selects now return 1 on success instead of a worthless statement
+handle.
+
+The outdated FAQ is not in the distribution anymore.
+
+Fixed the manpages, so perl5.002's pod2man doesn't grok.
+
+Added 7 tests to test the above mentioned changes.
+
+Simplified Makefile.PL with VERSION_FROM. Needs perl5.002.
+
+
+=head1 October 1, 1995
+
+Fixed a serious bug. Since we do not store $db->{SOCK} and family
+anymore, it's legal that the hash-entry doesn't exist. 1.02 returned
+the not very helpful message "Couldn't read svp".
+
+
+=head1 July 30, 1995
+
+Fixed a few documentation bugs. Reintroduced -lmisc in Makefile.PL.
+Introduced $Msql::QUIET, a variable to suppress error messages from
+the msql daemon when $^W is true (i.e. when the -w switch is on)
+
+
+=head1 July 8, 1995
+
+Implemented a new interface that uses methods to access the object
+attributes. The resulting version is a hermaphrodite that is fully
+backwards compatible, but also implements the new interface. Future
+versions will not support the old interface anymore. The reason for
+the change is a greater flexibility and also greater efficiency.
+
+Fixed a memory leak (Thanks to Dan McGuirk <mcguirk@indirect.com> for
+the report)
+
+
+=head1 June 4, 1995
+
+Introduced the handling of NULL fields that comes with msql 1.0.6.
+That should be a fully backwards compatible solution. (Thanks to Dirk
+vanGulik <Dirk.vanGulik@jrc.it> for giving it a go)
+
+IQuery is gone, it turned out to be of no use at all. FastQuery is
+still there.
+
+The Msql::Tie package has gone in a different file and is still
+considered experimental. If you have an opinion about it, tell me, if
+not, don't ever use this file.
+
+
+=head1 April 22, 1995
+
+Introduced masking of single ticks (') within the Insert method.
+
+
+=head1 Feb 28, 1995
+
+Connect(host, db) now connects to UNIX socket when hostname is the
+null string. Did only so, if called as Connect() followed by
+SelectDB(db).
+
+Added a bench/ directory with two sample benchmarks.
+
+$sth-{HOST}, $sth->{DATABASE}, and $sth->{SOCK} depreciated (will not
+supported in future releases). Use their $dbh equivalent instead!
+
+
+=head1 Feb 27, 1995
+
+Fetching of metadata via tie() on demand with caching for TieQuery and
+TieListFields implemeted. Turns out to be a performance PENALTY, as
+the benefits of tie are eaten by the tie overhead. As a byproduct new
+methods are available: $sth->fetchinternal(KEY), $dbh->FastQuery(),
+$dbh->IQuery(), $dbh->FastListFields(). The performance gain is much
+smaller than expected. Will have to be reevaluated with perl5.001. The
+new functions are only important for testing purposes, esp. for the
+implementation of the DBI switch.
+
+Insert() now checks the field type instead of the input type when it
+decides, if a value should be enclosed in ticks. Insert is faster now,
+but will be much faster, I suppose, once closures are available in
+perl.
+
+
+=head1 Feb 13, 1995
+
+$sth->{LENGTH} added.
+
+
+=head1 About August 1994
+
+First alpha release.

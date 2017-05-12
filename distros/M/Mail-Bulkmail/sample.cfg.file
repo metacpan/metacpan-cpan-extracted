@@ -1,0 +1,123 @@
+####################
+#
+# First, we'll set up values for Mail::Bulkmail
+#
+####################
+
+ define package Mail::Bulkmail
+ 
+ #server_class stores the server object that we're going to use. 
+ #uncomment the DummyServer line and comment out the Server line for debugging
+ 
+ server_class = Mail::Bulkmail::Server
+ #server_class = Mail::Bulkmail::DummyServer
+ 
+ #log our errors
+ ERRFILE = /etc/mb/error.txt
+ BAD    = /etc/mb/bad.txt
+ GOOD   = /etc/mb/good.txt
+ banned = /etc/mb/banned.txt
+
+ #by default, our precedence will be list
+ #remember, it can only be list, bulk, or junk
+ precedence	= list
+
+ #we're going to recommend that you follow the 80 character per line limit
+ force80 = 1
+
+ #And we're only going to be trusting with duplicates
+ Trusting @= duplicates
+
+ #By default, we'll turn on our envelope. Mail::Bulkmail might as well use it.
+ #Mail::Bulkmail::Dynamic doesn't care about this value.
+ use_envelope    	= 1
+
+####################
+#
+# Now, we'll set values for Mail::Bulkmail::Server
+#
+####################
+
+ define package Mail::Bulkmail::Server
+ 
+ #set up the domain we use to say HELO to our relay
+ Domain = mydomain.com
+ 
+ #Most servers are going to connect on port 25, so we'll set this as the default port here
+ Port = 25
+ 
+ #We'll give it 5 tries to connect before we let ->connect fail
+ Tries = 5
+
+ #Lets try to reconnect to a server 5 times if ->connect fails.
+ max_connection_attempts = 5
+
+ #100 is a good number for the envelope_limit
+ envelope_limit = 100
+ 
+ #Send 1,000 messages to each server in the round before going to the next one.
+ #set max_messages_per_robin to 0 if you're only using one server, otherwise you'll have needless
+ #overhead
+ max_messages_per_robin = 0
+ 
+ #maximum number of messages per connection. Probably best to keep this 0 unless you have a reason
+ #to do otherwise
+ max_messages_per_connection = 0 
+ 
+ #maximum number of messages for the server. Probably best to keep this 0 unless you have a reason
+ #to do otherwise
+ max_messages= 0
+ 
+ #maximum number of messages to send before sleeping, probably best to keep this 0 unless you need
+ #to let your server relax and sleep
+ max_messages_while_awake = 0
+ 
+ #sleep for 10 seconds if we're sleeping. This line is commented out because we don't need it.
+ #No harm in uncommenting it, though.
+ #sleep_length = 10
+ 
+ #time_out is how long we'll wait for a response code from a server before giving up. This should
+ #be pretty high
+ time_out = 3000
+ 
+ #talk_attempts is how many times we'll try to re-send a command after a 400 level (temporary) error
+ #this should be fairly low
+ talk_attempts = 5
+ 
+ #our list of servers
+ server_file = /etc/mb/servers.txt
+ 
+ #we can log the full SMTP conversation. ONLY turn this on for debugging purposes.
+ #this file is going to get HUGE.
+ #CONVERSATION = /etc/mb/conversation.txt
+ 
+####################
+#
+# Now, we'll set values for Mail::Bulkmail::DummyServer
+#
+####################
+  
+ define package Mail::Bulkmail::DummyServer
+
+ #Our dummy data file, for when we're using DummyServer. It's also useful to send the data to 
+ #/dev/null to test things if you don't care about the message output.
+ dummy_file = /etc/mb/dummy.file
+ #dummy_file = /dev/null
+ 
+ 
+####################
+#
+# Now, we'll set values for Mail::Bulkmail::Dynamic
+#
+####################
+
+ define package Mail::Bulkmail::Dynamic
+
+ #it is highly recommended that quotemeta be 1
+ quotemeta = 1
+ 
+ #set up our default delimiters
+ dynamic_message_delimiter			= ;
+ dynamic_message_value_delimiter	= =
+ dynamic_header_delimiter			= ;
+ dynamic_header_value_delimiter		= =

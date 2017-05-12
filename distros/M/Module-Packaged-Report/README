@@ -1,0 +1,12 @@
+
+Installation
+
+perl Build.PL
+./Build
+./Build test
+./Build install
+
+
+The script create_package_report.pl is installed along with the module.
+
+

@@ -1,0 +1,368 @@
+2017-01-11 v1.3003 pjacklam
+
+ * Fix syntax for required version of Math::BigInt::Lib.
+
+ * Better checking of POD coverage.
+
+ * Sync test files with Math-BigInt-1.999808.
+
+ * _from_hex() now accepts input without a "0x" prefix.
+
+ * _from_bin() is more now efficient as it utilises the fact that
+   Math::Pari::_hex_cvt() assumes the input is binary if the strings is
+   prefixed by "0b".
+
+ * Implement _to_hex(), _to_oct(), and _to_bin() for conversion to hexadecimal,
+   octal, and binary without prefix.
+
+ * Fix _nok() to work around a bug in Math::Pari::binomial(). It doesn't
+   correctly handle cases where both n and k are very large.
+
+ * Correct a few cases where non-OO syntax was used, e.g., "$x = _one();"
+   should be "$x = $class -> _one();".
+
+ * _inc() and _dec() now uses post-increment and post-decrement, respectively,
+   rather than adding or subtracting one.
+
+ * In test file t/01load.t, display the PARI library version number.
+
+2016-12-03 v1.3002 pjacklam
+
+ * Use ExtUtils::MakeMaker rather than Module::Install in Makefile.PL
+
+ * Remove author information in LICENSE file.
+
+2016-11-23 v1.3001 pjacklam
+
+ * Sync test files with Math-BigInt-1.999801. Add t/mbi_rand.t, t/mbimbf.t,
+   and t/mbimbf.inc since these are included in the test suite for the other
+   backend libraries (GMP and Pari).
+
+ * Add _nok() by using Pari's binomial() function.
+
+ * Add _lcm() by using Pari's lcm() function.
+
+2016-11-15 v1.3000 pjacklam
+
+ * Sync test files with Math-BigInt-1.999800.
+
+ * Math::BigInt::Pari is now a subclass of Math::BigInt::Lib, so remove pure
+   Perl methods from Math::BigInt::Pari that are implemented in the superclass
+   Math::BigInt::Lib. The methods removed are _modinv() and _log_int(). The
+   version of _log_int() implemented in Math::BigInt::GMP was buggy anyway.
+
+ * Add methods _str() and _set(), and correct _num() method.
+
+2016-04-25 v1.27 pjacklam
+
+ * Sync test files with Math-BigInt-1.999719.
+
+2016-04-22 v1.26 pjacklam
+
+ * Sync test files with Math-BigInt-1.999718.
+
+2016-01-03 v1.25 pjacklam
+
+ * Sync test files with Math-BigInt-1.999714.
+
+2015-12-31 v1.24 pjacklam
+
+ * Sync test files with Math-BigInt-1.999713.
+
+2015-11-22 v1.23 pjacklam
+
+ * Sync test files with Math-BigInt-1.999709.
+
+ * In v1.22 the required version of Math-BigInt was set to 1.999703, but it
+   should have been 1.999706. The required version is now 1.999709.
+
+ * Correct error in CHANGES file.
+
+2015-11-09 v1.22 pjacklam
+
+ * Sync test files with Math-BigInt-1.999709.
+
+ * Update the README file.
+
+ * Remove the LICENSE file as this information is already covered in the file
+   README.
+
+ * Replace 'use vars ...' with 'our ...'. We require a Perl newer than 5.6.0
+   anyway.
+
+ * Move 'Test::More' from 'build_requires' to 'test_requires' in Makefile.PL.
+
+ * Enable 'use warnings'. We require a Perl newer than 5.6.0 anyway.
+
+ * Add 'assertlib.*\.exe' to MANIFEST.SKIP, since make generates temporary
+   files like 'assertlibzxjE4WfG.exe' on Cygwin.
+
+2015-09-21 v1.21 pjacklam
+
+ * Sync test files with Math-BigInt-1.999703.
+
+ * Required version of Math-BigInt is now 1.999703.
+
+ * Update author information.
+
+2015-09-17 v1.20 pjacklam
+
+ * Sync test files with Math-BigInt-1.999702.
+
+ * Required version of Math-BigInt is now 1.999702.
+
+2015-09-11 v1.19 pjacklam
+ bigfltpm.inc
+  * File removed. It was included in the previous release by accident.
+ bigfltpm.t
+  * File removed. It was included in the previous release by accident.
+ bigintpm.inc
+  * File removed. It was included in the previous release by accident.
+ bigintpm.t
+  * File removed. It was included in the previous release by accident.
+ biglog.t
+  * File removed. It was included in the previous release by accident.
+ bigroot.t
+  * File removed. It was included in the previous release by accident.
+ inc/Module/Install.pm
+  * Update bundled Module::Install from v1.08 to v1.16.
+ lib/Math/BigInt/Pari.pm
+  * Updated version number.
+  * Fixed bug in _modpow().
+ Makefile.PL
+  * Updated required version of Math::BigInt to 1.999701.
+ t/01load.t
+  * Improve formatting of module version information.
+ t/03podcov.t
+  * Slight reformatting and better information message.
+ t/bigfltpm.inc
+  * Sync tests with the Math-BigInt distribution.
+ t/bigfltpm.t
+  * Adjust number of tests.
+  * Sync tests with the Math-BigInt distribution.
+  * Make sure we test Math::BigInt::Pari, not Math::BigInt::Calc.
+ t/bigintpm.inc
+  * Sync tests with the Math-BigInt distribution.
+ t/bigintpm.t
+  * Adjust number of tests.
+  * Make sure we test Math::BigInt::Pari, not Math::BigInt::Calc.
+ t/biglog.t
+  * Adjust number of tests.
+  * Sync tests with the Math-BigInt distribution.
+  * Make sure we test Math::BigInt::Pari, not Math::BigInt::Calc.
+ t/bigroot.t
+  * Adjust number of tests.
+  * Make sure we test Math::BigInt::Pari, not Math::BigInt::Calc.
+ t/*.t
+  * Add "use warnings" to test scripts, since Perl 5.6.2 is required anyway,
+    and "use warnings" was introduced in Perl 5.6.1.
+  * Modified test scripts so the difference between the test files in the
+    Math-BigInt distribution and the backend distributions are as few and as
+    small as possible. This makes for easier release management.
+
+2014-04-03 v1.18 pjacklam
+ * Updated test files from the Math::BigInt distribution (Peter John Acklam).
+ * Updated POD (Peter John Acklam)
+
+2011-09-04 v1.17 pjacklam
+ * Upgrade bundled modules in "inc" to latest version. (Peter John Acklam)
+ * Math::BigInt::GMP now requires Math::BigInt v1.997 (Peter John Acklam).
+ * Include "^MYMETA\.(yml|json)\z" in MANIFEST.SKIP. Whereas META.* are
+   generated by the distribution author at packaging time, MYMETA.* are
+   generated by the end user at configure time after any dynamic
+   dependencies are known. (Peter John Acklam)
+ * Updated common test files from the Math::BigInt distribution. (Peter
+   John Acklam)
+
+2011-02-26 v1.16 pjacklam (6153 tests)
+ * Change bigintpm.inc to reflect recent changes in the Math::BigInt
+   distribution (Peter John Acklam).
+
+2011-02-10 v1.15 pjacklam (6151 tests)
+ * Include latest version of test scripts from Math-BigInt (closes RT #65580)
+   (Peter John Acklam).
+ * Add 00sig.t for testing SIGNATURE, and 01load.t for basic module loading and
+   giving diagnostics useful for bug tracking (Peter John Acklam).
+ * Rename pod.t to 02pod.t and pod_cov.t to 03podcov.t and use more generic
+   code (Peter John Acklam).
+ * Clean up whitespace (Peter John Acklam).
+
+2010-09-10 v1.14 rafl 5716 tests
+ * Fix tests with Math::BigInt >= 1.90 and depend on it.
+
+2007-07-01 v1.13 Tels 5704 tests
+ * require Math::BigInt v1.87
+ * testsuite from MBI v1.87
+ * _log_int() calculates a guess, and then use this to find the real result,
+   this makes it almost independent from the results size and much faster:
+
+   Using Math::BigInt v1.87 and Math::BigInt::Pari v1.12
+
+  00 len 2:     3s (3.11 usr + 0.00 sys = 3.11 CPU) @  4714/s (n=14661)
+  01 len 2 big: 3s (3.00 usr + 0.01 sys = 3.01 CPU) @   532/s (n=1604)
+  02 len 3:     3s (3.19 usr + 0.01 sys = 3.20 CPU) @   728/s (n=2332)
+  03 len 7:     3s (3.01 usr + 0.16 sys = 3.17 CPU) @  1960/s (n=6216)
+  04 len 8:     3s (3.21 usr + 0.00 sys = 3.21 CPU) @  2247/s (n=7215)
+  05 len 11:    3s (3.18 usr + 0.00 sys = 3.18 CPU) @  2862/s (n=9104)
+  06 len 14:    3s (3.23 usr + 0.00 sys = 3.23 CPU) @  3620/s (n=11695)
+  06 len 20:    3s (3.25 usr + 0.00 sys = 3.25 CPU) @  4882/s (n=15868)
+  0a len 3 big: 3s (3.16 usr + 0.00 sys = 3.16 CPU) @   168/s (n=534)
+
+   Using Math::BigInt v1.87 and Math::BigInt::Pari v1.13
+
+  00 len 2:     2s (3.24 usr + 0.00 sys = 3.24 CPU) @ 13064/s (n=42328)
+  01 len 2 big: 3s (3.17 usr + 0.00 sys = 3.17 CPU) @  4853/s (n=15387)
+  02 len 3:     3s (3.23 usr + 0.00 sys = 3.23 CPU) @  4831/s (n=15607)
+  03 len 7:     3s (3.24 usr + 0.00 sys = 3.24 CPU) @  4813/s (n=15597)
+  04 len 8:     3s (3.22 usr + 0.00 sys = 3.22 CPU) @  4778/s (n=15387)
+  05 len 11:    3s (3.02 usr + 0.16 sys = 3.18 CPU) @  4754/s (n=15119)
+  06 len 14:    3s (3.15 usr + 0.00 sys = 3.15 CPU) @  4740/s (n=14934)
+  06 len 20:    3s (3.24 usr + 0.00 sys = 3.24 CPU) @  4749/s (n=15387)
+  0a len 3 big: 3s (3.22 usr + 0.00 sys = 3.22 CPU) @   877/s (n=2825)
+
+  For reference:
+
+   Using Math::BigInt v1.87 and Math::BigInt::GMP 1.22
+
+  00 len 2:     3s (3.14 usr + 0.00 sys = 3.14 CPU) @ 16853/s (n=52920)
+  01 len 2 big: 3s (3.13 usr + 0.00 sys = 3.13 CPU) @ 16391/s (n=51306)
+  02 len 3:     3s (3.17 usr + 0.03 sys = 3.20 CPU) @ 16036/s (n=51316)
+  03 len 7:     3s (2.97 usr + 0.13 sys = 3.10 CPU) @ 16063/s (n=49797)
+  04 len 8:     3s (3.10 usr + 0.01 sys = 3.11 CPU) @ 16011/s (n=49797)
+  05 len 11:    3s (3.14 usr + 0.00 sys = 3.14 CPU) @ 15858/s (n=49797)
+  06 len 14:    3s (3.14 usr + 0.01 sys = 3.15 CPU) @ 15808/s (n=49797)
+  06 len 20:    3s (3.15 usr + 0.01 sys = 3.16 CPU) @ 15761/s (n=49807)
+  0a len 3 big: 4s (3.20 usr + 0.04 sys = 3.24 CPU) @ 15838/s (n=51316)
+
+2007-04-17 v1.12 Tels 5258 tests
+ * require Math::BigInt v1.83, Math::Pari v2.010709
+ * use native sqrtint() for _sqrt(), making it faster
+ * use native sqrtn() for _root(), making it faster
+ * support api_version() 2: add:
+   + _from_oct(), _as_oct()
+   + _10ex(), _alen()
+
+2005-01-02 v1.11 Tels 5055 tests
+ * require Math::BigInt v1.74 and Math::Pari v2.010602
+ * testsuite from MBI v1.74
+ * support API from BigInt v1.70 and better
+ * add _is_two, _is_ten, _two, _ten, _log_int, _zeros, _sqrt, _root() etc
+
+2004-01-07 v1.10 Tels
+ * testsuite from MBI v1.68 - 4583 tests
+ * _as_hex() and _as_bin() handle zero, tests for that
+ * bacmp() is about 11% faster due to _acmp() using gcmp() vs. "<=>"
+ * added _modinv() and tests
+
+2002-07-07 v1.09 Tels
+ - testsuite from MBI v1.60 - 4061 tests
+ - prerequisite fixed
+ - _copy() uses $zero instead of PARI(0) - benchmark for full BigInt copy():
+   copy:  6 secs ( 5.16 usr + 0.04 sys = 5.20 CPU) @ 23649.23/s (n=122976)
+   copy:  5 secs ( 5.19 usr + 0.06 sys = 5.25 CPU) @ 27047.05/s (n=141997)
+ - digit() now uses a method that scales much better when extracting digits
+   counting from the right side ($n > 0)
+ - likeweise, _inc and _dec use $one instead of PARI(0). Benchmark over
+   Math::BigInt->bdec() and binc() (not just _inc() and _dec()!):
+
+   1.08, 100 and 1000 digit numbers (speed is largely irrel. of number size):
+   dec 100:  4 secs ( 5.11 usr +  0.06 sys =  5.17 CPU) @ 17412.57/s (n=90023)
+  dec 1000:  6 secs ( 5.17 usr +  0.08 sys =  5.25 CPU) @ 17147.24/s (n=90023)
+   inc 100:  5 secs ( 5.05 usr +  0.13 sys =  5.18 CPU) @ 17463.51/s (n=90461)
+  inc 1000:  6 secs ( 5.15 usr +  0.05 sys =  5.20 CPU) @ 17312.12/s (n=90023)
+
+   v1.09, 100 and 1000 digit long numbers:
+   dec 100:  6 secs ( 5.28 usr +  0.02 sys =  5.30 CPU) @ 24095.47/s (n=127706)
+  dec 1000:  4 secs ( 5.00 usr +  0.00 sys =  5.00 CPU) @ 23957.20/s (n=119786)
+   inc 100:  6 secs ( 5.39 usr +  0.00 sys =  5.39 CPU) @ 24157.70/s (n=130210)
+  inc 1000:  5 secs ( 4.93 usr +  0.07 sys =  5.00 CPU) @ 24108.80/s (n=120544)
+
+2002-03-23 v1.08 Tels
+ - testsuite from MBI v1.55 - 3881 tests
+ - prerequisite fixed
+
+2002-02-21 v1.07 Tels
+ - Math::Pari has _hex_cvt(), which makes from_hex() fast, but doesn't have
+   something for from_bin(). Now _from_bin() repacks the input as hex number
+   and then passes it to _hex_cvt().
+ - tests from Math::BigInt v1.51
+ - replaced _core_lib() by config()->{lib}
+
+2002-02-10 v1.06 Tels
+ - _lsft() and _rsft() do now bases != 2, too
+ - tests are now from v1.50
+ - added _fac() for faster factorial() (used from MBI v1.50 onwards)
+
+        #!/usr/bin/perl -w
+        use lib 'lib';
+        use Math::BigInt lib => 'Pari';
+        use Benchmark;
+        my $c = 20000;
+        my $x = Math::BigInt->new(1); my $z = $x->copy()->blsft($c);
+        my $x1 = Math::BigInt->new(1); my $z1 = $x->copy()->blsft($c*10);
+        timethese ( -3, {
+          right_1_10 => sub { $x->brsft(1,10); },
+          left_1_10 => sub { $z->blsft(1,10); },
+          right_10_10 => sub { $x1->blsft(10,10); },
+          left_10_10 => sub { $z1->brsft(10,10); }, } );
+
+        Results (operations per second) on a 1Ghz Athlon:
+
+                        v1.05   v1.06   Factor
+          -------------------------------------
+         left_10_10:     1990    6000   3.0
+          left_1_10:     2280    5150   2.2
+        right_10_10:     1130    1560   1.4
+         right_1_10:     2570    6433   2.5
+
+
+2001-11-11 v1.05 Tels
+  - fixed _inc() and _dec() so that they can be used by MBI v1.46
+
+2001-11-01 v1.04 Tels
+ - tests from BigInt v1.45
+ - added _mod() for faster % operator (about two times faster now)
+ - added _lsft() and _rsft() for faster shifting
+
+        #!/usr/bin/perl -w
+        use lib 'lib';
+        use Math::BigInt lib => 'Pari';
+        use Benchmark;
+        my $c = 20000;
+        my $x = Math::BigInt->new(1); my $z = $x->copy()->blsft($c);
+        my $x1 = Math::BigInt->new(1); my $z1 = $x->copy()->blsft($c*10);
+        timethese ( $c, {
+          right_1 => sub { $x->brsft(1,2); },
+          left_1 => sub { $z->blsft(1,2); },
+          right_10 => sub { $x1->blsft(10,2); },
+          left_10 => sub { $z1->brsft(10,2); }, } );
+
+        Results (operations per second) on a 1Ghz Athlon:
+
+                        v1.03   v1.04   Factor
+          -------------------------------------
+            left_1:      2577    6450   2.5
+           left_10:       881    3086   3.5
+           right_1:      2928    6990   2.4
+          right_10:      2020    5465   2.7
+
+1.03  2001.09.02 btrott
+    - Incorporated Tels's changes: no longer need to EXPORT_OK functions;
+      added empty import method.
+    - Added _as_hex and _as_bin implementations for Math::Pari integers,
+      to support as_hex and as_bin Math::BigInt methods.
+
+1.02  2001.08.05 btrott
+    - Added _gcd method; uses PARI library function to return gcd.
+    - Incorporated Tels's changes: _copy() is now linear; _is_zero,
+      _is_one, is_even, and is_odd now use PARI library functions
+      rather than overloaded ops and should thus be faster. Also
+      added new tests from Math::BigInt 1.40.
+
+1.01  2001.07.14 btrott
+    - Incorporated Tels's changes per calling args to plugin methods
+      (now class is *always* the first arg, so no more checking).
+      Fixed some tests per Math::BigInt changes.
+
+1.00  2001.07.11 btrott
+    - Initial release.

@@ -1,0 +1,31 @@
+%= stylesheet 'http://freqdec.github.io/slabText/css/slabtext.css'
+
+<section>
+  %= line 'The __END__'
+  %= line 'of everything'
+</section>
+
+<section>
+  %= line 'freenode'
+  %= line '#perl'
+</section>
+
+<section>
+  %= line q["but I can't]
+  %= line q[use CPAN"]
+</section>
+
+<section>
+  ARGH
+</section>
+
+<section>
+  %= line 'Hate that'
+  %= line 'so much!'
+</section>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+%= javascript 'http://freqdec.github.io/slabText/js/jquery.slabtext.min.js'
+%= javascript begin
+  $(function(){ $('section').slabText() });
+% end

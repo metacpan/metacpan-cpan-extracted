@@ -1,0 +1,11 @@
+Revision history for MooX-Commander
+
+0.03 2017-01-30T14:42:35Z
+  - Fixed option parsing in subcommands.
+
+0.02 2017-01-30T14:00:40Z
+  - Fixed cpanfile thanks to manwar.
+
+0.01 2017-01-30T02:33:47Z
+  - Inital version.
+

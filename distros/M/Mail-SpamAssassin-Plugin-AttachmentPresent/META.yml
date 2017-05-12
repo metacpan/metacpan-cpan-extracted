@@ -1,0 +1,32 @@
+---
+abstract: 'SpamAssassin plugin to score mail based on attachments '
+author:
+  - 'Merijn van den Kroonenberg <merijn@web2all.nl>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mail-SpamAssassin-Plugin-AttachmentPresent
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Archive::Zip: 0
+  Encode: 0
+  Encode::MIME::Header: 0
+  File::Spec: 0
+  IO::String: 0
+  Mail::SpamAssassin: 0
+  Mail::SpamAssassin::Logger: 0
+  Mail::SpamAssassin::Plugin: 0
+  Test::More: 0
+  Test::Pod: 0
+  base: 0
+version: 1.05

@@ -1,0 +1,22 @@
+Revision history for Perl extension MobileDetect.
+
+1.21  Tue Dec 6 22:36:33 2014
+		Updated new Code to Match latest MobileDetect.php
+
+1.12  Tue Nov 18 22:36:33 2014
+	- original version; created by h2xs 1.23 with options
+		-AXc -n MobileDetect
+
+1.13 Wed Nov 19 10:43 2014
+	- fixed some typos, better structure of MobileDetect.pm
+	- fixed some code, removed debug statements
+
+1.14 Wed Nov 19 12:52 2014
+	- beautifies pod output
+
+1.15 Wed Nov 21 14:44 2014
+	- build in Storage Module to support Flat File DB
+	- use Storable; is used to download raw json content, STORE the preparsed hash contents that are needed for processing
+	- so the first time you start the programm it downloads the json content and preparses it and stores it to flat file db
+	- next time you start the programm you should see increased speed in processing because downloadin the json content an parsing
+	it must not be done again, because the preparsed content is already been stored in flat file and only that we read from the second time into memory (=faster processing)

@@ -1,0 +1,104 @@
+NAME
+    Module::MultiConf - Configure and validate your app modules in one go
+
+VERSION
+    This document refers to version 1.0401 of Module::MultiConf
+
+SYNOPSIS
+     # first define the structure of your application configuration:
+ 
+     package MyApp::Config;
+     use Module::MultiConf;
+ 
+     __PACKAGE__->Validate({
+         first_module  => { ... }, # a Params::Validate specification
+         second_module => { ... }, # a Params::Validate specification
+     });
+ 
+     # make some module parameters "read-only"
+     __PACKAGE__->Force({
+         first_module  => { var1 => 'val', var2 => 'val' },
+     });
+ 
+     # then use that to validate config passing through your app:
+ 
+     package MyApp::ComponentThingy;
+     use Another::Module;
+     use MyApp::Config;
+  
+     sub new {
+         my $class = shift;
+         my $params = MyApp::Config->parse(@_);
+             # @_ will be validated, and transferred to $params
+
+         my $var1 = $params->myapp_componentthingy->{var1}; # gets a value
+         my $var2 = $params->me->{var1}; # same thing, "me" aliases current package
+
+         # you can update the contents of $params, and add new data
+         $params->me->{new_cached_obj} =
+            Another::Module->new( $params->another_module );
+  
+         return $class->SUPER::new($params);
+     };
+ 
+     # in addition, you can do things like this:
+ 
+     # override, or add to, the passed in parameters
+     my $params = MyApp::Config->parse(@_, {module => {foo => 12345}});
+  
+     # load a bunch of default config from a file (using Config::Any)
+         # and you can still add an override hashref, as in the above example.
+     my $params = MyApp::Config->parse('/path/to/some/file.yml');
+
+DESCRIPTION
+    This module might help you to manage your application configuration, if
+    most of the config is actually for other modules which you use. The idea
+    here is that you store all that config in one place, probably an
+    external file.
+
+    You can optionally use a validation specification, as described by
+    Params::Validate, to check you are not missing anything when the config
+    is loaded or passed around.
+
+    The interface to the stored config provides an object method per blob of
+    configuration, which returns a reference to the hash of that blob's
+    content.
+
+    You can load config using a filename parameter, which is passed to
+    Config::Any, or a hash reference of hash references, each representing
+    the config for one module. Each of these may be repeated as you like,
+    with later items overriding earlier ones.
+
+    Be aware that "Config::Any" is called with the "use_ext" parameter,
+    meaning you *must* use file extensions on your config files. I am sorry
+    about having to do this, but it makes things just too unpredictable not
+    to enable it.
+
+    Please refer to the bundled example files and tests for further details.
+    It would also be worth reading the Params::Validate and Config::Any
+    manual pages.
+
+    To have Params::Validate construct your mix of default and override
+    options whilst not validating for missing options, load the module like
+    so:
+
+     use MyApp::Config no_validation => 1;
+
+SEE ALSO
+    <http://jc.ngo.org.uk/blog/2007/01/15/perl-parameter-validation-and-erro
+    r-handling/>
+    Params::Validate
+    Params::Util
+    Config::Model
+
+AUTHOR
+    Oliver Gorwits "<oliver.gorwits@oucs.ox.ac.uk>"
+
+    Tests were written by myself and Ray Miller.
+
+COPYRIGHT & LICENSE
+    Copyright (c) The University of Oxford 2008.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

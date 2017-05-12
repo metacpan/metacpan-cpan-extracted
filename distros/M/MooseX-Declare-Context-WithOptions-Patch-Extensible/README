@@ -1,0 +1,41 @@
+NAME
+    MooseX::Declare::Context::WithOptions::Patch::Extensible - patch
+    MooseX::Declare for extensibility
+
+SYNOPSIS
+     use MooseX::Declare::Context::WithOptions::Patch::Extensible;
+
+DESCRIPTION
+    This module extends MooseX::Declare::Context::WithOptions to add a new
+    attribute `allowed_option_names` containing an arrayref of option names
+    that it can parse. The default is the standard MooseX::Declare list of
+    'extends', 'with' and 'is'.
+
+    It also patches the `strip_options` method so that it pays attention to
+    that arrayref.
+
+    If you don't understand why you'd need to do this, then you probably don't
+    need to do this.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Declare-Context-WithOpt
+    ions-Patch-Extensible>.
+
+SEE ALSO
+    `MooseX::Declare`.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

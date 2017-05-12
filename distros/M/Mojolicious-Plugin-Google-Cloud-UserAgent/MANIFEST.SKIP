@@ -1,0 +1,10 @@
+EIG.*
+.\~$
+\.bak$
+^blib/
+^local/
+^\.git
+^\.perl-version
+^cpanfile.*
+^Makefile$
+^pm_to_blib$

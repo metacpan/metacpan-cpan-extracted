@@ -1,0 +1,212 @@
+# Legend:
+# --- = A new release
+#   + = Added a feature (in a backwards compatible way)
+#   ! = Changed something significant, or removed a feature
+#   * = Fixed a bug, or made a minor improvement
+
+--- 2.009 (2013-07-21 03:30)
+
+  Mail::SPF:
+  * Default to querying only TXT type RRs (query_rr_types = Mail::SPF::Server->
+    query_rr_type_txt).  Experience has shown that querying SPF type RRs is
+    impractical.
+
+--- 2.008 (2012-01-30 08:15)
+
+  Mail::SPF:
+  * Sanitize result local_explanation (as well as result object string
+    representation) by replacing all non-printable or non-ascii characters
+    with their hex-escaped representation (e.g., "\x00").
+    (Addresses: bugs.launchpad.net #806926)
+
+  Miscellaneous:
+  * Change openspf.org URLs to openspf.net because openspf.org is unreachable
+    indefinitely.
+  * Change <http://www.ietf.org/rfc/….txt> URLs
+    to <http://tools.ietf.org/html/…>.
+  * META.yml: configure_requires: Module::Build 0.2805
+  * META.yml: requires: Net::DNS 0.62 (was: 0.52) (Closes: rt.cpan.org #28545)
+  * META.yml: Revert to flat version numbers for perl and Net::DNS::Resolver::
+    Programmable build requirements to avoid Module::Build::Compat/Makefile.PL
+    incompatibilities. (Closes: rt.cpan.org #53231)
+  * Attempt to prevent a cascading failure in t/00.03-class-result.t that seems
+    to happen under rare, unknown circumstances. (Closes: rt.cpan.org #39099)
+
+  Debian:
+  * Declare Debian source package format as 3.0.
+  * Standards-Version: 3.9.2 (was: 3.8.3)
+  * Bump debhelper compatibility level to 7 (was: 5) and simplify debian/rules
+    using debhelper 7 features.
+  * debian/control: Simplify depdendencies under the assumption that package
+    will be installed on Debian Lenny (oldstable at the time of writing) or
+    later (or the Ubuntu equivalent).
+  * debian/watch: Use dist-based URL.
+
+--- 2.007 (2009-10-31 21:00)
+
+  Mail::SPF:
+  * Macro expansion:
+    * Distinguish between split and join delimiters; they are not necessarily
+      the same.
+    * Support multiple split delimiters rather than at most one.
+
+  Miscellaneous:
+  * We ship and pass the 2009.10 release of the official RFC 4408 test suite.
+  * Give advice in INSTALL on how to install without root privileges.
+
+  Debian:
+  * Standards-Version: 3.8.3 (was: 3.8.0)
+  * Build-Depends-Indep: perl-modules (>= 5.10.0) | libmodule-build-perl (>= 0.26)
+    (was: libmodule-build-perl (>= 0.26))
+
+--- 2.006 (2008-08-17 22:00)
+
+  Mail::SPF:
+  + Added result object factory facility to Mail::SPF::Server in order to
+    support the sub-classing of Mail::SPF::Server and Mail::SPF::Result.
+    See README for details.
+    Any code throwing Mail::SPF::Result(::*) objects directly should stop doing
+    so and use Mail::SPF::Server::throw_result() instead.
+  + Added a "query_rr_types" option to Mail::SPF::Server's constructor as a
+    way to disable the retrieval of either "SPF" or "TXT" type RRs.
+    I wouldn't make use of it if I was you!
+  ! Changed the "max_void_dns_lookups" option's default value from undef (i.e.,
+    no limit) to a limit of 2.  This should not cause any problems in practice,
+    however see the "max_void_dns_lookups" option's description for specifics
+    on what this entails.
+  * Match <toplabel> patterns greedily by reversing the order of the <toplabel>
+    regexp alternatives from RFC 4408.  Thus TLDs with dashes (e.g.,
+    ".xn--wgv71a") are now correctly matched.
+  * In macro strings, expand '%-' to '%20' rather than '-'.
+    Thanks to Frank Ellermann for providing a test case for the RFC 4408 test
+    suite that inadvertently exposed this bug.
+  > Mail::SPF::Result:
+    + Added new received_spf_header_name() constant specifying the "Received-
+      SPF" header field name, which may (and usually should) be overridden by
+      custom result sub-classes; see the documentation.
+    * Generate "identity=mailfrom" rather than "identity=mfrom" in
+      "Received-SPF" header field.
+    * name() now returns a symbolic result name instead of the trailing part of
+      the result class name.  This should have no impact on 3rd-party code.
+    * Added new isa_by_name() method as an equivalent to the built-in isa(),
+      taking a result name instead of a class name.  Provides a superset of the
+      is_code() method's functionality.
+  * Substituted ";"s for "&" parameter separators in the openspf.org "Why?"
+    page URL in the default authority explanation string.  This change is
+    purely cosmetic.
+  * Minor documentation fixes and improvements.
+
+  Miscellaneous:
+  * We ship and pass the 2008.08 release of the official RFC 4408 test suite.
+  * While officially declaring a build-requirement of Module::Build >= 0.2805
+    (which, if not satisfied, Module::Build itself will warn about, but not
+    abort), do not strictly require it.  If the META.yml file generated during
+    package building is irrelevant, e.g., if we are being built by a package
+    management/build system such as Debian's, then 0.26 is sufficient.
+  * Recommend NetAddr::IP >= 4.007, as it has all $& and $` removed for better
+    performance;
+    see <http://issues.apache.org/SpamAssassin/show_bug.cgi?id=5312>.
+
+--- 2.005 (2007-05-30 23:00)
+
+  Mail::SPF:
+  + Added a "max_void_dns_lookups" option to Mail::SPF::Server's constructor,
+    allowing the number of potentially abusive lookups induced by DoS attacks
+    to be limited.  See the documentation of the Mail::SPF::Server class.
+  + Added a "precedence" class property to Mail::SPF::GlobalMod and sub-classes
+    that defines the order in which global modifiers are to be processed
+    (0: first, 1: last).  See Mail::SPF::Mod.
+    Mail::SPF::Mod::Exp has precedence 0.2, Mail::SPF::Mod::Redirect has 0.8.
+    Also, Mail::SPF::Record::global_mods() now returns modifiers ordered by
+    precedence.
+  + Added support for a non-standard %{_scope} pseudo macro that expands to the
+    request's identity scope.  Note: Do NOT use any such non-standard macros in
+    explanation strings published in DNS!
+  ! Mail::SPF::Util::valid_domain_for_ip_address() now requires a Mail::SPF::
+    Request object to be passed as a new second argument.  This is actually
+    consistent with many of Mail::SPF's methods.  Please excuse the late API
+    change (but who uses Mail::SPF::Util directly anyway?).
+  * Updated default authority explanation string to include identity scope in
+    the openspf.org "Why?" page URL in order to avoid misleading result
+    explanations.
+  * Truncate labels resulting from macro expansions to 63 bytes.  This is not
+    strictly required by RFC 4408, 8.1/27, but is merely meant as a precaution.
+  * Minor documentation fixes and improvements.
+
+  Miscellaneous:
+  * We ship and pass the 2007.05 release of the official RFC 4408 test suite
+    (no changes were required).
+  ! Build-require Module::Build >= 0.2805 (was: >= 0.26), hopefully fixing a
+    version.pm/CPAN.pm compatibility issue (closes: rt.cpan.org #26784).
+    (Debian packaging is not affected because it does not rely on META.yml.)
+
+  Debian:
+  * Conflicts: spfquery (<< 1.2.5.dfsg-1) (was unversioned)
+
+--- 2.004 (2007-01-20 02:00)
+
+  Mail::SPF:
+  * Correctly fall back to default authority explanation if the authority
+    domain does specify an explanation string but it cannot be expanded (e.g.
+    due to syntax errors).
+  * In Mail::SPF::Result::received_spf_header(), gracefully fall back to a
+    hostname of "unknown" if a fully qualified hostname can not be determined.
+    Some (misconfigured) systems simply will not reveal one.
+  * Minor documentation improvements and fixes.
+
+  Miscellaneous:
+  * Note in the README file that we pass the 2006.11 release of the official
+    RFC 4408 test-suite.
+
+  Tests:
+  * Do not test Mail::SPF::Util::hostname(), as some (misconfigured) systems
+    simply will not reveal a fully qualified hostname (see CPANTS tests for
+    2.003).
+  * Minor code clean-up.
+
+--- 2.003 (2007-01-10 00:00)
+
+  Mail::SPF:
+  * Fixed two Perl 5.6 incompatibilities:
+    * Added `use utf8` statements in several modules to keep Perl 5.6 from
+      whining about /[\p{}]/.
+    * Do not use the `use constant { a=>1, b=>2 }` multiple-constants idiom,
+      as it was introduced only in constant 1.03 (Perl 5.7.2).
+  * Fixed a very minor bug where a "TempError" result would incorrectly be
+    returned in the very rare case when the SPF-type look-up succeeded but
+    returned 0 records, and the following TXT-type look-up errored or timed
+    out.  Now a "None" result is correctly returned in that case as demanded
+    by RFC 4408.
+
+  spfquery:
+  * Minor documentation fixes.
+
+--- 2.002 (2006-12-14 00:00)
+
+  Mail::SPF:
+  * Updated default authority explanation string to the SPF website's new
+    "Why?" page URL parameters scheme:
+    <http://www.openspf.org/Why?id=%{S}&ip=%{I}&receiver=%{R}>
+
+  spfquery:
+  * Updated the '--help' text and man-page with regard to the black magic
+    options (which require the yet unreleased Mail::SPF::BlackMagic module).
+
+--- 2.001 (gold release) (2006-12-09 20:00)
+
+  Gold Release!
+
+  Major overhaul:
+  ! Major code refactoring, achieving full RFC 4408/4406 compliance, and
+    breaking API compatibility with 2.000.
+  ! Switched from ExtUtils::MakeMaker to Module::Build.
+  + Added complete rewrites of spfquery (2.500) and spfd (2.000).
+  + Added complete documentation.
+  + Added unit tests and the RFC 4408 test-suite.
+  + Added Debian package control files.
+  + And more... (closes: rt.cpan.org #20821, #20822, #21922, #21925)
+
+--- 2.000 (initial release) (2005-06-23 00:00)
+
+# $Id: CHANGES 61 2013-07-22 03:45:15Z julian $
+# vim:syn= tw=79 sts=2 sw=2

@@ -1,0 +1,15 @@
+Changes
+lib/Math/Vector/Real/XS.pm
+Makefile.PL
+MANIFEST
+mvr.h
+ppport.h
+README
+t/Math-Vector-Real-XS.t
+t/Math-Vector-Real.t
+t/warnings.t
+t/perl_vs_xs.t        
+typemap
+XS.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

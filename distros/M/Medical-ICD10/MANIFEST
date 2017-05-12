@@ -1,0 +1,19 @@
+Changes
+ignore.txt
+lib/Medical/ICD10.pm
+lib/Medical/ICD10/Graph.pm
+lib/Medical/ICD10/Parser.pm
+lib/Medical/ICD10/Term.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/boilerplate.t
+t/graph.t
+t/main.t
+t/manifest.t
+t/parser.t
+t/pod-coverage.t
+t/pod.t
+t/term.t
+META.yml                                 Module meta-data (added by MakeMaker)

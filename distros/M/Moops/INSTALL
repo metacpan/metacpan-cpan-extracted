@@ -1,0 +1,58 @@
+    Installing Moops should be straightforward.
+
+INSTALLATION WITH CPANMINUS
+    If you have cpanm, you only need one line:
+
+            % cpanm Moops
+
+    If you are installing into a system-wide directory, you may need to pass
+    the "-S" flag to cpanm, which uses sudo to install the module:
+
+            % cpanm -S Moops
+
+INSTALLATION WITH THE CPAN SHELL
+    Alternatively, if your CPAN shell is set up, you should just be able to
+    do:
+
+            % cpan Moops
+
+MANUAL INSTALLATION
+    As a last resort, you can manually install it. Download the tarball and
+    unpack it.
+
+    Consult the file META.json for a list of pre-requisites. Install these
+    first.
+
+    To build Moops:
+
+            % perl Makefile.PL
+            % make && make test
+
+    Then install it:
+
+            % make install
+
+    If you are installing into a system-wide directory, you may need to run:
+
+            % sudo make install
+
+OPTIONAL FEATURES
+    Moops provides several optional features, which may require additional
+    pre-requisites. These features are:
+
+    *   Moo (allow classes and roles to be built with Moo)
+
+    *   Moose (allow classes and roles to be built with Moose)
+
+    *   Mouse (allow classes and roles to be built with Mouse)
+
+    *   Tiny (allow classes and roles to be built with Class::Tiny/Role::Tiny)
+
+    cpanminus 1.7000 and above support installing optional features:
+
+            % cpanm --with-feature=Moo Moops
+
+    Otherwise, Makefile.PL can prompt you to select features. Set the
+    `MM_INSTALL_FEATURES` environment variable to "1" before running
+    Makefile.PL.
+

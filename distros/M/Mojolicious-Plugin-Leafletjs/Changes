@@ -1,0 +1,17 @@
+Revision history for Mojolicious-Plugin-Leafletjs
+
+0.004  2013-09-05 21:56:39 EDT
+	- Dont sanitize popup messages to allow for HTML
+	- fix missing semicolon in bindPopup
+  - Update deps list in cpanfile
+
+0.003  2013-09-05 00:18:27 EDT
+	- Add circles
+
+0.002  2013-09-04 23:03:23 EDT
+	- Add popups
+
+0.001  2013-09-04 22:31:24 EDT
+        - Initial release
+        - Supports creating a map
+        - Supports adding markers

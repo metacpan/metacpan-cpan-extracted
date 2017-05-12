@@ -1,0 +1,73 @@
+{
+   "abstract" : "Config::Simple::Extended ",
+   "author" : [
+      "& COPYRIGHT"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.4, Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-ConfigSimple",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.036"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Simple::Extended" : "0.15",
+            "Mojolicious" : "0.00",
+            "Test::Exception" : "0.32"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Pod" : "1.48"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hesco/Mojolicious-Plugin-ConfigSimple/issues"
+      },
+      "homepage" : "https://github.com/hesco/Mojolicious-Plugin-ConfigSimple",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hesco/Mojolicious-Plugin-ConfigSimple.git",
+         "web" : "https://github.com/hesco/Mojolicious-Plugin-ConfigSimple"
+      }
+   },
+   "version" : "0.06",
+   "x_contributors" : [
+      "Renee <reb@perl-services.de>",
+      "hesco <hesco@campaignfoundations.com>"
+   ]
+}
+

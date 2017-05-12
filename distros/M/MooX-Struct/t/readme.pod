@@ -1,0 +1,7 @@
+=head1 TEST COVERAGE
+
+As of 0.010, according to L<Devel::Cover> the test coverage for
+L<MooX::Struct> and L<MooX::Struct::Util> is 100%.
+
+=cut
+

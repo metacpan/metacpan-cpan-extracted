@@ -1,0 +1,4 @@
+Revision history for Perl extension Maypole::Plugin::Upload.
+
+0.02   Thu Jan 06 12:30:00 CET 2005
+    - don't overwrite fh with mimetype on apache. 

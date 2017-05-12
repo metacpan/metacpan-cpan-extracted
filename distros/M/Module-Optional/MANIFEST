@@ -1,0 +1,16 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/Module/Optional.pm
+lib/Params/Validate/Dummy.pm
+t/001_basic.t
+t/002_parval.t
+t/003_coremod.t
+t/004_version.t
+t/pod.t
+t/pod_coverage.t
+Makefile.PL
+examples/Foo.pm
+META.yml                                 Module meta-data (added by MakeMaker)

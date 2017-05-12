@@ -1,0 +1,75 @@
+#!/usr/bin/perl
+
+=head1 NAME 
+
+marc2dc - convert a MARC record to Dublin Core
+
+=head1 SYNOPSIS
+
+    % marc2dc [-q] marc.dat
+
+=head1 DESCRIPTION
+
+This script takes a MARC record as input and converts it
+to an ad-hoc text format created from the conversion of the
+record into Dublin Core.
+
+=head1 TODO
+
+=over 4 
+
+=item * generate more useful output
+
+=back
+
+=head1 AUTHOR
+
+=over 4 
+
+=item * Brian Cassidy E<lt>bricas@cpan.orgE<gt>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2004 by Brian Cassidy
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut
+
+use strict;
+use warnings;
+
+use MARC::Crosswalk::DublinCore;
+use MARC::Record;
+use File::Slurp;
+use Getopt::Std;
+use Pod::Usage;
+
+our $VERSION = '0.01';
+
+my %options;
+
+getopts( 'q', \%options );
+
+my $file = $ARGV[ 0 ];
+
+HELP_MESSAGE() unless defined $file;
+
+my $blob = read_file( $file );
+my $marc = MARC::Record->new_from_usmarc( $blob );
+
+my $crosswalk = MARC::Crosswalk::DublinCore->new( qualified => $options{ q } );
+my $dc        = $crosswalk->as_dublincore( $marc );
+
+for( $dc->elements ) {
+	my $qualifier = $_->qualifier;
+	my $scheme    = $_->scheme;
+	printf( "%s: %s\n", $_->name . ( $qualifier ? ".$qualifier" : '' ) . (  $scheme ? "($scheme)" : '' ), $_->content );
+}
+
+sub HELP_MESSAGE {
+	pod2usage();
+}

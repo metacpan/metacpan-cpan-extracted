@@ -1,0 +1,205 @@
+
+# PODNAME: Mojo::IOLoop::LineReader
+
+#pod =encoding utf8
+#pod
+#pod =head1 NAME
+#pod
+#pod Mojo::IOLoop::LineReader - Non-blocking line-oriented input stream
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod   use Mojo::IOLoop::LineReader;
+#pod
+#pod   # Create reader
+#pod   my $reader = Mojo::IOLoop::LineReader->new($handle);
+#pod   $reader->on(readln => sub {
+#pod     my ($reader, $line) = @_;
+#pod     ...
+#pod   });
+#pod   $reader->on(close => sub {
+#pod     my $reader = shift;
+#pod     ...
+#pod   });
+#pod   $reader->on(error => sub {
+#pod     my ($reader, $err) = @_;
+#pod     ...
+#pod   });
+#pod
+#pod   # Start and stop watching for new data
+#pod   $reader->start;
+#pod   $reader->stop;
+#pod
+#pod   # Start reactor if necessary
+#pod   $reader->reactor->start unless $reader->reactor->is_running;
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod L<Mojo::IOLoop::LineReader> is a subclass of L<Mojo::IOLoop::Stream>
+#pod that implements reading from a handle line by line.
+#pod
+#pod =head1 EVENTS
+#pod
+#pod L<Mojo::IOLoop::LineReader> inherits all events from L<Mojo::IOLoop::Stream> and can
+#pod emit the following new ones.
+#pod
+#pod =head2 readln
+#pod  
+#pod   $reader->on(readln => sub {
+#pod     my ($reader, $line) = @_;
+#pod     ...
+#pod   });
+#pod  
+#pod When data arrives on the stream, it is broken
+#pod down into lines. This event is emitted for each such line.
+#pod
+#pod =head1 ATTRIBUTES
+#pod
+#pod L<Mojo::IOLoop::LineReader> inherits all attributes
+#pod from L<Mojo::IOLoop::Stream> and implements the following new ones.
+#pod
+#pod =head2 input_record_separator
+#pod
+#pod   my $rs = $reader->input_record_separator;
+#pod   $reader = $reader->input_record_separator("");
+#pod
+#pod Line separator to use when breaking input to lines, defaults
+#pod to the value of C<$/> at construction time.
+#pod
+#pod =head1 METHODS
+#pod
+#pod L<Mojo::IOLoop::LineReader> inherits all methods from L<Mojo::IOLoop::Stream> and
+#pod implements the following new ones.
+#pod
+#pod =head2 new
+#pod  
+#pod   my $reader = Mojo::IOLoop::LineReader->new($handle);
+#pod  
+#pod Construct a new L<Mojo::IOLoop::LineReader> object
+#pod and subscribe to L<Mojo::IOLoop::Stream/"read"> and L<Mojo::IOLoop::Stream/"close"> events
+#pod with special handlers.
+#pod  
+#pod =head1 SEE ALSO
+#pod
+#pod L<Mojo::IOLoop::Stream>, L<MojoX::LineStream>.
+#pod
+#pod =head1 ACKNOWLEDGEMENTS
+#pod
+#pod Jan Henning Thorsen and Joel Berger for advice and code on #mojo.
+#pod
+#pod The development of this library has been partially sponsored by Connectivity, Inc.
+#pod
+#pod =cut
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Mojo::IOLoop::LineReader
+
+=head1 VERSION
+
+version 0.3
+
+=head1 SYNOPSIS
+
+  use Mojo::IOLoop::LineReader;
+
+  # Create reader
+  my $reader = Mojo::IOLoop::LineReader->new($handle);
+  $reader->on(readln => sub {
+    my ($reader, $line) = @_;
+    ...
+  });
+  $reader->on(close => sub {
+    my $reader = shift;
+    ...
+  });
+  $reader->on(error => sub {
+    my ($reader, $err) = @_;
+    ...
+  });
+
+  # Start and stop watching for new data
+  $reader->start;
+  $reader->stop;
+
+  # Start reactor if necessary
+  $reader->reactor->start unless $reader->reactor->is_running;
+
+=head1 DESCRIPTION
+
+L<Mojo::IOLoop::LineReader> is a subclass of L<Mojo::IOLoop::Stream>
+that implements reading from a handle line by line.
+
+=head1 NAME
+
+Mojo::IOLoop::LineReader - Non-blocking line-oriented input stream
+
+=head1 EVENTS
+
+L<Mojo::IOLoop::LineReader> inherits all events from L<Mojo::IOLoop::Stream> and can
+emit the following new ones.
+
+=head2 readln
+
+  $reader->on(readln => sub {
+    my ($reader, $line) = @_;
+    ...
+  });
+
+When data arrives on the stream, it is broken
+down into lines. This event is emitted for each such line.
+
+=head1 ATTRIBUTES
+
+L<Mojo::IOLoop::LineReader> inherits all attributes
+from L<Mojo::IOLoop::Stream> and implements the following new ones.
+
+=head2 input_record_separator
+
+  my $rs = $reader->input_record_separator;
+  $reader = $reader->input_record_separator("");
+
+Line separator to use when breaking input to lines, defaults
+to the value of C<$/> at construction time.
+
+=head1 METHODS
+
+L<Mojo::IOLoop::LineReader> inherits all methods from L<Mojo::IOLoop::Stream> and
+implements the following new ones.
+
+=head2 new
+
+  my $reader = Mojo::IOLoop::LineReader->new($handle);
+
+Construct a new L<Mojo::IOLoop::LineReader> object
+and subscribe to L<Mojo::IOLoop::Stream/"read"> and L<Mojo::IOLoop::Stream/"close"> events
+with special handlers.
+
+=head1 SEE ALSO
+
+L<Mojo::IOLoop::Stream>, L<MojoX::LineStream>.
+
+=head1 ACKNOWLEDGEMENTS
+
+Jan Henning Thorsen and Joel Berger for advice and code on #mojo.
+
+The development of this library has been partially sponsored by Connectivity, Inc.
+
+=head1 AUTHOR
+
+Adriano Ferreira <ferreira@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Adriano Ferreira.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

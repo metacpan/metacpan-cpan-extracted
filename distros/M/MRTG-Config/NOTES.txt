@@ -1,0 +1,41 @@
+
+
+# Use this in the lib dir to test the module...
+
+
+# Test the contents of the DBM DB file.
+perl -e 'use DBM::Deep; use Data::Dumper; my $db = new DBM::Deep("test.db"); print Dumper($db);'
+
+
+
+# Tests, loading, parsing, and persisting 450+ MRTG Configs at once (and some of our routers are HUGE)
+
+
+# Test 1: With continuous persistience.  -  17:24 time, 211MB file, 110MB ram
+/usr/bin/time -v perl -e 'select((select(STDOUT),$|=1)[0]);use MRTG::Config;my $mrtgCfg=new MRTG::Config();$mrtgCfg->{DEBUG}=2;$mrtgCfg->persist_file("test1.db");$mrtgCfg->persist(1);$mrtgCfg->loadparse("/home/mrtg/htdocs/indexnodes.cfg");' > test1.log
+
+
+# Test 2: With persistience at the end.  -  3:02 time, 211MB file, 170MB ram
+/usr/bin/time -v perl -e 'select((select(STDOUT),$|=1)[0]);use MRTG::Config;my $mrtgCfg=new MRTG::Config();$mrtgCfg->{DEBUG}=2;$mrtgCfg->persist_file("test2.db");$mrtgCfg->loadparse("/home/mrtg/htdocs/indexnodes.cfg");$mrtgCfg->persist(1);' > test2.log
+
+
+# Test 3: NO persistience (unless Data::Dumper counts)  -  1:19 time, 120MB file (not DBM), 700MB ram
+/usr/bin/time -v perl -e 'use MRTG::Config; my $mrtgCfg = new MRTG::Config(); $mrtgCfg->{DEBUG} = 2; $mrtgCfg->loadparse("/home/mrtg/htdocs/indexnodes.cfg"); use Data::Dumper; print Dumper($mrtgCfg->rawdata());' > test3.log
+
+
+
+
+
+
+NOTE: This module does validate the format of the config file(s), but it does not validate the syntax of the keywords or values of the directives against MRTG's documented expectations.
+
+
+
+
+# One of these is responsible for terrible performance when upgraded via CPAN (and I suspect Digest::MD5)
+use Clone ();
+use Digest::MD5 ();
+use FileHandle::Fmode ();
+use Scalar::Util ();
+use Fcntl qw( :DEFAULT :flock :seek );
+

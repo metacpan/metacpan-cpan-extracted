@@ -1,0 +1,6 @@
+^\.
+blib\b
+\.(?:bak|o|c|bs|swp)$
+^Makefile$
+^Makefile.old$
+^Module-Instal-ProvidesClass-

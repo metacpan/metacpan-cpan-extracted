@@ -1,0 +1,85 @@
+<div class="fleft">
+
+% foreach my $related_accessor ( map { $_->name } $object->hasa_columns ) {
+% my $related = $object->$related_accessor; 
+
+<fieldset>
+<legend><% $labels->{ $related->table } %> for <% $object->moniker %>: <% $object %></legend>
+<& .form, related => $related, 
+          object  => $object,
+          &>
+</fieldset>
+% }
+
+</div>
+
+<%once>
+    use HTML::FillInForm;
+</%once>
+<%args>
+    $object
+</%args>
+<%init>
+    return unless $object->hasa_columns;
+    my $labels = $config->table_labels;
+</%init>
+
+<%def .form>
+    <%args>
+        $object
+        $related
+    </%args>
+    <%init>
+        my $file = $m->current_comp->owner->source_file;
+        
+        # 2005-05-27 16:52:13
+        my $tp = Time::Piece->strptime( $object->last_update, '%Y-%m-%d %H:%M:%S' );
+        
+        my $template_updated = sub { $_[0]->get_created_at < (stat($file))[9] };
+        my $object_updated   = sub { $_[0]->get_created_at < $tp->epoch };
+        my $out_of_date      = sub { $form_failed_validation  or 
+                                     $object_updated->($_[0]) or 
+                                     $template_updated->($_[0])
+                                     };
+        
+        my $key = join ':', $object->table, $object->id, $related->table, $related->id;
+        
+        my $html = $m->cache->get( $key, expire_if => $out_of_date );
+        
+        if ( ! $html )
+        {
+            # must call validate() to set up error reporting in case the cache was expired 
+            # because $form_failed_validation was true
+            my $form = $request->as_form( 'edit_all_has_a', entity    => $related, 
+                                                            mode_args => { parent => $object },
+                                          );
+                                       
+            # must call validate() to set up error reporting 
+            $form->validate if $form_failed_validation->{edit_all_has_a}->{ $object->table }->{ $object->id };
+            
+            $html = $form->render;
+            
+            $m->cache->set( $key => $html ) unless $form_failed_validation->{edit_all_has_a}->{ $object->table }->{ $object->id };
+        }
+    </%init>
+    <% $html %>
+    <%filter>
+    
+        my $fif = HTML::FillInForm->new;
+        
+        my %rdata = map { $_ => $related->param($_) } $related->param;
+                
+        # see setup_from_mode() for the required form data
+        my $fdata = { __parent_class__ => ref( $object ),
+                      __parent_id__    => $object->id,
+                      %rdata,
+                      };
+    
+        $_ = $fif->fill( scalarref      => \$_,
+                         fdat           => $fdata,
+                         fill_password  => 0,
+                         );
+    
+    </%filter>
+</%def>
+

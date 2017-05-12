@@ -1,0 +1,49 @@
+MARC::SubjectMap History
+
+v0.93 Thu May  6 10:23:54 EDT 2010
+        - log formatting changes
+        - added --err option to subjmap for outputting records that lacked
+          subject heading translations
+
+v0.92   Tue Sep  6 16:29:55 2005
+	- pod fixes
+
+v0.91   Tue May  3 21:34:05 CDT 2005
+        - adjust logging a bit more
+
+v0.9    Apr 26 23:59:21 2005
+        - enhanced logging
+        - added sourceLanguage configuration option
+        - added indicator1 and indicator2 field attributes to config
+        - only add new fields when there are translations, not just copies
+          of subfield data.
+        - added record.t
+        - fixed doc type (thanks Brian Cassidy)
+
+v0.7    Fri Mar  4 09:45:02 CST 2005 
+        - use source from last rule match if a source for a subfield a 
+          rule was not found.
+
+v0.6    Fri Mar  4 09:32:26 CST 2005
+        - $2 is not repeatable in subject headings so only include
+          source of the subfield a if present.
+
+v0.5    Thu Mar  3 14:18:13 CST 2005
+        - strip trailing periods from subfields prior to lookup in 
+          MARC::SubjectMap::translateField() so that we actually get
+          matches when we're supposed to.
+
+v0.4    Thu Feb 17 20:22:34 CST 2005
+        - addition of period to translated field if period
+          or right parenthesis is not already present.
+
+v0.3    Sun Feb 13 13:51:44 CST 2005
+        - added stripping of trailing period in rule's original
+          value.
+
+v0.2    Thu Feb  3 13:17:49 CST 2005
+        - xml config uses encoding="ISO-8859-1"
+    
+
+v0.1    Mon Jan 31 09:21:32 CST 2005
+        - initial version

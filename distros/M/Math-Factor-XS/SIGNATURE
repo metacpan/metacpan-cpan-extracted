@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 0cd3f4ddbbc7a52cd167b27210ad31c2a7220f57 Build.PL
+SHA1 3a26f35458d1c3104d4e7365fc65ddc5442abd67 Changes
+SHA1 354152e2d36e193edf7d67a470a557de3731697f INSTALL
+SHA1 6505258b59587919f9d1f0ed03672221834d3182 MANIFEST
+SHA1 11736a79f44fb694577301728ef286aa05345cc7 META.json
+SHA1 304ca182e10c264f68f9d0ff8305138868bee70f META.yml
+SHA1 165dab4d885ef77bcdddeafd42da7f64017a3930 Makefile.PL
+SHA1 742a4bb690cefebc6f402a983d45fb04e1a86261 README
+SHA1 c3c8d7abe5375e126ebe4140967f0c6717d04464 XS.xs
+SHA1 9b41cbf27eeab50ebdf91069acf60152895bc27e lib/Math/Factor/XS.pm
+SHA1 1aa94adbaa3b7d46b403ff01ca7635c2513995a5 ppport.h
+SHA1 5cb1765800ac3fd94a51d70a33668bb48ca7dfea scripts/factors_matches.pl
+SHA1 be9bd247479932e9b6291774d19f23db1c9d6d2a t/00-load.t
+SHA1 789fd87675a969182a50bed2b126151e83c9ddf8 t/functions.t
+SHA1 a91d9f77eebca01d127c823c11dbf655983bae58 t/pod-coverage.t
+SHA1 1c2221234c6e97bd628d78e90052efb1a794e6ec t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iD8DBQFQLEBsLFMCIV9q3ToRAk2iAJ0WqqV+iTsbBz5Z12aiVWDP1p/qcgCfdOsQ
+wgWfgaHg7psXrnHs/hkFCOk=
+=l7tO
+-----END PGP SIGNATURE-----

@@ -1,0 +1,29 @@
+---
+abstract: 'Module::Install Support for Inline::Module'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Install-InlineModule
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+    - example
+requires:
+  Inline::Module: '0.30'
+  Module::Install: '1.14'
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/ingydotnet/module-install-inlinemodule-pm/issues
+  homepage: https://github.com/ingydotnet/module-install-inlinemodule-pm
+  repository: https://github.com/ingydotnet/module-install-inlinemodule-pm.git
+version: '0.03'

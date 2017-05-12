@@ -1,0 +1,5 @@
+use blib;
+use utf8;
+use Markup::Perl;
+<h1>not utf8</h1>(it's low-bit Latin-1)
+<h2><perl>src('t/notutf2.xml')</perl></h2>(it's Mac OS Roman)

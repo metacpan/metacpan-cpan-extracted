@@ -1,0 +1,19 @@
+MARC-Loader
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 Stéphane Delaune
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

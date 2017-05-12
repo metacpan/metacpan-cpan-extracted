@@ -1,0 +1,34 @@
+Revision history for Map-Metro-Plugin-Map-Copenhagen
+
+0.2006 2016-01-21T11:47:51Z UTC
+ [Requirements]
+ - Add missing prereqs (after removing cpanfile): Moose and
+   Map::Metro::Plugin::Map
+
+0.2005 2016-01-21T00:10:33Z UTC
+ [Other Changes]
+ - Rebuilt with current Dist::Iller::Config::Author::CSSON.
+
+ [Requirements]
+ - Require the same Perl version that Map::Metro needs (5.16).
+
+0.2004 2015-01-10T23:00:09Z CET
+ [Meta]
+ - Renamed github repository (should be named like the others)
+
+0.2003 2015-01-10T22:54:23Z CET
+ [Documentation]
+ - Added line information
+ - Added visualization
+
+ [Enhancements]
+ - Changed to new Map role api
+
+ [Meta]
+ - Added github to meta
+ - Adapted to new build style
+ - Bumped Map::Metro requirement
+
+0.2002 2014-12-13T02:47:57Z CET
+ - Initial release.
+

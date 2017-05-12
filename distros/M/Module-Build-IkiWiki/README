@@ -1,0 +1,52 @@
+Module-Build-IkiWiki version 0.0.1
+
+The package aids in the development of ikiwiki plugins by support the
+installation of template and css files. 
+
+It's a subclass of Module::Build module and uses some new parameters for the
+new method. These parameters are:
+
+- ikiwiki_paths 
+
+A hash with the installation paths for `templates` and `css` files.
+
+- ikiwiki_templates
+
+A list of template source files to install.
+
+- ikiwiki_css
+
+A list of stylesheets source files to install.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+- Module::Build 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 <Victor Moral>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License or
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+

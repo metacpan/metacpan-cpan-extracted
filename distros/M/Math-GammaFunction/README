@@ -1,0 +1,78 @@
+NAME
+    Math::GammaFunction - The Gamma and its related functions
+
+SYNOPSIS
+      use Math::GammaFunction qw/:all/;
+      my $gamma     = gamma(5); # 24
+      my $fac       = faculty(4); # same
+      my $psi       = psi(4); # 1.256...
+      my $psi_deriv = psi_derivative($x, $order); # order==0 => psi
+      # ...
+
+DESCRIPTION
+    This module computes the Gamma function, its logarithmic derivative (the
+    Psi or Digamma function) and the derivatives of the Psi function.
+
+    It is a thin wrapper around a couple of functions in the math library of
+    the R statistics package.
+
+  EXPORT
+    None by default. You may choose to export the following functions
+    separately or all at once using the ":all" tag:
+
+        gamma
+        log_gamma
+        faculty
+            psi
+        psi_derivative
+
+SUBROUTINES
+  gamma
+    Takes a real, positive number as argument. Computes the Gamma function.
+    ("n! == Gamma(n+1)")
+
+  log_gamma
+    Takes a real, positive number as argument. Computes the logarithm of the
+    Gamma function.
+
+  psi
+    Takes a real as argument. Computes the Psi (or Digamma) function. ("d/dx
+    Gamma(x) == Gamma(x)*Psi(x)" or "d/dx ln(Gamma(x)) == Psi(x)")
+
+  psi_derivative
+    Takes two arguments: The argument x of the function (real) and the order
+    of the derivative (integer 0 or positive). Computes the n-th derivative
+    of Psi at position x.
+
+    The maximum derivative is, as far as I can gather from the R sources,
+    100.
+
+    This is basically the Polygamma function.
+
+  faculty
+    Takes a positive integer as argument. Computes its faculty. (Thin
+    wrapper around "gamma")
+
+SEE ALSO
+    The actual computation is carried out in C by the excellent R library.
+
+    Thus, refer to the R manual for details. What I call "gamma" here is the
+    "gammafn" in R's C sources, "log_gamma" is is "gamma" in the C sources.
+    <http://www.r-project.org/>
+
+    Here's a list of Wikipedia pages about related functions:
+
+    <http://en.wikipedia.org/wiki/Gamma_function>,
+    <http://en.wikipedia.org/wiki/Polygamma_function>,
+    <http://en.wikipedia.org/wiki/Digamma_function>
+
+AUTHOR
+    Steffen Mueller, <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2007 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.6 or, at your
+    option, any later version of Perl 5 you may have available.
+

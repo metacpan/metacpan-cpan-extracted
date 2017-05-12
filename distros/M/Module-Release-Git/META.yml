@@ -1,0 +1,36 @@
+---
+abstract: 'Use Git with Module::Release'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+keywords:
+  - workflow
+  - module
+  - distribution
+  - pause
+  - automation
+  - testing
+  - git
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Release-Git
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Module::Release: '2.06'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/briandfoy/module-release-git/issues
+  homepage: https://github.com/briandfoy/module-release-git
+  repository: https://github.com/briandfoy/module-release-git.git
+version: '1.011'

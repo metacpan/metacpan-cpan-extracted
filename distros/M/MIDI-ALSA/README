@@ -1,0 +1,29 @@
+
+                         MIDI::ALSA
+
+
+This module offers a Perl interface to the ALSA library.  It is a
+call-compatible translation into Perl of the Lua module midialsa
+http://www.pjb.com.au/comp/lua/midialsa.html which is in turn based
+on the Python modules alsaseq.py and alsamidi.py by Patricio Paez.
+
+It also offers some functions to translate events from and to the
+event format used in Sean Burke's MIDI-Perl module.
+
+Nothing is exported by default, but all the functions and constants
+can be exported, e.g.:
+ use MIDI::ALSA(client, connectfrom, connectto, id, input, output);
+
+The event-type constants, beginning with SND_SEQ_, are available
+not as scalars, but as module subroutines with empty prototypes.
+They must therefore be used without a dollar-sign e.g.:
+ if ($event[0] == MIDI::ALSA::SND_SEQ_EVENT_PORT_UNSUBSCRIBED) { ...
+
+The example/ directory includes: midikbd, midiecho and midiclick.
+
+To install:
+	perl Makefile.PL; make; make install
+
+For up-to-date source, see http://search.cpan.org/~pjb/
+
+Peter J Billam    www.pjb.com.au/comp/contact.html    www.pjb.com.au

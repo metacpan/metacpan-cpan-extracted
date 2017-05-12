@@ -1,0 +1,80 @@
+                       tk-tag.pl 0.10
+====================================================================
+
+This program is a graphical interface for the MP3::Tag library.
+
+Some buttons do not have a function yet.
+
+But is shows you already the contents of the ID3v1/ID3v1.1 and ID3v2.3
+tags and let you change and save these tags.
+If you change something, the changes will only be saved if you click
+on 'Save changes' or press Control-S. This is the same after using
+the remove button. Without saving the changes, nothing will be removed
+permanently. 
+
+A undo function is not implemented yet, but if you didn't save any
+changes you can reload the original tags by selecting the file in the
+filelist again.
+
+Following functions work already:
+	- open a directory (sorry for the bad open directory interface)
+        - select a file form the filelist with a double click or by
+          pressing Enter
+	- You can load/save binary data in ID3v2 tags, like the APIC tag.
+        - Filter the filelist with the buttons below the filelist.
+          In the Entry-field you can type a regular expression, which
+          will be used for filtering.
+	- You can edit all fields of the ID3v1 and ID3v2 tags and the filename.
+          During editing you can use Control-U, Control-u, Control-l to 
+          switch a whole field to UPPERCASE, Uppercase First or lowercase.
+	  In the filename field you can use Control-Space to switch spaces
+          to underscores or vice versa (toggling).
+	- You can use the information of a ID3v1 tag to set the filename
+	  (see Options->Fileformat and documentation below). You can also
+	  use the Artist (TPE1), Album (TALB) and Song (TIT2) information
+          of an ID3v2 tag to set the filename.
+	- You can remove the whole ID3v1 or ID3v2 Tag. And even the whole file
+	  with the remove button, or by deleting the filename. (Remember to
+	  save the changes to really delete it).
+	- You can remove or add frames to a ID3v2 frame
+	- If you enter data in a tag which doesn't exist yet (red background color)
+	  it will be automatically created when you save the changes.
+	- Use Control-n to advance to the next file.
+	- Copy all ID3v1 tag information to the ID3v2 tag 
+	
+
+Warnings will mostly printed to the console and not to a tk-window.
+
+To use this program, you must have the Tk and Tk::JPEG modules from
+CPAN installed. And of course MP3::Tag.
+
+
+   Thomas   <thg@users.sourceforge.net>
+
+
+Filename format
+===============
+
+To set the filename from the data a tag, you can specify a format string:
+
+%a - will be replaced with artist
+%s - will be replaced with song
+%l - will be replaced with album
+%t - will be replaced with track    (not with ID3v2 at the moment)
+%y - will be replaced with year     (not with ID3v2 at the moment)
+%g - will be replaced with genre    (not with ID3v2 at the moment)
+%c - will be replaced with comment  (not with ID3v2 at the moment)
+
+options for %x: (where x is one of a,s,l,t,y,g,c)
+
+%nx    => use only first n characters
+          eg. artist="artist name"  %5a = "artis"
+
+%n:cx  => use at least n characters, if %x is shorter, 
+          fill it with character c
+          eg. track=3       %2:0t = '03'  , 
+	      artist="abc"  %5:_a = "__abc"
+
+%n!:cx => same as %n:cx, but if %x is longer than n, cut it at n
+          eg. artist="abc"      %5:_a = "__abc"  
+	      artist="abcdefg"  %5:_a = "abcde"

@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:                MySQL-Replication
+version:             0.0.2
+abstract:            Decentralised, peer-to-peer, multi-master MySQL replication
+license:             perl
+author:              
+    - Alfie John <alfiej@opera.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    AnyEvent:                      0
+    base:                          0
+    bigint:                        0
+    Class::Accessor:               0
+    constant:                      0
+    DBI:                           0
+    Errno:                         0
+    Fcntl:                         0
+    Getopt::Long:                  0
+    IO::Socket:                    0
+    Pod::Usage:                    0
+    Scalar::Util:                  0
+    strict:                        0
+    Sys::Syslog:                   0
+    Test::More:                    0
+    version:                       0
+    warnings:                      0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

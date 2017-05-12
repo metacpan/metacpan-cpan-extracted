@@ -1,0 +1,40 @@
+---
+abstract: 'MIME Types and their file extensions'
+author:
+  - 'Robert Rothenberg <rrwo at cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Fork: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.12'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Media-Type-Simple
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+recommends:
+  Test::Warnings: 0
+requires:
+  Carp: 0
+  Exporter::Lite: 0
+  File::Share: 0
+  File::ShareDir: 0
+  Storable: 0
+  perl: 5.01
+  version: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Media-Type-Simple
+  homepage: http://rrwo.tumblr.com
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: git://github.com/robrwo/Media-Types-Simple.git
+version: '0.031000'

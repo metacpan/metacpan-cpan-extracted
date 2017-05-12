@@ -1,0 +1,7 @@
+$DISPATCH_TABLE = {
+	$WSRF::Constants::MOBY.'#HelloWorld' => 'Service::HelloWorld',
+    $WSRF::Constants::MOBY.'#HelloWorld_submit' => 'Service::HelloWorld',
+    $WSRF::Constants::WSRPW.'/GetResourceProperty/GetResourcePropertyRequest' => 'Service::HelloWorld',
+    $WSRF::Constants::WSRPW.'/GetMultipleResourceProperties/GetMultipleResourcePropertiesRequest' => 'Service::HelloWorld',
+    $WSRF::Constants::WSRLW.'/ImmediateResourceTermination/DestroyRequest' => 'Service::HelloWorld',
+};

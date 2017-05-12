@@ -1,0 +1,54 @@
+{
+   "abstract" : "Draw building flowcharts from Makefiles using GraphViz",
+   "author" : [
+      "Yichun \"agentzh\" Zhang (章亦春) C<< <agentzh@gmail.com> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Makefile-GraphViz",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "samples",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "File::Compare" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "GraphViz" : "2.16",
+            "Makefile::Parser" : "0.216",
+            "perl" : "5.006001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/bsd-license.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/agentzh/makefile-graphviz-pm"
+      }
+   },
+   "version" : "0.21"
+}

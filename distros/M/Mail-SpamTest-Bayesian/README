@@ -1,0 +1,45 @@
+Mail/SpamTest/Bayesian version 0.02
+===================================
+
+       This module implements the naive Bayesian spam-testing algorithm 
+described by Paul Graham at:
+
+       http://www.paulgraham.com/spam.html
+
+       In short: the system is trained by exposure to mailboxes of 
+known spam and non-spam messages. These are (1) MIME-decoded, and 
+non-text parts deleted; (2) tokenised. The database files spam.db and 
+nonspam.db contain lists of tokens and the number of messages in which 
+they have occurred; general.db holds a message count.
+
+       This module is in early development; it is functional but basic. 
+It is expected that more mailbox parsing routines will be added, 
+probably using Mail::Box; and that ancillary programs will be supplied 
+for use of the module as a personal mail filter.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  BerkeleyDB
+  MIME::Parser (in MIME::tools)
+
+Also useful will be:
+
+  IO::File
+
+COPYRIGHT AND LICENCE
+
+This module is released under the same terms as Perl itself.
+
+Copyright (C) 2002 Roger Burton West <roger@firedrake.org>
+

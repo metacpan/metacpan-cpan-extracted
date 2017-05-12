@@ -1,0 +1,9 @@
+Revision history for Mail-IMAP2SMS
+
+1.20    2009/05/26 09:41:15
+        Altered Makefile.PL to handle
+        dependencies.
+
+1.10    2009/05/21 16:48:32
+        First submitted version.
+

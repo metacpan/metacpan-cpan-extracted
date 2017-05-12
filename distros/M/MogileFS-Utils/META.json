@@ -1,0 +1,53 @@
+{
+   "abstract" : "MogileFS utilities",
+   "author" : [
+      "Brad Fitzpatrick <brad@danga.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.76, CPAN::Meta::Converter version 2.132510",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MogileFS-Utils",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Compress::Zlib" : "0",
+            "LWP::Simple" : "0",
+            "MogileFS::Client" : "1.16"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://code.google.com/p/mogilefs/issues/list"
+      },
+      "homepage" : "http://www.mogilefs.org",
+      "repository" : {
+         "url" : "git://github.com/mogilefs/MogileFS-Utils.git"
+      },
+      "x_MailingList" : "http://groups.google.com/group/mogile"
+   },
+   "version" : "2.29"
+}

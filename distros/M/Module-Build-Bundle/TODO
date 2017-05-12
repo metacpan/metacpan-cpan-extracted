@@ -1,0 +1,19 @@
+TODO file for Module::Build::Bundle
+
+- The initial version held two methods from Module::Build::Base, which have
+  been lifted and changed. The plan is to have these two patched in
+  Module::Build::Base, but for know we keep the changed versions, until the
+  patches have been created, sent, evaluated and hopefully accepted.
+
+  See also:
+    http://logiclab.jira.com/browse/MBB-7
+    http://logiclab.jira.com/browse/MBB-8
+
+  This have changed however so we hold more stuff from Module::Build since
+  Module::Build has changed a lot, we now rely on 0.42 and the job might be bigger
+
+- Replace regular expression based search and replace by Pod::Weaver
+  implementation.
+
+  See also:
+    http://logiclab.jira.com/browse/MBB-11

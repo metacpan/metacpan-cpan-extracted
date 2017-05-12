@@ -1,0 +1,36 @@
+---
+abstract: 'find version and path of locally installed modules'
+author:
+  - 'Adriano R. Ferreira <ferreira@cpan.org>'
+build_requires:
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Which
+requires:
+  Carp: '0'
+  Exporter: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Glob: '0'
+  File::Spec: '0'
+  File::Spec::Unix: '0'
+  Getopt::Long: '0'
+  Pod::Usage: '0'
+  String::Truncate: '0'
+  Term::Size::Any: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilb/Module-Which
+  repository: https://github.com/neilb/Module-Which.git
+version: '0.05'

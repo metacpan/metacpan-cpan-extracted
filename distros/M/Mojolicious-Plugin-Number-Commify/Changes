@@ -1,0 +1,15 @@
+0.041 2017-04-01
+  - Update to use Mojo::File (version).
+
+0.031 2015-01-12
+  - Fix secrets bug [bug=2] (thanks Renee Baecker).
+
+0.023 2015-01-11
+  - Support any separator.
+  - Add Ted Olson fee to tests.
+
+0.011 2014-05-08
+  - Add helper and test.
+
+0.001 2014-04-16
+  - Initial packaging.

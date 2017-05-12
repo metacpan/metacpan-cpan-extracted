@@ -1,0 +1,68 @@
+NAME
+    Message::Passing::Output::MongoDB - message-passing out put to MongoDB
+
+SYNOPSIS
+        message-pass --input STDIN 
+          --output MongoDB --output_options '{ "database":"log_database", "collection":"logs"}'
+    
+        {"foo":"bar"}
+
+DESCRIPTION
+    Module for Message::Passing, send output to MongoDB
+
+METHODS
+    consume
+        Consumes a message by JSON encoding it save it in MongoDB
+
+ATTRIBUTES
+    database
+        Required, Str, the database to use.
+
+    collection
+        Required, Str, the collection to use.
+
+    connection_options
+        HashRef, takes any options as MongoDB::MongoClient->new(\%options)
+        do
+
+    username
+        Str, mongodb authentication user
+
+    password
+        Str, mongodb authentication password
+
+    indexes
+        ArrayRef[ArrayRef[HashRef]], mongodb indexes
+
+            ...
+            indexes => [
+                [{"foo" => 1, "bar" => -1}, { unique => true }],
+                [{"foo" => 1}],
+            ]
+            ...
+
+    collect_fields
+        Bool, default to 0, set to 1 to collect the fields' key and inserted
+        in collection $self->collection . "_keys", execution at the starting
+        and once per day.
+
+    retention
+        Int, time in seconds to conserver logs, set 0 to keep it permanent,
+        default is a week
+
+    verbose
+        Boolean, verbose
+
+SEE ALSO
+    Message::Passing
+
+SPONSORSHIP
+    This module exists due to the wonderful people at Suretec Systems Ltd.
+    <http://www.suretecsystems.com/> who sponsored its development for its
+    VoIP division called SureVoIP <http://www.surevoip.co.uk/> for use with
+    the SureVoIP API -
+    <http://www.surevoip.co.uk/support/wiki/api_documentation>
+
+AUTHOR, COPYRIGHT AND LICENSE
+    See Message::Passing.
+

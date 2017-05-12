@@ -1,0 +1,61 @@
+{
+   "abstract" : "Mason callback support via Params::CallbackRequest.",
+   "author" : [
+      "David E. Wheeler <david@justatheory.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MasonX-Interp-WithCallbacks",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.2701",
+            "Test::More" : "0.17"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.2701"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Apache::TestMB" : 0,
+            "Test::Pod" : "1.20"
+         },
+         "requires" : {
+            "Class::Container" : "0.09",
+            "HTML::Mason" : "1.23",
+            "Params::CallbackRequest" : "1.15",
+            "Test::Simple" : "0.17"
+         }
+      }
+   },
+   "provides" : {
+      "MasonX::Interp::WithCallbacks" : {
+         "file" : "lib/MasonX/Interp/WithCallbacks.pm",
+         "version" : "1.19"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/theory/masonx-interp-withcallbacks/issues/"
+      },
+      "homepage" : "http://search.cpan.org/dist/MasonX-Interp-WithCallbacks/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/theory/masonx-interp-withcallbacks/"
+      }
+   },
+   "version" : "1.19"
+}

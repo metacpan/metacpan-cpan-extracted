@@ -1,0 +1,90 @@
+0.46 Sat Jan 31 00:58:24 UTC 2009 ($Rev$, $Author$)
+    - fixed 5.8.6 dependency not to be 5.8.60 dependency
+    - increased Email::Address dependency to a known-good version
+
+0.45 Fri Jan 30 21:07:56 UTC 2009 (Rev: 63, Author: chromatic)
+    - removed dependency on deprecated Email::Simple::Headers
+
+    Sun Dec  3 08:04:20 UTC 2006 (Rev: 61, Author: chromatic)
+    - ported more tests to Test::Class format
+    - made POD tests optional
+
+    Sat Dec 24 07:21:19 UTC 2005 (Rev: 57, Author: chromatic)
+    - removed path changes from tests to help determine coverage
+    - added t/address_desc.t and t/request.t
+    - added POD tests
+
+    Mon Jul 25 00:58:33 UTC 2005 (Rev: 56, Author: chromatic)
+    - ported t/action.t to Test::Class (lib/Mail/Action/Test.pm)
+
+    Fri Dec  3 05:15:37 UTC 2004 (Rev: 56, Author: chromatic)
+    - added Mail::Mailer dependency to Build.PL
+
+    Fri Nov 26 20:32:48 UTC 2004 (Rev: 54, Author: chromatic)
+    - bumped up version number
+    - updated README
+
+    Thu Nov 25 20:47:47 UTC 2004 (Rev: 54, Author: chromatic)
+    - add default recipient in constructor
+    - allow setting recipient in constructor
+    - always treat recipient in Email::Address form
+    - don't duplicate addresses in remove_recipient() (bugfix)
+
+0.41
+    Thu Sep 30 06:40:54 UTC 2004 (Rev: 51, Author: chromatic)
+    - delete only the first recipient found in headers in Mail::Action::Request
+    - also, use the modified headers when copying headers (oooops)
+
+    Wed Sep 29 23:45:37 UTC 2004 (Rev: 50, Author: chromatic)
+    - add Mail::Action::Request to MANIFEST
+    - don't strip out recipient if it's the only address in a header
+
+    Tue Sep 28 23:38:10 UTC 2004 (Rev: 48, Author: chromatic)
+    - fix inadvertently failing test and renumber tests
+
+    Sun Sep 26 06:52:58 UTC 2004 (Rev: 46, Author: chromatic)
+    - added Mail::Action::Request
+    - cleaned up some very broken POD (text, not formatting) in Mail::Action
+
+0.40
+    Sun Jul 11 03:27:54 UTC 2004 (Rev: 39, Author: chromatic)
+    - port to Email::Simple and Email::MIME
+    - added remove_sig()
+    - mark build requirements in Build.PL
+    - added t/action.t
+    - added t/address_roles.t (not in version control previously, oops)
+
+0.30
+    Mon Mar 15 05:57:26 UTC 2004 (Rev: 31, Author: chromatic)
+    - fix spelling of Simon's name in README (sorry)
+
+    Mon Mar 15 04:51:15 UTC 2004 (Rev: 28, Author: chromatic)
+    - bumped up version number
+    - mark dependency on Mail::Box in Build.PL
+    - minor README copyright date tweak
+
+    Thu Mar 11 01:26:41 UTC 2004 (Rev: 28, Author: chromatic)
+    - ported to use Mail::Message from Mail::Internet
+    - added author keyword expansion to ChangeLog
+
+0.20
+    Sun Dec 14 01:00:37 UTC 2003 (Rev: 26)
+    - improve version number in module
+
+    Sat Dec 13 23:06:11 UTC 2003 (Rev: 25)
+    - made Mail::Action::Address supply roles instead of superclass
+    - updated tests
+    - updated documentation
+    - add dependency on Class::Roles
+
+    Thu Dec 11 05:42:18 UTC 2003 (Rev: 24)
+    - filled out Mail::Action::Address
+    - added docs
+    - updated version for 0.20 release
+
+0.10
+    Sun Nov  2 05:26:08 UTC 2003 (Rev: 23)
+    - added Mail::Action::Storage and Mail::Action::Address and tests
+
+    Sun Nov  2 03:34:28 UTC 2003 (Rev: 22)
+    - initial creation

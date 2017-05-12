@@ -1,0 +1,163 @@
+=head1 NAME
+
+Math::PartialOrder::Caching -
+class for partial orders which caches lookup results.
+
+=head1 SYNOPSIS
+
+  use Math::PartialOrder::Caching;
+  ...
+
+=head1 REQUIRES
+
+Math::PartialOrder::Std, Math::PartialOrder, Carp, Exporter
+
+=head1 DESCRIPTION
+
+Math::PartialOrder::Caching is a Math::PartialOrder::Base implementation for
+rooted finite partial orders (datatype hierarchies) which caches
+the reults of all inheritance- and type-operation lookups using
+Perl hashes.  It inherits from Math::PartialOrder::Std.
+
+Math::PartialOrder::Caching supports all methods
+described in L<Math::PartialOrder::Base>.
+
+=pod
+
+=head1 PACKAGE-GLOBAL VARIABLES
+
+=over 4
+
+=item * C<$CACHE_KEY_SEP>
+
+The value of this variable is a perl string which will
+be used as a separator between operation- and/or
+type-identifiers for
+purposes of placing them in the cache.  The default
+value is C<','>.
+
+=back
+
+
+
+=pod
+
+=head1 METHODS
+
+=head2 Construction & Initialization
+
+=over 4
+
+=item * C<new( {root=E<gt>$r} )>
+
+Creates and returns a new Math::PartialOrder::Caching object rooted at
+$r, which defaults to 'BOTTOM'.
+
+=pod
+
+=back
+
+=head2 Additional Hierarchy Maintainence Operations
+
+All additional methods provided by Math::PartialOrder::Std
+are supported.
+
+
+
+
+=head2 Hierarchy Maintainence: Low-level Accessors/Manipulators
+
+All low-level methods provided by Math::PartialOrder::Std are supported.
+
+=over 4
+
+=pod
+
+=item * C<_root(), _root($r)>
+
+Get/set the root of the hierarchy.
+
+=pod
+
+=item * C<_incache()>
+
+Returns a reference to the tied
+inheritance-cache, whose keys are
+type-name pairs separated by C<$CACHE_KEY_SEP>,
+C<"${t1}${CACHE_KEY_SEP}${t2}">,
+and whose values (where they exist) are booleans indicating
+whether C<$t1> has C<$t2> as an ancestor.
+
+=item * C<_get_cached_in($t1,$t2)>
+
+Gets and returns the cached value for
+the key C<"${t1}${CACHE_KEY_SEP}${t2}">, or
+C<undef> if not cached.
+
+=item * C<_set_cached_in($t1,$t2)>
+
+Sets and returns the cached value
+for the key C<"${t1}${CACHE_KEY_SEP}${t2}"> to
+C<$val>.
+
+=pod
+
+=item * C<_opcache()>
+
+Returns a reference to the tied
+operations-cache, whose keys are
+operation+type1+type2 triples separated by
+C<$CACHE_KEY_SEP>,
+C<"${op}${CACHE_KEY_SEP}${t1}${CACHE_KEY_SEP}${t2}">,
+and whose values are (references to) the results
+of the lookup.
+
+=item * C<_get_cached_op($op,$t1,$t2)>
+
+Gets and returns the cached value for
+the key C<"${op}${CACHE_KEY_SEP}${t1}${CACHE_KEY_SEP}${t2}">, or
+C<undef> if not cached.
+
+=item * C<_set_cached_op($op,$t1,$t2,$val)>
+
+Sets and returns the cached value
+for the key C<"${op}${CACHE_KEY_SEP}${t1}${CACHE_KEY_SEP}${t2}">
+to C<$val>.
+
+=pod
+
+=item * C<_clear_cache()>
+
+Clears all cached relations.  Automatically called
+on destructive hierarchy operations, otherwise
+never called by default (the cache never expires).
+
+=pod
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+perl by Larry Wall.
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>jurish@ling.uni-potsdam.deE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001, Bryan Jurish.  All rights reserved.
+
+This package is free software.  You may redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+perl(1).
+Math::PartialOrder(3pm).
+Math::PartialOrder::Base(3pm).
+Math::PartialOrder::Std(3pm).
+Math::PartialOrder::LRUCaching(3pm).
+Math::PartialOrder::CMasked(3pm).
+Math::PartialOrder::CEnum(3pm).
+Math::PartialOrder::Loader(3pm).

@@ -1,0 +1,5 @@
+`Module-Package-RDF`
+	perl_version_from  m`Module::Package::RDF`;
+	version_from       m`Module::Package::RDF`;
+	readme_from        m`Module::Package::RDF`;
+	install_script     f`bin/mkdist`.

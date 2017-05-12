@@ -1,0 +1,30 @@
+NAME
+    Message::Passing::Output::PocketIO - Output passing message to pocket.io
+
+DESCRIPTION
+    Run a webserver using PocketIO, then we can see the passing messages by
+    browser. Even notify by chrome desktop notification api.
+
+SYNOPSIS
+        $ message-passing --input STDIN --output PocketIO
+        {"foo" : "bar"}
+        $ open http://localhost:8080/
+
+METHODS
+  consume ($msg)
+SEE ALSO
+    Message::Passing
+    <http://logstash.net>
+    <http://socket.io>
+    PocketIO
+
+AUTHOR
+    chenryn, <rao.chenlin@gmail.com<gt>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2012 by chenryn
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.14.2 or, at
+    your option, any later version of Perl 5 you may have available.
+

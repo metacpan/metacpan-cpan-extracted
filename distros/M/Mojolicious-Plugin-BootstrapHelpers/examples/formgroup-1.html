@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Examples</title>
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    </head>
+
+    <body>
+        <div class="container">
+            
+
+<p>The first item in the array ref is used for both <code>id</code> and <code>name</code>. Except...</p>
+<pre>%= formgroup &#39;Text test 1&#39;, text_field =&gt; [&#39;test_text&#39;]</pre>
+<pre>&lt;div class=&quot;form-group&quot;&gt;
+    &lt;label class=&quot;control-label&quot; for=&quot;test_text&quot;&gt;Text test 1&lt;/label&gt;
+    &lt;input class=&quot;form-control&quot; id=&quot;test_text&quot; name=&quot;test_text&quot; type=&quot;text&quot; /&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="form-group">        <label class="control-label" for="test_text">Text test 1</label>        <input class="form-control" id="test_text" name="test_text" type="text" />    </div></div>
+<hr />
+<pre>%= formgroup &#39;Text test 2&#39;, text_field =&gt; [&#39;test_text&#39;, size =&gt; 30]</pre>
+<pre>&lt;div class=&quot;form-group&quot;&gt;
+    &lt;label class=&quot;control-label&quot; for=&quot;test_text&quot;&gt;Text test 2&lt;/label&gt;
+    &lt;input class=&quot;form-control&quot; id=&quot;test_text&quot; name=&quot;test_text&quot; size=&quot;30&quot; type=&quot;text&quot; /&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="form-group">        <label class="control-label" for="test_text">Text test 2</label>        <input class="form-control" id="test_text" name="test_text" size="30" type="text" />    </div></div>
+<hr />
+<p>...if the input name (the first item in the text_field array ref) contains dashes -- those are replaced (in the <code>name</code>) to underscores:</p>
+<pre>%= formgroup &#39;Text test 4&#39;, text_field =&gt; [&#39;test-text&#39;, large]</pre>
+<pre>&lt;div class=&quot;form-group&quot;&gt;
+    &lt;label class=&quot;control-label&quot; for=&quot;test-text&quot;&gt;Text test 4&lt;/label&gt;
+    &lt;input class=&quot;form-control input-lg&quot; id=&quot;test-text&quot; name=&quot;test_text&quot; type=&quot;text&quot; /&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="form-group">        <label class="control-label" for="test-text">Text test 4</label>        <input class="form-control input-lg" id="test-text" name="test_text" type="text" />    </div></div>
+<hr />
+<p>An input with a value:</p>
+<pre>%= formgroup &#39;Text test 5&#39;, text_field =&gt; [&#39;test_text&#39;, &#39;200&#39; ]</pre>
+<pre>&lt;div class=&quot;form-group&quot;&gt;
+    &lt;label class=&quot;control-label&quot; for=&quot;test_text&quot;&gt;Text test 5&lt;/label&gt;
+    &lt;input class=&quot;form-control&quot; id=&quot;test_text&quot; name=&quot;test_text&quot; type=&quot;text&quot; value=&quot;200&quot; /&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="form-group">        <label class="control-label" for="test_text">Text test 5</label>        <input class="form-control" id="test_text" name="test_text" type="text" value="200" />    </div></div>
+<hr />
+<p>Note the difference with the earlier example. Here <code>large</code> is outside the <code>text_field</code> array reference, and therefore <code>.form-group-lg</code> is applied to the form group:</p>
+<pre>&lt;form class=&quot;form-horizontal&quot;&gt;
+    %= formgroup &#39;Text test 6&#39;, text_field =&gt; [&#39;test_text&#39;], large, cols =&gt; { small =&gt; [2, 10] }
+&lt;/form&gt;</pre>
+<pre>&lt;form class=&quot;form-horizontal&quot;&gt;
+    &lt;div class=&quot;form-group form-group-lg&quot;&gt;
+        &lt;label class=&quot;control-label col-sm-2&quot; for=&quot;test_text&quot;&gt;Text test 6&lt;/label&gt;
+        &lt;div class=&quot;col-sm-10&quot;&gt;
+            &lt;input class=&quot;form-control&quot; id=&quot;test_text&quot; name=&quot;test_text&quot; type=&quot;text&quot;&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/form&gt;</pre>
+<div>    <form class="form-horizontal">        <div class="form-group form-group-lg">            <label class="control-label col-sm-2" for="test_text">Text test 6</label>            <div class="col-sm-10">                <input class="form-control" id="test_text" name="test_text" type="text">            </div>        </div>    </form></div>
+<hr />
+<pre>%= formgroup text_field =&gt; [&#39;test_text&#39;, xsmall] =&gt; begin
+    Text test 7
+%  end</pre>
+<pre>&lt;div class=&quot;form-group&quot;&gt;
+    &lt;label class=&quot;control-label&quot; for=&quot;test_text&quot;&gt; Text test 7 &lt;/label&gt;
+    &lt;input class=&quot;form-control input-xs&quot; id=&quot;test_text&quot; name=&quot;test_text&quot; type=&quot;text&quot; /&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="form-group">        <label class="control-label" for="test_text"> Text test 7 </label>        <input class="form-control input-xs" id="test_text" name="test_text" type="text" />    </div></div>
+<hr />
+<p>A formgroup used in a <code>.form-horizontal</code> <code>form</code>:(Note that in this context, <code>medium</code> and <code>large</code> are not shortcuts, but ordinary hash keys.)</p>
+<pre>%= formgroup &#39;Text test 8&#39;, text_field =&gt; [&#39;test_text&#39;], cols =&gt; { medium =&gt; [2, 10], small =&gt; [4, 8] }</pre>
+<pre>&lt;div class=&quot;form-group&quot;&gt;
+    &lt;label class=&quot;control-label col-md-2 col-sm-4&quot; for=&quot;test_text&quot;&gt;Text test 8&lt;/label&gt;
+    &lt;div class=&quot;col-md-10 col-sm-8&quot;&gt;
+        &lt;input class=&quot;form-control&quot; id=&quot;test_text&quot; name=&quot;test_text&quot; type=&quot;text&quot; /&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="form-group">        <label class="control-label col-md-2 col-sm-4" for="test_text">Text test 8</label>        <div class="col-md-10 col-sm-8">            <input class="form-control" id="test_text" name="test_text" type="text" />        </div>    </div></div>
+<hr />
+<pre>%= formgroup text_field =&gt; [&#39;test-text-9&#39;]</pre>
+<pre>&lt;div class=&quot;form-group&quot;&gt;
+    &lt;input class=&quot;form-control&quot; id=&quot;test-text-9&quot; name=&quot;test_text_9&quot; type=&quot;text&quot; /&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="form-group">        <input class="form-control" id="test-text-9" name="test_text_9" type="text" />    </div></div>
+<hr />
+<pre>%= formgroup &#39;Text test 9&#39;, text_area =&gt; [&#39;atextarea&#39;, &#39;default text&#39;]</pre>
+<pre>&lt;div class=&quot;form-group&quot;&gt;
+    &lt;label class=&quot;control-label&quot; for=&quot;atextarea&quot;&gt;Text test 9&lt;/label&gt;
+    &lt;textarea class=&quot;form-control&quot; id=&quot;atextarea&quot; name=&quot;atextarea&quot;&gt;default text&lt;/textarea&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="form-group">        <label class="control-label" for="atextarea">Text test 9</label>        <textarea class="form-control" id="atextarea" name="atextarea">default text</textarea>    </div></div>
+<p>Textareas can also be used in formgroups.</p>
+        </div>
+        <pre style="background-color: #fff; border-width: 0px;">
+
+
+
+        </pre>
+    </body>
+</html>

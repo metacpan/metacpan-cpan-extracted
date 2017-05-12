@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/MooseX/Lexical/Types.pm
+lib/MooseX/Lexical/Types/TypeDecorator.pm
+lib/MooseX/Lexical/Types/TypedScalar.pm
+t/basic.t
+t/custom.t
+t/lib/TypeLibrary.pm

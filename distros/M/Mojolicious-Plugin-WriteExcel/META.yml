@@ -1,0 +1,40 @@
+---
+abstract: 'write Excel spreadsheets from Mojolicious'
+author:
+  - 'Zak B. Elep <zakame@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-WriteExcel
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Mojolicious::Plugin::WriteExcel:
+    file: lib/Mojolicious/Plugin/WriteExcel.pm
+    version: '2.05'
+requires:
+  Mojolicious: '5.73'
+  Spreadsheet::WriteExcel::Simple: '1.04'
+resources:
+  bugtracker: https://github.com/zakame/mojox-renderer-writeexcel/issues
+  homepage: https://github.com/zakame/mojox-renderer-writeexcel
+  repository: git://github.com/zakame/mojox-renderer-writeexcel.git
+version: '2.05'
+x_contributors:
+  - 'Bryan Paxton <starbelly@pobox.com>'
+  - 'Zak B. Elep <zakame@zakame.net>'

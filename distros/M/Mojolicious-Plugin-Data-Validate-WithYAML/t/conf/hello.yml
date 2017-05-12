@@ -1,0 +1,46 @@
+---
+email:
+    type: required
+    regex: ^[\w.-]+\@.+\..{2,5}$
+    message: 'Email is not correct'
+plz:
+    type: required
+    regex: ^\d{4,5}$
+    no_validate: 1
+    message: 'Invalid zip code'
+country:
+    type: required
+    regex: ^[A-Z]{2,3}$
+greeting:
+    enum:
+        - Herr
+        - Frau
+        - Firma
+age:
+    type: optional
+    enum:
+        - 1
+        - 2
+    message: 'age must be either 1 or 2'
+age2:
+    type: required
+    min: 18
+    max: 67
+password:
+    length: 5,
+    message: 'Password is too short'
+    depends_on: admin
+    case:
+        administrator:
+            type: required
+            length: 10,
+        root:
+            type: required
+            length: 15,
+admin:
+    type: required
+    enum:
+        - administrator
+        - root
+        - superuser
+

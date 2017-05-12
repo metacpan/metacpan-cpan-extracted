@@ -1,0 +1,108 @@
+package Monitoring::GLPlugin::SNMP::MibsAndOids::IPFORWARDMIB;
+
+$Monitoring::GLPlugin::SNMP::MibsAndOids::origin->{'IP-FORWARD-MIB'} = {
+  url => '',
+  name => 'IP-FORWARD-MIB',
+};
+
+$Monitoring::GLPlugin::SNMP::MibsAndOids::requirements->{'IP-FORWARD-MIB'} = [
+  'SNMPv2-TC-v1-MIB',
+];
+
+$Monitoring::GLPlugin::SNMP::MibsAndOids::mib_ids->{'IP-FORWARD-MIB'} = 
+  '1.3.6.1.2.1.4.24';
+
+$Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'IP-FORWARD-MIB'} = {
+  'ipForward' => '1.3.6.1.2.1.4.24',
+  'ipForwardNumber' => '1.3.6.1.2.1.4.24.1.0',
+  'ipForwardTable' => '1.3.6.1.2.1.4.24.2',
+  'ipForwardEntry' => '1.3.6.1.2.1.4.24.2.1',
+  'ipForwardDest' => '1.3.6.1.2.1.4.24.2.1.1',
+  'ipForwardMask' => '1.3.6.1.2.1.4.24.2.1.2',
+  'ipForwardPolicy' => '1.3.6.1.2.1.4.24.2.1.3',
+  'ipForwardNextHop' => '1.3.6.1.2.1.4.24.2.1.4',
+  'ipForwardIfIndex' => '1.3.6.1.2.1.4.24.2.1.5',
+  'ipForwardType' => '1.3.6.1.2.1.4.24.2.1.6',
+  'ipForwardProto' => '1.3.6.1.2.1.4.24.2.1.7',
+  'ipForwardAge' => '1.3.6.1.2.1.4.24.2.1.8',
+  'ipForwardInfo' => '1.3.6.1.2.1.4.24.2.1.9',
+  'ipForwardNextHopAS' => '1.3.6.1.2.1.4.24.2.1.10',
+  'ipForwardMetric1' => '1.3.6.1.2.1.4.24.2.1.11',
+  'ipForwardMetric2' => '1.3.6.1.2.1.4.24.2.1.12',
+  'ipForwardMetric3' => '1.3.6.1.2.1.4.24.2.1.13',
+  'ipForwardMetric4' => '1.3.6.1.2.1.4.24.2.1.14',
+  'ipForwardMetric5' => '1.3.6.1.2.1.4.24.2.1.15',
+  'ipCidrRouteNumber' => '1.3.6.1.2.1.4.24.3.0',
+  'ipCidrRouteTable' => '1.3.6.1.2.1.4.24.4',
+  'ipCidrRouteEntry' => '1.3.6.1.2.1.4.24.4.1',
+  'ipCidrRouteDest' => '1.3.6.1.2.1.4.24.4.1.1',
+  'ipCidrRouteMask' => '1.3.6.1.2.1.4.24.4.1.2',
+  'ipCidrRouteTos' => '1.3.6.1.2.1.4.24.4.1.3',
+  'ipCidrRouteNextHop' => '1.3.6.1.2.1.4.24.4.1.4',
+  'ipCidrRouteIfIndex' => '1.3.6.1.2.1.4.24.4.1.5',
+  'ipCidrRouteType' => '1.3.6.1.2.1.4.24.4.1.6',
+  'ipCidrRouteTypeDefinition' => {
+    '1' => 'other',
+    '2' => 'reject',
+    '3' => 'local',
+    '4' => 'remote',
+  },
+  'ipCidrRouteProto' => '1.3.6.1.2.1.4.24.4.1.7',
+  'ipCidrRouteProtoDefinition' => {
+    '1' => 'other',
+    '2' => 'local',
+    '3' => 'netmgmt',
+    '4' => 'icmp',
+    '5' => 'egp',
+    '6' => 'ggp',
+    '7' => 'hello',
+    '8' => 'rip',
+    '9' => 'isIs',
+    '10' => 'esIs',
+    '11' => 'ciscoIgrp',
+    '12' => 'bbnSpfIgp',
+    '13' => 'ospf',
+    '14' => 'bgp',
+    '15' => 'idpr',
+    '16' => 'ciscoEigrp',
+  },
+  'ipCidrRouteAge' => '1.3.6.1.2.1.4.24.4.1.8',
+  'ipCidrRouteInfo' => '1.3.6.1.2.1.4.24.4.1.9',
+  'ipCidrRouteNextHopAS' => '1.3.6.1.2.1.4.24.4.1.10',
+  'ipCidrRouteMetric1' => '1.3.6.1.2.1.4.24.4.1.11',
+  'ipCidrRouteMetric2' => '1.3.6.1.2.1.4.24.4.1.12',
+  'ipCidrRouteMetric3' => '1.3.6.1.2.1.4.24.4.1.13',
+  'ipCidrRouteMetric4' => '1.3.6.1.2.1.4.24.4.1.14',
+  'ipCidrRouteMetric5' => '1.3.6.1.2.1.4.24.4.1.15',
+  'ipCidrRouteStatus' => '1.3.6.1.2.1.4.24.4.1.16',
+  'ipCidrRouteStatusDefinition' => 'SNMPv2-TC-v1-MIB::RowStatus',
+  'ipForwardConformance' => '1.3.6.1.2.1.4.24.5',
+  'ipForwardGroups' => '1.3.6.1.2.1.4.24.5.1',
+  'ipForwardCompliances' => '1.3.6.1.2.1.4.24.5.2',
+  'inetCidrRouteNumber' => '1.3.6.1.2.1.4.24.6.0',
+  'inetCidrRouteTable' => '1.3.6.1.2.1.4.24.7',
+  'inetCidrRouteEntry' => '1.3.6.1.2.1.4.24.7.1',
+  'inetCidrRouteDestType' => '1.3.6.1.2.1.4.24.7.1.1',
+  'inetCidrRouteDest' => '1.3.6.1.2.1.4.24.7.1.2',
+  'inetCidrRoutePfxLen' => '1.3.6.1.2.1.4.24.7.1.3',
+  'inetCidrRoutePolicy' => '1.3.6.1.2.1.4.24.7.1.4',
+  'inetCidrRouteNextHopType' => '1.3.6.1.2.1.4.24.7.1.5',
+  'inetCidrRouteNextHop' => '1.3.6.1.2.1.4.24.7.1.6',
+  'inetCidrRouteIfIndex' => '1.3.6.1.2.1.4.24.7.1.7',
+  'inetCidrRouteType' => '1.3.6.1.2.1.4.24.7.1.8',
+  'inetCidrRouteProto' => '1.3.6.1.2.1.4.24.7.1.9',
+  'inetCidrRouteAge' => '1.3.6.1.2.1.4.24.7.1.10',
+  'inetCidrRouteNextHopAS' => '1.3.6.1.2.1.4.24.7.1.11',
+  'inetCidrRouteMetric1' => '1.3.6.1.2.1.4.24.7.1.12',
+  'inetCidrRouteMetric2' => '1.3.6.1.2.1.4.24.7.1.13',
+  'inetCidrRouteMetric3' => '1.3.6.1.2.1.4.24.7.1.14',
+  'inetCidrRouteMetric4' => '1.3.6.1.2.1.4.24.7.1.15',
+  'inetCidrRouteMetric5' => '1.3.6.1.2.1.4.24.7.1.16',
+  'inetCidrRouteStatus' => '1.3.6.1.2.1.4.24.7.1.17',
+  'inetCidrRouteDiscards' => '1.3.6.1.2.1.4.24.8.0',
+};
+
+
+1;
+
+__END__

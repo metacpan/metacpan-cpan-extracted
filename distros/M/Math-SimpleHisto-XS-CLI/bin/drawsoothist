@@ -1,0 +1,35 @@
+#!perl
+use strict;
+use warnings;
+use SOOT qw/:all/;
+use Math::SimpleHisto::XS;
+
+local $/ = "";
+my @h;
+while (<STDIN>) {
+  my $hist;
+  foreach my $type (qw(json yaml simple native_pack)) {
+    #binmode(STDIN) if $type eq 'native_pack';
+    eval {$hist = Math::SimpleHisto::XS->new_from_dump($type, $_);};
+    last if defined $hist;
+  }
+  die "Failed to read dump of any type" if not defined $hist;
+
+  my $n = scalar(@h)+1;
+  push @h, $hist->to_soot("h$n", "h$n");
+}
+
+exit(1) if not @h;
+
+my @colors = (kBlue, kRed, kBlack, kCyan, kGreen, kTeal, kYellow);
+my $c = TCanvas->new;
+my $first = shift(@h);
+my $colno = 0;
+$first->SetLineColor($colors[$colno++]);
+$first->Draw();
+for (@h) {
+  $colno = 0 if $colno == @colors;
+  $_->SetLineColor($colors[$colno++]);
+  $_->Draw("SAME");
+}
+$gApplication->Run();

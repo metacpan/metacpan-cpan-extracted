@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Math/SymbolicX/BigNum.pm
+t/base.t

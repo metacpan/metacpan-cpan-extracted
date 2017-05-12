@@ -1,0 +1,122 @@
+Fri, Dec 17 2004 (1.6)
+ * very small spell mistake in perl-constants.c (GMIME_RECIPIENT_TYPE_[B]CC)
+
+Thu, Dec 16 2004 (1.5 bug fix release)
+ * improvement patches made by Sergey Skvortsov - maintainer of FreeBSD port of MIME-Fast
+ * fixed a problem with part->set_content_md5() reported by Sergey Skvortsov
+
+Thu, Oct 16 2003 (1.4)
+ * add link to gmime library to the README file
+ * perl Makefile.PL would stop running if it fails to find gmime library
+ * new filter: MIME::Fast::Filter::Windows
+
+Wed, Oct 15 2003 (1.2)
+ * fixed problem with enriched filter when compiled with gmime-2.1.0 (Thanks to Patel, Rupen)
+ * update to gmime-2.1.0:
+   - MIME::Fast::Utils::8bit_header_decode split into
+     MIME::Fast::Utils::header_decode_text and MIME::Fast::Utils::header_decode_phrase
+   - MIME::Fast::Utils::8bit_header_encode renamed to
+     MIME::Fast::Utils::header_encode_text
+   - MIME::Fast::Utils::8bit_header_encode_phrase renamed to
+     MIME::Fast::Utils::header_encode_phrase
+   - MIME::Fast::Charset::locale_name renamed to
+     MIME::Fast::locale_charset
+   - new function MIME::Fast::locale_language
+
+Mon, Jul 28 2003 (1.1)
+ * fixed a bad position of pTHX in gmime-stream-perlio.c
+
+Mon, Jun 23 2003 (1.0.1)
+ * polishing a code - drop unused variables, etc.
+ * gmime-stream-perlio.c - fixed compilation problems with multithreaded perl
+
+Sat, Jun 21 2003
+ * fixed wrong HV interpretation in $parser->set_header_regex()
+   Add new test paragraph for that case.
+
+Mon, Jun 18 2003 (1.0.0)
+ * split Fast.xs into separate classes located in Fast/ directory
+ * new filter added - MIME::Fast::Filter::Enriched
+ * new function MIME::Fast::Parser::[sg]et_persist_stream
+ * objects unsupported in gmime (Message-Disposition and Message-MDN)
+   are included but not compiled in (embraced with _UNSUPPORTED macros
+   that can be enabled in Makefile.PL)
+ * fixed a bug in construct_message when method used with parser argument
+ * new enhanced test file t/parser.t
+ * new subdirectory cincluse/ for gmime new functions
+ * cleaned gmime-newfunc.c (set_date_from_string hardencoded info Fast/Message.xs)
+ * new GMimeStreamPerlIO gmime plugin - this is used by the perl module
+   as a default stream for file handles, as well as for all the PerlIO
+   objects.
+ * new function MIME::Fast::Parser::set_header_regex() - a function
+   is called during header parsing when given regex would match
+
+Fri, Jun 13 2003 (0.2.2)
+ * fixed a bug with foreach_part method (Thanks to 
+   Ramprasad A Padmanabhan for testing)
+
+Fri, Jun 13 2003 (0.2.1)
+ * fixed problem with filehandles closed by gmime in MIME::Fast::Stream
+
+Thu, Jun 12 2003 (0.2)
+ * finished fixing bugs, and update to gmime 2.0.8
+ * Fast.xs:
+   - new function constat_string for string constants
+   - new GMime objects/types:
+     = enums:
+     + MIME::Fast::BestEncoding 
+     + MIME::Fast::FilterFromMode
+     + Mime::Fast::FilterYencDirection
+     = objects/types:
+     + MIME::Fast::Object
+     + MIME::Fast::Parser
+     + MIME::Fast::MultiPart
+     + MIME::Fast::MessagePart
+     + MIME::Fast::MessagePartial
+     + MIME::Fast::Disposition
+     + MIME::Fast::StreamFilter
+     + MIME::Fast::Filter::Basic
+     + MIME::Fast::Filter::Best
+     + MIME::Fast::Filter::Charset
+     + MIME::Fast::Filter::CRLF
+     + MIME::Fast::Filter::From
+     + MIME::Fast::Filter::HTML
+     + MIME::Fast::Filter::Md5
+     + MIME::Fast::Filter::Strip
+     + MIME::Fast::Filter::Yenc
+     + MIME::Fast::Charset
+   - thread safe _foreach method calls (uses no static variable)
+   - fixed destruction problems (gmime v2 uses now GLib object references)
+   - new methods:
+     + MIME::Fast::Param->append(name, value)
+     + MIME::Fast::Param->append_param(param)
+     + MIME::Fast::Param->write_to_string(fold, svtext)
+     + MIME::Fast::Stream->write_to_stream(stream_dst)
+     + MIME::Fast::Stream->length()
+     + MIME::Fast::Stream->set_bounds(start, end)
+     + MIME::Fast::Parser->new([mime_stream])
+     + MIME::Fast::Parser->init_with_stream(mime_stream)
+     + MIME::Fast::Parser->set_scan_from(scan_from)
+     + MIME::Fast::Parser->get_scan_from()
+     + MIME::Fast::Parser->tell()
+     + MIME::Fast::Parser->eos()
+     + MIME::Fast::Parser->get_from()
+     + MIME::Fast::Parser->get_from_offset()
+     + MIME::Fast::Utils::generate_message_id(fqdn)
+     + MIME::Fast::Utils::decode_message_id(message_id)
+
+   - MIME::Fast::Part is splited into Part and MultiPart
+   - MIME::Fast::Parser method construct_message has no argument now
+   - MIME::Fast::Hash::Header included from separate file Fast-Hash.xs
+   
+ * perl 5.8.x or higher required:
+   - uses XSINTERFACE_FUNC macros
+ * gmime 2.0.x updates:
+   - internet_address_unref instead of internet_address_destroy
+   - inheritance of objects in Fast.pm with @ISA arrays
+   - changed gchar variables to char type
+
+
+Wed, May 21 2003
+ * finished update to version 0.2 (to version 2.0.6 of gmime)
+

@@ -1,0 +1,8 @@
+Revision history for Perl extension Wurfl.
+
+0.02  Thu Nov 14 15:21:57 CET 2013
+        - Renamed to Mobile::Libwurfl
+0.01  Tue Oct 29 15:44:56 2013
+	- original version; created by h2xs 1.23 with options
+		-a -x usr/include/wurfl/wurfl.h
+

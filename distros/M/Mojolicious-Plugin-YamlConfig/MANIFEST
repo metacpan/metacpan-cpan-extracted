@@ -1,0 +1,14 @@
+Changes
+lib/Mojolicious/Plugin/YamlConfig.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/00-compile.t
+t/30-yaml_config_lite_app.t
+t/30-yaml_config_lite_app.yaml
+t/90-manifest.t
+t/90-notabs.t
+t/90-pod-syntax.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

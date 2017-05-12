@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--?
+
+  MKDoc-Core it_worked template
+
+  The page content is split into 3 sections using divs with the classes
+  header, content and footer.
+
+  $Id: en.html,v 1.7 2004/04/26 10:13:55 jhiver Exp $
+
+?-->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en" dir="ltr">
+  <head>
+    <title>MKDoc::Core - Success!</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" 
+          media="screen" 
+          type="text/css" 
+          title="Screen style sheet"
+          petal:attributes="href string:/.resources/css/core.css"
+          href="../../../css/core.css" />
+    <!--?
+
+      The favicon.ico is referenced with a fully qualified URI because Mozilla
+      won't load it with a relative URI (../../../images/favicon.ico)  
+
+    ?-->
+    <link rel="shortcut icon" 
+          type="image/x-icon" 
+          href="http://mkdoc.com/favicon.ico" 
+          petal:attributes="href string:/.resources/images/favicon.ico" />
+  </head>
+
+  <body>
+
+    <div class="header">
+
+      <img src="../../../images/mkdoc.gif"
+           alt="MKDoc"
+           petal:attributes="src string:/.resources/images/mkdoc.gif" />
+
+    </div>
+ 
+    <div class="content" id="content">
+ 
+      <h1>It worked!</h1>
+ 
+      <p>If you can see this, it means that the installation of <a
+      href="http://search.cpan.org/~bpostle/MKDoc-Core/">MKDoc::Core</a> on this
+      system was successful. You may now add products such as <a
+      href="http://search.cpan.org/~bpostle/MKDoc-Auth/">MKDoc::Auth</a> or <a
+      href="http://search.cpan.org/~bpostle/MKDoc-Forum/">MKDoc::Forum</a> to your
+      site to extend the site's functionality.</p>
+ 
+      <h2>CGI environment</h2>
+ 
+      <table>
+        <tr petal:repeat="key self/env_keys">
+          <td petal:content="key">Key</td>
+          <td petal:content="self/env_value key">Value</td>
+        </tr>
+      </table>
+ 
+    </div>
+
+    <div class="footer">
+
+      <p>
+        <a href="http://www.webarchitects.co.uk/">Webarchitects</a> | 
+        <a href="http://mkdoc.com/">MKDoc</a> |
+        <a href="http://webarch.net/">Webarch</a> 
+      </p>
+
+    </div>
+
+  </body>
+</html>

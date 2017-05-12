@@ -1,0 +1,48 @@
+Source: mail-spf-perl
+Homepage: http://search.cpan.org/dist/Mail-SPF/
+Section: mail
+Priority: optional
+Maintainer: Julian Mehnle <julian@mehnle.net>
+Build-Depends: debhelper (>= 7.0.50~)
+Build-Depends-Indep: perl,
+ liberror-perl,
+ libnet-dns-perl,
+ libnet-dns-resolver-programmable-perl,
+ libnetaddr-ip-perl,
+ libtest-pod-perl,
+ liburi-perl
+Standards-Version: 3.9.2
+Vcs-Svn: http://www.mehnle.net/svn/mail-spf-perl
+Vcs-Browser: http://www.mehnle.net/source/mail-spf-perl
+
+Package: libmail-spf-perl
+Section: perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends},
+ liberror-perl,
+ libnet-dns-perl,
+ libnetaddr-ip-perl,
+ liburi-perl
+Description: Perl implementation of Sender Policy Framework and Sender ID
+ Mail::SPF is an object-oriented Perl implementation of the Sender Policy
+ Framework (SPF) e-mail sender authentication system <http://www.openspf.net>.
+ .
+ It supports both the TXT and SPF RR types as well as both SPFv1 (v=spf1) and
+ Sender ID (spf2.0) records, and it is fully compliant to RFCs 4408 and 4406.
+ (It does not however implement the patented PRA address selection algorithm
+ described in RFC 4407.)
+
+Package: spf-tools-perl
+Section: mail
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends},
+ libmail-spf-perl (>= ${source:Version})
+Breaks: spfquery (<< 1.2.5.dfsg-1),
+ libmail-spf-query-perl (<< 1:1.999.1-3)
+Description: SPF tools (spfquery, spfd) based on the Mail::SPF Perl module
+ A collection of Sender Policy Framework (SPF) tools that are based on the
+ fully RFC-conforming Mail::SPF Perl module.  The following tools are included
+ in this package:
+ .
+   * spfquery:  A command-line tool for performing SPF checks.
+   * spfd:      A daemon for services that perform SPF checks frequently.

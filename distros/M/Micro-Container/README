@@ -1,0 +1,95 @@
+NAME
+    Micro::Container - Lite weight and inheritable object container
+
+SYNOPSIS
+      package MyContainer;
+      use parent 'Micro::Container';
+
+      __PACKAGE__->register(
+          JSON => [],
+      );
+
+      package MyContainer::Child;
+      use parent 'MyContainer';
+
+      __PACKAGE__->register(
+          MessagePack => sub {
+              my $c = shift;
+              my $mp = $c->load_class('Data::MessagePack')->new;
+              $mp->utf8;
+              $mp;
+          },
+      );
+
+      package main;
+      use MyContainer::Child;
+
+      my $container = MyContainer::Child->instance;
+      say $container->get('JSON')->encode_json({ foo => 'bar' });
+      my $data = $container->get('MessagePack')->decode($message_pack_string);
+
+DESCRIPTION
+    Micro::Container is inheritable object container.
+
+METHODS
+  instance()
+    Returns instance.
+
+      package MyContainer;
+      use parent 'Micro::Container';
+
+      package main;
+      use MyContainer;
+
+      my $container = MyContainer->instance;
+
+  register(%args)
+  add(%args)
+    Register objects to container.
+
+      package MyContainer;
+      use parent 'Micro::Container';
+
+      __PACKAGE__->register(
+          'LWP::UserAgent' => [ agent => 'FooBar' ],
+          JSON             => sub {
+              my $c = shift;
+              $c->load_class('JSON')->new->utf8;
+          },
+      );
+
+  unregister(@names)
+  remove(@names)
+    Remove registered objects by name.
+
+      MyContainer->unregister('JSON', 'LWP::UserAgent');
+
+  get($name)
+    Get registered method.
+
+      my $json = MyContainer->get('JSON');
+
+  load_class($class, $prefix)
+    Constructs a class name and "require" the class.
+
+    Taken from Plack::Util.
+
+      $class = MyContainer->load_class('Foo');                   # Foo
+      $class = MyContainer->load_class('Baz', 'Foo::Bar');       # Foo::Bar::Baz
+      $class = MyContainer->load_class('+XYZ::ZZZ', 'Foo::Bar'); # XYZ::ZZZ
+
+AUTHOR
+    xaicron <xaicron@cpan.org>
+
+COPYRIGHT
+    Copyright 2013 - xaicron
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Object::Container.
+
+    Plack::Util.
+

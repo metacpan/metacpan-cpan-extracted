@@ -1,0 +1,13 @@
+COPYING
+ChangeLog
+INSTALLING
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+lib/MIME/AltWords0.pm
+lib/MIME/AltWords.pm
+testlib/PtsTestLib.pm
+t/mime-altwords.t
+

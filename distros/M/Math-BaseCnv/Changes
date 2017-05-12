@@ -1,0 +1,129 @@
+CHANGES
+    Revision history for Perl extension Math::BaseCnv:
+
+    - 1.14 G7UM6iSk Sat Jul 30 06:44:28:46 -0500 2016
+      * synchronized README and Changes to updated POD
+
+    - 1.12 G7OMKBCn Sun Jul 24 20:11:12:49 -0500 2016
+      * added digit set 'b96' as a reordering of 'asc'
+
+    - 1.10 G7OMF3ZT Sun Jul 24 15:03:35:29 -0500 2016
+      * added new digit sets from Math::Base::Convert
+
+      * switched all old hex() to distinct new heX() and updated POD to
+      reflect
+
+      * fixed META license to match POD and resolve issue:
+      <HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=60122> (Thanks again
+      xenoterracide.)
+
+      * removed PT from VERSION to resolve issue:
+      <HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=60275> (Thanks
+      Alexandr.)
+
+    - 1.8.B59BrZX Mon May 9 11:53:35:33 2011
+      * updated 'url' digit set to URLSafe to resolve
+      <HTTPS://RT.CPAN.Org/Ticket/Display.html?id=60125> (Thanks
+      xenoterracide.)
+
+      * updated license copyright years (already had GPLv3)
+
+    - 1.6.A6FGHKE Tue Jun 15 16:17:20:14 2010
+      * bumped minor version number so they'll keep ascending (without PT
+      comprehension)
+
+    - 1.4.A6FAbEb Tue Jun 15 10:37:14:37 2010
+      * added Math::BigInt code for >64-bit number-base conversions
+
+      * added a bunch more DigitSets: IRCu, URL, RegEx, identifier variants,
+      XML Nmtoken, and XML ID Name
+
+    - 1.4.75O6Pbr Thu May 24 06:25:37:53 2007
+      * added Test::Pod(::Coverage)? tests and PREREQ entries
+
+      * added b85 for IPv6, generated META.yml (with needed newline before
+      EOF) and updated minor version number
+
+    - 1.2.68J9uJQ Sat Aug 19 09:56:19:26 2006
+      * added b64sort() and put POD at bottom
+
+    - 1.2.59M7mRX Thu Sep 22 07:48:27:33 2005
+      * testing Make as primary and BuildPL backup (needing rename for dot)
+
+    - 1.2.59IBlgw Sun Sep 18 11:47:42:58 2005
+      * testing just using Module::Build instead of MakeMaker
+
+      * fixed test 12 which was failing on AMD64
+
+      * added Build.PL to package
+
+    - 1.2.54HK3pB Sun Apr 17 20:03:51:11 2005
+      * removed 128 digit-set since some high-bit characters cause problems
+      on Win32
+
+      * made bin/cnv only executable to go in EXE_FILES
+
+      * made Math::BaseCalc a link in POD and updated License
+
+    - 1.2.45UC8fo Sun May 30 12:08:41:50 2004
+      * tidied POD and increased minor version number since CPAN can't read
+      PT in VERSION
+
+    - 1.0.44E9ljP Wed Apr 14 09:47:45:25 2004
+      * added test for divide-by-zero error in choo()
+
+      * added summ()
+
+    - 1.0.446EIbS Tue Apr 6 14:18:37:28 2004
+      * snuck in fact() and choo()
+
+    - 1.0.42REDir Fri Feb 27 14:13:44:53 2004
+      * changed test.pl to hopefully pass MSWin32-x86-multi-thread
+
+    - 1.0.428LV46 Sun Feb 8 21:31:04:06 2004
+      * broke apart CHANGES to descend chronologically
+
+      * made dec() auto uppercase param since dec(a) was returning 36
+      instead of 10
+
+    - 1.0.41M4GMP Thu Jan 22 04:16:22:25 2004
+      * put cnv in bin/ as EXE_FILES
+
+    - 1.0.418BEPc Thu Jan 8 11:14:25:38 2004
+      * testing new e auto-generate MANIFEST(.SKIP)?
+
+    - 1.0.3CNH37s Tue Dec 23 17:03:07:54 2003
+      * updated POD
+
+    - 1.0.3CG3dIx Tue Dec 16 03:39:18:59 2003
+      * normalized base spelling
+
+    - 1.0.3CD1Vdd Sat Dec 13 01:31:39:39 2003
+      * added ABSTRACT section to WriteMakeFile()
+
+      * changed synopsis example
+
+      * updated all POD indenting
+
+    - 1.0.3CCA5Mi Fri Dec 12 10:05:22:44 2003
+      * removed indenting from POD NAME field
+
+    - 1.0.3CB7M43 Thu Dec 11 07:22:04:03 2003
+      * updated package to coincide with Time::Fields release
+
+    - 1.0.39B36Lv Thu Sep 11 03:06:21:57 2003
+      * synchronized POD with README documentation using new e utility
+
+      * templatized package compilation
+
+      * fixed boundary bugs
+
+    - 1.0.37SLNGN Mon Jul 28 21:23:16:23 2003
+      * first version (and my first Perl module... yay!) put on CPAN
+
+    - 1.0.37JKj3w Sat Jul 19 20:45:03:58 2003
+      * reworked interface from shell utility to package
+
+    - 1.0.3159mLT Sun Jan 5 09:48:21:29 2003
+      * original version
+

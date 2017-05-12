@@ -1,0 +1,10 @@
+This file documents the revision history for the Monitoring-TT Generator
+
+1.0.1    Tue Sep 27 21:58:14 CEST 2016
+          - fix test when using non-system-perl
+
+1.0.0    Wed Aug 14 14:06:08 CEST 2013
+          - first release
+
+0.01    Tue Jan 22 13:10:38 CET 2013
+          - initial version

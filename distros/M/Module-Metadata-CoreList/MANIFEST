@@ -1,0 +1,27 @@
+bin/cc.corelist.pl
+bin/cc.perlmodule.pl
+bin/cc.whichperlmodule.pl
+Build.PL
+Changelog.ini
+CHANGES
+config/.htmodule.metadata.corelist.conf
+htdocs/assets/css/module/metadata/corelist/default.css
+htdocs/assets/css/module/metadata/corelist/fancy.table.css
+htdocs/assets/css/module/metadata/corelist/web.page.css
+htdocs/assets/templates/module/metadata/corelist/basic.column.tx
+htdocs/assets/templates/module/metadata/corelist/basic.table.tx
+htdocs/assets/templates/module/metadata/corelist/fancy.table.tx
+htdocs/assets/templates/module/metadata/corelist/web.page.tx
+html/module.metadata.corelist.report.html
+lib/Module/Metadata/CoreList.pm
+lib/Module/Metadata/CoreList/Config.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+scripts/copy.config.pl
+t/00.pod.t
+t/01.load.t
+t/test.corelist.t
+t/test.perlmodule.t

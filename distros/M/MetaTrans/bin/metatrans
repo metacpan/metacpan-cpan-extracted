@@ -1,0 +1,828 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+metatrans - Perl/Tk frontend to MetaTrans
+
+=head1 SYNOPSIS
+
+    metatrans
+
+=head1 CONFIGURATION
+
+A configuration file of following structure is expected in
+C</etc/metatrans.conf> or in C<$HOME/.metatrans>.
+
+    # plug-ins to be used
+    <modules>
+      # for example
+      add MetaTrans::SlovnikCz
+      add MetaTrans::SeznamCz
+      add MetaTrans::SmsCz
+      add MetaTrans::WordbookCz
+      add MetaTrans::UltralinguaNet
+    </modules>
+
+    # default language to translate from
+    lang_from = eng
+
+    # default language to translate to
+    lang_to   = ger
+
+    # should the matching be done at word boundaries only?
+    # this is a default value (can be changed in "Filtering options")
+    at_bounds = 1
+
+    # default matching type (see help in "Filtering options")
+    # 1 = exact match
+    # 2 = match at start
+    # 3 = match exprression
+    # 4 = match words
+    # 5 = no filtering
+    matching  = 5
+
+    # timeout in seconds
+    timeout   = 15 
+
+After the first run the C<~/.metatrans> is automatically overwritten
+to take into account configuration changes made during apllication run.
+This deletes all comments and makes the configuration file structure bit ugly.
+
+=cut
+
+use strict;
+use warnings;
+
+use MetaTrans;
+use MetaTrans::Base qw(:match_consts);
+use MetaTrans::Languages qw(get_lang_by_code get_code_by_lang);
+
+use Tk;
+use Tk::BrowseEntry;
+use Tk::DialogBox;
+use Tk::HList;
+use Tk::ItemStyle;
+use Tk::LabFrame;
+use Tk::ROText;
+
+use Config::Find;
+use Config::General qw(ParseConfig SaveConfig);
+use Encode;
+
+################################################################################
+# initialization                                                               #
+################################################################################
+
+my $app_name = 'metatrans';
+
+my $config_file = Config::Find->find(
+    name  => $app_name,
+    mode  => 'read',
+);
+    
+die("can't find a configuration file\n")
+    unless $config_file ne '';
+
+my %config = ParseConfig(
+    -ConfigFile           => $config_file,
+    -AllowMultiOptions    => 1,
+    -MergeDuplicateBlocks => 1,
+);
+
+$config{matching} = M_ALL
+    unless exists $config{matching};
+
+$config{at_bounds} = 1
+    unless exists $config{at_bounds};
+
+sub make_array
+{
+    my $scalar = shift;
+    return ref($scalar) eq 'ARRAY' ? @{$scalar} : ($scalar);
+}
+
+no warnings;
+my @modules  = make_array($config{modules}->{add});
+my @disabled = make_array($config{modules}->{disable});
+my %disabled_hash = map { ($_, 1) } @disabled;
+use warnings;
+
+my $MetaTrans = new MetaTrans;
+
+foreach my $module (@modules)
+{
+    eval "require $module"
+        or die("can't load '$module': $!");
+    my $translator = new $module;
+    $MetaTrans->add_translators($translator);
+    $MetaTrans->disable_translator($translator)
+        if $disabled_hash{$module};
+}
+
+$MetaTrans->set_timeout($config{timeout})
+    if exists $config{timeout};
+
+$MetaTrans->set_matching($config{matching});
+$MetaTrans->set_match_at_bounds($config{at_bounds});
+
+################################################################################
+# gui design                                                                   #
+################################################################################
+
+my $nonbold_font = '-*-helvetica-medium-r-*-*-12-*-*-*-*-*-*-*';
+my $unicode_font = '-*-fixed-medium-r-*-*-13-*-*-*-*-*-iso10646-1';
+
+my $main = new MainWindow;
+$main->configure(-title => 'Multilingual meta-translator');
+
+my $left_f = $main->LabFrame(
+    -label     => 'Translators search',
+    -labelside => 'acrosstop',
+);
+$left_f->pack(-side => 'left', -fill => 'both', -expand => 1);
+
+    my $top_left_f = $left_f->Frame;
+    $top_left_f->pack(-side => 'top', -fill => 'x');
+
+        my $Expression;
+        my $Stop;
+        my $expr_e = $top_left_f->Entry(
+            -bg           => 'white',
+            -textvariable => \$Expression,
+        );
+        $expr_e->bind('<Return>', sub { &run_translation; });
+        $expr_e->bind('<Escape>', sub { $Stop = 1; });
+        $expr_e->pack(-side => 'left', -fill => 'both', -expand => 1);
+
+        my $trans_b = $top_left_f->Button(
+            -text    => 'Translate',
+            -width   => 8,
+            -command => sub { &run_translation; },
+        );
+        $trans_b->pack(-side => 'left');
+
+        my $stop_b = $top_left_f->Button(
+            -text    => 'Stop',
+            -width   => 8,
+            -command => sub { $Stop = 1; },
+        );
+        $stop_b->pack(-side => 'left');
+
+    my $bottom_left_f = $left_f->Frame;
+    $bottom_left_f->pack(-side => 'top', -fill => 'both', -expand => 1);
+
+        my $result_t = $bottom_left_f->Scrolled('ROText',
+            -scrollbars => 'e',
+            -relief     => 'sunken',
+            -bd         => 2,
+            -bg         => 'gray',
+            -width      => 63,
+            -height     => 20,
+            -font       => $unicode_font,
+        );
+        $result_t->tag(qw/configure dark  -background/ => 'gray');
+        $result_t->tag(qw/configure light -background/ => 'gray90');
+        $result_t->pack(-fill => 'both', -expand => 1);
+
+my $right_f = $main->Frame;
+$right_f->pack(-side => 'left', -fill => 'y');
+
+    my $dir_conf_f = $right_f->LabFrame(
+        -label     => 'Translation direction',
+        -labelside => 'acrosstop',
+    );
+    $dir_conf_f->pack(-side => 'top', -fill => 'x');
+
+        my $src_l = $dir_conf_f->Label(-text => 'From');
+        $src_l->grid(-column => 0, -row => 0);
+
+        my $Src_Language;
+        my $from_be = $dir_conf_f->BrowseEntry(
+            -state     => 'readonly',
+            -variable  => \$Src_Language,
+            -browsecmd => sub {
+                &populate_to_be;
+                &enable_disable_swap;
+                &refresh_trans_states;
+            },
+        );
+        $from_be->grid(-column => 1, -row => 0);
+
+        my $dest_l = $dir_conf_f->Label(-text => 'To');
+        $dest_l->grid(-column => 0, -row => 1, -sticky => 'e');
+
+        my $Old_Dest_Language;
+        my $Dest_Language;
+        my $to_be = $dir_conf_f->BrowseEntry(
+            -state     => 'readonly',
+            -variable  => \$Dest_Language,
+            -browsecmd => sub {
+                &enable_disable_swap;
+                &refresh_trans_states;
+            },
+        );
+        $to_be->grid(-column => 1, -row => 1);
+
+        my $swap_b = $dir_conf_f->Button(
+            -text    => 'Swap',
+            -width   => 8,
+            -command => sub {
+                $Old_Dest_Language = get_code_by_lang($Src_Language);
+                $Src_Language = $Dest_Language;
+                &populate_to_be;
+                &refresh_trans_states;
+            },
+        );
+        $swap_b->grid(-column => 2, -row => 0, -rowspan => 2, -sticky => 'ns');
+
+    my $dicts_f = $right_f->LabFrame(
+        -label     => 'Translators',
+        -labelside => 'acrosstop',
+    );
+    $dicts_f->pack(-side => 'top', -fill => 'x');
+
+        my $dicts_t = $dicts_f->Frame(
+            -bd     => 2,
+            -bg     => 'black',
+            -relief => 'sunken'
+        );
+        $dicts_t->pack(-side => 'top', -padx => 2);
+
+        $dicts_t->Label(
+            -text => 'Host',
+            -relief => 'raised',
+            -anchor => 'w',
+            -width => 23,
+        )->grid(-column => 0, -row => 0, -sticky => 'we');
+
+        $dicts_t->Frame(
+            -width => 1,
+            -height => 1,
+            -bg => 'black',
+        )->grid(-column => 1, -row => 0);
+
+        $dicts_t->Label(
+            -text => 'State',
+            -relief => 'raised',
+            -anchor => 'w',
+            -width  => 9,
+        )->grid(-column => 2, -row => 0, -sticky => 'we');
+
+        $dicts_t->Frame(
+            -width => 1,
+            -height => 1,
+            -bg => 'black',
+        )->grid(-column => 3, -row => 0);
+
+        $dicts_t->Label(
+            -text => 'Disable',
+            -relief => 'raised',
+            -anchor => 'w',
+        )->grid(-column => 4, -row => 0, -sticky => 'we');
+
+    my $filtering_f = $right_f->Frame;
+    $filtering_f->pack(-side => 'top', -fill => 'x');
+        
+        my $filtering_b = $filtering_f->Button(
+            -text    => 'Filtering options...',
+            -command => sub {&filtering_options;},
+        );
+        $filtering_b->pack(-side => 'left', -fill => 'x', -expand => 1);
+
+        $filtering_f->Canvas(
+            -height => 1,
+            -width  => 1,
+        )->pack(-side => 'left');
+
+    $right_f->Canvas(-height => 2, -width => 1)->pack(-side => 'top');
+
+################################################################################
+# dialogs                                                                      #
+################################################################################
+
+my $match_type;
+my $at_bounds;
+my $at_bounds_cb;
+
+sub filtering_options
+{
+    my $filtering_dialog = $main->DialogBox(
+        -title   => 'Filtering options',
+        -buttons => ['OK', 'Cancel', 'Help'],
+    );
+
+    my $filter_conf_f = $filtering_dialog->Frame();
+    $filter_conf_f->pack(-side => 'top', -padx => 10, -pady => 10);
+
+        $match_type = $config{matching};
+
+        $filter_conf_f->Radiobutton(
+            -variable => \$match_type,
+            -anchor   => 'w',
+            -text     => 'Exact match',
+            -value    => M_EXACT,
+            -command  => sub { &enable_disable_at_bounds; },
+        )->pack(-side => 'top', -fill => 'x');
+
+        $filter_conf_f->Radiobutton(
+            -variable => \$match_type,
+            -anchor   => 'w',
+            -text     => 'Match expression at start',
+            -value    => M_START,
+            -command  => sub { &enable_disable_at_bounds; },
+        )->pack(-side => 'top', -fill => 'x');
+
+        $filter_conf_f->Radiobutton(
+            -variable => \$match_type,
+            -anchor   => 'w',
+            -text     => 'Match expression anywhere',
+            -value    => M_EXPR,
+            -command  => sub { &enable_disable_at_bounds; },
+        )->pack(-side => 'top', -fill => 'x');
+
+        $filter_conf_f->Radiobutton(
+            -variable => \$match_type,
+            -anchor   => 'w',
+            -text     => 'Match words of expression',
+            -value    => M_WORDS,
+            -command  => sub { &enable_disable_at_bounds; },
+        )->pack(-side => 'top', -fill => 'x');
+
+        $filter_conf_f->Radiobutton(
+            -variable => \$match_type,
+            -anchor   => 'w',
+            -text     => 'No filtering',
+            -value    => M_ALL,
+            -command  => sub { &enable_disable_at_bounds; },
+        )->pack(-side => 'top', -fill => 'x');
+
+        $filter_conf_f->Frame(
+            -width  => 1,
+            -height => 7,
+        )->pack(-side => 'top');
+
+        $at_bounds = $config{at_bounds};
+
+        $at_bounds_cb = $filter_conf_f->Checkbutton(
+            -anchor   => 'w',
+            -text     => 'Match at word boundaries only',
+            -command  => sub { $at_bounds = !$at_bounds; },
+        )->pack(-side => 'top', -fill => 'x');
+        $at_bounds ? $at_bounds_cb->select : $at_bounds_cb->deselect;
+
+    &enable_disable_at_bounds;
+
+    my $choice;
+    do 
+    {
+        $choice = $filtering_dialog->Show(-popover => $main);
+        &filtering_options_help() if $choice eq 'Help';
+    }
+    while ($choice eq 'Help');
+
+    if ($choice eq 'OK')
+    {
+        $config{matching}  = $match_type;
+        $config{at_bounds} = $at_bounds || 0;
+
+        $MetaTrans->set_matching($match_type);
+        $MetaTrans->set_match_at_bounds($at_bounds);
+    }
+}
+
+sub enable_disable_at_bounds
+{
+    my $disable = $match_type == M_EXACT || $match_type == M_ALL;
+    $at_bounds_cb->configure(-state => $disable ? 'disabled' : 'normal');
+}
+
+my $Filtering_Help_Window;
+sub filtering_options_help
+{
+    $Filtering_Help_Window->destroy
+        if Exists($Filtering_Help_Window);
+    
+    $Filtering_Help_Window = new MainWindow(
+        -title   => 'Filtering options help',
+    );
+
+    my $help_text = $Filtering_Help_Window->Scrolled('ROText',
+        -scrollbars => 'e',
+        -width      => 75,
+        -height     => 30,
+        -bg         => 'gray',
+    );
+    $help_text->pack(
+        -side   => 'top',
+        -fill   => 'both',
+        -expand => 1,
+        -padx   => 10,
+        -pady   => 10,
+    );
+
+    my $ok_b = $Filtering_Help_Window->Button(
+        -text    => 'OK',
+        -width   => 8,
+        -command => sub {$Filtering_Help_Window->destroy;},
+    );
+    $ok_b->pack(-side => 'top', -pady => 5);
+
+    $help_text->tag(qw/configure underline -underline on/);
+    $help_text->insert('end', <<EOF);
+Using filtering options one can affect the results of translation to be
+shown. In most cases 'No filtering' will do just fine as long as the
+sorting algorithm puts those results on the top, which are closest to the
+searched keyword(s).
+EOF
+    $help_text->insert('end', "\nExact match\n", 'underline');
+    $help_text->insert('end', <<EOF);
+Matches only those expressions which are the same as the searched one.
+Matching is incasesensitive and ignores grammar information, i.e.
+everything in parenthesis or after semi-colon. The same applies bellow.
+
+Examples:
+'Dog'  matches        'dog'      (incasesensitive)
+'Hund' matches        'Hund; r'  (grammar information ignored)
+'dog'  does not match 'dog bite' (not an exact match)
+EOF
+    $help_text->insert('end', "\nMatch expression at start\n", 'underline');
+    $help_text->insert('end', <<EOF);
+Matches those expressions which are prefixed with the searched expression.
+
+Examples:
+'Dog'  matches        'dog bite'      (incasesensitive)
+'Hund' matches        'Hund is los'
+'Hund' does not match 'bissiger Hund' ('Hund' is not a prefix)
+EOF
+    $help_text->insert('end', "\nMatch expression anywhere\n", 'underline');
+    $help_text->insert('end', <<EOF);
+Matches those expressions which contain the searched expression, no matter
+where.
+
+Examples:
+'Big Dog' matches        'very big dog'
+'big dog' does not match 'big angry dog' ('big dog' is not a substring)
+EOF
+    $help_text->insert('end', "\nMatch expression words\n", 'underline');
+    $help_text->insert('end', <<EOF);
+Matches those expressions which contain all the words of the searched
+expression.
+
+Examples:
+'big dog' matches        'big angry dog'
+'big dog' does not match 'angry dog'     (not all words are contained)
+EOF
+    $help_text->insert('end', "\nNo filtering\n", 'underline');
+    $help_text->insert('end', <<EOF);
+Just no filtering at all :).
+EOF
+    $help_text->insert('end', "\nMatch at word boundaries only\n", 'underline');
+    $help_text->insert('end', <<EOF);
+This options makes matching behave in a slightly different way.
+Subexpressions and words are matched at word boundaries only. In practice
+this means that with 'Match expression words' the expression 'big dog'
+won't be matched to 'big angry doggie' while it would be with
+match-at-word-boundaries-only option disabled. The same applies to
+'Match expression at start' and 'Match expression anywhere'. The option
+has no effect with 'Exact match' and 'No filtering'.
+EOF
+}
+
+################################################################################
+# gui initialization                                                           #
+################################################################################
+
+&populate_from_be;
+&populate_to_be;
+&enable_disable_swap;
+
+my %Status_Labels;
+
+my $row = 1;
+foreach my $translator ($MetaTrans->get_translators)
+{
+    $dicts_t->Label(
+        -text   => $translator->host_server,
+        -anchor => 'w',
+        -bg     => 'white',
+        -font   => $nonbold_font,
+    )->grid(-column => 0, -row => $row, -sticky => 'wens');
+
+    $Status_Labels{$translator} = $dicts_t->Label(
+        -text => 'busy',
+        -font => $nonbold_font,
+    )->grid(-column => 2, -row => $row, -sticky => 'wens');
+    
+    my $cb = $dicts_t->Checkbutton(
+        -bg       => 'white',
+        -command  => sub {
+            $MetaTrans->toggle_enabled_translator($translator);
+            &populate_from_be;
+            &populate_to_be;
+            &refresh_trans_states;
+        },
+    )->grid(-column => 4, -row => $row, -sticky => 'we');
+    $cb->select unless $MetaTrans->is_enabled_translator($translator);
+
+    $row ++;
+
+    $dicts_t->Frame(
+        -width  => 1,
+        -height => 1,
+        -bg     => 'black',
+    )->grid(-column => 0, -row => $row, -columnspan => 5);
+
+    $row ++;
+}
+
+&refresh_trans_states;
+
+################################################################################
+# procedures                                                                   #
+################################################################################
+
+sub populate_from_be
+{
+    $from_be->delete(0, 'end');
+
+    my @src_lang_codes = $MetaTrans->get_all_src_lang_codes;
+    my %src_lang_codes_hash = map {($_, 1)} @src_lang_codes;
+
+    foreach my $lang_code (@src_lang_codes)
+        { $from_be->insert('end', get_lang_by_code($lang_code)); }
+
+    unless (defined $Src_Language &&
+        $src_lang_codes_hash{get_code_by_lang($Src_Language)})
+    {
+        if ($config{lang_from} && $src_lang_codes_hash{$config{lang_from}})
+        {
+            $Src_Language = get_lang_by_code($config{lang_from});
+	}
+        elsif ($src_lang_codes[0])
+        {
+            $Src_Language = get_lang_by_code($src_lang_codes[0]);
+	}
+    }
+}
+
+sub populate_to_be
+{
+    $to_be->delete(0, 'end');
+    
+    $Old_Dest_Language = $config{lang_to}
+        unless defined $Old_Dest_Language;
+    undef $Dest_Language;
+
+    if (! defined $Src_Language)
+    {
+        return;
+    }
+    my $src_lang_code = get_code_by_lang($Src_Language);
+    foreach my $lang_code (
+        $MetaTrans->get_dest_lang_codes_for_src_lang_code($src_lang_code))
+    {
+        $to_be->insert('end', get_lang_by_code($lang_code));
+        $Dest_Language = get_lang_by_code($lang_code)
+            unless defined $Dest_Language;
+        $Dest_Language = get_lang_by_code($lang_code)
+            if $lang_code eq $Old_Dest_Language;
+    }
+
+    $Old_Dest_Language = get_code_by_lang($Dest_Language)
+        if defined $Dest_Language;
+}
+
+sub enable_disable_swap
+{
+    my @translators = ();
+    if (defined $Src_Language && defined $Dest_Language)
+    {
+        my $src_lang_code  = get_code_by_lang($Src_Language);
+        my $dest_lang_code = get_code_by_lang($Dest_Language);
+        @translators       = $MetaTrans->get_translators_for_direction(
+            $dest_lang_code, $src_lang_code);
+    }
+
+    $swap_b->configure(-state => @translators > 0 ? 'normal' : 'disabled');
+}
+
+sub refresh_trans_states
+{
+    my @available_trans = ();
+    if (defined $Src_Language && defined $Dest_Language)
+    {
+        my $src_lang_code  = get_code_by_lang($Src_Language);
+        my $dest_lang_code = get_code_by_lang($Dest_Language);
+        @available_trans   = $MetaTrans->get_translators_for_direction(
+            $dest_lang_code, $src_lang_code);
+    }
+
+    my %available_trans_hash;
+    foreach my $translator (@available_trans)
+        { $available_trans_hash{$translator} = 1; }
+
+    my $ready_count = 0;
+    foreach my $translator ($MetaTrans->get_translators)
+    {
+        my $label = $Status_Labels{$translator};
+
+        unless ($MetaTrans->is_enabled_translator($translator))
+        {
+            $label->configure(-text => 'disabled', -bg => 'gray');
+            next;
+        }
+
+        if ($available_trans_hash{$translator})
+        {
+            $label->configure(-text => 'ready', -bg => 'green');
+            $ready_count++;
+        }
+        else
+        {
+            $label->configure(-text => 'N/A',   -bg => 'gray');
+        }
+    }
+
+    $trans_b->configure(-state => $ready_count > 0 ? 'normal' : 'disabled');
+}
+
+sub run_translation
+{
+    $Expression =~ s/\s+/ /g;
+    $Expression =~ s/^ //;
+    $Expression =~ s/ $//;
+
+    $expr_e->selectionRange(0, 'end');
+
+    if ($Expression eq '')
+    {
+        &error_dialog('No expression to be translated specified.');
+        return;
+    }
+
+    $Stop = 0;
+
+    my $src_lang_code   = get_code_by_lang($Src_Language);
+    my $dest_lang_code  = get_code_by_lang($Dest_Language);
+    my @available_trans = $MetaTrans->get_translators_for_direction(
+        $dest_lang_code, $src_lang_code);
+
+    foreach my $translator (@available_trans)
+    {
+        my $label = $Status_Labels{$translator};
+        $label->configure(-text => 'busy', -bg => 'LightSkyBlue2');
+        $label->update;
+    }
+
+    $result_t->delete('1.0', 'end');
+    $result_t->update;
+
+    my @translations;
+    $MetaTrans->run_translators($Expression, $src_lang_code, $dest_lang_code,
+        tk_safe => 1) or return;
+
+    OUTER: while (1)
+    {
+        do
+        {
+            $stop_b->update;
+            if ($Stop)
+            {
+                $MetaTrans->stop_translators;
+                foreach my $translator (@available_trans)
+                {
+                    my $label = $Status_Labels{$translator};
+                    if ($MetaTrans->get_translators_state($translator) eq 'busy')
+                    {
+                        $label->configure(-text => 'interrupted', -bg => 'red');
+                        $label->update;
+                    }
+                }
+                last OUTER;
+            }
+        }
+        until $MetaTrans->is_translation_available(0.01);
+        
+        my ($translation, $translator) = $MetaTrans->get_translation(
+            return_translators => 1);
+        last unless defined $translator;
+
+        if ($translation eq '')
+        {
+            my $label = $Status_Labels{$translator};
+            $label->configure(
+                -text => $MetaTrans->get_translators_state($translator),
+                -bg => $MetaTrans->get_translators_state($translator) eq 'ok' ?
+                    'green' : 'red',
+            );
+            $label->update;
+
+            &show_translations(MetaTrans::sort_translations(
+                $Expression, @translations));
+            next;
+        }
+
+        push @translations, $translation;
+    }
+}
+
+sub show_translations
+{
+    my @translations    = @_;
+    my $max_characters  = ($result_t->width - 31) / $result_t->fontMeasure(
+        $unicode_font, '0');
+    my $max_eq_sign_pos = 0;
+
+    foreach my $trans (@translations)
+    {
+        $trans = Encode::decode_utf8($trans)
+            unless Encode::is_utf8($trans);
+        my $eq_sign_pos = index($trans, '=');
+        $max_eq_sign_pos = $eq_sign_pos
+            if $eq_sign_pos > $max_eq_sign_pos;
+    }
+
+    $max_eq_sign_pos = $max_characters / 2
+        if $max_eq_sign_pos > $max_characters / 2;
+
+    $result_t->delete('1.0', 'end');
+
+    my $bg = @translations % 2 == 1 ? 'dark' : 'light';
+    my $i  = 1;
+    foreach my $trans (@translations)
+    { 
+        my $eq_sign_pos = index($trans, '=');
+        $eq_sign_pos = $max_eq_sign_pos
+            if $eq_sign_pos > $max_eq_sign_pos;
+        my $blanks = ' ' x ($max_eq_sign_pos - $eq_sign_pos);
+        $trans =~ s/=/$blanks=/;
+
+        my $nl = @translations == $i ? "" : "\n";
+        $result_t->insert('end', $trans . $nl, $bg);
+        $bg = $bg eq 'dark' ? 'light' : 'dark';
+    }
+    continue { $i++; }
+
+    $result_t->update;
+}
+            
+
+sub error_dialog
+{
+    my $error = shift;
+    $main->messageBox(
+        -icon    => 'error',
+        -type    => 'OK',
+        -title   => 'Error',
+        -message => $error,
+    );
+}
+
+MainLoop();
+
+################################################################################
+# on exit                                                                      #
+################################################################################
+
+$config_file = Config::Find->find(
+    name  => $app_name,
+    mode  => 'write',
+    scope => 'user',
+);
+
+$config{lang_from} = get_code_by_lang($Src_Language);
+$config{lang_to}   = get_code_by_lang($Dest_Language);
+
+undef @disabled;
+foreach my $translator ($MetaTrans->get_translators)
+{
+    push @disabled, ref($translator)
+        unless $MetaTrans->is_enabled_translator($translator);
+}
+$config{modules}->{disable} = \@disabled;
+
+SaveConfig($config_file, \%config);
+
+__END__
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-metatrans@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.  I will be notified, and then you'll automatically
+be notified of progress on your bug as I make changes.
+
+=head1 AUTHOR
+
+Jan Pomikalek, C<< <xpomikal@fi.muni.cz> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2004 Jan Pomikalek, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<MetaTrans>, L<MetaTrans::Base>, L<Tk>

@@ -1,0 +1,29 @@
+0.006
+  - Change to use Moo. (Keedi Kim)
+
+  - Fix examples in docs.
+
+0.005
+  - Remove Message::Passing::Redis::Types - types we need are
+    now in the core Message::Passing type library.
+
+  - Change 'server' attribute to 'hostname' and 'port' attributes,
+    with the hostname being mandatory and the port having a default,
+    to match other components.
+
+0.004
+  - Allow a string for a single topic, rather than forcing a list
+    of one item in Message::Passing::Input::Redis
+
+  - Support subscription to patterns of topics in
+    Message::Passing::Input::Redis using 'ptopics' attribute.
+
+0.003
+  - Add some documentation.
+
+0.002
+  - Deal with changes in upstream Message::Passing
+
+0.001
+  - Initial barely working version.
+

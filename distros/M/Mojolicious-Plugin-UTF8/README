@@ -1,0 +1,51 @@
+NAME
+
+    Mojolicious::Plugin::UTF8
+
+VERSION
+
+    version 0.01
+
+SYNOPSIS
+
+        package App;
+        use Mojo::Base 'Mojolicious';
+    
+        sub startup {
+            my $self = shift;
+    
+            $self->plugin( 'Mojolicious::Plugin::UTF8' );
+        }
+
+SUPPORT
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests through the issue tracker at
+    https://github.com/sharabash/mojolicious-plugin-utf8/issues. You will
+    be notified automatically of any progress on your issue.
+
+ Source Code
+
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    https://github.com/sharabash/mojolicious-plugin-utf8
+
+      git clone git://github.com/sharabash/mojolicious-plugin-utf8.git
+
+AUTHOR
+
+    Nour Sharabash <amirite@cpan.org>
+
+CONTRIBUTOR
+
+    Nour Sharabash <nour.sharabash@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Nour Sharabash.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- https://ru.wikipedia.org/wiki/Екатеринбургский_метрополитен -->
+<tube name="Екатеринбургский метрополитен">
+  <lines>
+    <line id="1" name="Первая линия" color="green"/>
+  </lines>
+  <stations>
+    <station id="1-01" name="Проспект Космонавтов" line="Первая линия" link="1-02"/>
+    <station id="1-02" name="Уралмаш" line="Первая линия" link="1-01,1-03"/>
+    <station id="1-03" name="Машиностроителей" line="Первая линия" link="1-02,1-04"/>
+    <station id="1-04" name="Уральская" line="Первая линия" link="1-03,1-05"/>
+    <station id="1-05" name="Динамо" line="Первая линия" link="1-04,1-06"/>
+    <station id="1-06" name="Площадь 1905 года" line="Первая линия" link="1-05,1-07"/>
+    <station id="1-07" name="Геологическая" line="Первая линия" link="1-06,1-08"/>
+    <station id="1-08" name="Чкаловская" line="Первая линия" link="1-07,1-09"/>
+    <station id="1-09" name="Ботаническая" line="Первая линия" link="1-08"/>
+  </stations>
+</tube>

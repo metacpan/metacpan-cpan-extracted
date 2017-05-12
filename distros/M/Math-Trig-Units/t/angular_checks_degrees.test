@@ -1,0 +1,119 @@
+use Math::Trig::Degree qw(dsin dcos tan sec csc cot asin acos atan asec acsc acot sinh cosh tanh sech csch coth asinh acosh atanh asech acsch acoth deg_to_rad rad_to_deg);
+
+### POSITIVE ANGULAR CHECKS ###
+
+for ( $i = 0; $i<=360; $i+=15 ) {
+    printf "sin %3d %5f\tinverted %.1f\n", $i, dsin($i), asin(dsin($i)), "\n";
+}
+
+print "\n\n";
+for ( $i = 0; $i<=360; $i+=15 ) {
+    printf "cos %3d %5f\tinverted %.1f\n", $i, dcos($i), acos(dcos($i)), "\n";
+}
+
+print "\n\n";
+for ( $i = 0; $i<=360; $i+=15 ) {
+    printf "tan %3d %5f\tinverted %.1f\n", $i, tan($i), atan(tan($i)), "\n";
+}
+
+print "\n\n";
+for ( $i = 0; $i<=360; $i+=15 ) {
+    printf "sec %3d %5f\tinverted %.1f\n", $i, sec($i), asec(sec($i)), "\n";
+}
+
+print "\n\n";
+for ( $i = 0; $i<=360; $i+=15 ) {
+    printf "csc %3d %5f\tinverted %.1f\n", $i, csc($i), acsc(csc($i)), "\n";
+}
+
+print "\n\n";
+for ( $i = 0; $i<=360; $i+=15 ) {
+    printf "cot %3d %5f\tinverted %.1f\n", $i, cot($i), acot(cot($i)), "\n";
+}
+
+print "\n\n";
+for ( $i = 0; $i<=360; $i+=15 ) {
+    printf "sinh %3d %5f\tinverted %.1f\n", $i, sinh($i), asinh(sinh($i)), "\n";
+}
+print "\n\n";
+for ( $i = 0; $i<=360; $i+=15 ) {
+    printf "cosh %3d %5f\tinverted %.1f\n", $i, cosh($i), acosh(cosh($i)), "\n";
+}
+print "\n\n";
+for ( $i = 0; $i<=360; $i+=15 ) {
+    printf "tanh %3d %5f\tinverted %.1f\n", $i, tanh($i), atanh(tanh($i)), "\n";
+}
+
+print "\n\n";
+for ( $i = 0; $i<=360; $i+=15 ) {
+    printf "sech %3d %5f\tinverted %.1f\n", $i, sech($i), asech(sech($i)), "\n";
+}
+
+print "\n\n";
+for ( $i = 0; $i<=360; $i+=15 ) {
+    printf "csch %3d %5f\tinverted %.1f\n", $i, csch($i), acsch(csch($i)), "\n";
+}
+
+print "\n\n";
+for ( $i = 0; $i<=360; $i+=15 ) {
+    printf "coth %3d %5f\tinverted %.1f\n", $i, coth($i), acoth(coth($i)), "\n";
+}
+
+#### NEGATIVE ANGULAR CHECKS ###
+print "\n\n";
+for ( $i = 0; $i>=-360; $i-=15 ) {
+    printf "sin %3d %5f\tinverted %.1f\n", $i, dsin($i), asin(dsin($i)), "\n";
+}
+
+print "\n\n";
+for ( $i = 0; $i>=-360; $i-=15 ) {
+    printf "cos %3d %5f\tinverted %.1f\n", $i, dcos($i), acos(dcos($i)), "\n";
+}
+
+print "\n\n";
+for ( $i = 0; $i>=-360; $i-=15 ) {
+    printf "tan %3d %5f\tinverted %.1f\n", $i, tan($i), atan(tan($i)), "\n";
+}
+
+print "\n\n";
+for ( $i = 0; $i>=-360; $i-=15 ) {
+    printf "sec %3d %5f\tinverted %.1f\n", $i, sec($i), asec(sec($i)), "\n";
+}
+
+print "\n\n";
+for ( $i = 0; $i>=-360; $i-=15 ) {
+    printf "csc %3d %5f\tinverted %.1f\n", $i, csc($i), acsc(csc($i)), "\n";
+}
+
+print "\n\n";
+for ( $i = 0; $i>=-360; $i-=15 ) {
+    printf "cot %3d %5f\tinverted %.1f\n", $i, cot($i), acot(cot($i)), "\n";
+}
+
+print "\n\n";
+for ( $i = 0; $i>=-360; $i-=15 ) {
+    printf "sinh %3d %5f\tinverted %.1f\n", $i, sinh($i), asinh(sinh($i)), "\n";
+}
+print "\n\n";
+for ( $i = 0; $i>=-360; $i-=15 ) {
+    printf "cosh %3d %5f\tinverted %.1f\n", $i, cosh($i), acosh(cosh($i)), "\n";
+}
+print "\n\n";
+for ( $i = 0; $i>=-360; $i-=15 ) {
+    printf "tanh %3d %5f\tinverted %.1f\n", $i, tanh($i), atanh(tanh($i)), "\n";
+}
+
+print "\n\n";
+for ( $i = 0; $i>=-360; $i-=15 ) {
+    printf "sech %3d %5f\tinverted %.1f\n", $i, sech($i), asech(sech($i)), "\n";
+}
+
+print "\n\n";
+for ( $i = 0; $i>=-360; $i-=15 ) {
+    printf "csch %3d %5f\tinverted %.1f\n", $i, csch($i), acsch(csch($i)), "\n";
+}
+
+print "\n\n";
+for ( $i = 0; $i>=-360; $i-=15 ) {
+    printf "coth %3d %5f\tinverted %.1f\n", $i, coth($i), acoth(coth($i)), "\n";
+}

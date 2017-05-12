@@ -1,0 +1,1718 @@
+# Change history for the MongoDB Perl driver:
+
+v1.8.0    2017-04-10 14:05:59-04:00 America/New_York
+
+  [Additions]
+
+  - PERL-713 PERL-714 A username parameter no longer required for
+    MONGODB-X509 auth.  The username will be extracted from the client
+    certificate.
+
+  [Bug fixes]
+
+  - PERL-717 Avoid address lookup for localhost to workaround
+    IO::Socket::IP quirks.
+
+  - PERL-746 Fix GridFS tests on Windows if checked out from the repository
+
+  - PERL-763 Fix Makefile.PL for no '.' in @INC.
+
+  [~ Internal Changes ~]
+
+  - PERL-760 Switch to binary SASL payloads for compatibility with MongoDB
+    Atlas Free Tier.
+
+  - PERL-761 Replace OP_KILL_CURSORS with killCursors command for
+    compatibility with MongoDB Atlas Free Tier.
+
+v1.6.1    2017-01-10 09:26:56-05:00 America/New_York
+
+  [Bug fixes]
+
+  - PERL-711 Support authSource URI parameter
+
+  - PERL-712 Undefined reference to strerror_r on Windows
+
+v1.6.0    2016-11-29 12:12:26-05:00 America/New_York
+
+  [*** Deprecations ***]
+
+  - PERL-643 No new deprecations, but deprecated methods now issue warnings
+    and a stack trace once per call-site.
+
+  [Additions]
+
+  - PERL-443 Database->collection_names takes an optional filter parameter.
+
+  - PERL-611 Add support for the BSON Decimal128 type, available in
+    MongoDB v3.3.8 or later.  Adds a dependency on BSON::Decimal128 as the
+    type-wrapper for this type.
+
+  - PERL-620 Add support for GridFS files with custom file_id values.
+
+  - PERL-626 PERL-680 PERL-684 Add support for maxStalenessSeconds
+    configuration parameter, available for use with MongoDB v3.4.0 or later.
+
+  - PERL-627 Add support for sending write concern for all database
+    commands that allow it (varies based on server version).  Exceptions
+    will be thrown if write concern is requested for a command and
+    the server version does not support it.
+
+  - PERL-635 Add support for collation option to CRUD and index building
+    methods, available in MongoDB v3.4.0 or later.
+
+  - PERL-649 Report driver information, system information, and
+    user-configured application name to server during connection handshake.
+
+  [Bug fixes]
+
+  - PERL-582 Fix some edge cases in URI parsing.
+
+  - PERL-630 ReadConcern level must always be lower-case when sent to
+    server.
+
+  - PERL-632 Fix server selection bugs in the case of read preferences with
+    multiple tag-set entries.
+
+  - PERL-670 Make collection drop check for server error codes, not just
+    a magic text error string.
+
+  - PERL-685 Cached primary for server selection now expires based on
+    heartbeat frequency.
+
+  - PERL-687 Add support for bson_codec specific OID generation if the
+    codec has a "create_oid" class method (forthcoming in BSON.pm).
+
+  [Changes]
+
+  - PERL-644 Use of threads is no longer supported on perls before 5.8.5.
+
+  [Testing]
+
+  - PERL-665 Make index creation tests robust against changes in server
+    treatment of arbitrary options.
+
+  - PERL-675 Make fsync tests more robust by removing tests for specific
+    error strings.
+
+  [Documentation]
+
+  - PERL-657 Fix spelling typos.
+
+  - PERL-662 Update collation documentation links.
+
+  - PERL-664 Add Decimal128 type example.
+
+  [~ Internal changes ~]
+
+  - PERL-573 Generate a default ReadPreference if not specified in
+    the private _ReadOp role.
+
+  - PERL-645 Refactor internal roles.
+
+  - PERL-667 Add and pass Perl::Critic tests before release.
+
+v1.5.0    2016-09-19 15:26:09-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+v1.4.5    2016-08-22 15:40:36-04:00 America/New_York
+
+  [Bug fixes]
+
+  - PERL-652 The deprecated legacy 'update' method had a bug that wouldn't
+    allow an empty replacement document (which destroys all fields except
+    for _id).  While strange, this now works.
+
+v1.4.4    2016-07-27 15:06:43-04:00 America/New_York
+
+  [Bug fixes]
+
+  - PERL-647 Authenticate always to topology type Single to ensure
+    auth happens for hidden or uninitialized replica set members.
+
+v1.4.3    2016-07-18 16:05:16-04:00 America/New_York
+
+  [Bug fixes]
+
+  - PERL-636 Fix application of read preference to mongos
+
+  - PERL-638 Fix application of query modifiers for MongoDB server 3.2+
+
+v1.4.2    2016-06-14 09:30:05-04:00 America/New_York
+
+  [Bug fixes]
+
+  - PERL-622 Fixed GridFSBucket uploads when Class::XSAccessor
+    is not installed.  NOTE: Class::XSAccessor is currently listed
+    as a requirement for MongoDB.  This and PERL-621 lay the
+    groundwork for making the driver optionally pure-Perl.
+
+v1.4.1    2016-05-17 13:34:58-04:00 America/New_York
+
+  [Bug fixes]
+
+  - PERL-621 Fixed GridFSBucket uploads when Class::XSAccessor (an
+    optional dependency for Moo) is not installed.
+
+  [Documentation]
+
+  - Consolidated v1.3.x change notices into section v1.4.0
+
+v1.4.0    2016-05-10 16:59:16-04:00 America/New_York
+
+  [*** Deprecations ***]
+
+  - The MongoDB::GridFS and MongoDB::GridFS::File classes are deprecated
+    in favor of the MongoDB::GridFSBucket and related classes.  It will
+    be removed in a future major release.
+
+  [Additions]
+
+  - PERL-610 Adds support for maxTimeMS for parallel_scan (available in
+    MongoDB 3.4).
+
+  - Adds MongoDB::GridFSBucket class, which implements the new
+    driver-standard GridFS API.  Also included are classes to emulate file
+    handles for uploads and downloads, making GridFS operations more
+    composable with existing Perl libraries.
+
+  [Bug fixes]
+
+  - PERL-619 Fixed BSON memory leak when throwing exceptions during
+    encoding or decoding.
+
+  - Invalid BSON documents (e.g. invalid length, not null-terminated) were
+    silently ignored; the driver now correctly throws an error.
+
+  - bypassDocumentValidation is now sent as a boolean.
+
+  [Documentation]
+
+  - Fixed index creation examples.
+
+  - Fixed some typos and broken POD links.
+
+  [~ Internal changes ~]
+
+  - 'insert_one' with write concern {w:0} is sent via the legacy OP_INSERT
+    wire protocol for reduced latency.
+
+  - Optimized some query/command execution paths.
+
+v1.3.4    2016-04-27 11:06:55-04:00 America/New_York (TRIAL RELEASE)
+
+v1.3.3    2016-03-08 15:10:33-05:00 America/New_York (TRIAL RELEASE)
+
+v1.3.2    2016-01-26 16:44:09-05:00 America/New_York (TRIAL RELEASE)
+
+v1.3.1    2015-12-23 12:03:47-05:00 America/New_York (TRIAL RELEASE)
+
+v1.3.0    2015-12-18 12:21:09-05:00 America/New_York (TRIAL RELEASE)
+
+v1.2.3    2016-03-08 15:15:36-05:00 America/New_York
+
+  [Testing]
+
+  - Fixed tests for v3.3.X MongoDB series
+
+  [Documentation]
+
+  - Fixed method and attribute documentation in MongoDB::BSON::Regexp
+
+v1.2.2    2016-01-26 15:33:30-05:00 America/New_York
+
+  [Bug fixes]
+
+  - PERL-602 Support legacy Cpanel::JSON::XS booleans (before 2.3404)
+
+  - PERL-604 Improve detection of stale primaries when a replica set
+    election protocol version is being upgraded/downgraded.
+
+  - Fix uninitialized 'inserted_count' in MongoDB::InsertManyResult
+
+  [Documentation]
+
+  - Fixed broken link in POD for MongoDB::DataTypes
+
+v1.2.1    2015-12-18 11:32:19-05:00 America/New_York
+
+  [Bug fixes]
+
+  - PERL-599 Fix bson/bson-error.c compilation problem on Win32
+
+v1.2.0    2015-12-07 12:55:11-05:00 America/New_York
+
+  [Additions]
+
+  - PERL-561 Add support for bypassDocumentValidation option to relevant
+    CRUD methods.
+
+  - PERL-564 Add support for readConcern (for MongoDB 3.2 only).
+
+  - PERL-569 Add 'batch' method to QueryResult for retrieving a chunk of
+    results instead of just one (via 'next') or all.
+
+  - PERL-594 Add maxAwaitTimeMS option for tailable-await cursors on
+    MongoDB 3.2 servers.
+
+  - Add find_id method to MongoDB::Collection for easy retrieval of a
+    single document by _id.
+
+  - Add support for write concern find-and-modify-style methods (for
+    MongoDB 3.2 only)
+
+  [Bug fixes]
+
+  - PERL-493 Don't send writeConcern if it is not set; this allows the user
+    to get the default write concern set on the server.
+
+  - PERL-571 Add -D_GNU_SOURCE to ccflags if needed.
+
+  - PERL-597 Check findAndModify-type command results for
+    writeConcernErrors (for MongoDB 3.2 only).
+
+  [Changes]
+
+  - PERL-595 Change limit/batchSize behavior to match CRUD spec; most users
+    won't notice the difference, but generally speaking, when there is both
+    a limit and a batch size, under MongoDB 3.2, the batch size is
+    respected if it is smaller than the limit.  Previously, in some cases,
+    the batch size was ignored and the limit used instead.
+
+  [Documentation]
+
+  - PERL-570 Update MongoDB::Cursor::info documentation.
+
+  - Replace term 'slave' with 'secondary' in docs.
+
+  [Testing]
+
+  - Skip fsync test on inMemory storage engine.
+
+  [~ Internal changes ~]
+
+  - PERL-558 Implement fsyncUnlock as a command for MongoDB 3.2+.
+
+  - PERL-563 Implement find/getMore/killCursors as commands for MongoDB
+    3.2+.
+
+  - Verify that server replies are less than maxMessageSizeBytes.
+
+v1.1.1    2015-12-01 20:24:04-05:00 America/New_York (TRIAL RELEASE)
+
+v1.1.0    2015-11-18 10:37:37-05:00 America/New_York (TRIAL RELEASE)
+
+v1.0.4    2015-12-02 10:21:03-05:00 America/New_York
+
+  [Bug fixes]
+
+  - PERL-571 Add -D_GNU_SOURCE to ccflags if needed.
+
+  [Documentation]
+
+  - Fixed SYNOPSIS bug in MongoDB::IndexView for create_many
+
+v1.0.3    2015-11-03 22:25:12-05:00 America/New_York
+
+  [Bug fixes]
+
+  - Fixed BSON encoding tests for big-endian platforms.
+
+v1.0.2    2015-10-14 15:26:30-04:00 America/New_York
+
+  [Bug fixes]
+
+  - PERL-198 Validate user-constructed MongoDB::OID objects; also
+    coerces to lower case for consistency with generated OIDs.
+
+  - PERL-495 Preserve fractional seconds when using dt_type 'raw'
+
+  - PERL-571 Include limits.h explicitly rather than relying on other
+    headers to load it.
+
+  - PERL-526 Detect stale primaries by election_id (only supported by
+    MongoDB 3.0 or later)
+
+  - PERL-575 Copy inflated booleans instead of aliasing them.
+
+  - Fix a failing test in the case where a user is running a
+    single-node replica set.
+
+  [Documentation]
+
+  - PERL-532 Document loss of precision when serializing long doubles
+
+  - Noted that IPv6 support requires IO::Socket::IP (core since
+    Perl v5.20.0).
+
+  [Prerequisites]
+
+  - PERL-579 Require at least version 0.25 of boolean.pm
+
+  [~ Internal changes ~]
+
+  - PERL-475 Optimize 'all' QueryResult method
+
+v1.0.1    2015-09-22 12:55:08-04:00 America/New_York
+
+  [Bug fixes]
+
+  - PERL-567 Fixed a failing test in the case where a user is running a
+    replica set on the default port 27017.
+
+  [Documentation]
+
+  - PERL-568 Fixed SYNOPSIS of MongoDB.pm
+
+  - Clarified some confusing sections of MongoDB::Tutorial and added
+    hyperlinks to documentation for methods used in the tutorial.
+
+  - Clarified some sections of MongoDB::Collection and MongoDB::Cursor
+    and added some hyperlinks.
+
+v1.0.0    2015-09-21 16:15:04-04:00 America/New_York
+
+  [!!! Incompatible Changes !!!]
+
+  - The v1.0.0 driver includes numerous incompatible changes; users are
+    STRONGLY encouraged to read MongoDB::Upgrading for advice on upgrading
+    applications written for the 'v0' driver.
+
+  - PERL-221 The 'inflate_regexps' MongoDB::MongoClient option has been
+    removed.  BSON regular expressions always decode to
+    MongoDB::BSON::Regexp objects. This ensure safety and consistency with
+    other drivers.
+
+  - PERL-330 The driver now uses pure-Perl networking; SSL and SASL now
+    implemented via optional CPAN modules IO::Socket::SSL and Authen::SASL.
+
+  - PERL-442 Connection string options have revised to match MongoClient
+    options; connection string options always take precedence over
+    MongoClient constructor arguments.
+
+  - PERL-470 The MongoDB::Cursor globals "slave_ok" and "timeout" no longer
+    have any effect and have been removed.
+
+  - PERL-471 The MongoDB::Cursor 'snapshot' method now requires a boolean
+    argument.
+
+  - PERL-505 When bulk inserting a document without an '_id' field, the _id
+    will be added during BSON encoding, but the original document will NOT
+    be changed.  (This was the case for regular insertion in the v0.x
+    series, but not for the Bulk API.)
+
+  - PERL-519 The $MongoDB::BSON::use_binary global variable has been
+    removed. Binary data always decodes to MongoDB::BSON::Binary objects
+    (which now overload stringification).  This ensures that binary data
+    will correctly round-trip.
+
+  - PERL-520 The $MongoDB::BSON::utf8_flag_on global variable has been
+    removed. BSON strings will always be decoded to Perl character strings.
+    This ensures that string data will correctly round-trip.
+
+  - PERL-523 Requires a replica set name explicitly to connect to a replica
+    set.  Connecting to a single host is always in a 'direct' mode
+    otherwise.
+
+  - PERL-546 MongoDB::DBRef objects no longer have a 'fetch' method or
+    'client' attribute.  This is consistent with the design of the MongoDB
+    drivers for other language.  For the Perl driver, specifically, it
+    decouples the BSON model from the MongoClient model, eliminates a
+    circular reference, and avoid Perl memory bugs using weak references
+    under threads.
+
+  - MongoDB::MongoClient configuration options are now read-only and may
+    not be modified after client construction.
+
+  - The $MongoDB::BSON::looks_like_number and $MongoDB::BSON::char global
+    variables now ONLY have an effect at MongoDB::MongoClient construction.
+    Changing them later does not change BSON encoding.  Both are deprecated
+    as well and should not be used in new code.  Instead, the enhanced
+    MongoDB::BSON codec class has attributes that encapsulate these
+    behaviors.
+
+  - The 'dt_type' MongoDB::MongoClient option has been deprecated and made
+    read-only.  It now only takes effect if C<MongoDB::MongoClient>
+    constructs a MongoDB::BSON codec object and is read-only so that any
+    code that relied on changing it after client construction will fail
+    rather that being silently ignored.
+
+  - The 'inflate_dbrefs' MongoDB::MongoClient option has been removed. By
+    default, dbrefs are always inflated to MongoDB::DBRef objects.
+
+  - The MongoDB::MongoClient 'read_preference' method is no longer a
+    mutator.  It is now only an accessor for a MongoDB::ReadPreference
+    object constructed from 'read_preference_mode' and
+    'read_preference_tag_sets'.
+
+  - The legacy read preference constants in MongoDB::MongoClient have been
+    removed, as they are no longer are used with the new
+    MongoDB::ReadPreference class.
+
+  - The MongoDB::MongoClient 'authenticate' method has been removed;
+    credentials now must be passed via configuration options and
+    authentication is automatic on server connection.
+
+  - The MongoDB::Cursor class has been split. Actual result iteration is
+    done via a new MongoDB::QueryResult class.
+
+  - MongoDB::Error exception objects are now used consistently throughout
+    the driver, replacing other error mechanism and raw "die" calls.
+
+  - The MongoDB::WriteResult class was renamed to MongoDB::BulkWriteResult.
+
+  - The long-deprecated MongoDB::Connection class has been removed.
+
+  - Low-level client functions have been removed.
+
+  [*** Deprecations ***]
+
+  - PERL-398 The MongoDB::MongoClient 'timeout' and 'query_timeout' options
+    are deprecated in favor of new, more explicit 'connect_timeout_ms' and
+    'socket_timeout_ms' options.
+
+  - PERL-424 The MongoDB::Cursor 'count' method has been deprecated.
+
+  - PERL-464 The MongoDB::Database 'last_error' method has been deprecated.
+
+  - PERL-507 MongoDB::Collection 'get_collection' method is deprecated; it
+    implied sub-collections, which don't actually exist in MongoDB.
+
+  - PERL-511 The old CRUD method names for the MongoDB::Bulk API have been
+    deprecated in favor of names that match the new MongoDB::Collection
+    CRUD API.
+
+  - PERL-516 The MongoDB::Collection index management methods have been
+    deprecated in favor of the new MongoDB::IndexView API.
+
+  - PERL-533 The MongoDB::Collection 'save' method has been deprecated.
+
+  - PERL-534 The MongoDB::Collection 'validate' method has been deprecated.
+
+  - PERL-559 The MongoDB::Database 'eval' method has been deprecated, as
+    the MongoDB server version 3.0 deprecated the '$eval' command.
+
+  - The MongoDB::MongoClient 'sasl' and 'sasl_mechanism' config options
+    have been deprecated in favor of the more generic 'auth_mechanism'
+    option.
+
+  - Legacy MongoDB::Collection CRUD methods (insert, update, etc.) have
+    been deprecated in favor of new CRUD API methods.
+
+  - MongoDB::CommandResult changed the name of the accessor for the
+    document returned by the server to 'output' instead of 'result' for
+    clarity.  The 'result' method is deprecated.
+
+  - As mentioned above, 'dt_type', '$MongoDB::BSON::looks_like_number' and
+    '$MongoDB::BSON::char' have been deprecated in addition to their other
+    behavior changes.
+
+  [Additions]
+
+  - PERL-93 Implemented awaitData cursor support.
+
+  - PERL-135 Added the ability to set write_concern at database and
+    collection level, rather than only in MongoDB::MongoClient.
+
+  - PERL-233 Implemented SSL certificate support via IO::Socket::SSL
+    options.
+
+  - PERL-375 Added support for cursor options to the MongoDB::Collection
+    'find_one' method.
+
+  - PERL-378 Implemented the cross-driver Server Discovery and Monitoring
+    specification.
+
+  - PERL-379 Implemented the cross-driver Server Selection specification.
+
+  - PERL-406 Allowed count methods to work with query hints.
+
+  - PERL-408 Implemented SCRAM-SHA-1 and revised handshake for MongoDB 3.0
+    and later.
+
+  - PERL-413 Added max_time_ms as a MongoDB::MongoClient configuration
+    option to set a default for database and collection objects.
+
+  - PERL-422 Added support for specifying read preferences in the
+    connection string URI.
+
+  - PERL-465 Added support for arbitrary options on index creation.
+
+  - PERL-466 Added the ability to set read preference at the database and
+    collection level.
+
+  - PERL-486 Added 'has_modified_count' method to MongoDB::UpdateResult and
+    MongoDB::BulkWriteResult to ease detection of when that attribute is
+    supported by a server or not.
+
+  - PERL-490 Added 'list_collections' method to MongoDB::Database.
+
+  - PERL-500 Added 'topology_status' method to MongoDB::MongoClient.
+
+  - PERL-502 and PERL-503 Implemented new common driver CRUD API
+    specification in MongoDB::Collection.
+
+  - PERL-506 Added support for serializing/deserializing Time::Moment
+    objects.
+
+  - PERL-515 Added new MongoDB::IndexView API.
+
+  - PERL-554 Implemented 'server_selection_try_once' configuration option on
+    MongoDB::MongoClient.
+
+  - Added an optional read preference argument to 'run_command'.
+
+  - Added 'db' and 'coll' methods as aliases for 'get_database' and
+    'get_collection' on MongoDB::MongoClient and MongoDB::Database,
+    respectively.
+
+  - Added the 'get_namespace' method to MongoDB::MongoClient (with the
+    alias 'ns'), to get a MongoDB::Collection object directly from
+    a MongoDB::MongoClient object.
+
+  - Added a 'connect' class method to the MongoDB class for syntactic sugar
+    to create a client object.
+
+  - Added a 'with_codec' method to MongoDB::Collection for easier localized
+    changes to BSON codec attributes.
+
+  - Added a 'reconnect' method to MongoClient to handle reconnection after
+    a fork or thread spawn.
+
+  - Added support for correctly encoding boolean objects from JSON::XS,
+    Cpanel::JSON::XS, JSON::PP, JSON::Tiny and Mojo::JSON.
+
+  [Bug Fixes]
+
+  - PERL-146 Normalized server addresses to lower case.
+
+  - PERL-401 Fixed index creation to always have a non-zero write concern.
+
+  - PERL-409 Added missing declarations for MinGW on Windows.
+
+  - PERL-410 Fixed BSON encoding/decoding to detect and throw and error if
+    invalid UTF-8 is detected.
+
+  - PERL-429 Fixed read preference tag sets logic.
+
+  - PERL-435 Switched to http-style SSL certificate name validation.
+
+  - PERL-454 Prevented warnings when creating BSON datetimes at the epoch.
+
+  - PERL-477 Fixed list_indexes and list_collections when responses are too
+    big to fit in a single database response.
+
+  - PERL-480 Fixed GridFS bug: retrieving a GridFS file now throws an error
+    if no chunks exist instead of returning an empty string.
+
+  - PERL-489 Fixed fatal BSON encoding bug serializing references to
+    dual-vars.
+
+  - PERL-531 Bulk update/replace documents would not validate properly when
+    $MongoDB::BSON::char was not '$'.  While that functionality has moved
+    to the MongoDB::BSON codec instead of the global variable, all
+    update/replace documents (bulk and CRUD API) are now validated after
+    key munging.
+
+  - PERL-536 Fixed GridFS to stop throwing an error when a known empty file
+    has no chunks; errors will still be thrown if a non-empty file has no
+    chunks.
+
+  - PERL-540 Fixed memory leak in DateTime::Tiny inflation.
+
+  - PERL-543 Fixed a bug serializing undef from Tie::IxHash objects.
+
+  - PERL-556 Fixed serialization of thread-shared variables.
+
+  - Fixed t/cursor.t for new explain format.
+
+  - Removed storage engine dependent code and tests.
+
+  - Fixed MSVC compilation: fix unused vars and statements before
+    declarations; removed unused, but problematic bcon.c and bcon.h; use
+    Perl memory alloc functions instead of malloc.
+
+  - Made conflicting 'multi' and 'multiple' update options fatal.
+
+  - Fixed use of slave_ok and $readPreference for communicating read
+    preferences to a mongos.
+
+  - Fixed t/database.t for change in server error message.
+
+  - Ensured topology type is correct whenever a server is marked
+    unavailable.
+
+  - Fixed incorrect 'matched_count' result attribute for upserts.
+
+  - Fixed failing BSON element tests on 32-bit perls.
+
+  - Fixed bug in MongoDB::MongoClient::database_names error handling.
+
+  - Use of -Wall compiler flag during smoke testing has been restricted to
+    gcc compilers, only.
+
+  - Fixed encoding to raise an error if an array-reference document
+    contains duplicate keys.
+
+  - Stopped encoding scalar-ref objects as BSON BINARY type. (Throws an error
+    instead about an unhandled type.)
+
+  - Fixed incorrect configuration test for GCC atomic operations.
+
+  - Fixed bug numifying wtimeout in write concern serialization.
+
+  - Fixed BSON double tests on Perls with long-doubles enabled.
+
+  - Fixed t/gridfs to work around a bug in MongoDB 3.1.2.
+
+  - Fixed a number of XS memory leaks from non-mortalized variables during
+    BSON encoding.
+
+  [Changes]
+
+  - PERL-127 Integers that fit in 32-bits are now encoded as BSON Int32;
+    larger integers are encoded as BSON Int64; Math::BigInt objects are
+    always encoded as BSON Int64.
+
+  - PERL-331 The MongoDB::BSON package is now a full class, implementing a
+    BSON encoder-decoder (codec).  It can be supplied as an attribute to
+    MongoDB::MongoClient, MongoDB::Database and MongoDB::Collection
+    objects.
+
+  - PERL-488 MongoDB::WriteConcern method 'is_safe' renamed to
+    'is_acknowledged'.
+
+  - PERL-527 A database name is now optional for MongoDB::DBRef, which is
+    consistent with the DBRef specification.
+
+  - PERL-529 Connection string option keys are now parsed
+    case-insensitively.
+
+  - PERL-530 The driver now warns on unsupported connection options.
+
+  - PERL-550 DBRefs allow extra fields (for compatibility); this is not
+    recommended for new DBRefs.
+
+  - Renamed DocumentSizeError to a more general general DocumentError.
+
+  - MongoDB::Collection attributes that should not be set in the
+    constructor have been made private, but with public accessors for
+    backwards compatibility.  Private attributes that are set in the
+    constructor (e.g. 'database') are now public.
+
+  - Failure to create indexes when constructing a GridFS object are ignored
+    rather than a fatal error.
+
+  - Calls to Carp::confess() or die() have been replaced with exceptions
+    from MongoDB::Error subclasses, typically MongoDB::UsageError.
+
+  - Generic MongoDB::Error exceptions have been replaced with subclasses
+    that have a specific, documented purpose, including:
+    MongoDB::AuthError, MongoDB::GridFSError, MongoDB::InternalError and
+    MongoDB::UsageError.
+
+  - Configuration options representing times have stricter validation such
+    that options that should be non-negative will raise exceptions when
+    given negative numbers.
+
+  - BSON code derived from libbson has been updated to libbson 1.1.7.
+
+  - Returns MongoDB::UnacknowledgedResult from unacknowledged writes (i.e.
+    { w => 0 } write concern) instead of the corresponding result object
+    (i.e. MongoDB::InsertResult for inserts).
+
+  - Loads Authen::SCRAM::Client only on demand, as its Unicode module
+    dependencies are costly when not needed.
+
+  - MongoDB::QueryResult attributes have become private, as they are an
+    implementation detail and not intended for end-users to inspect.
+
+  - Aborts Makefile.PL on Windows before Vista/2008 for better error
+    message than subsequent compilation/test failures.
+
+  - Changes default connect_timeout_ms to 10,000.
+
+  - Credential details omitted from usage error messages.
+
+  [Documentation]
+
+  - PERL-423 Improved documentation of cursor snapshot mode, as it doesn't
+    do what many people think it does.
+
+  - PERL-425 Documented deprecation of the 'drop_dups' option for index
+    creation.
+
+  - PERL-524 Updated legacy author emails in docs and metadata.
+
+  - Added contributors section to MongoDB main documentation based on git
+    commit logs.
+
+  - Added MongoDB::Upgrading document with changes from v0.x.
+
+  - Documented how to disable returning _id from queries.
+
+  - Rearranged Collection and Database documentation.
+
+  - Corrected errors in MongoDB::Cursor documentation.
+
+  [Prerequisites]
+
+  - Added core modules IO::Socket and MIME::Base64 to the dependency list
+    for completeness.
+
+  - Added Class::XSAccessor, Moo and Type::Tiny::XS.
+
+  - Enforced minimum versions for configuration requirements.
+
+  - Moved DateTime::Tiny from a test_requires dependency to a
+    test_recommends dependency.
+
+  - Removed core modules File::Copy, File::Path and File::Spec from the
+    list of test dependencies.
+
+  - Removed Class::MOP::Class as an explicit dependency (still used
+    internally by Moose).
+
+  - Removed Data::Types and Data::Dump as test dependencies.
+
+  - Removed File::Slurp.
+
+  - Removed JSON module in favor of JSON::MaybeXS.
+
+  - Removed Moose, Syntax::Keyword::Junction and Throwable.
+
+  - Removed Test::Warn.
+
+  - Updated Path::Tiny minimum version to 0.054 (rather than unspecified).
+
+  - Updated IO::Socket requirement on Windows to 1.31.
+
+  - Updated Authen::SCRAM::Client minimum version to 0.003.
+
+  [Removals]
+
+  - PERL-467 Removed outdated MongoDB::Indexing document.
+
+  - PERL-497 The $MongoDB::BSON::use_boolean never worked; BSON boolean
+    values were always deserialized as boolean.pm objects.  Rather than
+    "fix" this and break people's code, the option has been removed and
+    documented as such.
+
+  - The MongoDB::MongoClient 'auto_connect', 'auto_reconnect', and
+    'find_master' methods have been removed, as server discovery and
+    selection is now automatic.
+
+  [Testing]
+
+  - PERL-371 Added tests for parsing localhost:port.
+
+  - PERL-492 Implemented server selection tests.
+
+  - PERL-513 Added maxTimeMS tests for CRUD API methods.
+
+  - Changed text index test to use $text operator, not text command (which
+    was removed in MongoDB 3.0).
+
+  - Changed t/max_time_ms.t to skip unless $ENV{FAILPOINT_TESTING} is true.
+
+  - Reduced number of threads used in threads testing to avoid out of
+    memory errors on memory constrained systems.
+
+  [~ Internal changes ~]
+
+  - PERL-133 Implemented a test that client can connect to replica sets
+    without primary.
+
+  - PERL-259 Implemented write commands for MongoDB 2.6+ (i.e. doing writes
+    via database commands versus via the wire protocol with OP_INSERT,
+    OP_UPDATE, etc.).
+
+  - PERL-325 Updated vendored ppport.h to version 3.31.
+
+  - PERL-433 Updated listCollections to use command form on 3.0 servers.
+
+  - PERL-434 Updated listIndexes to use command form on 3.0 servers.
+
+  - PERL-436 Bumped maxWireProtocolVersion for 3.0 support.
+
+  - PERL-455 Changed to use connect timeout as the socket timeout for
+    topology scans.
+
+  - Implemented a 5 second "cooldown" period after a network error during
+    topology scanning during which new connection attempts will not be
+    made.  This avoids excessive blocking in the driver when it's unlikely
+    that the server will be available right away.
+
+  - Removed unused vendored libyajl files.
+
+  - Refactored and reorganized perl-mongo.h and perl_mongo.c.  Removed
+    unused functions and macros.
+
+  - Disabled many internal class type constraints and runtime assertions
+    unless the PERL_MONGO_WITH_ASSERTS environment variable is true.
+
+  - Changed use of 'strerror_s' to 'strerror' to attempt to get C/XS
+    linking on Windows XP.
+
+  - Changed all Moose classes to Moo classes for speed and to minimize the
+    deep dependency tree.
+
+  - Changed argument handling for CRUD API methods to stop coercing inputs
+    to Tie::IxHash.  This makes them significantly faster.
+
+  - Optimized networking code paths substantially.
+
+  - Consolidated various constants to MongoDB::_Constants.
+
+  - Inlined and adapted the Throwable CPAN module to avoid deep
+    dependencies for MongoDB::Error.
+
+v0.999.999.6 2015-08-24 10:42:35-04:00 America/New_York (TRIAL RELEASE)
+
+v0.999.999.5 2015-08-13 17:11:49-04:00 America/New_York (TRIAL RELEASE)
+
+v0.999.999.4 2015-07-31 17:02:21-04:00 America/New_York (TRIAL RELEASE)
+
+v0.999.999.3 2015-06-29 12:21:07-04:00 America/New_York (TRIAL RELEASE)
+
+v0.999.999.2 2015-06-17 11:34:48-04:00 America/New_York (TRIAL RELEASE)
+
+v0.999.999.1 2015-06-10 09:48:53-06:00 America/Denver (TRIAL RELEASE)
+
+v0.999.998.6 2015-05-20 14:28:18-04:00 America/New_York (TRIAL RELEASE)
+
+v0.999.998.5 2015-04-30 06:12:39-04:00 America/New_York (TRIAL RELEASE)
+
+v0.999.998.4 2015-03-25 14:37:52-04:00 America/New_York (TRIAL RELEASE)
+
+v0.999.998.3 2015-03-25 14:30:00-05:00 America/New_York (TRIAL RELEASE)
+
+v0.999.998.2 2015-02-23 17:10:36-05:00 America/New_York (TRIAL RELEASE)
+
+v0.999.998.1 2014-11-12 15:10:40-05:00 America/New_York (TRIAL RELEASE)
+
+v0.708.4.0 2015-08-11 16:06:55-04:00 America/New_York
+
+  [Bug fixes]
+
+  - Fixes handling of 'safe' option for 'remove'
+
+  - PERL-555 Fixes serialization of thread-shared scalars (and likely
+    other tied/magic-using scalars) on Perls before 5.18
+
+v0.708.3.0 2015-07-14 15:42:16-04:00 America/New_York
+
+  [Bug fixes]
+
+  - PERL-543 fix serialization of undef in tied hashes
+
+  - PERL-553 fix duplicate _id bug with Tie::IxHash and array reference
+    documents with an existing _id
+
+  - Fix BSON tests on Perl with long doubled enabled
+
+v0.708.2.0 2015-06-05 16:39:00-04:00 America/New_York
+
+  [Bug fixes]
+
+  - PERL-536 fix GridFS to stop throwing an error when a known empty file has
+    no chunks; errors will still be thrown if a non-empty file has no chunks.
+
+  - PERL-541 fixed remove() to respect MongoClient write concern
+
+  [Documentation]
+
+  - PERL-525 updated legacy author emails in docs and metadata
+
+v0.708.1.0 2015-04-29 16:51:52-04:00 America/New_York
+
+  [Bug fixes]
+
+  - PERL-479 retrieving a GridFS file now throws an error if no chunks exist
+    instead of returning an empty string
+
+  [Removals]
+
+  - PERL-496 The $MongoDB::BSON::use_boolean never worked; BSON boolean values
+    were always deserialized as boolean.pm objects.  Rather than
+    "fix" this and break people's code, the option has been removed
+    and documented as such.
+
+v0.708.0.0 2015-01-20 16:57:11-05:00 America/New_York
+
+  [Additions]
+
+  - Added 'get_namespace' method (and 'ns' alias) to MongoDB::MongoClient
+    for getting a collection directly without an intermediate database object.
+
+  - Added 'db' and 'coll' aliases for 'get_database' and 'get_collection'
+
+  [Bug fixes]
+
+  - PERL-489 references to scalars with both number and string slots internally
+    would crash on BSON encoding, rather than encode the string part as a
+    binary.
+
+  [Diagnostics]
+
+  - Added parenthetical note to "can't get db response" errors to disambiguate
+    where they occur.
+
+v0.707.2.0 2014-12-22 05:35:31-05:00 America/New_York
+
+  [Bug fixes]
+
+  - PERL-476 fixed getting lists of collections and indices for changes in
+    MongoDB 2.8-rc3 and later.
+
+v0.707.1.0 2014-12-10 12:50:45-05:00 America/New_York
+
+  [Bug fixes]
+
+  - PERL-465 allowed arbitrary options on index creation
+
+  - Fixed t/database.t for change in error message for missing commands
+
+  - Fixed undef warning from get_indexes on older MongoDB versions
+
+  [Prerequisites]
+
+  - Removed Data::Types as a test dependency as it was barely used
+    and not necessary
+
+v0.707.0.0 2014-11-12 15:04:46-05:00 America/New_York
+
+  [Additions]
+
+  - Supports MongoDB 3.0; in addition to prior feature support, this release
+    fixes tests that were broken against non-default storage engines
+
+  [Bug fixes]
+
+  - PERL-454 suppress warnings storing datetimes at the epoch
+
+v0.706.0.0 2014-10-28 11:30:42-04:00 America/New_York
+
+  [*** Deprecations ***]
+
+  - PERL-425 the 'drop_dups' indexing option is deprecated because it is
+    ignored as of server version 2.7.5
+
+  [Additions]
+
+  - PERL-408 added support for SCRAM-SHA-1 (for MongoDB 2.7.8+)
+
+  [Bug fixes]
+
+  - PERL-409 fixed compilation on MSWin32 using the MinGW compiler
+
+  - Fixed compilation errors on MSWin32 using the MSVC compiler
+
+  - Fixed construction of Makefile LIBS argument for some platforms
+
+  - Fixed parallel scan and explain tests for changes in the MongoDB 2.7.x
+    development series
+
+  [Diagnostics]
+
+  - Passing the "ssl" parameter to MongoDB::MongoClient will now warn if SSL
+    support is not available.
+
+  [Documentation]
+
+  - Revised "run_command" documentation to explain that array references or
+    Tie::IxHash should be used.
+
+  [Prerequisites]
+
+  - Added dependency on Authen::SCRAM::Client 0.003
+
+  - Removed (test) dependency on File::Slurp
+
+  - Minimum required versions of configuration dependencies Path::Tiny and
+    Config::AutoConf are now enforced in the code, not just specified in
+    META.json
+
+  [~ Internal changes ~]
+
+  - PERL-433 uses the listCollections command if available (MongoDB 2.7.8+)
+
+  - PERL-434 uses the listIndexes command if available (MongoDB 2.7.8+)
+
+  - PERL-436 bumped supported maxWireProtocolVersion to 3 (MongoDB 2.7.8+)
+
+v0.705.0.0 2014-09-09 10:04:59-04:00 America/New_York
+
+  [Additions]
+
+  - PERL-406 allow count() to use hints
+
+  [Prerequisites]
+
+  - Clarified that Test::Deep 0.111 is required rather than any version
+
+v0.704.5.0 2014-08-19 14:17:00-04:00 America/New_York
+
+  [Bug fixes]
+
+  - PERL-407 fixed request_id race condition under threads
+
+  - PERL-410 dies on BSON encoding/decoding if invalid UTF-8 is detected
+
+v0.704.4.0 2014-07-30 05:43:11-04:00 America/New_York
+
+  [Testing]
+
+  - Restores behavior of skipping tests if no mongod is available for testing
+
+v0.704.3.0 2014-07-28 17:02:13-04:00 America/New_York
+
+  [Additions]
+
+  - PERL-130 improved support for connection string URI; added support for
+    options: ssl, connectTimeoutMS, w, wtimeoutMS, and journal
+
+  [Bug fixes]
+
+  - PERL-130 fixed parsing of connection string to allow for usernames containing :
+    and passwords containing @ if they are percent encoded (RFC 3986)
+
+  - PERL-166 fixed tailable cursors with no initial results
+
+  - PERL-290 when find_master is 0, the driver now consistently picks the first
+    server in the list
+
+  - PERL-387 made database_names() retry up to three times if the server returns
+    a lock error
+
+v0.704.2.0 2014-07-08 12:04:02-04:00 America/New_York
+
+  [Bug fixes]
+
+  - PERL-376 fixed fatal error loading the MongoDB::MongoClient module before
+    loading the top-level MongoDB module
+
+  - Fixed cursor to catch query or timeout errors that occur after the initial
+    query batch is received
+
+  - Fixed primary server selection to retry for 60 seconds instead of
+    immediately failing with an error
+
+  - Changed bulk insert to shallow copy inserted documents before adding
+    an '_id' field (if it didn't exist) to avoid modifying the original
+
+  [Testing]
+
+  - Fixed t/database.t for old versions of mongos
+
+  - PERL-355 Added support for parallel testing
+
+  - Finished converting from Test::Exception to the more robust Test::Fatal
+
+  - Improved test coverage
+
+v0.704.1.0 2014-06-17 21:55:18-04:00 America/New_York
+
+  [Bug fixes]
+
+  - PERL-336 fixed unknown command exception with index creation on 2.2 and
+    older servers; we now correctly fall back to legacy index creation
+
+  - PERL-349 fixed request ID misordering when reconnecting to a server; this
+    fixes the known issue regarding test failures with threads under
+    find_master
+
+  - PERL-368 changed all query docs to be coerced to Tie::IxHash; this ensures
+    that command queries are properly ordered and fixes a crashing bug when
+    using command helpers in concert with read preference
+
+  - PERL-369 fixed segfaults deserializing 64-bit integers from BSON on
+    pure 32-bit perls
+
+  - PERL-370 fixed bulk update results for upserts with non OID _id
+    on servers prior to 2.6
+
+  - Fixed stale detection of write command support for bulk operations
+
+  - Fixed wire version checks and max BSON size inspection for replica
+    sets with multiple hosts in the connection URI
+
+  [Documentation]
+
+  - PERL-366 documented bulk write initializers in Collection docs
+
+  - Updated Example.pod docs for field projection (Johann Rolschewski)
+
+  [Testing]
+
+  - PERL-348 tests report MongoDB version in test diagnostics
+
+  - PERL-351 fixed test failures if the local database has auth enabled;
+    tests will skip instead of fail
+
+  - PERL-356 enabled additional tests if the test database is a replica set
+    or sharded cluster
+
+  - Added test for field projection (Johann Rolschewski)
+
+  - Fixed various tests to run against a sharded cluster
+
+  - Moved unused orchestration tests out of the main test suite
+
+  [~ Internal changes ~]
+
+  - PERL-357 added developer tools for testing different cluster
+    configuration
+
+v0.704.0.0 2014-05-27 13:54:01-04:00 America/New_York
+
+  [!!! Incompatible Changes !!!]
+
+  - PERL-108 removed previously-deprecated AUTOLOAD functions
+
+  [*** Deprecations ***]
+
+  - PERL-320 low-level protocol functions in MongoDB.pm are deprecated
+
+  [Additions]
+
+  - PERL-221 added MongoDB::Regex class to represent stored regexes
+
+  - PERL-251 implemented support for aggregation command cursors
+
+  - PERL-252 added 'max_time_ms' method to cursors
+
+  - PERL-258 added support for '$out' aggregation pipeline operator
+
+  - PERL-262 read preference implementation
+
+  - PERL-278 added explain support for aggregation queries
+
+  - PERL-298 implement parallel_scan method for collections
+
+  - PERL-299 implemented new bulk write API
+
+  - Added nolock support to eval in MongoDB::Database (Ashley Willis)
+
+  [Bug Fixes]
+
+  - PERL-233 Fix find_and_modify error handling
+
+  - PERL-260 ensure_index no longer ignores weights, default_language, and
+    language_override options
+
+  - PERL-267 memory leak fixes (Casey Rojas)
+
+  - PERL-307 fix drop_dups option for ensure_index
+
+  - PERL-315 require DateTime 0.78 or later
+
+  - PERL-318 fix compiler warnings
+
+  - PERL-319 fix compilation failures on some platforms
+
+  - PERL-322 change return value and document low-level recv
+
+  - PERL-323 fixed possible socket leaks on communication errors
+
+  - PERL-336 fixed index creation legacy fallback against older mongos
+
+  - Cached client constructor arguments for replica set connections
+
+  - Cleaned Moose class namespaces of imported methods
+
+  - Ensured internal run_command exceptions include correct error string
+
+  - Fixed a bug that would serialize an index direction as a string on some
+    older Perls
+
+  - Fixed clock race in OID unit test
+
+  - Fixed exception handling for internal run_command calls
+
+  - Fixed fatal error in DESTROY with find_master and down server
+
+  - Fixed gridfs test for unique keys
+
+  - Fixed hint tests for MongoDB >= 2.5.4
+
+  - Fixed index creation and drop on MongoDB 2.6
+
+  - Fixed memory corruption error on Perl 5.19.1+
+
+  - Fixed several compiler warnings on Perl 5.8
+
+  - Fixed use of re::regexp_pattern for 5.10.0
+
+  - Made t/dbref.t use fresh test database
+
+  - Prevented GridFS MD5 calculation when 'safe' is not set (mapbuh)
+
+  - Provided backwards compatible HeUTF8 macro for Perl v5.10 and v5.8.8 and
+    earlier
+
+  - Removed hard-coded compiler flags for Darwin
+
+  - Updated ppport.h to version 3.22
+
+  [Documentation]
+
+  - PERL-217 improved documentation of GridFS::get
+
+  - PERL-287 updated "j" and "fsync" option docs for MongoDB 2.6
+
+  - PERL-311 fix legacy docs authentication link
+
+  - PERL-317 Clarified support for threads
+
+  - PERL-341 Added install documentation including use of non-standard C
+    library paths
+
+  - Added abstract to MongoDB::BSON::Regexp documentation
+
+  - Revised main MongoDB module and MongoDB::MongoClient docs
+
+  - Updated Changes file with changes since 0.701
+
+  [Prerequisites]
+
+  - Added namespace::clean
+
+  - Added Test::Deep
+
+  - Added Test::Fatal
+
+  - Added Throwable
+
+  - Added Syntax::Keyword::Junction
+
+  - Changed Test::More requirement to 0.96
+
+  - Removed Devel::Size
+
+  [~ Internal changes ~]
+
+  - PERL-261 use setVersion field in isMaster for replica set discovery (David
+    Storch)
+
+  - PERL-264 test for closing connection when MongoClient object leaves scope.
+    (Ashley Willis)
+
+  - PERL-269 test libraries for replica set and sharded cluster testing
+
+  - PERL-285 added wire protocol check
+
+  - PERL-296 implemented new index creation command for MongoDB 2.6
+
+  - PERL-312 default GridFS chunk size changed from 1mb -> 255kb
+
+  - Switched BSON implementation to libbson and bundled patched libbson 0.6.4
+    to avoid external library dependency
+
+  [~ Known Issues ~]
+
+  - PERL-233 SSL certificate validation not yet implemented
+
+  - PERL-349 changes to the testing framework revealed a bug when
+    threads are used with 'find_master' on the client; the offending
+    test is marked TODO and the bug will be addressed in the next
+    stable release.
+
+  - Some platforms may not compile, including Windows and some Solaris
+    and OpenBSD systems; these issues will be addressed in a future release
+
+v0.703.5  2014-05-23 06:26:46-04:00 America/New_York (TRIAL RELEASE)
+
+v0.703.4  2014-04-07 20:12:27-04:00 America/New_York (TRIAL RELEASE)
+
+v0.703.3  2014-04-01 10:32:49-04:00 America/New_York (TRIAL RELEASE)
+
+0.703_2 (TRIAL RELEASE)
+
+0.702.2
+
+  [Bug Fixes]
+
+  - Fix double-from-buffer alignment issue on ARM platform (Robin Lee)
+
+  - Set BSON_MINKEY to 255 if char is unsigned (Robin Lee)
+
+  - Fix test plans in connection.t and delegation.t (Robin Lee)
+
+  [Internal]
+
+  - Copyright update s/10gen/MongoDB/ due to company name change
+
+0.702.1
+
+  [Bug Fixes]
+
+  - Query Fields accept Tie::IxHash and Hashref.. (Colin Cyr)
+
+  - Fix for gridfs and creation of indexes (mapbuh)
+
+0.702.0
+
+  [Enhancements]
+
+  - SASL PLAIN suport added
+
+  - Makefile.PL can enable SSL/SASL builds via environment variables
+
+  [Bug Fixes]
+
+  - PERL-162 set_timeout fix
+
+  - PERL-245 fix fractional seconds in BSON datetime deserialization
+
+  - Fix specifying index keys as an array ref (D. Ilmari Mannsåker)
+
+  - Prevent legacy auth when in SASL mode
+
+  - Drop all created collections in dbref.t (D. Ilmari Mannsåker)
+
+  [Documentation]
+
+  - Deprecated AUTOLOAD functions removed from documenation
+
+  - Various module docs revised and updated
+
+  [Internal]
+
+  - Refactored boilerplate test code to a separate testing module
+
+0.701
+
+  [Enhancements]
+
+  - Support for Kerberos authentication on Linux (EXPERIMENTAL)
+
+  - Add a get_collection method to MongoDB::Collection (@sanbeg, pull #52)
+
+  - Optimizations on inserts and fetch (@ilmari, pull #66, PERL-129)
+
+  - Hash ordering fixes (@ilmari, pull #64)
+
+  - Double and int type helpers (@kenahoo, pull #65, PERL-227)
+
+  - TTL index support (@drtz, pull #60, PERL-222)
+
+  - Restored support for Perl 5.8.
+
+  - Support for native DBRefs.
+
+  [Bug Fixes]
+
+  - UTF-8 fixes (@ilmari, pull #67, #68)
+
+  - DateTime fixes (@kenahoo, pull #65)
+
+  - Don't do aggregation tests when running against MongoDB < 2.2.
+
+
+0.47 - 0.503.4
+
+  [Enhancements]
+
+  - Ordered hash support for MongoDB::Cursor::hint() (Colin Syr)
+
+  - timegm() implementation for Windows (Stevie-O)
+
+  - aggregate() helper method
+
+  - find_and_modify helper
+
+  - Connection URI support enhancements (Tianon Gravi)
+
+  - MongoClient new top-level object
+
+  - Removing AUTOLOAD method examples from documentation
+
+  - Replacing $conn examples with $client in docs.
+
+  - Deprecation warning for MongoDB::Connection
+
+  - Removed dependence on Any::Moose
+
+  - Support for fsyncLock/unlock (Casey Rojas)
+
+  - Support for dt_type param, DateTime::Tiny and raw epoch times
+
+  - Support for UTF8 hash keys (Roman Yerin)
+
+  - Support for 'j' param to turn on journaling (Casey Rojas)
+
+  [Bug Fixes]
+
+  - Miscellaneous documentation fixes (Andrey Khozov, others)
+
+  - Fixed socket timeout bug (nightlord)
+
+  - Fixed broken regex test for Perls < 5.14.
+
+  - More accurate isUTF8 function (Jan Anderssen)
+
+  - Proper serialization of regex flags via re::regexp_pattern
+
+
+0.46
+
+  [Enhancements]
+
+  - Added SSL support (Casey Rojas). See new documentation on
+    MongoDB::Connection's ssl attribute.
+
+  - Added MongoDB::BSON::Binary type and MongoDB::BSON::use_binary option. See
+    the Data Types documentation on using the Binary type instead of string refs
+    for binary data.
+
+  - Change default binary type from 2 to 0.  See MongoDB::BSON::Binary for
+    more information about the implications of this change.
+
+  [Bug Fixes]
+
+  - Fix auth connection issues (Olly Stephens)
+
+  - Fix driver creating duplicate connections when port isn't specified (Olly
+    Stephens)
+
+  - Fix authentication check on some versions of Perl (Olly Stephens)
+
+0.45 - September 7, 2011
+
+  This is a recommended upgrade.  There are no backwards-breaking changes, only
+  bug fixes and enhancements.
+
+  [Enhancements]
+
+  - Perl 5.8.4 and higher is now officially supported (5.8.7 was the previous
+    minimum version).
+
+  - Improved the way that connecting handles an interrupt signal.  The driver
+    now continues to attempt connection for the remaining duration of the
+    timeout, instead of erroring out immediately.
+
+  [Bug Fixes]
+
+  - Fixed MaxKey and MinKey deserialization. Deserializing these types would seg
+    fault if they hadn't been serialized previously.
+
+  - Fixed Windows compilation (Taro Nishino)
+
+  - Fixed MakeMaker arguments which were causing build problems on 5.14.
+
+0.44 - July 26, 2011
+
+  This is a recommended upgrade.  There are no backwards-breaking changes, only
+  bug-fixes and enhancements.
+
+  [Enhancements]
+
+  - Added MongoDB::BSON::looks_like_number flag.
+
+    The Perl driver has always been coy about turning strings into numbers.  If
+    you would like aggressive number parsing (if it looks like a number, send it
+    to the DB as a number), you can set MongoDB::BSON::looks_like_number to 1
+    (defaults to 0, the previous behavior).  See the MongoDB::DataTypes pod for
+    more info.
+
+  - Tests should now clean up after themselves, leaving no test databases
+    behind.
+
+  [Bug Fixes]
+
+  - Setting a sort in the arguments to MongoDB::Collection::find is now passed
+    through correctly to the cursor.
+
+  - Fixed segmentation fault in array serialization: caused by specifying an _id
+    field on insert and using an array (not a hash or Tie::IxHash).
+
+  - Fixed segmentation fault in threading: if Mouse was used instead of Moose,
+    version 0.43 of the driver would segfault if multiple threads were used.
+
+  - MongoDB::Cursor now inherits the $Mongo::Cursor::slave_okay global setting,
+    as well as checking if slave_okay is set on the cursor instance.
+
+  - Fix GridFS functions to only ensure GridFS indexes on writes, allowing
+    GridFS API usage on slaves.
+
+0.43 - May 31, 2011
+
+  This is a recommended upgrade.  There are no backwards-breaking changes, only
+  bug-fixes and enhancements.
+
+  [Enhancements]
+
+  - Auto-detects max BSON size for inserts, which means documents larger than
+    4MB can now be inserted.  See L<MongoDB::Connection/max_bson_size> for
+    details.
+
+  - Added the L<MongoDB::Cursor/info> method, which returns meta information
+    about the results being returned.
+
+  [Bug Fixes]
+
+  - When high UTF-8 values as hash keys, the driver now croaks instead of
+    segfaulting.
+
+  - Added 'use IO::File' before IO::File is used (Michael Langner)
+
+  - Fixed Perl 5.14 compile (Chip Salzenberg)
+
+0.42
+
+  - Fixes for Sparc architecture
+  - Fixed PVIV misinterpretations
+
+0.41
+
+  - Re-discover master on "not master" errors
+  - Make driver thread safe (Florian Ragwitz)
+  - POD fix (Ronald Kimball)
+  - Fix GridFS warning (Graham Barr)
+  - Allow auto_connect => 0 for replica sets (Graham Barr)
+
+0.40
+
+  - DateTime floating timezones now warn on serialization
+  - Attempting to serialize unrecognized object types now croaks
+  - MongoDB::Cursor::explain now resets cursor properly
+  - Added BSON::encode_bson and BSON::decode_bson (Jason Toffaletti)
+  - Safe writes return a hash of information instead of 1 (on success)
+  - Improved last_error/safe docs
+  - Fixed doc spelling errors (Stefan Hornburg)
+
+0.39
+
+  - Fixed memory leak
+
+0.38
+
+  - Fixed indexing subdocuments (x.y.z)
+  - Fixed GridFS to accept non-fs prefixes (Olly Stephens)
+  - Fixed compile for old C compilers (Taro Nishino)
+  - Added MongoDB::read_documents for handling db replies (Graham Barr)
+
+0.37
+
+  - Fixed cursor not found error condition
+  - Fixed compile for old C compilers
+  - Fixed weird file behavoir on some machines
+
+0.36
+
+  - Replica set support
+  - Deserialize booleans as booleans (instead of ints) (Andrew Page)
+  - Fixed OS X build (Todd Caine)
+  - Added background option for index creation (Graham Barr)
+  - Fixed slurp tests (Josh Rabinowitz)
+  - Added MongoDB::Timestamp type
+
+0.35 - 02 July 2010
+
+  - Added MongoDB::BSON::utf8_flag_on (Pan Fan)
+  - Added MongoDB::GridFS::File::slurp (Pan Fan)
+  - Fixed memory leak
+
+0.34 - 17 June 2010
+
+  - $conn->foo->bar->baz now gets the bar.baz collection in the foo database
+  - Slight speed improvements on inserts
+  - Added $conn->query_timeout option to control timeout lengths for all queries
+    done over a given connection
+  - MongoDB::Cursor::tailable and MongoDB::Cursor::immortal
+  - Added TO_JSON function to MongoDB::OID
+  - Fixed safe save (Othello Maurer)
+  - BACKWARD-BREAKING: removed old indexing syntax (if you started using the
+    driver less than a year ago, this shouldn't affect you.  If you're an old-
+    timer, make sure you're not using the syntax that has been deprecated for a
+    year).
+
+0.33 26 April 2010
+
+  - Fixed tests
+
+0.32 21 April 2010
+
+  - BACKWARD COMPATIBILITY BREAK: croak on failed safe
+    update/insert/remove/ensure_index (Eric Wilhelm)
+  - w and wtimeout (see MongoDB::Connection::w)
+  - die correctly on MongoCollection::count errors (help from Josh Rabinowitz)
+  - Added MongoDB::Collection::find (same as query)
+  - Added get, put, and delete methods to MongoDB::GridFS
+  - Perl 5.12 compatibility
+
+0.31 05 April 2010
+
+  - C89 fix (Taro Nishino)
+  - Added MongoDB::Code type
+  - Use connection format: mongodb://host1,host2:port2,host3...
+  - Arbitrary number of hosts supported
+  - Auto-reauthentication on dropped connection
+  - ensure_index name option
+
+0.30 10 March 2010
+
+  - Support BigInt
+  - On 64-bit machines, support 64-bit nums w/out BigInt (Ryan Olson)
+  - Added connection timeout option (Othello Maurer)
+  - Added clarifying docs on fields (Josh Rabinowitz)
+
+0.29 01 March 2010
+
+  - Added safe options for remove, update, and ensure_index
+  - Added save method
+  - Fixed bug in UTF8 checking
+  - Fixed serialization of "tie %hash, 'Tie:IxHash'"
+
+0.28 28 Jan 2010
+
+  - Fixed undef values (Andrew Bryan)
+  - Added GridFS multi-chunk test using File::Temp (Josh Rabinowitz)
+  - Allow tie(%h, 'Tie::IxHash') to be used as well as Tie::IxHash->new
+  - Fixed GridFS indexes and added chunkSize and uploadDate to metadata
+  - Fixed batch_insert doc (Eric Wilhelm)
+  - Fixed big endian build
+
+0.27 22 Dec 2009
+
+  - Indexes: Improved ensure_index syntax, added drop_dups option
+  - Inserts: Added safe insert, checks object is < 4 MB before inserting
+  - Fixed socket closing bug
+  - Big-endian support
+  - $ can be replaced by any character using MongoDB::BSON::char
+  - MongoDB::OIDs: Fixed undefined behavior in serialization (Peter Edwards), added OID::get_time
+  - 5.8.7-compatible memory allocation (Peter Edwards)
+  - Added MongoDB::MaxKey and MongoDB::MinKey support
+
+0.26  09 Nov 2009
+
+  - Don't force i386 arch (Needed to compile on OS X with x86_64) (Graham Barr)
+  - Include inc/ dir for CPAN
+  - Memory leak fixes
+  - Added tutorial
+
+0.24  15 Oct 2009
+
+  - Fix for uninitialized array values (David Morrison)
+  - Boolean support
+  - Connection memory leak fix
+  - Added MongoDB::Cursor::count
+
+0.23  25 Sept 2009
+
+  Changes in this version by Ask Bjørn Hansen, Florian Ragwitz,
+  Orlando Vazquez, Kristina Chodorow, and Eric Wilhelm:
+
+  - Make inserting double's (floats/NV's), undefined/null, Tie::IxHash values
+  - Query sorting, snapshot, explain, and hint
+  - Added non-unique ensure_index
+  - Added GridFS
+  - Added regex support
+  - find_one takes optional fields parameter
+  - DateTime used for dates
+  - No C++ driver dependency
+
+0.01  06 May 2009
+  - Initial release.
+
+# vim: set ts=2 sts=2 sw=2 et tw=75:

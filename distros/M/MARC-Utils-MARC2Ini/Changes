@@ -1,0 +1,10 @@
+Revision history for Perl extension MARC::Utils::MARC2Ini.
+
+0.02 Wed Feb  9 09:01:13 EST 2011
+    - added prerequisites
+    - set the perl version to 5.8.2
+
+0.01 Tue Feb  8 18:56:13 2011
+    - original version; created by h2xs 1.23 with options
+        -AX --skip-exporter --use-new-tests -n MARC::Utils::MARC2Ini
+

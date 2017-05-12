@@ -1,0 +1,30 @@
+Revision history for Mojolicious-Plugin-Qaptcha
+
+0.11    2015-10-11
+        fixed wrong usage of c.session
+0.10    2014-06-12
+        Mojolicious 5.0 support (deprication of to_xml in Mojo::DOM 4.98)
+0.09    2014-02-06
+        removed HARNESS_ACTIVE in _basedir (insecure 
+        when testing apps where qaptcha is used)
+0.08    2014-01-29
+        fixed bug in directory handling
+        missing share_dir in Build.PL
+        include jquery version 1.11
+        include jquery ui version 1.10
+0.07    2014-01-29
+        set key to '' on deletion instead of undef (less warnings)
+0.06    2014-01-27
+        more tests, fixed bug in after_dispatch and
+        configured url
+0.05    2014-01-27
+        improved documentation
+0.04    2014-01-27
+        makes options and qaptcha_url configurable
+0.03    2014-01-27
+        makes options and qaptcha_url configurable
+0.02    2014-01-27
+        added META*
+0.01    2014-01-27
+        initial QapTcha plugin.
+

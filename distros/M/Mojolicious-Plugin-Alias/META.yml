@@ -1,0 +1,28 @@
+---
+abstract: 'Mojolicious plugin to serve static files from aliased paths'
+author:
+  - 'Dotan Dimet <dotan@corky.net>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-Alias
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  Mojolicious: 4.85
+  perl: 5.010001
+resources:
+  bugtracker: http://github.com/dotandimet/mojolicious-plugin-alias/issues
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: http://github.com/dotandimet/mojolicious-plugin-alias
+version: v0.0.4

@@ -1,0 +1,42 @@
+Mail-IMAPTalk-MailCache
+
+Handles building a Mail::Cache cache for Mail::IMAPTalk.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Mail::IMAPTalk::MailCache
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mail-IMAPTalk-MailCache
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Mail-IMAPTalk-MailCache
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Mail-IMAPTalk-MailCache
+
+    Search CPAN
+        http://search.cpan.org/dist/Mail-IMAPTalk-MailCache/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Zane C. Bowers
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

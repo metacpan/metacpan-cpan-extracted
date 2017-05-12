@@ -1,0 +1,34 @@
+---
+abstract: 'Plugin to Module::Build to build PDL projets'
+author:
+  - 'Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.4005
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Build-Pluggable-PDL
+provides:
+  Module::Build::Pluggable::PDL:
+    file: lib/Module/Build/Pluggable/PDL.pm
+    version: 0.23
+requires:
+  List::MoreUtils: 0
+  Module::Build::Pluggable::Base: 0
+  PDL: 2.000
+  PDL::Core::Dev: 0
+  PDL::PP: 0
+  Pod::Perldoc: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Module-Build-Pluggable-PDL
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/mvgrimes/mb-pluggable-pdl
+version: 0.23
+x_test_requires:
+  IPC::Cmd: 0
+  Path::Class: 0
+  Test::More: 0.87

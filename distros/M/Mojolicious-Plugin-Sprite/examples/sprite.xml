@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<root>
+  <sprite src="/sprites/sprite.png?1376352016">
+    <image width="32" selector=".spr-icons-small-add" x="0" height="32" image="icons/small/Add.png" y="0" is_background="0" repeat="no"/>
+    <image width="48" selector=".spr-icons-medium-cd" x="0" height="48" image="icons/medium/CD.png" y="32" is_background="0" repeat="no"/>
+    <image width="48" selector=".spr-icons-medium-calender" x="0" height="48" image="icons/medium/Calender.png" y="80" is_background="0" repeat="no"/>
+    <image width="48" selector=".spr-icons-medium-chat" x="0" height="48" image="icons/medium/Chat.png" y="128" is_background="0" repeat="no"/>
+    <image width="48" selector=".spr-icons-medium-close" x="0" height="48" image="icons/medium/Close.png" y="176" is_background="0" repeat="no"/>
+    <image width="48" selector=".spr-icons-medium-folder-open" x="0" height="48" image="icons/medium/Folder_Open.png" y="224" is_background="0" repeat="no"/>
+    <image width="48" selector=".spr-icons-medium-forward" x="0" height="48" image="icons/medium/Forward.png" y="272" is_background="0" repeat="no"/>
+    <image width="48" selector=".spr-icons-medium-help" x="0" height="48" image="icons/medium/Help.png" y="320" is_background="0" repeat="no"/>
+    <image width="48" selector=".spr-icons-medium-home" x="0" height="48" image="icons/medium/Home.png" y="368" is_background="0" repeat="no"/>
+    <image width="32" selector=".bg-brick" x="0" height="32" image="icons/small/Brick.png" y="416" is_background="1" repeat="x"/>
+  </sprite>
+</root>

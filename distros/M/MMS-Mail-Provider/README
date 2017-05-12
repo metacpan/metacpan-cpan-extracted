@@ -1,0 +1,61 @@
+NAME
+    MMS::Mail::Provider - This provides a base class for parsing an
+    MMS::Mail::Message object into a MMS::Mail::Message::Parsed object.
+
+VERSION
+    Version 0.07
+
+SYNOPSIS
+    This class provides a parse method for parsing an MMS::Mail::Message
+    object into an MMS::Mail::Message::Parsed object for 'generic' MMS
+    messages (or ones that cannot be identified as coming from a specific
+    provider).
+
+METHODS
+    The following are the top-level methods of the MMS::Mail::Provider
+    class.
+
+  Constructor
+    "new()"
+        Return a new MMS::Mail::Provider object.
+
+  Regular Methods
+    "parse" MMS::Mail::Message
+        Instance method - The "parse" method parses the MMS::Mail::Message
+        and returns an MMS::Mail::Message::Parsed.
+
+    "retrieve_phone_number" STRING
+        Instance method - This method splits the provided string on @ and
+        returns the first list element from the split, replacing any leading
+        + character with 00. This seems to be the convention used by most UK
+        providers and may work for other non-UK providers.
+
+AUTHOR
+    Rob Lee, "<robl at robl.co.uk>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-mms-mail-provider@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MMS-Mail-Provider>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+NOTES
+    Please read the Perl artistic license ('perldoc perlartistic') :
+
+    10. THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+ACKNOWLEDGEMENTS
+    As per usual this module is sprinkled with a little Deb magic.
+
+COPYRIGHT & LICENSE
+    Copyright 2005 Rob Lee, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    MMS::Mail::Message, MMS::Mail::Message::Parsed, MMS::Mail::Provider
+

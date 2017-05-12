@@ -1,0 +1,17 @@
+---
+
+disable: 0
+
+weight_non_fqdn_sender: -5
+weight_unknown_sender_domain: -5 
+
+weight_non_fqdn_recipient: -5
+weight_unknown_recipient_domain: -5
+
+weight_invalid_helo_hostname: -5
+weight_non_fqdn_helo_hostname: -5
+weight_unknown_helo_hostname: -5
+
+#weight_unknown_client_hostname: -5
+weight_unknown_reverse_client_hostname: -5
+

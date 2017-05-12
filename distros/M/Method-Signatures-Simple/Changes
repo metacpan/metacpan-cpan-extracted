@@ -1,0 +1,46 @@
+Revision history for Method-Signatures-Simple
+
+1.07    2013-01-20  Rhesa Rozendaal <rhesa@cpan.org>
+        Fix RT80510: empty methods returning @_
+
+1.06    2013-01-20  Rhesa Rozendaal <rhesa@cpan.org>
+        Fix a test so it passes on 5.10
+
+1.05    2013-01-18  Rhesa Rozendaal <rhesa@cpan.org>
+        Fix RT80507: keep perl's idea of line number
+        intact when mangling multi-line signatures
+
+1.04    2013-01-17  Rhesa Rozendaal <rhesa@cpan.org>
+        Fix RT80505: allow comments in multiline
+        signature
+
+1.03    2013-01-17  Rhesa Rozendaal <rhesa@cpan.org>
+        Fix RT80508: allow space between invocant
+        and colon
+
+1.02    2011-09-01  Rhesa Rozendaal <rhesa@cpan.org>
+        Avoid uninitialized warning.
+
+1.01    2011-08-31  Rhesa Rozendaal <rhesa@cpan.org>
+        Add func keyword for subs with signatures.
+        Thanks to Chip Salzenberg.
+
+0.06    2010-06-11  Rhesa Rozendaal <rhesa@cpan.org>
+        Documented the import arguments.
+
+0.05    2010-01-07  Rhesa Rozendaal <rhesa@cpan.org>
+        Added repository to META.yml. No code changes.
+
+0.04    2010-01-07  Rhesa Rozendaal <rhesa@cpan.org>
+        Not released, dzil.ini cockup
+
+0.03    2009-01-11  Rhesa Rozendaal <rhesa@cpan.org>
+        Converted dist-maint to Dist::Zilla.
+        Put the dist on github
+
+0.02    2008-10-25  Rhesa Rozendaal <rhesa@cpan.org>
+        Bumped prereq of Devel::Declare
+
+0.01    2008-10-23  Rhesa Rozendaal <rhesa@cpan.org>
+        First version, released on an unsuspecting world.
+

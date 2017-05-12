@@ -1,0 +1,23 @@
+0.006
+    - Change 'host' attribute to 'hostname' to match other
+      inputs and outputs.
+
+0.005
+    - Depend on Message::Passing 0.007 for the Decoder
+      pass-through changes, so you no longer have to say
+      --decoder Null
+
+0.004
+    - More doc improvements
+
+    - Ability to subscribe to a subset of event types
+
+0.003
+    - Fix docs
+
+0.002
+    - Rename
+
+0.001
+    - Initial version
+

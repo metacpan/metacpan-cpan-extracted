@@ -1,0 +1,6 @@
+This directory provides a number of example scripts.
+
+Most notable are:
+- commands: a demonstration of the MQSeries::Command inquire functions
+- mq_clearq: a script to drain messages without administrative permissions
+- request-reply: sample request/reply programs

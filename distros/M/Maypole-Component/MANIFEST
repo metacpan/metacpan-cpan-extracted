@@ -1,0 +1,10 @@
+Changes
+Component.pm
+Makefile.PL
+MANIFEST
+README
+t/1.t
+t/beerdb.db
+t/templates/beer/view_as_comp
+t/templates/frontpage
+META.yml                                Module meta-data (added by MakeMaker)

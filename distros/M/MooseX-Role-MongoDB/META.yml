@@ -1,0 +1,62 @@
+---
+abstract: 'Provide MongoDB connections, databases and collections'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Log::Any::Adapter: '0'
+  Moose: '0'
+  MooseX::Role::Logger: '0.002'
+  Parallel::Iterator: '0'
+  Test::FailWarnings: '0'
+  Test::More: '0.96'
+  Test::Requires: '0'
+  perl: v5.10.0
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: v5.10.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-Role-MongoDB
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  MooseX::Role::MongoDB:
+    file: lib/MooseX/Role/MongoDB.pm
+    version: '0.010'
+requires:
+  Carp: '0'
+  MongoDB: '1'
+  MongoDB::MongoClient: '1'
+  Moose::Role: '2'
+  MooseX::AttributeShortcuts: '0'
+  Socket: '1.96'
+  String::Flogger: '0'
+  Type::Params: '0'
+  Types::Standard: '0'
+  namespace::autoclean: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/MooseX-Role-MongoDB/issues
+  homepage: https://github.com/dagolden/MooseX-Role-MongoDB
+  repository: https://github.com/dagolden/MooseX-Role-MongoDB.git
+version: '0.010'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Alexandr Ciornii <alexchorny@gmail.com>'
+  - 'David Golden <xdg@xdg.me>'
+  - 'Todd Bruner <tbruner@sandia.gov>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,19 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Module-Crypt
+version:      0.05
+version_from: Crypt.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    ExtUtils::CBuilder:            0
+    ExtUtils::Mkbootstrap:         0
+    ExtUtils::ParseXS:             0
+    File::Copy:                    0
+    File::Find:                    0
+    File::Path:                    0
+    File::Spec:                    0
+    File::Temp:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

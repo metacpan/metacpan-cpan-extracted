@@ -1,0 +1,64 @@
+$/BaseArith
+
+*****************  README  *****************
+User: Puckerig        Date: 10/21/02  Time:  9:37p
+Checked in $/BaseArith
+Comment:
+  Remove COPYRIGHT & LICENSE section.
+
+*****************  Version 9  *****************
+User: Puckerig        Date: 10/15/02  Time:  1:11a
+Added Makefile
+
+*****************  Changes  *****************
+User: Puckerig        Date: 10/15/02  Time:  1:08a
+Checked in $/BaseArith
+Comment:
+  Update change history.
+
+*****************  BaseArith.html  *****************
+User: Puckerig        Date: 10/15/02  Time:  1:03a
+Checked in $/BaseArith
+Comment:
+  
+
+*****************  Version 8  *****************
+User: Puckerig        Date: 10/15/02  Time:  1:03a
+Added test.pl
+
+*****************  Version 7  *****************
+User: Puckerig        Date: 10/15/02  Time:  1:03a
+Added README
+
+*****************  Version 6  *****************
+User: Puckerig        Date: 10/15/02  Time:  1:03a
+Added MANIFEST
+
+*****************  Version 5  *****************
+User: Puckerig        Date: 10/15/02  Time:  1:03a
+Added Makefile.PL
+
+*****************  Version 4  *****************
+User: Puckerig        Date: 10/15/02  Time:  1:03a
+Added Changes
+
+*****************  BaseArith.pm  *****************
+User: Puckerig        Date: 10/15/02  Time:  1:03a
+Checked in $/BaseArith
+Comment:
+  Make it a Math:: module.
+
+*****************  Version 3  *****************
+User: Puckerig        Date: 10/15/02  Time: 12:59a
+Shared $/lib/BaseArith.pm
+
+*****************  Version 2  *****************
+User: Puckerig        Date: 10/15/02  Time: 12:58a
+Shared $/lib/BaseArith.html
+
+*****************  Version 1  *****************
+User: Puckerig        Date: 10/15/02  Time: 12:58a
+Created BaseArith
+Comment:
+  
+

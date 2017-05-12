@@ -1,0 +1,54 @@
+MooseX::Attribute::ValidateWithException
+
+ALPHA QUALITY SOFTWARE.
+
+At present, when an attribute fails validation, Moose internally die()'s
+with a string. There is also no way to throw an exception object as part
+of the validation message, ( in order to give more context on the
+problem ), without also breaking how much of the validation works.
+
+This module is an experiment in providing that feature, which really
+should be done in Moose itself, and done better, which is why it has
+been given such an obtuse name.
+
+This module makes no promises of forwards compatibility with a future
+Moose release, in order to permit Moose to do whatever they want and not
+worry about "breaking code" that uses this module. ( So that they can
+easily replace this module in incompatible ways )
+
+If your code breaking is unacceptable, do *not* use this module.
+
+Use of this module assumes several things.
+
+1. You are o.k. with your code breaking in a future Moose release.
+2. You are o.k. with re-writing any and all code that depends on this
+functionality, if a future Moose release is incompatible with this
+module.
+
+I'm not saying I won't do my best to provide forwards compatibility, but
+it is highly unlikely it will be possible, due to differences in package
+naming which may be essential for handling exceptions.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric <kentnl@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

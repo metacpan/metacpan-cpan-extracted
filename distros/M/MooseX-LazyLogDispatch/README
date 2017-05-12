@@ -1,0 +1,109 @@
+NAME
+    MooseX::LazyLogDispatch - A Logging Role for Moose
+
+VERSION
+    This document describes MooseX::LazyLogDispatch version 0.01
+
+SYNOPSIS
+        package MyApp;
+        use Moose;
+
+        with MooseX::LazyLogDispatch;
+        # or alternately, use this role instead to give your
+        # class the logger methods "debug", "warning", etc...
+        # with MooseX::LazyLogDispatch::Levels;
+
+        # This part optional
+        #  without it you get some default logging to the screen
+        has log_dispatch_conf => (
+           is => 'ro',
+           isa => 'Log::Dispatch::Configurator',
+           lazy => 1,
+           required => 1,
+           default => sub {
+               my $self = shift;
+               My::Configurator->new( # <- you write this class!
+                   file => $self->log_file,
+                   debug => $self->debug,
+               );
+           },
+        );
+
+        # Here's another variant, using a Log::Dispatch::Configurator-style 
+        #  hashref to configure things without an explicit subclass
+        has log_dispatch_conf => (
+           is => 'ro',
+           isa => 'HashRef',
+           lazy => 1,
+           required => 1,
+           default => sub {
+               my $self = shift;
+               return $self->debug
+                   ? {
+                       class     => 'Log::Dispatch::Screen',
+                       min_level => 'debug',
+                       stderr    => 1,
+                       format    => '[%p] %m at %F line %L%n',
+                   }
+                   : {
+                       class     => 'Log::Dispatch::Syslog',
+                       min_level => 'info',
+                       facility  => 'daemon',
+                       ident     => $self->daemon_name,
+                       format    => '[%p] %m',
+                   };
+           },
+        );
+        
+    sub foo { 
+            my ($self) = @_;
+            $self->logger->debug("started foo");
+            ....
+            $self->logger->debug('ending foo');
+        }
+
+DESCRIPTION
+    Log::Dispatch role for use with your Moose classes.
+
+INTERFACE
+  logger
+    This method is provided by this role, and it is an Log::Dispatch
+    instance, which you can call level-names on, as in the debug examples in
+    the synopsis.
+
+    If you want the level-names as direct methods in your class, you should
+    use the MooseX::LazyLogDispatch::Levels role instead.
+
+  log_dispatch_config
+    This is an optional attribute you can give to your class. If you define
+    it as a hashref value, that will be interpreted in the style of the
+    configuration hashrefs documented in Log::Dispatch::Config documents
+    when they show examples of using Log::Dispatch::Configurator for
+    pluggable configuration.
+
+    You can also gain greater flexibility by defining your own complete
+    Log::Dispatch::Configurator subclass and having your
+    "log_dispatch_config" attribute be an instance of this class.
+
+    By lazy-loading either one ("lazy =" 1>), you can have the configuration
+    determined at runtime. This is nice if you want to change your log
+    format and/or destination at runtime based on things like MooseX::Getopt
+    / MooseX::Daemonize parameters.
+
+    If you don't provide this attribute, we'll default to sending everything
+    to the screen in a reasonable debugging format.
+
+SEE ALSO
+    MooseX::LazyLogDispatch::Levels MooseX::LogDispatch
+    Log::Dispatch::Configurator Log::Dispatch::Config Log::Dispatch
+
+AUTHOR
+    Brandon Black "<blblack@gmail.com>"
+
+    Based in part on MooseX::LogDispatch by Ash Berlin "<ash@cpan.org>" and
+    "<perigrin@cpan.org>"
+
+LICENCE
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

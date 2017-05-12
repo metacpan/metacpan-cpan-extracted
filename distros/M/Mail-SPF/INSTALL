@@ -1,0 +1,46 @@
+System Requirements
+-------------------
+
+The following Perl version and packages are required for...
+
+...building Mail::SPF:
+
+  Perl 5.6
+  Module-Build 0.2805
+  Test-More
+  Net-DNS-Resolver-Programmable 0.003
+  (plus all the run-time requirements)
+
+...running Mail::SPF:
+
+  Perl 5.6
+  version
+  Error
+  NetAddr-IP 4
+  Net-DNS 0.62
+  URI 1.13
+
+Building and Installing
+-----------------------
+
+You can build and install Mail::SPF automatically using the CPAN shell, or
+manually with the following commands:
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+If you want to install Mail::SPF without root privileges, then the hard-coded
+installation of the "spfd" executable to /usr/sbin poses a problem (cf.
+rt.cpan.org #34768).  This path had to be hard-coded because Perl's built-in
+Config.pm does not specify an "sbin" path that Module::Build could use as a
+suitable "sbin" install path.
+
+You can, however, work around this limitation by using the "--install_path"
+option during installation:
+
+  ./Build install --install_path sbin=/desired/sbin/path
+
+# $Id: INSTALL 61 2013-07-22 03:45:15Z julian $
+# vim:tw=79

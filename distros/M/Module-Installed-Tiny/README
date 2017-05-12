@@ -1,0 +1,67 @@
+SYNOPSIS
+
+     use Module::Installed::Tiny qw(module_installed module_source);
+    
+     # check if a module is available
+     if (module_installed "Foo::Bar") {
+         # Foo::Bar is available
+     } elsif (module_installed "Foo/Baz.pm") {
+         # Foo::Baz is available
+     }
+    
+     # get a module's source code, dies on failure
+     my $src = module_source("Foo/Baz.pm");
+
+DESCRIPTION
+
+    To check if a module is installed (available), generally the simplest
+    way is to try to require() it:
+
+     if (eval { require Foo::Bar; 1 }) {
+         # Foo::Bar is available
+     }
+
+    However, this actually loads the module. There are some cases where
+    this is not desirable: 1) we have to check a lot of modules (actually
+    loading the modules will take a lot of CPU time and memory; 2) some of
+    the modules conflict with one another and cannot all be loaded; 3) the
+    module is OS specific and might not load under another OS; 4) we simply
+    do not want to execute the module, for security or other reasons.
+
+    Module::Installed::Tiny provides a routine module_installed() which
+    works like Perl's require but does not actually load the module.
+
+    This module does not require any other module except Exporter.
+
+FUNCTIONS
+
+ module_installed($name) => bool
+
+    Check that module named $name is available to load. This means that:
+    either the module file exists on the filesystem and searchable in @INC
+    and the contents of the file can be retrieved, or when there is a
+    require hook in @INC, the module's source can be retrieved from the
+    hook.
+
+    Note that this does not guarantee that the module can eventually be
+    loaded successfully, as there might be syntax or runtime errors in the
+    module's source. To check for that, one would need to actually load the
+    module using require.
+
+ module_source($name) => str
+
+    Return module's source code, without actually loading it. Die on
+    failure.
+
+SEE ALSO
+
+    Module::Load::Conditional provides check_install which also does what
+    module_installed does, plus can check module version. It also has a
+    couple other knobs to customize its behavior. It's less tiny than
+    Module::Installed::Tiny though.
+
+    Module::Path and Module::Path::More. These modules can also be used to
+    check if a module on the filesystem is available. They do not handle
+    require hooks, nor do they actually check that the module file is
+    readable.
+

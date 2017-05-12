@@ -1,0 +1,104 @@
+#!/usr/bin/perl -Tw
+
+BEGIN
+  {
+  $|++;							# output buffering off
+  unshift @INC, 'lib', '../lib', 
+		'extensions/lib', '../extensions/lib';	# use local modules first
+  }
+
+$VERSION = '0.04';
+
+use strict;
+# use warnings;			# be lean
+use Mediawiki::POD;
+
+# wrong number of options?
+if (@ARGV > 1 || ((@ARGV == 1) && ($ARGV[0] eq '--help')))
+  {
+  require Pod::Usage;		# do not load this unless nec.
+  Pod::Usage::pod2usage(-2);	# print help and exit
+  }
+
+my $remove_newlines = shift(@ARGV) ? 0 : 1;
+
+my $timeout = 10;
+
+eval
+  {
+  local $SIG{ALRM} = sub { die "podcnv took more than $timeout seconds to parse POD\n" };
+  alarm $timeout;
+
+  my $converter = Mediawiki::POD->new();
+  $converter->remove_newlines($remove_newlines);
+
+  # slurp mode
+  local $/;
+  my $txt = <STDIN>;
+
+  print $converter->as_html( $txt);
+
+  # disable alarm
+  alarm 0;
+  };
+
+if ($@) 
+  {
+  # propagate unexpected errors
+  my $error = $@;
+
+  $error =~ s/\s*##ERROR(\d+)##\s*//; my $code = $1 || 2;
+  $error .= "." unless $error =~ /\.\z/;
+  $error =~ s/\.\s*\z/. /;
+
+  $error =~ s/&/&amp;/g;
+  $error =~ s/</&lt;/g;
+  $error =~ s/>/&gt;/g;
+
+  $error .= 'See the <a alt="online manual" title="online manual" href="'
+    . "error_page\#$code" .'">manual</a> for help.';
+  print "<strong class='error'>podcnv error:</strong> $error\n";
+  }
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+podcnv - convert POD to HTML
+
+=head1 SYNOPSIS
+
+	echo "=pod " | perl -T podcnv
+
+=head1 DESCRIPTION
+
+Turns a given POD (Plain Old Documentation) into HTML code,
+suitable for embedding it into Mediawiki.
+
+Will also handle C<graph> and C<graph-common> sections and
+turn these into inline HTML "grafics".
+
+=head1 VERSIONS
+
+Please see the CHANGES file for a complete version history.
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms of the GPL.
+
+See the LICENSE file for information.
+
+=head1 AUTHOR
+
+(c) by Tels bloodgate.com 2007
+
+=head1 SEE ALSO
+
+L<http://bloodgate.com/wiki/>, L<http://www.mediawiki.org/>.
+
+=cut

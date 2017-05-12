@@ -1,0 +1,143 @@
+<html>
+<head>
+<title>MHonArc Resources: SSMARKUP</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="spammode.html">SPAMMODE</a>]</td><td><nobr>[<a href="../resources.html#ssmarkup">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="stderr.html">STDERR</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>SSMARKUP</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p>
+<code>&lt;SSMARKUP&gt;</code><br>
+<var>markup...</var><br>
+<code>&lt;/SSMARKUP&gt;</code><br>
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>SSMARKUP defines the default markup that occurs at the <strong>very</strong>
+beginning of <strong>all</strong> created HTML pages.  This resource
+may be used to include any server-side processing markup that must
+occur before any HTML-related markup.
+</p>
+
+<p>If you require to have different initial markup for the different
+types of pages that MHonArc generates, then you can use the
+<a href="msgpgssmarkup.html">MSGPGSSMARKUP</a>,
+<a href="idxpgssmarkup.html">IDXPGSSMARKUP</a>, and
+<a href="tidxpgssmarkup.html">TIDXPGSSMARKUP</a>
+resources.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<p>Nil.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>The following example is stolen from the MHonArc mailing list
+which lead to the addition of SSMARKUP to MHonArc.  In this markup,
+some server-side markup is added to check if the user is logged
+in:
+</p>
+<pre>
+<b>&lt;SSMarkup&gt;</b>
+&lt;%<!--
+-->&#64;<!--
+--> LANGUAGE=VBSCRIPT %&gt;
+&lt;%
+If Not Session("LoginOK") Then Response.redirect "/default.htm"
+%&gt;
+<b>&lt;/SSMarkup&gt;</b>
+</pre>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>2.4.0
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+<a href="idxpgssmarkup.html">IDXPGSSMARKUP</a>,
+<a href="msgpgssmarkup.html">MSGPGSSMARKUP</a>,
+<a href="tidxpgssmarkup.html">TIDXPGSSMARKUP</a>
+</p>
+<p>
+<a href="../layout.html"><strong>Page Layout</strong></a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="spammode.html">SPAMMODE</a>]</td><td><nobr>[<a href="../resources.html#ssmarkup">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="stderr.html">STDERR</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2003/10/06 22:04:20 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"
+><strong>MHonArc</strong></a><br>
+Copyright &#169; 1999-2002 <a href="http://www.earlhood.com/"
+>Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org"
+>mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

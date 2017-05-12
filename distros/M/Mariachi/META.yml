@@ -1,0 +1,47 @@
+--- #YAML:1.0
+name: Mariachi
+version: 0.52
+license: perl
+distribution_type: module
+requires:
+  AppConfig: 1.55
+  Class::Accessor: 0
+  Date::Parse: 0
+  Email::Find: 0
+  Email::Folder: 0.5
+  Email::Thread: 0
+  File::Basename: 0
+  File::Copy: 0
+  File::Find::Rule: 0
+  File::Path: 0
+  Mail::Thread: 2.2
+  Mail::Thread::Chronological: 1.22
+  Memoize: 0
+  Module::Build: 0.18
+  Storable: 0
+  Template: 0
+  Template::Plugin::Page: 0
+  Text::Original: 0
+  Time::HiRes: 0
+  URI::Find::Schemeless::Stricter: 0
+  perl: 5.006
+recommends: {}
+build_requires:
+  Test::More: 0
+conflicts: {}
+dynamic_config: 1
+provides:
+  Mariachi:
+    file: lib/Mariachi.pm
+    version: 0.52
+  Mariachi::Folder:
+    file: lib/Mariachi.pm
+    version: 0.52
+  Mariachi::Lurker:
+    file: lib/Mariachi.pm
+    version: 0.52
+  Mariachi::Message:
+    file: lib/Mariachi/Message.pm
+  Template::Plugin::Mariachi:
+    file: lib/Template/Plugin/Mariachi.pm
+generated_by: Module::Build version 0.21

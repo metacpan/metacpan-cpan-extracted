@@ -1,0 +1,25 @@
+0.39:  Major performance increase; should use less memory now
+
+0.38:  Reformatted the code using perltidy and manual tweaks
+       Fixed the test suite to work properly on win32
+       Removed unnecessary (and relatively large) file from the test suite
+       Reversed the order of this Changes file (newest release at top)
+
+0.37:  Bugfixes, restructuring of distribution, basic test suite
+
+0.36:  Thomas Winkler patch - parse can now take a tag as string instead
+       of an open filehandle.  Text fields now support UNICODE, but forces
+       the data to iso-8859-1.  COMM now has a parse method.
+
+0.35:  Added Andrew Arensburger patch to fix USLT parsing
+       Added WXXX and TXXX support from Brian Degenhardt
+
+0.34:  <upload error, do not use>
+
+0.32:  Fixed missing nul in USLT frame, fixed a couple documentation
+       errors (frame_id instead of frameid).
+
+0.20:  Fixed padding bug (Thanks to Bruno Prior); added del_frame & set_frame,
+       Fixed pack string for image tags (Thanks Ong Kian Win).
+
+0.10:  Initial beta release

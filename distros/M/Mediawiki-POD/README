@@ -1,0 +1,200 @@
+=pod
+
+To better view this file, use:
+
+	perldoc README
+
+=head1 podcnv
+
+Take POD text (Plain Old Documentation, Perl's way to write documentation)
+and render it as HTML inside a wiki page.
+
+For instance this file here could be pasted between <pod> and </pod>
+tags inside a wiki and would then be displayed as HTML for any visitor.
+
+The reason for this extensionis that multiple authors can edit one
+POD file at the same time, and enjoy the advantages of Mediawiki
+like revision history, diffs, undo function, collapsable table
+of contents etc.
+
+=head1 Check the Signature
+
+First you need to check the signature on the package to verify that
+it is untampered and intact. To do this you have to:
+
+=over 2
+
+=item *
+
+Install the Perl module Module::Signature from http://search.cpan.org
+
+=item *
+
+Get my key from http://bloodgate.com/tels.asc, import it into
+GnuPG with:
+
+	gpg --import tels.asc
+
+You may also let the C<cpansign> utility fetch it automatically
+from a keyserver, if that works for you.
+
+=item *
+
+Extract the package to a directory, change there and then:
+
+=item *
+
+Type on a console:
+
+	cpansign --verify
+
+inside the unpacked directory. 
+
+=back
+
+If the last step says "good signature" or "SIGNATURE VERIFIED OK",
+everything is all right.
+
+Note that if you C<cpansign> let GnuPG download my key from a keyserver,
+it might put a C<tels.asc> file in the package directory, and then afterward
+complain that "tels.asc" is not in the MANIFEST:
+
+ Not in MANIFEST: tels.asc
+ ==> MISMATCHED content between MANIFEST and distribution files! <==
+
+You can safely ignore this warning.
+
+B<NOTE:> Please notify me immidiately if the signature
+does not verify. In that case do B<NOT> install this software, your system
+might get compromised!
+
+=head1 Installation
+
+Install the following Perl modules into your system:
+
+	Pod-Simple
+	HTML-Parser
+	HTML-Tagset
+
+You can get these modules from C<http://search.cpan.org/>.
+
+Afterwards, you should be able to run this on any command line:
+
+	perl -MPod-Simple\ 99
+
+and it should report your installed Pod::Simple (like v3.04).
+
+	Pod::Simple version 99 required--this is only version 3.04.
+	BEGIN failed--compilation aborted.
+
+If it says something about "Pod::Simple" not being found, you need to
+install it first as root (see above!).
+
+=head2 Installation on a shared host
+
+On a shared host you typically do not have the rights to install Perl
+modules. An easy way around that limitation is to place the modules
+inside a directory called C<lib/> in the C<extensions> directory:
+
+	http_docroot
+		\ - cgi-bin			etc
+		\ - wiki
+			\ - pod
+			\ - extensions		etc
+				\ - lib		<-- here
+
+Untar Pod::Simple and the other modules you need into this directory.
+
+=head2 Run the testsuite
+
+If you are on a shared host, skip this step.
+
+Otherwise, after installing the Perl modules from above into the system,
+then run in the directory of this package:
+
+	perl Makefile.PL
+	make test
+
+All tests should pass. If not, please notify me.
+
+=head2 Backup!
+
+B<Make a backup of your wiki! I repeat, MAKE A BACKUP! You have been warned!>
+
+=head2 Copy the files
+
+Then place the following two files from this Mediawiki-POD.tar.gz file
+so that into the subdirectory C<extensions> of your wiki installation
+like this:
+
+	http_docroot
+		\ - cgi-bin			etc
+		\ - wiki
+			\ - extensions		<-- here
+			\ - math		etc
+
+You need the following files inside C<wiki/extensions>:
+
+	podcnv
+	POD.php
+
+Then either install this module:
+
+	sudo make install
+
+Or if you on a shared host, place all the files from the C<lib/>
+subdirectory under the extensions directory, too:
+
+	lib/Mediawiki/POD.pm	   =>  extensions/lib/Mediawiki/POD.pm
+	lib/Mediawiki/POD/HTML.pm  =>  extensions/lib/Mediawiki/POD/HTML.pm
+	
+Then include the following line at the bottom of your C<LocalSettings.php>,
+but before the "?>" line:
+
+	include_once('extensions/POD.php');
+
+=head2 Manual test
+
+Change the permissions of C<podcnv> to be executable:
+
+	chmod a+x extensions/podcnv
+
+Now you should be able to run manually (from your wiki directory):
+
+	echo "=head1 NAME" | extensions/podcnv
+
+and should print some HTML code on the console.
+
+=head2 Wiki test
+
+Finally you should be able to edit any page of the wiki and insert:
+
+	<pod>
+	=head1 NAME
+
+	Some test.
+	</pod>
+
+and hit preview.
+
+If you get an error messages like:
+
+	Error running podcnv.
+
+make sure that you followed the steps above correctly.
+
+=head1 BUGS
+
+Please report bugs, feature requests or POD errors to:
+
+	http://rt.cpan.org/
+
+=head1 AUTHOR
+
+Copyright (C) 2007 by Tels http://bloodgate.com/
+
+Contact: <nospam-abuse@bloodgate.com> (literally :)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms of the GPL.
+

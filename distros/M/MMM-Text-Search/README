@@ -1,0 +1,16 @@
+This is pre-pre-alpha software. Use at your own risk.
+
+To read the documentation, type:
+
+	perldoc Search.pm
+
+
+To install:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+

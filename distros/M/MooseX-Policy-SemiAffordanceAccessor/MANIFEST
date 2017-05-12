@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/MooseX/Policy/SemiAffordanceAccessor.pm
+MANIFEST
+META.yml			# Will be created by "make dist"
+README				# Will be created by "make dist"
+t/basic.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+SIGNATURE    Added here by Module::Build

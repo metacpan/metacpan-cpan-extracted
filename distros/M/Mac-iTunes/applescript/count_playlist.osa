@@ -1,0 +1,15 @@
+(* $Id$ *)
+
+tell application "iTunes"
+	set myCount to 0
+	repeat with i from 1 to (the count of the playlists)
+		set this_playlist to playlist i
+		try
+			if the name of this_playlist is "iTune" then
+				set myCount to myCount + 1
+			end if
+		end try
+	end repeat
+	
+	return myCount
+end tell

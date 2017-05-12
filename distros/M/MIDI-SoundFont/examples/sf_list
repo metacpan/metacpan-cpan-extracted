@@ -1,0 +1,298 @@
+#! /usr/bin/perl
+#########################################################################
+#        This Perl script is Copyright (c) 2012, Peter J Billam         #
+#                          www.pjb.com.au                               #
+#                                                                       #
+#     This script is free software; you can redistribute it and/or      #
+#            modify it under the same terms as Perl itself.             #
+#########################################################################
+
+eval 'require MIDI::SoundFont'; if ($@) {
+	die "you'll need to install MIDI::SoundFont from www.cpan.org\n";
+}
+my $Version       = $MIDI::SoundFont::VERSION;
+my $VersionDate   = $MIDI::SoundFont::VERSION_DATE;
+use bytes;
+require Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Quotekeys = 0;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Terse = 1;
+
+my @Banks   = ();
+my @Patches = ();
+my $Long    = 0;
+my $Config  = 0;
+while ($ARGV[$[] =~ /^-([a-z])/) {
+	if ($1 eq 'v')      { shift;
+		my $n = $0; $n =~ s{^.*/([^/]+)$}{$1};
+		print "$n version $Version $VersionDate\n";
+		exit 0;
+	} elsif ($1 eq 'b') { shift; @Banks   = split ',', shift;
+	} elsif ($1 eq 'c') { shift; $Config = 1;
+	} elsif ($1 eq 'l') { shift; $Long = 1;
+	} elsif ($1 eq 'p') { shift; @Patches = split ',', shift;
+	} else {
+		print "usage:\n";  my $synopsis = 0;
+		while (<DATA>) {
+			if (/^=head1 SYNOPSIS/)     { $synopsis = 1; next; }
+			if ($synopsis && /^=head1/) { last; }
+			if ($synopsis && /\S/)      { s/^\s*/   /; print $_; next; }
+		}
+		exit 0;
+	}
+}
+my $File = $ARGV[$[];
+my $file_type = filetype($File);
+
+if ($file_type eq 'sf2') {
+	my %sf = MIDI::SoundFont::file2sf($File);
+
+	if (! @Patches and ! @Banks) {
+		if ($Config) {
+			print "# $sf{'INAM'}\n# $sf{'IENG'}\n";
+			if ($sf{'ICRD'}) { print "# $sf{'ICRD'}\n"; }
+		} else {
+			print "$sf{'INAM'}\n$sf{'IENG'}\n";
+			if ($sf{'ICRD'}) { print "$sf{'ICRD'}\n"; }
+		}
+	}
+	my @phdr_list = @{$sf{'phdr'}};
+	my %inst_hash = %{$sf{'inst'}};
+	my %shdr_hash = %{$sf{'shdr'}};
+	if (@Banks) {
+		my %banks = map { $_, 1 } @Banks;
+		my @short_list = ();
+		foreach my $pref (@phdr_list) {
+			if ($banks{$pref->{'wBank'}}) { push @short_list, $pref; }
+		}
+		@phdr_list = @short_list;
+	}
+	if (@Patches) {
+		my %patches = map { $_, 1 } @Patches;
+		my @short_list = ();
+		foreach my $pref (@phdr_list) {
+			if ($patches{$pref->{'wPreset'}}) { push @short_list, $pref; }
+		}
+		@phdr_list = @short_list;
+	}
+	$sf{'phdr'} = \@phdr_list;  # delete the phdr's not on the short_list
+	if ($Config) { print config($File, %sf); exit 0; }
+	@phdr_list = sort { (1000*$a->{'wBank'}+$a->{'wPreset'})
+	  <=> (1000*$b->{'wBank'}+$b->{'wPreset'})} @phdr_list;
+	if (! $Long) {
+		foreach my $p_ref (@phdr_list) {
+			print "bank $p_ref->{'wBank'},0 patch $p_ref->{'wPreset'} "
+			 . " # $p_ref->{'achPresetName'}\n";
+		}
+	} else {
+		# we delete the non-required instruments and samples and then Dump.
+		my %instruments_wanted = ();
+		foreach my $p_ref (@phdr_list) {
+			foreach my $pbag_ref (@{$p_ref->{'pbags'}}) {
+				my $ins = $pbag_ref->{'generators'}->{'instrument'};
+				if ($ins) { $instruments_wanted{$ins} += 1; }
+			}
+		}
+		my %samples_wanted = ();
+		foreach my $inst_name (sort keys %inst_hash) {
+			if (! $instruments_wanted{$inst_name}) {
+				delete $inst_hash{$inst_name};
+				next;
+			}
+			my $i_ref = $inst_hash{$inst_name};
+			foreach my $ibag_ref (@{$i_ref->{'ibags'}}) { # 'samplename' ?
+				my $sam = $ibag_ref->{'generators'}->{'sampleID'};
+				if ($sam) { $samples_wanted{$sam} += 1; }
+			}
+		}
+		$sf{'inst'} = \%inst_hash;
+		foreach my $smpl_name (sort keys %shdr_hash) {
+			my $s_ref = $shdr_hash{$smpl_name};
+			if ($samples_wanted{$smpl_name}) {
+				my $len = length $s_ref->{'sampledata'};
+				$s_ref->{'sampledata'} = " ... $len bytes ... ";
+			} else {
+				delete $shdr_hash{$smpl_name};
+			}
+		}
+		$sf{'shdr'} = \%shdr_hash;
+		print '\\%sf = ',Data::Dumper::Dumper(\%sf);
+	}
+} elsif (($file_type eq 'pat') || (($file_type eq 'zip') && $Long)) {
+	my %gravis = MIDI::SoundFont::file2gravis($File);
+	if ($Config) { print config($File, %gravis); exit 0; }
+	foreach my $filename (keys %gravis) {
+		foreach my $i (@{$gravis{$filename}{'instruments'}}) {
+			foreach my $l (@{$i->{'layers'}}) {
+				foreach my $w (@{$l->{'wavsamples'}}) {
+					my $len = length $w->{'data'};
+					$w->{'data'} = " ... $len bytes ... ";
+					@a = split '', $w->{'envelope_data'};
+					$w->{'envelope_data'}
+					  = join(' ', map { sprintf('%02x',ord($_)) } @a);
+				}
+			}
+		}
+	}
+	print Data::Dumper::Dumper(\%gravis);  # could strip off outer {} and '^  '
+#	foreach my $filename (sort keys %gravis) {
+#		print "\n# $filename\n";
+#		my %patch = %{$gravis{$filename}};
+#		# foreach my $k (sort keys %patch) {
+#		foreach my $k (qw(description manufacturer
+#		  num_channels num_voices instruments)) {
+#			if (! ref $patch{$k}) { print "$k = $patch{$k}\n"; next; }
+#			if ('ARRAY' eq ref $patch{$k}) {
+#				print "$k = ".Data::Dumper::Dumper(@{$patch{$k}});
+#			} elsif ('HASH' eq ref $patch{$k}) {
+#				if ($patch{$k}{'layers'}) {
+#					foreach my $l (@{$patch{'layers'}}) {
+#						foreach my $w (@{$l->{'wavsamples'}}) {
+#							$w->{'data'} = ' ... ';
+#						}
+#					}
+#				}
+#				print "$k = ".Data::Dumper::Dumper(%{$patch{$k}});
+#			} else {
+#				print "$k = ".$patch{$k}."\n";
+#			}
+#		}
+#	}
+} elsif ($file_type eq 'zip') {
+	# Don't bother using array to preserve zip order,
+	# alphabetic is best for finding things.
+	my %gravis = MIDI::SoundFont::file2gravis($File);
+	if ($Config) { print config($File, %gravis); exit 0; }
+	foreach my $file_name (sort keys %gravis) {
+		my $pat_ref =  $gravis{$file_name};
+		if (! $pat_ref) { last; }
+		my $s = $file_name;
+		if ($pat_ref->{'instruments'}[0]{'instr_name'}) {
+			$s .= "  # ".$pat_ref->{'instruments'}[0]{'instr_name'};
+		} elsif ($pat_ref->{'description'}) {
+			$s .= "  # ".$pat_ref->{'description'};
+		}
+		print "$s\n";
+	}
+} elsif ($file_type eq '') {
+	warn " unrecognised file type; should be .sf2, .zip, or .pat\n";
+}
+exit;
+
+sub filetype { my $f = $_[$[];
+	if (! open(F, $f)) { die "can't open $f: $!\n"; }
+	read F, my $s, 12;   close F;
+	if ($s =~ /^RIFF....sfbk/) { return 'sf2'; }
+	if ($s =~ /^PK/)       { return 'zip'; }
+	if ($s =~ /^GF1PATCH/) { return 'pat'; }
+	if ($f =~ /.sf2$/i)    { return 'sf2'; }
+	if ($f =~ /.zip$/i)    { return 'zip'; }
+	if ($f =~ /.pat$/i)    { return 'pat'; }
+	return '';
+}
+
+sub config {
+	return MIDI::SoundFont::timidity_cfg(@_);
+}
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+sf_list - lists the contents of a SoundFont or Gravis file
+
+=head1 SYNOPSIS
+
+ sf_list Glurk.sf2    # lists bank, patchnum, patchname
+ sf_list -b 3,4 Groik.sf2    # only shows banks 3 and 4
+ sf_list -b 0 -p 73 Groik.sf2   # shows bank 0 patch 73
+ sf_list -b 0 -p 17 -l doc/Jeux14.sf2     # more detail
+
+ sf_list Glork.zip    # lists contents of a .zip of GUS
+ sf_list fiddle.pat       # contents of a GUS .pat file
+
+ sf_list -b 0 -c doc/Jeux14.sf2 # suggests timidity.cfg
+ sf_list -c gravis/Gravis.zip   # suggests timidity.cfg
+
+=head1 DESCRIPTION
+
+This script uses the CPAN module MIDI::SoundFont
+to display a list of the Patches in a .sf2 SoundFont file,
+or in a Gravis B<.zip> archive,
+or the contents of a Gravis B<.pat> patch-file.
+
+It is distributed in the ./examples subdirectory of the MIDI::SoundFont module.
+
+It displays the Patches in a readable format, e.g.:
+
+ bank 8 patch 17  # Detuned Organ 2
+
+ready for pasting into a C<midi channel> command in B<muscript>, e.g.:
+
+ midi channel 3 bank 8 patch 17  # Detuned Organ 2
+
+The B<muscript> file can then be listened to by:
+
+ muscript -midi t > t.mid
+ timidity -x 'soundfont Glurk.sf2' t.mid
+
+=head1 OPTIONS
+
+=over 3
+
+=item I<-b 0,127>
+
+Only displays the patches in banks 0 and 127.
+Useful on SoundFont files.
+
+=item I<-c>
+
+Outputs a suggested I<timidity.cfg> paragraph to
+allow you to use your soundfont, or gravis patch or zip, in I<timidity>.
+
+You should insert the resulting string into your I<timidity.cfg> by hand,
+using your favourite text editor,
+because there are bound to be things you'll want to change.
+
+For Gravis I<.zip> archives, the I<String::Approx> module
+is used to guess some General-Midi-conformant patch-numbers.
+
+=item I<-l>
+
+Long output.
+Useful on SoundFont files,
+and particularly in conjunction with the B<-p> option.
+
+=item I<-p 73,74>
+
+Only displays patches number 73 and 74.
+Useful on SoundFont files,
+and particularly in conjunction with the B<-b> and B<-l> options.
+
+=item I<-v>
+
+Prints version number.
+
+=back
+
+=head1 CHANGES
+
+ 20120224  1.0  first working version
+
+=head1 AUTHOR
+
+Peter J Billam   http://www.pjb.com.au/comp/contact.html
+
+=head1 SEE ALSO
+
+ MIDI::SoundFont
+ timidity (1)
+ http://www.pjb.com.au/
+ http://www.pjb.com.au/muscript/index.html#midi
+
+=cut
+

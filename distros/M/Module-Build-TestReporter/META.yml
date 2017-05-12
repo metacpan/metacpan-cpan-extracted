@@ -1,0 +1,21 @@
+---
+name: Module-Build-TestReporter
+version: 1.00
+author: ~
+abstract: help users report test failures
+license: perl
+requires:
+  Class::Roles: ''
+  IPC::Open3: ''
+  Module::Build: ''
+  SUPER: 1.10
+  Test::Harness: 2.47
+build_requires:
+  IO::String: ''
+  Test::Exception: ''
+  Test::Simple: 0.48
+provides:
+  Module::Build::TestReporter:
+    file: lib/Module/Build/TestReporter.pm
+    version: 1.00
+generated_by: Module::Build version 0.2608

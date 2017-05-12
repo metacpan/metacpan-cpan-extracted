@@ -1,0 +1,203 @@
+NAME
+    Markup::Content - Extract content markup information from a markup
+    document
+
+SYNOPSIS
+            my $content = Markup::Content->new(
+                                    target => 'noname.html',
+                                    template => 'noname.xml',
+                                    target_options => {
+                                            no_squash_whitespace => [qw(script style pi code pre textarea)]
+                                    },
+                                    template_options => {
+                                            callbacks => {
+                                                    title => sub {
+                                                            print shift()->get_text();
+                                                    }
+                                            }
+                                    });
+
+            $content->extract();
+
+            $content->tree->save_as(\*STDOUT);
+
+DESCRIPTION
+    This modules uses a description of another markup page (template) to
+    match against a specified markup document (target). The point is to
+    extract formatted content from a markup page. While this module in
+    itself lends a good deal of flexibility and reuse, the script [to be]
+    written around this module is probably a better choice. See
+    <http://sourceforge.net/projects/content-x>.
+
+ARGUMENTS
+    template
+        This can be a file name, glob or internet address, or if you already
+        have a Markup::MatchTree you want to use as the template, you may
+        set this argument to the tree. This argument will be passed directly
+        to the "set_template" method. See the section "TEMPLATES" for more
+        information on what is meant by "template".
+
+    template_options
+        This HASHREF will be sent directly to Markup::MatchTree as the
+        "parser_options" option.
+
+    target
+        This can be a file name, glob or internet address, or if you already
+        have a Markup::Tree you want to use as the target, you may set this
+        argument to the tree. This argument will be passed directly to the
+        "set_target" method.
+
+    target_options
+        This HASHREF will be sent directly to Markup::Tree as the
+        "parser_options" option.
+
+    template_name
+        The name of the template. This is unused right now, but will
+        eventually be a nice-to-have-if-set option.
+
+METHODS
+    set_template(FILE|"Markup::MatchTree")
+        Makes a template tree from the FILE or "Markup::MatchTree". See the
+        section "TEMPLATES" for more information on what is meant by
+        "template".
+
+    set_target(FILE|"Markup::Tree")
+        Makes a target tree from the FILE or "Markup::Tree".
+
+    extract
+        Based on the "template" and "target" it will build a Markup::Tree,
+        with just the content, accessible as $content->tree.
+
+TEMPLATES
+    A template, as wanted by this module, is nothing more than a simple XML
+    document. I will try to outline the document structure below.
+
+    The XML root node should be template.
+
+            <template>
+
+    There are only two kinds of tags - "match" or "section".
+
+            <match />
+            <section />
+
+    There are four known attributes: "tagname", "options", "element_type",
+    and "text".
+
+            <match element_type = "-->text" tagname = "-->text" options = "text_not_null" text = "{!!}" />
+
+    Section elements are only used to mark off sections (as you may have
+    guessed). The name of the section is specified in the tag by the
+    "tagname" known attribute.
+
+            <section tagname = "nav1">
+                    <match tagname = "a" _href = "{!!}" />
+            </section>
+
+    Generally section elements will only be used to mark off content. This,
+    of course does not require children, and the tagname must be *CONTENT*.
+
+            <section tagname = "CONTENT" />
+
+    Match elements are used to match elements of the target.
+
+    Attributes are defined with a leading underscore.
+
+            <match tagname ="a" _href = "{!^http://!}" _title = "outside link" />
+
+    These are unknown or unnamed attributes. Known attributes are a short
+    list of pre-defined keywords. It is perfectly fine to have an unknown
+    attribute the same as a known attribute, such as:
+
+            <match tagname = "tagname" _tagname = "the_tag_name" />
+
+    This is unlikely to be encountered in the wild, as HTML tags don't have
+    any validity to the known attributes. We will describe our known
+    attributes more clearly below.
+
+  Known Attributes
+    tagname
+        This represents the name of the element. Likely it will correspond
+        to an HTML tag.
+
+    element_type
+        This will be directly mapped into Markup::MatchTree as the elements
+        element_type. See the "element_type" description under Markup::Tree
+        for a list of meaningful values.
+
+    text
+        Useful only if element_type is "-->text". Note that text need not be
+        specified only with <match element_type = "-->text" /> elements. It
+        could also be betwen <match> tags, like so:
+
+                <match tagname = "p">some text</p>
+
+    options
+        This is a comma-seperated (,) list of options. Options may be one or
+        more of the following:
+
+        call_filter(CALLBACK)
+            CALLBACK is the name of a key of the HASHREF option whose value
+            is a CODEREF of Markup::MatchTrees "callback" arguments. An
+            example will do nicely here.
+
+                    my $content = Markup::Content->new( target => 'http://foobar/',
+                                            template => '~/sites/foobar/foobar.xml',
+                                            template_options => {
+                                                    callbacks => {
+                                                            my_callback_filter => sub {
+                                                                    my $node = shift();
+                                                                    print $node->drop()->{'tagname'}, "\n";
+                                                            },
+                                                            another_callback_filter => sub {
+                                                                    my $node = shift();
+                                                                    do {
+                                                                            if ($node->{'element_type'} eq '-->text') {
+                                                                                    print $node->{'text'};
+                                                                            }
+                                                                    } while ($node = $node->next_node());
+                                                            }
+                                                    }
+                                            });
+
+        text_not_null
+            If the "text" or next text element of the specified element
+            contains more than whitespace, this option will not mark it as
+            an error.
+
+        ignore_children
+            If this option is specified, all children of the element will be
+            ignored, but not the element itself.
+
+        optional
+            This option marks the element as optional. That is to say, if
+            the element does not appear in the target document, it will not
+            be marked as an error.
+
+        ignore_attrs
+            Attributes will not be considered if this option is specified.
+
+    In addition to the above knowledge, there is only one more property to
+    consider. All text or attributes need not be an exact match. By
+    surrounding text or attribute values with {! and !} you are saying, "use
+    the perl5 regular expression specified between {! and !} to match the
+    target element". Luckily you don't have to actually say all that!
+
+    Please see "noname.html", "noname.xml" and "noname.pl" in this
+    distribution for a small example of this module, what it does, and a bit
+    on how to use it.
+
+CAVEATS
+    This module is *HIGHLY* experimental. It may save your life, job or
+    carrer. It is also liable to get you fired, get you divorced, or put
+    sugar in your gastank. I would love to hear your success/horror stories.
+
+SEE ALSO
+    Markup::Tree, Markup::MatchTree,
+    <http://sourceforge.net/projects/content-x>
+
+AUTHOR
+    BPrudent (Brandon Prudent)
+
+    Email: xlacklusterx@hotmail.com
+

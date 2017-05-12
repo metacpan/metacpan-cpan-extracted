@@ -1,0 +1,1488 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- Took this out for IE6ites "http://www.w3.org/TR/REC-html40/loose.dtd" -->
+<html lang="en">
+  <head>
+    <title>
+      PerlMonks - The Monastery Gates
+    </title>
+    
+    <!-- Theme : Web safe blue PerlMonks Theme    -->
+    <link rel="stylesheet" href="/css/common.css" type="text/css" />
+    <link rel="stylesheet" href="?node_id=204962" type="text/css" />
+    <!-- No CSS Link in User Settings -->
+    <!-- No CSS Data in User Settings -->
+    <link rel="icon" href="/favicon.ico" />
+    
+
+    <meta name    = "description"
+          content = "A community committed to sharing Perl
+                     knowledge and coding tips.  The site
+                     contains questions and answers, useful
+                     snippets, and a library of code."
+    />
+    <meta name    = "keywords"
+          content = "perl, mod_perl, regular expressions,
+                     regexp, xp whoring, CGI, programming,
+                     learning, tutorials, questions, answers,
+                     examples, vroom, tim, node, experience,
+                     votes, code"
+    />
+  </head>
+
+  <body id="id-131">
+<!-- monktainer -->
+<!-- monkbar2001 -->
+
+    <table id="monkbar" width="100%" border="0"
+        cellpadding="0" cellspacing="0">
+      <tr class="bannerrow">
+        <td align="left" width="100%">
+        <a href="http://pair.com">
+ <img src="http://promote.pair.com/i/pair-banner-current.gif"
+  height = "60"
+  width  = "468"
+  alt    = "Beefy Boxes and Bandwidth Generously Provided by pair Networks"
+ />
+</a>
+        </td>
+        <td rowspan="2" align="right" valign="bottom">
+          <!-- Monk Pic Turned Off In User Settings -->
+        </td>
+      </tr>
+      <tr class="monkquip">
+        <td class="monkquip"
+            valign="bottom" width="100%" >
+          good chemistry is complicated,<br />and a little bit messy -LW
+        </td>
+      </tr>
+      <tr class="titlebar">
+        <td class="titlebar">
+
+          <form method="get" action="?"
+              enctype="application/x-www-form-urlencoded" >
+            &nbsp;
+            <input type="text" name="node"
+                id="search_text"
+                size="20" maxlength="300" />
+            <input class="titlebar" type="submit"
+                value="Search" />
+          </form>
+        </td>
+        <td class="titlebar" id="mb2001titlebar" align="right" >
+          <a class="titlebar" href="?">PerlMonks</a>&nbsp;&nbsp;
+        </td>
+      </tr>
+    </table>
+
+<!-- /monkbar2001 -->
+<!-- Begin title bar -->
+<table width="98%" align="center" id="titlebar-top">
+  <tbody>
+    <tr>
+      <td valign="middle" class="titlechooser">
+        <!-- superdoc title chooser(1) -->
+        <h3 class="superdoc">The Monastery Gates</h3>
+        <!-- /superdoc title chooser(1) -->
+      </td>
+      <td valign="top" align="right" class="monktitlebar">
+        <!-- monktitlebar -->
+        <ul class="topnavmenu inline-list">
+<li><a href="?node_id=109">Log&nbsp;in</a></li><li><a href="?node_id=101">Create&nbsp;a&nbsp;new&nbsp;user</a></li>
+<li><a href="?">The&nbsp;Monastery&nbsp;Gates</a></li>
+<li><a href="?node=Super%20Search">Super&nbsp;Search</a></li>
+<br />
+<li><a href="?node=Seekers%20of%20Perl%20Wisdom">Seekers&nbsp;of&nbsp;Perl&nbsp;Wisdom</a></li>
+<li><a href="?node=Meditations">Meditations</a></li>
+<li><a href="?node=Perl%20Monks%20Discussion">PerlMonks&nbsp;Discussion</a></li>
+<br />
+<li><a href="?node=Obfuscated%20Code">Obfuscation</a></li>
+<li><a href="?node=Reviews">Reviews</a></li>
+<li><a href="?node=Cool%20Uses%20for%20Perl">Cool&nbsp;Uses&nbsp;For&nbsp;Perl</a></li>
+<li><a href="?node=Perl%20News">Perl&nbsp;News</a></li>
+<li><a href="?node=Categorized%20Questions%20and%20Answers">Q&amp;A</a></li>
+<li><a href="?node=Tutorials">Tutorials</a></li>
+<br />
+<li><a href="?node=Perl%20Poetry">Poetry</a></li>
+<li><a href="?node=Recently%20Active%20Threads">Recent&nbsp;Threads</a></li>
+<li><a href="?node=Newest%20Nodes">Newest&nbsp;Nodes</a></li>
+<li><a href="?node=Offering%20Plate">Donate</a></li>
+<li><a href="?node=Tidings">What's&nbsp;New</a></li>
+</ul>
+
+
+        <!-- /monktitlebar -->
+      </td>
+    </tr>
+  </tbody>
+</table>
+<table width="98%" align="center" id="titlebar-bottom">
+  <tbody>
+    <tr>
+      <td valign="middle" class="titlechooser">
+        <!-- superdoc title chooser(2) -->
+         <span class="addlinks">(&nbsp;#<a href="?node_id=131">131</a>=superdoc:&nbsp;<a href="?displaytype=print;node_id=131">print</a>&nbsp;<a href="?displaytype=print;node_id=131;replies=1">w/&nbsp;replies</a>, <a href="?displaytype=xml;node_id=131">xml</a>&nbsp;)</span>
+        <!-- superdoc title chooser(2) -->
+      </td>
+      <td valign="middle" align="right" class="monktitlebar">
+        <a href="?node=PerlMonks%20FAQ">Need Help??</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<!-- End title bar -->
+<!-- Begin main (monktainer) -->
+
+<center>
+  <table width="98%">
+    <tr>
+      <td  width="80%" valign="top"  class="main_content">
+        <!--contained stuff-->
+        
+<p><center><b><a href="?node=Offering%20Plate">Donations gladly accepted</a></b></center></p>
+
+<!--
+<a href="https://plus.google.com/110429821816504715800" rel="publisher">Google+</a>
+-->
+
+
+<center>If you're new here please read <a href="?node=PerlMonks%20FAQ">PerlMonks FAQ</a><br /> and <a href="?node=Create%20a%20new%20user">Create a new user</a>.</center><br /><table width="100%" cellpadding="0" cellspacing="0">
+
+  <tr class="section_title" width="100%" border="1">
+    <td class="section_title" width="100%">
+New Questions
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table width="100%" border="0" cellpadding="2" cellspacing="0">
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class="post-head post_head">
+  <td valign="top" style="padding-left:.2em">
+<!-- TITLE -->
+    <a id  ="post-head-id1105207" 
+       name="post-head-id1105207" 
+       href="?node_id=1105207"
+    >What does return() mean?</a>
+<br/>
+<!-- REPLIES -->
+    4 direct replies &mdash; <a href="?node_id=1105207">Read more / Contribute</a>
+  </td>
+  <td valign="top" align="right" style="padding-right:.2em">
+<!-- AUTHOR -->
+    by <a href="?node_id=1105205">yistaaa</a>
+<br/>
+<!-- DATE -->
+    on Oct 27, 2014 at 17:12
+  </td>
+</tr>
+<tr class="post-voterep">
+  <td colspan="2" class="voterep">
+  
+  </td>
+</tr>
+<tr class="post-body post_body">
+  <td colspan="2">
+<ul>I'm quite new to perl and there are some confusing things about it that I can't seem to find any information on
+
+For example:
+
+sub some_thing {
+    return ();
+}
+
+What does that return statement do? Is it a ref to something?</ul>
+
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class="post-head post_head">
+  <td valign="top" style="padding-left:.2em">
+<!-- TITLE -->
+    <a id  ="post-head-id1105074" 
+       name="post-head-id1105074" 
+       href="?node_id=1105074"
+    >Dive data with automatic array indexing</a>
+<br/>
+<!-- REPLIES -->
+    1 direct reply &mdash; <a href="?node_id=1105074">Read more / Contribute</a>
+  </td>
+  <td valign="top" align="right" style="padding-right:.2em">
+<!-- AUTHOR -->
+    by <a href="?node_id=1091567">peterp</a>
+<br/>
+<!-- DATE -->
+    on Oct 26, 2014 at 22:33
+  </td>
+</tr>
+<tr class="post-voterep">
+  <td colspan="2" class="voterep">
+  
+  </td>
+</tr>
+<tr class="post-body post_body">
+  <td colspan="2">
+<ul><p>Hi,</p>
+
+<p>I have a large dataset in a configuration file which I plan on eventually porting to a more practical format, but for various reasons this will be complex, therefore for now I have to deal with it. Historically, multidimensional data structures have been stored as sets of selector style keys and values. For example:</p>
+
+<pre class="code"><div class='codeblock'><tt class='codetext'>0.foo.bar = 0foobar
+0.foo.baz = 0foobaz
+1.foo     = 1foo
+
+equates to:
+
+&#91;
+    {
+        foo =&gt;
+        {
+            bar =&gt; &#39;0foobar&#39;,
+            baz =&gt; &#39;0foobaz&#39;
+        }
+    },
+    {
+        foo =&gt; &#39;1foo&#39;
+    }
+&#93;
+</tt></div><div class='embed-code-dl'><a href="?abspart=1;displaytype=displaycode;node_id=1105074;part=1">&#91;download&#93;</a></div></pre>
+
+
+<p>The data is parsed by splitting the key into its individual components then running them through Data::Diver. The problem is I sometimes need to add data into the middle of the dataset and as a result have to increment index components within keys below this, which can be tedious to say the least. I decided the easiest quick fix would be to pre-process the keys beforehand and automatically calculate the array indexes. Thus the above dataset would look:</p>
+
+<pre class="code"><div class='codeblock'><tt class='codetext'>&gt;.foo.bar = 0foobar
+&lt;.foo.baz = 0foobaz
+&gt;.foo     = 1foo
+</tt></div><div class='embed-code-dl'><a href="?abspart=1;displaytype=displaycode;node_id=1105074;part=2">&#91;download&#93;</a></div></pre>
+
+
+<p>Where '>' means "next index // 0" and '&lt;' means "last index // 0", within scope of the dimension. I wrote the following demo:</p> 
+
+<pre class="code"><div class='codeblock'><tt class='codetext'>use strict;
+use warnings;
+use Data::Diver  qw#DiveVal DiveError#;
+use Data::Dumper qw#Dumper#;
+
+$/ = qq#\r\n#;
+
+my $state = { };
+my $ref   = undef;
+
+while ( my $line = &lt;DATA&gt; )
+{
+    next if ( $line =~ qr#^(\#|\s*$)# ); # ignore line if comment or b<span class="line-breaker">
+<font color="red">+</font></span>lank.
+    
+    chomp $line; # remove newline.
+    
+    my ( $selector, $value ) = split qr#\s*=\s*#, $line; # (selector)=<span class="line-breaker">
+<font color="red">+</font></span>(value). todo: unless escaped.
+    
+    next if ( not defined $selector ); # ignore line if no selector.
+    
+    my @selector = split qr#\.#, $selector; # (one).(two).(three)... t<span class="line-breaker">
+<font color="red">+</font></span>odo: unless escaped.
+    
+    $ref //= ( $selector&#91;0&#93; =~ qr#^(&#91;&gt;&lt;&#93;|\d+)$# ) ? &#91; &#93; : { } ;
+
+    _dive( $ref, \@selector, $value );
+}
+
+print Dumper $state, $ref;
+
+sub _dive
+{
+    my ( $ref, $selector, $value ) = @_;
+    
+    return if ( not defined $ref or not defined $selector or not scala<span class="line-breaker">
+<font color="red">+</font></span>r @$selector ); # return if no ref or no selectees.
+    
+    my @selector_b = qw##;
+   
+    for my $selectee ( @$selector )
+    {
+        if ( $selectee =~ qr#^(&#91;&gt;&lt;&#93;)$# ) # if incognito selectee. todo<span class="line-breaker">
+<font color="red">+</font></span>: unless escaped.
+        {
+            my $selector_b = join q#.#, @selector_b;
+            
+            if ( $1 eq q#&gt;# ) # incognito selectee is of increment typ<span class="line-breaker">
+<font color="red">+</font></span>e.
+            {
+                if ( defined $state-&gt;{$selector_b} ) # we have seen th<span class="line-breaker">
+<font color="red">+</font></span>is state before.
+                {
+                    push @selector_b, $state-&gt;{$selector_b} += 1; # pu<span class="line-breaker">
+<font color="red">+</font></span>sh current index + 1.
+                }
+                else
+                {
+                    push @selector_b, $state-&gt;{$selector_b} = 0; # pus<span class="line-breaker">
+<font color="red">+</font></span>h 0 (first) index.
+                }
+            }
+            elsif ( $1 eq q#&lt;# ) # incognito selectee is of maintain t<span class="line-breaker">
+<font color="red">+</font></span>ype.
+            {
+                push @selector_b, $state-&gt;{$selector_b} //= 0; # push <span class="line-breaker">
+<font color="red">+</font></span>current index or 0 (first) index.
+            }
+        }
+        else # else non inconito selectee.
+        {
+            push @selector_b, $selectee; # push selectee.
+        }
+    }
+    
+    DiveVal( $ref, @selector_b ) = $value;
+    my ( $error ) = DiveError( );
+    $error and warn $error;
+    
+    return 1;
+}
+
+__DATA__
+
+&gt;.name          = john
+&lt;.location      = uk
+&lt;.interests.&gt;   = programming
+&lt;.interests.&gt;   = cycling
+
+&gt;.name          = laura
+&lt;.location      = 
+&lt;.interests.&gt;   = knitting
+&lt;.interests.&gt;   = tennis
+&lt;.interests.&gt;   = dancing
+
+&gt;.name
+&lt;.location      = canada
+&lt;.interests.&gt;.&gt; = dogs
+&lt;.interests.&lt;.&gt; = horses
+&lt;.interests.&gt;   = cars
+
+# test.error = blah
+</tt></div><div class='embed-code-dl'><a href="?abspart=1;displaytype=displaycode;node_id=1105074;part=3">&#91;download&#93;</a></div></pre>
+
+
+<p>Output:</p>
+
+<pre class="code"><div class='codeblock'><tt class='codetext'>$VAR1 = {
+          &#39;2.interests&#39; =&gt; 1,
+          &#39;&#39; =&gt; 2,
+          &#39;2.interests.0&#39; =&gt; 1,
+          &#39;0.interests&#39; =&gt; 1,
+          &#39;1.interests&#39; =&gt; 2
+        };
+$VAR2 = &#91;
+          {
+            &#39;interests&#39; =&gt; &#91;
+                           &#39;programming&#39;,
+                           &#39;cycling&#39;
+                         &#93;,
+            &#39;location&#39; =&gt; &#39;uk&#39;,
+            &#39;name&#39; =&gt; &#39;john&#39;
+          },
+          {
+            &#39;interests&#39; =&gt; &#91;
+                           &#39;knitting&#39;,
+                           &#39;tennis&#39;,
+                           &#39;dancing&#39;
+                         &#93;,
+            &#39;location&#39; =&gt; &#39;&#39;,
+            &#39;name&#39; =&gt; &#39;laura&#39;
+          },
+          {
+            &#39;interests&#39; =&gt; &#91;
+                           &#91;
+                             &#39;dogs&#39;,
+                             &#39;horses&#39;
+                           &#93;,
+                           &#39;cars&#39;
+                         &#93;,
+            &#39;location&#39; =&gt; &#39;canada&#39;,
+            &#39;name&#39; =&gt; undef
+          }
+        &#93;;
+</tt></div><div class='embed-code-dl'><a href="?abspart=1;displaytype=displaycode;node_id=1105074;part=4">&#91;download&#93;</a></div></pre>
+
+
+<p>Is this a good approach, or is there a better alternative? Perhaps I should look into extending Data::Diver's DiveRef function? Can my code be improved, I don't mind a bit of golfing, but I'm concerned there could be a particular scenario that I've missed where my code could break?</p>
+
+<p>Chris</p></ul>
+
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class="post-head post_head">
+  <td valign="top" style="padding-left:.2em">
+<!-- TITLE -->
+    <a id  ="post-head-id1105009" 
+       name="post-head-id1105009" 
+       href="?node_id=1105009"
+    >Perl version issue?</a>
+<br/>
+<!-- REPLIES -->
+    3 direct replies &mdash; <a href="?node_id=1105009">Read more / Contribute</a>
+  </td>
+  <td valign="top" align="right" style="padding-right:.2em">
+<!-- AUTHOR -->
+    by <a href="?node_id=975253">T-Fen</a>
+<br/>
+<!-- DATE -->
+    on Oct 25, 2014 at 22:06
+  </td>
+</tr>
+<tr class="post-voterep">
+  <td colspan="2" class="voterep">
+  
+  </td>
+</tr>
+<tr class="post-body post_body">
+  <td colspan="2">
+<ul><p> Hello perl monks- </p>
+
+<p>I'm on a Mac and recently upgraded from Mavericks to Yosemite which might be the cause of my current issue. </p>
+
+<p>I am using mutt with t-prot and getting the following error when attempting to view a message in mutt (which invokes t-prot)</p>
+
+<tt class='inlinecode'>&#39;Can&#39;t locate Locale/gettext.pm in @INC (you may need to install the Locale::gettext module) (@INC contains: /Library/Perl/5.12 /Library/Perl/5.18/darwin-thread-multi-2level /Library/Perl/5.18 /Network/Library/Perl/5.18/darwin-thread-multi-2level /Network/Library/Perl/5.18 /Library/Perl/Updates/5.18.2 /System/Library/Perl/5.18/darwin-thread-multi-2level /System/Library/Perl/5.18 /System/Library/Perl/Extras/5.18/darwin-thread-multi-2level /System/Library/Perl/Extras/5.18 .) at /usr/local/bin/t-prot line 1147.</tt>
+<p>When i do a search for getttext, I see the following:</p>
+
+<pre class="code"><div class='codeblock'><tt class='codetext'>/Library/Perl/5.16/darwin-thread-multi-2level/Locale/gettext.pm
+/Library/Perl/5.16/darwin-thread-multi-2level/auto/Locale/gettext
+/Library/Perl/5.16/darwin-thread-multi-2level/auto/Locale/gettext/.pac<span class="line-breaker">
+<font color="red">+</font></span>klist
+/Library/Perl/5.16/darwin-thread-multi-2level/auto/Locale/gettext/gett<span class="line-breaker">
+<font color="red">+</font></span>ext.bs
+/Library/Perl/5.16/darwin-thread-multi-2level/auto/Locale/gettext/gett<span class="line-breaker">
+<font color="red">+</font></span>ext.bundle
+/Previous System/Library/Perl/5.16/darwin-thread-multi-2level/auto/Loc<span class="line-breaker">
+<font color="red">+</font></span>ale/gettext
+/Previous System/usr/local/Cellar/gettext/0.19.3/share/doc/gettext/exa<span class="line-breaker">
+<font color="red">+</font></span>mples/hello-perl
+/Previous System/usr/local/Cellar/gettext/0.19.3/share/doc/gettext/exa<span class="line-breaker">
+<font color="red">+</font></span>mples/hello-perl/m4
+/Previous System/usr/local/Cellar/gettext/0.19.3/share/doc/gettext/exa<span class="line-breaker">
+<font color="red">+</font></span>mples/hello-perl/po
+/usr/local/Cellar/gettext/0.19.3/share/doc/gettext/examples/hello-perl
+/usr/local/Cellar/gettext/0.19.3/share/doc/gettext/examples/hello-perl<span class="line-breaker">
+<font color="red">+</font></span>/INSTALL
+/usr/local/Cellar/gettext/0.19.3/share/doc/gettext/examples/hello-perl<span class="line-breaker">
+<font color="red">+</font></span>/Makefile.am
+/usr/local/Cellar/gettext/0.19.3/share/doc/gettext/examples/hello-perl<span class="line-breaker">
+<font color="red">+</font></span>/autoclean.sh
+</tt></div><div class='embed-code-dl'><a href="?abspart=1;displaytype=displaycode;node_id=1105009;part=2">&#91;download&#93;</a></div></pre>
+
+
+<p>So seeing that @INC doesn't appear to look in /Library/Perl/5.16/ I then added the path using:</p>
+<tt class='inlinecode'>$ PERL5LIB=/Library/Perl/5.16/darwin-thread-multi-2level/; export PERL5LIB</tt>
+
+<p>Doing that, I now get this error when trying to view a message with mutt/t-prot:</p>
+<pre class="code"><div class='codeblock'><tt class='codetext'>&#39;Perl API version v5.16.0 of v5.16.0 does not match v5.18.0 at /System<span class="line-breaker">
+<font color="red">+</font></span>/Library/Perl/5.18/darwin-thread-multi-2level/DynaLoader.pm line 217.
+                                                                      <span class="line-breaker">
+<font color="red">+</font></span>                                                                     <span class="line-breaker">
+<font color="red">+</font></span>                                                                     <span class="line-breaker">
+<font color="red">+</font></span>                                            Compilation failed in req<span class="line-breaker">
+<font color="red">+</font></span>uire at /usr/local/bin/t-prot line 1147.
+</tt></div><div class='embed-code-dl'><a href="?abspart=1;displaytype=displaycode;node_id=1105009;part=4">&#91;download&#93;</a></div></pre>
+
+<p>/Library/Perl/ contains a /5.16 and a /5.18 directory but looks like anything related to gettext is only in /5.16.  Looking for guidance on how to fix this so that the needed files are found.</p>
+<p>Thanks!</p></ul>
+
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class="post-head post_head">
+  <td valign="top" style="padding-left:.2em">
+<!-- TITLE -->
+    <a id  ="post-head-id1104989" 
+       name="post-head-id1104989" 
+       href="?node_id=1104989"
+    >how to extract script output in new text file ?</a>
+<br/>
+<!-- REPLIES -->
+    5 direct replies &mdash; <a href="?node_id=1104989">Read more / Contribute</a>
+  </td>
+  <td valign="top" align="right" style="padding-right:.2em">
+<!-- AUTHOR -->
+    by <a href="?node_id=1104913">Chris202</a>
+<br/>
+<!-- DATE -->
+    on Oct 25, 2014 at 13:19
+  </td>
+</tr>
+<tr class="post-voterep">
+  <td colspan="2" class="voterep">
+  
+  </td>
+</tr>
+<tr class="post-body post_body">
+  <td colspan="2">
+<ul>Dear all
+
+I own nothing but faith in you all because I have tried to find the answer to my question on the internet for long but couldn't get (or understand) it... 
+Here's my problem:
+I have a script that scans throught a text file and writes all line except those starting with an A.
+<pre class="code"><div class='codeblock'><tt class='codetext'>#!/usr/bin/perl
+use strict;
+use warnings;
+open (my $file, &quot;&lt;&quot;, &quot;/file.txt&quot;) or die &quot;cannot open &lt; file.txt $!&quot;;
+while (&lt;$file&gt;) {
+    unless (/^A/) {
+        print;
+    }
+}  
+</tt></div><div class='embed-code-dl'><a href="?abspart=1;displaytype=displaycode;node_id=1104989;part=1">&#91;download&#93;</a></div></pre>
+
+
+That works, but I get the results of this script in the terminal. 
+What I want is just to get these results to be saved in a new text file. 
+Can somebody help me ? 
+Please light my path amid the darkness with the wisdom that is yours
+
+Thanks a lot ! 
+Chris</ul>
+
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class="post-head post_head">
+  <td valign="top" style="padding-left:.2em">
+<!-- TITLE -->
+    <a id  ="post-head-id1104960" 
+       name="post-head-id1104960" 
+       href="?node_id=1104960"
+    >Sorting/Cleansing a Duplicate File</a>
+<br/>
+<!-- REPLIES -->
+    4 direct replies &mdash; <a href="?node_id=1104960">Read more / Contribute</a>
+  </td>
+  <td valign="top" align="right" style="padding-right:.2em">
+<!-- AUTHOR -->
+    by <a href="?node_id=1052035">perlron</a>
+<br/>
+<!-- DATE -->
+    on Oct 25, 2014 at 09:24
+  </td>
+</tr>
+<tr class="post-voterep">
+  <td colspan="2" class="voterep">
+  
+  </td>
+</tr>
+<tr class="post-body post_body">
+  <td colspan="2">
+<ul>Hi,
+<br />
+With a desire to write elegant/optimal code in perl,i want to know any suggestions the monks might have to spare me.
+<br />A customer gave me a word document with country (duplicates due to multiple commitees per country)names. <br />I need to create a drop down in html showing country names.
+Hence my trivial code below  to read a list of duplicate country names , identify unique names and write them to a file in alphabetical order. Basic stuff.
+<br />
+<pre class="code"><div class='codeblock'><tt class='codetext'>#!/usr/bin/perl
+
+use strict;
+
+my ($key,$name,%countries);
+open (my $fh1,&quot;&lt;&quot;,&quot;files/country_listv1.txt&quot;) or die $!;
+while(&lt;$fh1&gt;){
+  if (!exists $countries{$_}){
+    $countries{$_} = &#39;1&#39;;
+  }
+}
+open (my $fh2,&quot;&gt;&quot;,&quot;files/country_listv2.txt&quot;) or die $!;
+foreach $key (sort keys %countries){
+    print $fh2 $key;
+  
+} 
+close($fh1,$fh2);
+</tt></div><div class='embed-code-dl'><a href="?abspart=1;displaytype=displaycode;node_id=1104960;part=1">&#91;download&#93;</a></div></pre>
+
+update
+<i>I still have one issue the comma character appears as TM. I suspect its a encoding issue of my text file. I am using textedit on a mac which doesnt seem to have a save as UTF8 option.strange. Im just updating this query than create a new one.
+Im going to try some options but please tell me which is the best way out, as this problem seems a generic one.
+use utf8 encoding in my perl script.
+recreate the text file in vim
+any other options ?
+</i>
+<br />
+
+<br />
+Do we have some perl code checker available for us to validate scripts / modules ?
+<br />Thanks
+
+<!-- Node text goes above. Div tags should contain sig only -->
+<div class="pmsig"><div class="pmsig-1052035">
+<i>Do not wait to strike when the iron is hot! Make it hot by striking - WB Yeats</i>
+</div></div></ul>
+
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class="post-head post_head">
+  <td valign="top" style="padding-left:.2em">
+<!-- TITLE -->
+    <a id  ="post-head-id1104905" 
+       name="post-head-id1104905" 
+       href="?node_id=1104905"
+    >Making PDF Tables</a>
+<br/>
+<!-- REPLIES -->
+    2 direct replies &mdash; <a href="?node_id=1104905">Read more / Contribute</a>
+  </td>
+  <td valign="top" align="right" style="padding-right:.2em">
+<!-- AUTHOR -->
+    by <a href="?node_id=961">Anonymous Monk</a>
+<br/>
+<!-- DATE -->
+    on Oct 24, 2014 at 15:13
+  </td>
+</tr>
+<tr class="post-voterep">
+  <td colspan="2" class="voterep">
+  
+  </td>
+</tr>
+<tr class="post-body post_body">
+  <td colspan="2">
+<ul>Hi Monks!<br />
+
+I need to create a PDF document with a few tables in it, from the code sample of the module PDF::Table its simple to have one table in the same page of a PDF, but I cant figure it out how I would add another table into the same PDF page. Has any of you tried or had to do the same thing using the same module?<br />
+Code Sample<br />
+<pre class="code"><div class='codeblock'><tt class='codetext'> use PDF::API2;
+ use PDF::Table;
+ 
+ my $pdftable = new PDF::Table;
+ my $pdf = new PDF::API2(-file =&gt; &quot;table_of_lorem.pdf&quot;);
+ my $page = $pdf-&gt;page;
+ 
+ # some data to layout
+ my $some_data =&#91;
+    &#91;&quot;1 Lorem ipsum dolor&quot;,
+    &quot;Donec odio neque, faucibus vel&quot;,
+    &quot;consequat quis, tincidunt vel, felis.&quot;&#93;,
+    &#91;&quot;Nulla euismod sem eget neque.&quot;,
+    &quot;Donec odio neque&quot;,
+    &quot;Sed eu velit.&quot;&#93;,
+    #... and so on
+ &#93;;
+ 
+ $left_edge_of_table = 50;
+ # build the table layout
+ $pdftable-&gt;table(
+     # required params
+     $pdf,
+     $page,
+     $some_data,
+     x =&gt; $left_edge_of_table,
+     w =&gt; 495,
+     start_y =&gt; 750,
+     next_y  =&gt; 700,
+     start_h =&gt; 300,
+     next_h  =&gt; 500,
+     # some optional params
+     padding =&gt; 5,
+     padding_right =&gt; 10,
+     background_color_odd  =&gt; &quot;gray&quot;,
+     background_color_even =&gt; &quot;lightblue&quot;, #cell background color for <span class="line-breaker">
+<font color="red">+</font></span>even rows
+  );
+# second table in the same PDF page
+ $pdftable-&gt;table(
+     # required params
+     $pdf,
+     $page,
+     $some_data,
+     x =&gt; $left_edge_of_table,
+     w =&gt; 500,
+     start_y =&gt; 755,
+     next_y  =&gt; 705,
+     start_h =&gt; 305,
+     next_h  =&gt; 505,
+     # some optional params
+     padding =&gt; 5,
+     padding_right =&gt; 10,
+     background_color_odd  =&gt; &quot;navy&quot;,
+     background_color_even =&gt; &quot;red&quot;, #cell background color for even r<span class="line-breaker">
+<font color="red">+</font></span>ows
+  );
+  
+ # do other stuff with $pdf
+ $pdf-&gt;saveas();
+
+</tt></div><div class='embed-code-dl'><a href="?abspart=1;displaytype=displaycode;node_id=1104905;part=1">&#91;download&#93;</a></div></pre>
+<br />
+Thanks for looking!</ul>
+
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class="post-head post_head">
+  <td valign="top" style="padding-left:.2em">
+<!-- TITLE -->
+    <a id  ="post-head-id1104891" 
+       name="post-head-id1104891" 
+       href="?node_id=1104891"
+    >compare always true in grep</a>
+<br/>
+<!-- REPLIES -->
+    5 direct replies &mdash; <a href="?node_id=1104891">Read more / Contribute</a>
+  </td>
+  <td valign="top" align="right" style="padding-right:.2em">
+<!-- AUTHOR -->
+    by <a href="?node_id=1080444">RonW</a>
+<br/>
+<!-- DATE -->
+    on Oct 24, 2014 at 14:05
+  </td>
+</tr>
+<tr class="post-voterep">
+  <td colspan="2" class="voterep">
+  
+  </td>
+</tr>
+<tr class="post-body post_body">
+  <td colspan="2">
+<ul><p>The following worked fine on Linux, but is not working on Win7 Pro (Strawberry Perl 5.18.2 64bit)</p>
+<p>(This uses the expression form of <a href="http://perldoc.perl.org/functions/grep.html">grep</a>)</p>
+<pre class="code"><div class='codeblock'><tt class='codetext'>#!perl -w
+
+use warnings;
+use strict;
+
+my @times = ( 1, 2, 3, 4);
+
+print STDERR &quot;Times: @times\n&quot;;
+if (grep ((0 + $_) &gt;= 99999999), @times) { die(&#39;Time values must be &lt; <span class="line-breaker">
+<font color="red">+</font></span>99999999&#39;); }
+</tt></div><div class='embed-code-dl'><a href="?abspart=1;displaytype=displaycode;node_id=1104891;part=1">&#91;download&#93;</a></div></pre>
+
+<p>Output:</p>
+<pre class="code"><div class='codeblock'><tt class='codetext'>&gt;perl ptest.pl
+Times: 1 2 3 4
+Time values must be &lt; 99999999 at ptest.pl line 9.
+&gt;
+</tt></div><div class='embed-code-dl'><a href="?abspart=1;displaytype=displaycode;node_id=1104891;part=2">&#91;download&#93;</a></div></pre>
+
+</ul>
+
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class="post-head post_head">
+  <td valign="top" style="padding-left:.2em">
+<!-- TITLE -->
+    <a id  ="post-head-id1104870" 
+       name="post-head-id1104870" 
+       href="?node_id=1104870"
+    >Windows folder access error</a>
+<br/>
+<!-- REPLIES -->
+    4 direct replies &mdash; <a href="?node_id=1104870">Read more / Contribute</a>
+  </td>
+  <td valign="top" align="right" style="padding-right:.2em">
+<!-- AUTHOR -->
+    by <a href="?node_id=1098998">ArifS</a>
+<br/>
+<!-- DATE -->
+    on Oct 24, 2014 at 10:31
+  </td>
+</tr>
+<tr class="post-voterep">
+  <td colspan="2" class="voterep">
+  
+  </td>
+</tr>
+<tr class="post-body post_body">
+  <td colspan="2">
+<ul>I am getting the following error when try to execute the following code-
+
+<pre class="code"><div class='codeblock'><tt class='codetext'>   # c:\Folders\1Folder\1aFolder        
+   my $directory = &quot;\\Folders\\1Folder\\1aFolder&quot;;
+   print &quot;Folder: &quot;, $directory, &quot;\n&quot;;      
+   opendir (DIR, $directory) or die $!;
+         while (my $fldr = readdir(DIR)) 
+         {
+         print &quot;Files &amp; Folders: &quot;, $fldr, &quot;\n&quot;; 
+    }
+</tt></div><div class='embed-code-dl'><a href="?abspart=1;displaytype=displaycode;node_id=1104870;part=1">&#91;download&#93;</a></div></pre>
+
+
+Error-
+<pre class="code"><div class='codeblock'><tt class='codetext'>Folder: \Folders\1Folder\1aFolder        
+
+Invalid argument at c:\temp\dir1A9A.tmp\read.pl line ...##.
+Press any key to continue . . .
+</tt></div><div class='embed-code-dl'><a href="?abspart=1;displaytype=displaycode;node_id=1104870;part=2">&#91;download&#93;</a></div></pre>
+
+Pointing to line - opendir (DIR, $directory) or die $!;
+<br /><br />
+Please let me know</ul>
+
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class="post-head post_head">
+  <td valign="top" style="padding-left:.2em">
+<!-- TITLE -->
+    <a id  ="post-head-id1104868" 
+       name="post-head-id1104868" 
+       href="?node_id=1104868"
+    >Net::LDAP, Active Directory, Move accounts across domain in forest?</a>
+<br/>
+<!-- REPLIES -->
+    No replies &mdash; <a href="?node_id=1104868">Read more</a> | <a href="?parent=1104868;node_id=3333">Post response</a>
+  </td>
+  <td valign="top" align="right" style="padding-right:.2em">
+<!-- AUTHOR -->
+    by <a href="?node_id=1104861">TomJ_SC</a>
+<br/>
+<!-- DATE -->
+    on Oct 24, 2014 at 10:25
+  </td>
+</tr>
+<tr class="post-voterep">
+  <td colspan="2" class="voterep">
+  
+  </td>
+</tr>
+<tr class="post-body post_body">
+  <td colspan="2">
+<ul><p>
+I am not new to Net::LDAP but I am unsure how to approach this problem. </p>
+
+<p>
+I have no issues using moddn to move accounts within a domain. However, I have a need to move users from one domain to another in the same Active Directory Forest (2008R2 functional).
+</p>
+
+<p>
+
+My initial plan was to delete the account from one domain and then create the account in the new domain.
+
+This brings up obvious issues (need to migrate emails, password reset to generated default, etc).
+</p>
+<p>
+I see that there is an option to move accounts within the same forest. It also appears that moddn does not support this and I do not see any help from Net::LDAP::Extra::AD (although reset_ADpassword and change_ADpassword are awesome-THANKS!).
+,/p>
+<p>
+Any guidance pointers?
+</p>
+<p>
+Thanks for your time and reading this.
+</p>
+<p>
+Tom
+</p></ul>
+
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class="post-head post_head">
+  <td valign="top" style="padding-left:.2em">
+<!-- TITLE -->
+    <a id  ="post-head-id1104841" 
+       name="post-head-id1104841" 
+       href="?node_id=1104841"
+    >refine output of Dumper</a>
+<br/>
+<!-- REPLIES -->
+    5 direct replies &mdash; <a href="?node_id=1104841">Read more / Contribute</a>
+  </td>
+  <td valign="top" align="right" style="padding-right:.2em">
+<!-- AUTHOR -->
+    by <a href="?node_id=963186">kaka_2</a>
+<br/>
+<!-- DATE -->
+    on Oct 24, 2014 at 06:04
+  </td>
+</tr>
+<tr class="post-voterep">
+  <td colspan="2" class="voterep">
+  
+  </td>
+</tr>
+<tr class="post-body post_body">
+  <td colspan="2">
+<ul>Hello Monks,
+
+i have following code which works well. only problem is output does not looks good.
+
+<pre class="code"><div class='codeblock'><tt class='codetext'>use strict;
+use warnings;
+use Data::Dumper;
+$Data::Dumper::Terse=1;
+my $StatChk=&quot;cat /tmp/teststatus.txt | grep -v OK&quot;;
+my $GoodStat=&quot;OK&quot;;
+
+my @SChk_Out;
+
+open (DChk, &quot;$StatChk |&quot;) || die &quot;Failed: $!\n&quot;;
+@SChk_Out = &lt;DChk&gt;; 
+close (DChk);
+
+print &quot;Output of command is =&quot;.Dumper(@SChk_Out);
+
+</tt></div><div class='embed-code-dl'><a href="?abspart=1;displaytype=displaycode;node_id=1104841;part=1">&#91;download&#93;</a></div></pre>
+
+
+and Output is:
+
+<pre class="code"><div class='codeblock'><tt class='codetext'>&#91;
+          &#39;Station 7777: Not good.
+&#39;,
+          &#39;Station 7778: Not Good
+&#39;
+        &#93;
+</tt></div><div class='embed-code-dl'><a href="?abspart=1;displaytype=displaycode;node_id=1104841;part=2">&#91;download&#93;</a></div></pre>
+
+
+how can i have output just
+
+<pre class="code"><div class='codeblock'><tt class='codetext'>Station 7777: Not good.
+Station 7778: Not good.
+</tt></div><div class='embed-code-dl'><a href="?abspart=1;displaytype=displaycode;node_id=1104841;part=3">&#91;download&#93;</a></div></pre>
+
+
+<p>it is important that i use the Dumper. in my actual program i cant just print array. (kind of limitation)</p>
+
+any help in this regard will be appriciated.</ul>
+
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class="post-head post_head">
+  <td valign="top" style="padding-left:.2em">
+<!-- TITLE -->
+    <a id  ="post-head-id1104831" 
+       name="post-head-id1104831" 
+       href="?node_id=1104831"
+    >Output to STDOUT and print last line to console</a>
+<br/>
+<!-- REPLIES -->
+    4 direct replies &mdash; <a href="?node_id=1104831">Read more / Contribute</a>
+  </td>
+  <td valign="top" align="right" style="padding-right:.2em">
+<!-- AUTHOR -->
+    by <a href="?node_id=1062307">waytoperl</a>
+<br/>
+<!-- DATE -->
+    on Oct 24, 2014 at 00:31
+  </td>
+</tr>
+<tr class="post-voterep">
+  <td colspan="2" class="voterep">
+  
+  </td>
+</tr>
+<tr class="post-body post_body">
+  <td colspan="2">
+<ul><p>
+I have a situation to write output to a file and also print on console or CMD. Need feedback on my non-working code. Thanks. 
+</p>
+
+<pre class="code"><div class='codeblock'><tt class='codetext'>#!/usr/bin/env perl -w
+
+use strict;
+use warnings;
+use Fcntl;
+use Tie::File;
+
+#-- saving result to output.txt
+open STDOUT, &quot;&gt;&quot;, &quot;output.txt&quot; or die &quot;$0: open: $!&quot;;
+
+#-- write to output.txt and print on console
+print &quot;##Start of SCRIPT.PL##\n&quot;; 
+
+my $run = &quot;SCRIPT.pl&quot;;
+system($run);
+
+#-- open the file 
+tie my @rows, &#39;Tie::File&#39;, &#39;output.txt&#39;, autochomp =&gt; 0 or die &quot;error:<span class="line-breaker">
+<font color="red">+</font></span> $!\n&quot;;
+
+#-- print last line of output.txt on console
+print &quot;$rows&#91;-1&#93;&quot;;
+
+</tt></div><div class='embed-code-dl'><a href="?abspart=1;displaytype=displaycode;node_id=1104831;part=1">&#91;download&#93;</a></div></pre>
+
+</ul>
+
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class="post-head post_head">
+  <td valign="top" style="padding-left:.2em">
+<!-- TITLE -->
+    <a id  ="post-head-id1104807" 
+       name="post-head-id1104807" 
+       href="?node_id=1104807"
+    >split (grep)</a>
+<br/>
+<!-- REPLIES -->
+    2 direct replies &mdash; <a href="?node_id=1104807">Read more / Contribute</a>
+  </td>
+  <td valign="top" align="right" style="padding-right:.2em">
+<!-- AUTHOR -->
+    by <a href="?node_id=994701">tbone654</a>
+<br/>
+<!-- DATE -->
+    on Oct 23, 2014 at 15:52
+  </td>
+</tr>
+<tr class="post-voterep">
+  <td colspan="2" class="voterep">
+  
+  </td>
+</tr>
+<tr class="post-body post_body">
+  <td colspan="2">
+<ul><p>
+This is driving me crazy... I'm ultimately trying to read in two lists, one with a single column of ordered names...  The second list is a column of names with a comma separated (this test script is using semi-colons) value after the name...
+<br />
+If I were able to do this in unix I would be:
+<pre class="code"><div class='codeblock'><tt class='codetext'>grep -f file1 file2
+</tt></div><div class='embed-code-dl'><a href="?abspart=1;displaytype=displaycode;node_id=1104807;part=1">&#91;download&#93;</a></div></pre>
+
+Which is ok, but file1 loses it's order to file2, and what I really want to do is print values from file2 next to the order in file1... so I need to split off values and print the results next to the members of file1 where there is a match...
+<br />
+But it seems like today I'm too stupid to figure out how to do the split command correctly...  Or, other...  I could just print the line from list2, but there could be many values and I need to split them out to do math on them after I figure out the problem with split...  perldoc -f split tells me it's returning the number of times each line succeeds, where I need to be able to manipulate the results.  I've been searching the site for something similar, with no success.  Thank you for any help in advance.
+</p>
+<pre class="code"><div class='codeblock'><tt class='codetext'>my $a;
+my @foo = qw/tom steve bill roger bob/;
+my @bar = qw/roger;99 steve;56 ted;88 tom;54/;
+for($a=0;$a&lt;@foo;$a++) {
+        printf(&quot;%s %s\n&quot;,$foo&#91;$a&#93;,grep(/$foo&#91;$a&#93;/,@bar));
+        }
+print &quot;----\n&quot;;
+for($a=0;$a&lt;@foo;$a++) {
+        # printf(&quot;%s\n&quot;, grep(/$foo&#91;$a&#93;/,@bar) );
+        printf(&quot;%s\n&quot;, (split /;/, grep(/$foo&#91;$a&#93;/,@bar))&#91;0&#93; );
+        }
+
+--output before split--
+tom tom;54
+steve steve;56
+bill
+roger roger;99
+bob
+----
+tom;54
+steve;56
+
+roger;99
+
+--output using split--
+tom tom;54
+steve steve;56
+bill
+roger roger;99
+bob
+----
+1
+1
+0
+1
+0
+
+</tt></div><div class='embed-code-dl'><a href="?abspart=1;displaytype=displaycode;node_id=1104807;part=2">&#91;download&#93;</a></div></pre>
+</ul>
+
+  </td>
+</tr>
+
+<!--  End Post  -->
+
+      </table>
+    </td>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+
+  <tr class="section_title" width="100%" border="1">
+    <td class="section_title" width="100%">
+New Meditations
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table width="100%" border="0" cellpadding="2" cellspacing="0">
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class="post-head post_head">
+  <td valign="top" style="padding-left:.2em">
+<!-- TITLE -->
+    <a id  ="post-head-id1105114" 
+       name="post-head-id1105114" 
+       href="?node_id=1105114"
+    >Reanimating regular issue: Indirect Object Notation</a>
+<br/>
+<!-- REPLIES -->
+    2 direct replies &mdash; <a href="?node_id=1105114">Read more / Contribute</a>
+  </td>
+  <td valign="top" align="right" style="padding-right:.2em">
+<!-- AUTHOR -->
+    by <a href="?node_id=840342">McA</a>
+<br/>
+<!-- DATE -->
+    on Oct 27, 2014 at 06:22
+  </td>
+</tr>
+<tr class="post-voterep">
+  <td colspan="2" class="voterep">
+  
+  </td>
+</tr>
+<tr class="post-body post_body">
+  <td colspan="2">
+<ul><p>Hi all,</p>
+<p>as a regular reader of the Perlweekly newsletter I stumbled on this entry in Edition <a href="http://perlweekly.com/archive/170.html">#170</a>: <a href="https://twitter.com/OvidPerl/status/524669894710013952">Stop using indirect object notation</a>.</p>
+<p>In the same moment I thought: Didn't I ask something related some time ago? Yes, I did. And I found it: <a href="?node_id=1020863">Reference needed</a>.</p>
+<p>So, I bring this to awareness once again.</p>
+<p>The reactions on twitter are interesting. IMHO the very first action that could be taken: Change all (changeable) documentation where <tt class='inlinecode'>new Class</tt> is used. Because most people don't care. They're copy&pasting the examples and synopsis of CPAN modules. And you can find this indirect notation on CPAN.</p>
+<p>Regards<br />
+McA</p></ul>
+
+  </td>
+</tr>
+
+<!--  End Post  -->
+<!-- Begin Post -->
+<!-- embed node with vote container -->
+<tr class="post-head post_head">
+  <td valign="top" style="padding-left:.2em">
+<!-- TITLE -->
+    <a id  ="post-head-id1104594" 
+       name="post-head-id1104594" 
+       href="?node_id=1104594"
+    >Refactoring Perl5 with Lua</a>
+<br/>
+<!-- REPLIES -->
+    1 direct reply &mdash; <a href="?node_id=1104594">Read more / Contribute</a>
+  </td>
+  <td valign="top" align="right" style="padding-right:.2em">
+<!-- AUTHOR -->
+    by <a href="?node_id=127615">rje</a>
+<br/>
+<!-- DATE -->
+    on Oct 21, 2014 at 14:31
+  </td>
+</tr>
+<tr class="post-voterep">
+  <td colspan="2" class="voterep">
+  
+  </td>
+</tr>
+<tr class="post-body post_body">
+  <td colspan="2">
+<ul><p>WARNING: It may be that I'm simply thinking about Parrot in a different way...</p>
+
+<p>If you've read <a href="www.perlmonks.org/?node_id=1104569">my previous post on microperl</a>, then you're sufficiently prepared to <b>take this post with a grain of salt</b>.  As a brief summary, I'll re-quote something Chromatic wrote to start me thinking about this problem in general:</p>
+
+<p><i>
+"If I were to implement a language now, I'd write a very minimal core suitable for bootstrapping. ... Think of a handful of ops. Think very low level. (Think something a little higher than the universal Turing machine and the lambda calculus and maybe a little bit more VMmy than a good Forth implementation, and you have it.) If you've come up with something that can replace XS, stop. You're there. Do not continue. That's what you need." (Chromatic, January 2013)
+</i></p>
+
+<p>Warning: I've never written a VM or a bytecode interpreter.  I have written interpreters and worked with bytecodes before (okay, a 6502 emulator, but that's basically a bytecode interpreter, right?)  Just remember that I'm not posting from a position of strength.</p>
+
+<p>So I found the Lua opcode set, and it seems a good starting point for talking about a small, though perhaps not minimal, Turing machine that seems to do much of what Chromatic was thinking about... except for XS, which I still haven't wrapped my head around.</p>
+
+<p>Lua has <a href="http://www.jucs.org/jucs_11_7/the_implementation_of_lua/jucs_11_7_1159_1176_defigueiredo.html#sec7">a register-based 35 opcode VM with flat closures, threads, coroutines, incremental garbage collection...</a> and manages to shoehorn in a tail call, a "for" loop, and a CLOSURE for goodness' sake.  And some of those opcodes could be "macros" built on top of other opcodes, rather than atomic opcodes (only if speed were unimportant): SUB, MUL, DIV, POW, LE.</p>
+
+<p>Again, a disclaimer: I haven't been in a compiler construction class for 25 years, and my career has typically been enterprise coding, data analysis, and tool scripting.  Regardless, a small opcode set seems to me to be important for portability.  And... 35 codes... well, that's dinky.</p>
+
+<p>I don't assume that Lua's codes are sufficient for Perl... things are likely missing or just not quite right for Perl.  But I have to start somewhere, right?  And I figure some of you have the right Domain Knowledge to shed some light on the subject.  Right?</p>
+
+<p>There's lots of neat notes in the aforementioned Lua design doc, written in a clear and concise manner.  And now for a brief glance at Lua's opcodes:</p>
+<div class='readmore-link'><a href="?node_id=1104594">Read more...</a><span class='readmore-size'> (3 kB)</span></div></ul>
+
+  </td>
+</tr>
+
+<!--  End Post  -->
+
+      </table>
+    </td>
+  </tr>
+</table>
+
+
+
+
+        <!--/contained stuff-->
+      </td>
+      <!--nodelet handling code (monktainer)-->
+      <td  width="20%" valign="top" align="right"  class="nodelets">
+        <!-- Begin nodelets -->
+<table class='nodelet_container' id='nodelet_container'>
+<!-- Nodelet Break -->
+    <tbody class="nodelet" id="Log_In">
+      <tr><th class="nodelet_head">
+          <span class="title">Log In</span><a href="?node=About the Log In" class="nodelethead-annot"><sup>?</sup></a>
+      </th></tr>
+      <tr><td class="nodelet_body">
+
+<form method="post" action="?" enctype="multipart/form-data" name="login">
+<div style="display:none"><input type="hidden" name="node_id" value="109"  /></div>
+<input type="hidden" name="op" value="login" />
+<input type="hidden" name="lastnode_id" value="131" />
+<table border="0"><tr><td>
+Username:</td><td>
+<input type="text" name="user"  size="10" maxlength="34" />
+</td></tr><tr><td>
+Password:</td><td>
+<input type="password" name="passwd"  size="10" maxlength="10" />
+
+</td></tr></table>
+<label><input type="checkbox" name="expires" value="+10y" />remember me</label>
+<input type="submit" name="login" value="Login" />
+<br />
+<a href="?node_id=2513">What's my password?</a>
+<br />
+<a href="?node_id=101">Create A New User</a>
+</form>
+
+
+      </td></tr>
+
+    </tbody>
+
+<!-- Nodelet Break -->
+    <tbody class="nodelet" id="Chatterbox">
+      <tr><th class="nodelet_head">
+          <span class="title">Chatterbox</span><a href="?node=About the Chatterbox" class="nodelethead-annot"><sup>?</sup></a>
+      </th></tr>
+      <tr><td class="nodelet_body">
+
+<form method="get" action="?" enctype="multipart/form-data">
+<div style="display:none"><input type="hidden" name="node_id" value="131"  /></div><i>and the web crawler heard nothing...</i>
+<input type="submit" name="foo" value="Refresh" />
+</form>
+<i><br /> <a href="?node=ChatterBox%20FAQ">How do I use this?</a>  |  <a href="?node_id=20842">Other CB clients</a></i>
+
+      </td></tr>
+
+    </tbody>
+
+<!-- Nodelet Break -->
+    <tbody class="nodelet" id="Other_Users">
+      <tr><th class="nodelet_head">
+          <span class="title">Other Users</span><a href="?node=About the Other Users" class="nodelethead-annot"><sup>?</sup></a>
+      </th></tr>
+      <tr><td class="nodelet_body">
+
+<span class="other-users-text">Others <span class="other-users-blurb">chilling in</span> the Monastery:</span> (15)<br /><ul class="spacey-list"><li><span class='even-row'><span class='item-000'><span class='user-level-24'><span class='user-461912'><a href="?node_id=461912" title="GrandFather's home node. Level 24. Member of: janitors, pmdev">GrandFather</a></span></span></span></span></li>
+<li><span class='odd-row'><span class='item-001'><span class='user-level-23'><span class='user-281137'><a href="?node_id=281137" title="davido's home node. Level 23. Member of: janitors, pollsters, pmdev, SiteDocClan, QandAEditors">davido</a></span></span></span></span></li>
+<li><span class='even-row'><span class='item-002'><span class='user-level-21'><span class='user-622051'><a href="?node_id=622051" title="toolic's home node. Level 21">toolic</a></span></span></span></span></li>
+<li><span class='odd-row'><span class='item-003'><span class='user-level-20'><span class='user-131279'><a href="?node_id=131279" title="talexb's home node. Level 20">talexb</a></span></span></span></span></li>
+<li><span class='even-row'><span class='item-004'><span class='user-level-18'><span class='user-968231'><a href="?node_id=968231" title="Athanasius's home node. Level 18">Athanasius</a></span></span></span></span></li>
+<li><span class='odd-row'><span class='item-005'><span class='user-level-18'><span class='user-70929'><a href="?node_id=70929" title="atcroft's home node. Level 18">atcroft</a></span></span></span></span></li>
+<li><span class='even-row'><span class='item-006'><span class='user-level-18'><span class='user-200365'><a href="?node_id=200365" title="Tux's home node. Level 18">Tux</a></span></span></span></span></li>
+<li><span class='odd-row'><span class='item-007'><span class='user-level-17'><span class='user-272364'><a href="?node_id=272364" title="MidLifeXis's home node. Level 17. Member of: power users">MidLifeXis</a></span></span></span></span></li>
+<li><span class='even-row'><span class='item-008'><span class='user-level-16'><span class='user-10261'><a href="?node_id=10261" title="dorko's home node. Level 16">dorko</a></span></span></span></span></li>
+<li><span class='odd-row'><span class='item-009'><span class='user-level-14'><span class='user-221725'><a href="?node_id=221725" title="poj's home node. Level 14">poj</a></span></span></span></span></li>
+<li><span class='even-row'><span class='item-010'><span class='user-level-12'><span class='user-844862'><a href="?node_id=844862" title="GotToBTru's home node. Level 12">GotToBTru</a></span></span></span></span></li>
+<li><span class='odd-row'><span class='item-011'><span class='user-level-11'><span class='user-1026244'><a href="?node_id=1026244" title="Loops's home node. Level 11">Loops</a></span></span></span></span></li>
+<li><span class='even-row'><span class='item-012'><span class='user-level-8'><span class='user-576485'><a href="?node_id=576485" title="mandarin's home node. Level 8">mandarin</a></span></span></span></span></li>
+<li><span class='odd-row'><span class='item-013'><span class='user-level-6'><span class='user-115082'><a href="?node_id=115082" title="chusqui's home node. Level 6">chusqui</a></span></span></span></span></li>
+<li><span class='even-row'><span class='item-014'><span class='user-level-5'><span class='user-1052035'><a href="?node_id=1052035" title="perlron's home node. Level 5">perlron</a></span></span></span></span></li>
+</ul><span class='update-time'><small>As of 2014-10-28 15:20 GMT</small></span>
+
+      </td></tr>
+
+    </tbody>
+
+<!-- Nodelet Break -->
+    <tbody class="nodelet" id="Sections">
+      <tr><th class="nodelet_head">
+          <span class="title">Sections</span><a href="?node=About the Sections" class="nodelethead-annot"><sup>?</sup></a>
+      </th></tr>
+      <tr><td class="nodelet_body">
+
+<ul class="spacey-list">
+<li><a href="?node=Seekers%20of%20Perl%20Wisdom">Seekers of Perl Wisdom</a></li>
+<li><a href="?node=Cool%20Uses%20for%20Perl">Cool Uses for Perl</a></li>
+<li><a href="?node=Meditations">Meditations</a></li>
+<li><a href="?node=Perl%20Monks%20Discussion">PerlMonks Discussion</a></li>
+<li><a href="?node=Categorized%20Questions%20and%20Answers">Categorized Q&amp;A</a></li>
+<li><a href="?node=Tutorials">Tutorials</a></li>
+<li><a href="?node=Obfuscated%20Code">Obfuscated Code</a></li>
+<li><a href="?node=Perl%20Poetry">Perl Poetry</a></li>
+<li><a href="?node=Perl%20News">Perl News</a></li>
+<li><a href="?node_id=483086">about</a></li>
+</ul>
+
+
+      </td></tr>
+
+    </tbody>
+
+<!-- Nodelet Break -->
+    <tbody class="nodelet" id="Information">
+      <tr><th class="nodelet_head">
+          <span class="title">Information</span><a href="?node=About the Information" class="nodelethead-annot"><sup>?</sup></a>
+      </th></tr>
+      <tr><td class="nodelet_body">
+
+<ul class="spacey-list">
+<li><a href="?node=PerlMonks%20FAQ">PerlMonks FAQ</a></li>
+<li><a href="?node=the%20Perl%20Monks%20guide%20to%20the%20Monastery">Guide to the Monastery</a></li>
+<li><a href="?node=Tidings">What's New at PerlMonks</a></li>
+<li><a href="?node=Voting%2FExperience%20System">Voting/Experience System</a></li>
+<li><a href="?node=Tutorials">Tutorials</a></li>
+<li><a href="?node=Reviews">Reviews</a></li>
+<li><a href="?node=Library">Library</a></li>
+<li><a href="?node=perlman%3Aperlfaq">Perl FAQs</a></li>
+<li><a href="?node=Where%20can%20I%20find%20more%20information%20on...">Other Info Sources</a></li>
+</ul>
+
+      </td></tr>
+
+    </tbody>
+
+<!-- Nodelet Break -->
+    <tbody class="nodelet" id="Find_Nodes">
+      <tr><th class="nodelet_head">
+          <span class="title">Find Nodes</span><a href="?node=About the Find Nodes" class="nodelethead-annot"><sup>?</sup></a>
+      </th></tr>
+      <tr><td class="nodelet_body">
+
+<ul class="spacey-list">
+<li><a href="?node_id=6364;user=961">Nodes You Wrote</a></li>
+<li><a href="?node=Super%20Search">Super Search</a></li>
+<li><a href="?node=Perl%20Monks%20User%20Search">List Nodes By Users</a></li>
+<li><a href="?node=Newest%20Nodes">Newest Nodes</a></li>
+<li><a href="?node=Recently%20Active%20Threads">Recently Active Threads</a></li>
+<li><a href="?node=Selected%20Best%20Nodes">Selected Best Nodes</a></li>
+<li><a href="?node=Best%20Nodes">Best Nodes</a></li>
+<li><a href="?node=Worst%20Nodes">Worst Nodes</a></li>
+<li><a href="?node=Saints%20in%20our%20Book">Saints in our Book</a></li>
+</ul>
+
+      </td></tr>
+
+    </tbody>
+
+<!-- Nodelet Break -->
+    <tbody class="nodelet" id="Leftovers">
+      <tr><th class="nodelet_head">
+          <span class="title">Leftovers</span><a href="?node=About the Leftovers" class="nodelethead-annot"><sup>?</sup></a>
+      </th></tr>
+      <tr><td class="nodelet_body">
+
+<ul class="spacey-list" id="user"></ul>
+<ul class="spacey-list" id="internal">
+<li><a href="?node=The%20St.%20Larry%20Wall%20Shrine">The St. Larry Wall Shrine</a></li>
+<li><a href="?node_id=781756">Buy PerlMonks Gear</a></li>
+<li><a href="?node=Offering%20Plate">Offering Plate</a></li>
+<li><a href="?node=Awards">Awards</a></li>
+<li><a href="?op=randomnode">Random Node</a></li>
+<li><a href="?node=Quests">Quests</a></li>
+<li><a href="?node=Craft">Craft</a></li>
+<li><a href="?node=Snippets%20Section">Snippets</a></li>
+<li><a href="?node=Code%20Catacombs">Code Catacombs</a></li>
+<li><a href="?node=Editor%20Requests">Editor Requests</a></li>
+</ul><ul class="spacey-list" id="external">
+<li><a href="http://blogs.perl.org/">blogs.perl.org</a></li>
+<!--<li>[http://planet.perl.org/|Planet Perl]</li>-->
+<li><a href="http://perlsphere.net/">Perlsphere</a></li>
+<li><a href="http://ironman.enlightenedperl.org/">Perl Ironman Blog</a></li>
+<li><a href="http://perlweekly.com/">Perl Weekly</a></li>
+<li><a href="http://perl.com/">Perl.com</a></li>
+<li><a href="http://www.perlfoundation.org/perl5/index.cgi">Perl 5 Wiki</a></li>
+<li><a href="http://jobs.perl.org/">Perl Jobs</a></li>
+<li><a href="http://www.pm.org/">Perl Mongers</a></li>
+<li><a href="http://www.perl.org/">Perl Directory</a></li>
+<li><a href="http://perldoc.perl.org/">Perl documentation</a></li>
+<li><a href="https://metacpan.org/">MetaCPAN</a></li>
+<li><a href="http://cpan.perl.org/">CPAN</a></li>
+</ul>
+
+
+      </td></tr>
+
+    </tbody>
+
+<!-- Nodelet Break -->
+    <tbody class="nodelet" id="Voting_Booth">
+      <tr><th class="nodelet_head">
+          <span class="title">Voting Booth</span><a href="?node=About the Voting Booth" class="nodelethead-annot"><sup>?</sup></a>
+      </th></tr>
+      <tr><td class="nodelet_body">
+
+<h4>For retirement, I am banking on:</h4><form method="post" action="?" enctype="multipart/form-data">
+<div style="display:none"><input type="hidden" name="displaytype" value="display"  /><input type="hidden" name="node_id" value="1104030"  /></div>
+<p>
+<label><input type="radio" name="vote" value="0" />My <a href="http://en.wikipedia.org/wiki/Savings_account">savings account</a></label><br /> <label><input type="radio" name="vote" value="1" />My <a href="http://en.wikipedia.org/wiki/Retirement#Saving_for_retirement">retirement account</a></label><br /> <label><input type="radio" name="vote" value="2" />My investments</label><br /> <label><input type="radio" name="vote" value="3" /><a href="http://en.wikipedia.org/wiki/Social_security">Social Security</a></label><br /> <label><input type="radio" name="vote" value="4" /><a href="http://en.wikipedia.org/wiki/Lottery#Probability_of_winning">Winning the lottery</a></label><br /> <label><input type="radio" name="vote" value="5" />A <a href="http://en.wikipedia.org/wiki/Special:Search?search=Post-scarcity%20economy">Post-scarcity economy</a></label><br /> <label><input type="radio" name="vote" value="6" />Retirement?! You'll have to pull the keyboard <a href="http://en.wikipedia.org/wiki/From_my_cold,_dead_hands">from my cold, dead hands</a></label><br /> <label><input type="radio" name="vote" value="7" />I'm independently wealthy</label><br /> <label><input type="radio" name="vote" value="8" />Other</label><br /><input type="submit" value="Vote">
+</p>
+</form>
+
+<p>
+<a href="?node_id=1104030">Results (181 votes)</a>, 
+<a href="?node=past%20polls">past polls</a></p>
+      </td></tr>
+
+    </tbody>
+
+
+</table>
+
+        <!-- End nodelets -->
+      </td>
+
+      <!--/nodelet handling code (monktainer)-->
+
+    </tr>
+  </table>
+</center>
+
+<!-- End main (monktainer)-->
+<br />
+<br />
+
+<div id="footer">
+          PerlMonks lovingly hand-crafted by <a href="?node=vroom">Tim Vroom</a>.<br/>
+      PerlMonks went on a couple dates, and then decided to shack up with
+      <a href="http://www.perlfoundation.org">The Perl Foundation</a>.<br />
+      Speedy Servers and Bandwidth Generously Provided by
+      <a href="http://promote.pair.com/direct.pl?perlmonks.org">
+      pair Networks</a>
+
+  <br/>Built with the <a href="http://perl.org">Perl programming language</a>.
+</div>
+<!-- /monktainer -->
+
+  
+  </body>    
+</html>

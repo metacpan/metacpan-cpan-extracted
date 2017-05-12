@@ -1,0 +1,6 @@
+<h1>MasonX::MiniMVC Sample Library Application</h1>
+<ul>
+<li><a href="book/">Books</a>
+<li><a href="author/">Authors</a>
+<li><a href="book/recommendation/">Recommendations</a>
+</ul>

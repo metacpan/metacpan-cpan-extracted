@@ -1,0 +1,71 @@
+MooseX-NotRequired
+
+This module allows you to create anonymous sub classes of Moose classes with all the
+required flags on the attributes turned off.
+
+    package ObjectA;
+
+    use Moose;
+
+    has required => (is => 'ro', isa => 'Str', required => 1);
+    has optional => (is => 'ro', isa => 'Int' );
+    has semi_required => (is => 'ro', isa => 'Str' );
+
+    1;
+
+    ...
+
+    use MooseX::NotRequired;
+
+    my $new_class = MooseX::NotRequired::make_optional_subclass('ObjectA');
+    my $obj = $new_class->new(); # no blow up
+    my $default = $new_class->new({ semi_required => undef }); # fine too
+    ...
+    my $second = ObjectA->new(); # blow up because required isn't filled in.
+    my $third = ObjectA->new({ required => 'a', semi_required => undef }); 
+    # blow up because semi_required must be a string.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc MooseX::NotRequired
+
+You can also look for information at:
+
+    Github request tracker (report bugs here)
+        https://github.com/colinnewell/MooseX-NotRequired/issues <https://github.com/colinnewell/MooseX-NotRequired/issues>
+
+    Github source code repository
+        https://github.com/colinnewell/MooseX-NotRequired/ <https://github.com/colinnewell/MooseX-NotRequired/>
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/MooseX-NotRequired
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/MooseX-NotRequired
+
+    Search CPAN
+        http://search.cpan.org/dist/MooseX-NotRequired/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011-2015 OpusVL
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,45 @@
+---
+abstract: 'Cause validation failures to throw exception objects.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-Attribute-ValidateWithException
+provides:
+  MooseX::Attribute::ValidateWithException:
+    file: lib/MooseX/Attribute/ValidateWithException.pm
+    version: v0.4.0
+  MooseX::Attribute::ValidateWithException::AttributeRole:
+    file: lib/MooseX/Attribute/ValidateWithException/AttributeRole.pm
+    version: v0.4.0
+  MooseX::Attribute::ValidateWithException::Exception:
+    file: lib/MooseX/Attribute/ValidateWithException/Exception.pm
+    version: v0.4.0
+recommends:
+  Moose: '2.000'
+requires:
+  Moose: '2.1200'
+  Moose::Exporter: '0'
+  Moose::Role: '0'
+  Throwable::Error: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/MooseX-Attribute-ValidateWithException/issues
+  homepage: https://github.com/kentnl/MooseX-Attribute-ValidateWithException
+  repository: https://github.com/kentnl/MooseX-Attribute-ValidateWithException.git
+version: v0.4.0

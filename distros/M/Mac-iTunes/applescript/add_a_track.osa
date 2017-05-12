@@ -1,0 +1,6 @@
+tell application "iTunes"
+	set myList to make new playlist
+	set name of myList to "iTunes Test"
+	set myFile to alias "Otter:Users:brian:Dev:MacOSX:iTunes:mp3:The_Wee_Kirkcudbright_Centipede.mp3"
+	set myTrack to add myFile to myList
+end tell

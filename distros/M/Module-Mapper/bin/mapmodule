@@ -1,0 +1,105 @@
+use Getopt::Long qw(:config no_ignore_case permute);
+use Pod::Usage;
+use Module::Mapper;
+
+use strict;
+use warnings;
+
+my $path = undef;
+my @modules = ();
+my @localdirs = ();
+my @exes = ();
+my $help = 0;
+my %options = (
+	Libs => \@localdirs,
+	Modules => \@modules,
+	Scripts => \@exes,
+	Verbose => sub { print $_[0]; }
+);
+
+GetOptions(
+	'a|all'         => sub { $options{All} = 1; },
+	'e|exe=s'         => sub {push @exes, $_[1]; },
+    'h|help'		=> \$help,
+    'I|useINC'      => sub { $options{UseINC} = 1; },
+    'l|lib=s'         => sub { push @localdirs, $_[1]; },
+    'M|module=s'      => sub { push @modules, $_[1]; },
+    'o|out|output=s' => sub { $options{Output} = $_[1]; },
+    'p|pod'         => sub { $options{IncludePOD} = 1; },
+    'P|project'     => sub { $options{Project} = $_[1]; },
+);
+
+pod2usage(1) if $help;
+
+#
+#	normalize and test for the directories
+#
+foreach (@localdirs) {
+	s![/\\]$!!;
+	die "Cannot find directory $_, exitting.\n" unless -d;
+}
+
+die "Nothing to do, exitting (perhaps you forgot -e or -M ?)."
+	if $options{UseINC} && 
+		(! scalar @localdirs) && 
+		(! scalar @modules) && 
+		(! scalar @exes);
+
+my $modules = find_sources(%options);
+
+die $@ unless $modules;
+
+=pod
+
+=head1 NAME
+
+mapmodule
+
+=head1 SYNOPSIS
+
+mapmodule [options]
+
+ Options:
+    -a|-all                 locate all children of specified modules
+    -e|-exe <filepath>      pathname to an executable script
+    -h|-help                display this help and exit
+    -I|-useINC              search in @INC after searching any specified
+                               local directories
+    -l|-lib <path>          search <path> for modules
+    -M|-module <module>     a module to search for (in X::Y::Z format)
+    -o|-out|-output <path>  target root directory mapped paths
+    -p|-pod                 include POD files (ending in .pod) in search
+    -P|-project             root project directory (for project mode only)
+
+Multiple source modules, executables, and libraries may be specified, e.g.,
+
+  mapmodule -a -o ./sources -I -l ./lib1 -l ./lib2 -M Some::Module -e ./bin/mapmodule
+
+searches ./lib1, ./lib2, and @INC for the first occurance of Some/Module.pm,
+and maps the results to ./sources/lib/Some/Module.pm if found in @INC,
+or ./sources/blib/Some/Module.pm if found in ./lib1 or ./lib2, and also
+maps ./bin/mapmodule to ./source/bin/mapmodule. If the directory where
+Some::Module was found has a Module directory, it will recurse through it to
+map all the child module files found.
+
+If none of -l, -e, or -M is specified, collects all	modules found in './lib'
+and all files in './bin' (aka "project mode"), e.g.,
+
+	mapmodule -o ./sources
+
+will map all modules under ./lib to ./sources/blib and all scripts under ./bin
+to ./sources/bin.
+
+=head1 DESCRIPTION
+
+Using L<Module::Mapper>, searches either specified directories, or @INC (or both) 
+for the specified module(s) or executable(s). Prints the full path where the 
+sources were found and (optionally) a mapping output path if the -o options was specified.
+
+If -o is specified, then the output path is mapped as follows:
+
+	Source Type         Location
+	-----------         ------------------------
+	executables         <path>/bin
+	local modules       <path>/blib
+	@INC modules        <path>/lib

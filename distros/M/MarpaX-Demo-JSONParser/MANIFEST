@@ -1,0 +1,16 @@
+Changelog.ini
+Changes
+data/json.1.bnf
+data/json.2.bnf
+data/json.3.bnf
+lib/MarpaX/Demo/JSONParser.pm
+lib/MarpaX/Demo/JSONParser/Actions.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+scripts/demo.pl
+t/basic.tests.t
+xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

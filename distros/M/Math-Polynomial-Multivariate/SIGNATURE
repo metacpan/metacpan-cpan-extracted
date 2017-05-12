@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 12fe5a739ad965eb63d33b2ed98a7fb84d3406a9 Changes
+SHA1 230d937815189fdb8ebaa71ef36da63b31c78c3f MANIFEST
+SHA1 b13c25e6d72ab411753fba05497fefc682a72446 META.json
+SHA1 3cc80fb5de6026365323cbd6d03741e1ce6f279c META.yml
+SHA1 3a5bdc38afba4d064e9d25a3700cf1fc9d89614b Makefile.PL
+SHA1 394e658da9b0ff0b82cade3508e04b5b920aa8f9 README
+SHA1 7867a038aeeaf5de211a61beb9c0650999297943 examples/ramanujan.pl
+SHA1 8cb58fb5cbd9711f08aa916e0b1a52009d7f0c28 examples/tutte.pl
+SHA1 a0c1d0755b6a0179b312a351d86473fbf1b5ccf7 lib/Math/Polynomial/Multivariate.pm
+SHA1 902b5693fda02755680852960727413bc39e7e59 t/01_basics.t
+SHA1 010e9cfa3c36404bc7188c5094af8a37af551021 t/02_operators.t
+SHA1 4670e0d03715ec54e4e6c9cac85da0bb604f4b8d t/03_bigrat.t
+SHA1 91129b5447f60b259659efc3acc90edd215c9d64 t/04_squaring.t
+SHA1 c58fa085ba1b1c350568a7b691359a7100b75df8 t/10_synopsis.t
+SHA1 12ee5eb7013598c45007b488ade9b94f146d5c7e t/90_pod.t
+SHA1 c28ebf0fa25e9cb7a8fbbbf5ae78dc39952f607a t/91_pod_cover_cp.t
+SHA1 39bee74c1e5d601a788e6975376a7314c39ab803 t/92_consistency.t
+SHA1 690c222221fa956f136f5277ef82ce96eb4b682b t/93_examples.t
+SHA1 1d5d8e199564f6d9baeadfef7ffef02a3b464f48 t/95_versions.t
+SHA1 1496e251e89201034ae1c6519408983a31f2ae5b t/99_signature.t
+SHA1 9744e568804fc24263d76e60ebb04db9f96725d0 t/data/KNOWN_VERSIONS
+SHA1 62d84450dca37b0bba6021987ad5442f7a55b371 t/lib/Test/MyUtils.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (Darwin)
+
+iQEcBAEBAgAGBQJTB2tQAAoJEGH3bZuRPycNm7kH/iaLzCrwnKpmZzsiGczQnufG
+d9bKwulBofZvGVN6AOtkF0ZLg11hFUX/BNRi3AAUS9MwYbi8ha5tqH7XEKYl6axk
+Og59rqepo4yx/Ouwr1YvhNN18SRlYHaNxEulk+9vuJCWO9wvXKJ+3U3bAQ/GL/uc
++/BFglJD0OwAUcrdg/BafCn4LvLEijMYRaur9LEpw3ckCM9t90kUckVYGMrtZ3RJ
+VgTWgLPsFGa5RVmLjUo9X85jiw8SU/RYRvfjwrNE2mW4qYKYEsGd59gMBK3PTumw
+vr4GRKftAJa4Dt2lcOuk07jYS2/H3oOl7VIuVMgZ0uDZxE8y7pqrDmCdgTVvEUs=
+=aQ+b
+-----END PGP SIGNATURE-----

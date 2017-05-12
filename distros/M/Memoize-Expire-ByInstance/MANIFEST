@@ -1,0 +1,12 @@
+Changes
+ignore.txt
+lib/Memoize/Expire/ByInstance.pm
+Makefile.PL
+MANIFEST
+Memoize-Expire-ByInstance-0.5.tar.gz
+README
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/test_memoize_expire_by_instance.t
+META.yml                                 Module meta-data (added by MakeMaker)

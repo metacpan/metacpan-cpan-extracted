@@ -1,0 +1,520 @@
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+
+This file is part of Math-PlanePath.
+
+Math-PlanePath is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+Math-PlanePath is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 124, January 2017
+    - new n_to_n_list()
+
+Version 123, April 2016
+    - bigfloat.t compare results with ==, needed by BigFloat 1.999720,
+      as reported by Petr Pisar RT#114014
+    - MultipleRings fix BigFloat output on BigRat input
+
+Version 122, January 2016
+    - test fix a sloppy test exposed by recent Math::BigFloat
+
+Version 121, September 2015
+    - new methods xyxy_to_n_list(), xyxy_to_n_list_either(),
+      turn_any_left(), turn_any_right(), turn_any_straight()
+
+Version 120, August 2015
+    - new HilbertSides
+    - PlanePathTurn new turn_type "Straight"
+
+Version 119, May 2015
+    - fixes to most n_to_level()
+    - Math::PlanePath::Base::Digits new round_up_pow()
+
+Version 118, February 2015
+    - new methods xyxy_to_n(), xyxy_to_n_either()
+    - DekkingCurve new "arms" parameter, correction to level N range
+
+Version 117, September 2014
+    - new methods n_to_level(), level_to_n_range()
+    - UlamWarburton,UlamWarburtonQuarter parameter parts=>octant,octant_up
+
+Version 116, June 2014
+    - new WythoffPreliminaryTriangle
+    - new methods is_tree(), x_negative_at_n(), y_negative_at_n()
+
+Version 115, March 2014
+    - CoprimeColumns new parameter direction=down
+    - MPeaks new parameter n_start
+    - Math::PlanePath::Base::Generic new parameter_info_nstart0()
+
+Version 114, February 2014
+    - PlanePathDelta new delta_type=>"dRadius","dRSquared"
+    - CCurve xy_to_n() by division instead of search
+
+Version 113, December 2013
+    - PythagoreanTree new tree_type="UArD", digit_order="LtoH"
+    - PlanePathCoord new coordinate_type "MinAbs","MaxAbs"
+
+Version 112, December 2013
+    - PythagoreanTree new tree_type="UMT"
+
+Version 111, November 2013
+    - FactorRationals new factor_coding "odd/even","negabinary","revbinary"
+    - new sumabsxy_minimum(), sumabsxy_maximum(), absdiffxy_minimum(),
+      absdiffxy_maximum()
+
+Version 110, August 2013
+    - PlanePathTurn new turn_type "SLR","SRL"
+
+Version 109, August 2013
+    - TerdragonCurve correction to dx_minimum()
+    - TerdragonMidpoint correction to dx_maximum()
+
+Version 108, July 2013
+    - new tree_n_to_subheight()
+    - PlanePathCoord new coordinate_type "SubHeight"
+    - tests skip some 64-bit perl 5.6.2 dodginess in "%" operator
+
+Version 107, July 2013
+    - PentSpiral,PentSpiralSkewed,HeptSpiralSkewed,OctagramSpiral,
+      Staircase,StaircaseAlternating new parameter n_start
+    - FilledRings fix parameter_info_array() missing n_start
+    - StaircaseAlternating fix parameter_info_array() missing end_type
+
+Version 106, June 2013
+    - new methods tree_n_root(), tree_num_roots(), tree_root_n_list(),
+      tree_depth_to_n_range(), tree_depth_to_width(), tree_num_children_list(),
+      dsumxy_minimum(),dsumxy_maximum(), ddiffxy_minimum(),ddiffxy_maximum()
+    - PyramidSpiral new parameter n_start
+    - PlanePathCoord new coordinate_type "RootN"
+
+Version 105, June 2013
+    - PlanePathCoord new coordinate_type "NumSiblings"
+
+Version 104, May 2013
+    - new method n_to_radius()
+
+Version 103, May 2013
+    - UlamWarburton new parts=2,1
+    - PythagoreanTree new coordinates="SM","SC","MC"
+
+Version 102, April 2013
+    - new sumxy_minimum(),sumxy_maximum(), diffxy_minimum(),diffxy_maximum(),
+    - PlanePathDelta new delta_type=>"dSumAbs"
+
+Version 101, April 2013
+    - MultipleRings fixes for ring_shape=polygon xy_to_n(), rect_to_n_range()
+    - CellularRule,CellularRule54,CellularRule57,CellularRule190
+      new parameter n_start
+    - DiagonalRationals new parameter direction=up
+
+Version 100, March 2013
+    - new absdx_minimum(),absdx_maximum(), absdy_minimum(),absdy_maximum(),
+      dir_minimum_dxdy(),dir_maximum_dxdy()
+    - AztecDiamondRings new parameter n_start
+    - TriangleSpiralSkewed new parameter skew=right,up,down
+    - WythoffArray new parameters x_start,y_start
+    - PlanePathDelta new delta_type=>"dAbsDiff"
+
+Version 99, February 2013
+    - oops, correction to IntXY on negatives
+
+Version 98, February 2013
+    - CoprimeColumns,DiagonalRationals,DivisibleColumns new n_start parameter
+    - PlanePathCoord new coordinate_type "IntXY"
+
+Version 97, January 2013
+    - new tree_num_children_minimum(), tree_num_children_maximum()
+
+Version 96, January 2013
+    - AnvilSpiral,HexSpiral,HexSpiralSkewed new n_start, which was in
+      parameter_info but did nothing
+    - FilledRings new n_start parameter
+
+Version 95, December 2012
+    - new tree_any_leaf()
+    - PythagoreanTree new coordinates="AC" and "BC"
+
+Version 94, December 2012
+    - new rsquared_minimum(), rsquared_maximum()
+    - PlanePathCoord new coordinate_type "IsLeaf","IsNonLeaf"
+    - ImaginaryHalf new option "digit_order"
+    - Math::PlanePath::Base::Generic new parameter_info_nstart1()
+
+Version 93, November 2012
+    - new xy_is_visited()
+    - PlanePathCoord new coordinate_type "Min","Max","BitAnd","BitOr","BitXor"
+
+Version 92, October 2012
+    - new x_minimum(),x_maximum(), y_minimum(),y_maximum(),
+      dx_minimum(),dx_maximum(), dy_minimum(),dy_maximum()
+
+Version 91, October 2012
+    - new tree_depth_to_n(), tree_depth_to_n_end()
+    - RationalsTree new tree_type "HCS"
+    - UlamWarburton,UlamWarburtonQuarter new "n_start" parameter
+    - PlanePathN new line_type=>"Depth_start","Depth_end"
+    - Math::PlanePath::Base::Digits new bit_split_lowtohigh()
+
+Version 90, October 2012
+    - new CfracDigits, ChanTree
+    - tree_n_num_children() return undef when no such N
+    - Diagonals new x_start,y_start parameters
+    - PlanePathCoord new coordinate_type "GCD"
+
+Version 89, September 2012
+    - RationalsTree new tree_type=L
+
+Version 88, September 2012
+    - new DekkingCurve, DekkingCentres
+    - new tree_n_to_depth()
+    - PlanePathCoord new coordinate_type "Depth"
+    - DiamondSpiral new "n_start" parameter
+
+Version 87, August 2012
+    - new tree_n_num_children()
+    - PlanePathCoord new coordinate_type "NumChildren"
+    - SierpinskiArrowhead,SierpinskiArrowheadCentres new parameter
+      align=right,left,diagonal
+    - Rows,Columns new "n_start" parameter
+    - KnightSpiral,PentSpiral,SierpinskiCurve fixes for n_to_xy() on
+      some fractional N
+
+Version 86, August 2012
+    - Diagonals,DiagonalsOctant,DiagonalsAlternating,PyramidRows,PyramidSides,
+      Corner new "n_start" parameter
+
+Version 85, August 2012
+    - SquareSpiral new "n_start" parameter
+    - PlanePathDelta new delta_type=>"AbsdX","AbsdY"
+
+Version 84, August 2012
+    - PyramidRows new "align" parameter
+
+Version 83, July 2012
+    - new n_to_dxdy()
+    - SierpinskiTriangle new parameter align=right,left,diagonal
+    - SierpinskiTriangle,TriangleSpiral,TriangleSpiralSkewed,Hypot new
+      "n_start" parameter
+    - PlanePathDelta new delta_type=>"dDiffYX"
+    - PlanePathN new line_type=>"Diagonal_NW","Diagonal_SW","Diagonal_SE"
+    - Math::PlanePath::Base::Digits new digit_join_lowtohigh()
+    - new Math::PlanePath::Base::Generic round_nearest()
+
+Version 82, July 2012
+    - new tree_n_children(), tree_n_parent()
+    - PlanePathDelta new delta_type=>"dDiffXY"
+    - ImaginaryBase,ImaginaryHalf rect_to_n_range() exact
+    - new Math::PlanePath::Base::Digits round_down_pow(),
+      digit_split_lowtohigh(), parameter_info_array(), parameter_info_radix2()
+
+Version 81, July 2012
+    - TriangularHypot new points=hex,hex_rotated,hex_centred
+
+Version 80, July 2012
+    - new AlternatePaperMidpoint
+    - AlternatePaper new "arms"
+    - GreekKeySpiral new "turns"
+    - ComplexPlus, Flowsnake, FlowsnakeCentres, TerdragonMidpoint,
+      TerdragonRounded, R5DragonMidpoint fix for arms>1 fractional N
+
+Version 79, June 2012
+    - TriangularHypot new option points=odd,even
+
+Version 78, June 2012
+    - new WythoffArray, PowerArray
+    - GcdRationals new option pairs_order
+    - Hypot,HypotOctant new option points=odd,even
+    - Diagonals new options direction=up,down
+
+Version 77, June 2012
+    - new DiagonalsOctant
+
+Version 76, May 2012
+    - tests allow for as_float() only in recent Math::BigRat
+
+Version 75, May 2012
+    - new CubicBase, CCurve, R5DragonCurve, R5DragonMidpoint, TerdragonRounded
+    - MultipleRings new ring_shape=>"polygon"
+    - PlanePathDelta new delta_type=>"dSum"
+    - fix TheodorusSpiral n_to_rsquared() on fractional N
+
+Version 74, May 2012
+    - new ImaginaryBase
+    - new method n_to_rsquared()
+    - PlanePathN new line_type X_neg,Y_neg
+    - fix ImaginaryBase xy_to_n() possible infloop on floating point rounding
+    - fix TerdragonMidpoint xy_to_n() undef on points outside requested arms
+
+Version 73, April 2012
+    - new GrayCode, SierpinskiCurveStair, WunderlichSerpentine
+    - fix GcdRationals xy_to_n() on BigInt
+    - PlanePathCoord new coordinate_type "SumAbs","TRadius","TRSquared"
+
+Version 72, March 2012
+    - PlanePathTurn new turn_type "Right"
+
+Version 71, February 2012
+    - new FilledRings
+    - misc fixes for Math::NumSeq::PlanePathCoord etc values_min etc
+
+Version 70, February 2012
+    - TheodorusSpiral fix n_to_xy() position saving
+    - StaircaseAlternating new end_type=>"square"
+
+Version 69, February 2012
+    - new Math::NumSeq::PlanePathTurn
+    - Math::NumSeq::PlanePathN new pred()
+
+Version 68, February 2012
+    - new xy_to_n_list()
+    - new CretanLabyrinth
+
+Version 67, February 2012
+    - oops, DragonMidpoint,DragonRounded xy_to_n() exclude points on the
+      arm one past what was requested
+    - new CellularRule57
+
+Version 66, February 2012
+    - new TerdragonMidpoint
+    - DragonCurve,DragonMidpoint,DragonRounded,TerdragonCurve faster xy_to_n()
+
+Version 65, January 2012
+    - new parameter_info_hash(), n_frac_discontinuity()
+
+Version 64, January 2012
+    - new AnvilSpiral, AlternatePaper, ComplexPlus, TerdragonCurve
+
+Version 63, January 2012
+    - new class_x_negative() and class_y_negative() methods
+    - new CellularRule, ComplexRevolving, Math::NumSeq::PlanePathN
+    - Math::NumSeq::PlanePathCoord etc new planepath_object option
+
+Version 62, December 2011
+    - new FractionsTree
+
+Version 61, December 2011
+    - new FactorRationals
+
+Version 60, December 2011
+    - new GcdRationals
+
+Version 59, December 2011
+    - new AR2W2Curve
+
+Version 58, December 2011
+    - new DiagonalRationals, StaircaseAlternating,
+      Math::NumSeq::PlanePathDelta
+
+Version 57, December 2011
+    - new HilbertSpiral
+    - LTiling new L_fill "left" and "upper"
+
+Version 56, December 2011
+    - new CincoCurve, DiagonalsAlternating, LTiling
+
+Version 55, November 2011
+    - new KochelCurve, MPeaks
+    - Flowsnake,QuintetCurve faster xy_to_n()
+
+Version 54, November 2011
+    - new WunderlichMeander
+    - PlanePathCoord new coordinate_type "Product","DiffXY","DiffYX","AbsDiff"
+    - BetaOmega,CellularRule190 exact rect_to_n_range()
+
+Version 53, November 2011
+    - new FibonacciWordFractal, Math::NumSeq::PlanePathCoord
+
+Version 52, November 2011
+    - new BetaOmega, CornerReplicate, DigitGroups, HIndexing
+
+Version 51, October 2011
+    - new CellularRule190
+
+Version 50, October 2011
+    - DragonRounded fix xy_to_n() with arms=2,3,4 on innermost XY=0,1
+    - SierpinskiCurve fixes for rect_to_n_range()
+
+Version 49, October 2011
+    - new AztecDiamondRings, DivisibleColumns, SierpinskiCurve,
+      UlamWarburtonQuarter
+    - SierpinskiArrowheadCentres fix for n_to_xy() on fractional $n
+
+Version 48, October 2011
+    - new UlamWarburton
+
+Version 47, October 2011
+    - new SquareReplicate
+
+Version 46, September 2011
+    - new GosperReplicate
+
+Version 45, September 2011
+    - new QuintetCurve, QuintetCentres, QuintetReplicate
+
+Version 44, September 2011
+    - new ComplexMinus
+    - RationalsTree new tree_type=Drib
+    - Corner new wider parameter
+
+Version 43, September 2011
+    - new KochSquareflakes, RationalsTree
+    - new parameter_info_array(), parameter_info_list()
+
+Version 42, September 2011
+    - new SierpinskiArrowheadCentres, SierpinskiTriangle
+
+Version 41, August 2011
+    - new QuadricCurve, QuadricIslands, ImaginaryBase
+
+Version 40, August 2011
+    - new DragonRounded, CellularRule54
+    - new arms_count() method
+    - Flowsnake, FlowsnakeCentres new "arms" parameter
+
+Version 39, August 2011
+    - new DragonCurve, DragonMidpoint
+
+Version 38, August 2011
+    - new Flowsnake, FlowsnakeCentres
+
+Version 37, July 2011
+    - new SquareArms, DiamondArms, File
+
+Version 36, July 2011
+    - new HexArms
+    - PeanoCurve new radix parameter
+
+Version 35, July 2011
+    - new GosperSide
+    - fixes for experimental BigFloat support
+
+Version 34, July 2011
+    - ZOrderCurve new radix parameter
+
+Version 33, July 2011
+    - new GosperIslands
+
+Version 32, June 2011
+    - new SierpinskiArrowhead, CoprimeColumns
+
+Version 31, June 2011
+    - KochCurve fix for fractional N
+
+Version 31, June 2011
+    - PythagoreanTree avoid dubious hypot() on darwin 8.11.0
+
+Version 30, May 2011
+    - new TriangularHypot, KochCurve, KochPeaks, KochSnowflakes
+
+Version 29, May 2011
+    - GreekKeySpiral rect_to_n_range() tighter $n_lo
+    - tests more diagnostics on PythagoreanTree
+
+Version 28, May 2011
+    - PixelRings xy_to_n() fix some X==Y points should be undef
+
+Version 27, May 2011
+    - new GreekKeySpiral
+
+Version 26, May 2011
+    - new PythagoreanTree
+    - Rows,Columns more care against width<=0 or height<=0
+
+Version 25, May 2011
+    - tests fix neg zero for long double NV
+
+Version 24, May 2011
+    - tests fix OEIS file comparisons
+    - MultipleRings xy_to_n() fix for x=-0,y=0
+
+Version 23, April 2011
+    - new ArchimedeanChords
+    - TheodorusSpiral rect_to_n_range() tighter $n_lo
+
+Version 22, March 2011
+    - new n_start() method
+    - SacksSpiral rect_to_n_range() include N=0
+
+Version 21, February 2011
+    - new Hypot, HypotOctant, OctagramSpiral
+    - TheodorusSpiral, VogelFloret allow for xy_to_n() result bigger than IV
+      (though that big is probably extremely slow)
+
+Version 20, February 2011
+    - fix Makefile.PL for perl 5.6.0
+    - tests avoid stringized "-0" from perl 5.6.x
+
+Version 19, January 2011
+    - new PixelRings
+
+Version 18, January 2011
+    - avoid some 5.12 warnings on infs
+
+Version 17, January 2011
+    - avoid some inf loops and div by zeros for n=infinity or x,y=infinity
+      (handling of infinity is unspecified, but at least don't hang)
+    - PyramidRows, PyramidSides exact rect_to_n_range()
+
+Version 16, January 2011
+    - new PeanoCurve, Staircase
+
+Version 15, January 2011
+    - MultipleRings fix xy_to_n() and rect_to_n_range() at 0,0
+    - Corners,Diagonals,MultipleRings tighter rect_to_n_range()
+
+Version 14, December 2010
+    - HilbertCurve exact rect_to_n_range()
+
+Version 13, December 2010
+    - new HilbertCurve, ZOrderCurve
+
+Version 12, October 2010
+    - oops, VogelFloret botched rect_to_n_range()
+
+Version 11, October 2010
+    - VogelFloret new rotation and radius parameters
+    - SacksSpiral,VogelFloret tighter rect_to_n_range() when away from origin
+
+Version 10, October 2010
+    - fix MultipleRings xy_to_n()
+
+Version 9, September 2010
+    - HexSpiral and HexSpiralSkewed new "wider" parameter
+
+Version 8, September 2010
+    - tests fix stray 5.010 should be just 5.004
+
+Version 7, August 2010
+    - new MultipleRings
+    - VogelFloret xy_to_n() fix for positions away from exact N
+    - Rows, Columns rect_to_n_range() tighter
+
+Version 6, August 2010
+    - new TheodorusSpiral
+
+Version 5, July 2010
+    - SquareSpiral new "wider" parameter
+
+Version 4, July 2010
+    - new PentSpiral, HeptSpiralSkewed
+    - PyramidRows "step" parameter
+
+Version 3, July 2010
+    - new PyramidSpiral, TriangleSpiral, TriangleSpiralSkewed, PentSpiralSkewed
+
+Version 2, July 2010
+    - in Diagonals don't negative sqrt() if n=0
+
+Version 1, July 2010
+    - the first version

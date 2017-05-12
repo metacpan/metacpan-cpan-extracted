@@ -1,0 +1,12 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/MIDI/Praxis/Variation.pm
+t/001_about_verbose.t
+t/002_load.t
+t/003_pod.t
+t/004_pod_coverage.t
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

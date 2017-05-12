@@ -1,0 +1,32 @@
+MetaCode/Reader version 0.01
+============================
+
+Perl module for translating Xerox's binary data format printer file format
+into a human readable format.
+
+The Xerox Metacode format is fed directly to Xerox Enterprise Printing
+Systems (EPS) for large volumn print jobs. The format is unpublished and this
+module only handles part of the decoding task. You will have to continue the
+reverse engineering effort if you want to get positional or drawing
+characters to appear.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build install
+
+COPYRIGHT AND LICENCE
+
+Copyright 2003, Joshua b. Jore. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of either:
+
+a) the GNU General Public License as published by the Free Software
+   Foundation; version 2, or
+
+b) the "Artistic License" which comes with Perl.
+

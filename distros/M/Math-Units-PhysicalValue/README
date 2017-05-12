@@ -1,0 +1,24 @@
+AUTHOR'S NOTE 
+
+    I was unhappy with the unfinished Math::Calc::Units; but I was
+    happy with Math::Units.  I felt that there should be a perl
+    module that handles units in a human readable way.
+
+    -Paul
+
+SYNOPSIS
+
+    use Math::Units::PhysicalValue qw(PV);
+
+    my $exit  = PV "10,000 ft";
+    my $open  = "3500 ft";
+    my $delay = "43 s";
+
+    my $dist  = $exit - $open;
+    my $rate  = $dist / $delay;
+
+    my $weight = "180 lbs";
+    my $momentum = ($weight * ( ($exit - $open) / $delay )) + "0 kg*m/s";
+
+    print "$momentum\n";                     # prints 3,761.82 kg*m/s
+    print ($rate + "0 miles/hour"), "\n"     # prints 103.07 miles/hour

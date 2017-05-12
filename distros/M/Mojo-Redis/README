@@ -1,0 +1,37 @@
+NAME
+    Mojo::Redis - DEPRECATED Redis client
+
+DESCRIPTION
+    Mojo::Redis is replaced by Mojo::Redis2.
+
+    THIS MODULE IS NO LONGER MAINTAINED AND WILL BE REPLACED BY A COMPLETELY
+    NEW API DURING 2015.
+
+    The new API is available in Mojo::Redis2.
+
+    Some time during 2015, this module will be completely replaced by the
+    code from Mojo::Redis2.
+
+    YOU SHOULD NOT USE THIS MODULE. THE RISK OF MEMORY LEAKS AND MISSING OUT
+    ON ERRORS IS INEVITABLE.
+
+    The exact date for replacement is not yet set, but when it's replaced
+    your existing Mojo::Redis code *will* break.
+
+    REPLACE Mojo::Redis WITH Mojo::Redis2 NOW.
+
+SUPPORT
+    There's no support for this module.
+
+AUTHOR
+    Sergey Zasenko, "undef@cpan.org".
+
+    Forked from MojoX::Redis and updated to new IOLoop API by Marcus Ramberg
+    "mramberg@cpan.org" and Jan Henning Thorsen "jhthorsen@cpan.org".
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2010-2011, Sergey Zasenko (C) 2012, Marcus Ramberg
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+

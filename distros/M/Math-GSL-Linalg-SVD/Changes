@@ -1,0 +1,6 @@
+Revision history for Perl extension Math::GSL::Linalg::SVD.
+
+0.01  Fri Dec 11 18:26:12 2009
+	- original version; created by h2xs 1.23 with options
+		-c Math::GSL::Linalg::SVD
+

@@ -1,0 +1,6 @@
+Module::Build::PM_Filter 
+------------------------------
+
+- Improve the test 
+- Add more examples
+- Fix the build of the examples pack

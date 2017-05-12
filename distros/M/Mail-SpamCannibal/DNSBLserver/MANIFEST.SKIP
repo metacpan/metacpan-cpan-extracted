@@ -1,0 +1,15 @@
+Makefile
+Makefile\.old
+pm_to_blib
+blib
+~$
+c_version\.h
+config\.db
+config\.log
+\.bs
+\.o
+CTest\.c
+dnsbls
+dnsbls\.pod
+mysiteconf\.h
+\.gz$

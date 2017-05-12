@@ -1,0 +1,6 @@
+Revision history for Perl extension Module::DynamicSubModule.
+
+0.01  Sun Nov 11 03:49:16 2007
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Module::DynamicSubModule
+

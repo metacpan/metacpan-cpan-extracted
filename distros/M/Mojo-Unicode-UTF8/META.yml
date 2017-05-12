@@ -1,0 +1,38 @@
+---
+abstract: 'use Unicode::UTF8 as the UTF-8 encoder for Mojolicious'
+author:
+  - 'Dan Book <dbook@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-Unicode-UTF8
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+provides:
+  Mojo::Unicode::UTF8:
+    file: lib/Mojo/Unicode/UTF8.pm
+    version: '0.002'
+requires:
+  Mojolicious: '6.0'
+  Unicode::UTF8: '0.58'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/Grinnz/Mojo-Unicode-UTF8/issues
+  homepage: https://github.com/Grinnz/Mojo-Unicode-UTF8
+  repository: https://github.com/Grinnz/Mojo-Unicode-UTF8.git
+version: '0.002'
+x_contributors:
+  - 'Dan Book <grinnz@grinnz.com>'

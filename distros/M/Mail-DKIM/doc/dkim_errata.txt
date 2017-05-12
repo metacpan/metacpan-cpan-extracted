@@ -1,0 +1,44 @@
+Following are some notes about gray areas in the RFC 4871 DKIM
+specification.
+
+
+Section 3.4.4 "relaxed" Body Canonicalization
+
+  Empty bodies. Unlike the "simple" body canonicalization, which
+  explicitly says to add a CRLF, the "relaxed" body canonicalization
+  does not say this. The consensus at DKIM-Interop was NOT to add
+  a CRLF for "relaxed" body canonicalization when the body is empty.
+
+
+Section 3.5 "i= Identity of the user or agent"
+
+  In the section describing "identity", it says dkim-quoted-printable
+  encoding is to be used, but quoted printable is not mentioned in the
+  ABNF. The ABNF includes the "Local-part" token, which allows a quoted
+  string with backslashes to escape certain characters.
+
+  My interpretation (combining the text and my own reasoning), is that
+  the i= tag value should be the dkim-quoted-printable encoding of:
+
+    [ Local-part ] "@" domain-name
+
+  So, e.g.
+                                     local part     domain
+                                     ----------     -----------
+    i="meet=20joe"@example.com  =>   "meet joe"     example.com
+    i="fine=3Bmess"@example.com =>   "fine;mess"    example.com
+    i="j=20s=22@example.com     =>   "j s"          example.com
+    i=j smith @ example . com   =>   jsmith         example.com
+
+
+Section 3.6.1 "granularity of the key"
+
+  Does "an empty g= value never matches any addresses" mean that any
+  signature, no matter the i= value, using this key cannot be
+  matched? The consensus at DKIM-Interop was that YES, that's what
+  it means.
+
+  It should be noted that this is an incompatible change from
+  RFC4870-DomainKeys, where an empty g= tag in the public key is
+  equivalent to g=*, which would match anything.
+

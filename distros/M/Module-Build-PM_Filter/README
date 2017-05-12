@@ -1,0 +1,77 @@
+Module-Build-PM_Filter
+
+DESCRIPTION 
+
+This module provides a Module::Build compatible class and adds a filter for
+.pm, .pl and script files. The filter could be used to replace Perl source
+from development environment to production, or to remove debug sentences.
+
+In the debug phase we can play with the application and modules without
+mattering to us where the library are; when we build the package for
+distribution, the modules and the scripts will contain the correct path in the
+final location.
+
+In addition the module makes sure that the archives pm_filter and debian/rules
+are copied in the distribution directory with the suitable permissions.
+
+SYNOPSIS
+
+In a Build.PL file you must use this module in place of the L<Module::Build>:
+
+    use Module::Build::PM_Filter;
+
+    my $build = Module::Build::PM_Filter->new(
+                module_name         =>  'MyIkiWiki::Tools',
+                license             =>  q(gpl),
+                dist_version        =>  '0.2',
+                dist_author         =>  'Víctor Moral <victor@taquiones.net>',
+                );
+
+    $build->create_build_script();
+
+In the package directory build a pm_filter file like this:
+
+    #!/usr/bin/perl -pl
+
+    s{##PACKAGE_LIB##}{use lib qw(/usr/share/myprogram);}g;
+
+and change its permissions for user execution.
+
+Then in a script from package insert a line like this:
+
+    package MyPackage;
+    use strict;
+    use base;
+    ...
+
+    ##PACKAGE_LIB##
+
+    ...
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Víctor Moral
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License.
+

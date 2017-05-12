@@ -1,0 +1,63 @@
+Revision history for Perl extension Math::BaseCalc.
+
+1.17 - Fri Jun  7 21:54:56 CDT 2013
+
+ - Fixed problem that occurs when digits of an M::BC object are
+   changed. [John M. Gamble]
+
+ - Moved repository from Google Code to GitHub.
+
+1.16 - Fri May 13 22:16:37 CDT 2011
+
+ - Added some minimal support for Math::BigInt.
+
+1.15 - Tue May 10 23:34:09 CDT 2011
+
+ - Fixed a problem converting very-large numbers (near the integer
+   limits of Perl's native types). [Spotted by Jacob Bunk Nielsen]
+
+1.14 - Sat Feb 26 21:06:25 CST 2011
+
+ - Added the ability to use a dash as a valid digit, which turns off
+   recognition of negative numbers. [Nicolas]
+
+ - Fixed typo in docs. [Takayuki Kawakami]
+
+ - Updated distribution to use Dist::Zilla.
+
+1.13 - Sat Jan 17 17:23:22 2009
+
+ - Fixed a test failure that occurred on some subset of 64-bit
+   machines. [Brian Szymanski, Andreas J. König]
+
+ - Moved the repository to SVN hosting at code.google.com instead of
+   CVS on my laptop.
+
+1.12 - Thu Jun 26 16:01:32 2008
+
+ - Modernized the layout of the distribution, including a lib/
+   directory, t/ directory, and using Test::More instead of rolling my
+   own TAP function.  [Todd E. Rinaldo]
+
+1.011  Sat Mar 09 22:46:07 2002
+
+ - Fixed a warning & a couple of tiny doc errors
+
+1.009  Thu Mar 29 21:28:57 EST 2001
+
+ - Now supports non-integers.  Thanks to jdimov@cis.clarion.edu for
+   idea (though I used a different implementation)
+
+ - Handles large numbers (bigger than 2^32, or type 'int').
+   [mizuhara@bellsouth.net (Mizuhara Mokoto)]
+
+1.008  2000/08/28 14:56:09
+
+ - Fixed a problem with from_base() and negative numbers.  They were
+   being treated as positive numbers.  [armengou@fonocom.es (Xavier Armengou)]
+
+
+1.007  Sun May 23 19:23:33 1999
+
+ - original version
+

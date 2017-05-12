@@ -1,0 +1,20 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml # Will be created by "make dist"
+README
+examples/calc-graham.pl
+inc/Test/Run/Builder.pm
+lib/Math/GrahamFunction.pm
+lib/Math/GrahamFunction/Object.pm
+lib/Math/GrahamFunction/SqFacts.pm
+lib/Math/GrahamFunction/SqFacts/Dipole.pm
+t/00-load.t
+t/01-results.t
+t/boilerplate.t
+t/cpan-changes.t
+t/pod-coverage.t
+t/pod.t
+t/style-trailing-space.t

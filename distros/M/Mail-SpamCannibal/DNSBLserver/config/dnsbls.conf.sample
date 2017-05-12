@@ -1,0 +1,153 @@
+#!/usr/bin/perl
+
+# Configuration for SpamCannibal::DNSBLserver
+
+my $DNSBLS = {
+
+# Specify the Zone Name for which this server is authoratative.
+# If not specified, the hostname of this server is used.
+# [ OPTIONAL, RECOMMENDED ]
+
+#	zonename	=> 'pfftt.mydomain.com',
+
+# Set the Contact name for the SOA record (an email address).
+# The @ sign will be replaced by a period (.) automagically. 
+# Default if not specified is root@(zonename).
+# [ OPTIONAL ]
+
+#	contact		=> 'person@mydomain.com',
+
+# Set the actual ttl for the SOA record. This used in 
+# combination with the TTL/minimum below to set the netative
+# caching interval for client DNS caches. The negative TTL
+# is the lesser of this setting or TTL/minimum below.
+# May be specified in seconds or alphanumerics or both
+#	i.e.	1w 1d 1h 1m 1s
+# [ OPTIONAL ]
+
+	neg_cache	=> '10m',	# 0 seconds default
+
+# Set the update/refresh interval for the SOA record.
+# [ OPTIONAL ]
+
+#	refresh		=> '12h',	# 43200 seconds default
+
+# Set the retry interval for the SOA record.
+# [ OPTIONAL ]
+
+#	retry		=> '1h',	# 3600 seconds default
+
+# Set the expire interval for the SOA record.
+# [ OPTIONAL ]
+
+#	expire		=> '1d',	# 86400 seconds default
+
+# Set the TTL/minimum for the SOA record.
+# [ OPTIONAL ]
+
+#	minimum		=> '5h',	# 10800 seconds default
+
+# Specify one or more name servers authoratative for this zone.
+# at a minimum, this host must be authoratitive for the zone.
+# If the name server is NOT this host, then it is not necessary
+# to specify the IP address. The IP address(s) will be retrieved
+# using DNS queries. Your resolver must be properly configured.
+# [ REQUIRED ] unless 'host' is set below
+
+#	ns	=> {			#    ip address
+#		'pfftt.mydomain.com'	=> '192.168.2.3',
+#			or if multihomed
+#					=> ['11.22.33.44', '55.66.77.88', ...]
+#		'ns2.second.domain.com'	=> '',	# looked up automatically
+#		},
+
+# Specify the name and optionally the IP address of the dnsbls host
+# as reported by the server. Same function as 'ns' above but also
+# sets the "local" host name from the daemon's viewpoint
+# [ REQUIRED ] unless 'ns' is set above
+	host	=> {			# ip address or blank ''
+		'my.local.name.com'	=> '22.33.44.55',
+		},
+
+# Specify MX servers if any. The IP requirements are the same as
+# for name servers -- optional
+# [ OPTIONAL ]
+
+#	mx	=> {			# priority, IP address
+#		'mx1.maildomain.com'	=> [ 10, '172.16.5.6', '22.33.44.55', ... ],
+#		'mx2.maildomain.com'	=> [ 50, '' ],	# looked up
+#		},
+
+# Block or allow AXFR transfers
+# [ REQUIRED ]
+
+	block		=>	1,
+
+# Set the port number that dnsbls listens on. 
+# Default, standard DNS port 53.
+# [ OPTIONAL ]
+
+#	port		=>	53,
+
+# Logs any dnsbls activity to syslog.
+# [ OPTIONAL ]
+
+#	log		=>	1,
+
+# Log verbosely to syslog
+# [ OPTIONAL ]
+
+#	verbose		=>	1,
+
+# Specify the default message for TXT record for numeric queries that are
+# found in the tarpit database but not found in the blcontrib database.
+# The message may be up to 255 characters in length.
+# [ REQUIRED ]
+
+	'127.0.0.2'	=> 'ERROR: connection tarpitted. See: http://www.mydomain.com',
+#	'127.0.0.2'	=> 'blocked, see: http://www.spamcannibal.org/cannibal.cgi?page=lookup&lookup=',
+#
+
+# Specify additional test response codes for 'dnsbls'
+# [ OPTIONAL ]
+
+#	response	=> {
+#		'127.0.0.3'	=> 'TEST RESPONSE: any text',
+#	},
+
+######################################################################
+######	The following options override parameters that would	######
+######	ordinarily be taken from the installation configuration	######
+######	For a standard installation there is no reason for them	######
+######								######
+######	       See:  man Mail::SpamCannibal::SiteConfig		######
+######								######
+######################################################################
+
+# Set the database root (aka) path to db environment home.
+# [ OPTIONAL ]
+
+#	environment	=>	'/var/run/dbtarpit',	# default
+
+# Set the tarpit database name.
+# [ OPTIONAL ]
+
+#	tarpit		=>	'tarpit',		# default
+
+# Set the contrib database name.
+# [ OPTIONAL ]
+
+#	contrib		=>	'blcontrib',		# default
+
+# Set the evidence database name.
+# [ OPTIONAL ]
+
+#	evidence	=>	'evidence',		# default
+
+# END dnsbls configuration
+#
+#	For a description of all the options, see the man pages for:
+#		Mail::SpamCannibal::DNSBLserver
+#
+};
+

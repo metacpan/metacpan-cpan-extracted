@@ -1,0 +1,23 @@
+Changes
+lib/Markup/Perl.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01basic.t
+t/02headers.t
+t/03edge.t
+t/04src.t
+t/05utf8.t
+t/basic1.xml
+t/edge1.xml
+t/edge2.xml
+t/notutf.xml
+t/edge3.xml
+t/edge4.xml
+t/notutf2.xml
+t/src1.xml
+t/src2.xml
+t/utf1.xml
+t/utf2.xml
+t/utf3.xml
+META.yml                                 Module meta-data (added by MakeMaker)

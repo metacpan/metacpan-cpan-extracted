@@ -1,0 +1,33 @@
+Revision history for Perl extension Module::List::Pluggable.
+
+0.01  Thu Apr 26 23:03:59 2007
+	- original version; created by h2xs 1.23 with options
+		-AX -nModule::List::Pluggable -b5.6.0
+
+0.02  Wed May 16 18:12:32 PDT 2007
+        - fixed tests: neglected to add t/dat/* to MANIFEST
+
+
+0.03  Wed May 16 18:12:32 PDT 2007
+        - specified dependency on Class::Base
+
+0.04  Monday May 28, 2007   7:42 PM
+        - pod revisions
+
+0.05  Friday June  1, 2007  11:31 PM
+        - fixed test failures under perl 5.6: eliminated
+        unintended 5.8.0 dependency via the test module
+        DummyProject::Modulular::Stuff which used Hash::Util, and
+        also made the two tests using the test module conditional
+        on it loading correctly.
+
+0.06  Sunday June  3, 2007   1:47 PM
+        - fixed another test failure under perl 5.6 (sort-order
+        was undefined in a two-element array in a deeply data
+        nested structure).
+
+0.07  Sunday June 10, 2007  11:30 AM
+        - bumping module dependencies up to 5.8.0
+
+0.08  Thursday March 20, 2008  11:57 AM
+        - pod improvements

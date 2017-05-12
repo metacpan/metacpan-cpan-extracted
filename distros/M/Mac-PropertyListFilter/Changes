@@ -1,0 +1,6 @@
+Revision history for Perl extension Mac::PropertyListFilter.
+
+0.01  Wed Apr  7 20:32:31 2004
+	- original version; created by h2xs 1.22 with options
+		-AXn Mac::PropertyListFilter
+

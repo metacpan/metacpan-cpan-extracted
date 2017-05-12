@@ -1,0 +1,117 @@
+---
+abstract: 'A Static Content Management System'
+author:
+  - 'Peter Shangov <pshangov@yahoo.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Miril
+provides:
+  Miril:
+    file: lib/Miril.pm
+    version: 0.008
+  Miril::App::Cmd:
+    file: lib/Miril/App/Cmd.pm
+  Miril::App::Cmd::Command::publish:
+    file: lib/Miril/App/Cmd/Command/publish.pm
+  Miril::App::Cmd::Command::server:
+    file: lib/Miril/App/Cmd/Command/server.pm
+  Miril::App::PSGI:
+    file: lib/Miril/App/PSGI.pm
+  Miril::CGI::Application:
+    file: lib/Miril/CGI/Application.pm
+  Miril::Config:
+    file: lib/Miril/Config.pm
+  Miril::DateTime:
+    file: lib/Miril/DateTime.pm
+  Miril::DateTime::ISO::Simple:
+    file: lib/Miril/DateTime/ISO/Simple.pm
+  Miril::Exception:
+    file: lib/Miril/Exception.pm
+  Miril::Filter::Markdown:
+    file: lib/Miril/Filter/Markdown.pm
+  Miril::InputValidator:
+    file: lib/Miril/InputValidator.pm
+  Miril::List:
+    file: lib/Miril/List.pm
+  Miril::Post:
+    file: lib/Miril/Post.pm
+  Miril::Publisher:
+    file: lib/Miril/Publisher.pm
+    version: 0.007
+  Miril::Store::File:
+    file: lib/Miril/Store/File.pm
+  Miril::Store::File::Post:
+    file: lib/Miril/Store/File/Post.pm
+  Miril::Template::Abstract:
+    file: lib/Miril/Template/Abstract.pm
+  Miril::Template::HTML::Template:
+    file: lib/Miril/Template/HTML/Template.pm
+  Miril::Template::Text::Template:
+    file: lib/Miril/Template/Text/Template.pm
+  Miril::Theme::Flashyweb:
+    file: lib/Miril/Theme/Flashyweb.pm
+  Miril::Theme::Flashyweb::Stylesheet:
+    file: lib/Miril/Theme/Flashyweb/Stylesheet.pm
+  Miril::Topic:
+    file: lib/Miril/Topic.pm
+  Miril::Type:
+    file: lib/Miril/Type.pm
+  Miril::URL:
+    file: lib/Miril/URL.pm
+  Miril::UserManager::XMLTPP:
+    file: lib/Miril/UserManager/XMLTPP.pm
+  Miril::Util:
+    file: lib/Miril/Util.pm
+  Miril::View:
+    file: lib/Miril/View.pm
+  Miril::Warning:
+    file: lib/Miril/Warning.pm
+requires:
+  App::Cmd: 0
+  CGI: 0
+  CGI::Application: 0
+  CGI::Application::Emulate::PSGI: 0
+  CGI::Application::Plugin::Authentication: 0
+  CGI::Application::Plugin::Forward: 0
+  CGI::Application::Plugin::Redirect: 0
+  CGI::Cookie: 0
+  Carp: 0
+  Class::Autouse: 0
+  Cwd: 0
+  Data::AsObject: 0
+  Data::Page: 0
+  Digest::MD5: 0
+  Exception::Class: 0
+  File::Copy: 0
+  File::Path: 0
+  File::Slurp: 0
+  File::Spec: 0
+  HTML::Template::Pluggable: 0
+  HTML::Template::Plugin::Dot: 0
+  IO::File: 0
+  List::Util: 0
+  Module::Load: 0
+  Number::Format: 0
+  Object::Tiny: 0
+  POSIX: 0
+  Plack::Loader: 0
+  Ref::List: 0
+  Scalar::Util: 0
+  Syntax::Keyword::Gather: 0
+  Text::MultiMarkdown: 0
+  Text::Sprintf::Named: 0
+  Time::Format: 0
+  Time::Local: 0
+  Try::Tiny: 0
+  XML::TreePP: 0
+  autodie: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.008

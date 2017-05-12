@@ -1,0 +1,61 @@
+NAME
+    Module::MakeMaker - A New Way to Make Modules
+
+SYNOPSIS
+        > mmm
+        > vim Mmm.yaml
+        > make
+        > make test
+        > make install
+        > make dist
+
+DESCRIPTION
+    Module::MakeMaker (MMM) is a new way to make modules. It builds on the
+    the old, tried and true method, but automates the repetitive, cumbersome
+    and error prone steps involved. It leverages YAML, Makefiles and
+    templating, to do the right things you want to do, when they need to be
+    done. This means you can apply a simple patch to your module, and then
+    run:
+
+        make upload
+
+    and know that all the appropriate actions need will be performed, and if
+    they are all successful, your module will be on its way to CPAN, and you
+    can move on to your next task.
+
+    MMM bootstraps a module environment from meta information that you
+    specify in "MMM.yaml" or "MMM/config.yaml" files. You can spread this
+    data over local and general yaml files to eliminate duplication.
+
+    The main difference between MMM and the traditional style is that none
+    of the files that you create in your module directory are used in the
+    actual distribution. These files are all copied (or templated or
+    generated) into a "cpan/" subdirectory and that is the final place for
+    testing and building the CPAN distribution.
+
+    You never need to edit the files in the "cpan/" directory. Also you can
+    run all the common make commands:
+
+        > make
+        > make test
+        > make install
+        > make dist
+
+    without needing to cd into the "cpan/" directory. The MMM Makefile has
+    targets to run these commands from the top level for you.
+
+    To get started, run the "mmm" command in your new or existing module
+    directory. It will set up things for you and tell you what you need to
+    do next.
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2008. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

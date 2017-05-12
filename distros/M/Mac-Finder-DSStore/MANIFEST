@@ -1,0 +1,20 @@
+README				Read this first.
+BuddyAllocator.pm		Buddy allocator implementation
+Build.PL			Build script
+DSStore.pm			Main module
+DSStoreFormat.pod		In-depth file format notes
+MANIFEST			This list of files
+META.yml			Machine-readable package information
+t/alloc_incore.t
+t/alloc_ondisk.t
+t/alloc_r.t
+t/btree.t
+t/pod.t
+t/recs_make.t
+t/recs_rw.t
+t/store1
+examples/circle.pl
+examples/dsstore_dump.pl
+examples/dumprecs.pl
+META.json
+SIGNATURE    Added here by Module::Build

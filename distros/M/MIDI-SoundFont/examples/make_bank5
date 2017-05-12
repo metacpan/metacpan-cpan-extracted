@@ -1,0 +1,406 @@
+#! /usr/bin/perl
+#########################################################################
+#        This Perl script is Copyright (c) 2012, Peter J Billam         #
+#                          www.pjb.com.au                               #
+#                                                                       #
+#     This script is free software; you can redistribute it and/or      #
+#            modify it under the same terms as Perl itself.             #
+#########################################################################
+use MIDI::SoundFont;
+my $Version       = $MIDI::SoundFont::VERSION;
+my $VersionDate   = $MIDI::SoundFont::VERSION_DATE;
+use bytes;
+
+# see ~/csound/make_txts for the rabbit and mt sequences !
+
+use Data::Dumper(Dumper);
+$Data::Dumper::Indent = 1;  $Data::Dumper::Sortkeys = 1;
+
+my $OutputDir = '/tmp';
+# if (-d '/home/pjb/www/midi/free') { $OutputDir='/home/pjb/www/midi/free'; }
+while ($ARGV[$[] =~ /^-([a-zA-Z])/) {
+	if ($1 eq 'v')      { shift;
+		my $n = $0; $n =~ s{^.*/([^/]+)$}{$1};
+		print "$n version $Version $VersionDate\n";
+		exit 0;
+	} elsif ($1 eq 'c') { suggest_cfg(); exit 0;
+	} elsif ($1 eq 'd') { shift; $OutputDir = shift;
+	} else {
+		print "usage:\n";  my $synopsis = 0;
+		while (<DATA>) {
+			if (/^=head1 SYNOPSIS/)     { $synopsis = 1; next; }
+			if ($synopsis && /^=head1/) { last; }
+			if ($synopsis && /\S/)      { s/^\s*/   /; print $_; next; }
+		}
+		exit 0;
+	}
+}
+
+# First create the samples...
+# starting sawtooth and fading to triangle
+# A=440 at 44100 samples/sec means 1 cycle = 100.25 samples
+# so we take 1 cycle = 100 samples and apply chCorrection = -4
+my @SawtoothToTriangle = ();
+my $n_cycles = 440;
+foreach my $i_cycle (1..$n_cycles) {
+	my $rise = round(25*$i_cycle/$n_cycles);
+	my $fall = 100 - $rise - $rise -1;
+	if ($rise > 0) {
+		foreach my $i_up_1st (1..$rise) {
+			push @SawtoothToTriangle, round(32000*($i_up_1st/$rise));
+		}
+	}
+	foreach my $i_down (0 .. $fall) {
+		push @SawtoothToTriangle, round(32000 - 64000*($i_down/$fall));
+	}
+	if ($rise > 0) {
+		foreach my $i_up_2nd (1..$rise) {
+			push @SawtoothToTriangle, round(32000*($i_up_2nd/$rise)-32000);
+		}
+	}
+}
+my @Square   = ();
+foreach my $i_cycle (1..$n_cycles) {
+	push @Square, 0;
+	foreach (1..49)  { push @Square, 32000; }
+	push @Square, 0;
+	foreach (51..99) { push @Square, -32000; }
+}
+my @Triangle = ();
+foreach my $i_cycle (1..$n_cycles) {
+	foreach (0..25) { push @Triangle, round(32000*($_/25)); }
+	foreach (1..50) { push @Triangle, round(32000 -64000*($_/50)); }
+	foreach (0..24) { push @Triangle, round(32000*($_/25))-32000; }
+}
+my @Sine     = ();
+my $twopi_over100 = 2.0 * 3.141592653589 / 100;
+foreach my $i_cycle (1..$n_cycles) {
+	foreach (0..99) { push @Sine, round(32000*sin($_*$twopi_over100)); }
+}
+my @RectifiedSine    = ();
+# for a rectified-sine starting at zero, start at theta=0.6901071
+# ~> perl -e 'print (sin(0.6901071)-2.0/3.141592653589)'
+#    6.65160282409261e-09
+# normalising to peak at -32000:   32000*(abs(sin(theta))*pi/2 - 1.0)
+my $pi_by_two = 3.141592653589 / 2.0;
+foreach my $i_cycle (1..$n_cycles) {
+	my $theta = 0.6901071;
+	foreach (0..99) {
+		push @RectifiedSine, round(32000*(
+			$pi_by_two*abs(sin($theta + 0.5*$_*$twopi_over100)) - 1.0
+		));
+	}
+}
+
+my @SquareToSine     = (); # starting square and fading to sine
+my @SquareToTriangle = (); # starting square and fading to triangle
+my @TriangleToSine   = (); # starting triangle and fading to sine
+foreach my $i_cycle (1..$n_cycles) {
+	my $f = $i_cycle/$n_cycles;  $f = $f*$f;
+	my $onemf = 1.0 - $f;
+	foreach my $i (0..99) {
+		push @SquareToSine,     round($onemf*$Square[$i] + $f*$Sine[$i]);
+		push @SquareToTriangle, round($onemf*$Square[$i] + $f*$Triangle[$i]);
+		push @TriangleToSine, round($onemf*$Triangle[$i] + 0.8*$f*$Sine[$i]);
+	}
+}
+
+# now create the soundfont...
+my %sf = MIDI::SoundFont::new_sf();
+$sf{'INAM'} = 'Bank 5 - some simple synthy sounds';
+$sf{'phdr'}[0]{'wBank'} = 5;
+$sf{'phdr'}[0]{'achPresetName'} = 'SawtoothToTriangle';
+my %smpl_0 = sf_sawtooth2triangle();
+$sf{'shdr'}{'smpl_0'} = \%smpl_0;
+
+push @{$sf{'phdr'}}, {
+achPresetName => 'SquareToSine',
+  pbags => [
+    {
+      generators => { instrument => 'inst_1', velRange => [0,127] },
+      modulators => []
+    }
+  ],
+  wBank => 5, wPreset => 1
+};
+$sf{'inst'}{'inst_1'} = {
+  ibags => [
+    {
+      generators => {
+        keyRange=>[0,127], pan=>+190, sampleID=>'smpl_1', sampleModes=>1
+      },
+      modulators => []
+    }
+  ]
+};
+my %smpl_1 = sf_wave2shdr(@SquareToSine);
+$sf{'shdr'}{'smpl_1'} = \%smpl_1;
+
+push @{$sf{'phdr'}}, {
+achPresetName => 'SquareToTriangle',
+  pbags => [
+    {
+      generators => { instrument => 'inst_2', velRange => [0,127] },
+      modulators => []
+    }
+  ],
+  wBank => 5, wPreset => 2
+};
+$sf{'inst'}{'inst_2'} = {
+  ibags => [
+    {
+      generators => {
+        keyRange=>[0,127], pan=>+190, sampleID=>'smpl_2',sampleModes => 1
+      },
+      modulators => []
+    }
+  ]
+};
+my %smpl_2 = sf_wave2shdr(@TriangleToSine);
+$sf{'shdr'}{'smpl_2'} = \%smpl_2;
+
+push @{$sf{'phdr'}}, {
+achPresetName => 'TriangleToSine',
+  pbags => [
+    {
+      generators => { instrument => 'inst_3', velRange => [0,127] },
+      modulators => []
+    }
+  ],
+  wBank => 5, wPreset => 3
+};
+$sf{'inst'}{'inst_3'} = {
+  ibags => [
+    {
+      generators => {
+        keyRange=>[0,127], pan=>+190, sampleID=>'smpl_3',sampleModes => 1
+      },
+      modulators => []
+    }
+  ]
+};
+my %smpl_3 = sf_wave2shdr(@TriangleToSine);
+$sf{'shdr'}{'smpl_3'} = \%smpl_3;
+
+push @{$sf{'phdr'}}, {
+achPresetName => 'RectifiedSine',
+  pbags => [
+    {
+      generators => { instrument => 'inst_4', velRange => [0,127] },
+      modulators => []
+    }
+  ],
+  wBank => 5, wPreset => 4
+};
+$sf{'inst'}{'inst_4'} = {
+  ibags => [
+    {
+      generators => {
+        keyRange=>[0,127], pan=>+190, sampleID=>'smpl_4',sampleModes => 1
+      },
+      modulators => []
+    }
+  ]
+};
+my %smpl_4 = sf_wave2shdr(@RectifiedSine);
+$sf{'shdr'}{'smpl_4'} = \%smpl_4;
+
+warn " creating $OutputDir/Bank5.sf2\n";
+MIDI::SoundFont::sf2file("$OutputDir/Bank5.sf2",%sf);
+# $smpl_0{'sampledata'} = '[ ... ]'; print Dumper(\%smpl_0);
+
+
+
+# ------------------- now the gravis patches -------------------
+my %pat_1 = MIDI::SoundFont::new_pat();
+$pat_1{'description'} = 'SawtoothToTriangle';
+my %wavsmpl_1 = gr_wave2pat(@SawtoothToTriangle);
+$pat_1{'instruments'}[0]{'layers'}[0]{'wavsamples'}[0] = \%wavsmpl_1;
+warn " creating $OutputDir/SawtoothToTriangle.pat\n";
+MIDI::SoundFont::gravis2file("$OutputDir/SawtoothToTriangle.pat",
+  ('SawtoothToTriangle.pat' => \%pat_1));
+
+my %pat_2 = MIDI::SoundFont::new_pat();
+$pat_2{'description'} = 'SquareToSine';
+my %wavsmpl_2 = gr_wave2pat(@SquareToSine);
+$pat_2{'instruments'}[0]{'layers'}[0]{'wavsamples'}[0] = \%wavsmpl_2;
+warn " creating $OutputDir/SquareToSine.pat\n";
+MIDI::SoundFont::gravis2file("$OutputDir/SquareToSine.pat",
+  ('SquareToSine.pat' => \%pat_2));
+
+my %pat_3 = MIDI::SoundFont::new_pat();
+$pat_3{'description'} = 'SquareToTriangle';
+my %wavsmpl_3 = gr_wave2pat(@SquareToTriangle);
+$pat_3{'instruments'}[0]{'layers'}[0]{'wavsamples'}[0] = \%wavsmpl_3;
+warn " creating $OutputDir/SquareToTriangle.pat\n";
+MIDI::SoundFont::gravis2file("$OutputDir/SquareToTriangle.pat",
+  ('SquareToTriangle.pat' => \%pat_3));
+
+my %pat_4 = MIDI::SoundFont::new_pat();
+$pat_4{'description'} = 'TriangleToSine';
+my %wavsmpl_4 = gr_wave2pat(@TriangleToSine);
+$pat_4{'instruments'}[0]{'layers'}[0]{'wavsamples'}[0] = \%wavsmpl_4;
+warn " creating $OutputDir/TriangleToSine.pat\n";
+MIDI::SoundFont::gravis2file("$OutputDir/TriangleToSine.pat",
+  ('TriangleToSine.pat' => \%pat_4));
+
+my %pat_5 = MIDI::SoundFont::new_pat();
+$pat_5{'description'} = 'RectifiedSine';
+my %wavsmpl_5 = gr_wave2pat(@RectifiedSine);
+$pat_5{'instruments'}[0]{'layers'}[0]{'wavsamples'}[0] = \%wavsmpl_5;
+warn " creating $OutputDir/RectifiedSine.pat\n";
+MIDI::SoundFont::gravis2file("$OutputDir/RectifiedSine.pat",
+  ('TriangleToSine.pat' => \%pat_5));
+
+exit 0;
+
+sub sf_sawtooth2triangle {
+	# Timidity does an artefact on low notes; should perhaps do 220 and 110 too
+	# 16-bit signed little-endian
+	my $sampledata = pack 's<*', @SawtoothToTriangle;
+	my $l = length $sampledata; # warn "l=$l\n";
+	return (
+      byOriginalKey => 69,
+      chCorrection => -4,
+      dwEnd => 100*$n_cycles,
+      dwEndloop => 100*($n_cycles-1),     # samples, not bytes
+      dwSampleRate => 44100,
+      dwStart => 0,
+      dwStartloop => 100*($n_cycles-3),   # samples, not bytes
+      sampledata => $sampledata,
+      sfSampleType => 1,
+      wSampleLink => 0
+	);
+}
+
+sub sf_wave2shdr {
+	my $sampledata = pack 's<*', @_;  # 16-bit signed little-endian
+	my $l = length $sampledata;
+	return (
+      byOriginalKey => 69,
+      chCorrection => -4,
+      dwEnd => 100*$n_cycles,
+      dwEndloop => 100*($n_cycles-1),     # samples, not bytes
+      dwSampleRate => 44100,
+      dwStart => 0,
+      dwStartloop => 100*($n_cycles-3),   # samples, not bytes
+      sampledata => $sampledata,
+      sfSampleType => 1,
+      wSampleLink => 0
+	);
+}
+
+sub gr_wave2pat {
+	# 16-bit signed little-endian;   See doc/timidity/instrum.[ch]
+	# MODES_16BIT    1  MODES_UNSIGNED 2  MODES_LOOPING   4  MODES_PINGPONG  8
+	# MODES_REVERSE 16  MODES_SUSTAIN 32  MODES_ENVELOPE 64  MODES_CLAMPED 128
+	my $sampledata = pack 's<*', @_;  # 16-bit signed little-endian
+	my $l = length $sampledata;
+	return (
+		balance => 7,
+		data => $sampledata,
+		envelope_data => "\x3f\x46\x81\x42\x3f\x3f\xd5\xf2\xf6\x08\x08\x08",
+		high_freq => 10000000,
+		loop_end => 200*($n_cycles-1),  # bytes, not samples
+		loop_start => 200*($n_cycles-3),  # bytes, not samples
+		low_freq => 20000,
+		mode => 1+4+32+64,
+		root_freq => 440000,
+		sample_name => 'NoName',
+		sample_rate => 44100,
+		scale_factor => 1024,
+		scale_freq => 60,
+		tune => 1
+	);
+}
+
+sub suggest_cfg {
+	print <<EOT;
+
+dir $OutputDir
+bank 0
+0 %font Bank5.sf2 5 0  # SawtoothToTriangle
+1 %font Bank5.sf2 5 1  # SquareToSine
+2 %font Bank5.sf2 5 2  # SquareToTriangle
+3 %font Bank5.sf2 5 3  # TriangleToSine
+4 %font Bank5.sf2 5 4  # RectifiedSine
+5 SawtoothToTriangle.pat
+6 SquareToSine.pat
+7 SquareToTriangle.pat
+8 TriangleToSine.pat
+9 RectifiedSine.pat
+
+EOT
+}
+
+sub round   { my $x = $_[$[];
+	if ($x > 0.0) { return int ($x + 0.5); }
+	if ($x < 0.0) { return int ($x - 0.5); }
+	return 0;
+}
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+make_bank5 - Creates a synthy SoundFont, as demo for MIDI::SoundFont
+
+=head1 SYNOPSIS
+
+ make_bank5            # the default output-file is /tmp/Bank5.sf2
+ make_bank5 -o /home/soundfonts/Bank5.sf2
+ make_bank5 -c -o /home/soundfonts/Bank5.sf2  # suggests timidity.cfg
+ perldoc make_bank5    # read the manual :-)
+
+=head1 DESCRIPTION
+
+This script creates a I<SoundFont> file from scratch, using
+some simple waveforms.  It is one of the example scripts
+that comes with the I<MIDI::SoundFont> CPAN module.
+
+=head1 OPTIONS
+
+=over 3
+
+=item I<-d /home/soundfonts>
+
+Sets the output directory, to I</home/soundfonts> in this example.
+In this directory, the files I<Bank5.sf2>,
+I<SawtoothToTriangle.pat> and
+I<SquareToSine.pat>
+will be created.
+The default directory is I</tmp>.
+
+=item I<-c>
+
+Also prints to I<STDOUT> a suggested paragraph for your I<timidity.cfg> file
+
+=item I<-v>
+
+Prints version number.
+
+=back
+
+=head1 CHANGES
+
+ 20120319  1.0  first working version
+
+=head1 AUTHOR
+
+Peter J Billam   http://www.pjb.com.au/comp/contact.html
+
+=head1 CREDITS
+
+Based on the MIDI::SoundFont CPAN module.
+
+=head1 SEE ALSO
+
+ http://search.cpan.org/perldoc?MIDI::SoundFont
+ http://www.pjb.com.au/midi/
+ man timidity.cfg
+
+=cut
+

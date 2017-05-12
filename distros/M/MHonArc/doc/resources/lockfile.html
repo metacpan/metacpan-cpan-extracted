@@ -1,0 +1,131 @@
+<html>
+<head>
+<title>MHonArc Resources: LOCKFILE</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="lockdelay.html">LOCKDELAY</a>]</td><td><nobr>[<a href="../resources.html#lockfile">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="lockmethod.html">LOCKMETHOD</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>LOCKFILE</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p>
+<code>M2H_LOCKFILE=</code><var>name</var>
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p>
+<code>-lockfile </code><var>name</var>
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>LOCKFILE is the name of the file used to create a lock on an
+archive.  The file is used in the archive directory to signify
+that a MHonArc process is accessing the archive, and any other
+MHonArc process will wait until the lock is released.
+</p>
+<table border=0 cellpadding=4>
+<tr valign=top>
+<td><strong><font color="red">WARNING</font></strong></td>
+<td><p>You should not override the default name unless
+absolutely necessary, and you are confident about what you are doing.
+</p>
+</td>
+</tr>
+</table>
+
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<p><tt>.mhonarc.lck</tt><br>
+<tt>mhonarc.lck</tt> (Windows/MSDOS)<br>
+<tt>mhonarc_lck</tt> (VMS)<br>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>None.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>1.2
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+<a href="lock.html">LOCK</a>,
+<a href="lockdelay.html">LOCKDELAY</a>,
+<a href="lockmethod.html">LOCKMETHOD</a>,
+<a href="locktries.html">LOCKTRIES</a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="lockdelay.html">LOCKDELAY</a>]</td><td><nobr>[<a href="../resources.html#lockfile">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="lockmethod.html">LOCKMETHOD</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2003/10/06 22:04:17 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"
+><strong>MHonArc</strong></a><br>
+Copyright &#169; 1998-2000, <a href="http://www.earlhood.com/"
+>Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org"
+>mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

@@ -1,0 +1,20 @@
+Revision history for MooseX-Validation-Doctypes
+
+0.05  2012-10-15
+      - fix undef not failing validation against collections (and fix the error
+        message that is given when it did fail)
+      - allow nesting doctype declarations, so they can be built up in parts
+      - implement a maybe_doctype helper which allows collections to be
+        optional
+
+0.04  2012-10-14
+      - don't rely on exact formatting from Data::Dumper in a test
+
+0.03  2012-10-11
+      - add TO_JSON and stringify overloading
+
+0.02  2012-10-10
+      - improved docs (stevan)
+
+0.01  2012-10-09
+      - Initial release

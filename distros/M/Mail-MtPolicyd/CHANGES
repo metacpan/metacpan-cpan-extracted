@@ -1,0 +1,462 @@
+==================================================
+Changes from 2015-08-11 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 2.02 at 2016-08-10 18:42:45 +0000
+-----------------------------------------
+
+  Change: e5fac2e10f1bf2653abb6ecc9af05034bd67e4cd
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-08-10 20:39:23 +0000
+
+    Add tests for session caching and fix related bugs
+
+    This add test cases for memcached and redis based session caching and
+    fixes a few related bugs.
+
+    fixes #15 #16 #17 #19 
+
+  Change: 78e42d2bcc4ce829ede501cfc145e0dd637fb66b
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-08-09 13:16:52 +0000
+
+    Fix Kwalitee issues 
+
+-----------------------------------------
+version 2.01 at 2016-08-06 19:52:29 +0000
+-----------------------------------------
+
+  Change: 01ed4fe6ac040944511cf11e8749ba148c3addc0
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-08-06 21:52:29 +0000
+
+    Dont include local/ in dist 
+
+  Change: 86f3b7663e7b38b54cbafd6e145add717a76d8bf
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-08-06 21:36:44 +0000
+
+    Add cpanfile.snapshot to .gitignore 
+
+  Change: 7456978e190f05a348bb9212dfca416aa87d481d
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-08-06 20:35:51 +0000
+
+    Revert using cpanfile.snapshot 
+
+  Change: 53ac1ccf5ba3a46b30224722ab73be6e7283ead3
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-08-06 20:32:49 +0000
+
+    Updated documentation/upgrade notes 
+
+  Change: 850a74f28f841bde2846f34e67799abce79e59dc
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-08-06 20:04:12 +0000
+
+    Add dependecy on Redis 
+
+  Change: 8b38a6ffa961224f48efa84d450a52f6c010f870
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-08-06 18:46:37 +0000
+
+    Added missing depedency on LDAP mock 
+
+  Change: d5b999117839ac6f3ff741ef597089a85d5e726e
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-08-06 18:31:26 +0000
+
+    Remove test for nonexisting SqlConnection class 
+
+  Change: bb36632db9c116a73d938906a6304d224b3a4c6f
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-08-06 18:17:38 +0000
+
+    Add temporary build files for .dockerignore 
+
+  Change: 290d62f94930c25d63b87b4b51eadce0b4cd0f6b
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-08-06 18:08:31 +0000
+
+    Add cpanfile.snapshot to fix carton deploy 
+
+  Change: 4046ff5d961992a20aa454699b33a8f9ddecb8a2
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-08-06 18:06:05 +0000
+
+    Fix docker-compose and use carton deployment 
+
+  Change: bfa6bde5ae15335431d325b90eaeb206089aed2e
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-08-06 17:51:37 +0000
+
+    Added docker and docker-compose configuration 
+
+  Change: 7590d99214e528d9a8169591bca61aa6b075df87
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-08-06 17:29:46 +0000
+
+    Remove debian packaging from CPAN dist 
+
+  Change: 11b13df83cec618d8c80cdedc501a6c788e96873
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-08-06 17:27:30 +0000
+
+    Remove dependecies from dist.ini 
+
+  Change: 604be923459e392b0279f3ccde434c49a94510d0
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-08-06 17:25:50 +0000
+
+    Adjust dist to cpanfile dependecies 
+
+  Change: b9fa0982842e7e294998c192764a73085c9a7c7a
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-08-06 17:14:14 +0000
+
+    Added support for redis connection and cache 
+
+  Change: d4e6534b970ca73d9f19226e161e8531cb885eb1
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-08-06 17:12:45 +0000
+
+    Fix tests and a some bugs
+
+    This adjusts the tests to the new ConnectionPool and SessionCache
+    infstracture. 
+
+  Change: cbdb082b47d3d6d05dd0b3a08de38d4d5b42e559
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-07-10 16:34:11 +0000
+
+    plugable session cache and connection pool
+
+    This adds a generic connection pool mechanism and the possiblitiy of
+    session caches other than memcached. 
+
+  Change: f55e530bed65bc4db5019c2067cf03a4ee2ee92f
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-07-04 12:31:37 +0000
+
+    Add some checks for uninitialized values
+
+    fixes #12 
+
+  Change: ddc8472f653be44db0ee51bdc8da4948acdd81e6
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-07-04 12:31:00 +0000
+
+    create sqlite database in postinst 
+
+  Change: 850641710fe36402ae0e0f5a22a8e35b12669fdd
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-03-04 15:11:19 +0000
+
+    Add softfail and update docs on SPF plugin
+
+    Two new options for softfail have been added to the SPF plugin:
+
+    * softfail_mode (default: passive)
+
+    * softfail_score (default: empty)
+
+    These could be used to apply a action or score whene the SPF check
+    returns a softfail status.
+
+    Also the documentation has been updated to clarify that on neutral
+    check result no action will be applied by the plugin. 
+
+  Change: e30ad9c2357323722c7c63d5ade6f0f473102028
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-03-02 09:08:35 +0000
+
+    Improvements for Condition module
+
+    This implements a generic method get() in the Request object to
+    retrieve request attributes or session variables.
+
+    It support the following syntax for retrieving variables:
+
+    To retrieve request attributes:
+
+    request:<variable>
+
+    r:<variable>
+
+    If no scope is given it defaults to 'request'
+
+    <variable>
+
+    To retrieve session variables:
+
+    session:<variable>
+
+    s:<variable>
+
+    It also changes the Condition plugin to accept this syntax in the
+    "key" configuration parameter.
+
+    Also an `invert` option has been added to the condition module. 
+
+  Change: aa17f3402d1924bfbdb58b56f5f4c6a3fdf993ad
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-12-14 16:23:47 +0000
+
+    create /var/run/mtpolicyd in debian package 
+
+-----------------------------------------
+version 1.23 at 2015-12-14 15:00:05 +0000
+-----------------------------------------
+
+  Change: bcecb4f1eb53867f5b602af9dc5071a129ecfb87
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-12-14 16:00:05 +0000
+
+    adjust rbl/dbl unit tests to changes SpamHaus output 
+
+  Change: 3cd7b711d909b3f9793e54659d9ee9797ca79b0b
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-12-14 15:49:49 +0000
+
+    prune README.pod link 
+
+  Change: 4c3f9c21ff6e725dbbbca52342f1edeb590f209d
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-12-14 15:33:05 +0000
+
+    create data folder in debian package 
+
+  Change: e72f8312d6b7a7a1449beded70c2a943219d2396
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-12-14 10:27:12 +0000
+
+    change distribution in changelog to jessie 
+
+  Change: 8d4578bcab0658fec72333256e9f02914270eb9e
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-12-14 10:15:33 +0000
+
+    fix debian package dependencies 
+
+  Change: b9a63185a236d958c481ceb48f14cae22e22e2d3
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-11-13 10:35:36 +0000
+
+    Remove RPM dependency on cron 
+
+-----------------------------------------
+version 1.22 at 2015-11-07 18:11:24 +0000
+-----------------------------------------
+
+  Change: b8bc2b905f55072fcb9e823ca97a65237d6b6804
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-11-07 19:11:24 +0000
+
+    fixes to ldap latest LDAP code 
+
+  Change: ef71ff8e2232f3915995e8ccbc2ce5713cff9d99
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-10-26 19:56:42 +0000
+
+    Added support for LDAP
+
+    Support for an global LDAP connection has been added to mtpolicyd.
+    The new plugin LdapUserConfig uses this connection to read parameters
+    from a LDAP server. 
+
+-----------------------------------------
+version 1.21 at 2015-09-22 09:04:58 +0000
+-----------------------------------------
+
+  Change: 0572110c8157f3ad9d5c204f6dfebf8e603b6efa
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-09-22 11:04:58 +0000
+
+    New plugin SMTPVerify
+
+    The SMTPVerify plugin implements address verification at a remote
+    SMTP server with MAIL FROM and RCPT TO commands.
+
+    It support the following checks:
+
+    * check if the remote SMTP server would accept mail for a address.
+
+    Apply actions or scores if a permanent or temporary error is returned
+
+    * If the remote server support the SIZE extension the SIZE will be
+
+    passed to the remote SMTP server. This way it could be checked
+
+    if the message exceeds the message size limit or the quota limit
+
+    of the recipient.
+
+    * Check if the remote SMTP server announces support for STARTTLS
+
+    * Check if there is a TLSA record for the remote SMTP server
+
+    * Check if there is OPENPGPKEY for the recipient. 
+
+  Change: 0d87c8d40ee26ef0ed2e0bed369f8beb10d40ad8
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-09-05 11:18:02 +0000
+
+    use Test::Memcached also in plugin-greylist.t 
+
+  Change: 71b1fae0e7afa31112c7172e2f2183cd2f44d024
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-09-04 13:05:17 +0000
+
+    another try for travis 
+
+  Change: 93c406f2ed96404ba9f7c900ddc2589712988307
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-09-04 12:57:54 +0000
+
+    one more for travis... 
+
+  Change: 1b7d9b743ccebc1b0a0e5365c76475cfe3df4c56
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-09-04 12:45:29 +0000
+
+    try init.d instead of systemctl in travis 
+
+  Change: ffec75868557ddd25b34d40b9b47ab6e3295d0ee
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-09-04 12:04:56 +0000
+
+    try using a local resolver in travis 
+
+  Change: 6e4adc13c9a4ae452a51d6054a1b3ceb0b2b0a82
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-09-04 11:40:11 +0000
+
+    new feature vhost_by_policy_context
+
+    New option vhost_by_policy_context will if activated tell mtpolicyd
+    to select the VirtualHost based on the policy_context.
+
+    For example in postfix main.cf use advanced syntax:
+
+    check_policy_service { inet:localhost:12345,
+
+    policy_context=reputation }
+
+    ...
+
+    check_policy_service { inet:localhost:12345,
+
+    policy_context=accounting }
+
+    In mtpolicyd.conf:
+
+    port="127.0.0.1:12345" # only 1 port
+
+    vhost_by_policy_context=1
+
+    <VirtualHost 12345>
+
+    name=reputation
+
+    ... plugins ...
+
+    </VirtualHost>
+
+    <VirtualHost 12345>
+
+    name=accounting
+
+    ... plugins ...
+
+    </VirtualHost>
+
+    The policy_context feature will be available in postfix 3.1 and
+    later. 
+
+  Change: ed99a4a0be2508937db23f2a8c4ce90b8de8251d
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-09-04 10:30:48 +0000
+
+    fix RBL plugin testcase
+
+    spamhaus removed '"' in response? 
+
+  Change: e4913c8f2f2622924e88803427005963c387c512
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-09-01 08:05:42 +0000
+
+    replace README.md with a link to pod docs 
+
+  Change: b79bb53324ff6bc1e3d0172ee900394ad815e9e0
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-09-01 07:57:01 +0000
+
+    add DBD::SQLite as a test prereq 
+
+  Change: 90232892201273263be1c1a0784c51f8febf5c5f
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-09-01 07:45:10 +0000
+
+    add cpanm --sudo option in travis 
+
+  Change: 791287bff9ccc1925eb1c21739ec87abddf9eebb
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 17:25:11 +0000
+
+    update .travis.yml 
+
+  Change: eccde3a2a29180e3ed33343ec0f239204588fef4
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 17:16:02 +0000
+
+    use cpanm --notest for prereqs in travis ci 
+
+  Change: 1ae4fdc01a50d652c6ff417dc0c9d0b46bbe68b7
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 17:13:35 +0000
+
+    install libdb-dev in travis 
+
+  Change: bb9cf757ed42fc3b9b737284d572c2969a364ed1
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 09:02:14 +0000
+
+    added minimum perl version 
+
+-----------------------------------------
+version 1.20 at 2015-08-18 16:13:36 +0000
+-----------------------------------------
+
+  Change: 8d54631b92ae3b36948701dc3cb84b1fcfcfa35a
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-18 18:13:36 +0000
+
+    enable TravisCI 
+
+  Change: 549801562d4392125a70b4a0ab066ea739021518
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-18 18:08:30 +0000
+
+    fix SQL connection handling after child fork
+
+    Closing the connection after child fork did not cause a reconnect on
+    all DBI versions. Instead do a reconnect by overwriting the previous
+    connection. 
+
+  Change: 757256c033399406d8e5d9803fa4d0843136ec79
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-18 18:07:45 +0000
+
+    improve request logging
+
+    mtpolicyd now logs the plugin that caused the result.
+
+    The new log format is:
+
+    <vhost>: instance=<instance>, type=<type>, t=<time>ms,
+    plugin=<plugin>, result=<result> 
+
+================================================
+Plus 9 releases after 2015-08-11 00:00:00 +0000.
+================================================

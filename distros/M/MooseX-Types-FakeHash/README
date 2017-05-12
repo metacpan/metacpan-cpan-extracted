@@ -1,0 +1,154 @@
+NAME
+    MooseX::Types::FakeHash - Types for emulating Hash-like behaviours with
+    ArrayRefs.
+
+VERSION
+    version 0.1.2
+
+SYNOPSIS
+  Standard Non-MooseX-Types style invocation
+      package #
+        Foo;
+
+      use Moose;
+      use MooseX::Types::FakeHash;
+
+      has foo => (
+        isa => 'KeyWith[ ArrayRef ]'
+        is  => 'rw',
+        required => 1,
+      );
+
+      has bar => (
+        isa      => 'ArrayRef[ KeyWith[ Str ] ]',
+        is       => 'rw',
+        required => 1,
+      );
+
+      ....
+
+
+      Foo->new(
+        foo => [ Hello => [] ]
+        bar => [
+           [ "Content-Type" => "text/plain" ],
+           [ "X-Zombies"    => "0"          ],
+        ],
+      );
+
+  MooseX-Types style invocation
+      package #
+        Foo;
+
+      use Moose;
+      use MooseX::Types::FakeHash qw( :all );
+      use MooseX::Types::Moose    qw( :all );
+
+      has foo => (
+        isa => KeyWith[ ArrayRef ]
+        is  => 'rw',
+        required => 1,
+      );
+
+      has bar => (
+        isa      => ArrayRef[ KeyWith[ Str ] ],
+        is       => 'rw',
+        required => 1,
+      );
+
+      ....
+
+
+      Foo->new(
+        foo => [ Hello => [] ]
+        bar => [
+           [ "Content-Type" => "text/plain" ],
+           [ "X-Zombies"    => "0"          ],
+        ],
+      );
+
+TYPES
+  KeyWith
+  KeyWith[ X ]
+    A parameterizable type intended to simulate a singular key/value pair
+    stored in an array.
+
+    The keys is required to be of type "Str", while the value is the
+    parameterized type.
+
+      has bar ( isa => KeyWith[ Foo ] , ... );
+
+      ...
+
+      ->new(
+        bar => [ "Key" => $fooitem ] # [ Str, Foo ]
+      );
+
+  FakeHash
+  FakeHash[ X ]
+    A parameterizable type intended to simulate the values of a HashRef, but
+    stored in an ArrayRef instead as an even number of key/values.
+
+    The keys are required to be of type "Str", while the value is the
+    parameterized type.
+
+      has bar ( isa => FakeHash[ Foo ] , ... );
+
+      ...
+
+      ->new(
+        bar => [
+          "Key"           => $fooitem,
+          "AnotherKey"    => $baritem,
+          "YetAnotherKey" => $quuxitem,
+        ] # [ Str, Foo, Str, Foo, Str, Foo ]
+      );
+
+  OrderedFakeHash
+  OrderedFakeHash[ X ]
+    A parameterizable type intended to simulate the values of a HashRef, but
+    stored in an ArrayRef instead as an array of "KeyWith" items. This is
+    much like a "FakeHash", but slightly different, in that the paring of
+    the Key/Value is stricter, and numerical-offset based lookup is simpler.
+
+      [
+         [ "Key" => $value ],
+         [ "Key" => $value ],
+      ]
+
+    In essence, OrderedFakeHash[ x ] is ShortHand for ArrayRef[ KeyWith[ x ]
+    ].
+
+    This makes it harder to convert to a native Perl 5 Hash, but somewhat
+    easier to iterate pairwise.
+
+      my $data = $object->orderedfakehashthing();
+      for my $pair ( @($data) ){
+        my ( $key, $value ) = @{ $pair };
+        ....
+      }
+
+    The keys are required to be of type "Str", while the value is the
+    parameterized type.
+
+      has bar ( isa => OrderedFakeHash[ Foo ] , ... );
+
+      ...
+
+      ->new(
+        bar => [
+          [ "Key"           => $fooitem  ],
+          [ "AnotherKey"    => $baritem  ],
+          [ "YetAnotherKey" => $quuxitem ],
+        ] # [ [ Str, Foo ],[ Str, Foo ],[ Str, Foo ] ]
+      );
+
+AUTHOR
+    Kent Fredric <kentnl@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Kent Fredric <kentnl@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

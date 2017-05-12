@@ -1,0 +1,27 @@
+--- #YAML:1.0
+#
+# $HeadURL: https://svn.oucs.ox.ac.uk/networks/src/debian/packages/libr/libmodule-multiconf-perl/trunk/examples/config.yml $
+# $LastChangedRevision: 1331 $
+# $LastChangedDate: 2007-07-11 13:19:35 +0100 (Wed, 11 Jul 2007) $
+# $LastChangedBy: oliver $
+#
+#
+# this, if loaded, creates the following:
+#
+# $params = {
+#     rpc_serialized => {
+#         server_class => 'RPC::Serialized::Server::UCSPI::IPC',
+#         acl_path     => undef,
+#         handlers     => {
+#             echo      => 'RPC::Serialized::Handler::Echo',
+#             localtime => 'RPC::Serialized::Handler::Localtime',
+#         },
+#     },
+# };
+#
+rpc_serialized:
+  server_class: 'RPC::Serialized::Server::UCSPI::IPC'
+  acl_path: ~
+  handlers:
+    echo: 'RPC::Serialized::Handler::Echo'
+    localtime: 'RPC::Serialized::Handler::Localtime'

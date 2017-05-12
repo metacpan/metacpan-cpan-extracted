@@ -1,0 +1,21 @@
+- ヘッダ追加
+-- my $depth = ( split /,/, $request->get('x-up-devcap-screendepth') )[0];                                                           
+-- my $color = $request->get('x-up-devcap-iscolor');                                                                                 
+- とかとか。
+- Plugin::UserID で serial を自由に設定できるようにしたい
+
+- 絵文字入力できるようにしたい
+- Kwalify サポート
+- 認証まわりを flexible にしたい
+-- OpenID に対応するとか
+- ezweb の DisplaySize が現在ブラウジング中画像表示サイズになっているが、これは壁紙画像表示サイズであるべき
+- あらかじめ登録した端末IDを切り替えられるとよいかも
+
+- plugins
+ - GPS Support(select point by google map?)
+ - support utn
+ - check contents size(max pdu)
+
+- add tests.
+
+http://kokogiko.net/m/archives/001955.html

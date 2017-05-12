@@ -1,0 +1,12 @@
+User-agent: *
+Disallow: /spam_report.cgi
+Disallow: /spam_report.plx
+Disallow: /bl.spamcannibal.org.in
+Disallow: /alldnsblusers.shtml
+Disallow: /rsync_users.shtml
+Disallow: /dnsblusers.shtml
+Disallow: /flags
+Disallow: /images
+Disallow: /incl
+Disallow: /tmp
+Disallow: /zonefiles

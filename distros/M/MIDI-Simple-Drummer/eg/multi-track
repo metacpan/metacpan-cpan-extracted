@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use MIDI::Simple::Drummer;
+
+my $d = MIDI::Simple::Drummer->new(-file => "$0.mid");
+
+$d->patterns(b1 => \&hihat);
+$d->patterns(b2 => \&backbeat);
+
+$d->sync_tracks(
+    sub { $d->beat(-name => 'b1') },
+    sub { $d->beat(-name => 'b2') },
+);
+
+$d->write();
+
+sub hihat { # tick
+    my $self = shift;
+    for (1 .. 2 * $self->beats) {
+        $self->pan(75);
+        $self->note($self->EIGHTH, $self->tick);
+    }
+}
+sub backbeat { # kick/snare
+    my $self = shift;
+    for (1 .. $self->beats) {
+        $self->pan(64);
+        $self->note($self->QUARTER, $self->rotate($_));
+    }
+}

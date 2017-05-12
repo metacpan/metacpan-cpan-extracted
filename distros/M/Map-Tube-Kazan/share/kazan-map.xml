@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tube name="Казанский метрополитен">
+  <!-- https://ru.wikipedia.org/wiki/Казанский_метрополитен -->
+  <lines>
+    <line id="1" name="Центральная линия" color="red"/>
+  </lines>
+  <stations>
+    <!-- https://ru.wikipedia.org/wiki/Центральная_линия_(Казань) -->
+    <station id="1-01" name="Авиастроительная" line="Центральная линия" link="1-02"/>
+    <station id="1-02" name="Северный вокзал" line="Центральная линия" link="1-01,1-03"/>
+    <station id="1-03" name="Яшьлек" line="Центральная линия" link="1-02,1-04"/>
+    <station id="1-04" name="Козья слобода" line="Центральная линия" link="1-03,1-05"/>
+    <station id="1-05" name="Кремлёвская" line="Центральная линия" link="1-04,1-06"/>
+    <station id="1-06" name="Площадь Габдуллы Тукая" line="Центральная линия" link="1-05,1-07"/>
+    <station id="1-07" name="Суконная слобода" line="Центральная линия" link="1-06,1-08"/>
+    <station id="1-08" name="Аметьево" line="Центральная линия" link="1-07,1-09"/>
+    <station id="1-09" name="Горки" line="Центральная линия" link="1-08,1-10"/>
+    <station id="1-10" name="Проспект Победы" line="Центральная линия" link="1-09"/>
+  </stations>
+</tube>

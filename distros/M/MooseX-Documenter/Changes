@@ -1,0 +1,6 @@
+Revision history for Perl extension MooseX::Documenter.
+
+0.01  Mon Apr 27 12:07:36 2009
+	- original version; created by h2xs 1.23 with options
+		-AX MooseX::Documenter
+

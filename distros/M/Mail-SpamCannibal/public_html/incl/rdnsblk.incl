@@ -1,0 +1,19 @@
+<script language=javascript1.1>
+document.writeln('<center>',
+'Fetch PTR records for this /24 block:<br>',
+'<font size="-1">enter IP address</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>',
+'<form name="rdnsblk" action="' + location.pathname + '" method=POST>',
+'<input type=text name=lookup value=""><br>',
+'<font size="-1">enter perl exclusion regexp</font><br>',
+'<input type=text name=regexp value=""><br>',
+'<input type=hidden name=page value=rdnsblk>',
+'<input type=submit value="Get PTRs">',
+'</form>',
+'</center>');
+document.rdnsblk.lookup.focus();
+</script>
+<noscript>
+<p>
+<font size=4 color=red>Javascript must be enabled to use this page</font>
+<p>
+</noscript>

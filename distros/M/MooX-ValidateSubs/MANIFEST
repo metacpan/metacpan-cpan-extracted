@@ -1,0 +1,24 @@
+Changes
+ignore.txt
+lib/MooX/ValidateSubs.pm
+lib/MooX/ValidateSubs/Role.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/00-load.t
+t/01-basics.t
+t/02-optional.t
+t/03-default_value.t
+t/04-returns.t
+t/05-combined.t
+t/06-extends.t
+t/07-extends_does_it_get_complicated.t
+t/manifest.t
+t/odea/Maybe.pm
+t/odea/Returns.pm
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

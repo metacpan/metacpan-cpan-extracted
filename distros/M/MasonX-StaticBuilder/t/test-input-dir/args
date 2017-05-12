@@ -1,0 +1,4 @@
+Foo is <% $foo %>
+<%args>
+$foo => undef
+</%args>

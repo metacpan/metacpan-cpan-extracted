@@ -1,0 +1,118 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+=head1 specs
+
+Turns http://www.loc.gov/marc/bibliographic/ecbdist.html into the format
+used by MARC::Lint.pm
+
+Takes ecbdist.html as input.  Skips fixed fields and data marked
+"[OBSOLETE]"  Also, the HTML file doesn't include the 841-88X tags,
+so those are hardcoded here.
+
+=head1 AUTHOR
+
+Originally written by Colin Campbell at Sirsi, and taken over and modified
+by Andy Lester.
+
+=cut
+
+open( my $fh, '<', "../lib/MARC/Lint.pm" ) or die "Can't open module";
+while ( <$fh> ) {
+    print;
+    last if /^__DATA__/;
+}
+close $fh;
+
+local $/ = undef;
+my $text = <>;
+$text =~ s/(<BR>|\r|\n)+/\n/ig;
+my @lines = split( /\n/, $text );
+
+
+my $in_tag = undef;
+my $i1;
+my $i2;
+my $curr_indicator;
+my $ntags;
+my $desc1;
+my $desc2;
+
+my $started = 0;
+for ( @lines ) {
+    unless ($started) {
+	$started=1 if /Number and Code Fields/;
+	next;
+    }
+    s/^\s+//;
+    s/\s+$//;
+    next if $_ eq "";
+
+    if ( /^(\d\d\d)/ ) {
+	my $tag = $1;
+	if (/OBSOLETE/) { 
+	    $in_tag = 0;
+	    next; 
+	}
+
+	/$tag - (.+) \((N?R)\)/ or die "Tag $tag is invalid format";
+	my $desc = $1;
+	my $nr = $2;
+	++$ntags;
+	$in_tag = 1;
+	print "\n" if $ntags > 1;
+	print "$tag\t$nr\t$desc\n";
+	$i1 = $i2 = "";
+	next;
+    }
+
+    next unless $in_tag;
+    next if /OBSOLETE/;
+    
+    if (/^First - (.+)/) {
+	$curr_indicator = 1;
+	$desc1 = $1;
+    } elsif (/^Second - (.+)/) {
+	print_indicator( 1, $i1, $desc1 );
+	undef $desc1;
+	$curr_indicator = 2;
+	$desc2 = $1;
+    } elsif (/^Subfield/) {
+	print_indicator( 2, $i2, $desc2 );
+	undef $desc2;
+	$curr_indicator = 0;
+    } else {
+	if ($curr_indicator) {
+	    my $data = '';
+	    if (/^(\d-\d)/) {
+		$data = $1;
+	    } elsif (/^([#0123456789])/) {
+		$data = $1;
+	    }
+	    $data = "b" if $data eq "#";
+	    if ($curr_indicator == 1) {
+		$i1 .= $data;
+	    } elsif ($curr_indicator == 2) {
+		$i2 .= $data;
+	    }
+
+	} else {
+	    if ( /^\$(.) - (.+)\s*\((N?R)\)/ ) {
+		my ($sub,$desc,$nr) = ($1,$2,$3);
+		print "$sub\t$nr\t$desc\n";
+	    } 
+	}
+    }
+} # main while
+
+sub print_indicator {
+    my $n = shift;
+    my $val = shift;
+    my $desc = shift;
+
+    $val = "blank" if $val eq "b";
+
+    print "ind$n\t$val\t$desc\n";
+}

@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.78.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 f2eb82e4fab208add7eb69550d601eb8cf102ff5 Changes
+SHA1 132f417f0a78286dfe53b3a9100f4c3b76339d60 MANIFEST
+SHA1 7251a607cc528b4c6f4d40d2ff565b1399789cd4 META.json
+SHA1 a243c1fec272ae35ea6f6beefc7931464564df76 META.yml
+SHA1 79dc735d4e94f7bfdf261ddf06e5dfa4186190b1 Makefile.PL
+SHA1 e01f58542b45a57a8af1cfebc60f8bfc2ba26854 README
+SHA1 822162993067e52fd16957f02c0381b04f9b40e2 lib/Music/Tag/Coveralia.pm
+SHA1 648788567162a3934a90d21cc9d4e272a06d4e20 t/Music-Tag-Coveralia.t
+SHA1 8a6ed893102adaff79b2a09e66fd5229fa44e5e7 t/empty.flac
+SHA1 190939b33d26a5900164708c5b5fd550d3e853f0 t/perlcritic.t
+SHA1 5d7d973829c379a25fdb0f2db0dfd1c9f23a7538 t/perlcriticrc
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJVTb12AAoJEMoENb5ewbNiVdQP/Axjn+B44DoI7NqBNVKklOYH
+/LbTFUx5KZAIUtNpR21Cy714+0r2qYdWYEjbzA+TjBGOdveMjYEN4deKZV1jm1WX
+6RjqGvezS0wB4E5IiWXCa77TwO+aUheQkioqJkrzhIF2UVkAnsa8mnMQ54rwRMNh
+hXjI6Wwjo6YfqffTlAmxTJfrH4311tZx5wGRT4DyMxQroiYZ6eRB5Pm02W+aRTtw
+2g4mNjv/TOrWWVSv9l0vaKZOJZT7wST2drhYGLdZR/YnaTwIWBcqiFXMFwH+7cTn
+hE+sEopcEVtlx3NeuYjWdyaB9JBhDSVEXcRibPh1mJiLVKWOyMC6xonAEIzzLSSs
+fBwDhCXliTpXimIfbyrLs6jjAJlMq+6XrIv5KPaJGHiYB8/9b0QJ4boeiuzfpP4t
+4hIQIBZisgB7VBhK31/aytZuiln8XeYEXyScr3FMcWKRW1zBnE93YUFa3uoAmuqk
+Na8U5cyjHdKBq7/o+HjZjRLAagsWvqWa3FVuR3wX7XFH1YCS6yu/XTPfRisJOoEs
+Mc5CVHRWdIFE7T5OgjS60GFIJ6nLoR3WG8g3uxgUMPv1wfgrFwKJdaEBQHlnCog5
+ec6qvat7ka7HWXyhiTe5Hl2F5R6W5Zhi4+RHn5iaUswOhI1OwXRN9ejkPRr54hnD
+lJzp8mj665zotfZt7XAH
+=GN8m
+-----END PGP SIGNATURE-----

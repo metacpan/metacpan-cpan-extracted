@@ -1,0 +1,69 @@
+
+==== NAME ====
+
+Module::DevAid - tools to aid perl module developers
+
+
+==== VERSION ====
+
+This describes version 0.24 of Module::DevAid.
+
+
+==== DESCRIPTION ====
+
+Module (and script) to aid with development, by helping (and testing)
+auto-building of certain files, and with the steps needed in building and
+committing a release.
+
+At this point this only uses the darcs or svk revision systems.
+
+Takes a project description, either through the command line options, or via
+a project config file, which defaults to 'mod_devaid.conf' in the current
+directory.
+
+Features:
+
+*   generates a README file from POD
+
+*   generates a TODO file from a devtodo .todo file
+
+*   auto-updates a Changes file from the revision-control system's change
+    log.
+
+*   auto-changes version-id in module and script files
+
+*   does all of the above and tags commits for a release
+
+
+==== REQUIRES ====
+
+    Getopt::Long
+    Pod::Usage
+    Data::Dumper
+    Test::More
+
+
+==== INSTALLATION ====
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+==== AUTHOR ====
+
+    Kathryn Andersen (RUBYKAT)
+    perlkat AT katspace dot com
+    http://www.katspace.com
+
+
+==== COPYRIGHT AND LICENCE ====
+
+Copyright (c) 2004-2007 by Kathryn Andersen
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

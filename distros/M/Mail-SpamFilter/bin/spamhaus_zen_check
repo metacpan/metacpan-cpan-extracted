@@ -1,0 +1,101 @@
+#!/usr/bin/perl
+#############################################################################
+## spamhous zen lookup script
+## Copyright (C) 2004  Martin Ward http://www.cse.dmu.ac.uk/~mward/
+## Email: martin@gkc.org.uk
+##
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation; either version 2 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#############################################################################
+#
+# Check the sender's IP address against the Spamhous Zen list
+# Add "X-SPAMHAUS-ZEN: BLOCK (ip) code-list"
+#  or "X-SPAMHAUS-ZEN: OK (ip)" as appropriate
+#
+# Usage: spamhaus_zen_check < msg > output
+#
+
+use strict;
+use warnings;
+
+umask 077;
+
+(my $myname = $0) =~ s|(.*/)*||;	# strip path component from name
+my $Usage = "Usage: $myname < msg\n";
+# Check for zero arguments:
+die $Usage unless (@ARGV == 0);
+
+my $HOME = $ENV{'HOME'} || $ENV{'LOGDIR'} ||
+                (getpwuid($<))[7] || die "You're homeless!\n";
+
+my $zen = "zen.spamhaus.org";
+my $base = "$HOME/.wpbl";
+my $exclude = "$base/data/exclude";
+
+# Compute a regexp of IPs to exclude (uses the wpbl list of my ISP addresses):
+my $excl_pat = "";
+
+open(EX, $exclude) or die "Can't read $exclude: $!\n";
+while (<EX>) {
+  chomp;
+  s/#.*$//;
+  next unless /\S/;
+  s/\s+//g;
+  s/\./\\./g;
+  $excl_pat .= "$_|";
+}
+# Remove trailing |
+$excl_pat =~ s/\|$//;
+$excl_pat = "^($excl_pat)";
+
+
+# Slurp message from STDIN:
+undef $/;
+$_ = <STDIN>;
+# Trim body if present:
+my $body = "";
+$body = $1 if s/\n(\n.*)/\n/s;
+
+# Join broken header lines:
+s/\n[ \t]+/ /g;
+
+# Get list of IPs in Received lines:
+my @ips = /\nReceived:.*?\[(\d+\.\d+\.\d+\.\d+)\]/g;
+
+# Delete exclusions:
+@ips = grep { !/$excl_pat/ } @ips;
+
+
+# If we found an IP (could be a local email)
+# then check $ips[0] against the Zen list:
+
+my $tags = "";
+if (@ips) {
+  my $rev = join(".", reverse split(/\./, $ips[0]));
+  my $result = `host $rev.$zen 2>&1`;
+  if ($result =~ /$rev\.$zen has address 127\.0\.0\.\d+/) {
+    # Sender IP is in block list
+    my $codes = join(",", $result =~ /$rev\.$zen has address 127\.0\.0\.(\d+)/g);
+    $tags .= "X-SPAMHOUSE-ZEN: BLOCK ($ips[0]) $codes\n";
+  } else {
+    $tags .= "X-SPAMHOUSE-ZEN: OK ($ips[0])\n";
+  }
+} else {
+  $tags .= "X-SPAMHOUSE-ZEN: OK (no ip)\n";
+}
+
+print $_, $tags, $body;
+
+exit(0);
+

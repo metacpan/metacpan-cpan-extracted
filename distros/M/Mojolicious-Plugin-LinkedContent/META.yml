@@ -1,0 +1,31 @@
+---
+abstract: 'manage linked css and js'
+author:
+  - 'Yaroslav Korshak  C<< <ykorshak@gmail.com> >>'
+  - 'Yaroslav Korshak <yko@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-LinkedContent
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Mojolicious: 5
+  perl: 5.10.0
+resources:
+  bugtracker: https://github.com/yko/mojolicious-plugin-linkedcontent/issues
+  license: http://dev.perl.org/licenses
+  repository: https://github.com/yko/mojolicious-plugin-linkedcontent
+version: '0.07'

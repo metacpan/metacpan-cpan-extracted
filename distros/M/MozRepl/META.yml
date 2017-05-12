@@ -1,0 +1,29 @@
+--- 
+abstract: Perl interface of MozRepl
+author: Toru Yamaguchi <zigorou@cpan.org>
+distribution_type: module
+generated_by: Module::Install version 0.65
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: MozRepl
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Carp::Clan: 0
+  Class::Accessor::Fast: 0
+  Class::Data::Inheritable: 0
+  Data::Dump: 0
+  Data::JavaScript::Anon: 0
+  File::Spec: 0
+  Module::Pluggable::Fast: 0
+  Net::Telnet: 0
+  Template: 0
+  Template::Provider::FromDATA: 0
+  Text::SimpleTable: 0
+  UNIVERSAL::require: 0
+  URI: 0
+version: 0.06

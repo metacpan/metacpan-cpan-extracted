@@ -1,0 +1,60 @@
+ThinPlateSpline*		O_OBJECT
+std::vector< Vec >		T_VECTORVEC
+const std::vector< Vec >	T_VECTORVEC
+std::istream*			T_ISTREAM_FROM_STRING
+
+INPUT
+
+T_ISTREAM_FROM_STRING
+	$var = new std::istringstream(SvPV_nolen($arg))
+
+T_VECTORVEC
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV) {
+	  AV* av = (AV*)SvRV($arg);
+	  const unsigned int len = av_len(av)+1;
+          $var.resize(len);
+	  for (unsigned int i = 0; i < len; ++i) {
+	    SV** elem;
+	    AV* vecAv;
+	    elem = av_fetch(av, i, 0);
+	    if (elem == NULL || !SvROK(*elem) || SvTYPE(SvRV(*elem))!=SVt_PVAV)
+	      Perl_croak(aTHX_ \"%s: Element %u in argument %s is not an array reference\",
+	                 ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	                 i, \"$var\");
+	    vecAv = (AV*)SvRV(*elem);
+	    const unsigned int vecLen = av_len(vecAv)+1;
+	    if (vecLen != 3) {
+	      Perl_croak(aTHX_ \"%s: Element %u in argument %s is not an array of three components (x/y/z)\",
+	                 ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	                 i, \"$var\");
+            }
+	    elem = av_fetch(vecAv, 0, 0);
+	    ${var}[i].x = (elem != NULL) ? SvNV(*elem) : 0.;
+	    elem = av_fetch(vecAv, 1, 0);
+	    ${var}[i].y = (elem != NULL) ? SvNV(*elem) : 0.;
+	    elem = av_fetch(vecAv, 2, 0);
+	    ${var}[i].z = (elem != NULL) ? SvNV(*elem) : 0.;
+	  }
+	}
+	else
+	  Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+	             ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	             \"$var\");
+
+OUTPUT
+
+T_VECTORVEC
+	AV* av = newAV();
+	$arg = newRV_noinc((SV*)av);
+	const unsigned int len = $var.size();
+	av_extend(av, len-1);
+	for (unsigned int i = 0; i < len; i++) {
+	  AV* vecAv = newAV();
+	  const Vec& v = ${var}[i];
+	  av_extend(vecAv, 2);
+	  av_store(vecAv, 0, newSVnv(v.x));
+	  av_store(vecAv, 1, newSVnv(v.y));
+	  av_store(vecAv, 2, newSVnv(v.z));
+	  av_store(av, i, newRV_noinc((SV*)vecAv));
+	}
+

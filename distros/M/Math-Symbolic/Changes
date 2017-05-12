@@ -1,0 +1,590 @@
+Revision history for Perl extension Math::Symbolic.
+
+0.612  Mon Jun 17 08:10 2013
+    - Attempt to fix versioning issues, take two.
+
+0.611  Wed Jun 05 08:10 2013
+    - Attempt to fix versioning issues.
+
+0.610  Wed Jun 05 07:10 2013
+    - More POD/encoding fixes (Gregor Herrmann).
+    - POD spelling fixes (Jonathan Yu).
+
+0.609  Wed May 14 07:20 2013
+    - Move POD tests to xt/
+    - POD/encoding fixes.
+
+0.608  Tue May 14 19:00 2013
+    - Move POD tests to xt/
+
+0.607  Mon Sep 19 09:03 2011
+    - Documentation change: Add warning about confusing ^ and **
+      for overloaded operations.
+
+0.606  Fri Dec 31 19:30 2010
+    - Distribution fix
+
+0.605  Fri Dec 31 18:30 2010
+    - Fix negation bug in simplification (RT #64269)
+
+0.604  Fri Jun 11 18:30 2010
+    - Fix regression in the quotient rule of derivatives (#58319)
+    - Fix problem with the atan2 derivative.
+
+0.603  Wed Mar  4 18:21 2009
+    - Fix regression in the Yapp-parser parser extension mechanism.
+
+0.602  Tue Mar  3 17:05 2009
+    - Fix RT #43783: Bug in the term simplification of constants in derivatives
+      of differences. (Reported by Alexander Platt)
+
+0.601  Thu Feb  5 21:50 2009
+    - Support for object-private parser extensions via
+      Math::SymbolicX::ParserExtensionFactory.
+
+0.510  Sun Jan 27 20:05 2008
+    - Implement commutativity information in @Math::Symbolic::Operator::Op_Types
+      (used by Math::Symbolic::Custom::Pattern 2.00 and later).
+
+0.509  Thu Dec 20 22:01 2007
+    - Add new operator type: atan2 which mostly corresponds to perl's atan2.
+      This provides some saftey during evaluation of atan(y/x) which may be
+      more common than any other use the arc tangent.
+
+0.508  Mon May 28 17:40 2007
+    - Fix two bugs in simplification (James Mastros).
+    - Some simplification improvements. (It's still crude, though.)
+    - Add mod_add_constant and mod_multiply_constant to DefaultMods.
+
+0.507  Sat Jan 20 11:35 2007
+    - The Yapp parser was improved so that it now works with
+      Math::Symbolic::Custom::Transformation.
+
+0.506  Fri Jan 12 11:35 2007
+    - Much more tests.
+    - Added test_num_equiv to DefaultTests for testing approximate equivalence
+      of a M::S tree and another or a M::S tree and a sub.
+    - Added a 'sqrt' function to both parsers which is transformed into
+      '(...)^0.5' internally.
+    - The Yapp parser now works with Math::SymbolicX::ParserExtensionFactory!
+
+0.505  Fri Jan 12 11:35 2007
+    - Fixed bug in ::Parser related to missing precompiled parsers.
+      (Thanks, Jerrad Pierce)
+    - You can now request a Parse::Yapp-based parser from the ::Parser->new()
+      method.
+    - Add is_one, is_zero, is_zero_or_one to DefaultTests
+    - Now does some simplification while deriving.
+    - Fix bug while deriving some logarithms.
+    - More derivative tests.
+
+0.504  Fri Nov  3 16:15 2006
+    - Improved POD coverage tests.
+    - This release is mainly intended to fix some PAUSE indexing trouble
+      of the last release.
+
+0.503  Fri Sep 12 18:08 2006
+    - Added an "exp()" function to the parsers. So now you can use "exp()" in
+      expressions and have it transformed to "e^(...)" internally with a pretty
+      high-precision Euler number. (The one returned by M::S::Constant->euler())
+
+0.502  Fri Apr 28  9:20 2006
+	- Small changes to the new parser to make it indexable by PAUSE.
+	- Added a script to compile the Yapp parser.
+	- Removed the Yapp parser's readme because the script documents itself.
+
+0.501  Thu Apr 27 19:19 2006
+	- Added a completely new and optional(!) parser as
+	  Math::Symbolic::Parser::Yapp.
+	  This new parser should be about 30x faster and it's over 10x faster in
+	  all benchmarks.
+	- Documented the new parser in Math::Symbolic::Parser.
+	- Augmented the tests.
+	- Added the new parser's grammar as Yapp.yp.
+	
+0.201  Tue Feb 14 15:32 2006
+	- Rewrote the to_latex() LaTeX dumper. Since it's quite a bit of code
+	  which few people actually need to load, the LaTeX dumper will be
+	  availlable as a separate distribution
+	  Math::Symbolic::Custom::LaTeXDumper.
+	- Ergo: Removed to_latex() from Math::Symbolic::Custom::DefaultDumpers.
+	- For some, this might be a change that breaks backwards compatibility.
+	  All you would need to do when upgrading Math::Symbolic is
+	  installing the aforementioned distribution and adding a call
+	  'use Math::Symbolic::Custom::LaTeXDumper;' to your program and the new,
+	  shiny *much* improved to_latex() method will be availlable.
+	- Don't blame me! to_latex() was flagged as 'extremely experimental'!
+
+0.164  Sat Dec 31 09:57:20 2005
+	- Fixed bug in det() of ::MiscAlgebra. Thanks to Markus Laire who
+	  noticed it.
+	- Added better tests to test for det() on 4x4 matrices and larger.
+
+0.163  Thu Oct 06 21:43:59 2005
+	- Added 'use strict;' to the top of ::Parser::Precompiled.
+	- Added 'use strict;' to the parser generator.
+	- Changed build process to use Module::Build but still supports
+	  Makefile.PL.
+
+0.162  Thu Sep 22 22:19:41 2005
+	- Added t/00pod.t which runs Test::Pod if it is availlable.
+	- Added a "license" line to META.yml
+
+0.161  Wed Sep  7 21:04:02 2005
+	- Corrected a few bugs in ::Derivative.
+	- Sped up ::Derivative a bit.
+	- Included obvious simplifications into the derivative
+	  routines that avoid crap such as '0*foo'.
+	- Small modifications to t/04deep_derivatives.t.
+	  We derive only ten times instead of twenty.
+	- simplify() now takes an argument: A boolean indicating
+	  whether or not the routine has to clone.
+	- Fixed bugs in simplify().
+	- Improved the simplification routines.
+
+0.160  Wed Aug 17 21:16:46 2005
+	- Fixed a bug in the parser that prevented it from parsing C
+	  floating point numbers of the form 1e10.
+	- Hacked on the parser so it's now at least 50% faster!
+	  This results in a very noticeably speedup. Test times jumped
+	  from 17 seconds to 12 seconds on my machine.
+
+0.150  Tue Aug 02 22:48:56 2005
+	- Optimized a couple of bits in the module. This should help a
+	  very slight bit with performance.
+	- Nothing that warrants the jump in version number. The jump is meant
+	  to signal that you should upgrade if you haven't already. Anything
+	  prior to 0.135 may become a problem due to ::Precompiled.
+
+0.136  Sat Jul 30 23:27:03 2005
+	- Added a (long) paragraph about performance to Math::Symbolic docs.
+	- Cleaned the README from some old cruft. (Who cares what was introduced
+	  in version 0.110? Read the change log. Oh. Well, that's what you're
+	  doing right now!)
+
+0.135  Fri Jul 29 21:23:36 2005
+	- Math::Symbolic is over 2 years old now.
+	- It's been 1 year since the last released version.
+	- Fixed bugs in Math::Symbolic::Parser::Precompiled that might cause it
+	  to not compile on some systems. Probably due to different behaviour of
+	  Parse::RecDescent in different versions or so.
+	- Sped up t/18vectorcalc.t which is, well, still slow, but it now has
+	  some Data::Dumper dumped code in its DATA section. That's because Perl
+	  parses *much* faster than Parse::RecDescent!
+	- Doctored around a bit on the docs.
+
+0.134  Thu Jul 29 17:51:53 2004
+	- Corrected embarassing derivative bug.
+	- Modified value() and apply() behaviour. Should not break
+	  compatibility but increase speed.
+	- Constants that are created with an undefined value now
+	  throw a fatal error. Previous behaviour was to do so on value()
+	  calls which turned out to be hard to debug.
+	  This may break compatibility in bad code.
+	- Tests for the above.
+
+0.133  Mon May 10 10:12:44 2004
+	- Documentation fixes.
+	- Parser returns undef if the input text hasn't been consumed
+	  entirely now.
+	- Fixed bug in 16tests.t (test 22).
+	- Added test for the above behaviour.
+
+0.132  Mon Apr 12 18:02:27 2004
+	- Added additional syntax to value() and set_value() methods
+	  as suggested by Henrik Edlund.
+	- Fixed bug in precompile_grammar.pl that broke the precompiled
+	  parser on many systems.
+	- Fixed bug in Math::Symbolic::Compiler that caused exports to fail.
+	- Reworked some of the examples. Particularily added an example that
+	  graphically demonstrates the differences between different Taylor
+	  polynomials. (examples/run16.pl)
+	- Changed the overloaded interface: If you add or subtract an
+	  existing Math::Symbolic object to/from <undef>, the result will be
+	  the Math::Symbolic::* object. (in case of the subtraction, the result
+	  will be a unary minus and the Math::Symbolic::* object.)
+	  Example where this is very useful:
+	  my @objects = (...some objects...);
+	  my $sum;
+	  $sum += $_ foreach @objects;
+
+0.131  Wed Mar 31 14:55:13 2004
+	- Changed $VERSION = 0.xxx; to ...= '0.xxx'; since that broke
+	  the Test::Distribution version tests.
+	- Improved documentation for M::S::MiscAlgebra.
+	- Added linear_solve to M::S::MiscAlgebra.
+	- Added docs and tests.
+	- Fixed errors in the documentation for M::S::Compiler.
+	- Extra tests for the compiler.
+	- Added the explicit_signature() method.
+	- Added tests and documentation.
+	- Fixed nasty bug in the compiler.
+	- Fixed even nastier misdocumentation of the compiler.
+	- Thanks to Henrik Edlund's input, one can now pass a hash ref to
+	  the compile* functions instead of an array ref.
+
+0.130  Sun Feb 15 23:54:54 2004
+	- Fixed documentation bug in M::S::VectorCalculus.
+	- Increased the accuracy of pi and euler number.
+	- Fixed documentation bug in M::S::Derivative
+	- Removed Pod::Coverage from the Makefile.PL requirements
+	- Modified the 00sanity.t tests to only use Pod::Coverage when
+	  availlable.
+	- Removed 1 test from 20miscalgebra.t which took way too long on
+	  automatted test platforms.
+	- Renamed 00sanity.t to 00podcover.t and added 00dist.t which uses
+	  Test::Distribution for well, exactly that.
+	- Modified precompile_grammar.pl (CVS only) to include a $VERSION
+	  in M::S::P::Precompiled.
+
+0.129  Sat Feb  7 19:04:50 2004
+	- Fixed associativity bug in parser for exponentiation.
+	- Regenerated the Precompiled Parser.
+	- Improved simplification of sums and differences.
+	- Removed some tests that tested methods redundantly with too much
+	  data. These tests unduly slowed down testing to the point that
+	  automatted testing facilities considered the tests failed.
+
+0.128  Wed Feb  4 13:14:12 2004
+	- Fixed bug in Constant.pm about special tag not being unset when
+	  the value of the constant is changed.
+	- Documented an important gotcha with the replace() method in Base.pm
+	- Added an extra check to the apply() method in Operator.pm that
+	  makes sure no "undefined ... in [arithmetic operation]" errors are
+	  generated when computing 1/0.
+
+0.127  Sat Jan  3 19:20:29 2004
+	- Happy New Year!
+	- There was an error in the 0.126 distribution related to
+	  the Math::Symbolic::Parser::Precompiled module.
+
+0.126  Sun Nov  9 16:54:26 2003
+	- Fixed parser bug with asinh, acosh.
+	- Added Oliver Ebenhoeh to the list of contributors.
+	- Now including a precompiled Parse::RecDescent grammar
+	  as Math::Symbolic::Parser::Precompiled. That's for startup
+	  performance.
+
+0.125  Wed Oct  8 16:19:13 2003
+	- Implemented binomial_coeff in AuxFunctions.
+	- Now requiring Memoize to be installed.
+	- Added META.yml and Makefile.PL dependency.
+	- Added bell_number() to AuxFunctions.
+	- Added bell_polynomial to MiscAlgebra.
+	- Slightly improved simplification.
+
+0.124  Wed Oct  1 15:08:49 2003
+	- Now value() and apply() return undef if any var is undefined.
+	- Docs for the above.
+	- value() on constants that aren't defined die.
+	- Fixed some documentation oversights.
+	- Added to_code, to_sub to DefaultDumpers.
+	- Added fill_in_vars() to Base.
+	- Moved the run*.pl files to ./examples/
+	- Added the perltidy.conf that is being used with this module
+	  to the CVS development tree.
+	- Added WronskyDet to VectorCalc
+	- Modified MANIFEST.skip to ignore CVS dirs and perltidy.conf
+	- Added 00sanity.t which uses all modules and uses
+	  Pod::Coverage to test for validity of documentation.
+	- Added requirement of Pod::Coverage to META.yml and Makefile.PL
+
+0.123  Fri Sep 26 00:49:55 2003
+	- Fixed the previously slightly broken to_latex() method.
+	- Added support for automatic greek output for to_latex().
+	- Added custom variable mapping for to_latex().
+
+0.122  Tue Sep 23 22:18:19 2003
+	- Added the 'to_' delegation prefix.
+	- Added Math::Symbolic::Custom::DefaultDumpers.
+	- Added support for dumping to LaTeX! *evil grin*
+
+0.121  Sun Sep 14 14:41:31 2003
+	- Added M::S::MiscAlgebra and the det() routine.
+	- Slightly improved simlification process
+	- Added is_identical_base to the DefaultTests
+	- Started implementation of mod_join_simple in DefaultMods.
+
+0.120  Thu Sep 11 16:42:51 2003
+	- Now mentioning "Hesse" as exportable function of M::S::VectorCalclus.
+	- Implemented TotalDifferential and DirectionalDerivative.
+	- Implemented TaylorPolyTwoDim.
+	- Cross-referenced the two taylor-related function docs.
+	- Tests and documentation for the new features.
+	- Added run17.pl to the distribution.
+
+0.119  Wed Sep 10 00:48:02 2003
+	- Improved exponentiation simplification.
+	- Now surpressing deep recursion warnings.
+	- Fixed a few bugs in the tree descending routines.
+	- Introduced M::S::MiscCalculus with TaylorPolynomial,
+	  TaylorErrorLagrange, and TaylorErrorCauchy.
+	- Added run16.pl to the distribution.
+	- Referenced the new module in Math::Symbolic.
+	- Added tests.
+
+0.118  Tue Sep  9 13:18:24 2003
+	- No more requiring Parse::RecDescent via Makefile.PL.
+	  After all, you can use Math::Symbolic without the parser
+	  (though you sacrifice the best piece of the interface
+	  that way.)
+	- Updated META.yml to recommend Parse::RecDescent and require it
+	  for building.
+	- Added Hesse() to M::S::VectorCalculus.
+	- Amended tests for M::S::VectorCalculus.
+	- Fixed typo in AUTHORS sections
+	- is_identical now auto-parses first argument if not a M::S tree.
+	- Slightly improved the simplification process using is_identical.
+	- Fixed various small bugs in M::S::Constant and M::S::Operator.
+	- Fixed parser bugs related to unary minus.
+	- Improved unary minus simplification.
+	- Added more unary minus parsing/simplification tests.
+
+0.117  Mon Sep  8 17:12:36 2003
+	- Added M::S::VectorCalculus with rot, grad, div, Jacobi
+	- Referenced it in the docs to the main module.
+	- Added run15.pl example of usage.
+	- Added tests.
+	- Fixed bug in M::S::Variable
+
+0.116  Wed Sep  3 22:16:51 2003
+	- Added META.yml
+	- Removed "Exporter" dependency in Makefile.PL. Who needs to install
+	  Exporter from CPAN anyway?
+	- Added run14.pl with Math::Complex stuff.
+	- Math::Symbolic::Parser now defers loading Parse::RecDescent to the
+	  first call of the parser constructor.
+	- Math::Symbolic now defers creating a parser to the first call of
+	  "parse_from_string".
+	- Together, the above changes made the testsuite run 30% faster
+	  because many of the basic test scripts don't use the parser.
+
+0.115  Tue Sep  2 16:23:15 2003
+	- Moved to sf.net
+	- Ran perltidy over the distro.
+	- Lots of doc patches including a section on extending the module.
+	- Added can() overriding to Base.pm in order to reflect method
+	  delegation.
+
+0.114  Thu Aug 28 13:26:47 2003
+	- Fixed bug in set_value() routine that was introduced in 0.113.
+	- New example in Math::Symbolic docs
+
+0.113  Sun Aug 17 19:13:28 2003
+	- Added the MS::Constant pi() constructor
+	- Added tests and docs.
+	- Added the MS::Base descend() routine. (This is a biggie.)
+	- Converted as many descending routines as possible to be using
+	  descend() instead of descending themselves.
+	  These include is_constant, is_simple_constant, is_sum,
+	  apply_constant_fold, apply_derivatives()
+	- Added new method namespace to be delegated to M::S::Custom:
+	  'contains_.
+	- Added docs and tests.
+	- Added replace().
+	- Fixed a bug in implement(). Now also autoparses strings.
+	- Added is_identical() to M::S::C::Default
+	- Split up M::S::C::Default into M::S::C::DefaultTests and
+	  M::S::C::DefaultMods.
+	- Added the M::S::Base::descending_operands() routine that tries to
+	  find the most sensible operands to descend into.
+	- Added the operand_finder parameter to descend().
+	- Moved set_value to M::S::Base and refactored it to use descend().
+	- Modified implement() similarily to set_value.
+	- Fixed some bugs in implement(), too.
+	- Hacked simplify() some more. This needs to be cleaned up real soon.
+
+0.112  Thu Aug  7 19:11:38 2003
+	- Continued moving functionality into the M::S::Custom::* namespace.
+	- Moved constant_fold into custom namespace
+	- Added tests.
+	- Fixed serious bugs.
+
+0.111  Tue Jul 29 12:38:40 2003
+	- Added Math::Symbolic::Custom::*.
+	- Added custom transformation and test functionality.
+	- Added is_sum(), is_constant(), is_integer() to M::S::C::Default
+	- Added documentation and tests for the above.
+	- Moved apply_derivatives() to the MSC::Default namespace.
+	- TODO goals met with this release:
+		+ Create a Math::Symbolic::Custom class and a
+		  Math::Symbolic::Custom::Default class.
+		+ The Math::Symbolic::Custom::Default class is to
+		  contain all builtin simplification and term-transformation
+		  routines.
+		  (Also contains methods that tests trees for particular
+		  properties)
+		+ All calls to Math::Symbolic methods that cannot be
+		  resolved in the Math::Symbolic inheritance hierarchy
+		  (which should consist of the package itself, anyhow) and
+		  that start with "apply_" should be delegated to the subs
+		  named apply_... in the Math::Symbolic::Custom
+		  package.
+		  ('is_', 'test_', and 'mod_' also delegated.)
+		+ Math::Symbolic::Custom should load
+		  Math::Symbolic::Custom::Default.
+		+ Math::Symbolic::Custom::Default should inherit
+		  from a package named Math::Symbolic::Custom::Base
+		  which defines a special import routine that automatically
+		  adds the loaded module to the @ISA of
+		  Math::Symbolic::Custom.
+		  (Implemented this using a custom exporter scheme.)
+		+ Thus, users can extend the number of
+		  Math::Symbolic::Custom's by writing a package with
+		  transformation subroutines in it that just inherits
+		  from Math::Symbolic::Custom::Base. Upon use-ing the
+		  custom module, the routines will automatically be
+		  added to Math::Symbolic's transformation and testing
+		  repertoire.
+
+0.110  Sat Jul 19 15:16:11 2003
+	- Documentation patches.
+	- Added total derivatives.
+	- Fixed the host of bugs that were discovered while implementing
+	  total derivatives.
+	- Added tests.
+	- Added docs.
+	- Added docs section on variable passing styles to Compiler.pm
+	- Added implement()
+	- Fixed uncovered bugs in total derivatives.
+	- TODO goals met with this release:
+		+ Add signatures to variables.
+		+ Add signature() methods to all elements.
+		+ Amend parser to parse signatures.
+		+ Given the signature-parser enhancements, total derivatives
+		  start making sense.
+		  Since function signatures must be defined by their signatures
+	 	  when they're used, total derivatives can be applied to all
+		  functions. (Or, if their implementation is still undefined,
+		  they can possibly still be kicked out because of their
+		  non-dependence on a particular variable.)
+		+ Add tests for sigs.
+		+ Add tests for the new features.
+
+0.109  Fri Jul 18 00:34:00 2003
+	- Documentation patches.
+	- Added signature attribute to variables.
+	- Added signature() method to all tree elements.
+	- Added set_signature() method to variables.
+	- Some docs for the sig. changes.
+	- Tests for the sig. changes.
+	- Modified parser to parse unknown 'function(list)' constructs
+	  as variables and their signatures.
+	- Tests for the parser changes.
+	- Documentation for the parser changes.
+	- Added some bad examples to the parser man-page.
+
+0.108  Wed Jul 16 22:41:01 2003
+	- Added Math::Symbolic::Compiler (as a modified to_sub.pl).
+	- Modified value() semantics to optionally take arguments.
+	- Added set_value() method.
+	- Added lots of docs.
+	- Added some tests.
+	- TODO milestones met with this release:
+		+ Refactor the to_sub.pl code to a package that allows to
+		  compile Math::Symbolic trees to subroutines and/or code.
+
+0.107  Sun Jul 13 21:25:29 2003
+	- Fixed tests. (Note to self: recreate MANIFEST for dists.)
+
+0.106  Sun Jul 13 19:56:29 2003
+	- Modified the parser to parse unknown identifiers as variables.
+	- Modified Operator constructor to send operands through the parser
+	  if they aren't valid Math::Symbolic::* objects.
+	- Added and fixed docs. A lot.
+	- Added tests.
+
+0.105  Wed Jul  9 18:56:33 2003
+	- Added several important items to the TODO.
+	- Accepted the fact that the TODO is growing faster than the code base.
+	- TODO milestones met with this release:
+		+ Add reasonable overloaded interface for arithmetic
+		  operators and some mathematical functions as far as feasible.
+		+ Overloaded interface for exp, sqrt, log, +,-,*,/,**.
+		+ Overloaded interface for boolean context and stringification.
+		+ O. i. for unary minus
+		+ O. i. for trig functions
+		+ Overloaded interface for numerical context.
+		+ Tests for the above.
+		+ Documentation for the above changes
+
+0.104  Sat Jul  5 19:17:00 2003
+	- Added to_sub.pl to the distribution. (Math::Symbolic -> Perl sub
+	  compiler.) This is just a proof-of-concept.
+
+0.103  Thu Jun  26 15:08:12 2003
+	- Fixed test errors.
+	- Added (very little) documentation.
+
+0.102  Wed Jun  25 21:04:41 2003
+	- Added overloaded interface for arithmetic operators, exp, log,
+	  sqrt, boolean context, numerical context, sin, cos, mutators.
+	- Added tests.
+	- Added docs.
+
+0.101  Fri Jun  20 15:45:10 2003
+	- Documentation fixes
+
+0.100  Fri Jun  20 01:32:32 2003
+	(Yep, I hack at random hours.)
+	- Implemented hyperbolic sine, h cosine.
+	- Implemented partial derivatives for h sine, h cosine
+	- Amended parser for h sine, h cosine.
+	- Same for tangents
+	- Myriad of bugfixes
+	- ExportConstants now includes (and exports) PI and EULER constants.
+	- Renamed class data in M::S::Operator.
+	- Cotangent.
+	- Arc sine, arc cosine, arc tangent, arc cotangent.
+	- Hyperbolic area sine, h. a. cosine
+	- Tests for the above.
+	- Broke the parser badly.
+	- (much later) Fixed it again.
+	- Some more documentation
+	- Renamed test files
+	- TODO milestones met with this release:
+		+ Add sine/cosine
+		+ Amend parser to parse sine/cosine.
+		+ Add sinh/cosh or at least allow the user to use them in the
+		  input string to the parser and have them replaced with
+		  (e^x ± e^-x)/2
+		+ Amend parser to parse hyperbolic sine/h. cosine.
+		+ Add tan, arctan, arcsine, arccosine
+		+ Amend parser to parse tan / arctan, arcsine / arccosine.
+		+ Find a more reasonable naming scheme for class data and
+		  rename appropriately.
+		+ Add tests for the new features.
+
+0.090  Wed Jun  18 16:37:56 2003
+	- Implemented sine, cosine, sine/cosine derivatives
+	- Amended parser for sine and cosine functions
+
+0.080  Sun Jun  15 22:17:11 2003
+	- Parser now a module (M::S::Parser)
+	- Parser accessible through new_from_string().
+
+0.070  Sat Jun  14 18:21:47 2003
+	- Parser now outputs Math::Symbolic tree
+	- Fixed unary-minus to infix issues.
+
+0.060  Wed Jun  11 16:58:59 2003
+	- Now including rudimentary parser for algebraic expressions.
+	- Some documentation added.
+
+0.050  Fri Jun  6 16:57:19 2003
+	- Moved the rules for partial derivatives to separate
+	  subs and introduced a lookup-table.
+
+0.040  Thu Jun  5 01:12:23 2003
+	- Many changes again.
+
+0.030  Wed Jun  4 18:43:00 2003
+	- More major enhancements (exp function, log, derivative as operator)
+
+0.020  Wed Jun  4 14:29:15 2003
+	- First working version.
+
+0.010  Tue Jun  3 21:45:57 2003
+	- original version; created by h2xs 1.21 with options
+		-AX Math::Symbolic
+

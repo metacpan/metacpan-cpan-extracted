@@ -1,0 +1,102 @@
+NAME
+    Music::Tag::OGG - Plugin module for Music::Tag to get information from
+    ogg-vorbis headers.
+
+SYNOPSIS
+            use Music::Tag
+
+            my $filename = "/var/lib/music/artist/album/track.ogg";
+
+            my $info = Music::Tag->new($filename, { quiet => 1 }, "OGG");
+
+            $info->get_info();
+   
+            print "Artist is ", $info->artist;
+
+DESCRIPTION
+    Music::Tag::OGG is used to read ogg-vorbis header information. It uses
+    Ogg::Vorbis::Header::PurePerl. I have gone back and forth with using
+    this and Ogg::Vorbis::Header. Finally I have settled on
+    Ogg::Vorbis::Header::PurePerl, because the autoload for
+    Ogg::Vorbis::Header was a pain to work with.
+
+    To write Ogg::Vorbis headers I use the program vorbiscomment. It looks
+    for this in the path, or in the option variable "vorbiscomment." This
+    tool is available from http://www.xiph.org/ as part of the vorbis-tools
+    distribution.
+
+    Music::Tag::Ogg objects must be created by Music::Tag.
+
+REQUIRED DATA VALUES
+    No values are required (except filename, which is usually provided on
+    object creation).
+
+SET DATA VALUES
+    title, track, totaltracks, artist, album, comment, releasedate, genre,
+    disc, label
+        Uses standard tags for these
+
+    asin
+        Uses custom tag "ASIN" for this
+
+    mb_artistid, mb_albumid, mb_trackid, mip_puid, countrycode, albumartist
+        Uses MusicBrainz recommended tags for these.
+
+METHODS
+    default_options
+        Returns the default options for the plugin.
+
+    set_tag
+        Save info from object back to ogg vorbis file using vorbiscomment
+
+    get_tag
+        Get info for object from ogg vorbis header using
+        Ogg::Vorbis::Header::PurePerl
+
+    close
+        Close the file and destroy the Ogg::Vorbis::Header::PurePerl object.
+
+    ogg Returns the Ogg::Vorbis::Header::PurePerl object.
+
+OPTIONS
+    vorbiscomment
+        The full path to the vorbiscomment program. Defaults to just
+        "vorbiscomment", which assumes that vorbiscomment is in your path.
+
+BUGS
+    No known additional bugs provided by this Module
+
+SEE ALSO
+    Ogg::Vorbis::Header::PurePerl, Music::Tag, http://www.xiph.org/
+
+AUTHOR
+    Edward Allen III <ealleniii _at_ cpan _dot_ org>
+
+COPYRIGHT
+    Copyright (c) 2007,2008 Edward Allen III. Some rights reserved.
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either:
+
+    a) the GNU General Public License as published by the Free Software
+    Foundation; either version 1, or (at your option) any later version, or
+
+    b) the "Artistic License" which comes with Perl.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See either the GNU
+    General Public License or the Artistic License for more details.
+
+    You should have received a copy of the Artistic License with this Kit,
+    in the file named "Artistic". If not, I'll be glad to provide one.
+
+    You should also have received a copy of the GNU General Public License
+    along with this program in the file named "Copying". If not, write to
+    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+    Boston, MA 02110-1301, USA or visit their web page on the Internet at
+    http://www.gnu.org/copyleft/gpl.html.
+
+    # vim: tabstop=4
+

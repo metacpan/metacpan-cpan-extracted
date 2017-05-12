@@ -1,0 +1,175 @@
+From http://flash-gordon.me.uk/ansi.c.txt
+
+Almost all contraints belongs to the compiler, except PERHAPS, I said PERHAPS
+because this does NOT mean that MarpaX::Languages::C::AST is wrong. These
+are constraints not in the grammar, as the few constraints already coded in
+this package.
+
+--------------------------------------------------------------
+.5.1 Storage-class specifiers
+
+Syntax
+
+          storage-class-specifier:
+                  typedef
+                  extern
+                  static
+                  auto
+                  register
+
+Constraints
+
+   At most one storage-class specifier may be given in the declaration
+specifiers in a declaration./48/
+--------------------------------------------------------------
+3.5.2.1 Structure and union specifiers
+
+Syntax
+
+          struct-or-union-specifier:
+                  struct-or-union identifier<opt> {  struct-declaration-list } 
+                  struct-or-union identifier
+
+          struct-or-union:
+                  struct
+                  union
+
+          struct-declaration-list:
+                  struct-declaration
+                  struct-declaration-list struct-declaration
+
+          struct-declaration:
+                  specifier-qualifier-list struct-declarator-list ;
+
+          specifier-qualifier-list:
+                  type-specifier specifier-qualifier-list<opt>
+                  type-qualifier specifier-qualifier-list<opt>
+
+          struct-declarator-list:
+                  struct-declarator
+                  struct-declarator-list ,  struct-declarator
+
+          struct-declarator:
+                  declarator
+                  declarator<opt> :  constant-expression
+
+Constraints
+
+   A structure or union shall not contain a member with incomplete or
+function type.  Hence it shall not contain an instance of itself (but
+may contain a pointer to an instance of itself).
+--------------------------------------------------------------
+3.5.3 Type qualifiers
+
+Syntax
+
+          type-qualifier:
+                  const
+                  volatile
+
+Constraints
+
+   The same type qualifier shall not appear more than once in the same
+specifier list or qualifier list, either directly or via one or more
+typedef s.
+--------------------------------------------------------------
+3.5.4.3 Function declarators (including prototypes)
+
+Constraints
+
+   A function declarator shall not specify a return type that is a
+function type or an array type.
+
+   The only storage-class specifier that shall occur in a parameter
+declaration is register.
+
+   An identifier list in a function declarator that is not part of a
+function definition shall be empty.
+--------------------------------------------------------------
+3.5.7 Initialization
+
+Syntax
+
+          initializer:
+                  assignment-expression
+                  {  initializer-list } 
+                  {  initializer-list , }
+
+          initializer-list:
+                  initializer
+                  initializer-list ,  initializer
+
+Constraints
+
+   There shall be no more initializers in an initializer list than
+there are objects to be initialized.
+--------------------------------------------------------------
+3.6.1 Labeled statements
+
+Syntax
+
+          labeled-statement:
+                  identifier :  statement
+                  case  constant-expression :  statement
+                  default :  statement
+
+Constraints
+
+   A case or default label shall appear only in a switch statement.
+--------------------------------------------------------------
+3.6.6.1 The goto statement
+
+Constraints
+
+   The identifier in a goto statement shall name a label located
+somewhere in the current function.
+--------------------------------------------------------------
+3.6.6.2 The continue statement
+
+Constraints
+
+   A continue statement shall appear only in or as a loop body.  
+--------------------------------------------------------------
+3.6.6.3 The break statement
+
+Constraints
+
+   A break statement shall appear only in or as a switch body or loop body.  
+--------------------------------------------------------------
+3.6.6.4 The return statement
+
+Constraints
+
+   A return statement with an expression shall not appear in a
+function whose return type is void .
+--------------------------------------------------------------
+3.7 EXTERNAL DEFINITIONS
+
+Syntax
+
+          translation-unit:
+                  external-declaration
+                  translation-unit external-declaration
+
+          external-declaration:
+                  function-definition
+                  declaration
+
+Constraints
+
+   The storage-class specifiers auto and register shall not appear in
+the declaration specifiers in an external declaration.
+--------------------------------------------------------------
+3.7.1 Function definitions
+
+Syntax
+
+          function-definition:
+                  declaration-specifiers<opt> declarator
+                            declaration-list<opt> compound-statement
+
+Constraints
+
+   The identifier declared in a function definition (which is the name
+of the function) shall have a function type, as specified by the
+declarator portion of the function definition./70/

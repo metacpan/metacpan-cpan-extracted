@@ -1,0 +1,32 @@
+---
+abstract: 'Generate a list of all primes less than or equal'
+author:
+  - 'David Oswald <davido [@at] cpan [d.o.t] org>'
+build_requires:
+  English: 0
+  ExtUtils::MakeMaker: 6.63
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.63
+  Inline::MakeMaker: 0.51
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Math-Prime-FastSieve
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Math::Prime::FastSieve:
+    file: lib/Math/Prime/FastSieve.pm
+    version: 0.19
+requires:
+  Inline: 0.51
+  Inline::C: 0.51
+  Inline::CPP: 0.42
+  perl: 5.006000
+version: 0.19

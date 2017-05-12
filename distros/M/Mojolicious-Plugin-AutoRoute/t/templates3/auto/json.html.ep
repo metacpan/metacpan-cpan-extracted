@@ -1,0 +1,6 @@
+<%
+  $self->render(json => {foo => 1});
+  return;
+%>
+
+1;

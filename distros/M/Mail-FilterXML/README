@@ -1,0 +1,33 @@
+SYNOPSIS
+      use Mail::FilterXML;
+      my $filter = new MailFilter(rules => "/home/matt/mail_rules.xml");
+      $filter->process();
+
+DESCRIPTION
+    This module builds upon Mail::Audit by Simon Cozens. Mail::Audit
+    is a module for constructing filters, Mail::FilterXML is a
+    filter of sorts. FilterXML is just made up of some logic for
+    processing an email message, and is controlled by the contents
+    of a rules file, so if I wanted to block a particular sender, I
+    could just add an element to my rules file, like:
+
+    <Rule type="from" content="microsoft.com" folder="Trash" />
+
+    The content attribute can contain perl regexps, such as
+    *\.microsoft\.*$, etceteras.
+
+FUTURE
+    I will be adding new "types" of rules, and the ability to reject
+    or altogether ignore messages, as possible in Mail::Audit. Any
+    feedback or patches are welcome.
+
+AUTHORS
+    Matthew MacKenzie <matt@geek.org>
+    Eli Ben-Shosan <eli@benshoshan.com
+COPYRIGHT
+    (c)2000-2002 Matthew MacKenzie. You may use/copy this under the same
+    terms as Perl.
+
+SEE ALSO
+    perl(1), Mail::Audit
+

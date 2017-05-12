@@ -1,0 +1,49 @@
+---
+name: Mail-Lite
+version: 0.1005
+author: []
+abstract: 'Mail::Lite -- Lite modules for mail messages parsing etc'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Clone: 0
+  MIME::Words: 0
+  Smart::Comments: 0
+  UNIVERSAL::require: 0
+  perl: 5.006
+build_requires:
+  Test::More: 0
+  YAML::Syck: 0
+provides:
+  Mail::Lite:
+    file: lib/Mail/Lite.pm
+    version: 0.1005
+  Mail::Lite::Constants:
+    file: lib/Mail/Lite/Constants.pm
+  Mail::Lite::Mbox:
+    file: lib/Mail/Lite/Mbox.pm
+  Mail::Lite::Message:
+    file: lib/Mail/Lite/Message.pm
+  Mail::Lite::Processor:
+    file: lib/Mail/Lite/Processor.pm
+  Mail::Lite::Processor::Chain:
+    file: lib/Mail/Lite/Processor/Chain.pm
+  Mail::Lite::Processor::Filter:
+    file: lib/Mail/Lite/Processor/Filter.pm
+  Mail::Lite::Processor::Last:
+    file: lib/Mail/Lite/Processor/Last.pm
+  Mail::Lite::Processor::Match:
+    file: lib/Mail/Lite/Processor/Match.pm
+  Mail::Lite::Processor::ParseRfc822:
+    file: lib/Mail/Lite/Processor/ParseRfc822.pm
+  Mail::Lite::Processor::Regexp:
+    file: lib/Mail/Lite/Processor/Regexp.pm
+  Mail::Lite::Processor::SplitMsg:
+    file: lib/Mail/Lite/Processor/SplitMsg.pm
+  Mail::Lite::Processor::Stub:
+    file: lib/Mail/Lite/Processor/Stub.pm
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

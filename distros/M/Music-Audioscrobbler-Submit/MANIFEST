@@ -1,0 +1,12 @@
+Artistic
+Copying
+lib/Music/Audioscrobbler/Submit.pm
+Makefile.PL
+MANIFEST			This list of files
+t/1-simple.t
+t/2-pod.t
+t/3-pod-coverage.t
+README
+CHANGES
+eg/nowplaying.pl
+META.yml                                 Module meta-data (added by MakeMaker)

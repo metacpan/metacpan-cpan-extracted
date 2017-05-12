@@ -1,0 +1,39 @@
+Mail::ListDetector
+------------------
+
+This module can be installed as standard for a CPAN module:
+
+  perl Makefile.PL
+  make 
+  make test
+  make install
+
+It provides the ability to examine Mail::Internet objects to determine
+if they were posted to a mailing list, and if so, which mailing list. See
+examples/sample.pl for how to use the module.
+
+The documentation is as yet very poor, and this module should be
+considered to still have alpha status - I may change functionality or
+the API at any time, and it may not actually DO anything for you. Or it
+might delete all your files.
+
+This module is licensed under the same terms as perl itself.
+
+It is free software; you can redistribute it and/or modify it under the terms
+of either:
+
+a) the GNU General Public License as published by the Free Software Foundation;
+either version 1, or (at your option) any later version:
+http://www.gnu.org/licenses/gpl.html
+
+or
+
+b) the "Artistic License" : http://dev.perl.org/licenses/artistic.html
+
+There is a public git repository available at:
+http://gitorious.org/mail-listdetector/mail-listdetector
+
+See the AUTHORS file for Copyright information.
+
+Michael Stevens
+michael@etla.org

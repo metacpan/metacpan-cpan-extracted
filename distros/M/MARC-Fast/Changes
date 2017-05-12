@@ -1,0 +1,417 @@
+commit 4ed177eeead2afff1d64a38fce08780baf679bda
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Aug 22 13:50:57 2013 +0200
+
+    added test to manifest
+
+commit ba7f6ac0e66a6b8090255b9527393639e7cce860
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Aug 22 13:49:58 2013 +0200
+
+    added resources to META.yml
+
+commit 935e0fcb29c3965a40d793b1517445d106b4c822
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Aug 22 13:38:38 2013 +0200
+
+    generate Changes from git
+
+commit 467b53f1a035f532af3fa75afc1fd522fdf6bba6
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Aug 22 11:24:36 2013 +0000
+
+    added hash_filter as option when calling to_hash [0.12]
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@47 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit da0d66efdc1d4735f05935a6300a408e7f3ac503
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Aug 22 10:48:18 2013 +0000
+
+    dump tsv file for TokyoCabinet import
+    
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@46 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 614bfc043eeaa5f8ae8de780d281d229021efc64
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Sep 23 13:51:58 2010 +0000
+
+    update MANIFEST
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@45 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 2448cacb6d649bec715fbdeb95606f0cfd76b9a3
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Sep 23 13:15:01 2010 +0000
+
+    bump version to [0.11]
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@44 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 01a39d84c74ffc4a3553eff9a57a10ae0231a850
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Sep 23 13:14:37 2010 +0000
+
+    better example with repetable field and subfields
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@43 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 4c444f30647dedeeaea1300adf8ba3e60d1f63f3
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Sep 23 13:07:28 2010 +0000
+
+    fix repeatable subfields in to_hash
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@42 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 8c6a77a95fedbce3e3d4ac2bc6adde00efe9793a
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Sep 23 13:06:25 2010 +0000
+
+    test data with repeatable subfield
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@41 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit eec94e2b3979b427ee2bb064c76ed364f2d53568
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Sep 23 13:05:59 2010 +0000
+
+    test repeatable subfields
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@40 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 7d7050d2aa6010d484860a54425a9ceff781283c
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Sep 23 12:55:35 2010 +0000
+
+    move Fast.pm into lib/MARC/Fast.pm
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@39 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit cabfd93a9ff6f82e8b67e3050ca3c2ea1ef0af37
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Sep 23 12:29:37 2010 +0000
+
+    use file from $marc_file variable
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@38 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 01dc793451bb00d0a95e6b2e70ee0e8882bdf0b7
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Sep 23 12:26:42 2010 +0000
+
+    use lib instead of blib for local testing
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@37 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 0dbe189e6984e2dd51cc903ffbbfa98094dd9f65
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Sep 23 12:24:38 2010 +0000
+
+    rename tag number to $tag
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@36 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 798e5a294ff67a1ff4dbd8b7ecfb97020929daa4
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Feb 4 17:15:09 2010 +0000
+
+    bump version [0.10]
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@35 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 4050a1d1d424433e2efd84be09d59014f24f07a5
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Feb 4 17:14:52 2010 +0000
+
+    add utf-8 tests and data into MANIFEST
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@34 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit c9df7a8379b2016ab44b0427198a193c4a98cf2e
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Feb 4 17:13:18 2010 +0000
+
+    don't card on junk at end, just warn
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@33 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 3155b9de32d2a7c8231fb4599b9061362ee775f7
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Feb 4 17:10:14 2010 +0000
+
+    added test and data for utf-8 encoding example
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@32 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit df7293d3cca255a7a43c0e78606fd113c8970725
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Feb 4 17:09:49 2010 +0000
+
+    return correct count for marc files with additional junk bytes at end
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@31 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 64db2e9e31595d73daddd3ee2bc628604fd82a1d
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Feb 4 17:08:03 2010 +0000
+
+    added documentation about utf-8 encoded marc files and utf-8 flag in perl scalars
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@30 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 936318a1af91fe3ac5ef2a91630af1097c6159c2
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Feb 4 12:54:00 2010 +0000
+
+    don't depend on Test::Exception
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@29 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 8bc90e39e0a8a20521a51e0e70aa6941499bde8a
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Sat Sep 6 10:40:52 2008 +0000
+
+    include_subfields with option -h
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@28 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 7434f8f97fce6913ee8b223942daa9965bfb16cd
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Sun Aug 3 06:49:12 2008 +0000
+
+    pull Changes from svk and release to CPAN 0.09
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@27 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 5fc18887422d2dd62c716b73d81a226f3a295e5b
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Mon Nov 19 16:37:00 2007 +0000
+
+    use Data::Dump for nicer (shorter/more readable) output instead of
+    Data::Dumper
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@26 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 3d844dfbf091bc62a45aff80189d402d1f9cba1f
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Tue Nov 6 20:06:26 2007 +0000
+
+    include subfields in to_hash dump
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@25 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 8ddb954243aacc37ee72801b9f1d969d893a5f85
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Tue Nov 6 20:06:07 2007 +0000
+
+    correctly upgrade repeatable field value to array
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@24 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 1677866871d5303a178499e33f86e3c02af57877
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Sun Nov 4 22:44:42 2007 +0000
+
+    much more sane implementation of to_hash which now include
+    option include_subfields just like Biblio::Isis does. [0.09]
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@23 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit a3bc3c51dfc371f2e18b3f719db239480e4a16e0
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Tue Oct 30 16:41:06 2007 +0000
+
+    display also leader in dump
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@22 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 2908568e3d5cbbae3ae26230f2c56d8b0b2ee24e
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Mon Oct 29 22:41:21 2007 +0000
+
+    correctly skip tests if there is no test MARC file
+    
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@21 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit c47ff33da7b163d95a3aa222fd5bff4734c81ce2
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Mon Oct 29 22:40:58 2007 +0000
+
+    update
+    
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@20 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 12f18ad14a52dc83e3449d908fb0678e16dabb49
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Mon Oct 29 22:38:55 2007 +0000
+
+    included sample marc file from MARC-Record-2.0
+    
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@19 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit a1d1939c89e83f096a59468d10bf1b5eb2214403
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Mon Oct 29 22:33:35 2007 +0000
+
+    added $marc->last_leader which returns leader of
+    last record accessed with $marc->fetch
+    bump version to [0.08]
+    
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@18 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 8b141e94aa130f0b8e50d89a2d57d1d1971f9f2b
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Jun 21 10:24:12 2007 +0000
+
+    update version [0.07]
+    
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@17 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 32a687e3527bec06b7a15ccceb53e6ba9f5d272a
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Jun 21 10:23:12 2007 +0000
+
+    make Data::Dump optional
+    
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@16 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 167dbfe1834fcf672e526e460c27846182ccaf5d
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Jun 21 10:05:39 2007 +0000
+
+    auto-generated from svn log
+    
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@15 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit e930b654bfda26d405ef840dce8918baeaf1208b
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Mon Jun 18 22:54:02 2007 +0000
+
+    push new (slim) version [0.06]
+    
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@14 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 8d434a1c9a1414e59e7a802cae41877bef3307e4
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Mon Jun 18 22:51:04 2007 +0000
+
+    remove huge unimarc.iso file from distribution
+    
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@13 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit f05bfba5ef7cefc8fff3a2bf0583ebd12c4fed88
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Mon Jun 18 22:32:41 2007 +0000
+
+    release preparation
+    
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@12 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit be2299900879d2c12a99cb9728a9113c85c6d8e8
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Fri Nov 3 20:34:31 2006 +0000
+
+    added to_ascii to be more like Biblio::ISIS API [0.05]
+    
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@11 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 79218e828e9e2e78f8b8c0f54be1ca9b99937d55
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Fri Nov 3 20:07:58 2006 +0000
+
+    change terminology to offset and limit
+    
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@10 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit b9f79b2dd586279171a83a095f2fae4714f86a5f
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Thu Jul 13 14:00:23 2006 +0000
+
+    hash_filter now gets record number as second arguments to be in sync with Biblio::Isis 0.22
+    
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@9 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 7740f0733c542c4a23750b42508d382d27e2e57d
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Wed Dec 28 22:16:39 2005 +0000
+
+    documented hash_filter, fully implemented repeatable subfileds. [0.03]
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@8 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 1eb9ffc53258d90a524ef05e88d9321c042def92
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Wed Dec 28 22:03:24 2005 +0000
+
+    pod documentation, new options, much nicer output
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@7 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 8300e4b53e83d8a355dba26d74624d521f67232f
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Sun Dec 18 23:12:26 2005 +0000
+
+    added to_hash, small fix to test, better output in dump_fastmarc.pl [0.02]
+    
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@6 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 96b41f990776b11c9bb1824d34cb93c368985053
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Sat Oct 8 16:33:09 2005 +0000
+
+    convert repeatable fileds into repeatable subfields
+    
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@5 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit bf7a8cd995686ae3652408d5c58067aba565bf2a
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Sat Oct 8 16:32:54 2005 +0000
+
+    added option -n number to dump just one record and -d for debug
+    
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@4 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit eb411e96a84d82b31bc173025803b2d7dd8ab404
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Fri Apr 8 12:19:24 2005 +0000
+
+    dump sorted fields
+    
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@3 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit fd2dd8625b3852a898b0a75237c862aa787208d4
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Tue Jan 4 15:32:54 2005 +0000
+
+    check for test data and skip tests if it doesn't exists
+    
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@2 49f9634a-d7ec-0310-8e6b-ec35c6cc8804
+
+commit 5c5233ec1192462b4f0e5d30ba274f1b09cc69fc
+Author: Dobrica Pavlinusic <dpavlin@rot13.org>
+Date:   Tue Jan 4 10:26:07 2005 +0000
+
+    initital import of 0.01 into subversion
+    
+    
+    git-svn-id: svn+ssh://llin/home/dpavlin/private/svn/MARC-Fast/trunk@1 49f9634a-d7ec-0310-8e6b-ec35c6cc8804

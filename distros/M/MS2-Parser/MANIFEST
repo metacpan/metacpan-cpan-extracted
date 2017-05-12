@@ -1,0 +1,19 @@
+Changes
+ignore.txt
+lib/MS2/.Parser.pm.swp
+lib/MS2/Header.pm
+lib/MS2/Parser.pm
+lib/MS2/Scan.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+README.pod
+t/00-load.t
+t/boilerplate.t
+t/file.ms2
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

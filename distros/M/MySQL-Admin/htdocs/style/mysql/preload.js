@@ -1,0 +1,12 @@
+var folderClosed = new Image(16,16);
+folderClosed.src='/style/lze/16/html-menu-treeview/folderClosed.gif';
+var plusNode = new Image(16,16);
+plusNode.src='/style/lze/16/html-menu-treeview/plusNode.gif';
+var lastPlusNode = new Image(16,16);
+lastPlusNode.src='/style/lze/16/html-menu-treeview/lastPlusNode.gif';
+var folderClosed22 = new Image(22,22);
+folderClosed22.src='/style/lze/22/html-menu-treeview/folderClosed.gif';
+var plusNode22 = new Image(22,22);
+plusNode22.src='/style/lze/22/html-menu-treeview/plusNode.gif';
+var lastPlusNode22 = new Image(22,22);
+lastPlusNode22.src='/style/lze/22/html-menu-treeview/lastPlusNode.gif';

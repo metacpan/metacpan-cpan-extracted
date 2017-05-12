@@ -1,0 +1,2 @@
+- Investigate using named graphs.
+- Document how other Module::Install plugins can build on this one.

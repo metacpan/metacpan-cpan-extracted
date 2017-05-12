@@ -1,0 +1,362 @@
+Revision history for Mojolicious-Plugin-BootstrapHelpers
+
+0.0204 2016-12-31 16:43:08 UTC
+ [Documentation]
+ - Updated documentation regarding which versions of Bootstrap and jQuery
+   are included when using those helpers.
+
+ [Stats & Dependency Changes]
+ - 2 files changed, 15 insertions(+), 15 deletions(-)
+ - (dev req) ~ Dist::Zilla 5.000 --> 6.008
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild 0.151680 -->
+   0.163040
+ - (dev req) ~ Dist::Zilla::Plugin::Git 2.036 --> 2.041
+ - (dev req) ~ Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.013 -->
+   0.014
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors 0.017 --> 0.029
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod 0.150250 --> 0.163250
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Compile 2.054 --> 2.056
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0312 --> 0.0313
+
+0.0203 2016-09-20T21:16:40Z UTC
+ [New Features]
+ - Added the 'context_menu' helper, a dropdown menu without button.
+
+ [Stats & Dependency Changes]
+ - 4 files changed, 109 insertions(+), 12 deletions(-)
+ - (dev req) ~ Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0100
+   --> 0.0200
+
+0.0202 2016-08-16T20:42:05Z UTC
+ [Other]
+ - No changes necessary for Mojolicious 7 compatibility.
+
+ [Enhancements]
+ - Updated Bootstrap version to 3.3.7 (when included via the cdn helpers).
+ - Updated jQuery version to 2.2.4 (when included via the cdn helpers).
+
+ [Stats & Dependency Changes]
+ - 4 files changed, 38 insertions(+), 38 deletions(-)
+ - (dev req) + Dist::Zilla::Plugin::MetaConfig (any)
+ - (dev req) + Dist::Zilla::Plugin::PromptIfStale (any)
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0309 --> 0.0312
+
+0.0201 2016-03-23T22:59:42Z UTC
+ [Enhancements]
+ - Added 'container' argument to navbar.
+ - Updated Bootstrap version to 3.3.6 (when included via the cdn helpers).
+ - Updated jQuery version to 2.2.2 (when included via the cdn helpers).
+
+ [Requirements]
+ - Requires latest (1.44) List::Util instead of List::MoreUtils, since it
+   now has 'uniq'.
+
+ [Other Changes]
+ - No longer uses package block syntax.
+
+ [Bug Fixes]
+ - Fixed an issue where an item in a 'nav' that wasn't a dropdown couldn't
+   have attributes.
+
+ [Documentation]
+ - Removed duplicated pod sections.
+
+ [Stats & Dependency Changes]
+ - 9 files changed, 961 insertions(+), 821 deletions(-)
+ - (run req) + List::Util 1.44
+ - (run req) - List::MoreUtils
+ - (test req) + IO::Handle (any)
+ - (test req) + IPC::Open3 (any)
+ - (dev req) + Badge::Depot 0.0103
+ - (dev req) + Badge::Depot::Plugin::Coverage (any)
+ - (dev req) + Badge::Depot::Plugin::Cpantesters (any)
+ - (dev req) + Badge::Depot::Plugin::Kwalitee (any)
+ - (dev req) + Badge::Depot::Plugin::Perl (any)
+ - (dev req) + Badge::Depot::Plugin::Travis (any)
+ - (dev req) + Dist::Zilla 5.000
+ - (dev req) + Dist::Zilla::Plugin::Authority 1.009
+ - (dev req) + Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.007
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0100
+ - (dev req) + Dist::Zilla::Plugin::Clean 0.07
+ - (dev req) + Dist::Zilla::Plugin::Git 2.036
+ - (dev req) + Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.013
+ - (dev req) + Dist::Zilla::Plugin::Git::Commit (any)
+ - (dev req) + Dist::Zilla::Plugin::InstallRelease 0.008
+ - (dev req) + Dist::Zilla::Plugin::NextRelease::Grouped 0.0200
+ - (dev req) + Dist::Zilla::Plugin::RewriteVersion::Transitional 0.007
+ - (dev req) + Dist::Zilla::Plugin::Test::Compile 2.054
+ - (dev req) + Dist::Zilla::Plugin::Test::EOF 0.0501
+ - (dev req) + Dist::Zilla::Plugin::Test::EOL 0.18
+ - (dev req) + Dist::Zilla::Plugin::Test::Kwalitee::Extra v0.2.1
+ - (dev req) + Dist::Zilla::Plugin::Test::NoTabs 0.15
+ - (dev req) + Dist::Zilla::Plugin::Test::Version 1.05
+ - (dev req) + Pod::Weaver::Section::GenerateSection 1.01
+ - (dev req) + Pod::Weaver::Section::Legal::Supplemented (any)
+ - (dev req) + Test::EOF (any)
+ - (dev req) + Test::EOL (any)
+ - (dev req) + Test::More 0.88
+ - (dev req) + Test::NoTabs 1.4
+ - (dev req) + Test::Version 1
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild (any) --> 0.151680
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors (any) --> 0.017
+ - (dev req) ~ Dist::Zilla::Plugin::GithubMeta (any) --> 0.54
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package (any) -->
+   2.003001
+ - (dev req) ~ Dist::Zilla::Plugin::PodWeaver (any) --> 4.006
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod (any) --> 0.150250
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests (any) --> 0.028
+ - (dev req) ~ Dist::Zilla::Plugin::Stenciller::HtmlExamples (any) -->
+   0.0201
+ - (dev req) ~ Dist::Zilla::Plugin::Stenciller::MojoliciousTests (any) -->
+   0.0200
+ - (dev req) ~ Dist::Zilla::Plugin::Test::ReportPrereqs (any) --> 0.021
+ - (dev req) ~ Dist::Zilla::Plugin::TravisYML (any) --> 1.15
+ - (dev req) ~ Pod::Weaver::Section::Badges (any) --> 0.0401
+ - (dev req) ~ Stenciller 0.1301 --> 0.1400
+ - (dev req) ~ Test::Warnings (any) --> 0.026
+ - (dev req) - Dist::Zilla::Plugin::CheckExtraTests
+ - (dev req) - Dist::Zilla::Plugin::MetaProvides::Class
+ - (dev req) - Dist::Zilla::Plugin::NextRelease
+ - (dev req) - Dist::Zilla::Plugin::NextVersion::Semantic
+ - (dev req) - Dist::Zilla::Plugin::OurPkgVersion
+ - (dev req) - Dist::Zilla::Plugin::PodnameFromClassname
+ - (dev req) - Dist::Zilla::Plugin::Prereqs::Plugins
+ - (dev req) - Dist::Zilla::Plugin::PreviousVersion::Changelog
+ - (dev req) - Dist::Zilla::Plugin::ReversionOnRelease
+ - (dev req) - Pod::Weaver::Section::Homepage::DefaultCPAN
+ - (dev req) - Pod::Weaver::Section::Legal
+ - (dev req) - Pod::Weaver::Section::Source::DefaultGitHub
+ - (dev sug) + Dist::Iller 0.1408
+ - (dev sug) + Dist::Iller::Config::Author::CSSON 0.0309
+
+0.0200 2015-11-24T14:12:19Z UTC
+ [Meta]
+ - Replaced iller.ini with iller.yaml
+ - Regenerated dist.ini (and weaver.ini) from iller.yaml with new plugins.
+ - Removed cpanfile
+
+ [Enhancements]
+ - Updated Bootstrap version to 3.3.5 (when included via the cdn helpers).
+ - Updated jQuery version to 2.1.4 (when included via the cdn helpers).
+ - The cdn helpers now always create https urls, previously they created
+   protocol relative urls.
+
+ [Requirements]
+ - Removed superfluous use of true.
+ - Moved Dist::Zilla things to the correct requirement phase.
+
+ [Documentation]
+ - Tests and examples (both inline in POD and in /examples) are now
+   generated via Stenciller.
+ - Various improvements.
+
+0.0187 2014-12-04T15:52:33Z CET
+ [New Features]
+ - Added support for textarea in formgroups.
+
+ [Enhancements]
+ - Updated currently supported Bootstrap version to 3.3.1.
+
+0.0186 2014-10-31T10:34:05Z CET
+ [Enhancements]
+ - Updated currently supported Bootstrap version to 3.3.0.
+
+0.0185 2014-10-02T23:11:42Z CEST
+ [Bug Fixes]
+ - If brand in a navbar is undef, no brand link is created (the url still
+   needs to exist). This was in the documentation, but wasn't implemented.
+
+0.0184 2014-09-26T09:42:13Z CEST
+ [Documentation]
+ - Inversing navbars mentioned.
+ - Added a missing header.
+
+0.0183 2014-09-25T22:36:02Z CEST
+ [Documentation]
+ - Added |item| description.
+ - Improved |link| description.
+
+0.0182 2014-09-24T18:34:20Z CEST
+ [Meta]
+ - Cleanup
+
+0.0181 2014-09-23T19:48:36Z CEST
+ [Documentation]
+ - Formatting and minor improvements.
+
+0.0180 2014-09-23T19:30:12Z CEST
+ [Meta]
+ - String::Random new prereq
+
+ [Enhancements]
+ - Finalized (for now) navbar syntax
+ - Improved dropdown (and similar) syntax
+ - Input groups can (again) take button groups.
+ - Navs can (again) take dropdowns.
+
+0.0176 2014-09-23T00:31:21Z CEST
+ [API Changes]
+ - Input groups can't currently take button groups.
+ - Navs can't currently take dropdowns.
+
+ [Enhancements]
+ - More work on streamlining menu syntax.
+
+ [Documentation]
+ - Note that some syntax descriptions are currently inaccurate. See
+   examples for current syntax.
+
+0.0175 2014-09-21T23:35:05Z CEST
+ [Enhancements]
+ - Slightly improved syntax for forms in navbar (urls now in array ref like
+   elsewhere).
+ - Navs in navbar can be right-ed.
+
+0.0174 2014-09-20T23:06:25Z CEST
+ [Enhancements]
+ - Improved navbar support (see examples)
+
+0.0173 2014-09-19T23:50:31Z CEST
+ [Enhancements]
+ - Support for nav pills and nav tabs (undocumented)
+ - Partial support for navbar (also undocumented)
+
+ [Documentation]
+ - Fixed some internal links.
+ - Fixed pod typo under init_short_strappings.
+
+0.0172 2014-09-17T22:51:58Z CEST
+ [Meta]
+ - Add DZP::PkgVersion::Block to build dependencies.
+
+ [API Changes]
+ - Actually removed input-group behaviour from form-group (it had already
+   been deprecated and de-documented).
+
+ [Enhancements]
+ - Added toolbar support.
+ - Added input group support.
+
+ [Documentation]
+ - Introduces the |...| syntax definition syntax.
+
+0.0171 2014-09-16T23:11:42Z CEST
+ [Meta]
+ - Use DZP::PkgVersion::Block.
+
+ [Enhancements]
+ - Added 'vertical' strapping to button group.
+ - Added 'justified' strapping to button group.
+ - Added 'dropup' strapping to nested button groups.
+ - Added shortcut to create a single button dropdown.
+ - Added type="button" to all buttons that should have it.
+
+ [Documentation]
+ - Synopsis contained a partially deprecated example.
+
+0.0170 2014-09-15T20:44:29Z CEST
+ [Enhancements]
+ - Added button group support (also supports nested groups)
+
+0.0161 2014-09-14T21:23:07Z CEST
+ [Meta]
+ - Shorter version numbers
+
+ [New Features]
+ - Undocumented preliminary support for button groups.
+
+0.0160 2014-09-13T15:59:45Z CEST
+ [API Changes]
+ - Improved the dropdown syntax. Now the arguments for the button goes in
+   the 'button' array ref.
+
+ [Enhancements]
+ - Fixed spacing around caret.
+ - Added disabled strapping to dropdown item.
+
+0.015.001 2014-09-12T18:46:54Z CEST
+ [API Changes]
+ - Remove divier from dropdown definition. Replaced by empty array ref.
+
+ [New Features]
+ - Use a string in a dropdown to create a dropdown header.
+
+0.015.000 2014-09-11T12:54:51Z CEST
+ [Meta]
+ - Remove DZP::CopyFromRelease
+ - Add missing build dependencies
+
+ [Documentation]
+ - Moved all examples to source files, meaning all examples are passed
+   through tests to ensure that they are correct.
+ - It also means that all tag helper tests are output as html files in the
+   examples/ directory
+
+0.014.001 2014-09-08T14:55:39Z CEST
+ - Removed the automatic insertion of _ after a customized prefix.
+ - Converted tests to Dist::Zilla::Plugin::Test::CreateFromMojoTemplates
+   style
+ - Changed ordering in documentation to alphabetical
+ - Removed trailing whitespace
+ - Changed some dzil plugins (and version style)
+
+0.014.000 2014-09-05T12:34:25Z CEST
+ - Restored the accidentally removed cols support for form groups
+ - Documentation: Minor typos fixed
+ - Documentation: Removed unsupported input groups examples
+ - There is no 0.013.
+
+0.012 2014-09-04T22:58:34Z CEST
+ - Added simple dropdown support
+ - Added icon support
+ - Fixed version number
+ - Removed support for input group (was incorrect)
+ - Put the helpers in a separate module
+
+0.011 2014-09-04T14:03:53Z CEST
+ - Much improved syntax definitions (no functional changes)
+
+0.010 2014-09-03T16:53:37Z CEST
+ - Added badge helper
+
+0.009 2014-09-01T15:20:27Z CEST
+ - Can add html attributes to table elements
+ - Added missing dependencies (++eserte)
+ - Documentation: Much improved syntax descriptions
+
+0.008 2014-09-01T10:52:55Z CEST
+ - Added support for placing a table in panel without a .panel-body
+ - Documentation: Described syntax conventions
+ - Documentation: Added syntax descriptions for table and button.
+
+0.007 2014-08-31T22:23:18Z CEST
+ - Documentation: Clarified shortcuts
+ - Documentation: Started work on structured syntax descriptions
+ - Documentation: Improved synopsis
+
+0.006 2014-08-31T17:37:26Z CEST
+ - Added table helpers
+ - Added helper to include bootstrap css and js (and possibly jquery)
+
+0.005 2014-08-31T15:01:23Z CEST
+ - Allow dashes in id, but change them to underscores in nam
+ - Documented buttons
+
+0.004 2014-08-31T14:14:19Z CEST
+ - Added many shortcuts (and adjusted documentation)
+ - Documented options
+ - Cleaned up internals
+ - Improved test layout
+ - Cleaned up cpanfile
+
+0.003 2014-08-31T11:21:10Z CEST
+ - Removed unnecessary dependency
+ - Much improved tests (with Test::Mojo::Trim)
+
+0.002 2014-08-30T22:50:05Z CEST
+ - First public release.
+
+0.001 2014-08-30T22:47:03Z CEST
+ - Initial release

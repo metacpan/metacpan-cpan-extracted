@@ -1,0 +1,143 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+# $Id: spews-scan,v 1.2 2005/11/03 13:39:46 lem Exp $
+
+use Pod::Usage;
+use NetAddr::IP;
+use Getopt::Std;
+use WWW::Mechanize;
+
+our $VERSION = do { my @r = (q$Revision: 1.2 $ =~ /\d+/g); sprintf " %d."."%03d" x $#r, @r };
+
+=pod
+
+=head1 NAME
+
+spews-scan - Locate SPEWS records
+
+=head1 SYNOPSIS
+
+    spews-scan [-h] [-v] IP...
+
+=head1 DESCRIPTION
+
+SPEWS (http://www.spews.org) is perhaps the most controversial public
+anti-spam resource. This tool eases the location of your network
+blocks in the SPEWS database.
+
+When passed a large (</24) subnet, it will be split in /24s and for
+each one, a query for the first and last address will be attempted.
+
+=head2 Do not abuse this script
+
+In general, it is not polite to send large numbers of queries to a
+host, as this might be interpreted as an attack. Use this scipt
+judiciously and avoid long and repeated queries.
+
+The following options are recognized:
+
+=over
+
+=item B<-h>
+
+Outputs this documentation.
+
+=item B<-v>
+
+Be verbose about progress.
+
+=cut
+
+    ;
+use vars qw/ $opt_h $opt_v /;
+
+getopts('hv');
+
+pod2usage(verbose => 2) if $opt_h;
+
+my $ua = WWW::Mechanize->new(agent => "spews-scan/$VERSION");
+
+				# Submit the search as we want it
+
+my @addr = map { $_->split(24) } NetAddr::IP::compact 
+    grep { defined $_ } map { NetAddr::IP->new($_) } @ARGV;
+
+foreach my $sn (@addr)
+{
+    my $result = 0;
+    
+    warn "Verify $sn...\n" if $opt_v;
+
+    for my $ip ($sn->first, $sn->last, @{$sn}[rand @{$sn}])
+    {
+	my $r = $ua->get('http://www.spews.org/ask.cgi?x=' . $ip->addr);
+	unless ($ua->success)
+	{
+	    warn "Get for ", $ip->addr, " failed: ", $r->status_line, "\n";
+	    next;
+	}
+	
+	if ($r->content =~ 
+	    /This <!--1record1--><!--2IP address2--> was NOT found in SPEWS./)
+	{
+	    print "$ip not found in SPEWS\n" if $opt_v;
+	}
+	elsif ($r->content =~ m!href=\"/html/S!)
+	{
+	    foreach ($r->content =~ m!href=\"/html/(S\d+)\.html\"!g)
+	    {
+		print "$sn: FOUND in SPEWS - $1\n";
+	    }
+	    $result = 1;
+	    last;
+	}
+	else
+	{
+	    print "$sn: Unknown status in SPEWS for $ip... HELP!\n";
+	    last;
+	}
+    }
+}
+
+__END__
+
+=pod
+
+=back
+
+The output is (mostly) human readable.
+
+=head1 HISTORY
+
+=over
+
+$Log: spews-scan,v $
+Revision 1.2  2005/11/03 13:39:46  lem
+Added a missing =back
+
+Revision 1.1  2004/03/10 20:19:10  lem
+Added bin/spews-scan
+
+=back
+
+=head1 LICENSE AND WARRANTY
+
+This code and all accompanying software comes with NO WARRANTY. You
+use it at your own risk.
+
+This code and all accompanying software can be used freely under the
+same terms as Perl itself.
+
+=head1 AUTHOR
+
+Luis E. Muñoz <luismunoz@cpan.org>
+
+=head1 SEE ALSO
+
+perl(1), C<acat(1)>, C<WWW::Mechanize(3)>
+
+=cut
+

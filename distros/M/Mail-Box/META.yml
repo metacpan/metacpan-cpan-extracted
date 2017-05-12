@@ -1,0 +1,40 @@
+---
+abstract: 'E-mail handling'
+author:
+  - 'Mark Overmeer'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mail-Box
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Cwd: 0
+  Date::Parse: 0
+  Devel::GlobalDestruction: 0.09
+  Errno: 0
+  Fcntl: 0
+  File::Basename: 0
+  File::Compare: 0
+  File::Copy: 0
+  File::Remove: 0.2
+  File::Spec: 0.7
+  IO::Scalar: 0
+  Mail::Message: 3
+  Mail::Transport: 3
+  Object::Realize::Later: 0.19
+  POSIX: 0
+  Scalar::Util: 1.13
+  Sys::Hostname: 0
+  Test::More: 0.47
+version: 3.002

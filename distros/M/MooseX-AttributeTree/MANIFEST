@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/MooseX/AttributeTree.pm
+lib/MooseX/AttributeTree/Accessor.pm
+t/00-all_prereqs.t
+t/00-load.t
+t/10-oneclass.t
+t/20-twoclasses.t
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t

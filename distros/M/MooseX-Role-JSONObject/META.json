@@ -1,0 +1,80 @@
+{
+   "abstract" : "create/store an object in a JSON-like hash",
+   "author" : [
+      "Peter Pentchev <roam@ringlet.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Role-JSONObject",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "List::Util" : "1.30",
+            "Method::Signatures" : "20141021",
+            "Moose" : "2",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "version" : "0.77"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "1.30",
+            "Method::Signatures" : "20141021",
+            "Moose" : "2",
+            "perl" : "5.012001",
+            "version" : "0.77"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::Role::JSONObject" : {
+         "file" : "lib/MooseX/Role/JSONObject.pm",
+         "version" : "v0.1.0"
+      },
+      "MooseX::Role::JSONObject::Meta::Trait" : {
+         "file" : "lib/MooseX/Role/JSONObject/Meta/Trait.pm",
+         "version" : "v0.1.0"
+      },
+      "MooseX::Role::JSONObject::Util" : {
+         "file" : "lib/MooseX/Role/JSONObject/Util.pm",
+         "version" : "v0.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.1.0",
+   "x_authority" : "cpan:ROAM",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

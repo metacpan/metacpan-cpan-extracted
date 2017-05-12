@@ -1,0 +1,20 @@
+---
+abstract: 'fixed-point arithmetic for Perl'
+author:
+  - 'Mariano Wahlmann <dichoso _at_ gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Math-FixedPoint
+requires:
+  Test::More: 0
+resources:
+  homepage: https://github.com/bluescreen10/Math-FixedPoint
+  repository: https://github.com/bluescreen10/Math-FixedPoint.git
+version: 0.20130625.1928

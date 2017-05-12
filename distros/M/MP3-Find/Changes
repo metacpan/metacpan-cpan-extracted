@@ -1,0 +1,30 @@
+Revision history for Perl extension MP3::Find.
+
+0.07  7 Jun 2011
+    - fixed tests that were failing due to a bad test plan
+
+0.06  11 Jul 2006
+    - deprecated the create_db, update_db, and sync_db methods
+    - databases can be selected by a custom DSN or an already open database handle
+
+0.05  28 Apr 2006
+    - mp3find searches in ID3v2 tags if MP3::Tag is available
+    - using Sort::Key for sorting of results (if available)
+
+0.04  2 Apr 2006
+    - BUGFIX: fixed tests that were failing because the test mp3 was not included
+    - added "status_callback" option to DB backend constructor
+
+0.03  27 Mar 2006
+    - added "exclude_path" option to filesystem backend
+    - added "sync_db" method to the DB backend
+    - added support for searching by ID3v2 tag (using MP3::Tag)
+
+0.02  1 Feb 2006
+    - doc updates to MP3::Find (thanks to Mike Slass for the suggestion)
+    - added a test suite for the DB backend
+    - DB management functions are now in the DB backend
+    - rewrote (and documented) mp3db to use the new DB backend functions
+
+0.01  29 Jan 2006
+    - first CPAN release

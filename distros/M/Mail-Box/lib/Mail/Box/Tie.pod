@@ -1,0 +1,71 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Box::Tie - access an existing message-folder as an array or hash
+
+=head1 SYNOPSIS
+
+As an array:
+
+ use Mail::Box::Tie;
+ tie my(@inbox), Mail::Box::Tie::ARRAY => $folder;
+ tie my(@inbox), Mail::Box::Tie => $folder;    # deprecated
+ print $inbox[3];
+
+or as hash:
+
+ tie my(%inbox), Mail::Box::Tie::HASH => $folder;
+ tie my(%inbox), Mail::Box::Tie => $folder;    # deprecated
+ print $inbox{'<12379.124879@example.com>'};
+
+=head1 DESCRIPTION
+
+The use of C<Mail::Box::Tie> is B<deprecated>, because it is succeeded by two
+separate modules: L<Mail::Box::Tie::ARRAY|Mail::Box::Tie::ARRAY> and L<Mail::Box::Tie::HASH|Mail::Box::Tie::HASH>.
+However, this module still works.
+
+Folders certainly look like an array of messages, so why not just
+access them as one?  Or, the order is not important, but the
+message-ids are (give relations): why not access them from a hash
+based on this message-id?  Programs using one of these ties will
+look simpler than programs using the more traditional method calls.
+
+=head1 METHODS
+
+=head1 SEE ALSO
+
+This module is part of Mail-Box distribution version 3.002,
+built on March 31, 2017.
+
+Do not forget to read
+L<Mail::Box-Overview>,
+L<Mail::Box-Cookbook>, and
+L<Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L<Mail::Message>,
+L<Mail::Box>,
+L<Mail::Box::IMAP4>,
+L<Mail::Box::POP3>,
+L<Mail::Box::Parser::C>,
+L<Mail::Box::Dbx> (unpublished),
+L<Mail::Transport>,
+L<Object::Realize::Later>, and
+L<User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

@@ -1,0 +1,38 @@
+---
+abstract: 'a quote-like operator that requires modules for you'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.61'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Moose::Meta::Class::__ANON__::SERIAL::6 version , CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Quote
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Module::Quote:
+    file: lib/Module/Quote.pm
+    version: '0.002'
+requires:
+  Module::Hash: '0.001'
+  PerlX::QuoteOperator: '0.004'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/Module-Quote/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Module-Quote
+  homepage: https://metacpan.org/release/Module-Quote
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-module-quote.git
+version: '0.002'

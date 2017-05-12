@@ -1,0 +1,100 @@
+#!/usr/bin/perl
+
+use Getopt::ArgvFile
+	home => 1,
+	current => 1,
+	resolveEnvVars => 1;
+use Getopt::Long qw[:config permute bundling no_ignore_case no_auto_abbrev];
+
+my %options;
+
+GetOptions(\%options,
+	'abstract|A=s',
+	'author|a=s%',
+	'backpan=s',
+	'copyright|c=s%',
+	'destination|d=s',
+	'dist_maker|D=s',
+	'help|usage|h',
+	'licence_class|l=s',
+	'package_flavour=s',
+	'use|M=s@',
+	'version|v',
+);
+
+$options{dist_maker} = 'App::mkdist';
+
+if ($options{help} || !@ARGV)
+{
+	print <<'HELP' and exit(1);
+mkdist [options] dist_name1 dist_name2 ...
+
+Options:
+
+	--abstract=S, -A=S       Short description for distribution
+	--author k=v, -a k=v     Set author data.
+	--backpan=S              URL for archives.
+	--copyright k=v, -c k=v  Set copyright data.
+	--destination=S, -d=S    Output directory.
+	--dist_maker=S, -D=S     Class to use to create distribution.
+	--help, -h               Show this help.
+	--licence_class=S, -l=S  Perl class with licensing data.
+	--package_flavour=S      use Module::Package::RDF::$flavour.
+	--use S, -M=S            Distribution should use these modules.
+	--version=S, -v=S        Initial version number.
+
+Author data keys:
+
+	cpanid            Author's CPAN ID
+	mbox              Author's email address
+	name              Author's full name
+
+Copyright data keys:
+
+	holder            Copyright holder
+	year              Copyright year
+
+The values of "use" are interpreted thusly:
+
+	* 'boolean' avoids defining constants for true and false.
+	* 'common_sense' uses common::sense instead of strict/warnings.
+	* 'namespace_clean' uses namespace::clean.
+	* 'moose' (lowercase) uses Moose and namespace::clean.
+	* Other values are interpreted as the names of modules to use.
+	* Perl version defaults to 5.010.
+
+license_class defaults to "Software::License::Perl_5".
+
+dist_maker defaults to "App::mkdist", but any package that provides the same
+API should work.
+
+package_flavour defaults to 'standard'.
+
+Example:
+
+	mkdist \
+		--author name="Toby Inkster" \
+		--author cpanid="tobyink" \
+		--copyright year=2010 \
+		--abstract="does something useful" \
+		--use autodie \
+		--use boolean \
+		--use common_sense \
+		--use DateTime \
+		--use 5.008003 \
+		"Local::Example::Useful"
+
+Frequently used settings can be kept in ~/.mkdist
+
+HELP
+}
+
+my $class = delete $options{dist_maker};
+eval "use $class 0 qw(); 1;"
+	or die "Could not use '$class'.\n";
+$class->import;
+
+while (my $dist = shift @ARGV)
+{
+	$class->create($dist, %options);
+}

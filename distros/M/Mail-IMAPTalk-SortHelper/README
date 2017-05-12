@@ -1,0 +1,56 @@
+Mail-IMAPTalk-SortHelper
+
+Generates a array from the sorted return of either
+Mail::IMAPTalk->sort or Mail::IMAPTalk->thread.
+
+Mail::Cache is used to speed this up.
+
+    use Mail::IMAPTalk::SortHelper;
+
+    my $sh = Mail::IMAPTalk::SortHelper->new();
+    my $sorted=$imap->thread('REFERENCES', 'UTF8', 'NOT', 'DELETED');
+    $mc->init('My::Module', 'imap', 'myAccount', 'INBOX');
+    my @processed=$sh->(@{$sorted}, $imap, $mc);
+    
+    use Data::Dumper;
+    print Data::Dumper->Dump(\@processed);
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Mail::IMAPTalk::SortHelper
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mail-IMAPTalk-SortHelper
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Mail-IMAPTalk-SortHelper
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Mail-IMAPTalk-SortHelper
+
+    Search CPAN
+        http://search.cpan.org/dist/Mail-IMAPTalk-SortHelper/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 Zane C. Bowers-Hadley
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,12 @@
+0.06  2015-06-07
+    - Updated to work with Mojolicious 6 (zhouzhen1)
+
+0.05  2012-12-28
+    - Displays session, stash, and config in console
+    - Logging only occurs in development mode
+
+0.04  2012-05-31
+    - Clears logs on every request
+
+0.03  2011-06-08
+    - Removed unused reference to Mojo::Client in tests

@@ -1,0 +1,9 @@
+---
+name: Math-Fractal-Mandelbrot
+version: 0.04
+version_from: lib/Math/Fractal/Mandelbrot.pm
+license: perl
+distribution_type: module
+generated_by: Math-Fractal-Mandelbrot version 0.04
+installdirs: perl
+requires: {}

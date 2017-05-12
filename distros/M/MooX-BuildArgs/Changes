@@ -1,0 +1,24 @@
+Revision history for Perl extension MooX::BuildArgs.
+
+0.04 2016-11-26
+
+ - Correct a typographical and a grammar mistake. @ppentchev
+ - Let the proxy args test pass on recent versions of Perl. @ppentchev
+
+0.03 2016-11-09
+
+ - Fix a couple of typographical errors. @ppentchev
+ - Switch from Test::Stream to Test2::Suite. @ppentchev
+ - Use Config::MethodProxy in MooX::MethodProxyArgs.
+
+0.02 2015-12-29
+
+ - Add MooX::MethodProxyArgs.
+ - Use Test::Stream for tests.
+ - Make BuildArgsHooks future compatibility tests work if the test
+   hooks are called.
+
+0.01 2014-11-07
+
+ - First release.
+

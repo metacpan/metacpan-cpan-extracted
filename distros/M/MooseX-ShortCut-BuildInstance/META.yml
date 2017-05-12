@@ -1,0 +1,69 @@
+---
+abstract: 'A shortcut to build Moose instances'
+author:
+  - 'Jed Lund <jandrew@cpan.org>'
+build_requires:
+  Capture::Tiny: '0.12'
+  Carp: '0'
+  Data::Dumper: '0'
+  DateTime: '0'
+  List::Util: '1.33'
+  Moose: '2.1213'
+  Moose::Exporter: '0'
+  Moose::Meta::Class: '0'
+  Moose::Role: '0'
+  Moose::Util: '0'
+  MooseX::HasDefaults::RO: '0'
+  MooseX::StrictConstructor: '0'
+  Smart::Comments: '0'
+  Test::Moose: '0'
+  Test::Most: '0'
+  Type::Tiny: '1.000'
+  lib: '0'
+  version: '0.77'
+configure_requires:
+  ExtUtils::MakeMaker: '7.04'
+  Moose: '2.1213'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-ShortCut-BuildInstance
+no_index:
+  package:
+    - Anonymous::Shiras::Moose::Class
+    - Identity
+    - Mineral
+    - Test::Class
+    - Test::Role
+    - Vegetable
+provides:
+  MooseX::ShortCut::BuildInstance:
+    file: lib/MooseX/ShortCut/BuildInstance.pm
+    version: v1.44.2
+  MooseX::ShortCut::BuildInstance::Types:
+    file: lib/MooseX/ShortCut/BuildInstance/Types.pm
+    version: v1.44.2
+requires:
+  Carp: '0'
+  Clone: '0'
+  Data::Dumper: '0'
+  Moose: '2.1213'
+  Moose::Exporter: '0'
+  Moose::Meta::Class: '0'
+  Moose::Util: '0'
+  MooseX::Types: '0'
+  MooseX::Types::Moose: '0'
+  MooseX::Types::Structured: '0'
+  lib: '0'
+  perl: '5.010'
+  utf8: '0'
+  version: '0.77'
+resources:
+  bugtracker: https://github.com/jandrew/MooseX-ShortCut-BuildInstance/issues
+  homepage: https://github.com/jandrew/MooseX-ShortCut-BuildInstance
+  repository: https://github.com/jandrew/MooseX-ShortCut-BuildInstance.git
+version: v1.44.2
+x_authority: cpan:JANDREW

@@ -1,0 +1,31 @@
+Rand::MersenneTwister Version 1.0.1
+========================
+
+DESCRIPTION
+-----------
+
+Context driven Mersenne Twister-based PRNG.  Allows you to have multiple
+concurrent PRNGs all individually seeded.
+
+PREREQUISITES
+-------------
+
+Perl 5.
+
+INSTALLATION
+------------
+
+1.  perl Makefile.PL
+2.  make test
+3.  make install
+
+COPYRIGHT AND DISCLAIMER
+------------------------
+
+Copyright (c) 2002 OmniTI Computer Consulting, Inc.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+This code is provided with no warranty of any kind, and is used entirely at
+your own risk.

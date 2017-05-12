@@ -1,0 +1,122 @@
+--stations
+
+# Line 1
+Vörösmarty tér
+Deák Ferenc tér
+Bajcsy-Zsilinszky út
+Opera
+Oktogon
+Vörösmarty utca
+Kodály körönd
+Bajza utca
+Hősök tere
+Széchenyi fürdő
+Mexikói út
+
+# Line 2
+Déli pályaudvar
+Széll Kálmán tér
+Batthyány tér
+Kossuth tér
+Deák Ferenc tér
+Astoria
+Blaha Lujza tér
+Keleti pályaudvar
+Puskás Ferenc Stadion
+Pillangó utca
+Örs vezér tere
+
+# Line 3
+Kőbánya-Kispest
+Határ út
+Pöttyös utca
+Ecseri út
+Népliget
+Nagyvárad tér
+Klinikák
+Corvin-negyed
+Kálvin tér
+Ferenciek tere
+Deák Ferenc tér
+Arany János utca
+Nyugati pályaudvar
+Lehel tér
+Dózsa György út
+Árpád híd
+Forgách utca
+Gyöngyösi utca
+Újpest-Városkapu
+Újpest-Központ
+
+# Line 4
+Kelenföld vasútállomás
+Bikás park
+Újbuda-központ
+Móricz Zsigmond körtér ent
+Szent Gellért tér
+Fővám tér
+Kálvin tér
+Rákóczi tér
+II. János Pál pápa tér
+Keleti pályaudvar
+
+--lines
+M1|M1|Line 1|color:#fff004,width:8
+M2|M2|Line 2|color:#eb2128,width:8
+M3|M3|Line 3|color:#31348f,width:8
+M4|M4|Line 4|color:#04a351,width:8
+
+--transfers
+
+--segments
+M1|Vörösmarty tér|Deák Ferenc tér
+M1|Deák Ferenc tér|Bajcsy-Zsilinszky út
+M1|Bajcsy-Zsilinszky út|Opera
+M1|Opera|Oktogon
+M1|Oktogon|Vörösmarty utca
+M1|Vörösmarty utca|Kodály körönd
+M1|Kodály körönd|Bajza utca
+M1|Bajza utca|Hősök tere
+M1|Hősök tere|Széchenyi fürdő
+M1|Széchenyi fürdő|Mexikói út
+
+M2|Déli pályaudvar|Széll Kálmán tér
+M2|Széll Kálmán tér|Batthyány tér
+M2|Batthyány tér|Kossuth tér
+M2|Kossuth tér|Deák Ferenc tér
+M2|Deák Ferenc tér|Astoria
+M2|Astoria|Blaha Lujza tér
+M2|Blaha Lujza tér|Keleti pályaudvar
+M2|Keleti pályaudvar|Puskás Ferenc Stadion
+M2|Puskás Ferenc Stadion|Pillangó utca
+M2|Pillangó utca|Örs vezér tere
+
+M3|Kőbánya-Kispest|Határ út
+M3|Határ út|Pöttyös utca
+M3|Pöttyös utca|Ecseri út
+M3|Ecseri út|Népliget
+M3|Népliget|Nagyvárad tér
+M3|Nagyvárad tér|Klinikák
+M3|Klinikák|Corvin-negyed
+M3|Corvin-negyed|Kálvin tér
+M3|Kálvin tér|Ferenciek tere
+M3|Ferenciek tere|Deák Ferenc tér
+M3|Deák Ferenc tér|Arany János utca
+M3|Arany János utca|Nyugati pályaudvar
+M3|Nyugati pályaudvar|Lehel tér
+M3|Lehel tér|Dózsa György út
+M3|Dózsa György út|Árpád híd
+M3|Árpád híd|Forgách utca
+M3|Forgách utca|Gyöngyösi utca
+M3|Gyöngyösi utca|Újpest-Városkapu
+M3|Újpest-Városkapu|Újpest-Központ
+
+M4|Kelenföld vasútállomás|Bikás park
+M4|Bikás park|Újbuda-központ
+M4|Újbuda-központ|Móricz Zsigmond körtér ent
+M4|Móricz Zsigmond körtér ent|Szent Gellért tér
+M4|Szent Gellért tér|Fővám tér
+M4|Fővám tér|Kálvin tér
+M4|Kálvin tér|Rákóczi tér
+M4|Rákóczi tér|II. János Pál pápa tér
+M4|II. János Pál pápa tér|Keleti pályaudvar

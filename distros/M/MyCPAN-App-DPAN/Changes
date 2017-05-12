@@ -1,0 +1,32 @@
+# Changes for DarkPAN::Creator
+
+1.28 - Fri Nov 20 05:44:47 2009
+	* Put relative paths in the indexer reports if you're
+	using the organize dists option.
+	* Update prereqs to latest version of MyCPAN::Indexer
+	and CPAN::PackageDetails.
+
+1.27 - Sun Nov  8 02:33:58 2009
+	* Now you can set the Log4perl config file with the
+	DPAN_LOG4PERL_FILE.
+	* Refactored some bits in the Minimal reporter to 
+	make it easier to override the bits that decide
+	which reports to index.
+
+1.22 - Thu May 21 17:44:59 2009
+	* Don't index packages (such as bytes, DB, MM) that are special
+	* Don't try to index tests. We don't need them to make DPAN
+
+1.21 - Wed May 20 14:32:45 2009
+	* Handle exit on our own to prevent applications using
+	an embedded indexer from stopping prematurely.
+
+1.18_04 - Sat May  9 02:07:47 2009
+	* Worked out some inheritance issues. I really need to use
+	roles.
+
+1.18_03 - Fri May  8 16:04:26 2009
+	* Clean up dist
+	* Fix problem with _exit inherited from MyCPAN::Indexer. This 
+	killed applications embedding the DPAN indexer
+

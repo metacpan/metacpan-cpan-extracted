@@ -1,0 +1,13 @@
+Changes
+examples/websocket.pl
+lib/MojoX/Transaction/WebSocket76.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.json
+META.yml
+README.md
+t/00-use.t
+t/01-pod.t
+t/02-pod-coverage.t
+t/03-manifest.t

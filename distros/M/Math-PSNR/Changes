@@ -1,0 +1,8 @@
+Revision history for Math-PSNR
+
+0.02  Sat Jan 12 15:43:12 JST 2013
+        Enabled a caching function.
+
+0.01  Wed Jan  9 14:32:48 JST 2013
+        Initial release.
+

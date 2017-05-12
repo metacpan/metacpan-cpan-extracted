@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               Mojolicious-Plugin-TweetButton
+version:            0.0003
+abstract:           TweetButton plugin for Mojolicious
+author:
+    - Viacheslav Tykhanovskyi <vti@cpan.org>
+license:            artistic_2
+distribution_type:  module
+configure_requires:  {}
+build_requires:  {}
+requires:
+    Mojo:  0.999926
+    perl:  5.008007
+resources:
+    license:     http://dev.perl.org/licenses/
+    repository:  http://github.com/vti/mojolicious-plugin-tweet_button
+no_index:
+    directory:
+        - t
+        - inc
+        - t
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

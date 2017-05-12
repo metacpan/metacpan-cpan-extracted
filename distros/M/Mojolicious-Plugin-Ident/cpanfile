@@ -1,0 +1,23 @@
+requires "AnyEvent" => "0";
+requires "AnyEvent::Ident" => "0.04";
+requires "EV" => "0";
+requires "Mojolicious" => "5.73";
+requires "perl" => "v5.10.0";
+recommends "EV" => "0";
+
+on 'test' => sub {
+  requires "AnyEvent::Ident" => "0.04";
+  requires "Mojolicious::Lite" => "0";
+  requires "Test::Mojo" => "0";
+  requires "Test::More" => "0.94";
+  requires "perl" => "v5.10.0";
+};
+
+on 'test' => sub {
+  recommends "EV" => "0";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+  requires "perl" => "v5.10.0";
+};

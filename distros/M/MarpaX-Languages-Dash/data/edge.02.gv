@@ -1,0 +1,11 @@
+graph Perl
+{
+graph [ rankdir="TB" ]
+node [ shape="oval" ]
+edge [ color="grey" ]
+"13" [ color="invis" label="" shape="point" width="0" ]
+"27" [ color="invis" label="" shape="point" width="0" ]
+"20" [ color="invis" label="" shape="point" width="0" ]
+"13" -- "27" [ color="cornflowerblue" label="Top row\nBottom row" ]
+"27" -- "20" [ color="red" label="Edges use cornflowerblue and red" ]
+}

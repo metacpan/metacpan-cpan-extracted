@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+gsl.h
+README
+SVD.c
+t/Math-GSL-Linalg-SVD.t
+lib/Math/GSL/Linalg/SVD.pm

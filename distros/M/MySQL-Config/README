@@ -1,0 +1,139 @@
+NAME
+    MySQL::Config - Parse and utilize MySQL's /etc/my.cnf and ~/.my.cnf
+    files
+
+SYNOPSIS
+        use MySQL::Config;
+
+        my @groups = qw(client myclient);
+        my $argc = 0;
+        my @argv = ();
+
+        load_defaults "my", \@groups, \$argc, \@argv;
+
+DESCRIPTION
+    "MySQL::Config" emulates the "load_defaults" function from
+    libmysqlclient. Just like "load_defaults", it will fill an aray with
+    long options, ready to be parsed by "getopt_long", a.k.a.
+    "Getopt::Long".
+
+THE my.cnf FILE
+    MySQL's my.cnf file is a mechanism for storing and reusing command line
+    arguments. These command line arguments are grouped into *groups* using
+    a simple INI-style format:
+
+        ; file: ~/.my.cnf
+
+        [client]
+        user = darren
+        host = db1
+        pager = less -SignMEX
+
+        [mytop]
+        color = 1
+        header = 0
+
+    Each element in "[", "]" pairs is a *group*, and each call to
+    "load_defaults" will specify 0 or more groups from which to grab
+    options. For example, grabbing the *client* group from the above config
+    file would return the *user*, *host*, and *pager* items. These items
+    will be formatted as command line options, e.g., *--user=darren*.
+
+USING MySQL::Config
+  load_defaults("name", \@groups, \$count, \@ary)
+    "load_defaults" takes 4 arguments: a string denoting the name of the
+    config file (which should generally be *my*); a reference to an array of
+    groups from which options should be returned; a reference to a scalar
+    that will hold the total number of parsed elements; and a reference to
+    an array that will hold the final versions of the extracted name, value
+    pairs. This final array will be in a format suitable for processing with
+    "Getopt::Long":
+
+        --user=username
+        --password=password
+
+    and so on.
+
+    If the final array reference is missing, @ARGV will be used. Options
+    will be pushed onto the end of the array, leaving what is already in
+    place undisturbed.
+
+    The scalar (the third argument to "load_defaults") will contain the
+    number of elements parsed from the config files.
+
+  parse_defaults("name", \@groups)
+    "load_defaults" has an un-Perlish interface, mostly because it is
+    exactly the same signature as the version from the C API. There is also
+    a function, not exported by default, called "parse_defaults", which
+    returns a hash of parsed (name, value) pairs (or a hashref in scalar
+    context):
+
+        use MySQL::Config qw(parse_defaults);
+
+        my %cfg = parse_defaults "my", \@groups;
+
+    %cfg looks like:
+
+        %cfg = (
+            "user" => "username",
+            "password" => "password",
+        )
+
+    and so on. This might be a more natural interface for some programs;
+    however, "load_defaults" is more true to the original.
+
+    Because "parse_defaults" flattens the arguments into a hash, it makes
+    special allowances for variables that contain multiple "="; these are
+    turned into nested hashes. For example, the MySQL's *set-variable*
+    option can contain name value pairs, like so:
+
+        set-variable    = key_buffer=16M
+        set-variable    = max_allowed_packet=1M
+        set-variable    = table_cache=64
+        set-variable    = sort_buffer=512K
+        set-variable    = net_buffer_length=8K
+        set-variable    = myisam_sort_buffer_size=8M
+
+    These will be turned into a nested hash like this:
+
+        'set-variable' => {
+                            'myisam_sort_buffer_size' => '8M',
+                            'sort_buffer' => '512K',
+                            'max_allowed_packet' => '16M',
+                            'key_buffer' => '16M',
+                            'table_cache' => 64,
+                            'net_buffer_length' => '8K'
+                          },
+
+    This is not done for "load_defaults", as "Getopt::Long" will correctly
+    handle variables with embedded "=" if the option is passed a hash
+    reference.
+
+USING SOMETHING OTHER THAN "my" AS THE FIRST STRING
+    This string controls the name of the configuration file; the names work
+    out to, basically ~/.${cfg_name}.cnf and /etc/${cnf_name}.cnf.
+
+    If you are using this module for mysql clients, then this should
+    probably remain *my*. Otherwise, you are free to mangle this however you
+    choose:
+
+        $ini = parse_defaults 'superapp', [ 'foo' ];
+
+SUPPORT
+    "MySQL::Config" is supported by the author.
+
+VERSION
+    This is "MySQL::Config", version 1.04.
+
+AUTHOR
+    darren chamberlain <darren@cpan.org>
+
+COPYRIGHT
+    (C) 2003 darren chamberlain
+
+    This library is free software; you may distribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Perl
+

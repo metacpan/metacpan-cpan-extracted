@@ -1,0 +1,42 @@
+NAME
+    Mojolicious::Plugin::CSSCompressor - Mojolicious plugin to compress
+    stylesheets
+
+SYNOPSIS
+      # in a lite app with default suffix -min
+      plugin 'CSSCompressor';
+  
+      # or a normal app
+      sub startup {
+          # ...
+  
+          # use .min as suffix instead of the default -min
+          $self->plugin( 'CSSCompressor', suffix => '.min' );
+  
+          # ...
+      }
+
+DESCRIPTION
+    This plugin looks at the file name and content type to compress
+    stylesheets.
+
+CONFIGURATION
+    suffix  String or regular expression object used as suffix to match
+            against the request filename. The suffix will be stripped out
+            and used to get the source file to compress. Using and empty
+            string as suffix means all css content will be compressed even
+            without suffix.
+
+SEE ALSO
+    CSS::Compressor, Mojolicious, Mojolicious::Lite
+
+AUTHOR
+    Simon Bertrang <janus@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2013 by Simon Bertrang
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.12.2 or, at
+    your option, any later version of Perl 5 you may have available.
+

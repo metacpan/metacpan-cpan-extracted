@@ -1,0 +1,17 @@
+Revision history for Perl extension MP3::Album.
+0.14  Mon Aug  4 16:46:32 WEST 2003
+	- Bug fix in format options.
+	
+0.13  Mon Jul 14 12:28:20 WEST 2003
+        - Some bugfixes.
+
+0.12
+      Wed Mar 19 19:06:00 2003
+ 	- Added method available_fetchers to MP3::Album.
+
+0.10  Mon Mar 17 23:24:36 2003
+	- Can now generate tags an rename filenames;
+
+0.01  Mon Mar 17 19:24:36 2003
+	- original version;
+

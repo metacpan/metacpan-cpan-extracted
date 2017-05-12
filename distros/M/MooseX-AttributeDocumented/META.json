@@ -1,0 +1,82 @@
+{
+   "abstract" : "Add Documented trait to all to attributes",
+   "author" : [
+      "Erik Carlsson <info@code301.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-AttributeDocumented",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "2.0000",
+            "Moose::Exporter" : "0",
+            "Moose::Role" : "0",
+            "MooseX::Types::Moose" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Moose::Meta::Attribute::Custom::Trait::Documented" : {
+         "file" : "lib/Moose/Meta/Attribute/Custom/Trait/Documented.pm",
+         "version" : "0.1003"
+      },
+      "MooseX::AttributeDocumented" : {
+         "file" : "lib/MooseX/AttributeDocumented.pm",
+         "version" : "0.1003"
+      },
+      "MooseX::AttributeDocumented::Meta::Attribute::Trait::Documented" : {
+         "file" : "lib/MooseX/AttributeDocumented/Meta/Attribute/Trait/Documented.pm",
+         "version" : "0.1003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Csson/p5-MooseX-AttributeDocumented/issues"
+      },
+      "homepage" : "https://metacpan.org/release/MooseX-AttributeDocumented",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Csson/p5-MooseX-AttributeDocumented.git",
+         "web" : "https://github.com/Csson/p5-MooseX-AttributeDocumented"
+      }
+   },
+   "version" : "0.1003"
+}
+

@@ -1,0 +1,81 @@
+README: Math::Zap
+    Draw 3D objects in 2D
+
+    This package supplies methods to draw a scene, containing three
+    dimensional objects, as a two dimensional image, using lighting and
+    shadowing to assist the human observer in reconstructing the original
+    three dimensional scene.
+
+    Example zap.pl
+
+     #!perl -w
+     #______________________________________________________________________
+     # Draw triangles with shadows in 3d
+     # Perl License.
+     # PhilipRBrenan@yahoo.com, 2004.
+     #______________________________________________________________________
+ 
+     use Math::Zap::Draw;
+     use Math::Zap::Cube unit=>'cu';
+     use Math::Zap::Triangle;
+     use Math::Zap::Vector;
+ 
+     #_ Draw _______________________________________________________________
+     # Draw this set of objects.
+     #______________________________________________________________________
+ 
+     draw 
+       ->from    (vector( 10,   10,  10))
+       ->to      (vector(  0,    0,   0))
+       ->horizon (vector(  1,  0.5,   0))
+       ->light   (vector( 20,   30, -20))
+ 
+         ->object(triangle(vector( 0,  0,  0), vector( 8,  0,  0), vector( 0,  8,  0)),                         'red')
+         ->object(triangle(vector( 0,  0,  0), vector( 0,  0,  8), vector( 0,  8,  0)),                         'green')
+         ->object(triangle(vector( 0,  0,  0), vector(12,  0,  0), vector( 0,  0, 12)) - vector(2.5,  0,  2.5), 'blue')
+         ->object(triangle(vector( 0,  0,  0), vector( 8,  0,  0), vector( 0, -8,  0)),                         'pink')
+         ->object(triangle(vector( 0,  0,  0), vector( 0,  0,  8), vector( 0, -8,  0)),                         'orange')
+         ->object(cu()*2+vector(3,5,1), 'lightblue')
+ 
+     ->done; 
+ 
+    See directory eg for further examples.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+INSTALL
+    This is alpha code. It is written in pure Perl. It uses the standard
+    Perl install mechanism.
+
+    Download Math-Zap-1.07.tar.gz from CPAN, untar and:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+    If you are on Windows, use nmake, available at:
+
+    http://download.microsoft.com/download/vc15/Patch/1.52/W95/EN-US/Nmake15
+    .exe
+
+    For bug reports or suggestions please send email to:
+    philiprbrenan@yahoo.com
+
+TO DO
+    Help with this project would be appreciated, expecially in the following
+    areas:
+
+    Optimization
+
+    Cylinders, spheres, torii
+
+    Integration of incident power
+
+    More object types
+
+    Lighting effects
+
+    Textures for each plane
+

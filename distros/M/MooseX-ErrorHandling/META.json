@@ -1,0 +1,56 @@
+{
+   "abstract" : "Monkey Patch Moose's Errors",
+   "author" : [
+      "Chris Reinhardt <crein@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MooseX-ErrorHandling",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Module::Runtime" : "0",
+            "Moose::Util" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::Spec" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/ctriv/perl-MooseX-ErrorHandling",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ctriv/perl-MooseX-ErrorHandling.git",
+         "web" : "https://github.com/ctriv/perl-MooseX-ErrorHandling"
+      }
+   },
+   "version" : "0.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

@@ -1,0 +1,65 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Mixin::Event::Dispatch::Bus
+at lib/Mixin/Event/Dispatch/Bus.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Mixin::Event::Dispatch::Bus - a message bus
+
+=head1 VERSION
+
+version 2.000
+
+=head1 SYNOPSIS
+
+ {
+  package Some::Class;
+  sub bus { shift->{bus} ||= Mixin::Event::Dispatch::Bus->new }
+ }
+ my $obj = bless {}, 'Some::Class';
+ $obj->bus->subscribe_to_event(
+  something => sub { my ($ev) = @_; warn "something!" }
+ );
+ $obj->bus->invoke_event('something');
+
+=head1 DESCRIPTION
+
+This class uses L<Mixin::Event::Dispatch> to provide
+a message bus - instantiate this and call the usual
+methods to deal with events:
+
+=over 4
+
+=item * L<Mixin::Event::Dispatch/subscribe_to_event>
+
+=item * L<Mixin::Event::Dispatch/invoke_event>
+
+=back
+
+This allows several classes to share a common
+message bus, or to avoid polluting a class with
+event-related methods.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Mixin::Event::Dispatch>
+
+L<add_handler_for_event|Mixin::Event::Dispatch/add_handler_for_event>, L<clear_event_handlers|Mixin::Event::Dispatch/clear_event_handlers>, L<event_handlers|Mixin::Event::Dispatch/event_handlers>, L<invoke_event|Mixin::Event::Dispatch/invoke_event>, L<subscribe_to_event|Mixin::Event::Dispatch/subscribe_to_event>, L<unsubscribe_from_event|Mixin::Event::Dispatch/unsubscribe_from_event>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@perlsite.co.uk>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2014. Licensed under the same terms as Perl itself.

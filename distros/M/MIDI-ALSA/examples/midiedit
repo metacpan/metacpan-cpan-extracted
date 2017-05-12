@@ -1,0 +1,2486 @@
+#! /usr/bin/perl
+#########################################################################
+#        This Perl script is Copyright (c) 2006, Peter J Billam         #
+#     c/o P J B Computing, GPO Box 669, Hobart TAS 7001, Australia      #
+#                                                                       #
+#     This script is free software; you can redistribute it and/or      #
+#            modify it under the same terms as Perl itself.             #
+#########################################################################
+# 20151106
+# 1) Sometimes after 'w' the w remains displayed at the end of the current line
+# 2) introduce a Buffer: ry=range-yank or rd=range-delete, then p=paste
+# 3) could display the patch of the current event, if there's room somewhere;
+#    perhaps lower right, at the end of the hline()
+# 4) do we _need_ to store Now? und_do,re_do $Now=$Track[$Ievent][$[+1]+1;
+#
+# Could do:
+# Option  -R = ReadOnly ?
+# When editing a note-pitch, midi-keyboard input could be accepted, perhaps
+#  even without a  p=pitch  first.  Should it also edit the v=velocity ?
+# u=undo seems to mess up deltatimes ? :-(
+
+# Not convincing, because of 'z' = all sounds off ...
+# It should be possible to choose, when moving times (arrows,page):
+#  terminate on-notes, or not terminate on-notes.
+#  Perhaps HJKL could mean do-not-terminate,
+#  and the Page keys could follow the previous u/l case of the hjkl keys ?
+
+# 20140303
+# midiedit could display pitches mapped left-to-right like a miniature piano
+#   C ab | Eb
+#   C    | Eb f~
+#        | Eb b f~
+# If possible at least 3 characters per octave, plus '| ' unmoving;
+# bass is 3.3 octaves, treble 4 octaves = 22 chars; plus '| ' makes 24
+# If less than 15 are available, revert to 'treble f~##' which uses 11.
+# Could also display the sounding chord, eg 'c233' or 'eb26'
+# see  sub note2str !
+
+# 20140622 To avoid having to type  rw filename  then  fi filename,
+# we should have either ri=range-insert,  or ir=insert-range,
+# or introduce a Buffer: ry=range-yank and rd=range-delete and p=paste
+
+# use Data::Dumper; $Data::Dumper::Indent = 0; $Data::Dumper::Sortkeys = 1;
+
+use Time::HiRes;  # 5.3
+
+my $Version = '7.8'; # -d on multi-track files resets ticks to 0 each track
+my $VersionDate = '20160701';
+my $UseCurses = 1;
+my $TopKeystrokesLine;   # set by display_keystrokes
+my $OutputPort = $ENV{'ALSA_OUTPUT_PORTS'};
+
+while ($ARGV[$[] =~ /^-(\w)/) {
+	if ($1 eq 'd')      { $UseCurses = 0; shift;
+	} elsif ($1 eq 'o') { shift; $OutputPort = shift;
+	} else {
+my $n = $0; $n =~ s#^.*/([^/]+)$#$1#;
+print <<EOT; exit 0;
+Usage:
+    $n filename.mid       # new specialised Curses and ALSA mode
+    $n -d filename.mid    # older dump and text-editor mode
+    perldoc $n            # read the real Documentation !
+Version $Version   $VersionDate   http://www.pjb.com.au/midi
+EOT
+	}
+}
+
+eval 'require MIDI'; if ($@) {
+   die "you need to install the MIDI::Perl module from www.cpan.org\n";
+}
+import MIDI;
+if ($UseCurses) {
+	eval 'require Curses'; if ($@) {
+		die "you need to install the Curses module from www.cpan.org\n";
+	}
+	import Curses;
+	eval 'require MIDI::ALSA'; if ($@) {
+		die "you need to install the MIDI::ALSA module from www.cpan.org\n";
+	}
+	import MIDI::ALSA;
+} else {
+	eval 'require Term::Clui'; if ($@) {
+		die "you need to install the Term::Clui module from www.cpan.org\n";
+	}
+	import Term::Clui;
+}
+
+my @note2letter=split / /,'C C D E E F F G G A B B c c d e e f f g g a b b';
+my @note2acc = ('','#','','b','','','#','','#','','b','');
+my %sysex2str = (   # 3.6
+	"\x7E\x7F\x09\x01\xF7" => 'gm 1',
+#	"\x7E\x7F\x09\x01\xF7" => 'gm on',
+	"\x7E\x7F\x09\x02\xF7" => 'gm off',
+	"\x7E\x7F\x09\x03\xF7" => 'gm 2',
+);
+my %Number2controller = (
+	0=>'Bank Select (MSB)',
+	1=>'Modulation (MSB)',
+	2=>'Breath Control (MSB)',
+	4=>'Foot Control (MSB)',
+	5=>'Portamento Time MSB',
+	6=>'Data Entry (MSB)',
+	7=>'Channel Volume MSB',
+	8=>'Balance (MSB)',
+	10=>'Pan (MSB)',
+	11=>'Expression (MSB)',
+	12=>'Effects Controller 1',
+	13=>'Effects Controller 2',
+	16=>'Gen Purpose 1 (MSB)',
+	17=>'Gen Purpose 2 (MSB)',
+	18=>'Gen Purpose 3 (MSB)',
+	19=>'Gen Purpose 4 (MSB)',
+	32=>'Bank Select (LSB)',
+	33=>'Modulation (LSB)',
+	34=>'Breath Control (LSB)',
+	36=>'Foot Control (LSB)',
+	37=>'Portamento Time LSB',
+	38=>'Data Entry (LSB)',
+	39=>'Channel Volume LSB',
+	40=>'Balance (LSB)',
+	42=>'Pan (LSB)',
+	43=>'Expression (LSB)',
+	48=>'Gen Purpose 1 (LSB)',
+	49=>'Gen Purpose 2 (LSB)',
+	50=>'Gen Purpose 3 (LSB)',
+	51=>'Gen Purpose 4 (LSB)',
+	64=>'Sustain Pedal',
+	65=>'Portamento on/off',
+	66=>'Sostenuto Pedal',
+	67=>'Soft Pedal',
+	68=>'Legato Pedal',
+	69=>'Hold 2',
+	70=>'Sound Variation',
+	71=>'Resonance',
+	72=>'Release Time',
+	73=>'Attack Time',
+	74=>'Cut-off Frequency',
+	75=>'Decay Time',
+	76=>'Vibrato Rate',
+	77=>'Vibrato Depth',
+	78=>'Vibrato Delay',
+	80=>'Gen Purpose 5',
+	81=>'Gen Purpose 6',
+	82=>'Gen Purpose 7',
+	83=>'Gen Purpose 8',
+	84=>'Portamento Control',
+	91=>'Reverb Depth',
+	92=>'Tremolo Depth',
+	93=>'Chorus Depth',
+	94=>'Celeste (De-tune)',
+	95=>'Phaser Depth',
+	96=>'Data Increment',
+	97=>'Data Decrement',
+	98=>'non-reg param lsb',
+	99=>'non-reg param msb',
+	100=>'Reg-Param (LSB)',
+	101=>'Reg-Param (MSB)',
+	120=>'All Sound Off',
+	121=>'Reset All Controllers',
+	122=>'Local Control',
+	123=>'All Notes Off',
+	124=>'Omni Off',
+	125=>'Omni On',
+	126=>'Mono On (Poly Off)',
+	127=>'Poly On (Mono Off)',
+);
+
+if (! $UseCurses) {
+	use bytes;  # 20150526 because of sysexes that need to end with \xF7
+	my $opus = MIDI::Opus->new({ 'from_file' => $ARGV[$[]});
+	open(SAVEOUT, ">&STDOUT") || die "couldn't dup STDOUT: $!";
+	close STDOUT;
+	my $text;
+	if (!open(STDOUT,'>',\$text)) { die "can't open STDOUT in-memory: $!\n"; }
+	print "# see   perldoc MIDI::Event\n\$newopus = ";
+	$opus->dump({'dump_tracks'=>1});
+	close STDOUT;
+	open(STDOUT, ">&SAVEOUT") || die "couldn't dup SAVEOUT: $!";
+	my @text = split(/\n/, $text);
+	my $tmp = "/tmp/midiedit.$$";
+	if (! open(T, '>', $tmp)) { die "can't open $tmp: $!\n"; }
+	local $ticks = 0;   # 7.8 line2comment resets ticks with each new Track
+	foreach my $line (@text) { print T $line.line2comment($line)."\n"; }
+	close T;
+	while (1) {
+		Term::Clui::edit($tmp);
+		unless ($return = do $tmp) {
+			warn "couldn't parse $tmp: $@\n" if $@;
+			warn "couldn't do $tmp: $!\n"    unless defined $return;
+			warn "couldn't run $tmp\n"       unless $return;
+		}
+		last if $newopus;
+		if (!Term::Clui::confirm("MIDI::Opus syntax error. OK to re-edit ?")) {
+			unlink $tmp; exit 1;
+		}
+	}
+	unlink $tmp;
+	$Debug=0;  if ($Debug) { $newopus->dump({'dump_tracks'=>1}); exit; }
+	$newopus->write_to_file( $ARGV[$[] );
+	exit 0;
+}
+
+# ----- the Curses app...
+my $File  = $ARGV[$[];
+my @score = file2ms_score($File);   # 1.7
+# foreach my $e (@Track) { if (! defined $e->[$[]) { debug("UNDEF 1"); } }
+my @buggyTrack = sort {$$a[$[+1] <=> $$b[$[+1]} @{$score[1]};  # 7.2
+my @Track = ();
+# 7.2 ARGGghhh... the sort introduces extra events with undefined types :-(
+foreach my $e (@buggyTrack) { if (defined $e->[$[]) { push @Track, $e; } }
+my $Now   = 0;   # ticks? secs?
+my $Ievent = $[; # perhaps $[-1 should mean before_the_first_event ?
+my $Paused = 1;
+my $Editing = 0;  # 1.4
+my $I_LastRefreshed = 0;  # 6.7 stores when the display was last refreshed
+my @EditEvent = ();  # 2.9 if event-type matches then '.' imposes the rest
+my @FindEvent = ();
+my $FindForwards  = 1;
+my $FindSubstring = 1;  # 7.6 currently not changed by anything; could be later
+my $NowBeforeFind = undef;
+my $Message = '';
+my @History  = ();  # (\@score,$ievent,$now, \@score,$ievent,$now, ...);
+my $Ihistory = -1;
+my $IncrementalTimes = 1;
+my $RangeSettingState = 0;     # 4.5
+my $RangeStart        = $[;    # 4.5
+my $RangeEnd          = $[-1;  # 4.5
+my $ReplaySpeed = 1.0;   # 3.1 varied by [ and ]
+my $RS = '1.0';   # 3.1 3-char sprintf of $ReplaySpeed
+my %c2s;   # should set it here really; it's set by sub cc2str
+initscr(); cbreak(); noecho(); nonl(); clear();
+# http://docstore.mik.ua/orelly/perl/cookbook/ch15_13.htm  BUT:
+keypad(stdscr(),1);
+$SIG{'INT'} = sub {exit 0;};   $SIG{'TERM'} = sub {exit 0;};
+add_to_history();
+my $FileIsChanged = 0;
+if (! MIDI::ALSA::client( "midiedit pid=$$", 0, 1, 1 )) {
+	die "can't start up the ALSA client\n";
+}
+my $ID = MIDI::ALSA::id().":0";
+display_screen($Now, $Ievent, @Track);
+
+# 2.0 shouldn't attempt to connect if $OutputPort is undefined or "0"
+if (! defined $OutputPort) {
+	display_message(
+	  "no -o option, and no ALSA_OUTPUT_PORTS environment variable");
+} elsif ($OutputPort eq '0') {
+	display_message("not connecting to any ALSA client");
+} else {
+	foreach my $cl_po (split /,/, $OutputPort) {  # 2.4
+		#$cl_po =~ /^(\d+):?(\d*)$/;
+		#my $cl = $1; my $po = $2 or 0;
+		#if ($cl == MIDI::ALSA::id()) {
+		#	display_message("can't connect to $cl_po, which is myself");
+		#}
+		if (! MIDI::ALSA::connectto( 1, $cl_po )) {   # 
+			display_message("can't connect to ALSA client $cl_po");
+		}
+	}
+}
+if (! MIDI::ALSA::start()) {
+	die "can't start the ALSA client queue\n";
+}
+# mustn't create call to endwin in nonCurses mode
+eval 'sub END {all_sounds_off(); endwin();}';
+while (1) {  # the loop
+	my $c = getch();
+	# debug("\$c = $c = decimal ".unpack('C*',$c));
+	# could use  my $c = getchar(); returns either $c or (undef, $keyc)
+	# debug('$c = '.join(" ",unpack('C*',$c)));
+	if ($c == ERR())   {
+		# debug("\$c = ERR()");
+		if ($Paused) {
+			# see man ncurses ==> man inopts
+			timeout(-1);  # Shouldn't happen. Anyway, block next read
+			# but could use this for a Message which vanishes after 2 sec
+		} else {
+			if ($Ievent < $#Track) {  # output next event
+				$Ievent += 1; $Now = $Track[$Ievent][$[+1] + 1;
+				# 6.7 If Playing, and next event is <10ms away, don't refresh
+				if ($Ievent == $#Track) {
+					display_screen();
+				} elsif (($Track[$Ievent+1][$[+1] - $I_LastRefreshed)
+				  > (10.0/$ReplaySpeed)) {
+					display_screen();
+				}
+				# 7.7: could loop through _all_ such events within 10mS ?
+				play_current_event();
+			}
+			set_timeout_for_next_note();
+		}
+	} elsif ($c eq 'w')    {
+		score2file($File, 1000,\@Track);
+		display_message("Saved to $File");
+		$FileIsChanged = 0;
+	} elsif ($c eq 'Q' or $c eq 'q')  {
+		if ($Paused) { quit(); }
+		$Paused = 1; timeout(-1); display_screen();
+	} elsif ($c eq 'D' or $c == KEY_DL() or $c == KEY_DC())    {
+		set_before_last_change($Ievent);  # 7.5
+		if ($IncrementalTimes) {
+			my $dt = delta_t($Ievent);
+			foreach my $ie ($Ievent+1..$#Track) { $Track[$ie][$[+1] -= $dt; }
+		}
+		splice @Track, $Ievent, 1;
+		if ($Ievent > $#Track) { $Ievent = $#Track; }
+		if ($RangeStart >= $Ievent) { $RangeStart -= 1; }   # 4.5
+		if ($RangeEnd   >= $Ievent) { $RangeEnd   -= 1; }
+		add_to_history(); display_screen();
+	} elsif ($c eq 'e')  {
+		$Paused = 1;  edit_event();  play_current_event();  display_screen();
+	} elsif ($c eq '.')  {
+		set_before_last_change($Ievent);  # 7.5
+		edit_again();  display_screen();  # 2.9
+	} elsif ($c eq 'i')  {
+		set_before_last_change($Ievent);  # 7.5
+		insert_event();  display_screen();
+	} elsif ($c eq ']' or $c eq '}')  {
+		$ReplaySpeed *= 1.41421356; $RS = sprintf('%.1f',$ReplaySpeed);
+		display_screen(); #3.1
+	} elsif ($c eq '[' or $c eq '{')  {
+		$ReplaySpeed *= 0.70710678; $RS = sprintf('%.1f',$ReplaySpeed);
+		display_screen(); #3.1
+	} elsif ($c eq 'R')    { set_range(); display_screen();
+	} elsif ($c eq 'f')    { file_menu(); display_screen();
+	} elsif ($c eq 'r')    { range(); display_screen();
+	} elsif ($c eq 'u')    { un_do(); display_screen();
+	} elsif ($c eq "\cR")  { re_do(); display_screen();
+	} elsif ($c eq '+')    { $IncrementalTimes = 1; display_screen();
+	} elsif ($c eq '-' or $c eq '=') { $IncrementalTimes = 0; display_screen();
+	#} elsif ($c eq 'B' or $c eq 'b') {  # 20120916 this is deprecated.
+	#	metronome_event($c); display_screen();
+	} elsif ($c eq '/') {  # f added 4.1, removed again 4.7
+		if (! $Paused) { $Paused = 1; timeout(-1); display_screen(); }
+		$FindForwards = 1; find(); display_screen();
+	} elsif ($c eq '?')    {
+		if (! $Paused) { $Paused = 1; timeout(-1); display_screen(); }
+		$FindForwards = 0; find(); display_screen();
+	} elsif ($c eq 'n')    {
+		if (! $Paused) { $Paused = 1; timeout(-1); display_screen(); }
+		find_next($FindForwards); display_screen();
+	} elsif ($c eq 'N')    {
+		if (! $Paused) { $Paused = 1; timeout(-1); display_screen(); }
+		find_next(! $FindForwards); display_screen();
+	} elsif ($c eq "\x08" or $c eq KEY_BACKSPACE()) {  # 7.7 back to before find
+		if (defined $NowBeforeFind) {
+			time_travel($NowBeforeFind - $Now); display_screen();
+		}
+	} elsif ($c eq ' ')         {
+		if ($Paused) { $Paused = 0; set_timeout_for_next_note();
+		} else       { $Paused = 1; timeout(-1);
+		}
+		display_screen();
+	} elsif ($c eq 'z')         { all_sounds_off();
+	} elsif ($c == KEY_UP() or $c eq 'k')    {
+		if ($Ievent > $[) {
+			event_travel(-1); display_screen();   # 5.2
+		}
+	} elsif ($c == KEY_DOWN() or $c eq 'j')  {
+		if ($Ievent < $#Track) {
+			event_travel(1); display_screen();   # 5.2
+		}
+	} elsif ($c == KEY_LEFT() or $c eq 'K')  {
+		time_travel(-1000);  display_screen();
+	} elsif ($c == KEY_RIGHT() or $c eq 'J') {
+		time_travel(1000);   display_screen();
+	} elsif ($c == KEY_PPAGE()) { time_travel(-10000); display_screen();
+	} elsif ($c == KEY_NPAGE()) { time_travel(10000);  display_screen();
+	} elsif ($c == KEY_HOME())  {
+		$Ievent = $[; $Now = $Track[$Ievent][$[+1];
+		$Paused = 1; display_screen(); timeout(-1);
+	} elsif ($c == KEY_END())   {
+		$Ievent = $#Track; $Now = $Track[$Ievent][$[+1];
+		$Paused = 1; display_screen(); timeout(-1);
+	}
+}
+
+#-------------- Infrastructure for the Curses version -------------
+sub addl { my ($lin,$col,$str) = @_;
+	if ($col < 2) { $col = 2;  $str = substr($str, $[, $[+$COLS-4); }  # 4.8
+	move($lin,$col); addstr($str); clrtoeol();
+}
+sub set_before_last_change {  my $i_event = $_[$[];  # 7.5
+	$History[$Ihistory-1] = $i_event;
+	$History[$Ihistory]   = $Track[$i_event][$[+1] + 1;
+	# so should we really store Now ? why not just restore it from Ievent ?
+}
+sub add_to_history {
+	#debug("add_to_h1: Ihistory=$Ihistory #History=$#History History=@History");
+	my @copy_track = deepcopy(@Track);
+	if ((1+$Ihistory) % 3) { # check that 1+Ihistory is a multiple of 3
+		_warn("add_to_history: Ihistory should be 3*n - 1, not $Ihistory");
+		$Ihistory -= ((1+$Ihistory)%3);
+		if ($Ihistory < 0) { $Ihistory = -1; }
+	}
+	if ((scalar @History) % 3) {
+		_warn("add_to_history: History should be multiple of 3, not "
+		  .scalar @History);
+		# if ($Ihistory < $[) { $Ihistory = $[; }
+	}
+	if ($#History > $Ihistory) { $#History = $Ihistory; }  # truncate here
+	push @History, \@copy_track, $Ievent, $Now;
+	# hardly space-efficient :-(
+	# could dump into text-format and use diff, or use a direct diff module:
+	# Diff::LibXDiff  Algorithm::Diff  in Lua: Diff  ltdiff
+	# http://search.cpan.org/~tyemq/Algorithm-Diff-1.1903/lib/Algorithm/Diff.pm
+	$Ihistory = $#History;
+	$FileIsChanged = 1;
+	$NowBeforeFind = undef;  # 7.7
+	#debug("add_to_h2: Ihistory=$Ihistory History=$#History History=@History");
+}
+sub all_sounds_off {   # 2.2
+	foreach my $c (0..15) {
+		MIDI::ALSA::output(MIDI::ALSA::controllerevent($c,120,0));
+		MIDI::ALSA::output(MIDI::ALSA::controllerevent($c,123,0));  # 6.9
+	}
+}
+
+sub cc2str { my $m = $_[$[];
+	if (! %c2s) { %c2s = (
+		0, 'Bank Select (MSB)',
+		32, 'Bank Select (LSB)',
+		64, 'Sustain Pedal',
+		96, 'Data Increment',
+		1, 'Modulation (MSB)',
+		33, 'Modulation (LSB)',
+		65, 'Portamento on/off',
+		97, 'Data Decrement',
+		2, 'Breath Control (MSB)',
+		34, 'Breath Control (LSB)',
+		66, 'Sostenuto Pedal',
+		98, 'non-reg param lsb',
+		67, 'Soft Pedal',
+		99, 'non-reg param msb',
+		4, 'Foot Control (MSB)',
+		36, 'Foot Control (LSB)',
+		68, 'Legato Pedal',
+		100, 'Reg Param (LSB)',
+		5, 'Portamento Time (MSB)',
+		37, 'Portamento Time (LSB)',
+		69, 'Hold 2',
+		101, 'Reg Param (MSB)',
+		6, 'Data Entry (MSB)',
+		38, 'Data Entry (LSB)',
+		70, 'Sound Variation',
+		7, 'Channel Volume (MSB)',
+		39, 'Channel Volume (LSB)',
+		71, 'Resonance, Q',
+		8, 'Balance (MSB)',
+		40, 'Balance (LSB)',
+		72, 'Release Time',
+		73, 'Attack Time',
+		10, 'Pan (MSB)',
+		42, 'Pan (LSB)',
+		74, 'Cut-off Frequency',
+		11, 'Expression (MSB)',
+		43, 'Expression (LSB)',
+		75, 'Decay Time',
+		12, 'Effects Controller 1',
+		76, 'Vibrato Rate',
+		13, 'Effects Controller 2',
+		77, 'Vibrato Depth',
+		78, 'Vibrato Delay',
+		84, 'Portamento Control',
+		120, 'All Sound Off',
+		121, 'Reset All Controllers',
+		122, 'Local Control',
+		91, 'Reverb Depth',
+		123, 'All Notes Off',
+		92, 'Tremolo Depth',
+		124, 'Omni Off',
+		93, 'Chorus Depth',
+		125, 'Omni On',
+		94, 'Celeste (De-tune)',
+		126, 'Mono On (Poly off)',
+		95, 'Phaser Depth', # 1.9
+		127, 'Poly On (Mono off)', # 1.9, 5.1
+		);
+	}
+	return $c2s{$_[$[]} || '';
+}
+
+sub debug {
+	open (T, '>>', '/tmp/debug');
+	print T $_[$[],"\n";
+	close T;
+}
+
+sub delta_t { my $ie = $_[$[];
+	my $dt;
+	if ($ie == $[) { $dt = $Track[$ie][$[+1];
+	} else { $dt = $Track[$ie][$[+1] - $Track[$ie-1][$[+1];
+	}
+	return $dt;
+}
+
+sub display_events {
+	my ($i_top, $i_now, $i_bot) = row_nums();
+	my %seen_a_ped = ();  # 6.0 remember by channel
+	my %seen_a_endped = ();
+	my %seen_a_cc = ();   # 6.5 remember by channel and cc
+	my $note_str = '';
+	my $iline=$i_now-1; while ($iline >= $i_top) {
+		# go upwards to show the most recent Ped and * only; more elegant
+		my $now = $Ievent-$i_now+$iline;
+		my $note_str = note2str(@{$Track[$now]});
+		addl($iline, 0, event2str($now));
+		if ($Track[$now][$[] =~ /note/) {
+			if (($Track[$now][$[+1] + $Track[$now][$[+2]) > $Now) {
+				addl($iline, 57, note2str(@{$Track[$now]}));
+				if ($note_str) {  # 4.1
+					attrset(A_BOLD());
+					move($iline,31);  # "31" depends on event2str  # 4.8
+					addstr(sprintf('%5d %5d',
+					  $Track[$now][$[+3],$Track[$now][$[+4]));
+					attrset(A_NORMAL());
+				}
+			}
+		} elsif ($Track[$now][$[] =~ /control_change/) {
+			my $cha = $Track[$now][$[+2];
+			if ($Track[$now][$[+3] == 64) {
+				if ($Track[$now][$[+4] >= 64) {
+			 		if (! $seen_a_ped{$cha}) { addl($iline, 57, 'Ped'); } # 6.0
+					$seen_a_ped{$cha} = 1;
+				} else {
+			 		if (! $seen_a_endped{$cha}) { addl($iline, 57, '*'); } # 6.0
+					$seen_a_endped{$cha} = 1;
+				}
+			} else {   # 6.5
+				my $cc = $Track[$now][$[+3];
+				if (! $seen_a_cc{$cha}{$cc}) { addl($iline, 57, cc2str($cc)); } 
+				$seen_a_cc{$cha}{$cc} = 1;
+			}
+		} elsif ($Track[$now][$[] =~ /patch_change/) {
+			my $patch = $MIDI::number2patch{$Track[$now][$[+3]};
+			addl($iline, 57, $patch);  # 6.4
+		} elsif ($Track[$now][$[] =~ /^sysex/) {
+			if ($sysex2str{$Track[$now][$[+2]}) {   # 3.6
+				addl($iline, 57, $sysex2str{$Track[$now][$[+2]});
+			}
+		}
+		$iline -= 1;
+	}
+	refresh();
+	foreach my $iline (($i_now+1)..$i_bot) {
+		my $iev = $Ievent-$i_now+$iline;
+		addl($iline, 0, event2str($iev));   # 4.7
+	}
+	attrset(A_BOLD());
+	addl($i_now, 0, event2str($Ievent));
+	my $notestr = '';  # 2.1
+	if ($Track[$Ievent][$[] eq 'note') {
+		$notestr = note2str(@{$Track[$Ievent]});
+	} elsif ($Track[$Ievent][$[] eq 'patch_change') {   # 6.4
+		$notestr = $MIDI::number2patch{$Track[$Ievent][$[+3]}
+	} elsif ($Track[$Ievent][$[] eq 'control_change') {   # 6.5
+		# ideally, I'd like this to set $seen_a_cc{$cha}{$cc}, see 28 lines up
+		$notestr = cc2str($Track[$Ievent][$[+3])
+	}
+	if ($Editing)     { addl($i_now,49, "EDITING $notestr ");  # 1.4
+	} elsif ($Paused) { addl($i_now,49, "PAUSED  $notestr ");  # 2.1
+	} else            { addl($i_now,49, "PLAYING $notestr ");  # 2.1
+	}
+	attrset(A_NORMAL());
+	refresh();
+}
+
+sub display_keystrokes {
+	$TopKeystrokesLine = $LINES-4;
+	# addstr("Ievent=$Ievent KEY_UP=".KEY_UP()." stdscr=$stdscr");
+	if ($Message) {
+		move($LINES-4,2); clrtoeol();
+		addl($LINES-4, round(0.4*($COLS - length $Message)) ,$Message);
+		move($LINES-3,2); clrtoeol();
+		$Message = '';
+	} else {
+		my $dot = '';
+		if ((@EditEvent>1) and $EditEvent[$[] eq $Track[$Ievent][$[]) {
+			$dot = ' .=again';
+		}
+		my $ran = 'f=file  R=set_range';
+		if ($RangeStart < $RangeEnd) { $ran .= ' r=range'; }
+		my $tim = '+=incrementaltimes';
+		if ($IncrementalTimes) { $tim = '-=absolutetimes'; }
+		addl($LINES-4,2, "$tim  $ran  i=insert  e=edit$dot");  # 6.6
+		addl($LINES-3,2, 'k/Up/j/Down=+-1event  '
+		  . 'Right/Left=+-1sec  PageDown/PageUp=+-10sec');  # 4.3
+	}
+	# p=paste y=yank ? dd ? 4dd ? 4j etc ?
+	my $s = 'D=Delete u=undo ^R=redo  /=find ';
+	if (defined $NowBeforeFind) {  # 7.7
+		$s = $s . '?=reverse  n=next N=previous  Backspace ';
+	} else {
+		$s = $s . '?=reversefind n=findnext N=findprevious ';
+	}
+	addl($LINES-2,2, $s);
+	if ($Paused) { # if event is editable, then t,d,c,n,v  and Space=play
+		addl($LINES-1,2,
+'Space=play  ]/[=speed Home=start End=end  z=allsoundsoff w=write q=quit');
+	} else {
+		addl($LINES-1,2,
+'Space=pause ]/[=speed Home=start End=end  z=allsoundsoff w=write q=quit');
+	}
+	refresh();
+}
+
+sub display_fields {   # 4.4
+	my $event_type = $Track[$Ievent][$[];
+	if ($RangeSettingState == 1) {  # 4.5
+		attrset(A_BOLD());
+		addl(0,5,'   move to other end of range and press R');
+		attrset(A_NORMAL());
+	} elsif ($NewFileState == 1) {  # 4.9
+		attrset(A_BOLD());
+		my $f = $File; # if filename too long use basename; 41=24+12+5; 5.0
+		if (length($f) > ($COLS-length($ID)-41)) { $f =~ s/^.*\///; }
+		addl(0,5,"now editing $f");
+		attrset(A_NORMAL());
+	} elsif ($event_type eq 'note') {
+		addl(0,5,'       Event  Ticks  Dura  Chan  Pitch  Vol');
+	} elsif ($event_type eq 'control_change') {
+		addl(0,5,'       Event  Ticks  Chan  Contrlr Value');
+	} elsif ($event_type eq 'patch_change') {
+		addl(0,5,'       Event  Ticks  Chan  Patch');
+	} else {
+		addl(0,5,'       Event  Ticks  Data');
+	}
+	move(0,$COLS-length($ID)-24); addstr("ReplaySpeed=$RS");  # 3.1
+	move(0,$COLS-length($ID)-8);  addstr("Output=$ID");
+}
+
+sub display_screen {
+	display_fields();
+	move(1,1); hline($ACS_HLINE,$COLS-2);
+	my $last = $Track[$#Track][$[+1];
+	move(1,$COLS-length($ID)-25); addstr(" Now at $Now / $last mS ");  # 3.1
+	move($LINES-5,1); hline($ACS_HLINE,$COLS-2);
+	if ($Ievent == $#Track) { $Paused = 1; }   # 4.1
+	display_keystrokes();
+	display_events();
+	refresh();
+	$I_LastRefreshed = $Now;   # 6.7
+}
+
+sub display_message {
+	my ($y,$x); getyx($y,$x);
+	$Message = $_[$[]; display_keystrokes();
+	move($y,$x);
+	refresh();
+}
+
+sub edit_event {  my $initial_ch = $_[$[];
+	# 2.9 must keep @EditEvent updated...
+	$Editing = 1;
+	my $prompt_y;
+	my $prompt_x;
+	sub time_prompt_to { my ($y, $x, $clr) = @_;
+		if ($IncrementalTimes) { addstr($y,$x-6,'time=+'.delta_t($Ievent));
+		} else { addstr($y,$x-5,'time='.$Track[$Ievent][$[+1]);
+		}
+		if ($clr) { clrtoeol(); }
+	}
+	sub keystroke_prompt { my $k = $_[$[];
+		if ($IncrementalTimes) { $k .= " -=absolutetimes";
+		} else { $k .= " +=incrementaltimes";
+		}
+		if ($Ievent == $[) { $k .= ' Down ';
+		} elsif ($Ievent == $#Track) { $k .= ' Up ';
+		} else { $k .= ' Up/Down ';
+		}
+		$k .= 'Space=Paused ';
+		addl($LINES-1,round(0.45*($COLS-length($k))),$k);
+		refresh();
+		getyx($prompt_y,$prompt_x);  # why ?
+	}
+	sub display_this_event { my @event = @_;  # 1.4
+		my $k;
+		move($LINES-4,1); clrtobot();
+		if ($event[$[] eq 'note') {
+			time_prompt_to($LINES-4,13,1);
+			addl($LINES-3,15,'duration='.$event[$[+2]);
+			addl($LINES-4,26,'channel='.$event[$[+3]);
+			addl($LINES-3,35,'pitch='.$event[$[+4]);   # 5.0
+			addl($LINES-3,46,note2str(@event));
+			addl($LINES-4,43,'volume='.$event[$[+5]);
+			$k = 't=time d=duration c=chan p=pitch v=vol';
+		} elsif ($event[$[] eq 'control_change') {
+			time_prompt_to($LINES-4,14,1);
+			addl($LINES-3,19,'channel='.$event[$[+2]);
+			addl($LINES-4,29,'midi-controller='.$event[$[+3]);
+			addl($LINES-4,49,cc2str($Track[$Ievent][$[+3]));
+			addl($LINES-3,41,'value='.$event[$[+4]);
+			$k = 't=time c=chan m=midicontroller v=value';
+		} elsif ($event[$[] eq 'patch_change') {
+			time_prompt_to($LINES-4,14,1);
+			addl($LINES-4,25,'channel='.$event[$[+2]);
+			addl($LINES-4,44,'patch='.$event[$[+3]);
+			addl($LINES-4,55,$MIDI::number2patch{$Track[$Ievent][$[+3]});
+			$k = 't=time c=channel p=patch';
+		} elsif ($event[$[] =~ /^marker|^text|^sysex_f0/) {
+			time_prompt_to($LINES-4,14,1);
+			addl($LINES-4,25,'message='.$event[$[+2]);
+			$k = 't=time m=message';
+		}
+		# 3.8 offer edit_again if applicable
+		# (perhaps if Ievent != LastEditedIevent)
+		if ((@EditEvent>1) and $EditEvent[$[] eq $Track[$Ievent][$[]) {
+			$k .= ' .=again';
+		}
+		display_events();
+		keystroke_prompt($k); move($prompt_y,$prompt_x); refresh();
+	}
+
+	my @event = @{$Track[$Ievent]};
+	@EditEvent = ($event[$[]);   # 2.9 remember the event_type
+	my $changed = 0;
+	timeout(-1);
+	my $i_before_edit = $Ievent;
+	while (1) {
+		display_this_event(@event);
+		if ($event[$[] eq 'note') {
+			while (1) {
+				my $c = getch();
+				if      ($c eq 't') { get_n($LINES-4,13,6,1); $changed=1;
+				} elsif ($c eq 'd') { get_n($LINES-3,24,6,2); $changed=1;
+				} elsif ($c eq 'c') { get_n($LINES-4,34,3,3); $changed=1;
+					addl($LINES-3,46,note2str(@{$Track[$Ievent]}));
+				} elsif ($c eq 'p') { get_n($LINES-3,41,5,4); $changed=1; #5.0
+					addl($LINES-3,46,note2str(@{$Track[$Ievent]}));
+				} elsif ($c eq 'v') { get_n($LINES-4,50,6,5); $changed=1;
+				} elsif ($c eq '+' and !$IncrementalTimes) {
+					$IncrementalTimes = 1; display_this_event(@event);
+				} elsif (($c eq '-' || $c eq '=') and $IncrementalTimes) {
+					$IncrementalTimes = 0; display_this_event(@event);
+				} elsif ($c == KEY_UP() or $c eq 'k')   {  # 1.4, 4.0
+					if ($Ievent > $[) {
+						event_travel(-1);   # 5.2
+						@event = @{$Track[$Ievent]};
+						display_this_event(@event);
+						display_fields();   # 4.4
+						last;  # 1.5
+					}
+				} elsif ($c == KEY_DOWN() or $c eq 'j') {  # 1.4, 4.0
+					if ($Ievent < $#Track) {
+						event_travel(1);   # 5.2
+						@event = @{$Track[$Ievent]};
+						display_this_event(@event);
+						display_fields();   # 4.4
+						last;  # 1.5
+					}
+				} elsif ($c eq 'e') { next;  # 1.4
+				} elsif ($c eq '.') {
+					set_before_last_change($i_before_edit); # 7.5
+					edit_again(); # 3.8 display_screen();
+				} else {
+					if ($changed) {
+						set_before_last_change($i_before_edit); # 7.5
+						add_to_history();
+					}
+					$Editing = 0;
+# press / ? n N during Editing should Pause, call ind_event and exit
+					return;
+				}
+				# display_events(); move($prompt_y,$prompt_x); refresh();
+				@event = @{$Track[$Ievent]};   # 2.7
+				display_this_event(@event);
+			}
+		} elsif ($event[$[] eq 'control_change') {
+			while (1) {
+				my $c = getch();
+				if      ($c eq 't') { get_n($LINES-4,14,6,1); $changed=1;
+				} elsif ($c eq 'c') { get_n($LINES-3,27,2,2); $changed=1;
+				} elsif ($c eq 'm') { get_n($LINES-4,45,3,3); $changed=1;
+					addl($LINES-4,49,cc2str($Track[$Ievent][$[+3]));
+				} elsif ($c eq 'v') { get_n($LINES-3,47,3,4); $changed=1;
+				} elsif ($c eq '+' and !$IncrementalTimes) {
+					$IncrementalTimes = 1; display_this_event(@event);
+				} elsif (($c eq '-' || $c eq '=') and $IncrementalTimes) {
+					$IncrementalTimes = 0; display_this_event(@event);
+				} elsif ($c == KEY_UP() or $c eq 'k')   {  # 1.4, 4.0
+					if ($Ievent > $[) {
+						if ($Now - $Track[$Ievent-1][$[+1] < 2) { # 4.8
+							$Track[$Ievent-1][$[+1] -= 1;
+						}
+						time_travel($Track[$Ievent-1][$[+1] + 1 - $Now);
+						@event = @{$Track[$Ievent]};
+						display_this_event(@event);
+						play_current_event(); last;  # 1.5
+					}
+				} elsif ($c == KEY_DOWN() or $c eq 'j') {  # 1.4, 4.0
+					if ($Ievent < $#Track) {
+						$Ievent += 1; $Now = $Track[$Ievent][$[+1] + 1;
+						@event = @{$Track[$Ievent]};
+						display_this_event(@event);
+						play_current_event(); last;  # 1.5
+					}
+				} elsif ($c eq 'e') { next;  # 1.4
+				} elsif ($c eq '.') { edit_again(); # 3.8 display_screen();
+				} else {
+					if ($changed) {
+						set_before_last_change($i_before_edit); # 7.5
+						add_to_history();
+					}
+					$Editing = 0; return;
+				}
+				# display_events(); move($prompt_y,$prompt_x); refresh();
+				@event = @{$Track[$Ievent]};   # 1.6
+				display_this_event(@event);
+			}
+		} elsif ($event[$[] eq 'patch_change') {
+			while (1) {
+				#get_n($LINES-4,50,3,3); $changed=1;   # XXX
+				#addl($LINES-4,55,$MIDI::number2patch{$Track[$Ievent][$[+3]});
+				my $c;
+				if ($initial_ch) { $c = $initial_ch; $initial_ch = undef;
+				} else { $c = getch();
+				}
+				if      ($c eq 't') { get_n($LINES-4,14,6,1); $changed=1;
+				} elsif ($c eq 'c') { get_n($LINES-4,33,3,2); $changed=1;
+				} elsif ($c eq 'p') { get_n($LINES-4,50,3,3); $changed=1;
+				  addl($LINES-4,55,$MIDI::number2patch{$Track[$Ievent][$[+3]});
+				} elsif ($c eq '+' and !$IncrementalTimes) {
+					$IncrementalTimes = 1; display_this_event(@event);
+				} elsif (($c eq '-' || $c eq '=') and $IncrementalTimes) {
+					$IncrementalTimes = 0; display_this_event(@event);
+				} elsif ($c == KEY_UP() or $c eq 'k')   {  # 1.4, 4.0
+					if ($Ievent > $[) {
+						if ($Now - $Track[$Ievent-1][$[+1] < 2) { # 4.8
+							$Track[$Ievent-1][$[+1] -= 1;
+						}
+						time_travel($Track[$Ievent-1][$[+1] + 1 - $Now); # 4.8
+						@event = @{$Track[$Ievent]};
+						display_this_event(@event);
+						play_current_event(); last;  # 1.5
+					}
+				} elsif ($c == KEY_DOWN() or $c eq 'j') {  # 1.4, 4.0
+					if ($Ievent < $#Track) {
+						$Ievent += 1; $Now = $Track[$Ievent][$[+1] + 1;
+						@event = @{$Track[$Ievent]};
+						display_this_event(@event);
+						play_current_event(); last;  # 1.5
+					}
+				} elsif ($c eq 'e') { next;  # 1.4
+				} elsif ($c eq '.') { edit_again(); # 3.8 display_screen();
+				} else {
+					if ($changed) {
+						set_before_last_change($i_before_edit); # 7.5
+						add_to_history();
+					}
+					$Editing = 0; return;
+				}
+				@event = @{$Track[$Ievent]};   # 2.7
+				display_this_event(@event);
+			}
+		} elsif ($event[$[] =~ /^marker|^text|^sysex_f0/) {
+			while (1) {
+				my $c;
+				if ($initial_ch) { $c = $initial_ch; $initial_ch = undef;
+				} else { $c = getch();
+				}
+				if      ($c eq 't') { get_n($LINES-4,14,6,1); $changed=1;
+				} elsif ($c eq 'm') {
+					my $s='';
+					move($LINES-4,33); clrtoeol();
+					echo(); getnstr($s,52); noecho();
+					$changed=1;   $Track[$Ievent][$[+2] = $s;
+					$EditEvent[$[+2] = $s;  # 7.3
+				} elsif ($c eq '+' and !$IncrementalTimes) {
+					$IncrementalTimes = 1; display_events();
+					time_prompt_to($LINES-4,14,0); keystroke_prompt($k);
+					refresh();
+				} elsif (($c eq '-' || $c eq '=') and $IncrementalTimes) {
+					$IncrementalTimes = 0; display_events();
+					time_prompt_to($LINES-4,14,0); keystroke_prompt($k);
+					refresh();
+				} elsif ($c == KEY_UP() or $c eq 'k')   {  # 1.4, 4.0
+					if ($Ievent > $[) {
+						$Ievent -= 1; $Now = $Track[$Ievent][$[+1] + 1;
+						@event = @{$Track[$Ievent]};
+						display_this_event(@event); last;
+					}
+				} elsif ($c == KEY_DOWN() or $c eq 'j') {  # 1.4, 4.0
+					if ($Ievent < $#Track) {
+						$Ievent += 1; $Now = $Track[$Ievent][$[+1] + 1;
+						@event = @{$Track[$Ievent]};
+						display_this_event(@event); last;
+					}
+				} elsif ($c eq 'e') { next;  # 1.4
+				} elsif ($c eq '.') { edit_again(); # 3.8 display_screen();
+				} else {
+					if ($changed) {
+						set_before_last_change($i_before_edit); # 7.5
+						add_to_history();
+					}
+					$Editing = 0; return;
+				}
+				# display_events(); move($prompt_y,$prompt_x); refresh();
+				@event = @{$Track[$Ievent]};   # 2.7
+				display_this_event(@event);
+			}
+		} else {
+			time_prompt_to($LINES-4,14,1);
+			my $k = 't=time,  ';
+			keystroke_prompt($k); refresh();
+			while (1) {
+				my $c = getch();
+				if      ($c eq 't') { get_n($LINES-4,14,6,1); $changed=1;
+				} elsif ($c eq '+' and !$IncrementalTimes) {
+					$IncrementalTimes = 1; display_events();
+					time_prompt_to($LINES-4,14,0); keystroke_prompt($k);
+					refresh();
+				} elsif (($c eq '-' || $c eq '=') and $IncrementalTimes) {
+					$IncrementalTimes = 0; display_events();
+					time_prompt_to($LINES-4,14,0); keystroke_prompt($k);
+					refresh();
+				} elsif ($c == KEY_UP() or $c eq 'k')   {  # 1.4, 4.0
+					if ($Ievent > $[) {
+						$Ievent -= 1; $Now = $Track[$Ievent][$[+1] + 1;
+						@event = @{$Track[$Ievent]};
+						display_this_event(@event); last;
+					}
+				} elsif ($c == KEY_DOWN() or $c eq 'j') {  # 1.4, 4.0
+					if ($Ievent < $#Track) {
+						$Ievent += 1; $Now = $Track[$Ievent][$[+1] + 1;
+						@event = @{$Track[$Ievent]};
+						display_this_event(@event); last;
+					}
+				} elsif ($c eq 'e') { next;  # 1.4
+				} elsif ($c eq '.') { edit_again(); # 3.8 display_screen();
+				} else {
+					if ($changed or $called_from_insert_event) {   # 4.3
+						play_current_event();   # 4.4
+						set_before_last_change($i_before_edit); # 7.5
+						add_to_history();
+					}
+					$Editing = 0; return;
+				}
+				# display_events(); move($prompt_y,$prompt_x); refresh();
+				@event = @{$Track[$Ievent]};   # 2.7
+				display_this_event(@event);
+# !!! should play the event !!!
+			}
+		}
+	}
+}
+
+sub sanitise_event_text { my @event = @_;  # 7.2
+	$event[$[+2] =~ tr/][A-Za-z0-9 _'"`.+:\/@&)(=*^%$#!?}{|\\~-//cd;   # 7.1
+	$event[$[+2] =~ s/\s+/ /g;
+	$event[$[+2] =~ s/^\s+//;
+	return @event;
+}
+
+sub event2str { my ($ie) = @_;
+	if ($ie > $#Track) { return ''; }   # 4.7 needed after a big range_delete
+	if ($ie < $[) { debug("event2str($ie)"); }
+	my @event = @{$Track[$ie]};
+	my $str = ' ';
+	if ($IncrementalTimes) {
+		if ($ie > $[) { $event[$[+1] -= $Track[$ie-1][$[+1]; }
+		$event[$[+1] = "+".$event[$[+1];
+		if ($event[$[] =~ /marker|sysex|text|track_name/) {  # 7.2 track_name
+			$str = sprintf(' %14s %6s %s', sanitise_event_text(@event));
+		} elsif (6 == scalar @event) {
+			$str = sprintf(' %14s %6s %5d %5d %5d %5d', @event);
+		} elsif (5 == scalar @event) {
+			$str = sprintf(' %14s %6s %5d %5d %5d', @event);
+		} elsif ($event[$[] eq 'pitch_wheel_change') {
+			$str = sprintf('%s %5s %4d %6d', @event);
+		} elsif (! defined $event[$[]) {
+		} elsif (4 == scalar @event) {
+			if ($event[$[] eq 'channel_after_touch') {  # 6.8
+				$event[$[] = 'cha_aftertouch';
+			}
+			$str = sprintf(' %14s %6s %5d %5d', @event);
+		} elsif (3 == scalar @event) {
+			$str = sprintf(' %14s %6s %5d', @event);
+		}
+	} else {
+		if ($event[$[] =~ /marker|sysex|text|track_name/) {  # 7.2 track_name
+			$str = sprintf(' %14s %6s %s', sanitise_event_text(@event));
+		} elsif (6 == scalar @event) {
+			$str = sprintf(' %14s %6d %5d %5d %5d %5d', @event);
+		} elsif (5 == scalar @event) {
+			$str = sprintf(' %14s %6d %5d %5d %5d', @event);
+		} elsif ($event[$[] eq 'pitch_wheel_change') {
+			$str = sprintf('%s %5s %4d %6d', @event);
+		} elsif (! defined $event[$[]) {
+		} elsif (4 == scalar @event) {
+			if ($event[$[] eq 'channel_after_touch') {  # 6.8
+				$event[$[] = 'cha_aftertouch';
+			}
+			$str = sprintf(' %14s %6d %5d %5d', @event);
+		} elsif (3 == scalar @event) {
+			$str = sprintf(' %14s %6d %5d', @event);
+		}
+	}
+	if (($ie == $RangeStart) || ($ie == $RangeEnd)) {
+		$str =~ s/^./-/;  # 4.5
+		# $str =~ s/^./\e[31m-/;  # Nope, this just gets displayed in ascii
+		# $str .= "\e[39m";  # and perl Curses doesn't support any color
+		# man color; perldoc Curses | grep color
+	} elsif (($ie > $RangeStart) && ($ie < $RangeEnd)) {
+		$str =~ s/^./|/;
+		# $str =~ s/^./\e[31m|/;  # Nope, this just gets displayed in ascii
+		# $str .= "\e[39m";  # and perl Curses doesn't support any color
+	}
+	return $str;
+}
+
+sub event_type { # this dialogue is used by insert_event();
+	if (! $Paused) { $Paused = 1; timeout(-1); display_events(); }
+	move($LINES-4,2); clrtobot(); addstr('Insert event type ? ');
+	my $s
+	  = 'n=note, c=control_change, p=patch_change, m=marker, b=bank_change ';
+	addl($LINES-2, round(0.4*($COLS - length $s)) ,$s);
+	move($LINES-4,22);
+	refresh();
+	my %c2event_type = qw{
+	 b bank_change n note c control_change p patch_change m marker
+	};
+	return $c2event_type{getch()};
+}
+
+sub file_menu {   # 4.8
+	if (! $Paused) { $Paused = 1; timeout(-1); display_events(); }
+	move($LINES-4,0); clrtobot();
+	my $x=13;
+	# addl($LINES-2,$x,'f=fork    n=new    s=save w=write    q=quit');
+	addl($LINES-2,$x,'f=fork    i=insert    n=new    s=save w=write    q=quit');
+	addl($LINES-3,4,'which file operation ? ');  my $x=27;
+	my $c = getch(); clrtobot(); echo();
+	if ($c eq 'f') {
+		addl($LINES-3,$x,'fork');
+		if ($FileIsChanged) {
+			addl($LINES-2,4,"save $File first (y/n) ? ");
+			my $c = getch();
+			if ($c eq 'y' or $c eq 'w') { score2file($File, 1000,\@Track); }
+		}
+		my $new_filename = $File;
+		foreach $s ('a'..'z') {
+			$new_filename = $File;
+			$new_filename =~ s/(_[a-z][a-z])?\.mid$/$s$1.mid/i;
+			if (! -e $new_filename) { last ; }
+		}
+		$File = $new_filename;
+		$NewFileState = 1;
+		$FileIsChanged = 0;
+	} elsif ($c eq 'i') {  # 6.2
+		my $filename = ask_filename($LINES-2, 'insert which file ? ');
+		if (! $filename) { return; }
+		if (! -e $filename) { _warn("$filename does not exist"); return; }
+		my @new_score = file2ms_score($filename);
+		my @new_track = @{$new_score[$[+1]};
+		if ($new_track[$[][$[] eq 'set_tempo') { shift @new_track; }
+		if (! @new_track) { _warn("$filename contains no events"); return; }
+		# evolved from range_repeat ...
+		@new_track = sort { $a->[$[+1] <=> $b->[$[+1] } @new_track;
+		my $delta = $new_track[$#new_track][$[+1];   # one note short?
+		my $start_time = $Track[$Ievent][$[+1];
+		my $k = $[;
+		while ($k <= $#new_track) { $new_track[$k][$[+1]+=$start_time; $k+=1; }
+		$k = $Ievent;
+		while ($k <= $#Track) { $Track[$k][$[+1] += $delta; $k += 1; }
+		# XXX should insert a marker at the start "inserted from $filename"
+		splice @Track, $Ievent, 0, @new_track;
+		# time_travel($delta);  No: leave Ievent at the start (to edit patches)
+		$RangeStart = $Ievent;
+		$RangeEnd   = $Ievent - 1 + scalar @new_track;
+		$Message = sprintf("%d new events", scalar @new_track);
+		set_before_last_change($Ievent); # 7.5
+		add_to_history();
+
+	} elsif ($c eq 'n') {
+		new_file();
+		my $filename = ask_filename($LINES-2,'new filename ? ');
+		if (! $filename) { return; }  # 6.2
+		if (! -e $filename) { _warn("$filename does not exist"); return; }
+		$File    = $filename;
+		@score   = file2ms_score($File);   # 1.7
+		@Track   = sort {$$a[$[+1] <=> $$b[$[+1]} @{$score[1]};
+		$Now     = 0;
+		$Ievent  = $[;
+		$Paused  = 1;
+		$Editing = 0;
+		$NewFileState = 1;
+		all_sounds_off();
+	} elsif ($c eq 's' or $c eq 'w') {
+		addl($LINES-3,$x,'save file');   # same as 'w' = write
+		score2file($File, 1000,\@Track);
+		_warn("Saved to $File");
+		$FileIsChanged = 0;
+	} elsif ($c eq 'q') {   # same as 'q' = quit
+		if ($Paused) { quit(); }
+		$Paused = 1; timeout(-1); # display_screen();
+	}
+}
+
+sub find_type { # used by find();  since 3.7 different from event_type
+	if (! $Paused) { $Paused = 1; timeout(-1); display_events(); }
+	move($LINES-4,2); clrtobot(); addstr('Find event type ? ');
+	my $s
+	  = 'n=note, c=control_change, p=patch_change, m=marker, b=bank_change ';
+	addl($LINES-2, round(0.4*($COLS - length $s)) ,$s);
+	$s = 'l=long_gap,  s=short_gap,  t=time';
+	my %c2event_type = qw{
+	 b bank_change n note c control_change p patch_change m marker
+	 l long_gap s short_gap t time
+	};
+	if ($RangeStart < $RangeEnd) {
+		$s .= ',  r=range_start  R=range_end';
+		$c2event_type{'r'} = 'range_start'; # 7.6 only if a range is defined!
+		$c2event_type{'R'} = 'range_end';   # 7.6
+	}
+	addl($LINES-1, round(0.4*($COLS - length $s)) ,$s);
+	move($LINES-4,20);
+	refresh();
+	return $c2event_type{getch()};
+}
+
+sub find {
+	my $event_type = find_type();
+	if (! $event_type) { return; }
+	addl($LINES-4,20,$event_type);
+	if ($event_type eq 'time')  { go_to(); return; }  # 3.7
+	if ($event_type =~ /_gap$/) { find_gap($event_type); return; }  # 4.2
+	if ($event_type ne 'marker') {
+		my $help = 'e.g. 64, >63, <65, !=93, >47&<73';   # 3.1
+		addl($LINES-4,$COLS-length($help)-2,$help);
+	}
+	if ($event_type eq 'range_start') {   # 4.5
+		time_travel($Track[$RangeStart][$[+1]-$Track[$Ievent][$[+1]); return;
+	}
+	if ($event_type eq 'range_end') {     # 4.5
+		time_travel($Track[$RangeEnd][$[+1]-$Track[$Ievent][$[+1]); return;
+	}
+	refresh;
+	@FindEvent = ($event_type);
+	if ($event_type eq 'note') {
+		addl($LINES-3,2,'  Duration          ?');
+		addl($LINES-2,2,'   Channel (0..15)  ?');
+		addl($LINES-1,2,'     Pitch (0..127) ?');
+		# shame about Volume not fitting on the screen...
+		refresh();
+		my $iline = 3;
+		while ($iline > 0) {
+			move($LINES-$iline,24);
+			my $str; my $n;
+			echo(); getnstr($str,20); noecho();
+			if (length $str) { $FindEvent[$[+5-$iline] = $str; }  # 2.8, 3.0
+			$iline -= 1;
+		}
+		#warn "FindEvent = ".join(', ',@FindEvent)."\r\n";
+	} elsif ($event_type eq 'control_change') {
+		addl($LINES-3,2,'   Channel (0..15)  ?');
+		addl($LINES-2,2,'Controller (0..127) ?');
+		addl($LINES-1,2,'     Value (0..127) ?');
+		refresh();
+		my $iline = 3;
+		while ($iline > 0) {
+			move($LINES-$iline,24);
+			my $str; my $n;
+			echo(); getnstr($str,20); noecho();
+			if (length $str) { $FindEvent[$[+5-$iline] = $str; }  # 2.8
+			$iline -= 1;
+		}
+		# warn "FindEvent = ".join(', ',@FindEvent)."\r\n"; sleep 5;
+	} elsif ($event_type eq 'patch_change') {
+		addl($LINES-3,2,'   Channel (0..15)  ?');
+		addl($LINES-2,2,'     Patch (0..127) ?');
+		clrtobot(); refresh();
+		my $iline = 3;
+		while ($iline > 1) {
+			move($LINES-$iline,24);
+			my $str; my $n;
+			echo(); getnstr($str,20); noecho();
+			if (length $str) { $FindEvent[$[+5-$iline] = $str; }  # 2.8
+			$iline -= 1;
+		}
+	} elsif ($event_type eq 'marker') {
+		addl($LINES-3,2,'      Text ? ');
+		clrtobot(); refresh();
+		my $str; my $n;
+		echo(); $n = getnstr($str,50); noecho();
+		if ($str) { $FindEvent[$[+2] = $str; }   # 5.9
+	} else {
+		return;
+	}
+	find_next($FindForwards);
+}
+
+sub find_gap { my $event_type = $_[$[];   # 4.2
+	# we roll the search into find_next(), so that 'n' or 'N' work
+	if ($event_type eq 'long_gap') {
+		addl($LINES-3,2,'gap longer than (mS) ? ');
+	} elsif ($event_type eq 'short_gap') {
+		addl($LINES-3,2,'gap shorter than (mS) ? ');
+	} else {
+		return;
+	}
+	clrtobot(); refresh(); echo(); $n = getnstr($str,50); noecho();
+	if (! defined $str) { return; }
+	@FindEvent = ($event_type,0+$str);
+	find_next($FindForwards);
+}
+
+sub find_match { my ($search_str, $num) = @_;  # 3.0
+	if (! defined $search_str) { return 1; }
+	if ($str =~ /^\d+$/) {
+		if ((0+$num)==(0+$search_str)) { return 1; } else { return 0; }
+	}
+	foreach my $str (split /&/, $search_str) {
+		if ($str =~ /^>(\d+)$/)       { if (!((0+$num)> (0+$1))) { return 0; }
+		} elsif ($str =~ /^<(\d+)$/)  { if (!((0+$num)< (0+$1))) { return 0; }
+		} elsif ($str =~ /^>=(\d+)$/) { if (!((0+$num)>=(0+$1))) { return 0; }
+		} elsif ($str =~ /^<=(\d+)$/) { if (!((0+$num)<=(0+$1))) { return 0; }
+		} elsif ($str =~ /^!=(\d+)$/) { if (!((0+$num)!=(0+$1))) { return 0; }
+		} else                        { if (!($num eq $str))     { return 0; }
+		}
+	}
+	return 1;
+}
+
+sub event_matches { my ($f, $e) = @_; my @fe = @$f; my @ev = @$e;
+	# factored out as a subroutine, 7.6
+	if ($FindSubstring and $fe[$[] eq 'marker') {  # 7.6
+		if (! defined $fe[$[+2]) { return 1; }  # blank text finds all markers
+		if (index($ev[$[+2], $fe[$[+2]) < $[) { return 0; }
+	} else {
+		foreach my $i ($[+1 .. $#fe) {
+			if (defined $fe[$i] and !find_match($fe[$i],$ev[$i])) { return 0; }
+		}
+	}
+	return 1;
+}
+sub find_next { my $find_forwards = $_[$[];
+	#warn "FindEvent=@FindEvent\n"; sleep 3;
+	my $iev = $Ievent;
+	my $found = 0;
+	if ($find_forwards) {
+		while ($iev < $#Track) {
+			$iev += 1;
+			if ($FindEvent[$[] eq $Track[$iev]->[$[]) {
+				if (event_matches(\@FindEvent,$Track[$iev])) {$found=1; last;}
+			} elsif ($FindEvent[$[] eq 'long_gap') {
+				if (delta_t($iev) > $FindEvent[$[+1]) { $found = 1; last; }
+			} elsif ($FindEvent[$[] eq 'short_gap') {
+				if (delta_t($iev) < $FindEvent[$[+1]) { $found = 1; last; }
+			}
+		}
+	} else {
+		while ($iev > $[) {
+			$iev -= 1;
+			if ($FindEvent[$[] eq $Track[$iev]->[$[]) {
+				if (event_matches(\@FindEvent,$Track[$iev])) {$found=1; last;}
+			} elsif ($FindEvent[$[] eq 'long_gap') {
+				if (delta_t($iev) > $FindEvent[$[+1]) { $found = 1; last; }
+			} elsif ($FindEvent[$[] eq 'short_gap') {
+				if (delta_t($iev) < $FindEvent[$[+1]) { $found = 1; last; }
+			}
+		}
+	}
+	if ($found) {
+		$NowBeforeFind = $Now;   # 7.7
+		time_travel($Track[$iev][$[+1] - $Now);   # 4.3
+		$Ievent = $iev;  # in case there are following events with zero dt
+		display_screen();
+	} else {
+		$Message = "Event (".join(', ',@FindEvent).") not found";
+	}
+}
+
+sub get_n { my ($y, $x, $l, $i) = @_;
+	move($y,$x); addstr(' 'x$l); move($y,$x); refresh();
+	my $t; echo(); getnstr($t, $l); noecho();
+	if ($t =~ /^\d+$/) {
+		if ($i == 1 and $IncrementalTimes and $Ievent>$[) {
+			my $dt = $t - delta_t($Ievent);
+			$Track[$Ievent][$[+1] = $Track[$Ievent-1][$[+1]+$t;
+			foreach my $ie ($Ievent+1..$#Track) { $Track[$ie][$[+1] += $dt; }
+			$EditEvent[$[+$i] = $t;  # 3.7 BUG if IncrementalTimes has changed
+		} elsif ($i == 1 and ! $IncrementalTimes) {
+			$Track[$Ievent][$[+1] = 0+$t;  # it might have changed order :-(
+			@Track = sort {$$a[$[+1] <=> $$b[$[+1]} @Track;
+		} else {
+			$Track[$Ievent][$[+$i] = 0+$t;
+			$EditEvent[$[+$i] = $t;  # 2.9
+		}
+	} elsif ($t =~ /^[-+]\d+$/) {   # 3.0 increments, e.g +10 or -15
+		if ($i > 1) {
+			$Track[$Ievent][$[+$i] += 0+$t;
+			$EditEvent[$[+$i] = $t;  # it's still a string
+		}
+	}
+}
+
+sub go_to {
+	if (! $Paused) { $Paused = 1; timeout(-1); display_events(); }
+	my $q = ' Go to time (ms) ? ';
+	addl($LINES-3,2,$q); clrtobot(); refresh();
+	my $str; my $n; echo(); $n = getnstr($str,10); noecho();
+	time_travel($str-$Now); play_current_event();
+	return;
+}
+
+sub insert_event {
+	my $event_type = event_type();
+	if (! $event_type) { return; }
+	# 4.8 patch_change must be earlier than just 1 tick before
+	my $gap_to_previous_event = $Track[$Ievent][$[+1]-$Track[$Ievent-1][$[+1];
+	my $gap_to_inserted_event = round(0.5 * $gap_to_previous_event);
+	if ($gap_to_inserted_event < 1) { $gap_to_inserted_event = 1; }
+	my $t = $Track[$Ievent][$[+1] - $gap_to_inserted_event;   # 4.8
+	if ($t < 0) { $t = 0; }
+	my @InsertEvent = ($event_type, $t);
+	if ($event_type eq 'note') { push @InsertEvent, 200,0,60,100;  # 5.4
+	} elsif ($event_type eq 'patch_change') { push @InsertEvent, 0, 0;
+	} elsif ($event_type eq 'control_change') { push @InsertEvent, 0, 10, 64;
+	} elsif ($event_type eq 'marker') { push @InsertEvent, 'NEW SECTION';
+	} elsif ($event_type eq 'bank_change') {
+		$InsertEvent[$[] = 'control_change';
+		my @msb = (@InsertEvent, 0, 0, 5);
+		splice @Track, $Ievent, 0, \@msb;
+		$Ievent += 1;
+		push @InsertEvent, 0, 32, 5;
+	}
+	splice @Track, $Ievent, 0, \@InsertEvent;
+	$FileIsChanged = 1; # could add_to_history, but normally it will be edited
+	if ($RangeStart >= $Ievent) { $RangeStart += 1; }   # 4.5
+	if ($RangeEnd   >= $Ievent) { $RangeEnd   += 1; }
+	local $called_from_insert_event = 1;   # 4.3
+	# after ip we could often go straight to the patch number 'p',
+	# (so ip4 not ipp4) but it's a drag if you only want to edit the channel.
+	edit_event();
+	play_current_event();
+	# should play_current_event perhaps here, perhaps in edit_event ...
+	# in edit_event there are many returns, and there are only two calls
+}
+
+sub metronome_event { my $c = $_[$[];   # must work in Play mode
+	# how do we set whether to insert a click or insert a marker or both ?
+	# Is this really necessary anyway ?
+	# it was just part of a crazy scheme to make midi2muscript easier...
+	my $pitch = 33;
+	my $text  = 'NEW BEAT';
+	if ($c eq 'B') { $pitch = 34; $text = 'NEW BAR'; }
+	# In Play mode, we want to insert just before the note currently playing.
+	# But Ievent doesn't necessarily point there; it might be pointing
+	# to a control_change event that has been output subsequently.
+	my $ievent = $Ievent;
+	my $time = $Track[$ievent][$[+1] - 1;  # just before the current event
+	if ($time < 0) { $time = 0; }
+	# my @event = ('note',$time, 500,9,$pitch,80);
+	my @event = ('marker',$time, $text);
+	splice @Track, $ievent, 0, \@event;
+	$Ievent += 1; $FileIsChanged = 1;
+}
+
+sub note2str { my ($s,$t,$dt,$cha,$note,$vol) = @_;
+	if ($s eq "control_change") {
+		if ($dt==64) { # cc=
+			if ($note > 63) { return "Ped"; } else { return "*"; }
+		}
+		return '';
+	}
+	if (0+$cha == 9) {
+		if ($note == 33) { return 'Metronome Click'; }  # 7.0
+		if ($note == 34) { return 'Metronome Bell'; }   # 7.0
+		return $MIDI::notenum2percussion{$note};
+	}
+# XXX By default, midiedit should display pitches
+# mapped left-to-right like a miniature piano:
+#   C ab | Eb
+#   C    | Eb f~
+#        | Eb b f~
+# If possible at least 3 characters per octave, plus '| ' unmoving;
+# bass is 3.3 octaves, treble 4 octaves = 22 chars; plus '| ' makes 24
+# If less than 15 are available, revert to 'treble f~##' which uses 11.
+# Could also display the sounding chord, eg 'c233' or 'eb26' or 'Eb F B'
+	my $clef = 'bass'; if ($note >= 60) { $clef = 'treble'; $note -= 24; }
+	my $octave = '';
+	if ($note < 36) {
+		my $o = int((47-$note)/12);
+		$octave = '_' x $o;
+		$note  +=  12 * $o; # 1.8
+	} elsif ($note >= 60) {
+		my $o = int(($note-48)/12);
+		$octave = '~' x $o;
+		$note  -=  12 * $o; # 1.8
+	}
+	$note -= 36;
+	return "$clef $note2letter[$note%24]$octave$note2acc[$note%12]";
+}
+
+sub play_current_event {
+	my @event = @{$Track[$Ievent]};
+	if ($event[$[] eq 'note') { # 3.1 and 5.1 adjust the duration
+		$event[$[+2] = round($event[$[+2] / $ReplaySpeed);  # millisec
+	}
+	my @alsaevent = MIDI::ALSA::scoreevent2alsa(@event);
+	my ($status, $time,$events) = MIDI::ALSA::status();
+	$alsaevent[$[+4] = $time+0.005;
+	MIDI::ALSA::output(@alsaevent);
+}
+
+sub edit_again {
+	if (@EditEvent < 2) { return; }
+	my @event = @{$Track[$Ievent]};
+	# if only ticks is involved, .=again should work even on different-types
+	if (($EditEvent[$[] ne $event[$[]) and (2 < @EditEvent)) {
+		$Message = "can't apply a (" . join(',',@EditEvent)
+		  . ") edit to a $event[$[] event";   # 4.3
+		return;
+	}
+	my $i = $[+1;  if (defined $EditEvent[$i]) {   # 3.7
+		my $t = $EditEvent[$i];
+		if ($IncrementalTimes and $Ievent>$[) { # similar to sub get_n above
+			my $dt = $t - delta_t($Ievent);
+			$event[$i] = $Track[$Ievent-1][$i] + $t;
+			foreach my $ie ($Ievent+1..$#Track) { $Track[$ie][$i] += $dt; }
+		}
+	}
+	for $i ($[+2 .. $#EditEvent) {
+		if (defined $EditEvent[$i]) {
+			if ($EditEvent[$i] =~ /^\d+$/) {
+				$event[$i] = 0+$EditEvent[$i];
+			} elsif ($EditEvent[$i] =~ /^[-+]\d+$/) {
+				$event[$i] += 0+$EditEvent[$i];
+			} elsif ($event[$[] =~ /^(marker|text)/) {  # 7.3
+				$event[$i] = $EditEvent[$i];
+			}
+		}
+	}
+	$Track[$Ievent] = \@event;
+	set_before_last_change($Ievent); # 7.5
+	add_to_history();
+}
+
+sub new_file {
+	$Paused = 1;
+	if (! $FileIsChanged) { return; }
+	move($LINES-4,2); clrtobot();
+	addl($LINES-2,10,
+	  "y = yes, save           n = no, don't save");
+	my $s = "Save $File first (y/n) ? ";
+	addl($LINES-4,round(0.4*($COLS-length($s))),$s);
+	timeout(-1);
+	my $c = getch();
+	if ($c eq 'y' or $c eq 'w') { score2file($File, 1000,\@Track); }
+	#	move($LINES-4,0); clrtobot();
+}
+
+sub quit {
+	$Paused = 1;
+	if (! $FileIsChanged) { exit 0; }
+	move($LINES-4,2); clrtobot();
+	addl($LINES-2,10,"y = save file,  n=just quit,  anything else cancels.");
+	my $s = "Save $File first (y/n) ? ";
+	addl($LINES-4,round(0.4*($COLS-length($s))),$s);
+	timeout(-1);
+	my $c = getch();
+	if ($c eq 'y' or $c eq 'w') { score2file($File, 1000,\@Track); exit 0;
+	} elsif ($c eq 'n') { exit 0;
+	}
+	display_keystrokes();
+}
+
+sub replay_setup { my ($from, $to) = @_;
+	# The arguments are _times_ in millisec.
+	# If going forwards, we seek patches and ccs from $from to $to;
+	# else we seek patches and ccs from $[ to $to.
+	my $ievent = $[;
+	if ($to > $from) {  # 5.3
+		while ($ievent < $#Track) {  # skip from beginning to $from
+			if ($Track[$ievent][$[+1] >= $from) { last; }
+			$ievent = $ievent + 1;
+		}
+	}
+	my %cha2latest_patch = ();
+	my %cha_cc2latest_val = ();
+	while ($ievent < $#Track) {  # scan to $to, looking for patch and cc
+		if ($Track[$ievent][$[+1] >= $to) { last; }
+		if ($Track[$ievent][$[] eq 'patch_change') {
+			$cha2latest_patch{$Track[$ievent][$[+2]} = $Track[$ievent][$[+3];
+		} elsif ($Track[$ievent][$[] eq 'control_change') {
+			$cha_cc2latest_val{"$Track[$ievent][$[+2],$Track[$ievent][$[+3]"}
+			 = $Track[$ievent][$[+4];
+		}
+		$ievent = $ievent + 1;
+	}
+	# output the latest of each
+	my ($cha,$pat);
+	while (($cha,$pat) = each %cha2latest_patch) {
+		my ($status, $time,$events) = MIDI::ALSA::status();
+		my @alsaevent = MIDI::ALSA::pgmchangeevent($cha,$pat,$time+0.001);
+		MIDI::ALSA::output(@alsaevent);
+	}
+	# 20121018
+	while (my ($cha_cc,$val) = each %cha_cc2latest_val) {
+		my ($cha,$cc) = split /,/, $cha_cc, 2;
+		my ($status, $time,$events) = MIDI::ALSA::status();
+		# the bank-change events must come _before_ the patch-change !
+		# the other controller-events must come after the patch-change ...
+		if (($cc != 0) and ($cc != 32)) { $time = $time + 0.002; }  # 5.4
+		my @alsaevent = MIDI::ALSA::controllerevent($cha,$cc,$val,$time);
+		MIDI::ALSA::output(@alsaevent);
+	}
+	if (%cha2latest_patch) {
+		Time::HiRes::usleep(5000);  # wait for the synth to load the patches
+	}
+}
+
+sub range {
+	$Paused = 1;
+	# the effect (or write-to-file, or global edit, or delete etc)
+	# there will typically be one set_range then several operations on it
+	# forget pan (ic), pad (+et)
+	if ($RangeStart >= $RangeEnd) {
+		$Message = "sorry, no range is set; try R"; return;
+	}
+	move($LINES-4,0); clrtobot();
+	addl($LINES-4,4,"range is ".range_string());   # 4.6
+	my $x=19;
+	addl($LINES-2,$x,'c=compand d=delete f=fade m=mixer p=pitch');
+	addl($LINES-1,$x,'q=quantise r=repeat t=tempo v=vol w=write_to_file');
+	addl($LINES-3,4,'apply effect ? ');  my $x=19;
+	my $c = getch(); clrtobot(); echo();
+	if ($c eq 'c') {
+		addl($LINES-3,$x,'compand');
+		addl($LINES-2,4,'compand gradient ? ');
+		# should display help about the 0.7 3:0.2 per-channel possibility
+		$n = getnstr(my $params,6);
+		range_compand(split(' ',$params));
+	} elsif ($c eq 'd') {
+		range_delete();
+	} elsif ($c eq 'p') {
+		addl($LINES-3,$x,'pitch');
+		addl($LINES-2,4,'pitch-change (cents) ? ');
+		$n = getnstr(my $cents,20);
+		range_pitch(split(' ',$cents));
+	} elsif ($c eq 'q') {
+		addl($LINES-3,$x,'quantise');
+		addl($LINES-2,4,'quantise interval (mS) ? ');
+		$n = getnstr(my $quan,6);
+		range_quantise(0+$quan);
+	} elsif ($c eq 'r') {
+		addl($LINES-3,$x,'repeat');
+		addl($LINES-2,4,'how many times altogether ? ');
+		$n = getnstr(my $times,6);
+		range_repeat(0+$times);
+	} elsif ($c eq 't') {
+		addl($LINES-3,$x,'tempo');
+		addl($LINES-2,4,'tempo speed-ratio ? ');
+		$n = getnstr(my $tempo,6);
+		range_tempo(0+$tempo);
+	} elsif ($c eq 'v') {
+		addl($LINES-3,$x,'volume');
+		addl($LINES-2,4,'volume increment ? ');
+		$n = getnstr(my $volume,6);
+		range_volume(split(' ',$volume));
+	} elsif ($c eq 'w') {   # 4.6
+		my $filename = ask_filename($LINES-3,'write to which filename ? ');
+		return unless $filename;
+		if ($filename !~ /\./) { $filename .= '.mid'; }
+		if (-e $filename) { _warn("$filename exists already"); return; }
+		range_write($filename);
+	}
+}
+
+sub ask_filename {  my ($y, $prompt) = @_;  # 6.3
+	my $filename;
+	addl($y,0,'');  # from 0 to COLS-1, apparently
+	refresh();
+	eval 'require Term::ReadLine'; if ($@) {
+		_warn("you should install Term::ReadLine::Gnu from www.cpan.org");
+		echo(); getnstr($filename,52); noecho();
+	} else {
+		system 'stty echo';  # Rough :-(
+		$term = new Term::ReadLine 'midiedit'; # ugly underline, but backspace
+		$filename = $term->readline("    $prompt");
+		system 'stty -echo'; # must be a better way than this...
+		print STDERR "\e[A\r\e[0K";  # very ugly, asking for trouble :-(
+		if ($filename) { $term->addhistory($filename); }
+		$filename =~ s/ $//;  # 6.2 no trailing space after completion
+	}
+	return $filename;
+}
+
+# 20120616
+# in Edit mode, / should go PAUSED and then propose the find dialogue
+# after Inserting, the field labels at the top should get updated
+
+sub range_delete {   # 4.5  should defend against $RangeEnd == $#Track
+	set_before_last_change($Ievent); # 7.5
+	my $delta = $Track[$RangeEnd+1][$[+1] - $Track[$RangeStart][$[+1];
+	my $n_deleted = $RangeEnd-$RangeStart+1;
+	splice @Track, $RangeStart, $n_deleted;
+	$Message = "$n_deleted events deleted";
+	my $k = $RangeStart;
+	while ($k <= $#Track) { $Track[$k][$[+1] -= $delta; $k += 1; }
+	if      ($Ievent > $#Track)     { $Ievent = $#Track;   # 4.7
+	} elsif ($Ievent > $RangeEnd)   { $Ievent -= $n_deleted;  # 5.6
+	} elsif ($Ievent > $RangeStart) { $Ievent = $RangeStart;  # 5.6
+	}
+	time_travel($Track[$Ievent][$[+1] - $Now);   # 5.6
+	$RangeEnd = $[-1;
+	add_to_history();
+}
+
+sub range_pitch { my @params = @_;  # 4.5; borrowed from midisox_pl
+	set_before_last_change($Ievent); # 7.5
+	my $h = ', see midisox --help-effect=pitch';
+	if (! @params) { return; }
+	my $default_incr;
+	my %channel_incr = ();
+	foreach my $param (@params) {
+		if ($param =~ /^[-+]?\d+$/) {
+			$default_incr = round($param/100);
+		} else {
+			if ($param =~ /^(\d+):([-+]?\d+)$/) {
+				$channel_incr{0+$1} = round($2/100);
+			} else {
+				$Message = "pitch: strange parameter $param$h\n";
+			}
+		}
+	}
+	if (not $default_incr) {
+		if (%channel_incr) { $default_incr = 0; } else { return; }
+	}
+	my $k = $RangeStart; while ($k <= $RangeEnd) {
+		if ($Track[$k][$[] eq 'note' and $Track[$k][$[+3] != 9) {
+			my $incr = $default_incr; # don't shift drumkit
+			if ($channel_incr{$Track[$k][$[+3]}) { 
+				$incr = $channel_incr{$Track[$k][$[+3]};
+			}
+			$Track[$k][4] += $incr;
+			if    ($Track[$k][$[+4] > 127) { $Track[$k][$[+4] = 127;
+			} elsif ($Track[$k][$[+4] < 0) { $Track[$k][$[+4] = 0;
+			}
+		}
+		$k += 1;
+	}
+	set_before_last_change($Ievent); # 7.5
+	add_to_history();
+}
+
+sub range_compand { my @params = @_;  # 4.5; borrowed from midisox_pl
+	set_before_last_change($Ievent); # 7.5
+	if (@params < 1) { $params[$[] = '0.5' }
+	my $default_gradient;
+	my %channel_gradient = ();
+	my $iparam = $[;
+	while ($iparam <= $#params) {
+		my $param = $params[$iparam];
+		if ($param =~ /^-?\.?\d+$|^-?\d+\.\d*$/) {
+			$default_gradient = 0 + $param;
+		} elsif ($param =~ '^(\d+):(-?[.\d]+)$') {
+			$channel_gradient{0+$1} = 0+$2;
+		} else {
+			_warn("compand: strange parameter $param$h");  return;
+		}
+		$iparam = $iparam + 1;
+	}
+	if (! defined $default_gradient) {
+		if (%channel_gradient) {  # test for empty table
+			$default_gradient = 1.0;
+		} else {
+			$default_gradient = 0.5;
+		}
+	}
+	# warn("channel_gradient=".Dumper(\%channel_gradient));
+	my $previous_note_time = 0;
+	my $k = $RangeStart; while ($k <= $RangeEnd) {
+		my $event_ref = $Track[$k];
+		if ($$event_ref[$[] eq 'note') {
+			my $gradient = $default_gradient;
+			if ($channel_gradient{$$event_ref[$[+3]}) {
+				$gradient = $channel_gradient{$$event_ref[$[+3]};
+			}
+			$$event_ref[$[+5]=100+round($gradient*($$event_ref[$[+5]-100));
+			if ($$event_ref[$[+5] > 127) {
+				$$event_ref[$[+5] = 127;
+			} elsif ($$event_ref[$[+5] < 1) {
+				$$event_ref[$[+5] = 1; # v=0 sometimes means v=default
+			}
+		}
+		$k += 1;
+	}
+}
+
+sub range_quantise { my $quantum = $_[$[];  # 4.5; borrowed from midisox_pl
+	set_before_last_change($Ievent); # 7.5
+	if ($quantum <= 0) {
+		$Message = "the quantise interval must be positive"; return;
+	}
+	my $old_previous_note_time = $Track[$RangeStart][$[+1];
+	my $new_previous_note_time = $Track[$RangeStart][$[+1];
+	my $k = $RangeStart+1; while ($k <= $RangeEnd) {
+		if ($Track[$k][$[] eq 'note') {
+			my $old_this_note_time = $Track[$k][$[+1];
+			my $dt = $old_this_note_time - $old_previous_note_time;
+			my $dn = round($dt/$quantum);   # quantum must not be zero
+			$Track[$k][$[+1] = $new_previous_note_time + $quantum*$dn;
+			my $new_this_note_time = $Track[$k][$[+1];
+			# readjust non-note events to lie between the adjusted times
+			# in the same proportion as they lay between the old times
+			my $k2 = $k - 1;
+			while ($k2 >= $[ and $Track[$k2][$[] ne 'note') {
+				my $old_non_note_time = $Track[$k2][$[+1];
+				if ($old_this_note_time > $old_previous_note_time) {
+					$Track[$k2][$[+1] = round($new_previous_note_time +
+					  ($old_non_note_time - $old_previous_note_time) *
+					  ($new_this_note_time - $new_previous_note_time) /
+					  ($old_this_note_time - $old_previous_note_time) );
+				} else {
+					$Track[$k2][$[+1] = $new_previous_note_time;
+				}
+				$k2 = $k2 - 1;
+			}
+			if ($dn > 0) {   # 5.8, see midisox* versions 5.4
+				$old_previous_note_time = $old_this_note_time;
+				$new_previous_note_time = $new_this_note_time;
+			}
+		}
+		$k += 1;
+	}
+	# now timeshift from $RangeEnd to $#Track ...
+	my $delta = $new_previous_note_time - $old_previous_note_time;
+	while ($k <= $#Track) { $Track[$k][$[+1] += $delta; $k += 1; }
+	add_to_history();
+}
+
+sub range_repeat {  my $times = round($_[$[]);
+	set_before_last_change($Ievent); # 7.5
+	if ($times == 0) {
+		$Message = "to repeat zero times, just use delete"; return;
+	}
+	if ($times == 1) {
+		$Message = "repeat once leaves the file unchanged"; return;
+	}
+	my $r_end = $RangeEnd; if ($RangeEnd == $#Track) { $r_end = $RangeEnd-1; }
+	my $delta = $Track[$r_end+1][$[+1] - $Track[$RangeStart][$[+1];
+	my $n_in_range = $r_end-$RangeStart+1;
+	# debug("r_end=$r_end delta=$delta n_in_range=$n_in_range");
+	my $k = $r_end;
+	foreach my $time (2 .. $times) {
+		splice @Track, $k+1, 0, deepcopy(@Track[$RangeStart..$r_end]);
+		foreach my $i (1 .. $n_in_range) {
+			$k += 1;
+			$Track[$k][$[+1] += $delta*($time-1);
+		}
+	}
+	$k += 1;
+	while ($k <= $#Track) {
+		$Track[$k][$[+1] += $delta*($times-1);
+		$k += 1;
+	}
+	# 5.7 move cursor, if it lay after RangeEnd (see range_delete 5.6)
+	if ($Ievent > $RangeEnd)   {   # 5.7
+		my $t = ($times-1)*$delta;
+		# debug("times=$times delta=$delta t=$t");
+		time_travel(($times-1)*$delta);
+	}
+	$Message = sprintf("%d new events", $n_in_range*($times-1));
+	add_to_history();
+}
+
+sub range_tempo { my $tempo = $_[$[];  # 4.5
+	set_before_last_change($Ievent); # 7.5
+	if ($tempo == 1.0) { return; }
+	if ($tempo <= 0) { $tempo = 0.1; }  # following midisox_pl usage
+	my $range_start_time   = $Track[$RangeStart][$[+1];
+	my $old_range_end_time = $Track[$RangeEnd][$[+1];
+	my $k = $RangeStart+1; while ($k <= $RangeEnd) {
+		$Track[$k][$[+1] = $range_start_time
+		  + round(($Track[$k][$[+1]-$range_start_time)/$tempo);
+		if ($Track[$k][$[] eq 'note') {  # fix the duration
+			$Track[$k][$[+2] = round($Track[$k][$[+2]/$tempo);
+		}
+		$k += 1;
+	}
+	my $new_range_end_time = $Track[$RangeEnd][$[+1];
+	# now timeshift from $RangeEnd to $#Track ...
+	my $delta = $new_range_end_time - $old_range_end_time;
+	while ($k <= $#Track) { $Track[$k][$[+1] += $delta; $k += 1; }
+	add_to_history();
+}
+
+sub range_volume { my @params = @_;  # 4.5
+	set_before_last_change($Ievent); # 7.5
+	my $h = ', see midisox --help-effect=vol';
+	if (! @params) { return; }
+	my $default_incr;
+	my %channel_incr = ();
+	foreach my $param (@params) {
+		if ($param =~ /^[-+]?\d+$/) {
+			$default_incr = 0 + $param;
+		} else {
+			if ($param =~ /^(\d+):([-+]?\d+)$/) {
+				$channel_incr{0+$1} = 0+$2;
+			} else {
+				die "vol: strange parameter $param$h\n";
+			}
+		}
+	}
+	if (not $default_incr) {
+		if (%channel_incr) { $default_incr = 0; } else { return; }
+	}
+	my $k = $RangeStart; while ($k <= $RangeEnd) {
+		if ($Track[$k][$[] eq 'note') {
+			my $incr = $default_incr;
+			if ($channel_incr{$Track[$k][$[+3]}) { 
+				$incr = $channel_incr{$Track[$k][$[+3]};
+			}
+			$Track[$k][5] += $incr;
+			if    ($Track[$k][$[+5] > 127) { $Track[$k][$[+5] = 127;
+			} elsif ($Track[$k][$[+5] < 0) { $Track[$k][$[+5] = 0;
+			}
+		}
+		$k += 1;
+	}
+	add_to_history();
+}
+
+sub range_write {   my $filename = $_[$[];   # 4.6, 6.1
+	return unless $filename;
+	my @range_score = ( 1000, [ ['set_tempo', 1, 1000000], ] );
+	# 6.1 a score uses absolute times; must subtract first t1 from all events
+	my $t1 = $Track[$RangeStart][$[+1];
+	my $k = $RangeStart; while ($k <= $RangeEnd) {
+		my @event = @{$Track[$k]};
+		$event[$[+1] -= $t1;   # 6.1
+		push @{$range_score[$[+1]}, \@event;
+		$k += 1;
+	}
+	# 6.2 append a marker to represent the time-to-next-note
+	# XXX should iterate to find a NOTE !
+	my $time_next_note = $Track[$RangeEnd+1][$[+1];
+	if ($time_next_note) {
+		my $file = $File;  # 6.3 give filename it came from, and $t1
+		if (20 < length $file) { $file =~ s#^.*/([^/]+)$#$1#; }
+		my $s = "from $file at $t1 mS";
+		push @{$range_score[$[+1]}, ['marker', $time_next_note-$t1, $s];
+	}
+	score2file($filename, @range_score);
+	_warn("range written to $filename");
+}
+
+sub re_do {
+	set_before_last_change($Ievent); # 7.5
+	#debug("re_do1: Ihistory=$Ihistory #History=$#History History=@History");
+	if ($Ihistory > ($#History-3)) {
+		$Message="Already at newest change"; return;
+	}
+	$Ihistory += 1; my $r = $History[$Ihistory];
+	if (ref $r ne ARRAY) { $Message="ref r was ".ref $r; }
+	@Track = deepcopy(@$r);
+	$Ihistory += 1; $Ievent = $History[$Ihistory];
+	$Ihistory += 1; $Now    = $History[$Ihistory];
+	#debug("re_do2: Ihistory=$Ihistory #History=$#History History=@History");
+}
+
+sub row_nums {
+	my $i_top = 2;   # row-number
+	if (!$TopKeystrokesLine) { display_keystrokes(); }
+	my $i_bot = $TopKeystrokesLine - 2;   # row-number
+	if ($i_top > ($i_bot-4)) { die "not enough rows on screen\n"; }
+	my $i_now;   # row-number
+	if ((scalar @Track) <= ($i_bot-$i_top+1)) {
+		$i_now = $i_top + $Ievent -$[;
+	} elsif ($Ievent < 0.5*($i_bot-$i_top+1)) {
+		$i_now = $i_top + $Ievent -$[;
+	} elsif (($#Track-$Ievent) < 0.5*($i_bot-$i_top+1)) {
+		$i_now = $i_bot + $Ievent - $#Track;
+	} else {
+		$i_now = round(0.5*($i_top+$i_bot));
+	}
+	return ($i_top, $i_now, $i_bot);
+}
+
+sub set_range {   # 4.5
+	if ($RangeSettingState == 0) {
+		$RangeStart = $Ievent;
+		$RangeEnd   = $[-1;
+		$RangeSettingState = 1;
+	} elsif ($RangeStart == $Ievent) {
+		$RangeEnd = $[-1;
+		$Message = "empty range";
+		$RangeSettingState = 0;
+	} else {
+		$RangeEnd = $Ievent;
+		if ($RangeEnd < $RangeStart) {
+			my $t=$RangeStart; $RangeStart=$RangeEnd; $RangeEnd=$t;
+		}
+		_warn("new range ".range_string());
+		$RangeSettingState = 0;
+	}
+}
+
+sub range_string {
+	my $start_ms = $Track[$RangeStart][$[+1];
+	my $end_ms   = $Track[$RangeEnd][$[+1];
+	return "from $start_ms to $end_ms mS";
+}
+
+sub set_timeout_for_next_note {
+	if ($Ievent < $#Track) {  # set the timeout for the one after
+		my $delay_ms = $Track[$Ievent+1][$[+1] - $Now;
+		$delay_ms = round($delay_ms / $ReplaySpeed);  # 3.1
+		if ($delay_ms < 1) { $delay_ms = 1; }
+		timeout($delay_ms);
+	}
+}
+
+sub time_travel { my $dt = $_[$[];
+	if (! $dt) { return; }
+	my $then = $Now;
+	$Now = $Now + $dt;
+	if ($dt > 0) {
+		my $found = 0;
+		while ($Ievent < $#Track) {
+			if ($Track[$Ievent+1][$[+1] > $Now) { $found = 1; last; }
+			$Ievent = $Ievent + 1;
+		}
+		if (! $found) { $Ievent = $#Track; $Now = $Track[$Ievent][$[+1]; }
+		replay_setup($then, $Now);
+	} else {
+		my $found = 0;
+		while ($Ievent >= $[) {
+			if ($Track[$Ievent][$[+1] < $Now) { $found = 1; last; }
+			$Ievent = $Ievent - 1;
+		}
+		if (! $found) { $Ievent = $[; $Now = $Track[$Ievent][$[+1]; }
+		replay_setup(0, $Now);
+	}
+	play_current_event();
+	if (! $Paused) { set_timeout_for_next_note(); }
+}
+
+sub event_travel { my $di = $_[$[];   # 5.2
+	# 20120930 stripped down from time_travel, for use by UP and DOWN
+	if (! $di) { return; }
+	my $then = $Now;
+	$Ievent = $Ievent + $di;
+	if ($Ievent > $#Track) { $Ievent = $#Track
+	} elsif ($Ievent < $[) { $Ievent = $[;
+	}
+	$Now = $Track[$Ievent][$[+1];
+	replay_setup($then, $Now);
+	play_current_event();
+	if (! $Paused) { set_timeout_for_next_note(); }
+}
+
+sub un_do {
+	if ($Ihistory < $[+3) { $Message = "Already at oldest change"; return; }
+	$Ihistory -= 3;
+	$Now    = $History[$Ihistory];
+	$Ievent = $History[$Ihistory-1];  # 7.5 re-instated
+	my $r   = $History[$Ihistory-2];
+	@Track = deepcopy(@$r);
+}
+
+#------------ MIDI infrastructure from midisox_pl ------------
+
+sub _print  { print ($_[$[]."\n"); }
+sub _warn   { $Message = $_[$[]; } # wiped by display_keystrokes()
+sub warning { _warn('warning: '.$_[$[]); }
+sub _die    { die($_[$[]."\n"); }
+sub round   { my $x = $_[$[];
+	if ($x > 0.0) { return int ($x + 0.5); }
+	if ($x < 0.0) { return int ($x - 0.5); }
+	return 0;
+}
+sub deepcopy {
+	use Storable;
+	if (1 == @_ and ref($_[$[])) { return Storable::dclone($_[$[]);
+	} else { my $b_ref = Storable::dclone(\@_); return @$b_ref;
+	}
+}
+sub vol_mul {
+	my $vol = $_[$[] || 100;
+	my $mul = $_[$[+1] || 1.0;
+	my $new_vol = round($vol*$mul);
+	if ($new_vol < 0) { $new_vol = 0 - $new_vol; }
+	if ($new_vol > 127) { $new_vol = 127;
+	} elsif ($new_vol < 1) { $new_vol = 1; # some synths see vol=0 as default
+	}
+	return $new_vol;
+}
+
+#---------------------- Encoding stuff -----------------------
+
+sub opus2file {
+	my ($filename, @opus) = @_;
+	my $format = 1;
+	if (2 == @opus) { $format = 0; }
+	my $cpan_opus = MIDI::Opus->new(
+		{'format'=>$format, 'ticks'  => 1000, 'tracks' => []});
+	my @list_of_tracks = ();
+	my $itrack = $[+1;
+	while ($itrack <= $#opus) {
+		push @list_of_tracks,
+		 MIDI::Track->new({ 'type' => 'MTrk', 'events' => $opus[$itrack]});
+		$itrack += 1;
+	}
+	$cpan_opus->tracks(@list_of_tracks);
+	if ($filename eq '-') {
+		$cpan_opus->write_to_file( '>-' );
+	} elsif ($filename eq '-d') {
+		$PID = fork;
+		if (! $PID) {
+			if (!open(P, '| aplaymidi -')) { die "can't run aplaymidi: $!\n"; }
+			$cpan_opus->write_to_handle( *P{IO}, {} );
+			close P;
+			exit 0;
+		}
+	} else {
+		$cpan_opus->write_to_file($filename);
+	}
+}
+
+sub score2opus {
+	if (2 > @_) { return (1000, []); }
+	my ($ticks, @tracks) = @_;
+	my @opus = ($ticks,);
+	my $itrack = $[;
+	while ($itrack <= $#tracks) {
+		my %time2events = ();
+		foreach my $scoreevent_ref (@{$tracks[$itrack]}) {
+			my @scoreevent = @{$scoreevent_ref};
+			if ($scoreevent[0] eq 'note') {
+				my @note_on_event = ('note_on',$scoreevent[1],
+				 $scoreevent[3],$scoreevent[4],$scoreevent[5]);
+				my @note_off_event = ('note_off',$scoreevent[1]+$scoreevent[2],
+				 $scoreevent[3],$scoreevent[4],$scoreevent[5]);
+				if ($time2events{$note_on_event[1]}) {
+				   push @{$time2events{$note_on_event[1]}}, \@note_on_event;
+				} else {
+				   @{$time2events{$note_on_event[1]}} = (\@note_on_event,);
+				}
+				if ($time2events{$note_off_event[1]}) {
+				   push @{$time2events{$note_off_event[1]}}, \@note_off_event;
+				} else {
+				   @{$time2events{$note_off_event[1]}} = (\@note_off_event,);
+				}
+			} elsif ($time2events{$scoreevent[1]}) {
+			   push @{$time2events{$scoreevent[1]}}, \@scoreevent;
+			} else {
+			   @{$time2events{$scoreevent[1]}} = (\@scoreevent,);
+			}
+		}
+		my @sorted_events = (); # list of event_refs sorted by time
+		for my $time (sort {$a <=> $b} keys %time2events) {
+			push @sorted_events, @{$time2events{$time}};
+		}
+		my $abs_time = 0;
+		for my $event_ref (@sorted_events) {  # convert abs times => delta times
+			my $delta_time = ${$event_ref}[1] - $abs_time;
+			$abs_time = ${$event_ref}[1];
+			${$event_ref}[1] = $delta_time;
+		}
+		push @opus, \@sorted_events;
+		$itrack += 1;
+	}
+	return (@opus);
+}
+
+sub score2file { my ($filename, @score) = @_;
+	my @opus = score2opus(@score);
+	return opus2file($filename, @opus);
+}
+
+#--------------------------- Decoding stuff ------------------------
+
+sub file2opus {
+	my $opus_ref;
+	if ($_[$[] eq '-') {
+		$opus_ref = MIDI::Opus->new({'from_handle' => *STDIN{IO}});
+	} elsif ($_[$[] =~ /^[a-z]+:\//) {
+		eval 'require LWP::Simple'; if ($@) {
+			_die "you need to install libwww-perl from www.cpan.org";
+		}
+		$midi = LWP::Simple::get($_[$[]);
+		if (! defined $midi) { _die("can't fetch $_[$[]"); }
+		open(P, '<', \$midi) or _die("can't open FileHandle, need Perl5.8");
+		$opus_ref = MIDI::Opus->new({'from_handle' => *P{IO}});
+		close P;
+	} else {
+		$opus_ref = MIDI::Opus->new({'from_file' => $_[$[]});
+	}
+	# $opus_ref->dump({'dump_tracks'=>1});
+	my @my_opus = (${$opus_ref}{'ticks'},);
+	foreach my $track ($opus_ref->tracks) {
+		push @my_opus, $track->events_r;
+	}
+	# print "3:\n", Dumper(\@my_opus);
+	return @my_opus;
+}
+
+sub opus2score {  my ($ticks, @opus_tracks) = @_;
+	# print "opus2score: ticks=$ticks opus_tracks=@opus_tracks\n";
+	if (!@opus_tracks) {
+		return (1000,[],);
+	}
+	my @score = ($ticks,);
+	#foreach my $i ($[+1 .. $#_) {
+	#    push @score, MIDI::Score::events_r_to_score_r($score[$i]);
+	#}
+	my @tracks = deepcopy(@opus_tracks); # couple of slices probably quicker...
+	# print "opus2score: tracks is ", Dumper(@tracks);
+	foreach my $opus_track_ref (@tracks) {
+		my $ticks_so_far = 0;
+		my @score_track = ();
+		my %chapitch2note_on_events = ();    # 4.4 XXX!!! Must be by Channel !!
+		foreach $opus_event_ref (@{$opus_track_ref}) {
+			my @opus_event = @{$opus_event_ref};
+			$ticks_so_far += $opus_event[1];
+			if ($opus_event[0] eq 'note_off'
+			 or ($opus_event[0] eq 'note_on' and $opus_event[4]==0)) { # YY
+				my $cha = $opus_event[2];
+				my $pitch = $opus_event[3];
+				my $key = $cha*128 + $pitch;
+				if ($chapitch2note_on_events{$key}) {
+					my $new_event_ref = shift @{$chapitch2note_on_events{$key}};
+					${$new_event_ref}[2] = $ticks_so_far - ${$new_event_ref}[1];
+					push @score_track, $new_event_ref;
+				} else {
+					_warn("note_off without a note_on, cha=$cha pitch=$pitch")
+				}
+			} elsif ($opus_event[0] eq 'note_on') {
+				my $cha = $opus_event[2];  # 4.4
+				my $pitch = $opus_event[3];
+				my $new_event_ref = ['note', $ticks_so_far, 0,
+				 $cha, $pitch, $opus_event[4]];
+				my $key = $cha*128 + $pitch;
+				push @{$chapitch2note_on_events{$key}}, $new_event_ref;
+			} else {
+				$opus_event[1] = $ticks_so_far;
+				push @score_track, \@opus_event;
+			}
+		}
+		# 4.7 check for unterminated notes, see: ~/lua/lib/MIDI.lua
+		while (my ($k1,$v1) = each %chapitch2note_on_events) {
+			foreach my $new_e_ref (@{$v1}) {
+				${$new_e_ref}[2] = $ticks_so_far - ${$new_e_ref}[1];
+				push @score_track, $new_e_ref;
+				warn("opus2score: note_on with no note_off cha="
+				 . ${$new_e_ref}[3] . ' pitch='
+				 . ${$new_e_ref}[4] . "; adding note_off at end\n");
+			}
+		}
+		push @score, \@score_track;
+	}
+	return @score;
+}
+
+sub file2score {
+	return opus2score(file2opus($_[$[]));
+}
+
+sub file2ms_score {
+	my @opus = file2opus($_[$[]);
+	my @ms = to_millisecs(@opus);
+	my @score = opus2score(@ms);
+	# must merge the tracks of a format-2 file; could perhaps even
+	# extend the @event to indicate which Track it originated in...
+	my $itrack = $#score; while ($itrack > ($[+1.5)) {
+		foreach my $event_ref (@{$score[$itrack]}) {
+			push @{$score[$[+1]}, $event_ref; # push them onto track 1
+		}
+		$itrack -= 1;
+		$#score = $itrack;  # and jettison the last track
+	}
+	return @score;
+}
+
+#------------------------ Other Transformations ---------------------
+
+sub to_millisecs {   # 20160702 rewrite, following MIDI.lua 6.7
+	my @old_opus = @_;
+	if (!@old_opus) { return (1000,[],); }
+	my $old_tpq  = $old_opus[$[];
+	my @new_opus = (1000,);
+	# 6.7 first go through building a table of set_tempos by absolute-tick
+	my %ticks2tempo = ();
+	$itrack = $[+1;
+	while ($itrack <= $#old_opus) {
+		my $ticks_so_far = 0;
+		foreach my $old_event_ref (@{$old_opus[$itrack]}) {
+			my @old_event = @{$old_event_ref};
+			if ($old_event[0] eq 'note') {
+				_die 'to_millisecs needs an opus, not a score';
+			}
+			$ticks_so_far += $old_event[1];
+			if ($old_event[0] eq 'set_tempo') {
+				$ticks2tempo{$ticks_so_far} = $old_event[2];
+			}
+		}
+		$itrack += 1;
+	}
+	# then get the sorted-array of their keys
+	my @tempo_ticks = sort { $a <=> $b; } keys %ticks2tempo;
+	#  then go through converting to millisec, testing if the next
+	#  set_tempo lies before the next track-event, and using it if so.
+	$itrack = $[+1;
+	while ($itrack <= $#old_opus) {
+		my $ms_per_old_tick = 1000.0 / $old_tpq;  # will round later
+		my $i_tempo_ticks = 0;
+		my $ticks_so_far = 0;
+		my $ms_so_far = 0.0;
+		my $previous_ms_so_far = 0.0;
+		my @new_track = (['set_tempo',0,1000000],);  # new "crochet" is 1 sec
+		foreach my $old_event_ref (@{$old_opus[$itrack]}) {
+			# detect if ticks2tempo has something before this event
+			# 20160702 if ticks2tempo is at the same time, leave it
+			my @old_event = @{$old_event_ref};
+			my $event_delta_ticks = $old_event[1];
+			if ($i_tempo_ticks <= $#tempo_ticks and
+			  $tempo_ticks[$i_tempo_ticks] < ($ticks_so_far+$old_event[1])) {
+				my $delta_ticks = $tempo_ticks[$i_tempo_ticks]-$ticks_so_far;
+				$ms_so_far += ($ms_per_old_tick * $delta_ticks);
+				$ticks_so_far = $tempo_ticks[$i_tempo_ticks];
+				$ms_per_old_tick=$ticks2tempo{$ticks_so_far}/(1000*$old_tpq);
+				$i_tempo_ticks += 1;
+				$event_delta_ticks -= $delta_ticks;
+			}   # now handle the new event
+			my @new_event = deepcopy(@old_event);  # copy.deepcopy ?
+			$ms_so_far += ($ms_per_old_tick * $old_event[1]);
+			$new_event[1] = round($ms_so_far-$previous_ms_so_far);
+			if ($old_event[0] ne 'set_tempo') { # set_tempos already handled!
+				$previous_ms_so_far = $ms_so_far;
+				push @new_track, \@new_event;
+			}
+			$ticks_so_far += $event_delta_ticks;
+		}
+		push @new_opus, \@new_track;
+		$itrack += 1;
+	}
+	# print "to_millisecs new_opus = ", Dumper(\@new_opus);
+	return @new_opus;
+}
+
+#----------------- non-Curses infrastructure -----------------
+sub line2comment { my $line = $_[$[];
+	if ($line =~ /[a-z]', (\d+), /) { $ticks += $1;
+	} elsif ($line =~ /MIDI::Track->new/) {  $ticks = 0; return q{};  # 7.8
+	} else { return q{};
+	}
+	my $len = length $line;
+	my $spaces = " ";
+	if ($len < 37) { $spaces = " " x (38-$len); }
+	my $event_type;  my $remainder;
+	if ($line =~ /\['([a-z_]+)', (.+)\]/) {
+		$event_type = $1; $remainder = $2;
+	}
+	if ($event_type =~ /^note_/) {
+		my ($dt,$cha,$note,$vol) = split(/,\s*/, $remainder);
+		my $str = note2str('',0,0,$cha,$note,$vol);
+		if ($event_type eq 'note_off' or $vol eq '0') {
+			return "$spaces# ticks=$ticks cha=$cha $str off";
+		} else {
+			return "$spaces# ticks=$ticks cha=$cha $str";
+		}
+	} elsif ($event_type eq 'control_change') {
+		my ($dt,$cha,$cc,$val) = split(/,\s*/, $remainder);
+		return "$spaces# ticks=$ticks cha=$cha cc$cc=$val";
+	} elsif ($event_type eq 'patch_change') {
+		my ($dt,$cha,$patch) = split(/,\s*/, $remainder);
+		return "$spaces# ticks=$ticks cha=$cha patch=$patch";
+	} else {
+		return "$spaces# ticks=$ticks";
+	}
+}
+
+
+=pod
+
+=head1 NAME
+
+midiedit - Edits a MIDI file
+
+=head1 SYNOPSIS
+
+ midiedit filename.mid       # uses the new Curses app, with sound
+ midiedit -o 128:0 filename.mid    # uses ALSA port 128:0 as synth
+ midiedit -d filename.mid  # uses your EDITOR on a MIDI::Perl dump
+ midiedit -v               # prints the Version number
+
+=head1 DESCRIPTION
+
+B<Midiedit> is a MIDI-file editor which now (since version 1.3)
+has a choice of two user-interface modes.
+
+In the new default mode,
+it uses I<Curses> to offer a purpose-designed user-interface
+and I<MIDI::ALSA> to play the notes to your synth.
+
+In the older lower-tech mode,
+it uses your favourite text-editor to edit the human-readable text-format
+provided by I<MIDI::Perl>'s $opus->dump function.
+
+=head1 CURSES MODE
+
+In the Curses mode, which is the default, I<midiedit>
+edits a MIDI file with a purpose-designed user-interface
+which re-uses some keystrokes inspired by B<vi>:
+for example, B<i>=insert B<m>=mark B<k/Up/j/Down>=+-1event
+B<u>=undo B<^R>=redo B</>=find B<?>=reversefind B<n>=findnext B<N>=findprevious
+B<w>=write B<q>=quit
+B<.>=last_edit_again,
+plus a few others, e.g.:
+B<e>=edit_event, B<D>=delete_event,
+B<R>=define_a_range, B<r>=operate_on_that_range,
+B<f>=file_operations, B<z>=all_sounds_off, and
+B<^H/Backspace>=return_where_you_were_before_the_I<Find>
+
+As in I<mplayer>, the spacebar toggles between Play and Pause,
+the Left and Right arrow keys move by 1 second,
+the Up and Down arrow keys move by 10 seconds,
+and the Home and End keys move to the start and end of the file,
+and B<[> and B<]> or B<{> and B<}> change the Replay-speed.
+
+The available keystrokes are displayed in the bottom four lines of the screen.
+
+The events are displayed in B<note>-form, i.e. with a start-time
+and a duration. There are no separate note_on and note_off events,
+which solves the matching-ons-and-offs problem.
+All times are displayed in milliseconds.
+
+The start-times can be displayed
+either as incremental times (since the previous event),
+or as absolute times (since the beginning).
+The B<+> and B<-> keys switch between these modes;
+the default mode is incremental.
+The behaviour of Edit, Insert and Delete adapts to the display-mode;
+for example with incremental times, deleting a note shortens the
+whole file by the deleted millisecond increment,
+but with absolute times deleting a note just removes that note
+and leaves the duration of the whole file unchanged.
+
+Since version 3.0, B</>=find allows search criteria such as
+>62 or <25 or >=60 or <=72 or !=9 or >59&<73
+which, when combined with B<.>=last_edit_again
+make it easier to do things like
+"move that high bit of the piano solo into a different channel".
+
+Since version 4.5, a I<Range> can be defined by pressing upper-case B<R>
+once at each end of the desired range.
+Once defined, the I<Range> can be operated on, using a lower-case B<r>,
+in various ways
+( B<c>=compand B<d>=delete B<m>=mixer B<p>=pitch
+B<q>=quantise B<r>=repeat B<t>=tempo B<v>=vol B<w>=write_to_file )
+largely modelled on the corresponding I<midisox> effects.
+For details of what the I<compand> effect does, see:
+ midisox --help-effect=compand
+
+Since version 7.7, after a I<Find> (B</>, B<?>, B<n> or B<N>),
+B<ctrl-H> or B<Backspace> returns you to where you were before the I<Find>.
+
+You can specify your choice of synth
+at the command line with a B<-o 128:0> option,
+or else with the I<ALSA_OUTPUT_PORTS> environment variable.
+The special value B<-o 0> silences the output
+(e.g. you might want to edit something while listening to something else).
+Since Version 2.4, you may supply a comma-separated list of ports, e.g.
+B<-o 20,128:1>
+
+As well as the B<MIDI-Perl> CPAN module,
+this mode also uses the B<Curses> module for the user-interface,
+and the B<MIDI::ALSA> module to play the file to your synth.
+
+=head1 DUMP MODE
+
+In the older, low-tech B<-d> mode, I<midiedit>
+edits a MIDI file in the human-readable text-format
+provided by I<MIDI::Perl>'s $opus->dump function.
+
+The text format representing the MIDI is executable Perl source,
+so as you edit, you should preserve valid Perl syntax.
+If the edited file has syntax errors,
+you will be asked if you want to re-edit it,
+and if you reply No then the original file will not get over-written.
+
+If you've changed the text, and then decide you want to quit without
+overwriting the MIDI file, then you have to deliberately mess up
+the Perl syntax (e.g. make sure the brackets are unbalanced).
+
+Assuming you've installed MIDI::Perl, then C<perldoc MIDI::Event>
+should document the format in which the various MIDI-events are represented.
+They are represented with incremental times (in ticks) and
+with separate note_on and note_off events,
+so you have to keep track of matching note_ons and note_offs.
+
+=head1 CHANGES
+
+ 7.8 20160701, -d with multi-track midi-files resets ticks to 0 each track
+ 7.7 20151106, after a Find, ctrl-H or Backspace returns to where you were
+ 7.6 20151105, finding a marker matches on a substring
+ 7.5 20151031, like 7.4, except it also works for multiple un-do's
+ 7.4 20151030, 'u' leaves Ievent as before last edit, not after the previous
+ 7.3 20151008, edit_again now works for markers and text events
+ 7.2 20151003, fix bug which introduced undefined events
+ 7.1 20151002, event2str defends against unprintable chars in text events
+ 7.0 20150513, displays also Metronome Click and Metronome Bell
+ 6.9 20150411, all_sounds_off also turns all notes off
+ 6.8 20150223, display channel_after_touch column-aligned as cha_aftertouch
+ 6.7 20141201, skip refreshes if <10ms to next event
+ 6.6 20141104, removed misleading 'm=mark' help-text
+ 6.5 20140703, controller_change events display controller-names
+ 6.4 20140702, display_events patch_change events display GM patch-names
+ 6.3 20140612, ask_filename does backspace, range_write won't overwrite
+ 6.2 20140611, range_write appends marker to represent time-to-next-note
+ 6.2 20140611, filename-completion gets its trailing space stripped
+ 6.2 20140611, File Include works, corresponding to range_write
+ 6.1 20140610, range_write no longer has big pause at the start
+ 6.0 20130404, display_events remembers the Ped/* state by channel
+ 5.9 20130323, find_marker with null text finds the next marker
+ 5.8 20130321, bug fixed in range_quantise effect
+ 5.7 20130302, range_repeat moves cursor down if it lay after RangeEnd
+ 5.6 20130301, range_delete moves cursor up if it lay after RangeEnd
+ 5.5 20130218, u=undo and ^R=redo seem to work
+ 5.4 20121028, replay_setup outputs bankchange before the patchchange
+ 5.3 20121001, replay_setup (hence time_travel) works for- and backward
+ 5.2 20120930, KEY_UP uses event_travel() to cope with dt=0
+ 5.1 20120930, works with MIDI::ALSA 1.15; PolyOn=127 fixed
+ 5.0 20120916, edit_event uses p=pitch not n=note
+ 4.9 20120910, f=file_menu: f=fork n=new s=save q=quit
+ 4.8 20120908, KEY_UP uses time_travel(), so as to get the right patch
+ 4.7 20120903, display_events clears lines after EOF, range_delete
+ 4.6 20120628, rw = range_write now works
+ 4.5 20120624, R and r range-operations largely work
+ 4.4 20120613, event-fields correctly displayed also in edit-mode
+ 4.3 20120612, consistent redo and undo; find_event uses time_travel
+ 4.2 20120609, can search for long gaps or short gaps
+ 4.1 20120608, becomes Paused at EOF; channel,note in bold if note-on
+ 4.0 20120604, j,k keys also available in Edit Mode
+ 3.9 20120604, '.'=repeat also offered in Edit Mode, if applicable
+ 3.8 20120604, find offers s=short_gap, l=long_gap and t=time (==go_to)
+ 3.7 20120604, '.' repeats also edit of dt if IncrementalTimes
+ 3.6 20120529, tracks shorter than screen-height don't get extended
+ 3.5 20120527, add g = go_to()
+ 3.4 20120525, displays most recent Ped and *
+ 3.3 20120510, displays currently on notes
+ 3.2 20120502, can now insert bank_change (= 2 control_changes)
+ 3.1 20120326,  # ] and [ or } and { change the ReplaySpeed
+ 3.0 20120110, find_match gives find >5&<15&!=9 searches
+ 2.9 20120108, '.' repeats last edit (if event-types match)
+ 2.8 20111126, find works if cha=0 or value=0
+ 2.7 20111107, edit_event dialogue updated as changes are made
+ 2.6 20111103, use the new MIDI-ALSA 1.11 to handle portnames
+ 2.5 20111029, column-titles better reflect the event-types
+ 2.4 20111028, OutputPort can be a comma-separated list
+ 2.3 20111027, merges multiple tracks; z=all_sounds_off
+ 2.2 20111027, entering PAUSED mode causes all_sounds_off
+ 2.1 20111027, displays note-string in main window
+ 2.0 20111027, doesn't try to connect if $OutputPort undefined or "0"
+ 1.9 20111022, Phaser Depth and Poly On displayed correctly
+ 1.8 20111021, displays notes with ~ and _ correctly
+ 1.7 20110926, handles non-millisec-tick files correctly
+ 1.6 20110917, display_this_event shows changes as they are made
+ 1.5 20110910, Up/Down in edit-mode play the new note
+ 1.4 20110909, in edit mode, Up and Down don't leave edit-mode
+ 1.3 20110820, the new Curses app is the default
+ 1.2 20110708, displays helpful comments
+ 1.1 20060728, first working version
+
+
+=head1 AUTHOR
+
+Peter J Billam  http://www.pjb.com.au/comp/contact.html
+
+=head1 CREDITS
+
+Based on the I<MIDI::Perl> and I<Curses> and  I<MIDI::ALSA> CPAN modules.
+The non-Curses mode also uses Peter Billam's I<Term::Clui> CPAN module.
+
+=head1 SEE ALSO
+
+ http://search.cpan.org/perldoc?MIDI
+ http://search.cpan.org/perldoc?Curses
+ http://search.cpan.org/perldoc?MIDI::ALSA
+ http://search.cpan.org/perldoc?Term::Clui
+ http://www.pjb.com.au/muscript
+ http://www.pjb.com.au/midi
+
+=cut

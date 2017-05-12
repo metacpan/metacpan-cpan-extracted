@@ -1,0 +1,103 @@
+NAME
+    MooseX::ModifyTaggedMethods - use sub attributes to specify which methods
+    want modifiers
+
+SYNOPSIS
+       {
+          package Local::Role::Transactions;
+      
+          use MooseX::RoleQR;
+          use MooseX::ModifyTaggedMethods;
+      
+          before methods_tagged('Database') => sub {
+             my $self = shift;
+             $self->dbh->do('BEGIN TRANSACTION');
+          };
+      
+          after methods_tagged('Database') => sub {
+             my $self = shift;
+             $self->dbh->do('COMMIT');
+          };
+       }
+   
+       {
+          package Local::BankAccount;
+      
+          use Sub::Talisman qw( Database );
+          use Moose;
+          with qw( Local::Role::Transactions );
+      
+          has dbh => (is => 'ro', isa => 'Object');
+      
+          sub transfer_funds : Database {
+             my ($self, $amount, $destination) = @_;
+         
+             # lots of database activity
+             ...;
+          }
+      
+          sub withdraw : Database { ... }
+          sub deposit  : Database { ... }
+       }
+
+DESCRIPTION
+    Normally Moose classes can specify method modifiers by name, an arrayref
+    of names, or via a regular expression. Moose roles are more limited, not
+    allowing regular expressions.
+
+    MooseX::RoleQR extends the functionality for roles, allowing them to use
+    regular expressions to specify method modifiers.
+    MooseX::ModifyTaggedMethods goes even further, allowing classes and roles
+    to use attributes (in the perlsub sense of the word) to indicate which
+    methods should be wrapped.
+
+    `methods_tagged(@tags)`
+        This module exports a single function `methods_tagged` which can be
+        used in conjunction with `before`, `after` and `around` to select
+        methods for modifying. What exactly it returns is best you don't know,
+        but it suffices to say that Moose and MooseX::RoleQR (but not plain
+        Moose::Role) know what to do with it.
+
+    Note that Perl does not allow you to use any old attribute without first
+    declaring it:
+
+     $ perl -MTest::More=no_plan -E'sub X :Y { }; ok(1)'
+     Invalid CODE attribute: Y at -e line 1.
+     BEGIN failed--compilation aborted at -e line 1.
+     # Looks like your test exited with 255 before it could output anything.
+
+    Sub::Talisman provides an easy way of declaring attributes:
+
+     $ perl -MSub::Talisman=Y -MTest::More=no_plan -E'sub X :Y { }; ok(1)'
+     ok 1
+     1..1
+
+    Sub::Talisman is used in the documentation and test cases for
+    MooseX::ModifyTaggedMethods, but any other technique that supports
+    `attributes::get($coderef)` will do.
+
+BUGS
+    Test suite mysteriously seems to fail using forkprove.
+
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-ModifyTaggedMethods>.
+
+SEE ALSO
+    Moose, MooseX::RoleQR.
+
+    Sub::Talisman, Sub::Talisman::Struct, perlsub, attributes.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012-2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,0 +1,57 @@
+/* ================================================================== */
+/* THEME: Ivy
+ */
+@import 'functions';
+@import 'fonts_ivy';
+@import 'icon_light_on_dark';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: #001100;
+$verge-fg: set-fg($verge-bg);
+$verge-border: #eeffee;
+$button-bg: #113311;
+$button-fg: set-fg($button-bg);
+$button-border: #005500;
+$main-bg: #003300;
+$main-fg: set-fg($main-bg);
+$link-fg: set-link($main-bg);
+$link-visited: set-visited($main-bg);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+    border-radius: 0;
+}
+
+.side,
+header,
+footer {
+    @extend .verge;
+    background-image: url(ivy1.jpg);
+    background-attachment: fixed;
+}
+
+body {
+	color: $main-fg;
+	background: $main-bg url(ivy2.jpg) fixed;
+}
+
+@include some-links($link-fg, $link-visited);
+@include fancy($verge-fg, $verge-bg, "ivy1.jpg");
+@include make-buttons;
+
+header nav li {
+	border-color: #005500;
+}
+header nav .selflink,
+header nav em,
+header nav .current a {
+	color: white;
+	background: #005500;
+}
+

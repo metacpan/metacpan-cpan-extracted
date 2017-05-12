@@ -1,0 +1,794 @@
+<HTML>
+<HEAD>
+<TITLE>MHonArc FAQ: Archives</TITLE></HEAD>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+<BODY>
+
+<!--X-NavButtons-Start-->
+<table width="100%"><tr><td align="left"><nobr>[<a href="usage.html">Prev</a>]</nobr></td><td align="center" width="100%">[<a href="faq.html">TOC</a>][<a href="../mhonarc.html">Manual</a>][<a href="http://www.mhonarc.org/">Home</a>]</td><td align="right"><nobr>[<a href="indexpgs.html">Next</a>]</nobr></td></tr></table>
+</p>
+<!--X-NavButtons-End-->
+
+<!-- ===================================================================== -->
+<HR>
+<H2><a name="archives">Archives</a></H2>
+
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#split">Why does a message get split into mulitple messages with no headers?</a></li>
+<li><a href="#move">Can I move a message from one archive to another?</a></li>
+<li><a href="#reconstruct">Can I reconstruct a database from the HTML messages?</a></li>
+<li><a href="#dynamic">Is it safe to add messages to an archive as they are received?</a></li>
+<li><a href="#forward">So it is safe.  How do I do it?</a></li>
+<li><a href="#majordomo">How can I do it with Majordomo lists?</a></li>
+<li><a href="#different">Can I get MHonArc to filter messages to different archives?</a></li>
+<li><a href="#exclude">Does MHonArc support the "no archive" flag in messages?</a></li>
+<li><a href="#addsafe">Is it safe to specify <tt>-add</tt> when no archive exists?</a></li>
+<li><a href="#jumps">Why are there "jumps" in message numbers?</a></li>
+<li><a href="#dups">Why do some messages get re-added each time MHonArc processes a mail folder?</a></li>
+<li><a href="#remove">How do I remove messages from an archive?</a></li>
+<li><a href="#tombox">Can I convert an archive back to mailbox format?</a></li>
+</ul>
+<!--X-TOC-End-->
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="split">Why does a message get split into mulitple messages with no headers?</a></b></h3>
+</td></tr></table>
+
+<P>If you are processing UUCP mailbox files, messages are
+separated by a line starting with "<code>From </code>" (ie. The
+word "<code>From</code>" followed by a space). Some mail software
+will prefix lines in message bodies with a `<code>&gt;</code>'
+to avoid MUA's from incorrectly treating the line as a message
+separator. However, some mail software doesn't.  </P>
+
+<P>To avoid incorrect separator detection, many MUAs perform
+a more stricter detection of separators beyond "<code>From </code>".
+MHonArc, by default, will treat lines starting
+with "<code>From </code>" as a message separator, which can lead to
+incorrect message termination if the From line has not been escaped
+with a `<code>&gt;</code>'.  </P>
+
+<P>To fix the problem, use the
+<a href="../resources/msgsep.html">MSGSEP</a> resource to
+instruct MHonArc to use a stricter test detecting a message
+separator. The following <a href="../resources/msgsep.html">MSGSEP</a>
+resource setting is
+known to work well: </P>
+
+<pre class="code">
+<b>&lt;MsgSep&gt;</b>
+^From \S+\s+\S+\s+\S+\s+\d+\s+\d+:\d+:\d+\s+\d+
+<b>&lt;/MsgSep&gt;</b>
+</pre>
+
+<p>In case you have message separates with quoted local parts in
+the address part of the separator, you can use the following:
+</p>
+
+<pre class="code">
+<b>&lt;MsgSep></b>
+^From\s+(?:"[^"]+"<!--
+-->&#64;<!--
+-->\S+|\S+)\s+\S+\s+\S+\s+\d+\s+\d+:\d+:\d+\s+\d+
+<b>&lt;/MsgSep></b>
+</pre>
+
+<p>Make sure to test things out before using in production
+environments.
+</p>
+
+<p>If this fails, you can try the
+<a href="../resources/conlen.html">CONLEN</a>
+resource available in v2.0 and later.  The
+<a href="../resources/conlen.html">CONLEN</a> resource, when set, tells
+MHonArc to utilize the <code>Content-Length</code> fields
+in the message head.  If your MTA defines this field accurately,
+then you can utilize this feature.
+Sun Solaris' delivery agent will define the
+<tt>Content-Length</tt> field for messages delivered to local users.
+</p>
+<p>If you use Procmail to filter your mail,
+you can try the following Procmail recipe (contributed by
+<a href="mailto:lindsey&#37;40ncsa.uiuc.edu">Christopher Lindsey</a>):
+</p>
+<blockquote>
+<p>However, one can add a Content-Length: header with everyone's favorite
+tool, procmail.  :)  Here's a recipe borrowed from David Tamkin about
+9 moons ago:
+</p>
+<pre class="code">
+  :0fhw # B won't help; size conditions ignore H and B flags on the :0 line
+  * ! ^Content-Length:.*[0-9]
+  * 1^1 B ?? &gt;1
+  | formail -a "Content-Length:  $="
+</pre>
+<p>So if you want to count on Content-Length, the message could be
+piped into procmail with a specific procmailrc file which would 
+do this counting and then call MHonArc.
+</p>
+</blockquote>
+
+<p>If <a href="http://www.sendmail.org/">sendmail</a> is
+your system's MTA and you use Procmail as your local delivery agent,
+you can configure things to have <tt>Content-Length</tt> defined
+for all locally delivered mail.  The following technique is
+contributed by
+<a href="mailto:tibbs&#37;40math.uh.edu">Jason L Tibbitts III</a>:
+</p>
+<blockquote>
+<p>I use Procmail as my local delivery agent.  I have the following extremely
+disgusting settings in my .mc (M4 config) file to add in a Content-Length:
+header, <u>but I'm <b>not</b> sure if I would recommend that anyone
+actually think of using this</u>:
+</p>
+<pre class="code">
+define(`LOCAL_MAILER_FLAGS',`SPfhn9Z')
+define(`LOCAL_MAILER_ARGS',`procmail -a $h -d $u')
+
+LOCAL_CONFIG
+#
+# Add fake Content-Length Header for local mailer
+# This is corrected by Procmail
+# Note that the Z flag is used here; if Z is ever defined, this
+#  will break something
+H?Z?Content-Length: 0000000000
+</pre>
+</blockquote>
+
+<p>If possible, try to avoid relying on the use of
+<tt>Content-Length</tt> since it is hard to guarantee that it is
+set properly.  When
+<a href="../resources/conlen.html">CONLEN</a>
+is specified, MHonArc will read at
+least the number of bytes specified by <tt>Content-Length</tt> before
+checking for the message separator, as defined by the
+<a href="../resources/msgsep.html">MSGSEP</a>
+resource.  Therefore, the value of <tt>Content-Length</tt> can be less
+than the actual message size, and message extraction will
+work as expected.  However, if <tt>Content-Length</tt> for a message
+has a value that is larger than the actual size, MHonArc may include
+the content of the next message as part of the current message.
+</p>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="move">Can I move a message from one archive to another?</a></b></h3>
+</td></tr></table>
+
+<P>No. In order to achieve the same effect, you must add the original,
+unprocessed, message to the destination archive, then remove the
+appropriate HTML version of the message from the source archive.  </P>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="reconstruct">Can I reconstruct a database from the HTML messages?</a></b></h3>
+</td></tr></table>
+
+<p>Yes.  v2.3 of MHonArc introduced a utility program called
+<b>mha-dbrecover</b>.  It gets installed with the other MHonArc
+files during the installation process.  See the documentation for
+usage information.
+</p>
+
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="dynamic">Is it safe to add messages to an archive as they are received?</a></b></h3>
+</td></tr></table>
+
+<p>Yes.  MHonArc performs archive locking to protect from
+multiple MHonArc process attempting to write to an archive
+at the same time.  This locking allows MHonArc to safely
+be used to add messages as they are received.
+</p>
+
+<table class="note" width="100%">
+<tr valign="baseline">
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>
+As an archive increases in size, performing updates as
+a message is received takes more processing time.  Therefore, for
+large archives, you may need to do updates through a periodic
+batch process (like via <b>cron</b>(8)) to avoid time-out problems.
+</p>
+</td>
+</tr>
+</table>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="forward">So it is safe.  How do I do it?</a></b></h3>
+</td></tr></table>
+
+<p>Many users use <b>Procmail</b>
+<a href="http://www.procmail.org/"
+>&lt;http://www.procmail.org/&gt;</a> to call MHonArc
+to archive messages.  Procmail provides the ability to preprocess
+mail as it arrives to do selective processing and automated tasks
+with your mail.
+</p>
+
+<p>For illustrative purposes, the following simple example shows
+a possible way of archiving messages as it arrives w/o using a tool
+like Procmail.
+This example assumes you are on a Unix-based system
+using <a href="http://www.sendmail.org/"><b>sendmail</b></a>
+as the mail transfer agent.
+Please refer to documentation about <b>sendmail</b> if you
+are not familiar with it
+(<cite><a href="http://www.ora.com/catalog/sendmail2/noframes.html"
+>sendmail, 2ed</a>, from O'Reilly</cite> is an excellent source).
+</p>
+
+<p>The approach shown here uses a
+<b><tt>.forward</tt></b> file in the home directory of the
+account you want mailed archived.  For this example, let's
+assume it is my account.
+Here is how to set up the <tt>.forward</tt> file
+to invoke MHonArc on incoming mail: </P>
+
+<pre class="code">
+\ehood, "|/home/ehood/bin/webnewmail #ehood"
+</pre>
+
+<table class="note" width="100%">
+<tr valign="baseline">
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>
+The "<code>\ehood</code>" tells <tt>sendmail</tt>
+to still deposit the incoming message to my mail spool file. The
+"<code>#ehood</code>" Bourne shell comment is needed to insure the
+command is unique from another user. Otherwise, <tt>sendmail</tt>
+may not invoke the program for you or the other user.
+</p>
+</td>
+</tr>
+</table>
+
+<P><tt>webnewmail</tt> is a Perl program that calls
+MHonArc with the appropriate arguments. A wrapper program
+is used instead of calling MHonArc directly to keep
+the <tt>.forward</tt> file simple, but you can call MHonArc
+directly if you want. Here is the code to the
+<tt>webnewmail</tt> program: </P>
+
+<pre class="code">
+#!/usr/local/bin/perl
+# Edit above path to point to where perl is on your system.
+
+##	Specify a package to protect names from MHonArc.
+
+package WebNewMail;
+
+##	Edit to point to installed mhonarc.
+
+$MHonArc = "/home/ehood/bin/mhonarc";
+
+##	Define ARGV (ARGV is same across all packages).
+##	Edit options as required/desired.
+
+<!--
+-->&#64;<!--
+-->ARGV = ("-add",
+	 "-quiet",
+	 "-outdir", "/home/ehood/public_html/newmail");
+
+##	Just require mhonarc, this prevents the overhead of a
+##	fork/exec.
+
+require $MHonArc;
+
+</pre>
+
+<p>The <tt>webnewmail</tt> program has to have the executable
+bit set.  This is achieved by using "<tt><b>chmod a+x webnewmail</b></tt>".
+</p>
+
+<table class="note" width="100%">
+<tr valign="baseline">
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>
+For better scalability and resource usage, the author
+recommends calling MHonArc from a facility like <b><tt>cron</tt></b>,
+which is provided on Unix-based operating systems.
+For those unfamiliar cron, it is a daemon that allows the execution
+of commands on a scheduled basis.
+</p>
+</td>
+</tr>
+</table>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="majordomo">How can I do it with Majordomo lists?</a></b></h3>
+</td></tr></table>
+
+<p>Here is a
+template for archiving messages as they arrive for a
+Majordomo list to include in sendmail's <tt>aliases</tt> file:
+</p>
+<pre class="code">
+<em>xxxx</em>:                "|<em>/usr/lib/majordomo/</em>wrapper resend -l <em>xxxx</em> <em>xxxx</em>-outgoing"
+<em>xxxx</em>-outgoing:       :include:<em>/var/lib/majordomo/lists/</em><em>xxxx</em>, <em>xxxx</em>-mhonarc
+<em>xxxx</em>-request:        <em>list-admin-address</em>
+owner-<em>xxxx</em>:          <em>list-admin-address</em>
+<em>xxxx</em>-owner:          <em>list-admin-address</em>
+
+<em>xxxx</em>-mhonarc:        "|<em>/usr/lib/majordomo/</em>wrapper mhonarc -add -quiet -outdir <em>/home/httpd/html/yyyyyyy</em> <em>-rcfile rcs.mrc</em> <em>-stderr /var/log/mhonarc</em>" 
+</pre>
+
+<p>Replace text that <tt class="icode"><em>is rendered like this</em></tt> with
+what is appropriate for your configuration.
+</p>
+<p>In order to run MHonArc with Majordomo's wrapper, the program has to 
+be in the same directory where the Majordomo programs are located. 
+An easy way to insure this is to create a symbolic link to in Majordomo's
+program directory to where MHonArc is installed.  For example:
+</p>
+<pre class="shell">
+prompt&gt; <b>ln -s <em>/usr/bin/mhonarc</em> <em>/usr/lib/majordomo/mhonarc</em></b>
+</pre>
+<p>Make sure <em><tt>/usr/bin/mhonarc</tt></em> is readable and executable
+by the majordomo user.  Something like the following can be done
+to insure this:
+</p>
+<pre class="shell">
+prompt&gt; <b>chmod <em>755</em> <em>/usr/bin/mhonarc</em></b>
+</pre>
+<p>If you redirect stderr to a logfile, the logfile must 
+be owned by the majordomo user and be writable by the majordomo user.
+The directory for that logfile must exist.
+</p>
+<p>The MHonArc-archive directory must be owned by the majordomo user
+and must have the minimum access permission 755.  Group ownership does not
+matter.
+</p>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="different">Can I get MHonArc to filter messages to different archives?</a></b></h3>
+</td></tr></table>
+
+<p>No.  This is outside of the MHonArc's scope.  You can grow your
+own filter, using the method described in the
+<a href="#forward">previous question</a>, to
+scan the message header an invoke MHonArc with the proper arguments.
+Or. you can use a tool like
+<b>Procmail</b>
+<a href="http://www.procmail.org/"
+>&lt;http://www.procmail.org/&gt;</a>.
+</p>
+
+<table class="note" width="100%">
+<tr valign="baseline">
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>You may want to check out the following:
+<strong><a href="http://www.mhonarc.org/release/mharc/">mharc</a></strong>
+at <a href="http://www.mhonarc.org/release/mharc/"
+>&lt;http://www.mhonarc.org/release/mharc/&gt;</a>:
+Mharc is a web-based mail archiving system for multiple mailing
+lists using Procmail, MHonArc, and Namazu.
+</p>
+</td>
+</tr>
+</table>
+
+<p>Here are a some messages from users about using Procmail:
+</p>
+
+<blockquote class="mail">
+<UL>
+<LI><em>From</em>: Achim Bohnet &lt;<A HREF="mailto:ach&#37;40rosat.mpe-garching.mpg.de">ach<!--
+-->&#64;<!--
+-->rosat.mpe-garching.mpg.de</A>&gt;</LI>
+<LI><em>Date</em>: Wed, 13 Nov 1996 13:56:08 +0100</LI>
+</UL>
+<pre>
+<var>... some text deleted ...</var>
+
+Here is what I use in .procmailrc to archive the mhonarc list:
+
+NEWDATE="`/usr/bin/date +%Y-%m`"
+MHONARC_MBOX="/local/mail/lists/mhonarc/$NEWDATE.mbox"
+:0: $MHONARC_MBOX$LOCKEXT
+* ^Sender:.*owner-mhonarc<!--
+-->&#64;<!--
+-->
+{
+        :0 c
+        $MHONARC_MBOX
+
+        :0 c
+        | /local/mail/mhonarc-1.2.2/mailarchive -add mhonarc "$NEWDATE"
+}
+
+Mailarchive is nothing more than a wrapper around mhonarc with my long.
+list of options.
+
+Achim
+P.S. Procmail itself comes with an example manual page. It's worth
+     looking into it.
+
+</pre>
+</blockquote>
+
+<blockquote class="mail">
+<UL>
+<LI><em>From</em>: "Eric D. Friedman" &lt;<A HREF="mailto:friedman&#37;40hydra.acs.uci.edu">friedman<!--
+-->&#64;<!--
+-->hydra.acs.uci.edu</A>&gt;</LI>
+<LI><em>Date</em>: Wed, 13 Nov 1996 06:38:42 -0800</LI>
+</UL>
+<pre>
+You can actually dispense with the wrapper if you use environment
+variables to pass options to MHonArc, but I'm sure Achim has a good
+reason for doing it his way.  Just for the purposes of comparion,
+here's how I do it:
+
+eeeweb% cat .procmailrc
+#Set on when debugging
+VERBOSE=off
+#Replace `mail' with your mail directory (Pine uses mail, Elm uses Mail)
+MAILDIR=$HOME/Mail
+#Directory for storing procmail log and rc files
+PMDIR=$HOME/.procmail
+#Path and options for mhonarc
+MHONARC='/dcs/packages/infosys/bin/mhonarc -add -quiet -umask 022 -idxfname inde
+x.html'
+:0
+* ^Originator:.*<!--
+-->&#64;<!--
+-->classes.uci.edu
+{
+  MHHOME=$HOME/classarc
+  LOGFILE=$PMDIR/classlists.log
+  INCLUDERC=$PMDIR/rc.classlists
+}
+:0 E
+{
+  MHHOME=$HOME/mail-arc
+  LOGFILE=$PMDIR/otherlists.log
+  INCLUDERC=$PMDIR/rc.otherlists
+}
+
+and then in the file .procmail/rc.classlists or rc.otherlists (depending
+on the Originator: of the message), lots of the following:
+
+# Procmail Entry for uci-www
+:0 E
+* ^TOuci-www
+{
+  :0 c
+  uci-www/.
+
+  :0
+  |$MHONARC -rcfile $MHHOME/uci-www/0-rcfile.html -outdir $MHHOME/uci-www
+}
+
+Eric D. Friedman
+friedman<!--
+-->&#64;<!--
+-->uci.edu
+</pre>
+</blockquote>
+
+<blockquote class="mail">
+<UL>
+<LI><em>From</em>: Paul McKinley &lt;<A HREF="mailto:mckinley&#37;40austin.asc.slb.com">mckinley<!--
+-->&#64;<!--
+-->austin.asc.slb.com</A>&gt;</LI>
+<LI><em>Date</em>: Mon, 21 Apr 1997 15:29:08 -0500</LI>
+</UL>
+<pre>
+<var>... some text deleted ...</var>
+
+I use procmail to drive mhonarc archives from Majordomo.  I set up a
+single pseudouser and drive several archives from the one pseudouser. 
+
+Here's a sample .forward file:
+
+"|/usr/ucb/rsh cappuccino \"set IFS=' '; exec
+/usr/local/procmail/bin/procmail #widget\""
+
+Another example is:
+
+"|/bin/csh -c \"set IFS=' '; exec /usr/local/procmail/bin/procmail
+#widget\""
+
+Two reasons to use the "rsh cappuccino":
+1. doesn't require the user to be able to login to server, although
+   the username must still be valid
+2. gets the processing load off the mail server
+
+Here's an example .procmail recipe:
+
+LOGFILE=$HOME/procmail_errors
+LOGABSTRACT=all
+LOCKEXT=.lock
+VERBOSE=on
+UMASK=003
+
+# widget: list short description
+:0 H
+* ^List-Name: widget
+{
+  # The rotate call (under construction) does archive rotation
+  # leave commented!
+  #:0c i
+  #| /home/web-arch/bin/rotate /usr/local/web/webarchive/widget
+
+  # Put the mail in the mailbox, which is used by archiver to re-generate
+  # the html indexes
+  :0 cA
+  /usr/local/web/webarchive/widget/current/mbox
+
+  # The mhonarc call examines mbox, turns the mail messages into .html
+  # documents, and compiles the indexes.
+  # -reverse -treverse\
+  :0 ia
+  | /usr/local/mhonarc/bin/mhonarc \
+    -idxfname index.shtml \
+    -tidxfname threads.shtml \
+    -rcfile widget.rc\
+    -outdir /usr/local/web/webarchive/widget/current \
+    /usr/local/web/webarchive/widget/current/mbox
+
+}
+
+I have a directory per archive, and put the current period in directory
+"current".  Then I have an index page per archive that indexes the
+periods, plus gives information about the list and how to
+subscribe/unsubscribe.  The widget.rc file resides in the pseudouser's
+home directory.
+
+Note the 
+* ^List-Name: widget
+I put the following in the majordomo list's config file:
+
+message_headers   &lt;&lt;  END
+List-Name: widget
+END
+
+This adds the "List-Name" header to messages, which is what procmail
+filters for.
+
+Hope this helps
+
+Paul McKinley
+Unix SysAdmin Contractor
+</pre>
+</blockquote>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="exclude">Does MHonArc support the "no archive" flag in messages?</a></b></h3>
+</td></tr></table>
+
+<p>Version 2.4, or later, does via the
+<a href="../resources/checknoarchive.html">CHECKNOARCHIVE</a>
+resource.
+</p>
+
+<p>If using an earlier version, or if you are already doing some preprocessing,
+you can use a pre-processor like <b>Procmail</b>
+to do the filtering.  Here is a message sent to the
+<a href="mailto:mhonarc-users&#37;40mhonarc.org">MHonArc mailing list</a>:
+</p>
+
+<blockquote class="mail">
+<UL>
+<LI><em>Subject</em>: Re: No archive</LI>
+<LI><em>From</em>: Christopher Lindsey &lt;<A HREF="mailto:lindsey&#37;40ncsa.uiuc.edu">lindsey<!--
+-->&#64;<!--
+-->ncsa.uiuc.edu</A>&gt;</LI>
+<LI><em>Date</em>: Thu, 1 Oct 1998 11:33:07 -0500 (CDT)</LI>
+</UL>
+<pre>
+&gt; Subscribers who don't want their messages to be archived
+&gt; could add a "no archive" flag within their mail.
+
+The most common way to do this is by checking for the existence
+of an 'X-no-archive: yes' or 'Restrict: no-external-archive' header.
+
+&gt; As I'm invoking MHonArc through a procmail recipe I guess
+&gt; it's possible to do this within the recipe.
+
+Very easy:
+
+   # If people don't want to be archived, then remove their
+   # message
+   :0
+   * ^(X-no-archive: yes|Restrict: no-external-archive)
+   /dev/null
+
+Chris
+</pre>
+</blockquote>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="addsafe">Is it safe to specify <tt>-add</tt> when no archive exists?</a></b></h3>
+</td></tr></table>
+
+<p>Yes.  If MHonArc sees no archive exists when perform
+an add, it will automatically create the archive.
+</p>
+
+<table class="caution" width="100%">
+<tr valign="baseline">
+<td><strong style="color: red;">WARNING:</strong></td>
+<td width="100%"><p>
+If using MHonArc versions 2.4, or earlier, make sure the file
+<tt>maillist.html</tt> (or the value
+of the IDXFNAME resource) does not exist if no archive exists and
+<tt>-add</tt> has been specified.  Otherwise, unpredictable output
+of the <tt>maillist.html</tt> file may result if <tt>maillist.html</tt>
+is not in the proper format.
+</p>
+</td>
+</tr>
+</table>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="jumps">Why are there "jumps" in message numbers?</a></b></h3>
+</td></tr></table>
+
+<p>Big gaps in the message number sequence may occur if you
+defined the
+<a href="../resources/maxsize.html">MAXSIZE</a>
+resource and you have
+MHonArc rescanning a mail folder for adding new messages.
+The problem occurs when MHonArc
+reads in messages that will automatically get deleted due
+to
+<a href="../resources/maxsize.html">MAXSIZE</a>.
+Ie.  Messages subject to automatic deletion are
+the oldest ones.  If the input contains old messages that will
+get deleted at the end of processing, the old messages will
+still use up message numbers since messages to be deleted are not
+determined until all input is read.  Since MHonArc does
+not keep information about deleted messages, if the messages are
+fed into MHonArc again, the "jumping" will occur
+again (and the jump will get larger for each additional update).
+</p>
+
+<p>To avoid the problem, try to pass only new, never processed,
+messages to MHonArc instead of having MHonArc
+rescanning the same mail folder for new messages.  Another
+approach is to set either the
+<a href="../resources/expireage.html">EXPIREAGE</a> or
+<a href="../resources/expiredate.html">EXPIREDATE</a>
+resources (available in v2.0 beta 2,
+or later).  These work as an alternative to
+<a href="../resources/maxsize.html">MAXSIZE</a>
+and will help in
+preventing message number jumping since expiration of a message is
+checked when it is initially read (bypassing the assignment of
+a message number).  </p>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="dups">Why do some messages get re-added each time MHonArc processes a mail folder?</a></b></h3>
+</td></tr></table>
+
+<p>This condition may occur when you have MHonArc examine the
+same folder periodically to add any new message.  If there are
+messages in the folder without message-ids, then those messages
+will be re-added each time MHonArc runs.
+</p>
+
+<p>Why?  Well, MHonArc uses message-ids for determining if a
+message has been archived, or not.  Therefore, if a message-id
+is missing for a message, then MHonArc believes it is new.
+</p>
+
+<p>In general, mail has message-ids.  They get assigned by
+MTAs.  However, if messages are generated by a CGI
+program, or other non-mail specific software, then the program
+in question should create a message-id.  Else, you will need
+to move already-processed messages into a different area so
+MHonArc does not read them again.
+</p>
+
+<table class="note" width="100%">
+<tr valign="baseline">
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>
+In MHonArc v2.4 and later, and if you have
+the <b>Digest::MD5</b> module installed, MHonArc will compute
+the MD5 digest of message headers without message-ids.  This
+allows MHonArc to skip the message in subsequent add operations.
+</p>
+</td>
+</tr>
+</table>
+
+<p>A related problem is messages showing up again in the archive
+after you deleted them with RMM.  MHonArc does not keep track of
+delete message-ids.  Therefore, if want to make sure that
+a message will not appear in the archive after explicitly deleted
+via RMM, make sure to remove the message from input source.
+</p>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="remove">How do I remove messages from an archive?</a></b></h3>
+</td></tr></table>
+
+<p>Automatic removal can be done via the
+<a href="../resources/expireage.html">EXPIREAGE</a> or
+<a href="../resources/expiredate.html">EXPIREDATE</a>
+resources (available in v2.0 beta 2,
+or later) or the
+<a href="../resources/maxsize.html">MAXSIZE</a>
+resource.
+</p>
+<p>Explicit message removal can be done with the
+<a href="../resources/rmm.html">RMM</a>
+resource.  Please read the RMM resource page for more information
+and examples.
+</p>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="tombox">Can I convert an archive back to mailbox format?</a></b></h3>
+</td></tr></table>
+
+<p><a href="mailto:anthonyw&#37;40albany.net">Anthony W</a> developed a
+Perl program called <tt>mhn2mbox</tt> for converting archives back
+into mailbox format.  A copy of the script is included in the contrib
+directory of the MHonArc distribution.
+</p>
+
+<!-- ===================================================================== -->
+<hr>
+
+<!--X-NavButtons-Start-->
+<table width="100%"><tr><td align="left"><nobr>[<a href="usage.html">Prev</a>]</nobr></td><td align="center" width="100%">[<a href="faq.html">TOC</a>][<a href="../mhonarc.html">Manual</a>][<a href="http://www.mhonarc.org/">Home</a>]</td><td align="right"><nobr>[<a href="indexpgs.html">Next</a>]</nobr></td></tr></table>
+</p>
+<!--X-NavButtons-End-->
+
+<hr>
+<address>
+$Date: 2005/06/07 19:17:25 $ <br>
+<img align="top" src="monicon.png" alt="">
+<a href="http://www.mhonarc.org/"
+><strong>MHonArc</strong></a><br>
+Copyright &#169; 1997-2001, <a href="http://www.earlhood.com/"
+>Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org"
+>mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

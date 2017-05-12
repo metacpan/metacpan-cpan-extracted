@@ -1,0 +1,34 @@
+MeSH-Parser-ASCII
+
+Module parsing the MeSH ASCII format
+
+INSTALLATION
+
+Use:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+	
+DEPENDENCIES
+
+Moose
+Log::Log4perl
+
+DOCUMENTATION
+
+After installing, you can find documentation modules and scripts with the perldoc 
+command, e.g.:
+perldoc MeSH-Parser-ASCII
+
+or visit the respective page on CPAN
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2010 European Bioinformatics Institute. All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it 
+under GPLv3.
+
+This software is provided "as is" without warranty of any kind.

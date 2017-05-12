@@ -1,0 +1,15 @@
+Math::Geometry implements classic geomtrical functions in Perl, it 
+has an emphasis on 3 dimensional geometry including projects, rotations
+and other standard 3 dimensional operations.
+
+	use Math::Geometry;
+
+	@P2=rotx(@P1,$angle);
+	@P3=rotx(@P1,$angle);
+	@N =triangle_normal(@P1,@P2,@P3);
+	@ZP=zplane_project(@P1,$d);
+
+
+See the pod documentation in Geometry.pm for more details.
+
+

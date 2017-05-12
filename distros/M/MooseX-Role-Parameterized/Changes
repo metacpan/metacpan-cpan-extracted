@@ -1,0 +1,186 @@
+Revision history for MooseX-Role-Parameterized
+
+1.10      2017-04-20 17:50:53Z
+   - add MooseX::Role::Parameterised as stub documentation, for
+     discoverability
+
+1.09      2016-08-07 01:20:31Z
+   - Give 'anonymous' generated roles names that are similar to the original
+     parameterized role so debug output is easier to read
+
+1.08      2014-08-23 22:38:12Z
+    - add x_breaks metadata for incompatibility issue with MooseX::Storage
+      (now resolved with MooseX-Storage-0.47)
+
+1.07      2014-08-06 05:44:11Z
+    - re-release to remove README.pod from shipped dist
+
+1.06      2014-08-02 04:34:06Z
+    - Restored MooseX::Role::Parameterized->current_metaclass as a public
+      method. Apparently there is code on CPAN that relies on this.
+
+1.05      2014-07-31 18:26:03Z
+    - If a parameterizable role was reinitialized after any parameters or a
+      role block was declared, those declarations were lost. Reinitialization
+      usually occurs when new metaroles are applied to the role by other
+      MooseX modules.
+
+1.04      2014-07-31 14:53:26Z
+    - Convert this distribution to Dist::Zilla to resolve packaging insanity
+
+1.03  2014-07-30
+    - This extension is now implemented as a role metarole, which means it can
+      (mostly) cooperate with other role extensions, such as
+      MooseX::Role::WithOverloading. Note that you should load
+      MooseX::Role::Parameterized _after_ other extensions.
+    - This module no longer supports passing a "-metaclass" parameter when you
+      load it. This was an artifact from a much earlier era of Moose
+      extensions.
+    - repository migrated to the github moose organization
+
+1.02  2013-09-11
+    - set %INC entries in test to avoid failures with
+      Moose pre-2.11 (kentfrederic)
+        https://github.com/sartak/MooseX-Role-Parameterized/pull/7
+        https://rt.cpan.org/Ticket/Display.html?id=88593
+
+1.01  2013-09-10
+    - removed use of deprecated Class::MOP::load_class (ether)
+
+1.00  2012-01-12
+    - MooseX::Role::Parameterized now depends on Moose 2.0300
+      released 2011-09-23 for its several core improvements, hence the
+      major version number bump.
+
+    - MXRP now uses the new meta_lookup feature added to Moose 2.0300
+      (specifically for MXRP) to avoid duplicating Moose-0.60-era
+      Moose::Role sugar. This means the error messages you get are
+      better, and there's a lot less ugly code in MXRP.
+    - Remove alias/excludes special case errors. They have long since been
+      replaced in core Moose by -alias and -excludes, and were finally
+      removed in Moose 2.0200.
+    - Expressly forbid using role { } inside role { } (which makes no
+      sense but I suppose you could accidentally trigger it)
+    - Documentation fix from cweyl@alumni.drew.edu
+      https://github.com/sartak/MooseX-Role-Parameterized/pull/5
+
+0.27  2011-08-22
+    - Remove MooseX::Role::Parameterized::Meta::Parameter; instead,
+      the default for parameters of (is => 'ro') is set by the
+      "parameter" sugar. This removes an unnecessary metaclass and
+      removes weird edge cases caused by it. Please please please
+      report any breakage!
+
+0.26  2011-03-20
+    - make tests stop relying on a specific format for anon class/role names (doy)
+
+0.25  2011-03-04
+    - Move the reinitialization hook from Role to Trait so hardcore hackers
+      (trait janitors) get the benefit too (doy)
+
+0.24  2011-03-01
+    - Made MXRP more extensible by hooking into the role metaobject
+      reinitialization (doy)
+
+0.23  2010-12-25
+    - Merry Christmas!
+    - Make MooseX::Role::Parameterized::Extending more instructive. Hopefully.
+
+0.22  2010-11-26
+    - The test suite now uses Test::Fatal instead of Test::Exception (Karen
+      Etheridge).
+    - Fix Test::More dependency (reported by Father Chrysostomos) [rt.cpan.org #63222]
+
+0.21  2010-11-15
+    - "package" arg can now tell generate_role to use a specific package (rjbs)
+
+0.20  2010-11-02
+    - Minor test refactoring to fix blead support [rt.perl.org #78244]
+
+0.19  2010-07-08
+    - Documentation improvements
+
+0.18  2010-03-10
+    - Improve the error message when you leave off the role {} block
+      http://stackoverflow.com/questions/2418177/moose-and-error-messages-the-sun-and-the-moon/2418429
+
+0.17  2010-02-11
+    - MANIFEST fixes (Karen Etheridge)
+
+0.16  2010-02-04
+    - Allow specifying custom metaclasses for parameterized
+      roles (Oliver Charles)
+
+    - Documentation improvements (Oliver Charles, Sartak)
+
+0.15  2010-01-05
+    - Move the guts of MXRPMR::Parameterized into a trait. See
+      http://www.nntp.perl.org/group/perl.moose/2010/01/msg1294.html (Sartak)
+
+0.14  2009-12-06
+    - Fix a nesting bug reported by nothingmuch with a test case provided
+      by rafl (Sartak)
+
+    - Parameterized roles now keep track of their genitor role (Sartak)
+
+    - Delegate parameterizable->has_parameter to parameters->has_attribute
+      (Sartak)
+
+0.13  2009-09-11
+    - Documentation improvements (Sartak)
+
+0.12  2009-08-15
+    - Add MooseX::Role::Parameterized->current_metaclass for forward compat
+      (Sartak)
+
+    - Various documentation improvements (Sartak)
+
+0.11  2009-08-09
+    - Explicitly test-require Test::Moose for Fedora packaging (RSRCHBOY)
+
+    - Finally a sensible synopsis (Sartak)
+
+    - More examples are always good :) (Sartak)
+
+0.10  2009-06-25
+    - Fix test that now warns in Moose (Sartak)
+
+0.09  2009-06-14
+    - Give all modules a version number (Sartak)
+
+0.08  2009-06-14
+    - Fix mis-packaging :) (Sartak)
+
+0.07  2009-06-14
+    - Leave the jules nest for github (Sartak)
+
+    - Switch to Module::Install (Sartak)
+
+0.06  2009-05-12
+    - Fix long-standing role-role combination bug, reported by several
+      users (Sartak)
+
+    - Documentation improvements (Sartak)
+
+0.05  2009-04-24
+    - Use replace_constructor in Meta::Parameter's make_immutable (nothingmuch)
+
+    - The & prototype hack has been obviated by Moose::Exporter goodness (rafl)
+
+    - List examples of MooseX::Role::Parameterized roles (Sartak)
+
+0.04  2009-01-30
+    - The role block now receives as an argument the consuming class or role.
+
+0.03  2009-01-17
+    - Parameters now default to read-only, so that you no longer have to specify
+      the extremely common case of: is => 'ro'
+
+0.02  2008-12-09
+    - Using keywords outside of the role block is now allowed and handled.
+
+    - The role generated by the role block is now composed with its parent role.
+      This is so you can have unparameterized components to your parameterized
+      roles, and so that does_role returns true if you ask about the parent
+      role (instead of the anonymous parameterized role).
+

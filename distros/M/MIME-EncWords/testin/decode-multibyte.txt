@@ -1,0 +1,20 @@
+GOOD
+("Subject: \xB0\xD4\xC0\xB8\xB8\xA7(laziness), \xC2\xFC\xC1\xF6\xB8\xBB\xB1\xE2(impatience), \xB1\xB3\xB8\xB8(hubris)", "euc-kr")
+Subject: =?EUC-KR?B?sNTAuLinKGxhemluZXNzKSwgwvzB9ri7seIoaW1w?=
+	=?EUC-KR?B?YXRpZW5jZSksILGzuLgoaHVicmlzKQ==?=
+
+GOOD
+("Subject: \xB0\xD4\xC0\xB8\xB8\xA7(laziness), \xC2\xFC\xC1\xF6\xB8\xBB\xB1\xE2(impatience), \xB1\xB3\xB8\xB8(hubris)", "euc-kr")
+Subject: =?euc-kr?b?sNTAuLinKGxhemluZXNzKSwgwvzB?=
+ =?euc-kr?b?9ri7seIoaW1wYXRpZW5jZSksILGzuLgoaHVicmlzKQ==?=
+
+GOOD
+("Subject: \xB0\xD4\xC0\xB8\xB8\xA7(laziness), \xC2\xFC\xC1\xF6\xB8\xBB\xB1\xE2(impatience), \xB1\xB3\xB8\xB8(hubris)", "euc-kr")
+Subject: =?euc-kr?b?sNTAuLinKGxhemluZXNzKSwgwvzB9ri7seI=?=
+        =?euc-kr?b?KGltcGF0aWVuY2UpLCCxs7i4KGh1YnJpcyk=?=
+
+GOOD
+("Subject: \xB0\xD4\xC0\xB8\xB8\xA7(laziness), \xC2\xFC\xC1\xF6\xB8\xBB\xB1\xE2(impatience), \xB1\xB3\xB8\xB8(hubris)", undef, "euc-kr")
+Subject: =?euc-kr?b?sNTAuLinKGxhemluZXNzKSwgwvzB?=
+ =?euc-kr?b?9ri7seIoaW1wYXRpZW5jZSksILGzuLgoaHVicmlzKQ==?=
+

@@ -1,0 +1,17 @@
+Revision history for MooseX::Attribute::TypeConstraint::CustomizeFatal
+
+0.03 2013-07-04 15:18:25
+
+   - When you supplied `on_typeconstraint_failure => "default"' or
+     `on_typeconstraint_failure => "default_no_warning"' with a
+     default sub { ... } we'd just return the CodeRef instead of its
+     value. Now we do the right thing and call the sub to get the
+     value instead.
+
+0.02 2013-07-01 10:43:59
+
+   - Add tests and documentation about the limitations of this module.
+
+0.01 2012-05-02 20:14:13
+
+    - Initial buggy version

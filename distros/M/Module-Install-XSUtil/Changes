@@ -1,0 +1,176 @@
+Revision history for Perl extension Module::Install::XSUtil
+
+0.45 2014-01-31 07:13:52+0900
+    - Requires ExtUtils::ParseXS 3.18 because of 2.21 issues
+      (https://github.com/xslate/p5-Text-Xslate/issues/104)
+
+0.44 2013-04-24 11:30:07
+    - Support PUREPERL_ONLY=1
+
+0.43 2012-06-25 09:23:04
+    - Remove experimental requires_xs() because Module::Install
+      provides another requires_xs()
+    - Move t/01_example.t to xt/
+
+0.42 2011-10-19 20:00:07
+    - Remove cc_inc_paths, which is already defined in M::I
+      (thanks to @shohex)
+
+0.41 2011-10-04 12:05:54
+    - Complete support for requires_cplusplus()
+
+0.40 2011-09-24 00:56:33
+    - ExtUtils::ParseXS is now configure_requires, instead of
+      build_requires (xaicron++)
+
+0.39 2011-08-22 11:28:15
+    - Add cc_inc_paths() as an alias to cc_include_paths()
+    - Add requires_cplusplus() as an experimental feature;
+      currently it chnages only warnings flags
+
+0.38 2011-06-22 15:15:37
+    - Workaround MacOSX's system perl failure caused by multiple -arch
+      for gcc (thanks to @kazuho)
+
+0.37 2011-05-16 23:33:49
+    - Makefile.PL -g implices "-g -ggdb -g3" for gcc (EXPERIMENTAL)
+    - PERL_ONLY=1 means --pp for modules with XS/PP dual backends
+
+0.36 Thu Oct  7 16:49:04 2010
+    - Resolve RT #61660 (SREZIC): Support for ccache missing
+    - Resolve RT #61770 (bokutin): A typo in SYNOPSIS
+
+0.35 Wed Sep 29 23:46:17 2010
+    - Checks C99 specification more strictly
+    - Add some macros to xshelper.h
+
+0.34 Sun Sep 26 12:18:18 2010
+    - Oops! The change in 0.33 did not work.
+
+0.33 Sun Sep 19 22:15:10 2010
+    - Disable -Wdeclaration-after-statement by requires_c99()
+
+0.32 Mon Sep 13 14:18:33 2010
+    - Don't clean xshelper.h by default.
+      Use use_xshelper -clean (or -realclean) to clean the file.
+
+0.31 Mon Sep 13 13:09:16 2010
+    - Fix a check for STATIC_INLINE (s/__cplusplus__/__cplusplus/)
+
+0.30 Sat Sep 11 14:17:06 2010
+    - Add use_xshelper() command to create xshelper.h
+
+0.27 Sun Sep  5 11:47:03 2010
+    - c99_available() should not have any side effects (reported by makamaka)
+
+0.26 Sat Aug  7 17:47:37 2010
+    - Use the version of installed gcc, not $Config{gccversion} (xaicron)
+
+0.25 Tue Jul 13 19:43:34 2010
+    - Add requires_c99() to assert that the compiler supports C99
+    - Fix Win32 problems, hopefully
+
+0.24 Sun May 16 13:24:58 2010
+    - Compliant with Module::Install 0.97
+
+0.23_02 Fri May 14 11:42:09 2010
+    - Don't exit if include dirs don't exist (lestrrat)
+    - Add cc_assert_lib() as an interface to Devel::CheckLib (lestrrat)
+    - Add want_xs() (lestrrat)
+    - Separate out detection of "-" and stuff to cc_libs(), and let
+      cc_append_to_lib()s just be a simple function (lestrrat)
+
+0.23_01 Mon May 10 12:10:59 2010
+    - Clarify docs (lestrrat)
+    - Add want_xs() command (lestrrat)
+
+0.23 Sun May  9 11:15:41 2010
+    - Setup clean_files for gcov output files (*.gcov, *.gcno, *.gcda)
+    - Add cc_libs() for MakeMaker's LIBS option (currently, it is just an
+      ailas to cc_append_libs())
+    - cc_append_libs (and then cc_libs) accepts raw arguments as
+      "cc_libs qw(-L/path/to/libs -lfoo)" (lestrrat++)
+
+0.22 Thu Mar 11 19:02:18 2010
+    - Add Devel::PPPort to build_requires if needed
+
+0.21 Sun Jan 10 15:22:20 2010
+    - Enable -Wc++-compat on gcc >= 4.1
+
+0.20 Sat Jan  9 16:31:53 2010
+    - Change cc_warnings()
+        - Add -Wc++-compat on gcc 4
+        - Add -Wno-comment on gcc 3
+    - Remove ExtUtils::CBuilder dependency, use can_cc() instead
+
+0.19 Tue Dec  8 10:35:19 2009
+    - Make cc_available recognize the '--pp' and '--xs' options
+
+0.18 Tue Nov 17 10:15:03 2009
+    - Optimize cc_available() by caching its value
+
+0.17 Thu Nov 12 13:30:47 2009
+    - Fix cc_warnings() for old gcc
+    - Add cc_available() using ExtUtils::CBuuilder
+
+0.16 Mon Nov  2 11:55:46 2009
+    - Fix a typo in cc_warnings()
+
+0.15 Thu Oct 29 09:31:07 2009
+    - Requires newer versions in prerequisites
+    - Switch the use of -Wextra/-W by gcc versions
+    - Revert "-g option is set implicitly in author's mode"
+
+0.14 Mon Sep 14 15:02:19 2009
+    - Improve debugging mode
+        - "-g" option is set implicitly in author's mode
+        - Set -DXS_ASSERT in author's mode (see XS::Assert)
+        - Set -Wdeclaration-after-statement in cc_warnings()
+
+0.13 Wed Sep  2 17:59:04 2009
+    - fix RT #48738 and add tests on it
+
+0.12 Fri Aug 21 12:54:20 2009
+    - re-fix the algorithm to find functions again (RT #48797)
+    - refer to Module::Install::AuthorRequires
+
+0.11 Wed Aug 19 16:15:33 2009
+    - re-fix the algorithm to find functions (RT #48797)
+    - remove -DDEBUGGING in '-g' option
+
+0.10 Tue Aug 18 13:05:46 2009
+    - add '-g' command line option (perl Makefile.PL -g)
+        - avoid optimization (remove -Ox from OPTIMIZE)
+        - add -DDEBUGGING to DEFINE
+    - make the function finding algorithm more smart (fix RT #48738 in XS::MagicExt)
+
+0.09 Thu Aug 13 22:27:20 2009
+    - fix a linking library issue on Cygwin
+
+0.08 Wed Aug 12 11:36:27 2009
+    - fix checklib algorithm
+    - enhance tests
+
+0.07 Tue Aug  4 17:02:32 2009
+    - apply a patch from RT #48321-2 (thanks to Taro Nishino)
+
+0.06 Tue Aug  4 09:20:08 2009
+    - fix tests for Win32 (RT #48321-1 reported by Taro Nishino)
+    - add cc_define() command
+
+0.05 Mon Aug  3 16:55:20 2009
+    - fix the algorithm for searching headers and libs
+
+0.04 Wed Jul 29 11:41:55 2009
+    - fix cc_append_to_ccflags() on non-Win32 system
+    - code refactering
+
+0.03 Tue Jul 28 12:05:42 2009
+    - May this work on Windows!
+
+0.02 Mon Jul 27 13:59:29 2009
+    - no 'provides' section for header files
+    - add rpository info
+
+0.01 Sun Jul 26 09:52:01 2009
+        - original version; created by Module::Setup

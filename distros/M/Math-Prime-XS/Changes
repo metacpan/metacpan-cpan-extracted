@@ -1,0 +1,177 @@
+Revision history for Perl extension Math::Prime::XS.
+
+0.27  2016-09-03  <kryde@cpan.org>
+
+ - Stable release.
+
+0.26_01  2013-04-28  <kryde@cpan.org>
+
+ - New count_primes() as suggested by Dana Jacobsen.
+
+0.26  2011-11-24  <kryde@cpan.org>
+
+ - Stable release.
+
+0.25_02  2011-10-30  <kryde@cpan.org>
+
+ - Fix functions.t test count for 64-bit long
+
+0.25_01  2011-10-25  <kryde@cpan.org>
+
+ - is_prime() all-XS code for speedup
+ - Try Perl's TRUE/FALSE to avoid stdbool.h configury
+
+0.25  2011-09-24  <kryde@cpan.org>
+
+ - Oops, restore stdbool.h bit from 0.23_01.
+
+0.24  2011-09-23  <kryde@cpan.org>
+
+ - mod_primes() fix: avoid infinite loop if number==2**32-1
+ - mod_primes() enhancement: consider only odd integers from "base"
+   upwards; divide only by odd numbers up to sqrt(n)
+
+0.23_01  2011-09-22  <schubiger@cpan.org>
+
+ - Fix build failure caused by perl's inclusion of stdbool.h.
+   [perl #99408 - Andreas Koenig]
+
+0.23  2011-01-10  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.22_01  2010-12-07  <schubiger@cpan.org>
+
+ - Fix overflow in xs_sieve_primes() marking 1928099 as composite
+   when it's not and add a test. [rt #62632 - Kevin Ryde]
+
+ - Strike out multiples in xs_sieve_primes() up to the square root
+   of the number.
+
+ - Define and use a macro to test for evenness.
+
+0.22  2010-10-24  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.21_01  2010-10-15  <schubiger@cpan.org>
+
+ - Omit checking for validations if the base equals the number.
+   [rt #62112 - Kevin Ryde]
+
+ - Add tests for calling the prime calculating functions with
+   the same base and number.
+
+ - Remove declaration of an unused variable in xs_sieve_primes().
+
+0.21  2010-10-08  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.20_02  2010-10-07  <schubiger@cpan.org>
+
+ - Allocate memory dynamically for xs_*_primes() instead of using
+   fixed-width arrays. [rt #58322 - Kevin Ryde]
+
+ - Utilize the composite array in xs_sieve_primes() as bit field.
+
+ - Don't use a hash in xs_trial_primes() to save primes.
+   [rt #58074 - Kevin Ryde]
+
+ - Optimize the implementation of some algorithms.
+
+ - Store numbers with automatically growing their memory.
+
+ - Separate the base number initialization and check from the XSUBs.
+
+ - is_prime() wraps around a xs_*_primes XSUB.
+
+ - Remove xs_is_prime() as it's no longer used.
+
+ - Validation of arguments is handled by Params::Validate.
+
+ - Use the boolean pragma for true/false values.
+
+ - Document both invocations of each prime calculating function.
+
+ - Refine the documentation of these functions and is_prime().
+
+ - Renew the benchmark results and rephrase its description.
+
+ - Mention bugs and caveats.
+
+ - Adapt the synopsis to use greater numbers.
+
+ - Reword the abstract.
+
+ - Update broken license link.
+
+ - Be more verbose while testing by printing the numbers.
+
+ - Remove the testing diagnostic.
+
+ - Rename calc_primes.t to functions.t.
+
+ - Adjust test file permissions.
+
+0.20_01 Thu May 15 17:13:07 CEST 2008
+
+ - Use memset() within xs_sieve_primes() to "clear" the
+   composite array.
+
+0.20 Wed May 14 15:46:42 CEST 2008
+
+ - Improved the speed of xs_sieve_primes() by using a fixed-width
+   array for the composites, instead of a hash.
+   [suggested by Moritz Lenz <http://search.cpan.org/~moritz>]
+
+ - Reformatted the source code layout of XS.xs.
+
+0.19 Sat Feb 23 16:20:29 CET 2008
+
+ - Use XSRETURN_IV() instead of manually extending the stack
+   and pushing the mortal boolean number.
+
+0.18 Fri Feb 15 15:23:36 CET 2008
+
+ - is_prime() now returns 0 if the number isn't a prime number.
+
+ - Added tests for calculating primes within a range.
+
+ - Updated ppport.h.
+
+0.17 Tue Apr  4 20:53:19 CEST 2006
+
+ - Changed Build.PL argument create_makefile_pl from 'passtrough'
+   to 'traditional' for the sake of compatibility.
+
+0.15 Thu Nov  3 20:45:22 CET 2005
+
+ - Omitted the pod-coverage testing part for XSUBs.
+
+0.14 Sat Oct 29 20:30:42 CEST 2005
+
+ - Added INSTALL instructions to the package.
+
+ - The xs_files argument in Build.PL specifies where *.xs
+   files reside.
+
+0.13 Wed Oct 26 19:44:23 CEST 2005
+
+ - Converted Math::Prime::Simple over to XS.
+
+ - Reimplemented the Sieve of Eratosthenes in C.
+
+ - Added modulo operator division, trial division and a
+   "hybrid" summing calculation method.
+
+ - Updated the docs with relevant function documentation
+   and related benchmarks.
+
+0.03 2004/01/14
+
+ - Implemented the Sieve of Eratosthenes.
+
+0.01 2004/01/14
+
+ - Initial version.

@@ -1,0 +1,8 @@
+README
+INSTALL
+ChangeLog
+MANIFEST
+Makefile.PL
+Received.pm
+t/all.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,27 @@
+Revision history for Perl extension MojoX-Session-Simple
+
+0.06 2016-07-07T02:33:43Z
+
+    - Removed `cpanfile.snapshot` from repository
+
+0.05 2015-01-23T00:02:14Z
+
+    - Update test dependency to use Test::TCP 2.07 or later
+
+0.04 2015-01-19T12:14:34Z
+
+    - Fixed module name in "Changes" (@reneeb)
+
+0.03 2015-01-19T12:05:35Z
+
+    - Fixed tests on `Mojolicious::secrets()` call
+    - Added versions to prerequisite modules (@reneeb)
+
+0.02 2014-11-24T04:14:27Z
+
+    - Fixes typo in module name. (@oalders)
+
+0.01 2014-11-21T13:15:22Z
+
+    - original version
+

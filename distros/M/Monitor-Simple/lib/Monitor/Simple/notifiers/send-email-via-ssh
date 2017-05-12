@@ -1,0 +1,64 @@
+#!/usr/bin/env perl
+#
+# A notifier script that sends emails to the given addresses by using
+# an extrenal server that will be first accessed by ssh.
+#
+#   Usage: ./send-email-via-ssh -service <name> -msg <file> -emails email1 [email2...]
+#                               -logfile <logfile> -loglevel <level> -logformat <format>
+#                               -login <user@hostname>
+#      where the general parameters for any notifier are:
+#         -service <name> idetifies a service on whom behave the notification is sent
+#         -msg <file> contains the message to be sent
+#         -emails <space-separated-list> are addresses whom to notify
+#         and optional logging parameters that will be used to initialize logging system
+#
+#      Other: -login <user@hostname> is used for the ssh command. The
+#      user of this script has to have its publis key already
+#      propagated to the provided ssh server.
+#
+#   Martin Senger <martin.senger@gmail.com>
+#   September 2011
+# -----------------------------------------------------------------
+
+use warnings;
+use strict;
+use Monitor::Simple;
+use Log::Log4perl qw(:easy);
+use Getopt::Long qw(GetOptionsFromArray);
+
+# read general command-line arguments
+my ($service_id, $msgfile, $emails) =
+    Monitor::Simple::Utils->parse_notifier_args (\@ARGV);
+my $subject = "Notification from the service [$service_id]";
+my $list_of_emails = join (',', @$emails);
+
+# read more command-line arguments specific for this notifier
+my ($login_name);
+Getopt::Long::Configure ('no_ignore_case', 'pass_through');
+GetOptionsFromArray (\@ARGV,
+                     'login=s' => \$login_name,
+    );
+LOGDIE ("Missing parameter '-login' with hostname or user\@hostname\n")
+    unless $login_name;
+
+# input file with the notification message
+open (my $msg, '<', $msgfile)
+    or LOGDIE ("Cannot open file '$msgfile' with the notification message: $!\n");
+
+# output stream to the 'ssh' command
+my @command = ('ssh', $login_name, 'mail', '-s', "'$subject'", $list_of_emails);
+DEBUG ("[$0] Command: " . join (' ', @command));
+open (my $ssh, '|-', @command);
+
+# send the message
+while (<$msg>) {
+    print $ssh $_;
+}
+close SSH;
+close $msg;
+
+INFO ("[$0] $subject: $list_of_emails");
+
+__END__
+
+echo "Body of the message" | ssh senger@open-bio.org mail -s 'Testing 2' martin.senger@gmail.com

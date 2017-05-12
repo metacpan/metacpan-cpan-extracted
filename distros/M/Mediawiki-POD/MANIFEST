@@ -1,0 +1,31 @@
+.htaccess
+Build.PL
+CHANGES
+extensions/POD.php
+extensions/podcnv
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Build.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Mediawiki/POD.pm
+lib/Mediawiki/POD/HTML.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data
+README
+SIGNATURE
+t/00_basic.t			basic podcnv tests
+t/01_pod.t
+t/02_html.t
+t/03_graphs.t
+t/pod.t
+t/pod/common.pod
+t/pod/split.pod
+t/pod_cov.t

@@ -1,0 +1,16 @@
+RM_F = perl -MExtUtils::Command -e rm_f
+EXE_FILES = sum1.exe sum2.exe sum3.exe sum4.exe sum5.exe
+OBJ_FILES = sum1.obj sum2.obj sum3.obj sum4.obj sum5.obj
+
+.SUFFIXES: .exe .obj .asm 
+
+all: $(EXE_FILES)
+
+.obj.exe:
+	link /NOLOGO $<;
+
+.asm.obj:
+	masm $<;
+
+clean:
+	$(RM_F) $(EXE_FILES) $(OBJ_FILES)

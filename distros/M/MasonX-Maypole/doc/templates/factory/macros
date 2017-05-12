@@ -1,0 +1,117 @@
+[%#
+
+=head1 MACROS
+
+These are some default macros which are used by various templates in the
+system.
+
+=head2 link
+
+This creates an <A HREF="... to a command in the Apache::MVC system by
+catenating the base URL, table, command, and any arguments.
+
+#%]
+[%
+MACRO link(table, command, additional, label) BLOCK;
+    SET lnk = base _ "/" _ table _ "/" _ command _ "/" _ additional;
+    lnk = lnk | uri | html;
+    '<a href="' _ lnk _ '">';
+    label;
+    "</a>";
+END;
+%]
+
+[%#
+
+=head2 maybe_link_view
+
+C<maybe_link_view> takes something returned from the database - either
+some ordinary data, or an object in a related class expanded by a
+has-a relationship. If it is an object, it constructs a link to the view
+command for that object. Otherwise, it just displays the data.
+
+#%]
+
+[%
+MACRO maybe_link_view(object) BLOCK;
+    IF object.table; # It's an object, i.e. a has-a
+        link(object.table, "view", object.id, object);
+    ELSE;
+        object;
+    END;
+END;
+%]
+
+[%#
+
+=head2 display_line
+
+C<display_line> is used in the list template to display a row from the
+database, by iterating over the columns and displaying the data for each
+column. It misses out the C<id> column by default, and magically
+URLifies columns called C<url>. This may be considered too much magic
+for some.
+
+#%]
+[% MACRO display_line(item) BLOCK;
+    FOR col = classmetadata.list_columns;
+        NEXT IF col == "id";
+        "<td>";
+        IF col == "url" AND item.url;
+            '<a href="'; item.url; '"> '; item.url; '</a>';
+        ELSIF col == item.stringify_column;
+            maybe_link_view(item);
+        ELSE;
+            maybe_link_view(item.$col);
+        END;
+        "</td>";
+    END;
+    '<td class="actions">';
+    button(item, "edit");
+    button(item, "delete");
+    "</td>";
+END %]
+[%#
+
+=head2 button
+
+This is a generic button, which performs an action on an object.
+
+=cut
+
+#%]
+[% MACRO button(obj, action) BLOCK; %]
+<form class="actionform" action="[% base %]/[% obj.table %]/[% action %]/[% obj.id %]" method="post">
+<div class="field"><input class="actionbutton" type="submit" value="[% action %]" /></div></form>
+[% END %]
+[%#
+
+=head2 view_related
+
+This takes an object, and looks up the C<related_accessors>; this should
+give a list of accessors that can be called to get a list of related
+objects. It then displays a title for that accessor, (i.e. "Beers" for a
+brewery) calls the accesor, and displays a list of the results. 
+
+=cut
+
+#%]
+[% 
+MACRO view_related(object) BLOCK;
+    FOR accessor = classmetadata.related_accessors.list;
+        "<div id=\"subtitle\">"; accessor | ucfirst; "</div>\n";
+        "<ul id=\"vlist\">";
+        FOR thing = object.$accessor;
+            "<li>"; maybe_link_view(thing); "</li>\n";
+        END;
+        "</ul>";
+    END; 
+END;
+
+MACRO test_xxxx(myblock) BLOCK;
+    FOR col = classmetadata.columns;
+        NEXT IF col == "id";
+        myblock;
+    END;
+END;
+%]

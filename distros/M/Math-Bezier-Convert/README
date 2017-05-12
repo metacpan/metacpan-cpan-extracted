@@ -1,0 +1,13 @@
+Math:Bezier::Convert - Convert cubic and quadratic bezier each other.
+
+Install:
+
+  perl Makefile.PL
+  make
+  make install
+
+There isn't test scripts yet.  Sample script with Tk is in ./samples 
+directory, instead.
+See perldoc Math:Bezier::Convert for further information.
+
+Yasuhiro Sasama (ySas), <ysas@nmt.ne.jp>

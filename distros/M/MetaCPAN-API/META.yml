@@ -1,0 +1,41 @@
+---
+abstract: 'A comprehensive, DWIM-featured API to MetaCPAN (DEPRECATED)'
+author:
+  - 'Sawyer X <xsawyerx@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::Fatal: 0
+  Test::More: 0
+  Test::RequiresInternet: 0
+  Test::TinyMocker: 0
+  perl: 5.006
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MetaCPAN-API
+no_index:
+  file:
+    - README.pod
+requires:
+  Carp: 0
+  HTTP::Tiny: 0
+  JSON: 0
+  Moo: 1.000001
+  Moo::Role: 0
+  Try::Tiny: 0
+  Types::Standard: 0
+  URI::Escape: 0
+  namespace::autoclean: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/xsawyerx/metacpan-api.git
+version: 0.50
+x_deprecated: 1

@@ -1,0 +1,655 @@
+#!perl
+use strict;
+use warnings FATAL => 'all';
+use diagnostics;
+use MarpaX::Languages::C::Scan;
+use Getopt::Long;
+use Pod::Usage;
+use POSIX qw/EXIT_FAILURE EXIT_SUCCESS/;
+use Config;
+use IO::String;
+use File::Basename;
+use File::Temp;
+use Log::Any qw/$log/;
+use Log::Any::Adapter;
+use Log::Log4perl qw/:easy/;
+use XML::LibXML;
+
+# ABSTRACT: C Header file transformation
+
+our $VERSION = '0.47'; # VERSION
+
+# PODNAME: csl
+
+my $help = 0;
+my $cpprun = undef;
+my @cppflags = ();
+my $filter = undef;
+my $prefix = 'csl_';
+my $anon = '__ANON__';
+my @print = ();
+my @target = ();
+my %targetopt = ();
+my $out = '';
+my $err = '';
+my $loglevel = 'WARN';
+my $logstderr = 0;
+my $enumType = 'int';
+my $lazy = 0;
+my @typedef = ();
+my @enum = ();
+my @xsltDirectories = ();
+my $module = '';
+
+# --------------------------
+# Parse command-line options
+# --------------------------
+Getopt::Long::Configure("pass_through");
+GetOptions ('help!' => \$help,
+            'module=s' => \$module,
+            'cpprun=s' => \$cpprun,
+            'cppflags=s' => \@cppflags,
+            'lazy!' => \$lazy,
+            'print=s' => \@print,
+            'typedef=s' => \@typedef,
+            'enum=s' => \@enum,
+            'xsltdir=s' => \@xsltDirectories,
+            'filter=s' => \$filter,
+            'prefix=s' => \$prefix,
+            'anon=s' => \$anon,
+            'target=s' => \@target,
+            'targetopt=s' => \%targetopt,
+            'loglevel=s' => \$loglevel,
+            'debug' => sub { $loglevel = 'DEBUG' },
+            'info' => sub { $loglevel = 'INFO' },
+            'warn' => sub { $loglevel = 'WARN' },
+            'error' => sub { $loglevel = 'ERROR' },
+            'fatal' => sub { $loglevel = 'FATAL' },
+            'trace' => sub { $loglevel = 'TRACE' },
+            'logstderr!' => \$logstderr,
+            'enumType=s' => \$enumType,
+            'out=s' => \$out,
+            'err=s' => \$err);
+
+@xsltDirectories = grep {$_ && "$_"} split(/,/, join(',', @xsltDirectories));
+@typedef = grep {$_ && "$_"} split(/,/, join(',', @typedef));
+@enum = grep {$_ && "$_"} split(/,/, join(',', @enum));
+
+#
+# Do redirection asap, i.e. now, err first, unless help is requested
+#
+my $saveerr = undef;
+my $saveout = undef;
+
+if (! $help) {
+    my $saveerr = _redirect(\*STDERR, $err);
+    my $saveout = _redirect(\*STDOUT, $out);
+
+    sub END {
+        _unredirect(\*STDOUT, $saveout);
+        _unredirect(\*STDERR, $saveerr);
+    }
+}
+
+# --------------------------
+# Init
+# --------------------------
+my $defaultLog4perlConf = <<DEFAULT_LOG4PERL_CONF;
+log4perl.rootLogger              = $loglevel, Screen
+log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
+log4perl.appender.Screen.stderr  = $logstderr
+log4perl.appender.Screen.layout  = PatternLayout
+log4perl.appender.Screen.layout.ConversionPattern = %d %-5p %6P %m{chomp}%n
+DEFAULT_LOG4PERL_CONF
+Log::Log4perl::init(\$defaultLog4perlConf);
+Log::Any::Adapter->set('Log4perl');
+
+if (! @ARGV) {
+  #
+  # Assume STDIN
+  #
+  push(@ARGV, '-');
+}
+
+my $guard = quotemeta('(if you read this message, do not worry: this is replaced by correct value at run-time)');
+my $pod = do {local $/; <DATA>};
+$pod =~ s/\$CPPRUN\b\s*$guard/$Config{cpprun}/g;
+$pod =~ s/\$CPPFLAGS\b\s*$guard/$Config{cppflags}/g;
+my $podfh = IO::String->new($pod);
+pod2usage(-verbose => 2, -noperldoc => 1, -input => $podfh, -exitval => EXIT_SUCCESS) if ($help);
+
+#
+# If there is more than one thing in @ARGV, assume these are (@cppflags, $file)
+#
+if ($#ARGV > 0) {
+  push(@cppflags, splice(@ARGV, 0, $#ARGV));
+}
+
+#
+# If filter starts with '/' assume this is a regexp
+# -------------------------------------------------
+if (defined($filter)) {
+    if (substr($filter, 0, 1) eq '/') {
+        $filter = eval "qr$filter"; ## no critic (ProhibitStringyEval)
+        die $@ if ($@);
+    }
+}
+
+my %config = ();
+$config{cpprun} = $cpprun if (defined($cpprun));
+$config{cppflags} = join(' ', @cppflags) if (@cppflags);
+$config{filename_filter} = $filter if (defined($filter));
+$config{enumType} = $enumType if (defined($enumType));
+$config{asDOM} = 1;
+$config{lazy} = $lazy if ($lazy);
+$config{typedef} = \@typedef if (@typedef);
+$config{enum} = \@enum if (@enum);
+$config{xsltDirectories} = \@xsltDirectories if (@xsltDirectories);
+
+# --------------------------
+# Parse C
+# --------------------------
+my $c = undef;
+my $input = shift;
+if (! $module) {
+  if ($input ne '-') {
+    $module = basename($input);
+    $module =~ s/\..*//;
+  } else {
+    $log->errorf('Please give a module name with --module option');
+    exit(EXIT_FAILURE);
+  }
+}
+my $tmp = undef;
+if (! defined($input) || $input eq '-') {
+  $tmp = File::Temp->new( UNLINK => 1, SUFFIX => '.c' ) || die "Cannot get a temporary file, $!";
+  print $tmp <STDIN> || $log->warnf('Cannot print to %s, %s', $tmp->filename, $!);
+  $input = $tmp->filename;
+}
+if (! defined($filter)) {
+  my $basename = basename($input);
+  my $quotedBasename = quotemeta($basename);
+  $filter = eval "qr/$quotedBasename/"; ## no critic (ProhibitStringyEval)
+  die $@ if ($@);
+  $config{filename_filter} = $filter;
+}
+$c = MarpaX::Languages::C::Scan->new(filename => $input, %config);
+if (defined($tmp)) {
+  close($tmp) || $log->warnf('Cannot close %s, %s', $tmp->filename, $!);
+}
+
+if (! defined($c)) {
+  exit(EXIT_FAILURE);
+}
+if (grep {$_ eq 'ast'} @print) {
+    print $c->astToString;
+}
+
+# --------------------------------
+# Get a concise view of the header
+# --------------------------------
+my $dom = _getConciseView($c);
+if (grep {$_ eq 'dom'} @print) {
+    print $dom->toString(1);
+}
+
+# --------------------------------
+# Generate target template
+# --------------------------------
+my $template = _generateTemplate($dom);
+if (grep {$_ eq 'template'} @print) {
+    print $template;
+}
+
+# --------------------------------
+# Generate targets
+# --------------------------------
+foreach (@target) {
+    my ($stylesheet, $result) = _generateTarget($c, $dom, $_);
+    if (defined($stylesheet) && defined($result) && grep {$_ eq 'target'} @print) {
+      print $stylesheet->output_as_chars($result);
+    }
+}
+
+# ================================
+# END
+# ================================
+exit(EXIT_SUCCESS);
+
+sub _redirect {
+    my ($fh, $filename) = @_;
+
+    my $savefh = undef;
+
+    if (defined($filename) && "$filename") {
+        if (! open($savefh, '>&', $fh)) {
+            warn "Cannot save $fh handle, $!";
+        } else {
+            if (! open($fh, '>', $filename)) {
+                warn "Cannot redirect $fh to $filename, $!";
+                if (! open($fh, '>&', $savefh)) {
+                    warn "Cannot restore $fh, $!";
+                }
+                $savefh = undef;
+            } else {
+                #
+                # Unbuffer the redirected filehandle
+                #
+                my $oldfh = select($fh);
+                $| = 1;
+                select($oldfh);
+            }
+        }
+    }
+    return $savefh;
+}
+
+sub _unredirect {
+    my ($fh, $savefh) = @_;
+
+    if (defined($savefh)) {
+        if (! close($fh)) {
+            warn "Cannot close $fh";
+        }
+        #
+        # Unredirect anyway
+        #
+        if (! open($fh, '>&', $savefh)) {
+            warn "Cannot restore $fh, $!";
+        }
+    }
+}
+
+sub _getConciseView {
+  my ($c, $dom, $stylesheet, $anonCounter, $recurseNb) = @_;
+
+  $dom       //= $c->ast;
+  $recurseNb //= 0;
+
+  $stylesheet //= eval {$c->xslt("csl.xsl")};
+  if ($@) {
+    $log->fatalf('%s', $@);
+    exit(EXIT_FAILURE);
+  }
+  $anonCounter //= 0;
+
+  XML::LibXSLT->register_function("urn:csl", "anon",
+                                  sub {
+                                    return $anon;
+                                  });
+  XML::LibXSLT->register_function("urn:csl", "tracef",
+                                  sub {
+                                    my $format = shift;
+                                    #
+                                    # Force stringification in case of an XML object
+                                    #
+                                    $log->tracef("%s$format", '  ' x $recurseNb,  map { defined($_) ? "$_" : ''} @_);
+                                    return '';
+                                  });
+  XML::LibXSLT->register_function("urn:csl", "warnf",
+                                  sub {
+                                    my $format = shift;
+                                    #
+                                    # Force stringification in case of an XML object
+                                    #
+                                    $log->warnf($format, map { defined($_) ? "$_" : ''} @_);
+                                    return '';
+                                  });
+  XML::LibXSLT->register_function("urn:csl", "getAnonIdentifier",
+                                  sub {
+                                    ++$anonCounter;
+                                    return "$anon$anonCounter";
+                                  });
+  XML::LibXSLT->register_function("urn:csl", "fileOk",
+                                  sub {
+                                    my ($file) = @_;
+                                    return $c->fileOk($file);
+                                  });
+  XML::LibXSLT->register_function("urn:csl", "recurse",
+                                  sub {
+                                    my ($this) = @_;
+                                    my $string = defined($this) ?
+                                      ((ref($this) eq 'XML::LibXML::NodeList') ?
+                                       join("\n", map {$_->toString(1)} $this->get_nodelist)
+                                       :
+                                       (ref($this) eq 'XML::LibXML::Node') ?
+                                       $this->toString(1)
+                                       :
+                                       '<not supported>: ' . ref($this)
+                                      )
+                                      :
+                                      '<undef>';
+                                    my $dom = XML::LibXML->load_xml(string => $string);
+                                    #
+                                    # In the recurse move we only want to see inner <identifiers>
+                                    #
+                                    ++$recurseNb;
+                                    my $thisDom = _getConciseView($c, $dom, $stylesheet, $anonCounter, $recurseNb);
+                                    my $thisCsl = $thisDom->firstChild;
+                                    my $thisIdentifiers = $thisCsl->firstChild;
+                                    my $toString = $thisIdentifiers->toString(1);
+                                    $log->tracef('recurse output: %s', $toString);
+                                    --$recurseNb;
+                                    return $toString;
+                                  });
+  my $result = eval {$stylesheet->transform($dom)};
+  if ($@) {
+    $log->fatalf('%s', $@);
+    exit(EXIT_FAILURE);
+  }
+  $log->tracef('%s', $stylesheet->output_as_bytes($result));
+  my $rc = XML::LibXML->load_xml(string => $stylesheet->output_as_bytes($result));
+  return $rc;
+}
+
+sub _generateTemplate {
+  my ($dom) = @_;
+
+    XML::LibXSLT->register_function("urn:csl", "prefix",
+                                    sub {
+                                        return $prefix;
+                                    });
+
+
+  my $stylesheet = eval {$c->xslt("cslTemplate.xsl")};
+  if ($@) {
+    $log->fatalf('%s', $@);
+    exit(EXIT_FAILURE);
+  }
+
+  my $result = eval {$stylesheet->transform($dom)};
+  if ($@) {
+    $log->fatalf('%s', $@);
+    exit(EXIT_FAILURE);
+  }
+  $log->tracef('%s', $stylesheet->output_as_bytes($result));
+  my $rc = $stylesheet->output_as_bytes($result);
+  return $rc;
+}
+
+sub _generateTarget {
+    my ($c, $dom, $target) = @_;
+
+    XML::LibXSLT->register_function("urn:csl", "prefix",
+                                    sub {
+                                        return $prefix;
+                                    });
+
+
+    XML::LibXSLT->register_function("urn:csl", "module",
+                                    sub {
+                                        return $module;
+                                    });
+
+
+    XML::LibXSLT->register_function("urn:csl", "localtime",
+                                    sub {
+                                        return '' . localtime;
+                                    });
+
+
+    my $stylesheet = eval {$c->xslt("$target.xsl")};
+    if ($@) {
+        $log->errorf('%s', $@);
+    } else {
+        my $result = eval {$stylesheet->transform($dom)};
+        if ($@) {
+            $log->errorf('%s', $@);
+        } else {
+          return ($stylesheet, $result);
+        }
+    }
+}
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+csl - C Header file transformation
+
+=head1 VERSION
+
+version 0.47
+
+=head1 AUTHOR
+
+Jean-Damien Durand <jeandamiendurand@free.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Jean-Damien Durand.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+__DATA__
+
+# --------------------------------------------------------------------------------------
+
+=head1 NAME
+
+csl - C Header file transformation
+
+=head1 SYNOPSIS
+
+ csl [options] [file]
+
+ Startup Options:
+   --help                Brief help message.
+   --module <argument>   Module name.
+   --cpprun <argument>   Preprocessor run command.
+   --cppflags <argument> Preprocessor flags.
+   --filter <argument>   File to look at after preprocessing.
+   --prefix <argument>   Prefix added to target language declarations.
+   --anon <argument>     String prepended to anonymous structures or unions.
+   --target <language>   Target language.
+   --targetopt <options> Target language specific options.
+   --out <argument>      Redirect any output to this filename.
+   --err <argument>      Redirect any error to this filename.
+   --loglevel <level>    A level that has to be meaningful for Log::Log4perl, typically DEBUG, INFO, WARN, ERROR, FATAL or TRACE.
+   --logstderr           Logs to stderr or not.
+   --enumType            Type for enumerators.
+   --xsltdir             Comma separated list of XSLT search directories
+
+ Aliased options:
+   --debug              Alias to --loglevel DEBUG
+   --info               Alias to --loglevel INFO
+   --warn               Alias to --loglevel WARN
+   --error              Alias to --loglevel ERROR
+   --fatal              Alias to --loglevel FATAL
+   --trace              Alias to --loglevel TRACE
+
+ Advanced options:
+   --print              Print out result of intermediate steps.
+   --lazy               Instruct the parser to try all alternatives on typedef/enum/identifier
+   --typedef <typedef>  Comma separated list of known typedefs
+   --enum <enums>       Comma separated list of known enums
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+This help
+
+=item B<--module <argument>>
+
+Module name. Default is the input's basename without extension if input is not "-".
+
+=item B<--cpprun <argument>>
+
+cpp run command. Default is the value when perl was compiled, i.e.:
+
+$CPPRUN (if you read this message, do not worry: this is replaced by correct value at run-time)
+
+This option can be repeated.
+
+=item B<--cppflags <argument>>
+
+cpp flags. Default is the value when perl was compiled, i.e.:
+
+$CPPFLAGS (if you read this message, do not worry: this is replaced by correct value at run-time)
+
+=item B<--filter <argument>>
+
+File to look at after proprocessing. Defaults to basename of file argument.
+
+csl is using the preprocessor. Every #include statement in your original source code is telling the preprocessor to look at another file, this is marked down by a line like:
+
+ #line ... "information on the file processed"
+
+in the generated output. The --filter argument is used to select which processed files is/are of interest. If $filter is starting with a slash "/" it is assumed to be a full regular expression (including modifier flags). The regexp can be used to handle the case of multiple input files.
+
+In case the file you parse I<already> contains preprocessing information, for example a generated C source code from a source file xxx.w, then you migh want to say: --filter xxx.w, or --filter '/xxx\\.w$/'
+
+=item B<--prefix <argument>>
+
+Prefix added to any declaration added by csl. Default is "csl_".
+
+=item B<--anon <argument>>
+
+String prepended to anonymous structures or unions. Default is "__ANON__".
+
+=item B<--target <targetLanguage>>
+
+Target language. Can be repeated.
+
+=item B<--targetopt <opt>>
+
+Target language specific options. Can be repeated. The following options are required:
+
+=over
+
+=item B<--targetopt package=XXX>
+
+where XXX is a package name. Typically the basename of a header file, without the extension.
+
+=back
+
+=item B<--out <argument>>
+
+Redirect any output to this filename.
+
+=item B<--err <argument>>
+
+Redirect any error to this filename.
+
+=item B<--loglevel level>
+
+A level that has to be meaningful for Log::Log4perl, typically DEBUG, INFO, WARN, ERROR, FATAL or TRACE.
+Default is WARN.
+
+Note that tracing Marpa library itself is possible, but only using environment variable MARPA_TRACE /and/ saying --loglevel TRACE.
+
+In case of trouble, typical debugging phases are:
+--loglevel INFO
+then:
+--loglevel DEBUG
+then:
+--loglevel TRACE
+
+=item B<--debug>
+
+Shortcut for --loglevel DEBUG
+
+=item B<--info>
+
+Shortcut for --loglevel INFO
+
+=item B<--warn>
+
+Shortcut for --loglevel WARN
+
+=item B<--error>
+
+Shortcut for --loglevel ERROR
+
+=item B<--fatal>
+
+Shortcut for --loglevel FATAL
+
+=item B<--trace>
+
+Shortcut for --loglevel TRACE
+
+=item B<--logstderr>
+
+Log to stderr or not. Default is a false value.
+
+=item B<--enumType>
+
+Type for enumerators. Default is 'int'.
+
+=item B<--xsltdir directories>
+
+Comma separated list of XSLT search path. Can be repeated. Default is an empty list.
+
+=item B<--lazy>
+
+Instruct the parser to try all alternatives on typedef/enum/identifier. Default is a false value.
+
+=item B<--print>
+
+Print out result of intermediate steps. Can be repeated. Supported values are:
+
+=over
+
+=item B<ast>
+
+Raw AST, in XML format, of the input.
+
+=item B<dom>
+
+Transformed AST of the input, in XML format, that will be sent to the template engine.
+
+=back
+
+=item B<--typedef typedefs>
+
+Comma separated list of known typedefs. Can be repeated. Default is an empty list.
+
+=item B<--enum enums>
+
+Comma separated list of known enums. Can be repeated. Default is an empty list.
+
+=back
+
+=head1 EXAMPLES
+
+ csl                                                                  /tmp/file.c --target lua
+ csl --cppflags "-I/tmp/dir1            -DMYDEFINE"                   /tmp/file.c --target marpa
+ csl --cppflags  -I/tmp/dir1 --cppflags -DMYDEFINE                    /tmp/file.c --target perl5 --print ast --print dom
+ csl --cppflags  -I/tmp/dir1 --cppflags -DMYDEFINE --filter '/\.H$/i' /tmp/file.c --target java
+
+=head1 NOTES
+
+Any unknown option on the command line is passed through to --cppflags. I.e.:
+
+ csl --cppflags  -I/tmp/dir1 --cppflags -DMYDEFINE /tmp/file.c
+
+and
+
+ csl -I/tmp/dir1 -DMYDEFINE /tmp/file.c
+
+are equivalent. A restriction is that the filename must be the last argument.
+
+=head1 NOTES
+
+=over
+
+=item
+
+If last argument is absent or equal to '-' and if there is no '--in' option value, then STDIN is assumed.
+
+=back
+
+=head1 SEE ALSO
+
+L<MarpaX::Languages::C::Scan>
+
+L<XML::LibXSLT>

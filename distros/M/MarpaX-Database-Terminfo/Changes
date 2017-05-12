@@ -1,0 +1,174 @@
+Changelog for MarpaX-Database-Terminfo
+
+0.012 2016-09-08T07:53:50
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - untabify
+ - Untaint
+ - Switch to Sereal - encoding bytes for build
+ - Switch to Sereal - fixes #2
+
+0.011 2016-09-04T07:40:36Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Disable CheckExtraTests
+ - POD spelling
+ - no tab
+ - Closes #1
+ - storable files are bytes encoded
+
+0.010 2013-08-22T22:13:40Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Make sure nullcount is an integer
+ - t/tputs_delay_PC.t needs a fixed ospeed for a successful test
+
+0.009 2013-08-22T21:35:13Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.009
+ - Fix for escaped characters within constants
+ - Update using real perl chars
+ - Survey of new distrib via cpan testers log.txt
+ - Suppression of charnames, generate code using real perl chars, because
+   perl already knows -;
+ - script/*pl exclude from distribution
+
+0.008 2013-08-22T08:58:46Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.008
+ - use full NAME instead of alias in charname
+ - char2charname.pl
+
+0.007 2013-08-21T21:58:30Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.007
+ - xtest compliance
+ - use Test::File::ShareDir
+ - POD fix
+ - network order for Storable
+ - Generated missing comment
+
+0.006 2013-08-21T10:34:00Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.006
+ - Marpa::R2 DSL compliance
+ - In POD, "terminfo x variable" -> "x variable"
+ - POD typo
+ - tvxxx test suite
+ - $self->tvxxxx normalisation: always returns true if found, false if not
+   found
+ - Preparation for use_env
+ - addPercentToRc: add a missing comment in generated code
+ - Fix error in addPushConst
+ - Fix indentation
+ - Removed unused method _doIndent
+ - _get_ospeed_and_baudrate environment variables fix
+ - A little better _get_ospeed_and_baudrate()
+ - use_env
+ - xtest compliance
+ - putp
+ - xtest compliance
+ - bsd_tputs, tputs fixes
+ - POD fixes, inversion of tgoto() arguments
+ - main_module is lib/MarpaX/Database/Terminfo/Interface.pm
+ - Fix indices on staticp and dynamicp
+ - renamed
+ - test the pure txt version of stubs
+ - rename
+ - xtest compliance
+ - More eval and failover
+ - xtest compliance and two ## no critic for eval
+ - xtest compliance
+ - Fix in untained mode, removed $log statements from stubs
+ - Removed $log statement
+ - A lot of stuff about stubs
+ - use pre computed stubs
+ - use pre computed stubs
+ - xtest compliance
+ - new stopwords
+ - stubs generation and shared files
+ - Use our parsing technique instead of perl version of GNU ncurses
+ - Order the tests by alias
+ - Use the real escape character
+ - Octal characters and not integer, debugf to tracef
+ - Octal characters and not integer
+ - String grammar and actions
+ - Character constants
+ - Doc touch up
+ - xtest compliance
+ - tparm and al.
+ - Moving from Class::Singleton to classic OO
+ - tgetstr and tigetstr compliance with the standard
+ - Try to change author so that I do not appear also as author and
+   contributor
+ - xtest compliance
+ - tiget family
+ - Allow internal routine _tget() to look into terminfo, termcap or
+   variable via a parameter, preparation for tgoto and al.
+ - Document that termcap and variable entries are automatically derived
+   using the caps parameter of _new_instance()
+ - Optional filehandle to POSIX::Termios::getattr()
+ - Support of $ENV{TERMINFO_BAUDRATE}
+ - Play with pos() on $areap
+ - PC, UP, BC, ospeed and baudrate initializations
+ - xtest compliance
+ - tget* interfaces
+ - Caps files
+ - {MARPAX_DATABASE_TERMINFO_BIN} and tgetent(() as exported
+ - feature in now an array
+ - feature is now an array, use terminfo constants
+ - Terminfo constants
+ - If boolean ends with '@' then it is explicitely false
+ - Add emacs backup files
+ - tgetent() prototype
+ - Value returned by Marpa is also a reference
+ - Oups, one level of reference too much
+ - POD fix
+
+0.005 2013-08-11T22:35:03Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.005
+ - share/ncurses-terminfo.storable is build manually, letting it here but
+   commented
+ - Commented Run::BeforeBuild, added share/ncurses-terminfo.storable, yet
+   another attempt to get dirty file commited at release
+ - pre-digested ncurses database using Storage
+ - Centralized regexps
+ - ncurses.t becomes script/do_ncurses.pl
+ - Get a beautiful array of hash from parse-tree value
+ - Revert "Reduce the number of callbacks to userspace" This reverts commit
+   7b6bf05d4862046c1768986e1f5ddb0a54d83011.
+ - Reduce the number of callbacks to userspace
+ - Again a fix to README.pod and META.json for dzil release
+
+0.004 2013-08-08T17:19:27Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Enabled CheckChangesHasContent and CheckExtraTests - Enabled
+   CheckChangesHasContent and CheckExtraTests
+
+0.003 2013-08-08T16:59:04Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - CopyFilesFromBuild / README.pod - Quicker regexp - CopyFilesFromBuild /
+   README.pod - Quicker regexp
+
+0.002 2013-08-08T11:49:51Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Remove Log::Log4perl from t/ncurses.t - Backskashed three octal digits -
+   Escape characters fix: escape char is ^, and there is a fixed list of
+   allowed backslashed characters - use terminfo.src from ncurses-5.9 - SEE
+   ALSO section - Favor README.pod instead of README.md - ncurses.t -
+   Ncurses extension, escapes comma, move everything to G1 - Remove
+   Log::Log4perl from t/ncurses.t - Backskashed three octal digits - Escape
+   characters fix: escape char is ^, and there is a fixed list of
+ - allowed backslashed characters - use terminfo.src from ncurses-5.9 - SEE
+   ALSO section - Favor README.pod instead of README.md - ncurses.t -
+   Ncurses extension, escapes comma, move everything to G1
+
+0.001 2013-08-07T09:54:41Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Add README.pod - Initial Changes and META.json - Corrected  .gitignore -
+   Removed non needed use Data::Dumper - Updated test - Doc - test unit
+   from HP man page - Renamed main.t to test1.t - Add spaces to MAXMATCH
+   stuff - No need of character class InSeparator - space optional after
+   comma at longname lookahead - lookahead of comma to longname - First
+   version - Initial commit
+
+ [jddurand <jeandamiendurand@free.fr>]
+ - Initial commit

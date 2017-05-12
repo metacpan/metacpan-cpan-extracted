@@ -1,0 +1,325 @@
+1.29  2016-06-28
+ - Keep document's members order when doing an insert (thanks Stefan)
+ - Improve Mango->new documentation to explain why you need to use a
+   helper sub (#17)
+
+1.28  2016-04-11
+ - Fix a BSON to JSON encoding test case failure due to changes in
+   Mojolicious 6.58. (#16)
+
+1.27  2016-02-29
+ - Fix a reconnection error where Mango was trying to use an old
+   connection after a shutdown. Thanks to fortl.
+ - Fix a small bug in Mango::Bulk where connection errors would be
+   ignored resulting in a wrong error message. (#14)
+
+1.26  2016-02-25
+ - Fix potential code injection when deserializing regex
+
+1.25  2016-02-16
+ - Make Mango fork-safe again by fixing ObjectID generation which
+   I broke in the last update. Thanks to Andrey Khozov.
+
+1.24  2016-01-01
+ - Small optimization in ObjectID generation
+ - Fix Collection::rename (bug #12 - thanks Isage)
+ - Change 'insert' behavior to avoid modifying the original document
+   during serialization. The documentation has also been updated. (#11)
+ - Fix 2 tests which failed with newer versions of Mojolicious.
+
+1.23  2015-11-12
+ - Fix a nasty bug where Mango would not finish to authenticate to the
+   server before sending the first request, resulting in an authentication
+   error. More details in bug #10 on Github.
+ - Small documentation fix thanks to Mohammad S Anwar.
+
+1.22  2015-11-06
+ - Fix test with BSON encoding of NaN with perl 5.23+
+ - Handle the deprecated BSON type 'Undefined' (very rare case)
+ - Fix BSON types MinKey and MaxKey. Their value was switched.
+
+1.21  2015-11-04
+ - Add new subs: bson_int32, bson_int64 and bson_double to force the
+   type of a numeric value. This is useful when your database is used
+   by strongly typed applications.
+ - Randomize the ObjectID counter at startup (as required by the MongoDB specs)
+
+1.20  2015-08-04
+ - Fix failing test case when Authen::SCRAM is not installed
+
+1.19  2015-08-03
+ - Fix packaging issue: Auth::SCRAM was missing from v1.18
+
+1.18  2015-06-04
+ - Added support for SCRAM-SHA-1 authentication using Authen::SCRAM (alexbyk)
+   The old MONGODB-CR method has been removed.
+ - Removed Mango::credentials
+ - Fix potential DoS attack by properly checking the ObjectID format.
+   Details here: http://sakurity.com/blog/2015/06/04/mongo_ruby_regexp.html
+ - A few documentation changes
+
+1.17  2015-03-23
+ - ACHTUNG! MongoDB 3.0+ is now requiered.
+   Older versions are no longer supported.
+ - Added Mango::Database::list_collections to query collections with
+   a Mango::Cursor with optional filtering.
+ - Mango::Database::collection_names also gains optional filtering.
+ - Improved Mango::Collection::index_information to accept a maximum
+   number of results, and to be faster (alexbyk).
+ - Breaking change: Mango::Collection::options now returns the short name
+   of the collection instead of the full_name (alexbyk).
+ - Added Mango::Collection::rename.
+
+1.16  2015-02-03
+  - Fix git repository in Makefile.PL
+
+1.15  2014-10-01
+  - New Github repository: https://github.com/oliwer/mango
+  - Mango::Cursor::Query attributes 'fields' and 'query' are now
+    undefined by default. Thanks to alexbyk.
+
+1.14  2014-09-22
+  - Fixed packaging bug.
+
+1.13  2014-09-21
+  - Updated Makefile.PL for version 2 of the CPAN distribution metadata
+    specification.
+
+1.12  2014-09-12
+  - Fixed small connection management bug.
+
+1.11  2014-09-11
+  - Fixed test that was depending on Mojolicious internals.
+
+1.10  2014-09-06
+  - Added module Mango::Cursor::Query.
+
+1.09  2014-09-01
+  - Improved Makefile.PL error message for 64-bit requirement.
+
+1.08  2014-08-24
+  - Improved to_datetime method in Mango::BSON::Time to be able to handle
+    higher precision times.
+
+1.07  2014-08-23
+  - Fixed small JSON serialization bug in Mango::BSON::Time.
+
+1.06  2014-08-22
+  - Added to_datetime method to Mango::BSON::Time.
+
+1.05  2014-08-10
+  - Added read_preference attribute to Mango::Cursor.
+
+1.04  2014-07-25
+  - Fixed connection leak.
+
+1.03  2014-07-25
+  - Improved Mango to avoid secondary nodes.
+
+1.02  2014-07-24
+  - Fixed version handling in Mango::GridFS.
+
+1.01  2014-06-28
+  - Improved update method in Mango::Collection to accept object ids.
+    (alexbyk)
+  - Fixed small bug in Mango::Cursor where callbacks would sometimes get the
+    wrong number of arguments.
+
+1.0  2014-06-24
+  - Removed experimental status from distribution.
+
+0.43  2014-06-15
+  - Improved remove method in Mango::Collection to accept object ids.
+
+0.42  2014-06-04
+  - Added md5 method to Mango::GridFS::Readers.
+  - Fixed bug in Mango::GridFS::Writer where files could get the wrong MD5
+    checksum.
+
+0.41  2014-06-02
+  - Added await_data attribute to Mango::Cursor.
+
+0.40  2014-05-31
+  - Added inactivity_timeout attribute to Mango.
+  - Fixed Mojolicious 5.0 support.
+
+0.39  2014-05-14
+  - Improved Mango::BSON performance.
+
+0.38  2014-05-12
+  - Changed heuristics for number detection in Mango::BSON to better line up
+    with user expectations.
+
+0.37  2014-05-12
+  - Added support for performing blocking and non-blocking operations at the
+    same time.
+
+0.36  2014-05-05
+  - Added support for TO_BSON method to Mango::BSON.
+
+0.35  2014-05-04
+  - Added num_to_return method to Mango::Cursor.
+  - Fixed bug where Mango::Cursor would request too many documents.
+
+0.34  2014-05-02
+  - Fixed bug where some Mango::Collection methods passed the wrong invocant
+    to callbacks. (alexbyk)
+
+0.33  2014-04-30
+  - Improved error message for old MongoDB versions.
+
+0.32  2014-04-24
+  - Added to_bytes method to Mango::BSON::ObjectID.
+  - Improved Mango::BSON performance.
+
+0.31  2014-04-23
+  - Improved support for pre-encoded BSON documents.
+
+0.30  2014-04-08
+  - Removed delete, insert and update methods from Mango.
+  - Removed build_delete, build_insert and build_update methods from
+    Mango::Protocol.
+  - Removed decode_int32, decode_int64, encode_int32 and encode_int64 methods
+    from Mango::BSON.
+  - Renamed timeout attribute in Mango::Cursor to max_time_ms.
+  - Added support for MongoDB 2.6 wire protocol, MongoDB 2.4 is no longer
+    supported.
+  - Added support for bulk operations.
+  - Added max_bson_size and max_write_batch_size attributes to Mango.
+  - Added build_write_concern method to Mango::Database.
+  - Added bulk method to Mango::Collection.
+  - Added write_error method to Mango::Protocol.
+  - Added bson_raw function to Mango::BSON.
+  - Improved aggregate method in Mango::Collection to return cursors by
+    default.
+  - Improved aggregate method in Mango::Collection with explain support.
+  - Improved connection management with wire protocol version check.
+  - Improved Mango::BSON performance.
+  - Improved command performance.
+  - Improved storage efficiency of Mango::GridFS::Writer by lowering the
+    default chunk size to 255KB.
+
+0.24  2014-02-27
+  - Added comment and timeout attributes to Mango::Cursor.
+
+0.23  2014-01-22
+  - Fixed a few small operator overloading bugs.
+
+0.22  2013-12-18
+  - Added options method to Mango::Collection.
+
+0.21  2013-12-04
+  - Improved handling of missing files in Mango::GridFS::Reader.
+
+0.20  2013-11-30
+  - Added from_string method to Mango.
+
+0.19  2013-11-18
+  - Improved Mango::Cursor to allow $query key in queries.
+
+0.18  2013-11-11
+  - Fixed concurrency bugs in Mango.
+  - Fixed bug in Mango::BSON where all objects that stringify to "1" were
+    considered booleans.
+
+0.17  2013-10-30
+  - Added cursor and collection support for aggregation.
+  - Added add_batch method to Mango::Cursor.
+  - Added from_epoch method to Mango::BSON::ObjectID.
+
+0.16  2013-10-12
+  - Added support for fallback servers.
+  - Fixed reconnect bugs.
+
+0.15  2013-10-11
+  - Fixed mongos compatibility bugs.
+
+0.14  2013-10-06
+  - Added DBRef support.
+  - Added dereference method to Mango::Database.
+  - Added bson_dbref function to Mango::BSON.
+
+0.13  2013-09-21
+  - Added fields argument to find and find_one methods in Mango::Collection.
+
+0.12  2013-08-17
+  - Fixed rewind bug in Mango::Cursor where the cursor would not be killed on
+    the server.
+
+0.11  2013-08-14
+  - Changed return values of remove and update methods in Mango::Collection.
+
+0.10  2013-08-06
+  - Improved connection management to be more fault-tolerant.
+
+0.09  2013-07-28
+  - Added connection event to Mango.
+  - Improved connection management to be fork-safe.
+
+0.08  2013-07-20
+  - Removed is_active method from Mango.
+  - Added max_scan attribute to Mango::Cursor.
+  - Added backlog method to Mango.
+
+0.07  2013-07-18
+  - Added is_closed method to Mango::GridFS::Writer.
+
+0.06  2013-07-17
+  - Added GridFS support.
+  - Added modules Mango::GridFS, Mango::GridFS::Reader and
+    Mango::GridFS::Writer.
+  - Added gridfs method to Mango::Database.
+  - Improved Mango::BSON performance. (avkhozov)
+  - Fixed non-blocking connection pool timing bug.
+  - Fixed ensure_index argument bug.
+
+0.05  2013-07-06
+  - Changed heuristics for number detection in Mango::BSON to better line up
+    with user expectations.
+  - Changed to_epoch in Mango::BSON::Time to return a high resolution time.
+  - Added connection pool support for non-blocking operations.
+  - Added max_connections attribute to Mango.
+  - Added drop_index, index_information and stats methods to
+    Mango::Collection.
+  - Added to_string method to Mango::BSON::ObjectID.
+  - Added to_string method to Mango::BSON::Time.
+  - Added stats method to Mango::Database.
+  - Added TO_JSON method to Mango::BSON::Binary.
+  - Added TO_JSON method to Mango::BSON::Time.
+  - Improved compatibility with Mojolicious 4.0.
+  - Improved Mango::BSON performance. (avkhozov)
+  - Improved Mango::BSON::ObjectID to validate object ids.
+  - Improved exception handling for commands.
+  - Fixed support for empty keys in Mango::BSON.
+  - Fixed a few memory leaks.
+
+0.04  2013-02-10
+  - Added collection_names method to Mango::Database.
+  - Added aggregate, build_index_name, find_and_modify map_reduce and save
+    methods to Mango::Collection.
+  - Added distinct method to Mango::Cursor.
+  - Changed remove and update methods in Mango::Collection to return the
+    number of documents affected.
+  - Fixed exception handling for commands.
+
+0.03  2013-02-09
+  - Added hint, snapshot and tailable attributes to Mango::Cursor.
+  - Added create, drop and ensure_index methods to Mango::Collection.
+  - Added build_query, clone and explain methods to Mango::Cursor.
+  - Added command_error and query_failure methods to Mango::Protocol.
+  - Fixed array encoding in Mango::BSON.
+  - Fixed small exception handling bugs in Mango.
+
+0.02  2013-02-07
+  - Added batch_size attribute to Mango::Cursor.
+  - Added count method to Mango::Cursor.
+  - Added next_id method to Mango::Protocol.
+  - Added multi and upsert options to update method in Mango::Collection.
+  - Added single option to remove method in Mango::Collection.
+  - Changed reply format from array to hash.
+  - Fixed a few exception handling bugs.
+  - Fixed limit functionality in Mango::Cursor.
+  - Fixed a few small timing bugs in Mango::Cursor.
+
+0.01  2013-02-06
+  - First release.

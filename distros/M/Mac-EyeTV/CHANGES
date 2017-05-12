@@ -1,0 +1,14 @@
+Revision history for Perl module Mac::EyeTV:
+
+0.30 Fri Dec  9 21:42:14 GMT 2005
+  - it's now possible to export and delete a programme
+  - new recordings method to view existing recordings
+
+0.29 Mon Jan  3 16:15:33 GMT 2005
+  - mention how to make Mac::Glue bindings and where to download
+    EyeTV from (thanks to Paul Mison)
+  - no longer use Mac::AppleScript's RunAppleScript (wow, that wasn't
+    so hard, thanks for pushing pudge)
+
+0.28 Wed Nov  3 19:12:28 GMT 2004 
+  - first release

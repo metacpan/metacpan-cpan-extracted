@@ -1,0 +1,138 @@
+Revision history for perl distribution Mandel
+
+0.29 2016-01-07T10:05:22+0100
+ - Fix all_document_names() will skip non-document classes
+
+0.28 2015-10-22T10:22:09+0200
+ - Fix adding already saved object to belongsTo relationship #27
+   Contributor: Huo Linhe
+ - Fix adding already saved object to hasMany relationship #27
+   Contributor: Huo Linhe
+
+0.27 2015-04-15T08:14:26+0200
+ - Deprecated plain "use Mandel;"
+
+0.26 2015-04-14T10:53:52+0200
+ - Add coercion support to fields #24
+   Contributor: Huo Linhe
+
+0.25 2015-03-01T17:56:17Z
+ - Fixed Document->get and Document->contains
+
+0.24 2015-03-01T17:52:44Z
+ - Compatible with Mojolicious 6.0
+
+0.23 2014-09-11T13:04:45Z
+ - Fix pushing object to ListOf relationship
+ - Change return value for BelongsTo get accessor: Now returns the saved
+   object.
+ - Change return value for HasOne get accessor: Now returns the saved
+   object.
+ - Mandel::Document will cache objects
+
+0.22 2014-09-10T16:40:05Z
+ - Fix missing dependencies
+ - Run perltidy on the codebase
+
+0.21 2014-09-10T15:50:50Z
+ - Fix document extends Contributor: Alexey Neyasov
+
+0.20 2014-05-08T19:26:11Z
+ - Add "builder" support to field.
+ - Remove "_build_data" from documentation.
+
+0.19 2014-04-26T18:28:58Z
+ - Fix DBRef in database: "$ref" did not have the right collection name
+
+0.18 2014-04-22T07:44:14Z
+ - Add EXPERIMENTAL ListOf relationship
+
+0.17 2014-04-14T17:14:45Z
+ - Improved DEBUG mode.
+
+0.16 2014-03-22T13:48:14Z
+ - Change use Mandel; will be deprecated
+ - Fix annoying perl warning on "use Mandel"
+
+0.15 2014-03-12T18:35:49Z
+ - Add more blocking methods Contributors: Joel Berger and Alexey Neyasov
+   https://github.com/jhthorsen/mandel/pull/9
+   https://github.com/jhthorsen/mandel/pull/12
+
+0.14 2014-03-05T06:57:04Z
+ - Add Mandel::Document::TO_JSON() Contributor: Sebastian Riedel -
+   https://github.com/jhthorsen/mandel/issues/10
+
+0.13 2014-03-02T16:25:48Z
+ - Add missing exception handling in HasOne relationship Contributor:
+   Sebastian Riedel - https://github.com/jhthorsen/mandel/issues/7
+ - Fix $col->remove() received $doc instead of $err in callback
+ - Fix documentation error Contributor: Alexey Neyasov -
+   https://github.com/jhthorsen/mandel/issues/8
+
+0.12 2014-02-20T14:28:55Z
+ - Add _build_data() for $document->data() default values
+ - Improved documentation
+
+0.11 2013-11-18T10:52:59Z
+ - Change Mandel::Model->field(): %meta need to be a hash-ref
+ - Change Mandel::Model->field(): Can retrive meta data for field
+ - Add Mandel::Model::Field
+
+0.10 2013-10-14T20:20:10Z
+ - Change Mandel::Collection::patch() works on search() arguments
+ - Add Mandel::Document->patch for updating partial documents
+
+0.09 2013-10-13T18:29:40Z
+ - Improved blocking support
+ - Fix Document->remove() and ->save(): Forgot to pass on $err
+
+0.08 2013-10-09T21:44:53Z
+ - Add support for setting belongs_to accessor to oid
+ - Fix Model->name() was not set when built from documents on disk
+
+0.07 2013-10-06T14:46:55Z
+ - Rename Model::add_field() to just field()
+ - Rename Document::_raw() to ::data()
+ - Relationships are now objects
+ - Change related documents are stored using a dbref
+
+0.06 2013-10-05T15:43:51Z
+ - Add support for isa. This also will force numbers to be coerced from
+   strings to actual numbers.
+ - Add support for perl -Mandel -e'...'
+ - Add support for blocking method call
+
+0.05 2013-10-05T13:02:14Z
+ - Change has_one/has_many documents point back to the "owner".
+ - Add belongs_to relationship
+
+0.04 2013-10-01T17:08:53Z
+ - Add support for has_one() and has_many('/json/pointer')
+ - Add support for MANDEL_CURSOR_DEBUG=1
+ - Add MYMETA* to MANIFEST.SKIP
+ - Add Model::new_collection()
+ - Rename Model::collection() to Model::collection_name
+
+0.03 2013-10-01T12:39:20Z
+ - Fix default collection name on custom document base class
+ - Add Mandel::Collection::patch()
+
+0.02 2013-09-28T12:02:38Z
+ - Add Mandel::Collection::save()
+ - Add Mandel::Document::contains()
+ - Add Mandel::connect(), remove ::uri()
+ - Add Mandel::model_class()
+ - Add Mandel::storage(), remove ::mango()
+ - Add builders for attributes, which makes it easier to customize in
+   subclass.
+ - Add support for custom base class for documents
+
+0.01 2013-09-27T18:55:40Z
+ - Released alpha software
+ - Add document model
+ - Add document base class
+ - Add collection managment
+ - Add cursor
+ - Add support for basic relationship: has_one and has_many
+

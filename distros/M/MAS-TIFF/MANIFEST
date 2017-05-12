@@ -1,0 +1,19 @@
+Build.PL
+COPYRIGHT
+lib/MAS/TIFF/Compression/LZW.pm
+lib/MAS/TIFF/DataType.pm
+lib/MAS/TIFF/Field.pm
+lib/MAS/TIFF/File.pm
+lib/MAS/TIFF/IFD.pm
+lib/MAS/TIFF/IO.pm
+lib/MAS/TIFF/Rational.pm
+Makefile.PL
+MANIFEST
+README.pod
+scripts/tryme.pl
+t/diffuse.tif
+t/lzw.t
+t/multi.tif
+t/noisy.tif
+t/original.tif
+META.yml                                 Module meta-data (added by MakeMaker)

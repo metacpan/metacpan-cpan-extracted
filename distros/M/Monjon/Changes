@@ -1,0 +1,37 @@
+Monjon
+======
+
+Created:      2014-04-14
+Home page:    <https://metacpan.org/release/Monjon>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Monjon>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.004	2014-09-15
+
+ [ Packaging ]
+ - Add repo link.
+ - Require at least Perl 5.6.
+
+0.003	2014-05-21
+
+ [ Documentation ]
+ - Document multiple-inheritance caveat.
+
+ [ Test Suite ]
+ - Moo is not going to support multi-inheritance well enough for Monjon any
+   time soon, so remove tests for it.
+
+ [ Packaging ]
+ - No longer require Moo 1.004_003. Moo 1.001000 should be sufficient.
+
+0.002	2014-04-16
+
+ [ Packaging ]
+ - Add Types::Standard to list of modules required for testing if either of
+   the AUTOMATED_TESTING or EXTENDED_TESTING environment variables are set
+   to true.
+
+ [ Other ]
+ - Load UNIVERSAL::DOES on Perl versions older than 5.10.
+
+0.001	2014-04-14	Initial release

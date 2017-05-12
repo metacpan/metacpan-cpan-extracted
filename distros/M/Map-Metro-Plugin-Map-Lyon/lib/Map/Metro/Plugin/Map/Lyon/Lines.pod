@@ -1,0 +1,102 @@
+
+# PODNAME: Map::Metro::Plugin::Map::Lyon::Lines
+# ABSTRACT: Lines and stations in the Lyon map
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Map::Metro::Plugin::Map::Lyon::Lines - Lines and stations in the Lyon map
+
+=head1 VERSION
+
+version 1.000
+
+=head1 LINES
+
+=head2 Line A: Perrache → Vaulx-en-Velin - La Soie [A]
+
+=for HTML <div style="background-color: #ee3898; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Perrache
+    Ampère - Victor Hugo
+    Bellecour                      (D)
+    Cordeliers
+    Hôtel de Ville - Louis Pradel  (C)
+    Foch
+    Masséna
+    Charpennes - Charles Hernu     (B)
+    République - Villeurbanne
+    Gratte-Ciel
+    Flachet
+    Cusset
+    Laurent Bonnevay - Astroballe
+    Vaulx-en-Velin - La Soie
+
+=head2 Line B: Charpennes - Charles Hernu → Gare d'Oullins [B]
+
+=for HTML <div style="background-color: #007dc5; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Charpennes - Charles Hernu          (A)
+    Brotteaux
+    Part-Dieu
+    Place Guichard - Bourse du Travail
+    Saxe - Gambetta                     (D)
+    Jean Macé
+    Place Jean Jaurès
+    Debourg
+    Stade de Gerland
+    Gare d'Oullins
+
+=head2 Line C: Cuire → Hôtel de Ville - Louis Pradel [C]
+
+=for HTML <div style="background-color: #f99d1d; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Cuire
+    Hénon
+    Croix-Rousse
+    Croix-Paquet
+    Hôtel de Ville - Louis Pradel  (A)
+
+=head2 Line D: Gare de Vaise → Gare de Vénissieux [D]
+
+=for HTML <div style="background-color: #00ac4d; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Gare de Vaise
+    Valmy
+    Gorge de Loup
+    Vieux Lyon - Cathédrale Saint-Jean
+    Bellecour                           (A)
+    Guillotière - Gabriel Péri
+    Saxe - Gambetta                     (B)
+    Garibaldi
+    Sans Souci
+    Monplaisir - Lumière
+    Grange Blanche
+    Laënnec
+    Mermoz - Pinel
+    Parilly
+    Gare de Vénissieux
+
+=head1 SEE ALSO
+
+=for :list * L<Map::Metro::Plugin::Map::Lyon>
+* L<Task::MapMetro::Maps>
+* L<Map::Metro>
+
+=head1 AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Philippe Bruhat (BooK) <book@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

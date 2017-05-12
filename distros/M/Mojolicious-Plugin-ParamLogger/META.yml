@@ -1,0 +1,27 @@
+---
+abstract: unknown
+author:
+  - 'Skye Shaw'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-ParamLogger
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '2.15'
+resources:
+  bugtracker: http://github.com/sshaw/Mojolicious-Plugin-ParamLogger/issues
+  homepage: http://github.com/sshaw/Mojolicious-Plugin-ParamLogger
+  repository: http://github.com/sshaw/Mojolicious-Plugin-ParamLogger
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,15 @@
+FSEvents *		T_FSEvents
+
+INPUT
+
+T_FSEvents
+	if (!(
+           SvROK ($arg)
+           && SvOBJECT (SvRV ($arg))
+           && sv_derived_from ($arg, \"Mac::FSEvents\")
+        ))
+          croak (\"object is not of type Mac::FSEvents\");
+        /**/
+        $var = (FSEvents *)SvPVX (SvRV ($arg));
+
+

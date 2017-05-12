@@ -1,0 +1,14 @@
+Revision history for Perl extension Mirror::YAML
+
+0.03 Sat 12 Apr 2008
+	- Added extensive POD documentation
+	- Bumped the YAML::Tiny dependency
+	- Switched to test_requires: deps.
+
+0.02 Sun 14 Jan 2007
+	- Renaming to Mirror::YAML
+	- Adding automatic master rediscovery
+	- Adding automatic mirror selection
+
+0.01 Tue  9 Jan 2007
+	- Initial version

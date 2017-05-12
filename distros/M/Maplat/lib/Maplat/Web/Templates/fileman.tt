@@ -1,0 +1,117 @@
+<p align="center">
+    [% tr.tr("On the remote machines, this directory is available at this path:") %]<br>
+    <b>[% uncpath %]</b><br>
+    <i>[% tr.tr("Directories are currently not supported!") %]</i>
+</p>
+
+<p align="center">
+    <form name="deletions" method="post" action="[% webpath %]" enctype="multipart/form-data">
+        <table class="data" align="center" id="HelperTable1">
+            <tr class="tabheader">
+                <th colspan="2">[% tr.tr("File download/delete") %]</th>
+            </tr>
+            [% FOREACH AvailFile IN AvailFiles %]
+                <tr>
+                    <td>
+                        <input type="checkbox" name="delfile" value="[% AvailFile %]">
+                    </td>
+                    <td align="left">
+                        <a href="[% downwebpath %]/[% AvailFile %]">[% AvailFile %]</a>
+                    </td>
+                </tr>
+            [% END %]
+            <tr>
+                <td></td>
+                <td>
+                    <input type="hidden" name="mode" value="delete">
+                    <input type="submit" value="[% tr.tr("Delete") %]">
+                </td>
+            </tr>
+        </table>
+    </form>
+</p>
+    
+</p>
+&nbsp;<br>
+<p align="center">
+    <form name="translations" method="post" action="[% webpath %]" enctype="multipart/form-data">
+        <table class="data" align="center" id="MainDataTable">
+            <tr class="tabheader">
+                <th>[% tr.tr("File upload") %]</th>
+            </tr>
+            <tr>
+                <td>
+                    <input type="file" name="upfile" id="upfile" size="chars" onchange="return upfile_change();">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    [% tr.tr("Upload as") %]:
+                    <input type="text" size="30" maxLength="50" name="upfname" id="upfname" onchange="return upfname_change();" onkeyup="return upfname_change();">
+                    <img src="/static/loading.gif" id="ajaxwait">
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                    <input type="hidden" name="mode" value="upload">
+                    <input type="submit" value="[% tr.tr("Upload") %]" id="upbutton" onclick="return startUpload();">
+                    <img src="/static/loading.gif" id="uploadwait">
+                </td>
+            </tr>                
+        </table>
+    </form>
+</p>
+
+<script>
+    function upfile_change() {
+        var origname_c = document.getElementById("upfile");
+        $("#ajaxwait").show();
+        $("#upbutton" ).button( "option", "disabled", true );
+        $('#upfname').attr("disabled", true);
+        ajaxUpdateFName();
+        return true;
+    }
+    
+    function upfname_change() {
+        var newname_c = document.getElementById("upfname");
+
+        if(newname_c.value == '') {
+            $( "#upbutton" ).button( "option", "disabled", true );
+        } else {
+            $( "#upbutton" ).button( "option", "disabled", false );
+        }
+
+        return true;
+    }
+    
+    $("#ajaxwait").hide();
+    $("#uploadwait").hide();
+
+    function ajaxUpdateFName() {
+      var origname_c = document.getElementById("upfile");
+      var newname_c = document.getElementById("upfname");
+      var params = "fname=" + origname_c.value;
+      srefresh.open("POST", "[% checkfname %]", true);
+      
+      //Send the proper header information along with the request
+      srefresh.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      srefresh.setRequestHeader("Content-length", params.length);
+      srefresh.setRequestHeader("Connection", "close");
+      
+      srefresh.onreadystatechange=function() {
+        if(srefresh.readyState == 4) {
+          newname_c.value = srefresh.responseText;
+          $("#ajaxwait").hide();
+          $('#upfname').removeAttr("disabled");
+          upfname_change();
+        }
+      }
+      srefresh.send(params);
+    }
+
+    function startUpload() {
+        $("#uploadwait").show();
+        return true;
+    }
+
+</script>

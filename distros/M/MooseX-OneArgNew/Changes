@@ -1,0 +1,19 @@
+Revision history for MooseX-OneArgNew
+
+0.005     2015-07-14 21:52:35-04:00 America/New_York
+        - bump required version of MXRP
+
+0.004     2013-10-05 09:05:39 America/New_York
+          update repo and bugtracker metadata
+
+0.003     2013-04-16 16:36:26 America/New_York
+        - add a "coerce" parameter to the role; now ->new can accept one arg
+          that can be coerced to the expected type; suggested by Mark Jason
+          Dominus
+
+0.002     2011-06-15 15:32:50 America/New_York
+          just removed the "might change radically" warning
+
+0.001     2010-10-18
+
+          first release

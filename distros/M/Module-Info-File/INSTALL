@@ -1,0 +1,21 @@
+INSTALL file for Module-Info-File
+
+The installation of Module-Info-File is pretty straightforward, this
+requires superuser priviledges and will install Module-Info-File in the
+appropriate directory. 
+
+% perl Makefile.PL
+
+The version.pl script which comes with Module-Info-File is installed in
+/usr/bin, but can alternatively be installed in /usr/local/bin or any
+directory of your choice by giving the following parameter:
+
+% perl Makefile.PL INSTALLSCRIPT=/usr/local
+
+% make
+
+% make test
+
+% make install
+
+jonasbn <jonasbn@cpan.org>

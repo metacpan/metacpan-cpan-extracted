@@ -1,0 +1,75 @@
+# This grammar is for 'transform' attribute of various tags.
+
+:default			::= action => [values]
+
+# G1 stuff.
+
+:start 				::= transforms
+
+transforms			::= transform
+						| transform transforms
+
+transform			::= matrix
+						| translate
+						| scale
+						| rotate
+						| skewX
+						| skewY
+
+matrix				::= 'matrix' '('
+						number number number number number number
+						')'								action => command
+
+translate			::= 'translate' '(' number_set ')'	action => command
+
+number_set			::= number
+						| number number
+
+scale				::= 'scale' '(' number_set ')'		action => command
+
+rotate				::= 'rotate' '(' rotate_set ')'		action => command
+
+rotate_set			::= number
+						| number number
+
+skewX				::= 'skewX' '(' number ')'			action => command
+
+skewY				::= 'skewY' '(' number ')'			action => command
+
+number				::= float							action => float
+						| integer						action => integer
+
+# G0 stuff.
+
+digit				~ [0-9]
+digit_any			~ digit*
+digit_many			~ digit+
+
+E					~ [Ee] sign_maybe digit_many
+E_maybe				~ E
+E_maybe				~
+
+:lexeme				~ integer
+integer				~ sign_maybe non_zero digit_any
+						| zero
+
+:lexeme				~ float
+float				~ sign_maybe digit_many E
+						| sign_maybe digit_any '.' digit_many E_maybe
+						| sign_maybe digit_many '.' E_maybe
+						| sign_maybe non_zero digit_any
+
+non_zero			~ [1-9]
+
+sign_maybe			~ [+-]
+sign_maybe			~
+
+zero				~ '0'
+
+# Boilerplate.
+# \x{09} => \t. \x{0A} => \n. \x{0D} => \r. \x{20} => \s.
+:discard			~ comma
+comma				~ ','
+
+:discard			~ whitespace
+whitespace			~ [\s]+

@@ -1,0 +1,50 @@
+Revision history for Perl extension MarpaX::Languages::SVG::Parser.
+
+1.06  Fri Sep 19 09:15:00 2014
+	- Fix typo in repo in Build.PL.
+
+1.05  Wed Sep 17 17:22:00 2014
+	- Update Build.PL and Makefile.PL re putting this package on github.
+
+1.04  Thu May 27 08:31:00 2014
+	- Remove t/version.t, and so remove Test::Version, since the latter fails when combined with Test::Pretty.
+		I do not use Test::Pretty, only Test::More.
+
+1.03  Sat Feb 22 17:44:00 2014
+	- Add 'lexeme default = latm => 1' to the grammar.
+	- Make V 2.082 the minimum version for Marpa::R2.
+
+1.02  Fri Nov  1 15:51:00 2013
+	- Stop tests from requiring *::Utis, which uses *::Config, which is for my use only.
+	- Simplify t/test.fake.data.t by not 'use'ing unused modules.
+
+1.01  Tue Oct 29 16:23:00 2013
+	- Set utf8 (sic) unilaterally on the log output, if logging. This allows STDOUT to be redirected.
+		For non-utf8 input files (data/*.svg except data/utf8.01.svg), it will not be noticed.
+		For data/utf8.01.svg, and similar user files, it is vital if log ouptut is being captured.
+		Note: utf-8 (sic) is not supported by Log::Handler, as of V 0.80. I'll send the author a patch.
+	- Fix counting of points within polygons and polylines. This was only a convenience, but was a bug.
+	- Change hashref output in the case of commands, as in data/ellipse.02.log:
+			Item  Type              Name              Value
+			29    command           -                 M
+		To what it should have been all along:
+			29    command           M                 -
+	- Eliminate the action object, and use some globals instead. This means the action class was re-written
+		to avoid using Moo. Global variables are declared in the action class, and initialized in the SAX handler
+		class. This is hardly ideal. We await Marpa::R3.
+	- The action functions now return the hashrefs which used to be pushed onto a stack.
+	- Add the decode_result() method in SAXHandler.pm, to handle arbitrarily nested arrayrefs and hashrefs.
+		This is the code required to unscramble what's returned by Marpa as the result of the parse.
+		The unscrambling makes the hashrefs returned by the action subs available as a list.
+	- Edit grammar slightly because we now use Marpa instead of Set::Array to gather results.
+		This just consists in making some tokens hidden from the semantics, i.e. in changing:
+			translate ::= 'translate'  '('  number_set  ')'  action => command
+		To:
+			translate ::= 'translate' ('(') number_set (')') action => command
+	- Update docs in each module.
+	- Add scripts/svg2log.pl to convert data/*.svg into data/*.log.
+	- Add t/test.real.data.t to check output of parse.file.pl against data/*.log.
+	- Rename t/runner.t to t/test.fake.data.t.
+
+1.00  Thu Oct 20 13:34:00 2013
+	  - Original version

@@ -1,0 +1,20 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Metadata-DB-Indexer
+version:      1.03
+version_from: lib/Metadata/DB/Indexer.pm
+installdirs:  site
+requires:
+    Cwd:                           3
+    DBI:                           1.50
+    File::Find::Rule:              0.30
+    File::Path:                    1.08
+    LEOCHARRE::Class2:             1.03
+    LEOCHARRE::DEBUG:              1.11
+    Metadata::DB:                  1.11
+    Metadata::DB::Analizer:        1.02
+    Smart::Comments:               0
+    Test::Simple:                  0.7
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

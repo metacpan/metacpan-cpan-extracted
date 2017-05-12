@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Math-Geometry-Planar
+version:      1.18
+version_from: Planar.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    Math::Geometry::Planar::GPC:   1.04
+    Math::Geometry::Planar::Offset: 1.03
+    POSIX:                         0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

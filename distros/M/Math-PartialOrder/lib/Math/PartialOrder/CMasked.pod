@@ -1,0 +1,543 @@
+=head1 NAME
+
+Math::PartialOrder::CMasked -
+class for compiled type hierarches using the Bit::Vector module.
+
+=head1 SYNOPSIS
+
+  use Math::PartialOrder::CMasked;
+
+  ...
+
+=head1 REQUIRES
+
+Carp,
+Exporter,
+Math::PartialOrder::Base,
+Bit::Vector.
+
+=head1 DESCRIPTION
+
+Math::PartialOrder::CMasked is a compiling Math::PartialOrder implementation for
+compiled datatype hierarchies using
+the Bit::Vector module for hierarchy operations and an internal
+representation of immediate hierarchy information as 'Enum' strings.
+It inherits directly from Math::PartialOrder::Base.
+
+This package implements the methods required by Math::PartialOrder::Base
+for datatype hierarchies.  See L<Math::PartialOrder::Base> for details.
+
+=pod
+
+=head1 METHODS
+
+=cut
+
+
+#----------------------------------------------------------------
+# Construction
+#----------------------------------------------------------------
+=pod
+
+=head2 Construction & Initialization
+
+=over 4
+
+=item * C<new( {root=E<gt>$r} )>
+
+Creates and returns a new Math::PartialOrder::CMasked object rooted at
+$r, which defaults to 'BOTTOM'.
+
+=back
+
+=cut
+
+
+#----------------------------------------------------------------
+# Compilation
+#----------------------------------------------------------------
+=pod
+
+=head2 Compilation Methods
+
+=over 4
+
+=item * C<compile()>
+
+Forces compilation of the hierarhcy.  Note that the hierarchy
+is automatically compiled on any call of a method involving
+inheritance relations other than direct parent/child relations,
+and is automatically de-compiled on destructive hierarchy
+operations such as add(), move() or remove().  Returns a
+true value on success, false otherwise.
+
+=pod
+
+=item * C<decompile>, C<uncompile>
+
+Forces de-compilation of the hierarchy.
+Really just sets an internal flag -- if you want to free up
+memory, use the C<_release_compiled()> method.
+
+=pod
+
+=item * C<_release_compiled()>
+
+Forces de-compilation of the hierarchy and eliminates
+references to the Bit::Vector objects in which the compiled
+information (if any) was stored.
+
+=back
+
+=cut
+
+
+#----------------------------------------------------------------
+# Manipulation
+#----------------------------------------------------------------
+=pod
+
+=head2 Additional Hierarchy Manipulation Methods
+
+=over 4
+
+
+
+=back
+
+=cut
+
+
+
+#----------------------------------------------------------------
+# Information
+#----------------------------------------------------------------
+=pod
+
+=head2 Additional Hierarchy Information Methods
+
+=over 4
+
+=item * C<has_ancestor_index($i1,$i2)>
+
+Like C<has_ancestor()>, but $i1 and $i2 are type-indices.
+
+
+=item * C<has_descendant_index($i1,$i2)>
+
+Like C<has_descendant()>, but $i1 and $i2 are type-indices.
+
+
+=item * C<ancestors_mask($i)>
+
+Returns the compiled bitmask of all ancestors of the type with
+index $i as a new Bit::Vector object, or C<undef> if
+the hierarchy contains no type with the index $i.
+
+
+=item * C<descendants_mask($i)>
+
+Returns the bitmask of all descendants of the type with index $i as
+a new Bit::Vector object, or C<undef> if the hierarchy contains
+no type with index $i.
+
+=back
+
+=cut
+
+
+
+
+#----------------------------------------------------------------
+# Comparison/Sorting
+#----------------------------------------------------------------
+=pod
+
+=head2 Additional Sorting and Comparison Methods
+
+=over 4
+
+=item * C<_compare_index($i1,$i2)>
+
+Like C<_compare()>, but $i1 and $i2 are type-indices.
+
+=item * C<_minimize($bv)>
+
+Destructively minimizes the Bit::Vector object $bv, returns $bv.
+
+=pod
+
+=item * C<_maximize($bv)>
+
+Destructively maximizes the Bit::Vector object $bv, returns $bv.
+
+=back
+
+=cut
+
+
+
+#----------------------------------------------------------------
+# Inheritance Operations
+#----------------------------------------------------------------
+=pod
+
+=head2 Additional Type Operations
+
+=over 4
+
+=back
+
+=cut
+
+#----------------------------------------------------------------
+# Iteration
+#----------------------------------------------------------------
+=pod
+
+=head2 Additional Iteration Methods
+
+=over 4
+
+=item * C<iterate_i(\&next,\&callback,\%args)>
+
+Like C<iterate(\&next,\&callback,\%args)>, but
+C<&next> is called with arguments
+($h,$i), where $i is a type-index, and is expected
+to return a list of type indices.
+Similarly,
+C<&callback> is called with
+arguments ($h, $i, \%args) for each type-index $i
+over which it iterates.  $args{start} is also expected to
+be a type-index.
+
+
+=item * C<iterate_pc_i(\&callback,\%args)>
+
+Like C<iterate_pc(\&callback,\%args)>, but
+C<$callback> is called with
+arguments ($h, $i, \%args) for each type-index $i
+over which it iterates.  $args{start} is also expected to
+be a type-index.
+
+=pod
+
+=item * C<iterate_cp_i(\&callback,\%args)>
+
+Like C<iterate_cp(\%args)>, but
+C<&callback> is called with
+arguments ($h, $i, \%args) for each type-index $i
+the hierarchy.  $args{start} is also expected to
+be a type-index.
+
+=back
+
+
+=cut
+
+
+#----------------------------------------------------------------
+# low-level
+#----------------------------------------------------------------
+=pod
+
+=head2 Low-Level Access
+
+=over 4
+
+=pod
+
+=item * C<_indices()>
+
+Return the hashref of type-indices keyed by type-names.
+
+=item * C<_types()>
+
+Return a reference to an array of currently-defined types keyed by type-index.
+
+=item * C<_root()>, C<_root($type)>
+
+Get/set root type.
+
+=item * C<_set_root($root)>
+
+Sets the root type without any additional checking.
+
+
+
+=item * C<_parents()>
+
+Returns reference to an array of Enum-strings indexed by
+type-index.
+
+=item * C<_parents_enum($type)>
+
+Returns the enum-string representing the direct parents of $type.
+
+=item * C<_parents_mask($type)>
+
+Returns a temporary Bit::Vector representing the parents of $type, or
+undef if none exists.  If you need to save this data, use
+the Bit::Vector::Clone() method on the result.
+
+=item * C<_parents_indices($type)>
+
+Returns a list of the indices of $type's parents.
+
+
+
+
+=item * C<_children()>
+
+Returns reference to an array of Enum-strings objects indexed by
+type-index.
+
+=item * C<_children_enum($type)>
+
+Returns the enum-string representing the direct children of $type.
+
+=item * C<_children_mask($type)>
+
+Returns a Bit::Vector representing the children of $type.
+Same caveats as for C<_parents_mask()>.
+
+=item * C<_children_indices($type)>
+
+Returns a list of the indices of $type's children.
+
+
+
+=item * C<_ancestors()>
+
+Returns a reference to an array of
+Bit::Vector objects encoding the ancestors of each type, keyed
+by type-index.  Compiled hierarchies only.
+
+=pod
+
+=item * C<_descendants()>
+
+Returns a reference to an array of
+Bit::Vector objects encoding the descendants of each type, keyed
+by type-index.  Compiled hierarchies only.
+
+
+=item * C<_types2mask($bv,@types)>
+
+Stores the bitmask for @types in $bv, returns $bv.  $bv should already
+be large enough to accomodate @types.
+
+
+
+=pod
+
+=item * C<types2mask($bv,@types)>
+
+Like _types2mask(), but checks for undefined types.
+
+=pod
+
+=item * C<_types2enum(@types)>
+
+Returns an Enum-string containing all and only the indices
+of @types.  Assumes that @types exist in the hierarchy.
+Nothing fancy, just a C<join>.
+
+=pod
+
+=item * C<types2enum(@types)>
+
+Like C<_types2enum()>, but checks for undefined types.
+
+=pod
+
+=item * C<_enum2types($enum,$bv)>
+
+Returns a list of types corresponding to the indices set in the
+enum-string $enum by first reading $enum into the Bit::Vector
+object $bv, which should already be large enough to accomodate it.
+A value of C<undef> in the returned list indicates an undefined type.
+
+=pod
+
+=item * C<enum2types($enum,$bv)>
+
+Like C<_enum2types()>, but weeds out C<undef> values
+from the returned list.
+
+=pod
+
+=item * C<_vectors()>, C<_vectors($num,...)>
+
+Without arguments, returns the internal bit-vectors for the hierarchy as an
+array-reference.
+With arguments, returns a list containing the internal vectors at indices
+C<$num,...>.
+
+=back
+
+=cut
+
+#----------------------------------------------------------------
+# Non-Methods: Bit::Vector
+#----------------------------------------------------------------
+=pod
+
+=head2 Non-Method Bit::Vector Utilities
+
+The following exportable subroutines can be imported together
+by specifying the C<:bvutils> tag to the C<use> directive.
+
+=over 4
+
+=item * C<_bv_ensure_size($bv,$size)>
+
+Ensures that the Bit::Vector $bv is at least $size bits long,
+resizing it if necessary.
+
+=item * C<_bv_make_comparable($bv1,$bv2)>
+
+Ensures that $bv1 and $bv2 are the same size by resizing
+the smaller of the two if they are not already of the
+same size.  Returns the new size of both vectors.
+
+
+=item * C<_bv_bit_test($bv,$bit)>
+
+Checks whether bit number $bit is set in the Bit::Vector $bv,
+performing a preliminary size-check.  No resize is performed.
+
+
+=item * C<_bv_bit_on($bv,$idx)>
+
+Sets bit at index $idx in the Bit::Vector $bv to 1, resizing
+$bv if necessary.
+
+
+=item * C<_bv_bit_off($bv,$idx)>
+
+Sets bit at index $idx in the Bit::Vector $bv to 0.
+
+
+=item * C<_bv_union_d($bv1,$bv2)>
+
+Destructive Bit::Vector union operation:
+sets $bv1 to be the union of itself and $bv2,
+making them comparable first.
+
+=item * C<_bv_intersection_d($bv1,$bv2)>
+
+Destructive Bit::Vector intersection operation:
+sets $bv1 to be the intersection of itself and $bv2, making them
+comparable first.
+
+=item * C<_bv_difference_d($bv1,$bv2)>
+
+Destructive Bit::Vector difference operation:
+sets $bv1 to be the difference of itself and
+$bv2, making them comparable first.
+
+=back
+
+=cut
+
+
+#----------------------------------------------------------------
+# Non-Methods: Enum
+#----------------------------------------------------------------
+=pod
+
+=head2 Non-Method Enum-string Utilities
+
+The following exportable subroutines can be imported together
+by specifying the C<:enumutils> tag to the C<use> directive.
+
+=over 4
+
+=item * C<_enum2indices($enum,$bv)>
+
+Returns a list of indices set in $enum by first reading it into
+the Bit::Vector $bv, which should already be large enough to
+accomodate it.
+
+=item * C<_enum_bit_test($enum,$bit,$bv)>
+
+Tests whether $bit is set in the enum-string $enum using the
+Bit::Vector $bv for the test.  $bv should be large enough
+to accomodata $enum.
+
+=item * C<_enum_bit_on($enum,$bit,$bv)>
+
+Returns the result of setting bit $bit in $enum by
+converting $enum to and from the Bit::Vector $bv, which is
+assumed to already be large enough to accomodate $enum, although
+it may not yet be large enough to accomodate $bit -- if this
+is the case, it will be resized.
+
+=pod
+
+=item * C<_enum_bit_off($enum,$bit,$bv)>
+
+Like _enum_bit_on(), but clears bit $bit.
+
+=pod
+
+=item * C<_enum_union($enum1,$enum2,$bv1,$bv2)>
+
+Returns the union of $enum1 and $enum2 as an enum-string,
+using the Bit::Vector objects $bv1 and $bv2 to perform the
+calculation.  $bv1 and $bv2 should already be large enough
+to accomodate $enum1 and $enum2, respectively
+
+=pod
+
+=item * C<_enum_intersection($enum1,$enum2,$bv1,$bv2)>
+
+Like C<_enum_union()>, but returns the intersection of
+$enum1 and $enum2.
+
+=pod
+
+=item * C<_enum_difference($enum1,$enum2,$bv1,$bv2)>
+
+Like C<_enum_union()>, but returns the difference of
+$enum1 and $enum2.
+
+=back
+
+=cut
+
+
+#----------------------------------------------------------------
+# footer
+#----------------------------------------------------------------
+=pod
+
+=head1 ACKNOWLEDGEMENTS
+
+perl by Larry Wall.
+
+Bit::Vector by Steffen Beyer.
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>jurish@ling.uni-potsdam.deE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001, Bryan Jurish.  All rights reserved.
+
+This package is free software.  You may redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+perl(1).
+Math::PartialOrder(3pm).
+Math::PartialOrder::Base(3pm).
+Math::PartialOrder::CEnum(3pm).
+Math::PartialOrder::Std(3pm).
+Math::PartialOrder::Caching(3pm).
+Math::PartialOrder::LRUCaching(3pm).
+Math::PartialOrder::Loader(3pm).
+Bit::Vector(3pm).

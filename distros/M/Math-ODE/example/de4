@@ -1,0 +1,20 @@
+#!/usr/bin/perl -w
+
+# Example 1: Solve  y' = x^-1, y(1) = 1 
+#	     Solution: y = ln(x)
+
+
+use Math::ODE;
+my $o = new Math::ODE ( file => 'data',
+			step => 0.1,
+			initial => [0], 
+			ODE => [ \&DE1 ], 
+			t0 => 1,
+			tf => 10 );
+$o->evolve;
+system("gnuplot -persist gnuplot.4");
+
+
+sub DE1 { my ($t,$y) = @_; return 1/$t; }
+#
+

@@ -1,0 +1,23 @@
+---
+abstract: 'Provide information for 3rd party modules (outside CPAN)'
+author:
+  - 'Sébastien Aperghis-Tramoni <sebastien@aperghis.net>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-ThirdParty
+provides:
+  Module::ThirdParty:
+    file: lib/Module/ThirdParty.pm
+    version: 0.27
+recommends:
+  Module::CoreList: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.27

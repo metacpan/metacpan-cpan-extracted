@@ -1,0 +1,53 @@
+{
+   "abstract" : "Redirects requests from mirrors to the main host (useful for SEO)",
+   "author" : [
+      "alexbyk <alex@alexbyk.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-RedirectHost",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Perl::Critic" : "1.02",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "3.0",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/alexbyk/Mojolicious-Plugin-RedirectHost/issues"
+      },
+      "repository" : {
+         "web" : "http://github.com/alexbyk/Mojolicious-Plugin-RedirectHost"
+      }
+   },
+   "version" : "1.07",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

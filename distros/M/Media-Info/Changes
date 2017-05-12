@@ -1,0 +1,78 @@
+Revision history for Media-Info
+
+0.12    2016-11-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add Media::Info::Mediainfo to list of known backends.
+
+
+0.11    2016-06-02 (PERLANCAR)
+
+	- [ux] Add completion for --backend.
+
+	- Add note about only Mplayer supports URL.
+
+
+0.10    2016-04-06 (PERLANCAR)
+
+        - Split CLI to App-MediaInfo to reduce dependencies for Media-Info.
+
+        - get_media_info(): Add information about the backend used in result
+          metadata (func.backend).
+
+
+0.09    2016-04-06 (PERLANCAR)
+
+	- Try multiple backend, now that we also have another backend
+	  (Media::Info::Ffmpeg).
+
+
+0.08    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.07     2014-11-28 (SHARYANTO)
+
+         - No functional changes.
+
+         - Prefer Perinci::CmdLine::Lite in CLI script.
+
+
+0.06     2014-07-22 (SHARYANTO)
+
+         - No functional changes.
+
+         - Switch CLI scripts from using Perinci::CmdLine to
+           Perinci::CmdLine::Any to reduce size of dependencies.
+
+
+0.05    2014-03-15 (SHARYANTO)
+
+        - No functional changes. Rebuild to fix POD documentation (function
+          argument documentation was broken in Perinci-To-POD < 0.42).
+
+
+0.04    2014-01-21 (SHARYANTO)
+
+        - bin/media-info: Allow multiple arguments.
+
+
+0.03    2013-10-31 (SHARYANTO)
+
+        - No functional changes. Add sample result in Synopsis.
+
+
+0.02    2013-09-21 (SHARYANTO)
+
+        - No functional changes. Tweak Abstract.
+
+
+0.01    2013-09-21 (SHARYANTO)
+
+        - First release.

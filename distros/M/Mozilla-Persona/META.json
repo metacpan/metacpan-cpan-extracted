@@ -1,0 +1,62 @@
+{
+   "abstract" : "Mozilla Persona server implementation",
+   "author" : [
+      "Mark Overmeer"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mozilla-Persona",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Apache::Htpasswd" : "1.9",
+            "CGI" : "0",
+            "CGI::Session" : "0",
+            "Crypt::OpenSSL::Bignum" : "0",
+            "Crypt::OpenSSL::RSA" : "0",
+            "Digest" : "0",
+            "File::Basename" : "0",
+            "File::Slurp" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "JSON" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "0",
+            "Log::Report" : "0",
+            "MIME::Base64" : "3.11",
+            "Mail::ExpandAliases" : "0",
+            "Mail::IMAPTalk" : "0",
+            "Term::ReadPassword" : "0.11",
+            "Test::More" : "0",
+            "Time::HiRes" : "0",
+            "URI" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.12"
+}

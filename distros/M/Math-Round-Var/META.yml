@@ -1,0 +1,25 @@
+---
+name: Math-Round-Var
+version: v1.0.0
+author:
+  - 'Eric L. Wilhelm @ <ewilhelm at cpan dot org>'
+abstract: Variations on rounding.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Test::More: 0
+provides:
+  Math::Round::Var:
+    file: lib/Math/Round/Var.pm
+    version: v1.0.0
+  Math::Round::Var::Fake:
+    file: lib/Math/Round/Var.pm
+  Math::Round::Var::Float:
+    file: lib/Math/Round/Var.pm
+  Math::Round::Var::Fraction:
+    file: lib/Math/Round/Var.pm
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

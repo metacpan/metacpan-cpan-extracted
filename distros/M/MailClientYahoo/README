@@ -1,0 +1,32 @@
+Mail::Client::Yahoo version 1.0
+===============================
+
+This module allows you to access your web-based Yahoo Mail account
+programatically.  Similar in function to Mail::Webmail::Yahoo, this
+module is more geared towards manipulation of individual messages,
+rather than simple bulk download.  This module is also probably more
+reliable than Mail::Webmail::Yahoo, as well.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Mail::Header, Mail::Internet, WWW::Mechanize, HTML::TableExtract
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004, Cory Johns.  All rights reserved.
+
+This module is free software; you can redistribute and/or modify
+it under the same terms as Perl itself.
+
+Address bug reports and comments to: Cory Johns <johnsca@cpan.org>

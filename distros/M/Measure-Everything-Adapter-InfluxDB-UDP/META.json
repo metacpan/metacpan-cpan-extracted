@@ -1,0 +1,58 @@
+{
+   "abstract" : "A Measure::Everything adapter to feed InfluxDB through UDP.",
+   "author" : [
+      "Javier Arturo Rodriguez <javier@rodriguez.org.mx>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Measure-Everything-Adapter-InfluxDB-UDP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Socket::INET" : "1.18",
+            "InfluxDB::LineProtocol" : "1.007",
+            "Measure::Everything" : "1.001",
+            "Measure::Everything::Adapter::Base" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IO::Select" : "0",
+            "Measure::Everything" : "1.001",
+            "Measure::Everything::Adapter" : "0",
+            "Sys::Hostname" : "0",
+            "Test::Exception" : "0.29",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/codehead/Measure-Everything-Adapter-InfluxDB-UDP/issues"
+      },
+      "homepage" : "https://github.com/codehead/Measure-Everything-Adapter-InfluxDB-UDP",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/codehead/Measure-Everything-Adapter-InfluxDB-UDP.git",
+         "web" : "https://github.com/codehead/Measure-Everything-Adapter-InfluxDB-UDP"
+      }
+   },
+   "version" : "0.01"
+}
+

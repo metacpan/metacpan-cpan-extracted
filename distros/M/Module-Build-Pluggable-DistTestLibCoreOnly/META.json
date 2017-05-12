@@ -1,0 +1,61 @@
+{
+   "abstract" : "(EXPERIMENTAL) run disttest with local lib",
+   "author" : [
+      "Tokuhiro Matsuno E<lt>tokuhirom AAJKLFJEF@ GMAIL COME<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Module-Build-Pluggable-DistTestLibCoreOnly",
+   "no_index" : {
+      "directory" : [
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::Pluggable::CPANfile" : "0.02",
+            "Module::Build::Pluggable::GithubMeta" : "0",
+            "Test::More" : "0.98",
+            "Test::Requires" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40",
+            "Module::Build::Pluggable" : "0",
+            "Module::Build::Pluggable::CPANfile" : "0.02",
+            "Module::Build::Pluggable::GithubMeta" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::cpanminus" : "0",
+            "Module::Build::Pluggable" : "0.08",
+            "lib::core::only" : "0",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      }
+   },
+   "provides" : {
+      "Module::Build::Pluggable::DistTestLibCoreOnly" : {
+         "file" : "lib/Module/Build/Pluggable/DistTestLibCoreOnly.pm",
+         "version" : "v0.0.6"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.0.6"
+}

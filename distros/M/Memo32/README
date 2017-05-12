@@ -1,0 +1,29 @@
+Palm/Memo32 version 1.00
+========================
+Palm::Memo32 works with the p5Palm module to read PaulComputing pEdit Memo32(pn32) databases.
+This module is base on Palm::Memo by Andrew Arensburger.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  p5Palm
+
+COPYRIGHT AND LICENCE
+
+The module is release under the Artistic License.
+
+Copyright (C) 2003 Wayne A. Arthurton
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

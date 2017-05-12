@@ -1,0 +1,67 @@
+#-*-perl-*-
+#
+# $Id: ValidPutMsgRecFields.in,v 33.4 2012/09/26 16:15:30 jettisu Exp $
+#
+# (c) 1999-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+package MQSeries::Constants;
+
+#
+# These are used to validate MQPMR fields
+#
+@ValidPutMsgRecFields =
+  qw(
+     MsgId
+     CorrelId
+     GroupId
+     Feedback
+     AccountingToken
+    );
+
+#
+# The wierd ?: construct:
+#
+#   defined &foo ? &foo : undef
+#
+# is to support V2, since those constants are V5 specific, and this is
+# the cleanest way to avoid them.  This hash is part of the
+# distribution list support, and won't be used in V2.
+#
+%ValidPutMsgRecFields =
+  (
+   
+   MsgId		=>
+   {
+    Flag		=> &MQPMRF_MSG_ID,
+    Size		=> 24,
+   },
+   
+   CorrelId		=>
+   {
+    Flag		=> &MQPMRF_CORREL_ID,
+    Size		=> 24,
+   },
+
+   GroupId		=>
+   {
+    Flag		=> &MQPMRF_GROUP_ID,
+    Size		=> 24,
+   },
+
+   Feedback		=>
+   {
+    Flag		=> &MQPMRF_FEEDBACK,
+    Size		=> "MQLONG",
+   },
+
+   AccountingToken	=>
+   {
+    Flag		=> &MQPMRF_ACCOUNTING_TOKEN,
+    Size		=> 32,
+   },
+
+  );
+
+1;

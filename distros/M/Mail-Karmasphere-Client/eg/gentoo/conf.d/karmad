@@ -1,0 +1,2 @@
+KARMAD_PROG="/usr/bin/karmad-exim"
+KARMAD_OPTS="--socketuser=mail --socketgroup=mail"

@@ -1,0 +1,112 @@
+CHANGES
+    Revision history for Perl extension Math::BaseConvert:
+    - 1.8 April 14 2016
+      * REALLY updated version number to pass PAUSE checks
+
+    - 1.8.0 Mon Jan 11 20:15:00 UTC 2016
+      * updated version number to pass PAUSE checks
+
+    - 1.7.1 Mon Jan 11 20:02:00 UTC 2016
+      * added 0 as sole argument to Math::BigInt->new (RT #110996)
+
+    - 1.7 Tue May 29 20:03:10 UTC 2012
+      * forked from Math::BaseCnv to fix version number
+      * no substantive other changes
+
+    - 1.6.A6FGHKE Tue Jun 15 16:17:20:14 2010
+      * bumped minor version number so they'll keep ascending (without PT
+      comprehension)
+
+    - 1.4.A6FAbEb Tue Jun 15 10:37:14:37 2010
+      * added Math::BigInt code for >64-bit number-base conversions
+
+      * added a bunch more DigitSets: IRCu, URL, RegEx, identifier variants,
+      XML Nmtoken, && XML ID Name
+
+    - 1.4.75O6Pbr Thu May 24 06:25:37:53 2007
+      * added Test::Pod(::Coverage)? tests && PREREQ entries
+
+      * added b85 for IPv6, gen'd META.yml (w/ newline before EOF), up'd
+      minor ver
+
+    - 1.2.68J9uJQ Sat Aug 19 09:56:19:26 2006
+      * added b64sort() && put pod at bottom
+
+    - 1.2.59M7mRX Thu Sep 22 07:48:27:33 2005
+      * testing Make as primary and BuildPL backup (needing rename for dot)
+
+    - 1.2.59IBlgw Sun Sep 18 11:47:42:58 2005
+      * testing just using Module::Build instead of MakeMaker
+
+      * fixed test 12 which was failing on AMD64
+
+      * added Build.PL to pkg
+
+    - 1.2.54HK3pB Sun Apr 17 20:03:51:11 2005
+      * removed 128 digit-set since some hi-bit chars cause probs on Win32
+
+      * made bin/cnv only executable to go in EXE_FILES
+
+      * made Math::BaseCalc a link in pod && updated License
+
+    - 1.2.45UC8fo Sun May 30 12:08:41:50 2004
+      * tidied POD && upped minor version number since CPAN can't read PTVR
+
+    - 1.0.44E9ljP Wed Apr 14 09:47:45:25 2004
+      * added test for div-by-zero error in choo()
+
+      * added summ()
+
+    - 1.0.446EIbS Tue Apr 6 14:18:37:28 2004
+      * snuck in fact() && choo()
+
+    - 1.0.42REDir Fri Feb 27 14:13:44:53 2004
+      * changed test.pl to hopefully pass MSWin32-x86-multi-thread
+
+    - 1.0.428LV46 Sun Feb 8 21:31:04:06 2004
+      * broke apart CHANGES to descend chronologically
+
+      * made dec() auto uppercase param since dec(a) was returning 36
+      instead of 10
+
+    - 1.0.41M4GMP Thu Jan 22 04:16:22:25 2004
+      * put cnv in bin/ as EXE_FILES
+
+    - 1.0.418BEPc Thu Jan 8 11:14:25:38 2004
+      * testing new e auto-gen MANIFEST(.SKIP)?
+
+    - 1.0.3CNH37s Tue Dec 23 17:03:07:54 2003
+      * updated POD
+
+    - 1.0.3CG3dIx Tue Dec 16 03:39:18:59 2003
+      * normalized base spelling
+
+    - 1.0.3CD1Vdd Sat Dec 13 01:31:39:39 2003
+      * added ABSTRACT section to WriteMakeFile()
+
+      * changed synopsis example
+
+      * updated all POD indenting
+
+    - 1.0.3CCA5Mi Fri Dec 12 10:05:22:44 2003
+      * removed indenting from POD NAME field
+
+    - 1.0.3CB7M43 Thu Dec 11 07:22:04:03 2003
+      * updated package to coincide with Time::Fields release
+
+    - 1.0.39B36Lv Thu Sep 11 03:06:21:57 2003
+      * synchronized POD with README documentation using new e utility
+
+      * templatized package compilation
+
+      * fixed boundary bugs
+
+    - 1.0.37SLNGN Mon Jul 28 21:23:16:23 2003
+      * first version (&& my first Perl module... yay!) put on CPAN
+
+    - 1.0.37JKj3w Sat Jul 19 20:45:03:58 2003
+      * reworked interface from shell utility to package
+
+    - 1.0.3159mLT Sun Jan 5 09:48:21:29 2003
+      * original version
+

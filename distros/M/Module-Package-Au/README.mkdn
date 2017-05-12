@@ -1,0 +1,36 @@
+# NAME
+
+Module::Package::Au - Reusable Module::Install bits
+
+# SYNOPSIS
+
+In `Makefile.PL`:
+
+    #!/usr/bin/env perl
+    use inc::Module::Package 'Au:dry 1';
+
+    # Put distribution-specific metadata here
+    requires "Some::Module";
+    keywords qw[ put some tags here ];
+
+# DESCRIPTION
+
+This module defines a set of standard configurations for `Makefile.PL`
+files based on [Module::Package](http://search.cpan.org/perldoc?Module::Package).
+
+# SEE ALSO
+
+[Module::Package::Ingy](http://search.cpan.org/perldoc?Module::Package::Ingy), [Module::Package](http://search.cpan.org/perldoc?Module::Package)
+
+# AUTHORS
+
+唐鳳 <cpan@audreyt.org>
+
+# CC0 1.0 Universal
+
+To the extent possible under law, 唐鳳 has waived all copyright and related
+or neighboring rights to Module-Package-Au.
+
+This work is published from Taiwan.
+
+[http://creativecommons.org/publicdomain/zero/1.0](http://creativecommons.org/publicdomain/zero/1.0)

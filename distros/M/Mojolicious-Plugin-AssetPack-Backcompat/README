@@ -1,0 +1,31 @@
+NAME
+    Mojolicious::Plugin::AssetPack::Backcompat - Provides back compat
+    functionality for 0.x series of AssetPack
+
+DESCRIPTION
+    Mojolicious::Plugin::AssetPack::Backcompat is only useful for those who
+    use the old version of Mojolicious::Plugin::AssetPack.
+
+    Have a look at
+    <http://thorsen.pm/perl/2016/02/21/rewriting-assetpack-plugin.html> for
+    an explanation behind the change.
+
+    Please move to the new version of the plugin and/or send me an email
+    and/or create and issue on github
+    <https://github.com/jhthorsen/mojolicious-plugin-assetpack/issues> if
+    you have reasons for not moving on.
+
+METHODS
+  add
+  base_url
+  fetch
+  get
+  headers
+  out_dir
+  preprocessors
+  purge
+  register
+  source_paths
+SEE ALSO
+    Mojolicious::Plugin::AssetPack.
+

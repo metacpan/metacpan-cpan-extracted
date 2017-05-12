@@ -1,0 +1,30 @@
+NAME
+    Mojolicious::Command::generate::dbicdump - dbicdump your Mojo app schema
+
+SYNOPSIS
+        # Run with an existing mojolicious app.
+        # $app->config->{db}{/database username password/}
+
+        ./my_mojo_app.pl generate dbicdump
+
+INSTALL
+        perl Makefile.PL
+        make && make install
+
+SUPPORT
+    Please report any bugs, feature request or patches to either:
+    http://search.cpan.org/dist/Mojolicious-Command-generate-dbicdump/
+    https://github.com/coffeemonster/mojolicious-command-generate-dbicdump/
+
+LICENSE AND COPYRIGHT
+    Copyright 2012 Alister West, alister at http://alisterwest.com
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+
+CHANGES
+    0.1.1 2012-08-31 - CPANified module
+

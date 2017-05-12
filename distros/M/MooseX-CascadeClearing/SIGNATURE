@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 cbe41e1b8d406e9a80d81a5a3c66664eefa2ba8b Changes
+SHA1 93e0dff8a10cf68e9aab241230fe19aef31bab45 INSTALL
+SHA1 05207cbc5971035849c1de2c7cb3babaeaccb6fb LICENSE
+SHA1 d1081f50411c99a3bf4b8b45c37f209659b48b21 MANIFEST
+SHA1 97d7c4d39db18f0b00a6690a0872319a9ced1dcf META.json
+SHA1 637eeda3138ff0808410662681ecc51fc722d380 META.yml
+SHA1 a471e00d12b0cd20c3223d3a896a3a6da3e59886 Makefile.PL
+SHA1 98b3306b4554e57d1f055443e1f3c6b69be8b410 README
+SHA1 3d310fcfa986c1cb70ea9c6c8caa6240d0c4c500 dist.ini
+SHA1 b36d15007fa0d6f44782a443cfb38e8ce3048012 lib/MooseX/CascadeClearing.pm
+SHA1 f115339474f18e8333aadaf2b9499af6763ac81b t/00-compile.t
+SHA1 a321fe7d57632f940891d520ca04bbbf17293716 t/00-load.t
+SHA1 524c9ffb2a8c9c26ace663bf696daf27a4626842 t/000-report-versions-tiny.t
+SHA1 f41d44d1a3dab7e0588da31e1249f290bc8cda55 t/01-meta-checks.t
+SHA1 73f1a06481e49319684edc7c206448bc126bd45e t/02-simple-cascade.t
+SHA1 04a9d8266c783a68bbe2a0875ae3677f376d3b51 t/03-cascaded-cascades.t
+SHA1 f58365135029d9e1eb51cc7219a310a3025e066b t/04-cascade-wo-calling-clear.t
+SHA1 421f14a5bbb9d2cc641b3988957dfed5d9278cb1 t/05-role.t
+SHA1 6cbb9bc6caf0d9dd127a583d59a4768e8caf3c99 t/author-pod-spell.t
+SHA1 706d182e5e1f7fd4d9060311cadc4f7cd86a8bad t/lib/CascadeFromRole.pm
+SHA1 d154d70dd0cb6d544da29059c054a7af1c10218f t/lib/CascadeRole.pm
+SHA1 177fddd801c9a59d3fbe2ebb8a3f0c42e5d09563 t/lib/DoubleCascade.pm
+SHA1 e96c0e68f5fa2f07d207cd165f8f54498fe72d32 t/lib/SingleCascade.pm
+SHA1 9c3627ff37f4fd5bddc34bf46cf3359eaf76a060 t/release-consistent-version.t
+SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
+SHA1 aed3b4e41d91a53207aa2fe9d804394c47ca487a t/release-has-version.t
+SHA1 52742c1f6afe174132d6a211b74b3df232c77bff t/release-no-smart-comments.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 813b0e0ecc511f5624ab014d43392b3a590c8895 t/release-pod-coverage.t
+SHA1 d9c92f295a56161e016b16b2c93a3a72f0ab7447 t/release-pod-syntax.t
+SHA1 43c8fc8616bf3445e5f90eb7cd90bb3911718e92 t/release-portability.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJQVCsOAAoJEOd5N1CvIgQkimwIAJNPfcWWBl6grYVB7b3xppgj
+IfKbukdKt1coBAWFTcDozW37FeAdPgMFX0zeUayqqdbrgm708TfUNOVvy8v4nM2e
+718NkySlrZIDzSl4KxVv4VklFdlWAp/kI2uf48gy+8lSAU165m6db+xvWRnc3EPn
+yB6la1ekhW8DzWIFQBgdZee53u2MylTo8d6T/swSsunVB05aV3hHYNG4KKNqsg7m
+Fo7LcIznK4UdsivFxmcp4AsHJepLkREq/0fALrHNs3Osg/51wSrpMt5cosDvkk4a
+Pjvzt4clfaS4K+F8Ha2mPxRBipDSGjrFC9PEn5IKd2Mmiwofdw0uk5u0bJdqn74=
+=hv7e
+-----END PGP SIGNATURE-----

@@ -1,0 +1,15 @@
+0.05 Mon Jan 19 13:01:21 NOVT 2015
+      - fix compatibility with old Mojolicious inside tests
+
+0.04 Sun Jan 18 14:41:25 NOVT 2015
+      - move from deprecated DOM and Collection methods inside tests
+
+0.03 Fri Dec  6 22:16:31 2013
+      - fix Mojo prereq version and tests: rt#91208
+
+0.02 Tue Nov 19 22:05:12 2013
+      - fix for relative paths with same name from different request paths
+      - windows compatibility added
+
+0.01 Mon Nov 18 22:55:54 2013
+      - original version;

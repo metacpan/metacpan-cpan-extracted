@@ -1,0 +1,33 @@
+Revision history for Perl module Ma::OSVersion
+
+1.002 2016-06-30T23:04:33Z
+	* Add El Capitan and Sierra
+
+1.01 - 2015-01-03
+	* Add Yosemite to the list
+
+0.16 - 2014-01-06
+	* Update meta data and requirements in Makefile.PL
+
+0.15 - 2013-12-17
+	* Support Mavericks
+
+0.14_01 - 2011-07-27
+	* Update for Lion
+
+0.14 - 2008-08-31
+	* Update for Snow Leopard
+
+0.12 - 2008-01-16
+	* Added functions minor_version_numbers, minor_version_names, and
+	methods() to get lists of data that the module uses
+	* The gestalt.t test doesn't blow up if Mac::Gestalt is missing.
+	* The Makefile.PL should exit(0) if you're not on a Mac (I'm
+	looking at you, CPAN::Reporter!)
+
+0.11 - 2007-11-18
+	* check if the external commands exist before trying to use them
+
+0.10 - 2007-11-18
+	* initial release of a module to try different methods to get
+	various numbers associated with Mac OS X versions.

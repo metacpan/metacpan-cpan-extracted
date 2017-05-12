@@ -1,0 +1,19 @@
+Revision history for Mail-Header-Generator
+
+0.301	Mon, 19 Jul 2010 11:46:18 -0400 (dmo)
+
+    * Provide fallback if $ENV{USER} does not exist
+
+0.300	Wed, 14 Jul 2010 14:48:19 -0400 (dmo)
+
+    * SMTP/ESMTP protocol should be upper-cased
+
+    * Handle email addresses per RFC 5321 description of Received
+
+0.200	Mon, 07 Jun 2010 11:35:29 -0400	(dmo)
+
+    * Methods now callable as either class methods or instance methods.
+
+0.100	Thu, 03 Jun 2010 15:51:11 -0400 (dmo)
+
+    * First version, released on an unsuspecting world.

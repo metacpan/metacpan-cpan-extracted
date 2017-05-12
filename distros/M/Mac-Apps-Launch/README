@@ -1,0 +1,23 @@
+This is Mac::Apps::Launch.  It provides a simplified interface to
+launching and quitting applications by their creator ID under Mac OS
+and Mac OS X.
+
+NOTE: if you want to test quitting and launching the Finder, add QUITFINDER=1
+to your environment.
+
+This archive can always be obtained from:
+
+    http://sf.net/projects/pudge/
+    http://www.cpan.org/authors/id/CNANDOR/
+    http://www.cpan.org/modules/by-module/Mac/
+
+The project homepage is:
+
+    http://projects.pudge.net/
+
+Please let me know how well it does(n't) work, and any changes you'd 
+like to see.
+
+Copyright (c) 1998-2004 Chris Nandor.  All rights reserved.  This program
+is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.

@@ -1,0 +1,27 @@
+[%#
+
+=head1 frontpage
+
+This is the frontpage for your Maypole application.
+It shows a list of all tables it is allowed to display.
+
+=cut
+
+#%]
+[% INCLUDE header %]
+<div id="title">
+    [% config.application_name || "A poorly configured Maypole application" %]
+</div>
+<div id="frontpage_list">
+<ul>
+[% FOR table = config.display_tables %]
+    <li>
+        <a href="[% base %]/[%table%]/list">List by [%table %]</a>
+    </li>	
+[% END %]
+</ul>
+</div>
+
+[% INCLUDE maypole %]
+
+[% INCLUDE footer %]

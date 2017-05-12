@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+META.json
+Makefile.PL
+README.md
+cpanfile
+lib/Markdown/TOC.pm
+minil.toml
+t/00_compile.t
+t/01_handlers.t
+t/02_order.t
+META.yml
+MANIFEST

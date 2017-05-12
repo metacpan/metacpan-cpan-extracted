@@ -1,0 +1,55 @@
+Revision history for Module-Build-JSAN-Installable
+
+0.13      2010-08-10 18:21
+
+        - fixed a name of the environment variable in docs 
+
+0.12      2010-07-02 07:27
+
+		- allow '-' as separator in the distribution name 
+
+0.11      2010-06-09 09:39
+
+		- 'docs' action no longer depends on 'manifest' (need to run it manually)
+		  this should allow to have the distributions w/o MANIFEST.SKIP file (which
+		  is otherwise created when building docs)
+
+0.10      2010-06-02 07:26
+		- change to Dist::Zilla as building tool
+
+0.09	01/24/2010
+	    - fixed bug in the test suite, which appears on some platforms
+	    
+0.08	01/23/2010
+	    - 'static_dir' property now saved to metadata
+
+0.07	01/21/2010
+	    - Trying ShipIt as release tool
+	    - Suppressed adding 'Module::Build' to 'configure_requires'
+	    - Suppressed prerequisites checking on initial run
+	    - Implemented ability to pickup the separate documentation file 
+
+0.06    01/19/2010
+        - Fixed test case, relying on examination of Module::Build internals,
+        which have slightly changed since 0.35_01
+        - Capture::Tiny moved from 'test_requires' to 'build_requires' since the 1st
+        option seems not being picked up on some systems
+        - removed Makefile.PL which also seems confuse some systems  
+
+0.05    01/15/2010
+        - ignoring git repo in MANIFEST
+        - removed workaround for Module::Build RT #46611, required Module::Build 0.35 instead
+        
+0.04    2009/08/6
+        - fixed dependency from 'docs' action in 'dist' action
+        
+0.03    2009/08/6
+        - implemented initial support for Markdown and MultiMarkdown markups in documentation
+        
+0.02    2009/07/21
+        - fixed missed dependency from JSON.pm (thanks to Dan Brook (broquaint) for report)
+        - some progress on documentation
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

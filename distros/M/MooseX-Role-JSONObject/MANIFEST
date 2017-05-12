@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/MooseX/Role/JSONObject.pm
+lib/MooseX/Role/JSONObject/Meta/Trait.pm
+lib/MooseX/Role/JSONObject/Util.pm
+minil.toml
+t/00_compile.t
+t/01_to_json.t
+t/02_from_json.t
+t/03_json_attr.t
+META.yml
+MANIFEST

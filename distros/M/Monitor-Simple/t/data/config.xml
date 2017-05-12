@@ -1,0 +1,80 @@
+<smon>
+  <general>
+    <plugins-dir></plugins-dir>
+    <notifiers-dir></notifiers-dir>
+
+    <email-group id="others">
+      <email>guest@localhost</email>
+    </email-group>
+
+    <!-- w    ... on WARNING             -->
+    <!-- u    ... on UNKNOWN             -->
+    <!-- c    ... on CRITICAL            -->
+    <!-- ok   ... on OK                  -->
+    <!-- all  ... on all                 -->
+    <!-- err  ... on all that are not OK -->
+    <!-- none ... no notification        -->
+    <notifier command="copy-to-file" on="all" format="tsv">
+      <args>
+        <arg>-file</arg>  <arg>testing simple monitor</arg>
+      </args>
+    </notifier>
+
+  </general>
+
+  <services>
+
+    <service id="no-name-service">
+      <plugin command="dummy.pl" />
+    </service>
+
+    <service id="copy" name="&lt;Moderated&gt; &quot;exit&quot;">
+      <description><![CDATA["This" is a <description> & company]]></description>
+      <plugin command="copy-message.pl">
+        <args>
+          <arg>2</arg>
+          <arg><![CDATA[This is an <"artificial"> error]]></arg>
+        </args>
+      </plugin>
+    </service>
+
+    <service id="s1" name="S 1">
+      <description>Description</description>
+      <plugin command="check-post.pl">
+        <head-test>
+          <url>exists1</url>
+        </head-test>
+        <head-test>
+          <url>exists2</url>
+        </head-test>
+        <post-test>
+          <url>exists3</url>
+          <data><![CDATA[data&data&1]]></data>
+          <response>
+            <content-type>text/dummy1</content-type>
+            <contains>dummyX</contains>
+          </response>
+        </post-test>
+        <post-test>
+          <url>exists4</url>
+          <data><![CDATA[data&data&2]]></data>
+          <response>
+            <content-type>text/dummy2</content-type>
+            <contains>dummyY</contains>
+            <contains>dummyZ</contains>
+          </response>
+        </post-test>
+        <get-test>
+          <url>exists5</url>
+          <response>
+            <content-type>text/dummy3</content-type>
+            <contains>dummyK</contains>
+            <contains>dummyL</contains>
+          </response>
+        </get-test>
+      </plugin>
+    </service>
+
+  </services>
+
+</smon>

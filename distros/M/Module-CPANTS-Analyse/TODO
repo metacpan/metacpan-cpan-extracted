@@ -1,0 +1,173 @@
+#-----------------------------------------------------------------
+# TODO Module-CPANTS-Analyse
+# $Rev: 409 $
+# $Date: 2006-09-14 19:42:31 +0200 (Thu, 14 Sep 2006) $ 
+#-----------------------------------------------------------------
+
+
+#-----------------------------------------------------------------
+# BUGS
+#-----------------------------------------------------------------
+
+Robert 'phaylon' Sedlacek <phaylon@dunkelheit.at>
+  Meldung, dass 'has_proper_version' nicht bestanden wird.     
+
+http://rt.cpan.org/Ticket/Display.html?id=21370
+  Win32 test fail:  analyse.t, analyse_afs.t, calc.t, testfile.t
+
+Moose and MooseX turn on strict, so count Moose[X] as use_strict
+
+The "ownership of a modules does not seem to get updated"
+e.g. still shows DAGOLDEN even tough it should be ADAMK
+http://cpants.perl.org/dist/external/Perl-Dist-Strawberry
+
+#-----------------------------------------------------------------
+# New Metrics
+#-----------------------------------------------------------------
+
+- no_boilerplate
+- has_valid_filenames
+- declares_dependencies
+- no_open_bugs
+- no_old_open_bugs  (older than a year?)
+
+
+- license_is_actual might be a good addition, like "copyright 2001-2002" is rather outdated
+
+- add list of modules that fail the use_warnings to $d->{error}{use_warnings}
+- same for use_strict
+
+
+- Allow the Debian and/or the Fedora packagers to "manually" report problems they 
+  encounter with certain packages directly from their systems.
+  So if there is a module that cannot automatically packaged (or tested?) because
+  they are interactive (in the wrong way) or they need network access...
+  On the Debian list it was discussed that they might start saving this information
+  from themself and then export this information with the rest of the data about
+  packages.
+
+
+
+- Signature checking ?
+- has_rating ?
+- relation of subs to lines of code ?
+
+- easily_repackagable
+- easily_repackagable_by_debian
+- easily_repackagable_by_fedora
+  on http://www.perlfoundation.org/perl5/index.cgi?cpan_packaging
+  there are guidelines for module authors to make their modules easily
+  repackagable by downstream distros.
+  It  would be great if we could add as many to CPANTS as possible.
+  Some we can check without executing code.
+  Others might be verified by the CPAN Testers, reported by the tools
+  and then collected from the reports by CPANTS.
+
+- version_number_is_sane
+  There are several issues here: 
+  1) Is the version number sane for perl (I think there is a metric already)
+  2) Is the version number sane for Debian/RedHat (they have different meaning of sane)
+  3) Is the scheme of the version numbers stable? (In Debian they don't like when ppl are
+     changing from D.DD to a D.D scheme or vice versa.
+
+  1.1.1 is not considered correct by MakeMaker but it is currently accepted by CPANTS
+  http://cpants.perl.org/dist/kwalitee/Sys-HostIP
+  http://www.nntp.perl.org/group/perl.qa/2007/12/msg10025.html
+
+- has_same_version_number_in_all_files ???
+  Some people will argue that when one of the files does not change, there is no
+  need to change its version number. So this might not be a good metric.
+
+- no_bugs_in_freebsd
+- has_patches_in_freebsd
+  The Debian and FreeBSD ppl will provide the interface for this -probably a csv file
+  that can be fetched using http.
+
+  This should be (an optional?) negative metric in case the module is
+  included in FreeBSD or Debian but it had to be patched. 
+  (Maybe we need to make sure that we set this negative metric only when the 
+   module versions are the same so we won't penalize a module because XYZ
+  has not yet integrated the newer version that possibly already includes 
+  the patch.
+- We might even have an optional metric to show that 
+  "the latest version of the module is included in Debian/FreeBSD etc".
+  This will be lost every time a new version of a module is released but
+  over time it will become ok again.
+
+  (in xt/ or in t/ and the same file has RELEASE_TESTING   in it)
+
+- has_no_indirect_code
+  Check the source code (and/or) the documentation if you see 
+  new Module::Name anywhere mark the metric as failed.
+
+
+- all_links_in_the_documentation_still_exist
+
+- declares_minimal_version_of_perl
+  It has "use N" somewhere in the Makefile.PL and/or Build.PL and/or the source code.
+  (and they match to each other :-)
+  (No specific N should be required)
+
+- "something about has good perl code"
+  (e.g. if uses 3 param open but does not say use perl 5.6 or similar)
+
+
+- has_humanreadable_license
+  the actual name of the license (perl, etc.) is in the database, use it 
+    Module::License::Report  integration
+    (though I am not sure if that should mean the main .pm
+        file only or all the files or what)
+- licenses_are_consistent
+
+Locate places where hard-coded pathes to perl (or other files?)
+are:
+>
+>       my @cmd = qw{/usr/bin/perl -Ilib -MPod::HtmlEasy -e};
+actually try to locate places where perl is called instead of $^X
+
+<@Tux> has no open bugs in RT older than 2 months
+<@Tux> and debian shipped last version is only ok is last version is older than 3 months
+
+
+#-----------------------------------------------------------------
+# Other Stuff 
+#-----------------------------------------------------------------
+
+- include more dists in test (for better test coverage)
+
+- improve NeedsCompiler (see its TODO)
+
+- Perl Critic report:
+  As this is not really in the consensus probably it is better not add it as 
+  a metric now but it might be nice to run it on each module 
+  (starting at level 5 ) and display it along with the metrics.
+  Maybe it can be added as an optional metric.
+
+
+
+
+- http://cpants.perl.org/author/search should also work on partial names
+  adding % % automatically (or at least tell the users on the search page to
+  use % as wildcards.
+
+- create stats (or metrics) for distros that were uploaded recently with failing metrics.
+  e.g. the fact that 9920 Distributions failing 'metayml_has_license' is skewed by the
+  many modules that were not updated in the past 1-2 years. It would be more important
+  to see the number of modules uploaded in the last year without metayml of without license
+  field in the metayaml.
+
+- Export the kwalitee of each distro in a csv file like so it can be easily integrated into
+  other web sites such as the search engines.
+
+- Export the kwalitee of each distro in a csv file like so it can be easily integrated into
+  other web sites such as the search engines.
+
+- Create a hierarchical report (aka CPANDepth) showing all the dependencies
+  their kwalitee, their age, their license (the name of the license from META.yml for now)
+
+- honor the META.yml key no_index. See RT#32777
+
+- Display the version of CPANTS used for indexing and show the date when the last update 
+  was executed. Maybe do so per distribution?
+
+

@@ -1,0 +1,30 @@
+---
+abstract: 'interface to SendGrid.com mail gateway APIs'
+author:
+  - 'Neil Bowers <neilb@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mail-SendGrid
+requires:
+  Carp: '1.20'
+  HTTP::Tiny: '0.013'
+  IO::Socket::SSL: '1.44'
+  JSON: '2.53'
+  Moo: '1.006'
+  URI::Escape: '3.30'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/neilb/Mail-SendGrid/issues
+  homepage: http://search.cpan.org/dist/Mail-SendGrid/
+  repository: git://github.com/neilb/Mail-SendGrid.git
+version: '0.09'

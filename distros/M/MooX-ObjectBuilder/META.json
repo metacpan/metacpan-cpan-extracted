@@ -1,0 +1,80 @@
+{
+   "abstract" : "lazy construction of objects from extra init args",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooX-ObjectBuilder",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt::Profile::TOBYINK" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Hooks::EndOfScope" : "0",
+            "Exporter::Shiny" : "0",
+            "Lexical::Accessor" : "0",
+            "MooseX::ConstructInstance" : "0",
+            "Sub::Name" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Moo" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.96",
+            "Test::Warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MooX::ObjectBuilder" : {
+         "file" : "lib/MooX/ObjectBuilder.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/MooX-ObjectBuilder/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=MooX-ObjectBuilder"
+      },
+      "homepage" : "https://metacpan.org/release/MooX-ObjectBuilder",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-moox-objectbuilder.git",
+         "web" : "https://github.com/tobyink/p5-moox-objectbuilder"
+      }
+   },
+   "version" : "0.002"
+}

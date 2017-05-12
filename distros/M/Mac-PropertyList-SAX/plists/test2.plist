@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<!-- we have a dict here only because t/plists.t expects it -->
+<dict>
+	<!--
+	make sure we maintain only one key in this hash; hash ordering is
+	inconsistent across perls and other variables
+	-->
+	<key>only</key>
+	<array>
+		<string>&lt; &amp; &gt;</string>
+		<string>&#60; &#38; &#62;</string>
+		<string>&#x3C; &#x26; &#x3E;</string>
+		<string>&#x2639;</string>
+	</array>
+</dict>
+</plist>

@@ -1,0 +1,7 @@
+t/99_cleanup_after_tests.pl
+t/testlib.pl
+t/55_indexer.t
+Makefile.PL
+lib/Metadata/DB/Indexer.pm
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)

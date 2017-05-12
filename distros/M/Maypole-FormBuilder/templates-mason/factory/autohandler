@@ -1,0 +1,31 @@
+<& header &>
+<& title &> 
+<& navbar &>
+
+% $m->call_next;
+
+<& footer &>
+
+<%doc>
+    You can use this filter to compress pages, but since MasonX::Maypole requires 
+    HTML::Mason >= 1.30, which sports the new plugin architecture, you can use 
+    MasonX::Plugin::Compress instead. 
+    
+    If configuring via Maypole::Plugin::Config::Apache:
+        PerlAddVar MaypoleMasonx "plugins => [ MasonX::Plugin::Compress->new ]"
+        
+    Normal method:
+        $config->masonx->{plugins} = [ MasonX::Plugin::Compress->new ];
+
+    # CODE NOT OPERATIONAL UNLESS PLACED OUTSIDE THE <%doc> SECTION.    
+    <%once>
+        use Compress::Zlib;
+    </%once>
+    <%filter>
+        if ($r->header_in( 'Accept-Encoding' ) =~ /((?:x-)?gzip)/ )
+        {
+            $r->content_encoding( $1 );
+            $_ = Compress::Zlib::memGzip( $_ );
+        } 
+    </%filter>
+</%doc>

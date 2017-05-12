@@ -1,0 +1,10 @@
+Revision history for Perl extension Minecraft::NBTReader.
+
+0.06  Mon Apr 13 20:30:00 2015
+	- Test for broken 64bit quad support in pack()
+	- Exit tests early if basic conditions aren't met
+	- Also tested on 5.16
+
+0.05  Tue Apr  7 15:17:55 2015
+	- Initial public release
+

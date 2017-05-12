@@ -1,0 +1,29 @@
+---
+abstract: 'Module Install Support for Test::Base'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Install-TestBase
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+    - example
+requires:
+  Module::Install: '1.10'
+  Test::Base: '0.86'
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/ingydotnet/module-install-testbase-pm/issues
+  homepage: https://github.com/ingydotnet/module-install-testbase-pm
+  repository: https://github.com/ingydotnet/module-install-testbase-pm.git
+version: '0.86'

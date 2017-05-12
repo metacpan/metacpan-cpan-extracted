@@ -1,0 +1,252 @@
+NAME
+    Music::Audioscrobbler::Submit - Module providing routines to submit
+    songs to last.fm using 1.2 protocol.
+
+DESCRIPTION
+    Music::Audioscrobbler::Submit is a scrobbler for MPD implementing the
+    1.2 protocol, including "Now Playing' feature.
+
+    Items are submitted and stored in a queue. This queue is stored as a
+    file using Tie::File. When you submit a track, it will add the queue to
+    the track and process the queue. If it submits all items in the queue,
+    the submit() method will return true. A method called
+    process_scrobble_queue() allows you to try again in case of failure. Do
+    not submit songs more than once!
+
+INSTALLATION
+    To install this module type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+DEPENDENCIES
+    This module requires these other modules and libraries:
+
+       Encode
+       File::Spec
+       Digest::MD5
+       Config::Options
+       LWP
+       Tie::File
+       Music::Tag
+
+METHODS
+    new()
+            my $mas = Music::Audioscrobbler::Submit->new($options);
+
+    options()
+        Get or set options via hash. Here is a list of available options:
+
+        lastfm_username
+            lastfm username
+
+        lastfm_password
+            lastfm password. Not needed if lastfm_md5password is set.
+
+        lastfm_md5password
+            MD5 hash of lastfm password.
+
+        lastfm_client_id
+            Client ID provided by last.fm. Defaults to "tst", which is valid
+            for testing only.
+
+        lastfm_client_version
+            Set to the version of your program when setting a valid
+            client_id. Defaults to "1.0"
+
+        verbose
+            Set verbosity level (1 through 4)
+
+        logfile
+            File to output log info to. If set to "STDERR" or undef, will
+            print messages to STDERR. If set to "STDOUT" will print messages
+            to STDOUT.
+
+        scrobble_queue
+            Path to file to queue info to. Defaults to
+            ~/.musicaudioscrobbler_queue
+
+        get_mbid_from_mb
+            Use the Music::Tag::MusicBrainz plugin to get missing "mbid"
+            value. Defaults false.
+
+        musictag
+            True if you want to use Music::Tag to get info from file. This
+            is important if you wish to use filenames to submit from.
+
+        musictag_overwrite
+            True if you want to Music::Tag info to override file info.
+            Defaults to false, which with the unicode problems with
+            Music::Tag is a good thing.
+
+        music_tag_opts
+            Options for Music::Tag
+
+        proxy_server
+            URL for proxy_server in the form http://my.proxy.ca:8080
+
+    default_options()
+        Returns a reference to the default options.
+
+    now_playing()
+        Takes a file, hashref, or Music::Tag object and submits the song to
+        Last.FM now playing info. For example:
+
+            $mas->now_playing("/path/to/file.mp3");
+
+        The hash reference is of the form:
+
+                { artist   => "Artist Name",   # Mandatory
+                  title    => "Song Title"     # Mandatory
+                  secs     => 300,             # Length of time in seconds (integers only please). Mandatory
+                  album    => "Album",         # Optional
+                  tracknum => 12,              # Optional
+                  mbid     => '6299a467-95bc-4bc1-925d-71c4e556770d'  # Optional
+                }
+ 
+    submit()
+        To submit a song pass an arrayref whose first entry is a File,
+        Music::Tag object, or hashref (see now_playing()) for format) and
+        whose second entry is an integer representing the seconds since
+        epoch (UNIX time). Several songs can be submitted simultaneously.
+        For example:
+
+            $mas->submit->(["/path/to/file.mp3", time]);
+
+        or:
+
+            $mas->submit->( ["/var/mp3s/song1.mp3", time - 600 ], 
+                            ["/var/mp3s/song2.mp3", time - 300 ], 
+                            ["/var/mp3s/song3.mp3", time ] );
+
+        Returns true if song was scrobbled, false otherwise. submit calls
+        process_scrobble_queue(). If it fails, process_scrobble_queue() can
+        be called again.
+
+        The following is taken from
+        http://www.audioscrobbler.net/development/protocol/:
+
+        The client should monitor the user's interaction with the music
+        playing service to whatever extent the service allows. In order to
+        qualify for submission all of the following criteria must be met:
+
+        1. The track must be submitted once it has finished playing. Whether
+        it has finished playing naturally or has been manually stopped by
+        the user is irrelevant.
+
+        2. The track must have been played for a duration of at least 240
+        seconds or half the track's total length, whichever comes first.
+        Skipping or pausing the track is irrelevant as long as the
+        appropriate amount has been played.
+
+        3. The total playback time for the track must be more than 30
+        seconds. Do not submit tracks shorter than this.
+
+        4. Unless the client has been specially configured, it should not
+        attempt to interpret filename information to obtain metadata instead
+        of tags (ID3, etc).
+
+    process_scrobble_queue()
+        Processes the current scrobble queue. Call this if submit fails and
+        you wish to try again. Do not resubmit a song.
+
+    handshake()
+        Perform handshake with Last.FM. You don't need to call this, it will
+        be called by submit() or now_playing() when necessary.
+
+    music_tag_opts()
+        Get or set the current options for new Music::Tag objects.
+
+    logfileout()
+        Glob reference (or IO::File) to current log file. If passed a value,
+        will use this instead of what the logfile option is set to. Any glob
+        reference that can be printed to will work (that's all we ever do).
+
+    status()
+        Print to log. First argument is a level (0 - 4). For example:
+
+            $mas->status($level, @message);
+
+    scrobble_queue()
+        Returns a reference to the current scrobble_queue. This is a tied
+        hash using Tie::File. Useful to found out how many items still need
+        to be scrobbled after a failed submit().
+
+    ua()
+        Returns the LWP::UserAgent used. If passed a value, will use that as
+        the new LWP::UserAgent object.
+
+    info_to_hash()
+        Takes a filename, hashref, or Music::Tag object and returns a hash
+        with the structure required by submit() or now_playing. Normally
+        this is called automatically by submit() or now_playing. See
+        now_playing for syntax of hash.
+
+        Examples:
+
+            my $hash = $mas->info_to_hash("/path/to/mp3/file.mp3");
+
+        is functionally equivalent to
+
+            my $hash = $mas->info_to_hash(Music::Tag->new("/path/to/mp3/file.mp3", $mas->music_tag_opts() ));
+
+SEE ALSO
+    Music::Tag, Music::Audioscrobbler::MPD
+
+CHANGES
+    Release Name: 0.05
+        *   Added new option: proxy_server to set proxy_server. Also now
+            reads proxy server from enviroment.
+
+    Release Name: 0.04
+        *   I noticed that Music::Tag was called with a use function.
+            Removed this line to remove Music::Tag requirement.
+
+        *   Added some more level 4 debuging messages.
+
+    Release Name: 0.03
+        *   Added musictag_overwrite option. This is false by default. It is
+            a workaround for problems with Music::Tag and unicode. Setting
+            this to true allows Music::Tag info to overwrite info from MPD.
+            Do not set this to true until Music::Tag returns proper unicode
+            consistantly.
+
+    Release Name: 0.02
+        *   Will print error and die if lastfm_password is not set.
+
+        *   Will print error and die if BADAUTH is received.
+
+    Release Name: 0.01
+        *   Initial Release
+
+AUTHOR
+    Edward Allen III <ealleniii _at_ cpan _dot_ org>
+
+COPYRIGHT
+    Copyright (c) 2007,2008 Edward Allen III. Some rights reserved.
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either:
+
+    a) the GNU General Public License as published by the Free Software
+    Foundation; either version 1, or (at your option) any later version, or
+
+    b) the "Artistic License" which comes with Perl.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See either the GNU
+    General Public License or the Artistic License for more details.
+
+    You should have received a copy of the Artistic License with this Kit,
+    in the file named "Artistic". If not, I'll be glad to provide one.
+
+    You should also have received a copy of the GNU General Public License
+    along with this program in the file named "Copying". If not, write to
+    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+    Boston, MA 02110-1301, USA or visit their web page on the Internet at
+    http://www.gnu.org/copyleft/gpl.html.
+

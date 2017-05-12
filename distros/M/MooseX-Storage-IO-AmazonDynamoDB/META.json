@@ -1,0 +1,81 @@
+{
+   "abstract" : "Store and retrieve Moose objects to AWS's DynamoDB, via MooseX::Storage.",
+   "author" : [
+      "Steve Caldwell <scaldwell@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.029, Dist::Milla version v1.0.9, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Storage-IO-AmazonDynamoDB",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.9",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AWS::CLI::Config" : "0",
+            "Amazon::DynamoDB" : "0",
+            "Data::Dumper" : "0",
+            "IO::Socket::SSL" : "0",
+            "JSON::MaybeXS" : "0",
+            "Module::Runtime" : "0",
+            "Moose" : "0",
+            "MooseX::Role::Parameterized" : "0",
+            "MooseX::Storage" : "0",
+            "Throwable::Error" : "0",
+            "Type::Tiny" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Clone" : "0",
+            "Future" : "0",
+            "Kavorka" : "0",
+            "MooseX::ClassAttribute" : "0",
+            "Test::Most" : "0",
+            "Test::Pod" : "0",
+            "Test::Warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stevecaldwell77/MooseX-Storage-IO-AmazonDynamoDB/issues"
+      },
+      "homepage" : "https://github.com/stevecaldwell77/MooseX-Storage-IO-AmazonDynamoDB",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stevecaldwell77/MooseX-Storage-IO-AmazonDynamoDB.git",
+         "web" : "https://github.com/stevecaldwell77/MooseX-Storage-IO-AmazonDynamoDB"
+      }
+   },
+   "version" : "0.06"
+}
+

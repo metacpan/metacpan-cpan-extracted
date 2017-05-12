@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name: Mail-Thread-Chronological
+version: 1.22
+license: perl
+distribution_type: module
+requires:
+  Date::Parse: 0
+  List::Util: 0
+  Mail::Thread: 0
+  Test::More: 0
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Mail::Thread::Chronological:
+    file: lib/Mail/Thread/Chronological.pm
+    version: 1.22
+generated_by: Module::Build version 0.18

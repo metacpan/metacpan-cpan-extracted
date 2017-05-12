@@ -1,0 +1,1 @@
+.//declarationSpecifiers[not (descendant::*[self::declarationSpecifiers])][1]

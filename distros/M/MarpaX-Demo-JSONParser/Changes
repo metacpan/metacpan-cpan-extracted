@@ -1,0 +1,51 @@
+Revision history for Perl extension MarpaX::Demo::JSONParser.
+
+1.07  2015-02-18T16:32:00
+	- Rename CHANGES to Changes as perl CPAN::Spec::Changes.
+	- Add github repo to docs and Makefile.PL.
+	- Adopt new repo structure. See
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Change licence from Artistic to Perl.
+	- Module::Install V 1.17, installed 2016-12-26 is unusable with Perl V 5.20.2. I get:
+		Prototype mismatch: sub main::prompt ($;$) vs none at inc/Module/Install.pm line 225.
+		So, wipe out all trace of it, including zapping File::ShareDir and moving share/ to data/.
+		This means the sample JSON BNF files are no longer installed, just shipped in data/.
+	- Switch from File::Slurp to File::Slurper.
+
+1.06  2014-08-31T09:12:00
+	- Add data/json.3.bfn, Jeffrey Kegler's latest grammar, which uses MarpaX::Simple.
+	- Modify JSONParser.pm code to use MarpaX::Simple. Modify the Synopsis to match the new demo.pl.
+	- Update the docs in various ways.
+	- Modify scripts/demo.pl to handle Marpa exceptions more cleanly.
+	- Update pre-reqs to use Marpa::R2 V 2.091, and MarpaX::Simple V 0.03.
+	- Fix bug in scripts/find.grammars.pl, which still only looked for json.1.bnf.
+
+1.05  2014-02-22T17:44:00
+	- Add 'lexeme default = latm => 1' to the grammar.
+	- Make V 2.082 the minimum version for Marpa::R2.
+
+1.04  2014-01-20T08:33:00
+	- Correct docs: Jean-Damien Durand authored MarpaX::Languages::C::AST, but Peter Stuifzand
+		authored json.1.bnf. This reverses the faulty correction in V 1.02. My apologies to Peter.
+
+1.03  2013-08-22T12:44:00
+	- Fix a couple of typos in 'See Also'.
+	- Add Test::Exception to the pre-reqs.
+
+1.02  2012-08-20T08:13:00
+	- In t/basic.test.t, put quotes around giant integers, so Perl compares them as strings.
+		CPAN testers are getting errors like this:
+		     $got->{id} = '281405942321532929'
+		$expected->{id} = '2.81405942321533e+017'
+	- Add README file.
+	- Correct docs: Jean-Damien Durand authored json.1.bnf and MarpaX::Languages::C::AST, not Peter Stuifzand.
+
+1.01  2013-08-17T09:34:00
+	- Replace Peter's JSON grammar with one using spaces (from his original gist). I had used tabs.
+	- Move the grammars from data/*.bnf to share/*.bnf. This, together with adopting File::ShareDir and
+		Module::Install, means these files are installed in a shared directory when the source code is installed.
+	- Add scripts/find.grammars.pl to print the path to the installed grammars json.1.bnf and json.2.bnf.
+	- Add scripts/demo.pl to actually use the module, and copy its source into the Synopsis.
+
+1.00  2013-07-01T14:14:00
+	- Initial version.

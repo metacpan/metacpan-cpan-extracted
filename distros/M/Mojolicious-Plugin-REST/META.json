@@ -1,0 +1,43 @@
+{
+   "abstract" : "Mojolicious Plugin for RESTful operations",
+   "author" : [
+      "Abhishek Shende <abhishekisnot@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-REST",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Lingua::EN::Inflect" : "1.895",
+            "Mojolicious" : "1.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/abhishekisnot/Mojolicious-Plugin-REST",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/abhishekisnot/Mojolicious-Plugin-REST.git",
+         "web" : "https://github.com/abhishekisnot/Mojolicious-Plugin-REST"
+      }
+   },
+   "version" : "0.006",
+   "x_contributors" : [
+      "Vincent HETRU <vincent.hetru@13pass.com>"
+   ]
+}
+

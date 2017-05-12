@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Math-Fractal-Curve
+version:             1.03
+abstract:            Generate fractal curves 
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Exporter:                      0
+    Imager:                        0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Steffen Mueller <fractal-module at steffen-mueller dot net>

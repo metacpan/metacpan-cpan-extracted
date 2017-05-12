@@ -1,0 +1,82 @@
+NAME
+    MAD::Scrambler - Scramble nibbles of a 32-bit integer
+
+VERSION
+    version 0.000005
+
+SYNOPSIS
+    Scrambles a 32-bit integer with a kind of reversible hashing function.
+    Definitely it is not a cryptographic hash, it is just of reversible
+    shuffle.
+
+        use MAD::Scramble;
+
+        my $scrambler = MAD::Scrambler->new(
+            scrambler => [ 1, 3, 5, 7, 0, 2, 4, 6 ],
+            bit_mask  => 0xFDB97531,
+        );
+
+        my $code = $scrambler->encode( 42 );
+        ## 0xFDB37533
+
+        my $number = $scrambler->decode( 0xFDB37533 );
+        ## 42
+
+    Very useful for example when you need to expose a reference to a object
+    into a database in a URL, but you don't want expose the original data.
+
+    Note that this is not for solving security problems, sure, since this is
+    reversible and someone can extract back the original value.
+
+    Think in this approach when you want difficult the guess of the value
+    instead of completely forbid the access to it.
+
+METHODS
+  new( %args )
+    Constructor.
+
+    %args is a hash which may contains the keys "scrambler" and "bit_mask".
+
+    "scrambler" is the order to "shuffle" the nibbles of the number you will
+    encode. Internally an "unscrambler" is calculated to reverse de process
+    when you decode a previously encoded number.
+
+    "bit_mask" is a 32-bit value to be "XORed" with the new scrambled number
+    when encoding or decoding.
+
+    If any argument is not supplied, it will be randomly generated.
+
+  encode( $number )
+    Scrambles a number into a different one based on the attributes
+    "scrambler" and "bit_mask".
+
+  decode( $code )
+    Reverses the encoding made by "encode".
+
+  nibble_split( $number )
+    Splits apart the given number in eight nibbles. The least significant
+    nibbles are put in the lowest indexes.
+
+        use MAD::Scrambler qw{ nibble_split };
+
+        @nibbles = nibble_split( 0x12345678 );
+        ## ( 8, 7, 6, 5, 4, 3, 2, 1 )
+
+  nibble_join( @nibbles )
+    Joins the nibbles together returning the corresponding integer. The
+    least significant nibbles are located in the lowest indexes.
+
+        use MAD::Scrambler qw{ nibble_join };
+
+        my $number = nibble_join( 1, 3, 5, 7, 9, 11, 13, 15 )
+        ## 0xFDB97531
+
+AUTHOR
+    Blabos de Blebe <blabos@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Blabos de Blebe.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

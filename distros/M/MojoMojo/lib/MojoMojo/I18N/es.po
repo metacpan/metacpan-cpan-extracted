@@ -1,0 +1,2377 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8    \n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. ($user->name)
+#: lib/MojoMojo/Controller/User.pm:310
+msgid ""
+"# Home node for x\n"
+"\n"
+"Put whatever you like here."
+msgstr ""
+"# Nodo principal para %1\n"
+"\n"
+"Pon lo que quieras aquí."
+
+#:
+msgid "(Private)"
+msgstr "(Privado)"
+
+#:
+msgid "(Unknown)"
+msgstr "(Desconocido)"
+
+#: root/base/edithelp/markdown.tt:18
+msgid "**bold** or __bold__"
+msgstr "**negrita** o __negrita__"
+
+#: root/base/edithelp/markdown.tt:14
+msgid "*italic* or _italic_"
+msgstr "*italica* o _italica_"
+
+#: root/base/edithelp/markdown.tt:149
+msgid "3 or more dashes or asterisks"
+msgstr "3 o mas guiones o asteriscos"
+
+#:
+msgid "<xml> and such.\\nor pure text."
+msgstr "<xml> y demás.\\no solo texto."
+
+#:
+msgid "A message from our sponsors..."
+msgstr "Un mensaje de nuestros patrocinadores..."
+
+#:
+msgid "A poorly configured MojoMojo Installation"
+msgstr "Una Instalacíon de MojoMojo mal configurada"
+
+#: lib/MojoMojo/Controller/User.pm:257
+msgid "Account Taken. Try another."
+msgstr "La cuenta ya está usada. Prueba otra."
+
+#: root/base/page/recent.tt:47
+msgid "Actions"
+msgstr "Funciones"
+
+#: root/base/admin/role.tt:17 root/base/admin/user.tt:13
+msgid "Active"
+msgstr "Activo"
+
+#: root/base/page/info.tt:45
+msgid "Active version"
+msgstr "Versión activa"
+
+#: root/base/admin/role_form.tt:8 root/forms/admin/role_form.yml:13
+msgid "Active?"
+msgstr "¿Activo?"
+
+#: root/base/page/addtags.tt:6
+msgid "Add"
+msgstr "Añadir"
+
+#: root/base/page/addtags.tt:1
+msgid "Add tag"
+msgstr "Añadir etiqueta"
+
+#: root/base/admin/user.tt:54
+msgid "Add user"
+msgstr "Añadir usuario"
+
+#: root/base/page/view.tt:33
+msgid "Added"
+msgstr "Añadido"
+
+#: lib/MojoMojo/Schema.pm:76
+msgid "Admins"
+msgstr "Administradores"
+
+#: root/base/user/profile.tt:26
+msgid "Age"
+msgstr "Edad"
+
+#: root/base/page/list.tt:18 root/base/tag/list.tt:5
+msgid "All Pages"
+msgstr "Todas las páginas"
+
+#. (page.path)
+#: root/base/page/list.tt:1 root/base/page/subtree.tt:1
+msgid "All Pages in x"
+msgstr "Todas las páginas en %1"
+
+#. (page.name)
+#. (styled_page_name)
+#: root/base/page/list.tt:19 root/base/page/subtree.tt:9
+msgid "All pages in x listed alphabetically"
+msgstr "Todas las páginas en %1 por orden alfabético"
+
+#. (activetag)
+#: root/base/tag/list.tt:22
+msgid "All pages tagged with x listed alphabetically"
+msgstr "Todas las páginas etiquetadas con %1 por orden alfabético"
+
+#: root/base/tag/cloud.tt:14
+msgid "All tags"
+msgstr "Todas las etiquetas"
+
+#: root/base/page/list.tt:49
+msgid "All tags in this path"
+msgstr "Todas las etiquetas en esta ruta"
+
+#: root/base/navbar.tt:11
+msgid "All tags in this wiki"
+msgstr "Todas las etiquetas en este wiki"
+
+#:
+msgid "All tags on photos"
+msgstr "Todas las etiquetas en fotos"
+
+#:
+msgid "Allow comments on this page."
+msgstr "Permitir comentarios en esta página."
+
+#: root/base/navbar.tt:45
+msgid "Alphabetically sorted list of pages"
+msgstr "Lista de páginas en orden alfabético"
+
+#:
+msgid "Also try h2,h3 and so on"
+msgstr "También intente h2, h3, y demás"
+
+#: lib/MojoMojo/Controller/User.pm:318
+msgid "An error occourred. Sorry."
+msgstr "Disculpe, un error ocurrió."
+
+#: root/base/edithelp/markdown.tt:138
+msgid "An h2 tag in a blockquote"
+msgstr "Un indentificador h2 en una cita bloque"
+
+#: root/base/edithelp/markdown.tt:141
+msgid "An unordered list"
+msgstr "Una lista no ordenada"
+
+#: root/base/edithelp/markdown.tt:140
+msgid "And additional Markdown formatting"
+msgstr "Y formato de Markdown adicional"
+
+#: root/base/edithelp/textile.tt:33
+msgid "And others."
+msgstr "Y otros."
+
+#: lib/MojoMojo/Schema.pm:78
+msgid "Anonymous"
+msgstr "Anónimo"
+
+#: lib/MojoMojo/Schema.pm:62
+msgid "Anonymous Coward"
+msgstr "Un cobarde anónimo"
+
+#: root/forms/admin/settings.yml:23
+msgid "Anonymous User (blank to disable)"
+msgstr "Usuario anónimo (omitir para desactivar)"
+
+#: lib/MojoMojo/Controller/PageAdmin.pm:184
+msgid "Anonymous edit disabled"
+msgstr "Desactivada la edición anónima"
+
+#: root/base/edithelp.tt:4
+msgid "Any phrase surrounded by double brackets or parentheses is a wiki word (camel-case wiki words are not supported for good reasons, one being that some languages don't have the concept of case)."
+msgstr "Cualquier frase entre cochetes dobles o paréntesis es una palabra wiki (palabras 'camel-case' no estan soportadas como palabras wiki por buenas razonas, una es que algunos lenguajes no tienen el concepto de mayúsculas)"
+
+#: root/base/gallery/photo_info.tt:7
+msgid "Aperture"
+msgstr "Apertura"
+
+#: root/base/page/delete.tt:5
+msgid "Are you sure you want to delete"
+msgstr "Estas seguro que quieres borrar"
+
+#: root/base/edithelp/markdown.tt:184
+msgid ""
+"As detailed in the book&#91;^footnote1&#93;, we will now show that...<br/>\n"
+"        ...later in the document...<br/>\n"
+"        &#91;^footnote1&#93;: Conway, Damian - Perl Best Practices, p. 117"
+msgstr ""
+
+#: root/forms/admin/settings.yml:99
+msgid "Attachment allowed by default"
+msgstr "Ficheros adjuntos permitidos por defecto"
+
+#: lib/MojoMojo/Controller/Attachment.pm:58
+msgid "Attachment not found."
+msgstr "El documento adjunto no fue encontrado."
+
+#: root/base/navbar.tt:44 root/base/page/editbar.tt:14 root/base/page/editbar.tt:9 root/base/page/info.tt:66
+msgid "Attachments"
+msgstr "Archivos Adjuntos"
+
+#: root/base/page/attachments.tt:1
+msgid "Attachments for"
+msgstr "Archivos adjuntos para"
+
+#: root/base/page/info.tt:63
+msgid "Attachments size"
+msgstr "Tamaño de los archivos adjuntos"
+
+#: root/base/navbar.tt:12
+msgid "Authors"
+msgstr "Autores"
+
+#: root/base/page/list.tt:50
+msgid "Authors in this path"
+msgstr "Autores en esta ruta"
+
+#: root/base/page/bottomnav.tt:24 root/base/page/bottomnav.tt:41
+msgid "Back in time"
+msgstr "Retroceder en el tiempo"
+
+#: root/base/page/bottomnav.tt:46 root/base/this_page_link.tt:18
+msgid "Back to the page"
+msgstr "Regresar a la página"
+
+#: root/base/page/list.tt:55
+msgid "Backlinks"
+msgstr "Retroenlace"
+
+#: root/forms/user/editprofile.yml:11
+msgid "Birth Date"
+msgstr "Fecha de nacimiento"
+
+#: root/base/edithelp/markdown.tt:131
+msgid "Block quotes"
+msgstr "Citas bloque"
+
+#: root/base/edithelp/markdown.tt:137
+msgid "Blockquotes can be nested"
+msgstr "Citas bloque pueden anidarse"
+
+#:
+msgid "Bold"
+msgstr "Negrita"
+
+#:
+msgid "Bullet list"
+msgstr "Lista"
+
+#: root/base/edithelp/textile.tt:20 root/base/edithelp/textile.tt:22
+msgid "Bulleted list"
+msgstr "Lista"
+
+#: root/base/edithelp.tt:9
+msgid "By default, a wiki word will reference it's children. To reference a sibling, you can do [[../Node]], or to reference a toplevel node do [[/Node]]"
+msgstr "Por defecto, una palabra wiki referenciará a su sucesor en la ruta. Para referenciar al predecesor puedes usar [[../Nodo]] o si quieres referenciar a uno de primer nivel usa [[/Nodo]]"
+
+#: root/forms/admin/settings.yml:74
+msgid "Cache permission data"
+msgstr "Cachear datos de permisos"
+
+#: root/base/gallery/photo_info.tt:4
+msgid "Camera"
+msgstr "Cámara"
+
+#: lib/MojoMojo/Controller/Attachment.pm:230
+msgid "Can only make inline version of photos"
+msgstr "Solo puede crear fotos en version en línea"
+
+#: lib/MojoMojo/Controller/Attachment.pm:204
+msgid "Can only make thumbnails of photos"
+msgstr "Solo puede crear miniaturas de imagenes"
+
+#: lib/MojoMojo/Controller/Admin.pm:87
+msgid "Cant find admin user: "
+msgstr "No se puede encontrar el usuario administrativo: "
+
+#: root/base/this_page_link.tt:9
+msgid "Change page content"
+msgstr "Cambiar contenido de la página"
+
+#: root/base/user/prefs.tt:7
+msgid "Change password"
+msgstr "Cambiar contraseña"
+
+#: root/base/user/profile.tt:10
+msgid "Change profile content"
+msgstr "Cambiar contenido de perfil"
+
+#: root/base/page/bottomnav.tt:70
+msgid "Change site settings"
+msgstr "Cambiar configuración de sitio"
+
+#: root/forms/admin/settings.yml:69
+msgid "Check permission on view"
+msgstr "Verificar permisos en la vista"
+
+#: root/base/page/info.tt:51
+msgid "Children"
+msgstr "Hijos"
+
+#: root/base/page/attachments.tt:18
+msgid "Choose attachments"
+msgstr "Escoge los ficheros adjuntos"
+
+#: root/base/gallery/photo.tt:33
+msgid "Click for original version"
+msgstr "Haga clic para la versión original"
+
+#: root/base/page/suggest.tt:12
+msgid "Click on a link above to create that page."
+msgstr "Haz click en el enlace de arriba para crear la página."
+
+#: root/base/edithelp/markdown.tt:153
+msgid "Code"
+msgstr "Código"
+
+#: root/base/comment.tt:6
+msgid "Comment"
+msgstr "Comentario"
+
+#: root/forms/comment/comment.yml:8
+msgid "Comment body"
+msgstr "Cuerpo del comentario"
+
+#: root/base/comment.tt:6
+msgid "Comments"
+msgstr "Comentarios"
+
+#: root/base/admin/toplinks.tt:8
+msgid "Configuration"
+msgstr "Configuración"
+
+#: root/base/page/info.tt:48
+msgid "Content size"
+msgstr "Tamaño del contenido"
+
+#: lib/MojoMojo/Controller/User.pm:57 root/base/comment/login.tt:8
+msgid "Could not authenticate that login."
+msgstr "El usuario y contraseña no se pudo autenticar."
+
+#. ($file)
+#: lib/MojoMojo/Controller/Attachment.pm:114
+msgid "Could not create attachment from x"
+msgstr "No se puede crear archivo adjunto de %1"
+
+#. ($url)
+#: lib/MojoMojo/Formatter/RSS.pm:77
+msgid "Could not parse feed x"
+msgstr "No se puede parsear el feed x"
+
+#: lib/MojoMojo/Controller/User.pm:186
+msgid "Could not recover password"
+msgstr "No se puede recuperar el la contraseña"
+
+#. ($url)
+#: lib/MojoMojo/Formatter/Include.pm:80 lib/MojoMojo/Formatter/RSS.pm:74
+msgid "Could not retrieve x"
+msgstr "No se puede recuperar %1"
+
+#: root/base/admin/create_role.tt:10
+msgid "Create Role"
+msgstr "Crear el rol"
+
+#: root/base/admin/role.tt:11 root/base/admin/role.tt:35
+msgid "Create a new role"
+msgstr "Crear un rol nuevo"
+
+#: root/forms/admin/settings.yml:79
+msgid "Create allowed by default"
+msgstr "Permitir la creación por defecto"
+
+#: root/base/page/edit.tt:62
+msgid "Create and View"
+msgstr "Crear y ver"
+
+#: root/base/page/info.tt:21
+msgid "Created by"
+msgstr "Creada por"
+
+#: root/base/edithelp/markdown.tt:150
+msgid "Creates"
+msgstr "Crea"
+
+#: root/base/page/edit.tt:1 root/base/page/edit.tt:7
+msgid "Creating"
+msgstr "Creando"
+
+#: root/base/page/bottomnav.tt:46
+msgid "Current Revision"
+msgstr "Edición actual"
+
+#: root/forms/user/password.yml:8
+msgid "Current password"
+msgstr "Contranseña actual"
+
+#: root/base/page/info.tt:20
+msgid "Date"
+msgstr "Fecha"
+
+#: root/base/user/profile.tt:54
+msgid "Date registered"
+msgstr "Fecha de registración"
+
+#. (page.path)
+#: root/base/page/delete.tt:1
+msgid "Delete"
+msgstr "Borrar"
+
+#: root/forms/admin/settings.yml:84
+msgid "Delete allowed by default"
+msgstr "Pemitir el borrado por defecto"
+
+#: root/base/page/bottomnav.tt:15
+msgid "Delete page"
+msgstr "Borrar página"
+
+#: root/base/page/deleted.tt:1 root/base/page/deleted.tt:4
+msgid "Deleted"
+msgstr "Borrada"
+
+#: root/base/page/info.tt:54
+msgid "Descendants"
+msgstr "Descendientes"
+
+#: root/base/user/validate.tt:11
+msgid "Didn't receive an email?"
+msgstr "¿No recibió un correo electrónico?"
+
+#: root/forms/admin/settings.yml:47
+msgid "Disable internal search (use Google)"
+msgstr "Desactivar el buscador interno (usar Google)"
+
+#: root/base/navbar.tt:14
+msgid "Download a ZIP of this page and its subpages"
+msgstr "Descargar un zip de esta página y sus sub-páginas"
+
+#: root/base/page/list.tt:52
+msgid "Download a zip with all the pages in this path"
+msgstr "Descargar un zip con todas las Páginas de esta ruta"
+
+#: lib/MojoMojo/Controller/PageAdmin.pm:249
+msgid "END OF CONFLICT"
+msgstr "FIN DEL CONFLICTO"
+
+#: root/base/admin/role.tt:27 root/base/page/editbar.tt:13 root/base/page/editbar.tt:7 root/base/page/permissions.tt:73
+msgid "Edit"
+msgstr "Editar"
+
+#: root/base/user/profile.tt:10
+msgid "Edit Profile"
+msgstr "Editar Perfil"
+
+#: root/base/admin/edit_role.tt:10
+msgid "Edit Role"
+msgstr "Editar Rol"
+
+#: root/forms/admin/settings.yml:89
+msgid "Edit allowed by default"
+msgstr "Permitir la edición por defecto"
+
+#: root/base/this_page_link.tt:13 root/base/this_page_link.tt:15
+msgid "Edit page"
+msgstr "Editar página"
+
+#: root/base/page/permissions.tt:46
+msgid "Edit permissions for this page"
+msgstr "Editar permisos para esta página"
+
+#: root/base/page/recent.tt:45
+msgid "Edited by"
+msgstr "Editado por"
+
+#: root/base/page/edit.tt:1 root/base/page/edit.tt:5
+msgid "Editing"
+msgstr "Editando"
+
+#. (user.name)
+#: root/base/user/editprofile.tt:1
+msgid "Editing user profile for x"
+msgstr "Editando perfil de %1"
+
+#: root/base/user/profile.tt:57
+msgid "Edits"
+msgstr "Páginas editadas"
+
+#: root/base/user/profile.tt:20 root/base/user/recover_pass.tt:5 root/base/user/validate.tt:16 root/forms/user/prefs.yml:23 root/forms/user/register.yml:33
+msgid "Email"
+msgstr "Correo Electrónico"
+
+#: root/base/user/validate.tt:1
+msgid "Email Validation"
+msgstr "Validación de correo electrónico"
+
+#: lib/MojoMojo/Controller/User.pm:210
+msgid "Emailed you your new password."
+msgstr "Se le ha enviado una contraseña nueva por correo electrónico."
+
+#: root/base/edithelp.tt:55
+msgid "Enable comments on this page."
+msgstr "Activar comentarios en esta página."
+
+#: root/forms/admin/settings.yml:50
+msgid "Enable graphical emoticons"
+msgstr "Activar emoticones gráficos"
+
+#: root/forms/admin/settings.yml:64
+msgid "Enforce login"
+msgstr "Forzár login"
+
+#:
+msgid "Enum list"
+msgstr "Lista enumerada"
+
+#: root/base/message.tt:1
+msgid "Error"
+msgstr ""
+
+#: lib/MojoMojo/Controller/User.pm:205
+msgid "Error occurred while emailing you your new password."
+msgstr "Un error ocurrió mientras se le enviaba su contraseña nueva por correo electrónico."
+
+#: root/base/edithelp.tt:40
+msgid "Examples"
+msgstr "Ejemplos"
+
+#: root/base/gallery/photo_info.tt:1
+msgid "Exif Data"
+msgstr "Información Exif"
+
+#:
+msgid "Existent Pages"
+msgstr "Páginas existentes"
+
+#: root/base/export.tt:1 root/base/navbar.tt:14 root/base/page/list.tt:52
+msgid "Export"
+msgstr "Exportar"
+
+#:
+msgid "External Link"
+msgstr "Enlace externo"
+
+#: root/forms/user/editprofile.yml:30
+msgid "Favorite Albums"
+msgstr "Álbumes Favoritos"
+
+#: root/forms/user/editprofile.yml:34
+msgid "Favorite Movies"
+msgstr "Películas Favoritas"
+
+#: root/base/feeds.tt:1 root/base/navbar.tt:13 root/base/page/list.tt:51
+msgid "Feeds"
+msgstr ""
+
+#: root/base/user/validate.tt:13
+msgid "Fill in the email address you want to use here"
+msgstr "Rellene la dirección electrónica que quiere usar aquí"
+
+#: root/base/gallery/photo_info.tt:8
+msgid "Flash"
+msgstr ""
+
+#: root/base/edithelp/markdown.tt:181
+msgid "Footnotes"
+msgstr "Notas al pie"
+
+#: root/base/edithelp/markdown.tt:107
+msgid "For nested lists, indent each level by 3 spaces"
+msgstr "Para listas enlazadas, identa cada nivel con 3 espacios"
+
+#: root/base/edithelp/markdown.tt:98
+msgid "For numbered lists, just use numbers instead of asterisks"
+msgstr "Para listas numeradas, pon numeros en lugar de asteriscos"
+
+#:
+msgid "Format content until next =pod as plain old documentation"
+msgstr "Formatear contenido como documentación sencilla (POD) hasta el próximo =pod"
+
+#: root/base/edithelp.tt:59
+msgid "Format content until {{end}} as plain old documentation"
+msgstr "Formatear contenido como documentación sencilla (POD) hasta el próximo {{end}}"
+
+#: root/base/page/bottomnav.tt:61
+msgid "Format page for printing"
+msgstr "Formatear página para impresión"
+
+#: root/base/page/bottomnav.tt:30 root/base/page/bottomnav.tt:36
+msgid "Forward in time"
+msgstr "Adelantar en tiempo"
+
+#: root/base/page/permissions.tt:12
+msgid "From"
+msgstr "De"
+
+#: root/base/feeds.tt:7 root/base/feeds.tt:9
+msgid "Full content"
+msgstr "Contenido completo"
+
+#: root/base/navbar.tt:40 root/base/navbar.tt:42
+msgid "Gallery"
+msgstr "Galería"
+
+#: root/base/user/profile.tt:31 root/forms/user/editprofile.yml:18
+msgid "Gender"
+msgstr "Sexo"
+
+#: root/base/navbar.tt:31
+msgid "Get in there"
+msgstr "Metase ahí"
+
+#: root/base/page/search_inline.tt:6 root/base/page/search_inline.tt:9
+msgid "Go"
+msgstr "Ir"
+
+#:
+msgid "Go directly to "
+msgstr "Ir directamente a "
+
+#:
+msgid "Go to home page"
+msgstr "Ir a la portada"
+
+#: root/base/navbar.tt:25
+msgid "Go to your user page"
+msgstr "Ir a tu página de usuario"
+
+#: root/base/edithelp/markdown.tt:175
+msgid "Going back to normal formatting"
+msgstr "Regresando a formato normal"
+
+#: root/base/export.tt:6
+msgid "HTML"
+msgstr "HTML"
+
+#: root/base/mail/reset_password.tt:8
+msgid "Have a nice day"
+msgstr "Tenga un buen día"
+
+#:
+msgid "Header 1"
+msgstr "Encabezado 1"
+
+#:
+msgid "Header 2"
+msgstr "Encabezado 2"
+
+#:
+msgid "Header 6"
+msgstr "Encabezado 6"
+
+#: root/base/edithelp/markdown.tt:47
+msgid "Headers"
+msgstr "Encabezados"
+
+#: root/base/feeds.tt:8
+msgid "Headlines"
+msgstr "Titulares"
+
+#. (page.name_orig)
+#: root/base/page/rss.tt:4
+msgid "Headlines for x"
+msgstr "Titulares para %1"
+
+#: lib/MojoMojo/Schema.pm:122
+msgid "Help"
+msgstr "Ayuda"
+
+#: root/base/mail/reset_password.tt:1
+msgid "Hi there."
+msgstr "Saludos."
+
+#. (user.name)
+#: root/base/mail/validate.tt:1
+msgid "Hi. This is a mail to validate your email address, x. To confirm, please click the url below:"
+msgstr "Hola. Este es un correo para validar tu correo electrónico, %1. Para confirmar, por favor oprime la siguiente url:"
+
+#: root/base/page/bottomnav.tt:56
+msgid "Hide changes"
+msgstr "Ocultar cambios"
+
+#: root/base/admin/toplinks.tt:11 root/base/page/wrapper.tt:11 root/base/sidebar.tt:3
+msgid "Home"
+msgstr "Página Principal"
+
+#: root/base/edithelp.tt:8
+msgid "HomePage, IBM, School"
+msgstr "PáginaPrincipal, IBM, Escuela"
+
+#:
+msgid "HomePage, ThreeWordsTogether, [[C++]], [[Lets play again!]] ((easy to type))"
+msgstr "PáginaPrincipal, TresPalabrasJuntas, [[C++]], [[¡Juguemos de nuevo!]] ((fácil de teclear))"
+
+#: root/base/edithelp/markdown.tt:146
+msgid "Horizontal Rules"
+msgstr "Linea Horizontal"
+
+#: root/base/gallery.tt:6
+msgid "Hover over an image to get more info."
+msgstr "Sostengase sobre una imagen para mas información."
+
+#:
+msgid "IBM, School"
+msgstr "IBM, Escuela"
+
+#: root/base/admin/role.tt:15
+msgid "ID"
+msgstr "Identificación"
+
+#: root/base/gallery/photo_info.tt:6
+msgid "ISO"
+msgstr "ISO"
+
+#:
+msgid "IdLabel"
+msgstr "IdentificaciónEtiqueta"
+
+#: root/base/page/attachments.tt:20
+msgid "If the flash uploader gives you problems, switch to the"
+msgstr "Si el la interfaz de subida en flash te causa problemas, puedes usar el"
+
+#. (link)
+#: root/base/user/validate.tt:22
+msgid "If you are unable to validate, please x"
+msgstr "Si no puede hacer la validación, por favor %1"
+
+#: root/base/edithelp/textile.tt:56
+msgid "Image"
+msgstr "Imagen"
+
+#: root/base/edithelp/markdown.tt:190
+msgid "Images"
+msgstr "Imagenes"
+
+#: root/base/user/profile.tt:36 root/forms/user/editprofile.yml:25
+msgid "Industry"
+msgstr "Industria"
+
+#: root/base/page/permissions.tt:8
+msgid "Inherited permissions"
+msgstr "Permisos heredados"
+
+#: root/base/edithelp/markdown.tt:193 root/base/page/bottomnav.tt:63
+msgid "Inline"
+msgstr "En línea"
+
+#:
+msgid "Inline Links"
+msgstr "Enlaces en línea"
+
+#: root/base/page/bottomnav.tt:63
+msgid "Inline for including content"
+msgstr "En linea para ser incluido"
+
+#: root/base/user/profile.tt:41 root/forms/user/editprofile.yml:28
+msgid "Interests"
+msgstr "Intereses"
+
+#:
+msgid "Internal Link"
+msgstr "Enlace interno"
+
+#: lib/MojoMojo/Controller/User.pm:169
+msgid "Invalid password"
+msgstr "Contraseña invalida"
+
+#:
+msgid "Italic"
+msgstr "Italica"
+
+#: root/base/edithelp/markdown.tt:142
+msgid "Item"
+msgstr "Artículo"
+
+#: root/base/edithelp/markdown.tt:109 root/base/edithelp/markdown.tt:121
+msgid "Item 1"
+msgstr ""
+
+#: root/base/edithelp/markdown.tt:111 root/base/edithelp/markdown.tt:122
+msgid "Item 1.1"
+msgstr ""
+
+#: root/base/edithelp/markdown.tt:112 root/base/edithelp/markdown.tt:123
+msgid "Item 1.2"
+msgstr ""
+
+#: root/base/edithelp/markdown.tt:114 root/base/edithelp/markdown.tt:124
+msgid "Item 1.2.1"
+msgstr ""
+
+#: root/base/edithelp/markdown.tt:117 root/base/edithelp/markdown.tt:125
+msgid "Item 2"
+msgstr ""
+
+#: root/base/edithelp/markdown.tt:136
+msgid "Just like email quoting!"
+msgstr "¡Justo como citando correos electrónicos!"
+
+#:
+msgid "Justified paragraph"
+msgstr "Párrafo justificado"
+
+#:
+msgid "Last changes"
+msgstr "Últimos cambios"
+
+#:
+msgid "Later in the document"
+msgstr "Después en el documento"
+
+#:
+msgid "Leave second blank if you do not want a password"
+msgstr "Deje el segundo en blanco si no quiere una contraseña"
+
+#: root/base/page/edit.tt:72
+msgid "Leave the second field blank if you do not want a password"
+msgstr "Deja el segundo campo en blanco si no quieres una contraseña"
+
+#:
+msgid "Left-justified paragraph"
+msgstr "Párrafo justficado a la izquierda"
+
+#: root/base/gallery/photo_info.tt:5
+msgid "Lens"
+msgstr "Lente"
+
+#: root/base/edithelp/markdown.tt:39 root/base/edithelp/markdown.tt:41
+msgid "Link Title"
+msgstr "Título de enlace"
+
+#: root/base/edithelp/markdown.tt:24
+msgid "Link to Another Page"
+msgstr "Enlazar a otra página"
+
+#: root/base/page/info.tt:76
+msgid "Linked from"
+msgstr "Enlazdo de"
+
+#: root/base/edithelp/markdown.tt:21
+msgid "Links"
+msgstr "Enlaces"
+
+#: root/base/page/info.tt:60
+msgid "Links from"
+msgstr "Enlaces de"
+
+#: root/base/page/info.tt:57
+msgid "Links to"
+msgstr "Enlaces a"
+
+#: root/base/edithelp/markdown.tt:30
+msgid "Links to Other Sites"
+msgstr "Enlaces a otros sitios"
+
+#: root/base/page/list.tt:66
+msgid "Links to non-existent pages."
+msgstr "Enlaces a páginas no existentes."
+
+#. (activetag)
+#: root/base/tag/list.tt:20
+msgid "List by x"
+msgstr "Listar por %1"
+
+#:
+msgid "List item 1"
+msgstr "Listar artículo 1"
+
+#: root/base/edithelp/markdown.tt:79
+msgid "Lists"
+msgstr "Listas"
+
+#:
+msgid "Lists can be nested by indentation level"
+msgstr "Listas pueden anidarse por nivel de sangría"
+
+#: root/base/navbar.tt:31
+msgid "Log in"
+msgstr "Entrar"
+
+#: root/base/navbar.tt:26
+msgid "Log out"
+msgstr "Salir"
+
+#: root/base/user/login.tt:1 root/forms/user/login.yml:24 root/forms/user/prefs.yml:7 root/forms/user/register.yml:8
+msgid "Login"
+msgstr "Login"
+
+#: root/base/edithelp/markdown.tt:50 root/base/edithelp/markdown.tt:51 root/base/edithelp/markdown.tt:56 root/base/edithelp/markdown.tt:57
+msgid "Main Header"
+msgstr "Encabezado principal"
+
+#: root/forms/admin/settings.yml:29
+msgid "Main formatter"
+msgstr "Formateador principal"
+
+#: root/base/page/rollback.tt:4
+msgid "Make current"
+msgstr "Hacerla actual"
+
+#:
+msgid "Mark some text to apply the toolbar actions to that text"
+msgstr "Marque algún texto para aplicar las acciones de la barra de herramientas a ese texto"
+
+#:
+msgid "Markdown formatting tips"
+msgstr "Sugerencias para formato de Markdown"
+
+#: root/base/edithelp/markdown.tt:1
+msgid "Markdown help"
+msgstr "Ayuda de Markdown"
+
+#: root/base/edithelp/markdown.tt:4
+msgid "Markdown reference - the basics"
+msgstr "Referencia de Markdown - Lo básico"
+
+#:
+msgid "MojoMojo - Spirit in a box"
+msgstr "MojoMojo - Espíritu en una caja"
+
+#: root/base/mail/reset_password.tt:9
+msgid "MojoMojo - The elegant wiki, Catalyst-powered"
+msgstr "MojoMojo - El wiki elegante, Catalyst-powered"
+
+#: root/base/user/profile.tt:51
+msgid "Movies"
+msgstr "Películas"
+
+#:
+msgid "MultiMarkdown formatting tips"
+msgstr "Concejos de formateo con MultiMarkdown"
+
+#: root/base/edithelp/markdown.tt:5
+msgid "MultiMarkdown reference - the extended syntax"
+msgstr "Referencia de MultiMarkdown - Sintaxis extendida"
+
+#: root/base/user/profile.tt:46
+msgid "Music"
+msgstr "Música"
+
+#: root/base/gallery/tags.tt:2 root/base/page/tags.tt:2
+msgid "My tags"
+msgstr "Mis etiquetas"
+
+#: root/base/edithelp/markdown.tt:92
+msgid "NOTE: you need a blank line before and after the list"
+msgstr "NOTA: es necesario una linea en blanco antes y despues de la lista"
+
+#: root/base/admin/role.tt:16 root/base/user/profile.tt:15 root/forms/user/editprofile.yml:8 root/forms/user/prefs.yml:17 root/forms/user/register.yml:42
+msgid "Name"
+msgstr "Nombre"
+
+#: root/base/user/profile.tt:16
+msgid "Name missing"
+msgstr "Nombre ausente"
+
+#: root/base/edithelp/markdown.tt:159
+msgid "Nested backticks"
+msgstr "Acentos graves anidados"
+
+#: root/base/user/register.tt:1
+msgid "New User Registration"
+msgstr "Registración de Usuario Nuevo"
+
+#: root/forms/admin/settings.yml:35
+msgid "New User Registration open"
+msgstr "Registración de Usuario Nuevo abierta"
+
+#: root/forms/user/password.yml:13
+msgid "New password"
+msgstr "Contraseña nueva"
+
+#: root/forms/user/password.yml:18
+msgid "New password again"
+msgstr "Contraseña nueva de nuevo"
+
+#: root/base/admin/user.tt:50 root/base/page/search_inline.tt:53
+msgid "Next"
+msgstr "Siguiente"
+
+#: root/base/page/list.tt:37
+msgid "Next page"
+msgstr "Siguiente página"
+
+#: root/base/admin/role.tt:26
+msgid "No"
+msgstr "No"
+
+#: root/base/comment.tt:25
+msgid "No Comments posted"
+msgstr "Ningún Comentario dejado"
+
+#. (c.pref('main_formatter')
+#. (c.pref("main_formatter"))
+#: root/base/edithelp/main.tt:1
+msgid "No help yet for x"
+msgstr "Ayuda aún no disponible para %1"
+
+#: root/base/admin/role_form.tt:23
+msgid "No members added yet."
+msgstr "Ningún miembro añadido aún."
+
+#:
+msgid "No permissions to edit this page"
+msgstr "No tienes permisos para editar esta página"
+
+#. ($operation || $c->loc('update')
+#: lib/MojoMojo/Controller/PageAdmin.pm:38
+msgid "No permissions to x this page"
+msgstr "No tienes permisos para %1 esta página"
+
+#: root/base/user/list.tt:13
+msgid "No recent changes"
+msgstr "No hay cambios recientes"
+
+#: root/base/page/search_inline.tt:26
+msgid "No results found"
+msgstr "No se ha encontrado ningún resultado"
+
+#. ($rev,                '<span class="error_detail">'                  . '<a href="'                  . $page->path . '">'                  . $page->name . '</a>'                  . '</span>')
+#: lib/MojoMojo/Controller/Page.pm:87
+msgid "No revision x for x"
+msgstr "No existe la revision %1 para %2"
+
+#: root/base/admin/role.tt:34
+msgid "No roles created yet."
+msgstr "No hay roles creados aún."
+
+#:
+msgid "No such revision for "
+msgstr "Ninguna edición para "
+
+#: root/base/tag/cloud.tt:5 root/base/tag/cloud.tt:9
+msgid "No tags in use."
+msgstr "No se esta usando ninguna etiqueta."
+
+#:
+msgid "Non-Existent Pages"
+msgstr "Páginas no existentes"
+
+#: root/base/page/permissions.tt:26 root/base/page/permissions.tt:42
+msgid "None"
+msgstr "Ninguna"
+
+#:
+msgid "Normal Paragraph"
+msgstr "Párrafo Normal"
+
+#: root/base/edithelp/markdown.tt:169
+msgid "Normal paragraph"
+msgstr "Párrafo normal"
+
+#: lib/MojoMojo/Formatter/Wiki.pm:315 root/base/page/list.tt:72
+msgid "Not found. Click to create this page."
+msgstr "No se encontró. Haga clic para crear esta página."
+
+#: root/base/edithelp.tt:8
+msgid "Not wiki words"
+msgstr "No son palabras wiki"
+
+#: root/base/edithelp/markdown.tt:177
+msgid "Note that for programming language code, it may be better to use the Syntax highlight plugin."
+msgstr "Ten en cuenta que para código en algun lenguaje de programación puede ser mejor usar el plugin de Syntax highlight."
+
+#:
+msgid "Nothing entered"
+msgstr "Nada entrado"
+
+#: root/base/edithelp/textile.tt:25 root/base/edithelp/textile.tt:27
+msgid "Numbered list"
+msgstr "Lista numerada"
+
+#:
+msgid "Numbered list item"
+msgstr "Artículo de lista enumerada"
+
+#:
+msgid "One or more pages in the requested path do not exist."
+msgstr "Una o más páginas en la ruta solicitada no existe."
+
+#: root/base/edithelp/markdown.tt:194
+msgid "Optional Title"
+msgstr "Título Opcional"
+
+#. (link)
+#: root/base/tag/cloud.tt:15
+msgid "Or you can check out x instead"
+msgstr "O puede revisar %1 en su lugar"
+
+#:
+msgid "Ordered Lists"
+msgstr "Listas Ordenadas"
+
+#: root/base/page/list.tt:79
+msgid "Orphaned Pages"
+msgstr "Páginas Órfanas"
+
+#:
+msgid "Other Suggestions"
+msgstr "Otras Sugerencias"
+
+#: root/base/page/list.tt:56
+msgid "Other pages that link to this page."
+msgstr "Otras páginas que se enlazen a esta página."
+
+#: root/base/page/recent.tt:44 root/base/this_page_link.tt:18
+msgid "Page"
+msgstr "Página"
+
+#: root/base/page/bottomnav.tt:18 root/base/page/bottomnav.tt:20
+msgid "Page Info"
+msgstr "Información de esta página"
+
+#: root/base/edithelp/markdown.tt:26
+msgid "Page Name Here"
+msgstr "Nombre de la página aquí"
+
+#. (page.path)
+#: root/base/page/info.tt:9
+msgid "Page info for x"
+msgstr "Información de la página para %1"
+
+#: root/base/page/bottomnav.tt:18 root/base/page/bottomnav.tt:20
+msgid "Page meta information"
+msgstr "Meta información de la página"
+
+#: root/forms/pageadmin/edit.yml:7
+msgid "Page text"
+msgstr "Texto de página"
+
+#: root/base/navbar.tt:10
+msgid "Pages sorted by when they were last changed"
+msgstr "Páginas ordenadas por la fecha del último cambio"
+
+#: root/base/page/list.tt:80
+msgid "Pages to which no other pages link."
+msgstr "Páginas a las que no enlaza ninguna otra página."
+
+#: root/forms/user/login.yml:18 root/forms/user/register.yml:18
+msgid "Password"
+msgstr "Contraseña"
+
+#: root/forms/user/password.yml:22 root/forms/user/register.yml:23
+msgid "Password did not match"
+msgstr "La contraseña no coincidió"
+
+#: root/forms/user/register.yml:27
+msgid "Password must be between 4 and 14 chars"
+msgstr "La contraseña debe tener entre 4 y 14 carácteres"
+
+#. ($c->stash->{page}->name)
+#: lib/MojoMojo.pm:674
+msgid "Permission Denied to view x"
+msgstr "Permiso denegado para ver %1"
+
+#. ([ $loc_permtocheck, $name ])
+#: lib/MojoMojo/Controller/PageAdmin.pm:179
+msgid "Permission denied to x x"
+msgstr "Permiso denegado para %1 %2"
+
+#: root/base/page/editbar.tt:11 root/base/page/editbar.tt:15 root/base/page/editbar.tt:5
+msgid "Permissions"
+msgstr "Permisos"
+
+#: root/base/page/permissions.tt:30
+msgid "Permissions for this page"
+msgstr "Permisos para esta página"
+
+#: root/base/navbar.tt:40
+msgid "Photo Album"
+msgstr "Álbum de Fotos"
+
+#: lib/MojoMojo/Controller/Gallery.pm:31
+msgid "Photo not found"
+msgstr "No se ha encontrado la foto"
+
+#: root/base/page/info.tt:69
+msgid "Photos"
+msgstr "Fotos"
+
+#: lib/MojoMojo/Controller/User.pm:235
+msgid "Please fill in the following information to register. All fields are mandatory."
+msgstr "Por favor llene la siguiente información para registrarse. Todos los campos son obligatorios."
+
+#: root/base/page/attachments.tt:19
+msgid "Please select a file to attach to this page. To upload multiple files, hold CTRL while selecting multiple files in the file selection pop up window."
+msgstr "Selecciona un fichero para anexar a esta página. Para subir varios ficheros, manten pulsada la tecla CTRL mientras seleccionas varios ficheros en la ventana de seleccion."
+
+#: lib/MojoMojo/Controller/Jsrpc.pm:31
+msgid "Please type something"
+msgstr "Por favor teclee algo"
+
+#: root/base/edithelp.tt:29
+msgid "Plugin syntax"
+msgstr "Sintaxis para los plugins"
+
+#: root/base/gallery/tags.tt:15 root/base/page/tags.tt:15
+msgid "Popular tags"
+msgstr "Etiquetas populares"
+
+#: root/base/comment/post.tt:4
+msgid "Post"
+msgstr "Entrada de Blog"
+
+#: root/base/footer.tt:2
+msgid "Powered by Catalyst"
+msgstr "Powered by Catalyst"
+
+#: root/base/navbar.tt:49
+msgid "Preferences"
+msgstr "Preferencias"
+
+#: root/base/edithelp/markdown.tt:163
+msgid "Preformatted Code Blocks"
+msgstr "Bloques de Código Previamente Formateados"
+
+#:
+msgid "Preformatted text"
+msgstr "Texto previamente formateado"
+
+#: root/base/page/editbar.tt:4
+msgid "Preview"
+msgstr "Vista Previa"
+
+#: root/base/admin/user.tt:42 root/base/page/search_inline.tt:47
+msgid "Previous"
+msgstr "Anterior"
+
+#: root/base/page/list.tt:29
+msgid "Previous page"
+msgstr "Página anterior"
+
+#: root/base/page/bottomnav.tt:61
+msgid "Print"
+msgstr "Imprimir"
+
+#: root/base/navbar.tt:47
+msgid "Profile"
+msgstr "Perfil"
+
+#. (version.creator.name)
+#: root/base/page/info.tt:32
+msgid "Profile for x"
+msgstr "Perfil de %1"
+
+#: root/base/export.tt:7
+msgid "Raw markup"
+msgstr "Marcado no procesado"
+
+#: root/base/navbar.tt:10
+msgid "Recent"
+msgstr "Reciente"
+
+#: root/base/tag/recent.tt:3
+msgid "Recent Pages"
+msgstr "Páginas Recientes"
+
+#. (page.path)
+#: root/base/page/atom.tt:6 root/base/page/list.tt:48 root/base/page/rss.tt:6 root/base/page/rss_full.tt:7
+msgid "Recent changes in x"
+msgstr "Cambios recientes en %1"
+
+#: root/base/page/recent.tt:1 root/base/page/recent.tt:3
+msgid "Recent pages in this wiki"
+msgstr "Páginas recientes en este wiki"
+
+#. (activetag)
+#. (page.path)
+#: root/base/page/recent.tt:1 root/base/page/recent.tt:5 root/base/tag/list.tt:23
+msgid "Recent pages in x"
+msgstr "Páginas recientes en %1"
+
+#. ([page.path, activetag])
+#. ([ page.path, activetag ])
+#: root/base/page/recent.tt:1 root/base/page/recent.tt:8
+msgid "Recent pages in x tagged with x"
+msgstr "Páginas recientes en %1 etiquetadas con %2"
+
+#: root/base/user/recover_pass.tt:1
+msgid "Recover Password"
+msgstr "Rescatar Contraseña"
+
+#: root/base/user/login.tt:13 root/base/user/recover_pass.tt:8
+msgid "Recover password"
+msgstr "Rescatar Contraseña"
+
+#:
+msgid "Rectangle"
+msgstr "Rectángulo"
+
+#: root/base/page/view.tt:5
+msgid "Redirected from"
+msgstr "Redirigido desde"
+
+#: root/base/navbar.tt:29 root/forms/comment/comment.yml:13 root/forms/user/register.yml:50
+msgid "Register"
+msgstr "Registrarse"
+
+#: root/base/user/login.tt:11
+msgid "Register new account"
+msgstr "Registrar una cuenta nueva"
+
+#: lib/MojoMojo/Controller/User.pm:230
+msgid "Registration is closed!"
+msgstr "!El registro esta cerrado!"
+
+#: root/base/tag/list.tt:34
+msgid "Related Tags"
+msgstr "Etiquetas Relacionadas"
+
+#: root/base/page/view.tt:33
+msgid "Removed"
+msgstr "Eliminado"
+
+#: root/forms/user/register.yml:30
+msgid "Repeat password"
+msgstr "Repetir contraseña"
+
+#: root/forms/admin/settings.yml:59
+msgid "Restrict user editing to home directory"
+msgstr "Restringir ediciones de los usuarios a su directorio raíz"
+
+#: lib/MojoMojo/Controller/Admin.pm:30
+msgid "Restricted area. Admin access required"
+msgstr "Área restringida. Se necesita permiso administrativo."
+
+#: root/base/page/search_inline.tt:45
+msgid "Result Page:"
+msgstr "Página de Resultados"
+
+#. ([pager.first, pager.last, pager.total_entries, found_within])
+#. ([ pager.first, pager.last, pager.total_entries, found_within ])
+#: root/base/page/search_inline.tt:24
+msgid "Results x-x of x found within x"
+msgstr "Resultado %1-%2 de %3 encontrados en %4"
+
+#. ([content.created.ymd, content.created.hms, content.creator.name])
+#. ([ content.created.ymd, content.created.hms, content.creator.name ])
+#: root/base/page/print.tt:13 root/base/page/view.tt:40
+msgid "Revised on x at x by x"
+msgstr "Editado el %1 a las %2 por %3"
+
+#: root/base/page/print.tt:7 root/base/page/view.tt:15 root/base/page/view.tt:40
+msgid "Revision"
+msgstr "Editado"
+
+#. (page.content.created.datetime)
+#: root/base/page/rss.tt:13
+msgid "Revision from x"
+msgstr "Edición de %1"
+
+#:
+msgid "Right-justified paragraph"
+msgstr "Párrafo justificado derecha"
+
+#: root/base/page/permissions.tt:33
+msgid "Role"
+msgstr "Rol"
+
+#: root/base/admin/role_form.tt:13
+msgid "Role Members"
+msgstr "Miembros del Rol"
+
+#: root/forms/admin/role_form.yml:8
+msgid "Role Name"
+msgstr "Nombre del Rol"
+
+#: root/base/admin/role_form.tt:4
+msgid "Role Name:"
+msgstr "Nombre del Rol:"
+
+#: root/base/admin/role.tt:9 root/base/admin/toplinks.tt:10
+msgid "Roles"
+msgstr "Roles"
+
+#. (page.content_version)
+#: root/base/page/view.tt:17
+msgid "Rolled Back (Current: x)"
+msgstr "Deshecho (Actual: %1)"
+
+#: lib/MojoMojo/Controller/PageAdmin.pm:270 root/base/admin/role_form.tt:37 root/base/page/edit.tt:63 root/base/page/permissions.tt:74 root/forms/admin/role_form.yml:21 root/forms/admin/settings.yml:102 root/forms/user/password.yml:26 root/forms/user/prefs.yml:32
+msgid "Save"
+msgstr "Guardar"
+
+#: root/base/page/edit.tt:62
+msgid "Save and View"
+msgstr "Guardar y Ver"
+
+#: root/base/navbar.tt:17
+msgid "Search"
+msgstr "Buscar"
+
+#: root/base/page/search.tt:1
+msgid "Search Results"
+msgstr "Resultados de la busqueda"
+
+#: root/base/page/search_inline.tt:10
+msgid "Search entire site"
+msgstr "Buscar en todo el sitio"
+
+#: root/base/admin/role_form.tt:16
+msgid "Search for users:"
+msgstr "Buscar usuarios:"
+
+#. (page.path)
+#: root/base/page/search_inline.tt:11
+msgid "Search within x"
+msgstr "Buscar dentro de %1"
+
+#: root/base/page/search_inline.tt:6 root/base/page/search_inline.tt:9
+msgid "Search:"
+msgstr "Buscar:"
+
+#: root/base/edithelp/textile.tt:20 root/base/edithelp/textile.tt:22 root/base/edithelp/textile.tt:25 root/base/edithelp/textile.tt:27
+msgid "Second item"
+msgstr "Segundo artículo"
+
+#: root/base/page/bottomnav.tt:53
+msgid "See changes"
+msgstr "Ver cambios"
+
+#: root/base/page/bottomnav.tt:30 root/base/page/bottomnav.tt:36
+msgid "See next revision"
+msgstr "Ver edición siguiente"
+
+#: root/base/page/bottomnav.tt:24 root/base/page/bottomnav.tt:41
+msgid "See previous revision"
+msgstr "Ver edición anterior"
+
+#: root/base/page/addtags.tt:1
+msgid "Set a keyword for this page"
+msgstr "Asignar palabra clave para esta página"
+
+#: root/base/page/bottomnav.tt:76
+msgid "Set language"
+msgstr "Asignar lenguaje"
+
+#:
+msgid "Shapes"
+msgstr "Formas"
+
+#: root/base/page/bottomnav.tt:53
+msgid "Show differences from previous version"
+msgstr "Mostrar differencias de versión anterior"
+
+#: root/base/page/bottomnav.tt:56
+msgid "Show normal page"
+msgstr "Ver página normal"
+
+#: root/base/gallery.tt:11
+msgid "Show picture"
+msgstr "Mostrar foto"
+
+#: root/base/page/info.tt:36
+msgid "Show revision"
+msgstr "Mostrar edición"
+
+#: root/base/edithelp.tt:51 root/base/edithelp/textile.tt:45
+msgid "Show this product"
+msgstr "Mostrar este producto"
+
+#: root/base/page/view.tt:32
+msgid "Showing changes from previous revision."
+msgstr "Mostrando cambios de edición anterior."
+
+#. ([pager.first, pager.last, pager.total_entries, c.wikiword( page.path, base)
+#. ([ pager.first, pager.last, pager.total_entries, c.wikiword(page.path, base) ])
+#: root/base/pager.tt:14
+msgid "Showing entries x-x of x in x"
+msgstr "Mostrando entradas %1-%2 de %3 en %4"
+
+#. ([pager.entries_on_this_page,pager.first,pager.last,pager.total_entries, link ])
+#. ([ pager.entries_on_this_page, pager.first, pager.last, pager.total_entries, link ])
+#: root/base/gallery/pager.tt:12
+msgid "Showing x (x-x) of x pictures in x"
+msgstr "Mostrando %1 (%2-%3) de %4 fotos en %5"
+
+#: root/base/edithelp/markdown.tt:167
+msgid "Simply indent every line of a code block by 4"
+msgstr "Simplemente deje un margen de 4 para cada línea de un bloque de código"
+
+#: root/forms/admin/settings.yml:20
+msgid "Site Admins (In addition to you)"
+msgstr "Administradores de Sitio (Además de usted)"
+
+#: root/base/admin/settings.tt:9
+msgid "Site Configuration"
+msgstr "Configuración de Sitio"
+
+#: root/forms/admin/settings.yml:13
+msgid "Site name"
+msgstr "Nombre de sitio"
+
+#: root/base/page/bottomnav.tt:70
+msgid "Site settings"
+msgstr "Opciones globales"
+
+#: lib/MojoMojo/Controller/User.pm:451
+msgid "Some fields are invalid. Please correct them and try again:"
+msgstr "Algunos campos no son válidos. Por favor corrijalos e intente de nuevo."
+
+#: lib/MojoMojo/Controller/PageAdmin.pm:237
+msgid "Someone else changed the page while you edited. Your changes has been merged. Please review and save again"
+msgstr "Alguien más cambio la página mientras usted la editaba. Sus cambios fueron unidos. Por favor reviselos y guarde de nuevo"
+
+#: root/base/page/delete.tt:8
+msgid "Sorry"
+msgstr "Perdon"
+
+#: root/base/edithelp/markdown.tt:171
+msgid ""
+"Spaces on the left\n"
+"    render text in monospace\n"
+"    like this example"
+msgstr ""
+"Espacios a la izquierda\n"
+"    mostrar el texto monoespaceado\n"
+"    como este ejemplo"
+
+#: root/base/message.tt:4
+msgid "Stop"
+msgstr "Detener"
+
+#: root/base/edithelp/markdown.tt:60 root/base/edithelp/markdown.tt:61 root/base/edithelp/markdown.tt:65 root/base/edithelp/markdown.tt:66 root/base/edithelp/markdown.tt:67
+msgid "Sub Header"
+msgstr "Sub Cabecera"
+
+#: root/base/page/list.tt:45
+msgid "Sub Page Tools"
+msgstr "Herramientas de Sub Página"
+
+#: root/base/edithelp/markdown.tt:71 root/base/edithelp/markdown.tt:75 root/base/edithelp/markdown.tt:76
+msgid "Sub Sub ... Header"
+msgstr "Sub Sub ... Cabecera"
+
+#: root/base/navbar.tt:45
+msgid "Sub pages"
+msgstr "Sub páginas"
+
+#: root/base/navbar.tt:13 root/base/page/list.tt:51
+msgid "Subscribe to changes by RSS"
+msgstr "Suscribase a los cambios por RSS"
+
+#: root/base/page/bottomnav.tt:62
+msgid "Subscribe to page changes"
+msgstr "Suscribase a los cambios de la página"
+
+#: root/base/page/attachments.tt:6
+msgid "Switch to flash uploader"
+msgstr "Cambiar a la interfaz de subida en flash"
+
+#:
+msgid "Syntax"
+msgstr "Sintaxis"
+
+#: lib/MojoMojo/Controller/PageAdmin.pm:247
+msgid "THEIR CHANGES"
+msgstr "CAMBIOS DE ELLOS"
+
+#: root/base/edithelp/textile.tt:51
+msgid "Table"
+msgstr "Tabla"
+
+#: lib/MojoMojo/Controller/Gallery.pm:67
+msgid "Tag not found"
+msgstr "No se ha encontrado el tag"
+
+#: root/base/navbar.tt:11 root/base/page/list.tt:49 root/base/page/list.tt:7 root/base/page/recent.tt:18 root/base/tag/recent.tt:7
+msgid "Tags"
+msgstr "Etiquetas"
+
+#. (page.name)
+#: root/base/tag/cloud.tt:1
+msgid "Tags under x"
+msgstr "Etiquetas bajo %1"
+
+#: root/base/gallery/photo_info.tt:3
+msgid "Taken"
+msgstr "Tomada"
+
+#: root/base/edithelp/markdown.tt:10
+msgid "Text Formatting"
+msgstr "Formato de Texto"
+
+#: root/base/edithelp/markdown.tt:13 root/base/edithelp/markdown.tt:17
+msgid "Text in"
+msgstr "Texto entrante"
+
+#:
+msgid "Textile formatting tips"
+msgstr "Sugerencias para formato de textil"
+
+#: root/base/edithelp/textile.tt:1
+msgid "Textile help"
+msgstr "Ayuda de Textile"
+
+#: root/base/edithelp/textile.tt:2
+msgid "Textile2 complete reference"
+msgstr "Referencia completa de Textile2"
+
+#: lib/MojoMojo/Controller/User.pm:365
+msgid "That mail is already in use"
+msgstr "Ese correo ya está en uso"
+
+#:
+msgid "The Wikilicious page"
+msgstr "La página Wikiliciosa"
+
+#. (user.email)
+#: root/base/user/validate.tt:8
+msgid "The email was sent to x."
+msgstr "El correo electrónico fue enviado a %1."
+
+#: root/base/page/deleted.tt:6
+msgid "The following pages have been deleted"
+msgstr "Se han borrado las siguientes páginas"
+
+#: root/base/page/suggest.tt:4
+msgid "The following pages in the requested path do not exist:"
+msgstr "Las siguentes páginas no existien el la ruta solicitada"
+
+#: root/base/page/delete.tt:6
+msgid "The following pages will be deleted. This can not be undone"
+msgstr "Se borraran las siguientes páginas. Esto no se podrá deshacer"
+
+#. ("$file.$suffix")
+#. ('<span class="error_detail">' . $c->stash->{pre_hacked_uri} . '</span>')
+#: lib/MojoMojo/Controller/Image.pm:114 lib/MojoMojo/Controller/Root.pm:49
+msgid "The requested URL was not found: x"
+msgstr "La URL solicitada no se ha encontrado: %1"
+
+#: root/forms/admin/settings.yml:26
+msgid "Theme name"
+msgstr "Nombre del tema"
+
+#:
+msgid "This is a pre formatted code block"
+msgstr "Este es un bloque de código previamente formateado"
+
+#: lib/MojoMojo/Controller/Jsrpc.pm:91
+msgid "This is the first revision! Nothing to diff against."
+msgstr "!Esta es la primera edición! No hay contra que diferenciarla."
+
+#: root/base/page/recent.tt:46
+msgid "Time edited"
+msgstr "Hora editada"
+
+#: root/base/edithelp.tt:33 root/base/edithelp/markdown.tt:82
+msgid "To get"
+msgstr "Para obtener"
+
+#: root/base/page/edit.tt:37
+msgid "To start editing this page, write in the text area below this preview. To find out what kind of codes you can use click the syntax link above."
+msgstr "Para empezar a editar esta página, escriba en la área de texto bajo esta vista previa. Para descubrir que tipo de códigos puede usar, haga clic en el enlace de sintaxis arriba."
+
+#:
+msgid "Two or more uppercase words stuck together (camel case) or any phrase surrounded by double brackets or parenthesis is a wiki word. A camel-case wiki word can be escaped by putting \\ in front of it."
+msgstr "Dos o más palabras pegadas juntas (camel case) o cualquier frase entre doble corchetes o paréntesis es una palabra wiki. Una palabra wiki de estilo camel-case se puede exceptuar poniendo \\ delante de ella."
+
+#: root/base/edithelp/textile.tt:37
+msgid "URL"
+msgstr "URL"
+
+#:
+msgid "Unordered Lists with Paragraphs"
+msgstr "Listas No Ordenadas con Párrafos"
+
+#: root/forms/user/editprofile.yml:37
+msgid "Update"
+msgstr "Actualizar"
+
+#:
+msgid "Update "
+msgstr "Actualizar "
+
+#: lib/MojoMojo/Controller/User.pm:143
+msgid "Updated preferences"
+msgstr "Preferencias actualizadas"
+
+#: lib/MojoMojo/Controller/Admin.pm:114
+msgid "Updated successfully."
+msgstr "Actualización exitosa."
+
+#: root/base/page/attachments.tt:11
+msgid "Upload"
+msgstr "Subir"
+
+#: root/forms/admin/settings.yml:40
+msgid "Use captcha"
+msgstr "Usar captcha"
+
+#: root/base/page/permissions.tt:77
+msgid "Use inherited permissions"
+msgstr "Usar permisos heredados"
+
+#:
+msgid "User Preferences"
+msgstr "Preferencias de Usuario"
+
+#: root/base/navbar.tt:47
+msgid "User Profile"
+msgstr "Perfil de Usuario"
+
+#: root/base/navbar.tt:49
+msgid "User Settings"
+msgstr "Configuración de Usuario"
+
+#:
+msgid "User not found!"
+msgstr "!Usuario no encontrado!"
+
+#. ($login)
+#: lib/MojoMojo/Controller/User.pm:122 lib/MojoMojo/Controller/User.pm:398 lib/MojoMojo/Controller/User.pm:427
+msgid "User not found: x"
+msgstr "Usuario no encontrado: %1"
+
+#. (person.name)
+#: root/base/user/profile.tt:1 root/base/user/profile.tt:2
+msgid "User profile for x"
+msgstr "Perfil del usuario %1"
+
+#:
+msgid "User x not found!"
+msgstr "!El usuario %1 no fue encontrado!"
+
+#: root/base/user/recover_pass.tt:5 root/forms/user/login.yml:8
+msgid "Username"
+msgstr "Nombre de Usuario"
+
+#: lib/MojoMojo/Schema.pm:77 root/base/admin/toplinks.tt:9 root/base/admin/user.tt:9
+msgid "Users"
+msgstr "Usuarios"
+
+#: root/base/user/validate.tt:6
+msgid "Validation"
+msgstr "Validación"
+
+#: root/base/page/info.tt:19
+msgid "Version"
+msgstr "Versión"
+
+#: root/base/page/recent.tt:63
+msgid "View Diff"
+msgstr "Ver Diff"
+
+#: root/forms/admin/settings.yml:94
+msgid "View allowed by default"
+msgstr "Permitir vista por defecto"
+
+#: root/base/gallery.tt:19
+msgid "View as files"
+msgstr "Ver como archivos"
+
+#: root/base/attachments/list.tt:75
+msgid "View as gallery"
+msgstr "Ver como galería"
+
+#: root/base/page/bottomnav.tt:61
+msgid "Views"
+msgstr "Vistas"
+
+#: root/base/page/list.tt:65
+msgid "Wanted Pages"
+msgstr "Páginas requeridas"
+
+#: root/base/user/validate.tt:7
+msgid "We've sent you an email with an activation link. Please click on it to activate your account!"
+msgstr "Te hemos enviado un correo electrónico con un enlace de activación. !Por favor abrelo para activar tu cuenta!"
+
+#. ($user->name)
+#: lib/MojoMojo/Controller/User.pm:344
+msgid "Welcome, x your email is validated. Please log in."
+msgstr "Bienvenido, %1 su correo electrónico fue confirmado. Por favor acceda el sistema."
+
+#: root/base/navbar.tt:12 root/base/page/list.tt:50
+msgid "Who wrote what"
+msgstr "Quién escribió qué"
+
+#: root/base/edithelp.tt:2 root/base/edithelp.tt:7
+msgid "Wiki words"
+msgstr "Palabras wiki"
+
+#:
+msgid "With a second line"
+msgstr "Con la segunda línea"
+
+#: root/base/edithelp.tt:34 root/base/edithelp/markdown.tt:88
+msgid "Write"
+msgstr "Escriba"
+
+#: lib/MojoMojo/Controller/PageAdmin.pm:248
+msgid "YOUR CHANGES"
+msgstr "TUS CAMBIOS"
+
+#: root/base/admin/role.tt:26 root/base/page/delete.tt:21
+msgid "Yes"
+msgstr "Sí"
+
+#: root/base/export.tt:4
+msgid "You can export all the pages in this web as a zip file in either HTML (with working links and all) or the pure markup (to import in another wiki)."
+msgstr "Puede exportar todas las páginas en esta web como un archivo zip conteniendo HTML (con enlaces válidos y demás) o conteniendo marcado (para importar a otro wiki)."
+
+#: root/base/message.tt:9
+msgid "You can go to the"
+msgstr "Puedes ir a"
+
+#: root/base/feeds.tt:4
+msgid "You can subscribe to this wiki by RSS and get either just the headlines of the pages that change or the entire page."
+msgstr "Puede suscribirse a este wiki por medio de RSS y obtener o solo los titulares de las páginas cambiantes o la página entera."
+
+#. ($operation)
+#: lib/MojoMojo/Controller/Attachment.pm:45
+msgid "You do not have permissions to x attachments for this page"
+msgstr "No tienes permisos para %1 ficheros anexados en esta página"
+
+#: lib/MojoMojo/Controller/User.pm:445
+msgid "You have to fill in all required fields."
+msgstr "Tienes que llenar todos los campos mandatorios."
+
+#: root/base/comment/login.tt:4
+msgid "You have to log in to post a comment."
+msgstr "Tienes que entrar para dejar un comentario."
+
+#: root/base/page/delete.tt:9
+msgid "You lack permissions to delete this page (or any of the sub pages)."
+msgstr "No tienes permisos para borrar esta página (ni las sub-páginas)."
+
+#: lib/MojoMojo/Formatter/YouTube.pm:58
+msgid "YouTube Video"
+msgstr "Video de YouTube"
+
+#: root/base/user/prefs.tt:4
+msgid "Your Account"
+msgstr "Su Cuenta"
+
+#: lib/MojoMojo/Controller/Jsrpc.pm:38
+msgid "Your input is invalid, please reformat it and try again."
+msgstr "Entrada inválida, por favor reformateelo e intente de nuevo."
+
+#. ($c->pref('name')
+#: lib/MojoMojo/Controller/User.pm:196
+msgid "Your new password on x"
+msgstr "Su nueva contraseña en %1"
+
+#: lib/MojoMojo/Controller/User.pm:174
+msgid "Your password has been updated"
+msgstr "Su contraseña fue actualizada"
+
+#. (c.pref('name')
+#. (c.pref("name"))
+#: root/base/mail/reset_password.tt:3
+msgid "Your password on x has been reset. This is your new password:"
+msgstr "Su contraseña en %1 fue restaurada. Esta es su contraseña nueva:"
+
+#: root/base/edithelp.tt:7
+msgid "[[C++]], [[Let's rock!]] ((easy to type))"
+msgstr "[[C++]], [[Let's rock!]] ((facil de escribir))"
+
+#. ($c->pref('name')
+#: lib/MojoMojo/Controller/User.pm:307
+msgid "[x] New User Validation"
+msgstr "[%1] Validación de Usuario Nuevo"
+
+#: root/base/page/permissions.tt:57
+msgid "actions"
+msgstr "acciones"
+
+#: root/base/gallery/footer.tt:7
+msgid "add"
+msgstr "añadir"
+
+#: root/base/comment.tt:27
+msgid "add a comment"
+msgstr "añadir comentario"
+
+#: root/base/gallery/footer.tt:2
+msgid "add tag"
+msgstr "añadir etiqueta"
+
+#: lib/MojoMojo/Schema.pm:165
+msgid "admin home page"
+msgstr ""
+"# Usuario Administrador.\n"
+"\n"
+"Este es el nodo raíz del usuario administrador. Puedes cambiar este texto usando el enlace de editar página."
+
+#:
+msgid "advanced"
+msgstr "avanzado"
+
+#: root/base/edithelp/markdown.tt:194
+msgid "alt text"
+msgstr "texto alternativo"
+
+#: lib/MojoMojo/Schema.pm:62
+msgid "anonymouscoward"
+msgstr "un cobarde anónimo"
+
+#: root/base/page/permissions.tt:56
+msgid "apply to subpages"
+msgstr "aplicar a las sub-páginas"
+
+#: root/base/page/edit.tt:64
+msgid "as"
+msgstr "como"
+
+#. (c.wikiword(user.link,base)
+#. (c.wikiword(user.link, base))
+#: root/base/comment/post.tt:4
+msgid "as x"
+msgstr "como %1"
+
+#: root/base/page/view.tt:15 root/base/tag/recent.tt:27
+msgid "at"
+msgstr "en"
+
+#: root/base/page/permissions.tt:36 root/base/page/permissions.tt:55
+msgid "attachment"
+msgstr "fichero anexado"
+
+#:
+msgid "back"
+msgstr "regresar"
+
+#: root/base/edithelp/markdown.tt:156
+msgid "blocks are wrapped in backticks"
+msgstr "bloques estan encapsulados en acentos graves"
+
+#: root/base/edithelp/markdown.tt:17
+msgid "bold"
+msgstr "negrita"
+
+#: root/base/page/edit.tt:59
+msgid "busy spinner"
+msgstr ""
+
+#: root/base/page/search_inline.tt:35 root/base/page/view.tt:41 root/base/tag/recent.tt:26
+msgid "by"
+msgstr "por"
+
+#: root/base/page/info.tt:64
+msgid "bytes"
+msgstr "bytes"
+
+#: root/base/page/permissions.tt:21
+msgid "can"
+msgstr "puede"
+
+#:
+msgid "centered paragraph"
+msgstr "párrafo centrado"
+
+#: root/base/page/info.tt:49
+msgid "chars"
+msgstr "carácteres"
+
+#: root/base/edithelp/markdown.tt:156
+msgid "code"
+msgstr "código"
+
+#: root/base/comment.tt:15
+msgid "comment"
+msgstr "comentario"
+
+#: root/base/comment.tt:2
+msgid "comments disabled for preview"
+msgstr "comentarios desactivados para vista previa"
+
+#: root/base/tag/list.tt:35
+msgid "common uses"
+msgstr "usos comunes"
+
+#:
+msgid "configuration"
+msgstr "Configuración"
+
+#: lib/MojoMojo/Controller/User.pm:373
+msgid "confirmation message resent"
+msgstr "mensaje de confirmación enviado de nuevo"
+
+#: lib/MojoMojo/Controller/PageAdmin.pm:171 root/base/page/permissions.tt:36 root/base/page/permissions.tt:51
+msgid "create"
+msgstr "crear"
+
+#: root/forms/pageadmin/edit.yml:12
+msgid "creator"
+msgstr "creador"
+
+#: root/base/attachments/list.tt:65 root/base/page/permissions.tt:36 root/base/page/permissions.tt:54
+msgid "delete"
+msgstr "borrar"
+
+#:
+msgid "deleted"
+msgstr "borrar"
+
+#: root/base/edithelp/markdown.tt:181
+msgid "details"
+msgstr "detalles"
+
+#:
+msgid "do not pass jail, do not collect $200..."
+msgstr "no pasa por prisión, no recibe $200..."
+
+#: root/base/attachments/list.tt:20
+msgid "download"
+msgstr "descargar"
+
+#: lib/MojoMojo/Controller/PageAdmin.pm:172 lib/MojoMojo/Controller/PageAdmin.pm:54
+msgid "edit"
+msgstr "editar"
+
+#: root/base/admin/user.tt:17
+msgid "email"
+msgstr "correo electrónico"
+
+#: root/base/page/search_inline.tt:17 root/base/page/search_inline.tt:21
+msgid "entire site"
+msgstr "el sitio entero"
+
+#: root/base/edithelp/markdown.tt:32 root/base/edithelp/markdown.tt:34 root/base/edithelp/markdown.tt:39 root/base/edithelp/markdown.tt:41
+msgid "example"
+msgstr "ejemplo"
+
+#: lib/MojoMojo/Controller/Image.pm:37
+msgid "file not found."
+msgstr "No se ha encontrado el fichero."
+
+#: root/base/comment/post.tt:5 root/base/page/edit.tt:67
+msgid "forget me"
+msgstr "olvideme"
+
+#: root/base/gallery/pager.tt:11 root/base/gallery/photo.tt:1
+msgid "gallery"
+msgstr "galería"
+
+#: root/base/edithelp/textile.tt:15 root/base/edithelp/textile.tt:17
+msgid "hello"
+msgstr "hola"
+
+#: lib/MojoMojo/Schema.pm:161
+msgid "help message"
+msgstr ""
+"# Help Index.\n"
+"\n"
+"## Editing Pages\n"
+"\n"
+"## Formatter Syntax\n"
+"\n"
+"## Using Tags\n"
+"\n"
+"## Attachments & Photos\n"
+
+#: root/base/message.tt:9
+msgid "home page"
+msgstr "portada"
+
+#: root/base/edithelp/markdown.tt:43
+msgid "hover over the link to see the title"
+msgstr "pasa por encima del enlace para ver el título"
+
+#: root/base/edithelp/markdown.tt:34 root/base/edithelp/markdown.tt:41
+msgid "http://example.com"
+msgstr "http://ejemplo.com"
+
+#: root/base/edithelp/markdown.tt:32 root/base/edithelp/markdown.tt:39
+msgid "http://example.com/"
+msgstr "http://ejemplo.com/"
+
+#: root/base/edithelp/markdown.tt:160
+msgid "in the wrapping block"
+msgstr "en el bloque encapsulador"
+
+#: root/base/edithelp.tt:43
+msgid "include this page"
+msgstr "incluido en esta página"
+
+#: root/base/edithelp.tt:47 root/base/edithelp/textile.tt:62
+msgid "include this rss feed"
+msgstr "incluir esta fuente en rss"
+
+#:
+msgid "increase # for smaller headline"
+msgstr "incrementar # para un titular más pequeño"
+
+#:
+msgid "inline view"
+msgstr "vista en línea"
+
+#: root/base/attachments/list.tt:55
+msgid "insert link"
+msgstr "insertar enlace"
+
+#: root/base/attachments/list.tt:59
+msgid "insert thumbnail"
+msgstr "insertar miniatura"
+
+#: root/base/edithelp/markdown.tt:33 root/base/edithelp/markdown.tt:40
+msgid "is formatted as:"
+msgstr "tiene el siguiente formato:"
+
+#: lib/MojoMojo/Formatter/YouTube.pm:71
+msgid "is not a valid link to youtube video"
+msgstr "no es un enlace a un video de youtube válido"
+
+#: lib/MojoMojo/Formatter/YouTube.pm:64
+msgid "is not a valid url"
+msgstr "no es una url válida"
+
+#: root/base/edithelp/markdown.tt:13
+msgid "italics"
+msgstr "italicas"
+
+#: root/base/edithelp/markdown.tt:160
+msgid "just use `2`"
+msgstr "use simplemente `2`"
+
+#:
+msgid "left justified paragraph"
+msgstr "párrafo justificado izquierda"
+
+#: root/base/edithelp.tt:40
+msgid "level"
+msgstr "nivel"
+
+#: root/base/edithelp/textile.tt:37 root/base/edithelp/textile.tt:39
+msgid "linkname"
+msgstr "nombre de enlace"
+
+#: root/base/comment/login.tt:15
+msgid "log in"
+msgstr "entrar al sistema"
+
+#: root/base/user/validate.tt:21
+msgid "log out"
+msgstr "salir del sistema"
+
+#: root/base/admin/user.tt:14 root/base/comment/login.tt:11 root/base/message.tt:10
+msgid "login"
+msgstr "entrar al sistema"
+
+#:
+msgid "my tags"
+msgstr "mis etiquetas"
+
+#: root/base/admin/user.tt:16
+msgid "name"
+msgstr "nombre"
+
+#: root/base/page/permissions.tt:36
+msgid "no"
+msgstr "no"
+
+#: root/base/gallery/photo.tt:37
+msgid "no description"
+msgstr "descripción no disponible"
+
+#: root/base/admin/user.tt:33
+msgid "no email address"
+msgstr "correo electrónico no disponible"
+
+#: root/base/page/permissions.tt:21
+msgid "not access page"
+msgstr "página de tipo no acceso"
+
+#: root/base/gallery/photo_info.tt:3 root/base/gallery/photo_info.tt:4 root/base/gallery/photo_info.tt:5 root/base/gallery/photo_info.tt:6 root/base/gallery/photo_info.tt:7 root/base/gallery/photo_info.tt:8
+msgid "not specified"
+msgstr "no especificado"
+
+#: root/base/page/search_inline.tt:36
+msgid "on"
+msgstr "el"
+
+#: root/base/edithelp/markdown.tt:68
+msgid "optionally, you can add the same number of trailing # marks"
+msgstr "opcionalmente, puedes añadir el la misma cantidad de # al final"
+
+#: root/base/edithelp/markdown.tt:149 root/base/user/login.tt:11
+msgid "or"
+msgstr "o"
+
+#: root/base/message.tt:10
+msgid "or you can try to"
+msgstr "o puedes intentar"
+
+#: root/base/page/info.tt:58 root/base/page/info.tt:61
+msgid "pages"
+msgstr "páginas"
+
+#: root/base/comment/login.tt:13
+msgid "password"
+msgstr "contraseña"
+
+#: root/base/gallery/cloud.tt:1
+msgid "photo tags"
+msgstr "etiquetas de la foto"
+
+#: root/base/page/attachments.tt:20
+msgid "plain uploader"
+msgstr "formulario simple"
+
+#:
+msgid "popular tags"
+msgstr "etiquetas populares"
+
+#: root/base/comment.tt:12
+msgid "posted"
+msgstr "enviado"
+
+#: root/base/comment.tt:10
+msgid "poster"
+msgstr "enviado por"
+
+#: root/base/user/prefs.tt:1
+msgid "preferences"
+msgstr "preferencias"
+
+#: root/base/page/permissions.tt:14 root/base/page/permissions.tt:17 root/base/page/permissions.tt:36 root/base/page/permissions.tt:52
+msgid "read"
+msgstr "leer"
+
+#: lib/MojoMojo/Formatter/Redirect.pm:48
+msgid "redirect to"
+msgstr "redirigida a"
+
+#. (wanted.from_page.path)
+#: root/base/page/list.tt:73
+msgid "referenced by x"
+msgstr "referenciada por %1"
+
+#: root/base/comment/login.tt:5
+msgid "register"
+msgstr "registrar"
+
+#: root/base/admin/role_form.tt:29
+msgid "remove"
+msgstr "eliminar"
+
+#: lib/MojoMojo/Controller/PageAdmin.pm:422
+msgid "rename via non-POST method"
+msgstr "renombrar via un metodo no-POST"
+
+#: root/base/page/bottomnav.tt:25
+msgid "revision"
+msgstr "edición"
+
+#:
+msgid "right justified paragraph"
+msgstr "párrafo justificado derecha"
+
+#: root/base/admin/user.tt:15
+msgid "roles"
+msgstr "roles"
+
+#: lib/MojoMojo/Controller/PageAdmin.pm:390
+msgid "rollback"
+msgstr ""
+
+#:
+msgid "shrinked head"
+msgstr "encabezado reducido"
+
+#:
+msgid "start"
+msgstr "comenzar"
+
+#: root/base/edithelp.tt:39
+msgid "table of contents"
+msgstr "tabla de contenidos"
+
+#: root/base/tag/list.tt:9
+msgid "tags"
+msgstr "etiquetas"
+
+#: lib/MojoMojo/Controller/User.pm:446
+msgid "the following are missing:"
+msgstr "los siguientas estan ausentes:"
+
+#: root/base/edithelp/markdown.tt:73
+msgid "up to 6 levels of headers"
+msgstr "hasta 6 niveles de encabezados"
+
+#:
+msgid "url inside paranthesis"
+msgstr "url dentro de paréntesis"
+
+#:
+msgid "users"
+msgstr "usuarios"
+
+#: root/base/page/permissions.tt:36
+msgid "view"
+msgstr "ver"
+
+#: root/base/attachments/list.tt:46
+msgid "view full size"
+msgstr "Ver a tamaño completo"
+
+#: root/base/attachments/list.tt:50
+msgid "view in your browser"
+msgstr "ver en tu navegador"
+
+#. ("test")
+#: lib/MojoMojo/Schema.pm:157
+msgid "welcome message"
+msgstr ""
+"# !Bienvenido a MojoMojo!\n"
+"\n"
+"Esta es su portada. Para comenzar la administración de su wiki, por favor acceda al sistema con\n"
+"nombre de usuario 'admin' y contraseña 'admin'. Desde ahí podrá haver su\n"
+"configuración. Si quiere experimentar un poco con el wiki, solo cree \n"
+"una [[Página Nueva]] o edite esta usando el enlace de editar página.\n"
+"\n"
+"## ¿Necesita más ayuda?\n"
+"\n"
+"Revise la sección de [[Ayuda]]."
+
+#: root/base/page/permissions.tt:14 root/base/page/permissions.tt:18 root/base/page/permissions.tt:36 root/base/page/permissions.tt:53
+msgid "write"
+msgstr "escribir"
+
+#:
+msgid "x hits"
+msgstr "%1 aciertos"
+
+#. ($url)
+#: lib/MojoMojo/Formatter/Include.pm:71 lib/MojoMojo/Formatter/RSS.pm:71
+msgid "x is not a valid URL"
+msgstr "%1 no es una URL válida"
+
+#. (page.content.max_version - page.content_version)
+#. (page.content.max_version - rev)
+#. (rev - 1)
+#: root/base/page/bottomnav.tt:30 root/base/page/bottomnav.tt:36 root/base/page/bottomnav.tt:41
+msgid "x more"
+msgstr "%1 más"
+
+#. (page.versions_rs.count)
+#: root/base/page/info.tt:14
+msgid "x revisions"
+msgstr "%1 ediciones"
+
+#: root/base/page/permissions.tt:36
+msgid "yes"
+msgstr "sí"
+
+#: root/base/edithelp/textile.tt:10 root/base/edithelp/textile.tt:12 root/base/edithelp/textile.tt:5 root/base/edithelp/textile.tt:7
+msgid "your text"
+msgstr "tu texto"
+
+#: root/base/edithelp.tt:44 root/base/edithelp.tt:48 root/base/edithelp/textile.tt:60
+msgid "your/url"
+msgstr "tu/url"
+
+#: root/base/edithelp/textile.tt:49
+msgid "|a|table|row|"
+msgstr "|a|tabla|hilera|"
+
+#: root/base/edithelp/textile.tt:49
+msgid "|b|table|row|"
+msgstr "|b|tabla|hilera|"

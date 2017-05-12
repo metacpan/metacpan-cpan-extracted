@@ -1,0 +1,39 @@
+NAME
+    Mock::Person::SV - generate random sets of Swedish names
+
+DESCRIPTION
+    Data for this module was found on these pages:
+
+    Last names
+        namelab <http://genealogy.familyeducation.com/browse/origin/swedish>
+
+    Middle names
+        There's usually no distinction between a first and middle name in
+        Sweden.
+
+    First names
+        babynames <http://www.babynames.org.uk/swedish-baby-names.htm>
+
+GENERAL FUNCTIONS
+  name
+    Recieves scalar with sex of the person ('male' or 'female') and returns
+    scalar with generated name.
+
+  first_male
+    Returns random fists name of male person.
+
+  first_female
+    Returns random fists name of female person.
+
+  middle_male
+    Returns random middle name of male person.
+
+  middle_female
+    Returns random middle name of female person.
+
+  last_male
+    Returns random last name of male person.
+
+  last_female
+    Returns random last name of female person.
+

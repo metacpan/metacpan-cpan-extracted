@@ -1,0 +1,47 @@
+---
+abstract: 'Moose type constraints for strings or string-like objects'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
+  List::Util: '0'
+  Moose: '0'
+  Test::More: '0.96'
+  version: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-Types-Stringlike
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  MooseX::Types::Stringlike:
+    file: lib/MooseX/Types/Stringlike.pm
+    version: '0.003'
+requires:
+  MooseX::Types: '0'
+  MooseX::Types::Moose: '0'
+  overload: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/MooseX-Types-Stringlike/issues
+  homepage: https://github.com/dagolden/MooseX-Types-Stringlike
+  repository: https://github.com/dagolden/MooseX-Types-Stringlike.git
+version: '0.003'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Karen Etheridge <ether@cpan.org>'

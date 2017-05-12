@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $class;
+
+BEGIN {
+    $class = $ENV{MODULE_START_CLASS} || 'Module::Start';
+    eval "use $class"; die $@ if $@;
+}
+
+$class->new->run(@ARGV);

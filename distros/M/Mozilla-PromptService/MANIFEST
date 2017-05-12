@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+PromptService.xs
+README
+t/Mozilla-PromptService.t
+lib/Mozilla/PromptService.pm
+t/test.html
+META.yml                                 Module meta-data (added by MakeMaker)

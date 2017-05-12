@@ -1,0 +1,374 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLInputElement
+
+=for object Mozilla::DOM::HTMLInputElement
+
+Mozilla::DOM::HTMLInputElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLInputElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLInputElement interface is the interface to a [X]HTML
+ * input element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLInputElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $htmlinputelement->B<Blur>()
+
+=over
+
+=back
+
+=head2 $htmlinputelement->B<Click>()
+
+=over
+
+=back
+
+=head2 $htmlinputelement->B<Focus>()
+
+=over
+
+=back
+
+=head2 $htmlinputelement->B<Select>()
+
+=over
+
+=back
+
+=head2 $form = $htmlinputelement->B<GetForm>()
+
+=over
+
+=back
+
+=head2 $accept = $htmlinputelement->B<GetAccept>()
+
+=over
+
+=back
+
+=head2 $htmlinputelement->B<SetAccept>($accept)
+
+=over
+
+=over
+
+=item * $accept (string)
+
+=back
+
+=back
+
+=head2 $accesskey = $htmlinputelement->B<GetAccessKey>()
+
+=over
+
+=back
+
+=head2 $htmlinputelement->B<SetAccessKey>($accesskey)
+
+=over
+
+=over
+
+=item * $accesskey (string)
+
+=back
+
+=back
+
+=head2 $align = $htmlinputelement->B<GetAlign>()
+
+=over
+
+=back
+
+=head2 $htmlinputelement->B<SetAlign>($align)
+
+=over
+
+=over
+
+=item * $align (string)
+
+=back
+
+=back
+
+=head2 $alt = $htmlinputelement->B<GetAlt>()
+
+=over
+
+=back
+
+=head2 $htmlinputelement->B<SetAlt>($alt)
+
+=over
+
+=over
+
+=item * $alt (string)
+
+=back
+
+=back
+
+=head2 $bool = $htmlinputelement->B<GetChecked>()
+
+=over
+
+=back
+
+=head2 $htmlinputelement->B<SetChecked>($checked)
+
+=over
+
+=over
+
+=item * $checked (boolean)
+
+=back
+
+=back
+
+=head2 $bool = $htmlinputelement->B<GetDefaultChecked>()
+
+=over
+
+=back
+
+=head2 $htmlinputelement->B<SetDefaultChecked>($defaultchecked)
+
+=over
+
+=over
+
+=item * $defaultchecked (boolean)
+
+=back
+
+=back
+
+=head2 $defaultvalue = $htmlinputelement->B<GetDefaultValue>()
+
+=over
+
+=back
+
+=head2 $htmlinputelement->B<SetDefaultValue>($defaultvalue)
+
+=over
+
+=over
+
+=item * $defaultvalue (string)
+
+=back
+
+=back
+
+=head2 $bool = $htmlinputelement->B<GetDisabled>()
+
+=over
+
+=back
+
+=head2 $htmlinputelement->B<SetDisabled>($disabled)
+
+=over
+
+=over
+
+=item * $disabled (boolean)
+
+=back
+
+=back
+
+=head2 $maxlength = $htmlinputelement->B<GetMaxLength>()
+
+=over
+
+=back
+
+=head2 $htmlinputelement->B<SetMaxLength>($maxlength)
+
+=over
+
+=over
+
+=item * $maxlength (integer (long))
+
+=back
+
+=back
+
+=head2 $name = $htmlinputelement->B<GetName>()
+
+=over
+
+=back
+
+=head2 $htmlinputelement->B<SetName>($name)
+
+=over
+
+=over
+
+=item * $name (string)
+
+=back
+
+=back
+
+=head2 $bool = $htmlinputelement->B<GetReadOnly>()
+
+=over
+
+=back
+
+=head2 $htmlinputelement->B<SetReadOnly>($readonly)
+
+=over
+
+=over
+
+=item * $readonly (boolean)
+
+=back
+
+=back
+
+=head2 $size = $htmlinputelement->B<GetSize>()
+
+=over
+
+=back
+
+=head2 $htmlinputelement->B<SetSize>($size)
+
+=over
+
+=over
+
+=item * $size (integer (long))
+
+=back
+
+=back
+
+=head2 $src = $htmlinputelement->B<GetSrc>()
+
+=over
+
+=back
+
+=head2 $htmlinputelement->B<SetSrc>($src)
+
+=over
+
+=over
+
+=item * $src (string)
+
+=back
+
+=back
+
+=head2 $tabindex = $htmlinputelement->B<GetTabIndex>()
+
+=over
+
+=back
+
+=head2 $htmlinputelement->B<SetTabIndex>($tabindex)
+
+=over
+
+=over
+
+=item * $tabindex (integer (long))
+
+=back
+
+=back
+
+=head2 $type = $htmlinputelement->B<GetType>()
+
+=over
+
+=back
+
+=head2 $htmlinputelement->B<SetType>($type)
+
+=over
+
+=over
+
+=item * $type (string)
+
+=back
+
+=back
+
+=head2 $usemap = $htmlinputelement->B<GetUseMap>()
+
+=over
+
+=back
+
+=head2 $htmlinputelement->B<SetUseMap>($usemap)
+
+=over
+
+=over
+
+=item * $usemap (string)
+
+=back
+
+=back
+
+=head2 $value = $htmlinputelement->B<GetValue>()
+
+=over
+
+=back
+
+=head2 $htmlinputelement->B<SetValue>($value)
+
+=over
+
+=over
+
+=item * $value (string)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

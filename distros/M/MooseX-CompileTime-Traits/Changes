@@ -1,0 +1,9 @@
+Revision history for MooseX-CompileTime-Traits: 1.102570
+
+1.102570  2010-09-14 04:27:12 America/Chicago
+        Update dist.ini
+        Add weaver.ini
+        Remove the newlines before the opening braces
+        
+0.092801  2009-10-07 18:34:25 UTC
+        Initial release

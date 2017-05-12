@@ -1,0 +1,23 @@
+Revision history for MooseX-CascadeClearing
+
+0.05      2012-09-15 00:15:21 America/Los_Angeles
+	* drop our init_meta() in favor of just Moose::Exporter
+	* minor pod tweaks
+	* make our changelog log more like a changelog
+
+0.04
+	* Allow MooseX::CascadeClearing to be used in a role with Moose 1.9900+ (Dave
+	  Rolsky)
+
+0.03    Mon Sep  6 15:22:50 PDT 2010
+	* Update how we use Moose::Util::MetaRole such that we avoid depreciation
+	  warnings
+
+0.02    Thu Sep 17 08:30:27 PDT 2009
+	* dial back our Moose req to 0.88; we don't strictly need 0.90 and 0.88 is
+	  available in Fedora 11 at the moment
+	* same with namespace::autoclean (0.09 back to 0.08)
+
+0.01    Wed Sep 16 23:01:01 PDT 2009
+	* First version, released on an unsuspecting world
+

@@ -1,0 +1,20 @@
+---
+name: MealMaster
+version: 0.28
+author:
+  - 'Leon Brocard, C<< <acme@astray.com> >>'
+abstract: Parse MealMaster format recipe files
+license: perl
+requires:
+  Class::Accessor::Chained::Fast: 0
+  Test::Exception: 0
+  Test::More: 0
+provides:
+  MealMaster:
+    file: lib/MealMaster.pm
+    version: 0.28
+  MealMaster::Ingredient:
+    file: lib/MealMaster/Ingredient.pm
+  MealMaster::Recipe:
+    file: lib/MealMaster/Recipe.pm
+generated_by: Module::Build version 0.261

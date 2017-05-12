@@ -1,0 +1,6 @@
+name = "MojoX-Log-Log4perl-Tiny"
+badges = ["travis"]
+authority="cpan:YOWCOW"
+
+module_maker="ModuleBuildTiny"
+

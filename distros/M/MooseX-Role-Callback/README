@@ -1,0 +1,4 @@
+MooseX::Role::Callback
+==================
+
+Execute a function when a role is applied. See the perldoc for more info.

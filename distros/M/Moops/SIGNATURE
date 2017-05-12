@@ -1,0 +1,106 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2c58ee185f18eb84f812bdc11e79bf3615a05a17 COPYRIGHT
+SHA1 6051a28932d064b052ecc8d2850ec5a9cbade7c8 CREDITS
+SHA1 15ddd93213da8c0320cdab1fb4fab8d264ff9144 Changes
+SHA1 778e63aaaa913ee92351d9f7c8353883969ef64c INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 06df8ab6e2778ee85cb495ead9a187ac10c733bd MANIFEST
+SHA1 c1e1dc1848c12dc5028f98a3a2e2dc860142f1d4 META.json
+SHA1 09dbcc27eff51f73026610e8adaca5a391532a3e META.yml
+SHA1 b5e9bbe76ee47a1b89347f0f9d705051dbd5680a Makefile.PL
+SHA1 2e247c60b5520dfa63fcee51aafb934005b229a7 README
+SHA1 a1de9e1386567b9f2d16b830fac353cf8b0ce888 dist.ini
+SHA1 0104a0c077955ec85197c71af7213d86a7672b66 doap.ttl
+SHA1 327c3931098a4aabacf484977bffe8af64bcac6c examples/bench.pl
+SHA1 f93ec33dbded76078df892fe8a76bcf277fce309 examples/calculator.pl
+SHA1 4c8cf95ea28826e3a3363be2bec79e751d541faf examples/class-versus-object-method.pl
+SHA1 5c33f9df66bbbf0aaa6e5f0477aab0a1daf40ea5 examples/cli-app.pl
+SHA1 e1ad650d5fe58dfa57a6e3445852068b1ccd4c1f examples/extending-moops.pl
+SHA1 08c658b3e06cf364d4f6f8c00e54c34475fa49f5 examples/lib/MoopsX/Keyword/Exception.pm
+SHA1 666df19166e0e54b5eed2bc9e7f90d6748551eed examples/lib/MoopsX/TraitFor/Parser/ExceptionKeyword.pm
+SHA1 67671b263a97d7f34a81d8aabf5492b5cc406c16 examples/multimethods.pl
+SHA1 797b9a9e22b785b9f62510e16ea2300bb0e1f4d7 examples/using-moops-with-method-signatures.pl
+SHA1 7ffa5a1438c744e564877933571a806efe50be30 examples/using-moosextypes-in-moo.pl
+SHA1 7ebeb5a5cf81321e1d16776dc2abacf65abfbb8e lib/Moops.pm
+SHA1 f50f76a6f380a756de21a0c0509f925089de1bfa lib/Moops/ImportSet.pm
+SHA1 d593298beb796f846ca0ab25624353014139d2c4 lib/Moops/Keyword.pm
+SHA1 301c7856c7d0b09127dd0c64d95df83befef3c10 lib/Moops/Keyword/Class.pm
+SHA1 35d85977903dadbea0346b8c470c8695a08e501e lib/Moops/Keyword/Library.pm
+SHA1 1f7e402b68bb43993b16ba79f56dee931b4d0688 lib/Moops/Keyword/Role.pm
+SHA1 5e65850b5f1f9530510afc09487dc249f1580658 lib/Moops/Manual/Objects101.pod
+SHA1 279ceede8577228664d85ea8ee1257f7ce15908b lib/Moops/MethodModifiers.pm
+SHA1 a2b0a932a4c2eb3aa439946b3c616bb4005beb2f lib/Moops/Parser.pm
+SHA1 0f6b4e83056a43a0a33f755ac4d45b69daf3e8c6 lib/Moops/TraitFor/Keyword/assertions.pm
+SHA1 32ebacf6194513264a7db09ab7a0ec5eb52ed82f lib/Moops/TraitFor/Keyword/dirty.pm
+SHA1 481624130d5e99b31eb5b6a7d1e739c6380782d1 lib/Moops/TraitFor/Keyword/fp.pm
+SHA1 7d09986b12290597570571eaf3aa04d7cf1ac45e lib/Moops/TraitFor/Keyword/mutable.pm
+SHA1 8cbad5059ab1f22bef2bed195a9c987c80fe7267 lib/Moops/TraitFor/Keyword/ro.pm
+SHA1 22f4e8f1f998f8a98a900b2d06118b8361417784 lib/Moops/TraitFor/Keyword/rw.pm
+SHA1 983b76236f8006cf692ab937fbf43eb89c7fcec6 lib/Moops/TraitFor/Keyword/rwp.pm
+SHA1 8b26ad7b56350b52abf4d2fa268df402a09129bf lib/MooseX/FunctionParametersInfo.pm
+SHA1 86c251e0455fe3e469d5104e56e6bd2b0b759899 lib/PerlX/Define.pm
+SHA1 7792a0666b5fc7cc2c60d7f4c4d0ed9bd70cedb1 t/01basic.t
+SHA1 01af441b4fda437f5b7baf423894af23e7f2b881 t/02outer.t
+SHA1 7bfef609016082ab0c98d14e8863f1b07e50129b t/03lines.t
+SHA1 5f37101b6ff5e4e51ee69f379dbcbab8a776dcc0 t/04composition.t
+SHA1 142aeaf292a05b4457ca2f48034d75e51f12f641 t/05true.t
+SHA1 291f0c19e702c870ed2f3b0a009ccac53af6da88 t/11class-moose.t
+SHA1 a8d24b36863562f8bebea18d6eb3a916b77dea22 t/11class-mouse.t
+SHA1 345d368cbcc6ffe039979cfef72b705aa694b3ab t/11class-tiny.t
+SHA1 465a54c19771ddcf7851b7a569e6bc525b224bce t/11class.t
+SHA1 df63e529408d611963a03ceb7816e459485ec52c t/12role-moose.t
+SHA1 f42c8a9071a449b4a6d03395fb0a22d1435d023c t/12role-mouse.t
+SHA1 270b2d7a1f2a6c532eb87046e507f4ed805c5037 t/12role-tiny.t
+SHA1 fb296c126242e51be0c778c3c6b796f6a6e70e38 t/12role.t
+SHA1 968e6256291aa249c25fab3395dea4a2f84f2b04 t/13namespace.t
+SHA1 4e83a90cbb895ab8ba924b8706584556867629f3 t/14versions.t
+SHA1 cc43d2fb6da18bb1379eeaf2d25dd6256e0a51e8 t/21fun.t
+SHA1 0796381a890576f767c9e3283e8ec63077388e41 t/22method-moose.t
+SHA1 ed0a332f831b2a0376338f12e95ce88aaa1840e9 t/22method.t
+SHA1 a94a1bcaeae7a9602210c542b64ccc4532a912ae t/23modifiers-moose.t
+SHA1 02773a6137411251846f002fe491a63d0cf81b5d t/23modifiers.t
+SHA1 ff75df407642cf69975b865ecf1598ce1266162b t/31types-moose.t
+SHA1 7d13130304194ab7199ab41e9a6df1846c9b5bd1 t/31types-moosextypes-imported.t
+SHA1 9cf57f4e4fe8feebfe5d7ebfbd7e967d0c06d6b6 t/31types-moosextypes-moo.t
+SHA1 7d7960782a42883c80d95df8602d1fb2ed8c76c1 t/31types-moosextypes.t
+SHA1 9ec5c19b89ee72c61269d6b319ea74950ac8ea68 t/31types-mouse.t
+SHA1 f03fc3694d1398a588f24467cf1fe056870c5ea8 t/31types.t
+SHA1 ff2e343fb71c7db1a7b503819fc89b61a2972a40 t/32typeimport-moosextypes.t
+SHA1 e47ffedb6bec74232a7e3bc8134486c5a6da730e t/32typeimport.t
+SHA1 6084fe9098f52e69577210fd445f2652648d2a12 t/33type-timing.t
+SHA1 f259bc78937fc15bcdb4c1332e6f9606e6719851 t/41constants.t
+SHA1 87843a816ee0c713844aa26d2fbc2662516be2e4 t/51moresugar.t
+SHA1 a2a447dc2c57c49efc6554d6434a7242261cf40c t/52customsugar.t
+SHA1 0f520be366940bcc870848fef90aeea3421053c7 t/53warnings.t
+SHA1 8d5a9d173bf18491cdbaa267f3afbc48ce997f11 t/71library-moosextypes.t
+SHA1 8504fe493608a1c5bd0e52015179f6a90352bb78 t/71library.t
+SHA1 7dfba69b6e93ee70a6a46caa8f1adbf9322cc528 t/91traits.t
+SHA1 5589eb1fc8553acb56f4c02ea26f5d167e29f80f t/92trait-dirty.t
+SHA1 0208e554b3f82d3db5401d13004ef9001cadc88c t/93trait-mutable.t
+SHA1 3c316ede34e88b2cac64c826bcfa7dd55317ac5f t/94trait-ro-rw-rwp.t
+SHA1 eabf4c8a36478d04a1ab8a0805aea93b9e8407a4 t/99threads.t
+SHA1 ab93a79d322143a2694cba527f87c2d2965aa021 t/QuuxDie.pm
+SHA1 cb6c25e22ce924d3eaf3854df40af0518c02e0a1 t/ReturnsTrue.pm
+SHA1 f49ca0306bfc38fe0d46e4129f0c90bc9388f856 t/ReturnsTrueAgain.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQ6iK4ACgkQzr+BKGoqfTlBEACfbFD0xKMKIpJO2KdbCTb2imZK
+occAniaqufEyyPNgQ+g2kqOQLyWQQRSf
+=hKle
+-----END PGP SIGNATURE-----

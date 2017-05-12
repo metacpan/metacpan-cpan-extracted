@@ -1,0 +1,296 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8    \n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: root/static/js/edit.js:112
+msgid "=head1 Header"
+msgstr "=head1 Encabezado"
+
+#: root/static/js/edit.js:142
+msgid "Also try h2, h3 and so on"
+msgstr "También intente h2, h3, y demás"
+
+#: root/static/js/edit.js:159
+msgid "Bigger"
+msgstr "Más grande"
+
+#: root/static/js/edit.js:151 root/static/js/edit.js:184
+msgid "Block quote"
+msgstr "Cita de párrafo"
+
+#: root/static/js/edit.js:156 root/static/js/edit.js:186
+msgid "Bold"
+msgstr "Negrita"
+
+#: root/static/js/edit.js:143 root/static/js/edit.js:175
+msgid "Bullet list"
+msgstr "Lista"
+
+#: root/static/js/edit.js:147 root/static/js/edit.js:181
+msgid "Cell"
+msgstr ""
+
+#: root/static/js/edit.js:154
+msgid "Centered paragraph"
+msgstr "Párrafo en el centro"
+
+#: root/static/js/edit.js:150 root/static/js/edit.js:185
+msgid "Code"
+msgstr "Código"
+
+#: root/static/js/edit.js:180 root/static/js/edit.js:181
+msgid "Content"
+msgstr ""
+
+#: root/static/js/edit.js:188
+msgid "Deleted Text"
+msgstr "Texto borrado"
+
+#: root/static/js/edit.js:158
+msgid "Deleted text"
+msgstr ""
+
+#: root/static/js/edit.js:144 root/static/js/edit.js:176
+msgid "Enum list"
+msgstr "Lista enumerada"
+
+#: root/static/js/edit.js:164 root/static/js/edit.js:190
+msgid "External link"
+msgstr "Enlace externo"
+
+#: root/static/js/edit.js:178
+msgid "First Header"
+msgstr ""
+
+#: root/static/js/edit.js:110
+msgid "Formatter"
+msgstr "Formateador"
+
+#: root/static/js/edit.js:177
+msgid "Grouping"
+msgstr ""
+
+#: root/static/js/edit.js:111
+msgid "IRC formatter"
+msgstr "Formateador de IRC"
+
+#: root/static/js/edit.js:116
+msgid "Insert"
+msgstr "Instertar"
+
+#: root/static/js/edit.js:145 root/static/js/edit.js:177
+msgid "Insert table"
+msgstr ""
+
+#: root/static/js/edit.js:163 root/static/js/edit.js:189
+msgid "Internal link"
+msgstr "Enlace interno"
+
+#: root/static/js/edit.js:163 root/static/js/edit.js:189
+msgid "Intrawiki link"
+msgstr "Enlace inter-wiki"
+
+#: root/static/js/edit.js:157 root/static/js/edit.js:187
+msgid "Italic"
+msgstr "Italica"
+
+#: root/static/js/edit.js:155
+msgid "Justified paragraph"
+msgstr "Párrafo justificado"
+
+#: root/static/js/edit.js:152
+msgid "Left-justified paragraph"
+msgstr "Párrafo justficado a la izquierda"
+
+#: root/static/js/edit.js:143 root/static/js/edit.js:175
+msgid "List item 1"
+msgstr "Listar artículo 1"
+
+#: root/static/js/edit.js:180
+msgid "Long Cell"
+msgstr ""
+
+#: root/static/js/edit.js:142 root/static/js/edit.js:174
+msgid "Main heading"
+msgstr "Encabezamiento principal"
+
+#: root/static/js/edit.js:215
+msgid "Mark some text to apply the toolbar actions to that text"
+msgstr "Marque algún texto para aplicar las acciones de la barra de herramientas a ese texto"
+
+#: root/static/js/edit.js:144 root/static/js/edit.js:176
+msgid "Numbered list item"
+msgstr "Artículo de lista enumerada"
+
+#: root/static/js/edit.js:112
+msgid "POD formatter"
+msgstr "Formateador POD"
+
+#: root/static/js/edit.js:166 root/static/js/edit.js:192
+msgid "Picture"
+msgstr "Foto"
+
+#: root/static/js/edit.js:165 root/static/js/edit.js:191
+msgid "Picture left"
+msgstr "Foto izquierda"
+
+#: root/static/js/edit.js:167 root/static/js/edit.js:193
+msgid "Picture right"
+msgstr "Foto derecha"
+
+#: root/static/js/edit.js:153
+msgid "Right-justified paragraph"
+msgstr "Párrafo justificado derecha"
+
+#: root/static/js/edit.js:178
+msgid "Second Header"
+msgstr ""
+
+#: root/static/js/edit.js:160
+msgid "Smaller"
+msgstr "Mas chico"
+
+#: root/static/js/edit.js:2
+msgid "Split Edit"
+msgstr "Editar en Dos"
+
+#: root/static/js/edit.js:162
+msgid "Subscript"
+msgstr "Subíndice"
+
+#: root/static/js/edit.js:161
+msgid "Superscript"
+msgstr "Superíndice"
+
+#: root/static/js/edit.js:3
+msgid "Syntax"
+msgstr "Sintaxis"
+
+#: root/static/js/edit.js:131
+msgid "Syntax Highlight"
+msgstr "Resaltador de sintaxis"
+
+#: root/static/js/edit.js:148
+msgid "Table"
+msgstr ""
+
+#: root/static/js/edit.js:182
+msgid "Table Title"
+msgstr ""
+
+#: root/static/js/edit.js:178
+msgid "Third Header"
+msgstr ""
+
+#: root/static/js/edit.js:159
+msgid "bigger"
+msgstr "mas grande"
+
+#: root/static/js/edit.js:156 root/static/js/edit.js:186
+msgid "bold"
+msgstr "negrita"
+
+#: root/static/js/edit.js:154
+msgid "centered paragraph"
+msgstr "párrafo centrado"
+
+#: root/static/js/edit.js:150 root/static/js/edit.js:185
+msgid "code"
+msgstr "código"
+
+#: root/static/js/edit.js:117
+msgid "comments"
+msgstr "comentarios"
+
+#: root/static/js/edit.js:122
+msgid "cpan"
+msgstr "cpan"
+
+#: root/static/js/edit.js:158 root/static/js/edit.js:188
+msgid "deleted"
+msgstr "borrado"
+
+#: root/static/js/wiki.js:230 root/static/js/wiki.js:237 root/static/js/wiki.js:243
+msgid "done"
+msgstr "hecho"
+
+#: root/static/js/edit.js:120
+msgid "include"
+msgstr "incluir"
+
+#: root/static/js/edit.js:174
+msgid "increase # for smaller headline"
+msgstr "incrementar # para un titular más pequeño"
+
+#: root/static/js/edit.js:157 root/static/js/edit.js:187
+msgid "italic"
+msgstr "italica"
+
+#: root/static/js/edit.js:155
+msgid "justified paragraph"
+msgstr "párrafo justificado"
+
+#: root/static/js/edit.js:152
+msgid "left justified paragraph"
+msgstr "párrafo justificado izquierda"
+
+#: root/static/js/edit.js:164 root/static/js/edit.js:190
+msgid "linked text"
+msgstr "texto enlazado"
+
+#: root/static/js/wiki.js:479
+msgid "maximize"
+msgstr "maximizar"
+
+#: root/static/js/wiki.js:480
+msgid "maximize width"
+msgstr "maximizar a lo ancho"
+
+#: root/static/js/edit.js:151 root/static/js/edit.js:184
+msgid "quote"
+msgstr "cita"
+
+#: root/static/js/edit.js:119
+msgid "redirect"
+msgstr "redirigir"
+
+#: root/static/js/edit.js:153
+msgid "right justified paragraph"
+msgstr "párrafo justificado derecha"
+
+#: root/static/js/edit.js:133
+msgid "say \"Howdy partner.\";"
+msgstr ""
+
+#: root/static/js/edit.js:160
+msgid "small"
+msgstr "chico"
+
+#: root/static/js/edit.js:162
+msgid "subscript"
+msgstr "subíndice"
+
+#: root/static/js/edit.js:161
+msgid "superscript"
+msgstr "superíndice"
+
+#: root/static/js/edit.js:118
+msgid "toc"
+msgstr ""
+
+#: root/static/js/edit.js:121
+msgid "youtube"
+msgstr "youtube"

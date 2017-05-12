@@ -1,0 +1,35 @@
+---
+abstract: 'MIME message handling'
+author:
+  - 'Mark Overmeer'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mail-Message
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Date::Format: 0
+  Date::Parse: 0
+  Encode: 2.26
+  File::Spec: 0.7
+  IO::Scalar: 0
+  MIME::Base64: 0
+  MIME::Types: 1.004
+  Mail::Address: 2.17
+  Scalar::Util: 1.13
+  Sys::Hostname: 0
+  Test::More: 0.47
+  Time::Zone: 0
+  URI: 1.23
+  User::Identity: 0.94
+version: 3.000

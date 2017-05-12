@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- https://ru.wikipedia.org/wiki/Новосибирский_метрополитен -->
+<tube name="Новосибирский метрополитен">
+  <lines>
+    <line id="1" name="Ленинская линия" color="red"/>
+    <line id="2" name="Дзержинская линия" color="green"/>
+  </lines>
+  <stations>
+    <!-- https://ru.wikipedia.org/wiki/Ленинская_линия -->
+    <station id="1-01" name="Заельцовская" line="Ленинская линия" link="1-02"/>
+    <station id="1-02" name="Гагаринская" line="Ленинская линия" link="1-01,1-03"/>
+    <station id="1-03" name="Красный проспект" line="Ленинская линия" link="1-02,1-04,2-01,2-03"/>
+    <station id="1-04" name="Площадь Ленина" line="Ленинская линия" link="1-03,1-05"/>
+    <station id="1-05" name="Октябрьская" line="Ленинская линия" link="1-04,1-06"/>
+    <station id="1-06" name="Речной вокзал" line="Ленинская линия" link="1-05,1-07"/>
+    <station id="1-07" name="Студенческая" line="Ленинская линия" link="1-06,1-08"/>
+    <station id="1-08" name="Площадь Маркса" line="Ленинская линия" link="1-07"/>
+
+    <!-- https://ru.wikipedia.org/wiki/Дзержинская_линия -->
+    <station id="2-01" name="Площадь Гарина-Михайловского" line="Дзержинская линия" link="2-02"/>
+    <station id="2-02" name="Сибирская" line="Дзержинская линия" link="1-02,1-04,2-01,2-03"/>
+    <station id="2-03" name="Маршала Покрышкина" line="Дзержинская линия" link="2-02,2-04"/>
+    <station id="2-04" name="Берёзовая роща" line="Дзержинская линия" link="2-03,2-05"/>
+    <station id="2-05" name="Золотая Нива" line="Дзержинская линия" link="2-04"/>
+  </stations>
+</tube>

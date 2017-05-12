@@ -1,0 +1,6 @@
+Build.PL
+lib/Foo.pm
+lib/Foo.xs
+MANIFEST			This list of files
+t/basic.t
+typemap

@@ -1,0 +1,23 @@
+---
+abstract: 'Digest datatypes for Moose'
+author:
+  - 'Michael Langner'
+build_requires:
+  Moose: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-Types-Digest
+requires:
+  Moose::Util::TypeConstraints: '0'
+  MooseX::Types: '0'
+  strict: '0'
+  warnings: '0'
+version: '1.01'
+x_serialization_backend: 'YAML::Tiny version 1.70'

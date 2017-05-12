@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 007d9eadef38d89600c372861a631e950cadab7e .travis.yml
+SHA1 0a266ef51a4ddac39a9a70505eec81afbf32c647 Changes
+SHA1 bf2d713ceca5b8ad3d680ed15baba1b89df7e149 LICENSE
+SHA1 0dd2034ac914e617e31673fad14c1325f615acab MANIFEST
+SHA1 0c1268fc6058524498f4eaa78a313d175427567d META.json
+SHA1 57b0a3c84a3c6ebf1030cb95269a12a48819677c META.yml
+SHA1 3c24e025992bad04eac9778a52840a5e5dc560df Makefile.PL
+SHA1 f7f183364899998478c728cbe9380acb6386bd7b README
+SHA1 d6ebdea8904dcb200d3c7154714bd87a886c8f60 cpanfile
+SHA1 8d472da2f0882628da4678130508fe66c8ff998b dist.ini
+SHA1 a0a0fff8dad845f049b3d10c0a811804f764492b lib/MooseX/CurriedDelegation.pm
+SHA1 e63ebd0a235fb127d73a765ab23e62ee1a05a523 lib/MooseX/CurriedDelegation/Trait/Attribute.pm
+SHA1 7783bf89b5d5265fd43b3d76e4fdbe86fd007e81 lib/MooseX/CurriedDelegation/Trait/Method/Delegation.pm
+SHA1 4bdb7637c377a4563e26e887313ef118c1d1a22d t/00-check-deps.t
+SHA1 3f697ef6931c07599edb409d15b5cc97e13def48 t/00-compile.t
+SHA1 17385a21baf745d4a72dbebd6b0ce29cccab8443 t/00-report-prereqs.dd
+SHA1 f026d8957b78b6f36cdde15a8e0a533a7497eaab t/00-report-prereqs.t
+SHA1 eb359904beac8564977cfe9ce2b3a1ce749e149f t/basic.t
+SHA1 fb9c1adb15dc774b302e49846deb8f41cee94996 xt/author/eol.t
+SHA1 e2afe5b727e8457ac23e7b97ffb1f7161666338f xt/author/no-tabs.t
+SHA1 cd2bb73d16e2cb7f9c1211246b8a30c8b4c59742 xt/author/pod-coverage.t
+SHA1 0c05d254db4b8db1a5a4c84f7d34c9918231db2a xt/author/pod-spell.t
+SHA1 19232bc0556ebf606a26c5fde610b15361b7f8ff xt/author/pod-syntax.t
+SHA1 a7948d34cfaad400286ea5d5fa6206c4c7e2552c xt/release/consistent-version.t
+SHA1 49ce1896c9d577c45b17e623375b8a50f49d56c4 xt/release/has-version.t
+SHA1 d66b2d6ec9a7697f790d8acc4fd3ff3fa3fdf570 xt/release/minimum-version.t
+SHA1 21cde55ff89e0752ccb9c7d50d1ee56e98458cca xt/release/no-smart-comments.t
+SHA1 677b2da1f86906dd702844a00acd01e41917ef7b xt/release/pod-linkcheck.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJYI4yBAAoJEJP6zjPp4XX4h7UH/0wzoudcv2Db2Rui8oJIz6eT
+wOwwhGlvZxI3iE6dPJlaX6PQSMZfksSUdTVHSWTDEA0AzKnrET3DQxdP90ZSmLQV
+Rpz7+EpGlEbuLk19x1N+E2s610akNxk8XjsCHZtYylEfaL+9MJ0tBeYK0iUeEt59
+cXcRCR9YFsP0aNJTZsxzZe5xksadjWhYaZndmhystAeQGe9L8KSS4BOTHKkg969V
+IkI4r9J5vitv/h9k4a7PU74EKL36t2athjdcvYAZcJqJ9nVcYyAGA3ozqgmIOGDy
+HlX7eF1AlYf/86lT024AQaZvm7nMxyxed+6JVlGua9WPBupmMdpmmTdsxhztDA0=
+=bCmi
+-----END PGP SIGNATURE-----

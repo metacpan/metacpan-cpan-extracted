@@ -1,0 +1,252 @@
+NAME
+    Math::ematica - Perl extension for connecting Mathematica(TM)
+
+SYNOPSIS
+      use Math::ematica qw(:PACKET :TYPE :FUNC);
+
+WARNING
+    This is alpha software. User visible changes can happen any time.
+
+    The module is completely rewritten. Literally no line of the old stuff
+    is used (don't ask - I've learned a few things since these days ;-). If
+    you are using the old 1.006 version, note that the interface has
+    changed. If there is an overwhelming outcry, I will provide some
+    backward compatibility stuff.
+
+    Feel free to suggest modifications and/or extensions. I don not use
+    Mathematica for real work right now and may fail to foresee the most
+    urgent needs. Even if you think that the interface is great, you are
+    invited to complete the documentation (and fix grammos and typos). Since
+    I am no native English speaker, I will delay the writing of real
+    documentation until the API has stabilized.
+
+    I developed this module using Mathematica 3.0.1 on a Linux 2.0.30 box. I
+    verified that it still works with Mathematica 4.0 for Solaris. Let me
+    know, if it does work with other versions of Mathematica or does not
+    work on other *nix flavors.
+
+    The module still compiles fine with Mathematica 5.0 on Linux 2.6 and
+    libc-2.3.2.
+
+DESCRIPTION
+    The "Math::ematica" module provides an interface to the MathLink(TM)
+    library. Functions are not exported and should be called as methods.
+    Therefore the Perl names have the 'ML' prefix stripped. Since Perl can
+    handle multiple return values, methods fetching elements from the link
+    return the values instead of passing results in reference parameters.
+
+    The representation of the data passed between Perl and Mathematica is
+    straight forward exept the symbols which are represented as blessed
+    scalars in Perl.
+
+Exported constants
+    PACKET
+         The "PACKET" tag identifies constants used as packet types.
+
+           print "Got result packet" if $link->NextPacket == RETURNPKT;
+
+    TYPE The "TYPE" tag identifies constants used as elements types.
+
+           print "Got a symbol" if $link->GetNext == MLTKSYM;
+
+Exported functions
+    FUNC The "FUNC" tag currently only contains the "symbol" function which
+         returns the symbol for a given name.
+
+           $sym = symbol 'Sin';
+
+The plain interface
+    This set of methods gives you direct access to the MathLink function.
+    Don't despair if you don't know them too much. There is a convenient
+    layer ontop of them ;-). Methods below are only commented if they do
+    behave different than the corresponding C functions. Look in your
+    MathLink manual for details.
+
+  "new"
+    The constructor is just a wrapper around "MLOpenArgv".
+
+      $ml = new Math::ematica '-linklaunch', '-linkname', 'math -mathlink';
+
+    The link is automatically activated on creation and will be closed upon
+    destruction. So "MLCloseLink" is not accessible; use "undef" or lexical
+    variables to store links. If you use a global variable and dont force
+    the link close, you will get an optional warning during global
+    destruction.
+
+  "ErrorMessage"
+      print $link->ErrorMessage;
+
+  "EndPacket"
+  "Flush"
+  "NewPacket"
+  "NextPacket"
+  "Ready"
+  "PutSymbol"
+  "PutString"
+  "PutInteger"
+  "PutDouble"
+  "PutFunction"
+  "GetNext"
+  "GetInteger"
+  "GetDouble"
+  "GetString"
+    The method does the appropriate "MLDisownString" call for you.
+
+  "GetByteString"
+    The method does the appropriate "MLDisownByteString" call for you.
+
+  "GetSymbol"
+    The module does the appropriate "MLDisownSymbol" call for you. It also
+    blesses the result string into the package "Math::ematica::symbol".
+
+  "Function"
+    Returns the function name and argument count in list context. In scalar
+    contex only the function name is returned.
+
+  "GetRealList"
+    Returns the array of reals.
+
+The convenience interface
+  "PutToken"
+    Puts a single token according to the passed data type.
+
+      $link->PutToken(1);               # MLPutInteger
+
+    Symbols are translated to "MLPutFunction" if the arity is provided as
+    aditional parameter.
+
+      $link->PutToken(symbol 'Pi');     # MLPutSymbol
+      $link->PutToken(symbol 'Sin', 1); # MLPutFunction
+
+  "read_packet"
+    Reads the current packet and returns it as nested data structure. The
+    implementaion is not complete. But any packet made up of "MLTKREAL",
+    "MLTKINT", "MLTKSTR", "MLTKSYM", and "MLTKFUNC" should translate
+    correctely. A function symbol "List" is dropped automatically. So the
+    Mathematica expression "List[1,2,3]" translates to the Perl expression
+    "[1,2,3]".
+
+    *Mabybe this is *too* convenient?*.
+
+  "call"
+    Call is the main convenience interface. You will be able to do most if
+    not all using this call.
+
+    Note that the syntax is nearly the same as you are used to as *FullForm*
+    in Mathematica. Only the function names are moved inside the brackets
+    and separated with ',' from the arguments. The method returns the nested
+    data structures read by "read_packet".
+
+      $link->call([symbol 'Sin', 3.14159265358979/2]); # returns something near 1
+
+    To get a table of values use:
+
+      $link->call([symbol 'Table',
+                   [symbol 'Sin', symbol 'x'],
+                   [symbol 'List', symbol 'x',  0, 1, 0.1]]);
+
+    This returns a reference to an array of doubles.
+
+    You may omit the first "symbol". *Maybe we should choose the default
+    mapping to *Symbol* an require *Strings*s to be marked?*
+
+  "install"
+    If you find this too ugly, you may "install" Mathematica functions as
+    Perl functions using the "install" method.
+
+      $link->install('Sin',1);
+      $link->install('Pi');
+      $link->install('N',1);
+      $link->install('Divide',2);
+
+      Sin(Divide(Pi(),2.0)) # should return 1 (on machines which can
+                            # represent '2.0' *exactely* in a double ;-)
+
+    The "install" method takes the name of the mathematica function, the
+    number of arguments and optional the name of the Perl function as
+    argument.
+
+      $link->install('Sin',1,'sin_by_mathematica');
+
+    Make shure that you do not call any *installed* function after the $link
+    has gone. Wild things will happen!
+
+  "send_packet"
+    Is the sending part of "call". It translates the expressions passed to a
+    Mathematica package and puts it on the link.
+
+  "register"
+    This method allows to register your Perl functions to Mathematica.
+    *Registered* functions may be called during calculations.
+
+      sub addtwo {
+        $_[0]+$_[1];
+      }
+
+      $link->register('AddTwo', \&addtwo, 'Integer', 'Integer');
+      $link->call([symbol 'AddTwo',12, 3]) # returns 15
+
+    You may register functions with unspecified argument types using undef:
+
+      sub do_print {
+        print @_;
+      }
+      $link->register('DoPrint', undef);
+      $link->call(['DoPrint',12]);
+      $link->call(['DoPrint',"Hello"]);
+
+  "main"
+    This method allows to have Perl scripts installed in a running
+    Mathematica session. The Perl script try.pl might look like this:
+
+      use Math::ematica;
+      sub addtwo {
+        my ($x, $y) = @_;
+  
+        $x + $y;
+      }
+      $ml->register('AddTwo', \&addtwo, 'Integer', 'Integer');
+      $ml->main;
+  
+    Inside the Mathematica do:
+
+      Install["try.pl"]
+      AddTwo[3,5];
+
+    Admittedly, adding two numbers would be easier inside Mathematica. But
+    how about DNS lookups or SQL Databases?
+
+AUTHOR
+    Ulrich Pfeifer <pfeifer@wait.de>
+
+SEE ALSO
+    See also perl(1) and your Mathematica and MathLink documentation. Also
+    check the t/*.t files in the distribution.
+
+ACKNOWLEDGEMENTS
+    I wish to thank Jon Orwant of *The Perl Journal*, Nancy Blachman from
+    *The Mathematica Journal* and Brett H. Barnhart from *Wolfram Research*
+
+    Jon brought the earlier versions of this module to the attention of
+    Nancy Blachman. She in turn did contact Brett H. Barnhart who was so
+    kind to provide a trial license which made this work possible.
+
+    So subscribe to *The Perl Journal* and *The Mathematica Journal* if you
+    are not subscribed already if you use this module (a Mathematica license
+    is needed anyway). You would be nice to nice people and may even read
+    something more about this module one day ;-)
+
+    Special thanks to Randal L. Schwartz for naming this module.
+
+    Thanks also to Richard Jones for providing a login on a Solaris box so
+    that I could check that the module still works with Mathematica 4.0.
+
+Copyright
+    The Math:ematica module is Copyright (c) 1996,1997,1998,2000,2005 Ulrich
+    Pfeifer. Germany. All rights reserved.
+
+    You may distribute under the terms of either the GNU General Public
+    License or the Artistic License, as specified in the Perl README file.
+
+    Mathematica and MathLink are registered trademarks of Wolfram Research.
+

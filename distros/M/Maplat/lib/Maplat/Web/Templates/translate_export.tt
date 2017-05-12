@@ -1,0 +1,39 @@
+<p align="center">
+    <table class="data" align="center" id="HelperTable1">
+        <tr class="tabheader">
+            <th>[% tr.tr("Export translations") %]</th>
+        </tr>
+        <tr>
+            <td align="center">
+                <a id="ExpFile" href="[% ExportFile %]">[% tr.tr("Export") %]</a>
+            </td>
+        </tr>
+    </table>
+</p>
+    
+</p>
+&nbsp;<br>
+<p align="center">
+    <form name="translations" method="post" action="[% PostLink %]" enctype="multipart/form-data">
+        <table class="data" align="center" id="MainDataTable">
+            <tr class="tabheader">
+                <th>[% tr.tr("Import translations") %]</th>
+            </tr>
+            <tr>
+                <td><input type="file" name="filename" size="chars"></td>
+            </tr>
+            <tr>
+                <td align="center">
+                    <input type="hidden" name="mode" value="import">
+                    <input type="submit" value="[% tr.tr("Import") %]">
+                </td>
+            </tr>                
+        </table>
+    </form>
+</p>
+<script>
+    $(function() {
+        $( "#ExpFile").button();
+        //$( "a", ".demo" ).click(function() { return false; });
+    });
+</script>

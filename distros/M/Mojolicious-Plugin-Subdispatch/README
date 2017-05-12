@@ -1,0 +1,29 @@
+Mojolicious::Plugin::Subdispatch - create requests to your Mojolicious actions
+
+This plugin creates a `subdispatch` helper, which helps you creating a request
+for your actions, and returns the response object with your fully rendered
+HTML content.
+
+Installation:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Basic usage:
+
+    plugin 'Subdispatch';
+
+    [web app stuff...]
+
+    my $html = app->subdispatch->get('route_name', foo => 'bar')->body;
+
+For more informations, see the inlined POD documentation in
+lib/Mojolicious/Plugin/Subdispatch.pm or view it in the terminal with
+    
+    perldoc Mojolicious::Plugin::Subdispatch
+
+Copyright Mirko Westermeier <mail@memowe.de>
+
+Licensed under the same terms as Perl itself.

@@ -1,0 +1,11 @@
+Revision history for Mail-Audit-List.
+
+1.853     2013-10-02 07:56:19 America/New_York
+          repackage, update repo, bugtracker
+
+1.852     2007-11-01
+          do not accept as list mail if list name is unknown
+            https://rt.cpan.org/Ticket/Display.html?id=20935
+
+1.851     2007-03-06
+          split from Mail-Audit

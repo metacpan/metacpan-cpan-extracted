@@ -1,0 +1,22 @@
+Source: libmojolicious-plugin-mailexception-perl
+Section: perl
+Priority: optional
+Maintainer: Dmitry E. Oboukhov <unera@debian.org>
+Uploaders: Roman V. Nikolaev <rshadow@rambler.ru>
+Build-Depends: debhelper (>= 8)
+Build-Depends-Indep: libmime-lite-perl,
+ libmime-tools-perl,
+ libmojolicious-perl,
+ perl
+Standards-Version: 3.9.3
+Homepage: http://search.cpan.org/dist/Mojolicious-Plugin-MailException/
+
+Package: libmojolicious-plugin-mailexception-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends},
+ libmime-lite-perl,
+ libmime-tools-perl,
+ libmojolicious-perl
+Description: Mojolicious plugin to send crash information by email
+ The plugin catches all exceptions, packs them into email and sends them to
+ email.

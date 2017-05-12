@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=<% settings.charset %>" />
+    <title>MooseX::amine</title>
+    <!--<link rel="stylesheet" href="[% request.uri_base %]/css/style.css" />-->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
+  </head>
+  <frameset cols="250,*">
+    <frame name="sidebar" src="<% request.uri_base %>/_list" frameborder=1 />
+    <frame name="main"    src="<% request.uri_base %>/_show" frameborder=1 />
+  </frameset>
+</html>

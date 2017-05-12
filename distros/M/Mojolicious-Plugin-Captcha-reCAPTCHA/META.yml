@@ -1,0 +1,19 @@
+---
+abstract: 'use Captcha::reCAPTCHA in Mojolicious apps'
+author:
+  - 'Renee Baecker <module@renee-baecker.de>'
+  - 'Heiko Jansen <jansen@hbz-nrw.de>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150001'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Captcha-reCAPTCHA
+requires:
+  Captcha::reCAPTCHA: '0'
+  Mojolicious: '2.00'
+version: '0.05'

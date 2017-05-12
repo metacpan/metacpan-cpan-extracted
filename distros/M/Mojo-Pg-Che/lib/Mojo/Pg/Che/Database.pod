@@ -1,0 +1,137 @@
+=pod
+
+=encoding utf-8
+
+Доброго всем
+
+=head1 Mojo::Pg::Che::Database
+
+¡ ¡ ¡ ALL GLORY TO GLORIA ! ! !
+
+=head1 NAME
+
+Mojo::Pg::Che::Database - mix of parent Mojo::Pg::Database and DBI.pm
+
+
+=head1 SYNOPSIS
+
+See also L<Mojo::Pg::Database#SYNOPSIS>
+
+    my $db = $pg->db;
+    
+    # DBI style
+    my $now = $db->selectrow_hashref('select now() as now')->{now};
+    
+    my $now = $db->selectrow_array('select now() as now', {Async=>1,});
+    
+    $db->query('select pg_sleep(?::int), now() as now', undef, 2, $cb);
+    
+    $db->do('set ...');
+
+=head2 Transaction syntax
+
+See also L<Mojo::Pg::Che#Transaction-syntax>.
+
+  eval {
+    $db->begin;
+    $db->query('insert into foo (name) values (?)', 'bar');
+    $db->do('insert into foo (name) values (?)', 'baz');
+    $db->commit;
+  };
+  die $@ if $@;
+  
+  $db->begin;
+  $db->do('insert into foo (name) values (?)', 'bazzzz');
+  $db->rollback;
+  $db->begin;
+  $db->query('insert into foo (name) values (?)', 'barrr');
+  $db->commit;
+
+=head1 Non-blocking query cases
+
+See L<Mojo::Pg::Che#Non-blocking-query-cases>.
+
+=head1 METHODS
+
+All methods from parent module L<Mojo::Pg::Database> are inherits and implements the following new ones.
+
+=head2 prepare
+
+Prepare and return DBI statement handler for query string. See L<DBI#prepare>.
+
+=head2 prepare_cached
+
+Prepare and return DBI cached statement handler for query string. See L<DBI#prepare_cached>.
+
+=head2 selectrow_array
+
+DBI style quering. See L<DBI#selectrow_array>. Blocking | non-blocking. Input params - L<Mojo::Pg::Che::Database#Params-for-quering-methods>.
+
+=head2 selectrow_arrayref
+
+DBI style quering. See L<DBI#selectrow_arrayref>. Blocking | non-blocking. Input params - L<Mojo::Pg::Che::Database#Params-for-quering-methods>.
+
+=head2 selectrow_hashref
+
+DBI style quering. See L<DBI#selectrow_hashref>. Blocking | non-blocking. Input params - L<Mojo::Pg::Che::Database#Params-for-quering-methods>.
+
+=head2 selectall_arrayref
+
+DBI style quering. See L<DBI#selectall_arrayref>. Blocking | non-blocking. Input params - L<Mojo::Pg::Che::Database#Params-for-quering-methods>.
+
+=head2 selectall_hashref
+
+DBI style quering. See L<DBI#selectall_hashref>. Blocking | non-blocking. Input params - L<Mojo::Pg::Che::Database#Params-for-quering-methods>.
+
+=head2 selectcol_arrayref
+
+DBI style quering. See L<DBI#selectcol_arrayref>. Blocking | non-blocking. Input params - L<Mojo::Pg::Che::Database#Params-for-quering-methods>.
+
+=head2 do
+
+DBI style quering. See L<DBI#do>. Blocking | non-blocking. Input params - L<Mojo::Pg::Che::Database#Params-for-quering-methods>.
+
+=head2 begin
+
+Start transaction for given object which attr C< {tx} > is a L<Mojo::Pg::Transaction> object. Sinonyms are: C<< ->tx >> and C<< ->begin_work >>.
+
+=head2 commit
+
+Commit transaction and drop attr C< {tx} > for destroing L<Mojo::Pg::Transaction> object.
+
+=head2 rollback
+
+Rollback transaction and drop attr C< {tx} > for destroing L<Mojo::Pg::Transaction> object.
+
+=head1 Params for quering methods
+
+The methods C<select...>, C<do> has next input params:
+
+=over 4
+
+=item * String query | statement handler object
+
+=item * Hashref attrs (optional)
+
+=item * Array of bind values (optional)
+
+=item * Callback non-blocking (optional)
+
+=back
+
+=head1 AUTHOR
+
+Михаил Че (Mikhail Che), C<< <mche[-at-]cpan.org> >>
+
+=head1 BUGS / CONTRIBUTING
+
+Please report any bugs or feature requests at L<https://github.com/mche/Mojo-Pg-Che/issues>. Pull requests also welcome.
+
+=head1 COPYRIGHT
+
+Copyright 2016 Mikhail Che.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

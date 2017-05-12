@@ -1,0 +1,28 @@
+Mojolicious::Plugin::INIConfig
+
+Mojolicious::Plugin::INIConfig is a INI configuration plugin that
+preprocesses its input with Mojo::Template.
+
+Example
+
+  # myapp.ini
+  [section]
+  foo=bar
+  music_dir=<%= app->home->rel_dir('music') %>
+
+  # Mojolicious
+  my $config = $self->plugin('INIConfig');
+
+  # Mojolicious::Lite
+  my $config = plugin 'INIConfig';
+
+  # foo.html.ep
+  %= $config->{section}{foo}
+
+  # The configuration is available application wide
+  my $config = app->config;
+
+  # Everything can be customized with options
+  my $config = plugin INIConfig => {file => '/etc/myapp.conf'};
+
+

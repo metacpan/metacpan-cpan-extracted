@@ -1,0 +1,35 @@
+
+    <center>
+% if (stash 'key') {
+<div class="row-fluid">
+<h3>
+        <%= current_instance %>
+</h3>
+<% my $custom = begin %><%= include current_object.'/change_button' =%><% end %>
+<% my $generic = begin %><%= include 'change_button'; =%><% end %>
+%= $custom->() || $generic->();
+
+</div>
+% } else {
+<div class="row-fluid" style='color:grey;'>
+<h3>
+        <%= ucfirst(printable(current_object)) %> : <i>none</i>
+</h3>
+</div>
+% }
+    </center>
+
+
+<ul class="nav nav-tabs">
+    <li style='height:25px;'>&nbsp;</li>
+% for my $a (tabs) {
+    <li <%== $a eq current_tab() ? q[ class="active"] : '' %>>
+        <%= link_to "$toto_prefix/".current_object()."/$a/".(current_instance->key || '') => begin =%>
+            <%= $a =%>
+        <%= end =%>
+    </li>
+% }
+    <li style='height:25px;'>&nbsp;</li>
+</ul>
+
+

@@ -1,0 +1,208 @@
+=head1 NAME
+
+Mail::Exchange::Tutorial - Introduction to the Mail::Exchange classes and
+Interface
+
+=head1 DESCRIPTION
+
+=head2 Introduction
+
+Microsoft Exchange, as a server application, uses a proprietary binary
+protocol when communicating with Microsoft Outlook as a client program.
+This protocol is tightly connected to the internal format used to store
+message objects, which in turn is tightly connected to the binary format
+(.msg) that Outlook uses to store messages in files.
+
+Right now, the Mail::Exchange classes are little more than a facility to read
+and write .msg files, but it is expected they grow into a more complete
+way to interact with an Exchange Server in the future.
+
+=head2 Data structures
+
+A Message object, in Exchange/Outlook, is something like a Property Container,
+that contains a list of property/value pairs. Many often-used properties
+are pre-defined by Microsoft, having constant, unique, property IDs, along
+with property types like String, Integer, Time etc. A (more or less) complete
+list of these properties is defined in [MS-OXPROPS], and they are made
+available by the Mail::Exchange::PidTagIDs module.
+
+In addition to those properties, Microsoft defines named properties as well.
+These may be string named properties, which are, for example, used for
+non-standard Internet Headers, or numerical named properties, which
+abbreviate often-used strings with a 2 byte number, and define a data type,
+just like the standard properties do. These numeric named Properties are
+listed in Mail::Exchange::PidLidIDs.
+
+There are two data object types may occur more than once in a message object -
+Attachments and Recipients. A message can have only one sender, but several
+recipients, with each of them having properties like email address, address
+type ('To', 'Cc', 'Bcc'), and real names. Thus, Attachments and Recipients
+have their own Object type, of which zero or more instances can be attached
+to a message. Mail::Exchange::Attachment and Mail::Exchange::Recipient
+are the classes to handles these data objects.
+
+=head2 Reading Message Files
+
+When creating a new Message object, the new() method can be given a filename
+parameter. This will read in the complete message object, from which
+properties can be extracted afterwards:
+
+    my $msg=Mail::Exchange::Message->new("my.msg");
+    print "Subject: ", $msg->get(PidTagSubject), "\n";
+
+=head2 Writing Message Files
+
+Message Files can be created by modifying existing ones, or by creating them
+from scratch. Also, there is a method to import a MIME-formatted email
+message into a Message object.
+
+=head3 Modifying existing Message files
+
+To modify an existing message file, read it in as above, set the 
+properties you want changed, and write it out to the same or a different
+file name:
+
+    my $msg=Mail::Exchange::Message->new("original.msg");
+    $msg->set(PidTagImportance, 2);
+    $msg->set('received-spf', 'none', 6, PtypString,
+   		 "00020386-0000-0000-c000-000000000046");
+    $msg->setSubject('new subject');
+    $msg->save('changed.msg');
+
+The primary method to set Properties is the C<set> method. Its first
+parameter is either a standard PidTag property, a numeric named PidLid
+property, or a string named property. In the case of PidTag or PidLid
+properties, their type is already known to the message object, but for
+string named properties, the property data type and property use guid
+must be given. Property data types are defined in
+Mail::Exchange::PropertyTypes.pm, while GUIDs can be taken from
+[MS-OXPROPS] section 1.3.2. The above example GUID is defined to
+contain Internet Headers.
+
+For some often uses Properties, there are abbreviation functions, like
+setSubject. These abbreviation functions may set several properties at once,
+so it makes sense to use them where possible.
+
+=head3 Creating message files from scratch
+
+The Mail::Exchange::Message->new method, when called without a file
+parameter, creates an empty message object, but sets a few of the
+most important message properties in it. However, it does NOT set
+the message type, which can be one of Calendar entry, ToDo task entry, Mail,
+or various others. So, to create an email message, it is better to
+use Mail::Exchange::Message::Email->new to create an email message object.
+(At the time of this writing, Email ist the only existing subclass,
+more are expected to be implemented in the future).
+
+After creating an empty message, set some properties in it and save it,
+like in
+
+    my $message=Mail::Exchange::Message::Email->new();
+    $message->setUnicode(1);
+    $message->setSender('somebody@somewhere.com');
+    $message->setDisplayTo("Doe, John <jdoe@target.com>");
+    $message->setSubject("trying out message files");
+    $message->setBody("hello world");
+
+    my $recipient=Mail::Exchange::Recipient->new();
+    $recipient->setEmailAddress("jdoe@target.com");
+    $recipient->setDisplayName("Doe, John");
+    $message->addRecipient($recipient);
+
+    $message->save("mail.msg");
+
+If you want to prepare a message to be sent by Outlook, set the
+C<mfUnsent> message flag before saving it:
+
+    $message->set(PidTagMessageFlags, mfUnsent);
+
+This way, you'll get your standard "send" button from Outlook, so you can
+prepare a message from perl, review it in Outlook, and send it just like
+you'd written it yourself. If you don't set this flag, the message will
+be displayed by outlook like one in your inbox - you can reply to it,
+forward  it, or save attachments as files, but can't send it again.
+
+=head3 Adding recipients
+
+For each recipient you want your message to have, you need to create
+a Mail::Exchange::Recipient object and add it to the message:
+
+    my $recipient=Mail::Exchange::Recipient->new();
+    $recipient->setEmailAddress('jdoe@target.com');
+    $recipient->setDisplayName('Doe, John');
+    $recipient->setType("To");
+
+    my $recipient=Mail::Exchange::Recipient->new();
+    $recipient->setEmailAddress('mdae@target.com');
+    $recipient->setDisplayName('Dae, Mary');
+    $recipient->setType("To");
+
+    my $recipient=Mail::Exchange::Recipient->new();
+    $recipient->setEmailAddress('bob@another.target.org');
+    $recipient->setDisplayName('Bob');
+    $recipient->setType("Cc");
+
+    $message->addRecipient($recipient);
+
+    $message->setDisplayTo("Doe, John; Dae, Mary");
+    $message->setDisplayCc("Bob");
+
+Adding a recipient will _not_ make that recipient show in the To: and CC:
+boxes in Outlook, you have to use setDisplayTo, setDisplayCC
+(and setDisplayBcc) to set these entries.
+
+=head3 Adding attachments
+
+Just like with recipients, you can add attachments to a Message object:
+
+    my $attachment=Mail::Exchange::Attachment->new("file.dat");
+    $message->addAttachment($attachment);
+
+If you pass an existing file name to the constructor, all properties
+that can be derived from the file (name, content, extension,
+creation and modification time, ...) will be set automatically. Or, you can
+use a string for the contents of a file, but you'll have to set other
+properties yourself:
+
+    my $attachment=Mail::Exchange::Attachment->new();
+    $attachment->setString($content);
+    $attachment->setFileName("string.dat");
+    $attachment->set(PidTagCreationTime, mstime_to_unixtime(time());
+    $attachment->set(PidTagLastModificationTime, mstime_to_unixtime(time());
+
+    $message->addAttachment($attachment);
+
+=head2 Reading MIME Mail files
+
+To read in a MIME mail file, use Email::MIME to parse it first. Then,
+you can use the Mail:Exchange::Message::Email->fromMIME constructor to
+turn it into a Message object:
+
+    open(MAIL, "<$message.mime");
+    do {
+	local $/;
+	$mail=<MAIL>;
+    };
+    close MAIL;
+
+    $parsed=Email::MIME->new($mail);
+    $msg=Mail::Exchange::Message::Email->fromMIME($parsed);
+
+    $msg->save("message.msg");
+
+=head1 AUTHOR
+
+Guntram Blohm <gbl at bso2001 dot com>
+
+=head1 REFERENCES
+
+A good amount of documentation by Microsoft can be downloaded
+from:
+    http://msdn.microsoft.com/en-us/library/cc425499(v=exchg.80).aspx
+
+=head1 BUGS
+
+Probably many. This implementation is quite new, so there's lots of stuff
+not finished yet. However, the basic functions work. Still, please don't use
+this library in a context where bugs might do any harm. As always, there
+is no warranty at all.

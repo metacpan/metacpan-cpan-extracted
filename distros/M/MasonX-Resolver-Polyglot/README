@@ -1,0 +1,30 @@
+Polyglot - the component internationalization resolver
+------------------------------------------------------
+
+This is a custom HTML::Mason resolver, as well as a PerlInitHandler.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  HTML::Mason
+  Locale::Language
+  Locale::Country
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Benjamin H Kram <ben@base16consulting.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+If you come up with a particularly neat way of using this, I'd like to know.

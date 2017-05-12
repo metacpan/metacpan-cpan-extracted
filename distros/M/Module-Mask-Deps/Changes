@@ -1,0 +1,30 @@
+Changelog for Module::Mask::Deps
+
+0.07 - Sat 3 Mar 2012
+	- Made dependency lookup use META.*
+	- Fixed some mistakes in documentation - thanks to Kevin Ryde.
+
+0.06 - Sat 28 Jun 2008
+	- Fixed required perl version.
+
+0.05 - Wed Oct 4 2006
+        - Stopped POD tests from relying on File::Find::Rule.
+
+0.04 - Wed Oct 4 2006
+	- Avoided pipe open when reading Makefile.PL dependencies, as this is
+	  not well supported on windows. (RT bug 20779)
+
+	- Fixed another bug with sub-packages.
+	  Modules loaded from sub-packages couldn't load their dependencies.
+
+0.03 - Fri May 12 2006
+	- Fixed a bug whereby modules loaded in sub-packages of a module file
+          would not be loaded.
+
+0.02 - Fri Apr 28 2006
+	- Made provision for loading local paths
+	- Added Changes and README
+
+0.01 - Wed Apr 12 2006
+	- initial revision
+

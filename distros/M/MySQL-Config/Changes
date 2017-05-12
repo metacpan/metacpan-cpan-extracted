@@ -1,0 +1,26 @@
+# ======================================================================
+#                         --- MySQL::Config ---
+# ======================================================================
+
+# ----------------------------------------------------------------------
+# Version 1.02                                           August 22, 2002
+# ----------------------------------------------------------------------
+* Initial version.
+
+# ----------------------------------------------------------------------
+# Version 1.03                                        September 24, 2003
+# ----------------------------------------------------------------------
+* Correctly (and warnings-free) parse boolean options, assigning a 1
+  as the value.
+
+* No longer returns items in hash order.
+
+* More robust test suite.
+
+* parse_defaults separates out variables with embedded = into a nested
+  hashref, rather than collapsing them into one variable.
+
+# ----------------------------------------------------------------------
+# Version 1.04                                            August 2, 2008
+# ----------------------------------------------------------------------
+* Added ^ and $ to the regexp that anchors the groups.

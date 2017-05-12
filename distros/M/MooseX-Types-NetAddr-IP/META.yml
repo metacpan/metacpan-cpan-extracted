@@ -1,0 +1,27 @@
+---
+abstract: 'NetAddr::IP related types and coercions for Moose'
+author:
+  - 'Todd Caine <todd.caine@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-Types-NetAddr-IP
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Module::Runtime: '0.014'
+  Moose: '0.41'
+  MooseX::Types: '0.19'
+  NetAddr::IP: '0'
+  Test::Exception: '0'
+  namespace::clean: '0.08'
+version: '0.07'

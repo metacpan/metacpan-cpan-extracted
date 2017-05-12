@@ -1,0 +1,51 @@
+=head1 NAME
+
+Mozilla::DOM::Attr
+
+Mozilla::DOM::Attr is a wrapper around an instance of Mozilla's
+nsIDOMAttr interface. This inherits from
+L<Mozilla::DOM::Node|Mozilla::DOM::Node>.
+
+ * The nsIDOMAttr interface represents an attribute in an "Element" object.
+ * Typically the allowable values for the attribute are defined in a document
+ * type definition.
+ *
+ * For more information on this interface please see
+ * L<http:E<sol>E<sol>www.w3.orgE<sol>TRE<sol>DOM-Level-2-CoreE<sol>>
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::Attr->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $name = $attr->B<GetName>()
+
+=head2 $element = $attr->B<GetOwnerElement>()
+
+=head2 $bool = $attr->B<GetSpecified>()
+
+=head2 $value = $attr->B<GetValue>()
+
+=head2 $attr->B<SetValue>($value)
+
+=over
+
+=item * $value (string)
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

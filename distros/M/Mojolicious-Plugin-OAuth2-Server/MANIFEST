@@ -1,0 +1,27 @@
+Changes
+Makefile.PL
+README.md
+README.pod
+lib/Mojolicious/Plugin/OAuth2/Server.pm
+MANIFEST
+t/000_prerequisites.t
+t/001_compiles_pod.t
+t/003_changes.t
+t/010_basic.t
+t/015_overrides.t
+t/025_no_config.t
+t/030_expiry_config.t
+t/035_login_confirm_error.t
+t/040_full_fat_app.t
+t/050_jwt.t
+t/060_jwt_with_revoke.t
+t/070_overrides_hash_args.t
+t/080_password_grant_basic.t
+t/090_password_grant_overrides.t
+t/100_implicit_grant_basic.t
+t/110_implicit_grant_overrides.t
+t/120_client_credentials_grant_basic.t
+t/130_client_credentials_grant_overrides.t
+t/AllTests.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

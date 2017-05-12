@@ -1,0 +1,16 @@
+Revision history for Perl extension Mail::SpamTest::Bayesian.
+
+0.02  Sun Sep  8 18:12:45 2002
+	- improved sort portability, should now be cleanly subclassable.
+        - Removed /0 error when no (non-)?spam messages had been loaded.
+        - init_db now deletes old database files (removes "uninitialised
+          value" warnings).
+        - added _stream methods to merge mbox files without loading the
+          whole thing into memory
+        - tokens comprising numbers only are now ignored
+        - added example script
+
+0.01  Tue Aug 20 15:11:49 2002
+	- original version; created by h2xs 1.21 with options
+		-A -X -n Mail::SpamTest::Bayesian
+        - basic development version of the module.

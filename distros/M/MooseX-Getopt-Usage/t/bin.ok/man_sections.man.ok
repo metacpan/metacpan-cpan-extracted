@@ -1,0 +1,18 @@
+NAME
+    man_sections - Test man_sections option.
+
+SYNOPSIS
+     man_sections.pl [OPTIONS] [MANS]
+
+OPTIONS
+    Some extra options text.
+
+    --help -? --usage
+        Display the usage message and exit
+
+    --man
+        Display man page
+
+AUTHOR
+    Invader Scouge
+

@@ -1,0 +1,30 @@
+---
+abstract: 'This is a instantial object of MooX::CalcTime::Role'
+author:
+  - 'Yan Xueqing <yanxueqing621@163.com>'
+build_requires:
+  Module::Build: 0.28
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 1.00
+configure_requires:
+  Module::Build: 0.28
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooX-CalcTime
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  DateTime: 0
+  Modern::Perl: 0
+  Moo: 0
+  Moo::Role: 0
+version: 0.0.8

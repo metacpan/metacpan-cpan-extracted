@@ -1,0 +1,98 @@
+From - Mon Jul 11 11:29:52 2005
+X-UIDL: 3a9500470000b54b
+X-Mozilla-Status: 0001
+X-Mozilla-Status2: 00000000
+Return-Path: <xxx@xxx.edu>
+X-Original-To: xxx@xxx.edu
+Delivered-To: xxx@xxx.edu
+Received: from localhost (localhost [127.0.0.1])
+	by mail.xxxxxxxxxxxxxxxx.edu (Postfix) with ESMTP id CC30433669
+	for <xxx@xxx.edu>; Mon, 11 Jul 2005 11:29:53 +0300 (EEST)
+Received: from smtp.xxxxxxxxxxxxxx.edu (smtp.xxxxxxxxxx.edu.tr [192.168.1.91])
+	by mail.xxxxxxxxxxxxxx.edu (Postfix) with ESMTP id 638B533668
+	for <xxx@xxx.edu>; Mon, 11 Jul 2005 11:29:53 +0300 (EEST)
+Received: from sabanciuniv.edu (xxxx.xxxxxxxxxxxxx.edu [10.10.1.173])
+        (authenticated as xxxxx bits=0)
+        by smtp.xxxxxxxxxxxxxxx.edu  with ESMTP id j6B8TruC018406
+        for <xxx@xxx.edu>; Mon, 11 Jul 2005 11:29:53 +0300
+Message-ID: <42D22DFE.6050106@xxx.edu>
+Date: Mon, 11 Jul 2005 11:29:50 +0300
+From: =?ISO-8859-9?Q?Xxxxx_Xxx=FD?= <xxx@xxx.edu>
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.4) Gecko/20030624 Netscape/7.1 (ax)
+X-Accept-Language: tr, en-us, en
+MIME-Version: 1.0
+To: Alper Sari <xxx@xxx.edu>
+Subject: test with Turkish characters iso-8859-9
+Content-Type: multipart/mixed;
+ boundary="------------080204030105050406030001"
+X-Virus-Scanned: by AMaViS
+Status:   
+
+This is a multi-part message in MIME format.
+--------------080204030105050406030001
+Content-Type: multipart/alternative;
+ boundary="------------030509000709060208040801"
+
+
+--------------030509000709060208040801
+Content-Type: text/plain; charset=ISO-8859-9; format=flowed
+Content-Transfer-Encoding: 8bit
+
+The attachment's name includes some turkish characters like (þðüýçö)
+Thank you
+best
+
+-- 
+
+
+
+--------------030509000709060208040801
+Content-Type: text/html; charset=ISO-8859-9
+Content-Transfer-Encoding: 8bit
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-9">
+  <title></title>
+</head>
+<body text="#000000" bgcolor="#ffffff">
+The attachment's name includes some turkish characters like (þðüýçö)<br>
+Thank you <br>
+best<br>
+<br>
+<div class="moz-signature">-- <br>
+<meta http-equiv="Content-Type" content="text/html; ">
+<title></title>
+<p
+ style="color: rgb(51, 102, 102); font-family: Courier New,Courier,monospace; font-size: 9pt;">
+ <br><br><br>
+</p>
+</div>
+</body>
+</html>
+
+--------------030509000709060208040801--
+
+--------------080204030105050406030001
+Content-Type: text/plain;
+ name="test =?ISO-8859-9?Q?=FE=F0=FC=FD=E7=F6_characters=2Etxt?="
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline;
+ filename="test =?ISO-8859-9?Q?=FE=F0=FC=FD=E7=F6_characters=2Etxt?="
+
+some text for test 
+
+some Turkish characters as ðüþöçý
+sd asdf
+asdf 
+
+
+ Note that the query also selects records with dates that lie in the future.
+
+Functions that expect date values usually accept datetime values and ignore the time part. Functions that expect time values usually accept datetime values and ignore the date part.
+
+Functions that return the current date or time each are evaluated only once per query at the start of query execution. This means that multiple references to a function such as NOW() within a single query always produce the same result. This principle also applies to CURDATE(), CURTIME(), UTC_DATE(), UTC_TIME(), UTC_TIMESTAMP(), and to any of their synonyms. 
+
+--------------080204030105050406030001--
+

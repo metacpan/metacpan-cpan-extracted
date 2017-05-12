@@ -1,0 +1,5 @@
+0.02    Tue Aug 18 12:40:23 UTC 2009
+    - added support for 'mountopts' option (Oleg Kostyuk)++
+
+0.01    Sat May  9 16:38:47 CDT 2009
+    - initial release

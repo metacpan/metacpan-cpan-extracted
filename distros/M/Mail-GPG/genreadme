@@ -1,0 +1,3 @@
+#!/bin/sh
+perldoc -t lib/Mail/GPG.pm | \
+  perl -n -e 'BEGIN{$print=1} $print = 0 if /^EXAMPLES|SEE ALSO/; $print=1 if /^AUTHOR/; print if $print' > README

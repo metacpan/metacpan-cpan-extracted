@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/MooseX/Attribute/TypeConstraint/CustomizeFatal.pm
+t/00-compile.t
+t/basic.t
+t/release-pod-syntax.t

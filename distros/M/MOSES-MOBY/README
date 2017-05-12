@@ -1,0 +1,71 @@
+MOSES-MOBY version .92
+======================
+
+OVERVIEW
+
+Perl MoSeS is a generator of Perl based BioMOBY
+web services (SOAP & CGI based). This module
+will hopefully help all those service providers
+that have something to offer, but don't want to
+get overwhelmed by the BioMOBY services protocol.
+
+Perl MoSeS takes care of all data marshalling and
+un-marshalling, web service transporting, and much
+more, leaving the service provider the sole task 
+of providing the business logic for their service.
+
+INSTALLATION
+
+	To install this module type the following:
+	
+	   perl Makefile.PL
+	   make
+	   make test
+	   make install
+
+	To install this module on WinOS:
+	
+		perl Makefile.PL
+		nmake
+		nmake test
+		nmake install
+	
+	If you have any problems installing prerequisite modules,
+	you may find it easier to use ActiveStates ppm utility.
+
+UPGRADING
+
+It is extremely important to remove your moby-services.cfg
+file when upgrading to version 0.82!
+
+GETTING STARTED
+
+The module MOSES::MOBY has extensive documentation to
+get you started and we suggest that you go there first!
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Test::More
+ExtUtils::MakeMaker
+Carp
+File::Spec
+SOAP::Lite
+XML::LibXML
+Log::Log4perl
+Template
+Config::Simple
+IO::Stringy
+Unicode::String
+File::HomeDir
+File::ShareDir
+IO::Prompt - unless you are using Windows
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2006 Martin Senger, Edward Kawas. All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+This software is provided "as is" without warranty of any kind.

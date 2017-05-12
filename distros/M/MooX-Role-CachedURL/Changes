@@ -1,0 +1,40 @@
+Revision history for Perl module MooX::Role::CachedURL
+
+0.07 2015-11-04 NEILB
+    - Updated github repo URL after changing my github username
+    - Added [MetaJSON] to dist.ini, so releases will include META.json file
+
+0.06 2014-05-05
+    - Changed tests 2 and 3 to use a cache path in t/.
+      Two of the tests were reported as failing on some CPAN Testers
+      platforms (inc Linux), when unlinking cache files just created.
+      Updated the code doing the unlinking to report why it fails,
+      so if the tests still fail, I'll get an idea why.
+
+0.05 2014-05-05
+    - Added a test for the 'path' attribute: t/04-path.t
+    - If the cache_path or path attributes reference a file ending with .gz,
+      we assume it's gzip'd and transparently unzip it for you
+      with PerlIO::gzip. This means that large files can be requested and
+      cached gzip'd.
+
+0.04 2014-04-28
+    - Split the 'path' into 'path' and 'cache_path' attributes.
+      Previously 'path' was used for both the local cache path,
+      and for your to specify your own local file. That meant you
+      couldn't specify your own path for local caching.
+    - Added [Git::Tag] and [Git::Push] to dist.ini
+
+0.03 2014-03-29
+    - Changed the 'expires' attribute to 'max_age', which feels
+      the right name having read various caching-related things recently.
+
+0.02 2014-03-25
+    - Added 'expires' attribute, which uses Time::Duration::Parse to
+      let you express the expiry time in a variety of ways.
+    - Split out test package into a separate module in t/lib/
+    - Added major todo items to section in pod
+
+0.01 2014-03-22
+    - First release to CPAN
+

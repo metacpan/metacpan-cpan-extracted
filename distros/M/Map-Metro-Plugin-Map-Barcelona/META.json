@@ -1,0 +1,65 @@
+{
+   "abstract" : "Map::Metro map for Barcelona",
+   "author" : [
+      "Erik Carlsson <info@code301.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Map-Metro-Plugin-Map-Barcelona",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Map::Metro" : "0.2206",
+            "Moose::Role" : "2.0000",
+            "perl" : "5.014000"
+         }
+      }
+   },
+   "provides" : {
+      "Map::Metro::Plugin::Map::Barcelona" : {
+         "file" : "lib/Map/Metro/Plugin/Map/Barcelona.pm",
+         "version" : "0.1007"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Csson/p5-Map-Metro-Barcelona/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Map-Metro-Plugin-Map-Barcelona",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Csson/p5-Map-Metro-Barcelona.git",
+         "web" : "https://github.com/Csson/p5-Map-Metro-Barcelona"
+      }
+   },
+   "version" : "0.1007"
+}
+

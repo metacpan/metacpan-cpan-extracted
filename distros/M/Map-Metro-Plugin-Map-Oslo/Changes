@@ -1,0 +1,43 @@
+Revision history for Map-Metro-Plugin-Map-Oslo
+
+0.1104 2016-01-24T14:27:55Z UTC
+ [Other Changes]
+ - Rebuilt with latest Dist::Iller::Config::Author::CSSON(::MapMetro).
+
+0.1103 2015-01-22T11:11:40Z CET
+ [Documentation]
+ - Fixed visualization (removed debug information).
+ - Slightly improved synopsis.
+
+0.1102 2015-01-22T11:04:26Z CET
+ [Bug Fixes]
+ - Removed no longer used line (line 1 used to have one line in each
+   direction due to Gulleråsen).
+
+ [Documentation]
+ - Added visualization.
+ - Added detailed line information.
+ - Rebuilt with podweaver.
+
+ [Requirements]
+ - Bumped Map::Metro req to 0.2206.
+
+0.1101 2014-12-31T17:02:50Z CET
+ [Meta]
+ - Fixed prereqs.
+
+0.1100 2014-12-30T22:35:09Z CET
+ [Enhancements]
+ - Changes in Map::Metro 0.1900 now makes it possible to correctly map the
+   one-way nature of Gulleråsen station.
+
+ [Meta]
+ - Bumped Map::Metro requirement to 0.1900.
+
+0.1001 2014-12-28T22:22:04Z CET
+ [Meta]
+ - Github is the repo and issue tracker.
+
+0.1000 2014-12-21T00:22:00Z CET
+ - Initial release
+

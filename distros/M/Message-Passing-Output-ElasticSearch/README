@@ -1,0 +1,20 @@
+NAME
+    Message::Passing::Output::ElasticSearch - output logstash messages into
+    ElasticSearch.
+
+DESCRIPTION
+METHODS
+  consume ($msg)
+    Consumes a message, queuing it for consumption by ElasticSearch
+
+SEE ALSO
+    Message::Passing
+    <http://logstash.net>
+
+AUTHOR
+    Tomas (t0m) Doran <bobtfish@bobtfish.net>
+
+COPYRIGHT
+LICENSE
+    XXX - TODO
+

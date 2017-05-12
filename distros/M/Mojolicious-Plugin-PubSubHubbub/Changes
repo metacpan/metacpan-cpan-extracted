@@ -1,0 +1,86 @@
+0.17 2017-01-10
+        - Updated to Mojolicious 7.13.
+        - Removed deprecated methods pubsub_publish, pubsub_subscribe,
+          pubsub_unsubscribe, pubsub_discover.
+
+0.16 2016-07-26
+        - Updated to Mojolicious 7.
+        - Added pubsub->publish helper.
+        - Added pubsub->subscribe helper.
+        - Added pubsub->unsubscribe helper.
+        - Added pubsub->discover helper.
+        - Deprecated pubsub_publish in favor of pubsub->publish.
+        - Deprecated pubsub_subscribe in favor of pubsub->subscribe.
+        - Deprecated pubsub_unsubscribe in favor of pubsub->unsubscribe.
+        - Deprecated pubsub_discover in favor of pubsub->discover.
+
+0.15 2016-02-29
+        - Updated to Mojolicious 6.48.
+
+0.14 2015-04-24
+        - Updated to Mojolicious 6.00.
+
+0.13 2014-10-17
+        - Updated to Mojolicious 5.49.
+        - Fixed test suite for new every_param() method.
+
+0.12 2014-05-31
+        - Compatibility fix for link headers in Mojo versions > 4.99.
+
+0.11 2014-05-29
+        - Cleanup.
+        - Fixed License issue (now coherent Artistic License 2.0).
+
+0.10 2013-08-03
+        - Update to Mojolicious 4.23.
+
+0.09 2013-05-20
+        - Fixed for Mojolicious 4.0 compatibility.
+
+0.08 2013-04-19
+        - Improved documentation.
+        - Updated dependencies.
+
+0.07 2013-03-31
+        - Bug fixes from development versions.
+
+0.06 2013-03-29
+        - Improved documentation.
+        - Improved content handling in example app.
+        - Fixed bug in using "values" with a dereferenced array.
+        - Fixed prototype bug.
+        - 0.06_1: Improved test suite.
+        - 0.06_2: Deleted all ~~ from test suite.
+        - 0.06_3: Sort topics.
+
+0.05 2013-03-23
+        - Fixed a bug in the subscription process
+          of the example app.
+
+0.04 2013-03-22
+        - Fixed base bug in discovery.
+        - Fixed bug in encoding.
+        - Made example app working in real world.
+        - Don't use constants.
+        - Improve documentation.
+        - Change lease seconds default to 9 days.
+        - Add screenshot of example app.
+        - First CPAN release.
+
+0.03 2013-03-14
+        - Added discovery.
+        - Improved example script.
+        - Changed default lease seconds to 7 days,
+          as appspot has a maximum of 10 days.
+
+0.02 2013-03-12
+        - Changed 'on_pubsub_acceptance' hook
+          to 'pubsub_accept' callback.
+        - Changed 'on_pubsub_verification' hook
+          to 'pubsub_verify' callback.
+        - Added example script.
+
+0.01 2013-02-05
+        - Small improvements to documentation.
+        - Separation from Sojolicious package.
+        - Initial submission to GitHub.

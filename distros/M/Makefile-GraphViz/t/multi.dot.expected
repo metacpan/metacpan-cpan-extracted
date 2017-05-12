@@ -1,0 +1,57 @@
+digraph timer {
+	graph [rankdir=BT,
+		ratio=auto
+	];
+	node [fillcolor="#ffff99",
+		fontname=Arial,
+		fontsize=10,
+		label="\N",
+		shape=box,
+		style=filled
+	];
+	edge [color=red];
+	any	 [label=any];
+	node1	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="echo larry\lecho howdy\l",
+		shape=note];
+	node1 -> any;
+	foo	 [label=foo];
+	foo -> node1;
+	node4	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="echo hallo\l",
+		shape=note];
+	foo -> node4;
+	node2	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="echo Hi\l",
+		shape=note];
+	node2 -> foo;
+	blah	 [label=blah];
+	blah -> node1;
+	blah -> node2;
+	boo	 [label=boo];
+	boo -> node2;
+	node3	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="echo Hey\l",
+		shape=note];
+	node3 -> foo;
+	howdy	 [label=howdy];
+	howdy -> node3;
+	buz	 [label=buz];
+	buz -> node3;
+	hiya	 [label=hiya];
+	hiya -> node1;
+	blow	 [label=blow];
+	blow -> node1;
+	all	 [label=all];
+	node4 -> all;
+	bar	 [label=bar];
+	bar -> node4;
+}

@@ -1,0 +1,29 @@
+Revision history for perl module Mojolicious::Plugin::FeedReader
+
+0.08 2016-05-29
+
+   - Fix missing use statement in 2 tests. Thanks CPAN testers!
+
+0.07 2015-03-01
+
+   - Made small adjustment to accommodate Mojolicious 6.0 changes.
+
+0.06 2014-12-24
+
+   - Removed use of Mojo::Collection::pluck, deprecated in Mojolicious 5.57
+   - Fix test depending on absolute url of test server. Thanks CPAN testers!
+
+0.05 2014-10-28
+
+   - Fixed possible bug revealed by Mojolicious 5.54 changes. Thanks CPAN testers!
+   - Added parse_opml helper.
+
+0.04 2014-05-09
+
+  - Fixed test broken by Mojolicious changes
+
+0.03 2014-04-03
+
+  - The helper parse_feed introduced as an alias (and future replacement) for parse_rss
+  - Calling parse_feed with a Mojo::DOM is not recommended because of encoding issues
+  - some re-writing of how a Mojo::DOM is created from the input (no interface change)

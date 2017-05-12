@@ -1,0 +1,43 @@
+Return-path: <hwat@cpan.org>
+Message-id: <54CDF8A8.7020404@mac.com>
+Date: Sun, 01 Feb 2015 18:58:00 +0900
+MIME-version: 1.0
+Subject: test MIME::Expander
+Content-type: multipart/mixed; boundary=------------010808020207000803080801
+
+This is a multi-part message in MIME format.
+--------------010808020207000803080801
+Content-Type: text/plain; charset=iso-2022-jp
+Content-Transfer-Encoding: 7bit
+
+Welcome to test MIME::Expander!
+
+--------------010808020207000803080801
+Content-Type: text/plain; charset=UTF-8;
+ name="apple.txt"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="apple.txt"
+
+QXBwbGUK
+--------------010808020207000803080801
+Content-Type: application/x-zip-compressed;
+ name="cake.zip"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="cake.zip"
+
+UEsDBAoAAAAAAIKTQUZJa7L2BwAAAAcAAAAPABwAY2FrZS9iYW5hbmEudHh0VVQJAAOj8c1U
+SfjNVHV4CwABBPYBAAAE9gEAAEJhbmFuYQpQSwMECgAAAAAACpdBRmm1+3O/AAAAvwAAABIA
+HABjYWtlL2ZydWl0cy50YXIuZ3pVVAkAA0P4zVRD+M1UdXgLAAEE9gEAAAT2AQAAH4sIAEP4
+zVQAA+3TSw6CMBSFYcauoivQC32twkUwkNigkvBIXL4gYKIDByYVif83ubP2tienqLvQNrsk
+JhHxIuo+nXuaM5VmxmnttbWZkjRLrU2UjbrVpGvavO5XOYa6ysvw8TnTOx5zJYox//PhVF22
+7bWNcUf/H86Yd/m7OX9x1vb5G9E+URJjmVd/nv9+CH6z9BZYytz/UOa/0X/vx/4L/f+G/RA8
+/QcAAAAAAAAAAAAAYNVu+KiIkAAoAABQSwECHgMKAAAAAACCk0FGSWuy9gcAAAAHAAAADwAY
+AAAAAAABAAAApIEAAAAAY2FrZS9iYW5hbmEudHh0VVQFAAOj8c1UdXgLAAEE9gEAAAT2AQAA
+UEsBAh4DCgAAAAAACpdBRmm1+3O/AAAAvwAAABIAGAAAAAAAAAAAAKSBUAAAAGNha2UvZnJ1
+aXRzLnRhci5nelVUBQADQ/jNVHV4CwABBPYBAAAE9gEAAFBLBQYAAAAAAgACAK0AAABbAQAA
+AAA=
+--------------010808020207000803080801--
+
+

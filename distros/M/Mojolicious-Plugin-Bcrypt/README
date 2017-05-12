@@ -1,0 +1,74 @@
+NAME
+    Mojolicious::Plugin::Bcrypt - bcrypt your passwords!
+
+VERSION
+    Version 0.04
+
+SYNOPSIS
+    Provides a helper for crypting and validating passwords via bcrypt.
+
+        use Mojolicious::Plugin::Bcrypt;
+
+        sub startup {
+            my $self = shift;
+            $self->plugin('bcrypt', { cost => 4 });
+        }
+
+        ...
+
+    Optional parameter "cost" is a non-negative integer controlling the cost
+    of the hash function. The number of operations is proportional to
+    2^cost. The current default value is 6.
+
+HELPERS
+  bcrypt
+    Crypts a password via the bcrypt algorithm.
+
+        $self->bcrypt( $password, $settings );
+
+    $settings is an optional string which encodes the algorithm parameters,
+    as described in Crypt::Eksblowfish::Bcrypt.
+
+        sub signup {
+            my $self = shift;
+            my $crypted_pass = $self->bcrypt( $self->param('password') );
+            ...
+        }
+
+  bcrypt_validate
+    Validates a password against a crypted copy (for example from your
+    database).
+
+        sub login {
+            my $self = shift;
+            my $entered_pass = $self->param('password');
+            my $crypted_pass = $self->get_password_from_db();
+            if ( $self->bcrypt_validate( $entered_pass, $crypted_pass ) ) {
+
+                # Authenticated
+                ...;
+            }
+            else {
+
+                # Wrong password
+                ...;
+            }
+        }
+
+DEVELOPMENT AND REPOSITORY
+    Clone it on GitHub at
+    https://github.com/naturalist/Mojolicious--Plugin--Bcrypt
+
+SEE ALSO
+    Crypt::Eksblowfish::Bcrypt, Mojolicious, Mojolicious::Plugin
+
+AUTHOR
+    Stefan G., "<minimal at cpan.org>"
+
+LICENSE AND COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,21 @@
+bin/modules-used
+Build.PL
+Changes
+lib/Module/Used.pm
+MANIFEST			This list of files
+README
+t/a_use_ok.t
+t/b_modules_used.t
+xt/author/consistent_version_numbers.t
+xt/author/copyright.t
+xt/author/distribution.t
+xt/author/kwalitee.t
+xt/author/perlcritic-code.t
+xt/author/perlcritic-tests.t
+xt/author/perlcriticrc-code
+xt/author/perlcriticrc-tests
+xt/author/pod_coverage.t
+xt/author/pod_syntax.t
+xt/author/README
+META.yml
+META.json

@@ -1,0 +1,24 @@
+MojoX-Tree
+=================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Mojolicious;
+	MojoX::Mysql;
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Kostya Ten
+
+

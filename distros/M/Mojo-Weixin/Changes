@@ -1,0 +1,323 @@
+2017-04-14 Mojo::Weixin v1.3.3
+1）修复微信confirming状态bug (https://github.com/sjdy521/Mojo-Weixin/issues/73)
+2）Openwx插件 增加 跨域响应头 Access-Control-Allow-Origin: *
+3）XiaoiceReply插件产生的智能回复消息 $msg->from 属性设置为"bot"
+4）state.json文件中增加previous_state属性，记录当前状态的前一个状态
+5）新增MiPush/HwPush/FmPush插件，支持小米手机、华为手机、魅族手机消息推送 感谢 @heipidage
+6）修复ShowQRCodeInTerm不可用问题
+
+2017-02-14 Mojo::Weixin v1.3.2
+1）GCM插件增加is_ban_official参数用于控制是否推送公众号消息
+2）IRCShel插件完善，非常感谢 @eleven @csrgxtu 等人在整个过程中的支持
+    使用sendFile XXX 或者 !!XXX 两种形式发送文件
+    load_friend参数默认为0
+    考虑到个人隐私安全upload_api默认不开启
+    文件上传图床，由于https://sm.ms/api/upload接口不支持图片以外的文件，换成兼容http://img.vim-cn.com/的接口形式
+    新增auto_join_channel参数，默认为1，收到未加入的频道消息会自动加入频道并接收消息，主要为了防止漏收
+    修复HexChat客户端使用/list无法获取到人数为空频道信息
+    修复用户更新昵称中存在空格等特殊字符，导致irc虚拟用户异常的问题
+    增加allow_group/ban_group参数
+    增加登录验证支持
+    增加ssl加密支持
+3）Openqq插件增加https支持
+
+2017-02-08 Mojo::Weixin v1.3.1
+1）IRCShell插件完善
+   /query xxxx 如果用户不存在时，会实时从好友中搜索并创建用户
+   设置了upload_api时，url地址会直接替换原始的本地文件路径
+2）修复产生 "Mojo::Util::slurp is DEPRECATED" 的警告
+3）修复分片上传分片处理上的错误导致上传文件不正确或无法上传文件问题
+4）改进了判断消息是否为接收消息的判断逻辑，兼容更多服务端数据异常的情况
+5）synccheck/sync时采用的实际上是两个独立的key：syncCheckKey和syncKey
+   程序原来是混为一起，可能导致重复接收消息或接收消息异常，现已修复
+6）GCM插件添加发送者类别支持回复功能
+7）修复在开启事件上报之后短时内内重启程序，无法重用之前的登录cookie实现免扫码登录的bug
+8）修复controller设置了log_path的情况下，创建的客户端运行日志无法打印到log_path指定路径的bug
+9）Openwx插件相关改进
+   新增好友验证事件 friend_request 上报
+   新增/openwx/accept_friend_request 接口用于接受好友请求
+
+2017-02-03 Mojo::Weixin v1.3.0
+1）修复/openwx/get_user_info接口返回的个人信息中account属性为空的bug 感谢 @超 反馈
+2）移植 PostQRCodeToTelegram插件到Weixin
+3）新增 is_load_plugin 方法 检测客户端是否加载某个插件
+4）GCM插件支持推送事件，修复GCM插件二维码url错误,无视GCM插件设置allow_group=>[]的情况
+5) IRCShell插件完善
+    插件参数master_irc_user更名为master_irc_nick
+    插件参数image_api更名为upload_api
+    上传api替换为https://sm.ms/api/upload接口
+    新增群组、群组名称修改irc上也能够自动同步
+    修复irc无法正常发送好友、群组消息的问题
+6）完善MakeFile.PL文件
+
+2017-01-16 Mojo::Weixin v1.2.9
+1）新增GCM插件
+2）修复/openwx/create_group创建的群组，上报new_group事件时群组id为空的bug 感谢 @霸牙 反馈
+3）Dockerfile完善，充分利用cache机制，加快build速度，设置镜像为北京时区
+
+2017-01-14 Mojo::Weixin v1.2.8
+1）对于请求失败重试，debug日志增加了n/m的重试过程，例如:
+[17/01/11 10:08:25] [warn] http://127.0.0.1:80/ 请求(0/2)失败: 404 Not Found
+[17/01/11 10:08:25] [warn] http://127.0.0.1:80/ 请求(1/2)失败: 404 Not Found
+[17/01/11 10:08:25] [warn] http://127.0.0.1:80/ 请求(2/2)失败: 404 Not Found
+2）减少Openwx插件事件上报失败的重试次数
+3）设置$client->log_unicode 为0 避免某些情况下产生的乱码问题
+4）修复Openwx插件如下api接口不可用问题，感谢 @霸牙 反馈
+/openwx/create_group
+/openwx/invite_friend
+/openwx/kick_group_member
+5）基于Docker Hub实现自动化集成
+
+2017-01-10 Mojo::Weixin v1.2.7
+1）修复XiaoiceReply插件无法转发文件图片的bug
+   XiaoiceReply插件增加allow_friend_reply/allow_group_reply参数
+2）修复二维码邮件乱码
+3）移除非开源推荐
+4）加载了UploadQRcode插件之后，Openwx插件input_qrcode事件上报也会带上上传的二维码url
+5）压缩或删除一些图片，减少这个项目的体积
+6）Openwx插件auth认证失败时返回json格式数据而非原来的文本错误信息
+7）修复客户端正常调用->stop() 退出时无法清理临时文件的bug
+   修复客户端正常调用->stop() 退出时无法正常上报事件的bug
+   修复ctrl+c时客户端报错 Mojo::IOLoop already running at /usr/local/share/perl5/Mojo/UserAgent.pm line 60
+
+2016-12-29 Mojo::Weixin v1.2.6
+1）修复由于官方改对导致误发正常发送视频文件的bug
+   文件最大不能超过20M，大于512KB会采用分片上传机制，每个分片大小512K
+2）增加 before_send_message 事件，方便全局设置发送消息的小尾巴
+3）new中新增属性 is_init_group_member，控制是否在客户端初始登录时获取详细的群成员信息（比如account/sex）等
+   默认为0，如果你很在意这些群成员属性，可以设置为1，但可能会极大降低启动速度
+4）修复 AutoVerify 插件不可用的问题，感谢 @Hector.X 的反馈
+5）UploadQRcode插件采用新的https://sm.ms/的图床接口，感谢 @那谁 的建议
+6）修复在多账号Controller控制下，/openwx/check_event接口无法正常工作的问题
+7）修复/openwx/get_avatar无法获取登录帐号头像的问题
+8）XiaoiceReply插件修复不可用问题，插件进一步完善 感谢 @NeverMin @活在当下 反馈
+   修复XiaoiceReply插件无法转发图片的问题
+   XiaoiceReply插件新增allow_group/ban_group/allow_friend/ban_friend/allow_group_member/ban_group_member等参数支持
+9）修复性别获取为空的bug
+10）Openwx插件增加名片消息的接收识别和上报
+11）开启http_debug后，debug日志不打印http post上传文件的二进制内容
+12）修复日志打印在某些情况下产生大量警告错误的问题
+13）版本内部编码重构，通过http_get/http_post发送或接收json/form数据不再需要encode/decode
+14）日志打印支持颜色显示，可以通过new中的disable_color=>0来禁用颜色显示
+
+2016-12-02 Mojo::Weixin v1.2.5
+1）紧急修复1.2.4版本Controller调用api大量报错的问题
+2）修复文档错误
+
+2016-12-01 Mojo::Weixin v1.2.4
+1）Openwx插件新增update_user/update_friend/update_group事件上报，默认不上报，需要在post_event_list中显式指定
+2）sticky_group函数改名为stick() 支持好友和群组设置取消置顶
+3）Openwx插件 /openwx/sticky_group 修改为 /openwx/stick 支持设置取消好友群组对象置顶
+4）修复Openwx插件返回的好友信息中缺失 category 属性的问题 感谢 @Hector.X 的反馈
+5）Openwx插件新增/openwx/check_event接口，用于获取事件（消息）
+6）修复 微软小冰的微信公众号从 ms-xiaoice 变更为 xiaoice-ms 导致 XiaoiceReply 插件不可用问题，感谢 @cocoakekeyu
+7）增加撤回消息支持
+8）相关文档的完善
+
+2016-11-11 Mojo::Weixin v1.2.3
+1）完善客户端http请求超时时间
+2）XiaoiceReply插件的bug修复
+3）客户端增加state属性和增加 state_change 事件
+4）Controller增加更多实用api
+    查询客户端运行状态 /openwx/check_client?client=xxx 输出格式变更
+    获取登录二维码     /openwx/get_qrcode?client=xxx
+    Controller增加auth认证支持
+5）Openwx插件大量改进
+    增加 post_event_list 参数，控制上报的事件列表
+    支持state_change事件上报
+    上报消息添加对象的uid/name属性
+    新增/openwx/sticky_group 设置或取消群组置顶
+    /openwx/set_friend_markname 改为 /openwx/set_markname
+    新增poll_api参数，解决内网穿透问题
+    修复经常出现 can't call method "res" on an undefined value的警告信息
+    消息上报增加发送者备注名称 sender_markname 
+6）修复获取好友、群组信息不全的问题 感谢 @海狼团队 的反馈
+7）修复接收消息出现大量503报错问题 @Beckjiang 反馈
+8）更新郑重声明
+9）完善当前判断群组和个人用户id的逻辑，除了 @@ 开头，还有结尾包含 @chatroom 关键字
+10）客户端new初始化新增http_max_message_size属性，设置http请求和响应的最大大小，默认16M，解决警告 "Maximum message size"
+11）群组对象新增 owner_uid 属性，表示群组管理员的uid
+12）消息处理添加更多debug日志
+13）新增update_user/update_friend/update_group事件
+14）修复群成员备注、群昵称错乱问题 感谢 @beckjiang 的反馈
+15）客户端初始化新增 log_console 参数 默认为1 用于日志写入文件的同时也打印到终端 方便调试
+16）不设置log_path的情况下，客户端默认日志打印到STDOUT（原来是STDERR）
+17）完善昵称、备注里包含emoji字符的处理
+
+2016-10-21 Mojo::Weixin v1.2.2
+1）新增插件ShowQRcode/ShowQRCodeInTerm 感谢 @hyvinlam
+2）修复 KnowledgeBase2 插件会导致知识库文件出现重复记录的问题 感谢 @时光盒子 的反馈
+3）Openwx插件 /openwx/get_avatar 获取用户头像接口返回图片带有cache-control和expires头部 让浏览器可以缓存住1小时
+    避免在某些应用场景下大量重复请求
+4）增加捐赠小伙伴列表，记住那些曾经爱心捐助的人们，非常感谢，你们的鼓励就是我坚持的动力
+5）SmartReply插件图灵官方api请求形式变更
+6）完善联系人群组信息获取机制,每次最大获取50个对象，超过50个分批次进行
+7）文档和MakeFile.PL的完善
+8）添加Mojo::Weixin::Controller对象以及API支持，用于管理微信多个帐号
+
+2016-10-10 Mojo::Weixin v1.2.1
+1）new中增加qrcode_count_max参数 二维码扫描超时达到一定次数就退出
+2）Openwx插件发送媒体消息支持直接以media_id作为发送对象，避免转发相同消息时重复上传文件，同时新增更多api接口：
+   获取客户端进程信息：/openwx/get_client_info
+   停止客户端运行：/openwx/stop_client
+   上传媒体文件： /openwx/upload_media
+3）新增start_time属性，用于记录程序启动时间和运行时间
+4）接收消息区分视频和小视频
+5）完善emoji表情处理
+6）好友对象的 category  属性现在可以区分普通好友、系统帐号和公众号类型 感谢 @海狼团队 的反馈
+7）ua_debug参数改名为 http_debug 更容易理解
+8）微信官方使用的主要api域名发送变化，跟进更新，并支持海外的web.wechat.com的登录
+9）修复在某些情况下出现登录死循环的问题 感谢 @Never 的反馈
+10）修正部分api请求提交参数格式错误问题
+11）new中增加 stop_with_mobile 参数，可以设置是否允许通过手机端强制客户端停止运行
+
+2016-09-28 Mojo::Weixin v1.2.0
+1）PostQRcode插件在使用465端口时自动开启tls支持
+2）新增group_notice类型消息，群提示信息，比如： xxx邀请xxx加入群聊
+3）新增emoji_to_text参数，用于控制emoji表情的输出方式
+4）调整接收消息的执行顺序为全部插件加载完毕后再执行，以避免加载插件耗时过长导致接收消息无法处理而被服务端邀请重新登录
+5）对象增加uid属性 感谢 @45 的建议
+6）Openwx插件增加二维码扫描事件的上报，新增应用分享消息上报，图片数据json上报时改为base64编码以减少上报数据量
+7）修复"艾特"某人时显示问题
+
+2016-09-07 Mojo::Weixin v1.1.9
+1）debug日志中不打印二进制数据
+2）尝试修复扫描二维码登录成功后又马上要重新登录扫描二维码的问题
+3）新增UploadQRcode插件，可以将二维码上传至云存储获取到url地址
+4）登录成功后删除残留的二维码文件
+5）修改docker镜像的默认api监听端口为3000
+
+2016-08-18 Mojo::Weixin v1.1.8
+1）修复二维码文件写入失败时，失败原因为空的问题 感谢 @卍 延延 卐 反馈
+2）修复下载的图片扩展名异常的问题 感谢 @斌 的反馈
+3）增加stop事件
+4）修复IRCShell插件无法正常识别账号的bug
+5）增加捐赠信息
+
+2016-08-10 Mojo::Weixin v1.1.7
+1）修复KnowledgeBase2插件好友消息不生效的bug
+2）Openwx插件参数中datatype=jsonp的方式支持跨域访问
+3）input_qrcode事件参数增加二维码原始数据
+4）支持自动检测系统的代理设置（通过环境变量 HTTP_PROXY/HTTPS_PROXY)
+5）下载的媒体文件支持识别更多文件类型来定义扩展名
+6）支持发送和接收文本、图片、语音、短视频、表情消息类型
+7）缓解由于发送媒体消息时会出现接收消息进入死循环的官方问题
+8）添加获取头像方法，Openwx插件添加/openwx/get_avatar获取头像api接口
+
+2016-07-18 Mojo::Weixin v1.1.6
+1）修复Xiaoice插件提示找不到小冰的bug 感谢 @斌
+2）Openwx插件修复启动时会触发大量无意义的group_member_property_change事件的问题
+3）Openwx插件消息上报接口支持对消息回复图片
+4）新增$msg->reply_media方法
+5）插件完善 KnowledgeBase/KnowledgeBase2
+6）针对【收到无法识别消息】刷屏的情况进行了优化
+
+2016-06-30 Mojo::Weixin v1.1.5
+1）修复当群成员超过40人数时，无法正常邀请好友入群的问题 感谢 @斌 的反馈
+2）Openwx插件新增好友请求接口：/openwx/make_friend?id=xxx&verify=xxx
+3）Openwx插件新增login事件上报,修复发送的群消息上报产生错误的bug
+4）新增$client->make_friend()方法，发送好友请求
+5）日志信息中增加cookie加载路径
+6）http请求json数据的方式进行了调整，对于获取json数据失败的情况进行日志警告
+7）ShowMsg插件的完善，现在会把加群/退群 好友申请等信息也打印出来
+8）新增accept_friend_request方法和friend_request事件 用于支持处理好友验证申请
+9）新增AutoVerify插件实现收到好友申请自动批准同意
+10）二维码input_qrcode事件取消携带url参数
+11）去掉显式的login调用
+12）IRCShell的bug修复，增加图片自动上传图床的功能
+13）相关文档完善
+
+2016-06-18 Mojo::Weixin v1.1.4
+1）修复Translate插件不可用的bug 感谢 @丶Seven
+2）Openwx插件支持发送消息上报，原来只支持接收消息上报 感谢 @斌 的建议
+3）README文档中增加友情链接
+4）XiaoiceReply插件支持图片消息 感谢 @hejialaifen 反馈
+5）新增send_media事件，手机发送的图片也会下载到本地并触发相关事件 感谢 @斌 反馈
+6）二维码事件回调参数中新增二维码原始url
+7）新增ImageStore插件，按日期保存图片
+
+2016-05-25 Mojo::Weixin v1.1.3
+1）Openwx插件支持图片消息上报，bug修复，新增以下接口：
+        修改好友备注名称 /openwx/set_friend_markname
+        设置群组的显示名称 /openwx/set_group_displayname
+2）修复初始化好友、群组信息时也大量触发new_group/new_friend/new_group_member等事件的bug 感谢 @西瓜科技 的测试反馈
+3）new_group_member事件上报中添加group信息（https://github.com/sjdy521/Mojo-Weixin/issues/16）
+
+2016-04-27 Mojo::Weixin v1.1.2
+1）修复Beauty插件的bug
+2）增加docker支持
+
+2016-04-21 Mojo::Weixin v1.1.1
+1）客户端的spawn方法增加一个新的参数 is_blocking 用于进行阻塞式执行命令
+2）修复Beauty插件的bug
+3）修复add_job方法的bug 感谢 @化缘 的反馈
+4）完善MakeFile
+
+2016-04-13 Mojo::Weixin v1.1.0
+1）Openwx插件删除调试代码 感谢 @lyrl 的反馈
+2）文档完善
+
+2016-04-07 Mojo::Weixin v1.0.9
+1）修复IRCShell插件的bug
+2）修复更新群信息的bug
+3）新增 创建群、邀请好友入群、移除群成功、修改群成名的功能
+4）Openwx插件增加 创建群、邀请好友入群、移除群成功、搜索好友、搜索群的API接口
+5）修复SmartReply插件包含<br />等html标签的问题
+6）新增 XiaoiceReply 插件
+
+2016-03-25 Mojo::Weixin v1.0.8
+1）登录过程完善（发送状态通知、完善cookie处理、注销处理）
+2）手机端强制退出或其他设备登录收到下线通知不再重新登录而是停止运行
+3）修复打印出来的请求错误信息可能乱码的问题
+4）消息上报的API接口增加事件上报支持 感谢 @漩涡
+5）文档完善，新增IRC.md
+
+2016-03-17 Mojo::Weixin v1.0.7
+1）二维码扩展名从png变为jpg
+2）发送好友消息API支持 id=@all 群发消息给所有好友
+3）删除cookie_dir属性，新增cookie_path属性，指定cookie保存路径
+   当运行多个微信帐号时，指定不同cookie文件路径避免多账号登录cookie互相干扰
+4）尝试修复"群名未知"、"昵称未知"等问题
+5）修复Riddle插件api不可用的问题
+
+2016-03-14 Mojo::Weixin v1.0.6
+1）修复好友、群对象创建时产生报警错误
+2）增加发送图片和文件的方法（函数）
+3）Openwx插件增加发送图片和文件的参数 media_path 和 account参数
+4）支持接收图片、增加 receive_media 事件，可以在事件回调中获取图片保存路径和图片原始数据
+5）新增Mojo::Weixin::Plugin::Beauty插件，识别消息中的关键字”看妹子“发送美女图片
+6）新增 Mojo::Weixin::Plugin::Weather 插件，天气预报 感谢 @autodataming
+7）新增 Mojo::Weixin::Plugin::Riddle 插件，输入关键字"猜谜"进行猜谜游戏
+
+2016-03-02 Mojo::Weixin v1.0.5
+1）修复发送消息和接收消息中的换行符被显示为<br\>的问题
+2）增加API.md/FAQ.md
+3）增加微软小冰的智能回复接口，参见API.md
+4）修复删除好友、取消关注公众号等情况下程序报错的bug
+
+2016-02-28 Mojo::Weixin v1.0.4
+1）修复 demo 下openwx-client.pl名称错误
+2）修复 发送消息中的斜杠'/'被转义为 '\/'的问题 感谢 @京 的反馈
+3）修复 Perlcode/Perldoc插件 自己发送的消息无法识别的bug
+4）修复Openwx插件设置post_api后，上报消息报错的问题
+5）完善错误输出信息，打印更多的函数堆栈信息方便定位问题
+
+2016-02-16 Mojo::Weixin v1.0.3
+1）修复PostQRcode bug
+2）新增receive_raw_message的事件，方便某些情况下直接处理接收到的原始消息数据
+3）KnowledgeBase插件针对不同的群或好友设置的知识库进行隔离，以免不同群之间互相干扰
+4）修复KnowledgeBase插件存在的bug可能导致死循环问题
+5）加入免责声明
+
+2016-02-03 Mojo::Weixin v1.0.2
+1）文档完善
+2）修复微信不同帐号可能使用不同api地址导致无法正常登录（不停重新登录）的bug 感谢 @飛 的反馈和提供测试支持
+
+2016-01-26 Mojo::Weixin v1.0.1
+1）大量文档完善
+2）修复在某些情况下登录失败进入死循环的bug
+3）修复IRCshell插件不可用的bug
+4）增加emoji表情的识别
+
+2016-01-25 Mojo::Weixin v1.0.0 
+1）基础稳定版本发布

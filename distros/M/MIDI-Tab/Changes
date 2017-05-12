@@ -1,0 +1,31 @@
+Revision history for MIDI-Tab
+
+0.0401 2014-08-30
+    - Enhanced dzil distribution
+    - Fixed egregious spelling errors (exposed by Test::PodSpelling).
+    - Exposed the rhythm control line as "experimental."
+    - Fixed POD.
+
+0.03_1 Sun Feb 5 2012
+    - Began to integrate a rhythm control tab line with a test no-less!
+
+0.03 Mon Oct 31 10:15:00 2011
+    - Document that bar lines are ignored
+    - Remove the drum_channel global and instead set it in the drum sub if none
+      has been provided in the noop args.
+    - Update SYNOPSIS with a useful code example.
+    - Clean-up the eg code.
+    - Clean-up the methods test code.
+
+0.02 Sun Oct 30 23:45:00 2011
+    - Resuscitated by Gene Boggs.
+    - Added actual tests.
+    - Made drum setting variables alterable to the outside world.
+    - Added all GM drums instead of a tiny fraction.
+    - Factored-out redundancy, temporary variables and hid low-level code by
+      making common routines.
+    - Normalized variable naming across the subroutines.
+    - Enhanced POD, big-time.
+
+0.01 Tue Aug  5 16:32:09 2003
+    - Original version created by ExtUtils::ModuleMaker 0.32 by Rob Symes.

@@ -1,0 +1,11 @@
+Changes
+lib/Mojolicious/Plugin/HTMLTemplateRenderer.pm
+Makefile.PL
+MANIFEST			This list of files
+t/basic.t
+t/lib/TestApp.pm
+t/lib/TestApp/TestController.pm
+t/templates/ht_test_1.html.tmpl
+t/templates/ht_test_3.html.tmpl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

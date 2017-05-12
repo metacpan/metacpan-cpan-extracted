@@ -1,0 +1,104 @@
+/* ================================================================== */
+/* THEME: Lavender Blue
+ */
+/* ================================================================== */
+/* THEME: Light Blue - fonts
+ */
+/* ------------------------------------------------------------------ */
+/* Fonts */
+h1, h2, h3, h4 {
+  font-family: merlin, hancock, black, barcool, "lucida calligraphy", Merced, sans-serif;
+  font-weight: normal;
+  color: black;
+}
+
+/* ================================================================== */
+/* ICONS - dark on light
+ * Nav arrows with transparent backgrounds
+ */
+.side nav li > ul {
+  list-style-image: url(nav_black.png);
+}
+
+/* ================================================================== */
+/* General */
+.verge, header,
+footer,
+.side, .fancy {
+  color: #000633;
+  background: #b1b9f2;
+  border-color: navy;
+}
+
+header,
+footer,
+.side {
+  background-image: url(blue2a.jpg);
+}
+
+body {
+  color: #000033;
+  background: #ccccff;
+}
+
+a:link {
+  color: #003366;
+}
+
+a:visited {
+  color: #330066;
+}
+
+.fancy {
+  color: #000633;
+  background-image: url("blue2a.jpg");
+  border: 5px double #5063ed;
+  padding: 0;
+}
+.fancy li {
+  padding: 0.5em;
+  margin: 5px;
+  border: 5px solid #5063ed;
+  background-color: #b1b9f2;
+  background: linear-gradient(#b1b9f2, #6f9ce7);
+}
+.fancy li a:link {
+  color: #004066;
+}
+.fancy li a:visited {
+  color: #260066;
+}
+
+.button, input[type=submit], header nav a,
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: #020033;
+  border-color: navy;
+  background-color: #8a85eb;
+}
+
+.button a:link, input[type=submit] a:link, header nav a a:link,
+header nav .selflink a:link,
+header nav em a:link,
+header nav .current a a:link, a.button:link, header nav a:link {
+  color: #020033;
+}
+
+.button a:visited, input[type=submit] a:visited, header nav a a:visited,
+header nav .selflink a:visited,
+header nav em a:visited,
+header nav .current a a:visited, a.button:visited, header nav a:visited {
+  color: #370066;
+}
+
+header nav li {
+  border-color: #555588;
+}
+
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: #9900CC;
+  background-color: #ccccff;
+}

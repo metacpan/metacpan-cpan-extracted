@@ -1,0 +1,196 @@
+# PODNAME: Meerkat::Tutorial
+# ABSTRACT: Getting started with Meerkat
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Meerkat::Tutorial - Getting started with Meerkat
+
+=head1 VERSION
+
+version 0.015
+
+=head1 TUTORIAL
+
+=head2 Prerequisites
+
+If you don't already have MongoDB installed and running, see the
+L<installation guide|http://docs.mongodb.org/manual/installation/>.
+
+Check that you can connect to the C<test> database from the C<mongo> shell:
+
+    $ mongo test
+
+=head2 Creating Your Document Model
+
+A Meerkat document is just a Moose class with the
+L<Meerkat::Role::Document> role applied.  This tutorial uses a simplified
+version of the C<My::Model::Person> class used for testing.  It has a
+required C<name> attribute, and also attributes for C<likes> and C<tags>:
+
+    package My::Model::Person;
+
+    use Moose;
+
+    with 'Meerkat::Role::Document';
+
+    has name => (
+        is       => 'ro',
+        isa      => 'Str',
+        required => 1,
+    );
+
+    has likes => (
+        is      => 'ro',
+        isa     => 'Num',
+        default => 0,
+    );
+
+
+    has tags => (
+        is      => 'ro',
+        isa     => 'ArrayRef',
+        default => sub { [] },
+    );
+
+    1;
+
+Meerkat::Role::Document will also add C<_id>, C<_collection> and
+C<_removed> attributes.
+
+Note that all attributes are B<read-only>.  You don't want to modify these
+directly or you'll be out of sync with the database and bad things will happen.
+You will update attributes using the C<update> methods, shown later.
+
+=head2 Connecting to the Database
+
+Once the document class is written, using it requires a L<Meerkat> object
+to manage the connection to the database:
+
+    use Meerkat;
+
+    my $meerkat = Meerkat->new(
+        model_namespace => "My::Model",
+        database_name   => "test",
+    );
+
+By specifying a C<model_namespace> of "My::Model", the object will return
+collections for classes underneath that namespace.  The example above will
+connect to the default MongoDB on localhost.  If your MongoDB is running on
+a different host or port, you could pass C<client_options> which will be
+passed through to the L<MongoDB::MongoClient> constructor.
+
+Actually working with the document class requires getting a
+L<Meerkat::Collection> object from the Meerkat object.  A Meerkat collection
+associates a Perl class name with a specific MongoDB collection in the database
+managed by the Meerkat object.
+
+    my $person = $meerkat->collection("Person"); # My::Model::Person
+
+The collection name is derived from the Perl class by replacing "::" with "_".
+So "My::Model::Person" objects are stored in the "My_Model_Person" collection.
+In this tutorial example, that collection is in the "test" database on the
+localhost MongoDB.
+
+=head2 Creating New Documents
+
+A Meerkat document needs to know what collection it came from, so the
+Meerkat::Collection is a factory for constructing objects.
+
+    my $obj = $person->create( name => "Larry Wall" );
+
+When the object is created, it is immediately inserted into the database.
+(If an error occurs, an exception is thrown.)
+
+Don't create objects directly from the document class.  Even if you provide a
+Meerkat::Collection, the documents won't be inserted and things will never get
+in sync.  B<Always create objects from a Meerkat::Collection>.
+
+=head2 Updating, Synchronizing and Removing Documents
+
+With Meerkat, objects reflect the state of a document in the database at a
+moment in time.  Therefore, you never change the state of your object
+directly, because it might no longer reflect the true state of the document
+in the database.  Instead, you issue database commands to modify the
+document atomically in the database and then Meerkat synchronizes your
+object with the result.
+
+Conveniently, Meerkat::Role::Document gives your model class some methods to
+make that easy:
+
+    $obj->update_set ( name  => "Warry Lall"   ); # change a field
+    $obj->update_inc ( likes => 1              ); # increment a counter
+    $obj->update_push( tags  => qw/hot trendy/ ); # push to an array
+
+If you aren't changing data, but want to update your object's snapshot of the
+document in the database, call the C<sync> method:
+
+    $obj->sync
+
+And should you need to get rid of a document, the C<remove> method will take
+care of it.
+
+    $obj->remove
+
+Afterwards, C<is_removed> will be true and C<update> and C<sync> calls will
+do nothing and return a false value.
+
+=head2 Errors
+
+Generally, Meerkat methods return true if they executed successfully and false
+if they could not.
+
+For example, if a document was removed in the database by another process and
+an C<update> or C<sync> is called, it will return false.  (It will flag the
+object as having been removed from the database, but will not otherwise modify
+its data.)
+
+Should any major error occur, an exception will get thrown.
+
+=head2 Searching the Database
+
+To retrieve a document from the database, the collection provides search
+methods similar to L<MongoDB::Collection>, but which return objects from
+your model class.
+
+For single objects, there are the C<find_id> and C<find_one> methods:
+
+    # find a single object
+    my $obj1 = $person->find_id( $id );
+    my $obj2 = $person->find_one( { name => 'John' } );
+
+If you have a L<MongoDB
+query|http://docs.mongodb.org/manual/tutorial/query-documents/> for multiple
+objects, you pass it to C<find> and get a L<Meerkat::Cursor> object back.  It
+proxies for L<MongoDB::Cursor> but returns objects when iterated.
+
+    my $cursor = $person->find( $query_hashref );
+
+    while ( my $obj = $cursor->next ) { ... }
+
+=head2 Next steps
+
+Try out the example class above using the 'test' database on your
+machine.
+
+Afterwards, check out the L<Meerkat::Cookbook> for more on working with
+Meerkat.
+
+=head1 AUTHOR
+
+David Golden <dagolden@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by David Golden.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

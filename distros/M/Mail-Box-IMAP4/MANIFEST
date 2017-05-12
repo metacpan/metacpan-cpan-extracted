@@ -1,0 +1,29 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/Mail/Box/IMAP4.pm
+lib/Mail/Box/IMAP4.pod
+lib/Mail/Box/IMAP4/Head.pm
+lib/Mail/Box/IMAP4/Head.pod
+lib/Mail/Box/IMAP4/Message.pm
+lib/Mail/Box/IMAP4/Message.pod
+lib/Mail/Server/IMAP4.pm
+lib/Mail/Server/IMAP4.pod
+lib/Mail/Server/IMAP4/Fetch.pm
+lib/Mail/Server/IMAP4/Fetch.pod
+lib/Mail/Server/IMAP4/List.pm
+lib/Mail/Server/IMAP4/List.pod
+lib/Mail/Server/IMAP4/Search.pm
+lib/Mail/Server/IMAP4/Search.pod
+lib/Mail/Server/IMAP4/User.pm
+lib/Mail/Server/IMAP4/User.pod
+lib/Mail/Transport/IMAP4.pm
+lib/Mail/Transport/IMAP4.pod
+t/10client-read.t
+t/11client-write.t
+t/12client-flags.t
+t/20server-fetch.t
+t/21server-list.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

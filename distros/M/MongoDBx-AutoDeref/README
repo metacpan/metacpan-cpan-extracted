@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution MongoDBx-AutoDeref,
+version 1.110560:
+
+  Automagically dereference MongoDB DBRefs lazily
+
+This software is copyright (c) 2010 by Nicholas R. Perez <nperez@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

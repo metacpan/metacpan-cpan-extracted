@@ -1,0 +1,38 @@
+---
+abstract: 'A fast and simple mbox folder reader'
+author:
+  - 'David Coppit <david@coppit.org>.'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  File::Path: 2.08
+  File::Slurp: 0
+  Test::More: 0
+  Text::Diff: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+  File::Slurp: 0
+  URI::Escape: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: gpl2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Mail::Mbox::MessageParser
+name: Mail-Mbox-MessageParser
+no_index:
+  directory:
+    - inc
+    - private-lib
+    - t
+requires:
+  FileHandle::Unget: 0
+  Storable: 0
+  perl: '5.005'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Mail-Mbox-MessageParser
+  homepage: https://github.com/coppit/mail-mbox-messageparser
+  license: http://opensource.org/licenses/gpl-2.0.php
+  repository: https://github.com/coppit/mail-mbox-messageparser
+version: '1.5105'

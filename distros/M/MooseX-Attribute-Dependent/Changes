@@ -1,0 +1,21 @@
+1.1.3 - 2016-10-24
+  - fix breakage with recent Moose > 2.1700 dues to removal of List::MoreUtils
+    from Moose.
+  - minor updates to make Dist::Zilla build/release work again
+
+1.1.2 - 2011-09-17
+  - fixed bug where the dependency parameter would swallow all subsequent parameters
+
+1.1.1 - 2011-04-05
+  - fixed role composition (doy)
+  - fixed bogus prereqs
+
+1.1.0 - 2011-03-17
+  - Dependent attribute can now be defined in roles
+    and applied to roles or classes
+
+1.0.1 - 2011-03-08
+  - Moose 2.0 and 1.24 compatible (thanks doy)
+
+1.0.0 - 2010-12-29
+  - Initial release

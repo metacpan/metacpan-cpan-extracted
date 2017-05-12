@@ -1,0 +1,153 @@
+#!/usr/bin/perl -w
+# This is a CGI-BIN script, invoked by a web server when an HTTP
+# POST comes in, dispatching requests to the appropriate module
+# (BioMoby web service).
+#
+# It includes some hard-coded paths - they were added during the
+# generate service call.
+#
+# $Id: service-cgi-async.tt,v 1.3 2009/04/16 18:13:03 kawas Exp $
+# Contact: Edward Kawas <edward.kawas@gmail.com>
+# ---------------------------------------------------------------
+[%# A template for an async cgi biomoby service.
+    ===================================
+
+    Expected/recognized parameters:
+      obj         ... a service definition, type MOSES::MOBY::Def::Service
+-%]
+
+#-----------------------------------------------------------------
+# Authority:    [% obj.authority %]
+# Service name: [% obj.name %]
+# Generated:    [% USE Date (format = '%d-%b-%Y %H:%M:%S %Z') %][% Date.format %]
+# Contact: Edward Kawas <edward.kawas@gmail.com>
+#-----------------------------------------------------------------
+
+use strict;
+use CGI qw/:standard/;
+use CGI::Carp qw(fatalsToBrowser);
+use Cwd qw(realpath);
+
+# limit the max size of a post - change it as you see fit
+$CGI::POST_MAX=1024 * 1024 * 10;  # max 10MB posts
+
+# --- during service generation
+use lib '[% pmoses_home %]';
+use lib '[% generated_dir %]';
+use lib '[% services_dir %]';
+
+# here we require the service module and add it to ISA hierarchy
+use base 'Service::[% obj.name %]';
+
+use POSIX;
+use MOBY::Async::LSAE;
+use MOBY::Async::WSRF;
+use MOSES::MOBY::Async;
+
+# the url path
+my $url = url( -relative => 1, -path_info => 1 );
+$url =~ s/%([\da-f][\da-f])/chr( hex($1) )/egi;
+
+# extract the name of the script
+my $fullpath = realpath($0);
+if ($fullpath =~ m|.*/(.*)$|gi) {
+	$fullpath = $1;
+}
+chomp $fullpath;
+# get the CGI variable
+my $q = new CGI;
+
+# check to see what it is that we need to do
+if ($url =~ m/^\Q$fullpath\E$/ or $url =~ m/^\Q$fullpath\E\/$/) {
+	# submit a job
+	my $async = MOSES::MOBY::Async->new;
+	my $epr = $async->create_epr($q);
+	# submit the job
+	&call_service();
+	print $q->header(-type=>'text/plain', 'moby-wsrf' => $epr);
+} elsif ($url =~ m/^\Q$fullpath\E\/status$/) {
+	# check the status of the WSRF resource
+	my $data = $q->param('data') || $q->param('POSTDATA') || "";
+	my $header = $q->http('moby-wsrf');
+	unless ($data and $header) {
+		print $q->header(-status=>'400 Bad request');
+		exit;
+	}
+	my $async = MOSES::MOBY::Async->new;
+    my ($head, $ans) = $async->poll($header,$data);
+    # strip newlines from the header
+	$head =~ s/[\r\n]+//g;
+	print $q->header(-type=>'text/plain', 'moby-wsrf' => $head);
+    print "$ans";
+} elsif ($url =~ m/^\Q$fullpath\E\/results$/) {
+	# obtain the results of a WSRF resource
+	my $data = $q->param('data') || $q->param('POSTDATA') || "";
+	my $header = $q->http('moby-wsrf');
+	unless ($data and $header) {
+		print $q->header(-status=>'400 Bad request');
+		exit;
+	}
+	my $async = MOSES::MOBY::Async->new;
+    my ($head, $ans) = $async->result($header,$data);
+    #strip newlines
+	$head =~ s/[\r\n]+//g;
+	print $q->header(-type=>'text/plain', 'moby-wsrf' => $head);
+	print "$ans";
+} elsif ($url =~ m/^\Q$fullpath\E\/destroy$/) {
+	# destroy the WSRF resource
+	my $data = $q->param('data') || $q->param('POSTDATA') || "";
+	my $header = $q->http('moby-wsrf');
+	unless ($data and $header) {
+		print $q->header(-status=>'400 Bad request');
+		exit;
+	}
+	my $async = MOSES::MOBY::Async->new;
+    my ($ans, $head);
+	eval {($head, $ans) = $async->destroy($header,$data);};
+	#strip newlines
+	$head =~ s/[\r\n]+//g;
+	print $q->header(-type=>'text/plain', 'moby-wsrf' => $head);
+	print "$ans" if $ans;
+} else {
+	# invalid request
+	print $q->header(-status=>'400 Bad request');
+}
+
+# call the service with any input
+sub call_service {
+	# get the data from the 'data' parameter
+	my $data = $q->param('data') || $q->param('POSTDATA') || "";
+	# remove any \r because these cause errors in our messages with newlines
+	$data =~ s/\r//gi;
+	# call the service
+	__PACKAGE__->[% obj.name %]($data);
+	
+}
+
+# over-ride the method in Service::ServiceBase => no more soap
+sub finish_output {
+    my ($self, $out_package) = @_;
+    return $out_package->toXMLdocument->documentElement->toString (1);
+}
+
+# override process_all so that we can use file based WS-Resources
+sub process_all {
+    my ($self, $in_package, $out_package) = @_;
+    my @queryIDs;
+    foreach my $job (@{ $in_package->jobs }) {
+        push @queryIDs, $job->jid;
+    }
+    # store the query ids
+    my $ID=$ENV{ID};
+    my $lock = WSRF::MobyFile->new(undef, $ID);
+    $WSRF::WSRP::Private{queryIDs} = \@queryIDs;
+    $lock->toFile();
+
+    foreach my $job (@{ $in_package->jobs }) {
+        my $async = MOSES::MOBY::Async->new;
+		$async->submit($self, $ID, $job, $in_package, $out_package);
+    }
+}
+
+__END__
+

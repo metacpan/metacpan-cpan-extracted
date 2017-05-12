@@ -1,0 +1,15 @@
+준비물
+-------
+
+필요한 모듈은 다음과 같습니다.
+
+- [CPAN의 Win32::GuiTest 모듈][cpan-win32-guitest]
+- [CPAN의 Win32::GuiTest::Examples 예제][cpan-win32-guitest-examples]
+
+윈도우에서는 다음 명령을 이용해서 모듈을 설치합니다.
+
+1. cpan Win32::GuiTest
+2. cpan Win32::GuiTest::Examples
+
+[cpan-win32-guitest]:          http://p3rl.org/Win32::GuiTest
+[cpan-win32-guitest-examples]: http://p3rl.org/Win32::GuiTest::Examples

@@ -1,0 +1,6 @@
+Revision history for Perl extension Mail::Simple::DKIM::Signer.
+
+0.01  Sat Jul 24 04:26:48 2010
+	- original version; created by h2xs 1.23 with options
+		-AXn Mail::Simple::DKIM::Signer
+

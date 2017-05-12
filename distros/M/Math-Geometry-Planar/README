@@ -1,0 +1,73 @@
+Planar.pm -- A planar geometry package
+
+ABSTRACT:
+
+This module provides a set of 2D polygon, line and line segment operations.
+The module also uses the GPC module for polygon clipping operaions.
+
+For full information on usage, see the accompanying man and html
+
+COPYRIGHT INFO
+
+The Planar.pm module is copyright 2002 Danny Van de Pol.  It is
+covered by the Perl "Artistic License", which allows for free usage
+and redistribution.  See the Artistic License in the Perl source
+package for details.
+
+THE LATEST VERSION IS 1.18
+
+INSTALLATION:
+
+Read these instructions all the way through before you start!
+
+this is not guaranteed.
+
+3.  Unpack the tar file:
+
+	zcat Math-Geometry-Planar-1.XX.tar.gz | tar xvf -
+
+    (Where "XX" is the most recent revision number.)  This will create
+    the directory Math-Geometry-Planar-1.XX.
+
+4.  and execute the standard installation steps
+
+	a.  cd Math-Geometry-Planar-1.XX
+	b.  perl Makefile.PL
+	c.  make
+        d.  make test (optional)
+	e.  make html (optional)
+	f.  make install
+
+    This will create Planar.pm, its HTML manual page, and install Planar into
+    the system-wide Perl library directory.  You'll need root
+    privileges to do the install step.  If you don't have them, see below.
+
+IF YOU RUN INTO PROBLEMS
+
+Make sure you have the GPC module installed before installing Math::Geomentry::Planar.
+Since no executables are called, installation should be no problem.
+
+FREQUENTLY ASKED QUESTIONS
+
+BUG REPORTS
+
+Feel free to contact me via e-mail, subject to the caveats below.
+Provide the version numbers of Planar, Perl, make and model
+of your operating system, and make and model of your Web server, if
+appropriate.  Provide a small script that demonstrates the bug.
+
+WHAT'S NEW IN 1.XX
+
+ACKNOWLEDGEMENTS:
+
+UPDATES:
+
+The current version of Math::Geometry::Planar can be found at:
+
+   http://www.cpan.org
+
+AUTHOR:
+
+Danny Van de Pol
+daniel.van_de_pol@alcatel-lucent.be
+http://www.alcatel.be

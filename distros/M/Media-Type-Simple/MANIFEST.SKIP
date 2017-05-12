@@ -1,0 +1,20 @@
+.*~$
+.*\.(bak|old)$
+\.git/.*
+\.gitignore
+
+^Makefile$
+
+^blib/
+^pm_to_blib$
+
+Media-Type-Simple-.*/
+Media-Type-Simple-.*\.tar\.gz
+
+^MYMETA\.*
+
+# QA tests not needed for distribution
+
+^xt/
+
+^\.travis\.yml$

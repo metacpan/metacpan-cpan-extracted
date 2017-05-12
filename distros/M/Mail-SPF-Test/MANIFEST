@@ -1,0 +1,22 @@
+Build.PL
+CHANGES
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/libmail-spf-test-perl.install
+debian/rules
+examples/yaml-test
+examples/yaml-test-stats
+INSTALL
+lib/Mail/SPF/Test.pm
+lib/Mail/SPF/Test/Base.pm
+lib/Mail/SPF/Test/Case.pm
+lib/Mail/SPF/Test/Scenario.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+TODO
+SIGNATURE    Added here by Module::Build

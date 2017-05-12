@@ -1,0 +1,98 @@
+Received: from ns.ATComputing.nl (ns.ATComputing.nl [195.108.229.25])
+	by atcmpg.ATComputing.nl (8.9.0/8.9.0) with ESMTP id XAA24495
+	for <markov@ATComputing.nl>; Wed, 9 Feb 2000 23:15:26 +0100 (MET)
+Received: (from nobody@localhost)
+	by ns.ATComputing.nl (8.8.8/8.8.8) id XAA01230
+	for <markov@ATComputing.nl>; Wed, 9 Feb 2000 23:15:25 +0100
+Received: from viper.oldcity.dca.net(216.158.38.4) by ns.ATComputing.nl via smap (V2.1)
+	id xma001228; Wed, 9 Feb 00 23:15:21 +0100
+Received: from unca-don.wizards.dupont.com ([204.183.81.133])
+	by viper.oldcity.dca.net (8.9.3/8.9.3/DCANET) with ESMTP id RAA04756;
+	Wed, 9 Feb 2000 17:13:55 -0500
+Received: (from majordomo@localhost)
+	by unca-don.wizards.dupont.com (8.9.3/8.9.3) id QAA29764
+	for magick-outgoing; Wed, 9 Feb 2000 16:55:37 -0500 (EST)
+X-Authentication-Warning: unca-don.wizards.dupont.com: majordomo set sender to owner-magick@wizards.dupont.com using -f
+Message-ID: <38A1E3B0.F148D74A@websidestory.com>
+Date: Wed, 09 Feb 2000 14:01:20 -0800
+From: Steve Dotson <steve@websidestory.com>
+X-Mailer: Mozilla 4.7 [en] (X11; U; Linux 2.2.5-15 i686)
+X-Accept-Language: en
+MIME-Version: 1.0
+To: Jeffrey Krzysztow <jeffrey.krzysztow@pvii.com>
+CC: William Park <parkw@better.net>, Mark Sappol <Mark_Sappol@ipicorp.com>,
+        "magick@wizards.dupont.com" <magick@wizards.dupont.com>
+Subject: Re: File Conversion From HTML to PS and TIFF
+References: <38A11D0E.A2064062@ipicorp.com> <20000209154405.C265@better.net> <38A1DBE7.9D3718C9@pvii.com>
+Content-Transfer-Encoding: 7bit
+Sender: owner-magick@wizards.dupont.com
+Precedence: bulk
+Reply-To: Steve Dotson <steve@websidestory.com>
+Content-Type: text/plain; charset=us-ascii
+Status: RO
+Content-Length: 2129
+Lines: 63
+
+http://home.netscape.com/newsref/std/x-remote.html
+
+
+Jeffrey Krzysztow wrote:
+> 
+> William,
+> 
+> Where did you find information about -remote command line option for Netscape?
+> 
+> William Park wrote:
+> 
+> > On Wed, Feb 09, 2000 at 07:53:50AM +0000, Mark Sappol wrote:
+> > > I am new to this list so please forgive me if I am asking something that
+> > > has already been answered previously.  I did check the archives but too
+> > > no avail.
+> > >
+> > > I need to create a postscript file from an HTML document.  I have no
+> > > problem here with the text but I do have a logo (gif file) on this
+> > > document which does not get converted.  How can I go about converting
+> > > the HTML documents I generate, along with any linked GIF images, to
+> > > PostScript, as well as at other times, to TIFF?
+> > >
+> > > I would appreciate any feedback and help on this request.
+> > >
+> > > Thanks in advance,
+> > > Mark
+> >
+> > You can convert .html to .ps using Netscape.  You can do this manually
+> > by clicking mouse, or through '-remote' command line option.  For
+> > example,
+> >     netscape -remote "openURL(http://sexybabes.for.you/)" \
+> >              -remote "saveAs(xxx.ps, Postscript)"
+> >
+> > You can then convert .ps to .tiff like FAX program does.
+> >
+> > William
+> >
+> > ***********************************************************************
+> > To remove yourself from this mailing list, send mail to:
+> >         majordomo@wizards.dupont.com
+> >
+> > Include the following command in the body of your message:
+> >         unsubscribe magick
+> > ***********************************************************************
+
+-- 
+Steve Dotson
+Software Engineer
+
+WebSideStory, Inc.
+10182 Telesis Court, Sixth Floor
+San Diego, California 92121
+P:  858.546.0040  ext. 417
+F:  858.546.0480
+E:  steve@websidestory.com
+
+***********************************************************************
+To remove yourself from this mailing list, send mail to:
+	majordomo@wizards.dupont.com
+
+Include the following command in the body of your message:
+	unsubscribe magick
+***********************************************************************

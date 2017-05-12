@@ -1,0 +1,81 @@
+Copyright 2012, 2013, 2014, 2015 Kevin Ryde
+
+This file is part of Math-PlanePath-Toothpick.
+
+Math-PlanePath-Toothpick is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+Math-PlanePath-Toothpick is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Math-PlanePath-Toothpick.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 18, October 2015
+    - ToothpickSpiral new turn_any_straight()
+
+Version 17, May 2015
+    - LCornerReplicate fix for level methods
+
+Version 16, February 2015
+    - ToothpickTree fix for n_to_level()
+
+Version 15, September 2014
+    - new methods n_to_level(), level_to_n_range()
+
+Version 14, June 2014
+    - new methods x_negative_at_n(), y_negative_at_n()
+
+Version 13, December 2013
+    - new HTree
+
+Version 12, October 2013
+    - new sumabsxy_minimum()
+
+Version 12, July 2013
+    - new tree_n_to_subheight()
+
+Version 11, June 2013
+    - ToothpickTree new parts=two_horiz
+    - new tree_num_children_list()
+
+Version 10, May 2013
+    - new ToothpickSpiral
+
+Version 9, May 2013
+    - LCornerTree new parts=octant+1, octant_up+1, wedge+1
+
+Version 8, May 2013
+    - ToothpickReplicate fix parameter_info_array() choices only 4,3,2,1
+
+Version 7, May 2013
+    - LCornerTree new parts=diagonal,diagonal-1
+
+Version 6, April 2013
+    - new sumxy_minimum(),sumxy_maximum(), diffxy_minimum(),diffxy_maximum(),
+    - ToothpickTree new parts=octant,octant_up,wedge
+
+Version 5, April 2013
+    - LCornerTree,OneOfEight new parts=octant_up,wedge
+
+Version 4, April 2013
+    - new dir_maximum_dxdy()
+    - LCornerTree new parts=octant
+    - Math::NumSeq::OEIS catalogue entries for OneOfEight
+
+Version 3, February 2013
+    - new OneOfEight
+
+Version 2, January 2013
+    - new tree_num_children_maximum()
+
+Version 1, December 2012
+    - the first version, ToothpickTree,ToothpickReplicate, ToothpickUpist,
+       LCornerTree,LCornerReplicate,
+	

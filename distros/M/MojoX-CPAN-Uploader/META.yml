@@ -1,0 +1,35 @@
+---
+abstract: 'Mojo way to upload files to CPAN'
+author:
+  - 'Yaroslav Korshak  C<< <yko@cpan.org> >>'
+  - 'Yaroslav Korshak <yko@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.12'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MojoX-CPAN-Uploader
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::Spec: 0
+  Getopt::Long: 0
+  IO::Socket::SSL: 1.43
+  IPC::Open3: 0
+  Mojolicious: 1.51
+  Term::ReadKey: 0
+  perl: 5.10.0
+resources:
+  bugtracker: http://github.com/yko/mojox-cpan-uploader/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/yko/mojox-cpan-uploader
+version: 0.034

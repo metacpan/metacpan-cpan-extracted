@@ -1,0 +1,25 @@
+---
+abstract: 'Filters related to HTML generation'
+author:
+  - 'Jonathan Swartz <swartz@pobox.com>'
+build_requires:
+  Test::Class::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200008, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mason-Plugin-HTMLFilters
+no_index:
+  directory:
+    - lib/Mason/Plugin/HTMLFilters
+requires:
+  HTML::FillInForm: 2.00
+  Mason: 2.00
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mason-Plugin-HTMLFilters
+  repository: git://github.com/jonswar/perl-mason-plugin-htmlfilters.git
+version: 0.03

@@ -1,0 +1,89 @@
+MooseX-MungeHas
+===============
+
+Created:      2013-05-27
+Home page:    <https://metacpan.org/release/MooseX-MungeHas>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-MungeHas>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.007	2014-09-09
+
+ - Allow exporting of more than one `has` function.
+ - Better detection of OO framework.
+ - Bugfix for interaction of `is_rw` and `has $name=>$builder`.
+
+0.006	2014-09-09	tobyink ♥ builder
+
+ - Allow Moo-style `builder=>$coderef` in Moose and Mouse.
+ - Allow Object::Simple-style `has $name=>$coderef` in Moo, Moose, and
+   Mouse.
+ - Allow `has $name=>$type` in Moo, Moose, and Mouse.
+
+0.005	2014-02-14	tobyink ♥ isa
+
+ [ Bug Fixes ]
+ - s/find_or_parse_type_constraint/find_or_create_isa_type_constraint/
+   Fixes RT#92557.
+   Pierre Masci++
+   <https://rt.cpan.org/Ticket/Display.html?id=92557>
+
+ [ Documentation ]
+ - Various documentation improvements.
+
+ [ Test Suite ]
+ - No longer depend on Types::Standard for tests; skip those tests if it's
+   not installed.
+
+ [ Packaging ]
+ - No longer depend on Eval::TypeTiny.
+
+ [ Other ]
+ - Allow Moo-style isa=>sub{...} in Moose and Mouse.
+ - Always enable the eq_1 feature; it's never useful for it to be disabled.
+ - Remove the absolute dependency on Eval::TypeTiny; allow Eval::Closure to
+   be used in its stead.
+
+0.004	2013-08-29
+
+ [ Bug Fixes ]
+ - Fix a stray `$.` that wasn't changed in 0.003.
+   Andrew Rodland++
+
+0.003	2013-08-28
+
+ - Use the `$_` variable for the attribute name instead of `$.`.
+ - Use the `%_` hash for the attribute spec instead of `%$_`.
+
+0.002	2013-08-20
+
+ [ Bug Fixes ]
+ - Fix syntax error compiling the eq_1 munger.
+
+0.001	2013-06-12
+
+ [ Documentation ]
+ - examples/relax-type-constraints.pl
+
+0.000_04	2013-05-31
+
+ [ Bug Fixes ]
+ - local @_ doesn't work with goto in Perl < 5.18. (Only affects Mouse.)
+   Luc J. Bourhis++
+
+0.000_03	2013-05-31
+
+ [ Bug Fixes ]
+ - Fix weird overloading-related bug in Perl < 5.17.
+
+0.000_02	2013-05-31
+
+ [ Packaging ]
+ - Depend on newer version of Eval::TypeTiny.
+ - Much improved test suite.
+
+ [ Other ]
+ - Added: Make coerce => 0|1 work in Moo.
+ - Removed: Drop the idea of shortcutting import with a single coderef; it
+   doesn't work out so well.
+
+0.000_01	2013-05-27	Preview release

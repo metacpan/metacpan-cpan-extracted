@@ -1,0 +1,9 @@
+CHANGES
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+PROGRAM_LICENSE
+README
+bin/message_score.pl
+lib/Message/Style.pm
+t/use.t

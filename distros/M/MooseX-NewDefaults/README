@@ -1,0 +1,81 @@
+NAME
+    MooseX::NewDefaults - Alter attribute defaults with less pain
+
+VERSION
+    This document describes version 0.004 of MooseX::NewDefaults - released
+    September 24, 2012 as part of MooseX-NewDefaults.
+
+SYNOPSIS
+        package One;
+        use Moose;
+        use namespace::autoclean;
+
+        has A => (is => 'ro', default => sub { 'say ahhh' });
+        has B => (is => 'ro', default => sub { 'say whoo' });
+
+        package Two;
+        use Moose;
+        use namespace::autoclean;
+        use MooseX::NewDefaults;
+
+        extends 'One';
+
+        # sugar for defining a new default
+        default_for A => sub { 'say oooh' };
+
+        # this is also legal
+        default_for B => 'say oooh';
+
+DESCRIPTION
+    Ever start using a package from the CPAN, only to discover that it
+    requires lots of subclassing and "has '+foo' => (default => ...)"? It's
+    not recommended Moose best practice, and it's certainly not the
+    prettiest thing ever, either.
+
+    That's where we come in.
+
+    This package introduces new sugar that you can use in your class,
+    default_for (as seen above).
+
+    e.g.
+
+        has '+foo' => (default => sub { 'a b c' });
+
+    ...is the same as:
+
+        default_for foo => sub { 'a b c' };
+
+NEW SUGAR
+  default_for
+    default_for() is a shortcut to extend an attribute to give it a new
+    default; this default value may be any legal value for default options.
+
+        # attribute bar defined elsewhere (e.g. superclass)
+        default_for bar => 'new default';
+
+    ... is the same as:
+
+        has '+bar' => (default => 'new default');
+
+SOURCE
+    The development version is on github at
+    <http://github.com/RsrchBoy/moosex-newdefaults> and may be cloned from
+    <git://github.com/RsrchBoy/moosex-newdefaults.git>
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/moosex-newdefaults/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2011 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

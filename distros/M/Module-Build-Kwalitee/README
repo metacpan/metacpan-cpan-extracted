@@ -1,0 +1,53 @@
+NAME
+    Module::Build::Kwalitee - Module::Build subclass with prepackaged tests
+
+SYNOPSIS
+    This module requires this bit of magic in your Build.PL:
+
+      use lib 'mbk';
+      use Module::Build::Kwalitee;
+
+      Module::Build::Kwalitee->new(
+        module_name => 'Foo::Bar',
+          ...,
+        },
+      )->create_build_script();
+
+DESCRIPTION
+    Module::Build::Kwalitee subclasses Module::Build to provide boilerplate
+    tests for your project. It does this by overriding "new()" and copying
+    tests to your t directory when you run 'perl Build.PL'.
+
+    Module::Build::Kwalitee gets over the bootstrapping problem by
+    overriding Module::Build's "distdir" target, adding a "mbk" directory to
+    your distribution containing a small stub Module::Build::Kwalitee which
+    just overrides Module::Build's build_requires() method to add the
+    dependencies of its tests.
+
+    Module::Build::Kwalitee tests are not automatically added to MANIFEST so
+    if you want them shipped with your distribution you will have to do this
+    manually.
+
+  Tests
+    Several boilerplate tests are added to t/:
+
+    compile test
+    "use strict" test
+    "use warnings" tests
+    POD syntax & coverage tests
+    'use lib' test
+
+ADDITIONAL FEATURES
+    You can get the "t/003pod.t" to report which functions are not
+    documented by using the "SHOW_NAKED" enviromental variable
+
+      bash$ SHOW_NAKED=1 perl -Ilib t/003compile.t
+
+SEE ALSO
+    Module::Build
+
+AUTHOR
+    Stig Brautaset <stig@brautaset.org>, Mark Fowler
+    <mark@twoshortplanks.com>, Norman Nunley <nnunley@fotango.com>,
+    Chia-liang Kao <clkao@clkao.org>, et al.
+

@@ -1,0 +1,95 @@
+Revision history for Mojolicious::Plugin::DSC
+
+1.006 2016-08-01
+  Fixed failing test t/advanced.t.
+  Mojolicious::Plugin::Charset was removed in version 7.0.
+
+1.005 2015-03-21
+  Requiring DBIx::Simple::Class 1.009.
+
+1.004 2015-03-01
+  - Pushed up required versions of dependencies:
+    Mojolicious 6.0, DBIx::Simple::Class 1.008.
+  - Yet a little more tests.
+
+
+1.003 2015-02-28
+  - Improved statement test coverage by Bartłomiej Syguła (NATANAEL)
+    as part of the CPAN pull request challenge. Thanks!
+  - Improved condition and branch test coverage. Total: 91.6%!
+  - Works with Mojolicious 6.0! 
+
+1.002 2015-02-22
+  - Fixed bug! Assigning to a scalar instead of array of classes to load.
+
+1.001 2015-02-22
+  - Upgraded from Mojolicious 3.85 to 5.81!
+  - Improved test coverage.
+
+1.000 2014-11-30
+      - Added support for callbacks for "onconnect_do".
+        This is suitable to execute arbitrary Perl code after
+        connection is established.
+
+0.999  2013-12-04 00:52:23 CET
+      - Considerably enhanced CONFIGURATION section of the documentation.
+      - Added configuration key "postpone_connect". 
+      Default behavior is to NOT postpone the connection.
+
+0.998  2013-12-01 00:12:38 CET
+      - Fixed loading for modules out of $config->{namespace}.
+      - Fixed loading for modules when $config->{load_classess}
+      is empty.
+
+0.997  2013-05-26 15:51:41 EEST
+      - Made tests compatible with Mojolicious 4.0+
+
+0.996  2013-04-09 01:22:58 EEST
+      - Postponed connecting to the database for the time
+      when the helpers are called for the first time.
+
+0.995  2013-02-26 23:40:38 EET
+      - Explicitely state MIN_PERL_VERSION => '5.10.1' in Makefile.PL.
+
+0.994  2013-02-23 16:06:50 EET
+       - Cleaned up unneeded "use"s in tests hoping strange fails will dissapear.
+
+0.993  2013-02-21 13:07:45 EET
+       - Updated required Mojolicious version to 3.85
+
+0.992  2013-02-21 10:49:26 EET
+       - Updated advanced.t to not use the deprecated post_form_ok()
+       but post_ok() with named parameter "form".
+       - Avoided basic tests on SunOS/Solaris. 
+       See http://www.cpantesters.org/cpan/report/d083269c-7a9e-11e2-a1fe-9ffbdb32a9a6 
+
+0.991  2012-10-11 01:43:05 EEST
+      - Fixed register(). Now using $app->$dbix_helper - not $app->dbix.
+      - Fixed POD so Test::Pod::Coverage does not report "config" as naked.
+      - Increased DBIx::Simple::Class verion dependency.
+      - Hidden from CPAN example classes used for testing.
+      - Jumping from 0.60 to be inline with DBIx::Simple::Class.
+
+0.60  2012-08-09 22:48 EEST
+      - Jumping from 0.06 to 0.60 to be closer to DBIx::Simple::Class.
+      - Multiple dbix helpers. My->dbix can be different from Your->dbix
+      if overriden. See DBIx::Simple::Class/dbix
+      - Try to guess default namespace for loading classes
+      from $config->{database} and $config->{dsn}.
+      Supported drivers:mysql, SQLite, Pg.
+      - Using Carp instead of Mojo::Exception.
+      - Removed default $DRIVER_ATTRIBUTES
+      - Improved Makefile.PL.
+
+0.06  2012-08-05 23:49 EEST
+      - README is a text file now
+      - enhanced documentation
+
+0.05  2012-08-04 14:50 EEST
+      - Added tests and example classes.
+      - Added missing licence in Makefile.PL.
+      - Added _load_classes() to separate logical chuncks of code..
+      - Added missing Changelog.
+
+0.04  2012-08-04 10:26 EEST
+      - Uploaded first usable version on CPAN.

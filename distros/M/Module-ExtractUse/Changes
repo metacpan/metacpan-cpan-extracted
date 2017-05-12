@@ -1,0 +1,180 @@
+#-----------------------------------------------------------------
+# Changes for Module::ExtractUse
+#-----------------------------------------------------------------
+
+0.341   2016-01-30T22:18:20
+    - fixed 20_parse_self.t; version.pm is not used anymore (Kenichi Ishigaki)
+
+
+0.340   2016-01-30T20:42:39
+    - load_first_existing_class() is now working (Anthony Brummett)
+    - Class::Load::load_class(), try_load_class() and load_optional_class() are working (Anthony Brummett)
+    - Detect uses of Module::Runtime (Anthony Brummett)
+    - include extractuse as provided by Jonathan Yu in example/ (Anthony Brummett)
+    - Linkify POD modules, mention Module::Extract::Use to resolve RT#45571. (Jeremy Mates)
+
+
+0.33    2014-04-11T21:04:52+0200
+    - added base() handling to no (Thomas Klausner)
+    - support 'no MODULE' etc (for RT-94305) (Kenichi Ishigaki)
+    - typo fix (David Steinbrunner)
+    - ignore __DATA|END__ sections (see https://rt.cpan.org/Ticket/Display.html?id=88969 ) (Kenichi Ishigaki)
+    - ignore use/require method calls (Kenichi Ishigaki)
+
+
+0.32    2013-09-04T16:48:07+0200
+    - not to include cached results (Kenichi Ishigaki)
+    - Fix handling module beginning with v and pragma with version.
+      (Yasutaka ATARASHI)
+    - Recognize "use parent". (Yasutaka ATARASHI)
+
+
+0.31	2013-05-31T10:21:06+0200
+    - applied a patch from cjm with slight modification to resolve RT#50723
+      (support use Foo::Bar (); etc) (Kenichi Ishigaki)
+    - fixed RT#71761 (Kenichi Ishigaki)
+    - applied a patch from wyant (RT#71761) (Kenichi Ishigaki)
+    - fixed the Pod::Simple encoding issue (Kenichi Ishigaki)
+    - Fix incorrect regexp (ref gh-5). (Yasutaka ATARASHI)
+    - Avoid regex features introduced only in later perl (close gh-5).
+      (Yasutaka ATARASHI)
+    - Use plan() instead of done_testing() (ref gh-5). (Yasutaka ATARASHI)
+    - Add support for bareword leading hyphyen, in-place arrayref and hashref.
+      (Yasutaka ATARASHI)
+    - proper version number for older releases (Brian Cassidy)
+
+
+0.30	2013-04-18T08:57:49+0200
+    - Add accessors and tests for _in_eval/_out_of_eval. (Yasutaka ATARASHI)
+    - reworked 80_failig.t to TODO tests; (Thomas Klausner)
+    - added more require-in-string corner test cases (suggested by Buddy Burden)
+      (Thomas Klausner)
+    - Fix the case for eval["']expr["'] and add regression tests.
+      (Yasutaka ATARASHI)
+
+0.29    2013-02-25T20:25:44+0100
+    - fixed regex to filter use/require (RT83569) (reported by
+      ribasushi)
+
+
+0.28   2012-08-21T14:41:15+0200
+    - whitespace in use base is valid (Barbie)
+
+
+0.27	2012-03-23T12:40:44+0100
+    - fixed 23_universal_require.t for real (RT75342) (reported by
+      Manoj Kumar and Paul Howarth)
+
+
+0.26    2012-03-23T08:42:25+0100
+    - removed Test::NoWarning from a t/23_universal_require.t because
+      it upsets the (manual) plan if the tests are skipped
+
+
+0.25    2012-03-22T10:55:42+0100
+    - autogenerate the grammer during ./Build (based on a patch by
+      jtbraun@CPAN.org) (RT74879)
+    - added $VERSION to into Module::ExtractUse::Grammar, suggested
+      by Manoj Kumar (RT75342)
+    - specify min verion of Parse::RecDescent (1.967009),
+      suggested by ANDK@cpan.org (RT75130)
+    - fix typos reported by gregor herrmann (RT75115)
+    - switched to Dist::Zilla (all on my own!)
+
+
+0.24    2012-02-12T14:27:36+0100
+    - regenerated Grammer to work with new Parse::RecDescent
+      (thanks to cpan-testers, TMUELLER, KENTNL, dirkus@yo****.com and
+      paul@city****.org for reporting the problem)
+
+
+0.23   2008-04-26 22:14:28
+    - fixed bug regarding 'use utf8' which was interpreted as 'utf'
+
+
+0.22    2007-11-16
+    - added 'use warnings' again to the Grammer... grr, stupid grammer
+      generator
+
+
+0.21    2007-11-14
+    - fixed Bug reported by hanekomu via IRC:
+      Modules::ExtractUse breaks if it is used with UNIVERSAL::require
+      so I renamed the grammer tokens 'use' and 'require'. No API changes, 
+      but if you use the grammer directly, you'll have to adapt to the new 
+      names ('token_use' and 'token_reqire')
+
+
+0.20    2007-11-07
+    - resolved RT #30414 by applying the patch submitted by
+      David Landgren
+    - rearranged code to better fit my current Perl style      
+    - added 'use warnings' to Module::ExtractUse::Grammer for that
+      extra kwalitee point
+
+
+0.19    2007-04-21
+    - resolved RT #22953 reported by David R Throop
+      documentation error in SYNOPSIS
+    - resolved RT #24066 reported by Jose Pedro Oliveira
+      license clarification
+    - some doc cleanup
+    - added more Test modules to build_requires
+    - no actual code changes where done in this release
+
+
+0.18    2006-06-19
+    - resolved [rt.cpan.org #19302] reported by DAGOLDEN@cpan.org
+      (thanks for the hint!)
+      we can now handle stuff like:
+          my $ver=1.22;
+          eval "use Test::Pod $ver;"
+    - moved Test::* prereq into build_requires
+
+
+0.17	2005-11-07
+    - switched to new Changes format
+    - updated dependencies (Pod::Strip instead of Pod::Simple)
+
+
+0.16	2005-09-01
+    - added test provided by  BRICAS (thanks a lot)
+    - removed bug reported by BRICAS
+    - updated docs and various stuff
+    - find uses in eval
+
+
+0.15	2004-10-01
+    - use Pod::Strip instead of Pod::Simple subclass hack
+    - added accessor method C<files>
+    - updated docs
+    - added t/pod.t and t/pod_coverage.t
+    - adapted test suite to new data structure / accessors
+    - resolved rt.cpan.org ticket #7013 "Parser should remember previously
+      scanned modules" (Michael G. Schwern) by shuffling various data
+      structures around
+    - switched to Module::Build
+
+
+0.11	2004-07-20
+    - resolved rt.cpan.org ticket #7012 "uses preceded by a comment can be
+      ignored" by applying the patch by Michael G. Schwern. Thanks!
+
+
+0.10	2003-06-08
+   - accelerated the parsing:
+     - Parse a statement instead of a whole module
+     - Befor parsing, check with a regex if the statement
+       contains 'use' or 'require'
+     - Enhanced grammer (thanks to $::RD_TRACE)
+
+
+0.05	2003-04-18
+    - added precompilation of grammar to Makefile.PL
+    - changed @found to @::found
+    - init @::found in start-rule instead via startup-action
+
+
+0.03	2003-03-31
+    - sort of working
+

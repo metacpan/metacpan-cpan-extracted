@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Module/Overview.pm
+MANIFEST			This list of files
+META.yml
+README
+script/plmo
+t/01_Module-Overview.t
+t/distribution.t
+t/fixme.t
+t/lib/M/O.pm
+t/pod-coverage.t
+t/pod-spell.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

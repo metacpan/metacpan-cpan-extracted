@@ -1,0 +1,324 @@
+Notes on the Maypole API
+========================
+
+Compiled by David Baird <cpan@riverside-cms.co.uk>, 20th Nov 2004.
+
+Criteria: simply a listing of the apparently public methods in each class,
+          pretty much in the order they appear in the source. 'Public' methods
+          are assumed to be those with no leading underscores.
+
+
+--------------------------------------------------------------------------------
+Inheritance
+--------------------------------------------------------------------------------
+Not all modules are involved in any given app e.g. CGI apps will load
+CGI::Maypole, but not Apache::MVC etc.
+
+    Maypole
+        Apache::MVC
+            MasonX::Maypole
+        CGI::Maypole
+
+    Maypole::View::Base
+        Maypole::View::TT
+        Maypole::View::Mason
+        MasonX::Maypole::View
+
+
+    Class::DBI and Maypole::Model::Base
+        Maypole::Model::CDBI
+            BeerDB or whatever (i.e. your app)
+
+
+--------------------------------------------------------------------------------
+The request
+--------------------------------------------------------------------------------
+
+    Maypole
+        class data accessors:
+            config
+            init_done
+            view_object
+
+        instance data accessors:
+            ar
+            params
+            query
+            objects
+            model_class
+            template_args
+            output
+            path
+            args
+            action
+            template
+            error
+            document_encoding
+            content_type
+            table
+
+        debug
+        setup
+        init
+        handler
+        handler_guts
+        is_applicable
+        call_authenticate
+        call_exception
+        additional_data         # empty
+        authenticate
+        exception
+        parse_path
+        get_template_root
+        get_request             # empty
+        parse_location          # abstract
+        send_output             # abstract
+
+    Apache::MVC - Maypole subclass
+        get_request
+        parse_location
+        parse_args
+        send_output
+        get_template_root
+
+    MasonX::Maypole - Apache::MVC subclass
+        class data accessor:
+            mason_ah
+
+        init
+        set_mason_comp_roots
+        parse_args
+        send_output
+        get_template_root
+
+    CGI::Maypole - Maypole subclass
+        run
+        get_request
+        parse_location
+        parse_args
+        send_output
+        get_template_root
+
+
+--------------------------------------------------------------------------------
+The view
+--------------------------------------------------------------------------------
+
+    Maypole::View::Base
+        new
+        paths
+        vars
+        process
+        error
+        template    # abstract
+
+    Maypole::View::TT - Maypole::View::Base subclass
+        template
+
+    MasonX::Maypole::View - Maypole::View::Base subclass
+        template
+        error
+
+
+--------------------------------------------------------------------------------
+Template variables
+--------------------------------------------------------------------------------
+
+    basic set:
+        $request        # Maypole request
+        $objects        # $r->objects
+        $base           # $r->config->uri_base
+        $config         # $r->config
+
+    if $r->model_class:
+        $classmetadata = { name              => $r->model_class,
+                           table             => $r->model_class->table,
+                           columns           => [ $r->model_class->display_columns ],
+                           list_columns      => [ $r->model_class->list_columns ],
+                           colnames          => { $r->model_class->column_names },
+                           related_accessors => [ $r->model_class->related( $r ) ],
+                           moniker           => $r->model_class->moniker,
+                           plural            => $r->model_class->plural_moniker,
+                           cgi               => { $r->model_class->to_cgi },
+                           };
+
+    if > 1 objects in $r->objects:
+        ${ $r->model_class->plural_moniker } = $objects
+    else:
+        ${ $r->model_class->moniker }        = $objects
+
+    Any values set in $r->template_args during the request are also included in
+    the template variables, possibly overriding the values set here. For instance,
+
+        $pager          # set in Maypole::Model::CDBI::do_pager
+        $search         # set (to 1) in Maypole::Model::CDBI::search
+        $errors         # set in Maypole::Model::CDBI::do_edit (maybe elsewhere too?)
+        $cgi_params     # set in Maypole::Model::CDBI::do_edit (maybe elsewhere too?)
+
+
+--------------------------------------------------------------------------------
+The model
+--------------------------------------------------------------------------------
+
+The CDBI model loads up this stuff:
+
+        package Maypole::Model::CDBI;
+
+        use base qw(Maypole::Model::Base Class::DBI);
+
+        use Class::DBI::AsForm;
+        use Class::DBI::FromCGI;
+        use Class::DBI::Loader;
+        use Class::DBI::AbstractSearch;
+        use Class::DBI::Plugin::RetrieveAll;
+        use Class::DBI::Pager;
+
+        use Lingua::EN::Inflect::Number qw(to_PL);
+        use CGI::Untaint;
+
+    Maypole::Model::Base
+        process
+        list_columns
+        display_columns
+        class_of            # abstract
+        setup_database      # abstract
+        do_edit             # abstract
+        list                # abstract      # Exported
+        view                # empty         # Exported
+        edit                # empty         # Exported
+        column_names
+        description
+        is_public
+        related             # empty
+
+    Maypole::Model::CDBI
+        related
+        related_class
+        do_edit                         # Exported
+        delete                          # Exported
+        stringify_column
+        adopt
+        search                          # Exported
+        do_pager
+        order
+        list                            # Exported
+        setup_database
+        class_of
+
+    Class::DBI::AsForm
+        to_cgi
+        to_field
+        type_of             # - don't know what this is, but it's in the export list
+        column_type         # - from Class::DBI::Plugin::Type
+
+    Class::DBI::FromCGI
+        update_from_cgi
+        create_from_cgi
+        untaint_columns
+        cgi_update_errors
+        untaint_type
+
+    Class::DBI::Loader
+        (nothing exported)
+
+    Class::DBI::AbstractSearch
+        search_where
+
+    Class::DBI::Plugin::RetrieveAll
+        retrieve_all_sorted_by
+        retrieve_all_sort_field
+
+    Class::DBI::Pager
+        pager
+
+    Class::DBI
+        use base qw(Class::Accessor Class::Data::Inheritable Ima::DBI);
+
+        class data: sequence iterator_class purge_object_index_every
+
+        stringify_self
+        transform_sql
+
+        connection
+        set_db
+        table
+        table_alias
+        columns
+        all_columns
+        id
+        primary_column
+        primary_columns     # same thing
+        find_column
+        has_real_column
+        data_type
+        accessor_name
+        mutator_name
+        autoupdate
+        make_read_only
+        find_or_create
+        create
+        purge_dead_from_object_index
+        remove_from_object_index
+        clear_object_index
+        retrieve
+        copy
+        construct
+        move
+        delete
+        update
+        discard_changes
+        get
+        set
+        is_changed
+        any_changed
+        normalize_column_values
+        validate_column_values
+        set_sql
+        dbi_commit
+        dbi_rollback
+        constrain_column
+        add_constraint
+        add_trigger
+        add_relationship_type
+        meta_info
+        retrieve_all
+        retrieve_from_sql
+        search_like
+        search
+        add_constructor
+        sth_to_objects
+        count_all
+        maximum_value_of
+        minimum_value_of
+
+    Ima::DBI
+        set_db
+        set_sql
+        transform_sql
+        db_names
+        db_handles
+        sql_names
+
+        db_*
+        sql_*
+
+        DBIwarn
+
+        commit
+        rollback
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,358 @@
+NAME
+    Module::Reload::Selective - Reload perl modules during development
+
+SYNOPSIS
+    Instead of:
+
+            use                        Foobar::MyModule;
+
+    Do this:
+
+            use Module::Reload::Selective; 
+            &Module::Reload::Selective->reload(qw(Foobar::MyModule));
+
+    Or, if you need the "import" semantics of "use", do this:
+
+            use                        Foobar::MyModule    (@ImportArgs);
+
+    Do this:
+
+            use Module::Reload::Selective; 
+            Module::Reload::Selective->reload(qw(Foobar::MyModule));
+            import                     Foobar::MyModule    (@ImportArgs);
+
+    ... then configure your server or other runtime environment settings to
+    trigger Module::Reload::Selective to only kick in when you need.
+
+    For example: you could have it kick in only when the web server is
+    running on a particular port number or particular (development) host.
+
+OVERVIEW
+    Utility for module developers to selectively reload needed modules
+    and/or conditionally augment @INC with additional, per-developer library
+    directories, at development time based on environment variables.
+
+    Particularly helpful in conjunction with mod_perl applications where
+    some or all application logic resides in separate Perl modules that
+    would otherwise not get reloaded until the server restarts.
+
+    Copyright (c) 2002, Chris Thorman.
+
+    Released to the public under the terms of the Perl Artistic License.
+
+DETAILS
+    This module defines a "reload" routine that scripts, CGI scripts,
+    Embperl scripts, handlers, etc. can use to reload (re-require) a module
+    or modules, optionally forcing the modules AND ANY MODULES THEY USE,
+    recursively, to reload, even if already previously loaded and listed in
+    %INC.
+
+    The reloading feature is helpful for when you're actively writing and
+    debugging modules intended to be used with Apache and mod_perl (either
+    used by Apache::Registry or HTML::Embperl script, or handlers, or other
+    mechanisms) and want to ensure that your code changes get reloaded on
+    every hit, even if the module had previously been loaded into the parent
+    or child process.
+
+    In addition to the selective reloading feature, this module can also
+    (optionally) dynamically prepend some additional paths to @INC to allow
+    programmers to work on, test, and debug private development copies of
+    modules in a private directory while other modules are loaded from a
+    more stable, shared, or public, library directory.
+
+    The @INC-modifying feature is helpful even if you're only developing
+    command-line perl scripts in an environment where there are multiple
+    programmers and an individual programmer, for testing purposes, needs to
+    optionally load some modules under development from his or her own
+    private source directory in preference to the "standard" locations.
+
+    This is a common need when multiple Perl developers are working on the
+    same Unix host.
+
+    How this module differs from Module::Reload:
+
+    *   Module::Reload reloads just files that it sees have changed on disk
+        since the last reload, whereas this module conditionally reloads
+        based on other conditions at runtime; this module also has other
+        features of convenience to develoepers.
+
+    How this module differs from Apache::StatINC:
+
+    *   Reloads requested modules (recursively) regardless of modification
+        date.
+
+    *   Skips reloading any modules that have been previously loaded from
+        lib/perl* (or other customizable list of dir name patterns), so you
+        can only reload items outside the standard library locations, by
+        default.
+
+    *   Allows dynamic overriding of @INC on a per-USER basis.
+
+    *   This module lacks StatINC's ability to disable symbol-redef
+        warnings, so best not to reload modules with const subroutines...
+        (sorry).
+
+    *   Works outside of Apache as well as within it (not sure whether this
+        is true of Apache::StatINC), so is testable from the command line,
+        and even useful in a batch script context, if not for its reloading
+        capabilities, then at least for its ability to override the search
+        path on a per-USER basis, allowing the development and debugging of
+        a private copy of a system-wide module or modules.
+
+    *   Works fine from within individual pages or scripts; does not
+        necessarily need to be loaded at server startup time.
+
+    *   Is a no-op (does not reload) unless certain environment variables
+        and/or options are set, allowing you to leave calls to it in
+        production code with negligible performance hit on non-debugging
+        servers.
+
+DISCUSSION
+    To request that a module Foobar::MyModule, and any modules it calls, be
+    reloaded, do this:
+
+            use Module::Reload::Selective; 
+            Module::Reload::Selective->reload(qw(Foobar::MyModule));
+
+    This reloads the module, executing its BEGIN blocks, syntax-checking it,
+    and recompiling any subroutines it has.
+
+    Then, if you want to import any semantics from the module into the
+    current namespace, you should directly "import" the module.
+
+            import                     Foobar::MyModule    (@ImportArgs);
+
+    IMPORTANT: Under normal circumstances, reload will load the module
+    normally with no difference from the usual behavior of "use" ... i.e.
+    files won't be reloaded if they already have been, and no special
+    modifications to @INC will be applied.
+
+    BUT, if certain environment variables (see below) are set to non-false
+    values, Module::Reload::Selective will force them and any modules THEY
+    need, to be reloaded from their source file every time, also using
+    temporary modifications to @INC.
+
+    The variables are:
+
+    $ENV{RLD} ## Useful for command-line testing/debugging
+
+    prompt> RLD=1 perl index.cgi
+
+    Just set this environment variable before invoking the script and the
+    Reloader will be activated.
+
+    $ENV{DEBUGGING_SERVER} ## Set this in the server startup
+
+    At server startup, set the environment variable conditionally, only if
+    you're starting up a private debugging server, say, on a different port.
+    You could use something like this in a <Perl> section in your
+    httpd.conf, for example:
+
+            if (($My::HostName =~ /^dev/) && $Port == 8081)
+            {
+                $User = 'upload';
+                $Group = 'upload';
+                print STDERR "Starting as user $User/$Group\n" if -t STDERR;
+
+                push @PerlSetEnv, ['DEBUGGING_SERVER', 1];
+
+                ## Could also set other Module::Reload::Selective runtime options here.
+            }
+
+RUNTIME OPTIONS
+    Runtime options are initialized by Module::Reload::Selective when it is
+    first "use"d, and may be overridden individually later before calling
+    "reload", by setting a few elements of the
+    $Module::Reload::Selective::Options hash, like this:
+
+            $Module::Reload::Selective::Options->{SearchProgramDir} = 0;
+
+    The available options, and their initial default values, are:
+
+            ReloadOnlyIfEnvVarsSet      => 1,
+
+            ## If 0, always reloads, regardless of environment var settings
+            ## described above.
+
+            SearchProgramDir            => 1,
+
+            ## If 1, cur working dir of script, as determined from $0, will be
+            ## added to the search paths before reloading.
+
+            ## This is very handy for keeping private local copies of modules
+            ## being tested in the same directory tree as the application that
+            ## uses them.
+
+            SearchUserDir               => 1,
+
+            ## If 1, "user dir" as determined by the other "User" options
+            ## below, will added to the search paths, after ProgramDir.
+
+            DontReloadIfPathContains    => ['lib/perl'],
+
+            ## List of strings that, if found in the loaded path of an already
+            ## loaded module, prevent that module from being re-loaded.  By
+            ## specifying "lib/perl" (on Unix), no library modules installed
+            ## in the standard perl library locations will ever be reloaded.
+            ## Force reloading of those, too, by removing that entry, or add
+            ## additional strings to disable additional subdirectories,
+            ## perhaps ones of your own.
+
+        FirstAdditionalPaths        => [],
+        LastAdditionalPaths         => [],
+
+            ## Lists; if non-empty, these specify additional paths to be
+            ## searched before or after any of the obove options, but in any
+            ## case always before any of the other locations normally in @INC.
+
+            User                        => '',
+
+            ## Name of user whose directory will be searched.
+
+            DefaultUser                 => $ENV{RELOAD_USER} || $ENV{USER} || $ENV{REMOTE_USER},
+
+            ## Name of user whose directory will be searched if no User option
+            ## is specified to override it.  If empty, no user name will be
+            ## used.
+
+            UserDirTemplate             => '/home/USER/src/lib',
+
+            ## Path to search when looking for source modules in a User's
+            ## programming directory.  If "USER" is in the path, it will be
+            ## substituted at runtime with the value of User or DefaultUser as
+            ## appropriate.  The resulting directory path is only added to the
+            ## search paths if it actually exists.
+
+DEBUGGING & ANALYSIS OF WHAT GOT LOADED
+    For debugging purposes, Module::Reload::Selective creates these hash
+    references, in the same format as %INC, that show what the last "reload"
+    command did. You can examine these (e.g. with Data::Dumper) after
+    calling reload if you want to be sure that reload did its job.
+
+            $Module::Reload::Selective::Debug->{INCHashBefore}
+            $Module::Reload::Selective::Debug->{INCHashAfter}
+
+            $Module::Reload::Selective::Debug->{NewlyLoaded}
+            $Module::Reload::Selective::Debug->{Reloaded}
+            $Module::Reload::Selective::Debug->{NotReloaded}
+
+            $Module::Reload::Selective::Debug->{GotLoaded}
+
+    NewlyLoaded -- modules that weren't loaded (from anywhere) prior to
+    calling reload.
+
+    Reloaded -- modules that previously appeared in %INC but got reloaded.
+
+    NotReloaded -- modules that previously appeared in %INC but were not
+    reloaded.
+
+    GotLoaded -- The union of Reloaded and NewlyLoaded -- i.e. anything that
+    got loaded as a result of the "reload" command.
+
+    You can examine these by putting something like one of these statements
+    in your code:
+
+            use Data::Dumper;
+            print &Dumper($Module::Reload::Selective::Debug);
+            print &Dumper($Module::Reload::Selective::Debug->{GotLoaded});
+
+    For example, if you use HTML::Embperl, you could put the following line
+    in your application:
+
+            <PRE>[+ &Dumper($Module::Reload::Selective::Debug); +]</PRE>
+
+    ... and comment it out when done:
+
+            [# <PRE>[+ &Dumper($Module::Reload::Selective::Debug); +]</PRE> #]
+
+    Note: if you use "reload" to force a reload of all your modules into a
+    virgin child process, the "NewlyLoaded" hash should be empty in a web
+    server environment where the Web server has been properly configured to
+    pre-load all necessary modules at server startup. You could use this
+    side-effect as a way to test your server configuration to see if you've
+    remembered to preload everything needed by your application at server
+    startup; anything that shows up in NewlyLoaded is something you've
+    forgotten to preload and you can fix that.
+
+    To see what private version of @INC was used by "reload", have a look at
+    this debugging variable:
+
+            $Module::Reload::Selective::Debug->{INCArrayAfterModification}
+
+    To see what time the last reload occurred, view this variable:
+
+            $Module::Reload::Selective::Debug->{LastLoadTime}
+
+    (This, along with the GotLoaded hash, will also help you reassure
+    yourself that the things you wanted to reload really did get reloaded;
+    if GotLoaded doesn't list your module, and/or LastLoadTime did not
+    change, then something did not reload.)
+
+WARNINGS
+    RELOADING IS RECURSIVE
+
+    If you reload module A that uses module B, module B will be reloaded,
+    too. This allows you to reload all related modules at one time. But if
+    you're not working on A, only on B, it is more efficient to just reload
+    module B. Don't reload more than you need, in other words.
+
+    RELOADING CAN MESS WITH GLOBALS IN APACHE CHILD PROCESSES
+
+    Note that the reloaded modules are loaded into the (child) process's
+    global namespace and so will affect all applications served by the
+    affected process... including any bugs you've introduced or modules that
+    failed to compile.
+
+    So if using Module::Reload::Selective for Web application development,
+    each programmer should be testing with his/her own private Apache
+    server, (possibly running on a unique port).
+
+    This way when you force the reloading of a buggy version of a module,
+    everyone else's runtime environment is not also screwed up.
+
+    WARNING: SYMBOL REDEFINITION WARNINGS
+
+    If the loaded module, or any module it reloads uses constant
+    subroutines, as in constant.pm, you will get warnings every time it
+    reloads. I tried to emulate a trick used by Doug MacEachern in
+    Apache::StatINC to prevent this from happening, but in this version, I
+    haven't been able to get that to work. Suggestions / fixes welcome.
+
+THANKS
+    Thanks to Joshua Pritikin for suggestions and the use of the
+    Module::Reload namespace.
+
+INSTALLATION
+    Using CPAN module:
+
+        perl -MCPAN -e 'install Module::Reload::Selective'
+
+    Or manually:
+
+        tar xzvf Module-Reload-Sel*gz
+        cd Module-Reload-Sel*-?.??
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+SEE ALSO
+    The Module::Reload::Selective home page:
+
+        http://christhorman.com/projects/perl/Module-Reload-Selective/
+
+    Apache(3), mod_perl, http://perl.apache.org/src/contrib, Module::Reload,
+    Apache::StatINC.
+
+    The implementation in Selective.pm.
+
+    The perlmod manual page.
+
+AUTHOR
+    Chris Thorman <chthorman@cpan.org>
+
+    Copyright (c) 1995-2002 Chris Thorman. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

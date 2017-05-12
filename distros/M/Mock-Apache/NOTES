@@ -1,0 +1,26 @@
+NOTES
+=====
+
+Dispatching to handlers
+-----------------------
+
+Initially just call specified handler, but could have list of handlers
+or even discover from config file.
+
+
+Sending data
+------------
+
+stdout is tied to mod_perl (I think - is this just in content
+handler?)  Need to tie - possibly using IO::String - tie to $r->{_output}
+
+$r->send_http_header grabs the status and headers and sends them - no
+further setting of headers is possible after that.
+
+
+Client disconnect
+-----------------
+
+Could count method calls and allow a disconnect_after option, which
+takes a hash of method=>count pairs - on each method update its count
+and flag disconnect when that count reaches the threshold

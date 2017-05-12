@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.54.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 30ceba8f4e2d6b3906dbd719d85b687c9290e690 .htaccess
+SHA1 38dd40d4fe9a8a408648f2f2c1a2a3ac76bbac72 Build.PL
+SHA1 2b37f4fbbfd6cd8fc9645139cfb7d9b107f446b5 CHANGES
+SHA1 02154445bc9831e791c35050f1a018ed99030016 LICENSE
+SHA1 8491edfdee1da42a278b4f288cc1f4e175c53582 MANIFEST
+SHA1 b2f56e57e2e75903d7f5e71fbafd30304bda49a7 MANIFEST.SKIP
+SHA1 a78a4383ec02dde7a5b6c7f590cd3ea6bc3f5cf3 META.yml
+SHA1 fff48f51c8bdf12fa3654aaf99b796b1269be8f0 Makefile.PL
+SHA1 e83dfd69ee0c65ab65c1fe2ec331fe25262cde0f README
+SHA1 6f0814991672217d716384e6ede67da67637f830 extensions/POD.php
+SHA1 be2f2ad396230da5202faab42d3ed524452461d0 extensions/podcnv
+SHA1 ceac99579ef3914de1936417282842c07d907a6a inc/Module/Install.pm
+SHA1 6c9471c92c28e247fb84f4ab7dc277f68b33ea95 inc/Module/Install/Base.pm
+SHA1 6ecc9d4d9b41480c00987af7d4b8daec4ca8a7b4 inc/Module/Install/Build.pm
+SHA1 b2cb1026330e8c4f8533c79569498ab15f189d86 inc/Module/Install/Can.pm
+SHA1 78acbad45c4289c228ead2278fc213ddd66bcead inc/Module/Install/Fetch.pm
+SHA1 642e5b27f4cbbbe440e5dc05c639f5fb79875fe3 inc/Module/Install/Makefile.pm
+SHA1 80d024f3eccf1c825b02b5e59de236b0af7d4bfc inc/Module/Install/Metadata.pm
+SHA1 fe6780ea5cfd67c79140699fbd4f0fe262255d57 inc/Module/Install/Win32.pm
+SHA1 51d43bffcfd7ffdecb8c8e9f97f3896c31b2e1b2 inc/Module/Install/WriteAll.pm
+SHA1 d3074bec2e6ed509b3d050548e586ef9f53811b2 lib/Mediawiki/POD.pm
+SHA1 b4373b9e9cc9dc3b0a717971163d596adc81600d lib/Mediawiki/POD/HTML.pm
+SHA1 1e26e5e0c221ba11c053d96817565ec74b642540 t/00_basic.t
+SHA1 898f442c9b25bbfa23af120b68fa0805991ba7a5 t/01_pod.t
+SHA1 7462b2b27394306b0718631be92dd524190e2daa t/02_html.t
+SHA1 3c4528584063d4cb11892e556a4c7b21ec122efa t/03_graphs.t
+SHA1 e813365ccbacbef165375cff5e21d3a55a927b82 t/pod.t
+SHA1 803b7c0b46a6cbb80db709af5c6114d8765511ad t/pod/common.pod
+SHA1 2ce4a94b12c9a0af510d77ea7010cd975620b480 t/pod/split.pod
+SHA1 3f99bde8f970066b40139ccabf9a67f7644aa1e8 t/pod_cov.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2 (GNU/Linux)
+
+iQEVAwUBRjyiZXcLPEOTuEwVAQK/WAf9GLDl+XrXgjdizNr5F9iEaPUYD/BtpZSn
+/h2XAe8beWBQnStxXJDGy/W26yBaOAsRgvhnweqdlBQ+I+p8zSQD25uWwUUU4bYe
+V71mTcfLneWjZH21nkKfUXTjw8ryda+NszJ7eTcE7LDs+qtrlRwNv/F0fOoPHNH2
+Pfcgj66h2ynU83kCyBGPnFR+a05++eFFyZU+H3JdjQlMvBkP5ToFXBWeVXQMMIsa
+/1LGG9pDe5qKyl1uCgfsLioY7h62zqSVhc3WPQYYPFq5vNjmTBZgxoOHmfZoRHBT
+Edi1mmhSh81EmvGUyWsWmxrvPVploDD8F1Tc5aa+c+O3qo/lPMV7GQ==
+=ao22
+-----END PGP SIGNATURE-----

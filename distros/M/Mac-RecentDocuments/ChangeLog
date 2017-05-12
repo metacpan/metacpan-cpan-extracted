@@ -1,0 +1,11 @@
+Revision history for Perl extension Mac::RecentDocuments
+                                        Time-stamp: "2004-12-29 18:56:19 AST"
+
+2004-12-29  Sean M. Burke  sburke@cpan.org
+
+        * Release 1.02 -- no code changes; just rebundling
+	
+2000-10-12  Sean M. Burke  sburke@cpan.org
+
+	* Release 0.01 -- Initial release.
+

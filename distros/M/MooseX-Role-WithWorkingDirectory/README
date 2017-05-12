@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution MooseX-Role-WithWorkingDirectory,
+version 0.02:
+
+  Syntactic sugar for running a method while in a directory
+
+This software is copyright (c) 2011 by Rob Hoelz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

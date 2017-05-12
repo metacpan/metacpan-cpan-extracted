@@ -1,0 +1,179 @@
+0.39 2017-02-20
+- Support `remove_files => 1` parameter to force unlinking of files
+  provided by previous versions
+
+0.38 2016-07-14
+ - Support `INSTALLDIRS=vendor`
+ - Properly honor `$DESTDIR` at `make install` time
+
+0.37 2014-12-24
+ - Add the Module::Install::ReadmeFromPod dependency
+
+0.36 2014-09-02
+ - Add deprecated_rt and no_readme_generation flags to RTx()
+ - Alter the right structures when requires_rt_plugin is called twice
+
+0.35 2014-07-28
+ - No changes since 0.34_05
+
+0.34_05 2014-07-14
+ - Apply consistent transformations to RTHOME as we do when prompting
+ - Check Debian request-tracker4 install location by default as well
+
+0.34_04 2014-06-26
+ - Automatically generate a README
+
+0.34_03 2014-06-19
+ - Stop runtime code from clearing out inc/ if run as an author
+
+0.34_02 2014-06-19
+ - Fix requires_rt_plugin
+ - Standardize error messages for rt_too_new and requires_rt
+
+0.34_01 2014-06-19
+ - Remove RT 3.8-specific code
+ - Update documentation to reflect 3.8-era Plugin world order
+ - Add requires_rt_plugin helper
+ - Remove WITH_SUBDIRS support
+ - Remove non-working PREFIX support
+ - Add RT version information to META.yml
+ - Default minimum perl version based on minimum RT version
+ - Tidy Changes file
+
+0.34 2014-05-20
+ - Backcompat workaround so you can ship static/css and static/js and on
+   4.0 we copy to html/NoAuth/{css,js}.  Isn't a full win for images which
+   needed a dhandler hack under 4.0.
+
+0.33 2014-03-17
+ - Better error message when requires_rt dies
+ - Release a pent up set of changes now that they've been tested
+
+0.32_02 2014-02-10
+ - Avoid some false positives that would offer a make upgrade-database
+   which cannot work.
+
+0.32_01 2014-01-10
+ - Now that we aren't packaging extensions against 3.6, we can use
+   cmp_versions imported from RT core rather than copy/paste.
+ - new rt_too_new which allows you to bail out before being installed on a
+   version of RT which is too new for you to function normally on
+   (corollary to requires_rt).
+ - requires_rt now dies if your RT is too old rather than just warning.
+
+0.32 2013-09-06
+ - new make upgrade-database command; this feature needs RT 4.2 or
+   4.0.14+ for maximum benefit, and is used in the RTIR 3.0 release
+   series
+
+0.31 2013-04-08
+ - Use the DatabaseAdmin configuration if supplied
+ - Install /static/ on future 4.2 versions of RT
+
+0.30 2012-11-06
+ - remove a lot of old unused code
+ - add support for a 4.1 feature that records database changes made by the
+   extension
+
+0.29_02 2012-08-16
+ - further removal of make factory, this time 'make dropdb'
+
+0.29_01 2012-08-16
+ - Remove support for 'make factory'
+ - Add support for a new 4.1 feature that records database changes made by
+   the extension
+
+0.29 2011-05-20
+ - add requires_rt to handle requiring an RT version since MakeMaker and
+   Module::Install::AutoInstall can't deal with RT version numbers.
+
+0.28 2011-03-15
+ - search /opt/rt4 for RT.pm
+
+0.27 2010-12-16
+ - Include RT's lib/ directory in INC so that requires() on RT::VERSION
+   work properly
+
+0.26 2010-12-14
+ - Search RTHOME before searching @INC This works around distribution
+   packages lurking in @INC
+
+0.25 2009-10-08
+ - Make prompt for lib path clearer [rt.cpan.org #50328
+ - trim RT.pm from lib paths entered by users
+
+0.24 2008-09-15
+ - updated docs
+ - die when target is RT 3.8.0
+ - install libs only into one path, don't double-install them on RT 3.8.x
+ - delete VERSION from POD, we just always forget to update it
+
+0.23 2008-05-09
+ - RT now respects the --datafile flag to rt-setup-database when used with
+   --action acl or --action schema. Don't pass the initialdata file when
+   we're doing schema changes
+
+0.22 2008-03-25
+ - Add local lib path to the @INC when we call any script that may load RT
+   config.
+
+0.21 2007-12-07
+ - LICENSING CHANGE: This compilation and all individual files in it are
+   now under the permissive "MIT" license.  See the COPYRIGHT section in
+   README for the new terms.
+ - Cleanup on POD, changelog, README, etc.
+ - Bump dependency of Module::Install::Admin to 0.40, so we can make use of
+   all_from() and drop the parentheses in Makefile.PL commands.
+
+0.20 2007-12-05
+ - Support for new RT 3.7 "RT Plugin" mechanism.
+ - No longer tries to write to the global local perl man and site
+   directories (packlists and manpages), instead installing them within the
+   RT hierarchy.
+
+0.11 2005-02-26
+ - make initdb now prompts for dba password.
+
+0.10 2004-09-09
+ - "make initialize-database" added as an alias to "make initdb", for
+   better consistency with core RT installation. Reported by: Sika.
+
+0.09 2004-09-09
+ - Moved under SVK management; remove all keyword expansion lines.
+ - Corrected the use of $ENV{RTHOME} and documented it.
+
+0.08 2004-05-31
+ - "make initdb" now moved to M::I::RTx::Factory, so the person running
+   "perl Makefile.PL" needs not have permission to read RT_SiteConfig.pm.
+ - M::I::RTx::Factory now survives pod-stripping.
+ - Jesse reports that RTx('RT-Foo-Bar') breaks.
+ - Improve table detection in Pg.
+ - Better handling failed require() on _Overlay classes in the factory.
+
+0.07 2004-05-13
+ - Need to use RT::LoadConfig instead of requiring the config files
+   directly. Reported by: Jesse Vincent
+
+0.06 2004-05-10
+ - Support "make factory", "make initdb", "make dropdb" for extensions that
+   has its own initialdata and schema.
+
+0.05 2004-02-01
+ - Now installs libs to $RT::LocalPath/lib instead of perl's sitelib.
+ - Now properly skips lib installation when WITH_SUBDIRS does not include
+   lib.
+ - Allow overriding prefix with $ENV{PREFIX}
+
+0.04 2004-01-10
+ - Update copyright years.
+ - Make var/ directory writable
+ - Some people insist on doing "make initialize-database" before "make
+   install".
+ - Add etc/initialdata insertion.
+ - Take care of "inplace" layout by also probing in lib/RT.pm.
+ - Now takes WITH_SUBDIRS to restrict the subdirectories to install.
+ - Some POD cleanups.
+
+0.01 2003-12-15
+ - Initial release.
+

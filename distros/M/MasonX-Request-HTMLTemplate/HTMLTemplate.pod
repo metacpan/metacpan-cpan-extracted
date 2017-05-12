@@ -1,0 +1,535 @@
+=head1 NAME
+
+MasonX::Request::HTMLTemplate - Add templates to the Mason Request object
+
+=head1 SYNOPSIS
+
+  In your httpd.conf file:
+
+    PerlSetVar  MasonRequestClass      MasonX::Request::HTMLTemplate
+    # and optionally
+    PerlSetVar  MasonDefaultLanguage   en
+    PerlSetVar  MasonTemplateBaseDir   undef
+
+  In a component hello.mpl
+
+    % $m->print_template;
+
+  In a file hello.htt
+
+    <HTML><HEAD></HEAD><BODY>
+      Hello: %user%
+    </BODY></HTML>
+  
+  and if you call hello.mpl with parameter "user=your_name" 
+  through POST or through GET like:
+
+  http://your_web_site/hello.mpl?user=your_name
+  
+  HTML response will be
+
+    <HTML><HEAD></HEAD><BODY>
+      Hello: your_name
+    </BODY></HTML>
+
+  In a file hello.it.htt
+
+    <HTML><HEAD></HEAD><BODY>
+      Ciao: %user%
+    </BODY></HTML>
+
+  and if you call hello.mpl with parameter "user=your_name" 
+  and "lang=it" through POST or through GET as
+
+  http://your_web_site/hello.mpl?user=your_name&lang=it
+
+  the HTML response will be
+
+    <HTML><HEAD></HEAD><BODY>
+      Ciao: your_name
+    </BODY></HTML>
+    
+=head1 DESCRIPTION
+
+This module tries to add two peculiar functionalities to Mason:
+
+=over 4
+
+=item *
+
+easy use of templates;
+
+=item *
+
+easy building of localized web site;
+
+=back
+ 
+to produce a framework with all power of Mason but by 
+separating completely the script language from the graphical interface language.
+
+This is done by inheritance C<HTML::Mason::Request> and C<HTML::Template::Extension> 
+in a single module and by
+adding one public method C<print_template> to standard Mason syntax.
+
+In the form more simple, C<print_template> prints out the html code present in a file
+in the same folder of the called component but with an "htt" extension.
+This file has opened using C<HTML:Template> and C<HTML::Template::Extension>.
+
+This file receives a template variable which is a merge of this objects:
+
+=over 4
+
+=item *
+
+all parameters passed from client through GET/POST (C<$m-E<gt>request_args>)
+
+=item *
+
+all parameters present in the session variable C<$m-E<gt>session>
+that is a C<MasonX::Request::WithApacheSession> object. (only available in
+L<MasonX::Request::HTMLTemplate::WithApacheSession|MasonX::Request::HTMLTemplate::WithApacheSession> 
+environment.
+
+=item *
+
+all parameters set through C<add_template_args> method.
+
+=item *
+
+for each parameter C<$key =E<gt> $value> of the previous items an element of the form
+C<$key=$value =E<gt> 1> (to be used with TMPL_IF and IF_TERN 
+C<HTML::Template::Extension> plugins).
+
+=back
+
+This template variable can be used inside the HTML template file using the 
+C<HTML::Template> and C<HTML::Template::Extension> syntax.
+
+As an example, writing a component which calls simply the method C<print_template>
+
+  html_test.mpl
+  =============
+  % $m->print_template;
+  
+one is simply saying that content HTML of the file html_test.htt 
+is wanted to be printed.
+
+If the content HTML of the file  is
+
+  html_test.htt
+  =============
+  <HTML><HEAD></HEAD><BODY>
+    Hello: %user%
+  </BODY></HTML>
+  
+the response will be: "Hello:". 
+
+But if you call html_test.mpl with parameter C<user=my_name> 
+through POST or through GET as http://my_web_site/html_test.mpl?user=my_name 
+the response will be "Hello: my_name". 
+
+In the same way, if the variable user is values within the components
+using C<add_template_args> like:
+
+  html_test.mpl
+  =============
+  % $m->add_template_args( user => my_name );
+  % $m->print_template;
+  
+the result will be the same one.
+
+Moreover if a variable C<lang> come sent to the template why defined in the 
+cookie of session, in the arguments passes to you through POST or through GET or 
+why explicitly defined in the component, then it will come tried, 
+if it exists, the file C<html_test.${lang}.htt> like model localized 
+for the demanded language.
+
+=head1 EXAMPLES
+
+Before giving a glance  to the syntax of the module we see some uses 
+possible of this module.
+
+=head2 SIMPLE SUBSTITUTION OF VARIABLE
+
+  simple_var.mpl
+  ==============
+  <%init>
+    # comment next line and call this component as
+    # http://.../simple_var.mpl?myscript=Mason
+    # it produces the same result
+    $m->add_template_args( myscript => 'Mason');
+    $m->print_template();
+  </%init>
+
+  simple_var.htt
+  ==============
+  <HTML><HEAD></HEAD><BODY>
+    I love %myscript%!
+  </BODY></HTML>
+
+it will output
+
+  <HTML><HEAD></HEAD><BODY>
+    I love Mason!
+  </BODY></HTML>
+
+The HTML page simple_var.htt can also be wrote like:
+
+  <HTML><HEAD></HEAD><BODY>
+    I love <TMPL_VAR name="myscript">!
+  </BODY></HTML>
+
+or like:
+
+  <HTML><HEAD></HEAD><BODY>
+    I love 
+      <TMPL_VAR name="myscript">
+        here my preferred language will appear!
+	  </TMPL_VAR>
+  </BODY></HTML>
+
+because they produce the same output.
+
+=head2 AUTOHANDLER TO DEFINE TEMPLATES
+
+Using Mason autohandler we can define what kind of file are 
+automatically interpreted as template
+
+  autohandler
+  ===========
+  <%init>
+    if ($m->request_comp->name =~ /\.htm$/) {
+      $m->print_template(undef,$m->request_comp->path);
+      return;
+    }
+    $m->call_next;
+  </%init>
+
+all files with the extension .htm will be interpreted as template file.
+Of course, so that htm files are processes from autohandler it's necessary
+that they are seen as Mason component. To do this simply add to 
+your httpd.conf 
+
+  <Files ~ "\.htm$" />
+    SetHandler perl-script
+    PerlHandler HTML::Mason::ApacheHandler
+  </Files>
+
+or however in an analogous way to as they have been it sets up .mpl/.mhtm
+files.
+
+With this autohandler, the first example can therefore be rewritten like :
+
+  simple_var.htm
+  ==============
+  <HTML><HEAD></HEAD><BODY>
+    I love %myscript%!
+  </BODY></HTML>
+
+without use of mpl/htt binomial. Obviously, if it is necessary to have 
+greater control about the operation of the page one can be always used 
+the binomial "mpl/htt".
+
+=head2 PAGES IN VARIOUS LANGUAGES
+
+We suppose we have set the parameter "default_language" as "en" 
+(this is however the default value) in handler.pm and, for 
+simplicity, we continue to use, as possible, autohandler above.
+
+  Which_language_I_speak.htm           Which_language_I_speak.it.htm 
+  ==========================           =============================                         
+  <HTML><HEAD></HEAD><BODY>            <HTML><HEAD></HEAD><BODY>
+    I speak %lang%                       Io parlo %lang%         
+  </BODY></HTML>                       </BODY></HTML>        
+  
+  Which_language_I_speak.fr.htm        Which_language_I_speak.es.htm 
+  =============================        =============================
+  <HTML><HEAD></HEAD><BODY>            <HTML><HEAD></HEAD><BODY>
+    Je parle %lang%                      Jo ablo %lang%         
+  </BODY></HTML>                       </BODY></HTML> 
+
+When a browser requests C<Which_language_I_speak.htm> the relative page
+in correct language if you have set the variable "lang" in one of this forms
+
+=over 4 
+
+=item *
+
+defining it explicitly in you URI request through query string or
+POST content as
+
+  http://.../Which_language_I_speak.htm?lang=[en,it,fr,es]
+
+
+=item * 
+
+if in whatever other pages called before this you set the session parameter
+(in L<MasonX::Request::HTMLTemplate::WithApacheSession|MasonX::Request::HTMLTemplate::WithApacheSession> environement):
+
+  $m->session->{lang} = "en"; # or "it" or "fr" or "es"
+
+=item *
+
+if you use a mpl component instead to directly call Which_language_I_speak.htm, 
+by changing them  by substituting "htm" with "htt" and by defining the variable C<lang>
+directly in the component like:
+
+  $m->add_template_args( 'lang' => "en" ); # or "it" or "fr" or "es"
+  $m->print_template;
+
+=back
+
+Of course Which_language_I_speak.htm (or .htt with the component usage) will be
+used if C<lang=en> or C<lang> is not set or C<lang> is set to a value for which
+C<Which_language_I_speack.${lang}.htm> doesn't exist.
+
+=head2 TEXTBOX FORM WITH VALUES PROPAGATED
+
+  form_text.htm
+  =============
+  <html><head></head><body>
+    <form method="POST" action="#">
+      I love <input type="text" name="myscript" value="%myscript%">
+      <input type="submit" value="Test me" name="action">
+    </form>
+  </body></html>
+
+When this page comes sent you can see that next page
+remember the value previously stated in the text field.
+
+Also value comes stated in the text field if you call page with
+query string or POST content like http://.../form_text.htm?myscript=MASON
+
+=head2 COMBO FORM WITH VALUES PROPAGATED
+
+  form_combo.htm
+  ==============
+  <html><head></head><body>
+    <form method="POST" action="#">
+      I love 
+      <select name="myscript">
+      <option %myscript?:selected%></option>
+      <option %myscript=MASON?selected%>MASON</option>
+      <option %myscript=PHP?selected%>PHP</option>
+      <option %myscript=VBScript?selected%>VBScript</option>
+      <input type="submit" value="Test me" name="action">
+    </form>
+  </body></html>
+
+Here it can be seen as it's much simple one to remember the element 
+of the combo selected without to write no line of scripting code but
+using the TMPL_IF C<HTML::Template> syntax given by IF_TERM Extension
+plugin.
+
+Like described in the relative section L<to the method items|"item_items">
+in fact to all the models it comes given, beyond to a reference to 
+the hash of the parameters of form of the type C<$key=>$value> and 
+for every element of this type, also an element C<$key=$value =E<gt> 1>.
+So, if you select "MASON" item the next page will have a template 
+parameter C<myscript=MASON =E<gt> 1> beyond to a parameter
+C<myscript =E<gt> 'MASON'> and so C<%myscript=MASON:selected%> will print 
+C<selected>.
+
+=head2 CHECKBOX FORM WITH VALUES PROPAGATED
+
+  form_checkbox.htm
+  =================
+  <html><head></head><body>
+    <form method="POST" action="#">
+      I love<br>
+      <input type="checkbox" name="myscript" 
+        value="MASON" %myscript=MASON?checked%>MASON<br>
+      <input type="checkbox" name="myscript" 
+        value="PHP" %myscript=PHP?checked%>PHP<br>
+      <input type="checkbox" name="myscript"
+        value="VBScript" %myscript=VBScript?checked%>VBScript<br>
+      <input type="submit" value="Test me" name="action">
+    </form>
+  </body></html>
+
+=head2 RADIO BUTTON FORM WITH VALUES PROPAGATED
+
+  form_radio.htm
+  ==============
+  <html><head></head><body>
+    <form method="POST" action="#">
+      I love<br>
+      <input type="radio" name="myscript" 
+        value="MASON" %myscript=MASON?checked%>MASON<br>
+      <input type="radio" name="myscript" 
+        value="PHP" %myscript=PHP?checked%>PHP<br>
+      <input type="radio" name="myscript"
+        value="VBScript" %myscript=VBScript?checked%>VBScript<br>
+      <input type="submit" value="Test me" name="action">
+    </form>
+  </body></html>
+
+=head1 USAGE
+
+=head2 ACTIVATION
+
+To use this module you need to tell Mason to use this
+class for requests.  This can be done in one of two ways.
+If you are configuring Mason via your httpd.conf file,
+simply add this:
+
+  PerlSetVar  MasonRequestClass  MasonX::Request::HTMLTemplate
+
+If you are using a handler.pl file, simply add this parameter 
+to the parameters given to the ApacheHandler constructor:
+
+  request_class => 'MasonX::Request::HTMLTemplate'
+
+=head2 CONFIGURATION
+
+For every parameter we will give the syntax to configure them
+in httpd.conf file or via handler.pl file as parameters to
+and ApacheHandler contructor.
+
+This module accept two optional parameters:
+
+=over 4
+
+=item * C<template_base_path / MasonTemplateBasePath =E<gt> your_template_path>
+
+It's the path where we automatically find template if not explicitally
+given in C<print_template> or C<filename> methods. Default is undef
+that means null template path.
+
+So if we call a component C</foo/bar/moo.mpl> that calls
+C<print_template> the template must be located in
+C</your_template_path/foo/bar/moo.htt> where root is 
+Mason root component path.
+
+=item * C<default_language / MasonDefaultLanguage =E<gt> lang>
+
+Give the language for which default template will be called. 
+
+If C<default_language  = 'en'> and you call a componente foo.mpl 
+with C<lang = 'fr'> then foo.fr.htt will be search and, if exists,
+returned, else will be used foo.htt. But if you call it with
+C<lang = 'en'> then foo.htt will be used and not foo.en.htt.
+
+=back
+
+=head2 PUBLIC METHODS
+
+=over 4
+
+=item C<add_template_args ( item_1 =E<gt> value_1,..., item_n =E<gt> value_n )>
+
+This method will be make that the list passed as parameter could be used in the
+template in agreement with the syntax of the HTML::Template::Extension module.
+
+=item C<filename ( $template_file_path )>
+
+Set/get the filename path of the tamplate to be used.
+
+=item C<is_absolute (0|1)>
+
+This method set/get a boolean value that set if the template_file_path parameter
+in the print_template and filename method is relative to the root filesystem or is relative
+to the root Mason component path.
+
+=item C<items>
+
+Return a reference of an hash that is a merge of this objects:
+
+=over 4
+
+=item *
+
+all parameters passed from client through GET/POST (C<$m-E<gt>request_args>)
+
+=item *
+
+all parameters present in the session variable
+
+=item *
+
+all parameters set through C<add_template_args> method.
+
+=item *
+
+for each parameter C<$key =E<gt>$value> of the previous items an element of the form
+C<$key=$value" =E<gt> 1> (to be used with TMPL_IF and IF_TERN C<HTML::Template::Extension>
+plugins).
+
+=back
+
+=item C<print_template ( [$args] , [$template_file_path] )>
+
+This method print the output in the template present in the same path as the camponent
+called but with an extention file "htt".
+
+=item C<template_arg ( template_param_name )>
+
+Return the value of the selected template parameter previously added with 
+C<add_template_args> method.
+
+=back
+
+=head2 PUBLIC VARIABLES
+
+No public variables defined
+
+=head1 DIAGNOSTICS
+
+No diagnostics error returned.
+
+=head1 EXPORT
+
+Nothing to export.
+
+=head1 REQUIRES 
+
+HTML::Mason, HTML::Template::Extension, 
+Params::Validate, File::Spec
+
+=head1 SUPPORT
+
+Contact directly the author or submit a bug to
+
+http://rt.cpan.org/NoAuth/Bugs.html?Dist=MasonX-Request-HTMLTemplate
+
+=head1 AUTHOR
+
+Emiliano Bruni, E<lt>info <at> ebruni <dot> itE<gt>
+
+=head1 SEE ALSO
+
+L<HTML::Template::Extension>, L<HTML::Template>
+
+To see some web sites that use this package take a look to http://www.micso.fr/
+and http://www.micso.com/Z<>.
+
+=head1 LICENSE
+
+MasonX::Request::HTMLTemplate - Add templates to the Mason Request object
+
+Copyright (C) 2003 Emiliano Bruni (info <at> ebruni <dot> it)
+
+This module is free software; you can redistribute it and/or modify it
+under the terms of either:
+
+a) the GNU General Public License as published by the Free Software
+Foundation; either version 1, or (at your option) any later version,
+or
+
+b) the "Artistic License" which comes with this module.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
+the GNU General Public License or the Artistic License for more details.
+
+You should have received a copy of the Artistic License with this
+module, in the file ARTISTIC.  If not, I'll be glad to provide one.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+USA
+
+=cut

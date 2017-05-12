@@ -1,0 +1,29 @@
+---
+abstract: 'XML Generation with Mojolicious'
+author:
+  - 'Nils Diewald'
+build_requires:
+  Test::More: '0'
+  Test::Warn: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-XML-Loy
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '5.81'
+  XML::Loy: '0.38'
+  perl: '5.010001'
+resources:
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/Akron/Mojolicious-Plugin-XML-Loy
+version: '0.14'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,37 @@
+---
+abstract: unknown
+author:
+  - 'WATANABE Hiroaki <hwat@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MIME-Expander
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Archive::Tar: '1.82'
+  Class::Data::Inheritable: '0.03'
+  Email::MIME: '1.905'
+  Email::MIME::ContentType: '0'
+  File::MMagic: '1.29'
+  IO::Scalar: '2.110'
+  IO::Uncompress::Bunzip2: '2.048'
+  IO::Uncompress::Gunzip: '2.048'
+  IO::Uncompress::Unzip: '2.048'
+  MIME::Type: '0.12'
+  MIME::Type::FileName: '1.00'
+  Module::Load: '0.22'
+  Module::Pluggable: '0'
+  Scalar::Util: '0'
+  Test::More: '0.32'
+  parent: '0'
+version: '0.02'

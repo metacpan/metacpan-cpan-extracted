@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST (this file)
+MultiCat.pm  (the module)
+README
+gpl.txt (text of the Gnu Public License)
+
+multicat.dat (example file read by the module wnen called by t/1.t)
+top      (example used by multicat.dat)
+bottom   (example used by multicat.dat)
+1.txt    (example used by multicat.dat)
+2.txt    (example used by multicat.dat)
+3.txt    (example used by multicat.dat)
+
+t/1.t    (testing file, called with 'make test'
+          from this directory)
+

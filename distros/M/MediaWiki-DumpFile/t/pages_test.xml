@@ -1,0 +1,69 @@
+<mediawiki xmlns="http://www.mediawiki.org/xml/export-0.3/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mediawiki.org/xml/export-0.3/ http://www.mediawiki.org/xml/export-0.3.xsd" version="0.3" xml:lang="simple">
+
+<siteinfo>
+  <sitename>Sitename Test Value</sitename>
+  <base>Base Test Value</base>
+  <generator>Generator Test Value</generator>
+  <case>Case Test Value</case>
+  <namespaces>
+    <namespace key="-1">Special</namespace>
+    <namespace key="0" />
+    <namespace key="1">Talk</namespace>
+  </namespaces>
+</siteinfo>
+
+<page>
+  <title>Talk:Title Test Value</title>
+  <id>1</id>
+    <revision>
+      <id>47084</id>
+      <timestamp>2005-07-09T18:41:10Z</timestamp>
+      <contributor><username>Username Test Value</username><id>1292</id></contributor>
+      <minor></minor>
+      <text xml:space="preserve">Text Test Value</text>
+    </revision>
+</page>
+
+<page>
+  <title>Title Test Value #2</title>
+  <id>2</id>
+    <revision>
+      <id>47085</id>
+      <timestamp>2005-07-09T18:41:10Z</timestamp>
+      <contributor><username>Username Test Value 2</username><id>1292</id></contributor>
+      <minor/>
+      <comment>Comment Test Value 2</comment>
+      <text xml:space="preserve">#redirect : [[fooooo]]</text>
+    </revision>
+    <revision>
+      <id>12345</id>
+      <timestamp>2006-07-09T18:41:10Z</timestamp>
+      <contributor><username>Username Test Value 3</username><id>1211</id></contributor>
+      <comment>Comment Test Value 3</comment>
+      <text xml:space="preserve">more test data</text>
+    </revision>
+</page>
+
+<page>
+  <title>Title Test Value #3</title>
+  <id>3</id>
+    <revision>
+      <id>47086</id>
+      <timestamp>2007-07-09T18:41:10Z</timestamp>
+      <contributor><username>Username Test Value</username><id>1292</id></contributor>
+      <minor/>
+      <comment>Comment Test Value</comment>
+      <text xml:space="preserve">#redirect [[fooooo]]</text>
+    </revision>
+    <revision>
+      <id>57086</id>
+      <timestamp>2008-07-09T18:41:10Z</timestamp>
+      <contributor>
+      	<ip>194.187.135.27</ip></contributor>
+      <minor/>
+      <comment>Second Comment Test Value</comment>
+      <text xml:space="preserve">Expecting this data</text>
+    </revision>
+</page>
+
+</mediawiki>

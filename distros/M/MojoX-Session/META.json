@@ -1,0 +1,108 @@
+{
+   "abstract" : "Session management for Mojo",
+   "author" : [
+      "Viacheslav Tykhanovskyi, C<vti@cpan.org>."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MojoX-Session",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "MIME::Base64" : "0",
+            "Mojolicious" : "5.78",
+            "Storable" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MojoX::Session" : {
+         "file" : "lib/MojoX/Session.pm",
+         "version" : "0.33"
+      },
+      "MojoX::Session::Store" : {
+         "file" : "lib/MojoX/Session/Store.pm"
+      },
+      "MojoX::Session::Store::AsyncOrm" : {
+         "file" : "lib/MojoX/Session/Store/AsyncOrm.pm"
+      },
+      "MojoX::Session::Store::Couchdb" : {
+         "file" : "lib/MojoX/Session/Store/Couchdb.pm"
+      },
+      "MojoX::Session::Store::Dbi" : {
+         "file" : "lib/MojoX/Session/Store/Dbi.pm"
+      },
+      "MojoX::Session::Store::Dbic" : {
+         "file" : "lib/MojoX/Session/Store/Dbic.pm"
+      },
+      "MojoX::Session::Transport" : {
+         "file" : "lib/MojoX/Session/Transport.pm"
+      },
+      "MojoX::Session::Transport::Cookie" : {
+         "file" : "lib/MojoX/Session/Transport/Cookie.pm"
+      },
+      "Mojolicious::Plugin::Session" : {
+         "file" : "lib/Mojolicious/Plugin/Session.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vti/mojox-session/issues"
+      },
+      "homepage" : "https://github.com/vti/mojox-session",
+      "repository" : {
+         "url" : "git://github.com/vti/mojox-session.git",
+         "web" : "https://github.com/vti/mojox-session"
+      }
+   },
+   "version" : "0.33",
+   "x_contributors" : [
+      "David Davis <xantus@xantus.org>",
+      "und3f <d3fin3@gmail.com>",
+      "vti <vti@evologics.de>",
+      "Daniel Mascarenhas <daniel.mts@gmail.com>",
+      "Yaroslav Korshak <ykorshak@gmail.com>",
+      "Tom Kistner <tom@kistner.nu>",
+      "Alex Hutton <highspeeddub@gmail.com>",
+      "Alex Hutton <ahutton@infoxchange.net.au>",
+      "Sergey Homenkow <sergey@homenkow.ru>",
+      "Jeen Lee <aiatejin@gmail.com>",
+      "Viacheslav Tykhanovskyi <viacheslav.t@gmail.com>"
+   ]
+}

@@ -1,0 +1,23 @@
+<p>
+    <table class="data" align="center">
+        [% IF statustext %]
+            <tr>
+                <td>&nbsp;</td>
+            </tr>
+            <tr class="tabheader">
+                <th>
+                    <div class="infotext">[% tr.tr("Status") %]</div>
+                </th>
+            </tr>
+            <tr class="odd">
+                <th>
+                    <div class="errortext">[% tr.tr(statustext) %]</div>
+                </th>
+            </tr>
+        [% END %]
+        <tr>
+            <td>[% tr.tr("The requested URL can not be accessed with your user privileges!") %]<br>
+                [% tr.tr("Maybe your access right have changed, you used a stored link or something weird just happened.") %]</td>
+        </tr>
+    </table>
+</p>

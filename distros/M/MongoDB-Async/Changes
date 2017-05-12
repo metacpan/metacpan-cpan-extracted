@@ -1,0 +1,267 @@
+
+0.702.3
+	Fixed memory leak in cursor when doing queries, thanks Michael Fung for bugreport.
+
+0.702.2
+	Integrated new features from 0.702.2 MongoDB driver release
+
+0.46
+
+  [Enhancements]
+
+  - Added SSL support (Casey Rojas). See new documentation on
+    MongoDB::Connection's ssl attribute.
+
+  - Added MongoDB::BSON::Binary type and MongoDB::BSON::use_binary option. See
+    the Data Types documentation on using the Binary type instead of string refs
+    for binary data.
+
+  - Change default binary type from 2 to 0.  See MongoDB::BSON::Binary for
+    more information about the implications of this change.
+
+  [Bug Fixes]
+
+  - Fix auth connection issues (Olly Stephens)
+
+  - Fix driver creating duplicate connections when port isn't specified (Olly
+    Stephens)
+
+  - Fix authentication check on some versions of Perl (Olly Stephens)
+
+0.45 - September 7, 2011
+
+  This is a recommended upgrade.  There are no backwards-breaking changes, only
+  bug fixes and enhancements.
+
+  [Enhancements]
+
+  - Perl 5.8.4 and higher is now officially supported (5.8.7 was the previous
+    minimum version).
+
+  - Improved the way that connecting handles an interrupt signal.  The driver
+    now continues to attempt connection for the remaining duration of the
+    timeout, instead of erroring out immediately.
+
+  [Bug Fixes]
+
+  - Fixed MaxKey and MinKey deserialization. Deserializing these types would seg
+    fault if they hadn't been serialized previously.
+
+  - Fixed Windows compilation (Taro Nishino)
+
+  - Fixed MakeMaker arguments which were causing build problems on 5.14.
+
+0.44 - July 26, 2011
+
+  This is a recommended upgrade.  There are no backwards-breaking changes, only
+  bug-fixes and enhancements.
+
+  [Enhancements]
+
+  - Added MongoDB::BSON::looks_like_number flag.
+
+    The Perl driver has always been coy about turning strings into numbers.  If
+    you would like aggressive number parsing (if it looks like a number, send it
+    to the DB as a number), you can set MongoDB::BSON::looks_like_number to 1
+    (defaults to 0, the previous behavior).  See the MongoDB::DataTypes pod for
+    more info.
+
+  - Tests should now clean up after themselves, leaving no test databases
+    behind.
+
+  [Bug Fixes]
+
+  - Setting a sort in the arguments to MongoDB::Collection::find is now passed
+    through correctly to the cursor.
+
+  - Fixed segmentation fault in array serialization: caused by specifying an _id
+    field on insert and using an array (not a hash or Tie::IxHash).
+
+  - Fixed segmentation fault in threading: if Mouse was used instead of Moose,
+    version 0.43 of the driver would segfault if multiple threads were used.
+
+  - MongoDB::Cursor now inherits the $Mongo::Cursor::slave_okay global setting,
+    as well as checking if slave_okay is set on the cursor instance.
+
+  - Fix GridFS functions to only ensure GridFS indexes on writes, allowing
+    GridFS API usage on slaves.
+
+0.43 - May 31, 2011
+
+  This is a recommended upgrade.  There are no backwards-breaking changes, only
+  bug-fixes and enhancements.
+
+  [Enhancements]
+
+  - Auto-detects max BSON size for inserts, which means documents larger than
+    4MB can now be inserted.  See L<MongoDB::Connection/max_bson_size> for
+    details.
+
+  - Added the L<MongoDB::Cursor/info> method, which returns meta information
+    about the results being returned.
+
+  [Bug Fixes]
+
+  - When high UTF-8 values as hash keys, the driver now croaks instead of
+    segfaulting.
+
+  - Added 'use IO::File' before IO::File is used (Michael Langner)
+
+  - Fixed Perl 5.14 compile (Chip Salzenberg)
+
+0.42
+
+  - Fixes for Sparc architecture
+  - Fixed PVIV misinterpretations
+
+0.41
+
+  - Re-discover master on "not master" errors
+  - Make driver thread safe (Florian Ragwitz)
+  - POD fix (Ronald Kimball)
+  - Fix GridFS warning (Graham Barr)
+  - Allow auto_connect => 0 for replica sets (Graham Barr)
+
+0.40
+
+  - DateTime floating timezones now warn on serialization
+  - Attempting to serialize unrecognized object types now croaks
+  - MongoDB::Cursor::explain now resets cursor properly
+  - Added BSON::encode_bson and BSON::decode_bson (Jason Toffaletti)
+  - Safe writes return a hash of information instead of 1 (on success)
+  - Improved last_error/safe docs
+  - Fixed doc spelling errors (Stefan Hornburg)
+
+0.39
+
+  - Fixed memory leak
+
+0.38
+
+  - Fixed indexing subdocuments (x.y.z)
+  - Fixed GridFS to accept non-fs prefixes (Olly Stephens)
+  - Fixed compile for old C compilers (Taro Nishino)
+  - Added MongoDB::read_documents for handling db replies (Graham Barr)
+
+0.37
+
+  - Fixed cursor not found error condition
+  - Fixed compile for old C compilers
+  - Fixed weird file behavoir on some machines
+
+0.36
+
+  - Replica set support
+  - Deserialize booleans as booleans (instead of ints) (Andrew Page)
+  - Fixed OS X build (Todd Caine)
+  - Added background option for index creation (Graham Barr)
+  - Fixed slurp tests (Josh Rabinowitz)
+  - Added MongoDB::Timestamp type
+
+0.35 - 02 July 2010
+
+  - Added MongoDB::BSON::utf8_flag_on (Pan Fan)
+  - Added MongoDB::GridFS::File::slurp (Pan Fan)
+  - Fixed memory leak
+
+0.34 - 17 June 2010
+
+  - $conn->foo->bar->baz now gets the bar.baz collection in the foo database
+  - Slight speed improvements on inserts
+  - Added $conn->query_timeout option to control timeout lengths for all queries
+    done over a given connection
+  - MongoDB::Cursor::tailable and MongoDB::Cursor::immortal
+  - added TO_JSON function to MongoDB::OID
+  - Fixed safe save (Othello Maurer)
+  - BACKWARD-BREAKING: removed old indexing syntax (if you started using the
+    driver less than a year ago, this shouldn't affect you.  If you're an old-
+    timer, make sure you're not using the syntax that has been deprecated for a
+    year).
+
+0.33 26 April 2010
+
+  - Fixed tests
+
+0.32 21 April 2010
+
+  - BACKWARD COMPATIBILITY BREAK: croak on failed safe
+    update/insert/remove/ensure_index (Eric Wilhelm)
+  - w and wtimeout (see MongoDB::Connection::w)
+  - die correctly on MongoCollection::count errors (help from Josh Rabinowitz)
+  - added MongoDB::Collection::find (same as query)
+  - added get, put, and delete methods to MongoDB::GridFS
+  - Perl 5.12 compatibility
+
+0.31 05 April 2010
+
+  - C89 fix (Taro Nishino)
+  - Added MongoDB::Code type
+  - Use connection format: mongodb://host1,host2:port2,host3...
+  - Arbitrary number of hosts supported
+  - Auto-reauthentication on dropped connection
+  - ensure_index name option
+
+0.30 10 March 2010
+
+  - Support BigInt
+  - On 64-bit machines, support 64-bit nums w/out BigInt (Ryan Olson)
+  - Added connection timeout option (Othello Maurer)
+  - Added clarifying docs on fields (Josh Rabinowitz)
+
+0.29 01 March 2010
+
+  - Added safe options for remove, update, and ensure_index
+  - Added save method
+  - Fixed bug in UTF8 checking
+  - Fixed serialization of "tie %hash, 'Tie:IxHash'"
+
+0.28 28 Jan 2010
+
+  - Fixed undef values (Andrew Bryan)
+  - Added GridFS multi-chunk test using File::Temp (Josh Rabinowitz)
+  - Allow tie(%h, 'Tie::IxHash') to be used as well as Tie::IxHash->new
+  - Fixed GridFS indexes and added chunkSize and uploadDate to metadata
+  - Fixed batch_insert doc (Eric Wilhelm)
+  - Fixed big endian build
+
+0.27 22 Dec 2009
+
+  - Indexes: Improved ensure_index syntax, added drop_dups option
+  - Inserts: Added safe insert, checks object is < 4 MB before inserting
+  - Fixed socket closing bug
+  - Big-endian support
+  - $ can be replaced by any character using MongoDB::BSON::char
+  - MongoDB::OIDs: Fixed undefined behavior in serialization (Peter Edwards), added OID::get_time
+  - 5.8.7-compatible memory allocation (Peter Edwards)
+  - Added MongoDB::MaxKey and MongoDB::MinKey support
+
+0.26  09 Nov 2009
+
+  - Don't force i386 arch (Needed to compile on OS X with x86_64) (Graham Barr)
+  - Include inc/ dir for CPAN
+  - Memory leak fixes
+  - Added tutorial
+
+0.24  15 Oct 2009
+
+  - Fix for uninitialized array values (David Morrison)
+  - boolean support
+  - Connection memory leak fix
+  - added MongoDB::Cursor::count
+
+0.23  25 Sept 2009
+
+  Changes in this version by Ask Bjørn Hansen, Florian Ragwitz,
+  Orlando Vazquez, Kristina Chodorow, and Eric Wilhelm:
+
+  - Make inserting double's (floats/NV's), undefined/null, Tie::IxHash values
+  - Query sorting, snapshot, explain, and hint
+  - Added non-unique ensure_index
+  - Added GridFS
+  - Added regex support
+  - find_one takes optional fields parameter
+  - DateTime used for dates
+  - No C++ driver dependency
+
+0.01  06 May 2009
+  - Initial release.

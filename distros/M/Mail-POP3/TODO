@@ -1,0 +1,17 @@
+Tidy mailbox object creation to just 1 sub in conf
+Mailbox-making should die if fails, give text to user
+
+Make Folder->retrieve and ->top just return the text, not print it to fh
+
+Fix Received: headers in ::jobserve so OE doesn't show incorrect time
+
+Sort Mail::POP3::Daemon and SIGUSR1 vs re-reading config. Do in
+    surrounding script, or pass 'config_file' in config hash?
+    Have Daemon->start return a value that means pass in new config?
+
+Make README give accurate install process
+
+Rationalise installscript, mpopdctl, mpopdstats
+
+Document main classes, inc Mail::POP3::Server::load_class
+

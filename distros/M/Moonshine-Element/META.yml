@@ -1,0 +1,37 @@
+---
+abstract: 'Build some more html.'
+author:
+  - 'Robert Acock <thisusedtobeanemail@gmail.com>'
+build_requires:
+  Moonshine::Test: '0.14'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Moonshine-Element
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Moonshine::Element:
+    file: lib/Moonshine/Element.pm
+    version: '0.11'
+requires:
+  Autoload::AUTOCAN: '0.004'
+  Data::GUID: '0.048'
+  Ref::Util: '0.113'
+  UNIVERSAL::Object: '0.06'
+  feature: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/ThisUsedToBeAnEmail/Moonshine-Element.git
+version: '0.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,7 @@
+Changes for Perl extension Module-Build-PerlTar
+
+1.001 Mon 26 Jul 2010
+	- Use new key of ptar to not have world-writable files (CHORNY)
+
+1.000 Fri 29 Jan 2010
+	- Initial version.

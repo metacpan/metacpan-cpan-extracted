@@ -1,0 +1,72 @@
+
+<h2><% $request->action eq 'do_search' ? 'Search results: ' : '' %><% ucfirst( $request->model_class->plural_moniker ) %></h2>
+
+% my $listview = sprintf '.%sview', $request->listviewmode; # .listview or .editlistview
+
+<& .switch   &>
+<& pager     &>
+<& $listview &>
+<& addnew    &>
+<& search    &>
+    
+% #
+% # The columns and fields rendered in .listview     are set here (list_columns + list_fields).
+% # The columns and fields rendered in .editlistview are set in setup_form_mode, editlist mode
+% #        (list_columns + list_fields in the default model MP::FB::Model).
+% #
+
+% # -------------------------------------
+<%def .listview>
+<%perl>
+    my $callback = sub 
+    {
+        my ( $object ) = @_;
+        
+        return  $request->as_form( 'edit_button',   entity => $object )->render,
+                $request->as_form( 'delete_button', entity => $object )->render;
+    };
+
+    my @data = $request->tabulate( with_colnames => 1, 
+                                   callback      => $callback, 
+                                   fields        => [ $request->model_class->list_columns, 
+                                                      $request->model_class->list_fields
+                                                      ],
+                                   );
+    
+    # 2 extra columns in the header row to accommodate the edit/delete buttons
+    push @{ $data[0] }, ( '', '' );
+</%perl>
+% # quick_table will populate the table with list_columns by default
+<div class="NavListTable"><% $request->quick_table( labels => 'T' )->render( @data ) %></div>
+</%def>
+
+% # -------------------------------------
+<%def .editlistview>
+% my @forms = $request->as_forms( 'editlist' );
+% my %names = $request->model_class->column_names;
+<div class="FormListTable">
+<table border="0">
+<tr>
+% my $dummy_form = $forms[0] || $request->model_class->as_form( mode => 'editlist' );
+% foreach my $field ( grep { $_->type ne 'hidden' } $dummy_form->fields ) {
+<th><% $names{ $field } || ucfirst( $field ) %></th>
+% }
+<th colspan="5">Actions</th>
+</tr>
+% foreach my $form ( @forms ) {
+<% $request->render_form_as_row( $form ) %>
+% }
+</table>
+</div>
+</%def>
+
+% # -------------------------------------
+<%def .switch>
+% my $other = $request->listviewmode eq 'editlist' ? 'navigable' : 'editable';
+<p class="subheading">
+<% $request->link( table  => $request->model_class->table,
+                   action => 'switchlistmode',
+                   label  => "Switch to $other list view",
+                   ) %>
+</p>
+</%def>

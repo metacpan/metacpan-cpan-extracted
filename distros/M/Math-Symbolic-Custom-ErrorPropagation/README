@@ -1,0 +1,43 @@
+Math::Symbolic::Custom::ErrorPropagation version 0.10
+=====================================================
+
+This module extends the functionality of Math::Symbolic by offering
+facilities to calculate Gaussian Error Propagation using the well
+known formula:
+
+variance(f(x,y,...)) = sqrt( variance(x)^2 * (df/dx)^2 + ... )
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More (version 0.44 and up)
+  Math::Symbolic (version 0.132 and up)
+
+SEE ALSO
+
+Current versions of this module may be found on http://steffen-mueller.net or
+CPAN.
+
+Please send feedback, bug reports, and support requests to one of the
+contributors or the Math::Symbolic mailing list.
+
+List of contributors:
+
+  Steffen Müller, symbolic-module at steffen-mueller dot net
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Steffen Mueller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

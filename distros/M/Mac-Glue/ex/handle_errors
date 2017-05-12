@@ -1,0 +1,34 @@
+#!perl -w
+use strict;
+use Mac::Glue;
+
+my $finder = new Mac::Glue 'Finder';
+
+$finder->ERRORS( sub { die "We got some error ($_[0]->{errn}): $_[0]->{errs}\n\n" } );
+
+print <<EOT;
+# We should get two errors here.  If we don't, something went wrong.
+# Like, you probably have really weird filenames or something.
+
+EOT
+
+
+$finder->open(
+	$finder->obj( item => 'kjashdkasdhakjshdasdjkhasd-1' ),
+	# override main handler
+	ERRORS => \&error_handler
+);
+
+# revert back to main handler
+$finder->open(
+	$finder->obj( item => 'kjashdkasdhakjshdasdjkhasd-2' ),
+);
+
+sub error_handler {
+	my($err, @args) = @_;
+	my $args = join ', ', @args;
+	warn "$err->{glue}\->$err->{event}($args) event failed ($err->{errn}):\n".
+	     "$err->{errs}\n\n";
+}
+
+__END__

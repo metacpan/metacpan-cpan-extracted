@@ -1,0 +1,1066 @@
+
+=head1 NAME
+
+Math::decNumber - Arbitrary-precision decimal arithmetic using the decNumber library.
+
+=head1 SYNOPSIS
+
+  use strict;
+  use warnings;
+  use Math::decNumber 'd_';
+
+  my $a = 0;                  # $a binary
+  $a += 0.1 for (1..1000);
+  print "$a\n";               # print 99.9999999999986
+
+  $a = d_(0);                 # $a decimal
+  $a += 0.1 for (1..1000);
+  print "$a\n";               # print 100.0
+
+=head1 DESCRIPTION
+
+The Math::decNumber module is a Perl interface to the decNumber C library.
+This library allows us to do arithmetic calculations in decimal and not in
+binary as usual. The decimal arithmetic is preferred for business and
+financial applications. This library complies with the IEEE 754 Standard
+for Floating Point Arithmetic.
+
+=head2 Numbers
+
+The floating-point data used by this module are
+
+=over
+
+=item *
+
+the I<normal> floating-point decimal numbers of the form C<sM*10**e> where
+C<s> is the sign (+ or -), C<M> (the I<significand> or I<mantissa>) is a
+positive number with a maximum of C<ndigits> decimal digits and C<e> (the
+I<exponent>) an integer such that  C<emin <= e <= emax>.
+
+The default values are C<ndigits = 34>, C<emin = -6143> and C<emax = 6144>.
+
+The smallest positive normal floating-point number is C<1*10**emin>. The non-
+zero floating-point numbers with magnitude less than C<1*10**emin> are called
+I<subnormal> (or I<denormalized>).
+The subnormal numbers don't have the full precision of the normal numbers
+but they permit underflow to be gradual (no gap between C<0> and C<1*10**emin>).
+
+There are two zeros C<+0> and C<-0>. This two zeros are distinguishable
+arithmetically only by either division-by-zero ( producing appropriately signed
+infinities ) or else by the C<CopySign> function.
+
+=item *
+
+the two infinities, C<+Infinity> (or C<Infinity> or C<+Inf>) and
+C<-Infinity> (or C<-Inf>).
+
+=item *
+
+Two NaNs, C<NaN> (quiet NaN) and C<sNaN> (signaling NaN).
+NaN means "Not a Number" or more precisely "Not any Number". NaN must not be
+confused with undefined.
+
+For every infinite or finite number C<$x>, the predicate C<$x == $x> is I<true>
+and the predicate C<$x != $x> is I<false>. But, for NaNs C<NaN == NaN> is
+I<false> and C<NaN != NaN> is I<true>.
+
+Most operations propagate quiet NaNs without signaling exceptions, and signal
+the invalid operation exception when given a signaling NaN operand.
+
+=back
+
+A simple exemple:
+
+  #!/usr/bin/perl
+  use strict;
+  use warnings;
+  use v5.10;
+  use Math::decNumber ':all';
+
+  say "1/0 = ", 1/d_(0);                    # 1/0 = Infinity
+  say "1/-0 = ", 1/-d_(0);                  # 1/-0 = -Infinity
+  say "1/Inf = ", 1/d_('Inf');              # 1/Inf = 0E-6176
+  say "Inf + 3 = ", d_('Inf')+3;            # Inf + 3 = Infinity
+  say "Inf - Inf = ", d_('Inf')-d_('Inf');  # Inf - Inf = NaN
+  say "sqrt(-1) = ", sqrt(d_ -1);           # sqrt(-1) = NaN
+
+  say d_('NaN') == d_('NaN')?'true':'false';  # false
+  say d_('NaN') != d_('NaN')?'true':'false';  # true
+
+=head2 Context
+
+=head3 Parameters
+
+The context parameters determine how the calculations are done and the results
+produced.
+
+=over
+
+=item * $old_ndigits = ContextPrecision( [ndigits] )
+
+Get/Set the number C<ndigits> of decimal digits used for the calculations (or the
+number of digits to that a result is rounded).
+
+  use Math::decNumber qw( ContextPrecision d_ );
+
+  my $save = ContextPrecision(100);   # change precision and save old value
+  my $r = sqrt d_(2);                 # do calculation
+  print "$r\n";
+  ContextPrecision($save);            # restore old precision
+
+=item * $old_rounding_mode = ContextRounding( [rounding_mode] )
+
+Get/Set the rounding algorithm to be used if rounding is necessary during an operation.
+The rounding modes available are:
+
+  ROUND_CEILING     Round towards +Infinity.
+  ROUND_DOWN        Round towards 0 (truncation).
+  ROUND_FLOOR       Round towards -Infinity.
+  ROUND_HALF_DOWN   Round to nearest; if equidistant, round down.
+  ROUND_HALF_EVEN   Round to nearest; if equidistant, round so that the final digit is even.
+  ROUND_HALF_UP     Round to nearest; if equidistant, round up.
+  ROUND_UP          Round away from 0.
+  ROUND_05UP        The same as DEC_ROUND_UP, except that rounding up only
+                    occurs if the digit to be rounded up is 0 or 5 and after
+                    Overflow the result is the same as for DEC_ROUND_DOWN.
+
+Example:
+
+  use Math::decNumber qw( :all );
+
+  ContextPrecision(6);
+  ContextRounding(ROUND_FLOOR);
+  my $a = d_('12345.6789');
+  print "$a\n";             # print 12345.6
+
+=item * $old_max_exponent = ContextMaxExponent( [exponent] )
+
+Get/Set the magnitude of the largest adjusted exponent C<emax> that is permitted
+(a value in the range 0 through 999,999,999).
+
+If the adjusted exponent for a result or conversion would be larger
+than C<emax> then an overflow results.
+
+=item * $old_min_exponent = ContextMinExponent( [exponent] )
+
+Get/Set the smallest adjusted exponent C<emin> that is permitted for normal numbers
+(a value in the range -999,999,999 through 0). C<emin> is usually set to
+C<-emax> or to C<-(emax-1)>.
+
+If the adjusted exponent for a result or conversion would be smaller than emin
+then the result is subnormal. If the result is also inexact, an underflow results.
+
+=item * $old_clamp_mode = ContextClamp( [0 | 1] )
+
+The clamp field controls explicit exponent clamping, as is applied when a result
+is encoded in one of the compressed formats. When 0, a result exponent is limited
+to a maximum of C<emax> and a minimum of C<emin> (for example, the exponent of a zero
+result will be clamped to be in this range). When 1, a result exponent has the
+same minimum but is limited to a maximum of C<emax-(ndigits-1)>.
+As well as clamping zeros, this may cause the coefficient of a result to be padded
+with zeros on the right in order to bring the exponent within range.
+
+=item * $old_traps_mode = ContextTraps( [traps_mode] )
+
+The traps field is used to indicate which of the exceptional conditions should
+cause a trap.
+See L</"Exception handling">.
+
+=item * $old_mode = ContextExtended( [0 | 1] )
+
+The extended field controls the level of arithmetic supported.
+When 1, special values are possible, some extra checking required for IEEE 754
+conformance is enabled, and subnormal numbers can result from operations.
+
+By default, the module is compiled with the DECSUBSET tuning parameter set to 0
+(for speed improvement) so the function does nothing and always returns 1.
+I<The Context is always extended>.
+
+This function is useful only if the module is compiled with DECSUBSET set
+to 1 in Makefile.PL.
+
+=back
+
+
+=head3 Status
+
+To each exceptional condition that may arise during operations corresponds a
+status flag in the context. The constant names of this status flags are:
+
+    DEC_Conversion_syntax         DEC_Division_by_zero
+    DEC_Division_impossible       DEC_Division_undefined
+    DEC_Insufficient_storage      DEC_Inexact
+    DEC_Invalid_context           DEC_Invalid_operation
+    DEC_Lost_digits               DEC_Overflow
+    DEC_Clamped                   DEC_Rounded
+    DEC_Subnormal                 DEC_Underflow
+
+When a condition occurs, the corresponding flag in the context takes the
+value 1 (and remains set until cleared) and a exception is raised if the
+corresponding trap is enabled (see L</"Exception handling">).
+
+For convenience, the flags are grouped in
+
+- flags which cause a result to become qNaN
+
+  DEC_NaNs = ( DEC_Conversion_syntax  | DEC_Division_impossible |
+               DEC_Division_undefined | DEC_Insufficient_storage |
+               DEC_Invalid_context    | DEC_Invalid_operation )
+
+- flags which are normally errors (result is qNaN, infinite, or 0)
+
+  DEC_Errors = ( DEC_Division_by_zero | DEC_NaNs |
+                 DEC_Overflow | DEC_Underflow )
+
+- flags which are normally for information only (finite results)
+
+  DEC_Information  = ( DEC_Clamped | DEC_Rounded |
+                       DEC_Inexact | DEC_Lost_digits )
+
+=over
+
+=item * ContextClearStatus( $status )
+
+This function resets one or more status flags in the status field.
+
+  ContextClearStatus( DEC_Subnormal | DEC_Underflow ) # reset the 2 specified bits
+
+=item * $status = ContextGetStatus( )
+
+This function returns the current status field of the context.
+
+=item * $string = ContextStatusToString( )
+
+=item * @strings = ContextStatusToString( )
+
+In scalar context, this function returns a string describing a status bit.
+If no bits are set in the status field, the string "No status" is returned.
+If more than one bit is set, the string "Multiple status" is returned.
+
+In list context, the function returns a list of strings describing each status
+bit set.
+
+=item * ContextSetStatus( $status )
+
+This function is used to set one or more status bits in the status field of
+the context.
+
+If any of the bits being set have the corresponding bit set in the traps
+field, a trap is raised (regardless of whether the bit is already set in the
+status field). Only one trap is raised even if more than one bit is being set.
+
+Normally, only library modules use this function. Applications may clear
+status bits but should not set them (except, perhaps, for testing).
+
+=item * ContextSetStatusQuiet( status )
+
+This function is identical to C<ContextSetStatus> except that the context
+traps field is ignored (i.e., no trap is raised).
+
+=item * ContextSetStatusFromString( $string )
+
+This function is used to set a status bit in the status field of the context,
+using the name of the bit as returned by the C<ContextStatusToString> function.
+
+If the bit being set has the corresponding bit set in the traps field, a trap
+is raised (regardless of whether the bit is already set in the status field).
+
+=item * ContextSetStatusFromStringQuiet( $string )
+
+This function is identical to C<ContextSetStatusFromString> except that the
+context traps field is ignored (i.e., no trap is raised).
+
+=item * $result = ContextSaveStatus( $mask )
+
+This function is used to save one or more status bits from the status
+field of the context. Returns the integer which is the logical And of the
+context status field and the C<$mask>.
+
+=item * $result = ContextTestStatus( $mask )
+
+This function is used to test one or more status bits in a context.
+Returns the integer which is the logical And of the context status
+field and C<$mask>.
+
+=item * $result = ContextTestSavedStatus( $status, $mask )
+
+This function is used to test one or more status bits in a saved C<$status> field.
+Returns the integer which is the logical And of C<$status> and C<$mask>.
+
+=item * ContextRestoreStatus( $status, $mask )
+
+This function restores one or more status bits in the status field
+of the context from a saved C<$status> field.
+
+Note that setting a bit using this function does not cause a trap
+contrary to the function C<ContextSetStatus>.
+
+=item * ContextZeroStatus( )
+
+This function clears (set to zero) all the status bits in the status field
+of the context.
+
+=back
+
+=head2 Functions
+
+=head3 Conversion functions
+
+=over
+
+=item * $number = FromString( $string )
+
+Converts a character string in a decNumber.
+The conversion is exact provided that the numeric string has no more
+significant digits than C<ndigits> and the adjusted exponent is in the
+range [C<emin>, C<emax>].
+
+If C<$string> can not be interpreted as number, the function returns
+C<NaN> (Not a Number).
+
+  use v5.10;
+  use Math::decNumber 'FromString';
+
+  say FromString('12345.67');     # print 12345.67
+  say FromString('12345.67e-2');  # print 123.4567
+  say FromString(' 12345.67');    # print NaN
+
+=item * @numbers = d_( $string [, $string2, ...] )
+
+With a single argument, C<d_($string)> converts the string as the
+function C<FromString> but removes any leading or trailing spaces.
+With several arguments it returns the list of conversion of its arguments.
+
+  use Math::decNumber 'd_';
+
+  my ($x, $y, $z) = d_ '-123.45', "  23456e-3", -345.67;
+
+  print "$x : $y : $z\n";   # print -123.45 : 23.456 : -345.67
+
+
+=item * $string = ToString( $number )
+
+Converts C<$number> to a character string, using scientific notation
+if an exponent is needed (that is, there will be just one digit
+before any decimal point). This function is used for the
+stringification of a decNumber.
+
+  use v5.10;
+  use Math::decNumber qw(d_ ToString);
+
+  my $x = d_ '1234.5e+15';
+  say $x;             # print 1.2345E+18
+  say ToString($x);   # idem
+
+=item * $string = ToEngString( $number )
+
+Converts C<$number> to a character string, using engineering notation
+(where the exponent will be a multiple of three, and there may be up
+to three digits before any decimal point) if an exponent is needed.
+
+  use v5.10;
+  use Math::decNumber qw(d_ ToEngString);
+
+  my $x = d_ '1234.5e+14';
+  say $x;                 # print 1.2345E+17
+  say ToEngString($x);    # print 123.45E+15
+
+=back
+
+
+=head3 Arithmetic functions
+
+=over
+
+=item * $number = Abs( $a )
+
+Returns the absolute value of C<$a>. The C<abs> Perl function is overload
+by C<Abs>, so C<abs($a) := Abs($a)>.
+
+=item * $number = Add( $a, $b )
+
+Returns the sum of C<$a> and C<$b>. The C<+> operator is overload by
+this function, so C<$a + $b := Add($a, $b)>.
+
+=item * $number = Divide( $a, $b )
+
+Returns C<$a> divided by C<$b>. The C</> operator is overload by
+this function, so C<$a / $b := Divide($a, $b)>.
+
+=item * $number = DivideInteger( $a, $b )
+
+Returns the integer part of the result of dividing C<$a> by the C<$b>.
+
+=item * $number = Exp( $a )
+
+Exponential function: returns C<e> to the power of C<$a>.
+The C<exp> Perl function is overload by C<Exp>, so C<exp($a) := Exp($a)>.
+
+=item * $number = FMA( $a, $b, $c )
+
+The FusedMultiplyAdd function: returns C<$a * $b + $c> but the intermediate
+result C<$a * $b> is not rounded and will not cause overflow or underflow.
+Only the final result is rounded and checked.
+
+Example:
+
+  use v5.10;
+  use Math::decNumber qw( ContextPrecision d_ FMA );
+
+  ContextPrecision(16);
+
+  my $a = d_ '-246913578024696';
+  my $b = d_ '+4.9999999999999';
+  my $c = d_ '+1234567890123456';
+
+  say $a * $b + $c;       # print 1
+  say FMA($a, $b, $c);    # print 0.6913578024696
+
+With C<ContextPrecision(30)> the two results are equal to C<0.6913578024696>.
+
+This function allows, in general, more accurate dot product, matrix
+multiplications, polynomial evaluations (Horner scheme) ...etc.
+
+=item * $number = Ln( $a )
+
+Returns the natural logarithm (logarithm in base C<e>) of C<$a>.
+
+Finite results will always be full precision and inexact, except when C<$a>
+is equal to C<1>, which gives an exact result of C<0>. Inexact results will
+almost always be correctly rounded, but may be up to 1 ulp
+(unit in last place) in error in rare cases.
+
+The C<log> Perl function is overload by C<Ln>, so C<log($a) := Ln($a)>.
+
+=item * $number = Log10( $a )
+
+Returns the logarithm in base ten of C<$a>, rounded if necessary using the
+digits setting in the context and using the round-half-even rounding
+algorithm. C<$a> must be positive or a zero.
+
+Finite results will always be full precision and inexact, except when
+C<$a> is equal to an integral power of ten, in which case the result is
+the exact integer.
+Inexact results will almost always be correctly rounded, but may be up
+to 1 ulp (unit in last place) in error in rare cases.
+
+=item * $number = Max( $a, $b )
+
+This function compares C<$a> and C<$b> numerically and returns the larger.
+
+Unusually, if one operand is a quiet C<NaN> and the other a number, then
+the number is returned.
+
+=item * $number = MaxMag( $a, $b )
+
+This function compares the magnitude of C<$a> and C<$b> numerically and
+returns the larger. It is identical to C<Max> except that the signs of
+the operands are ignored.
+
+=item * $number = Min( $a, $b )
+
+This function compares C<$a> and C<$b> numerically and returns the smaller.
+
+Unusually, if one operand is a quiet C<NaN> and the other a number, then
+the number is returned.
+
+=item * $number = MinMag  ( $a, $b )
+
+This function compares the magnitude of C<$a> and C<$b> numerically and
+returns the smaller. It is identical to C<Min> except that the signs of
+the operands are ignored.
+
+=item * $number = Minus( $a )
+
+Returns the result of subtracting C<$a> from C<0>. That is, it is negated,
+following the usual arithmetic rules: C<Minus( $a ) := -$a>.
+
+=item * $number = Multiply( $a, $b )
+
+Returns the product of C<$a> and C<$b>. The C<*> operator is overload by
+this function, so C<$a * $b := Multiply($a, $b)>.
+
+=item * $number = NextMinus( $a )
+
+Returns the closest value to C<$a> in the direction of C<-Infinity>.
+
+This function is a generalization of the IEEE 754 C<nextDown> operation.
+
+Note: C<NextMinus( $a ) == -NextPlus( -$a )>
+
+=item * $number = NextPlus( $a )
+
+Returns the closest value to C<$a> in the direction of C<+Infinity>.
+
+This function is a generalization of the IEEE 754 C<nextUp> operation.
+
+  use Math::decNumber qw( :all );
+
+  ContextPrecision(8);
+  my $a = d_ '12.34';
+  printf "NextMinus($a) = %s\n", NextMinus($a); # NextMinus(12.34) = 12.339999
+  printf "NextPlus ($a) = %s\n", NextPlus($a);  # NextPlus (12.34) = 12.340001
+
+There is no C<printf> field specifier for C<decNumber>. We use C<%s> to force
+the stringification.
+
+=item * $number = NextToward( $a, $b )
+
+Returns the closest value to C<$a> in the direction of C<$b>.
+
+This function is a generalization of the proposed IEEE 754 C<nextAfter>
+operation.
+
+=item * $number = Plus( $a )
+
+Returns the result of adding C<$a> to C<0>.
+
+=item * $number = Power( $a, $b )
+
+Returns the result of raising C<$a> to the power of C<$b>, rounded if necessary
+using the settings in the context.
+
+Results will be exact when C<$b> has an integral value and the result does not
+need to be rounded, and also will be exact in certain special cases, such as
+when C<$a> is a zero.
+
+Inexact results will always be full precision, and will almost always be
+correctly rounded, but may be up to 1 ulp (unit in last place) in error
+in rare cases.
+
+The C<**> operator is overload by this function,
+so C<$a ** $b := Power($a, $b)>.
+
+  use v5.10;
+  use Math::decNumber qw( :all );
+
+  say d_(3) ** 0.5;   # 1.732050807568877293527446341505872
+  say sqrt(d_ 3);     # 1.732050807568877293527446341505872
+
+=item * $number = Remainder( $a, $b )
+
+Integer-divides C<$a> by C<$b> and returns the remainder from the division.
+For C<$a> and C<$b> finite, and if C<$b != 0> we have
+
+C<Remainder( $a, $b ) = $a - DivideInteger( $a, $b ) * $b>
+
+=item * $number = RemainderNear( $a, $b )
+
+For C<$a> and C<$b> finite, and if C<$b != 0> we have
+
+C<RemainderNear( $a, $b ) = $a - $n * $b> where C<$n> is the integer nearest
+the number C<$a/$b>.
+
+  use v5.10;
+  use Math::decNumber qw( :all );
+
+  say Remainder(d_ 17, 6);        # print 5 because  17 = 6*2+5
+  say RemainderNear(d_ 17, 6);    # print -1 because 17 = 6*3-1
+
+=item * $number = Rotate( $a, $b )
+
+Returns a copy of C<$a> with the digits of its coefficient rotated to the left
+(if C<$b> is positive) or to the right (if C<$b> is negative) without
+adjusting the exponent or the sign. If C<$a> has fewer digits than
+C<ndigits> the coefficient is padded with zeros on the left before the rotate.
+Any insignificant leading zeros in the result are removed, as usual.
+C<$b> is the count of digits to rotate; it must be an integer (that is, it must
+have an exponent of 0) and must be in the range C<-ndigits> through C<+ndigits>.
+
+  use v5.10;
+  use Math::decNumber qw(:all);
+
+  ContextPrecision(10);         # ndigits = 10
+
+  say Rotate(d_ '012345', 3);   # print 12345000
+  say Rotate(d_ '012345', -2);  # print 4500000123
+
+=item * $number = Shift( $a, $b )
+
+Returns a copy of C<$a> with the digits of its coefficient shifted to the left
+(if C<$b> is positive) or to the right (if C<$b> is negative) without adjusting
+the exponent or the sign. The coefficient is padded with zeros on the left or
+right, as necessary. Any leading zeros in the result are ignored, as usual.
+C<$b> is the count of digits to shift; it must be an integer (that is, it must
+have an exponent of 0) and must be in the range C<-ndigits> through C<+ndigits>.
+
+The C<E<lt>E<lt>> and C<E<gt>E<gt>> Perl operators are overloaded by C<Shift>:
+C<$aE<lt>E<lt>$b := Shift($a, $b)> and C<$aE<gt>E<gt>$b := Shift($a, -$b)>.
+
+  use v5.10;
+  use Math::decNumber qw(:all);
+
+  ContextPrecision(10);         # ndigits = 10
+
+  say Shift(d_ '012345', 3);    # print 12345000
+  say Shift(d_ '012345', -2);   # print 123
+
+
+=item * $number = SquareRoot( $a )
+
+Returns the square root of C<$a>, rounded if necessary using the digits
+setting in the context and using the round-half-even rounding algorithm.
+
+The C<sqrt> Perl function is overload by C<SquareRoot>, so
+C<sqrt($a) := SquareRoot($a)>.
+
+=item * $number = Subtract( $a, $b )
+
+Returns the result of subtracting C<$b> from C<$a>.
+
+The C<-> operator is overload by
+this function, so C<$a - $b := Subtract($a, $b)>.
+
+=item * $number = ToIntegralExact( $a )
+
+Returns C<$a>, with any fractional part removed if necessary using the
+rounding mode in the context.
+
+The C<Inexact> flag is set if the result is numerically different
+from C<$a>. Other than that, no flags are set (unless the operand is a
+signaling C<NaN>). The result may have a positive exponent.
+
+=item * $number = ToIntegralValue($a )
+
+Returns C<$a>, with any fractional part removed if necessary using the
+rounding mode in the context.
+
+No flags, not even C<Inexact>, are set (unless the operand is a signaling
+C<NaN>). The result may have a positive exponent.
+
+=back
+
+=head3 Formatting
+
+=over
+
+=item * $number = LogB( $a )
+
+Return the adjusted exponent of C<$a>, that is to say, roughly speaking,
+the exponent of the power of 10 in the scientific notation of C<$a>.
+
+For positive finite C<a>, the value of C<logB(a>) is C<floor(log10(a))>.
+
+  use v5.10;
+  use Math::decNumber qw( :all );
+
+  say LogB(d_ 12345.67);  # print  4 --> 12345.67 = 1.234567e4
+  say LogB(d_ 0.001234);  # print -3 --> 0.001234 = 1.234e-3
+
+=item * $number = Quantize( $a, $b )
+
+This function is used to modify the number C<$a> so that its exponent has
+a specific value, equal to that of C<$b>. The C<Rescale> function may also
+be used for this purpose, but requires the exponent to be given as a
+decimal number.
+When C<$b> is a finite number, its exponent is used as the requested exponent
+(it provides a I<pattern> for the result). Its coefficient and sign are ignored.
+The number is set to a value which is numerically equal (except for any
+rounding) to the C<$b>, modified as necessary so that it has the requested
+exponent.
+
+  use v5.10;
+  use Math::decNumber qw(d_ Quantize);
+
+  my $x = d_ '1234.5678';
+  my $y = Quantize( $x, d_ "1.00" );
+  say $y;         # print 1234.57
+
+=item * $number = Rescale( $a, $b )
+
+This function is used to rescale the number C<$a> so that its exponent has
+a specific value, given by C<$b>. The C<Quantize> function may also be used
+for this purpose, and is often easier to use.
+
+  use v5.10;
+  use Math::decNumber qw(d_ Rescale);
+
+  my $x = d_ '1234.5678';
+  my $y = Rescale( $x, d_ -2 );
+  say $y;         # print 1234.57
+
+=item * $number = ScaleB( $a, $b )
+
+This function is used to adjust (scale) the exponent of a C<$a>:
+it returns the result of multiplying C<$a> by ten raised to the power
+of C<$b>. C<$b> must be an integer.
+
+  use v5.10;
+  use Math::decNumber qw( :all );
+
+  say ScaleB(d_ 12345.67, -2);  # print 123.4567
+  say ScaleB(d_ 0.001234, 3);   # print 1.234
+
+We have: C<1 <= ScaleB($a, -LogB($a)) < 10> when C<$a> is positive
+and finite.
+
+=item * $number = Trim( $a )
+
+Removes insignificant trailing zeros from C<$a>, unconditionally.
+
+=back
+
+=head3 Logical functions
+
+The logical functions expect their arguments to be logical operands.
+A logical operand is a decNumber whose exponent and sign are both zero,
+and whose digits are all either 0 or 1.
+
+=over
+
+=item * $number = And( $a, $b )
+
+Returns digit-wise logical B<and> of the logical operands C<$a> and C<$b>.
+The C<&> Perl operator is overload by this function, so C<$a & $b := And($a, $b)>.
+
+  use v5.10;
+  use Math::decNumber 'd_';
+
+  say d_('10101101') & d_('11100000');  # print 10100000
+
+=item * $number = Invert( $a )
+
+Returns the digit-wise inversion of C<$a> (A 0 digit becomes 1 and vice versa.)
+The C<~> Perl operator is overload by this function, so C<~$a := Invert($a)>.
+
+  use v5.10;
+  use Math::decNumber 'd_'; # default precision 34
+
+  say ~d_(0); # print 1111111111111111111111111111111111
+
+=item * $number = Or( $a, $b )
+
+Returns digit-wise logical B<or> of the logical operands C<$a> and C<$b>.
+The C<|> Perl operator is overload by this function, so C<$a | $b := Or($a, $b)>.
+
+  use v5.10;
+  use Math::decNumber 'd_';
+
+  say d_('10101101') | d_('11100110');  # print 11101111
+
+=item * $number = Xor( $a, $b )
+
+Returns digit-wise logical B<xor> of the logical operands C<$a> and C<$b>.
+The C<^> Perl operator is overload by this function, so C<$a ^ $b := Xor($a, $b)>.
+
+  use v5.10;
+  use Math::decNumber 'd_';
+
+  say d_('10101101') ^ d_('01100110');  # print 11001011
+
+=back
+
+=head3 Comparison
+
+=over
+
+=item * $number = Compare( $a, $b )
+
+This function compares C<$a> and C<$b> numerically. If the C<$a> is less than
+C<$b> then the function returns the value C<-1>. If they are equal
+it returns C<0>. If C<$a> is greater than C<$b> then it returns the value C<1>.
+If the operands are not comparable (that is, one or both is a C<NaN>)
+the result will be C<NaN>.
+
+The C<E<lt>=E<gt>> Perl operator is overloaded by this function, so
+ C<$a E<lt>=E<gt> $b := Compare($a, $b)>.
+
+  use v5.10;
+  use Math::decNumber qw(:all);
+
+  say Compare(d_(1)/0, d_ 3); # print 1 (+Inf > 3)
+  say Compare(d_(0)/0, d_ 3); # print NaN (NaN and 3 are not comparable)
+
+=item * $number = CompareSignal( $a, $b )
+
+This function is identical to C<Compare> except that all C<NaN>s
+(including quiet C<NaN>s) signal.
+
+=item * $number = CompareTotal( $a, $ b )
+
+This function compares C<$a> and C<$b> using the IEEE 754 total ordering.
+If the C<$a> is less than C<$b> in the total order then the function returns
+the value C<-1>.
+If they are equal it returns C<0>. If C<$a> is greater than C<$b> then
+it returns the value C<1>.
+The total order differs from the numerical comparison in that:
+
+C<-NaN < -sNaN < -Infinity < -finites < -0 < +0 < +finites < +Infinity < +sNaN < +NaN>.
+
+  use v5.10;
+  use Math::decNumber qw(:all);
+
+  say CompareTotal(d_(1)/0, d_ 3);  # print 1 (+Inf > 3)
+  say CompareTotal(d_(0)/0, d_ 3);  # print 1 (+NaN > 3)
+
+=item * $number = CompareTotalMag( $a, $b )
+
+This function compares the magnitude of C<$a> and C<$b> using the IEEE 754
+total ordering. It is identical to C<CompareTotal> except that the signs of the
+operands are ignored and taken to be 0 (non-negative).
+
+=item * $number = SameQuantum( $a, $b )
+
+This function is used to test whether the exponents of two numbers are equal.
+The coefficients and signs of the operands (C<$a> and C<$b>) are ignored.
+If the exponents of the operands are equal, or if they are both C<Infinitie>s
+or they are both C<NaN>s, it returns C<1>. In all other cases, it returns C<0>.
+
+  use v5.10;
+  use Math::decNumber qw(d_ SameQuantum);
+
+  say SameQuantum(d_ '12e3', '12000e3' ); # print 1
+  say SameQuantum(d_ '12e3', '120e2' );   # print 0
+
+=back
+
+=head3 Test functions
+
+=over
+
+=item * $boolean = IsCanonical( $a )
+
+Tests whether the encoding of C<$a> is canonical.
+Returns always I<true>, because decNumbers always have canonical encodings
+(the function is provided for compatibility with the IEEE 754).
+
+=item * $boolean = IsFinite( $a )
+
+Returns 1 (I<true>) if C<$a> is finite, or 0 (I<false>) otherwise
+(that is, it is an infinity or a C<NaN>).
+
+=item * $boolean = IsInfinite( $a )
+
+Returns 1 (I<true>) if C<$a> is infinite, or 0 (I<false>) otherwise
+(that is, it is a finite number or a C<NaN>).
+
+=item * $boolean = IsNaN( $a )
+
+Returns 1 (I<true>) if C<$a> is a C<NaN>, or 0 (I<false>) otherwise.
+
+=item * $boolean = IsNegative( $a )
+
+Returns 1 (I<true>) if C<$a> is negative, or 0 (I<false>) otherwise.
+
+=item * $boolean = IsNormal( $a )
+
+Returns 1 (I<true>) if C<$a> is normal (that is, finite, non-zero,
+and not subnormal), or 0 (I<false>) otherwise.
+
+=item * $boolean = IsQNaN( $a )
+
+Returns 1 (I<true>) if C<$a> is a C<Quiet NaN>, or 0 (I<false>) otherwise.
+
+=item * $boolean = IsSNaN( $a )
+
+Returns 1 (I<true>) if C<$a> is a C<Signaling NaN>, or 0 (I<false>) otherwise.
+
+=item * $boolean = IsSpecial( $a )
+
+Returns 1 (I<true>) if C<$a> is special (Infinity or C<NaN>), or 0 (I<false>)
+otherwise.
+
+=item * $boolean = IsSubnormal( $a )
+
+Returns 1 (I<true>) if C<$a> is subnormal (that is, finite, non-zero,
+and magnitude less than C<10**emin>), or 0 (I<false>) otherwise.
+
+=item * $boolean = IsZero( $a )
+
+Returns 1 (I<true>) if C<$a> is zero, or 0 (I<false>) otherwise.
+
+=back
+
+=head3 Utility functions
+
+=over
+
+=item * $int_class = Class( $a )
+
+Returns the number of the class of C<$a> in the enumeration:
+
+  sNaN  0   NaN   1   -Infinity   2   -Normal 3   -Subnormal  4
+  -Zero 5   +Zero 6   +Subnormal  7   +Normal 8   +Infinity   9
+
+This number can be converted to a character string using C<ClassToString>.
+
+=item * $string = ClassToString( $a | $int_class )
+
+Returns the name of the class of C<$a> or corresponding to
+the number C<$int_class>.
+
+=item * $number = Reduce( $a )
+
+Returns the simplest (shortest) form of C<$a>.
+
+  use v5.10;
+  use Math::decNumber qw(d_ Reduce);
+
+  my $x = d_ '123000.000';
+  say $x;             # print 123000.000
+  say Reduce($x);     # print 1.23E+5
+
+=item * $int = Radix( )
+
+This function returns the radix (number base) used by the package.
+This always returns 10.
+
+=item * $number = Copy( $a )
+
+Returns a copy of C<$a>.
+
+=item * $number = CopyAbs( $a )
+
+This function is identical to C<Copy> except that the sign of the result
+is always C<+>.
+
+=item * $number = CopyNegate( $a )
+
+This function is identical to C<Copy> except that the sign of the result
+is the inverse of the sign of C<$a>.
+
+=item * $number = CopySign( $a, $b )
+
+This function is identical to C<Copy> except that the sign of the result
+is the sign of C<$b>.
+
+=item * $string = Version( )
+
+Returns description of the version of the decNumber library being run.
+
+=back
+
+=head2 Exception handling
+
+With C<Math::decNumber> all operations and functions return a result.
+By default, there is no exception. For example, the script:
+
+  use strict;
+  use warnings;
+  use v5.10;
+  use Math::decNumber ':all';
+
+  for my $x (1..3) {
+    say 1/sqrt(d_(2) - $x);
+  }
+
+prints:
+
+    1
+    Infinity
+    NaN
+
+When one of the C<Math::decNumber> functions sets a bit in the context status,
+the bit is compared with the corresponding bit in the traps field.
+If that bit is set (is 1) then a Floating-Point Exception signal (C<FPE>) is
+raised. At that point, a signal handler function (previously installed)
+is called.
+
+  use strict;
+  use warnings;
+  use v5.10;
+  use Math::decNumber ':all';
+
+  ContextTraps(DEC_Division_by_zero); # to trap division by zero
+
+  $SIG{FPE}  = \&signal_handler;      # install the signal handler
+
+  sub signal_handler {                # a simple signal handler
+    die "Division by zero: it's illegal!";
+  }
+
+  for my $x (1..3) {
+    say 1/sqrt(d_(2) - $x);
+  }
+
+prints:
+
+    1
+    Division by zero: it's illegal! at ...etc
+
+See L<perlipc/"signals">.
+
+=head2 Export
+
+The module exports nothing by default:
+the function names and constants must be explicitly exported.
+
+=head3 Export Tags:
+
+=over
+
+=item * :ROUND_
+
+exports the C<ROUND_*> L<"ContextRounding"> modes constants.
+
+=item * :DEC_
+
+exports the C<DEC_*> Trap-enabler and L<"Status"> flags and constants.
+
+=item * :all
+
+exports all.
+
+=back
+
+=head1 SEE ALSO
+
+L<Math::Decimal>, L<Math::Decimal64>.
+
+The author of the decNumber library, B<Mike Cowlishaw>, has a very rich
+web page about decimal arithmetic:
+
+The General Decimal Arithmetic website -
+http://speleotrove.com/decimal/
+
+=head1 AUTHOR
+
+Jean-Louis Morel, E<lt>jl_morel@bribes.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2014 by J-L Morel
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+ICU License for the decNumber C library - ICU 1.8.1 and later
+
+COPYRIGHT AND PERMISSION NOTICE
+
+Copyright (c) 1995-2010 International Business Machines Corporation
+and others
+
+All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, and/or sell copies of the Software, and to permit persons
+to whom the Software is furnished to do so, provided that the above
+copyright notice(s) and this permission notice appear in all copies
+of the Software and that both the above copyright notice(s) and this
+permission notice appear in supporting documentation.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+OF THIRD PARTY RIGHTS. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+HOLDERS INCLUDED IN THIS NOTICE BE LIABLE FOR ANY CLAIM, OR ANY
+SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER
+RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
+CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+Except as contained in this notice, the name of a copyright holder
+shall not be used in advertising or otherwise to promote the sale,
+use or other dealings in this Software without prior written
+authorization of the copyright holder.
+
+All trademarks and registered trademarks mentioned herein are the
+property of their respective owners.
+
+=cut

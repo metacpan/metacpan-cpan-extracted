@@ -1,0 +1,38 @@
+#!/usr/bin/perl -w
+
+use strict;
+use lib './lib';
+
+use Mail::Stats;
+use Getopt::Std qw(getopts); 
+use Data::Dumper;
+
+my %cfg = (
+	   s => 'a',
+	  );
+
+getopts('has:m:', \%cfg);
+
+if($cfg{h}) {
+  usage();
+  exit(1);
+}
+
+if(!Mail::Stats::newmail(\%cfg)) {
+  usage();
+  exit(1);
+}
+
+sub usage {
+  print STDERR <<USAGE;
+countmail: list number of new mail messages in mailboxes
+    usage: countmail [-h] [-a] [-s A|a|N|n] [-m mbox1[:mbox2[:mbox3...]]] [-c config file]
+      -a : show all mailboxes (even if they have 0 messages)
+      -h : print this message
+      -s : sort mailbox list Alpha Desc, Alpha Asc, Numerically Desc,
+                             Numerically Asc
+      -m : ignore config file, process mbox files directly
+      -c : use specified config file (will try ~/.countmailrc by default)
+
+USAGE
+}

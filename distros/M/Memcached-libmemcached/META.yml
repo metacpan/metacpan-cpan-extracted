@@ -1,0 +1,20 @@
+---
+abstract: 'Thin fast full interface to the libmemcached client API'
+author:
+  - 'Tim Bunce <Tim.Bunce@pobox.com>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Memcached-libmemcached
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  bugtracker: https://github.com/timbunce/Memcached-libmemcached/issues/
+  repository: git://github.com/timbunce/Memcached-libmemcached.git
+version: 1.001801

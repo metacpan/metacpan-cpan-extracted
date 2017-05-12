@@ -1,0 +1,115 @@
+NAME
+    MSIE::MenuExt - Generates registry file (.reg) for MSIE Menu Extension
+
+SYNOPSIS
+      use CGI;
+      use MSIE::MenuExt;
+
+      my $action = MSIE::MenuExt::Action->new();
+      $action->title('Blog It!');
+      $action->accesskey('B');
+      $action->action('javascript:external.menuArguments.blahblah()');
+      $action->context(MENUEXT_DEFAULT + MENUEXT_TEXT_SELECTIONS);
+
+      my $reg = MSIE::MenuExt->new();
+      $reg->add_action($action);
+
+      print CGI::header(-type => 'text/plain; name=blogit.reg',
+                        -content_disposition => 'attachment; filename=blogit.reg');
+      print $reg->content();
+
+    This example would print
+
+      REGEDIT4
+      [HKEY_CURRENT_USER\Software\Microsoft\Internet Explorer\MenuExt\&Blog It!]
+      @="javascript:external.menuArguments.blahblah()"
+      "contexts"=hex:11
+
+DESCRIPTION
+    MSIE::MenuExt is a module to create Win32 registry file (.reg) to
+    register an action to Microsoft IE's Menu Extension.
+
+METHODS
+    new
+          my $reg = MSIE::MenuExt->new();
+          my $reg = MSIE::MenuExt->new(@actions);
+
+        constructs new MSIE::MenuExt object. If MSIE::MenuExt::Action
+        objects are given, it automaticaly calls "add_action()".
+
+    add_action
+          $reg->add_action($action);
+
+        takes MSIE::MenuExt::Action object.
+
+    clear_action
+          $reg->clear_action();
+
+        clears action objects holded inside.
+
+    content
+          my $text = $reg->content();
+
+        returns content of the registry file as a string.
+
+MSIE::MenuExt::Actino METHODS
+    new
+          my $action = MSIE::MenuExt::Action->new();
+          my $action = MSIE::MenuExt::Action->new({
+              title => 'Blog It!', acceskey => 'B',
+              action => 'C:\file\js.htm', context => MENUEXT_DEFAULT,
+          });
+
+        constructs new MSIE::MenuExt::Action object. If hash reference is
+        given, it sets these variables as a initial state.
+
+    title
+          my $title = $action->title();
+          $action->title($title);;
+
+        gets/sets the title of the action, which is displayed in a menu
+        extension.
+
+    accesskey
+          my $key = $action->accesskey();
+          $action->accesskey($key);
+
+        gets/sets the accesskey of the action, which you can use for a
+        shortcut to the action. It uses the 1st string of its "title"
+        attribute as a default.
+
+    action
+          my $act = $action->action();
+          $action=>action($act);
+
+        gets/sets the associated action, which can be a path of the
+        executable file or script.
+
+    context
+          my $context = $action->context();
+          $action->context($context);
+
+        gets/sets the context where the action can be executed. The
+        following constants can be used.
+
+          MENUEXT_DEFAULT
+          MENUEXT_IMAGES
+          MENUEXT_CONTROLS
+          MENUEXT_TABLES
+          MENUEXT_TEXT_SELECTIONS
+          MENUEXT_ANCHORS
+
+        If you put your actions in several contexts, just sum these context
+        constants like:
+
+          $action->context(MENUEXT_DEFAULT + MENUEXT_TEXT_SELECTIONS);
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    http://www.siteexperts.com/tips/hj/ts01/index.asp
+

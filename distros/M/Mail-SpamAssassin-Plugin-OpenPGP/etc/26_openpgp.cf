@@ -1,0 +1,18 @@
+# changes to this should also be changed in OpenPGP.pm's SYNOPSIS section
+
+ifplugin Mail::SpamAssassin::Plugin::OpenPGP
+
+rawbody   OPENPGP_SIGNED     eval:check_openpgp_signed()
+describe OPENPGP_SIGNED     OpenPGP: message body is signed
+
+rawbody   OPENPGP_ENCRYPTED     eval:check_openpgp_encrypted()
+describe OPENPGP_ENCRYPTED     OpenPGP: message body is encrypted
+
+rawbody   OPENPGP_SIGNED_GOOD     eval:check_openpgp_signed_good()
+describe OPENPGP_SIGNED_GOOD     OpenPGP: message body is signed with a valid signature
+tflags OPENPGP_SIGNED_GOOD nice
+
+rawbody   OPENPGP_SIGNED_BAD     eval:check_openpgp_signed_bad()
+describe OPENPGP_SIGNED_BAD     OpenPGP: message body is signed but the signature is invalid, or doesn't match with email's date or sender
+
+endif   # Mail::SpamAssassin::Plugin::OpenPGP

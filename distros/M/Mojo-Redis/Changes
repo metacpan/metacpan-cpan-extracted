@@ -1,0 +1,172 @@
+Revision history for perl distribution Mojo-Redis
+
+1.02 2015-07-14T17:20:07+0200
+ - Deprecated with even more verbose message.
+
+1.01 2015-01-18T13:33:26Z
+ - Replace emit_safe() with emit()
+
+1.00 2014-10-02T17:26:26Z
+ - Mojo::Redis is deprecated
+
+0.9928 2014-05-30T07:50:27Z
+ - Test suite is compatible with Mojolicious 5.0
+
+0.9927 2014-04-30T09:32:11Z
+ - Add support for blpop/message once() events as well
+
+0.9926 2014-04-27T16:35:52Z
+ - Remove optional Test::LeakTrace requirement
+   https://github.com/marcusramberg/mojo-redis/issues/28
+
+0.9925 2014-04-23T11:25:03Z
+ - Fix on(message => $name => ...) leak with home brewed t::LeakTrap
+
+0.9924 2014-04-11T19:38:12Z
+ - Allow just $redis->server($hostname) without port
+ - Cleaned up documentation
+
+0.9923 2014-04-11T16:34:00Z
+ - Add support for $redis->on(message => @channels => $cb) events
+ - Add support for $redis->on(blpop => @list_names => $cb) events
+ - Add support for $redis->on(brpop => @list_names => $cb) events
+
+0.9922 2013-12-25T10:15:18Z
+ - Made connected() more intelligent
+
+0.9921 2013-12-25T10:15:18Z
+ - Fix "Use of uninitialized value in join or string at Mojo/Redis.pm line
+   113." if $ENV{MOJO_REDIS_DEBUG};
+
+0.9920 2013-11-20T13:22:43Z
+ - Restructured tests.
+
+0.9919 2013-10-28T13:27:43Z
+ - Fix printing debug messages to STDERR
+
+0.9918 2013-10-26T15:49:53Z
+ - Add MYMETA* to MANIFEST.SKIP
+
+0.9917 2013-09-30T15:51:31Z
+ - Remove events which cause iternal loop during global destruction
+ - Fix clear message queue on disconnect()
+ - Fix _inform_queue need to pass on "undef" to the callbacks
+
+0.9916 2013-09-06T21:59:13Z
+ - Add support for psubscribe.
+ - Fix documentation for subscribe. Contributor: kanatohodets
+
+0.9915 2013-09-02T09:00:45Z
+ - Fix Can't call method "_inform_queue" on an undefined value at
+   /Mojo/Redis.pm line 121.
+
+0.9914 2013-09-01T20:08:16Z
+ - Fix leak into protocol_redis
+
+0.9913 2013-08-24T16:06:49Z
+ - Change default timeout to 0 (no timeout)
+ - Try to detect invalid stream state
+
+0.9912 2013-07-30T22:05:53Z
+ - Fix documentation Contributor: akarelas
+
+0.9911 2013-07-30T22:01:52Z
+ - Fixed timeout() can now be set to 0. Contributor: gatitskiy
+
+0.9910 2013-06-18T20:00:09Z
+ - 0.9909 was rubbish
+
+0.9909 2014-04-10T10:45:36Z
+ - Fix timeout() might not have a stream, even though it has a stream id
+
+0.9908 2013-06-18T13:13:20Z
+ - Fix making a Subscription object from an active Redis object
+
+0.9907 2013-05-07T12:55:41Z
+ - Forgot to fix unittest
+
+0.9906 2013-05-07T12:51:07Z
+ - Fix extracting DB index from redis path
+
+0.9905 2013-05-07T01:05:11Z
+ - Fix parsing of redis://host:port/db-index
+
+0.9904 2013-04-23T21:23:46Z
+ - Will also emit "error" on timeout
+ - Fix timeout is passed on to subscription object
+
+0.9903 2012-11-08T23:02:57Z
+ - Fix error in documentation, related to on(message) event
+
+0.9902 2012-11-06T23:59:00Z
+ - Add support for "redis://" url scheme
+ - Add support for "SELECT INDEX" on connect using
+   $redis->server('redis://127.0.0.1/INDEX')
+ - Add support for AUTH on connect using
+   $redis->server('redis://foo:AUTHKEY@127.0.0.1')
+
+0.9901 2012-11-06T12:06:18Z
+ - Fix POD errors
+ - Use Mojo::IOLoop->delay in Mojolicious example
+ - Add websocket example
+ - Add jhthorsen to AUTHOR list
+
+0.99 2012-11-06T11:03:46Z
+ - Add "close" and "error" events
+ - Add execute() can handle multiple commands
+ - Add hgetall() will return a hash-ref instead of array-ref
+ - Add pubsub support
+ - Add Mojo::Redis::Subscription
+ - Add support for changing timeout later on
+ - Remove "error" attribute and on_error() callback
+ - Remove start() and stop()
+ - Replace AUTOLOAD with sub routine injection
+
+0.9 2012-06-17T00:00:00Z
+ - Forked to new name
+ - Updated to work with new IOLoop API.
+
+0.83 2011-12-11T00:00:00Z
+ - Added info about Protocol::Redis::XS
+ - Fixed to work with latest Mojolicious
+
+0.82 2011-11-02T00:00:00Z
+ - Documentation improved
+
+0.81 2011-07-30T00:00:00Z
+ - fixed encoding issue on multi-bulk reply
+
+0.8 2011-02-01T00:00:00Z
+ - moved to Protocol::Redis parser
+ - changed response format for multi-bulk replies (LRANGE, ...) API
+   CHANGED!
+ - use new API of IOLoop
+
+0.7 2011-01-30T00:00:00Z
+ - on_error method added
+ - added not live tests
+ - added fast commands
+
+0.6 2010-12-15T00:00:00Z
+ - Better connection handling
+
+0.5 2010-11-25T00:00:00Z
+ - Fixed memory leaks
+
+0.4 2010-11-14T00:00:00Z
+ - Warning! Changed callback interface
+ - Documentation added
+ - Small improvements
+
+0.3 2010-11-09T00:00:00Z
+ - Fixed encoding support
+ - Processing nil values
+ - Processing lists with zero elements
+
+0.2 2010-11-06T00:00:00Z
+ - Nice pipline command parsing
+ - timeout added
+
+0.1 2010-11-04T00:00:00Z
+ - First release
+

@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution MooseX-ExtraArgs,
+version 0.01:
+
+  Save constructor arguments that were not consumed.
+
+This software is copyright (c) 2012 by Aran Deltac.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

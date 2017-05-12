@@ -1,0 +1,78 @@
+NAME
+    MooseX::Lists - treat arrays and hashes as lists
+
+SYNOPSIS
+       package Stuff;
+
+       use Moose;
+       use MooseX::Lists;
+
+       has_list a => ( is => 'rw', isa => 'Array');
+       has_list h => ( is => 'rw', isa => 'Hash' );
+
+       has_list same_as_a => ( is => 'rw' );
+
+       ...
+
+       my $s = Stuff-> new(
+            a => [1,2,3],
+            h => { a => 1, b => 2 }
+       );
+
+       my @list   = $s-> a;     # ( 1 2 3 )
+       my $scalar = $s-> a;     # [ 1 2 3 ]
+
+       $s-> a(1,2,3);           # 1 2 3
+       $s-> a([1,2,3]);         # 1 2 3
+       $s-> a([]);              # empty array
+       $s-> a([[]]);            # []
+
+       my %list = $s-> h;       # ( a => 1, b => 2 )
+       my $sc   = $s-> h;       # { a => 1, b => 2 }
+
+       $s-> h(1,2,3,4);         # 1 2 3 4
+       $s-> h({1,2,3,4});       # 1 2 3 4
+       $s-> h({});              # empty hash
+
+DESCRIPTION
+    Provides asymmetric list access for arrays and hashes.
+
+METHODS
+    has_list
+        Replacement for "has", with exactly same syntax, expect for "isa",
+        which can be either "Array" or "Hash". "[]" notation is not
+        supported.
+
+        When a method is declared with "has_list", internally it is a normal
+        perl array or hash (Moose's "ArrayRef" and "HashRef" don't apply).
+        The method behaves differently if called in scalar or list context.
+        See below for details.
+
+    Array
+        In get-mode, behaves like "auto_deref": in scalar context, returns
+        direct reference to the array, list context, returns defereenced
+        array.
+
+        In set-mode behaves asymmetrically: if passed one argument, and this
+        argument is an arrayref, treats it as an arrayref, otherwise
+        dereferences the arguments and creates a new arrayref, which is
+        stored internally. I.e. the only way to clear the array is to call "
+        -"method([]) >.
+
+    Hash
+        In get-mode, behaves like "auto_deref": in scalar context, returns
+        direct reference to the hash, list context, returns defereenced
+        hash.
+
+        In set-mode behaves asymmetrically: if passed one argument, and this
+        argument is a hashref, treats it as a hashref, otherwise
+        dereferences the arguments and creates a new hashref, which is
+        stored internally. I.e. the only way to clear the hash is to call "
+        -"method({}) >.
+
+AUTHOR
+    Dmitry Karasik, <dmitry@karasik.eu.org>.
+
+THANKS
+    Karen Etheridge, Jesse Luehrs.
+

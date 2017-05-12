@@ -1,0 +1,9 @@
+$Id: test.tmpl 444 2008-09-04 18:55:10Z davidp $
+This file is a template used by the test suite to perform various tests, and
+parse the output to check it worked properly.
+
+artist:<tmpl_var name="artist">
+album:<tmpl_var  name="album">
+<tmpl_loop name="tracks">
+<tmpl_var name="track">:<tmpl_var name="title">:<tmpl_var name="artist">
+</tmpl_loop>

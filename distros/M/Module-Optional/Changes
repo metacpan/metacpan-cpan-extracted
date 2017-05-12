@@ -1,0 +1,15 @@
+Revision history for Perl module Module::Optional
+
+0.04 Mon May 19 2008
+    Kwalitee improvements
+
+0.03 Fri Sep  6 2006
+    Documentation change, see RT #21389
+
+0.02 Mon Sep 26 2005
+	Improve Kwalitee: tests for pod and pod coverage
+	Write some pod for Params::Validate::Dummy
+
+0.01 Fri Sep  2 2005
+	- original version; created by ExtUtils::ModuleMaker 0.32
+

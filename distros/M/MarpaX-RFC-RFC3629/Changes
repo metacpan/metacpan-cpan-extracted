@@ -1,0 +1,11 @@
+Changelog for MarpaX-RFC-RFC3629
+
+0.001 2015-10-18T10:01:49
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Changes/META.json/README.pod for the 1st release
+ - dist.ini: add Str in stopwords
+ - Removed encoding attribute and fixed nb of tests for Test::More
+ - Removed unused module
+ - POD
+ - Make dzil happy
+ - First commit

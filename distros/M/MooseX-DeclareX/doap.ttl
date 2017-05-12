@@ -1,0 +1,172 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "Class::Load"^^doap-deps:CpanId ], [ doap-deps:on "Data::OptList"^^doap-deps:CpanId ], [ doap-deps:on "Sub::Install"^^doap-deps:CpanId ], [ doap-deps:on "Throwable::Error"^^doap-deps:CpanId ], [ doap-deps:on "TryCatch"^^doap-deps:CpanId ], [ doap-deps:on "Devel::Declare"^^doap-deps:CpanId ], [
+		doap-deps:on "Devel::Declare::Context::Simple"^^doap-deps:CpanId;
+	], [ doap-deps:on "Moose"^^doap-deps:CpanId ], [ doap-deps:on "Moose::Role"^^doap-deps:CpanId ], [ doap-deps:on "Moose::Util"^^doap-deps:CpanId ], [ doap-deps:on "MooseX::Declare"^^doap-deps:CpanId ], [
+		doap-deps:on "MooseX::Declare::Context::WithOptions::Patch::Extensible"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "MooseX::Method::Signatures"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [ doap-deps:on "Test::Exception"^^doap-deps:CpanId ], [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-DeclareX>;
+	doap:created         "2012-08-20"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/MooseX-DeclareX>;
+	doap:homepage        <https://metacpan.org/release/MooseX-DeclareX>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "MooseX-DeclareX";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX/v_0-008>, <http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX/v_0-009>;
+	doap:shortdesc       "more sugar for MooseX::Declare".
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "MooseX-DeclareX-0.001"^^xsd:string;
+	dc:issued            "2012-08-21"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-DeclareX-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "MooseX-DeclareX-0.002"^^xsd:string;
+	dc:issued            "2012-08-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Add dep on Throwable::Error.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-DeclareX-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "MooseX-DeclareX-0.003"^^xsd:string;
+	dc:issued            "2012-08-22"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Split out abstract class functionality.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Split out method privacy functionality.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-DeclareX-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "MooseX-DeclareX-0.004"^^xsd:string;
+	dc:issued            "2012-08-24"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Get MooseX::Declare relative-package-naming feature working. (The 'namespace' keyword is still not working.)";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-DeclareX-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX/v_0-005>
+	a                    doap:Version;
+	rdfs:label           "Preikestolen";
+	dc:identifier        "MooseX-DeclareX-0.005"^^xsd:string;
+	dc:issued            "2012-08-25"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "MooseX::Types injection into classes.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Some handy constants for attribute definition.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-DeclareX-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "MooseX-DeclareX-0.006"^^xsd:string;
+	dc:issued            "2012-09-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Inject imports into classes.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-DeclareX-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "MooseX-DeclareX-0.007"^^xsd:string;
+	dc:issued            "2013-06-28"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Fix hash key randomization issues.";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Remove use of smart match.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-DeclareX-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "MooseX-DeclareX-0.008"^^xsd:string;
+	dc:issued            "2013-07-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Get `has` handling to work properly for MooseX::DeclareX::MethodPrefix.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-DeclareX-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX/v_0-009>
+	a                    doap:Version;
+	dc:identifier        "MooseX-DeclareX-0.009"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-DeclareX-0.009.tar.gz>;
+	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

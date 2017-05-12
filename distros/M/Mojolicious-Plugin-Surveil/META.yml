@@ -1,0 +1,26 @@
+---
+abstract: 'Surveil user actions'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-Surveil
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: 5.10
+resources:
+  bugtracker: https://github.com/jhthorsen/mojolicious-plugin-surveil/issues
+  homepage: https://github.com/jhthorsen/mojolicious-plugin-surveil
+  repository: https://github.com/jhthorsen/mojolicious-plugin-surveil.git
+version: 0.01

@@ -1,0 +1,63 @@
+# NAME
+
+Module::Install::Bugtracker - A Module::Install extension that automatically sets the CPAN bugtracker URL
+
+# SYNOPSIS
+
+    # in Makefile.PL
+    use inc::Module::Install;
+    name 'Foo-Bar';
+    auto_set_bugtracker;
+
+# DESCRIPTION
+
+This is a plugin for [Module::Install](https://metacpan.org/pod/Module::Install) to automatically set the bugtracker URL
+via `bugtracker()` which will then be added to resources under _META.yml_.
+
+At present this module only support CPAN bug trackers, resulting in links such
+as https://rt.cpan.org/Dist/Display.html?Name=Module-Install-Bugtracker
+
+# FUNCTIONS
+
+- `auto_set_bugtracker`
+
+    Sets the bugtracker URL via [Module::Install](https://metacpan.org/pod/Module::Install)'s `bugtracker()` function. The
+    `name()` needs to be set before calling this function.
+
+# BUGS AND LIMITATIONS
+
+Please report any bugs or feature requests through the web interface at
+[https://rt.cpan.org/Dist/Display.html?Name=Module-Install-Bugtracker](https://rt.cpan.org/Dist/Display.html?Name=Module-Install-Bugtracker).
+
+# INSTALLATION
+
+See perlmodinstall for information and options on installing Perl modules.
+
+# AVAILABILITY
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit [http://www.perl.com/CPAN/](http://www.perl.com/CPAN/) to find a CPAN
+site near you. Or see [http://search.cpan.org/dist/Module-Install-Bugtracker/](http://search.cpan.org/dist/Module-Install-Bugtracker/).
+
+The development version lives at
+[http://github.com/coppit/module-install-bugtracker/](http://github.com/coppit/module-install-bugtracker/). Instead of sending
+patches, please fork this project using the standard git and github
+infrastructure.
+
+# AUTHORS
+
+David Coppit, `<david@coppit.org>`
+
+Marcel Grünauer, `<marcel@cpan.org>`
+
+# COPYRIGHT AND LICENSE
+
+Copyright 2015, David Coppit. Prior versions copyright Marcel Grünauer.
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See the file LICENSE in the distribution for
+details.
+
+# SEE ALSO
+
+[Module::Install](https://metacpan.org/pod/Module::Install)

@@ -1,0 +1,82 @@
+=head1 NAME
+
+Mozilla::Persona::Validate::IMAPTalk - validate the existence via IMAP
+
+=head1 INHERITANCE
+
+ Mozilla::Persona::Validate::IMAPTalk
+   is a Mozilla::Persona::Validate
+
+=head1 SYNOPSIS
+
+  # add to the configation of $domain.json
+  { ...
+    "validate" : {
+      "class" : "Mozilla::Persona::Validator::IMAPTalk",
+      "server" : "imap.example.com"
+    },
+    ...
+  }
+
+=head1 DESCRIPTION
+
+The validator object must ensure that the user/password combination
+is valid.  In this implementation, being able to log-in to an IMAP4
+server (by using IMAP::Talk) is a prove of the user's authenticity.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Mozilla::Persona::Validate::IMAPTalk-E<gt>B<new>(OPTIONS)
+
+ -Option--Default
+  server  <required>
+
+=over 2
+
+=item server => SERVER
+
+The server to contact.
+
+=back
+
+=back
+
+=head2 Validation
+
+=over 4
+
+=item $obj-E<gt>B<isValid>(USER, PASSWORD)
+
+See L<Mozilla::Persona::Validate/"Validation">
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<server>()
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mozilla-Persona distribution version 0.12,
+built on November 22, 2012. Website: F<http://perl.overmeer.net>.  The code is based on the MulkyID code by
+Matthias Benkard.
+
+Persona is described at F<http://www.mozilla.org/persona/>
+
+=head1 COPYRIGHTS
+
+Copyrights of the perl code and the related documentation by
+2012 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

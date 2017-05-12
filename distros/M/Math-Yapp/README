@@ -1,0 +1,51 @@
+Math-Yapp version 1.01
+======================
+
+Most of the information you need on the motivation for this module and how
+to use it are better found in the perldoc (POD) on the module.  The short
+story is:
+
+There is already a Math::Polynomial package avaliable on CPAN, I felt it
+does not do enough of the basics, like solving polynomials or providing
+enough ways to construct them.  It also seemed like a fun project, my
+primary motivation.  Hence, the name, Yapp: Let Another Polynomial Package.
+
+For the testing phase I tried an experiment, since I was unable to get
+a solid answer to my question: Sam Tregar's book "Writing Perl Modules
+for CPAN" suggests writing either one testing module with many tests or
+a separate testing module for each test. Question: How about several
+testing modules, each comprised of several related tests?  For example,
+one module for constructors, another for arithmetic, etc.  Well, I'm
+trying it.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test TEST_VERBOSE=1 # The TEST_VERBOSE=1 is optional but suggested
+   make install             # Must by root (*nix) or Administrator (Windows)
+
+DEPENDENCIES
+
+At this time, this module requires Math::Complex, which is quite standard.
+In my bug report (BUGS section in the POD) I discuss using Math::MPC for
+higher precision math but that idea has been but on the back burner for
+reasons explained in that section.
+
+There is no other module dependency.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 by Jacob Salomon (jakesalomon@yahoo.com)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+Note that part of it were tested under Perl 5.08 on a Solaris box and
+seemed to work well enough.
+
+FYI: This module was devloped mostly in a Cygwin environment running
+under Windows-7.
+============

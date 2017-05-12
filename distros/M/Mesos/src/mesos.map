@@ -1,0 +1,64 @@
+TYPEMAP
+Status T_ENUM
+
+mesos::perl::CommandChannel* O_COMMAND_CHANNEL
+mesos::perl::MesosCommand    O_MESOS_COMMAND
+
+mesos::perl::CommandDispatcher*   O_COMMAND_DISPATCHER
+mesos::perl::PipeDispatcher*      O_COMMAND_DISPATCHER
+mesos::perl::InterruptDispatcher* O_COMMAND_DISPATCHER
+
+mesos::perl::ExecutorDriver*  O_EXECUTOR_DRIVER
+mesos::perl::SchedulerDriver* O_SCHEDULER_DRIVER
+
+INPUT
+O_COMMAND_CHANNEL
+    $var = ($type) tied_object_to_ptr(aTHX_ $arg, \"$var\", \"Mesos::Channel\");
+
+O_MESOS_COMMAND
+        if (!SvROK($arg) || !(SvTYPE(SvRV($arg)) == SVt_PVAV))
+            Perl_croak(aTHX_ \"$var must be an array ref\");
+        AV* command_av = (AV*) SvRV($arg);
+        SV* name_sv = *(av_fetch(command_av, 0, 0));
+        if (SvTYPE(name_sv) != SVt_PV)
+            Perl_croak(aTHX_ \"Command name must be a string\");
+        mesos::perl::CommandArgs args;
+        int length = AvFILL(command_av) + 1;
+        for (int i = 1; i < length; i++) {
+            SV* arg = *(av_fetch(command_av, i, 0));
+            args.push_back(sv_to_CommandArg(arg));
+        }
+        $var = ($type) mesos::perl::MesosCommand(sv_to_string(name_sv), args);
+
+O_COMMAND_DISPATCHER
+    $var = ($type) tied_object_to_ptr(aTHX_ $arg, \"$var\", \"Mesos::Dispatcher\");
+
+O_EXECUTOR_DRIVER
+    $var = ($type) tied_object_to_ptr(aTHX_ $arg, \"$var\", \"Mesos::ExecutorDriver\");
+
+O_SCHEDULER_DRIVER
+    $var = ($type) tied_object_to_ptr(aTHX_ $arg, \"$var\", \"Mesos::SchedulerDriver\");
+
+
+OUTPUT
+O_COMMAND_CHANNEL
+    $arg = ptr_to_tied_object(aTHX_ (void*) $var, \"Mesos::Channel\");
+
+O_MESOS_COMMAND
+        mesos::perl::MesosCommand command((mesos::perl::MesosCommand) $var);
+        AV* retval  newAV();
+        av_store(retval, 0, newSVpvn(command.name_.c_str(), command.name_.length()));
+        for (int i=0; i < command.args_.size(); i++) {
+            av_store(retval, i + 1, CommandArg_to_sv( command.args_.at(i) ));
+        }
+        $arg = sv_2mortal(newRV_noinc((SV*) retval));
+
+O_COMMAND_DISPATCHER
+    $arg = ptr_to_tied_object(aTHX_ (void*) $var, \"Mesos::Dispatcher\");
+
+O_EXECUTOR_DRIVER
+    $arg = ptr_to_tied_object(aTHX_ (void*) $var, \"Mesos::ExecutorDriver\");
+
+O_SCHEDULER_DRIVER
+    $arg = ptr_to_tied_object(aTHX_ (void*) $var, \"Mesos::SchedulerDriver\");
+

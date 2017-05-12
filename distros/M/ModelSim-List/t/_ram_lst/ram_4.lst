@@ -1,0 +1,17 @@
+         ns   /ram/mfc         /ram/bus_data                
+               /ram/bus_rw                  /ram/data       
+                      /ram/bus_data                         
+          0          0 HiZ zzzzzzzz zzzzzzzz zzzzzzzz 
+          1          0 St0 0000ffff 0000ffff zzzzzzzz 
+         13          1 St0 0000ffff 0000ffff zzzzzzzz 
+         15          0 St0 0000ffff 0000ffff zzzzzzzz 
+         20          0 St0 zzzzzzzz zzzzzzzz zzzzzzzz 
+         21          0 St0 0000abcd 0000abcd zzzzzzzz 
+         33          1 St0 0000abcd 0000abcd zzzzzzzz 
+         35          0 St0 0000abcd 0000abcd zzzzzzzz 
+         40          0 St0 zzzzzzzz zzzzzzzz zzzzzzzz 
+         42          0 St1 zzzzzzzz zzzzzzzz zzzzzzzz 
+         54          1 St1 0000ffff 0000ffff 0000ffff 
+         61          0 St1 zzzzzzzz zzzzzzzz zzzzzzzz 
+         78          1 St1 0000abcd 0000abcd 0000abcd 
+         88          0 St1 zzzzzzzz zzzzzzzz zzzzzzzz 

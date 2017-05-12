@@ -1,0 +1,117 @@
+{
+   "abstract" : "Set of classes for multiuser web applications.",
+   "author" : [
+      "Zahatski Aliaksandr zag@cpan.org"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4204",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MetaStore",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "1.16",
+            "Collection" : "0.49",
+            "Data::UUID" : "0.11",
+            "IO::Zlib" : "1.04",
+            "JSON" : "2.07",
+            "MIME::Base64" : "3.07",
+            "Template" : "2.14",
+            "WebDAO" : "2.20",
+            "XML::Flow" : "0.86"
+         }
+      }
+   },
+   "provides" : {
+      "MetaStore" : {
+         "file" : "lib/MetaStore.pm",
+         "version" : "0.62"
+      },
+      "MetaStore::Auth" : {
+         "file" : "lib/MetaStore/Auth.pm",
+         "version" : "0.01"
+      },
+      "MetaStore::Auth::Group" : {
+         "file" : "lib/MetaStore/Auth/Group.pm",
+         "version" : "0.01"
+      },
+      "MetaStore::Auth::User" : {
+         "file" : "lib/MetaStore/Auth/User.pm",
+         "version" : "0.01"
+      },
+      "MetaStore::Auth::UserGuest" : {
+         "file" : "lib/MetaStore/Auth/UserGuest.pm",
+         "version" : "0.1"
+      },
+      "MetaStore::Base" : {
+         "file" : "lib/MetaStore/Base.pm",
+         "version" : "0.01"
+      },
+      "MetaStore::Cmetalinks" : {
+         "file" : "lib/MetaStore/Cmetalinks.pm",
+         "version" : "0.1"
+      },
+      "MetaStore::Cmetatags" : {
+         "file" : "lib/MetaStore/Cmetatags.pm",
+         "version" : "0.1"
+      },
+      "MetaStore::Component" : {
+         "file" : "lib/MetaStore/Component.pm",
+         "version" : "0.01"
+      },
+      "MetaStore::Config" : {
+         "file" : "lib/MetaStore/Config.pm",
+         "version" : "0.3"
+      },
+      "MetaStore::DAOItem" : {
+         "file" : "lib/MetaStore/DAOItem.pm",
+         "version" : "0.01"
+      },
+      "MetaStore::IsAuthed" : {
+         "file" : "lib/MetaStore/IsAuthed.pm",
+         "version" : "0.1"
+      },
+      "MetaStore::Item" : {
+         "file" : "lib/MetaStore/Item.pm",
+         "version" : "0.01"
+      },
+      "MetaStore::Kern" : {
+         "file" : "lib/MetaStore/Kern.pm",
+         "version" : "0.1"
+      },
+      "MetaStore::Links" : {
+         "file" : "lib/MetaStore/Links.pm",
+         "version" : "0.01"
+      },
+      "MetaStore::Response" : {
+         "file" : "lib/MetaStore/Response.pm",
+         "version" : "0.1"
+      },
+      "MetaStore::StoreDir" : {
+         "file" : "lib/MetaStore/StoreDir.pm",
+         "version" : "0.1"
+      },
+      "MetaStore::Users" : {
+         "file" : "lib/MetaStore/Users.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.62"
+}

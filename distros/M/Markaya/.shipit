@@ -1,0 +1,8 @@
+steps = FindVersion, ChangeVersion, CheckChangeLog, DistTest, Commit, Tag, MakeDist, UploadCPAN, Twitter
+
+git.tagpattern = release-%v
+
+CheckChangeLog.files = Changes
+
+twitter.config = /Users/gugod/.twitterrc
+

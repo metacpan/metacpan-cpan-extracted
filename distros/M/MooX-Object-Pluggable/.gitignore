@@ -1,0 +1,7 @@
+# Dzil build directorys
+/MooX-Object-Pluggable*
+[._][Bb]uild/
+release*
+*.bak$
+*.swp$
+.gitnxtver_cache

@@ -1,0 +1,107 @@
+html:
+  - head:
+    - title: Markaya Spec
+  
+  - body:
+    - h1: Markaya Spec
+    - h2: Description
+    - p:
+        Markaya is a YAML-based text-to-html conversion convention,
+        Similar to Textile, but using YAML as its syntax. Any Markaya
+        document is also a valid YAML document.
+    
+    - p: >
+        The major goal of Markaya is to provide a full one-to-one mapping
+        convention between YAML and XHTML. There are lot of ways to
+        conver between a YAML document, and an XHTML document. Markaya
+        syntax is also optimized for human, instead of machines, to
+        read or to write Markaya documents. Balance between the fact
+        that XHTML are too verbose to write, and syntax errors happens
+        very easily. For example, here's a simple Markaya document:
+    
+    - pre: |
+        html:
+          - head:
+            - title: Markaya Example
+          - body:
+            - h1: Hello World
+            - p: This is an example
+  
+    - h2: Markaya Documents
+
+    - p:
+        A Markaya docuemnt contain one root node keyed "html", with
+        a sequence value that should contain only two key-value
+        pairs with keyname "head" and "body", in that sequence.
+
+    - p: >
+        All nodes except for the root node, should be an sequence of mapping or strings.
+        Sequences can preserve ordering, and mapping are used to map YAML synatx to HTML
+        tags. Most of the nodes in a sequence should contain only one mapping. Like this:
+
+    - pre: |
+        - p: Nihao
+
+    - p:
+        But it's OK to have a sequence of strings. And that should
+        be the same as concatinating those strings altogether in
+        that order.
+
+    - p: >
+        HTML documents always come with nested tags mixed within
+        text conent. In Markaya, a sequence of mix of strings and
+        mappings are used for this purpose:
+
+    - pre: |
+        - p: 
+          - Hello, 
+          - a href="http://who.int": World
+          - . It's a beautiful day.
+
+    - p:
+        All string literals in a Markaya document are shown literaly
+        when compiled to HTML. Which implies that no inline HTML
+        is allowed.
+
+    - h2: Mapping XHTML Tags
+  
+    - p: >
+        Simple XHTML Tags are mapped to a key-value pair in a sequence. For example:
+    
+    - pre: |
+        <p>Niaho</p>
+    
+    - p:
+        Is mapped to  
+    
+    - pre: |
+        - p: Nihao
+
+    - p: >
+        Tags with attrubtes are also mapped to a key-value pair in a sequence, but with
+        attributes in-lined as a part of key. For example:
+
+    - pre: |
+        - p class=description: Nihao
+
+    - p: >
+        If you need spaces inside an attribute value, you can quote the value
+        with double quote:
+
+    - pre: |
+        - p class="salut description": Nihao
+
+    - p: >
+        Inline tags are simply a tag within text sequences. For example, to do this in HTML:
+
+    - pre: |
+        <p>Hello,<a href="http://who.int">World</a></p>
+
+    - p: >
+        Just say this:
+
+    - pre: |
+        - p: 
+          - Hello, 
+          - a href="http://who.int": World
+

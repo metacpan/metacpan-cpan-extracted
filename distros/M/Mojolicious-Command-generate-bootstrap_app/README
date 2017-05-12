@@ -1,0 +1,249 @@
+NAME
+    Mojolicious::Command::generate::bootstrap_app - Generates a basic
+    application with simple DBIC-based authentication featuring Twitter
+    Bootstrap 3.0.3 and jQuery 1.10.2.
+
+VERSION
+    Version 0.07
+
+SYNOPSIS
+    This command generates an application with a DBIx::Class model and
+    simple authentication and users controllers.
+
+    To generate an app run:
+
+        mojo generate bootstrap_app My::Bootstrap::App
+
+    This will create the directory structure with a default YAML config and
+    basic testing.
+
+        cd my_bootstrap_app
+
+    To get database version and migration management you should install
+    DBIx::Class::Migration (>= 0.038).
+
+    The default database is an SQLite database that gets installed into
+    share/my_bootstrap_app.db. If you would like to change the database edit
+    your config.yml accordingly.
+
+    If installed you can use script/migration as a thin wrapper around
+    dbic-migration setting lib and the correct database already. Running:
+
+        script/migrate prepare
+        script/migrate install
+        script/migrate populate
+
+    Prepare generates the SQL files needed, install actually creates the
+    database schema and populate will populate the database with the data
+    from share/fixtures. So edit those to customize the default user.
+
+    If you do not have and do not want DBIx::Class::Migrate you can
+    initialize the database with:
+
+        script/migrate --init
+
+    Now run the test to check if everything went right.
+
+        script/my_bootstrap_app test
+
+    The default login credentials are admin:password.
+
+FILES
+    The file structure generated is very similar to the non lite app with a
+    few differences:
+
+        |-- config.yml                                     => your applications config file
+        |                                                     contains the database connection details and more
+        |-- lib
+        |   `-- My
+        |       `-- Bootstrap
+        |           |-- App
+        |           |   |-- Controller                     => authentication related controllers
+        |           |   |   |-- Auth.pm
+        |           |   |   |-- Example.pm
+        |           |   |   `-- Users.pm
+        |           |   |-- Controller.pm                  => the application controller
+        |           |   |                                     all controllers inherit from this
+        |           |   |                                     so application wide controller code goes here
+        |           |   |-- DB                             => the basic database
+        |           |   |   `-- Result                        including a User result class used for authentication
+        |           |   |       `-- User.pm
+        |           |   `-- DB.pm
+        |           `-- App.pm
+        |-- public
+        |   |-- bootstrap-3.0.3                            => Twitter Bootstrap
+        |   |   |-- css
+        |   |   |   |-- bootstrap.min.css
+        |   |   |   `-- bootstrap-theme.min.css
+        |   |   |-- fonts
+        |   |   |   |-- glyphicons-halflings-regular.eof
+        |   |   |   |-- glyphicons-halflings-regular.svg
+        |   |   |   |-- glyphicons-halflings-regular.ttf
+        |   |   |   `-- glyphicons-halflings-regular.woff
+        |   |   `-- js
+        |   |       |-- bootstrap.min.js
+        |   |       `-- jquery-1.10.2.min.js               => jQuery to make modals, dropdowns, etc. work
+        |   |-- index.html
+        |   `-- style.css
+        |-- script
+        |   |-- migrate                                    => migration script using DBIx::Class::Migration
+        |   `-- my_bootstrap_app
+        |-- share                                          => fixtures for the default admin user
+        |   |-- development                                   structure for three modes prepared
+        |   |   `-- fixtures                                  you can add as many as you need
+        |   |       `-- 1
+        |   |           |-- all_tables
+        |   |           |   `-- users
+        |   |           |       `-- 1.fix
+        |   |           `-- conf
+        |   |               `-- all_tables.json
+        |   |-- production
+        |   |   `-- fixtures
+        |   |       `-- 1
+        |   |           |-- all_tables
+        |   |           |   `-- users
+        |   |           |       `-- 1.fix
+        |   |           `-- conf
+        |   |               `-- all_tables.json
+        |   `-- testing
+        |       `-- fixtures
+        |           `-- 1
+        |               |-- all_tables
+        |               |   `-- users
+        |               |       `-- 1.fix
+        |               `-- conf
+        |                   `-- all_tables.json
+        |-- t
+        |   `-- basic.t
+        `-- templates                                      => templates to make use of the authentication
+            |-- auth
+            |   `-- login.html.ep
+            |-- elements                                   => configure key elements of the site seperatly from
+            |   |-- flash.html.ep                             the main layout
+            |   |-- footer.html.ep
+            |   `-- topnav.html.ep
+            |-- example
+            |   `-- welcome.html.ep
+            |-- layouts
+            |   `-- bootstrap.html.ep
+            `-- users
+                |-- add.html.ep
+                |-- edit.html.ep
+                `-- list.html.ep
+
+AUTHOR
+    Matthias Krull, "<m.krull at uninets.eu>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-mojolicious-command-generate-bootstrap_app at rt.cpan.org", or
+    through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Mojolicious-Command-gene
+    rate-bootstrap_app>. I will be notified, and then you'll automatically
+    be notified of progress on your bug as I make changes.
+
+    Alternatively file an issue at the github repo:
+
+    <https://github.com/mkrull/Mojolicious-Command-generate-bootstrap_app/is
+    sues>
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Mojolicious::Command::generate::bootstrap_app
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mojolicious-Command-genera
+        te-bootstrap_app>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Mojolicious-Command-generate-bootstrap_app
+        >
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Mojolicious-Command-generate-bootstra
+        p_app>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Mojolicious-Command-generate-bootstrap_
+        app/>
+
+    *   Repository
+
+        <https://github.com/mkrull/Mojolicious-Command-generate-bootstrap_ap
+        p/>
+
+LICENSE AND COPYRIGHT
+  Bootstrap
+    <http://www.apache.org/licenses/LICENSE-2.0>
+
+    <https://github.com/twitter/bootstrap/wiki/License>
+
+  jQuery
+    Copyright 2013 jQuery Foundation and other contributors
+    http://jquery.com/
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+  Generator
+    Copyright 2013 Matthias Krull.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a copy
+    of the full license at:
+
+    <http://www.perlfoundation.org/artistic_license_2_0>
+
+    Any use, modification, and distribution of the Standard or Modified
+    Versions is governed by this Artistic License. By using, modifying or
+    distributing the Package, you accept this license. Do not use, modify,
+    or distribute the Package, if you do not accept this license.
+
+    If your Modified Version has been derived from a Modified Version made
+    by someone other than you, you are nevertheless required to ensure that
+    your Modified Version complies with the requirements of this license.
+
+    This license does not grant you the right to use any trademark, service
+    mark, tradename, or logo of the Copyright Holder.
+
+    This license includes the non-exclusive, worldwide, free-of-charge
+    patent license to make, have made, use, offer to sell, sell, import and
+    otherwise transfer the Package with respect to any patent claims
+    licensable by the Copyright Holder that are necessarily infringed by the
+    Package. If you institute patent litigation (including a cross-claim or
+    counterclaim) against any party alleging that the Package constitutes
+    direct or contributory patent infringement, then this Artistic License
+    to you shall terminate on the date that such litigation is filed.
+
+    Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+    AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+    THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+    PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+    YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+    CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

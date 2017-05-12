@@ -1,0 +1,14 @@
+  [
+    {
+      "type" : "select",
+      "name" : "languages",
+      "data" : [
+        "de",
+        "en",
+        "cn",
+        "jp"
+      ],
+      "multiple" : 1,
+      "size" : 3
+    }
+  ]

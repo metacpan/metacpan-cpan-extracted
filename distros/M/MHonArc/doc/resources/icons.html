@@ -1,0 +1,237 @@
+<html>
+<head>
+<title>MHonArc Resources: ICONS</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="htmlext.html">HTMLEXT</a>]</td><td><nobr>[<a href="../resources.html#icons">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="iconurlprefix.html">ICONURLPREFIX</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>ICONS</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p>
+<code>&lt;ICONS&gt;<br></code>
+<var>icon-specification</var><br>
+<var>icon-specification</var><br>
+<var>...</var><br>
+<code>&lt;/ICONS&gt;<br></code>
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<P>The ICONS resource is used to specify the icons that represent the
+different content-types of messages.  This resource is used to
+define the possible expanded values of the
+<tt><a href="../rcvars.html#ICON">$ICON$</a></tt> resource variable.
+</p>
+
+<p>The ICON resource can only be defined via the resource file element.
+The format of each line in the <CODE>ICONS</CODE> element is as
+follows:
+</p>
+<pre>
+<var>content-type</var>:<var>url</var>
+</pre>
+
+<p>The definition of each item is a follows:
+
+<dl>
+
+<dt><var>content-type</var></dt>
+<dd><p>MIME content-type that an icon should be associated to.
+    Examples: <tt>text/plain</tt>, <tt>image/jpeg</tt>.  An icon
+    can be associated to a base type by using a <tt>*</tt> as the
+    sub-type.  Examples: <tt>text/*</tt>, <tt>image/*</tt>.  The
+    default icon can be specified by using a content-type of
+    <tt>*/*</tt>.
+    </p>
+    </dd>
+
+<dt><var>url</var></dt>
+<dd><p>The URL of the icon.  Example: <tt>http://host/icons/text.gif</tt>,
+    <tt>/icons/image.gif</tt>.
+    </p>
+    <p>The url can be prefixed with a
+    width and height specification to provide rendering hints to
+    browsers.  The syntax for specify the width and height is
+    as follows: <tt>[<var>W</var>x<var>H</var>]</tt>, where
+    <var>W</var> is the width and <var>H</var> is the height.  The
+    following is an example URL setting with width and height specification:
+    <tt>[20x22]/icons/image.gif</tt>.
+    </p>
+    <p>The width and height values map directly to the <tt>WIDTH</tt>
+    and <tt>HEIGHT</tt> attributes of the HTML <tt>IMG</tt> element
+    when <tt><a href="../rcvars.html#ICON">$ICON$</a></tt> is used.
+    Specifying the width and height decreases the rendering time
+    of a page since browsers do not have to wait to fetch the image
+    to determine how much area to provide for rendering.
+    </p>
+    </dd>
+
+</dl>
+
+<P>In order to have icons appear in your pages, use the
+<tt><a href="../rcvars.html#ICON">$ICON$</a></tt> resource variable.
+For example:
+</p>
+
+<pre class="code">
+<b>&lt;LiTemplate&gt;</b>
+$ICON$ &lt;strong&gt;$SUBJECT:40$&lt;/strong&gt;
+&lt;em&gt;$FROMNAME$&lt;/em&gt;&lt;br&gt;
+<b>&lt;/LiTemplate&gt;</b>
+</pre>
+
+<P>The <CODE>$ICON$</CODE> variable expands to the <CODE>IMG</CODE>
+HTML element with the appropriate URL in the <CODE>SRC</CODE> attribute
+to the icon. The <CODE>ALT</CODE> attribute of the <CODE>IMG</CODE>
+element contains the content-type of the message, surrounded by
+<CODE>[]</CODE>'s, for use with text based browsers.  If the width
+and height values have been defined for the given URL as described
+earlier, they will map to the <tt>WIDTH</tt> and <tt>HEIGHT</tt> attributes.
+</P>
+
+<p>The <tt><a href="../rcvars.html#ICONURL">$ICONURL$</a></tt> resource
+variable  may be used if you want redefine the format of the
+<CODE>IMG</CODE> element.  For example:
+</p>
+
+<PRE class="code">
+<b>&lt;LiTemplate&gt;</b>
+&lt;img src="$ICONURL$" alt="*"&gt;
+&lt;strong&gt;$SUBJECT:40$&lt;/strong&gt;
+&lt;em&gt;$FROMNAME$&lt;/em&gt;&lt;br&gt;
+<b>&lt;/LiTemplate&gt;</b>
+</PRE>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<p>Nil.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>The following example works well if using the Apache HTTP server
+and the default set of icons that are provided with it:
+</p>
+<pre class="code">
+<b>&lt;Icons&gt;</b>
+application/*;[20x22]/icons/generic.gif
+application/msword;[20x22]/icons/layout.gif
+application/postscript;[20x22]/icons/ps.gif
+application/rtf;[20x22]/icons/layout.gif
+application/x-csh;[20x22]/icons/script.gif
+application/x-dvi;[20x22]/icons/dvi.gif
+application/x-gtar;[20x22]/icons/tar.gif
+application/x-gzip;[20x22]/icons/compressed.gif
+application/x-ksh;[20x22]/icons/script.gif
+application/x-latex;[20x22]/icons/tex.gif
+application/octet-stream;[20x22]/icons/binary.gif
+application/x-patch;[20x22]/icons/patch.gif
+application/pdf;[20x22]/icons/pdf.gif
+application/x-script;[20x22]/icons/script.gif
+application/x-sh;[20x22]/icons/script.gif
+application/x-tar;[20x22]/icons/tar.gif
+application/x-tex;[20x22]/icons/tex.gif
+application/x-zip-compressed;[20x22]/icons/compressed.gif
+application/zip;[20x22]/icons/compressed.gif
+audio/*;[20x22]/icons/sound1.gif
+chemical/*;[20x22]/icons/sphere2.gif
+image/*;[20x22]/icons/image2.gif
+message/external-body;[20x22]/icons/link.gif
+multipart/*;[20x22]/icons/layout.gif
+text/*;[20x22]/icons/text.gif
+video/*;[20x22]/icons/movie.gif
+*/*;[20x22]/icons/generic.gif
+<b>&lt;/Icons&gt;</b>
+</pre>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>1.0
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+<tt><a href="../rcvars.html#ICON">$ICON$</a></tt>,
+<tt><a href="../rcvars.html#ICONURL">$ICONURL$</a></tt>,
+<a href="iconurlprefix.html">ICONURLPREFIX</a>,
+<a href="litemplate.html">LITEMPLATE</a>,
+<a href="tlitxt.html">TLITXT</a>,
+<a href="tsingletxt.html">TSINGLETXT</a>,
+<a href="ttopbegin.html">TTOPBEGIN</a>
+</p>
+<p>The
+<tt><a href="mimefilters.html#m2h_external">m2h_external::filter</a></tt>
+<a href="mimefilters.html">mime filter</a>.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="htmlext.html">HTMLEXT</a>]</td><td><nobr>[<a href="../resources.html#icons">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="iconurlprefix.html">ICONURLPREFIX</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2003/10/06 22:04:17 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"><strong>MHonArc</strong></a><br>
+Copyright &#169; 1997-2001, <a href="http://www.earlhood.com/">Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org">mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

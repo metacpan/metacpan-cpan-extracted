@@ -1,0 +1,38 @@
+.perltidyrc
+.ship.conf
+.travis.yml
+Changes
+cpanfile
+examples/chat.pl
+lib/Mojo/Redis2.pm
+lib/Mojo/Redis2/Backend.pm
+lib/Mojo/Redis2/Bulk.pm
+lib/Mojo/Redis2/Client.pm
+lib/Mojo/Redis2/Cursor.pm
+lib/Mojo/Redis2/Server.pm
+lib/Mojo/Redis2/Transaction.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+script/try-mojo-redis2.pl
+t/00-basic.t
+t/all-basic-operations.t
+t/backend.t
+t/basic-operations.t
+t/blocking-operations.t
+t/bulk.t
+t/client.t
+t/config.t
+t/connection-refused.t
+t/constructor.t
+t/disconnected.t
+t/lite.t
+t/protocol.t
+t/pubsub.t
+t/scan-operations.t
+t/start-server.t
+t/transaction.t
+t/Util.pm
+t/version.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

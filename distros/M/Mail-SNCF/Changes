@@ -1,0 +1,8 @@
+Revision history for Mail::SNCF
+
+0.011   26/03
+		Now it's called Mail::SNCF instead of SNCF
+
+0.01    18/02
+        It's now a module. Initially, it was only a single script..
+

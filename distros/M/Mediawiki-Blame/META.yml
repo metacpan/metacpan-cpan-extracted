@@ -1,0 +1,39 @@
+---
+abstract: 'see who is responsible for each line of page content'
+author:
+  - 'Lars Dɪᴇᴄᴋᴏᴡ  C<< <daxim@cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Spec::Functions: 0
+  Test::Exception: 0
+  Test::More: 0.42
+  Test::Without::Module: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mediawiki-Blame
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Algorithm::Annotate: 0
+  Carp: 0
+  Class::Spiffy: 0
+  DateTime: 0
+  DateTime::Format::ISO8601: 0
+  LWP::UserAgent: 0
+  Params::Validate: 0
+  Readonly: 0
+  Regexp::Common: 0
+  XML::Twig: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.0.3

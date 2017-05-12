@@ -1,0 +1,181 @@
+--stations
+
+# L2
+Simonis % Leopold II
+Osseghem
+Beekkant
+Gare de l'Ouest % Weststation
+Delacroix
+Clemenceau
+Gare du Midi % Zuidstation
+Porte de Hal % Hallepoort
+Hôtel des Monnaies % Munthof
+Louise % Louiza
+Porte de Namur % Naamsepoort
+Trône % Troon
+Arts-Loi % Kunst-Wet
+Madou
+Botanique
+Rogier
+Yser
+Ribaucourt
+Elisabeth
+
+# L1
+Beekkant
+Étangs Noirs % Zwarte Vijvers
+Comte de Flandre % Graaf van Vlaanderen
+Sainte-Catherine % Sint-Katelijne
+De Brouckère
+Gare Centrale % Centraal Station
+Parc % Park
+Maelbeek
+Schuman
+Mérode
+Montgomery
+Joséphine-Charlotte
+Gribaumont
+Tomberg
+Roodebeek
+Vandervelde
+Alma
+Crainhem % Kraainem
+Stockel
+
+# L5
+Erasme % Erasmus
+Eddy Merckx
+CERIA % COOVI
+La Roue % Het Rad
+Bizet
+Veeweyde % Veeweide
+Saint-Guidon % Sint-Guido
+Aumale
+Jacques Brel
+De Brouckère
+Maelbeek
+Schuman
+Mérode
+Thieffry
+Pétillon
+Hankar
+Delta
+Beaulieu
+Demey
+Herrmann-Debroux
+
+# L6
+Roi Baudouin % Koning Boudewijn
+Heysel % Heizel
+Houba-Brugmann
+Stuyvenbergh
+Bockstael
+Pannenhuis
+Belgica
+
+# T3
+Gare du Nord % Noordstation
+Bourse % Beurs
+Anneessens
+Lemonnier
+Parvis de Saint-Gilles % Sint-Gillis Voorplein
+Horta
+Albert 
+
+--lines
+L1|L1|Line 1|color:#b92c92,width:8
+L2|L2|Line 2|color:#ff8306,width:8
+T3|T3|Line 3|color:#c3cf21,width:6
+L5|L5|Line 5|color:#fcb814,width:8
+L6|L6|Line 6|color:#0080b3,width:8
+
+--transfers
+Simonis|Elisabeth
+
+--segments
+L6|Roi Baudouin|Heysel
+L6|Heysel|Houba-Brugmann
+L6|Houba-Brugmann|Stuyvenbergh
+L6|Stuyvenbergh|Bockstael
+L6|Bockstael|Pannenhuis
+L6|Pannenhuis|Belgica
+L6|Belgica|Simonis
+
+L2,L6|Simonis|Osseghem
+L2,L6|Osseghem|Beekkant
+L2,L6|Beekkant|Gare de l'Ouest
+L2,L6|Gare de l'Ouest|Delacroix
+L2,L6|Delacroix|Clemenceau
+L2,L6|Clemenceau|Gare du Midi
+L2,L6|Gare du Midi|Porte de Hal
+L2,L6|Porte de Hal|Hôtel des Monnaies
+L2,L6|Hôtel des Monnaies|Louise
+L2,L6|Louise|Porte de Namur
+L2,L6|Porte de Namur|Trône
+L2,L6|Trône|Arts-Loi
+L2,L6|Arts-Loi|Madou
+L2,L6|Madou|Botanique
+L2,L6|Botanique|Rogier
+L2,L6|Rogier|Yser
+L2,L6|Yser|Ribaucourt
+L2,L6|Ribaucourt|Elisabeth
+
+L1|Gare de l'Ouest|Beekkant
+L1|Beekkant|Étangs Noirs
+L1|Étangs Noirs|Comte de Flandre
+L1|Comte de Flandre|Sainte-Catherine
+L1|Sainte-Catherine|De Brouckère
+L1|De Brouckère|Gare Centrale
+L1|Gare Centrale|Parc
+L1|Parc|Arts-Loi
+L1|Arts-Loi|Maelbeek
+L1|Maelbeek|Schuman
+L1|Schuman|Mérode
+L1|Mérode|Montgomery
+L1|Montgomery|Joséphine-Charlotte
+L1|Joséphine-Charlotte|Gribaumont
+L1|Gribaumont|Tomberg
+L1|Tomberg|Roodebeek
+L1|Roodebeek|Vandervelde
+L1|Vandervelde|Alma
+L1|Alma|Crainhem
+L1|Crainhem|Stockel
+
+L5|Erasme|Eddy Merckx
+L5|Eddy Merckx|CERIA
+L5|CERIA|La Roue
+L5|La Roue|Bizet
+L5|Bizet|Veeweyde
+L5|Veeweyde|Saint-Guidon
+L5|Saint-Guidon|Aumale
+L5|Aumale|Jacques Brel
+L5|Jacques Brel|Gare de l'Ouest
+L5|Gare de l'Ouest|Beekkant
+L5|Beekkant|Étangs Noirs
+L5|Étangs Noirs|Comte de Flandre
+L5|Comte de Flandre|Sainte-Catherine
+L5|Sainte-Catherine|De Brouckère
+L5|De Brouckère|Gare Centrale
+L5|Gare Centrale|Parc
+L5|Parc|Arts-Loi
+L5|Arts-Loi|Maelbeek
+L5|Maelbeek|Schuman
+L5|Schuman|Mérode
+L5|Mérode|Thieffry
+L5|Thieffry|Pétillon
+L5|Pétillon|Hankar
+L5|Hankar|Delta
+L5|Delta|Beaulieu
+L5|Beaulieu|Demey
+L5|Demey|Herrmann-Debroux
+
+T3|Gare du Nord|Rogier
+T3|Rogier|De Brouckère
+T3|De Brouckère|Bourse
+T3|Bourse|Anneessens
+T3|Anneessens|Lemonnier
+T3|Lemonnier|Gare du Midi
+T3|Gare du Midi|Porte de Hal
+T3|Porte de Hal|Parvis de Saint-Gilles
+T3|Parvis de Saint-Gilles|Horta
+T3|Horta|Albert

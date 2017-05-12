@@ -1,0 +1,26 @@
+---
+abstract: 'An object-oriented Mapper for the Marathon REST API'
+author:
+  - 'Sebastian Geidies <seb@geidi.es>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Marathon
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: '7.11'
+  IO::All: '0.86'
+  JSON::XS: '3.01'
+  LWP::UserAgent: '6.13'
+  perl: '5.006'
+version: '0.9'

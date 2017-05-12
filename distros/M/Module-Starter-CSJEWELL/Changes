@@ -1,0 +1,8 @@
+Revision history for Module-Starter-CSJEWELL
+
+0.200  Wed 04 Aug 2010
+       - Added tests, moved author tests to xt/author.
+       - Updated version numbers on author tests.
+
+0.100  Fri 14 Aug 2009
+       - Initial release.

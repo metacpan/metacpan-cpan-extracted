@@ -1,0 +1,37 @@
+--- #YAML:1.0
+name:               Muldis-Rosetta
+version:            0.16.0
+abstract:           Full-featured truly relational DBMS in Perl
+author:
+    - Darren Duncan <darren@DarrenDuncan.net>
+license:            lgpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  6.48
+build_requires:
+    Carp::Always:         0.09
+    ExtUtils::MakeMaker:  6.48
+    Test::More:           0.92
+requires:
+    Class::MOP:           0.98
+    Moose:                0.98
+    Moose::Role:          0.98
+    MooseX::Singleton:    0.22
+    namespace::autoclean:  0.09
+    perl:                 5.008001
+    Test::Moose:          0.98
+    Test::More:           0.92
+    Try::Tiny:            0.04
+resources:
+    homepage:     http://www.muldis.com/
+    license:      http://www.fsf.org/licensing/licenses/lgpl.html
+    MailingList:  http://mm.DarrenDuncan.net/mailman/listinfo
+    repository:   http://github.com/muldis/Muldis-Rosetta
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

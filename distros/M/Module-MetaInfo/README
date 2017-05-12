@@ -1,0 +1,60 @@
+N.B. After looking at WAIT integration, I've decided that I had better
+clear up the difference between a module distribution file and a
+module.  Module::MetaInfo deals with the meta information for CPAN
+module distribution file.  A module is only one exact package
+namespace provided in that module.  The module distribution files
+normally contain a set of modules which it is logical to install
+together.  This means that when they are packaged into a binary
+distribution they should be packaged together.
+
+	- so that it's easier to manage since there are less objects
+
+		- less individual installation jobs
+		- less choice - less confusion
+
+	- so that less mistakes are made by failing to install needed
+	  software (N.B. package dependency systems) 
+
+
+Module::MetaInfo is an experimental interface to the meta information
+of a perl package.  The first release is primarily intended to get some
+debate about whether this is the correct way to do such things.
+
+At the present moment, most of the meta information produced is
+guessed from the contents of the module.
+
+Module::MetaInfo currently (partially) implements one particular model
+for how developers can deliberately provide information by putting it
+in files in a directory (PkgData in the package top level directory).
+See Module::MetaInfo::DirTree for details.
+
+This has the advantages of
+
+	- low clutter in the distribution
+	- extreme simplicity
+	- can represent any data
+
+And the disadvantages of 
+
+	- space inefficient on old fasioned operating systems *
+	- slight time inefficiency **
+	- it is not in any way standard.
+
+I'm interested in alternative suggestions B<with working code>.
+Especially there have been several suggestions including the use of
+XML.
+
+A patch for Module::MetaInfo support has been contributed to RedHat's
+cpanflute.  A copy is included in the file cpanflute.patch.  This
+should allow the building of RPMs using the metainformation that the
+program meta-from-perl-mods can extract.
+
+Please see the copyright notice in each file.  
+
+* This is caused by the extra space taken up by small files on certain
+operating systems.  If you are using a Windows family operating such
+as an XP system, you are advised to upgrade a more modern one such as
+GNU/Linux or FreeBSD.
+
+** this is caused by extra system calls to open each file and is a
+very minor problem

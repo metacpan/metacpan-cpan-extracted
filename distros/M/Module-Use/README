@@ -1,0 +1,65 @@
+NAME
+    Module::Use
+
+SYNOPSIS
+    Perl
+      use Module::Use (Logger => "Debug");
+
+    mod_perl
+      <Perl>
+      use Module::Use (Logger => "Debug");
+      </Perl>
+
+      PerlChildExitHandler Module::Use
+      PerlCleanupHandler Module::Use
+      PerlLogHandler Module::Use
+
+DESCRIPTION
+    Module::Use will record the modules used over the course of the Perl
+    interpreter's lifetime. If the logging module is able, the old logs are
+    read and frequently used modules are automatically loaded. Note that no
+    symbols are imported into packages.
+
+    Under mod_perl, only one Perl*Handler should be selected, depending on
+    when and how often logging should take place.
+
+OPTIONS
+    The following options are available when `use'ing this module.
+
+    Count
+        This is the number of times a module has been used for it to be
+        automatically loaded.
+
+    Decay
+        This number is subtracted from the count of all modules that are in
+        the data store but were not loaded.
+
+    Grow
+        This number is added to the count of all modules that were loaded.
+
+    Limit
+        Do not automatically load more than this many modules.
+
+    Logger
+        This is the logging module to use. Configuration is specific to the
+        module chosen. Please see the documentation for the module.
+
+        The module name is `Module::Use::Logger' with `Logger' replaced with
+        the value of this option.
+
+    Percentage
+        The percentage of total module loads is used in the same manner as
+        the `Count'. If both `Percentage' and `Count' are given, the one
+        with the greater counts is used.
+
+SEE ALSO
+    the Module::Use::Debug manpage, the Module::Use::DB_FileLock manpage.
+
+AUTHOR
+    James G. Smith <jgsmith@jamesmith.com>
+
+COPYRIGHT
+    Copyright (C) 2001 James G. Smith
+
+    Released under the same license as Perl itself.
+

@@ -1,0 +1,39 @@
+The scripts in this directory provide an example of request/reply
+applications, a common usage pattern for MQSeries applications.
+
+It shows three types of requesting scripts (generally client
+applications) and a server script to provide responses:
+
+- request_fixed: a request script with a fixed reply queue shared
+  across instances.  Because each requestor needs to be able to pick
+  out its reply from the others, it uses the MsgId-to-CorrelId
+  protocol (the default for well-behaved request/reply apps) to pick
+  out its reply from the queue.
+
+- request_tempdyn: a request script using a temporary dynamic reply
+  queue.  Since the queue isn't shared, it just picks up the first
+  reply message.  (This is only safe if the script doesn't send out
+  multiple requests before looking for replies; in general, even
+  scripts like this should use MsgId-to-CorrelId or similar to pick
+  out the reply.)  This script uses non-pesistent messages.
+
+- request_permdyn: a request script using a permanent dynamic reply
+  queue, i.e. one that can survive across instances.  It opens the
+  reply queue in excluisve mode, but since it sends out multiple
+  request messages before getting replies, it needs to select messages
+  using CorrelId.  Purely for demonstration purposes, this script uses
+  the CorrelId-to-CorrelId protocol, so we can show the server script
+  handles this correctly.
+
+- server: the server script that reads from the request queue,
+  provides overly simple message handling (little more than an echo),
+  but demonstrates key features of an MQ server:
+  - handling persistent messages transactionally, i.e. under syncpoint
+  - handling MsgId-to-CorrelId as well as CorrelId-to-CorrelId
+  - detecting poison messages and moving them to an error queue
+  - using Put1 to send a reply without opening the reply queue
+
+None of these scripts are industrial-strength, enterprise-ready.  The
+error handling is minimal and they don't perform logging.  However,
+the server script provides a solid core, and the request scripts are
+certainly good enough for most purposes.

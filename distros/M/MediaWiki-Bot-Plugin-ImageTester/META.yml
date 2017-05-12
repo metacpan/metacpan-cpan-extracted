@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               MediaWiki-Bot-Plugin-ImageTester
+version:            0.2.7
+abstract:           a plugin for MediaWiki::Bot which contains image copyright checking and analysis for the english wikipedia
+author:
+    - Dan Collins (ST47)
+license:            gpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:            0
+    HTML::Entities:  1.35
+    MediaWiki::Bot:  1.5.2
+    URI::Escape:     3.28
+    WWW::Mechanize:  1.30
+    XML::Simple:     2.16
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

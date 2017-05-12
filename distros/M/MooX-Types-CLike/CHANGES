@@ -1,0 +1,43 @@
+Revision History for MooX-Types-CLike
+=====================================
+
+v0.92 2013-03-19
+----------------
+
+commit 7973c8e9df7d391597da4136153182d4b1b42658
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Tue Mar 19 11:16:11 2013 -0400
+
+    Fix ordering issue with NonBigInt (now an error in newer MooseLike)
+
+commit 93c55ba21a0a340c9ec730ca65a0e97754a85068
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Thu Feb 28 17:31:13 2013 -0500
+
+    (Travis YML)
+
+v0.91 2012-10-02
+----------------
+
+commit 7e22147d3c36f4a0c55fb978c490e20d0e338d45
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Tue Oct 2 11:34:46 2012 -0400
+
+    Release v0.91
+
+commit f085d94bb889c1c706c785f7ca7da1222675d0dd
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Tue Oct 2 11:27:08 2012 -0400
+
+    Simplify dist.ini
+
+commit 8f4f4218cbaa236a6b297c7ce3e54472ecf06f94
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Mon Oct 1 08:39:57 2012 -0400
+
+    Fix NaN/inf checks for integers (some OSs report NaN as "0")
+    Fix minor doc bug
+
+===================================
+End of changes in the last 365 days
+===================================

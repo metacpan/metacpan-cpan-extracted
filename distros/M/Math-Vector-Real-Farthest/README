@@ -1,0 +1,34 @@
+Math-Vector-Real-Farthest
+=========================
+
+Find the two more distant vectors in a set
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Math::Vector::Real
+  Math::nSphere
+  Sort::Key::Top
+
+The module Sort::Key::Radix is required if the method
+find_2d_convex_hull is going to be used.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Salvador Fandino
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

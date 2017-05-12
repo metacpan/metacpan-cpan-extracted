@@ -1,0 +1,53 @@
+Revision history for Perl extension Module-Build-XSHelper
+
+0.16 2015-06-29T15:55:13Z
+    - Fix regexp of _gcc_version for Ubuntu and Debian
+        (syohex)
+    - Set -std=c99 explicitly for older GCC
+        (syohex)
+
+0.15 2015-04-23T22:43:05Z
+    - Update XSHelper for Fix STATIC_INLINE for gcc -std=c89
+        (vpit)
+
+0.14 2014-08-04T09:48:00Z
+    - Skip broken test.
+
+0.13 2014-08-02T20:31:27Z
+    - Fixed C++11 support(Detecting compiler support)
+
+0.12 2014-08-02T13:57:10Z
+    - Add C++11 support
+
+0.11_01 2014-06-14T14:36:33Z
+    - Add diag message for test
+
+0.10 2014-05-02T21:04:33Z
+    - Add build test
+
+0.09 2014-05-01T01:55:51Z
+    - Remove broken test
+
+0.08 2014-04-30T10:08:48Z
+    - Fixed broken test
+
+0.07 2014-04-28T15:10:06Z
+    - Fixed issue #4
+
+0.06 2014-01-12T02:14:32Z
+    - Fixed typo in POD
+
+0.05 2013-11-22T21:37:33Z
+    - Fixed documentation issue
+        (tokuhirom)
+
+0.03 2013-06-25T11:09:35Z
+    - Fixed: cc_warnings bug (issue#1)
+
+0.02 2013-06-23T09:06:28Z
+    - Fixed: cc_warnings enable by default
+
+0.01 2013-06-23T07:50:33Z
+
+    - original version
+

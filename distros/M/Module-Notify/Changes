@@ -1,0 +1,14 @@
+Module-Notify
+=============
+
+Created:      2013-05-24
+Home page:    <https://metacpan.org/release/Module-Notify>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Module-Notify>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.001	2013-05-24	Initial release

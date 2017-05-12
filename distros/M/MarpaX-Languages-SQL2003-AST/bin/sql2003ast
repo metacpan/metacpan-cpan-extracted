@@ -1,0 +1,115 @@
+#!perl
+use strict;
+use warnings FATAL => 'all';
+use MarpaX::Languages::SQL2003::AST;
+use POSIX qw/EXIT_SUCCESS EXIT_FAILURE/;
+use Getopt::Long;
+use Pod::Usage;
+use IO::String;
+use File::Slurp qw/read_file/;
+use Data::Dumper;
+
+# ABSTRACT: SQL-2003 AST
+
+our $VERSION = '0.005'; # VERSION
+
+# PODNAME: sql2003ast
+
+my $help = 0;
+my $xml = 1;
+my $trace_terminals = 0;
+my $trace_values = 0;
+my $host = '';
+GetOptions ('help!' => \$help,
+            'xml!' => \$xml,
+            'trace_terminals!' => \$trace_terminals,
+            'trace_values!' => \$trace_values,
+            'host=s' => \$host);
+
+if ($help || $#ARGV > 0) {
+  my $pod = do {local $/; <DATA>};
+  my $podfh = IO::String->new($pod);
+  pod2usage(-verbose => 2, -noperldoc => 1, -input => $podfh, -exitval => $help ? EXIT_SUCCESS : EXIT_FAILURE);
+}
+
+my $input = (@ARGV && $ARGV[0] ne '-') ? read_file(shift) : <STDIN>;
+my $ast = MarpaX::Languages::SQL2003::AST->new(host => $host);
+my %opts = (trace_terminals => $trace_terminals, trace_values => $trace_values);
+print $xml ? $ast->asXML($input, %opts)->toString(1) : Dumper($ast->asBlessed($input, %opts));
+
+exit(EXIT_SUCCESS);
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+sql2003ast - SQL-2003 AST
+
+=head1 VERSION
+
+version 0.005
+
+=head1 AUTHOR
+
+Jean-Damien Durand <jeandamiendurand@free.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Jean-Damien Durand.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+__DATA__
+
+# --------------------------------------------------------------------------------------
+
+=head1 NAME
+
+sql2003ast - SQL AST
+
+=head1 SYNOPSIS
+
+ sql2003ast [options] [file]
+
+where options can be:
+
+  --help            This help.
+  --xml             XML mode. Default is a true value. Say --noxml for bless mode.
+  --host            Host language.
+  --trace_terminals Trace terminals. Default is a false value.
+  --trace_values    Trace AST values. Default is a false value.
+
+and arguments can be:
+
+  file          Input filename containing SQL statement
+
+=head1 NOTES
+
+=over
+
+=item
+
+Say --noxml to disable the XML mode, i.e. to use a blessed mode (i.e. a hierarchical structure of blessed perl's arrays).
+
+=item
+
+--host option value if when grammar is using Host Identifiers, e.g. "EXEC SQL SELECT salary INTO :a FROM employees". Default host SQL sub-grammar is the C language. Supported values are: C, Ada, Cobol, Fortran, Mumps, Pascal, PLI.
+
+=item
+
+If file is absent or equal to '-', then STDIN is assumed.
+
+=item
+
+Any ambiguous parse will result in a failure, with a hopefully clear stack trace.
+
+=back
+
+=head1 SEE ALSO
+
+L<MarpaX::Languages::SQL2003::AST>

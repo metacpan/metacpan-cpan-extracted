@@ -1,0 +1,34 @@
+Revision history for Moment
+
+1.0.0   2015-01-09
+        [Major]
+        * First public release
+
+1.0.1   2015-01-09
+        [Patch]
+        * Fixing POD indentation
+
+1.1.0   2015-01-14
+        [Minor]
+        * New methods get_d() & get_t()
+
+1.2.0   2015-04-29
+        [Minor]
+        * New method get_weekday_number()
+
+        [Patch]
+        * Adding SemVer levels to Changes
+
+1.2.1   2015-08-02
+        [Patch]
+        * Removed FAQ question about week day number and returned question about week number
+        * Making Data::Printer to be link in POD
+
+1.3.0   2015-11-07
+        [Minor]
+        * Constructor new() works with 'iso_string' and new method get_iso_string()
+
+        [Patch]
+        * Using ISO 8601 format for Data::Prtiner output
+        * Added link to ISO 8601 in 'See also' section
+        * Constructor new() dies if parameter has "\n" at the end

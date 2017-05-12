@@ -1,0 +1,32 @@
+---
+abstract: 'Process various dump files from a MediaWiki instance'
+author:
+  - "\"Tyler Riddle <triddle@cpan.org>\""
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MediaWiki-DumpFile
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  XML::CompactTree::XS: 0.02
+requires:
+  Data::Compare: 1.2101
+  File::Find::Rule: 0.32
+  File::Type: 0.22
+  IO::Uncompress::AnyUncompress: v2.0.37
+  Scalar::Util: 1.21
+  Test::Exception: 0.27
+  Test::More: 0.94
+  Test::Simple: 0.94
+  XML::TreePuller: v0.1.0
+version: v0.2.2

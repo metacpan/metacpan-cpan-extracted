@@ -1,0 +1,27 @@
+Build.PL
+Changes
+etc/61_konfidi.cf
+etc/init_konfidi.pre
+lib/Mail/SpamAssassin/Plugin/Konfidi.pm
+LICENSE-Apache.txt
+MANIFEST
+MANIFEST.SKIP
+META.yml			# Will be created by "make dist"
+NOTICE.txt
+README
+rules/10_misc.cf
+rules/test_load_plugin.pre
+rules/user_prefs.template
+t/00-load.t
+t/acceptance-base.pl
+t/acceptance.t
+t/boilerplate.t
+t/config
+t/config.dist
+t/data/gpg_thunderbird.eml
+t/data/plain.eml
+t/pod.t
+t/SATest.pm
+t/test_dir
+t/unit.t
+SIGNATURE    Added here by Module::Build

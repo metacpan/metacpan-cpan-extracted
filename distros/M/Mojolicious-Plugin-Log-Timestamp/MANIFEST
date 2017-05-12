@@ -1,0 +1,15 @@
+Changes
+lib/Mojolicious/Plugin/Log/Timestamp.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.md
+test/00-load.t
+test/10-log.t
+test/99-play.pl
+test/manifest.t
+test/pod.t
+test/version.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,128 @@
+<html>
+<head>
+<title>MHonArc Resources: DEFRCFILE</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="definevar.html">DEFINEVAR</a>]</td><td><nobr>[<a href="../resources.html#defrcfile">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="defrcname.html">DEFRCNAME</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>DEFRCFILE</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p>
+<code>M2H_DEFRCFILE=</code><var>filename</var>
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>DEFRCFILE is the pathname to the default resource file.  The file
+is read each time MHonArc is invoked.  The file is
+read before processing the resource file specified by the
+<a href="rcfile.html">RCFILE</a> resource and before command-line options
+are processed.
+The default resource file allows you change what the default resource
+values are.  This can be useful if you want to have a set of resources
+values to be in effect each time MHonArc is invoked.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<p><var>user-home-path</var><tt>/</tt><a href="defrcname.html"
+>DEFRCNAME</a>
+</p>
+
+<p>If the above does not exist, then:
+</p>
+
+<p><var>MHonArc-library-path</var><tt>/</tt><a href="defrcname.html"
+>DEFRCNAME</a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>None.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>2.0
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+<a href="defrcname.html">DEFRCNAME</a>,
+<a href="rcfile.html">RCFILE</a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="definevar.html">DEFINEVAR</a>]</td><td><nobr>[<a href="../resources.html#defrcfile">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="defrcname.html">DEFRCNAME</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2003/10/06 22:04:16 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"
+><strong>MHonArc</strong></a><br>
+Copyright &#169; 1997-1998, <a href="http://www.earlhood.com/"
+>Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org"
+> mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

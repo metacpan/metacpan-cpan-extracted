@@ -1,0 +1,297 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Message::Field::Address - One e-mail address
+
+=head1 INHERITANCE
+
+ Mail::Message::Field::Address
+   is a Mail::Identity
+   is a User::Identity::Item
+
+=head1 SYNOPSIS
+
+ my $addr = Mail::Message::Field::Address->new(...);
+
+ my $ui   = User::Identity->new(...);
+ my $addr = Mail::Message::Field::Address->coerce($ui);
+
+ my $mi   = Mail::Identity->new(...);
+ my $addr = Mail::Message::Field::Address->coerce($mi);
+
+ print $addr->address;
+ print $addr->fullName;   # possibly unicode!
+ print $addr->domain;
+
+=head1 DESCRIPTION
+
+Many header fields can contain e-mail addresses.  Each e-mail address
+can be represented by an object of this class.  These objects will
+handle interpretation and character set encoding and decoding for you.
+
+Extends L<"DESCRIPTION" in Mail::Identity|Mail::Identity/"DESCRIPTION">.
+ 
+=head1 OVERLOADED
+
+=over 4
+
+=item overload: B<boolean>
+
+The object used as boolean will always return C<true>
+
+=item overload: B<string $comparison>
+
+Two address objects are the same when their email addresses are the
+same.
+
+=item overload: B<stringification>
+
+When the object is used in string context, it will return the encoded
+representation of the e-mail address, just like L<string()|Mail::Message::Field::Address/"Access to the content"> does.
+
+=back
+
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Identity|Mail::Identity/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Mail::Identity|Mail::Identity/"Constructors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<coerce>( <STRING|$object>, %options )
+
+Try to coerce the $object into a C<Mail::Message::Field::Address>.
+In case of a STRING, it is interpreted as an email address.
+
+The %options are passed to the object creation, and overrule the values
+found in the $object.  The result may be C<undef> or a newly created
+object.  If the $object is already of the correct type, it is returned
+unmodified.
+
+The $object may currently be a L<Mail::Address|Mail::Address>, a L<Mail::Identity|Mail::Identity>, or
+a L<User::Identity|User::Identity>.  In case of the latter, one of the user's addresses
+is chosen at random.
+
+=item Mail::Message::Field::Address-E<gt>B<new>( [NAME], OPTIONS )
+
+Inherited, see L<Mail::Identity/"Constructors">
+
+=item $obj-E<gt>B<parse>(STRING)
+
+Parse the string for an address.  You never know whether one or more
+addresses are specified on a line (often applications are wrong), therefore,
+the STRING is first parsed for as many addresses as possible and then the
+one is taken at random.
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Mail::Identity|Mail::Identity/"Attributes">.
+ 
+=over 4
+
+=item $obj-E<gt>B<address>()
+
+Inherited, see L<Mail::Identity/"Attributes">
+
+=item $obj-E<gt>B<charset>()
+
+Inherited, see L<Mail::Identity/"Attributes">
+
+=item $obj-E<gt>B<comment>( [STRING] )
+
+Inherited, see L<Mail::Identity/"Attributes">
+
+=item $obj-E<gt>B<description>()
+
+Inherited, see L<User::Identity::Item/"Attributes">
+
+=item $obj-E<gt>B<domain>()
+
+Inherited, see L<Mail::Identity/"Attributes">
+
+=item $obj-E<gt>B<language>()
+
+Inherited, see L<Mail::Identity/"Attributes">
+
+=item $obj-E<gt>B<location>()
+
+Inherited, see L<Mail::Identity/"Attributes">
+
+=item $obj-E<gt>B<name>( [NEWNAME] )
+
+Inherited, see L<User::Identity::Item/"Attributes">
+
+=item $obj-E<gt>B<organization>()
+
+Inherited, see L<Mail::Identity/"Attributes">
+
+=item $obj-E<gt>B<phrase>()
+
+Inherited, see L<Mail::Identity/"Attributes">
+
+=item $obj-E<gt>B<username>()
+
+Inherited, see L<Mail::Identity/"Attributes">
+
+=back
+
+=head2 Collections
+
+Extends L<"Collections" in Mail::Identity|Mail::Identity/"Collections">.
+ 
+=over 4
+
+=item $obj-E<gt>B<add>(COLLECTION, ROLE)
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<addCollection>(OBJECT | ([TYPE], OPTIONS))
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<collection>(NAME)
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<parent>( [PARENT] )
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<removeCollection>(OBJECT|NAME)
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<type>()
+
+=item Mail::Message::Field::Address-E<gt>B<type>()
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=item $obj-E<gt>B<user>()
+
+Inherited, see L<User::Identity::Item/"Collections">
+
+=back
+
+=head2 Searching
+
+Extends L<"Searching" in Mail::Identity|Mail::Identity/"Searching">.
+ 
+=over 4
+
+=item $obj-E<gt>B<find>(COLLECTION, ROLE)
+
+Inherited, see L<User::Identity::Item/"Searching">
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<encoding>()
+
+Character-set encoding, like 'q' and 'b', to be used when non-ascii
+characters are to be transmitted.
+
+=back
+
+=head2 Access to the content
+
+=over 4
+
+=item $obj-E<gt>B<string>()
+
+Returns an RFC compliant e-mail address, which will have character
+set encoding if needed.  The objects are also overloaded to call
+this method in string context.
+
+example: 
+
+ print $address->string;
+ print $address;          # via overloading
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: $object is not a collection.
+
+The first argument is an object, but not of a class which extends
+L<User::Identity::Collection|User::Identity::Collection>.
+
+=item Error: Cannot coerce a $type into a Mail::Message::Field::Address
+
+When addresses are specified to be included in header fields, they may
+be coerced into L<Mail::Message::Field::Address|Mail::Message::Field::Address> objects first.  What
+you specify is not accepted as address specification.  This may be an
+internal error.
+
+=item Error: Cannot load collection module for $type ($class).
+
+Either the specified $type does not exist, or that module named $class returns
+compilation errors.  If the type as specified in the warning is not
+the name of a package, you specified a nickname which was not defined.
+Maybe you forgot the 'require' the package which defines the nickname.
+
+=item Error: Creation of a collection via $class failed.
+
+The $class did compile, but it was not possible to create an object
+of that class using the options you specified.
+
+=item Error: Don't know what type of collection you want to add.
+
+If you add a collection, it must either by a collection object or a
+list of options which can be used to create a collection object.  In
+the latter case, the type of collection must be specified.
+
+=item Warning: No collection $name
+
+The collection with $name does not exist and can not be created.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Message distribution version 3.000,
+built on February 02, 2017.
+
+Do not forget to read
+L</Mail::Box-Overview>,
+L</Mail::Box-Cookbook>, and
+L</Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L</Mail::Message>,
+L</Mail::Box>,
+L</Mail::Box::IMAP4>,
+L</Mail::Box::POP3>,
+L</Mail::Box::Parser::C>,
+L</Mail::Box::Dbx> (unpublished),
+L</Mail::Transport>,
+L</Object::Realize::Later>, and
+L</User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

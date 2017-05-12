@@ -1,0 +1,43 @@
+# where to find the distributions
+# this doesn't have to be an actual backpan.
+backpan_dir /Users/brian/Desktop/TestCPAN
+
+# where to store the distribution reports
+report_dir  /Users/brian/Desktop/dpantest
+
+# where to unpack the dists or create any temporary files
+temp_dir    /Users/brian/Desktop/dpantest/temp
+
+# the maximum amount of time allowed to index a distribution, in seconds
+alarm       15
+
+# If set to a true value, copy bad distributions to the named directory
+copy_bad_dists 0
+
+# Try to index a distribution even if it was previously tried and
+# had an error
+retry_errors 1
+
+# give yourself a name
+indexer_id brian d foy <brian.d.foy@gmail.com>
+
+# give the indexing system a name, just to identify the machine
+system_id macbookpro
+
+# the Perl class to use as the Indexing class. It has to at least
+# provide a run method
+indexer_class MyCPAN::Indexer::DPAN
+
+queue_class MyCPAN::Indexer::Queue
+
+# the Perl class to use to hand out indexing jobs.
+dispatcher_class MyCPAN::Indexer::Dispatch::Parallel
+
+interface_class MyCPAN::Indexer::Interface::Text
+
+worker_class    MyCPAN::Indexer::Worker
+
+reporter_class  MyCPAN::Indexer::DPAN
+
+# The number of parallel jobs to run
+parallel_jobs 4

@@ -1,0 +1,7 @@
+{
+   "dbi": {
+      "password": "",
+      "dsn":      "dbi:mysql:database=foo_test",
+      "username": "root"
+   }
+}

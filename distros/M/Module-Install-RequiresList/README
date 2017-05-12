@@ -1,0 +1,38 @@
+NAME
+    Module::Install::RequiresList - Report prerequisite modules and version
+    numbers
+
+SYNOPSIS
+    In your Makefile.PL:
+
+        use inc::Module::Install;
+        ...
+        requires_list;
+        ...
+
+    From the command line:
+
+        > perl Makefile.PL
+        > make requires-list
+
+DESCRIPTION
+    This module adds a target to your Makefile for listing the modules
+    required.
+
+    The report is broken into sections: Required, Recommended, Build
+    Requires, and Author Requires.
+
+    For each module listed, the report prints 3 versions: the version you
+    are requesting, your installed version and the CPAN version.
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2011-2014. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

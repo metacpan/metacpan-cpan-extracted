@@ -1,0 +1,23 @@
+Changes
+lib/MooX/Types/MooseLike.pm
+lib/MooX/Types/MooseLike/Base.pm
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST			This list of files
+t/basic.t
+t/builder.t
+t/default.t
+t/inflate_0.t
+t/inflate_name.t
+t/inflate_sub.t
+t/parameterized.t
+t/parameterized_inflate.t
+t/parameterized_subtype.t
+t/parameterized_with_coderefs.t
+t/parameterized_with_string.t
+t/required.t
+t/subtype.t
+t/version.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)

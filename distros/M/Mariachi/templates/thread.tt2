@@ -1,0 +1,41 @@
+<li class="thread" id="m_[% thread.message.filename FILTER replace('/', '_') %]">
+[% IF thread.message %]
+	[% IF backlink ; thread.message.linked.thread = file ; END %]
+	[% this = thread.message == message %]
+	[% IF thread.message.prev.subject != thread.message.subject %]
+		[%# The previous subject line differed, so show the new one %]
+		[% IF this ; "<b>" ; ELSE %]
+		<a href="[% base %][% thread.message.filename %]">
+		[% END %]
+		[% thread.message.subject | html | mariachi %]
+		[% IF this ; "</b>" ; ELSE ; "</a>" ; END %]
+		<small>[% thread.message.from | html | mariachi %] <i>[% date.format(thread.message.epoch_date) %]</i>[% context = mariachi.config.get('thread-context') ; IF context  %]<br />
+		[% thread.message.$context | html%][% END %]</small>
+	[% ELSE %]
+		[%# The previous subject line was the same, so don't show it %]
+		[% IF this ; "<b>" ; ELSE %]
+		<a href="[% base %][% thread.message.filename %]">
+		[% END %]
+		[% thread.message.from | html %] 
+		[% IF this ; "</b>" ; ELSE ; "</a>" ; END %]
+		<i>[% date.format(thread.message.epoch_date) %]</i>
+		[% context = mariachi.config.get('thread-context') ; IF context  %]<br />
+		<small>[% thread.message.$context | html%]</small>[% END %]
+	
+	[% END %]
+[% ELSE %]
+	(no message)
+[% END %]
+[% IF thread.child %]
+  <ul>
+	[% IF maxdepth && depth >= maxdepth %]
+<li>too deep to show</li>
+	[% ELSE %]
+		[% INCLUDE thread.tt2 thread=thread.child depth=depth+1 %]
+	[% END %]
+  </ul>
+[% END %]
+</li>
+[% IF thread.next %]
+  [% INCLUDE thread.tt2 thread=thread.next backlink=backlink %]
+[% END %]

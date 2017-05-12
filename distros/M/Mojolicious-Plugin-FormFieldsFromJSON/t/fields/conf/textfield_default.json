@@ -1,0 +1,8 @@
+ [
+    {
+        "label" : "Name",
+        "type" : "text",
+        "name" : "name",
+        "data" : "default value"
+    }
+ ]

@@ -1,0 +1,21 @@
+---
+name: Math-Prime-TiedArray
+version: 0.04
+author:
+  - 'Dan Boger <cpan@peeron.com>'
+abstract: Simulate an infinite array of prime numbers
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Tie::Array: 0.01
+build_requires:
+  Test::More: 0.01
+provides:
+  Math::Prime::TiedArray:
+    file: lib/Math/Prime/TiedArray.pm
+    version: 0.04
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,34 @@
+Revision history for Makefile-Parallel
+
+0.09    12-10-2015
+        - Corrected POD issue
+
+0.08    27-12-2010
+        - added option to pmake to send an email when finishing each
+          task (for PBS systems). Might be adapted later for sending
+          only one e-mail when finishing the full makefile and/or in
+          case of error.
+
+0.07    30-10-2010
+        - trying to guess what's going wrong with some CPAN Testers reports.
+
+0.06    19-06-2008
+        - fixed bug when a rule with one variable depends on rules with more
+        than one variable.
+
+0.05    16-06-2008
+        - fixed bug when using more than one variable on a pmakefile.
+
+0.04	14-06-2008
+        - support multiple variables for parametric rules
+
+0.03    27-12-2007
+        - Changelog lost
+
+0.02    02-09-2007/16:15
+        - A bunch of new features, including constants, embedded Perl or Bash code
+        on the Makefiles, bugfixes and probably new bugs too :-)
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

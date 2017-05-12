@@ -1,0 +1,54 @@
+version 0.005; 2012-02-15
+
+  * include META.json in distribution
+
+  * convert .cvsignore to .gitignore
+
+  * add MYMETA.json to .cvsignore
+
+version 0.004; 2010-10-23
+
+  * check for required Perl version at runtime
+
+  * use full stricture in test suite
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.003; 2009-09-26
+
+  * bugfix: avoid wrongly truncating floating-point x values to integer
+    for comparison in the binary search
+
+  * remove bogus "exit 0" from Build.PL
+
+version 0.002; 2009-04-30
+
+  * document standard Math::Interpolator methods in M::I::Linear and
+    M::I::Robust
+
+  * abandon use of the "fields" module
+
+  * use simpler "parent" pragma in place of "base"
+
+  * test POD syntax and coverage, and rename some internal functions to
+    satisfy the coverage test
+
+  * drop prototypes from method subs (where the prototypes have no effect)
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * complete dependency list
+
+  * include signature in distribution
+
+  * in documentation, separate "license" section from "copyright" section
+
+version 0.001; 2007-01-21
+
+  * avoid "my __PACKAGE__", for compatibility with perl v5.6
+
+version 0.000; 2006-06-13
+
+  * initial released version

@@ -1,0 +1,6 @@
+(* $Id$ *)
+
+tell application "iTunes"
+	set myList to make new playlist
+	set name of myList to "iTunes test"
+end tell

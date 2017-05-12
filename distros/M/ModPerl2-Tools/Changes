@@ -1,0 +1,35 @@
+0.10  Wed Jun 15 18:36:41 CEST 2011
+      - clear subrequest's headers_in table before running it in fetch_url
+
+0.09  Fri Jun 10 16:58:00 CEST 2011
+      - streaming interface for fetch_url()
+
+0.08  Mon Mar 14 20:14:39 CET 2011
+      - next try to fix the close_fd bug. fileno(DIRHANDLE) does not work
+        in Perl.
+
+0.07  Tue Mar  8 11:15:43 CET 2011
+      - Bugfix: avoid closing the fd directory handle in close_fd() on Linux
+      - tests now without "use Apache::Test qw/:withtestmore/"
+
+0.06  Sun Aug 22 20:00:09 CEST 2010
+      - prevent a few "File does not exist" messages
+
+0.05  Wed Apr 14 11:44:22 CEST 2010
+      - $r->headers_sent
+
+0.04  Fri Mar  5 10:19:20 CET 2010
+      - check for existence of mod_proxy.c in fetch_url()
+
+0.03  Wed Mar  3 19:04:17 CET 2010
+      - reset $r->status_line before calling ap_die()
+      - reimplement Apache2::RequestRec::safe_die without ap_die()
+      - all versions of safe_die() now call ModPerl::Util::exit(0)
+        instead of returning OK.
+
+0.02  Wed Mar  3 14:10:30 CET 2010
+      - fetch_url using mod_proxy
+      - more documentation	
+
+0.01  Tue Mar  2 21:42:23 CET 2010
+      - initial version

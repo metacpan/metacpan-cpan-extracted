@@ -1,0 +1,42 @@
+Revision history for Mojolicious::Pugin::ReverseProxy
+0.705 2016-09-23
+  - cleanup url processing
+
+0.704 2016-09-23
+  - use ignore property in cookie jar ... not having a jar at all seeems not possible anymore
+
+0.703 2014-12-23
+  - make destination urls work that do NOT point to the root directory
+    this time for real :)
+
+0.702 2014-12-23
+  - make destination urls work that do NOT point to the root directory
+
+0.701 2014-12-02
+  - fixed documentation typos
+
+0.7 2014-12-02
+  - Mojolicious 5.63 fixed the content length bug
+    no need for us to work around it anymore
+
+0.6 2014-12-01
+  - new architecture ... by calling the plugin, your route gets installed
+    no helper anymore ... 
+
+0.5  2014-11-20
+  - fix host header in forwarded request
+  - fix content_length header it seems that at least when IE is posting, the
+    content forwarded by mojo is 2 byte smaller than what came in originally
+
+0.4   2014-11-20
+  - just clone the request .. this should be able to better deal with large
+    bodies
+
+0.3   2014-11-19
+  - properly forward the body of POST requests
+
+0.2   2014-09-04
+  - return if page is already rendered after preprocessing
+
+0.1   2014-08-13
+  - initial

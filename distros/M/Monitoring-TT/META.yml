@@ -1,0 +1,37 @@
+---
+abstract: 'Generic Monitoring Config based on Template Toolkit Templates'
+author:
+  - 'Sven Nierlein, 2013, <sven.nierlein@consol.de>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: gpl3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Monitoring-TT
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::BOM: 0
+  Perl::Critic::Policy::Dynamic::NoIndirect: 0
+  Perl::Critic::Policy::NamingConventions::ProhibitMixedCaseSubs: 0
+  Perl::Critic::Policy::ValuesAndExpressions::ProhibitAccessOfPrivateData: 0
+  Pod::Usage: 0
+  Template: 0
+  Test::Cmd: 0
+  Test::Perl::Critic: 0
+  Test::Pod: 1.4
+  Test::Pod::Coverage: 0
+resources:
+  bugtracker: https://github.com/sni/Monitoring-TT/issues
+  homepage: http://labs.consol.de
+  license: http://opensource.org/licenses/gpl-3.0.html
+  repository: https://github.com/sni/Monitoring-TT
+version: 1.0.1

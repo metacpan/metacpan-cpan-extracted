@@ -1,0 +1,19 @@
+Makefile.PL
+MANIFEST
+README
+lib/Metadata/ByInode.pm
+lib/Metadata/ByInode/Search.pm
+lib/Metadata/ByInode/Indexer.pm
+bin/mbi-index
+bin/mbi-find
+t/1_basic.t
+t/2_index.t
+t/misc/Coop.pm
+t/misc/indexme.pm
+t/misc/indexme2.pm
+t/misc/Index.one
+t/misc/file2.x
+t/misc/file2.txt
+t/misc/file1.txt
+t/misc/ffile2.x
+META.yml                                 Module meta-data (added by MakeMaker)

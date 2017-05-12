@@ -1,0 +1,112 @@
+#!/usr/bin/perl
+
+use strict;
+use File::Spec         ();
+use Getopt::Long       ();
+use Module::Collection ();
+
+use vars qw{$VERSION};
+BEGIN {
+	$VERSION = '0.02';
+	$| = 1;
+}
+
+# If Smart::Comments are available, enable them
+BEGIN { eval "use Smart::Comments;" }
+
+
+
+
+
+# Configuration Phase
+
+# Get the options
+my $VERBOSE = 0;
+my $NEWEST  = 0;
+my $MERGED  = 0;
+Getopt::Long::GetOptions(
+	"verbose+" => \$VERBOSE,
+	"newest"   => \$NEWEST,
+	"merged"   => \$MERGED,
+	);
+
+# Merged implies newest
+$NEWEST = 1 if $MERGED;
+
+# Where is the collection
+my $root = defined $ARGV[0]
+	? shift(@ARGV)
+	: File::Spec->curdir;
+
+
+
+
+
+# Create the Collection
+
+print "Searching for dists... ";
+my $collection = Module::Collection->new( root => $root );
+
+# Did we find anything?
+my $found = $collection->dists
+	or die "$root does not contain any distributions";
+print "found $found\n";
+
+# If we are going to need to unpack them, do it all at once
+my @dists = $collection->dists;
+if ( $NEWEST or $VERBOSE or $MERGED ) {
+	foreach ( @dists ) { ### Loading dists [===|   ] %
+		$collection->dist($_);
+	}
+}
+
+# If they only want the newest, remove the old ones
+$collection->ignore_old_dists if $NEWEST;
+
+# Display Output
+print "\n";
+foreach my $file ( $collection->dists ) {
+	unless ( $VERBOSE ) {
+		# Short form
+		print "$file\n";
+		next;
+	}
+
+	# Show the details for the dist
+	my $dist = $collection->dist($file);
+	print "\n";
+	print "$file\n";
+	print "  Name:    " . $dist->dist_name    . "\n";
+	print "  Version: " . $dist->dist_version . "\n";
+	if ( $VERBOSE >= 2 ) {
+		# Regular Dependencies
+		my $requires = $dist->dist_requires;
+		if ( keys %$requires ) {
+			print "  Requires:\n";
+			foreach ( sort keys %$requires ) {
+				print "    $_: $requires->{$_}\n";
+			}
+		} else {
+			print "  Requires: Nothing\n";
+		}
+
+		my $build_requires = $dist->dist_build_requires;
+		if ( keys %$build_requires ) {
+			print "  Build Requires:\n";
+			foreach ( sort keys %$build_requires ) {
+				print "    $_: $build_requires->{$_}\n";
+			}
+		} else {
+			print "  Build Requires: Nothing\n";
+		}
+	}
+}
+
+if ( $MERGED ) {
+	print "\n";
+	print "Listing Merged Depencies:\n";
+	my $merged = $collection->depends;
+	print $merged->as_string;
+}
+
+exit(0);

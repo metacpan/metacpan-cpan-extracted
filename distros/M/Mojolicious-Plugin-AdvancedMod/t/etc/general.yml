@@ -1,0 +1,23 @@
+development:
+  static_path: public
+  templates_path: templates
+  db_master: etc/pg.yml
+  db_slave:
+    user: 'www'
+    password: 'q1w2e3'
+    host: 127.0.0.1
+    dbname: test
+    port: 5432
+    options:
+      PrintWarn: 0
+      PrintError: 0
+      RaiseError: 1
+      pg_enable_utf8: 1
+    dsn: 'dbi:Pg:dbname=${development.db_slave.dbname};host=${development.db_slave.host};port=${development.db_slave.port}'
+production:
+  static_path: /www/mysite
+  templates_path: /www/mysite/templates
+  db: /www/mysite/etc/pg.yml
+overall:
+  secrets: 0514eb3b7d219eddc82d403d53e1a6ba
+

@@ -1,0 +1,53 @@
+{
+   "abstract" : "Symbolic Algebra in Pure Perl",
+   "author" : [
+      "PhilipRBrenan@gmail.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-Algebra-Symbols",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "IO::Handle" : "0",
+            "Math::BigInt" : "0",
+            "Scalar::Util" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Math::Algebra::Symbols" : {
+         "file" : "lib/Math/Algebra/Symbols.pm",
+         "version" : "1.27"
+      },
+      "Math::Algebra::Symbols::Sum" : {
+         "file" : "lib/Math/Algebra/Symbols/Sum.pm",
+         "version" : "1.27"
+      },
+      "Math::Algebra::Symbols::Term" : {
+         "file" : "lib/Math/Algebra/Symbols/Term.pm",
+         "version" : "1.27"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.27"
+}

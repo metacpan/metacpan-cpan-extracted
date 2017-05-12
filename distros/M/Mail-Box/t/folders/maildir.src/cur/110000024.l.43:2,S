@@ -1,0 +1,39 @@
+Received: from ns.ATComputing.nl (ns.ATComputing.nl [195.108.229.25])
+	by atcmpg.ATComputing.nl (8.9.0/8.9.0) with ESMTP id SAA28005
+	for <markov@ATComputing.nl>; Wed, 14 Jun 2000 18:04:59 +0200 (MET DST)
+Received: (from nobody@localhost)
+	by ns.ATComputing.nl (8.8.8/8.8.8) id SAA12271
+	for <markov@ATComputing.nl>; Wed, 14 Jun 2000 18:04:58 +0200
+Received: from gatekeeper.es.dupont.com(192.26.233.2) by ns.ATComputing.nl via smap (V2.1)
+	id xma012267; Wed, 14 Jun 00 18:04:36 +0200
+Received: from mystic.es.dupont.com (mystic.es.dupont.com [138.196.253.24])
+	by gatekeeper.es.dupont.com (8.9.3/8.9.3) with ESMTP id MAA26846
+	for <markov@ATComputing.nl>; Wed, 14 Jun 2000 12:04:35 -0400 (EDT)
+Received: (from cristy@localhost)
+	by mystic.es.dupont.com (8.10.0.Beta12/8.10.0.Beta12) id e5EGYfI19547
+	for markov@ATComputing.nl; Wed, 14 Jun 2000 12:34:41 -0400 (EDT)
+Date: Wed, 14 Jun 2000 12:34:41 -0400 (EDT)
+From: Cristy <cristy@mystic.es.dupont.com>
+Message-Id: <200006141634.e5EGYfI19547@mystic.es.dupont.com>
+To: markov@ATComputing.nl
+Subject: Re: your mail
+Content-Type: text
+Status: RO
+X-Status: A
+Content-Length: 670
+Lines: 14
+
+> It what you propose a feature or a designed thing?  You specify the
+> coordinate of the right-top (NorthEast) wrt to the right-bottom
+> (SouthEast).  I expect that x=0,y=0,SouthWest will work wrt to
+> NorthWest.  It is not logical for me to treat North/South differently
+> from East/West (designed before the fall of the Iron curtain?)
+
+I'll send you a script that illustrates how gravity works.  The x,y
+offset basically creates a bounding box within the image and the text
+is placed relative to the virtual bounding box.
+
+> And also: the text still appears in black.
+
+Are you using ImageMagick 5.2.0?  When I used the script I sent the
+text color was indeed yellow.

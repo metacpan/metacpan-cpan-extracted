@@ -1,0 +1,73 @@
+ModPerl-ParamBuilder -- Making custom Apache directives easier 
+
+SYNOPSIS
+
+    package MyApp::Parameters; 
+
+    use strict; 
+    use warnings; 
+    use ModPerl::ParamBuilder; 
+
+    use base qw( ModPerl::ParamBuilder ); 
+
+    my $builder = ModPerl::ParamBuilder->new( __PACKAGE__ ); 
+
+    $builder->param( 'Template' ); 
+
+    $builder->on_off( 'Caching' ); 
+
+    $builder->yes_on( 'AutoCommit' ); 
+
+    $builder->load; 
+
+    # Elsewhere in your application 
+    package MyApp::Main; 
+
+    use MyApp::Parameters; 
+
+    my $params  = MyApp::Parameters->new; 
+    my $config  = $params->get_config; 
+
+    $template   = $$config{'Template'}; 
+    $caching    = $$config{'Caching'};
+    $autocommit = $$config{'AutoCommit'};
+
+    # In your httpd.conf 
+    PerlLoadModule MyApp::Paramters; 
+
+    <Location /myapp> 
+       SetHandler perl-script 
+
+       Template foo.tt 
+       Caching Off
+       AutoCommit On 
+
+       PerlResponseHandler MyApp::Main
+    </Location> 
+
+REQUIREMENTS
+
+    This module only works with mod_perl 2.0 and above.  There are no
+    plans to support the older mod_perl 1.x releases. 
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+DOCUMENTATION 
+
+    See the included pod documentation for details on how to use this
+    module. 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Revolution Systems, LLC.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,260 @@
+#!/usr/bin/perl -w
+###########################################################################
+#
+# salsaconfig
+# Version 0.01
+#
+# Copyright (c) 2005 Henrique Dias <hdias@aesbuc.pt>. All rights reserved.
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+# Last Change: Fri Apr 22 16:09:06 WEST 2005
+#
+###########################################################################
+
+use strict;
+use Mail::Salsa::Config;
+use Mail::Salsa::Sendmail;
+use Mail::Salsa::Utils qw(make_dir_rec);
+use vars qw($VERSION);
+
+$VERSION = '0.01';
+
+my @standartdir = qw(/usr/bin /usr/local/bin);
+my @standartsmrshdir = qw(/usr/adm/sm.bin /etc/smrsh /usr/local/etc/smrsh);
+my $cf = "/etc/cucaracha.conf";
+my $smcf = "/etc/mail/sendmail.cf";
+my $salsa_aliases = "/etc/mail/salsa.aliases";
+my $user = "mail";
+my $userid = 0;
+my $groupid = 0;
+
+&main();
+
+sub main {
+
+	my %defaults = (
+		'smtp_server' => "",
+		'timeout'     => 120,
+		'list_dir'    => "/usr/local/salsa/lists",
+		'logs_dir'    => "/usr/local/salsa/logs",
+		'archive_dir' => "/usr/local/salsa/archives",
+		'queue_dir'   => "/usr/local/salsa/mqueue",
+		'tmp_dir'     => "/tmp",
+		'smrsh_dir'   => "",
+		'cucaracha'   => "",
+	);
+
+	my $config = {};
+	if(-e $cf) {
+		my $answer = &get_answer("The configuration file already exists! Reconfigure? [y/N]: ");
+		($answer eq "Y" or $answer eq "y") or exit();
+
+		$config = Mail::Salsa::Config::get_config(
+			file     => $cf,
+			defaults => \%defaults
+		);
+	} else { $config = \%defaults; }
+
+	&make_config($config);
+
+	exit();
+}
+
+sub get_smuser {
+	my $config = shift;
+
+	open(FILE, "<", $smcf) or die("$!");
+	while(<FILE>) {
+		last if(($userid, $groupid) = /^O DefaultUser=(\d+)\:(\d+)\s+/);
+	}
+	close(FILE);
+
+	unless($userid or $groupid) {
+		($userid, $groupid) = (getpwnam($user))[2,3] or die("$user not in passwd file: $!");
+	}
+
+	return();
+}
+
+sub gen_config_file {
+	my $config = shift;
+
+	open(FILE, ">", $cf) or die("$!");
+	print FILE <<END_OF_CONFIG;
+
+smtp_server = $config->{'smtp_server'}
+
+timeout = $config->{'timeout'}
+
+list_dir = $config->{'list_dir'}
+
+logs_dir = $config->{'logs_dir'}
+
+archive_dir = $config->{'archive_dir'}
+
+queue_dir = $config->{'queue_dir'}
+
+tmp_dir = $config->{'tmp_dir'}
+END_OF_CONFIG
+	close(FILE);
+
+	return();
+}
+
+sub make_config {
+	my $config = shift;
+
+	&get_smuser();
+	&server_choice("List all smtp servers", $config->{'smtp_server'});
+	&time_choice("Timeout", $config->{'timeout'});
+	&dir_choice("Lists directory", $config->{'list_dir'});
+	&dir_choice("Logs directory", $config->{'logs_dir'});
+	&dir_choice("Archive directory", $config->{'archive_dir'});
+	&dir_choice("Queue directory", $config->{'queue_dir'});
+	&dir_choice("Temporary directory", $config->{'tmp_dir'});
+
+	for my $dir (@standartsmrshdir) {
+		$config->{'smrsh_dir'} = $dir if(-d $dir);
+	}
+	$config->{'smrsh_dir'} or &dir_choice("Directory for restricted programs", $config->{'smrsh_dir'});
+
+	for my $dir (@standartdir) {
+		my $bin = join("/", $dir, "cucaracha");
+		$config->{'cucaracha'} = $bin if(-e $bin);
+	}
+	$config->{'cucaracha'} or &whereis_cucaracha("Directory where is cucaracha", $config->{'cucaracha'});
+
+	print <<END_OF_CONFIG;
+
+* Global Configuration
+
+                 Smtp servers: $config->{'smtp_server'}
+                      Timeout: $config->{'timeout'}
+              Lists directory: $config->{'list_dir'}
+               Logs directory: $config->{'logs_dir'}
+            Archive directory: $config->{'archive_dir'}
+              Queue directory: $config->{'queue_dir'}
+          Temporary directory: $config->{'tmp_dir'}
+Restricted programs directory: $config->{'smrsh_dir'}
+    Path to cucaracha program: $config->{'cucaracha'}
+
+END_OF_CONFIG
+
+	my $answer = &get_answer("This is correct? [Y/n]: ");
+	&make_config($config) if($answer eq "N" or $answer eq "n");
+
+	&gen_config_file($config);
+
+	my $sl = join("/", $config->{'smrsh_dir'}, "cucaracha");
+	unless(-l $sl || -e $sl) {
+		$answer = &get_answer("Creates a symbolic link between \"cucaracha\" and \"$sl\"? [y/N]: ");
+		symlink($config->{'cucaracha'}, $sl) if($answer eq "Y" or $answer eq "y");
+	}
+	(-e $salsa_aliases) or &create_file($salsa_aliases, "# Aliases to manage the salsa mailing lists.\n");
+
+	return();
+}
+
+sub create_file {
+	my $file = shift;
+	my $string = shift || "";
+
+	open(FILE, ">", $file) or die("$!");
+	print FILE $string if($string);
+	close(FILE);
+
+	return();
+}
+
+sub check_server {
+
+	my @serversok = ();
+	for my $server (split(/ *\, */, $_[0])) {
+		my $sm = Mail::Salsa::Sendmail->new(
+			'smtp_server' => [$server],
+			'smtp_port'   => 25,
+			'timeout'     => 120,
+		) or last;
+
+		$sm->helo();
+		$sm->quit();
+		push(@serversok, $server);
+	}
+	$_[0] = join("\, ", @serversok);
+	return(scalar(@serversok) ? 1 : 0);
+}
+
+sub server_choice {
+	my $string = shift;
+
+	my $answer = "";
+	do {
+		$answer = &get_answer("$string [$_[0]]: ");
+	} while(!(length($answer) == 0 or &check_server($answer)));
+
+	$_[0] = $answer ? $answer : $_[0];
+
+	return();
+}
+
+sub time_choice {
+	my $string = shift;
+
+	my $answer = "";
+	do {
+		$answer = &get_answer("$string [$_[0]]: ");
+	} while(!(length($answer) == 0 or $answer =~ /^\d+$/));
+
+	$_[0] = $answer eq "" ? $_[0] : $answer;
+
+	return();
+}
+
+sub whereis_cucaracha {
+	my $string = shift;
+
+	my $answer = "";
+	do {
+		$answer = &get_answer("$string [$_[0]]: ");
+		$answer = $_[0] unless(length($answer));
+	} while(!(-e $answer));
+	$_[0] = $answer ? $answer : $_[0];
+	return();
+}
+
+sub dir_choice {
+	my $string = shift;
+
+	my $answer = "";
+	do {
+		$answer = &get_answer("$string [$_[0]]: ");
+		$answer = $_[0] unless(length($answer));
+	} while(!(&init_make_dir($answer)));
+
+	$_[0] = $answer ? $answer : $_[0];
+	return();
+}
+
+sub init_make_dir {
+	my $dir = shift;
+
+	return(1) if(-d $dir);
+	my $answer = &get_answer("Create the directory \"$dir\"? [y/N]: ");
+	if($answer eq "Y" or $answer eq "y") {
+		make_dir_rec($dir);
+		-d $dir or return(0);
+		chown($userid, $groupid, $dir);
+	}
+	return(1);
+}
+
+sub get_answer {
+	my $string = shift;
+
+	print $string;
+	my $answer = <>;
+	chomp $answer;
+	return($answer);
+}
+
+1;

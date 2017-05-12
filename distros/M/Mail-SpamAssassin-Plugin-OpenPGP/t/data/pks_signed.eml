@@ -1,0 +1,120 @@
+Delivered-To: user0009-dave@brondsema.net
+Received: (qmail 20016 invoked from network); 3 Feb 2005 13:12:52 -0000
+Received: from udomo.calvin.edu (153.106.4.110)
+  by 0 with SMTP; 3 Feb 2005 13:12:52 -0000
+Received: (from majordom@localhost)
+	by udomo.calvin.edu (8.11.6/8.11.6) id j13DCHY06162
+	for abstraction-chat-outgoing; Thu, 3 Feb 2005 08:12:17 -0500
+X-ASG-Debug-ID: 1107436336-19444-266-0
+X-Barracuda-URL: http://153.106.4.10:80/cgi-bin/mark.cgi
+Date: Thu, 03 Feb 2005 08:12:00 -0500
+User-Agent: Mozilla Thunderbird 1.0 (Windows/20041206)
+X-Accept-Language: en-us, en
+MIME-Version: 1.0
+X-ASG-Orig-Subj: Comcast outages...
+Subject: Comcast outages...
+Content-Type: multipart/signed; protocol="application/x-pkcs7-signature"; micalg=sha1; boundary="------------ms040604070606020206050908"
+X-Virus-Scanned: amavisd-new at wieringafamily.com
+X-Virus-Scanned: by Calvin Spam Firewall at calvin.edu
+X-Barracuda-Spam-Score: 0.28
+X-Barracuda-Spam-Status: No, SCORE=0.28 using per-user scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=7.0 tests=BAYES_44, FORGED_RCVD_HELO, MAILTO_TO_SPAM_ADDR
+X-Barracuda-Spam-Report: Code version 2.64, rules version 2.1.1025
+	Rule breakdown below	pts        rule name                      description
+	---- ---------------------- -------------------------------------------
+	-0.00 BAYES_44               BODY: Bayesian spam probability is 44 to 50%
+	                           [score: 0.4945]
+	0.28 MAILTO_TO_SPAM_ADDR    URI: Includes a link to a likely spammer email
+	0.00 FORGED_RCVD_HELO       Received: contains a forged HELO
+Precedence: bulk
+X-Spam-Checker-Version: SpamAssassin 3.0.2 (2004-11-16) on ferrari
+X-Spam-Level: 
+X-Spam-Status: No, score=0.1 required=4.0 tests=FORGED_RCVD_HELO 
+	autolearn=failed version=3.0.2
+
+This is a cryptographically signed message in MIME format.
+
+--------------ms040604070606020206050908
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+
+Again, I had a Comcast outage last night from around 7:30pm -> ?.  Did 
+anyone else in GR have this outage, or is my area just horrible for 
+unplanned downtime?
+
+Anyone else getting sick of the frequent outages that are occuring? 
+Back when AT&T ran the system, I can't remember an outage; whereas I've 
+gotten over a week credited to my account in the last 3 months for 
+outages with Comcast.
+
+Chris
+
+--------------ms040604070606020206050908
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIJxzCC
+Az4wggKnoAMCAQICAwxxazANBgkqhkiG9w0BAQQFADBiMQswCQYDVQQGEwJaQTElMCMGA1UE
+ChMcVGhhd3RlIENvbnN1bHRpbmcgKFB0eSkgTHRkLjEsMCoGA1UEAxMjVGhhd3RlIFBlcnNv
+bmFsIEZyZWVtYWlsIElzc3VpbmcgQ0EwHhcNMDQwNjA0MTM1ODA0WhcNMDUwNjA0MTM1ODA0
+WjCBlTERMA8GA1UEBBMIV2llcmluZ2ExFDASBgNVBCoTC0NocmlzdG9waGVyMR0wGwYDVQQD
+ExRDaHJpc3RvcGhlciBXaWVyaW5nYTEiMCAGCSqGSIb3DQEJARYTY3dpZXJpMzlAY2Fsdmlu
+LmVkdTEnMCUGCSqGSIb3DQEJARYYY2hyaXNAd2llcmluZ2FmYW1pbHkuY29tMIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1KKlRM6GNhV4WJGmUBPePRXal4imakFMYyRbaTAp
+xi6TxhED/xfOyI/eEpFdn6QF5ym36G5CX3IhLRtFN+gMdCpC0gmv4WH3Te2Leh6VYB2XcgtA
+s+r6jotaasTf9xP6TYkzLHLKrtRg7PB5QIBcySD3xA07hNHcgGzLP7cVMr6Ae5NGuwHummy7
+XB0A4pfB7WTQop1aYf+55PejnCLiuTPKZJqM5iJjjAGu5CLLoebUA9a5zLzAhhPsO0m8AsYp
+I1CKYlotRz6cRLnKhsOHi/3Z3Zk+1N97ppXFv+v9wxLJi7LsuRuN/Xbs4UOtKE+eFj1MEx4b
+to0BxDYBPsuw2QIDAQABo0owSDA4BgNVHREEMTAvgRNjd2llcmkzOUBjYWx2aW4uZWR1gRhj
+aHJpc0B3aWVyaW5nYWZhbWlseS5jb20wDAYDVR0TAQH/BAIwADANBgkqhkiG9w0BAQQFAAOB
+gQByQxSa58h1uXQZLQwiJEolhtJ0ixa9MX7T42e3AKtXZL60zFIcpBy5qiv3do3iUz+5xDRL
+idWbPuynH1v9bsugQbSspFVdABgPeRND3iXNYn2dsVcshDdLh/x4TpvRi/vy9lD/Ihkhx/nh
+yrCJxhywTh8bIOAqmghybGJCK0rF8jCCAz4wggKnoAMCAQICAwxxazANBgkqhkiG9w0BAQQF
+ADBiMQswCQYDVQQGEwJaQTElMCMGA1UEChMcVGhhd3RlIENvbnN1bHRpbmcgKFB0eSkgTHRk
+LjEsMCoGA1UEAxMjVGhhd3RlIFBlcnNvbmFsIEZyZWVtYWlsIElzc3VpbmcgQ0EwHhcNMDQw
+NjA0MTM1ODA0WhcNMDUwNjA0MTM1ODA0WjCBlTERMA8GA1UEBBMIV2llcmluZ2ExFDASBgNV
+BCoTC0NocmlzdG9waGVyMR0wGwYDVQQDExRDaHJpc3RvcGhlciBXaWVyaW5nYTEiMCAGCSqG
+SIb3DQEJARYTY3dpZXJpMzlAY2FsdmluLmVkdTEnMCUGCSqGSIb3DQEJARYYY2hyaXNAd2ll
+cmluZ2FmYW1pbHkuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1KKlRM6G
+NhV4WJGmUBPePRXal4imakFMYyRbaTApxi6TxhED/xfOyI/eEpFdn6QF5ym36G5CX3IhLRtF
+N+gMdCpC0gmv4WH3Te2Leh6VYB2XcgtAs+r6jotaasTf9xP6TYkzLHLKrtRg7PB5QIBcySD3
+xA07hNHcgGzLP7cVMr6Ae5NGuwHummy7XB0A4pfB7WTQop1aYf+55PejnCLiuTPKZJqM5iJj
+jAGu5CLLoebUA9a5zLzAhhPsO0m8AsYpI1CKYlotRz6cRLnKhsOHi/3Z3Zk+1N97ppXFv+v9
+wxLJi7LsuRuN/Xbs4UOtKE+eFj1MEx4bto0BxDYBPsuw2QIDAQABo0owSDA4BgNVHREEMTAv
+gRNjd2llcmkzOUBjYWx2aW4uZWR1gRhjaHJpc0B3aWVyaW5nYWZhbWlseS5jb20wDAYDVR0T
+AQH/BAIwADANBgkqhkiG9w0BAQQFAAOBgQByQxSa58h1uXQZLQwiJEolhtJ0ixa9MX7T42e3
+AKtXZL60zFIcpBy5qiv3do3iUz+5xDRLidWbPuynH1v9bsugQbSspFVdABgPeRND3iXNYn2d
+sVcshDdLh/x4TpvRi/vy9lD/Ihkhx/nhyrCJxhywTh8bIOAqmghybGJCK0rF8jCCAz8wggKo
+oAMCAQICAQ0wDQYJKoZIhvcNAQEFBQAwgdExCzAJBgNVBAYTAlpBMRUwEwYDVQQIEwxXZXN0
+ZXJuIENhcGUxEjAQBgNVBAcTCUNhcGUgVG93bjEaMBgGA1UEChMRVGhhd3RlIENvbnN1bHRp
+bmcxKDAmBgNVBAsTH0NlcnRpZmljYXRpb24gU2VydmljZXMgRGl2aXNpb24xJDAiBgNVBAMT
+G1RoYXd0ZSBQZXJzb25hbCBGcmVlbWFpbCBDQTErMCkGCSqGSIb3DQEJARYccGVyc29uYWwt
+ZnJlZW1haWxAdGhhd3RlLmNvbTAeFw0wMzA3MTcwMDAwMDBaFw0xMzA3MTYyMzU5NTlaMGIx
+CzAJBgNVBAYTAlpBMSUwIwYDVQQKExxUaGF3dGUgQ29uc3VsdGluZyAoUHR5KSBMdGQuMSww
+KgYDVQQDEyNUaGF3dGUgUGVyc29uYWwgRnJlZW1haWwgSXNzdWluZyBDQTCBnzANBgkqhkiG
+9w0BAQEFAAOBjQAwgYkCgYEAxKY8VXNV+065yplaHmjAdQRwnd/p/6Me7L3N9VvyGna9fww6
+YfK/Uc4B1OVQCjDXAmNaLIkVcI7dyfArhVqqP3FWy688Cwfn8R+RNiQqE88r1fOCdz0Dviv+
+uxg+B79AgAJk16emu59l0cUqVIUPSAR/p7bRPGEEQB5kGXJgt/sCAwEAAaOBlDCBkTASBgNV
+HRMBAf8ECDAGAQH/AgEAMEMGA1UdHwQ8MDowOKA2oDSGMmh0dHA6Ly9jcmwudGhhd3RlLmNv
+bS9UaGF3dGVQZXJzb25hbEZyZWVtYWlsQ0EuY3JsMAsGA1UdDwQEAwIBBjApBgNVHREEIjAg
+pB4wHDEaMBgGA1UEAxMRUHJpdmF0ZUxhYmVsMi0xMzgwDQYJKoZIhvcNAQEFBQADgYEASIzR
+UIPqCy7MDaNmrGcPf6+svsIXoUOWlJ1/TCG4+DYfqi2fNi/A9BxQIJNwPP2t4WFiw9k6GX6E
+sZkbAMUaC4J0niVQlGLH2ydxVyWN3amcOY6MIE9lX5Xa9/eH1sYITq726jTlEBpbNU1341Yh
+eILcIRk13iSx0x1G/11fZU8xggM7MIIDNwIBATBpMGIxCzAJBgNVBAYTAlpBMSUwIwYDVQQK
+ExxUaGF3dGUgQ29uc3VsdGluZyAoUHR5KSBMdGQuMSwwKgYDVQQDEyNUaGF3dGUgUGVyc29u
+YWwgRnJlZW1haWwgSXNzdWluZyBDQQIDDHFrMAkGBSsOAwIaBQCgggGnMBgGCSqGSIb3DQEJ
+AzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTA1MDIwMzEzMTIwMFowIwYJKoZIhvcN
+AQkEMRYEFNy4jF1P//yWYU+fUjipoBApIOyIMFIGCSqGSIb3DQEJDzFFMEMwCgYIKoZIhvcN
+AwcwDgYIKoZIhvcNAwICAgCAMA0GCCqGSIb3DQMCAgFAMAcGBSsOAwIHMA0GCCqGSIb3DQMC
+AgEoMHgGCSsGAQQBgjcQBDFrMGkwYjELMAkGA1UEBhMCWkExJTAjBgNVBAoTHFRoYXd0ZSBD
+b25zdWx0aW5nIChQdHkpIEx0ZC4xLDAqBgNVBAMTI1RoYXd0ZSBQZXJzb25hbCBGcmVlbWFp
+bCBJc3N1aW5nIENBAgMMcWswegYLKoZIhvcNAQkQAgsxa6BpMGIxCzAJBgNVBAYTAlpBMSUw
+IwYDVQQKExxUaGF3dGUgQ29uc3VsdGluZyAoUHR5KSBMdGQuMSwwKgYDVQQDEyNUaGF3dGUg
+UGVyc29uYWwgRnJlZW1haWwgSXNzdWluZyBDQQIDDHFrMA0GCSqGSIb3DQEBAQUABIIBAFGJ
+NSs+ozrvdI0QL8rrCBRFEbnjvpz675pQ2Tw6r02VPXrL7tY8JNOhFmISx36o+EuwyK3qeP7z
+ZcUYjg8gXtC5OfK9Mn4HTLCfGjNR4+Svh48CQu2XQ+OAoxPyxYT7kdvTmujc+WZhjdGzalCg
+zrjmxtj3LKy0NgjA9d4lfzEJjUyhG157raSdcjDEYUYh+Ezi4XCrGF/D18pfLCbnC0RW3k+R
+rTF7arej04hpN8qAxE2l9R5z5mVxNFJkvwZyuENSZLNY1qby9k82UJUtHdLMuuhpNy0xIOe5
+2bi6DeBjcBD6FagdNJCb4dnnng12RB5pEBz55C6wkhgfqhI2EC8AAAAAAAA=
+--------------ms040604070606020206050908--

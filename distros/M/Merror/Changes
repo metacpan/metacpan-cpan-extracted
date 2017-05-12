@@ -1,0 +1,6 @@
+Revision history for Perl extension Merror.
+
+0.01  Wed Feb 17 21:10:19 2010
+	- original version; created by h2xs 1.23 with options
+		-X -n Merror
+

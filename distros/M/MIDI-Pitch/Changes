@@ -1,0 +1,18 @@
+HISTORY
+    0.7     Added Changes file.
+
+    0.6     findsemitone now also understands semitones specified as
+            integers between 0 and 11. Fixed bug in findsemitone.
+
+    0.5     Added findsemitone function
+
+    0.2     Added pitch rounding (60.49 and 59.5 will both be considered
+            60/'C4').
+
+            Added frequency/pitch conversion.
+
+            Added POD tests.
+
+    0.1     Original version; created by h2xs 1.22 with options
+
+              -A -C -X -n MIDI::Pitch -v 0.1 -b 5.5.3

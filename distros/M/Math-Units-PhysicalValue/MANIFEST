@@ -1,0 +1,24 @@
+Changes
+lib/Math/Units/PhysicalValue.pod
+lib/Math/Units/PhysicalValue/AutoUnit.pm
+Makefile.PL
+MANIFEST
+PhysicalValue.pm
+README
+t/01_load.t
+t/05_skydiving.t
+t/10_metric.t
+t/15_exponents.t
+t/20_longBIGfloats.t
+t/25_scalar_reductions.t
+t/30_sigfigs.t
+t/35_powers.t
+t/40_some_standard_values.t
+t/45_boolean.t
+t/47_compare.t
+t/49_assbackwards.t
+t/50_zero.t
+t/55_exponents.t
+t/60_plurals.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

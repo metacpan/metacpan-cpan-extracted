@@ -1,0 +1,105 @@
+From 86c1fb487cd84b1971d4446e58ddb1602c95fdc3 Mon Sep 17 00:00:00 2001
+From: ph10 <ph10@6239d852-aaf2-0410-a92c-79f79f948069>
+Date: Thu, 23 Feb 2017 17:05:43 +0000
+Subject: [PATCH] Check malloc returns in pcre2test.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+git-svn-id: svn://vcs.exim.org/pcre2/code/trunk@669 6239d852-aaf2-0410-a92c-79f79f948069
+
+Petr Písař: Ported to 10.23.
+---
+ ChangeLog            |  9 +++++++++
+ configure.ac         |  6 +++---
+ src/pcre2.h          |  6 +++---
+ src/pcre2test.c      | 22 +++++++++++++++++++---
+ testdata/testinput2  |  3 +++
+ testdata/testoutput2 |  4 ++++
+ 6 files changed, 41 insertions(+), 9 deletions(-)
+
+diff --git a/src/pcre2test.c b/src/pcre2test.c
+index 241c22c..01457e8 100644
+--- a/src/pcre2test.c
++++ b/src/pcre2test.c
+@@ -1365,8 +1365,7 @@ are supported. */
+   (test_mode == PCRE8_MODE && G(x,8)->f r (y)) || \
+   (test_mode == PCRE16_MODE && G(x,16)->f r (y)) || \
+   (test_mode == PCRE32_MODE && G(x,32)->f r (y)))
+-
+-
++  
+ 
+ /* ----- Two out of three modes are supported ----- */
+ 
+@@ -1775,7 +1774,7 @@ the three different cases. */
+ #define TESTFLD(x,f,r,y) ( \
+   (test_mode == G(G(PCRE,BITONE),_MODE) && G(x,BITONE)->f r (y)) || \
+   (test_mode == G(G(PCRE,BITTWO),_MODE) && G(x,BITTWO)->f r (y)))
+-
++  
+ 
+ #endif  /* Two out of three modes */
+ 
+@@ -6169,7 +6168,16 @@ if ((pat_patctl.control & CTL_POSIX) != 0)
+   if (msg[0] == 0) fprintf(outfile, "\n");
+ 
+   if (dat_datctl.oveccount > 0)
++    { 
+     pmatch = (regmatch_t *)malloc(sizeof(regmatch_t) * dat_datctl.oveccount);
++    if (pmatch == NULL)
++      {
++      fprintf(outfile, "** Failed to get memory for recording matching "
++        "information (size set = %du)\n", dat_datctl.oveccount);
++      return PR_OK;     
++      }     
++    }   
++ 
+   if ((dat_datctl.options & PCRE2_NOTBOL) != 0) eflags |= REG_NOTBOL;
+   if ((dat_datctl.options & PCRE2_NOTEOL) != 0) eflags |= REG_NOTEOL;
+   if ((dat_datctl.options & PCRE2_NOTEMPTY) != 0) eflags |= REG_NOTEMPTY;
+@@ -6305,6 +6313,14 @@ else
+   PCRE2_MATCH_DATA_CREATE(match_data, max_oveccount, NULL);
+   }
+ 
++if (CASTVAR(void *, match_data) == NULL)
++  {
++  fprintf(outfile, "** Failed to get memory for recording matching "
++    "information (size requested: %d)\n", dat_datctl.oveccount);
++  max_oveccount = 0;   
++  return PR_OK;     
++  }     
++
+ /* Replacement processing is ignored for DFA matching. */
+ 
+ if (dat_datctl.replacement[0] != 0 && (dat_datctl.control & CTL_DFA) != 0)
+diff --git a/testdata/testinput2 b/testdata/testinput2
+index a700d5a..921d83c 100644
+--- a/testdata/testinput2
++++ b/testdata/testinput2
+@@ -4969,4 +4969,7 @@ a)"xI
+ 
+ /(?<a>a)(?<b>b)\g{b}\g{a}\g{a}\g{a}\g{a}(?<a>xx)(?<b>zz)/I,dupnames
+ 
++//
++    \=ovector=7777777777
++
+ # End of testinput2 
+diff --git a/testdata/testoutput2 b/testdata/testoutput2
+index ce8c667..9862ea3 100644
+--- a/testdata/testoutput2
++++ b/testdata/testoutput2
+@@ -15479,6 +15479,10 @@ First code unit = 'a'
+ Last code unit = 'z'
+ Subject length lower bound = 11
+ 
++//
++    \=ovector=7777777777
++** Invalid value in 'ovector=7777777777'
++
+ # End of testinput2 
+ Error -63: PCRE2_ERROR_BADDATA (unknown error number)
+ Error -62: bad serialized data
+-- 
+2.7.4
+

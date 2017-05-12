@@ -1,0 +1,63 @@
+{
+   "abstract" : "POE backend for Mojo::Reactor",
+   "author" : [
+      "Dan Book <dbook@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-Reactor-POE",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla::PluginBundle::Author::DBOOK" : "0.003"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Mojolicious" : "5.70",
+            "POE" : "1.366",
+            "Scalar::Util" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IO::Socket::INET" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Mojo::Reactor::POE" : {
+         "file" : "lib/Mojo/Reactor/POE.pm",
+         "version" : "0.009"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Grinnz/Mojo-Reactor-POE/issues"
+      },
+      "homepage" : "https://github.com/Grinnz/Mojo-Reactor-POE",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Grinnz/Mojo-Reactor-POE.git",
+         "web" : "https://github.com/Grinnz/Mojo-Reactor-POE"
+      }
+   },
+   "version" : "0.009"
+}
+

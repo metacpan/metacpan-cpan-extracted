@@ -1,0 +1,182 @@
+chunk
+stat list
+stat list
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+generatefib
+optional colon name element
+funcbody
+(
+optional parlist
+namelist
+Name
+n
+)
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+coroutine
+.
+Name
+wrap
+args
+(
+optional explist
+explist
+exp
+function
+keyword function
+function
+funcbody
+(
+optional parlist
+)
+block
+chunk
+stat list
+stat list
+stat
+keyword local
+local
+namelist
+Name
+a
+Name
+b
+optional namelist initialization
+=
+explist
+exp
+Number
+1
+exp
+Number
+1
+stat
+keyword while
+while
+exp
+exp
+var
+Name
+a
+<=
+exp
+var
+Name
+n
+keyword do
+do
+block
+chunk
+stat list
+stat list
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+coroutine
+.
+Name
+yield
+args
+(
+optional explist
+explist
+exp
+var
+Name
+a
+)
+stat
+varlist
+var
+Name
+a
+var
+Name
+b
+=
+explist
+exp
+var
+Name
+b
+exp
+exp
+var
+Name
+a
++
+exp
+var
+Name
+b
+keyword end
+end
+keyword end
+end
+)
+keyword end
+end
+stat
+keyword for
+for
+namelist
+Name
+i
+keyword in
+in
+explist
+exp
+exp
+var
+Name
+generatefib
+args
+(
+optional explist
+explist
+exp
+Number
+1000
+)
+keyword do
+do
+block
+chunk
+stat list
+stat
+functioncall
+prefixexp
+var
+Name
+print
+args
+(
+optional explist
+explist
+exp
+var
+Name
+i
+)
+keyword end
+end

@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 d9808c9e643a179f6739b312b9f5ecd8c3a66144 Changes
+SHA1 a9a7680943de8be0dc36bf1c71b2a24ef09187a2 INSTALL
+SHA1 43b9ff0e21a8504c73194bee2acdd52769627608 LICENSE
+SHA1 4178e488700fbf71080aa2d3ccc3446fd1d390b6 MANIFEST
+SHA1 75015edbb25d3e0c97ab777c442a7b7db92dadae MANIFEST.SKIP
+SHA1 f65a3fc5fcb26c9aa2007ef75475021fb7fa37e1 META.json
+SHA1 97773939ad2b1e35124f3c9b5e7e70659499ac78 Makefile.PL
+SHA1 db644494168c8991ce26e5c5c328f307eb1c1229 README
+SHA1 2a7a6c69359600d3718dae12f51df0a43155309c dist.ini
+SHA1 a5aff692f00058bec164d7b51aa3198680851ff5 lib/Markup/Unified.pm
+SHA1 800d56e8a71ab38d50ccfad3d2a46144a5dd46a2 t/00-load.t
+SHA1 2ce3604afc09cd7ccb8571f8abe9673cf1507645 t/01-format_bbcode.t
+SHA1 2917e04b4732d0e595fe596a64e2a5248f53870c t/02-format_markdown.t
+SHA1 5ddaa63cb9f0520813ad9a6502c0d04e778e0a50 t/03-format_textile.t
+SHA1 423f2b44d07e29ca8de26801fb948b8683ad7f33 t/04-format_truncate.t
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iF4EAREIAAYFAlT1/+sACgkQa4OHQAFM10dD/gD/Q8pzV65dNFMS+OaKKy3CDEsz
+vui2UberNPH0NxuBhxcA/RoMpF4aAsv5Qq0HyzTgo/8slU1uD4f4kQGbHQPWvdW0
+=Yi/p
+-----END PGP SIGNATURE-----

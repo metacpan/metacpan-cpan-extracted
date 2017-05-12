@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 1c8e4b1322ae9368c7dd2a73107830628648f56a Changes
+SHA1 c0c5d8d3db55216f0a7da679b566b7473b820d93 INSTALL
+SHA1 4dceae0eaef7a9ac83dea9d378c954bfce55223a LICENSE
+SHA1 28d543e47226aeb176d1fe008863871ac1778709 MANIFEST
+SHA1 8905884024dc4d03ecc81139a63bf7de64a26cf8 MANIFEST.SKIP
+SHA1 70298a7e59a63f44330811b504b48928e81e4357 META.json
+SHA1 bf6d562a9130f3d9b59241b80106d1395686ba56 META.yml
+SHA1 b607c9509070c5a7997b96df0ae8ce39c2936af9 Makefile.PL
+SHA1 40fb1bc54f38512db6dbf704434932ceca9cd916 README
+SHA1 62afbcff6a4bc5a38c2752c104eab0bb256b137a dist.ini
+SHA1 796232d6efdd9e90be3a414ded6fa1c4975ae0f2 lib/MorboDB.pm
+SHA1 9fcb075b2b763970b68902c41689b9cab7241bce lib/MorboDB/Collection.pm
+SHA1 11f54d73b1110896c594e016fa2d19b3d55d8890 lib/MorboDB/Cursor.pm
+SHA1 8f1b032b91f5c3fa3eb817b7cd14e5887023067d lib/MorboDB/Database.pm
+SHA1 4272d38652fe0fff2501ca65a751a25ccd99cc66 lib/MorboDB/OID.pm
+SHA1 c22691d214ed5cd14698c52542472c351f307ed1 t/00-load.t
+SHA1 056fdea77d51efdbe4055b3125c0d8103a93dd79 t/01-manual_oids.t
+SHA1 74d9b7aaa0ff45dfad79c17e6e4727398a0547f9 t/02-automatic_oids.t
+SHA1 ce252902d3ca1f8fadc04ba6a516e4aa961daffd t/03-cursor-sort.t
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+SHA1 9433c240fe590bc404ab68ff63984df763e347ed t/release-pod-coverage.t
+SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iF4EAREIAAYFAlK576sACgkQa4OHQAFM10da0gD/Rt7JPUvlsF85URW6NKmmogIT
+l3ExybxMqshc5Xem/bYA/i1o1vDQmWwg/BizjaiwGiszGav9pBkyPT7J1LxRKinV
+=k/iD
+-----END PGP SIGNATURE-----

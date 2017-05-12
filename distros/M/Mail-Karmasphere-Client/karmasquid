@@ -1,0 +1,82 @@
+#! /usr/bin/perl
+
+use strict;
+use warnings;
+use Mail::Karmasphere::Client qw(:all);
+
+$| = 1;
+
+my $debug = 0;
+my $config = configure();
+my $client = new Mail::Karmasphere::Client(
+					Principal	=> $config->{Principal},
+					Credentials	=> $config->{Credentials},
+				);
+$config->{Client} = $client;
+
+if ($debug) {
+	print STDERR "Principal = " . $config->{Principal} . "\n";
+	print STDERR "Credentials = " . $config->{Credentials} . "\n"; 
+}
+
+# Each line from squid consists of:
+# URL ip/fqdn method ident
+while (<STDIN>) {
+	chomp;
+	my ($url, $ip_fqdn) = (split);
+	my ($ip4, $fqdn) = split(/\//, $ip_fqdn);
+	print redirect($config, url => $url, ip4 => $ip4, fqdn => $fqdn);
+}
+
+sub configure {
+	my $config = {
+			Redirbase	=> 'http://localhost/karmasquid',
+			Principal	=> undef,
+			Credentials	=> undef,
+			Composite	=> 'karmasphere.sitekarma',
+		};
+	my $configfile = "/etc/karmasquid.conf";
+	if ( -r $configfile ) {
+		local *CONFIG;
+		open(CONFIG, "<$configfile") or die "Can't open $configfile";
+		while (my $line = <CONFIG>) {
+			chomp($line);
+			my ($key, $value) = split(/\s+/, $line);
+			$config->{ucfirst(lc($key))} = $value;
+		}
+		close(CONFIG);
+	}
+	return $config
+}
+
+sub redirect {
+	my $config = shift;
+	my %identities = @_;
+	my $query = new Mail::Karmasphere::Query(
+						Composite	=> $config->{Composite},
+						Identities	=> [[ $identities{url}, IDT_URL ],
+										[ $identities{ip4}, IDT_IP4 ],
+										[ $identities{fqdn}, IDT_DOMAIN ]],
+					);
+	my $response = $config->{Client}->ask($query);
+	my $new_url = "\n";
+
+	return $new_url unless $response;  # XXX Probably not a good idea.
+
+	if ($response->value < -300) {
+		$new_url = $config->{Redirbase};
+		if ($identities{url} =~ /\.jpg|\.jpeg|\.gif|.png|\.tga|\.tiff/i) {
+			$new_url .= "/karmasquid.png";
+		}
+		elsif ($identities{url} =~ /\.htm|\.html|\.php|\.asp|\/$/i) {
+			$new_url .= "/karmasquid.html";
+		}
+		else {
+			$new_url .= "/karmasquid.txt";
+		}
+
+		$new_url .= "\n";
+	}
+
+	return $new_url;
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Append-UTF8",
+  "abstract": "Append a file with utf8 chars",
+  "X_Module_Faker": {
+    "append": [ {
+        "file": "lib/Append/UTF8.pm",
+        "content": "\n\n=head1 NAME\n\nAppend::UTF8 - abstract"
+    }, {
+        "file": "Changes",
+        "content": "2012-01-01  0.01  First release - codename 'M\u00FCnchen'\n"
+    } ]
+  }
+}

@@ -1,0 +1,68 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+
+use Module::Husbandry qw( newpmdist parse_cli );
+
+newpmdist parse_cli \@ARGV, {
+    param_count => "1..",
+    examples    => <<'END_EXAMPLES',
+%p Foo-Bar    ## Create Foo-Bar and populate it
+%p Foo::Bar   ## as above
+END_EXAMPLES
+
+    description  => <<'END_DESCRIPTION',
+Creates a working directory for a standard Perl module using a set of
+templates found in the ~/.newpm/skel directory.  Here's an example (all
+but the first line are newpmdist's output):
+
+    $ newpmdist Foo-Bar
+    newpmdist$ mkdir -p Foo-Bar
+    newpmdist$ chdir Foo-Bar
+    newpmdist$ install Makefile.PL
+    newpmdist$ install MANIFEST.SKIP
+    newpmdist$ install CHANGES
+    newpmdist$ install lib/Foo/Bar.pm
+    newpmdist$ mkdir -p lib/Foo
+    newpmdist$ install t/Foo-Bar.t
+    newpmdist$ mkdir -p t
+    newpmdist/usr/local/bin/perl Makefile
+    Checking if your kit is complete...
+    Looks good
+    Writing Makefile for Foo::Bar
+    newpmdist$ chdir ..
+
+The contents of each of the installed files is exactly what's in that file
+in the template directory with some simple macro substitutions done to
+set things like file paths, package names, and copyright date.  Notice that
+it doesn't install a MANIFEST?  It builds that as it goes (we hope to add
+Module::Build support too, one day).
+
+Let's explore the resulting directory tree:
+
+    $ cd Foo-Bar
+    $ find .
+    .
+    ./Makefile.PL
+    ./MANIFEST
+    ./MANIFEST.SKIP
+    ./CHANGES
+    ./lib
+    ./lib/Foo
+    ./lib/Foo/Bar.pm
+    ./t
+    ./t/Foo-Bar.t
+    ./Makefile
+    $ perl Makefile.PL
+    Writing Makefile for Foo::Bar
+    $ make distcheck
+    /usr/local/bin/perl "-MExtUtils::Manifest=fullcheck" -e fullcheck
+    $ make test
+    cp lib/Foo/Bar.pm blib/lib/Foo/Bar.pm
+    PERL_DL_NONLAZY=1 /usr/local/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+    t/Foo-Bar....ok                                                              
+    All tests successful.
+    Files=1, Tests=1,  0 wallclock secs ( 0.06 cusr +  0.00 csys =  0.06 CPU)
+
+END_DESCRIPTION
+};

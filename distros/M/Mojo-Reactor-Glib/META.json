@@ -1,0 +1,48 @@
+{
+   "abstract" : "Glib::MainLoop backend for Mojo",
+   "author" : [
+      "Ralesk <ralesk@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-Reactor-Glib",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Glib" : "0",
+            "Mojolicious" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://bitbucket.org/ralesk/mojo-reactor-glib/issues"
+      },
+      "repository" : {
+         "type" : "hg",
+         "url" : "https://bitbucket.org/ralesk/mojo-reactor-glib",
+         "web" : "https://bitbucket.org/ralesk/mojo-reactor-glib"
+      }
+   },
+   "version" : "0.002"
+}

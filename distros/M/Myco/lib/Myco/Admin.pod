@@ -1,0 +1,340 @@
+=head1 NAME
+
+Myco::Admin - myco System Administration Guide.
+
+=head1 VERSION
+
+=over 4
+
+=item Release
+
+0.01
+
+=cut
+
+our $VERSION = 0.01;
+
+=item Repository
+
+$Revision$ $Date$
+
+=back
+
+=head1 DESCRIPTION
+
+This guide is intended for the system administrator in charge of installing,
+configuring, or tuning a myco system.
+
+=head1 QUICK INSTALLATION
+
+Follow these instructions to install myco without having to think about
+anything.
+
+=over 4
+
+=item 1
+
+Install Perl 5.6.1 or greater (5.8.2 or later strongly recommended - 5.8.0 has
+known issues with C<tie> and should be avoided.
+
+=item 2
+
+Install PostgreSQL 7.1 or greater.
+
+=item 3
+
+Install myco -- As root, use the CPAN module to install the myco framework perl
+modules plus all CPAN prerequisite modules.
+
+ perl -MCPAN -e 'install Myco'
+
+=back
+
+If you run into problems then read below for the details.
+
+=head1 PACKAGES
+
+The myco framework requires a lot of other components to be installed; here's a
+list of them:
+
+=over 4
+
+=item *
+
+Perl 5.6.1 (5.8.2 or later recommended)
+
+=item *
+
+Perl Modules:
+
+=begin installation
+
+START MODULE LIST
+
+=end installation
+
+=over 4
+
+=item Bit::Vector
+
+=item Class::Data::Inheritable
+
+=item Class::Inner
+
+=item Class::Tangram 1.15
+
+=item DBD::Pg
+
+=item DBI
+
+=item Date::Calc
+
+=item Date::Manip
+
+=item Devel::StackTrace
+
+=item Devel::Symdump
+
+=item Error
+
+=item Exception::Class
+
+=item Locale::SubCountry
+
+=item Pod::Constants
+
+=item Set::Object 1.04
+
+=item Tangram
+
+=item Test::Unit
+
+=item WeakRef
+
+=back
+
+=begin installation
+
+END MODULE LIST
+
+=end installation
+
+=item * PostgreSQL 7.1.3
+
+=back
+
+=head1 INSTALLATION
+
+Follow these instructions to prepare your system for myco.
+
+=head2 Perl
+
+The standard Perl installation should apply with no problems.  If your
+system comes with a package manager (ex. Redhat Linux RPM, FreeBSD
+ports, etc.) then you can use that to install Perl.
+
+Here is how to install Perl from source:
+
+=over 4
+
+=item *
+
+Download the Perl source tarball from
+L<http://www.perl.com|http://www.perl.com>.
+
+=item *
+
+Gunzip and untar the sources.
+
+=item *
+
+Change to the source directory and execute these commands:
+
+  sh Configure
+  make
+  make test
+  make install
+
+=back
+
+=head2 PostgreSQL
+
+PostgreSQL is an integral part of myco: it's where all of your objects are
+stored! Its installation is pretty straight-forward and typical, but it
+requires a number of extra steps that one might not expect.
+
+If you're using Redhat Linux you may already have Postgres installed. If so,
+all you need to do to get it ready for use with myco is edit your
+postgresql.conf file (run C<locate postgresql.conf> to find it) and turn on
+the tcpip_socket option:
+
+  tcpip_socket = true
+
+Otherwise, here are the installation details:
+
+=over 4
+
+=item *
+
+Download the PostgreSQL source tarball from www.postgresql.org.
+
+=item *
+
+Gunzip and untar the sources.
+
+=item *
+
+Change into the source directory and read the INSTALL file to see if you need
+to use any Configure commands.
+
+=item *
+
+Install PostgreSQL:
+
+  ./configure
+  make
+  make install
+
+=item *
+
+If the PostgreSQL installation did not create a user named "pgsql" for you,
+create it now. This is the user that will start the PostgreSQL server and own
+the log and data files.
+
+=item *
+
+Now make a directory in which you want to keep your PostgreSQL databases,
+including the myco database. Make the "pgsql" user the owner of that
+directory.
+
+  mkdir /var/db/pgsql
+  mkdir /var/db/pgsql/data
+  chown pgsql /var/db/pgsql/data
+
+and set the right permissions:
+
+  chmod -R 0700 /var/db/pgsql/data
+
+=item *
+
+Initialize the PostgreSQL database. Be sure to pass the directory you just
+created to the C<-D> command.
+
+  su - pgsql -c "/usr/local/pgsql/bin/initdb -D /var/db/pgsql/data"
+
+=item *
+
+Start the PostgreSQL "postmaster".
+
+  /usr/local/etc/rc.d/pgsql.sh start
+
+If you start postgres this way, you'll need to set the C<PGDATA>
+environment variable first:
+
+  su - pgsql -c "export PGDATA=/var/db/pgsql/data"
+
+=item *
+
+Now create a postgres user for yourself. Using your login username is best,
+since the myco deploy and testrun scripts depend on this. The other option is
+to set the C<PGDATABASE>, C<PGUSER>, C<PGPASSWORD> environment variables.
+
+  su - pgsql -c "createuser someuser"
+
+=back
+
+
+And now PostgreSQL is ready to go!
+
+Note that only a little work is required to make myco compatible with MySQL
+and other Tangram-supported RDBMSs - notably changing PostreSQL-specific SQL
+directives passed to Tangram in various Entity attribute specifications. Formal
+myco releases may depend on the transaction support embedded in postgres and
+will not provide this support by default.
+
+=head2 Myco.pm and required Perl Modules
+
+There are quite a few 3rd-party Perl modules required by the myco framework (see
+L<"PACKAGES"> above for a list). The easiest way to install them all, together
+with all myco framework modules (Myco.pm et al), is to let CPAN.pm take care of
+the process:
+
+  perl -MCPAN -e 'install Myco'
+
+If you have never before used the CPAN module then you will be prompted to
+go through configuration process.  Setting the environment variable FTP_PASSIVE
+beforehand can be helpful:
+
+ export FTP_PASSIVE=yes   # sh, bash
+ setenv FTP_PASSIVE yes   # csh
+
+See L<CPAN> for more information.
+
+Alternatively, the process may be performed "by hand."  Manual installation of
+each of the required modules follows the usual perl module installation process:
+
+=over 4
+
+=item *
+
+Download the package sources.
+
+=item *
+
+Gunzip and untar the sources.
+
+=item *
+
+Change to the source directory and execute these commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+=back
+
+=head2 Deploying the Database
+
+Now you should deploy the database, assuming you were successful in installing
+PostgreSQL.
+
+=over
+
+=item *
+
+Set the MYCO_ROOT environment variable to point to the directory (usually 'myco'
+or 'myco/framework') that contains the 'classes', 'test',
+'bin', and 'conf' directories. Alternatively you can set it temporarily on the
+command line if you don't plan to be runnin the myco web application.
+
+=item *
+
+Change to the 'bin' directory, in the source directory, and run the 'deploy'
+script:
+
+  cd bin
+  perl deploy
+
+or
+
+  env MYCO_ROOT=~/myco/framework perl deploy
+
+=back
+
+Your database should now be populated. Try running 'psql' or your favourite
+PostgreSQL client to inspect that its OK.
+
+If you run into problems, send a note with as much information as possible to
+myco-users@lists.sourceforge.net
+
+=head1 AUTHOR
+
+Charles Owens <czbsd@cpan.org> and Ben Sommer <Ben.Sommer@enc.edu>; based on
+L<Bric::Admin|Bric::Admin> by David Wheeler
+
+=head1 SEE ALSO
+
+L<Myco|Myco>, L<Myco::Base::Entity|Myco::Base::Entity>
+
+=cut

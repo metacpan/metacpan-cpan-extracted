@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 2a0995e8f4ea107ac5740bb23f5602dc7b0216fa Build.PL
+SHA1 d682e2538b8d23e10b3b1ba3e6010051b69ba1f7 Changes
+SHA1 715f00c27841c9e55587f86856b7dab59799a830 MANIFEST
+SHA1 bb307de92575e71393f9835f5921edc58fca0c11 META.json
+SHA1 06600e12dff947da35ed094b5000e8e7068028c1 META.yml
+SHA1 4bd99b7839619d627ad16d69d09772d3ef2e7784 README
+SHA1 ce1905b44e3723456e49bab806946125368c90b5 lib/Mail/GnuPG.pm
+SHA1 3ec6171779122b0bdc69937c283be11b2a15dd89 t/00.signature.t
+SHA1 269c6c48fbe5fd830479e83b2d7aae8ddca00133 t/05.load.t
+SHA1 2679e880c6c9f225dc97c1d7a462d3e43e2834b1 t/20.inline-verify.t
+SHA1 22d2700f00f149941964d96cabbb7c87aa908bfb t/25.multipart-verify.t
+SHA1 7bf3a408b7c981e84ef94a252319874c2009e81a t/30.inline-decrypt.t
+SHA1 27b2a825bb10243ff3db6fbc0ed46397993bb510 t/35.has-public-key.t
+SHA1 5a5966f563a4b6a4f7664c0b1251d3c1d2446c09 t/99.pod.t
+SHA1 bc67dceb8bdc0db2b256c273b0dbd4e7f134f1ae t/agent.t
+SHA1 782c0040382d4721f14f987a82e9ed34281e6781 t/base.t
+SHA1 58677c70dd194c09422dea0ad15ebfb9e3f04062 t/import_keys.pl
+SHA1 42f5e5ec614ad6e44a0f91c8aee0554b48b8445a t/msg/inline-encrypted-qp.eml
+SHA1 ea32c1f860eea29382f65acedb3ba3cd4c0ed9d7 t/msg/inline-signed-qp.eml
+SHA1 59b756891362972b3aa98207750f0dbcce52c3ec t/msg/multipart-signed-qp.eml
+SHA1 94727af5fd3e3f8823afbc690df01b054f114185 t/pubkeys.asc
+SHA1 5b89f061e6bb84e4fb73f36d737a36b4ad5fac7a t/round-trip.t
+SHA1 1932b1026feb122fedd16396d7cd069ba0330640 t/test-key.pgp
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQGcBAEBCAAGBQJXG8ijAAoJEPIClx2kp54slAEL/03PhOsMXqfIZejYkCuLcNJ/
+YTfvdrvGvlC3noXG9mRcdh3E0VaISG5uGiU8izvGQzLPioD9nEE2kJ6YLgi7Rppa
+xw+8RPHrfSDQqwmixJ+P9XXa+d8ezmOTQhwdUYZhd8LWzj7xcs6kLYUEbCY5vikB
+RU71EkIUQb1vG7Ls5nb3w+78ZeojtELSLL1wbEMyAX05G/juPaUFLsICzaTVdFsh
+MC0tDztUeknrROvQsrPkEED+m9e3nUQD7FJFaC9MO7rmyZZlYh2BCnKhfbjwM7ds
++rPEzowNL1L8YFCZHY3RTqDtOUnotX9d6ph/ZvxgiDDOK2oezMbpP8aEQ1PGB/j+
+KE1WEdH3ji0B4AMgRmr6tq3V7NX5eePTuEX3L8RR/xMii08PE5yc1OwagV4dULbu
+KC7ShOR1lSPSgB7TM7xIKR+VZCciaOKLWIKcTQJ+I7rYEI6l+ZspvjyWwq2pb6cE
+HGb6btb6b6Z8OwiAFRC9LfwOBTLjwBBv31U7fyTA8w==
+=1qRa
+-----END PGP SIGNATURE-----

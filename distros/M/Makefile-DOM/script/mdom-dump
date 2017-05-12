@@ -1,0 +1,13 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use MDOM::Document::Gmake;
+use MDOM::Dumper;
+
+my $doc = MDOM::Document::Gmake->new(shift);
+die unless $doc;
+my $dumper = MDOM::Dumper->new( $doc );
+$dumper->print;
+

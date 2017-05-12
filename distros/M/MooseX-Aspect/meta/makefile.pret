@@ -1,0 +1,17 @@
+# This file provides instructions for packaging.
+
+`MooseX-Aspect`
+	perl_version_from m`MooseX::Aspect`;
+	version_from      m`MooseX::Aspect`;
+	readme_from       m`MooseX::Aspect`;
+	requires          p`Devel::Caller`;
+	requires          p`Moose 2.00`;
+	requires          p`MooseX::ClassAttribute`;
+	requires          p`MooseX::RoleQR 0.002`;
+	requires          p`MooseX::Singleton`;
+	requires          p`namespace::sweep`;
+	requires          p`Scalar::Does 0.002`;
+	requires          p`thanks`;
+	test_requires     p`Test::More 0.61`;
+.
+

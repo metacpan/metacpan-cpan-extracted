@@ -1,0 +1,100 @@
+Mecom
+
+MECOM is a new Perl program which implements a work flow to analyze the evolutive behaviour of different regions within a protein structure. Structural and evolutive analysis was implemented as follow:
+
+First, structural data of each subunit within a protein complex is processed getting the residue classification. Each one, is labeled as Exposed or Buried depending on its surface exposure and Contact or Non Contact depending on its proximity with other atom allocated in a different subunit. The information about the residues and subunits against each residue is in close proximity is also retrieved.
+
+Second, the program carries out a codon sorting on the user provided nucleotide multiple alignment for each chain following the above indicated residue classification criteria.
+Third, an evolutive analysis is carried out. The program calls the program 'yn00' from PAML package and gets the nucleotide substitutions rates (synonymous and nonsynonymous substitutions, dS and dN, respectively) for each pair of sequences and some further statistical information.
+
+At least, the program calculates the interaction rates as ΣdN[1]/ΣdN[2] (being 1 and 2 different residue categories) and run a Z-Test to get statistical significance.
+
+As an open source software, this program can be improved by collaborative development, and other structural, evolutive and statistical analysis could be implemented easily to get more insights on molecular interaction constraints.
+
+MECOM have several outer dependencies. It means, whether the installing procedure you chose, a couple of programs must be installed in your system before install and/or run MECOM. Also, many perl module dependencies must be installed and we recommend install the package through CPAN. Thus, all module dependences will be installed automatically.
+
+Please, read this installation instructions carefully.
+
+REQUIREMENTS
+
+1. PAML - Phylogenetic Analysis by Maximum Likelihood
+
+PAML is a package of programs for phylogenetic analyses of DNA or protein sequences using maximum likelihood. It must be correctly installed before run Molevol::Complex. Concretely, an environment variable called "PAMLDIR" must be set with the value of the PAML binaries directory.
+
+This software can be downloaded for free from the author website:
+
+http://abacus.gene.ucl.ac.uk/software/paml.html
+
+Once PAML is installed, this environment variable can be set as follow:
+
+$ export PAMLDIR='/path/to/paml4x/bin/' # for Bourne, bash, and related shells
+$ setenv PAMLDIR='/path/to/paml4x/bin/' # for csh and related shells
+
+2. DSSP - Dictionary of protein secondary structure
+
+The DSSP program was designed by Wolfgang Kabsch and Chris Sander to standardize secondary structure assignment. It is used by this module to analyze the accesible surface of each residue.
+
+Binaires can be donwloaded from the authors website:
+
+http://swift.cmbi.ru.nl/gv/dssp/
+
+The module calls this program as dssp by default, but this value can be modified in each run.
+
+3. Bioperl and Bioperl-run
+
+The Bioperl and Bioperl-run packages are used to run the analysis. They can be installed through public repositories sush as CPAN or Fink, or manually after donwloading from the community website:
+
+http://www.bioperl.org/wiki/Getting_BioPerl
+
+MANUAL INSTALLATION
+
+First, download the current version from author's website or from a public repository. Next, uncompress the tar file:
+
+$ tar -xvzf Mecom-1.XX.tar-gz
+
+At least, to install this module, run the following commands:
+
+$ perl Makefile.PL
+$ make
+$ make test
+$ make install
+
+GIT INSTALLATION
+
+Github is used as public repository for MECOM. Instead download the compressed file before proceed the manual installation, you can clone the current version to your system as follow:
+
+$ git clone git@github.com:hvpareja/Mecom.git
+
+CPAN INSTALLATION
+
+This procedure is the most recommended by the authors because all module dependences will be installed automatically. To proceed, just type the following command:
+
+$ sudo perl -MCPAN -e 'install Mecom'
+
+or
+
+$ sudo cpan Mecom
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Mecom
+
+You can also look for information at:
+
+    Authors website
+        http://mecom.hval.es
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Hector Valverde & Juan Carlos Aledo
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+

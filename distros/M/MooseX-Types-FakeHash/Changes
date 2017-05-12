@@ -1,0 +1,59 @@
+﻿Release history for MooseX-Types-FakeHash
+
+0.1.2 2013-03-23T18:08:47Z
+ - Minor Code restructuring.
+
+0.1.1 2013-03-23T15:35:10Z
+ - Minor Maint release
+
+ [Dependencies::Changed / build requires]
+ - Module::Build 0.3601 → 0.4003
+
+ [Dependencies::Changed / configure requires]
+ - Module::Build 0.3601 → 0.4003
+
+ [Dependencies::Changed / develop recommends]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite 0.01009803 → v1.3.0
+
+ [Dependencies::Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.0.0 → v1.7.0
+
+ [Dependencies::New / develop recommends]
+ - Pod::Coverage::TrustPod
+ - Test::CPAN::Meta
+ - Test::Pod
+ - Test::Pod::Coverage
+ - version
+
+ [Dependencies::New / runtime requires]
+ - perl v5.10
+ - strict
+ - warnings
+
+ [Dependencies::Removed / test requires]
+ - English
+
+ [Dependencies:Changed / test requires]
+ - Test::More 0.96 → 0.98
+
+ [Documentation]
+ - Update Copyright year
+ - Update license indentation
+ - Update license contact address
+ - Add README.mkdn
+
+ [Internals]
+ - add a $AUTHORITY value to all packages
+ - move $VERSION out of BEGIN
+
+ [Meta]
+ - Bug Tracker to github
+ - Git URIs' to SSL
+ - add x_authority
+
+ [Packaging]
+ - author/release tests only in xt/
+
+0.1.0 2011-06-04T06:22:54Z
+ - First version.
+

@@ -1,0 +1,90 @@
+NAME
+    MasonX::LeakGuard::Object - report memory leaks (objects) per request
+
+SYNOPSIS
+        use MasonX::LeakGuard::Object;
+        %MasonX::LeakGuard::Object::OPTIONS = (
+            exclude => [
+                'utf8',
+                'HTML::Mason::*',
+                'Devel::StackTrace',
+            ],
+            hide_arguments => [
+                'pass', 'password',
+            ],
+        );
+        my @MasonParameters = (
+            ...
+            plugins => [qw(MasonX::LeakGuard::Object)],
+        );
+
+DESCRIPTION
+    This is plugin for HTML::Mason based applications that helps you find
+    memory leaks in OO code. It uses Devel::LeakGuard::Object framework for
+    that.
+
+OPTIONS
+    It's possible to use all options leakguard function in
+    Devel::LeakGuard::Object supports. Look at "SYNOPSIS" for example.
+
+    Some additional options are supported.
+
+  on_leak
+    on_leak option can be used to customize report or redirect to custom
+    log, for example:
+
+        %MasonX::LeakGuard::Object::OPTIONS = (
+            on_leak => sub {
+                my ($report, %args) = @_;
+                MyApp->logger->error( $args{'message'} );
+            },
+        );
+
+    First argument is the report structure (read more on it in
+    Devel::LeakGuard::Object). To make life easier more data is passed into
+    your function as a hash. The hash contains:
+
+    formatted - formatted report, a text table.
+    message - formatted default message containg description, request path,
+    request arguments and report. For example:
+            Leak(s) found after request to '/index.html' with $ARGS1 = [
+                       'argument',
+                       'value',
+                     ];
+            Leaked objects:
+              Class          Before  After  Delta
+              MyApp::Class        0      1      1
+
+    path - request path.
+    arguments - request arguments, array reference.
+
+  hide_arguments
+    It's possible to specify list of arguments names to hide from reports,
+    for example:
+
+        %MasonX::LeakGuard::Object::OPTIONS = (
+            hide_arguments => [
+                'pass', 'password',
+            ],
+        );
+
+FALSE POSITIVES
+    It's possible that false positives are reported, for example if a
+    compontent has ONCE block where you cache some values on first request.
+    Most caches will generate false positive reports, but it's possible to
+    use options of function leakguard in Devel::LeakGuard::Object. Look at
+    "SYNOPSIS" for example and "OPTIONS" for additional details.
+
+    To avoid many false positives the module as well ignores first request
+    to a path.
+
+    Sure it doesn't protect you from all cases.
+
+AUTHOR
+    Ruslan Zakirov <ruz@bestpractical.com>
+
+LICENSE
+    Under the same terms as perl itself.
+
+    -cut
+

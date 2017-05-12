@@ -1,0 +1,100 @@
+=head1 NAME
+
+Mozilla::DOM::NSHTMLImageElement
+
+=for object Mozilla::DOM::NSHTMLImageElement
+
+Mozilla::DOM::NSHTMLImageElement is a wrapper around an instance of Mozilla's
+nsIDOMNSHTMLImageElement interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::NSHTMLImageElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $lowsrc = $nshtmlimageelement->B<GetLowsrc>()
+
+Output:
+
+=over
+
+=item $lowsrc (string)
+
+=back
+
+=head2 $nshtmlimageelement->B<SetLowsrc>($lowsrc)
+
+Input:
+
+=over
+
+=item $aLowsrc (string)
+
+=back
+
+=head2 $bool = $nshtmlimageelement->B<GetComplete>()
+
+Output:
+
+=over
+
+=item $bool (bool)
+
+=back
+
+=head2 $naturalheight = $nshtmlimageelement->B<GetNaturalHeight>()
+
+Output:
+
+=over
+
+=item $naturalheight (int)
+
+=back
+
+=head2 $naturalwidth = $nshtmlimageelement->B<GetNaturalWidth>()
+
+Output:
+
+=over
+
+=item $naturalwidth (int)
+
+=back
+
+=head2 $x = $nshtmlimageelement->B<GetX>()
+
+Output:
+
+=over
+
+=item $x (int)
+
+=back
+
+=head2 $y = $nshtmlimageelement->B<GetY>()
+
+Output:
+
+=over
+
+=item $y (int)
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

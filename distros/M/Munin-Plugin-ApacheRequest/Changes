@@ -1,0 +1,17 @@
+Revision history for Munin-Plugin-ApacheRequest
+===============================================
+
+0.04    2014-10-13
+        - fixed license fields in META.json to be lists.
+        - extended META test suites.
+
+0.03    2014-04-20
+        - limit results to 10 decimal places.
+        - capture output better, when file doesn't exist.
+
+0.02    2014-04-12
+        - switched to using tail option supported by Solaris.
+        - ensure output is sorted (thanks Slaven, #94618).
+
+0.01    2014-04-09
+        - first release

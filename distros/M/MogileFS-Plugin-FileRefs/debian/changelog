@@ -1,0 +1,43 @@
+libmogilefs-plugin-filerefs-perl (0.07) lucid; urgency=low
+
+  * Add resources to distribution metadata.
+
+ -- Dave Lambley <davel@state51.co.uk>  Fri, 08 Feb 2013 12:52:27 +0000
+
+libmogilefs-plugin-filerefs-perl (0.06) lucid; urgency=low
+
+  * Avoid using a full table lock, stick to application locks instead.
+
+ -- Dave Lambley <davel@square.state51.co.uk>  Fri, 16 Nov 2012 15:42:27 +0000
+
+libmogilefs-plugin-filerefs-perl (0.05) lucid; urgency=low
+
+  * Make locks low priority, but we still block on them.
+
+ -- Dave Lambley <davel@state51.co.uk>  Fri, 16 Nov 2012 15:42:19 +0000
+
+libmogilefs-plugin-filerefs-perl (0.04) lucid; urgency=low
+
+  * Get made_new_ref return value correct.
+  * Munge arguments to work with Mogile::Client without poking around in
+    it's internals.
+
+ -- Dave Lambley <davel@state51.co.uk>  Mon, 15 Oct 2012 14:20:20 +0000
+
+libmogilefs-plugin-filerefs-perl (0.03) lucid; urgency=low
+
+  * Fix up domain argument.
+
+ -- Dave Lambley <davel@state51.co.uk>  Mon, 08 Oct 2012 15:29:06 +0000
+
+libmogilefs-plugin-filerefs-perl (0.02) lucid; urgency=low
+
+  * Fix argument passing.
+
+ -- Dave Lambley <davel@state51.co.uk>  Fri, 05 Oct 2012 15:00:08 +0000
+
+libmogilefs-plugin-filerefs-perl (0.01) unstable; urgency=low
+
+  * Initial release.
+
+ -- Dave Lambley <davel@state51.co.uk>  Fri, 05 Oct 2012 13:56:49 +0000

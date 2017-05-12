@@ -1,0 +1,85 @@
+NAME
+    MooseX::Role::XMLRPC::Client - Provide provide the needed bits to be a
+    XML-RPC client
+
+VERSION
+    This document describes version 0.06 of MooseX::Role::XMLRPC::Client -
+    released April 03, 2012 as part of MooseX-Role-XMLRPC-Client.
+
+SYNOPSIS
+        package MultipleWiths;
+        use Moose;
+
+        # ...
+
+        # we don't want to keep any login information here
+        with 'MooseX::Role::XMLRPC::Client' => {
+            name => 'bugzilla',
+            uri  => 'https://bugzilla.redhat.com/xmlrpc.cgi',
+            login_info => 0,
+        };
+
+        # basic info
+        with 'MooseX::Role::XMLRPC::Client' => {
+            name => 'foo',
+            uri  => 'http://foo.org/a/b/c',
+        };
+
+        sub _build_foo_userid { 'userid'   }
+        sub _build_foo_passwd { 'passw0rd' }
+
+        sub foo_login  { 'do login magic here..'   }
+        sub foo_logout { 'do logout magic here...' }
+
+DESCRIPTION
+    This is a Moose role that provides methods and attributes needed to
+    enable a class to serve as an XML-RPC client. It is parameterized
+    through MooseX::Role::Parameterized, so you can customize how it embeds
+    in your class. You can even embed it multiple times with different
+    parameterization, if it strikes your fancy :-)
+
+ROLE PARAMETERS
+    This role generates methods and attributes depending on these
+    parameters. None of them are required.
+
+  name
+    This parameter defaults to "xmlrpc". It serves as a prefix to all
+    generated methods and attributes. File and URI types are coerced.
+
+  uri (Uri)
+  login_info (Bool)
+  cookie_jar (File)
+  traits (ArrayRef[Str])
+    An arrayref of traits to apply to the attributes.
+
+METHODS/ATTRIBUTES
+    Right now, the best documentation can be found in the tests.
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   RPC::XML::Client
+
+SOURCE
+    The development version is on github at
+    <http://github.com/RsrchBoy/moosex-role-xmlrpc-client> and may be cloned
+    from <git://github.com/RsrchBoy/moosex-role-xmlrpc-client.git>
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/moosex-role-xmlrpc-client/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2011 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

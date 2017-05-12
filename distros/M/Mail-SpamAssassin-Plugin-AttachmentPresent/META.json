@@ -1,0 +1,51 @@
+{
+   "abstract" : "SpamAssassin plugin to score mail based on attachments ",
+   "author" : [
+      "Merijn van den Kroonenberg <merijn@web2all.nl>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mail-SpamAssassin-Plugin-AttachmentPresent",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "Encode" : "0",
+            "Encode::MIME::Header" : "0",
+            "File::Spec" : "0",
+            "IO::String" : "0",
+            "Mail::SpamAssassin" : "0",
+            "Mail::SpamAssassin::Logger" : "0",
+            "Mail::SpamAssassin::Plugin" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "base" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.05"
+}

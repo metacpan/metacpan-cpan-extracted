@@ -1,0 +1,109 @@
+=head1 NAME
+
+Mozilla::DOM::NSHTMLTextAreaElement
+
+=for object Mozilla::DOM::NSHTMLTextAreaElement
+
+Mozilla::DOM::NSHTMLTextAreaElement is a wrapper around an instance of Mozilla's
+nsIDOMNSHTMLTextAreaElement interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+Note: The `GetControllers' method is not wrapped; it has something to do
+with XUL.
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::NSHTMLTextAreaElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=begin comment
+
+=head2 $controllers = $nshtmltextareaelement->B<GetControllers>()
+
+Output:
+
+=over
+
+=item $controllers (nsIControllers)
+
+=back
+
+=end comment
+
+=head2 $textlength = $nshtmltextareaelement->B<GetTextLength>()
+
+Output:
+
+=over
+
+=item $textlength (int)
+
+=back
+
+=head2 $selectionstart = $nshtmltextareaelement->B<GetSelectionStart>()
+
+Output:
+
+=over
+
+=item $selectionstart (int)
+
+=back
+
+=head2 $nshtmltextareaelement->B<SetSelectionStart>($selectionstart)
+
+Input:
+
+=over
+
+=item $aSelectionStart (int)
+
+=back
+
+=head2 $selectionend = $nshtmltextareaelement->B<GetSelectionEnd>()
+
+Output:
+
+=over
+
+=item $selectionend (int)
+
+=back
+
+=head2 $nshtmltextareaelement->B<SetSelectionEnd>($selectionend)
+
+Input:
+
+=over
+
+=item $aSelectionEnd (int)
+
+=back
+
+=head2 $nshtmltextareaelement->B<SetSelectionRange>($selectionstart, $selectionend)
+
+Input:
+
+=over
+
+=item $selectionStart (int)
+
+=item $selectionEnd (int)
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

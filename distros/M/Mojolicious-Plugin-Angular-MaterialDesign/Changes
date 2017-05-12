@@ -1,0 +1,22 @@
+Revision history for Perl extension Mojolicious-Plugin-Angular-MaterialDesign
+
+1.1.0 2016-08-28T11:00:12Z
+
+    - Updating Material component and fixing missing dependency
+
+0.603 2014-12-28T10:01:56Z
+
+    - minor fixes
+
+0.602 2014-12-28T09:58:13Z
+
+    - cleanup
+
+0.601 2014-12-27T13:04:09Z
+
+    - minor fixes
+
+0.6 2014-12-27T12:59:24Z
+
+    - first release
+

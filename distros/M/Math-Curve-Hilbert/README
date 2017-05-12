@@ -1,0 +1,40 @@
+Math/Curve/Hilbert version 0.01
+===============================
+
+This is a Perl Implementation of Hilberts space filling Curve.
+
+The Hilbert Curve module provides some useful functions using Hilberts Space-filling
+Curve. This is handy for things like Dithering, Flattening n-dimensional data,
+fractals - all kind of things really.
+
+Interestingly David Hilbert thought of it way back in 1891 - 104 years before I started university, and
+112 years before I started this module.
+
+"A Space Filling Curve is a special fractal curve which has the following basic characteristics:
+ ­ it covers completely an area, a volume or a hyper-volume in a 2-d, 3-d or N-d space respectively,
+ ­ each point is visited once and only once (the curve does not cross itself), and
+ ­ neighbor points in the native space are likely to be neighbors in the space filling curve."
+definition from Multiple Range Query Optimization in Spatial Databases, Apostolos N. Papadopoulos and Yannis Manolopoulos
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module attempts to implement Hilberts curve in pure-perl, no modules should be
+required, but some may be optional later to provide additional functionality or
+improved performance.
+
+COPYRIGHT AND LICENCE
+
+This software is licensed for use under the same conditions of perl itself.
+That means that it is made availabe under the Artistic License and the GNU GPL.
+
+Copyright (C) 2003,2004 Aaron J. Trevena <teejay@droogs.org>
+

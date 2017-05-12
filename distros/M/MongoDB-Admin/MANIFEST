@@ -1,0 +1,6 @@
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/MongoDB-Admin.t
+lib/MongoDB/Admin.pm

@@ -1,0 +1,12 @@
+diff -Nur -x '*.orig' -x '*~' aron//lib/Math/Aronson.pm aron.new//lib/Math/Aronson.pm
+--- aron//lib/Math/Aronson.pm	2010-10-13 09:21:28.000000000 +1100
++++ aron.new//lib/Math/Aronson.pm	2010-10-13 09:23:12.000000000 +1100
+@@ -238,7 +238,7 @@
+     $it = Math::Aronson->new (letter => 'F');  # 1, 7 only
+ 
+ This is "F is the first, seventh" giving 1, 7 but ends there as there's no
+-more "F"s in "seventh".  See F<examples/terminate.pl> in the sources to run
++more "F"s in "seventh".  See F</usr/share/doc/libmath-aronson-perl/examples/terminate.pl> to run
+ thorough which letters seem to terminate or not.
+ 
+ =head2 Sloane's OEIS

@@ -1,0 +1,24 @@
+---
+abstract: 'Render Handlebars inside Mojolicious'
+author:
+  - 'Robert Grimes <rmzgrimes@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-HandlebarsJSRenderer
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JavaScript::V8::Handlebars: '0.01'
+  Mojolicious: '1'
+  perl: '5.006'
+version: '0.06'

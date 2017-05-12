@@ -1,0 +1,17 @@
+RM_F = perl -MExtUtils::Command -e rm_f
+EXE_FILES = sum1.exe sum2.exe
+OBJ_FILES = sum1.obj sum2.obj ast++.sum.o
+
+all : $(EXE_FILES) ast++.sum.o
+
+ast++.%.o: ast++.%.c
+	cl /L ast++.$*.lib $<
+
+%.obj : %.asm
+	masm /t $<;
+
+%.exe : %.obj
+	link /BATCH /NOLOGO $<;
+
+clean :
+	$(RM_F) $(EXE_FILES) $(OBJ_FILES)

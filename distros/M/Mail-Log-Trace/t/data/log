@@ -1,0 +1,900 @@
+Aug 18 00:01:38 acmemail1 postfix/smtp[5727]: CF6C9214B: to=<00000000@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.63, delays=0.54/0/0/0.09, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13987_12168_1 6B1B62259)
+Aug 18 00:01:38 acmemail1 postfix/smtpd[5833]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:01:38 acmemail1 postfix/qmgr[20508]: 6B1B62259: from=<00000001@baz.acme.gov>, size=84778, nrcpt=7 (queue active)
+Aug 18 00:01:38 acmemail1 postfix/smtpd[5819]: 7326D2B54: client=unknown[10.0.80.60]
+Aug 18 00:01:38 acmemail1 postfix/smtpd[5748]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:01:38 acmemail1 postfix/smtpd[5748]: 7918B29DA: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:01:38 acmemail1 postfix/smtp[5772]: 6B1B62259: to=<00000002@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.06, delays=0.01/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5772]: 6B1B62259: to=<00000003@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.06, delays=0.01/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5772]: 6B1B62259: to=<00000004@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.06, delays=0.01/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5772]: 6B1B62259: to=<00000005@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.06, delays=0.01/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5772]: 6B1B62259: to=<00000006@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.06, delays=0.01/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5772]: 6B1B62259: to=<00000007@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.06, delays=0.01/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5772]: 6B1B62259: to=<00000000@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.06, delays=0.01/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/qmgr[20508]: 6B1B62259: removed
+Aug 18 00:01:38 acmemail1 postfix/cleanup[5624]: 7918B29DA: message-id=<D31A582E5B6A2B45902C41C643D99A5A01399D5C@K001MB101.network.ad.baz.gov>
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000008@associates.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000009@associates.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000010@associates.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000011@associates.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000012@associates.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000013@associates.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000014@associates.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000015@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000016@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000017@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000018@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000019@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000020@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000021@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000022@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000023@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000024@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000025@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000026@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000027@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000028@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000029@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000030@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000031@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000032@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000033@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000034@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000035@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000036@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000037@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000038@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000039@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000040@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000041@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000042@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/qmgr[20508]: 7918B29DA: from=<00000001@baz.acme.gov>, size=84778, nrcpt=50 (queue active)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000043@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000044@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000045@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000046@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000047@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000048@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000049@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000050@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000051@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000052@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000053@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000054@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000055@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000056@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5824]: CF6C9214B: to=<00000057@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.7, delays=0.54/0/0/0.15, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69084_1 7918B29DA)
+Aug 18 00:01:38 acmemail1 postfix/smtpd[5748]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:01:38 acmemail1 postfix/qmgr[20508]: CF6C9214B: removed
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000008@associates.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000009@associates.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000010@associates.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000011@associates.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000012@associates.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000013@associates.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000014@associates.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000015@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000016@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000017@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000018@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000019@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000020@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000021@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000022@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000023@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000024@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000025@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000026@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000027@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000028@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000029@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000030@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000031@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000032@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000033@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000034@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000035@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000036@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000037@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000038@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000039@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000040@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000041@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000042@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000043@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000044@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000045@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000046@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000047@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000048@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000049@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000050@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000051@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000052@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000053@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000054@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000055@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000056@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/smtp[5775]: 7918B29DA: to=<00000057@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.02/0.01/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:38 acmemail1 postfix/qmgr[20508]: 7918B29DA: removed
+Aug 18 00:01:38 acmemail1 postfix/cleanup[5835]: 7326D2B54: message-id=<D31A582E5B6A2B45902C41C643D99A5A01399D5C@K001MB101.network.ad.baz.gov>
+Aug 18 00:01:38 acmemail1 postfix/qmgr[20508]: 7326D2B54: from=<00000001@baz.acme.gov>, size=78753, nrcpt=36 (queue active)
+Aug 18 00:01:38 acmemail1 postfix/smtpd[5819]: ECF422BE6: client=unknown[10.0.80.60]
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5747]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5747]: 012652BE7: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:01:39 acmemail1 postfix/cleanup[5840]: 012652BE7: message-id=<D31A582E5B6A2B45902C41C643D99A5A01399D5C@K001MB101.network.ad.baz.gov>
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000058@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000059@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000060@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000061@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000062@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000001@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000063@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000064@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000065@faa.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000066@example.com>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000067@hq.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000068@hq.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000069@hq.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000070@HQ.acme.GOV>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000071@hq.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000072@hq.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000061@hq.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000073@hq.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000074@example.gov.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000075@example.gov.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000076@lajric.org>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000077@mitre.org>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000078@mitre.org>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000079@mitre.org>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000080@mitre.org>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000081@nbcuni.com>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000082@patch.break.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000083@patch.break.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000084@patch.break.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000085@random.com>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000086@foobar.co.uk>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000087@OHSP.google.com>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000088@yahoo.com>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000089@hotmail.com>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000090@usace.collect.co.uk>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5841]: 7326D2B54: to=<00000091@uscg.co.uk>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.59, delays=0.42/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F422_13989_69085_1 012652BE7)
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5747]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:01:39 acmemail1 postfix/qmgr[20508]: 012652BE7: from=<00000001@baz.acme.gov>, size=78911, nrcpt=36 (queue active)
+Aug 18 00:01:39 acmemail1 postfix/qmgr[20508]: 7326D2B54: removed
+Aug 18 00:01:39 acmemail1 postfix/cleanup[5838]: ECF422BE6: message-id=<XpLe1rYDG00001918@K001MB101.network.ad.baz.gov>
+Aug 18 00:01:39 acmemail1 postfix/smtp[5776]: 012652BE7: to=<00000058@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5776]: 012652BE7: to=<00000059@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5776]: 012652BE7: to=<00000060@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5776]: 012652BE7: to=<00000061@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5776]: 012652BE7: to=<00000062@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5776]: 012652BE7: to=<00000001@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5776]: 012652BE7: to=<00000063@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5776]: 012652BE7: to=<00000064@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5829]: 012652BE7: to=<00000065@faa.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5776]: 012652BE7: to=<00000067@hq.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5829]: 012652BE7: to=<00000066@example.com>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5776]: 012652BE7: to=<00000068@hq.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5829]: 012652BE7: to=<00000074@example.gov.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5776]: 012652BE7: to=<00000069@hq.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5829]: 012652BE7: to=<00000075@example.gov.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5829]: 012652BE7: to=<00000076@lajric.org>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5776]: 012652BE7: to=<00000070@HQ.acme.GOV>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5776]: 012652BE7: to=<00000071@hq.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5829]: 012652BE7: to=<00000077@mitre.org>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5776]: 012652BE7: to=<00000072@hq.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5829]: 012652BE7: to=<00000078@mitre.org>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5776]: 012652BE7: to=<00000061@hq.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5829]: 012652BE7: to=<00000079@mitre.org>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5776]: 012652BE7: to=<00000073@hq.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5829]: 012652BE7: to=<00000080@mitre.org>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5829]: 012652BE7: to=<00000081@nbcuni.com>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5829]: 012652BE7: to=<00000082@patch.break.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5829]: 012652BE7: to=<00000083@patch.break.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5829]: 012652BE7: to=<00000084@patch.break.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5829]: 012652BE7: to=<00000085@random.com>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5829]: 012652BE7: to=<00000086@foobar.co.uk>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5829]: 012652BE7: to=<00000087@OHSP.google.com>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5829]: 012652BE7: to=<00000088@yahoo.com>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5829]: 012652BE7: to=<00000089@hotmail.com>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5829]: 012652BE7: to=<00000090@usace.collect.co.uk>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/smtp[5829]: 012652BE7: to=<00000091@uscg.co.uk>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.03/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/qmgr[20508]: 012652BE7: removed
+Aug 18 00:01:39 acmemail1 postfix/qmgr[20508]: ECF422BE6: from=<>, size=75061, nrcpt=1 (queue active)
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5834]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5834]: 3FF792A76: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:01:39 acmemail1 postfix/cleanup[5835]: 3FF792A76: message-id=<XpLe1rYDG00001918@K001MB101.network.ad.baz.gov>
+Aug 18 00:01:39 acmemail1 postfix/smtp[5825]: ECF422BE6: to=<00000093@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.33, delays=0.23/0/0/0.09, dsn=2.0.0, status=sent (250 OK, sent 48A8F423_13989_69086_1 3FF792A76)
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5834]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:01:39 acmemail1 postfix/qmgr[20508]: 3FF792A76: from=<>, size=75244, nrcpt=1 (queue active)
+Aug 18 00:01:39 acmemail1 postfix/qmgr[20508]: ECF422BE6: removed
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5819]: 457F02A8F: client=unknown[10.0.80.60]
+Aug 18 00:01:39 acmemail1 postfix/smtp[5775]: 3FF792A76: to=<00000093@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.01/0/0/0.07, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/qmgr[20508]: 3FF792A76: removed
+Aug 18 00:01:39 acmemail1 postfix/cleanup[5624]: 457F02A8F: message-id=<D31A582E5B6A2B45902C41C643D99A5A01399D5C@K001MB101.network.ad.baz.gov>
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5090]: connect from unknown[10.0.81.60]
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5090]: 739602B80: client=unknown[10.0.81.60]
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5821]: connect from ndcscan01.fiz.acme.gov[10.0.77.16]
+Aug 18 00:01:39 acmemail1 postfix/cleanup[5838]: 739602B80: message-id=<D31A582E5B6A2B45902C41C643D99A5A01399D5C@K001MB101.network.ad.baz.gov>
+Aug 18 00:01:39 acmemail1 postfix/qmgr[20508]: 457F02A8F: from=<00000001@baz.acme.gov>, size=84645, nrcpt=1 (queue active)
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5821]: NOQUEUE: reject_warning: RCPT from ndcscan01.fiz.acme.gov[10.0.77.16]: 450 4.1.8 <00000094@sapdb07.cpb.acme.gov>: Sender address rejected: Domain not found; from=<00000094@sapdb07.cpb.acme.gov> to=<qs1adm@sapdb07.cpb.acme.gov> proto=ESMTP helo=<tnwg01a064.fiz.acme.gov>
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5821]: 8180D2BBE: client=ndcscan01.fiz.acme.gov[10.0.77.16]
+Aug 18 00:01:39 acmemail1 postfix/cleanup[5836]: 8180D2BBE: message-id=<200808180401.m7I41cGe029201@sapdb07.cpb.acme.gov>
+Aug 18 00:01:39 acmemail1 postfix/qmgr[20508]: 8180D2BBE: from=<00000094@sapdb07.cpb.acme.gov>, size=1329, nrcpt=1 (queue active)
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5821]: disconnect from ndcscan01.fiz.acme.gov[10.0.77.16]
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5828]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5819]: disconnect from unknown[10.0.80.60]
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5828]: 8A19A2E68: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:01:39 acmemail1 postfix/qmgr[20508]: 739602B80: from=<00000001@acme.gov>, size=79408, nrcpt=1 (queue active)
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5090]: disconnect from unknown[10.0.81.60]
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5625]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5625]: 915652EA1: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:01:39 acmemail1 postfix/cleanup[5840]: 915652EA1: message-id=<D31A582E5B6A2B45902C41C643D99A5A01399D5C@K001MB101.network.ad.baz.gov>
+Aug 18 00:01:39 acmemail1 postfix/cleanup[5835]: 8A19A2E68: message-id=<200808180401.m7I41cGe029201@sapdb07.cpb.acme.gov>
+Aug 18 00:01:39 acmemail1 postfix/smtp[5727]: 8180D2BBE: to=<00000094@sapdb07.cpb.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.07, delays=0.02/0/0/0.05, dsn=2.0.0, status=sent (250 OK, sent 48A8F423_13987_12169_1 8A19A2E68)
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5828]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:01:39 acmemail1 postfix/qmgr[20508]: 8A19A2E68: from=<00000094@sapdb07.cpb.acme.gov>, size=1520, nrcpt=1 (queue active)
+Aug 18 00:01:39 acmemail1 postfix/qmgr[20508]: 8180D2BBE: removed
+Aug 18 00:01:39 acmemail1 postfix/smtp[5826]: 457F02A8F: to=<00000093@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.35, delays=0.27/0/0/0.08, dsn=2.0.0, status=sent (250 OK, sent 48A8F423_13989_69087_1 915652EA1)
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5625]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:01:39 acmemail1 postfix/qmgr[20508]: 915652EA1: from=<00000001@baz.acme.gov>, size=84828, nrcpt=1 (queue active)
+Aug 18 00:01:39 acmemail1 postfix/qmgr[20508]: 457F02A8F: removed
+Aug 18 00:01:39 acmemail1 postfix/smtp[5626]: 8A19A2E68: to=<00000094@sapdb07.cpb.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.04/0/0.01/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/qmgr[20508]: 8A19A2E68: removed
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5833]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5833]: A599B2A8F: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:01:39 acmemail1 postfix/cleanup[5624]: A599B2A8F: message-id=<D31A582E5B6A2B45902C41C643D99A5A01399D5C@K001MB101.network.ad.baz.gov>
+Aug 18 00:01:39 acmemail1 postfix/smtp[5776]: 915652EA1: to=<00000093@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.01/0/0.01/0.07, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/qmgr[20508]: 915652EA1: removed
+Aug 18 00:01:39 acmemail1 postfix/smtp[5824]: 739602B80: to=<00000093@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.22, delays=0.1/0/0/0.12, dsn=2.0.0, status=sent (250 OK, sent 48A8F423_13985_5088_1 A599B2A8F)
+Aug 18 00:01:39 acmemail1 postfix/smtpd[5833]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:01:39 acmemail1 postfix/qmgr[20508]: A599B2A8F: from=<00000001@acme.gov>, size=79591, nrcpt=1 (queue active)
+Aug 18 00:01:39 acmemail1 postfix/qmgr[20508]: 739602B80: removed
+Aug 18 00:01:39 acmemail1 postfix/smtp[5775]: A599B2A8F: to=<00000093@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.01/0/0/0.07, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:39 acmemail1 postfix/qmgr[20508]: A599B2A8F: removed
+Aug 18 00:01:41 acmemail1 postfix/smtpd[5823]: connect from email.O0OlII.net[10.0.73.31]
+Aug 18 00:01:41 acmemail1 postfix/smtpd[5823]: 69CF62A8F: client=email.O0OlII.net[10.0.73.31]
+Aug 18 00:01:41 acmemail1 postfix/cleanup[5836]: 69CF62A8F: message-id=<ednHM3SOl00007bbc@MWEX3M4.O0OlII.net>
+Aug 18 00:01:41 acmemail1 postfix/qmgr[20508]: 69CF62A8F: from=<>, size=86979, nrcpt=1 (queue active)
+Aug 18 00:01:41 acmemail1 postfix/smtpd[5823]: disconnect from email.O0OlII.net[10.0.73.31]
+Aug 18 00:01:41 acmemail1 postfix/smtpd[5834]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:01:41 acmemail1 postfix/smtpd[5834]: 8F8AF214B: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:01:41 acmemail1 postfix/cleanup[5835]: 8F8AF214B: message-id=<ednHM3SOl00007bbc@MWEX3M4.O0OlII.net>
+Aug 18 00:01:41 acmemail1 postfix/smtp[5841]: 69CF62A8F: to=<00000001@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.17, delays=0.11/0/0/0.06, dsn=2.0.0, status=sent (250 OK, sent 48A8F425_13989_69088_1 8F8AF214B)
+Aug 18 00:01:41 acmemail1 postfix/smtpd[5834]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:01:41 acmemail1 postfix/qmgr[20508]: 8F8AF214B: from=<>, size=87156, nrcpt=1 (queue active)
+Aug 18 00:01:41 acmemail1 postfix/qmgr[20508]: 69CF62A8F: removed
+Aug 18 00:01:41 acmemail1 postfix/smtp[5772]: 8F8AF214B: to=<00000001@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.06, delays=0.01/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:41 acmemail1 postfix/qmgr[20508]: 8F8AF214B: removed
+Aug 18 00:01:41 acmemail1 postfix/smtpd[5837]: connect from unknown[10.0.63.7]
+Aug 18 00:01:41 acmemail1 postfix/smtpd[5837]: lost connection after CONNECT from unknown[10.0.63.7]
+Aug 18 00:01:41 acmemail1 postfix/smtpd[5837]: disconnect from unknown[10.0.63.7]
+Aug 18 00:01:44 acmemail1 postfix/smtpd[5821]: connect from treccweb.ice.acme.gov[10.0.87.108]
+Aug 18 00:01:44 acmemail1 postfix/smtpd[5821]: DF91D214B: client=treccweb.ice.acme.gov[10.0.87.108]
+Aug 18 00:01:45 acmemail1 postfix/cleanup[5624]: DF91D214B: message-id=<Yny43UAgi000005ef@EVS1.oconus.ice.acme.gov>
+Aug 18 00:01:45 acmemail1 postfix/qmgr[20508]: DF91D214B: from=<>, size=143465, nrcpt=1 (queue active)
+Aug 18 00:01:45 acmemail1 postfix/smtpd[5828]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:01:45 acmemail1 postfix/smtpd[5821]: disconnect from treccweb.ice.acme.gov[10.0.87.108]
+Aug 18 00:01:45 acmemail1 postfix/smtpd[5828]: 7C00D2259: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:01:45 acmemail1 postfix/cleanup[5840]: 7C00D2259: message-id=<Yny43UAgi000005ef@EVS1.oconus.ice.acme.gov>
+Aug 18 00:01:45 acmemail1 postfix/smtp[5727]: DF91D214B: to=<00000095@immd.gov.hk>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.66, delays=0.58/0/0/0.09, dsn=2.0.0, status=sent (250 OK, sent 48A8F429_13989_69089_1 7C00D2259)
+Aug 18 00:01:45 acmemail1 postfix/smtpd[5828]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:01:45 acmemail1 postfix/qmgr[20508]: 7C00D2259: from=<>, size=143648, nrcpt=1 (queue active)
+Aug 18 00:01:45 acmemail1 postfix/qmgr[20508]: DF91D214B: removed
+Aug 18 00:01:45 acmemail1 postfix/smtp[5827]: 7C00D2259: to=<00000095@immd.gov.hk>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.07, delays=0.01/0/0/0.06, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:45 acmemail1 postfix/qmgr[20508]: 7C00D2259: removed
+Aug 18 00:01:47 acmemail1 postfix/smtpd[5839]: connect from email.O0OlII.net[10.0.73.31]
+Aug 18 00:01:47 acmemail1 postfix/smtpd[5839]: 78C112259: client=email.O0OlII.net[10.0.73.31]
+Aug 18 00:01:47 acmemail1 postfix/cleanup[5836]: 78C112259: message-id=<0AF44B6ABCC6B140AEB436E48466B416163FF7@MWEX3M4.O0OlII.net>
+Aug 18 00:01:47 acmemail1 postfix/qmgr[20508]: 78C112259: from=<00000096@O0OlII.gov>, size=2488, nrcpt=1 (queue active)
+Aug 18 00:01:47 acmemail1 postfix/smtpd[5839]: disconnect from email.O0OlII.net[10.0.73.31]
+Aug 18 00:01:47 acmemail1 postfix/smtpd[5625]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:01:47 acmemail1 postfix/smtpd[5625]: 8E198214B: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:01:47 acmemail1 postfix/cleanup[5838]: 8E198214B: message-id=<0AF44B6ABCC6B140AEB436E48466B416163FF7@MWEX3M4.O0OlII.net>
+Aug 18 00:01:47 acmemail1 postfix/smtp[5825]: 78C112259: to=<00000097@aadvantage.email.aa.com>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.14, delays=0.07/0/0/0.07, dsn=2.0.0, status=sent (250 OK, sent 48A8F42B_13989_69090_1 8E198214B)
+Aug 18 00:01:47 acmemail1 postfix/smtpd[5625]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:01:47 acmemail1 postfix/qmgr[20508]: 8E198214B: from=<00000096@O0OlII.gov>, size=2693, nrcpt=1 (queue active)
+Aug 18 00:01:47 acmemail1 postfix/qmgr[20508]: 78C112259: removed
+Aug 18 00:01:47 acmemail1 postfix/smtp[4840]: 8E198214B: to=<00000097@aadvantage.email.aa.com>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.13, delays=0.05/0/0/0.09, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:47 acmemail1 postfix/qmgr[20508]: 8E198214B: removed
+Aug 18 00:01:53 acmemail1 postfix/smtpd[5819]: connect from unknown[10.0.63.2]
+Aug 18 00:01:53 acmemail1 postfix/smtpd[5819]: lost connection after CONNECT from unknown[10.0.63.2]
+Aug 18 00:01:53 acmemail1 postfix/smtpd[5819]: disconnect from unknown[10.0.63.2]
+Aug 18 00:01:58 acmemail1 postfix/smtpd[5090]: connect from nwg-scan-a-001.fiz.acme.gov[10.0.77.245]
+Aug 18 00:01:58 acmemail1 postfix/smtpd[5090]: 66AE6214B: client=nwg-scan-a-001.fiz.acme.gov[10.0.77.245]
+Aug 18 00:01:58 acmemail1 postfix/cleanup[5624]: 66AE6214B: message-id=<10719543.1219032118209.JavaMail.default@10.159.39.63>
+Aug 18 00:01:58 acmemail1 postfix/qmgr[20508]: 66AE6214B: from=<00000098@acme.gov>, size=2496, nrcpt=1 (queue active)
+Aug 18 00:01:58 acmemail1 postfix/smtpd[5090]: disconnect from nwg-scan-a-001.fiz.acme.gov[10.0.77.245]
+Aug 18 00:01:58 acmemail1 postfix/smtpd[5834]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:01:58 acmemail1 postfix/smtpd[5834]: 7338B2259: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:01:58 acmemail1 postfix/cleanup[5835]: 7338B2259: message-id=<10719543.1219032118209.JavaMail.default@10.159.39.63>
+Aug 18 00:01:58 acmemail1 postfix/smtp[5826]: 66AE6214B: to=<00000099@OLYMPIC-AIRWAYS.GR>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.1, delays=0.05/0/0/0.06, dsn=2.0.0, status=sent (250 OK, sent 48A8F436_13989_69091_1 7338B2259)
+Aug 18 00:01:58 acmemail1 postfix/smtpd[5834]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:01:58 acmemail1 postfix/qmgr[20508]: 7338B2259: from=<00000098@acme.gov>, size=2688, nrcpt=1 (queue active)
+Aug 18 00:01:58 acmemail1 postfix/qmgr[20508]: 66AE6214B: removed
+Aug 18 00:01:58 acmemail1 postfix/smtp[5818]: 7338B2259: to=<00000099@OLYMPIC-AIRWAYS.GR>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.04/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:01:58 acmemail1 postfix/qmgr[20508]: 7338B2259: removed
+Aug 18 00:02:08 acmemail1 postfix/smtpd[5839]: connect from mx2.fins3.acme.gov[10.0.87.108]
+Aug 18 00:02:08 acmemail1 postfix/smtpd[5839]: B65722259: client=mx2.fins3.acme.gov[10.0.87.108]
+Aug 18 00:02:08 acmemail1 postfix/cleanup[5836]: B65722259: message-id=<7CB0F0A5EA0AC7428B309FA5D1F35C2802457FA3@Z02EXIBUF01.irmnet.ds2.acme.gov>
+Aug 18 00:02:08 acmemail1 postfix/qmgr[20508]: B65722259: from=<00000100@fins3.acme.gov>, size=2572, nrcpt=1 (queue active)
+Aug 18 00:02:08 acmemail1 postfix/smtpd[5833]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:08 acmemail1 postfix/smtpd[5833]: DB1F7214B: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:08 acmemail1 postfix/cleanup[5840]: DB1F7214B: message-id=<7CB0F0A5EA0AC7428B309FA5D1F35C2802457FA3@Z02EXIBUF01.irmnet.ds2.acme.gov>
+Aug 18 00:02:08 acmemail1 postfix/smtp[5824]: B65722259: to=<00000101@yahoo.com>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.25, delays=0.19/0/0/0.07, dsn=2.0.0, status=sent (250 OK, sent 48A8F440_13989_69092_1 DB1F7214B)
+Aug 18 00:02:08 acmemail1 postfix/smtpd[5833]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:08 acmemail1 postfix/qmgr[20508]: DB1F7214B: from=<00000100@fins3.acme.gov>, size=2757, nrcpt=1 (queue active)
+Aug 18 00:02:08 acmemail1 postfix/qmgr[20508]: B65722259: removed
+Aug 18 00:02:08 acmemail1 postfix/smtpd[5839]: disconnect from mx2.fins3.acme.gov[10.0.87.108]
+Aug 18 00:02:08 acmemail1 postfix/smtp[4841]: DB1F7214B: to=<00000101@yahoo.com>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.04/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:08 acmemail1 postfix/qmgr[20508]: DB1F7214B: removed
+Aug 18 00:02:10 acmemail1 postfix/smtpd[5821]: connect from treccweb.ice.acme.gov[10.0.87.108]
+Aug 18 00:02:10 acmemail1 postfix/smtpd[5821]: 5D508214B: client=treccweb.ice.acme.gov[10.0.87.108]
+Aug 18 00:02:10 acmemail1 postfix/cleanup[5838]: 5D508214B: message-id=<F02726857B054045891AF6F5ABAC0B2502BADBBE@Z02EXISEA03.irmnet.ds2.acme.gov>
+Aug 18 00:02:10 acmemail1 postfix/qmgr[20508]: 5D508214B: from=<00000102@fins3.acme.gov>, size=2365, nrcpt=1 (queue active)
+Aug 18 00:02:10 acmemail1 postfix/smtpd[5625]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:10 acmemail1 postfix/smtpd[5625]: 860682259: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:10 acmemail1 postfix/cleanup[5624]: 860682259: message-id=<F02726857B054045891AF6F5ABAC0B2502BADBBE@Z02EXISEA03.irmnet.ds2.acme.gov>
+Aug 18 00:02:10 acmemail1 postfix/smtpd[5821]: disconnect from treccweb.ice.acme.gov[10.0.87.108]
+Aug 18 00:02:10 acmemail1 postfix/smtp[5727]: 5D508214B: to=<00000103@hotmail.com>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.32, delays=0.2/0/0/0.12, dsn=2.0.0, status=sent (250 OK, sent 48A8F442_13989_69093_1 860682259)
+Aug 18 00:02:10 acmemail1 postfix/smtpd[5625]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:10 acmemail1 postfix/qmgr[20508]: 860682259: from=<00000102@fins3.acme.gov>, size=2554, nrcpt=1 (queue active)
+Aug 18 00:02:10 acmemail1 postfix/qmgr[20508]: 5D508214B: removed
+Aug 18 00:02:10 acmemail1 postfix/smtp[5831]: 860682259: to=<00000103@hotmail.com>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.15, delays=0.11/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:10 acmemail1 postfix/qmgr[20508]: 860682259: removed
+Aug 18 00:02:13 acmemail1 postfix/smtpd[5819]: connect from mx3.fins3.acme.gov[10.0.87.120]
+Aug 18 00:02:13 acmemail1 postfix/smtpd[5819]: 6A38F2259: client=mx3.fins3.acme.gov[10.0.87.120]
+Aug 18 00:02:13 acmemail1 postfix/cleanup[5835]: 6A38F2259: message-id=<8XIwGyW8p00000028@Z02SPIIRM01.irmnet.ds2.acme.gov>
+Aug 18 00:02:13 acmemail1 postfix/qmgr[20508]: 6A38F2259: from=<>, size=4093, nrcpt=1 (queue active)
+Aug 18 00:02:13 acmemail1 postfix/smtpd[5834]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:13 acmemail1 postfix/smtpd[5834]: 97D71214B: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:13 acmemail1 postfix/cleanup[5836]: 97D71214B: message-id=<8XIwGyW8p00000028@Z02SPIIRM01.irmnet.ds2.acme.gov>
+Aug 18 00:02:13 acmemail1 postfix/smtpd[5819]: disconnect from mx3.fins3.acme.gov[10.0.87.120]
+Aug 18 00:02:13 acmemail1 postfix/smtp[5841]: 6A38F2259: to=<00000104@etp1101.etp.na.blackberry.net>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.3, delays=0.22/0/0/0.09, dsn=2.0.0, status=sent (250 OK, sent 48A8F445_13989_69094_1 97D71214B)
+Aug 18 00:02:13 acmemail1 postfix/smtpd[5834]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:13 acmemail1 postfix/qmgr[20508]: 97D71214B: from=<>, size=4295, nrcpt=1 (queue active)
+Aug 18 00:02:13 acmemail1 postfix/qmgr[20508]: 6A38F2259: removed
+Aug 18 00:02:13 acmemail1 postfix/smtp[5830]: 97D71214B: to=<00000104@etp1101.etp.na.blackberry.net>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.12, delays=0.05/0/0/0.07, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:13 acmemail1 postfix/qmgr[20508]: 97D71214B: removed
+Aug 18 00:02:18 acmemail1 postfix/smtpd[5839]: connect from nwg-scan-a-001.fiz.acme.gov[10.0.77.245]
+Aug 18 00:02:18 acmemail1 postfix/smtpd[5839]: 484C2214B: client=nwg-scan-a-001.fiz.acme.gov[10.0.77.245]
+Aug 18 00:02:18 acmemail1 postfix/cleanup[5840]: 484C2214B: message-id=<26795951.1219032135693.JavaMail.default@10.159.39.63>
+Aug 18 00:02:18 acmemail1 postfix/qmgr[20508]: 484C2214B: from=<00000098@acme.gov>, size=2544, nrcpt=1 (queue active)
+Aug 18 00:02:18 acmemail1 postfix/smtpd[5839]: disconnect from nwg-scan-a-001.fiz.acme.gov[10.0.77.245]
+Aug 18 00:02:18 acmemail1 postfix/smtpd[5828]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:18 acmemail1 postfix/smtpd[5828]: 550EF2259: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:18 acmemail1 postfix/cleanup[5838]: 550EF2259: message-id=<26795951.1219032135693.JavaMail.default@10.159.39.63>
+Aug 18 00:02:18 acmemail1 postfix/smtp[5825]: 484C2214B: to=<00000105@SEAGULLMARINE.COM>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.1, delays=0.05/0/0/0.05, dsn=2.0.0, status=sent (250 OK, sent 48A8F44A_13989_69095_1 550EF2259)
+Aug 18 00:02:18 acmemail1 postfix/smtpd[5828]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:18 acmemail1 postfix/qmgr[20508]: 550EF2259: from=<00000098@acme.gov>, size=2738, nrcpt=1 (queue active)
+Aug 18 00:02:18 acmemail1 postfix/qmgr[20508]: 484C2214B: removed
+Aug 18 00:02:18 acmemail1 postfix/smtp[5829]: 550EF2259: to=<00000105@SEAGULLMARINE.COM>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.04/0/0/0.03, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:18 acmemail1 postfix/qmgr[20508]: 550EF2259: removed
+Aug 18 00:02:28 acmemail1 postfix/smtpd[5837]: connect from mx3.fins3.acme.gov[10.0.87.120]
+Aug 18 00:02:28 acmemail1 postfix/smtpd[5837]: 8C9DA2259: client=mx3.fins3.acme.gov[10.0.87.120]
+Aug 18 00:02:28 acmemail1 postfix/cleanup[5624]: 8C9DA2259: message-id=<4A4026A9151C3347BB9B4841ED8D805B02A26E8D@Z02EXISPM03.irmnet.ds2.acme.gov>
+Aug 18 00:02:28 acmemail1 postfix/qmgr[20508]: 8C9DA2259: from=<00000106@fins3.acme.gov>, size=8262, nrcpt=1 (queue active)
+Aug 18 00:02:28 acmemail1 postfix/smtpd[5833]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:28 acmemail1 postfix/smtpd[5833]: D9E5E214B: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:28 acmemail1 postfix/smtpd[5837]: disconnect from mx3.fins3.acme.gov[10.0.87.120]
+Aug 18 00:02:28 acmemail1 postfix/cleanup[5835]: D9E5E214B: message-id=<4A4026A9151C3347BB9B4841ED8D805B02A26E8D@Z02EXISPM03.irmnet.ds2.acme.gov>
+Aug 18 00:02:28 acmemail1 postfix/smtp[5727]: 8C9DA2259: to=<00000107@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.43, delays=0.3/0/0/0.13, dsn=2.0.0, status=sent (250 OK, sent 48A8F454_13989_69096_1 D9E5E214B)
+Aug 18 00:02:28 acmemail1 postfix/smtpd[5833]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:28 acmemail1 postfix/qmgr[20508]: D9E5E214B: from=<00000106@fins3.acme.gov>, size=8449, nrcpt=1 (queue active)
+Aug 18 00:02:28 acmemail1 postfix/qmgr[20508]: 8C9DA2259: removed
+Aug 18 00:02:28 acmemail1 postfix/smtp[5776]: D9E5E214B: to=<00000107@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.04/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:28 acmemail1 postfix/qmgr[20508]: D9E5E214B: removed
+Aug 18 00:02:39 acmemail1 postfix/smtpd[5823]: connect from unknown[10.0.81.60]
+Aug 18 00:02:39 acmemail1 postfix/smtpd[5823]: 706D0214B: client=unknown[10.0.81.60]
+Aug 18 00:02:39 acmemail1 postfix/cleanup[5836]: 706D0214B: message-id=<LkUMceECv00001ce0@K021BH002.network.ad.baz.gov>
+Aug 18 00:02:39 acmemail1 postfix/qmgr[20508]: 706D0214B: from=<>, size=2897, nrcpt=1 (queue active)
+Aug 18 00:02:39 acmemail1 postfix/smtpd[5823]: disconnect from unknown[10.0.81.60]
+Aug 18 00:02:39 acmemail1 postfix/smtpd[5748]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:39 acmemail1 postfix/smtpd[5748]: 7CA4D2259: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:39 acmemail1 postfix/cleanup[5840]: 7CA4D2259: message-id=<LkUMceECv00001ce0@K021BH002.network.ad.baz.gov>
+Aug 18 00:02:39 acmemail1 postfix/smtp[5841]: 706D0214B: to=<00000108@tvc.baz.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.1, delays=0.03/0/0/0.07, dsn=2.0.0, status=sent (250 OK, sent 48A8F45F_13989_69097_1 7CA4D2259)
+Aug 18 00:02:39 acmemail1 postfix/smtpd[5748]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:39 acmemail1 postfix/qmgr[20508]: 7CA4D2259: from=<>, size=3109, nrcpt=1 (queue active)
+Aug 18 00:02:39 acmemail1 postfix/qmgr[20508]: 706D0214B: removed
+Aug 18 00:02:39 acmemail1 postfix/smtp[5626]: 7CA4D2259: to=<00000108@tvc.baz.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.04/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:39 acmemail1 postfix/qmgr[20508]: 7CA4D2259: removed
+Aug 18 00:02:39 acmemail1 postfix/smtpd[5819]: connect from unknown[10.0.80.60]
+Aug 18 00:02:39 acmemail1 postfix/smtpd[5819]: C32A62259: client=unknown[10.0.80.60]
+Aug 18 00:02:39 acmemail1 postfix/cleanup[5838]: C32A62259: message-id=<D0F1C252BF18CD4794C0511C24AEDF121612C6@K001MB103.network.ad.baz.gov>
+Aug 18 00:02:39 acmemail1 postfix/qmgr[20508]: C32A62259: from=<00000109@baz.acme.gov>, size=1410, nrcpt=1 (queue active)
+Aug 18 00:02:39 acmemail1 postfix/smtpd[5625]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:39 acmemail1 postfix/smtpd[5625]: D7360214B: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:39 acmemail1 postfix/smtpd[5819]: disconnect from unknown[10.0.80.60]
+Aug 18 00:02:39 acmemail1 postfix/cleanup[5624]: D7360214B: message-id=<D0F1C252BF18CD4794C0511C24AEDF121612C6@K001MB103.network.ad.baz.gov>
+Aug 18 00:02:39 acmemail1 postfix/smtp[5824]: C32A62259: to=<00000109@comcast.net>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.16, delays=0.1/0/0/0.06, dsn=2.0.0, status=sent (250 OK, sent 48A8F45F_13989_69098_1 D7360214B)
+Aug 18 00:02:39 acmemail1 postfix/smtpd[5625]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:39 acmemail1 postfix/qmgr[20508]: D7360214B: from=<00000109@baz.acme.gov>, size=1597, nrcpt=1 (queue active)
+Aug 18 00:02:39 acmemail1 postfix/qmgr[20508]: C32A62259: removed
+Aug 18 00:02:39 acmemail1 postfix/smtp[5827]: D7360214B: to=<00000109@comcast.net>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.04/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:39 acmemail1 postfix/qmgr[20508]: D7360214B: removed
+Aug 18 00:02:41 acmemail1 postfix/smtpd[5090]: connect from mx3.fins3.acme.gov[10.0.87.120]
+Aug 18 00:02:41 acmemail1 postfix/smtpd[5090]: DA0B0214B: client=mx3.fins3.acme.gov[10.0.87.120]
+Aug 18 00:02:42 acmemail1 postfix/cleanup[5835]: DA0B0214B: message-id=<6CA0AABDDBF6D04BAE5E7EB6EC6AC8AD0374813D@Z02EXISPM03.irmnet.ds2.acme.gov>
+Aug 18 00:02:42 acmemail1 postfix/qmgr[20508]: DA0B0214B: from=<00000110@fins3.acme.gov>, size=93832, nrcpt=7 (queue active)
+Aug 18 00:02:42 acmemail1 postfix/smtpd[5834]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:42 acmemail1 postfix/smtpd[5834]: 76F6A2259: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:42 acmemail1 postfix/cleanup[5836]: 76F6A2259: message-id=<6CA0AABDDBF6D04BAE5E7EB6EC6AC8AD0374813D@Z02EXISPM03.irmnet.ds2.acme.gov>
+Aug 18 00:02:42 acmemail1 postfix/smtp[5841]: DA0B0214B: to=<00000111@associates.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.68, delays=0.59/0/0/0.08, dsn=2.0.0, status=sent (250 OK, sent 48A8F462_13989_69099_1 76F6A2259)
+Aug 18 00:02:42 acmemail1 postfix/smtp[5841]: DA0B0214B: to=<00000112@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.68, delays=0.59/0/0/0.08, dsn=2.0.0, status=sent (250 OK, sent 48A8F462_13989_69099_1 76F6A2259)
+Aug 18 00:02:42 acmemail1 postfix/smtp[5841]: DA0B0214B: to=<00000113@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.68, delays=0.59/0/0/0.08, dsn=2.0.0, status=sent (250 OK, sent 48A8F462_13989_69099_1 76F6A2259)
+Aug 18 00:02:42 acmemail1 postfix/smtp[5841]: DA0B0214B: to=<00000114@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.68, delays=0.59/0/0/0.08, dsn=2.0.0, status=sent (250 OK, sent 48A8F462_13989_69099_1 76F6A2259)
+Aug 18 00:02:42 acmemail1 postfix/smtp[5841]: DA0B0214B: to=<00000115@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.68, delays=0.59/0/0/0.08, dsn=2.0.0, status=sent (250 OK, sent 48A8F462_13989_69099_1 76F6A2259)
+Aug 18 00:02:42 acmemail1 postfix/smtp[5841]: DA0B0214B: to=<00000116@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.68, delays=0.59/0/0/0.08, dsn=2.0.0, status=sent (250 OK, sent 48A8F462_13989_69099_1 76F6A2259)
+Aug 18 00:02:42 acmemail1 postfix/smtp[5841]: DA0B0214B: to=<00000117@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.68, delays=0.59/0/0/0.08, dsn=2.0.0, status=sent (250 OK, sent 48A8F462_13989_69099_1 76F6A2259)
+Aug 18 00:02:42 acmemail1 postfix/smtpd[5834]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:42 acmemail1 postfix/qmgr[20508]: 76F6A2259: from=<00000110@fins3.acme.gov>, size=93990, nrcpt=7 (queue active)
+Aug 18 00:02:42 acmemail1 postfix/qmgr[20508]: DA0B0214B: removed
+Aug 18 00:02:42 acmemail1 postfix/smtpd[5090]: disconnect from mx3.fins3.acme.gov[10.0.87.120]
+Aug 18 00:02:42 acmemail1 postfix/smtp[5775]: 76F6A2259: to=<00000111@associates.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.06, delays=0.01/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:42 acmemail1 postfix/smtp[5775]: 76F6A2259: to=<00000112@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.06, delays=0.01/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:42 acmemail1 postfix/smtp[5775]: 76F6A2259: to=<00000113@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.06, delays=0.01/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:42 acmemail1 postfix/smtp[5775]: 76F6A2259: to=<00000114@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.06, delays=0.01/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:42 acmemail1 postfix/smtp[5775]: 76F6A2259: to=<00000115@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.06, delays=0.01/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:42 acmemail1 postfix/smtp[5775]: 76F6A2259: to=<00000116@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.06, delays=0.01/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:42 acmemail1 postfix/smtp[5775]: 76F6A2259: to=<00000117@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.06, delays=0.01/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:42 acmemail1 postfix/qmgr[20508]: 76F6A2259: removed
+Aug 18 00:02:42 acmemail1 postfix/smtpd[5837]: connect from unknown[10.0.63.7]
+Aug 18 00:02:42 acmemail1 postfix/smtpd[5837]: lost connection after CONNECT from unknown[10.0.63.7]
+Aug 18 00:02:42 acmemail1 postfix/smtpd[5837]: disconnect from unknown[10.0.63.7]
+Aug 18 00:02:42 acmemail1 postfix/smtpd[5821]: connect from ndcscan01.fiz.acme.gov[10.0.77.16]
+Aug 18 00:02:42 acmemail1 postfix/smtpd[5821]: NOQUEUE: reject_warning: RCPT from ndcscan01.fiz.acme.gov[10.0.77.16]: 450 4.1.8 <00000118@pp650n29.fiz.acme.gov>: Sender address rejected: Domain not found; from=<00000118@pp650n29.fiz.acme.gov> to=<root@pp650n29.fiz.acme.gov> proto=ESMTP helo=<tnwg01a064.fiz.acme.gov>
+Aug 18 00:02:42 acmemail1 postfix/smtpd[5821]: E18B923CB: client=ndcscan01.fiz.acme.gov[10.0.77.16]
+Aug 18 00:02:42 acmemail1 postfix/cleanup[5624]: E18B923CB: message-id=<200808180400.m7I400CQ027698@pp650n29.fiz.acme.gov>
+Aug 18 00:02:42 acmemail1 postfix/qmgr[20508]: E18B923CB: from=<00000118@pp650n29.fiz.acme.gov>, size=1278, nrcpt=1 (queue active)
+Aug 18 00:02:42 acmemail1 postfix/smtpd[5821]: NOQUEUE: reject_warning: RCPT from ndcscan01.fiz.acme.gov[10.0.77.16]: 450 4.1.8 <00000118@pp650n29.fiz.acme.gov>: Sender address rejected: Domain not found; from=<00000118@pp650n29.fiz.acme.gov> to=<root@pp650n29.fiz.acme.gov> proto=ESMTP helo=<tnwg01a064.fiz.acme.gov>
+Aug 18 00:02:42 acmemail1 postfix/smtpd[5821]: E881A2A64: client=ndcscan01.fiz.acme.gov[10.0.77.16]
+Aug 18 00:02:42 acmemail1 postfix/smtpd[5747]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:42 acmemail1 postfix/smtpd[5747]: E947029DA: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:42 acmemail1 postfix/cleanup[5835]: E881A2A64: message-id=<200808180400.m7I400BB027702@pp650n29.fiz.acme.gov>
+Aug 18 00:02:42 acmemail1 postfix/qmgr[20508]: E881A2A64: from=<00000118@pp650n29.fiz.acme.gov>, size=1282, nrcpt=1 (queue active)
+Aug 18 00:02:42 acmemail1 postfix/smtpd[5821]: disconnect from ndcscan01.fiz.acme.gov[10.0.77.16]
+Aug 18 00:02:42 acmemail1 postfix/smtpd[5828]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:42 acmemail1 postfix/smtpd[5828]: F08432A76: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:42 acmemail1 postfix/cleanup[5836]: E947029DA: message-id=<200808180400.m7I400CQ027698@pp650n29.fiz.acme.gov>
+Aug 18 00:02:42 acmemail1 postfix/smtp[5826]: E18B923CB: to=<00000118@pp650n29.fiz.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.07, delays=0.02/0/0/0.05, dsn=2.0.0, status=sent (250 OK, sent 48A8F462_13989_69100_1 E947029DA)
+Aug 18 00:02:42 acmemail1 postfix/smtpd[5747]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:42 acmemail1 postfix/qmgr[20508]: E947029DA: from=<00000118@pp650n29.fiz.acme.gov>, size=1468, nrcpt=1 (queue active)
+Aug 18 00:02:42 acmemail1 postfix/qmgr[20508]: E18B923CB: removed
+Aug 18 00:02:43 acmemail1 postfix/cleanup[5838]: F08432A76: message-id=<200808180400.m7I400BB027702@pp650n29.fiz.acme.gov>
+Aug 18 00:02:43 acmemail1 postfix/smtp[5841]: E881A2A64: to=<00000118@pp650n29.fiz.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.07, delays=0.02/0/0/0.05, dsn=2.0.0, status=sent (250 OK, sent 48A8F462_13987_12170_1 F08432A76)
+Aug 18 00:02:43 acmemail1 postfix/smtpd[5828]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:43 acmemail1 postfix/qmgr[20508]: F08432A76: from=<00000118@pp650n29.fiz.acme.gov>, size=1472, nrcpt=1 (queue active)
+Aug 18 00:02:43 acmemail1 postfix/qmgr[20508]: E881A2A64: removed
+Aug 18 00:02:43 acmemail1 postfix/smtp[5772]: E947029DA: to=<00000118@pp650n29.fiz.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.04/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:43 acmemail1 postfix/qmgr[20508]: E947029DA: removed
+Aug 18 00:02:43 acmemail1 postfix/smtp[5626]: F08432A76: to=<00000118@pp650n29.fiz.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.05/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:43 acmemail1 postfix/qmgr[20508]: F08432A76: removed
+Aug 18 00:02:43 acmemail1 postfix/smtpd[5839]: connect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:43 acmemail1 postfix/smtpd[5839]: NOQUEUE: reject_warning: RCPT from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]: 450 4.1.8 <00000118@pp650n29.fiz.acme.gov>: Sender address rejected: Domain not found; from=<00000118@pp650n29.fiz.acme.gov> to=<root@pp650n29.fiz.acme.gov> proto=SMTP helo=<NWG-SCAN-A-002.AD.fiz.acme.GOV>
+Aug 18 00:02:43 acmemail1 postfix/smtpd[5839]: 36DAA2A76: client=nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:43 acmemail1 postfix/cleanup[5840]: 36DAA2A76: message-id=<200808180400.m7I400BB027702@pp650n29.fiz.acme.gov>
+Aug 18 00:02:43 acmemail1 postfix/qmgr[20508]: 36DAA2A76: from=<00000118@pp650n29.fiz.acme.gov>, size=2019, nrcpt=1 (queue active)
+Aug 18 00:02:43 acmemail1 postfix/smtpd[5839]: disconnect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:43 acmemail1 postfix/smtpd[5833]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:43 acmemail1 postfix/smtpd[5833]: 4480B214B: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:43 acmemail1 postfix/cleanup[5835]: 4480B214B: message-id=<200808180400.m7I400BB027702@pp650n29.fiz.acme.gov>
+Aug 18 00:02:43 acmemail1 postfix/smtp[5825]: 36DAA2A76: to=<00000118@pp650n29.fiz.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.11, delays=0.05/0/0/0.06, dsn=2.0.0, status=sent (250 OK, sent 48A8F463_13989_69101_1 4480B214B)
+Aug 18 00:02:43 acmemail1 postfix/smtpd[5833]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:43 acmemail1 postfix/qmgr[20508]: 4480B214B: from=<00000118@pp650n29.fiz.acme.gov>, size=2209, nrcpt=1 (queue active)
+Aug 18 00:02:43 acmemail1 postfix/qmgr[20508]: 36DAA2A76: removed
+Aug 18 00:02:43 acmemail1 postfix/smtp[5776]: 4480B214B: to=<00000118@pp650n29.fiz.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.04/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:43 acmemail1 postfix/qmgr[20508]: 4480B214B: removed
+Aug 18 00:02:44 acmemail1 postfix/smtpd[5823]: connect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:44 acmemail1 postfix/smtpd[5823]: NOQUEUE: reject_warning: RCPT from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]: 450 4.1.8 <00000118@pp650n29.fiz.acme.gov>: Sender address rejected: Domain not found; from=<00000118@pp650n29.fiz.acme.gov> to=<root@pp650n29.fiz.acme.gov> proto=SMTP helo=<NWG-SCAN-A-002.AD.fiz.acme.GOV>
+Aug 18 00:02:44 acmemail1 postfix/smtpd[5823]: 79047214B: client=nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:44 acmemail1 postfix/cleanup[5838]: 79047214B: message-id=<200808180400.m7I400BB027702@pp650n29.fiz.acme.gov>
+Aug 18 00:02:44 acmemail1 postfix/qmgr[20508]: 79047214B: from=<00000118@pp650n29.fiz.acme.gov>, size=4967, nrcpt=1 (queue active)
+Aug 18 00:02:44 acmemail1 postfix/smtpd[5823]: disconnect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:44 acmemail1 postfix/smtpd[5748]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:44 acmemail1 postfix/smtpd[5748]: 990CA2259: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:44 acmemail1 postfix/smtpd[5090]: connect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:44 acmemail1 postfix/cleanup[5840]: 990CA2259: message-id=<200808180400.m7I400BB027702@pp650n29.fiz.acme.gov>
+Aug 18 00:02:44 acmemail1 postfix/smtp[5824]: 79047214B: to=<00000118@pp650n29.fiz.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.18, delays=0.09/0/0/0.08, dsn=2.0.0, status=sent (250 OK, sent 48A8F464_13989_69102_1 990CA2259)
+Aug 18 00:02:44 acmemail1 postfix/smtpd[5748]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:44 acmemail1 postfix/qmgr[20508]: 990CA2259: from=<00000118@pp650n29.fiz.acme.gov>, size=5157, nrcpt=1 (queue active)
+Aug 18 00:02:44 acmemail1 postfix/qmgr[20508]: 79047214B: removed
+Aug 18 00:02:44 acmemail1 postfix/smtpd[5090]: NOQUEUE: reject_warning: RCPT from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]: 450 4.1.8 <00000118@pp650n29.fiz.acme.gov>: Sender address rejected: Domain not found; from=<00000118@pp650n29.fiz.acme.gov> to=<root@pp650n29.fiz.acme.gov> proto=SMTP helo=<NWG-SCAN-A-002.AD.fiz.acme.GOV>
+Aug 18 00:02:44 acmemail1 postfix/smtpd[5090]: A721B214B: client=nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:44 acmemail1 postfix/cleanup[5836]: A721B214B: message-id=<200808180400.m7I400CQ027698@pp650n29.fiz.acme.gov>
+Aug 18 00:02:44 acmemail1 postfix/qmgr[20508]: A721B214B: from=<00000118@pp650n29.fiz.acme.gov>, size=5700, nrcpt=1 (queue active)
+Aug 18 00:02:44 acmemail1 postfix/smtpd[5090]: disconnect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:44 acmemail1 postfix/smtp[5775]: 990CA2259: to=<00000118@pp650n29.fiz.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.11, delays=0.04/0/0/0.07, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:44 acmemail1 postfix/qmgr[20508]: 990CA2259: removed
+Aug 18 00:02:44 acmemail1 postfix/smtpd[5828]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:44 acmemail1 postfix/smtpd[5828]: BDD0C2259: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:44 acmemail1 postfix/cleanup[5835]: BDD0C2259: message-id=<200808180400.m7I400CQ027698@pp650n29.fiz.acme.gov>
+Aug 18 00:02:44 acmemail1 postfix/smtp[5841]: A721B214B: to=<00000118@pp650n29.fiz.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.14, delays=0.05/0/0/0.09, dsn=2.0.0, status=sent (250 OK, sent 48A8F464_13989_69103_1 BDD0C2259)
+Aug 18 00:02:44 acmemail1 postfix/smtpd[5828]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:44 acmemail1 postfix/qmgr[20508]: BDD0C2259: from=<00000118@pp650n29.fiz.acme.gov>, size=5890, nrcpt=1 (queue active)
+Aug 18 00:02:44 acmemail1 postfix/qmgr[20508]: A721B214B: removed
+Aug 18 00:02:44 acmemail1 postfix/smtp[5626]: BDD0C2259: to=<00000118@pp650n29.fiz.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.04/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:44 acmemail1 postfix/qmgr[20508]: BDD0C2259: removed
+Aug 18 00:02:44 acmemail1 postfix/smtpd[5819]: connect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:44 acmemail1 postfix/smtpd[5819]: NOQUEUE: reject_warning: RCPT from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]: 450 4.1.8 <00000118@pp650n29.fiz.acme.gov>: Sender address rejected: Domain not found; from=<00000118@pp650n29.fiz.acme.gov> to=<root@pp650n29.fiz.acme.gov> proto=SMTP helo=<NWG-SCAN-A-002.AD.fiz.acme.GOV>
+Aug 18 00:02:44 acmemail1 postfix/smtpd[5819]: F19122259: client=nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:45 acmemail1 postfix/cleanup[5624]: F19122259: message-id=<200808180400.m7I400CQ027698@pp650n29.fiz.acme.gov>
+Aug 18 00:02:45 acmemail1 postfix/qmgr[20508]: F19122259: from=<00000118@pp650n29.fiz.acme.gov>, size=6437, nrcpt=1 (queue active)
+Aug 18 00:02:45 acmemail1 postfix/smtpd[5819]: disconnect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:45 acmemail1 postfix/smtpd[5747]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:45 acmemail1 postfix/smtpd[5747]: 13146214B: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:45 acmemail1 postfix/cleanup[5840]: 13146214B: message-id=<200808180400.m7I400CQ027698@pp650n29.fiz.acme.gov>
+Aug 18 00:02:45 acmemail1 postfix/smtp[5825]: F19122259: to=<00000118@pp650n29.fiz.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.14, delays=0.05/0/0/0.09, dsn=2.0.0, status=sent (250 OK, sent 48A8F465_13989_69104_1 13146214B)
+Aug 18 00:02:45 acmemail1 postfix/smtpd[5747]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:45 acmemail1 postfix/qmgr[20508]: 13146214B: from=<00000118@pp650n29.fiz.acme.gov>, size=6627, nrcpt=1 (queue active)
+Aug 18 00:02:45 acmemail1 postfix/qmgr[20508]: F19122259: removed
+Aug 18 00:02:45 acmemail1 postfix/smtp[5772]: 13146214B: to=<00000118@pp650n29.fiz.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.04/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:45 acmemail1 postfix/qmgr[20508]: 13146214B: removed
+Aug 18 00:02:45 acmemail1 postfix/smtpd[5821]: connect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:45 acmemail1 postfix/smtpd[5821]: NOQUEUE: reject_warning: RCPT from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]: 450 4.1.8 <00000118@pp650n29.fiz.acme.gov>: Sender address rejected: Domain not found; from=<00000118@pp650n29.fiz.acme.gov> to=<root@pp650n29.fiz.acme.gov> proto=SMTP helo=<NWG-SCAN-A-002.AD.fiz.acme.GOV>
+Aug 18 00:02:45 acmemail1 postfix/smtpd[5821]: 7C31D214B: client=nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:45 acmemail1 postfix/cleanup[5838]: 7C31D214B: message-id=<200808180400.m7I400BB027702@pp650n29.fiz.acme.gov>
+Aug 18 00:02:45 acmemail1 postfix/qmgr[20508]: 7C31D214B: from=<00000118@pp650n29.fiz.acme.gov>, size=7178, nrcpt=1 (queue active)
+Aug 18 00:02:45 acmemail1 postfix/smtpd[5821]: disconnect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:45 acmemail1 postfix/smtpd[5834]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:45 acmemail1 postfix/smtpd[5834]: 94B702259: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:45 acmemail1 postfix/cleanup[5836]: 94B702259: message-id=<200808180400.m7I400BB027702@pp650n29.fiz.acme.gov>
+Aug 18 00:02:45 acmemail1 postfix/smtp[5826]: 7C31D214B: to=<00000118@pp650n29.fiz.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.15, delays=0.06/0/0/0.09, dsn=2.0.0, status=sent (250 OK, sent 48A8F465_13989_69105_1 94B702259)
+Aug 18 00:02:45 acmemail1 postfix/smtpd[5834]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:45 acmemail1 postfix/qmgr[20508]: 94B702259: from=<00000118@pp650n29.fiz.acme.gov>, size=7368, nrcpt=1 (queue active)
+Aug 18 00:02:45 acmemail1 postfix/qmgr[20508]: 7C31D214B: removed
+Aug 18 00:02:45 acmemail1 postfix/smtp[5775]: 94B702259: to=<00000118@pp650n29.fiz.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.04/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:45 acmemail1 postfix/qmgr[20508]: 94B702259: removed
+Aug 18 00:02:45 acmemail1 postfix/smtpd[5837]: connect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:45 acmemail1 postfix/smtpd[5837]: NOQUEUE: reject_warning: RCPT from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]: 450 4.1.8 <00000118@pp650n29.fiz.acme.gov>: Sender address rejected: Domain not found; from=<00000118@pp650n29.fiz.acme.gov> to=<root@pp650n29.fiz.acme.gov> proto=SMTP helo=<NWG-SCAN-A-002.AD.fiz.acme.GOV>
+Aug 18 00:02:45 acmemail1 postfix/smtpd[5837]: CE2532259: client=nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:45 acmemail1 postfix/cleanup[5840]: CE2532259: message-id=<200808180400.m7I400BB027702@pp650n29.fiz.acme.gov>
+Aug 18 00:02:45 acmemail1 postfix/qmgr[20508]: CE2532259: from=<00000118@pp650n29.fiz.acme.gov>, size=7915, nrcpt=1 (queue active)
+Aug 18 00:02:45 acmemail1 postfix/smtpd[5839]: connect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:45 acmemail1 postfix/smtpd[5837]: disconnect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:45 acmemail1 postfix/smtpd[5839]: NOQUEUE: reject_warning: RCPT from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]: 450 4.1.8 <00000118@pp650n29.fiz.acme.gov>: Sender address rejected: Domain not found; from=<00000118@pp650n29.fiz.acme.gov> to=<root@pp650n29.fiz.acme.gov> proto=SMTP helo=<NWG-SCAN-A-002.AD.fiz.acme.GOV>
+Aug 18 00:02:45 acmemail1 postfix/smtpd[5839]: EB15F214B: client=nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:45 acmemail1 postfix/smtpd[5625]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:45 acmemail1 postfix/smtpd[5625]: F1BD023CB: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:46 acmemail1 postfix/cleanup[5838]: EB15F214B: message-id=<200808180400.m7I400CQ027698@pp650n29.fiz.acme.gov>
+Aug 18 00:02:46 acmemail1 postfix/qmgr[20508]: EB15F214B: from=<00000118@pp650n29.fiz.acme.gov>, size=8648, nrcpt=1 (queue active)
+Aug 18 00:02:46 acmemail1 postfix/smtpd[5839]: disconnect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:46 acmemail1 postfix/cleanup[5624]: F1BD023CB: message-id=<200808180400.m7I400BB027702@pp650n29.fiz.acme.gov>
+Aug 18 00:02:46 acmemail1 postfix/smtp[5841]: CE2532259: to=<00000118@pp650n29.fiz.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.22, delays=0.1/0/0/0.12, dsn=2.0.0, status=sent (250 OK, sent 48A8F465_13989_69106_1 F1BD023CB)
+Aug 18 00:02:46 acmemail1 postfix/smtpd[5625]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:46 acmemail1 postfix/qmgr[20508]: F1BD023CB: from=<00000118@pp650n29.fiz.acme.gov>, size=8105, nrcpt=1 (queue active)
+Aug 18 00:02:46 acmemail1 postfix/qmgr[20508]: CE2532259: removed
+Aug 18 00:02:46 acmemail1 postfix/smtpd[5833]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:46 acmemail1 postfix/smtpd[5833]: 114EF29DA: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:46 acmemail1 postfix/smtp[5776]: F1BD023CB: to=<00000118@pp650n29.fiz.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.1, delays=0.06/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:46 acmemail1 postfix/qmgr[20508]: F1BD023CB: removed
+Aug 18 00:02:46 acmemail1 postfix/cleanup[5836]: 114EF29DA: message-id=<200808180400.m7I400CQ027698@pp650n29.fiz.acme.gov>
+Aug 18 00:02:46 acmemail1 postfix/smtp[5824]: EB15F214B: to=<00000118@pp650n29.fiz.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.16, delays=0.06/0/0/0.1, dsn=2.0.0, status=sent (250 OK, sent 48A8F466_13987_12171_1 114EF29DA)
+Aug 18 00:02:46 acmemail1 postfix/smtpd[5833]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:46 acmemail1 postfix/qmgr[20508]: 114EF29DA: from=<00000118@pp650n29.fiz.acme.gov>, size=8838, nrcpt=1 (queue active)
+Aug 18 00:02:46 acmemail1 postfix/qmgr[20508]: EB15F214B: removed
+Aug 18 00:02:46 acmemail1 postfix/smtp[5626]: 114EF29DA: to=<00000118@pp650n29.fiz.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.04/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:46 acmemail1 postfix/qmgr[20508]: 114EF29DA: removed
+Aug 18 00:02:46 acmemail1 postfix/smtpd[5823]: connect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:46 acmemail1 postfix/smtpd[5823]: NOQUEUE: reject_warning: RCPT from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]: 450 4.1.8 <00000118@pp650n29.fiz.acme.gov>: Sender address rejected: Domain not found; from=<00000118@pp650n29.fiz.acme.gov> to=<root@pp650n29.fiz.acme.gov> proto=SMTP helo=<NWG-SCAN-A-002.AD.fiz.acme.GOV>
+Aug 18 00:02:46 acmemail1 postfix/smtpd[5823]: E0DA729DA: client=nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:47 acmemail1 postfix/smtpd[5823]: disconnect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:47 acmemail1 postfix/smtpd[5090]: connect from mx1.fins3.acme.gov[10.0.87.107]
+Aug 18 00:02:47 acmemail1 postfix/smtpd[5090]: 917DD29DA: client=mx1.fins3.acme.gov[10.0.87.107]
+Aug 18 00:02:47 acmemail1 postfix/cleanup[5624]: 917DD29DA: message-id=<6CA0AABDDBF6D04BAE5E7EB6EC6AC8AD0374813E@Z02EXISPM03.irmnet.ds2.acme.gov>
+Aug 18 00:02:48 acmemail1 postfix/qmgr[20508]: 917DD29DA: from=<00000110@fins3.acme.gov>, size=904507, nrcpt=1 (queue active)
+Aug 18 00:02:48 acmemail1 postfix/smtpd[5090]: disconnect from mx1.fins3.acme.gov[10.0.87.107]
+Aug 18 00:02:48 acmemail1 postfix/smtpd[5748]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:48 acmemail1 postfix/smtpd[5748]: B2189214B: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:48 acmemail1 postfix/cleanup[5838]: B2189214B: message-id=<6CA0AABDDBF6D04BAE5E7EB6EC6AC8AD0374813E@Z02EXISPM03.irmnet.ds2.acme.gov>
+Aug 18 00:02:48 acmemail1 postfix/smtp[5826]: 917DD29DA: to=<00000119@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=1.2, delays=1/0/0/0.16, dsn=2.0.0, status=sent (250 OK, sent 48A8F468_13989_69107_1 B2189214B)
+Aug 18 00:02:48 acmemail1 postfix/smtpd[5748]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:48 acmemail1 postfix/qmgr[20508]: B2189214B: from=<00000110@fins3.acme.gov>, size=904694, nrcpt=1 (queue active)
+Aug 18 00:02:48 acmemail1 postfix/qmgr[20508]: 917DD29DA: removed
+Aug 18 00:02:48 acmemail1 postfix/smtpd[5837]: connect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:48 acmemail1 postfix/smtpd[5837]: DB4F82A64: client=nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:48 acmemail1 postfix/smtp[5772]: B2189214B: to=<00000119@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.18, delays=0.03/0/0/0.15, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:48 acmemail1 postfix/qmgr[20508]: B2189214B: removed
+Aug 18 00:02:48 acmemail1 postfix/smtpd[5821]: connect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:48 acmemail1 postfix/cleanup[5840]: DB4F82A64: message-id=<20080818040247.DB3547FBB@acmemail2.acme.gov>
+Aug 18 00:02:48 acmemail1 postfix/qmgr[20508]: DB4F82A64: from=<>, size=5507, nrcpt=1 (queue active)
+Aug 18 00:02:48 acmemail1 postfix/smtpd[5837]: disconnect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:48 acmemail1 postfix/smtpd[5821]: E70392A76: client=nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:48 acmemail1 postfix/cleanup[5836]: E70392A76: message-id=<20080818040247.DAC9F815E@acmemail2.acme.gov>
+Aug 18 00:02:48 acmemail1 postfix/qmgr[20508]: E70392A76: from=<>, size=5507, nrcpt=1 (queue active)
+Aug 18 00:02:48 acmemail1 postfix/smtpd[5821]: disconnect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:48 acmemail1 postfix/smtpd[5828]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:48 acmemail1 postfix/smtpd[5828]: F2A982A8F: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:49 acmemail1 postfix/cleanup[5624]: F2A982A8F: message-id=<20080818040247.DB3547FBB@acmemail2.acme.gov>
+Aug 18 00:02:49 acmemail1 postfix/smtp[5825]: DB4F82A64: to=<00000118@pp650n29.fiz.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.14, delays=0.05/0/0/0.1, dsn=2.0.0, status=sent (250 OK, sent 48A8F468_13989_69108_1 F2A982A8F)
+Aug 18 00:02:49 acmemail1 postfix/smtpd[5828]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:49 acmemail1 postfix/qmgr[20508]: F2A982A8F: from=<>, size=5697, nrcpt=1 (queue active)
+Aug 18 00:02:49 acmemail1 postfix/qmgr[20508]: DB4F82A64: removed
+Aug 18 00:02:49 acmemail1 postfix/smtpd[5747]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:49 acmemail1 postfix/smtpd[5747]: 0AC382A64: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:49 acmemail1 postfix/smtp[5775]: F2A982A8F: to=<00000118@pp650n29.fiz.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.04/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:49 acmemail1 postfix/qmgr[20508]: F2A982A8F: removed
+Aug 18 00:02:49 acmemail1 postfix/cleanup[5840]: 0AC382A64: message-id=<20080818040247.DAC9F815E@acmemail2.acme.gov>
+Aug 18 00:02:49 acmemail1 postfix/smtp[5841]: E70392A76: to=<00000118@pp650n29.fiz.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.15, delays=0.05/0/0/0.1, dsn=2.0.0, status=sent (250 OK, sent 48A8F468_13987_12172_1 0AC382A64)
+Aug 18 00:02:49 acmemail1 postfix/smtpd[5747]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:49 acmemail1 postfix/qmgr[20508]: 0AC382A64: from=<>, size=5697, nrcpt=1 (queue active)
+Aug 18 00:02:49 acmemail1 postfix/qmgr[20508]: E70392A76: removed
+Aug 18 00:02:49 acmemail1 postfix/smtp[5772]: 0AC382A64: to=<00000118@pp650n29.fiz.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.04/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:49 acmemail1 postfix/qmgr[20508]: 0AC382A64: removed
+Aug 18 00:02:49 acmemail1 postfix/smtpd[5819]: connect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:49 acmemail1 postfix/smtpd[5819]: 33ACC2A64: client=nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:49 acmemail1 postfix/cleanup[5838]: 33ACC2A64: message-id=<20080818040247.DB3547FBB@acmemail2.acme.gov>
+Aug 18 00:02:49 acmemail1 postfix/qmgr[20508]: 33ACC2A64: from=<>, size=6244, nrcpt=1 (queue active)
+Aug 18 00:02:49 acmemail1 postfix/smtpd[5090]: connect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:49 acmemail1 postfix/smtpd[5819]: disconnect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:49 acmemail1 postfix/smtpd[5090]: 4605D29DA: client=nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:49 acmemail1 postfix/smtpd[5834]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:49 acmemail1 postfix/smtpd[5834]: 4A42B214B: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:49 acmemail1 postfix/cleanup[5624]: 4605D29DA: message-id=<20080818040247.DAC9F815E@acmemail2.acme.gov>
+Aug 18 00:02:49 acmemail1 postfix/qmgr[20508]: 4605D29DA: from=<>, size=6244, nrcpt=1 (queue active)
+Aug 18 00:02:49 acmemail1 postfix/smtpd[5090]: disconnect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:49 acmemail1 postfix/cleanup[5836]: 4A42B214B: message-id=<20080818040247.DB3547FBB@acmemail2.acme.gov>
+Aug 18 00:02:49 acmemail1 postfix/smtp[5826]: 33ACC2A64: to=<00000118@pp650n29.fiz.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.14, delays=0.05/0/0/0.09, dsn=2.0.0, status=sent (250 OK, sent 48A8F469_13989_69109_1 4A42B214B)
+Aug 18 00:02:49 acmemail1 postfix/smtpd[5834]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:49 acmemail1 postfix/qmgr[20508]: 4A42B214B: from=<>, size=6434, nrcpt=1 (queue active)
+Aug 18 00:02:49 acmemail1 postfix/qmgr[20508]: 33ACC2A64: removed
+Aug 18 00:02:49 acmemail1 postfix/smtpd[5828]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:49 acmemail1 postfix/smtp[5626]: 4A42B214B: to=<00000118@pp650n29.fiz.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.04/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:49 acmemail1 postfix/qmgr[20508]: 4A42B214B: removed
+Aug 18 00:02:49 acmemail1 postfix/smtpd[5828]: 5DA902259: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:49 acmemail1 postfix/cleanup[5840]: 5DA902259: message-id=<20080818040247.DAC9F815E@acmemail2.acme.gov>
+Aug 18 00:02:49 acmemail1 postfix/smtp[5824]: 4605D29DA: to=<00000118@pp650n29.fiz.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.15, delays=0.05/0/0/0.1, dsn=2.0.0, status=sent (250 OK, sent 48A8F469_13987_12173_1 5DA902259)
+Aug 18 00:02:49 acmemail1 postfix/smtpd[5828]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:49 acmemail1 postfix/qmgr[20508]: 5DA902259: from=<>, size=6434, nrcpt=1 (queue active)
+Aug 18 00:02:49 acmemail1 postfix/qmgr[20508]: 4605D29DA: removed
+Aug 18 00:02:49 acmemail1 postfix/smtp[5776]: 5DA902259: to=<00000118@pp650n29.fiz.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.04/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:49 acmemail1 postfix/qmgr[20508]: 5DA902259: removed
+Aug 18 00:02:50 acmemail1 postfix/smtpd[5823]: connect from unknown[10.0.81.60]
+Aug 18 00:02:50 acmemail1 postfix/smtpd[5823]: 05DD12259: client=unknown[10.0.81.60]
+Aug 18 00:02:50 acmemail1 postfix/cleanup[5838]: 05DD12259: message-id=<78395FB1FAD34245BA25F80B2DE252CDE2DD83@K021MB101.network.ad.baz.gov>
+Aug 18 00:02:50 acmemail1 postfix/qmgr[20508]: 05DD12259: from=<00000120@baz.acme.gov>, size=3607, nrcpt=2 (queue active)
+Aug 18 00:02:50 acmemail1 postfix/smtpd[5823]: disconnect from unknown[10.0.81.60]
+Aug 18 00:02:50 acmemail1 postfix/smtpd[5625]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:50 acmemail1 postfix/smtpd[5625]: 11549214B: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:50 acmemail1 postfix/cleanup[5624]: 11549214B: message-id=<78395FB1FAD34245BA25F80B2DE252CDE2DD83@K021MB101.network.ad.baz.gov>
+Aug 18 00:02:50 acmemail1 postfix/smtp[5841]: 05DD12259: to=<00000121@gmail.com>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.1, delays=0.04/0/0/0.07, dsn=2.0.0, status=sent (250 OK, sent 48A8F46A_13989_69110_1 11549214B)
+Aug 18 00:02:50 acmemail1 postfix/smtp[5841]: 05DD12259: to=<00000122@gmail.com>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.1, delays=0.04/0/0/0.07, dsn=2.0.0, status=sent (250 OK, sent 48A8F46A_13989_69110_1 11549214B)
+Aug 18 00:02:50 acmemail1 postfix/smtpd[5625]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:50 acmemail1 postfix/qmgr[20508]: 11549214B: from=<00000120@baz.acme.gov>, size=3765, nrcpt=2 (queue active)
+Aug 18 00:02:50 acmemail1 postfix/qmgr[20508]: 05DD12259: removed
+Aug 18 00:02:50 acmemail1 postfix/smtp[5830]: 11549214B: to=<00000121@gmail.com>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.1, delays=0.06/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:50 acmemail1 postfix/smtp[5830]: 11549214B: to=<00000122@gmail.com>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.1, delays=0.06/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:50 acmemail1 postfix/qmgr[20508]: 11549214B: removed
+Aug 18 00:02:50 acmemail1 postfix/smtpd[5839]: connect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:50 acmemail1 postfix/smtpd[5839]: 860BB214B: client=nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:50 acmemail1 postfix/cleanup[5840]: 860BB214B: message-id=<20080818040247.DB3547FBB@acmemail2.acme.gov>
+Aug 18 00:02:50 acmemail1 postfix/qmgr[20508]: 860BB214B: from=<>, size=9192, nrcpt=1 (queue active)
+Aug 18 00:02:50 acmemail1 postfix/smtpd[5839]: disconnect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:50 acmemail1 postfix/smtpd[5747]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:50 acmemail1 postfix/smtpd[5747]: A06322259: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:50 acmemail1 postfix/cleanup[5836]: A06322259: message-id=<20080818040247.DB3547FBB@acmemail2.acme.gov>
+Aug 18 00:02:50 acmemail1 postfix/smtp[5825]: 860BB214B: to=<00000118@pp650n29.fiz.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.16, delays=0.06/0/0/0.1, dsn=2.0.0, status=sent (250 OK, sent 48A8F46A_13989_69111_1 A06322259)
+Aug 18 00:02:50 acmemail1 postfix/smtpd[5747]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:50 acmemail1 postfix/qmgr[20508]: A06322259: from=<>, size=9382, nrcpt=1 (queue active)
+Aug 18 00:02:50 acmemail1 postfix/qmgr[20508]: 860BB214B: removed
+Aug 18 00:02:50 acmemail1 postfix/smtp[5775]: A06322259: to=<00000118@pp650n29.fiz.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.04/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:50 acmemail1 postfix/qmgr[20508]: A06322259: removed
+Aug 18 00:02:50 acmemail1 postfix/smtpd[5821]: connect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:50 acmemail1 postfix/smtpd[5821]: E410D2259: client=nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:50 acmemail1 postfix/cleanup[5838]: E410D2259: message-id=<20080818040247.DB3547FBB@acmemail2.acme.gov>
+Aug 18 00:02:51 acmemail1 postfix/qmgr[20508]: E410D2259: from=<>, size=9929, nrcpt=1 (queue active)
+Aug 18 00:02:51 acmemail1 postfix/smtpd[5821]: disconnect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:51 acmemail1 postfix/smtpd[5833]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:51 acmemail1 postfix/smtpd[5833]: 1A4A123CB: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:51 acmemail1 postfix/cleanup[5624]: 1A4A123CB: message-id=<20080818040247.DB3547FBB@acmemail2.acme.gov>
+Aug 18 00:02:51 acmemail1 postfix/smtp[5826]: E410D2259: to=<00000118@pp650n29.fiz.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.22, delays=0.12/0/0/0.1, dsn=2.0.0, status=sent (250 OK, sent 48A8F46B_13989_69112_1 1A4A123CB)
+Aug 18 00:02:51 acmemail1 postfix/smtpd[5833]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:51 acmemail1 postfix/qmgr[20508]: 1A4A123CB: from=<>, size=10119, nrcpt=1 (queue active)
+Aug 18 00:02:51 acmemail1 postfix/qmgr[20508]: E410D2259: removed
+Aug 18 00:02:51 acmemail1 postfix/smtp[5772]: 1A4A123CB: to=<00000118@pp650n29.fiz.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.04/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:51 acmemail1 postfix/qmgr[20508]: 1A4A123CB: removed
+Aug 18 00:02:51 acmemail1 postfix/smtpd[5837]: connect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:51 acmemail1 postfix/smtpd[5837]: D41AA2259: client=nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:51 acmemail1 postfix/cleanup[5840]: D41AA2259: message-id=<20080818040247.DAC9F815E@acmemail2.acme.gov>
+Aug 18 00:02:51 acmemail1 postfix/qmgr[20508]: D41AA2259: from=<>, size=11403, nrcpt=1 (queue active)
+Aug 18 00:02:51 acmemail1 postfix/smtpd[5837]: disconnect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:51 acmemail1 postfix/smtpd[5625]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:51 acmemail1 postfix/smtpd[5625]: F162B29DA: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:52 acmemail1 postfix/cleanup[5836]: F162B29DA: message-id=<20080818040247.DAC9F815E@acmemail2.acme.gov>
+Aug 18 00:02:52 acmemail1 postfix/smtp[5824]: D41AA2259: to=<00000118@pp650n29.fiz.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.16, delays=0.07/0/0/0.1, dsn=2.0.0, status=sent (250 OK, sent 48A8F46B_13989_69113_1 F162B29DA)
+Aug 18 00:02:52 acmemail1 postfix/smtpd[5625]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:52 acmemail1 postfix/qmgr[20508]: F162B29DA: from=<>, size=11593, nrcpt=1 (queue active)
+Aug 18 00:02:52 acmemail1 postfix/qmgr[20508]: D41AA2259: removed
+Aug 18 00:02:52 acmemail1 postfix/smtp[5776]: F162B29DA: to=<00000118@pp650n29.fiz.acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.04/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:52 acmemail1 postfix/qmgr[20508]: F162B29DA: removed
+Aug 18 00:02:52 acmemail1 postfix/smtpd[5839]: connect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:52 acmemail1 postfix/smtpd[5839]: 2340D29DA: client=nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:52 acmemail1 postfix/cleanup[5838]: 2340D29DA: message-id=<20080818040247.DB3547FBB@acmemail2.acme.gov>
+Aug 18 00:02:52 acmemail1 postfix/qmgr[20508]: 2340D29DA: from=<>, size=12140, nrcpt=1 (queue active)
+Aug 18 00:02:52 acmemail1 postfix/smtpd[5839]: disconnect from nwg-scan-a-002.fiz.acme.gov[10.0.77.246]
+Aug 18 00:02:52 acmemail1 postfix/smtpd[5748]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:52 acmemail1 postfix/smtpd[5748]: 41CBC214B: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:52 acmemail1 postfix/smtpd[5748]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:52 acmemail1 postfix/smtp[5841]: 2340D29DA: to=<00000118@pp650n29.fiz.acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.14, delays=0.07/0/0/0.07, dsn=5.0.0, status=bounced (host 127.0.0.1[127.0.0.1] said: 554 during .: 5.4.0 Error: too many hops (in reply to end of DATA command))
+Aug 18 00:02:52 acmemail1 postfix/qmgr[20508]: 2340D29DA: removed
+Aug 18 00:02:54 acmemail1 postfix/smtpd[5823]: connect from phmccweb.ice.acme.gov[10.0.87.107]
+Aug 18 00:02:54 acmemail1 postfix/smtpd[5823]: 41C7C23CB: client=phmccweb.ice.acme.gov[10.0.87.107]
+Aug 18 00:02:54 acmemail1 postfix/cleanup[5840]: 41C7C23CB: message-id=<6CA0AABDDBF6D04BAE5E7EB6EC6AC8AD0374813F@Z02EXISPM03.irmnet.ds2.acme.gov>
+Aug 18 00:02:54 acmemail1 postfix/smtpd[5821]: connect from unknown[10.0.63.2]
+Aug 18 00:02:54 acmemail1 postfix/smtpd[5821]: lost connection after CONNECT from unknown[10.0.63.2]
+Aug 18 00:02:54 acmemail1 postfix/smtpd[5821]: disconnect from unknown[10.0.63.2]
+Aug 18 00:02:55 acmemail1 postfix/qmgr[20508]: 41C7C23CB: from=<00000110@fins3.acme.gov>, size=1335460, nrcpt=3 (queue active)
+Aug 18 00:02:55 acmemail1 postfix/smtpd[5823]: C5EFA2B80: client=phmccweb.ice.acme.gov[10.0.87.107]
+Aug 18 00:02:55 acmemail1 postfix/smtpd[5747]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:55 acmemail1 postfix/smtpd[5747]: CA369214B: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:55 acmemail1 postfix/cleanup[5838]: CA369214B: message-id=<6CA0AABDDBF6D04BAE5E7EB6EC6AC8AD0374813F@Z02EXISPM03.irmnet.ds2.acme.gov>
+Aug 18 00:02:55 acmemail1 postfix/smtp[5826]: 41C7C23CB: to=<00000123@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=1.6, delays=1.4/0/0/0.21, dsn=2.0.0, status=sent (250 OK, sent 48A8F46F_13989_69115_1 CA369214B)
+Aug 18 00:02:55 acmemail1 postfix/smtp[5826]: 41C7C23CB: to=<00000124@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=1.6, delays=1.4/0/0/0.21, dsn=2.0.0, status=sent (250 OK, sent 48A8F46F_13989_69115_1 CA369214B)
+Aug 18 00:02:55 acmemail1 postfix/smtp[5826]: 41C7C23CB: to=<00000117@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=1.6, delays=1.4/0/0/0.21, dsn=2.0.0, status=sent (250 OK, sent 48A8F46F_13989_69115_1 CA369214B)
+Aug 18 00:02:55 acmemail1 postfix/smtpd[5747]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:55 acmemail1 postfix/qmgr[20508]: CA369214B: from=<00000110@fins3.acme.gov>, size=1335618, nrcpt=3 (queue active)
+Aug 18 00:02:55 acmemail1 postfix/qmgr[20508]: 41C7C23CB: removed
+Aug 18 00:02:55 acmemail1 postfix/cleanup[5836]: C5EFA2B80: message-id=<6CA0AABDDBF6D04BAE5E7EB6EC6AC8AD03748140@Z02EXISPM03.irmnet.ds2.acme.gov>
+Aug 18 00:02:56 acmemail1 postfix/smtp[5775]: CA369214B: to=<00000123@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.19, delays=0.02/0/0/0.17, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:56 acmemail1 postfix/smtp[5775]: CA369214B: to=<00000124@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.19, delays=0.02/0/0/0.17, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:56 acmemail1 postfix/smtp[5775]: CA369214B: to=<00000117@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.19, delays=0.02/0/0/0.17, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:56 acmemail1 postfix/qmgr[20508]: CA369214B: removed
+Aug 18 00:02:56 acmemail1 postfix/qmgr[20508]: C5EFA2B80: from=<00000110@fins3.acme.gov>, size=696927, nrcpt=1 (queue active)
+Aug 18 00:02:56 acmemail1 postfix/smtpd[5828]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:56 acmemail1 postfix/smtpd[5828]: 867D62259: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:56 acmemail1 postfix/cleanup[5624]: 867D62259: message-id=<6CA0AABDDBF6D04BAE5E7EB6EC6AC8AD03748140@Z02EXISPM03.irmnet.ds2.acme.gov>
+Aug 18 00:02:56 acmemail1 postfix/smtp[5824]: C5EFA2B80: to=<00000119@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.8, delays=0.67/0/0/0.13, dsn=2.0.0, status=sent (250 OK, sent 48A8F470_13989_69116_1 867D62259)
+Aug 18 00:02:56 acmemail1 postfix/smtpd[5828]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:56 acmemail1 postfix/qmgr[20508]: 867D62259: from=<00000110@fins3.acme.gov>, size=697114, nrcpt=1 (queue active)
+Aug 18 00:02:56 acmemail1 postfix/qmgr[20508]: C5EFA2B80: removed
+Aug 18 00:02:56 acmemail1 postfix/smtpd[5823]: 94D0029DA: client=phmccweb.ice.acme.gov[10.0.87.107]
+Aug 18 00:02:56 acmemail1 postfix/smtp[5626]: 867D62259: to=<00000119@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.12, delays=0.01/0/0/0.11, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:56 acmemail1 postfix/qmgr[20508]: 867D62259: removed
+Aug 18 00:02:56 acmemail1 postfix/cleanup[5840]: 94D0029DA: message-id=<6CA0AABDDBF6D04BAE5E7EB6EC6AC8AD03748140@Z02EXISPM03.irmnet.ds2.acme.gov>
+Aug 18 00:02:57 acmemail1 postfix/qmgr[20508]: 94D0029DA: from=<00000110@fins3.acme.gov>, size=681809, nrcpt=6 (queue active)
+Aug 18 00:02:57 acmemail1 postfix/smtpd[5823]: disconnect from phmccweb.ice.acme.gov[10.0.87.107]
+Aug 18 00:02:57 acmemail1 postfix/smtpd[5833]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:57 acmemail1 postfix/smtpd[5833]: 6549D2B13: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:02:57 acmemail1 postfix/cleanup[5838]: 6549D2B13: message-id=<6CA0AABDDBF6D04BAE5E7EB6EC6AC8AD03748140@Z02EXISPM03.irmnet.ds2.acme.gov>
+Aug 18 00:02:57 acmemail1 postfix/smtp[5825]: 94D0029DA: to=<00000125@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.87, delays=0.7/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F471_13989_69117_1 6549D2B13)
+Aug 18 00:02:57 acmemail1 postfix/smtp[5825]: 94D0029DA: to=<00000126@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.87, delays=0.7/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F471_13989_69117_1 6549D2B13)
+Aug 18 00:02:57 acmemail1 postfix/smtp[5825]: 94D0029DA: to=<00000127@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.87, delays=0.7/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F471_13989_69117_1 6549D2B13)
+Aug 18 00:02:57 acmemail1 postfix/smtp[5825]: 94D0029DA: to=<00000124@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.87, delays=0.7/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F471_13989_69117_1 6549D2B13)
+Aug 18 00:02:57 acmemail1 postfix/smtp[5825]: 94D0029DA: to=<00000128@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.87, delays=0.7/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F471_13989_69117_1 6549D2B13)
+Aug 18 00:02:57 acmemail1 postfix/smtp[5825]: 94D0029DA: to=<00000117@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.87, delays=0.7/0/0/0.17, dsn=2.0.0, status=sent (250 OK, sent 48A8F471_13989_69117_1 6549D2B13)
+Aug 18 00:02:57 acmemail1 postfix/smtpd[5833]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:02:57 acmemail1 postfix/qmgr[20508]: 6549D2B13: from=<00000110@fins3.acme.gov>, size=681967, nrcpt=6 (queue active)
+Aug 18 00:02:57 acmemail1 postfix/qmgr[20508]: 94D0029DA: removed
+Aug 18 00:02:57 acmemail1 postfix/smtp[5776]: 6549D2B13: to=<00000125@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.15, delays=0.02/0/0/0.13, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:57 acmemail1 postfix/smtp[5776]: 6549D2B13: to=<00000126@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.15, delays=0.02/0/0/0.13, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:57 acmemail1 postfix/smtp[5776]: 6549D2B13: to=<00000127@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.15, delays=0.02/0/0/0.13, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:57 acmemail1 postfix/smtp[5776]: 6549D2B13: to=<00000124@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.15, delays=0.02/0/0/0.13, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:57 acmemail1 postfix/smtp[5776]: 6549D2B13: to=<00000128@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.15, delays=0.02/0/0/0.13, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:57 acmemail1 postfix/smtp[5776]: 6549D2B13: to=<00000117@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.15, delays=0.02/0/0/0.13, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:02:57 acmemail1 postfix/qmgr[20508]: 6549D2B13: removed
+Aug 18 00:03:01 acmemail1 postfix/smtpd[5819]: connect from mx4.fins3.acme.gov[10.0.87.121]
+Aug 18 00:03:01 acmemail1 postfix/smtpd[5819]: A062E2B13: client=mx4.fins3.acme.gov[10.0.87.121]
+Aug 18 00:03:01 acmemail1 postfix/cleanup[5624]: A062E2B13: message-id=<2155947BBE72F94E893ADD79B9C68F96C9FEC0@Z02EXIPHO01.irmnet.ds2.acme.gov>
+Aug 18 00:03:01 acmemail1 postfix/qmgr[20508]: A062E2B13: from=<00000129@fins3.acme.gov>, size=2265, nrcpt=1 (queue active)
+Aug 18 00:03:01 acmemail1 postfix/smtpd[5625]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:03:01 acmemail1 postfix/smtpd[5625]: D4700214B: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:03:01 acmemail1 postfix/cleanup[5836]: D4700214B: message-id=<2155947BBE72F94E893ADD79B9C68F96C9FEC0@Z02EXIPHO01.irmnet.ds2.acme.gov>
+Aug 18 00:03:01 acmemail1 postfix/smtp[5841]: A062E2B13: to=<00000130@yahoo.com>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.33, delays=0.26/0/0/0.06, dsn=2.0.0, status=sent (250 OK, sent 48A8F475_13989_69118_1 D4700214B)
+Aug 18 00:03:01 acmemail1 postfix/smtpd[5625]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:03:01 acmemail1 postfix/qmgr[20508]: D4700214B: from=<00000129@fins3.acme.gov>, size=2452, nrcpt=1 (queue active)
+Aug 18 00:03:01 acmemail1 postfix/qmgr[20508]: A062E2B13: removed
+Aug 18 00:03:01 acmemail1 postfix/smtpd[5819]: disconnect from mx4.fins3.acme.gov[10.0.87.121]
+Aug 18 00:03:02 acmemail1 postfix/smtp[4840]: D4700214B: to=<00000130@yahoo.com>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.15, delays=0.04/0/0/0.11, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:03:02 acmemail1 postfix/qmgr[20508]: D4700214B: removed
+Aug 18 00:03:08 acmemail1 postfix/smtpd[5839]: connect from mx3.fins3.acme.gov[10.0.87.120]
+Aug 18 00:03:08 acmemail1 postfix/smtpd[5839]: C3434214B: client=mx3.fins3.acme.gov[10.0.87.120]
+Aug 18 00:03:08 acmemail1 postfix/cleanup[5840]: C3434214B: message-id=<E69F0D19553A3B41A0A8B25DE0287A7B01647DD9@Z02EXCCIS12.irmnet.ds2.acme.gov>
+Aug 18 00:03:12 acmemail1 postfix/smtpd[5821]: connect from nwg-scan-a-001.fiz.acme.gov[10.0.77.245]
+Aug 18 00:03:12 acmemail1 postfix/smtpd[5821]: C8C812259: client=nwg-scan-a-001.fiz.acme.gov[10.0.77.245]
+Aug 18 00:03:12 acmemail1 postfix/cleanup[5624]: C8C812259: message-id=<25276323.1219032192630.JavaMail.default@10.159.39.63>
+Aug 18 00:03:12 acmemail1 postfix/qmgr[20508]: C8C812259: from=<00000098@acme.gov>, size=2498, nrcpt=1 (queue active)
+Aug 18 00:03:12 acmemail1 postfix/smtpd[5821]: disconnect from nwg-scan-a-001.fiz.acme.gov[10.0.77.245]
+Aug 18 00:03:12 acmemail1 postfix/smtpd[5834]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:03:12 acmemail1 postfix/smtpd[5834]: D74BA23CB: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:03:12 acmemail1 postfix/cleanup[5836]: D74BA23CB: message-id=<25276323.1219032192630.JavaMail.default@10.159.39.63>
+Aug 18 00:03:12 acmemail1 postfix/smtp[5826]: C8C812259: to=<00000131@CATHAYPACIFIC.COM>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.13, delays=0.05/0/0/0.07, dsn=2.0.0, status=sent (250 OK, sent 48A8F480_13989_69119_1 D74BA23CB)
+Aug 18 00:03:12 acmemail1 postfix/smtpd[5834]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:03:12 acmemail1 postfix/qmgr[20508]: D74BA23CB: from=<00000098@acme.gov>, size=2691, nrcpt=1 (queue active)
+Aug 18 00:03:12 acmemail1 postfix/qmgr[20508]: C8C812259: removed
+Aug 18 00:03:12 acmemail1 postfix/smtpd[5819]: connect from nwg-scan-a-001.fiz.acme.gov[10.0.77.245]
+Aug 18 00:03:12 acmemail1 postfix/smtp[4841]: D74BA23CB: to=<00000131@CATHAYPACIFIC.COM>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.11, delays=0.06/0/0/0.05, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:03:12 acmemail1 postfix/qmgr[20508]: D74BA23CB: removed
+Aug 18 00:03:12 acmemail1 postfix/smtpd[5819]: F399323CB: client=nwg-scan-a-001.fiz.acme.gov[10.0.77.245]
+Aug 18 00:03:13 acmemail1 postfix/cleanup[5838]: F399323CB: message-id=<20051738.1219032192771.JavaMail.default@10.159.39.63>
+Aug 18 00:03:13 acmemail1 postfix/qmgr[20508]: F399323CB: from=<00000098@acme.gov>, size=2498, nrcpt=1 (queue active)
+Aug 18 00:03:13 acmemail1 postfix/smtpd[5819]: disconnect from nwg-scan-a-001.fiz.acme.gov[10.0.77.245]
+Aug 18 00:03:13 acmemail1 postfix/smtpd[5748]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:03:13 acmemail1 postfix/smtpd[5748]: 0C6842259: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:03:13 acmemail1 postfix/cleanup[5624]: 0C6842259: message-id=<20051738.1219032192771.JavaMail.default@10.159.39.63>
+Aug 18 00:03:13 acmemail1 postfix/smtp[5825]: F399323CB: to=<00000131@CATHAYPACIFIC.COM>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.11, delays=0.05/0/0/0.06, dsn=2.0.0, status=sent (250 OK, sent 48A8F481_13989_69120_1 0C6842259)
+Aug 18 00:03:13 acmemail1 postfix/smtpd[5748]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:03:13 acmemail1 postfix/qmgr[20508]: 0C6842259: from=<00000098@acme.gov>, size=2691, nrcpt=1 (queue active)
+Aug 18 00:03:13 acmemail1 postfix/qmgr[20508]: F399323CB: removed
+Aug 18 00:03:13 acmemail1 postfix/smtpd[5090]: connect from nwg-scan-a-001.fiz.acme.gov[10.0.77.245]
+Aug 18 00:03:13 acmemail1 postfix/smtp[5829]: 0C6842259: to=<00000131@CATHAYPACIFIC.COM>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.09, delays=0.05/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:03:13 acmemail1 postfix/qmgr[20508]: 0C6842259: removed
+Aug 18 00:03:13 acmemail1 postfix/smtpd[5090]: 29CEF2259: client=nwg-scan-a-001.fiz.acme.gov[10.0.77.245]
+Aug 18 00:03:13 acmemail1 postfix/cleanup[5838]: 29CEF2259: message-id=<22413802.1219032192927.JavaMail.default@10.159.39.63>
+Aug 18 00:03:13 acmemail1 postfix/qmgr[20508]: 29CEF2259: from=<00000098@acme.gov>, size=2484, nrcpt=1 (queue active)
+Aug 18 00:03:13 acmemail1 postfix/smtpd[5090]: disconnect from nwg-scan-a-001.fiz.acme.gov[10.0.77.245]
+Aug 18 00:03:13 acmemail1 postfix/smtpd[5747]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:03:13 acmemail1 postfix/smtpd[5747]: 3654723CB: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:03:13 acmemail1 postfix/cleanup[5836]: 3654723CB: message-id=<22413802.1219032192927.JavaMail.default@10.159.39.63>
+Aug 18 00:03:13 acmemail1 postfix/smtp[5841]: 29CEF2259: to=<00000132@SAS.SE>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.1, delays=0.05/0/0/0.06, dsn=2.0.0, status=sent (250 OK, sent 48A8F481_13989_69121_1 3654723CB)
+Aug 18 00:03:13 acmemail1 postfix/smtpd[5747]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:03:13 acmemail1 postfix/qmgr[20508]: 3654723CB: from=<00000098@acme.gov>, size=2671, nrcpt=1 (queue active)
+Aug 18 00:03:13 acmemail1 postfix/qmgr[20508]: 29CEF2259: removed
+Aug 18 00:03:13 acmemail1 postfix/smtp[5818]: 3654723CB: to=<00000132@SAS.SE>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.04/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:03:13 acmemail1 postfix/qmgr[20508]: 3654723CB: removed
+Aug 18 00:03:13 acmemail1 postfix/qmgr[20508]: C3434214B: from=<00000133@fins3.acme.gov>, size=3858385, nrcpt=3 (queue active)
+Aug 18 00:03:13 acmemail1 postfix/smtpd[5839]: disconnect from mx3.fins3.acme.gov[10.0.87.120]
+Aug 18 00:03:14 acmemail1 postfix/smtpd[5828]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:03:14 acmemail1 postfix/smtpd[5828]: 1AA6123CB: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:03:14 acmemail1 postfix/cleanup[5624]: 1AA6123CB: message-id=<E69F0D19553A3B41A0A8B25DE0287A7B01647DD9@Z02EXCCIS12.irmnet.ds2.acme.gov>
+Aug 18 00:03:14 acmemail1 postfix/smtp[5824]: C3434214B: to=<00000134@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=5.5, delays=4.9/0/0/0.55, dsn=2.0.0, status=sent (250 OK, sent 48A8F481_13989_69122_1 1AA6123CB)
+Aug 18 00:03:14 acmemail1 postfix/smtp[5824]: C3434214B: to=<00000135@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=5.5, delays=4.9/0/0/0.55, dsn=2.0.0, status=sent (250 OK, sent 48A8F481_13989_69122_1 1AA6123CB)
+Aug 18 00:03:14 acmemail1 postfix/smtp[5824]: C3434214B: to=<00000136@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=5.5, delays=4.9/0/0/0.55, dsn=2.0.0, status=sent (250 OK, sent 48A8F481_13989_69122_1 1AA6123CB)
+Aug 18 00:03:14 acmemail1 postfix/qmgr[20508]: 1AA6123CB: from=<00000133@fins3.acme.gov>, size=3858543, nrcpt=3 (queue active)
+Aug 18 00:03:14 acmemail1 postfix/qmgr[20508]: C3434214B: removed
+Aug 18 00:03:14 acmemail1 postfix/smtpd[5828]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:03:14 acmemail1 postfix/smtpd[5821]: connect from unknown[10.0.80.60]
+Aug 18 00:03:14 acmemail1 postfix/smtp[5831]: 1AA6123CB: to=<00000134@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.5, delays=0.11/0/0/0.39, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:03:14 acmemail1 postfix/smtp[5831]: 1AA6123CB: to=<00000135@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.5, delays=0.11/0/0/0.39, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:03:14 acmemail1 postfix/smtp[5831]: 1AA6123CB: to=<00000136@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.5, delays=0.11/0/0/0.39, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:03:14 acmemail1 postfix/qmgr[20508]: 1AA6123CB: removed
+Aug 18 00:03:14 acmemail1 postfix/smtpd[5821]: A528D2259: client=unknown[10.0.80.60]
+Aug 18 00:03:14 acmemail1 postfix/cleanup[5838]: A528D2259: message-id=<0C203F7F4C2BF4499E6193119781774619F035@K001MB101.network.ad.baz.gov>
+Aug 18 00:03:14 acmemail1 postfix/qmgr[20508]: A528D2259: from=<00000137@baz.acme.gov>, size=11051, nrcpt=1 (queue active)
+Aug 18 00:03:14 acmemail1 postfix/smtpd[5821]: disconnect from unknown[10.0.80.60]
+Aug 18 00:03:14 acmemail1 postfix/smtpd[5748]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:03:14 acmemail1 postfix/smtpd[5748]: DB05F29DA: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:03:14 acmemail1 postfix/cleanup[5840]: DB05F29DA: message-id=<0C203F7F4C2BF4499E6193119781774619F035@K001MB101.network.ad.baz.gov>
+Aug 18 00:03:14 acmemail1 postfix/smtp[5826]: A528D2259: to=<00000138@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.29, delays=0.16/0/0/0.13, dsn=2.0.0, status=sent (250 OK, sent 48A8F482_13989_69123_1 DB05F29DA)
+Aug 18 00:03:14 acmemail1 postfix/smtpd[5748]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:03:14 acmemail1 postfix/qmgr[20508]: DB05F29DA: from=<00000137@baz.acme.gov>, size=11237, nrcpt=1 (queue active)
+Aug 18 00:03:14 acmemail1 postfix/qmgr[20508]: A528D2259: removed
+Aug 18 00:03:14 acmemail1 postfix/smtp[5772]: DB05F29DA: to=<00000138@acme.gov>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.04/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:03:14 acmemail1 postfix/qmgr[20508]: DB05F29DA: removed
+Aug 18 00:03:19 acmemail1 postfix/smtpd[5819]: connect from mx4.fins3.acme.gov[10.0.87.121]
+Aug 18 00:03:19 acmemail1 postfix/smtpd[5819]: 4806129DA: client=mx4.fins3.acme.gov[10.0.87.121]
+Aug 18 00:03:19 acmemail1 postfix/cleanup[5624]: 4806129DA: message-id=<E69F0D19553A3B41A0A8B25DE0287A7B01647DDA@Z02EXCCIS12.irmnet.ds2.acme.gov>
+Aug 18 00:03:22 acmemail1 postfix/smtpd[5090]: connect from nwg-scan-a-001.fiz.acme.gov[10.0.77.245]
+Aug 18 00:03:22 acmemail1 postfix/smtpd[5090]: B6665214B: client=nwg-scan-a-001.fiz.acme.gov[10.0.77.245]
+Aug 18 00:03:22 acmemail1 postfix/cleanup[5838]: B6665214B: message-id=<7494106.1219032201989.JavaMail.default@10.159.39.63>
+Aug 18 00:03:22 acmemail1 postfix/qmgr[20508]: B6665214B: from=<00000098@acme.gov>, size=2456, nrcpt=1 (queue active)
+Aug 18 00:03:22 acmemail1 postfix/smtpd[5090]: disconnect from nwg-scan-a-001.fiz.acme.gov[10.0.77.245]
+Aug 18 00:03:22 acmemail1 postfix/smtpd[5833]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:03:22 acmemail1 postfix/smtpd[5833]: C3A5F2259: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:03:22 acmemail1 postfix/cleanup[5840]: C3A5F2259: message-id=<7494106.1219032201989.JavaMail.default@10.159.39.63>
+Aug 18 00:03:22 acmemail1 postfix/smtp[5841]: B6665214B: to=<00000139@AIRCANADA.CA>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.11, delays=0.05/0/0/0.06, dsn=2.0.0, status=sent (250 OK, sent 48A8F48A_13989_69124_1 C3A5F2259)
+Aug 18 00:03:22 acmemail1 postfix/smtpd[5833]: disconnect from localhost.localdomain[127.0.0.1]
+Aug 18 00:03:22 acmemail1 postfix/qmgr[20508]: C3A5F2259: from=<00000098@acme.gov>, size=2638, nrcpt=1 (queue active)
+Aug 18 00:03:22 acmemail1 postfix/qmgr[20508]: B6665214B: removed
+Aug 18 00:03:22 acmemail1 postfix/smtp[4840]: C3A5F2259: to=<00000139@AIRCANADA.CA>, relay=10.0.0.1[10.0.0.1]:1025, delay=0.08, delays=0.04/0/0/0.04, dsn=2.0.0, status=sent (250 Message received and queued)
+Aug 18 00:03:22 acmemail1 postfix/qmgr[20508]: C3A5F2259: removed
+Aug 18 00:03:29 acmemail1 postfix/smtpd[5823]: connect from unknown[10.0.80.60]
+Aug 18 00:03:29 acmemail1 postfix/smtpd[5823]: 1B91C2259: client=unknown[10.0.80.60]
+Aug 18 00:03:29 acmemail1 postfix/cleanup[5838]: 1B91C2259: message-id=<D31A582E5B6A2B45902C41C643D99A5A01399D5D@K001MB101.network.ad.baz.gov>
+Aug 18 00:03:29 acmemail1 postfix/qmgr[20508]: 1B91C2259: from=<00000001@baz.acme.gov>, size=4754, nrcpt=62 (queue active)
+Aug 18 00:03:29 acmemail1 postfix/smtpd[5834]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:03:29 acmemail1 postfix/smtpd[5834]: 69842214B: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:03:29 acmemail1 postfix/cleanup[5840]: 69842214B: message-id=<D31A582E5B6A2B45902C41C643D99A5A01399D5D@K001MB101.network.ad.baz.gov>
+Aug 18 00:03:29 acmemail1 postfix/smtpd[5747]: connect from localhost.localdomain[127.0.0.1]
+Aug 18 00:03:29 acmemail1 postfix/smtpd[5747]: 74BFE23CB: client=localhost.localdomain[127.0.0.1]
+Aug 18 00:03:29 acmemail1 postfix/smtp[5824]: 1B91C2259: to=<00000060@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.4, delays=0.28/0/0/0.12, dsn=2.0.0, status=sent (250 OK, sent 48A8F491_13987_12174_1 69842214B)
+Aug 18 00:03:29 acmemail1 postfix/smtp[5824]: 1B91C2259: to=<00000056@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.4, delays=0.28/0/0/0.12, dsn=2.0.0, status=sent (250 OK, sent 48A8F491_13987_12174_1 69842214B)
+Aug 18 00:03:29 acmemail1 postfix/smtp[5824]: 1B91C2259: to=<00000057@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.4, delays=0.28/0/0/0.12, dsn=2.0.0, status=sent (250 OK, sent 48A8F491_13987_12174_1 69842214B)
+Aug 18 00:03:29 acmemail1 postfix/smtp[5824]: 1B91C2259: to=<00000002@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.4, delays=0.28/0/0/0.12, dsn=2.0.0, status=sent (250 OK, sent 48A8F491_13987_12174_1 69842214B)
+Aug 18 00:03:29 acmemail1 postfix/smtp[5824]: 1B91C2259: to=<00000003@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.4, delays=0.28/0/0/0.12, dsn=2.0.0, status=sent (250 OK, sent 48A8F491_13987_12174_1 69842214B)
+Aug 18 00:03:29 acmemail1 postfix/smtp[5824]: 1B91C2259: to=<00000063@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.4, delays=0.28/0/0/0.12, dsn=2.0.0, status=sent (250 OK, sent 48A8F491_13987_12174_1 69842214B)
+Aug 18 00:03:29 acmemail1 postfix/smtp[5824]: 1B91C2259: to=<00000140@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.4, delays=0.28/0/0/0.12, dsn=2.0.0, status=sent (250 OK, sent 48A8F491_13987_12174_1 69842214B)
+Aug 18 00:03:29 acmemail1 postfix/smtp[5824]: 1B91C2259: to=<00000005@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.4, delays=0.28/0/0/0.12, dsn=2.0.0, status=sent (250 OK, sent 48A8F491_13987_12174_1 69842214B)
+Aug 18 00:03:29 acmemail1 postfix/smtp[5824]: 1B91C2259: to=<00000064@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.4, delays=0.28/0/0/0.12, dsn=2.0.0, status=sent (250 OK, sent 48A8F491_13987_12174_1 69842214B)
+Aug 18 00:03:29 acmemail1 postfix/smtp[5824]: 1B91C2259: to=<00000006@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.4, delays=0.28/0/0/0.12, dsn=2.0.0, status=sent (250 OK, sent 48A8F491_13987_12174_1 69842214B)
+Aug 18 00:03:29 acmemail1 postfix/smtp[5824]: 1B91C2259: to=<00000007@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.4, delays=0.28/0/0/0.12, dsn=2.0.0, status=sent (250 OK, sent 48A8F491_13987_12174_1 69842214B)
+Aug 18 00:03:29 acmemail1 postfix/smtp[5824]: 1B91C2259: to=<00000000@acme.gov>, relay=127.0.0.1[127.0.0.1]:10025, delay=0.4, delays=0.28/0/0/0.12, dsn=2.0.0, status=sent (250 OK, sent 48A8F491_13987_12174_1 69842214B)
+Aug 18 00:03:29 acmemail1 postfix/smtpd[5834]: disconnect from localhost.localdomain[127.0.0.1]

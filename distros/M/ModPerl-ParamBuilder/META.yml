@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: ModPerl-ParamBuilder
+version: 0.08
+author:
+  - Frank Wiles <frank@revsys.com>
+abstract: Makes building custom Apache directives easy
+license: perl
+generated_by: Module::Build version 0.2608, without YAML.pm

@@ -1,0 +1,176 @@
+0.31 December 18, 2007
+
+- Patch by Michael Scoltock (scoltock . at . ictp.it ) to fix subexec
+- Patch submitted as guest user to fix the CGI Environment Problems.
+
+0.30  March 19, 2004
+
+- MasonX::Request::WithApacheSession is now a very thin wrapper around
+Apache::Session::Wrapper (it's a wrapper wrapper!).  This change
+should be transparent to users.
+
+- Because of the above, you can now do this:
+
+ PerlSetVar MasonSessionCookieExpires session
+
+and get a cookie which expires when the browser is closed.  Requested
+by Herald (RT #5615).
+
+
+0.25  February 11, 2004
+
+- Ken broke Module::Build's backwards compatibility with older
+passthrough Makefile.PL scripts and went on vacation.  This version
+has no code changes besides a newly generated Makefile.PL.
+
+
+0.24  November 5, 2003
+
+- This distro now includes the MasonX::Request::WithMultiSession
+module.  This module tries to help solve the problem of allowing a
+user to open multiple browser windows, each with their own individual
+session-based state.
+
+- Switched to Module::Build.
+
+- Distribution is signed with Module::Signature.
+
+
+0.23  August 15, 2003
+
+- Changed the 01-basic.t tests to not use the
+Apache::Session::Lock::File module, since file locking may not work on
+all platforms.
+
+
+0.22  August 12, 2003
+
+- Fixed handling of the session_long_read_len and session_textsize
+parameters.  Reported by Mario Truyens.
+
+
+0.21  March 19, 2003
+
+- Fixed the docs, which erroneously indicated that the session_handle
+and session_lock_handle parameter could be set via an Apache config
+file.
+
+
+0.20  February 21, 2003
+
+- Added a session_args_param constructor parameter, which tells this
+module to look in the request args for a session id.  This can be used
+in combination with cookies or by itself.
+
+- Cookies are now sent when the request object is created, not when
+the session() method is first called.
+
+- Rewrote the internals a bit to clean things up.  All tests pass but
+as always, use caution when deploying a new release.
+
+
+0.12  January 4, 2003
+
+- Setting the session_cookie_resend parameter to false caused the
+module to never send a cookie at all.  Reported and fixed by Michele
+Gherlone.
+
+
+0.11  December 17, 2002
+
+- Make sure Mason modules are loaded before declaring
+HTML::Mason::Exception subclass.  Previously, loading this module
+before loading HTML::Mason::Exceptions caused this module to die.
+
+- Fixed a pod nit.
+
+
+0.10  not released because I'm dumb
+
+- This module would not set cookies properly when run with mod_perl
+2.0 or when run under CGIHandler.  Even though it loaded CGI::Cookie,
+it would attempt call ->bake on the cookie object, which only works
+with Apache::Cookie.
+
+- Added session_cookie_resend parameter, which allows you to tell this
+module to not resend cookies every time the session is accessed.  The
+default remains the same, which is to resend the cookie every time the
+session is accessed.  Based on a patch from John Armstrong.
+
+
+0.09  October 21, 2002
+
+- ** Change the default cookie name to
+"MasonX-Request-WithApacheSession".  This means if you were using
+previous versions of the module with the default cookie name and you
+install this one, old cookies will not be recognized.  You can
+explicitly set the cookie name to the old value,
+"HTML-Mason-Request-WithApacheSession", if this is a problem.
+
+- The previous version would try to use Apache::Cookie for
+reading/setting cookies even if it couldn't load Apache::Cookie.
+
+
+0.08  October 19, 2002
+
+- ** Renamed to MasonX::Request::WithApacheSession.  MasonX is the new
+official namespace for classes distributed outside of the Mason core
+that extend Mason.
+
+This means that when you install this release, it will not replace
+HTML::Mason::Request::WithApacheSession.  Make sure you change your
+usage of this class in your httpd.conf or handler.pl file!
+
+- Get cookie (and session id) in the constructor, so that the session
+is available from the request object returned by
+ApacheHandler->prepare_request().  Bug report by Matthias Juchem.
+
+- Try to use Apache::Cookie if we're running under mod_perl, but
+fallback to CGI::Cookie if necessary.
+
+
+0.07  August 19, 2002 (from Taiwan)
+
+- Some parameters which should have allowed undef were not allowing
+it.
+
+- When an incoming cookie contained an invalid session id and a new
+session was created, the old session id was still being set in the
+cookie for that request.  Reported by Warren Welch.
+
+
+0.06  August 1, 2002
+
+- Every call to $m->session was baking a new cookie.  Reported by
+Chris Huseman.
+- Added $m->delete_session method.  Suggested by Chris Huseman.
+
+
+0.05  July 23, 2002
+
+- Use Request->alter_superclass method available in Mason 1.12.
+
+
+0.04  July 17, 2002
+
+- Make it play nicer with a caching Class::Container.
+
+
+0.03  July 15, 2002
+
+- Make it work with upcoming Class::Container (which does more
+caching).
+
+- Fix handling of subrequests.
+
+
+0.02  June 20, 2002
+
+- Make it work with CGIHandler as well.
+
+- Add Apache::Session to prereq (duh!).  Reported by Alex Muntada.
+
+
+0.01  June 12, 2002
+
+- initial release

@@ -1,0 +1,196 @@
+--stations
+# M1
+Kifisia
+KAT
+Marousi
+Nerantziotissa
+Eirini
+Irakleio
+Nea Ionia
+Pefkakia
+Perissos
+Ano Patisia
+Agios Eleftherios
+Kato Patisia
+Agios Nikolaos
+Attiki
+Victoria
+Omonia
+Monastiraki
+Thiseio
+Petralona
+Tavros
+Kallithea
+Moschato
+Faliro
+Piraeus
+
+# M2
+Anthoupoli
+Peristeri
+Agios Antonios
+Sepolia
+# Attiki
+Larissa Station % :Larissa % :Athens Railway Station
+Metaxourghio
+# Omonia
+Panepistimio
+Syntagma
+Akropoli
+Syngrou Fix
+Neos Kosmos
+Agios Ioannis
+Dafni
+Agios Dimitrios
+Ilioupoli
+Alimos
+Argyroupoli
+Elliniko
+
+# M3
+Agia Marina
+Egaleo
+Eleonas
+Kerameikos
+# Monastiraki
+# Syntagma
+Evangelismos
+Megaro Moussikis
+Ambelokipi
+Panormou
+Katehaki
+Ethniki Amyna
+Holargos
+Nomismatokopio
+Agia Paraskevi
+Chalandri
+Doukissis Plakentias
+Pallini
+Paiania-Kantza
+Koropi
+Athens International Airport % :Airport
+
+# P1
+Kiato
+Zevgolatio
+Corinth
+Kineta
+Megara
+Agioi Theodoroi
+Nea Peramos
+Magoula
+Aspropyrgos
+Ano Liosia
+Agioi Anargyroi
+# Larissa
+Rentis
+Lefka
+# Piraeus
+
+# P2
+# Ano Liosia
+Acharnai Railway Center % :Acharnai
+Metamorfosi
+Irakleio P
+# Nerantziotissa
+Kifisias
+Pentelis
+# on to airport
+
+--lines
+M1|M1|Metro 1|color:#00853f, width:6
+M2|M2|Metro 2|color:#ee3124, width:6
+M3|M3|Metro 3|color:#0093d0, width:6
+P1|P1|Proastiakos 1|color:#0069aa, width:9
+P2|P2|Proastiakos 2|color:#fdb913, width:9
+
+--transfers
+
+--segments
+M1|Kifisia|KAT
+M1|KAT|Marousi
+M1|Marousi|Nerantziotissa
+M1|Nerantziotissa|Eirini
+M1|Eirini|Irakleio
+M1|Irakleio|Nea Ionia
+M1|Nea Ionia|Pefkakia
+M1|Pefkakia|Perissos
+M1|Perissos|Ano Patisia
+M1|Ano Patisia|Agios Eleftherios
+M1|Agios Eleftherios|Kato Patisia
+M1|Kato Patisia|Agios Nikolaos
+M1|Agios Nikolaos|Attiki
+M1|Attiki|Victoria
+M1|Victoria|Omonia
+M1|Omonia|Monastiraki
+M1|Monastiraki|Thiseio
+M1|Thiseio|Petralona
+M1|Petralona|Tavros
+M1|Tavros|Kallithea
+M1|Kallithea|Moschato
+M1|Moschato|Faliro
+M1|Faliro|Piraeus
+
+M2|Anthoupoli|Peristeri
+M2|Peristeri|Agios Antonios
+M2|Agios Antonios|Sepolia
+M2|Sepolia|Attiki
+M2|Attiki|Larissa Station
+M2|Larissa Station|Metaxourghio
+M2|Metaxourghio|Omonia
+M2|Omonia|Panepistimio
+M2|Panepistimio|Syntagma
+M2|Syntagma|Akropoli
+M2|Akropoli|Syngrou Fix
+M2|Syngrou Fix|Neos Kosmos
+M2|Neos Kosmos|Agios Ioannis
+M2|Agios Ioannis|Dafni
+M2|Dafni|Agios Dimitrios
+M2|Agios Dimitrios|Ilioupoli
+M2|Ilioupoli|Alimos
+M2|Alimos|Argyroupoli
+M2|Argyroupoli|Elliniko
+
+M3|Agia Marina|Egaleo
+M3|Egaleo|Eleonas
+M3|Eleonas|Kerameikos
+M3|Kerameikos|Monastiraki
+M3|Monastiraki|Syntagma
+M3|Syntagma|Evangelismos
+M3|Evangelismos|Megaro Moussikis
+M3|Megaro Moussikis|Ambelokipi
+M3|Ambelokipi|Panormou
+M3|Panormou|Katehaki
+M3|Katehaki|Ethniki Amyna
+M3|Ethniki Amyna|Holargos
+M3|Holargos|Nomismatokopio
+M3|Nomismatokopio|Agia Paraskevi
+M3|Agia Paraskevi|Chalandri
+M3|Chalandri|Doukissis Plakentias
+M3,P2|Doukissis Plakentias|Pallini
+M3,P2|Pallini|Paiania-Kantza
+M3,P2|Paiania-Kantza|Koropi
+M3,P2|Koropi|Athens International Airport
+
+P1|Kiato|Zevgolatio
+P1|Zevgolatio|Corinth
+P1|Corinth|Kineta
+P1|Kineta|Megara
+P1|Megara|Agioi Theodoroi
+P1|Agioi Theodoroi|Nea Peramos
+P1|Nea Peramos|Magoula
+P1|Magoula|Aspropyrgos
+P1|Aspropyrgos|Ano Liosia
+P1|Ano Liosia|Agioi Anargyroi
+P1|Agioi Anargyroi|Larissa Station
+P1|Larissa Station|Rentis
+P1|Rentis|Lefka
+P1|Lefka|Piraeus
+
+P2|Ano Liosia|Acharnai Railway Center
+P2|Acharnai Railway Center|Metamorfosi
+P2|Metamorfosi|Irakleio P
+P2|Irakleio P|Nerantziotissa
+P2|Nerantziotissa|Kifisias
+P2|Kifisias|Pentelis
+P2|Pentelis|Doukissis Plakentias

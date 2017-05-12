@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Mail/SendEasy.pm
+lib/Mail/SendEasy/AUTH.pm
+lib/Mail/SendEasy/Base64.pm
+lib/Mail/SendEasy/IOScalar.pm
+lib/Mail/SendEasy/SMTP.pm
+test.pl

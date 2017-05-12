@@ -1,0 +1,17 @@
+{
+   "license" : [ "perl_5" ],
+   "x_deprecated": 1,
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/jberger/Mojolicious-Plugin-SimpleSlides"
+      },
+      "bugtracker" : {
+         "web" : "http://github.com/jberger/Mojolicious-Plugin-SimpleSlides/issues"
+      },
+      "license" : [ "http://dev.perl.org/licenses/" ]
+   }
+}

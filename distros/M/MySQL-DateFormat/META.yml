@@ -1,0 +1,24 @@
+---
+abstract: unknown
+author:
+  - 'Nick Tonkin (1nickt@gmail.com)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MySQL-DateFormat
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Date::Calc: '0'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+version: '2.04'

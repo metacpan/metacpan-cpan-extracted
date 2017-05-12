@@ -1,0 +1,44 @@
+NAME
+    Module::Install::NoAutomatedTesting - A Module::Install extension to
+    avoid CPAN Testers
+
+SYNOPSIS
+      # In Makefile.PL
+
+      use inc::Module::Install;
+      no_auto_test;
+
+    The Makefile.PL will exit if it detects that it is being run on a CPAN
+    Tester's "smoker".
+
+DESCRIPTION
+    CPAN Testers are great and do a worthy and thankless job, testing all
+    the distributions uploaded to CPAN. But sometimes we don't want a
+    distribution to be tested by these gallant individuals.
+
+    Module::Install::NoAutomatedTesting is a Module::Install extension that
+    will exit from the "Makefile.PL" when it detects that it is being run by
+    a CPAN Tester.
+
+COMMANDS
+    This plugin adds the following Module::Install command:
+
+    "no_auto_test"
+        Does nothing on the author-side. On the user side it detects whether
+        or not automated testing is in effect and exits accordingly.
+
+AUTHOR
+    Chris "BinGOs" Williams
+
+LICENSE
+    Copyright © Chris Williams
+
+    This module may be used, modified, and distributed under the same terms
+    as Perl itself. Please see the license that came with your Perl
+    distribution for details.
+
+SEE ALSO
+    Module::Install
+
+    <http://wiki.cpantesters.org/>
+

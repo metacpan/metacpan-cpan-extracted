@@ -1,0 +1,37 @@
+NAME
+    Module::Install::InlineModule - Module::Install Support for
+    Inline::Module
+
+SYNOPSIS
+        use inc::Module::Install;
+
+        name     'Foo-Bar';
+        all_from 'lib/Foo/Bar.pm';
+
+        inline module => 'Foo::Bar';
+
+        WriteAll;
+
+DESCRIPTION
+    This module adds the "inline" directive to Module::Install.
+
+    You can use it to ship Inline::Module based modules.
+
+SEE
+    *   Inline::Module
+
+    *   Module::Install
+
+    *   Alt::Acme::Math::XS::ModuleInstall
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT
+    Copyright 2009-2014. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

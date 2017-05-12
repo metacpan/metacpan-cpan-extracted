@@ -1,0 +1,97 @@
+{
+   "abstract" : "Moose type constraints for strings or string-like objects",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Types-Stringlike",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5.015",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.060",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MooseX::Types" : "0",
+            "MooseX::Types::Moose" : "0",
+            "overload" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Requirements" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec::Functions" : "0",
+            "List::Util" : "0",
+            "Moose" : "0",
+            "Test::More" : "0.96",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::Types::Stringlike" : {
+         "file" : "lib/MooseX/Types/Stringlike.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dagolden/MooseX-Types-Stringlike/issues"
+      },
+      "homepage" : "https://github.com/dagolden/MooseX-Types-Stringlike",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/MooseX-Types-Stringlike.git",
+         "web" : "https://github.com/dagolden/MooseX-Types-Stringlike"
+      }
+   },
+   "version" : "0.003",
+   "x_authority" : "cpan:DAGOLDEN",
+   "x_contributors" : [
+      "Karen Etheridge <ether@cpan.org>"
+   ]
+}
+

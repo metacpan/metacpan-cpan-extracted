@@ -1,0 +1,18 @@
+Revision history for Perl extension MVS::VBFile.
+
+0.01  Wed Mar  3 08:21:43 1999
+	- original version; created by h2xs 1.18
+	- Geoffrey Rommel (grommel@sears.com)
+
+0.02  Mon Apr 12 08:47:38 1999
+	- changed unpacking from 's' (native) to 'n' (network) so
+	  that it would also work on little-endian machines
+
+0.03  Fri Aug 18 13:56:58 2000
+	- added option to process or ignore BDW's
+
+0.04  Thu Mar  8 13:57:05 2001
+	- added vbopen, vbput, vbclose
+
+0.05  Wed May 12 10:00:46 2004
+	- added keep_rdw option

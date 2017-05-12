@@ -1,0 +1,118 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+marclint - MARC record linting utility
+
+=head1 SYNOPSIS
+
+B<marclint> [options] file(s)
+
+=over 4
+
+=item options
+
+=over 4
+
+=item --help
+
+Print a summary of commands
+
+=item --[no]stats
+
+Print a statistical summary by file at the end.  (Default: on)
+
+=back
+
+=back
+
+=cut
+
+use strict;
+use integer;
+
+use MARC::File::USMARC;
+use MARC::Lint;
+use Getopt::Long;
+
+use constant USAGE => <<"END";
+Usage: marclint [options] file(s)
+    options
+        --help
+            Print a summary of commands
+        --version
+            Print version
+        --[no]quiet
+            Suppress status messages
+        --[no]stats
+            Print a statistical summary by file at the end
+END
+
+my $stats = 1;
+my $help = 0;
+my $quiet = 0;
+
+my $rc = GetOptions(
+    "stats!" => \$stats,
+    "quiet!" => \$quiet,
+    "help"   => \$help,
+    "version"   => sub { print "$0, using MARC::Record v$MARC::Record::VERSION\n"; exit 1; },
+    );
+
+my @files = @ARGV;
+
+die USAGE if $help or (not $rc) or (@files == 0);
+
+my $linter = new MARC::Lint;
+my %counts;
+my %errors;
+
+for my $filename ( @files ) {
+    $counts{$filename} = 0;
+    $errors{$filename} = 0;
+
+    my $file = MARC::File::USMARC->in( $filename ) or die $MARC::File::ERROR;
+    warn "$filename\n" unless $quiet;
+
+    while ( my $marc = $file->next() ) {
+        if ( not $marc ) {
+            warn $MARC::Record::ERROR;
+            ++$errors{$filename};
+        } else {
+            ++$counts{$filename};
+        }
+
+        #store warnings in @warningstoreturn
+        my @warningstoreturn = ();
+
+        #retrieve any decoding errors
+        #get any warnings from decoding the raw MARC
+        push @warningstoreturn, $marc->warnings();
+
+        $linter->check_record( $marc );
+
+        #add any warnings from MARC::Lint
+        push @warningstoreturn, $linter->warnings;
+
+        if ( @warningstoreturn ) {
+            print join( "\n",
+                $marc->title,
+                @warningstoreturn,
+                "",
+                "",
+            );
+            ++$errors{$filename};
+        }
+    } # while
+    $file->close();
+} # for 
+
+if ( $stats ) {
+    print "\n\n";
+    print " Recs  Errs Filename\n";
+    print "----- ----- --------\n";
+    for my $key ( sort keys %counts ) {
+        printf( "%5d %5d %s\n", $counts{$key}, $errors{$key}, $key );
+    } # for
+} # if stats
+

@@ -1,0 +1,11 @@
+Revision history for Mojo-Command-Generate-InitScript
+
+0.03    05.02
+        Fixed deploying for Debian, added some :) documentation
+
+0.02    26.01
+        Added Debian initscript generation
+
+0.01    26.01
+        First version, released on an unsuspecting world.
+

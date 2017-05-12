@@ -1,0 +1,15 @@
+0.04  Tue, 05 Jan 2010 20:37:32 +0100
+    - Avoid warnings from Class::MOP.
+
+0.03  Mon, 28 Sep 2009 17:54:35 +0200
+    - Implement ambigious_match_callback as a way for users to hook into what
+      happens on ambigious matches.
+
+0.02
+    - Use MooseX::Clone, not some half assed clone routine
+    - Types are sorted topologically now. All variants in a single slot
+      are tried for a match, and if the result is ambiguous an error is
+      thrown. This matches Perl 6's behavior for multi method dispatch.
+
+0.01
+    - Initial release

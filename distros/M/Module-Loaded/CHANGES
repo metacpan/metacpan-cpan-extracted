@@ -1,0 +1,20 @@
+Changes for 0.08    Sun Nov 27 20:44:00 GMT 2011
+=================================================
+* Remove trailing spaces and update Makefile.PL
+
+Changes for 0.06    Mon Sep  7 09:45:48 BST 2009
+=================================================
+* Messed up the test changes for core, fixed.
+
+Changes for 0.04    Mon Sep  7 09:33:15 BST 2009
+=================================================
+* Users of 0.02 need not upgrade
+* Due to core changes use 'less' instead of 'strict'
+  in the tests when PERL_CORE is set
+
+Changes for 0.02    Sat Dec 13 18:35:01 CET 2008
+=================================================
+* Users of 0.01 need not upgrade
+* Module::Loaded is a core module, so the Makefile.PL
+  should reflect this and install into the 'core'
+  directory, instead of 'site'

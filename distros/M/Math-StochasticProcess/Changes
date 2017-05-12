@@ -1,0 +1,16 @@
+Revision history for Math-StochasticProcess
+
+0.01    25-11-2008
+        All basic functionality tested. Lumpiness removed except for OO place
+        holders.
+
+0.02	2-12-2008
+        Updated license. Reformatted text. Fixed README. Enforced
+        Params::Validate dependency.
+
+0.03	16-12-2009
+	Added hygiene test scripts: Changes, Manifest, Prereq, Podspell etc. 
+
+0.04    9-3-2010
+	Added dependecy on Exporter 5.57 and switched to Module::Build.
+

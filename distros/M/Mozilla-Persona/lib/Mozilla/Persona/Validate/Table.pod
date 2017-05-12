@@ -1,0 +1,125 @@
+=head1 NAME
+
+Mozilla::Persona::Validate::Table - validate the existence via a simple table
+
+=head1 INHERITANCE
+
+ Mozilla::Persona::Validate::Table
+   is a Mozilla::Persona::Validate
+
+=head1 SYNOPSIS
+
+  # add to the configation of $domain.json
+  { ...
+    "validate" : {
+      "class"  : "Mozilla::Persona::Validator::Table",
+      "pwfile" : "/etc/persona/passwords",
+      "domain" : "example.com",
+    },
+    ...
+  }
+
+=head1 DESCRIPTION
+
+The validator object must ensure that the user/password combination
+is valid.  In this case, a simple password-file-like table is used
+to authenticate the user.
+
+You may put that file with the other configuration information
+in F</etc/persona/>, for instance under the name C<passwords>.  This
+is the default when you run C<persona setup>.
+
+=head2 Password file syntax
+
+Lines which are blank (visually empty) or start with a '#' (comment)
+are ignored.  Other lines describe users.
+
+The user definition lines contain (currently) three fields separated by a
+colon ':'.  First a username, than the digest algorithm used (acceptable
+to Digest, you may need to install additional Digest modules) and
+finally the base64 encoded version of that digest.  The username may
+either include the domain, or the domain must be set in the configuration.
+
+Example of two lines in the C<passwords> file:
+
+  # my test user
+  test@example.com:MD5:47b0eb54a2f09e1b97881eb8746486ce
+
+With "domain" set to "example.com", your usernames become easier
+
+  test:MD5:47b0eb54a2f09e1b97881eb8746486ce
+
+You may still use full usernames if you want.  Full usernames which
+are in an other domain are silently dropped.
+
+B<Be warned> that md5sum produces hex, where we need base64 here.
+Other scripts output base64 directly, for instance F<sha256sum>.  You
+may use that to produce the third field of a user defining line:
+
+  echo -n "my-password" | sha256sum
+  echo "my-password\c"  | sha256sum
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Mozilla::Persona::Validate::Table-E<gt>B<new>(OPTIONS)
+
+ -Option--Default
+  domain  undef
+  pwfile  <required>
+
+=over 2
+
+=item domain => DOMAIN
+
+Default domain for all users in the file.
+
+=item pwfile => FILENAME
+
+The password file.  Probably, you want to provide an absolute path.
+When the file changes, it will automatically be reloaded.
+
+=back
+
+=back
+
+=head2 Validation
+
+=over 4
+
+=item $obj-E<gt>B<isValid>(USER, PASSWORD)
+
+See L<Mozilla::Persona::Validate/"Validation">
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<domain>()
+
+=item $obj-E<gt>B<pwfile>()
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mozilla-Persona distribution version 0.12,
+built on November 22, 2012. Website: F<http://perl.overmeer.net>.  The code is based on the MulkyID code by
+Matthias Benkard.
+
+Persona is described at F<http://www.mozilla.org/persona/>
+
+=head1 COPYRIGHTS
+
+Copyrights of the perl code and the related documentation by
+2012 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

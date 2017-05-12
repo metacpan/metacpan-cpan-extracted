@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+META.yml
+lib/Mac/Tie/PList.pm
+t/01.basic.t
+t/10.readxml.t
+t/11.readbin.t
+t/90.pod.t
+t/91.podcoverage.t
+t/test-bin.plist
+t/test-xml.plist

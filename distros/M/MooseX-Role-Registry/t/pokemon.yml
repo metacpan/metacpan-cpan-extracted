@@ -1,0 +1,10 @@
+---
+bulbasaur:
+    johto: 231
+    evolves_from: egg
+ivysaur:
+    johto: 232
+    evolves_from: bulbasaur
+venusaur:
+    johto: 233
+    evolves_from: ivysaur

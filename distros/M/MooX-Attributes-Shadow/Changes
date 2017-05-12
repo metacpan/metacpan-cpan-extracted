@@ -1,0 +1,50 @@
+0.03 - Thu May  9 22:57:41 EDT 2013
+
+Stable release
+
+Enhancement
+-----------
+
+* new role method, new_from_attr, allows easier construction of
+  contained object
+
+* shadowed attribute names are now more easily renamed by passing
+  a hash of attribute name pairs to shadow_attrs
+
+* more comprehensible docs.
+
+
+0.02 - Wed Dec 26 15:08:17 EST 2012
+
+Stable release
+
+[INTERNALS]
+
+    * be more clever about getting has() sub from container class
+
+0.01_06 - Mon Dec 17 11:54:10 EST 2012
+
+[BUILD FIX]
+    * Add missing test dependency on Test::Deep. Fixes RT#81957
+
+
+0.01_05 - Wed Dec  5 09:35:45 EST 2012
+
+    * API change to xtract_attrs and shadowed_attrs
+    * passing container class to shadowed_attrs is now optional if
+      it is called from that class.
+
+
+0.01_04 - Fri Nov 30 16:33:18 2012 -0500
+
+    * after the first call to shadowable_attrs(), it will return the
+      attributes which may be shadowed.
+
+    * new routine shadowed_attrs(), returns the attributes actually
+      shadowed in a container.  can be used to easily delegate
+      attributes to the contained class.
+
+
+0.01 -	Fri Nov 16 16:35:51 EST 2012
+
+    * initial release to an unsuspecting world

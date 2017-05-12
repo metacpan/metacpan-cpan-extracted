@@ -1,0 +1,9 @@
+t/test.html
+ComputedStyle.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Mozilla-DOM-ComputedStyle.t
+lib/Mozilla/DOM/ComputedStyle.pm
+META.yml                                 Module meta-data (added by MakeMaker)

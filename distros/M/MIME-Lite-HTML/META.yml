@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                MIME-Lite-HTML
+version:             1.24
+abstract:            Provide routine to transform a HTML page in a MIME-Lite mail
+license:             ~
+author:              
+    - Alain BARBET (alian@cpan.org)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    HTML::LinkExtor:               0
+    LWP::UserAgent:                0
+    MIME::Lite:                    1
+    Test::More:                    0
+    URI::URL:                      0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

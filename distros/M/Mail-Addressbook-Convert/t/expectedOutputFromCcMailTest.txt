@@ -1,0 +1,18 @@
+alias jdel "jdel"<jdel@noplace.net>
+note jdel  Personal Internet address
+alias jdoe2a "JDoe2"<JDoe2@lzz.com>
+alias jones "Jones Sam"<Jones@f2groups.fsd.siwash.edu>
+note jones  Siwash University
+alias lbsmtpgate "Bobbit Lorena"<lb%smtpgate@lou_mail.nosl.sea06.navy.mil>
+alias lbsmtpgate100 "Bobbit Lorena"<lb%smtpgate@lou_mail.nosl.sea06.army.mil>
+alias networkinggroup "Networking Group"<networking-group@goldfish.sb.qdc.com>
+note networkinggroup  Networking SIG
+alias networkinggroup101 "Networking Group"<networking-group@goldfish.lzzd.com>
+note networkinggroup101  Networking SIG
+alias twistedsistercisw1pp "TWISTED SISTER on DDN"<twisted_sister/cisw1_pp@nos850.nosl.sea06.army.mil>
+alias everybody jdel,jdoe,lbsmtpgate,networkinggroup,jdoe2a,falbert,lmaryland,lbsmtpgate100,networkinggroup101,jones,twistedsistercisw1pp
+alias falbert Albert, Fat FAlbert@lzz.com
+alias jdoe Doe, John JDoe@lzz.com
+alias lmaryland Maryland, Laurel LMaryland@lzz.com
+alias notonanotherlist jdel,jdoe,lbsmtpgate,networkinggroup,jdoe2a,falbert,lmaryland,lbsmtpgate100,networkinggroup101,jones,twistedsistercisw1pp
+

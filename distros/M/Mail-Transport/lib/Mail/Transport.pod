@@ -1,0 +1,292 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Transport - base class for message exchange
+
+=head1 INHERITANCE
+
+ Mail::Transport
+   is a Mail::Reporter
+
+ Mail::Transport is extended by
+   Mail::Transport::Receive
+   Mail::Transport::Send
+
+=head1 SYNOPSIS
+
+ my $message = Mail::Message->new(...);
+
+ # Some extensions implement sending:
+ $message->send;
+ $message->send(via => 'sendmail');
+
+ my $sender = Mail::Transport::SMTP->new(...);
+ $sender->send($message);
+
+ # Some extensions implement receiving:
+ my $receiver = Mail::Transport::POP3->new(...);
+ $message = $receiver->receive;
+
+=head1 DESCRIPTION
+
+Objects which extend C<Mail::Transport> implement sending and/or
+receiving of messages, using various protocols.
+
+L<Mail::Transport::Send|Mail::Transport::Send> extends this class, and offers general
+functionality for send protocols, like SMTP.  L<Mail::Transport::Receive|Mail::Transport::Receive>
+also extends this class, and offers receive method.  Some transport
+protocols will implement both sending and receiving.
+
+Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Reporter|Mail::Reporter/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
+ 
+=over 4
+
+=item Mail::Transport-E<gt>B<new>(%options)
+
+ -Option    --Defined in     --Default
+  executable                   undef
+  hostname                     'localhost'
+  interval                     30
+  log         Mail::Reporter   'WARNINGS'
+  password                     undef
+  port                         undef
+  proxy                        undef
+  retry                        <false>
+  timeout                      120
+  trace       Mail::Reporter   'WARNINGS'
+  username                     undef
+  via                          'sendmail'
+
+=over 2
+
+=item executable => FILENAME
+
+If you specify an executable, the module does not need to search the
+system directories to figure-out where the client lives.  Using this
+decreases the flexible usage of your program: moving your program
+to other systems may involve changing the path to the executable,
+which otherwise would work auto-detect and unmodified.
+
+=item hostname => HOSTNAME|ARRAY
+
+The host on which the server runs.  Some protocols accept an ARRAY
+of alternatives for this option.
+
+=item interval => SECONDS
+
+The time between tries to contact the remote server for sending or
+receiving a message in SECONDS.  This number must be larger than 0.
+
+=item log => LEVEL
+
+=item password => STRING
+
+Some protocols require a password to be given, usually in combination
+with a password.
+
+=item port => INTEGER
+
+The port number behind which the service is hiding on the remote server.
+
+=item proxy => PATH
+
+The name of the proxy software (the protocol handler).  This must be
+the name (preferable the absolute path) of your mail delivery
+software.
+
+=item retry => NUMBER|undef
+
+The number of retries before the sending will fail.  If C<undef>, the
+number of retries is unlimited.
+
+=item timeout => SECONDS
+
+SECONDS till time-out while establishing the connection to a remote server.
+
+=item trace => LEVEL
+
+=item username => STRING
+
+Some protocols require a user to login.
+
+=item via => CLASS|NAME
+
+Which CLASS (extending C<Mail::Transport>) will transport the data.
+Some predefined NAMEs avoid long class names: C<mail> and C<mailx>
+are handled by the L<Mail::Transport::Mailx|Mail::Transport::Mailx> module, C<sendmail>
+and C<postfix> belong to L<Mail::Transport::Sendmail|Mail::Transport::Sendmail>, and C<smtp>
+is implemented in L<Mail::Transport::SMTP|Mail::Transport::SMTP>.  The C<pop> or C<pop3>
+protocol implementation can be found in L<Mail::Transport::POP3|Mail::Transport::POP3>.
+
+=back
+
+=back
+
+=head2 Server connection
+
+=over 4
+
+=item $obj-E<gt>B<findBinary>( $name, [@directories] )
+
+Look for a binary with the specified $name in the directories which
+are defined to be safe.  The list of standard directories is followed
+by the optional @directories.  The full pathname is returned.
+
+You may specify L<new(proxy)|Mail::Transport/"METHODS">, which specifies the absolute name
+of the binary to be used.
+
+=item $obj-E<gt>B<remoteHost>()
+
+Returns the hostname, port number, username and password to be used to
+establish the connection to the server for sending or receiving mail.
+
+=item $obj-E<gt>B<retry>()
+
+Returns the retry interval, retry count, and timeout for the connection.
+
+=back
+
+=head2 Error handling
+
+Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
+ 
+=over 4
+
+=item $obj-E<gt>B<AUTOLOAD>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<addReport>($object)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+=item Mail::Transport-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<errors>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<log>( [$level, [$strings]] )
+
+=item Mail::Transport-E<gt>B<log>( [$level, [$strings]] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logPriority>($level)
+
+=item Mail::Transport-E<gt>B<logPriority>($level)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<notImplemented>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<report>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<reportAll>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<trace>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<warnings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=back
+
+=head2 Cleanup
+
+Extends L<"Cleanup" in Mail::Reporter|Mail::Reporter/"Cleanup">.
+ 
+=over 4
+
+=item $obj-E<gt>B<DESTROY>()
+
+Inherited, see L<Mail::Reporter/"Cleanup">
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Warning: Avoid program abuse: specify an absolute path for $exec.
+
+Specifying explicit locations for executables of email transfer agents
+should only be done with absolute file names, to avoid various pontential
+security problems.
+
+=item Warning: Executable $exec does not exist.
+
+The explicitly indicated mail transfer agent does not exists. The normal
+settings are used to find the correct location.
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Transport distribution version 3.000,
+built on February 02, 2017.
+
+Do not forget to read
+L</Mail::Box-Overview>,
+L</Mail::Box-Cookbook>, and
+L</Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L</Mail::Message>,
+L</Mail::Box>,
+L</Mail::Box::IMAP4>,
+L</Mail::Box::POP3>,
+L</Mail::Box::Parser::C>,
+L</Mail::Box::Dbx> (unpublished),
+L</Mail::Transport>,
+L</Object::Realize::Later>, and
+L</User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

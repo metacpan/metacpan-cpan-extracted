@@ -1,0 +1,10 @@
+<!DOCTYPE html> 
+<html> 
+<body>
+    <form> 
+        <%== _dfv_error('username') ? "<font color=red>Username</font>" : "Username" %>: <input type=text name=username value="<%= $username %>"> <br />
+        <%== _dfv_error('email') ? "<font color=red>Email</font>" : "Email" %>: <input type=text name=email value="<%= $email %>"> <br />
+        <input type=submit>
+    </form>
+</body>
+</html>

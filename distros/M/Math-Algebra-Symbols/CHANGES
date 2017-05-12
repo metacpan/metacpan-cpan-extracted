@@ -1,0 +1,85 @@
+Changes
+    2016/01/27 1.27 use strict
+    2016/01/20 1.26 Build.PL again
+    2016/01/20 1.25 Build.PL
+
+    2016/01/20 1.24 Bug fixes to run under Perl 5.18
+    Now built on Ubuntu
+    Converted to Module::Build
+    Added fix for Bug #57148 for Math-Algebra-Symbols from
+    salvatore.bonaccorso@gmail.com
+
+    2004/06/14 1.21 Minor documentation corrections.
+
+    2004/06/10 1.20 Capitalized module file names correctly.
+
+    2004/06/09 1.19 Lib, Pod cleanup
+
+    2004/06/08 Observed transit of Venus in room converted to Camera
+    Obscura.
+
+    2004/06/04 1.18 Equation simplification tied to += operator
+
+    2004/06/02 1.17 Following further excellent suggestions from Mike
+    Schilli slightly improved notation for equation solving:
+
+    eq is a synonym for -
+
+    > is a synonym for solve()
+
+    Thus:
+
+      $x      = symbols('x');
+     ($a, $b) =  @{ ($x**2 eq 5*$x+6) > $x };
+
+      print "$a,$b\n";
+
+     # 2,3
+
+    2004/06/01 1.16 Following excellent suggestions from Mike Schilli detect
+    constants with decimal places and convert them to rational fractions,
+    thus 1.2 becomes 12/10. The rationale: using fractions avoids loss of
+    precision, if you only need approximate numerical results, there is no
+    need for symbolic manipulations.
+
+    2004/05/28 1.15 Minor changes to documentation.
+
+    2004/05/27 1.14 Admiring new CPAN Layout: diff+grep. Updated META.yml
+    requires/recommends to match MANIFEST. Removed use of Hash::Util as this
+    seems to be causing problems with ActiveState.
+
+    2004/05/11 1.13 Memory Leak and exp() problems solved:
+
+    1. Solved a memory leak by using Scalar::Util::weaken(). This has
+    reduced memory consumption when running the test cases from 130M to 37M:
+    intermediate expressions are now being freed. I believe that this has
+    been the source of the erratic failures on various platforms, other than
+    my development system, as reported (most helpfully) by CPAN testers and
+    a Mac OSX user: these reported errors appear to have been related to
+    running out of memory.
+
+    2. Corrected exp(-i)*exp(-i) which was being correctly reduced to
+    exp(0), but should have been reduced further to 1, which was causing the
+    multiply out of exp(i...) in cot(x) == 1/tan(x) to fail.
+
+    3. Added the != operator, as this simplifies testing with the test
+    harness.
+
+    2004/04/30 1.12 Included PREREQ_PM in Makefile as a result of notes from
+    automated CPAN testing.
+
+    2004/04/24 1.08 Included test cases in manifest and renamed to .t in
+    line with observed practice.
+
+    2004/03/28 Split into three classes. Considerable performance
+    improvements. Added standard Perl Test harness. Unfixed power() so we
+    are back to constant powers.
+
+    2004/03/14 Fixed power() so that it recognizes constant and variable
+    powers. Added TODO List. Finished testSM(): new requirements in TODO.
+
+    2004/03/13 Added change log on esteemed advice of Steffen Müller. Made
+    yet another attempt to stop polynomialDivide() from producing an
+    infinite series as a representation of a single term. Most of
+    mathematics seems to erupt from the division of one polynomial by
+    another.

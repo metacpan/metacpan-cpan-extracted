@@ -1,0 +1,9 @@
+Revision history for Perl extension Math::SymbolicX::Calculator.
+
+0.02  Sun May 26 11:11 2013
+    - Move POD tests to xt.
+    - Fix POD encoding issue.
+
+0.01  Tue Dec 12 13:52 2006
+    - original version
+

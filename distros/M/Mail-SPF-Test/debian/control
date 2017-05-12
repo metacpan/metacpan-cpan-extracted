@@ -1,0 +1,18 @@
+Source: mail-spf-test-perl
+Section: mail
+Priority: extra
+Maintainer: Julian Mehnle <julian@mehnle.net>
+Build-Depends: debhelper (>= 5)
+Build-Depends-Indep: perl (>= 5.6), libmodule-build-perl (>= 0.26), libversion-perl
+Standards-Version: 3.7.2
+
+Package: libmail-spf-test-perl
+Section: perl
+Architecture: all
+Depends: perl (>= 5.6), libversion-perl, libnetaddr-ip-perl (>= 4), libnet-dns-perl (>= 0.58), libyaml-perl (>= 0.50), ${misc:Depends}
+Description: Perl class for reading and manipulating SPF test-suite data
+ Mail::SPF::Test is a Perl class for for reading and manipulating SPF test-
+ suite data.
+ .
+ See <http://www.openspf.org/Test_Suite> for information about the SPF test-
+ suite.  See <http://www.openspf.org> for information about SPF.

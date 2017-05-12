@@ -1,0 +1,27 @@
+---
+abstract: 'The MooseFS Info API!'
+author:
+  - 'chenryn <rao.chenlin@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseFS
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  IO::Socket::INET: 0
+  Moo: 0
+  perl: 5.006
+resources:
+  repository: https://github.com/chenryn/perl-moosefs
+version: 0.04

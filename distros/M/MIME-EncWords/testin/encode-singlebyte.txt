@@ -1,0 +1,51 @@
+GOOD
+("Oc\xE9 3165 Network Copier down for maintenance", Charset => "iso-8859-1")
+=?ISO-8859-1?Q?Oc=E9?= 3165 Network Copier down for maintenance
+
+GOOD
+("Keith Moore <moore\@cs.utk.edu>", Charset => "iso-8859-1")
+Keith Moore <moore@cs.utk.edu>
+
+GOOD
+([["Keld J\xF8rn Simonsen"],[" "],["<keld\@dkuug.dk>"]], Charset => "iso-8859-1")
+=?ISO-8859-1?Q?Keld_J=F8rn_Simonsen?= <keld@dkuug.dk>
+
+GOOD
+([["Andr\xE9 "],["(<- one space) Pirard"],[" "],["<PIRARD\@vm1.ulg.ac.be>"]], Charset => "iso-8859-1")
+=?ISO-8859-1?Q?Andr=E9_=28=3C-?= one space) Pirard <PIRARD@vm1.ulg.ac.be>
+
+GOOD
+([["Andr\xE9"],[" (<- one space) Pirard"],[" "],["<PIRARD\@vm1.ulg.ac.be>"]], Charset => "iso-8859-1")
+=?ISO-8859-1?Q?Andr=E9?= (<- one space) Pirard <PIRARD@vm1.ulg.ac.be>
+
+GOOD
+([["Andr\xE9  "],["(<- two spaces) Pirard"],[" "],["<PIRARD\@vm1.ulg.ac.be>"]], Charset => "iso-8859-1")
+=?ISO-8859-1?Q?Andr=E9__=28=3C-?= two spaces) Pirard <PIRARD@vm1.ulg.ac.be>
+
+GOOD
+([["Andr\xE9 "],[" (<- two spaces) Pirard"],[" "],["<PIRARD\@vm1.ulg.ac.be>"]], Charset => "ISO-8859-1")
+=?ISO-8859-1?Q?Andr=E9_?= (<- two spaces) Pirard <PIRARD@vm1.ulg.ac.be>
+
+GOOD
+([["Andr\xE9"],["  (<- two spaces) Pirard"],[" "],["<PIRARD\@vm1.ulg.ac.be>"]], Charset => "iso-8859-1")
+=?ISO-8859-1?Q?Andr=E9?=  (<- two spaces) Pirard <PIRARD@vm1.ulg.ac.be>
+
+GOOD
+("Network Copier Oc\xE9 3165 down for maintenance", Charset => "iso-8859-1")
+Network Copier =?ISO-8859-1?Q?Oc=E9?= 3165 down for maintenance
+
+GOOD
+("La r\xE9alisation du Syst\xE8me de R\xE9f\xE9rence C\xE9leste", Charset => "iso-8859-1")
+La =?ISO-8859-1?Q?r=E9alisation?= du =?ISO-8859-1?Q?Syst=E8me?= de
+ =?ISO-8859-1?Q?R=E9f=E9rence_C=E9leste?=
+
+GOOD
+("Th\xE8me tr\xE8s important\xA0: La r\xE9alisation du Syst\xE8me de R\xE9f\xE9rence C\xE9leste", Charset => "iso-8859-1")
+=?ISO-8859-1?Q?Th=E8me_tr=E8s_important=A0=3A?= La =?ISO-8859-1?Q?r=E9alis?=
+ =?ISO-8859-1?Q?ation?= du =?ISO-8859-1?Q?Syst=E8me?= de =?ISO-8859-1?Q?R?=
+ =?ISO-8859-1?Q?=E9f=E9rence_C=E9leste?=
+
+GOOD
+("_-_")
+_-_
+

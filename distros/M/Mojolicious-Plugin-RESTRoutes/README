@@ -1,0 +1,163 @@
+NAME
+
+    Mojolicious::Plugin::RESTRoutes - routing helper for RESTful operations
+
+VERSION
+
+    version 1.0.0
+
+DESCRIPTION
+
+    This Mojolicious plugin adds a routing helper for REST
+    <http://en.wikipedia.org/wiki/Representational_state_transfer>ful CRUD
+    <http://en.wikipedia.org/wiki/Create,_read,_update_and_delete>
+    operations via HTTP to the app.
+
+    The routes are intended, but not restricted to be used by AJAX
+    applications.
+
+MOJOLICIOUS SHORTCUTS
+
+ rest_routes
+
+    Can be used to easily generate the needed RESTful routes for a
+    resource.
+
+        my $r = $self->routes;
+        my $userroute = $r->rest_routes(name => 'user');
+    
+        # Installs the following routes (given that $r->namespaces == ['My::Mojo']):
+        #    GET /users                      --> My::Mojo::User::rest_list()
+        #   POST /users                      --> My::Mojo::User::rest_create()
+        #    GET /users/:userid              --> My::Mojo::User::rest_show()
+        #    PUT /users/:userid              --> My::Mojo::User::rest_update()
+        # DELETE /users/:userid              --> My::Mojo::User::rest_remove()
+
+    Please note: the english plural form of the given name attribute will
+    be used in the route, i.e. "users" instead of "user". If you want to
+    specify another string, see parameter route below.
+
+    You can also chain rest_routes:
+
+        $userroute->rest_routes(name => 'hat', readonly => 1);
+    
+        # Installs the following additional routes:
+        #    GET /users/:userid/hats         --> My::Mojo::Hat::rest_list()
+        #    GET /users/:userid/hats/:hatid  --> My::Mojo::Hat::rest_show()
+
+    The target controller has to implement the following methods:
+
+      * rest_list
+
+      * rest_create
+
+      * rest_show
+
+      * rest_update
+
+      * rest_remove
+
+    Parameters to control the route creation
+
+    name
+
+      The name of the resource, e.g. a "user", a "book" etc. This name will
+      be used to build the route URL as well as the controller name (see
+      example above).
+
+    readonly (optional)
+
+      If set to 1, no create/update/delete routes will be created
+
+    controller (optional)
+
+      Default behaviour is to use the resource name to build the CamelCase
+      controller name (this is done by Mojolicious::Routes::Route). You can
+      change this by directly specifying the controller's name via the
+      controller attribute.
+
+      Note that you have to give the real controller class name (i.e.
+      CamelCased or whatever you class name looks like) including the full
+      namespace.
+
+          $r->rest_routes(name => 'user', controller => 'My::Mojo::Person');
+      
+          # Installs the following routes:
+          #    GET /users         --> My::Mojo::Person::rest_list()
+          #    ...
+
+    route (optional)
+
+      Specify a name for the route, i.e. prevent automatic usage of english
+      plural form of the name parameter as the route component.
+
+          $r->rest_routes(name => 'angst', route => 'aengste');
+      
+          # Installs the following routes (given that $r->namespaces == ['My::Mojo']):
+          #    GET /aengste       --> My::Mojo::Angst::rest_list()
+
+    How to retrieve the parameters / IDs
+
+    There are two ways to retrieve the IDs given by the client in your
+    rest_show, rest_update and rest_remove methods.
+
+    Example request: GET /users/5/hats/no9
+
+    1. New way: the stash entry fm.ids holds a hash with all ids:
+
+        package My::Mojo::Hats;
+        use Mojo::Base 'Mojolicious::Controller';
+    
+        sub rest_show {
+            use Data::Dump qw(dump);
+            print dump($self->stash('fm.ids'));
+    
+            # { user => 5, hat => 'no9' }
+        }
+
+    2. Old way: for each resource there will be a parameter ***id, e.g.:
+
+        package My::Mojo::Hat;
+        use Mojo::Base 'Mojolicious::Controller';
+    
+        sub rest_show {
+            my ($self) = @_;
+            my $user = $self->param('userid');
+            my $hat = $self->param('hatid');
+            return $self->render(text => "$userid, $hatid");
+    
+            # text: "5, no9"
+        }
+
+    Furthermore, the parameter idname holds the name of the last ID in the
+    route:
+
+        package My::Mojo::Hat;
+        use Mojo::Base 'Mojolicious::Controller';
+    
+        sub rest_show   {
+            my $p_name = $self->param('idname');
+            my $id = $self->param($p_name);
+            return $self->render(text => sprintf("%s = %s", $p_name, $id || ''));
+    
+            # text: "hatid = 5"
+        }
+
+METHODS
+
+ register
+
+    Adds the routing helper (called by Mojolicious).
+
+AUTHOR
+
+    Jens Berthold <cpan@jebecs.de>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2017 by Jens Berthold.
+
+    This is free software, licensed under:
+
+      The MIT (X11) License
+

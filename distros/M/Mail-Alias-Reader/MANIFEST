@@ -1,0 +1,17 @@
+COPYRIGHT
+examples/aliases
+examples/forward
+lib/Mail/Alias/Reader.pm
+lib/Mail/Alias/Reader/Parser.pm
+lib/Mail/Alias/Reader/Token.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+scripts/aliases.pl
+scripts/forward.pl
+t/main.t
+t/parser.t
+t/token.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

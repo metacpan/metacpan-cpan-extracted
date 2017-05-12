@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b37d4b2b73ec83bd14e2ca6581720e730ca248ba COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 52bcf11efcc5a86bd42d6b7ceb2905e644653d1f Changes
+SHA1 454cd467cc44ae7eb7a6878cbe874fc7923528d2 INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 3c9b22d192d1f94adc6259030f932f50305e8d25 MANIFEST
+SHA1 50b4042a5a5665acb5043da0ed3ee97f170956b8 META.json
+SHA1 cb24318d271753d9fb8526bf9d027791309fddb7 META.yml
+SHA1 511116a2d064e99fe25417ed5fee7939545485b8 Makefile.PL
+SHA1 69fe0333616c27deebe040b1a47164301623d916 README
+SHA1 697d33139927409bfd2b9c34c1428bf6e49a719a dist.ini
+SHA1 8dc3bccd04733bffe300aedeb489f11df790ffd4 doap.ttl
+SHA1 480e111425e4d516a2fb563044f223dd82f824ce lib/MooseX/Types/MoreUtils.pm
+SHA1 e06562c0745478f753e44f83fe0a844d26f5f622 t/01basic.t
+SHA1 602b4eef022e63d7498b47d6b95f43193cad2c30 t/02plus_coercions.t
+SHA1 56e3655e90e8fe1ea104c6903285c0fa6d558ba9 t/03plus_coercions_mxt.t
+SHA1 a879b73f8db32a7531baf6cdde9505c807a5ee8f t/04plus_coercions_tt.t
+SHA1 070c1989e8ef9d73f8cff878c7a7518c7baf268c t/05minus_coercions.t
+SHA1 3a75aa3e75c3d210cd22a125c7ebbe4eb1ad6c19 t/06minus_coercions_mxt.t
+SHA1 48c87911ff008a70d351effbae68ce0303afa271 t/07minus_coercions_tt.t
+SHA1 ca4eada99e2f93eef7c26a88112547fd03f1e889 t/08no_coercions.t
+SHA1 a58146d2c8a5bcf841b76c463a0eab3c45c92cbf t/09no_coercions_mxt.t
+SHA1 155f9e0d4da2eef9eca8feb70790a2084c670ece t/10no_coercions_tt.t
+SHA1 4b92ecd567065f0cd87efc9225611a506f719b16 t/11of.t
+SHA1 078c2b8e3fce4e3ccf229cd86a8fa80b1d49cb6c t/12of_mxt.t
+SHA1 5f8292225bfbca416fc02dda12ec235ac0dfbebf t/13of_tt.t
+SHA1 4eb4bdff9fc03226a032de430ee8c349bd99e2bd t/14where.t
+SHA1 ffec1df8fcdd71496fbfbf71aa2b1e54516be8f7 t/15where_mxt.t
+SHA1 8f455bfd496ac7bdc655c8eced6dca7fe3bdbc5d t/16where_tt.t
+SHA1 15ddf78108d95fc6319679782823c1299dd1a735 t/17type.t
+SHA1 a056c8109634c64c49d8e1379847389a980a0cf2 t/lib/Local/StdTests.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQ0QbQACgkQzr+BKGoqfTlIxgCdEGgjU2o8w5sburRxVT731QcJ
+IFQAni9F8C9ScqF3NPcNrRraaR058BK5
+=RiEc
+-----END PGP SIGNATURE-----

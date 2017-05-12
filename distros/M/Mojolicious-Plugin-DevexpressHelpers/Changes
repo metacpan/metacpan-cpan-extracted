@@ -1,0 +1,41 @@
+Revision history for Mojolicious-Plugin-DevexpressHelpers
+
+0.163572  2016-12-22 17:22:16+01:00 Europe/Paris
+        dist.ini - add README and LICENSE (by removing @Basic)
+0.163571  2016-12-22 13:23:56+01:00 Europe/Paris
+        automatically specify name attribut rather than specifying in inputAttr
+0.163570  2016-12-22 11:39:20+01:00 Europe/Paris
+        breaking change : Replace attr by inputAttr for 16.2 compatibility (not backward compatibility)
+0.162360  2016-08-23 09:58:21+02:00 Europe/Paris
+        Upgrade to Mojolicious::Plugin::AssetPack 1.20.
+0.160822  2016-03-22 15:34:48+01:00 Europe/Paris
+        Add a prependTo/appendTo option to dxbind, so it can attach a 
+          control to an already existing tag, using jQuery selector syntax.
+        Add a js_prefix option to dxbuild to customize javascript wrapper.
+        Fix typo on TextArea\d
+        Add dxform specifics
+        Add more controls.
+0.153360  2015-12-02 09:39:58+01:00 Europe/Paris
+        Add prepend_js and append_js helpers
+0.153350  2015-12-01 13:26:30+01:00 Europe/Paris
+        Add all other controls as generic controls.
+0.152460  2015-09-03 17:02:55+02:00 Europe/Paris
+
+0.152320  2015-08-20 15:59:07+02:00 Europe/Paris
+        Add dxselectbox helper + indent_binding
+0.151552  2015-06-04 16:08:06+02:00 Europe/Paris
+        Add dxloadpanel helper
+0.151550_000 2015-06-04 13:20:25+02:00 Europe/Paris (TRIAL RELEASE)
+        Add dxmenu helper
+0.151530  2015-06-02 16:12:27+02:00 Europe/Paris
+        Add dxlookup helper
+0.151480  2015-05-28 12:14:46+02:00 Europe/Paris
+        Decode ByteStream to utf-8 characters by default
+        Take in account dot in id for jquery
+        Add more dx-controls.
+        Review prereqs
+0.151410  2015-05-21 16:13:14+02:00 Europe/Paris
+        Add dxpopup helper, modify API to introduce id parameters.
+0.01    2015-05-04 17:05:22+02:00 Europe/Paris
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,232 @@
+#!/usr/bin/perl5
+#
+# $Id: mqini2chl,v 33.4 2012/09/26 16:15:22 jettisu Exp $
+#
+# (c) 2001-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+use strict;
+use English;
+use Getopt::Long;
+
+use MQSeries::Config::ChannelTable;
+
+our %Args = (version => 7);
+
+GetOptions( \%Args, qw(version=i debug!) ) || usage();
+
+my ($InputFile,$OutputFile) = @ARGV;
+
+print "Parsing input file $InputFile\n";
+
+my @channels = parseInput($InputFile);
+
+print "Writing channel table $OutputFile\n";
+
+MQSeries::Config::ChannelTable->writeFile
+  (
+   Filename             => $OutputFile,
+   Version              => $Args{version},
+   Clntconn             => \@channels,
+  );
+
+exit 0;
+
+
+sub parseInput {
+    my ($file) = @_;
+
+    my @data = ();
+    my $stanza;
+
+    open(FILE, '<', $file) || die "Unable to open $file: $!\n";
+
+    while ( <FILE> ) {
+
+        next if (/^\#/ || /^\s*$/); # Skip comments, blank lines
+
+        if ( /^(\S+):/ ) {
+            push(@data,$stanza) if defined $stanza;
+            $stanza = { ChannelName => $1 };
+            next;
+        }
+
+        #
+        # A data line belongs to a stanza and looks like 'Prefix=/var/mqm'
+        #
+        if ( /^\s*(\S+)=(.*)/ ) {
+            my ($key, $value) = ($1, $2);
+            die "Have data line before first stanza in [$file]: $_"
+              unless (defined $stanza);
+
+            next if $key eq 'ChannelName';
+
+            if ( defined $stanza->{$key} ) {
+                if ( ref $stanza->{$key} eq 'ARRAY' ) {
+                    push( @{$stanza->{$key}}, $value );
+                } else {
+                    $stanza->{$key} = [ $stanza->{$key}, $value ];
+                }
+            } else {
+                $stanza->{$key} = $value;
+            }
+
+        }
+
+    }
+
+    push(@data,$stanza);
+
+    close(FILE);
+
+    return @data;
+}
+
+
+sub usage {
+    die <<"EndOfUsage";
+mqini2chl inputfile outputfile [ -version "4 | 6" | "7"] [ -debug ]
+EndOfUsage
+}
+
+__END__
+
+=head1 NAME
+
+mqini2chl - Write an MQSeries client channel table using a text configuration file
+
+=head1 SYNOPSIS
+
+mqini2chl inputfile outputfile [ -version "4 | 6" | "7" ]
+
+=head1 DESCRIPTION
+
+mqini2chl is used to manage MQSeries client channel table files
+directly, without requiring a running queue manager to create them.
+The inputfile is a simple, text format stanza file, similar to the
+other "*.ini" files used to manage MQSeries (eg. mqs.ini, qm.ini,
+etc).
+
+This is a very powerful mechanism for managing multiple client channel
+table files, since you can maintain (or autogenerate) the ini files
+and then easily create more than one version.  This is significantly
+more complex if do things the IBM way, and use a queue manager to
+create these files.
+
+=head1 OPTIONS
+
+=head2 -version "4 | 6"
+
+This specifies the version of the channel table to write.  Currently,
+only version 4 (MQSeries 5.0) or version 6 (MQSeries 5.1 and later)
+are supported.  By default, a version 4 file is written.
+
+Note that this will fail is you specify more than one of any of the
+following attributes:
+
+  MsgExit
+  MsgUserData
+  SendExit
+  SendUserData
+  ReceiveExit
+  ReceiveUserData
+
+These can only be a list if a version 6 file is written.
+
+NOTE: According to IBM, and if you read carefully, the MQSeries
+documentation, ChannelType=Clntconn does B<NOT> support MsgExits at
+all.  However, you can define them (try it in runmqsc), and they do
+get written into the channel table file, although you can not display
+them.  Yet another ugly facet of this product.
+
+=head1 FILE FORMAT
+
+The stanza format of the ini file should not be particularly shocking
+to anyone who has worked with MQSeries, since the format is stolen
+from the mqs.ini and qm.ini files.  Not because this is the best
+format for such data, but simply to allow the administrators to
+experience that warm and fuzzy feeling of familiarity when working
+with the file.
+
+Any line starting with a '#' is a comment, and as one might imagine,
+completely ignored.
+
+Each individual stanza has a master key, which is single word (no
+embedded whitespace) ending in a ':'.  This is interpreted as the
+ChannelName of the CLNTCONN represented by the stanza.
+
+The rest of the stanza are key/value pairs, with the key and value
+seperated by a single '=' sign.  The only supported keys are those
+which represent members of the MQCD data structure relevant for a
+CLNTCONN definition.  The values depend on the specific key, but they
+may contain embedded white space.  Everything after the '=' will be
+interpreted as part of the value.
+
+The first stanza in the file should be the SYSTEM.DEF.CLNTCONN, and
+any key/value pairs specified here will be assumed to be defaults for
+all of the other stanzas.  Thus, if all or most of your CLNTCONN
+definitions have a MaxMsgLength of 20000, then specify it here, and
+omit that definition from the rest of the stanzas in the file.
+
+This is best understood by looking at the following example:
+
+  #
+  # Default to TCP and 4MB messages
+  #
+  SYSTEM.DEF.CLNTCONN:
+     TransportType=TCP
+     MaxMsgLength=4194304
+
+  SNP1:
+     ChannelDesc=Client Connection to SNP1
+     QMgrName=SNP1
+     SecurityExit=/ms/dist/mq/exits/libkrb5exit.so(exitFunc)
+     SecurityUserData=2, unix
+     ConnectionName=snsmq1(16672)
+
+  SAT98:
+     ChannelDesc=Client Connection to SAT98
+     QMgrName=SAT98
+     SecurityExit=/ms/dist/mq/exits/libkrb5exit.so(exitFunc)
+     SecurityUserData=0, unix
+     ConnectionName=sasmq4(25025)
+
+The keys which are supported are:
+
+  Key                   Value (Max Length of strings)
+  ===                   =====
+  TransportType         String (see below)
+  ChannelDesc           String (64)
+  QMgrName              String (48)
+  ModeName              String (8)
+  TpName                String (64)
+  SecurityExit          String (128)
+  MsgExit               String (128)
+  SendExit              String (128)
+  ReceiveExit           String (128)
+  MaxMsgLength          Number
+  SecurityUserData      String (32)
+  MsgUserData           String (32)
+  SendUserData          String (32)
+  ReceiveUserData       String (32)
+  UserIdentifier        String (12)
+  Password              String (12)
+  ConnectionName        String (264)
+
+Note that the ChannelName is implicit, since that is the master key
+for each stanza.  The Version is not specified, since one can
+typically generate either a V4 or V6 file with the same input (unless
+you use more than one MsgExit, SendExit or ReceiveExit.  See the notes
+on the -version option above).  The ChannelType is also not supported,
+since it only has one value anyway: "Clntconn".
+
+If any unsupported keys are given, then mqini2chl will die with a
+error message.
+
+=head1 SEE ALSO
+
+mqchl2ini(8), MQSeries::Config::ChannelTable(3)
+
+=cut
+

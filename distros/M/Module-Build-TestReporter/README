@@ -1,0 +1,31 @@
+Module::Build::TestReporter
+---------------------------
+
+1.00 Fri Jun 10 05:20:23 UTC 2005
+
+REQUIREMENTS
+   IPC::Open3
+   Class::Roles
+   Module::Build
+   SUPER         1.10
+   Test::Harness 2.47
+
+DESCRIPTION
+   Shipping test suites with your code is a good thing, as it helps your users
+   know that your code works as you expect on your systems and it allows you
+   better debugging information if things break in environments where you
+   haven't yet tested your code. However, it can be tedious and tricky to
+   convince your users to send you the appropriate failure information.
+
+   Module::Build::TestReporter extends and enhances Module::Build to collect
+   information on test failures and the Perl environment for users to send to
+   you. Rather than walking them through running tests in verbose mode on the
+   phone, in IRC, or via e-mail, use this module alongside your usual
+   Module::Build build process and it will gather this information in case of
+   failure.
+
+COPYRIGHT
+    Copyright (c) 2005, chromatic. Some rights reserved.
+
+    This module is free software; you can use, redistribute, and modify it
+    under the same terms as Perl 5.8.

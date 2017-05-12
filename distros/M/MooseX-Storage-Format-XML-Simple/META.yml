@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                MooseX-Storage-Format-XML-Simple
+version:             0.04
+abstract:            An XML::Simple serialization role
+license:             ~
+author:              
+    - Bruno Czekay <brunorc@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Moose::Role:                   0
+    MooseX::Storage:               0
+    Test::More:                    0
+    XML::Simple:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

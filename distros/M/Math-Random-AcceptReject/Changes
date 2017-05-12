@@ -1,0 +1,9 @@
+Revision history for Perl extension Math::Random::AcceptReject.
+
+0.01  Thu Jan  4 15:02 2007
+  - original version
+
+0.02  Thu Jan  5 16:21 2007
+  - Minor documentation tweaks.
+  - Computer-readable license statement in Makefile.PL
+

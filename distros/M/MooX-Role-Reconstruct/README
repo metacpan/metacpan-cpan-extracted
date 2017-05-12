@@ -1,0 +1,34 @@
+MooX-Role-Reconstruct version v0.1.1
+=========================
+
+Often one would like to retrieve a row from a database table or decode a
+JSON object and then use that as the params to "new" but the presence
+of "init_arg => undef" prevents that. This module allows one to do
+just that.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Sub::Quote
+Sub::Defer
+Role::Tiny
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014, Jim Bacon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.016002
+or, at your option, any later version of Perl 5 you may have available.

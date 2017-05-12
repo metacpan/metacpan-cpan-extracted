@@ -1,0 +1,261 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLTableElement
+
+=for object Mozilla::DOM::HTMLTableElement
+
+Mozilla::DOM::HTMLTableElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLTableElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLTableElement interface is the interface to a [X]HTML
+ * table element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLTableElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $retval = $htmltableelement->B<CreateCaption>()
+
+=head2 $retval = $htmltableelement->B<CreateTFoot>()
+
+=head2 $retval = $htmltableelement->B<CreateTHead>()
+
+=head2 $htmltableelement->B<DeleteCaption>()
+
+=head2 $htmltableelement->B<DeleteRow>($index)
+
+=over
+
+=over
+
+=item * $index (integer (long))
+
+=back
+
+=back
+
+=head2 $htmltableelement->B<DeleteTFoot>()
+
+=head2 $htmltableelement->B<DeleteTHead>()
+
+=head2 $align = $htmltableelement->B<GetAlign>()
+
+=head2 $bgcolor = $htmltableelement->B<GetBgColor>()
+
+=head2 $border = $htmltableelement->B<GetBorder>()
+
+=head2 $caption = $htmltableelement->B<GetCaption>()
+
+=head2 $cellpadding = $htmltableelement->B<GetCellPadding>()
+
+=head2 $cellspacing = $htmltableelement->B<GetCellSpacing>()
+
+=head2 $frame = $htmltableelement->B<GetFrame>()
+
+=head2 $rows = $htmltableelement->B<GetRows>()
+
+A collection of all the rows in the table, including all in THEAD,
+TFOOT, all TBODY elements (think of <tr>).
+
+$rows is a L<Mozilla::DOM::HTMLCollection|Mozilla::DOM::HTMLCollection>.
+
+In list context, returns a list of L<Mozilla::DOM::HTMLTableRowElement|Mozilla::DOM::HTMLTableRowElement>.
+
+=head2 $rules = $htmltableelement->B<GetRules>()
+
+=head2 $summary = $htmltableelement->B<GetSummary>()
+
+=head2 $tbodies = $htmltableelement->B<GetTBodies>()
+
+A collection of the table bodies (including implicit ones) (<tbody>).
+(I'm not sure what this is useful for.)
+
+$tbodies is a L<Mozilla::DOM::HTMLCollection|Mozilla::DOM::HTMLCollection>.
+
+In list context, returns a list of L<Mozilla::DOM::HTMLElement|Mozilla::DOM::HTMLElement>.
+(I didn't see a more specific HTML element to QueryInterface it to.)
+
+=head2 $tfoot = $htmltableelement->B<GetTFoot>()
+
+=head2 $thead = $htmltableelement->B<GetTHead>()
+
+=head2 $width = $htmltableelement->B<GetWidth>()
+
+=head2 $retval = $htmltableelement->B<InsertRow>($index)
+
+=over
+
+=over
+
+=item * $index (integer (long))
+
+=back
+
+=back
+
+=head2 $htmltableelement->B<SetAlign>($align)
+
+=over
+
+=over
+
+=item * $align (string)
+
+=back
+
+=back
+
+=head2 $htmltableelement->B<SetBgColor>($bgcolor)
+
+=over
+
+=over
+
+=item * $bgcolor (string)
+
+=back
+
+=back
+
+=head2 $htmltableelement->B<SetBorder>($border)
+
+=over
+
+=over
+
+=item * $border (string)
+
+=back
+
+=back
+
+=head2 $htmltableelement->B<SetCaption>($caption)
+
+=over
+
+=over
+
+=item * $caption (Mozilla::DOM::HTMLTableCaptionElement)
+
+=back
+
+=back
+
+=head2 $htmltableelement->B<SetCellPadding>($cellpadding)
+
+=over
+
+=over
+
+=item * $cellpadding (string)
+
+=back
+
+=back
+
+=head2 $htmltableelement->B<SetCellSpacing>($cellspacing)
+
+=over
+
+=over
+
+=item * $cellspacing (string)
+
+=back
+
+=back
+
+=head2 $htmltableelement->B<SetFrame>($frame)
+
+=over
+
+=over
+
+=item * $frame (string)
+
+=back
+
+=back
+
+=head2 $htmltableelement->B<SetRules>($rules)
+
+=over
+
+=over
+
+=item * $rules (string)
+
+=back
+
+=back
+
+=head2 $htmltableelement->B<SetSummary>($summary)
+
+=over
+
+=over
+
+=item * $summary (string)
+
+=back
+
+=back
+
+=head2 $htmltableelement->B<SetTFoot>($tfoot)
+
+=over
+
+=over
+
+=item * $tfoot (Mozilla::DOM::HTMLTableSectionElement)
+
+=back
+
+=back
+
+=head2 $htmltableelement->B<SetTHead>($thead)
+
+=over
+
+=over
+
+=item * $thead (Mozilla::DOM::HTMLTableSectionElement)
+
+=back
+
+=back
+
+=head2 $htmltableelement->B<SetWidth>($width)
+
+=over
+
+=over
+
+=item * $width (string)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

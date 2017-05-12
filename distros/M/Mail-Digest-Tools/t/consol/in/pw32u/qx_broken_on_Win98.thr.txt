@@ -1,0 +1,120 @@
+Thread:       qx_broken_on_Win98
+Message:      001_0002_0007
+From:         lang@some.web.address.com
+Text:
+
+qw// seems to be
+broken when perl is built with GNU tools, and dmake on Win98.
+Or is it something wrong with my system?
+
+here it is from a bash shell:
+
+Here is some id:
+C:\s\home\greg>perl -v
+
+C:\perl\bin>.\perl -e "qx/cd/"
+
+C:\perl\bin>.\perl -e "system( q/cd/ )"
+C:\perl\bin
+
+What do you make of this?
+
+-- 
+Greg Marlinson, TAiwan
+
+--__--__--
+
+Thread:       qx_broken_on_Win98
+Message:      001_0002_0008
+From:         Tobias Heinrich <thoellri@some.web.address.com>
+Text:
+
+Works fine, once you know what the difference between system and qx is (read
+"perldoc -f system" and "perldoc perlop" [search for `STRING` in the later
+one]). 
+
+(on FreeBSD):
+frisco% pwd
+/usr
+frisco% perl -v
+
+frisco% perl -e 'qx{pwd};'      
+frisco% perl -e 'print qx{pwd};'
+/usr
+frisco% 
+
+(on Windows XP):
+C:\>cd
+C:\
+
+Hope this helps
+ Tobias
+
+--__--__--
+
+Thread:       qx_broken_on_Win98
+Message:      001_0002_0009
+From:         Odysseus <kalinabears@some.web.address.com>
+Text:
+
+lang@some.web.address.com wrote:
+> qw// seems to be
+> broken when perl is built with GNU tools, and dmake on Win98.
+> Or is it something wrong with my system?
+> 
+> 	C:\cygwin\home\greg\smoke>cd
+> 	C:\cygwin\home\greg\smoke
+> 
+> 	C:\cygwin\home\greg\smoke>perl -e "qx/cd/"
+> 
+> 	C:\cygwin\home\greg\smoke>perl -e "system( q/cd/ )"
+> 	C:\cygwin\home\greg\smoke
+> 
+
+I get the same behaviour on Win2k, with both AS-built perl and 
+Mingw-built perl (cmd.exe shell).
+
+Should it be different ? (Not a rhetorical question ..... I don't know 
+the answer :-)
+
+Cheers,
+Rob
+
+--__--__--
+
+Thread:       qx_broken_on_Win98
+Message:      001_0002_0010
+From:         "Keith C. Dandelion" <kcivey@some.web.address.com>
+Text:
+
+lang@some.web.address.com wrote:
+
+> 	C:\cygwin\home\greg\smoke>perl -e "qx/cd/"
+> 
+> 	C:\cygwin\home\greg\smoke>perl -e "system( q/cd/ )"
+> 	C:\cygwin\home\greg\smoke
+> 
+> here it is from a bash shell:
+> 
+> 	greg@momotaro ~/smoke
+> 	$ perl -e 'qx/pwd/'  
+> 
+> 	greg@momotaro ~/smoke
+> 	$ perl -e 'system( "pwd" )'
+> 	/home/greg/smoke
+
+And?  What is it that you think is wrong?  Have you read the 
+documentation for qx()?  It's not the same as system() -- it's 
+the same as backticks.
+
+It's not impossible for something to be broken in perl, but 
+whenever you suspect it is, remember that it's orders of 
+magnitude more likely that what's broken is your program or 
+your understanding of the situation.
+
+-- 
+Keith C. Dandelion <kcivey@some.web.address.com>
+Washington, DC
+
+--__--__--
+

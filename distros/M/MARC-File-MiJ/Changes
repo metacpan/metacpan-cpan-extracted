@@ -1,0 +1,16 @@
+Revision history for MARC-MiJ
+
+0.04    2013/07/23
+        - fix test failure noise on some *BSD platforms
+
+0.03    2013/07/18
+        - list all dependencies to make automated testers happy
+
+0.02    2013/07/15
+        - Switch license to Perl license
+        - Add monkey patches (and tests) for ->to_mij, MARC::Record->new_from_mij
+        - Fix license and CPAN-links in documentation
+
+0.01    2013/07/11
+        First version, released on an unsuspecting world.
+

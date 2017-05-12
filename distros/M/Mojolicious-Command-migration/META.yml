@@ -1,0 +1,29 @@
+---
+abstract: 'MySQL migration tool for Mojolicious'
+author:
+  - 'Alexey Likhatskiy <likhatskiy\@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Command-migration
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBD::mysql: '0'
+  DBI: '0'
+  Getopt::Long: '0'
+  Mojolicious: '4'
+  SQL::Translator: '0'
+  SQL::Translator::Diff: '0'
+  Test::Simple: '0.44'
+  common::sense: '0'
+version: 0.15

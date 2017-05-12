@@ -1,0 +1,147 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+
+Mail::Abuse - A suite of tools to parse and process abuse reports
+
+Abuse desks  charged with the  task of responding to  abuse complaints
+against its users face a time consuming and complex challenge. It's my
+belief that  this is one of  the contributing reasons  for the general
+lack of  response that can be  observed in many  network operations in
+these days.
+
+I wrote this  module bundle to help with the first  steps of the abuse
+management process,  namely the correlation and  identification of the
+abuse sources within your own  network. This is discussed in much more
+detail  on  my  3   part  article  "Implementing  an  Effective  Abuse
+Management Process", published in  SysAdmin magazine on June, July and
+August 2005. You  should grab it if you have a  chance, as this series
+also includes a tutorial on how to set up your Mail::Abuse platform.
+
+This bundle includes various  modules with different purposes, as seen
+below:
+
+  Mail::Abuse		- Main class, where docs for the package are
+			  kept
+
+	::Report	- The "coordinator" class that encapsulates
+			  the read - parse - filter - process cycle
+			  automatically.
+
+	::Incident	- Base class for all the parsers. A parser can
+			  obtain individual incidents from a report by
+			  analyzing its text.
+
+		::*	- This package includes various incident
+			  parsers. New additions will be inclued in
+			  the Mail::Abuse manpage.
+
+	::Filter	- Base class for incident filters. This allows
+			  the software to discard incidents which are
+			  not interesting to you.
+
+		::*	- The incident filters that are included with
+			  this package.
+
+	::Reader	- Base class for all report readers. A reader
+			  fetches a message and adds it to a Report
+			  object so that the cycle can be executed.
+
+		::*	- The different readers included with this
+			  distribution. You'll be most interested in
+			  Mail::Abuse::Reader::POP3, which can detch
+			  reports from a POP3 mailbox.
+
+	::Processor	- The base class for all the
+			  processors. Processors can act on each
+			  individual report or incident.
+
+		::*	- The processors included in this bundle. 
+
+I would love  to see the maintainers from  log aggregation services to
+also  write  a  corresponding  ::Incident::myAggregator so  that  more
+people can start responding to their messages quickly.
+
+Additionally to the modules, a number of scripts that should be useful
+to people  managing abuse  desks is included.   See the  included bin/
+directory  for  more information,  as  each  script  includes its  own
+documentation. These  scripts are not  intended to abuse  or otherwise
+sabotage any  site or  facility. You should  seek permission  from the
+corresponding  site   owners  if  bulk  usage  of   these  scripts  is
+expected. You'll understand this warning a bit better when you look at
+the scripts.
+
+To install, follow the standard CPAN recipe of:
+
+$ perl Makefile.PL
+$ make
+$ make test
+
+If all tests pass, then do
+
+$ make install
+
+The test suite  includes a lot of cases.  Note  that all tests require
+Test::More. The  module's documentation  can be accessed  through POD.
+After installing the module, you can do
+
+$ perldoc Mail::Abuse
+
+to access the  documentation. Of course, there are  many other modules
+inside. Each one has its own documentation.
+
+Bug  reports  are  welcome. Please  do  not  forget  to tell  me  what
+version/platform are you running this code on. Providing a small piece
+of  code that  shows the  bug helps  me a  lot in  sorting it  out and
+possibly in writting more tests for the distribution. And *definitely*
+include the abuse report that caused the problem.
+
+Also, this code is intended to be strict and -w safe, so please report
+cases where warnings are generated so that I can fix them.
+
+Report your bugs to me (luismunoz@cpan.org).
+
+DO YOU WANT TO THANK ME?
+
+If  you consider this  a valuable  contribution, there  is a  web page
+where you can express your gratitude. Please see
+
+	http://mipagina.cantv.net/lem/thanks-en.html (English)
+	http://mipagina.cantv.net/lem/thanks-es.html (Spanish)
+
+SECURITY CONSIDERATIONS
+
+I  have  no control  on  the machanisms  involved  in  the storage  or
+transport  of this distribution.  This means  that I  cannot guarantee
+that  the distribution  you have  in your  hands is  indeed,  the same
+distribution I packed and uploaded.
+
+Along the distribution file, you should have a file with the extension
+".asc".   This  contains a  GPG  "detached  signature"  that makes  it
+impossible for anybody to alter  this distribution.  If security is of
+any concern to you, by all means verify the signature of this file and
+contact the author if any discrepancy is detected.
+
+You can find more information about this at the following URL
+
+             http://mipagina.cantv.net/lem/gpg/
+
+This  information includes  the correct  keys,  fingerprints, etc.Note
+that this README file should also be signed.
+
+LICENSE AND WARRANTY
+
+This software is (c) Luis E. Muñoz.  It can be used under the terms of
+the perl artistic license provided  that proper credit for the work of
+the  author is  preserved in  the form  of this  copyright  notice and
+license for this module.
+
+No warranty of any kind is  expressed or implied. This code might make
+your computer go up in a puff of black smoke.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.1 (Darwin)
+
+iD8DBQFELUbGQyDWGRI/hhARArTRAJ4mthg/GpLsVMuwvb/vEG2xMP5LNwCfa94s
+jcEAsr19Q3A0VHbkoMnkVU4=
+=RbOQ
+-----END PGP SIGNATURE-----

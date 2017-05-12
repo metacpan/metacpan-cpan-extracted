@@ -1,0 +1,11 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Microarray-GeneXplorer
+version:      0.11
+version_from: VERSION
+installdirs:  site
+requires:
+    Getopt::Long:                  0
+    GD:                            1.19
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

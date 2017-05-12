@@ -1,0 +1,100 @@
+{
+   "abstract" : "Internationalized Resource Identifier (IRI): Generic Syntax - Marpa Parser",
+   "author" : [
+      "Jean-Damien Durand <jeandamiendurand@free.fr>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MarpaX-RFC-RFC3987",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "English" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Synopsis" : "0",
+            "Test::Version" : "1",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Marpa::R2" : "0",
+            "Moo" : "0",
+            "MooX::ClassAttribute" : "0",
+            "Types::Standard" : "0",
+            "diagnostics" : "0",
+            "perl" : "5.006",
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "perl" : "5.006",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MarpaX::RFC::RFC3987" : {
+         "file" : "lib/MarpaX/RFC/RFC3987.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-MarpaX-RFC-RFC3987@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=MarpaX-RFC-RFC3987"
+      },
+      "homepage" : "https://metacpan.org/release/MarpaX-RFC-RFC3987",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jddurand/marpax-rfc-rfc3987.git",
+         "web" : "https://github.com/jddurand/marpax-rfc-rfc3987"
+      }
+   },
+   "version" : "0.001"
+}
+

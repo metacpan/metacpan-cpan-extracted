@@ -1,0 +1,14 @@
+Revision history for Perl extension ModPerl::VersionUtil.
+
+0.03  Thu Dec 28 14:58:00 2006
+      - Collectly Handle an external script called from a mod_perl 
+        (Craig Manley)
+      - Modified and added some tests for an external script
+
+0.02  Tue Jan 17 10:15:00 2006
+      - fix typo in the pod.
+
+0.01  Mon Jan 16 19:19:16 2006
+      - original version; created by h2xs 1.23 with options -X -A -n
+        ModPerl::VersionUtil
+

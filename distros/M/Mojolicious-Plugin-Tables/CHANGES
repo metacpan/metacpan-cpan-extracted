@@ -1,0 +1,96 @@
+commit 8c9d7e9422921fc4d62b956f5fb85705c4e5dad6
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Mon Mar 14 17:00:51 2016 +0000
+
+    refactor scripts, etc
+
+commit bcc68255998e412f39f2d84c32aec843369be2e8
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Mon Mar 14 13:11:07 2016 +0000
+
+    Update README.md
+
+commit f87cfac5ed6e157391fd79a3846a74d733d0f092
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Mon Mar 14 13:00:23 2016 +0000
+
+    README->README.md
+
+commit aed769098aff7896e53582c0a36ae378cc65758f
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Mon Mar 14 12:59:20 2016 +0000
+
+    Update README
+
+commit 86760a18b74de50a990e89927a88ed544a9d67f1
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Mon Mar 14 12:49:03 2016 +0000
+
+    fix test
+
+commit 70d62270c1185ac798b631dc78185214e1ed910e
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Mon Mar 14 12:25:43 2016 +0000
+
+    document TABLES_DEBUG
+
+commit 94346a46b83a8210c790b1b0b263566a18452e0d
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Mon Mar 14 12:14:56 2016 +0000
+
+    Create .travis.yml
+
+commit 38cc9ea9a1ebd2c94526275f4c062a0906e95cf9
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sun Mar 13 02:12:15 2016 +0000
+
+    typo
+
+commit dce83ba3e41f7557aecb278a393fda73600347a8
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sat Mar 12 16:55:19 2016 +0000
+
+    cleanup
+
+commit 6bf204e2df2e8745bac36155943ae743edb46d8a
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sat Mar 12 16:53:42 2016 +0000
+
+    add "template-override" facility
+
+commit 6c8e29e1cf082feb70e2fe78032aeedcc360a6b2
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Fri Mar 11 02:42:33 2016 +0000
+
+    distribution
+
+commit 2ef419d3443fb1b781d3b6c1e36d76892f9adacb
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Fri Mar 11 02:41:20 2016 +0000
+
+    Makefile.PL
+
+commit faa4d2921800ae71041f38ba9aee94b74e60f367
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Fri Mar 11 02:06:54 2016 +0000
+
+    introduce CHANGES
+
+commit 4da2adbb3881bdcbe171f42fd822a9ece81516d8
+Merge: 817e7f2 b33d1e4
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Fri Mar 11 02:05:52 2016 +0000
+
+    Merge branch 'master' of github.com:frank-carnovale/Mojolicious-Plugin-Tables
+
+commit 817e7f288fada01eca5a736f5df0c4fc2c0e66b2
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Fri Mar 11 02:03:54 2016 +0000
+
+    commit the first
+
+commit b33d1e484f3d244e661f49e7354033a7d6c9bb97
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Fri Mar 11 01:59:10 2016 +0000
+
+    Initial commit

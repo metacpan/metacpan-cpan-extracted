@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+  <head>
+    <title>Slow frame</title>
+    <script type="text/javascript"><!---
+function Wait()
+{
+    for ( var i = 0; i <= 65535; i++ ) {
+        var x = 0;
+        for ( var i = 0; i <= 65535; i++ ) { 
+            x += 5*i;
+        }
+    }
+}
+
+function SlowWrite( frame, str )
+{
+    Wait();
+    frame.writeln( str );
+    Wait();
+}
+
+function BuildRight( )
+{
+    var rf = top.frames.right;
+    var rd = rf.document;
+    rf.open;
+    Wait();
+    SlowWrite( rd, "<html>\n<head><title>Right Frame</title></head>" );
+    SlowWrite( rd, "<body>" );
+    SlowWrite( rd, "<h1>Constructed document</h1>" );
+    SlowWrite( rd, "Just another line" );
+    SlowWrite( rd, "</body>\n</html>" );
+//alert( 'Ready now' );
+//    rf.close;
+}
+// -->
+    </script>
+  </head>
+  <body onload="BuildRight()">
+    <h1>Left header</h1>
+    <p>Simple paragraph</p>
+  </body>
+</html>

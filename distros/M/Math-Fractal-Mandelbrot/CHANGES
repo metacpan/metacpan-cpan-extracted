@@ -1,0 +1,24 @@
+
+2006-02-27 v0.04 Tels - 12 tests
+  * remove unusued class arguments in XS code
+  * rename "class" to "myclass" in XS code to avoid clashes
+
+2005-11-06 v0.03 Tels - 12 tests
+  * update distribution with META.yml, pod tests
+  * add X<> keywords to POD
+  * fix POD errors (Thanx to the CPANTS project!)
+
+2003-01-18 v0.02 Tels - 12 tests
+  * Changed: point() now only gets $x and $y, please change your code!
+  * added: set_limit(), set_epsilon(), set_bounds(), set_max_iter()
+    (a set epsilon is currently ignored)
+  * added: hor_line(), ver_line()
+  * fixed INSTALL
+
+2003-01-14 v0.01 Tels - 4 tests
+  * First version (basically working)
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

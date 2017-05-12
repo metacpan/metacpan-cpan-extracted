@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<config>
+  <language name="Tamil" code="tam"/>
+  <detrans-fields>
+    <field tag="100">
+      <subfield code="a"/>
+      <subfield code="q"/>
+      <subfield code="d" copy="true"/>
+      <subfield code="n" copy="true"/>
+    </field>
+  </detrans-fields>
+  <rule>
+    <roman>k</roman>
+    <marc>க்</marc>
+  </rule>
+</config>

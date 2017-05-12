@@ -1,0 +1,14 @@
+Revision history for MooX::TypeTiny
+
+0.001003 - 2016-02-29
+  - fix error reporting for checks nested inside other attributes
+
+0.001002 - 2015-11-05
+  - bump Moo prereq for quotify function
+
+0.001001 - 2015-09-28
+  - bump Type::Tiny prereq to a version compatible with perl 5.10
+  - be compatible with older Moo versions
+
+0.001000 - 2015-08-28
+  - initial release

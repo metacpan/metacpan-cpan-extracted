@@ -1,0 +1,7 @@
+# TODO list for Perl module Mail::Log::Parse
+
+- [ ] Improve bounds checks for go_backward and go_forward methods.
+- [ ] Improve meanings of return values of go_backward and go_forward methods.
+- [ ] Look into what it would take to make this whole thing thread-safe.
+
+

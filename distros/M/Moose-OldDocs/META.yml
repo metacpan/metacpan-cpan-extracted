@@ -1,0 +1,21 @@
+---
+abstract: 'A distro that contains stubs for documentation which has moved.'
+author:
+  - 'Dave Rolsky <autarch@urth.org>'
+build_requires:
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Moose-OldDocs
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Moose-OldDocs
+  repository: git://git.moose.perl.org/Moose-OldDocs.git
+version: 0.04

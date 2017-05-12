@@ -1,0 +1,4 @@
+bar
+###before: @TEST@
+###after: @TEST@
+bar

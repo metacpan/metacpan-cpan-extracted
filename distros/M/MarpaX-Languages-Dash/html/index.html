@@ -1,0 +1,342 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Index of sample files created by MarpaX::Languages::Dash</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<meta http-equiv="cache-control" content="no-cache">
+	<meta http-equiv="pragma" content="no-cache">
+	<link rel="stylesheet" type="text/css" href="/assets/css/marpax/languages/dash/default.css">
+	<link rel="stylesheet" type="text/css" href="/assets/css/marpax/languages/dash/fancy.table.css">
+</head>
+<body>
+	<h1 align="center">Index of sample files created by <a href="http://metacpan.org/release/MarpaX-Languages-Dash">MarpaX::Languages::Dash</a> V 1.00.</h1>
+
+	<p>This demo was created as part of my article
+	<a href="http://savage.net.au/Ron/html/Conditional.preservation.of.whitespace.html">Conditional preservation of whitespace when parsing with Marpa::R2</a>.</p>
+
+	<p>More-or-less all the coding effort has gone into the problem of handling the various quoting rules (below).</p>
+
+	<p>I'm currently (2016-12-25) using <a href="http://metacpan.org/release/Marpa-R2">Marpa::R2</a> V 3.</p>
+
+<hr />
+
+	<p>All input files and output files required to generate these examples are shipped in the MarpaX::Languages::Dash distro.</p>
+
+<hr />
+
+	<p align = "center">Herewith a brief summary of the syntax.<br>
+	This syntax is a cut-down version of Graphviz's <a href = "http://www.graphviz.org/content/dot-language">DOT language</a>.<br>
+	Some sample data might not be acceptable to <a href="http://graphviz.org">Graphviz</a>.
+	If it is, there will be an image on the right-hand-side.</p>
+
+	<table align = "center" border = "1">
+	<tr>
+		<th align = "left">Element</th><th align = "left">Syntax</th>
+	</tr>
+	<tr>
+		<td>Edge names</td><td>Either '->' or '--'.</td>
+	</tr>
+	<tr>
+		<td>Node names</td><td>
+1: Delimited by '[' and ']'.<br>
+2: May be quoted with " or '.<br>
+3: Escaped characters, using '\', are allowed.<br>
+4: Internal spaces in node names are preserved even if not quoted.</td>
+	</tr>
+	<tr>
+		<td>Both edges and nodes can have attributes.</td>
+	</tr>
+	<tr>
+		<td>Attributes</td><td>
+1: Delimited by '{' and '}'.<br>
+2: Within that, any number of "key : value" pairs separated by ';'.<br>
+3: Values may be quoted with " or ' or '&lt;...&gt;' or '&lt;&lt;table&gt;...&lt;/table&gt;&gt;'.<br>
+4: Escaped characters, using '\', are allowed.<br>
+5: Internal spaces in attribute values are preserved even if not quoted.</td>
+	</tr>
+	</table>
+
+<br>
+
+<table border = "1">
+<tr>
+  <td>Input file # 1 - data/edge.01.dash:<br /># Edge with attributes. OK.<br />-&gt; {color:cornflowerblue; label: This edge&#39;s color is blueish ;}</td>
+  <td># Edge with attributes. OK.<br /><object data = "./edge.01.svg"></object><br />Output file # 1 - html/edge.01.svg</td>
+</tr>
+<tr>
+  <td>Input file # 2 - data/edge.02.dash:<br /># Juxtaposed edges (without comma) with attributes. OK.<br />-- {color: cornflowerblue; label: Top row\nBottom row}<br />-- {color:red; label: Edges use cornflowerblue and red}</td>
+  <td># Juxtaposed edges (without comma) with attributes. OK.<br /><object data = "./edge.02.svg"></object><br />Output file # 2 - html/edge.02.svg</td>
+</tr>
+<tr>
+  <td>Input file # 3 - data/edge.03.dash:<br /># Edge followed by node. OK.<br />-&gt; [node.1]{label: \N }</td>
+  <td># Edge followed by node. OK.<br /><object data = "./edge.03.svg"></object><br />Output file # 3 - html/edge.03.svg</td>
+</tr>
+<tr>
+  <td>Input file # 4 - data/edge.04.dash:<br /># Edges with fancy arrows. OK.<br />[node.1] {label:   Node  1} -&gt; {arrowhead: box;     dir: forward; label: A box}      [node.2]{color:blue}<br />[node.3] {label: &#39;Node  3&#39;} -&gt; {arrowhead: crow;    dir: forward; label: A crow}     [node.4]{color:blue}<br />[node.5] {label: &quot;Node  5&quot;} -&gt; {arrowhead: diamond; dir: forward; label: A diamond}  [node.6]{color:blue}<br />[node.7] {label: &lt;Node  7&gt;} -&gt; {arrowhead: veevee;  dir: forward; label: A veevee}   [node.8]{color:blue}<br />[node.9] {label:   Node  9} -&gt; {arrowhead: teetee;  dir: forward; label: A teetee}  [node.10]{color:blue}</td>
+  <td># Edges with fancy arrows. OK.<br /><object data = "./edge.04.svg"></object><br />Output file # 4 - html/edge.04.svg</td>
+</tr>
+<tr>
+  <td>Input file # 5 - data/edge.05.dash:<br /># Edge with attributes. OK.<br />-&gt; {color:cornflowerblue; label: Use various escaped chars (\&#39; \&quot; \&lt; \&gt;) in label}</td>
+  <td># Edge with attributes. OK.<br /><object data = "./edge.05.svg"></object><br />Output file # 5 - html/edge.05.svg</td>
+</tr>
+<tr>
+  <td>Input file # 6 - data/edge.06.dash:<br /># Juxtaposed edges (without any spacing) without attributes. OK.<br />------</td>
+  <td># Juxtaposed edges (without any spacing) without attributes. OK.<br /><object data = "./edge.06.svg"></object><br />Output file # 6 - html/edge.06.svg</td>
+</tr>
+<tr>
+  <td>Input file # 7 - data/graph.01.dash:<br /># Ends with edge without attributes. OK.<br />[node.1]{color: red; label: Node A}<br />-&gt;{color: green; label: Edge B;}<br />-&gt;{color: red; label: Edge C C ; }<br />[node.2]<br />-&gt;</td>
+  <td># Ends with edge without attributes. OK.<br /><object data = "./graph.01.svg"></object><br />Output file # 7 - html/graph.01.svg</td>
+</tr>
+<tr>
+  <td>Input file # 8 - data/graph.02.dash:<br /># Juxtapositioned edges (without comma). OK.<br />[node] {label: &quot;n 1&quot;}<br />-&gt; {label: &#39;e 1&#39;}<br />-&gt; {label: e 2}<br />[] {label: n 2}<br />-&gt; {label  :  e 3}</td>
+  <td># Juxtapositioned edges (without comma). OK.<br /><object data = "./graph.02.svg"></object><br />Output file # 8 - html/graph.02.svg</td>
+</tr>
+<tr>
+  <td>Input file # 9 - data/graph.03.dash:<br /># Juxtapositioned edges (with and without commas). OK.<br />[node.1] {label: &quot;n 1&quot;}<br />-&gt; {label: &#39;e 1&#39;}<br />-&gt; {label: e 2}<br />[] {label: n 2}<br />-&gt; {label  :  e 3}<br />[node.3] {label: &quot;n 3&quot;}<br />-&gt; {label: &#39;e 4&#39;},<br />-&gt; {label: e 5}<br />[] {label: n 2}<br />-&gt; {label  :  e 6}</td>
+  <td># Juxtapositioned edges (with and without commas). OK.<br /><object data = "./graph.03.svg"></object><br />Output file # 9 - html/graph.03.svg</td>
+</tr>
+<tr>
+  <td>Input file # 10 - data/graph.04.dash:<br /># Juxtapositioned edges (-&gt; -&gt; twice). OK.<br />-&gt;<br />-&gt;<br /><br />[node]<br />[node] -&gt;<br />-&gt; {label: Start} -&gt; {color: red} [node.1] {color: green} -&gt; [node.2]<br />[node.1] [node.2] [node.3]<br /><br />[]<br />[node.1]<br />[node 1]<br />[\[node\]]<br />[&quot;node&quot;]<br />[     From here     ] -&gt; [     To there     ]</td>
+  <td># Juxtapositioned edges (-> -> twice). OK.<br /><object data = "./graph.04.svg"></object><br />Output file # 10 - html/graph.04.svg</td>
+</tr>
+<tr>
+  <td>Input file # 11 - data/node.01.dash:<br /># Anonymous node. OK.<br />[]</td>
+  <td># Anonymous node. OK.<br /><object data = "./node.01.svg"></object><br />Output file # 11 - html/node.01.svg</td>
+</tr>
+<tr>
+  <td>Input file # 12 - data/node.02.dash:<br /># Named node with space. OK.<br />[Perl 6] {color: red}</td>
+  <td># Named node with space. OK.<br /><object data = "./node.02.svg"></object><br />Output file # 12 - html/node.02.svg</td>
+</tr>
+<tr>
+  <td>Input file # 13 - data/node.03.dash:<br /># Anonymous node with attributes. OK.<br />[]{color:red}</td>
+  <td># Anonymous node with attributes. OK.<br /><object data = "./node.03.svg"></object><br />Output file # 13 - html/node.03.svg</td>
+</tr>
+<tr>
+  <td>Input file # 14 - data/node.04.dash:<br /># Juxtaposed nodes (without comma) with attributes. OK.<br />[node.1]{label: A and B}<br />[node.2]{label : A or B}</td>
+  <td># Juxtaposed nodes (without comma) with attributes. OK.<br /><object data = "./node.04.svg"></object><br />Output file # 14 - html/node.04.svg</td>
+</tr>
+<tr>
+  <td>Input file # 15 - data/node.05.dash:<br /># Named node, with spaces. OK.<br />[    node.1    ]</td>
+  <td># Named node, with spaces. OK.<br /><object data = "./node.05.svg"></object><br />Output file # 15 - html/node.05.svg</td>
+</tr>
+<tr>
+  <td>Input file # 16 - data/node.06.dash:<br /># Named node with attributes, with spaces. OK.<br />[  node.1 ]       { label : &#39;                  A     Z               &#39;  }</td>
+  <td># Named node with attributes, with spaces. OK.<br /><object data = "./node.06.svg"></object><br />Output file # 16 - html/node.06.svg</td>
+</tr>
+<tr>
+  <td>Input file # 17 - data/node.07.dash:<br /># Named node with attributes, with spaces. OK.<br />   [ node.1 ] {  label  :  Flight Path from Melbourne to London  }</td>
+  <td># Named node with attributes, with spaces. OK.<br /><object data = "./node.07.svg"></object><br />Output file # 17 - html/node.07.svg</td>
+</tr>
+<tr>
+  <td>Input file # 18 - data/node.08.dash:<br /># Complete graph. OK.<br />[node.1]<br />-&gt; {arrowhead: odot; arrowtail: ediamond; color: green; dir: both; label: A 1; penwidth: 1}<br />-&gt; {color: blue; label: B 2; penwidth: 3}<br />-&gt; {arrowhead: box; arrowtail: invdot; color: maroon; dir: both; label: C 3; penwidth: 5}<br />[] {label: &#39;Some node&#39;}<br />-&gt; [node.2]</td>
+  <td># Complete graph. OK.<br /><object data = "./node.08.svg"></object><br />Output file # 18 - html/node.08.svg</td>
+</tr>
+<tr>
+  <td>Input file # 19 - data/node.09.dash:<br /># Named node with escape chars. OK.<br />[\[node\]]</td>
+  <td># Named node with escape chars. OK.<br /><object data = "./node.09.svg"></object><br />Output file # 19 - html/node.09.svg</td>
+</tr>
+<tr>
+  <td>Input file # 20 - data/node.10.dash:<br /># Named node with [] in name. OK.<br />[[ \]]</td>
+  <td># Named node with [] in name. OK.<br /><object data = "./node.10.svg"></object><br />Output file # 20 - html/node.10.svg</td>
+</tr>
+<tr>
+  <td>Input file # 21 - data/node.11.dash:<br /># Named node with escape chars. OK.<br />[&quot; a \&#39; b \&quot; c&quot;]</td>
+  <td># Named node with escape chars. OK.<br /><object data = "./node.11.svg"></object><br />Output file # 21 - html/node.11.svg</td>
+</tr>
+<tr>
+  <td>Input file # 22 - data/quote.01.dash:<br /># Named node with ; in label. OK.<br />[node] {color: red; label: \; ; shape: square}</td>
+  <td># Named node with ; in label. OK.<br /><object data = "./quote.01.svg"></object><br />Output file # 22 - html/quote.01.svg</td>
+</tr>
+<tr>
+  <td>Input file # 23 - data/quote.02.dash:<br /># Named node with ; in label. OK.<br />[node] {color: red; label: &quot;;&quot; ; shape: square}</td>
+  <td># Named node with ; in label. OK.<br /><object data = "./quote.02.svg"></object><br />Output file # 23 - html/quote.02.svg</td>
+</tr>
+<tr>
+  <td>Input file # 24 - data/quote.03.dash:<br /># Named node with ; in label. OK.<br />[node] {color: red; label: &#39;;&#39; ; shape: square}</td>
+  <td># Named node with ; in label. OK.<br /><object data = "./quote.03.svg"></object><br />Output file # 24 - html/quote.03.svg</td>
+</tr>
+<tr>
+  <td>Input file # 25 - data/quote.04.dash:<br /># Named node with ; in label. OK.<br />[node] {color: red; label: &lt;;&gt;; shape: square}</td>
+  <td># Named node with ; in label. OK.<br /><object data = "./quote.04.svg"></object><br />Output file # 25 - html/quote.04.svg</td>
+</tr>
+<tr>
+  <td>Input file # 26 - data/quote.05.dash:<br /># Named node with ; in label. OK.<br />[node.1] {color: pink; label: &lt;&lt;table border=&#39;1&#39;&gt;&lt;tr&gt;&lt;td&gt;;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;; shape: rectangle}</td>
+  <td># Named node with ; in label. OK.<br /><object data = "./quote.05.svg"></object><br />Output file # 26 - html/quote.05.svg</td>
+</tr>
+<tr>
+  <td>Input file # 27 - data/quote.06.dash:<br /># Named node with &quot; in label. OK.<br />[node] {color: red; label: \&quot;; shape: square}</td>
+  <td># Named node with " in label. OK.<br /><object data = "./quote.06.svg"></object><br />Output file # 27 - html/quote.06.svg</td>
+</tr>
+<tr>
+  <td>Input file # 28 - data/quote.07.dash:<br /># Named node with &quot; in label. OK.<br />[node] {color: red; label: &#39;&quot;&#39; ; shape: square}</td>
+  <td># Named node with " in label. OK.<br /><object data = "./quote.07.svg"></object><br />Output file # 28 - html/quote.07.svg</td>
+</tr>
+<tr>
+  <td>Input file # 29 - data/quote.08.dash:<br /># Named node with &quot; in label. OK.<br />[node] {color: red; label: &lt;&quot;&gt; ; shape: square}</td>
+  <td># Named node with " in label. OK.<br /><object data = "./quote.08.svg"></object><br />Output file # 29 - html/quote.08.svg</td>
+</tr>
+<tr>
+  <td>Input file # 30 - data/quote.09.dash:<br /># Named node with &quot; in label. OK.<br />[node.1] {color: pink; label: &lt;&lt;table border=&#39;1&#39;&gt;&lt;tr&gt;&lt;td&gt;&quot;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;; shape: rectangle}</td>
+  <td># Named node with " in label. OK.<br /><object data = "./quote.09.svg"></object><br />Output file # 30 - html/quote.09.svg</td>
+</tr>
+<tr>
+  <td>Input file # 31 - data/quote.10.dash:<br /># Named node with &#39; in label. OK.<br />[node] {color: red; label: \&#39;; shape: square}</td>
+  <td># Named node with ' in label. OK.<br /><object data = "./quote.10.svg"></object><br />Output file # 31 - html/quote.10.svg</td>
+</tr>
+<tr>
+  <td>Input file # 32 - data/quote.11.dash:<br /># Named node with &#39; in label. OK.<br />[node] {color: red; label: &quot;&#39;&quot;; shape: square}</td>
+  <td># Named node with ' in label. OK.<br /><object data = "./quote.11.svg"></object><br />Output file # 32 - html/quote.11.svg</td>
+</tr>
+<tr>
+  <td>Input file # 33 - data/quote.12.dash:<br /># Named node with &#39; in label. OK.<br />[node] {color: red; label: &lt;&#39;&gt; ; shape: square}</td>
+  <td># Named node with ' in label. OK.<br /><object data = "./quote.12.svg"></object><br />Output file # 33 - html/quote.12.svg</td>
+</tr>
+<tr>
+  <td>Input file # 34 - data/quote.13.dash:<br /># Named node with &#39; in label. OK.<br />[node.1] {color: pink; label: &lt;&lt;table border=&#39;1&#39;&gt;&lt;tr&gt;&lt;td&gt;&#39;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;; shape: rectangle}</td>
+  <td># Named node with ' in label. OK.<br /><object data = "./quote.13.svg"></object><br />Output file # 34 - html/quote.13.svg</td>
+</tr>
+<tr>
+  <td>Input file # 35 - data/quote.14.dash:<br /># Named node with } in label. OK.<br />[node] {color: red; label: \} ; shape: square}</td>
+  <td># Named node with } in label. OK.<br /><object data = "./quote.14.svg"></object><br />Output file # 35 - html/quote.14.svg</td>
+</tr>
+<tr>
+  <td>Input file # 36 - data/quote.15.dash:<br /># Named node with } in label. OK.<br />[node] {color: red; label: &quot;}&quot;; shape: square}</td>
+  <td># Named node with } in label. OK.<br /><object data = "./quote.15.svg"></object><br />Output file # 36 - html/quote.15.svg</td>
+</tr>
+<tr>
+  <td>Input file # 37 - data/quote.16.dash:<br /># Named node with } in label. OK.<br />[node] {color: red; label: &#39;}&#39;; shape: square}</td>
+  <td># Named node with } in label. OK.<br /><object data = "./quote.16.svg"></object><br />Output file # 37 - html/quote.16.svg</td>
+</tr>
+<tr>
+  <td>Input file # 38 - data/quote.17.dash:<br /># Named node with } in label. OK.<br />[node] {color: red; label: &lt;}&gt;; shape: square}</td>
+  <td># Named node with } in label. OK.<br /><object data = "./quote.17.svg"></object><br />Output file # 38 - html/quote.17.svg</td>
+</tr>
+<tr>
+  <td>Input file # 39 - data/quote.18.dash:<br /># Named node with } in label. OK.<br />[node.1] {color: green; label: &lt;&lt;table border=&#39;1&#39;&gt;&lt;tr&gt;&lt;td&gt;}&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;; shape: rectangle}</td>
+  <td># Named node with } in label. OK.<br /><object data = "./quote.18.svg"></object><br />Output file # 39 - html/quote.18.svg</td>
+</tr>
+<tr>
+  <td>Input file # 40 - data/quote.19.dash:<br /># Named node with &lt; in label. OK.<br />[node.1] {color: green; label: &#39;&lt;&#39;; shape: rectangle}</td>
+  <td># Named node with < in label. OK.<br /><object data = "./quote.19.svg"></object><br />Output file # 40 - html/quote.19.svg</td>
+</tr>
+<tr>
+  <td>Input file # 41 - data/quote.20.dash:<br /># Named node with &gt; in label. OK.<br />[node.1] {color: green; label: &#39;&gt;&#39;; shape: rectangle}</td>
+  <td># Named node with > in label. OK.<br /><object data = "./quote.20.svg"></object><br />Output file # 41 - html/quote.20.svg</td>
+</tr>
+<tr>
+  <td>Input file # 42 - data/quote.21.dash:<br /># Named node with &lt;&lt; in label. OK.<br />[node.1] {color: green; label: &#39;&lt;&lt;&#39;; shape: rectangle}</td>
+  <td># Named node with << in label. OK.<br /><object data = "./quote.21.svg"></object><br />Output file # 42 - html/quote.21.svg</td>
+</tr>
+<tr>
+  <td>Input file # 43 - data/quote.22.dash:<br /># Named node with &gt;&gt; in label. OK.<br />[node.1] {color: green; label: &#39;&gt;&gt;&#39;; shape: rectangle}</td>
+  <td># Named node with >> in label. OK.<br /><object data = "./quote.22.svg"></object><br />Output file # 43 - html/quote.22.svg</td>
+</tr>
+<tr>
+  <td>Input file # 44 - data/table.01.dash:<br /># Node with HTML-style and &#39; in label. OK.<br />[node.1] {color: pink; label: &lt;&lt;table border=&#39;1&#39;&gt;&lt;tr&gt;&lt;td&gt;HTML-style label and &#39;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;; shape: rectangle}</td>
+  <td># Node with HTML-style and ' in label. OK.<br /><object data = "./table.01.svg"></object><br />Output file # 44 - html/table.01.svg</td>
+</tr>
+<tr>
+  <td>Input file # 45 - data/table.02.dash:<br /># Node with HTML-style and &quot; in label. OK.<br />[node.1] {color: pink; label: &lt;&lt;table border=&quot;1&quot;&gt;&lt;tr&gt;&lt;td&gt;HTML-style label and &quot;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;; shape: rectangle}</td>
+  <td># Node with HTML-style and " in label. OK.<br /><object data = "./table.02.svg"></object><br />Output file # 45 - html/table.02.svg</td>
+</tr>
+<tr>
+  <td>Input file # 46 - data/table.03.dash:<br /># Node with HTML-style and &quot; and &#39; in label. OK.<br />[node.1] {color: pink; label: &lt;&lt;table border=&quot;1&quot;&gt;&lt;tr&gt;&lt;td&gt;HTML-style label and &quot; and &#39;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;; shape: rectangle}</td>
+  <td># Node with HTML-style and " and ' in label. OK.<br /><object data = "./table.03.svg"></object><br />Output file # 46 - html/table.03.svg</td>
+</tr>
+<tr>
+  <td>Input file # 47 - data/table.04.dash:<br /># Node with HTML-style and &#39; and &quot; in label. OK.<br />[node.1] {color: pink; label: &lt;&lt;table border=&#39;1&#39;&gt;&lt;tr&gt;&lt;td&gt;HTML-style label and &#39; and &quot;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;; shape: rectangle}</td>
+  <td># Node with HTML-style and ' and " in label. OK.<br /><object data = "./table.04.svg"></object><br />Output file # 47 - html/table.04.svg</td>
+</tr>
+<tr>
+  <td>Input file # 48 - data/table.05.dash:<br /># Node with HTML-style and &#39; label. OK.<br />[node.1] {color: red; label: &lt;&lt;table border=&#39;0&#39;&gt;&lt;tr&gt;&lt;td&gt;HTML-style label but without borders&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;; shape: tripleoctagon}</td>
+  <td># Node with HTML-style and ' label. OK.<br /><object data = "./table.05.svg"></object><br />Output file # 48 - html/table.05.svg</td>
+</tr>
+<tr>
+  <td>Input file # 49 - data/table.06.dash:<br /># Node with HTML-style and &quot; label. OK.<br />[node.1] {color: red; label: &lt;&lt;table border=&quot;0&quot;&gt;&lt;tr&gt;&lt;td&gt;HTML-style label but without borders&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;; shape: tripleoctagon}</td>
+  <td># Node with HTML-style and " label. OK.<br /><object data = "./table.06.svg"></object><br />Output file # 49 - html/table.06.svg</td>
+</tr>
+<tr>
+  <td>Input file # 50 - data/table.07.dash:<br /># Node with HTML-style entities in label. OK.<br />[node.1] {color: pink; label: &lt;&lt;table border=&#39;1&#39;&gt;&lt;tr&gt;&lt;td&gt;HTML-style entities: &amp;amp;, &amp;lt;, &amp;gt; and &amp;quot; in label&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&gt;; shape: rectangle}</td>
+  <td># Node with HTML-style entities in label. OK.<br /><object data = "./table.07.svg"></object><br />Output file # 50 - html/table.07.svg</td>
+</tr>
+<tr>
+  <td>Input file # 51 - data/utf8.01.dash:<br /># Graph with utf8 attributes. OK.<br />[From]{color: green; label: Reichwaldstra&szlig;e}<br />-&gt; {color:red; label: &Pi;&eta;&lambda;&eta;&#x3CA;&#x3AC;&delta;&epsilon;&omega; &#x1F08;&chi;&iota;&lambda;&#x1FC6;&omicron;&sigmaf;}<br />[To]{color: blue; label: &Delta; Lady}</td>
+  <td># Graph with utf8 attributes. OK.<br /><object data = "./utf8.01.svg"></object><br />Output file # 51 - html/utf8.01.svg</td>
+</tr>
+</table>
+
+<hr />
+
+<h3 class="global_toc_text">Links</h3>
+
+<h2 align="center">Index page for <a href="http://savage.net.au/Graphviz.html">all graph module demos</a></h2>
+
+<hr />
+
+<h3 class="global_toc_text">Environment</h3>
+
+<table align="center" cellspacing="0">
+<tr>
+<!-- Left -->
+<td>
+<div class="even_left">
+Author
+</div>
+</td>
+<!-- Right -->
+<td>
+<div class="even_right">
+<a href="http://savage.net.au/">Ron Savage</a>
+</div>
+</td>
+</tr>
+<tr>
+<!-- Left -->
+<td>
+<div class="odd_left">
+Date
+</div>
+</td>
+<!-- Right -->
+<td>
+<div class="odd_right">
+2016-12-25
+</div>
+</td>
+</tr>
+<tr>
+<!-- Left -->
+<td>
+<div class="even_left">
+OS
+</div>
+</td>
+<!-- Right -->
+<td>
+<div class="even_right">
+Debian V 8.6
+
+</div>
+</td>
+</tr>
+<tr>
+<!-- Left -->
+<td>
+<div class="last_odd_left">
+Perl
+</div>
+</td>
+<!-- Right -->
+<td>
+<div class="last_odd_right">
+5.20.2
+</div>
+</td>
+</tr>
+</table>
+
+<hr />
+
+</body>
+</html>

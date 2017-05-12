@@ -1,0 +1,34 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mashtree
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Bio::Matrix::IO: '0'
+  Bio::Tree::DistanceFactory: '0'
+  Bio::Tree::Statistics: '0'
+  DBD::SQLite: '0'
+  DBI: '1'
+  Data::Dumper: '1'
+  Exporter: '1'
+  File::Basename: '1'
+  List::Util: '1'
+  Thread::Queue: '1'
+  threads: '1'
+  threads::shared: '1'
+version: '0.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

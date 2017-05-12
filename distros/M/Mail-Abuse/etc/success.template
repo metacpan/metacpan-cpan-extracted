@@ -1,0 +1,44 @@
+
+========= PLEASE PLEASE PLEASE ============================================
+
+Do edit this file before putting your new Mail::Abuse module in production.
+This contains some boilerplate information, but due to the seriousness of
+this issue, must be properly edited and reviewed by you, according to your
+local policies, procedures and configuration.
+
+$Id: success.template,v 1.1 2003/11/07 15:40:49 lem Exp $
+
+===========================================================================
+
+Hi.
+
+This is Mail::Abuse. I am an automatted processor intended to handle
+abuse complaints.
+
+My owners are probably very concerned about spam, virii, worms, port
+scans, copyright violations and probably other common forms of
+abuse. This is the reason why they have taken the time to install me,
+as this message attests.
+
+Since I'm new here, I can't but assume that my owners have a published
+acceptable use policy at some URL, but I have not been told. Also, I
+can process abuse complaints quite fast (a couple of seconds tops,
+really), but then I don't know what kind of lead time to expect from
+my owners back here in closing the incident.
+
+Also, I don't know if you'll get a follow up message after the
+incident is closed, as various places at which I've worked before seem
+to have different policies regarding this. I would assume, however,
+that there is a human, flesh and blood, carbon based life form that
+will be overseeing my operation and making sure that your reports are
+properly addressed.
+
+After this introduction, I am happy to inform you that your report has
+been analyzed by me. Through my inner workings, I've been able to
+extract enough information so as to, hopefully, locate the source of
+the incident within my master's network. At least, that is what I am
+being told.
+
+Virtually yours,
+
+Mail::Abuse

@@ -1,0 +1,5 @@
+0.002     2015-09-06 19:29:01 EDT
+  - Add explicit requirement for perl 5.10.1
+
+0.001     2015-09-06 17:10:44 EDT
+  - First release

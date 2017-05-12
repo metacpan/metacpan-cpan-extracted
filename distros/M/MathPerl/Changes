@@ -1,0 +1,14 @@
+Revision history for Perl library suite MathPerl.
+
+0.100000 2016-03-14 Codename Cherry
+
+    - HOLIDAY EDITION: Happy Rounded Pi Day 3/14/16!
+    - Geometry, Pi Generator
+    - Fractal, Mandelbrot
+    - Fractal, Julia
+    - Geometric Algebra, Inner Products, Vector & Bivector Euclidean
+
+0.000001 2016-02-02 Unreleased
+
+    - HOLIDAY EDITION: Happy Groundhog Day!
+    - Created MathPerl

@@ -1,0 +1,124 @@
+NAME
+    Mojolicious::Plugin::Logf - Plugin for logging datastructures using
+    sprintf
+
+VERSION
+    0.10
+
+DESCRIPTION
+    Mojolicious::Plugin::Logf is a plugin which will log complex
+    datastructures and avoid "unitialized" warnings. This plugin use
+    Mojo::Log or whatever "log" in Mojo is set to, to do the actual logging.
+
+SYNOPSIS
+      use Mojolicious::Lite;
+      plugin logf => {rfc3339 => 1};
+
+      get "/" => sub {
+        my $c = shift;
+        $c->logf(info => 'request: %s', $self->req->params->to_hash);
+        $c->render(text => "cool!");
+      };
+
+    Setting "rfc3339" to "1" will make the log look like this:
+
+      [2016-02-19T13:05:37Z] [info] Some log message
+
+COPY/PASTE CODE
+    If you think it's a waste to depend on this module, you can copy paste
+    the code below to get the same functionality as the "logf" helper:
+
+      helper logf => sub {
+        my ($c, $level, $format) = (shift, shift, shift);
+        my $log = $c->app->log;
+        return $c unless $log->is_level($level);
+        my @args = map { ref $_ eq 'CODE' ? $_->() : $_ } @_;
+        local $Data::Dumper::Indent   = 0;
+        local $Data::Dumper::Maxdepth = $Data::Dumper::Maxdepth || 2;
+        local $Data::Dumper::Sortkeys = 1;
+        local $Data::Dumper::Terse    = 1;
+        for (@args) {
+          $_
+            = !defined($_) ?  "__UNDEF__" 
+            : overload::Method($_, q("")) ? "$_"
+            : ref($_) ? Data::Dumper::Dumper($_)
+            :           $_;
+        }
+        $log->$level(sprintf $format, @args);
+        return $c;
+      };
+
+    Note: The code above is generated and tested from the original source
+    code, but it will more difficult to get updates and bug fixes.
+
+HELPERS
+  logf
+      $self = $c->logf;
+      $c = $c->logf($level => $format, @args);
+
+    Logs a string formatted by the usual "printf" conventions of the C
+    library function "sprintf". $level need to be a valid Mojo::Log level.
+    @args will be converted using "flatten".
+
+    Calling this method without any arguments will return $self (an instance
+    of this plugin), allowing you to call "flatten":
+
+      @args_as_strings = $c->logf->flatten(@args);
+
+METHODS
+  flatten
+      @args_as_strings = $self->flatten(@args);
+
+    Used to convert input @args using these rules:
+
+    *   Scalar
+
+        No rule applied.
+
+    *   Code ref
+
+        A code ref will be called, and the list of return values will be
+        flattened. The code below will not calculate the request params,
+        unless the log level is "debug":
+
+          $c->logf(debug => 'request: %s', sub {$c->req->params->to_hash});
+
+    *   Object with string overloading
+
+        Will be coverted to a string using the string overloading function.
+
+    *   Data structure or object
+
+        Will be serialized using Data::Dumper with these settings:
+
+          $Data::Dumper::Indent = 0;
+          $Data::Dumper::Maxdepth = $Data::Dumper::Maxdepth || 2;
+          $Data::Dumper::Sortkeys = 1;
+          $Data::Dumper::Terse = 1;
+
+        NOTE! These settings might change, but will always do its best to
+        serialize the object into one line. $Data::Dumper::Maxdepth is used
+        to avoid dumping large nested objects. Set this variable if you need
+        deeper logging. Example:
+
+          local $Data::Dumper::Maxdepth = 1000;
+          $c->logf(info => 'Deep structure: %s', $some_object);
+
+    *   Undefined value
+
+        Will be logged as "__UNDEF__". This value can be changed by setting
+        the global environment variable "MOJO_LOGF_UNDEF" before loading
+        this plugin.
+
+  register
+    Will register the "logf" helper in the application
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014, Jan Henning Thorsen
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+AUTHOR
+    Jan Henning Thorsen - "jhthorsen@cpan.org"
+

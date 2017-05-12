@@ -1,0 +1,12 @@
+Revision history for Module-Install-AggressiveInclude
+
+0.01_01    Apr 16th 2010
+           Dev release updated to cpan.
+0.01_pre01 Apr 19th 2010
+           Change version scheme to compat with gentoo
+0.01_pre02 Apr 19th 2010
+           Update README file and MANIFEST for meta
+0.01_pre03 Apr 19th 2010
+           Fixing META.yml issues for dist
+0.01_pre04 Apr 19th 2010
+           Fixed bug in incorrect usage of Module::Find

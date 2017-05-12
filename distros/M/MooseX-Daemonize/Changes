@@ -1,0 +1,147 @@
+Revision history for MooseX-Daemonize
+
+0.21      2016-02-16 05:15:14Z
+    - some distribution retooling
+
+0.20      2015-08-16 03:27:34Z
+    - some tooling modernization and documentation cleanup.
+
+0.19      2014-02-07 04:19:25Z
+    - fix buggy test that does not try hard enough to look for a nonexistent
+      pid (ether)
+    - repository moved to github moose organization
+
+0.18      2013-05-13 19:34:52Z
+    - make tests a bit more tolerant of slow systems, by waiting longer for
+      processes to die (RT#85229, Chisel Wright)
+
+0.17  2013-04-20
+    - Makefile.PL now prevents installation on MSWin32
+
+0.16  2013-04-14
+    - fix incompatibilities with Test::Builder 1.005+ (schwern, RT#76523)
+    - add missing dependency on the version of File::Path which added
+      make_path (RT#79169, Jonathan Sailor)
+    - add missing test dependency on Test::Exception (RT#70382)
+    - document the 'basedir' attribute and its behaviour (RT#83055)
+    - add 'documentation' keys for public attributes, to be used when
+      displaying --help (RT#54295)
+
+0.15  2012-05-31
+    - fix versions
+
+0.14  2012-05-30
+    - recommend Daemon::Control instead
+    - fix bug with pidbase dir not being created
+      if it doesn't already exist
+
+0.13  2011-07-06
+    - adding docs related to closing all
+      filehandles and the issues that can
+      cause with things like Log::Log4Perl
+      (thanks to Maik Hentsche via RT #67016)
+    - updating copyright dates
+
+0.12  2010-07-11
+    - release without the .git directory in it
+
+0.11  2010-07-10
+    * MooseX::Daemonize::Core
+      - make the options to daemonize()
+        into proper attributes but still
+        retained back-compat (Thanks to Magnus Erixzon)
+          - adjusted docs and tests
+
+    - removed the pod.t and pod-coverage.t tests
+
+0.10  2010-04-17
+    - updated copyrights
+    - removed the POE test because it was causing
+      random failures when installing from CPAN
+      and not adding enough value to keep around
+    - applied POD corrections from RT #50091
+      (thanks to Kostyuk Oleg)
+
+0.09  2009-10-05
+	* s/no_plan => 1/'no_plan'/g (Dave Rolsky)
+	* Synchronize Version numbers
+
+0.08  2008-09-07
+    * t/
+      - Removed usage of Cwd in favour of a temporary dir to prevent test fails
+        when running in an unwritable dir
+      - patch to ensure that t/01.filecreate.t passes (thanks to Jose Luis Rey)
+
+0.07  2008-05-24
+    * MooseX::Daemonize
+      - Made default pidbase '/var/run' rather
+        than './var/run'
+
+    * t/
+      - Small fixups to pidfile testing in
+        t/31.with_pid_file_and_poe.t
+
+    ~ Removed the Build.PL since Module::Install
+      has removed their support
+
+0.06  2007-12-21
+    * MooseX::Daemonize
+      - Fix logic that kills process so it doens't always warn
+        about undead process
+      - Added stop_timeout to allow user to control timings.
+      - Refactored to roles
+        - removed Proc::Daemon dependency
+        - removed File::Pid dependency
+      - added exit_code and status_message to capture the
+        exit code and a status message :)
+        - refactored start/stop/restart to use these
+        - added tests for this
+      - added a &status command which returns a bool telling
+        you if the daemon is running or not
+        - added tests for this
+
+    * Test::MooseX::Daemonize
+      - updated docs
+      - removed Proc::Daemon dependency
+
+    * MooseX::Daemonize::Core
+      - the core daemonization methods are here
+        - added tests for this
+
+    * MooseX::Daemonize::WithPidFile
+      - the PID file handling is added to the core here
+        - added tests for this
+
+    * MooseX::Daemonize::Pid
+      - added this package to replace the File::Pid stuff
+
+    * MooseX::Daemonize::Pid::File
+      - added this package to replace the File::Pid stuff, it is a subclass
+        of MooseX::Daemonize::Pid (stevan)
+        - added tests for this (stevan)
+
+0.05  2007-11-18
+    - Fix logic that kills process so it doens't always warn
+      about undead process
+    - Added stop_timeout to allow user to control timings.
+
+0.04  2007-11-11
+    - Fix stupid perlcritic.t cause the Module::Starter::PBP tests were
+      stupid but I didn't realize it.
+
+0.03  2007-10-22
+    - Add File::Slurp to dependencies so our tests pass better
+
+0.02  2007-09-19
+    - Fixed bug where sometimes the pidfile is writeable but pidbase is not -- reported by dec
+    - Fixed bug where the pidfile wasn't being updated properly -- reported by dec
+    - Added is_daemon attribute
+    - Added another fork to make sure we short circuit out of the daemonize process properly
+    - Switch to File::Pid
+    - Add the GetOpt prereq
+    - Adjust the kill timings
+    - Added THANKS to pod
+
+0.0.1  2007-05-16
+       Initial release.
+

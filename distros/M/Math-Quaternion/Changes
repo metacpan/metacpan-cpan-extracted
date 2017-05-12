@@ -1,0 +1,31 @@
+Revision history for Perl module Math::Quaternion
+
+0.07 2013-11-17 13:34:00 UTC
+    - Updated Changes to conform to CPAN::Changes::Spec (thanks to NEILB)
+    - Patch from DJERIUS: rotation() incorrectly generates a non-rotating quaternion when passed two vectors which are parallel but opposite.
+
+0.06 2013-08-24 12:40:20 BST
+    - Updated Changelog!
+
+0.05 2013-08-24 12:27:43 BST
+    - Merged Bruce Gray's patch for exponentiation
+
+0.04 2013-05-19 00:05:56 BST
+    - Added code and tests to fix crashing when creating quaternion from
+      two parallel vectors (i.e. cross product is zero).
+    - Added guard code against zero-length rotation vectors.
+    - Added new fields to META.yml; fixed or removed old fields.
+    - Added thanks to Daniel Connelly and Luc Vereecken.
+    - Fixed POD of method new() - axis and angle were swapped.
+
+0.03 2008-05-05 00:41:56 BST
+    - fixed a bug in the documentation pointed out by Andreas Lund
+    - fixed a warning during 001_basic.t
+
+0.02 2004-07-10 17:22:47 BST
+    - some small markup fixes in the POD
+
+0.01 2003-01-05 00:17:12
+    - original version; created by h2xs 1.22 with options
+        -XAn Quaternion
+

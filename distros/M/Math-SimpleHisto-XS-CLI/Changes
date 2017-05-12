@@ -1,0 +1,41 @@
+Revision history for Perl extension Math::SimpleHisto::XS::CLI.
+
+1.07  Tue Jul 03 13:04:00 2012
+  - Distribution fixes.
+
+1.06  Sun Jul 01 18:40:00 2012
+  - "continuoushist" tool combining "histify" and "drawasciihist"
+    and updating histogram output as data comes in.
+  - "continuoushist" has some basic stats output and other new
+    features, too.
+  - Lots of refactoring: Moved code to module. 
+    (So plenty of new bugs)
+
+1.05  Sat Jun 16 22:19:00 2012
+  - --random option for randomly filled histograms
+  - --pipe option as a convenience for both reading&writing dumps
+  - --rebin option for rebinning
+  - "range" description type
+
+1.04  Wed Sep 28 22:02:00 2011
+  - --log option for log-scale histogram plotting.
+  - --cumulative option for cumulative histograms.
+  - --dump-as-input option for reading histogram dumps as input.
+  - --dump option for writing out dumps.
+
+1.03  Thu Sep 22 14:06:00 2011
+  - --timestamp option of drawasciihist.
+  - --min=auto fix for drawasciihist.
+
+1.02  Thu Sep 22 09:01:00 2011
+  - Document drawasciihist.
+  - Various CLI changes for drawasciihist.
+
+1.01  Wed Sep 21 18:52:00 2011
+  - Support the --xw option to histify which aggregates/rebins with
+    weights.
+  - drawasciihist now defaults to 80 columns if not writing to a
+    terminal.
+
+1.00  Tue Sep 20 18:52:00 2011
+  - original version

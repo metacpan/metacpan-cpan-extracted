@@ -1,0 +1,250 @@
+$Id: README 224 2017-04-04 10:27:41Z minus $
+
+.___  ___. .______   .___  ___.  __  .__   __.  __   __    ____.
+|   \/   | |   _  \  |   \/   | |  | |  \ |  | |  | |  |  /    |
+|  \  /  | |  |_)  | |  \  /  | |  | |   \|  | |  | |  | |   (-`
+|  |\/|  | |   ___/  |  |\/|  | |  | |  . `  | |  | |  |  \   \    
+|  |  |  | |  |      |  |  |  | |  | |  |\   | |  `-'  | .-)   |   
+|__|  |__| | _|      |__|  |__| |__| |__| \__|  \_____/  |____/    
+
+NAME
+
+    MPMinus - mod_perl2 Web Application Framework
+
+VERSION
+
+    Version 1.20
+    
+FILE STRUCTURE OF YOUR PROJECTS
+
+/                                                [ DocumentRoot /  ModperlRoot ]
++- cache                                             [ Cache dir for TemplateM ]
++- conf                                        [ Extended setting files *.conf ]
++- css                                                             [ CSS-files ]
++- data                                               [ Any static shared data ]
++- db                     [ Local private storages: sessions, coockies and etc ]
++- files             [ Shared static files by MIME: swf, flv, avi, mp3 and etc ]
++- img                                                         [ Static images ]
++- inc                                                              [ Inclides ]
++- js                                                       [ JavaScript files ]
++- lib                                            [ Libraries for installation ]
+|  +- MPM                                                      [ MPM namespace ]
+|     +- Project                             [ Uniq unix-style name of project ]
+|     |  +- Handlers.pm                                             [ Handlers ]
+|     |  +- Index.pm                                              [ Index file ]
+|     |  +- Root.pm                                              [ Root record ]
+|     |  +- Info.pm                                     [ Info (Kernel) record ]
+|     |  +- Foo.pm                                               [ Foo handler ]
+|     |  +- Bar.pm                                              [ Bar handlers ]
+|     |  +- Baz.pm                                              [ Baz handlers ]
+|     +- Project.pm            [ Uniq unix-style name of project  - descriptor ]
++- log                                                                  [ Logs ]
++- shtml                                                           [ Templates ]
+|  +- error                                                      [ Error pages ]
+|  |  +- ssi                                       [ SSI files for error pages ]
+|  +- default.shtml                   [ Default template (for root record: / ) ]
+|  +- mpminfo.shtml          [ Info (Kernel) template (for record: /Info.mpm ) ]
+|  +- foo.shtml                                             [ Template for foo ]
+|  +- bar.xml                                               [ Template for bar ]
+|  +- baz.html                                              [ Template for baz ]
+|  +- ssi                                                  [ General SSI files ]
++- src                                  [ Sources, examples, templates and etc ]
++- t                                                                   [ Tests ]
++- Project.conf                                   [ Custom settings of Project ]
++- CHANGES                                                      [ Your changes ]
++- INSTALL                                         [ Installation instructions ]
++- LICENSE                                                      [ License file ]
++- MANIFEST                                                    [ List of files ]
++- META.yml                                              [ META file for maker ]
++- README                                                        [ README file ]
++- TODO                                                            [ TODO-list ]
++- Makefile.PL                                                         [ Maker ]
++- favicon.ico                                            [ Favorite icon file ]
++- robots.txt                                                   [ Robot's file ]
+
+COMMON CONSTANTS
+
+ -2  Apache2::Const::DONE
+ -1  Apache2::Const::DECLINED
+ 0   Apache2::Const::OK
+ 302 Apache2::Const::REDIRECT
+ 401 Apache2::Const::AUTH_REQUIRED
+ 403 Apache2::Const::FORBIDDEN
+ 404 Apache2::Const::NOT_FOUND
+ 500 Apache2::Const::SERVER_ERROR
+
+HTTP 1.1 STATUS CODES ORDERED BY NAMES
+
+ 202 Apache2::Const::HTTP_ACCEPTED 
+ 502 Apache2::Const::HTTP_BAD_GATEWAY 
+ 400 Apache2::Const::HTTP_BAD_REQUEST 
+ 409 Apache2::Const::HTTP_CONFLICT 
+ 100 Apache2::Const::HTTP_CONTINUE 
+ 201 Apache2::Const::HTTP_CREATED 
+ 417 Apache2::Const::HTTP_EXPECTATION_FAILED 
+     Apache2::Const::HTTP_FAILED_DEPENDENCY 
+ 403 Apache2::Const::HTTP_FORBIDDEN 
+ 504 Apache2::Const::HTTP_GATEWAY_TIME_OUT 
+ 410 Apache2::Const::HTTP_GONE 
+     Apache2::Const::HTTP_INSUFFICIENT_STORAGE 
+ 500 Apache2::Const::HTTP_INTERNAL_SERVER_ERROR 
+ 411 Apache2::Const::HTTP_LENGTH_REQUIRED 
+     Apache2::Const::HTTP_LOCKED 
+ 405 Apache2::Const::HTTP_METHOD_NOT_ALLOWED 
+ 301 Apache2::Const::HTTP_MOVED_PERMANENTLY 
+ 302 Apache2::Const::HTTP_MOVED_TEMPORARILY 
+ 300 Apache2::Const::HTTP_MULTIPLE_CHOICES 
+     Apache2::Const::HTTP_MULTI_STATUS 
+ 203 Apache2::Const::HTTP_NON_AUTHORITATIVE 
+ 406 Apache2::Const::HTTP_NOT_ACCEPTABLE 
+     Apache2::Const::HTTP_NOT_EXTENDED 
+ 404 Apache2::Const::HTTP_NOT_FOUND 
+ 501 Apache2::Const::HTTP_NOT_IMPLEMENTED 
+ 304 Apache2::Const::HTTP_NOT_MODIFIED 
+ 204 Apache2::Const::HTTP_NO_CONTENT 
+ 200 Apache2::Const::HTTP_OK 
+ 206 Apache2::Const::HTTP_PARTIAL_CONTENT 
+ 402 Apache2::Const::HTTP_PAYMENT_REQUIRED 
+ 412 Apache2::Const::HTTP_PRECONDITION_FAILED 
+     Apache2::Const::HTTP_PROCESSING 
+ 407 Apache2::Const::HTTP_PROXY_AUTHENTICATION_REQUIRED 
+ 416 Apache2::Const::HTTP_RANGE_NOT_SATISFIABLE 
+ 413 Apache2::Const::HTTP_REQUEST_ENTITY_TOO_LARGE 
+ 408 Apache2::Const::HTTP_REQUEST_TIME_OUT 
+ 414 Apache2::Const::HTTP_REQUEST_URI_TOO_LARGE 
+ 205 Apache2::Const::HTTP_RESET_CONTENT 
+ 303 Apache2::Const::HTTP_SEE_OTHER 
+ 503 Apache2::Const::HTTP_SERVICE_UNAVAILABLE 
+ 101 Apache2::Const::HTTP_SWITCHING_PROTOCOLS 
+ 307 Apache2::Const::HTTP_TEMPORARY_REDIRECT 
+ 401 Apache2::Const::HTTP_UNAUTHORIZED 
+     Apache2::Const::HTTP_UNPROCESSABLE_ENTITY 
+ 415 Apache2::Const::HTTP_UNSUPPORTED_MEDIA_TYPE 
+     Apache2::Const::HTTP_UPGRADE_REQUIRED 
+ 305 Apache2::Const::HTTP_USE_PROXY 
+     Apache2::Const::HTTP_VARIANT_ALSO_VARIES
+
+HTTP 1.1 STATUS CODES
+
+Informational 1xx:
+ 100 HTTP_CONTINUE                        Continue
+ 101 HTTP_SWITCHING_PROTOCOLS             Switching Protocols
+
+Successful 2xx:
+ 200 HTTP_OK                              OK
+ 201 HTTP_CREATED                         Created
+ 202 HTTP_ACCEPTED                        Accepted
+ 203 HTTP_NON_AUTHORITATIVE               Non-Authoritative Information
+ 204 HTTP_NO_CONTENT                      No Content
+ 205 HTTP_RESET_CONTENT                   Reset Content
+ 206 HTTP_PARTIAL_CONTENT                 Partial Content
+
+Redirection 3xx:
+ 300 HTTP_MULTIPLE_CHOICES                Multiple Choices
+ 301 HTTP_MOVED_PERMANENTLY               Moved Permanently
+ 302 HTTP_MOVED_TEMPORARILY               Found
+ 303 HTTP_SEE_OTHER                       See Other
+ 304 HTTP_NOT_MODIFIED                    Not Modified
+ 305 HTTP_USE_PROXY                       Use Proxy
+ 306                                      (Unused)
+ 307 HTTP_TEMPORARY_REDIRECT              Temporary Redirect
+
+Client Error 4xx:
+ 400 HTTP_BAD_REQUEST                     Bad Request
+ 401 HTTP_UNAUTHORIZED                    Unauthorized
+ 402 HTTP_PAYMENT_REQUIRED                Payment Required
+ 403 HTTP_FORBIDDEN                       Forbidden
+ 404 HTTP_NOT_FOUND                       Not Found
+ 405 HTTP_METHOD_NOT_ALLOWED              Method Not Allowed
+ 406 HTTP_NOT_ACCEPTABLE                  Not Acceptable
+ 407 HTTP_PROXY_AUTHENTICATION_REQUIRED   Proxy Authentication Required
+ 408 HTTP_REQUEST_TIMEOUT                 Request Timeout
+ 409 HTTP_CONFLICT                        Conflict
+ 410 HTTP_GONE                            Gone
+ 411 HTTP_LENGTH REQUIRED                 Length Required
+ 412 HTTP_PRECONDITION_FAILED             Precondition Failed
+ 413 HTTP_REQUEST_ENTITY_TOO_LARGE        Request Entity Too Large
+ 414 HTTP_REQUEST_URI_TOO_LARGE           Request-URI Too Long
+ 415 HTTP_UNSUPPORTED_MEDIA_TYPE          Unsupported Media Type
+ 416 HTTP_RANGE_NOT_SATISFIABLE           Requested Range Not Satisfiable
+ 417 HTTP_EXPECTATION_FAILED              Expectation Failed
+
+Server Error 5xx:
+ 500 HTTP_INTERNAL_SERVER_ERROR           Internal Server Error
+ 501 HTTP_NOT IMPLEMENTED                 Not Implemented
+ 502 HTTP_BAD_GATEWAY                     Bad Gateway
+ 503 HTTP_SERVICE_UNAVAILABLE             Service Unavailable
+ 504 HTTP_GATEWAY_TIME_OUT                Gateway Timeout
+ 505 HTTP_VERSION_NOT_SUPPORTED           HTTP Version Not Supported        
+
+MVC SKEL TRANSACTION
+
+                                  +-------+
+    04/26/13                      | Start |
+                                  +-------+
+                                      |
+                                ++---------++
+                                || caccess ||
+                                ++---------++
+                                     |
+                               status is true?
+                                     /\
+                      _____yes______/  \____no__ 
+                     |              \  /        |
+               status < 300?         \/         |
+                     /\                    ++-------++
+            ___yes__/  \____no___          || cdeny ||
+           |        \  /         |         ++-------++
+      event ~ go?    \/          |______________|
+           /\                             |
+     _no__/  \__yes__                     |
+    |     \  /       |                    |
+    |      \/   ++--------++              |
+    |           || ccheck ||              |
+    |           ++--------++              |
+    |                |                    |
+    |          status is true?            |
+    |                /\                   |
+    |         __no__/  \___yes_           |
+    |        |      \  /       |          |
+    |        |       \/   ++-------++     |
+    |        |            || mproc ||     |
+    |        |            ++-------++     |
+    |________|_________________|          |
+                               |          |
+                         status < 300?    |
+                               /\         |
+                       __yes__/  \____no__|
+                      |       \  /        |
+                 ++-------++   \/         |
+                 || vform ||              |
+                 ++-------++              |
+                      |                   |
+                      |___________________|
+                                     |
+                                 +--------+
+                                 | Finish |
+                                 +--------+
+
+SEE ALSO
+
+   perldoc MPMinus::Manual
+
+     @            @@    
+     @@@  @    @  @@@@   
+    @@@@@@@    @@@@@@@@  
+   @@@@@@@@    @@@@@@@@  
+    @@@@@@      @@@@@@   
+     @@@@        @@@@    
+     @@@          @@@    
+  @@@@@ @@@@@@@@@@ @@@@@ 
+ @@@@@@ @@@@@@@@@W @@@@@@
+ @@@@@@ @@@@@@@@@@ @@@@@@
+ @@@@@@ @@@@@@@@@@ @@@@@@
+  @@@@@ @@@@@@@@@@ @@@@@ 
+     @@@          @@@    
+     @@@@         @@@    
+    @@@@@        @@@@@   
+    @@@@@@@    @@@@@@@@  
+    @@@@@@@    @@@@@@@   
+     @@@  @    @@ @@@    

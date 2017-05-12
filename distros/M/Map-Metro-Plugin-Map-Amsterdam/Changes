@@ -1,0 +1,31 @@
+Revision history for Map-Metro-Plugin-Map-Amsterdam
+
+0.1102 2016-01-22T18:15:49Z UTC
+ [Other Changes]
+ - Rebuilt with latest Dist::Iller::Config::Author::CSSON(::MapMetro).
+
+ [Requirements]
+ - Bump Map::Metro to 0.2300.
+
+0.1101 2015-01-25T18:48:16Z CET
+ [Documentation]
+ - Some cleanup.
+
+ [Requirements]
+ - Bumped Map::Metro version to 0.2206
+
+0.1100 2015-01-05T16:57:36Z CET
+ [Documentation]
+ - Added a graphviz image of the network.
+ - Added line and station documentation.
+
+ [Enhancements]
+ - Changed dist.ini to use @Iller
+
+0.1001 2015-01-02T12:33:35Z CET
+ [Meta]
+ - Github as repo and issue tracker.
+
+0.1000 2015-01-01T19:20:19Z CET
+ - Initial release
+

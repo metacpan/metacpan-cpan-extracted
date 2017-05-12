@@ -1,0 +1,8 @@
+MANIFEST
+Build.PL
+lib/MarpaX/Simple/Rules.pm
+t/basics.t
+t/plus.t
+t/identifiers.t
+META.yml
+META.json

@@ -1,0 +1,72 @@
+Mail::SpamAssassin::SpamCopURI
+===========
+This module must now only be installed with SA 2.63 or 2.64.  
+A check is done in the Makefile.PL to ensure the correct version.
+Changes were made to core classes and these are distributed with 
+this package to ease installation.  
+
+For completeness I have included a complete diff between the
+SA sources and the modifications included in the file diff-2.63.
+
+Upgrading from versions prior to 0.11
+=====================================
+If you are installing over a version prior to 0.11, you should
+remove spamcopuri-update from your cron (if you set this up)
+as well as delete it from your bin directory.  This script
+is no longer needed.
+
+You can also remove the 'spamcop_uri' from your .spamassassin 
+directory typically found under your home directory.
+
+Quick Install
+===========
+perl Makefile.PL
+make
+make test
+make install
+
+cp rules/spamcop_uri.cf /etc/mail/spamassassin
+
+You may need to restart your spamd to pick up the new rules change,
+if you run the daemon process.
+
+You may see some output like this when running perl Makefile.PL:
+
+  # SAPATH /usr/lib/perl5/site_perl/5.8.3
+  # installsitelib /usr/lib/perl5/site_perl/5.8.3
+  # INSTALLDIRS site
+
+This is safe to ignore and is only printed out to aid with potential
+installation problems.
+
+Upgrading 2.63 to 2.64 with SpamCopURI
+=============
+
+If you are upgrading from SA 2.63 to 2.64 and have SpamCopURI installed, 
+you will most likely need to remove /etc/mail/spamassassin/spamcop_uri.cf 
+for all the SA tests to complete successfully.
+
+Painful Install
+=============
+If you don't see the rules being hit, then you most likely have some
+issue with @INC.  Do a search for PerMsgStatus.pm, Conf.pm and SpamCopURI.pm.
+
+You need to copy PerMsgStatus.pm and Conf.pm over the files that SpamAssassin
+originally installed.  
+You can find this out by typing:
+
+perl -MMail::SpamAssassin::PerMsgStatus -e 'print $INC{"Mail/SpamAssassin/PerMsgStatus.pm"},"\n"'
+
+which will print out something like:
+
+/usr/lib/perl5/site_perl/5.8.3/Mail/SpamAssassin/PerMsgStatus.pm
+
+In this case you just need to copy from this package
+  lib/Mail/SpamAssassin/PerMsgStatus.pm 
+  lib/Mail/SpamAssassin/Conf.pm 
+  lib/Mail/SpamAssassin/SpamCopURI.pm
+
+  to /usr/lib/perl5/site_perl/5.8.3/Mail/SpamAssassin
+
+After placing the rules in a proper place, you should be all set.
+

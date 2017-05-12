@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c77b7d6607729c628927986f21aa270b7fb77737 BUGS
+SHA1 e9e761ef02c4f6067efd54fff7c75faf04450bf3 CHANGES
+SHA1 d7c83d8f89b92a3262a01eb2778d39402e77263a LICENSE
+SHA1 20fa01cb3cef36ee3f372144cc01eb019984506a MANIFEST
+SHA1 48d2f63f37c05a530a864a0e808a5dc78980c4f2 MANIFEST.SKIP
+SHA1 5465b1626007eae0c3f798b29571627ae13d1141 META.json
+SHA1 f4b41d079d1ec3570a8892bb9783d745eea83d21 META.yml
+SHA1 3e00dabe6c8d1f49e7134c8ec1cf32ac774de933 Makefile.PL
+SHA1 fa23172f6c9445f82d09680a2f7d42ea386b36e2 NEW
+SHA1 ba678389bdd7d51702a02abb5fedab243f6f5209 README
+SHA1 9cb6d05fd79edf4bd657ba8ea01e31dd2db77ac1 TODO
+SHA1 5b6fb7cc5e684a4b182c65a1a25865602786c6c1 lib/Math/BigInt/Lite.pm
+SHA1 c48fcc967e22b44d8c3880e2c5e6c3c4092093f4 t/alias.inc
+SHA1 8a305081a2db9b3954364585f526766610ebd88d t/bigintpm.inc
+SHA1 5a19a35d0a463e1bd7529c108a9545e18c926938 t/bigintpm.t
+SHA1 74ba39d4b9a57683091068e8fbdb97e4099602da t/from_bin-mbl.t
+SHA1 037be1650a0327a10f17906fb6bd57c60eb858af t/from_hex-mbl.t
+SHA1 5e8b7738bd4c703fc5c7161e6267f286dd52e043 t/from_oct-mbl.t
+SHA1 890769fdfa9b01a66c798187a988090579f33056 t/lite.t
+SHA1 4f8ede4cf2012e85c87f67054c0e1870f6afd0ad t/mbi_ali.t
+SHA1 72799e1f2076bb94344856940a7f9dd6383090c0 t/pod.t
+SHA1 9fd69ee86e39a6253559bd80861ccd0ec5a88d16 t/pod_cov.t
+SHA1 a872151e84b3f57a8835a979d905aeee059451b1 t/with.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYtr5WAAoJEGcmPl2fr166CcYH/R1WBNbHfRR4oJCzYvBEmpbx
+MwXLfHs60w+jvCqQz1TcSTS0fgadxpM4G4zCFz+T62TeBIDg0rKqxl4+iMgYez/c
+KK8UFvdH2G6QrpjwlYzMeNJY6dI9jI+IehlE2dU2FRXqElQZ6rHkmVzrU184kTZY
+efcyzL1lY3tUbnM5nb2i0R4JPNWho0yQRlQQ//Mmu2oA4WynfwahiQwrGr9Pvtwr
+RtX/3A6zjgP4eS+DAwAtKZz40gb5G685arqwqvi1ys5lRnyjuILyx4UvQ6uTt4Dr
+gljc9ykrdbkN+SsCDarz7KrK5OwMfIRlF9rsOZVERsapoonQkfxLhhN2utxBtro=
+=vGQ5
+-----END PGP SIGNATURE-----

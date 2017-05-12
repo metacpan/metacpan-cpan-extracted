@@ -1,0 +1,33 @@
+This original documentation for Mail::SRS version 0.10 is no longer
+relevant to newer versions of this module, but it is preserved here
+for posterity just in case of questions. See also README.pobox.
+
+-- begin --
+
+The Sender Rewriting Scheme preserves .forward functionality
+in an SPF-compliant world.
+
+This module should be considered alpha at this
+time. Documentation is incomplete. Pobox.com decided to
+publish Mail::SRS to CPAN anyway because there seems to be
+a fair amount of interest out there in implementing SRS.
+
+SPF requires the SMTP client IP to match the envelope sender
+(return-path).  When a message is forwarded through an
+intermediate server, that intermediate server may need to
+rewrite the return-path to remain SPF compliant.  If the
+message bounces, that intermediate server needs to validate
+the bounce and forward the bounce to the original sender.
+
+SRS provides a convention for return-path rewriting which
+allows multiple forwarding servers to compact the return-path.
+SRS also provides an authentication mechanism to ensure that
+purported bounces are not arbitrarily forwarded.
+
+SRS is documented at http://spf.pobox.com/srs.html
+
+A given SRS address is valid for one month by default.
+
+Cookies are relatively unique.
+
+-- end --

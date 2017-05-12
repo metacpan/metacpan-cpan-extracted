@@ -1,0 +1,52 @@
+---
+abstract: "Calculate the Graham's Function of a Natural"
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.39
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830'
+keywords:
+  - factors
+  - fun
+  - function
+  - graham
+  - math
+  - mathematics
+  - maths
+  - mjd
+  - obscure
+  - pure-perl
+  - riddle
+  - riddles
+  - quizzes
+  - qotw
+  - quiz
+  - quiz-of-the-week
+  - square
+  - week
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Math-GrahamFunction
+provides:
+  Math::GrahamFunction:
+    file: lib/Math/GrahamFunction.pm
+    version: 0.02001
+  Math::GrahamFunction::Object:
+    file: lib/Math/GrahamFunction/Object.pm
+  Math::GrahamFunction::SqFacts:
+    file: lib/Math/GrahamFunction/SqFacts.pm
+  Math::GrahamFunction::SqFacts::Dipole:
+    file: lib/Math/GrahamFunction/SqFacts/Dipole.pm
+requires:
+  Class::Accessor: 0
+  List::Util: 0
+  perl: 5.008
+resources:
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: https://bitbucket.org/shlomif/perl-math-grahamfunction/
+version: 0.02001

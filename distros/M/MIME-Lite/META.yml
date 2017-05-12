@@ -1,0 +1,26 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.8, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MIME-Lite
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Email::Date::Format: 1.000
+  File::Basename: 0
+  File::Spec: 0
+resources:
+  repository: http://github.com/rjbs/MIME-Lite
+version: 3.030

@@ -1,0 +1,77 @@
+README for MIDI-Perl
+                                        Time-stamp: "2010-12-23 09:15:20 conklin"
+
+			      MIDI-Perl
+
+MIDI-Perl is a suite of Perl modules that allows you to read, compose,
+modify, and write MIDI files.  It is largely object-oriented, but if
+you follow the example code, you should be able to get along fine.
+
+See http://interglacial.com/~sburke/pub/perl_midi/ for more info.
+
+
+
+PREREQUISITES
+
+This suite requires Perl 5.
+
+MIDI-Perl uses no external libraries at this time, aside from Carp,
+which has been standard for as long as I can remember.  If you want to
+use MIDI::Opus::draw, you'll also need GD.pm, however.
+
+
+
+INSTALLATION
+
+You install this module-suite, as you would install any perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of this module-suite in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL PREFIX=~/perl
+
+See perldoc perlmodinstall for more information on installing modules.
+
+
+
+DOCUMENTATION
+
+See lib/MIDI.pm for an overview of the suite.  See ChangeLog for
+recent changes.  POD-style documentation is included in all modules.
+POD is readable with the 'perldoc' utility.
+
+
+
+MACPERL INSTALLATION NOTES
+
+Don't bother with the makefiles.
+Just move MIDI.pm and the "MIDI" folder into your MacPerl library
+folder.  Read the PODs with Shuck.
+
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+MIDI-Perl should just be sent to me at CONKLIN@cpan.org
+
+
+AVAILABILITY
+
+The latest version of MIDI-Perl is available from the Comprehensive
+Perl Archive Network (CPAN).  <http://search.cpan.org/> is my favorite
+way to view CPAN.
+
+
+
+COPYRIGHT
+
+Copyright 1998+ by Sean M. Burke sburke@cpan.org
+Copyright 2010+ by D. Conklin conklin@cpan.org

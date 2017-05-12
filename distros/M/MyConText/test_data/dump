@@ -1,0 +1,16 @@
+#!/usr/bin/perl -w
+
+use DBI;
+my $dbh = DBI->connect('dbi:mysql:test') or die $DBI::errstr;
+
+my $TABLE = shift;
+$TABLE = 'ctx_test_1_data' unless defined $TABLE;
+
+my $sth = $dbh->prepare("select word,idx from $TABLE order by word");
+$sth->execute;
+
+while (my @data = $sth->fetchrow_array) {
+	$data[1] = join ' ', unpack 'S*', $data[1];
+	print "@data\n";
+	}
+

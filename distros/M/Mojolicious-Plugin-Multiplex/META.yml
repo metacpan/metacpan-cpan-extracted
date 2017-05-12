@@ -1,0 +1,28 @@
+---
+abstract: 'A websocket multiplexing layer for Mojolicious applications'
+author:
+  - 'Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.014, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Multiplex
+provides:
+  Mojolicious::Plugin::Multiplex:
+    file: lib/Mojolicious/Plugin/Multiplex.pm
+    version: '0.02'
+  Mojolicious::Plugin::Multiplex::Multiplexer:
+    file: lib/Mojolicious/Plugin/Multiplex/Multiplexer.pm
+requires:
+  Mojolicious: '6.0'
+resources:
+  bugtracker: http://github.com/jberger/Mojolicious-Plugin-Multiplex/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jberger/Mojolicious-Plugin-Multiplex
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

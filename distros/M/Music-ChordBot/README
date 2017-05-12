@@ -1,0 +1,63 @@
+Music-ChordBot
+
+Chordbot is a songwriting tool / electronic backup band for
+iPhone/iPad and Android that lets you experiment with advanced chord
+progressions and arrangements quickly and easily. You can use Chordbot
+for songwriting experiments, as accompaniment when learning new songs
+or for making backing tracks for your guitar / saxophone / theremin
+solos.
+
+ChordBot can import and export songs in JSON format. Music::ChordBot
+provides a set of modules that can be used to programmatically
+build songs and produce the JSON data suitable for import into
+ChordBot.
+
+ChordBot web site: http://www.chordbot.com .
+
+Note that Music::ChordBot requires the full version of ChordBot since
+the Lite version does not have import capabilities. 
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Music::ChordBot
+
+But you'll probably be mostly interested in
+
+    perldoc Music::ChordBot::Song
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Music-ChordBot
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Music-ChordBot
+
+    Search CPAN
+        http://search.cpan.org/dist/Music-ChordBot
+
+WARNING
+
+There is currently NO VALIDATION of argument values. Illegal values
+will result in program crashes and songs that cannot be imported, or
+played, by ChordBot.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 Johan Vromans
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

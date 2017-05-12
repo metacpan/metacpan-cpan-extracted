@@ -1,0 +1,92 @@
+Revision history for perl distribution Mojo-IOLoop-ReadWriteFork
+
+0.23 2016-10-13T10:07:18+0200
+ - Fix documentation: There is no "spawn" event #8
+
+0.22 2016-06-27T08:28:49+0200
+ - Add "fork" event
+
+0.21 2016-05-03T14:27:40+0200
+ - Fix failing t/synopsis.t #6
+
+0.20 2016-04-18T14:51:14+0200
+ - Add support for passing in %ENV #5
+
+0.19 2016-04-14T11:54:18+0200
+ - Add missing documentation for CODE passed on to run() / start()
+ - Change conduit() into holding a hash.
+
+0.18 2016-04-14T09:54:31+0200
+ - Improved documentation
+ - Add conduit() attribute
+ - Remove deprecated reactor() attribute
+
+0.17 2016-03-10T22:41:54+0100
+ - Improve tests on FreeBSD
+   http://cpantesters.org/cpan/report/9d911494-a39d-11e5-932c-a1bf8fb2e322
+
+0.16 2015-11-19T19:36:39+0100
+ - Fix Minion::Backend::File does not exist anymore #2
+
+0.15 2015-10-15T16:50:48+0200
+ - Made t/minion.t more robust
+
+0.14 2015-10-15T16:21:07+0200
+ - Will use waitpid() if $SIG{CHLD} = "DEFAULT"
+   https://github.com/kraih/minion/issues/15
+
+0.13 2015-07-16T12:42:41+0200
+ - Will use EV::child to look for SIGCHLD if EV is available
+
+0.12 2015-04-28T15:14:02+0200
+ - Fix reading from stdout_read after "Input/output error" ($!=5)
+ - Improved output to screen in DEBUG mode
+ - Will not require Test::Memory::Cycle
+   It could not be installed, since it require CGI.pm which is not core anymore
+
+0.11 2015-01-03T15:32:16Z
+ - Skip sudo.t
+
+0.10 2015-01-03T12:59:57Z
+ - Fix die() inside callback in child process
+ - Fix starting invalid program
+ - Add "ioloop" attribute
+ - Remove hackish /proc/$pid test
+ - Deprecated "reactor" attribute
+
+0.09 2014-11-19T15:35:36Z
+ - Trying to fix t/telnet.t with \r\n on BSD
+
+0.08 2014-11-16T14:16:47Z
+ - Trying to fix t/telnet.t with localhost
+
+0.07 2014-11-13T18:52:55Z
+ - Trying to fix t/telnet.t with 127.0.0.1
+ - Mojo::EventEmitter::emit_safe is DEPRECATED
+
+0.06 2014-08-11T16:59:18Z
+ - Fix "Use of uninitialized value in numeric eq (==) at ReadWriteFork.pm
+   line 182."
+ - Add support for write() before child process has started
+ - Add support for "drain" callback to write()
+ - Add run(). a simpler version start()
+ - Add close() for closing STDIN
+
+0.05 2014-02-19T13:29:54Z
+ - Fix "read" event cannot change ERRNO from sysread()
+
+0.04 2013-11-22T19:52:52Z
+ - Add support for callbacks
+ - Fix failing tests
+
+0.03 2013-11-22T08:35:43Z
+ - A bit more relaxed test for cat.t: Running it on BSD results in
+   "^D&#8;&#8;" at the end.
+
+0.02 2013-11-20T11:36:38Z
+ - Add example/tail.pl
+ - Fix failing t/bash.t
+
+0.01 2013-11-20T10:25:19Z
+ - First release on CPAN
+

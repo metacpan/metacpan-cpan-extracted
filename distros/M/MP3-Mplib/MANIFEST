@@ -1,0 +1,23 @@
+Changes
+MANIFEST			This list of files
+MANIFEST.SKIP
+Makefile.PL
+Mplib.pm
+Mplib.xs
+README
+mplib/Makefile.PL
+mplib/mplib.c
+mplib/mplib.h
+mplib/mplib_paas.c
+mplib/mplib_s.c
+mplib/mplib_s.h
+mplib/xmalloc.c
+mplib/xmalloc.h
+t/copy.pl
+t/t1.t
+t/t2.t
+t/t3.t
+t/t4.t
+t/t5.t
+t/test.mp3
+META.yml                                 Module meta-data (added by MakeMaker)

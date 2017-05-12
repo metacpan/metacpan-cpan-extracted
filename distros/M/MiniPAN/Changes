@@ -1,0 +1,25 @@
+Revision history for MiniPAN
+
+0.04 - Wed Nov 11 19:06:40 2009
+    - moved to Module::Install                                                                                                                                                     
+    - use http cpan mirror instead of ftp which is less painfull usually                                                                                                               - added dependenciy to external binaries (make, sudo, yes)                                                                                                                     
+    - install minipan script properly                                                                                                                                              
+    - added support for Makefile.PL that doesnt support --skipdeps                                                                                                                 
+      (like WWW::Mechanize apparently)                                                                                                                                             
+    - use default answers when asked questions in configure runs                                                                                                                   
+    - fixed regexp to detect perl modules
+
+0.03    2009-01-09 03:15
+    - minor fixes
+
+0.02    2009-01-09 00:28
+    - use perl modules instead of system() for downloading and extracting
+	  sources
+    - therefore added following dependencies:
+	  * LWP::UserAgent
+	  * IO::Uncompress::Gunzip
+	  * Archive::Tar
+	  * File::Path
+
+0.01    2009-01-03 22:01
+    - First version, released on an unsuspecting world.

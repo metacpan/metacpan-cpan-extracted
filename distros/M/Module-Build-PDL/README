@@ -1,0 +1,39 @@
+Module-Build-PDL version 0.0.3
+
+The purpose of Module::Build::PDL is to provide a Module::Build
+style avenue for creating PDL distributions.  PDL has its own filetype,
+.pd, which needs to be processed to generate .xs and .pm files.
+Module::Build::PDL handles all of that.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+AUTHOR TESTS
+
+The author tests are located in the directory xt.  I would like to add
+authortests as a build target, but until I get there, here are two commands
+you can use to run them (either one should work fine):
+
+	prove xt/*
+	./Build test --test_files 'xt/*'
+
+
+DEPENDENCIES
+
+This module depends on Module::Build and PDL.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010, David Mertens
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

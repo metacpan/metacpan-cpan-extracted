@@ -1,0 +1,21 @@
+0.015 - 2016/12/18
+- fix signing/validation: only a single header (starting from the bottom) should
+  be checked for each entry in [h]eader.
+- option `h_auto` to automatically create a useful [h]eader entry when signing
+- fixed problem with breaking long lines which made mail header invalid (missing
+  space in folded line)
+- new scripts/sign.pl for signing mails
+- no more endless loop on broken input mails in scripts/validate-emails.pl
+0.014 - 2016/06/14
+- leave arguments for next as they are, i.e. don't work on alias for(@_) and
+  thus inadvertantily change the buffer in the caller
+0.013 - 2015/12/16
+- make parse_taglist public
+0.012 - 2015/11/20
+- added filter argument so that for example only signatures matching the domain
+  of the From header will be checked
+0.011 - 2015/11/18
+- make interface more similar to Mail::SPF::Iterator, i.e. everything is done
+  through a single method C<next>
+0.010 - 2015/11/17
+- initial release

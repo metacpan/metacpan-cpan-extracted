@@ -1,0 +1,157 @@
+=head1 NAME
+
+MasonX::Request::HTMLTemplate::WithApacheSession - Add templates to the Mason Request object with session support
+
+=head1 SYNOPSIS
+
+  In your httpd.conf file:
+
+    PerlSetVar  MasonRequestClass      MasonX::Request::HTMLTemplate::WithApacheSession
+    # and optionally
+    PerlSetVar  MasonDefaultLanguage   en
+    PerlSetVar  MasonTemplateBaseDir   undef
+    # add here all PerlSetVar needed 
+    # by MasonX::Request::WithApacheSession
+    # (see its manual page). As an example
+    # PerlSetVar  MasonSessionCookieDomain  .example.com
+    # PerlSetVar  MasonSessionClass         Apache::Session::MySQL
+    # PerlSetVar  MasonSessionDataSource    dbi:mysql:somedb
+
+  now you can set a session variable in a component
+
+    % $m->session->{myscript} = 'MASON';
+
+  and use it in a template read_session.htt
+
+    <HTML><HEAD></HEAD><BODY>
+      I love %myscript%
+    </BODY></HTML>
+
+  called from a component read_session.mpl
+
+	% $m->print_template;
+	
+  You can moreover set your prefered language in a component 
+  like http://.../set_lang.mpl?lang=xx
+
+	% $m->session->{lang} = $ARGS{lang}
+
+  and every template you call later, system will try to 
+  use ******.xx.htt if exists, as template file. Of course, if 
+  this file doesn't exist, standard ******.htt will be used.
+
+=head1 DESCRIPTION
+
+This module add session to MasonX::Request::HTMLTemplate so you can use session variable in
+your pages. Moreover session will be passed to templates and could be use inside them.
+
+You can use a complex structure in session variable like reference to hash and use it as
+template variables.
+
+If you define an a hash ref in a session variable like:
+
+  $m->session->{complex} = {
+                             key1 => value1,
+                             key2 => value2,
+                             key3 => {
+                                       skey1 => svalue1,
+                                       skey2 => svalue2,
+                                       .......
+                             .......
+
+you can get this values in template using template variables as
+
+  %complex_key1%             that it will be relaced from "value1"
+  %complex_key2%             that it will be relaced from "value2"
+  %complex_key3_skey1%       that it will be relaced from "svalue1"
+  %complex_key3_skey2%       that it will be relaced from "svalue2"
+
+and so on.
+
+=head2 USAGE
+
+=head2 ACTIVATION
+
+To use this module you need to tell Mason to use this
+class for requests.  This can be done in one of two ways.
+If you are configuring Mason via your httpd.conf file,
+simply add this:
+
+  PerlSetVar  MasonRequestClass  MasonX::Request::HTMLTemplate::WithApacheSession
+
+If you are using a handler.pl file, simply add this parameter
+to the parameters given to the ApacheHandler constructor:
+
+  request_class => 'MasonX::Request::HTMLTemplate::WithApacheSession'
+
+=head2 CONFIGURATION
+
+All inherit from L<MasonX::Request::HTMLTemplate|MasonX::Request::HTMLTemplate>
+
+=head2 PUBLIC METHODS
+
+All inherit from L<MasonX::Request::HTMLTemplate|MasonX::Request::HTMLTemplate>
+
+=head2 PUBLIC VARIABLES
+
+All inherit from L<MasonX::Request::HTMLTemplate|MasonX::Request::HTMLTemplate>
+
+=head1 DIAGNOSTICS
+
+All inherit from L<MasonX::Request::HTMLTemplate|MasonX::Request::HTMLTemplate>
+
+=head1 EXPORT
+
+All inherit from L<MasonX::Request::HTMLTemplate|MasonX::Request::HTMLTemplate>
+
+=head1 REQUIRES 
+
+MasonX::Request::WithApacheSession
+
+=head1 SUPPORT
+
+Contact directly the author or submit a bug to
+
+http://rt.cpan.org/NoAuth/Bugs.html?Dist=MasonX-Request-HTMLTemplate
+
+=head1 AUTHOR
+
+Emiliano Bruni, E<lt>info <at> ebruni <dot> itE<gt>
+
+=head1 SEE ALSO
+
+L<MasonX::Request::HTMLTemplate>, L<MasonX::Request::WithApacheSession>
+
+To see some web sites that use this package take a look to http://www.micso.fr/
+and http://www.micso.com/Z<>.
+
+=head1 LICENSE
+
+MasonX::Request::HTMLTemplate::WithApacheSession - Add templates to the Mason Re
+quest object with session support
+
+Copyright (C) 2003 Emiliano Bruni (info <at> ebruni <dot> it)
+
+This module is free software; you can redistribute it and/or modify it
+under the terms of either:
+
+a) the GNU General Public License as published by the Free Software
+Foundation; either version 1, or (at your option) any later version,
+or
+
+b) the "Artistic License" which comes with this module.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
+the GNU General Public License or the Artistic License for more details.
+
+You should have received a copy of the Artistic License with this
+module, in the file ARTISTIC.  If not, I'll be glad to provide one.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+USA
+
+=cut

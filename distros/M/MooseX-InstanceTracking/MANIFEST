@@ -1,0 +1,20 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/GithubMeta.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/MooseX/InstanceTracking.pm
+lib/MooseX/InstanceTracking/Role/Class.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/001-basic.t
+t/002-clone.t
+t/003-rebless.t
+t/004-make_immutable.t
+t/005-compose.t

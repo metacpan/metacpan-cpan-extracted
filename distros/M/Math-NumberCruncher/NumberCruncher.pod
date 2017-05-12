@@ -1,0 +1,716 @@
+=head1 NAME
+
+Math::NumberCruncher - Collection of useful math-related functions.
+
+=head1 SYNOPSIS
+
+It should be noted that as of v4.0, there is now an OO interface to Math::NumberCruncher. For backwards compatibility, however, the previous, functional style will always be supported.
+
+# OO Style
+
+use Math::NumberCruncher;
+
+$ref = Math::NumberCruncher->new();
+
+# From this point on, all of the subroutines shown below will be available
+# through $ref (i.e., ( $high,$low ) = $ref->Range( \@array )). For the sake
+# of brevity, consult the functional documentation (below) for the use
+# of specific functions.
+
+# Functional Style
+
+use Math::NumberCruncher;
+
+($high, $low) = Math::NumberCruncher::Range(\@array);
+
+$mean = Math::NumberCruncher::Mean(\@array);
+
+$median = Math::NumberCruncher::Median(\@array [, $decimal_places]);
+
+$odd_median = Math::NumberCruncher::OddMedian(\@array);
+
+$mode = Math::NumberCruncher::Mode(\@array);
+
+$covariance = Math::NumberCruncher::Covariance(\@array1, \@array2);
+
+$correlation = Math::NumberCruncher::Correlation(\@array1, \@array2);
+
+($slope, $y_intercept) = Math::NumberCruncher::BestFit(\@array1, \@array2 [, $decimal_places]);
+
+$distance = Math::NumberCruncher::Distance($x1,$y1,$z1,$x2,$y2,$z2 [, $decimal_places]);
+
+$distance = Math::NumberCruncher::Distance($x1,$y1,$x1,$x2 [, $decimal_places]);
+
+$distance = Math::NumberCruncher::ManhattanDistance($x1,$y1,$x2,$y2);
+
+$probAll = Math::NumberCruncher::AllOf('0.3','0.25','0.91','0.002');
+
+$probNone = Math::NumberCruncher::NoneOf('0.4','0.5772','0.212');
+
+$probSome = Math::NumberCruncher::SomeOf('0.11','0.56','0.3275');
+
+$factorial = Math::NumberCruncher::Factorial($some_number);
+
+$permutations = Math::NumberCruncher::Permutation($n);
+
+$permutations = Math::NumberCruncher::Permutation($n,$k);
+
+$roll = Math::NumberCruncher::Dice(3,12,4);
+
+$randInt = Math::NumberCruncher::RandInt(10,50);
+
+$randomElement = Math::NumberCruncher::RandomElement(\@array);
+
+Math::NumberCruncher::ShuffleArray(\@array);
+
+@unique = Math::NumberCruncher::Unique(\@array);
+
+@a_only = Math::NumberCruncher::Compare(\@a,\@b);
+
+@union = Math::NumberCruncher::Union(\@a,\@b);
+
+@intersection = Math::NumberCruncher::Intersection(\@a,\@b);
+
+@difference = Math::NumberCruncher::Difference(\@a,\@b);
+
+$gaussianRand = Math::NumberCruncher::GaussianRand();
+
+$ways = Math::NumberCruncher::Choose($n,$k);
+
+$binomial = Math::NumberCruncher::Binomial($attempts,$successes,$probability);
+
+$gaussianDist = Math::NumberCruncher::GaussianDist($x,$mean,$variance);
+
+$StdDev = Math::NumberCruncher::StandardDeviation(\@array [, $decimal_places]);
+
+$variance = Math::NumberCruncher::Variance(\@array [, $decimal_places]);
+
+@scores = Math::NumberCruncher::StandardScores(\@array [, $decimal_places]);
+
+$confidence = Math::NumberCruncher::SignSignificance($trials,$hits,$probability);
+
+$e = Math::Numbercruncher::EMC2( "m512", "miles" [, $decimal_places] );
+
+$m = Math::NumberCruncher::EMC2( "e987432" "km" [, $decimal_places] );
+
+$force = Math::NumberCruncher::FMA( "m12", "a73.5" [, $decimal_places] );
+
+$mass = Math::NumberCruncher::FMA( "a43", "f1324" [, $decimal_places] );
+
+$acceleration = Math::NumberCruncher::FMA( "f53512", "m356" [, $decimal_places] );
+
+$predicted_value = Math::NubmerCruncher::Predict( $slope, $y_intercept, $proposed_x [, $decimal_places] );
+
+$area = Math::NumberCruncher::TriangleHeron( $a, $b, $c [, $decimal_places] );
+
+$area = Math::NumberCruncher::TriangleHeron( 1,3, 5,7, 8,2 [, $decimal_places] );
+
+$perimeter = Math::NumberCruncher::PolygonPerimeter( $x0,$y0, $x1,$y1, $x2,$y2, ... [, p$decimal_places]);
+
+$direction = Math::NumberCruncher::Clockwise( $x0,$y0, $x1,$y1, $x2,$y2 );
+
+$collision = Math::NumberCruncher::InPolygon( $x, $y, @xy );
+
+@points = Math::NumberCruncher::BoundingBox_Points( $d, @p );
+
+$in_triangle = Math::NumberCruncher::InTriangle( $x,$y, $x0,$y0, $x1,$y1, $x2,$y2 );
+
+$area = Math::NumberCruncher::PolygonArea( 0, 1, 1, 0, 2, 0, 3, 2, 2, 3 [, p$decimal_places] );
+
+$area = Math::NumberCruncher::CircleArea( $diameter [, $decimal_places] );
+
+$circumference = Math::NumberCruncher::Circumference( $diameter [, $decimal_places] );
+
+$volume = Math::NumberCruncher::SphereVolume( $radius [, $decimal_places] );
+
+$surface_area = Math::NumberCruncher::SphereSurface( $radius [, $decimal_places] );
+
+$years = Math::NumberCruncher::RuleOf72( $interest_rate [, $decimal_places] );
+
+$volume = Math::NumberCruncher::CylinderVolume( $radius, $height [, $decimal_places] );
+
+$volume = Math::NumberCruncher::ConeVolume( $lowerBaseArea, $height [, $decimal_places] );
+
+$radians = Math::NumberCruncher::deg2rad( $degrees [, $decimal_places] );
+
+$degrees = Math::NumberCruncher::rad2deg( $radians [, $decimal_places] );
+
+$Fahrenheit = Math::NumberCruncher::C2F( $Celsius [, $decimal_places] );
+
+$Celsius = Math::NumberCruncher::F2C( $Fahrenheit [, $decimal_places] );
+
+$cm = Math::NumberCruncher::in2cm( $inches [, $decimal_places] );
+
+$inches = Math::NumberCruncher::cm2in( $cm [, $decimal_places] );
+
+$ft = Math::NumberCruncher::m2ft( $m [, $decimal_places] );
+
+$m = Math::NumberCruncher::ft2m( $ft [, $decimal_places] );
+
+$miles = Math::NumberCruncher::km2miles( $km [, $decimal_places] );
+
+$km = Math::NumberCruncher::miles2km( $miles [, $decimal_places] );
+
+$lb = Math::NumberCruncher::kg2lb( $kg [, $decimal_places] );
+
+$kg = Math::NumberCruncher::lb2kg( $lb [, $decimal_places] );
+
+$RelativeStride = Math::NumberCruncher::RelativeStride( $stride_length, $leg_length [, $decimal_places] );
+
+$RelativeStride = Math::NumberCruncher::RelativeStride_2( $DimensionlessSpeed [, $decimal_places] );
+
+$DimensionlessSpeed = Math::NumberCruncher::DimensionlessSpeed( $RelativeStride [, $decimal_places] );
+
+$DimensionlessSpeed = Math::NumberCruncher::DimensionlessSpeed_2( $ActualSpeed, $leg_length [, $decimal_places]);
+
+$ActualSpeed = Math::NumberCruncher::ActualSpeed( $leg_length, $DimensionlessSpeed [, $decimal_places] );
+
+$eccentricity = Math::NumberCruncher::Eccentricity( $half_major_axis, $half_minor_axis [, $decimal_places] );
+
+$LatusRectum = Math::NumberCruncher::LatusRectum( $half_major_axis, $half_minor_axis [, $decimal_places] );
+
+$EllipseArea = Math::NumberCruncher::EllipseArea( $half_major_axis, $half_minor_axis [, $decimal_places] );
+
+$OrbitalVelocity = Math::NumberCruncher::OrbitalVelocity( $r, $a, $M [, $decimal_places] );
+
+$sine = Math::NumberCruncher::sin( $x [, $decimal_places] );
+
+$cosine = Math::NumberCruncher::cos( $x [, $decimal_places] );
+
+$tangent = Math::NumberCruncher::tan( $x [, $decimal_places] );
+
+$arcsin = Math::NumberCruncher::asin( $x [, $decimal_places] );
+
+$arccos = Math::NumberCruncher::acos( $x [, $decimal_places] );
+
+$arctan = Math::NumberCruncher::atan( $x [, $decimal_places] );
+
+$cotangent = Math::NumberCruncher::cot( $x [, $decimal_places] );
+
+$arccot = Math::NumberCruncher::acot( $x [, $decimal_places] );
+
+$secant = Math::NumberCruncher::sec( $x [, $decimal_places] );
+
+$arcsec = Math::NumberCruncher::asec( $x [, $decimal_places] );
+
+$cosecant = Math::NumberCruncher::csc( $x [, $decimal_places] );
+
+$arccosecant = Math::NumberCruncher::acsc( $x [, $decimal_places] );
+
+$exsecant = Math::NumberCruncher::exsec( $x [, $decimal_places] );
+
+$versine = Math::NumberCruncher::vers( $x [, $decimal_places] );
+
+$coversine = Math::NumberCruncher::covers( $x [, $decimal_places] );
+
+$haversine = Math::NumberCruncher::hav( $x [, $decimal_places] );
+
+$grouped = Math::NumberCruncher::Commas( $number );
+
+$SqrRoot = Math::NumberCruncher::SqrRoot( $number [, $decimal_places] );
+
+$square_root = Math::NumberCruncher::sqrt( $x  [, $decimal_places] );
+
+$root = Math::NumberCruncher::Root( 55, 3 [, $decimal_places] );
+
+$root = Math::NumberCruncher::Root2( 55, 3 [, $decimal_places] );
+
+$log = Math::NumberCruncher::Ln( 100 [, $decimal_places] );
+
+$log = Math::NumberCruncher::log( $num [, $decimal_places] );
+
+$num = Math::NumberCruncher::Exp( 0.111 [, $decimal_places] );
+
+$num = Math::NumberCruncher::exp( $log [, $decimal_places] );
+
+$Pi = Math::NumberCruncher::PICONST( $decimal_places );
+
+$E = Math::NumberCruncher::ECONST( $decimal_places );
+
+( $A, $B, $C ) = Math::NumberCruncher::PythagTriples( $x, $y [, $decimal_places] );
+
+$z = Math::NumberCruncher::PythagTriplesSeq( $x, $y [, $decimal_places] );
+
+@nums = Math::NumberCruncher::SIS( [$start, $numbers, $increment] );
+
+$inverse = Math::NumberCruncher::Inverse( $number [, $decimal_places] );
+
+@constants = Math::NumberCruncher::CONSTANTS( 'all' [, $decimal_places] );
+
+$bernoulli = Math::NumberCruncher::Bernoulli( $num [, $decimal_places] );
+
+@bernoulli = Math::NumberCruncher::Bernoulli( $num );
+
+=head1 DESCRIPTION
+
+This module is a collection of commonly needed number-related functions, including numerous standard statistical, 
+geometric, and probability functions. Some of these functions are taken directly from _Mastering Algorithms with Perl_, 
+by Jon Orwant, Jarkko Hietaniemi, and John Macdonald, and others are adapted heavily from same. The remainder are 
+either original functions written by the author, or original adaptations of standard algorithms. Some of the functions 
+are fairly obvious, others are explained in greater detail below. For all calculations involving pi, the value of pi is 
+taken out to 2000 places. Overkill? Probably, but it is better, in my opinion, to have too much accuracy as opposed to 
+not enough. I've also included the value of Euler's e, g (Newton's gravitational constant), and the natural log of 2 
+out to 2000 places. These are available for export as $PI, $_e_, $_g_, and $_ln2_, respectively. In addition, via the 
+CONSTANT() routine, the Golden Mean, Catalan constant, Apery constant, Landau-Ramanujan constant, Khintchine constant, 
+Sierpinski constant, Wilbraham-Gibbs constant, Euler's gamma, square root of 2, square root of 3, and square root of 5 
+are pre-calculated to 2000 decimal places and are constructed only as requested by the user. See below for further 
+details. Additionally, sqrt, sin, cos, log, and exp are suitable as drop-in replacements for the built-in functions of
+the same name. Usage is exactly the same, the only difference being the number of default decimal places is 20, and
+can be changed on the fly with each call. Further details below.
+
+The default number of decimal places throughout is 20. This can be modified either by changing the value of $DECIMALS
+at the top of the NumberCruncher.pm file itself, or it can be changed for the duration of a given script by modifying
+$Math::NumberCruncher::DECIMALS. Or, where noted, you can specify a number of decimal places on a given call. For
+example, if you want the square root of two taken out to the default 20 decimal places, you can simply use: "$root =
+Math::NumberCruncher::SqrRoot( 2 )". However, if you want to take the square root of two out to, say, 100 decimal
+places, you can use: "$root = Math::NumberCruncher::SqrRoot( 2, 100 )".
+
+The following functions are available for export: sqrt, sin, asin, cos, acos, tan, atan, cot, acot, sec, asec, csc,
+acsc, vers, covers, hav, log, exp. Where there is a function of the same name as a built-in function, the
+Math::NumberCruncher version is suitable as a drop-in replacement, allowing for a greater degree of accuracy. It should
+be noted, however, that the functions are potentially a good deal slower than the built-in functions, depending upon
+the complexity of the call. For a simple call, like the square root of 1111 taken out to 50 decimal places, the result
+is reasonably fast.  For something like the 20th root of 123456789.9876543210000001, expect it to take substantially
+longer.
+
+=head1 EXAMPLES
+
+=head2 ($high,$low) = B<Math::NumberCruncher::Range>(\@array);
+
+Returns the largest and smallest elements in an array.
+
+=head2 $mean = B<Math::NumberCruncher::Mean>(\@array);
+
+Returns the mean, or average, of an array.
+
+=head2 $median = B<Math::NumberCruncher::Median>(\@array [, $decimal_places]);
+
+Returns the median, or the middle, of an array.  The median may or may not be an element of the array itself.
+
+=head2 $odd_median = B<Math::NumberCruncher::OddMedian>(\@array);
+
+Returns the odd median, which, unlike the median, *is* an element of the array.  In all other respects it is similar to the median.
+
+=head2 $mode = B<Math::NumberCruncher::Mode>(\@array);
+
+Returns the mode, or most frequently occurring item, of @array.
+
+=head2 $covariance = B<Math::NumberCruncher::Covariance>(\@array1,\@array2);
+
+Returns the covariance, which is a measurement of the correlation of two variables.
+
+=head2 $correlation = B<Math::NumberCruncher::Correlation>(\@array1,\@array2);
+
+Returns the correlation of two variables. Correlation ranges from 1 to -1, with a correlation of zero meaning no correlation exists between the two variables.
+
+=head2 ($slope,$y_intercept ) = B<Math::NumberCruncher::BestFit>(\@array1,\@array2 [, $decimal_places]);
+
+Returns the slope and y-intercept of the line of best fit for the data in question.
+
+=head2 $distance = B<Math::NumberCruncher::Distance>($x1,$y1,$x1,$x2 [, $decimal_places]);
+
+Returns the Euclidian distance between two points.  The above example demonstrates the use in two dimensions. For three dimensions, usage would be $distance = B<Math::NumberCruncher::Distance>($x1,$y1,$z1,$x2,$y2,$z2);>
+
+=head2 $distance = B<Math::NumberCruncher::ManhattanDistance>($x1,$y1,$x2,$y2);
+
+Modified two-dimensional distance between two points. As stated in _Mastering Algorithms with Perl_, "Helicopter pilots tend to think in Euclidian distance, good New York cabbies tend to think in Manhattan distance." Rather than distance "as the crow flies," this is distance based on a rigid grid, or network of streets, like those found in Manhattan.
+
+=head2 $probAll = B<Math::NumberCruncher::AllOf>('0.3','0.25','0.91','0.002');
+
+The probability that B<all> of the probabilities in question will be satisfied. (i.e., the probability that the Steelers will win the SuperBowl B<and> that David Tua will win the World Heavyweight Title in boxing.)
+
+=head2 $probNone = B<Math::NumberCruncher::NoneOf>('0.4','0.5772','0.212');
+
+The probability that B<none> of the probabilities in question will be satisfied. (i.e., the probability that the Steelers will not win the SuperBowl and that David Tua will not win the World Heavyweight Title in boxing.)
+
+=head2 $probSome = B<Math::NumberCruncher::SomeOf>('0.11','0.56','0.3275');
+
+The probability that at least one of the probabilities in question will be satisfied. (i.e., the probability that either the Steelers will win the SuperBowl B<or> David Tua will win the World Heavyweight Title in boxing.)
+
+=head2 $factorial = B<Math::NumberCruncher::Factorial>($some_number);
+
+The number of possible orderings of $factorial items. The factorial n! gives the number of ways in which n objects can be permuted.
+
+=head2 $permutations = B<Math::NumberCruncher::Permutation>($n);
+
+The number of permutations of $n elements.
+
+=head2 $permutations = B<Math::NumberCruncher::Permutation>($n,$k);
+
+The number of permutations of $k elements drawn from a set of $n elements.
+
+=head2 $roll = B<Math::NumberCruncher::Dice>($number,$sides,$plus);
+
+The obligatory dice rolling routine. Returns the result after passing the number of rolls of the die, the number of sides of the die, and any additional points to be added to the roll. As commonly seen in role playing games, 4d12+5 would be expressed as B<Dice(4,12,5)>.  The function defaults to a single 6-sided die rolled once without any points added.
+
+=head2 $randInt = B<Math::NumberCruncher::RandInt>(10,50);
+
+Returns a random integer between the two number passed to the function, inclusive. With no parameters passed, the function returns either 0 or 1.
+
+=head2 $randomElement = B<Math::NumberCruncher::RandomElement>(\@array);
+
+Returns a random element from @array.
+
+=head2 B<Math::NumberCruncher::ShuffleArray>(\@array);
+
+Shuffles the elements of @array and returns them.
+
+=head2 @unique = B<Math::NumberCruncher::Unique>(\@array);
+
+Returns an array of the unique items in an array.
+
+=head2 @a_only = B<Math::NumberCruncher::Compare>(\@a,\@b);
+
+Returns an array of elements that appear only in the first array passed. Any elements that appear in both arrays, or appear only in the second array, are discarded. 
+
+=head2 @union = B<Math::NumberCruncher::Union>(\@a,\@b);
+
+Returns an array of the unique elements produced from the joining of the two arrays.
+
+=head2 @intersection = B<Math::NumberCruncher::Intersection>(\@a,\@b);
+
+Returns an array of the elements that appear in both arrays.
+
+=head2 @difference = B<Math::NumberCruncher::Difference>(\@a,\@b);
+
+Returns an array of the symmetric difference of the two arrays. For example, in the words of _Mastering Algorithms in Perl_, "show me the web documents that talk about Perl B<or> about sets B<but not> those that talk about B<both>.
+
+=head2 $gaussianRand = B<Math::NumberCruncher::GaussianRand>();
+
+Returns one or two floating point numbers based on the Gaussian Distribution, based upon whether the call wants an array or a scalar value.
+
+=head2 $ways = B<Math::NumberCruncher::Choose>($n,$k);
+
+The number of ways to choose $k elements from a set of $n elements, when the order of selection is irrelevant.
+
+=head2 $binomial = B<Math::NumberCruncher::Binomial>($n,$k,$p);
+
+Returns the probability of $k successes in $n tries, given a probability of $p. (i.e., if the probability of being struck by lightning is 1 in 75,000, in 100 days, the probability of being struck by lightning exactly twice would be expressed as B<Binomial('100','2','0.0000133')>)
+
+=head2 $probability = B<Math::NumberCruncher::GaussianDist>($x,$mean,$variance);
+
+Returns the probability, based on Gaussian Distribution, of our random variable, $x, given the $mean and $variance.
+
+=head2 $StdDev = B<Math::NumberCruncher::StandardDeviation>(\@array [, $decimal_places]);
+
+Returns the Standard Deviation of @array, which is a measurement of how diverse your data is.
+
+=head2 $variance = B<Math::NumberCruncher::Variance>(\@array [, $decimal_places]);
+
+Returns the variance for @array, which is the square of the standard deviation.  Or think of standard deviation as the square root of the variance.  Variance is another indicator of the diversity of your data.
+
+=head2 @scores = B<Math::NumberCruncher::StandardScores>(\@array [, $decimal_places]);
+
+Returns an array of the number of standard deviations above the mean for @array.
+
+=head2 $confidence = B<Math::NumberCruncher::SignSignificance>($trials,$hits,$probability);
+
+Returns the probability of how likely it is that your data is due to chance.  The lower the confidence, the less likely your data is due to chance.
+
+=head2 $e = B<Math::NumberCruncher::EMC2>( "m36", "km" [, $decimal_places] );
+
+Implementation of Einstein's E=MC**2.  Given either energy or mass, the function returns the other. When passing mass, the value must be preceeded by a "m," which may be either upper or lower case.  When passing energy, the value must be preceeded by a "e," which may be either upper or lower case. The second argument is whether you wish to use kilometers per second or miles per second for the speed of light. Case is irrelevant. EMC2() keys off of the first letter of the second argument, so all that is necessary to pass is either "k" or "m".
+
+=head2 $force = B<Math::NumberCruncher::FMA>( "m97", "a53" [, $decimal_places] );
+
+Implementation of the stadard force = mass * acceleration formula.  Given two of the three variables (i.e., mass and force, mass and acceleration, or acceleration and force), the function returns the third.  When passing the values, mass must be preceeded by a "m," force must be preceeded by a "f," and acceleration must be preceeded by an "a."  Case is irrelevant.
+
+=head2 $predicted = B<Math::NumberCruncher::Predict>( $slope, $y_intercept, $proposed_x [, $decimal_places] );
+
+Useful for predicting values based on data trends, as calculated by BestFit(). Given the slope and y-intercept, and a proposed value of x, returns corresponding y.
+
+=head2 $area = B<Math::NumberCruncher::TriangleHeron>( $a, $b, $c [, $decimal_places] );
+
+Calculates the area of a triangle, using Heron's formula.  TriangleHeron() can be passed either the lengths of the three sides of the triangle, or the (x,y) coordinates of the three verticies.
+
+=head2 $perimeter = B<Math::NumberCruncher::PolygonPerimeter>( $x0,$y0, $x1,$y1, $x2,$y2, ... [, p$decimal_places]);
+
+Calculates the length of the perimeter of a given polygon. The final argument specifies the number of decimal places you want. To specify a number other than the default (see above), the number must be preceeded by the letter "p". For example: Math::NumberCruncher::PolygonPerimeter( 1, 1, 2, 3, 4, 5, p75 );
+
+=head2 $direction = B<Math::NumberCruncher::Clockwise>( $x0,$y0, $x1,$y1, $x2,$y2 );
+
+Given three pairs of points, returns a positive number if you must turn clockwise when moving from p1 to p2 to p3, returns a negative number if you must turn counter-clockwise when moving from p1 to p2 to p3, and a zero if the three points lie on the same line.
+
+=head2 $collision = B<Math::NumberCruncher::InPolygon>( $x, $y, @xy );
+
+Given a set of xy pairs (@xy) that define the perimeter of a polygon, returns a 1 if point ($x,$y) is inside the polygon and returns 0 if the point ($x,$y) is outside the polygon.
+
+=head2 @points = B<Math::NumberCruncher::BoundingBox_Points>( $d, @p );
+
+Given a set of @p points and $d dimensions, returns two points that define the upper left and lower right corners of the bounding box for set of points @p. 
+
+=head2 $in_triangle = B<Math::NumberCruncher::InTriangle>( $x,$y, $x0,$y0, $x1,$y1, $x2,$y2 );
+
+Returns true if point $x,$y is inside the triangle defined by points ($x0,$y0), ($x1,$y1), and ($x2,$y2)
+
+=head2 $area = B<Math::NumberCruncher::PolygonArea>( 0, 1, 1, 0, 3, 2, 2, 3, 0, 2  [, p$decimal_places]);
+
+Calculates the area of a polygon using determinants. As with PolygonPerimeter(), the final argument specified the number of decimal places you want.  See PolygonPerimeter(), above, for details.
+
+=head2 $area = B<Math::NumberCruncher::CircleArea>( $diameter [, $decimal_places] );
+
+Calculates the area of a circle, given the diameter.
+
+=head2 $circumference = B<Math::NumberCruncher::Circumference>( $diameter [, $decimal_places] );
+
+Calculates the circumference of a circle, given the diameter.
+
+=head2 $volume = B<Math::NumberCruncher::SphereVolume>( $radius [, $decimal_places] );
+
+Calculates the volume of a sphere, given the radius.
+
+=head2 $surface_area = B<Math::NumberCruncher::SphereSurface>( $radius [, $decimal_places] );
+
+Calculates the surface area of a sphere, given the radius.
+
+=head2 $years = B<Math::NumberCruncher::RuleOf72>( $interest_rate [, $decimal_places] );
+
+A very simple financial formula. It calculates how many years, at a given interest rate, it will take to double your money, provided that the money and all interest is left in the account.
+
+=head2 $volume = B<Math::NumberCruncher::CylinderVolume>( $radius, $height [, $decimal_places] );
+
+Calculates the volume of a cylinder given the radius and the height.
+
+=head2 $volume = B<Math::NumberCruncher::ConeVolume>( $lowerBaseArea, $height [, $decimal_places] );
+
+Calculates the volume of a cone given the lower base area and the height.
+
+=head2 $radians = B<Math::NumberCruncher::deg2rad>( $degrees [, $decimal_places] );
+
+Converts degrees to radians.
+
+=head2 $degrees = B<Math::NumberCruncher::rad2deg>( $radians [, $decimal_places] );
+
+Converts radians to degrees.
+
+=head2 $Fahrenheit = B<Math::NumberCruncher::C2F>( $Celsius [, $decimal_places] );
+
+Converts Celsius to Fahrenheit.
+
+=head2 $Celsius = B<Math::NumberCruncher::F2C>( $Fahrenheit [, $decimal_places] );
+
+Converts Fahrenheit to Celsius.
+
+=head2 $cm = B<Math::NumberCruncher::in2cm>( $inches [, $decimal_places] );
+
+Converts inches to centimeters.
+
+=head2 $inches = B<Math::NumberCruncher::cm2in>( $cm [, $decimal_places] );
+
+Converts centimeters to inches.
+
+=head2 $ft = B<Math::NumberCruncher::m2ft>( $m [, $decimal_places] );
+
+Converts meters to feet.
+
+=head2 $m = B<Math::NumberCruncher::ft2m>( $ft [, $decimal_places] );
+
+Converts feet to meters.
+
+=head2 $miles = B<Math::NumberCruncher::km2miles>( $km [, $decimal_places] );
+
+Converts kilometers to miles.
+
+=head2 $km = B<Math::NumberCruncher::miles2km>( $miles [, $decimal_places] );
+
+Converst miles to kilometers.
+
+=head2 $lb = B<Math::NumberCruncher::kg2lb>( $kg [, $decimal_places] );
+
+Converts kilograms to pounds.
+
+=head2 $kg = B<Math::NumberCruncher::lb2kg>( $lb [, $decimal_places] );
+
+Converts pounds to kilograms.
+
+=head2 $RelativeStride = B<Math::NumberCruncher::RelativeStride>( $stride_length, $leg_length [, $decimal_places] );
+
+Welcome to the world of ichnology. This was originally for a dinosaur simulation I have been working on. This and the following four routines are all part of determining the speed of a dinosaur (or any other animal, including people), based on leg measurements and stride measurements. Ichnology is study of trace fossils (i.e., nests, eggs, fossilized dung...seriously, that's not a joke), and in this case, fossilized footprints, or trackways. RelativeStride() is for determining the relative stride of the animal given stride length and leg length.
+
+=head2 $RelativeStride = B<Math::NumberCruncher::RelativeStride_2>( $DimensionlessSpeed [, $decimal_places] );
+
+This differs from the previous routine in that it calculates relative stride based on dimensionless speed, rather than stride and leg length.
+
+=head2 $DimensionlessSpeed = B<Math::NumberCruncher::DimensionlessSpeed>( $RelativeStride [, $decimal_places] );
+
+Dimensionless speed is a calculated value that relates the speed of an animal to leg length and stride length.
+
+=head2 $DimensionlessSpeed = B<Math::NumberCruncher::DimensionlessSpeed_2>( $speed, $legLength [, $decimal_places] );
+
+This differs from the previous routine in that it calculates dimensionless speed based on actual speed and leg length.
+
+=head2 $ActualSpeed = B<Math::NumberCruncher::ActualSpeed>( $leg_length, $DimensionlessSpeed [, $decimal_places] );
+
+This is the really interesting one. Given leg length and dimensionless speed, it returns the actual speed (or absolute speed) of the animal in question in distance per second. There is no unit of measure conversion performed, so if you pass it measurements in meters, the answer is in meters per second. If you pass it measurements in inches, it returns inches per second, and so on.
+
+=head2 $eccentricity = B<Math::NumberCruncher::Eccentricity>( $half_major_axis, $half_minor_axis [, $decimal_places] );
+
+Calculates the eccentricity of an ellipse, given the semi-major axis and the semi-minor axis.
+
+=head2 $LatusRectum = B<Math::NumberCruncher::LatusRectum>( $half_major_axis, $half_minor_axis [, $decimal_places] );
+
+Calculates the latus rectum of an ellipse, given the semi-major axis and the semi-minor axis.
+
+=head2 $EllipseArea = B<Math::NumberCruncher::EllipseArea>( $half_major_axis, $half_minor_axis [, $decimal_places] );
+
+Calculates the area of an ellipse, given the semi-major axis and the semi-minor axis.
+
+=head2 $OrbitalVelocity = B<Math::NumberCruncher::OrbitalVelocity>( $r, $a, $M [, $decimal_places] );
+
+Calculates orbital velocity of an object given the radial distance at a given point on an elliptical orbit, the mean distance of the central object, and the mass of the central object. 
+
+=head2 $SqrRoot = B<Math::NumberCruncher::SqrRoot>( $number [, $decimal_places] );
+
+Calculates the square root of a number out to an arbitrary number of decimal places. It should be noted that this method is potentially substantially slower than the built-in sqrt() function. However, especially with large numbers, this method is far more accurate.
+
+=head2 $sqrt = B<Math::NumberCruncher::sqrt>( $number [, $decimal_places] );
+
+An alias for SqrRoot. This is exportable and is suitable as a drop-in replacement for the built-in sqrt() function.
+
+=head2 $root = B<Math::NumberCruncher::Root>( 55, 3 [, $decimal_places] );
+
+Calculates the N-th root of a given number using Newton's Method. In the above example, $root is the cube root of 55. Root() tends to be faster than Root2() when dealing with integers, or numbers with few decimal places.
+
+=head2 $root = B<Math::NumberCruncher::Root2>( 55, 3 [, $decimal_places] );
+
+Calculates the N=th root of a given number using logarithms. In the above example, $root is the cube root of 55. Root2() tends to be faster than Root() when dealing with numbers containing multiple decimal places.
+
+=head2 $sin = B<Math::NumberCruncher::sin>( $x [, $decimal_places] );
+
+Calculates the sine. This is available for export and is suitable as a drop-in replacement for the built-in sin() function.
+
+=head2 $cos = B<Math::NumberCruncher::cos>( $x [, $decimal_places] );
+
+Calculates the cosine. This is available for export and is suitable as a drop-in replacement for the built-in cos() function.
+
+=head2 $tan = B<Math::NumberCruncher::tan>( $x [, $decimal_places] );
+
+Calculates the tangent.
+
+=head2 $arcsin = B<Math::NumberCruncher::asin>( $x [, $decimal_places] );
+
+Calculates the inverse sine.
+
+=head2 $arccos = B<Math::NumberCruncher::acos>( $x [, $decimal_places] );
+
+Calculates the inverse cosine.
+
+=head2 $arctan = B<Math::NumberCruncher::atan>( $x [, $decimal_places] );
+
+Calculates the inverse tangent.
+
+=head2 $secant = B<Math::NumberCruncher::sec>( $x [, $decimal_places] );
+
+Calculates the secant.
+
+=head2 $arcsec = B<Math::NumberCruncher::asec>( $x [, $decimal_places] );
+
+Calculates the inverse secant.
+
+=head2 $cosecant = B<Math::NumberCruncher::csc>( $x [, $decimal_places] );
+
+Calculates the cosecant.
+
+=head2 $arccosecant = B<Math::NumberCruncher::acsc>( $x [, $decimal_places] );
+
+Calculates the inverse of the cosecant.
+
+=head2 $exsecant = B<Math::NumberCruncher::exsec>( $x [, $decimal_places] );
+
+Calculates the exsecant.
+
+=head2 $cotangent = B<Math::NumberCruncher::cot>( $x [, $decimal_places] );
+
+Calculates the cotangent.
+
+=head2 $arccot = B<Math::NumberCruncher::acot>( $x [, $decimal_places] );
+
+Calculates the inverse cotangent.
+
+=head2 $versine = B<Math::NumberCruncher::vers>( $x [, $decimal_places] );
+
+Calculates the versine.
+
+=head2 $coversine = B<Math::NumberCruncher::covers>( $x [, $decimal_places] );
+
+Calculates the coversine.
+
+=head2 $haversine = B<Math::NumberCruncher::hav>( $x [, $decimal_places] );
+
+Calculates the haversine.
+
+=head2 $grouped = B<Math::NumberCruncher::Commas>( $number );
+
+Performs digit grouping, making large number more visually pleasing.
+
+=head2 $log = B<Math::NumberCruncher::Ln>( 100 [, $decimal_places] );
+
+Calculates the natural log of a given number to a given number of decimal places.
+
+=head2 $log = B<Math::NumberCruncher::log>( $num [, $decimal_places] );
+
+An alias for Log(). This is exportable and is suitable as a drop-in replacement for the built-in log() function.
+
+=head2 $num = B<Math::NumberCruncher::Exp>( $log [, $decimal_places] );
+
+Performs the inverse of Ln(). 
+
+=head2 $num = B<Math::NumberCruncher::exp>( $log [, $decimal_places] );
+
+An alias for Exp(). This is exportable and is suitable as a drop-in replacement for the built-in exp() function.
+
+=head2 $Pi = B<Math::NumberCruncher::PICONST>( $decimal_places );
+
+Calculates Pi out to an arbitrary number of decimal places. Math::NumberCruncher has Pi pre-calculated out to 2000 decimal places. If you want more decimal places than 2000, be advised that this can take a non-trivial length of time.
+
+=head2 $E = B<Math::NumberCruncher::ECONST>( $decimal_Places );
+
+Calculaes Euler's number e out to an arbitrary number of decimal places. Math::NumberCruncher has e pre-calculated out to 2000 decimal places. If you want more decimal places than 2000, be advised that this can take a non-trivial length of time.
+
+=head2 ( $A, $B, $C ) = B<Math::NumberCruncher::PythagTriples>( 5, 7 [, $decimal_places] );
+
+Calculates Pythagorian Triples based on the two numbers passed. Remember Pythagorian Triples are three numbers where the sum of the squares of the first two numbers is equal to the square of the third.
+
+=head2 $z = B<Math::NumberCruncher::PythagTriplesSeq>( 55, 32 [, $decimal_places] );
+
+Completes the Pythagorian Triple sequence based on the two numbers passed.
+
+=head2 @nums = B<Math::NumberCruncher::SIS>( [$start, $numbers, $increment] );
+
+Returns an array of numbers in a super-increasing sequence. All parameters are optional. You can pass the number with which you want the sequence to start, the quantity numbers you want returned, and by how much you want to increase the next number over the sum of all of the previous numbers. By default, start is 1, numbers returned is 50, and increment is 1.
+
+=head2 $inverse = B<Math::NumberCruncher::Inverse>( $num [, $decimal_places] );
+
+Returns the inverse of a given number.
+
+=head2 @constants = B<Math::NumberCruncher::CONSTANTS>( 'all' [, $decimal_places] );
+
+A variety of relatively common constants pre-calculated out to 2000 decimal places. For backwards compatibility, $PI, $_e_, and $_g_ will always be available without invoking CONSTANTS(), but all future pre-calculated constants will be available through here. The constants can be called individually by name, or you can specify 'all' and have all available constants returned as an array. The available constant names are '_gm_' (Golden Mean); '_catalan_' (Catalan constant); '_apery_' (Apery constant); '_landau_' or '_ramanujan_' (Landau-Ramanujan constant); '_khintchine_' (Kintchine constant); '_sierpinski_' (Sierpinski constant); '_wilbraham_' or '_gibbs_' (Wilbraham-Gibbs constant); '_gamma_' (Euler's constant, gamma); '_sqrt2_' (square root of 2); '_sqrt3_'(square root of 3); '_sqrt5_' (square root of 5). For example: $gamma = Math::NumberCruncher::CONSTANT( '_gamma_', 75 ) will return Euler's constant, gamma, out to 75 decimal places.
+
+=head2 $bernoulli = B<Math::NumberCruncher::Bernoulli>( $num [, $decimal_places] );
+
+Bernoulli numbers according to the modern definition, sometimes called the "even-index" Bernoulli numbers. The first 498 Bernoulli numbers are cached. Only even numbers can be passed to Bernoulli(). Odd numbers, negative numbers, or numbers less than 2 return undef. Bernoulli() can be called in either scalar or list context. In scalar context, it returns the value. In list context, it returns the two numbers which, when the first is divided by the second, yields the same value as that given in scalar context.
+
+=head1 AUTHOR
+
+Kurt Kincaid, sifukurt@yahoo.com
+
+=head1 COPYRIGHT
+
+Copyright (c) 2002, Kurt Kincaid.  All rights reserved. This code is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.  Several of the algorithms contained herein are adapted from _Mastering
+Algorithms with Perl_, by Jon Orwant, Jarkko Hietaniemi, and John Macdonald. Copyright (c) 1999 O-Reilly & Associates,
+Inc.
+
+=head1 SPECIAL THANKS
+
+Thanks to Douglas Wilson for allowing me to borrow his code for Ln(), Exp(), Root2(), and the various other supporting
+functions. Mr. Wilson's code is based on an algorithm described at L<http://www.geocities.com/zabrodskyvlada/aat/>
+
+I would also like to thank the folks at L<http://www.perlmonks.org> for their input on optimizing B<Root()>.
+
+=head1 SEE ALSO
+
+perl(1).
+
+=cut

@@ -1,0 +1,55 @@
+---
+abstract: 'Deprecated. Use under the name MarpaX::Languages::Dash'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MarpaX-Demo-StringParser
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Capture::Tiny: '0.11'
+  Config: '0'
+  Config::Tiny: '2.14'
+  Date::Simple: '3.03'
+  File::Basename: '2.78'
+  File::Copy: '2.21'
+  File::HomeDir: '0.99'
+  File::Slurp: '9999.19'
+  File::Spec: '3.33'
+  Getopt::Long: '2.38'
+  GraphViz2: '2.33'
+  HTML::Entities::Interpolate: '1.04'
+  Log::Handler: '0.82'
+  Marpa::R2: '2.096'
+  Moo: '1.002'
+  Path::Tiny: '0.025'
+  Pod::Usage: '1.36'
+  Set::Array: '0.23'
+  Test::More: '0.94'
+  Text::CSV: '1.32'
+  Text::CSV::Slurp: '1.01'
+  Text::Xslate: '1.4001'
+  Tree::DAG_Node: '1.24'
+  Try::Tiny: '0.09'
+  Types::Standard: '1.000004'
+  charnames: '0'
+  open: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  license: http://opensource.org/licenses/Artistic-2.0
+  repository: https://github.com/ronsavage/MarpaX-Demo-StringParser.git
+version: '2.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

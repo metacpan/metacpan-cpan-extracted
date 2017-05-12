@@ -1,0 +1,79 @@
+{
+   "abstract" : "Manage machine-readable Changes/CHANGES/Changelog.ini files",
+   "author" : [
+      "Ron Savage (ron@savage.net.au)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Module-Metadata-Changes",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::IniFiles" : "2.88",
+            "DateTime" : "0.66",
+            "DateTime::Format::HTTP" : "0.42",
+            "DateTime::Format::Strptime" : "1.73",
+            "DateTime::Format::W3CDTF" : "0.06",
+            "File::Slurper" : "0.008",
+            "File::chdir" : "0.101",
+            "Getopt::Long" : "0",
+            "HTML::Entities::Interpolate" : "1.06",
+            "HTML::Template" : "2.95",
+            "Moo" : "2.000002",
+            "Pod::Usage" : "0",
+            "Try::Tiny" : "0.24",
+            "Types::Standard" : "1.000005",
+            "feature" : "0",
+            "lib" : "0",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.001002",
+            "Test::Pod" : "1.51"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Module::Metadata::Changes"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ronsavage/Module-Metadata-Changes.git",
+         "web" : "https://github.com/ronsavage/Module-Metadata-Changes"
+      }
+   },
+   "version" : "2.12",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

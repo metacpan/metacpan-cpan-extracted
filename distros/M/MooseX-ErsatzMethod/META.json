@@ -1,0 +1,93 @@
+{
+   "abstract" : "provide a method implementation that isn't as good as the real thing",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>",
+      ""
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-ErsatzMethod",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Module::Runtime" : "0",
+            "Moose" : "2.00"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.61"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::ErsatzMethod" : {
+         "file" : "lib/MooseX/ErsatzMethod.pm",
+         "version" : "0.004"
+      },
+      "MooseX::ErsatzMethod::Meta::Method" : {
+         "file" : "lib/MooseX/ErsatzMethod.pm",
+         "version" : "0.004"
+      },
+      "MooseX::ErsatzMethod::Trait::ApplicationToClass" : {
+         "file" : "lib/MooseX/ErsatzMethod.pm",
+         "version" : "0.004"
+      },
+      "MooseX::ErsatzMethod::Trait::ApplicationToInstance" : {
+         "file" : "lib/MooseX/ErsatzMethod.pm",
+         "version" : "0.004"
+      },
+      "MooseX::ErsatzMethod::Trait::ApplicationToRole" : {
+         "file" : "lib/MooseX/ErsatzMethod.pm",
+         "version" : "0.004"
+      },
+      "MooseX::ErsatzMethod::Trait::Composite" : {
+         "file" : "lib/MooseX/ErsatzMethod.pm",
+         "version" : "0.004"
+      },
+      "MooseX::ErsatzMethod::Trait::Role" : {
+         "file" : "lib/MooseX/ErsatzMethod.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=MooseX-ErsatzMethod"
+      },
+      "homepage" : "https://metacpan.org/release/MooseX-ErsatzMethod",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-moosex-ersatzmethod.git",
+         "web" : "https://github.com/tobyink/p5-moosex-ersatzmethod"
+      }
+   },
+   "version" : "0.004"
+}

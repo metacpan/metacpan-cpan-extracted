@@ -1,0 +1,36 @@
+---
+abstract: 'Mojolicious plugin to interact with a remote ident service'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  AnyEvent::Ident: '0.04'
+  Mojolicious::Lite: '0'
+  Test::Mojo: '0'
+  Test::More: '0.94'
+  perl: v5.10.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: v5.10.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Ident
+no_index:
+  directory:
+    - example
+recommends:
+  EV: '0'
+requires:
+  AnyEvent: '0'
+  AnyEvent::Ident: '0.04'
+  EV: '0'
+  Mojolicious: '5.73'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/plicease/Mojolicious-Plugin-Ident/issues
+  homepage: http://perl.wdlabs.com/Mojolicious-Plugin-Ident
+  repository: git://github.com/plicease/Mojolicious-Plugin-Ident.git
+version: '0.31'

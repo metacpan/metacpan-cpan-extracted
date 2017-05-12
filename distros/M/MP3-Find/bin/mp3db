@@ -1,0 +1,78 @@
+#!/usr/bin/perl -w
+use strict;
+
+use MP3::Find::DB;
+
+use File::Spec::Functions qw(catfile);
+use Getopt::Long;
+GetOptions(
+    'create'   => \my $CREATE,
+    'file|f=s' => \my $DB_FILE,
+);
+
+$DB_FILE ||= catfile($ENV{HOME}, 'mp3.db');
+
+my @NAMES = @ARGV;
+
+my $f = MP3::Find::DB->new;
+$f->create_db($DB_FILE) if $CREATE;
+
+if (@NAMES) {
+    my @files = grep { -f } @NAMES;
+    my @dirs  = grep { -d } @NAMES;
+
+    $f->update({
+	dsn   => "dbi:SQLite:dbname=$DB_FILE",
+	dirs  => \@dirs,
+	files => \@files,
+    });
+}
+
+=head1 NAME
+
+mp3db - Frontend for creating and updating a database for MP3::Find::DB
+
+=head1 SYNOPSIS
+
+    # create the database file
+    $ mp3db --create --file my_mp3.db
+    
+    # add info
+    $ mp3db --file my_mp3.db ~/mp3
+    
+    # update, and add results from another directory
+    $ mp3db --file my_mp3.db ~/mp3 ~/cds
+
+=head1 DESCRIPTION
+
+    mp3db [options] [directory] [directories...]
+
+Creates and/or updates a database of ID3 data from the mp3s found
+in the given directories.
+
+=head2 Options
+
+=over
+
+=item C<--create>, C<-c>
+
+Create the database file named by the C<--file> option.
+
+=item C<--file>, C<-f>
+
+The name of the database file to work with. Defaults to F<~/mp3.db>.
+
+=back
+
+=head1 AUTHOR
+
+Peter Eichman <peichman@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2006 by Peter Eichman. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

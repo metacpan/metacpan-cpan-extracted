@@ -1,0 +1,123 @@
+==================================================
+Changes from 2013-03-31 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.5 at 2014-03-31 10:24:47 +0000
+----------------------------------------
+
+  Change: 02b1843a08cc52f99371e2c02aa0866bb290ff1a
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-02-04 12:54:47 +0000
+
+    v0.4 
+
+----------------------------------------
+version 0.4 at 2014-02-03 23:54:18 +0000
+----------------------------------------
+
+  Change: 0b84e80feec970dab51dd541315867fd16069160
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-02-04 12:54:18 +0000
+
+    push a latest branch that can be installed from 
+
+  Change: 8aa81872540af108ade2f376634384c672d03710
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-02-04 12:48:53 +0000
+
+    v0.3 
+
+----------------------------------------
+version 0.3 at 2014-02-03 23:48:16 +0000
+----------------------------------------
+
+  Change: 4481048dc7819ec3e7bdf20373b24d35e5b4f749
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-02-04 12:48:16 +0000
+
+    make the DC autoselector a bit more robust 
+
+  Change: 5e96bc384ca2c00deb292d7f51b47cfca03cc6f5
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2014-01-21 16:31:27 +0000
+
+    parameter handling for importer 
+
+  Change: ef3e35140903450339179532cfd4629319bedaea
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-12-30 15:16:05 +0000
+
+    v0.2 
+
+----------------------------------------
+version 0.2 at 2013-12-30 02:15:42 +0000
+----------------------------------------
+
+  Change: bd37d11155ec96c2c55ce550a0e2adc00161a906
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-12-30 15:15:42 +0000
+
+    dist.ini tuning 
+
+----------------------------------------
+version 0.1 at 2013-12-30 02:07:46 +0000
+----------------------------------------
+
+  Change: 19630a72c1477e1b9786ca4484a0b0de00cacfa0
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-12-30 15:07:46 +0000
+
+    satisfy Perl::Critic 
+
+  Change: 498d0366540c7f3d557472c4debffafca3d7c850
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-12-30 15:06:45 +0000
+
+    satisfy Perl::Critic 
+
+  Change: b6354b84b95bb94e2ee1960448314c7ff1afa84a
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-12-30 15:04:55 +0000
+
+    satisfy Perl::Critic 
+
+  Change: 7f8a66d467bb9446b13268c4af1e8571130edb09
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-12-30 14:57:36 +0000
+
+    satisfy Perl::Critic 
+
+  Change: 23e4952526c167598569a5ca66e092a3ed9afd30
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-12-30 14:51:07 +0000
+
+    satisfy dzil 
+
+  Change: f6f3c7b265d7afa904b6b761ee49019fe03a9edc
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-12-30 14:47:53 +0000
+
+    added a basic CSV importer 
+
+  Change: f0bd2c47282eaa94f0ceb8f735e234334e2bf40c
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-12-30 14:15:30 +0000
+
+    added some docs 
+
+  Change: 8fae91d16bda253699c299fff400e4962feb40a8
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-12-30 14:07:30 +0000
+
+    first draft 
+
+  Change: b556629d43cc462b7d12e99a54897b6ca898435b
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-12-30 12:42:38 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

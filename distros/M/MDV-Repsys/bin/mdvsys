@@ -1,0 +1,443 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use MDV::Repsys;
+use MDV::Repsys::Remote;
+use POSIX qw(getcwd);
+use File::Temp qw(tempdir);
+
+=head1 NAME
+
+mdvsys - Tools to import and extract rpms from a svn
+
+=head1 SYNOPSIS
+
+    mdvsys [options] <action> ...
+
+=head1 OPTIONS
+
+The <action> specified on the command-line can be one of:
+
+=over 4
+
+=item create pkgname
+
+Create a package directory on the subversion repository.
+
+=item import rpmfile1 [[rpmfile2] ...]
+
+Import one or more src.rpm directly into the subversion
+repository.
+
+=item getsrpm pkgname
+
+Extract a source package from the subversion repository
+into the current directory. The package name is prefixed by
+@<rev>: where <rev> is the current subversion revision
+unless the no-youri option in used. The prefixed source
+package have a valid name to be uploaded by youri.
+
+=item checkout pkgname [dir]
+
+=item co pkgname [dir]
+
+Checkout the "current" version of a package for the
+subversion repository. A directory with the same name
+than the package is created in dir. This new repository
+contains a SPECS directory with the spec file, and a
+SOURCES directory with the source files and patches of
+the package.
+
+=item commit [dir]
+
+=item ci [dir]
+
+Perform the same action than C<svn commit>, but check that the sources
+listed in the specfile are in sync with the svn contents.
+
+Currently you have to use the -m option to set the svn log message.
+
+=item sync [dir]
+
+Search the sources and patches used in the spec file, and 
+perform the commands needed to add the new ones in the
+repository, and remove the ones no more used from the
+repository.
+
+The changes are not commited.
+
+=item build [pkgname]
+
+Build a package. If a package name is given on the command
+line, the latest version from the subversion repository is
+built. If no package name is provided, the package of the
+current directory is built.
+
+=item stripcl [specfile]
+
+Remove the changelog of the specfile and commit it into the svn.
+
+If the --no-commit option is set, the commit part is not done.
+
+=item info <pkgname>
+
+Give information about pkgname from svn.
+
+=item log <pkgname>
+
+Generate %changelog about pkgname from svn.
+
+=item submit <pkgname>
+
+Submit packages to be built from svn.
+
+=back
+
+If no package name is given, mdvsys will try to deduce it from the
+current working copy, if applicable, for the command log, submit, info
+and getsrpm.
+
+=cut
+
+my %roptions;
+
+=pod
+
+Options can be one of:
+
+=over 4
+
+=item -v
+
+Increase verbosity level.
+
+=item -q
+
+Be completly silent
+
+=item -c <configfile>
+
+Use this configuration file instead /etc/repsys.conf.
+
+=item --no-commit
+
+Commit into the svn will not be done.
+
+This options has effect for import action.
+
+=item -r <revision>
+
+Work on a specific revision.
+
+=item -m <message>
+
+Set this message for commiting
+
+=item --noyouri
+
+Get the standard srpms file, without the '@rev:' prefix.
+
+=back
+
+=cut
+
+GetOptions(
+    'no-commit'  => \my $nocommit,
+    'm=s'        => \$roptions{message},
+    'r=s'        => \$roptions{revision},
+    't|target=s' => \$roptions{target},
+    'c|config=s' => \my $configfile,
+    'd|dest=s'   => \$roptions{destdir},
+    'noyouri'    => \my $noyouri,
+    'v+'         => \my $verbosity,
+    'q|quiet'    => \my $silent,
+) or pod2usage(1);
+
+my ($action, @args) = @ARGV;
+
+if (!$action) {
+    pod2usage(0);
+}
+
+my $exitstatus = 0;
+
+$verbosity = $silent ? 0 : ++$verbosity;
+
+MDV::Repsys::set_verbosity($verbosity);
+
+for ($action) {
+
+    /^sync$/ and do {
+        my $dir = $args[0] || getcwd();
+        my $spec = (glob("$dir/SPECS/*.spec"))[0];
+        if ($spec) {
+            MDV::Repsys::set_rpm_dirs($dir);
+            if (! MDV::Repsys::sync_source(
+                $dir,
+                (glob("$dir/SPECS/*.spec"))[0],
+            )) {
+                warn "Can't sync $dir:\n";
+                warn MDV::Repsys::repsys_error() ."\n";
+                $exitstatus = 1;
+            }
+        } else {
+            warn "Can't find any specfile\n";
+            $exitstatus = 1;
+        }
+        last;
+    };
+
+    my $repsys = MDV::Repsys::Remote->new(
+        nocommit => $nocommit,
+        configfile => $configfile,
+    );
+    $repsys or exit 1;
+    $repsys->set_verbosity($verbosity);
+
+    /^create$/ and do {
+        my $pkgname = $args[0] or pod2usage(1);
+        if (!$repsys->create_pkg($pkgname)) {
+            warn $repsys->last_error() . "\n";
+            warn "Can't create $pkgname\n";
+            $exitstatus = 1;
+        }
+        last;
+    };
+
+    /^import$/ and do {
+        $args[0] or pod2usage(1);
+        foreach my $rpmfile (@args) {
+            if (!$repsys->import_pkg(
+                $rpmfile,
+                %roptions,
+            )) {
+                warn $repsys->last_error() . "\n";
+                warn "Can't import $rpmfile\n";
+                $exitstatus = 1;
+            }
+        }
+        last;
+    };
+
+    /^getsrpm$/ and do {
+        if (! $args[0]) {
+            my $package = $repsys->get_pkgname_from_wc();
+            $args[0] = $package if $package;
+        }
+        if (! @args) {
+            warn "No package given on the command line, and not in a checkout directory\n";
+            $exitstatus = 1;
+        }  
+        foreach my $name (@args) {
+            my ($r, $f) = $repsys->get_srpm(
+                $name,
+                %roptions,
+            );
+            if ($r) {
+                if ($noyouri) {
+                    print "$r $f\n";
+                } else {
+                    my $ysrpms = sprintf(
+                        '@%d:%s',
+                        $r, ($f =~ m:.*/+(.*\.src.rpm)$:)[0]
+                    );
+                    system('mv', $f, $ysrpms);
+                    print "$ysrpms\n";
+                }
+            } else {
+                warn $repsys->last_error() . "\n";
+                warn "Can't extract $name\n";
+                $exitstatus = 1;
+            }
+        }
+        last;
+    };
+
+    /^(co|checkout)$/ and do {
+        $args[0] or pod2usage(1);
+        if (!$repsys->checkout_pkg(
+            $args[0],
+            $args[1],
+            %roptions,
+        )) {
+            warn $repsys->last_error() . "\n";
+            warn "Can't checkout $args[0]\n";
+            $exitstatus = 1;
+        }
+        last;
+    };
+
+    /^(ci|commit)$/ and do {
+        my $dir = $args[0] || getcwd();
+        $repsys->commit(
+            $dir,
+            %roptions,
+            callback => sub {
+                $| = 1;
+                print "According the specfile, some sources are not into svn\n";
+                print "Do you want to sync first ? (Y/n) ";
+                my $reply = <STDIN>;
+                if ($reply =~ m/^(N|n)/) {
+                    return;
+                }
+                1;
+            },
+        ) or do {
+            warn $repsys->last_error() . "\n";
+            warn "Can't commit $dir\n";
+        }; 
+        last;
+    };
+
+    /^log$/ and do {
+        if (! $args[0]) {
+            my $package = $repsys->get_pkgname_from_wc();
+            $args[0] = $package if $package;
+        }
+        $args[0] or pod2usage(1);
+        if (!$repsys->build_final_changelog($args[0])) {
+            warn $repsys->last_error() . "\n";
+            warn "Can't get changelog of $args[0]\n";
+            $exitstatus = 1;
+        }
+        last;
+    };
+
+    /^tag$/ and do {
+        if (!$repsys->tag_pkg(
+            $args[0],
+            %roptions,
+        )) {
+            warn $repsys->last_error() . "\n";
+            warn "Can't tag $args[0]\n";
+            $exitstatus = 1;
+        }
+        last;
+    };
+
+    /^build$/ and do {
+        my $bdir;
+        my $specfile;
+        my $odir;
+        if ($args[0]) {
+            $bdir = tempdir();
+            $repsys->checkout_pkg(
+                $args[0],
+                $bdir,
+                 %roptions,
+            ) or do {
+                warn $repsys->last_error() . "\n";
+                warn "Can't extract $args[0]\n";
+                $exitstatus = 1;
+                next;
+            };
+            $odir = File::Tempdir->new();
+            $specfile = $repsys->get_final_spec(
+                (glob("$bdir/SPECS/*.spec"))[0],
+                %roptions, pkgname => $args[0],
+                destdir => $odir->name(),
+            ) or do {
+                warn $repsys->last_error() . "\n";
+                warn "can't get final specfile\n";
+                $exitstatus = 1;
+                next;
+            };
+        } else {
+            $bdir = getcwd();
+        }
+        RPM4::setverbosity('INFO');
+        MDV::Repsys::build(
+            $bdir,
+            'b',
+            %roptions, specfile => $specfile,
+        ) or do {
+            warn ((MDV::Repsys::repsys_error() || "") . "\n");
+            warn "Build failed\n";
+            $exitstatus = 1;
+        };
+        RPM4::setverbosity('WARNING');
+        last;
+    };
+
+    /^stripcl$/ and do {
+        my $specfile = $args[0] || (glob("SPECS/*.spec"))[0];
+        if (! ($nocommit ?
+            MDV::Repsys::strip_changelog($specfile) :
+            $repsys->splitchangelog($specfile))) {
+            warn $repsys->last_error() . "\n";
+            warn "Can't extract changelog";
+            $exitstatus = 1;
+        }
+        last;
+    };
+
+    /^info$/ and do {
+        $args[0] or $args[0] = $repsys->get_pkgname_from_wc(); 
+        $args[0] or pod2usage(1);
+        my %info = $repsys->get_pkg_info($args[0], %roptions);
+        if ($info{last_rev}) {
+
+            printf(<<EOF,
+Package:       %s
+Size:          %d
+Last Revision: %s
+Last author:   %s
+EOF
+                $args[0],
+                $info{size} || 0,
+                $info{last_rev} || 0,
+                $info{last_author} || 'N/A',
+            ) 
+        } else {
+            print $args[0] . " is not in svn.\n";
+        }
+        last;
+    };
+
+    /^submit$/ and do {
+        $args[0] or $args[0] = $repsys->get_pkgname_from_wc(); 
+        $args[0] or pod2usage(1);
+        
+        if (! $roptions{revision}) {
+           my %info = $repsys->get_pkg_info($args[0], %roptions);
+           $roptions{revision} = $info{last_rev};
+        }
+
+        if (! $roptions{revision}) {
+            warn "Package $args[0] not in svn\n";
+            $exitstatus = 1;
+	    last;
+        }
+
+	if (! $repsys->submit($args[0], %roptions)) {
+            #warn $repsys->last_error() . "\n";
+            warn "Can't submit $args[0]\n";
+            $exitstatus = 1;
+	    last;
+        }
+
+        print "Package submitted!\n";
+        last;
+    };
+
+
+    pod2usage(1);
+}
+
+exit($exitstatus);
+
+__END__
+
+=head1 AUTHORS
+
+Olivier Thauvin <nanardon@mandriva.org>
+
+=head1 SEE ALSO
+
+L<repsys>
+
+=cut

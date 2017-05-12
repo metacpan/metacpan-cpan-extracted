@@ -1,0 +1,91 @@
+Revision history for Map::Tube::CLI
+
+0.24  Thu Mar 23 13:55:00 2017
+      - Tidied up test scripts and removed "-T" switch.
+      - Added test for loading package Map::Tube::CLI::Option.
+      - Updated test minimum requirement Map::Tube::London v0.82.
+      - Minor pod changes.
+
+0.23  Sat Mar 04 14:50:00 2017
+      - Updated test minimum requirement Map::Tube::London v0.79 as some CPANTESTERs not happy.
+
+0.22  Wed Mar 01 08:35:00 2017
+      - Fixed the order of command line options.
+      - Updated description of option --line.
+
+0.21  Sun Feb 26 11:00:00 2017
+      - Updated dependency on MooX::Options v4.023, fixing reporting mandatory params.
+
+0.20  Thu Oct 27 10:30:00 2016
+      - Upgraded to use Map::Tube::Exception v3.08.
+
+0.19  Tue Aug 23 13:20:00 2016
+      - Added unit test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.18  Fri Jun 17 10:10:00 2016
+      - Added support for map Map::Tube::NizhnyNovgorod.
+      - Updated copyright year information.
+
+0.17  Wed Feb 10 12:30:00 2016
+      - Added ability to generate entire map not just one line map.
+
+0.16  Sun Nov 29 01:45:00 2015
+      - Added key 'provides' to the Makefile.PL script.
+
+0.15  Sun Nov 08 11:15:00 2015
+      - Fixed CPANTS inconsistent version error.
+
+0.14  Thu Nov 05 11:00:00 2015
+      - Fixed the error reported by CPANT Testers.
+      - Upgraded to use Map::Tube::Exception v3.06.
+      - Updated unit test with regard to the change in Map::Tube::Exception error message.
+      - Fixed a buggy unit test.
+      - Updated pod document with regard to the exception error message and exected result.
+      - Added $AUTHORITY to the pod document.
+
+0.13  Fri Sep 18 10:40:00 2015
+      - Replaced die() with Map::Tube::Exception::* call.
+
+0.12  Sat Sep 12 16:25:00 2015
+      - Added support for Malaga map.
+
+0.11  Wed Sep 02 09:42:00 2015
+      - Added support to generate line map as png image.
+
+0.10  Fri Aug 14 11:00:00 2015
+      - Added support for KualaLumpur map.
+
+0.09  Sun Jun 07 00:30:00 2015
+      - Validated parameter in the method BUILD() and not in the method run().
+      - Added unit test for command line parameters.
+
+0.08  Tue May 12 10:30:00 2015
+      - Extracted out options and added as Moo Role (Map::Tube::CLI::Option) to make it easier to test.
+      - Added unit test 01-map-tube-cli.t script.
+      - Added Capure::Tiny v0.28 as build require in the Makefile.PL script.
+
+0.07  Sun Apr 05 02:55:00 2015
+      - Improved error handling.
+
+0.06  Sat Mar 28 08:50:00 2015
+      - Renamed the supplied script to 'map-tube'.
+      - Updated pod document accordingly in the package Map::Tube::CLI.
+
+0.05  Thu Mar 26 11:25:00 2015
+      - Updated pod document with regards to the changes to Map::Tube v2.95.
+
+0.04  Thu Mar 26 03:55:00 2015
+      - Tidied up pod document.
+
+0.03  Wed Mar 25 22:35:00 2015
+      - Proposed solution for issue RT: #103105 subject to feedbacks.
+
+0.02  Tue Mar 24 12:15:00 2015
+      - Documented method run().
+      - Tweaked slightly method run() to return the result with "\n" at the end.
+      - Updated the distribution description.
+      - Removed the 'except' pragma from the Module::Pluggable.
+      - Tidied up few other things in the pod document.
+
+0.01  Tue Mar 24 10:20:00 2015
+      - Module Created.

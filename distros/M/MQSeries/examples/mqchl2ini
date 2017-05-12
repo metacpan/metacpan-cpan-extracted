@@ -1,0 +1,210 @@
+#!/usr/bin/perl5
+#
+# $Id: mqchl2ini,v 33.4 2012/09/26 16:15:21 jettisu Exp $
+#
+# (c) 2001-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+use strict;
+use English;
+use Getopt::Long;
+
+use MQSeries::Config::ChannelTable;
+
+our %Args;
+GetOptions( \%Args, qw( debug! ) ) || usage();
+
+my ($InputFile,$OutputFile) = @ARGV;
+
+print "Parsing channel table $InputFile\n";
+
+my @channels = MQSeries::Config::ChannelTable->readFile
+  (
+   Filename		=> $InputFile,
+  );
+
+print "Writing output file $OutputFile\n";
+
+writeOutput($OutputFile,@channels);
+
+exit 0;
+
+
+sub writeOutput {
+    my ($file,@channels) = @_;
+
+    my $date = scalar(localtime);
+    my $data = <<"EndOfHeader";
+#
+# Written by mqchl2ini on $date
+#
+EndOfHeader
+
+    my @stanza = ();
+
+    my $default;
+
+    #
+    # Write the SYSTEM.DEF.CLNTCONN first
+    #
+    foreach my $channel ( @channels ) {
+	next unless $channel->{ChannelName} eq 'SYSTEM.DEF.CLNTCONN';
+	push(@stanza,writeStanza($channel));
+	$default = $channel;
+	last;
+    }
+
+    foreach my $channel ( @channels ) {
+	next if $channel->{ChannelName} eq 'SYSTEM.DEF.CLNTCONN';
+	push(@stanza,writeStanza($channel,$default));
+    }
+
+    $data .= join("\n", @stanza);
+
+    open(FILE, '>', $file) || die "Unable to write to $file: $ERRNO\n";
+    print FILE $data;
+    close(FILE) || die "Unable to close $file: $ERRNO\n";
+
+}
+
+
+sub writeStanza {
+    my ($channel,$default) = @_;
+
+    my $stanza = "$channel->{ChannelName}:\n";
+
+    #
+    # Let's write these out in the same order as they are found in the
+    # header def.  Looks nice...
+    #
+    foreach my $field ( @MQSeries::Config::ChannelTable::MQCDFields ) {
+
+	my ($key,$method,$length,$version,$need) = @$field;
+
+	next unless $need;
+
+	next if $key eq 'ChannelName';
+	next if $key eq 'Version';
+	next if $key eq 'ChannelType';
+
+	#
+	# Skip anything that matches the default
+	#
+	if ( $default ) {
+	    if ( $method eq 'String' ) {
+
+		if ( ref $channel->{$key} eq 'ARRAY' &&
+		     ref $default->{$key} eq 'ARRAY' &&
+		     scalar @{$channel->{$key}} == scalar @{$default->{$key}} ) {
+		    my $diff = 0;
+		    for ( my $index = 0 ; $index < scalar @{$channel->{$key}} ; $index++ ) {
+			$diff++ if $channel->{$key}->[$index] ne $default->{$key}->[$index];
+		    }
+		    next unless $diff;
+		}
+
+		if ( ref $channel->{$key} ne 'ARRAY' &&
+		     ref $default->{$key} ne 'ARRAY' ) {
+		    next if $default->{$key} eq $channel->{$key};
+		}
+
+	    } elsif ( $method eq 'Number' ) {
+		next if $default->{$key} == $channel->{$key};
+	    }
+	} else {
+	    if ( $method eq 'String' ) {
+		next unless $channel->{$key};
+	    }
+	}
+
+	if ( ref $channel->{$key} eq 'ARRAY' ) {
+	    foreach my $value ( @{$channel->{$key}} ) {
+		$stanza .= "   $key=$value\n";
+	    }
+	} else {
+	    $stanza .= "   $key=$channel->{$key}\n";
+	}
+
+    }
+
+    return $stanza;
+}
+
+
+sub usage {
+    die <<"EndOfUsage";
+mqchl2ini inputfile outputfile [ -debug ]
+EndOfUsage
+}
+
+__END__
+
+=head1 NAME
+
+mqchl2ini - Convert an MQSeries client channel table file to a text stanza format
+
+=head1 SYNOPSIS
+
+mqchl2ini inputfile outputfile
+
+=head1 DESCRIPTION
+
+mqchl2ini will read an MQSeries client channel table file, of version
+4 (MQSeries 5.0), 6 (MQSeries 5.1 and later) or 7 (MQSeries 5.3 and
+later), and convert it to a text file written with a stanza format
+similar to the various "*.ini" files used with MQSeries (eg. mqs.ini,
+qm.ini, etc).
+
+This file is intended to bootstrap the process of using the partner
+utility, mqini2chl, to maintain channel table files without using a
+queue manager.  In other words, this utility will typically be run
+once, against an existing chanenl table file, then the relationship
+reversed.  The text file will be use as the master source, and the
+channel table derived from it.
+
+The output format is kept as compact as possible.  The first entry
+written into the text file will always be SYSTEM.DEF.CLNTCONN, which
+should always be found in any channel table file.  Keys will be
+omitted if the values are strings, and empty.
+
+For each additional CLNTCONN definition found in the channel table
+file, another stanza is written, with the primary key being the
+ChannelName, and the stanza consisting of all of the keys which differ
+from the SYSTEM.DEF.CLNTCONN definition.  Thus, if a security exit,
+for example, is defined for the SYSTEM.DEF.CLNTCONN, then any CLNTCONN
+definition which has the same SecurityExit defined will not have the
+key defined in its stanza.
+
+=head1 EXAMPLES
+
+The following sample output shows how the authors channel table file
+gets converted to text:
+
+  #
+  # Written by mqchl2ini on Thu Mar 22 15:04:17 2001
+  #
+  SYSTEM.DEF.CLNTCONN:
+     TransportType=TCP
+     MaxMsgLength=4194304
+
+  SNP1:
+     ChannelDesc=Client Connection to SNP1
+     QMgrName=SNP1
+     SecurityExit=/ms/dist/mq/exits/libkrb5exit.so(exitFunc)
+     SecurityUserData=2, unix
+     ConnectionName=snsmq1(16672)
+
+  SAT98:
+     ChannelDesc=Client Connection to SAT98
+     QMgrName=SAT98
+     SecurityExit=/ms/dist/mq/exits/libkrb5exit.so(exitFunc)
+     SecurityUserData=0, unix
+     ConnectionName=sasmq4(25025)
+
+=head1 SEE ALSO
+
+mqini2chl(8), MQSeries::Config::ChannelTable(3)
+
+=cut
+

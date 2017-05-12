@@ -1,0 +1,19 @@
+MMapDB	T_ARRAY_OBJ
+
+INPUT
+
+T_ARRAY_OBJ
+	if (sv_derived_from($arg, \"${ntype}\") &&
+	    SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV)
+	    $var = ($type)SvRV($arg);
+	else
+	    Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+			\"$var\", \"$ntype\")
+
+
+OUTPUT
+
+T_ARRAY_OBJ
+	$arg = newRV_noinc((SV*)$var);
+	sv_bless($arg, gv_stashpv(\"$ntype\", GV_ADD));

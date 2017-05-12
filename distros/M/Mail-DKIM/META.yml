@@ -1,0 +1,28 @@
+---
+abstract: 'Signs/verifies Internet mail with DKIM/DomainKey signatures'
+author:
+  - 'Jason Long <jason@long.name>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mail-DKIM
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Crypt::OpenSSL::RSA: '0.24'
+  Digest::SHA: '0'
+  MIME::Base64: '0'
+  Mail::Address: '0'
+  Net::DNS: '0'
+  Test::Simple: '0'
+version: '0.41'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

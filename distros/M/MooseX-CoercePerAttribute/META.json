@@ -1,0 +1,83 @@
+{
+   "abstract" : "Define Coercions per attribute!",
+   "author" : [
+      "Mike Francis <ungrim97@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.12.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-CoercePerAttribute",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Test::Most" : "0.31"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::CoercePerAttribute" : {
+         "file" : "lib/MooseX/CoercePerAttribute.pm",
+         "version" : "1.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ungrim97/MooseX-CoercePerAttribute/issues"
+      },
+      "homepage" : "https://github.com/ungrim97/MooseX-CoercePerAttribute",
+      "repository" : {
+         "url" : "git://github.com/ungrim97/MooseX-CoercePerAttribute.git",
+         "web" : "https://github.com/ungrim97/MooseX-CoercePerAttribute"
+      }
+   },
+   "version" : "1.001",
+   "x_contributors" : [
+      "Chris Weyl <cweyl@alumni.drew.edu>",
+      "David Steinbrunner <dsteinbrunner@pobox.com>",
+      "ungrim97 <ungrim97@hotmail.com>"
+   ]
+}

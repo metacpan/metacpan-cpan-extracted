@@ -1,0 +1,16 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use Mac::AppleScript::Glue qw(dump_pretty from_string);
+
+if (@ARGV) {
+	for my $i (0 .. $#ARGV) {
+		my $x = from_string($ARGV[$i]);
+		dump_pretty($x, "ARGV[$i]", *STDOUT);
+	}
+
+} else {
+	my $x = from_string(join('', <STDIN>));
+	dump_pretty($x, 'stdin', *STDOUT);
+}

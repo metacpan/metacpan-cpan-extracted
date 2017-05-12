@@ -1,0 +1,88 @@
+0.17 Wed Oct 26 08:34:17 EST 2011
+
+ * Warnings avoidance for reloading a module not in %INC
+ * Updated inc/ and META.yml
+
+0.16 Fri Apr 15 15:03:21 EST 2011
+
+ * SIGNATURE file bug
+
+0.15 Fri Apr 15 15:00:15 EST 2011
+
+ * No functional changes. Added missing test dependencies. Thanks to JQUELIN & Paul at City Fan
+
+0.14 Tue Apr 12 18:07:44 EST 2011
+
+ * Actually remove subroutines from the symbol table, Thanks to DOY.
+
+0.13 Thu May  3 23:03:00 EDT 2007
+
+ * Requires 5.8.1. (Uses tricks that don't work on 5.6). Thanks to DCANTRELL
+
+0.12 Mon Apr 30 15:34:42 EDT 2007
+
+ * Requires 5.6. (Causes 5.5 to bus error). Thanks to RJBS.
+
+0.11 Tue Apr 24 13:25:24 EDT 2007
+
+  * Fix for [rt.cpan.org #26536] Test suite uses /tmp with predictable filenames 
+    Reported by ANDK
+
+0.10_01 Tue May  9 01:21:55 EDT 2006
+
+* Module::Refresh->refresh_module_if_modified($module) 
+    as suggested by Daisuke Maki
+
+0.09 Thu Dec 22 19:03:14 EST 2005
+
+* Artur Bergman pointed out a bug in the overview docs.
+
+0.08
+ * From Ivan Kohler.  (rt.cpan.org #14879)
+  Without this patch, I was getting a fatal error:
+   Can't undef active subroutine at /usr/share/perl5/Module/Refresh.pm line 154.
+
+   This patch changes this to a warning and adds the name of the subroutine that
+   triggered it.  I now get the non-fatal warning:
+
+     HTML::Mason::handler: Can't undef active subroutine at
+     /usr/share/perl5/Module/Refresh.pm line 154.
+
+
+0.07 Sun Aug 21 13:25:20 EDT 2005
+
+  * Put in a work-around for a perl bug before 5.8.7.
+
+0.06 Fri May 20 22:11:11 EDT 2005
+
+  * Trade overrefreshing for underrefreshing in some cases; test and document
+    (We were over-aggressively reloading modules
+     -- David Glasser
+
+
+0.05 Tue Nov 16 23:15:10 EST 2004
+
+  * Explicitly, don't clobber the 'VERSION' symbol on setup.
+
+0.04 Thu Nov 11 12:53:21 CST 2004
+ 
+  * Fix tests to run correctly on Win32.
+
+0.03 Wed Nov 10 21:30:59 CST 2004
+
+  * "Anonymize" all our methods so we can refresh ourselves.
+  * POD cleanup; nomenclature unification.
+  * ->refresh now implicitly calls ->new for the first time.
+  
+   minor doc updates
+  
+  * Various cleanups to make it 5.005-friendly.
+  * Use (inode, size, mtime) as the cache value instead of mtime alone.
+  
+0.02 Wed Nov 10 18:28:12 CST 2004
+
+    - Now we clean out subroutines loaded by the package we're unloading. 
+
+0.01 Mon Nov  8 19:48:00 CST 2004
+
+    - Initial release

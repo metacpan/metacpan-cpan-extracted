@@ -1,0 +1,35 @@
+% layout "$controller/common", title => "Select * from $table limit 0, 1000";
+
+<h2>select * from <i><%= $table %></i></h2>
+<form method="get" action="<%= url_for %>" >
+  <div class="condition">
+    where <%= select_field condition_column => $header %>
+      like
+      <%= input_tag 'condition_value', size => 50 %>
+      <%= submit_button 'Search' %>
+      <%= hidden_field database => param('database') %>
+      <%= hidden_field table => param('table') %>
+  </div>
+</form>
+<div style="margin-left:40px; margin-bottom:15px; font-size:150%">
+  % my $first_count = ($pager->current_page - 1) * $pager->entries_per_page + 1;
+  % my $last_count = $first_count + $pager->entries_on_this_page - 1;
+  <%= $first_count %> to <%= $last_count %> (Total <i><%= $pager->total_entries %></i> count)
+</div>
+
+<table>
+<tr>
+  % for my $h (@$header) {
+      <th><%= $h %></th>
+  % }
+</tr>
+% for my $row (@$rows) {
+  <tr>
+    % for my $data (@$row) {
+      <td><%= $data %></td>
+    % }
+  </tr>
+% }
+</table>
+
+%= include "$controller/pagenavi";

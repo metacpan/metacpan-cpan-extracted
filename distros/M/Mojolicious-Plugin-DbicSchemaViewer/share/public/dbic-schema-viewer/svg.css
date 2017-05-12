@@ -1,0 +1,118 @@
+.modal-dialog {
+    width: 930px;
+}
+.modal-dialog tr th:first-child {
+    width: 240px;
+}
+
+svg {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+.edge * {
+    stroke-width: 2;
+    stroke: #444444;
+}
+.edge polygon {
+    fill: #444444;
+}
+.edge:hover {
+    cursor: pointer;
+}
+.edge path, .edge polyline, .edge ellipse {
+    fill: none;
+}
+.edge polygon {
+    stroke-width: 1.5;
+}
+/*
+    .edge.hovered: when the user hovers or has clicked on the relation
+    .edge.active:  when the user hovers or has clicked on a column or table name
+*/
+.edge.hovered * {
+    stroke: #ff5050;
+}
+.edge.hovered polygon {
+    fill: #ff5050;
+}
+.edge.active * {
+    stroke: #54b9f7;
+}
+.edge.active polygon {
+    fill: #54b9f7;
+}
+
+.node polygon {
+    stroke-width: 0.4;
+}
+.node polygon.border {
+    stroke: #dddfdd;
+    stroke-width: 1.5;
+    fill: none;
+}
+.node.hovered polygon.border {
+    stroke: #bdddff;
+}
+.node.related-table polygon.border {
+    stroke-width: 1.75;
+    stroke: #54b9f7;
+}
+.node.faded text {
+    fill-opacity: 0.7;
+}
+.node polygon.column-name {
+    fill: #fefefe;
+}
+.node polygon.column-name:nth-of-type(odd) {
+    fill: #f8f8f8;
+}
+.node polygon.table-name {
+    fill: #dddfdd;
+}
+.node.hovered polygon.table-name {
+    fill: #bdddff;
+    cursor: pointer;
+}
+.node text.table-name {
+    fill: #333333;
+}
+.node .table-name:hover {
+    cursor: pointer;
+}
+
+.node.unwanted polygon.table-name {
+    fill: #ff1111;
+    cursor: pointer;
+}
+.node.unwanted polygon.border {
+    stroke-width: 1.75;
+    stroke: #ff1111;
+}
+.node.unwanted text.table-name {
+    color: #f8f8f8;
+}
+
+.node polygon.column-name.hovered {
+    fill: #d8efff;
+    cursor: pointer;
+}
+.node text.column-name:hover {
+    cursor: pointer;
+}
+
+.node text.table-name {
+    font-family: helvetica, sans-serif;
+    font-size: 10pt;
+    font-weight: bold;
+}
+.node text.column-name {
+    font-family: helvetica, sans-serif;
+    font-size: 8pt;
+}
+.node text.column-name[data-is-primary] {
+    font-weight: bold;
+}
+.node text.column-name[data-is-foreign] {
+    text-decoration: underline;
+}

@@ -1,0 +1,10 @@
+---
+
+cache:
+    # class: File
+    # cache_root: /tmp/decency-cache
+    # class: FastMmap
+    # share_file: /tmp/decency.mmap
+    # expire_time: 1h
+    # cache_size: 20m
+

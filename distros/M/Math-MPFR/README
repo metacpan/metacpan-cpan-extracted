@@ -1,0 +1,172 @@
+This module wraps the MPFR library functions.
+
+The MPFR library is a C library for multiple-precision floating-point
+computations with exact rounding (also called correct rounding). It
+is based on the GMP multiple-precision C library.
+
+The main goal of MPFR is to provide a library for multiple-precision
+floating-point computation which is both efficient and has a
+well-defined semantics. It copies the good ideas from the
+ANSI/IEEE-754 standard for double-precision floating-point
+arithmetic (53-bit mantissa).
+
+It also offers a wide range of trig, log, and other functions, and
+constants.
+
+MPFR, like GMP, is free. It is distributed under the
+GNU Lesser General Public License (GNU Lesser GPL).
+
+Because this module wraps the MPFR functions, it requires that both
+the GMP C library and the MPFR C library have been installed.
+
+For the GMP library see:
+http://gmplib.org
+
+For the MPFR library see:
+http://www.mpfr.org
+
+Minimum required version of gmp is gmp-4.2.0.
+Minimum required version of mpfr is mpfr-2.4.0.
+Some features of Math::MPFR require later versions
+of the gmp and mpfr libraries.
+
+You'll get errors if you try to build Math::MPFR against an
+insufficiently recent version of the mpfr library.
+
+To build this module you need perl 5.6.0 or later. I'm not sure of all
+the requirements to get it to build with earlier versions of perl, but
+it's definite that the XS code relating to operator overloading will
+not compile with perl versions prior to 5.6.
+
+Build in the usual way:
+
+ perl Makefile.PL
+ make
+ make test
+ make install
+
+When building this module, the GMP and MPFR libraries will need to be
+accessible. If those files are in a location where your compiler does
+not find them by default, then instead of running 'perl Makefile.PL',
+you'll need to run:
+
+perl Makefile.pl INC="-I/path/to/gmp_includes -I/path/to/mpfr_includes"
+ LIBS="-L/path/to/mpfr_lib -lmpfr -L/path/to/gmp_lib -lgmp"
+
+Other commandline args you may want to provide to 'perl Makefile.PL' are
+D64=1 (for _Decimal64 support) and F128=1 (for __float128 support).
+See the Decimal64 and Float128 sections (below).
+
+==================================
+64-bit-int and long double support
+==================================
+
+If your perl's Config reports that 'ivsize' is greater than or
+equal to 8 && 'ivtype' is not 'long', then Math::MPFR will, by default,
+be built with access to the mpfr_*_uj and mpfr_*_sj functions. Else,
+access to those functions is, by default, denied. You can override the
+default by opening up the Makefile.PL and uncommenting the appropriate
+line (just a few lines down from the top of the file ... the comments
+in that file should make it clear).
+
+Similarly, if your perl's Config reports that 'nvsize' is greater than
+8 then Math::MPFR will be built with access to the mpfr_*_ld functions.
+Else, access to those functions is, by default, denied. Again, you can
+override the default by opening up the Makefile.PL and uncommenting the
+appropriate line.
+
+I believe it to be both unnecessary and inadvisable to override the
+default - but if you do find that you need to override the default,
+please let me know. That you have found it necessary to override the
+default is something I probably ought to know about.
+
+I am contactable by email at sisyphus at(@) cpan dot (.) org.
+
+=========================================================
+Conversion between Math::Decimal64 and Math::MPFR objects
+=========================================================
+
+The functions Rmpfr_set_DECIMAL64 and Rmpfr_get_DECIMAL64 allow
+conversion between Math::Decimal64 (_Decimal64) and Math::MPFR (mpfr_t)
+objects.
+For this feature to be available you firstly need a compiler that has
+the _Decimal64 data type.
+Then you need to build and install Math::Decimal64.
+You'll also need to have the mpfr library built with _Decimal64 support.
+See the mpfr documentation for details of that aspect.
+
+If those pre-conditions are met, you also need to provide D64=1
+as a command line argument to 'perl Makefile.PL'. (Altenatively you
+could edit the Makefile.PL before building Math::MPFR and set its
+$have_decimal64 variable to 1.)
+
+Similarly, ensuring that Decimal64 support is *not* built in can be
+achieved by omitting the D64=1 argument && by not altering the value
+assigned to $have_decimal64.
+
+=========================================================
+Conversion between Math::Float128 and Math::MPFR objects
+=========================================================
+
+The functions Rmpfr_set_FLOAT128 and Rmpfr_get_FLOAT128 allow
+conversion between Math::Float128 (__float128) and Math::MPFR (mpfr_t)
+objects.
+For this feature to be available you firstly need a compiler that has
+the __float128 data type.
+Then you need to build and install Math::Float128.
+You'll also need to have the mpfr library (version 4.0.0 at least)
+built with __float128 support. See the mpfr documentation for details
+of that aspect. (It's just a matter of providing Configure with the
+--enable-float128 option when building mpfr-4.0.0 or later.)
+
+If those pre-conditions are met, you also need to provide F128=1
+as a command line argument to 'perl Makefile.PL'. (Altenatively you
+could edit the Makefile.PL before building Math::MPFR and set its
+$have_float128 variable to 1.)
+
+Similarly, ensuring that __float128 support is *not* built in can be
+achieved by not providing the F128=1 argument && by not changing the
+value of $have_float128 in the Makefile.PL.
+
+==========================================================
+Conversion between Math::LongDouble and Math::MPFR objects
+==========================================================
+
+There are 2 functions provided for conversion between Math::LongDouble
+and Math::MPFR objects:
+
+ Rmpfr_set_LD (assign the value of a Math::LongDouble object to a
+               Math::MPFR object)
+ Rmpfr_get_LD (assign the value of a Math::MPFR object to a
+               Math::Long Double object)
+
+If your perl's nvtype is long double, just use Rmpfr_set_ld and
+Rmpfr_get_ld instead.
+Math::LongDouble provides 'long double' support for perls whose
+nvtype is other than 'long double'.
+
+=======================================================
+Conversion between __float128 NV and Math::MPFR objects
+=======================================================
+
+As of perl-5.21.4 it is possible to build perl with an nvtype of
+__float128. This is achieved by specifying -Dusequadmath as a
+Configure arg .... but, it will not work for all architectures
+and compilers.
+
+If $Config{nvtype} specifies '__float128' && if your mpfr library
+(need 4.0.0 or later) was built with --enable-float128 then you
+can pass your __float128 NV values to and from Math::MPFR using
+the Rmpfr_set_float128() and Rmpfr_get_float128() functions.
+And the overloaded operations will also accept the __float128 NV
+arguments as one would want.
+
+However, for that to work, you also need to have built Math::MPFR
+by starting with:
+
+  perl Makefile.PL F128=1
+
+(Altenatively you could edit the Makefile.PL before building
+Math::MPFR and set its $have_float128 variable to 1.)
+
+

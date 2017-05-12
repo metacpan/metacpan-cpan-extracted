@@ -1,0 +1,7 @@
+% languages 'ru';
+% stash subject => 'Тест!';
+
+Это письмо!
+
+%=l 'hello'
+%=l 'hello2'

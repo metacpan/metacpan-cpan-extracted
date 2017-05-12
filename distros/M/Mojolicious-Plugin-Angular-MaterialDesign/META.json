@@ -1,0 +1,81 @@
+{
+   "abstract" : "Mojolicious + https://material.angularjs.org/",
+   "author" : [
+      "mudler <mudler@dark-lab.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Angular-MaterialDesign",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojo::Base" : "0",
+            "Mojolicious::Plugin::AssetPack" : "0",
+            "Mojolicious::Plugin::AssetPack::Backcompat" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Mojolicious" : "0",
+            "Test::Mojo" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::Angular::MaterialDesign" : {
+         "file" : "lib/Mojolicious/Plugin/Angular/MaterialDesign.pm",
+         "version" : "v1.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mudler/Mojolicious-Plugin-Angular-MaterialDesign/issues"
+      },
+      "homepage" : "https://github.com/mudler/Mojolicious-Plugin-Angular-MaterialDesign",
+      "repository" : {
+         "url" : "git://github.com/mudler/Mojolicious-Plugin-Angular-MaterialDesign.git",
+         "web" : "https://github.com/mudler/Mojolicious-Plugin-Angular-MaterialDesign"
+      }
+   },
+   "version" : "1.1.0",
+   "x_authority" : "cpan:MUDLER",
+   "x_contributors" : [
+      "mudler <mudler@sabayon.org>"
+   ]
+}

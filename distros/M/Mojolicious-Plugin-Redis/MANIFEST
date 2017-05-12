@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Mojolicious/Plugin/Redis.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-load.t
+t/01-functional-default.t
+t/02-functional-helper.t
+t/03-functional-nohelper.t
+t/pod.t

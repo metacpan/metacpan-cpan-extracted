@@ -1,0 +1,32 @@
+
+                        Math::Evol
+
+This module implements the evolution search strategy.
+Derivatives of the objective function are not required.
+Constraints can be incorporated.  The caller must supply initial
+values for the variables and for the initial step sizes.
+
+This evolution search strategy is a random strategy, and as such is
+particularly robust and will cope well with large numbers of variables
+or rugged objective funtions.  It derives from the 'EVOL' Fortran routine
+of Schwefel, which uses Rechenberg's work on step-size adjustment.
+
+Evol.pm works either automatically with an objective function to be
+minimised, or interactively with a (suitably patient) human who at
+each step will choose the better of two (or several) possibilities.
+
+A subroutine (text_evol) is supplied allowing the evolution of numeric
+parameters in a text file. The parameters are identified by special
+comments, which also supply the step sizes. This makes possible the
+optimisation of code according to human judgement, for example PostScript
+code.  A script ps_evol is included for fine-tuning PostScript drawings.
+
+Also included is a call-compatible translation into Lua.
+
+To install:
+	perl Makefile.PL
+	make install test
+
+For up-to-date source, see http://search.cpan.org/~pjb
+
+        Peter J Billam       http://www.pjb.com.au

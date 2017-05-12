@@ -1,0 +1,46 @@
+Revision history for MooseX-TrackDirty-Attributes
+
+2.003     2014-12-23 14:40:49 PST-0800
+	* Apparently we can no longer rely on $self->name to return a value when
+	  called in an attribute builder on an attribute metaclass... Or
+	  something.  Don't rely on the builder, but work around and skip related
+	  tests until this gets sorted properly -- in any case, trait application
+	  during attribute extension or to a metaclass instance are likely to
+	  be... atypical.
+
+2.002     2012-11-24 16:35:39 PST8PDT
+
+	* use around, not override, to modify methods; this helps prevent
+	  conflicts with other traits [Gianni Ceccarelli]
+
+2.001     2012-07-19 13:10:25 America/Los_Angeles
+
+	* add "cleaner" attribute option to generate an accessor capable of marking
+	  an attribute as clean without clearing it
+
+2.000     2012-02-28 14:38:21 America/Los_Angeles
+- require Test::Moose::More 0.005+
+
+1.900     2012-02-15 14:43:40 America/Los_Angeles
+- handle native traits!
+
+1.000     2011-09-28 17:49:29 America/Los_Angeles
+- "Recreate" the accessor metaclass each time we ask for it...
+- ...which means we can drop the v5.10 requirement.
+- No code changes since 0.90.
+
+0.90      2011-09-24 22:23:23 America/Los_Angeles
+- switch to Dist::Zilla
+- use two slots for tracking dirtiness, rather than a base class role and
+  additional attribute
+- jump to v1, the better to indicate api breakage
+
+0.02     Tue Oct 13 20:13:33 PDT 2009
+- switch our attribute option processing from the metaclass trait to the
+  attribute metaclass trait
+- add initial native attribute helper tracking and tests...  just Hash and
+  Array traits properly tracked at the moment.
+
+0.01     Tue Oct  6 21:34:48 PDT 2009 
+- First version, released on an (possibly) unsuspecting world.
+

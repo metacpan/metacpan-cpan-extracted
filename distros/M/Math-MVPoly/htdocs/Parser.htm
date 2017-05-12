@@ -1,0 +1,290 @@
+<HTML>
+<HEAD>
+<TITLE>Parser - a simple algebraic command parser</TITLE>
+<LINK REV="made" HREF="mailto:bguarrac@hotmail.com">
+</HEAD>
+
+<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#NAME">NAME</A>
+	<LI><A HREF="#DESCRIPTION">DESCRIPTION</A>
+	<LI><A HREF="#AUTHOR">AUTHOR</A>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="NAME">NAME</A></H1>
+<P>
+Parser - a simple algebraic command parser
+
+<P>
+<HR>
+<H1><A NAME="DESCRIPTION">DESCRIPTION</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new</A></STRONG><DD>
+<P>
+Return a reference to a new Parser object.
+
+<p>
+
+<DT><STRONG><A NAME="item_variables">variables</A></STRONG><DD>
+<DT><STRONG>variables HASHREF</STRONG><DD>
+<P>
+If input is passed, then assign this input as the new value of variables.
+Return the current value of variables to teh caller.
+
+<p>
+
+<DT><STRONG><A NAME="item_status">status</A></STRONG><DD>
+<DT><STRONG>status INT</STRONG><DD>
+<P>
+If input is passed, then assign this input as the new value to the current
+status. Return the current status to the caller.
+
+<p>
+
+<DT><STRONG><A NAME="item_statusIsValid">statusIsValid</A></STRONG><DD>
+<P>
+Returns a boolean indicating whether or not the current status is 'valid.'
+
+<p>
+
+<DT><STRONG><A NAME="item_statusToString">statusToString</A></STRONG><DD>
+<P>
+Converts the current status value into its string representation and
+returns it.
+
+<p>
+
+<DT><STRONG><A NAME="item_toString">toString</A></STRONG><DD>
+<P>
+Return a string representing the internal state of the parser.
+
+<p>
+
+<DT><STRONG><A NAME="item_setVariable">setVariable NAME,VALUE</A></STRONG><DD>
+<P>
+Set the variable NAME to VALUE.
+
+<p>
+
+<DT><STRONG><A NAME="item_getVariable">getVariable NAME</A></STRONG><DD>
+<P>
+Return the value of variable NAME to the caller.
+
+<p>
+
+<DT><STRONG><A NAME="item_haveVariable">haveVariable NAME</A></STRONG><DD>
+<P>
+Return a boolean indicating the existence of variable NAME.
+
+<p>
+
+<DT><STRONG><A NAME="item_printConstant">printConstant INFO</A></STRONG><DD>
+<P>
+Return a string representing the constant referred to by INFO.
+
+<p>
+
+<DT><STRONG><A NAME="item_printVariable">printVariable INFO</A></STRONG><DD>
+<P>
+Return a string representing the variable referred to by INFO.
+
+<p>
+
+<DT><STRONG><A NAME="item_printCommand">printCommand</A></STRONG><DD>
+<P>
+Return a string representing the results of the command referred to by
+INFO.
+
+<p>
+
+<DT><STRONG><A NAME="item_doPrint">doPrint</A></STRONG><DD>
+<P>
+Based on the block info, generate a string containing a printable value.
+
+<p>
+
+<DT><STRONG><A NAME="item_doGBasis">doGBasis</A></STRONG><DD>
+<P>
+Calculate the Groebner Basis of p1,...,p2.
+
+<p>
+
+<DT><STRONG><A NAME="item_doSPoly">doSPoly</A></STRONG><DD>
+<P>
+Calculate the S-Poly of p1 and p2.
+
+<p>
+
+<DT><STRONG><A NAME="item_doMonLCM">doMonLCM</A></STRONG><DD>
+<P>
+Calculate the monomial Least Common Multiple of p1 and p2.
+
+<p>
+
+<DT><STRONG><A NAME="item_doReduce">doReduce</A></STRONG><DD>
+<P>
+Attempt to reduce a polyomial to a simpler form.
+
+<p>
+
+<DT><STRONG><A NAME="item_doGCD">doGCD</A></STRONG><DD>
+<P>
+Determine the Greatest Common Divisor of p1 and p2, where p1 and p2 are
+single variabel polynomials.
+
+<p>
+
+<DT><STRONG><A NAME="item_doMult">doMult</A></STRONG><DD>
+<P>
+Perform polynomial multiplication.
+
+<p>
+
+<DT><STRONG><A NAME="item_doQuo">doQuo</A></STRONG><DD>
+<P>
+Determine the quotient of p1 / p2, where p1 and p2 are single variable
+polynomials.
+
+<p>
+
+<DT><STRONG><A NAME="item_doRem">doRem</A></STRONG><DD>
+<P>
+Determine the remainder of a p1 / p2.
+
+<p>
+
+<DT><STRONG><A NAME="item_doNormalf">doNormalf</A></STRONG><DD>
+<P>
+Calculate the normal form of p1 / (p2,...,pn).
+
+<p>
+
+<DT><STRONG><A NAME="item_doDivide">doDivide</A></STRONG><DD>
+<P>
+Perform polynomial division. 
+
+<p>
+
+<DT><STRONG><A NAME="item_doSubtract">doSubtract</A></STRONG><DD>
+<P>
+Perform polynomial subtraction. 
+
+<p>
+
+<DT><STRONG><A NAME="item_doAdd">doAdd</A></STRONG><DD>
+<P>
+Perform polynomial addition.
+
+<p>
+
+<DT><STRONG><A NAME="item_doFunction">doFunction</A></STRONG><DD>
+<P>
+Determine and execute a function as indicated by the block info.
+
+<p>
+
+<DT><STRONG><A NAME="item_doMonomialOrdering">doMonomialOrdering</A></STRONG><DD>
+<P>
+Modify the monomial ordering.
+
+<p>
+
+<DT><STRONG><A NAME="item_haveMonomialOrdering">haveMonomialOrdering</A></STRONG><DD>
+<P>
+Return a boolean indicating the existence of a monomial ordering.
+
+<p>
+
+<DT><STRONG><A NAME="item_doVariableOrdering">doVariableOrdering</A></STRONG><DD>
+<P>
+Modify the variable ordering.
+
+<p>
+
+<DT><STRONG><A NAME="item_haveVariableOrdering">haveVariableOrdering</A></STRONG><DD>
+<P>
+Return a boolean indicating the existence of a variable ordering.
+
+<p>
+
+<DT><STRONG><A NAME="item_doVerbose">doVerbose</A></STRONG><DD>
+<P>
+Toggle the verbose state of the interpreter and and polynomials contained
+within.
+
+<p>
+
+<DT><STRONG><A NAME="item_doState">doState</A></STRONG><DD>
+<P>
+Generate a string representing the state of the variables in the
+interpreter.
+
+<p>
+
+<DT><STRONG><A NAME="item_doValue">doValue</A></STRONG><DD>
+<P>
+See <CODE>value()</CODE> in Language Commands. 
+
+<p>
+
+<DT><STRONG><A NAME="item_doAssignment">doAssignment</A></STRONG><DD>
+<P>
+Determine and assign a value to a variable.
+
+<p>
+
+<DT><STRONG><A NAME="item_getBlockInfo">getBlockInfo</A></STRONG><DD>
+<P>
+Query a string to determine its nature relative to the parsing scheme and
+return the info.
+
+<p>
+
+<DT><STRONG><A NAME="item_varToString">varToString VARNAME</A></STRONG><DD>
+<P>
+Retrieve the contents of VARNAME and convert the value into a string.
+
+<p>
+
+<DT><STRONG><A NAME="item_parseLine">parseLine STRING</A></STRONG><DD>
+<P>
+Parse the string as a command.
+
+<p>
+
+<DT><STRONG><A NAME="item_parseCmdString">parseCmdString STRING</A></STRONG><DD>
+<P>
+Isolate each command in STRING by parsing on ';', and then iterate through
+the list and call parseLine for each.  
+
+<p>
+
+<DT><STRONG><A NAME="item_parseCGICmdString">parseCGICmdString STRING</A></STRONG><DD>
+<P>
+Operates almost identically to parseCmdString except that the resulting
+string is parsed, replacing each EOL with an HTML EOL. 
+
+<p>
+
+<DT><STRONG><A NAME="item_parseFile">parseFile FILENAME</A></STRONG><DD>
+<P>
+Read a file and pass it to parseCmdString.
+
+</DL>
+<P>
+<HR>
+<H1><A NAME="AUTHOR">AUTHOR</A></H1>
+<P>
+Brian Guarraci &lt;<A
+HREF="mailto:bguarrac@hotmail.com">bguarrac@hotmail.com</A>&gt;
+
+</BODY>
+
+</HTML>

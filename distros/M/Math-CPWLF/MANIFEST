@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Math/CPWLF.pm
+t/00-load.t
+t/01-find_neighbors.t
+t/02-one_dimension.t
+t/03-multi_dimensional.t
+t/04-exceptions.t
+t/pod-coverage.t
+t/pod.t
+META.yml

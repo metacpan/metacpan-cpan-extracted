@@ -1,0 +1,9 @@
+---
+
+
+logging:
+    syslog: 0
+    console: 0
+    log_level: 0
+    #directory: 
+

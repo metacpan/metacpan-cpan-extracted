@@ -1,0 +1,20 @@
+---
+name: Math-Vec
+version: 1.01
+author: []
+abstract: Object-Oriented Vector Math Methods in Perl
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Test::More: 0
+provides:
+  Math::Vec:
+    file: lib/Math/Vec.pm
+    version: 1.01
+  Math::Vec::Support:
+    file: lib/Math/Vec.pm
+generated_by: Module::Build version 0.2807
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

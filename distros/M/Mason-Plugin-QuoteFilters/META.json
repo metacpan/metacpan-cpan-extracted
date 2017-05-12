@@ -1,0 +1,52 @@
+{
+   "abstract" : "Filters for making quoted strings",
+   "author" : [
+      "Stephen Clouse <stephenclouse@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mason-Plugin-QuoteFilters",
+   "no_index" : {
+      "directory" : [
+         "lib/Mason/Plugin/QuoteFilters"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mason" : "2.00"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Class::Most" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-mason-plugin-quotefilters@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mason-Plugin-QuoteFilters"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/StephenClouse/perl-mason-plugin-quotefilters.git",
+         "web" : "https://github.com/StephenClouse/perl-mason-plugin-quotefilters"
+      }
+   },
+   "version" : "0.002"
+}
+

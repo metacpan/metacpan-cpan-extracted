@@ -1,0 +1,95 @@
+NAME
+    Module::Overview - print/graph module(s) information
+
+SYNOPSIS
+        use Module::Overview;
+    
+            my $mo = Module::Overview->new({
+                    'module_name' => 'Module::Overview',
+            });
+    
+        print $mo->text_simpletable;
+    
+        my $graph = $mo->graph;    # Graph::Easy
+        open my $DOT, '|dot -Tpng -o graph.png' or die ("Cannot open pipe to dot: $!");
+        print $DOT $graph->as_graphviz;
+        close $DOT;
+
+DESCRIPTION
+        .------------------+--------------------------------------------------------------.
+        | class            | Module::Overview                                             |
+        +------------------+--------------------------------------------------------------+
+        | parents          | Class::Accessor::Fast                                        |
+        | classes          | Class::Accessor                                              |
+        +------------------+--------------------------------------------------------------+
+        | uses             | Carp                                                         |
+        |                  | Class::Sniff                                                 |
+        |                  | Graph::Easy                                                  |
+        |                  | Module::ExtractUse                                           |
+        |                  | Text::SimpleTable                                            |
+        +------------------+--------------------------------------------------------------+
+        | methods          | _carp() [Class::Accessor]                                    |
+        |                  | _croak() [Class::Accessor]                                   |
+        |                  | _mk_accessors() [Class::Accessor]                            |
+        |                  | accessor_name_for() [Class::Accessor]                        |
+        |                  | best_practice_accessor_name_for() [Class::Accessor]          |
+        |                  | best_practice_mutator_name_for() [Class::Accessor]           |
+        |                  | follow_best_practice() [Class::Accessor]                     |
+        |                  | get()                                                        |
+        |                  | graph()                                                      |
+        |                  | import() [Class::Accessor]                                   |
+        |                  | make_accessor() [Class::Accessor::Fast]                      |
+        |                  | make_ro_accessor() [Class::Accessor::Fast]                   |
+        |                  | make_wo_accessor() [Class::Accessor::Fast]                   |
+        |                  | mk_accessors() [Class::Accessor]                             |
+        |                  | mk_ro_accessors() [Class::Accessor]                          |
+        |                  | mk_wo_accessors() [Class::Accessor]                          |
+        |                  | mutator_name_for() [Class::Accessor]                         |
+        |                  | new()                                                        |
+        |                  | set() [Class::Accessor]                                      |
+        |                  | text_simpletable()                                           |
+        +------------------+--------------------------------------------------------------+
+        | methods_imported | _hide_methods_accessor()                                     |
+        |                  | _module_name_accessor()                                      |
+        |                  | _recursion_filter_accessor()                                 |
+        |                  | _recursive_accessor()                                        |
+        |                  | confess()                                                    |
+        |                  | hide_methods()                                               |
+        |                  | module_name()                                                |
+        |                  | recursion_filter()                                           |
+        |                  | recursive()                                                  |
+        |                  | subname() [Class::Accessor]                                  |
+        '------------------+--------------------------------------------------------------'
+
+PROPERTIES
+        module_name
+        recursive
+        recursion_filter
+        hide_methods
+
+METHODS
+  new()
+    Object constructor.
+
+  get
+    Return hash ref with module overview.
+
+  text_simpletable
+    Returns string with tabular text representation of get.
+
+  graph
+    Returns Graph::Easy with representation of get.
+
+SEE ALSO
+    Class::Sniff, Module::ExtractUse
+
+AUTHOR
+    jozef@kutej.net, `<jkutej at cpan.org>'
+
+LICENSE AND COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

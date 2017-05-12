@@ -1,0 +1,177 @@
+Revision history for MIDI-Simple-Drummer
+
+0.0803    2015-10-04 17:53:32-05:00 America/Chicago
+    - Replaced the broken rock SYNOPSIS example with a working example.
+
+0.0802    2015-10-04 16:44:34-05:00 America/Chicago
+    - Removed unneeded, accidentally included distribution files.
+
+0.0801    2015-10-04 16:35:01-05:00 America/Chicago
+    - Fix crucial SYNOPSIS typo.
+
+0.08      2014-10-12 21:06:54-04:00 America/New_York
+    - Fixed the MIDI time_signature finally!
+
+0.0701    2014-08-30 09:25:54-04:00 America/New_York
+    - Gave life to the Euclidean module via J Mates.
+    - Added the rotate($necklace) method.
+    - Added Euclidean tests!
+    - Removed Funky cruft until it's actually ready for prime time.
+    - Fixed POD
+
+0.0601    2014-03-03 19:16:51EST-0500 America/New_York
+    - Creating eg/back-in-black...
+    - Fixed accidental phrase duplication in Rock patterns.
+    - Modularized Rock "half beat" code.
+    - Added Funk placeholder...
+
+0.06      2014-01-13 22:45:55 America/New_York
+    - Enabled MIDI drumkit types (e.g. "power", "brushes").
+    - Enabled MIDI reverb and chorus effect setting.
+    - Made the rudiment code generically useful.
+    - Improved the eg/ rock-drummer and metronome.
+    - Set backbeat to "kick snare kick" if the time signature is a multiple of 3.
+
+0.05      2013-12-26 08:09:30 America/New_York
+    - Improved documentation!
+    - Added the rest of the rudiments.
+
+0.04      2013-12-23 20:26:35 America/Los_Angeles
+    - Added bitmask representation handling.
+    - Improved documentation!
+    - Enabled reverb and chorus CC effects.
+    - Added the -pan_width attribute.
+    - Enabled the accent_note() method.
+    - Added all but one roll and diddle phrases.
+
+0.03      2013.01.27
+    - Added time signature support and tests.
+    - Replaced duration computaton with the Music:Duration module.
+    - Added Changes versioning plugin.
+    - Added spellchecking plugin.
+    - Removed niave swing() method until true wisdom emerges.
+    - Made the eg/basics script more user-friendly.
+    - Flesh-out panning features in the Rudiments module.
+    - Added a couple more rudiments and better tests.
+
+0.02_1    2012.02.23
+    - Added MIDI panning (CC#10).
+
+ ^^^ version mix-up vvv
+
+0.0201    2012.02.05
+    - Updated copyright year.
+    - Added M-S-D-Rudiments module.
+    - Added tests for Rudiments.
+
+ ^^^ version mix-up vvv
+
+0.02      2011.11.17
+    - Added multi-track capability, testing and POD enhancement.
+    - Added explicit in-line comments.
+
+0.0101    2011.01.05
+    - Refactored with Dist::Zilla.
+
+0.01      2011.01.04
+    - Added rhythm metric attributes called bars() and swing().
+    - It didn't mean a thing when it didn't have that swing.
+    - Made tests and an example jazz drummer.
+    - Updated the other example programs.
+    - Updated POD and comments.
+    - Removed API.pod.
+
+0.00_23   2010.06.19
+    - How about a Makefile.PL to go with the distribution? Eh?
+
+0.00_22   2010.06.15
+    - Fixed -kit vs Kit, -pat vs Pat, mixup. :\
+    - Fixed pattern name tests.
+    - Began to turn the API POD into a Pod::S5 slideshow.
+
+0.00_21   Fri 2010.05.15
+    - Cleaned up docs a bit.
+
+0.00_20   Fri 2010.05.14
+    - Normalized things and cleaned up a bit.
+    - Made eg/* work again. :)
+
+0.00_19   Fri 2010.05.14
+    - Refactored to use proper inheritance for distinct styles.
+    - Cleaned up much ugliness.
+
+0.00_18   Wed 2010.04.28
+    - Factored-out kits and patterns.
+    - Perceived the ugliness that I hacked-up... Must fix ASAP.
+
+0.00_17   Sat Nov 14, 2009
+    - Added bpm, volume and accent accessors and an accent method.
+    - Spruced-up POD.
+    - Added a beat() method TODO test.
+
+0.00_16   Tue Nov 10, 2009
+    - Fixed an option_strike() beat call that fubar'd the testing.
+    - Fixed mistaken method example syntax in POD.
+    - Improved eg/drummer again and made an eg/metronome.
+
+0.00_15   Sat Nov 8, 2009
+    - Repaired tests.
+    - Improved eg/drummer.
+    - Streamlined the pattern/key logic.
+
+0.00_14   Sat Oct 31, 2009
+    - Reorganized POD sections.
+    - Renamed the fill aptterns to be more meaningful.
+
+0.00_13   Thu Oct 29, 2009
+    - Collapsed known pattern code.
+    - Improved POD.
+    - Made eg/basics a more useful example.
+
+0.00_12   Thu Oct 29, 2009
+    - Whoops. Recorrectified.
+
+0.00_11   Thu Oct 29, 2009
+    - Smoothified.
+    - Improveified.
+    - Correctificated.
+    - Enhancified.
+
+0.00_10   Mon Oct 19, 2009
+    - Note to self: Read the 0.00_09 change notes.
+    - Fix eg/drummer.
+
+0.00_09   Mon Oct 19, 2009
+    - Note to self: Don't release a distro when you are more tired than alive.
+
+0.00_08   Mon Oct 19, 2009
+    - Simplified the public and internal interface.
+
+0.00_07   Sat Oct 17, 2009
+    - Something good happened, I'm sure...
+
+0.00_06   Sat Oct 17, 2009
+    - Fixed eq/drummer that was "backwards."
+    - Made the package synopsis identical to eg/drummer.
+
+0.00_05   Sat Oct 17, 2009
+    - Renamed methods.
+    - Began adding tests.
+    - Enhanced POD.
+
+0.00_04   Tue Oct 13, 2009
+    - Allowed user defined patterns to be added to the repertoire.
+    - Improved code! Imagine that!
+    - Improved documentation.
+    - Added POD tests.
+
+0.00_03   Sun Oct 11, 2009
+    - Wtf? The _02 distro is blank?
+
+0.00_02   Sun Oct 11, 2009
+    - Fixed distribution files and documentation.
+
+0.00_01   Sat Oct 10, 2009
+    - First version, released on an unsuspecting world by Module::Starter.
+    - Made it live in the Possible Now.
+

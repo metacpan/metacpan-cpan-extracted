@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b90f2159540495c82c61fa062005fcffbd4cdc40 Changes
+SHA1 7d9986bc37f4cfa2dc2bfb0ee5323b1a046e91ff LICENSE
+SHA1 d6c1b3fbb44350a21edd814277fa1fd2d0750b10 MANIFEST
+SHA1 78c660a263ea9f08ec9da7e61631a012b76c4a27 META.yml
+SHA1 a79a98aea9aa3a721576a128cd8e59d109199337 Makefile.PL
+SHA1 59c78ac33e5503c905fdd59ac1c561488061f9bb README
+SHA1 d63e032ca180ef9871c5379efe9596f5fb09b625 ROM.pm
+SHA1 0ca671cadcff31f25014f3eba8a33e5e98eafc53 examples/ex1.pl
+SHA1 aa39c28e94537306e39aa51203e689d5a4e1494f examples/ex2.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 b8c9f4a2701ea12e6249b59b441aa70892490bef t/Mock-Person-SK-ROM/01-use.t
+SHA1 23a513cffa923756cf24ca06ff80a2b9eb164483 t/Mock-Person-SK-ROM/02-version.t
+SHA1 3fe02750300f2bc2ea7144fbcab12a6341f805e6 t/Mock-Person-SK-ROM/03-first_male.t
+SHA1 7a264b51c0931e6772d7484cf3e48d0e3c47c6f6 t/Mock-Person-SK-ROM/04-first_female.t
+SHA1 1474f779f52693370c4874c4be1a8abb2601a823 t/Mock-Person-SK-ROM/05-last_male.t
+SHA1 3c0f7d1fedcd897e445af76b8f1e4d501fbad69a t/Mock-Person-SK-ROM/06-last_female.t
+SHA1 b84850375e03e54d98b33332333ac410352a338d t/Mock-Person-SK-ROM/07-middle_male.t
+SHA1 61ce58ba5c2641f4baf9166fd7079da596bea923 t/Mock-Person-SK-ROM/08-middle_female.t
+SHA1 bc86eacc7f4f77597387e0dd520e80dbae8cd4ad t/Mock-Person-SK-ROM/09-name.t
+SHA1 06633b2da720e7efef68364a5af6232141d28d46 xt/Mock-Person-SK-ROM/01-pod_coverage.t
+SHA1 3880e7b7f7357c3a887fea7a4f30505eb621d420 xt/Mock-Person-SK-ROM/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWL1PIAAoJEJe+XXKaIuTlZd4H/1/FCdKxeYlIljZtcqryx6XI
+OcD5qcvU3vZ+ZVBe3r5PC0eXOS+04vRXHw7oKWTgYRGBvAFy9ZNPP6krDvFuQCKK
+6rYxCikyfLDfD1mVafi1OiZti6gWRaY6e+7HUAxLeUtwvx8jMz/S+MMq+XpmYm2k
+C9/FAziZ3RoV33mGeE6B3o/TaZ+6iB5Z3v6cScU7uaN508+/lB7kdDEwiAnFZKzp
+h5HmpH11U4Nlz9okzc+/t7AvOXaAAk9GNsulbCTQ0xlIqu1QR8g/tHf/eODdP5d1
+GC3BsmFsJgIxOU1D1ZDAS6Shmbd9rE2xpVCLJ515rIkm41CosJEFW251to/lcwE=
+=kjDq
+-----END PGP SIGNATURE-----

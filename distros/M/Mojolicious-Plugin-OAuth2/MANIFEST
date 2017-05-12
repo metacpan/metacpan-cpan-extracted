@@ -1,0 +1,23 @@
+.perltidyrc
+.ship.conf
+.travis.yml
+Changes
+cpanfile
+lib/Mojolicious/Plugin/OAuth2.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-basic.t
+t/delayed.t
+t/error.t
+t/get_authorize_url.t
+t/Helper.pm
+t/live.t
+t/mocked.t
+t/mocked_blocking.t
+t/oauth2-auth_url.t
+t/oauth2-get_token.t
+t/original.t
+t/sync.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

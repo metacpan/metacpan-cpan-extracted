@@ -1,0 +1,6 @@
+Revision history for Perl extension MLDBM::Easy.
+
+0.01  Mon Apr 12 13:29:22 2004
+	- original version; created by h2xs 1.23 with options
+		-A -X MLDBM::Easy
+

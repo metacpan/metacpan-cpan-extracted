@@ -1,0 +1,32 @@
+---
+abstract: 'Blah blah blah'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, Dist::Milla version v1.0.16, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MojoX-Log-Syslog
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Mojolicious: '0'
+  Sys::Syslog: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/fayland/MojoX-Log-Syslog/issues
+  homepage: https://github.com/fayland/MojoX-Log-Syslog
+  repository: https://github.com/fayland/MojoX-Log-Syslog.git
+version: '0.01'

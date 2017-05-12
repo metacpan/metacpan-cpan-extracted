@@ -1,0 +1,80 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use lib './lib';
+
+use Benchmark qw( cmpthese );
+use Markdent::Handler::CaptureEvents;
+use Markdent::Handler::HTMLStream;
+use Markdent::Parser;
+use Storable qw( nfreeze thaw );
+use Text::Markdown qw( markdown );
+
+use File::Find qw( find );
+use File::Slurp qw( read_file );
+
+my $reps = shift || 10;
+
+my %files;
+find(
+    {
+        wanted => sub {
+            return unless $File::Find::name =~ /\.text$/;
+
+            $files{$File::Find::name} = read_file($File::Find::name);
+        },
+        no_chdir => 1,
+    },
+    't/mdtest-data'
+);
+
+my %captured;
+
+for my $file ( keys %files ) {
+    my $ch = Markdent::Handler::CaptureEvents->new();
+    my $parser = Markdent::Parser->new( handler => $ch );
+    $parser->parse( markdown => $files{$file} );
+
+    $captured{$file} = nfreeze( $ch->captured_events() );
+}
+
+cmpthese(
+    $reps, {
+        'parse from scratch'          => \&parse,
+        'replay from captured events' => \&replay,
+        'Text::Markdown'              => \&tm,
+    },
+);
+
+sub parse {
+    for my $file ( keys %files ) {
+        my $html = _html_handler();
+        my $parser = Markdent::Parser->new( handler => $html );
+        $parser->parse( markdown => $files{$file} );
+    }
+}
+
+sub replay {
+    for my $file ( keys %files ) {
+        my $html     = _html_handler();
+        my $captured = thaw( $captured{$file} );
+        $captured->replay_events($html);
+    }
+}
+
+sub _html_handler {
+    my $buffer = q{};
+    open my $fh, '>', \$buffer or die $!;
+    return Markdent::Handler::HTMLStream->new(
+        title  => 'Benchmark',
+        output => $fh,
+    );
+}
+
+sub tm {
+    for my $file ( keys %files ) {
+        my $html = markdown( $files{$file} );
+    }
+}

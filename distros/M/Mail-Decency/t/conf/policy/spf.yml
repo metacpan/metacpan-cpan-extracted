@@ -1,0 +1,37 @@
+---
+
+disable: 0
+
+# all versions
+versions: [ 1, 2 ]
+
+# either 'mfrom' or 'helo' or 'pra'
+scope: 'mfrom'
+
+# the sender ip is allowed to send from this ip
+weight_pass: 20
+
+# no spf support from sender domain
+weight_none: 0
+
+# it is a fail, but sender domain admin has not the balls to use hard restrictions
+#   neutral is a bit more wishy-washy then softail is, but essentially both
+#   are saying: the particular sender is not really permitted, but it won't deny it
+#   the ..by_default neutral status i don't get..
+weight_neutral: -100
+weight_neutral_by_default: -100
+weight_softfail: -100
+
+# this admin has the bals. the sender ip is not permitted for this domain
+weight_fail: -100
+
+# some temporary dns problem. should not be weighted negativly, cause this
+#   could happen to any of us
+weight_temperror: 0
+
+# the permanent error says: we received something, but dont know what.
+weight_permerror: -10
+
+# this seems to catch error's which could not be further determined..
+weight_error: 0
+

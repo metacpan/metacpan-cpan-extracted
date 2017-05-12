@@ -1,0 +1,17 @@
+^_build/
+^Build$
+^blib/
+^debian/libmail-spf-perl/
+^debian/spf-tools-perl/
+^debian/tmp/
+^MANIFEST\.bak$
+^Makefile$
+^tmp/
+^\.
+/\.
+\.bak$
+\.old$
+\.swp$
+\.tar\.gz$
+~$
+^MYMETA.yml$

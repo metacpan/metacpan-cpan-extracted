@@ -1,0 +1,27 @@
+---
+abstract: unknown
+author:
+  - 'Ian Kent <iankent@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MongoDB-Simple
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DateTime: 1.03
+  DateTime::Format::W3CDTF: 0.06
+  Exporter: 5.6403
+  MongoDB: 0.7
+  Switch: 2.16
+  Tie::Array: 1.04
+version: 0.005

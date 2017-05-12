@@ -1,0 +1,20 @@
+Revision history for MySQL-QueryMulti
+
+0.08    fixed a bug around the database() function
+
+0.07	modified unit tests so they can be skipped if a connection to mysql fails
+
+0.06	added capability to handle the mysql function database() properly
+	cleaned up some unit test stuff
+
+0.05    added prereq namespace::autoclean
+
+0.04	bug fixes for distinct and sth->execute error conditions
+
+0.03    removed debug statments from mysqlqm
+
+0.02	modified the PREREQ_PM info and added EXE_FILES
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

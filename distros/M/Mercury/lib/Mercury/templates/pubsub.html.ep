@@ -1,0 +1,87 @@
+
+<div class="container-fluid">
+    <div class="row">
+
+        <div class="col-md-6">
+
+            <p>Requesting a WebSocket from the URL <code>/sub/leela</code>
+            creates a subscription to the topic "leela". Requesting a WebSocket
+            from the URL <code>/pub/leela</code> allows sending messages to the
+            "leela" topic, which are then received by all the subscribers.</p>
+
+        </div>
+
+        <div class="col-md-6">
+
+            <p>Topics are heirarchical to allow for broad subscriptions without
+            requring more sockets. A subscription to the topic "wong" receives
+            all messages published to the topic "wong" or any child topic like
+            "wong/amy" or "wong/leo"</p>
+
+        </div>
+    </div>
+    <div class="row">
+
+        <div class="col-md-6">
+            <h2>Subscribe</h2>
+            <p>Type in a topic and press Enter to subscribe to that topic.</p>
+
+            <form id="sub-form">
+                <div id="sub-topic-field" class="form-group">
+                    <label for="sub-topic">Topic: </label>
+                    <div class="input-group">
+                        <span class="input-group-addon">/sub/</span>
+                        <input type="text" id="sub-topic" class="form-control" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary">Subscribe</button>
+                        </span>
+                    </div>
+                </div>
+            </form>
+            <div id="sub-log" class="log"></div>
+        </div>
+
+        <div class="col-md-6">
+            <h2>Publish</h2>
+
+            <p>Once you're subscribed, type in a topic and a message to send a message
+            on that topic.</p>
+
+            <form id="pub-form">
+                <div id="pub-topic-field" class="form-group has-feedback">
+                    <label for="pub-topic">Topic: </label>
+                    <div class="input-group">
+                        <span class="input-group-addon">/pub/</span>
+                        <span class="glyphicon glyphicon-warning-sign form-control-feedback" aria-hidden="true"></span>
+                        <span class="glyphicon glyphicon-ok-sign form-control-feedback" aria-hidden="true"></span>
+                        <input type="text" id="pub-topic" class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="pub-message">Message: </label>
+                    <div class="input-group">
+                        <input type="text" id="pub-message" class="form-control" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary">Publish</button>
+                        </span>
+                    </div>
+                </div>
+            </form>
+            <div id="pub-log" class="log"></div>
+        </div>
+
+    </div>
+</div>
+
+%= javascript begin
+
+    $(function(){
+        $( '#pub-form' ).on( 'submit', function ( e ) {
+            connect_send( e, 'pub', '<%= url_for( 'pub' )->path %>' );
+        } );
+        $( '#sub-form' ).on( 'submit', function ( e ) {
+            connect_recv( e, 'sub', '<%= url_for( 'sub' )->path %>' );
+        } );
+    });
+
+% end

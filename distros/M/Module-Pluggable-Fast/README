@@ -1,0 +1,35 @@
+NAME
+    Module::Pluggable::Fast - Fast plugins with instantiation
+
+SYNOPSIS
+        package MyClass;
+        use Module::Pluggable::Fast
+          name   => 'components',
+          search => [ qw/MyClass::Model MyClass::View MyClass::Controller/ ];
+
+        package MyOtherClass;
+        use MyClass;
+        my @components = MyClass->components;
+
+DESCRIPTION
+    Similar to "Module::Pluggable" but instantiates plugins as soon as
+    they're found, useful for code generators like "Class::DBI::Loader".
+
+  OPTIONS
+   name
+    Name for the exported method. Defaults to plugins.
+
+   search
+    Arrayref containing a list of namespaces to search for plugins. Defaults
+    to the ::Plugin:: namespace of the calling class.
+
+AUTHOR
+    Sebastian Riedel, "sri@cpan.org"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Module::Pluggable
+

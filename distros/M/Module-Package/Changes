@@ -1,0 +1,113 @@
+---
+version: 0.30
+date:    Thu Oct  6 10:37:01 EDT 2011
+changes:
+- Patch from tobyink++ to support user side plugins
+---
+version: 0.29
+date:    Sun Sep 25 22:21:20 CEST 2011
+changes:
+- Put a error message on a die statement.
+- Released from Liz++ and Wendy++'s garage.
+---
+version: 0.28
+date:    Sat Aug 20 18:20:15 CEST 2011
+changes:
+- skip author requires for modules that have a Module::Install plugin
+---
+version: 0.27
+date:    Fri Aug 19 20:57:02 EEST 2011
+changes:
+- Add Gloom Support
+---
+version: 0.26
+date:    Sun Jul  3 19:54:14 EDT 2011
+changes:
+- Support Test::Common updating
+---
+version: 0.25
+date:    Tue Jun 14 00:10:30 EST 2011
+changes:
+- Only guess the module name on the author side
+---
+version: 0.24
+date:    Mon Jun 13 18:12:51 EST 2011
+changes:
+- Allow for unicode package names
+---
+version: 0.23
+date:    Sun Jun 12 03:48:23 EST 2011
+changes:
+- Allow requires_from after requires
+- Add modules to @known_author_only
+---
+version: 0.22
+date:    Tue Jun  7 17:37:16 EST 2011
+changes:
+- Fix new bug on clean perl installs.
+- Since we no longer load inc::Module::Install, we need to put 'inc' on @INC.
+- Add =encoding to Tutorial
+---
+version: 0.21
+date:    Mon Jun  6 02:10:28 EST 2011
+changes:
+- audreyt++ found the elusive bootstrapping bug.
+- Allow $PM and $POD to be preset.
+---
+version: 0.20
+date:    Sun Jun  5 02:32:35 EST 2011
+changes:
+- Add pkg/manifest.skip to MANIFEST.SKIP
+- Add a debugging dump for mystery M:I 1.00 situation.
+- Support install_share.
+---
+version: 0.19
+date:    Tue May 31 20:25:05 EST 2011
+changes:
+- Hopefully fix the non-upgrable bootstrapping bugs.
+- Added xt test to assure that it works.
+---
+version: 0.18
+date:    Mon May 30 20:35:50 EST 2011
+changes:
+- Added post_WriteAll hook.
+---
+version: 0.17
+date:    Mon May 30 15:11:20 EST 2011
+changes:
+- Fixed a stupid user side bug.
+- Add an xt test to make sure we can really make installable stuff.
+---
+version: 0.16
+date:    Sun May 29 18:04:20 EST 2011
+changes:
+- More refactoring, documentation and functionality
+- Solidfied $PM and $POD
+- Tempered the 'final' methods
+- Added audreyt++ VERSION hack to the 0.11 viral bug fix.
+- Made a better version check
+- Added Module::Install 1.01 requirement
+- Added requires_from to options
+- Added $AUTHOR_ONLY support
+---
+version: 0.15
+date:    Sun May 29 00:07:13 EST 2011
+changes:
+- Another fix to try to get a stable first release.
+---
+version: 0.14
+date:    Sat May 28 14:55:50 EST 2011
+changes:
+- Fixed a terrible showstopper bootstrapping bug
+---
+version: 0.12
+date:    Sat May 28 04:11:28 EST 2011
+changes:
+- Major refactoring... don't even know where to begin.
+---
+version: 0.11
+date:    Wed May 18 14:09:55 EST 2011
+changes:
+- First Release
+- This module is the rename/replacement for Package/inc::Package.
+- Package was at 0.10 at the switch, so starting with 0.11.

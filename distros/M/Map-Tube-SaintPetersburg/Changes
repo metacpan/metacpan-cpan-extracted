@@ -1,0 +1,46 @@
+0.06 2015-11-05T11:30:11+01:00
+ - Add EXAMPLE5 section to doc.
+ - Implement station order.
+ - Rewrite XML map to new version with line IDs.
+ - Rewrite XML map to new version without junctions.
+
+0.05 2015-10-16T12:38:00+02:00
+ - Improve description for get_lines() in doc.
+ - Update to Map::Tube 3.06.
+
+0.04 2015-10-08T09:41:29+02:00
+ - Add 04-map.t test.
+ - Add EXAMPLE4 to doc.
+ - Add get_line_by_id() and get_line_by_name() methods to doc.
+ - Add tests for get_node_by_id() and get_node_by_name() methods.
+ - Move author tests to xt/ directory.
+ - Rewrite SEE ALSO section to new style.
+ - Update Module::Install to 1.16 version.
+
+0.03 2015-02-18T07:15:03+01:00
+ - Add <?xml> header to XML document.
+ - Add EXAMPLE3 section to doc.
+ - Add Map::Tube::Graph, Map::Tube::GraphViz, Map::Tube::Text::Table,
+   Task::Map::Tube, Map::Tube::Budapest, Map::Tube::Dnipropetrovsk,
+   Map::Tube::Nanjing, Map::Tube::Novosibirsk, Map::Tube::Prague,
+   Map::Tube::Tbilisi, Map::Tube::Vienna and Map::Tube::Yekaterinburg to
+   SEE ALSO section in doc.
+ - Add Map::Tube::Plugin::FuzzyFind, Map::Tube::Glasgow,
+   Map::Tube::KoelnBonn, Map::Tube::Lyon and Map::Tube::Singapore to SEE
+   ALSO section in doc.
+ - Add Map::Tube::Plugin::Graph to SEE ALSO section in doc.
+ - Add lines to XML document.
+ - Add get_lines() method to doc.
+ - Add get_stations() method to doc.
+ - Fix links between lines.
+ - Fix xml() method description in doc.
+ - Remove obsolete code from EXAMPLE2 section in doc.
+ - Rewrite ids in XML file to right line ids.
+ - Update copyright years to 2015.
+
+0.02 2014-12-18T08:09:34+01:00
+ - Fix saint_petersburg-map.xml file.
+ - Remove executable bit from saint_petersburg-map.xml file.
+
+0.01 2014-12-16T23:42:10+01:00
+ - First version

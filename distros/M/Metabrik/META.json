@@ -1,0 +1,71 @@
+{
+   "abstract" : "There is Brik for that.",
+   "author" : [
+      "GomoR <gomor_at_metabrik.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Metabrik",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Gomor" : "0",
+            "Cwd" : "0",
+            "Data::Dump" : "0",
+            "File::Find" : "0",
+            "File::HomeDir" : "0",
+            "File::Path" : "0",
+            "IO::All" : "0",
+            "Lexical::Persistence" : "0",
+            "Module::Reload" : "0",
+            "PPI" : "0",
+            "Term::ANSIColor" : "0",
+            "Term::ReadLine::Gnu" : "0",
+            "Term::Shell" : "0",
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "Metabrik" : {
+         "file" : "lib/Metabrik.pm",
+         "version" : "1.26"
+      },
+      "Metabrik::Core::Context" : {
+         "file" : "lib/Metabrik/Core/Context.pm",
+         "version" : "1.25"
+      },
+      "Metabrik::Core::Global" : {
+         "file" : "lib/Metabrik/Core/Global.pm",
+         "version" : "1.25"
+      },
+      "Metabrik::Core::Log" : {
+         "file" : "lib/Metabrik/Core/Log.pm",
+         "version" : "1.25"
+      },
+      "Metabrik::Core::Shell" : {
+         "file" : "lib/Metabrik/Core/Shell.pm",
+         "version" : "1.25"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/BSD-3-Clause"
+      ]
+   },
+   "version" : "1.26",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

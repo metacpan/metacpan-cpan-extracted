@@ -1,0 +1,9 @@
+Revision history for Markdown::phpBB
+
+0.02      2014-01-17 02:51:51 Australia/Melbourne
+
+    * Added support for blockquote syntax.
+
+0.01      2014-01-16 10:31:37 Australia/Melbourne
+
+    * First release.

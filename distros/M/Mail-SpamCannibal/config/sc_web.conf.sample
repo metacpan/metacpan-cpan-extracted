@@ -1,0 +1,200 @@
+# sc_web.conf.sample
+# version 1.11, 2-1-10
+#
+# The configuration file is divided into three sections
+#
+# 1) remote admin wrapper
+# 2) local admin wrapper
+# 3) web script
+#
+my $CONFIG = {
+
+## additional KEYS may be included with an INCLUDE statement of the form:
+#
+#  INCLUDE => 'path/to/file.conf',
+#
+#  this file may include an INCLUDE statement, as may the next, etc...
+#
+#
+#################################################
+# SECTION (1	remote admin wrapper
+#################################################
+#
+# Set the path to remote shell program on this
+# local host and the intended target host user and name
+#
+  remoteshell	=> '/usr/bin/ssh spam@remote.host.com',
+
+# Set the path to the remote wrapper
+# command on the remote host
+#
+  remotecommand	=> '/usr/local/spamcannibal/scripts/sc_sesswrap',
+
+#################################################
+# SECTION (2	local admin wrapper
+#################################################
+#
+# Set the encryption secret [optional]
+# if not set, the fully qualified domain name
+# of the local host will be used
+
+#  secret	=> 'some secret string',
+
+# allow or deny non-administrative (user)
+# IP delete privileges. This must be set on both the
+# local and remote sides to work properly
+
+#  userdelOK	=> 0,	# set to true to allow
+
+#################################################
+# SECTION (3	web service
+#################################################
+#
+# Set which admin wrapper to use and 
+# the path to administrative functions
+#
+  wrapper	=> '../scripts/sc_sesswrap',
+#  wrapper	=> '../scripts/sc_remotewrap',
+
+# A description of the DAEMON port for database access.
+# If the port is on the local host, this looks like a file
+# and usually is:
+#
+#	/var/run/dbdbtarpit/bdbread
+#
+# If the port is on a remote host, it is an array ref for
+# a URL and timeout of the form:
+#
+#	['host.name.com:portnumber' ,seconds]
+#
+# If the entry is NOT present, the default value from
+#
+#	$SiteConfig->{SPMCNBL_ENVIRONMENT} . '/bdbread'
+#
+# will be used. See more below.
+
+#  bdbDAEMON	=> /var/run/dbtarpit/bdbread
+#  bdbDAEMON	=> ['myhost.com:8888',30],
+
+# Where to send contact messages [REQUIRED]
+#
+  email	=> '',			# my.emailaddy.com
+
+# Alternate MX host(s) if sending direct
+# to the target MX host is not desired
+#
+#  altMXhosts	=> [qw( mx1.host.com mx2.hots.com)],
+
+# Set session expiration for the admin pages
+#
+  expire	=> 900,		# seconds
+
+# Set login expiration for the admin pages
+#
+  log_expire	=> 180,		# seconds
+
+# Set maximum number of login attempts
+#
+  maxretry	=> 3,
+
+# Require a secure https connection for admin pages
+#
+#  secure	=> 1,		# true value
+
+# Background page color, default if not present is 'white'
+#
+#  bgcolor	=> '#ffffff',
+
+# A list of the the static pages, using the SECOND PAGE format 
+# (logo2, not 'home' page), whose content come entirely from the 
+# 'incl/xxxx.incl' files
+#
+  static	=> [qw(
+	down
+  )],
+
+# The reasons you add spam to your tarpit database
+# html markup is OK
+#
+# The text below is the DEFAULT if 'reason' is not specified
+#
+  reason	=> q
+|SpamCannibal does not block email access except for IP addresses that have
+sent or relayed what we believe to be spam or other unsolicited email
+directly to our email servers.  Spam originating IP addresses are blocked 
+ONLY for access to our mail servers, however, the database we use for that 
+purpose is freely available for anyone to look at and use as they see fit.
+|,
+
+# A list of static admin pages, as above
+#
+  admin		=> [qw(
+	sorry
+	login
+	passwd
+	blklist
+	spamlst
+	updpass
+  )],
+
+#########################################################################
+# Enter the html/text file names here that will be used to populate 	#
+# your web pages. If the module is used by Apache::mod-perl, the page	#
+# text will be cached in the child process for later 'speedy' use. 	#
+# Portions that are used repeatedly for  multiple pages will be sent to	#
+# the client without further access to the file system.			#
+#########################################################################
+
+# An entry for each 'incl/xxxx.incl' file
+# the 'key' is what is passed in the query
+# string from the nav bar
+#
+# if you edit these files, move them all to another
+# directory and change the path below to prevent
+# them from being overwritten by software updates
+#
+  top	  => './incl/top.incl',		# used by all pages
+  top2	  => './incl/top2.incl',	# used by all pages
+  logo1	  => './incl/logo1.incl',	# for the home page
+  logo2	  => './incl/logo2.incl',	# for all other pages
+  stats	  => './incl/stats.incl',	# OPTIONAL LaBrea stats pages
+  nav	  => './incl/nav.incl',		# for all user pages
+  nav2	  => './incl/nav2.incl',	# for all admin pages
+######## individual body text follows
+# if page text does not appear here, it must be generated in this script
+  delist  => './incl/delist.incl',	# text box
+  sorry	  => './incl/sorry.incl',	# 411 error
+  blklist => './incl/blklist.incl',
+  contact => './incl/contact.incl',
+  spamlst => './incl/spamlst.incl',
+  login	  => './incl/login.incl',
+  passwd  => './incl/passwd.incl',
+  updpass => './incl/updpass.incl',
+  home	  => './incl/home.incl',
+  down	  => './incl/download.incl',
+  lookup  => './incl/lookup.incl',	# partial top text, some dynamic
+  whois	  => './incl/whois.incl',	# partial top text, some dynamic
+
+#########################################################################
+# The default site configuration is shown below. If for some reason	#
+# Mail::SpamCannibal::SiteConfig does not provide the configuration	#
+# needed for THIS INSTANCE of index.cgi, then uncomment and edit	#
+# the hash below. See the man page Mail::SpamCannibal::SiteConfig	#
+# for the defaults for your site.					#
+#########################################################################
+#
+# SiteConfig = {
+#	'SPMCNBL_DB_ARCHIVE'	=> 'archive',
+#	'SPMCNBL_DB_CONTRIB'	=> 'blcontrib',
+#	'SPMCNBL_DB_EVIDENCE'	=> 'evidence',
+#	'SPMCNBL_DB_TARPIT'	=> 'tarpit',
+#	'SPMCNBL_ENVIRONMENT'	=> '/var/run/dbtarpit',
+#	'SPMCNBL_SCRIPT_DIR'	=> '/usr/local/spamcannibal/scripts',
+#	'SPMCNBL_CONFIG_DIR'	=> '/usr/local/spamcannibal/config',
+# },
+
+};
+
+#########################################################################
+#			END CONFIG					#
+#########################################################################

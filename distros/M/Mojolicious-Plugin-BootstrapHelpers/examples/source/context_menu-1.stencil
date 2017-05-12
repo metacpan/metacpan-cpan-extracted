@@ -1,0 +1,19 @@
+== stencil ==
+
+--input--
+        <%= context_menu id => 'my-context-menu', items => [
+                ['Item 1', ['item1'] ],
+                ['Item 2', ['item2'] ],
+                [],
+                ['Item 3', ['item3'] ]
+             ] %>
+    </div>
+--end input--
+--output--
+    <ul class="dropdown-menu" id="my-context-menu">
+        <li><a class="menuitem" href="item1" tabindex="-1">Item 1</a></li>
+        <li><a class="menuitem" href="item2" tabindex="-1">Item 2</a></li>
+        <li class="divider"></li>
+        <li><a class="menuitem" href="item3" tabindex="-1">Item 3</a></li>
+    </ul>
+--end output--

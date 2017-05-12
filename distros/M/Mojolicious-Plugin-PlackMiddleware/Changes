@@ -1,0 +1,126 @@
+Revision history for Mojolicious::Plugin::PlackMiddleware
+
+0.36 2016/05/23
+  - Fixed tests in favor of Mojo::Home recent changes
+
+0.35 2015/04/28
+  - Updated dependency.
+
+0.34 2015/04/28
+  - Tested with Mojolicious v6.10.
+
+0.33 2015/02/15
+  - Improved to support MOJO_REVERSE_PROXY.
+  - Updated Plack dependency to v1.0031 for security improvement.
+  - Updated Mojolicious dependency to v5.79.
+
+0.32 2014/06/20
+  - Updated partial test for mojo v5.08
+  - Set CPAN no_index
+
+0.31 2014/06/02
+  - Updated header manipulation for new core api
+
+0.30 2013/06/29
+  - Updated depencency.
+
+0.29 2013/06/29
+  - Fixed a bug on multiple headers with the same name.
+  - Ported compat tests from mojo v4.90
+  - Improved internal code.
+
+0.28 2013/06/29
+  - Updated manifest and remved MYMETA.*
+
+0.27 2013/06/01
+  - Updated tests for new test API.
+
+0.26 2013/05/30
+  - Tested for Mojolicious v3.97
+  - Supported SSL
+  - Updated comatibility tests.
+
+0.25 2012/10/30
+  - Fixed a bug on false valued body.
+
+0.24 2012/07/30
+  - Updated compatibility tests.
+
+0.23 2012/02/25
+  - Depended on Mojolicious v2.52
+  - Stoped using on_dispatch in favor of around_dispatch.
+  - Stoped refering to internal stash values.
+
+0.22 2011/08/31
+  - Fixed a bug on multipart req body
+
+0.21 2011/08/02
+  - Tests fixed for rare invironment
+
+0.20 2011/08/02
+  - Condition callback now gets psgi env for 2nd argument
+  - FIX: Middlewares who invoke app multiple times haven't work propery.
+
+0.19 2011/07/29
+  - Original request body respected
+  - PSGI env generation improved
+  - psgi_env_to_mojo_req added
+
+0.18 2011/07/29
+  - Fixed a bug that env hasn't modifiable
+
+0.17 2011/07/25
+  - Dependency on Mojolicious specified
+
+0.16 2011/07/25
+  - pod fixed
+
+0.15 2011/07/23
+  - mojo_req_to_psgi_env added
+
+0.14 2011/07/23
+  - Fixed a bug on multipart request
+
+0.13 2011/07/14
+  - Auth header supported
+
+0.12 2011/07/13
+  - Proper way to use middlewares directed in pod
+  - A dependency for test specified
+  - FIX: Hasn't worked on port specific request
+
+0.11 2011/06/30
+  - This now wraps on_process instead of hooking after_dispatch so that request
+    filters may work with this.
+  - Wrapping order of multiple middleware is onioned, compatible to plack.
+
+0.10 2011/06/27
+  - Stoped warning. I found mojolicious itself logging warning.
+  - psgi_res_to_mojo_res and mojo_res_to_psgi_res added
+
+0.09 2011/06/26
+  - Class prefix can be ommitted.
+  - Plugin can reports error.
+
+0.08 2011/06/24
+  - Compatibility to Plack::Middleware improved
+
+0.07 2011/06/24
+  - API changed. Now this isa plugin
+
+0.06 2011/06/23
+  - enable_if added
+
+0.05 2011/06/23
+  - Got capable of filtering headers
+  - Distribution renamed
+
+0.04 2011/06/15
+  - Tested
+  - Now it dies if loading middleware failed
+
+0.02 2011/04/30
+  - Disabled $res->fix_headers which sometimes causes the responce slow.
+
+0.01 2011/03/31
+  - initial release

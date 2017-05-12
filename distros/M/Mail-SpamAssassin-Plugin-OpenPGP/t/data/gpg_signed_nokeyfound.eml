@@ -1,0 +1,49 @@
+From users-return-17323-dave=brondsema.net@myfaces.apache.org Sun Feb 19 00:50:23 2006
+Return-Path: <users-return-17323-dave=brondsema.net@myfaces.apache.org>
+Delivered-To: dbrond-dave@brondsema.net
+Received: (qmail 31163 invoked from network); 19 Feb 2006 00:50:22 -0000
+Received: from hermes.apache.org (HELO mail.apache.org) (209.237.227.199) by 0 with SMTP; 19 Feb 2006 00:50:22 -0000
+Received: (qmail 43312 invoked by uid 500); 19 Feb 2006 00:50:19 -0000
+Received: (qmail 5346 invoked by uid 99); 18 Feb 2006 18:27:47 -0000
+X-ASF-Spam-Status: No, hits=1.4 required=10.0 tests=DNS_FROM_RFC_POST
+Received-SPF: pass (asf.osuosl.org: local policy)
+X-IronPort-AV: i="4.02,127,1139205600";  d="asc'?scan'208"; a="108856567:sNHT42981145010"
+Subject: Pre-selection of selectitems
+Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-zb4H4dW9VcdsD/Ngs5OL"
+Organization: =?ISO-8859-1?Q?Tecnol=F3gico?= de Monterrey
+Date: Sat, 18 Feb 2006 12:27:09 -0600
+Message-Id: <1140287229.8012.2.camel@nozdormu.cem.itesm.mx>
+Mime-Version: 1.0
+X-Mailer: Evolution 2.2.3 (2.2.3-2.fc4) 
+X-Virus-Checked: Checked by ClamAV on apache.org
+X-Spam-Flag: NO
+X-Spam-Checker-Version: SpamAssassin 3.0.4 (2005-06-05) on mahatma
+X-Spam-Level: 
+X-Spam-Status: No, score=0.0 required=4.0 tests=none autolearn=failed  version=3.0.4
+
+
+--=-zb4H4dW9VcdsD/Ngs5OL
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
+I haven't found yet a way to do this, does this require a custom
+component?
+
+If I have a selectitem (si) and I give it values {a,b,c}, how do I make
+it so none of them are selected on the first load of the page? I have
+tried setting the value in the managed bean to null with no luck.
+
+--=-zb4H4dW9VcdsD/Ngs5OL
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQBD92b9l9TIghMc6HwRAtdvAKC00pEzCCJtCcwmdvuNO+4N9v1ulwCgwyuq
+5mtlksLnGUDFbkjD/OCDYqA=
+=Vrld
+-----END PGP SIGNATURE-----
+
+--=-zb4H4dW9VcdsD/Ngs5OL--
+

@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 bf64377c9c2a6ce1dca311ea703ac21c6110eaee BuddyAllocator.pm
+SHA1 878b813af9a6b8eaaa3b63d9b0810c86613ef84f Build.PL
+SHA1 d739a2f77dae2c85c1d79842308c390639608360 DSStore.pm
+SHA1 85261acfb6a85cd0bb8dad5cc481997d0cfdb2b7 DSStoreFormat.pod
+SHA1 1d64a7fdce664342ab65f479f9241408b727baf9 MANIFEST
+SHA1 692c7203623aa12e7597f03213aa98c222baf499 META.json
+SHA1 5b90e69278708add3963ef9312e59f1b78d55050 META.yml
+SHA1 21f7eab009ca95919dcfe3ff9fe518ed81d67ad4 README
+SHA1 567cdadd952e82046475f96bd6604e890ec3835a examples/circle.pl
+SHA1 24baf2a19679ff9d0fa5a57a4fc5b4d9dd8152b0 examples/dsstore_dump.pl
+SHA1 5c3bd3b507bc657ebae487b7478a772de5f59c7b examples/dumprecs.pl
+SHA1 65aebdae39ca9fc4a51e7469fa3c40e7ba4e9494 t/alloc_incore.t
+SHA1 92908ab2fe46df05318d1aa5fa3276c13b3563ff t/alloc_ondisk.t
+SHA1 dbd4f88f3bdef5758ec72028d5a52eea70417da0 t/alloc_r.t
+SHA1 11bbff500bd61c516407332291b39f26d3635cc9 t/btree.t
+SHA1 e9c6a5881fc60173fbc8d479c1afd2ce3b43bef1 t/pod.t
+SHA1 db3d350d9f6b81167a4989a8dc7e47d3f7a8c747 t/recs_make.t
+SHA1 a9e9b96be92336cdadde38fabaae518a28a28a67 t/recs_rw.t
+SHA1 e82659b3a9ffc4c10c299b4d7cbd20c7926586eb t/store1
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (Darwin)
+
+iQGcBAEBAgAGBQJSe1ltAAoJEBOuRdswMEbremUL/20RhXKZIs6po7fOCsZhsSjs
+lRK27P9rq3eogPAHBNrI9xJl5eU/GfYfqR8Cet+3LkvD5DVzI9L2jmJFX165JJyS
+Dc+gPen8NfO7PBTiZ2RGjLFwmM+BF75Jbhm2icg4p8iVYPykbVf3fJT2jlD294R1
+0boAXuDomjdn9wP8dOO0fH63BK0QAGa+dAwsVWtkqLKxXiJ2XQGrDBQ5gW7zQ8qo
+LShYmXBld8v+cOlz3O/paYplgJNNWfrniYW+Cp9T9nlxFE7FDrFM88uMykY6s6pG
+zpl5GbKtRHISfRfOGFxqcWot1PH0POf+ReRqX107DKzZzW1m6mBtuBD314pmYgVC
+JJmulMUGndCU1fyppGn+4b/kdbfp+kkxPGKvkjuj5iu0FGtc8fUMC0mI+SZ98R05
+UwsyAtTPisYCVArjMaRvFGCZJU8llgz9TMuyrn8gZglIfaD89wEmeN2Nx4vs6zI/
+vwA8mxNA+9/sJ53qrb/47it/JHky7KstPdtmt4Mw6w==
+=iE8X
+-----END PGP SIGNATURE-----

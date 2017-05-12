@@ -1,0 +1,10 @@
+ - add: server command > dynamic build
+ - write more test
+ - add mediawiki
+
+done
+ - add: -f --floor switch for build command
+ - plugin support
+ - support static folder in floor directories
+ - add: choose custom template for each post
+ - add: /config and /config/blog.yml to init CLI

@@ -1,0 +1,8 @@
+#!/usr/bin/env perl
+## Copyright (C) Graham Barr
+## vim: ts=8:sw=4:expandtab:shiftround
+
+use strict;
+use warnings;
+use Mesoderm::Command;
+Mesoderm::Command->new_with_options->execute;

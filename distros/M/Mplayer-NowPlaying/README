@@ -1,0 +1,129 @@
+NAME
+    Mplayer::NowPlaying - query a running mplayer process for now playing
+    metadata
+
+SYNOPSIS
+        use Mplayer::NowPlaying;
+
+        ...
+
+        my $current = now_playing;
+
+        if(exists($current->{artist})) {
+          print "Current artist is $current->{artist}\n";
+        }
+
+DESCRIPTION
+    Mplayer::NowPlaying was born because the author runs mplayer daemonized,
+    controlling it via named pipes. I wanted a simple way to retrieve
+    various 'now playing' metadata for the currently playing song.
+
+    Mplayer::NowPlaying supports two modes:
+
+  Normal
+    Start mplayer in normal mode and redirect STDOUT to a file:
+
+      mplayer *.mp3 > ./mplayer_log
+
+    Get the current song title:
+
+      # 'normal' argument optional; this is the default
+      my $now_playing = now_playing("$ENV{HOME}/mplayer.log", 'normal');
+
+      printf("Current song is %s\n", $now_playing->{title});
+
+    Mplayer produces a lot of output in normal mode, effectively making our
+    metadata retrieval slow very fast (10 songs played or so). Therefore
+    it's really recommended to use identify mode.
+
+  Identify
+    Start mplayer with the -identify switch:
+
+      mplayer -identify *.mp3 > mplayer_log
+
+    or the preferred
+
+      mplayer -quiet -msglevel all=0 -identify *.mp3 > mplayer_log
+
+    Get the current song title:
+
+      # note 'identify' argument
+      my $now_playing = now_playing("$ENV{HOME}/mplayer.log", 'identify');
+
+      printf("Current song is %s\n", $now_playing->{title});
+
+    By using -msglevel all=0 -identify the amount of output from mplayer is
+    reduced to a minimum, making the retrieval very fast. This is
+    recommended.
+
+EXPORTS
+  now_playing()
+    Parameters: ($logfile | $filehandle), ($mode)
+
+    Returns: \%metadata
+
+      my %metadata = %{ now_playing($logfile, 'identify'); };
+      my $artist = $metadata{artist};
+
+    now_playing() takes two arguments (the last one optional):
+
+    * The logfile (or filehandle) output from mplayer is directed to
+
+    * 'normal' or 'identify' mode. Normal is the default.
+
+    The hash will be filled with the available metadata for the current
+    media. A typical result might look like:
+
+      album    => "Me and Simon",
+      artist   => "Laleh",
+      audio    => 44100,
+      bitrate  => 128000,
+      channels => 2,
+      chapters => 0,
+      codec    => "mp3",
+      demuxer  => "audio",
+      file     => "~/Laleh-Me_and_Simon/01-big_city_love.mp3",
+      format   => 85,
+      genre    => 1,
+      id       => 0,
+      length   => "1288.00",
+      seekable => 1,
+      start    => "0.00",
+      title    => "Big city love",
+      year     => 2009
+
+    Possible keys include:
+
+      title
+      artist
+      album
+      year
+      comment
+      genre
+      bitrate
+      codec
+      format
+      id
+      channels
+      chapters
+      audio
+      demuxer
+      length
+      seekable,
+      start
+      file
+
+AUTHOR
+      Magnus Woldrich
+      CPAN ID: WOLDRICH
+      magnus@trapd00r.se
+      http://japh.se
+
+COPYRIGHT
+    Copyright 2011 Magnus Woldrich <magnus@trapd00r.se>. This program is
+    free software; you may redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+SEE ALSO
+    mplayer(1)
+

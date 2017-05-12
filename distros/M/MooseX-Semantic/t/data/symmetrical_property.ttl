@@ -1,0 +1,11 @@
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+<A> foaf:knows <B> .
+<B> foaf:knows <C> .
+<C> foaf:knows <D> .
+<E> foaf:knows <F> .
+<F> foaf:knows <F> .
+<F> foaf:knows <B> .
+<F> foaf:knows <C> .
+<C> foaf:knows <A> .
+

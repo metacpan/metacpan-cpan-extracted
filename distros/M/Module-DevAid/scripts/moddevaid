@@ -1,0 +1,338 @@
+#!/usr/bin/env perl
+
+use strict;
+
+=head1 NAME
+
+moddevaid - script to interface to the Module::DevAid module
+
+=head1 VERSION
+
+This describes version B<0.24> of moddevaid.
+
+=cut
+
+our $VERSION = '0.24';
+
+=head1 SYNOPSIS
+
+moddevaid [--changes_file I<filename> ] [ --commit_todo ]
+[ --dist_name I<string> ] [ --gen_readme | --nogen_readme ]
+[ --gen_todo | --nogen_todo ] { --modules I<filename> }
+[ --pod_file I<filename> ] [ --readme_file I<filename> ]
+{ --scripts I<filename> } [ --todo_file I<filename> ]
+[ --version_control I<string> ]
+[ --version_file I<filename> ] [ --old_version_file I<filename> ]
+I<command>
+
+where I<command> is one of
+
+DUMP | CHANGES | LIST | README | TODO | VERSION | RELEASE
+
+=head1 DESCRIPTION
+
+Script to aid with development, by helping (and testing) auto-building
+of certain files, and with the steps needed in building and committing
+a release.
+
+At this point this uses the darcs or svk revision systems.
+
+Takes a project description, either through the command line options, or
+via a project config file. (see L<CONFIG FILE> for more information).
+
+=head1 OPTIONS
+
+=over
+
+=item --changes_file I<filename>
+
+Name of the Changes file to be generated. (default: Changes)
+
+=item --commit_todo
+
+Should we commit the TODO file we generated?  If true, then will
+attempt to do a commit on the generated TODO file.  This needs
+to be an option because some setups need the TODO file (as well as the
+.todo file) to be under revision control, and others don't.
+(see L<--gen_todo>) (default: false)
+
+=item --dist_name I<string>
+
+The distribution name of the project, such as the name of the module
+My::Module. (required)
+
+=item --gen_readme | --nogen_readme
+
+Should we generate a README file? (see L<--pod_file>)
+
+=item --gen_todo | --nogen_todo
+
+Should we generate a TODO file?  If true, the TODO file will be
+generated from a .todo file of the kind created by the devtodo program.
+(see L<--todo_file>)
+
+=item --modules I<filename>
+
+The module files in the project.  Must have their path relative
+to the top directory of the project.  To add more than one, repeat
+the option. (required)
+
+=item --old_version_file I<filename>
+
+The file which will hold the previous version (gets updated by VERSION
+command).  (see L<--version_file>) (default: old_version.txt)
+
+=item --pod_file I<filename>
+
+The file which contains the POD from which the README file should
+be generated.  If not defined, defaults to the first module
+in the B<modules> list.
+
+If B<gen_readme> is true, the README file will be generated from
+I<select> sections of the --pod_file file.  The important ones are
+NAME, DESCRIPTION, INSTALLATION, REQUIRES and AUTHOR.
+
+=item --readme_file I<filename>
+
+Name of the README file to be generated. (default: README)
+
+=item --scripts I<filename>
+
+The script files in the project (if any).  Must have their path relative
+to the top directory of the project.  To add more than one, repeat the
+option.
+
+=item --todo_file I<filename>
+
+Name of the TODO file to be generated. (default: TODO)
+
+=item --version_control I<string>
+
+Which version-control (revision control) system is being used.  The options are
+'darcs' and 'svk'.  The version control system is used for listing and
+committing changes.  (default: darcs)
+
+=item --version_file I<filename>
+
+The file from which to take the version.  The version should be in the form
+of a standard VERSION id: I<number>.I<number> on a line by itself.
+Optionally, it can be I<number>.I<number> followed by a general id,
+for example 2.03_rc1
+(default: version.txt)
+
+=back
+
+=head2 COMMANDS
+
+The commands are:
+
+=over
+
+=item DUMP
+
+Dump the Module::DevAid object on STDOUT and exit.  Good for checking
+what the script thinks the settings are.
+
+=item CHANGES
+
+Show what the Changes file generated from the change-log would be like.
+
+=item LIST
+
+List the changes committed since the last release. (This is the same
+format as is used for updating the Changes file.)
+
+=item README
+
+Show what the README file generated from the Pod documentation in the module
+would be like. (prints on STDOUT)
+
+=item TODO
+
+Show what the TODO file generated from devtodo .todo file would be like.
+
+=item VERSION
+
+Change version-number in designated files. Reads the new version from
+the version_file, so you can use this to test version-changing by
+simply not changing the version file, and see if things still look okay.
+
+=item RELEASE
+
+Do all of the above and all the other things required for a release,
+including commits.  So only do this if you're sure that everything is
+okay.
+
+When making a release do the following:
+
+1. Check for unrecorded changes:
+"darcs whatsnew -s" and/or "darcs whatsnew -ls" or "svk status"
+and commit them.
+
+2. Check that the tests pass: "Build test".
+
+3. Update version.txt (can't automate this since it requires a
+human decision as to what the next version number is).
+
+4. "moddevaid RELEASE"
+
+=back
+
+=head1 CONFIG FILE
+
+The information about a project can be given in a config file, which
+defaults to 'mod_devaid.conf' in the current directory.  If you want
+to use a different file, set the MOD_DEVAID_CONF environment variable,
+and the script will use that.
+
+The options which can be set in the config file are exactly the same
+as those which can be set on the command line, with two additions:
+L<version_bump_code> and L<version_bump_files>.
+
+The options are set with a 'option = value' setup.  Blank lines are
+ignored.
+
+For example:
+
+	dist_name = My::Module
+	modules = lib/My/Module.pm lib/My/Module/Other.pm
+	gen_readme = 1
+
+=head2 version_bump_code
+
+Use with CAUTION.
+
+This defines additional code which can be used for the automatic
+update of version numbers in files.  It has to be defined all on one
+line, and basically be a subroutine definition, like so:
+
+version_bump_code = sub { my $version = shift; # code to update files ...  };
+
+Reference to a function which will perform custom actions to
+automatically change the version-id.  The default actions go through the
+B<modules> and B<scripts> and update anything matching a standard
+VERSION-setting string, and which matches a 'This describes version'
+string.  This subroutine is for doing anything additional or different.
+
+This is given one arguments, the version string.
+
+=head2 version_bump_files
+
+The list of files altered by the version_bump_code, so that all the
+version changes can be committed at the same time.  This is needed because
+some tests require the test files to have the version-id in them,
+and therefore all version commits should be done at the same time,
+otherwise the tests will fail, and the commits won't work.
+
+=head1 REQUIRES
+
+Getopt::Long
+Getopt::ArgvFile
+Pod::Usage
+File::Basename
+Module::DevAid
+Data::Dumper
+
+=head1 SEE ALSO
+
+perl(1).
+Module::DevAid
+
+=head1 AUTHOR
+
+    Kathryn Andersen (RUBYKAT)
+    perlkat AT katspace dot com
+    http://www.katspace.com
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (c) 2004-2007 by Kathryn Andersen
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+use Getopt::ArgvFile justload=>1;
+use Getopt::Long 2.34;
+use Pod::Usage;
+use Module::DevAid;
+use Data::Dumper;
+use File::Basename;
+
+MAIN: {
+    my %config = ();
+
+    pod2usage(2) unless @ARGV;
+
+    my $nameBuilder=sub
+    {
+	my $sname=basename($_[0]);
+	[".${sname}rc", ".${sname}/config"];
+    };
+    Getopt::ArgvFile::argvFile(
+			       resolveEnvVars=>1,
+			       home=>1,
+			       current=>1,
+			       startupFilename => $nameBuilder,
+			       fileOption=>'options',
+    );
+
+    my $op = new Getopt::Long::Parser;
+    $op->configure(qw(auto_version auto_help));
+    $op->getoptions(\%config,
+	       "changes_file=s",
+	       "commit_todo!",
+	       "dist_name=s",
+	       "gen_readme!",
+	       "gen_todo!",
+	       "modules=s@",
+	       "pod_file=s",
+	       "readme_file=s",
+	       "scripts=s@",
+	       "todo_file=s",
+	       "version_file=s",
+	       "version_control=s",
+	       "old_version_file=s",
+	      ) or pod2usage(2);
+
+    my $mda = Module::DevAid->new(%config)
+	or die "Couldn't make Module::DevAid object";
+
+    my $command = shift;
+
+SWITCH: for (1) {
+	    ($command =~ /^DUMP$/i) && do {
+		print Data::Dumper->Dump([$mda],[qw(Module::DevAid)]);
+		last;
+	    };
+	    ($command =~ /^README$/i) && do {
+		print $mda->get_readme_content();
+		last;
+	    };
+	    ($command =~ /^TODO$/i) && do {
+		print $mda->get_todo_content();
+		last;
+	    };
+	    ($command =~ /^CHANGES$/i) && do {
+		my $old_version = $mda->get_old_version();
+		my $version = $mda->get_new_version();
+		print $mda->get_changes_content($old_version, $version);
+		last;
+	    };
+	    ($command =~ /^LIST$/i) && do {
+		my $old_version = $mda->get_old_version();
+		print $mda->get_new_changes($old_version);
+		last;
+	    };
+	    ($command =~ /^VERSION$/i) && do {
+		my $version = $mda->get_new_version();
+		$mda->version_bump($version);
+		last;
+	    };
+	    ($command =~ /^RELEASE$/i) && do {
+		$mda->do_release();
+		last;
+	    };
+	}
+}

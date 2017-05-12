@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:                Muck
+version:             0.02
+abstract:            manage the muck of an Amazon EC2 and S3 cloud
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Cache::Memcached:              0
+    ConfigReader::Simple:          0
+    DBI:                           0
+    Digest::HMAC_SHA1:             0
+    Fuse:                          0.08
+    HTTP::Request:                 0
+    LWP::UserAgent:                0
+    POE::Component::IKC::ClientLite: 0
+    Test::More:                    0.44
+    URI::Escape:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Mike Schroeder (info@muckos.org)

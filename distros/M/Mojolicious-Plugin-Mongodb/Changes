@@ -1,0 +1,61 @@
+Revision history for Mojolicious-Plugin-Mongodb
+
+1.16      2014-05-21 13:39:19WIT+0700 Asia/Jakarta
+    Fixes to the no_OPTION methods
+
+1.15      2013-07-01 18:07:22 Asia/Jakarta
+    Added the 'no_db', 'no_coll' and 'no_model' configuration options.
+    Removed the patch_mongodb option because the newer drivers have some
+    of the methods it used to patch in available now.
+    
+
+1.14      2012-11-03 18:07:02 Asia/Jakarta
+    Removed some warnings that were not needed
+
+1.13      2012-09-23 05:45:53 Asia/Jakarta
+    Added a new helper called "model" which acts like a (supposedly) smart 
+    combination of "db" and "coll". Please see the documentation for details.
+
+1.12      2012-04-26 05:50:28 Asia/Jakarta
+    So sorry, but doing a findOne on a collection doesn't work because group is
+    in fact a command that gets run, but the MongoDB docs about it's proper
+    usage are vague, and 
+
+        db.$cmd.findOne() 
+
+    is apparently equivalent to a runCommand, but not quite.
+
+1.11      2012-04-26 05:33:58 Asia/Jakarta
+    Group as a runCommand apparently does not work the way you think it does,
+    and actually is a parameter to findOne() so that's bene fixed too. Hope
+    now it all works... 
+
+1.10      2012-04-26 05:20:33 Asia/Jakarta
+    Fixed up the experimental patch_mongodb methods to take arguments in the same
+    style as the MongoDB driver; a hash ref, not a hash
+
+1.09      2012-04-26 05:15:02 Asia/Jakarta
+    Added experimental 'patch_mongodb' configuration option that will do some
+    Moose tricks to import the "group", "find_and_modify" and "map_reduce"
+    methods into MongoDB::Collection
+
+1.08      2012-04-08 04:08:02 Asia/Jakarta
+    BACKWARDS COMPATIBILITY BREAKER:  This release will probably break your 
+    existing code. Some care went into not changing how the core functionality 
+    works, but keep in mind that things might go hideously wrong.
+
+    Added helpers for findAndModify and mapReduce operations, and changed the 
+    architecture around a bit, we now use our own little object to hold the 
+    connection info and all other pertinent methods and expose them to the user 
+    via helpers.
+
+1.07      2011-04-27 04:14:15 Asia/Jakarta
+    BACKWARDS COMPATIBILITY BREAKER: Renamed the 'connection' attribute 
+    to 'mongodb_connection', since 'connection' is very generic and could 
+    theoretically end up getting clobbered.
+
+    Added 'no_helper' configuration option to prevent creation of a 
+    helper altogether.
+
+1.06      2011-04-24 19:38:54 Asia/Jakarta
+    No change track

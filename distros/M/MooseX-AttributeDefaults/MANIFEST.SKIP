@@ -1,0 +1,11 @@
+\.svn
+blib
+
+\.bak$
+\.old$
+\#$
+~$
+\.swp
+
+^Makefile$
+^\.DS_Store$

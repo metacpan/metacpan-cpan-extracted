@@ -1,0 +1,85 @@
+== stencil ==
+
+The class is set to <code>.panel-default</code>, by default:
+
+--input--
+    %= panel
+--end input--
+--output--
+    <div class="panel panel-default">
+        <div class="panel-body">
+        </div>
+    </div>
+--end output--
+
+
+== stencil ==
+
+If you want a panel without title, set the title to <code>undef</code>:
+
+--input--
+    %= panel undef ,=> begin
+        <p>A short text.</p>
+    %  end
+--end input--
+--output--
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <p>A short text.</p>
+        </div>
+    </div>
+--end output--
+
+
+== stencil { to_pod => 0 } ==
+--input--
+    <%= panel 'The Header', -header => [
+                            buttongroup => [buttons => [
+                                ['Click me', ['#'], data => { holder => 'claw'}],
+                                ['Tap-tap', ['#'], caret, items => [
+                                    ['Me too', ['#']]
+                                ]],
+                            ]]] => begin %>
+        <p>A short text.</p>
+    %  end
+--end input--
+--output--
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <div class="btn-group pull-right">
+                    <a class="btn btn-default" data-holder="claw" href="#">Click me</a>
+                    <div class="btn-group">
+                        <a type="button" href="#" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Tap-tap <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a tabindex="-1" href="#" class="menuitem">Me too</a></li>
+                        </ul>
+                    </div>
+                </div>The Header</h3>
+        </div>
+        <div class="panel-body">
+            <p>A short text.</p>
+        </div>
+    </div>
+--end output--
+
+
+== stencil ==
+
+A <code>success</code> panel with a header:
+
+--input--
+    %= panel 'Panel 5', success, begin
+        <p>A short text.</p>
+    %  end
+--end input--
+--output--
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            <h3 class="panel-title">Panel 5</h3>
+        </div>
+        <div class="panel-body">
+            <p>A short text.</p>
+        </div>
+    </div>
+--end output--

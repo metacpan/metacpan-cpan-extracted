@@ -1,0 +1,74 @@
+MasonX-Request-WithApache2Session version 0.04
+==============================================
+
+Copyright (c) 2004 by Beau E. Cox. All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+MasonX::Request::WithApache2Session is a copy of the Mason
+module MasonX::Request::WithApacheSession. With
+MasonX::Apache2Handler Mason can run in a pure mod_perl2
+environment.
+
+Complete documentation may be found in the MasonX::Apache2Handler
+distribution.
+
+WARNINGS!
+
+THIS MODULE IS EXPERIMENTAL AND NOT RECOMMENDED
+EXCEPT IN A TEST ENVIRONMENT.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+After MasonX::Request::WithApache2Session is installed, you will need
+to activate it by adding some directives to your Apache configuration
+files.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+        mod_perl                    => 1.9910
+        HTML::Mason                 => 1.25
+        libapreq2                   => 2.02-dev
+        MasonX::Apache2Handler      => 0.02
+
+GETTING HELP
+
+Contact the author at <mason@beaucox.com>.
+
+REPORTING BUGS
+
+Send bug reports to the author at <mason@beaucox.com>.
+
+For all bug reports indicate your architecture, Apache/Perl/module
+versions, etc. For installation problems send your handler.pl and
+httpd.conf. For component problems try to isolate the bug in a single
+small component or set of components, and send those.
+
+LICENSE
+
+This module is provided "as is" and without any express or implied
+warranties, including, without limitation, the implied warranties of
+merchantability and fitness for a particular purpose.
+
+It is released under the same terms as Perl itself.  For more
+information see the "README" or "Artistic" files provided with the
+Perl distribution.
+
+AUTHOR
+
+Beau E. Cox
+mason@beaucox.com
+
+Based on MasonX::Request::WithAppacheSession written by:
+
+Dave Rolsky
+autarch@urth.org

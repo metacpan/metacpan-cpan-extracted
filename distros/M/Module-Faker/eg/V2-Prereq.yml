@@ -1,0 +1,11 @@
+--- #YAML:1.0
+name: V2-Prereq
+abstract: we have needs
+prereqs:
+    runtime:
+        requires:
+            Mostly::Auto: 1.00
+            Provides::Inner: ~
+    test:
+        requires:
+            Some::Other: 2.00

@@ -1,0 +1,8 @@
+ [
+    {
+        "label" : "Name",
+        "type" : "checkbox",
+        "name" : "type",
+        "data" : ["internal", "external" ]
+    }
+ ]

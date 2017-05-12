@@ -1,0 +1,111 @@
+NAME
+    MooX::late - easily translate Moose code to Moo
+
+SYNOPSIS
+       package Foo;
+       use Moo;
+       use MooX::late;
+       has bar => (is => "ro", isa => "Str", default => "MacLaren's Pub");
+
+    (Examples for Moo roles in section below.)
+
+DESCRIPTION
+    Moo is a light-weight object oriented programming framework which aims to
+    be compatible with Moose. It does this by detecting when Moose has been
+    loaded, and automatically "inflating" its classes and roles to full Moose
+    classes and roles. This way, Moo classes can consume Moose roles, Moose
+    classes can extend Moo classes, and so forth.
+
+    However, the surface syntax of Moo differs somewhat from Moose. For
+    example the `isa` option when defining attributes in Moose must be either
+    a string or a blessed Moose::Meta::TypeConstraint object; but in Moo must
+    be a coderef. These differences in surface syntax make porting code from
+    Moose to Moo potentially tricky. MooX::late provides some assistance by
+    enabling a slightly more Moosey surface syntax.
+
+    MooX::late does the following:
+
+    1.  Supports `isa => $stringytype`.
+
+    2.  Supports `does => $rolename` .
+
+    3.  Supports `lazy_build => 1`.
+
+    4.  Exports `blessed` and `confess` functions to your namespace.
+
+    5.  Handles certain attribute traits. Currently `Hash`, `Array` and `Code`
+        are supported. This feature requires MooX::HandlesVia.
+
+        `String`, `Number`, `Counter` and `Bool` are unlikely to ever be
+        supported because of internal implementation details of Moo. If you
+        need another attribute trait to be supported, let me know and I will
+        consider it.
+
+    Five features. It is not the aim of `MooX::late` to make every aspect of
+    Moo behave exactly identically to Moose. It's just going after the
+    low-hanging fruit. So it does five things right now, and I promise that
+    future versions will never do more than seven.
+
+    Previous releases of MooX::late added support for `coerce => 1` and
+    `default => $nonref`. These features have now been added to Moo itself, so
+    MooX::late no longer has to deal with them.
+
+  Use in Moo::Roles
+    MooX::late should work in Moo::Roles, with no particular caveats.
+
+       package MyRole;
+       use Moo::Role;
+       use MooX::late;
+
+    Package::Variant can be used to build the Moo equivalent of parameterized
+    roles. MooX::late should work in roles built with Package::Variant.
+
+       use Package::Variant
+          importing => [ qw( Moo::Role MooX::late ) ],
+          subs      => [ qw( has with ) ];
+
+  Type constraints
+    Type constraint strings are interpreted using Type::Parser, using the type
+    constraints defined in Types::Standard. This provides a very slight
+    superset of Moose's type constraint syntax and built-in type constraints.
+
+    Any unrecognized string that looks like it might be a class name is
+    interpreted as a class type constraint.
+
+  Subclassing
+    MooX::late is designed to be reasonably easy to subclass. There are
+    comments in the source code explaining hooks for extensibility.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooX-late>.
+
+SEE ALSO
+    `MooX::late` uses Types::Standard to check type constraints.
+
+    `MooX::late` uses MooX::HandlesVia to provide native attribute traits
+    support.
+
+    The following modules bring additional Moose functionality to Moo:
+
+    *   MooX::Override - support override/super
+
+    *   MooX::Augment - support augment/inner
+
+    MooX allows you to load Moo plus multiple MooX extension modules in a
+    single line.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012-2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

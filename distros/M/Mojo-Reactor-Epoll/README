@@ -1,0 +1,190 @@
+NAME
+
+    Mojo::Reactor::Epoll - epoll backend for Mojo::Reactor
+
+SYNOPSIS
+
+      use Mojo::Reactor::Epoll;
+    
+      # Watch if handle becomes readable or writable
+      my $reactor = Mojo::Reactor::Epoll->new;
+      $reactor->io($first => sub {
+        my ($reactor, $writable) = @_;
+        say $writable ? 'First handle is writable' : 'First handle is readable';
+      });
+    
+      # Change to watching only if handle becomes writable
+      $reactor->watch($first, 0, 1);
+    
+      # Turn file descriptor into handle and watch if it becomes readable
+      my $second = IO::Handle->new_from_fd($fd, 'r');
+      $reactor->io($second => sub {
+        my ($reactor, $writable) = @_;
+        say $writable ? 'Second handle is writable' : 'Second handle is readable';
+      })->watch($second, 1, 0);
+    
+      # Add a timer
+      $reactor->timer(15 => sub {
+        my $reactor = shift;
+        $reactor->remove($first);
+        $reactor->remove($second);
+        say 'Timeout!';
+      });
+    
+      # Start reactor if necessary
+      $reactor->start unless $reactor->is_running;
+    
+      # Or in an application using Mojo::IOLoop
+      use Mojo::Reactor::Epoll;
+      use Mojo::IOLoop;
+      
+      # Or in a Mojolicious application
+      $ MOJO_REACTOR=Mojo::Reactor::Epoll hypnotoad script/myapp
+
+DESCRIPTION
+
+    Mojo::Reactor::Epoll is an event reactor for Mojo::IOLoop that uses the
+    epoll(7) Linux subsystem. The usage is exactly the same as other
+    Mojo::Reactor implementations such as Mojo::Reactor::Poll.
+    Mojo::Reactor::Epoll will be used as the default backend for
+    Mojo::IOLoop if it is loaded before Mojo::IOLoop or any module using
+    the loop. However, when invoking a Mojolicious application through
+    morbo or hypnotoad, the reactor must be set as the default by setting
+    the MOJO_REACTOR environment variable to Mojo::Reactor::Epoll.
+
+EVENTS
+
+    Mojo::Reactor::Epoll inherits all events from Mojo::Reactor.
+
+METHODS
+
+    Mojo::Reactor::Epoll inherits all methods from Mojo::Reactor and
+    implements the following new ones.
+
+ again
+
+      $reactor->again($id);
+
+    Restart timer. Note that this method requires an active timer.
+
+ io
+
+      $reactor = $reactor->io($handle => sub {...});
+
+    Watch handle for I/O events, invoking the callback whenever handle
+    becomes readable or writable.
+
+      # Callback will be invoked twice if handle becomes readable and writable
+      $reactor->io($handle => sub {
+        my ($reactor, $writable) = @_;
+        say $writable ? 'Handle is writable' : 'Handle is readable';
+      });
+
+ is_running
+
+      my $bool = $reactor->is_running;
+
+    Check if reactor is running.
+
+ next_tick
+
+      my $undef = $reactor->next_tick(sub {...});
+
+    Invoke callback as soon as possible, but not before returning or other
+    callbacks that have been registered with this method, always returns
+    undef.
+
+ one_tick
+
+      $reactor->one_tick;
+
+    Run reactor until an event occurs or no events are being watched
+    anymore. Note that this method can recurse back into the reactor, so
+    you need to be careful.
+
+      # Don't block longer than 0.5 seconds
+      my $id = $reactor->timer(0.5 => sub {});
+      $reactor->one_tick;
+      $reactor->remove($id);
+
+ recurring
+
+      my $id = $reactor->recurring(0.25 => sub {...});
+
+    Create a new recurring timer, invoking the callback repeatedly after a
+    given amount of time in seconds.
+
+ remove
+
+      my $bool = $reactor->remove($handle);
+      my $bool = $reactor->remove($id);
+
+    Remove handle or timer.
+
+ reset
+
+      $reactor->reset;
+
+    Remove all handles and timers.
+
+ start
+
+      $reactor->start;
+
+    Start watching for I/O and timer events, this will block until "stop"
+    is called or no events are being watched anymore.
+
+      # Start reactor only if it is not running already
+      $reactor->start unless $reactor->is_running;
+
+ stop
+
+      $reactor->stop;
+
+    Stop watching for I/O and timer events.
+
+ timer
+
+      my $id = $reactor->timer(0.5 => sub {...});
+
+    Create a new timer, invoking the callback after a given amount of time
+    in seconds.
+
+ watch
+
+      $reactor = $reactor->watch($handle, $readable, $writable);
+
+    Change I/O events to watch handle for with true and false values. Note
+    that this method requires an active I/O watcher.
+
+      # Watch only for readable events
+      $reactor->watch($handle, 1, 0);
+    
+      # Watch only for writable events
+      $reactor->watch($handle, 0, 1);
+    
+      # Watch for readable and writable events
+      $reactor->watch($handle, 1, 1);
+    
+      # Pause watching for events
+      $reactor->watch($handle, 0, 0);
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book, dbook@cpan.org
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2015, Dan Book.
+
+    This library is free software; you may redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+SEE ALSO
+
+    Mojolicious, Mojo::IOLoop, Linux::Epoll
+

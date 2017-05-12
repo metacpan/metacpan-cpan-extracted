@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+Music.pm
+Music.xs
+README
+kandahar.mid
+test.pl

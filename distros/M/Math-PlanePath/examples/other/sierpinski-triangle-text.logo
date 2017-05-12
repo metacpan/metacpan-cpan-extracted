@@ -1,0 +1,49 @@
+#!/usr/bin/ucblogo
+
+; Copyright 2012 Kevin Ryde
+
+; This file is part of Math-PlanePath.
+;
+; Math-PlanePath is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by the
+; Free Software Foundation; either version 3, or (at your option) any later
+; version.
+;
+; Math-PlanePath is distributed in the hope that it will be useful, but
+; WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+; or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+; for more details.
+;
+; You should have received a copy of the GNU General Public License along
+; with Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
+
+
+; Usage: ucblogo sierpinski-triangle-text.logo
+;
+; Print the Sierpinski triangle pattern in text with spaces and stars,
+; using BITAND to decide whether to plot at a given X,Y or not.
+;
+; :limit determines the padding at the left, and within that limit the
+; range of :y to print is arbitrary.
+; Print rows of the triangle from 0 to :limit inclusive.
+;
+;            *
+;           * *
+;          *   *
+;         * * * *
+;        *       *
+;       * *     * *
+;      *   *   *   *
+;     * * * * * * * *
+;
+
+make "limit 15
+for [y 0 :limit] [
+  for [x -:limit :y] [
+    type ifelse (and :y+:x >= 0                ; blank left of triangle
+                     (remainder :y+:x 2) = 0   ; only "even" squares
+                     (bitand :y+:x :y-:x) = 0  ; Sierpinski bit test
+                ) ["*] ["| |]                  ; star or space
+  ]
+  print []
+]

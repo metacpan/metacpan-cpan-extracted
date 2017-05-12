@@ -1,0 +1,169 @@
+Changes file for Module::Build::Bundle
+
+0.17 2015-09-06 Maintenance release, update not required
+
+- Added is_windowsish as required by Module::Build for sub-classing
+
+
+0.16 2015-09-06 Bug fix release, update not required
+
+- Fixed issue with test dependencies, Text::Soundex was missing
+
+- Addressed issue #2, File::stat used instead of File::Stat
+
+  https://github.com/jonasbn/mbb/issues/2
+  https://rt.cpan.org/Ticket/Display.html?id=83208
+  
+
+0.15 2015-08-11 Maintenance release, update not required
+
+- Ported from Module::Build to Dist::Zilla [#1]
+
+
+0.14 2015-08-09 Significant maintenance release, update recommended
+
+- Addressed broken test suite [RT:94847]
+  
+  introducing the following method lifted from Module::Build::Base:
+
+  - do_create_metafile
+
+  https://rt.cpan.org/Ticket/Display.html?id=94847
+
+- Core implementation updated to comply with Module::Build 0.42
+
+- Changed license to be Artistic 2.0, please see the LICENSE file included
+  with the distribution
+
+- Examined and addressed issues with Module::Build compability, we are now
+  dependent on version 0.42. New code lifted from Module::Build since
+  proper inheritance is not possible at this time, pondering patches
+
+- The whole test suite has been revisited and all tests now pass again
+  as we rely on File::Tempdir instead of own logic, this eliminated a lot
+  of code and removed at least one bug
+
+- Addressed [Compatibility::PerlMinimumVersionAndWhy] _pragma_utf8
+  requires 5.008, so perl requirement has been bumped up to version
+  5.006.
+
+- Added changes.t automatic assertion of the integrity of the Changes file
+  see also MBB-38 [MBB-40]
+
+  https://logiclab.jira.com/browse/MBB-40
+
+- 0.13 release is a ghost it never got released
+
+0.12 2013-08-01 Maintenance release, update not required
+
+- Addressed issue reported by Ken Williams [RT:86220] so we now use CPAN::Meta::YAML
+  instead of Module::Build::YAML [MBB-39]
+
+  https://logiclab.jira.com/browse/MBB-39
+
+- Fixed up Changes file as part of my Questhub quest adhering to the standard
+  described in: CPAN::Changes::Spec [MBB-38]
+
+  Quest: http://questhub.io/realm/perl/quest/51f0fd8e18ba7dcf4b000040
+  Spec: https://metacpan.org/module/CPAN::Changes::Spec
+
+  https://logiclab.jira.com/browse/MBB-38
+
+
+0.11 2013-03-15 Maintenance release, update not required
+
+- Addressed installation issue [MBB-37/[RT:83754] the issue was related to
+  permissions on main file in lib. We now work on the equivalent in blib/lib.
+  Issue was reported by DAXIM
+  https://logiclab.jira.com/browse/MBB-37
+  https://rt.cpan.org/Ticket/Display.html?id=83754
+
+
+0.10 2013-01-26 Maintenance release, update not required
+
+- Addressed failing tests for 0.09 [MBB-36]/[RT:82128], issue with undeclared
+  dependency on File::Slurp, introduced in release 0.09. Issue found by CPAN
+  testers and was also reported by ANDK
+  https://logiclab.jira.com/browse/MBB-36
+  https://rt.cpan.org/Ticket/Display.html?id=82128
+
+
+0.09 2012-12-02 Maintenance release, update not required
+
+- Attempt at address all the failing tests [MBB-35]
+  http://logiclab.jira.com/browse/MBB-35
+
+- Added Test::Perl::Critic to test suite
+
+- Documentation on method ACTION_build [MBB-32]
+  http://logiclab.jira.com/browse/MBB-32
+
+- Replaced file reading code with use of File::Slurp as recommended by the
+  Perl::Critic policy InputOutput::ProhibitJoinedReadline [MBB-34]
+  http://logiclab.jira.com/browse/MBB-34
+
+
+0.08 2012-11-22 Maintenance release, update not required
+
+- Attempt at address all the failing tests (308 fails against 177 passes at
+  the time of writing) [MBB-31]
+  http://logiclab.jira.com/browse/MBB-31
+
+- Turned the dates in the changes file into ISO 8601 format
+
+
+0.07 2011-06-15 Maintenance release, update not required
+
+- Addressed issue with test suite and permissions [MBB-28]
+  http://logiclab.jira.com/browse/MBB-28
+
+- Investigated create_makefile_pl [MBB-29]
+  http://logiclab.jira.com/browse/MBB-29
+
+- Described current limitation in POD in regard to root based distributions	
+  [MBB-30]
+  http://logiclab.jira.com/browse/MBB-30
+
+
+0.06 2011-05-06 Maintenance release, update not required
+
+- Addressed failing tests [MBB-25] tests should now pass under newer perls
+  [MBB-26], when we cheat on the Perl version
+  http://logiclab.jira.com/browse/MBB-25 and
+  http://logiclab.jira.com/browse/MBB-26
+
+
+0.05 2011-04-23 Bug fix release, update not required
+
+- Addressed failing tests [MBB-22] removing regression test suite, M::B is
+  a  moving target
+  http://logiclab.jira.com/browse/MBB-22
+
+
+0.04 2010-11-23 Bug fix release, update recommended
+
+- Addressed failing tests [MBB-18] missing listing of required file
+  http://logiclab.jira.com/browse/MBB-18
+
+
+0.03 2010-11-21 Bug fix release, update recommended
+
+- Addressed failing tests [MBB-17]
+  http://logiclab.jira.com/browse/MBB-17
+
+
+0.02 2010-09-26 Bug fix release, update recommended
+
+- Changed inheritance [MBB-13]
+  http://logiclab.jira.com/browse/MBB-13
+
+- Issues with distribution generation [MBB-16]
+  http://logiclab.jira.com/browse/MBB-16
+
+- Addressed failing tests [MBB-14]
+  http://logiclab.jira.com/browse/MBB-14
+
+
+0.01 2010-09-14
+
+- Initial release

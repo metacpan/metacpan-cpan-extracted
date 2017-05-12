@@ -1,0 +1,18 @@
++ flock locking isn't available yet.  RSN.
+
++ When is the prccess an update_message and append_message actually do
+  their work is inconsistent.  Some do it immediately, some queue it
+  up to be done when sync is called.
+
++ Since it's alpha code, the interface is still subject to change...
+  In particular, some of the routines will be changed to accept lists.
+  Some of those routines will require rearranging the order of their
+  arguments.
+
++ Fatal vs. non-fatal errors isn't completely baked yet.
+
++ The regression test for NNTP is lacking (read: nonexistant).
+
++ There are some methods that still need to be written.
+
++ Not all the bugs are documented. :-)

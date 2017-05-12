@@ -1,0 +1,209 @@
+#!/usr/local/bin/perl
+#
+# $Id: pcpmac,v 0.70 2005/08/09 15:47:00 dankogai Exp $
+#
+
+use strict;
+use Getopt::Std;
+use File::stat;
+use File::Basename;
+
+my %Opt;
+getopts("fiprv", \%Opt);
+$Opt{i} and delete $Opt{f}; # for safety
+
+my $IAM = basename($0); 
+my %Hardlink; # key = inode, val = name of first file copied
+
+my $Dst = pop @ARGV; @ARGV or help();
+my $Dstst = stat($Dst); # not lstat; symlink to directory allowed
+unless (-d _){
+    @ARGV == 1 or help();
+    do_copy($ARGV[0], $Dst);
+}else{
+    $Dst =~ s,/+$,,o; 
+    for my $src (@ARGV){
+	$src =~ s,/+$,,o; 
+	do_copy($src, $Dst . '/' . basename($src));
+    }
+}
+exit;
+
+use MacOSX::File::Copy;
+use MacOSX::File::Info;
+
+sub do_copy{
+    my ($src, $dst) = @_;
+    my $srcst = lstat($src) or warn "$src: Can't lstat!" and return;
+    $srcst->ino == $Dstst->ino and $srcst->dev == $Dstst->dev
+	and warn "$src and $dst are identical. skipped" and return;
+
+    $Opt{v} and print STDERR "$src\n";
+
+   if (my $dstst = lstat($dst) and -l _ or -f _){
+	$Opt{i} and prompt($dst) or return;
+	$Opt{f} and unlink $dst;	
+    }
+
+    $srcst = lstat($src);
+    if    (-l _){ # just copy the linkage
+	symlink(readlink($src), $dst) or warn "$src -> $dst : $!";
+    }elsif(-f _){ 
+	if ($srcst->nlink > 1){ # MacOSX has hard links!
+	    if (my $link = $Hardlink{$srcst->ino}){
+		link($link, $dst) or warn "$link -> $dst:$!";
+	    }else{
+		$Hardlink{$srcst->ino} = $dst;
+	    }
+	}
+	copy($src, $dst) # simple file-to-file copy
+	    or warn "$dst:$! ($MacOSX::File::OSErr)";
+	# set attributes
+	if ($Opt{p}){
+	    chown $srcst->uid, $srcst->gid, $dst; 
+	    chmod $srcst->mode & 07777, $dst or warn "$dst : $!";
+	}else{
+	    my $now = time();
+	    utime $now, $now, $dst or warn "$dst: $!";
+	}
+    }elsif(-d _){ # tough part;
+	unless ($Opt{r}){
+	     warn "$IAM: $src is a directory. skipped";
+	     return;
+	 }
+	mkdir $dst,0777 or die "$dst:$!";
+	opendir my $d, $src or die "$src:$!";
+	# see ._* is avoided
+	my @f = grep !/^\.(?:\.?$|_)/o, readdir $d;
+	closedir $d;
+	my $finfo = getfinfo($src)
+	    or die "$src:Error $MacOSX::File::OSErr";
+	for my $f (@f){
+	    my ($srcf, $dstf) = ("$src/$f", "$dst/$f");
+	    # no cross-device traversal within source directory
+	    # so you can casually go like 'pcpmac -R / /Volumes/backup'
+	    lstat($srcf)->dev != $srcst->dev and next;
+	    -e $dstf and die "$dstf: already exists!";
+	    # else lets' do it recursively
+	    do_copy($srcf, $dstf);
+	}
+	# copy finfo info after all traversal is done
+	$finfo->set($dst) or warn "$dst : $MacOSX::File::OSErr";
+	# set attributes
+	if ($Opt{p}){
+	    chown $srcst->uid, $srcst->gid, $dst; 
+	    chmod $srcst->mode & 07777, $dst or warn "$dst : $!";
+	}else{
+	    # do nothing
+	}
+    }else{
+	# do nothing for devices, sockets and fifos; 
+	# devices are handled by devfs on Macs
+    }
+}
+
+sub prompt{
+    my $path = shift;
+    $| = 1;
+    print "Overwrite $path? [y/N]:";
+    my $answer = <STDIN>; chomp $answer;
+    return lc($answer) eq 'y';
+}
+
+sub help{
+    # warn caller;
+    print STDERR <<"EOT";
+usage: $IAM [-r] [-f|-i] [-p][-v] src target
+       $IAM [-r] [-f|-i] [-p][-v] src1 ... srcN directory
+EOT
+exit;
+}
+1;
+
+__END__
+=head1 NAME
+
+pcpmac -- CpMac(1) or cp(1),  implemented as perl script
+
+=head1 SYNOPSIS
+
+ pcpmac [-r] [-f|-i] [-p][-v] source_file target_file
+ pcpmac [-r] [-f|-i] [-p][-v] source_file ... target_directory
+
+=head1 TIGER
+
+As of Mac OS X v10.4 (Tiger), the ordinary L<cp(1)> does support resource fork.
+
+=head1 DESCRIPTION
+
+pcpmac, as its name implies, copies files with finder info and
+resource fork.  
+
+In the first synopsis form, pcpmac copies the contents of the
+source_file to the target_file. In the second synopsis form, the contents
+of each named source_file is copied to the destination target_directory.
+The names of the files themselves are not changed.  If cpmac detects an 
+attempt to copy a file to itself, the copy will fail.
+
+The following options are available:
+
+=item -r
+
+If source_file designates a directory, cp copies the directory and
+the entire subtree connected at that point.
+
+=item -f
+
+Foreach existing destination pathname, attempt to overwrite it. If
+permissions do not allow copy to succeed, remove it and create a
+new file, without prompting for confirmation. 
+
+=item -i
+
+Causes pcpmac to write a prompt to the standard error output before
+copying a file that would overwrite an existing file.  If the response 
+from the standard input begins with the character "y" or "Y", the
+file copy is attempted.
+
+For safety, this option cancels -f option.  This is the opposite of
+BSD cp implementation.
+
+=item -p
+
+Causes cp to preserve in the copy as many of the modification time,
+access time, file flags, file mode, user ID, and group ID as allowed 
+by permissions.
+
+Note that no symlinks are followed.  Instead the target will also
+be symlink which points to the same path.  With this respect,  This
+option corresponds to C<cp -PR> of BSD cp.
+
+pcpmac also prevents from crossing devices when subtrees belong to
+different volumes.  That way you can safely C<pcpmac /* /Volumes/backup>
+without hanging yourself.  This is anologous to -x(dev) option of find
+command but somehow nothing like that existed for cp so I made it.
+
+pcpmac also goes one step forward when both of two arguments are same
+I<directory>.  Compare C<cp -r dir1 dir1> and C<pcpmac dir1 dir1> where
+dir1 are identical.  It is a kind of fun what cp does!
+
+=item -v
+
+Verbose mode.  Prints each copied item to standard output.
+
+=head1 AUTHOR
+
+Dan Kogai <dankogai@dan.co.jp>
+
+=head1 SEE ALSO
+
+L<cp(1)>
+
+F</Developer/Tools/CpMac>
+
+=head1 COPYRIGHT
+
+Copyright 2002-2005 Dan Kogai <dankogai@dan.co.jp>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.

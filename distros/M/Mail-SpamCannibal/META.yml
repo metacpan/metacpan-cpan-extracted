@@ -1,0 +1,31 @@
+--- #YAML:1.0
+name:                Mail-SpamCannibal
+version:             1.08
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Data::Password::Manager:       0.01
+    Digest::MD5:                   2.00
+    File::SafeDO:                  0.12
+    Geo::IP::PurePerl:             1.10
+    IPTables::IPv4::DBTarpit:      0.43
+    MIME::Base64:                  2.00
+    Net::DNS::Codes:               0.09
+    Net::DNS::ToolKit:             0.41
+    Net::DNSBL::MultiDaemon:       0.26
+    Net::SMTP:                     2.10
+    Net::Whois::IP:                0.35
+    NetAddr::IP::Lite:             0.02
+    Proc::PidUtil:                 0.06
+    Sys::Hostname::FQDN:           0.06
+    Test::Harness:                 2.01
+    Test::Simple:                  0.42
+    Unix::Syslog:                  0.97
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3
+configure_requires:
+    IPTables::IPv4::DBTarpit::Inst: 0

@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+#
+# Figure out the (atonal) prime form and (NRT) normalized form of all
+# pitch sets. This shows candidate pitch sets for NRT operations (e.g.
+# where there are two normalized forms for a given prime form) and
+# those that have no such possibility (within the scope of that prime
+# form set).
+#
+# (This will take some time to complete; farming the calculations out to
+# multiple processes or systems would doubtless speed things up; or,
+# feed all possible prime forms to the `nrt-study-setclass` program and
+# it should tell you whether or not the set class is suitable.)
+
+use strict;
+use warnings;
+
+use Algorithm::Permute          ();
+use Music::AtonalUtil           ();
+use Music::NeoRiemannianTonnetz ();
+
+my $atu = Music::AtonalUtil->new;
+my $nrt = Music::NeoRiemannianTonnetz->new;
+
+my $imax = $atu->scale_degrees;
+for my $set_size ( 2 .. $imax - 1 ) {
+  my $p = Algorithm::Permute->new( [ 0 .. $imax - 1 ], $set_size );
+
+  my ( %prime2norm, %seen );
+  while ( my @set = $p->next ) {
+    my $prime = join ',', @{ $atu->prime_form( \@set ) };
+    my $norm = $nrt->normalize( \@set );
+
+    push @{ $prime2norm{$prime} }, $norm if !$seen{$norm}++;
+  }
+  for my $prime ( sort keys %prime2norm ) {
+    print "$prime\t", join( ' ', sort @{ $prime2norm{$prime} } ), "\n";
+  }
+}

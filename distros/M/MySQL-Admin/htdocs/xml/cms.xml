@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+	<action position="top" output="loadPage">
+		<title>About</title>
+		<xml>xml/about.xml</xml>
+		<xsl>xsl/page.xsl</xsl>
+		<out>content</out>
+		<id>e1</id>
+		<text>About</text>
+	</action>
+	<action position="top" output="loadPage">
+		<title>Help</title>
+		<xml>xml/doc.xml</xml>
+		<xsl>xsl/page.xsl</xsl>
+		<out>content</out>
+		<id>e2</id>
+		<text>Help</text>
+	</action>
+	<action position="top" output="loadPage">
+		<title>Screenshots</title>
+		<xml>xml/screenshots.xml</xml>
+		<xsl>xsl/page.xsl</xsl>
+		<out>content</out>
+		<id>e3</id>
+		<text>Screenshots</text>
+	</action>
+	<action position="top" output="loadPage">
+		<title>Developer</title>
+		<xml>xml/developer.xml</xml>
+		<xsl>xsl/page.xsl</xsl>
+		<text>Developer</text>
+		<id>e4</id>
+	</action>
+</actions>

@@ -1,0 +1,24 @@
+---
+abstract: 'Provide interface to various cipher algorithms'
+author:
+  - 'Marco Romano <nemux@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Crypto
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Crypt::CBC: '2.33'
+  CryptX: '0.021'
+  Mojolicious: '4.99'
+version: '0.14'

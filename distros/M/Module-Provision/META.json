@@ -1,0 +1,417 @@
+{
+   "abstract" : "Create Perl distributions with VCS and selectable toolchain",
+   "author" : [
+      "Peter Flanigan, C<< <pjfl@cpan.org> >>"
+   ],
+   "dynamic_config" : "1",
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Module-Provision",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "inc",
+         "share",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.4004",
+            "version" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004",
+            "version" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Meta" : "2.150005",
+            "CPAN::Uploader" : "0.103004",
+            "Class::Null" : "2.110730",
+            "Class::Usul" : "v0.73.0",
+            "Config::Tiny" : "2.22",
+            "Date::Format" : "2.24",
+            "Dist::Zilla" : "5.037",
+            "Dist::Zilla::Plugin::AbstractFromPOD" : "v0.3.0",
+            "Dist::Zilla::Plugin::LicenseFromModule" : "0.05",
+            "Dist::Zilla::Plugin::ManifestInRoot" : "v0.13.0",
+            "Dist::Zilla::Plugin::Meta::Dynamic::Config" : "0.04",
+            "Dist::Zilla::Plugin::ModuleBuild::Custom" : "4.26",
+            "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0.150250",
+            "Dist::Zilla::Plugin::Signature" : "1.100930",
+            "Dist::Zilla::Plugin::Test::ReportMetadata" : "v0.4.0",
+            "Dist::Zilla::Plugin::VersionFromModule" : "0.08",
+            "File::DataClass" : "v0.68.0",
+            "File::ShareDir" : "1.102",
+            "HTTP::Message" : "6.06",
+            "LWP" : "6.13",
+            "LWP::Protocol::https" : "0",
+            "Module::Metadata" : "1.000011",
+            "Moo" : "2.000001",
+            "Perl::Version" : "1.013",
+            "Pod::Eventual" : "0.094001",
+            "Software::License" : "0.103010",
+            "Template" : "2.26",
+            "Test::Requires" : "0.08",
+            "Try::Tiny" : "0.22",
+            "Type::Tiny" : "1.000004",
+            "Unexpected" : "v0.43.0",
+            "local::lib" : "2.000014",
+            "namespace::autoclean" : "0.26",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "File::Spec" : "0",
+            "Module::Build" : "0.4004",
+            "Module::Metadata" : "1.000011",
+            "Sys::Hostname" : "0",
+            "Test::Requires" : "0.08",
+            "version" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Module::Provision" : {
+         "file" : "lib/Module/Provision.pm",
+         "version" : "v0.42.1"
+      },
+      "Module::Provision::Base" : {
+         "file" : "lib/Module/Provision/Base.pm",
+         "version" : "v0.42.1"
+      },
+      "Module::Provision::Config" : {
+         "file" : "lib/Module/Provision/Config.pm",
+         "version" : "v0.42.1"
+      },
+      "Module::Provision::MetaData" : {
+         "file" : "lib/Module/Provision/MetaData.pm",
+         "version" : "v0.42.1"
+      },
+      "Module::Provision::TraitFor::AddingFiles" : {
+         "file" : "lib/Module/Provision/TraitFor/AddingFiles.pm",
+         "version" : "v0.42.1"
+      },
+      "Module::Provision::TraitFor::Badges" : {
+         "file" : "lib/Module/Provision/TraitFor/Badges.pm",
+         "version" : "v0.42.1"
+      },
+      "Module::Provision::TraitFor::CPANDistributions" : {
+         "file" : "lib/Module/Provision/TraitFor/CPANDistributions.pm",
+         "version" : "v0.42.1"
+      },
+      "Module::Provision::TraitFor::CreatingDistributions" : {
+         "file" : "lib/Module/Provision/TraitFor/CreatingDistributions.pm",
+         "version" : "v0.42.1"
+      },
+      "Module::Provision::TraitFor::EnvControl" : {
+         "file" : "lib/Module/Provision/TraitFor/EnvControl.pm",
+         "version" : "v0.42.1"
+      },
+      "Module::Provision::TraitFor::PrereqDifferences" : {
+         "file" : "lib/Module/Provision/TraitFor/PrereqDifferences.pm",
+         "version" : "v0.42.1"
+      },
+      "Module::Provision::TraitFor::Rendering" : {
+         "file" : "lib/Module/Provision/TraitFor/Rendering.pm",
+         "version" : "v0.42.1"
+      },
+      "Module::Provision::TraitFor::UpdatingContent" : {
+         "file" : "lib/Module/Provision/TraitFor/UpdatingContent.pm",
+         "version" : "v0.42.1"
+      },
+      "Module::Provision::TraitFor::VCS" : {
+         "file" : "lib/Module/Provision/TraitFor/VCS.pm",
+         "version" : "v0.42.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Module-Provision@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Module-Provision"
+      },
+      "homepage" : "https://metacpan.org/author/PJFL",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pjfl/p5-module-provision.git",
+         "web" : "http://github.com/pjfl/p5-module-provision"
+      }
+   },
+   "version" : "0.42.1",
+   "x_Dist_Zilla" : {
+      "perl" : {
+         "version" : "5.014004"
+      },
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "requires"
+               }
+            },
+            "name" : "Prereqs",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "configure",
+                  "type" : "requires"
+               }
+            },
+            "name" : "ConfigureRequires",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "build",
+                  "type" : "requires"
+               }
+            },
+            "name" : "BuildRequires",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "test",
+                  "type" : "requires"
+               }
+            },
+            "name" : "TestRequires",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Meta::Dynamic::Config",
+            "name" : "Meta::Dynamic::Config",
+            "version" : "0.04"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaNoIndex",
+            "name" : "MetaNoIndex",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaProvides::Package" : {
+                  "finder_objects" : [
+                     {
+                        "class" : "Dist::Zilla::Plugin::FinderCode",
+                        "name" : "MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+                        "version" : "5.037"
+                     }
+                  ]
+               },
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "inherit_missing" : "1",
+                  "inherit_version" : "0",
+                  "meta_noindex" : "1"
+               }
+            },
+            "name" : "MetaProvides::Package",
+            "version" : "2.003001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "MetaResources",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
+            "name" : "ReadmeMarkdownInRoot",
+            "version" : "0.150250"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Run::BeforeBuild",
+            "config" : {
+               "Dist::Zilla::Plugin::Run::Role::Runner" : {
+                  "fatal_errors" : 1,
+                  "quiet" : 0,
+                  "run" : [
+                     "cp .build.PL Build.PL"
+                  ]
+               }
+            },
+            "name" : "Run::BeforeBuild",
+            "version" : "0.038"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CopyFilesFromBuild",
+            "name" : "CopyFilesFromBuild",
+            "version" : "0.150250"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "config" : {
+               "Dist::Zilla::Plugin::GatherDir" : {
+                  "exclude_filename" : [
+                     "cpanfile"
+                  ],
+                  "exclude_match" : [],
+                  "follow_symlinks" : "0",
+                  "include_dotfiles" : "0",
+                  "prefix" : "",
+                  "prune_directory" : [],
+                  "root" : "."
+               }
+            },
+            "name" : "GatherDir",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
+            "name" : "ReadmeAnyFromPod",
+            "version" : "0.150250"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Signature",
+            "name" : "Signature",
+            "version" : "1.100930"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "ShareDir",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AbstractFromPOD",
+            "name" : "AbstractFromPOD",
+            "version" : "0.3.5"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::LicenseFromModule",
+            "name" : "LicenseFromModule",
+            "version" : "0.05"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::VersionFromModule",
+            "name" : "VersionFromModule",
+            "version" : "0.08"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ModuleBuild::Custom",
+            "name" : "ModuleBuild::Custom",
+            "version" : "4.26"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CPANFile",
+            "name" : "CPANFile",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "License",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "MetaConfig",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "MetaJSON",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "MetaYAML",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestInRoot",
+            "name" : "ManifestInRoot",
+            "version" : "0.16.2"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "ManifestSkip",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::ReportMetadata",
+            "name" : "Test::ReportMetadata",
+            "version" : "0.5.1"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":AllFiles",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":NoFiles",
+            "version" : "5.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : "MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+            "version" : "5.037"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : "0"
+         },
+         "version" : "5.037"
+      }
+   }
+}
+

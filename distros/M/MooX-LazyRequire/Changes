@@ -1,0 +1,11 @@
+Release history for MooX::LazyRequire
+
+0.001002 - 2015-04-21
+  - drop use of undeclared dependency strictures
+
+0.001001 - 2014-08-16
+  - specify perl prerequisite in metadata
+  - fix handling of multiple attributes in one has statement
+
+0.001000 - 2014-03-16
+  - initial release

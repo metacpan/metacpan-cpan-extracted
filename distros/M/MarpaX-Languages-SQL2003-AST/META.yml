@@ -1,0 +1,64 @@
+---
+abstract: 'Translate SQL-2003 source to an AST'
+author:
+  - 'Jean-Damien Durand <jeandamiendurand@free.fr>'
+build_requires:
+  Data::Section: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 5.028, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MarpaX-Languages-SQL2003-AST
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - blog
+provides:
+  MarpaX::Languages::SQL2003::AST:
+    file: lib/MarpaX/Languages/SQL2003/AST.pm
+    version: '0.005'
+  MarpaX::Languages::SQL2003::AST::Actions:
+    file: lib/MarpaX/Languages/SQL2003/AST/Actions.pm
+    version: '0.005'
+  MarpaX::Languages::SQL2003::AST::Actions::Blessed:
+    file: lib/MarpaX/Languages/SQL2003/AST/Actions/Blessed.pm
+    version: '0.005'
+  MarpaX::Languages::SQL2003::AST::Actions::XML:
+    file: lib/MarpaX/Languages/SQL2003/AST/Actions/XML.pm
+    version: '0.005'
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  File::Slurp: '0'
+  Getopt::Long: '0'
+  IO::String: '0'
+  Marpa::R2: '2.100000'
+  Math::BigFloat: '0'
+  POSIX: '0'
+  Pod::Usage: '0'
+  SUPER: '0'
+  Scalar::Util: '0'
+  XML::LibXML: '0'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MarpaX-Languages-SQL2003-AST
+  homepage: https://metacpan.org/release/MarpaX-Languages-SQL2003-AST
+  repository: git://github.com/jddurand/marpax-languages-sql2003-ast.git
+version: '0.005'

@@ -1,0 +1,117 @@
+#!/usr/bin/env perl
+
+# Pragmas.
+use strict;
+use warnings;
+
+# Modules.
+use Encode qw(encode_utf8);
+use Mock::Person::DE;
+
+# Get all last male names.
+my @last_males = @Mock::Person::DE::last_male;
+
+# Print out.
+print sort map { encode_utf8($_)."\n" } @last_males;
+
+# Output:
+# Albrecht
+# Arnold
+# Bauer
+# Baumann
+# Beck
+# Becker
+# Berger
+# Bergmann
+# Brandt
+# Braun
+# Busch
+# Böhm
+# Dietrich
+# Engel
+# Fischer
+# Frank
+# Franke
+# Friedrich
+# Fuchs
+# Graf
+# Groß
+# Günther
+# Haas
+# Hahn
+# Hartmann
+# Heinrich
+# Herrmann
+# Hoffmann
+# Hofmann
+# Horn
+# Huber
+# Jung
+# Jäger
+# Kaiser
+# Keller
+# Klein
+# Koch
+# Kraus
+# Krause
+# Krämer
+# Krüger
+# Kuhn
+# Köhler
+# König
+# Kühn
+# Lang
+# Lange
+# Lehmann
+# Lorenz
+# Ludwig
+# Maier
+# Martin
+# Mayer
+# Meier
+# Meyer
+# Möller
+# Müller
+# Neumann
+# Otto
+# Peters
+# Pfeiffer
+# Pohl
+# Richter
+# Roth
+# Sauer
+# Schmid
+# Schmidt
+# Schmitt
+# Schmitz
+# Schneider
+# Scholz
+# Schreiber
+# Schröder
+# Schubert
+# Schulte
+# Schulz
+# Schulze
+# Schumacher
+# Schuster
+# Schwarz
+# Schäfer
+# Seidel
+# Simon
+# Sommer
+# Stein
+# Thomas
+# Vogel
+# Vogt
+# Voigt
+# Wagner
+# Walter
+# Weber
+# Weiß
+# Werner
+# Winkler
+# Winter
+# Wolf
+# Wolff
+# Ziegler
+# Zimmermann

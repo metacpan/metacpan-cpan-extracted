@@ -1,0 +1,20 @@
+Changes
+Lexical.xs
+lib/Method/Lexical.pm
+Makefile.PL
+MANIFEST
+META.yml
+mro.h
+ppport.h
+README
+t/01_use.t
+t/autoload.t
+t/basic.t
+t/cache.t
+t/depth.t
+t/fail.t
+t/fqname.t
+t/method_name_value.t
+t/module_autoload_fail.t
+t/pod.t
+META.json                                Module JSON meta-data (added by MakeMaker)

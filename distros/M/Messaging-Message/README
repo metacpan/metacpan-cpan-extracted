@@ -1,0 +1,54 @@
+Messaging-Message
+
+Messaging-Message is a set of Perl modules useful to deal with "messages",
+as used in "messaging", see for instance:
+http://en.wikipedia.org/wiki/Enterprise_messaging_system.
+
+The modules include a transport independent message abstraction, a versatile
+message generator and several message queues/spools to locally store messages.
+
+A Python implementation of the same messaging abstractions is available at
+https://github.com/cern-mig/python-messaging so messaging components can be
+written in different programming languages.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+In addition to the mandatory modules listed in Makefile.PL, the
+following optional modules do bring extra functionality:
+
+    Compress::LZ4 - allows body (de)compression when (de)serializing
+    Compress::Snappy - allows body (de)compression when (de)serializing
+    Compress::Zlib - allows body (de)compression when (de)serializing
+    Directory::Queue::Normal - required by Messaging::Message::Queue::DQN
+    Directory::Queue::Simple - required by Messaging::Message::Queue::DQS
+    Net::STOMP::Client - allows interaction with STOMP messaging brokers
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Messaging::Message
+    perldoc Messaging::Message::Generator
+    perldoc Messaging::Message::Queue
+    perldoc Messaging::Message::Queue::DQN
+    perldoc Messaging::Message::Queue::DQS
+    perldoc Messaging::Message::Queue::NULL
+    perldoc Messaging::Message::Queue::ZERO
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) CERN 2011-2016
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

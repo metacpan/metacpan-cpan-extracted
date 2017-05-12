@@ -1,0 +1,200 @@
+#!/usr/bin/env perl 
+
+use strict;
+use warnings;
+use lib qw(/home/agentz/gmake-db/lib /home/agentz/mdom-gmake/lib);
+
+#use Smart::Comments;
+use Getopt::Long;
+use Makefile::Parser::GmakeDB;
+use IPC::Run3;
+use File::Slurp;
+use Makefile::AST::Evaluator;
+use List::Util 'first';
+
+my $VERSION = $Makefile::Parser::GmakeDB::VERSION;
+
+my @DefaultMakefile = (
+    'GNUmakefile',
+    'makefile',
+    'Makefile'
+);
+
+my $user_makefile;
+my $print_version;
+my ($makefile, $njobs, @goals);
+Getopt::Long::Configure ("bundling");
+GetOptions(
+    'f|file|makefile=s' => \$user_makefile,
+    'j=s' => \$njobs,  # job server is not really supported
+    'n|just-print|dry-run|recon' => \$Makefile::AST::Evaluator::JustPrint,
+    's|silent|quiet'  => \$Makefile::AST::Evaluator::Quiet,
+    'i|ignore-errors' => \$Makefile::AST::Evaluator::IgnoreErrors,
+    'B|always-make' => \$Makefile::AST::Evaluator::AlwaysMake,
+    'q|question' => \$Makefile::AST::Evaluator::Question,
+    'v|version' => \$print_version,
+) or die "Usage: $0 [-f makefile] goals...\n";
+### $makefile
+### @ARGV
+
+if ($print_version) {
+    print <<"_EOC_";
+pgmake-db $VERSION
+_EOC_
+    exit 0;
+}
+
+if ($Makefile::AST::Evaluator::Question) {
+    $Makefile::AST::Evaluator::Quiet = 1;
+}
+our $MAKE;
+my @var_defs;
+for my $arg (@ARGV) {
+    if ($arg =~ /(.*?)=(.*)/) {
+        my ($var, $value) = ($1, $2);
+        if ($var eq 'MAKE') {
+            $MAKE = $value;
+        }
+        push @var_defs, $arg;
+    } else {
+        push @goals, $arg;
+    }
+}
+if (!defined $MAKE) {
+    ($MAKE = $0) =~ s/.*[\\\/]//;
+    push @var_defs, "MAKE=$MAKE";
+}
+
+$makefile = $user_makefile;
+if (!defined $makefile) {
+    $makefile = first { -f $_ } @DefaultMakefile;
+} elsif ($makefile ne '-' and !-f $makefile) {
+    warn "$MAKE: $makefile: No such file or directory\n";
+    push @goals, $makefile; # This is required
+}
+
+### var defs via command line: @var_defs
+
+my ($stdout, $stderr);
+run3 ['make', '-pqRrs', '-f', $makefile, @var_defs], undef, \$stdout, \$stderr;
+## $stderr
+my $exit_code = $? >> 8;
+if ($stderr and $exit_code == 2 and $stderr !~ /^make:/) {
+    $stderr =~ s/^make:/$MAKE:/msg;
+    warn $stderr;
+    exit $exit_code;
+}
+if ($stderr =~ /warning: (overriding|ignoring old) commands for target/) {
+    warn $stderr;
+}
+
+#die "GNU make stdout: $stdout\n";
+
+# XXX debug only
+write_file('/home/agentz/mdom-gmake/make.db', $stdout);
+
+# patch the database output to work around gmake bugs
+patch_database(\$stdout);
+
+# XXX debug only
+write_file('/home/agentz/mdom-gmake/make.db.patched', $stdout);
+
+#if ($stdout =~ m{^\s*\./Makefile_\S+\s*:\s*[^\n]*$}ms) {
+#    die $&;
+#}
+#print $stdout;
+#exit 0;
+
+$Makefile::AST::Runtime = 1;
+
+my $ast = Makefile::Parser::GmakeDB->parse(\$stdout);
+$ast->{makefile} = $makefile;
+## $ast
+## var a: $ast->get_var('a')
+## var b: $ast->get_var('b')
+#die;
+
+my $default_goal = $ast->default_goal;
+push @goals, $ast->default_goal
+    if !@goals && defined $default_goal;
+### @goals
+
+if (!@goals && !defined $makefile) {
+    warn "$MAKE: *** No targets specified and no makefile found.  Stop.\n";
+    exit(2);
+}
+
+my $eval = Makefile::AST::Evaluator->new($ast);
+$eval->set_required_target($user_makefile)
+    if defined $user_makefile;
+my $up_to_date = 1;
+for my $goal (@goals) {
+    ### goal: $goal
+    $Makefile::AST::Evaluator::CmdRun = 0;
+    my $res = $eval->make($goal);
+    ### result: $res
+    if ($res and $res eq 'UP_TO_DATE')  {
+        if (!$Makefile::AST::Evaluator::Question and !$Makefile::AST::Evaluator::CmdRun) {
+            print "$::MAKE: Nothing to be done for `$goal'.\n";
+        }
+    } else {
+        $up_to_date = 0;
+    }
+}
+
+if ($Makefile::AST::Evaluator::Question) {
+    exit 0 if $up_to_date;
+    exit 1;
+}
+
+# XXX promote the fixes on the GNU make side
+sub patch_database {
+    my $ref = shift;
+    #$$ref =~ s/(\n\S+)#/$1\\#$2/gsm;
+    $$ref =~ s/^([^\n]*)(?<!\\)\\(\S[^\n]*\n#  Implicit rule search has)/$1\\\\$2/msg;
+    $$ref =~ s/^([^\n]*)(?<!\\)#(\S[^\n]*\n#  Implicit rule search has)/$1\\#$2/msg;
+    $$ref =~ s/^([^\n]*)(?<!\\):(\S[^\n]*:\n#  Implicit rule search has)/$1\\:$2/msg;
+}
+
+__END__
+
+=head1 NAME
+
+pgmake-db - A make utility using Makefile::Parser::GmakeDB, Makefile::AST, and Makefile::AST::Evaluator
+
+=head1 SYNOPSIS
+
+    $ pgmake-db
+    $ pgmake-db -f mine.mk
+
+=head1 DESCRIPTION
+
+This is a F<make> tool using L<Makefile::Parser::GmakeDB>, L<Makefile::AST>, and L<Makefile::AST::Evaluator>.
+
+This script is primary for testing the whole toolchain via running GNU make's official test suite.
+
+As of this writing, pgmake-db has already passed 51% of GNU make 3.81's test suite.
+
+=head1 SVN REPOSITORY
+
+For the very latest version of this script, check out the source from
+
+L<http://github.com/agentzh/makefile-parser-pm>.
+
+There is anonymous access to all.
+
+=head1 AUTHOR
+
+Zhang "agentzh" Yichun C<< <agentzh@gmail.com> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2007-2008 by Zhang "agentzh" Yichun (agentzh).
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Makefile::Parser::GmakeDB>, L<Makefile::AST>, L<Makefile::AST::Evaluator>, L<Makefile::Parser::GmakeDB>, L<pgmake-db>, L<makesimple>, L<Makefile::DOM>.
+

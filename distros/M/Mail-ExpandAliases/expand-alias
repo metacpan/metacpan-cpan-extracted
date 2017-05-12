@@ -1,0 +1,181 @@
+#!/usr/bin/perl
+
+# ----------------------------------------------------------------------
+# expand-alias - expand an alias from /etc/aliases
+# Copyright (C) 2002 darren chamberlain <darren@cpan.org>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; version 2.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+# 02111-1307  USA
+# ----------------------------------------------------------------------
+
+use strict;
+use vars qw($VERSION $opt_h $opt_f $opt_t $opt_v
+                     $opt_n $opt_c $opt_s $opt_D
+                     $joint);
+
+use Getopt::Std;
+use Mail::ExpandAliases;
+
+getopts("Dtcnhf:sv");
+
+if ($opt_h) {
+    exec("perldoc $0");
+    exit 0;
+}
+
+if (($opt_t + $opt_c + $opt_n + $opt_s) > 1) {
+    die "Please specify only one of -t, -n, -c, or -s.";
+}
+
+$joint = $opt_t ? "\t" : $opt_c ? ", " : $opt_n ? "\n" : " ";
+
+$Mail::ExpandAliases::DEBUG =1 if $opt_D;
+my $expander = Mail::ExpandAliases->new($opt_f);
+
+for (@ARGV) {
+    my $alias = $opt_v ? "$_: " : "";
+    if ($opt_s) {
+        my (@expandos, $last, $comma, $num, $str);
+
+        @expandos = $expander->expand($_);
+        if (@expandos > 2) {
+            my $last = pop @expandos;
+            print $alias, join(", ", @expandos), ", and ", $last;
+        } elsif (@expandos == 2) {
+            print $alias, join " and ", @expandos;
+        } else {
+            print $alias, @expandos;
+        }
+    } else {
+        print $alias, join $joint, $expander->expand($_);
+    }
+    print "\n";
+}
+
+exit(0);
+
+__END__
+
+=head1 NAME
+
+expand-alias - expand mail aliases from /etc/aliases
+
+=head1 SYNOPSIS
+
+    $ expand-alias MAILER-DAEMON
+    root
+
+    $ expand-alias -c listname
+    addr1, addr2, addr3
+
+    $ expand-alias -n listname
+    addr1
+    addr2
+    addr3
+
+    $ expand-alias -t listname
+    addr1	addr2	addr3
+
+    $ expand-alias -f ~/my.aliases friends
+    friend1@isp.net other.friend@isp2.net
+
+    $ expand-alias -f ~/my.aliases -s friends
+    friend1@isp.net and other.friend@isp2.net
+
+=head1 DESCRIPTION
+
+C<expand-alias> expands aliases from an aliases file, as implemented
+by the Mail::ExpandAliases module.
+
+=head1 USE
+
+C<expand-alias> takes 0 or more aliases as arguments:
+
+    $ expand-alias postmaster
+    darren@cpan.org
+
+    $ expand-alias foo
+    foo
+
+Note that unknown aliases expand to themselves; that is, they don't
+expand.
+
+C<expand-alias> has several command line swicthes that control the
+output:
+
+=over 4
+
+=item -c
+
+comma-separated output:
+
+    $ expand-alias -c listname
+    addr1, addr2, addr3
+
+=item -t
+
+tab-separated output
+
+    $ expand-alias -c listname
+    addr1	addr2	addr3
+
+=item -n
+
+newline separated output
+
+    $ expand-alias -n listname
+    addr1
+    addr2
+    addr3
+
+=item -s
+
+"sentence" form (a, b, and c).
+
+    $ expand-alias -s listname
+    addr1, addr2, and addr3
+
+=back
+
+The default separator is a single space:
+
+    $ expand-alias listname
+    addr1 addr2 addr3
+
+This is useful in shell scripts:
+
+    $ for addr in `expand-alias -f ~/my.lists friends`; do
+    > mail -s 'For your eyes only!' $addr < secret-file
+    > done
+
+C<expand-alias> also takes a C<-f> option, as hinted above, which
+indicates the file to be used; see L<Mail::ExpandAliases> for details
+about alias files search paths.
+
+If the C<-v> (verbose) flag is set, alias expansions are prefixed by
+the alias itself.  This is useful when specifying multiple aliases on
+the command line:
+
+    $ expand-alias -vc listone listtwo listthree
+    listone: addr1, addr2, addr3
+    listtwo: addr4, addr3, addr2
+    listthree: addr1, addr4, addr3
+
+=head1 AUTHOR
+
+darren chamberlain E<lt>darren@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+L<Perl>, L<Mail::ExpandAliases>

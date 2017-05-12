@@ -1,0 +1,32 @@
+This file contains a short description of what the goals of this project are,
+building guidelines etc. This was born after discussions with John Peacock, who
+provided helpfull feedback.
+
+* KISS - Keep It Simple, Stupid!
+* Favour correctness over speed
+* Make your code maintable, so avoid Copy&Paste, unclear constructs, read-only
+  code and special hacks whenever possible
+* Optimize more for the average case than the worst, while trying to avoid
+  performance hits for the worst case.
+  The average case is more for longer numbers than short, based on the
+  assumption that if you wanted to add 1 and 2 _fast_ together, you wouldn't
+  use BigInt nor Perl, now would you? ;)
+  (Or in other words: Time saved in one case of a large number may be
+  multitudes of what you can waste on a small number)
+* Make subclassing as easy and painless as possible. This means clean
+  inheritance and overload section, no C&P code etc.
+* Keep the interface as consistent and easy as possible.
+
+Secondary goals:
+* Make mixing of classes work, like in:
+	$x = Math::BigFloat->new(10);
+	$y = Math::BigInt->new(2);
+	$z = $x / $y;			# $z = Math::BigFloat = 5
+* Make auto-upgrading/downgrading work
+
+  See also BUGS.
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

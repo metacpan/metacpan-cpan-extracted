@@ -1,0 +1,15 @@
+.cvsignore
+Build.PL
+Changes
+examples/Example.pm
+examples/README.txt
+examples/Test.pm
+examples/Test/Params.pm
+lib/ModPerl/ParamBuilder.pm
+MANIFEST
+MANIFEST.SKIP
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/pod-coverage.t
+t/pod.t

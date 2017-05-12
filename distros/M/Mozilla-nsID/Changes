@@ -1,0 +1,6 @@
+Revision history for Perl extension Mozilla::nsID.
+
+0.01  Mon Sep  4 11:54:33 2006
+	- original version; created by h2xs 1.23 with options
+		-A -n Mozilla::nsID /usr/include/mozilla/nsID.h
+

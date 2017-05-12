@@ -1,0 +1,26 @@
+digraph Perl
+{
+graph [ rankdir="TB" ]
+node [ shape="oval" ]
+edge [ color="grey" ]
+"33" [ color="invis" label="" shape="point" width="0" ]
+"40" [ color="invis" label="" shape="point" width="0" ]
+"node"
+"47" [ color="invis" label="" shape="point" width="0" ]
+"54" [ color="invis" label="" shape="point" width="0" ]
+"node.1" [ color="green" ]
+"node.2"
+"node.3"
+""
+"node 1"
+"\[node\]"
+"From here"
+"To there"
+"33" -> "40"
+"40" -> "node"
+"node" -> "47"
+"47" -> "54" [ label="Start" ]
+"54" -> "node.1" [ color="red" ]
+"node.1" -> "node.2"
+"From here" -> "To there"
+}

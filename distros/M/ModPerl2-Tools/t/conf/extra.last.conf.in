@@ -1,0 +1,199 @@
+<Perl>
+  {
+   package My::Test;
+   use strict;
+   use warnings;
+
+   use Apache2::RequestRec ();
+   use Apache2::RequestIO ();
+   use Apache2::Const -compile=>qw/OK/;
+
+   use ModPerl2::Tools;
+
+   sub spawn1 {
+     pipe my ($rd, $wr);
+     my $pid=ModPerl2::Tools::spawn +{keep_fd=>[fileno $wr]},
+                                    sub {warn "TESTTESTTEST\n";print $wr "$$"};
+     close $wr;
+     $_[0]->print("$pid:$$:".readline $rd);
+
+     return Apache2::Const::OK;
+   }
+
+   sub spawn2 {
+     local $^F=1_000_000_000;	# prevent close-on-exec on $wr
+     pipe my ($rd, $wr);
+     my $fd=fileno $wr;
+     my $pid=ModPerl2::Tools::spawn +{keep_fd=>[$fd]},
+	                            qw/perl -e/,
+				    'warn "TESTTESTTEST\n";
+                                     open F, ">&='.$fd.'";
+                                     print F "$$"',
+				    fileno($wr);
+     close $wr;
+     $_[0]->print("$pid:$$:".readline $rd);
+
+     return Apache2::Const::OK;
+   }
+
+   sub data {
+     my $n=$_[0]->args || 1;
+     $_[0]->headers_out->{'Content-Length'}=$n*80;
+     while($n--) {
+       $_[0]->print(("x"x79)."\n");
+       $_[0]->rflush;
+     }
+     return Apache2::Const::OK;
+   }
+
+   sub fetch1 {
+     $_[0]->print(length $_[0]->fetch_url('/data?'.$_[0]->args));
+     return Apache2::Const::OK;
+   }
+
+   sub fetch2 {
+     use Data::Dumper;
+     local $Data::Dumper::Useqq=1;
+     local $Data::Dumper::Indent=1;
+     $_[0]->print(Dumper($_[0]->fetch_url($_[0]->args)));
+     return Apache2::Const::OK;
+   }
+
+   sub fetch3 {
+     my ($r)=@_;
+     my $nchunks=0;
+     my $totallen=0;
+     my $cl;
+     my $status;
+     my $data='';
+     my ($s, $hdr)=$r->fetch_url($r->args, sub {
+       my ($subr, @chunk)=@_;
+       if( $nchunks==0 ) {
+         $cl=$subr->headers_out->{'Content-Length'};
+         $status=$subr->status;
+       }
+       $nchunks+=@chunk;
+       $totallen+=length for (@chunk);
+       $data.=join '', @chunk;
+     });
+     no warnings 'uninitialized';
+     $r->print(<<"EOF");
+nchunks=$nchunks
+totallen=$totallen
+cl=$cl
+CL=$hdr->{'content-length'}
+status=$status
+s='$s'
+
+$data
+EOF
+
+     return Apache2::Const::OK;
+   }
+
+   sub fetch4 {
+     use Apache::TestRequest ();
+     my ($r)=@_;
+     my $url='/hdrs';
+     $url=Apache::TestRequest::resolve_url($url) if $r->args eq 'use_proxy';
+     $r->print("including $url\n");     
+     $r->fetch_url($url, [qw/X-MyHdr my-hdr/], sub {shift; $r->print(@_)});
+     return Apache2::Const::OK;
+   }
+
+   sub hdrs {
+     my ($r)=@_;
+     use APR::Table ();
+     $r->headers_in->do(sub {$r->print("$_[0]: $_[1]\n"); 1});
+     return Apache2::Const::OK;
+   }
+
+   sub req_die {
+     $_[0]->safe_die(410);
+     my $n=10;
+     while($n--) {
+       $_[0]->print(("x"x79)."\n");
+       $_[0]->rflush;
+     }
+     return Apache2::Const::OK;
+   }
+  }
+
+  {
+    package My::Filter;
+    use strict;
+    use warnings;
+
+    use ModPerl2::Tools;
+    use base 'Apache2::Filter';
+
+    sub handler : FilterRequestHandler {
+      my ($f, $bb)=@_;
+      return $f->safe_die(410);
+    }
+  }
+</Perl>
+
+<Location /spawn1>
+  SetHandler modperl
+  PerlResponseHandler My::Test::spawn1
+</Location>
+
+<Location /spawn2>
+  SetHandler modperl
+  PerlResponseHandler My::Test::spawn2
+</Location>
+
+<Location /data>
+  SetHandler modperl
+  PerlResponseHandler My::Test::data
+</Location>
+
+<Location /fetch1>
+  SetHandler modperl
+  PerlResponseHandler My::Test::fetch1
+</Location>
+
+<Location /fetch2>
+  SetHandler modperl
+  PerlResponseHandler My::Test::fetch2
+</Location>
+
+<Location /fetch3>
+  SetHandler modperl
+  PerlResponseHandler My::Test::fetch3
+</Location>
+
+<Location /fetch4>
+  SetHandler modperl
+  PerlResponseHandler My::Test::fetch4
+</Location>
+
+<Location /hdrs>
+  SetHandler modperl
+  PerlResponseHandler My::Test::hdrs
+</Location>
+
+PerlModule ModPerl::Registry
+Alias /perl @DocumentRoot@/perl
+<Location /perl>
+  SetHandler perl-script
+  PerlResponseHandler ModPerl::Registry
+  PerlOptions +ParseHeaders
+  Options +ExecCGI
+</Location>
+
+<Location /filter_die>
+  SetHandler modperl
+  PerlResponseHandler My::Test::data
+  PerlOutputFilterHandler My::Filter::handler
+</Location>
+
+<Location /req_die>
+  SetHandler modperl
+  PerlResponseHandler My::Test::req_die
+</Location>
+
+<Location /dir>
+    Options +Indexes
+</Location>

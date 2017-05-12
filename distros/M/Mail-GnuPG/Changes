@@ -1,0 +1,125 @@
+Revision history for Perl extension Mail::GnuPG.
+
+0.22 Sat Apr 23 2016
+
+  - Make agent.t optional, since making it work with 2.1 and with
+    pre-2.1 is too painful.
+
+0.22 Sun Apr 10 2016
+
+  - [RT #102719] Update t/agent.t for GnuPG 2.1
+
+0.21 Tue Aug 26 2014
+
+  - update get_decrypt_key to work with GnuPG::Interface >> 0.50
+
+0.20 Mon Jul 28 2014
+
+  - [RT #97283] Bugfixes for gnupg-agent support
+  - Replacing parsing of stderr with use of status-fd
+
+0.19 Sat May 4 2013
+
+  - [RT #83465] Update gnupg-agent support for GnuPG::Interface >= 0.46
+
+0.18 Sat Jul 21 2012
+
+  - [RT #77070] Support non-default GPG key directory
+
+0.17 Sun Dec 10 2011
+
+  - [RT #73036] Support trust-model = always-trust
+
+0.16 Tue Dec 14 2010
+
+  - [RT #60280] Add support for gnupg-agent
+  - [RT #60246] Use undecoded text for decode and get_decrypt_key of inline PGP
+  - [RT #4388, #2718, #46168]  Add test case for verify of encoded bodies
+
+0.15 Sat Mar  8 19:51:55 PST 2008
+
+  This is the ntyni release, as he provided most of the fixes:
+ 
+  - Fix roundtrip test by trusting test keyring.
+  - New test to show blocking issues on large messages.
+  - Switch to a non-blocking (select) based mechanism for interacting
+    with gpg.
+
+0.10 Mon Jul  9 15:12:10 PDT 2007
+
+  - Fixed "-1" result code from waitpid handling. (On OSX, it can mean 'reaped' not actually an error)
+
+0.09
+
+  - MIME content type of signed portion will be same as content type
+    of original message.
+
+0.08   Sat Jul 17 19:11:06 PDT 2004
+
+really tiny release for Paul's issue
+
+  - https://rt.cpan.org/Ticket/Display.html?id=6968
+    IO::Handle::sync not implemented on all systems, can cause Mail::GnuPG to fail 
+  - cleanup some test warnings
+
+0.07   Tue Dec 16 20:32:09 PST 2003
+
+  Lots o Documentation Updates
+
+  (From Paul J. Schinder)
+   - bugfix for encrypt without signing
+
+  (For Jesse)
+   - verify(): return uid/email on success
+   - new methods: is_signed() and is_encrypted(), which are
+     encapsulations of the simple tests for guessing whether something
+     is signed or encrypted.
+
+   - get_decrypt_key(): fix for gpg not in current path
+   - decrypt(): return uid/email on successful decrypt of signed msg
+
+   - verify() : fix tempfile creation location
+
+0.06   Wed Jul 23 19:59:51 PDT 2003
+
+  (From Jörn Reder)
+   - bugfix in decrypt(): with ASCII armor messages the first line of
+   the cleartext was removed by MIME::Parser, if the cleartext was no
+   entity but simple ASCII text.
+
+   - new method get_decrypt_key() which returns a secret key and the
+   corresponding mail address, which could be used to decrypt a given
+   encrypted message.
+
+
+0.05  Thu Jun 12 23:05:48 PDT 2003
+
+  (From Jörn Reder)
+  - insecure temp file handling (still insecure, but not that much ;)
+  - non portable temp directory handling
+  - insecure temp file / MIME::Parser handling in decrypt()
+  - broken signature verification on quoted printable ascii armor messages
+  - broken MIME canonical conversion (was broken if single CR's or
+    CR/LF sequences were already in the message)
+  - removed line break mangling in mime_encrypt(). RFC3156 doesn't
+    request it.
+
+  new methods:
+
+  clear_sign()        - clearsign the body of an email message
+  ascii_encrypt()     - encrypt an email message body using ascii armor
+  ascii_signencrypt() - encrypt and sign an email message body using
+			ascii armor
+
+0.04  Fri Apr  4 18:35:09 PST 2003
+	- Previous version didn't work.
+
+0.03  Thu Mar 27 22:32:21 PST 2003
+	- Previous version didn't work.
+
+0.02  Thu Mar 27 20:32:21 PST 2003
+        - Update Makefile.PL to set prereqs
+
+0.01  Mon Jan  6 19:16:27 2003
+	- original version; created by h2xs 1.21 with options
+		-X Mail::GnuPG

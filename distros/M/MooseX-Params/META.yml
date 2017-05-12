@@ -1,0 +1,52 @@
+---
+abstract: 'Parameters with meta, laziness and %_'
+author:
+  - 'Peter Shangov <pshangov@yahoo.com>'
+build_requires:
+  Carp::Always: 0
+  File::Find: 0
+  File::Temp: 0
+  IO::String: 0
+  Test::More: 0
+  Test::Most: 0
+  base: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Params
+no_index:
+  package:
+    - Moose::Util::TypeConstraints
+requires:
+  Attribute::Lexical: 0
+  B::Hooks::EndOfScope: 0
+  Carp: 0
+  Class::MOP::Class: 0
+  List::Util: 0
+  Moose: 1.24
+  Moose::Meta::Method: 0
+  Moose::Meta::TypeConstraint::Parameterizable: 0
+  Moose::Util::TypeConstraints: 0
+  Package::Stash: 0.18
+  Perl6::Caller: 0
+  Scalar::Readonly: 0
+  Scalar::Util: 0
+  Sub::Identify: 0
+  Sub::Mutate: 0
+  Text::CSV_XS: 0
+  Try::Tiny: 0
+  Variable::Magic: 0
+  parent: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Params
+  homepage: https://github.com/pshangov/moosex-params
+  repository: https://github.com/pshangov/moosex-params.git
+version: 0.010

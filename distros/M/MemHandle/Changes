@@ -1,0 +1,30 @@
+Revision history for Perl extension MemHandle.
+
+0.07  Sun Feb 12 10:08:14 PST 2012
+      - DEPRECATED documentation with reference to IO::stringy's IO::Scalar
+      - Fix spelling https://rt.cpan.org/Ticket/Display.html?id=69812
+0.06  Thu Aug  5 11:54:27 PDT 1999
+        - updated test.pl
+	- got rid of circular reference so that
+	  memory can be garbage collected without
+	  having to close the mh.
+0.05  Thu Jul  8 17:39:56 PDT 1999
+        - Put SYNOPSIS section back in Tie.pm,
+	  albeit empty.
+0.04  Wed Jul  7 14:39:52 PDT 1999
+        - Updated Documentation
+	- MemHandle::Tie::mem can take an optional
+	  parameter to set the memory.
+	- MemHandle::new can take an optional
+	  parameter to set the memory.
+0.03  Thu Jul  1 17:16:07 PDT 1999
+        - provided mem() routine for accessing
+	  the memory, rather than having to rely
+	  on file operations.
+0.02  Thu Jul  1 14:29:44 PDT 1999
+        - used 3 parameter version of substr 
+	  so perl versions earlier than 5.005
+	  can use it.
+	- use 5.000;
+0.01  Wed Jun 30 02:03:25 1999
+	- original version; created by h2xs 1.18

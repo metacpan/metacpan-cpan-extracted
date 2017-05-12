@@ -1,0 +1,27 @@
+This is Perl module Mojolicious::Plugin::ProxyPassReverse::SubDir.
+
+INSTALLATION
+
+Mojolicious::Plugin::ProxyPassReverse::SubDir installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Mojolicious::Plugin::ProxyPassReverse::SubDir
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Mojolicious::Plugin::ProxyPassReverse::SubDir documentation is available as in POD. So you can do:
+
+    % perldoc Mojolicious::Plugin::ProxyPassReverse::SubDir
+
+to read the documentation online with your favorite pager.
+
+Shingo MURATA

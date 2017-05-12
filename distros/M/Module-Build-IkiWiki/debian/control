@@ -1,0 +1,19 @@
+Source: libmodule-build-ikiwiki-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 5), libmodule-build-perl
+Build-Depends-Indep: perl (>= 5.8.8-12)
+Maintainer: Victor Moral <victor@taquiones.net>
+Standards-Version: 3.7.3
+Homepage: http://taquiones.net/software/factory/module-build-ikiwiki.html
+
+Package: libmodule-build-ikiwiki-perl
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}, libmodule-build-perl (>= 0.26)
+Description: Build and install IkiWiki plugins 
+ Subclass the Module::Build package and adds new items to the install process.
+ .
+ These items are templates and style sheets files and they are installed in the
+ /usr/share/ikiwiki/templates and /usr/share/ikiwiki/basewiki directories
+ respectively.
+ .

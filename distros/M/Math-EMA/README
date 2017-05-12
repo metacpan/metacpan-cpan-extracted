@@ -1,0 +1,83 @@
+NAME
+    Math::EMA - compute the exponential moving average
+
+SYNOPSIS
+      use Math::EMA;
+      my $avg=Math::EMA->new(alpha=>0.926119, ema=>$initial_value);
+      $avg->set_param($iterations, $end_weight);
+      $avg->alpha=$new_alpha;
+      $avg->ema=$new_value;
+      $avg->add($some_value);
+      my $ema=$avg->ema;
+
+INSTALLATION
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+DEPENDENCIES
+    * perl 5.8.0
+
+DESCRIPTION
+    This module computes an exponential moving average by the following
+    formula
+
+      avg(n+1) = (1 - alpha) * new_value + alpha * avg(n)
+
+    where alpha is a number between 0 and 1.
+
+    That means a new value influences the average with a certain weight
+    (1-alpha). That weight then exponentially vanes when other values are
+    added.
+
+  How to choose alpha?
+    The value of alpha determines how fast a given value vanes but it never
+    completely drops out. Assume you can define a limit say after 10
+    iterations the weight of a certain value should be 1% or 0.01. Then
+
+                   _____
+             _10  /     `
+     alpha =  \  / 0.01   = exp( log(0.01) / 10 )
+               \/
+
+  Methods
+   Math::EMA->new( key=>value, ... )
+    creates a new "Math::EMA" object. Parameters are passed as "key=>value"
+    pairs. Currently these keys are recognized:
+
+    *   alpha
+
+        initializes alpha. Alpha must be in the range from 0 to 1.
+
+    *   ema
+
+        initializes the average. If an uninitialized ema is used the first
+        value being added initializes it.
+
+   $obj->alpha
+    set or retrieve the current alpha
+
+   $obj->ema
+    set or retrieve the current average
+
+   $obj->set_param($iterations, $end_weight)
+    computes alpha from the passed values. After $iterations new values a
+    certain value should have a weight of $end_weight in the average.
+
+SEE ALSO
+    <http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average>
+
+    <http://en.wikipedia.org/wiki/Exponential_smoothing#The_exponential_movi
+    ng_average>
+
+AUTHOR
+    Torsten Förtsch, <torsten.foertsch@gmx.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008 by Torsten Foertsch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.0 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,11 @@
+[% USE date( format = '%H:%M on %d %b %Y' ) %]
+[% USE Mariachi %]
+<html>
+<head>
+<title>[% title | html | mariachi %]</title>
+<style type="text/css"><!--
+[% INCLUDE css.tt2 %]  
+--></style>
+</head>
+<body>
+

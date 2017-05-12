@@ -1,0 +1,10 @@
+Revision history for Perlbal-Plugin-TrustHeader
+
+0.02    2009-10-21
+
+  Add Module::Install as a prerequisite
+
+0.01    2003-10-15
+
+  Initial version
+

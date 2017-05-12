@@ -1,0 +1,321 @@
+#!/usr/bin/perl -w
+#-----------------------------------------------------------------
+# Moby
+# Author: Edward Kawas <edward.kawas@gmail.com>,
+# For copyright and disclaimer see below.
+#
+# $Id: Moby,v 1.2 2009/04/15 16:54:25 kawas Exp $
+#
+# NOTES:
+# 	1. This script can be used to test whether the various 
+#	   registry scripts have been installed in their default
+#      locations. The script attempts to read HTTP_HOST from
+#	   the web servers' environment. If that fails, it 
+#      defaults to localhost:8080 which is probably incorrect, so
+#      edit it below.
+#
+#-----------------------------------------------------------------
+
+use strict;
+use CGI qw/:standard/;
+
+my $form = new CGI;
+print $form->header('text/html');
+print &PRINT_HTML;
+
+sub PRINT_HTML {
+my $location = '';
+
+# TODO get this from the mobyconfig file
+if ( $ENV{'HTTP_HOST'} ) {
+
+	$location .= $ENV{'HTTP_HOST'};
+}
+else {
+
+	# Set this to the default hostname
+	$location .= 'localhost:8080';
+}
+
+my $msg =<<EOF;
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Registry Scripts Test Page</title>
+<style type="text/css">
+<!--
+body {
+	background: #ffffcd;
+	color: #000000;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12pt;
+	font-weight: normal;
+	margin-top: 110px;
+	margin-right: 1em;
+	margin-bottom: 1em;
+	margin-left: 1em;
+	background-position: left top;
+	background-repeat: no-repeat;
+}
+.indent {
+	margin-left: 5em;
+}
+td.text {
+	background: #ffffcd;
+	color: #000000;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12pt;
+	font-weight: normal;
+	margin-top: 110px;
+	margin-right: 1em;
+	margin-bottom: 1em;
+	margin-left: 1em;
+}
+h1 {
+	border: solid;
+	text-align:center;
+	background-color:yellow;
+	color: navy;
+}
+h2 {
+	border: ridge;
+	padding: 5px;
+	background-color:yellow;
+	color: navy;
+}
+h3 {
+	border: none;
+	padding: 5px;
+	background-color:yellow;
+	color: navy;
+}
+.subtitle {
+	border: none;
+	padding: 5px;
+	background-color:yellow;
+	color: navy;
+}
+a:link {
+	color: #0000ff;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	text-decoration: underline
+}
+a:visited {
+	color: #0099ff;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	text-decoration: underline
+}
+a:active {
+	color: #0000ff;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	text-decoration: underline
+}
+a:hover {
+	color: #336666;
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	text-decoration: underline
+}
+li {
+	list-style-type: square;
+	margin: 1em;
+	list-style-image: url(b_yellow.gif);
+}
+li.tiny {
+	list-style-type: square;
+	margin: 0;
+	list-style-image: none;
+}
+li.count {
+	list-style-type: upper-roman;
+	list-style-image: none;
+	margin: 0;
+}
+li.dcount {
+	list-style-type: decimal;
+	list-style-image: none;
+	margin: 0;
+}
+dd {
+	margin-bottom: 0.5em
+}
+.address {
+	font-size: 5pt;
+	margin-right:1em
+}
+.smaller {
+	font-size: 8pt
+}
+.note {
+	font-style: italic;
+	padding-left: 5em;
+	margin: 1em;
+}
+.update {
+	background-color:#ccffcd;
+}
+pre.code {
+	border: ridge;
+	padding: 5px;
+	background-color:#FFFF99;
+	color: navy;
+}
+pre.script {
+	padding: 5px;
+	background-color: white;
+	color: navy;
+}
+pre.script2 {
+	padding: 5px;
+	background-color: white;
+	color: navy;
+	margin-left: 5em;
+}
+pre.sscript {
+	padding: 5px;
+	background-color: white;
+	color: navy;
+	font-size: 8pt;
+}
+pre.ssscript {
+	padding: 5px;
+	background-color: white;
+	color: navy;
+	font-size: 6pt;
+}
+tr.options {
+	background-color: #FFFF99;
+	color: navy;
+}
+b.step {
+	background-color: white;
+	color: navy;
+	font-size: 8pt;
+}
+.motto {
+	text-align: right;
+	font-style: italic;
+	font-size: 10pt;
+}
+.motto-signature {
+	text-align: right;
+	font-style: normal;
+	font-size: 8pt;
+}
+.sb {
+	font-weight: bold;
+	font-size: 8pt;
+}
+.sbred {
+	font-weight: bold;
+	font-size: 8pt;
+	color: red;
+}
+.mail {
+	font-size: medium;
+}
+-->
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+</head>
+<body>
+<h1>BioMOBY Registry Scripts</h1>
+<p><a href="./AgentRDFValidator" target="_blank">RDF Agent Test</a> - 
+Invoke the RDF agent on the remote location that houses your RDF.</p>
+<blockquote>
+  <p>For a form based page, <a href="./AgentRDFValidator" target="_blank">click here</a>. 
+</p>
+</blockquote>
+<p><a href="./GenerateRDF.cgi" target="_blank">Generate RDF For Services</a> - 
+Create RDF for any one service or group of services already registered in the registry.</p>
+<blockquote>
+  <p>For a form based page, <a href="./GenerateRDF.cgi" target="_blank">click here</a>. 
+</p>
+</blockquote>
+<p><a href="./ServicePingerValidator" target="_blank">Ping Registered Services</a> - 
+Invoke the service pinger on any already registered service or group of services from a single service provider.</p>
+<blockquote>
+  <p>For a form based page, <a href="./ServicePingerValidator" target="_blank">click here</a>. 
+</p>
+</blockquote>
+<p><a href="./ValidateService">CallableServiceScript</a> -Use this to 
+determine whether or not a particular service(s) is reachable. </p>
+<blockquote>
+  <p>This servlet takes in the following parameters:</p>
+  <ul>
+    <li><strong><em>service</em></strong> - the name of your service 
+&lt;optional&gt; </li>
+    <li><strong><em>authority</em></strong> - the service providers 
+authority URI &lt;optional&gt;</li>
+    <li><strong><em>getStats</em></strong> - Whether or not to show some 
+statistics &lt;optional&gt; - set parameter to <b>true</b> to see 
+stats</li>
+    <li><strong><em>getDeadServices</em></strong> - When given this 
+parameter, only dead services are shown. &lt;optional&gt; </li>
+  </ul>
+  <p>As an example, <a href="http://$location/cgi-bin/ValidateService" 
+target="_blank">click here</a> to see a report for all services. <br />
+    In addition, to see a report for services by the authority 
+bioinfo.icapture.ubc.ca, <a 
+href="http://$location/cgi-bin/ValidateService?authority=bioinfo.icapture.ubc.ca" 
+target="_blank">click here.<br />
+    </a> To see a list of unreachable services sorted by service provider, 
+<a href="http://$location/cgi-bin/ValidateService?getDeadServices" 
+target="_blank">click here.</a><br/>
+    To see some stats regarding the percent of alive services, <a 
+href="http://$location/cgi-bin/ValidateService?getStats=true" 
+target="_blank">click here.</a><br/>
+    Finally, to see whether the service, getGoTerm, by the authority 
+bioinfo.icapture.ubc.ca is alive, <a 
+href="http://$location/cgi-bin/ValidateService?authority=bioinfo.icapture.ubc.ca&amp;service=getGoTerm" 
+target="_blank">click here.</a><br/>
+  </p>
+</blockquote>
+<p><a href="http://$location/cgi-bin/BioMobyWSDL/">BioMobyWSDL 
+</a> - RESTful app that returns WSDL for a given service. 
+</p>
+<blockquote>
+  <p>For example,</p>
+  <ol>
+    <li><a href="http://$location/cgi-bin/BioMobyWSDL/bioinfo.icapture.ubc.ca/getGoTerm">WSDL for getGoTerm, 
+    by the authority bioinfo.icapture.ubc.ca </a></li>
+  </ol>
+  <p>All that you have to do is append <strong><em>authURI/servicename</em></strong> to the path of the script. <br/>
+  The WSDL for that service, if it exists, will be returned!</p>
+</blockquote>
+<p><a href="http://$location/cgi-bin/RESOURCES/">The Resources 'Scripts' 
+</a> - Servlets that return the RDF representations of the BioMOBY 
+ontologies. </p>
+<blockquote>
+  <p>For example,</p>
+  <ol>
+    <li><a href="http://$location/cgi-bin/RESOURCES/MOBY-S/Objects">Object 
+Ontology </a></li>
+    <li><a 
+href="http://$location/cgi-bin/RESOURCES/MOBY-S/Namespaces">Namespace 
+Ontology</a></li>
+    <li><a 
+href="http://$location/cgi-bin/RESOURCES/MOBY-S/Services">Service Type 
+Ontology</a></li>
+    <li><a 
+href="http://$location/cgi-bin/RESOURCES/MOBY-S/ServiceInstances">Service 
+Instance Ontology</a></li>
+  </ol>
+</blockquote>
+</body>
+</html>
+
+
+
+EOF
+
+return $msg;
+}
+
+__END__

@@ -1,0 +1,5 @@
+
+B<WARNING>! This is the monolithic version of [%MODULE%]
+generated with an automatic build tool. If you experience problems
+with this version, please install and use the supported standard
+version. This version is B<NOT SUPPORTED>.

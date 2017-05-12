@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.36.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+
+SHA1 3fde6bf8ec485487d8ba7d02ed2cecb549bfb969 BUGS
+SHA1 96ffc7dd0b2688c85a6b96e79bc5e5d04a76bb5e CHANGES
+SHA1 9562bac6f49b6c4366dc946c1567e07e63b68f94 CREDITS
+SHA1 d6a6c30ee6d9ba6b9afab8bbf6a25e1b23c744e0 LICENSE
+SHA1 c19282d80fdda45077ce4a8539b3078ef534ec9e MANIFEST
+SHA1 dbc40e80659a635cabc7edf7286ca3b594d84952 META.yml
+SHA1 3a0725c7f91b4ac17ef79391d0e4460dcae4e616 Makefile.PL
+SHA1 17c3f78e6428ec62b4c1fb7d4c0e998f2abc08b3 NEW
+SHA1 f9c04a00e086e6039d484a8a048522a9a7db57de README
+SHA1 0421d037bd415034320314cb4535d78b3841631e TODO
+SHA1 4698981c9193da74779050439684ff9a674d6cbb lib/Mail/Graph.pm
+SHA1 552a0de189eb787984dec5426ebda13d04558704 samples/archive/sample.txt.gz
+SHA1 84dbf70f4dab31029599c962fb6e809530d0a011 samples/archive/sample2.txt.gz
+SHA1 41f928aa44f806c2b250ec9ef95558967649fd4c samples/convert.pl
+SHA1 6f2a20b2c0ef8d2a6a0d7d64278cfb699dd2b8fd samples/index.tpl
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 samples/index/dummy.txt
+SHA1 59c16d247fba14535baceec8e4fd88ccd99e981e samples/output/spam.css
+SHA1 3c08ff8e64883c8aeb2b24e205915c22f8de3b2d samples/output/w3c.png
+SHA1 0294f6bdd09a47da855c53394de178b373da7ca8 samples/sample.pl
+SHA1 a21646cf02e927ecc2e3d6e2bd2b0aaff3967765 t/mailgraph.t
+SHA1 04179f69ce3c9e81a9828a692f6441b11e4c7c9b t/target.t
+SHA1 2a921a86ead45b3afa24038b19a723b629121c41 t/testmail.1
+SHA1 5101f7c1da21829abca1e5737c72817639accca2 t/testmail.2
+SHA1 16273e1b8b128032fec7af70ea6502752a217607 t/testmail.3
+SHA1 5fa65493848528d899a71079fd4e0595b5c95c32 t/testmail.4
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.2-rc1-SuSE (GNU/Linux)
+Comment: When cryptography is outlawed, bayl bhgynjf jvyy unir cevinpl.
+
+iQEVAwUBP/gUv3cLPEOTuEwVAQF4gQf/SD5chQTpupWyxE/MlKmGxPYezPyr3+TG
+a4NcivdxzS5Afyyg9/rNSFL9qIkOAfo7NXR9ocllHjFb8rNXj1mdezZV+6E3D9Z6
+kuudw6B7sgbV78Fy/tSj1izcbpZa17RPlhJ6d/e+EGh2gZHWqrcxa6MLF99BJ3u2
+bq++TEz08mnIDlJoUMXeGJmtUqGd2DCC9/QLovJ9ry+XGw8Nd6OkOS3JXkCa6Qkt
+RSYCPPUYwXhSlXU4xVTN51PGigOytoEt7kgJIsN6Bvd/1bJu0EJzRylrGrJUJBa5
+9eRiFTuPrxa/zCi7JcQPE4KkPZdMOzLYHUzZdjyT/yDDtfA4NLvfRA==
+=C8jS
+-----END PGP SIGNATURE-----

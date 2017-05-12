@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/Math/SymbolicX/Calculator.pm
+lib/Math/SymbolicX/Calculator/Command.pm
+lib/Math/SymbolicX/Calculator/Command/Assignment.pm
+lib/Math/SymbolicX/Calculator/Command/DerivativeApplication.pm
+lib/Math/SymbolicX/Calculator/Command/Insertion.pm
+lib/Math/SymbolicX/Calculator/Command/Transformation.pm
+lib/Math/SymbolicX/Calculator/Interface.pm
+MANIFEST			This list of files
+README
+t/01basic.t
+xt/00pod.t
+xt/00podcover.t
+Makefile.PL
+META.yml
+META.json

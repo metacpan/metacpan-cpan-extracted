@@ -1,0 +1,89 @@
+{
+   "abstract" : "Mojolicious Lexicon Translation Generator",
+   "author" : [
+      "dokechin <>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Command-generate-lexicont",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::PL" : "0",
+            "Encode" : "0",
+            "Module::Load" : "0",
+            "Mojo::Base" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "JSON" : "0",
+            "Mojolicious" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Warn" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Lingua::Translate::BingWrapper" : {
+         "file" : "lib/Lingua/Translate/BingWrapper.pm"
+      },
+      "Mojolicious::Command::generate::lexicont" : {
+         "file" : "lib/Mojolicious/Command/generate/lexicont.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dokechin/Mojolicious-Command-generate-lexicont/issues"
+      },
+      "homepage" : "https://github.com/dokechin/Mojolicious-Command-generate-lexicont",
+      "repository" : {
+         "url" : "git://github.com/dokechin/Mojolicious-Command-generate-lexicont.git",
+         "web" : "https://github.com/dokechin/Mojolicious-Command-generate-lexicont"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "dokechin <ttatsumi@ra2.so-net.ne.jp>",
+      "dokechin <user@user-PC.(none)>"
+   ]
+}

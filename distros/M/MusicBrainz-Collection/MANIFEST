@@ -1,0 +1,18 @@
+bin/mbcol
+Changes
+lib/MusicBrainz/Collection.pm
+Makefile.PL
+MANIFEST
+README
+t/01use.t
+t/02pod.t
+t/03podcoverage.t
+t/04critic.rc
+t/04critic.t
+t/library/aac.m4a
+t/library/flac.flac
+t/library/mp3.mp3
+t/library/vorbis.ogg
+t/library/wma.wma
+t/tags.t
+META.yml                                 Module meta-data (added by MakeMaker)

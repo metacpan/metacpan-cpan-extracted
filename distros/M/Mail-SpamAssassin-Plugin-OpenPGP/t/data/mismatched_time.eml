@@ -1,0 +1,54 @@
+From dave@brondsema.net Mon Feb 28 01:48:55 2005
+Return-Path: <dave@brondsema.net>
+Delivered-To: user0009-dmail-test@brondsema.net
+Received: (qmail 20789 invoked by uid 0); 28 Feb 2005 01:48:54 -0000
+Received: from unknown (HELO ?192.168.1.101?) (user0009@65.42.184.210)
+  by 0 with SMTP; 28 Feb 2005 01:48:54 -0000
+Message-ID: <4222786D.1090509@brondsema.net>
+Date: Sun, 27 Feb 2007 20:48:29 -0500
+From: Dave Brondsema <dave@brondsema.net>
+User-Agent: Mozilla Thunderbird 1.0 (X11/20041206)
+X-Accept-Language: en-us, en
+MIME-Version: 1.0
+Subject: fdsad
+X-Enigmail-Version: 0.90.0.0
+X-Enigmail-Supports: pgp-inline, pgp-mime
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enigB48DE1F35CA9A7B4D3273633"
+X-Spam-Checker-Version: SpamAssassin 3.0.2 (2004-11-16) on ferrari
+X-Spam-Level:
+X-Spam-Status: No, score=0.0 required=4.0 tests=none autolearn=failed
+        version=3.0.2
+
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enigB48DE1F35CA9A7B4D3273633
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+
+
+asdf
+asdf
+safd
+
+--
+Dave Brondsema : dave@brondsema.net
+http://www.splike.com : programming
+http://csx.calvin.edu : student org
+http://www.brondsema.net : personal
+
+--------------enigB48DE1F35CA9A7B4D3273633
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.0 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+
+iD8DBQFCInhtVvBSb5uzznARAjdGAJ9+GqCCN7pE7EU6+d1Rhaa7Icl4YgCffAUP
+jNkw+WOGZVwOlFrGLN6kQ2Q=
+=nDUX
+-----END PGP SIGNATURE-----
+
+--------------enigB48DE1F35CA9A7B4D3273633--

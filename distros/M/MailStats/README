@@ -1,0 +1,44 @@
+This is an alpha release of the Mail::Stats module for perl5
+
+What does it do?
+
+Mail::Stats is a rework of a perl script I had written to tell me how many
+new mail messages I had in my procmail generated mail boxes.  I found that
+once I switched to procmail (and had > 20 mailboxes it was filtering in to)
+I would often not realize that I had gotten mail.  It is designed with speed
+in mind, as I run in on login, which is why it doesn't do much.
+
+Basically it just runs a quick set of regex, counting up all messages,
+and all Status or X-Status flags.  It can then do simple math to figure 
+out what has changed.
+
+Why is it alpha software?
+
+Because the code is very rough.  I mostly wanted to get it out there so other
+people could help me figure out where it works and where it doesn't.  
+It has been tested under perl 5.6.0, and perl 5.5.2.  It gives a warning
+on perl 5.4.1 (on solaris) about sort routines.
+
+Also the documentation is lacking.  I will change this soon, I promiss.
+
+How do I get started?
+
+After installing this module, you will find a program called countmail
+installed.  countmail -h will give you the basic syntax.  You can run
+countmail with just command line switches.  Also (for your convenience)
+you can set up a ~/.countmailrc file.  A sample is provided with this
+package.
+
+Where is this heading?
+
+Don't know yet.  It has been useful to me and my associates, so hopefully
+it will be useful to others.
+
+
+
+Please report any bugs/suggestions to <sean@dague.net>.
+
+Copyright (c) 2000 Sean Dague <sean@dague.net>.
+
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.

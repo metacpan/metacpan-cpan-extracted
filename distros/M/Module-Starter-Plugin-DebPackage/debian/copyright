@@ -1,0 +1,18 @@
+This is the debian package for the Module::Starter::Plugin::DebPackage module.
+It was created by Bradley Dean <bjdean@bjdean.id.au> using module-starter
+with the Module::Starter::Plugin::DebPackage plugin.
+
+It was downloaded from http://search.cpan.org/dist/Module-Starter-Plugin-DebPackage
+
+Copyright (C) 2010 Bradley Dean <bjdean@bjdean.id.au>
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+The author is: Bradley Dean <bjdean@bjdean.id.au>
+
+The Debian packaging is (C) 2010, Bradley Dean <bjdean@bjdean.id.au> and
+is licensed under the same terms as the software itself (see above).

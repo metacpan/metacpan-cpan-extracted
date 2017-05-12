@@ -1,0 +1,11 @@
+bin/mythfs.pl
+Build.PL
+Changes
+lib/Net/MythTV/Fuse.pm
+lib/Net/MythTV/Fuse/Recordings.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+t/01.mythfs.t
+t/data/dummy_xml.gz

@@ -1,0 +1,82 @@
+<html>
+<body>
+<pre>
+&lt;!-- ================================================================== --&gt;
+&lt;!--  File:
+	$Id: utf-8.mrc,v 1.7 2004/03/15 21:07:18 ehood Exp $
+      Author:
+	Earl Hood &lt;earl @ earlhood . com&gt;
+
+      Description:
+	MHonArc, &lt;http://www.mhonarc.org/&gt;, resource file to
+	generate UTF-8 pages.
+
+      Notes:
+	* If using v2.6.0, or later, you may want to use
+	  utf-8-encode.mrc instead.
+  --&gt;
+&lt;!-- ==================================================================
+--&gt;
+
+<b><a href="../resources/charsetconverters.html">&lt;CharsetConverters override&gt;</a></b>
+plain;          mhonarc::htmlize;
+default;        MHonArc::UTF8::str2sgml;     MHonArc/UTF8.pm
+<b>&lt;/CharsetConverters&gt;</b>
+
+&lt;!-- MHonArc v2.5.10 introduced the following resource to control
+     how text clipping is performed, mainly for resource variables
+     (e.g. <b><a href="../rcvars.html#SUBJECTNA">$SUBJECTNA:72$</a></b>).
+  --&gt;
+
+<b><a href="../resources/textclipfunc.html">&lt;TextClipFunc&gt;</a></b>
+MHonArc::UTF8::clip; MHonArc/UTF8.pm
+<b>&lt;/TextClipFunc&gt;</b>
+
+&lt;!-- The beginning page markup of MHonArc pages need to be modified
+     to tell clients that the pages are in UTF-8 by using a
+     &lt;meta http-equiv&gt; tag.
+
+     The following resource settings are just the default settings
+     for each resource but with the appropriate &lt;meta http-equiv&gt;
+     tag added.
+  --&gt;
+
+<b><a href="../resources/idxpgbegin.html">&lt;IdxPgBegin&gt;</a></b>
+&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd"&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;<b><a href="../rcvars.html#IDXTITLE">$IDXTITLE$</a></b>&lt;/title&gt;
+&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;<b><a href="../rcvars.html#IDXTITLE">$IDXTITLE$</a></b>&lt;/h1&gt;
+<b>&lt;/IdxPgBegin&gt;</b>
+
+<b><a href="../resources/tidxpgbegin.html">&lt;TIdxPgBegin&gt;</a></b>
+&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd"&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;<b><a href="../rcvars.html#TIDXTITLE">$TIDXTITLE$</a></b>&lt;/title&gt;
+&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;<b><a href="../rcvars.html#TIDXTITLE">$TIDXTITLE$</a></b>&lt;/h1&gt;
+<b>&lt;/TIdxPgBegin&gt;</b>
+
+
+<b><a href="../resources/msgpgbegin.html">&lt;MsgPgBegin&gt;</a></b>
+&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd"&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;<b><a href="../rcvars.html#SUBJECTNA">$SUBJECTNA$</a></b>&lt;/title&gt;
+&lt;link rev="made" href="mailto:<b><a href="../rcvars.html#FROMADDR">$FROMADDR$</a></b>"&gt;
+&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+<b>&lt;/MsgPgBegin&gt;</b>
+</pre>
+</body>
+</html>

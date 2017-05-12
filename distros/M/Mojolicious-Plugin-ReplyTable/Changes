@@ -1,0 +1,30 @@
+Revision history for Perl module Mojolicious::Plugin::ReplyTable
+
+0.09 2017-03-28
+  - Fix documentation from previous release
+
+0.08 2017-03-28
+  - Allow CSV formatter options (Ryan Perry)
+
+0.07 2016-07-22
+  - Fix another test broken in Mojolicious 7.0
+
+0.06 2016-07-21
+  - Fix a test broken in Mojolicious 7.0
+  - Convert dist to Module::Build::Tiny
+
+0.05 2015-10-02
+  - Added support for Text::Table::Tiny
+
+0.04 2015-04-28
+  - Mojolicious dependency set to 5.60 for needed features
+
+0.03 2015-04-27
+  - Fix tests on older Perl versions
+
+0.02 2015-04-27
+  - POD fixes (Akron, kberov)
+
+0.01 2015-04-26
+  - Initial release
+

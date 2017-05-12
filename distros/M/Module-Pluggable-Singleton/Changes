@@ -1,0 +1,12 @@
+Revision history for Module-Pluggable-Singleton
+
+0.06      2013-09-17 14:19:40 Europe/London
+	Fix Changes file
+	Fix circular test dependency
+
+0.05      2013-09-05 12:29:08 Europe/London
+        Created class to extend Module::Pluggable::Object
+
+0.01    2011/02/15
+        First version, released on an unsuspecting world.
+

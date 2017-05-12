@@ -1,0 +1,62 @@
+{
+   "abstract" : "\"proper\" handling of DBI based connections in Mojolicious",
+   "author" : [
+      "Ben van Staveren <madcat@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-Database",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "0",
+            "Mojo::Base" : "0",
+            "perl" : "5.010001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "File::Temp" : "0",
+            "Mojolicious::Lite" : "0",
+            "Test::Mojo" : "0",
+            "Test::More" : "0",
+            "Try::Tiny" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::Database" : {
+         "file" : "lib/Mojolicious/Plugin/Database.pm",
+         "version" : "1.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/benvanstaveren/Mojolicious-Plugin-Database/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/Mojolicious-Plugin-Database/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/benvanstaveren/Mojolicious-Plugin-Database.git",
+         "web" : "https://github.com/benvanstaveren/Mojolicious-Plugin-Database"
+      }
+   },
+   "version" : "1.10"
+}
+

@@ -1,0 +1,32 @@
+Revision history for MooseX-AbstractFactory
+
+0.004003  2014-02-23
+	- remove Class::Load entirely for Module::Runtime
+
+0.004002  2014-01-24
+	- More Class::MOP::load_class -> Class::Load fixes ( zoffix )
+
+0.004001  2012-06-16
+	- support calling implementation_does with an arrayref as documented
+
+0.004000  2012-02-01
+	- Allow passing of any kind of params to the implementation
+
+0.003003  2012-01-13
+	- use Class::Load instead of Class::MOP->load_class (fix for Moose
+	  2.04)
+	- use Try::Tiny instead of eval
+	- cleanup for conversiont to Dist::Zilla
+
+0.3       2008-10-16
+	- Refactor to use sugar and metaclass.
+	- Eradicate MooseX::AbstractFactory::Implementation role
+
+0.2       2007-12-28
+	- Use Module::Install, fix a few inconsistencies.
+	- Change how _roles() is handled.
+	- change args to create()
+	- (sometime later) upload to Moose repo
+
+0.1       2007-12-16
+	- Initial release to private SVN.

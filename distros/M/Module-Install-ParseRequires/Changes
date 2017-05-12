@@ -1,0 +1,6 @@
+0.002 Thursday December 22 22:55:22 PST 2011:
+    - Change to Dist::Zilla
+    - Release with newer Module::Install
+
+0.001 Friday April 30 19:45:51 PDT 2010:
+    - Initial release

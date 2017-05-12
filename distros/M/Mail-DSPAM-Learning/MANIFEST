@@ -1,0 +1,23 @@
+bin/dspam-learn
+Build.PL
+Changes
+examples/mbox
+examples/dspam-learn-example
+examples/MyConfig.pm
+INSTALL
+lib/Mail/DSPAM/Learning.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/0-creation.t
+t/1-setMailBox.t
+t/2-askPassword.t
+t/3-parseMailbox.t
+t/4-settingConfig.t
+t/5-LoadingMyConfig.t
+t/6-ForwardMessages.t
+t/pod-coverage.t
+t/pod.t
+TODO
+META.yml

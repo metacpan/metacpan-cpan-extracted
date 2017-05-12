@@ -1,0 +1,12 @@
+#!/usr/bin/perl -w
+use strict;
+use Mac::Glue ':all';
+
+my $itunes = new Mac::Glue 'iTunes';
+print $itunes->obj(
+	track    => 1,
+	tracks   => whose(artist => equals => 'Johnny Cash'),
+	playlist => 1,
+)->play;
+
+__END__

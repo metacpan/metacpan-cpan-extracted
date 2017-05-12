@@ -1,0 +1,45 @@
+NAME
+    MooseX::DeclareX::Privacy - shiny syntax for MooseX::Privacy
+
+SYNOPSIS
+            class Person extends Mammal
+            {
+                    private method decide ($choices) {
+                            ...;
+                    }
+            }
+
+DESCRIPTION
+    This distribution adds three new plugins to MooseX::DeclareX.
+
+    `private method`
+        A method that can only be called from within this class.
+
+    `protected method`
+        A method that can be called from within this class, or from derived
+        classes.
+
+    `public method`
+        Essentially a no-op.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-DeclareX-Privacy>.
+
+SEE ALSO
+    MooseX::DeclareX, MooseX::Privacy.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

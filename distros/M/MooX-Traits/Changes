@@ -1,0 +1,32 @@
+MooX-Traits
+===========
+
+Created:      2014-05-24
+Home page:    <https://metacpan.org/release/MooX-Traits>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Traits>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.005	2014-09-16
+
+ [ Packaging ]
+ - Add link to #moose on IRC.
+ - Fix repo link.
+
+0.004	2014-05-29
+
+ [ Bug Fixes ]
+ - MooX::Traits::Util should also load UNIVERSAL::DOES.
+
+0.003	2014-05-29
+
+ [ Bug Fixes ]
+ - Load UNIVERSAL::DOES on Perls older than 5.10.
+
+0.002	2014-05-29
+
+ - Added: Bundle a MooX::Traits::Util module, broadly similar to
+   MooseX::Traits::Util.
+ - Added: Provide a `new_class_with_traits_one_by_one` function.
+   Torsten Raudssus++
+
+0.001	2014-05-25	Initial release

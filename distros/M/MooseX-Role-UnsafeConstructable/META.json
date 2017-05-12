@@ -1,0 +1,54 @@
+{
+   "abstract" : "construct an object without type-checks",
+   "author" : [
+      "Aaron Cohen <aarondcohen@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Role-UnsafeConstructable",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.06"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::MakeMaker::CPANfile" : "0",
+            "Moose" : "2.1206",
+            "Test::Most" : "0",
+            "namespace::autoclean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/aarondcohen/perl-moosex-role-unsafeconstructable/issues"
+      },
+      "homepage" : "http://github.com/aarondcohen/perl-moosex-role-unsafeconstructable",
+      "repository" : {
+         "url" : "git://github.com/aarondcohen/perl-moosex-role-unsafeconstructable.git"
+      }
+   },
+   "version" : "0.03"
+}

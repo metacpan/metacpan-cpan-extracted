@@ -1,0 +1,94 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Mojo::IRC::Server::Chinese - A Chinese IRC server base on Mojolicious
+
+=head1 SYNOPSIS
+
+    use Mojo::IRC::Server::Chinese;
+    my $server = Mojo::IRC::Server::Chinese->new(
+        host        =>  "0.0.0.0",
+        port        =>  6667,
+        log_level   =>  "debug",
+    );
+    $server->run();
+
+    #监听多个地址端口，使用listen参数
+    my $server = Mojo::IRC::Server::Chinese->new(
+        log_level   =>  "debug",
+        listen      => [
+            {host=>"0.0.0.0",port=>6667},
+            {host=>"0.0.0.0",port=>6668},
+        ],
+    );
+    $server->run();
+
+    #TLS加密支持
+    my $server = Mojo::IRC::Server::Chinese->new(
+        log_level   =>  "debug",
+        listen      => [
+            {host=>"0.0.0.0",port=>6667},
+            {host=>"0.0.0.0",port=>6697,tls=>1},
+        ],
+    );
+    $server->run();
+
+    #TLS更多详细参数使用说明参见 https://metacpan.org/pod/Mojo::IOLoop::Server#tls
+    tls                 #0|1 是否启用tls加密
+    tls_ca              #可选，本地ca证书路径 例如 /etc/tls/ca.crt
+    tls_cert            #可选，服务器证书路径，默认会生成一个测试证书
+    tls_ciphers         #可选，加密套件，例如 AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH
+    tls_key             #可选，服务器证书key文件路径
+    tls_verify          #可选，验证模式
+    tls_version         #可选，协议版本，例如 TLSv1_2
+
+    #登录验证支持
+    my $server = Mojo::IRC::Server::Chinese->new(
+        log_level   =>  "debug",
+        listen      => [
+            {host=>"0.0.0.0",port=>6667},
+            {host=>"0.0.0.0",port=>6668},
+        ],
+        auth        => sub{
+            my($nick,$user,$pass) = @_; #传递给验证函数的三个参数依次是 irc客户端的NICK/USER/PASS
+            if($nick eq '小灰'){#对于昵称"小灰"进行密码验证
+                return 0 if not defined $pass; #没有设置密码，验证失败
+                return 0 if $pass ne '123456'; #设置的密码不是 "123456" 验证失败
+                return 1; #验证成功，允许正常登录
+            }
+            else{return 1;}#对其他登录昵称不进行验证，全部允许登录
+        },
+    );
+    $server->run();
+    
+
+=head1 DESCRIPTION
+
+Mojo::IRC::Server::Chinese是一个基于Mojolicious框架的IRC服务器，采用异步事件驱动，纯中文支持（请使用UTF8编码）
+
+支持使用中文昵称、中文频道名称，不限制昵称长度，让该死的只能使用英文字符见鬼去吧，目前只实现了聊天相关的常用功能
+
+=head1 SEE ALSO
+
+L<https://github.com/sjdy521/Mojo-IRC-Server-Chinese>
+
+L<https://github.com/sjdy521/Mojo-Webqq>
+
+L<https://github.com/sjdy521/Mojo-Weixin>
+
+=head1 AUTHOR
+
+sjdy521, E<lt>sjdy521@163.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by sjdy521
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

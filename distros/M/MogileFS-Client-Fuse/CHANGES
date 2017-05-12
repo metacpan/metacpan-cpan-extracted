@@ -1,0 +1,20 @@
+2013-10-05: Release version 0.05
+
+	* add support for perl 5.8
+	* add timestamps to log messages
+	* add support for presenting MogileFS meta-data through xattr
+	* return actual free/total space for statfs call
+	* generate actual block size data for stat
+	* added a log option to allow logging of errors
+	* Separated buffered file flushing from fsync to allow flushing to happen without a full fsync
+	* Added support for a read-only option
+
+2012-03-12: Release version 0.03
+
+	* Improved performance of directory cache
+	* Fixed rename throwing an error even though it completed successfully
+	* Added additional documentation
+
+2012-02-18: Release version 0.02
+
+	* Initial release

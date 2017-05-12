@@ -1,0 +1,125 @@
+==================================================
+Changes from 2015-04-09 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.004 at 2016-04-08 13:36:26 +0000
+------------------------------------------
+
+  Change: 92f7398405c5958451a2f6cde14d7c49bb783e99
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-04-08 14:36:19 +0000
+
+    Update README 
+
+  Change: 91671fcc7da104669c1a446bf8db12b28f668ee5
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-04-08 12:22:09 +0000
+
+    Added session_id helper 
+
+------------------------------------------
+version 0.003 at 2016-04-08 10:01:05 +0000
+------------------------------------------
+
+  Change: e8f0b4ac05eefdcbfc0ed95cc3ea9882b019a342
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-04-08 11:01:05 +0000
+
+    Moved test 
+
+  Change: de6c62da39a771aef65b48ce53c33a02d6538c31
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-04-08 10:52:01 +0000
+
+    Added default_expiration to CHI storage 
+
+------------------------------------------
+version 0.002 at 2016-04-07 17:41:08 +0000
+------------------------------------------
+
+  Change: cdf6e7ada92d504f01adf528ee21cc5e5e9b0122
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-04-07 18:41:08 +0000
+
+    Fixed misnamed class 
+
+------------------------------------------
+version 0.001 at 2016-04-07 17:21:37 +0000
+------------------------------------------
+
+  Change: 91693f4103c748c4aa2b5c9eab0ec95cc953b93d
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-04-07 18:21:37 +0000
+
+    Better doc 
+
+  Change: e989a559e06ebc16a3f1561df3a6dcf0c5c4f40a
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-04-07 18:03:06 +0000
+
+    Shallow copy flash 
+
+  Change: 043c02f67f70119ad4b30c13975a794531c78508
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-04-07 16:39:46 +0000
+
+    Integration test of Storage::CHI. Testing flash 
+
+  Change: d5e029369b77af7413a137098f4ff94b028e0d2f
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-04-07 15:28:39 +0000
+
+    Tested session expiration 
+
+  Change: 50f1dd7150fd43bfe9a2737f8adf1075e17e4232
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-04-07 12:14:32 +0000
+
+    Added missing doc 
+
+  Change: c6a480f203e05b99a248437e98ae6610d031237a
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-04-07 12:10:48 +0000
+
+    Basic cookie + memory storage works 
+
+  Change: b5215bbcef7ad59f2bff8e93ca516b7def8bd120
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-04-06 12:53:04 +0000
+
+    Checked standard options are taken into account 
+
+  Change: e1e5b6479c9b7479e7f33bf9f29d2e061f557615
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-04-06 12:45:34 +0000
+
+    Default session mechanism works 
+
+  Change: 9db1a93da93554ae45053e8479fff27010e04307
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-04-06 11:04:50 +0000
+
+    Test! 
+
+  Change: c89bee184e2174c1f1c28902c2d832f116b0d920
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-04-05 12:37:58 +0000
+
+    Added cpanfile 
+
+  Change: 4a6103a1a5fea93e9effdfdc3a17a71ac608b3d0
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-04-05 12:24:34 +0000
+
+    Basic building 
+
+  Change: a14855ddcfbc05eb8a76b27de8a6dbb5e137b5ab
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-04-05 12:18:50 +0000
+
+    First commit 
+
+================
+End of releases.
+================

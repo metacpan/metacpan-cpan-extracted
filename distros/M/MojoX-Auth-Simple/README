@@ -1,0 +1,31 @@
+MojoX-Auth-Simple
+
+The aim of this mobule is to provide a framework to allow a simple                                                                
+authentication model for Mojolicious.                                                                                             
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc MojoX::Auth::Simple
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Kim Hawtin
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

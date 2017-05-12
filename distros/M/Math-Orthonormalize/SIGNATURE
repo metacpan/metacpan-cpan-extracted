@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.44.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f10331662dba9afda13538cc656f258e7a90e2da Build.PL
+SHA1 1f09566e3d113ea0f4e630703c06b2857d17e38f Changes
+SHA1 cbbd48a262d98227562386d703cbc94d43fb2e04 MANIFEST
+SHA1 96575df5ea0269efb0cb703e796354421958c95b META.yml
+SHA1 28339be08a234ed9f98bde774c746c8e06cf2c92 Makefile.PL
+SHA1 0654e2e614bf7612313ce977e4b07420d7cdf712 README
+SHA1 90cd3818c021cc35d2cfd94af88f2dfd764cd356 lib/Math/Orthonormalize.pm
+SHA1 bb0da54f2b3f2d7955baa41ee458cb3d1887f475 t/00pod.t
+SHA1 2db32c1aac44c2e41530ea63431166d91bd458bf t/00podcover.t
+SHA1 63f101f015b6f0ddba449272b7db48db052fb14a t/01scalarp.t
+SHA1 3a34962e0b2cd6db19754b385bc64b4153bde6de t/02normalize.t
+SHA1 85ab7146c9664e6b31e45bfeb1b602b4a5708c41 t/03scale.t
+SHA1 b5e931aef2188ac235149f5924a01f284f75ae5e t/04orthogonalize.t
+SHA1 3e6c6e42414d8c9b0f7d9201b49758ace05597b0 t/05orthonormalize.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.0 (GNU/Linux)
+
+iD8DBQFDRWWVZCuimE51gxcRAnbmAJ903+vbiizzuguwW0l5LWdw4NIvRgCeOgbR
+zQ17WyLFGHYe5+bA1GGCTC8=
+=3fMM
+-----END PGP SIGNATURE-----

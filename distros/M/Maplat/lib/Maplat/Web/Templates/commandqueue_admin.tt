@@ -1,0 +1,119 @@
+<p align="center">
+    <table class="data" id="MainDataTable">
+        <tr class="tabheader">
+                <th>ID</th>
+                <th>[% tr.tr("Planned Starttime") %]</th>
+                <th>[% tr.tr("Command") %]</th>
+                <th>[% tr.tr("Arguments") %]</th>
+                <th>[% tr.tr("Queue Time") %]</th>
+                <th>[% tr.tr("Worker") %]</th>
+                <th></th>
+        </tr>
+        [% FOREACH command IN commands %]
+            <form name="command_[% command.id %]" method="post" action="[% webpath %]">
+                <tr>
+                    <td>[% command.id %]</td>
+                    <td>[% command.starttime %]</td>
+                    [% IF command.class  %]
+                        <td class="[% command.class %]">
+                    [% ELSE %]
+                        <td>
+                    [% END %]
+                        [% command.name %]</td>
+                    <td>[% command.args %]</td>
+                    <td>[% command.time %]</td>
+                    <td>[% command.worker %]</td>
+                    <td valign="center">
+                        <input type="hidden" name="command" value="[% command.id %]">
+                        <input type="hidden" name="submitform" value="1">
+                        <input type="hidden" name="mode" value="deletecommand">
+                        <input type="submit" value="[% tr.tr("Delete") %]">
+                    </td>
+                </tr>
+            </form>
+        [% END %]
+    </table>
+</p>
+
+[% IF statustext %]
+    <p align="center">
+        <table class="data">
+            <tr>
+                <td colspan="2">&nbsp;</td>
+            </tr>
+            <tr class="tabheader">
+                <th colspan="2">
+                    <div class="infotext">[% tr.tr("Status") %]</div>
+                </th>
+            </tr>
+            <tr class="odd">
+                <th colspan="2">
+                    <div class="[% statuscolor %]">[% tr.tr(statustext) %]</div>
+                </th>
+            </tr>
+        </table>
+    </p>
+[% END %]
+
+<p align="center">
+    <table class="data" id="HelperTable1">
+        <tr class="tabmasterheader">
+            <th colspan="4">
+                [% tr.tr("Admin commands") %]
+            </th>
+        </tr>
+        <tr class="tabheader">
+            <th>[% tr.tr("Command") %]</th>
+            <th>[% tr.tr("Argument(s)") %]</th>
+            <th>[% tr.tr("Starttime") %]</th>
+            <th></th>
+        </tr>
+    [% FOREACH command IN admincommands %]
+    <form name="admincommand_[% command.name %]" method="post" action="[% webpath %]">
+        <tr>
+            <td>
+                [% command.name %]
+                <input type="hidden" name="command" value="[% command.name %]"
+            </td>
+            [% IF command.type == 'simple' %]
+                <td></td>
+            [% ELSIF command.type == 'alllines' %]
+                <td>*</td>
+            [% ELSIF command.type == 'prodline' %]
+                <td>
+                    <select name="prodline">
+                        [% FOREACH Prodline IN Prodlines %]
+                            <option value="[% Prodline.line_id %]">[% Prodline.line_id %]</option>
+                        [% END %]
+                    </select>
+                </td>
+            [% ELSIF command.type == 'table' %]
+                <td>
+                    <select name="tablename">
+                        [% FOREACH Table IN Tables %]
+                            <option value="[% Table.tablename %]">[% Table.tablename %]</option>
+                        [% END %]
+                    </select>
+                </td>
+            [% ELSIF command.type == 'report' %]
+                <td>
+                    <select name="reciever">
+                        [% FOREACH Reciever IN Recievers %]
+                            <option value="[% Reciever %]">[% Reciever %]</option>
+                        [% END %]
+                    </select>
+                </td>
+            [% ELSE %]
+                <td>error not implemented: [% command.type %]</td>
+            [% END %]
+            <td><input type="text" name="starttime" maxLength="40" size="30" value=""></td>
+            <td>
+                <input type="hidden" name="submitform" value="1">
+                <input type="hidden" name="mode" value="schedulecommand">
+                <input type="submit" value="Schedule"
+            </td>
+        </tr>
+    </form>
+    [% END %]
+</p>
+

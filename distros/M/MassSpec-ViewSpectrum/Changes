@@ -1,0 +1,26 @@
+Revision history for Perl extension MassSpec::ViewSpectrum.
+
+0.01  Mon Jan 10 15:14:24 2005
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n MassSpec::ViewSpectrum
+0.02  Mon Jan 24 15:14:24 2005
+	- cleaned up documentation, documented options, modified colors and
+		annotation scheme, centered x-axis title, fixed y annotation
+		label offsets, modified x-axis size computation and shortened 
+		x-axis numeric labels
+0.03  Mon Jan 25 15:14:24 2005
+	- added title & extranegativeheight options, adjust x-axis size
+		computation, set fonts for axis labels, permitted negative
+		peak intensities ("pseudospectra")
+0.04  Fri Jan 29 15:14:24 2005
+	- permit suppression of annotations selected peaks labelled with
+		a leading '@'.  Note that when this option is selected, those
+		peaks are still colored according to their annotations.
+0.05  Thu Feb 10 22:14:24 2005
+	- process annotations pattern-matching in a prescribed order rather
+		than according to arbitrary Perl hash ordering, make peak
+		font sizes configurable, adjust axes labels and numbering,
+		preliminary support for "hotspots" suitable for Javascript
+		mouseovers; added simple PNG/JPEG/GIF test suite
+
+

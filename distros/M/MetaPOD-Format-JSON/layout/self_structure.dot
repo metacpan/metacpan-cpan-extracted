@@ -1,0 +1,33 @@
+strict digraph Perl {
+	graph [overlap=false, rankdir=LR, ranksep=5, splines=spline];
+	node [label="\N", shape=record, style=dotted];
+	edge [minlen=1];
+	subgraph cluster_1 {
+		graph [label="MetaPOD::",
+			rank=min];
+		subgraph cluster_2 {
+			graph [label="MetaPOD::Format::JSON::"];
+			"MetaPOD::Format::JSON::Decoder::v1" [label="MetaPOD::Format::JSON::Decoder::v1", shape=Mrecord, style=solid, color="#15b01a", fontsize=7, height="0.1"];
+			"MetaPOD::Format::JSON::PostCheck::v1" [label="MetaPOD::Format::JSON::PostCheck::v1", shape=Mrecord, style=solid, color="#15b01a", fontsize=7, height="0.1"];
+			"MetaPOD::Format::JSON::does::v1" [label="MetaPOD::Format::JSON::does::v1", shape=Mrecord, style=solid, color="#15b01a", fontsize=7, height="0.1"];
+			"MetaPOD::Format::JSON::inherits::v1" [label="MetaPOD::Format::JSON::inherits::v1", shape=Mrecord, style=solid, color="#15b01a", fontsize=7, height="0.1"];
+			"MetaPOD::Format::JSON::interface::v1_1" [label="MetaPOD::Format::JSON::interface::v1_1", shape=Mrecord, style=solid, color="#15b01a", fontsize=7, height="0.1"];
+			"MetaPOD::Format::JSON::namespace::v1" [label="MetaPOD::Format::JSON::namespace::v1", shape=Mrecord, style=solid, color="#15b01a", fontsize=7, height="0.1"];
+			"MetaPOD::Format::JSON::v1" [label="MetaPOD::Format::JSON::v1", shape=Mrecord, style=solid, color="#0343df", fontsize=7, height="0.1"];
+			"MetaPOD::Format::JSON::v1_1" [label="MetaPOD::Format::JSON::v1_1", shape=Mrecord, style=solid, color="#0343df", fontsize=7, height="0.1"];
+			"MetaPOD::Format::JSON::Decoder::v1" -> "MetaPOD::Format::JSON::v1" [arrowhead=vee, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, tailclip=1, weight=5];
+			"MetaPOD::Format::JSON::PostCheck::v1" -> "MetaPOD::Format::JSON::v1" [arrowhead=vee, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, tailclip=1, weight=5];
+			"MetaPOD::Format::JSON::does::v1" -> "MetaPOD::Format::JSON::v1" [arrowhead=vee, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, tailclip=1, weight=5];
+			"MetaPOD::Format::JSON::inherits::v1" -> "MetaPOD::Format::JSON::v1" [arrowhead=vee, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, tailclip=1, weight=5];
+			"MetaPOD::Format::JSON::namespace::v1" -> "MetaPOD::Format::JSON::v1" [arrowhead=vee, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, tailclip=1, weight=5];
+			"MetaPOD::Format::JSON::v1" -> "MetaPOD::Format::JSON::v1_1" [arrowhead=vee, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, tailclip=1, weight=10];
+			"MetaPOD::Format::JSON::interface::v1_1" -> "MetaPOD::Format::JSON::v1_1" [arrowhead=vee, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, tailclip=1, weight=5];
+		}
+		"MetaPOD::Format::JSON" [label="MetaPOD::Format::JSON", shape=Mrecord, style=solid, color="#0343df", fontsize=7, height="0.1"];
+		"MetaPOD::Role::Format" [label="MetaPOD::Role::Format"];
+		"MetaPOD::Role::Format" -> "MetaPOD::Format::JSON" [arrowhead=vee, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, tailclip=1, weight=5];
+	}
+	"Moo::Object" [label="Moo::Object"];
+	"Moo::Object" -> "MetaPOD::Format::JSON" [arrowhead=vee, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, tailclip=1, weight=10];
+	"Moo::Object" -> "MetaPOD::Format::JSON::v1" [arrowhead=vee, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, tailclip=1, weight=10];
+}

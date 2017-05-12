@@ -1,0 +1,7 @@
+Revision history for MooseX::Types::Ro
+
+0.002 - 2010-01-28
+    - Add missing namespace::autoclean prereq
+
+0.001 - 2010-01-26
+    - Initial release.

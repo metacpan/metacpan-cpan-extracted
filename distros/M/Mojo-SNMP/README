@@ -1,0 +1,274 @@
+NAME
+    Mojo::SNMP - Run SNMP requests with Mojo::IOLoop
+
+VERSION
+    0.12
+
+SYNOPSIS
+      use Mojo::SNMP;
+      my $snmp = Mojo::SNMP->new;
+      my @response;
+
+      $snmp->on(response => sub {
+        my($snmp, $session, $args) = @_;
+        warn "Got response from $args->{hostname} on $args->{method}(@{$args->{request}})...\n";
+        push @response, $session->var_bind_list;
+      });
+
+      $snmp->defaults({
+        community => 'public', # v1, v2c
+        username => 'foo', # v3
+        version => 'v2c', # v1, v2c or v3
+      });
+
+      $snmp->prepare('127.0.0.1', get_next => ['1.3.6.1.2.1.1.3.0']);
+      $snmp->prepare('localhost', { version => 'v3' }, get => ['1.3.6.1.2.1.1.3.0']);
+
+      # start the IOLoop unless it is already running
+      $snmp->wait unless $snmp->ioloop->is_running;
+
+DESCRIPTION
+    You should use this module if you need to fetch data from many SNMP
+    servers really fast. The module does its best to not get in your way,
+    but rather provide a simple API which allow you to extract information
+    from multiple servers at the same time.
+
+    This module use Net::SNMP and Mojo::IOLoop to fetch data from hosts
+    asynchronous. It does this by using a custom dispatcher,
+    Mojo::SNMP::Dispatcher, which attach the sockets created by Net::SNMP
+    directly into the ioloop reactor.
+
+    If you want greater speed, you should check out Net::SNMP::XS and make
+    sure Mojo::Reactor::EV is able to load.
+
+    Mojo::SNMP is supposed to be a replacement for a module I wrote earlier,
+    called SNMP::Effective. Reason for the rewrite is that I'm using the
+    framework Mojolicious which includes an awesome IO loop which allow me
+    to do cool stuff inside my web server.
+
+CUSTOM SNMP REQUEST METHODS
+    Net::SNMP provide methods to retrieve data from the SNMP agent, such as
+    get_next(). It is possible to add custom methods if you find yourself
+    doing the same complicated logic over and over again. Such methods can
+    be added using "add_custom_request_method".
+
+    There are two custom methods bundled to this package:
+
+    *   bulk_walk
+
+        This method will run "get_bulk_request" until it receives an oid
+        which does not match the base OID. maxrepetitions is set to 10 by
+        default, but could be overrided by maxrepetitions inside %args.
+
+        Example:
+
+          $self->prepare('192.168.0.1' => { maxrepetitions => 25 }, bulk_walk => [$oid, ...]);
+
+    *   walk
+
+        This method will run "get_next_request" until the next oid retrieved
+        does not match the base OID or if the tree is exhausted.
+
+EVENTS
+  error
+      $self->on(error => sub {
+        my($self, $str, $session, $args) = @_;
+      });
+
+    Emitted on errors which may occur. $session is set if the error is a
+    result of a Net::SNMP method, such as get_request().
+
+    See "response" for $args description.
+
+  finish
+      $self->on(finish => sub {
+        my $self = shift;
+      });
+
+    Emitted when all hosts have completed.
+
+  response
+      $self->on(response => sub {
+        my($self, $session, $args) = @_;
+      });
+
+    Called each time a host responds. The $session is the current Net::SNMP
+    object. $args is a hash ref with the arguments given to "prepare", with
+    some additional information:
+
+      {
+        method => $str, # get, get_next, ...
+        request => [$oid, ...],
+        # ...
+      }
+
+  timeout
+      $self->on(timeout => sub {
+        my $self = shift;
+      })
+
+    Emitted if wait has been running for more than "master_timeout" seconds.
+
+ATTRIBUTES
+  concurrent
+    How many hosts to fetch data from at once. Default is 20. (The default
+    may change in later versions)
+
+  defaults
+    This attribute holds a hash ref with default arguments which will be
+    passed on to "session" in Net::SNMP. User-submitted %args will be merged
+    with the defaults before being submitted to "prepare". "prepare()" will
+    filter out and ignore arguments that don't work for the SNMP "version".
+
+    NOTE: SNMP version will default to "v2c".
+
+  master_timeout
+    How long to run in total before timeout. Note: This is NOT per host but
+    for the complete run. Default is 0, meaning run for as long as you have
+    to.
+
+  ioloop
+    Holds an instance of Mojo::IOLoop.
+
+METHODS
+  add_custom_request_method
+      $self->add_custom_request_method(name => sub {
+        my($session, %args) = @_;
+        # do custom stuff..
+      });
+
+    This method can be used to add custom Net::SNMP request methods. See the
+    source code for an example on how to do "walk".
+
+    NOTE: This method will also replace any method, meaning the code below
+    will call the custom callback instead of "get_next_request" in
+    Net::SNMP.
+
+      $self->add_custom_request_method(get_next => $custom_callback);
+
+  get
+      $self->get($host, $args, \@oids, sub {
+        my($self, $err, $res) = @_;
+        # ...
+      });
+
+    Will call the callback when data is retrieved, instead of emitting the
+    "response" event.
+
+  get_bulk
+      $self->get_bulk($host, $args, \@oids, sub {
+        my($self, $err, $res) = @_;
+        # ...
+      });
+
+    Will call the callback when data is retrieved, instead of emitting the
+    "response" event. $args is optional.
+
+  get_next
+      $self->get_next($host, $args, \@oids, sub {
+        my($self, $err, $res) = @_;
+        # ...
+      });
+
+    Will call the callback when data is retrieved, instead of emitting the
+    "response" event. $args is optional.
+
+  prepare
+      $self = $self->prepare($host, \%args, ...);
+      $self = $self->prepare(\@hosts, \%args, ...);
+      $self = $self->prepare(\@hosts, ...);
+      $self = $self->prepare('*' => ...);
+
+    *   $host
+
+        This can either be an array ref or a single host. The "host" can be
+        whatever "session" in Net::SNMP can handle; generally a hostname or
+        IP address.
+
+    *   \%args
+
+        A hash ref of options which will be passed directly to "session" in
+        Net::SNMP. This argument is optional. See also "defaults".
+
+    *   dot-dot-dot
+
+        A list of key-value pairs of SNMP operations and bindlists which
+        will be given to "prepare". The operations are the same as the
+        method names available in Net::SNMP, but without "_request" at end:
+
+          get
+          get_next
+          set
+          get_bulk
+          inform
+          walk
+          bulk_walk
+          ...
+
+        The special hostname "*" will apply the given operation to all
+        previously defined hosts.
+
+    Examples:
+
+      $self->prepare('192.168.0.1' => { version => 'v2c' }, get_next => [$oid, ...]);
+      $self->prepare('192.168.0.1' => { version => 'v3' }, get => [$oid, ...]);
+      $self->prepare(localhost => set => [ $oid => OCTET_STRING, $value, ... ]);
+      $self->prepare('*' => get => [ $oid ... ]);
+
+    Note: To get the "OCTET_STRING" constant and friends you need to do:
+
+      use Net::SNMP ':asn1';
+
+  set
+      $self->set($host, $args => [ $oid => OCTET_STRING, $value, ... ], sub {
+        my($self, $err, $res) = @_;
+        # ...
+      });
+
+    Will call the callback when data is set, instead of emitting the
+    "response" event. $args is optional.
+
+  walk
+      $self->walk($host, $args, \@oids, sub {
+        my($self, $err, $res) = @_;
+        # ...
+      });
+
+    Will call the callback when data is retrieved, instead of emitting the
+    "response" event. $args is optional.
+
+  bulk_walk
+      $self->bulk_walk($host, $args, \@oids, sub {
+        my($self, $err, $res) = @_;
+        # ...
+      });
+
+    Will call the callback when data is retrieved, instead of emitting the
+    "response" event. $args is optional.
+
+  wait
+    This is useful if you want to block your code: "wait()" starts the
+    ioloop and runs until "timeout" or "finish" is reached.
+
+      my $snmp = Mojo::SNMP->new;
+      $snmp->prepare(...)->wait; # blocks while retrieving data
+      # ... your program continues after the SNMP operations have finished.
+
+AUTHOR
+    Jan Henning Thorsen - "jhthorsen@cpan.org"
+
+CONTRIBUTORS
+    Espen Tallaksen - "espen.tallaksen@telenor.com"
+
+    Joshua Keroes - "joshua.keroes@integratelecom.com"
+
+    Oliver Gorwits - "oliver@cpan.org"
+
+    Per Carlson - "per.carlson@broadnet.no"
+
+COPYRIGHT & LICENSE
+    Copyright (C) 2012-2016, "AUTHOR" and "CONTRIBUTORS".
+
+    This library is free software. You can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

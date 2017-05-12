@@ -1,0 +1,20 @@
+Changelog for Module-Install-AutoLicense
+========================================
+
+0.10  Fri Feb 17 13:22:59 GMT 2017
+  - Handle perls without dot in @INC correctly
+
+0.08  Fri Apr 30 15:29:09 BST 2010
+  - Missed a test when making the parallel test
+    execution work.
+
+0.06  Thu Apr 29 12:43:47 BST 2010
+  - tests should be capable of parallel execution now
+    reported by Florian Ragwitz RT #56981
+
+0.04  Tue Apr 20 10:52:56 BST 2010
+  - $self->author is an array, so we
+    need to join the elements to make a string.
+
+0.02	Fri May  1 11:16:13 BST 2009
+	- Initial CPAN release

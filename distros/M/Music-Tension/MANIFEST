@@ -1,0 +1,20 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+eg/calc-forte-tensions
+eg/compare-tensions
+eg/fit-tensions
+eg/gen-pl-nums
+lib/Music/Tension.pm
+lib/Music/Tension/Cope.pm
+lib/Music/Tension/PlompLevelt.pm
+t/00-load.t
+t/Music-Tension-Cope.t
+t/Music-Tension-PlompLevelt.t
+t/Music-Tension.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

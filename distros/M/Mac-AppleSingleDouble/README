@@ -1,0 +1,194 @@
+NAME
+    Mac::AppleSingleDouble - Read Mac files in AppleSingle or
+    AppleDouble format.
+
+SYNOPSIS
+     use Mac::AppleSingleDouble;
+     $foo = new Mac::AppleSingleDouble(shift);
+     $finder_info = $foo->get_finder_info();
+     print "The file Type is: $finder_info->{'Type'}\n";
+     print "The file Creator is: $finder_info->{'Creator'}\n";
+     print "The Finder label color is: $finder_info->{'LabelColor'}\n";
+     $foo->close();
+
+REQUIRES
+    Perl5 (tested with 5.005_03; may work with older versions of
+    Perl 5), the FileHandle module.
+
+EXPORTS
+    Nothing.
+
+DESCRIPTION
+    Mac::AppleSingleDouble is a class which knows how to decode the
+    AppleSingle and AppleDouble file formats. An instance of
+    Mac::AppleSingleDouble represents one file on disk.
+
+    The structure of Macintosh files is unlike the structure of
+    files on non-Macintosh operating systems. Most operating systems
+    represent a file as a filename (with the file type appended as a
+    suffix), a few attribute bits, and a single chunk of data.
+    Macintosh files consist of a filename, attribute bits, a four-
+    character file type code ('TEXT', 'APPL', 'JPEG', 'PDF ', etc.),
+    a four-character file creator code ('MSWD' for Microsoft Word,
+    '8BIM' for Photoshop, 'SIT!' for StuffIt, etc.), a chunk of
+    unstructured data called the "Data Fork", and a chunk of
+    structured data called the "Resource Fork". In order to store
+    Macintosh files on other computers, some form of encoding must
+    be used or the resource and attribute information will be lost
+    (which is OK in some cases). MacBinary, BinHex, and AppleSingle
+    all encode the original Mac file in a single chunk of data
+    suitable for export to other operating systems. AppleDouble
+    encodes all the Mac-only data in one file, but leaves the chunk
+    of unstructured data in a separate file all by itself, which
+    allows non-Mac-aware programs to read the unstructured data with
+    no decoding step. AppleSingle and AppleDouble were originally
+    developed for A/UX (an Apple Unix flavor discontinued long ago),
+    and are used by netatalk (an AppleShare file server for Unix
+    servers and Mac clients).
+
+    If you are working Mac files on a Mac (presumably with MacPerl),
+    you probably do NOT need this class. If you are working with Mac
+    files on a non-Mac, the files may be encoded in AppleSingle or
+    AppleDouble format, and this class can be useful if you need to
+    get at the Mac file attributes such as the Finder label, the
+    type and creator codes, or the IsInvisible bit.
+
+    See the "AppleSingle/AppleDouble Formats for Foreign Files
+    Developer's Note" and the book "Inside Macintosh: Finder
+    Interface" from Apple Computer, Inc for more details on the
+    formats themselves.
+
+METHODS
+  Creation
+
+    $applefile = new Mac::AppleSingleDouble($filename)
+        Creates a new Mac::AppleSingleDouble object to represent the
+        file named in $filename.
+
+  Cleanup
+
+    $applefile->close()
+        Closes the underlying AppleSingle or AppleDouble file.
+
+  Access
+
+    $applefile->get_finder_info()
+        Returns a hash containing Finder information decoded from
+        the FInfo and FXInfo data structures.
+
+    $applefile->get_entry($id)
+        Returns the raw binary data of an entry, given its ID. Types
+        defined by Apple are: 1: Data Fork 2: Resource Fork 3: Real
+        Name 4: Comment 5: Icon, B&W 6: Icon, Color 8: File Dates
+        Info 9: Finder Info 10: Macintosh File Info 11: ProDOS File
+        Info 12: MS-DOS File Info 13: Short Name 14: AFP File Info
+        15: Directory ID
+
+    $applefile->get_file_format()
+        Returns 'AppleSingle', 'AppleDouble', or 'Plain' based on
+        the "magic number" found at the beginning of the file.
+        (0x00051600 is AppleSingle, 0x00051607 is AppleDouble, and
+        anything else is Plain.)
+
+    $applefile->is_applesingle()
+        Returns 1 if the file format is AppleSingle. See
+        get_file_format().
+
+    $applefile->is_appledouble()
+        Returns 1 if the file format is AppleDouble. See
+        get_file_format().
+
+    $applefile->get_entry_descriptors()
+        Returns a hash with entry IDs as keys, and hash references
+        as values. The references hashes contain three keys:
+        EntryID, Offset, and Length. Offset is the offset from the
+        start of the file to the entry data, and Length is the
+        length of the data, both in bytes. (There are higher-level
+        methods to access entry data so most users will not need to
+        call this method.)
+
+    $applefile->get_all_entries()
+        Returns a hash with entry IDs as keys, and raw entry data as
+        values. All entry IDs found in the file will be returned.
+
+    $applefile->dump()
+        Dump a formatted ASCII representation of the contents of the
+        AppleSingle or AppleDouble file to STDOUT.
+
+    $applefile->dump_header()
+        Dump the filename and file size and header information to
+        STDOUT. The header information includes: magic number,
+        format version number, and all entry descriptors (entry ID,
+        offset, and length of each).
+
+    $applefile->dump_entries()
+        Print a hex dump of the entry data for all entries in the
+        file to STDOUT.
+
+    $applefile->dump_entry($id)
+        Print a hex dump of the entry data for the specified id to
+        STDOUT.
+
+  Configuration
+
+    $applefile->set_labelnames(%new_labelnames)
+        Given a hash with keys 0 through 7 and string values, change
+        the values corresponding to the LabelName key in the hash
+        returned by get_finder_info(). Note that 0 should always be
+        'None' since it cannot be changed in the Finder, and the
+        menu in the Finder lists labels in descending order
+        (starting with 7 and counting down to 1).
+
+    $applefile->set_labelcolors(%new_labelcolors)
+        Given a hash with keys 0 through 7 and string values, change
+        the values corresponding to the LabelColors key in the hash
+        returned by get_finder_info(). Note that 0 should always be
+        'Black' or 'None' since it cannot be changed in the Finder,
+        and the menu in the Finder lists labels in descending order
+        (starting with 7 and counting down to 1).
+
+    $applefile->preload_entire_file()
+        Loads all the entry data from the file into memory and
+        closes the underlying file.
+
+    $applefile->cache_entries()
+        Causes subsequent entry data accesses to be cached in memory
+        in the object.
+
+DIAGNOSTICS
+    The constructor (new) requires a filename as an argument!
+        (F) The constructor (new Mac::AppleSingleDouble($filename))
+        was called but the required filename argument was not
+        defined. The path to the AppleSingle or AppleDouble file to
+        be examined must be passed to the constructor.
+
+    File '/usr/bin/perl' is not in AppleSingle or AppleDouble format!
+        (F) The file was readable but did not start with the "magic
+        number" denoting AppleSingle or AppleDouble format.
+
+    '..' is not a file!
+        (F) The filename specified in the constructor does not point
+        to a file.
+
+BUGS
+    The AppleSingle and AppleDouble formats come in two versions - 1
+    and 2. I was unable to find documentation for version 1 -
+    supposedly there is a manual called "A/UX Toolbox: Macintosh ROM
+    Interface", but I was unable to find it. However, netatalk uses
+    version 1. So, this class was coded using the version 2
+    specification but it was tested on version 1 files written by
+    netatalk. Entry ID 7 appears in version 1 files but I have no
+    idea what it means. However, it seems to work...
+
+RESTRICTIONS
+    This module can read AppleSingle and AppleDouble files, but it
+    cannot create or modify them. It's not worth my time to change
+    it so that it can (testing it thoroughly with other programs
+    which use the files would be very time consuming), so I probably
+    won't do it. If you want to make that enhancement and send your
+    changes to me, I would be happy to integrate them into a new
+    version and to give you credit for your work.
+
+AUTHOR
+    Jamie Flournoy, jamie@white-mountain.org
+

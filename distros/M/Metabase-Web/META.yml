@@ -1,0 +1,33 @@
+---
+abstract: 'the Metabase web service'
+author:
+  - '=over '
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Metabase::Client::Simple: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.88'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Metabase::Web
+name: Metabase-Web
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+    - xt
+requires:
+  Catalyst::Controller::REST: 0
+  Catalyst::Plugin::ConfigLoader: 0
+  Catalyst::Runtime: 5.8
+  Data::GUID: 0
+  JSON: 2
+  Metabase: 0.001
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.001

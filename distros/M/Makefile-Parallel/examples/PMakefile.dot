@@ -1,0 +1,93 @@
+digraph natools {
+        rotate = 90;
+        rankdir = LR;
+
+	node [shape=box];
+
+	codify [label="Codify\n10:00"];
+
+	initmat01 [label="InitMat01\n31:10"];
+	initmat02 [label="InitMat01\n28:20"];
+	initmat03 [label="InitMat01\n30:30"];
+	initmat04 [label="InitMat01\n33:10"];
+	initmat05 [label="InitMat01\n29:30"];
+	initmat06 [label="InitMat01\n35:20"];
+
+	ngramsA [label="nGrams A\n5:00:01"];	
+	ngramsB [label="nGrams B\n5:10:31"];
+
+
+	ipfp01 [label="ipfp 01\n1:01:03"];
+	ipfp02 [label="ipfp 01\n1:10:03"];
+	ipfp03 [label="ipfp 01\n1:01:30"];
+	ipfp04 [label="ipfp 01\n1:10:30"];
+	ipfp05 [label="ipfp 01\n1:03:03"];
+	ipfp06 [label="ipfp 01\n1:06:04"];
+
+	postipfp01 [label="postIpfp 01\n1:30"];	
+	postipfp02 [label="postIpfp 02\n1:20"];
+	postipfp03 [label="postIpfp 03\n1:50"];
+	postipfp04 [label="postIpfp 04\n1:37"];
+	postipfp05 [label="postIpfp 05\n1:31"];
+	postipfp06 [label="postIpfp 06\n1:01"];
+	
+	postbin01 [label="postBin 01\n1:00"];
+	postbin02 [label="postBin 02\n1:01"];
+	postbin03 [label="postBin 03\n1:10"];
+	postbin04 [label="postBin 04\n1:31"];
+	postbin05 [label="postBin 05\n1:03"];
+	postbin06 [label="postBin 06\n1:53"];
+
+	dicA [label="dic A\n4:00"];
+	dicB [label="dic B\n3:00"];
+
+	dump [label="dump\n10"];	
+
+	codify -> initmat01;
+	codify -> initmat02;
+	codify -> initmat03;
+	codify -> initmat04;
+	codify -> initmat05;
+	codify -> initmat06;
+
+	codify -> ngramsA;
+	codify -> ngramsB;
+
+        initmat01 -> ipfp01;
+        initmat02 -> ipfp02;
+        initmat03 -> ipfp03;
+        initmat04 -> ipfp04;
+        initmat05 -> ipfp05;
+        initmat06 -> ipfp06;
+
+        ipfp01 -> postipfp01;
+        ipfp02 -> postipfp02;
+        ipfp03 -> postipfp03;
+        ipfp04 -> postipfp04;
+        ipfp05 -> postipfp05;
+        ipfp06 -> postipfp06;
+
+        postipfp01 -> postbin01;
+        postipfp02 -> postbin02;
+        postipfp03 -> postbin03;
+        postipfp04 -> postbin04;
+        postipfp05 -> postbin05;
+        postipfp06 -> postbin06;
+
+        postbin01 -> dicA;
+        postbin02 -> dicA;
+        postbin03 -> dicA;
+        postbin04 -> dicA;
+        postbin05 -> dicA;
+        postbin06 -> dicA;
+
+        postbin01 -> dicB;
+        postbin02 -> dicB;
+        postbin03 -> dicB;
+        postbin04 -> dicB;
+        postbin05 -> dicB;
+        postbin06 -> dicB;
+
+        dicA -> dump;
+        dicB -> dump;
+}

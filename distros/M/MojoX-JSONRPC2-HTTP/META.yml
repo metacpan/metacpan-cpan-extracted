@@ -1,0 +1,47 @@
+---
+abstract: 'Client for JSON RPC 2.0 over HTTP'
+author:
+  - 'Alex Efros <powerman@cpan.org>'
+build_requires:
+  JSON::RPC2::Server: '0'
+  Mojolicious::Lite: '0'
+  Mojolicious::Plugin::JSONRPC2: v1.1.1
+  Test::Exception: '0'
+  Test::Mojo: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MojoX-JSONRPC2-HTTP
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  MojoX::JSONRPC2::HTTP:
+    file: lib/MojoX/JSONRPC2/HTTP.pm
+    version: v2.0.1
+requires:
+  JSON::RPC2: v1.0.0
+  JSON::RPC2::Client: '0'
+  JSON::XS: '0'
+  Mojo::Base: '0'
+  Mojo::UserAgent: '0'
+  Mojolicious: '7.13'
+  Scalar::Util: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/powerman/perl-MojoX-JSONRPC2-HTTP/issues
+  homepage: https://github.com/powerman/perl-MojoX-JSONRPC2-HTTP
+  repository: https://github.com/powerman/perl-MojoX-JSONRPC2-HTTP.git
+version: v2.0.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

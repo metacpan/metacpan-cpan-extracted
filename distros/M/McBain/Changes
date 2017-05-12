@@ -1,0 +1,40 @@
+Revision history for McBain
+
+2.001000  2015-01-05 20:29:00+02:00 Asia/Jerusalem
+	- Improvement: in contextual mode, if McBain doesn't find a context class under
+	  the root package, it will go up the package hierarchy until it finds one. For
+	  example, if the root package is Some::API, then McBain will try Some::API::Context,
+	  then Some::Context, then finally Context. This was added to allow the sharing of
+	  the same context class in a project comprised of several APIs.
+
+2.000002  2014-08-19 19:23:26+03:00 Asia/Jerusalem
+	- Bugfix _break_path
+
+2.000001  2014-08-19 19:05:15+03:00 Asia/Jerusalem
+	- Small documentation bugfix
+
+2.000000  2014-08-19 18:54:35+03:00 Asia/Jerusalem
+	- Changed the way runner modules are used. The MCBAIN_WITH environment
+	  variable is no longer used. Instead, the name of the runner module is
+	  passed when loading the API. See README for more details.
+
+1.003000  2014-08-03 20:29:20+03:00 Asia/Jerusalem
+	- Added support for pre routes and post routes, see README
+	  for details
+
+1.002000  2014-07-28 23:46:31+03:00 Asia/Jerusalem
+	- Added support for a new, "contextual" mode, see README
+	  for details
+	- Fixed yet another bug with _find_root returning the
+	  wrong package in certain situations
+
+1.001001  2014-01-28 21:34:46 Asia/Jerusalem
+	- Fixed bug with _find_root returning the wrong package
+	  when the API doesn't start at a root package
+
+1.001000  2013-12-20 15:17:23 Asia/Jerusalem
+	- Added support for OPTIONS requests
+	- Documentation fixes
+
+1.000000  2013-12-19 00:51:35 Asia/Jerusalem
+	- First public release

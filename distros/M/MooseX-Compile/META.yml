@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                MooseX-Compile
+version:             0.01
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Class::Inspector:              0
+    Data::Dump:                    0
+    Data::Visitor:                 0.15
+    Devel::INC::Sorted:            0
+    Moose:                         0.34
+    PadWalker:                     0
+    Test::use::ok:                 0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

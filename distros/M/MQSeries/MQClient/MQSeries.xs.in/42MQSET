@@ -1,0 +1,165 @@
+# -*-c-*-
+#
+# $Id: 42MQSET,v 33.6 2012/09/26 16:10:06 jettisu Exp $
+#
+# (c) 1999-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+
+void
+MQSET(Hconn,Hobj,CompCode,Reason,...)
+        MQHCONN   Hconn
+        MQHOBJ    Hobj
+        MQLONG    CompCode = NO_INIT
+        MQLONG    Reason = NO_INIT
+
+    PREINIT:
+        long      numArgs = 0L;
+        MQLONG    SelectorCount = 0L;
+        PMQLONG   pSelectors = 0L;
+        MQLONG    IntAttrCount = 0L;
+        PMQLONG   pIntAttrs = 0L;
+        MQLONG    CharAttrLength = 0;
+        PMQCHAR   pCharAttrs = 0L;
+        SV       *tempSV = (SV *)0;
+        MQLONG    loop = 0;
+        MQLONG    tempSelector = 0;
+        int       tempLen = 0;
+        PMQLONG   pCurIntAttr = 0L;
+        PMQCHAR   pCurCharAttr = 0L;
+        char      attrKey[8];
+
+        HV       *AttributeLengthHV;
+        SV      **svp;
+
+    CODE:
+        CompCode = MQCC_FAILED;
+        Reason = MQRC_UNEXPECTED_ERROR;
+        sv_setiv(ST(2),(IV)CompCode);
+        sv_setiv(ST(3),(IV)Reason);
+
+        numArgs = (MQLONG)items - 4;
+
+        if ( (AttributeLengthHV = perl_get_hv("MQSeries::Constants::AttributeLength",0)) == NULL ) {
+            warn("Unable to access %%MQSeries::Constants::AttributeLength hash\n");
+            XSRETURN_EMPTY;
+        }
+
+        if ( (numArgs <= 0) || (numArgs%2 != 0) ) {
+            warn("Invalid Selector/Value parameters in MQSET\n");
+            XSRETURN_EMPTY;
+        }
+
+        SelectorCount = numArgs/2;
+        if ( (pSelectors = (PMQLONG)malloc(SelectorCount*sizeof(MQLONG))) == NULL ) {
+            warn("Unable to allocate memory for Selectors in MQSET.\n");
+            XSRETURN_EMPTY;
+        }
+
+        for (loop = 0; loop < SelectorCount; loop++) {
+            tempSV = ST((loop*2)+4);
+            tempSelector = SvIV(tempSV);
+
+            if ( (tempSelector >= MQIA_FIRST) && (tempSelector <= MQIA_LAST) )
+                IntAttrCount++;
+            else if ( (tempSelector >= MQCA_FIRST) && (tempSelector <= MQCA_LAST) ) {
+                sprintf(attrKey, "%ld", (long)tempSelector);
+                svp = hv_fetch(AttributeLengthHV,attrKey,strlen(attrKey),0);
+                if ( svp == NULL ) {
+                    free(pSelectors);
+                    warn("Unknown selector attribute '%d' in MQSET\n",tempSelector);
+                    XSRETURN_EMPTY;
+                }
+                CharAttrLength += SvIV(*svp);
+            } else {
+                free(pSelectors);
+                warn("Selector value %d invalid in MQSET (pre-MQSET)\n",tempSelector);
+                XSRETURN_EMPTY;
+            }
+
+            pSelectors[loop] = tempSelector;
+        }
+
+        if (IntAttrCount > 0) {
+              if ( (pIntAttrs = (PMQLONG)malloc(IntAttrCount*sizeof(MQLONG))) == NULL ) {
+                  free(pSelectors);
+                  warn("Unable to allocate memory in MQSET\n");
+                  XSRETURN_EMPTY;
+              }
+        }
+
+        if (CharAttrLength > 0) {
+            if ( (pCharAttrs = (PMQCHAR)malloc(CharAttrLength)) == NULL ) {
+                free(pSelectors);
+                if (pIntAttrs)
+                    free(pIntAttrs);
+                warn("Unable to allocate memory in MQSET\n");
+                XSRETURN_EMPTY;
+            }
+              memset(pCharAttrs,' ',CharAttrLength);
+        }
+
+        pCurIntAttr = pIntAttrs;
+        pCurCharAttr = pCharAttrs;
+
+        for (loop = 0; loop < SelectorCount; loop++) {
+            tempSelector = pSelectors[loop];
+            tempSV = ST((loop*2)+4+1);
+
+            if ( (tempSelector >= MQIA_FIRST) && (tempSelector <= MQIA_LAST) ) {
+                *pCurIntAttr = SvIV(tempSV);
+                pCurIntAttr++;
+            } else if ( (tempSelector >= MQCA_FIRST) && (tempSelector <= MQCA_LAST) ) {
+                if ( !SvPOK(tempSV) ) {
+                    free(pSelectors);
+                    if (pIntAttrs)
+                        free(pIntAttrs);
+                    if (pCharAttrs)
+                        free(pCharAttrs);
+                    warn("Non-string value passed in arg %d "
+                         "for character selector in MQSET\n",
+                         (loop*2)+4+1);
+                    XSRETURN_EMPTY;
+                }
+
+                sprintf(attrKey, "%ld", (long)tempSelector);
+                svp = hv_fetch(AttributeLengthHV,attrKey,strlen(attrKey),0);
+                if ( svp == NULL ) {
+                    free(pSelectors);
+                    if (pIntAttrs)
+                        free(pIntAttrs);
+                    if (pCharAttrs)
+                        free(pCharAttrs);
+                    warn("Unknown selector attribute '%d' in MQSET\n",tempSelector);
+                    XSRETURN_EMPTY;
+                }
+                tempLen = SvIV(*svp);
+
+                memcpy(pCurCharAttr,SvPV(tempSV,PL_na),
+                       (tempLen > (int)SvCUR(tempSV) ? SvCUR(tempSV) : tempLen));
+                pCurCharAttr += tempLen;
+            } else {
+                free(pSelectors);
+                if (pIntAttrs)
+                    free(pIntAttrs);
+                if (pCharAttrs)
+                    free(pCharAttrs);
+                warn("Selector value %d invalid in MQSET (pre-MQSET)\n",tempSelector);
+                XSRETURN_EMPTY;
+            }
+        }
+
+        MQSET(Hconn,
+              Hobj,
+              SelectorCount,
+              pSelectors,
+              IntAttrCount,
+              pIntAttrs,
+              CharAttrLength,
+              pCharAttrs,
+              &CompCode,
+              &Reason);
+
+        sv_setiv(ST(2),(IV)CompCode);
+        sv_setiv(ST(3),(IV)Reason);

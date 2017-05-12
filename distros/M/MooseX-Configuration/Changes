@@ -1,0 +1,9 @@
+0.02    2011-01-01
+
+- When including a comment about an attribute's default, the comment always
+  said that the default was 1, not the actual default value.
+
+
+0.01    2010-12-06
+
+- Initial release.

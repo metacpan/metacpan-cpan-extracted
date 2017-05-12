@@ -1,0 +1,137 @@
+NAME
+    MooX::ObjectBuilder - lazy construction of objects from extra init args
+
+SYNOPSIS
+       package Person {
+          use Moo;
+      
+          has name  => (is => "ro");
+          has title => (is => "ro");
+       }
+   
+       package Organization {
+          use Moo;
+          use MooX::ObjectBuilder;
+      
+          has name => (is => "ro");
+          has boss => (
+             is => make_builder(
+                "Person" => (
+                   boss_name   => "name",
+                   boss_title  => "title",
+                ),
+             ),
+          );
+       }
+   
+       my $org = Organization->new(
+          name       => "Catholic Church",
+          boss_name  => "Francis",
+          boss_title => "Pope",
+       );
+   
+       use Data::Dumper;
+       print Dumper( $org->boss );
+
+DESCRIPTION
+    This module exports a function `make_builder` which can be used to
+    generate lazy builders suitable for Moo attributes. The import procedure
+    also performs some setup operations on the caller class necessary for
+    `make_builder` to work correctly.
+
+  Functions
+    `make_builder( $class|$coderef, \%args|\@args|%args )`
+        The `make_builder` function conceptually takes two arguments, though
+        the second one (which is normally a hashref or arrayref) may be passed
+        as a flattened hash.
+
+        The %args hash is a mapping of argument names where keys are names in
+        the "aggregating" or "container" class (i.e. "Organization" in the
+        "SYNOPSIS") and values are names in the "aggregated" or "contained"
+        class (i.e. "Person" in the "SYNOPSIS").
+
+        If `\@args` is provided instead, this is expanded into a hash as
+        follows:
+
+           my %args = map { $_ => $_ } @args;
+
+        The builder returned by this function will accept arguments from the
+        aggregating class and map them into arguments for the aggregated
+        class. The builder will then construct an instance of $class passing
+        it a hashref of arguments. If $coderef has been provided instead of a
+        class name, this will be called with the hashref of arguments instead.
+
+        The `make_builder` function behaves differently in scalar and list
+        context. In list context, it returns a three item list. The first two
+        items are the strings "lazy" and "builder"; the third item is the
+        builder coderef described above. In scalar context, only the coderef
+        is returned. Thus the following two examples work equivalently:
+
+           # Scalar context
+           my $builder = make_builder($class, {...});
+           has attr => (
+              is      => "lazy",
+              builder => $builder,
+           );
+
+           # List context
+           has attr => (
+              is => make_builder($class, {...}),
+           );
+
+  Class Setup
+    On import, this module installs a sub called `BUILD` into your class. If
+    your class already has a sub with this name, it will be wrapped.
+
+    The point of this sub is to capture argument passed to the aggregating
+    class' constructor, to enable them to be later forwarded to the aggregated
+    class.
+
+    See also: "BUILD" in Moo.
+
+  Using MooX::ObjectBuilder with Moose and Mouse
+    It is possible to use `make_builder` in scalar context with Moose and
+    Mouse classes:
+
+       has attr => (
+          is      => "ro",
+          lazy    => 1,
+          default => scalar make_builder($class, {...}),
+       );
+
+  MooseX::ConstructInstance
+    If your object does the MooseX::ConstructInstance role, then this module
+    will automatically do the right thing and delegate to that for the actual
+    object construction.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooX-ObjectBuilder>.
+
+SEE ALSO
+    Moo, Moose, Mouse.
+
+    MooseX::ConstructInstance.
+
+    MooX::LazyRequire, MooseX::LazyRequire, MooseX::LazyCoercion, etc.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+CREDITS
+    Most of the test suite was written by Torbjørn Lindahl (cpan:TORBJORN).
+
+    Various advice was given by Graham Knop (cpan:HAARG) and Matt S Trout
+    (cpan:MSTROUT).
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

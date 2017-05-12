@@ -1,0 +1,94 @@
+*===========================*
+|    MooseX-Getopt-Usage    |
+*===========================*
+
+Perl Moose Role that extends L<MooseX::Getopt> to provide usage printing
+that inspects your classes meta information to build a (coloured) usage
+message including that meta information.
+
+
+SYNOPSIS
+
+    ## In your class
+    package My::App;
+    use Moose;
+
+    with 'MooseX::Getopt::Usage',
+         'MooseX::Getopt::Usage::Role::Man';
+
+    has verbose => ( is => 'ro', isa => 'Bool', default => 0,
+        documentation => qq{Say lots about what we are doing} );
+
+    has gumption => ( is => 'rw', isa => 'Int', default => 23,
+        documentation => qq{How much gumption to apply} );
+
+    # ... rest of class
+
+    ## In your script
+    #!/usr/bin/perl
+    use My::App;
+    my $app = My::App->new_with_options;
+
+Can now get help,
+
+ $ synopsis.pl -?
+ Usage:
+     synopsis.pl [OPTIONS]
+ 
+ Options:
+      --man             - Bool. Display man page
+      --help -? --usage - Bool. Display the usage message and exit
+      --verbose         - Bool. Say lots about what we are doing
+      --gumption        - Int. Default=23. How much gumption to apply
+
+as well as man page:
+
+ $synopsis.pl --man
+
+
+INSTALLATION
+
+To install from CPAN
+
+ sudo cpan MooseX::Getopt::Usage
+
+To install from the src, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+Note on systems with checkinstall use
+
+    checkinstall ./Build install
+
+If you want to create an uninstallable package.
+
+
+SUPPORT AND DOCUMENTATION
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc MooseX::Getopt::Usage
+
+The source code and other information is hosted on github:
+
+    http://github.com/markpitchless/moosex-getopt-usage
+
+You can browse documentation on CPAN:
+
+    https://metacpan.org/module/MooseX::Getopt::Usage
+    http://search.cpan.org/~pitchless/MooseX-Getopt-Usage/lib/MooseX/Getopt/Usage.pm
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Mark Pitchless
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

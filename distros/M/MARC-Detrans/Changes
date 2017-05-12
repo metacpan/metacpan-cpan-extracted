@@ -1,0 +1,71 @@
+v1.3    Tue Dec 20 12:07:56 CST 2005
+        - added urdu.xml from Jane Jacobs at Queens Borough Public Library
+
+v1.2    Mon May  2 15:51:16 CDT 2005
+        - added new example configuration files
+
+v1.1    Mon Jan 31 20:15:52 CST 2005
+        - allow ^ESC sequence in rule <to> sections
+
+v1.0   Thu Nov 18 11:43:19 CST 2004
+        - require at least 5.7.2 for XML encoding support
+
+v0.99   Tue Nov 16 22:47:16 CST 2004
+        - added 'records written' to log
+        - MARC::Detrans::convert() can return undef when a bad error
+          has ocurred or when the record is not edited.
+        - added translation and parallel title log tallies
+        - added new russian config file
+        - added test of record skipping when target script is already
+          present in the record (t/scriptpresent.t)
+        - added the creation of a 940 tag to convert.pl
+
+v0.98   Sun Nov 14 19:48:05 CST 2004
+        - added 001 to log messages
+
+v0.97   Tue Nov  9 21:37:20 CST 2004
+        - don't include $c(B in 066
+
+v0.96   Tue Nov  9 21:26:21 CST 2004
+        - add script code to $6 in 880 and config options
+        - add script orientation to $6 in 880 and config options
+        - test for both
+
+v0.95   Mon Nov  8 20:48:59 CST 2004
+        - fixed writing to log file in example/convert.pl
+
+v0.9    Sat Nov  6 14:21:03 CST 2004
+        - fixed counting for linked field
+
+v0.8    Wed Nov  3 21:58:12 CST 2004
+        - original field gets an subfield 6 now
+
+v0.7    Sat Oct 23 14:25:36 CDT 2004
+        - enhanced logging in convert.pl
+        - functionality and tests for handling translations
+        - functionality and tests for handling parallel titles
+
+v0.6    Thu Oct 21 20:39:24 CDT 2004
+        - fixed ordering of 880s and the content of the subfield 6 
+
+v0.5    Wed Oct 20 10:40:42 CDT 2004
+        - fixed bug in setup of MARC::Detrans object. Needed to set errors
+          internal array. 
+
+v0.4    Fri Oct 15 09:41:18 CDT 2004
+        - added ability to define position on rules (initial, medial, final)
+          to control when a rule is activated.
+
+v0.3    Wed Oct 13 21:04:21 CDT 2004
+        - changed error() to errors() in MARC::Detrans so that multiple
+          errors can be accumulated.
+        - convert() always returns a MARC::Record object instead of returning
+          undef when an error was encountered.
+
+v0.2    Wed Oct 13 14:09:35 CDT 2004
+        - docfix in Detrans.pm (thanks Brian Cassidy)
+        - updated error messages in Detrans.pm to indicate field/subfield
+        - updated error messages emitted by convert.pl
+
+v0.1    Sun Sep 26 10:04:32 CDT 2004
+        - initial release

@@ -1,0 +1,20 @@
+---
+name: Movie-Info
+version: 0.2
+author:
+  - 'Simon Wistow <simon@thegestalt.org>'
+abstract: get meta data from various format movie files
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  File::Which: 0
+dynamic_config: 1
+provides:
+  Movie::Info:
+    file: lib/Movie/Info.pm
+    version: 0.2
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

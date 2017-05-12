@@ -1,0 +1,132 @@
+==============================
+9999-99-99 99:99:99 +0000 HEAD
+==============================
+
+  commit 02f586228a51acb58eb45f98efc669901b8b6569
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Wed Jun 29 13:46:58 2011 -0700
+  
+    Added a version of mmcleric's test that is immutable
+
+  commit 9c6e67562cfee2472c8d63162629804fffdbe6f8
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Wed Jun 29 13:31:03 2011 -0700
+  
+    To support more composite role cases, changed to apply roles, than
+    attribute modifers. Thanks mmcleric! 
+
+================================
+2011-06-22 19:23:30 -0700 v0.0.8
+================================
+
+  commit 847ef6287080048043909c469e9a18b0d45b13a8
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Wed Jun 22 19:23:30 2011 -0700
+  
+    Changed prereqs and changed composition_class_roles to be done with
+    around method modifier
+
+  commit 2abcba6dbdf0efb737da91b9008e03d858f38357
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Thu Jun 16 16:23:13 2011 -0700
+  
+    Changed meta.t so it no longer assumes time is always increasing 
+
+================================
+2011-06-13 20:32:54 -0700 v0.0.7
+================================
+
+  commit 009e83b11309e36e0b53b741319e32c678455508
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Mon Jun 13 20:32:54 2011 -0700
+  
+    Revised POD. Added notes about placement and meta usage. Also revised
+    tests and added meta test.
+
+  commit 4e4ba9c085fdb7f49beacbdc76b2b30a1fd6c1a5
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Fri Jun 10 14:04:35 2011 -0700
+  
+    Revised tests to include more situations 
+
+================================
+2011-06-09 18:10:47 -0700 v0.0.6
+================================
+
+  commit 3b153022edd3e0b0706119fae37dfec0e5c92f83
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Thu Jun 9 12:36:18 2011 -0700
+  
+    playing with dist.ini
+
+  commit 9b847a5dd655e99ae61891070efa5393381edfd8
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Thu Jun 9 11:13:33 2011 -0700
+  
+    Fixed some silly critic issues on stolen code
+
+  commit 89dee4ede69e17d966ee0755c7ba73bd01bf9c17
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Thu Jun 9 11:02:50 2011 -0700
+  
+    Changes to devel.ini
+
+  commit 2b7442fb019cca1c5a94f35bca7bf270eebd0cb5
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Thu Jun 9 11:01:32 2011 -0700
+  
+    Replaced clone_and_inherit with my own hack
+
+  commit d23d0f55f4639116666631e2d788108b5bcbf46d
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Tue Jun 7 22:13:29 2011 -0700
+  
+    Added trait test. Which fails. 
+
+================================
+2011-06-06 21:30:01 -0700 v0.0.5
+================================
+
+  commit 7bd514571a5834717a66bdf092c2d20e693e8e96
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Mon Jun 6 21:30:01 2011 -0700
+  
+    Minor changes to dist.ini
+
+  commit ca218744a83e5351e6ab7d6bcde7cacfad00d52c
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Mon Jun 6 21:17:43 2011 -0700
+  
+    Configured to use git log for changes as I am lazy 
+
+================================
+2011-06-06 21:07:32 -0700 v0.0.4
+================================
+
+  commit 4c46432a85c8c641221f7cade20277ccdacd7841
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Mon Jun 6 21:07:32 2011 -0700
+  
+    New CPAN release of MooseX-Role-AttributeOverride - v0.0.4
+
+  commit c726b7e3d4791118ec52b08591da2e5132b9c0d2
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Mon Jun 6 20:59:32 2011 -0700
+  
+    Added some author tests and revised POD generation
+
+  commit b46fbd47997a55eaee622cfbcc04ac31eb8fbb97
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Mon Jun 6 20:18:29 2011 -0700
+  
+    Perl Critic Fixes for silly little things
+
+  commit 803ed79263a3e99d5f1fd7abb354422f6ec9c890
+  Author: Edward Allen <ealleniii@cpan.org>
+  Date:   Sun Jun 5 23:17:00 2011 -0700
+  
+    Switched to using Dist::Zilla 
+
+===================================
+End of changes in the last 365 days
+===================================

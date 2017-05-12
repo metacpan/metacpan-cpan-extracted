@@ -1,0 +1,28 @@
+#!perl
+use strict;
+use warnings;
+use MySQL::Warmer::CLI;
+MySQL::Warmer::CLI->run(@ARGV);
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+mysql-warmup - warmup mysql
+
+=head1 SYNOPSIS
+
+    % mysql-warmup database [options]
+    Options:
+        --host|h=s
+        --user|u=s
+        --password|p:s
+        --port|P=i
+        --socket|S=s
+        --dry-run
+
+=head1 DESCRIPTION
+
+mysql-warmup is utility for warming up mysql.

@@ -1,0 +1,181 @@
+Revision history for Perl extension MooseX-AttributeHelpers
+
+0.25      2016-02-16 05:27:31Z
+    - stronger deprecation notice in pod
+
+0.24      2015-08-16 18:49:16Z
+    - Don't rely on hash order in tests (RT#81564)
+    - repository migrated to the GitHub Moose organization
+
+0.23 Fri Jan 1, 2010
+    - A small internals fix to prevent breakage with the next version of
+      Moose. (Dave Rolsky)
+
+0.22 Mon Sep 14, 2009
+    - Fix to work with Moose 0.90. Ignore meta when auto-providing a method
+      provider's methods. (Dave Rolsky)
+	
+0.21 Sun July 19, 2009
+    - Add length to String (Florian Ragwitz).
+    - Specify build dependency on Test::Moose (Closes RT#47258) (Florian Ragwitz).
+    - Fix the error message you get on unknown 'curries' parameters to tell you
+      what it really expected (Florian Ragwitz).
+    - Doc typo fix in Collection::Bag (Sartak).
+
+0.20 Thu June 25, 2009
+    - MXAH is moving into core. This module will be deprecated when
+      that finally happens.
+    - Remove register_implementation methods from the traits because
+      we don't want to conflict with cored AttributeHelpers. You'll need to
+      specify the full package name for traits --
+      MooseX::AttributeHelpers::Trait::Counter instead of Counter
+    - New provided method for hashs: elements (Returns the key, value
+      pairs in the hash as a flattened list) (plu)
+
+0.19 Sun June 14, 2009
+    - No functional changes from 0.18_01
+
+0.18_01 Mon June 1, 2009
+    - Turn our metaclasses into traits, though metaclasses still exist for
+      backwards compatibility (Sartak and doy)
+    - Add accessor to Hash and Array (Sartak)
+    - Let the user know which constraint they have violated in the confessed
+      message (nperez)
+
+0.17 Fri April 19, 2009
+    - Add defined to Hash (Evan Carroll).
+
+0.16 Sun April 5, 2009
+    - Add substr to String (Florian Ragwitz).
+
+0.15 Thu March 26, 2009
+    - The splice helper for arrays was completely broken. Reported by
+      Abhijit Mahabal. RT #43343.
+
+0.14 Thu October 2, 2008
+    - Run pod tests only for authors
+
+0.13 Mon September 1, 2008
+    - No code changes, just a stable release for Moose 0.56.
+
+0.12_01 Wed August 20, 2008
+    - fixed some missing Pod::Coverage (stevan)
+    - fixes to work with Moose 0.55_01 and Class::MOP 0.64_01
+      (nothingmuch)
+
+0.12 Sun. Jun 29, 2008
+    - Move get from Array to List (gphat)
+    - Add first and last to List (gphat)
+    - Doc fixes (gphat)
+    - fix failing tests due to using DateTime (jasonmay)
+
+0.11 Thurs. Jun 26, 2008
+    - add the ability to curry method providers (thanks to jasonmay)
+    - Counter: add set and allow inc and dec to accept args
+    - add Bool as an attribute helper (thanks to jasonmay)
+        - bump all modules to version 0.11 for consistency (Sartak)
+
+0.09 Sat. May 24, 2008
+    - remove Module::Build in favor of Module::Install
+
+    * MooseX::AttributeHelpers::MethodProvider::Hash
+      - delete with multiple keys will now work (thanks to frodwith)
+
+    * MooseX::AttributeHelpers::MethodProvider::List
+      - add "join" and "elements" provided methods (thanks to Sartak)
+
+    * MooseX::AttributeHelpers::MethodProvider::Array
+      - add "splice" provided method
+
+0.08 Sat. April 12, 2008
+    ~~ updates copyright year on all modules ~~
+
+    * MooseX::AttributeHelpers::MethodProvider::Hash
+      - fixed bug in non-type constraint version of set
+        method (thanks to frodwith)
+
+0.07 Tues. Jan. 1, 2008
+    * MooseX::AttributeHelpers::String
+      - Initial version
+    * MooseX::AttributeHelpers::Hash
+      - get and set now support aggregate operations
+
+0.06 Tues. Dec. 7, 2007
+    * MooseX::AttributeHelpers::Base
+      - added the &remove_accessors method to comply with the
+        Class::MOP::Attribute interface
+        - added test for this
+      - the &install_accessors method now also properly assocaites
+        the methods with the attribute, so they are accessible via
+        introspection now.
+
+0.05 Sat. Nov. 24, 2007
+    - update Class::MOP dependency
+    - hide the Moose::Meta::Attribute::Custom::* package
+      declarations from search.cpan.org (when did they change
+      things to start seeing these?? *sigh*)
+
+0.04 Fri. Nov. 23, 2007
+    * MooseX::AttributeHelpers::Base
+      - changing this to use the new Class::MOP::Attribute
+        reader and write method ref stuff.
+      - fixed this to use find_or_create_type_constraint
+        instead of trying to parse stuff on our own.
+
+    * MooseX::AttributeHelpers::Collection
+      - this is pretty much empty subclass now cause of
+        the find_or_create_type_constraint fix above
+
+    + MooseX::AttributeHelpers::Collection::ImmutableHash
+    + MooseX::AttributeHelpers::Collection::Bag
+      - added these two new collection types
+        - added method provider roles for them
+        - added tests for them
+
+    * MooseX::AttributeHelpers::MethodProvider::Hash
+      - this is now composed from the ImmutableHash
+        method provider
+
+    * t/
+      - fixed the plans on all the tests
+
+0.03 Mon. Sept. 17, 2007
+    ~~ more misc. doc updates ~~
+
+    * MooseX::AttributeHelpers::Counter
+      - now provides default attribute options for 'is',
+      'isa', 'provides', and 'default' if not specified.
+
+    * MooseX::AttributeHelpers::Base
+      - added attribute $name to the params passed to
+        process_options_or_provides(), which gives us more
+        flexibility when writing additional helpers
+      - removed check for 'provides' and 'isa' attr
+        options before _process_options. It should be
+        called always.
+
+    * MooseX::AttributeHelpers::MethodProvider::Array
+      - added `delete` and `insert` methods
+
+0.02 Thurs. Sept. 13, 2007
+    ~~ some misc. doc updates ~~
+
+    * MooseX::AttributeHelpers::Base
+      - now providing subrefs for the reader and writer
+        methods to all the method provider constructors
+        (this should speed things up quite a bit).
+        - all method providers now use this internally
+
+    * MooseX::AttributeHelpers::Counter
+      - added the 'reset' method
+
+    * MooseX::AttributeHelpers::Collection::Array
+      - Extracted the List method provider role from
+        Array and made Array consume List.
+
+    + MooseX::AttributeHelpers::Collection::List
+      - created the Collection::List metaclass
+        derived from parts of the old Collection::Array
+
+0.01 Mon. Aug. 13, 2007
+    - module released to CPAN

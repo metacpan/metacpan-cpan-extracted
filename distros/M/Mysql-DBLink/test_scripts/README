@@ -1,0 +1,53 @@
+
+This directory contains the following scripts and data files:
+
+build_test.sh
+create_two_tables.sql
+dbl_add_data.pl
+dbl_add_update_test1.pl
+dbl_add_update_test2.pl
+dbl_create_linked_records.pl
+dbl_delete_linked_records.pl
+dbl_create_link.pl
+dbl_drop_link.pl
+dbl_search.pl
+test_data.csv
+README
+
+Please note that these scripts depend upon using the test database that is built when mysql is installed.
+
+The following steps prepare two tables in the test database as a basis for the sample text used here:
+
+1) The bash script build_test.sh will take the sql file create_two_tables.sql and use it against database test.
+   Please note that the create_two_tables.sql sql deletes the tables test1 and test2 ( if they exist ) and adds them.
+
+2) test1 and test2 table are simple tables that contain demographic fields (name,address,city,state,phone).
+
+3) The script dbl_add_data.pl will read data file test_data.csv and add this data to the two built tables.
+
+Steps 1-3 above is all you need to be able to play with the scripts that use the module Mysql::DBLink.
+Step 3 actually uses the Mysql::DBLink module updateAdd to accomplish this.
+
+The following scripts are examples of using updateAdd to add data to a table - in this case tables test1 and test2
+
+dbl_add_update_test1.pl
+dbl_add_update_test2.pl
+
+
+dbl_create_link.pl will take test1 and test2 and create the table test1_test2_lnk providing the framework for the linking the tables
+
+dbl_drop_link.pl will drop the linking table between test1 and test2
+
+dbl_create_linked_records.pl reads the data from test1 and test2 supplied by step 3 above and creates links in the linking table 
+                             test1_test2_lnk - this script creates a one to one link for every record in test1 to all records in test2
+
+dbl_delete_linked_records.pl deletes one record from test1_test2_lnk
+
+
+dbl_search.pl - demostrates different ways to use linked records to find data in table linked via a linking table.
+
+
+The above scripts demostrate the use of the module.  In actual practice the mysql user used to open the database and provide the handle
+must have create and drop table access.
+
+

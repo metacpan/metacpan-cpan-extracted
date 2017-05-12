@@ -1,0 +1,1627 @@
+NAME
+    Mail::SpamCannibal - HOWTO Install SpamCannibal
+
+Where to get SpamCannibal
+Support and Project Participation
+Creating the SpamCannibal user
+    Create a user account for the SpamCannibal client. The mail client
+    should not be run as a root user, to do so creates an unacceptable
+    security risk.
+
+    Check the /etc/passwd and /etc/group files to make sure that uid and gid
+    assignments for the new user are not already used, then run groupadd and
+    adduser.
+
+      groupadd -g 95 spam
+
+      adduser
+
+      Login name for new user []: spam
+
+      User id for spam [ defaults to next available]:
+
+      Initial group for spam [users]: spam
+
+      Additional groups for spam (seperated
+      with commas, no spaces) []: 
+
+      spam's home directory [/home/spam]: /usr/local/spamcannibal
+
+      spam's shell [/bin/bash]: 
+
+      spam's account expiry date (YYYY-MM-DD) []: 
+
+      OK, I'm about to make a new account. Here's what you entered so far:
+
+      New login name: spam
+      New UID: [Next available]
+      Initial group: spam
+      Additional groups: [none]
+      Home directory: /usr/local/spamcannibal
+      Shell: /bin/bash
+      Expiry date: [no expiration]
+
+      This is it... if you want to bail out, hit Control-C.  Otherwise, press
+      ENTER to go ahead and make the account.
+
+      you fill in the rest......
+
+Recompiling Linux 2.4x kernel with IPTABLES
+    Most newer kernels do NOT need this step. What is needed is the
+    iptables-devel headers, see the next section.
+
+    You can check the "config" file in your /boot directory or linux kernel
+    directory to see if the NF_QUEUE directives are activated.
+
+    http://www.kernel.org/
+
+    Recompile your kernel to include iptables.
+
+    When you "make config", choose at least these options...
+
+      Network packet filtering (replaces ipchains) 
+            (CONFIG_NETFILTER) [Y/n/?] y
+
+    It is recommended that you not use connection tracking since each
+    tarpitted connection will consume resources. If the tarpit is run on a
+    linux box used as a firewall, then this is unavoidable.
+
+      connection tracking (required for masq/NAT) 
+            (CONFIG_IP_NF_CONNTRACK) [Y/m/n/?] n
+
+      Userspace queueing via NETLINK (EXPERIMENTAL)
+            (CONFIG_IP_NF_QUEUE) [Y/m/n/?] y or m
+
+      ----------------------------------------
+
+    COMMENT: Our firewall runs with... connection tracking (required for
+    masq/NAT) (CONFIG_IP_NF_CONNTRACK) [Y/m/n/?] Y
+
+    I've seen as many as several thousand threads in the tarpit without
+    affecting performance on an aging 486 with not much memory. It's not a
+    big deal.
+
+iptables-devel
+    iptables-devel headers are required for SpamCannibal. Either download
+    the iptables-devel package for your system or rebuild iptables (the
+    version installed on your system) and make and install the developer
+    portion.
+
+      iptables -V will tell you the version.
+
+    iptables source downloads available from:
+
+      L<http://www.netfilter.org/downloads.html>
+
+libnet-1.x.x
+    http://libnet.sourceforge.net/
+
+    Google "libnet mirrors"
+
+      Installation:
+      -------------
+      0. nroff -man doc/libnet.3 | less
+      1. Read the doc/ files
+      2. ./configure
+      3. make
+      4. make install
+
+       - optional -
+      5. make supp
+      6. make util
+
+    For RPM's, Google "libnet RPM's" and check for your distro.
+
+Adding PGP support
+    Select one of the PGP packages from the download page.
+
+    For RSA key generation, use pgp-6.5.8. GPG will read RSA keys but not
+    generate them. If you already have a means to generate keys then it does
+    not matter which package is used. Default for both packages is DSA keys,
+    but this is not compatible with some older mail client PGP
+    implementations.
+
+  Installing GPG - GNU Privacy Guard - a free PGP workalike
+
+    GPG comes with a comprehensive installation guide -- read it.
+
+    Briefly: ./configure make make install
+
+  Installing PGP 6.5.8 for Linux
+
+    PGP 6.5.8 comes as a binary distribution in both tar.gz and rpm formats.
+
+    For the binary distribution, download and copy the executable to the
+    appropriate directory on your system.
+
+      i.e.  cd [distribution src directory]
+            cp pgp /usr/local/bin
+
+Building Perl modules
+  Prerequisite modules
+
+      Test::Harness
+      Test::More
+      MIME::Base64
+      Digest::MD5
+      Unix::Syslog
+      Net::DNS::Codes
+      Net::DNS::ToolKit
+      NetAddr::IP::Lite
+      Net::SMTP -- part of standard perl
+      Net::Whois::IP
+      Proc::PidUtil
+      Sys::Hostname::FQDN
+
+    In a build directory of your choice such as:
+
+      /usr/src/perlmods
+
+    For each module
+
+      tar -xzvf {module name - version}.tar.gz
+      cd {module name - version}
+      perl Makfile.PL
+      make
+      make test
+      make install
+
+  IPTables::IPv4::DBTarpit - tarpit daemon
+
+    IPTables::IPv4::DBTarpit includes the tarpit daemon dbtarpit and a tool
+    kit for accessing its database(s). This database and several others are
+    used by spamcannibal.
+
+    You must install libnet-1.0.x and recompile your Linux kernel before
+    building this package.
+
+   installing the IPTables::IPv4::DBTarpit
+
+      tar -xzvf IPTables-IPv4-DBTarpit-x.xx.tar.gz
+      cd IPTables-IPv4-DBTarpit-x.xx
+      perl Makefile.PL
+
+      #####################################################
+      DBTarpit comes with a preselected set of defaults 
+      that should work for almost all installations. 
+
+            For use with SpamCannibal, set
+            the daemon install directory to:
+
+               /usr/local/spamcannibal/bin
+
+      #####################################################
+
+      dbtarpit daemon install directory       : [/usr/local/sbin] /usr/local/spamcannibal/bin
+      Are you sure you want to use '/usr/local/spamcannibal/bin'? [yes]
+      shared library install directory        : [/usr/local/lib] 
+      shared library header install directory : [/usr/local/include] 
+      dbtarpit database env/home directory    : [/var/run/dbtarpit] 
+      dbtarpit primary database name          : [tarpit] 
+      dbtarpit secondary database name        : [archive] 
+
+            type:   rm config.db
+                    perl Makefile.PL
+            to restore defaults
+
+      make
+      make test
+      make install
+
+   setting up 'dbtarpit'
+
+    If you will be using the SpamCannibal sc_dbwatch script (recommended)
+    then copy the rc.dbtarpit script to the SpamCannibal (home)/scripts
+    directory, otherwise opy the rc.dbtarpit script to the appropriate
+    startup directory and edit the host startup scripts so that it is
+    included.
+
+    Note: this is a Perl program. DO NOT place in in a start up script
+    prefixed with a period '.' This instructs the shell to process the file
+    as a shell script and not use the designated perl shell. It will fail
+    badly :-(
+
+    for command line details.
+
+   configuring IPTABLES for dbtarpit
+
+    In the iptables configuration file (usually rc.iptables), place the
+    filter for dbtarpit as the first entry in the INPUT chain. do not insert
+    other entries ahead of this rule.
+
+      i.e.
+
+      IPTABLES = "/usr/local/spamcannibal/bin/iptables"
+      INET_IFACE="eth0"     # or your internet device
+      ...
+
+      $IPTABLES -A INPUT -p tcp -i $INET_IFACE --dport 25 -j QUEUE
+
+    This rule will send tcp packets destined for port 25 from the internet
+    to the dbtarpit daemon. If the IP address of the packet is not found in
+    the database, the packet is returned to the chain untouched. If the IP
+    address is found in the database, the packet is dropped and the
+    connection tarpitted.
+
+    If the target host is not the host that will process the connection,
+    i.e. you are using NAT on a dual-homed bastion host, then the following
+    rules would apply.
+
+      i.e.
+      TARGET = "1.2.3.4"
+      LAN_IFACE = "eth1"
+
+      $IPTABLES -t nat -p tcp --dport 25 -j DNAT --to $TARGET
+
+    If the incoming IP address is virtual (i.e. eth0:n) then simply add the
+    virtual IP address -d $VIRTUAL_DEST_IP to the above rules.
+
+            and in the FORWARD chain
+      $IPTABLES $IPTABLES -A FORWARD -p tcp -o $LAN_IFACE \
+            --dport 10025 -d $TARGET -j QUEUE
+      $IPTABLES $IPTABLES -A FORWARD -p tcp -o $LAN_IFACE \
+            --dport 10025 -d $TARGET -j ACCEPT
+
+    WARNING: if the dbtarpit daemon is not running, packets destined for
+    port 25 are silently dropped by IPTABLES.
+
+  Mail::SpamCannibal
+
+    Before installing SpamCannibal, you must edit the configuration the
+    install script to indicate the location and executable name for the PGP
+    binary you will use on your system.
+
+    Edit the file executableTestPath.conf. The contents of the file looks
+    like this:
+
+      #
+      # put the path to the pgp executable 
+      # in this file in "quotes"
+      #
+      # i.e.
+      #       /usr/local/bin/pgp
+      #       /usr/local/bin/gpg
+
+      sub privacyexecutables {
+        return qw (
+            /usr/local/bin/gpg
+            /usr/local/bin/pgp
+        );
+      }
+      1;
+
+    Include only the executables you have installed on your system.
+
+    Now you can proceed with a standard perl module installation by typing:
+
+      perl Makefile.PL
+
+        #####################################################
+        SpamCannibal comes with a preselected set of defaults 
+        that should work for almost all installations. 
+
+        #####################################################
+
+        spamcannibal db environment directory   : [/var/run/dbtarpit] 
+        spamcannibal user (must already exist)  : [spam] 
+        spamcannibal user home directory        : [/usr/local/spamcannibal] 
+        spamcannibal tarpit database name       : [tarpit] 
+        spamcannibal archive database name      : [archive] 
+        spamcannibal black list contrib name    : [blcontrib] 
+        spamcannibal evidence database name     : [evidence] 
+        spamcannibal default umask (007)        : [007] 
+        If you wish to support additional databases, edit
+        the rc.xxxx startup scripts for the appropriate program.
+
+      make
+      make test
+      make install
+
+SpamCannibal setup
+    SpamCannibal can be run entirely on a single host or the dbtarpit and
+    dnsbls daemons can be run on one host with the public and administrative
+    web services running on a seperate host.
+
+    Additional security can be provided by running dbtarpit/dnsbls daemons
+    in a DMZ. Access restrictions for zone transfer can be provide by using
+    BIND as the distribution DNS and updating the slave DNS servers from the
+    dnsbls server with no outside access. Users are invited to write an
+    expanded FAQ or installation procedure and submit it for inclusion with
+    this documentation package.
+
+  rDNS setup
+
+    There are three methods to set up SpamCannibal rDNS. There are
+    advantages to each and disadvantages to each method. With all methods, a
+    zone file is available that can be copied for http or ftp download to
+    mirror providers.
+
+   example 1: rDNS direct
+
+    This method is the simplest and must be used to provide service for the
+    following two methods. The dnsbls daemon is run on port 53.
+
+    and the dnsbls.conf file for details.
+
+    The advantage to this method is that it is that setup is minimized and
+    no additional daemons are required.
+
+    The disadvantage is that the robustness of dnsbls has not been
+    extensively tested and dnsbls does not have all the features, security
+    and control that is available from BIND.
+
+   example 2: rDNS via BIND slave
+
+    Set up dnsbls as above. To run it on the same host as the BIND daemon,
+    have it answer on port 8653 (or other suitable port). You may wish to
+    block access to this port from all except the local network, or if on
+    the same host as BIND, all except 127.0.0.1.
+
+    In the BIND configuration file, named.conf, add these lines:
+
+      // zone my.zonename.net
+      zone "my.zonename.net" in {
+            type slave;
+            file "slave/my.zonefile.name.in";
+            masters {
+                    127.0.0.1 port 8653;
+            };
+      };
+
+    The advantage to this method is that BIND provides a very robust and
+    proven DNS daemon with significant security features. Response to
+    queries is very fast and most answers will always be found in the daemon
+    cache.
+
+    The zone file is always available for export in the BIND daemon
+    directory tree.
+
+    The disadvantage to this method is that the zone file must be updated
+    frequently to provide current information on IP addresses that are added
+    to the zone. If multiple mail hosts depend on a single tarpit database
+    for blocking then this can be a significant factor in allowing spam to
+    slip by during the time from database entry until the zone file is
+    updated. The zone file gets very large quickly (ours is 30 megs) and
+    frequent updates can take a considerable bite out of cpu resources on an
+    intermittent basis. In addition, because of the frequent zone file
+    updates, the BIND daemon cache will generally contain the entire
+    contents of the zone file and will be very large.
+
+   example 3: rDNS via BIND forward only
+
+    Set up dnsbls with dnsbls running on port 8653 as in example 2. You may
+    wish to block access to this port from all except the local network, or
+    if on the same host as BIND, all except 127.0.0.1.
+
+    In the BIND configuration file, named.conf, add these lines:
+
+      // zone my.zonename.net
+      zone "my.zonename.net" in {
+            type forward;
+            forward only;
+            forwarders {
+                    127.0.0.1 port 8653;
+            };
+      };
+
+    The advantage to this method is that BIND provides a very robust and
+    proven DNS daemon with significant security features. Response to
+    queries is fast but once removed since a forward query to dnsbls must be
+    made for requested record if it is not in the BIND daemon cache. In
+    general the delay will be very small. In addition, no zone file is
+    required and there is no need for the BIND daemon to do zone transfers
+    as in the previous method. The BIND daemon cache will only contain
+    recent/active dnsbl domain contents and should remain quite small (for
+    dnsbl hits).
+
+    The disadvantage to this method is that BIND will not provide recursive
+    lookup service for this zone. Access to the zone is available only for
+    clients, or other instances of BIND that are configured to query for the
+    "forward" zone as a forwarder itself. In addition, no zone file is
+    immediately available for export. A zone file can be created on demand
+    by issuing a SIG_USR2 to the dnsbls daemon. Providing a zone file in
+    this manner is best left to a cron job. See example CRON shell script in
+    the ./contrib directory of this distribution.
+
+   example 4: rDNS -- practical combinations
+
+    To provide public rDNS service and realtime tarpit lookup service, it is
+    possible to combine the approaches above. When the dnsbl resides on the
+    same server as BIND and BIND is slaved to dnsbl to provide robust DNS
+    service, secondary servers can still access the dnsbl daemon directly
+    with a zone file that looks like:
+
+      // zone my.zonename.net
+      zone "my.zonename.net" in {
+            type forward;
+            forward only;
+            forwarders {
+      // insert the IP address of the primary dnsbl host
+                    1.2.3.4 port 8653;
+            };
+      };
+
+    The primary BIND installation would have a slave zone as described
+    above. SpamCannibal running on the primary host never access BIND for
+    its own data since it uses the database directly and not through dnsbls.
+    Thus secondary tarpit installations using the local zone configuration
+    (immediately above) would have access to the dynamic records, and the
+    public would see the zone file as delayed by the update interval. For
+    speedier service, use method one instead.
+
+   example 5: rDNS with concurrent BIND -- not using BIND
+
+    You can run the dnsbl daemon on a host running bind and provide rDNS
+    service on an alternate IP address. Set up dnsbls as in example 2,
+    running on port 8653. Assign another IP address to the host adapter
+    which will provide service to the new IP address. Issue these commands
+    at startup to bind the IP address to the host adapter.
+
+      Example:      add this to the network initialization script
+                    assuming there is only one IP address bound
+                    to the current device (i.e. eth0)
+
+      for an address at 1.2.3.132 in a CIDR/26 block
+
+      # for each additional device, increment LUN
+      # Edit for your setup.
+      NETMASK="255.255.255.192"     # YOUR netmask!
+      NETWORK="1.2.3.128"           # YOUR network address!
+      BROADCAST="1.2.3.191"         # YOUR broadcast address
+
+      # first extra IP address is logical unit 0
+      # i.e. eth0:0
+      LUN=0
+
+      SETVIRT () {
+        IFACE=${DEVICE}:${LUN}
+        /sbin/ifconfig ${IFACE} ${IPADDR} \
+         broadcast ${BROADCAST} netmask ${NETMASK}
+        /sbin/route add ${IPADDR} dev ${IFACE}
+        echo Configuring $IFACE as $IPADDR
+        LUN=$[${LUN}+1]
+      }
+
+      IPADDR="1.2.3.132"
+      SETVIRT
+
+    Add the following NAT rules in your IPTABLES file after the PREROUTING
+    entries:
+
+      DNSBL_PORT=8653
+      DNSBL_IP="1.2.3.132"
+  
+      $IPTABLES -t nat -A PREROUTING -p tcp -d $DNSBL_IP \
+            --dport 53 -j REDIRECT --to-port $DNSBL_PORT
+      $IPTABLES -t nat -A PREROUTING -p udp -d $DNSBL_IP \
+            --dport 53 -j REDIRECT --to-port $DNSBL_PORT  
+
+    With these rules, you can still slave BIND to the dnsbls as in example 2
+    and/or access the dnsbls on port 8653 as in example 4
+
+  Initializing the database
+
+    To initialize the database you must be a root user in the module
+    installation directory. To initialize the databases, type the following:
+
+      cd scripts
+      ./sc_initdb.pl
+
+    This procedure will create the database environment and the database
+    files as well as set the permissions on the files and directories.
+
+  Setting up DNSBL check scripts
+
+    The dbtarpit daemon records every connection to the port it monitors in
+    the archive database. SpamCannibal provides script sc_BLcheck.pl to
+    check each address in the archive database against a list of DNSBL
+    servers in its config file. sc_BLcheck.pl removes checked IP addresses
+    from the archive database.
+
+   activating sc_BLcheck.pl
+
+    sc_BLcheck.pl reads each IP address from the archive database and checks
+    it against its list of DNSBL servers. Addresses that have a match
+    criteria are added to the tarpit database and the reason for the
+    addition is added to the blcontrib database. This is usually the
+    returned TXT record from the matching DNSBLS or the default set in the
+    config file.
+
+    Login as the spamcannibal user and put an entry in your crontab
+    something like this:
+
+      # check accumulated archive IP addresses every 15 minutes file
+      */4 * * * *  ./scripts/sc_BLcheck.pl ./config/sc_BlackList.conf
+
+    Since this is a background job, a better entry might be:
+
+      */4 * * * * /usr/bin/nice -n 20 ./scripts/sc_BLcheck.pl ./config/sc_BlackList.conf
+
+       Syntax: ./sc_BLcheck.pl path/to/config.file
+        or
+            ./sc_BLcheck.pl -d path/to/config.file
+            ./sc_BLcheck.pl -v path/to/config.file
+
+      The -d switch allows you to see what the 
+      script will do without any db updates 
+      taking place. The -v switch will print
+      the scripts actions to the screen. 
+      -v -v does it more verbosely.
+      The -d switch implies a single -v.
+
+    In the ./config directory
+
+      cp sc_BLackList.conf.sample sc_BLackList.conf
+
+    The sc_BLackList.conf file is heavily commented and pre-loaded with
+    several working DNSBLS entries. You may wish to delete some of these or
+    add one of your favorite ones.
+
+   activating sc_BLpreen.pl
+
+    sc_BLpreen.pl periodically validates the entries found in the blcontrib
+    database and removes those which the original DNSBLS no longer
+    blacklists or those for which the DNSBLS can not be contacted for a time
+    specified in the config file for that DNSBLS.
+
+    Login as the spamcannibal user and put an entry in your crontab
+    something like this:
+
+      # check valid blcontrib every few days
+      21 0 */4 * * ./scripts/sc_BLpreen.pl ./config/sc_BlackList.conf
+
+    Since this is a background job, a better entry might be:
+
+      21 0 */4 * * /usr/bin/nice -n 20 ./scripts/sc_BLpreen.pl ./config/sc_BlackList.conf
+
+      Syntax: ./sc_BLpreen.pl path/to/config.file
+        or
+            ./sc_BLpreen.pl -d path/to/config.file
+            ./sc_BLpreen.pl -v path/to/config.file
+
+      The -d switch allows you to see what the 
+      script will do without any db updates 
+      taking place. The -v switch will print
+      the scripts actions to the screen. 
+      -v -v does it more verbosely.
+      The -d switch implies a single -v.
+
+   activating sc_cleanup.pl
+
+    sc_cleanup.pl periodically runs through the databases and *optionally*
+    expires very old records and checks that there are not multiple entries
+    in the database for the same IP address or an entry that is present in
+    one database that is missing a corresponding entry in a companion
+    database.
+
+    For example:
+
+      A spam messages arrives and makes it through the system to your in
+      box. Subsequently, sc_BLcheck.pl finds the IP address of the spam host
+      in a remote DNSBL and adds records to the tarpit and blcontrib
+      databases. You find the spam on your desktop and add it to the tarpit
+      and evidence databases via the sc_mailfilter.pl robot script. Now
+      there is an extra record in blcontrib that is unused.
+
+    There are many more possible ways for such inconsistencies to occur and
+    sc_cleanup.pl removes these records automatically.
+
+    Login as the spamcannibal user and put an entry in your crontab
+    something like this:
+
+      # check valid blcontrib every few days
+      21 0 */4 * * ./scripts/sc_cleanup.pl
+
+    Since this is a background job, a better entry might be:
+
+      21 0 */4 * * /usr/bin/nice -n 20 ./sc_cleanup.pl
+
+      Syntax: scripts/sc_cleanup.pl -q
+        or
+            scripts/sc_cleanup.pl -d
+            scripts/sc_cleanup.pl -v
+        or
+            scripts/sc_cleanup.pl [options] -x nnn
+
+    The -q switch is for normal, quiet operation. The -d switch allows you
+    to see what the script will do without any db updates taking place. The
+    -v switch will print the scripts actions to the screen. The -d switch
+    implies a -v.
+
+    The -x switch expires records more than 'nnn' days old and removes them
+    from the database.
+
+  Setting up the DNS blacklist daemon
+
+    The first part of the installation guide assumes that the host has no
+    other DNS daemon running. Section 2 covers running a DNSBL along with a
+    conventional DNS. In either case, an NS record must be added to the zone
+    file for the blacklist domain.
+
+    Login as the spamcannibal user.
+
+      cd ./config
+      cp dnsbls.conf.sample dnsbls.conf
+
+    Edit dnsbls.conf for your site. The file is heavily commented and should
+    be self explanatory. Your comments and additions to this documment are
+    welcomed.
+
+    Most of the configuration items do not need changing. What MUST be
+    specified for which the defaults usually must be changed are the
+    following:
+
+            zonename
+            contact
+            ns
+            127.0.0.2
+
+   standalone DNSBL service
+
+    For stand alone service, nothing more is necessary except execution of
+    the start script.
+
+            ./rc.dnsbls start
+
+    The ./rc.dnsbls start and ./rc.dnsbls stop commands should be included
+    in the sc_dbwatch.conf file described later in this document.
+
+   running DNSBL concurrently with BIND
+
+    Concurrent operation of DNSBL and BIND is relatively simple. dnsblsruns
+    as a hidden 'master' zone server with BIND providing slave service and
+    answering queries to the internet on behalf of the blacklist zone.
+
+    Edit the dnsbls.conf file to make the following changes:
+
+    1. start dnsbls on a non-standard port
+                port    => 10053,  # or port of your choice
+
+        Check your iptables configuration to make sure that his port is
+        blocked to external queries.
+
+    2. un-block axfr transfers
+                block   => 0,
+
+        This will allow zone transfers for locally added spam records from
+        dnsbls to the bind daemon. Zone records that have been added to the
+        tarpit by virtue of being found in other DNSBL's will not appear in
+        the zone transfer. This is a "FEATURE" to prevent the inadvertent
+        feedback of remote record additions in a cooperative dnsbl
+        environment. Read the man pages for dnsbls if you really want to
+        enable remote record transfer in the blacklist zone... you've been
+        warned!
+
+    3. set the zone refresh time to something LOW
+                refresh => '3h',        # 3 hours
+
+    4. set the blacklist host name
+        The blacklist host name should be set the same as the host (DNS)
+        name of the BIND host.
+
+                host    => 'bind.hostname.com',
+
+    What remains is to configure BIND to read the zone file from dnsbls.
+    Make an entry like this in the named.conf file for the bind daemon.
+
+      // zone bl.spamcannibal.org
+      zone "blacklist.mydomain.com" in {
+            type slave;
+            file "slave/blacklist.mydomain.com.in";
+            masters {
+                    127.0.0.1 port 10053;
+            };
+    };
+
+    Add any additional configuration grammar that you feel is necessary to
+    restrict zone transfer, etc...
+
+  Setting up a cooperative dnsbls network
+
+    Multiple dnsbls daemons can share locally added black list records by
+    configuring the sc_BLcheck.pl script to check remote dnsbls daemons. Add
+    a regular DNSBL record to the scripts config file for the cooperation
+    remote daemon.
+
+      'blacklist.remotehost.com' => {
+         accept    => {
+            '127.0.0.2' => 'known spam/virus source',
+         },
+         response  => '127.0.0.3',
+         error     => 'blocked, See: http://www.bl.mydomain.com',
+         expire    => '7d',
+      },
+
+    Any number of spamcannibals can be interconnected in this manner. Since
+    they share only locally added spam records, there is never any overlap
+    in the shared data.
+
+  Setting up the web database access daemon
+
+    The bdbaccess daemon is configured entirely from the command line and
+    can be run in one of three modes. Separate daemons can be run for the
+    same database to provide both local and remote access.
+
+   bdbaccess local access
+
+    The default configuration of the rc.bdbaccess file provides local
+    access. In the sc_dbwatch.conf file or your host startup scripts put a
+    lines like this:
+
+      rc.bdbaccess start
+            and
+      rc.bdbaccess stop
+
+    The daemon listens on a unix domain socket and creates a pid file in
+    /var/run/dbtarpit called:
+
+      bdbaccess_unix.pid
+
+   bdbaccess remote access stand-alone
+
+    In the host startup scripts, put lines like this to specifiy the
+    listening port and start/stop actions:
+
+      rc.bdbaccess start -p 10925
+            and
+      rc.bdbaccess stop -p 10925
+
+    The daemon will listen on the designated port and create a pid file in
+    /var/run/dbtarpit called:
+
+      bdbaccess_net.pid
+
+    Make sure and properly set the values in sc_web.conf for:
+
+      remoteshell
+      remotecommand
+      wrapper
+      bdbDAEMON
+
+    Insert a rule like this in the rc.iptables TCP chain to restrict access
+    to the daemon to your preferred hosts:
+
+      $IPTABLES -A is_tcp -p tcp -s $PREFERRED_HOST --dport 10925 -j allowed
+
+   bdbaccess remote access via inetd
+
+    The daemon can be setup for remote access with tcp wrappers. Insert a
+    line in /etc/services that looks like:
+
+      bdbaccess     10925/tcp
+
+    Insert a line in /etc/inetd.conf that looks like:
+
+      (this should all be on one long line)
+
+      bdbaccess stream tcp nowait root /usr/sbin/tcpd
+        /usr/local/spamcannibal/bin/bdbaccess -i -r /var/run/dbtarpit 
+        -f tarpit -f blcontrib -f archive -f evidence
+
+    Make sure and properly set the values in sc_web.conf for:
+
+      remoteshell
+      remotecommand
+      wrapper
+      bdbDAEMON
+
+  Setting up web services
+
+    The install process automatically copies a complete SpamCannibal web
+    site into the spamcannibal user space.
+
+      [default] or whatever is specified
+      /usr/local/spamcannibal/public_html
+
+   WARNING
+
+    Because every install copies files into public_html, make a backup copy
+    to avoid losing modified files.
+
+    The web site consists of two subdirectories
+
+            public_html/images
+            public_html/incl
+
+    The easiest way to preserve a modified web site is to create a third
+    directory, copy all of the 'incl' files to it and modify those files.
+
+    Update the sc_web.conf file to reflect the new directory name.
+
+    The web site is a copy of the SpamCannibal web site. There is provided
+    in the 'incl' directory, a GENERIC home page rather than the
+    SpamCannibal blurb. Simply copy 'GENERIC.home.incl' to home.incl for
+    starters if you'd like something a little more tame.
+
+   modperl or perl cgi?
+
+    Web services can be run as ordinary perl cgi or on a modperl enhanced
+    server. The cgi scripts expect to be executable in the public_html
+    directory.
+
+    To use modperl, three files need to be modified.
+
+    1. cannibal.cgi
+        This file should be renamed with the modperl execution suffix.
+
+          i.e.  cannibal.plx or cannibal.pl
+
+    2. admin.cgi
+        This is a link to cannibal.cgi. It should be removed and re-linked
+        to the new file name.
+
+          i.e.  ln -s cannibal.plx admin.plx
+
+    3. index.html
+        The index file contains a redirect to cannibal.cgi. This should be
+        edited to reflect the new cannibal.plx file name.
+
+  Configuring the web site
+
+    Login in as the spamcannibal user.
+
+      cd config
+      cp sc_web.conf.sample sc_web.conf
+
+      cd ../private
+      cp passwd.initial passwd
+
+    The passwd file contains a single admin username with a blank password.
+
+    Edit the sc_web.conf file to setup local/remote access and specifics for
+    your web site. In most cases the default values will work fine.
+
+    However, you must specify:
+
+   web configuration for local databases
+
+      email => 'my.emailaddy.com',
+
+    The contact email address for the 'CONTACT' page of the web site. This
+    address is never exposed. The server WILL DIE if this is not configured.
+
+   web configuration for remote databases
+
+      remoteshell   => '/usr/bin/ssh spam@remote.host.com',
+      remotecommand => '/usr/local/spamcannibal/scripts/sc_sesswrap',
+      wrapper       => '../scripts/sc_remotewrap',
+      bdbDAEMON     => ['remotehost.com:10925',10],  
+      secure        => 1,
+
+    Remote administration by default uses ssh. Set the target for the remote
+    user@host. Generate a public/private key pair on the local host and put
+    a copy of the public key in 'authorized_keys' on the target host. Login
+    manually at least once to eliminate the 'known_hosts' dialog.
+
+    Using https service for remote administration is recommend unless you
+    operate entirely within a firewall protected environment. Passwords are
+    passed from the web client to the server in CLEAR TEXT.
+
+    See the procedure for the web access daemon.
+
+  Adding and removing web menu items/pages
+
+    The menus are located in two files:
+
+      public menus  incl/nav.incl
+      admin menus   incl/nav2.incl
+
+    Simply add or remove items as you see fit. Pages are passed to the web
+    generation script as a query value of the form 'page=newfile'. Follow
+    the format of the existing 'nav' entries and it should work fine. New
+    static pages can be added by creating a new file containing 'body' text
+    of whatever kind.
+
+      i.e.          incl/newfile.incl
+
+    Add an entry in the sc_web.conf 'static' array and the file name in the
+    list of files. Take care not to duplicate any of the other hash key
+    names.
+
+  Web and other Security Issues
+
+    The admin web interface has a 'C' wrapper that is suid to the
+    spamcannibal user and is named sc_sesswrap for local host execution and
+    is linked as sc_remotewrap for remote host execution. This wrapper
+    executes either sc_session.pl or sc_remote.pl respectively.
+
+    The permissions on various files have been selected to provide minimum
+    access to potentially sensitive information by users other than
+    spamcannibal and root.
+
+   PROBLEMS with web admin login
+
+    invalid permissions on sc_session.pl and sc_sesswrap
+
+    Permissions for the wrapper, the session scripts and their directories
+    should be set correctly by the installation routines. Should they happen
+    to get messed up, you can reset them as shown below:
+
+    Login as user spam.spam or whatever your spamcannibal user/group values
+    are.
+
+            chmod 700 sc_session.pl (or 1700)
+            chmod 700 sc_remote.pl 
+            chmod 4755 sc_sesswrap 
+
+   enabling admin management on user admin web page
+
+    Admin management is enabled by default by the installation procedure.
+    The sticky bit on the sc_session.pl file is used as a flag to
+    enable/disable admin management support. With admin management disabled,
+    you must add and delete administrative user from the private/passwd file
+    using a text editor. New users may be added with a blank password.
+
+      i.e.  fred:
+
+    To admin access to allow admins to add and delete users, login as the
+    spamcannibal user and type this:
+
+            cd scripts
+            ./sc_session.pl admin on
+
+    to restrict access so that admin users must be added and removed by
+    hand,
+
+            ./sc_session.pl admin off
+
+   session and password file/directory permissions
+
+    Permissions for the session and password directories and their contents
+    are set by the installation routine. Should they happen to become
+    altered you can reset them as shown below:
+
+    Login as the spamcannibal user and set the directory permissions.
+
+            chmod 700 private
+            chmod 700 sess   
+
+    Then set the file permissions.
+
+            chmod 600 private/passwd
+
+   permission settings for files in 'config'
+
+    The permissions on the files in the config directory are set by the
+    installation routine. Should they happen to become altered you can reset
+    them as shown below:
+
+    Login as the spamcannibal user and set the directory permissions.
+
+            cd config
+            chmod 640 *
+            chmod 644 sc_web.conf
+
+   permission settings for the database environment
+
+    These permissions should be correctly set by the sc_initdb.pl script.
+    Should they happen to become altered you can reset them as shown below
+    as the root user:
+
+            cd /var/run
+            chown -R spam dbtarpit
+            chgrp -R spam dbtarpit
+            chmod 755 dbtarpit
+            cd dbtarpit
+            chmod 660 *
+
+  Installing optional LaBrea::Tarpit report statistics pages
+
+    The optional LaBrea::Tarpit statistics pages show the number and IP
+    addresses of spam/virus hosts that are currently visiting or have
+    recently visited your site.
+
+   LaBrea::Tarpit module installation
+
+    No configuration needs to be done for LaBrea::Tarpit. The innards are
+    used, but none of the scripts or daemons. Just install it in the usual
+    perl manner and forget it.
+
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+   edit sc_web.conf
+
+    In the sc_web.conf file, find the commented out line:
+
+       top     => './incl/top.incl',        # used by all pages
+       logo1   => './incl/logo1.incl',      # for the home page
+       logo2   => './incl/logo2.incl',      # for all other pages
+     #  stats       => './incl/stats.incl',         # OPTIONAL Labrea stats pages
+       nav     => './incl/nav.incl',        # for all user pages
+       nav2    => './incl/nav2.incl',       # for all admin pages
+
+    and remove the comment mark from the 'stats' line.
+
+   configuring spam_report.cgi
+
+    Rename this script spam_report.cgi or spam_report.(your perl
+    executable). This web script may be run either as standard 'cgi' or on a
+    mod-perl enhanced web server. Simple rename the file to reflect the
+    extension used on your system for perl web scripts. This must be the
+    same extension as used for admin.??? and cannibal.???
+
+    This script is from an older generation of modules and has the
+    configuration embedded in the script itself. Most of the varibles are
+    set to their optimum default values but certain ones must be configured
+    specifically for your site. You must configure:
+
+    * d_port REQUIRED
+        The port to interrogate on the localhost or a remote host to get
+        data for the web process.
+
+        Pick a port on your system that is appropriate. The sister dameon
+        from LaBrea::Tarpit defaults to 8686, don't use that one.
+
+    * d_host REQUIRED
+        The host name to interrogate to get data for the web process. This
+        defaults to 'localhost'.
+
+    The rest of the parameters should not require configuration. Read the
+    comments in the file itself for additional information.
+
+   spam_report.cgi won't run ???
+
+    The most common problem is that the permissions on the html cache
+    directory don't allow the script to read or write its cache files. The
+    directory may be changed in the configuration section of the script, but
+    is set by default to:
+
+            public_html/tmp
+
+    'tmp' must be read/writable by the web server. By default, the
+    installation routine sets the ownership to the spamcannibal user/group
+    and the permissions to world read/write (0777). This may not be
+    desirable from a security standpoint (though it's no worse than /tmp).
+    If your script won't run and the permissions are different than above,
+    this may be the reason for the difficulty.
+
+   configuring rc.sc_lbdaemon.pl
+
+    This is the data collection daemon. It attaches to a unix domain socket
+    that provides the log output of the tarpit daemon.
+
+    If your SpamCannibal installation will be running the sc_dbwatch daemon
+    (recommended) then the daemon script is already correctly installed in
+    the SpamCannibal (home)/scripts directory. Just copy
+    rc.sc_lbdaemon.pl.sample to rc.sc_lbdaemon.pl and include the
+    appropriate
+
+            rc.sc_lbdaemon  start
+            rc.sc_lbdaemon  stop
+
+    entries in the sc_dbwatch.conf file.
+
+    Otherwise, copy the daemon to the startup directory of your system and
+    edit the startup script to include it at run time.
+
+            /path/rc.sc_lbdaemon.pl
+
+    Don't put a '.' in front of the script name as it disables the auto
+    detection of the perl shell for this script.
+
+    The script is from an older generation of modules and has the
+    configuration embedded in the script itself. Most of the varibles are
+    set to their optimum default values but certain ones must be configured
+    specifically for your site. You must configure:
+
+    * d_port
+        The port on which to listen for data requests from the web process.
+        Pick a port on your system that is appropriate. The sister dameon
+        from LaBrea::Tarpit defaults to 8686, don't use that one.
+
+    * d_host
+        The default interface for the listen socket. Use the hostname or IP
+        address of the interface. Use 'localhost' if the web server is on
+        the same host.
+
+    * allowed
+        This is the wrapper function. Only hosts listed here will be allowed
+        to connect to the service port. Defaults to ALL. Use the name or IP
+        address of the allowed host(s) or 'localhost' if the web server is
+        on the same host.
+
+  Setting up the DB watch daemon
+
+    The sc_dbwatch daemon and startup script provides a single interface
+    point for the host system. The daemon periodically checks that all DB
+    tasks that have registered and exited have done so in a normal manner.
+    If a task exits abnormally, then sc_dbwatch will kill all remaining
+    registered tasks, block the starting of any new tasks and cron jobs then
+    recover the database environment and restart the DB daemon tasks.
+
+    Follow these steps for configuration:
+
+    Login as the SpamCannibal user and...
+
+            cd config
+            cp sc_dbwatch.conf.sample sc_dbwatch.conf
+
+    Edit the configuration file for your site. The configuration file is
+    well commented and each of the entries has an explanation.
+
+    The individual tasks that will be started and stopped by sc_dbwatch
+    should be configured and tested prior to inclusion in the configuration
+    file. It should be noted that in a running system there is not
+    particular reason to start and stop all tasks to maintain or reconfigure
+    just one. It is quite proper to start and stop the daemons individually
+    using their respective rc.xxxxx scripts.
+
+    When this is completed, copy the rc.sc_dbwatch file from the
+    SpamCannibal source installation directory to the appropriate startup
+    directory on your host and edit the startup scripts as required to
+    instantiate it at system start and stop.
+
+   developing new scripts and daemons that use sc_dbwatch
+
+    sc_dbwatch determines if a job has exited badly by checking that each
+    pid file in the database directory has a corresponding running job. Jobs
+    that are found not to be running are marked as crashed and will force an
+    automatic task shutdown and database recovery.
+
+    Cron jobs, scripts, daemons and their children that use the databases
+    have a minimum set of requirements as follows:
+
+    * create a pid file
+        To register with the sc_dbwatch program, tasks using the database
+        add their pid files to the watched directory. The pid file should be
+        of the form "name.pid" for scripts and daemon parents and of the
+        form "name.nnn.pid" (where nnn is the PID number) for any child
+        process. This exact format is not a requirement. The only
+        requirement is that the pid files end in the suffix .pid and that
+        the file names be unique for all tasks that are registered.
+
+        The pid file should be placed in the same directory as the
+        databases. The directory path is determined for a 'C' process by
+        using the "dbhome" directory pointer and for a perl process by using
+        the
+
+    * respond to SIGTERM
+        Every process that registers its pid file should respond to a
+        SIGTERM by gracefully terminating its activity as quickly as
+        possible, removing its pid file and exiting.
+
+    * remove pid file on exit
+        Every process that registers its pid file should remove it when it
+        finishes using the databases.
+
+  * Installing optional Country Code and Flags display.
+
+    Download and install the two Geo::xxx modules from CPAN
+
+    SpamCannibal will automatically detect the presence of the modules and
+    display a country code and flag if Whois and Lookup IP address's are
+    found in the GeoIp database.
+
+    The SpamCannibal installation script sets the permissions for the
+
+      /usr/local/spamcannibal/public_html/flags
+
+    directory to 0777 if the directory is not already present so that the
+    web process can retrieve and write new flag images as needed from the
+    CIA web site. If you wish to set this directory with more restrictive
+    permissions, use the utilities that come with Geo::CountryFlags to
+    download ALL the country flags so that global write permissions are not
+    necessary.
+
+SpamCannibal mail robot script sc_mailfilter.pl
+    SpamCannibal provides a mail header parsing script, sc_mailfilter.pl,
+    that examines a mail header and after eliminating known local MTA's,
+    identifies the originator of the mail traffic. This script can
+    incorporate PGP armor (recommended) to prevent unauthorized messages
+    from being used. Basically, if you identify a piece of mail as being
+    SPAM, email it to the spam user on the tarpit host system as follows:
+
+    1. unhide the headers on the spam message
+    2. copy the headers and beginning message body to a new message
+    3. encrypt the message with spam's public key
+    4. email the message to spam
+        NOTE: it is important to keep the public_key a secret. The manner in
+        which it is used in this application provides the security for
+        sending messages to add to the spamcannibal tarpit. Anyone with the
+        public key can send a message to sc_mailfilter.pl for inclusion in
+        the tarpit database. sc_mailfilter.pl will reject messages that are
+        not PGP armored and which do not decrypt.
+
+        WARNING: The sc_mailfilter.pl script only reads the first 10,000
+        characters of incoming messages. If you encode more characters than
+        this with PGP, you will get INVALID ARMOR errors and the submitted
+        spam will not be decoded. If you get this error, either don't paste
+        as much message into what is sent to the spam user or edit
+        sc_mailfilter.pl to increase the number of characters. The latter
+        choice make the evidence database that much bigger on the average.
+
+  Setting up sc_mailflter's PGP keys
+
+    The details of the procedure vary slightly depending on whether you
+    select GPG or PGP, but the basic steps are the same.
+
+    create a private/public key pair for the spamcannibal user
+    export the public key to a file
+    install the public key file in your mail client
+   key generation for GPG
+
+    Login as the spamcannibal user and type:
+
+      gpg --gen-key
+
+      Please select what kind of key you want:
+       (1) DSA and ElGamal (default)
+       (2) DSA (sign only)
+       (5) RSA (sign only)
+      Your selection? 1
+      DSA keypair will have 1024 bits.
+      About to generate a new ELG-E keypair.
+                  minimum keysize is  768 bits
+                  default keysize is 1024 bits
+        highest suggested keysize is 2048 bits
+      What keysize do you want? (1024) 
+      Requested keysize is 1024 bits   
+      Please specify how long the key should be valid.
+             0 = key does not expire
+          <n>  = key expires in n days
+          <n>w = key expires in n weeks
+          <n>m = key expires in n months
+          <n>y = key expires in n years
+      Key is valid for? (0) 
+      Key does not expire at all
+      Is this correct (y/n)? y
+                        
+    You need a User-ID to identify your key; the software constructs the
+    user id from Real Name, Comment and Email Address in this form:
+    "Heinrich Heine (Der Dichter) <heinrichh@duesseldorf.de>"
+
+      Real name: SpamCannibal
+      Email address: spam@myhost.com          
+      Comment: eats spammers for lunch
+      You selected this USER-ID:                   
+        "SpamCannibal (eats spammers for lunch) <spam@myhost.com>"
+
+      Change (N)ame, (C)omment, (E)mail or (O)kay/(Q)uit? O
+      You need a Passphrase to protect your secret key.    
+
+      Enter password: myspampassword
+      Reenter password: myspampassword
+
+      (gng generates the keys...++..++++...)
+
+      gpg: /usr/local/spamcannibal .gnupg/trustdb.gpg: trustdb created
+
+      public and secret key created and signed.
+      key marked as ultimately trusted.
+
+      pub  1024D/EA000A1B 2003-08-28 SpamCannibal (eats spammers for lunch) <spam@myhost.com>
+           Key fingerprint = EBBD 0A8A 1AB4 B6E8 38B6  FFA1 E9A3 E4C8 EA00 0A1B
+      sub  1024g/37858C46 2003-08-28
+
+    Done!, the keys can now be found in:
+
+      ls -1 .gnupg/
+            gpg.conf
+            pubring.gpg
+            random_seed
+            secring.gpg
+            trustdb.gpg
+
+    Export the public key and transport it to your mail client.
+
+      gpg --armor --export SpamCannibal        
+
+      gpg: please see http://www.gnupg.org/faq.html for more information
+      -----BEGIN PGP PUBLIC KEY BLOCK-----
+      Version: GnuPG v1.2.2 (GNU/Linux)
+
+      mQGiBD9ON2gRBACLXEuYYtz/wIjwGKsgcIDIz8KySCjgM8/XamKjqv+Ir7IpO2jA
+      o7oH3+vpvse6xvVA4yNTLAsnozojc2D9gS9U2ZwtFq3mnvP3VLOLa4CkgixoO+ET
+      /JkPAF+RG7lRCFVg733IxSkQE4eyuhSuu/6DIrREUNt/z6Mr4p4U1DApWwCg6Pba
+      uLDAeumG2XyYSsXpVAEIn4cD/03z0FPHBxpCFnZ82IykQoNH6PMtRrFjNW/0FrjK
+      lGa4Wger1bGwaQ846/lpYBeqVZEk7BhX7kg0uRmizZf2LRujl0uu2onbpAyvSY3u
+      O1DZRm+o4r3gihO9x3LrsCp0H2osSLyv0PT3s6w+2EAeQ7F/nGs9W/zQAUkTnEJi
+      K+w8A/9qln10T+FzF/tQHdNilEVLu9/c/pnlkQk/AXRXygvpjD4rDchaWcXDWODK
+      oNDIcHO7doEoox2tpHilLjHpHoJi9QBDueRuu0ATCXhXszkIQuS4trgddP5R/N8D
+      bmvYtuHNnyURR5bO4ZQbxVWE0029C5tyYSBndIdgWUb3OeD9ILQ4U3BhbUNhbm5p
+      YmFsIChlYXRzIHNwYW1tZXJzIGZvciBsdW5jaCkgPHNwYW1AbXlob3N0LmNvbT6I
+      XAQTEQIAHAUCP043aAcLCQgHAwIBAxUCAwMWAgECHgECF4AACgkQ6aPkyOoAChse
+      5gCeKKb+qx9fEDyjjGsz0t9qhRK+jkkAnR69AP97bXgjByd5tWl3zrAmsnq1uQEN
+      BD9ON2sQBADkDn8M6idGEuEr0PSPPI6VG/PPpMDlDf9LT8lSSpDhNLOg2msFplmM
+      bK6MyIZc/CKL7mnAsIURd87lvK4lRv1L5gtj0ORHP+4xYTj2CQ0EBFHfTPkRL1mU
+      6eZTmtkTxFn6wQQ7oVNCjMYdv3V7eaZVY4WAbUpUTMMF34w31Z27TwADBQP/WQhW
+      AiO+PnmOfI8i0tOXGt1XD1eem/Chtl3nqprDnf2L3aUPVijTHbj0u08VXYV4cExi
+      fH0vubql3xWAYmZSPEesVn5GDH8R6LH/PpqApUqzp7jiqo8C28Kwh46pLsAosB6W
+      GakCkwK5Owm4bUeeHrcAO2x4J/GbJp8F1MO8WUCIRQQYEQIABgUCP043awAKCRDp
+      o+TI6gAKG0BGAJ92+fXyJztpAIHtWCxr4/SL1P5TbACXbYNCPu/7IUgFt1bibhK5
+      QCnYTg==
+      =omfJ
+      -----END PGP PUBLIC KEY BLOCK-----
+
+   key generation for PGP
+
+    Login as the spamcannibal user and type:
+
+       pgp -kg
+
+      Pretty Good Privacy(tm) Version 6.5.8
+      (c) 1999 Network Associates Inc.
+      Uses the RSAREF(tm) Toolkit, which is copyright RSA Data Security, Inc.
+      Export of this software may be restricted by the U.S. government.
+
+      Choose the public-key algorithm to use with your new key
+      1) DSS/DH (a.k.a. DSA/ElGamal) (default)
+      2) RSA
+      Choose 1 or 2: 2
+      Pick your RSA key size:
+      1)  1024 bits- High commercial grade, secure for many years
+      2)  2048 bits- "Military" grade, secure for forseeable future
+      Choose 1, 2, or enter desired number of bits: 1
+      Generating a 1024-bit RSA key.
+
+      You need a user ID for your public key.  The desired form for this
+      user ID is your name, followed by your E-mail address enclosed in
+      <angle brackets>, if you have an E-mail address.
+      For example:  John Q. Smith <jqsmith@nai.com>
+
+      Enter a user ID for your public key: SpamCannibal <spam@myhost.com>
+
+      Enter the validity period of your signing key in days from 0 - 10950
+      0 is forever (the default is 0): 0
+
+    You need a pass phrase to protect your RSA secret key. Your pass phrase
+    can be any sentence or phrase and may have many words, spaces,
+    punctuation, or any other printable characters.
+
+      Enter pass phrase: myspampassword
+      Enter same pass phrase again: myspampassword
+
+      Note that key generation is a lengthy process.
+      ******* ........*******
+      Make this the default signing key? (Y/n) y
+
+      Key generation completed.
+
+    Done!, the keys can be found in:
+
+      ls -1 .pgp
+            PGPMacBinaryMappings.txt
+            PGPgroup.pgr
+            PGPsdkPreferences
+            pgp.cfg
+            pubring-bak-1.pkr
+            pubring-bak-2.pkr
+            pubring.pkr
+            randseed.rnd
+            secring-bak-1.skr
+            secring-bak-2.skr
+            secring.skr
+
+    Export the public key and transport it to your mail client.
+
+      pgp -kx SpamCannibal
+      Pretty Good Privacy(tm) Version 6.5.8
+      (c) 1999 Network Associates Inc.
+      Uses the RSAREF(tm) Toolkit, which is copyright RSA Data Security, Inc.
+      Export of this software may be restricted by the U.S. government.
+
+      Extracting from keyring '/usr/local/spamcannibal/.pgp/pubring.pkr', userid "SpamCannibal".
+
+      Extracting from keyring '/home/calvarys/.pgp/pubring.pkr', userid "SpamCannibal".
+
+      Extract the above key(s) into which file? spam
+
+      Key extracted to file 'spam.pgp'.
+
+  Setting up sc_mailfilter.pl
+
+    Mail is delivered to sc_mailfilter.pl by the hosts local mail transport
+    system. Login as the spamcannibal user and create a .forward file
+    containing a line like this:
+
+      "|/usr/local/spamcannibal/scripts/sc_mailfilter.pl \
+        -v /usr/local/spamcannibal/config/sc_mailfilter.conf"
+
+    To keep the load factor down when multiple mail items are submitted
+    similtaneously, renice the task:
+
+      "|/usr/bin/nice -n 20 /usr/local/spamcannibal/scripts/sc_mailfilter.pl \
+        -v /usr/local/spamcannibal/config/sc_mailfilter.conf"
+
+      Syntax: ./scripts/sc_mailfilter.pl path/to/config.file
+        or
+            ./scripts/sc_mailfilter.pl -d path/to config.file
+            ./scripts/sc_mailfilter.pl -v path/to/config.file
+
+      The -v switch sends debug error messages to 
+      the REPORT target email address (if present)
+
+      The -d switch returns the information that would
+      be added to the tarpit and evidence databases.
+      Nothing is added to the database files.
+
+    Then cd to the config directory
+
+      cd config
+      cp sc_mailfilter.conf.sample sc_mailfilter.conf
+
+Setting up sc_abuse.pl
+    SpamCannibal provides a mail header parsing script, sc_abuse.pl, that
+    examines a mail header and after eliminating known local MTA's,
+    identifies the originator of the mail traffic. This script then sends an
+    abuse report to abuse@domain of the identified smtp server address.
+
+    Preparation of the mail message to send to this robot script by the spam
+    moderator is the same as the section on "SpamCannibal mail robot script
+    sc_mailfilter.pl", above.
+
+  Create the sc_abuse user and aliases
+
+    Follow the same procedure used to create the spam user shown in the
+    section on "Creating the SpamCannibal user".
+
+    1. add the user sc_abuse
+    2. make sure the group is spam (95 in the example above)
+    3. add aliases for domains longer than 2 names.
+        sc_abuse.pl determines the number of domain name segements to use in
+        forming the target (abuse@spam.domain.com) by examining its To:
+        address trailing digit. The default domain parsing method is to
+        always parse the last two domains segments from the remote smtp host
+        address.
+
+          i.e. for some.spam.domain.com
+
+          To: scab  2 domain fields 'abuse@domain.com'
+          To: scab1 2 domain fields 'abuse@domain.com'
+          To: scab2 2 domain fields 'abuse@domain.com'
+          To: scab3 3 domain fields 'abuse@spam.domain.com'
+          To: scab4 4 domain fields 'abuse@some.spam.domain.com'
+
+        Use a short easy address prefix for your mail target such as:
+
+          sca   SpamCannibalAbuse
+            or
+          scab  SpamCannibalABuse
+
+        For sendmail, the alias entries would be as follows:
+
+          sca:          sc_abuse
+          sca3:         sc_abuse
+          sca4:         sc_abuse
+
+        These aliases are used infrequently but are handy when spam domains
+        such as
+
+          smtp.spammer.co.uk
+
+        are the source of spam messages to which an abuse report should be
+        sent.
+
+        The resulting abuse report will arrive at the destination with the
+        headers:
+
+          To: abuse@spammer.co.uk
+          Subject: spam from smtp.spammer.co.uk
+
+          message body... this should include the headers and
+                          some minimimum spam body content
+
+  Activate the sc_abuse.pl script
+
+    Mail is delivered to sc_abuse.pl by the hosts local mail transport
+    system. Login as the sc_abuse user and create a .forward file.
+
+    This example assumes that the default SpamCannibal installation
+    directories were used.
+
+     "|/usr/bin/nice -n 20 /usr/local/spamcannibal/scripts/sc_abuse.pl \
+      -v /usr/local/spamcannibal/config/sc_mailfilter.conf"
+
+Setting up rc.multi_dnsbl
+    Download and install Net::DNSBL::MultiDaemon. This is an excerpt from
+    the installation procedure.
+
+    multi_dnsbl can be installed as either a standalone DNSBL or as a
+    plug-in to a BIND 9 installation on the same host. In either case, copy
+    the rc.multi_daemon script to the appropriate startup directory on your
+    host and modify the start, stop, restart scripts as required. Operation
+    of the script is as follows:
+
+      Syntax: ./rc.multi_dnsbl start    /path/to/config.file
+              ./rc.multi_dnsbl start -v /path/to/config.file
+              ./rc.multi_dnsbl stop     /path/to/config.file
+              ./rc.multi_dnsbl restart  /path/to/config.file
+
+      The -v switch will print the scripts 
+      actions verbosely to the STDERR.
+
+  CONFIGURATION FILE
+
+    The configuration file for multi_dnsbl shares a common format with the
+    Mail::SpamCannibal sc_BLcheck.pl script, facilitating common maintenance
+    of DNSBL's for your MTA installation.
+
+    The sample configuration file multi_dnsbl.conf.sample is heavily
+    commented with the details for each configuration element. If you plan
+    to use a common configuration file in a SpamCannibal installation,
+    simply add the following elements to the sc_BlackList.conf file:
+
+      MDstatfile     => '/path/to/statistics/file.txt',
+      MDpidpath      => '/path/to/pidfiles', # /var/run
+      MDzone         => 'pseudo.dnsbl',
+
+      # OPTIONAL
+      MDstatrefresh => 300,       # seconds
+      MDipaddr      => '0.0.0.0', # PROBABLY NOT WHAT YOU WANT
+      MDport        => 9953,
+  
+  STANDALONE OPERATION
+
+    For standalone operation, simply set MDport = 53, nothing more is
+    required.
+
+    Interrogating the installation will then return the first match from the
+    configured list of DNSBL servers.
+
+      i.e.  dig 2.0.0.127.pseudo.dnsbl
+
+            .... results
+
+    Note that the results will contain all of the "authority" and
+    "additional" (glue) records from the responding DNSBL placed into the
+    additional section of the returned record that will have an authority
+    record from of "localhost".
+
+  PLUGIN to BIND 9
+
+    multi_dnsbl may be used as a plugin helper for a standard bind 9
+    installation by adding a forward zone to the configuration file as
+    follows:
+
+      //zone pseudo.dnsbl
+      zone "pseudo.dnsbl" in {
+            type forward;
+            forward only;
+            forwarders { 
+                127.0.0.1 port 9953;
+            };
+      };
+
+    You may also wish to add one or more of the following statements with
+    appropriate address_match_lists to restrict access to the facility.
+
+            allow-notify {};
+            allow-query { address_match_list };
+            allow-recursion { address_match_list };
+            allow-transfer {};      
+
+  MTA CONFIGURATION
+
+    Access to DNSBL lookup is configured in the normal fashion for each MTA.
+    Since MTA's generally must interrogate on port 53, multi_dnsbl must be
+    installed on a stand-alone server or as a plugin for BIND 9.
+
+    A typical configuration line for sendmail M4 configuration file is shown
+    below:
+
+      FEATURE(`dnsbl',`pseudo.dnsbl',
+      `554 Rejected $&{client_addr} found in http://www.my.blacklist.org')dnl
+
+COPYRIGHT
+    Copyright 2003 - 2004, Michael Robinton <michael@bizsystems.com>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+AUTHOR
+    Michael Robinton <michael@bizsystems.com>
+

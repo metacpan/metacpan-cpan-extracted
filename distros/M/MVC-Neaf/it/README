@@ -1,0 +1,6 @@
+Integration tests.
+
+Anything that spawns processes, listens to ports, relies on timeouts
+etc should be here.
+
+Format is still *.t - used by prove.

@@ -1,0 +1,95 @@
+diff -ur Fuse-0.08-orig/examples/example.pl Fuse-0.08/examples/example.pl
+--- Fuse-0.08-orig/examples/example.pl 2006-01-03 08:19:08.000000000 -0800
++++ Fuse-0.08/examples/example.pl   2007-01-03 08:48:38.000000000 -0800
+@@ -2,7 +2,7 @@
+ use strict;
+ 
+ use blib;
+-use Fuse;
++use Fuse qw(fuse_get_context);
+ use POSIX qw(ENOENT EISDIR EINVAL);
+ 
+ my (%files) = (
+@@ -23,6 +23,12 @@
+      mode => 0644,
+      ctime => time()-1000
+   },
++  me => {
++     size => 45,
++     type => 0100,
++     mode => 0644,
++     ctime => time()-1000
++  },
+ );
+ 
+ sub filename_fixup {
+@@ -38,6 +44,7 @@
+   $file = '.' unless length($file);
+   return -ENOENT() unless exists($files{$file});
+   my ($size) = exists($files{$file}{cont}) ? length($files{$file}{cont}) : 0;
++  $size = $files{$file}{size} if exists $files{$file}{size};
+   my ($modes) = ($files{$file}{type}<<9) + $files{$file}{mode};
+   my ($dev, $ino, $rdev, $blocks, $gid, $uid, $nlink, $blksize) = (0,0,0,1,0,0,1,1024);
+   my ($atime, $ctime, $mtime);
+@@ -59,7 +66,7 @@
+   my ($file) = filename_fixup(shift);
+   print("open called\n");
+   return -ENOENT() unless exists($files{$file});
+-  return -EISDIR() unless exists($files{$file}{cont});
++  return -EISDIR() if $files{$file}{type} & 0040;
+   print("open ok\n");
+   return 0;
+ }
+@@ -70,6 +77,11 @@
+   my ($file) = filename_fixup(shift);
+   my ($buf,$off) = @_;
+   return -ENOENT() unless exists($files{$file});
++  if(!exists($files{$file}{cont})) {
++     return -EINVAL() if $off > 0;
++     my $context = fuse_get_context();
++     return sprintf("pid=0x%08x uid=0x%08x gid=0x%08x\n",@$context{'pid','uid','gid'});
++  }
+   return -EINVAL() if $off > length($files{$file}{cont});
+   return 0 if $off == length($files{$file}{cont});
+   return substr($files{$file}{cont},$off,$buf);
+diff -ur Fuse-0.08-orig/Fuse.pm Fuse-0.08/Fuse.pm
+--- Fuse-0.08-orig/Fuse.pm 2006-11-29 05:24:15.000000000 -0800
++++ Fuse-0.08/Fuse.pm   2007-01-03 08:42:20.000000000 -0800
+@@ -21,7 +21,7 @@
+ # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
+ # will save memory.
+ our %EXPORT_TAGS = (
+-         'all' => [ qw(XATTR_CREATE XATTR_REPLACE) ],
++         'all' => [ qw(XATTR_CREATE XATTR_REPLACE fuse_get_context) ],
+          'xattr' => [ qw(XATTR_CREATE XATTR_REPLACE) ]
+          );
+ 
+diff -ur Fuse-0.08-orig/Fuse.xs Fuse-0.08/Fuse.xs
+--- Fuse-0.08-orig/Fuse.xs 2006-08-22 04:35:23.000000000 -0700
++++ Fuse-0.08/Fuse.xs   2007-01-03 08:47:14.000000000 -0800
+@@ -813,6 +813,24 @@
+ MODULE = Fuse    PACKAGE = Fuse
+ PROTOTYPES: DISABLE
+ 
++SV*
++fuse_get_context()
++  PREINIT:
++  struct fuse_context *fc;
++  CODE:
++  fc = fuse_get_context();
++  if(fc) {
++     HV *hash = newHV();
++     hv_store(hash, "uid", 3, newSViv(fc->uid), 0);
++     hv_store(hash, "gid", 3, newSViv(fc->gid), 0);
++     hv_store(hash, "pid", 3, newSViv(fc->pid), 0);
++     RETVAL = newRV_noinc((SV*)hash);
++  } else {
++     XSRETURN_UNDEF;
++  }
++  OUTPUT:
++  RETVAL
++
+ void
+ perl_fuse_main(...)
+   PREINIT:
+

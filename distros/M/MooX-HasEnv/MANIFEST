@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/MooX/HasEnv.pm
+t/00-load.t
+t/10-simple.t
+t/20-code.t
+t/lib/MooXTestBla.pm
+t/lib/MooXTestBlub.pm
+t/release-pod-syntax.t

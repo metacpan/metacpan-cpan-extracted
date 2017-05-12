@@ -1,0 +1,104 @@
+Revision history for MKDoc::XML 
+
+0.75 Thu Mar 10 15:12:00 2005
+    - Added tests for tagger bugs when matching numbers and double escaping attribute contents
+    - bugfix for double-encoding attribute-contents bug
+    - fix for invalid XML produced when tagging text matching numeric strings
+
+0.74 Thu Dec 09 14:00:00 2004
+    - Fix for longstanding bug introduced in 0.66 that resulting in MKDoc::XML::Tagger producing invalid XML.
+
+0.73 Wed Oct 06 12:58:00 2004
+    - removed defunct jhiver email address
+    - Fixed some 'uninitialized value' problem
+
+0.72 Wed Jul 21 18:41:28 2004
+    - Added MKDoc::XML::TreePrinter
+
+0.71 Mon Jun 21 13:38:38 2004
+    - Fixed MKDoc::XML::Tagger bug
+    - Added t/302_MKDoc_XML_Tagger_Spaces.t
+ 
+0.70 Mon Apr  5 14:31:31 2004
+    - Attribute parsing fix not commited somehow
+
+0.69 Thu Mar 18 17:25:55 2004
+    - Added experimental MKDoc::XML::Tagger::Preserve module
+    - Fixed broken attribute parsing in MKDoc::XML::Token
+
+0.68 Sat Jan 31 10:44:31 2004
+    - Fixed backwards compatibility decoding bug
+
+0.67 Mon Jan 26 13:52:43 2004
+    - Fixed more backwards compatibility bugs 
+
+0.66 Fri Jan 23 16:03:03 2004
+    - Fixed double hyperlinking issue with MKDoc::XML::Tagger
+ 
+0.65 Fri Jan 23 13:08:33 2004
+    - Fixed some backwards compatibility issues 
+
+0.64 Fri Jan 23 12:28:27 2004
+    - Fixed "Use of uninitialized value in join or string" warnings in MKDoc::XML::Decode
+
+0.63
+    - Added more comprehensive XHTML entities decoding 
+
+0.62 Thu Nov  6 11:54:49 2003
+    - Added current MKDoc backwards compatibility
+
+0.61 Thu Oct 16 13:44:40 2003
+    - Fixed not dying on <p foo=bar>
+    - <p foobar>
+    - <p foo bar> ...
+
+0.60 Thu Oct  9 16:54:44 2003
+    - Refactored / Modularized MKDoc::XML::Decode
+    - MKDoc whitelist: added required xml container (html), head, title and body
+    - MKDoc whitelist: recreated from xhtml 1.0 strict
+    - MKDoc whitelist: updated test case t/402_MKDoc_XML_Stripper_def.t
+    - Fixed error reporting in MKDoc::XML::TreeBuilder
+    - Removed "noframes" element from xhtml 1.0 transitional
+
+0.53 Tue Sep 30 10:49:06 2003
+    - Fixed a structural bug in MKDoc::XML::Token
+    - Renamed all is_XXX methods to XXX
+
+0.52 Thu Sep 25 14:19:49 2003
+    - Fixed a bug in MKDoc::XML::Tagger which would happen with Perl 5.6.1
+    - Added MKDoc::XML::Stripper XHTML specs contributed by Patrick
+    - Amended MKDoc::XML::Stripper POD accordingly
+    - Fixed missing dependencies
+
+0.51 Fri Sep 19 16:48:10 2003
+    - Changed lib/MKDoc/XML.pm and Makefile.PL so that it can be picked
+      up by Petal's Makefile.PL
+
+0.5 Fri Sep 19 16:37:12 2003
+    - Improved MKDoc::XML::Encode and MKDoc::XML::Decode
+    - Added definition loading to MKDoc::XML::Stripper
+
+0.4 Fri Sep 19 12:15:23 2003
+    - Fixed Robin Berjon's reported bug about tokenizer not dying on invalid comment
+    - Fixed MKDoc::XML::Token incorrectly parsing attributes in single quotes
+    - Fixed MKDoc::XML::Token not parsing attributes spanned on many lines
+    - Fixed bogus regexes in is_self_close() method
+    - Fixed MKDoc::XML::Token not parsing attributes containing '-'
+
+0.3 Wed Sep 17 15:40:50 2003
+    - Fixed patrick's reported bug "XML::Stripper" not compiling
+    - Fixed patrick's reported bug "p tag not closing"
+
+0.2 Thu Sep 11 16:19:46 2003
+    - Applied Bruno's documentation typo patches
+    - MKDoc::XML::Encode initial release
+    - MKDoc::XML::EncodeHO initial release
+    - MKDoc::XML::Decode initial release
+    - MKDoc::XML::Dumper initial release
+
+0.1 Thu Sep  4 12:02:03 2003
+    - MKDoc::XML::Token initial release
+    - MKDoc::XML::Tokenizer initial release
+    - MKDoc::XML::TreeBuilder initial release
+    - MKDoc::XML::Stripper initial release
+    - MKDoc::XML::Tagger initial release

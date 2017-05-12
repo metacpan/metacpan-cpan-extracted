@@ -1,0 +1,10 @@
+Revision history for Perl extension MARC::Crosswalk::DublinCore
+
+0.02  Wed Mar 30 2005
+	- switched to Module::Build
+	- added dc simple and qualified tests
+	- added pod_coverage.t
+
+0.01  Wed Nov 17 20:31:45 2004
+	- original version
+

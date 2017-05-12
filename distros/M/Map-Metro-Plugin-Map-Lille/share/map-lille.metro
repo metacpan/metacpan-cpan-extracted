@@ -1,0 +1,135 @@
+--stations
+# Line 1
+Quatre Cantons - Stade Pierre-Mauroy % :Quatre Cantons
+Cité scientifique - Professeur Gabillard % :Cité scientifique
+Triolo
+Villeneuve-d'Ascq - Hôtel de Ville % :Villeneuve-d'Ascq
+Pont de Bois
+Lezennes
+Hellemmes
+Marbrerie
+Fives
+Caulier
+Gare Lille-Flandres
+Rihour
+République - Beaux-Arts % :République
+Gambetta
+Wazemmes
+Porte des Postes
+CHR Oscar-Lambret % :Oscar-Lambret
+CHR B-Calmette % :B-Calmette
+
+# Line 2
+Saint-Philibert
+Bourg
+Maison des Enfants
+Mitterie
+Pont Supérieur
+Lomme - Lambersart
+Canteleu
+Bois Blancs
+Port de Lille
+Cormontaigne
+Montebello
+Porte des Postes
+Porte d'Arras
+Porte de Douai
+Porte de Valenciennes
+Lille Grand Palais
+Mairie de Lille
+Gare Lille-Flandres
+Gare Lille-Europe
+Saint-Maurice Pellevoisin
+Mons Sarts
+Mairie de Mons
+Fort de Mons
+Les Prés
+Jean-Jaurès
+Wasquehal - Pavé de Lille
+Wasquehal - Hôtel de ville
+Croix - Centre
+Croix - Mairie
+Épeule - Montesquieu
+Roubaix - Charles-de-Gaulle
+Eurotéléport
+Roubaix - Grand-Place
+Gare - Jean-Lebas
+Alsace
+Mercure
+Carliers
+Tourcoing - Sébastopol
+Tourcoing - Centre
+Colbert
+Phalempins
+Pont de Neuville
+Bourgogne
+CH Dron
+
+--lines
+M1|M1|Line 1|color:#ffcd09,width:7
+M2|M2|Line 2|color:#e43417,width:7
+
+--transfers
+
+--segments
+M1|Quatre Cantons - Stade Pierre-Mauroy|Cité scientifique - Professeur Gabillard
+M1|Cité scientifique - Professeur Gabillard|Triolo
+M1|Triolo|Villeneuve-d'Ascq - Hôtel de Ville
+M1|Villeneuve-d'Ascq - Hôtel de Ville|Pont de Bois
+M1|Pont de Bois|Lezennes
+M1|Lezennes|Hellemmes
+M1|Hellemmes|Marbrerie
+M1|Marbrerie|Fives
+M1|Fives|Caulier
+M1|Caulier|Gare Lille-Flandres
+M1|Gare Lille-Flandres|Rihour
+M1|Rihour|République - Beaux-Arts
+M1|République - Beaux-Arts|Gambetta
+M1|Gambetta|Wazemmes
+M1|Wazemmes|Porte des Postes
+M1|Porte des Postes|CHR Oscar-Lambret
+M1|CHR Oscar-Lambret|CHR B-Calmette
+
+M2|Saint-Philibert|Bourg
+M2|Bourg|Maison des Enfants
+M2|Maison des Enfants|Mitterie
+M2|Mitterie|Pont Supérieur
+M2|Pont Supérieur|Lomme - Lambersart
+M2|Lomme - Lambersart|Canteleu
+M2|Canteleu|Bois Blancs
+M2|Bois Blancs|Port de Lille
+M2|Port de Lille|Cormontaigne
+M2|Cormontaigne|Montebello
+M2|Montebello|Porte des Postes
+M2|Porte des Postes|Porte d'Arras
+M2|Porte d'Arras|Porte de Douai
+M2|Porte de Douai|Porte de Valenciennes
+M2|Porte de Valenciennes|Lille Grand Palais
+M2|Lille Grand Palais|Mairie de Lille
+M2|Mairie de Lille|Gare Lille-Flandres
+M2|Gare Lille-Flandres|Gare Lille-Europe
+M2|Gare Lille-Europe|Saint-Maurice Pellevoisin
+M2|Saint-Maurice Pellevoisin|Mons Sarts
+M2|Mons Sarts|Mairie de Mons
+M2|Mairie de Mons|Fort de Mons
+M2|Fort de Mons|Les Prés
+M2|Les Prés|Jean-Jaurès
+M2|Jean-Jaurès|Wasquehal - Pavé de Lille
+M2|Wasquehal - Pavé de Lille|Wasquehal - Hôtel de ville
+M2|Wasquehal - Hôtel de ville|Croix - Centre
+M2|Croix - Centre|Croix - Mairie
+M2|Croix - Mairie|Épeule - Montesquieu
+M2|Épeule - Montesquieu|Roubaix - Charles-de-Gaulle
+M2|Roubaix - Charles-de-Gaulle|Eurotéléport
+M2|Eurotéléport|Roubaix - Grand-Place
+M2|Roubaix - Grand-Place|Gare - Jean-Lebas
+M2|Gare - Jean-Lebas|Alsace
+M2|Alsace|Mercure
+M2|Mercure|Carliers
+M2|Carliers|Tourcoing - Sébastopol
+M2|Tourcoing - Sébastopol|Tourcoing - Centre
+M2|Tourcoing - Centre|Colbert
+M2|Colbert|Phalempins
+M2|Phalempins|Pont de Neuville
+M2|Pont de Neuville|Bourgogne
+M2|Bourgogne|CH Dron

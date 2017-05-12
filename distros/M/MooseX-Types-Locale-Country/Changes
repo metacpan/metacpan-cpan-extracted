@@ -1,0 +1,193 @@
+This file documents the revision history for Perl distribution
+`MooseX-Types-Locale-Country`.
+
+
+VERSION HISTORY
+===============
+
+0.05 : Released on 2013-12-25 (JST)
+-----------------------------------
+
+Codes have no changes.
+
+### Bug fixes
+
+#### Packaging
+
+-   The package no longer includes test modules.
+    They caused a failure of the tests.
+    It is concerned with RT #89913 (by Poul Henning Sørensen), #91051
+    (by Slaven Rezić) and #91581 (by Caleb Cushing).
+    Thank you for your contributions.
+
+
+0.04 : Released on 2010-03-20 (JST)
+-----------------------------------
+
+Codes have no changes.
+
+### Bug fixes
+
+#### Packaging
+
+-   Remove superfluous dependency `mro` which related to `Test::Class`
+    (`MRO::Compat`).
+    This problem is concerned with RT #55482.
+
+### Refactoring
+
+#### Packaging
+
+-   Refactor `Makefile.PL`.
+
+
+0.03 : Released on 2010-03-19 (JST)
+-----------------------------------
+
+Codes have no changes.
+
+### Bug fixes
+
+#### Packaging
+
+-   Resolve RT #55482: Undeclared dependencies on test related modules.
+    Thanks to Andreas Koenig.
+-   Explicitly declare `author_tests` in `Makefile.PL`
+    (for including `Module::Install::AuthorTests`).
+-   Correct resources (repository and homepage).
+-   Disable `auto_install`.
+
+
+0.02 : Released on 2010-03-03 (JST)
+-----------------------------------
+
+### Bug fixes
+
+#### Tests
+
+-   Made test skip itself
+    when `MooseX::Getopt` is not installed in tester's environment.
+
+
+0.01 : Released on 2010-03-03 (JST)
+-----------------------------------
+
+### Features
+
+#### `MooseX::Types::Locale::Country` and `MooseX::Types::Locale::Country::Fast`
+
+-   Added type mapping for `MooseX::Getopt`.
+
+### Bug fixes
+
+#### `MooseX::Types::Locale::Country` and `MooseX::Types::Locale::Country::Fast`
+
+-   No warnings to assign undefined value.
+
+### Documents
+
+#### `Changes`
+
+-   Modified version notation to explain guide of upgrade.
+
+#### `MooseX::Types::Locale::Country`
+
+-   Refered to `/examples/complex.pl` to explain that code conversion is not
+    supported.
+
+### Others
+
+-   Changed the bugtracker URI on Makefile.PL from GitHub to CPAN RT.
+
+-   Removed nonexistent `coverage` file from `MANIFEST`.
+
+
+0.000 : Released on 2009-10-14 (JST)
+------------------------------------
+
+(Regarded as version 0.00)
+
+Initial version.
+
+This version kept in step with `MooseX::Types::Locale::Language` 0.003.
+
+### Features
+
+#### `MooseX::Types::Locale::Country`
+
+-   Implemented `MooseX::Types::Locale::Country`,
+    which packages several `Moose::Util::TypeConstraints` with coercions,
+    designed to work with the values of `Locale::Country`.
+
+-   Exported function name is `CountryCode`, `Alpha2Country`, `Alpha3Country`,
+    `NumericCountry`, and `CountryName`.
+
+#### `MooseX::Types::Locale::Country::Fast`
+
+-   Also implemented `MooseX::Types::Locale::Country::Fast`,
+    which provides only constraints, without coercions.
+
+-   Exported function name is same as above.
+
+### Tests
+
+-   Prepared tests for `MooseX::Types::Locale::Country`
+    and `MooseX::Types::Locale::Country::Fast`.
+
+-   Added several author tests.
+
+-   Added coverage checking scripts `coverage.sh`
+    (and `coverage.bat` for MS Windows).
+
+### Documents
+
+-   Prepared minimal documents.
+
+-   Prepared minimal examples.
+
+
+META INFORMATION
+================
+
+Version notation
+----------------
+    V.vvrr_dd : Released on YYYY-MM-DD
+
+### V  : Major version number
+
+-   Added ambitious features
+-   Changed in APIs
+    (older API will be keeped to compatibility for a some period)
+-   ...
+
+### vv : Minor version number (in major version)
+
+-   Added several features
+-   Improved any features
+-   Fixed bugs
+-   ...
+
+### rr : Revision number (in minor version, on demand)
+
+You would not need to update the distribution.
+
+-   Improved tests
+-   Updated documents
+
+### dd : Developer release number (in revision number, on demand)
+
+This is unstable version.
+Unless you are a developer, You will not be recommended to upgrade
+the distribution.
+
+-   Added experimental features
+-   Fixed bugs provisionally
+
+
+Document format
+---------------
+
+This `Changes` file was formatted in Markdown.
+
+    $ perl -MText::Markdown -MFile::Slurp -e \
+      'print (Text::Markdown->new->markdown(scalar read_file(q{Changes})));'

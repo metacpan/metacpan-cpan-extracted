@@ -1,0 +1,23 @@
+---
+abstract: 'Gzip a Mojo::Message::Response'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MojoX-Encode-Gzip
+requires:
+  Compress::Zlib: '0'
+  Mojolicious: '4.50'
+  Test::More: '0'
+resources:
+  bugtracker: http://github.com/reneeb/MojoX-Encode-Gzip/issues
+  homepage: http://github.com/reneeb/MojoX-Encode-Gzip
+  repository: http://github.com/reneeb/MojoX-Encode-Gzip.git
+version: '1.11'

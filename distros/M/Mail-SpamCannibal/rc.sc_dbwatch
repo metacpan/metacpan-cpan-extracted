@@ -1,0 +1,258 @@
+#!/usr/bin/perl
+#
+# rc.sc_dbwatch
+#
+# version 1.04, 11-16-08
+#
+#################################################################
+# WARNING! do not modify this script, make one with a new name. #
+# This script will be overwritten by subsequent installs of     #
+# SpamCannibal.                                                 #
+#################################################################
+#
+# Copyright 2003 - 2008, Michael Robinton <michael@bizsystems.com>
+   
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+   
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+   
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+
+use strict;
+#use diagnostics;
+use vars qw($watchconfig $SiteConfig $LogLevel);
+use lib qw(blib/lib blib/arch);
+use Unix::Syslog 0.97 qw(:macros :subs);
+use Mail::SpamCannibal::SiteConfig;
+use Mail::SpamCannibal::ScriptSupport 0.10 qw(
+	job_died
+	dbjob_chk
+	dbjob_kill
+	dbjob_recover
+	doINCLUDE
+);
+
+use Mail::SpamCannibal::PidUtil 0.03 qw(
+	is_running
+	get_script_name
+	make_pidfile
+	zap_pidfile
+);
+
+use Net::DNS::ToolKit qw(
+	ttlAlpha2Num
+);
+
+use IPTables::IPv4::DBTarpit::Tools;
+
+sub usage {
+  print STDERR $_[0],"\n\n" if $_[0];
+  print STDERR qq|
+Syntax:
+	$0 start   path/to/config.file
+	$0 restart path/to/config.file
+	$0 stop    path/to/config.file
+
+|;
+  exit 1;
+}
+
+$| = 1;
+
+my $action = shift @ARGV;
+usage() unless $action;
+
+my $config = shift @ARGV;
+usage() unless $config;
+
+$watchconfig = doINCLUDE($config);
+usage('could not load config file')
+	unless $watchconfig;
+
+usage('corrupted config file')
+	unless  keys %$watchconfig;
+
+my $recheck = ttlAlpha2Num($watchconfig->{RECHECK});
+usage('missing RECHECK interval')
+	unless $recheck;
+$recheck = 60 if $recheck < 60;		# reasonable value is not less than once per minute
+
+my $graceperiod = ttlAlpha2Num($watchconfig->{GRACE_PERIOD});
+usage('missing GRACE_PERIOD')
+	unless $graceperiod;
+
+$SiteConfig = $watchconfig->{SiteConfig} ||
+	new Mail::SpamCannibal::SiteConfig;
+
+if ($watchconfig->{SYSLOG}) {
+  $LogLevel = eval "$watchconfig->{SYSLOG}";
+}
+
+# only open the db's we will need
+my ($environment,$tarpit,$archive,$contrib,$evidence) = (
+	$SiteConfig->{SPMCNBL_ENVIRONMENT},
+	$SiteConfig->{SPMCNBL_DB_TARPIT},
+	$SiteConfig->{SPMCNBL_DB_ARCHIVE},
+	$SiteConfig->{SPMCNBL_DB_CONTRIB},
+	$SiteConfig->{SPMCNBL_DB_EVIDENCE},
+);
+   
+my %default = (
+	dbhome 	=> $environment,
+	dbfile	=> [$tarpit,$archive],
+	txtfile	=> [$contrib,$evidence],
+);
+
+my $me = get_script_name();
+$0 = $me;			# clean up ps and top display info
+my $pidfile = $environment .'/'. $me . '.pid';
+my $run = is_running($pidfile);
+
+if ($action eq 'stop' || $action eq 'restart') {
+  kill 15, $run if $run;
+  sleep 1;
+  kill 9, $run if $run && kill 0, $run;
+  $run = 0;
+  openlog($me, LOG_PID(), LOG_MAIL()) if $watchconfig->{SYSLOG};
+  do_common('STOP');
+  closelog if $watchconfig->{SYSLOG};
+  exit 0 if $action eq 'stop';
+}
+elsif ($action ne 'start') {
+  usage();
+}
+
+if ($run) {
+  print "$me: $run, already running\n";
+  exit 1;
+}
+
+# fork and test
+if ( $run = fork ) {
+  waitpid($run,0);
+  exit;
+}
+# clean up for proper daemon operation 
+chdir '/';			# allow root dismount
+open STDIN, '/dev/null' or die "Can't dup STDIN to /dev/null: $!";
+open STDOUT, '>/dev/null' or die "Can't dup STDOUT to /dev/null: $!";
+open STDERR, '>/dev/null' or die "Can't dup STDERR to /dev/null: $!";
+exit 0 if $run = fork;
+
+$run = make_pidfile($pidfile);
+
+if ($watchconfig->{SYSLOG}) {
+  openlog($me, LOG_PID(), LOG_MAIL());
+  syslog($LogLevel,"%s\n",'Initiated...');
+}
+
+my $forcefile = $environment .'/'. get_script_name() . '.startup.pid';
+open(F,'>'. $forcefile) or die "could not open startup file $forcefile\n";
+print F 0,"\n";		# bogus entry to force rebuild
+close F;
+
+local $SIG{TERM} = sub { $run = 0 };
+while ($run) {
+  next if dbjob_chk(\%default);
+  if ($watchconfig->{SYSLOG}) {
+    my %jobs;
+    if (job_died(\%jobs,$environment)) {
+      foreach(keys %jobs) {
+        unless ($jobs{$_} || $_ eq $forcefile) {
+          syslog($LogLevel, "%s failed\n", $_);
+        }
+      }
+    }
+  }
+  dbjob_kill(\%default,$graceperiod);
+  dbjob_recover(\%default);
+  do_common('START');
+} continue {
+  sleep $recheck;
+}
+if ($watchconfig->{SYSLOG}) {
+  syslog($LogLevel,"%s\n",'caught SIGTERM, exiting...');
+  closelog();
+}
+zap_pidfile($environment);
+
+sub do_common {
+  my($action) = @_;
+  return 0 unless $action eq 'STOP' || $action eq 'START';
+  for(my $i=0; $i<= $#{$watchconfig->{$action}};$i+=2) {
+    my $cmd	= $watchconfig->{$action}->[$i];
+    my $args	= $watchconfig->{$action}->[$i+1];
+    if ($cmd !~ m|^/|) {
+      $cmd = $SiteConfig->{SPMCNBL_SCRIPT_DIR} .'/'. $cmd;
+    }
+    my $response = (-e $cmd && -x $cmd)
+    	? qx|$cmd $args|
+	: 'not found or not executable';
+    syslog($LogLevel, "%s, %s\n", $watchconfig->{$action}->[$i], $response)
+	if $response && $watchconfig->{SYSLOG};
+  }
+  sleep 1 if $action eq 'STOP';	# give cleanup some time
+  return 1;
+}
+
+1;
+__END__
+
+=head1 NAME
+
+rc.sc_dbwatch - Database watcher
+
+=head1 SYNOPSIS
+
+  rc.sc_dbwatch	start
+  rc.sc_dbwatch	restart
+  rc.sc_dbwatch stop
+
+=head1 DESCRIPTION
+
+  rc.sc_dbwatch	start
+	Start the db watcher and configured db daemons
+	any previously running db tasks are first terminated
+	with a SIGTERM and if the do not respond with a SIGKILL
+
+  rc.sc_dbwatch restart
+	Previous instance of rc.sc_dbwatch is terminated 
+	with a SIGTERM or SIGKILL if unresponsive. Configured
+	db daemons are terminated using the STOP method in
+	the sc_dbwatch.conf file. sc_dbwatch then uses the 
+	start method described above to terminate any other
+	db tasks and restart the configured daemons.
+
+  rc.sc_dbwatch	stop
+	Previous instance of rc.sc_dbwatch is terminated
+	with a SIGTERM or SIGKILL if unresponsive. Configured
+	db daemons are terminated using the STOP method in
+	the sc_dbwatch.conf file.
+
+The rc.sc_dbwatch daemon expects its configuration file
+to contain information about all daemons that will use
+the database. Cron jobs are not configured though they will be blocked or killed
+if they register their PID and if there is a database fault.
+
+=head1 AUTHOR
+
+Michael Robinton <michael@bizsystems.com>
+
+=head1 COPYRIGHT
+
+Copyright 2003 - 2008, Michael Robinton <michael@bizsystems.com>
+This script is free software; you can redistribute it and/or
+modify it under the terms of the GPL software license.
+
+=cut
+
+1;

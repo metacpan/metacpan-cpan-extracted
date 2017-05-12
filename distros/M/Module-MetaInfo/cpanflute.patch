@@ -1,0 +1,144 @@
+--- cpanflute.orig	Wed Aug 22 22:48:44 2001
++++ cpanflute	Thu Aug 23 10:25:07 2001
+@@ -1,6 +1,73 @@
+ #!/usr/bin/perl
+ 
+ # need this for hostname()
++
++=head1 NAME
++
++cpanflute - build rpms from perl modules
++
++=head1 DESCRIPTION
++
++cpanflute is designed to make it easy to build RPMs from perl modules.
++It does this by generating a spec file with the standard instructions
++for installing a perl module then calling rpm to buld the module.
++
++=head1 USAGE
++
++cpanflute [..options] <tarball>
++
++The tarball should be a perl module distribution file.  The options
++can be as follows:
++
++=head2 --meta-info=<directory>
++
++This gives the directory where meta information for the perl modules
++is stored.  See the section on META INFORMATION for more information.
++
++=head2 --email=<email-address>
++
++The email address for the person building the package.
++
++=head1 META INFORMATION
++
++In this verison, C<cpanflute> can read meta information.  It needs an
++argument with the directory where this is stored and then expects the
++metainformaiton files to be kept in a subdirectory with the same name
++as the distribution file from which we are building.
++
++Currently two files C<description> and C<docs> can be in that
++directory.  The C<description> file contains the %description section
++of the spec file.  The C<docs> file contains a list of documentation
++
++Files in a format which can be included directly into the files list.
++
++See L<meta-from-perl-mods> from the Module::MetaInfo (currently
++experimental) distribution for generating the meta-information.
++
++=head1 BUGS
++
++There are a number of perl modules which need interaction to
++build.. cpanflute doesn't cope with this.
++
++It's not at all easy to work out what order to build perl modules in.
++The problem is that we don't know which perl module reqires which and
++if we try the wrong one it might just break completely.  RedHat gets
++round this by building them in order and keeping the ones that work
++then trying again from the beginning repeatedly..  UGLY but sort of
++effective.
++
++This could be fixed possibly by looking at the new provides mechanisms
++for perl (RPM > 3.0.4) and using that for ordering.. 
++
++=head1 SEE ALSO
++
++There's a script B<makerpm> on CPAN.  This has more features but is
++much more complicated.
++
++L<perl> L<rpm>
++
++=cut
++
+ use File::Basename;
+ use Sys::Hostname;
+ use Getopt::Long;
+@@ -11,7 +78,7 @@
+ # set default options, then get options
+ my %options=();
+ $options{'email'}=(getpwuid($<))[0] . "\@redhat.com" ;
+-GetOptions(\%options, "email=s", "n=s", "create") || exit 1;
++GetOptions(\%options, "email=s", "n=s", "create", "meta-info=s") || exit 1;
+ 
+ my $InputFile = $ARGV[0];
+ my $create = '';
+@@ -42,6 +109,34 @@
+ ($clm_name eq "") && die "Module name not specified\n";
+ ($clm_version eq "") && die "Module version not specified\n";
+ 
++my $desc="$clm_name module for perl";
++my $docs="";
++
++if ($options{'meta-info'}) {
++  my $metadir=$options{'meta-info'};
++  my $mod_metadir=$options{'meta-info'} . '/' . $tarball;
++  die "meta-info directory  doesn't exist"
++    unless -d $metadir;
++  warn "module meta-info directory $mod_metadir doesn't exist"
++    unless -d $mod_metadir;
++  my $descfile=$mod_metadir . '/description';
++  my $docfile=$mod_metadir . '/docs';
++  if ( -e $descfile ) {
++    open DESC, $descfile || die "couldn't open description file $descfile";
++    while (<DESC>) {
++      $desc .= $_;
++    }
++    close DESC;
++  }
++  if ( -e $docfile ) {
++    open DOC, $docfile || die "couldn't open doc list file $docfile";
++    while (<DOC>) {
++      $docs .= $_;
++    }
++    close DOC;
++  }
++}
++
+ # Create and Open file to create SPEC files.
+ mkdir($MainDir, 0755);
+ system("cp $InputFile $MainDir");
+@@ -58,11 +153,12 @@
+ Source0: $clm_name-$clm_version.tar.gz
+ Url: http://www.cpan.org
+ BuildRoot: /var/tmp/perl-$clm_name-buildroot/
+-BuildRequires: perl >= 5.00503
+-Requires: perl >= 5.00503
++#comment out for testing : new version numbers are different???
++#BuildRequires: perl >= 5.00503
++#Requires: perl >= 5.00503
+ 
+ %description
+-$clm_name module for perl
++$docs
+ 
+ # Provide perl-specific find-{provides,requires}.
+ %define __find_provides /usr/lib/rpm/find-provides.perl
+@@ -97,6 +193,7 @@
+ 
+ %files -f $clm_name-$clm_version-filelist
+ %defattr(-,root,root)
++$docs
+ 
+ %changelog
+ * $clm_changelog

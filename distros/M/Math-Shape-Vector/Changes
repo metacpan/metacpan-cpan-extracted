@@ -1,0 +1,57 @@
+Change history for Math::Shape::Vector
+
+0.15    2015/10/01
+        -Fixed broken tests caused by CPU float sizes in t/Vector.t
+
+0.14    2014/10/15
+        -Added radians() and header_vector methods.
+
+0.13    2014/10/11
+        -Fixed vector enclosed_angle() and convert_to_unit_vector()
+
+0.12    2014/10/01
+        -Added vector distance() method for vector, circle and oriented rectangle objects
+        -Added OrientedRectangle circle_hull() to return a circular hull shape of the object
+
+0.11    2014/09/29
+        -Fixed Oriented Rectangle - Line Segment collision
+        -Added tests for all collision combinations.
+
+0.1     2014/09/28
+        -Added circle-rectangle collision detection
+        -Added rectangle-vector, rectangle-line, rectangle-LineSegment collision detection
+        -Added rectangle corner() method
+
+0.09    2014/09/23
+        -Added circle-vector, circle-line, circle-LineSegment collision detection
+        -Made all object methods immutable
+
+0.08    2014/09/21
+        -Added Circle class
+        -Added Rectangle class
+        -Added OrientedRectangle class
+
+0.07    2014/09/21
+        -Removed test dependency on Math::Shape::Point
+
+0.06    2014/09/20
+        -Added LineSegment collides() and Line one_one_side methods
+
+0.05    2014/09/13
+        -Added rotate_90(), enclosed_angle(), collides()
+        -Added Math::Shape::Utils
+        -Added Math::Shape::Line
+        -Added Math::Shape::LineSegment
+        -Renamed get_length() and get_dot_product(), removing 'get_'
+
+0.04    2014/09/02
+        -Added get_dot_product(), project(), rotate(), convert_to_unit_vector()
+
+0.03    2014/09/01
+        -Added get_length()
+
+0.02    2014/09/01
+        -Updated POD
+
+0.01    2014/09/01
+        -Initial build

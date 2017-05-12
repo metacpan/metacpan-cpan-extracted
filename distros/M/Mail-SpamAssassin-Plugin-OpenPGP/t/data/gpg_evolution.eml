@@ -1,0 +1,73 @@
+Return-Path: <users-return-34819-dave=brondsema.net@myfaces.apache.org>
+Delivered-To: dbrond-dave@brondsema.net
+Received: (qmail 4802 invoked from network); 22 Feb 2007 19:32:11 -0000
+Received: from unknown (HELO mail.apache.org) (140.211.11.2)
+  by 0 with SMTP; 22 Feb 2007 19:32:11 -0000
+Received: (qmail 1758 invoked by uid 500); 22 Feb 2007 19:32:18 -0000
+Precedence: bulk
+Received: (qmail 1737 invoked by uid 99); 22 Feb 2007 19:32:18 -0000
+Received: from herse.apache.org (HELO herse.apache.org) (140.211.11.133)
+    by apache.org (qpsmtpd/0.29) with ESMTP; Thu, 22 Feb 2007 11:32:18 -0800
+X-ASF-Spam-Status: No, hits=0.0 required=10.0
+	tests=
+Received-SPF: pass (herse.apache.org: local policy)
+Received: from [216.228.160.103] (HELO cuda3.bendbroadband.com) (216.228.160.103)
+    by apache.org (qpsmtpd/0.29) with ESMTP; Thu, 22 Feb 2007 11:32:06 -0800
+Subject: myfaces and acegi problem
+From: Brad Smith <bgsmith@bendcable.com>
+Content-Type: multipart/signed; micalg=pgp-sha1; protocol="application/pgp-signature"; boundary="=-snpAsh8dbvHp5RvgyQK6"
+Date: Thu, 22 Feb 2007 11:31:44 -0800
+Message-Id: <1172172704.25648.9.camel@pial>
+Mime-Version: 1.0
+X-Mailer: Evolution 2.8.3 (2.8.3-1.fc6) 
+X-Virus-Scanned: by BendBroadband Relay Firewall at bendbroadband.com
+X-Virus-Checked: Checked by ClamAV on apache.org
+X-Spam-Flag: NO
+X-Spam-Checker-Version: SpamAssassin 3.0.4 (2005-06-05) on mahatma
+X-Spam-Level: 
+X-Spam-Status: No, score=0.0 required=4.0 tests=none autolearn=failed 
+	version=3.0.4
+
+
+--=-snpAsh8dbvHp5RvgyQK6
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
+Hello -
+
+I have been trying to integrate acegi security (w/ Spring) and JSF as
+described on the myfaces wiki page:
+
+http://wiki.apache.org/myfaces/JSF_and_Acegi
+
+The error I get is from tomcat is: "The requested resource
+(/pmmWeb/j_acegi_security_check.html) is not available." where pmmWeb is
+the web application context.
+
+I do have /j_acegi_security_check.jsp in the faces-config.xml file and
+in the application context file for acegi. =20
+
+This application uses facelets as well.
+
+Has anyone used the process described on the wiki page successfully with
+facelets?
+
+Thanks,
+
+Brad Smith
+
+
+--=-snpAsh8dbvHp5RvgyQK6
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQBF3e+gkkegtSoBeLkRAlgkAKCHeAV1ROsWtDXDyscc8eJ9BiSllgCaA2nC
+rRTxkfqaEtyRfIYgtNRd0KM=
+=rc3m
+-----END PGP SIGNATURE-----
+
+--=-snpAsh8dbvHp5RvgyQK6--
+

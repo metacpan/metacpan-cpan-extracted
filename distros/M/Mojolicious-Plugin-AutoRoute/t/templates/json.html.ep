@@ -1,0 +1,4 @@
+<%
+  $self->render(json => {foo => $id});
+  return;
+%>

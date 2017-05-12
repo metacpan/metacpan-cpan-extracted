@@ -1,0 +1,39 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+examples/horner.pl
+examples/legendre.pl
+examples/migration.pl
+examples/runge.pl
+examples/runge_plot.png
+examples/symbolic.pl
+lib/Math/Polynomial.pm
+lib/Math/Polynomial/Generic.pm
+t/01_load.t
+t/02_basics.t
+t/03_expressions.t
+t/04_lagrange.t
+t/05_euclid.t
+t/06_calculus.t
+t/07_strings.t
+t/08_generic.t
+t/09_linear_terms.t
+t/10_math_complex.t
+t/11_math_bigrat.t
+t/12_gf3.t
+t/13_trees.t
+t/14_math_modint.t
+t/15_deprecation.t
+t/90_pod.t
+t/91_pod_cover_cp.t
+t/92_consistency.t
+t/93_examples.t
+t/94_diag_cover.t
+t/95_versions.t
+t/99_signature.t
+t/data/KNOWN_VERSIONS
+t/lib/Test/MyUtils.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

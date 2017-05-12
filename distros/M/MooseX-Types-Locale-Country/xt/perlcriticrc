@@ -1,0 +1,5 @@
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = MooseX::Types
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = MooseX::Types

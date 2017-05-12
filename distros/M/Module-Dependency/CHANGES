@@ -1,0 +1,103 @@
+=head1 NAME
+
+Module::Dependency::Changes - List of significant changes to Module::Dependency
+
+=head2 Changes in Module::Dependency 1.86 (svn rev 6643),  12th July 2006
+
+    No longer use umask(0) before creating dir for data file.
+    Move db file store function from Indexer.pm to Info.pm
+    Use $ENV{PERL_PMD_DB} to override location of data file.
+
+=head2 Changes in Module::Dependency 1.85 (svn rev 6642),  12th July 2006
+
+    Fixed blank lines in output.
+    Fixed parent to mean what item depends_on
+        and child to mean what item is depended_on_by
+    Added sorting of final top-level output order with -sort
+    Added -Unique option (global version of -unique)
+    Added -All option to dump everything using Data::Dumper
+    Added != and !~ support to object selector patterns
+    Non-scripts always have a / in the key and filename
+        (./ is prepended if there's no / already)
+    Improved duplicate file/package warning.
+    The -h option doesn't remove indent, use -i='' for that.
+
+=head2 Changes in Module::Dependency 1.84 (svn rev 6633),  11th July 2006
+
+    Replaced pmd_dumper.plx with much more flexible pmd_dump.pl
+    Unresolved dependencies now get entries in allobjects,
+        with their reverse dependencies listed so they can be queried.
+    Because of that the grapher html output changed but the tests
+        haven't yet been updated so they're skipped.
+    All entries have a 'key' field matching the key of the allobjects hash.
+
+=head2 Changes in Module::Dependency 1.83 (svn rev 6569),  27th June 2006
+
+    Fixed VERSION numbers.
+    Simplified README docs, INSTALL and added my name to LICENCE.
+
+=head2 Changes in Module::Dependency 1.82 (svn rev 6568),  27th June 2006
+
+    Stored data changes:
+    - 'filename' is now a relative file path, not absolute.
+    - the "key" name for scripts is now the relative file path not basename.
+    - new 'filerootdir' holds absolute prefix of filename.
+    - 'scripts' now holds relative file paths
+
+    Ignore ~ and .bak files.
+    Don't decend into ignored directories (.svn, .cpan etc)
+    Attempt to recognise .t test files.
+    Improve robustness of parsing.
+    Give more, and more useful, warning messages.
+    More compact output for pmd_dumper -a
+
+=head2 Changes in Module::Dependency 1.81,  30th May 2006
+
+First release under new maintainer Tim Bunce.
+
+    Fixed parsing of multi-line use statements.
+    Fixed parsing of unusual =cut statements.
+    Fixed tests to not depend on hash order.
+
+    Renamed scripts to have a pmd_ prefix.
+    Moved examples into new examples/ subdirectory.
+    Moced pmd_cgidepend.plx and pmd_cgiform.html into examples.
+    Unified script and module parsing code.
+
+=head2 Changes prior to version 1.81
+
+Date: 2002/09/25 23:09:31
+
+Fixed minor typoes and niggling things that should have been corrected 
+in the distribution - thanks to Mike Castle & Ron Savage
+
+Indexer.pm converts paths to absolute paths before running File::Find,
+giving the correct, expected, behaviour when you try to index relative
+folders
+
+Added support for the 'base' pragma.
+
+Added the 'relationship' method (and hence the -r option to dumper.plx)
+which tells you how two items are related.
+
+Improved POD-skipping algorithm - i.e. it now has one.
+
+There should be no platform-specific code left, and in theory this will
+run on any OS.
+
+Added a little POD-only module called Module::Dependency.
+
+We 'use' as little as possible and 'require' the rest.
+
+The indexer can optionally (and does, by default) look at a file's #! line
+to see if it's a perl program. .pl, .plx and .pm files are always indexed.
+
+Added accessor routine for the 'check_shebang' switch.
+
+cgidepend.plx, the CGI program, slightly tweaked to be even more
+mod_perl friendly.
+
+Some code and ideas kindly contributed by S Rezic, S Heffner and C Sampson,
+among others.
+
+=cut

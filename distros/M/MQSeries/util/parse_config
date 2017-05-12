@@ -1,0 +1,163 @@
+#-*-perl-*-
+#
+# $Id: parse_config,v 33.5 2012/09/26 16:15:38 jettisu Exp $
+#
+# (c) 1999-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+# Parse our config file to get the parameters we need
+#
+
+foreach my $relpath ( qw( . .. ../.. ../../.. ) ) {
+    next unless -f "$relpath/CONFIG";
+    $config = "$relpath/CONFIG";
+    last;
+}
+
+die "Unable to locate CONFIG file\n" unless -f $config;
+use File::Basename;
+#
+# In the test scripts, we need to disable the non-lazy loading of
+# symbols, since the IRIX client has lots of undefined symbols that
+# can't be resolved.  Normally, these are never called, so not a
+# problem.  However, since the non-lazy loading is an important test,
+# we only disable it on IRIX.
+#
+use Config;
+if ( $Config{osname} =~ /irix/ ) {
+    $ENV{PERL_DL_NONLAZY} = '0';
+}
+elsif ( $ENV{FORCE_PERL_DL_NONLAZY} ) {
+    $ENV{PERL_DL_NONLAZY} = '0';
+}
+
+#
+# Accept MQMTOP from the environment even if not set in CONFIG file
+#
+$myconfig{MQMTOP} = $ENV{MQMTOP} if (defined $ENV{MQMTOP});
+
+#
+# Read CONFIG file.  Anything can be overriden from environment.
+#
+open(CONFIG, '<', $config) or
+  die "Unable to open CONFIG file: $ERRNO\n";
+while ( <CONFIG> ) {
+    next if /^\#/;
+    next unless ($key,$value) = /^(\w+)\s*=\s*(.*)\s*$/;
+    if ( $ENV{$key} ) {
+        print "Environment variable '$key' overrides CONFIG definition\n";
+        $myconfig{$key} = $ENV{$key};
+    } else {
+        $myconfig{$key} = $value;
+    }
+}
+close(CONFIG) or
+  die "Unable to close CONFIG file: $ERRNO\n";
+
+#
+# Validate the structure of the MQMTOP directory.  It has to exist,
+# and have lib and inc (or include) subdirectories.
+#
+
+if ( defined $myconfig{MQMTOP} ) {
+    $mqmtop = $myconfig{MQMTOP};
+} else {
+
+    #
+    # Canonical default.  True for most of the UNIX platforms.
+    #
+    $mqmtop = "/opt/mqm";
+    $systemdir = q{/var/mqm/qmgrs/@SYSTEM};
+
+    if ( $Config{osname} =~ /aix/ ) {
+        $mqmtop = "/usr/lpp/mqm";
+    } elsif ( $Config{osname} =~ /win32/i ) {
+
+      require "Win32/TieRegistry.pm";
+      import Win32::TieRegistry;
+
+      $Registry->Delimiter('/');
+
+      my $CurrentVersion = "LMachine/SOFTWARE/IBM/MQSeries/CurrentVersion/";
+
+      my ($mqmdir) = (
+                      $Registry->{"$CurrentVersion/FilePath"} ||
+                      $Registry->{"$CurrentVersion/WorkPath"} ||
+                      "C:/Mqm"
+                     );
+
+      $mqmtop = "$mqmdir/Tools";
+
+      $systemdir = $mqmdir . q{/qmgrs/@SYSTEM};
+
+    }
+}
+
+unless ( -d $mqmtop ) {
+    die "No such directory '$mqmtop'\n";
+}
+
+unless ( -d "$mqmtop/lib" ) {
+    die "Missing lib directory in $mqmtop\n";
+}
+
+if ( -d "$mqmtop/inc" ) {
+    $include = "$mqmtop/inc";
+} elsif ( -d "$mqmtop/include" ) {
+    $include = "$mqmtop/include";
+} elsif ( -d "$mqmtop/C/include" ) {
+    $include = "$mqmtop/C/include";
+} else {
+    die "Missing inc or include directory in $mqmtop\n";
+}
+
+#
+# Ugh.  Need to figure out which version we are.  This is kinda ugly...
+#
+# The lowest version we support is MQ v5.  We detect MQ v6 and MQ v7
+# based on features new for that release.
+#
+# Previous releases used to check for MQGMO_VERSION_3, to detect MQ
+# 5.1 or above - i.e. detect a subrelease.  But really, at this time,
+# nobody ought to be running MQ releases quite that old.
+#
+$mqversion = 5;
+
+open(CMQC, '<', "$include/cmqc.h")
+  or die "Unable to open $include/cmqc.h: $ERRNO\n";
+while ( <CMQC> ) {
+    $mqversion = 6 if ($mqversion < 6 && /MQOT_LISTENER/); # New in MQ v6
+    $mqversion = 7 if ($mqversion < 7 && /MQGMO_VERSION_4/);  # New in MQ v7
+}
+close(CMQC);
+
+#
+# This hack is probably going to go away in the future...
+#
+if ( defined $myconfig{MQMLOCALE} ) {
+    $mqmlocale = $myconfig{MQMLOCALE};
+} else {
+    $mqmlocale = "";
+}
+
+#
+# perhaps useful only on OS/390
+#
+sub cat2hfs {
+    my $member = shift;
+    my $hlq = shift;
+    my $pdsdir = shift;
+    my $incdir = shift;
+
+    my $header = $member;
+    $header =~ tr/[A-Z]/[a-z]/;
+    $header = "$header.h";
+    my $rc = 0;
+    if ( ! -e "$incdir/$header" ) {
+        $rc = `cat \"//'$hlq.$pdsdir($member)'\" > $incdir/$header`;
+        die "$rc, Unable to catenate \"//'$hlq.$pdsdir($member)'\": $ERRNO\n"
+          if ( $rc || $? );
+    }
+}
+
+1;

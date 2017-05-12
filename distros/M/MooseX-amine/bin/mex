@@ -1,0 +1,108 @@
+#! /opt/perl/bin/perl
+
+# ABSTRACT: A console-based inspector for Moose classes
+# PODNAME: mex
+
+
+use List::Util qw/ max /;
+use Modern::Perl;
+use MooseX::amine;
+
+# set up colored output if we page thru less
+# also exit pager immediately if <1 page of output
+$ENV{LESS} = 'RF';
+
+# don't catch any errors here; if this fails we just output stuff like
+# normal and nobody is the wiser.
+#eval 'use IO::Page';
+
+my $module = shift
+  or die "Need a module to examine!";
+
+my $mex;
+if (-e $module ) {
+  $mex = MooseX::amine->new({ path => $module });
+}
+else {
+  $mex = MooseX::amine->new( $module );
+}
+
+my $data = $mex->examine;
+
+my $attribute_name_length = max_length( keys %{ $data->{attributes} });
+my $attribute_from_length = max_length( map { $data->{attributes}{$_}{from} } keys %{ $data->{attributes} } );
+my $attribute_isa_length  = max_length( map { $data->{attributes}{$_}{meta}{constraint} || 0 } keys %{ $data->{attributes} });
+
+my $attribute_fstring = "%-${attribute_name_length}s  %2s   %-${attribute_isa_length}s  %-${attribute_from_length}s\n";
+
+say "** ATTRIBUTES";
+
+printf $attribute_fstring , 'NAME' , 'IS' , 'ISA' , 'FROM';
+printf $attribute_fstring , '-' x $attribute_name_length , '--' ,
+  '-' x $attribute_isa_length , '-' x $attribute_from_length;
+
+foreach my $attribute ( sort keys %{ $data->{attributes} }) {
+  my $rw = ( $data->{attributes}{$attribute}{writer} or $data->{attributes}{$attribute}{accessor} )
+    ? 'rw' : 'ro';
+
+  printf $attribute_fstring , $attribute , $rw ,
+    $data->{attributes}{$attribute}{meta}{constraint} || '' , $data->{attributes}{$attribute}{from};
+}
+
+my $method_name_length = max_length( keys %{ $data->{methods} } );
+my $method_from_length = max_length( values %{ $data->{methods} } );
+my $method_fstring = "%-${method_name_length}s  %-${method_from_length}s\n";
+
+say "\n** METHODS";
+printf $method_fstring , 'NAME' , 'FROM';
+printf $method_fstring , '-' x $method_name_length , '-' x $method_from_length;
+foreach my $method( sort keys %{ $data->{methods} } ) {
+  printf $method_fstring , $method , $data->{methods}{$method}{from};
+}
+
+sub max_length {
+  my @list = map { length $_ } @_;
+  return max @list;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mex - A console-based inspector for Moose classes
+
+=head1 VERSION
+
+version 0.6
+
+=head1 SYNOPSIS
+
+    mex MyMooseModule
+    # install IO::Page for a nicer output experience...
+
+=head1 DESCRIPTION
+
+Ever had the problem of needing to get up to speed on a large Moose-based hunk
+of code? Feel like you're lost in a twisty little maze of attributes, methods,
+roles, and classes? Worried about grues? Maybe C<mex> can help.
+
+=head1 SEE ALSO
+
+mexi(1)
+
+=head1 AUTHOR
+
+John SJ Anderson <genehack@genehack.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by John SJ Anderson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

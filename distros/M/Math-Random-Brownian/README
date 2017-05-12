@@ -1,0 +1,35 @@
+Math-Random-Brownian version 0.01
+========================
+
+Math::Random::Brownian is a perl interface to multiple methods for
+simulating stationary Gaussian processes.  The original C code was written by
+Ton Dieker and adapted to perl by Walter Szeliga.  For a copy of the original
+unmolested C code see http://homepages.cwi.nl/~ton/fbm/. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Currently, initiation of a Math::Random::Brownian object relies upon both
+'time ^ ($$ + ($$ << 15));' and 'time ^ $$ ^ unpack "%L*", `ps axww |
+gzip`;' to provide seeds.  Whether this is sufficient or not remains to
+be seen.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Walter Szeliga 
+Original C code is Copyright (C) 2002 by Ton Dieker.
+FFT code by J. Claerbout Copyright (C) 1985
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

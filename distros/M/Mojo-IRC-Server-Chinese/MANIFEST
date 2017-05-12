@@ -1,0 +1,15 @@
+Changes
+demo/demo.pl
+doc/Chinese.pod
+lib/Mojo/IRC/Server/Chinese.pm
+lib/Mojo/IRC/Server/Chinese.pod
+lib/Mojo/IRC/Server/Chinese/Base.pm
+lib/Mojo/IRC/Server/Chinese/Channel.pm
+lib/Mojo/IRC/Server/Chinese/Object.pm
+lib/Mojo/IRC/Server/Chinese/User.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/load_module.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

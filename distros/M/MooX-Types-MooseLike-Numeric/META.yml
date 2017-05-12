@@ -1,0 +1,30 @@
+---
+abstract: 'Moo types for numbers'
+author:
+  - 'mateu - Mateu X. Hunter (cpan:MATEU) <hunter@missoula.org>'
+build_requires:
+  Moo: '1.004002'
+  Test::Fatal: '0.003'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-Types-MooseLike-Numeric
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  MooX::Types::MooseLike: '0.23'
+  perl: '5.006'
+resources:
+  IRC: irc://irc.perl.org/#web-simple
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooX-Types-MooseLike-Numeric
+  repository: git://github.com/mateu/MooX-Types-MooseLike-Numeric.git
+version: '1.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

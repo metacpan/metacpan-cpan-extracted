@@ -1,0 +1,78 @@
+{
+   "abstract" : "Model for Mojolicious applications",
+   "author" : [
+      "Andrey Khozov, C<avkhozov@googlemail.com>."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Model",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "5.80",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "provides" : {
+      "MojoX::Model" : {
+         "file" : "lib/MojoX/Model.pm"
+      },
+      "Mojolicious::Plugin::Model" : {
+         "file" : "lib/Mojolicious/Plugin/Model.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/avkhozov/Mojolicious-Plugin-Model/issues"
+      },
+      "homepage" : "https://github.com/avkhozov/Mojolicious-Plugin-Model",
+      "repository" : {
+         "url" : "git://github.com/avkhozov/Mojolicious-Plugin-Model.git",
+         "web" : "https://github.com/avkhozov/Mojolicious-Plugin-Model"
+      }
+   },
+   "version" : "0.09",
+   "x_authority" : "cpan:AVKHOZOV",
+   "x_contributors" : [
+      "Denis Ibaev <dionys@gmail.com>",
+      "Logioniz <logioniz@ya.ru>",
+      "Andrey Khozov <avkhozov@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

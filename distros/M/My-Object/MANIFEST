@@ -1,0 +1,10 @@
+README
+LICENSE
+MANIFEST
+Changes
+Makefile.PL
+lib/My/Object.pm
+t/01-inheritance.t
+t/02-example.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

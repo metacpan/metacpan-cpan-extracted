@@ -1,0 +1,22 @@
+#!/sbin/runscript
+# Copyright 1999-2003 Shevek
+# Distributed under the terms of the GNU General Public License, v2 or later
+
+# NB: Config is in /etc/conf.d/spfd.conf
+
+depend() {
+	need net
+}
+
+start() {
+	ebegin "Starting srsd"
+	start-stop-daemon --start --background \
+		--exec /usr/bin/srsd -- ${SRSD_OPTS}
+	eend $? "Failed to start srsd"
+}
+
+stop() {
+	ebegin "Stopping srsd"
+	start-stop-daemon --stop --quiet --name srsd
+	eend $? "Failed to stop srsd"
+}

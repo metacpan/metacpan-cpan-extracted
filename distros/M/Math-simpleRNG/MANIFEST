@@ -1,0 +1,10 @@
+MANIFEST
+MANIFEST.SKIP
+README
+CPOL.txt
+Makefile.PL
+simpleRNG.pm
+Changes
+t/simple.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

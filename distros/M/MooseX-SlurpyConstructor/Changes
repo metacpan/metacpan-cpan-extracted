@@ -1,0 +1,53 @@
+Revision history for MooseX-SlurpyConstructor
+
+1.30    2017-02-06 02:28:24Z
+        - repository has moved to the GitHub Moose organization
+
+1.2     2011-04-12
+        - Complete rewrite to resolve various issues (Karen Etheridge):
+          - constructor is not inlined (RT#66784)
+          - child classes cannot be slurpy if the parent is not (RT#66785)
+          - compatibility issues with Moose 2.0
+          - use from within a role
+          - interactions with MooseX::StrictConstructor are now reversed -
+            if Strict behaviour is applied to the class, it will take
+            precedence over Slurpy behaviour. This is a simply due to how
+            method modification works in Moose: the constructor cannot be
+            "unmodified" again to tolerate arguments that it already finds
+            intolerable.
+
+1.1     2010-08-29
+        - Previous versions didn't honour undefined predicates or lazy
+          attributes
+            - fixed, with tests to ensure no regression in future.
+            - thanks to Christian Walde for report and fix.
+            - I'm surprised I never ran into this issue before now. :)
+        - Now avoids deprecation warnings about Moose::Util::MetaRole
+            - thanks again to Christian Walde for report
+        - Moved pod testing into xt dir
+        - Upped required Moose version to 0.94.
+        - Minor non-semantic changes.
+
+0.94      2010-01-26
+        - Fixed tests to:
+            - remove tests about import to main package, as now allowed by
+              Moose
+            - test file for bad usage wasn't active, due to bad filename,
+              fixed.
+        - Changed versioning to be latest updated Moose version.
+        - No main code changes.
+
+0.11      2009-07-28
+        - Avoid test failures when specific Test::* versions are used.
+        - No main code changes.
+
+0.10      2009-07-13
+        - Honour 'slurpy' attributes 'init_arg' when determining if request is
+          valid.
+        - Underlying implementation now wraps 'new' instead of BUILDARGS, to
+          allow slurpy attribute with no init_arg defined.
+        - Better error messages.
+        - Doesn't untar into the current directory when installing (oops, sorry!)
+
+0.01      2009-07-06
+        - Initial version.

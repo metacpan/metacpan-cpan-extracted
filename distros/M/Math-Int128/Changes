@@ -1,0 +1,144 @@
+Revision history for Perl extension Math::Int128.
+
+0.22     2015-04-07
+      - Fix for #RT103359: CLONE hook was dying because its signature
+        was wrong (bug report by Duke Smith)
+
+0.21     2015-03-09
+      - Remove obsolete compiler checks from C API files (bug report
+        and analysis by Matt Sisk)
+      - Fix compilation in Solaris with Solaris Studio
+      - Add test for Strawberry Perl bug
+
+0.20     2015-02-10
+      - Fix syntax error masked by some isspace macro implementations.
+
+0.19     2015-02-08
+      - Fix bug #101982: infinite loop in string_to_uint128 (reported
+        by Matt Sisk).
+
+0.18     2015-01-05
+      - No changes from last release.
+
+0.17_02  2014-12-30
+      - Reverted the probe change in the last version. This wasn't necessary
+        and it brought back the old failure of clang on FreeBSD i386 claiming
+        it supported int128 values when it really didn't.
+
+0.17_01  2014-12-29
+      - Trying out a slightly different probe for uint128 support. The
+        previous version could have (very rarely) returned false when it
+        should have returned true.
+      - Made this module compile with the system Perl on OSX by brutally
+        stripping the "-arch i386" flag when running the compiler. Your
+        results may vary (but it passes its tests).
+
+0.17     2014-12-23
+      - No changes from the last release.
+
+0.16_05  2014-12-18
+      - More left and right shift fixes. When shifting left by more than 127
+        bits, the return value is always 0. When shifting right by more than
+        127 bits, the return value is 0 for numbers >= 0 and -1
+        otherwise. This is consistent with how Math::Int64 works.
+
+0.16_04  2014-12-15
+      - clang on FreeBSD i386 will claim to support 128-bit integers but then
+        segfault when compiling this module's XS code. The compiler feature
+        checking now uses a more complex test program to ensure that the
+        compiler really does support 128-bit integers.
+
+0.16_03  2014-12-13
+      - Removed compiler detection in favor of compiler feature checking with
+        Config::AutoConf. (Dave Rolsky)
+
+0.16_02  2014-11-05
+      - add logic for detecting Apple variant of clang compiler
+
+0.16_01  2014-11-02
+      - dump output from compiler version command when running on a
+        CPAN tester
+
+0.15     2014-10-30
+      - improve clang version detection code (bug report by Olaf
+        Alders)
+      - relax gcc version detection
+
+0.14     2014-10-29
+      - tests were broken on perls compiled with -Dusequadmath (bug
+        report by Sisyphus)
+
+0.13     2013-09-07
+      - fix unaligned memory access problems happening on
+        Windows+Strawerry Perl (bug report by Sisyphus)
+      - silent several compiler warnings (bug report and patch by
+        d.thomas@its.uq.edu.au)
+
+0.12     2013-07-19
+      - improve gcc version detection (bug report by
+        d.thomas@its.uq.edu.au)
+      - experimental support for clang compiler added
+
+0.11     2013-07-18
+      - fix >>= operator (patch by Dave Rolsky)
+      - more and better tests (patch by Dave Rolsky)
+      - easy compilation of the git version
+
+0.10     2013-07-17
+      - add support for exponentiation (bug report by Dave Rolsky)
+
+0.09     2013-07-11
+      - operator <<= was broken for unsigned 128bit numbers (bug
+        report by Dave Rolsky)
+
+0.08_01  Not Released
+      - include stdint.h for 64bit integer definitions (bug report and
+        solution by Sisyphus)
+
+0.07     2012-12-10
+      - rerelease as stable
+
+0.06_07  2012-11-05
+      - gcc version detection was too picky (bug report by Peter John
+        Acklam)
+      - int128_to_net and uint128_to_net were broken
+      - add tests addapted from Math::Int64 module
+      - mark internal representation of int128 wrappers as readonly in
+        order to disallow their modification from outside the module
+
+0.06_06  2012-07-20
+      - update Math::Int64 C API support files
+
+0.06_05  2012-07-19
+      - stash caching code was broken on non threaded perls
+      - several errors on C API corrected
+
+0.06_04  2012-07-17
+      - add support for C API
+      - stash caching handling was broken on threaded perls
+      - improve die_on_overflow handling
+
+0.06_03  2012-01-11
+      - add die_on_overflow feature
+      - add support for int64_t integers via Math::Int64 
+      
+0.05     2011-04-24
+      - support for gcc 4.4 and 4.5 contributed by KMX
+
+0.04     2011-03-08
+      - delete generated Makefile when aborting Makefile.PL
+
+0.03     2011-03-04
+      - abort Makefile.PL unless compiler is GCC 4.6 or better
+
+0.02     2011-02-14
+      - add new set of operations that use one argument for output for
+        improved performance
+      - on string to int128 conversion skip zeros at the left before
+        testing for overflow
+      - remove OPTIMIZE='-g -O0' from Makefile.PL
+
+0.01     2011-02-07
+	- original version; created by h2xs 1.23 with options
+		-An Math::Int128
+

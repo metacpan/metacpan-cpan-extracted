@@ -1,0 +1,9 @@
+Usage:
+     inlinepod$ inlinepod.pl [OPTIONS] [THINGS]
+
+Options:
+    Some extra options text.
+
+     --help -? --usage - Bool. Display the usage message and exit
+     --man             - Bool. Display man page
+

@@ -1,0 +1,45 @@
+% my $first_page = $pager->first_page;
+% my $current_page = $pager->current_page;
+% my $last_page = $pager->last_page;
+% if ($last_page > 1) {
+  <div class="pagenavi">
+    
+    <a style="color:#6666FF;font-size:70%" href="<%= url_for->query($self->req->params->clone)->query([page => 1]) %>">
+      Fisrt
+    </a>
+    % my $prev_page = $current_page - 1;
+    % $prev_page = 1 if $prev_page < 1;
+    <a href="<%= url_for->query($self->req->params->clone)->query([page => $current_page - 1]) %>">
+      <b>Prev</b>
+    </a>
+    % my $navi_first_page = $current_page - 10;
+    % my $navi_last_page = $current_page + 9;
+    % if ($navi_first_page < 1) {
+    %   $navi_last_page += 1 - $navi_first_page;
+    %   $navi_first_page = 1;
+    % }
+    % if ($navi_last_page > $last_page) {
+    %   $navi_last_page = $last_page;
+    %   $navi_first_page = $navi_last_page - 19;
+    %   $navi_first_page = 1 if $navi_first_page < 1;
+    % }
+
+    % for my $page ($navi_first_page .. $navi_last_page) {
+      % if ($page == $current_page) {
+        <span style="font-size:95%;"><b><%= $page %></b></span>
+      % } else {
+        <a style="font-size:80%;padding-left:1px;padding-right:1px;" href="<%= url_for->query($self->req->params->clone)->query([page => $page]) %>">
+          <%= $page %>
+        </a>
+      % }
+    % }
+    % my $next_page = $current_page + 1;
+    % $next_page = $last_page if $next_page > $last_page;
+    <a href="<%= url_for->query($self->req->params->clone)->query([page => $next_page]) %>">
+      <b>Next</b>
+    </a>
+    <a style="color:#6666FF;font-size:70%" href="<%= url_for->query($self->req->params->clone)->query([page => $last_page]) %>">
+       Last
+    </a>
+  </div>
+% }

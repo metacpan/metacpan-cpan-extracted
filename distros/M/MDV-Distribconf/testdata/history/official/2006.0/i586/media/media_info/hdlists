@@ -1,0 +1,6 @@
+hdlist_main.cz	media/main	Main	(3400m)
+noauto:hdlist_main.src.cz	../SRPMS/main	Main Sources	
+hdlist_contrib.cz	media/contrib	Contrib	(4300m)
+noauto:hdlist_contrib.src.cz	../SRPMS/contrib	Contrib Sources	
+noauto:hdlist_jpackage.cz	media/jpackage	Jpackage	(360m)
+noauto:hdlist_jpackage.src.cz	../SRPMS/jpackage	Jpackage Sources	

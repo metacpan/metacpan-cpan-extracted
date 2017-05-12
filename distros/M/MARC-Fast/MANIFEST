@@ -1,0 +1,15 @@
+Changes
+lib/MARC/Fast.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+scripts/dump_fastmarc.pl
+t/001_marc.t
+t/002_marc-utf8.t
+t/003_marc-repeatable.t
+t/camel.usmarc
+t/koha-232766.mrc
+t/utf8.marc
+t/004_marc-hash_filter.t

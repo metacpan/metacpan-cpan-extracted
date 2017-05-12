@@ -1,0 +1,42 @@
+1999-09-17  Jochen Wiedmann  <joe@ispsoft.de.de> (0.1102)
+
+	* examples/ispmailgate.m4: Removed --debug flag.
+	* examples/ispmailgate.m4: Modified ISPMAILGATE_MAILER_MAX
+	  to a default of 10000000
+	* lib/Mail/IspMailGate/Filter/VirScan.pm: $ofile always had
+	  the same name as $ifile, resulting in an endless loop. The
+	  deflaters now have an optional attribute 'extension', that
+	  will be removed from $ofile.
+
+1999-09-12  Jochen Wiedmann  <joe@ispsoft.de> (0.1100)
+
+	* Completely reworked the configuration system. Is now mostly
+	  self configurable.
+	* lib/Mail/IspMailGate.pm: Error messages are now sent to the
+	  admin.
+	* lib/Mail/IspMailGate/Filter/VirScan.pm (HasVirus): HasVirus
+	  is now a method and not longer a config file variable.
+
+1999-08-17  Jochen Wiedmann  <joe@ispsoft.de> (0.1004)
+
+	* GPL'ed
+	* Added --host option
+
+1999-02-22  Jochen Wiedmann  <joe@ispsoft.de> (0.1003)
+
+	* ispMailGate.c (main): Added a shutdown on the socket. My thanks
+	  to Matt Crawford <crawdad@fnal.gov> for suggesting this.
+
+1998-10-21  Jochen Wiedmann  <joe@ispsoft.de> (0.1002)
+
+	* Added lib/Mail/IspMailGate/Test.pm.
+	* lib/Mail/IspMailGate/Filter/Banner.pm (doFilter): Fixed bug,
+	  $/ was not set to undef while reading contents.
+
+1998-10-21  Jochen Wiedmann  <joe@ispsoft.de> (0.1001)
+
+	* Fixed numerous bugs.
+	* Added lib/Mail/IspMailGate/Filter/Banner.pm and t/14banner.t.
+	* Added t/14antivir.t, t/24mail-antivir.t and eicar.com to check
+	  the AntiVir virus scanner.
+

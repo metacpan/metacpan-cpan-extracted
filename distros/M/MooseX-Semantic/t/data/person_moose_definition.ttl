@@ -1,0 +1,27 @@
+@prefix : <http://myapp/> .
+
+@prefix moose: <http://moose.perl.org/onto#> .
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:    <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf:   <http://xmlns.com/foaf/0.1/> .
+@prefix bio:    <http://purl.org/vocab/bio/0.1/> .
+@prefix schema: <http://schema.org/> .
+
+<http://myapp/FoafMixin>
+    a moose:Class ;
+    moose:class_name "EmptyMoosePackage" ;
+    moose:has_attribute <knows>,
+                        <name>.
+<knows>
+	a moose:Attribute ;
+    moose:attr_name "knows" ;
+    moose:uri foaf:knows ;
+    moose:type "ArrayRef[MooseX::Semantic::Text::Person]".
+
+<name> 
+    a moose:Attribute ;
+    moose:attr_name "name" ;
+    moose:uri foaf:name ;
+    moose:type "Str" .

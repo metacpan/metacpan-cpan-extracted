@@ -1,0 +1,7 @@
+Revision history for Memoize-Expire-ByInstance
+
+0.5.1   11/11/2009
+        Accidentally specified 1.2 for Scalar::Util instead of 1.1
+
+0.5     11/11/2009
+        Initial version, released upon an suspecting world.

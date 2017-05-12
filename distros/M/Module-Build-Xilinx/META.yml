@@ -1,0 +1,39 @@
+---
+abstract: 'Xilinx ISE Webpack based FPGA Development using commandline'
+author:
+  - 'Vikas N Kumar <vikas@cpan.org>'
+build_requires:
+  Module::Build: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+  Pod::Readme: 0
+  Software::License: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.132661'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Build-Xilinx
+provides:
+  App::mbxilinx:
+    file: lib/App/mbxilinx.pm
+    version: 0.13
+  Module::Build::Xilinx:
+    file: lib/Module/Build/Xilinx.pm
+    version: 0.13
+requires:
+  Config: 0
+  Cwd: 0
+  Data::Dumper: 0
+  File::Basename: 0
+  File::HomeDir: 0
+  File::ShareDir: 1.00
+  File::Spec: 0
+  Module::Build: 0
+  YAML: 0
+  perl: 5.0008
+resources:
+  license: http://www.opensource.org/licenses/mit-license.php
+version: 0.13

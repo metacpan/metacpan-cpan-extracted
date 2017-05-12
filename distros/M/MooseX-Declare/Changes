@@ -1,0 +1,215 @@
+Revision history for MooseX-Declare
+
+0.43      2015-08-16 03:29:28Z
+  - add some diagnostics to a test that is failing occasionally
+
+0.42      2015-06-04 06:17:43Z
+  - eliminate remaining uses of List::MoreUtils
+  - increase required version of namespace::autoclean to 0.16 to avoid test
+    failures
+
+0.41      2015-05-16 03:35:49Z
+  - mark this distribution as deprecated in metadata
+
+0.40      2014-11-12 02:27:58Z
+  - mention deprecation status in module ABSTRACT
+  - fix warning in tests on 5.8.x
+
+0.39      2014-08-16 19:12:31Z
+  - line numbers in shipped code are now almost the same (within 1) as
+    the repository source, for easier debugging
+  - pod fixes (Frank Wiegand, RT#51722)
+
+0.38      2013-12-14 18:39:30Z
+  - update configure_requires checking in Makefile.PL, add CONTRIBUTING file
+
+0.37      2013-09-26 04:08:21Z
+  - repository migrated to the github moose organization
+  - re-release with fixed compile test
+
+0.36      2013-09-10 02:33:28Z
+  - Depend on 'aliased'.
+  - The test suite now uses Test::Fatal instead of Test::Exception. (Karen
+    Etheridge)
+  - removed use of deprecated Class::MOP::load_class, calling enum with a list
+  - converted use of Class::MOP::class_of to Moose::Util::find_meta
+  - new WARNING section added to pod, regarding future utility of this module
+
+0.35   2011-08-23 11:13:10Z
+  - Adapt to changes in MooseX::Role::Parameterized 0.27.
+
+0.34   2010-08-31 23:10:28Z
+  * Depend on MooseX::Method::Signatures 0.36 to avoid deprecation warnings on
+    new versions of Moose (Jeremy Carman).
+
+0.33   2010-02-04 01:50:14Z
+  - Depend on MooseX::Method::Signatures 0.30 to fix various incompatibilities.
+
+0.32   2009-11-02 02:00:42Z
+  - Add link to Geany syntax notes to documentation (Michele Beltrame).
+  - Convert from MooseX::MethodAttributes to Native::Trait (Justin Hunter).
+  - Update dependency on MooseX::Types (Chris Prather).
+
+0.31   2009-09-17 16:10:22Z
+  - Bump dependencies for no more warnings on new Moose versions.
+
+0.30   2009-09-05 00:48:05Z
+  - Make the attr inheriting TODO test work.
+  - Make default values for role parameters work (nperez).
+  - Add tests for the above (nperez).
+
+0.29   2009-08-31 17:11:25Z
+  - Add failing test for applying modifiers to a method directly composed from
+    a role (nperez).
+  - Fix the failing test by depending on MXMS 0.24.
+
+0.28   2009-08-27 20:44:34Z
+  - Bump prereqs on MooseX::Method::Signatures, Moose, and namespace::clean in
+    order to avoid test failure.
+
+0.27   2009-08-18 06:54:22Z
+  - Depend on MooseX::Method::Signatures 0.21 to make sure type aliasing works
+    and there are no warnings due to the recent MooseX::LazyRequire changes.
+
+0.26   2009-08-16 12:48:12Z
+  - Declare dependency on MooseX::AttributeHelpers.
+
+0.25   2009-08-16 03:31:59Z
+  - Don't persist the inner keywords over more than one invocation of the declarator.
+  - Pass along the current context to import_symbols_from and imported_moose_symbols.
+  - Implement parameterizable roles.
+
+0.24   2009-08-15 21:48:09Z
+  - Add repository and bugtracker to Makefile.PL (Ash Berlin).
+  - Tests and doc fixes on applying multiple roles at once (Chas. J. Owens IV).
+  - Produce better diagnostic output on test failures (Dave Rolsky).
+  - Make MooseX::Method::Signatures handle the actual parsing for method-like
+    keywords (nperez).
+  - Clean now warns in autoclean namespaces (Robert 'phaylon' Sedlacek).
+  - 'method' keyword now only available by default in namespaces that consumed
+    MooseSetup (Robert 'phaylon' Sedlacek).
+  - Added 'namespace' keyword and allow namespaces, superclasses and roles to
+    be relative (Robert 'phaylon' Sedlacek).
+  - Add tests for using anonymous methods as attribute defaults (Devin Austin).
+  - Stop depending on B::Hooks::EndOfScope. We don't use it direectly anymore.
+  - Add a real 'with' keyword.
+  - 'with' in a class- or role-body doesn't defer role application until the
+    end of the class- or role-definition anymore. The 'with'-option for the
+    class and role keywords still does.
+  - Add a tests for role application and method modifier ordering.
+  - Make anon classes immutable as well (unless explicitly asked not to).
+  - Add a ctx method to add cleanup code that should be injected as early as
+    possible.
+  - Depend on recent versions of DD and MXMS to make keywords less reserved
+    (i.e. hash keys and barewords before fat commas).
+  - Make t/with_newlines.t less noisy.
+  - Add tests for methods with no signature not caring about their arguments,
+    other than $self.
+
+0.23   2009-06-25 03:09:10Z
+  - Add test to make sure methods returned from meta are
+    MooseX::Method::Signatures::Meta::Method (nperez).
+  - Add the actual ::Signature methods to the meta class instead of letting it
+    wrap the coderef itself.
+  - Make inner scopes inherit the declaration provider instead of hardcoding
+    'MooseX::Declare' (Robert 'phaylon' Sedlacek).
+  - Fix test failure on new Moose versions, which inline a DESTROY method on
+    immutalisation.
+
+0.22   2009-05-06 00:37:37Z
+  - Add TODO tests for creating nested anonymous classes and roles
+    (nperez).
+  - Always end injected code with a semicolon.
+  - Only do namespace nesting if the inner namespace starts with "::".
+  - Depend on D::D 0.005001 to get a skip_declarator that doesn't fail
+    when code is being compiled between calling the linstr callback and
+    skip_declarator. This appears to be necessary to work on 5.8.
+
+0.21   2009-05-04 23:55:41Z
+  - Add tests for automatic cleaning with the clean/dirty traits
+    (Stevan Little).
+  - Automatically clean all imports at the end of compile time unless the
+    dirty trait is given.
+  - Clean now warns in autoclean namespaces (Robert Sedlacek).
+  - Document all refactored components (Robert Sedlacek).
+  - Improve error reporting (Robert Sedlacek).
+  - Added link to emacs syntax highlighter (Nelo Onyiah).
+  - Fix a doc typo (reported by Alexander Hartmaier).
+  - Make method keyword now only available by default in namespaces that
+    consumed MooseSetup (Robert Sedlacek).
+  - Be more strict about what gets accepted as injectable "code part"
+    (Robert Sedlacek).
+  - Split up namespaced declaration parsing and added context traits
+    (Robert Sedlacek).
+  - Break strip_name_and_options into strip_word and strip_options.
+  - Some refactoring on how options are handled.
+
+0.20   2009-05-01 08:40:02Z
+  - Massive refactor for extensibility (Robert Sedlacek).
+  - Allow passing multiple comma seperated values to options
+    without repeating the key.
+  - Depend on MX::Method::Signatures 0.16 for non-scalar parameters.
+  - Documentation fixes (Matt Kraai).
+  - Added link to vim syntax (Rafael Kitover).
+
+0.10   2009-04-08 02:09:56Z
+  - Depend on D::D 0.003005 for the inject_if_block return value.
+  - Docs now mention namespace::clean (Ash Berlin).
+  - Refactor - aka throw code away - by potring to
+    D::D::Context::Simple (Ash Berlin).
+  - Remove prototype from exported subs (Ash Berlin).
+  - Make keywords less reversed (i.e. as hash keys) and make class()
+    return an anon-metaclass (Ash Berlin).
+  - Update pod mentioning restrictions on class names (Ash Berlin).
+
+0.09   2009-03-03 16:43:13Z
+  - Improve clean documentation:
+    - Actually use the clean keyword in the example (Hans Dieter Pearcey).
+    - Substitute MyDumper with Foo for consistency (Nelo Onyiah).
+
+0.08   2009-03-03 01:55:46Z
+  - Implement the clean keyword.
+    - Document the clean keyword (Nelo Onyiah).
+
+0.07   2009-02-28 20:01:32Z
+  - Mention all contributors.
+  - Use MooseX::Method::Signatures::Meta::Method instead of injecting
+    method keywords.
+  - Update copyright notice for the new year (Yanick Champoux).
+
+0.06   2009-02-24 06:20:03Z
+  - Automatically import strict and warnings.
+  - Don't use the Moose sugar sugar methods for installing modifiers.
+  - Don't use the Moose sugar functions for applying roles.
+  - Use Test::NoWarnings instead of Test::Warn.
+  - Declare test dependency on Test::NoWarnings.
+
+0.05   2009-02-23 07:33:16Z
+  - Depend on the latest MooseX::Method::Signatures.
+  - UnTODO passing tests.
+  - Docs now mention namespace::clean (Ash Berlin).
+  - Add tests some more problematic signatures (Piers Cawley).
+    - Make those work.
+
+0.04   2009-02-21 21:41:01Z
+  - Fix a parsing bug related to class declarations with options being on
+    another line than the opening '{'.
+  - Depend on the latest MooseX::Method::Signatures.
+  - Added a test to catch weirdness in around filters and optional positionals
+    (Piers Cawley).
+  - Added a test for a segfault caused by a syntax error (Piers Cawley).
+  - Test for has +foo feature which does not work yet due to roles being
+    applied at the end (Tomas Doran).
+
+0.03   2008-11-29 13:24:48Z
+  - Remove debugging code I accidentally left in th last release.
+
+0.02   2008-11-26 13:20:08Z
+  - Bump Devel::Declare prerequisite to 0.003000.
+
+0.01   2008-11-26 11:07:16Z
+  - More tests.
+  - Improve class nesting.
+
+0.01_01   2008-10-19 19:08:16Z
+  - Initial release.

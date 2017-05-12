@@ -1,0 +1,87 @@
+/* ================================================================== */
+/* THEME: Midnight Blue
+ */
+/* ================================================================== */
+/* THEME: Midnight Blue - fonts
+ */
+/* ------------------------------------------------------------------ */
+/* Fonts */
+h1, h2, h3, h4 {
+  font-family: Ethnocentric, "Flipside BRK", "Metal Lord", Fantazian, ESP, Scott, Illusion, Slant, verdana, arial, helvetica, sans-serif;
+  font-weight: normal;
+  color: white;
+}
+
+/* ================================================================== */
+/* ICONS - light on dark
+ * Nav arrows with transparent backgrounds
+ */
+.side nav li > ul {
+  list-style-image: url(nav_white.png);
+}
+
+/* ================================================================== */
+/* General */
+.verge, header,
+footer,
+.side, .fancy {
+  color: #e0e0eb;
+  background: #000033;
+  border-color: #ccccff;
+}
+
+body {
+  color: #e0e0eb;
+  background: #000080 url(midnightblue1.jpg);
+}
+
+a:link {
+  color: #a3ccf5;
+}
+
+a:visited {
+  color: #cca3f5;
+}
+
+.fancy {
+  color: #e0e0eb;
+  background-image: url("midnightblue1.jpg");
+  border: 5px double #0a0a76;
+  padding: 0;
+}
+.fancy li {
+  padding: 0.5em;
+  margin: 5px;
+  border: 5px solid #0a0a76;
+  background-color: #000033;
+  background: linear-gradient(#000033, black);
+}
+.fancy li a:link {
+  color: #a3ccf5;
+}
+.fancy li a:visited {
+  color: #cca3f5;
+}
+
+.button, input[type=submit], header nav a,
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: #e0e3eb;
+  border-color: #000099;
+  background-color: #001144;
+}
+
+.button a:link, input[type=submit] a:link, header nav a a:link,
+header nav .selflink a:link,
+header nav em a:link,
+header nav .current a a:link, a.button:link, header nav a:link {
+  color: #e0e3eb;
+}
+
+.button a:visited, input[type=submit] a:visited, header nav a a:visited,
+header nav .selflink a:visited,
+header nav em a:visited,
+header nav .current a a:visited, a.button:visited, header nav a:visited {
+  color: #b8a3f5;
+}

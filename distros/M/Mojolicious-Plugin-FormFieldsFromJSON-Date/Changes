@@ -1,0 +1,21 @@
+Release history for Mojolicious::Plugin::FormFieldsFromJSON::Date
+=================================================================
+
+0.03 2015-01-01
+
+  [BUGFIX]
+  * pass startyear to year dropdown generation
+
+  [TESTS]
+  * shown days an months aren't formatted, so fix the tests
+
+0.02 2014-12-31
+
+  [TESTS]
+  * The tests worked only on Dec 29th, 2014. This is fixed now!
+  * Added tests for default values (defined in field config, via request, passed in method call and fallback)
+
+0.01 2014-12-29
+
+  [INIT]
+  * allow additional type "date" for Mojolicious::Plugin::FormFieldsFromJSON

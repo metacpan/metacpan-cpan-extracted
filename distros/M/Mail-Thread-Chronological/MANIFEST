@@ -1,0 +1,8 @@
+MANIFEST
+Changes
+lib/Mail/Thread/Chronological.pm
+t/lurker.t
+Build.PL
+Makefile.PL
+META.yml
+SIGNATURE

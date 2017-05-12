@@ -1,0 +1,5 @@
+See also the git repository.
+
+ * 0.02 - subsets, eg script improvements, customizable context and
+   start functions for rand().
+ * 0.01 - first version, released on a mostly unsuspecting world.

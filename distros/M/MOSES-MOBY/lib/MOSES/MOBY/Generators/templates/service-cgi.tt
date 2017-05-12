@@ -1,0 +1,61 @@
+#!/usr/bin/perl -w
+# This is a CGI-BIN script, invoked by a web server when an HTTP
+# POST comes in, dispatching requests to the appropriate module
+# (BioMoby web service).
+#
+# It includes some hard-coded paths - they were added during the
+# generate service call.
+#
+# $Id: service-cgi.tt,v 1.3 2009/03/30 13:14:09 kawas Exp $
+# Contact: Edward Kawas <edward.kawas@gmail.com>
+# ---------------------------------------------------------------
+[%# A template for a cgi biomoby service.
+    ===================================
+
+    Expected/recognized parameters:
+      obj         ... a service definition, type MOSES::MOBY::Def::Service
+-%]
+
+#-----------------------------------------------------------------
+# Authority:    [% obj.authority %]
+# Service name: [% obj.name %]
+# Generated:    [% USE Date (format = '%d-%b-%Y %H:%M:%S %Z') %][% Date.format %]
+# Contact: Martin Senger <martin.senger@gmail.com> or
+#          Edward Kawas <edward.kawas@gmail.com>
+#-----------------------------------------------------------------
+
+use strict;
+use CGI;
+use CGI::Carp qw(fatalsToBrowser);
+
+# limit the max size of a post - change it as you see fit
+$CGI::POST_MAX=1024 * 1024 * 10;  # max 10MB posts
+
+# --- during service generation
+use lib '[% pmoses_home %]';
+use lib '[% generated_dir %]';
+use lib '[% services_dir %]';
+
+# here we require the service module and add it to ISA hierarchy
+use base 'Service::[% obj.name %]';
+
+# get the cgi variable
+my $q = new CGI;
+
+# get the data from the 'data' parameter
+my $data = $q->param('data') || $q->param('POSTDATA') || "";
+# call the service
+my $x =  __PACKAGE__->[% obj.name %]($data);
+
+# print the results
+print $q->header(-type=>'text/xml');
+print $x;
+
+# over-ride the method in Service::ServiceBase => no more soap
+sub finish_output {
+    my ($self, $out_package) = @_;
+    return $out_package->toXMLdocument->toString (1);
+}
+
+__END__
+

@@ -1,0 +1,4 @@
+# local defaults for perlcritic
+severity = 3
+verbose = 4
+exclude = ProhibitOneArgSelect ProhibitConstantPragma

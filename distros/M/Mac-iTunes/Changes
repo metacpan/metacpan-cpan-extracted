@@ -1,0 +1,47 @@
+# $Id$
+Revision history for Perl extension MacOSX::iTunes.
+
+1.22 - Sun Jul 15 19:01:19 2012
+	* Fix a typo in a module name link, and various cleanups
+	* This new release doesn't mean everything works with the
+	latest iTunes.
+
+0.89 - Sun Mar 18 08:55:12 2007
+	* Fixed a pod error for kwalitee. The Python example in the crypt-rijndael.pl
+	example wasn't happy.
+
+0.86 - Fri Jun 23 15:40:22 2006
+	* Updated distro, minor non-code fixes. The module is still really,
+	really old, and I'm waiting for an Intel Mac to start anything
+	new.
+
+0.85 - Fri Jul 15 00:40:29 2005
+	* Added check in Parse.pm for the iTunes library version number.
+	We can't handle stuff later than version 4.5, so we die if that
+	happens. I'd like to handle the later versions, but I haven't had
+	time to figure out the file format.
+
+0.84 - Fri Oct  8 16:15:49 2004
+* i fixed up a few distribution things, but this module needs a 
+lot of work to catch up to the current state of iTunes.  You
+probably don't want this unless you are dealing with iTunes 3
+
+0.82 - Fri Jan  3 12:33:22 2003
+	* the test mp3 is now a 20 second clip, so the dist size is
+	much smaller
+
+	* marked the unimplemented functions as such in the documentation
+
+0.81 Sun Dec  1 22:21:56 CST 2002
+	- fix POD formatting errors
+	- no code changes
+	
+0.80 Tue Nov 26 21:44:20 CST 2002 
+	- much better htim parsing
+	- none of the applescript has changed
+	- some tests are more robust
+	- new_from_directory() makes Item object correctly
+	
+0.01  Mon Jun 10 19:16:12 2002
+	- original version; created by h2xs 1.21 with options
+		-AXn MacOSX::iTunes

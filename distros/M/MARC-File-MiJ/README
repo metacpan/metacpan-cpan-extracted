@@ -1,0 +1,43 @@
+MARC-MiJ
+
+Allow perl's MARC::Record and MARC::File/MARC::Batch to deal with marc-in-json, a 
+MARC serialization described at http://dilettantes.code4lib.org/blog/2010/09/a-proposal-to-serialize-marc-in-json/.
+
+EXAMPLES
+
+    # Read in from newline-delimieted JSON file
+    use MARC::Batch;
+    use MARC::File::MiJ;
+
+    my $reader = new MARC::Batch('MiJ', $jsonfilename);
+    while (my $r = $batch->next) { ... }
+    
+    
+    # Convert binary to marc-in-json
+    use MARC::Record::MiJ;
+    my $batch = MARC::Batch->new('USMARC', 'file.mrc');
+    open(my $jsonfile, '>', 'file.ndj' );
+    while (my $r = $batch->next) {
+      print $jsonfile MARC::Record::MiJ->to_mij($r), "\n";
+    }
+    close $jsonfile;
+    
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+LICENSE AND COPYRIGHT
+
+This software is free software and may be distributed under the same
+terms as Perl itself.
+
+Copyright (C) 2013 Bill Dueber
+

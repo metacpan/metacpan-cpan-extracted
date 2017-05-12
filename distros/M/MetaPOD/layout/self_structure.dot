@@ -1,0 +1,26 @@
+strict digraph Perl {
+	graph [overlap=false, rankdir=LR, ranksep=5, splines=spline];
+	node [label="\N", shape=record, style=dotted];
+	edge [minlen=1];
+	subgraph cluster_1 {
+		graph [label="MetaPOD::",
+			rank=min];
+		"MetaPOD::Assembler" [label="MetaPOD::Assembler", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+		"MetaPOD::Exception" [label="MetaPOD::Exception", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+		"MetaPOD::Exception::Decode::Data" [label="MetaPOD::Exception::Decode::Data", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+		"MetaPOD::Extractor" [label="MetaPOD::Extractor", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+		"MetaPOD::JSON" [label="MetaPOD::JSON"];
+		"MetaPOD::Result" [label="MetaPOD::Result", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+		"MetaPOD::Role::Format" [label="MetaPOD::Role::Format", shape=Mrecord, style=solid, color="#15b01a", fontsize=7, height="0.1"];
+		"MetaPOD::Spec" [label="MetaPOD::Spec"];
+		"MetaPOD::Exception" -> "MetaPOD::Exception::Decode::Data" [arrowhead=vee, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, tailclip=1, weight=10];
+	}
+	MetaPOD [label=MetaPOD];
+	"Moo::Object" [label="Moo::Object"];
+	"Pod::Eventual" [label="Pod::Eventual"];
+	"Throwable::Error" [label="Throwable::Error"];
+	"Moo::Object" -> "MetaPOD::Assembler" [arrowhead=vee, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, tailclip=1, weight=10];
+	"Throwable::Error" -> "MetaPOD::Exception" [arrowhead=vee, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, tailclip=1, weight=10];
+	"Pod::Eventual" -> "MetaPOD::Extractor" [arrowhead=vee, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, tailclip=1, weight=10];
+	"Moo::Object" -> "MetaPOD::Result" [arrowhead=vee, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, tailclip=1, weight=10];
+}

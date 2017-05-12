@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 fb36dfb999c2e55963a16c9a7586b81037dc2612 Build.PL
+SHA1 4f8a429aa529b3c55130e2ba50b502c56e4ad074 ChangeLog
+SHA1 74165139c5ac184b4db5c651680e6be68fe3f723 Changes
+SHA1 10e1988580da7e1abc32d94f8d99296d828f5fc8 LICENSE
+SHA1 a3fd841b9b5173094de84f9c2c63743f2dba0943 MANIFEST
+SHA1 1ed2cdcc328ffcff7e1314edd7b459b2cb02875c MANIFEST.SKIP
+SHA1 204a10ac6f42bd42314140835696e82a96437e7b META.json
+SHA1 6da70ca023c9d1ff529fb4ddd2b7626d2eba422b META.yml
+SHA1 3d43c13b456cde6bf6886c567fa47cc5958fd4e3 Makefile.PL
+SHA1 c6595e0bb8a00fa36fc73b47d756f4eb685e2fa2 README
+SHA1 e8b6a4c174827489240d3f6228bdd92e40cc5646 lib/Math/Rational/Approx.pm
+SHA1 bfc921dd17726b19cba67e77372b6b054e22b66e lib/Math/Rational/Approx/ContFrac.pm
+SHA1 7cb7198767218ecae77aea72e85aa618f1f2c615 lib/Math/Rational/Approx/MaxD.pm
+SHA1 b08cb20959a3925de9efc7c66dd9e3f8c279ce0d t/00-load.t
+SHA1 6c3764cebbe1753c82d116326994a540130b583f t/contfrac-oo-iface.t
+SHA1 a711bc34c66ad1ec38af9f7e07a984a63d0b201e t/contfrac-oo.t
+SHA1 31b5a9290feae5ff97bc95594574e041261c76ed t/contfrac-proc-iface.t
+SHA1 72740c5b1e3aacaa14b4fecf90bc81ecedfd55b3 t/contfrac-proc.t
+SHA1 e938dd542c53645ca8bd24bde18efb81312f4470 t/maxd-oo-iface.t
+SHA1 42ef7e50137fdf4542d8a6a814f94b056ca1678a t/maxd-oo.t
+SHA1 db98c57ff111f59ed0e15b50c9f48b92abacb7e3 t/maxd-proc-iface.t
+SHA1 7732561ce2560d3454ff8f365a7aa635db0d8809 t/maxd-proc.t
+SHA1 046814a76085e5ebdccdf4113a06b3dbf0bcd702 xt/perlcritic.t
+SHA1 2eeaa3202587666a40077b1ee5b7abf10df1103c xt/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 xt/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJS5HijAAoJEKoeWalx+IodF+QIAJ6pHTCPHVlx5wSfotMi4HUB
+WlRFRpsA4qoXZMFf/N8KYso/wYked53+ci6bjc78RstJhH/4XNeLT0bzje/aKSqq
+s/0U9DWrv/zA8WPWBw+N9jS/U2dVSyHRGWfELFs18LrA6s5p9sUlMy3EpiRLA3u9
+rZtpqNPI17DdBrRIv0VsVxpohoinaXDYKKX3RZdJBqIeSEtyxtOCajCMJ1Ypzxjj
+RMrI+eqeDtf7h+L7wF0MrNcDv1bnvMiy+BUHQHY2IlQ+6IyScpneWL6EeQWJF2kM
+cbQcV/bOSRngCix8aSatszxropM0a2XWjDKtKQ2ohr7BjToAYKySjSfkpHxZjbI=
+=hRyU
+-----END PGP SIGNATURE-----

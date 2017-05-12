@@ -1,0 +1,33 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+bin/persona
+lib/Mozilla/Persona.pm
+lib/Mozilla/Persona.pod
+lib/Mozilla/Persona/Aliases.pm
+lib/Mozilla/Persona/Aliases.pod
+lib/Mozilla/Persona/Aliases/MailConfig.pm
+lib/Mozilla/Persona/Aliases/MailConfig.pod
+lib/Mozilla/Persona/Check.pm
+lib/Mozilla/Persona/Check.pod
+lib/Mozilla/Persona/Server.pm
+lib/Mozilla/Persona/Server.pod
+lib/Mozilla/Persona/Setup.pm
+lib/Mozilla/Persona/Setup.pod
+lib/Mozilla/Persona/Validate.pm
+lib/Mozilla/Persona/Validate.pod
+lib/Mozilla/Persona/Validate/Htpasswd.pm
+lib/Mozilla/Persona/Validate/Htpasswd.pod
+lib/Mozilla/Persona/Validate/IMAPTalk.pm
+lib/Mozilla/Persona/Validate/IMAPTalk.pod
+lib/Mozilla/Persona/Validate/Table.pm
+lib/Mozilla/Persona/Validate/Table.pod
+lib/Mozilla/Persona/setup/authenticate.html
+lib/Mozilla/Persona/setup/authenticate.js
+lib/Mozilla/Persona/setup/index.pl
+lib/Mozilla/Persona/setup/provision.html
+lib/Mozilla/Persona/setup/provision.js
+t/01use.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

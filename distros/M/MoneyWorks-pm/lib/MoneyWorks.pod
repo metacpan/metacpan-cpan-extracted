@@ -1,0 +1,369 @@
+
+=head1 NAME
+
+MoneyWorks.pm - Perl interface to MoneyWorks accounting software
+
+=head1 VERSION
+
+0.11
+
+=head1 SYNOPSIS
+
+  use MoneyWorks ();
+  
+  
+  # OO use:
+  
+  $m = new MoneyWorks::
+    rego   => $registration_number,
+    user   => $user,
+    password => $password,
+    file   => $filename,
+    bin    => '/usr/bin/moneyworks',
+    keep_alive => 0;  # default is 1
+  $m->rego($rego); # change it
+  $m->user($new_user); # etc.
+  
+  $m->version; # returns the MoneyWorks version
+  $m->eval( $moneyworks_expression );
+  
+  $m->import( data => $string, map => $filepath );
+  $m->import( data_file => $datafile, map => $filepath );
+  
+  # Not yet supported
+  # $m->import( data => \@array_of_hashes, table => 'product' );
+  
+  my $hashref = $m->export(
+    table => $table,
+    fields => \@fields,  # optional; all fields by default
+    search => $search,
+    key => $key, # if key is omitted an array ref is returned
+  );
+  
+
+  # Ties (currently read-only):
+  
+  tie my %products, MoneyWorks =>
+    file => 'moneyworks://localhost?doc=Acme%20Widgets.mwd5'
+    table => 'Product'
+    key    => 'Code';
+  # Other constructor args (rego, etc.) are permitted.
+  
+  $description = $products{'CA100'}{Description};
+  # etc.
+  
+  # Also:
+  my $products = $m->tie('Product','Code');
+  my $price = $products->{CA100}{SellPrice};
+  
+  
+  # Utility functions:
+  
+  use MoneyWorks;
+  $quoted = mw_cli_quote q/"'`abc/;
+  $quoted = mw_str_quote q/"'`abc/;
+
+=begin for-later
+
+This will be added to the synopsis later if I can get it working:
+
+  my $string = $m->report(
+    report => $filepath,
+    format => 'text', # or html or hash
+    from   => $startdate,
+    to     => $enddate,
+  );
+  
+  
+=end for-later
+
+=head1 DESCRIPTION
+
+This module provides a Perl interface to MoneyWorks Gold or MoneyWorks
+Datacentre Client.
+
+It uses the command line interface, either running individual commands
+(with C<< keep_alive => 0 >>), or maintaining a single moneyworks
+process.
+
+It is highly recommended that one read the L<moneyworks> manpage before
+using this.
+
+=head1 INTERFACE
+
+=head2 Constructor
+
+ my $m = new MoneyWorks %args;
+
+The C<%args> are as follows:
+
+=over
+
+=item rego
+
+Registration number
+
+=item user
+
+=item password
+
+Log-in credentials for local files. For documents on servers, include the
+credentials in the URL.
+
+=item file
+
+The company file to open. This can be a local file path or a moneyworks://
+URL (see L<http://cognito.co.nz/support.faq.php?art=url>).
+
+If you are using a moneyworks:// URL, you must include a port
+number if running under a user without a preference file, such as www. If
+there I<is> a preference file, MoneyWorks will assume the last used port
+number. Always provide one to be on the safe side.
+
+=item bin
+
+The location of the MoneyWorks executable.
+
+This module automatically tries to find it. You can override it with this
+option. In Windows, you will almost always have to specify this explicitly,
+since the executable needs to be copied and modified to work with stdio.
+
+=item keep_alive
+
+When this is set to a false value, every access to the database will 
+require a separate
+invocation of the moneyworks executable. If you are connecting to a server
+(moneyworks:// URL), this means a new connection each time.
+
+With C<keep_alive> set to a true value (the default), a MoneyWorks process 
+will be kept 
+running. This can
+reduce overhead in the case of multiple database accesses. But be warned 
+that only one instance of MoneyWorks can open a local file at a
+time. Data access methods will die if the file is already open by another
+process.
+
+=begin comment
+
+=item timeout
+
+This only applies if C<keep_alive> is true. If no command has been issued
+for the number of seconds specified, a new moneyworks process will be
+started.
+
+=end comment
+
+=back
+
+=head2 Accessors
+
+All the options to the constructor are also the names of accessor methods.
+You can set these by passing an argument.
+
+If there is a moneyworks process running, setting any of these will
+terminate the process.
+
+=head2 Methods for Data Access
+
+=over
+
+=item version
+
+Returns the MoneyWorks version number.
+
+=item eval
+
+Evaluates the MoneyWorks expression and returns the result. This method
+also replaces line breaks with spaces, to make it easier to write long
+expressions. (MoneyWorks expressions cannot contain line breaks.)
+
+=item import ( data => $str, map => $file )
+
+Import data into MoneyWorks. The C<$file> is the path to the import map
+(usually in the plugins folder).
+
+The return value is a hash ref containing the the number of records created 
+and updated (except
+for User, Contact and Build files, which will always report zero).
+
+Note that field values cannot contain line breaks. (A line break indicates
+a new record.) But you can use vertical tabs (control-K) (which is
+precisely how MoneyWorks exports them).
+
+=item import ( data_file => $datafile, map => $file )
+
+Like the above, but with a file name instead of the actual data.
+
+=begin comment
+
+=item import ( data => \@data, table => $table )
+
+In this form, you can pass an array of hashes and specify into which table
+it is to be imported. The keys of the hashes are the names of fields and
+must match the capitalisation given in the MoneyWorks manual.
+
+This only applies to Product, Name, ...
+
+=end comment
+
+=item export ( %options )
+
+Retrieve data from MoneyWorks. C<%options> are as follows:
+
+  table   The name of the table (aka 'file')
+  fields  Array ref of field names to retrieve (optional)
+  search  Search string (filter) in MoneyWorks 'Calculations and
+          Things' syntax
+  key     Which field to use as a hash key for each record (the
+          key does not need to be included in the list of fields)
+          (optional)
+
+If C<fields> is omitted, all fields are returned.
+
+If C<key> is not specified, this method returns an array ref of hash refs;
+otherwise it returns a hash ref of hash refs.
+
+=begin for-later
+
+I can’t actually get doreport to work from the command line right now.
+
+=item report ( %options )
+
+Run a MoneyWorks report. The C<%options> are:
+
+  report   File name
+  format  'text', 'html', or 'hash': The first two are default
+           MoneyWorks report formats. The last is a Perl data struc-
+           ture that is the result of parsing the text output.
+  from     Starting date
+  to       Ending date
+
+=end for-later
+
+=item command ( $command )
+
+Issues a MoneyWorks command and returns the result as a string.
+
+=begin comment
+
+ in scalar context, or a
+hash of headers followed by the result in list context.
+
+=end comment
+
+=back
+
+=head2 Methods Pertaining to the Child Process
+
+These methods only apply in keep-alive mode.
+
+=over
+
+=item pid
+
+Returns the process ID of the MoneyWorks process, if there is one.
+
+=item close
+
+This method terminates the process
+if it is running.
+
+=back
+
+=head2 Ties
+
+You can tie a hash to a MoneyWorks table like this:
+
+  tie my %products, MoneyWorks =>
+    file => $filename,
+    table => "Product",
+    key    => "Code";
+
+Other options from the constructor are permitted. S<C<< keep_alive => 0 >>>
+is I<not> recommended, as it would be very inefficient.
+
+You can also create a tie from an existing object by simply calling the
+C<tie> method with the table and and the key as its arguments. It returns a
+reference
+to a tied hash.
+
+=head2 Utility Functions
+
+These are exported by default. You can C<use MoneyWorks ();> to load the
+module without exporting them. Or you can have just one of them exported by
+naming it explicitly.
+
+=over
+
+=item mw_cli_quote
+
+This quotes its argument for use on the command line or with the C<command>
+method. It picks whatever ASCII delimiter is available, starting with chr
+127 and working backwards.
+
+=item mw_str_quote
+
+This functions quotes its arguments for use as a string in MoneyWorks
+expressions. It escapes characters as necessary and chooses either " or `
+as the delimiter.
+
+=back
+
+=head1 WARNINGS
+
+You may see these messages if you have warnings enabled.
+
+=over
+
+=item Command contains null chars
+
+If you have warnings enabled and you (directly or indirectly) pass a string
+to the C<command> method that contains null characters, you will see this
+message. Null bytes confuse MoneyWorks and cause the input and output to
+get out of sync, so the module strips them and warns if it finds them.
+
+=item Argument to mw_cli_quote contains line breaks
+
+Commands cannot contain line breaks. C<mw_cli_quote> is not capable of
+escaping them, so it warns.
+
+=back
+
+=head1 LIMITATIONS
+
+There is no easy way to edit individual fields in MoneyWorks' databases;
+you have to create a custom import map. Another way is to evaluate an
+expression containing the undocumented Replace() function. The syntax is
+Replace("table.field", "search expression", "replacement expression").
+
+The tie interface does not work with the C<keys> and C<each> functions. It
+would be very hard to implement this efficiently.
+
+=head1 BUGS
+
+None have been reported yet, but I've left some room for them:
+
+=over 4
+
+=item *
+
+=item *
+
+=item *
+
+=back
+
+=head1 PREREQUISITES
+
+L<perl> 5.6 or higher
+
+L<constant::lexical>
+
+L<MoneyWorks Gold or Datacentre Client (http://cognito.co.nz/)|http://cognito.co.nz/>
+
+=head1 AUTHOR & COPYRIGHT
+
+Copyright (C) 2009-16, Father Chrysostomos (sprout at, um, cpan dot org)
+
+This program is free software; you may redistribute or modify it (or both)
+under the same terms as perl.

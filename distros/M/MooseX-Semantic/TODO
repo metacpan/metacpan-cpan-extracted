@@ -1,0 +1,93 @@
+Sun Aug 26 22:16:56 CEST 2012
+-----------------------------
+* Export should take Trine::Literals as Array Elements into account
+
+Mon Jun  4 01:10:53 CEST 2012
+-----------------------------
+* Interesting paper from ESWC2012 about object-oriented class instantiation
+  strategies from ontology data (http://www.springerlink.com/content/gt857662n3274882, DOI: 10.1007/978-3-642-30284-8_51 )
+
+Tue Mar 27 02:57:43 CEST 2012
+-----------------------------
+* A meta-attribute 'inverse' to specify that $self->rdf_about should be the
+  object of a statement, not it's subject.
+* A Moose class for all that is known about $self->rdf_about across named
+  graphs/contexts and with '$self->rdf_about' as subject or object
+
+Fri Feb 24 15:10:35 CET 2012
+----------------------------
+* Just found out toby has written a small schema for perl modules
+  (Module::Install::DOAP) - really useful. Could be foundation for solving
+  the inheritance problem, i.e. have MXS RdfImport recognize a special
+  cpanterms:package_name property and instantiating that instead of the
+  base class specified in isa
+
+Fri Feb 24 05:30:07 CET 2012
+----------------------------
+
+Additionally:
+* Detect attributes that contain a model and export the model
+
+On 02/23/2012 07:49 PM, Kjetil Kjernsmo wrote:
+> On Friday 10. February 2012 16.37.34 Kjetil Kjernsmo wrote:
+>> "what would we do with Moose if 
+>> we got to hack on it for a few days with cabal members to help us?"
+Some ideas off the top of my head:
+
+* How to map Moose TypeConstraints to RDF in a generalized way, i.e.
+  * how to handle multiple statements with the same predicate
+  * how to handle type inheritance (e.g. for an attribute that "isa 
+    =>'My::Plugin'" but should be instantiated as My::Plugin::Specialized
+    depending on some additional data
+  * how to handle rdf:List/rdf:Seq/rdf:Bag etc.
+  * mapping to/from MooseX::Type/subtype
+  * Offering hooks to add application-specific behaviour for Moose<->RDF
+    mapping, e.g. using MooseX::Role::Parametrized.
+
+* A separate MooseX::Types distribution with ready-to-use RDF::Trine
+specific types and coercions
+
+* A role that adds a RDF::Trine::Model to any object, along with some
+delegation methods. This can be useful as a general data container, for
+storing obsolete statements, contextual information.
+
+* A utility role or maybe a MooseX::Singleton that encapsulates
+shortcuts for tedious tasks, at least what RDF::Trine exports (iri,
+literal, statement etc.), one or more solutions for Namespaces
+Management and other stuff that RDF::TrineShortcuts et. al. offer.
+
+* Integrate with MooseX::Storage?
+
+* By introspecting a RDF schema, MooseX::Semantic powered classes can in
+theory be created from scratch or MooseX::Semantic attributes "injected"
+into existing Moose classes. While this works, it requires conventions
+how to do it in a general way.
+
+* Tools for extracting the schema out of a set of MooseX::Class and
+validating it.
+
+* Conventions for exporting any Moose class to RDF, something like
+
+@prefix ns1: <urn:moose:My::Plugin#> .
+@prefix moose: <http://moose.perl.org/onto#> .
+ns1:name a moose:Attribute ;
+    moose:isa "Str";
+    moose:default "ANONYMOUS".
+_:inst123 a <urn:moose:My::Plugin> ;
+         ns1:name "John Doe";
+         ns1:age  26.
+
+* Porting Class::OWL to Moose
+
+* Two modules MooseX::Semantic::NonMoose,
+MooseX::Semantic::NonMooseXSemantic] that make it easy to wrap Non-Moose
+or Moose-but-not-MooseX::Semanic classes (a more specialized version of
+MooseX::NonMoose)
+
+* A way to query all objects of one or more Moose classes using SPARQL
+(some metaclass trickery to track all created objects and convert them
+to RDF/query them on the fly)
+
+
+Cheers,
+Konstantin

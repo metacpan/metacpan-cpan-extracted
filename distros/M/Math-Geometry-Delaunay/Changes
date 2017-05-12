@@ -1,0 +1,107 @@
+Revision history for Perl extension Math::Geometry::Delaunay.
+
+0.19 Sunday November 30 21:00:00 2014
+
+  - Fix build for ARM-linux, e.g. Raspberry Pi
+
+0.18 Friday October 10 18:27:00 2014
+
+  - custom DESTROY method for topology hash to fix failed garbage collection
+
+0.17 Wednesday March 5 02:48:00 2014
+
+  - small documentation edit
+
+0.16 Saturday February 23 17:03:00 2013
+
+  - Fixed crash on Win64 - now passes all build tests on that platform.
+  
+0.15 Wednesday Feb 08 01:02:00 2013
+
+  - Fixed more search-replace mistakes in new Win64 copy of triangle.c.
+  
+0.14 Wednesday Feb 06 21:52:00 2013
+
+  - Fixed search-replace mistakes in new Win64 copy of triangle.c.
+
+0.13 Wednesday Feb 06 17:58:00 2013
+
+  - Separate Windows 64 bit version of triangle.c that uses
+    "unsigned long long" to support Triangle's pointer manipulation.
+
+0.12 Wednesday Feb 05 01:40:00 2013
+
+  - Added compile option to support 64 bit MinGW environment. 
+
+0.11 Wednesday Jan 23 12:20:00 2013
+
+  - Triangle option strings can no longer be used in the 
+    new() constructor. They may instead be passed to the
+    triangulate() method.
+
+  - Changed all args for to_svg() to be key=>value style, 
+    and added image dimension option.
+
+  - The to_svg() utility will now print to STDOUT if no file 
+    name is specified.
+
+  - The mic_adjust() utility now adds a list of tangent point 
+    pairs to the nodes it processes - one pair for each edge
+    emanating from the node.
+
+  - Got addSegments() working.
+
+  - Fixed some failures and improved automatic generation of 
+    polygon hole identification points.
+
+  - Improved auto margin detection for to_svg(), to avoid clipping 
+    node circles at edges of display.
+
+0.10 Wednesday Dec 19 07:36:00 2012
+
+  - The floating point unit config done by Triangle under Linux could
+    trigger a floating point exception when doing subtraction (at least)
+    involving infinity (usually an acceptable operation). Triangle's FPU
+    config has been disabled in favor of the FPU config done by xpfpa.h.
+
+0.09 Tuesday Dec 18 19:08:00 2012
+
+  - fixed typo in segment intersection code that made addHole() fail
+
+0.08 Thursday Dec 13 11:07:00 2012
+
+  - fix for undefined value test in line intersections
+
+0.07 Friday Nov 30 02:50:00 2012
+
+  - mic_adjust() improvements
+
+0.06 Wednesday Nov 28 15:47:00 2012
+
+  - mic_adjust() bug fix
+
+0.05 Wednesday Nov 28 02:00:00 2012
+
+  - added to_svg()
+  - added mic_adjust(), for medial axis approximations
+  - enabled Delaunay triangle - Voronoi vertex cross referencing
+
+0.04 Sunday Nov 25 16:04:00 2012
+
+  - bugfix: last edge in voronoi topology had references to all rays
+  - documented edge list cross referencing
+  - might build on OpenBSD now
+
+0.03 Sunday Nov 19 08:43:00 2012
+
+  - added ExtUtils::CppGuess as a configure requirement for Build.PL
+
+0.02 Sunday Nov 18 02:04:00 2012
+
+  - now builds with MSVC 2012
+  - now builds with gcc under MinGW (Citrus Perl) and Cygwin (Perl 5.8)
+
+0.01 Fri Nov 16 09:38:00 2012
+
+  - initial public version
+

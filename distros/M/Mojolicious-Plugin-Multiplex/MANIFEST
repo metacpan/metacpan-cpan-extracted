@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+cpanfile
+ex/vue_chat.pl
+lib/Mojolicious/Plugin/Multiplex.pm
+lib/Mojolicious/Plugin/Multiplex/Multiplexer.pm
+t/server.t
+xt/reconnect.t

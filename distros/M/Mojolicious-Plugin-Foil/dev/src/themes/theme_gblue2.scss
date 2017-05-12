@@ -1,0 +1,29 @@
+/* ================================================================== */
+/* THEME: Grey-Blue 2
+ * dark_on_light
+ */
+@import 'functions';
+@import 'theme_gblue';
+@import 'fonts_gblue2';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: #9999cc;
+$verge-fg: set-fg($verge-bg);
+$verge-border: navy;
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+}
+header,
+footer,
+.side {
+	@extend .verge;
+	background-image: url(gblue2_h.jpg);
+}
+

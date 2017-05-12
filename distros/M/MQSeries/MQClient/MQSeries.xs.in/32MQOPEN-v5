@@ -1,0 +1,344 @@
+# -*-c-*-
+#
+# $Id: 32MQOPEN-v5,v 33.5 2012/09/26 16:10:03 jettisu Exp $
+#
+# (c) 1999-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+void
+MQOPEN(Hconn,ObjDesc,Options,CompCode,Reason)
+        MQHCONN Hconn
+        MQOD    ObjDesc
+        MQLONG  Options
+        MQLONG  CompCode = NO_INIT
+        MQLONG  Reason = NO_INIT
+
+    PREINIT:
+        MQHOBJ  Hobj;
+        SV     *Return, **svp;
+        AV     *ObjectRecs, *ObjectRecsArrayEntry;
+        AV     *ResponseRecArray;
+        HV     *ObjectRecsHashEntry, *ResponseRecHash;
+        PMQRR   pResponseRecPtr = NULL;
+        PMQOR   pObjectRecPtr;
+        char   *String;
+        STRLEN  StringLength;
+        int     index;
+#ifdef MQOD_VERSION_4
+	MQCHAR  resolved_object_string[MQ_TOPIC_STR_LENGTH];
+#endif
+    PPCODE:
+        CompCode = MQCC_FAILED;
+        Reason = MQRC_UNEXPECTED_ERROR;
+        sv_setiv(ST(3),(IV)CompCode);
+        sv_setiv(ST(4),(IV)Reason);
+
+        /*
+          If there is a list of ObjectRecs, then we are dealing with a
+          distribution list.
+         */
+
+        if ( hv_exists((HV*)SvRV(ST(1)),"ObjectRecs",10) ) {
+
+          svp = hv_fetch((HV*)SvRV(ST(1)),"ObjectRecs",10,FALSE);
+          if ( svp == NULL ) {
+            warn("Unable to fetch value for key ObjectRecs\n");
+            XSRETURN_EMPTY;
+          }
+
+          if (
+              !SvROK(*svp) ||
+              ( SvROK(*svp) && SvTYPE(SvRV(*svp)) != SVt_PVAV )
+              ) {
+            warn("Invalid data for 'ObjectRecs', not an ARRAY reference\n");
+            XSRETURN_EMPTY;
+          }
+
+          ObjectRecs = (AV*)SvRV(*svp);
+
+          /* Override this, even if it was provided by the user */
+          ObjDesc.RecsPresent = av_len(ObjectRecs) + 1;
+
+          /* If this is NOT set, then MQOPEN() will puke.  One more
+             thing the user doesn't have to care about... */
+          ObjDesc.Version = MQOD_VERSION_2;
+
+          if ( (pResponseRecPtr = (PMQRR)malloc( ObjDesc.RecsPresent * sizeof(MQRR) ) ) == NULL ) {
+            perror("Unable to allocate memory");
+            XSRETURN_EMPTY;
+          }
+
+          memset(pResponseRecPtr,'\0',ObjDesc.RecsPresent * sizeof(MQRR));
+
+          if ( (pObjectRecPtr = (PMQOR)malloc( ObjDesc.RecsPresent * sizeof(MQOR) ) ) == NULL ) {
+            perror("Unable to allocate memory");
+            XSRETURN_EMPTY;
+          }
+
+          memset(pObjectRecPtr,'\0',ObjDesc.RecsPresent * sizeof(MQOR));
+
+          ObjDesc.ResponseRecPtr = pResponseRecPtr;
+          ObjDesc.ObjectRecPtr = pObjectRecPtr;
+
+          /*
+            Now we have to go through the list, and extract the
+            QName/QMgrName pairs.  We'll allow this to be one of three
+            formats.
+
+            ObjectRecs => [qw( FOO BAR BAZ )],
+
+            ObjectRecs => [
+            [qw( FOO QM1 )],
+            [qw( BAR QM2 )],
+            [qw( BAZ QM3 )],
+            ],
+
+            ObjectRecs => [
+            {
+            ObjectName  => 'FOO',
+            ObjectQMgrName      => 'QM1',
+            },
+            {
+            ObjectName  => 'BAR',
+            ObjectQMgrName      => 'QM2',
+            },
+            {
+            ObjectName  => 'BAZ',
+            ObjectQMgrName      => 'QM3',
+            },
+            ],
+
+            That is, you can either provide a simple array of queue
+            names, or an array of arrays, where the qname and
+            qmgrname are provided seperately, or an array of hashes,
+            where the qname and qmgrname are given as key/vaue
+            pairs.
+          */
+
+          for ( index = 0 ; index < ObjDesc.RecsPresent ; index++ ) {
+
+            svp = av_fetch(ObjectRecs,index,FALSE);
+            if ( svp == NULL ) {
+              warn("Unable to retreive array element from ObjectRecs!!\n");
+              XSRETURN_EMPTY;
+            }
+
+            /* It had better be a string, array or hash reference */
+
+            if ( !SvPOK(*svp) &&
+                 !(SvROK(*svp) && SvTYPE(SvRV(*svp)) == SVt_PVAV) &&
+                 !(SvROK(*svp) && SvTYPE(SvRV(*svp)) == SVt_PVHV) ) {
+              warn("Invalid data in ObjectRecs->[%d], not a string or ARRAY/HASH reference\n",index);
+              XSRETURN_EMPTY;
+            }
+
+            if ( SvPOK(*svp) ) {
+              String = SvPV(*svp,StringLength);
+              strncpy(pObjectRecPtr->ObjectName,
+                      String,
+                      (StringLength > (size_t)MQ_Q_NAME_LENGTH ?
+                       (size_t)MQ_Q_NAME_LENGTH :
+                       StringLength));
+              pObjectRecPtr++;
+              continue;
+            }
+
+            if ( SvROK(*svp) && SvTYPE(SvRV(*svp)) == SVt_PVAV ) {
+
+              ObjectRecsArrayEntry = (AV*)SvRV(*svp);
+
+              /* The first entry (the QName) must be there */
+              svp = av_fetch(ObjectRecsArrayEntry,0,FALSE);
+              if ( svp == NULL ) {
+                warn("Unable to retreive array element ObjectRecs->[%d]->[0]!!\n",index);
+                XSRETURN_EMPTY;
+              }
+
+              if ( !SvPOK(*svp) ) {
+                warn("Invalid data in ObjectRecs->[%d]->[0], not a string\n",index);
+                XSRETURN_EMPTY;
+              }
+
+              String = SvPV(*svp,StringLength);
+              strncpy(pObjectRecPtr->ObjectName,
+                      String,
+                      (StringLength > (size_t)MQ_Q_NAME_LENGTH ?
+                       (size_t)MQ_Q_NAME_LENGTH :
+                       StringLength));
+
+              /* The second entry (the QMgrName) is optional */
+              svp = av_fetch(ObjectRecsArrayEntry,1,FALSE);
+              if ( svp != NULL ) {
+                /* But if it is there, it had better be a string...*/
+                if ( !SvPOK(*svp) ) {
+                  warn("Invalid data in ObjectRecs->[%d]->[1], not a string\n",index);
+                  XSRETURN_EMPTY;
+                }
+                String = SvPV(*svp,StringLength);
+                strncpy(pObjectRecPtr->ObjectQMgrName,
+                        String,
+                        (StringLength > (size_t)MQ_Q_NAME_LENGTH ?
+                         (size_t)MQ_Q_NAME_LENGTH :
+                         StringLength));
+              }
+
+              pObjectRecPtr++;
+              continue;
+            }
+
+            if ( SvROK(*svp) && SvTYPE(SvRV(*svp)) == SVt_PVHV ) {
+
+              ObjectRecsHashEntry = (HV*)SvRV(*svp);
+
+              if ( !hv_exists(ObjectRecsHashEntry,"ObjectName",10) ) {
+                warn("Missing required key 'ObjectName' from ObjectRecs->[%d]",index);
+                XSRETURN_EMPTY;
+              }
+
+              svp = hv_fetch(ObjectRecsHashEntry,"ObjectName",10,FALSE);
+              if ( svp == NULL ) {
+                warn("Unable to fetch value of key 'ObjectName' from ObjectRecs->[%d]",index);
+                XSRETURN_EMPTY;
+              }
+
+              if ( !SvPOK(*svp) ) {
+                warn("Invalid data in ObjectRecs->[%d]->{ObjectName}, not a string\n",index);
+                XSRETURN_EMPTY;
+              }
+
+              String = SvPV(*svp,StringLength);
+              strncpy(pObjectRecPtr->ObjectName,
+                      String,
+                      (StringLength > (size_t)MQ_Q_NAME_LENGTH ?
+                       (size_t)MQ_Q_NAME_LENGTH :
+                       StringLength));
+
+              if ( hv_exists(ObjectRecsHashEntry,"ObjectQMgrName",14) ) {
+
+                svp = hv_fetch(ObjectRecsHashEntry,"ObjectQMgrName",14,FALSE);
+                if ( svp == NULL ) {
+                  warn("Unable to fetch value of key 'ObjectQMgrName' from ObjectRecs->[%d]",index);
+                  XSRETURN_EMPTY;
+                }
+
+                if ( !SvPOK(*svp) ) {
+                  warn("Invalid data in ObjectRecs->[%d]->{ObjectQMgrName}, not a string\n",index);
+                  XSRETURN_EMPTY;
+                }
+
+                String = SvPV(*svp,StringLength);
+                strncpy(pObjectRecPtr->ObjectQMgrName,
+                        String,
+                        (StringLength > (size_t)MQ_Q_NAME_LENGTH ?
+                         (size_t)MQ_Q_NAME_LENGTH :
+                         StringLength));
+
+              }
+
+              pObjectRecPtr++;
+              continue;
+
+            }
+
+          }
+
+        }
+
+        /* XS doesn't like empty lines before an ifdef */
+#ifdef MQOD_VERSION_4
+        /*
+	 * If we have version 4 of the MQOD, make sure the
+	 * MQCHARV for the ResObjectString points to a 
+	 * buffer with a long enough name.
+	 */
+        if (ObjDesc.Version >= MQOD_VERSION_4) {
+	    ObjDesc.ResObjectString.VSPtr = resolved_object_string;
+	    ObjDesc.ResObjectString.VSBufSize = MQ_TOPIC_STR_LENGTH;
+	    ObjDesc.ResObjectString.VSCCSID = MQCCSI_APPL; /* Maybe UTF-8 */
+	}
+#endif /* MQOD_VERSION_4 */
+
+        MQOPEN(Hconn,&ObjDesc,Options,&Hobj,&CompCode,&Reason);
+
+        /*
+          If there were multiple reason codes imbedded in the
+          "Response Records", then we have to decode these.
+         */
+        if ( Reason == MQRC_MULTIPLE_REASONS ) {
+
+            ResponseRecArray = newAV();
+
+            for ( index = 0 ; index < ObjDesc.RecsPresent ; index++ ) {
+                ResponseRecHash = newHV();
+                hv_store(ResponseRecHash,"CompCode",8,newSViv(pResponseRecPtr->CompCode),FALSE);
+                hv_store(ResponseRecHash,"Reason",6,newSViv(pResponseRecPtr->Reason),FALSE);
+                av_push(ResponseRecArray,newRV_noinc((SV*)ResponseRecHash));
+                pResponseRecPtr++;
+            }
+
+            hv_store((HV*)SvRV(ST(1)),"ResponseRecs",12,newRV_noinc((SV*)ResponseRecArray),FALSE);
+
+        }
+
+        /*
+          This adds all the usual fields to the ObjDesc hash
+         */
+        hv_store((HV*)SvRV(ST(1)),"Version",7,
+                 (newSViv(ObjDesc.Version)),0);
+        hv_store((HV*)SvRV(ST(1)),"ObjectType",10,
+                 (newSViv(ObjDesc.ObjectType)),0);
+        hv_store((HV*)SvRV(ST(1)),"ObjectName",10,
+                 (newSVpv(ObjDesc.ObjectName, 48)),0);
+        hv_store((HV*)SvRV(ST(1)),"ObjectQMgrName",14,
+                 (newSVpv(ObjDesc.ObjectQMgrName, 48)),0);
+        hv_store((HV*)SvRV(ST(1)),"DynamicQName",12,
+                 (newSVpv(ObjDesc.DynamicQName, 48)),0);
+        hv_store((HV*)SvRV(ST(1)),"AlternateUserId",15,
+                 (newSVpv(ObjDesc.AlternateUserId, 12)),0);
+        hv_store((HV*)SvRV(ST(1)),"RecsPresent",11,
+                 (newSViv(ObjDesc.RecsPresent)),0);
+        hv_store((HV*)SvRV(ST(1)),"KnownDestCount",14,
+                 (newSViv(ObjDesc.KnownDestCount)),0);
+        hv_store((HV*)SvRV(ST(1)),"UnknownDestCount",16,
+                 (newSViv(ObjDesc.UnknownDestCount)),0);
+        hv_store((HV*)SvRV(ST(1)),"InvalidDestCount",16,
+                 (newSViv(ObjDesc.InvalidDestCount)),0);
+#ifdef MQOD_VERSION_3
+        if (ObjDesc.Version >= MQOD_VERSION_3) {
+	    STRLEN  len;
+	    char   *ptr;
+
+	    ptr = memchr(ObjDesc.ResolvedQName, ' ', 48);
+	    len = (ptr ? ptr - ObjDesc.ResolvedQName : 48);
+	    hv_store((HV*)SvRV(ST(1)),"ResolvedQName",13,
+		     (newSVpv(ObjDesc.ResolvedQName, len)),0);
+
+	    ptr = memchr(ObjDesc.ResolvedQMgrName, ' ', 48);
+	    len = (ptr ? ptr - ObjDesc.ResolvedQMgrName : 48);
+	    hv_store((HV*)SvRV(ST(1)),"ResolvedQMgrName",16,
+		     (newSVpv(ObjDesc.ResolvedQMgrName, len)),0);
+        }
+#endif
+#ifdef MQOD_VERSION_4
+        if (ObjDesc.Version >= MQOD_VERSION_4) {
+            if (ObjDesc.ResObjectString.VSLength) {
+		hv_store((HV*)SvRV(ST(1)),"ResObjectString",15,
+			 (newSVpv(resolved_object_string, ObjDesc.ResObjectString.VSLength)),0);
+            }
+	    hv_store((HV*)SvRV(ST(1)),"ResolvedType",13,
+		     (newSViv(ObjDesc.ResolvedType)),0);
+        }
+#endif
+        SvSETMAGIC(ST(1));
+
+        sv_setiv(ST(3), (IV)CompCode);
+        SvSETMAGIC(ST(3));
+
+        sv_setiv(ST(4), (IV)Reason);
+        SvSETMAGIC(ST(4));
+
+        Return = sv_newmortal();
+        sv_setiv(Return,(IV)Hobj);
+
+        XPUSHs(Return);

@@ -1,0 +1,30 @@
+Source: libmogilefs-client-async-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 7)
+Build-Depends-Indep: perl (>= 5.8.6), libmogilefs-client-perl,
+  libanyevent-perl, libanyevent-http-perl, libtest-exception-perl,
+  libdigest-sha1-perl, libtest-simple-perl, libio-aio-perl (>= 3.65), libnamespace-clean-perl,
+  libtry-tiny-perl,
+  libfile-slurp-perl,
+  libpackage-stash-perl,
+  libpackage-deprecationmanager-perl,
+  liblinux-pipemagic-perl,
+  libmodule-install-perl
+Maintainer: Tomas Doran <t0m@state51.co.uk>
+Standards-Version: 3.8.3
+Homepage: http://search.cpan.org/dist/MogileFS-Client-Async/
+
+Package: libmogilefs-client-async-perl
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}, libmogilefs-client-perl,
+  libanyevent-perl, libanyevent-http-perl, libio-aio-perl (>= 3.65), libnamespace-clean-perl,
+  libtry-tiny-perl,
+  libfile-slurp-perl,
+  libpackage-stash-perl,
+  libpackage-deprecationmanager-perl,
+  liblinux-pipemagic-perl
+Description: foo
+ foo
+ .
+ This description was automagically extracted from the module by dh-make-perl.

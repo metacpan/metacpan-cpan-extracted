@@ -1,0 +1,54 @@
+{
+   "abstract" : "Mail::Box connector via POP3",
+   "author" : [
+      "Mark Overmeer"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mail-Box-POP3",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Digest::MD5" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "IO::Socket" : "0",
+            "List::Util" : "0",
+            "Mail::Box::FastScalar" : "3",
+            "Mail::Box::Net" : "3",
+            "Mail::Box::Parser::Perl" : "3",
+            "Mail::Box::Test" : "3",
+            "Mail::Reporter" : "3",
+            "Mail::Transport::Receive" : "3",
+            "Socket" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "3.001"
+}

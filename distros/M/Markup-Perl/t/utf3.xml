@@ -1,0 +1,4 @@
+use blib;
+use utf8;
+use Markup::Perl;
+I ♥ p€rl

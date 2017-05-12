@@ -1,0 +1,20 @@
+
+This lists any changes between the last version and the current, since the full
+change log got quite big:
+
+v0.14:
+  * forgot to remove DEBUG output
+
+v0.13:
+Fixed:
+  * samples/convert: Had a bug of "Return-path" vs. "Return-Path:"
+  * when extracting target, don't look into From:
+  * limit SA score to 200, not 100000
+  * output dir no longer gets a trailing slash (good for OS/2?) and we use
+    File::Spec to construct output file names
+Added:
+  * create the output dir if it does not exist (Thanx Paul Wolters!)
+  * added BUGS section to doc
+Tests:
+  * converted makegraph.t to Test::More and added some tests
+

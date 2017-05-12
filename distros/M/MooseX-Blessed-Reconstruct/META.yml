@@ -1,0 +1,46 @@
+---
+abstract: 'A L<Data::Visitor> for creating Moose objects from blessed placeholders'
+author:
+  - 'Yuval Kogman <nothingmuch@woobling.org>'
+  - 'Jonathan Rockway <jrockway@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0.88'
+  ok: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-Blessed-Reconstruct
+provides:
+  MooseX::Blessed::Reconstruct:
+    file: lib/MooseX/Blessed/Reconstruct.pm
+    version: '1.00'
+requires:
+  Carp: '0'
+  Class::Load: '0'
+  Class::MOP: '0.93'
+  Data::Visitor: '0.21'
+  Moose: '1.05'
+  Scalar::Util: '0'
+  Test::use::ok: '0'
+  namespace::clean: '0'
+resources:
+  bugtracker: https://github.com/yanick/moosex-blessed-reconstruct/issues
+  homepage: http://search.cpan.org/dist/MooseX-Blessed-Reconstruct/
+  repository: https://github.com/yanick/moosex-blessed-reconstruct.git
+version: '1.00'
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Jesse Luehrs <doy@tozt.net>'
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'

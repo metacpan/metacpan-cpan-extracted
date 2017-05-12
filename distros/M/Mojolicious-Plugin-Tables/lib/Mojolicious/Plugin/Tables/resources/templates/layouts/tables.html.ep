@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title><%= title %></title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    % param(theme=>session('theme')||config 'default_theme') unless param('theme');
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/<%=param('theme')%>/jquery-ui.css" id="jqueryui-theme">
+    %#
+    % if(stash 'include_dt') {
+    <link rel="stylesheet" href="//cdn.datatables.net/1.10.10/css/dataTables.jqueryui.min.css">
+    <link rel="stylesheet" href="//cdn.datatables.net/buttons/1.1.0/css/buttons.jqueryui.min.css">
+    % }
+    %#
+    <link rel="stylesheet" href="/css/tables.css">
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    %#
+    % if(stash 'include_dt') {
+    <script src="//cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js"></script>
+    <script src="//cdn.datatables.net/1.10.10/js/dataTables.jqueryui.min.js"></script>
+    <script src="//cdn.datatables.net/buttons/1.1.1/js/dataTables.buttons.min.js"></script>
+    <script src="//cdn.datatables.net/buttons/1.1.1/js/buttons.colVis.min.js"></script>
+    <script src="//cdn.datatables.net/buttons/1.1.0/js/buttons.jqueryui.min.js"></script>
+    % }
+    %#
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <script src="/js/tables.js"></script>
+</head>
+
+<script id="session" type="application/json"><%== Mojo::JSON::encode_json(session)%></script>
+<script id="shipped" type="application/json"><%== Mojo::JSON::encode_json(shipped)%></script>
+
+<body class="ui-widget">
+    <div id="header" class="ui-widget-header ui-corner-all ui-helper-clearfix">
+
+        <a id="logo" class="left ui-corner-all" href="<%=url_for '/'%>">&nbsp;</a>
+
+            <h2 class="left pad10">Tables</h2>
+            % if (my $banner = title) {
+                <h2 class="left pad10" id="banner-title"><%=$banner%></h2>
+            % }
+
+        <div class="right pad10"><%=stash('user_id')||'who?'%></div>
+
+    </div>
+
+    %# tag nesting below is modelled on jquery-ui info box examples
+
+    % for my $msg ( @{flash('messages')||[]}, @{stash('messages')||[]} ) {
+    %    next unless $msg;
+    %=   t div => class=>'ui-widget-content tables-notice ui-state-highlight ui-corner-all' => begin
+    %=     t p => begin
+    %=       t span => class=>'left ui-icon ui-icon-info', ''
+    %=       $msg
+    %      end
+    %    end
+    %  }
+
+    % for my $msg ( @{flash('errors')||[]}, @{stash('errors')||[]} ) {
+    %    next unless $msg;
+    %=   t div => class=>'ui-widget-content tables-notice ui-state-error ui-corner-all' => begin
+    %=     t p => begin
+    %=       t span => class=>'left ui-icon ui-icon-alert', ''
+    %=       $msg
+    %      end
+    %    end
+    %  }
+
+    <%= content %>
+
+    <div id="footer" class="pad8 ui-widget-header ui-corner-all ui-helper-clearfix">
+        <span id="status-line"></span>
+        %= link_to 'Tables'   => '/tables',      class=>'button'
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,63 @@
+Revision history for Perl extension Math::Random.
+
+0.61  Wed May 19 07:55:53 1999
+	- Added a space to the translation table in phrtsd.
+	- Cosmetic changes to bring this module into line with other
+	  Perl modules: added test.pl, Changes, MANIFEST, README;
+	  corrected some spelling, used "make dist", and so on.
+	- Geoffrey Rommel
+
+0.62  Wed Aug 22 09:30:14 2001
+	- In com.c and randlib.c, changed the Fortran-style labels
+	  and goto's in certain functions to proper {} blocks.  (For
+	  this I consulted the original L'Ecuyer/Cote paper.)
+	- Changed all floats to doubles.
+	- Increased the precision of many literals in accordance with
+	  the original papers (e.g. 1/M1 in ranf, log 4 in genbet,
+	  and so on).
+	- Corrected one test in test.pl.
+
+0.63  Wed Sep  5 09:31:04 2001
+        - Modified Makefile.PL to see whether Perl is using sv_yes
+	  or PL_sv_yes and adjust things automatically.
+
+0.64  Thu Dec  6 13:26:03 2001
+	- Rebuilt using h2xs 1.18 and a vanilla .xs file rather than
+	  a SWIG wrapper file.  This is more Perlish and will get
+	  around a reported problem with 'na' and 'sv_yes' in the
+	  wrapper.c file.
+
+0.65  Wed May  1 08:55:30 2002
+	- Add helper.h so that XS recognizes the return value of
+	  gvprfw().  Thanks to Stephan Heuel for noticing and
+	  correcting this problem.
+
+0.66  Fri Jun  7 12:17:36 2002
+	- The test for random_multivariate_normal displayed an odd
+	  error message on some systems but not others.  This has
+	  been corrected.  The problem was noted by the CPAN-testers,
+	  Maynard Brandsma, and Nat Goodman.
+
+0.67  Fri Mar 14 13:57:16 2003
+	- Corrected an interface error in getsd and phrtsd.  Noted by
+	  Eric Moore.
+
+0.68  Fri Jun 30 12:17:01 2006
+	- Added a new version of phrtsd and the phrtsd_orig option.
+
+0.69  Tue Sep 12 08:55:10 2006
+	- Changed pow to exp at randlib.c[1040] to get around a bug
+	  with gcc under AIX. (Would it also be possible to avoid
+	  this by using -lmsaa rather than -lm?)
+
+0.70  Fri Oct 12 16:30:18 2007
+	- Minor corrections to POD.
+
+0.71  Tue Sep 16 15:38:06 2008
+	- Used $ARGV[0] rather than shift in Makefile.PL.  Thanks to John
+	  Fong for the correction.
+
+0.72  Sat Aug 29 21:51:19 2015
+	- The random seed was based on time of day and was a bit too
+	  predictable. Applying patch provided by Jonathan Yu:
+	  https://rt.cpan.org/Public/Bug/Display.html?id=48080

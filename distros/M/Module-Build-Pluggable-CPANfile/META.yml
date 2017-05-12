@@ -1,0 +1,44 @@
+---
+abstract: 'Include cpanfile'
+author:
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+build_requires:
+  Capture::Tiny: 0.21
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.6.4, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Build-Pluggable-CPANfile
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Module::Build::Pluggable::CPANfile:
+    file: lib/Module/Build/Pluggable/CPANfile.pm
+    version: 0.05
+requires:
+  List::Util: 1.14
+  Module::Build::Pluggable: 0.05
+  Module::CPANfile: 0.9010
+  parent: 0
+  perl: 5.008005
+  version: 0.99
+resources:
+  bugtracker: https://github.com/kazeburo/Module-Build-Pluggable-CPANfile/issues
+  homepage: https://github.com/kazeburo/Module-Build-Pluggable-CPANfile
+  repository: git://github.com/kazeburo/Module-Build-Pluggable-CPANfile.git
+version: 0.05

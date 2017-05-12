@@ -1,0 +1,14 @@
+Revision history for Perl extension Module::Build::Pluggable::ReadmeMarkdownFromPod
+
+0.04 2013-03-18T16:39:32
+
+    - M::B modifies README.mkdn to 0444.
+      We need to back it to writable.
+      (tokuhirom)
+
+0.02
+
+    - split package from M::B::P core.
+
+0.01    Sun Nov  4 17:02:10 2012
+    - original version

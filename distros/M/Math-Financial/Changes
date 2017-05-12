@@ -1,0 +1,11 @@
+Revision history for Perl extension Math::Financial.
+
+0.75  Thu Sep  9 13:11:10 1999
+	- original version; created by h2xs 1.18
+
+0.76  15 Sep 1999 - Fixed an error in the loan_term method
+                  - Module now works with Perl 5.004 (and
+                    should work with 5.003 as well.
+                  - Changed the name of the IMPORT group
+                    for non object-oriented users to
+                    :standard

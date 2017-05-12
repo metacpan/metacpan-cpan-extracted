@@ -1,0 +1,33 @@
+NAME
+    Mac::AppleScript::Glue - allows AppleScript to be written in Perl
+
+SYNOPSIS
+        use Mac::AppleScript::Glue;
+
+        my $finder = new Mac::AppleScript::Glue::Application('Finder');
+
+        $finder->insertion_location->open;
+
+DESCRIPTION
+    This module allows you to write Perl code in object-oriented syntax to
+    control Mac applications. The module does not actually execute Apple
+    Events, but actually translates Perl code to AppleScript code and causes
+    it to be executed.
+
+    [See the manpage for further details.]
+
+AUTHOR
+    John Labovitz <johnl@johnlabovitz.com>
+
+    New versions of this package are available at
+    http://www.johnlabovitz.com/hacks/
+
+ACKNOWLEDGEMENTS
+    Thanks to David Bonn for the use of his mountain retreat, where most of
+    this module was written over three days of peace, quiet, and light.
+
+COPYRIGHT
+    Copyright (c) 2002 John Labovitz. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+

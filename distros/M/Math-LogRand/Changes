@@ -1,0 +1,16 @@
+Revision history for Perl extension Math::LogRand.
+
+0.05  2012-09-04 11:00 CET
+	- RT 79391
+
+0.03  2008-03-05 17:57
+	- eg; extra test
+
+0.02  2007-08-11 14:38:00
+	- updated Synopsis in POD,
+	  thanks Jonathan Eunice <jeunice-at-illuminata.com>
+
+0.01  2001-05-22 15:22:29
+	- original version; created by h2xs 1.20 with options
+		-Xcfn Math::LogRand
+

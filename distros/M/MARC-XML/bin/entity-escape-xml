@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Unicode::Normalize;
+binmode(STDIN,':utf8');
+
+while (my $stuff = NFC(<>)) {
+	$stuff =~ s/([\x{0080}-\x{fffd}])/sprintf('&#x%X;',ord($1))/sgoe;
+	print $stuff;
+}

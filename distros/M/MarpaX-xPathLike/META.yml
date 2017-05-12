@@ -1,0 +1,27 @@
+---
+abstract: 'a xPath like processor for perl data-structures (hashes and arrays)! '
+author:
+  - 'Isidro Vila Verde <jvverde@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.131560'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MarpaX-xPathLike
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Marpa::R2: 0
+  Scalar::Util: 0
+  Test::Deep: 0
+  perl: 5.006
+version: 0.203

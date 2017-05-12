@@ -1,0 +1,248 @@
+=head1 NAME
+
+Mozilla::DOM::Element
+
+=for object Mozilla::DOM::Element
+
+Mozilla::DOM::Element is a wrapper around an instance of Mozilla's
+nsIDOMElement interface. This inherits from
+L<Mozilla::DOM::Node|Mozilla::DOM::Node>.
+
+ * The nsIDOMElement interface represents an element in an HTML or
+ * XML document.
+ *
+ * For more information on this interface please see
+ * L<http:E<sol>E<sol>www.w3.orgE<sol>TRE<sol>DOM-Level-2-CoreE<sol>>
+
+Note: you can QueryInterface an Element object to a subclass like
+L<HTMLSelectElement|Mozilla::DOM::HTMLSelectElement> (from which
+of course you can call Element methods).
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::Element->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $tagname = $element->B<GetTagName>()
+
+=over
+
+=back
+
+=head2 $bool = $element->B<HasAttribute>($name)
+
+=over
+
+=over
+
+=item * $name (string)
+
+=back
+
+=back
+
+=head2 $attr = $element->B<GetAttribute>($name)
+
+=over
+
+=over
+
+=item * $name (string)
+
+=back
+
+=back
+
+=head2 $element->B<SetAttribute>($name, $value)
+
+=over
+
+=over
+
+=item * $name (string)
+
+=item * $value (string)
+
+=back
+
+=back
+
+=head2 $element->B<RemoveAttribute>($name)
+
+=over
+
+=over
+
+=item * $name (string)
+
+=back
+
+=back
+
+=head2 $bool = $element->B<HasAttributeNS>($namespaceURI, $localName)
+
+=over
+
+=over
+
+=item * $namespaceURI (string)
+
+=item * $localName (string)
+
+=back
+
+=back
+
+=head2 $attr = $element->B<GetAttributeNS>($namespaceURI, $localName)
+
+=over
+
+=over
+
+=item * $namespaceURI (string)
+
+=item * $localName (string)
+
+=back
+
+=back
+
+=head2 $element->B<SetAttributeNS>($namespaceURI, $qualifiedName, $value)
+
+=over
+
+=over
+
+=item * $namespaceURI (string)
+
+=item * $qualifiedName (string)
+
+=item * $value (string)
+
+=back
+
+=back
+
+=head2 $element->B<RemoveAttributeNS>($namespaceURI, $localName)
+
+=over
+
+=over
+
+=item * $namespaceURI (string)
+
+=item * $localName (string)
+
+=back
+
+=back
+
+=head2 $attrnode = $element->B<GetAttributeNode>($name)
+
+=over
+
+=over
+
+=item * $name (string)
+
+=back
+
+=back
+
+=head2 $attrnode = $element->B<SetAttributeNode>($newAttr)
+
+=over
+
+=over
+
+=item * $newAttr (Mozilla::DOM::Attr)
+
+=back
+
+=back
+
+=head2 $attrnode = $element->B<RemoveAttributeNode>($attrnode)
+
+=over
+
+=over
+
+=item * $oldAttr (Mozilla::DOM::Attr)
+
+=back
+
+=back
+
+=head2 $attrnode = $element->B<GetAttributeNodeNS>($namespaceURI, $localName)
+
+=over
+
+=over
+
+=item * $namespaceURI (string)
+
+=item * $localName (string)
+
+=back
+
+=back
+
+=head2 $attrnode = $element->B<SetAttributeNodeNS>($newAttr)
+
+=over
+
+=over
+
+=item * $newAttr (Mozilla::DOM::Attr)
+
+=back
+
+=back
+
+=head2 $nodelist = $element->B<GetElementsByTagName>($name)
+
+In scalar context, returns a L<Mozilla::DOM::NodeList|Mozilla::DOM::NodeList>.
+In list context, returns a list of L<Mozilla::DOM::Element|Mozilla::DOM::Element>s.
+
+=over
+
+=over
+
+=item * $name (string)
+
+=back
+
+=back
+
+=head2 $nodelist = $element->B<GetElementsByTagNameNS>($namespaceURI, $localName)
+
+In scalar context, returns a L<Mozilla::DOM::NodeList|Mozilla::DOM::NodeList>.
+In list context, returns a list of L<Mozilla::DOM::Element|Mozilla::DOM::Element>s.
+
+=over
+
+=over
+
+=item * $namespaceURI (string)
+
+=item * $localName (string)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

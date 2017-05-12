@@ -1,0 +1,199 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+require 5.010;
+
+use Term::ReadKey;
+use Getopt::Long;
+use File::Spec;
+
+use MojoX::CPAN::Uploader;
+
+use subs 'config_file';
+
+my %config = config();
+
+my $has_config = 1;
+
+unless (%config) {
+    $has_config = 0;
+}
+
+GetOptions(
+    'user|u=s'          => \$config{user},
+    'pass|password|p=s' => \$config{password}
+);
+
+my ($file, $subdir) = @ARGV;
+
+usage() unless $file;
+
+die "No such file '$file'" unless -f $file;
+
+unless (defined $config{user}) {
+    while (!$config{user}) {
+        print "Username: ";
+        $config{user} = <STDIN>;
+        chomp($config{user});
+    }
+}
+
+unless (defined $config{password}) {
+    ReadMode 2;
+    while (!$config{password}) {
+        print "Password: ";
+        $config{password} = <STDIN>;
+        chomp($config{password});
+    }
+    ReadMode 0;
+    print "\n";
+}
+
+my $up = MojoX::CPAN::Uploader->new();
+
+$up->auth($config{user}, $config{password});
+
+my $result = $up->upload($file, $subdir);
+
+if (ref $result) {
+    print $result . "\n";
+    exit;
+}
+
+print "File '$file' uploaded successfull "
+  . ($subdir ? " to '$subdir'" : '') . "\n";
+
+unless ($has_config || -f config_file) {
+
+    # I won't ask user, if can not write...
+    return unless open my $PAUSE, '>', config_file;
+
+    print "Save user/password to '" . config_file . '"? [Y/n]';
+    my $answer = lc(<STDIN>);
+    $answer =~ s/^\s+|\s+$//g;
+
+    # If no, we just create empty .pause and never ask again
+    if (index('yes', $answer) >= 0) {
+        print $PAUSE <<END
+user        $config{user}
+password    $config{password}
+END
+    }
+    close $PAUSE;
+    chmod(oct("0600"), config_file);
+}
+
+exit;
+
+sub usage {
+    print <<END;
+mojo-cpanup v. $MojoX::CPAN::Uploader::VERSION
+
+Usage:
+    $0 --user=username --password=password package.tar.gz subdir
+    $0 --user=username --password=password package.tar.gz 
+    $0 --user=username package.tar.gz
+    $0 package.tar.gz
+END
+    exit;
+}
+
+sub home {
+    my $home = '.';    # Living under bridge
+
+    return $ENV{HOME} if $ENV{HOME};
+
+    if ($^O eq 'MSWin32') {
+        $home = $ENV{USERPROFILE};
+    }
+    return $home;
+}
+
+sub config_file { File::Spec->catfile(home, '.pause') }
+
+sub config {
+    my $filename = shift;
+
+    $filename ||= config_file;
+
+    return unless -e $filename;
+    return {} unless -r $filename;
+
+    open my $pauserc, '<', $filename
+      or die "can't open '$filename' for reading: $!";
+
+    my %from_file;
+    while (<$pauserc>) {
+        chomp;
+        next unless $_ and $_ !~ /^\s*#/;
+
+        my ($k, $v) = /^\s*(\w+)\s+(.+)$/;
+        Carp::croak "multiple enties for $k" if $from_file{$k};
+        $from_file{$k} = $v;
+    }
+
+    return %from_file;
+}
+
+1;
+__END__
+
+=head1 NAME
+
+mojo-cpanup - upload files on CPAN in Mojo way
+
+
+=head1 SYNOPSIS
+
+    mojo-cpanup file.tar.gz subdir_on_cpan_server
+
+
+=head1 DESCRIPTION
+
+This script uses power of L<Mojo::Client> to upload your files on CPAN.
+
+
+=head1 ARGUMENTS
+
+mojo-cpanup takes two arguments: 
+
+=over 4
+
+=item filename
+
+Name of local file which should be uploaded to CPAN.
+
+=item subdir
+
+Subdir on CPAN server in which file should be placed.
+
+=back
+
+=cut
+
+=head1 CONFIGURATION
+
+mojo-cpanup users same configuration file as L<CPAN::Uploader>.
+Config file stored in C<.pause> file in your home direfctory (~ or %USERPROFILE%)
+Example of config file:
+
+    user        yko
+    password    #############
+
+You don't need to create this file manually. On first successfull upload C<mojo-cpanup>
+will ask you if you want to store your creditionals in config.
+If you answer no - it will never ask you again.
+
+=head1 AUTHOR
+
+Yaroslav Korshak  C<< <yko@cpan.org> >>
+
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2010-2011, Yaroslav Korshak C<< <yko@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.

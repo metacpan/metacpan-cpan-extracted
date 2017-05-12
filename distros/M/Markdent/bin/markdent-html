@@ -1,0 +1,10 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+our $VERSION = '0.26';
+
+use Markdent::CLI;
+
+Markdent::CLI->new_with_options()->run();

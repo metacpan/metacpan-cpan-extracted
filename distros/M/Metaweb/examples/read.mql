@@ -1,0 +1,9 @@
+{
+  "albums": {
+    "query": {
+      "type": "/music/artist",
+      "name": "The Police",
+      "album": []
+    }
+  }
+}

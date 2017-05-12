@@ -1,0 +1,37 @@
+0.05 2015-10-16T12:07:20+02:00
+ - Improve description for get_lines() in doc.
+ - Update to Map::Tube 3.06.
+
+0.04 2015-10-07T13:01:18+02:00
+ - Add <?xml> header to XML document.
+ - Add EXAMPLE4 to doc.
+ - Add get_line_by_id() and get_line_by_name() methods to doc.
+ - Add test of map validity.
+ - Add tests for get_node_by_id() and get_node_by_name() methods.
+ - Fix names of lines.
+ - Move author tests to xt/ directory.
+ - Rewrite SEE ALSO section to new style.
+ - Update Module::Install to 1.16 version.
+
+0.03 2015-01-10T14:17:31+01:00
+ - Add EXAMPLE3 section to doc.
+ - Add Map::Tube::GraphViz, Map::Tube::Text::Table, Task::Map::Tube,
+   Map::Tube::Bucharest, Map::Tube::Budapest, Map::Tube::Dnipropetrovsk,
+   Map::Tube::Kazan, Map::Tube::Kharkiv, Map::Tube::Nanjing,
+   Map::Tube::Novosibirsk, Map::Tube::SaintPetersburg, Map::Tube::Samara,
+   Map::Tube::Tbilisi, Map::Tube::Vienna and Map::Tube::Yekaterinburg to
+   SEE ALSO section in doc.
+ - Add get_lines() method to doc.
+ - Add get_stations() method to doc.
+ - Remove executable bit from minsk-map.xml file.
+ - Update abstract to same name as other my Map::Tube modules.
+ - Update copyright years to 2015.
+
+0.02 2014-12-09T07:46:54+01:00
+ - Add Map::Tube::Kiew to SEE ALSO section in doc.
+ - Fix REPOSITORY section in doc.
+ - Fix minimal Map::Tube dependency for name() method.
+ - Fix minimal Perl version.
+
+0.01 2014-12-08T01:20:23+01:00
+ - First version

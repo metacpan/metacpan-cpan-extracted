@@ -1,0 +1,23 @@
+[% PROCESS header.tt2 title=mariachi.config.name _ " - Messages for " _ archive_date %]
+[% PROCESS paginate.tt2 %]
+<h1>messages for [% archive_date %]</h1>
+
+[% PROCESS pagenav.tt2 %]
+
+<p>
+[<a href="TODO">last</a>]
+[<a href="TODO">next</a>]
+[<a href="[% base %]index.html">thread index</a>]
+</p>
+
+[% FOR mail=page.splice(content) %]
+<ul class=threads>
+<li class=thread>
+<a href="[% base %][% mail.filename %]" name="[% mail.filename %]">
+[% mail.subject | html %]</a><br />
+<small>[% mail.from | html %] <i>[% date.format(mail.epoch_date) %]</i></small>
+</li></ul>
+[% END %]
+
+[% PROCESS pagenav.tt2 %]
+[% PROCESS footer.tt2 %]

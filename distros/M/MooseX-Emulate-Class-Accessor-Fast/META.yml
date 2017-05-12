@@ -1,0 +1,27 @@
+---
+abstract: 'Emulate Class::Accessor::Fast behavior using Moose attributes'
+author:
+  - 'Guillermo Roditi (groditi) <groditi@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Emulate-Class-Accessor-Fast
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 0.84
+  namespace::clean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.00903

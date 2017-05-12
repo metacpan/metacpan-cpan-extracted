@@ -1,0 +1,22 @@
+Revision history for MojoX::Log::Any
+
+0.005     2017-05-07 20:59:10+01:00 Europe/London
+
+0.004     2017-05-07 13:22:23+01:00 Europe/London
+
+  * Fixes:
+    * Added missing dependencies in META
+
+0.003     2017-05-06 21:42:39+01:00 Europe/London
+
+  * New:
+    * Load History and Format plugins to make adapter compatible with
+      default Mojolicious templates
+  * Fixed:
+    * No-op on import if app->log is already a Log::Any::Proxy
+    * Numerous minor compliance fixes, courtesy of CPANTS
+    * Better detection of lite and full apps    
+
+0.001     2016-12-13 11:08:26+00:00 Europe/London
+
+  * Initial release

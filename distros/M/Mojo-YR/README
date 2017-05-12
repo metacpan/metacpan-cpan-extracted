@@ -1,0 +1,95 @@
+NAME
+    Mojo::YR - Get weather information from yr.no
+
+DESCRIPTION
+    Mojo::YR is an (a)synchronous weather data fetcher for the Mojolicious
+    framework. The backend for weather data is <http://yr.no>.
+
+    Look at the resources below for mere information about the API:
+
+    *   <http://api.yr.no/weatherapi/documentation>
+
+    *   <http://api.yr.no/weatherapi/locationforecast/1.8/documentation>
+
+    *   <http://api.yr.no/weatherapi/textforecast/1.6/documentation>
+
+SYNOPSIS
+      use Mojo::YR;
+      my $yr = Mojo::YR->new;
+
+      # Fetch location_forecast ==========================================
+      my $now = $yr->location_forecast([59, 10])->find('pointData > time')->first;
+      my $temp = $now->at('temperature');
+
+      warn "$temp->{value} $temp->{unit}";
+
+      # Fetch text_forecast ==============================================
+      my $today = $yr->text_forecast->children('time')->first;
+      my $hordaland = $today->at('area[name="Hordaland"]');
+
+      warn $hordaland->at('header')->text;
+      warn $hordaland->at('in')->text; # "in" holds the forecast text
+
+ATTRIBUTES
+  url_map
+      $hash_ref = $self->url_map;
+
+    Returns the URL used to fetch data.
+
+    Note: These will always be what you expect. If the resources get changed
+    in the future, a "version()" attribute will be added to this class to
+    ensure you always get the same URL map.
+
+    Default:
+
+      {
+        location_forecast => 'http://api.yr.no/weatherapi/locationforecast/1.8/',
+        text_forecast => 'http://api.yr.no/weatherapi/textforecast/1.6/',
+      };
+
+METHODS
+  location_forecast
+      $self = $self->location_forecast([$latitude, $longitude], sub { my($self, $err, $dom) = @_; ... });
+      $self = $self->location_forecast(\%args, sub { my($self, $err, $dom) = @_; ... });
+      $dom = $self->location_forecast([$latitude, $longitude]);
+      $dom = $self->location_forecast(\%args);
+
+    Used to fetch weather forecast for a specified place
+    <http://api.yr.no/weatherapi/locationforecast/1.8/documentation>.
+
+    %args is required (unless "[$latitude,$longitude]" is given):
+
+      {
+        latitude => $num,
+        longitude => $num,
+      }
+
+    $dom is a Mojo::DOM object you can use to query the result. See
+    "SYNOPSIS" for example.
+
+  text_forecast
+      $dom = $self->text_forecast(\%args);
+      $self = $self->text_forecast(\%args, sub { my($self, $err, $dom) = @_; ... });
+
+    Used to fetch textual weather forecast for all parts of the country
+    <http://api.yr.no/weatherapi/textforecast/1.6/documentation>.
+
+    %args is optional and has these default values:
+
+      {
+        forecast => 'land',
+        language => 'nb',
+      }
+
+    $dom is a Mojo::DOM object you can use to query the result. See
+    "SYNOPSIS" for example.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014 Jan Henning Thorsen
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+AUTHOR
+    Jan Henning Thorsen - "jhthorsen@cpan.org"
+

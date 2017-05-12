@@ -1,0 +1,40 @@
+---
+abstract: 'd[ o_0 ]b - has, extends, lazy_components'
+author:
+  - 'Robert Acock <thisusedtobeanemail@gmail.com>'
+build_requires:
+  Moonshine::Test: '0.14'
+  Test::More: '0'
+  UNIVERSAL::Object: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Metadata: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Moonshine-Magic
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Moonshine::Magic:
+    file: lib/Moonshine/Magic.pm
+    version: '0.07'
+requires:
+  BEGIN::Lift: '0.04'
+  MOP: '0.05'
+  Moonshine::Element: '0.11'
+  Moonshine::Util: '0.07'
+  perl: '5.01'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/ThisUsedToBeAnEmail/Moonshine-Magic.git
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,14 @@
+Revision history for Perl extension MySQL::Binlog_RBR_Data.
+
+1.02  Thu Jun 21 11:28:31 2012
+	- fixed documentation
+	- added test cases
+
+1.01  Thu Oct 20 10:53:23 2011
+	- fix parser to ignore data in changes, not parse them as statements
+	- keep link between old and new values (two arrays per changed row,
+	  instead of each being in 'added'/'removed' hash entries
+
+1.00  Thu Oct 13 16:54:17 2011
+	- new simplified binlog parser
+

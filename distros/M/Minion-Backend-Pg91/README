@@ -1,0 +1,353 @@
+NAME
+    Minion::Backend::Pg91 - PostgreSQL 9.1 backend
+
+SYNOPSIS
+      use Minion::Backend::Pg91;
+
+      my $backend = Minion::Backend::Pg91->new('postgresql://postgres@/test');
+
+DESCRIPTION
+    Minion::Backend::Pg91 is a backend for Minion based on
+    Minion::Backend::Pg . All necessary tables will be created automatically
+    with a set of migrations named `minion'. Note that this backend only
+    supports PostgreSQL 9.1.
+
+ATTRIBUTES
+    Minion::Backend::Pg91 inherits all attributes from Minion::Backend and
+    implements the following new ones.
+
+  pg
+      my $pg   = $backend->pg;
+      $backend = $backend->pg(Mojo::Pg->new);
+
+    Mojo::Pg object used to store all data.
+
+METHODS
+    Minion::Backend::Pg91 inherits all methods from Minion::Backend and
+    implements the following new ones.
+
+  dequeue
+      my $job_info = $backend->dequeue($worker_id, 0.5);
+      my $job_info = $backend->dequeue($worker_id, 0.5, {queues => ['important']});
+
+    Wait a given amount of time in seconds for a job, dequeue it and
+    transition from `inactive' to `active' state, or return `undef' if
+    queues were empty.
+
+    These options are currently available:
+
+    queues
+        queues => ['important']
+
+      One or more queues to dequeue jobs from, defaults to `default'.
+
+    These fields are currently available:
+
+    args
+        args => ['foo', 'bar']
+
+      Job arguments.
+
+    id
+        id => '10023'
+
+      Job ID.
+
+    retries
+        retries => 3
+
+      Number of times job has been retried.
+
+    task
+        task => 'foo'
+
+      Task name.
+
+  enqueue
+      my $job_id = $backend->enqueue('foo');
+      my $job_id = $backend->enqueue(foo => [@args]);
+      my $job_id = $backend->enqueue(foo => [@args] => {priority => 1});
+
+    Enqueue a new job with `inactive' state.
+
+    These options are currently available:
+
+    attempts
+        attempts => 25
+
+      Number of times performing this job will be attempted, defaults to
+      `1'.
+
+    delay
+        delay => 10
+
+      Delay job for this many seconds (from now).
+
+    priority
+        priority => 5
+
+      Job priority, defaults to `0'.
+
+    queue
+        queue => 'important'
+
+      Queue to put job in, defaults to `default'.
+
+  fail_job
+      my $bool = $backend->fail_job($job_id, $retries);
+      my $bool = $backend->fail_job($job_id, $retries, 'Something went wrong!');
+      my $bool = $backend->fail_job(
+        $job_id, $retries, {whatever => 'Something went wrong!'});
+
+    Transition from `active' to `failed' state, and if there are attempts
+    remaining, transition back to `inactive' with a delay based on Minion.
+
+  finish_job
+      my $bool = $backend->finish_job($job_id, $retries);
+      my $bool = $backend->finish_job($job_id, $retries, 'All went well!');
+      my $bool = $backend->finish_job(
+        $job_id, $retries, {whatever => 'All went well!'});
+
+    Transition from `active' to `finished' state.
+
+  job_info
+      my $job_info = $backend->job_info($job_id);
+
+    Get information about a job, or return `undef' if job does not exist.
+
+      # Check job state
+      my $state = $backend->job_info($job_id)->{state};
+
+      # Get job result
+      my $result = $backend->job_info($job_id)->{result};
+
+    These fields are currently available:
+
+    args
+        args => ['foo', 'bar']
+
+      Job arguments.
+
+    attempts
+        attempts => 25
+
+      Number of times performing this job will be attempted, defaults to
+      `1'.
+
+    created
+        created => 784111777
+
+      Time job was created.
+
+    delayed
+        delayed => 784111777
+
+      Time job was delayed to.
+
+    finished
+        finished => 784111777
+
+      Time job was finished.
+
+    priority
+        priority => 3
+
+      Job priority.
+
+    queue
+        queue => 'important'
+
+      Queue name.
+
+    result
+        result => 'All went well!'
+
+      Job result.
+
+    retried
+        retried => 784111777
+
+      Time job has been retried.
+
+    retries
+        retries => 3
+
+      Number of times job has been retried.
+
+    started
+        started => 784111777
+
+      Time job was started.
+
+    state
+        state => 'inactive'
+
+      Current job state, usually `active', `failed', `finished' or
+      `inactive'.
+
+    task
+        task => 'foo'
+
+      Task name.
+
+    worker
+        worker => '154'
+
+      Id of worker that is processing the job.
+
+  list_jobs
+      my $batch = $backend->list_jobs($offset, $limit);
+      my $batch = $backend->list_jobs($offset, $limit, {state => 'inactive'});
+
+    Returns the same information as "job_info" but in batches.
+
+    These options are currently available:
+
+    state
+        state => 'inactive'
+
+      List only jobs in this state.
+
+    task
+        task => 'test'
+
+      List only jobs for this task.
+
+  list_workers
+      my $batch = $backend->list_workers($offset, $limit);
+
+    Returns the same information as "worker_info" but in batches.
+
+  new
+      my $backend = Minion::Backend::Pg91->new('postgresql://postgres@/test');
+
+    Construct a new Minion::Backend::Pg91 object.
+
+  register_worker
+      my $worker_id = $backend->register_worker;
+      my $worker_id = $backend->register_worker($worker_id);
+
+    Register worker or send heartbeat to show that this worker is still
+    alive.
+
+  remove_job
+      my $bool = $backend->remove_job($job_id);
+
+    Remove `failed', `finished' or `inactive' job from queue.
+
+  repair
+      $backend->repair;
+
+    Repair worker registry and job queue if necessary.
+
+  reset
+      $backend->reset;
+
+    Reset job queue.
+
+  retry_job
+      my $bool = $backend->retry_job($job_id, $retries);
+      my $bool = $backend->retry_job($job_id, $retries, {delay => 10});
+
+    Transition from `failed' or `finished' state back to `inactive', already
+    `inactive' jobs may also be retried to change options.
+
+    These options are currently available:
+
+    delay
+        delay => 10
+
+      Delay job for this many seconds (from now).
+
+    priority
+        priority => 5
+
+      Job priority.
+
+    queue
+        queue => 'important'
+
+      Queue to put job in.
+
+  stats
+      my $stats = $backend->stats;
+
+    Get statistics for jobs and workers.
+
+    These fields are currently available:
+
+    active_jobs
+        active_jobs => 100
+
+      Number of jobs in `active' state.
+
+    active_workers
+        active_workers => 100
+
+      Number of workers that are currently processing a job.
+
+    failed_jobs
+        failed_jobs => 100
+
+      Number of jobs in `failed' state.
+
+    finished_jobs
+        finished_jobs => 100
+
+      Number of jobs in `finished' state.
+
+    inactive_jobs
+        inactive_jobs => 100
+
+      Number of jobs in `inactive' state.
+
+    inactive_workers
+        inactive_workers => 100
+
+      Number of workers that are currently not processing a job.
+
+  unregister_worker
+      $backend->unregister_worker($worker_id);
+
+    Unregister worker.
+
+  worker_info
+      my $worker_info = $backend->worker_info($worker_id);
+
+    Get information about a worker, or return `undef' if worker does not
+    exist.
+
+      # Check worker host
+      my $host = $backend->worker_info($worker_id)->{host};
+
+    These fields are currently available:
+
+    host
+        host => 'localhost'
+
+      Worker host.
+
+    jobs
+        jobs => ['10023', '10024', '10025', '10029']
+
+      Ids of jobs the worker is currently processing.
+
+    notified
+        notified => 784111777
+
+      Last time worker sent a heartbeat.
+
+    pid
+        pid => 12345
+
+      Process id of worker.
+
+    started
+        started => 784111777
+
+      Time worker was started.
+
+SEE ALSO
+    Minion, Minion::Backend::Pg, Mojolicious::Guides,
+    http://mojolicious.org.
+

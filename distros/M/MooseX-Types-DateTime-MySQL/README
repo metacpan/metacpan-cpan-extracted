@@ -1,0 +1,36 @@
+NAME
+    MooseX::Types::DateTime::MySQL - Joins MooseX::Types::DateTime and
+    DateTime::Format::MySQL
+
+DESCRIPTION
+    Defines a "MySQLDateTime" type which will round-trip coerce to the
+    "DateTime" type from MooseX::Types::DateTime.
+
+TYPES
+  MySQLDateTime
+    Coerces to and from "DateTime".
+
+  MySQLDate
+    Coerces to and from "DateTime" and will coerce to "MySQLDateTime".
+
+  MySQLTime
+    Coerces from "Int" (duration) and "DateTime" (by extracting only the
+    time part).
+
+BUGS
+    The MySQL datetime detection regex is imperfect as it just looks for "
+    \d "s, rather than things which are known valid months.
+    Probably more
+
+AUTHOR
+    Tomas Doran (t0m) "<bobtfish@bobtfish.net">
+
+COPYRIGHT
+    Copyright state51.
+
+LICENSE
+    Copyright 2009 the above author(s).
+
+    This sofware is free software, and is licensed under the same terms as
+    perl itself.
+

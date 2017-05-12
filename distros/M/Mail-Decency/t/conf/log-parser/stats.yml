@@ -1,0 +1,18 @@
+---
+
+disable: 0
+use_date_interval: 1
+intervals:
+    - 10
+    - 600
+    - 86400
+
+csv_log:
+    file: set-by-test
+    classes:
+        - total_reject
+        - connections
+        - sent
+        - deferred
+        - bounced
+

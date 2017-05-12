@@ -1,0 +1,6 @@
+Module::Install::POE::Test::Loops
+
+Module::Install add-on to generate POE::Loop tests with POE::Test::Loops
+
+
+-- martijn

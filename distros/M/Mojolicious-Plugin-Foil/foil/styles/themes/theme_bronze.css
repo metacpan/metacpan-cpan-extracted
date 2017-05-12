@@ -1,0 +1,130 @@
+/* ================================================================== */
+/* THEME: Bronze
+ * bronze-ish background, black text
+ *
+ * This only defines fonts, colours and borders, not layout.
+ */
+/* ================================================================== */
+/* THEME: Bronze - fonts
+ */
+/* ------------------------------------------------------------------ */
+/* Fonts */
+h1, h2, h3, h4 {
+  font-family: "Lucida Calligraphy", Merlin, "Black", verdana, helvetica, arial, sans-serif;
+  color: black;
+}
+
+/* ================================================================== */
+/* ICONS - light on dark
+ * Nav arrows with transparent backgrounds
+ */
+.side nav li > ul {
+  list-style-image: url(nav_white.png);
+}
+
+/* ================================================================== */
+/* General */
+.verge, header,
+footer, .side, .fancy {
+  color: #ebe5e0;
+  background: #b5631f;
+  border-color: #552200;
+}
+
+header,
+footer {
+  background-image: url(bronze_h.png);
+}
+
+.side {
+  background-image: url(bronze_side.png);
+}
+
+body {
+  color: #332400;
+  background: #ffcc55;
+}
+
+a:link {
+  color: #293300;
+}
+
+a:visited {
+  color: #661400;
+}
+
+header a:link,
+footer a:link,
+.side a:link,
+.verge a:link,
+header a:link,
+footer a:link,
+.side a:link,
+.fancy a:link {
+  color: #f7f16e;
+}
+
+header a:visited,
+footer a:visited,
+.side a:visited,
+.verge a:visited,
+header a:visited,
+footer a:visited,
+.side a:visited,
+.fancy a:visited {
+  color: #a7f5a3;
+}
+
+.fancy {
+  color: #ebe5e0;
+  background-image: url("wood3.jpg");
+  border: 5px double #ce8a53;
+  padding: 0;
+}
+.fancy li {
+  padding: 0.5em;
+  margin: 5px;
+  border: 5px solid #ce8a53;
+  background-color: #b5631f;
+  background: linear-gradient(#b5631f, #742714);
+}
+.fancy li a:link {
+  color: #f7f16e;
+}
+.fancy li a:visited {
+  color: #a7f5a3;
+}
+
+.button, input[type=submit], header nav a,
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: #f7f16e;
+  border-color: #552200;
+  background-color: #894b18;
+}
+
+.button a:link, input[type=submit] a:link, header nav a a:link,
+header nav .selflink a:link,
+header nav em a:link,
+header nav .current a a:link, a.button:link, header nav a:link {
+  color: #f7f16e;
+}
+
+.button a:visited, input[type=submit] a:visited, header nav a a:visited,
+header nav .selflink a:visited,
+header nav em a:visited,
+header nav .current a a:visited, a.button:visited, header nav a:visited {
+  color: #a7f5a3;
+}
+
+header nav li {
+  border-color: #226622;
+}
+
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: #bb0055;
+  background-color: #669933;
+}

@@ -1,0 +1,96 @@
+%# -*- mode: html-helper; mmm-classes: mason; -*-
+
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>request examiner</title>
+</head>
+
+<body>
+
+<h1>Mason page request examiner</h1>
+<p>
+This simple Mason page examines the mod_perl 2 <b>$r</b> object passed to every
+Mason page. The first object shown is the actual <b>$r</b> passed.
+In mod_perl 2 there are two 'request objects':
+<ul>
+  <li>Apache::RequestRec</li>
+  <p>The workhorse request object with most of the useful
+  methods attached. The Apache::Cookie new and fetch methods take
+    this object as a parameter in libapreq2.
+    As of <b>MasonX::Apache2Handler-0.05</b> this object
+  is passed as <b>$r</b>. The change was made to conform to the request
+    object received by standard mod_perl 2 handlers.
+  </p>
+  <li>Apache::Request</li>
+  <p>The other request object with a limited number of methods
+  attached. Prior to <b>MasonX::Apache2Handler-0.05</b> this object
+  was passed as <b>$r</b>.
+  </p>
+</ul>
+</p>
+
+<p>
+Please refer to the
+<a href="http://perl.apache.org/docs/2.0/user/index.html">mod perl 2 documentation</a>
+for further information.
+</p>
+
+<%perl>
+my $disp = '$r';
+my $name = sprintf( "%s", $r );
+$name =~ s/=.*//;
+my @methods = $m->comp( '.probe_methods', $name );
+$m->comp( '.display', $disp, $name, @methods );
+
+my $rr;
+if( $name eq 'Apache::RequestRec' ) {
+    $disp = 'Apache::Request->new( $r );';
+    $rr = Apache::Request->new( $r );
+} else {
+    $disp = 'Apache->request;';
+    $rr = Apache->request;
+}
+$name = sprintf( "%s", $rr );
+$name =~ s/=.*//;
+@methods = $m->comp( '.probe_methods', $name );
+$m->comp( '.display', $disp, $name, @methods );
+</%perl>
+
+<hr />
+<address><a href="http://beaucox.com/">Beau E. Cox &lt;beau@beaucox.com&gt;</a></address>
+<!-- hhmts start --> Last modified: Tue Apr 13 08:33:53 HST 2004 <!-- hhmts end -->
+</body> </html>
+
+<%def .probe_methods>
+<%perl>
+my $name = shift;
+my @methods = ();
+my $probe_method_string =
+'for my $symname( sort keys %'.$name.':: ) {'.
+'    local *sym = $'.$name.'::{$symname};'.
+'    push @methods, $symname if defined &sym;'.
+'};';
+eval $probe_method_string;
+Carp::croak( "error probing methods: $@" ) if $@;
+return @methods;
+</%perl>
+</%def>
+
+<%def .display>
+% my( $disp, $name, @methods ) = @_;
+<hr />
+<h3><% $disp %></h3>
+<p>is a <% $name %>.</p>
+<p>The following methods are in this interface:
+<table cellpadding="2">
+% push @methods, '&nbsp;' while @methods % 6;
+% for( my $row = 0; $row < @methods / 6; $row++ ) {
+  <tr>
+%     for( my $col = 0; $col < 6; $col++ ) {
+    <td><% $methods[$row+$col*@methods/6] %></td>
+%     }
+  </tr>
+% }
+</table>
+</p>
+</%def>

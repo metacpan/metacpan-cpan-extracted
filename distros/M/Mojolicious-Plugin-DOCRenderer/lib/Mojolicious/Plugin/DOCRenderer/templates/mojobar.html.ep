@@ -1,0 +1,123 @@
+%= javascript '/mojo/jquery/jquery.js'
+<div id="mojobar">
+  <style scoped="scoped">
+    #mojobar {
+      background-color: #1a1a1a;
+      background: -webkit-linear-gradient(top, #2a2a2a 0%, #000 100%);
+      background: -moz-linear-gradient(top, #2a2a2a 0%, #000 100%);
+      background: linear-gradient(top, #2a2a2a 0%, #000 100%);
+      box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.6);
+      height: 46px;
+      overflow: hidden;
+      position: absolute;
+      text-align: right;
+      vertical-align: middle;
+      width: 100%;
+      z-index: 1000;
+    }
+    #mojobar-logo {
+      float: left;
+      margin-left: 5em;
+      padding-top: 3px;
+    }
+    #mojobar-links {
+      display:table-cell;
+      float: right;
+      height: 60px;
+      margin-right: 5em;
+      margin-top: 0.8em;
+    }
+    #mojobar-links a {
+      color: #ccc;
+      font: 1em 'Helvetica Neue', Helvetica, sans-serif;
+      font-weight: 300;
+      margin-left: 0.5em;
+      text-decoration: none;
+      transition: all 200ms ease-in-out;
+    }
+    #mojobar-links a:hover { color: #fff }
+    #mojobar-links input {
+      border: 0;
+      border-radius: 10px;
+      display: inline;
+      margin-left: 1em;
+      padding: 3px;
+    }
+    #mojobar-links input:focus { outline: 0 }
+    #mojobar-links form { display: inline }
+    .animated { transition: top 0.2s ease-in-out }
+  </style>
+  <div id="mojobar-logo">
+    %= link_to 'http://mojolicio.us' => begin
+      %= image '/mojo/logo-white.png', alt => 'Mojolicious logo'
+    % end
+  </div>
+  <div id="mojobar-links">
+    %= link_to Documentation => 'http://mojolicio.us/perldoc'
+    %= link_to Wiki => 'https://github.com/kraih/mojo/wiki'
+    %= link_to GitHub => 'https://github.com/kraih/mojo'
+    %= link_to CPAN => 'http://metacpan.org/release/Mojolicious/'
+    %= link_to MailingList => 'http://groups.google.com/group/mojolicious'
+    %= link_to Blog => 'http://blog.kraih.com'
+    %= link_to Twitter => 'http://twitter.com/kraih'
+    %= form_for 'http://google.com/cse' => (target => '_blank') => begin
+      %= hidden_field cx => '014527573091551588235:pwfplkjpgbi'
+      %= hidden_field ie => 'UTF-8'
+      %= search_field 'q', placeholder => 'Search'
+    %= end
+  </div>
+</div>
+<script>
+  var mojobar = $('#mojobar');
+  var mojobarHeight = mojobar.outerHeight();
+  function fixOffset() {
+    var offset = $(window.location.hash).offset();
+    if (offset) {
+      $('html, body').animate({scrollTop: offset.top - mojobarHeight}, 1);
+    }
+  }
+  $(window).load(function () {
+    if (window.location.hash) {
+      fixOffset();
+    }
+    var start = mojobar.offset().top;
+    var fixed;
+    var lastScrollTop = start;
+    $(window).scroll(function () {
+      var st = $(window).scrollTop();
+      if (!fixed && st > start) {
+        fixed = true;
+        mojobar.css('position', 'fixed').css('top', 0);
+      } else if (fixed && st <= start) {
+        fixed = false;
+        mojobar.removeClass('animated');
+        mojobar.css('position', 'absolute').css('top', start + 'px');
+      }
+      else if (fixed && (Math.abs(lastScrollTop - st) > 100)) {
+        if (!mojobar.hasClass('animated')) {
+          mojobar.addClass('animated');
+        }
+        if (st > lastScrollTop && st > (mojobarHeight + start + 250)) {
+          mojobar.css('top', 0 - (mojobarHeight + 5));
+        } else if (st + $(window).height() < $(document).height()) {
+          mojobar.css('top', 0);
+        }
+        lastScrollTop = st;
+      }
+    });
+  });
+  $(document).ready(function() {
+    $('a[href^="#"]').addClass('mojoscroll');
+    $(".mojoscroll").click(function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var hash   = "#" + this.href.split("#")[1];
+      var target = $(hash);
+      var old    = target.attr('id');
+      target.attr('id', '');
+      location.hash = hash;
+      target.attr('id', old);
+      fixOffset();
+    });
+  });
+</script>

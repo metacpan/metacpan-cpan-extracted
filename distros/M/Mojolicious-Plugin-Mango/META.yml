@@ -1,0 +1,35 @@
+---
+abstract: 'provide mango helpers to Mojolicious'
+author:
+  - 'Huo Linhe <huolinhe@berrygenomics.com>'
+build_requires:
+  Module::Build: '0.28'
+  Module::Find: '0'
+  Mojolicious::Lite: '0'
+  Test::Mojo: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  Try::Tiny: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.024, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Mango
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Mango: '0'
+  Modern::Perl: '0'
+  Mojo::Base: '0'
+  namespace::clean: '0'
+version: 0.0.2

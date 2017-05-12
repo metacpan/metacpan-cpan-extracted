@@ -1,0 +1,80 @@
+Revision history for MooseX-RemoteHelper
+0.001021  2013-12-30
+	- Remove Class::Load
+	- fix compile tests hanging on windows
+
+0.001020  2013-09-06
+	- Simplification and correctness improvement of last release
+
+0.001019  2013-09-06
+	- Add Support for automatically serializing arrays of objects
+
+0.001018  2013-08-01
+	- gah, dzil detected an inline class as a dep, remove, bad dzil
+
+0.001017  2013-08-01
+	- remove MooseX::Constructor::AllErrors in MooseY::RemoteHelper::MessagePart
+	  - see RT #87508
+
+0.001016  2013-07-31
+	- improve docuementation
+	- use MooseX::Constructor::AllErrors in MooseY::RemoteHelper::MessagePart
+
+0.001015  2013-07-25
+	- add Enable/Disable to MooseX::RemoteHelper::Types::Bool
+	- add Y[es]/N[o] to MooseX::RemoteHelper::Types::Bool
+
+0.001014  2013-07-22
+	- add Enabled/Disabled to MooseX::RemoteHelper::Types::Bool
+
+0.001013  2013-07-08
+	- add MooseY::RemoteHelper::MessagePart
+	- add MooseY::RemoteHelper::Role::Client
+
+0.001012  2013-05-20
+	- add a type library for commonly needed coercions
+
+0.001011  2012-06-12
+	- non trial release
+
+0.001010  2012-05-28
+	- write documentation
+	- trial release to cpan
+	- remove deps on Data::Dumper and Test::Exception
+	- license as Artistic 2.0
+
+0.001009  2012-05-24
+	- give no default serializer as we can use this for a check in composite
+	  serializing to make sure it behaves sanely
+
+0.001008  2012-05-24
+	- fix issues where dependancies created in tests are detected as external
+	  deps
+
+0.001007  2012-05-24
+
+	- add MooseX::RemoteHelper::CompositeSerialization Role
+
+0.001006  2012-05-01
+	- rename to MX::RemoteHelper
+
+0.001005  2012-04-13
+	- fix another call to ->orig. refs #639
+
+0.001004  2012-04-13
+	- fix issue where a false value passed to the remote name wouldn't get
+	  used for the value of that attribute, refs #638
+
+0.001003  2012-04-13
+	- fix bug where skiping init_arg handling would have broken in a second
+	  place, refs #639
+
+0.001002  2012-04-13
+	- add meta methods for handling serializing
+	- fix bug where skiping init_arg handling would have broken, refs #639
+
+0.001001  2012-04-12
+	- don't rename init arg if the remote name is the same as the init arg
+
+0.001000  2012-04-11
+	- initial release

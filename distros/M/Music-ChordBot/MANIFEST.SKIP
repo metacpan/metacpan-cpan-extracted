@@ -1,0 +1,9 @@
+Pro/.*
+Light/.*
+examples/.*
+\.git.*
+.*~$
+^Makefile$
+.*\.bak$
+MYMETA\..*
+

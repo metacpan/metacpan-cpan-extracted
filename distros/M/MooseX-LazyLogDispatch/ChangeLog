@@ -1,0 +1,7 @@
+Revision history for Perl extension MooseX::LazyLogDispatch
+
+0.02 - Dec 21, 2007
+    - Oops, add IO::Scalar as a test dep
+
+0.01 - Dec 21, 2007
+    - Initial release

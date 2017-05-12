@@ -1,0 +1,46 @@
+---
+abstract: 'Cache plugin with blocking and non-blocking support'
+author:
+  - 'Companies House <chgovuk@cpan.org>'
+build_requires:
+  File::Basename: 0
+  Mojo::IOLoop: 0
+  Test::Exception: 0
+  Test::More: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MojoX-Plugin-AnyCache
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  AnyEvent: 0
+  Cache::Memcached: 0
+  Cache::Memcached::AnyEvent: 0
+  Data::MessagePack: 0
+  EV: 0
+  MIME::Base64: 0
+  Memcached::Client: 0
+  Mojo::Base: 0
+  Mojo::Redis: 0
+  Mojo::Util: 0
+  Mojolicious: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/companieshouse/MojoX-Plugin-AnyCache/issues
+  homepage: https://github.com/companieshouse/MojoX-Plugin-AnyCache
+  repository: https://github.com/companieshouse/MojoX-Plugin-AnyCache.git
+version: 0.04

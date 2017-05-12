@@ -1,0 +1,14 @@
+<div id="navcontainer">
+<ul id="navlist">
+[% FOREACH  table IN  config.display_tables %]
+<li[% IF request.model_class &&  request.model_class.table == table %] id="active" [% END %]>
+[% request.link( table =  table,
+                  action = 'list',
+                  additional = '',
+                  label = table,
+                   ) 
+%]
+</li>
+[% END %]
+</ul>
+</div>

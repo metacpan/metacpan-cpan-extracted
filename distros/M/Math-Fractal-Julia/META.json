@@ -1,0 +1,50 @@
+{
+   "abstract" : "Calculate points in the Julia set",
+   "author" : [
+      "Jeffrey T. Palmer <jtpalmer@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-Fractal-Julia",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jtpalmer/Math-Fractal-Julia/issues"
+      },
+      "homepage" : "https://github.com/jtpalmer/Math-Fractal-Julia",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jtpalmer/Math-Fractal-Julia.git",
+         "web" : "https://github.com/jtpalmer/Math-Fractal-Julia"
+      }
+   },
+   "version" : "0.000003"
+}
+

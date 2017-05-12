@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Math-Vector-Real.t
+t/dont_use_xs
+lib/Math/Vector/Real.pm
+lib/Math/Vector/Real/Test.pm
+examples/dist_to_line.pl
+examples/Math-Matrix.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,296 @@
+0.26   2015-05-31
+
+- Fixes for Unicode characters when generating HTML. The Markdent::Simple::*
+  classes now make sure that the scalar it returns containing HTML contains
+  characters, not bytes. The Markdent::Handler::HTMLStream::* classes no
+  longer entitize non-ASCII characters. Only control characters and HTML
+  reserved character (< > & ") are encoded as HTML entities. The problems with
+  Unicode handling were reported by Polina Shubha. GitHub PR #8.
+
+- HTML blocks containing Unicode characters could cause the parser to die or
+  warn. Reported by Polina Shubha. GitHub PR #8.
+
+- A change in 0.25 broke the ability to have a dialect with just a block
+  parser or span parser rather than both. Reported by Polina Shubina. GitHub
+  issue #7.
+
+- The parsing of HTML entities was too greedy, so that something like
+  "&lt;word&gt;" would be parsed a sigle eneity, "lt;word&gt", which is
+  clearly wrong. Fixed by Polina Shubina. GitHub PR #3.
+
+- Accept Pandoc (1.12.3)-generated GitHub-format Markdown document style for
+  fenced code blocks - "``` {.Perl}". Implemented by Andrew Speer. GitHub PR
+  #4.
+
+
+0.25   2015-01-04
+
+- HTML output now uses the HTML5 doctype. In addition, table cell alignment is
+  set using a style tag in generated HTML, rather than the deprecated-in-HTML5
+  "align" attribute.
+
+- The Markdent::Handler::HTMLStream::Document and Markdent::Simple::Document
+  classes now accept optional charset and language parameters.
+
+- The HTML output for table cells was broken. Cells always ended with </th>
+  even for body cells. Reported by Polina Shubina. GitHub PR #2.
+
+- Replaced Class::Load with Module::Runtime.
+
+
+0.24   2014-01-25
+
+- Shut up enum warnings from the latest Moose (2.1200). Patch by Zoffix. RT
+  #92274.
+
+
+0.23   2013-12-13
+
+- Added support for drunken (42, 5, 3) and lazy (1, 1, 1) ordered lists, per
+  the Markdown spec -
+  http://daringfireball.net/projects/markdown/syntax#list. Based on tests and
+  patch from Jason McIntosh.
+
+
+0.22   2012-07-22
+
+* All dialects except the Standard dialect are now roles. This makes it
+  possible to create a parser that parses multiple dialects. It's possible for
+  dialects to have conflicting parsing rules, in which case the results are
+  unpredictable.
+
+  This is a backwards incompatible change, but should not break most code,
+  unless you have implemented your own dialect, or you were explicitly setting
+  a block or span parser class to something like
+
+      block_parser_class => 'Markdent::Dialect::Theory::BlockParser'
+
+  But there was really no good reason to do this.
+
+- The Standard dialect block/span parser classes are now named
+  Markdent::Parser::BlockParser and ::SpanParser.
+
+- The use of a "dialect" as a named parameter has been replaced by
+  "dialects". The "dialects" parameter can be either a string or an array ref
+  of strings. However, the "dialect" parameter is still accepted for backwards
+  compatibility. This may be removed in the future.
+
+- The Standard dialect now parses two spaces at the end of a line as a line
+  break. There is a new Markdent::Event::LineBreak class to go with this.
+
+- Improve the bin/markdent-html script. It now has a --help option. You can
+  pass it Markdown text via the CLI --text option, rather than only via a
+  --file.
+
+- Implemented most of GitHub-flavored Markdown as a dialect.
+
+
+0.21   2012-06-22
+
+- The StartListItem event now has a bullet attribute. This contains the text
+  of the bullet, something like "*" or "1.". Requested by Steven Haryanto. RT
+  #77893.
+
+
+0.20   2012-05-18
+
+- Work around breakage introduced with MooseX::Types 0.32.
+
+
+0.19   2012-03-04
+
+- Some modules were missing a version number in the last release.
+
+
+0.18   2012-03-04
+
+- The Markdent::Handler::HTMLStream::Document and ::Fragment modules did not
+  detect when streaming to a file handle failed. This is because HTML::Stream
+  does not check that it's calls to ->print succeed. This has been fixed by
+  wrapping file handles (native or IO::Handle) in an object which checks that
+  print succeeds.
+
+- Distro/packaging cleanup.
+
+
+0.17   2010-09-27
+
+- Avoid warnings from the next Moose.
+
+- Added a Null handler.
+
+
+0.16   2010-06-03
+
+- The last release (and others?) did not include a $VERSION in its
+  modules. Doh.
+
+
+0.15   2010-06-03
+
+- Even more table parsing improvements. Now the parse speed is approximately
+  50 times faster than 0.13.
+
+
+0.14   2010-06-03
+
+- Greatly improved table parsing speed. Large tables took a very long time to
+  parse, as the parser ended up backtracking way too much. Thanks to Yuval
+  Kogman for his suggestions. Now large tables parse approximately 10 times
+  faster.
+
+
+0.13   2010-06-01
+
+- Fixed handling of a very pathological case for table parsing, which caused
+  the parser to die. Instead, it will now keep going. Your output may be
+  bizarre, but the parser should not die.
+
+- Fixed handling of a tab character next to a cell delimiter. This caused the
+  parser to become very confused and go into an endless loop. Now such tabs
+  are simply stripped from the output (just like other whitespace next to a
+  cell delimiter).
+
+
+0.12   2010-05-25
+
+- Allow setting the handler class when calling Test::Markdent::parse_ok().
+
+
+0.11   2010-05-25
+
+- Moved Test::Markdent into lib (from t/lib), since it is useful to anyone who
+  wants to write a Markdent dialect.
+
+
+0.10   2010-05-19
+
+- Split all HTML generating code into ::Document and ::Fragment classes. This
+  means that Markdent::Handler::HTMLStream is now
+  Markdent::Handler::HTMLStream::Document and
+  Markdent::Handler::HTMLStream::Fragment. Similarly, Markdent::Simple is now
+  Markdent::Simple::Document and Markdent::Simple::Fragment.
+
+  This was done to make it easy to turn a snippet of Markdown into a snippet
+  of HTML. Previously, you could only generate a complete HTML document.
+
+
+0.09   2010-02-15
+
+- The Theory dialect parser would parse text in brackets as a table caption
+  even if no table followed, for example:
+
+  [Not a caption]
+
+  Just some text
+
+
+0.08   2009-12-06
+
+- Added a missing dependency, MooseX::Role::Parameterized.
+
+
+0.07   2009-11-27
+
+- You can now include a header marker at the beginning and/or end of the
+  table. This matches how MySQL outputs tables from its CLI tool.
+
+  +------+-------------+------------------------------+--------+
+  | id   | name        | description                  | price  |
+  +------+-------------+------------------------------+--------+
+  |    1 | gizmo       | Takes care of the doohickies |   1.99 |
+  |    2 | doodad      | Collects *gizmos*            |  23.80 |
+  |   10 | dojigger    | Foo                          | 102.98 |
+  | 1024 | thingamabob | Self-explanatory, no?        |   0.99 |
+  +------+-------------+------------------------------+--------+
+
+  Suggested by David Wheeler.
+
+
+0.06   2009-11-27
+
+- Added a new handler, Markdent::Handler::HTMLFilter, which removes all HTML
+  events (except for entities) from the event stream.
+
+- Added a new role, Markdent::Role::FilterHandler, to make it easier to write
+  filtering handlers.
+
+
+0.05   2009-11-27
+
+- Theory-style tables no longer need to have header rows. They can just
+  consist of a body.
+
+- Theory-style header rows can use equals signs (=) in the marker:
+  
+  | Header 1 | Header 2 |
+  +==========+==========+
+  | Body 1   | Body 2   |
+
+
+0.04   2009-11-26
+
+- Added Markdent::Manual, a start at more comprehensive high-level docs on how
+  to use Markdent.
+
+- Fixed some parsing bugs where some match methods did not return true, which
+  could cause failures if the handler's handle_event method didn't return
+  true. Now all match methods explicitly return true when they match (as they
+  should).
+
+- Added a new handler, Multiplexer, which lets you multiplex the event stream
+  to more than one handler at a time.
+
+
+0.03   2009-11-26
+
+- Added Markdent::Handler::CaptureEvents and Markdent::CapturedEvents. In my
+  benchmarks, thawing a Markdent::CaptureEvents object and replaying its
+  events to generate HTML for a bunch of documents was about 6x faster than
+  parsing from scratch.
+
+- Started implementing some Markdown extensions proposed by David Wheeler as
+  the "Theory" dialect. This includes a nice syntax for tables. For now this
+  only includes the table extension.
+
+- Made it easy to specify a dialect for a parser by writing
+
+    my $parser = Markdent::Parser->new( dialect => 'Theory' );
+
+- HTML comments are now parsed as comments, not text or HTML tags. There are
+  two events for this, HTMLCommentBlock and HTMLComment. The block version is
+  for standalone comments, the other is for comments embedded in text.
+
+- Made tag balancing a bit more generic with the Markdent::Role::BalancedEvent
+  role, which makes it easier to compare start & end events to see if they're
+  balanced.
+
+- Refactored some parser internals to improve subclassability.
+
+
+0.02   2009-11-24
+
+- Fixed some cases of nested strong and em in the Standard dialect's
+  parser. It was broken for cases like this:
+
+  *This **is a test***.
+
+  This should turn into HTML like
+
+  <em>This <strong>is a test</strong></em>
+
+  but instead turned into
+
+  <em>This</em> <em>is a test</em>*.
+
+- Added some missing test dependencies.
+
+- There is now a separate class for each type of event, all of which do the
+  Markdent::Role::Event role.
+
+
+0.01   2009-11-21
+
+- First version, released on an unsuspecting world. Still rather alpha, and
+  internals are subject to lots of change.
+

@@ -1,0 +1,163 @@
+=head1 NAME
+
+Mozilla::DOM::NSEvent
+
+=for object Mozilla::DOM::NSEvent
+
+Mozilla::DOM::NSEvent is a wrapper around an instance of Mozilla's
+nsIDOMNSEvent interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+The following constants are available. Export them as
+
+  use Mozilla::DOM::NSEvent qw(:events);
+
+=over 4
+
+=item MOUSEDOWN => 1
+
+=item MOUSEUP => 2
+
+=item MOUSEOVER => 4
+
+=item MOUSEOUT => 8
+
+=item MOUSEMOVE => 16
+
+=item MOUSEDRAG => 32
+
+=item CLICK => 64
+
+=item DBLCLICK => 128
+
+=item KEYDOWN => 256
+
+=item KEYUP => 512
+
+=item KEYPRESS => 1024
+
+=item DRAGDROP => 2048
+
+=item FOCUS => 4096
+
+=item BLUR => 8192
+
+=item SELECT => 16384
+
+=item CHANGE => 32768
+
+=item RESET => 65536
+
+=item SUBMIT => 131072
+
+=item SCROLL => 262144
+
+=item LOAD => 524288
+
+=item UNLOAD => 1048576
+
+=item XFER_DONE => 2097152
+
+=item ABORT => 4194304
+
+=item ERROR => 8388608
+
+=item LOCATE => 16777216
+
+=item MOVE => 33554432
+
+=item RESIZE => 67108864
+
+=item FORWARD => 134217728
+
+=item HELP => 268435456
+
+=item BACK => 536870912
+
+=item TEXT => 1073741824
+
+=item ALT_MASK => 1
+
+=item CONTROL_MASK => 2
+
+=item SHIFT_MASK => 4
+
+=item META_MASK => 8
+
+=back
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::NSEvent->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $originaltarget = $nsevent->B<GetOriginalTarget>()
+
+  /** The original target of the event, before any retargetings. */
+
+Output:
+
+=over
+
+=item $originaltarget (Mozilla::DOM::EventTarget)
+
+=back
+
+=head2 $explicitoriginaltarget = $nsevent->B<GetExplicitOriginalTarget>()
+
+   * The explicit original target of the event.  If the event was retargeted
+   * for some reason other than an anonymous boundary crossing, this will be set
+   * to the target before the retargeting occurs.  For example, mouse events
+   * are retargeted to their parent node when they happen over text nodes (bug
+   * 185889), and in that case .target will show the parent and
+   * .explicitOriginalTarget will show the text node.
+   * .explicitOriginalTarget differs from .originalTarget in that it will never
+   * contain anonymous content.
+
+Output:
+
+=over
+
+=item $explicitoriginaltarget (Mozilla::DOM::EventTarget)
+
+=back
+
+=head2 $tmprealoriginaltarget = $nsevent->B<GetTmpRealOriginalTarget>()
+
+Output:
+
+=over
+
+=item $tmprealoriginaltarget (Mozilla::DOM::EventTarget)
+
+=back
+
+=head2 $bool = $nsevent->B<GetIsTrusted>()
+
+Output:
+
+=over
+
+=item $bool (bool)
+
+=back
+
+=head2 $nsevent->B<PreventBubble>()
+
+=head2 $nsevent->B<PreventCapture>()
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

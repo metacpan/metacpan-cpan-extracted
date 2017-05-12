@@ -1,0 +1,18 @@
+--- 
+abstract: MogileFS plugins for using multiple hooks
+author: Toru Yamaguchi <zigorou@cpan.org>
+distribution_type: module
+generated_by: Module::Install version 0.65
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: MogileFS-Plugin-MultiHook
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  MogileFS::Config: 0
+  MogileFS::Server: 0
+version: 0.03

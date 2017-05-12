@@ -1,0 +1,37 @@
+
+===== ChangeLog of Mail::Box version 3.*
+
+version 3.002: Fri 31 Mar 14:22:17 CEST 2017
+
+	Fixes:
+	- repair test on Windows again :(
+	- error while global destruction of locker
+	- show installed version of POP3, not POP4 (of course)
+	  rt.cpan.org#120651 [Kent Fredric]
+
+version 3.001: Mon  6 Feb 17:07:53 CET 2017
+
+	Fixes:
+	- test on windows, cause the path syntax differences
+	- posix lock on BSD [Slaven Rezic]
+	- SEE ALSO links broken.
+	  rt.cpan.org#120119 [Christophe Deroulers]
+	- do not test multi-lock on BSDs
+
+	Improvements:
+	- Mail::Box::Locker* cleaner OO
+	- ::Locker::Multi uses FcntlLock, not POSIX by default
+
+version 3.000: Thu  2 Feb 15:50:36 CET 2017
+
+	Changes:
+	- split Mail::Box 2* into separate distributions:
+		Mail::Box             basic and simple mail folders
+	    Mail::Message         only message handling
+	    Mail::Transport       sending messages
+	    Mail::Box::IMAP4      net-imap folders
+	    Mail::Box::POP3       pop3(s) folders
+	    Mail::Box::Dbx        Outlook express folders (unpublished)
+	- simplify structure of tests
+	- do not ask questions during installation
+	- shared footer

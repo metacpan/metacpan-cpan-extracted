@@ -1,0 +1,17 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Method/Autoload.pm
+t/001_load.t
+t/002_packages.t
+t/003_DESTROY.t
+t/004_AUTOLOAD.t
+t/005_AUTOLOAD.t
+t/006_autoloaded.t
+scripts/Method-Autoload-example.pl
+scripts/lib/My/Fuz.pm
+scripts/lib/My/Baz.pm
+META.yml                                 Module meta-data (added by MakeMaker)

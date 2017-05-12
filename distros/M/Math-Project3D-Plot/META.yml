@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Math-Project3D-Plot
+version:             1.02
+abstract:            Perl extension for plotting projections of 3D functions
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Imager:                        0.41
+    Math::Project3D:               1.02
+    Test::More:                    0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Steffen Mueller <project3d-module@steffen-mueller.net>

@@ -1,0 +1,76 @@
+NAME
+    MooseX::ABCD - MooseX::ABC, but checking required methods on
+    make_immutable
+
+SYNOPSIS
+       {
+          package Shape;
+          use Moose;
+          use MooseX::ABCD;
+          requires 'draw';
+          __PACKAGE__->meta->make_immutable;
+       }
+   
+       {
+          package Circle;
+          use Moose;
+          extends 'Shape';
+          sub draw {
+             ...;
+          }
+          __PACKAGE__->meta->make_immutable;
+       }
+   
+       my $shape  = Shape->new;   # dies
+       my $circle = Circle->new;  # succeeds
+   
+       {
+          package Square;
+          use Moose;
+          extends 'Shape';
+          __PACKAGE__->meta->make_immutable;
+          # ^^^ dies, draw is unimplemented
+       }
+
+DESCRIPTION
+    What does ABCD stand for? Hmmm... maybe "abstract base classes deferred"?
+    or "abstract base classes declare-compatible"? (This module works with
+    MooseX::Declare, whereas MooseX::ABC does not!)
+
+    Anyway, whatever ABCD does or does not stand for, this is what
+    MooseX::ABCD does: it works just like MooseX::ABC, the checks that derived
+    classes implement all abstract methods happen when the class is made
+    immutable, not when inheritance is set up.
+
+    Why? It works better with MooseX::Declare this way.
+
+  Functions
+    This module exports one function to your namespace:
+
+    `requires`
+        Works like `requires` in Moose roles, but for classes.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-ABCD>.
+
+SEE ALSO
+    MooseX::ABC, MooseX::AbstractMethod.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>, though most of the code is stolen from
+    Jesse Luehrs. (But don't blame him is something goes wrong. For that
+    matter, don't blame me either - take a look at the disclaimer of
+    warranties.)
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012-2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

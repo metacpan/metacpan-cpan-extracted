@@ -1,0 +1,41 @@
+Revision history for Perl module Mail::SendGrid
+
+0.09 2015-11-08
+    - Switched from Mouse to Moo: I was requiring 0.94 of Mouse, but that
+      was causing failures on old versions of Perl because recent releases
+      of Mouse have version numbers with a leading 'v', eg 'v2.4.5'.
+      See https://github.com/gfx/p5-Mouse/issues/55
+
+0.08 2015-10-23
+    - Updated github repo after changing my github username
+    - Added [MetaJSON] to dist.ini, to META.json will be in the release
+    - Auto tagging and pushing to github on release
+
+0.07 2014-01-27
+    - Added explicit min perl version of 5.8 to SendGrid.pm
+
+0.06 2012-12-04
+    - Added example to doc showing how to delete all bounces
+    - Dropped Git from dist.ini
+    - I'd left a print statement in used during dev
+
+0.05 2012-12-04
+    - old internal function name not changed after a refactoring
+
+0.04 2012-12-04
+    - Added delete_bounces() method
+    - switched to the JSON endpoint, as much less hassle than XML
+
+0.03 2011-10-12
+    - fixed typo in SYNOPSIS section of Mail::SendGrid::Bounce
+    - Added Test::CPAN::Change to dist.ini
+    - Added GitHub to dist.ini; distribution now on Github as well.
+    - made the attributes required in Mail::SendGrid::Bounce
+
+0.02 2011-10-11
+    - added Changes file
+    - accidental release while playing with Dist::Zilla :-)
+
+0.01 2011-10-11
+    - initial release of module, with bounces method only
+

@@ -1,0 +1,238 @@
+NAME
+    MMS::Mail::Parser - A class for parsing MMS (or picture) messages via
+    email.
+
+VERSION
+    Version 0.14
+
+SYNOPSIS
+    This class takes an MMS message and parses it into two 'standard'
+    formats (an MMS::Mail::Message and MMS::Mail::Message::Parsed) for
+    further use. It is intended to make parsing MMS messages
+    network/provider agnostic such that a 'standard' object results from
+    parsing, independant of the network/provider it was sent through.
+
+  Code usage example
+    This example demonstrates the use of the two stage parse. The first pass
+    provides an MMS::Mail::Message instance that is then passed through to
+    the "provider_parse" method that attempts to determine the Network
+    provider the message was sent through and extracts the relevant
+    information and parses it into an MMS::Mail::Message::Parsed instance.
+
+        use MMS::Mail::Parser;
+        my $mms = MMS::Mail::Parser->new();
+        my $message = $mms->parse(\*STDIN);
+        if (defined($message)) {
+          my $parsed = $mms->provider_parse;
+          print $parsed->header_subject."\n";
+        }
+
+  Examples of input
+    MMS::Mail::Parser has the same input methods as MIME::Parser.
+
+        # Parse from a filehandle:
+        $entity = $parser->parse(\*STDIN);
+
+        # Parse an in-memory MIME message: 
+        $entity = $parser->parse_data($message);
+
+        # Parse a file based MIME message:
+        $entity = $parser->parse_open("/some/file.msg");
+
+        # Parse already-split input (as "deliver" would give it to you):
+        $entity = $parser->parse_two("msg.head", "msg.body");
+
+  Examples of parser modification
+    MMS::Mail::Parser uses MIME::Parser as it's parsing engine. The
+    MMS::Mail::Parser class creates it's own MIME::Parser instance if one is
+    not passed in via the "new" or "mime_parser" methods. There are a number
+    of reasons for providing your own parser, such as forcing all attachment
+    storage to be done in memory than on disk (providing a speed increase to
+    your application at the cost of memory usage).
+
+        my $parser = new MIME::Parser;
+        $parser->output_to_core(1);
+        my $mmsparser = new MMS::Mail::Parser;
+        $mmsparser->mime_parser($parser);
+        my $message = $mmsparser->parse(\*STDIN);
+        if (defined($message)) {
+          my $parsed = $mms->provider_parse;
+        }
+
+  Examples of error handling
+    The parser contains an error stack and will ultimately return an undef
+    value from any of the main parse methods if an error occurs. The last
+    error message can be retreived by calling "last_error" method.
+
+        my $message = $mmsparser->parse(\*STDIN);
+        unless (defined($message)) {
+          print STDERR $mmsparser->last_error."\n";
+          exit(0);
+        }
+
+  Miscellaneous methods
+    There are a small set of miscellaneous methods available. The
+    "output_dir" method is provided so that a new MIME::Parser instance does
+    not have to be created to supply a separate storage directory for parsed
+    attachments (however any attachments created as part of the process are
+    removed when the message is destroyed so the lack of specification of a
+    storage location is not a requirement for small scale message parsing ).
+
+        # Provide debug ouput to STDERR
+        $mmsparser->debug(1);
+
+        # Set an output directory for MIME::Parser 
+        $mmsparser->output_dir('/tmp');
+
+        # Get/set an array reference to the error stack
+        my $errors = $mmsparser->errors;
+
+        # Get/set the MIME::Parser instance used by MMS::Parser
+        $mmsparser->mime_parser($parser);
+
+        # Set the characters to be stripped from the returned 
+        # MMS::Mail::Message and MMS::Mail::Message::Parsed instances
+        $mmsparser->strip_characters("\r\n");
+
+        # Set the regular expression map for accessors
+        # Removes trailing EOL chars from subject and body accessors
+        my $map = { header_subject => 's/\n$//g',
+                    header_datetime => 's/\n$//g'
+                  };
+        $mmsparser->cleanse_map($map);
+
+  Tutorial
+    A tutorial can be accessed at
+    http://www.monkeyhelper.com/2006/02/roll_your_own_flickrpoddr_or_v.html
+
+METHODS
+    The following are the top-level methods of MMS::Mail::Parser class.
+
+  Constructor
+    "new()"
+        Return a new MMS::Mail::Parser instance. Valid attributes are:
+
+        "mime_parser" MIME::Parser
+            Passed as a hash reference, "parser" specifies the MIME::Parser
+            instance to use instead of MMS::Mail::Parser creating it's own.
+
+        "debug" INTEGER
+            Passed as a hash reference, "debug" determines whether debuging
+            information is outputted to standard error (defaults to 0 - no
+            debug output).
+
+        "strip_characters" STRING
+            Passed as a hash reference, "strip_characters" defines the
+            characters to strip from the MMS::Mail::Message (and
+            MMS::Mail::Message::Parsed) class "header_*" and "body_text"
+            properties.
+
+        "cleanse_map" HASH REF
+            Passed as a hash reference, "cleanse_map" defines regexes (or
+            function references) to apply to instance properties from the
+            MMS::Mail::Message (and MMS::Mail::Message::Parsed) classes.
+
+  Regular Methods
+    "parse" INSTREAM
+        Instance method - Returns an MMS::Mail::Message instance by parsing
+        the input stream INSTREAM
+
+    "parse_data" DATA
+        Instance method - Returns an MMS::Mail::Message instance by parsing
+        the in memory string DATA
+
+    "parse_open" EXPR
+        Instance method - Returns an MMS::Mail::Message instance by parsing
+        the file specified in EXPR
+
+    "parse_two" HEADFILE, BODYFILE
+        Instance method - Returns an MMS::Mail::Message instance by parsing
+        the header and body file specified in HEADFILE and BODYFILE
+        filenames
+
+    "provider_parse" MMS::MailMessage
+        Instance method - Returns an MMS::Mail::Message::Parsed instance by
+        attempting to discover the network provider the message was sent
+        through and parsing with the appropriate MMS::Mail::Provider. If an
+        MMS::Mail::Message instance is supplied as an argument then the
+        "provider_parse" method will parse the supplied MMS::Mail::Message
+        instance. If a provider has been set via the provider method then
+        that parser will be used by the "provider_parse" method instead of
+        attempting to discover the network provider from the
+        MMS::Mail::Message attributes.
+
+    "output_dir" DIRECTORY
+        Instance method - Returns the "output_dir" parameter used with the
+        MIME::Parser instance when invoked with no argument supplied. When
+        an argument is supplied it sets the "output_dir" property used by
+        the MIME::Parser to the value of the argument supplied.
+
+    "mime_parser" MIME::Parser
+        Instance method - Returns the MIME::Parser instance used by
+        MMS::Mail::Parser (if created) when invoked with no argument
+        supplied. When an argument is supplied it sets the MIME::Parser
+        instance used by the MMS::Mail::Parser instance to parse messages.
+
+    "provider" MMS::Mail::Provider
+        Instance method - Returns an instance for the currently set provider
+        property when invoked with no argument supplied. When an argument is
+        supplied it sets the provider to the supplied instance.
+
+    "strip_characters" STRING
+        Instance method - Returns the characters to be stripped from the
+        returned MMS::Mail::Message and MMS::Mail::Message::Parsed
+        instances. When an argument is supplied it sets the strip characters
+        to the supplied string.
+
+    "cleanse_map" HASHREF
+        Instance method - This method allows a regular expression or
+        subroutine reference to be applied when an accessor sets a value,
+        allowing message values to be cleansed or modified. These accessors
+        are "header_from", "header_to", "body_text", "header_datetime" and
+        "header_subject".
+
+        The method expects a hash reference with key values as one of the
+        above public accessor method names and values as a scalar in the
+        form of a regular expression or as a subroutine reference.
+
+    "errors"
+        Instance method - Returns the error stack used by the
+        MMS::Mail::Parser instance as an array reference.
+
+    "last_error"
+        Instance method - Returns the last error from the stack.
+
+    "debug" INTEGER
+        Instance method - Returns a number indicating whether STDERR
+        debugging output is active (1) or not (0). When an argument is
+        supplied it sets the debug property to that value.
+
+AUTHOR
+    Rob Lee, "<robl at robl.co.uk>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-mms-mail-parser@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MMS-Mail-Parser>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+NOTES
+    Please read the Perl artistic license ('perldoc perlartistic') :
+
+    10. THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+ACKNOWLEDGEMENTS
+    As per usual this module is sprinkled with a little Deb magic.
+
+COPYRIGHT & LICENSE
+    Copyright 2005 Rob Lee, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    MMS::Mail::Message, MMS::Mail::Message::Parsed, MMS::Mail::Provider
+

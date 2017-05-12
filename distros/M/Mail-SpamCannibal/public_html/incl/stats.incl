@@ -1,0 +1,7 @@
+<script language=javascript1.2>
+var mend = /\.[^\/\.]+$/;
+var lext = location.pathname.match(/\.[^\/\.]+$/);
+var lpath = location.pathname.match(/[^\/]+$/);
+lpath[1] = location.pathname.substr(0,lpath.index);
+labrea = lpath[1] + 'spam_report' + lext[0];
+</script>

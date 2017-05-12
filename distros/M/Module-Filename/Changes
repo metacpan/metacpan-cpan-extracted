@@ -1,0 +1,9 @@
+Revision history for Perl module Module::Filename
+
+0.02 2014-12-22
+  - Added export function module_path to compete with Module::Path
+  - Updated documentation
+  - Added example script module_filename.pl
+
+0.01 2009-01-19
+  - original version

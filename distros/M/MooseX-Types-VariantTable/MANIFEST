@@ -1,0 +1,12 @@
+Changes
+lib/Moose/Meta/Method/VariantTable.pm
+lib/MooseX/Types/VariantTable.pm
+lib/MooseX/Types/VariantTable/Declare.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/basic.t
+t/structured.t
+t/sugar.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

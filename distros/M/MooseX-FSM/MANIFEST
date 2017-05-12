@@ -1,0 +1,15 @@
+.cvsignore
+Build.PL
+Changes
+lib/MooseX/FSM.pm
+lib/MooseX/FSM/State.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-load.t
+t/01fsm.t
+t/boilerplate.t
+t/lib/FSM_01.pm
+t/pod-coverage.t
+t/pod.t

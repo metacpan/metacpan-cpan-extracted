@@ -1,0 +1,26 @@
+---
+abstract: 'Queue memcache calls when in a dbh transaction'
+author:
+  - 'Jason Terry <oaxlin@cpan.org>'
+build_requires:
+  DBD::CSV: '0'
+  Data::Dumper: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: v5.10.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MemcacheDBI
+requires:
+  Cache::Memcached::Fast: '0'
+  Clone: '0'
+  DBI: '0'
+  perl: '5.010'
+version: '0.08'

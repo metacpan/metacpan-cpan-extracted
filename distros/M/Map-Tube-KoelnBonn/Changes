@@ -1,0 +1,43 @@
+Revision history for Perl extension Map::Tube::KoelnBonn.
+
+0.09 2015-03-24
+  - Amended map entries to make use of Map::Tube 2.92 features
+
+0.08 2015-03-09
+  - fixied MANIFEST.SKIP and tests to cope with ExtUtils::MakeMaker 7.05+
+    (thanks to Slaven's tireless research)
+
+0.07 2015-03-02
+  - added file missing from previous version (More thanks to Slaven and Michal!)
+
+0.06 2015-02-26  - minuscule changes to pod
+  - no end to permissions problems... (Thanks again, Slaven!)
+
+0.05 2015-02-25
+  - expanded tests
+  - expanded Makefile.pl (based on hints by Slaven -- thanks!)
+  - added more pod
+  - fixed permissions problem again (Thanks Slaven!)
+
+0.04 2015-02-24
+  - cleaned up Makefile.pl
+  - cleaned up tests
+  - use Test::Map::Tube
+  - bumped Map::Tube version required to 2.87
+  - removed files needed only for initial construction of xml map file
+
+0.03 2015-02-04
+  - added line colours
+  - modified t/03-xml.t for changed return value from Map::Tube 2.72
+  - bumped minimum Map::Tube version to 2.72
+  - fixed number of plans in t/01-xml.t
+  - explicitly cast output from nodes() method to hash reference in t/02-xml.t
+  - extended testing of correctness of xml file
+  - changed and extended tests
+
+0.02 2015-01-22
+  - fixed character set problem in abstract / META files.
+  - Fixed module name in t\12-meta-yml.t
+
+0.01 2015-01-22
+  - initial release

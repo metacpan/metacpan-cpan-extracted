@@ -1,0 +1,10 @@
+Revision history for Mail-Audit-DKIM
+
+0.003     2013-09-28 21:21:30 America/New_York
+          update bugtracker, build system, repo metadata
+
+0.002     2007-12-04
+          test for "none" result
+
+0.001     2007-12-04
+          first release; head hung in resignation

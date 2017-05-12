@@ -1,0 +1,167 @@
+#! /usr/bin/perl
+#########################################################################
+#        This Perl script is Copyright (c) 2003, Peter J Billam         #
+#               c/o P J B Computing, www.pjb.com.au                     #
+#                                                                       #
+#     This script is free software; you can redistribute it and/or      #
+#            modify it under the same terms as Perl itself.             #
+#########################################################################
+use Math::RungeKutta;
+
+my ($maxcols, $maxrows);
+eval 'require "Term/Size.pm"';
+if ($@) {
+	$maxcols = `tput cols`;
+	if ($^O eq 'linux') { $maxrows = (`tput lines` + 0);
+	} else { $maxrows = (`tput rows` + 0);
+	}
+} else {
+	($maxcols, $maxrows) = &Term::Size::chars(*STDERR);
+}
+$maxcols = $maxcols || 80; $maxcols--;
+$maxrows = $maxrows || 24;
+my $xmin=-1.4; my $xrange=3.0;
+my $ymin=-1.6; my $yrange=3.0;
+
+# t        x0 y0 vx0 vy0  x1 y1 vx1 vy1  x2 y2 vx2 vy2
+@m=(1100,10000,95);
+$t=0; @y = (0,1, 3.0,0,   0,0, -0.27,0,   0,-1, -3.0,0);
+$y[6] = -1.0 * ($m[0]*$y[2]+$m[2]*$y[10]) / $m[1];  # zero overall momentum
+$G=.001;
+$tmax = 20.0;
+$dt=0.01;
+$epsilon = 0.000001;
+
+&clear(); $|=1;
+if ($maxcols < 100 || $maxrows <60) {
+	&move(0,1); print
+	"It looks best if you run a small font and a big window, say 120x80";
+}
+while ($t<$tmax) {
+	($t, $dt, @y) = &rk4_auto( \@y, \&dydt, $t, $dt, $epsilon );
+	($t_midpoint, @y_midpoint) = &rk4_auto_midpoint();
+   &display($t_midpoint, @y_midpoint);
+	&display($t, @y);
+}
+&move (0,$maxrows-1);
+exit 0;
+
+sub dydt { my ($t, @y) = @_;
+	# t  x0 y0 vx0 vy0  x1 y1 vx1 vy1  x2 y2 vx2 vy2
+	my @dydt; local $[=0;
+
+	$dydt[0] = $y[2];  $dydt[1] = $y[3];
+	$dydt[4] = $y[6];  $dydt[5] = $y[7];
+	$dydt[8] = $y[10]; $dydt[9] = $y[11];
+
+	$dist01squared = ($y[0]-$y[4])**2 + ($y[1]-$y[5])**2;
+	$dist02squared = ($y[0]-$y[8])**2 + ($y[1]-$y[9])**2;
+	$dist12squared = ($y[4]-$y[8])**2 + ($y[5]-$y[9])**2;
+
+	if ($dist01squared < .0001) {  # should perhaps collide & coalesce ...
+		$force01  = 0.0;
+		$force01x = 0.0;
+		$force01y = 0.0;
+	} else {
+		$force01  = $G * $m[0]*$m[1] / $dist01squared;
+		$force01x = $force01 * ($y[0]-$y[4]) / sqrt $dist01squared;
+		$force01y = $force01 * ($y[1]-$y[5]) / sqrt $dist01squared;
+	}
+	if ($dist02squared < .0001) {
+		$force02  = 0.0;
+		$force02x = 0.0;
+		$force02y = 0.0;
+	} else {
+		$force02  = $G * $m[0]*$m[2] / $dist02squared;
+		$force02x = $force02 * ($y[8]-$y[0]) / sqrt $dist02squared;
+		$force02y = $force02 * ($y[9]-$y[1]) / sqrt $dist02squared;
+	}
+	if ($dist12squared < .0001) {
+		$force12  = 0.0;
+		$force12x = 0.0;
+		$force12y = 0.0;
+	} else {
+		$force12  = $G * $m[1]*$m[2] / $dist12squared;
+		$force12x = $force12 * ($y[4]-$y[8]) / sqrt $dist12squared;
+		$force12y = $force12 * ($y[5]-$y[9]) / sqrt $dist12squared;
+	}
+
+	$dydt[2]  = (0 - $force01x - $force02x) / $m[0];
+	$dydt[3]  = (0 - $force01y - $force02y) / $m[0];
+	$dydt[6]  = ($force01x - $force12x) / $m[1];
+	$dydt[7]  = ($force01y - $force12y) / $m[1];
+	$dydt[10] = ($force02x + $force12x) / $m[2];
+	$dydt[11] = ($force02y + $force12y) / $m[2];
+	return @dydt;
+}
+
+my @lastx; my @lasty;
+sub display { my ($t, @y) = @_;
+	# printf "%g 1=%g,%g 2=%g,%g 3=%g,%g\n",
+	#  $t,$y[0],$y[1],$y[4],$y[5],$y[8],$y[9];
+	my $x; my $y;
+	my @symb = ('o','O','.');
+	&move(0,0); printf "t = %g  ",$t;
+	foreach $i (0,1,2) {
+		&move ($lastx[$i],$lasty[$i]); print $symb[$i];
+		$x = int (($y[4*$i] - $xmin) * $maxcols / $xrange);
+		$y = int (($y[1 + 4*$i] - $ymin) * $maxrows / $yrange);
+		if ($x>=0 && $x<$maxcols && $y>=0 && $y<$maxrows) {
+			&move ($x,$y); &reverse(); print $symb[$i]; &normal();
+			$lastx[$i] = $x; $lasty[$i] = $y;
+		}
+	}
+}
+sub move    { my ($x,$y) = @_;
+	printf "\033[%d;%dH",$y+1,$x+1;
+}
+sub bold    { print "\033[1m"; }
+sub normal  { print "\033[0m"; }
+sub clear   { print "\033[H\033[J"; }
+sub reverse { print "\033[7m" };
+
+__END__
+
+=pod
+
+=head1 NAME
+
+three-body - Perl script to illustrate Math::RungeKutta
+
+=head1 SYNOPSIS
+
+ perl examples/three-body
+
+=head1 DESCRIPTION
+
+This script uses I<Math::RungeKutta> integrate Newton's inverse-square
+law of gravity for three objects moving in a two-dimensional plane.
+
+It uses I<rk4_auto> to adjust the step-size automatically,
+and I<rk4_auto_midstep> for a smoother display.
+
+The display assumes you are running something sufficiently
+I<vt100>-compatible to understand moveto and reverse.
+It looks best if you run a large square window with a tiny font,
+perhaps somewhere round 118x80.
+
+You can experiment with changing the masses I<@m> of the objects or
+their initial positions and velocities I<@y>, and you will probably
+discover how sensitive three-body motion is, and explore some of the
+many things that can go wrong during numerical integration :-)
+
+=head1 AUTHOR
+
+Peter J Billam  www.pjb.com.au/comp/contact.html
+
+=head1 CREDITS
+
+Based on Math::RungeKutta
+
+=head1 SEE ALSO
+
+examples/exponentials,
+examples/sine-cosine,
+Math::RungeKutta,
+Term::Size
+

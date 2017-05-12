@@ -1,0 +1,21 @@
+0.06  2011-04-12
+    Use the shiny new Moose 2.0 API for inlining constructor code (doy)
+
+0.05  2010-07-24
+    Use the new Moose::Exporter API
+
+0.04  2009-07-06
+    Fix which constructor methods we wrap, which have become private (doy)
+
+0.03  2009-03-29
+    Declare dependency on Set::Object::Weak
+
+0.02  2009-03-25
+    The interface has changed to:
+        use Moose;
+        use MooseX::InstanceTracking;
+    since we now inject multiple traits.
+
+    We now support make_immutable by injecting a constructor trait, so you can
+        have your instances fast *and* big-brothered.
+

@@ -1,0 +1,80 @@
+a:link { font-weight: bold; }
+a:visited { font-weight: bold; }
+body
+  {
+  background: #ffffff;
+  }
+table.bottom {
+  padding-top: .5em;
+  padding-right: 1em;
+  padding-left: 1em;
+  padding-bottom: .5em;
+  margin-top:  2em;
+  border: 1px solid black;
+  clear: both;
+  background: #e0e0d0;
+  }
+h1 
+  {
+  padding-top: .2em;
+  padding-bottom: .2em;
+  padding-right: 0.5em;
+  padding-left: 0.5em;
+  border: 1px solid black;
+  background: #e0e0d0;
+  }
+h2 
+  {
+  padding-top: .1em;
+  padding-bottom: .1em;
+  padding-right: 0.3em;
+  padding-left: 0.5em;
+  border: 1px solid black;
+  background: #e0e0d0;
+  }
+p.stat 
+  {
+  padding-top: .5em;
+  padding-bottom: .5em;
+  padding-right: 0.3em;
+  padding-left: 0.5em;
+  border-right: 1px solid black;
+  border-left: 1px solid black;
+  border-bottom: 1px solid black;
+  margin-top: 0;
+  background: #fffff0;
+  }
+p.statistics 
+  {
+  padding-top: .5em;
+  padding-bottom: .5em;
+  padding-right: 0.3em;
+  padding-left: 0.5em;
+  border: 1px solid black;
+  background: #fffff0;
+  }
+p.head 
+  {
+  font-weight: bold;
+  margin-bottom: 0;
+  padding-bottom: .5em;
+  padding-top: .5em;
+  padding-right: 0.3em;
+  padding-left: 0.5em;
+  background: #f0f0e0;
+  border: 1px solid black;
+  }
+table
+  {
+  border: 1px solid black;
+  }
+td.left
+  {
+  background: #f0f0e0;
+  text-align: right;
+  }
+td.right
+  {
+  text-align: right;
+  }
+

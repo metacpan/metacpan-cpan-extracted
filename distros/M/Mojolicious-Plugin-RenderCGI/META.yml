@@ -1,0 +1,24 @@
+---
+abstract: 'Rendering template with Perl code and CGI.pm funcs/subs for tags emits.'
+author:
+  - "Ð\x9CÐ¸Ñ\NÐ°Ð¸Ð» Ð§Ðµ <mche@cpan.org>"
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-RenderCGI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI: '4'
+  Mojolicious: '6'
+  perl: '5.006'
+version: '0.100'

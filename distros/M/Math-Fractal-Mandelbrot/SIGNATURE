@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.42.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+
+SHA1 8b1bcb072be0316a028b0c1b3e3f45c9f8b51952 BUGS
+SHA1 931d296e82731395ab3b82b46c804de31f313d0e CHANGES
+SHA1 a167a6aee7e2846c9a3f4274b513b75204688614 CREDITS
+SHA1 e4996cdf580e677fe5d8a16eb070debc9dbb38d0 INSTALL
+SHA1 d6a6c30ee6d9ba6b9afab8bbf6a25e1b23c744e0 LICENSE
+SHA1 e599548e5fcb80e6e6382cc28830b7da72420ce7 MANIFEST
+SHA1 5961ebaef28b1a4107d54188fe438d8d86980197 META.yml
+SHA1 dc6357793ed9b667b66e34da77a6782ed594f609 Makefile.PL
+SHA1 6f2c338620babe4d0f09c2bc80dd6cb6494b6b35 Mandelbrot.xs
+SHA1 1752616a3f0bbc163ea55fdfec237dcb6442c75d README
+SHA1 8cfc1d0c0a08dcc97c2193a49ee696f62de1ef98 TODO
+SHA1 f6998a0186704c2e3d9ac107bac68aa4ae9652f2 lib/Math/Fractal/Mandelbrot.pm
+SHA1 bc03d108abd569285562b4fa1f83461dade7a957 t/mandel.t
+SHA1 aa29d3e7d15d44c4d3d390a7dcf0294e49a840cf t/pod.t
+SHA1 fc9e5d92056019681376aac3157f57de3a03cce0 t/pod_cov.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iQEVAwUBRANaancLPEOTuEwVAQG/BQf9E8GyuwbuFf2ni55oIFSMc3NQT20LaSrb
+1ZRfZwGzymt3+hniGdaqfgnlzyTWhINbdONOZaCtrhFIgFwnjB9Q9wwdAtnO94UP
+COSPowuGgbg0bzXO7lTP4vFCd+vPSKp2U8jEL9KW4iSnPjk+7SYIJqkzmc0xITgi
+3MbrYG3tAw+fsWbWQf1YpzC5MHLVKdIdP1zCwShNNCh6qg9tRL4r9x72NelYm3Gx
+MdNVQUvx7NVhHiwVMX81BmNIPtv3TAZ5ptOd71lopAUzO8Lon6NnvZesEPvfqMgE
+mDqzJ5p0pCVngOsmeJxGKyOjV9cOJ9As5pUkFc3jXkfpw4fKI1YaDA==
+=b3sv
+-----END PGP SIGNATURE-----

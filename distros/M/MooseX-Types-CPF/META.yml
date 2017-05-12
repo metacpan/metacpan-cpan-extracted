@@ -1,0 +1,22 @@
+--- 
+abstract: CPF type for Moose classes
+author: 
+  - Thiago Rondon C<< <thiago@aware.com.br> >>
+build_requires: 
+  Test::Exception: 0
+  Test::More: 0
+  ok: 0
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: MooseX-Types-CPF
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  MooseX::Types: 0
+version: 0.01

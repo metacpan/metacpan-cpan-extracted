@@ -1,0 +1,1271 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Muldis::D::Manual::TemporalExtras -
+Legacy temporal data types, operators, and syntax removed from Muldis D
+
+=head1 VERSION
+
+This document is Muldis::D::Manual::TemporalExtras version 0.9.0.
+
+=head1 PREFACE
+
+This document is part of the Muldis D language and implementations manual,
+whose root document is L<Muldis::D::Manual>; you should read that root
+document before you read this one, which provides subservient details.
+
+=head1 DESCRIPTION
+
+The Muldis D language specification included a collection of non-mixin
+types and/or non-virtual operators from its first released version 0.0.0
+(on 2007-06-20) through version 0.120.0 (on 2010-04-23), which generally
+denoted temporal artifacts in terms of Gregorian
+year-month-day-hour-minute-second units; during that period the collection
+was rewritten or substantially altered a small number of times.  Then, with
+version 0.121.0 (on 2010-04-24), these were entirely purged from the Muldis
+D language specification.  The primary reason for this action is that
+details of the Gregorian calendar et al are too complicated and too subject
+to change to define in a core programming language spec, and are best left
+to separate modules; and even if not, the existing such types needed a huge
+refactor anyway.
+
+The remainder of this document contains the bulk of the purged temporal
+material as they were in the spec version 0.120.0; this document preserves
+that material in order to provide a resource for any future third-party
+efforts to provide temporal non-mixin types and/or non-virtual operators
+for Muldis D, such that these might best be provided as user-defined
+materials rather than being built-in to the language.  Alternately, such a
+derived effort may appear in the form of one or more official Muldis D
+language extensions that are not L<Muldis::D::Ext::Temporal>.
+
+The material of the following sections were originally published in these 4
+member documents of the Muldis D language specification, which still exist
+sans said material: L<Muldis::D::Ext::Temporal>,
+L<Muldis::D::Dialect::PTMD_STD>, L<Muldis::D::Dialect::HDMD_Perl6_STD>,
+L<Muldis::D::Dialect::HDMD_Perl5_STD>.
+
+=head1 LEGACY DESCRIPTION
+
+This current C<Temporal> document describes the system-defined I<Muldis D
+Temporal Extension>, which consists of temporal data types and operators,
+particularly calendar dates and intervals.  The bundled data types describe
+common kinds of temporal artifacts according to modern calendars.  They can
+represent a variety of precisions and epochs so that users can employ them
+in a way that most accurately represents what they actually know about
+their data.  Any types whose names start with C<TAI> are TAI temporal
+artifacts expressed simply as a count of seconds from a TAI epoch,
+and any whose names start with C<UTC> or C<Float> are based on
+year-month-day-hour-minute-second components in the Gregorian calendar,
+either the UTC time zone or a "floating" time zone.
+
+The I<Muldis D Temporal Extension> is expressly not meant to be complete by
+any means, as a solution for working with temporal data.  Rather it is
+meant to be "good enough" for many common uses.  Moreover it isn't intended
+to have a scope much greater than the temporal data handling abilities of
+the ISO/IEC 9075 (SQL) standard and the Perl L<DateTime> module.  In many
+situations, users may be better off ignoring this extension, and using
+Muldis D's core facilities for user-defined types and routines, and code an
+alternate temporal data solution that works best for them, building over
+Muldis D's basic integer or such types, or alternately using third-party
+Muldis D temporal extensions.  This current extension exists primarily to
+ease the porting of SQL databases to Muldis D, and save users accustomed to
+SQL's facilities and the Perl DateTime module's facilities from having to
+frequently reinvent the wheel.  The details of this Muldis D extension are
+typically just the same as those in ISO/IEC 9075 (SQL) section "4.6
+Datetimes and intervals", but with some alterations.  As with SQL and
+DateTime, dates and times are specified as YYYY.MM.DD.HH.II.SS+ in the
+proleptic Gregorian calendar, specifically the version with a year zero and
+negative year numbers, either in the UTC time-zone or floating / no-zone.
+Matters of "local time" or specifications of other time-zones or daylight
+savings time are not supported for encoding into values, due partly to
+various logical problems and complexity such as an inability to distinguish
+between duplicated times of day around a daylight savings adjustment.  If
+you want to work with "local time", you generally will have to convert to
+UTC on input and from UTC on output with the I<Muldis D Temporal
+Extension>; UTC is better for storage, local is maybe better for display.
+
+Now the general practice of working with calendar-centric temporal data is
+an imperfect process and can not be done with perfect mathematical
+precision.  This is partly because our temporal data in general comes from
+measurements of environmental cycles (such as rotations of the Earth,
+revolutions of the Earth's moon around it, and revolutions of the Earth
+around its sun), which not only are rounded approximations, but we also
+know for a fact that the actual amount of time these events takes slowly
+varies over time (such as that the rotation of the Earth is gradually
+slowing as the moon gradually drifts away from it each year).  Also our
+typical calendaring systems change over time, sometimes to deal with our
+improved ability to measure the environmental cycles or compensate for
+drift; witness for example a large part of the world's moving from the
+Julian to the Gregorian calendar.  So the best we have to work with in
+general will involve rounding, and sometimes a conceptually commutative or
+associative sequence of operations on temporal data may not yield an
+identical result from identical inputs when the operations are rearranged
+into a conceptually equivalent but different form; a simple example being
+adding or subtracting dates.  All the issues can be complicated.
+
+=head1 TYPE SUMMARY
+
+Following are all the data types described in this document, arranged in a
+type graph according to their proper sub|supertype relationships:
+
+    sys.std.Core.Type.Universal
+        sys.std.Core.Type.Scalar
+            sys.std.Core.Type.DHScalar
+
+                sys.std.Core.Type.Int
+                    sys.std.Core.Type.NNInt
+                        sys.std.Core.Type.PInt
+                            sys.std.Temporal.Type.PInt[12|31]
+                        sys.std.Temporal.Type.NNInt[23|59]
+
+                sys.std.Core.Type.Cat.DHScalarWP
+
+                    sys.std.Core.Type.Rat
+                        sys.std.Core.Type.NNRat
+                            sys.std.Temporal.Type.NNRatLT62
+
+                    # The following are all regular ordered scalar types.
+
+                    sys.std.Temporal.Type.TAIInstant
+                    sys.std.Temporal.Type.TAIDuration
+
+                    sys.std.Temporal.Type.UTCInstant
+                        sys.std.Temporal.Type.UTCDateTime
+                        sys.std.Temporal.Type.UTCDate
+                        sys.std.Temporal.Type.UTCTime
+
+                    sys.std.Temporal.Type.FloatInstant
+                        sys.std.Temporal.Type.FloatDateTime
+                        sys.std.Temporal.Type.FloatDate
+                        sys.std.Temporal.Type.FloatTime
+
+                    sys.std.Temporal.Type.UTCDuration
+
+This graph slice shows all of the temporal types that compose any mixin
+types, shown grouped under the mixin types that they compose:
+
+    sys.std.Core.Type.Universal
+
+        sys.std.Core.Type.Ordered
+
+            sys.std.Temporal.Type.TAIInstant
+            sys.std.Temporal.Type.TAIDuration
+            sys.std.Temporal.Type.UTCInstant
+            sys.std.Temporal.Type.FloatInstant
+            sys.std.Temporal.Type.UTCDuration
+
+        sys.std.Temporal.Type.Instant
+
+            sys.std.Temporal.Type.TAIInstant
+            sys.std.Temporal.Type.UTCInstant
+            sys.std.Temporal.Type.FloatInstant
+
+        sys.std.Temporal.Type.Duration
+
+            sys.std.Temporal.Type.TAIDuration
+            sys.std.Temporal.Type.UTCDuration
+
+=head1 DATA TYPES FOR TEMPORAL ARTIFACTS
+
+These non-core data types are all ordered scalar types.
+
+=head2 sys.std.Temporal.Type.PInt[12|31]
+
+C<PInt[12|31]> is a proper subtype of
+C<PInt> where all member values are not greater than 12|31.  Its default
+and minimum value is 1; its maximum value is 12|31.  The significance is
+that in proleptic Gregorian dates, the [month|month-day] portion is a
+positive integer not greater than 12|31.
+
+=head2 sys.std.Temporal.Type.NNInt[23|59]
+
+C<NNInt[23|59]> is a proper subtype of
+C<NNInt> where all member values are not greater than 23|59.  Its default
+and minimum value is 0; its maximum value is 23|59.  The significance is
+that in the time portion of proleptic Gregorian dates, the [hour|minute]
+portion is a non-negative integer not greater than 23|59.
+
+=head2 sys.std.Temporal.Type.NNRatLT62
+
+C<NNRatLT62> is a proper subtype of
+C<NNRat> where all member values are less than 62.  Its default and minimum
+value is 0; its maximum value is conceptually infinitessimally less than 62
+and practically impossible.  The significance is that in the time portion
+of proleptic Gregorian dates, the 'second' portion is a non-negative
+rational less than 62.  The cardinality of this type is infinity; to define
+a most-generalized finite C<NNRatLT62> subtype, you must specify the
+greatest magnitude value denominator of its C<ratio> possrep, that is, its
+maximum precision (that denominator is 10^9 if we're working to nanosecond
+precision).
+
+=head2 sys.std.Temporal.Type.TAIInstant
+
+A C<TAIInstant> is a single point in time
+which is specified with arbitrary precision in terms of atomic seconds
+with fractions.  That is, a C<TAIInstant> is defined as a point on the
+canonical continuous timeline of International Atomic Time (TAI; this is a
+perfectly linear scale with no discontinuities), specified by a scalar
+number of TAI seconds since the TAI epoch, which is exactly midnight at the
+start of January 1st of the year 1958 CE.  The C<TAIInstant> type
+explicitly composes the C<Instant> mixin type.
+
+A C<TAIInstant> has 1 system-defined possrep named C<tai_instant> which
+consists of 1 C<Rat>-typed attribute named C<seconds>.  The C<TAIInstant>
+type explicitly composes the C<Ordered> mixin type.  A C<TAIInstant> is
+a simple wrapper for a C<Rat> and all of its other details such as default
+and minimum and maximum values and cardinality and default ordering
+algorithm all correspond directly.  But C<TAIInstant> is explicitly
+disjoint from C<Rat> due to having a different intended interpretation.
+
+The C<TAIInstant> type is intended more for use with system event
+time-stamps or sensitive scientific applications and is not necessarily the
+best choice for common human-specified temporal artifacts according to
+various calendars, since there is no fixed conversion rate between them in
+the general case that includes future dates, and also calendar-based
+artifacts may be very non-specific; see also the C<UTCInstant> data type,
+which is defined in terms of calendars.
+
+=head2 sys.std.Temporal.Type.TAIDuration
+
+A C<TAIDuration> is a single amount of
+time, which is specified with arbitrary precision in terms of the same
+units as a C<TAIInstant> is structured with.  A C<TAIDuration> is not fixed
+to any point in time.  A C<TAIDuration> is the result type of taking the
+difference between two C<TAIInstant> values, but it is not defined in terms
+of said two values.  The C<TAIDuration> type explicitly
+composes the C<Duration> mixin type.  A
+C<TAIDuration> has 1 system-defined possrep named C<tai_duration> which
+consists of 1 C<Rat>-typed attribute named C<seconds>.  The C<TAIDuration>
+type explicitly composes the C<Ordered> mixin type.  A C<TAIDuration> is
+a simple wrapper for a C<Rat> in all ways as per C<TAIInstant>.  But
+C<TAIDuration> is explicitly disjoint from C<TAIInstant> due to having a
+different intended interpretation.  The C<TAIDuration> type is intended
+more for benchmarking or scientific applications and is not intended for
+human-specified calendar based artifacts; again see the C<UTCDuration> data
+type for alternatives.
+
+=head2 sys.std.Temporal.Type.UTCInstant
+
+A C<UTCInstant> is a single point in time,
+or a periodic multiplicity of points in time, which is specified with
+arbitrary precision using a set of unit quantities involving multiple
+units, where the units do not generally have a fixed conversion rate with
+each other.  The C<UTCInstant> type explicitly composes the C<Instant>
+mixin type.  A C<UTCInstant> is defined against the proleptic Gregorian
+calendar and uses these 6 units: terrestrial year, month within year, day
+within month, hour within day, minute within hour, second and possibly
+fraction of a second within minute; the only fixed conversion rates are: 1
+year is 12 months, 1 hour is 60 minutes.  A C<UTCInstant> is defined
+against the UTC time-zone specifically, so you use it when you I<do know>
+that the instant you are specifying was experienced in the UTC time-zone
+with the specified unit values; if you are otherwise working according to
+your local time-zone, you would be selecting your C<UTCInstant> values in
+terms of a time-zone offset (and daylight-savings time offset if
+applicable) from your local time.
+
+A C<UTCInstant> has 1 system-defined possrep whose name is C<instant>,
+which has 6 attributes: C<year> (a C<maybe_of.Int>), C<month> (a
+C<maybe_of.PInt12>), C<day> (a C<maybe_of.PInt31>), C<hour> (a
+C<maybe_of.NNInt23>), C<minute> (a C<maybe_of.NNInt59>), C<second> (a
+C<maybe_of.NNRatLT62>).  For each attribute, that attribute should be a
+C<Just> if a quanity in that unit is known, and it should be C<Nothing>
+if there is no applicable or known quantity in that unit.  The C<year>
+values greater than zero are CE, those less than zero are BCE.  The
+C<month> value C<1> corresponds to the month of January, and C<12>
+corresponds to the month of December.  The value of C<day> is further
+restricted depending on the combined values of C<year> and C<month>, such
+that all 3 together may only represent a valid date of the proleptic
+Gregorian calendar (taking into account leap-days); so for example you
+can't select April 31st or February 30th.  The value of C<second> is
+further restricted as per C<day>, as leap-seconds are only valid on certain
+days, and perhaps only when the hour-minute is 23-59.  These further
+restrictions do not apply if any of the attributes needed to calculate
+whether they apply are C<Nothing>.
+
+The default value of C<UTCInstant> is exactly midnight at the start of
+January 1st of the year 1 CE (which also happens to be the proleptic
+Gregorian calendar's epoch); its minimum and maximum values are
+conceptually infinities and practically impossible.  The cardinality of
+this type is infinity; to define a most-generalized finite C<UTCInstant>
+subtype, you must specify the earliest and latest dates it includes
+(minimally, the earliest and latest C<year>), as well as the granularity of
+the type as a fraction of a second (minimally, the largest value
+denominator for C<second>).
+
+The C<UTCInstant> type explicitly composes the C<Ordered> mixin type.
+The C<UTCInstant> type has a default ordering algorithm; for 2 distinct
+C<UTCInstant> values, the earlier value is ordered before the later value.
+To make full ordering of C<UTCInstant> values possible and deterministic
+(though semi-meaningless) in the face of unknown/inapplicable attributes;
+the algorithm works like this: 1. ordering is done numerically one
+attribute at a time, from the largest units to the smallest; 2. for each
+attribute, the C<Nothing> value will order before any C<Just> value.
+
+=head2 sys.std.Temporal.Type.UTCDateTime
+
+A C<UTCDateTime> is a single specific
+time on a specific date, with precision to arbitrary fractions of a second.
+A C<UTCDateTime> is a proper subtype of C<UTCInstant> where all 6
+attributes of its C<instant> possrep have C<Just> / known values.  A
+C<UTCDateTime> adds 1 system-defined possrep whose name is C<datetime>,
+which has 6 attributes: C<year> (an C<Int>), C<month> (a C<PInt12>), C<day>
+(a C<PInt31>), C<hour> (a C<NNInt23>), C<minute> (a C<NNInt59>), C<second>
+(a C<NNRatLT62>).  The default and minimum and maximum values are the same
+as for C<UTCInstant>.
+
+=head2 sys.std.Temporal.Type.UTCDate
+
+A C<UTCDate> is a single specific
+terrestrial day, at no particular time of day.  A C<UTCDate> is a proper
+subtype of C<UTCInstant> where the 3 attributes of its C<instant> possrep
+named [C<year>, C<month>, C<day>] have C<Just> / known values, and the
+other 3 C<instant> possrep attributes each have the C<Nothing> / unknown
+value.  A C<UTCDate> adds 1 system-defined possrep whose name is C<date>,
+which has 3 attributes: C<year> (an C<Int>), C<month> (a C<PInt12>), C<day>
+(a C<PInt31>).  The default value of C<UTCDate> is January 1st of the year
+1 CE; its minimum and maximum values are conceptually infinities and
+practically impossible.  The cardinality of this type is infinity; to
+define a most-generalized finite C<UTCDate> subtype, you must specify the
+earliest and latest dates it includes (minimally, the earliest and latest
+C<year>).
+
+=head2 sys.std.Temporal.Type.UTCTime
+
+A C<UTCTime> is a single specific time
+that isn't on any day in particular (or alternately that is repeating on
+multiple days), with a precision to arbitrary fractions of a second; its
+allowed range is between zero seconds (inclusive) and 1 terrestrial day
+(exclusive).  A C<UTCTime> is a proper subtype of C<UTCInstant> where the 3
+attributes of its C<instant> possrep named [C<hour>, C<minute>, C<second>]
+have C<Just> / known values, and the other 3 C<instant> possrep
+attributes each have the C<Nothing> / unknown value.  A C<UTCTime> adds 1
+system-defined possrep whose name is C<time>, which has 3 attributes:
+C<hour> (a C<NNInt23>), C<minute> (a C<NNInt59>), C<second> (a
+C<NNRatLT62>).  The default and minimum value of C<UTCTime> is exactly
+midnight at the start of its day (all of its C<time> possrep attributes are
+zero-valued); its maximum value is conceptually infinitessimally less than
+the midnight at the end of its day and practically impossible.  The
+cardinality of this type is infinity; to define a most-generalized finite
+C<UTCTime> subtype, you must specify the granularity of the type as a
+fraction of a second (minimally, the largest value denominator for
+C<second>).
+
+=head2 sys.std.Temporal.Type.FloatInstant
+
+A C<FloatInstant> is exactly the same as
+C<UTCInstant>, but that it is not defined against any specific time-zone,
+but rather is floating; you use it when you I<do not know> in what
+time-zone the specified date+time is supposed to refer to (it was just
+I<somewhere>), or when that detail is not significant.  The C<FloatInstant>
+type explicitly composes the C<Instant> mixin type.  The C<FloatInstant>
+type explicitly composes the C<Ordered> mixin type.  The C<FloatInstant>
+type is disjoint from the C<UTCInstant> type, but all of its details save
+its name and one aspect of its interpretation (representation, cardinality,
+default values, ordering algorithm, etc) are identical.
+
+=head2 sys.std.Temporal.Type.FloatDateTime
+
+C<FloatDateTime> is to C<UTCDateTime>
+as C<FloatInstant> is to C<UTCInstant>.
+
+=head2 sys.std.Temporal.Type.FloatDate
+
+C<FloatDate> is to C<UTCDate> as C<FloatInstant> is to C<UTCInstant>.
+
+=head2 sys.std.Temporal.Type.FloatTime
+
+C<FloatTime> is to C<UTCTime> as C<FloatInstant> is to C<UTCInstant>.
+
+=head2 sys.std.Temporal.Type.UTCDuration
+
+A C<UTCDuration> is a single amount of
+time, which is specified with arbitrary precision using 6 quantities in the
+same units as a C<UTCInstant> is structured with.  It is not fixed to any
+date or time and is agnostic to the calendar, other than the interpretation
+of units' size.  A C<UTCDuration> is the result type of taking the
+difference between two C<UTCInstant> values or between two C<FloatInstant>
+values, but it is not defined in terms of said two values.  The
+C<UTCDuration> type explicitly composes the C<Duration> mixin type.
+
+A C<UTCDuration> has 1 system-defined possrep whose name is C<duration>,
+which has 6 attributes: C<years>, C<months>, C<days>, C<hours>, C<minutes>,
+(all 5 each a C<maybe_of.Int>), C<seconds> (a C<maybe_of.Rat>).  Each
+attribute value is C<Nothing> when it is unknown or not applicable, and a
+C<Just> when it is known and applicable, as per a C<UTCInstant>.
+
+The default value of C<UTCDuration> is zero; its minimum and maximum values
+are conceptually infinities and practically impossible.  The cardinality of
+this type is infinity; to define a most-generalized finite C<UTCDuration>
+subtype, you must specify the maximum amount of time that its values may
+be, plus the granularity of the type in fractions of a second; in other
+words, you specify C<seconds> as per a C<Rat> and the other attributes as
+per C<Int>.
+
+The C<UTCDuration> type explicitly composes the C<Ordered> mixin type.
+The C<UTCDuration> type has a default ordering algorithm which is
+structurally the same as for C<UTCInstant>: 1. ordering is done numerically
+one attribute at a time, from the largest units to the smallest; 2. for
+each attribute, the C<Nothing> value will order before any C<Just> value.
+However, because the unit values are unconstrained, this algorithm will
+sort [0 months and 40 days] before [1 month and 0 days] even though common
+sense says the second should be before the first.  So for ordering to make
+sense, either in general leave all attributes C<Nothing> except one
+(recommended), or otherwise be careful to just set compatible attribute
+values.
+
+=head1 FUNCTIONS IMPLEMENTING VIRTUAL ORDERED FUNCTIONS
+
+=head2 sys.std.Temporal.TAIInstant.order
+
+C<< function order (Order <--
+topic : TAIInstant, other : TAIInstant, misc_args? : Tuple,
+is_reverse_order? : Bool) implements sys.std.Core.Ordered.order {...} >>
+
+This is a (total) C<order-determination> function specific to
+C<TAIInstant>.
+
+=head2 sys.std.Temporal.TAIDuration.order
+
+C<< function order (Order <--
+topic : TAIDuration, other : TAIDuration, misc_args? : Tuple,
+is_reverse_order? : Bool) implements sys.std.Core.Ordered.order {...} >>
+
+This is a (total) C<order-determination> function specific to
+C<TAIDuration>.
+
+=head2 sys.std.Temporal.UTCInstant.order
+
+C<< function order (Order <--
+topic : UTCInstant, other : UTCInstant, misc_args? : Tuple,
+is_reverse_order? : Bool) implements sys.std.Core.Ordered.order {...} >>
+
+This is a (total) C<order-determination> function specific to
+C<UTCInstant>.
+
+=head2 sys.std.Temporal.FloatInstant.order
+
+C<< function order (Order <--
+topic : FloatInstant, other : FloatInstant, misc_args? : Tuple,
+is_reverse_order? : Bool) implements sys.std.Core.Ordered.order {...} >>
+
+This is a (total) C<order-determination> function specific to
+C<FloatInstant>.
+
+=head2 sys.std.Temporal.UTCDuration.order
+
+C<< function order (Order <--
+topic : UTCDuration, other : UTCDuration, misc_args? : Tuple,
+is_reverse_order? : Bool) implements sys.std.Core.Ordered.order {...} >>
+
+This is a (total) C<order-determination> function specific to
+C<UTCDuration>.
+
+=head1 FUNCTIONS IMPLEMENTING VIRTUAL INSTANT FUNCTIONS
+
+=head1 TAIInstant
+
+=head2 sys.std.Temporal.TAIInstant.diff
+
+C<< function diff (TAIDuration <-- minuend : TAIInstant,
+subtrahend : TAIInstant) implements sys.std.Temporal.Instant.diff {...} >>
+
+This function results in the duration-typed difference when its
+instant-typed C<subtrahend> argument is subtracted from its instant-typed
+C<minuend> argument.  The result is the amount of time between the 2
+arguments, which may be positive or negative depending on which argument
+was earlier.
+
+=head2 sys.std.Temporal.TAIInstant.abs_diff
+
+C<< function abs_diff (TAIDuration <-- topic : TAIInstant,
+other : TAIInstant) implements sys.std.Temporal.Instant.abs_diff {...} >>
+
+This symmetric function results in the absolute difference between its 2
+arguments.  The result is the amount of time between the 2 arguments, which
+is always non-negative.
+
+=head2 sys.std.Temporal.TAIInstant.later
+
+C<< function later (TAIInstant <-- instant : TAIInstant,
+duration : TAIDuration) implements sys.std.Temporal.Instant.later {...} >>
+
+This function results in the instant that is later than its C<instant>
+argument by the amount of time in the C<duration> argument.
+
+=head2 sys.std.Temporal.TAIInstant.earlier
+
+C<< function earlier (TAIInstant <-- instant : TAIInstant,
+duration : TAIDuration) implements sys.std.Temporal.Instant.earlier {...}>>
+
+This function results in the instant that is earlier than its C<instant>
+argument by the amount of time in the C<duration> argument.
+
+=head1 UTCInstant
+
+=head2 sys.std.Temporal.UTCInstant.diff
+
+C<< function diff (UTCDuration <-- minuend : UTCInstant,
+subtrahend : UTCInstant) implements sys.std.Temporal.Instant.diff {...} >>
+
+This function results in the duration-typed difference when its
+instant-typed C<subtrahend> argument is subtracted from its instant-typed
+C<minuend> argument.  The result is the amount of time between the 2
+arguments, which may be positive or negative depending on which argument
+was earlier.
+
+=head2 sys.std.Temporal.UTCInstant.abs_diff
+
+C<< function abs_diff (UTCDuration <-- topic : UTCInstant,
+other : UTCInstant) implements sys.std.Temporal.Instant.abs_diff {...} >>
+
+This symmetric function results in the absolute difference between its 2
+arguments.  The result is the amount of time between the 2 arguments, which
+is always non-negative.
+
+=head2 sys.std.Temporal.UTCInstant.later
+
+C<< function later (UTCInstant <-- instant : UTCInstant,
+duration : UTCDuration) implements sys.std.Temporal.Instant.later {...} >>
+
+This function results in the instant that is later than its C<instant>
+argument by the amount of time in the C<duration> argument.
+
+=head2 sys.std.Temporal.UTCInstant.earlier
+
+C<< function earlier (UTCInstant <-- instant : UTCInstant,
+duration : UTCDuration) implements sys.std.Temporal.Instant.earlier {...}>>
+
+This function results in the instant that is earlier than its C<instant>
+argument by the amount of time in the C<duration> argument.
+
+=head1 FloatInstant
+
+=head2 sys.std.Temporal.FloatInstant.diff
+
+C<< function diff (UTCDuration <-- minuend : FloatInstant,
+subtrahend : FloatInstant) implements sys.std.Temporal.Instant.diff {...}>>
+
+This function results in the duration-typed difference when its
+instant-typed C<subtrahend> argument is subtracted from its instant-typed
+C<minuend> argument.  The result is the amount of time between the 2
+arguments, which may be positive or negative depending on which argument
+was earlier.
+
+=head2 sys.std.Temporal.FloatInstant.abs_diff
+
+C<< function abs_diff (UTCDuration <-- topic : FloatInstant,
+other : FloatInstant) implements sys.std.Temporal.Instant.abs_diff {...} >>
+
+This symmetric function results in the absolute difference between its 2
+arguments.  The result is the amount of time between the 2 arguments, which
+is always non-negative.
+
+=head2 sys.std.Temporal.FloatInstant.later
+
+C<< function later (FloatInstant <-- instant : FloatInstant,
+duration : UTCDuration) implements sys.std.Temporal.Instant.later {...} >>
+
+This function results in the instant that is later than its C<instant>
+argument by the amount of time in the C<duration> argument.
+
+=head2 sys.std.Temporal.FloatInstant.earlier
+
+C<< function earlier (FloatInstant <-- instant : FloatInstant,
+duration : UTCDuration) implements sys.std.Temporal.Instant.earlier {...}>>
+
+This function results in the instant that is earlier than its C<instant>
+argument by the amount of time in the C<duration> argument.
+
+=head1 FUNCTIONS IMPLEMENTING VIRTUAL DURATION FUNCTIONS
+
+=head1 TAIDuration
+
+=head2 sys.std.Temporal.TAIDuration.abs
+
+C<< function abs (TAIDuration <-- topic : TAIDuration)
+implements sys.std.Temporal.Duration.abs {...} >>
+
+This function results in the absolute value of its argument.
+
+=head2 sys.std.Temporal.TAIDuration.sum
+
+C<< function sum (TAIDuration <-- topic? : bag_of.TAIDuration)
+implements sys.std.Temporal.Duration.sum {...} >>
+
+This function results in the sum of the N element values of its argument;
+it is a reduction operator that recursively takes each pair of input values
+and adds (which is both commutative and associative) them together until
+just one is left, which is the result.  If C<topic> has zero values, then
+C<sum> results in the duration zero, which is the identity value for
+addition.
+
+=head2 sys.std.Temporal.TAIDuration.diff
+
+C<< function diff (TAIDuration <-- minuend : TAIDuration,
+subtrahend : TAIDuration) implements sys.std.Temporal.Duration.diff {...}>>
+
+This function results in the difference when its C<subtrahend> argument is
+subtracted from its C<minuend> argument.
+
+=head2 sys.std.Temporal.TAIDuration.abs_diff
+
+C<< function abs_diff (TAIDuration <-- topic : TAIDuration,
+other : TAIDuration) implements sys.std.Temporal.Duration.abs_diff {...} >>
+
+This symmetric function results in the absolute difference between its 2
+arguments.
+
+=head1 UTCDuration
+
+Note that all inter-duration operators in general will just do the math on
+each corresponding attribute individually and not normalize between
+attributes.  This is subject to be revised in the future.
+
+=head2 sys.std.Temporal.UTCDuration.abs
+
+C<< function abs (UTCDuration <-- topic : UTCDuration)
+implements sys.std.Temporal.Duration.abs {...} >>
+
+This function results in the absolute value of its argument.
+
+=head2 sys.std.Temporal.UTCDuration.sum
+
+C<< function sum (UTCDuration <-- topic? : bag_of.UTCDuration)
+implements sys.std.Temporal.Duration.sum {...} >>
+
+This function results in the sum of the N element values of its argument;
+it is a reduction operator that recursively takes each pair of input values
+and adds (which is both commutative and associative) them together until
+just one is left, which is the result.  If C<topic> has zero values, then
+C<sum> results in the duration zero, which is the identity value for
+addition.
+
+=head2 sys.std.Temporal.UTCDuration.diff
+
+C<< function diff (UTCDuration <-- minuend : UTCDuration,
+subtrahend : UTCDuration) implements sys.std.Temporal.Duration.diff {...}>>
+
+This function results in the difference when its C<subtrahend> argument is
+subtracted from its C<minuend> argument.
+
+=head2 sys.std.Temporal.UTCDuration.abs_diff
+
+C<< function abs_diff (UTCDuration <-- topic : UTCDuration,
+other : UTCDuration) implements sys.std.Temporal.Duration.abs_diff {...} >>
+
+This symmetric function results in the absolute difference between its 2
+arguments.
+
+=head1 FUNCTIONS FOR CONVERSION BETWEEN UTC AND TAI
+
+These functions convert between C<UTCDateTime> values and equal or nearly
+equal C<TAIInstant> values.  I<WARNING:  These functions may not produce
+consistent results over time when dealing with future dates because it is
+unknown in advance when leap seconds will be added to the UTC time scale,
+and TAI has no leap seconds.>
+
+=head2 sys.std.Temporal.UTCInstant.UTC_from_TAI
+
+C<< function UTC_from_TAI (UTCDateTime <-- tai : TAIInstant) {...} >>
+
+This selector function results in the C<UTCDateTime> value that is
+conceptually equal to its C<TAIInstant> argument, insofar as relevant leap
+seconds are known.
+
+=head2 sys.std.Temporal.UTCInstant.TAI_from_UTC
+
+C<< function TAI_from_UTC (TAIInstant <-- utc : UTCDateTime) {...} >>
+
+This selector function results in the C<TAIInstant> value that is
+conceptually equal to its C<UTCDateTime> argument, insofar as relevant leap
+seconds are known.
+
+=head1 SYSTEM-SERVICES IMPLEMENTING VIRTUALS FOR CURRENT DATES AND TIMES
+
+These system-service routines provide ways to get the current date or time
+from the system.
+
+=head2 sys.std.Temporal.TAIInstant.fetch_curr_instant
+
+C<system-service fetch_curr_instant (&target : TAIInstant)
+implements sys.std.Temporal.Instant.fetch_curr_instant {...}>
+
+This system-service routine will update the variable supplied as its
+C<target> argument so that it holds the value of the current TAI instant as
+taken with the full precision that the implementation's system clock or
+used time server supports.
+
+=head2 sys.std.Temporal.UTCInstant.fetch_curr_datetime
+
+C<system-service fetch_curr_datetime (&target : UTCDateTime)
+implements sys.std.Temporal.Instant.fetch_curr_instant {...}>
+
+This system-service routine will update the variable supplied as its
+C<target> argument so that it holds the value of the current UTC date and
+time (YMDHIS) as taken with the full precision that the implementation's
+system clock or used time server supports.
+
+=head2 sys.std.Temporal.UTCInstant.fetch_curr_date
+
+C<system-service fetch_curr_date (&target : UTCDate)
+implements sys.std.Temporal.Instant.fetch_curr_instant {...}>
+
+This system-service routine is the same as
+C<sys.std.Temporal.UTCInstant.fetch_curr_date> except that it only
+produces an instant value with the date (YMD) attributes set.
+
+=head2 sys.std.Temporal.UTCInstant.fetch_curr_time
+
+C<system-service fetch_curr_time (&target : UTCTime)
+implements sys.std.Temporal.Instant.fetch_curr_instant {...}>
+
+This system-service routine is the same as
+C<sys.std.Temporal.UTCInstant.fetch_curr_date> except that it only
+produces an instant value with the time (HIS) attributes set; it still
+retains the full precision.
+
+=head2 sys.std.Temporal.FloatInstant.fetch_curr_datetime
+
+C<system-service fetch_curr_datetime (&target : FloatDateTime)
+implements sys.std.Temporal.Instant.fetch_curr_instant {...}>
+
+This system-service routine will update the variable supplied as its
+C<target> argument so that it holds the value of the current floating date
+and time (YMDHIS) as taken with the full precision that the
+implementation's system clock or used time server supports.
+
+=head2 sys.std.Temporal.FloatInstant.fetch_curr_date
+
+C<system-service fetch_curr_date (&target : FloatDate)
+implements sys.std.Temporal.Instant.fetch_curr_instant {...}>
+
+This system-service routine is the same as
+C<sys.std.Temporal.FloatInstant.fetch_curr_date> except that it only
+produces an instant value with the date (YMD) attributes set.
+
+=head2 sys.std.Temporal.FloatInstant.fetch_curr_time
+
+C<system-service fetch_curr_time (&target : FloatTime)
+implements sys.std.Temporal.Instant.fetch_curr_instant {...}>
+
+This system-service routine is the same as
+C<sys.std.Temporal.FloatInstant.fetch_curr_date> except that it only
+produces an instant value with the time (HIS) attributes set; it still
+retains the full precision.
+
+=head1 FOR ALL 3 STD - STANDARD SYNTAX EXTENSIONS
+
+The C<standard_syntax_extensions> pragma declares which optional portions
+of the Muldis D grammar a programmer may employ with their Muldis D code.
+
+There is currently 1 specified standard syntax extension: C<temporal>.
+These are all mutually independent and any or all may be used at once.
+
+=head2 temporal
+
+The C<temporal> standard syntax extension is closely related to the
+L<Muldis::D::Ext::Temporal> language extension, and it constitutes special
+syntax for its data types; in the future it may improve the type syntax or
+add syntax for operators.
+
+When the C<standard_syntax_extensions> pragma includes C<temporal> in its
+list, then the following grammar extensions are in effect:
+
+    <value__code_as_data> ::=
+          ...
+        | <value__sse_temporal>
+
+    <value_kind> ::=
+          ...
+        | <value_kind__sse_temporal>
+
+    <value_payload> ::=
+          ...
+        | <value_payload__sse_temporal>
+
+=head1 PTMD_STD - TEMPORAL EXTENSION OPAQUE VALUE LITERALS
+
+The C<temporal> standard syntax extension is closely related to the
+L<Muldis::D::Ext::Temporal> language extension, and it constitutes special
+syntax for its data types; in the future it may improve the type syntax or
+add syntax for operators.
+
+Grammar:
+
+    <value__sse_temporal> ::=
+          ...
+        | <TAIInstant>
+        | <TAIDuration>
+        | <UTCInstant>
+        | <FloatInstant>
+        | <UTCDuration>
+
+    <value_kind__sse_temporal> ::=
+          ...
+        | TAIInstant
+        | TAIDuration
+        | UTC [Instant | DateTime | Date | Time]
+        | Float [Instant | DateTime | Date | Time]
+        | UTCDuration
+
+    <value_payload__sse_temporal> ::=
+          ...
+        | <TAIInstant_payload>
+        | <TAIDuration_payload>
+        | <UTCInstant_payload>
+        | <FloatInstant_payload>
+        | <UTCDuration_payload>
+
+=head2 PTMD_STD - Date and Time Literals
+
+Grammar:
+
+    <TAIInstant> ::=
+        TAIInstant ':' <unspace>
+        [<type_name> ':' <unspace>]?
+        <TAIInstant_payload>
+
+    <TAIInstant_payload> ::=
+        <Rat_payload>
+
+    <TAIDuration> ::=
+        TAIDuration ':' <unspace>
+        [<type_name> ':' <unspace>]?
+        <TAIDuration_payload>
+
+    <TAIDuration_payload> ::=
+        <Rat_payload>
+
+    <UTCInstant> ::=
+        UTC [Instant | DateTime | Date | Time] ':' <unspace>
+        [<type_name> ':' <unspace>]?
+        <UTCInstant_payload>
+
+    <UTCInstant_payload> ::=
+        <UTCDuration_payload>
+
+    <FloatInstant> ::=
+        Float [Instant | DateTime | Date | Time] ':' <unspace>
+        [<type_name> ':' <unspace>]?
+        <FloatInstant_payload>
+
+    <FloatInstant_payload> ::=
+        <UTCDuration_payload>
+
+    <UTCDuration> ::=
+        UTCDuration ':' <unspace>
+        [<type_name> ':' <unspace>]?
+        <UTCDuration_payload>
+
+    <UTCDuration_payload> ::=
+          <num_max_col_val> ';' <unspace> <utc_duration_body>
+        | <d_utc_duration_body>
+
+    <utc_duration_body> ::=
+        '[' <ws>?
+            [<int_body>? [<ws>? ',' <ws>?]] ** 5
+            <ws>? ',' <ws>? <rat_body>?
+        <ws>? ']'
+
+    <d_utc_duration_body> ::=
+        '[' <ws>?
+            [<d_int_body>? [<ws>? ',' <ws>?]] ** 5
+            <ws>? ',' <ws>? <d_rat_body>?
+        <ws>? ']'
+
+A C<TAIInstant> node represents a single point in time which is specified
+in terms of atomic seconds; it is a rational numeric type, that is disjoint
+from both C<Rat> and C<TAIDuration>.  This node is interpreted as a Muldis
+D C<sys.std.Temporal.Type.TAIInstant> value as follows:  A
+C<TAIInstant_payload> is formatted and interpreted in the same way as a
+C<Rat_payload>.
+
+A C<TAIDuration> node represents a single amount of time (the difference
+between two instants) which is specified in terms of atomic seconds; it is
+a rational numeric type, that is disjoint from both C<Rat> and
+C<TAIInstant>.  This node is interpreted as a Muldis D
+C<sys.std.Temporal.Type.TAIDuration> value as follows:  A
+C<TAIDuration_payload> is formatted and interpreted in the same way as a
+C<Rat_payload>.
+
+A C<UTCInstant> node represents an "instant"/"datetime" value that is
+affiliated with the UTC time-zone.  This node is interpreted as a Muldis D
+C<sys.std.Temporal.Type.UTCInstant> value whose C<instant> possrep
+attribute values are defined as follows:
+
+A C<UTCInstant_payload> consists mainly of a bracket-delimited sequence of
+6 comma-separated elements, where each element is either a valid numeric
+literal or is completely absent.  The 6 elements correspond in order to
+the 6 attributes: C<year>, C<month>, C<day>, C<hour>, C<minute>, C<second>.
+For each element that is absent or defined, the corresponding attribute has
+the C<Nothing> or a C<Just> value, respectively.  For each of the first 5
+elements, when it is defined, it must qualify as a valid I<body> part of an
+C<Int> node; for the 6th element, when it is defined, it must qualify as a
+valid I<body> part of a C<Rat> node.
+
+Fundamentally each C<UTCInstant> node element is formatted and interpreted
+like an C<Int> or C<Rat> node, and any similarities won't be repeated here.
+
+A defined C<year> may be any integer, each of [C<month>, C<day>] must be a
+positive integer, each of [C<hour>, C<minute>] must be a non-negative
+integer, and C<second> must be a non-negative rational number.  If all 6
+attributes are defined, then the new C<UTCInstant> value is also a
+C<UTCDateTime>; if just the first 3 or last 3 are defined, then the value
+is not a C<UTCDateTime> but rather a C<UTCDate> or C<UTCTime>,
+respectively; if any other combination of attributes are defined, then the
+value is just a C<UTCInstant> and not of any of the other 3 subtypes.
+
+If the C<value_kind> of a C<value> node is C<UTCDateTime> or C<UTCDate> or
+C<UTCTime> rather than C<UTCInstant>, then the C<value> node is interpreted
+simply as a C<UTCInstant> node whose C<type_name> is C<UTCDateTime> or
+C<UTCDate> or C<UTCTime>, and the allowed I<body> is appropriately further
+restricted.
+
+A C<FloatInstant> node represents an "instant"/"datetime" value that is
+"floating" / not affiliated with any time-zone.  This node is interpreted
+as a Muldis D C<sys.std.Temporal.Type.FloatInstant> value in an identical
+fashion to how a C<UTCInstant> node is interpreted, whose format it
+completely shares.  Likewise regarding C<Float[DateTime|Date|Time]>.
+
+A C<UTCDuration> node represents a duration value, an amount of time, which
+is not fixed to any instant in time.  This node is interpreted as a Muldis
+D C<sys.std.Temporal.Type.UTCDuration> value whose C<duration> possrep
+attribute values are defined as follows:
+
+A C<UTCDuration_payload> consists mainly of a bracket-delimited sequence of
+6 comma-separated elements, where each element is either a valid numeric
+literal or is completely absent.  The 6 elements correspond in order to the
+6 attributes: C<years>, C<months>, C<days>, C<hours>, C<minutes>,
+C<seconds>.  For each element that is absent or defined, the corresponding
+attribute has the C<Nothing> or a C<Just> value, respectively.  For each
+of the first 5 elements, when it is defined, it must qualify as a valid
+I<body> part of an C<Int> node; for the 6th element, when it is defined, it
+must qualify as a valid I<body> part of a C<Rat> node.
+
+Mostly a C<UTCDuration> is formatted and interpreted like a C<UTCInstant>
+node, and any similarities won't be repeated here.
+
+A defined [C<years>, C<months>, C<days>, C<hours>, C<minutes>] may be any
+integer, and C<seconds> may be any rational number.  I<Currently,
+C<UTCDuration> has no system-defined subtypes, but that may change later.>
+
+See also the definition of the catalog data type
+C<sys.std.Core.Type.Cat.OVLScaValExprNodeSet>, a tuple of which is what
+every kind of C<value__sse_temporal> node distills to when it is beneath
+the context of a C<depot> node, as it describes some semantics.
+
+Examples:
+
+    TAIInstant:1235556432.0
+
+    TAIInstant:854309115.0
+
+    TAIDuration:3600.0
+
+    TAIDuration:-50.0
+
+    TAIDuration:3.14159
+
+    TAIDuration:b;1011101101*10^-11011
+
+    TAIDuration:1/43
+
+    UTCInstant:[1964,10,16,16,12,47.5] #`a UTCDateTime`#
+
+    UTCInstant:[2002,12,6,,,] #`a UTCDate`#
+
+    UTCInstant:[,,,14,2,29.0] #`a UTCTime`#
+
+    FloatInstant:[2003,4,5,2,,] #`min,sec unknown or N/A`#
+
+    FloatInstant:[1407,,,,,] #`just know its sometime in 1407`#
+
+    UTCDuration:[3,5,1,6,15,45.000012]
+
+=head1 HDMD_Perl6_STD - TEMPORAL EXTENSION OPAQUE VALUE LITERALS
+
+The C<temporal> standard syntax extension is closely related to the
+L<Muldis::D::Ext::Temporal> language extension, and it constitutes special
+syntax for its data types; in the future it may improve the type syntax or
+add syntax for operators.
+
+When this extension is active, there exist 5 additional varieties of
+C<value> node:  C<TAIInstant>, C<TAIDuration>,
+C<UTCInstant>, C<FloatInstant>, C<UTCDuration>.  Also,
+between these 5 varieties, these 11 additional values are allowed for
+C<value>'s C<value_kind> attribute:  C<TAIInstant>, C<TAIDuration>,
+C<UTC[Instant|DateTime|Date|Time]>,
+C<Float[Instant|DateTime|Date|Time]>, C<UTCDuration>.  For all of these
+varieties, the C<value_kind> may not be omitted.
+
+=head2 HDMD_Perl6_STD - Date and Time Literals
+
+A C<TAIInstant> node represents a single point in time which is specified
+in terms of atomic seconds.  This node is interpreted as a Muldis D
+C<sys.std.Temporal.Type.TAIInstant> value as follows:  The payload must be
+a Perl C<Instant>, which is mapped directly.
+
+A C<TAIDuration> node represents a single amount of time (the difference
+between two instants) which is specified in terms of atomic seconds.  This
+node is interpreted as a Muldis D C<sys.std.Temporal.Type.TAIDuration>
+value as follows:  The payload must be a Perl C<Duration>, which is mapped
+directly.
+
+A C<UTCInstant> node represents an "instant"/"datetime" value that is
+affiliated with the UTC time-zone.  This node is interpreted as a Muldis D
+C<sys.std.Temporal.Type.UTCInstant> value whose C<instant> possrep
+attribute values are defined as follows:
+
+The payload must be a Perl C<Seq|Array> with 6 elements, where each element
+may be either undefined or defined; or if fewer than 6 elements are
+provided, the C<Seq|Array> will be implicitly extended to 6, filling with
+undefs.  The 6 payload elements correspond in order, from the lowest to the
+highest indexed, to the 6 attributes: C<year>, C<month>, C<day>, C<hour>,
+C<minute>, C<second>.  For each payload element that Perl considers
+undefined or defined, the corresponding attribute has the C<Nothing> or a
+C<Just> value, respectively.  For each of the first 5 elements, when it
+is defined, it must qualify as a valid payload for an C<Int> node; for
+the 6th element, when it is defined, it must qualify as a valid payload for
+a C<Rat> node.
+
+A defined C<year> may be any integer, each of [C<month>, C<day>] must be a
+positive integer, each of [C<hour>, C<minute>] must be a non-negative
+integer, and C<second> must be a non-negative rational number.  If all 6
+attributes are defined, then the new C<UTCInstant> value is also a
+C<UTCDateTime>; if just the first 3 or last 3 are defined, then the value
+is not a C<UTCDateTime> but rather a C<UTCDate> or C<UTCTime>,
+respectively; if any other combination of attributes are defined, then the
+value is just a C<UTCInstant> and not of any of the other 3 subtypes.
+
+A C<FloatInstant> node represents an "instant"/"datetime" value that is
+"floating" / not affiliated with any time-zone.  This node is interpreted
+as a Muldis D C<sys.std.Temporal.Type.FloatInstant> value in an identical
+fashion to how a C<UTCInstant> node is interpreted, whose format it
+completely shares.  Likewise regarding C<Float[DateTime|Date|Time]>.
+
+A C<UTCDuration> node represents a duration value, an amount of time, which
+is not fixed to any instant in time.  This node is interpreted as a Muldis
+D C<sys.std.Temporal.Type.UTCDuration> value whose C<duration> possrep
+attribute values are defined as follows:
+
+The payload must be a Perl C<Seq|Array> with 6 elements, where each element
+may be either undefined or defined; or if fewer than 6 elements are
+provided, the C<Seq|Array> will be implicitly extended to 6, filling with
+undefs.  The 6 payload elements correspond in order, from the lowest to the
+highest indexed, to the 6 attributes: C<years>, C<months>, C<days>,
+C<hours>, C<minutes>, C<seconds>.  For each payload element that Perl
+considers undefined or defined, the corresponding attribute has the
+C<Nothing> or a C<Just> value, respectively.  For each of the first 5
+elements, when it is defined, it must qualify as a valid payload for an
+C<Int>  node; for the 6th element, when it is defined, it must qualify
+as a valid payload for a C<Rat>  node.
+
+A defined [C<years>, C<months>, C<days>, C<hours>, C<minutes>] may be any
+integer, and C<seconds> may be any rational number.  I<Currently,
+C<UTCDuration> has no system-defined subtypes, but that may change later.>
+
+Examples I<TODO: What is t actual syntax for P6 [Instant|Duration] types?>:
+
+    :TAIInstant( Instant.new(1235556432.0) )
+
+    Instant.new(854309115.0)
+
+    :TAIDuration( Duration.new(3600.0) )
+
+    Duration.new(-50.0)
+
+    Duration.new(3.14159)
+
+    Duration.new(0b1011101101 * 0b10 ** -0b11011)
+
+    Duration.new(1/43)
+
+    :UTCInstant[1964,10,16,16,12,47.5] # a UTCDateTime #
+
+    :UTCInstant[2002,12,6] # a UTCDate #
+
+    :UTCInstant[undef,undef,undef,14,2,29.0] # a UTCTime #
+
+    :FloatInstant[2003,4,5,2] # min,sec unknown or N/A #
+
+    :FloatInstant[1407] # just know its sometime in 1407 #
+
+    :UTCDuration[3,5,1,6,15,45.000012]
+
+=head1 HDMD_Perl5_STD - TEMPORAL EXTENSION OPAQUE VALUE LITERALS
+
+The C<temporal> standard syntax extension is closely related to the
+L<Muldis::D::Ext::Temporal> language extension, and it constitutes special
+syntax for its data types; in the future it may improve the type syntax or
+add syntax for operators.
+
+When this extension is active, there exist 5 additional varieties of
+C<value> node:  C<TAIInstant>, C<TAIDuration>,
+C<UTCInstant>, C<FloatInstant>, C<UTCDuration>.  Also,
+between these 5 varieties, these 11 additional values are allowed for
+C<value>'s C<value_kind> attribute:  C<TAIInstant>, C<TAIDuration>,
+C<UTC[Instant|DateTime|Date|Time]>,
+C<Float[Instant|DateTime|Date|Time]>, C<UTCDuration>.  For all of these
+varieties, the C<value_kind> may not be omitted.
+
+=head2 HDMD_Perl5_STD - Date and Time Literals
+
+A C<TAIInstant> node represents a single point in time which is specified
+in terms of atomic seconds; it is a rational numeric type, that is disjoint
+from both C<Rat> and C<TAIDuration>.  This node is interpreted as a Muldis
+D C<sys.std.Temporal.Type.TAIInstant> value by directly mapping the
+payload, which must be as per the payload of a C<Rat> node.
+
+A C<TAIDuration> node represents a single amount of time (the difference
+between two instants) which is specified in terms of atomic seconds; it is
+a rational numeric type, that is disjoint from both C<Rat> and
+C<TAIInstant>.  This node is interpreted as a Muldis D
+C<sys.std.Temporal.Type.TAIDuration> value by directly mapping the payload,
+which must be as per the payload of a C<Rat> node.
+
+A C<UTCInstant> node represents an "instant"/"datetime" value that is
+affiliated with the UTC time-zone.  This node is interpreted as a Muldis D
+C<sys.std.Temporal.Type.UTCInstant> value whose C<instant> possrep
+attribute values are defined as follows:
+
+=over
+
+=item *
+
+If the payload is a Perl array ref, then it must have 6 elements, where
+each element may be either undefined or defined; or if fewer than 6
+elements are provided, the array ref will be implicitly extended to 6,
+filling with undefs.  The 6 payload elements correspond in order, from the
+lowest to the highest indexed, to the 6 attributes: C<year>, C<month>,
+C<day>, C<hour>, C<minute>, C<second>.  For each payload element that Perl
+considers undefined or defined, the corresponding attribute has the
+C<Nothing> or a C<Just> value, respectively.  For each of the first 5
+elements, when it is defined, it must qualify as a valid payload for an
+C<Int> node; for the 6th element, when it is defined, it must qualify
+as a valid payload for a C<Rat> node.
+
+A defined C<year> may be any integer, each of [C<month>, C<day>] must be a
+positive integer, each of [C<hour>, C<minute>] must be a non-negative
+integer, and C<second> must be a non-negative rational number.  If all 6
+attributes are defined, then the new C<UTCInstant> value is also a
+C<UTCDateTime>; if just the first 3 or last 3 are defined, then the value
+is not a C<UTCDateTime> but rather a C<UTCDate> or C<UTCTime>,
+respectively; if any other combination of attributes are defined, then the
+value is just a C<UTCInstant> and not of any of the other 3 subtypes.
+
+=item *
+
+If the payload is a Perl hash ref, then it must have 1 element, whose key
+and value are designated, in order, I<max-col-val> and I<main payload>; the
+max-col-val must be a Perl string and the main payload must be a Perl array
+ref as per the payload of the previous bullet point but that none of the 6
+elements is a Perl hash ref.  Each of the 6 main payload elements, when
+defined, is further interpreted according to the max-col-val, in the same
+manner as how an C<Int> or C<Rat> node's hash ref payload's element's value
+is interpreted.  The interpretation of this payload is the same as for the
+Perl array ref payload.
+
+=back
+
+A C<FloatInstant> node represents an "instant"/"datetime" value that is
+"floating" / not affiliated with any time-zone.  This node is interpreted
+as a Muldis D C<sys.std.Temporal.Type.FloatInstant> value in an identical
+fashion to how a C<UTCInstant> node is interpreted, whose format it
+completely shares.  Likewise regarding C<Float[DateTime|Date|Time]>.
+
+A C<UTCDuration> node represents a duration value, an amount of time, which
+is not fixed to any instant in time.  This node is interpreted as a Muldis
+D C<sys.std.Temporal.Type.UTCDuration> value whose C<duration> possrep
+attribute values are defined as follows:
+
+=over
+
+=item *
+
+If the payload is a Perl array ref, then it must have 6 elements, where
+each element may be either undefined or defined; or if fewer than 6
+elements are provided, the array ref will be implicitly extended to 6,
+filling with undefs.  The 6 payload elements correspond in order, from the
+lowest to the highest indexed, to the 6 attributes: C<years>, C<months>,
+C<days>, C<hours>, C<minutes>, C<seconds>.  For each payload element that
+Perl considers undefined or defined, the corresponding attribute has the
+C<Nothing> or a C<Just> value, respectively.  For each of the first 5
+elements, when it is defined, it must qualify as a valid payload for an
+C<Int>  node; for the 6th element, when it is defined, it must qualify
+as a valid payload for a C<Rat>  node.
+
+A defined [C<years>, C<months>, C<days>, C<hours>, C<minutes>] may be any
+integer, and C<seconds> may be any rational number.  I<Currently,
+C<UTCDuration> has no system-defined subtypes, but that may change later.>
+
+=item *
+
+If the payload is a Perl hash ref, then it must have 1 element, whose key
+and value are designated, in order, I<max-col-val> and I<main payload>; the
+max-col-val must be a Perl string and the main payload must be a Perl array
+ref as per the payload of the previous bullet point but that none of the 6
+elements is a Perl hash ref.  Each of the 6 main payload elements, when
+defined, is further interpreted according to the max-col-val, in the same
+manner as how an C<Int> or C<Rat> node's hash ref payload's element's value
+is interpreted.  The interpretation of this payload is the same as for the
+Perl array ref payload.
+
+=back
+
+Examples:
+
+    [ 'TAIInstant', 1235556432.0 ]
+
+    [ 'TAIInstant', 854309115.0 ]
+
+    [ 'TAIDuration', 3600.0 ]
+
+    [ 'TAIDuration', -50.0 ]
+
+    [ 'TAIDuration', 3.14159 ]
+
+    [ 'TAIDuration', { b => ['1011101101','10','-11011'] } ]
+
+    [ 'TAIDuration', [1,43] ]
+
+    [ 'UTCInstant', [1964,10,16,16,12,47.5] ] # a UTCDateTime #
+
+    [ 'UTCInstant', [2002,12,6] ] # a UTCDate #
+
+    [ 'UTCInstant', [undef,undef,undef,14,2,29.0] ] # a UTCTime #
+
+    [ 'FloatInstant', [2003,4,5,2] ] # min,sec unknown or N/A #
+
+    [ 'FloatInstant', [1407] ] # just know its sometime in 1407 #
+
+    [ 'UTCDuration', [3,5,1,6,15,45.000012] ]
+
+=head1 SEE ALSO
+
+Go to L<Muldis::D::Manual> for the majority of distribution-internal
+references.
+
+=head1 AUTHOR
+
+Darren Duncan (C<darren@DarrenDuncan.net>)
+
+=head1 LICENSE AND COPYRIGHT
+
+This file is part of the Muldis D language and implementations manual.
+
+Muldis D Manual is Copyright © 2008-2010, Muldis Data Systems, Inc.
+
+See the LICENSE AND COPYRIGHT of L<Muldis::D::Manual> for details.
+
+=head1 TRADEMARK POLICY
+
+The TRADEMARK POLICY in L<Muldis::D::Manual> applies to this file too.
+
+=head1 ACKNOWLEDGEMENTS
+
+The ACKNOWLEDGEMENTS in L<Muldis::D::Manual> apply to this file too.
+
+=cut

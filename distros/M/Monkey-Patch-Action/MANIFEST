@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+README
+dist.ini
+lib/Monkey/Patch/Action.pm
+lib/Monkey/Patch/Action/Handle.pm
+t/00-compile.t
+t/01-basics.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/release-rinci.t

@@ -1,0 +1,23 @@
+<!-- version 1.02 1-24-14 -->
+<p>
+&nbsp;
+<script language=javascript1.1>
+function zapcook() {
+  var cd = new Date();
+  cd.setTime(cd.getTime() -1);
+  document.cookie = "SpamCannibal=; expires=" + cd.toGMTString();
+  return true;
+}
+</script>
+<center>
+<form name=login action="" method=POST target='passwd'>
+<font size="-1">Enter your USER NAME:</font><br>
+<input type=text name=u2><p>
+<input type=hidden name=user value=''>
+<input type=hidden name=page value=password>
+<input type=submit value=GO onClick="zapcook();login.user.value = login.u2.value;login.u2.value = '********';popwin(bgcolor);document.login.action = location.pathname;">
+</form>
+</center>
+<script language=javascript1.1>
+document.login.u2.focus();
+</script>

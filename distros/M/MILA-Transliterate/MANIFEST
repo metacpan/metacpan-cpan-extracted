@@ -1,0 +1,13 @@
+
+MANIFEST
+Build.PL
+Makefile.PL
+README
+INSTALL
+META.yml
+
+lib/MILA/Transliterate.pm
+
+t/transliterate.t
+t/1.module_load.t
+t/2.module_load.t

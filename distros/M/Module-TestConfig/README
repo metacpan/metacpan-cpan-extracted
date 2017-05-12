@@ -1,0 +1,711 @@
+# -*- perl -*-
+#
+# Module::TestConfig - asks questions and autowrite a module
+#
+# $Id: README,v 1.1 2003/08/20 19:30:20 jkeroes Exp $
+
+package Module::TestConfig;
+
+require 5.005_62;
+use strict;
+use Carp;
+use Fcntl;
+use File::Basename	qw/dirname/;
+use File::Path		qw/mkpath/;
+use Text::FormatTable;
+use Data::Dumper;
+use Term::ReadKey;
+use Params::Validate;
+use Config::Auto;
+use Module::TestConfig::Question;
+
+use vars qw/$VERSION/;
+$VERSION  = '0.02';
+
+#------------------------------------------------------------
+# Methods
+#------------------------------------------------------------
+
+sub new {
+    my $proto = shift;
+    my $class = ref $proto || $proto;
+    my $self = bless {}, $class;
+    return $self->init(
+	verbose   => 1,
+	defaults  => 'defaults.config',
+	file      => 'MyConfig.pm',
+	package   => 'MyConfig',
+	order     => [ qw/defaults/ ],
+	questions => [ ],
+	_defaults => { },
+        qi       => 0,
+        @_,
+    );
+}
+
+sub init {
+    my ( $self, %args )  = @_;
+
+    while ( my ( $method, $args ) = each %args ) {
+	if ( $self->can( $method ) ) {
+	    $self->$method( $args );
+	} else {
+	    croak "Can't handle arg: '$method'. Aborting";
+	}
+    }
+
+    $self->load_defaults;
+
+    return $self;
+}
+
+sub load_defaults {
+    my $self = shift;
+    $self->{_defaults} = Config::Auto::parse( $self->{defaults} )
+	if -r $self->{defaults};
+}
+
+sub verbose {
+    my $self = shift;
+    $self->{verbose} = shift if @_;
+    $self->{verbose};
+}
+
+sub debug {
+    my $self = shift;
+    $self->{debug} = shift if @_;
+    $self->{debug};
+}
+
+sub file {
+    my $self = shift;
+    $self->{file} = shift if @_;
+    $self->{file};
+}
+
+sub package {
+    my $self = shift;
+    $self->{package} = shift if @_;
+    $self->{package};
+}
+
+# The filename of the defaults file.
+sub defaults {
+    my $self = shift;
+    $self->{defaults} = shift if @_;
+    $self->{defaults};
+}
+
+# The defaults hash
+sub _defaults {
+    my $self = shift;
+    $self->{_defaults} = shift if @_;
+    $self->{_defaults};
+}
+
+sub order {
+    my $self = shift;
+
+    if ( @_ ) {
+	my @order = ref $_[0] eq "ARRAY" ? @{ $_[0] } : @_;
+	for my $order ( @order ) {
+	    croak "Bad arg given to order(): '$order'"
+		unless grep /^$order$/, qw/defaults env/;
+	}
+	$self->{order} = [ @order ];
+    }
+
+    return wantarray ? @{ $self->{order} } : $self->{order};
+}
+
+sub questions {
+    my $self = shift;
+
+    if ( @_ > 1 ) {
+	$self->{questions}
+	    = [ map { Module::TestConfig::Question->new( $_ ) } @_ ];
+    } elsif ( @_ == 1 && ref $_[0] eq "ARRAY" ) {
+	$self->{questions}
+	    = [ map { Module::TestConfig::Question->new( $_ ) } @{ $_[0] } ];
+    } elsif ( @_ ) {
+	croak "questions() got bad args. Needs a list or arrayref.";
+    }
+
+    return wantarray ? @{ $self->{questions} } : $self->{questions};
+}
+
+sub answers {
+    my $self = shift;
+    $self->{answers} = shift if @_;
+    return wantarray ? %{ $self->{answers} } : $self->{answers};
+}
+
+sub answer {
+    my $self = shift;
+    return $self->{answers}{+shift};
+}
+
+sub ask {
+    my $self = shift;
+
+    do {
+	my $i	     = $self->{qi};
+	my $q	     = $self->{questions}[$i];
+	my $name     = $q->name;
+
+	# Skip the question?
+	if ( $q->skip ) {
+	    if ( ref $q->skip eq "CODE" ) {
+		next if $q->skip->( $self );
+	    } elsif ( not ref $q->skip ) {
+		next if $q->skip;
+	    } else {
+		croak "Don't know how to handle question #$i\'s skip block";
+	    }
+	}
+
+	$self->prompt( $q );
+
+	# Valid answer?
+	my @args = ( $q->name => $self->{answers}{name});
+
+	if ( $q->validate && ! validate( @args, $q->validate ) ) {
+	    warn "Your answer didn't validate. Please try again.\n\n";
+	    redo;
+	}
+    } while ( $self->{qi}++ < scalar @{$self->{questions}} - 1 );
+
+    return $self;
+}
+
+sub get_default {
+    my ($self, $i) = @_;
+
+    $i ||= $self->{qi};
+    my $q = $self->{questions}[$i];
+    my $default = $q->default;
+    my $name    = $q->name
+	or croak "No name defined for question \#$i.";
+
+    for ( $self->order ) {
+	if ( /^env/o ) {
+	    return $ENV{"\U$name"} if defined $ENV{"\U$name"};
+	    return $ENV{"\L$name"} if defined $ENV{"\L$name"};
+	}
+
+	return $self->{_defaults}{$name}
+	    if /^defaults/ && $self->{_defaults}{$name};
+    }
+
+    # This will be undef unless set via answers()
+    # or new( answers => {...} ).
+    return $self->{answers}{$name} || $default;
+}
+
+sub save {
+    my ($self) = @_;
+
+    my $text = $self->package_text
+	or croak "No text to save. Aborting.";
+
+    my $dir = dirname( $self->{file} );
+    unless ( -d $dir ) {
+	mkpath( [ $dir ], $self->{verbose})
+	    or croak "Can't make path $dir: $!";
+    }
+
+    sysopen F, $self->{file}, O_CREAT | O_WRONLY | O_TRUNC, 0600
+	or croak "Can't open '$self->{file}' for write: $!";
+    print F  $text;
+    close F or carp "Can't close '$self->{file}'. $!", return;
+
+    print "Module::TestConfig saved $self->{file} with these settings:\n"
+	. $self->report if $self->{verbose};
+}
+
+sub report {
+    my $self = shift;
+
+    my $screen_width = (Term::ReadKey::GetTerminalSize())[0] || 79;
+    my $table	     = Text::FormatTable->new( '| r | l |' );
+
+    $table->rule('=');
+    $table->head('Name', 'Value');
+    $table->rule('=');
+
+    for my $q ( @{ $self->{questions} } ) {
+	if ( $q->noecho ) {
+	    $table->row( $q->name, '*****' );
+	} else {
+	    $table->row( $q->name, $self->answer( $q->name ) );
+	}
+    }
+
+    $table->rule('-');
+
+    return $table->render($screen_width);
+}
+
+sub package_text {
+    my $self = shift;
+
+    local $/ = undef;
+    local $_ = <DATA>;
+
+    my $pkg  = $self->{package};
+
+    $Data::Dumper::Terse = 2;
+    my $answers = Data::Dumper->Dump( [$self->{answers}] );
+
+    s/%%PACKAGE%%/$pkg/m;
+    s/%%ANSWERS%%/$answers/m;
+
+    return $_;
+}
+
+
+# Based on ExtUtils::MakeMaker::prompt().
+sub prompt {
+    my $self  = shift;
+    my $q     = shift || $self->{questions}[$self->{qi}];
+
+    local $| = 1;
+
+    croak "prompt() called incorrectly"
+	unless defined $q->msg && defined $q->name;
+
+    my $def      = $self->get_default;
+    my $dispdef	 = defined $def ? " [$def] " : " ";
+    $def	 = defined $def ? $def      : "";
+
+    print $q->msg . $dispdef;
+
+    my $ans = '';
+    my $ISA_TTY = -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT)); # Pipe?
+
+    if ( $ISA_TTY ) {
+	if ( $Term::ReadKey::VERSION && $q->noecho ) {
+	    ReadMode( 'noecho' );
+	    chomp( $ans = ReadLine(0) );
+	    ReadMode( 'normal' );
+	    print "\n";
+	} else {
+	    chomp( $ans = <STDIN> );
+	}
+    } else {
+        print "$def\n";
+    }
+
+    $self->{answers}{$q->name} = $ans ne '' ? $ans : $def;
+}
+
+# Question index
+sub qi {
+    my $self = shift;
+    $self->{qi} = shift if @_;
+    $self->{qi};
+}
+
+#------------------------------------------------------------
+# Docs
+#------------------------------------------------------------
+
+=head1 NAME
+
+Module::TestConfig - Write a config module for your tests and/or module.
+
+=head1 SYNOPSIS
+
+  use Module::TestConfig;
+
+  Module::TestConfig->new(
+	verbose   => 1,
+	defaults  => 'defaults.config',
+	file      => 'MyConfig.pm',
+	package   => 'MyConfig',
+	order     => [ qw/defaults env/ ],
+	questions => [
+	  [ 'Would you like tea?' => 'tea', 'y' ],
+	  [ 'Crumpets?' => 'crumpets', 'y' ],
+	]
+  )->ask->save;
+
+# and in another module or test file:
+
+  use MyConfig;
+
+  my $config = TestConfig->new;
+  print $config->tea eq 'y'
+    ? "We're having tea today; splendid!"
+    : "No tea, I'm afraid. P'raps tomorrow.";
+
+  print $config->crumpets eq 'y'
+    ? "Crumpets; lovely!"
+    : "Alas, we have no crumpets today";
+
+
+=head1 DESCRIPTION
+
+This module prompts a user for info and writes a module for later use.
+You can use it during the module build process (e.g. perl Makefile.PL)
+to share info among your test files. You can use it to write a module
+and install that into your site_perl tree.
+
+Module::TestConfig writes an object-oriented file. You specify
+the file's location as well as the package name. When you use
+that file, all of the question names will behave as object methods.
+
+e.g. If you asked the question:
+
+  Module::TestConfig->new(
+	file      => 't/MyConfig.pm',
+	package   => 'MyConfig',
+	questions => [
+  		       { name => 'fingers',
+		         msg => 'How many fingers am I holding up?',
+		         default => 11,
+		       },
+		     ],
+  )->ask->save;
+
+Then the file t/MyConfig.pm would be written. To use it, add this
+to another file:
+
+  use MyConfig;
+
+  my $config = MyConfig->new;
+  print $config->fingers; # prints 11 or whatever number the user picked.
+
+=head2 PUBLIC METHODS
+
+=over 2
+
+=item new()
+
+Args and defaults:
+
+  verbose   => 1,
+  defaults  => 'defaults.config',
+  file      => 'MyConfig.pm',
+  package   => 'MyConfig',
+  order     => [ 'defaults' ],
+  questions => [ ... ],
+
+Returns a new Module::TestConfig object.
+
+=item questions()
+
+Set up the questions that we prompt the user for. They can be in one
+of two forms, the array form or the hash form. See
+L<Module::TestConfig::Question> for more about the question's
+arguments.
+
+Args:
+
+=over 4
+
+=item questions:
+
+A string like "Have you seen my eggplant?" or "Kittens:". They look
+best when they end with a ':' or a '?'.
+
+=item name:
+
+A simple mnemonic used for looking up values later. Since it will turn
+into a method name in the future, it ought to match /[\w_]+/.
+
+=item default:
+
+optional. a default answer.
+
+=item options:
+
+optional. A hashref with any or all of the following:
+
+=over 4
+
+=item noecho:
+
+optional. 1 or 0. Do we print the user's answer while they are typing?
+This is useful when asking for for passwords.
+
+=item skip:
+
+optional. Accepts either a coderef or a scalar. The Module::TestConfig
+will be passed to the coderef as its first and only argument. Use it
+to look up answer()s. If the coderef returns true or the scalar is
+true, the current question will be skipped.
+
+=item validate:
+
+optional. a Params::Validate::validate() hashref.  See
+L<Params::Validate>. The question will loop until the user types an
+answer that validates.
+
+=back
+
+=back
+
+Args:
+  an AoH. e.g. questions( [ { ... }, ... ] )
+  a  LoH. e.g. questions(   { ... }, ...   )
+
+e.g.
+
+  [
+    [ "Question to ask",  $name, $optional_default, \%optional_options ],
+    ...
+  ]
+
+or
+
+  [
+    { question => "Question to ask",
+      name => "foo",
+      default => 0,
+      opts => { ... }
+    },
+    ...
+  ]
+
+the $optional_options looks like:
+
+  {
+     noecho => 1, 		# set to 1 for password-prompting
+     skip => \&coderef | $scalar, # skip the current question if true
+     validate => Params::Validate::hashref # question will loop until this passes
+     ...
+  }
+
+Returns:
+  a  list of questions in list context
+  an arrayref of questions in scalar context.
+
+=item ask()
+
+Asks the user the questions.
+
+Returns: a Module::TestConfig object.
+
+=item save()
+
+Writes our answers to the file. The file created will always be
+0600 for security reasons. This may change in the future. See
+L<"SECURITY"> for more info.
+
+=item defaults()
+
+A file parsed by Config::Auto which may be used as default answers to
+the questions. See L<"order()">
+
+Default: "defaults.config"
+
+Args: A filename or path.
+
+Returns: A filename or path.
+
+=item file()
+
+The filename that gets written during save().
+
+Default: "MyConfig.pm"
+
+Args: a filepath that should probably end in ".pm". e.g. "t/MyConfig.pm"
+
+Returns: the filename or path.
+
+=item package()
+
+The file's package name written during save().
+
+Default: "MyConfig"
+
+Args: a package namespace. e.g. "Foo::Bar::Baz"
+
+Returns: the set package.
+
+=item order()
+
+Default: [ 'defaults' ]
+
+Args: ordered list of 'defaults' and/or 'env'.
+
+Defaults to the questions can come from either a file, the environment,
+or some combination of both.
+
+Args:
+
+=over 4
+
+=item defaults:
+
+a file read by Config::Auto that must parse to a hash of question
+names and values.
+
+=item env:
+
+environment variables in either upper or lowercase.
+
+=back
+
+The following will also be checked, in order:
+
+=over 4
+
+=item answers:
+
+Any answers already hard-set via answers().
+
+=item a question's default:
+
+A default supplied with the question.
+
+=back
+
+There's a security risk when accepting defaults from the environment.
+See L<"SECURITY">
+
+=item answer()
+
+Get the current value of a question. This can be used with skip.
+
+Args: a question's name.
+
+Returns: The current value or undef.
+
+=item verbose()
+
+Should the module be chatty while running? Should it print a report at
+the end?
+
+Default: 1
+
+Args: 1 or 0
+
+Returns: current value
+
+=item debug()
+
+Placeholder for future development - this method isn't used.
+
+Default: 0
+
+Args: 1 or 0
+
+Returns: current value
+
+=back
+
+=head1 PROTECTED METHODS
+
+These are documented primarily for subclassing.
+
+=over 2
+
+=item answers()
+
+A user's questions get stored here. If you preset any answers
+beforehand, they may be used as defaults. See L<"order()"> for
+those rules.
+
+Args: a hash of question names and answers
+
+Returns: A hash in list context, a hashref in scalar context.
+
+=item prompt()
+
+Ask the user a question. The answer will be cached in the object for
+later.
+
+Args: $question, $default_answer, \%options
+
+=item get_default()
+
+Look through the options(), the answers(), and the question's default
+for a suitable default to print with the question.
+
+=item load_defaults()
+
+Uses Config::Auto to parse the file specified by defaults(). Defaults
+are stored in $obj-E<gt>{_defaults}.
+
+=item package_text()
+
+Returns the new file's text. This should take package() and
+answers() into account.
+
+=item qi()
+
+The current question index.
+
+Args: A number
+
+Returns: The current number
+
+=item report()
+
+Returns a report of question names and values. Will be printed if the
+object is in verbose mode.
+
+=back
+
+=head1 SECURITY
+
+The resultant file (TestConfig.pm by default) will be chmod'd to 0600
+but it will remain on the system.
+
+Using the environment as input may also be a security risk - or a
+potential bug - especially if your names mimic existing environment
+variables.
+
+=head1 AUTHOR
+
+Joshua Keroes E<lt>jkeroes@eli.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2003 by Joshua Keroes E<lt>jkeroes@eli.netE<gt>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<ExtUtils::MakeMaker>
+L<Module::Build>
+
+=cut
+
+# Template for module generation follows:
+
+__DATA__
+# -*- perl -*-
+#
+# This module was autogenerated by Module::TestConfig
+
+package %%PACKAGE%%;
+
+use strict;
+use Carp;
+use vars '$AUTOLOAD';
+
+sub new {
+    my $proto = shift;
+    my $class = ref $proto || $proto;
+    my $self = %%ANSWERS%%;
+    return bless $self, $class;
+}
+
+sub AUTOLOAD {
+    my $self = shift;
+
+    ($AUTOLOAD) = $AUTOLOAD =~ /(\w+)$/;
+
+    croak "No such method: $AUTOLOAD"
+        unless defined $self->{$AUTOLOAD}
+            || $AUTOLOAD eq "DESTROY";
+
+    return $self->{$AUTOLOAD};
+}
+
+1;

@@ -1,0 +1,36 @@
+body {
+	font-family: Tahoma, Verdana, Helvetica, Arial, sans-serif;
+	background-color: #ffffff;
+}
+
+img {
+	border: 1px solid #cccccc;
+}
+
+dt {
+	font-weight: bold;
+}
+
+.MDGraph {
+	background-color: #e0e0e0;
+}
+
+.MDGraphTable tr th {
+	border: 1px solid #cccccc;	
+	color: #ffffff;
+	background-color: #000000;
+}
+
+.MDGraphTable tr td {
+	border: 1px solid #cccccc;	
+}
+
+.MDGraphParent {
+	background-color: #d0d0ff;
+}
+.MDGraphSeed {
+	background-color: #d0ffd0;
+}
+.MDGraphChild {
+	background-color: #ffd0d0;
+}

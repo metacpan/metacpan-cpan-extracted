@@ -1,0 +1,7 @@
+_build
+blib
+^Build$
+\.bak$
+^dump$
+\.svn
+\.tar\.gz$

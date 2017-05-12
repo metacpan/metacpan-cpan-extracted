@@ -1,0 +1,63 @@
+[% PROCESS macros %]
+[% INCLUDE header %]
+[% INCLUDE title %]
+[% IF search %]
+    <div id="title">Search results</div>
+[% ELSE %]
+    <div id="title">Listing of all [% classmetadata.plural %]</div>
+[% END %]
+[% INCLUDE navbar %]
+<div class="list">
+    <table id="matrix">
+        <tr>
+            [% FOR col = classmetadata.list_columns.list;
+                NEXT IF col == "id" OR col == classmetadata.table _ "_id";
+                "<th>"; 
+                SET additional = "?order=" _ col;
+                SET additional = additional _ "&page=" _ pager.current_page
+                    IF pager;
+                SET additional = additional _ "&o2=desc" 
+                IF col == request.params.order and request.params.o2 != "desc";
+                SET action = "list";
+                FOR name = classmetadata.columns.list;
+                  IF request.query.$name;
+                    SET additional =
+                        additional  _ "&" _ name _ "=" _
+                        request.params.$name;
+                    SET action = "do_search";
+                  END;
+                END;
+		USE model_obj = Class request.model_class;
+		IF model_obj.find_column(col);
+                  link(classmetadata.table, action, additional,
+                    classmetadata.colnames.$col);
+                  IF col == request.params.order;
+                    IF request.params.o2 != "desc";
+                        "&darr;";
+                    ELSE;
+                        "&uarr;";
+                    END;
+                  END;
+		ELSE;
+		  classmetadata.colnames.$col || col FILTER ucfirst;
+		END;
+                "</th>";
+            END %]
+	    <th id="actionth">Actions</th>
+        </tr>
+        [%  SET count = 0;
+        FOR item = objects;
+            SET count = count + 1;
+            "<tr";
+            ' class="alternate"' IF count % 2;
+            ">";
+            display_line(item);
+            "</tr>";
+        END %]
+    </table>
+
+[% INCLUDE pager %]
+[% INCLUDE addnew %]
+[% INCLUDE search_form %]
+</div>
+[% INCLUDE footer %]

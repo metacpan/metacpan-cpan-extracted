@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>MySQL::Admin</title>
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<script type="text/javascript" src="cgi-bin/translate.pl" charset="utf-8"></script>
+<script type="text/javascript" src="style/treeview.js" charset="utf-8"></script>
+<script type="text/javascript" src="javascript/cms.js" charset="utf-8"></script>
+<script type="text/javascript" src="javascript/mysql_admin.js" charset="utf-8"></script>
+<script type="text/javascript" src="javascript/Crystal/preload.js" charset="utf-8"></script>
+<link href="style/mysql/mysql_admin.css" rel="stylesheet" type="text/css"/>
+<link href="style/mysql/Crystal.css" rel="stylesheet" type="text/css"/>
+</head>
+<body onload="init()">
+<table cellpadding="0" cellspacing="0" width="100%" id="mainLayout">
+<tr><td class="menu closed" id="menu" onclick="menu()" height="800"></td>
+<td style="vertical-align:top;" id="con">
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+<tr><td><div id="tab"></div></td></tr>
+<tr><td id="content" class="content" style="padding-left:5px;"></td></tr>
+</table>
+</td>
+</tr>
+</table>
+<div class="popup" id="popup" style="display:none;" >
+<div id="popupContent1" class="popupContent1" align="right" >
+<div class="popupCaption" onmousedown="startdrag('popupContent1');">
+<div id="popupTitle" class="popupTitle" style="float:left"></div>
+  <div id="closeButton" class="closeButton">X</div>
+</div>
+<div id="popupContent" class="popupContent"></div>
+</div>
+</div>
+<div id="errorMessage"></div>
+<div id="sid"></div>
+<div id="moveHere" style="display:none;" class="moveHereContent" width="100px"></div>
+<noscript>
+This is the Website from Dirk Lindner
+<br/>
+Please Enable JavaScript.
+<h1>In Ihrem Browser ist JavaScript deaktiviert.</h1>
+<p>Im SELFHTML-Wiki erfahren Sie, <a href="http://wiki.selfhtml.org/wiki/JavaScript/Tutorials/JavaScript_aktivieren"> wie Sie JavaScript in Ihrem Browser aktivieren können.</a></p>
+<a href="cgi-bin/plaintext.pl"></a>
+</noscript>
+<div id="load" style="display:none;" >
+<div id="animation_1" class="animationBox"></div>
+<div id="animation_2" class="animationBox"></div>
+<div id="animation_3" class="animationBox"></div>
+<div id="animation_4" class="animationBox"></div>
+</div>
+</body>
+</html>

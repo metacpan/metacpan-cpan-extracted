@@ -1,0 +1,24 @@
+TYPEMAP
+DKIM_LIB *	T_PTR
+DKIM *		T_PTR
+DKIM_STAT	T_INT
+DKIM_STAT *	T_PTR
+DKIM_SIGERROR	T_INT
+DKIM_SIGINFO *	T_PTROBJ
+DKIM_SIGINFO **	T_PTR
+dkim_canon_t	T_ENUM
+dkim_alg_t	T_ENUM
+dkim_param_t	T_ENUM
+dkim_atps_t	T_INT
+struct timeval *	T_PTR
+struct dkim_hdrdiff *	T_PTR
+off_t		T_LONG
+int *		T_PTR
+uint64_t	T_LONG
+const void *	T_PV
+void *		T_PV
+# const unsigned char *	T_STRING
+const unsigned char *	T_PTR
+unsigned char **	T_PTR
+size_t *	T_PV
+_Bool	T_BOOL

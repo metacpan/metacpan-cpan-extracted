@@ -1,0 +1,37 @@
+This template is for testing Maypole::Plugin::Authorization's
+authorized methods method.
+
+This should be a list of actions
+ZZ [% request.get_authorized_methods.sort.join(',') %] YY methods
+
+This should be a list of actions
+XX [% request.get_authorized_methods(1).sort.join(',') %] WW methods
+
+This should be an empty list
+VV [% request.get_authorized_methods(2).sort.join(',') %] UU methods
+
+This should be a list of actions
+TT [% request.get_authorized_methods(undef, 'BeerDB::Beer').sort.join(',')
+   %] SS methods
+
+This should be an empty list
+RR [% request.get_authorized_methods(undef, 'BeerDB::Pub').sort.join(',')
+   %] QQ methods
+
+This should be a list of actions
+PP [% request.get_authorized_methods(1, 'BeerDB::Beer').sort.join(',')
+   %] OO methods
+
+This should be an empty list
+NN [% request.get_authorized_methods(1, 'BeerDB::Pub').sort.join(',')
+   %] MM methods
+
+This should be an empty list
+LL [% request.get_authorized_methods(2, 'BeerDB::Beer').sort.join(',')
+   %] KK methods
+
+This should be an empty list - called on Style class
+JJ [% request.get_authorized_methods.sort.join(',') %] II methods
+
+This should be an empty list - called with no class
+HH [% request.get_authorized_methods.sort.join(',') %] GG methods

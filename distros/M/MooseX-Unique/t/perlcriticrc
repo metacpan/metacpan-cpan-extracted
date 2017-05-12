@@ -1,0 +1,32 @@
+severity = 2
+verbose = 9
+[Documentation::RequirePodSections]
+    language = en_US
+    lib_sections    = NAME | DESCRIPTION | SYNOPSIS | AUTHOR | COPYRIGHT AND LICENSE
+    script_sections = NAME | USAGE | OPTIONS | EXIT STATUS | AUTHOR | COPYRIGHT AND LICENSE
+
+
+# PBP says to build tables, perltidy wrecks them.
+[-CodeLayout::RequireTidyCode]
+
+
+# I'm pretty good, and don't want to be hassled.
+[-Tics::ProhibitLongLines]
+
+# These are for things I don't use
+[-Editor::RequireEmacsFileVariables] 
+[-Miscellanea::RequireRcsKeywords]
+
+# Annoying.
+[-Compatibility::PodMinimumVersion]
+
+# Moose
+[-Subroutines::ProhibitCallsToUndeclaredSubs]
+
+# Allow use strict at top
+[-Modules::RequireExplicitPackage]
+
+[-CodeLayout::RequireUseUTF8] 
+[-Documentation::RequirePODUseEncodingUTF8] 
+
+

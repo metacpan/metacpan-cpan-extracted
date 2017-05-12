@@ -1,0 +1,75 @@
+{
+   "abstract" : "Spotify OAuth Plugin for Mojolicious::Plugin::Web::Auth",
+   "author" : [
+      "Olaf Alders <olaf@wundercounter.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-Web-Auth-Site-Spotify",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.28",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojo::Base" : "0",
+            "Mojolicious::Plugin::Web::Auth" : "0.12",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/oalders/Mojolicious-Plugin-Web-Auth-Site-Spotify/issues"
+      },
+      "homepage" : "https://github.com/oalders/mojolicious-plugin-web-auth-site-contrib-spotify",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/oalders/mojolicious-plugin-web-auth-site-contrib-spotify.git",
+         "web" : "https://github.com/oalders/mojolicious-plugin-web-auth-site-contrib-spotify"
+      }
+   },
+   "version" : "0.000001",
+   "x_contributors" : [
+      "Olaf Alders <olaf@wundersolutions.com>"
+   ]
+}
+

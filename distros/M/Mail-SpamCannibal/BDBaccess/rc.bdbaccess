@@ -1,0 +1,220 @@
+#/usr/bin/perl
+#!/usr/bin/perl -w
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+#
+# rc.bdbaccess version 0.06, 6-8-04
+#
+# Copyright 2003, 2004, Michael Robinton <michael@bizsystems.com>
+# rc.bdbaccess is free software; you can redistribute it and/or 
+# modify it under the terms of the GPL software license.
+#
+use strict;
+use Mail::SpamCannibal::SiteConfig;
+
+my $CONFIG = new Mail::SpamCannibal::SiteConfig;
+
+# you can override the installation configuration variables by
+# uncommenting and editing various items below:
+#
+# $CONFIG->{SPMCNBL_ENVIRONMENT} = '/var/run/dbtarpit',		# "spamcannibal db environment directory\t:",
+# $CONFIG->{SPAMCANNIBAL_HOME}	 = '/usr/local/spamcannibal',	# "spamcannibal user home directory\t:",
+# $CONFIG->{SPMCNBL_DB_TARPIT}	 = 'tarpit',			# "spamcannibal tarpit database name\t:",
+# $CONFIG->{SPMCNBL_DB_ARCHIVE}	 = 'archive',			# "spamcannibal archive database name\t:",
+# $CONFIG->{SPMCNBL_DB_CONTRIB}	 = 'blcontrib',			# "spamcannibal black list contrib name\t:",
+# $CONFIG->{SPMCNBL_DB_EVIDENCE} = 'evidence',			# "spamcannibal evidence database name\t:",
+#
+
+my $daemon	= 'bdbaccess';
+my $daemonX	= $CONFIG->{SPAMCANNIBAL_HOME} .'/bin/'. $daemon;
+
+# Default configuration is shown below. Edit the command string below to change this
+#
+my $execmd = $daemonX .' -r '. $CONFIG->{SPMCNBL_ENVIRONMENT};
+
+
+$execmd   .= ' -f '. $CONFIG->{SPMCNBL_DB_TARPIT};
+$execmd   .= ' -f '. $CONFIG->{SPMCNBL_DB_ARCHIVE};
+$execmd   .= ' -f '. $CONFIG->{SPMCNBL_DB_CONTRIB};
+$execmd   .= ' -f '. $CONFIG->{SPMCNBL_DB_EVIDENCE};
+
+# how long to wait for stop on restart (in seconds)
+use constant MAX_RESTART_WAIT => 10;
+
+###########################################################################
+############## NO MORE CONFIGURABLE ITEMS BEYOND THIS POINT ###############
+###########################################################################
+
+my $DEBUG;	# set true to print command instead of executing
+		# same as 'rc.bdbaccess debug'
+
+=pod
+
+=head1 NAME
+
+rc.bdbaccess - bdbaccess controller
+
+=head1 SYNOPSIS
+
+  rc.bdbaccess start [-extra -flags]
+  rc.bdbaccess stop
+  rc.bdbaccess restart
+  rc.bdbaccess help
+
+=head1 DESCRIPTION
+
+This script controls the bdbaccess daemon.
+
+  rc.bdbaccess start	 - start the bdbaccess daemon
+  rc.bdbaccess start -T  - show configuration and exit
+
+  rc.bdbaccess stop	 - stop the bdbaccess daemon
+
+  rc.bdbaccess restart	 - stop then start the daemon
+
+  rc.bdbaccess help	 - print help and exit
+
+The daemon may be started with "any" extra flags by 
+passing them on the command line after "start". Type:
+
+  bdbaccess -h
+
+for a short synopsis or see the man page for bdbaccess
+
+=head1 AUTHOR
+
+Michael Robinton <michael@bizsystems.com>
+
+=head1 COPYRIGHT
+
+Copyright 2003, Michael Robinton <michael@bizsystems.com>
+This script is free software; you can redistribute it and/or
+modify it under the terms of the GPL software license.
+
+=cut
+
+die <<EOF unless -e $daemonX && -x $daemonX;
+###############################################################
+
+  Can not find $daemon daemon. Please check your installation
+
+###############################################################
+EOF
+
+die <<EOF if -e $CONFIG->{SPMCNBL_ENVIRONMENT} .'/'. 'blockedBYwatcher';
+##############################################
+
+  startup blocked by DB watcher process
+
+##############################################   
+EOF
+
+$| = 1;
+# get status
+my $running = 0;
+my $pid = 0;
+my $pid_file	= $CONFIG->{SPMCNBL_ENVIRONMENT} .'/'. $daemon;
+
+if (join(' ',$execmd,@ARGV) =~ /\-p\s+\d+/) {		# operating on a port in network environment
+  $pid_file .= '_net.pid';
+} else {
+  $pid_file .= '_unix.pid';
+}
+if (-e $pid_file) {
+    open(P,$pid_file);
+    $pid = <P>;
+    close P;
+    chomp $pid;
+    if ($pid and kill(0, $pid)) {
+        $running = 1;
+    }
+}
+
+my $command = shift @ARGV || '';
+
+if ($command eq 'start') {
+    do_start();
+}
+elsif ($command eq 'stop') {
+    exit do_stop();
+}
+elsif ($command eq 'restart') {
+    do_stop();
+    for my $wait (0..MAX_RESTART_WAIT()) {
+	last unless $running;
+	$running = (kill(0, $pid));
+    	print '.';
+	sleep 1;
+    }
+    exit 1 if $running;
+    do_start();
+}
+elsif ($command =~ 'help') {
+    usage();
+}
+elsif ($command =~ 'debug') {
+    $DEBUG = 1;
+    do_start();   
+}
+
+usage("\nUNKNOWN command\n");
+
+sub do_stop {
+    unless ($running) {
+	print "$command $daemon not running\n";
+    }
+    elsif (kill 15, $pid) {
+	print "$command $daemon stopping\n";
+	return 0;
+    } else {
+	print "$command $daemon could not be stopped\n";
+    }
+    return 1;
+}
+
+sub do_start {
+    my $extra = $_[0] || '';
+    my @extra = @ARGV;
+    if ($extra) {
+	unshift @extra, @_;
+    }
+    $extra = join ' ', @extra if @extra;
+    $extra = ' '. $extra if $extra;
+    if ($running) {
+	print "$command: $daemon pid ($pid) already running\n";
+    }
+    elsif ($DEBUG) {
+        print $execmd, $extra, "\n";
+    }
+    elsif (system($execmd . $extra)) {
+	print "$command: $daemon could not be started\n";
+	exit 1;
+    }
+    exit 0;
+}
+
+sub usage {
+  my $msg = $_[0] || '';
+  print $msg, q|
+  This script controls the bdbaccess daemon.
+
+  rc.bdbaccess start     - start the bdbaccess daemon
+  rc.bdbaccess start -T  - show configuration and exit
+
+  rc.bdbaccess stop      - stop the bdbaccess daemon
+
+  rc.bdbaccess restart   - stop then start the daemon
+
+  rc.bdbaccess help      - print help and exit
+
+The daemon may be started with "any" extra flags by
+passing them on the command line after "start". Type:
+
+  |. $daemonX . q| -h
+
+for a short synopsis, or see the man page for bdbaccess
+
+|;
+  exit 0;
+}

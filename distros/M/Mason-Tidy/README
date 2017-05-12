@@ -1,0 +1,45 @@
+NAME
+    Mason::Tidy - Engine for masontidy
+
+VERSION
+    version 2.57
+
+SYNOPSIS
+        use Mason::Tidy;
+
+        my $mc = Mason::Tidy->new(mason_version => 2);
+        my $dest = $mc->tidy($source);
+
+DESCRIPTION
+    This is the engine used by masontidy - read that first to get an
+    overview.
+
+    You can call this API from your own program instead of executing
+    `masontidy'.
+
+CONSTRUCTOR PARAMETERS
+    indent_block
+    indent_perl_block
+    mason_version (required)
+    perltidy_argv
+    perltidy_block_argv
+    perltidy_line_argv
+    perltidy_tag_argv
+        These options are the same as the equivalent `masontidy'
+        command-line options, replacing dashes with underscore (e.g. the
+        `--indent-per-block' option becomes `indent_perl_block' here).
+
+METHODS
+    tidy ($source)
+        Tidy component source *$source* and return the tidied result. Throw
+        fatal error if source cannot be tidied (e.g. invalid syntax).
+
+AUTHOR
+    Jonathan Swartz <swartz@pobox.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Jonathan Swartz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

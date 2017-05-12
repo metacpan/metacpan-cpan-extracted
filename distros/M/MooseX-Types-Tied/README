@@ -1,0 +1,56 @@
+NAME
+    MooseX::Types::Tied - Basic tied Moose types library
+
+VERSION
+    This document describes version 0.003 of MooseX::Types::Tied - released
+    April 21, 2012 as part of MooseX-Types-Tied.
+
+SYNOPSIS
+        use Moose;
+        use MooseX::Types::Tied ':all';
+
+        has tied_array => (is => 'ro', isa => TiedArray);
+
+        # etc...
+
+DESCRIPTION
+    This is a collection of basic Moose types for tied references. The
+    package behaves as you'd expect a MooseX::Types library to act: either
+    specify the types you want imported explicitly or use the ':all'
+    catchall.
+
+TYPES
+  Tied
+    Base type: Ref (to Scalar)
+
+  TiedArray
+    Base type: ArrayRef
+
+  TiedHash
+    Base type: HashRef
+
+  TiedHandle
+    Base type: FileHandle
+
+SOURCE
+    The development version is on github at
+    <http://github.com/RsrchBoy/moosex-types-tied> and may be cloned from
+    <git://github.com/RsrchBoy/moosex-types-tied.git>
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/moosex-types-tied/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2011 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

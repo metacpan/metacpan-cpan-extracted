@@ -1,0 +1,85 @@
+[![Build Status](https://travis-ci.org/berkmancenter/p5-MediaCloud-JobManager.svg?branch=develop)](https://travis-ci.org/berkmancenter/p5-MediaCloud-JobManager) [![Coverage Status](https://coveralls.io/repos/github/berkmancenter/p5-MediaCloud-JobManager/badge.svg?branch=develop)](https://coveralls.io/github/berkmancenter/p5-MediaCloud-JobManager)
+
+# MediaCloud::JobManager
+
+(Yet another) Perl worker / client library for running jobs asynchronously.
+
+## Features
+
+* Job brokers supported:
+    * [RabbitMQ](https://www.rabbitmq.com/) using [Celery's](http://www.celeryproject.org/) protocol
+* Automattic worker logging via [Log::Log4perl](http://search.cpan.org/~mschilli/Log-Log4perl/)
+* Restarting failed jobs
+* Progress reporting
+
+## Sample
+
+### Worker
+
+```perl
+package AddTwoNumbers;
+
+use strict;
+use warnings;
+
+use Moose;
+with 'MediaCloud::JobManager::Job';
+
+sub run($;$)
+{
+    my ( $self, $args ) = @_;
+
+    my $number_1 = $args->{ number_1 };
+    my $number_2 = $args->{ number_2 };
+
+    # Write the sum to the database here
+    say STDERR "Sum: " . ( $number_1 + $number_2 );
+
+    return 1;
+}
+
+no Moose;    # gets rid of scaffolding
+
+# Return package name instead of 1 or otherwise worker.pl won't know the
+# name of the package it's loading
+__PACKAGE__;
+```
+
+### Client
+
+```perl
+use AddTwoNumbers;
+
+my $args = { number_1 => 3, number_2 => 4 };
+
+# Run locally, like any other function
+AddTwoNumbers->run_locally( $args );
+
+# Run remotely, wait for the function to finish
+AddTwoNumbers->run_remotely( $args );
+
+# Add to broker's queue and return instantly, don't wait for the function to finish
+AddTwoNumbers->add_to_queue( $args );
+```
+
+
+# Development Notes
+
+## Installing
+
+OS X doesn't provide OpenSSL headers required by `Net::AMQP::RabbitMQ`, so before installing this module run:
+
+    # Install OpenSSL from Homebrew which provides required headers
+    brew install openssl
+
+    # Make Net::AMQP::RabbitMQ's Makefile look for OpenSSL headers in /usr/local/opt/openssl;
+    # also, remove MACOSX_DEPLOYMENT_TARGET from LD and use just "cc"
+    export PERL_MM_OPT='CCFLAGS="-I/usr/local/opt/openssl/include" LDFLAGS="-L/usr/local/opt/openssl/lib" LD="env cc"'
+
+
+## Code formatting
+
+Install `perltidy` Git hook to automatically fix script formatting:
+
+    cpanm --installdeps .
+    githook-perltidy install

@@ -1,0 +1,40 @@
+Math::HashSum version 0.02
+=============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DESCRIPTION
+
+  This module allows you to sum a list of key-value pairs on a per-key basis.
+  It adds up all the values associated with each key in the given list and
+  returns a hash containing the sum associated with each key.
+  
+  The examples below should explain usage of the module effectively.
+
+USAGE
+
+  use Math::HashSum qw(hashsum);
+  
+  my %hash1 = (a=>.1, b=>.4); 
+  my %hash2 = (a=>.2, b=>.5);
+  my %sum = hashsum(%hash1,%hash2);
+  
+  print "$sum{a}\n"; # Prints .3
+  print "$sum{b}\n"; # Prints .9
+    
+AUTHOR
+  David James <david@jamesgang.com>
+
+COPYRIGHT
+   Copyright 2003, David James.  All Rights Reserved.
+   This program is free software.
+   You may copy or redistribute it under the same terms as Perl itself.
+

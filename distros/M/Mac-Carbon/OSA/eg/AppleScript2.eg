@@ -1,0 +1,31 @@
+#!/usr/bin/perl
+# show how to use OSASetProperty()
+
+use warnings;
+use strict;
+
+use Mac::AppleEvents;
+use Mac::Components;
+use Mac::OSA;
+
+my $applescript = OpenDefaultComponent(kOSAComponentType, "ascr") or die "AppleScript not installed";
+my $script1 = AECreateDesc typeChar, <<'END_SCRIPT';
+tell app "iTunes" to get current track
+END_SCRIPT
+my $script2 = AECreateDesc typeChar, <<'END_SCRIPT';
+tell app "iTunes" to get name of foo
+END_SCRIPT
+
+my $compiled1 = OSACompile($applescript, $script1, kOSAModeNull) or die $!;
+my $compiled2 = OSACompile($applescript, $script2, kOSAModeCompileIntoContext) or die $!;
+
+my $value1 = OSAExecute($applescript, $compiled1, kOSANullScript, kOSAModeNull) or die $!;
+
+my $name  = AEDesc->new(typeChar, 'foo');
+OSASetProperty($applescript, kOSAModeNull, $compiled2, $name, $value1);
+my $value2 = OSAExecute($applescript, $compiled2, kOSANullScript, kOSAModeNull) or die $!;
+my $result2 = OSADisplay($applescript, $value2, typeChar, kOSAModeNull) or die $!;
+
+print $result2->get, "\n";
+
+__END__

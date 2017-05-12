@@ -1,0 +1,12 @@
+Changes
+=======
+
+0.00003 20 Mar 2009
+    * Fix typo (miyagawa)
+    * Specify Any::Moose (0.04) so that MooseX:: stuff works properly
+
+0.00002 20 Mar 2009
+    * Add Any::Moose to prerequisite if it hasn't been specified yet
+
+0.00001 18 Mar 2009
+    * Initial release

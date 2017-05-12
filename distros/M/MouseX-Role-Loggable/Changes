@@ -1,0 +1,7 @@
+0.113   Sat Dec  5 03:30:17 PST 2015
+  * Use namespace::autoclean instead of namespace::sweep.  [github #1]
+    ns::sweep is deprecated.
+
+0.112   Sat Jan 12 18:49:11 PST 2013
+  * First release based on MooseX::Role::Loggable 0.112.  See their
+    change log for past changes.

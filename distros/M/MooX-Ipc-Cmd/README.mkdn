@@ -1,0 +1,106 @@
+# NAME
+
+MooX::Ipc::Cmd - Moo role for issuing commands, with debug support, and signal handling
+
+# VERSION
+
+version 1.2.1
+
+# SYNOPSIS
+
+This role provides the ability to capture system calls, and to execute system calls.
+
+Features
+
+- Prints output in realtime, in debug mode
+- Handles signals, and kills via signal if configured too.
+- Uses Log::Any for logging.  If in debug mode, will log output of commands, and execution line
+- Command line option
+
+    package Moo_Package;
+    use Moo;
+    use MooX::Options; # required before with statement
+    with qw(MooX::Ipc::Cmd);
+
+    has '+_cmd_kill' => (default=>1); # override default
+    sub run {
+        my $self=shift
+        $self->_system(['cmd']);
+        my @result=$self->_capture(['results']);
+    }
+    1;
+
+    package main
+    use Log::Any::Adapter('Stdout');  #setup Log::Any::Adapter;
+    my $app=Moo_Package->new_with_options(_cmd_kill=>0); #command line processing
+    my $app=Moo_Package->new(_cmd_kill=>0); #no command line processing
+    1;
+
+# ATTRIBUTES
+
+## \_cmd\_kill
+
+If set to 1 will send the propgate signal when cmd exits due to signal.
+
+Reader: \_cmd\_kill
+
+Default: 1
+
+## mock
+
+Mocks the cmd, does not run
+
+Reader: mock 
+
+Default: 0
+
+Command line option, via MooX::Options
+
+# METHODS
+
+## \_system(\\@cmd', /%opts);
+
+Runs a command like system call, with the output silently dropped, unless in log::any debug level
+
+- Params:
+
+        $cmd : arrayref of the command to send to the shell
+        %opts
+          valid_exit => [0] - exits to not throw exception, defaults to 0
+
+- Returns:
+
+    exit code
+
+- Exception
+
+    Throws an error when case dies, will also log error using log::any category \_cmd
+
+## \_capture(\\@cmd',\\%opts);
+
+Runs a command like qx call.  Will display cmd executed 
+
+- Params:
+
+        $cmd: arrayref of the command to send to the shell
+        %opts:
+           valid_exit => [0] - exits to not throw exception, defaults to 0
+
+- Returns:
+
+    combined stderr stdout
+
+- Exception
+
+    Throws an MooX::Ipc::Cmd::Exception error
+
+# AUTHOR
+
+Eddie Ash &lt;eddie+cpan@ashfamily.net>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Edward Ash.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

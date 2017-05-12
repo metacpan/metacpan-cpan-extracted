@@ -1,0 +1,122 @@
+NAME
+    MMS::Mail::Message - A class representing an MMS (or picture) message
+    sent via email.
+
+VERSION
+    Version 0.06
+
+SYNOPSIS
+    This class is used by MMS::Mail::Parser to provide an itermediate data
+    storage class after the MMS has been parsed by the "parse" method but
+    before it has been through the second stage of parsing (the
+    MMS::Mail::Parser "provider_parse" method). If this doesn't make sense
+    then take a look at MMS::Mail::Parser to get an idea where this module
+    fits in before progressing any further.
+
+METHODS
+    The following are the top-level methods of the MMS::Mail::Message class.
+
+  Constructor
+    "new()"
+        Return a new MMS::Mail::Message object. Valid attributes are any
+        public accessor outlined in the Regular Methods section below.
+
+  Regular Methods
+    "header_datetime" STRING
+        Instance method - Returns the time and date the MMS was received
+        when invoked with no supplied parameter. When supplied with a
+        parameter it sets the object property to the supplied parameter.
+
+    "header_from" STRING
+        Instance method - Returns the sending email address the MMS was sent
+        from when invoked with no supplied parameter. When supplied with a
+        parameter it sets the object property to the supplied parameter.
+
+    "header_to" STRING
+        Instance method - Returns the recieving email address the MMS was
+        sent to when invoked with no supplied parameter. When supplied with
+        a parameter it sets the object property to the supplied parameter.
+
+    "header_subject" STRING
+        Instance method - Returns the MMS subject when invoked with no
+        supplied parameter. When supplied with a parameter it sets the
+        object property to the supplied parameter.
+
+    "header_received_from" STRING
+        Instance method - Returns the email server that (last) sent the mms
+        when invoked with no supplied parameter. When supplied with a
+        parameter it sets the object property to the supplied parameter.
+
+    "body_text" STRING
+        Instance method - Returns the MMS bodytext when invoked with no
+        supplied parameter. When supplied with a paramater it sets the
+        object property to the supplied parameter.
+
+    "strip_characters" STRING
+        Instance method - The supplied string should be a set of characters
+        valid for use in a regular expression character class "s/[]//g".
+        When set with a value the property is used by the "header_from",
+        "header_to", "header_datetime", "body_text" and "header_subject"
+        methods to remove these characters from their respective properties
+        (in both the "MMS::Mail::Message" and "MMS::Mail::Message::Parsed"
+        classes).
+
+    "cleanse_map" HASHREF
+        Instance method - This method allows a regular expression or
+        subroutine reference to be applied when an accessor sets a value,
+        allowing message values to be cleansed or modified. These accessors
+        are "header_from", "header_to", "body_text", "header_datetime" and
+        "header_subject".
+
+        The method expects a hash reference with key values as one of the
+        above public accessor method names and values as a scalar in the
+        form of a regular expression or as a subroutine reference.
+
+    "attachments" ARRAYREF
+        Instance method - Returns an array reference to the array of MMS
+        message attachments. When supplied with a parameter it sets the
+        object property to the supplied parameter.
+
+    "add_attachment" MIME::Entity
+        Instance method - Adds the supplied "MIME::Entity" attachment to the
+        attachment stack for the message. This method is mainly used by the
+        "MMS::Mail::Parser" class to add attachments while parsing.
+
+    "is_valid"
+        Instance method - Returns true or false depending if the
+        "header_datetime", "header_from" and "header_to" fields are all
+        populated or not.
+
+    "set"
+        Instance method - Overides the Class::Accessor superclass set method
+        to apply cleanse_map and strip_character functionality to accessors.
+
+AUTHOR
+    Rob Lee, "<robl at robl.co.uk>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-mms-mail-message@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MMS-Mail-Message>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+NOTES
+    Please read the Perl artistic license ('perldoc perlartistic') :
+
+    10. THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+ACKNOWLEDGEMENTS
+    As per usual this module is sprinkled with a little Deb magic.
+
+COPYRIGHT & LICENSE
+    Copyright 2005 Rob Lee, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    MMS::Mail::Message, MMS::Mail::Message::Parsed, MMS::Mail::Provider
+

@@ -1,0 +1,32 @@
+Strategies for Asynchronous DNS
+-------------------------------
+
+Principles
+
+1. As soon as we can tell what to query, initiate the query.
+
+2. Design things so that the results of the query aren't needed
+   until later in the process.
+
+Three different strategies?
+
+ A. Have the query_async() call return a token that can be used by
+    a later function to get the actual result of the query.
+	The "token" can actually be a subroutine that when called,
+	produces the result of the query.
+
+ B. Have the query_async() call not return anything, but the result
+    will be cached so a later call can get the result of the query
+    by passing in the same query parameters.
+
+ C. Have the query_async() call take an extra parameter, a reference
+    to a callback function... i.e. a function that will be called
+    whenever the query finishes, with the result of the query.
+
+I think I prefer strategy A to B; it's more standard of a practice.
+One trick about A is knowing where to store the "token".
+I'm not sure yet about A vs C.
+
+C fits in more naturally with coroutines and continuations.
+Might make the code more simple, but I need another function that
+will block until the query is finished.

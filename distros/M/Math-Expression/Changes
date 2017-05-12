@@ -1,0 +1,303 @@
+
+addw: Thu 30 Jan 2003 17:22
+Expression.pm:	Initial Create.
+
+addw: Thu 30 Jan 2003 17:22
+TestExpr.pl:	Initial Create.
+
+addw: Sat 01 Feb 2003 10:42
+Expression.pm: Ensure that 012 is interpretted as a decimal and not octal number.
+TestExpr.pl: Ensure that 012 is interpretted as a decimal and not octal number.
+
+addw: Mon 03 Feb 2003 12:59
+Expression.pm: Add a defined() function, allow '_' in var names, fix bug introduced last time on truncating floats
+
+addw: Mon 03 Feb 2003 13:00
+TestExpr.pl: Add defined() test, '_' in var names & do the syntax error checks.
+
+addw: Tue 04 Feb 2003 23:22
+Expression.pm: Forgot to put the mandatory '1;' at the end of the module.
+
+addw: Fri 07 Feb 2003 13:39
+Expression.pm: Recognise forgotten != operator, change ordering to recognise things like != anyway.
+
+addw: Fri 07 Feb 2003 13:42
+TestExpr.pl: Perform tests on some operators that had been forgotten, print count of tests performed.
+
+addw: Fri 07 Feb 2003 14:00
+Expression.pm: Make logical AND and OR consistent with perl: && and ||, not & and |.
+TestExpr.pl: Make logical AND and OR consistent with perl: && and ||, not & and |.
+
+addw: Mon 24 Feb 2003 13:23
+TestExpr.pl: Test aindex function
+Expression.pm: New function: aindex
+
+addw: Wed 26 Feb 2003 16:08
+Expression.pm: Fix consistency error if VarSetFun were reset
+
+addw: Fri 28 Feb 2003 14:21
+TestExpr.pl: Improve tests
+
+addw: Mon 24 Mar 2003 17:04
+Expression.pm: Add POD
+
+addw: Tue 25 Mar 2003 13:21
+Makefile.PL:	Initial Create.
+
+addw: Tue 25 Mar 2003 13:21
+README:	Initial Create.
+
+addw: Tue 25 Mar 2003 13:22
+MANIFEST:	Initial Create.
+
+addw: Tue 25 Mar 2003 13:22
+Expression.pm: Update documentation
+
+addw: Tue 25 Mar 2003 13:23
+TestExpr.pl: Add copyright & print version number.
+Renamed as test.pl
+
+
+addw: Tue 25 Mar 2003 13:24
+test.pl: Note change of name;
+
+addw: Tue 25 Mar 2003 13:47
+README: Allow for different version numbers between README and the module itself.
+Rename as README.in.
+
+
+addw: Tue 25 Mar 2003 13:56
+MANIFEST: Add TODO
+
+addw: Tue 25 Mar 2003 14:10
+TODO:	Initial Create.
+
+addw: Tue 25 Mar 2003 14:16
+test.pl: Changed $Version to $VERSION
+
+addw: Tue 25 Mar 2003 14:24
+Expression.pm: If an operand to '.' is undef, treat as empty.
+
+addw: Tue 25 Mar 2003 14:50
+Expression.pm: Dummy change just to bumb the version number - packaging didn't quite work right.
+
+addw: Tue 25 Mar 2003 14:56
+BuildDistribution.sh:	Initial Create.
+
+addw: Wed 26 Mar 2003 21:43
+Expression.pm: Add auto init feature/option
+
+addw: Wed 26 Mar 2003 21:49
+Expression.pm: Document the last change - AutoInit
+
+addw: Thu 27 Mar 2003 10:42
+MANIFEST: Add a few more files
+README.in: Add copyright release.
+TODO: Add copyright release.
+
+addw: Thu 08 Apr 2004 18:12
+Expression.pm: Implement monadic +-~!, exponent op '**', floats of form 123E21 and abs function.
+test.pl: Test implementation of monadic +-~!, exponent op '**', floats of form 123E21 and abs function.
+	Option to print the tree after an error.
+
+addw: Mon 05 Mar 2007 13:12
+test.t: Move from test.pl to t/test.t
+	Change to work with the current testing framework.
+MANIFEST: Change where the test script lives
+README.in: Talk about new location for test script
+
+addw: Mon 05 Mar 2007 14:38
+test.t: Be parsimonious on the use of POSIX, comment out a comment!
+Credits:	Initial Create.
+Credits: Add Alexandr Ciornii as a tester
+Makefile.PL: Add LICENSE
+Expression.pm: Be parsimonious on the use of POSIX.
+
+addw: Tue 06 Mar 2007 08:34
+Expression.pm: Just to increment version #
+
+addw: Thu 03 Jan 2008 16:23
+test.t: Add some extra tests for parsing numbers. Fix up how-to-run-me examples
+
+addw: Thu 03 Jan 2008 16:23
+Expression.pm: Fix RE that recognises floating point numbers
+
+addw: Thu 03 Jan 2008 16:30
+Credits: Add someone who found a prob with number parsing
+
+addw: Wed 13 Feb 2008 09:50
+test.t: Add test for rounding -ve numbers
+
+addw: Wed 13 Feb 2008 10:07
+test.t: Add test for rounds() - round() reverts to previously documented behaviour
+
+addw: Wed 13 Feb 2008 10:08
+Expression.pm: Add rounds() - sign sensitive round()
+
+addw: Wed 13 Feb 2008 13:30
+UseOfOptions.pl:	Initial Create.
+
+addw: Wed 13 Feb 2008 13:31
+test.t: A few extra comments
+
+addw: Wed 13 Feb 2008 13:32
+MANIFEST: Add Examples/UseOfOptions.pl
+
+addw: Wed 13 Feb 2008 13:35
+README.in: Note Examples directory
+
+addw: Wed 13 Feb 2008 13:41
+UseOfOptions.pl: Remove test option
+
+addw: Wed 13 Feb 2008 13:54
+BasicUse.pl:	Initial Create.
+
+addw: Wed 13 Feb 2008 13:55
+MANIFEST: Add Examples/BasicUse.pl
+
+addw: Wed 13 Feb 2008 13:56
+Expression.pm: Add option: ExtraFuncEval & a bit of documentation.
+	Fix a problem where an undefined variable could result in the use on uninitialised strings.
+
+addw: Wed 13 Feb 2008 13:57
+BasicUse.pl: Remove test option
+
+addw: Tue 04 Mar 2008 08:55
+MANIFEST: Add t/options.t
+
+addw: Tue 04 Mar 2008 09:00
+UseOfOptions.pl: Show use of RoundNegatives
+
+addw: Tue 04 Mar 2008 09:01
+test.t: Remove test for rounds()
+
+addw: Tue 04 Mar 2008 09:01
+options.t:	Initial Create.
+
+addw: Tue 04 Mar 2008 09:02
+Expression.pm: Remove rounds(), replace with RoundNegatives options.
+	Fix problems in SetOption
+
+addw: Thu 21 Aug 2008 12:38
+README.in: Add how to contribute and how to get new versions
+
+addw: Wed 11 Mar 2015 17:41
+Expression.pm: Fix small typeo in example
+
+addw: Mon 23 Mar 2015 02:25
+Expression.pm: Add method ParseToScalar
+	Remove some redundant variables
+	Add ';' - statement separator
+	Some extra examples
+
+addw: Tue 24 Mar 2015 00:29
+Expression.pm: Introduce grouping with { }
+	Test for functions known at compile time
+	Change to the compile engine, no longer pushes a '(' at the start of the expression
+
+addw: Wed 25 Mar 2015 11:55
+Expression.pm: Add flow: if & while
+	Rewrite parser
+	Update description
+
+addw: Wed 25 Mar 2015 12:06
+Expression.pm: Use OO syntax more
+
+addw: Wed 25 Mar 2015 14:06
+Expression.pm: Implement ++ and --
+
+addw: Wed 25 Mar 2015 14:15
+Expression.pm: Change an example to use ++
+
+addw: Wed 25 Mar 2015 14:36
+Expression.pm: Tweak documentation
+
+addw: Thu 26 Mar 2015 12:48
+Expression.pm: Fix bug with nested flows
+	Change varname: $nodep -> $newt
+	Fix assignment so that multiple assignment works properly.
+
+addw: Fri 27 Mar 2015 02:14
+Expression.pm: Allow array indexes with []
+	Code simplifications
+
+addw: Fri 27 Mar 2015 02:48
+Expression.pm: Fix error where a string comparison operator could match the start of a variable name
+
+addw: Fri 27 Mar 2015 09:26
+TODO: uptodate
+
+addw: Fri 27 Mar 2015 10:19
+Expression.pm: Implement string length restrictions (denial of service)
+	Option EnablePrintf - also DoS problem
+
+addw: Fri 27 Mar 2015 10:38
+Expression.pm: Add a preset variable _TIME
+
+addw: Fri 27 Mar 2015 10:39
+Expression.pm: Fix example
+
+addw: Fri 27 Mar 2015 13:11
+Expression.pm: Renumber precedences to return to integers
+
+addw: Fri 27 Mar 2015 14:14
+MANIFEST: Add Examples/Strings.pl
+
+addw: Fri 27 Mar 2015 15:20
+README.in: Provide a better overview
+
+addw: Fri 27 Mar 2015 15:46
+Expression.pm: Update documentation.
+	Want a new number so that I can have a better README on CPAN
+
+addw: Fri 27 Mar 2015 15:57
+README.in: Tweak again
+
+addw: Fri 27 Mar 2015 18:50
+Expression.pm: Fix bug so that +a[i] works
+
+addw: Sat 28 Mar 2015 12:43
+Expression.pm: Document StringMaxLength
+
+addw: Sun 29 Mar 2015 22:18
+Expression.pm: Variables named more restricted, either foo or $foo - which both refer to the same variable
+	Add functions: push, pop, shift, unshift, strlen, count
+	Allow -ve indicies on arrays
+	Change precedence table to leave gaps
+
+addw: Mon 30 Mar 2015 11:24
+Expression.pm: Simplify: PrintError does the test for PrintErrFunc
+
+addw: Mon 30 Mar 2015 12:02
+Expression.pm: Add type to constants - there to distinguish strings from numbers
+
+addw: Mon 30 Mar 2015 15:05
+Expression.pm: Fix problem with assigning to -ve array indexes
+
+addw: Mon 30 Mar 2015 18:29
+Expression.pm: Fix bug where assigning empty array caused prob with ;
+
+addw: Sat 11 Apr 2015 00:37
+Expression.pm: Add recognition of some escape characters in double quoted strings
+
+addw: Sun 12 Apr 2015 20:58
+README.in: Extend author dates; mention string escapes
+
+addw: Tue 05 May 2015 23:55
+TODO: Add need for error flag
+
+addw: Thu 21 Jul 2016 00:56
+TODO: Bring up to date
+
+addw: Thu 21 Jul 2016 01:02
+README.in: Bring up to date
+
+addw: Thu 21 Jul 2016 01:06
+Expression.pm: Fix: empty list '()' works, functions with no arguments
+	User defined functions
+	Unicode escapes in strings
+	Small change in output format of PrintTree()
+	Update documentation
+
+addw: Thu 21 Jul 2016 12:48
+Expression.pm: A simpler/better way of managing a () in input. More comments

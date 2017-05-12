@@ -1,0 +1,38 @@
+---
+abstract: store multi-level Perl hash structure in single level tied hash
+author:
+  - 'Gurusamy Sarathy <gsar@umich.edu>'
+  - Alexandr Ciornii (alexchorny@gmail.com)
+build_requires:
+  Test::More: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MLDBM
+provides:
+  MLDBM:
+    file: lib/MLDBM.pm
+    version: 2.05
+  MLDBM::Serializer:
+    file: lib/MLDBM.pm
+    version: 2.05
+  MLDBM::Serializer::Data::Dumper:
+    file: lib/MLDBM/Serializer/Data/Dumper.pm
+    version: 0
+  MLDBM::Serializer::FreezeThaw:
+    file: lib/MLDBM/Serializer/FreezeThaw.pm
+    version: 0
+  MLDBM::Serializer::Storable:
+    file: lib/MLDBM/Serializer/Storable.pm
+    version: 0
+requires:
+  Carp: 0
+  Data::Dumper: 2.08
+  perl: 5.005
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/chorny/MLDBM/
+version: 2.05

@@ -1,0 +1,9 @@
+^blib/
+^\.git/
+\.gitignore$
+.*~$
+^Makefile(\.old)?$
+^MANIFEST\.bak$
+^MYMETA\.(yml|json)$
+^pm_to_blib$
+^Module-Install-Rust-.*\.tar\.gz$

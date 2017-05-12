@@ -1,0 +1,22 @@
+---
+name: Module-Pluggable-Dependency
+version: 0.0.4
+author:
+  - 'Michael Hendricks  <michael@ndrix.org>'
+abstract: order plugins based on inter-plugin dependencies
+license: mit
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+requires:
+  Algorithm::Dependency: 1.04
+  Module::Pluggable: 1.9
+build_requires:
+  Test::More: 0
+provides:
+  Module::Pluggable::Dependency:
+    file: lib/Module/Pluggable/Dependency.pm
+    version: 0.0.4
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

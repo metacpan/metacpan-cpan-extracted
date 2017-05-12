@@ -1,0 +1,63 @@
+[%# 
+
+=head1 display_search_inputs
+
+This displays inputs for search page.  Override in individual class template
+directories as needed. 
+
+Vars it needs: 
+classmetadata-- the hash of inputs keyed on column names
+errors		 -- hash of errors keyed on columns 
+=cut
+
+#%]
+
+[% IF errors.FATAL; "FATAL ERROR: "; errors.FATAL; "<br>"; END %]
+
+[% 	USE this = Class(classmetadata.name);
+	SET srch_fields = classmetadata.search_columns || 
+			  classmetadata.columns; 
+	SET cgi         = classmetadata.cgi; 
+	SET delimiter = this.foreign_input_delimiter;
+	FOR field IN srch_fields;
+		NEXT IF !cgi.$field;
+ 		# Recursivly call this tmeplate if we have foreign field 
+        # (hash of foreign inputs should come with it) 
+		IF (  cgi.$field.keys ); 
+	     	fclass = this.related_class(request, field); 
+			fclass_meta = this.get_classmetadata(fclass);
+			fclass_meta.cgi = cgi.$field; 
+			tbl   = fclass_meta.table;
+			INCLUDE display_search_inputs
+				col_prefix    = col _ delimiter _ col_prefix
+				classmetadata = fclass_meta;
+			NEXT;
+		END;
+
+	NEXT IF field == 'id' OR field == classmetadata.table _ 'id';
+ 	SET element = cgi.$field; 
+%]
+
+<label>
+		<span class="field">
+		[% 
+			classmetadata.colnames.$field || field | ucfirst | replace('_',' '); %]
+		</span>
+		[% 	IF element.tag == "select";
+				# set the previous value 
+				IF cgi_params.exists(field);
+				   	set_selected(element, cgi_params.$field);
+				END;
+					
+			END;
+            IF element.tag == "input";  # wipe out any default value
+			  old_val =  element.attr('value', '');
+           	END;
+       
+
+	    	element.as_XML; 
+		%]
+</label>
+[% END; %]
+	
+

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist SYSTEM "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="0.9">
+<dict>
+	<key>AlignViewToGrid</key>
+	<true/>
+	<key>AppleSavePanelExpanded</key>
+	<string>NO</string>
+	<key>BackgroundColors</key>
+	<data>
+	BAt0eXBlZHN0cmVhbYED6IQBQISEhA5OU011dGFibGVBcnJheQCEhAdOU0FycmF5AISE
+	CE5TT2JqZWN0AIWEAWkBkoSEhAdOU0NvbG9yAJWEAWMBhARmZmZmgz9/AACDP38AAIM/
+	fwAAAYaG
+	</data>
+	<key>BackgroundMusicChoices</key>
+	<array/>
+	<key>CacheAllImages</key>
+	<true/>
+	<key>DeletePhotosAfterImport</key>
+	<true/>
+	<key>EditDoubleClickBehavior</key>
+	<string>DoubleClickEditTab</string>
+	<key>EnableBackgroundMusic</key>
+	<false/>
+	<key>ExternalEditorPath</key>
+	<string></string>
+	<key>FilmRollNewLine</key>
+	<true/>
+	<key>FirstLaunch</key>
+	<false/>
+	<key>KeywordMode</key>
+	<integer>0</integer>
+	<key>LoopSlides</key>
+	<false/>
+	<key>MostRecentFirst</key>
+	<false/>
+	<key>NSDefaultOpenDirectory</key>
+	<string>~/Desktop/Pics</string>
+	<key>NSWindow Frame ArchiveWindowFrame</key>
+	<string>35 74 750 522 0 0 1024 746 </string>
+	<key>NSWindow Frame Progress</key>
+	<string>337 236 323 129 0 0 1024 746 </string>
+	<key>PrintDialogName</key>
+	<string>SimplePrintDialog</string>
+	<key>RootDirectory</key>
+	<string>/Volumes/CPAN/Pictures/iPhoto Library</string>
+	<key>ShowCaptions</key>
+	<false/>
+	<key>ShowFilmRolls</key>
+	<false/>
+	<key>ShowKeywords</key>
+	<false/>
+	<key>SlideDuration</key>
+	<integer>2</integer>
+	<key>ThumbnailSize</key>
+	<real>3.837209000000000e-01</real>
+</dict>
+</plist>

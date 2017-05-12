@@ -1,0 +1,357 @@
+Changelog for MarpaX-Languages-ECMAScript-AST
+
+0.020 2015-01-09T19:20:59
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Impl/Logger.pm: issue with latest Log::Any
+
+0.019 2014-10-25T22:15:15Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - ECMAScript_262_5/Program.pm: github issue #5
+ - t/asi.t: say more when there is a failure
+
+0.018 2014-07-23T20:09:04Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.018
+ - t/github_issue_0004.t: More than one parse tree value #4
+ - t/github_issue_0003.t: fix comment
+ - github issue #3
+ - ECMAScript_262_5 Generic Template for version 0.018
+ - Grammar/Base.pm: too_many_earley_items as a class method
+ - Grammar/Base.pm: too_many_earley_items => 0
+ - ECMASCript/Program.pm: fix ExpressionStatement ambiguity with Block or
+   FunctionDeclaration
+ - Grammar/Base.pm: support of eventual traverser
+ - ECMAScript_262_5 Generic Template for version 0.018
+ - AST/Impl.pm: fix recce method
+
+0.017 2014-07-03T21:41:45Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.017
+ - ECMAScript_262_5 Generic Template for version 0.017
+ - Program/Semantics.pm: optimization
+ - Merge branch 'master' of
+   https://github.com/jddurand/MarpaX-Languages-ECMAScript-AST
+ - Program/Semantics.pm: add lhs and rhs information in value -
+   StringLiteral: documentation and behaviour mismatch #2
+ - ECMAScript_262_5/Program.pm: few optimizations
+ - ECMAScript_262_5 Generic Template for version 0.017
+ - t/github_issue_0001.t: Removed logging
+
+0.016 2014-07-01T22:45:04Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.016
+ - Code that throws a "subexpression recursion limit exception". (#1)
+ - number dev+
+
+0.015 2014-02-22T08:34:45Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.015
+ - Grammar/Base.pm: Fixed show of last expression in case of error
+ - Revert "Use slr->ambiguity_metric to detect ambiguous parse" This
+   reverts commit 510867cf17ba5b65515f76af8ed34a33f7445659.
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - Merge branch 'master' of
+   https://github.com/jddurand/MarpaX-Languages-ECMAScript-AST
+ - AST/Impl.pm: use Marpa::R2 2.080000
+ - Use slr->ambiguity_metric to detect ambiguous parse
+
+0.014 2014-02-16T21:10:23Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.014
+ - Pattern/Semantics.pm: revisited way to condtionnaly use perl feature
+
+0.013 2014-02-16T15:21:39Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.013
+ - use Marpa::R2 2.079015 rewritten as use Marpa::R2 2.079_015
+ - t/pattern.t: full coverage of Pattern/Semantics.pm
+ - Pattern/Semantics.pm: _HexEscapeSequence fix
+ - t/pattern.c: escape parens test
+ - lexeme default = forgiving => 1 && DecimalDigits
+ - lexeme default = forgiving => 1
+ - t/pattern.t: Caret test not at the beginning of string
+ - Pattern/Semantics.pm: Caret assertino bug
+ - Pattern/Semantics.pm: bug in _charsetUnion
+ - t/pattern.t: more tests
+ - Pattern/Semantics.pm: one more parameter for regexp, a routine to
+   eventually do its own upper case
+ - t/pattern.t: Assertion \b and \B tests conted
+ - t/pattern.t: Assertion \\b and \\B tests
+ - Pattern/Semantics.pm: bug fix in _isWordChar
+ - script/cover.sh
+ - _AtomEscape_CharacterClassEscape fix
+
+0.012 2014-02-14T21:21:11Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.012
+ - use File::HomeDir 0.93; because of my_dist_data
+
+0.011 2014-02-09T23:30:10Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.011
+ - Impl/Singleton.pm: Removed some debug statement
+ - t/stringNumericLiteralBigFloat.t: on some old Math::BigInt, 0x is not
+   optional in from_hex
+
+0.010 2014-02-09T01:01:49Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.010
+ - Float wooes
+ - StringNumericLiteral/NativeNumberSemantics.pm: do {my $n = 2; $n *= $n
+   while $n < $n*$n; $n} only when absolutely necessary
+
+0.009 2014-02-08T18:16:41Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.009
+ - t/stringNumericLiteral*.t: Infinity tests
+ - StringNumericLiteral/NativeNumberSemantics.pm: Try to deal with
+   platforms without pos_zero or pos_infinity
+ - ECMAScript_262_5/Program.pm: Tiny optimization
+
+0.008 2014-02-07T19:36:39Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.008
+ - ECMAScript_262_5 Generic Template for version 0.008
+ - Replaced __PACKAGE__ by $class
+ - Fix tests
+ - Problem with file naming (2)
+ - Pb with file naming
+ - Fix Semantics package runtime settings
+ - Added missing ABSTRACT and VERSION
+ - URI prototype
+ - URI dev+
+ - JSON prototype
+ - dist.ini: double quotes for portability
+ - Singleton centralization
+ - AST/Impl.pm: Typo in POD
+ - Pattern/Semantics.pm: Fix POD error
+
+0.007 2014-02-05T23:04:05Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.007
+ - Refactorisation
+ - Lexical/NumericLiteral.pm: Load grammar once
+ - Program/Actions.pm renamed to Program/DefaultSemanticsPackage.pm
+ - StringNumericLiteral: fix bareword warnings
+ - t/pattern.t: better indentation
+ - t/pattern.t: move test of value upper
+ - t/pattern.t: two more test with alternation
+ - Pattern: Fix lexeme issue (longest match win)
+
+0.006 2014-02-03T22:18:19Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.006
+ - use
+   MarpaX::Languages::ECMAScript::AST::Grammar::ECMAScript_262_5::Character
+   Classes
+ - t/pattern.t: Removed logging
+ - Pattern: t+ and deviation from the spec for Assertions returning a
+   matcher
+ - Pattern: t+
+ - Revert "ECMAScript_262_5/Pattern.pm :  missing track of lparens for
+   lookahead disjunctions" This reverts commit
+   71d04f099f953fde146afd4ec3d5b4b59279fa85.
+ - Revert "Pattern/DefaultSemanticsPackage.pm: support of lparens in
+   lookahead disjunctions" This reverts commit
+   72cfe8ac1f5a430bbc0e6e3d9820786ba53e3fbe.
+ - Pattern/DefaultSemanticsPackage.pm: support of lparens in lookahead
+   disjunctions
+ - ECMAScript_262_5/Pattern.pm :  missing track of lparens for lookahead
+   disjunctions
+ - Pattern: positive lookahead test
+ - Pattern: backtracking fix
+ - Pattern/DefaultSemanticsPackage.pm: _CharacterEscape_IdentityEscape fix
+ - Pattern: t+
+ - Pattern: t+
+ - Pattern: t+
+ - Pattern: dev+
+ - Grammar/CharacterClasses.pm: Added export of BS
+ - Pattern/DefaultSemanticsPackage.pm: Use only exported functions from
+   CharacterClasses
+ - Grammar/CharacterClasses.pm: added NULL range and value
+ - Pattern: dev+
+ - StringNumericLiteral/DefaultSemanticsPackage.pm: POD fix
+ - Grammar/CharacterClasses.pm: Export explicitely the characters composing
+   LineTerminator and Whitespace
+ - Pattern: dev+
+ - ECMAScript_262_5/Program.pm: Fix POD
+ - StringNumericLilteral/DefaultSemanticsPackage.pm: Fix POD
+ - Pattern: dev+
+ - StringNumericLiteral/DefaultSemanticsPackage: Fix POD
+ - Revisited method names for StringNumericLiteral
+ - Pattern: dev+
+ - ECMAScript_262_5.pm: say that only the Program grammar provides an AST
+ - Pattern: dev+
+ - Lexical.pm: removed as non-needed
+ - Base: say that every string in the AST is a perl string
+ - rename of t/stringNumericLiteral*.t
+ - t/stringNumericLiteralBigFloat: Math::BigFloat implementation
+ - StringNumericLiteral: Fix call to implementations
+ - StringNumericLiteral::DefaultSemanticsPackage: Fix POD
+ - Pattern/DefaultSemanticsPackage.pm: POD fix
+ - Impl.pm: use Marpa::R2 2.078000
+ - ECMAScript_262_5 Generic Template for version 0.006
+ - Added default actions, fixed IdentityEscape
+ - AST/Grammar/ECMAScript_262_5.pm: added pattern()
+ - AST/Grammar.pm: added pattern()
+ - AST.pm: more POD, added pattern()
+ - ECMAScript_262_5 Generic Template for version 0.006
+ - StringNumericLiteral: renamed method value to hostValue
+ - Pattern.pm : make compilable
+ - Merge branch 'master' of
+   https://github.com/jddurand/MarpaX-Languages-ECMAScript-AST
+ - Regexp string preparation
+ - Regexp string preparation
+ - Regexp string preparation
+ - Regexp string preparation
+ - AST.pm : document more options argument passing
+ - Several POD fix (dzil xtest)
+ - StringNumericLiteral/DefaultSemanticsPackage.pm; Removed unused method
+ - Grammar/ECMAScript_262_5: POD fix
+ - Impl.pm: use Marpa::R2 2.077015 for a semantics_package fix
+ - Grammar/ECMAScript_262_5.pm: fix option passing
+ - Externalised semantic package example
+ - t/stringNumericLiteral.t: test cases with space (or empty input -;
+ - StringNumericLiteral: fix call to actions
+ - StringNumericLiteral defaults and test-suite
+ - ECMAScript_262_5 Generic Template for version 0.006
+ - Supreesed modules
+ - Fix default and make_grammar_option method overwrite
+ - t/stringNumericLiteral.t: dev+
+ - Template new moved from HASH to ref to HASH
+ - StringNumericLiteral: dev+
+ - Added missing exports for template and stringNumericLiteral
+ - ECMAScript_262_5 Generic Template for version 0.006
+ - StringNumericLiteral.pm: a somewhat better default
+ - Impl.pm: always use local hash for G->new() input
+ - Impl.pm: always use local hash to R->new() input
+ - StringNumericLiteral export
+ - StringNumericLiteral/DefaultSemanticsPackage.pm: fix typo
+ - StringNumericLiteral singleton and default semantics_package
+ - ECMAScript_262_5 Generic Template for version 0.006
+ - Use cached grammars for Program and StringLiteral
+ - Support of cached grammars
+ - StringNumericLiteral: dev+
+ - t/asi.t: use the same instance for all subtest
+ - Program/Singleton.pm: cached Program grammar
+ - StringNumericLiteral dev+
+ - Lexical::StringNumericLiteral: dev+
+ - Grammar::CharacterClasses: add IseOrE
+ - Lexical::StringNumericLiteral::Actions: dev+
+ - Lexical::StringNumericLiteral: dev+
+ - Lexical::StringLiteral: use inherited parse()
+ - Use range for character class when possible
+ - RT #91120
+
+0.005 2013-11-30T21:38:48Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.005
+ - Lexical/StringLiteral/Actions.pm; octal actions fixes
+ - AST/Impl.pm: typo in POD
+ - AST/Impl.pm: possibility to cache the Marpa::R2::Scanless::G for speedup
+ - Program/Actions.pm: StringLiteral action
+ - Program.pm: StringLiteral action
+ - Program.pm: keepOriginalSource => 0
+ - Lexical/StringLiteral: actions
+ - Lexical/NumericLiteral/Actions.pm: Removed use Math::BigInt
+ - Grammar/ECMAScript_262_5.pm: Removed non-needed code
+ - Grammar/Base.pm: Fixed default _grammar_option, Say default value for
+   parse() options
+ - Exceptions.pm: Added missing ABSTRACT and VERSION
+ - ECMAScript_262_5 Generic Template for version 0.005
+ - NumericLiteral: actions dev+
+ - NumericLiteral: actions dev+
+ - NumericLiteral: action templates
+ - NumericLiteral: more actions
+ - MV of NumericLiteral: dev+
+ - MV of NumericLiteral: dev+
+ - NumericLiteral actions and injection
+ - Fix transpilation callbacks return value processing
+ - script/generateTemplate.pl: fix callback usage
+ - use Exception::Class
+ - generateTemplate: callback trial t+
+ - Impl: rule_id, rule_expand, symbol_name
+ - AST: Use recommended Marpa methods
+ - Removed non warnings recursion
+
+ [jddurand <jeandamiendurand@free.fr>]
+ - NumericLiteral: dev+
+
+0.004 2013-11-10T17:16:22Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.004
+ - perl critic
+ - perlcritic.rc
+ - Remove Template.pm from allow_dirty
+ - Try to not be fooled by git commit of ECMAScript_262_5/Template at
+   BeforeBuild exit code
+ - Add git commit of ECMAScript_262_5/Template at BeforeBuild
+ - ECMAScript_262_5 Generic Template for version 0.004
+ - script/generateTemplate.pl: better indentation
+ - ECMAScript_262_5/Template: Putted by hand until I understand how to tell
+   dzil to do it for me...
+ - script/generateTemplate.pl: Generate POD
+ - Template.pm fix t+
+ - BeforeBuild of
+   lib/MarpaX/Languages/ECMAScript/AST/Grammar/ECMAScript_262_5/Template.pm
+ - Supressed script/generateTemplateXslate.pl
+ - generateTemplateXslate.pl -> generateTemplate.pl
+ - AST/Grammar/ECMAScript_262_5/Template: Generated template for
+   ECMAScript_262_5
+ - script/generateTemplateXslate: PP version
+ - AST/Grammar/ECMAScript_262_5/Program: no more need ot automatic blessing
+ - AST/Grammar/ECMAScript_262_5: This grammar's generic template
+ - AST/Grammar: template() stub
+ - AST: Removed startRuleId
+ - AST: startRuleId method
+ - AST: sub templatePath
+ - generateTemplateXslate: use ~ between calls
+ - generateTemplateXslate: typo fix
+ - generateTemplateXslate.pl: automatic generation of template's template -
+   prototype
+ - generateTemplateXslate: prototype
+ - AST: get the underlying grammarAlias
+ - AST/Grammar: rename alias() method to grammarAlias()
+ - AST/Grammar: return the grammar alias as found in this distribution
+ - Program: no need anymore of "proxy" G1 rules since the parse tree value
+   will contain the G1 rules Id
+ - Program/Actions: shall I return reference to @_ directly or not
+ - AST: describe contains both G0 and G1
+ - AST: new format for describe
+ - Program: AST is a hash with values and ruleId
+ - AST: Fix usage of is_lax
+ - AST: Add version of this package in cache
+ - AST: default cache is off
+ - AST: describe() method, factorized _init()
+ - Impl: g1_rule_ids() and rule()
+
+0.003 2013-11-03T21:48:28Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.003
+ - Program: Insert a true semicolon in the AST where there is an invisible
+   semicolon
+ - AST: Fix usage of cache
+ - Program: Put special lexeme in dedicated LHSs
+ - Program/Actions: remove non-needed actions
+ - Fix filename cache
+ - AST: Fix POD about cache
+ - AST: use my_dist_data for cache root storage
+ - AST: Fix synopsis, use CHI label and namespace
+
+0.002 2013-10-31T21:01:47Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.002
+ - Cache via CHI and optimizations
+ - Fix POD
+ - Fixed usage
+ - Rebless explicitely NumericLiteral lexemes
+
+0.001 2013-10-30T18:05:36Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.001
+ - first commit
+ - first commit
+

@@ -1,0 +1,29 @@
+---
+abstract: 'Mask modules not listed as dependencies'
+author:
+  - 'Matt Lawrence <mattlaw@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.4
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120620'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Mask-Deps
+provides:
+  Module::Mask::Deps:
+    file: lib/Module/Mask/Deps.pm
+    version: 0.07
+recommends:
+  Test::Pod: 1.14
+  Test::Pod::Coverage: 1.04
+requires:
+  Module::CoreList: 1.01
+  Module::Mask: 0
+  perl: v5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.07

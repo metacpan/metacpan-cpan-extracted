@@ -1,0 +1,58 @@
+NAME
+    MooseX::GlobRef - Store a Moose object in glob reference
+
+SYNOPSIS
+      package My::IO;
+
+      use Moose;
+      use MooseX::GlobRef;
+
+      has 'file' => ( is => 'ro', isa => 'Str', required => 1 );
+
+      sub open {
+        my $fh = shift;
+        open $fh, $fh->file or confess "cannot open";
+        return $fh;
+      }
+
+      sub getlines {
+        my $fh = shift;
+        return readline $fh;
+      }
+
+      my $io = My::IO->new( file => '/etc/passwd' );
+      print "::::::::::::::\n";
+      print $io->file, "\n";
+      print "::::::::::::::\n";
+      $io->open;
+      print $io->getlines;
+
+DESCRIPTION
+    This module allows to store Moose object in glob reference of file
+    handle. The class attributes will be stored in hash slot associated with
+    glob reference. It allows to create a Moose version of IO::Handle.
+
+    The attributes can be accessed directly with following expression:
+
+      my $hashref = \%{*$self};
+      print $hashref->{key};
+
+    or shorter:
+
+      print *$self->{key};
+
+    but the standard accessors should be used instead:
+
+      print $self->key;
+
+AUTHOR
+    Piotr Roszatycki <dexter@cpan.org>
+
+LICENSE
+    Copyright (c) 2007, 2008, 2009, 2010 Piotr Roszatycki <dexter@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as perl itself.
+
+    See http://dev.perl.org/licenses/artistic.html
+

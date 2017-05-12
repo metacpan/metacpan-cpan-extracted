@@ -1,0 +1,21 @@
+Changes
+ignore.txt
+lib/Moonshine/Util.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/00-load.t
+t/100-trim_ws.t
+t/110-join_class.t
+t/120-append_str.t
+t/130-prepend_str.t
+t/140-elide.t
+t/150-assert_valid_html5_tag.t
+t/160-valid_attributes_for_tag.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,334 @@
+--stations
+
+# Länsmansgården->Centrum
+Varmfrontsgatan % Länsmansgården
+Temperaturgatan
+Väderilsgatan % Biskopsgården
+Friskväderstorget
+Önskevädersgatan
+Mildvädersgatan
+Vårväderstorget
+Sålöfjordsgatan
+Eketrägatan
+Gropegårdsgatan
+Rambergsvallen
+Wieselgrensplatsen % Brämaregården
+Vågmästareplatsen
+Hjalmar Brantingsplatsen
+Frihamnen
+Nordstan
+Lilla Bommen
+
+# Från Angered
+Angered Centrum % Angered
+Storås
+Hammarkullen
+Hjällbo
+
+# Från Bergsjön
+Aprilgatan % Kortedala
+Komettorget % Bergsjön
+Rymdtorget
+Teleskopgatan
+Galileis Gata
+Januarigatan
+Allhelgonakyrkan
+Kortedala torg
+Runstavsgatan
+Nymånegatan
+Beväringsgatan
+Kviberg
+Bellevue
+SKF
+Gamlestadstorget
+Ejdergatan
+
+# Från östra sjukhuset
+Östra Sjukhuset
+Tingvallsvägen
+Kaggeledstorget
+Ättehögsgatan
+Munkebäckstorget
+Härlanda
+Stockholmsgatan
+Redbergsplatsen
+Olskrokstorget
+Svingeln
+Ullevi Norra
+Ullevi Södra
+Scandinavium
+
+Solrosgatan
+Sanatoriegatan
+Virginsgatan % Kålltorp
+Welandergatan
+Töpelsgatan
+Bögatan
+Ekmanska
+Bäckeliden
+S:t Sigfrids Plan
+Liseberg
+
+# Från Mölndal
+Mölndal centrum % Mölndal
+Mölndals sjukhus
+Lackarebäck
+Krokslätts Fabriker
+Krokslätts torg
+Lana
+Varbergsgatan
+Elisedal
+Almedal
+Getebergsäng
+
+# Från Saltholmen
+Saltholmen
+Roddföreningen
+Långedrag
+Hinsholmen
+Käringberget
+Tranered
+Hagen
+Nya Varvsallén
+Kungssten
+Sandarna
+Sannaplan
+Ostindiegatan
+Vagnhallen Majorna
+Jaegerdorffsplatsen
+Chapmans Torg
+Kaptensgatan
+Stigbergstorget
+Masthuggstorget
+
+Mariaplan
+Godhemsgatan
+Ekedal
+Majvallen
+Fjällgatan
+
+# Från Guldheden
+Dr. Sydows gata % Guldheden
+Dr. Fries gata
+
+# Från Tynnered
+Opaltorget % Tynnered
+Smaragdgatan
+Briljantgatan
+Frölunda Torg % Frölunda
+Positivgatan
+Musikvägen
+Nymilsgatan
+Lantmilsgatan
+Axel Dahlströms Torg % Högsbotorp
+Marklandsgatan
+
+Bokekullsgatan
+Högsbogatan
+Klintens Väg
+
+Botaniska Trädgården
+Linnéplatsen
+Olivedalsgatan
+Prinsgatan
+Seminariegatan
+Brunnsgatan
+Handelshögskolan
+
+Salhgrenska Huvudentré
+Medicinaregatan
+Wavrinskys Plats
+Chalmers
+Kapellplatsen
+
+# Centrum
+Järntorget
+Hagakyrkan
+Vasa Viktoriagatan
+Vasaplatsen
+Grönsakstorget
+Domkyrkan
+Brunnsparken
+Kungsportsplatsen
+Valand
+Berzeliigatan
+Korsvägen
+Centralstationen % Drottningtorget
+
+--lines
+1|1|Line 1|color:#cccccc,width:8
+2|2|Line 2|color:#ffd938,width:8
+3|3|Line 3|color:#007cc5,width:8
+4|4|Line 4|color:#00a763,width:8
+5|5|Line 5|color:#ff403a,width:8
+6|6|Line 6|color:#ff9430,width:8
+7|7|Line 7|color:#a55311,width:8
+8|8|Line 8|color:#a024a1,width:8
+9|9|Line 9|color:#72d8f7,width:8
+10|10|Line 10|color:#c6e091,width:8
+11|11|Line 11|color:#2b2e34,width:8
+13|13|Line 13|color:#ffcc9b,width:8
+
+--segments
+5,6|Varmfrontsgatan|Temperaturgatan
+5,6|Temperaturgatan|Väderilsgatan
+5,6,10|Väderilsgatan|Friskväderstorget
+5,6,10|Friskväderstorget|Önskevädersgatan
+5,6,10|Önskevädersgatan|Mildvädersgatan
+5,6,10|Mildvädersgatan|Vårväderstorget
+5,6,10|Vårväderstorget|Sålöfjordsgatan
+5,6,10|Sålöfjordsgatan|Eketrägatan
+5,6,10|Eketrägatan|Gropegårdsgatan
+5,6,10|Gropegårdsgatan|Rambergsvallen
+5,6,10|Rambergsvallen|Wieselgrensplatsen
+5,6,10,13|Wieselgrensplatsen|Vågmästareplatsen
+5,6,10,13|Vågmästareplatsen|Hjalmar Brantingsplatsen
+5,6,10,13|Hjalmar Brantingsplatsen|Frihamnen
+6,13|Frihamnen|Nordstan
+6|Nordstan|Brunnsparken
+13|Nordstan|Centralstationen
+5,10|Frihamnen|Lilla Bommen
+5,10|Lilla Bommen|Brunnsparken
+
+4,8,9|Angered Centrum|Storås
+4,8,9|Storås|Hammarkullen
+4,8,9|Hammarkullen|Hjällbo
+4,8,9|Hjällbo|Gamlestadstorget
+
+6|Aprilgatan|Allhelgonakyrkan
+7,11|Komettorget|Rymdtorget
+7,11|Rymdtorget|Teleskopgatan
+7,11|Teleskopgatan|Galileis Gata
+7,11|Galileis Gata|Januarigatan
+7,11|Januarigatan|Allhelgonakyrkan
+6,7,11|Allhelgonakyrkan|Kortedala torg
+6,7,11|Kortedala torg|Runstavsgatan
+6,7,11|Runstavsgatan|Nymånegatan
+6,7,11|Nymånegatan|Beväringsgatan
+6,7,11|Beväringsgatan|Kviberg
+6,7,11|Kviberg|Bellevue
+6,7,11|Bellevue|SKF
+6,7,11|SKF|Gamlestadstorget
+4,7,9,11|Gamlestadstorget|Centralstationen
+6,8|Gamlestadstorget|Ejdergatan
+6,8|Ejdergatan|Redbergsplatsen
+
+1,5|Östra Sjukhuset|Tingvallsvägen
+1,5|Tingvallsvägen|Kaggeledstorget
+1,5|Kaggeledstorget|Ättehögsgatan
+1,5|Ättehögsgatan|Munkebäckstorget
+5|Munkebäckstorget|Solrosgatan
+3,5|Solrosgatan|Sanatoriegatan
+3,5|Sanatoriegatan|Virginsgatan
+3|Solrosgatan|Härlanda
+1|Munkebäckstorget|Härlanda
+1,3|Härlanda|Stockholmsgatan
+1,3|Stockholmsgatan|Redbergsplatsen
+1,3,6,8|Redbergsplatsen|Olskrokstorget
+1,3,6,8|Olskrokstorget|Svingeln
+1,3,6,8|Svingeln|Ullevi Norra
+1,3|Ullevi Norra|Centralstationen
+6,8|Ullevi Norra|Ullevi Södra
+2,13|Ullevi Södra|Centralstationen
+2,6,8,13|Ullevi Södra|Scandinavium
+2,6,8,13|Scandinavium|Korsvägen
+
+5|Virginsgatan|Welandergatan
+5|Welandergatan|Töpelsgatan
+5|Töpelsgatan|Bögatan
+5|Bögatan|Ekmanska
+5|Ekmanska|Bäckeliden
+5|Bäckeliden|S:t Sigfrids Plan
+5|S:t Sigfrids Plan|Liseberg
+5|Liseberg|Korsvägen
+
+2,4|Mölndal centrum|Mölndals sjukhus
+2,4|Mölndals sjukhus|Lackarebäck
+2,4|Lackarebäck|Krokslätts Fabriker
+2,4|Krokslätts Fabriker|Krokslätts torg
+2,4|Krokslätts torg|Lana
+2,4|Lana|Varbergsgatan
+2,4|Varbergsgatan|Elisedal
+2,4|Elisedal|Almedal
+2,4|Almedal|Getebergsäng
+2,4|Getebergsäng|Korsvägen
+
+11|Saltholmen|Roddföreningen
+11|Roddföreningen|Långedrag
+11|Långedrag|Hinsholmen
+11|Hinsholmen|Käringberget
+11|Käringberget|Tranered
+11|Tranered|Hagen
+11|Hagen|Nya Varvsallén
+11|Nya Varvsallén|Kungssten
+9,11|Kungssten|Sandarna
+9,11|Sandarna|Sannaplan
+9|Sannaplan|Ostindiegatan
+11|Sannaplan|Mariaplan
+3,9|Ostindiegatan|Vagnhallen Majorna
+3,9|Vagnhallen Majorna|Jaegerdorffsplatsen
+3,9|Jaegerdorffsplatsen|Chapmans Torg
+3,9|Chapmans Torg|Kaptensgatan
+3,9|Kaptensgatan|Stigbergstorget
+
+3|Marklandsgatan|Bokekullsgatan
+3|Bokekullsgatan|Högsbogatan
+3|Högsbogatan|Klintens Väg
+3|Klintens Väg|Godhemsgatan
+3|Mariaplan|Ostindiegatan
+
+3,11|Mariaplan|Godhemsgatan
+11|Godhemsgatan|Ekedal
+11|Ekedal|Majvallen
+11|Majvallen|Fjällgatan
+11|Fjällgatan|Stigbergstorget
+
+3,9,11|Stigbergstorget|Masthuggstorget
+3,9,11|Masthuggstorget|Järntorget
+
+10|Dr. Sydows gata|Dr. Fries gata
+10|Dr. Fries gata|Wavrinskys plats
+
+1,7|Opaltorget|Smaragdgatan
+1,7|Smaragdgatan|Briljantgatan
+1,7|Briljantgatan|Frölunda Torg
+1,7,8|Frölunda Torg|Positivgatan
+1,7,8|Positivgatan|Musikvägen
+1,7,8|Musikvägen|Nymilsgatan
+1,7,8|Nymilsgatan|Lantmilsgatan
+1,7,8|Lantmilsgatan|Axel Dahlströms Torg
+1,2,7,8|Axel Dahlströms Torg|Marklandsgatan
+
+1,2,7,8|Marklandsgatan|Botaniska Trädgården
+1,2|Botaniska Trädgården|Linnéplatsen
+1,2,6|Linnéplatsen|Olivedalsgatan
+1,6|Olivedalsgatan|Prinsgatan
+1,6|Prinsgatan|Järntorget
+2|Olivedalsgatan|Seminariegatan
+2|Seminariegatan|Brunnsgatan
+2|Brunnsgatan|Handelshögskolan
+2|Handelshögskolan|Vasa Viktoriagatan
+
+7,8|Botaniska Trädgården|Salhgrenska Huvudentré
+6|Linnéplatsen|Salhgrenska Huvudentré
+6,7,8,13|Salhgrenska Huvudentré|Medicinaregatan
+6,7,8,13|Medicinaregatan|Wavrinskys Plats
+6,7,8,10,13|Wavrinskys Plats|Chalmers
+6,8,13|Chalmers|Korsvägen
+7,10|Chalmers|Kapellplatsen
+7,10|Kapellplatsen|Vasaplatsen
+
+1,3,6,9,11|Järntorget|Hagakyrkan
+1,6,9,11|Hagakyrkan|Grönsakstorget
+3|Hagakyrkan|Vasa Viktoriagatan
+2,3|Vasa Viktoriagatan|Vasaplatsen
+1,2,6,9,11|Grönsakstorget|Domkyrkan
+1,2,6,9,11|Domkyrkan|Brunnsparken
+2|Vasaplatsen|Grönsakstorget
+3,7,10|Vasaplatsen|Valand
+
+4,5|Korsvägen|Berzeliigatan
+4,5|Berzeliigatan|Valand
+3,4,5,7,10|Valand|Kungsportsplatsen
+3,4,5,7,10|Kungsportsplatsen|Brunnsparken
+1,2,3,4,7,9,11|Brunnsparken|Centralstationen

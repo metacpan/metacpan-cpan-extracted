@@ -1,0 +1,36 @@
+Mcrypt Version 2.5.7.0
+========================
+
+DESCRIPTION
+-----------
+
+The Mcrypt modules provides and simple and inuitive perl abstraction of the
+libmcrypt cryptography library.  It provide mechanisms for encoding and
+decoding perl scalars.
+
+PREREQUISITES
+-------------
+
+Mcrypt-x.y.z.r requires libmcrypt version x.y.z.  It may or may not work with
+other versions of libmcrypt -- YMMV.
+
+It also requires Perl 5.
+
+INSTALLATION
+------------
+
+1.  Edit the Makefile.PL and change the -L and -I paths to reflect your
+	installation of libmcrypt if necessary.
+2.  perl Makefile.PL
+3.  make install
+
+COPYRIGHT AND DISCLAIMER
+------------------------
+
+Copyright (c) 1999,2000,2001,2007 Theo Schlossnagle <jesus@omniti.com>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+This code is provided with no warranty of any kind, and is used entirely at
+your own risk.

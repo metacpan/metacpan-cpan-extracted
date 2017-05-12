@@ -1,0 +1,27 @@
+---
+abstract: 'Plugin for JIP::Conf.'
+author:
+  - 'Vladimir Zhavoronkov <flyweight@yandex.ru>'
+build_requires:
+  English: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-JIPConf
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JIP::Conf: '0.02'
+  Mojo::Base: '0'
+  Mojolicious: '0'
+  Mojolicious::Plugin: '0'
+  perl: '5.006'
+version: '0.02'

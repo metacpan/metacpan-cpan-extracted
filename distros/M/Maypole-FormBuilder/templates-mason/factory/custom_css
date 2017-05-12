@@ -1,0 +1,14 @@
+<%doc>
+    Checks if a custom css file is available for the current model, 
+    and if so, injects a link in to the header.
+    
+    Also checks for a site-wide /css/maypole_local.css file. 
+</%doc>
+% if ( my $model = $request->model_class ) {
+% if ( $m->comp_exists( '/css/' . $model->table . '.css' ) ) {
+<link href="<% $base %>/css/<% $model->table %>.css" type="text/css" rel="stylesheet" />
+% }
+% }
+% if ( $m->comp_exists( '/css/maypole_local.css' ) ) {
+<link href="<% $base %>/css/maypole_local.css" type="text/css" rel="stylesheet" />
+% }

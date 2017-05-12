@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title><% h($ARGS{title}) %></title>
+  <link rel="stylesheet" href="style.css" type="text/css" />
+  <link rel="top"        href="index.html" />
+  <link rel="previous"   href="<% $ARGS{previous} %>" />
+  <link rel="next"       href="<% $ARGS{next} %>" />
+% foreach my $href (@{$ARGS{prefetch}}) {
+  <link rel="prefetch"   href="<% $href %>" />
+% }
+  <script type="text/javascript" src="space_next.js"></script>
+</head>
+<body id="<% $ARGS{id} %>">
+
+  <h1><% h($ARGS{title}) %>&nbsp;</h1>
+
+%   if($ARGS{image}) {
+<p class="pic"><img src="images/<% $ARGS{image} %>" alt="<% $ARGS{image} %>" /></p>
+%   }
+<div id="content">
+% foreach my $item (@{$ARGS{content}}) {
+%   my($type, $data) = @$item;
+%   if($type eq 'bullets') {
+<& .bullets, $data &>
+%   }
+%   elsif($type eq 'code'){
+<& .code, $data &>
+%   }
+%   elsif($type eq 'screenshot') {
+  <div class="screenshot"/><img src="images/<% $data %>" alt="<% $data %>" /></div>
+%   }
+% }
+</div>
+
+<div id="nav">\
+% if($ARGS{previous}) {
+<a
+  id="nav-prev" title="Previous Slide" href="<% $ARGS{previous} %>"><img
+  src="images/nav_prev.png" alt="Previous" /></a>\
+% }
+<a
+  id="nav-toc" title="Table of Contents" href="toc.html"><img
+  src="images/nav_toc.png" alt="Table of Contents" /></a>\
+% if($ARGS{next}) {
+<a
+  id="nav-next" title="Next Slide" href="<% $ARGS{next} %>"><img
+  src="images/nav_next.png" alt="Next" /></a>\
+% }
+</div>
+
+  <ul id="footer">
+% if($ARGS{metadata}{event}) {
+    <li><% $ARGS{metadata}{event} %></li>
+% }
+% if($ARGS{metadata}{date}) {
+    <li><% $ARGS{metadata}{date} %></li>
+% }
+  </ul>
+
+</body>
+</html>
+<%def .bullets>
+  <ul>
+% foreach my $item (@{$_[0]}) {
+    <li><% $item %></li>
+% }
+  </ul>\
+</%def>
+<%def .code>
+% if($_[0] =~ m{<span\s+class="syn.*"}) {
+  <pre class="code"><% $_[0] %></pre>\
+% }
+% else {
+  <pre class="code"><% h($_[0]) %></pre>\
+% }
+</%def>

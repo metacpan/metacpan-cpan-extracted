@@ -1,0 +1,156 @@
+#
+# $Id: Changes,v 0.71 2005/08/19 06:11:26 dankogai Exp $
+#
+$Revision: 0.71 $ $Date: 2005/08/19 06:11:26 $
+! bin/psync
+  Addressed: #!/usr/local/bin/perl missing, causing unsuable 
+  script being installed.  Ouch!
+  Message-Id: <9E018196-A9C6-4F0F-B5D9-6236CD358928@ppp.bekkoame.ne.jp>
+! bin/psync
+  POD fixes by Jean-Louis Fuchs
+  Message-Id: <42F8E601.60108@fangorn.ch>
+
+0.70  2005/08/09 15:47:00
++ t/AskGetFileInfo.pm
+! t/catalog.t t/info.t
+  Modified so it passes under Tiger.
+! File.pm bin/*
+  tiger's utilities are now mentioned in pod
+! bin/psync 
+  is now replaced with that of Jean-Louis Fuchs 
+  <ganwell@fangorn.ch>
+  Message-Id: <42F8BE38.8050608@fangorn.ch>
+
+0.69 2004/08/05 03:18:15
+! File.pm Catalog/Catalog.pm Spec/Spec.pm Copy/Copy.pm Info/Info.pm
+  s/use 5.6.0;/use 5.006;/ so v-string warning on 5.8.1-RC3 is quiet.
+
+0.68 2004/05/25 16:03:23
+! Catalog/Makefile.PL Info/Makefile.PL Copy/Makefile.PL Spec/Makefile.PL
+  Now uses gcc2 when perl version is 5.8.1 or before  so it compiles
+  without 'make CC=gcc2' on Apple-bundled /usr/bin/perl
+  https://rt.cpan.org/Ticket/Display.html?id=6409
+
+0.67 2004/05/03 14:53:29
+! Copy/filecopy.c Spec/Spec.xs common/util.c
+  Panther compatibility patch by emoy applied.
+
+0.66 2003/04/09 08:25:26
+! Copy/filecopy.c
+  Now supports file names that contains \x{10000} and higher.
+  HFS+ stores characters in UTF-16 but until now MacOSX::File only
+  suported UCS-2 (Apple's document only says "Unicode".  Sigh).
+! bin/psync
+  Addressed the problem that the ownership of the locked files are not
+  copied correctly.  Reported by Joel Sumner <joel.sumner@ni.com>
+  Message-Id: <5.1.1.6.0.20030408162041.04bce6d8@postoffice.natinst.com>
+
+0.65 2003/01/19 17:53:21
+    ! common/util.c
+      s/strcpy/strncpy/  I though I fixed it :)
+    ! Catalog/Catalog.xs
+      Guy Sabourin <guysab@videotron.ca> has reported that an evil typecast
+      found in the code above was preventing MacOSX::File::Catalog from
+      copying creator properly.  Though I could not duplicate his claim
+      on my environment (compiler difference?), his version is definitely
+      better.
+      Message-Id: <BA504461.3E6E%guysab@videotron.ca>
+      FYI, psync and other scripts that come with this package use
+      MacOSX::File::Info rather than MacOSX::File:Catalog in favor of speed
+      and memory so they are unaffected as of this release.
+0.64  2002.03.07
+      ! bin/psync
+        ! uses MacOSX::File::Info instead of MacOSX::File::Catalog
+	  back again.
+        + pod improvement
+0.63  2002.03.07
+      ! File.pm README
+        Mention to binary distribution dropped;  I will release binary
+	distribution elsewhere.  CPAN infrastracture is not quite fit
+	for binary distribution.
+0.62  2002.03.07
+      ! File.pm
+	+ unlink() which overrides CORE::unlink that deletes '._file'
+	  if 'file' is deleted
+      ! Catalog/Catalog.xs Info/Info.xs
+        File Locking scheme changed so that it works on UFS volume
+        more correctly.  Now 'make test' on UFS volume works.
+      ! bin/psync
+        uses MacOSX::File::Catalog instead of MacOSX::File::Info
+0.61  2002.01.28
+      ! Info/Info.xs Catalog/Catalog.xs
+       * $obj->set() without argument failed
+0.60  2002.01.28
+      ! */*.xs
+        * (data|rsrc)(Logical|Physical)size is now NV instead of IV
+	to accomodate 64bit values (same trick done in stat->size in
+	Perl's stat cache)
+        * Other members of FSCatalogInfo is now more compliant with
+	Inside Macintosh (UV instead of IV where appropriate)
+      ! bin/psync
+        * cosmetic changes for opt_v
+0.52  2002.01.20
+      ! bin/psync
+        Code optimization
+	More intuitive option settings
+0.51  2002.01.20
+      ! bin/psync
+        Greatly enhanced.  See the manual for details
+      ! Copy/filecopy.c
+        More housekeeping functions added
+0.50  2002.01.19
+      ! Makefile.PL
+        INSTALLSCRIPT  => /usr/local/bin
+        INSTALLMAN1DIR => /usr/local/share/man/man1
+        INSTALLMAN3DIR => /usr/local/share/man/man3
+
+      This iso prevent clobbering important files on /usr/{bin,/share/man} .
+      Though this is against platform-independent Makefile.PL, this module 
+      is very platform-dependent to begin with.
+
+      + bin/psync
+        Does update copy.  The very reason I wanted a module like this!
+      ! Catalog/Catalog.pm
+      ! Info/Info.pm
+        set* subs now checks validity of information so it won't call
+	xs_* when invalid.
+      ! Copy/Copy.pm
+        $nocopycat -> $preserve
+	Note now the default is reversed!
+0.42  2002.01.16
+      ! bin/pcpmac
+        regex bug that causes all dot-files ignored gets fixed
+	< my @f = grep !/^\.[\._]?/o, readdir $d;
+        > my @f = grep !/^\.(?:\.?$|_)/o, readdir $d;
+        Well, to err is human.
+0.41  2002.01.13
+      * documention
+      * verious fixes
+0.40  2002.01.13
+      - MoreFiles/*
+        MacOSX::File now implements its own, FSSpec-free file
+	copy function so MoreFiles is gone!
+      + bin/pcpmac
+      + bin/pmvmac
+      * various bugfixes
+0.30  2002.01.13
+      + bin/pgetfinfo
+      + bin/pgetfinfo
+      + t/benchmark.pl
+      ! common/util.c
+        minor bug at dirname() fixed;
+      ! FSp(Set|Rst)Lock done when and only when the target is file
+        (When done to directory, Carbon slaps you with segfault!)
+      * and lots of bug fixes and cleanups here and there
+0.21  2002.01.10
+      ! Info/Info.xs, Catalog/Catalog.xs 
+        possible memory leak fixed
+0.20  2002.01.10
+      + MacOSX::File::Catalog added
+      ! Info/Info.xs -- FSpRstLock() before FSSetCatalogInfo()
+0.11  2002.01.08
+      + File/Constants.pm
+      ! Info/Info.pm -- constants moved to Constants.pm
+      ! Info/Info.xs -- possible memory leak fixed.
+0.10  2002.01.06
+      First Release

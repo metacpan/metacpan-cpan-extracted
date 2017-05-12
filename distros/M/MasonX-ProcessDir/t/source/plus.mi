@@ -1,0 +1,5 @@
+<%class>
+has ['num', 'word'];
+</%class>
+
+<% $.word %> plus <% $.word %> equals <% $.num + $.num %>

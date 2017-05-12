@@ -1,0 +1,17 @@
+RM_F = perl -MExtUtils::Command -e rm_f
+WRAPPERS = prog timer
+PERL_LIB = E:/Perl/lib
+
+all: test2.exe test.exe
+
+%.exe : %.obj
+	link /nologo $<
+
+%.obj : %.c
+	cl /nologo /c $<
+
+%.c: %.c.tt $(WRAPPERS)
+	perl -S -I$(PERL_LIB) tpage.bat $< > $@
+
+clean:
+	$(RM_F) *.exe *.obj *.c

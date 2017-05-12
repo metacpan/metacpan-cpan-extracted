@@ -1,0 +1,427 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<!--
+     (local-set-key [(meta return)] 
+        	    (ilam (shell-command-on-region (point) (mark) "perl -MMDK::Common")))
+-->
+
+<head>
+  <title>perl-MDK-Common tutorial</title>
+  <link rev="made" href="mailto:pixel at mandriva dot com" />
+  <meta name="keywords" content="perl mandriva pixel library functional" />
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000" link="#0000ee" vlink="#551a8b">
+
+  <h1 align="center">perl-MDK-Common tutorial v0.1</h1>
+
+<p>Guillaume Cottenceau (maintainer: <a href="mailto:pixel at mandriva dot com">Pixel</a>)</p>
+
+<hr />
+
+
+  <h2>Introduction</h2>
+  
+  <p>This document aims at helping people interested in learning
+  more on <tt>perl-MDK-Common</tt>, a Perl library which is intensively
+  used in Mandriva in-house software development.</p>
+
+  <p>The library adds some convenient "basic" functions to Perl,
+  allows easier functional-style programming, and also provides
+  some better system-related operations. It can be seen as an
+  extension to the standard Perl library, adding missing helpful
+  functions. It is divided as follows:</p>
+
+  <ul>
+    <li><tt>MDK::Common::File</tt>: some useful list/hash functions</li>
+    <li><tt>MDK::Common::Func</tt>: functions suited to functional-style programming</li>
+    <li><tt>MDK::Common::Math</tt>: some math functions</li>
+    <li><tt>MDK::Common::String</tt>: functions to perform various formatting on strings</li>
+    <li><tt>MDK::Common::System</tt>: system-related useful functions</li>
+    <li><tt>MDK::Common::Various</tt>: other useful functions</li>
+  </ul>
+
+  <p>Thanks to <tt>perl-MDK-Common</tt>'s own documentation, an
+  easy way to directly access information about the provided
+  functions is to use <tt>perldoc</tt>. For example,
+  <tt>perldoc MDK::Common::Func</tt> will list the functions
+  of the Func sub-module. Use <tt>perldoc MDK::Common</tt> to view
+  information on all the available functions.</p>
+
+  <p>Additionally, <tt>perl-MDK-Common</tt> provides a binary
+  called <tt>perl_checker</tt>, which is a Perl compiler aiming
+  at enforcing the use of a subset of Perl, so that all
+  Mandriva Perl programs roughly follow the same code style.
+  It will also help the programmer to remove unneeded parentheses
+  and conditionals.</p>
+
+<hr />
+
+
+  <h2>Prerequisites</h2>
+
+  <p>Of course, a first look at the Perl language will be
+  necessary for the reader. The following can be a good Perl
+  Tutorial (although there are many others on the web): <a
+  href="http://www.comp.leeds.ac.uk/Perl/">http://www.comp.leeds.ac.uk/Perl/</a>.</p>
+
+  <p>Programming with <tt>perl-MDK-Common</tt> also emphasizes
+  the following quality properties on your code:</p>
+
+  <ul>
+  <li><b>no code duplication:</b> at the grassroots, this library
+  aims at helping you with simple operations you have to deal
+  with so many times in usual programs; this includes reading the
+  contents of a file, finding the maximum numeric element of an
+  array, etc; in order to be efficient with
+  <tt>perl-MDK-Common</tt>, you need to always keep in mind to
+  not duplicate code to perform a single action</li>
+  <br>
+
+  <li><b>functional style programming:</b> this is not a so
+  common technique among programmers, and maybe it's even worse
+  with Perl programmers; but functional-style programs are often
+  clearer, more expressive, more reusable, and more
+  maintainable, than traditional programs</li>
+  <br>
+
+  <li><b>strict code style:</b> Perl is known to be a language
+  with which "there is more than one way to do it"; actually,
+  nearly every Perl program uses a different code-style; that's
+  nice for the programmer's freedom, and that's awful for code
+  maintainance; <tt>perl_checker</tt> will ask you to follow a
+  specific code style</li>
+
+  </ul>
+
+  <p>We can't discuss Perl programming without referring to two
+  excellent books from O'Reilly. The first one is called "The
+  Perl Cookbook", and covers many daily problems a Perl
+  programmer will face, in a recipe-like fashion. All Perl
+  programmers should own this book :). The second one can be a
+  good resource for more skillful programmers, and is called
+  "Advanced Perl Programming"; it covers interesting advanced
+  features of Perl.</p>
+
+<hr />
+
+
+  <h2>Structure of this document</h2>
+
+  <p>This document will first try to emphasize the most useful
+  functions of the <tt>perl-MDK-Common</tt> library, e.g. the
+  most commonly used and simple. Then, some functions whose use
+  is not trivial will be explained. As a last part, an
+  introduction to the code-style to please
+  <tt>perl_checker</tt> will be shown.</p>
+
+<hr />
+
+
+  <h2>Most useful functions</h2>
+
+  <p><b>Note:</b> many functions' name, extending capabilities of
+  existing functions, or being their functional counterpart, are
+  suffixed with the underscore character (<tt>_</tt>); for
+  example, <tt>chomp_</tt> is the semantical equivalent of
+  <tt>chomp</tt>, but returns the chomp'ed results instead of
+  modifying its argument.</p>
+
+  <ul>
+  <li>
+   <b>cat_</b>(FILENAME): returns the file contents; in scalar 
+    context it returns a single string, in array context it
+    returns the lines. If the file doesn't exist, it returns
+    <tt>undef</tt>.
+
+  <p>Perl IO operations are verbose and the API is cluttered.
+  There are many situations in which you want to read the
+  contents of a file, put it in a scalar or loop around the
+  files. <tt>cat_</tt> allows to do that easily:</p>
+
+  <pre class="SCREEN">
+  printf "Mandriva release:\n%s\n", cat_('/etc/mandriva-release');
+
+  foreach (cat_('/proc/mounts')) {
+      my ($dev, $where, $type) = split;
+      print "$dev is mounted on $where (type $type)\n";
+  }
+  </pre>
+  </li>
+
+
+  <li>
+   <b>output</b>(FILENAME, LIST): creates a file and outputs the
+    list (if the file exists, it is clobbered)
+
+  <p>Counterpart of <tt>cat_</tt>:</p>
+
+  <pre class="SCREEN">
+  output('/tmp/resolv.conf', 
+         "search $domain\n", 
+         map { "nameserver $_\n" } @name_servers);
+  </pre>
+  </li>
+
+
+  <li>
+   <b>member</b>(SCALAR, LIST): is the value in the list?
+
+  <p>Returns true if the value is stringwise equivalent to an
+  element of the list:</p>
+
+  <pre class="SCREEN">
+  if (!member($driver, @modules)) {
+      print "Sorry, the driver is not available in our modules.\n"
+  }
+  </pre>
+  </li>
+
+
+  <li>
+   <b>difference2</b>(ARRAY REF, ARRAY REF): returns the first
+   list without the element of the second list
+
+  <p>Performs a set-wise substraction, e.g. removes in first list
+  the elements that are members of the second one:</p>
+
+  <pre class="SCREEN">
+  my @types = difference2(\@available_types, \@bad_types);
+  print "Please select a type from: @types\n";
+  </pre>
+  </li>
+
+
+  <li>
+   <b>uniq</b>(LIST): returns the list with no duplicates
+
+  <p>Removes duplicates from the list, keeping the order of the
+  list, and the first element when duplicates.</p>
+
+  <pre class="SCREEN">
+  my @types = uniq map { (split)[2] } cat_('/proc/mounts');
+  print "Filesystem types in use: @types\n"
+  </pre>
+  </li>
+
+
+  <li>
+   <b>min</b>(LIST): returns the minimum number from a list
+   <p></p>
+  </li>
+
+
+  <li>
+   <b>max</b>(LIST): returns the maximum number from a list
+   <p></p>
+  </li>
+
+
+  <li>
+   <b>chomp_</b>(STRING): non-mutable version of <tt>chomp</tt>:
+    do not modify the argument, returns the chomp'ed value.
+
+  <p>Very useful for simple functional expressions.</p>
+
+  <p>Note: also works on lists: <tt>chomp_($a, $b)</tt> is
+  equivalent to <tt>chomp($a); chomp($b); ($a,$b)</tt>.</p>
+
+  <pre class="SCREEN">
+  my $pid = chomp_(cat_('/var/run/cardmgr.pid'));
+  </pre>
+  </li>
+
+
+  </ul>
+
+<hr />
+
+
+  <h2>Other interesting functions</h2>
+
+  <p>The following describes functions whose use is not
+  trivial.</p>
+
+  <ul>
+  <li>
+   <b>if_</b>(BOOL, LIST)
+
+  <p>Returns LIST if the BOOL condition is true, else an empty
+  list.</p>
+
+  <p>Note: it's equivalent as doing <tt>BOOL ? LIST : ()</tt>,
+  except that since it's a function, LIST is evaluated even if
+  BOOL is false. It's useful because it's shorter and more
+  readable than the ternary <tt>?:</tt>.</p>
+
+  <p>A first convenient use is when you want to loop on a list
+  and conditionally on another:</p>
+
+  <pre class="SCREEN">
+  foreach (@types, if_($arch eq 'ppc', @ppc_types)) {
+      # ...
+  }</pre>
+
+  <p>It's also useful to select elements from a list and modify
+  them on-the-fly, e.g. performing the equivalent of a
+  <tt>grep</tt> then a <tt>map</tt>. It works because
+  Perl automatically concatenates lists.</p>
+
+  <pre class="SCREEN">
+  my @md_devices = map { if_(/^(md\d+)/, $1) } cat_('/proc/mdstat');
+
+      # equivalent (but much more elegant!) to:
+
+  my @md_devices = map { /^(md\d+)/ } grep { /^md\d+/ } cat_('/proc/mdstat');
+  </pre>
+  </li>
+
+
+  <li>
+  <b>substInFile</b> { CODE } FILENAME: executes the code for
+    each line of the file; you can know the end of the file is
+    reached using <tt>eof</tt>
+
+  <p>Typically used to change a parameter in a file:
+
+  <pre class="SCREEN">
+  substInFile { s/^FORWARD_IPV4.*\n//; $_ .= "FORWARD_IPV4=true\n" if eof } '/etc/sysconfig/network';
+  </pre>
+
+
+  <li>
+   <b>each_index</b> { CODE } LIST: iterate on a list to execute
+   some code needing the index of the list element (available in
+   <tt>$::i</tt>)
+
+  <p>Useful when you need to perform an action on each element of
+  a list, but you also need the index of each element:</p>
+
+  <pre class="SCREEN">
+  each_index { printf "%s mountpoint: $_", $::i == 2 ? 'third' : 'other' } cat_('/proc/mounts');
+  </pre>
+  </li>
+
+
+  </ul>
+
+<hr />
+
+
+  <h2>perl_checker</h2>
+
+  <p>Let's examine now the code-style perl_checker wants you to
+  adopt. Let's consider the following naive code example:</p>
+
+  <pre class="SCREEN">
+  1: sub calc {
+  2:     my ($x,$y) = @_;
+  3:     $_ = $y;
+  4:     ($x==0 && $y==0) and return -1;
+  5:     my @tab = (1, 2, 3);
+  6: 			
+  7:     /sysconfig\/i18n/ and return 1;
+  8: }
+  </pre>
+
+  <p>
+  The following problems are reported:
+  </p>
+
+  <ul>
+  <li><pre class="SCREEN">
+line 2, character 12-12
+you should have a space here</pre>
+
+  <p>
+  Good: <tt>my ($x, $y) = @_;</tt>
+  <br>
+  Why: you should put a space after the comma when specifying a list.
+  </p>
+
+  <li><pre class="SCREEN">
+line 3, character 5-7
+undeclared variable $_</pre>
+
+  <p>
+  Good: <tt>local $_ = $y;</tt>
+  <br>
+  Why: you should always localize <tt>$_</tt> when you set it, because it's a global variable.
+  </p>
+
+  <li><pre class="SCREEN">
+line 4, character 8-8
+you should have a space here</pre>
+
+  <p>
+  Good: <tt>($x == 0 && $y == 0) and return -1;</tt>
+  <br>
+  Why: you should put spaces before and after operators.
+  </p>
+
+  <li><pre class="SCREEN">
+line 4, character 5-21
+unneeded parentheses</pre>
+
+  <p>
+  Good: <tt>$x == 0 && $y == 0 and return -1;</tt>
+  <br>
+  Why: because of operators precedence, the parentheses are unneeded (if unsure about precedence, see <tt>perlop(1)</tt>)
+  </p>
+
+  <li><pre class="SCREEN">
+line 5, character 8-12
+unused variable @tab</pre>
+
+  <p>
+  Why: Assigning to unused variables is (typically) useless. If you really need to assign to an unused variable, prefix its name with `_' and perl_checker will stop boring you (for example, <tt>@_tab</tt>).
+  </p>
+
+  <li><pre class="SCREEN">
+line 7, character 20-21
+change the delimit character / to get rid of this escape</pre>
+
+  <p>
+  Good: <tt>m|sysconfig/i18n|</tt>
+  <br>
+  Why: <tt>/</tt> is not the only regexp delimiter! if you want to specify a slash in your regexp, use another delimiter so that your regexp will be more readable.
+  </p>
+
+  </ul>
+
+  <p>Finally, the correct code looks like:</p>
+
+  <pre class="SCREEN">
+  sub calc {
+      my ($x, $y) = @_;
+      local $_ = $y;
+      $x == 0 && $y == 0 and return -1;
+      my @_tab = (1, 2, 3);
+  			
+      m|sysconfig/i18n| and return 1;
+  }
+  </pre>
+
+  <p>Under Emacs, you might want to add the following to your
+  <tt>.emacs</tt> and then be able to validate your code with <tt>C-Enter</tt>:</p>
+  </p>
+
+  <pre class="SCREEN">
+  (defmacro ilam (&rest body) `(lambda () (interactive) ,@body))
+  (add-hook 'cperl-mode-hook 
+	    '(lambda ()
+	       (local-set-key [(control return)] 
+			      (ilam (save-some-buffers 1) (compile (concat "perl_checker --restrict-to-files " (buffer-file-name (current-buffer))))))
+	       ))
+  </pre>
+
+<hr />
+
+    <p>
+       Last update: Wed Apr 30 18:05:40 2003
+    </p>
+
+</body>
+
+</html>

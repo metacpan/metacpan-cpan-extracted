@@ -1,0 +1,50 @@
+#!perl -w
+
+use strict;
+use Movie::Info;
+
+die "You must pass at least one file\n" unless @ARGV;
+my $mi = Movie::Info->new || die "Couldn't find a copy of mplayer to use\n";
+
+for my $file (@ARGV) {
+	print "$file:\n";
+	my %info;
+
+	unless (%info = $mi->info($file)) {
+		print "\tcouldn't get info\n\n";
+		next;
+	}
+
+	delete $info{filename};
+	foreach my $key (sort keys %info) {
+		print "\t$key: $info{$key}\n";
+	}
+	print "\n\n";
+}
+
+exit 0;
+
+
+=head1 NAME
+
+movieinfo - dump information about movie file(s)
+
+=head1 USAGE
+	
+	movieinfo <movie files[s]>
+
+=head1 DESCRIPTION
+
+Largely based around mplayer's C<midentify> script this will
+dump information about various formats of movie file (depending 
+on what codecs you have installed for mplayer)
+
+=head1 AUTHOR
+
+Simon Wistow <simon@thegestalt.org>
+
+=head1 COPYRIGHT
+
+Copyright, 2005 - Simon Wistow
+
+=cut

@@ -1,0 +1,39 @@
+---
+doctype: dist
+
+header:
+  name: Map-Metro-Plugin-Map-Copenhagen
+
+prereqs:
+  runtime:
+    requires:
+     - perl: 5.016000
+     - Moose: 2.0000
+     - Map::Metro::Plugin::Map: 0.2300
+
+plugins:
+  - +config: Author::CSSON
+
+  - +extend_plugin: Git::GatherDir
+    exclude_match:
+      - \.png
+
+  - +plugin: MapMetro::MakeGraphViz
+
+  - +plugin: MapMetro::MakeLinePod
+
+  - +replace_plugin: TravisYML
+    perl_version: 5.16 5.18 5.20 5.22
+    post_before_install:
+     - sudo apt-get update -qq
+     - sudo apt-get install -y graphviz
+    pre_install: 
+     - cpanm Test::Stream --force
+     - cpanm GraphViz2 -v
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+    splint: 0

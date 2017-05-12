@@ -1,0 +1,352 @@
+chunk
+stat list
+stat list
+stat
+keyword local
+local
+namelist
+Name
+offset
+optional namelist initialization
+=
+explist
+exp
+Number
+0
+stat
+keyword while
+while
+exp
+keyword true
+true
+keyword do
+do
+block
+chunk
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat
+keyword local
+local
+namelist
+Name
+s
+optional namelist initialization
+=
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+read
+args
+(
+optional explist
+explist
+exp
+Number
+16
+)
+stat
+keyword if
+if
+exp
+exp
+var
+Name
+s
+==
+exp
+keyword nil
+nil
+keyword then
+then
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+elseif sequence
+optional else block
+keyword end
+end
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+string
+.
+Name
+format
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+"%08X  "
+exp
+var
+Name
+offset
+)
+)
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+string
+.
+Name
+gsub
+args
+(
+optional explist
+explist
+exp
+var
+Name
+s
+exp
+String
+double quoted string
+"(.)"
+exp
+function
+keyword function
+function
+funcbody
+(
+optional parlist
+namelist
+Name
+c
+)
+block
+chunk
+stat list
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+string
+.
+Name
+format
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+"%02X "
+exp
+exp
+var
+prefixexp
+var
+Name
+string
+.
+Name
+byte
+args
+(
+optional explist
+explist
+exp
+var
+Name
+c
+)
+)
+)
+keyword end
+end
+)
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+string
+.
+Name
+rep
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+" "
+exp
+exp
+Number
+3
+*
+exp
+(
+exp
+exp
+Number
+16
+-
+exp
+exp
+var
+prefixexp
+var
+Name
+string
+.
+Name
+len
+args
+(
+optional explist
+explist
+exp
+var
+Name
+s
+)
+)
+)
+)
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+" "
+exp
+exp
+var
+prefixexp
+var
+Name
+string
+.
+Name
+gsub
+args
+(
+optional explist
+explist
+exp
+var
+Name
+s
+exp
+String
+double quoted string
+"%c"
+exp
+String
+double quoted string
+"."
+)
+exp
+String
+double quoted string
+"\n"
+)
+stat
+varlist
+var
+Name
+offset
+=
+explist
+exp
+exp
+var
+Name
+offset
++
+exp
+Number
+16
+keyword end
+end

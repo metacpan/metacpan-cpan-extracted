@@ -1,0 +1,135 @@
+#!/usr/bin/perl
+
+#
+# Author: Mohammad S Anwar (mohammad.anwar@yahoo.com)
+# Distribution: Map::Tube v3.26.
+
+package MapDataConverter;
+
+use JSON;
+use XML::Twig;
+use File::Basename;
+use Map::Tube::Utils qw(to_perl);
+use Map::Tube::Exception::FoundUnsupportedMapDataFormat;
+
+use Moo;
+use namespace::clean;
+use MooX::Options;
+
+has 'IN'  => (is => 'rw');
+has 'OUT' => (is => 'rw');
+
+option 'to_json' => (is => 'ro', doc => 'Convert data to JSON format.');
+option 'to_xml'  => (is => 'ro', doc => 'Convert data to XML format.');
+option 'input'   => (is => 'ro', required => 1, format => 's', doc => 'Map data file.');
+
+sub BUILD {
+    my ($self) = @_;
+
+    $self->{OUT} = output_file($self->input);
+
+    if ($self->to_json) {
+        $self->{IN} = XML::Twig->new->parsefile($self->input)->simplify(keyattr => 'tube', forcearray => 0);
+    }
+    elsif ($self->to_xml) {
+        $self->{IN} = to_perl($self->input);
+    }
+    else {
+        die "ERROR: Missing option --to_json or --to_xml.\n";
+    }
+}
+
+sub run {
+    my ($self) = @_;
+
+    if ($self->to_json) {
+        $self->save_output($self->json);
+    }
+    elsif ($self->to_xml) {
+        $self->save_output($self->xml);
+    }
+}
+
+#
+#
+# METHODS
+
+sub save_output {
+    my ($self, $data) = @_;
+
+    my $file = $self->{OUT};
+    open(my $O, '>:encoding(utf8)', $file) or die "ERROR: Couldn't open [$file]: $!\n";
+    print $O $data;
+    close($O);
+}
+
+sub output_file {
+    my ($input) = @_;
+
+    my ($name, $path, $ext) = fileparse($input, '\.[^\.]*');
+    if ($ext =~ /\.xml/i) {
+        $ext = '.json';
+    }
+    elsif ($ext =~ /\.json/i) {
+        $ext = '.xml';
+    }
+    else {
+        my @caller = caller(0);
+        @caller    = caller(2) if $caller[3] eq '(eval)';
+
+        Map::Tube::Exception::FoundUnsupportedMapDataFormat->throw({
+            method      => __PACKAGE__."::output_file",
+            message     => "ERROR: Unsupportd map data format [$input].",
+            filename    => $caller[1],
+            line_number => $caller[2] });
+    }
+
+    return sprintf("%s%s%s", $path, $name, $ext);
+}
+
+sub xml {
+    my ($self) = @_;
+
+    my $IN  = $self->{IN};
+    my $xml = XML::Twig->new()->set_xml_version("1.0")->set_encoding('utf-8');
+
+    my $attr;
+    if (exists $IN->{name}) {
+        $attr = { name => $IN->{name} };
+    }
+
+    my $map = XML::Twig::Elt->new('tube', $attr);
+    $xml->set_root($map);
+
+    if (exists $IN->{stations}) {
+        my $stations = $map->insert_new_elt('stations');
+        if (exists $IN->{stations}->{station}) {
+            foreach (@{$IN->{stations}->{station}}) {
+                $stations->insert_new_elt('station', $_);
+            }
+        }
+    }
+
+    if (exists $IN->{lines}) {
+        my $lines = $map->insert_new_elt('lines');
+        if (exists $IN->{lines}->{line}) {
+            foreach (@{$IN->{lines}->{line}}) {
+                $lines->insert_new_elt('line', $_);
+            }
+        }
+    }
+
+    $xml->set_pretty_print('indented');
+    return $xml->sprint;
+}
+
+sub json {
+    my ($self) = @_;
+
+    return JSON->new->utf8(1)->pretty(1)->encode($self->{IN});
+}
+
+package main;
+
+
+MapDataConverter->new_with_options->run;

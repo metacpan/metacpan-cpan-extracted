@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use MIDI::Simple::Drummer::Euclidean;
+
+my $d = MIDI::Simple::Drummer::Euclidean->new(
+    -file   => "$0.mid",
+    -bpm    => 70,
+    -onsets => 4,
+    -beats  => 6,
+    -tr808  => 1,
+);
+
+$d->sync_tracks(
+    sub {
+        $d->{-pad} = 'n36';
+        $d->{-rhythm} = [qw( x . x x x . )];
+        $d->beat(-name => 1);
+    },
+    sub {
+        $d->{-pad} = 'n42';
+        $d->{-rhythm} = [qw( . x . x x . )];
+        $d->beat(-name => 1);
+    },
+);
+
+$d->write();

@@ -1,0 +1,48 @@
+<?xml version='1.0' standalone='yes'?>
+<!-- 
+
+    This file is used to test handling strange GNUpod files. It's perfectly
+    valid XML, but is strange in just about every other way you can think of.
+
+-->
+
+<gnuPod>
+ <files>
+    <!-- Empty file tag -->
+    <file />
+
+    <!-- File w/o id -->
+    <file album="S2_INC" artist="Soundtrack" bitrate="192" cdnum="0" cds="0" filesize="7324948" genre="Soundtrack" path=":iPod_Control:Music:F01:Track_08___Kanon_D_dur__normal_.mp3" playcount="0" prerating="0" rating="0" songnum="0" songs="0" srate="44100" starttime="0" stoptime="0" time="305200" title="Kanon D-dur (normal)" volume="0" year="1997" />
+
+    <!-- file w/ negative id -->
+    <file album="S2_INC" artist="Soundtrack" bitrate="192" cdnum="0" cds="0" comment="W Quintett" filesize="7299871" genre="Soundtrack" id="-1" path=":iPod_Control:Music:F07:Track_09___Kanon_D_dur__W_quinte.mp3" playcount="0" prerating="0" rating="0" songnum="0" songs="0" srate="44100" starttime="0" stoptime="0" time="304155" title="Kanon D-dur" volume="0" year="1997" />
+
+    <!-- files w/ non-consecutive ids -->
+    <file album="S2_INC" artist="Soundtrack" bitrate="192" cdnum="0" cds="0" filesize="2810989" genre="Soundtrack" id="8" path=":iPod_Control:Music:F12:Track_41___A_15__Tenpo_chi_.mp3" playcount="0" prerating="0" rating="0" songnum="0" songs="0" srate="44100" starttime="0" stoptime="0" time="117119" title="A-15 &quot;Tenpo chi&quot;" volume="0" year="1997" />
+    <file album="S2_INC" artist="Soundtrack" bitrate="192" cdnum="0" cds="0" filesize="3145856" id="7" path=":iPod_Control:Music:F02:Track_42___A_15__Tenpo_chi_Rizum.mp3" playcount="0" prerating="0" rating="0" songnum="0" songs="0" srate="44100" starttime="0" stoptime="0" time="131072" title="Tenpo chi Rizumo" volume="0" year="0" />
+    <file album="Refrain" artist="Soundtrack" bitrate="128" cdnum="0" cds="0" comment="Evangelion Refrain" filesize="3886856" id="20" path=":iPod_Control:Music:F17:02___Zankoku_Na_Tenshi_No_These.mp3" playcount="0" prerating="0" rating="0" songnum="0" songs="0" srate="44100" starttime="0" stoptime="0" time="242920" title="Cruel Angel's Thesis - Ambiv" volume="0" year="1997" />
+
+    <!-- file w/ duplicate id -->
+    <file album="S2_INC" artist="Soundtrack" bitrate="192" cdnum="0" cds="0" filesize="482538" genre="Soundtrack" id="8" path=":iPod_Control:Music:F04:Track_04___Violin_Tuning.mp3" playcount="0" prerating="0" rating="0" songnum="0" songs="0" srate="44100" starttime="0" stoptime="0" time="20100" title="Violin Tuning" volume="0" year="1997" />
+
+ </files>
+
+ <!-- Empty add tag -->
+ <playlist name="Empty Add" >
+   <add  />
+   <add id="3" />
+ </playlist>
+
+ <!-- Adding non-existent ids -->
+ <playlist name="No such id" >
+    <add id="4" />
+    <add id="10" />
+ </playlist>
+
+<!-- Empty regex and iregex tags -->
+ <playlist name="Empty (i)Regex" >
+    <regex />
+    <iregex />
+ </playlist>
+
+</gnuPod>

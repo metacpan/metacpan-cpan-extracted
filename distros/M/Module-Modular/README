@@ -1,0 +1,163 @@
+NAME
+    Module::Modular - Create optional plugins for your module
+
+DESCRIPTION
+    Module::Modular allows you, or others, to create plugins for your
+    modules. They are not loaded by default - only when you want them to be.
+    This means you can even load them further on down in your module if you
+    wish. The idea is to have your plugins handle certain tasks you don't
+    want cluttering the core code of your module. I started writing this
+    before I came across another plugin module called Module::Pluggable. So
+    if you like how that one works better, or even prefer the name (I do),
+    then go check it out. This one is different in the sense you explicitly
+    tell your module what plugins to load, and each plugin may have an
+    initialiser ("__init") that will get run once it has been loaded, which
+    I found pretty neat. This module is modular itself. By importing "with"
+    followed by an array of options you can extend the functionality of
+    Module::Modular. Currently just the one option is available
+    ("Accessors") which provides methods for accessing meta data of your
+    plugins. A plugin can only be loaded if it's within the same namespace
+    and within your path (ie: YourModule::Plugin::*)
+
+SYNOPSIS
+        # MyModule.pm
+    
+        package MyModule;
+
+        use Module::Modular;
+        load_plugins qw<Foo Bar>;
+    
+        sub load_another_plugin {
+            load_plugins 'DifferentOne';
+        }
+
+        # MyModule::Plugin::Foo
+        package MyModule::Plugin::Foo;
+
+        sub __init {
+            my ($class, $name) = @_;
+            # $class = MyModule::Plugin::Foo
+            # $name  = Foo
+
+            # some code here to be run when loaded
+        }
+
+        sub foo {
+            print "You have been foo'd!\n";
+        }
+
+    Now, when you "use MyModule", the Foo plugin will get loaded and run
+    "__init" from "MyModule::Plugin::Foo". Simple. The initialiser is
+    completely optional. It's quite simple to get a list of plugins, or you
+    can get hold of a single plugin to do stuff with.
+
+        # Run the foo() method within the Foo plugin
+        my $foo_plugin = $module->plugin('Foo')->foo();
+
+    Calling the "plugins" method will return an array of your loaded
+    plugins. Each one will be blessed, so you have objects to work with
+    which makes things easier.
+
+        # call the foo() method on every loaded plugin
+        for my $plugin ($module->plugins) {
+            $plugin->foo();
+        }
+
+METHODS
+    "Module::Modular" exports only a few functions into your module. They
+    are...
+
+  load_plugins
+      void load_plugins(@list)
+
+    Takes an array of plugins (Not their entire path, just the name of the
+    plugin. For example, if I wanted to load "MyModule::Plugin::Foo" I would
+    only have to use "load_plugins 'Foo'". If it can't load the module for
+    any reason it will print out a warnings and move onto the next one if
+    it's specified.
+
+  plugins
+      @array plugins(void)
+
+    Returns an array of your loaded plugins. It will only register those
+    introduced by "load_plugins", just having one in the right namespace and
+    loaded by any other means will do nothing.
+
+  plugin
+      $object plugin(string)
+
+    Returns a blessed reference of a plugin (ie: The plugin object). You
+    only need to supply the name, not the entire path. For example
+
+        my $plugin = $module->plugin('Foo');
+
+  stash
+    This is a plugin method (Called from a plugin only). It's a really
+    simple method used to get the data of a specific global variable from
+    the base module. After all, what's the point of a plugin if you have
+    absolutely no way to share data, right?
+
+        # MyModule.pm
+        package MyModule;
+
+        use Module::Modular;
+
+        our $PluginStash = { bees => 'knees' };
+        load_plugins 'Bees';
+
+        # MyModule::Plugin::Bees
+        package MyModule::Plugin::Bees;
+
+        sub __init {
+            my ($self, $name) = @_;
+            print "The $name have " . $self->stash('bees');
+        }
+
+    It's not overly useful, secure, or remotely interesting, but if you need
+    a quick and dirty way to get some data to your plugins, it works. I am
+    trying to find a neater solution..
+
+  OPTIONS
+    When you "use Module::Modular" you can pass a key called "with" as an
+    arrayref of options or just a string for a single option.
+
+    Accessors
+
+    Implements specific accessors to access the meta data of a plugin
+
+        # MyModule.pm
+        use Module::Modular
+            with => 'Accessors';
+
+        load_plugins qw<Foo Bar>;
+
+        # test.pl
+        for my $plugin ($module->plugins) {
+            say "Name: " . $plugin->name;
+            say "Version: " . $plugin->version;
+        }
+
+    Strict
+
+    Will not allow you to get a plugin object directly from outside the core
+    modules scope
+
+        # MyModule.pm
+        use Module::Modular
+            with => [qw<Accessors Strict>];
+
+        load_plugins 'Foo';
+        sub get_plugin { my $self = shift; return $self->plugin('Foo'); }
+
+        # test.pl
+        my $c = MyModule->new;
+        $c->plugin('Foo')->foo(); # fails
+        my $plugin = $c->get_plugin(); # works, because it went through the core module first
+
+AUTHOR
+    Brad Haywood <brad@perlpowered.com>
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

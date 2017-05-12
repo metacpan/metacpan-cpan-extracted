@@ -1,0 +1,1194 @@
+# %ARRAY checked.
+# %HASH checked. (3 left to document)
+# %FLAGS checked.
+# %ALIASES - deal with last.
+
+=pod
+
+=begin readme text
+
+Module-Build-Functions version 0.02
+
+=end readme
+
+=for readme stop
+
+=head1 NAME
+
+Module::Build::Functions - Module::Install style syntax for Module::Build
+
+=head1 VERSION
+
+This document describes Module::Build::Functions version 0.001_010.
+
+=head1 SYNOPSIS
+
+	# Our own Build.PL.
+	# $^W = 1; # Can't use "use warnings", see perl_version below.
+	use inc::Module::Build::Functions;
+	
+	module_name         'Module::Build::Functions';
+	license             'perl';
+	perl_version        '5.005';
+	dist_author         'Curtis Jewell <csjewell@cpan.org>';
+	dist_version_from   'lib/Module/Build/Functions.pm';
+	autosplit           'lib/Module/Build/Functions.pm';
+	requires            'File::Slurp';
+	test_requires       'Test::More';
+	test_requires       'Test::Compile';
+	test_requires       'Capture::Tiny' => 0.06;
+	add_to_cleanup      'Module-Build-Functions-*';
+	create_makefile_pl  'passthrough';
+	
+	create_build_script;
+
+or in more relaxed DSL notation:
+	
+    use inc::Module::Build::Functions::DSL;
+    
+    module_name         MBF::Test
+    license             perl
+    perl_version        5.005
+    dist_author         'Curtis Jewell <csjewell@cpan.org>'
+    dist_version_from   lib/Module/Build/Functions.pm
+    autosplit           'lib/Module/Build/Functions.pm
+    requires            File::Slurp
+    test_requires       Test::More
+    test_requires       Test::Compile
+    test_requires       Capture::Tiny   0.06
+    add_to_cleanup      Module-Build-Functions-*
+    create_makefile_pl  passthrough
+	
+
+=for readme continue
+
+	
+=head1 DESCRIPTION
+
+This module gives a Module::Install-like syntax to Module::Build, using 
+modules (other than Module::Build itself) that are in the core in 5.006.
+
+Most commands from Module::Install are supported, and most parameters to
+Module::Build's C<new> routine are supported as commands. This includes 
+the share directory implementation that L<Module::Install::Share> and 
+L<File::ShareDir> implements.
+
+This means that using this module instead of Module::Install can be as easy 
+as replacing the C<use inc::Module::Install> line by 
+C<use inc::Module::Build::Functions>, and renaming the resulting file to 
+Build.PL. Module::Install::DSL syntax is also supported with 
+L<Module::Build::Functions::DSL>.
+
+
+Unfortunately, Module::Install extensions are not supported.
+
+=begin readme
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+This method of installation will install a current version of Module::Build 
+if it is not already installed.
+    
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	Build
+	Build test
+	Build install
+
+(Use ./Build instead of Build if the current directory is not in your path.)
+	
+=end readme
+
+=for readme stop
+
+=head1 INTERFACE 
+
+All functions are exported by default.
+
+Unless specified otherwise, a function is accumulative - it can be 
+called more that once to add to a list.
+
+=head2 Functions unique to Module::Build::Functions
+
+=head3 cygwin
+
+	some_code if cygwin;
+
+Returns true if $^O equals cygwin. 
+
+=head3 get_builder
+
+	my $mb_object = get_builder();
+	
+Creates the L<Module::Build> object (or returns it if already created) 
+defined by the functions previously executed in this module.
+
+=head2 Module::Build->new parameters (with synonyms noted)
+
+=head3 Lists of modules
+
+All lists of modules take a module name (with an optional version) or a 
+hashref that contains a list of modules and versions.
+
+Versions are specified as L<Module::Build::Authoring|Module::Build::Authoring#Format_of_prerequisites>
+specifies them.
+
+If the version parameter is omitted when one module is being added to the 
+list, the version is assumed to be 0.
+
+=head4 requires
+
+	requires 'Module::CoreList' => 2.17;
+	requires 'Acme::24';
+	requires 'Acme' => '!1.11111';
+
+Modules listed using this function are required for using the module(s) 
+being installed.
+
+=head4 recommends
+
+	recommends 'Module::CoreList' => 2.17;
+	recommends 'Acme::24';
+	recommends 'Acme' => '!1.11111';
+
+Modules listed using this function are recommended, but not required,
+for using the module(s) being installed.
+
+=head4 configure_requires
+
+	configure_requires 'Module::CoreList' => 2.17;
+	configure_requires 'Acme::24';
+	configure_requires 'Acme' => '!1.11111';
+
+Modules listed using this function are required for running the 
+distribution's C<Build.PL>.
+
+B<Note:> Module::Build does not need to be added to this list, as
+Module::Build::Functions will determine the version of Module::Build
+required for the functions used.
+
+=head4 build_requires
+
+	build_requires 'Module::CoreList' => 2.17;
+	build_requires 'Acme::24';
+	build_requires 'Acme' => '!1.11111';
+
+Modules listed using this function are only required for running C<./Build> 
+itself, not C<Build.PL>, nor the module(s) being installed.
+
+B<Note:> Module::Build does not need to be added to this list, as
+Module::Build::Functions will determine the version of Module::Build
+required for the functions used.
+
+=head4 test_requires
+
+    test_requires       'Test::More';
+    test_requires       'Test::Compile' => 0.01;
+    test_requires       'Capture::Tiny' => 0.06;
+
+Modules listed using this function are required for running the 
+distribution's test suite.
+
+
+=head4 conflicts
+
+	conflicts 'Acme' => '1.11111';
+	conflicts 'Perl::Dist' => '<1.14';
+
+Modules listed using this function conflict in some serious way with the 
+module being installed, and the Build.PL will not continue if these modules 
+are already installed.
+
+=head3 Directories
+
+=head4 c_source
+
+	# Not accumulative - only the last c_source is used. 
+	c_source 'src';
+
+This function specifies a directory which contains C source files that the 
+rest of the build may depend on. 
+
+See L<Module::Build's documentation on c_source()|Module::Build::API/c_source> 
+for more information.
+
+=head4 include_dirs
+
+=head4 include_dir (Module::Build::Functions synonym)
+
+	include_dir 'include';
+	include_dir File::Spec->catdir(qw(include xs));
+	
+Specifies any additional directories in which to search for C header files. May be given as a string indicating a single directory, or as a list reference indicating multiple directories.
+
+=head4 install_path
+
+	install_path 'lib' '/foo/lib';
+	install_path 'man' File::Spec->catdir(File::Spec->rootdir(), 'foo', 'man');
+
+To set specific locations for different types of installable elements, 
+call C<install_path> with the type of installable element and the location 
+where it should be installed.
+
+I<Recommendation>: Don't use this unless you are either deliberately 
+installing outside the default perl library directories, or installing a 
+new type, defined by L</install_path>.
+	
+=head3 Files
+
+=head4 PL_files
+
+=head4 pl_files
+
+=head4 Pl_file
+
+=head4 pl_file
+
+An optional parameter specifying a set of C<.PL> files in your
+distribution.  These will be run as Perl scripts prior to processing
+the rest of the files in your distribution with the name of the file
+they're generating as an argument.  They are usually used as templates
+for creating other files dynamically, so that a file like
+C<lib/Foo/Bar.pm.PL> might create the file C<lib/Foo/Bar.pm>.
+
+The files are specified with the C<.PL> files as hash keys, and the
+file(s) they generate as hash values, like so:
+
+  my $build = Module::Build->new
+    (
+     module_name => 'Foo::Bar',
+     ...
+     PL_files => { 'lib/Foo/Bar.pm.PL' => 'lib/Foo/Bar.pm' },
+    );
+
+Note that the path specifications are I<always> given in Unix-like
+format, not in the style of the local system.
+
+If your C<.PL> scripts don't create any files, or if they create files
+with unexpected names, or even if they create multiple files, you can
+indicate that so that Module::Build can properly handle these created
+files:
+
+  PL_files => {
+               'lib/Foo/Bar.pm.PL' => 'lib/Foo/Bar.pm',
+               'lib/something.PL'  => ['/lib/something', '/lib/else'],
+               'lib/funny.PL'      => [],
+              }
+
+Here's an example of a simple PL file.
+
+    my $output_file = shift;
+    open my $fh, ">", $output_file or die "Can't open $output_file: $!";
+
+    print $fh <<'END';
+    #!/usr/bin/perl
+
+    print "Hello, world!\n";
+    END
+
+PL files are not installed by default, so its safe to put them in
+F<lib/> and F<bin/>.
+
+
+=head4 pm_files
+
+An optional parameter specifying the set of C<.pm> files in this
+distribution, specified as a hash reference whose keys are the files'
+locations in the distributions, and whose values are their logical
+locations based on their package name, i.e. where they would be found
+in a "normal" Module::Build-style distribution.  This parameter is
+mainly intended to support alternative layouts of files.
+
+For instance, if you have an old-style C<MakeMaker> distribution for a
+module called C<Foo::Bar> and a F<Bar.pm> file at the top level of the
+distribution, you could specify your layout in your C<Build.PL> like
+this:
+
+  my $build = Module::Build->new
+    (
+     module_name => 'Foo::Bar',
+     ...
+     pm_files => { 'Bar.pm' => 'lib/Foo/Bar.pm' },
+    );
+
+Note that the values should include C<lib/>, because this is where
+they would be found in a "normal" Module::Build-style distribution.
+
+Note also that the path specifications are I<always> given in
+Unix-like format, not in the style of the local system.
+
+=head4 pod_files
+
+=head4 pod_file
+
+Just like C<pm_files>, but used for specifying the set of C<.pod>
+files in your distribution.
+
+=head4 xs_file
+
+=head4 xs_files
+
+Just like C<pm_files>, but used for specifying the set of C<.xs>
+files in your distribution.
+
+
+=head3 Metadata
+
+Functions in this section are used when generating metadata for C<META.yml> and PPD files. 
+
+=head4 all_from
+
+	all_from 'lib\Module\Build\Functions.pm';
+
+Specifies the file to look for the abstract, the author, the version, the 
+license, and the perl version required in.
+
+=head4 dist_abstract
+ 
+=head4 abstract (Module::Install synonym)
+
+	# Not accumulative - only the last dist_abstract or abstract is used. 
+	dist_abstract 'Module::Install style syntax for Module::Build';
+	abstract 'Module::Install style syntax for Module::Build';
+
+This should be a short description of the distribution. 
+	
+If either this function, L<abstract_from|#abstract_from>, or 
+L<all_from|#all_from> is not given, then Module::Build looks in the POD of 
+the module from which it gets the distribution's version. If it finds a POD 
+section marked "=head1 NAME", then it looks for the first line matching 
+\s+-\s+(.+), and uses the captured text as the abstract.
+
+=head4 abstract_from
+
+	abstract_from 'lib\Module\Build\Functions.pm';
+
+Specifies a file to look for the abstract in.
+
+=head4 dist_author
+
+=head4 author (Module::Install synonym)
+
+	dist_author 'John Doe <jdoe@example.com>';
+	author 'Jane Doe <doej@example.com>';
+	
+This should be something like "John Doe <jdoe@example.com>", or if there are 
+multiple authors, this routine can be called multiple times, or an anonymous 
+array of strings may be specified. 
+	
+If either this function, L</author_from>, or L</all_from> is not used, then 
+Module::Build looks at the module from which it gets the distribution's 
+version. If it finds a POD section marked "=head1 AUTHOR", then it uses the 
+contents of this section.
+
+=head4 author_from (Module::Install synonym)
+
+	author_from 'lib\Module\Build\Functions.pm';
+	
+Specifies a file to look for the author in, using the contents of a 
+POD section marked "=head1 AUTHOR" or "=head1 AUTHORS".
+
+If either this function, L</author>, L</dist_author>,or L</all_from> is 
+not used, then Module::Build looks at the module from which it gets the 
+distribution's version. If it finds a POD section marked "=head1 AUTHOR", 
+then it uses the contents of this section.
+
+=head4 dist_name
+
+	dist_name 'Module-Build-Functions';
+
+Specifies the name for this distribution. Most authors won't need to set 
+this directly, they can use L<module_name|/module_name> to set C<dist_name> 
+to a reasonable default. However, some agglomerative distributions like 
+I<libwww-perl> or I<bioperl> have names that don't correspond directly to 
+a module name, so C<dist_name> can be set independently.
+
+=head4 name (Module::Install synonym)
+
+=head4 module_name
+
+	module_name 'Module::Build::Functions';
+	
+Specifies the name of the main module for this distribution.  This will set 
+the distribution's name and version.
+
+=head4 dist_version
+
+=head4 version (Module::Install synonym)
+
+	dist_version '0.001_001';
+
+Specifies a version number for the distribution. See 
+L<module_name|#module_name> or L<dist_version_from|#dist_version_from> 
+for ways to have this set automatically from a C<$VERSION> variable in a 
+module. One way or another, a version number needs to be set.
+
+=head4 perl_version
+
+	perl_version '5.006001';
+
+Specifies a minimum version of perl that this distribution requires.
+
+=head4 perl_version_from
+
+	perl_version_from 'lib\Module\Build\Functions.pm';
+
+Specifies a file to look for the minimum perl version in.
+
+=head4 dist_version_from
+
+=head4 version_from (Module::Install synonym)
+
+	dist_version_from 'lib/Module/Build/Functions.pm';
+
+Specifies a file to look for the distribution version in. Most authors 
+won't need to set this directly, they can use C<module_name|#module_name> 
+to set it to a reasonable default.
+
+=head4 license
+
+	license 'perl';
+
+Specifies the licensing terms of your distribution. Valid licenses are listed in 
+L<Module::Build::API>.
+
+=head4 license_from
+
+	license_from 'lib\Module\Build\Functions.pm';
+
+Specifies a file to look for the choice of license in. 
+
+=head4 meta_add
+
+=head4 meta_merge
+
+	meta_add 'provides' { 'Module::Build::Functions' => { file => 'lib\Module\Build\Functions.pm', version => '0.001_010'} };
+	meta_merge 'resources' 'bugtracker' 'http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Module-Build-Functions';
+
+meta_add and meta_merge adds their parameters to the C<META.yml> file.
+
+The first parameter is the key to add or merge to, and the second parameter 
+is the value of that key (which may be a string, an arrayref, or a hashref.)
+
+The one difference is that meta_add overwrites anything else in that key, 
+while meta_merge will merge an arrayref or hashref into the current 
+contents of the key. 
+
+Also, meta_merge allows a hashref to be ommitted if it contains only one value.
+
+=head4 no_index
+
+  no_index directory => 'examples';
+  no_index package   => 'DB';
+
+Quite often a distrubition will provide example scripts or testing
+modules (.pm files) as well as the actual library modules.
+
+In almost all situations, you do B<not> want these indexed in the CPAN
+index, the master Perl packages list, or displayed on the
+L<http://search.cpan.org/> website, you just want them along for the
+ride.
+
+The C<no_index> command is used to indicate directories or files where
+there might be non-library .pm files or other files that the CPAN
+indexer and websites such as L<http://search.cpan.org/> should
+explicitly ignore.
+
+The most common situation is to ignore example or demo directories,
+but a variety of different situations may require a C<no_index> entry.
+
+Another common use for C<no_index> is to prevent the PAUSE indexer
+complaining when your module makes changes inside a "package DB" block.
+This is used to interact with the debugger in some specific ways.
+
+See the F<META.yml> documentation for more details on what C<no_index>
+values are allowed.
+
+The F<inc>, F<t> and F<share> (if C<install_share> is used) directories
+are automatically C<no_index>'ed for you if found and do not require
+an explicit command.
+
+To summarize, if you can see it on L<http://search.cpan.org/> and you
+shouldn't be able to, you need a C<no_index> entry to remove it.
+
+=head3 Flags
+
+Functions listed here are B<not> accumulative - only the last value a flag has 
+been set to will apply.
+
+=head4 create_packlist
+
+	create_packlist 1;
+	create_packlist 0; # Not recommended.
+	
+If this flag is set (and it is set by default), Module::Build will create a .packlist 
+file duting the L<install> action.
+
+=head4 create_makefile_pl
+
+	create_makefile_pl 'small';
+	create_makefile_pl 'passthrough';
+	create_makefile_pl 'traditional';
+
+This function lets you use Module::Build::Compat during the C<distdir> (or 
+C<dist>) action to automatically create a C<Makefile.PL> for compatibility 
+with ExtUtils::MakeMaker. The parameter's value should be one of the styles 
+named in the L<Module::Build::Compat|Module::Build::Compat> documentation.
+
+=head4 create_readme
+
+	create_readme 1;
+
+This function tells Module::Build whether to automatically create a README 
+file at the top level of your distribution or not. Currently it will simply 
+use Pod::Text (or Pod::Readme if it's installed) on the file indicated by 
+dist_version_from and put the result in the README file. This is by no means 
+the only recommended style for writing a README, but it seems to be one 
+common one used on the CPAN.
+
+If you generate a README in this way, it's probably a good idea to create a 
+separate INSTALL file if that information isn't in the generated README.
+
+=head4 create_license
+
+	create_license 1;
+
+This function tells Module::Build whether to automatically create a LICENSE 
+file at the top level of your distribution or not. If set to 1, it creates 
+a LICENSE file based on the license you give for your META.yml file.
+
+This requires L<Software::License> to be installed.
+
+=head4 dynamic_config
+
+	dynamic_config 1;
+	dynamic_config 0;
+
+This function indicates whether the Build.PL file must be executed, or 
+whether this module can be built, tested and installed solely from 
+consulting its metadata file. The main reason to set this to a true value 
+is that your module performs some dynamic configuration as part of its 
+build/install process. If the flag is omitted, the META.yml spec says that 
+installation tools should treat it as 1 (true), because this is a safer way 
+to behave.
+
+Currently Module::Build doesn't actually do anything with this flag - it's up 
+to higher-level tools like CPAN.pm to do something useful with it. It can 
+potentially bring lots of security, packaging, and convenience improvements.
+
+=head4 installdirs
+
+	# Not accumulative - last one of installdirs or 
+	# any aliases to installdirs will be used.
+	installdirs 'site';
+	installdirs 'core';
+	installdirs 'vendor';
+	
+Determines where files are installed within the normal perl hierarchy as 
+determined by Config.pm. Valid values are: core, site, vendor. The 
+default is site. See L<Module::Build#INSTALL PATHS>
+
+=head4 recursive_test_files
+
+	recursive_test_files 1;
+
+If this is set to 1, Module::Build will search recursively under C</t> for 
+C<*.t> files to use when testing.  Defaults to 0.
+
+=head4 sign
+
+	sign 1;
+
+If this is set to 1, Module::Build will use L<Module::Signature> to create 
+a signature file for your distribution during the C<distdir> action.
+
+=head4 use_tap_harness
+
+	use_tap_harness 1;
+	use_tap_harness 0;
+	
+This indicates whether or not to use L<TAP::Harness> for testing rather than L<Test::Harness>. Defaults to false. If set to true, you must add TAP::Harness as a requirement for your module in L</build_requires>. 
+
+This will be set to a true value if tap_harness_args is specified.
+
+=head4 tap_harness_args
+
+	use_tap_harness { verbosity => 1, lib => [ 'lib', 'blib/lib', 'blib/arch' ] };
+	
+This indicates the options to use when L<TAP::Harness> is used for testing,
+and is given as a hash reference.
+ 
+If set, you must add TAP::Harness as a requirement for your module in 
+L</build_requires>. 
+
+B<WARNING>: May change to a accumulative function in future versions.
+
+=head3 Other functions
+
+=head4 add_to_cleanup
+ 
+	add_to_cleanup 'Module-Build-Functions-*';
+	add_to_cleanup 'Makefile';
+	 
+Adds a file specification (or an arrayref of file specifications) to the 
+list of files to cleanup when the C<clean> action is performed.
+
+=head4 auto_configure_requires
+
+    auto_configure_requires 0;
+    auto_configure_requires 1;
+
+This parameter determines whether Module::Build will be added to 'configure_requires' (and 'build_requires') if Module::Build is not already there. 
+The required version will be the last 'major' release, as defined by the decimal version truncated to two decimal places (e.g. 0.34, instead of 0.3402). 
+The default value is true.
+
+=head4 auto_features
+
+	auto_features 'pg_support',    'description' => 'Interface with Postgres databases';
+	auto_features 'pg_support',    'requires'    => 'DBD::Pg'                 => '23.3';
+	auto_features 'pg_support',    'requires'    => 'DateTime::Format::Pg'    => 0;
+	auto_features 'mysql_support', 'description' => 'Interface with MySQL databases';
+	auto_features 'mysql_support', 'requires'    => 'DBD::mysql'              => '17.9';
+	auto_features 'mysql_support', 'requires'    => 'DateTime::Format::MySQL' => 0;
+
+This parameter supports the setting of features (see L<"Module::Build|feature($name)">) 
+automatically based on a set of prerequisites.
+
+B<*WARNING*> The syntax for this may change before 1.000!
+	
+=head4 autosplit
+
+	autosplit           'lib/Module/Build/Functions.pm';
+	
+Adds a file (or an arrayref containing a list of files) that need(s) to 
+have L<Autosplit::autosplit()|Autosplit#autosplit> ran on them
+(because the file in question uses L<AutoLoader>, most likely).
+
+=head4 build_class
+
+	# Not accumulative - only the last build_class is used. 
+	build_class 'Module::Build::Subclass';
+
+Sets the name of a subclass of Module::Build that the Build script uses.
+
+This is used if the subclass has requirements that are satisfied by 
+L</build_requires>, but are not neccessarily installed when Build.PL 
+will be executed.
+
+If the subclass, specified with this directive, define some additional propeties, 
+helper functions for them will be exported in the building script automatically.
+However, if this will happened at run-time, they should be used with parenthesis:
+
+    use inc::Module::Build::Functions;
+    
+    build_class 'Module::Build::SubClass';
+    
+    custom_flag('flag_set');
+    
+    custom_array(1);
+    custom_array(10);
+    
+    custom_hash(key1 => 'value1');
+    custom_hash(key2 => 'value2');
+    
+    module_name         'MBF::Test';
+    dist_version_from   'lib/MBF/Test.pm';
+    
+    create_build_script; 
+
+To use new helper functions without parenthesis, specify the 'build_class' in the
+parameters for 'import' method:
+
+    use inc::Module::Build::Functions( build_class => 'Module::Build::SubClass' );
+    
+    custom_flag 'flag_set';
+    
+    custom_array    1;
+    custom_array    10;
+    
+    custom_hash     key1 => 'value1';
+    custom_hash     key2 => 'value2';
+    
+    module_name         'MBF::Test';
+    dist_version_from   'lib/MBF/Test.pm';
+    
+    create_build_script; 
+  
+See also L</additional_hash>, L</additional_array>, L</additional_flag>.
+  
+=head4 extra_compiler_flags 
+
+=head4 extra_linker_flags
+
+I<Aliases>: C<extra_compiler_flag>, C<extra_linker_flag>
+
+These parameters can contain strings (which are split on whitespace and accumulate into an array reference in the order added) or array references to pass through to the compiler and linker phases when compiling/linking C code.
+For example, to tell the compiler that your code is C++, you might do:
+
+	extra_compiler_flag '-x c++';
+
+To link your XS code against glib you might write something like:
+
+	extra_compiler_flags scalar `glib-config --cflags`;
+	extra_linker_flags   scalar `glib-config --libs`;
+
+=head4 get_options
+
+	get_options loud => { store => \$loud };
+	get_options dbd => { type => '=s' };
+	get_options quantity => { type => '+' };
+
+Adds a command line parameter (or a hashref of command line parameters) that 
+the C<Build.PL> or C<Build> script is to process according to the specifications
+given (the specification hashrefs are documented in the 
+L<Module::Build::API documentation|Module::Build::API#get_options>.)
+
+=head4 subclass
+
+This creates a new C<Module::Build> subclass on the fly, as described
+in the L<Module::Build::Authoring/"SUBCLASSING"> section.  The caller
+must provide either a C<class> or C<code> parameter, or both.  The
+C<class> parameter indicates the name to use for the new subclass, and
+defaults to C<MyModuleBuilder>.  The C<code> parameter specifies Perl
+code to use as the body of the subclass.
+
+
+=head4 create_build_script
+
+=head4 WriteAll (Module::Install synonym)
+
+Creates the I<Build.PL> to be run in future steps, and returns the 
+L<Module::Build> object created.
+
+=head3 Supported Module::Install syntax not mentioned above
+	
+=head4 install_as_core
+
+=head4 install_as_cpan
+
+Aliases for C<installdirs 'core';>. See L<installdirs|#installdirs>.
+
+=head4 install_as_site
+
+Alias for C<installdirs 'site';>. See L<installdirs|#installdirs>.
+
+=head4 install_as_vendor
+
+Alias for C<installdirs 'vendor';>. See L<installdirs|#installdirs>.
+
+=head4 win32
+
+	requires 'Win32' 0.30 if win32;
+
+Returns true if $^O eq 'MSWin32'.
+
+=head4 winlike
+
+	requires 'Win32' 0.28 if winlike;
+
+Returns true if $^O eq 'cygwin' or $^O eq 'MSWin32'.
+
+=head4 release_testing
+
+=head4 automated_testing
+
+Returns true if the appropriate environment variable is set to something 
+that is true.
+
+=head4 requires_external_bin
+
+	configure_requires 'ExtUtils::MakeMaker' 6.52 if cygwin;
+	requires_external_bin 'svn';
+
+This routine checks that a particular command is available on the host 
+system.
+
+The I<Build.PL> file will abort with an I<NA> result if the command is not
+available.
+
+The example code shows the one limitation on this routine - because of a
+bug in ExtUtils::MakeMaker, this routine does not find some commands on 
+Cygwin systems until pre-release versions of ExtUtils::MakeMaker 6.52.
+
+=head4 requires_external_cc
+
+	requires_external_cc;
+
+This routine checks that there is a compiler and linker on the system, and 
+that they actually work, by calling 
+L<ExtUtils::CBuilder::have_compiler|ExtUtils::CBuilder/have_compiler>.
+
+The I<Build.PL> file will abort with an I<NA> result if the command is not
+available.
+
+=head4 can_run
+
+	configure_requires 'ExtUtils::MakeMaker' 6.52 if cygwin;
+	my $has_svn = can_run 'svn';
+
+This routine returns whether a particular command is available on the system.
+	
+The example code shows the one limitation on this routine - because of a
+bug in ExtUtils::MakeMaker, this routine does not find some commands on 
+Cygwin systems until pre-release versions of ExtUtils::MakeMaker 6.52.
+
+=head4 can_cc
+
+	my $has_compiler = can_cc;
+
+This routine returns whether there is a compiler and linker on the system, and 
+that they actually work, by calling 
+L<ExtUtils::CBuilder::have_compiler|ExtUtils::CBuilder/have_compiler> to 
+verify that fact.
+
+=head4 can_use
+
+	my $has_perl_svn = can_use 'SVN::Core';
+	my $has_real_alien_wix = can_use 'Alien::WiX', 0.300001;
+
+The can_use function tests the ability to load a specific named module. Currently it will load the module in the process, although this may change in the future.
+
+Takes an optional second param of a version number. The currently installed version of the module will be tested to make sure it is equal to or greater than the specified version.
+
+=head4 author_context;
+
+	my $is_author = author_context;
+	if (author_context) { ... }
+
+Returns true if being run by the author.
+
+This is determined by looking for the C<inc/.author> directory, trying 
+to detect a version control system, and looking for the I<MANIFEST.SKIP>
+file, in that order.
+
+=head4 repository
+
+	repository 'http://svn.ali.as/cpan/trunk/Module-Build-Functions/';
+	
+Alias for C<< meta_merge 'resources', 'repository' => $url >>. 
+L<http://search.cpan.org/> will use this to display the repository on the 
+distribution's main page.
+
+=head4 bugtracker
+
+	bugtracker 'http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Module-Build-Functions';
+
+Alias for C<< meta_merge 'resources', 'bugtracker' => $url >>. 
+L<http://search.cpan.org/> will use this instead of its usual link to 
+rt.cpan.org to report bugs from the repository's main page.
+
+=head4 script_files
+
+=head4 script_file
+
+=head4 install_script (Module::Install synonym)
+
+	# The following are equivalent
+	install_script 'foo';
+	install_script 'script/foo';
+
+XXX
+
+The 'script_files' command provides support for the installation of scripts that will become available at the 
+console on both Unix and Windows (in the later case by wrapping it up as a .bat file).
+To support less typing, if a script is located in the C</script> directory, you need refer to it by name only.
+
+XXX
+
+An optional parameter specifying a set of files that should be installed as executable 
+Perl scripts when the module is installed. May be given as an array reference of the 
+files, as a hash reference whose keys are the files (and whose values will currently be ignored), 
+as a string giving the name of a directory in which to find scripts, or as a string 
+giving the name of a single script file.
+
+The default is to install any scripts found in a 'bin' directory at the top level of 
+the distribution, minus any keys of PL_files.
+
+
+=head4 interactive
+
+	print "A question I need a user to see.\n" if interactive;
+
+Returns true if in an interactive environment, or false otherwise.
+
+=head4 install_share
+
+	# These are the same - they put files in the 'share' directory
+    # where File::ShareDir::dist_dir or dist_file can access them 
+	# when your module is used.	
+	install_share;
+	install_share 'dist', 'share';
+
+	# If you want to call the directory within your distribution
+	# something different, you can.
+	install_share 'dist', 'data';
+	
+	# This installs a share directory for a module, where
+    # File::ShareDir::module_dir or module_file can find the files 
+	# when your module is used.
+	install_share 'module' => 'Perl::Dist::WiX', File::Spec->catdir('data', 'WiX');
+	install_share 'module' => 'Perl::Dist::Inno', File::Spec->catdir('data', 'Inno');
+	install_share 'module' => 'Acme::Angels', 'data';
+
+This command provides a way for modules or distributions to install 
+read-only data in a way that is easily findable after installation, 
+and is not operating system dependent.
+
+The first parameter is either C<'dist'> or C<'module'>, and specifies the 
+type of directory this is - whether it applies to the whole distribution, 
+or only a single module (and it's subclasses, see 
+L<File::ShareDir::class_file()|File::ShareDir/class_file>). If installing
+files for a module, the module name is required, as well. This defaults to 
+C<'dist'> if not given.
+
+The last parameter is the directory in your distribution that contains the
+files to install, and defaults to C<'share'> for a distribution, although if a 
+type is given, a directory must be, as well. The directory is given in
+local file system format, so you may wish to use L<File::Spec> to stitch two
+or more directories together, as shown above.
+
+Unlike L<Module::Install|Module::Install>'s C<install_share>, this 
+will NOT install a file that is not in the I<MANIFEST>, so you may need
+to alter your I<MANIFEST> or I<MANIFEST.SKIP> files to let certain files 
+through if they would ordinarily be skipped. If the C<MANIFEST> file cannot
+be read, then no files are copied, and the C<Build.PL> script stops.  You 
+have been warned.
+
+
+=head3 Additional properties definition
+
+This group of directives is mostly required for non-trivial subclassing of 
+Module::Build. Module::Build::Functions do its best to find new properties 
+from subclasses transparently.
+
+Every directive in this group accepts a single argument - the name of new
+property. The helper function with corresponding name will be exported to the
+script's scope. See also L</build_class> for additional details.
+
+=head4 additional_hash
+
+This directive define a new "hash" property. Property will be accumulative:
+
+    use inc::Module::Build::Functions;
+    
+    additional_hash 'custom_hash';
+    
+    custom_hash(key1 => 'value1');
+    custom_hash(key2 => 'value2');
+    ...
+
+=head4 additional_array
+
+This directive define a new "array" property. Property will be accumulative:
+
+    use inc::Module::Build::Functions;
+    
+    additional_hash 'custom_array';
+    
+    custom_array('value1');
+    custom_array('value2');
+    ...
+
+=head4 additional_flag
+
+This directive define a new "flag" (non-accumulative) property.
+
+    use inc::Module::Build::Functions;
+    
+    additional_flag 'custom_custom';
+    
+    custom_flag('value');
+    ...
+
+=head3 Deprecated directives
+
+=head4 auto_bundle
+
+=head4 auto_bundle_deps
+
+=head4 bundle
+
+=head4 bundle_deps
+
+This directives comes from Module::Install::Bundle. The author has deliberately 
+chosen to drop support for bundling at this point, since Module::Build
+quite probably will have native bundling capabilities soon.
+
+=head4 auto_install
+
+This directive comes from Module::Install::AutoInstall and is deprecated,
+as its support in the Module::Install::AutoInstall itself may be dropped 
+soon.
+
+=head4 check_nmake
+
+This directive is deprecated in the Module::Install itself.
+
+=head4 get_file
+
+
+=head3 Directives to be documented
+
+=head4 test_file
+
+=head4 test_files
+
+
+
+
+
+=head1 DIAGNOSTICS
+
+=for author to fill in:
+    List every single error and warning message that the module can
+    generate (even the ones that will "never happen"), with a full
+    explanation of each problem, one or more likely causes, and any
+    suggested remedies.
+
+=over
+
+=item C<< %s cannot be found >>
+
+There was probably a misspelling in the command name in the Build.PL.
+
+=item C<< %s is not supported yet >>
+
+Module::Build::Functions is not completely implemented yet, so a number of
+functions will croak with this error.
+
+Hang on, support will be coming soon!
+
+=item C<< auto_install is deprecated >>
+
+The author has deliberately chosen to drop support for auto_install.
+(he happens to be irritated at pre-0.86 Module::Installs that stop 
+CPAN upgrades to make him answer an unneeded question.  Of COURSE, I
+want prerequisites installed. Why would I not?)
+
+Patches, however, would be welcomed to implement an auto_install that 
+is not annoying.
+
+=item C<< bundle is deprecated >>
+
+=item C<< auto_bundle is deprecated >>
+
+=item C<< bundle_deps is deprecated >>
+
+=item C<< auto_bundle_deps is deprecated >>
+
+The author has deliberately chosen to drop support for bundling at 
+this point.
+
+Patches, however, would be welcomed.
+
+=item C<< Invalid install type >>
+
+=item C<< Illegal or invalid share dir type '%s' >>
+
+=item C<< Illegal or missing directory install_share param >>
+
+=item C<< Missing or invalid module name '%s' >>
+
+=item C<< Too many parameters to install_share  >>
+
+=item C<< cannot add directory %s to a list of script_files >>
+
+=item C<< attempt to overwrite string script_files with %s failed  >>
+
+=item C<< cannot add a glob to a list of test_files  >>
+
+=item C<< attempt to overwrite string test_files failed  >>
+
+Will be documented soon.
+
+=back
+
+=head1 CONFIGURATION AND ENVIRONMENT
+  
+Module::Build::Functions requires no configuration files or environment 
+variables of its own. See L<Module::Build> for its configuration variables
+or environment variables.
+
+=for readme continue
+
+=head1 DEPENDENCIES
+
+L<File::Slurp> and L<Module::Build> are required on the system of an author 
+using this module in his Build.PL.
+
+L<Capture::Tiny> version 0.06 or greater is used during testing only.
+
+On the system of the person installing a module using 
+Module::Build::Functions, only Module::Build is required.  The version of 
+Module::Build that will be required is determined by the functions used.
+
+=for readme stop
+
+=head1 INCOMPATIBILITIES
+
+=for author to fill in:
+    A list of any modules that this module cannot be used in conjunction
+    with. This may be due to name conflicts in the interface, or
+    competition for system or program resources, or due to internal
+    limitations of Perl (for example, many modules that use source code
+    filters are mutually incompatible).
+
+None reported.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+C<bug-Module-Build-Functions@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.
+
+=head1 AUTHOR
+
+Curtis Jewell  C<< <csjewell@cpan.org> >>
+
+=for readme continue
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2009, Curtis Jewell C<< <csjewell@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself, either version
+5.005_04 or any later version. See L<perlartistic> and L<perlgpl>.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+=for readme stop
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

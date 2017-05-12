@@ -1,0 +1,48 @@
+{
+   "abstract" : "Mojolicious plugin to display database information on browser",
+   "author" : [
+      "Yuki Kimoto <kimoto.yuki@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-DBViewer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Connector" : "0.52",
+            "DBIx::Custom" : "0.40",
+            "Data::Page" : "2.02",
+            "Mojolicious" : "2.59",
+            "Mojolicious::Plugin::AutoRoute" : "0.12",
+            "Test::More" : "0",
+            "Validator::Custom" : "1.0201"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.29",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

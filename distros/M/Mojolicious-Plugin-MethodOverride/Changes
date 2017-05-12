@@ -1,0 +1,49 @@
+Revision history for Mojolicious-Plugin-MethodOverride
+
+0.060   2016-10-23
+	- Fix for Mojolicious 7.0 breaking changes.
+
+0.053   2015-06-03
+	- Bug fix: t/04-override-charset.t failed w/ M<4.50.
+	- Reduce requirement to Mojolicious 2.48.
+
+0.052   2015-04-28
+	- Bug fix: Clone URL query before touching it.
+	- Add documentation about M:P::Charset with M:P::MethodOverride.
+
+0.051   2015-04-19
+	- Fix Version in POD.
+
+0.050   2015-04-19
+	- Override method as soon as the request header is read.
+	- Mention _method parameter since Mojolicious 6.03.
+
+0.042	2015-01-25
+	- Add README (suggested by Chris Kirke).
+	- Declare minimum Perl version.
+	- Enable Travis CI (suggested by Chris Kirke).
+	- Markdownify README.
+
+0.041	2015-01-07
+	- Remove test "method override for static files":
+	  POST static_file must not be possible, but this was fixed in
+	  Mojolicious 5.30. OTOH method overriding does no harm if the
+	  HTTP method is completely ignored for static files before 5.30.
+
+0.040   2014-11-23
+	- No extra check for static files.
+
+0.030   2014-05-15
+	- Test fix for Mojolicious 4.91 breaking changes (chorny)
+
+0.020   2013-05-20
+	- Fix for Mojolicious 4.0 breaking changes.
+	- Increase Mojolicious minimum version to 3.21.
+
+0.010   2012-10-22
+	- Accept any HTTP method name (if its made of ASCII letters).
+	- Mojolicious 2 ist minimum requirement.
+	- Updated test for recent Mojolicous.
+
+0.001   2011-10-31
+	First version, released on an unsuspecting world.

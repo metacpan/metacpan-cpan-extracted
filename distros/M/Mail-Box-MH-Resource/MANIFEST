@@ -1,0 +1,7 @@
+CHANGES
+MANIFEST
+Makefile.PL
+Resource.pm
+t/1.t
+t/1.mh_profile
+t/Mail/sequence

@@ -1,0 +1,28 @@
+MooseX-Graph-Easy-StateMachine version 0.01
+===========================================
+
+The goodness of Graph-Easy-StateMachine, now with Moose sugar.
+Specifically, we call caller()->meta->create with a superclasses
+argument instead of just defining an @ISA.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Any::Moose
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 David Nicol <davidnico@cpan.org>
+Released under Creative Commons Attribution license international 3.0
+
+

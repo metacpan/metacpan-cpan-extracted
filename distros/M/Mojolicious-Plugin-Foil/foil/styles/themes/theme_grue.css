@@ -1,0 +1,151 @@
+/* ================================================================== */
+/* THEME: Grue
+ */
+/* ================================================================== */
+/* THEME: Grue - fonts
+ */
+/* ------------------------------------------------------------------ */
+/* Fonts */
+h1, h2, h3, h4 {
+  font-family: "Black", blackchancery, ZurichCalligraphic, verdana, helvetica, arial, sans-serif;
+  font-weight: normal;
+  color: black;
+}
+
+/* ================================================================== */
+/* ICONS - light on dark
+ * Nav arrows with transparent backgrounds
+ */
+.side nav li > ul {
+  list-style-image: url(nav_white.png);
+}
+
+/* ================================================================== */
+/* General */
+.verge, header,
+footer,
+.side, .fancy {
+  color: #e0ebeb;
+  background: #336666;
+  border-color: #005500;
+}
+
+header,
+footer,
+.side {
+  background-image: url(grue1a.jpg);
+}
+
+body {
+  color: black;
+  background: #003333 url(grue1b.jpg);
+}
+
+#main-wrap {
+  color: #003333;
+  background: #75a3a3;
+  border-color: #001100;
+  border-radius: 2em;
+  box-shadow: rgba(0, 0, 0, 0.8) 3px 3px 10px;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+a:link {
+  color: #006633;
+}
+
+a:visited {
+  color: #003366;
+}
+
+header a:link,
+footer a:link,
+.side a:link,
+.verge a:link,
+header a:link,
+footer a:link,
+.side a:link,
+.fancy a:link {
+  color: #a3f5cc;
+}
+
+header a:visited,
+footer a:visited,
+.side a:visited,
+.verge a:visited,
+header a:visited,
+footer a:visited,
+.side a:visited,
+.fancy a:visited {
+  color: #a3ccf5;
+}
+
+.fancy {
+  color: #e0ebeb;
+  background-image: url("grue1a.jpg");
+  border: 5px double #5e8888;
+  padding: 0;
+}
+.fancy li {
+  padding: 0.5em;
+  margin: 5px;
+  border: 5px solid #5e8888;
+  background-color: #336666;
+  background: linear-gradient(#336666, #1a332d);
+}
+.fancy li a:link {
+  color: #a3f5cc;
+}
+.fancy li a:visited {
+  color: #a3ccf5;
+}
+
+.button, input[type=submit], header nav a,
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: #e0e6eb;
+  border-color: #003300;
+  background-color: #264d73;
+}
+
+.button a:link, input[type=submit] a:link, header nav a a:link,
+header nav .selflink a:link,
+header nav em a:link,
+header nav .current a a:link, a.button:link, header nav a:link {
+  color: #e0e6eb;
+}
+
+.button a:visited, input[type=submit] a:visited, header nav a a:visited,
+header nav .selflink a:visited,
+header nav em a:visited,
+header nav .current a a:visited, a.button:visited, header nav a:visited {
+  color: #a3a3f5;
+}
+
+header nav a:link:hover,
+header nav a:visited:hover {
+  background-color: #99FF99;
+  color: navy;
+}
+
+header nav li {
+  border-color: #7777dd;
+}
+
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: #336699;
+  background-color: white;
+}
+
+/* ------------------------------------------------------------------ */
+@media screen and (max-width: 50em) {
+  #main-wrap {
+    border-radius: 0;
+    margin: 0;
+    box-shadow: none;
+  }
+}

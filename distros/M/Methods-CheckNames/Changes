@@ -1,0 +1,18 @@
+0.06
+    - Uploading 0.05_01 as a stable release, without modifications.
+
+0.05_01
+    - Doesn't work back to 5.005 now.
+    - Make the effects lexical.
+
+0.04
+	- Works all the way back to 5.005 now
+
+0.03
+	- D'oh... HvNAME_get is not in the perlapi, HvNAME is =P
+
+0.02
+	- Support for Perl 5.8
+
+0.01
+	- Initial release

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Math-nSphere.t
+lib/Math/nSphere.pm
+META.yml                                 Module meta-data (added by MakeMaker)

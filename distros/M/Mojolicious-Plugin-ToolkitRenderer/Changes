@@ -1,0 +1,19 @@
+Revision history for Mojolicious::Plugin::ToolkitRenderer
+
+1.07      2015-11-30 12:52:05-08:00 America/Los_Angeles
+        - Add "content" keyword into stash as default controller->content
+
+1.06      2015-04-20 14:26:58-07:00 America/Los_Angeles
+        - Switch render_exception to reply->exception (Mojo deprecated old sub)
+
+1.05      2015-01-29 15:30:18-08:00 America/Los_Angeles
+        - Fix for documentation bug (wrong URLs)
+
+1.04      2015-01-29 15:25:45-08:00 America/Los_Angeles
+        - Implementing use of Dist::Zilla
+
+1.02      Wed Sep 25 10:00:58 PDT 2014
+        - Some OCD cleanup; addition of Travis and Coveralls
+
+1.01      Mon Aug  5 12:47:03 PDT 2013
+        - First version, released on an unsuspecting world

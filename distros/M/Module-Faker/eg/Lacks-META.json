@@ -1,0 +1,7 @@
+{
+  "name": "Lacks-META",
+  "abstract": "this dist has no META.yaml",
+  "X_Module_Faker": {
+    "omitted_files": [ "META.yml" ]
+  }
+}

@@ -1,0 +1,78 @@
+This module wraps the MPFI C library functions.
+
+This version of Math::MPFI needs mpfi-1.5 or later.
+
+The MPFI library is intended to be a portable library written in C
+for arbitrary precision interval arithmetic with intervals represented
+using MPFR reliable floating-point numbers. It is based on the GNU MP
+(GMP) library and on the MPFR library.
+
+MPFI, like MPFR and GMP, is free. It is distributed under the
+GNU Lesser General Public License (GNU Lesser GPL).
+
+Because this module wraps the MPFI functions, it requires that the
+MPFI library (version 1.5 or later), the GMP library (version 4.2.0
+or later) and the MPFR library (version 2.3.0 or later) have been
+installed.
+
+For the GMP library see:
+http://gmplib.org
+
+For the MPFR library see:
+http://www.mpfr.org
+Do not use the (outdated) MPFR library source that ships with the
+GMP source.
+
+For the MPFI library see:
+https://gforge.inria.fr/projects/mpfi/
+
+You'll also need to have Math::MPFR (version 3.23 or later) installed.
+
+To build this module you need perl 5.6.0 or later. I'm not sure of all
+the requirements to get it to build with earlier versions of perl, but
+it's definite that the XS code relating to operator overloading will
+not compile with perl versions prior to 5.6.
+
+Build in the usual way:
+
+ perl Makefile.PL
+ make
+ make test
+ make install
+
+When building this module, the MPFI, GMP and MPFR libraries will need to be
+accessible. If those files are in a location where your compiler does
+not find them by default, then instead of running 'perl Makefile.PL',
+you'll need to run:
+
+perl Makefile.pl INC="-I/path/to/gmp_includes -I/path/to/mpfr_includes -I/path/to/mpfi/include"
+ LIBS="-L/path/to/mpfi_lib -lmpfi -L/path/to/mpfr_lib -lmpfr -L/path/to/gmp_lib -lgmp"
+
+==================================
+64-bit-int and long double support
+==================================
+
+If your perl's Config reports that 'ivsize' is greater than or
+equal to 8 && 'ivtype' is not 'long', then Math::MPFI will, by default,
+be built with access to the mpfr_*_uj and mpfr_*_sj functions. Else,
+access to those functions is, by default, denied. You can override the
+default by opening up the Makefile.PL and uncommenting the appropriate
+line (just a few lines down from the top of the file ... the comments in
+that file should make it clear).
+
+Similarly, if your perl's Config reports that 'nvsize' is greater than
+8 then Math::MPFI will be built with access to the mpfr_*_ld functions.
+Else, access to those functions is, by default, denied. Again, you can
+override the default by opening up the Makefile.PL and uncommenting the
+appropriate line.
+
+==================
+__float128 support
+==================
+
+Beginning perl-5.21.3 (or thereabouts) it is possible to build perl with
+nvtype of __float128 (if the architecture and compiler support that data type).
+The Makefile.PL should automatically detect and set the appropriate level of
+__float128 support.
+
+I am contactable by email at sisyphus at(@) cpan dot (.) org.

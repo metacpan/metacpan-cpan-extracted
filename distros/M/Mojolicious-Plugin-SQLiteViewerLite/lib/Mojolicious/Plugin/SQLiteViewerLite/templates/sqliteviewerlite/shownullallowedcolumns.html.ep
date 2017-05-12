@@ -1,0 +1,20 @@
+% layout "$controller/common", title => "Null allowed columns in $database";
+% my $tables = [sort keys %$null_allowed_columns];
+<h2>Null allowed columns in <i><%= $database %></i> (<%= @$tables %>)</h2>
+<table>
+  % for (my $i = 0; $i < @$tables; $i += 3) {
+    <tr>
+      % for my $k (0 .. 2) {
+        <td>
+          % my $table = $tables->[$i + $k];
+          % if (defined $table) {
+            <a href="<%= url_for("/$prefix/table")->query(database => $database, table => $table) %>">
+              <%= $table %>
+            </a>
+            (<%= join(', ', @{$null_allowed_columns->{$table} || []}) %>)
+          % }
+        </td>
+      % }
+    </tr>
+  % }
+</table>

@@ -1,0 +1,168 @@
+NAME
+    Math::Prime::XS - Detect and calculate prime numbers with deterministic
+    tests
+
+SYNOPSIS
+     use Math::Prime::XS ':all';
+     # or
+     use Math::Prime::XS qw(is_prime primes mod_primes sieve_primes sum_primes trial_primes);
+
+     print "prime" if is_prime(59);
+
+     @all_primes   = primes(100);
+     @range_primes = primes(30, 70);
+
+     @all_primes   = mod_primes(100);
+     @range_primes = mod_primes(30, 70);
+
+     @all_primes   = sieve_primes(100);
+     @range_primes = sieve_primes(30, 70);
+
+     @all_primes   = sum_primes(100);
+     @range_primes = sum_primes(30, 70);
+
+     @all_primes   = trial_primes(100);
+     @range_primes = trial_primes(30, 70);
+
+DESCRIPTION
+    "Math::Prime::XS" detects and calculates prime numbers by either
+    applying Modulo operator division, the Sieve of Eratosthenes, a
+    Summation calculation or Trial division.
+
+FUNCTIONS
+  is_prime
+     is_prime($number);
+
+    Returns true if the number is prime, false if not.
+
+    The XS function invoked within "is_prime()" is subject to change
+    (currently it's an all-XS trial division skipping multiples of 2,3,5).
+
+  primes
+     @all_primes   = primes($number);
+     @range_primes = primes($base, $number);
+
+    Returns all primes for the given number or primes between the base and
+    number.
+
+    The resolved function called is subject to change (currently
+    "sieve_primes()").
+
+  count_primes
+     $count = count_primes($number);
+     $count = count_primes($base, $number);
+
+    Return a count of primes from 0 to $number, or from $base to $number,
+    inclusive. The arguments are the same as "primes()" but the return is
+    just a count of the primes.
+
+SPECIFIC ALGORITHMS
+  mod_primes
+     @all_primes   = mod_primes($number);
+     @range_primes = mod_primes($base, $number);
+
+    Applies the Modulo operator division algorithm:
+
+    Divide the number by 2 and all odd numbers <= sqrt(n); if any divides
+    exactly then the number is not prime.
+
+    Returns all primes between 2 and $number, or between $base and $number
+    (inclusive).
+
+    (This function differs from "trial_primes" in that the latter takes some
+    trouble to divide only by primes below sqrt(n), whereas "mod_primes"
+    divides by all integers not easily identifiable as composite.)
+
+  sieve_primes
+     @all_primes   = sieve_primes($number);
+     @range_primes = sieve_primes($base, $number);
+
+    Applies the Sieve of Eratosthenes algorithm:
+
+    One of the most efficient ways to find all the small primes (say, all
+    those less than 10,000,000) is by using the Sieve of Eratosthenes (ca
+    240 BC). Make a list of all numbers less than or equal to n (and greater
+    than one) and strike out the multiples of all primes less than or equal
+    to the square root of n: the numbers that are left are primes.
+
+    Returns all primes for the given number or primes between the base and
+    number.
+
+    <http://primes.utm.edu/glossary/page.php?sort=SieveOfEratosthenes>
+
+  sum_primes
+     @all_primes   = sum_primes($number);
+     @range_primes = sum_primes($base, $number);
+
+    Applies the Summation calculation algorithm:
+
+    The summation calculation algorithm resembles the modulo operator
+    division algorithm, but also shares some common properties with the
+    Sieve of Eratosthenes. For each saved prime smaller than or equal to the
+    square root of the number, recall the corresponding sum (if none, start
+    with zero); add the prime to the sum being calculated while the
+    summation is smaller than the number. If none of the sums equals the
+    number, then the number is prime.
+
+    Returns all primes for the given number or primes between the base and
+    number.
+
+    <http://www.geraldbuehler.de/primzahlen/>
+
+  trial_primes
+     @all_primes   = trial_primes($number);
+     @range_primes = trial_primes($base, $number);
+
+    Applies the Trial division algorithm:
+
+    To see if an individual small number is prime, trial division works
+    well: just divide by all the primes less than or equal to its square
+    root. For example, to assert 211 is prime, divide by 2, 3, 5, 7, 11 and
+    13. Since none of these primes divides the number evenly, it is prime.
+
+    Returns all primes for the given number or primes between the base and
+    number.
+
+    <http://primes.utm.edu/glossary/page.php?sort=TrialDivision>
+
+BENCHMARK
+    Following output resulted from a benchmark measuring the time to
+    calculate primes up to 1,000,000 with 100 iterations for each function.
+    The tests were conducted by the "cmpthese" function of the Benchmark
+    module.
+
+                    Rate   mod_primes trial_primes   sum_primes sieve_primes
+     mod_primes   1.32/s           --         -58%         -79%         -97%
+     trial_primes 3.13/s         137%           --         -49%         -93%
+     sum_primes   6.17/s         366%          97%           --         -86%
+     sieve_primes 43.3/s        3173%        1284%         602%           --
+
+    The "Rate" column is the speed in how many times per second, so
+    "sieve_primes()" is the fastest for this particular test.
+
+EXPORT
+  Functions
+    "is_prime(), primes(), mod_primes(), sieve_primes(), sum_primes(),
+    trial_primes()" are exportable.
+
+  Tags
+    ":all - *()"
+
+BUGS & CAVEATS
+    Note that the order of execution speed for functions may differ from the
+    benchmarked results when numbers get larger or smaller.
+
+SEE ALSO
+    <http://primes.utm.edu>,
+    <http://www.it.fht-esslingen.de/~schmidt/vorlesungen/kryptologie/seminar
+    /ws9798/html/prim/prim-1.html>
+
+AUTHOR
+    Steven Schubiger <schubiger@cpan.org>
+
+LICENSE
+    This program is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://dev.perl.org/licenses/>
+

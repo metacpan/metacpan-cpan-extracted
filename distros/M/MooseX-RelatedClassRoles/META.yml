@@ -1,0 +1,12 @@
+--- 
+abstract: Apply roles to a class related to yours
+author: 
+  - Hans Dieter Pearcey <hdp@cpan.org>
+generated_by: Dist::Zilla::Plugin::MetaYaml version 1.004
+license: perl
+name: MooseX-RelatedClassRoles
+requires: 
+  Class::MOP: 0.80
+  Moose: 0.73
+  MooseX::Role::Parameterized: 0.04
+version: 0.004

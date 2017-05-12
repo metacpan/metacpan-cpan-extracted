@@ -1,0 +1,72 @@
+Revision history for Perl extension Microarray.
+
+0.01  Tue Oct 23 11:49:46 2007
+	- original version released as TRL::Microarray
+	- created by h2xs 1.23 with options
+		-XAn TRL::Microarray
+0.23  Tue Nov 06 12:45:50 2007
+        - numerous updates
+            - Microarray module now functions as expected
+            - Image module now functions as expected
+            - GenePix module now aligned better with Quantarray/BlueFuse
+            - Added Clone_Locn_File module for parsing CGH genomic locations
+            - Testing of some modules still needs work; trust GenePix/Agilent at your peril
+0.24  Tue Nov 07 11:20:50 2007
+	- Fixed some GenePix and BlueFuse cross-format issues  
+        - Perldoc updates
+	- Removed pipeline_bac_feature packages from Feature
+0.241  Tue Nov 13 12:08:00 2007
+	- Update to package log_file in TRL::Microarray::Microarray_File
+	- Filehandle now created properly
+	- Some Perldoc changes
+0.31	Mon Nov 19 12:00:00 2007
+	- Major revision
+	- Package re-organised as Microarray
+	- Microarray::Microarray_File renamed as Microarray::File
+	- Microarray::Microarray_File::Data_File renamed as Microarray::File::Data
+	- Microarray::Microarray_File::GAL_File renamed as Microarray::File::GAL
+	- Microarray::Microarray_File::Clone_Locns_File renamed as Microarray::File::Clone_Locns
+	- Modules inheriting from Microarray::File::Data now reside in Microarray::File::Data:: namespace
+	- Microarray::File package microarray_image_file now moved to Microarray::File::Image
+0.32	Mon Dec 17 12:00:00 2007
+	- New modules Microarray::Analysis and Microarray::Analysis::CGH
+	- Some methods from CGH plots in Microarrary::Image now moved to Microarray::Analysis::CGH
+0.33	Mon Jan 21 12:00:00 2008
+	- Microarray::Image - changes to colour graduation in package cgh_plot
+	- Microarray::File - fixed set_delimiter to ignore case of file extension
+	- Microarray::File::Data::Quantarray - will now guess the barcode from file name
+	- Microarray::File::Data::GenePix - various bug fixes to slide_barcode(), laser_power(), image_resolution() 
+0.4	Tue Feb 5 12:00:00 2008
+	- Changed Microarray::Feature to Microarray::Reporter
+	- Numerous changes to use new namespace
+	- This version imcompatible with previous versions
+0.41	Wed Feb 6 12:00:00 2008
+	- Microarray - Removed spot pixel data from quality control
+	- Micrarray::File::Data::Bluefuse - added methods channel1_sat/channel2_sat
+0.42	Fri Feb 8 16:00:00 2008
+	- Perldoc update
+0.43	Thu Mar 6 12:52:00 2008
+	- Split Microarray::Image into Microarray::Image, Microarray::Image::QC_Plots and Microarray::Image::CGH_Plot
+	- Fixed bugs in Microarray::File::Data::Agilent
+	- All Microarray::File::Data:: classes now set their delimiter
+	- Various changes to Microarray::Analysis::CGH and Microarray::Image::CGH_Plot, implementing handling of CGHcall and DNAcopy data
+	- Many other minor changes and Perldoc updates
+0.43d   Mon July 21 11:29:00 2008
+	- Significant performance enhancements to CGH data smoothing (Microarray::Analysis::CGH) and plotting (Microarray::Image::CGH_Plot)
+	- Microarray::Image::CGH_Plot
+		- Added function to plot gene location
+0.45    Tue August 5 16:49:00 2008
+	- Updated Microarray, Microarray::File::Data and Microarray::File::Data:: modules to use a more sensible 'Plug-In' architecture
+	- Updated Microarray, Microarray::Image, Microarray::Image::QC_Plots and Microarray::Image::CGH_Plot to correct gdFont issues with latest release of GD
+	- Reorganised QC of spot data 
+		- now performed by the Reporter object, not the Microarray object
+		- added method to reject unique spots after QC 
+		- QC variables are now stored in $ENV
+	- Fixed many bugs
+	- Added new tests
+		- image plotting in Microarray.pm, which also tests some of the Microarray::Image::QC_Plots code as well
+		- image plotting in Microarray::Image::CGH_Plot.pm
+		- image plotting tests need extra test files downloadable from our web site - see ReadMe
+		- Microarray::Reporter
+	- Resolved some errors in Perldoc left over from earlier changes to module namespace
+	- Other Perldoc changes/updates

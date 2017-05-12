@@ -1,0 +1,58 @@
+doubleArray *                                   T_ARRAY
+intArray *                                      T_ARRAY
+Math::Geometry::Delaunay::Triangulateio		T_OPAQUE_STRUCT
+Math::Geometry::Delaunay::TriangulateioPtr	T_PTROBJ
+#############################################################################
+INPUT
+T_OPAQUE_STRUCT
+	if (sv_derived_from($arg, \"${ntype}\")) {
+	    STRLEN len;
+	    char  *s = SvPV((SV*)SvRV($arg), len);
+
+	    if (len != sizeof($var))
+		croak(\"Size %d of packed data != expected %d\",
+			len, sizeof($var));
+	    $var = *($type *)s;
+	}
+	else
+	    croak(\"$var is not of type ${ntype}\")
+
+ANY_OBJECT
+    $var = ($type) SvIV((SV*)SvRV($arg));
+
+T_ARRAY
+    /**************************************************************************/
+    /* Modified TYPEMAP INPUT FOR T_ARRAY                                     */
+    /* This always skips the first item on the stack, ST(0), which is our     */
+    /* object reference. This allows the array getter/setter to be called     */
+    /* like obj->getset().                                                    */
+    /* Array members are read as doubles, then cast to the type set up in a   */
+    /* define like this:                                                      */
+    /* #define intArrayPtrContains int                                        */
+    /* So it should work with doubles and the largest ints that fit in your   */
+    /* doubles. The largest int that fits in a double is then the limit for   */
+    /* the number of points or edges in a triangulation.                      */
+    /**************************************************************************/
+    IV ix_$var = $argoff + 1;
+    items--;
+    if (items>0) {
+        $var = $ntype(items - $argoff + 1);
+        while (items--) {
+            /* 
+            DO_ARRAY_ELEM;
+            */
+            
+            ${var}\[ix_$var - $argoff - 1] = (${ntype}Contains)SvNV(ST(ix_$var));
+            ix_$var++;
+        }
+    }
+    /* this is the number of elements in the array */
+    ix_$var -= ($argoff + 1)
+
+#############################################################################
+OUTPUT
+T_OPAQUE_STRUCT
+	sv_setref_pvn($arg, \"${ntype}\", (char *)&$var, sizeof($var));
+
+ANY_OBJECT
+    sv_setref_pv($arg,CLASS, (void*) $var);

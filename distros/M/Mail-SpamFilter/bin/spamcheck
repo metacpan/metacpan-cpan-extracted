@@ -1,0 +1,91 @@
+#!/usr/bin/perl
+#############################################################################
+## spamcheck
+## Copyright (C) 2004  Martin Ward  http://www.cse.dmu.ac.uk/~mward/
+## Email: martin@gkc.org.uk
+##
+## This program is free software; you can redistribute it and/or modify
+## it under the same terms as Perl itself, either Perl version 5.8.1 or, at
+##
+#############################################################################
+# Read an email, run all the spam checks on it
+# and combine the results.
+# Add an X-Spam-Votes: header with the result
+#
+# spamcheck -f: don't run the slow spamassassin check
+
+use strict;
+use warnings;
+use Mail::SpamFilter ':all';
+
+sub extra_vote($$$);
+
+my @filters = @Mail::SpamFilter::FILTER_LIST;
+
+if (@ARGV && ($ARGV[0] eq "-f")) {
+  shift(@ARGV);
+  @filters = grep { $_ ne "spamassassin" } @filters;
+}
+
+# Exclude bogofilter while we are training it:
+# @filters = grep { $_ ne "bogofilter" } @filters;
+# Include bogofilter instead of dspam:
+@filters = grep { $_ ne "dspam" } @filters;
+
+
+# Slurp message from command line or STDIN:
+undef $/;
+my $msg = <>;
+die "$!\n" unless defined($msg);
+
+if (length($msg) > 750000) {
+  # Don't run checks due to timeout
+  print $msg;
+  exit(0);
+}
+
+$msg =~ s/\nX-Spam-Votes:.*//g;
+
+my ($tags, $header, $body) = filter_message($msg, @filters);
+
+my ($spam_votes) = count_votes($tags, @filters);
+
+
+# Add MailScanner's vote:
+$spam_votes++ if $$tags{"*extra*"} =~ /(^|\n)X-\w+-MailScanner-SpamScore: .*sssss/;
+
+# Add extra vote:
+$spam_votes++ if extra_vote($tags, $header, $body);
+
+# Extra vote if body is empty/blank:
+$spam_votes++ if $body =~ /^\s*$/;
+
+
+print $header;
+print $$tags{"*extra*"};
+foreach my $filter (sort @filters) {
+  print $$tags{$filter};
+}
+print "X-Spam-Votes: $spam_votes\n";
+print $body;
+
+
+
+# Check for an image with a href tag:
+
+sub extra_vote($$$) {
+  my ($tags, $header, $body) = @_;
+  $body =~ s/=([a-fA-F0-9]{2})/pack("H2", "$1")/ge;
+  if ($body =~ /<a\s+href=[^\"]*\"(.*?)\">\s*<img/is) {
+    my $ref = $1;
+    return(1) unless $ref =~ /amazon|ebay|paypal/i;
+  } elsif ($body =~ /<a\s+href\s*=\s*[^\"]*\"(.*?)\">.*<[^<>]*img .*src\s*=\s*\"cid:/is) {
+    my $ref = $1;
+    return(1) unless $ref =~ /amazon|ebay|paypal/i;
+  } elsif ($body =~ /<a\s+href\s*=\s*[^\"]*\"(.*?)\">.*\"font-size:\s*1px;\"/is) {
+    my $ref = $1;
+    return(1) unless $ref =~ /amazon|ebay|paypal/i;
+  }
+  return(0);
+}
+

@@ -1,0 +1,2 @@
+<tmpl_loop files><tmpl_var files_item>
+</tmpl_loop>

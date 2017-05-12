@@ -1,0 +1,177 @@
+NAME
+    MooseX::Interface - Java-style interfaces for Moose
+
+SYNOPSIS
+      package DatabaseAPI::ReadOnly
+      {
+        use MooseX::Interface;
+        requires 'select';
+        one;
+      }
+  
+      package DatabaseAPI::ReadWrite
+      {
+        use MooseX::Interface;
+        extends 'DatabaseAPI::ReadOnly';
+        requires 'insert';
+        requires 'update';
+        requires 'delete';
+        one;
+      }
+  
+      package Database::MySQL
+      {
+        use Moose;
+        with 'DatabaseAPI::ReadWrite';
+        sub insert { ... }
+        sub select { ... }
+        sub update { ... }
+        sub delete { ... }
+      }
+  
+      Database::MySQL::->DOES('DatabaseAPI::ReadOnly');   # true
+      Database::MySQL::->DOES('DatabaseAPI::ReadWrite');  # true
+
+DESCRIPTION
+    MooseX::Interface provides something similar to the concept of interfaces
+    as found in many object-oriented programming languages like Java and PHP.
+
+    "What?!" I hear you cry, "can't this already be done in Moose using
+    roles?"
+
+    Indeed it can, and that's precisely how MooseX::Interface works.
+    Interfaces are just roles with a few additional restrictions:
+
+    *   You may not define any methods within an interface, except:
+
+        *   Moose's built-in `meta` method, which will be defined for you;
+
+        *   You may override methods from UNIVERSAL; and
+
+        *   You may define constants using the constant pragma.
+
+    *   You may not define any attributes. (Attributes generate methods.)
+
+    *   You may not define method modifiers.
+
+    *   You can extend other interfaces, not normal roles.
+
+  Functions
+    `extends $interface`
+        Extends an existing interface.
+
+        Yes, the terminology "extends" is used rather than "with".
+
+    `excludes $role`
+        Prevents classes that implement this interface from also composing
+        with this role.
+
+    `requires $method`
+        The name of a method (or attribute) that any classes implementing this
+        interface *must* provide.
+
+    `requires $method => \@signature`
+        Declares a signature for the given method. This effectively creates an
+        `around` method modifier for the method to check the signature.
+
+        As an example:
+
+          requires log_message => [qw( Str )];
+
+        If the `log_message` method above were called with multiple arguments,
+        then the additional arguments would be tolerated; the only check is
+        that the first argument is a string.
+
+    `const $name => $value`
+        Experimental syntactic sugar for declaring constants. It's probably
+        not a good idea to use this yet.
+
+    `test_case { BLOCK } $name`
+        Experimental syntactic sugar for embedded test cases. This extends the
+        idea that an interface is a contract for classes to fulfil.
+
+        The block will be called with an instance of a class claiming to
+        implement the interface in $_ and should return true if the instance
+        passes the test and false if it fails.
+
+          package CalculatorAPI
+          {
+            use MooseX::Interface;
+    
+            requires 'add';
+            test_case { $_->add(8, 2) == 10 };
+    
+            requires 'subtract';
+            test_case { $_->subtract(8, 2) == 6 };
+    
+            requires 'multiply';
+            test_case { $_->multiply(8, 2) == 16 };
+    
+            requires 'divide';
+            test_case { $_->divide(8, 2) == 4 };
+          }
+  
+          package Calculator
+          {
+            use Moose;
+            with 'CalculatorAPI';
+            sub add      { $_[1] + $_[2] }
+            sub subtract { $_[1] - $_[2] }
+            sub multiply { $_[1] * $_[2] }
+            sub divide   { $_[1] / $_[2] }
+          }
+  
+          my $result = CalculatorAPI->meta->test_implementation(
+            Calculator->new,
+          );
+
+        The result of `test_implementation` is an overloaded object which
+        indicates success when evaluated in boolean context; indicates the
+        number of failures in numeric context; and provides TAP-like "ok" or
+        "not ok" in string context. You can call methods `passed` and `failed`
+        on this object to return arrayrefs of failed test cases. Each test
+        case is itself an object, with `name`, `code` and
+        `associated_interface` attributes.
+
+        Do not rely on test cases being run in any particular order, or
+        maintaining any state between test cases. (Theoretically each test
+        case could be run with a separate instance of the implementing class.)
+
+    `one`
+        This function checks the integrity of your role, making sure it
+        doesn't do anything that interfaces are not supposed to do, like
+        defining methods.
+
+        While you don't need to call this function at all, your interface's
+        integrity will get checked anyway when classes implement the
+        interface, so calling `one` will help you catch potential problems
+        sooner. `one` helpfully returns '1', so it can be used as the magical
+        return value at the end of a Perl module.
+
+        (Backwards compatibility note: in MooseX::Interface versions 0.005 and
+        below, this was performed automatically using Hook::AfterRuntime. From
+        0.006, the `one` function was introduced instead.)
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Interface>.
+
+SEE ALSO
+    MooseX::Interface::Tutorial, MooseX::Interface::Internals.
+
+    Moose::Role, MooseX::ABCD.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

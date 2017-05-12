@@ -1,0 +1,158 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Mojolicious::Plugin::I18N - Internationalization Plugin for Mojolicious
+
+=head1 SYNOPSIS
+
+  # Mojolicious
+  $self->plugin('I18N');
+  % languages 'de';
+  %=l 'hello'
+
+  # Mojolicious::Lite (detect language from URL, i.e. /en/ or /de/)
+  plugin I18N => {namespace => 'MyApp::I18N', support_url_langs => [qw(en de)]};
+  %=l 'hello'
+  
+  # Lexicon
+  package MyApp::I18N::de;
+  use Mojo::Base 'MyApp::I18N';
+
+  our %Lexicon = (hello => 'hallo');
+
+  1;
+
+=head1 DESCRIPTION
+
+L<Mojolicious::Plugin::I18N> is internationalization plugin for Mojolicious
+It works with Mojolicious 4.0+.
+
+Old namespace is L<Mojolicious::Plugin::I18N2>.
+
+=head1 OPTIONS
+
+L<Mojolicious::Plugin::I18N> supports the following options.
+
+=head2 C<support_url_langs>
+  
+  plugin I18N => {support_url_langs => [qw(en de)]};
+
+Detect language from URL.
+
+=head2 C<support_hosts>
+
+  plugin I18N => {support_hosts => { 'mojolicious.ru' => 'ru', 'mojolicio.us' => 'en' }};
+
+Detect Host header and use language for that host. 
+
+=head2 C<no_header_detect>
+
+  plugin I18N => {no_header_detect => 1};
+
+Off header detect.
+
+=head2 C<default>
+
+  plugin I18N => {default => 'en'};
+
+Default language for i18n, defaults to C<en>.
+
+=head2 C<namespace>
+
+  plugin I18N => {namespace => 'MyApp::I18N'};
+
+Lexicon namespace, defaults to the application class followed by C<::I18N>.
+
+=head1 HELPERS
+
+L<Mojolicious::Plugin::I18N> implements helpers same as L<Mojolicious::Plugin::I18N>.
+
+=head2 C<l>
+
+  %=l 'hello'
+  $self->l('hello');
+
+Translate sentence.
+
+=head2 C<languages>
+
+  % languages 'de';
+  $self->languages('de');
+
+Change languages.
+
+=head1 METHODS
+
+L<Mojolicious::Plugin::I18N> inherits all methods from L<Mojolicious::Plugin::I18N>
+and reimplements the following new ones.
+
+=head2 C<register>
+
+  $plugin->register;
+
+Register plugin hooks and helpers in L<Mojolicious> application.
+
+=head1 DEBUG MODE
+
+L<Mojolicious::Plugin::I18N> has debug mode.
+
+  # debug mode on
+  BEGIN { $ENV{MOJO_I18N_DEBUG} = 1 };
+
+  # or
+  MOJO_I18N_DEBUG=1 perl script.pl
+
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+
+=head1 AUTHORS
+
+2011-2014 Anatoly Sharifulin <sharifulin@gmail.com>
+
+2010-2012 Sebastian Riedel <kraihx@googlemail.com>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-mojolicious-plugin-i18n at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.htMail?Queue=Mojolicious-Plugin-I18N>.  We will be notified, and then you'll
+automatically be notified of progress on your bug as we make changes.
+
+=over 5
+
+=item * Github
+
+L<http://github.com/sharifulin/mojolicious-plugin-i18n/tree/master>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.htMail?Dist=Mojolicious-Plugin-I18N>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Mojolicious-Plugin-I18N>
+
+=item * CPANTS: CPAN Testing Service
+
+L<http://cpants.perl.org/dist/overview/Mojolicious-Plugin-I18N>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Mojolicious-Plugin-I18N>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Mojolicious-Plugin-I18N>
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (C) 2011-2014 by Anatoly Sharifulin.
+Copyright (C) 2008-2012, Sebastian Riedel.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License version 2.0.
+
+=cut

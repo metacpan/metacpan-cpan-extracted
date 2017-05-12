@@ -1,0 +1,48 @@
+Copyright 2014, 2015, 2016 Kevin Ryde
+
+This file is part of Math-OEIS.
+
+Math-OEIS is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+Math-OEIS is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Math-OEIS.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 9, July 2016
+    - Grep loosen the mandatory match down to 10 values or 40 chars
+
+Version 8, April 2016
+    - Grep=-search output coding with Encode::Locale when available
+
+Version 7, November 2015
+    - Stripped fix for sequences starting with a negative
+
+Version 6, August 2015
+    - Names,Stripped propagate taint of file input
+
+Version 5, August 2014
+    - Grep fix print when match reaches end of stripped line
+
+Version 4, July 2014
+    - Grep better message on no stripped file,
+      stringize bigints as a workaround for Math::BigInt::GMP bug,
+      per Dana Jacobsen RT#97218 and RT#97221
+
+Version 3, July 2014
+    - Grep fix for "name" parameter usage,
+      better handling of bignums in halving/doubling attempts
+
+Version 2, June 2014
+    - fix for Stripped anum_to_values()
+
+Version 1, June 2014
+    - the first version

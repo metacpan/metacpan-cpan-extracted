@@ -1,0 +1,282 @@
+/* ======================================
+ * FLEX layout
+ * Now has three columns by default!
+ */
+body,
+#page-wrap {
+  padding: 0;
+  margin: 0;
+}
+
+/* ---------------------------------------------------- */
+/* MAJOR:
+ * page-wrap, header, main, side, footer
+ */
+main {
+  margin: 1em;
+}
+
+.verge, .side,
+header,
+footer {
+  border: solid 1px black;
+  border-radius: 2em;
+  padding: 1em;
+  box-shadow: rgba(0, 0, 0, 0.8) 3px 3px 10px;
+}
+
+.side,
+header,
+footer {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+/* ---------------------------------------------------- */
+/* Buttons, navigation
+ */
+.button, header nav a,
+header nav .selflink,
+header nav em,
+header nav .current a, input[type=submit] {
+  display: inline-block;
+  background-image: url(gloss.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #808080;
+  text-decoration: none;
+  margin-top: 5px;
+  margin-left: 0;
+  border-radius: 10px 10px 10px 10px;
+}
+
+header #header_top {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+header nav {
+  font-size: 0.9em;
+  font-family: sans;
+  margin-bottom: 0.5em;
+}
+
+header nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+header nav li {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+
+header nav a,
+header nav .selflink,
+header nav em,
+header nav .current a {
+  display: block;
+  border-radius: 20px 5px 20px 5px;
+}
+
+.button:hover, header nav a:hover,
+header nav .selflink:hover,
+header nav em:hover, input[type=submit]:hover,
+header nav a:hover {
+  text-decoration: underline;
+  background-image: url(gloss2.png);
+}
+
+.button:active, header nav a:active,
+header nav .selflink:active,
+header nav em:active, input[type=submit]:active,
+header nav a:active {
+  background-image: url(gloss3.png);
+  background-repeat: repeat-x;
+}
+
+header nav .selflink,
+header nav em,
+header nav .current a {
+  font-style: normal;
+  font-weight: bold;
+  background-image: none;
+}
+
+.side nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.side nav ul li ul {
+  list-style-position: inside;
+  margin-top: 0;
+  margin-left: 0;
+}
+
+.side nav ul ul ul {
+  margin-left: 1em;
+}
+
+/* ---------------------------------------------------- */
+/* Smaller things */
+.breadcrumb {
+  font-size: 0.8em;
+}
+
+footer {
+  text-align: center;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  font-size: 0.8em;
+}
+
+footer p,
+footer div {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+/* ======================================
+ * FLEX default layout - three cols
+ */
+#inner {
+  display: flex;
+  justify-content: space-between;
+}
+
+#main-wrap {
+  width: 70%;
+  order: 20;
+}
+
+.verso-wrap {
+  width: 15%;
+  order: 10;
+}
+
+.recto-wrap {
+  width: 15%;
+  order: 30;
+}
+
+/* ======================================
+ * FLEX MEDIUM layout
+ * Put the right sidebar at the bottom
+ */
+@media screen and (min-width: 50em) {
+  #inner {
+    flex-wrap: wrap;
+  }
+
+  #main-wrap {
+    width: 80%;
+  }
+
+  .verso-wrap {
+    width: 20%;
+  }
+
+  .recto-wrap {
+    width: 100%;
+  }
+
+  #page-wrap {
+    padding: 0;
+    max-width: 70em;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+/* ======================================
+ * FLEX WIDE layout
+ * Don't let it get too wide.
+ */
+@media screen and (min-width: 90em) {
+  #page-wrap {
+    max-width: 90em;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .verso-wrap,
+  .recto-wrap {
+    width: 13.5em;
+    margin: 0;
+  }
+
+  #main-wrap {
+    width: 60em;
+  }
+}
+/* ======================================
+ * FLEX SMALL layout
+ * Put all the sidebars at the bottom.
+ */
+@media screen and (max-width: 50em) {
+  #inner {
+    display: block;
+  }
+
+  #main-wrap,
+  header,
+  footer,
+  .side {
+    border: solid 1px black;
+    border-radius: 0;
+    margin: 0;
+    padding: 1em;
+    box-shadow: none;
+  }
+
+  #main-wrap,
+  .verso-wrap,
+  .recto-wrap {
+    width: 100%;
+  }
+
+  footer {
+    border-top: none;
+    padding-top: 0.5em;
+  }
+
+  .side {
+    border-bottom: none;
+    padding-bottom: 0.5em;
+  }
+}
+/* ======================================
+ * FLEX PRINT layout - things to hide in printouts
+ */
+@media print {
+  header {
+    display: none;
+  }
+
+  footer {
+    display: none;
+  }
+
+  .side {
+    display: none;
+  }
+
+  main {
+    margin: 1ex;
+    width: 98%;
+    background: white;
+    color: black;
+    left: 0;
+    position: static;
+  }
+}

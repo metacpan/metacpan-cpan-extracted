@@ -1,0 +1,20 @@
+NAME
+    MooseX::Net::API - Easily create client for net API (DEPRECATED)
+
+VERSION
+    version 0.12
+
+SYNOPSIS
+    DEPRECATED
+
+    THIS MODULE IS BEING DEPRECATED IN FAVOUR OF Net::HTTP::API.
+
+AUTHOR
+      franck cuny <franck@lumberjaph.net>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by linkfluence.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,11 @@
+
+Revision history for Mango-BSON-Dump
+
+0.2       2016-09-26 10:08:24-07:00 America/Los_Angeles
+
+   - Bump JSON::XS version to investigate CPAN tester failures
+
+0.1       2016-09-25 12:50:11-07:00 America/Los_Angeles
+
+   - Initial version
+

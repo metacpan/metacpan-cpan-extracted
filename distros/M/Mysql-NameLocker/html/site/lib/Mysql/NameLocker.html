@@ -1,0 +1,122 @@
+<HTML>
+<HEAD>
+<TITLE>Mysql::NameLocker - Safe way of locking and unlocking MySQL tables using named locks.</TITLE>
+<LINK REL="stylesheet" HREF="../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Mysql::NameLocker - Safe way of locking and unlocking MySQL tables using named locks.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#class methods">CLASS METHODS</A></LI>
+	<UL>
+
+		<LI><A HREF="#new ($dbh,$lockname,$timeout)">new ($dbh,$lockname,$timeout)</A></LI>
+		<LI><A HREF="#destroy">DESTROY</A></LI>
+	</UL>
+
+	<LI><A HREF="#history">HISTORY</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Mysql::NameLocker - Safe way of locking and unlocking MySQL tables using named locks.</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use Mysql::NameLocker;</PRE>
+<PRE>
+ # Simulate a record lock
+ my $tablename = 'category'
+ my $id = 123;
+ my $lockname = &quot;$tablename_$id&quot;;
+ my $timeout = 10;
+ my $locker = new Mysql::NameLocker($dbh,$lockname,$timeout);</PRE>
+<PRE>
+ # Execute some tricky statements here...</PRE>
+<PRE>
+ # Locks are automically released when $locker goes out of scope.
+ undef($locker);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Mysql::NameLocker is a simple class for safely using MySQL named locks.
+A locks is created when you instantiate the class and is automatically
+released when the object goes out of scope (or when you call undef on the
+object). One situation where this class is useful is when you have
+persistent database connections such as in some mod_perl scripts and you
+want to be sure that locks are always released even when a script dies
+somewhere unexpectedly.</P>
+<P>
+<HR>
+<H1><A NAME="class methods">CLASS METHODS</A></H1>
+<P>
+<H2><A NAME="new ($dbh,$lockname,$timeout)">new ($dbh,$lockname,$timeout)</A></H2>
+<P>Attempts to acquire a named lock and returns a Mysql::NameLocker object
+that encapsulates this lock. If a timeout occurs, then undef is returned.
+If an error occurs (The MySQL statement <CODE>GET_LOCK()</CODE> returns NULL) then this
+constructor croaks.</P>
+<P>Parameters:</P>
+<OL>
+<LI><STRONG><A NAME="item_DBI_database_handle_object%2E">DBI database handle object.</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_Lock_name%2E">Lock name.</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_Timeout_in_seconds%2E">Timeout in seconds.</A></STRONG><BR>
+
+</OL>
+<P>Returns: Mysql::NameLocker object or undef if failed to acquire lock.</P>
+<P>
+<H2><A NAME="destroy">DESTROY</A></H2>
+<P>Destructor called implicitly by perl when object is destroyed. The acquired
+lock is released here if the DBI database handle is still connected.</P>
+<P>
+<HR>
+<H1><A NAME="history">HISTORY</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_Version_1%2E00_2002%2D03%2D26">Version 1.00  2002-03-26</A></STRONG><BR>
+<DD>
+Initial version
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Craig Manley	&lt;<A HREF="mailto:cmanley@cpan.org">cmanley@cpan.org</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (C) 2001 Craig Manley.  All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under under the same terms as Perl itself. There is NO warranty;
+not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>The MySQL documentation about <CODE>GET_LOCK()</CODE> and RELEASE_LOCK().</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Mysql::NameLocker - Safe way of locking and unlocking MySQL tables using named locks.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

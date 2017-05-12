@@ -1,0 +1,9 @@
+severity  = harsh
+# only      = 1
+# force     = 0
+verbose   = 4
+# top       = 50
+theme     = core
+# include   = NamingConventions ClassHierarchies    #Space-delimited list
+exclude   = RequireUseStrict RequireUseWarnings Subroutines::RequireArgUnpacking Subroutines::RequireFinalReturn Subroutines::ProhibitBuiltinHomonyms Variables::RequireInitializationForLocalVars
+# criticism-fatal = 1                               #Zero or One

@@ -1,0 +1,12 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+mh.pm
+pm_to_blib
+t/base.t
+t/fetch.t
+t/inbox
+t/msg1
+t/msg2
+t/store.t
+t/unseen.t

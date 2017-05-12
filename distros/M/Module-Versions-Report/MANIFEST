@@ -1,0 +1,10 @@
+ChangeLog
+lib/Module/Versions/Report.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+SIGNATURE
+t/00about.t
+t/10load.t

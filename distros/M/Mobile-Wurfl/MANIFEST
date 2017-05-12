@@ -1,0 +1,10 @@
+Changes
+HOWTO.txt
+lib/Mobile/Wurfl.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README.txt
+t/wurfl.t
+wurfl.cgi
+wurfl.sql.dump

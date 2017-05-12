@@ -1,0 +1,136 @@
+=head1 NAME
+
+Mojar::Guide::GoogleAnalytics - Reporting from Google Analytics
+
+=head1 SETUP
+
+Before you start coding against the API, first ensure you can get results via
+the query explorer (see link below).  To use that, you log into GA using
+credentials that have access to the appropriate analytics account.  Typically
+this means logging out of the account you use for email and logging back in with
+an email account that someone has authorised to access the analytics account
+(although there is no technical problem with these being the same email
+account).
+
+In the query browser you also select a profile.  If your analytics account has
+multiple profiles, take care which one you test, and ensure that you use the
+same one when coding against the API.
+
+In order to use the API, you will need
+
+=over 4
+
+=item auth_user
+
+The API user that Google created for you when you registered to use the API.
+This is typically something of the form
+
+  123456789@developer.gserviceaccount.com
+
+=item private_key
+
+The private key you generated to use against the API.  This is typically held in
+a file (with a .pem suffix) and slurped up each time you want to use it.  Check
+that the file contains a line for "BEGIN PRIVATE KEY" and also for "END PRIVATE
+KEY".
+
+=item profile_id
+
+A string of digits identifying the appropriate profile; exactly the same one you
+tested earlier.
+
+=back
+
+Then create your analytics object.
+
+  my $analytics = Mojar::Google::Analytics->new(
+    auth_user => q{123456789@developer.gserviceaccount.com},
+    private_key => $pk,
+    profile_id => '123456'
+  );
+
+You may optionally disable timeouts (default 60 sec) by including
+
+  timeout => 0
+
+=head1 FETCH RESULTS
+
+=head2 Build the Request
+
+  $analytics->req(
+    dimensions => [qw(pagePath)],
+    metrics => [qw(entrances exits bounces)],
+    sort => 'pagePath',
+    start_date => $day,
+    end_date => $day,
+    start_index => $start,
+    max_results => $max_resultset
+  );
+
+For the first iteration, start_index should be 1.  It is often quicker/easier to
+test with yesterday's data than today's data.  I usually set max_results to be
+10_000, so any result set larger than that is fetched in batches.
+
+=head2 Get the Result Set
+
+  $res = $analytics->fetch;
+  if (defined $res and $res->success) {
+    # Success
+  }
+  else {
+    # Failure
+  }
+
+If you have success you will want to extract the data from the resultset within
+C<res>; if you have failure you should abort.
+
+Once you have a resultset, check its headers
+
+  $res->{column_headers}[$i]{name}
+
+to ensure they are what your code expects.  Then iterate through
+
+  ${ $res->{rows} }
+
+processing your data as appropriate.
+
+=head2 Update Your Cursor
+
+  $start = $1 if $res->{next_link} and $res->{next_link} =~ /start-index=(\d+)/;
+
+so that you can go round the next iteration with the start_index that the API
+said to use next.
+
+=head1 DEBUGGING
+
+To see the communications between client and server, simply set the
+C<MOJO_USERAGENT_DEBUG> variable in your environment.  For example, in bash this
+would be
+
+  export MOJO_USERAGENT_DEBUG=1
+
+and then set it to 0 (or unset it completely) to disable all that debug output.
+
+To view an object, you already have C<dumper> available.
+
+  use Mojar::Util 'dumper';
+  $self->log->debug(dumper $res);
+
+=head1 SEE ALSO
+
+=over 2
+
+=item L<https://www.google.com/analytics>
+
+for overview material,
+
+=item
+L<https://developers.google.com/analytics/devguides/reporting/core/v3/reference>
+
+for the reference documentation, and
+
+=item L<http://ga-dev-tools.appspot.com/explorer>
+
+for the query explorer.
+
+=back

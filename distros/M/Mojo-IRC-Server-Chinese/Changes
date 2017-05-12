@@ -1,0 +1,70 @@
+2017-02-12 Mojo::IRC::Server::Chinese v1.8.1
+1）新增频道bug修复
+2）TLS加密支持
+
+2017-02-11 Mojo::IRC::Server::Chinese v1.8.0
+1）增加登录验证支持
+
+2017-02-11 Mojo::IRC::Server::Chinese v1.7.9
+1）修复demo例子中的错误
+2）增加 user_registered/new_channel 事件
+3）客户端登录成功后服务端返回信息完善
+
+2016-05-09 Mojo::IRC::Server::Chinese v1.7.8
+1）修复设置监听host地址不生效，始终是0.0.0.0的问题
+2）文档完善
+
+2015-12-01 Mojo::IRC::Server::Chinese v1.7.7
+1）修复部分客户端消息\n分割（默认\r\n）导致无法正常登录的问题
+
+2015-11-16 Mojo::IRC::Server::Chinese v1.7.6
+1）修复增加多个相同昵称虚拟帐号会导致程序进行死循环的严重bug
+
+2015-10-22 Mojo::IRC::Server::Chinese v1.7.5
+1）修复pod文档仍然使用旧的命名空间的bug
+
+2015-10-22 Mojo::IRC::Server::Chinese v1.7.4
+1）Mojo::IRC::Server改名为Mojo::IRC::Server::Chinese
+
+2015-10-21 Mojo::IRC::Server v1.7.3
+1）客户端直接退出未发送QUIT指令的情况进行处理
+2）增加AWAY命令支持
+3）增加服务端反向PING客户端的机制，客户端如果不响应PONG，180s超时会被服务端关闭链接
+4）修复客户端QUIT消息重复发送给其他客户端 导致其他客户端会把QUIT消息打印到server tab中的bug
+5）修复昵称已经存在的情况下更换昵称缺无法正常登录的bug
+
+2015-09-07 Mojo::IRC::Server v1.7.2
+1）修复虚拟用户可能出现重复新增的bug
+2）修复irc客户端修改昵称服务器响应消息重复的bug 感谢@pity的测试反馈
+3）已经加入频道的客户端重复加入，消息不广播给其他客户端
+4）修复 WHO 的处理错误
+5）修复频道广播消息的bug
+6）添加对未识别命令的响应
+7）修复 TOPIC 和 MODE 处理存在的bug
+
+2015-09-06 Mojo::IRC::Server v1.7.1
+1）修复No such channel响应消息格式错误的bug
+2）新增特性：当真实帐号抢占了虚拟帐号，真实帐号退出后 虚拟帐号会自动还原回来
+3）修复无法退出频道的bug
+4）修复user相同时没有把客户端链接关闭的bug
+5）修复频道发送消息重复的bug
+6）修复服务器频道消息转发给非频道内用户的bug
+
+2015-09-03 Mojo::IRC::Server v1.7.0
+1）版本重构，大量更新
+2）为纪念中国反法西斯抗战70周年，特别设置版本号为1.7.0，感谢@wxg的支持
+
+2015-08-29 Mojo::IRC::Server v1.0.4
+1）大量bug修复和基础功能的完善
+2）支持用户私信消息
+3）增加虚拟用户支持
+
+2015-08-29 Mojo::IRC::Server v1.0.3
+1）修复bug
+2）重新调整代码框架
+
+2015-08-29 Mojo::IRC::Server v1.0.2
+添加发布到cpan相关的支持文件
+
+2015-08-29 Mojo::IRC::Server v1.0.1
+基础稳定版本发布

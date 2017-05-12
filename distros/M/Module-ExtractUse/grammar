@@ -1,0 +1,124 @@
+#-----------------------------------------------------------------
+# Rules for use
+#-----------------------------------------------------------------
+
+token_use:		/\buse\s/ use_stuff /[;}]/
+		{ $return=$item{use_stuff} }
+
+use_stuff:	(base | parent | version | module)
+
+base:		"base" import_list
+
+parent:		"parent" import_list
+		{ $return='parent'; $return.=' '.$item[2] if $item[2] !~ /^\s*-norequire\b/; }
+
+module:		module_name module_more
+		{ $return=$item{module_name} }
+
+module_name: 	/[\w:]+/
+
+module_more:	eos | version(?) var(?) import_list(?)
+
+#-----------------------------------------------------------------
+# Rules for require
+#-----------------------------------------------------------------
+
+token_require:	/\brequire\s/ require_stuff /[;}]/
+		{ $return=$item{require_stuff} }
+
+require_stuff:	(version | require_name | module)
+
+require_name:	<perl_quotelike>
+		{ my $name=$item[1][2];
+		  return 1 if ($name=~/\.pl$/);
+		  $name=~s(/)(::)g;
+		  $name=~s/\.pm//;
+		  $return=$name;
+		}
+
+#-----------------------------------------------------------------
+# Rules for no
+#-----------------------------------------------------------------
+
+token_no:		/\bno\s/ no_stuff /[;}]/
+		{ $return=$item{no_stuff} }
+
+no_stuff:	(base | version | module)
+
+#----------------------------------------------------------------
+# Functions provided by Module::Runtime
+#----------------------------------------------------------------
+
+module_runtime_require_module:  ( 'Module::Runtime::require_module(' | /\brequire_module\(/ ) <perl_quotelike> ')'
+                                { $return = $item[2][2] }
+
+module_runtime_use_fcn:         ( 'use_module' | 'use_package_optimistically' )
+
+module_runtime_version:         ',' /\s*/ version
+
+module_runtime_use:             ( ( 'Module::Runtime::' module_runtime_use_fcn '(' ) | ( m/\b/ module_runtime_use_fcn '(' ) ) <perl_quotelike> module_runtime_version(?) ')'
+                                { $return = $item[2][2] }
+
+token_module_runtime:           module_runtime_require_module | module_runtime_use
+
+#-----------------------------------------------------------------
+# Functions provided by Class::Load
+#-----------------------------------------------------------------
+
+hash_pair: /\S+/ comma ( <perl_quotelike> | /[^\s,}]+/ )
+
+comma_hash_pair: comma hash_pair
+
+hashref:    '{' hash_pair comma_hash_pair(s?) '}'
+
+comma_hashref:  comma hashref
+
+class_load_functions:   'load_class' | 'try_load_class' | 'load_optional_class'
+
+class_load:     ( ( 'Class::Load::' class_load_functions ) | ( /\b/ class_load_functions ) ) '(' <perl_quotelike> comma_hashref(?) ')'
+                { $return = $item[3][2] }
+
+first_existing_arg: <perl_quotelike> comma_hashref(?)
+                    { $return = $item[1][2] }
+
+comma_first_existing_arg:   comma first_existing_arg
+                            { $return = $item{first_existing_arg} }
+
+class_load_first_existing:  ( 'Class::Load::load_first_existing_class' | /\bload_first_existing_class/ ) '(' first_existing_arg comma_first_existing_arg(s?) ')'
+                            { $return = $item{first_existing_arg};
+                              $return .= " " . join(" ", @{$item{'comma_first_existing_arg(s?)'}}) if $item{'comma_first_existing_arg(s?)'};
+                              1;
+                            }
+
+token_class_load:   class_load | class_load_first_existing
+
+#-----------------------------------------------------------------
+# General Rules
+#-----------------------------------------------------------------
+
+version:	/v?[\d\._]+/
+
+eos:		{ $text=~/^[\s;]+$/ ? 1 : undef;}
+
+var:        /\$[\w+]/
+
+import_list:	/[(]?/
+		list_item
+		comma_list_item(s?)
+		/[)]?/
+		{ $return=$item[2];
+		  $return.=" ".join(" ",@{$item[3]}) if $item[3];
+		}
+		|
+		/[(]\s*[)]/      { $return='' }
+
+list_item:	<perl_quotelike> { $return=$item[1][2] }
+		|
+		<perl_codeblock (){}[]> { $return=$item[1] }
+		|
+		/-?\w+/            { $return=$item[1] }
+
+comma_list_item: comma list_item
+		{ $return=$item{list_item} }
+
+comma:		(',' | '=>')

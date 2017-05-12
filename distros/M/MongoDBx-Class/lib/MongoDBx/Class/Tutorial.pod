@@ -1,0 +1,786 @@
+=head1 NAME
+
+MongoDBx::Class::Tutorial - Tutorial for using MongoDBx::Class
+
+=head1 VERSION
+
+version 1.030002
+
+=head1 INTRODUCTION
+
+L<MongoDBx::Class> is a flexible object relational mapper (ORM) for
+L<MongoDB> databases. Before reading this tutorial, please read
+L<MongoDBx::Class/"DESCRIPTION">.
+
+=head1 CREATING DOCUMENT CLASSES
+
+The first step towards using MongoDBx::Class is creating document classes.
+Let's say your application is called MyApp, and that it reviews novels
+by popular authors. Every novel has a title (its name), the full name of
+its author, its release year, a synopsis, the date the novel was added
+to the database, a list of tags categorizing the novel, a list of related
+novels, and zero or more reviews.
+
+MongoDBx::Class provides you with a flexible foundation for building classes
+that represent our proposed database schema and the relationships (or "joins")
+between these classes. This foundation is provided by three modules:
+
+=over
+
+=item * L<MongoDBx::Class::Moose> - intended to be used by document classes
+in place of L<Moose>. It provides Moose, and all needed relationship types,
+in the form of Moose attributes.
+
+=item * L<MongoDBx::Class::Document> - a L<Moose role|Moose::Role> intended
+to be consumed by document classes. When documents are expanded from the
+database, this role is applied to them and thus provides them some common
+attributes and methods.
+
+=item * L<MongoDBx::Class::EmbeddedDocument> - a L<Moose role|Moose::Role>
+intended to be consumed by embedded document classes. When embedded
+documents are found inside other documents and expanded, this role is
+applied to them and thus provides them some common attributes and methods.
+
+=back
+
+Before actually creating document classes, we need to design our schema.
+The most common question to tackle when designing a schema is when and how
+to use references, and when to simply embed documents. Refer to
+L<http://www.mongodb.org/display/DOCS/Schema+Design#SchemaDesign-Embedvs.Reference>
+for some information about schema design in MongoDB.
+
+Our database schema will be like this:
+
+=over
+
+=item * Every novel will be represented by a document in the 'novels' collection.
+
+=item * An author's name will be stored in the novel's document as an
+embedded document that has first and last names, and possibly a middle name.
+
+=item * The synopsis of the novel will be stored as a standalone document
+in the 'synopsis' collection, and will simply reference the novel with
+a 'novel' attribute.
+
+=item * The date and time the novel was added to the database will be
+stored as a W3C formatted string which will automatically be converted to
+a L<DateTime> object (see L<MongoDBx::Class::ParsedAttribute::DateTime>
+or read further for the rationale).
+
+=item * The list of tags will be stored in the novel document as an array
+of embedded documents.
+
+=item * The list of related novels will be stored in the novel document
+as an array of database references to other novels.
+
+=item * The reviews for every novel are stored as standalone documents in 
+the 'reviews' collection, and will simply reference the novel with a
+'novel' attribute.
+
+=back
+
+Let's look at a possible JSON representation of a novel - "The Valley of
+Fear" by Sir Arthur Conan Doyle:
+
+	# in the 'novels' collection
+	{
+		"_id": ObjectId("4cbca90d576fad5916790100"),
+		"title": "The Valley of Fear",
+		"year": 1914,
+		"author": {
+			"first_name": "Arthur",
+			"middle_name": "Conan",
+			"last_name": "Doyle"
+		},
+		"added": "2010-01-11T22:12:44+02:00",
+		"tags": [
+			{ "category": "mystery", "subcategory": "thriller" },
+			{ "category": "mystery", "subcategory": "detective" },
+			{ "category": "crime", "subcategory": "fiction" }
+		],
+		"related_novels": [
+			{ "$ref": "novels", "$id": ObjectId("4cbca90d3a41e35916720100") },
+			{ "$ref": "novels", "$id": ObjectId("4cbca90d44d8c959167a0100") },
+			{ "$ref": "novels", "$id": ObjectId("4cbca90d486bbf59166f0100") }
+		]
+	}
+
+	# in the 'synopsis' collection
+	{
+		"_id": ObjectId("4cbca90d699e9a5916670100"),
+		"novel": { "$ref": "novels", "$id": ObjectId("4cbca90d576fad5916790100") },
+		"text": "The Valley of Fear is the final Sherlock Holmes novel by Sir Arthur Conan Doyle. The story was first published in the Strand Magazine between September 1914 and May 1915. The first book edition was published in New York on 27 February 1915."
+	}
+
+	# in the 'reviews' collection
+	{
+		"_id": ObjectId("4cbca90dfbb2945916740100"),
+		"novel": { "$ref": "novels", "$id": ObjectId("4cbca90d576fad5916790100") },
+		"reviewer": "Some Guy",
+		"text": "I really liked it!",
+		"score": 5
+	}, 
+	{
+		"_id": ObjectId("4cbca90e0ad57b5916f50100"),
+		"novel": { "$ref": "novels", "$id": ObjectId("4cbca90d576fad5916790100") },
+		"reviewer": "Some Other Guy",
+		"text": "It was okay.",
+		"score": 3
+	}, 
+	{
+		"_id": ObjectId("4cbca90e0b9c175916c60100"),
+		"novel": { "$ref": "novels", "$id": ObjectId("4cbca90d576fad5916790100") },
+		"reviewer": "Totally Different Guy",
+		"text": "Man, that just sucked!",
+		"score": 1
+	}
+
+We now need to translate this structure to MongoDBx::Class document classes.
+As mentioned before, document classes are L<Moose> classes, but instead
+of using Moose, they use L<MongoDBx::Class::Moose>. We'll start with the
+document class representing novels:
+
+	package MyApp::Schema::Novel;
+
+	use MongoDBx::Class::Moose;
+	use namespace::autoclean;
+
+	with 'MongoDBx::Class::Document';
+
+	has 'title' => (is => 'ro', isa => 'Str', required => 1, writer => 'set_title');
+
+	holds_one 'author' => (is => 'ro', isa => 'MyApp::Schema::PersonName', required => 1, writer => 'set_author');
+
+	has 'year' => (is => 'ro', isa => 'Int', predicate => 'has_year', writer => 'set_year');
+
+	has 'added' => (is => 'ro', isa => 'DateTime', traits => ['Parsed'], required => 1);
+
+	has 'review_count' => (is => 'rw', isa => 'Int', traits => ['Transient'], builder => '_build_review_count');
+
+	holds_many 'tags' => (is => 'ro', isa => 'MyApp::Schema::Tag', predicate => 'has_tags');
+
+	joins_one 'synopsis' => (is => 'ro', isa => 'Synopsis', coll => 'synopsis', ref => 'novel');
+
+	has_many 'related_novels' => (is => 'ro', isa => 'Novel', predicate => 'has_related_novels', writer => 'set_related_novels', clearer => 'clear_related_novels');
+
+	joins_many 'reviews' => (is => 'ro', isa => 'Review', coll => 'reviews', ref => 'novel');
+
+	sub _build_review_count { shift->reviews->count }
+
+	sub print_related_novels {
+		my $self = shift;
+
+		foreach my $other_novel ($self->related_novels) {
+			print $other_novel->title, ', ',
+			      $other_novel->year, ', ',
+			      $other_novel->author->name, "\n";
+		}
+	}
+
+	around 'reviews' => sub {
+		my ($orig, $self) = (shift, shift);
+
+		my $cursor = $self->$orig;
+		
+		return $cursor->sort([ year => -1, title => 1, 'author.last_name' => 1 ]);
+	};
+
+	__PACKAGE__->meta->make_immutable;
+
+Aside from standard Moose usage, we've used some of MongoDBx::Class' built-in
+relationship types. Head over to L<MongoDBx::Class::Moose> for a list of
+provided relationship types and how they translate to database entries.
+
+In this example, we've used the C<holds_one> relationship to denote that
+a Novel document entirely holds one embedded PersonName sub-document. We've
+used C<holds_many> to have Novel documents entirely hold Tag documents.
+We've also used C<joins_one> to easily find a novel's synopsis, located
+in the synopsis collection. C<joins_many> was used to easily find all
+Review documents located in the reviews collection. Finally, we've used
+C<has_many> for the list of references to related novels.
+
+You will notice that when using the C<holds_one> and C<holds_many> relationship
+types, we've given the full package names to the C<isa> option (such as
+MyApp::Schema::PersonName), while in other relationship types, we've given
+the class names only (such as 'Synopsis'). This inconsistency is only
+temporary, and will change in future versions, so keep your finger on the
+pulse.
+
+Of particular interest is the 'added' attribute, for which we've added
+the <Parsed|MongoDBx::Class::AttributeTraits::Parsed> attribute trait
+(automatically provided with MongoDBx::Class). When adding this trait
+to an attribute, MongoDBx::Class looks for a module implementing the
+L<MongoDBx::Class::ParsedAttribute> role named like the 'isa' option of
+the attribute. In our example, MongoDBx::Class will look for
+L<MongoDBx::Class::ParsedAttribute::DateTime>. However, if you're creating
+your own ParsedAttribute classes, you need to also pass the 'parser' option.
+For example:
+
+	has 'added' => (is => 'ro', isa => 'DateTime', traits => ['Parsed'], parser => 'MyApp::ParsedAttribute::MyCoolDateTimeParser', required => 1);
+
+The 'Parsed' trait means that the parser is responsible for expanding this
+attribute from the database when loading a document, and for collapsing
+the attribute when saving to the database. This is similar to L<DBIx::Class>'
+L<InflateColumn|DBIx::Class::InflateColumn> family of classes from the
+SQL world. You might ask yourself why we're using a special DateTime
+parser here, even though L<MongoDB> natively supports DateTime objects.
+The following paragraph is taken from L<MongoDBx::Class::ParsedAttribute::DateTime>'s
+documentation):
+
+	While the Perl L<MongoDB> driver already supports L<DateTime> objects
+	natively, due to a bug with MongoDB, you can't save dates earlier than
+	the UNIX epoch. This module overcomes this limitation by simply saving
+	dates as strings and automatically turning them into DateTime objects
+	(and vica-versa). The DateTime strings are formatted by the L<DateTime::Format::W3CDTF>
+	module, which parses dates in the format recommended by the W3C. This is
+	good for web apps, and also makes it easier to edit dates from the
+	MongoDB shell. But most importantly, it also allows sorting by date.
+
+Also note the 'review_count' attribute, which has the 'Transient' trait.
+This trait means the attribute is not to be saved in the database, even
+though it is one of the document's attributes. This is useful for calculated
+attributes, or any supporting attributes you add to a document class whose
+state should not be saved. You should note that if for some reason a
+document in the database I<does> have an attribute marked as transient in
+the document's class (for example if you added it to the document manually),
+the value of this attribute will also be ignored when the document is read
+from the database.
+
+As you can see, the C<joins_many> relationship creates a one-to-many
+relationship between one document to one or more other documents which can be
+considered "child documents". In this example, there is a one-to-many
+relationship between a 'novel' document and one or more 'review' documents.
+A C<joins_many> relationship is implemented with a cursor. For example,
+calling the C<reviews()> method on a C<Novel> object will generally
+return a L<MongoDBx::Class::Cursor> object for a C<find()> query that
+searches for documents in the 'reviews' collection, whose 'novel' attribute
+references the C<Novel> document. In the C<Novel> class above, you will
+notice the C<reviews()> method is also modified with Moose's C<around>
+method modifier. This example illustrates the fact that C<joins_many> is
+implemented with a cursor. Suppose you know you will always want to call
+C<reviews()> and get the child documents sorted by date (or other fields).
+The above modification simply sorts the cursor before returning it to the
+caller. Of course, this is merely an example of the things you can do with
+the C<joins_many> relationship.
+
+Continuing on, lets create our two embedded document classes. We'll start
+with PersonName:
+
+	package MyApp::Schema::PersonName;
+
+	use MongoDBx::Class::Moose;
+	use namespace::autoclean;
+	
+	with 'MongoDBx::Class::EmbeddedDocument';
+
+	has 'first_name' => (is => 'ro', isa => 'Str', required => 1, writer => 'set_first_name');
+	
+	has 'middle_name' => (is => 'ro', isa => 'Str', predicate => 'has_middle_name', writer => 'set_middle_name');
+
+	has 'last_name' => (is => 'ro', isa => 'Str', required => 1, writer => 'set_last_name');
+
+	sub name {
+		my $self = shift;
+
+		my $name = $self->first_name;
+		$name .= ' '.$self->middle_name if $self->has_middle_name;
+		$name .= ' '.$self->last_name;
+
+		return $name;
+	}
+
+	__PACKAGE__->meta->make_immutable;
+
+This is a very simple class, with no relationships. We use the C<name()>
+method to easily print a person's full name.
+
+On to the Tag document class:
+
+	package MyApp::Schema::Tag;
+
+	use MongoDBx::Class::Moose;
+	use namespace::autoclean;
+
+	with 'MongoDBx::Class::EmbeddedDocument';
+
+	has 'category' => (is => 'ro', isa => 'Str', required => 1);
+
+	has 'subcategory' => (is => 'ro', isa => 'Str', required => 1);
+
+	__PACKAGE__->meta->make_immutable;
+
+Again, this is a very simple example. Embedded documents will often be
+as simple as that.
+
+We have two document classes left. The first is the Synopsis class:
+
+	package MyApp::Schema::Synopsis;
+
+	use MongoDBx::Class::Moose;
+	use namespace::autoclean;
+
+	with 'MongoDBx::Class::Document';
+
+	belongs_to 'novel' => (is => 'ro', isa => 'Novel', required => 1);
+
+	has 'text' => (is => 'ro', isa => 'Str', writer => 'set_text', required => 1);
+
+	__PACKAGE__->meta->make_immutable;
+
+Here, we've used C<belongs_to> to signify a Synopsis document belongs to
+a Novel document. Every Synopsis document has a 'novel' attribute which
+references the parent Novel document.
+
+Only the Review class is left:
+
+	package MyApp::Schema::Review;
+
+	use MongoDBx::Class::Moose;
+	use namespace::autoclean;
+
+	with 'MongoDBx::Class::Document';
+
+	belongs_to 'novel' => (is => 'ro', isa => 'Novel', required => 1);
+
+	has 'reviewer' => (is => 'ro', isa => 'Str', required => 1);
+
+	has 'text' => (is => 'ro', isa => 'Str', required => 1);
+
+	has 'score' => (is => 'ro', isa => 'Int', predicate => 'has_score');
+
+	__PACKAGE__->meta->make_immutable;
+
+That wraps up our document classes. Before we continue, it is important
+to note that MongoDBx::Class' ability to identify the class of a document
+is currently reliant on the existance of a '_class' attribute in every
+document in the database (as described in L<MongoDBx::Class/"CAVEATS AND THINGS TO CONSIDER">).
+So, looking at the JSON representations from before, we need to modify
+the representations like so:
+
+	# in the 'novels' collection
+	{
+		"_id": ObjectId("4cbca90d576fad5916790100"),
+		"_class": "Novel",
+		"title": "The Valley of Fear",
+		"year": 1914,
+		"author": {
+			"first_name": "Arthur",
+			"middle_name": "Conan",
+			"last_name": "Doyle"
+		},
+		"added": "2010-01-11T22:12:44+02:00",
+		"tags": [
+			{ "category": "mystery", "subcategory": "thriller" },
+			{ "category": "mystery", "subcategory": "detective" },
+			{ "category": "crime", "subcategory": "fiction" }
+		],
+		"related_novels": [
+			{ "$ref": "novels", "$id": ObjectId("4cbca90d3a41e35916720100") },
+			{ "$ref": "novels", "$id": ObjectId("4cbca90d44d8c959167a0100") },
+			{ "$ref": "novels", "$id": ObjectId("4cbca90d486bbf59166f0100") }
+		]
+	}
+
+	# in the 'synopsis' collection
+	{
+		"_id": ObjectId("4cbca90d699e9a5916670100"),
+		"_class": "Synopsis",
+		"novel": { "$ref": "novels", "$id": ObjectId("4cbca90d576fad5916790100") },
+		"text": "The Valley of Fear is the final Sherlock Holmes novel by Sir Arthur Conan Doyle. The story was first published in the Strand Magazine between September 1914 and May 1915. The first book edition was published in New York on 27 February 1915."
+	}
+
+	# in the 'reviews' collection
+	{
+		"_id": ObjectId("4cbca90dfbb2945916740100"),
+		"_class": "Review",
+		"novel": { "$ref": "novels", "$id": ObjectId("4cbca90d576fad5916790100") },
+		"reviewer": "Some Guy",
+		"text": "I really liked it!",
+		"score": 5
+	}, 
+	{
+		"_id": ObjectId("4cbca90e0ad57b5916f50100"),
+		"_class": "Review",
+		"novel": { "$ref": "novels", "$id": ObjectId("4cbca90d576fad5916790100") },
+		"reviewer": "Some Other Guy",
+		"text": "It was okay.",
+		"score": 3
+	}, 
+	{
+		"_id": ObjectId("4cbca90e0b9c175916c60100"),
+		"_class": "Review",
+		"novel": { "$ref": "novels", "$id": ObjectId("4cbca90d576fad5916790100") },
+		"reviewer": "Totally Different Guy",
+		"text": "Man, that just sucked!",
+		"score": 1
+	}
+
+You will notice that it is not required to add the '_class' attribute
+to embedded documents, only to standalone documents. The reason for the
+'_class' requirement is the fact that MongoDBx::Class doesn't enforce
+one collection for every document class. Every collection can have documents
+of one or more classes, and documents of the same class can be stored in
+one or more collections, even databases.
+
+=head1 LOADING MongoDBx::Class AND CONNECTING TO A MongoDB SERVER
+
+The next step is loading the schema we've just created, and connecting to
+a MongoDB server:
+
+	my $dbx = MongoDBx::Class->new(namespace => 'MyApp::Schema');
+
+We need to pass the namespace of our schema to MongoDBx::Class. It will
+attempt to automatically load every document class under that namespace,
+and will return a L<MongoDBx::Class> object back.
+
+We then initiate a connection to a server:
+
+	my $conn = $dbx->connect();
+
+We don't pass anything to the C<connect()> method, so it attempts to connect
+to a MongoDB server running on 'localhost', on the default 27017 port. We
+can connect to a specific server like so:
+
+	my $conn = $dbx->connect(host => $host, port => $port);
+
+The connect method accepts any of the options that the C<new()> method in
+L<MongoDB::Connection> accepts, plus the new 'safe' boolean attribute.
+Passing a true value for this attribute causes MongoDBx::Class to automatically
+enable the 'pass' option to all insert/update/delete operations performed
+on the database, so we don't need to pass C<< { safe => 1 } >> to the
+C<insert()>, C<update()> methods, etc. The safe option is actually required
+in order to autoamtically expand/collapse documents, so you'd probably
+want to enable it, but it is kept disabled by default for compatibility
+with the original MongoDB module.
+
+The C<connect()> method returns a L<MongoDBx::Class::Connection>
+object.
+
+NOTE: versions prior to 0.7 stored the returned connection object as the
+'conn' attribute of the C<$dbx> variable. This behavior has been dropped
+in version 0.7 in order to be consistent with L<MongoDB> and allowing
+multiple connections.
+
+Now that we have our connection object, we can get a database object:
+
+	$conn->get_database('whatever'); # also simply $conn->whatever
+
+=head1 INSERTING DOCUMENTS
+
+Now the we've loaded our schema and connected to a server, we can start
+using MongoDBx::Class. Basically, our usage will not differ greatly from
+direct L<MongoDB> usage, as MonogDBx::Class simply extends MongoDB. The
+biggest difference between directly using MongoDB and using MongoDBx::Class,
+is the automatic expanding and collapsing of documents. Documents are
+automatically expanded when inserting documents only if the C<safe> option
+is on, as mentioned in the previous section.
+
+Let's create a novel document:
+
+	my $db = $conn->get_database('myapp');
+	my $novels_coll = $db->get_collection('novels');
+	
+	my $novel = $novels_coll->insert({
+		_class => 'Novel',
+		title => 'The Valley of Fear',
+		year => 1914,
+		author => {
+			first_name => 'Arthur',
+			middle_name => 'Conan',
+			last_name => 'Doyle',
+		},
+		added => DateTime->now(time_zone => 'Asia/Jerusalem'),
+		tags => [
+			{ category => 'mystery', subcategory => 'thriller' },
+			{ category => 'mystery', subcategory => 'detective' },
+			{ category => 'crime', subcategory => 'fiction' },
+		],
+	});
+
+Notice that when inserting the novel document, we've directly inserted
+the PersonName embedded document and the Tags embedded documents as
+hash-refs.
+
+This insert, which was safe (since the 'safe' attribute of our connection
+object had a true value), returns the novel document after expansion:
+
+	$novel->author->name; # prints 'Arthur Conan Doyle'
+
+If the insert was unsafe, we'd just get the L<MongoDB::OID> of the document
+back. But note that you can't get the OID object and immediately attempt
+to load the document with it, as you can't predict the order in which
+MongoDB will perform asynchronous operations.
+
+Lets insert our synopsis now:
+
+	my $synopsis = $db->synopsis->insert({
+		_class => 'Synopsis',
+		novel => $novel,
+		text => "The Valley of Fear is the final Sherlock Holmes novel by Sir Arthur Conan Doyle. The story was first published in the Strand Magazine between September 1914 and May 1915. The first book edition was published in New York on 27 February 1915.",
+	});
+
+Notice how we've passed the C<$novel> object directly as the 'novel' attribute.
+When inserting, MongoDBx::Class will automatically save it as a DBRef
+object for us.
+
+Now for our reviews:
+
+	my @reviews = $conn->get_collection('reviews')->batch_insert([
+		{
+			_class => 'Review',
+			novel => $novel,
+			reviewer => 'Some Guy',
+			text => 'I really liked it!',
+			score => 5,
+		}, 
+		{
+			_class => 'Review',
+			novel => $novel,
+			reviewer => 'Some Other Guy',
+			text => 'It was okay.',
+			score => 3,
+		}, 
+		{
+			_class => 'Review',
+			novel => $novel,
+			reviewer => 'Totally Different Guy',
+			text => 'Man, that just sucked!',
+			score => 1,
+		}
+	]);
+
+	my ($total_score, $avg_score) = (0, 0);
+	foreach (@reviews) {
+		$total_score += $_->score || 0;
+	}
+	$avg_score = $total_score / scalar(@reviews);
+	print $avg_score; # prints 3
+
+If we now run C<< $novel->reviews() >>, we'd get a L<MongoDBx::Class::Cursor>
+back. And since we've created a method modification in the Novel class
+on this method, this cursor will also be sorted.
+
+	foreach ($novel->reviews->all) {
+		# $_ is now a MyApp::Schema::Review object
+		print $_->score;
+	}
+
+=head1 SEARCHING DOCUMENTS
+
+MongoDBx::Class adds automatic expansion to document searching, plus some
+convenient shortcuts. Say we've received the ID of a novel document as
+input, and we want to load it. With MongoDB, we'd probably do:
+
+	$db->novels->find_one({ _id => MongoDB::OID->new(value => $oid) })
+
+With MongoDBx::Class, we can just do:
+
+	$db->novels->find_one($oid);
+
+And C<$oid> can either be the string ID, or a L<MongoDB::OID> object.
+
+If the document is found, and has the '_class' attribute, then it will be
+automatically expanded.
+
+	my $novel = $db->novels->find_one($oid)
+		|| die "Oh my god I can't find this, kill me, kill me now";
+
+	print $novel->author->name; # again, prints 'Arthur Conan Doyle'
+
+Let's search for reviews written by a certain reviewer:
+
+	my $cursor = $db->reviews->find({ reviewer => 'Some Guy' })->sort({ score => -1 }); # the `find` method also has two synonyms: `query` and `search`
+
+This gives a L<MongoDBx::Class::Cursor> back:
+
+	print $cursor->count; # prints 1
+
+	while (my $review = $cursor->next) {
+		print $review->novel->title, "\n";
+	}
+
+Sorting documents is easier. We can sort by a list of ordered attributes
+like so:
+
+	$cursor->sort([ attr1 => 1, attr2 => 1, attr3 => -1 ]);
+
+=head1 UPDATING DOCUMENTS
+
+Updating documents is much easier with MongoDBx::Class. There are two
+ways to update documents in MongoDBx::Class:
+
+=over 2
+
+=item * The older, L<MongoDB> way of using the C<update()> method in
+L<MongoDBx::Class::Collection>. This is now mostly used to update multiple
+documents at once.
+
+=item * The new, L<MongoDBx::Class> way of using the C<update()> method
+provided to document classes by L<MongoDBx::Class::Document>. This is used
+to update a specific document.
+
+=back
+
+Let's take a look at the first way. Suppose we want to cheat and update
+all reviews for "The Valley of Fear" with a score of five:
+
+	$db->reviews->update({ 'novel.$id' => $novel->_id }, { '$set' => { score => 5 } }, { multiple => 1 }); # updates are by default singular, so we add the 'multiple' option
+
+This is exactly like using L<MongoDB::Collection> directly. If we're updating
+a specific document we've already loaded, however, MongoDBx::Class provides
+a much more comfortable way. Instead of doing:
+
+	$db->novels->update({ _id => $novel->_id }, { ... })
+
+We can do:
+
+	$novel->update({ year => 1915 });
+
+This will effectively invoke a '$set' update like this:
+
+	$db->novels->update({ _id => $novel->_id }, { '$set' => { year => 1915 } });
+
+But this isn't really the Moose way of doing things, so MongoDBx::Class
+gives us yet another way of updating a document:
+
+	$novel->set_year(1915); # we can do this because we've added a 'writer' option to the 'year' attribute
+	$novel->update;
+
+When invoking C<update()> on a document object with no arguments, a "snapshot"
+of the document is taken, and the following update is effectively performed:
+
+	$db->novels->update({ _id => $novel->_id }, { title => "The Valley of Fear", year => 1915, ... });
+
+When we pass arguments to the C<update()> method (there are two arguments
+we can pass, the hash-ref of updates to perform, and the standard options
+hash-ref we know from the original C<update()> method in L<MongoDB::Collection>),
+MongoDBx::Class simply performs a '$set' update on the passed hash-ref
+attributes only. So doing this:
+
+	$novel->set_year(1915);
+	$novel->update({ title => 'The Valley of Fearrrrrr' });
+
+Will only result in the 'title' attribute being updated, not the year
+attribute.
+
+Updating embedded documents is similarly easy:
+
+	$novel->author->set_first_name('Sir Arthur');
+	$novel->update;
+
+=head1 REMOVING DOCUMENTS
+
+Removing documents with MongoDBx::Class is very easy. Having the document
+object, simply call:
+
+	$novel->remove;
+
+Or:
+
+	$novel->delete;
+
+And this novel document will be removed from the database. Note, however,
+that the delete operation does not cascade, so only the novel document is
+deleted. The synopsis and reviews are not deleted, and you have to do so
+manually.
+
+You can still use the original C<remove()> method on collections, now mostly
+to remove multiple documents:
+
+	$db->get_collection('reviews')->remove({ 'novel.$id' => $novel->_id }); # removes are by default multiple
+
+=head1 FAQ
+
+=head2 Can I use more than one database?
+
+Yes, you can use as many databases as you like and use the same document
+classes across them:
+
+	my $data_db = $conn->get_database('myapp_data');
+	my $user_db = $conn->get_database('myapp_users');
+
+=head2 Can I define different document classes to different databases?
+
+There currently isn't a way to define individual schemas for different
+databases. You can, however, "split" your schema. For example, if your
+application has a data DB and a user DB, you can put all the document
+classes of the data DB under MyApp::Schema::Data, and all the document
+classes of the user DB under MyApp::Schema::User.
+
+=head2 What if I want to use the asynchronous L<AnyMongo> driver instead?
+
+Currently, MongoDBx::Class only supports the official L<MongoDB> driver,
+but support for L<AnyMongo> is planned.
+
+=head2 What if I have attributes I don't want to save in the database?
+
+MongoDBx::Class does not provide an option like that yet, but will probably
+do so in upcoming versions.
+
+=head2 I'm not getting document objects but just the document hash-refs, what gives?
+
+If, either when searching for documents or creating/updating documents, you are not
+receiving expanded document objects back but only the document hash-refs
+when searching/updating, or the documents' L<MongoDB::OID>s when inserting,
+there might be a few reasons for this:
+
+=over
+
+=item 1. You are not using safe operations: MongoDBx::Class cannot expand
+documents when not using safe operations. Either enable the 'safe' option
+when inserting/updating, or enable the safe option globally when connecting
+using L<MongoDBx::Class>'s C<connect()> method.
+
+=item 2. The document hash-ref does not define the '_class' attribute:
+MongoDBx::Class cannot expand document without knowing to which document
+class the document belongs. Therefore, documents in the MongoDB database
+must have the '_class' attribute.
+
+=item 3. The '_class' attribute is wrong or does not exist: If the document
+has the '_class' attribute and you're still not getting document objects
+back, then MongoDBx::Class probably can't find the document class. This
+might be because the class name is wrong, or the class was not found when
+loading MongoDBx::Class. If that is the case, you might wanna take a look
+at the L</"search_dirs"> attribute of MongoDBx::Class.
+
+=back
+
+=head2 Who framed Roger Rabbit?
+
+I framed Roger Rabbit!
+
+=head1 WRAP UP
+
+You now know how you can use L<MongoDBx::Class> in your applications,
+and make MongoDB act like a relational database, without sacrificing its
+NoSQL nature and special features.
+
+Before using MongoDBx::Class, please take into account that its alpha
+software, and is not ready yet for production use. If you find bugs,
+please report them in the usual channels (see L<MongoDBx::Class/"BUGS">).
+
+=head1 AUTHOR
+
+Ido Perlmuter, C<< <ido at ido50.net> >>
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+	perldoc MongoDBx::Class::Tutorial
+
+=head1 SEE ALSO
+
+L<MongoDBx::Class>, L<MongoDB>, L<http://www.mongodb.org/>.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010-2014 Ido Perlmuter.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

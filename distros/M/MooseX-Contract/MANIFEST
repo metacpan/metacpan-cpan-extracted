@@ -1,0 +1,13 @@
+Changes
+lib/MooseX/Contract.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-interface.t
+t/02-with-context.t
+t/03-inheritance.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

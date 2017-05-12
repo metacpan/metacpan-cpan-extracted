@@ -1,0 +1,66 @@
+{
+    "name": "MooseX-PDF",
+    "version": "0.01",
+    "abstract": "Create PDF files with Moose using Template Toolkit templates",
+    "author": [
+        "Hamid Afshar <hamster@cpan.org>"
+    ],
+ 
+    "license": "artistic_2",
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "Hand 1.0",
+    "keywords" : [
+        "pdf",
+        "template",
+        "toolkit"
+    ],
+    "prereqs" : {
+        "test" : {
+            "requires": {
+                "IO::File": "0",
+                "Test::Most": "0"
+            },
+            "recommends": {
+                "MooseX::ClassCompositor": "0",
+                "Pod::Coverage": "0.18",
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::CheckManifest": "0.9",
+                "Test::Moose": "0",
+                "Test::Pod": "1.22",
+                "Test::Pod::Coverage": "1.08"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "File::chdir": 0,
+                "IO::CaptureOutput": 0,
+                "Moose::Role": 0,
+                "PDF::Reuse": 0,
+                "Template": 0
+            }
+        }
+    },
+
+    "provides": {
+        "MooseX::PDF": {
+            "file": "lib/MooseX/PDF.pm",
+            "version": "0.01"
+        }
+    },    
+    
+    "no_index": {
+        "directory": ["t","examples"]
+    },
+ 
+    "resources": {
+        "license": "http://www.perlfoundation.org/artistic_license_2_0",
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-PDF" }
+     }
+}

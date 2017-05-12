@@ -1,0 +1,63 @@
+Revision history for MKDoc::Core 
+
+0.91 Wed Sep 29 14:57:00 2004
+    - url() method that calls SUPER::url()
+    - Applied patch from Charlie Garrison to make port stripping configurable
+
+0.10 Wed Sep 29 12:55:00 2004
+
+0.9 Mon Sep  6 14:33:32 2004
+    - Made it so that :80xx are stripped from URIs
+    - Fixed content negotiation bug with Opera
+    - Added Content-Length and ETag to response headers
+    - Added Last-Modified headers for resource files
+    - Added MKDoc::Core::Request::param_checked()
+
+0.8 Mon Aug  9 12:47:55 2004
+    - Added MKDoc::Core::Request::delete_all_fast()
+    - Updated MKDoc::Core::Request::param()
+    - Added MKDoc::Core::Language 'eq' overload magic
+
+0.7 Sun Jul 18 19:42:57 2004
+    - Added a list() subroutine in MKDoc::Core::ResourceFinder
+    - Documented MKDoc::Core::ResourceFinder
+
+0.6 Tue Jul 13 15:21:42 2004
+    - Fixed CGI redirects not working on my box
+    - Added MKDoc::Core::SessionPlugin
+    - MKDoc::Core::Language objects are now string-overloaded
+    - Fixed a path_info bug in MKDoc::Core::Request::self_url()
+    - Renamed MKDoc::Core::Request::self_url to 'self_uri'
+    - Fixed MKDoc::Core::Plugin throwing warnings
+ 
+0.5 Wed Jun 16 13:17:27 2004
+    - Memoized some slow MKDoc::Core::Language methods
+
+0.4 Fri Apr 16 13:02:38 2004
+    - Added MKDoc::Core::site_dir()
+    - Added MKDoc::Core::core_dir()
+    - Added support for resources
+    - Added logo as a resource
+    - Added style sheet as a resource
+    - Added mime.types resource file
+
+0.3 Thu Apr  1 17:07:13 2004 
+    - Changed the uri() and uri_relative() methods now use URI.pm
+    - Changed the default template pathes for plugins
+    - Made HTTP headers go through CGI.pm
+    - Fixed broken MKDoc::Core::Error error handling
+    - Added return_uri() method to base plugin class
+    - Added MKDoc::Core::FileCache class
+    - Fixed apache appending stuff on 404 pages issue
+    - Improved Petal template search path init
+    - Made some setup names a little better
+
+0.2 Thu Mar 18 14:16:49 2004
+    - Fixed some MKDoc::Core::Language issues
+    - Added a couple of methods in MKDoc::Core::Language
+    - Added code to ease backwards compatiblity with mkdoc 1.6
+
+0.1 Thu Mar 11 17:40:42 2004
+    - Changed MKDoc 2.02 to MKDoc::Core 0.1
+    - Fixed numerous documentation issues
+    - Added experimental Apache 2 /mod_perl 1.99 config

@@ -1,0 +1,38 @@
+<div class="addto">
+
+<h2><% ucfirst( $related_class->plural_moniker ) %></h2>
+
+% if ( my @many = $request->maybe_many_link_views( $add_to->$field ) ) {
+<ol>
+% foreach my $link ( @many ) {
+<li><% $link %></li>
+% }
+</ol>
+% }
+
+<h3>Add a new <% $related_class->moniker %> to <% $add_to->moniker %>: <% $add_to %></h3>
+
+% # need to supply the entity argument because setup_form_mode is called *on* the entity, 
+% # it can't currently be used to *set* the entity, which is annoying and might change one day
+<% $request->as_form( 'addto', entity    => $related_class,
+                               mode_args => { addto => $add_to,
+                                              field => $field,
+                                              } )->render %>
+
+<br />
+
+<% $request->as_form( 'addhowmany', entity    => $related_class,
+                                    mode_args => { addto    => $add_to,
+                                                   how_many => 20,
+                                                   } )->render %>
+
+</div>
+
+<%init>
+    my $related_class = $add_to->related_class( $request, $field );
+    
+</%init>
+<%args>
+    $add_to
+    $field
+</%args>

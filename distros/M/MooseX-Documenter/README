@@ -1,0 +1,39 @@
+MooseX-Documenter version 0.01
+=============================
+
+This module provides a simple way to autodocument your Moose modules.  While PPI is good for normal perl class and objects, it does not work for Moose.
+
+This module is intended to help make documentation from your Moose classes.  It will not only document what your Moose classes do but also make it easy to see the relationships between your various Moose classes.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Moose
+  Test::More
+  Test::Exception
+  Test::MockObject::Extends
+  FindBin
+  PPI::Document
+  Exporter 
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2009 by David Bury
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,10 @@
+ [
+    {
+        "label" : "Name",
+        "type" : "text",
+        "attributes" : {
+            "class" : "testclass"
+        },
+        "name" : "name"
+    }
+ ]

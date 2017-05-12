@@ -1,0 +1,38 @@
+Date: Mon, 7 Aug 2000 11:38:44 +0200
+From: Mark Overmeer <markov@ATComputing.nl>
+To: Bryan Burchette <blburch@mindspring.com>
+Subject: Re: Core Dump on ReadImage
+Message-ID: <20000807113844.A22119@atcmpg.ATComputing.nl>
+References: <4.3.1.0.20000801154753.00ae3ed0@mindspring.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+X-Mailer: Mutt 1.0pre4i
+In-Reply-To: <4.3.1.0.20000801154753.00ae3ed0@mindspring.com>; from blburch@mindspring.com on Tue, Aug 01, 2000 at 03:54:42PM -0400
+Status: RO
+Content-Length: 1041
+Lines: 24
+
+
+(I was away for holidays last week, so not able to response earlier)
+
+* Bryan Burchette (blburch@mindspring.com) [000801 22:37]:
+> I am using ImageMagick 5.2.2 and for testing puposes I am using the little 
+> test program on the website under the API section. No matter what I do, the 
+> program cores on ReadImage().
+
+> Current function is main
+>     33     image=ReadImage(image_info,&exception);
+
+I located the problem in the getc() of ReadImage using PerlMagick.  I did
+not succeed in creating a reduced sized example for my program which
+reproduces the problem, so I'm glad I'm not the only one with this problem.
+
+Is there are more clarity on the cause of the crash?  Any response from the
+developers?
+-- 
+               Mark Overmeer   %-]
+
+------------------------------------------------------------------------
+drs Mark A.C.J. Overmeer                           markov@ATComputing.nl
+AT Computing, UNIX Training and Consultancy    http://www.ATComputing.nl
+http://www.dhp.nl/~markov/                         http://satfoto.dhp.nl

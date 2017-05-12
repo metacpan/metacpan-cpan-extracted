@@ -1,0 +1,86 @@
+{
+   "abstract" : "execute warming up queries for InnoDB",
+   "author" : [
+      "Songmu <y.songmu@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.7",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MySQL-Warmer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Test::mysqld" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "0",
+            "DBIx::Inspector" : "0",
+            "Getopt::Long" : "0",
+            "Moo" : "0",
+            "Pod::Usage" : "0",
+            "Term::ReadKey" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "MySQL::Warmer" : {
+         "file" : "lib/MySQL/Warmer.pm",
+         "version" : "0.02"
+      },
+      "MySQL::Warmer::CLI" : {
+         "file" : "lib/MySQL/Warmer/CLI.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Songmu/p5-MySQL-Warmer/issues"
+      },
+      "homepage" : "https://github.com/Songmu/p5-MySQL-Warmer",
+      "repository" : {
+         "url" : "git://github.com/Songmu/p5-MySQL-Warmer.git",
+         "web" : "https://github.com/Songmu/p5-MySQL-Warmer"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "Teppei Yano <buckelwal@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,130 @@
+#!/usr/bin/perl
+
+=pod
+=head1 NAME
+
+cufilter - Filter emails through Mail::CheckUser
+
+=head1 SYNOPSIS
+
+Add the following lines to your ~/.procmailrc:
+
+  # Filter mail through Mail::CheckUser
+  :0f
+  | /usr/bin/cufilter
+
+
+=head1 DESCRIPTION
+
+When email messages are filtered through this program
+using the procmail settings as outlined in the SYNOPSYS,
+the email address in the "From:" header is passed through
+Mail::CheckUser to ensure validity.  If there is a problem
+with the email address, the "Subject:" header is modified
+to show which email address failed along with the failure
+reason.  No messages are lost, but it provides an easy way
+for the mail client to organize, sort, or filter based on
+the subject tweaks.
+
+=head1 EXAMPLES
+
+Lets say a spammer sends a message with the following headers:
+
+  From: god@heaven.org
+  To: you@host.com
+  Subject: Happy Pill
+
+Then the new headers might change to the following:
+
+  From: god@heaven.org
+  To: you@host.com
+  Subject: [CU!god@heaven.org!DNS failure: SERVFAIL] Happy Pill
+
+This makes it easy to filter for mail clients.
+
+=head1 INSTALL
+
+This file can be installed into /usr/bin/cufilter and
+is intended to be utilized through the procmail
+functionality by adding the following lines to your
+~/.procmailrc configuration.
+
+  # Filter mail through Mail::CheckUser
+  :0f
+  | /usr/bin/cufilter
+
+=head1 AUTHORS
+
+Rob Brown bbb@cpan.org
+
+=head1 COPYRIGHT
+
+Copyright (c) 2003 Rob Brown bbb@cpan.org.
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+$Id: cufilter,v 1.3 2003/09/18 15:36:26 hookbot Exp $
+
+=head1 SEE ALSO
+
+Mail::CheckUser(3),
+procmail(1).
+
+=cut
+
+use strict;
+use Mail::CheckUser qw(check_email last_check);
+use vars qw($VERSION);
+
+$Mail::CheckUser::Timeout = 300;
+$Mail::CheckUser::Treat_Timeout_As_Fail = 1;
+$Mail::CheckUser::Treat_Full_As_Fail = 1;
+
+$VERSION = "0.03";
+my $HEAD = "";
+my %checks = ();
+while (<STDIN>) {
+  if (/^[\r\n]+$/) {
+    $HEAD .= "Subject: (no subject)\r\n" unless $HEAD =~ /^Subject:/im;
+    if (keys %checks) {
+      foreach my $check (keys %checks) {
+        if ($checks{$check}->[0]) {
+          # Bad email
+          $HEAD =~ s/^(Subject:)/$1 [CU!$check!$checks{$check}->[1]]/im;
+        }
+      }
+    } else {
+      $HEAD =~ s/^(Subject:)/$1 [CU!no sender address found!]/im;
+    }
+    print $HEAD;
+    print "X-CU-Filter: $Mail::CheckUser::VERSION/$VERSION - Checked ".(scalar keys %checks)." addresses\r\n";
+    print "\r\n";
+    while (<STDIN>) {
+      print;
+    }
+    exit;
+  }
+  $HEAD .= $_;
+  if (/^\S*(return-path|from|sender)\S*[: ]+(.+)/i) {
+    my $email = $2;
+    $email = $1 if $email =~ /\<(\S*)\>/;
+    1 while $email =~ s/\([^()]\)//;
+    1 while $email =~ s/"[^\"]"//;
+    $email =~ s/(@\S+)\s.*/$1/;
+    $email =~ s/.*\s(\S+@)/$1/;
+    if ($email =~ /@/) {
+      $email =~ y/A-Z/a-z/;
+      $checks{$email} ||= do {
+        check_email($email);
+        my $l = last_check;
+        [$l->{code}, $l->{reason}];
+      };
+    }
+  } elsif (/^[\w\-]+:.*/ || /^[ \t]/) {
+    # Looks like a valid header
+  } else {
+    $HEAD =~ s/(.*)$/X-Invalid-Header: $1/;
+  }
+}

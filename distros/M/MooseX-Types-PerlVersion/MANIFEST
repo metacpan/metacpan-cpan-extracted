@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/MooseX/Types/PerlVersion.pm
+t/01_basic.t
+t/release-eol.t
+t/release-no-tabs.t

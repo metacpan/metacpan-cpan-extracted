@@ -1,0 +1,21 @@
+
+Perl-Win32-Users_Digest,_Vol_1,_Issue_1.txt
+  1. RE: Net::SSH::Perl (John_Ramrod)
+  2. Perl and delphi interaction query. (Baker Richard-qswi266)
+  3. RE: Perl and delphi interaction query. (Goldenrod, Christopher J)
+
+Perl-Win32-Users_Digest,_Vol_1,_Issue_2.txt
+  1. RE: Net::SSH::Perl (skillman)
+  2. RE: Perl and delphi interaction query. (Lynn. Rickards)
+  3. RE: Net::SSH::Perl (skillman)
+  4. Re: Net::SSH::Perl (skillman)
+  5. Re: Net::SSH::Perl (Odysseus)
+  6. RE: Net::SSH::Perl (Armour, Mike)
+  7. qx// broken on Win98 (lang@some.web.address.com)
+  8. RE: qx// broken on Win98 (Tobias Heinrich)
+  9. Re: qx// broken on Win98 (Odysseus)
+ 10. Re: qx// broken on Win98 (Keith C. Dandelion)
+ 11. Re: qx// broken on Win98 (Greg Marlinson)
+ 12. Re: qx// broken on Win98 (Greg Marlinson)
+ 13. Re: Net::SSH::Perl (Odysseus)
+ 14. RE: Perl and delphi interaction query. (Baker Richard-qswi266)

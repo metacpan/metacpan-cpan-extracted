@@ -1,0 +1,35 @@
+Revision history for Perl extension MP3::Splitter.
+
+0.01  Sat Apr  3 01:09:19 2004
+	- original version; created by h2xs 1.23 with options
+		-XAfn MP3::Splitter -b 5.5.0
+
+0.02	New arguments to callbacks.
+	MPEG::Audio::Frame 0.04 dependency marked.
+	New argument: options; if $_[0] is not an array reference, assume it is
+		a reference to a hash of global flags.
+	More arguments to end-piece callback:...
+	Recognize "2h34m45.033", "2:34:45.033" (and all possible variations).
+	Recognize "=2:58:24.033" for the duration (the absolute position of
+		the end).
+	Recognize "INF" as the end.
+	Recognize ">5.5" for the gap (the relative position of the start).
+	Recognize and Xing and Lame headers.
+	prepend, append, keep_Xing, update_Xing options.
+
+	!!! Uncompatible change: instead of of fixed-position per-piece
+	optional configuration parameters: use a hash.
+	Export mp3split() by default.
+	New function mp3split_read().
+
+0.03	Would not detect misformatted time (such as 3.03.45).
+	"Unitialized" warning if seconds are omitted.
+	Had `my $var = ... if ...' mis-construct.
+	Now update_Xing is a no-op unless keep_Xing...
+	Add example file `cuts' and two components of a sample mp3 file.
+	Actual used callback name is `name_callback' not 'piece_name'.
+	Actual tests introduced.
+
+0.04	_Xing() could have been called on undef if no frames found
+		(usually triggered by a bug in MPEG::Audio::Frame 0.09)...
+	Minor cleanup of the docs; hint at bugs of Apple and M::A::Frame.

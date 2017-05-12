@@ -1,0 +1,8 @@
+Revision history for Perl module Mojolicious::Plugin::Memorize.
+
+0.02 2015-01-25
+  - Fix a test which failed due to Mojolicious changes (reneeb++)
+
+0.01 2013-08-21
+	- Initial release
+

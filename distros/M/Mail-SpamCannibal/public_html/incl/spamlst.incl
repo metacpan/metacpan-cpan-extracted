@@ -1,0 +1,37 @@
+<font size="+2">Add Spam to Tarpit</font>
+<br>
+<!-- version 1.04, 9-21-06 -->
+Evidence of spam sent to this site.
+<br>
+<blockquote>
+<form name=SpamAdd action="" method=POST>
+<input type=hidden name=page value=spamadd>
+<input type=text name=host> host dot quad IP address<br>
+<textarea name=spam cols=60 rows=15 wrap=off></textarea><br>
+&nbsp;
+<input type=submit name=submit value="ADD SPAM" onClick="document.SpamAdd.action=location.pathname;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>ADD CIDR BLOCK</b>
+<input type=submit name=submit value=31
+  onClick="if (confirm('do you really want to add this 2 address block?')) { document.SpamAdd.action=location.pathname; } else { return false;}">
+<input type=submit name=submit value=30
+  onClick="if (confirm('do you really want to add this 4 address block?')) { document.SpamAdd.action=location.pathname; } else { return false;}">
+<input type=submit name=submit value=29
+  onClick="if (confirm('do you really want to add this 8 address block?')) { document.SpamAdd.action=location.pathname; } else { return false;}">
+<input type=submit name=submit value=28
+  onClick="if (confirm('do you really want to add this 16 address block?')) { document.SpamAdd.action=location.pathname; } else { return false;}">
+<input type=submit name=submit value=27
+  onClick="if (confirm('do you really want to add this 32 address block?')) { document.SpamAdd.action=location.pathname; } else { return false;}">
+<input type=submit name=submit value=26
+  onClick="if (confirm('do you really want to add this 64 address block?')) { document.SpamAdd.action=location.pathname; } else { return false;}">
+<input type=submit name=submit value=25
+  onClick="if (confirm('do you really want to add this 128 address block?')) { document.SpamAdd.action=location.pathname; } else { return false;}">
+<input type=submit name=submit value=24
+  onClick="if (confirm('do you really want to add this 256 address block?')) { document.SpamAdd.action=location.pathname; } else { return false;}">
+<blockquote>
+INSERT <a href="#top" onClick='SpamAdd.spam.value="spam source, anonymous/un-named IP\nsee\n"+ SpamAdd.host.value;return false;'>&quot;spam source, anonymous/un-named IP&quot;</a>
+</blockquote>
+</form>
+</blockquote>
+<script language=javascript1.1>
+document.SpamAdd.host.focus();
+</script>

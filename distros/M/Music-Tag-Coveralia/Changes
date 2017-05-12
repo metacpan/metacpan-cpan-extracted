@@ -1,0 +1,8 @@
+Revision history for Perl extension Music::Tag::Coveralia.
+
+0.001 2015-05-09T10:55+02:00
+ - Stable release
+ - Use HTTP::Tiny instead of LWP::Simple
+
+0.000_001 2014-10-30T01:02+02:00
+ - Initial release

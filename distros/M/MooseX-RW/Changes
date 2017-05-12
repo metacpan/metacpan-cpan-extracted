@@ -1,0 +1,14 @@
+Revision history for Perl module MooseX::RW
+
+0.003 2012-03-28
+
+ - Dependencies were missing, which cause some test failing
+
+0.002 2012-02-19
+
+ - Few doc
+
+0.001 2012-02-18
+
+ - Initial release
+

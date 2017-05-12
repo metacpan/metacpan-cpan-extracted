@@ -1,0 +1,25 @@
+---
+abstract: 'An object oriented interface to Icinga'
+author:
+  - 'Robin Schroeder <schrorg@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Monitoring-Icinga
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  HTTP::Request::Common: 0
+  JSON::XS: 0
+  LWP::UserAgent: 0
+version: 0.02

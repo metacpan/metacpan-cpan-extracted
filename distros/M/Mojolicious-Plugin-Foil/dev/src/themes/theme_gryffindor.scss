@@ -1,0 +1,57 @@
+/* ================================================================== */
+/* THEME: Gryffindor
+ */
+@import 'functions';
+@import 'fonts_gryffindor';
+@import 'icon_light_on_dark';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: #660000;
+$verge-fg: set-fg($verge-bg);
+$verge-border: #330000;
+$button-bg: #552200;
+$button-fg: set-fg($button-bg);
+$button-border: #333300;
+$main-bg: #f2f2aa;
+$main-fg: set-fg($main-bg);
+$link-fg: set-link($main-bg);
+$link-visited: set-visited($main-bg);
+$verge-link-fg: hsl(60, 90%, 70%);
+$verge-link-visited: hsl(30, 90%, 70%);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+}
+
+header,
+footer,
+.side {
+	@extend .verge;
+	background-image: url(gryf_red1.jpg);
+}
+
+body {
+	color: $main-fg;
+	background: $main-bg;
+}
+
+@include many-links($link-fg, $link-visited, $verge-link-fg, $verge-link-visited);
+@include fancy($verge-fg, $verge-bg, "gryf_red1.jpg");
+@include make-buttons;
+
+header nav li {
+	border-color: #226622;
+}
+header nav .selflink,
+header nav em,
+header nav .current a {
+	color: #bb0055;
+	background-color: #669933;
+}
+

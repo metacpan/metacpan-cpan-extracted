@@ -1,0 +1,7 @@
+
+Some goals for Math::MatrixReal:
+--------------------------------
+
+o Correctness is more important than speed
+o Test all methods, at least once
+

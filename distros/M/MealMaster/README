@@ -1,0 +1,51 @@
+NAME
+    MealMaster - Parse MealMaster format recipe files
+
+SYNOPSIS
+      my $mm = MealMaster->new();
+      my @recipes = $mm->parse("t/31000.mmf");
+      foreach my $r (@recipes) {
+        print "Title: " . $r->title . "\n";
+        print "Categories: " . join(", ", sort @{$r->categories}) . "\n";
+        print "Yield: " . $r->yield . "\n";
+        print "Directions: " . $r->directions . "\n";
+        print "Ingredients:\n";
+        foreach my $i (@{$r->ingredients}) {
+          print "  " . $i->quantity .
+                 " " . $i->measure  .
+                 " " . $i->product . 
+                 "\n";
+        }
+
+DESCRIPTION
+    People like to share food recipes on the internet. MealMaster is a
+    popular program for collating recipes. The MealMaster module parses the
+    MealMaster recipe export format, providing you with recipe objects. You
+    can recognize these MealMaster format files as they generally start with
+    "Recipe via Meal-Master".
+
+CONSTRUCTOR
+  new
+    The constructor. Takes no arguments:
+
+      my $mm = MealMaster->new();
+
+METHODS
+  parse($filename)
+    The parse method takes a filename and recipes an array of
+    MealMaster::Recipe objects representing the recipes in the file:
+
+      my @recipes = $mm->parse("t/31000.mmf");
+
+SEE ALSO
+    MealMaster::Recipe, MealMaster::Ingredient
+
+AUTHOR
+    Leon Brocard, "<acme@astray.com>"
+
+COPYRIGHT
+    Copyright (C) 2005, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

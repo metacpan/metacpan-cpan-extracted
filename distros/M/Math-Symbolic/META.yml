@@ -1,0 +1,89 @@
+---
+abstract: 'Symbolic calculations'
+author:
+  - 'Steffen Mueller <smueller@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Math-Symbolic
+provides:
+  Math::Symbolic:
+    file: lib/Math/Symbolic.pm
+    version: 0.612
+  Math::Symbolic::AuxFunctions:
+    file: lib/Math/Symbolic/AuxFunctions.pm
+    version: 0.612
+  Math::Symbolic::Base:
+    file: lib/Math/Symbolic/Base.pm
+    version: 0.612
+  Math::Symbolic::Compiler:
+    file: lib/Math/Symbolic/Compiler.pm
+    version: 0.612
+  Math::Symbolic::Constant:
+    file: lib/Math/Symbolic/Constant.pm
+    version: 0.612
+  Math::Symbolic::Custom:
+    file: lib/Math/Symbolic/Custom.pm
+    version: 0.612
+  Math::Symbolic::Custom::Base:
+    file: lib/Math/Symbolic/Custom/Base.pm
+    version: 0.612
+  Math::Symbolic::Custom::DefaultDumpers:
+    file: lib/Math/Symbolic/Custom/DefaultDumpers.pm
+    version: 0.612
+  Math::Symbolic::Custom::DefaultMods:
+    file: lib/Math/Symbolic/Custom/DefaultMods.pm
+    version: 0.612
+  Math::Symbolic::Custom::DefaultTests:
+    file: lib/Math/Symbolic/Custom/DefaultTests.pm
+    version: 0.612
+  Math::Symbolic::Derivative:
+    file: lib/Math/Symbolic/Derivative.pm
+    version: 0.612
+  Math::Symbolic::ExportConstants:
+    file: lib/Math/Symbolic/ExportConstants.pm
+    version: 0.612
+  Math::Symbolic::MiscAlgebra:
+    file: lib/Math/Symbolic/MiscAlgebra.pm
+    version: 0.612
+  Math::Symbolic::MiscCalculus:
+    file: lib/Math/Symbolic/MiscCalculus.pm
+    version: 0.612
+  Math::Symbolic::Operator:
+    file: lib/Math/Symbolic/Operator.pm
+    version: 0.612
+  Math::Symbolic::Parser:
+    file: lib/Math/Symbolic/Parser.pm
+    version: 0.612
+  Math::Symbolic::Parser::Precompiled:
+    file: lib/Math/Symbolic/Parser/Precompiled.pm
+    version: 0.612
+  Math::Symbolic::Parser::Yapp:
+    file: lib/Math/Symbolic/Parser/Yapp.pm
+    version: 0
+  Math::Symbolic::Parser::Yapp::Driver:
+    file: lib/Math/Symbolic/Parser/Yapp.pm
+    version: 1.05
+  Math::Symbolic::Variable:
+    file: lib/Math/Symbolic/Variable.pm
+    version: 0.612
+  Math::Symbolic::VectorCalculus:
+    file: lib/Math/Symbolic/VectorCalculus.pm
+    version: 0.612
+  Parse::RecDescent::Math::Symbolic::Parser::Precompiled:
+    file: lib/Math/Symbolic/Parser/Precompiled.pm
+    version: 0
+requires:
+  Data::Dumper: 0
+  Memoize: 1.01
+  Parse::RecDescent: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.612

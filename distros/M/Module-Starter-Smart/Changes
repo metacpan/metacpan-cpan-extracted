@@ -1,0 +1,21 @@
+Revision history for Module-Starter-Smart
+
+0.0.6  Jan 30, 2015
+    * Some amendments to the code for clarity and a new test for basic function
+
+0.0.5  Jan 18, 2014
+    * Fix typos and update CPAN metadata
+
+0.0.4  Mar 29, 2012
+    * Fix broken dependency
+
+0.0.3  Mar 28, 2012
+    * Fix RT 72565: Revise use cases
+    * Rewrite create_distro() according to the latest version of Module::Starter::Simple (1.58)
+    * Explicitly subclass Module::Starter::Simple, thanks to brian d foy's suggestion.
+
+0.0.2  Apr 3, 2007
+    * Add use cases
+
+0.0.1  May 7, 2006
+    * Initial release

@@ -1,0 +1,71 @@
+=pod
+
+=head1 NAME
+
+MP3::Album::Track - Perl extension to manage a "physical" track of a mp3 album. 
+
+=head1 SYNOPSIS
+
+	use MP3::Album::Track;
+
+	#create a track object
+	$track = MP3::Album::Track->new(filename=>$path_to_mp3_file);
+
+	#set it's mp3 tag
+	$track->set_tag(title=>'i dont know why');	
+
+	#rename it!
+	$track->rename(filename=>$path_to_new_file);
+
+=head1 DESCRIPTION
+
+Manages a mp3 album track. Gets and sets mp3 file info.
+
+=head1 PUBLIC METHODS
+
+All the methods return undef in error case. The error description is stored in $@.
+
+=over
+
+=item $t = new(filename=>$filename)
+
+Creates a new MP3::Album::Track track using $filename.
+
+=item $filename = $t->filename()
+
+Returns the filename of the track.
+
+=item $br = $t->bitrate()
+
+Returns the encoding bitrate of this track.
+
+=item $fq = $t->frequency() 
+
+Returns the encoding frequency for this track.
+
+=item $result = $t->set_tag([title => $title, artist => $artist, album => $album, year => $year, comment => $comment, genre => $genre])
+
+Sets the tag of the mp3 file according to the passed parameters. If you don't pass one or more of the parameters they will be empty on the tag.
+I'm thinking of a parameter to maintain the previous value on a tag field but i am not sure if that is the proper approach.
+
+=item $result = $t->rename( filename => $new_filename [,keep_copy=>$boo])
+
+Renames this track to a new filename. If you pass a true "keep_copy" value the track will be copied instead of moved. In any case the object filename property will be set to the new file name.
+
+=back
+
+=head1 PRIVATE METHODS
+
+Documented as being not documented.
+
+=head1 BUGS
+
+There are no known bugs, contact me if you find one. 
+
+=head1 CONTACT AND COPYRIGHT
+
+Copyright 2003 Bruno Tavares <bmavt@cpan.org>.  All
+rights reserved.  This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+=cut

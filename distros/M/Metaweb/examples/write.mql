@@ -1,0 +1,10 @@
+{
+    "testwrite": {
+        "query": {
+            "create": "unless_exists", 
+            "id": null,
+            "type": "/common/topic", 
+            "name": "INSERT RANDOM NAME HERE 12345"
+        }
+    }
+}

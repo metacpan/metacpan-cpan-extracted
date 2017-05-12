@@ -1,0 +1,163 @@
+<div class="entry"><script type="text/javascript">
+function getSeqSegmentsForID(id)
+{
+	var items = new Array();
+
+	if (id == '6') {
+		items[0] = document.getElementById('fs_5');
+		items[1] = document.getElementById('fs_6');
+	}
+	else if (id == '11') {
+		items[0] = document.getElementById('fs_16');
+	}
+	else if (id == '3') {
+		items[0] = document.getElementById('fs_21');
+	}
+	else if (id == '7') {
+		items[0] = document.getElementById('fs_8');
+	}
+	else if (id == '9') {
+		items[0] = document.getElementById('fs_12');
+	}
+	else if (id == '12') {
+		items[0] = document.getElementById('fs_18');
+	}
+	else if (id == '2') {
+		items[0] = document.getElementById('fs_11');
+		items[1] = document.getElementById('fs_12');
+		items[2] = document.getElementById('fs_13');
+		items[3] = document.getElementById('fs_14');
+		items[4] = document.getElementById('fs_15');
+		items[5] = document.getElementById('fs_16');
+		items[6] = document.getElementById('fs_17');
+		items[7] = document.getElementById('fs_18');
+		items[8] = document.getElementById('fs_19');
+	}
+	else if (id == '8') {
+		items[0] = document.getElementById('fs_9');
+	}
+	else if (id == '1') {
+		items[0] = document.getElementById('fs_3');
+	}
+	else if (id == '4') {
+		items[0] = document.getElementById('fs_1');
+	}
+	else if (id == '0') {
+		items[0] = document.getElementById('fs_0');
+		items[1] = document.getElementById('fs_1');
+		items[2] = document.getElementById('fs_2');
+		items[3] = document.getElementById('fs_3');
+		items[4] = document.getElementById('fs_4');
+		items[5] = document.getElementById('fs_5');
+		items[6] = document.getElementById('fs_6');
+		items[7] = document.getElementById('fs_7');
+		items[8] = document.getElementById('fs_8');
+		items[9] = document.getElementById('fs_9');
+		items[10] = document.getElementById('fs_10');
+		items[11] = document.getElementById('fs_11');
+		items[12] = document.getElementById('fs_12');
+		items[13] = document.getElementById('fs_13');
+		items[14] = document.getElementById('fs_14');
+		items[15] = document.getElementById('fs_15');
+		items[16] = document.getElementById('fs_16');
+		items[17] = document.getElementById('fs_17');
+		items[18] = document.getElementById('fs_18');
+		items[19] = document.getElementById('fs_19');
+		items[20] = document.getElementById('fs_20');
+		items[21] = document.getElementById('fs_21');
+	}
+	else if (id == '13') {
+		items[0] = document.getElementById('fs_19');
+	}
+	else if (id == '10') {
+		items[0] = document.getElementById('fs_14');
+	}
+	else if (id == '5') {
+		items[0] = document.getElementById('fs_6');
+	}
+
+
+	return items;
+}
+
+function highlightFeature(id) {
+	var i;
+
+	for (i = 0; i < 22; ++i)
+	{
+		var item = document.getElementById('fs_' + i);
+		if (item && item.className == 'highlighted')
+			item.className = '';
+	}
+
+	for (i = 0; i < 14; ++i)
+	{
+		var item = document.getElementById('feature_' + i);
+		if (item && item.className == 'highlighted')
+			item.className = '';
+	}
+
+	var item = document.getElementById('feature_' + id);
+	if (item)
+		item.className = 'highlighted';
+
+	var items = getSeqSegmentsForID(id);
+
+	for (i in items)
+	{
+		if (items[i])
+			items[i].className = 'highlighted';
+	}
+}
+
+function enterFeature(id)
+{
+	var item = document.getElementById('feature_' + id);
+	
+	if (item && item.className != 'highlighted')
+		item.className = 'clickable';
+	
+	var items = getSeqSegmentsForID(id);
+
+	for (i in items)
+	{
+		if (items[i] && items[i].className != 'highlighted')
+			items[i].className = 'hover-feature';
+	}
+	
+	return true;
+}
+
+function leaveFeature(id)
+{
+	var item = document.getElementById('feature_' + id);
+	
+	if (item && item.className != 'highlighted')
+		item.className = '';
+
+	var items = getSeqSegmentsForID(id);
+
+	for (i in items)
+	{
+		if (items[i] && items[i].className != 'highlighted')
+			items[i].className = '';
+	}
+	
+	return true;
+}
+
+</script>
+ <table cellpadding="0" cellspacing="0" width="100%"><tr><th colspan="2">Entry information</th></tr> <tr><td width="20%">Entry name</td> <td><strong>VE6_HPV16</strong></td></tr> <tr><td>Primary accession</td> <td><strong>P03126</strong></td></tr> <tr><td>Secondary accessions</td> <td>Q71BI7</td></tr> <tr><td>integrated into UniProtKB/Swiss-Prot</td> <td>21 July 1986</td></tr> <tr><td>sequence version 1</td> <td>21 July 1986</td></tr> <tr><td>entry version 76</td> <td>23 March 2010</td></tr> <tr><th colspan="2">Name and origin of the protein</th></tr> <tr><td rowspan="1">Protein name</td> <td>Protein E6</td></tr> <tr><td rowspan="1">Gene names</td> <td class="sub_entry"><table cellpadding="0" cellspacing="0" width="100%"><tr><td class="label" width="20%">Name</td> <td>E6</td></tr></table></td></tr> <tr><td rowspan="1">From</td> <td>Human papillomavirus type 16 (Taxon ID: <a href="entry.do?db=taxonomy&amp;id=333760">333760</a>)</td></tr> <tr><td>Taxonomy</td> <td><a href="query.do?db=taxonomy&amp;query=Viruses">Viruses</a>; <a href="query.do?db=taxonomy&amp;query=dsDNA viruses, no RNA stage">dsDNA viruses, no RNA stage</a>; <a href="query.do?db=taxonomy&amp;query=Papillomaviridae">Papillomaviridae</a>; <a href="query.do?db=taxonomy&amp;query=Alphapapillomavirus">Alphapapillomavirus</a></td></tr> <tr><td>Keywords</td> <td><a href="query.do?db=uniprot&amp;query=kw:3D-structure ">3D-structure</a>; <a href="query.do?db=uniprot&amp;query=kw:Activator ">Activator</a>; <a href="query.do?db=uniprot&amp;query=kw:DNA-binding ">DNA-binding</a>; <a href="query.do?db=uniprot&amp;query=kw:Early kw:protein ">Early protein</a>; <a href="query.do?db=uniprot&amp;query=kw:Host kw:nucleus ">Host nucleus</a>; <a href="query.do?db=uniprot&amp;query=kw:Host-virus kw:interaction ">Host-virus interaction</a>; <a href="query.do?db=uniprot&amp;query=kw:Metal-binding ">Metal-binding</a>; <a href="query.do?db=uniprot&amp;query=kw:Oncogene ">Oncogene</a>; <a href="query.do?db=uniprot&amp;query=kw:Transcription ">Transcription</a>; <a href="query.do?db=uniprot&amp;query=kw:Transcription kw:regulation ">Transcription regulation</a>; <a href="query.do?db=uniprot&amp;query=kw:Zinc ">Zinc</a>; <a href="query.do?db=uniprot&amp;query=kw:Zinc-finger ">Zinc-finger</a></td></tr> <tr><th colspan="2">References</th></tr> <tr><td>1</td> <td class="sub_entry">Seedorf K., Krammer G., Durst M., Suhai S., Rowekamp W.G.;  <strong>"Human papillomavirus type 16 DNA sequence." </strong> Virology 145:181-185(1985)  <br /> <table cellpadding="0" cellspacing="0" width="100%"><tr><td class="label" width="20%">MEDLINE</td> <td><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;list_uids=85246220&amp;dopt=Abstract">85246220</a></td></tr> <tr><td class="label" width="20%">PubMed</td> <td><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&amp;cmd=search&amp;term=2990099">2990099</a></td></tr> <tr><td class="label" width="20%">DOI</td> <td><a href="http://dx.doi.org/10.1016/0042-6822(85)90214-4">10.1016/0042-6822(85)90214-4</a></td></tr> <tr><td class="label" width="20%">Reference Position</td> <td>nucleotide sequence [genomic dna]. </td></tr></table></td></tr> <tr><td>2</td> <td class="sub_entry">Terai M., Fu L., Ma Z., Burk R.D.;  <strong>"Cloning and sequencing of non-European human papillomavirus (HPV) variant complete genomes from cervicovaginal cells by an overlapping PCR method." </strong> Submitted (AUG-2002) to the EMBL/GenBank/DDBJ databases  <br /> <table cellpadding="0" cellspacing="0" width="100%"><tr><td class="label" width="20%">Reference Position</td> <td>nucleotide sequence [genomic dna]. </td></tr> <tr><td class="label" width="20%">Reference Comment</td> <td>strain=isolate european german 131</td></tr></table></td></tr> <tr><td>3</td> <td class="sub_entry">Schneider-Maunoury S., Pehau-Arnaudet G., Breitburd F., Orth G.;  <strong>"Expression of the human papillomavirus type 16 genome in SK-v cells, a line derived from a vulvar intraepithelial neoplasia." </strong> J. Gen. Virol. 71:809-817(1990)  <br /> <table cellpadding="0" cellspacing="0" width="100%"><tr><td class="label" width="20%">MEDLINE</td> <td><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;list_uids=90218027&amp;dopt=Abstract">90218027</a></td></tr> <tr><td class="label" width="20%">PubMed</td> <td><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&amp;cmd=search&amp;term=2157796">2157796</a></td></tr> <tr><td class="label" width="20%">Reference Position</td> <td>nucleotide sequence [genomic dna] of 31-50. </td></tr></table></td></tr> <tr><td>4</td> <td class="sub_entry">Du M., Fan X., Hong E., Chen J.J.;  <strong>"Interaction of oncogenic papillomavirus E6 proteins with fibulin-1." </strong> Biochem. Biophys. Res. Commun. 296:962-969(2002)  <br /> <table cellpadding="0" cellspacing="0" width="100%"><tr><td class="label" width="20%">MEDLINE</td> <td><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;list_uids=22188366&amp;dopt=Abstract">22188366</a></td></tr> <tr><td class="label" width="20%">PubMed</td> <td><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&amp;cmd=search&amp;term=12200142">12200142</a></td></tr> <tr><td class="label" width="20%">DOI</td> <td><a href="http://dx.doi.org/10.1016/S0006-291X(02)02041-7">10.1016/S0006-291X(02)02041-7</a></td></tr> <tr><td class="label" width="20%">Reference Position</td> <td>interaction with human fbln1, and inhibition of e6-mediated transformation. </td></tr></table></td></tr> <tr><td>5</td> <td class="sub_entry">Gewin L., Myers H., Kiyono T., Galloway D.A.;  <strong>"Identification of a novel telomerase repressor that interacts with the human papillomavirus type-16 E6/E6-AP complex." </strong> Genes Dev. 18:2269-2282(2004)  <br /> <table cellpadding="0" cellspacing="0" width="100%"><tr><td class="label" width="20%">PubMed</td> <td><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&amp;cmd=search&amp;term=15371341">15371341</a></td></tr> <tr><td class="label" width="20%">DOI</td> <td><a href="http://dx.doi.org/10.1101/gad.1214704">10.1101/gad.1214704</a></td></tr> <tr><td class="label" width="20%">Reference Position</td> <td>interaction with human nfx1. </td></tr></table></td></tr> <tr><td>6</td> <td class="sub_entry">Thomas M., Laura R., Hepner K., Guccione E., Sawyers C., Lasky L., Banks L.;  <strong>"Oncogenic human papillomavirus E6 proteins target the MAGI-2 and MAGI-3 proteins for degradation." </strong> Oncogene 21:5088-5096(2002)  <br /> <table cellpadding="0" cellspacing="0" width="100%"><tr><td class="label" width="20%">PubMed</td> <td><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&amp;cmd=search&amp;term=12140759">12140759</a></td></tr> <tr><td class="label" width="20%">DOI</td> <td><a href="http://dx.doi.org/10.1038/sj.onc.1205668">10.1038/sj.onc.1205668</a></td></tr> <tr><td class="label" width="20%">Reference Position</td> <td>interaction with human magi3. </td></tr></table></td></tr> <tr><td>7</td> <td class="sub_entry">Lee C., Laimins L.A.;  <strong>"Role of the PDZ domain-binding motif of the oncoprotein E6 in the pathogenesis of human papillomavirus type 31." </strong> J. Virol. 78:12366-12377(2004)  <br /> <table cellpadding="0" cellspacing="0" width="100%"><tr><td class="label" width="20%">PubMed</td> <td><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&amp;cmd=search&amp;term=15507623">15507623</a></td></tr> <tr><td class="label" width="20%">DOI</td> <td><a href="http://dx.doi.org/10.1128/JVI.78.22.12366-12377.2004">10.1128/JVI.78.22.12366-12377.2004</a></td></tr> <tr><td class="label" width="20%">Reference Position</td> <td>interaction with human magi3. </td></tr></table></td></tr> <tr><td>8</td> <td class="sub_entry">Massimi P., Gammoh N., Thomas M., Banks L.;  <strong>"HPV E6 specifically targets different cellular pools of its PDZ domain-containing tumour suppressor substrates for proteasome-mediated degradation." </strong> Oncogene 23:8033-8039(2004)  <br /> <table cellpadding="0" cellspacing="0" width="100%"><tr><td class="label" width="20%">PubMed</td> <td><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&amp;cmd=search&amp;term=15378012">15378012</a></td></tr> <tr><td class="label" width="20%">DOI</td> <td><a href="http://dx.doi.org/10.1038/sj.onc.1207977">10.1038/sj.onc.1207977</a></td></tr> <tr><td class="label" width="20%">Reference Position</td> <td>interaction with human magi3. </td></tr></table></td></tr> <tr><th colspan="2">Comments</th></tr> <tr><td>function</td> <td class="sub_entry">Transcriptional transactivator. Binds double stranded DNA. Has transforming activity. Inactivates, with E6-AP ubiquitin-
+ protein ligase, the human TP53/p53 tumor suppressor protein by
+ targeting it to degradation. Binds and targets human MUPP1/MPDZ
+ protein to degradation. Those two functions presumably contribute
+ to transforming activity (By similarity). Interaction with human
+ FBLN1 protein also seems to be linked to cell transformation.
+</td></tr> <tr><td>subunit</td> <td class="sub_entry">Forms a complex with E6-AP ubiquitin-protein ligase which interacts with human P53. Binds to human FBLN1 and MPDZ (By
+ similarity). Interacts with human NFX1 and MAGI3.
+</td></tr> <tr><td>interaction</td> <td class="sub_entry"> O15350-1:TP73 (xeno); NbExp=1; IntAct=EBI-1177242, EBI-389619;
+ O15350-2:TP73 (xeno); NbExp=1; IntAct=EBI-1177242, EBI-389623;
+</td></tr> <tr><td>subcellular location</td> <td class="sub_entry">Host nucleus matrix.</td></tr> <tr><td>miscellaneous</td> <td class="sub_entry">HPV16, in comparison to HPV types 6 and 11, is more often associated with malignant genital cancers in humans.
+</td></tr> <tr><td>similarity</td> <td class="sub_entry">Belongs to the papillomaviridae E6 protein family.</td></tr> <tr><th colspan="2">Copyright</th></tr> <tr><td colspan="2"><small>Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms Distributed under the Creative Commons Attribution-NoDerivs License </small></td></tr> <tr><th colspan="2">Cross-references</th></tr> <tr><td rowspan="3">EMBL</td> <td><a href="query.do?db=embl&amp;query=ac:K02718">K02718</a>; AAA46939.1; -; Genomic_DNA.</td></tr> <tr><td><a href="query.do?db=embl&amp;query=ac:AF536179">AF536179</a>; AAQ10712.1; -; Genomic_DNA.</td></tr> <tr><td><a href="query.do?db=embl&amp;query=ac:D00735">D00735</a>; BAA00632.1; -; Genomic_DNA.</td></tr> <tr><td rowspan="1">PIR</td> <td>A03682; W6WLHS.</td></tr> <tr><td rowspan="1">RefSeq</td> <td>NP_041325.1; -.</td></tr> <tr><td rowspan="2">PDB</td> <td><a href="entry.do?db=pdb&amp;id=1VZN">1VZN</a>; Model; -; A=1-158.</td></tr> <tr><td><a href="entry.do?db=pdb&amp;id=2FK4">2FK4</a>; NMR; -; A=88-158.</td></tr> <tr><td rowspan="2">PDBsum</td> <td>1VZN; -.</td></tr> <tr><td>2FK4; -.</td></tr> <tr><td rowspan="1">IntAct</td> <td>P03126; 5.</td></tr> <tr><td rowspan="1">MINT</td> <td>MINT-96563; -.</td></tr> <tr><td rowspan="1">GeneID</td> <td>1489078; -.</td></tr> <tr><td rowspan="7">GO</td> <td><a href="entry.do?db=go&amp;id=0044204"></a>; C:host cell nuclear matrix; IEA:UniProtKB-SubCell.</td></tr> <tr><td><a href="entry.do?db=go&amp;id=0003677"></a>; F:DNA binding; IEA:UniProtKB-KW.</td></tr> <tr><td><a href="entry.do?db=go&amp;id=0005515"></a>; F:protein binding; IPI:IntAct.</td></tr> <tr><td><a href="entry.do?db=go&amp;id=0008270"></a>; F:zinc ion binding; IEA:UniProtKB-KW.</td></tr> <tr><td><a href="entry.do?db=go&amp;id=0006350"></a>; P:cellular transcription; IEA:UniProtKB-KW.</td></tr> <tr><td><a href="entry.do?db=go&amp;id=0044419"></a>; P:interspecies interaction between organisms; IEA:UniProtKB-KW.</td></tr> <tr><td><a href="entry.do?db=go&amp;id=0045449"></a>; P:regulation of cellular transcription; IEA:UniProtKB-KW.</td></tr> <tr><td rowspan="1">InterPro</td> <td><a href="entry.do?db=interpro&amp;id=IPR001334">IPR001334</a>; E6.</td></tr> <tr><td rowspan="1">Pfam</td> <td><a href="query.do?db=pfama&amp;query=ac:PF00518">PF00518</a>; E6; 1.</td></tr> <tr><th colspan="2">Features</th></tr> <tr><td class="sub_entry" colspan="2"><div class="feature_table"><table cellpadding="0" cellspacing="0" width="100%"><tr><th width="10%">Key</th> <th style="text-align:right" width="5%">From</th> <th style="text-align:right" width="5%">To</th> <th style="text-align:right" width="5%">Length</th> <th width="75%">Description</th></tr> <tr onmouseout="leaveFeature('0');" onclick="highlightFeature('0')" onmouseover="enterFeature('0');" id="feature_0"><td>chain</td> <td style="text-align:right">1</td> <td style="text-align:right">158</td> <td style="text-align:right">158</td> <td>       Protein E6.<br /> /FTId=PRO_0000133336.</td></tr> <tr onmouseout="leaveFeature('1');" onclick="highlightFeature('1')" onmouseover="enterFeature('1');" id="feature_1"><td>zn_fing</td> <td style="text-align:right">37</td> <td style="text-align:right">73</td> <td style="text-align:right">37</td> <td>       Potential.</td></tr> <tr onmouseout="leaveFeature('2');" onclick="highlightFeature('2')" onmouseover="enterFeature('2');" id="feature_2"><td>zn_fing</td> <td style="text-align:right">110</td> <td style="text-align:right">146</td> <td style="text-align:right">37</td> <td>       Potential.</td></tr> <tr onmouseout="leaveFeature('3');" onclick="highlightFeature('3')" onmouseover="enterFeature('3');" id="feature_3"><td>motif</td> <td style="text-align:right">155</td> <td style="text-align:right">158</td> <td style="text-align:right">4</td> <td>       PDZ-binding (By similarity).</td></tr> <tr onmouseout="leaveFeature('4');" onclick="highlightFeature('4')" onmouseover="enterFeature('4');" id="feature_4"><td>conflict</td> <td style="text-align:right">17</td> <td style="text-align:right">17</td> <td style="text-align:right">1</td> <td>       R -> G (in Ref. 2; AAQ10712).</td></tr> <tr onmouseout="leaveFeature('5');" onclick="highlightFeature('5')" onmouseover="enterFeature('5');" id="feature_5"><td>conflict</td> <td style="text-align:right">90</td> <td style="text-align:right">90</td> <td style="text-align:right">1</td> <td>       L -> V (in Ref. 2; AAQ10712).</td></tr> <tr onmouseout="leaveFeature('6');" onclick="highlightFeature('6')" onmouseover="enterFeature('6');" id="feature_6"><td>strand</td> <td style="text-align:right">87</td> <td style="text-align:right">90</td> <td style="text-align:right">4</td> <td></td></tr> <tr onmouseout="leaveFeature('7');" onclick="highlightFeature('7')" onmouseover="enterFeature('7');" id="feature_7"><td>helix</td> <td style="text-align:right">93</td> <td style="text-align:right">100</td> <td style="text-align:right">8</td> <td></td></tr> <tr onmouseout="leaveFeature('8');" onclick="highlightFeature('8')" onmouseover="enterFeature('8');" id="feature_8"><td>turn</td> <td style="text-align:right">101</td> <td style="text-align:right">105</td> <td style="text-align:right">5</td> <td></td></tr> <tr onmouseout="leaveFeature('9');" onclick="highlightFeature('9')" onmouseover="enterFeature('9');" id="feature_9"><td>strand</td> <td style="text-align:right">111</td> <td style="text-align:right">113</td> <td style="text-align:right">3</td> <td></td></tr> <tr onmouseout="leaveFeature('10');" onclick="highlightFeature('10')" onmouseover="enterFeature('10');" id="feature_10"><td>helix</td> <td style="text-align:right">119</td> <td style="text-align:right">128</td> <td style="text-align:right">10</td> <td></td></tr> <tr onmouseout="leaveFeature('11');" onclick="highlightFeature('11')" onmouseover="enterFeature('11');" id="feature_11"><td>strand</td> <td style="text-align:right">132</td> <td style="text-align:right">135</td> <td style="text-align:right">4</td> <td></td></tr> <tr onmouseout="leaveFeature('12');" onclick="highlightFeature('12')" onmouseover="enterFeature('12');" id="feature_12"><td>strand</td> <td style="text-align:right">138</td> <td style="text-align:right">141</td> <td style="text-align:right">4</td> <td></td></tr> <tr onmouseout="leaveFeature('13');" onclick="highlightFeature('13')" onmouseover="enterFeature('13');" id="feature_13"><td>helix</td> <td style="text-align:right">142</td> <td style="text-align:right">146</td> <td style="text-align:right">5</td> <td></td></tr></table></div></td></tr> <tr><th colspan="2">Sequence information</th></tr> <tr><td colspan="2">Length: <strong>158 aa</strong>, molecular weight <strong>19187 Da</strong>, CRC64 checksum <strong>01FEF5ADCFDB37EB </strong></td></tr> <tr><td class="sequence" colspan="2"><pre><span id="fs_0">MHQKRTAMFQ DPQERP</span><span id="fs_1">R</span><span id="fs_2">KLP QLCTELQTTI HDIILE</span><span id="fs_3">CVYC KQQLLRREVY DFAFRDLCIV
+YRDGNPYAVC DKC</span><span id="fs_4">LKFYSKI SEYRHY</span><span id="fs_5">CYS</span><span id="fs_6">L </span><span id="fs_7">YG</span><span id="fs_8">TTLEQQYN </span><span id="fs_9">KPLCD</span><span id="fs_10">LLIR</span><span id="fs_11">C </span><span id="fs_12">INC</span><span id="fs_13">QKPLC</span><span id="fs_14">PE
+EKQRHLDK</span><span id="fs_15">KQ R</span><span id="fs_16">FHNI</span><span id="fs_17">RG</span><span id="fs_18">RWT G</span><span id="fs_19">RCMSC</span><span id="fs_20">CRSS RTRR</span><span id="fs_21">ETQL</span></pre></td></tr></table></div>

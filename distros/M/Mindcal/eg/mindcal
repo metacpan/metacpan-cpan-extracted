@@ -1,0 +1,79 @@
+#!/usr/bin/perl
+###########################################
+# mindcal 
+# 2007, Mike Schilli <cpan@perlmeister.com>
+###########################################
+use strict;
+use warnings;
+
+use Mindcal;
+use DateTime;
+use Getopt::Std;
+
+getopts("y", \my %opts);
+
+while(1) {
+    my $year = 1900 + int rand 200;
+    my $month = int rand(12) + 1;
+    my $day   = int rand(31) + 1;
+
+    my $dt;
+  
+    eval {
+        $dt = DateTime->new(
+          day => $day, month => $month, year => $year
+        );
+    };
+
+    next if $@;
+
+    my $mc = Mindcal->new(date => $dt);
+
+    if($opts{y}) {
+        my $year2 = ($year % 100);
+        print "$year2?\n";
+    } else {
+        print "$month/$day/$year?\n";
+    }
+    <>;
+
+    if($opts{y}) {
+        print $mc->year_item(), "\n";
+    } else {
+        print $mc->year_item(), "-",
+              $mc->month_item(), "-",
+              $mc->day_item(), "-",
+              $mc->adjust(), ": ",
+              $mc->weekday(), "\n";
+    }
+    print "\n\n";
+}
+
+__END__
+
+=head1 NAME
+
+mindcal - Train calculating the day of the week of any given date
+
+=head1 SYNOPSIS
+
+    mindcal [-y]
+
+=head1 DESCRIPTION
+
+mindcal prints random dates in the 20th and 21st century and prints
+the corresponding year, month, day, and adjustment items to help you
+train to calculate the weekday of any given date.
+
+If the C<-y> option is given, only the year item gets calculated and
+displayed.
+
+=head1 LEGALESE
+
+Copyright 2007 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2007, Mike Schilli <cpan@perlmeister.com>

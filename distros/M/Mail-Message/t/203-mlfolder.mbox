@@ -1,0 +1,1054 @@
+From root@home.etla.org Sat Jan 20 13:37:58 2001
+Envelope-to: usenet@home.etla.org
+Received: from root by pool.home.etla.org with local (Exim 3.12 #1 (Debian))
+	id 14JyDO-00006n-00
+	for <usenet@home.etla.org>; Sat, 20 Jan 2001 13:37:58 +0000
+To: usenet@home.etla.org
+Subject: innwatch warning: messages in /var/log/news/news.crit
+Message-Id: <E14JyDO-00006n-00@pool.home.etla.org>
+From: root <root@home.etla.org>
+Date: Sat, 20 Jan 2001 13:37:58 +0000
+Status: RO
+Content-Length: 1824
+Lines: 34
+
+-rw-r--r--    1 root     news         1550 Jan 19 21:51 /var/log/news/news.crit
+-----
+Server running
+Allowing remote connections
+Parameters c 14 i 50 (0) l 1000000 o 1011 t 300 H 2 T 60 X 0 normal specified
+Not reserved
+Readers separate enabled
+Perl filtering enabled
+-----
+Nov  7 23:37:27 pool innd: SERVER shutdown received signal 15
+Nov  7 23:40:13 pool innd: SERVER shutdown received signal 15
+Nov  8 00:02:11 pool innd: SERVER shutdown received signal 15
+Nov  8 01:07:00 pool innd: SERVER shutdown received signal 15
+Nov  9 23:37:20 pool innd: SERVER shutdown received signal 15
+Nov 10 23:37:26 pool innd: SERVER shutdown received signal 15
+Nov 12 01:35:44 pool innd: SERVER shutdown received signal 15
+Nov 12 19:24:33 pool innd: SERVER shutdown received signal 15
+Nov 12 23:33:52 pool innd: SERVER shutdown received signal 15
+Nov 13 23:05:11 pool innd: SERVER shutdown received signal 15
+Nov 14 22:09:04 pool innd: SERVER shutdown received signal 15
+Nov 15 22:52:53 pool innd: SERVER shutdown received signal 15
+Nov 18 14:31:53 pool innd: SERVER shutdown received signal 15
+Nov 23 07:44:13 pool innd: SERVER shutdown received signal 15
+Nov 24 08:11:38 pool innd: SERVER shutdown received signal 15
+Nov 29 23:42:48 pool innd: SERVER shutdown received signal 15
+Dec 17 18:07:43 pool innd: SERVER shutdown received signal 15
+Dec 17 22:47:32 pool innd: SERVER shutdown received signal 15
+Dec 23 15:50:30 pool innd: SERVER shutdown received signal 15
+Jan 14 12:41:56 pool innd: SERVER shutdown received signal 15
+Jan 14 12:45:33 pool innd: SERVER shutdown received signal 15
+Jan 15 01:09:26 pool innd: SERVER shutdown received signal 15
+Jan 17 23:42:55 pool innd: SERVER shutdown received signal 15
+Jan 18 22:35:34 pool innd: SERVER shutdown received signal 15
+Jan 19 21:51:19 pool innd: SERVER shutdown received signal 15
+
+From templates-admin@template-toolkit.org Tue Nov 28 21:17:30 2000
+Envelope-to: mstevens@firedrake.org
+Received: from trinity.fluff.org [194.153.168.225] (mail)
+	by dayspring.firedrake.org with esmtp (Exim 3.12 #1 (Debian))
+	id 140s82-0007x1-00; Tue, 28 Nov 2000 21:17:30 +0000
+Received: from www.ourshack.com (dog.ourshack.com) [212.74.28.146] 
+	by trinity.fluff.org helo dog.ourshack.com with esmtp (Exim 3.12)
+	id 140s81-0003hh-00 for michael@etla.org
+	; Tue, 28 Nov 2000 21:17:29 +0000
+Received: from localhost.ourshack.com ([127.0.0.1] helo=dog.ourshack.com)
+	by dog.ourshack.com with esmtp (Exim 3.16 #1)
+	id 140t7Y-000KE6-00; Tue, 28 Nov 2000 22:21:04 +0000
+Received: from dayspring.firedrake.org ([195.82.105.251] ident=mail)
+	by dog.ourshack.com with esmtp (Exim 3.16 #1)
+	id 140t6i-000KDq-00
+	for templates@template-toolkit.org; Tue, 28 Nov 2000 22:20:12 +0000
+Received: from mstevens by dayspring.firedrake.org with local (Exim 3.12 #1 (Debian))
+	id 140s6M-0007sK-00; Tue, 28 Nov 2000 21:15:46 +0000
+From: Michael Stevens <michael@etla.org>
+To: templates@template-toolkit.org
+Message-ID: <20001128211546.A29664@firedrake.org>
+Mail-Followup-To: templates@template-toolkit.org
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.2.5i
+Subject: [Templates] ttree problems - the sequel
+Sender: templates-admin@template-toolkit.org
+Errors-To: templates-admin@template-toolkit.org
+X-BeenThere: templates@template-toolkit.org
+X-Mailman-Version: 2.0rc1
+Precedence: bulk
+List-Help: <mailto:templates-request@template-toolkit.org?subject=help>
+List-Post: <mailto:templates@template-toolkit.org>
+List-Subscribe: <http://www.template-toolkit.org/mailman/listinfo/templates>,
+	<mailto:templates-request@template-toolkit.org?subject=subscribe>
+List-Id: Template Toolkit mailing list <templates.template-toolkit.org>
+List-Unsubscribe: <http://www.template-toolkit.org/mailman/listinfo/templates>,
+	<mailto:templates-request@template-toolkit.org?subject=unsubscribe>
+List-Archive: <http://www.template-toolkit.org/pipermail/templates/>
+Date: Tue, 28 Nov 2000 21:15:46 +0000
+Status: RO
+
+Hi.
+  I finally had time to debug my problems with pre_process and ttree
+in more detail.
+
+It turned out that ttree thinks PRE_PROCESS and POST_PROCESS are
+multiple value fields, so it returns the values supplied for them as arrays,
+eg
+
+  pre_process = foo:bar
+
+is sent to Template as PRE_PROCESS => [ 'foo:bar' ]. The delimiter splitting
+routines in Template::Service only split up if values are scalars rather
+than array references, so it wasn't getting split, and therefore it tried
+to pre_process the file 'foo:bar'.
+
+ttree learnt that those two fields were arrays sometime between beta5 and
+rc2, I'm not sure why.
+
+One fix, as far as I can tell, is to apply this patch:
+
+--cut here for patch--
+diff -urN Template-Toolkit-2.00-rc2.orig/bin/ttree Template-Toolkit-2.00-rc2/bin/ttree
+--- Template-Toolkit-2.00-rc2.orig/bin/ttree	Tue Nov 28 20:56:28 2000
++++ Template-Toolkit-2.00-rc2/bin/ttree	Tue Nov 28 20:57:18 2000
+@@ -324,8 +324,8 @@
+ 	'template_pre_chomp|pre_chomp|prechomp',
+ 	'template_post_chomp|post_chomp|postchomp',
+ 	'template_trim|trim',
+-        'template_pre_process|pre_process|preprocess=s@',
+-        'template_post_process|post_process|postprocess=s@',
++        'template_pre_process|pre_process|preprocess=s',
++        'template_post_process|post_process|postprocess=s',
+         'template_process|process=s',
+         'template_default|default=s',
+         'template_error|error=s',
+--cut here for patch--
+
+Which reverts this change. However, if this was originally done for a good
+reason, it's not the end of the story. The modified version passes all tests
+still, but I can't see that they actually exercise ttree.
+
+Michael
+
+_______________________________________________
+templates mailing list
+templates@template-toolkit.org
+http://www.template-toolkit.org/mailman/listinfo/templates
+
+From nick@ccl4.org Sat Jan 20 22:25:52 2001
+Envelope-to: mstevens@firedrake.org
+Received: from paladin.globnix.org [195.11.247.40] 
+	by dayspring.firedrake.org with esmtp (Exim 3.12 #1 (Debian))
+	id 14K6SG-0006b2-00; Sat, 20 Jan 2001 22:25:52 +0000
+Received: from tmtowtdi.perl.org ([209.85.3.25] ident=qmailr)
+	from qmailr by paladin.globnix.org with smtp id 14K6SF-0008JY-00
+	for mstevens@globnix.org; Sat, 20 Jan 2001 22:25:52 +0000
+Received: (qmail 6144 invoked by uid 508); 20 Jan 2001 22:25:48 -0000
+Mailing-List: contact perl5-porters-help@perl.org; run by ezmlm
+Precedence: bulk
+list-help: <mailto:perl5-porters-help@perl.org>
+list-unsubscribe: <mailto:perl5-porters-unsubscribe@perl.org>
+list-post: <mailto:perl5-porters@perl.org>
+Delivered-To: mailing list perl5-porters@perl.org
+Received: (qmail 6135 invoked from network); 20 Jan 2001 22:25:47 -0000
+Received: from plum.flirble.org (exim@195.40.6.20)
+  by tmtowtdi.perl.org with SMTP; 20 Jan 2001 22:25:47 -0000
+Received: from nick by plum.flirble.org with local (Exim 3.20 #3)
+	id 14K6SA-0003BQ-00
+	for perl5-porters@perl.org; Sat, 20 Jan 2001 22:25:46 +0000
+Date: Sat, 20 Jan 2001 22:22:51 +0000
+From: Nicholas Clark <nick@ccl4.org>
+To: perlbug@perl.org
+Subject: qu() exposes utf8 hash key problem
+Message-ID: <20010120222250.A10531@plum.flirble.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+User-Agent: Mutt/1.2.5i
+X-Organisation: Tetrachloromethane
+Resent-From: nick@plum.flirble.org
+Resent-Date: Sat, 20 Jan 2001 22:25:46 +0000
+Resent-To: perl5-porters@perl.org
+Resent-Message-Id: <E14K6SA-0003BQ-00@plum.flirble.org>
+Status: RO
+
+This is a bug report for perl from nick@talking.bollo.cx,
+generated with the help of perlbug 1.33 running under perl v5.7.0.
+
+
+-----------------------------------------------------------------
+[Please enter your report here]
+
+using the utf8 representation of codepoints 128-255 as a hash key seems to
+produce some undesirable effects.
+[I'm using a '£' (pound sterling) as my test character - if this gets stripped
+to 7 bit you will see hash '#'. The next hash after this sentence is in
+the OS version "2.2.17-rmk1 #9"]
+
+I assume that these occur with substr and utf8 scalars, but they are very
+easy to make with the new qu operator
+
+the strings are equal, which (I believe) is correct:
+
+perl -le '$uni = qu(£); $eight = "£"; print $uni eq $eight'
+1
+
+however, interesting things start happening with hash keys:
+
+perl  -MDevel::Peek -le '$a{qu(£)} = "foo"; $a{"£"} = "bar" ; foreach (keys %a) {Dump($_)}'
+SV = PVIV(0x20d8690) at 0x20d7e94
+  REFCNT = 2
+  FLAGS = (POK,FAKE,READONLY,pPOK)
+  IV = 168
+  PV = 0x20e40a0 "\243"
+  CUR = 1
+  LEN = 0
+SV = PVIV(0x20d86e0) at 0x20e25d0
+  REFCNT = 2
+  FLAGS = (POK,FAKE,READONLY,pPOK,UTF8)
+  IV = 6770
+  PV = 0x20e3eb8 "\302\243"
+  CUR = 2
+  LEN = 0
+
+I shouldn't get 2 hash entries should I?
+[for the FAKE,READONLY SV the hash value is cached in the IV, so you can see
+that the two representations have hashed to different numbers]
+
+perl -wle '$a{qu(£)} = "foo"; $a{qw(£)} = "bar" ; foreach (keys %a) {print $_};'
+£
+£
+Attempt to free non-existent shared string '£'.
+
+perl -wle '$uni = qu(£); $eight = "£"; $a{$uni} = "foo"; $a{$eight} = "bar"; foreach (keys %a) {print $a{$_}}' 
+bar
+foo
+
+perl -wle '$uni = qu(£); $eight = "£"; $a{$uni} = "foo"; $a{$eight} = "bar"; foreach (keys %a) {print $_; print $a{$_}}'
+£
+bar
+£
+Use of uninitialized value in print at -e line 1.
+
+Attempt to free non-existent shared string '£'.
+
+the warnings are explained by:
+
+perl -MDevel::Peek -wle '$uni = qu(£); $eight = "£"; $a{$uni} = "foo"; $a{$eight} = "bar"; foreach (keys %a) {print $_; Dump($_)}'
+£
+SV = PVIV(0x20d8690) at 0x20d7e94
+  REFCNT = 2
+  FLAGS = (POK,FAKE,READONLY,pPOK)
+  IV = 168
+  PV = 0x20e07e0 "\243"
+  CUR = 1
+  LEN = 0
+£
+SV = PVIV(0x20d86c0) at 0x20e25f8
+  REFCNT = 2
+  FLAGS = (POK,FAKE,READONLY,pPOK)
+  IV = 6770
+  PV = 0x20dbd88 "\243"
+  CUR = 1
+  LEN = 0
+Attempt to free non-existent shared string '£'.
+
+
+*something* is feeling quite happy to mess with a readonly scalar
+
+for information
+
+1: it seems no errors are currently being generated if shared strings remain
+   at global destruction time.
+2: SvREADONLY_off() is a scary thing. Perl_ck_require uses it indiscriminately
+   without force_normal to append ".pm" (would a patch be wanted for that?
+   It doesn't affect anything *yet*). I'm guessing something else is doing
+   something equally horrible on output.
+
+I guess we need a canonical representation for hash keys which at least
+one codepoint in the range 128-255 but none >255. Possibly downgraded to
+8 bit. Or possibly upgraded to utf8.
+
+
+Sorry, I have not patches for the above things.
+
+Nicholas Clark
+
+[Please do not change anything below this line]
+-----------------------------------------------------------------
+---
+Flags:
+    category=core
+    severity=medium
+---
+Site configuration information for perl v5.7.0:
+
+Configured by nick at Thu Jan 18 19:24:14 GMT 2001.
+
+Summary of my perl5 (revision 5.0 version 7 subversion 0) configuration:
+  Platform:
+    osname=linux, osvers=2.2.17-rmk1, archname=armv4l-linux
+    uname='linux bagpuss.unfortu.net 2.2.17-rmk1 #9 fri dec 8 23:52:12 gmt 2000 armv4l unknown '
+    config_args='-Dusedevel -Ubincompat5005 -Uinstallusrbinperl -Dcf_email=nick@talking.bollo.cx -Dperladmin=nick@talking.bollo.cx -Dinc_version_list=  -Dinc_version_list_init=0 -Duseperlio -des'
+    hint=recommended, useposix=true, d_sigaction=define
+    usethreads=undef use5005threads=undef useithreads=undef usemultiplicity=undef
+    useperlio=define d_sfio=undef uselargefiles=define usesocks=undef
+    use64bitint=undef use64bitall=undef uselongdouble=undef
+  Compiler:
+    cc='cc', ccflags ='-fno-strict-aliasing -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64',
+    optimize='-O2',
+    cppflags='-fno-strict-aliasing -I/usr/local/include'
+    ccversion='', gccversion='2.95.2 20000220 (Debian GNU/Linux)', gccosandvers=''
+    intsize=4, longsize=4, ptrsize=4, doublesize=8, byteorder=1234
+    d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=8
+    ivtype='long', ivsize=4, nvtype='double', nvsize=8, Off_t='off_t', lseeksize=8
+    alignbytes=4, usemymalloc=n, prototype=define
+  Linker and Libraries:
+    ld='cc', ldflags =' -L/usr/local/lib'
+    libpth=/usr/local/lib /lib /usr/lib
+    libs=-lnsl -lndbm -ldb -ldl -lm -lc -lposix -lcrypt -lutil
+    perllibs=-lnsl -ldl -lm -lc -lposix -lcrypt -lutil
+    libc=/lib/libc-2.1.3.so, so=so, useshrplib=false, libperl=libperl.a
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef, ccdlflags='-rdynamic'
+    cccdlflags='-fpic', lddlflags='-shared -L/usr/local/lib'
+
+Locally applied patches:
+    DEVEL8452
+
+---
+@INC for perl v5.7.0:
+    /usr/local/lib/perl5/5.7.0/armv4l-linux
+    /usr/local/lib/perl5/5.7.0
+    /usr/local/lib/perl5/site_perl/5.7.0/armv4l-linux
+    /usr/local/lib/perl5/site_perl/5.7.0
+    /usr/local/lib/perl5/site_perl
+    .
+
+---
+Environment for perl v5.7.0:
+    HOME=/home/nick
+    LANG (unset)
+    LANGUAGE (unset)
+    LC_CTYPE=en_GB.ISO-8859-1
+    LD_LIBRARY_PATH (unset)
+    LOGDIR (unset)
+    PATH=/home/nick/bin:/usr/local/bin:/usr/bin:/bin:/usr/bin/X11:/usr/games:/sbin:/usr/sbin:/usr/local/sbin
+    PERL_BADLANG (unset)
+    SHELL=/bin/bash
+
+From bounce-debian-devel=zal=debian.org@lists.debian.org Wed Jan  9 16:19:33 2002
+X-Envelope-From: bounce-debian-devel=zal=debian.org@lists.debian.org  Wed Jan  9 16:19:33 2002
+Return-Path: <bounce-debian-devel=zal=debian.org@lists.debian.org>
+Delivered-To: laz+debian@clustermonkey.org
+Received: from master.debian.org (master.debian.org [216.234.231.5])
+	by x-o.clustermonkey.org (Postfix) with ESMTP id 0DCF661EB84
+	for <laz+debian@clustermonkey.org>; Wed,  9 Jan 2002 16:19:33 -0500 (EST)
+Received: from murphy.debian.org [216.234.231.6] 
+	by master.debian.org with smtp (Exim 3.12 1 (Debian))
+	id 16OQ8C-0004ll-00; Wed, 09 Jan 2002 15:19:32 -0600
+Received: (qmail 22818 invoked by uid 38); 9 Jan 2002 21:07:42 -0000
+X-Envelope-Sender: debbugs@master.debian.org
+Received: (qmail 22385 invoked from network); 9 Jan 2002 21:07:37 -0000
+Received: from master.debian.org (mail@216.234.231.5)
+  by murphy.debian.org with SMTP; 9 Jan 2002 21:07:37 -0000
+Received: from debbugs by master.debian.org with local (Exim 3.12 1 (Debian))
+	id 16OPvY-0003bQ-00; Wed, 09 Jan 2002 15:06:28 -0600
+X-Loop: owner@bugs.debian.org
+Subject: Bug#128487: ITP: ferite -- Ferite programming language
+Reply-To: Eric Dorland <eric@debian.org>, 128487@bugs.debian.org
+Resent-From: Eric Dorland <eric@debian.org>
+Original-Sender: Eric <eric@apocalypse>
+Resent-To: debian-bugs-dist@lists.debian.org
+Resent-Cc: debian-devel@lists.debian.org, wnpp@debian.org
+Resent-Date: Wed, 09 Jan 2002 21:06:27 GMT
+Resent-Message-ID: <handler.128487.B.101061021111054@bugs.debian.org>
+X-Debian-PR-Message: report 128487
+X-Debian-PR-Package: wnpp
+Received: via spool by submit@bugs.debian.org id=B.101061021111054
+          (code B ref -1); Wed, 09 Jan 2002 21:06:27 GMT
+From: Eric Dorland <eric@debian.org>
+To: Debian Bug Tracking System <submit@bugs.debian.org>
+X-Reportbug-Version: 1.41.14213
+X-Mailer: reportbug 1.41.14213
+Date: Wed, 09 Jan 2002 16:03:25 -0500
+Message-Id: <E16OPsb-0000u7-00@apocalypse>
+Sender: Eric <eric@apocalypse.clustermonkey.org>
+Delivered-To: submit@bugs.debian.org
+X-Mailing-List: <debian-devel@lists.debian.org> archive/latest/105153
+X-Loop: debian-devel@lists.debian.org
+Precedence: list
+Resent-Sender: debian-devel-request@lists.debian.org
+Status: RO
+
+Package: wnpp
+Version: N/A; reported 2002-01-09
+Severity: wishlist
+
+* Package name    : ferite
+  Version         : 0.99.4
+  Upstream Author : Chris Ross (boris) <ctr@ferite.org>
+* URL             : http://www.ferite.org/
+* License         : BSD
+  Description     : Ferite programming language
+
+Ferite is a language that incorporates the design philosophies of other
+languages, but without many of their drawbacks. It has strong
+similiarities to perl, python, C, Java and pascal, while being both
+lightweight, modular, and embeddable.
+
+-- System Information
+Debian Release: 3.0
+Architecture: i386
+Kernel: Linux apocalypse 2.4.16 #1 Fri Nov 30 14:38:38 EST 2001 i686
+Locale: LANG=en_US, LC_CTYPE=
+
+
+
+-- 
+To UNSUBSCRIBE, email to debian-devel-request@lists.debian.org
+with a subject of "unsubscribe". Trouble? Contact listmaster@lists.debian.org
+
+From owner-london-pm@lists.dircon.co.uk Sun Jan 21 17:08:14 2001
+Envelope-to: michael@etla.org
+Received: from lists.dircon.co.uk [194.112.50.5] 
+	by dayspring.firedrake.org with esmtp (Exim 3.12 #1 (Debian))
+	id 14KNyQ-0007mp-00; Sun, 21 Jan 2001 17:08:14 +0000
+Received: (from majordom@localhost)
+	by lists.dircon.co.uk (8.9.3/8.9.3) id RAA28531
+	for michael@etla.org; Sun, 21 Jan 2001 17:08:13 GMT
+X-Authentication-Warning: lists.dircon.co.uk: majordom set sender to owner-london-pm@lists.dircon.co.uk using -f
+Received: from dayspring.firedrake.org (mail@dayspring.firedrake.org [195.82.105.251])
+	by lists.dircon.co.uk (8.9.3/8.9.3) with ESMTP id RAA28043
+	for <london-pm@lists.dircon.co.uk>; Sun, 21 Jan 2001 17:07:23 GMT
+Received: from mstevens by dayspring.firedrake.org with local (Exim 3.12 #1 (Debian))
+	id 14KNxb-0007mH-00; Sun, 21 Jan 2001 17:07:23 +0000
+Date: Sun, 21 Jan 2001 17:07:23 +0000
+From: Michael Stevens <michael@etla.org>
+To: london-pm@lists.dircon.co.uk
+Subject: Mail::ListDetector - please test
+Message-ID: <20010121170723.A29498@firedrake.org>
+Mail-Followup-To: london-pm@lists.dircon.co.uk
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.2.5i
+X-Phase-Of-Moon: The Moon is Waning Crescent (7% of Full)
+Sender: owner-london-pm@lists.dircon.co.uk
+Precedence: bulk
+Reply-To: london-pm@lists.dircon.co.uk
+Status: RO
+
+Hi.
+
+I have an (as yet unreleased) module called Mail::ListDetector,
+which takes a Mail::Internet object, and attempts to tell you if the
+message involved was posted to a mailing list, and if so, attempts to
+get some details about that list.
+
+I need testers - in particular, see if it builds and passes tests for
+you, and throw lots of messages at the sample script and see if you
+can get it to be inaccurate for any of them. If you can, please send
+me the message in question. (if you don't want to give out the content,
+just headers should do).
+
+Currently it should know about majordomo, smartlist, ezmlm, and mailman,
+although the majordomo and smartlist guessers are a bit experimental.
+
+It's at:
+
+http://www.etla.org/Mail-ListDetector-0.05.tar.gz
+
+Michael
+
+From - Wed Feb 14 09:49:48 2001
+Return-Path: <noustestons-owner@cru.fr>
+Received: from listes.cru.fr (listes.cru.fr [195.220.94.165])
+          by home.cru.fr (8.9.3/jtpda-5.3.1) with ESMTP id JAA26395
+          ; Wed, 14 Feb 2001 09:49:23 +0100
+Received: from (sympa@localhost)
+          by listes.cru.fr (8.9.3/jtpda-5.3.2) id JAA07499
+          ; Wed, 14 Feb 2001 09:49:23 +0100
+Sender: Olivier.Salaun@cru.fr
+Message-ID: <3A8A4691.70332989@cru.fr>
+Date: Wed, 14 Feb 2001 09:49:21 +0100
+From: Olivier Salaun <olivier.salaun@cru.fr>
+Organization: CRU
+X-Mailer: Mozilla 4.74 [en] (X11; U; Linux 2.2.16-3 i686)
+X-Accept-Language: en
+MIME-Version: 1.0
+To: noustestons@cru.fr
+Subject: This is a sample message
+X-Loop: noustestons@cru.fr
+X-Sequence: 168
+Precedence: list
+List-Help: <mailto:sympa@cru.fr?subject=help>
+List-Subscribe: <mailto:sympa@cru.fr?subject=subscribe%20noustestons>
+List-Unsubscribe: <mailto:sympa@cru.fr?subject=unsubscribe%20noustestons>
+List-Post: <mailto:noustestons@cru.fr>
+List-Owner: <mailto:noustestons-request@cru.fr>
+List-Archive: <http://listes.cru.fr/wws/arc/noustestons>
+Content-type: multipart/mixed; boundary="----------=_982140563-24435-126"
+Content-Transfer-Encoding: 8bit
+X-Mozilla-Status: 8001
+X-Mozilla-Status2: 00000000
+
+This is a multi-part message in MIME format...
+
+------------=_982140563-24435-126
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+
+Hope it helps....
+
+--
+Olivier Salaün
+Comité Réseaux des Universités
+
+------------=_982140563-24435-126
+Content-Type: text/plain; name="message.footer"
+Content-Disposition: inline; filename="message.footer"
+Content-Transfer-Encoding: 8bit
+
+fgdfgdfgdfdg
+
+------------=_982140563-24435-126--
+
+From adm-bounce@oasys.net  Mon Jun  4 06:41:14 2001
+Received: from thufir.oasys.net (oasys.net [216.227.134.4]) by
+    nani.mikomi.org (8.9.3/8.9.3) with ESMTP id GAA08314 for
+    <turner@mikomi.org>; Mon, 4 Jun 2001 06:41:13 -0400
+Received: from thufir (thufir [127.0.0.1]) by thufir.oasys.net (Postfix)
+    with ESMTP id 345138003; Mon,  4 Jun 2001 06:41:12 -0400 (EDT)
+Received: with LISTAR (v0.129a; list adm); Mon, 04 Jun 2001 06:41:12 -0400
+    (EDT)
+Delivered-To: adm@oasys.net
+Received: from nani.mikomi.org (nani.mikomi.org [216.227.135.6]) by
+    thufir.oasys.net (Postfix) with ESMTP id 8AF917FC1 for <adm@oasys.net>;
+    Mon,  4 Jun 2001 06:41:10 -0400 (EDT)
+Received: (from turner@localhost) by nani.mikomi.org (8.9.3/8.9.3) id
+    GAA08291; Mon, 4 Jun 2001 06:41:07 -0400
+X-Authentication-Warning: nani.mikomi.org: turner set sender to
+    turner@mikomi.org using -f
+Date: Mon, 4 Jun 2001 06:41:07 -0400
+From: Andrew Turner <turner@mikomi.org>
+To: Seikihyougen <seikihyougen@mikomi.org>
+Cc: adm@oasys.net
+Subject: [adm] Marvin Minsky AI Talk
+Message-Id: <20010604064107.A6940@mikomi.org>
+Mail-Followup-To: Seikihyougen <seikihyougen@mikomi.org>, adm@oasys.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.3.14i
+X-Archive-Position: 161
+X-Listar-Version: Listar v0.129a
+Sender: adm-bounce@oasys.net
+Errors-To: adm-bounce@oasys.net
+X-Original-Sender: turner@mikomi.org
+Precedence: list
+Reply-To: adm@oasys.net
+X-List: adm
+Status: RO
+Content-Length: 498
+Lines: 21
+
+An intersting talk he gave at the Game Developers Conference 2001.
+
+Video:
+
+rtsp://media.cmpnet.com/twtoday_media/realtest/tnc-gdc2k1-prog.rm
+
+Audio:
+
+http://199.125.85.76/ftp/technetcast/mp3/tnc-0526-24.mp3
+
+Transcript:
+
+http://technetcast.ddj.com/tnc_play_stream.html?stream_id=526
+
+-- 
+Andy <turner@mikomi.org> - http://anime.mikomi.org/ - Community Anime Reviews
+  And the moral of this message is...
+    Let the meek inherit the earth -- they have it coming to them.
+    		-- James Thurber
+
+From sentto-482527-3071-992625570-turner=mikomi.org@returns.onelist.com  Fri Jun 15 13:21:26 2001
+Return-Path: <sentto-482527-3071-992625570-turner=mikomi.org@returns.onelist.com>
+Received: from ef.egroups.com (ef.egroups.com [64.211.240.229]) by
+    undef.jmac.org (8.11.0/8.11.0) with SMTP id f5FHLPl26276 for
+    <turner@mikomi.org>; Fri, 15 Jun 2001 13:21:26 -0400
+Received: from [10.1.4.54] by ef.egroups.com with NNFMP; 15 Jun 2001
+    17:19:30 -0000
+Received: (qmail 74089 invoked from network); 15 Jun 2001 17:19:29 -0000
+Received: from unknown (10.1.10.26) by l8.egroups.com with QMQP;
+    15 Jun 2001 17:19:29 -0000
+Received: from unknown (HELO c9.egroups.com) (10.1.2.66) by mta1 with SMTP;
+    15 Jun 2001 17:19:29 -0000
+X-Egroups-Return: turner@undef.jmac.org
+Received: from [10.1.2.91] by c9.egroups.com with NNFMP; 15 Jun 2001
+    17:19:28 -0000
+X-Egroups-Approved-BY: lordtenchimasaki@planetjurai.com via web; 15 Jun
+    2001 17:19:26 -0000
+X-Sender: turner@undef.jmac.org
+X-Apparently-To: ryokoforever@yahoogroups.com
+Received: (EGP: mail-7_1_3); 15 Jun 2001 15:04:27 -0000
+Received: (qmail 72431 invoked from network); 15 Jun 2001 15:04:26 -0000
+Received: from unknown (10.1.10.26) by l7.egroups.com with QMQP;
+    15 Jun 2001 15:04:26 -0000
+Received: from unknown (HELO undef.jmac.org) (199.232.41.30) by mta1 with
+    SMTP; 15 Jun 2001 15:04:26 -0000
+Received: (from turner@localhost) by undef.jmac.org (8.11.0/8.11.0) id
+    f5FF54H25878 for ryokoforever@yahoogroups.com; Fri, 15 Jun 2001 11:05:04
+    -0400
+To: ryokoforever@yahoogroups.com
+Message-Id: <20010615110504.F23926@mikomi.org>
+References: <65.15c83c77.285a1ed0@aol.com> <9gc0tj+9u4r@eGroups.com>
+User-Agent: Mutt/1.2.5i
+In-Reply-To: <9gc0tj+9u4r@eGroups.com>; from gensao@yahoo.com on Fri,
+    Jun 15, 2001 at 03:54:27AM -0000
+From: Andrew Turner <turner@mikomi.org>
+MIME-Version: 1.0
+Mailing-List: list ryokoforever@yahoogroups.com; contact
+    ryokoforever-owner@yahoogroups.com
+Delivered-To: mailing list ryokoforever@yahoogroups.com
+Precedence: list
+List-Unsubscribe: <mailto:ryokoforever-unsubscribe@yahoogroups.com>
+Date: Fri, 15 Jun 2001 11:05:04 -0400
+Reply-To: ryokoforever@yahoogroups.com
+Subject: [ryokoforever] Re: [ryokoforever] Re: Fan Fiction Websites
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Status: RO
+Content-Length: 631
+Lines: 16
+
+Yeah, I'm really sorry about all this.  The stupid cable company has been
+very unhelpful in getting my cable modem back online... I'll be moving my
+machine (and thus, the domains hosted with it like tmffa.com) to a colo
+environment very soon, which should put an end to down time.
+
+--
+Andy <turner@mikomi.org>
+
+
+To unsubscribe from this group, send an email to:
+ryokoforever-unsubscribe@egroups.com
+
+ 
+
+Your use of Yahoo! Groups is subject to http://docs.yahoo.com/info/terms/ 
+
+
+
+
+
+From london.pm-admin@london.pm.org Fri Aug 17 13:47:55 2001
+Return-Path: <london.pm-admin@london.pm.org>
+Received: from punt-2.mail.demon.net by mailstore for
+    lpm@mirth.demon.co.uk id 998052475:20:20927:5; Fri, 17 Aug 2001 12:47:55
+    GMT
+Received: from penderel.state51.co.uk ([193.82.57.128]) by
+    punt-2.mail.demon.net id aa2103774; 17 Aug 2001 12:47 GMT
+Received: from penderel ([127.0.0.1] helo=penderel.state51.co.uk) by
+    penderel.state51.co.uk with esmtp (Exim 3.03 #1) id 15Xj23-0004Oi-00;
+    Fri, 17 Aug 2001 13:47:23 +0100
+Received: from plough.barnyard.co.uk ([195.149.50.61]) by
+    penderel.state51.co.uk with esmtp (Exim 3.03 #1) id 15Xj1T-0004OQ-00 for
+    london.pm@london.pm.org; Fri, 17 Aug 2001 13:46:47 +0100
+Received: from richardc by plough.barnyard.co.uk with local (Exim 3.13 #1)
+    id 15Xj1E-0006Wp-00 for london.pm@london.pm.org; Fri, 17 Aug 2001 13:46:32
+    +0100
+From: Richard Clamp <richardc@unixbeard.net>
+To: london.pm@london.pm.org
+Subject: Re: better header
+Message-Id: <20010817134539.A9368@mirth.demon.co.uk>
+References: <170801229.13787@webbox.com>
+    <20010817122254.B18192@mccarroll.demon.co.uk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20010817122254.B18192@mccarroll.demon.co.uk>
+User-Agent: Mutt/1.3.20i
+Sender: london.pm-admin@london.pm.org
+Errors-To: london.pm-admin@london.pm.org
+X-Beenthere: london.pm@london.pm.org
+X-Mailman-Version: 2.0.1
+Precedence: bulk
+Reply-To: london.pm@london.pm.org
+List-Id: London.pm Perl M[ou]ngers <london.pm.london.pm.org>
+List-Archive: <http://london.pm.org/pipermail/london.pm/>
+Date: Fri, 17 Aug 2001 13:45:39 +0100
+Status: RO
+Content-Length: 439
+Lines: 12
+
+On Fri, Aug 17, 2001 at 12:22:54PM +0100, Greg McCarroll wrote:
+> testing a reply to the announce list
+
+Could someone extend the hacks committed into changing the
+headers and the like, then they'd not be auto-filtered to the same
+place by such fine modules as Mail::ListDetector or lesser homebrew
+systems such as my own.
+
+The announce lists rocks, but that'd just make it rock so much harder.
+
+-- 
+Richard Clamp <richardc@unixbeard.net>
+
+
+
+From adm-bounce@oasys.net  Mon Jun  4 06:41:14 2001
+Received: from thufir.oasys.net (oasys.net [216.227.134.4]) by
+    nani.mikomi.org (8.9.3/8.9.3) with ESMTP id GAA08314 for
+    <turner@mikomi.org>; Mon, 4 Jun 2001 06:41:13 -0400
+Received: from thufir (thufir [127.0.0.1]) by thufir.oasys.net (Postfix)
+    with ESMTP id 345138003; Mon,  4 Jun 2001 06:41:12 -0400 (EDT)
+Received: with ECARTIS (v1.0.0; list adm); Mon, 04 Jun 2001 06:41:12 -0400
+    (EDT)
+Delivered-To: adm@oasys.net
+Received: from nani.mikomi.org (nani.mikomi.org [216.227.135.6]) by
+    thufir.oasys.net (Postfix) with ESMTP id 8AF917FC1 for <adm@oasys.net>;
+    Mon,  4 Jun 2001 06:41:10 -0400 (EDT)
+Received: (from turner@localhost) by nani.mikomi.org (8.9.3/8.9.3) id
+    GAA08291; Mon, 4 Jun 2001 06:41:07 -0400
+X-Authentication-Warning: nani.mikomi.org: turner set sender to
+    turner@mikomi.org using -f
+Date: Mon, 4 Jun 2001 06:41:07 -0400
+From: Andrew Turner <turner@mikomi.org>
+To: Seikihyougen <seikihyougen@mikomi.org>
+Cc: adm@oasys.net
+Subject: [adm] Marvin Minsky AI Talk
+Message-Id: <20010604064107.A6940@mikomi.org>
+Mail-Followup-To: Seikihyougen <seikihyougen@mikomi.org>, adm@oasys.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.3.14i
+X-Archive-Position: 161
+X-Ecartis-Version: Ecartis v1.0.0
+Sender: adm-bounce@oasys.net
+Errors-To: adm-bounce@oasys.net
+X-Original-Sender: turner@mikomi.org
+Precedence: list
+Reply-To: adm@oasys.net
+X-List: adm
+Status: RO
+Content-Length: 498
+Lines: 21
+
+An intersting talk he gave at the Game Developers Conference 2001.
+
+Video:
+
+rtsp://media.cmpnet.com/twtoday_media/realtest/tnc-gdc2k1-prog.rm
+
+Audio:
+
+http://199.125.85.76/ftp/technetcast/mp3/tnc-0526-24.mp3
+
+Transcript:
+
+http://technetcast.ddj.com/tnc_play_stream.html?stream_id=526
+
+-- 
+Andy <turner@mikomi.org> - http://anime.mikomi.org/ - Community Anime Reviews
+  And the moral of this message is...
+    Let the meek inherit the earth -- they have it coming to them.
+    		-- James Thurber
+
+
+
+
+
+From adm-bounce@oasys.net  Mon Jun  4 06:41:14 2001
+Return-Path: <Mail-ListDetector-report@gunzel.org>
+Received: from <mld@walker.wattle.id.au>
+  by freeonline.com.au (CommuniGate Pro RULES 4.0.6)
+  with RULES id 360012; Fri, 14 Mar 2003 01:00:12 +0000
+X-ListServer: CommuniGate Pro LIST 4.0.6
+List-Unsubscribe: <mailto:Mail-ListDetector-off@gunzel.org>
+List-ID: <Mail-ListDetector.gunzel.org>
+Message-ID: <list-360011@freeonline.com.au>
+Reply-To: <Mail-ListDetector@gunzel.org>
+Sender: <Mail-ListDetector@gunzel.org>
+To: <Mail-ListDetector@gunzel.org>
+Precedence: list
+X-Original-Message-Id: <a05200e2dba96da10d185@[192.168.14.36]>
+Date: Fri, 14 Mar 2003 12:00:05 +1100
+From: Matthew Walker <mld@walker.wattle.id.au>
+Subject: Hello to the Mail-ListDetector Mailing List at gunzel.org
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii" ; format="flowed"
+
+<x-flowed>This is a sample message for use in automated testing.
+
+Regards
+
+Matthew
+
+#############################################################
+This message is sent to you because you are subscribed to
+  the mailing list <Mail-ListDetector@gunzel.org>.
+To unsubscribe, E-mail to: <Mail-ListDetector-off@gunzel.org>
+To switch to the DIGEST mode, E-mail to <Mail-ListDetector-digest@gunzel.org>
+To switch to the INDEX mode, E-mail to <Mail-ListDetector-index@gunzel.org>
+Send administrative queries to  <Mail-ListDetector-request@gunzel.org>
+
+
+</x-flowed>
+
+From adm-bounce@oasys.net  Mon Jun  4 06:41:14 2001
+Date: Sun, 11 Nov 2001 02:19:29 +0900
+From: Foobar <foo@bar.com>
+Reply-To: mlname@domain.example.com
+Subject: [mlname:07389] add new member
+To: mlname@domain.example.com (mlname ML)
+Message-Id: <20011111021844.0836.foo@domain.example.com>
+X-ML-Name: mlname
+X-Mail-Count: 07389
+X-MLServer: fml [fml 4.0 STABLE (20010208)]; post only (only members can post)
+X-ML-Info: If you have a question, send e-mail with the body "help" (without quotes) to the address mlname-ctl@domain.example.com; help=<mailto:mlname-ctl@domain.example.com?body=help>
+X-Mailer: Becky! ver. 2.00.07
+Mime-Version: 1.0
+Content-Type: text/plain; charset="ISO-2022-JP"
+Content-Transfer-Encoding: 7bit
+Precedence: bulk
+Lines: 1
+List-Software: fml [fml 4.0 STABLE (20010208)]
+List-Post: <mailto:mlname@domain.example.com>
+List-Owner: <mailto:mlname-admin@domain.example.com>
+List-Help: <mailto:mlname-ctl@domain.example.com?body=help>
+List-Unsubscribe: <mailto:mlname-ctl@domain.example.com?body=unsubscribe>
+Status: RO
+
+This is a message
+
+From adm-bounce@oasys.net  Mon Jun  4 06:41:14 2001
+Received: from mldetector.net (msv-x05.mldetector.ne.jp [10.158.32.3])
+    by ml.mldetector.gr.jp (8.9.3p2/3.7W/) with ESMTP id AAA74508
+    for <announce@ml.mldetector.gr.jp>; Thu, 17 Jul 2003 01:52:35 +0900 (JST)
+Received: from denshadego (whrr.hou.mldetector.net [10.12.6.189])
+    (authenticated (0 bits))
+    by mldetector.net (8.12.5/8.11.2) with ESMTP id 732h6GFqXkO002877
+    for <announce@ml.mldetector.gr.jp>; Thu, 17 Jul 2003 01:52:32 +0900
+Date: Thu, 17 Jul 2003 01:52:22 +0900
+From: "Densha De Go" <densha@mldetector.net>
+Reply-To: Announce@mldetector.gr.jp
+Subject: [Announce:00089] Web mldetector
+To: <announce@ml.mldetector.gr.jp>
+Message-Id: <00a801c34bb2$4jhasjdh58udsc0@orient.corp.mldetector.com>
+X-ML-Name: Announce
+X-Mail-Count: 00089
+X-MLServer: fml [fml 4.0 STABLE (20010218)](fml commands only mode); post only only members can post)
+X-ML-Info: If you have a question,
+    please contact Announce-admin@mldetector.gr.jp;
+    <mailto:Announce-admin@mldetector.gr.jp>
+X-Mailer: Microsoft Outlook Express 6.00.2800.1158
+Mime-Version: 1.0
+Content-Type: text/plain;
+    charset="iso-2022-jp"
+Content-Transfer-Encoding: 7bit
+Precedence: bulk
+List-Subscribe: <mailto:Announce-ctl@mldetector.gr.jp?body=subscribe>
+Resent-From: denshadego@yo.mldetector.or.jp
+Resent-To: Announce@mldetector.gr.jp (moderated)
+Resent-Date: Thu, 17 Jul 2003 00:52:57 +0900
+Resent-Message-Id: <200307170052.FMLAAB99994.Announce@mldetector.gr.jp>
+
+One line of body
+
+From adm-bounce@oasys.net  Mon Jun  4 06:41:14 2001
+Return-Path: <owner-sample@v2.listbox.com>
+Received: from rime.listbox.com ([216.65.124.73] verified) by
+    freeonline.com.au (CommuniGate Pro SMTP 4.0.6) with ESMTP id 452321 for
+    mld-listbox@walker.wattle.id.au; Tue, 17 Jun 2003 20:16:02 +0000
+Received: by rime.listbox.com (Postfix, from userid 440) id 7378ADF7381;
+    Tue, 17 Jun 2003 16:18:01 -0400 (EDT)
+Received: from umbrella.listbox.com (umbrella.listbox.com
+    [208.210.125.21]) by rime.listbox.com (Postfix) with ESMTP id 7378ADF7381
+    for <sample@v2.listbox.com@fast.exploders.listbox.com>;
+    Tue, 17 Jun 2003 16:18:00 -0400 (EDT)
+Received: by umbrella.listbox.com (Postfix, from userid 440) id
+    7378ADF7381; Tue, 17 Jun 2003 16:17:01 -0400 (EDT)
+Received: from freeonline.com.au (a.mx.freeonline.com.au
+    [127.0.0.126]) by umbrella.listbox.com (Postfix) with SMTP id
+    7378ADF7381 for <sample@v2.listbox.com>; Tue, 17 Jun 2003 16:16:59
+    -0400 (EDT)
+Message-Id: <7378ADF7381aTjhj36@x>
+Date: Tue, 17 Jun 2003 13:17:17 -0700
+To: sample@v2.listbox.com
+From: "Listbox Sample" <mld+listbox@walker.wattle.id.au>
+Subject: [sample] Archive
+Sender: owner-sample@v2.listbox.com
+Precedence: list
+Reply-To: sample@v2.listbox.com
+List-Id: <sample@v2.listbox.com>
+List-Help: <http://v2.listbox.com/help?list_name=sample@v2.listbox.com>
+List-Subscribe: <mailto:subscribe-sample@v2.listbox.com>,
+    <http://v2.listbox.com/subscribe/?listname=sample@v2.listbox.com>
+List-Unsubscribe: <mailto:unsubscribe-sample@v2.listbox.com>,
+    <http://v2.listbox.com/member/unsubscribe/?listname=sample@v2.listbox.com>
+
+An archive for this list is there ?
+
+-------
+Sample: http://example.com/
+Archives at http://archives.listbox.com/sample/current/
+To unsubscribe, change your address, or temporarily deactivate your
+ubscription,
+please go to http://v2.listbox.com/member/?listname=sample@v2.listbox.com
+
+From adm-bounce@oasys.net  Mon Jun  4 06:41:14 2001
+Return-Path: <owner-sample@v2.listbox.com>
+Received: from rime.listbox.com ([216.65.124.73] verified) by
+    freeonline.com.au (CommuniGate Pro SMTP 4.0.6) with ESMTP id 452321 for
+    mld-listbox@walker.wattle.id.au; Tue, 17 Jun 2003 20:16:02 +0000
+Received: by rime.listbox.com (Postfix, from userid 440) id 7378ADF7381;
+    Tue, 17 Jun 2003 16:18:01 -0400 (EDT)
+Received: from umbrella.listbox.com (umbrella.listbox.com
+    [208.210.125.21]) by rime.listbox.com (Postfix) with ESMTP id 7378ADF7381
+    for <sample@v2.listbox.com@fast.exploders.listbox.com>;
+    Tue, 17 Jun 2003 16:18:00 -0400 (EDT)
+Received: by umbrella.listbox.com (Postfix, from userid 440) id
+    7378ADF7381; Tue, 17 Jun 2003 16:17:01 -0400 (EDT)
+Received: from freeonline.com.au (a.mx.freeonline.com.au
+    [127.0.0.126]) by umbrella.listbox.com (Postfix) with SMTP id
+    7378ADF7381 for <sample@v2.listbox.com>; Tue, 17 Jun 2003 16:16:59
+    -0400 (EDT)
+Message-Id: <7378ADF7381aTjhj36@x>
+Date: Tue, 17 Jun 2003 13:17:17 -0700
+To: sample@v2.listbox.com
+From: "Listbox Sample" <mld+listbox@walker.wattle.id.au>
+Subject: [sample] Archive
+Sender: owner-sample@v2.listbox.com
+Precedence: list
+Reply-To: sample@v2.listbox.com
+List-Id: <sample@v2.listbox.com>
+List-Help: <http://v2.listbox.com/help?list_name=sample@v2.listbox.com>
+List-Subscribe: <mailto:subscribe-sample@v2.listbox.com>,
+    <http://v2.listbox.com/subscribe/?listname=sample@v2.listbox.com>
+List-Unsubscribe: <mailto:unsubscribe-sample@v2.listbox.com>,
+    <http://v2.listbox.com/member/unsubscribe/?listname=sample@v2.listbox.com>
+List-Software: listbox.com v2.0
+
+An archive for this list is there ?
+
+-------
+Sample: http://example.com/
+Archives at http://archives.listbox.com/sample/current/
+To unsubscribe, change your address, or temporarily deactivate your
+ubscription,
+please go to http://v2.listbox.com/member/?listname=sample@v2.listbox.com
+
+From adm-bounce@oasys.net Mon Jun  4 06:41:14 2001
+Received: from lmailexample1.example.com ([10.22.163.233] verified)
+  by example.com.au (CommuniGate Pro SMTP 4.1)
+  with ESMTP id 946911982 for matthew@EXAMPLE.COM.AU;
+  Wed, 12 Aug 2001 21:49:00 0000
+Received: from LISTSERV.EXAMPLE.COM (tem01.mx.example.com) by
+  lmailexample1.example.com (LSMTP for Windows NT v1.1b) with SMTP id
+  <0.940293@lmailexample1.example.com>; Wed, 12 Aug 2001 21:29:46 +0400
+Received: from LISTSERV.EXAMPLE.COM by LISTSERV.EXAMPLE.COM (LISTSERV-TCP/IP
+  release 1.8e) with spool id 8932592 for EXAMPLE@LISTSERV.EXAMPLE.COM;
+  Wed, 12 Aug 2001 20:58:31 +0400
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-ID:  <DEADCAFE.3289872@example.net>
+Date:         Wed, 12 Aug 2001 20:58:11 -0200
+Reply-To:     EXAMPLE Discussion <EXAMPLE@LISTSERV.EXAMPLE.COM>
+Sender:       EXAMPLE Discussion <EXAMPLE@LISTSERV.EXAMPLE.COM>
+From:         I. EXAMPLE <iiiii@EXAMPLE.NET>
+Subject: Boring sample message
+To:           EXAMPLE@LISTSERV.EXAMPLE.COM
+In-Reply-To:  <7834BADFE3125E.90301@example.com>
+Precedence: list
+
+This is a really boring example Listserv message.
+
+--
+EXAMPLE - http://www.example.com/
+
+To Remove yourself from this list, simply send an email to
+<listserv@listserv.example.com> with the
+body of "SIGNOFF EXAMPLE" in the email message. You can leave the Subject:
+field of your email blank.
+
+From adm-bounce@oasys.net Mon Jun  4 06:41:14 2001
+Return-Path: <>
+Received: from listserv.example.com (listserv.example.com
+    [10.51.0.6]) by listserv.example.com (8.11.6p2/8.11.6) with ESMTP
+    id h32hgds039; Wed, 10 Apr 2001 20:48:08 -0500 (EST)
+Received: from LISTSERV.EXAMPLE.COM by LISTSERV.EXAMPLE.COM
+    (LISTSERV-TCP/IP release 1.8d) with spool id 137738 for
+    COCO@LISTSERV.EXAMPLE.COM; Wed, 10 Apr 2001 19:13:57 -0500
+Approved-BY: spcadmin@EXAMPLE.COM
+Received: from relay.example.com (relay.example.com
+    [10.51.0.1]) by listserv.example.com (8.11.6p2/8.11.6) with ESMTP
+    id h31L8r26559 for <coco@listserv.example.net>; Wed,
+    1 Apr 2003 16:52:55 -0500 (EST)
+Received: from cp.example.com (cp.example.com [10.51.0.1]) by
+    relay.example.com (Switch-2.2.6/Switch-2.2.5) with ESMTP id
+    htyLqsv14600 for <coco@example.com>; Wed, 10 Apr 2001 15:26:55
+    -0500 (EST)
+Received: (from nobody@localhost) by cp.example.com (8.11.6/8.11.6) id
+    h31LqsX16086; Wed, 10 Apr 2001 15:25:54 -0500 (EST)
+Message-Id: <200104102125.h31LqsX16086@cp.example.com>
+Date: Wed, 10 Apr 2001 15:25:54 -0500
+Reply-To: vibrant_newsletters@EXAMPLE.NET
+Sender: Comedy Company <COCO@LISTSERV.EXAMPLE.COM>
+From: Comedy Company <spcadmin@EXAMPLE.COM>
+Subject: Another boring sample message
+To: COCO@LISTSERV.EXAMPLE.COM
+Status: U
+
+And here's another one but the Reply-To is not set to the list.
+
+From adm-bounce@oasys.net Mon Jun  4 06:41:14 2001
+Received: from [10.80.0.8] by mail.example.com
+       (SMTPD32-3.04) id A3CCCC1700AC; Mon, 02 Feb 1998 20:25:33 -0700
+Received: from total.example.com (du-226.example.com [10.80.0.226])
+       by poseidon.example.com (8.8.6/8.8) with SMTP id QBB30808; Mon, 2 Feb
+	1998 04:08:00 GMT
+Subject: CommuniGate List example
+Message-Id: <00000038942968439085@total.example.com>
+To: subscribers:;
+X-ListServer: CommuniGate List 1.4
+From: test@example.com (Test Account)
+Sender: CGnet@total.example.com (CGnet)
+Date: Mon, 02 Feb 1998 13:57:22 +1000
+Organization: Example Limited
+X-Mailer: CommuniGate 2.9.8
+Errors-To: Greene@total.example.com
+Reply-To: CGnet@total.example.com
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="__==========0000000003894==total.example.com==__"
+
+
+This is a MIME-encapsulated message
+ If you read this, you may want to switch to a better mailer
+--__==========0000000003894==total.example.com==__
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8bit
+
+
+List content goes here.
+
+--__==========0000000003894==total.example.com==__
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8bit
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+You have received this message because you are subscribed to
+Gnet.
+
+To unsubscribe, send any message to: CGnet-off@total.example.com
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--__==========0000000003894==total.example.com==__--
+

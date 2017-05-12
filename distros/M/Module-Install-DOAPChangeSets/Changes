@@ -1,0 +1,100 @@
+Module-Install-DOAPChangeSets
+=============================
+
+Created:      2010-01-08
+Home page:    <https://metacpan.org/release/Module-Install-DOAPChangeSets>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Module-Install-DOAPChangeSets>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.206  2013-07-31
+
+ - (Update) Minor changes to the release header now that
+   CPAN::Changes::Spec 0.02 has been published.
+
+0.205  2013-06-18
+
+ - (Bugfix) Oops! That should be 'dcs:fixes'.
+
+0.204  2013-06-18
+
+ - (Addition Bugfix) Support 'dbug:fixes'.
+   Fixes RT#86225
+
+0.203  2012-07-04
+
+ - (Addition) Support 'dcs:thanks'.
+   ++$KJETILK
+ - When Module::Install::RDF is in use, then don't complain about missing
+   files.
+
+0.202  2012-01-18
+
+ - (Addition) Support 'dcs:blame'.
+ - Improved sort order of change items within each version.
+
+0.201  2011-10-06
+
+ - (Packaging) Upgrade Module::Package::RDF version.
+
+0.200  2011-10-01
+
+ - (Removal) No longer produces top heading for Changes file: just a
+   smaller heading for each project. (And there will rarely be more than
+   one project described.)
+ - Will use data from Module::Install::RDF in favour of 'meta/changes.ttl',
+   if 'rdf_metadata' has been called prior to 'write_doap_changes'.
+
+0.103  2011-09-30
+
+ - Default input file is now called 'meta/changes.ttl'.
+ - Output is now compliant with CPAN::Changes::Spec.
+
+0.102  2011-04-02
+
+ - Allow change items to have multiple RDF types.
+ - Improve sort order of versions in output. Take dates into consideration.
+
+0.101  2010-07-21
+
+ - (Bugfix) XML output no longer just an empty file!
+
+0.100  2010-07-18
+
+ - Sort change items within each version for text output.
+ - Use RDF::Trine::Serializer::RDFXML for XML output.
+
+0.04  2010-04-07
+
+ - (Update) Best practice is to use http://purl.org/NET/cpan-uri/.
+
+0.03  2010-03-26
+
+ - Use Perl::Version to sort revisions in output.
+
+0.02  2010-01-27
+
+ - (Bugfix) Project name was being overridden by URI.
+
+0.01  2010-01-18
+
+ - Documentation improvements.
+
+0.00_04  2010-01-13  Omega 4
+
+ - Split out RDF::DOAP::ChangeSets as a separate Perl module.
+
+0.00_03  2010-01-11  Omega 3
+
+ - (Addition) Support Aaron Cope's changefile vocab as a legacy input
+   format.
+ - (Addition) Use Text::Wrap to wrap text.
+ - Reverse order of versions in Changelog (newest at top)
+
+0.00_02  2010-01-08  Omega 2
+
+ - Don't recommend QNames containing '.' -- they're supported by libraptor,
+   but illegal in Turtle.
+
+0.00_01  2010-01-08  Omega 1
+
+

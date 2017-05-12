@@ -1,0 +1,49 @@
+Math-BigInt
+
+Math::BigInt and Math::BigFloat are modules for arbitrary precision
+arithmetic.
+
+INSTALLATION
+
+To install this module, unpack the distribution file, and run the following
+commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for these modules with the
+perldoc command.
+
+    perldoc Math::BigInt
+    perldoc Math::BigFloat
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-BigInt
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Math-BigInt
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Math-BigInt
+
+    Search CPAN
+        http://search.cpan.org/dist/Math-BigInt
+
+COPYRIGHT AND LICENCE
+
+Copyright 1996-2001 Mark Biggar, Ilya Zakharevich.
+
+Copyright 2001-2008 Tels, L<http://bloodgate.com>.
+
+Copyright 2010 Florian Ragwitz L<flora@cpan.org>.
+
+Copyright 2011- Peter John Acklam L<pjacklam@online.no>.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

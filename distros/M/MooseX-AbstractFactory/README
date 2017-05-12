@@ -1,0 +1,108 @@
+NAME
+    MooseX::AbstractFactory - AbstractFactory behaviour as a Moose extension
+
+VERSION
+    version 0.004003
+
+SYNOPSIS
+            package My::Factory;
+            use MooseX::AbstractFactory;
+
+            # optional role(s) that define what the implementations should implement
+
+            implementation_does [ qw( My::Factory::Implementation::Requires ) ];
+            implementation_class_via sub { 'My::Implementation::' . shift };
+
+            # -------------------------------------------------------------
+            package My::Implementation::One;
+            use Moose;
+
+            has connection => (is => 'ro', isa => 'Str');
+
+            sub tweak_connection {
+                    ...
+            }
+
+
+            # -------------------------------------------------------------
+            package My::Factory::Implementation::Requires;
+            use Moose::Role;
+            requires 'tweak_connection';
+
+
+            # -------------------------------------------------------------
+            package main;
+            use My::Factory;
+
+            my $imp = My::Factory->create('One',
+                    { connection => 'Type1' },
+            );
+
+DESCRIPTION
+    Implements an AbstractFactory as a Moose extension
+
+METHODS
+  create()
+    Returns an instance of the requested implementation.
+
+        use MooseX::AbstractFactory;
+
+            my $imp = My::Factory->create(
+                    'Implementation',
+                    { connection => 'Type1' },
+            );
+
+  implementation_does
+    Syntactic sugar to define a list of roles each implementation must
+    consume.
+
+  implementation_class_via
+    Syntactic sugar to provide a sub to generate the implementation class
+    name: e.g.:
+
+        use MooseX::AbstractFactory;
+        implementation_class_via sub { 'My::Implementation::' . shift };
+
+    and then
+
+        my $imp = My::Factory->create("ClassA");
+
+        # $imp->isa "My::Implementation::ClassA"
+
+    The default behaviour is to prepend the factory class name, so in the
+    above example (without the implementation_class_via) the implementation
+    class would be "My::Factory::ClassA".
+
+  init_meta
+    Overrides Moose's "init_meta" and applies MooseX::AbstractFactory::Role.
+
+DIAGNOSTICS
+    "No implementation provided"
+        If the factory class's new() method doesn't get an implementation
+        passed, then it will die with the above error.
+
+    "Invalid implementation class %s: %s""
+        The implementation passed to the factory class mapped to a class
+        that doesn't exist.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/fleetfootmike/MX-AbstractFactory/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+CONTRIBUTOR
+    Zoffix Znet <cpan@zoffix.com>
+
+AUTHORS
+    *   Mike Whitaker <mike@altrion.org>
+
+    *   Caleb Cushing <xenoterracide@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Mike Whitaker.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,31 @@
+---
+abstract: 'Cryptographically-secure, cross-platform replacement for rand()'
+author:
+  - 'Max Kanat-Alexander <mkanat@cpan.org>'
+  - 'Arthur Axel "fREW" Schmidt <math-random-secure@afoolishmanifesto.com>'
+build_requires:
+  List::MoreUtils: '0'
+  Test::More: '0'
+  Test::SharedFork: '0'
+  Test::Warn: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Random-Secure
+recommends:
+  Math::Random::ISAAC::XS: '0'
+requires:
+  Crypt::Random::Source: '0.07'
+  Math::Random::ISAAC: '1.001'
+  Moo: '2'
+resources:
+  bugtracker: https://github.com/frioux/Math-Random-Secure/issues
+  homepage: https://github.com/frioux/Math-Random-Secure
+  repository: https://github.com/frioux/Math-Random-Secure.git
+version: '0.080001'
+x_serialization_backend: 'YAML::Tiny version 1.69'

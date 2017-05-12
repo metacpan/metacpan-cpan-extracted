@@ -1,0 +1,31 @@
+---
+doctype: dist
+
+header:
+  name: MojoX-CustomTemplateFileParser
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.014000
+      - Moose: 2.12
+      - MooseX::Object::Pluggable: 0.0013
+      - Path::Tiny: 0.050
+      - Storable: 2.24
+      - HTML::Entities: 3.65
+  test:
+    requires:
+      - Test::Deep: 0.110
+      - Data::Dump::Streamer: 2.37
+
+
+plugins:
+  - +config: Author::CSSON
+
+  - +plugin: Deprecated
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON

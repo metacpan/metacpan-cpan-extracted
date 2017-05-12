@@ -1,0 +1,21 @@
+
+0.05 2014.05.15
+    Add 2 more scripts.
+    Don't accept 'open_source' as a license key.
+
+0.04 2013.03.24
+    Add bin/metacpan_favorite.pl
+
+
+0.03 2013.03.05
+    Add bin/metacpan_reverse_dependencies.pl
+    Add bin/metacpan_impact.pl
+    Add more text to the POD
+    Add some more META information
+
+0.02 2013.01.13
+    Add bin/metacpan_namespace.pl script.
+
+0.01 2013.01.08
+    First version with bin/metacpan_meta.pl script.
+

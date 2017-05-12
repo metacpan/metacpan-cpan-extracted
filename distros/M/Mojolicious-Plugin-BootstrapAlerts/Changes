@@ -1,0 +1,30 @@
+History for Mojolicious::Plugin::BootstrapAlerts
+================================================
+
+0.06  2013-12-13
+
+      * fix documentation: In two places the plugin was named 'Bootstrap' instead of 'BootstrapAlerts'. (thanks to ravenhall, see issue #1)
+
+0.05  2013-10-25
+
+      * minor improvement: return as early as possible
+
+0.04  2013-10-24
+
+      * use PodWeaver
+
+0.03  2013-10-24
+
+      * dist.ini => s/Alert/Alerts/g
+      * return from hook when no element found
+
+0.02  2013-10-23
+
+      + fix bug: when no notify call happened, the app died
+      + add feature: auto_inject, injects the notifications before or after a certain element
+        -> adds a Mojolicious hook (after_render)
+        -> due to a minor weakness of Mojo::DOM there might be problems with auto_inject
+
+0.01  2013-10-23
+
+      initial release

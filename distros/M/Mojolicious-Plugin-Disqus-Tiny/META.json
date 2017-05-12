@@ -1,0 +1,71 @@
+{
+   "abstract" : "Mojolicious plugin for integrating Disqus forum",
+   "author" : [
+      "Adam Stokes L<adamjs@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.5, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Disqus-Tiny",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Mojolicious::Lite" : "0",
+            "Test::Mojo" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.037"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojo::Base" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/battlemidget/Mojolicious-Plugin-Disqus-Tiny/issues"
+      },
+      "homepage" : "https://github.com/battlemidget/Mojolicious-Plugin-Disqus-Tiny",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/battlemidget/Mojolicious-Plugin-Disqus-Tiny.git",
+         "web" : "https://github.com/battlemidget/Mojolicious-Plugin-Disqus-Tiny"
+      }
+   },
+   "version" : "1.004",
+   "x_contributors" : [
+      "Adam Stokes <adam.stokes@ubuntu.com>",
+      "Adam Stokes <battlemidget@users.noreply.github.com>",
+      "Bitdeli Chef <chef@bitdeli.com>",
+      "adam.stokes <battlemidget@users.noreply.github.com>",
+      "mudler <mudler@dark-lab.net>"
+   ]
+}
+

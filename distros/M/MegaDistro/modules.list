@@ -1,0 +1,25 @@
+# This is a sample list of modules #
+#
+# commented modules on this list require external dependencies,
+#  which are not yet supported by the system.
+
+File::Spec
+Test::More
+XML::NamespaceSupport
+XML::SAX
+XML::Simple
+Digest::MD5
+Net::FTP
+HTML::Tagset
+HTML::Parser
+URI
+Compress::Zlib
+LWP
+IO::Zlib
+Archive::Tar
+DBI
+#GD
+#DBD::mysql
+#Net::SSLeay
+Convert::ASN1
+Net::LDAP

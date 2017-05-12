@@ -1,0 +1,13 @@
+This is the README for Module-Install-ExtraTests.
+
+in Makefile.PL:
+
+  extra_tests;
+
+in your dist:
+
+  ./xt/author/run-by-author.t
+  ./xt/release/run-during-disttest.t
+  ./xt/smoke/run-by-smokers.t
+
+For more information, see the POD.

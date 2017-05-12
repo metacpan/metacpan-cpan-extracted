@@ -1,0 +1,79 @@
+{
+   "abstract" : "Powerful, high-performance templating for the web and beyond",
+   "author" : [
+      "Jonathan Swartz <swartz@pobox.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mason",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "lib/Mason/t",
+         "lib/Mason/Test",
+         "lib/Mason/Plugin/Defer",
+         "lib/Mason/Plugin/DollarDot",
+         "lib/Mason/Plugin/LvalueAttributes",
+         "lib/Mason/Plugin/TidyObjectFiles"
+      ],
+      "file" : [
+         "lib/Mason/Util.pm"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Class::Load" : "0",
+            "Class::Unload" : "0",
+            "Devel::GlobalDestruction" : "0",
+            "Exception::Class" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Guard" : "0",
+            "IPC::System::Simple" : "0",
+            "JSON" : "0",
+            "Log::Any" : "0.08",
+            "Memoize" : "0",
+            "Method::Signatures::Simple" : "0",
+            "Moose" : "1.15",
+            "MooseX::HasDefaults" : "0.03",
+            "MooseX::StrictConstructor" : "0.13",
+            "Scalar::Util" : "1.01",
+            "Try::Tiny" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Class::Most" : "0",
+            "Test::LongString" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-mason@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mason"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jonswar/perl-mason.git",
+         "web" : "https://github.com/jonswar/perl-mason"
+      }
+   },
+   "version" : "2.24"
+}
+

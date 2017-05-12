@@ -1,0 +1,124 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Message::Construct::Read - read a Mail::Message from a file handle
+
+=head1 SYNOPSIS
+
+ my $msg1 = Mail::Message->read(\*STDIN);
+ my $msg2 = Mail::Message->read(\@lines);
+
+=head1 DESCRIPTION
+
+When complex methods are called on a C<Mail::Message> object, this package
+is autoloaded to support the reading of messages directly from any file
+handle.
+
+=head1 METHODS
+
+=head2 Constructing a message
+
+=over 4
+
+=item Mail::Message-E<gt>B<read>($fh|STRING|SCALAR|ARRAY, %options)
+
+Read a message from a $fh, STRING, SCALAR, or a reference to an
+ARRAY of lines.  Most %options are passed to the L<new()|Mail::Message/"Constructors"> of the message
+which is created, but a few extra are defined.
+
+Please have a look at L<build()|Mail::Message::Construct::Build/"Constructing a message"> and L<buildFromBody()|Mail::Message::Construct::Build/"Constructing a message"> before thinking about
+this C<read> method.  Use this C<read> only when you have a file-handle
+like STDIN to parse from, or some external source of message lines.
+When you already have a separate set of head and body lines, then C<read>
+is certainly B<not> your best choice.
+
+Some people use this method in a procmail script: the message arrives
+at stdin, so we only have a filehandle.  In this case, you are stuck
+with this method.  The message is preceded by a line which can be used
+as message separator in mbox folders.  See the example how to handle
+that one.
+
+This method will remove C<Status> and C<X-Status> fields when they appear
+in the source, to avoid the risk that these fields accidentally interfere
+with your internal administration, which may have security implications.
+
+ -Option             --Default
+  body_type            undef
+  strip_status_fields  <true>
+
+=over 2
+
+=item body_type => CLASS
+
+Force a body type (any specific implementation of a L<Mail::Message::Body|Mail::Message::Body>)
+to be used to store the message content.  When the body is a multipart or
+nested, this will be overruled.
+
+=item strip_status_fields => BOOLEAN
+
+Remove the C<Status> and C<X-Status> fields from the message after
+reading, to lower the risk that received messages from external
+sources interfere with your internal administration.  If you want
+fields not to be stripped (you would like to disable the stripping)
+you probably process folders yourself, which is a Bad Thing!
+
+=back
+
+example: 
+
+ my $msg1 = Mail::Message->read(\*STDIN);
+ my $msg2 = Mail::Message->read(\@lines, log => 'PROGRESS');
+ $folder->addMessages($msg1, $msg2);
+
+ my $msg3 = Mail::Message->read(<<MSG);
+ Subject: hello world
+ To: you@example.com
+                      # warning: empty line required !!!
+ Hi, greetings!
+ MSG
+
+ # promail example
+ my $fromline = <STDIN>;
+ my $msg      = Mail::Message->read(\*STDIN);
+ my $coerced  = $mboxfolder->addMessage($msg);
+ $coerced->fromLine($fromline);
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Message distribution version 3.000,
+built on February 02, 2017.
+
+Do not forget to read
+L</Mail::Box-Overview>,
+L</Mail::Box-Cookbook>, and
+L</Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L</Mail::Message>,
+L</Mail::Box>,
+L</Mail::Box::IMAP4>,
+L</Mail::Box::POP3>,
+L</Mail::Box::Parser::C>,
+L</Mail::Box::Dbx> (unpublished),
+L</Mail::Transport>,
+L</Object::Realize::Later>, and
+L</User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

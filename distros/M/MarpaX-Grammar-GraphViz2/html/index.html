@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns = 'http://www.w3.org/1999/xhtml' xml:lang = 'en' lang = 'en'>
+<head>
+	<title>Index of sample files created by MarpaX::Grammar::GraphViz2 V 1.05</title>
+	<meta http-equiv = 'content-type' content='text/html;charset=utf-8' />
+	<meta http-equiv = 'cache-control' content='no-cache'>
+	<meta http-equiv = 'pragma' content='no-cache'>
+	<link rel = 'stylesheet' type = 'text/css' href = '/assets/css/marpax/grammar/graphviz2/default.css'>
+	<link rel = 'stylesheet' type = 'text/css' href = '/assets/css/marpax/grammar/graphviz2/fancy.table.css'>
+</head>
+<body>
+	<a name = 'top'>
+	<h1 align = 'center'>Index of sample files created by <a href="http://metacpan.org/release/MarpaX-Grammar-GraphViz2">MarpaX::Grammar::GraphViz2</a> V 1.05.</h1>
+
+	<p align = 'center'>All scripts and input files required to generate these examples are shipped with the MarpaX::Grammar::GraphViz2 distro. Output files are shipped too.</p>
+
+	<p align = 'center'>Note 1: The SVG file for c.ast.bnf has been omitted from this demo page because of its size.<br>
+		It takes Graphviz's 'dot' program 6 m 25 s to generate (off-line), and is 1.4 Mb in size.<br>
+		These are not problems, only facts. The problem is the width of the image. So I skipped it.</p>
+
+	<p align = 'center'>Note 2: Some images have a tiny subgraph whose root is, e.g., 'comma'. This is due to the author using<br>
+		both 'comma' and '&lt;comma&gt;' as tokens within the grammar. So far this module does not handle that.</p>
+
+	<p align = 'center'>Note 3: A similar thing (as in Note 2) can happen elsewhere, e.g. with named event statements,
+		when the rhs name uses (say) '&lt;xyz&gt;' and the rule referred to uses just 'xyz'.<br>
+		In all such cases, there will be 2 nodes, with 2 names differing in just the brackets.</p>
+
+	<p align = 'center'>Note 4: Some characters are replaced by similar Unicode characters, because Graphviz teats those characters<br>
+		as special. These characters are: &lt;, &gt;, " and :. Indeed, the " char is replaced by 2 single quotes.</p>
+
+	<p align = 'center'>Note 5: The legend is experimental, and it's form may change at any time. It is displayed here on all<br>
+		images, but is of course optional.</p>
+
+	<p align = 'center'>Note 6: There is a problem displaying any grammar, when a token is used on the right-hand side of a rule<br>
+		both with and without a qualifier. An example is 'value' in these 2 rules in the json.1.bnf:</p>
+
+	<table align = 'center' border = '1'>
+		<tr><td>pair</td><td>::=</td><td>string ':' value</td><td>action => do_pair</td></tr>
+		<tr><td>elements</td><td>::=</td><td>value+</td><td>separator => comma action => do_list</td></tr>
+	</table>
+
+	<p align = 'center'>There is no way to display the text 'value' both with and without that '+' sign.</p>
+
+	<p align = 'center'>Note 7: Numbers on nodes are rule numbers within the input stream.</p>
+
+	<p align = 'center'>Table of Contents</p>
+
+<table align = 'center' border = '1'>
+<tr>
+  <td><a href = './index.html#json.1.bnf'>Input file # 1 - json.1.bnf</a></td>
+</tr>
+<tr>
+  <td><a href = './index.html#json.2.bnf'>Input file # 2 - json.2.bnf</a></td>
+</tr>
+<tr>
+  <td><a href = './index.html#json.3.bnf'>Input file # 3 - json.3.bnf</a></td>
+</tr>
+<tr>
+  <td><a href = './index.html#metag.bnf'>Input file # 4 - metag.bnf</a></td>
+</tr>
+<tr>
+  <td><a href = './index.html#numeric.expressions.bnf'>Input file # 5 - numeric.expressions.bnf</a></td>
+</tr>
+<tr>
+  <td><a href = './index.html#stringparser.bnf'>Input file # 6 - stringparser.bnf</a></td>
+</tr>
+<tr>
+  <td><a href = './index.html#termcap.info.bnf'>Input file # 7 - termcap.info.bnf</a></td>
+</tr>
+</table>
+
+	<p align = 'center'>Due to its width, the SVG file for the c.ast.bnf case is not in this table,
+		but can be <a href = './c.ast.svg'>viewed here.</a></p>
+
+<table border = '1'>
+<tr>
+  <td><a name = 'json.1.bnf'></a>Input file # 1 - json.1.bnf</td>
+  <td><object data = './json.1.svg'></object><br />Output file # 1 - html/json.1.svg. <a href = '#top'>Top</a></td>
+</tr>
+<tr>
+  <td><a name = 'json.2.bnf'></a>Input file # 2 - json.2.bnf</td>
+  <td><object data = './json.2.svg'></object><br />Output file # 2 - html/json.2.svg. <a href = '#top'>Top</a></td>
+</tr>
+<tr>
+  <td><a name = 'json.3.bnf'></a>Input file # 3 - json.3.bnf</td>
+  <td><object data = './json.3.svg'></object><br />Output file # 3 - html/json.3.svg. <a href = '#top'>Top</a></td>
+</tr>
+<tr>
+  <td><a name = 'metag.bnf'></a>Input file # 4 - metag.bnf</td>
+  <td><object data = './metag.svg'></object><br />Output file # 4 - html/metag.svg. <a href = '#top'>Top</a></td>
+</tr>
+<tr>
+  <td><a name = 'numeric.expressions.bnf'></a>Input file # 5 - numeric.expressions.bnf</td>
+  <td><object data = './numeric.expressions.svg'></object><br />Output file # 5 - html/numeric.expressions.svg. <a href = '#top'>Top</a></td>
+</tr>
+<tr>
+  <td><a name = 'stringparser.bnf'></a>Input file # 6 - stringparser.bnf</td>
+  <td><object data = './stringparser.svg'></object><br />Output file # 6 - html/stringparser.svg. <a href = '#top'>Top</a></td>
+</tr>
+<tr>
+  <td><a name = 'termcap.info.bnf'></a>Input file # 7 - termcap.info.bnf</td>
+  <td><object data = './termcap.info.svg'></object><br />Output file # 7 - html/termcap.info.svg. <a href = '#top'>Top</a></td>
+</tr>
+</table>
+
+<hr />
+
+<h3 class = 'global_toc_text'>Links</h3>
+
+<h2 align = 'center'>Index page for <a href = 'http://savage.net.au/Graphviz.html'>all graph module demos</a></h2>
+
+<hr />
+
+<h3 class = 'global_toc_text'>Environment</h3>
+
+<table align="center" cellspacing="0">
+<tr>
+<!-- Left -->
+<td>
+<div class="even_left">
+Author
+</div>
+</td>
+<!-- Right -->
+<td>
+<div class="even_right">
+<a href="http://savage.net.au/">Ron Savage</a>
+</div>
+</td>
+</tr>
+<tr>
+<!-- Left -->
+<td>
+<div class="odd_left">
+Date
+</div>
+</td>
+<!-- Right -->
+<td>
+<div class="odd_right">
+2015-06-07
+</div>
+</td>
+</tr>
+<tr>
+<!-- Left -->
+<td>
+<div class="even_left">
+OS
+</div>
+</td>
+<!-- Right -->
+<td>
+<div class="even_right">
+Debian V 6
+</div>
+</td>
+</tr>
+<tr>
+<!-- Left -->
+<td>
+<div class="last_odd_left">
+Perl
+</div>
+</td>
+<!-- Right -->
+<td>
+<div class="last_odd_right">
+5.20.2
+</div>
+</td>
+</tr>
+</table>
+
+<hr />
+
+</body>
+</html>

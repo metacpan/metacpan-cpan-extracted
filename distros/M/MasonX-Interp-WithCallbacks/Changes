@@ -1,0 +1,94 @@
+Revision history for Perl extension MasonX::Interp::WithCallbacks.
+
+1.19  2011-06-21T04:33:14
+      - Fixed a pasto in the "Support" section.
+      - Moved repostitory to [GitHub](https://github.com/theory/class-meta/).
+      - Fixed installation documentation in the READE so that it demonstrates
+        using `Build.PL rather than `Makefile.PL`, as the latter is not
+        included in the distribution.
+
+1.18  2008-05-03T23:26:42
+      - Added "configure_requires" parameter to Build.PL and added Test::Pod
+        to the "recommends" parameter.
+      - Updated POD test to require Test::Pod 1.20 or later.
+      - Fixed test failures under Perl 5.6. Reported by Slaven Rezic via
+        CPAN-Testers.
+      - Added a link to the Subversion repository.
+      - Fixed the test suite to run properly with Apache::TestMB under
+        mod_perl 2 as well as mod_perl 1.
+      - Fixed failing test with older versions of CGI, such as that
+        distributed with Perl 5.6.2.
+
+1.17  2007-07-24T19:37:47
+      - Fixed test failures with Mason 1.36. Patch from Niko Tyni.
+
+1.16  2006-07-21T17:00:55
+      - Replaced broken passthrough Makefile.PL with a real Makefile.PL.
+        Reported by Scott Lanning.
+
+1.15  2006-05-26T23:02:03
+      - Added missing t/htdocs/alt.mc to MANIFEST and therefore to the
+        distribution. D'oh!
+
+1.14  2006-05-26T22:55:15
+      - Now passing the the interp object to callbacks via the new 'requster'
+        parameter the request() method of Params::CallbacRequest, introduced
+        in version 1.15 of that module.
+      - Added the comp_path() accessor. This so that callbacks can change it
+        if they want, by calling $cb->requester->comp_path($comp_path).
+      - Fixed CGI redirect tests to be compliant with the new "302 Found"
+        header created by CGI.pm. It used to be "302 Moved".
+
+1.13  2004-11-19T02:37:50
+      - Makefile.PL no longer requires Apache::TestMB, since it may not
+        be installed, but MasonX::Interp::WithCallbacks can still be installed
+        with Module::Build. Reported by Scott Lanning.
+      - Added Apache::TestMB to the list of recommended modules in Build.PL.
+
+1.12  2004-06-28T17:04:23
+      - Fixed Apache tests to eliminate failure under more recent versions
+        of Apache::Test and LWP.
+      - Changed "%PARAMS" to the correct Mason hash, "%ARGS", in the synopsis.
+        Reported by Mike Dorman.
+      - Ported installer from ExtUtils::MakeMaker to Module::Build using the
+        newly released Apache::TestMB.
+
+1.11  Wed Oct  8 20:12:20 2003
+      - Require Class::Container 0.09 or later. It seems that older versions
+        don't work properly.
+      - Updated Apache test to skip tests if the Apache server doesn't run
+        mod_perl. Suggesed by Geoffrey Young.
+      - Stopped checking for presence of LWP in Apache tests, since
+        Apache::TestClient should work fine for the simple test requests.
+      - The module now requires HTML::Mason 1.23, rather than just the
+        requirements in Makefile.PL.
+      - Require Params::CallbackRequest 1.11 or later to be in sync with
+        request callback order of execution.
+      - Fixed failing tests of notes functionality under Apache. Not sure
+        how they ever passed, frankly.
+
+1.10  Mon Sep  8 21:15:42 2003
+      - Code moved over from MasonX::ApacheHandler::WithCallbacks, which is
+        deprecated. Differences from that class are as follows.
+      - Callback handling code from MasonX::ApacheHandler::WithCallbacks has
+        been migrated to Params::CallbackRequest.
+      - Code from MasonX::CallbackHandler has been migrated to
+        Params::Callback.
+      - MasonX::CallbackTester has been removed, since it isn't necessary
+        in a non-mod_perl environment.
+      - Params::CallbackRequest::Exceptions supplies the exceptions thrown
+        by Params::CallbackRequest, since that module is not strictly
+        connected to Mason.
+      - Changed the request_args() accessor from MasonX::CallbackHandler to
+        params() in Params::Callback, to reflect the idea that this is a
+        generic parameter-triggered callback architecture.
+      - Replaced the ah() accessor, since the callback controller isn't a
+        Mason ApacheHandler anymore, with cb_request() in Params::Callback.
+      - Added cb_request() accessor to MasonX::Interp::WithCallbacks.
+      - Replaced the "exec_null_cb_values" parameter from
+        MasonX::ApacheHandler::WithCallbaks, which had defaulted to true,
+        with "ignore_nulls" in Params::CallbackRequest, which defaults to
+        false.
+      - Added Params::CallbackRequest notes() interface, which copies all
+        notes to the Mason request notes() interface before the request
+        executes.

@@ -1,0 +1,1446 @@
+# Copyright 2015 Jeffrey Kegler
+# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# redistribute it and/or modify it under the terms of the GNU Lesser
+# General Public License as published by the Free Software Foundation,
+# either version 3 of the License, or (at your option) any later version.
+#
+# Marpa::R2 is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser
+# General Public License along with Marpa::R2.  If not, see
+# http://www.gnu.org/licenses/.
+
+=head1 NAME
+
+Marpa::R2::Event - SLIF parse events
+
+=head1 Synopsis
+
+=for Marpa::R2::Display
+name: SLIF Event synopsis
+normalize-whitespace: 1
+partial: 1
+
+    my $input = q{a b c "insert d here" e e f h};
+    my $length = length $input;
+    my $pos    = $slr->read( \$input );
+
+    my $actual_events = q{};
+
+    READ: while (1) {
+
+        my @actual_events = ();
+
+        my $next_lexeme;
+        EVENT:
+        for my $event ( @{ $slr->events() } ) {
+            my ($name) = @{$event};
+
+=for Marpa::R2::Display::End
+
+=for Marpa::R2::Display
+name: SLIF Event synopsis
+normalize-whitespace: 1
+partial: 1
+
+            push @actual_events, $name;
+        }
+
+        if (@actual_events) {
+            $actual_events .= join q{ }, "Events at position $pos:", @actual_events;
+            $actual_events .= "\n";
+        }
+
+=for Marpa::R2::Display::End
+
+=for Marpa::R2::Display
+name: SLIF Event synopsis
+normalize-whitespace: 1
+partial: 1
+
+        if ($pos < $length) {
+            $pos = $slr->resume();
+            next READ;
+        }
+        last READ;
+    } ## end READ: while (1)
+
+=for Marpa::R2::Display::End
+
+The synopsis is extracted from an example given in full
+L<below|/"An example">.
+
+=head1 About this document
+
+This document is an overview of B<SLIF parse events>.
+SLIF parse events
+B<trigger> based on conditions declared in the DSL.
+Typical events are the prediction or recognition
+of a symbol.
+
+SLIF parse events are often used to allow an application to
+switch over to its own custom procedural logic.
+Among other things,
+an application can do its own "external" scanning of lexemes.
+An application may ask Marpa to resume internal scanning at
+any point.
+
+SLIF parse events may be named or unnamed.
+Use of unnamed events is discouraged, and should be reserved for legacy
+code.
+New applications should only use named events.
+When not otherwise specified,
+this document is talking about named events.
+Unnamed events are described
+L<below,
+in a section dedicated to them|/"Unnamed events">.
+
+=head1 Terminology
+
+SLIF parse events are called B<parse events>
+or simply B<events>,
+in contexts where the meaning is clear.
+
+SLIF parse events evolved over time from simpler
+mechanisms,
+and the term SLIF parse event was introduced late
+in the development of Marpa::R2.
+In previous versions of Marpa::R2,
+SLIF parse events and their precursors are called "pauses" or simply "events".
+For historical reasons,
+some of the method names dealing with SLIF parse events
+still have the word "pause" as part of their name.
+
+In this document, an B<instance> of a symbol
+in a parse
+means an occurrence
+of the symbol in that parse
+with a specific start location and length.
+An instance of a symbol is also called
+a B<symbol instance>.
+A consequence of this definition
+is that every symbol instance
+has exactly one end location.
+
+For some string and grammar,
+we say that a parse is B<valid>
+if the parse of the string
+is valid according to the grammar.
+In a parse,
+a nulled symbol instance,
+or B<nulled symbol>, is a symbol instance with a length of zero.
+A non-nulled symbol instance, non-nulled instance,
+or B<non-nulled symbol>, is a symbol instance which is not
+nulled.
+A symbol in a grammar is 
+a B<nullable symbol> if it has
+at least one nulled instance
+in at least one valid parse of at least one string.
+A symbol in a grammar is 
+a B<nulling symbol> if,
+for all strings,
+all of its instances in valid parses are nulled instances.
+A symbol is B<non-nulling> if it is not nulling.
+
+Intuitively, a string is actual to I<L> if we
+know the actual input as far as I<L>,
+and the string is consistent with the input.
+More formally,
+let C<A> be the actual input to a parse.
+Let C<S> be an arbitrary string in the same alphabet.
+Let C<prefix(A, L)> be the prefix of length I<L>
+that is of length C<L>,
+and let C<prefix(S, L)> be defined in the same way.
+If C<prefix(A, L) = prefix(S, L)>,
+then we say that
+string C<S> is B<consistent with
+the actual input up to location L>.
+For brevity,
+we will often say
+that C<S> is B<actual to L>.
+
+If an instance of symbol I<S>
+that starts at location I<L> is in a valid parse
+of some string actual to I<L>,
+we say that a symbol I<S> is B<acceptable> at
+a location I<L>.
+We say that a symbol
+is B<acceptable> at
+a location I<L> if it is the symbol of
+a symbol instance acceptable at location I<L>.
+
+If an instance of symbol I<S>
+that ends at location I<L> is in a valid parse
+of some string actual to I<L>,
+we say that a symbol I<S> is B<recognized> at
+a location I<L>.
+We say that a symbol
+is B<recognized> at
+a location I<L> if it is the symbol of
+a symbol instance recognized at location I<L>.
+
+=head1 The life cycle of events
+
+=over 4
+
+=item * An SLIF parse event must be B<declared>.
+
+=item * A declared event may B<trigger>.
+
+=item * Once an event triggers, it may be B<accessed>.
+
+=back
+
+Parse events are declared in the SLIF DSL.
+A parse event is either a lexeme event
+or a non-lexeme event.
+A lexeme event is declared using a
+L<C<:lexeme> pseudo-rule|Marpa::R2::Scanless::DSL/"Lexeme pseudo-rule">.
+A non-lexeme event is declared using a
+L<named event statement|Marpa::R2::Scanless::DSL/"Named event statement">.
+The various types of parse events are described in detail
+L<below|/"Types of parse event">.
+The description of
+each type of parse event
+will state whether it is a lexeme or a non-lexeme event.
+
+Once declared, a parse event
+may trigger during any event-triggering SLIF
+recognizer method.
+The event-triggering SLIF recognizer methods are
+L<C<read()>|Marpa::R2::Scanless::R/"read()">,
+L<C<resume()>|Marpa::R2::Scanless::R/"resume()">,
+L<C<lexeme_read()>|Marpa::R2::Scanless::R/"lexeme_read()"> and
+L<C<lexeme_complete()>|Marpa::R2::Scanless::R/"lexeme_complete()">.
+
+The location at which a parse event triggers is the B<event location>.
+An event may trigger at any location, including location 0.
+When an event triggers, it causes the event-triggering
+method to return immediately, with the current location
+at the B<trigger location>.
+The trigger location is the same as the event location,
+except in the case of
+L<pre-lexeme events|/"Pre-lexeme events">.
+
+A non-lexeme event may trigger during any of the event-triggering
+methods.
+A lexeme event will only trigger during calls of the
+C<< $slr->read() >> and C<< $slr->resume() >> methods.
+
+The triggering of events may be controlled with
+the L<activate() method|Marpa::R2::Scanless::R/"activate()">.
+An event will only trigger if activated.
+All events are automatically activated when declared.
+
+Events may be accessed using
+L<the Scanless recognizer's events()
+method|Marpa::R2::Scanless::R/"events()">.
+The beginning and end of the lexeme triggering a lexeme event
+may be found using
+L<the Scanless recognizer's pause_span()
+method|Marpa::R2::Scanless::R/"pause_span()">.
+
+=head1 Types of parse event
+
+=head2 Completion events
+
+Completion events are declared in the SLIF DSL
+using the
+L<named event statement|Marpa::R2::Scanless::DSL/"Named event statement">:
+
+=for Marpa::R2::Display
+name: SLIF completed event statement synopsis
+partial: 1
+normalize-whitespace: 1
+
+    event 'a' = completed A
+    event 'b'=off = completed B
+    event 'c'=on = completed C
+    event 'd' = completed D
+
+=for Marpa::R2::Display::End
+
+A completion SLIF parse event can be specified for any
+symbol that is not a lexeme.
+Completion events are non-lexeme events.
+A completion event triggers
+whenever a non-nulled instance of its symbol
+is recognized at the current location.
+
+When a completion event triggers,
+its trigger location and its event location
+are set to the current location,
+which will be the end location
+of the instance that triggered the event.
+The event is called a "completion"
+because, at the trigger location,
+the recognition of its symbol
+is "complete".
+
+In the SLIF parse event descriptor returned
+by the 
+L<the C<< $slr->events() >>
+method|Marpa::R2::Scanless::R/"events()">,
+the name of completed event is the only element.
+
+=head2 Discard events
+
+=for Marpa::R2::Display
+name: SLIF discard event statement synopsis 2
+partial: 1
+normalize-whitespace: 1
+
+    :discard ~ ws event => ws
+    ws ~ [\s]+
+    :discard ~ [,] event => comma=off
+    :discard ~ [;] event => 'semicolon'=on
+    :discard ~ [.] event => period
+
+=for Marpa::R2::Display::End
+
+Discard events are specified in
+L<discard pseudo-rules|Marpa::R2::Scanless::DSL/"Discard pseudo-rule">.
+They are non-lexeme events.
+This may seem counter-intuitive,
+but a lexeme must be a symbol visible to the G1
+grammar and discarded symbols
+are discarded
+before the G1 grammar can see them.
+
+When a discard event triggers, its trigger location and its event location are set to the current location.
+This will be the end location of the discarded text.
+
+In the SLIF parse event descriptor returned
+by the 
+L<the C<< $slr->events() >>
+method|Marpa::R2::Scanless::R/"events()">,
+there will be 4 elements:
+
+=over 4
+
+=item *
+
+The name of the discard event.
+
+=item *
+
+The start location of the discarded text,
+as an offset in the physical input stream.
+
+=item *
+
+The end location of the discarded text,
+as an offset in the physical input stream.
+
+=item *
+
+The G1 location of the last lexeme read.
+
+=back
+
+An intended purpose of the G1 location is to allow
+the synchronization of data taken from a series of discard events,
+with data taken from a parse tree.
+Physical input stream locations can often
+be used for this purpose,
+but an application is allowed to move around
+in the physical input stream.
+If an application does not move monotonically
+through the physical input stream,
+physical input stream locations will not
+necessarily indicate the order from the point
+of view of the parse tree,
+and of the virtual input stream.
+G1 locations are always in left-to-right order
+from the point of view of parse tree,
+and of the virtual input stream on which it is based.
+
+Since discarded text is not seen by G1,
+it does not really have a G1 location, so the G1 location
+reported with the event
+is that of the last lexeme read.
+All lexemes have G1 locations.
+If the discarded text is at the beginning of the parse,
+before any lexemes have been read,
+the G1 location is reported as zero.
+
+=head2 Nulling events
+
+A nulling event is declared in the SLIF DSL
+using the
+L<named event statement|Marpa::R2::Scanless::DSL/"Named event statement">:
+
+=for Marpa::R2::Display
+name: SLIF nulled event statement synopsis
+partial: 1
+normalize-whitespace: 1
+
+    event '!a' = nulled A
+    event '!b'=off = nulled B
+    event '!c'=on = nulled C
+    event '!d' = nulled D
+
+=for Marpa::R2::Display::End
+
+A nulling SLIF parse event occurs whenever a nulled instance
+of its symbol is recognized at the current location.
+When a completion event triggers,
+its trigger location and its event location
+are set to the current location,
+which will be
+the location where the triggering instance both begins and ends.
+
+A nulling event is a non-lexeme event.
+A nulling SLIF parse event can be specifed for any
+symbol that is not a lexeme.
+A nulled symbol may derive other null symbols,
+producing one or more nulled trees;
+because a null derivation may be ambiguous,
+a nulled symbol may derive more than one nulled
+tree.
+A set of one or more nulled trees
+is called a nulled forest.
+
+When a nulling event triggers for a symbol instance,
+all activated nulling events declared
+for symbols derived
+from the triggered symbol instance will
+also trigger.
+The triggering of nulling events is recursive,
+so that when a nulled symbol instance
+triggers an event, it triggers all the events
+in the nulled forest derived
+from the triggering symbol instance.
+Nulled forests are described in more detail
+in L<a separate
+section|"Nulled forests">.
+
+In the SLIF parse event descriptor returned
+by the 
+L<the C<< $slr->events() >>
+method|Marpa::R2::Scanless::R/"events()">,
+the name of nulling event is the only element.
+
+=head2 Prediction events
+
+A prediction event is declared in the SLIF DSL
+using the
+L<named event statement|Marpa::R2::Scanless::DSL/"Named event statement">:
+
+=for Marpa::R2::Display
+name: SLIF predicted event statement synopsis
+partial: 1
+normalize-whitespace: 1
+
+    event '^a' = predicted A
+
+=for Marpa::R2::Display::End
+
+A prediction event triggers whenever
+a non-nulling symbol is acceptable at the current location.
+When a prediction event triggers,
+its trigger location and its event location
+are set to the current location.
+A prediction may not result in an actual instance of the symbol,
+but no actual symbol instance can start
+at the event location unless a prediction,
+if properly declared and activated,
+would trigger at that location.
+
+Prediction SLIF parse events may be defined for any symbol,
+whether it is a lexeme or not.
+But prediction events are non-lexeme events,
+even when their symbol is a lexeme.
+
+In the SLIF parse event descriptor returned
+by the 
+L<the C<< $slr->events() >>
+method|Marpa::R2::Scanless::R/"events()">,
+the name of prediction event is the only element.
+
+=head2 Post-lexeme events
+
+=for Marpa::R2::Display
+name: SLIF Event synopsis
+partial: 1
+normalize-whitespace: 1
+
+    :lexeme ~ <a> pause => after event => '"a"'
+
+=for Marpa::R2::Display::End
+
+A post-lexeme event is a lexeme event.
+It triggers if the lexeme is scanned at the current location.
+The SLIF recognizer will have
+already read the lexeme
+when its post-lexeme event triggers.
+
+When a post-lexeme event triggers,
+its trigger location and its event location
+are set to the current location,
+which will also be the location where the lexeme ends.
+A post-lexeme event also sets the
+L<C<pause span> and
+C<pause lexeme>|"Pause span and pause lexeme">.
+Post-lexeme events which trigger during
+C<< $slr->lexeme_complete() >> and
+C<< $slr->lexeme_read() >> calls are discarded.
+
+In the SLIF parse event descriptor returned
+by the 
+L<the C<< $slr->events() >>
+method|Marpa::R2::Scanless::R/"events()">,
+the name of post-lexeme event is the only element.
+
+=head2 Pre-lexeme events
+
+=for Marpa::R2::Display
+name: SLIF Event synopsis
+partial: 1
+normalize-whitespace: 1
+
+    :lexeme ~ <insert d> pause => before event => 'insert d'
+
+=for Marpa::R2::Display::End
+
+A pre-lexeme event is a lexeme event.
+It triggers if the lexeme is scanned at the current location.
+When a pre-lexeme event triggers,
+its event location
+is set to the current location.
+Its trigger location is set to the location where the lexeme starts,
+which will be before the event location.
+A pre-lexeme event also sets the
+L<C<pause span> and
+C<pause lexeme>|"Pause span and pause lexeme">.
+
+The SLIF recognizer will B<not> have
+read the lexeme
+when its pre-lexeme event triggers.
+In effect, it "rewinds" the scanning.
+
+For most events, the trigger location is the current location,
+but pre-lexeme events are the exception.
+Its setting of the trigger location to the start of the lexeme
+is consistent with the pre-lexeme event's behavior as a "rewind".
+An intended use of pre-lexeme events
+is catching a lexeme which
+is about to be read, and giving it special treatment.
+For more on this, see
+L<below|"External scanning">.
+Pre-lexeme events which trigger during
+C<< $slr->lexeme_complete() >> and
+C<< $slr->lexeme_read() >> calls are discarded.
+
+There is a lot of similarity
+between pre-lexeme events and predictions,
+but there are also very important differences.
+
+=over 4
+
+=item *
+
+A pre-lexeme event does not occur
+unless triggering lexeme is actually
+found in the input.
+On the other hand,
+a prediction event is,
+as the name suggests, only a prediction --
+the triggering lexeme may never
+actually be found in the input.
+
+=item *
+
+Even though they have the same
+trigger location,
+pre-lexeme and prediction events
+do not occur at the same time,
+because pre-lexeme events
+require a scan of the lexeme,
+while prediction events do not.
+If both
+are defined for a symbol,
+the prediction event will trigger first,
+B<before> the lexeme is scanned.
+The pre-lexeme event will trigger next,
+B<after> the lexeme is scanned.
+
+=item *
+
+Pre-lexeme events can be defined only
+for lexemes.
+Prediction events can be defined for any
+symbol.
+
+=item *
+
+Prediction events will occur together
+with the other events expected at the trigger location.
+Pre-lexeme events will not,
+because they do not happen at the trigger location --
+the trigger location is moved back to the
+start of the lexeme as a convenience.
+
+=back
+
+In the SLIF parse event descriptor returned
+by the 
+L<the C<< $slr->events() >>
+method|Marpa::R2::Scanless::R/"events()">,
+the name of pre-lexeme event is the only element.
+
+=head2 Exhaustion events
+
+=for Marpa::R2::Display
+name: SLIF exhaustion recognizer setting synopsis
+partial: 1
+normalize-whitespace: 1
+
+        my @shortest_span = ();
+        my $recce         = Marpa::R2::Scanless::R->new(
+            {   grammar    => $g,
+                exhaustion => 'event',
+            },
+            $recce_debug_args
+        );
+        my $pos = $recce->read( \$string, $target_start );
+
+        EVENT:
+        for my $event ( @{ $recce->events() } ) {
+            my ($name) = @{$event};
+            if ( $name eq 'target' ) {
+                @shortest_span = $recce->last_completed_span('target');
+                diag(
+                    "Preliminary target at $pos: ",
+                    $recce->literal(@shortest_span)
+                ) if $verbose;
+                next EVENT;
+            } ## end if ( $name eq 'target' )
+                # Not all exhaustion has an exhaustion event,
+                # so we look for exhaustion explicitly below.
+            next EVENT if $name eq q('exhausted);
+            die join q{ }, "Spurious event at position $pos: '$name'";
+        } ## end EVENT: for my $event ( @{ $recce->events() } )
+
+=for Marpa::R2::Display::End
+
+An exhaustion parse event triggers on asynchronous parse exhaustion,
+if the recognizer's C<exhaustion> setting is "C<event>".
+The name of the event is
+"C<'exhausted>"
+(The initial single quote is part of the event's name,
+and indicates it is a reserved name,
+which will not conflict with
+the name of any user-named event.)
+
+Intuitively, parse exhaustion events are created only when
+needed for control to return to the application.
+More precisely,
+a parse exhaustion event is called B<synchronous> if it
+occurs at a G1 location where control would return to the application
+in any case, either due to end of string or another event.
+A parse exhaustion event is called B<asynchronous> if it is not
+synchronous.
+
+The event itself is often simply discarded,
+because an application typically
+does not care whether
+exhaustion is synchronous or asynchronous.
+The L<C<exhausted()> method|Marpa::R2::Scanless::R/"exhausted()">
+can be relied on to report
+both asynchronous and synchronous parse exhaustion,
+and it is usually used instead.
+Exhaustion is discussed further in
+L<a separate document|Marpa::R2::Exhaustion>.
+
+=head2 Rejection events
+
+=for Marpa::R2::Display
+name: SLIF rejection recognizer setting synopsis
+partial: 1
+normalize-whitespace: 1
+
+    my $recce = Marpa::R2::Scanless::R->new(
+        {   grammar   => $g,
+            rejection => 'event',
+        },
+        $recce_debug_args
+    );
+    my $pos = $recce->read( \$suffixed_string, 0, $original_length );
+
+    READ_LOOP: while (1) {
+        my $rejection = 0;
+        my $pos       = $recce->pos();
+        EVENT:
+        for my $event ( @{ $recce->events() } ) {
+            my ($name) = @{$event};
+            if ( $name eq q('rejected) ) {
+                $rejection = 1;
+                diag("You fool! you forget the semi-colon at location $pos!")
+                    if $verbose;
+                next EVENT;
+
+            } ## end if ( $name eq q('rejected) )
+            die join q{ }, "Spurious event at position $pos: '$name'";
+        } ## end EVENT: for my $event ( @{ $recce->events() } )
+
+        last READ_LOOP if not $rejection;
+
+        $recce->resume( $original_length, 1 );
+        diag("I fixed it for you.  Now you owe me.") if $verbose;
+        $recce->resume( $pos, $original_length - $pos );
+    } ## end READ_LOOP: while (1)
+
+=for Marpa::R2::Display::End
+
+A rejection event triggers if
+all lexemes at a G1 location are rejected,
+and the recognizer's C<rejection> setting is "C<event>".
+The name of the event is
+"C<'rejected">
+(The initial single quote is part of the event's name,
+and indicates it is a reserved name,
+which will not conflict with the name
+of any user-named event.)
+
+=head1 Lexeme events
+
+SLIF parse events are divided
+into lexeme and non-lexeme events,
+based on their type.
+The lexeme events are the pre-lexeme event
+and post-lexeme event.
+
+A lexeme event will trigger at the current location
+if all of the following criteria,
+applied in order, are true:
+
+=over 4
+
+=item *
+
+It is declared in a
+L<C<:lexeme> pseudo-rule|Marpa::R2::Scanless::DSL/"Lexeme pseudo-rule">.
+
+=item *
+
+Its lexeme has been scanned by the L0 grammar at that location.
+
+=item *
+
+The G1 grammar would accept its lexeme at that location.
+
+=item *
+
+The lexeme is not scanned externally,
+that is,
+it is not scanned
+by a call of the
+L<C<< $slr->lexeme_complete() >> method|Marpa::R2::Scanless::R/"lexeme_complete()">
+or of the
+L<C<< $slr->lexeme_read() >> method|Marpa::R2::Scanless::R/"lexeme_read()">
+method.
+
+=item *
+
+The event is activated.
+An event is activated by default when it
+is declared.
+Deactivation and reactivation of events is
+done with the SLIF recognizer's
+L<activate() method|Marpa::R2::Scanless::R/"activate()">.
+
+=item *
+
+Its lexeme priority is higher than, or equal to,
+that of any other lexeme
+remaining after the previous criteria
+have been applied.
+
+=item *
+
+If it is a post-lexeme event,
+none of other remaining events are pre-lexeme events.
+(In other words, a pre-lexeme event prevents
+post-lexeme events from triggering at the same location.)
+
+=back
+
+Marpa allows ambiguous lexemes and,
+even after all the above criteria have been applied,
+there may be more than one lexeme event at a G1 location.
+
+=head2 Pause span and pause lexeme
+
+When a lexeme event triggers, it will set
+the B<pause lexeme> to the lexeme symbol.
+It will also set
+the B<pause span> to the start physical input stream location
+and length of the triggering lexeme.
+The pause span and pause lexeme are
+originally undefined.
+Every call
+to the L<C<read()>|Marpa::R2::Scanless::R/"read()">
+or the L<C<resume()>|Marpa::R2::Scanless::R/"resume()">
+methods resets the pause lexeme
+and the pause span to undefined.
+
+The pause span may be accessed directly
+with the
+L<C<< $slr->pause_span() >>
+method|Marpa::R2::Scanless::R/"pause_span()">.
+L<Accessing the pause lexeme
+directly|Marpa::R2::Scanless::R/"pause_lexeme()">
+is discouraged,
+because multiple lexeme events may occur at the
+same G1 location,
+but only one pause lexeme, arbitrarily chosen, is recorded.
+This is not a problem with the pause span, because
+all pause spans at a G1 location will be identical.
+
+=head1 Non-lexeme events
+
+Prediction, completion and nulling events are non-lexeme events.
+The conditions for a non-lexeme event are simpler than those for
+a lexeme event, because they do not involve lexical processing.
+
+A non-lexeme event will trigger at the current location
+if all of the following are true:
+
+=over 4
+
+=item *
+
+It is declared in a
+L<named event statement|Marpa::R2::Scanless::DSL/"Named event statement">.
+
+=item *
+
+Its B<triggering condition> is true.  Specifically,
+
+=over 4
+
+=item *
+
+It is a prediction and its symbol is acceptable at the current location; or
+
+=item *
+
+it is a completion or a nulling event and its symbol is recognized
+at the current location; or
+
+=item *
+
+it is an exhaustion event, and asynchronous parse exhaustion,
+L<as defined above|/"Exhaustion events">,
+occurs at the current location; or
+
+=item *
+
+it is an rejection event, and all lexeme alternatives are rejected
+at the current location.
+
+=back
+
+=item *
+
+The event is activated.
+An event is activated by default when it
+is declared.
+Deactivation and reactivation of events is
+done with the SLIF recognizer's
+L<activate() method|Marpa::R2::Scanless::R/"activate()">.
+
+=back
+
+=head1 Techniques
+
+=head2 External scanning
+
+Switching to external scanning is an intended use case
+for all events, other than exhaustion events.
+In particular,
+the behavior of pre-lexeme events
+is most intuitive when thought about with
+external scanning in mind.
+
+L<The example code for this document|/"An example">
+contains an artificially simple example of external
+scanning.
+The symbol C<< <insert d> >> has a pre-lexeme event
+declared:
+
+=for Marpa::R2::Display
+name: SLIF Event synopsis
+partial: 1
+normalize-whitespace: 1
+
+    :lexeme ~ <insert d> pause => before event => 'insert d'
+
+=for Marpa::R2::Display::End
+
+When this triggers, the code in the example switches to
+external scanning:
+It reads a C<< <d> >> symbol externally,
+skips over the lexeme actually found
+in the physical input,
+and resumes internal scanning.
+
+=head2 Markers
+
+It is quite reasonable to create "markers" --
+nulling symbols
+whose primary (or sole) purpose
+is to have nulling events declared for them.
+Markers are the only way to declare events that trigger in
+the middle of a rule.
+
+=head2 Rules
+
+There are no events explicitly defined in terms of rules,
+but every rule event that is wanted can be achieved in
+one or more ways.
+The most flexible of these, and the best for many purposes,
+is to use L<markers|/"Markers">.
+
+Another method is to use the LHS of a rule to track rule
+predictions and completions.
+This requires that the LHS symbol of the rule be unique to that
+rule.
+
+=head1 Implications
+
+This section describes 
+some implications of the SLIF parse events mechanism
+that may be unexpected at first.
+These implications are Marpa working as designed and,
+I hope the reader will agree,
+as is desirable.
+
+=head2 Ambiguity
+
+If a parse is ambiguous, events trigger for
+B<all> the possible symbols.
+A user thinking in terms of one of the parses,
+and unaware of the ambiguity, may find this unexpected.
+In L<the example|/"An example">,
+events for both the symbols C<< <ambig1> >>
+and C<< <ambig2> >>, as well as all their
+derived symbols, trigger.
+
+=head2 Tentative events
+
+Marpa's events are left-eidetic but right-blind.
+Left of the event location, Marpa's events are 100% accurate.
+Right of the event location, they are totally unaware of
+what the actual input will be --
+there is no "lookahead".
+Because events trigger based on input action
+only up to the event location,
+events are B<tentative>.
+
+Once the parse is complete,
+and the actual input to the right of the event
+location is taken into account,
+it is quite possible that
+none of the parse trees
+will actually contain the symbol instance
+that triggered an event.
+
+In L<the example|/"An example">,
+prediction and completion
+events are reported for the symbols
+C<< <start1> >>,
+C<< <start2> >>,
+C<< <mid1> >> and
+C<< <mid2> >>,
+but none of these symbols
+winds up in
+any of the parse tress.
+This is because they are derived from
+C<< <ambig1> >> or
+C<< <ambig2> >>,
+and C<< <ambig1> >> or
+C<< <ambig2> >> will never be fully recognized
+in any of the parse trees.
+The reason that 
+C<< <ambig1> >> and
+C<< <ambig2> >> will not be fully recognized
+is that their full recognition requires
+that there be a 
+C<< <z> >> symbol in the input and the
+input stream in the example does not contain a
+C<< <z> >> symbol.
+
+Exhaustion events are not tentative.
+All other SLIF parse events are tentative.
+
+In the example, the predictions
+for 
+C<< <mid1> >> and
+C<< <mid2> >> do not match anything in
+the final parse tree,
+because the locations where
+C<< <mid1> >> and
+C<< <mid2> >> would be predicted are not reached in
+those trees.
+For similar reasons, nulling events are tentative.
+
+Lexemes can be ambiguous and
+when they are ambiguous
+one or more of the lexeme alternatives
+may not be used in any final parse tree.
+Because of this,
+lexeme events are also tentative.
+
+After rejection events,
+input can be,
+and typically is,
+retried at the same G1 location.
+This is what happens when the Ruby Slippers technique
+is used.
+Often, on the second or later attempt, one or
+more lexemes are found that are acceptable
+to the grammar.
+For this reason,
+rejection events are tentative.
+
+=head2 Nulled forests
+
+When a symbol is nulled, any symbol which can be null-derived
+from it
+is also nulled.
+In L<the example|/"An example">,
+when the 
+symbol C<< <g> >> is nulled,
+derived symbols
+C<< <g1> >>,
+C<< <g2> >>,
+C<< <g3> >>,
+C<< <g4> >>
+are also nulled.
+
+Note that what was said about
+L<ambiguity|"Ambiguity">
+applies here.
+In the example, the symbols
+C<< <g1> >> and
+C<< <g2> >> are in one derivation,
+while C<< <g3> >> and
+C<< <g4> >> are in another,
+so that not just a parse tree,
+but an entire parse forest
+is nulled.
+(Pedantically, a nulled tree is a forest
+of a single tree.)
+
+More precisely,
+
+=over 4
+
+=item *
+
+If the grammar allows
+any derivation of the symbol
+I<Y> from I<X> in which I<X> and I<Y> are both
+nulled; and
+
+=item *
+
+a nulling SLIF parse event
+is declared for I<Y> and activated; and
+
+=item *
+
+a nulled instance of I<X> is encountered
+in the parse at location I<L>; then
+
+=item *
+
+a nulling SLIF parse event for I<Y>
+will trigger at location I<L>.
+
+=back
+
+=head2 Events and instances
+
+As stated above, only nulling instances generate nulling events,
+and only non-nulled symbols generate prediction events
+and completion events.
+Since lexemes cannot be zero length, this means that,
+for a given symbol instance,
+nulling events and all other events,
+are mutually exclusive.
+In other words, if a nulling event occurs for an
+instance, no other event will trigger for that instance.
+
+Some cases may seem to violate this rule.
+For example
+at position 23
+in the parse in
+L<the code below|/"An example">,
+we have four events
+of four different types,
+all for the symbol C<< <e> >>.
+In addition to
+a nulling event, there is
+a post-lexeme event,
+a prediction event
+and a completion event:
+
+=for Marpa::R2::Display
+name: SLIF Event synopsis
+normalize-whitespace: 1
+partial: 1
+
+    Events at position 23: "e" e$ e[] ^e ^f
+
+=for Marpa::R2::Display::End
+
+The reason for this is that these events are
+for three different symbol instances, all of which
+share the same trigger location:
+
+=over 4
+
+=item 1
+
+A nulled instance at location 23.
+
+=item 2
+
+A potential non-nulled instance, which may begin
+at location 23.
+
+=item 3
+
+A non-nulled instance, which begins at location 22
+and ends at location 23.
+
+=back
+
+The prediction of the second instance is, in fact,
+fulfilled, as reported at location 25:
+
+=for Marpa::R2::Display
+name: SLIF Event synopsis
+normalize-whitespace: 1
+partial: 1
+
+    Events at position 25: "e" e$ ^f
+
+=for Marpa::R2::Display::End
+
+The second instance is length 1 and predicted at location
+23, but its completion is reported at location 25.
+This is because whitespace delayed its start by one position.
+
+=for Marpa::R2::Display
+name: SLIF Event synopsis
+normalize-whitespace: 1
+partial: 1
+
+    Events at position 21: d$ mid1$ mid2$ e[] ^e ^f
+
+=for Marpa::R2::Display::End
+
+The third instance is reported as predicted at position 21,
+even though it actually begins at position 22.
+The delayed start is
+because of whitespace.
+
+Prediction and completion events exclude
+nulled symbols,
+because there is no practical distinction between predicting
+a nulled symbol, and actually seeing one.
+This means that the prediction and completion of a nulled symbol
+would always occur together.
+This very special nature of nulled symbols motivates their
+treatment as a special case.
+
+=head2 Hidden events
+
+An important aspect of the event mechanism is that
+it triggers a return from the event-triggering
+method at the trigger location.
+It may happen, however, that the method would return
+at that location in any case,
+and in this circumstance
+the triggering
+can be said to be B<hidden>.
+A event which causes hidden triggering is called
+a B<hidden event>.
+
+As one example,
+the
+L<C<lexeme_complete()>|Marpa::R2::Scanless::R/"lexeme_complete()"> and
+L<C<lexeme_read()>|Marpa::R2::Scanless::R/"lexeme_read()">
+methods return at every lexeme at which a lexeme is read, so
+all triggering in those methods is hidden triggering.
+In L<the example code in this
+document|/"An example">,
+the events at this location were all caused by hidden
+triggering inside a call to C<< $slr->lexeme_complete() >>:
+
+=for Marpa::R2::Display
+name: SLIF Event synopsis
+normalize-whitespace: 1
+partial: 1
+
+    Events at position 21: d$ mid1$ mid2$ e[] ^e ^f
+
+=for Marpa::R2::Display::End
+
+As another example,
+the C<< $slr->read() >> and C<< $slr->resume() >> methods
+return at end of string,
+but events may also trigger at end of string.
+The events at this location were caused by hidden
+triggering inside C<< $slr->resume() >>
+at end of string:
+
+=for Marpa::R2::Display
+name: SLIF Event synopsis
+normalize-whitespace: 1
+partial: 1
+
+    Events at position 29: "h" test$
+
+=for Marpa::R2::Display::End
+
+The L<example code for this document|/"An example">
+is programmed with the possibility of hidden
+triggering in mind.
+To do this, it is careful to access events after its
+calls to the
+C<< $slr->lexeme_read() >>
+as well as to make an additional pass through the event-accessing loop
+after an end of string is encountered.
+
+=head2 Lexeme events and external scanning
+
+During external scanning, lexemes are read using the
+L<C<< $slr->lexeme_complete() >>|Marpa::R2::Scanless::R/"lexeme_complete()"> and
+L<C<< $slr->lexeme_read() >>|Marpa::R2::Scanless::R/"lexeme_read()"> methods.
+Non-lexeme events may trigger during these methods, as was discussed
+in L</"Hidden events">.
+However, lexeme events that would occur during the
+C<< $slr->lexeme_complete() >> and
+C<< $slr->lexeme_read() >> methods are ignored,
+and will never trigger.
+
+This behavior may seem non-orthogonal,
+but in fact it is the most consistent course of action.
+A pre-lexeme event occuring during 
+a C<< $slr->lexeme_complete() >> and
+C<< $slr->lexeme_read() >> method call would reverse its effect,
+a behavior which is at best pointless.
+A post-lexeme event would be less dangerous,
+but it would be completely redundant --
+its presence or absence
+would tell the application only what
+the application already knows from the
+return of success or failure by the
+C<< $slr->lexeme_complete() >> or
+C<< $slr->lexeme_read() >> methods.
+
+=head1 An example
+
+The SLIF DSL in this example
+is designed to
+include the unusual and "corner"
+cases described in this document.
+It is not like any grammar that you are likely
+to encounter in normal practice.
+
+=for Marpa::R2::Display
+name: SLIF Event synopsis
+normalize-whitespace: 1
+
+    sub forty_two { return 42; };
+
+    use Marpa::R2;
+
+    my $dsl = <<'END_OF_DSL';
+    :default ::= action => [name,values]
+    lexeme default = latm => 1
+
+    test ::= a b c d e e f g h action => main::forty_two
+        | a ambig1 | a ambig2
+    e ::= <real e> | <null e>
+    <null e> ::=
+    g ::= g1 | g3
+    g1 ::= g2
+    g2 ::= 
+    g3 ::= g4
+    g4 ::= 
+    d ::= <real d> | <insert d>
+    ambig1 ::= start1 mid1 z
+    ambig2 ::= start2 mid2 z
+    start1 ::= b  mid1 ::= c d
+    start2 ::= b c  mid2 ::= d
+
+    a ~ 'a' b ~ 'b' c ~ 'c'
+    <real d> ~ 'd'
+    <insert d> ~ ["] 'insert d here' ["]
+    <real e> ~ 'e'
+    f ~ 'f'
+    h ~ 'h'
+    z ~ 'z'
+
+    :lexeme ~ <a> pause => after event => '"a"'
+    :lexeme ~ <b> pause => after event => '"b"'
+    :lexeme ~ <c> pause => after event => '"c"'
+    :lexeme ~ <real d> pause => after event => '"d"'
+    :lexeme ~ <insert d> pause => before event => 'insert d'
+    :lexeme ~ <real e> pause => after event => '"e"'
+    :lexeme ~ <f> pause => after event => '"f"'
+    :lexeme ~ <h> pause => after event => '"h"'
+
+    event '^test' = predicted test
+    event 'test$' = completed test
+    event '^start1' = predicted start1
+    event 'start1$' = completed start1
+    event '^start2' = predicted start2
+    event 'start2$' = completed start2
+    event '^mid1' = predicted mid1
+    event 'mid1$' = completed mid1
+    event '^mid2' = predicted mid2
+    event 'mid2$' = completed mid2
+
+    event '^a' = predicted a
+    event '^b' = predicted b
+    event '^c' = predicted c
+    event 'd[]' = nulled d
+    event 'd$' = completed d
+    event '^d' = predicted d
+    event '^e' = predicted e
+    event 'e[]' = nulled e
+    event 'e$' = completed e
+    event '^f' = predicted f
+    event 'g[]' = nulled g
+    event '^g' = predicted g
+    event 'g$' = completed g
+    event 'g1[]' = nulled g1
+    event 'g2[]' = nulled g2
+    event 'g3[]' = nulled g3
+    event 'g4[]' = nulled g4
+    event '^h' = predicted h
+
+    :discard ~ whitespace
+    whitespace ~ [\s]+
+    END_OF_DSL
+
+    my $grammar = Marpa::R2::Scanless::G->new( { source => \$dsl } );
+    my $slr = Marpa::R2::Scanless::R->new(
+        { grammar => $grammar, semantics_package => 'My_Actions' } );
+
+    my $input = q{a b c "insert d here" e e f h};
+    my $length = length $input;
+    my $pos    = $slr->read( \$input );
+
+    my $actual_events = q{};
+
+    READ: while (1) {
+
+        my @actual_events = ();
+
+        my $next_lexeme;
+        EVENT:
+        for my $event ( @{ $slr->events() } ) {
+            my ($name) = @{$event};
+            if ($name eq 'insert d') {
+               my (undef, $length) = $slr->pause_span();
+               $next_lexeme = ['real d', 'd', $length];
+            }
+            push @actual_events, $name;
+        }
+
+        if (@actual_events) {
+            $actual_events .= join q{ }, "Events at position $pos:", @actual_events;
+            $actual_events .= "\n";
+        }
+
+        if ($next_lexeme) {
+            $slr->lexeme_read(@{$next_lexeme});
+            $pos = $slr->pos();
+            next READ;
+        }
+        if ($pos < $length) {
+            $pos = $slr->resume();
+            next READ;
+        }
+        last READ;
+    } ## end READ: while (1)
+
+    my $expected_events = <<'=== EOS ===';
+    Events at position 0: ^test ^a
+    Events at position 1: "a" ^b ^start1 ^start2
+    Events at position 3: "b" start1$ ^c ^mid1
+    Events at position 5: "c" start2$ ^d ^mid2
+    Events at position 6: insert d
+    Events at position 21: d$ mid1$ mid2$ e[] ^e ^f
+    Events at position 23: "e" e$ e[] ^e ^f
+    Events at position 25: "e" e$ ^f
+    Events at position 27: "f" g[] g1[] g3[] g2[] g4[] ^h
+    Events at position 29: "h" test$
+    === EOS ===
+
+=for Marpa::R2::Display::End
+
+=head1 Unnamed events
+
+Use of unnamed events is strongly discouraged.
+However, to support legacy code, unnamed events are still supported.
+
+Unnamed events are declared by
+L<C<:lexeme> pseudo-rules|Marpa::R2::Scanless::DSL/"Lexeme pseudo-rule">,
+when
+L<the C<pause> adverb|Marpa::R2::Scanless::DSL/"pause"> 
+is used without
+L<the C<event> adverb|Marpa::R2::Scanless::DSL/"event">.
+Since the
+L<the C<pause> adverb|Marpa::R2::Scanless::DSL/"pause">
+creates a SLIF parse event, but
+L<the C<event> adverb|Marpa::R2::Scanless::DSL/"event">
+provides the event's name,
+this results in a SLIF parse event without a name --
+an unnamed event.
+
+Unnamed events cannot be accessed using
+L<the C<< $slr->events() >>
+method|Marpa::R2::Scanless::R/"events()">.
+The only accessors for unnamed events are
+L<the C<< $slr->pause_lexeme() >>
+method|Marpa::R2::Scanless::R/"pause_lexeme()">
+and L<the C<< $slr->pause_span() >>
+method|Marpa::R2::Scanless::R/"pause_span()">.
+
+=head1 Copyright and License
+
+=for Marpa::R2::Display
+ignore: 1
+
+  Copyright 2015 Jeffrey Kegler
+  This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+  redistribute it and/or modify it under the terms of the GNU Lesser
+  General Public License as published by the Free Software Foundation,
+  either version 3 of the License, or (at your option) any later version.
+
+  Marpa::R2 is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser
+  General Public License along with Marpa::R2.  If not, see
+  http://www.gnu.org/licenses/.
+
+=for Marpa::R2::Display::End
+
+=cut
+
+# vim: expandtab shiftwidth=4:

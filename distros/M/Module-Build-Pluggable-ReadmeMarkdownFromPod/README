@@ -1,0 +1,42 @@
+NAME
+    Module::Build::Pluggable::ReadmeMarkdownFromPod - Make README.mkdn from
+    POD.
+
+SYNOPSIS
+        use Module::Build::Pluggable (
+            'ReadmeMarkdownFromPod',
+        );
+
+DESCRIPTION
+    This plugin generates README.mkdn from pod file.
+
+OPTIONS
+    filename
+            use Module::Build::Pluggable (
+                'ReadmeMarkdownFromPod' => {
+                    filename => 'lib/Foo.pod'
+                },
+            );
+
+        You can specify the source pod filename. If you don't specify the
+        filename, this plugin uses dist_version_from file.
+
+    clean (Default: 0)
+        If you set this flag as true value, this plugin adds README.mkdn to
+        cleanup file list.
+
+AUTHOR
+    Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>
+
+    And this module is based on Module::Install::ReadmeMarkdownFromPod
+
+SEE ALSO
+    Module::Build::Pluggable, Module::Build,
+    Module::Install::ReadmeMarkdownFromPod
+
+LICENSE
+    Copyright (C) Tokuhiro Matsuno
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

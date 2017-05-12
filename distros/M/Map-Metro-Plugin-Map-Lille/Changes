@@ -1,0 +1,14 @@
+Revision history for Map-Metro-Plugin-Map-Lille
+
+0.1002 2015-05-09T23:03:04Z CEST
+ [Meta]
+ - Replaced iller.ini with iller.yaml, and regenerated dist.ini and
+   weaver.ini from it (and improved kwalitee).
+
+0.1001 2015-01-09T23:28:38Z CET
+ [Documentation]
+ - The documentation wasn't built correctly.
+
+0.1000 2015-01-09T23:23:35Z CET
+ - Initial release
+

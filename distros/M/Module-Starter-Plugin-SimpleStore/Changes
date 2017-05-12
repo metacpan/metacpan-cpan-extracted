@@ -1,0 +1,26 @@
+Revision history for Module-Starter-Plugin-SimpleStore
+
+0.144   2011-12-23
+        fixed a very dumb bug in InlineStore; thanks, Oleg Kostyuk!
+
+0.143   2007-01-14
+        added Carp.pm to DirStore to fix tests
+
+0.142   2006-11-18
+        packaging fixes
+
+0.141   2006-11-14
+        packaging fixes
+
+0.14    2004-10-01 22:05
+        fixed incredible error: broken package declaration in ModuleStore
+
+0.12    2004-09-30 08:30
+        added ModuleStore
+        added (lousy) ms-pack
+
+0.10    2004-09-20 19:55
+        get the template_dir or template_file from config if possible
+
+0.02    2004-08-19 10:50 EDT
+        Stable enough for use.  Will benefit greatly from global config file

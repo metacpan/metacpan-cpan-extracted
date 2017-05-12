@@ -1,0 +1,98 @@
+#!/usr/bin/perl
+
+use strict;
+use XML::Simple;
+use Data::Dumper;
+use Makerelease;
+
+our $VERSION = '0.1';
+
+my %opts = (c => "makerelease.xml");
+my %parameters;
+my $descr;
+
+#XXX: should probably forcearray => 1 for everything
+our @XMLinopts = (ForceArray => [qw(steps step commands command
+				    modifications modify
+				    perl code files file
+				   )]);
+
+LocalGetOptions(\%opts,
+	   ['c|config-file=s',        'makerelease xml config file to use'],
+	   ['r|regexp-ignore-steps=s','Ignore these REGEXP steps'],
+	   ['s|start-at=s',           'Skip all steps until ARG'],
+	   ['p|parameters=s',         'Parameters: parameter=value,...'],
+	   ['i|interactive',          'Prompt whether to do each step'],
+	   ['S|sleep=i',              'Sleep INTEGER seconds between steps'],
+ 	   ['n|dry-run',     'Dry run only.  Don\'t actually do anything.'],
+ 	   ['T|list-toc',     'Just print a step Table-of-Contents.'],
+ 	   ['t|test-only',            'Only test the configuration file.'],
+	   ['v|verbose',     'Verbose output about steps taken.'],
+	   ['h|help', 'Help']) || exit;
+
+my $extrajunk = shift;
+die "Unexpected argument ($extrajunk)" if ($extrajunk);
+
+######################################################################
+# Parse the parameters
+if ($opts{'p'}) {
+    foreach my $def (split(/,\s*/,$opts{'p'})) {
+	my ($name, $value) = ($def =~ /^([^=]+)=(.*)/);
+	die "bad parameter spec: $def\n" if (!defined($name));
+	$parameters{$name} = $value;
+    }
+}
+
+######################################################################
+# read in XML structure
+if (!-f $opts{'c'}) {
+    print STDERR "Can't find a configuration file: $opts{'c'}  (use the -c flag to specify one)\n";
+    exit 1;
+}
+
+my $relinfo = XMLin($opts{'c'},	@XMLinopts);
+
+######################################################################
+# Process steps
+my $makerelease = new Makerelease(opts => \%opts, parameters => \%parameters);
+if ($makerelease->test_steps($relinfo,'')) {
+    print STDERR
+      "Can not continue; release step instructions contained errors\n";
+    exit 1;
+}
+exit 0 if ($opts{'t'});
+if ($opts{'T'}) {
+    $makerelease->print_toc($relinfo,'');
+    exit;
+}
+$makerelease->process_steps($relinfo,'');
+
+
+#######################################################################
+# getopt long gui portability code
+#
+sub LocalGetOptions {
+    if (eval {require Getopt::GUI::Long;}) {
+	import Getopt::GUI::Long;
+	Getopt::GUI::Long::Configure(qw(display_help no_ignore_case));
+	return GetOptions(@_);
+    } else {
+	require Getopt::Long;
+	Getopt::Long::Configure(qw(auto_help no_ignore_case));
+	import Getopt::Long;
+    }
+    GetOptions(LocalOptionsMap(@_));
+}
+
+sub LocalOptionsMap {
+    my ($st, $cb, @opts) = ((ref($_[0]) eq 'HASH')
+			    ? (1, 1, $_[0]) : (0, 2));
+    for (my $i = $st; $i <= $#_; $i += $cb) {
+	if ($_[$i]) {
+	    next if (ref($_[$i]) eq 'ARRAY' && $_[$i][0] =~ /^GUI:/);
+	    push @opts, ((ref($_[$i]) eq 'ARRAY') ? $_[$i][0] : $_[$i]);
+	    push @opts, $_[$i+1] if ($cb == 2);
+	}
+    }
+    return @opts;
+}

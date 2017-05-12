@@ -1,0 +1,28 @@
+0.05 2015-09-22T14:11:18+02:00
+ - Fix LICENSE file.
+ - Fix comment (thanks Mohammad S Anwar).
+ - Move author tests to xt/ directory.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SEE ALSO section in doc.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.04 2014-08-15T10:22:34+02:00
+ - Add 'readme_from' directive to Makefile.PL.
+ - Add minimal Perl version.
+ - Update Module::Install to 1.10 version.
+
+0.03 2013-09-22
+ - Fix bug in tests with name() subroutine.
+
+0.02 2013-09-21
+ - Add link to Mock::Person::CZ in doc.
+ - Add link to Mock::Person::EN in doc.
+ - Add link to Mock::Person::SK in doc.
+ - Add link to Mock::Person::SK::ROM in doc.
+ - Fix doc spelling.
+ - Fix situation, when generate first and middle name same.
+ - Rewrite Changes file to CPAN::Changes::SPEC format.
+
+0.01 2013-07-25
+ - First version.

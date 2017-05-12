@@ -1,0 +1,38 @@
+Revision history for Perl extension Test-Spy
+
+0.07 2017-03-01T12:51:17Z
+
+    - Load a class that to be spied to suppress `Subroutine XXX redefined` warning #6
+      (aereal++)
+
+0.06 2017-01-19T01:46:50Z
+
+    - Updated docs(aereal++)
+
+0.05 2015-07-20T10:29:55Z
+
+    - Support array return value in `and_returns` method.
+      (pine613)
+
+0.04 2014-06-02T23:18:25Z
+
+    - Added missing `returns` method.
+
+0.03 2014-03-07T03:49:13Z
+
+    [INCOMPATIBLE CHANGES]
+    - Rename spy() to spy_on()
+    - Added calls_* methods.
+
+0.02 2014-03-05T11:02:57Z
+
+    Do not call original function by default.
+    - added call_fake method
+    - added call_through method
+    - clean up
+
+
+0.01 2014-03-05T04:40:21Z
+
+    - original version
+

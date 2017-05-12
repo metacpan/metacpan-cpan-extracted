@@ -1,0 +1,43 @@
+Revision history for MooX-TaggedAttributes
+
+0.01	2015-03-26T17:19:41-0400
+
+  [ BUILD ]
+
+    * Clean up test suite; add more tests
+
+0.00_03	2015-01-14T15:59:19-0500
+
+  [ BUG FIX ]
+
+    * if a class inherited tags from a parent class, *and* consumed more than
+      one role which provided tagged attributes, it ignored all but the last
+      role.
+
+0.00_02	2015-01-13T17:14:58-0500
+
+  [ ENHANCEMENT ]
+
+    * _tags is now a class as well as object method
+
+0.00_01	2015-01-12T14:34:17-0500
+
+  [ BUG FIX ]
+
+    * Changes to classes or role would be reflected in existing
+      instantiated objects due to lazy assembly of the tags.  Tags
+      are now assembled at object instantiation.
+
+  [ BUG INTRODUCTION ]
+
+    * Tags on attributes in roles applied to an existing object are
+      not visible.
+
+  [ BUILD FIX ]
+
+    * Generate proper module dependencies in CPAN meta files
+
+
+0.00	2015-01-09T17:23:29-0500
+       Initial release.
+

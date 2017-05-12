@@ -1,0 +1,165 @@
+NAME
+    Mad::Mapper - Map Perl objects to PostgreSQL, MySQL or SQLite data
+
+VERSION
+    0.09
+
+DESCRIPTION
+    Mad::Mapper is a base class for objects that should be stored in a
+    persistent SQL database. Currently the supported backends are Mojo::Pg
+    Mojo::mysql and Mojo::SQLite. These backends need to be installed
+    separately.
+
+      $ cpanm Mad::Mapper
+      $ cpanm Mojo::Pg # Mad::Mapper now supports postgres!
+
+    THIS MODULE IS EXPERIMENTAL. It is in use in production though, so big
+    changes will not be made without extreme consideration.
+
+SYNOPSIS
+      package MyApp::Model::User;
+      use Mad::Mapper -base;
+
+      # Class attributes
+      col id => undef;
+      col email => '';
+
+    See also Mad::Mapper::Guides::Tutorial for more details and
+    Mad::Mapper::Guides::Custom if you want more control.
+
+RELATIONSHIPS
+    See Mad::Mapper::Guides::HasMany for example "has many" relationship.
+
+    TODO: "belongs_to()" and maybe "has_one()".
+
+EXPORTED FUNCTIONS
+  col
+    Used to define a column. Follow the same rules as "has".
+
+  has
+      has name => "Bruce";
+      has [qw(name email)];
+      has pet => sub { Cat->new };
+
+    Same as "has" in Mojo::Base.
+
+  pk
+    Used to define a primary key. Follow the same rules as "has".
+
+    The primary key is used by default in "load" and "update" to update the
+    correct row. If omitted, the first "col" will act as primary key.
+
+    Note that "pk" is not returned by "columns".
+
+  table
+    Used to define a table name. The default is to decamelize the last part
+    of the class name and add "s" at the end, unless it already has "s" at
+    the end. Examples:
+
+      .-------------------------------------.
+      | Class name            | table       |
+      |-----------------------|-------------|
+      | App::Model::User      | users       |
+      | App::Model::Users     | users       |
+      | App::Model::Group     | groups      |
+      | App::Model::UserAgent | user_agents |
+      '-------------------------------------'
+
+ATTRIBUTES
+  db
+      $db = $self->db;
+      $self->db($db_obj);
+
+    Need to hold either a Mojo::Pg::Database or Mojo::mysql::Database
+    object.
+
+  in_storage
+      $bool = $self->in_storage;
+      $self = $self->in_storage($bool);
+
+METHODS
+  expand_sql
+      ($sql, @args) = $self->expand_sql($sql, @args);
+
+    Used to expand a given $sql statement with variables defined by helpers.
+
+    *   %t
+
+        Will be replaced by "table". Example: "SELECT * FROM %t" becomes
+        "SELECT * FROM users".
+
+    *   %c
+
+        Will be replaced by "columns". Example: "name,email".
+
+    *   %c=
+
+        Will be replaced by "columns" assignment. Example: "name=?,email=?"
+
+    *   %c?
+
+        Will be replaced by "columns" placeholders. Example: "?,?,?"
+
+    *   %pc
+
+        Include "pk" in list of columns. Example: "id,name,email".
+
+    *   \%c
+
+        Becomes a literal "%c".
+
+    It is also possible to define aliases for "%t", "%c", "%c=" and "%pc".
+    Example:
+
+      %t.x = some_table as x
+      %c.x = x.col1
+
+  expand_sst
+    DEPRECATED in favor of "expand_sql".
+
+  columns
+      @str = $self->columns;
+
+    Returns a list of columns, defined by "col".
+
+  delete
+      $self = $self->delete;
+      $self = $self->delete(sub { my ($self, $err) = @_, ... });
+
+    Will delete the object from database if "in_storage".
+
+  fresh
+      $self = $self->fresh;
+
+    Will mark the next relationship accessor to fetch new data from
+    database, instead of using the cached data on $self.
+
+  load
+      $self = $self->load;
+      $self = $class->load(sub { my ($self, $err) = @_; });
+
+    Used to fetch data from storage and update the object attributes.
+
+  save
+      $self = $self->save;
+      $self = $self->save(sub { my ($self, $err) = @_, ... });
+
+    Will update the object in database if "in_storage" or insert it if not.
+
+  import
+    Will set up the caller class with Mad::Mapper functionality if "-base"
+    is given as argument. See "SYNOPSIS" for example.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014-2016, Jan Henning Thorsen
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+AUTHOR
+    Jan Henning Thorsen - "jhthorsen@cpan.org"
+
+    Красимир Беров - "berov@cpan.org"
+
+    Stefan Adams - "sadams@cpan.org"
+

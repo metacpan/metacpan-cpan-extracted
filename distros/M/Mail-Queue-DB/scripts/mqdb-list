@@ -1,0 +1,117 @@
+#!/usr/bin/perl -w 
+#
+#   mqdb-list - part of the Mail::Queue::DB suite
+#
+#   Copyright (C) 2004  S. Zachariah Sprackett <zacs@cpan.org>
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#
+#
+
+=head1 NAME
+
+mqdb-list - part of the Mail::Queue::DB suite
+
+=head1 SYNOPSIS
+
+mqdb-list [-n] [-s]
+
+=head1 DESCRIPTION
+
+Lists the contents of the mail database.  The -n switch causes mqdb-list
+to simply print the number of messages in the queue and exit.  The -s 
+switch causes mqdb-list to omit the leading header when displaying the 
+contents of the database.
+
+=head2 MQDB_DB
+
+mqdb-list honours the MQDB_DB environment variable.  The default location
+for the mail database is $HOME/.mqdb_email.db
+
+=cut
+
+use strict;
+use Mail::Queue::DB;
+use Getopt::Std;
+
+my ($file, %opts);
+
+getopts('ns', \%opts);
+
+if (exists $ENV{MQDB_DB}) {
+	$file = $ENV{MQDB_DB};
+} else {
+	$file = $ENV{HOME} . "/.mqdb_email.db";
+}
+
+my $z = new Mail::Queue::DB(db_file => $file);
+
+if ($opts{n}) {
+	print $z->count_queue() . "\n";
+	exit 0;
+}
+if (!$opts{s}) {
+	my $count = $z->count_queue();
+
+	print "$count messages awaiting delivery.\n";
+
+	if ($count) {
+		printf("\n%8.8s %20.20s %20.20s %25.25s\n", 'Id', 'To', 'From', 'Subject');
+	}
+}
+
+$z->iterate_queue(\&read_msg, 'read');
+
+sub read_msg {
+	my ($id, $args, $msg) = @_;
+
+	my ($subject, $from) = ('','');
+	foreach(split /\n/, $msg) {
+		$subject = $1 if ($_ =~ /^Subject:\s*(.*)\s*$/);
+		$from = $1 if ($_ =~ /^From:\s*(.*)\s*$/);
+
+		last if ($subject && $from);
+	}
+
+	my (undef, $to) = split /--/, $args;
+	$to = '' unless $to;
+	$to =~ s/^.*\<//;
+	$to =~ s/\>.*//;
+
+	$from = '' unless $to;
+	$from =~ s/^.*\<//;
+	$from =~ s/\>.*//;
+
+	printf("%8.8s %20.20s %20.20s %25.25s\n", $id, $to, $from, $subject);
+}
+
+__END__
+
+=head1 AUTHOR
+
+S. Zachariah Sprackett <zacs@cpan.org>
+
+=head1 COPYRIGHT
+
+(C) Copyright 2004, S. Zachariah Sprackett <zacs@cpan.org>
+
+Distributed under the terms of the GPL version 2 or later.
+
+=head1 SEE ALSO
+
+L<Mail::Queue::DB>, L<mqdb-sendmail>, L<mqdb-rm>, L<mqdb-flush>
+
+=cut

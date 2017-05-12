@@ -1,0 +1,23 @@
+Revision history for Method-Signatures-WithDocumentation
+
+1.000 2015-04-23
+ [API CHANGES]
+ - Split out Pod::Weaver::Section::AutoDoc
+
+ [BUG FIXES]
+ - Do not use require
+ - Skip anonymous functions
+ - Fix @INC
+
+ [DOCUMENTATION]
+ - Mark named paramters in signatures
+
+ [ENHANCEMENTS]
+ - Improve tests
+ - New attribute: Name
+
+0.001 2015-04-19
+ - Initial release
+
+0.000 0000-00-00
+

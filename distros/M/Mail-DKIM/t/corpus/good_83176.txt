@@ -1,0 +1,17 @@
+DKIM-Signature: v=1; a=rsa-sha1; c=simple; d=messiah.edu; h=from:to
+	:subject:date; s=test6; q=foo/bar:dns/txt:exam/ple; bh=N9OQp3Fyd
+	w5h5SJ1UDyZrgBPEDU=; b=V8HzPqEKKPcpbMlhrG5NllrKYkPMesJ8ifRa6jQOa
+	eQ4Dj+yRToplcOiDdlKx/vqRDLlJIxfCa62ItoUeD5yU+XCYsf16m/l1N3ZpAjOU
+	umTb7sctxq55AGvRvrH63fATlRLYhJMskU+1AaziLUL164Xyy9zpt49mpNrt5g7G
+	mM=
+Received: from machine.example by x.y.test; 21 Nov 1997 10:01:22 -0600
+From: Jason Long <jlong@messiah.edu>
+To: Nobody <nobody@messiah.edu>
+Subject: dkim test (checking issue rt.cpan.org 83176)
+Date: Wed, 6 Feb 2013 09:11:00 -0500
+
+This is a test
+  More lines here
+
+Blah  blah  blah
+

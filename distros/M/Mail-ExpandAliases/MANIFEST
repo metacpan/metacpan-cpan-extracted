@@ -1,0 +1,14 @@
+Changes
+expand-alias
+ExpandAliases.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/aliases
+t/aliases.t
+t/expand-alias.t
+t/exists.t
+t/incfile
+t/self-referential-aliases
+META.yml                                 Module meta-data (added by MakeMaker)

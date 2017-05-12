@@ -1,0 +1,14 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+lib/MasonX/ProcessDir.pm
+t/01-use.t
+t/process.t
+t/source/Base.mc
+t/source/four.mc
+t/source/plus.mi
+t/source/two.mc

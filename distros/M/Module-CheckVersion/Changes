@@ -1,0 +1,51 @@
+Revision history for Module-CheckVersion
+
+0.07    2016-03-16 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace JSON with JSON::MaybeXS.
+
+
+0.06    2015-08-26 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with updated
+          Pod::Weaver::Section::Completion::PerinciCmdLine (0.13) which
+          generates Completion POD section for Perinci::CmdLine::Inline scripts.
+
+
+0.05    2015-08-19 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with updated App:GenPericmdCompleterScript (0.04)
+          which produces smaller completer script.
+
+
+0.04    2015-08-19 (PERLANCAR)
+
+        - [build] Rebuild with updated DZP:GenPericmdScript (0.23) which now
+          generates a shell completer script for
+          Perinci::CmdLine::Inline-generated scripts.
+
+
+0.03    2015-07-31 (PERLANCAR)
+
+	- [ux] Merge App-CheckModuleVersion into our dist so users only
+	  need to install a single dist, check-module-version CLI uses
+	  pericmd-inline so it does not add any runtime deps.
+
+
+0.02    2015-07-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention about non-CPAN modules, tweak example, mention
+	  App::CheckModuleVersion.
+
+
+0.01     2015-07-10 (PERLANCAR)
+
+         - First release.

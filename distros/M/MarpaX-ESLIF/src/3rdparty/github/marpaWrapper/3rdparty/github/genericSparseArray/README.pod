@@ -1,0 +1,113 @@
+=for html <a href="https://travis-ci.org/jddurand/c-genericSparseArray"><img src="https://travis-ci.org/jddurand/c-genericSparseArray.svg?branch=master" alt="Travis CI build status" height="18"></a> <a href="https://badge.fury.io/gh/jddurand%2Fc-genericSparseArray"><img src="https://badge.fury.io/gh/jddurand%2Fc-genericSparseArray.svg" alt="GitHub version" height="18"></a> <a href="http://opensource.org/licenses/MIT" rel="nofollow noreferrer"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License MIT" height="18"></a>
+
+=head1 NAME
+
+genericSparseArray - generic sparse array interface
+
+=head1 DESCRIPTION
+
+genericSparseArray is an ANSI set of macros implementing sparse array. It is built on top of L<genericHash|https://github.com/jddurand/c-genericHash>, and exposes key hashing, as well as value copying and freeing functions. Since internal storage is based on hashing, there is no limitation on the array indice number, this mean that negative indices are supported.
+
+=head1 SYNOPSIS
+
+  #include <genericSparseArray.h>
+
+  genericSparseArray_t *mySparseArrayp;
+
+=head1 MACROS
+
+=head2 GENERICSPARSEARRAY_NEW(sparseArrayName, keyIndFunctionp)
+
+Alias to GENERICSPARSEARRAY_NEW_ALL(sparseArrayName, keyIndFunctionp, valCopyFunctionp, valFreeFunctionp, wantedSize, wantedSubSize), see below.
+
+=head2 GENERICSPARSEARRAY_NEW_ALL(sparseArrayName, keyIndFunctionp, valCopyFunctionp, valFreeFunctionp, wantedSize, wantedSubSize)
+
+Create an empty sparse array on the heap, where function pointer prototypes are shared with L<genericHash|https://github.com/jddurand/c-genericHash>, i.e.:
+
+  typedef size_t (*genericHashKeyIndFunction_t)(void *userDatavp, genericStackItemType_t itemType, void **pp);
+  typedef void  *(*genericHashValCopyFunction_t)(void *userDatavp, void **pp);
+  typedef void   (*genericHashValFreeFunction_t)(void *userDatavp, void **pp);
+
+All these functions are called with a context C<userDatavp> that is passed as-is through macros described below. The generic pointers are I<always> pointers to data, i.e. pointer to char, pointer to pointer, etc... Take care, nothing prevent the pointer content to be a C<NULL> pointer itself, depending on the context (see below).
+
+=over
+
+=item C<keyIndFunctionp>
+
+  typedef size_t (*genericHashKeyIndFunction_t)(void *userDatavp, genericStackItemType_t itemType, void **pp);
+
+Mandatory. This function returns the indice in the hash. C<itemType> is generated using genericStack constants, e.g. it can be C<GENERICSTACKITEMTYPE_CHAR>, C<GENERICSTACKITEMTYPE_PTR>, etc... C<*pp> is a I<pointer> to the data, regardless of its type, i.e. it can be a pointer to char, a pointer to a pointer, etc...
+
+=item C<valCopyFunctionp>
+
+  typedef void  *(*genericHashValCopyFunction_t)(void *userDatavp, void **pp);
+
+Optional. May be called if the value is a PTR. Must return a non-NULL value if C<*pp> is non-NULL.
+
+=item C<valFreeFunctionp>
+
+  typedef void   (*genericHashValFreeFunction_t)(void *userDatavp, void **pp);
+
+Optional. May be called if the value is a PTR. Nothing prevent C<*pp> to be NULL.
+
+=item C<wantedSize>
+
+Optional. Initial number of hash rows.
+
+=item C<wantedSubSize>
+
+Optional. Initial number of columns within a hash row.
+
+=back
+
+=head2 GENERICSPARSEARRAY_INIT(sparseArrayName, keyIndFunctionp)
+
+Alias to GENERICSPARSEARRAY_INIT_ALL(sparseArrayName, keyIndFunctionp, valCopyFunctionp, valFreeFunctionp, wantedSize, wantedSubSize), see below.
+
+=head2 GENERICSPARSEARRAY_INIT_ALL(sparseArrayName, keyIndFunctionp, valCopyFunctionp, valFreeFunctionp, wantedSize, wantedSubSize)
+
+Create an empty sparse array on the stack, where function pointer prototypes have the same meaning as in GENERICSPARSEARRAY_NEW.
+
+=head2 GENERICSPARSEARRAY_SET(sparseArrayName, userDatavp, indice, valType, valVal)
+
+Set an entry in the array C<sparseArrayName> at indice C<keyVal>, and value C<valVal> of type C<valType>. C<keyType> and C<valType> must be I<shorthands> for genericStack constants, i.e. C<CHAR>, C<PTR>, etc...
+
+=head2 GENERICSPARSEARRAY_FIND(sparseArrayName, userDatavp, keyVal, valType, valValp, findResult)
+
+Find an entry in the array C<sparseArrayName> at indice C<keyVal>, and expecting a value of type C<valType>. C<valValp> must be a pointer, eventually C<NULL>. If successful, the content of C<valValp> is filled with the found value. C<findResult> must be a valid C identifier, in which a true or a false will be set. C<keyType> and C<valType> must be I<shorthands> for genericStack constants, i.e. C<CHAR>, C<PTR>, etc...
+
+=head2 GENERICSPARSEARRAY_REMOVE(sparseArrayName, userDatavp, indice, keyVal, valType, valValp, findResult)
+
+Remove an entry in the array C<sparseArrayName> at indice C<keyVal>, and expecting a value of type C<valType>. C<valValp> must be a pointer, eventually C<NULL>. If successful, the content of C<valValp> is filled with the found value. When C<valValp> is C<NULL>, key and data are explicitely removed, eventually calling the free callback functions. C<keyType> and C<valType> must be I<shorthands> for genericStack constants, i.e. C<CHAR>, C<PTR>, etc...
+
+=head2 GENERICSPARSEARRAY_FREE(sparseArrayName, useDatavp)
+
+Releases a sparse array allocated on the heap. This may call the free callback functions.
+
+=head2 GENERICSPARSEARRAY_RESET(sparseArrayName, useDatavp)
+
+Releases a sparse array initialized on the stack. This may call the free callback functions.
+
+=head2 GENERICSPARSEARRAY_RELAX(sparseArrayName, useDatavp)
+
+Releases partially the array, so that it can be reused. More efficient than recreating the array in case of reuse.
+
+=head2 GENERICSPARSEARRAY_USED(sparseArrayName)
+
+Returns a true value if the array has an error, a false value otherwise.
+
+=head2 GENERICSPARSEARRAY_ERROR(sparseArrayName)
+
+Returns a true value if the array has an error, a false value otherwise.
+
+=head2 GENERICSPARSEARRAY_VALCOPYFUNCTION(sparseArrayName)
+
+Accessor to the val copy function.
+
+=head2 GENERICSPARSEARRAY_VALFREEFUNCTION(sparseArrayName)
+
+Accessor to the val free function.
+
+=head1 SEE ALSO
+
+L<genericHash|https://github.com/jddurand/c-genericHash>

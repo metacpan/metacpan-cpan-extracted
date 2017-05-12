@@ -1,0 +1,24 @@
+Many people deserve recoginition for their help with Math::MatrixReal:
+
+* 	Many thanks to Steffen Beyer <sb@engelschall.com> himself for being very 
+	open to third-party additions. (Of course, this acknowledgment is due to Rodolphe. :-)
+	Steffen Beyer released the original Math::MatrixReal and maintained it
+	until v1.3a5, then handed off to Jonathan Leto <jonathan@leto.net>.
+
+* 	Rodolphe Ortalo <ortalo@laas.fr> for many contributions.
+
+*	As always, many thanks to Andreas Koenig <andreas.koenig@mind.de>
+	for his relentless support and efforts as upload manager of the CPAN!
+
+*	Also many thanks to Stu Smith <stu@cs.uml.edu> for raising the questions
+	concerning the "new_from_string()" method (whose documentation was mis-
+	leading and incomplete)!
+
+*	Mike South <msouth@fulcrum.org> for the new_from_cols() and new_from_rows() functions
+	that were integrated from Math::MatrixReal::Ext1
+
+*	Everybody involved with CPAN Testers, thanks guys/gals!
+
+
+Current Maintainer: Jonathan Leto <jonathan@leto.net>
+

@@ -1,0 +1,9 @@
+ [
+    {
+        "label" : "Name",
+        "type" : "radio",
+        "name" : "type",
+        "after_element" : "<br />",
+        "data" : ["internal", "external" ]
+    }
+ ]

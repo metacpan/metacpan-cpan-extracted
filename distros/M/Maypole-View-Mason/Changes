@@ -1,0 +1,15 @@
+Revision history for Perl extension Maypole::View::Mason.
+
+0.3   Mon Jan 10 00:48:33 2005
+	- Updated template to match newest maypole templates
+	- Changed error mode to fatal to be more like the TT View
+	- $self->vars is now automatically defined as variables in Mason
+	- Added POD tests and general cleanup
+0.2   Thu Jul 22 00:28:00 2004
+	- Fixed bug in link macro.
+	- Changed factory macros to be individual components.
+	- Added intitial support for reverse arguments.
+0.1   Tue May 25 13:55:00 2004
+	- First public version, includes factory templates
+0.01  Fri May 21 22:54:02 2004
+	- original version; Split from Maypole main distribution

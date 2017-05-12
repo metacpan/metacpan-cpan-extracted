@@ -1,0 +1,332 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Box::Parser::Perl - reading messages from file using Perl
+
+=head1 INHERITANCE
+
+ Mail::Box::Parser::Perl
+   is a Mail::Box::Parser
+   is a Mail::Reporter
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+The C<Mail::Box::Parser::Perl> implements parsing of messages
+in Perl.  This may be a little slower than the C<C> based parser
+L<Mail::Box::Parser::C|Mail::Box::Parser::C>, but will also work on platforms where no C
+compiler is available.
+
+Extends L<"DESCRIPTION" in Mail::Box::Parser|Mail::Box::Parser/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Box::Parser|Mail::Box::Parser/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Mail::Box::Parser|Mail::Box::Parser/"Constructors">.
+ 
+=over 4
+
+=item Mail::Box::Parser::Perl-E<gt>B<new>(%options)
+
+ -Option           --Defined in       --Default
+  file               Mail::Box::Parser  undef
+  filename           Mail::Box::Parser  <required>
+  fix_header_errors                     <false>
+  log                Mail::Reporter     'WARNINGS'
+  mode               Mail::Box::Parser  'r'
+  trace              Mail::Reporter     'WARNINGS'
+  trusted                               <false>
+
+=over 2
+
+=item file => FILE-HANDLE
+
+=item filename => FILENAME
+
+=item fix_header_errors => BOOLEAN
+
+When header errors are detected, the parsing of the header will
+be stopped.  Other header lines will become part of the body of
+the message.  Set this flag to have the erroneous line added to
+the previous header line.
+
+=item log => LEVEL
+
+=item mode => OPENMODE
+
+=item trace => LEVEL
+
+=item trusted => BOOLEAN
+
+Is the input from the file to be trusted, or does it require extra
+tests.  Related to Mail::Box subroutine new option trusted.
+
+=back
+
+=back
+
+=head2 The parser
+
+Extends L<"The parser" in Mail::Box::Parser|Mail::Box::Parser/"The parser">.
+ 
+=over 4
+
+=item $obj-E<gt>B<fileChanged>()
+
+Inherited, see L<Mail::Box::Parser/"The parser">
+
+=item $obj-E<gt>B<filename>()
+
+Inherited, see L<Mail::Box::Parser/"The parser">
+
+=item $obj-E<gt>B<fixHeaderErrors>( [BOOLEAN] )
+
+If set to C<true>, parsing of a header will not stop on an error, but
+attempt to add the erroneous this line to previous field.  Without BOOLEAN,
+the current setting is returned.
+
+example: 
+
+ $folder->parser->fixHeaderErrors(1);
+ my $folder = $mgr->open('folder', fix_header_errors => 1);
+
+=item $obj-E<gt>B<restart>()
+
+Inherited, see L<Mail::Box::Parser/"The parser">
+
+=item $obj-E<gt>B<start>(%options)
+
+Inherited, see L<Mail::Box::Parser/"The parser">
+
+=item $obj-E<gt>B<stop>()
+
+Inherited, see L<Mail::Box::Parser/"The parser">
+
+=back
+
+=head2 Parsing
+
+Extends L<"Parsing" in Mail::Box::Parser|Mail::Box::Parser/"Parsing">.
+ 
+=over 4
+
+=item $obj-E<gt>B<bodyAsFile>( $fh [$chars, [$lines]] )
+
+Inherited, see L<Mail::Box::Parser/"Parsing">
+
+=item $obj-E<gt>B<bodyAsList>( [$chars, [$lines]] )
+
+Inherited, see L<Mail::Box::Parser/"Parsing">
+
+=item $obj-E<gt>B<bodyAsString>( [$chars, [$lines]] )
+
+Inherited, see L<Mail::Box::Parser/"Parsing">
+
+=item $obj-E<gt>B<bodyDelayed>( [$chars, [$lines]] )
+
+Inherited, see L<Mail::Box::Parser/"Parsing">
+
+=item $obj-E<gt>B<filePosition>( [$position] )
+
+Inherited, see L<Mail::Box::Parser/"Parsing">
+
+=item $obj-E<gt>B<lineSeparator>()
+
+Inherited, see L<Mail::Box::Parser/"Parsing">
+
+=item $obj-E<gt>B<popSeparator>()
+
+Inherited, see L<Mail::Box::Parser/"Parsing">
+
+=item $obj-E<gt>B<pushSeparator>(STRING|Regexp)
+
+Inherited, see L<Mail::Box::Parser/"Parsing">
+
+=item $obj-E<gt>B<readHeader>()
+
+=item $obj-E<gt>B<readSeparator>(%options)
+
+Inherited, see L<Mail::Box::Parser/"Parsing">
+
+=back
+
+=head2 Internals
+
+Extends L<"Internals" in Mail::Box::Parser|Mail::Box::Parser/"Internals">.
+ 
+=over 4
+
+=item $obj-E<gt>B<closeFile>()
+
+Inherited, see L<Mail::Box::Parser/"Internals">
+
+=item $obj-E<gt>B<defaultParserType>( [$class] )
+
+=item Mail::Box::Parser::Perl-E<gt>B<defaultParserType>( [$class] )
+
+Inherited, see L<Mail::Box::Parser/"Internals">
+
+=item $obj-E<gt>B<openFile>($args)
+
+Inherited, see L<Mail::Box::Parser/"Internals">
+
+=item $obj-E<gt>B<takeFileInfo>()
+
+Inherited, see L<Mail::Box::Parser/"Internals">
+
+=back
+
+=head2 Error handling
+
+Extends L<"Error handling" in Mail::Box::Parser|Mail::Box::Parser/"Error handling">.
+ 
+=over 4
+
+=item $obj-E<gt>B<AUTOLOAD>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<addReport>($object)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+=item Mail::Box::Parser::Perl-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<errors>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<log>( [$level, [$strings]] )
+
+=item Mail::Box::Parser::Perl-E<gt>B<log>( [$level, [$strings]] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logPriority>($level)
+
+=item Mail::Box::Parser::Perl-E<gt>B<logPriority>($level)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<notImplemented>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<report>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<reportAll>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<trace>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<warnings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=back
+
+=head2 Cleanup
+
+Extends L<"Cleanup" in Mail::Box::Parser|Mail::Box::Parser/"Cleanup">.
+ 
+=over 4
+
+=item $obj-E<gt>B<DESTROY>()
+
+Inherited, see L<Mail::Reporter/"Cleanup">
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Warning: File $filename changed during access.
+
+When a message parser starts working, it takes size and modification time
+of the file at hand.  If the folder is written, it checks wether there
+were changes in the file made by external programs.
+
+Calling Mail::Box subroutine update on a folder before it being closed
+will read these new messages.  But the real source of this problem is
+locking: some external program (for instance the mail transfer agent,
+like sendmail) uses a different locking mechanism as you do and therefore
+violates your rights.
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=item Warning: Unexpected end of header in $source: $line
+
+While parsing a message from the specified source (usually a file name),
+the parser found a syntax error.  According to the MIME specification in the
+RFCs, each header line must either contain a colon, or start with a blank
+to indicate a folded field.  Apparently, this header contains a line which
+starts on the first position, but not with a field name.
+
+By default, parsing of the header will be stopped.  If there are more header
+lines after the erroneous line, they will be added to the body of the message.
+In case of new(fix_headers) set, the parsing of the header will be continued.
+The erroneous line will be added to the preceding field.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Message distribution version 3.000,
+built on February 02, 2017.
+
+Do not forget to read
+L</Mail::Box-Overview>,
+L</Mail::Box-Cookbook>, and
+L</Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L</Mail::Message>,
+L</Mail::Box>,
+L</Mail::Box::IMAP4>,
+L</Mail::Box::POP3>,
+L</Mail::Box::Parser::C>,
+L</Mail::Box::Dbx> (unpublished),
+L</Mail::Transport>,
+L</Object::Realize::Later>, and
+L</User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,10 @@
+Revision history for Perl extension MySQL-Explain-Parser
+
+0.02 2014-06-20T16:02:18Z
+
+    - Support multi-byte characters
+
+0.01 2014-06-19T04:26:24Z
+
+    - original version
+

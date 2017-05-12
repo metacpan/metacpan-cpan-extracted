@@ -1,0 +1,8 @@
+Build.PL
+Changes
+lib/MooseX/Role/DBIx/Connector.pm
+MANIFEST			This list of files
+t/01basics.t
+README
+LICENSE
+META.yml

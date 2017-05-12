@@ -1,0 +1,80 @@
+0.15
+ - Fix overloading of comparison operators when operands are reversed.
+
+0.14
+ - Add $Math::Decimal64::NNW (set to 0). If this variable is set to 1,
+   then non-numeric warnings will be given whenever a string containing
+   any non-numeric characters is given to Math::Decimal64::_atodecimal().
+ - Remove looks_like_number() from _atodecimal
+ - No longer export nnumflag(), set_nnum() and clear_nnum().
+
+0.13
+ - Third attempt at getting the assignPV.t workarounds right
+
+0.12
+ - Try again to get the assignPV.t workarounds right
+
+0.11
+ - Workarounds in _atodecimal() and assignPV.t to cater for broken
+   compiler/libc handling of signed zero _Decimal64 values.
+
+0.10
+ - Add PV overloading.
+ - Rewrite assignPV in XS. (Now uses _atodecimal XSub.)
+ - Rewrite PVtoD64. (Now uses _atodecimal XSub.)
+ - Remove (unused) XSubs _c2ld() and _c2d().
+ - add assignD64() and use it to modify sub assignME() such that the latter should always
+   work correctly even when $Config{longdblsize} is 8.
+
+0.09
+ - Change D64toME to use decode_d64() rather than C's strtold (as per Math::Decimal128).
+ - Fix bug in overload_sub by adding overload_neg.
+ - No longer allow new() to assign an NV. (NVtoD64 must now be used instead.)
+ - Add assignIV(), assignUV() and assignNV().
+ - Add D64toFSTR() and D64toRSTR().
+ - Fix Decimal64.pm's FR64toME to work with Math-MPFR-3.23 and later (when
+   Rmpfr_set_decimal64 was renamed to Rmpfr_set_DECIMAL64).
+
+0.08
+ - Add get_exp() and get_sign()
+ - Add d64_bytes()
+
+0.07
+ - Add unpack() and associated subs.
+
+0.06
+ - Fix t/conv_math_mpfr.t to cater for the case that Math::MPFR loads but is an older
+   version that doesn't provide the Math::MPFR::_MPFR_WANT_DECIMAL_FLOATS function.
+ - Define PERL_NO_GET_CONTEXT.
+ - Add metadata to Makefile.PL.
+ - Work around compiler/libc bug in handling of the value 897e-292. (Affects PPC only.)
+
+0.05
+ - Fix D64toME() so that it works correctly on powerpc processors.
+ - Add FR64toME and pFR.
+ - Document LDtoD64 and D64toLD.
+ - Add assignInf, assignNaN, assignPV.
+ - Allow overloaded operations to accept integers (IV/UV).
+ - Alter the way that strEQ gets hold of HvNAME(SvSTASH(SvRV(sv))) - so that -Wall
+    doesn't emit "null argument" warnings. (Thanks Daniel Kahn Gillmor.)
+ - Have only *one* NaN ( = inf/inf). Originally we could also set NaN to -(inf/inf),
+   but this is stupid and can cause problems.
+
+0.04
+ - Fix bugs in t/lengthy_mantissa.t. (A '-' in a regex needed to be escaped.)
+   Also the precise number that appears in $@ for test 3 will vary, depending
+   upon nvsize. (Test 3 modified to accommodate this.)
+
+0.03
+ - Add LDtoD64 and D64toLD (conversions between Math::LongDouble and
+   Math::Decimal64 objects).
+
+0.02
+ - Small change to _sci2me() to avoid 'uninitialized' warnings on 5.10 (and
+   perhaps earlier).
+
+   Replace 'exp10' (which already exists in at least some C libraries)
+   with Exp10.
+
+0.01
+ - First release.

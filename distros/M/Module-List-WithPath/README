@@ -1,0 +1,12 @@
+DESCRIPTION
+
+    This module is a fork of Module::List 0.003. It's exactly like
+    Module::List, except that it sets the resulting hash values with paths
+    (or array of paths, if more than one paths are found).
+
+SEE ALSO
+
+    Module::List
+
+    Complete::Module
+

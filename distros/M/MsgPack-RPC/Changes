@@ -1,0 +1,43 @@
+Revision history for MessagePack
+
+1.0.1 2017-03-15
+  [ BUG FIXES ]
+    - Empty strings were failing.
+
+  [ STATISTICS ]
+    - code churn: 6 files changed, 34 insertions(+), 5 deletions(-)
+
+1.0.0 2017-02-28
+  [ API CHANGES ]
+    - Switching from Future to Promises.
+
+  [ STATISTICS ]
+    - code churn: 7 files changed, 52 insertions(+), 32 deletions(-)
+
+0.1.2 2016-06-02
+  [ BUG FIXES ]
+    - List::Gather was not playing well with threads.
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 16 insertions(+), 12 deletions(-)
+
+0.1.1 2016-03-16
+  [ BUG FIXES ]
+    - Tests were failing on perls compiled with -Duselongdouble because of
+      comparison. (GH#4, reported by eserte)
+
+  [ STATISTICS ]
+    - code churn: 3 files changed, 17 insertions(+), 2 deletions(-)
+
+0.1.0 2015-09-24
+  [ ENHANCEMENTS ]
+    - Now supports all of MessagePack types!
+
+  [ STATISTICS ]
+    - code churn: 4 files changed, 905 insertions(+), 136 deletions(-)
+
+0.0.1 2015-09-14
+  - First version, unleashed on an unsuspecting world.
+
+  [ STATISTICS ]
+    - code churn: 3 files changed, 29 insertions(+), 1 deletion(-)

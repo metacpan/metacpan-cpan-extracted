@@ -1,0 +1,36 @@
+---
+abstract: 'Manipulate Mac OS X pasteboards'
+author:
+  - 'Tom Wyant (wyant at cpan dot org)'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  Test::More: '0.96'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mac-Pasteboard
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  Mac::Pasteboard:
+    file: lib/Mac/Pasteboard.pm
+    version: '0.009'
+requires:
+  Carp: '0'
+  Encode: '0'
+  Scalar::Util: '1.01'
+  perl: '5.006002'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Mac-Pasteboard
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/trwyant/perl-Mac-Pasteboard.git
+version: '0.009'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

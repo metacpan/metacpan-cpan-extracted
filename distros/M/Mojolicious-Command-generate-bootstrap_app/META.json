@@ -1,0 +1,55 @@
+{
+   "abstract" : "Generate a simple application with DBIx::Class authentication and Twitter Bootstrap CSS.",
+   "author" : [
+      "Matthias Krull <m.krull@uninets.eu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4203",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Command-generate-bootstrap_app",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::Passwd::XS" : "0",
+            "DBIx::Class" : "0",
+            "DBIx::Connector" : "0",
+            "Email::Valid" : "0",
+            "Mojolicious" : "4",
+            "String::Random" : "0",
+            "YAML" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Command::generate::bootstrap_app" : {
+         "file" : "lib/Mojolicious/Command/generate/bootstrap_app.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/mkrull/Mojolicious-Command-generate-bootstrap_app.git"
+      }
+   },
+   "version" : "0.07"
+}

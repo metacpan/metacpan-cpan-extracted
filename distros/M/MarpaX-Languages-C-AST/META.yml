@@ -1,0 +1,138 @@
+---
+abstract: 'Translate a C source to an AST'
+author:
+  - 'Jean-Damien Durand <jeandamiendurand@free.fr>'
+build_requires:
+  Clone: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  Test::Trap: '0'
+  blib: '1.01'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+  perl: '5.006'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MarpaX-Languages-C-AST
+no_index:
+  directory:
+    - blog
+    - examples
+    - t
+    - xt
+provides:
+  MarpaX::Languages::C::AST:
+    file: lib/MarpaX/Languages/C/AST.pm
+    version: '0.47'
+  MarpaX::Languages::C::AST::Callback:
+    file: lib/MarpaX/Languages/C/AST/Callback.pm
+    version: '0.47'
+  MarpaX::Languages::C::AST::Callback::Events:
+    file: lib/MarpaX/Languages/C/AST/Callback/Events.pm
+    version: '0.47'
+  MarpaX::Languages::C::AST::Callback::Method:
+    file: lib/MarpaX/Languages/C/AST/Callback/Method.pm
+    version: '0.47'
+  MarpaX::Languages::C::AST::Callback::Option:
+    file: lib/MarpaX/Languages/C/AST/Callback/Option.pm
+    version: '0.47'
+  MarpaX::Languages::C::AST::Grammar:
+    file: lib/MarpaX/Languages/C/AST/Grammar.pm
+    version: '0.47'
+  MarpaX::Languages::C::AST::Grammar::ISO_ANSI_C_2011:
+    file: lib/MarpaX/Languages/C/AST/Grammar/ISO_ANSI_C_2011.pm
+    version: '0.47'
+  MarpaX::Languages::C::AST::Grammar::ISO_ANSI_C_2011::Actions:
+    file: lib/MarpaX/Languages/C/AST/Grammar/ISO_ANSI_C_2011/Actions.pm
+    version: '0.47'
+  MarpaX::Languages::C::AST::Grammar::ISO_ANSI_C_2011::Scan:
+    file: lib/MarpaX/Languages/C/AST/Grammar/ISO_ANSI_C_2011/Scan.pm
+    version: '0.47'
+  MarpaX::Languages::C::AST::Grammar::ISO_ANSI_C_2011::Scan::Actions:
+    file: lib/MarpaX/Languages/C/AST/Grammar/ISO_ANSI_C_2011/Scan/Actions.pm
+    version: '0.47'
+  MarpaX::Languages::C::AST::Impl:
+    file: lib/MarpaX/Languages/C/AST/Impl.pm
+    version: '0.47'
+  MarpaX::Languages::C::AST::Impl::Logger:
+    file: lib/MarpaX/Languages/C/AST/Impl/Logger.pm
+    version: '0.47'
+  MarpaX::Languages::C::AST::Scope:
+    file: lib/MarpaX/Languages/C/AST/Scope.pm
+    version: '0.47'
+  MarpaX::Languages::C::AST::Util:
+    file: lib/MarpaX/Languages/C/AST/Util.pm
+    version: '0.47'
+  MarpaX::Languages::C::AST::Util::Data::Find:
+    file: lib/MarpaX/Languages/C/AST/Util/Data/Find.pm
+    version: '0.47'
+  MarpaX::Languages::C::Scan:
+    file: lib/MarpaX/Languages/C/Scan.pm
+    version: '0.47'
+  MarpaX::Languages::C::Scan::Actions:
+    file: lib/MarpaX/Languages/C/Scan/Actions.pm
+    version: '0.47'
+requires:
+  Carp: '0'
+  Class::Struct: '0'
+  Data::Dumper: '0'
+  Env: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Find: '0'
+  File::ShareDir: '0'
+  File::Slurp: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Getopt::Long: '0'
+  IO::CaptureOutput: '0'
+  IO::File: '0'
+  IO::Handle: '0'
+  IO::String: '0'
+  IPC::Cmd: '0'
+  IPC::Run: '0'
+  Log::Any: '0'
+  Log::Any::Adapter: '0'
+  Log::Log4perl: '0'
+  Marpa::R2: '2.081001'
+  POSIX: '0'
+  Pod::Usage: '0'
+  Regexp::Common: '0'
+  SUPER: '0'
+  Scalar::Util: '0'
+  Term::ProgressBar: '0'
+  Try::Tiny: '0'
+  Unicode::CaseFold: '0'
+  XML::LibXML: '0'
+  XML::LibXSLT: '0'
+  constant: '0'
+  diagnostics: '0'
+  filetest: '0'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MarpaX-Languages-C-AST
+  homepage: https://metacpan.org/release/MarpaX-Languages-C-AST
+  repository: git://github.com/jddurand/marpax-languages-c-ast.git
+version: '0.47'
+x_contributors:
+  - 'Ben Bullock <benkasminbullock@gmail.com>'
+  - 'Ivan Baidakou <basiliscos@openmailbox.com>'
+  - 'Jeffrey Kegler <JKEGL@cpan.org>'
+  - 'Jeffrey Kegler <jkegl@cpan.org>'
+  - 'jddurand <jeandamiendurand@free.fr>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

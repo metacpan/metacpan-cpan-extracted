@@ -1,0 +1,7 @@
+Changes
+HashRef.pm
+Makefile.PL
+MANIFEST
+README
+t/merge_hashref.t
+Test/HashRef.pm

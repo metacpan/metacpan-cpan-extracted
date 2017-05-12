@@ -1,0 +1,30 @@
+---
+abstract: 'redis support for spamassassin AWL/TxRep'
+author:
+  - 'Markus Benning <ich@markusbenning.de>'
+build_requires:
+  File::Find: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mail-SpamAssassin-Plugin-RedisAWL
+requires:
+  Mail::SpamAssassin::Logger: '0'
+  Mail::SpamAssassin::PersistentAddrList: '0'
+  Mail::SpamAssassin::Plugin: '0'
+  Mail::SpamAssassin::Util: '0'
+  Redis: '0'
+  perl: v5.8.5
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mail-SpamAssassin-Plugin-RedisAWL
+  repository: https://github.com/benningm/Mail-SpamAssassin-Plugin-RedisAWL
+version: '1.001'

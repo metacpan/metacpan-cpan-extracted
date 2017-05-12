@@ -1,0 +1,13 @@
+graph Perl
+{
+graph [ rankdir="TB" ]
+node [ shape="oval" ]
+edge [ color="grey" ]
+"6" [ color="invis" label="" shape="point" width="0" ]
+"20" [ color="invis" label="" shape="point" width="0" ]
+"27" [ color="invis" label="" shape="point" width="0" ]
+"13" [ color="invis" label="" shape="point" width="0" ]
+"6" -- "20"
+"20" -- "27"
+"27" -- "13"
+}

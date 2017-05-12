@@ -1,0 +1,49 @@
+Received: from ns.ATComputing.nl (ns.ATComputing.nl [195.108.229.25])
+	by atcmpg.ATComputing.nl (8.9.0/8.9.0) with ESMTP id KAA01750
+	for <markov@ATComputing.nl>; Sat, 8 Jul 2000 10:27:39 +0200 (MET DST)
+Received: (from nobody@localhost)
+	by ns.ATComputing.nl (8.8.8/8.8.8) id KAA25253
+	for <markov@ATComputing.nl>; Sat, 8 Jul 2000 10:27:38 +0200
+Received: from magick.imagemagick.org(38.220.172.2) by ns.ATComputing.nl via smap (V2.1)
+	id xma025238; Sat, 8 Jul 00 10:27:26 +0200
+Received: (from majordomo@localhost)
+	by imagemagick.org (8.9.3/8.9.3) id EAA15589;
+	Sat, 8 Jul 2000 04:55:40 -0400
+Date: Sat, 8 Jul 2000 04:55:40 -0400
+Message-Id: <200007080855.EAA15589@imagemagick.org>
+X-Authentication-Warning: magick.imagemagick.org: majordomo set sender to Majordomo-Owner@imagemagick.org using -f
+To: markov@ATComputing.nl
+From: Majordomo@imagemagick.org
+Subject: Confirmation for subscribe magick-developer
+Reply-To: Majordomo@imagemagick.org
+Content-Type: text
+Status: RO
+X-Status: A
+Content-Length: 822
+Lines: 25
+
+--
+
+Someone (possibly you) has requested that your email address be added
+to or deleted from the mailing list "magick-developer@imagemagick.org".
+
+If you really want this action to be taken, please send the following
+commands (exactly as shown) back to "Majordomo@imagemagick.org":
+
+	auth 44b84310 subscribe magick-developer markov@ATComputing.nl
+
+If you do not want this action to be taken, simply ignore this message
+and the request will be disregarded.
+
+If your mailer will not allow you to send the entire command as a single
+line, you may split it using backslashes, like so:
+
+        auth 44b84310 subscribe magick-developer \
+        markov@ATComputing.nl
+
+If you have any questions about the policy of the list owner, please
+contact "magick-developer-approval@imagemagick.org".
+
+Thanks!
+
+Majordomo@imagemagick.org

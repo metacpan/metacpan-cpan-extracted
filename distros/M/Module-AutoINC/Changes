@@ -1,0 +1,11 @@
+Revision history for Perl extension Module::AutoINC.
+
+0.02  Mon Jan 15 14:29:00 2007
+    - Makefile.pl now requires only Perl v5.4 as a minimum, so it will build on
+      the test systems for ActiveState's PPM repository.
+
+0.01  Tue Oct 10 19:18:23 2006
+	- original version; created by h2xs 1.23 with options
+		-X -n Module::AutoINC
+
+See Module::AutoINC's POD for more history information

@@ -1,0 +1,5 @@
+2007-12-12  Sam Vilain  <sam.vilain@catalyst.net.nz>
+
+	* Maptastic 1.01
+	* add the Maptastic::DBI iterator
+	* note heritage of module

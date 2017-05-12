@@ -1,0 +1,25 @@
+---
+abstract: 'Parser for the MeSH ASCII format'
+author:
+  - 'Tomasz Adamusiak <tomasz@cpan.org>'
+build_requires:
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MeSH-Parser-ASCII
+provides:
+  MeSH::Parser::ASCII:
+    file: lib/MeSH/Parser/ASCII.pm
+    version: 0.03
+requires:
+  Log::Log4perl: 0
+  Moose: 0.89
+resources:
+  license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
+version: 0.03

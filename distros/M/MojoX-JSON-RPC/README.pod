@@ -1,0 +1,133 @@
+
+=pod
+
+=head1 NAME
+
+MojoX::JSON::RPC - Perl implementation of JSON-RPC 2.0 protocol for Mojolicious
+
+=head1 SYNOPSIS
+
+Server as plugin (L<Mojolicious::Plugin::JsonRpcDispatcher>):
+
+    #!/usr/bin/env perl
+    use Mojolicious::Lite;
+    use MojoX::JSON::RPC::Service;
+
+    plugin 'json_rpc_dispatcher' => {
+        services => {
+            '/jsonrpc' => MojoX::JSON::RPC::Service->new->register(
+                'sum',
+                sub {
+                    my @params = @_;
+                    my $sum    = 0;
+                    $sum += $_ for @params;
+                    return $sum;
+                }
+            )
+        }
+    };
+
+    app->start;
+
+Client (L<MojoX::JSON::RPC::Client>):
+
+    #!/usr/bin/env perl
+    use MojoX::JSON::RPC::Client;
+
+    my $client = MojoX::JSON::RPC::Client->new;
+    my $url    = 'http://www.example.com/jsonrpc';
+    my $callobj = {
+        id      => 1,
+        method  => 'sum',
+        params  => [ 17, 25 ]
+    };
+
+    my $res = $client->call($url, $callobj);
+
+    if($res) {
+        if ($res->is_error) { # RPC ERROR
+            print 'Error : ', $res->error_message;
+        }
+        else {
+            print $res->result;
+        }
+    }
+    else {
+        my $tx_res = $client->tx->res; # Mojo::Message::Response object
+        print 'HTTP response '.$tx_res->code.' '.$tx_res->message;
+    }
+
+Non-blocking client:
+
+    #!/usr/bin/env perl
+    use MojoX::JSON::RPC::Client;
+
+    my $client = MojoX::JSON::RPC::Client->new;
+    my $url    = 'http://www.example.com/jsonrpc';
+    my $callobj = {
+        id      => 1,
+        method  => 'sum',
+        params  => [ 17, 25 ]
+    };
+
+    $client->call($url, $callobj, sub {
+        # With callback
+        my $res = pop;
+
+        if($res) {
+            if ($res->is_error) { # RPC ERROR
+                print 'Error : ', $res->error_message;
+            }
+            else {
+                print $res->result;
+            }
+        }
+        else {
+           my $tx_res = $client->tx->res; # Mojo::Message::Response object
+           print 'HTTP response '.$tx_res->code.' '.$tx_res->message;
+        }
+
+        Mojo::IOLoop->stop;
+    });
+
+    Mojo::IOLoop->start;
+
+=head1 DESCRIPTION
+
+This module implments a client and a server plugin for JSON-RPC 2.0 for use
+with Mojolicious.
+
+This module follows the draft specficiation for JSON-RPC 2.0. More information
+can be found at L<http://groups.google.com/group/json-rpc/web/json-rpc-2-0>.
+
+=head1 SEE ALSO
+
+L<Mojolicious::Plugin::JsonRpcDispatcher>, L<MojoX::JSON::RPC::Dispatcher>,
+L<MojoX::JSON::RPC::Client>
+
+=head1 AUTHOR
+
+Henry Tang
+
+=head1 CREDITS
+
+=over 2
+
+Igor Afanasyev
+
+Renee Baecker (https://github.com/reneeb)
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (C) 2011-2015, Henry Tang.
+
+MojoX::JSON::RPC is provided "as is" and without any express or
+implied warranties, including, without limitation, the implied warranties
+of merchantibility and fitness for a particular purpose.
+
+This program is free software, you can redistribute it and/or modify it
+under the terms of the Artistic License version 2.0.
+
+=cut

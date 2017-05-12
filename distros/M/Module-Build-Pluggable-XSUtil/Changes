@@ -1,0 +1,26 @@
+Revision history for Perl extension Module::Build::Pluggable::XSUtil
+
+1.03 2016-09-14T08:34:57Z
+
+    commit a0e1cfa8f9cf98ccea23800ff130b49c08457be8
+    Author: jfoug <jfoug@cox.net>
+    Date:   Tue Jan 20 10:49:44 2015 -0600
+
+        spelling error for cygwin installs
+
+1.02 2013-05-16T00:00:50Z
+
+    - Fix the problem to which the builder() method not called in M::B::P::CheckLib
+      (hideo55)
+
+1.01 2013-04-03T20:17:09Z
+
+    - Fixed: typo of method name that is called when c++ flag is true.
+      (hideo55)
+
+1.00 2013-03-07T06:54:23
+
+    - depend to perl 5.8 instead of 5.10
+
+0.01    Fri Nov  9 11:25:40 2012
+    - original version

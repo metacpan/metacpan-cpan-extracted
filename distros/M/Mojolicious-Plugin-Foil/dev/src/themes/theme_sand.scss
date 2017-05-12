@@ -1,0 +1,58 @@
+/* ================================================================== */
+/* THEME: Sand
+ */
+@import 'functions';
+@import 'fonts_sand';
+@import 'icon_dark_on_light';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: #dbb268;
+$verge-fg: set-fg($verge-bg);
+$verge-border: #330000;
+$button-bg: darken($verge-bg, 10);
+$button-fg: set-fg($button-bg);
+$button-border: #330000;
+$main-bg: #f2de8c;
+$main-fg: set-fg($main-bg);
+$link-fg: set-link($main-bg);
+$link-visited: set-visited($main-bg);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+}
+
+header,
+footer {
+	@extend .verge;
+	background-image: url(sgback2.jpg);
+}
+
+.side {
+	@extend .verge;
+	background-image: url(sgback.jpg);
+}
+
+body {
+	color: $main-fg;
+	background: $main-bg;
+}
+
+@include some-links($link-fg, $link-visited);
+@include fancy($verge-fg, $verge-bg, "sgback.jpg");
+@include make-buttons;
+
+header nav li {
+	border-color: #996633;
+}
+header nav .selflink,
+header nav em,
+header nav .current a {
+	color: black;
+	background-color: #f2de8c;
+}

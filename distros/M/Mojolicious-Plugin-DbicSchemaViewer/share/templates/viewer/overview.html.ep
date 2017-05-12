@@ -1,0 +1,106 @@
+%   use experimental 'postderef';
+%   use List::Util 'any';
+
+<div class="container">
+    <h1>Schema documentation for <%= $title %></h1>
+
+%   foreach my $rc ($db->{'sources'}->@*) {
+%       my $columns = $rc->{'columns'};
+
+        <h2 id="rc-<%= $rc->{'clean_name'} %>"><%= $rc->{'name'} %></h2>
+
+        <div class="panel panel-info">
+            <div class="panel-heading">Columns</div>
+            <table class="table table-striped table-condensed">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Autoinc</th>
+                        <th>Nullable</th>
+                        <th>Default</th>
+                        <th>Unique</th>
+                        <th>Indexed</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+            %   foreach my $column ($columns->@*) {
+                    <tr>
+                        <td>
+                            %   if(any { $column->{'name'} eq $_ } $rc->{'primary_columns'}->@*) {
+                                    pk
+                            %   }
+                            %   elsif($column->{'is_foreign_key'}) {
+                                    fk
+                            %   }
+                        </td>
+                        <td><%= $column->{'name'} %></td>
+                        <td>
+                            <%= $column->{'data_type'} %><%= exists $column->{'size'} ? qq{($column->{'size'})} : '' %>
+                            %   if(ref $column->{'extra'}{'list'} eq 'ARRAY') {
+                                    <span class="badge" title="<%= join ', ' => $column->{'extra'}{'list'}->@* %>"><%= scalar $column->{'extra'}{'list'}->@* %></span>
+                            %   }
+                        </td>
+                        <td><%= exists $column->{'is_auto_increment'} ? 'yes' : '' %></td>
+                        <td><%= $column->{'is_nullable'} ? 'yes' : '' %></td>
+                        <td><%= exists $column->{'default_value'} ? ref $column->{'default_value'} eq 'SCALAR' ? $column->{'default_value'}->$* : qq{'$column->{"default_value"}'} : '' %></td>
+                        <td><%= exists $rc->{'uniques'}{ $column->{'name'} } ? join ', ' => $rc->{'uniques'}{ $column->{'name'} }->@* : '' %></td>
+                        <td>
+                            <%= exists $column->{'index'} ? $column->{'index'} eq '1' ? 'yes' : $column->{'index'} : '' %>
+                        </td>
+                    </tr>
+            %   }
+                </tbody>
+            </table>
+        </div>
+
+%       if(scalar $rc->{'relationships'}->@*) {
+        <div class="panel panel-warning">
+            <div class="panel-heading">Relationships</div>
+            <table class="table table-striped table-condensed">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Class</th>
+                        <th>Relation type</th>
+                        <th style="white-space: nowrap;">Cascade on</th>
+                        <th>Condition</th>
+                    </tr>
+                </thead>
+                <tbody>
+            %   foreach my $relation ($rc->{'relationships'}->@*) {
+            %       my $attrs = $relation->{'attrs'};
+                    <tr>
+                        <td><%== $relation->{'has_reverse_relation'} ? '' : '<span class="alert-danger">Missing reverse relation</span> ' %><a href="#rc-<%= $relation->{'clean_name'} %>"><%= $relation->{'name'} %></a></td>
+                        <td><%= $relation->{'class_name'} %></td>
+                        <td><%= $relation->{'relation_type'} %></td>
+                        <td><%= join ', ' => $relation->{'on_cascade'}->@* %></td>
+                        <td><pre><%= $relation->{'condition'} %></pre></td>
+                    </tr>
+            %   }
+                </tbody>
+            </table>
+        </div>
+%       }
+%   }
+
+    <p>Powered by <a href="https://metacpan.org/pod/Mojolicious::Plugin::DbicSchemaViewer">Mojolicious::Plugin::DbicSchemaViewer</a></p>
+</div>
+<div class="modal fade" id="help-modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+                <h3 class="modal-title" id="help-title">Help</h3>
+            </div>
+            <div class="modal-body">No help written.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/dbic-schema-viewer/svg.js"></script>

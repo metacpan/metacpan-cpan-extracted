@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+README
+README.html
+Makefile.PL
+MemHandle.pm
+test.pl
+MemHandle/Tie.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,5 @@
+This is version 0.2 of Mail::Webmail::MessageParser. It uses a whole new
+parsing routine over v0.1, and thus is (partially) incompatible with versions
+of Mail::Webmail::Yahoo earlier than 0.5. It is also likely to change again in
+the near future as several of the parsing idiosyncracies are worked out. YHBW.
+You should probably be using M:W:Yahoo and not M:W:MessageParser directly.

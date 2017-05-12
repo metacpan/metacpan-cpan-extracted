@@ -1,0 +1,34 @@
+MIME/DecodeText version 0.01
+============================
+
+
+The perl module MIME::DecodeText allow to decode a text string
+which was composed of a few differently encoded parts and plain
+text parts. The 'spase' character is used as parts separator.
+
+Please report any bugs/suggestions to Vlad Danego <vlad@al.lg.ua>
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+   MIME::Base64
+   MIME::QuotedPrint
+
+COPYRIGHT AND LICENCE
+
+All files contained in this installation are
+Copyright (c) 2004 Vlad Danego <vlad@al.lg.ua>
+unless otherwise specified. All rights reserved.
+
+This library is free software. You can redistribute it
+and/or modify it under the same terms as Perl itself.

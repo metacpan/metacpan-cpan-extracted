@@ -1,0 +1,72 @@
+Math-Geometry-Delaunay
+
+This is a Perl interface to Jonathan Shewchuk's Triangle library.
+
+alpha release - not thoroughly tested
+
+"Triangle generates exact Delaunay triangulations, constrained Delaunay 
+triangulations, conforming Delaunay triangulations, Voronoi diagrams, and 
+high-quality triangular meshes. The latter can be generated with no small or 
+large angles, and are thus suitable for finite element analysis." 
+-- from http://www.cs.cmu.edu/~quake/triangle.html
+
+This Perl wrapper provides convenient methods for adding polygons, polylines,
+segments and points as input for Triangle, and for accessing triangulation
+results topologically, or as simple lists of triangles, edges, or points.
+
+This XS module includes Triangle version 1.6.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Math::Geometry::Delaunay
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Geometry-Delaunay
+
+    Search CPAN
+        http://search.cpan.org/dist/Math-Geometry-Delaunay/
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Michael E. Sheldrake
+
+This Perl binding to is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+TRIANGLE LICENCE
+
+Triangle, by Jonathan Richard Shewchuck, copyright 2005, includes the following
+notice in the C source code. Please refer to the C source, included with this
+Perl module distribution, for the full notice.
+
+    This program may be freely redistributed under the condition that the
+    copyright notices (including this entire header and the copyright
+    notice printed when the `-h' switch is selected) are not removed, and
+    no compensation is received.  Private, research, and institutional
+    use is free.  You may distribute modified versions of this code UNDER
+    THE CONDITION THAT THIS CODE AND ANY MODIFICATIONS MADE TO IT IN THE
+    SAME FILE REMAIN UNDER COPYRIGHT OF THE ORIGINAL AUTHOR, BOTH SOURCE
+    AND OBJECT CODE ARE MADE FREELY AVAILABLE WITHOUT CHARGE, AND CLEAR
+    NOTICE IS GIVEN OF THE MODIFICATIONS.  Distribution of this code as
+    part of a commercial system is permissible ONLY BY DIRECT ARRANGEMENT
+    WITH THE AUTHOR.  (If you are not directly supplying this code to a
+    customer, and you are instead telling them how they can obtain it for
+    free, then you are not required to make any arrangement with me.)
+

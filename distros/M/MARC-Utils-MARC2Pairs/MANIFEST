@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/MARC-Utils-MARC2Pairs.t
+lib/MARC/Utils/MARC2Pairs.pm
+META.yml                                 Module meta-data (added by MakeMaker)

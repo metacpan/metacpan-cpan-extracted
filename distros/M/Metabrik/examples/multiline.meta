@@ -1,0 +1,19 @@
+use shell::command
+
+set core::log level 3
+set core::shell debug 1
+
+# We have to put Metabrik Commands in '' because in multiline we switch into Perl Code
+# Using '' says to core::shell to convert the string into a Metabrik Command executable 
+# like Perl Code
+# Example:
+#  'run shell::command system "echo $_"'
+#  Is rewritten as:
+#  $SHE->cmd("run shell::command system echo $count");
+my $count = 0;
+for (1..10) {
+   $count = $_;
+   'run shell::command system echo $count';
+   'run shell::command system echo $count+1';
+   'run shell::command system echo';
+}

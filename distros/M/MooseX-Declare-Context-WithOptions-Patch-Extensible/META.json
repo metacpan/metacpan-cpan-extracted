@@ -1,0 +1,67 @@
+{
+   "abstract" : "patch MooseX::Declare for extensibility",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::6 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Declare-Context-WithOptions-Patch-Extensible",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MooseX::Declare" : "0.30"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.61"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::Declare::Context::WithOptions::Patch::Extensible" : {
+         "file" : "lib/MooseX/Declare/Context/WithOptions/Patch/Extensible.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/MooseX-Declare-Context-WithOptions-Patch-Extensible/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Declare-Context-WithOptions-Patch-Extensible"
+      },
+      "homepage" : "https://metacpan.org/release/MooseX-Declare-Context-WithOptions-Patch-Extensible",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-moosex-declare-context-withoptions-patch-extensible.git",
+         "web" : "http://github.com/tobyink/p5-moosex-declare-context-withoptions-patch-extensible"
+      }
+   },
+   "version" : "0.002"
+}

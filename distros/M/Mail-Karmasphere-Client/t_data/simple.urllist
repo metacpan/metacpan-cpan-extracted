@@ -1,0 +1,8 @@
+http://foo:bar@abc.example1.com/
+ftp://fred:quux@hij.example3.com/
+https://sheila:jim@klm.example4.com/
+http://nop.example5.com:1234/
+http://qrs.example6.com/this/is/a/path
+http://tuv.example7.com:4321/some/other/path
+http://a:b@wxy.example8.com:567/
+http://c:d@zab.example9.com:437/a/path/through/a/park

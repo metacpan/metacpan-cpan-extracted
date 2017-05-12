@@ -1,0 +1,18 @@
+-- MySQL dump 8.23
+--
+-- Host: localhost    Database: mobyrelationship
+---------------------------------------------------------
+-- Server version	3.23.58
+
+--
+-- Dumping data for table `relationship`
+--
+
+
+INSERT INTO relationship VALUES (1,'urn:lsid:biomoby.org:objectrelation:hasa','hasa','1','Describes a container relationship where the predicate object is contained within the subject object in one copy only','www.biomoby.org','markw@illuminae.com','object');
+INSERT INTO relationship VALUES (2,'urn:lsid:biomoby.org:objectrelation:has','has','1','Describes a container relationship where the predicate object is contained within the subject object in one or more copies','www.biomoby.org','markw@illuminae.com','object');
+INSERT INTO relationship VALUES (3,'urn:lsid:biomoby.org:objectrelation:isa','isa','0','Describes an inheritence relationship where all attributes of the parent must be in the child','www.biomoby.org','markw@illuminae.com','object');
+INSERT INTO relationship VALUES (4,'urn:lsid:biomoby.org:servicerelation:isa','isa','0','Describes an inheritence relationship where the predicate service performs a more specific operation compared to the subject service','www.biomoby.org','markw@illuminae.com','service');
+
+
+

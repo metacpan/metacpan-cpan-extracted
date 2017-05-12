@@ -1,0 +1,30 @@
+Revision history for mojolicious-plugin-linkedcontent
+
+0.07    Fri Jan 15 15:56:32 2015
+        Support Mojolicious 5.0+
+        Replaced render with render_to_string
+
+0.06    Wed Aug 14 22:37:01 2013
+        Support Mojolicious 4.0+
+        Replaced render_partial with render (oliverguenther)
+
+0.05    Mon Oct 22 23:50:27 2012
+        Fixed undocumented stuff broken by Mojolicious 2.62+
+        Updated to Module::Install 1.06
+        Separated author tests
+
+0.04    Tue Nov 15 11:27:26 2011
+        Switched to Module::Install
+
+0.03_1  Thu Feb 10 14:52:06 2011
+        Upgraded to Mojolicious 1.01
+        Removed Module::Build suport
+
+0.02_1  Fri Dec 10 21:21:52 2010
+        CSS support
+        Elements ordering fix
+        Support for absolute url
+        Support for absolute path
+
+0.01_1  Wed Jan 27 18:07:19 2010
+        Initial release.

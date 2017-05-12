@@ -1,0 +1,68 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Mite::App;
+Mite::App->run;
+
+
+=head1 NAME
+
+mite - A Perl OO compiler
+
+=head1 SYNOPSIS
+
+    cd Your-Project
+    mite init Your-Project
+    ...write code with use Your::Project::Mite...
+    mite compile
+
+
+=head1 DESCRIPTION
+
+mite is a Perl compiler for L<Mite>, a Moose-like module for doing
+object oriented code.  Unlike others, code using Mite has no
+dependencies, I<even on Mite itself>.
+
+mite allows you to write object-oriented Perl modules without any
+dependencies.  There is also no startup cost to build the classes,
+they are already built.
+
+mite compiles not into C, but into more Perl.  Each .pm file which
+uses Mite will have an associated .mite.pm file which contains the
+additional code implementing the class.  This is pure Perl code and
+will load as fast as any other Perl.
+
+=head1 COMMANDS
+
+=head2 init
+
+    mite init <project name>
+
+Initializes a project to use Mite.
+
+Creates a F<.mite> directory in the current directory where the
+configuration file F<.mite/config> is stored.
+
+Generates the project specific mite shim file.
+
+=head2 compile
+
+    mite compile
+
+Reads each .pm file and creates the necessary extra mite code so it
+will run.
+
+You must run C<mite compile> after editing any file which uses Mite.
+
+=head1 NOTE
+
+You B<must> rerun C<mite compile> after every change to a file
+which uses Mite.
+
+=head1 SEE ALSO
+
+L<Mite>
+
+=cut

@@ -1,0 +1,6 @@
+The following list is not up to date:
+
+* fix t/leak.t
+* put _str() into XS
+* put _add()/_sub() into XS
+* put all the other routines into XS

@@ -1,0 +1,80 @@
+NAME
+    MooseX::RoleFor - limit the applicability of a Moose::Role
+
+SYNOPSIS
+      package Watchdog;
+  
+      use Moose::Role;
+      use MooseX::RoleFor;
+  
+      role_for 'Dog';
+      requires 'make_noise';
+  
+      sub hear_intruder
+      {
+        my ($self) = @_;
+        $self->make_noise;
+      }
+  
+      1;
+
+DESCRIPTION
+    This package allows your Moose roles to limit what classes and objects
+    they may be composed with. This is often not a good idea - one of the
+    advantages of roles is that they can be reused in such different contexts.
+
+    However, if you search CPAN for "TraitFor" you'll see that it's quite a
+    common desire to indicate that a role should only be applies to certain
+    classes.
+
+  `role_for $class, $consequence`
+    $class is a string (class name) or arrayref of strings indicating which
+    classes this role may be composed with. Inheritance is respected.
+
+    $consequence is either "carp" (the default) or "croak".
+
+  How it works
+    Adding `use MooseX::RoleFor` to your role imports the `role_for` function
+    to your class, and applies the
+    `MooseX::RoleFor::Meta::Role::Trait::RoleFor` role to your role's
+    metaclass.
+
+    The `role_for` function is basically:
+
+      sub role_for
+      {
+        __PACKAGE__->meta->role_is_for($_[0])
+        __PACKAGE__->meta->role_misapplication_consequence($_[1])
+          if defined $_[1];
+      }
+
+    `MooseX::RoleFor::Meta::Role::Trait::RoleFor` hooks onto
+    `Moose::Meta::Role`'s `apply` method to enforce your restriction.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-RoleFor>.
+
+  Known
+    When misapplying a role to an instance (rather than a class), you get not
+    one warning, but two: one for the object, and one for its metaclass.
+
+SEE ALSO
+    Moose, Moose::Meta::Role.
+
+    MooseX::RoleFor::Meta::Role::Trait::RoleFor - internals.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2011-2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

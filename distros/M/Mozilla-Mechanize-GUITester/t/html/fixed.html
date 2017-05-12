@@ -1,0 +1,30 @@
+<html>
+<head>
+<title>Fixed Test</title>
+<style>
+#but {
+	position: fixed;
+	left: 100px;
+	top: 100px;
+}
+#div {
+	position: fixed;
+	left: 300px;
+	top: 100px;
+}
+
+#but2 {
+	position: absolute;
+	left: 599px;
+	top: 599px;
+}
+</style>
+</head>
+<body>
+<input id="but" type="button" value="Hello" onclick="alert('clicked 1');" />
+<input id="but2" type="button" value="Hello" onclick="alert('clicked 2');" />
+<div id="div">
+<input id="but3" type="button" value="Hello" onclick="alert('clicked 3');" />
+</div>
+</body>
+</html>

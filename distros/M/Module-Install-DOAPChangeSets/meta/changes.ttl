@@ -1,0 +1,242 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dbug:    <http://ontologi.es/doap-bugs#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/Module-Install-DOAPChangeSets/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project :release my:v_0-00_01 .
+my:v_0-00_01
+	a               :Version ;
+	dc:issued       "2010-01-08"^^xsd:date ;
+	:revision       "0.00_01"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAPChangeSets-0.00_01.tar.gz> ;
+	rdfs:label      "Omega 1" ;
+	rdfs:comment    "Developer preview."@en .
+
+my:project :release my:v_0-00_02 .
+my:v_0-00_02
+	a               :Version ;
+	dc:issued	"2010-01-08"^^xsd:date ;
+	:revision	"0.00_02"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAPChangeSets-0.00_02.tar.gz> ;
+	rdfs:label	"Omega 2" ;
+	rdfs:comment    "Developer preview."@en ;
+	dcs:changeset [
+		dcs:versus my:v_0-00_01 ;
+		dcs:item   [ rdfs:label "Don't recommend QNames containing '.' -- they're supported by libraptor, but illegal in Turtle."@en ]
+	] .
+
+my:project :release my:v_0-00_03 .
+my:v_0-00_03
+	a               :Version ;
+	dc:issued       "2010-01-11"^^xsd:date ;
+	:revision       "0.00_03"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAPChangeSets-0.00_03.tar.gz> ;
+	rdfs:label      "Omega 3" ;
+	rdfs:comment    "Developer preview."@en ;
+	dcs:changeset [
+		dcs:versus my:v_0-00_02 ;
+		dcs:item   [ rdfs:label "Support Aaron Cope's changefile vocab as a legacy input format."@en ; a dcs:Addition ] ;
+		dcs:item   [ rdfs:label "Reverse order of versions in Changelog (newest at top)"@en ] ;
+		dcs:item   [ rdfs:label "Use Text::Wrap to wrap text."@en ; a dcs:Addition ]
+	] .
+
+my:project :release my:v_0-00_04 .
+my:v_0-00_04
+	a               :Version ;
+	dc:issued       "2010-01-13"^^xsd:date ;
+	:revision       "0.00_04"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAPChangeSets-0.00_04.tar.gz> ;
+	rdfs:label      "Omega 4" ;
+	rdfs:comment    "Developer preview."@en ;
+	dcs:changeset [
+		dcs:versus my:v_0-00_03 ;
+		dcs:item   [ rdfs:label "Split out RDF::DOAP::ChangeSets as a separate Perl module."@en ]
+	] .
+
+my:project :release my:v_0-01 .
+my:v_0-01
+	a               :Version ;
+	dc:issued       "2010-01-18"^^xsd:date ;
+	:revision       "0.01"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAPChangeSets-0.01.tar.gz> ;
+	rdfs:comment    "First vaguely stable release."@en ;
+	dcs:changeset [
+		dcs:versus my:v_0-00_04 ;
+		dcs:item   [ rdfs:label "Documentation improvements."@en ]
+	] .
+
+my:project :release my:v_0-02 .
+my:v_0-02
+	a               :Version ;
+	dc:issued       "2010-01-27"^^xsd:date ;
+	:revision       "0.02"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAPChangeSets-0.02.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v-0_01 ;
+		dcs:item   [ rdfs:label "Project name was being overridden by URI."@en ; a dcs:Bugfix ]
+	] .
+
+my:project :release my:v_0-03 .
+my:v_0-03
+	a               :Version ;
+	dc:issued       "2010-03-26"^^xsd:date ;
+	:revision       "0.03"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAPChangeSets-0.03.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-02 ;
+		dcs:item   [ rdfs:label "Use Perl::Version to sort revisions in output."@en ]
+	] .
+
+my:project :release my:v_0-04 .
+my:v_0-04
+	a               :Version ;
+	dc:issued       "2010-04-07"^^xsd:date ;
+	:revision       "0.04"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAPChangeSets-0.04.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-03 ;
+		dcs:item   [ rdfs:label "Best practice is to use http://purl.org/NET/cpan-uri/."@en ; a dcs:Update ]
+	] .
+
+my:project :release my:v_0-100 .
+my:v_0-100
+	a               :Version ;
+	dc:issued       "2010-07-18"^^xsd:date ;
+	:revision       "0.100"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAPChangeSets-0.100.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-04 ;
+		dcs:item   [ rdfs:label "Use RDF::Trine::Serializer::RDFXML for XML output."@en ] ;
+		dcs:item   [ rdfs:label "Sort change items within each version for text output."@en ]
+	] .
+
+my:project :release my:v_0-101 .
+my:v_0-101
+	a               :Version ;
+	dc:issued       "2010-07-21"^^xsd:date ;
+	:revision       "0.101"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAPChangeSets-0.101.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-100 ;
+		dcs:item   [ rdfs:label "XML output no longer just an empty file!"@en ; a dcs:Bugfix ]
+	] .
+
+my:project :release my:v_0-102 .
+my:v_0-102
+	a               :Version ;
+	dc:issued       "2011-04-02"^^xsd:date ;
+	:revision       "0.102"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAPChangeSets-0.102.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-101 ;
+		dcs:item   [ rdfs:label "Improve sort order of versions in output. Take dates into consideration."@en ] ;
+		dcs:item   [ rdfs:label "Allow change items to have multiple RDF types."@en ]
+	] .
+
+my:project :release my:v_0-103 .
+my:v_0-103
+	a               :Version ;
+	dc:issued       "2011-09-30"^^xsd:date ;
+	:revision       "0.103"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAPChangeSets-0.103.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-102 ;
+		dcs:item   [ rdfs:label "Output is now compliant with CPAN::Changes::Spec."@en ] ;
+		dcs:item   [ rdfs:label "Default input file is now called 'meta/changes.ttl'."@en ]
+	] .
+
+my:project :release my:v_0-200 .
+my:v_0-200
+	a               :Version ;
+	dc:issued       "2011-10-01"^^xsd:date ;
+	:revision       "0.200"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAPChangeSets-0.200.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-103 ;
+		dcs:item   [ rdfs:label "Will use data from Module::Install::RDF in favour of 'meta/changes.ttl', if 'rdf_metadata' has been called prior to 'write_doap_changes'."@en ] ;
+		dcs:item   [ rdfs:label "No longer produces top heading for Changes file: just a smaller heading for each project. (And there will rarely be more than one project described.)"@en ; a dcs:Removal ]
+	] .
+
+my:project :release my:v_0-201 .
+my:v_0-201
+	a               :Version ;
+	dc:issued       "2011-10-06"^^xsd:date ;
+	:revision       "0.201"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAPChangeSets-0.201.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-200 ;
+		dcs:item   [ a dcs:Packaging ; rdfs:label "Upgrade Module::Package::RDF version."@en ] 
+	] .
+
+my:project :release my:v_0-202 .
+my:v_0-202
+	a               :Version ;
+	dc:issued       "2012-01-18"^^xsd:date ;
+	:revision       "0.202"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAPChangeSets-0.202.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-201 ;
+		dcs:item   [ a dcs:Addition ; rdfs:label "Support 'dcs:blame'."@en ] ;
+		dcs:item   [ rdfs:label "Improved sort order of change items within each version."@en ]
+	] .
+
+my:project :release my:v_0-203 .
+my:v_0-203
+	a               :Version ;
+	dc:issued       "2012-07-04"^^xsd:date ;
+	:revision       "0.203"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAPChangeSets-0.203.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-202 ;
+		dcs:item   [ a dcs:Addition ; rdfs:label "Support 'dcs:thanks'."@en ; dcs:thanks [ foaf:nick "KJETILK" ] ] ;
+		dcs:item   [ rdfs:label "When Module::Install::RDF is in use, then don't complain about missing files."@en ]
+	] .
+
+my:project :release my:v_0-204 .
+my:v_0-204
+	a               :Version ;
+	dc:issued       "2013-06-18"^^xsd:date ;
+	:revision       "0.204"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAPChangeSets-0.204.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-203 ;
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "Support 'dbug:fixes'."@en;
+			dcs:fixes <http://purl.org/NET/cpan-uri/rt/ticket/86225>;
+		];
+	].
+
+my:project :release my:v_0-205 .
+my:v_0-205
+	a               :Version ;
+	dc:issued       "2013-06-18"^^xsd:date ;
+	:revision       "0.205"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAPChangeSets-0.205.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-204 ;
+		dcs:item [
+			a dcs:Bugfix;
+			rdfs:label "Oops! That should be 'dcs:fixes'."@en;
+		];
+	].
+
+my:project :release my:v_0-206 .
+my:v_0-206
+	a               :Version ;
+	dc:issued       "2013-07-31"^^xsd:date ;
+	:revision       "0.206"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAPChangeSets-0.206.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-205 ;
+		dcs:item [
+			a dcs:Update;
+			rdfs:label "Minor changes to the release header now that CPAN::Changes::Spec 0.02 has been published."@en;
+		];
+	].
+

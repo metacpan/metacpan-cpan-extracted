@@ -1,0 +1,11 @@
+0.04  2014-05-31 13:24:31 GMT
+    * Bug #445 : Fix synopsis (Gabor Szabo)
+
+0.03  2014-02-09 17:40:47 GMT
+    * Feature #419 : Add more features and simplify usage (Celogeek San)
+
+0.02  2014-02-09 15:57:11 GMT
+    * Bug #418 : Each instance of Memory Stats should be independant (Celogeek San)
+
+0.01  2014-01-03 12:00:08 GMT
+    * Feature #395 : Init Project (Celogeek San)

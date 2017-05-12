@@ -1,0 +1,99 @@
+2017-02-02 0.09 pjacklam
+
+ * Trim whitespace.
+
+ * POD nits (CPAN RT #51825).
+
+ * POD formatting.
+
+ * The NEW file now refers to the CHANGES file.
+
+ * Revert to ExtUtils::MakeMaker since use Module::Install is discouraged.
+   Change license from "perl" to "perl_5", which is the recommended for Perl 5.
+
+ * More documentation in POD about BUGS and SUPPORT.
+
+ * Update README file.
+
+ * Remove INSTALL file. The information in that file is now in the README file.
+
+ * Required version of Test::More is 0.47, not 0.62.
+
+ * Required version of Math::String is 1.22, not 1.28.
+
+ * Required version of Math::BigInt is 1.74, not 1.87.
+
+ * Remove Math::BigFloat from list of requirements, since this is bundled with
+   Math::BigInt in the Math-BigInt distribution.
+
+2008-04-03 0.08 Tels 181 tests
+
+ * modernize package (bundle Module::Install etc.)
+
+ * add POD tests
+
+ * we don't need to have Exporter in @ISA
+
+Complete version history
+========================
+
+##############################################################################
+Math::String::Charset::Wordlist
+
+2003-02-06 v0.01 Tels
+  * first version
+
+2003-04-14 v0.02 Tels
+  * fix for scale not beeing a legal parameter to new()
+  * added method copy() (with special case for Tie::File object)
+
+2003-04-27 v0.03 Tels  81 tests
+  * added: file(), class()
+  * fixed: str2num: use the "normal" sorting of the wordlist (like
+ 	   "sort -u" produces), instead of "shortest strings first"
+  * fixed: ones(), start(), end(), char()
+  * made it's own distribution with XS code to replace File::Tie
+    _file(), _free(), _offset() and _record()
+  * fixed: str2num(): use $self->{_len}->numify() instead of $self->count()
+           This makes the search _much_ faster since it no longer uses
+	   BigInt math (e.g. 1800/s vs. 70/s)
+
+2003-04-27 v0.04 Tels  152 tests
+  * speedup str2num: just set $leftstr/$rightstr from $middlestr instead of
+    fetching them over and over. (2470/s instead of 1800/s)
+  * _offset(): return undef when a negative record number is passed
+  * offset(-$n): return offset counting from last record backwards
+  * _record(): increase limit from 1024 to 8192 bytes. (still, fixed limit is
+    baaad...)
+  * _record(): remove 0x0A and 0x0D from record end (to cater for win32 files)
+  * _file() reads in the file blockwise (8 KByte) instead of bytewise, this
+    makes if _much_ faster again:
+
+   # perl time.pl big2.lst
+    Math::String::Charset::Wordlist v0.03
+    new() took 0.549798965454102 seconds.
+    contains 913954 words.
+    FETCHALL took 0.000316023826599121 seconds.
+
+    perl -I/lib -I/blib/arch time.pl big2.lst
+    Math::String::Charset::Wordlist v0.04
+    new() took 0.0736250877380371 seconds.
+    contains 913954 words.
+    FETCHALL took 0.000316977500915527 seconds.
+
+2003-04-28 v0.05 Tels  178 tests
+  * if record len was 0, _record() bombed (buffer underflow)
+  * dictionaries with more than 8192 bytes did not work, due to bug in offset
+    reading
+  * num2str() did not work for negative numbers (abs() missing)
+  * more tests
+  * we need Test::Simple, so list it in Makefile.PL
+
+2004-08-13 v0.06 Tels  179 tests
+  * override chars() from Charset.pm and return 1
+  * minlen()/maxlen() can be inherited
+  * adjust prerequisites
+  * fix warnings about unused vars in XS code
+
+2004-11-20 v0.07 Tels  179 tests
+  * make to work with Math::String v1.25

@@ -1,0 +1,21 @@
+Changes
+lib/Mojo/Pg/Che.pm
+lib/Mojo/Pg/Che/Results.pm
+lib/Mojo/Pg/Che/Database.pm
+lib/Mojo/Pg/Che/Database.pod
+Makefile.PL
+MANIFEST			This list of files
+README
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/00-load.t
+t/02-connection.t
+t/03-query.t
+t/04-select.t
+t/05-transaction.t
+t/06-pubsub.t
+example/ws-pubsub.pl
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

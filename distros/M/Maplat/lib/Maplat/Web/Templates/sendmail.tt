@@ -1,0 +1,60 @@
+<p>
+    <form name="sendmail" method="post" action="[% webpath %]">
+        <table class="data" align="center" id="MainDataTable">
+            [% IF statustext %]
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr class="tabheader">
+                    <th colspan="2">
+                        <div class="infotext">[% tr.tr("Status") %]</div>
+                    </th>
+                </tr>
+                <tr>
+                    <th colspan="2">
+                        <div class="[% statuscolor %]">[% tr.tr(statustext) %]</div>
+                    </th>
+                </tr>
+            [% END %]
+            <tr>
+                    <td colspan="2">&nbsp;</td>
+            </tr>
+            <tr>
+                <td align="right">[% tr.tr("Reciever") %]:</td>
+                <!--<td><input type="text" size="70" maxlength="100" name="reciever" value="[% reciever %]">-->
+                <td>
+                    <table class="data" align="center" id="SubHelperTable1">
+                    [% FOREACH user IN users %]
+                        <tr>
+                            <td>[% user.username %]</td>
+                            <td>[% user.email_addr %]</td>
+                            <td><input type="checkbox" name="reciever[]" value="[% user.email_addr %]"
+                            [% IF user.checked %]
+                                checked="checked"
+                            [% END %]
+                            ></td>
+                        </tr>
+                    [% END %]
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">[% tr.tr("Subject") %]:</td>
+                <td><input type="text" size="70" maxlength="100" name="subject" value="[% subject %]">
+            </tr>
+            <tr>
+                <td align="right">[% tr.tr("Text") %]:</td>
+                <td><textarea cols="70" rows="15" name="mailtext">[% mailtext %]</textarea>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <table border="0" cellpadding="4" cellspacing="5" align="right">
+                        <td align="center"><input type="submit" value="[% tr.tr("Send") %]"></td>
+                        <td align="center"><input type="reset" value="[% tr.tr("Reset") %]"></td>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <input type="hidden" name="submitform" value="1">
+    </form>
+</p>

@@ -1,0 +1,9 @@
+Changes
+lib/MKDoc/Control_List.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/100_Basic_Tests.t
+t/101_toys.t
+t/data/toy_config.txt

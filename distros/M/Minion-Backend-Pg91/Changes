@@ -1,0 +1,14 @@
+- 5.00
+    - Updating with minor changes to match Minion::Backend::Pg version 5.0
+- 4.06
+    - Updating with changes as in Minion::Backend::Pg version 4.06
+- 4.0403
+    - Adding LICENSE file for Github
+    - Meta-merge field updated for Metacpan.org
+- 4.0402
+    - Performing check if PostgreSQL 9.1 is supported.
+- 4.0401
+    - Fixing the CPAN distribution and upgrading to 4.0401
+- 4.04
+    - Creating Minion::Backend::Pg91 to support Postgres 9.1. Code modified from
+      Minion::Backend::Pg 4.04

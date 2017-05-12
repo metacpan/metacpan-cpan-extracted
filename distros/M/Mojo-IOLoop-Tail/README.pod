@@ -1,0 +1,27 @@
+NAME
+    Mojo::IOLoop::Tail - IOLoop interface to tail a file asynchronously
+
+VERSION
+    0.02
+
+DESCRIPTION
+    This is an IOLoop interface to tail a file asynchronously
+
+SYNOPSIS
+        use Mojo::Base -strict;
+
+        use Mojo::IOLoop::Tail;
+
+        my $tail = Mojo::IOLoop::Tail->new(file => "tail.me");
+
+        $tail->on(oneline => sub {
+            my $tail = shift;
+            my $line = shift;
+
+            print($line);
+        });
+
+        $tail->run;
+
+        $tail->ioloop->start unless $tail->ioloop->is_running;
+

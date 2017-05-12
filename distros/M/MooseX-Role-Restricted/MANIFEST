@@ -1,0 +1,7 @@
+lib/MooseX/Role/Restricted.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/basic.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

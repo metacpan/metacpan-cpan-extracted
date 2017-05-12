@@ -1,0 +1,45 @@
+This file documents the revision history for the Mojolicious::Command::deploy::heroku distribution.
+
+0.10    2012-08-23 00:00:00
+        - Removed dependency of MOJO_APP env variable
+        - Fixed inconsistencies in Perloku file generation, with ./command
+
+0.09    2012-08-03 00:00:00
+        - Fix generate heroku for full apps by switching to Mojo::Util->class_to_file
+          (was not working since v0.06 with Mojolicious 3.0+)
+        - Require Mojolicious 3.0
+
+0.08    2012-07-18 00:00:00
+        - Added help text displaying signup url when prompting for credentials
+
+0.07    2012-06-30 00:00:00
+        - Fixed help typo
+
+0.06    2012-06-28 00:00:00
+        - Inherits Mojolicious::Command instead of Mojo::Command, as necessary
+          starting with Mojolicious 3.0
+
+0.05    2012-06-14 00:00:00
+        - Prints each file added to repo, with total count
+
+0.04    2012-06-07 00:00:00
+        - Added git config option core.autocrlf=false to prevent ugly
+          warnings when pushing in windows
+
+0.03    2012-06-07 00:00:00
+        - POD references to Perloku and git repo operation.
+        - Works on Windows
+        - Git/Heroku process prints out progress
+
+0.02    2012-06-05 00:00:00
+        - Prompts for credentials if api key not found
+          - Saves api key in ~/.heroku/credentials after retrieval
+        - SSH keys
+          - If no remote keys and no local keys, generates and uploads key
+          - If no remote keys but local keys, prompts to choose and uploads
+          - If remote keys but no local keys, generates and uploads key
+        - Fixed description
+        - POD with instructions
+
+0.01    2012-06-05 00:00:00
+        - Initial release

@@ -1,0 +1,143 @@
+0.29 - 2015-06-26
+    - Add more Num tests (meAmdios)
+    - Improve POD (meAmidos)
+    - Add DISTNAME to MakeMaker args
+
+0.28 - 2015-02-27
+    - Refine POD (github.com/meAmidos)
+    - Bump version of Moo and Module::Runtime pre-reqs
+    - Modernize Makefile.PL
+
+0.27 - 2014-08-19
+    - Fix tests to not use package B (haarg)
+
+0.26 - 2014-08-18
+    - Bugfix for recent versions of Moo changing error messages (skaufman)
+
+0.25 - 2013-07-29
+    - Don't trigger bool overrides when checking for object instance type
+      [RT#87382] (Mithaldu)
+    - Make Moo a build dep. instead of run dep.
+
+0.24 - 2013-07-10
+    - Upgrade Num test, keep in sync w/ Moose (autarch)
+    - Improve documentation
+
+0.23 - 2013-03-07
+     - Fix regression in subtypes defined with a string (for the parent test)
+
+0.22 - 2013-03-04
+     - Allow subtyping of parameterized types (haarg)
+     - Extract SetObject and Numeric types into their own distributions
+
+0.21 - 2013-02-16
+      - Allow type libraries more control over inflation to Moose types (tobyink)
+
+0.20 - 2013-02-11
+      - Improve documentation
+
+0.19 - 2013-02-10
+      - New type: Enum
+
+0.18 - 2013-02-09
+      - AnyOf now supports parameterized types
+        API CHANGE: AnyOf no longer takes types in a string
+                    This means you should write: AnyOf[Int, CodeRef] 
+                    instead of: AnyOf['Int', 'CodeRef']
+      - New type: AllOf (intersection of defined types)
+      - Simplify new make_type() code (haarg)
+
+0.17 - 2013-02-08
+      - New type: AnyOf (union of defined types)
+
+0.16 - 2012-10-11
+      - Handle undef with grace (github issues 13 and 14)
+      - Improve POD for: InstanceOf, ConsumerOf, HasMethods
+      - Restrict ConsumerOf and HasMethods to something blessed (i.e. an instance)
+      - Bump Moo requirements (better role composition and isa builder check) 
+
+0.15 - 2012-09-28
+      - Relax InstanceOf definition to use isa()
+
+0.14 - 2012-09-19
+      - Remove pesky Set::Object from build requirements
+
+0.13 - 2012-09-18
+      - Only test SetObject when Set::Object is already installed
+
+0.12 - 2012-09-11
+       Release Name: Independence for Catalunya
+       - Improve POD
+       - Add testing dependency
+       - Correct SetObject
+       - Enable ConsumerOf to accept multiple roles
+
+0.11 - 2012-09-10
+       - Generalize parameterizable (fREW)
+       - Rework type string arguments to follow ['Str'] pattern (mattp)
+       - New types: InstanceOf, ConsumerOf and HasMethods
+
+0.10 - 2012-08-26
+       - Allow Type() arguments (mattp)
+       - Improve error handling for parameterized types (mattp)
+       - Improve documentation
+
+0.09 - 2012-07-23
+       - Preserve attribute properties defined after 'isa'
+         [github issue #7]
+         Failing tests (xsawyerx)
+
+0.08 - 2012-07-03
+       - Support for parameterized type: Maybe
+         For example,  isa => Maybe[Int]
+
+0.07 - 2012-06-29
+       - Support for parameterized types: ArrayRef, HashRef, ScalarRef
+         This means one can now write: isa => ArrayRef[HashRef]
+
+0.06 - 2012-06-27
+       - Make subtype use full test [RT#78074] (SineSwiper)
+       - Correct SingleDigit type definition [RT#78074] (SineSwiper)
+       - Add Stack Trace on Exception [RT#77583] (Mithaldu)
+
+0.05 - 2012-05-16
+       - Add Deps [RT#77225] (SymKat)
+       - Add META (SineSwiper)
+
+0.04 - 2012-04-27
+       ADDITIONS:
+       * Add support for Moo type inflation to Moose (mst)
+
+       API CHANGE:
+       * Numeric types equivalent to MooseX::Type::Common::Numeric
+
+0.03 - 2012-03-19
+       IMPROVEMENTS:
+       * Bunches of POD [RT#73519]
+       * Simplified Exporter usage [RT#75209] (dolmen)
+       * Removed Data::Dumper::Concise dependency [RT#73469] (rsimoes)
+
+       ADDITIONS:
+       * Numeric Types
+       * Experimental type building API
+
+       API CHANGE:
+       * Basic types are now found in MooX::Types::MooseLike::Base
+         instead of MooX::Types::MooseLike
+
+
+0.02 - 2011-10-21
+       ADDITIONS:
+       * Most non-parameterized types of the basic Moose type hierarchy
+         are now supported.  Exceptions are ClassName and RoleName
+       * Ability to re-use the type tests to build new ones via is_$type()
+
+       IMPROVEMENTS:
+       * Refactored generation of assert_Foo() to use a dispatch table
+         and captures for quote_sub.
+
+       FIXES:
+       * Add AutoPrereq to dist.ini so Makefile.PL gets dependencies generated
+
+0.01 - 2011-09-15
+       Initial Release

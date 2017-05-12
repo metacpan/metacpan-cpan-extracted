@@ -1,0 +1,42 @@
+---
+abstract: 'Installer for CGI applications'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  Test::File::Cleaner: 0.03
+  Test::More: 0.42
+  Test::Script: 1.02
+  URI: 1.35
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Module::CGI::Install
+name: Module-CGI-Install
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  CGI::Capture: 1.08
+  Carp: 0
+  Config: 0
+  ExtUtils::Packlist: 0
+  File::Basename: 0
+  File::Copy: 0
+  File::Path: 0
+  File::Remove: 0.36
+  File::Spec: 0.80
+  File::chmod: 0.31
+  LWP::Simple: 1.41
+  Object::Tiny: 1.02
+  Params::Util: 0.25
+  Scalar::Util: 1.17
+  Term::Prompt: 1.03
+  URI::ToDisk: 1.09
+  perl: 5.005
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.07

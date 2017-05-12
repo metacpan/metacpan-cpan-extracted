@@ -1,0 +1,43 @@
+Revision history for Mojolicious-Plugin-RedirectHost
+
+1.07      2016-08-04 15:09:29+03:00 Europe/Kiev
+
+1.06      2016-08-04 04:51:50+03:00 Europe/Kiev
+
+1.05      2014-05-14 16:38:27+03:00 Europe/Kiev
+- added examples
+
+1.04      2014-05-14 15:00:37+03:00 Europe/Kiev
+- more explanation in docs
+
+1.03      2014-04-25 05:10:09+03:00 Europe/Kiev
+- fix small mistake in pod
+
+1.02      2014-04-25 02:51:04+03:00 Europe/Kiev
+- improved dist.ini
+- added .perlcritic file for Travic CI
+- changed README.md
+- changed cpanfile to install missing depencies (Test::Perl::Critic and Pod::Coverage::TrustPod) for TRAVIS CI
+
+1.01      2014-04-24 22:53:23+03:00 Europe/Kiev
+- added .travis.yml
+
+1.00      2014-04-22 05:48:07+03:00 Europe/Kiev
+- added silent option
+- start using Dist::Zilla
+- added er option (except robots.txt) for Yandex
+- remove russian docs
+- going to keep code simple
+
+0.05    2014-03-24
+- new except_path feature
+
+0.04    2012-05-27
+- Mojolicious 4.x support
+
+0.03    2012-04-19
+- Russian docs
+
+0.02    2012-04-19
+- First release, I hope the last one too)
+

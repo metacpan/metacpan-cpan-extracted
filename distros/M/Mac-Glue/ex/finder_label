@@ -1,0 +1,18 @@
+#!perl -w
+# this version works in Mac OS X
+use Time::HiRes 'sleep';
+use Mac::Glue ':all';
+use strict;
+
+my($f, $vol, $label, @orig, @prop);
+
+$f        = new Mac::Glue 'Finder';
+$vol      = $f->prop('startup disk');
+$label    = $vol->prop('label_index');
+
+$f->activate;
+
+for my $i (0 .. 32) {
+    $label->set(to => $i % 8);
+    sleep(.2);
+}

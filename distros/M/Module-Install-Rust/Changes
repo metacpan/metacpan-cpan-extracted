@@ -1,0 +1,16 @@
+Revision history for Module-Install-Rust
+
+0.04    2016-10-04
+	Add support for building modules on OSX.
+
+0.03	2016-08-30
+	Require Rust 1.11.
+	Use cdylib crate type.
+	Allow build profile configuration.
+
+0.02	2016-05-18
+	Packaging fixes.
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

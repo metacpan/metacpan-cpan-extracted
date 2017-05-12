@@ -1,0 +1,52 @@
+Revision history for MooseX-Types-LoadableClass
+
+0.014     2015-08-16 02:03:26Z
+  - update some distribution tooling
+
+0.013     2014-11-16 21:29:04Z
+  - switch from Class::Load to Module::Runtime for loading modules
+
+0.012     2013-10-20 19:04:23Z
+  - re-release with fixed encoding in metadata, support files
+
+0.011     2013-10-02 01:36:29Z
+  - only try to load the class if it's a valid module name (ilmari)
+
+0.010     2013-09-07 21:37:31Z
+  - avoid trying to load the class if already loaded (minor optimization)
+  - repository moved to the github moose organization
+
+0.009 2013-06-10
+  - now performing type checking in the type check itself, not the coercion,
+    to fix results when the type check fails (RT#86041, Karen Etheridge)
+
+0.008 2012-03-13
+  - Do not require Test::Exception. RT#75246
+
+0.007 2012-02-15
+  - Be more paranoid about the potential for $_ being clobbered.
+
+0.006 2011-07-05
+  - Change to use Class::Load, rather than Class::MOP::load_class
+
+0.005 2010-06-22
+  - Fix required version of MooseX::Types.
+
+0.004 2010-05-14
+  - Add a LoadableRole type.
+
+0.003 2010-05-12
+  - 'ClassName' is now exactly the same as 'LoadableClass', so that old code
+    still works if you use a custom type map of 'LoadableClass' for
+    MX::Storage/Kioku etc.
+    (Note that they should normally work anyway with a default type map, as
+    they subtype ClassName which subtypes Str)
+
+0.002 2010-05-12
+  - Change the name to 'LoadableClass' as this is what people expect.
+    The old 'ClassName' export is still present for backwards compatibility,
+    but no longer documented.
+
+0.001 2010-03-03
+  - Initial version.
+

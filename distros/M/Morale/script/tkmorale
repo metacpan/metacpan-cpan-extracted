@@ -1,0 +1,101 @@
+#!/usr/bin/perl -w
+#
+# tkmorale
+#
+# Copyright (C) 1999 Gregor N. Purdy. All rights reserved.
+#
+
+use strict;
+
+use Morale;
+use Tk;
+use Carp;
+use vars qw($top $my_scale $co_scale $bar $my_morale $co_morale);
+#use lib '.';
+
+$top = MainWindow->new();
+
+$my_scale = $top->Scale(
+	-orient       => 'horizontal',
+	-from         => 0,
+	-to           => 100,
+	-tickinterval => 10,
+#	-label        => 'My Morale:',
+	-length       => 300,
+	-variable     => \$my_morale,
+	-showvalue    => 0,
+	-command      => \&set_my_morale
+)->pack(side=> 'top', fill => 'x');
+
+#
+# TODO: Change this to a canvas with recessed body containing
+# a single rectangle (`bar') which will represent the overall
+# morale. The scale should be 0 to 100, just as with the scale.
+#
+
+$co_scale = $top->Canvas(
+	-height       => 20,
+	-width        => 300,
+	-borderwidth  => 2,
+	-relief       => 'sunken'
+)->pack(side=> 'top', fill => 'x', pady => 5);
+
+$bar = $co_scale->createRectangle(
+	0, 0, 0, 25,
+	-fill  => 'blue',
+	-width => 0
+);
+
+get_my_morale();
+get_co_morale();
+
+MainLoop();
+
+
+#
+# get_my_morale()
+#
+
+sub get_my_morale
+{
+	my $morale = get_morale();
+
+	if (!defined($morale)) { $my_morale = 50; }
+	else                   { $my_morale = $morale; }
+}
+
+
+#
+# set_my_morale()
+#
+
+sub set_my_morale
+{
+	set_morale($my_morale);
+
+	get_co_morale();
+}
+
+
+#
+# get_co_morale()
+#
+
+sub get_co_morale
+{
+	$co_morale = calc_morale();
+
+	if (!defined($co_morale)) { $co_morale = 0; }
+
+#	my $incr  = $co_scale->cget('-width') / 100;
+	my $incr  = 6;
+	my $width = $co_morale * $incr;
+
+	$co_scale->itemconfigure($bar, -width => $width);
+}
+
+
+#
+# End of file.
+#
+

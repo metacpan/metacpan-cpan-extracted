@@ -1,0 +1,27 @@
+Revision history for Perl extension Mail::SpamFilter.
+
+0.01  Tue Apr 13 09:17:54 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -n Mail::SpamFilter
+
+0.02  Tue Apr 13 17:05:23 BST 2004
+	- First implementation to go live
+
+0.03  Wed Apr 14 12:41:40 BST 2004
+	- Added spamprobe to the list of filters
+	- Updated dspam flags for v3.0 of dspam
+
+0.04  Thu Jan 19 13:07:06 GMT 2006
+	- Changed wpbl_check to check the upload log files as well as
+	  the wpbl-blocks.cidr file to catch repeated spam from the same IP
+
+0.05  Sun Jun 22 14:54:41 BST 2008
+	- Added entries for bogofilter: http://bogofilter.sourceforge.net/
+
+0.06  Fri Oct 10 16:12:59 BST 2008
+	- Cleaned up and added entries for spamhaus_zen_check:
+	  http://www.spamhaus.org/ZEN/
+
+0.08  Tue May  5 11:38:09 BST 2009
+	- Fixes for Windows
+

@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use MIDI::Simple::Drummer::Jazz;
+
+my $d = MIDI::Simple::Drummer::Jazz->new(
+    -bpm     => shift || 111,
+    -volume  => shift || 121,
+    -phrases => shift || 4,
+    -brushes => 1,
+    -file    => "$0.mid",
+    -signature => '3/4',
+);
+
+my ($beat, $fill) = (0, 0);
+
+$d->count_in;
+
+for my $p (1 .. $d->phrases) {
+    if($p % 2 > 0) {
+        $beat = $d->beat(-name => 1);
+    }
+    else {
+        $beat = $d->beat(-name => 3);   # TODO [3,4,5]
+    }
+}
+
+$d->rest($d->TRIPLET_WHOLE);
+
+$d->write;

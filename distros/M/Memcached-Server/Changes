@@ -1,0 +1,14 @@
+Revision history for Memcached-Server
+
+0.04    2010.8.19
+        Add handling per connection ability.
+
+0.03    2010.8.17
+        Add no_extra option.
+
+0.02    2010.8.17
+        Lost test file.
+
+0.01    2010.8.17
+        First version, released on an unsuspecting world.
+

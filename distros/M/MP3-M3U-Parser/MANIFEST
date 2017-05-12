@@ -1,0 +1,44 @@
+.perlcriticrc
+03_basic.html
+04_basic_xml.xml
+05_sub_html.html
+06_sub_search.html
+07_scalar_xml.xml
+08_scalar_html.html
+Build.PL			Generated automatically
+builder/lib/Build.pm
+builder/lib/Build/Constants.pm
+builder/lib/Build/Spec.pm
+builder/lib/Build/Util.pm
+builder/templates/pod/author.pod
+builder/templates/pod/monolith-warning.pod
+builder/templates/tools/Build.PL
+builder/templates/tools/builder.header
+builder/templates/tools/Makefile.PL
+builder/templates/tools/Makefile.PL.hook
+Changes
+eg/m3u.cgi
+lib/MP3/M3U/Parser.pm
+lib/MP3/M3U/Parser/Constants.pm
+lib/MP3/M3U/Parser/Dummy.pm
+lib/MP3/M3U/Parser/Export.pm
+LICENSE
+Makefile.PL			Generated automatically
+MANIFEST
+META.json
+META.yml
+monolithic_version/MP3/M3U/Parser.pm	The monolithic version of MP3::M3U::Parser to ease dropping into web servers. Generated automatically.
+monolithic_version/README
+README
+SPEC
+t/01-basic.t
+t/02-export.t
+t/04-basic_xml.t
+t/05-sub_html.t
+t/06-sub_search.t
+t/07-scalar_xml.t
+t/08-scalar_html.t
+t/data/mixed.m3u
+t/data/test.m3u
+xt/author/201-pod.t
+xt/author/202-pod-coverage.t

@@ -1,0 +1,16 @@
+Revision history for Module-Build-TAPArchive
+
+0.04    Aug 13, 2009
+    + Use capture() instead of capture_merged() from Capture::Tiny in the tests because
+      capture_merged() doesn't seem to work the same in 0.06
+
+0.03    Apr 4, 2009
+    + Remove Makefile.PL support and just go wtith Build.PL
+    + Clean up any archive files created when ./Build clean is run
+
+0.02    Mar 30, 2009
+    + Fix bug with making sure the @INC that Module::Build sets up is passed to TAP::Harness::Archive - M. Peters
+
+0.01    Mar 29, 2009
+    + First version, released on an unsuspecting world.
+

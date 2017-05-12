@@ -1,0 +1,4 @@
+% layout 'default';
+<h2><%= $message %></h2>
+<a href="<%== url_for %>">click here</a>
+to reload the page 

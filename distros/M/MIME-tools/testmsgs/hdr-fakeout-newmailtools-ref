@@ -1,0 +1,16 @@
+{
+  "Parser" => {
+    "Message" => "testmsgs/hdr-fakeout.msg",
+    "ExtractNested" => 1,
+    "OutputToCore" => "0",
+    "Name" => "anonymous"
+  },
+  "Msg" => {
+  	"Subject" => "test message 1",
+	"Type" => "text/plain",
+	"To" => "\"Russell P. Sutherland\" <russ\@quist.on.ca>",
+	"From" => "\"Russell P. Sutherland\" <russ\@quist.on.ca>",
+	"Encoding" => "7bit"
+   }
+}
+

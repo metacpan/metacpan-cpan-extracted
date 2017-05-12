@@ -1,0 +1,410 @@
+Revision history for Map-Metro
+
+0.2405 2016-07-23 11:33:37 UTC
+ [Requirements]
+ - Bump Moose version to ensure Type::Tiny compatibility (fixes #12).
+
+ [Stats & Dependency Changes]
+ - 28 files changed, 28 insertions(+), 30 deletions(-)
+ - (run req) ~ Moose 2.1405 --> 2.1803
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0309 --> 0.0310
+
+0.2404 2016-04-30T17:20:01Z UTC
+ [New Features]
+ - Added experimental to_hash() method to several of the graph classes.
+
+ [Stats & Dependency Changes]
+ - 30 files changed, 158 insertions(+), 29 deletions(-)
+ - (run req) + PerlX::Maybe 1.001
+ - (run req) ~ List::Util 1.42 --> 1.45
+ - (dev req) + Dist::Zilla::Plugin::MetaConfig (any)
+
+0.2403 2016-03-19T20:00:19Z UTC
+ [Bug Fixes]
+ - Add missing use statement (#11).
+
+ [Stats & Dependency Changes]
+ - 28 files changed, 29 insertions(+), 28 deletions(-)
+
+0.2402 2016-02-27T12:42:39Z UTC
+ [Requirements]
+ - Minimum version required for MooseX::App due to app_description.
+
+ [Testing]
+ - Use shorter non-existing line id to avoid some systems using scientific
+   notation.
+
+ [Stats & Dependency Changes]
+ - 30 files changed, 31 insertions(+), 31 deletions(-)
+ - (run req) ~ MooseX::App (any) --> 1.29
+
+0.2401 2016-02-25T00:35:45Z UTC
+ [Other Changes]
+ - Removed no longer used dependency.
+
+ [Documentation]
+ - Improved some documentation wording.
+
+ [Stats & Dependency Changes]
+ - 29 files changed, 43 insertions(+), 52 deletions(-)
+ - (run req) - MooseX::SetOnce
+
+0.2400 2016-02-24T18:56:43Z UTC
+ [Enhancements]
+ - Lowered required Perl to 5.10 (from 5.16). If Perl version is 5.16 or
+   newer, 'fc' is used for string comparisons instead of 'lc'.
+
+ [Other Changes]
+ - Rewritten to no longer use Moops/Kavorka.
+
+ [Bug Fixes]
+ - The 'available' command no longer lists <map>::Lines as available map
+   names.
+
+ [Stats & Dependency Changes]
+ - 41 files changed, 2211 insertions(+), 2040 deletions(-)
+ - (run req) + Safe::Isa 1.000005
+ - (run req) + Throwable::SugarFactory (any)
+ - (run req) + Try::Tiny 0.24
+ - (run req) + namespace::autoclean 0.22
+ - (run req) ~ File::ShareDir (any) --> 1.102
+ - (run req) ~ Graph (any) --> 0.9704
+ - (run req) ~ List::Util 1.33 --> 1.42
+ - (run req) ~ Moose (any) --> 2.1405
+ - (run req) ~ MooseX::AttributeDocumented (any) --> 0.1003
+ - (run req) ~ MooseX::AttributeShortcuts (any) --> 0.028
+ - (run req) ~ Path::Tiny (any) --> 0.072
+ - (run req) ~ Types::Path::Tiny (any) --> 0.005
+ - (run req) ~ Types::Standard (any) --> 1.000005
+ - (run req) ~ perl 5.016000 --> 5.010000
+ - (run req) - Kavorka
+ - (run req) - Kavorka::TraitFor::Parameter::doc
+ - (run req) - Moops
+ - (run req) - MoopsX::UsingMoose
+ - (run req) - Sub::Exporter
+ - (run req) - Syntax::Collector
+ - (run req) - Throwable::X
+ - (run req) - Type::Tiny::Enum
+ - (run req) - namespace::clean
+ - (run req) - true
+ - (run rec) - GraphViz2
+ - (test req) + IO::Handle (any)
+ - (test req) + IPC::Open3 (any)
+ - (dev req) + Badge::Depot 0.0103
+ - (dev req) + Badge::Depot::Plugin::Coverage (any)
+ - (dev req) + Badge::Depot::Plugin::Cpantesters (any)
+ - (dev req) + Badge::Depot::Plugin::Kwalitee (any)
+ - (dev req) + Badge::Depot::Plugin::Perl (any)
+ - (dev req) + Badge::Depot::Plugin::Travis (any)
+ - (dev req) + Dist::Zilla 5.000
+ - (dev req) + Dist::Zilla::Plugin::Authority 1.009
+ - (dev req) + Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.007
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0100
+ - (dev req) + Dist::Zilla::Plugin::Git 2.036
+ - (dev req) + Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.013
+ - (dev req) + Dist::Zilla::Plugin::Git::Commit (any)
+ - (dev req) + Dist::Zilla::Plugin::NextRelease::Grouped 0.0200
+ - (dev req) + Dist::Zilla::Plugin::RewriteVersion::Transitional 0.007
+ - (dev req) + Dist::Zilla::Plugin::Test::CleanNamespaces (any)
+ - (dev req) + Dist::Zilla::Plugin::Test::Compile 2.054
+ - (dev req) + Dist::Zilla::Plugin::Test::EOF 0.0501
+ - (dev req) + Dist::Zilla::Plugin::Test::EOL 0.18
+ - (dev req) + Dist::Zilla::Plugin::Test::Kwalitee::Extra v0.2.1
+ - (dev req) + Dist::Zilla::Plugin::Test::NoTabs 0.15
+ - (dev req) + Pod::Weaver::Section::GenerateSection 1.01
+ - (dev req) + Test::CleanNamespaces 0.15
+ - (dev req) + Test::EOF (any)
+ - (dev req) + Test::EOL (any)
+ - (dev req) + Test::More 0.88
+ - (dev req) + Test::NoTabs 1.4
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::Clean (any) --> 0.07
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild (any) --> 0.151680
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors (any) --> 0.017
+ - (dev req) ~ Dist::Zilla::Plugin::GithubMeta (any) --> 0.54
+ - (dev req) ~ Dist::Zilla::Plugin::InstallRelease (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package (any) -->
+   2.003001
+ - (dev req) ~ Dist::Zilla::Plugin::PodWeaver (any) --> 4.006
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod (any) --> 0.150250
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests (any) --> 0.028
+ - (dev req) ~ Dist::Zilla::Plugin::Test::ReportPrereqs (any) --> 0.021
+ - (dev req) ~ Dist::Zilla::Plugin::TravisYML (any) --> 1.15
+ - (dev req) ~ Pod::Elemental::Transformer::Splint (any) --> 0.1201
+ - (dev req) ~ Pod::Weaver::Section::Badges (any) --> 0.0401
+ - (dev req) ~ Test::Warnings (any) --> 0.026
+ - (dev req) - Dist::Zilla::Plugin::CheckExtraTests
+ - (dev req) - Dist::Zilla::Plugin::MetaProvides::Class
+ - (dev req) - Dist::Zilla::Plugin::NextRelease
+ - (dev req) - Dist::Zilla::Plugin::NextVersion::Semantic
+ - (dev req) - Dist::Zilla::Plugin::OurPkgVersion
+ - (dev req) - Dist::Zilla::Plugin::PodnameFromClassname
+ - (dev req) - Dist::Zilla::Plugin::Prereqs::Plugins
+ - (dev req) - Dist::Zilla::Plugin::PreviousVersion::Changelog
+ - (dev req) - Dist::Zilla::Plugin::ReversionOnRelease
+ - (dev req) - Pod::Weaver::Section::Homepage::DefaultCPAN
+ - (dev req) - Pod::Weaver::Section::Source::DefaultGitHub
+ - (dev sug) + Dist::Iller 0.1408
+ - (dev sug) + Dist::Iller::Config::Author::CSSON 0.0309
+
+0.2300 2016-01-14T23:43:08Z UTC
+ [Enhancements]
+ - Make Map::Metro::Standard::Moops inherit from MoopsX::UsingMoose (and
+   remove 'using Moose' from every class).
+ - Don't inherit other type libraries in Map::Metro::Types, import them in
+   Map::Metro::Standard::Moops.
+
+ [Documentation]
+ - Set abstract for more classes.
+ - Specify type libraries for [Splint] in weaver.ini so that they are
+   correctly linked.
+
+0.2208 2015-10-27T11:51:53Z UTC
+ [Requirements]
+ - Switched from List::AllUtils to List::Util (ETHER++)
+
+0.2207 2015-03-03T11:03:16Z CET
+ [Meta]
+ - iller.yaml replaces iller.ini.
+ - cpanfile removed, now sets prereqs in iller.yaml/dist.ini.
+
+ [Requirements]
+ - Removed Data::Dump::Streamer as a prereq (unused since MM::Cmd::Dump was
+   removed).
+ - Listed dist/weaver.ini plugins as develop prereqs (and also added one or
+   two).
+ - Added strict and warnings to all (most ofc already had them via Moops).
+
+ [Documentation]
+ - Fixed an abstract typo, fixes #8 (MANWAR++)
+
+0.2206 2015-01-20T13:55:44Z CET
+ [Meta]
+ - Now there should be no more truth failures.
+
+0.2205 2015-01-19T14:48:11Z CET
+ [Meta]
+ - Add 1; to some more classes (pr:6)
+
+0.2204 2015-01-17T17:32:23Z CET
+ [Bug Fixes]
+ - Add 1; to a couple of classes (had some test failures).
+
+0.2203 2015-01-13T03:44:34Z CET
+ [Documentation]
+ - Layout fix.
+
+0.2202 2015-01-13T03:39:35Z CET
+ [Enhancements]
+ - Lowered Perl requirement to 5.16.
+ - Made routing_for one method, instead of multiple.
+
+ [Documentation]
+ - Testing a new layout.
+
+0.2201 2015-01-09T23:19:28Z CET
+ [Bug Fixes]
+ - Fixed a problem with version.
+
+0.2200 2015-01-08T01:10:28Z CET
+ [Meta]
+ - Adapted to DZP::OurPkgVersion and new Podweaver settings.
+
+ [Enhancements]
+ - 0.2101 might have not been as fast as advertised. This should be fixed
+   now.
+ - Since the dump/hoist and serealize/deserealize commands now are slower
+   than the route command, those four commands have been removed (and all
+   code related to them in other classes).
+
+0.2101 2015-01-05T14:51:40Z CET
+ [Enhancements]
+ - Stop using signatures.
+
+0.2100 2015-01-05T14:43:04Z CET
+ [Enhancements]
+ - By default, paths are now only searched between the chosen stations.
+   This leads to significantly improved performance when searching one/few
+   routes per execution.
+ - Remoted use of 'aliased', for an extra (and easy) performance gain.
+ - Can override cost of line changes (to force route finder to follow
+   lines). Undocumented.
+
+ [Documentation]
+ - Added a short comparison between Map::Metro and Map::Tube.
+
+0.2002 2015-01-04T13:12:02Z CET
+ [Meta]
+ - Added prereq (was missing since the map api change in 0.1900)
+
+0.2001 2015-01-03T11:48:46Z CET
+ [Enhancements]
+ - Added width option on lines.
+ - MM::Cmd::Graphviz takes an optional string parameter to set custom
+   lengths on edges. The string can alternatively be a path to a file
+   containing the settings. This feature is undocumented.
+
+0.2000 2015-01-02T22:51:13Z CET
+ [New Features]
+ - Introduced graphviz command, which creates a schematic view of a
+   network.
+
+ [Enhancements]
+ - Lines can have options. So far only 'color'.
+
+ [Bug Fixes]
+ - Comments (in the map file) must be at the beginning of a line, or
+   preceeded only by whitespace.
+
+0.1901 2015-01-01T01:01:42Z CET
+ [Documentation]
+ - Mention Dist::Zilla::MintingProfile::MapMetro::Map
+
+0.1900 2014-12-30T22:16:46Z CET
+ [API Changes]
+ - The MM::Plugin::Map api is changed. The old api will continue to work
+   for now (this is not a deprecation notice). The new api allows
+   MM::Cmd::Serealize to know the version of the map.
+
+ [Enhancements]
+ - MM::Cmd::Serealize now saves the Sereal-ized file in the
+   File::ShareDir::dist_dir of the map distribution.
+ - MM::Cmd::Deserealize can now also (for maps serealized starting with
+   this version) deserealize maps given the city name (previously you could
+   only give a file path).
+ - If there is a Serealized file for the current map (and, if applicable,
+   version), *and* no hooks are attached, then that file will be
+   deserealized and used (instead of re-building the network).
+
+ [Bug Fixes]
+ - Removed next_line_station/previous_line_station from LineStation, and
+   the setting of them in MM::Graph. These weren't used, and made it harder
+   to map a network (eg Oslo) where a line stops at a station in one
+   direction, but not in the other.
+
+0.1804 2014-12-19T19:17:48Z CET
+ [Meta]
+ - Add github as issue tracker/repo
+
+0.1803 2014-12-15T14:15:34Z CET
+ [Enhancements]
+ - Added serealize and deserealize commands to MM::Cmd. Helps a bit with
+   the performance issue.
+ - By default, station names with diacritics (like å, ä and ö) are added
+   with their diacritics removed as a search name. This can be turned off
+   if it causes problems. See MM::Plugin::Map.
+
+ [Documentation]
+ - Added a note on the performance issue on large maps.
+
+0.1802 2014-12-13T19:13:25Z CET
+ [Bug Fixes]
+ - Line ids can again be both letters and digits.
+
+ [Documentation]
+ - Fixed error in synopsis.
+
+0.1801 2014-12-13T17:19:37Z CET
+ [Enhancements]
+ - Added notation to add extra names (for search and display) to stations.
+
+ [Bug Fixes]
+ - available_maps() and map-metro.pl available works again.
+ - MM::Emitter should use MM::Hook.
+
+0.1800 2014-12-13T15:12:14Z CET
+ [API Changes]
+ - Changed notation to describe segments where a line travels in one
+   direction.
+
+0.1702 2014-12-13T12:52:32Z CET
+ [Meta]
+ - Removed MooseX::Object::Pluggable prereq (replaced by Module::Pluggable
+   in 0.1700)
+
+ [Bug Fixes]
+ - Thanks to SREZIC:
+ - Added missing prereqs
+ - Fixed shebang in map-metro.pl
+
+0.1701 2014-12-13T02:04:19Z CET
+ [API Changes]
+ - Removed a couple of undocumented methods from LineStation. Their purpose
+   is better handled by Step.
+
+ [Enhancements]
+ - Added one-way option to segments.
+ - Rewrote Lines command to step through lines using Step (instead of
+   LineStation).
+
+ [Bug Fixes]
+ - Suppressed much warnings during build.
+
+0.1700 2014-12-12T23:54:30Z CET
+ [API Changes]
+ - Renamed routing_completed hook to before_add_routing.
+ - Revamped plugin systems for maps.
+
+ [Enhancements]
+ - Argument hooks to Map::Metro->new can now be a string (when only using
+   one hook).
+ - Added before_add_station hook.
+ - Added original_name to Station, so if before_add_station changes the
+   station's name, we can still search for the old name (esp when creating
+   Segments, but also in routing_for()).
+ - Added MM::Plugin::Hook::StreamStations, mostly as a hook example.
+
+ [Bug Fixes]
+ - In the output from MM::Cmd::Station the last line wouldn't be printed.
+
+ [Documentation]
+ - Fleshed out hook example.
+
+0.1600 2014-12-12T02:29:55Z CET
+ [API Changes]
+ - Removed add to_text() (and related) methods from MM::Graph::*.
+
+ [New Features]
+ - Created an event/hook system (so far only emits 'routing_completed').
+ - Implemented a MM::Plugin::Hook::PrettyPrinter that auto-prints on
+   routing_completed.
+
+ [Enhancements]
+ - All relevant MM::Cmd classes are adapted to the new hook system.
+ - Ensures that maps only resides in the MM::Plugin::Map namespace.
+
+0.1501 2014-12-11T15:39:01Z CET
+ [Enhancements]
+ - Added dump and hoist commands to map-metro.pl
+
+0.1500 2014-12-10T19:06:42Z CET
+ [Meta]
+ - More prereqs.
+
+0.1499 2014-12-10T18:09:34Z CET
+ [Meta]
+ - Missing prereq.
+
+0.1498 2014-12-10T17:23:49Z CET
+ [Meta]
+ - Missing prereq.
+
+0.1497 2014-12-10T15:09:17Z CET
+ [Meta]
+ - Added test prereq
+
+0.1496 2014-12-10T14:24:35Z CET
+ [Documentation]
+ - Typo
+
+0.1495 2014-12-10T13:12:02Z CET
+ [API Changes]
+ - Renamed get_route() in MM::Graph to routing_for().
+
+ [Documentation]
+ - Cleanup, and minor improvements.
+ - Added documentation about map-metro.pl lines <city>
+
+0.1494 2014-12-10T00:29:59Z CET
+ - First public release

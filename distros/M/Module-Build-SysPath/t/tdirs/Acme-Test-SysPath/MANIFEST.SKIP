@@ -1,0 +1,33 @@
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+,v$
+\B\.svn\b
+^\.git
+\.cvsignore
+\.svnignore
+
+# Avoid Makemaker generated and utility files.
+^Makefile$
+\bblib
+\bMakeMaker-\d
+\bpm_to_blib$
+\bblibdirs$
+^MANIFEST\.(SKIP|bak)$
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build
+\bcover_db
+
+# Avoid temp and backup files.
+~$
+\.tmp$
+\.old$
+\.bak$
+\#$
+\b\.#
+
+^tmp/
+.*\.tar\.gz
+^MYMETA.yml$

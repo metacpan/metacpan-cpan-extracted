@@ -1,0 +1,31 @@
+0.07 2016-07-21
+        - Update to recent version of M::P::XRD.
+
+0.06 2015-04-26
+        - Update to recent versions of Mojolicious.
+	- Updated dependencies.
+
+0.05b 2014-10-10
+        - Update to Mojolicious 5.48.
+	- Coherent license (Artistic 2).
+
+0.05 2013-08-03
+        - Update to Mojolicious 4.23.
+
+0.04 2013-06-09
+        - Fixed a small bug in the test suite.
+	- Updated depenencies.
+
+0.03 2013-04-15
+        - Added async example.
+	- First release on CPAN.
+	- Trim tail of undefined values.
+
+0.02 2013-04-12
+	- Added example application.
+	- Added secure flag to register.
+
+0.01 2013-04-10
+        - Initial release on GitHub.
+        - Separated WebFinger from Sojolicious.
+   	- Support for WebFinger Draft 10.

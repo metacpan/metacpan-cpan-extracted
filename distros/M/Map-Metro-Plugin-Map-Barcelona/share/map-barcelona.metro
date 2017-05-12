@@ -1,0 +1,388 @@
+--stations
+
+# L1
+Hospital de Bellvitge
+Bellvitge
+Avinguda Carrilet
+Rambla Just Oliveras
+Can Serra
+Florida
+Torrassa
+Santa Eulàlia
+Mercat Nou
+Plaça de Sants
+Hostafrancs
+Espanya
+Rocafort
+Urgell
+Universitat
+Catalunya
+Urquinaona
+Arc de Triomf
+Marina
+Glòries
+Clot
+Navas
+La Sagrera
+Fabra i Puig
+Sant Andreu
+Torras i Bages
+Trinitat Vella
+Baró de Viver
+Santa Coloma
+Fondo
+
+# L2
+Paral·lel % :Parallel
+Sant Antoni
+Universitat
+Passeig de Gràcia
+Tetuan
+Monumental
+Sagrada Família
+Encants
+Clot
+Bac de Roda
+Sant Martí
+La Pau
+Verneda
+Artigues-Sant Adrià
+Sant Roc
+Gorg
+Pep Ventura
+Badalona Pompeu Fabra
+
+# L3
+Zona Universitària
+Palau Reial
+Maria Cristina
+Les Corts
+Plaça del Centre
+Sants Estació
+Tarragona
+Espanya
+Poble Sec
+Paral·lel
+Drassanes
+Liceu
+Catalunya
+Passeig de Gràcia
+Diagonal
+Fontana
+Lesseps
+Vallcarca
+Penitents
+Vall d'Hebron
+Montbau
+Mundet
+Valldaura
+Canyelles
+Roquetes
+Trinitat Nova
+
+# L4
+Trinitat Nova
+Via Júlia
+Llucmajor
+Maragall
+Guinardó-Hospital de Sant Pau
+Alfons X
+Joanic
+Verdaguer
+Girona
+Passeig de Gràcia
+Urquinaona
+Jaume I
+Barceloneta
+Ciutadella-Vila Olímpica
+Bogatell
+Llacuna
+Poblenou
+Selva de Mar
+El Maresme-Fòrum
+Besòs Mar
+Besòs
+La Pau
+
+# L5
+Cornellà Centre
+Gavarra
+Sant Ildefons
+Can Boixeres
+Can Vidalet
+Pubilla Cases
+Collblanc
+Badal
+Plaça de Sants
+Entença
+Hospital Clínic
+Verdaguer
+Sagrada Família
+Sant Pau-Dos de Maig
+Camp de l'Arpa
+Congrés
+Maragall
+Virrei Amat
+Vilapicina
+Horta
+El Carmel
+La Teixonera
+Vall d'Hebron
+
+# L6
+Catalunya
+Provença
+Gràcia
+Sant Gervasi
+Muntaner
+La Bonanova
+Les Tres Torres
+Sarrià
+Reina Elisenda
+
+# L7
+Catalunya
+Provença
+Gràcia
+Plaça Molina
+Pàdua
+El Putxet
+Avinguda Tibidabo
+
+# L8
+Espanya
+Magòria-La Campana
+Ildefons Cerdà
+Europa-Fira
+Gornal
+Sant Josep
+Avinguda Carrilet
+Almeda
+Cornellà-Riera
+Sant Boi
+Molí Nou-Ciutat Cooperativa
+
+# L9
+Can Zam
+Singuerlín
+Església Major
+Fondo
+Santa Rosa
+Can Peixauet
+Bon Pastor
+Onze de Setembre
+
+# L10
+La Salut
+Llefià
+
+# L11
+Casa de l'Aigua
+Torre Baró-Vallbona
+Ciutat Meridiana
+Can Cuiàs
+
+# Montjuic
+Parc de Montjuïc % :Parc de Montjuic
+
+# Tramvia blau
+Plaça Kennedy
+Plaça del Doctor Andreu
+
+# Tibidabo
+Tibidabo
+
+
+--lines
+L1|L1|Line 1|color:#e1393e,width:7
+L2|L2|Line 2|color:#992f9c,width:7
+L3|L3|Line 3|color:#4fbf48,width:7
+L4|L4|Line 4|color:#febd10,width:7
+L5|L5|Line 5|color:#317bc8,width:7
+L6|L6|Line 6|color:#847dc6,width:10
+L7|L7|Line 7|color:#ad5414,width:10
+L8|L8|Line 8|color:#e659b4,width:10
+L9|L9|Line 9|color:#f68429,width:7
+L10|L10|Line 10|color:#00adef,width:7
+L11|L11|Line 11|color:#9ed84c,width:7
+FM|FM|Funicular de Montjuïc|color:#2f8f28,width:4
+FT|FT|Funicular del Tibidabo|color:#444444,width:4
+TB|TB|Tramvia Blau|color:#0077dd,width:4
+
+--transfers
+Avinguda Tibidabo|Plaça Kennedy
+Provença|Diagonal
+Plaça Molina|Sant Gervasi
+
+--segments
+L1|Hospital de Bellvitge|Bellvitge
+L1|Bellvitge|Avinguda Carrilet
+L1|Avinguda Carrilet|Rambla Just Oliveras
+L1|Rambla Just Oliveras|Can Serra
+L1|Can Serra|Florida
+L1|Florida|Torrassa
+L1|Torrassa|Santa Eulàlia
+L1|Santa Eulàlia|Mercat Nou
+L1|Mercat Nou|Plaça de Sants
+L1|Plaça de Sants|Hostafrancs
+L1|Hostafrancs|Espanya
+L1|Espanya|Rocafort
+L1|Rocafort|Urgell
+L1|Urgell|Universitat
+L1|Universitat|Catalunya
+L1|Catalunya|Urquinaona
+L1|Urquinaona|Arc de Triomf
+L1|Arc de Triomf|Marina
+L1|Marina|Glòries
+L1|Glòries|Clot
+L1|Clot|Navas
+L1|Navas|La Sagrera
+L1|La Sagrera|Fabra i Puig
+L1|Fabra i Puig|Sant Andreu
+L1|Sant Andreu|Torras i Bages
+L1|Torras i Bages|Trinitat Vella
+L1|Trinitat Vella|Baró de Viver
+L1|Baró de Viver|Santa Coloma
+L1|Santa Coloma|Fondo
+
+FM|Paral·lel|Parc de Montjuïc
+
+L2|Paral·lel|Sant Antoni
+L2|Sant Antoni|Universitat
+L2|Universitat|Passeig de Gràcia
+L2|Passeig de Gràcia|Tetuan
+L2|Tetuan|Monumental
+L2|Monumental|Sagrada Família
+L2|Sagrada Família|Encants
+L2|Encants|Clot
+L2|Clot|Bac de Roda
+L2|Bac de Roda|Sant Martí
+L2|Sant Martí|La Pau
+L2|La Pau|Verneda
+L2|Verneda|Artigues-Sant Adrià
+L2|Artigues-Sant Adrià|Sant Roc
+L2|Sant Roc|Gorg
+L2|Gorg|Pep Ventura
+L2|Pep Ventura|Badalona Pompeu Fabra
+
+L3|Zona Universitària|Palau Reial
+L3|Palau Reial|Maria Cristina
+L3|Maria Cristina|Les Corts
+L3|Les Corts|Plaça del Centre
+L3|Plaça del Centre|Sants Estació
+L3|Sants Estació|Tarragona
+L3|Tarragona|Espanya
+L3|Espanya|Poble Sec
+L3|Poble Sec|Paral·lel
+L3|Paral·lel|Drassanes
+L3|Drassanes|Liceu
+L3|Liceu|Catalunya
+L3|Catalunya|Passeig de Gràcia
+L3|Passeig de Gràcia|Diagonal
+L3|Diagonal|Fontana
+L3|Fontana|Lesseps
+L3|Lesseps|Vallcarca
+L3|Vallcarca|Penitents
+L3|Penitents|Vall d'Hebron
+L3|Vall d'Hebron|Montbau
+L3|Montbau|Mundet
+L3|Mundet|Valldaura
+L3|Valldaura|Canyelles
+L3|Canyelles|Roquetes
+L3|Roquetes|Trinitat Nova
+
+L4|Trinitat Nova|Via Júlia
+L4|Via Júlia|Llucmajor
+L4|Llucmajor|Maragall
+L4|Maragall|Guinardó-Hospital de Sant Pau
+L4|Guinardó-Hospital de Sant Pau|Alfons X
+L4|Alfons X|Joanic
+L4|Joanic|Verdaguer
+L4|Verdaguer|Girona
+L4|Girona|Passeig de Gràcia
+L4|Passeig de Gràcia|Urquinaona
+L4|Urquinaona|Jaume I
+L4|Jaume I|Barceloneta
+L4|Barceloneta|Ciutadella-Vila Olímpica
+L4|Ciutadella-Vila Olímpica|Bogatell
+L4|Bogatell|Llacuna
+L4|Llacuna|Poblenou
+L4|Poblenou|Selva de Mar
+L4|Selva de Mar|El Maresme-Fòrum
+L4|El Maresme-Fòrum|Besòs Mar
+L4|Besòs Mar|Besòs
+L4|Besòs|La Pau
+
+L5|Cornellà Centre|Gavarra
+L5|Gavarra|Sant Ildefons
+L5|Sant Ildefons|Can Boixeres
+L5|Can Boixeres|Can Vidalet
+L5|Can Vidalet|Pubilla Cases
+L5|Pubilla Cases|Collblanc
+L5|Collblanc|Badal
+L5|Badal|Plaça de Sants
+L5|Plaça de Sants|Sants Estació
+L5|Sants Estació|Entença
+L5|Entença|Hospital Clínic
+L5|Hospital Clínic|Diagonal
+L5|Diagonal|Verdaguer
+L5|Verdaguer|Sagrada Família
+L5|Sagrada Família|Sant Pau-Dos de Maig
+L5|Sant Pau-Dos de Maig|Camp de l'Arpa
+L5|Camp de l'Arpa|La Sagrera
+L5|La Sagrera|Congrés
+L5|Congrés|Maragall
+L5|Maragall|Virrei Amat
+L5|Virrei Amat|Vilapicina
+L5|Vilapicina|Horta
+L5|Horta|El Carmel
+L5|El Carmel|La Teixonera
+L5|La Teixonera|Vall d'Hebron
+
+L6,L7|Catalunya|Provença
+L6,L7|Provença|Gràcia
+L6|Gràcia|Sant Gervasi
+L6|Sant Gervasi|Muntaner
+L6|Muntaner|La Bonanova
+L6|La Bonanova|Les Tres Torres
+L6|Les Tres Torres|Sarrià
+L6|Sarrià|Reina Elisenda
+
+L7|Gràcia|Plaça Molina
+L7|Plaça Molina|Pàdua
+L7|Pàdua|El Putxet
+L7|El Putxet|Avinguda Tibidabo
+
+TB|Plaça Kennedy|Plaça del Doctor Andreu
+FT|Plaça del Doctor Andreu|Tibidabo
+
+L8|Espanya|Magòria-La Campana
+L8|Magòria-La Campana|Ildefons Cerdà
+L8|Ildefons Cerdà|Europa-Fira
+L8|Europa-Fira|Gornal
+L8|Gornal|Sant Josep
+L8|Sant Josep|Avinguda Carrilet
+L8|Avinguda Carrilet|Almeda
+L8|Almeda|Cornellà-Riera
+L8|Cornellà-Riera|Sant Boi
+L8|Sant Boi|Molí Nou-Ciutat Cooperativa
+
+L9|Can Zam|Singuerlín
+L9|Singuerlín|Església Major
+L9|Església Major|Fondo
+L9|Fondo|Santa Rosa
+L9|Santa Rosa|Can Peixauet
+L9|Can Peixauet|Bon Pastor
+L9,L10|Bon Pastor|Onze de Setembre
+L9,L10|Onze de Setembre|La Sagrera
+
+# L10
+L10|Gorg|La Salut
+L10|La Salut|Llefià
+L10|Llefià|Bon Pastor
+
+# L11
+L11|Trinitat Nova|Casa de l'Aigua
+L11|Casa de l'Aigua|Torre Baró-Vallbona
+L11|Torre Baró-Vallbona|Ciutat Meridiana
+L11|Ciutat Meridiana|Can Cuiàs

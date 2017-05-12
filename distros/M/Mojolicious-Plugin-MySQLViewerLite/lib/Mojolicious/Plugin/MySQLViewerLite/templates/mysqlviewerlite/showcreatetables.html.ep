@@ -1,0 +1,8 @@
+% layout "$controller/common", title => "Create tables in $database ";
+% my $tables = [sort keys %$create_tables];
+<h2>Create tables in <i><%= $database %></i></h2>
+% for my $table (@$tables) {
+  <pre>
+    <%= $create_tables->{$table} =%>
+  </pre>
+% }

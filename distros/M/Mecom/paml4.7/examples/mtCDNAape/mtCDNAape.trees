@@ -1,0 +1,14 @@
+6 1
+
+((1.Human_Horai, 2.Human_Arnason) #1, (3.Chimp_Horai, 4.Chimp_Arnason) #1, (5.Gorilla_Horai, 6.Gorilla_Arnason) #1 );
+
+
+// end of file.  the reast of the file are notes.
+
+
+branch labels:
+	1: between species
+	0: within species
+
+
+

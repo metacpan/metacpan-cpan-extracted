@@ -1,0 +1,31 @@
+-- field the drop event
+on open argv
+	
+	-- Make the file names into strings containing quoted POSIX file names, and concatenate them with spaces between.
+	set shell_argv to ""
+	repeat with arg in argv
+		set shell_argv to shell_argv & " " & quoted form of POSIX path of arg
+	end repeat
+	
+	-- Our Perl script is droplet.PL in the Resources directory of the application bundle.
+	set perl_script to quoted form of POSIX path of (path to resource "droplet.PL")
+	
+	-- Run the Perl script. The file names appear in @ARGV. Its output to STDOUT is captured in result.
+	set result to do shell script perl_script & shell_argv
+	
+	-- Display a dialog containing the result.
+	display dialog result as string
+	
+end open
+
+-- AUTHOR
+
+-- Thomas R. Wyant, III F<wyant at cpan dot org>
+
+-- COPYRIGHT AND LICENSE
+
+-- Copyright (C) 2011-2017 by Thomas R. Wyant, III
+
+-- This program is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For more details, see the full text of the licenses in the directory LICENSES.
+
+-- This program is distributed in the hope that it will be useful, but without any warranty; without even the implied warranty of merchantability or fitness for a particular purpose.

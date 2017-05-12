@@ -1,0 +1,1201 @@
+Revision history for Perl extension Mail::SpamCannibal
+
+1.08   Fri Jun 12 21:23:06 PDT 2015
+	add style to top.incl to float 'TOP' link on lookup page
+	change html to float 'TOP' link in cannibal.cgi v2.23
+
+1.07   Mon Jan 27 11:59:58 PST 2014
+        modify Makefile.PL to bypass missing 'pod2text'
+
+1.06  Fri Jan 24 12:01:12 PST 2014
+	updated cannibal.cgi to show IP time tag in admin mode
+	updated cannibal.cgi to add FLIP for IP addresses
+	updated cannibal.cgi to allow '-'s in IP address
+	update passwd.incl v1.03 to remove cookie code
+	update login.incl v1.02 to add cookie deletion code
+
+1.05  Tue Mar 13 14:43:17 PDT 2012
+	Modify Mail::Spamcannibal::SMTPsen to add "Hello => fqdn()" 
+	so that HELO/ELOH does not say "localhost.localdomain"
+
+	Add "CHILDREN" parameter to sc_mailfilter.conf to allow
+	configuration of the number of running mail filter scripts
+
+	Modify sc_mailfilter.pl to use CHILDREN parameter
+
+	correct corner case build error where tlib/exists_but_dead
+	has the wrong mode
+
+1.04  Fri Apr 23 15:00:08 PDT 2010
+	Add optional array pointer to call to ScriptSupport::mailcheck 
+	so that the name of the spam source and spam content is available
+	to the calling routine
+
+	update sc_mailfilter.conf to include KEY spamCC => [email@addr]
+	which contains email address's that all spam and abuse reports
+	should be sent a copy to.
+
+	update sc_abuse.pl to send 'spamCC' reports
+	update sc_mailfilter.pl to send 'spamCC' reports
+
+	require IPTables v0.43 for redHat distro bug repair
+
+1.03  Mon Apr 19 16:05:27 PDT 2010
+	Correct typo in sc_web.conf.sample for 'altMXhosts'
+	Update Makefile.PL insert of "all clean_CTest relink_subdirs"
+	to work around bug in certain redHat distro's of perl
+
+1.02  Thu Nov 12 12:47:40 PST 2009
+	correct error (typo in code) introduced in last revision
+	of public_html/cannibal.cgi
+
+	modify cannibal.cgi to highlight date changes in admin LOOKUP display
+
+1.01  Mon Sep 14 17:34:53 PDT 2009
+	Add 'userdelOK' paramater to config/sc_web.conf.sample v1.10 and 
+	implement check for non-administrative (user) deletes of IP
+	addresses in scripts/sc_session.pl v1.12 and 
+	public_html/cannibal.cgi v2.17
+
+1.00  Sat May 30 10:34:23 PDT 2009
+	Bug note added about missing internal MakeMaker parameter names
+
+0.99  Wed May 13 11:27:15 PDT 2009
+	fixed type in the Quick Install document
+
+	moved some debug code in ScriptSupport.pm that makes AutoSplit
+	unhappy in newer versions of perl.
+
+	enforce LANG - en_US in Makefile.PL
+
+	in BDBaccess 0.24
+	edited CTest.xs, main.c, netio.c, misc_func.h, godaemon.c,
+	and util_pid.c to kill warnings from newer gcc versions
+
+	in dsocket.t & rsocket.t change "kill 15" to "kill 9" in tests 
+	that won't die under newer version of perl and make utilities
+
+	fixed typo in test 5 of t/util_pid.t that failed with potential
+	false positive.
+
+	in DNSBLserver 0.54
+	edit CText.xs, godaemon.c, hostinfo.c, hostinfo_func.h, main.c,
+	misc.c, misc_func.h, mung_macros.c, metio.c, ns.c, ns_func.h,
+	zonedump.c, and zonefile.c to eliminate warnings from new gcc
+	versions.
+
+	correct typo error in t/util_pid.t that caused false positve failure
+	enforce LANG - en_US in Makefile.PL
+
+0.98  Sun Nov 16 17:31:58 PST 2008
+	update ScriptSupport v0.57 to consolidate CheckTxt into a single
+	function in BLcheck and BLpreen. update to support INCLUDE keys
+	in config files.
+
+	add 'acceptany' criteria for DNSBL
+
+  NOTE: the following scripts have been updated to support
+	INCLUDE file keys. If you plan to use this feature,
+	you must update your scripts.
+
+	rc.sc_dbwatch
+	contrib/mimedefang-filter
+	contrib/zonedump.pl
+	public_html/cannibal.cgi
+	scripts/sc_BLcheck.pl
+	scripts/sc_BLpreen.pl
+	scripts/sc_abuse.pl
+	scripts/sc_mailfilter.pl
+	DNSBLserver/rc.dnsbls
+	DNSBLserver/sc_zoneload
+
+0.97  Wed Oct 15 14:19:29 PDT 2008
+	require Net-DNS-ToolKit verion 0.41
+	here and in DNSBLserver 0.52
+
+	convert DNSBLserver configuration to autoconf
+
+0.96  Thu Oct  2 12:42:55 PDT 2008
+	major upgrade to contrib/mimedefang-filter
+	changes allow mimedefang to import the IGNORE whitelist
+	from the scBlackList.conf file and cache the contents
+
+	add CPAN automated tester cutout to Makefile.pl
+
+	update GENERIC PTR list in config/sc_BlackList.conf.sample
+
+0.95  Thu Jun 19 17:33:10 PDT 2008
+	change extension in robots.txt from alldnsblusers.html
+	to alldnsblusers.shtml
+
+	modify cannibal.cgi to accept Delete List arguments
+	that start with leading spaces
+
+	add "country name" as the third parameter returned by 
+	IP2ccFlag.pm v0.02
+
+	add "country name" to html output for ADMIN lookup page
+
+0.94  Wed Apr 30 16:43:57 PDT 2008
+	add code to retrieve record by "record number" to sc_admin.pl v1.06
+
+	map ONLY_COUNT_ONE to GENERIC in ScriptSupport.pm v0.55
+
+0.93  Wed Apr 16 13:40:03 PDT 2008
+	DNSBLserver/zonedump.c
+	create 256k buffer for zonedump fd write
+
+	add #include <stdlib.h> to main.c in DNSBLserver v0.51 and
+	BDBaccess v0.23 for compatability with newer Clib versions
+
+0.92  Mon Apr 14 10:28:56 PDT 2008
+	Add info about where to find LIBNET to the INSTALL document
+
+0.91  Tue Feb 26 16:38:09 PST 2008
+	update list of generic patterns in config/sc_BlackList.conf
+
+	update Copyright notice date
+
+	add intermediate time stamp write to contrib/zonedump.pl v1.09
+	so that the the zone file creation and conversion times are
+	both shown with the -t option.
+
+	add IP "GOTO" capability for 'view db' in addition to the record
+	number GOTO in public_html/cannibal.cgi v2.12
+
+0.90  Tue Feb 12 14:04:38 PST 2008
+	update ScriptSupport::mailcheck v0.54 to return the message received
+	in debug mode when no headers are detected since it is usuall SPAM
+	targeted at the spam@ address of the processing host.
+
+	update config/sc_BlackList.conf.sample to include the DIALUP
+	ranges from http://www.sdsc.edu/~jeff/spam/dialup_zones.txt
+	in the GENERIC rejection list
+
+0.89  Tue Feb  5 13:58:57 PST 2008
+	add is_GENERIC function to ScriptSupport v0.53
+	add CONTACT refusal to public_html/cannibal.cgi
+	add 'blockcontact' configuration param to GENERIC
+	set permissions on sc_BlackList.conf to 0644
+
+	The above changes allow the contact page to check the 
+	submitted IP address against the GENERIC blacklist 'regexp'
+	and refuse to honor the CONTACT submission. Instead, the 
+	submittor gets the CONTACT page back again with the PTR
+	record(s) displayed for the submitted page along with the
+	message that the IP is not eligible for removal because
+	of its GENERIC status. This functionality is controlled
+	by the 'blockcontact' key in sc_BlackList.conf
+
+0.88  Mon Jan  7 00:52:28 PST 2008
+	update ScriptSupport 0.52 so that BLcheck 'counts' the number
+	of times an IP is found during its check process
+
+0.87  Sat Dec 22 14:23:40 PST 2007
+	update GENERIC pattern config/sc_Blacklist.conf.sample
+
+	add routines in ScriptSupport 0.51 to collect IP addresses
+	and store them in a configurable file when sc_Blcheck.pl runs
+
+0.86  Thu Dec 13 18:08:23 PST 2007
+	increase the allowable number of nameservers
+	in DNSBLserver v0.49 to 15
+
+	update GENERIC pattern config/sc_BlackList.conf.sample
+
+0.85  Wed Dec 12 12:26:31 PST 2007
+	re-try on EXTRA_META tag syntax
+	add time tags to -t zonedump print function
+
+	remove $VERSION from CTest.pm modules in BDBaccess v0.22
+	and DNSBLserver v0.48 and replace with $modVERSION
+
+0.84  Mon Dec 10 12:59:52 PST 2007
+	add -t print function in 'zonedump.pl' to show the time
+	required to complete the zonedump.
+
+	add additional 'generic' patterns to sc_Blacklist.conf.example
+
+	add EXTRA_META tag to Makefile.PM for CPAN engine
+	thanks to Slaven Rezic for spotting it and providing the solution.
+
+0.83  Wed Nov 21 13:06:35 PST 2007
+	This release includes a major upgrade to the way in which
+	IP's are added to an removed from the database. IP's whose
+	PTR record match the generic form 'ddd.ddd.ddd.ddd' were
+	targeted for optional inclusion in the permanent zonefile
+	in rev 0.83. This concept has been expanded in this release
+	to include automated addition to the zonefile (evidence
+	database) of IP's that match a configurable regular 
+	expression list for both mailfilter and BLcheck scripts.
+	In addition, for the BLcheck script the additions can be
+	alternatively made to the internal (non-zonefile blcontrib db)
+	which are also removable by BLpreen script.
+
+	Matching updates have been made to the helper routine
+	Net::DNSBL::MultiDaemon which prefilters connections to the
+	mail system before BLcheck runs.
+	
+	updated sc_Blacklist.conf.example to change 
+	sbl.spamhaus.org to zen.spamhaus.org
+	removed relays.ordb.org, commented out bl.spamcop.net
+	because it is way to aggressive.
+
+	move dnsbl blocking check to after ordered delay
+	in sc_mailfilter.pl
+
+	disable restart wait period if in sub 'block4zonedump'
+	when no zonedump pid file is found
+
+	fix typo in public_html/incl/delist.incl
+
+	subroutine xcidr24 is deprecated and removed, replaced
+	with Xcidr24 that has an enhanced API
+
+	GENERIC PTR record checking and CIDR24 checking
+	is added to sub BLcheck in ScriptSupport v0.48
+
+	configuration for sc_mailfilter.conf XCIDR24
+	and sc_BLcheck GENERIC is enhanced and added
+	respectively
+
+	change ignor, regexp GENERIC detection to ignore case
+	in ScriptSupport.pm v0.49
+
+0.82  Tue Oct 30 11:25:04 PDT 2007  
+	add bogon dnsbl to sc_BlackList
+	add page to return PTR records for an IP address
+	modify admin LOOKUP page to have PTR records button
+
+	add expanded /24 spam recording for generic IP addresses
+	see ScriptSupport::xcidr24 and comments in
+	config/sc_mailfilter.conf.example
+
+	updated sc_mailfilter.conf.example to support above
+
+0.81  Sat Aug 18 14:45:27 PDT 2007
+	in SMTPsend 0.05, correct documentation format error
+
+	add admin 'delete list' function to provide a text box into which 
+	a commented list of IP addresses can be entered for deletion,
+	set wrap=off
+
+	change ScriptSupport to return entire email sent to mail filter
+	when required header match fails
+
+0.80  Mon Jun 25 09:51:43 PDT 2007
+	in ParseMessage 0.09 add sub to conditionally remove blank
+	lines and trim the total number of lines in the message portion 
+	of the spam sample if 'MSGMAX' is in the config file
+
+	in ScriptSupport 0.42 add call to trimmsg above.
+
+	add description of config element and alter sample
+	config file.
+
+0.79  Thu May 17 16:11:33 PDT 2007
+	dnsbls 0.47
+	add reporting of "qflag" to -T output
+
+	Change wording in cannibal.cgi v2.05 for LOOKUP warning to:
+	Automated lookups not allowed, click LOOKUP IP to continue.
+
+	added 'block4zonedump' to ScriptSupport.pm v0.40
+	add call to 'block4zonedump' to scripts
+	sc_BLcheck.pl, sc_BLpreen.pl, sc_cleanup.pl
+
+	zonedumps for very large zone files are perturbed by blcheck and
+	blpreen IP additions and deletions. This addition to the script
+	files allows them to block until the zonedump completes
+
+0.78  Thu Oct 19 08:06:45 PDT 2006
+	removed stub zone collection from contrib/zonedump.pl
+	and ScriptSupport::dns2rblz v0.39 -- concept flawed
+	use Net::Bind::rbldnsdAccessor instead
+
+0.77  Thu Sep 22 11:54:11 PDT 2006
+	ScriptSupport::dns2rlbz v0.38
+	set ttl for soa to be the $TTL if present or the 
+	minimum from the soa record
+
+	add stub zone collection to ScriptSupport::dns2rblz v0.38
+	so that (almost) authoratitive mirroring can be set up on 
+	a bind 9 server using forwarder and forward only.
+
+	add sample stub zone collection to contrib/zonedump.pl
+
+  REMEMBER to update your zonedump.pl if you wish to use this feature
+
+	add missing -L argument to dnsbls optarg list
+	in DNSBLserver package
+
+0.76  Thu Sep 21 14:12:12 PDT 2006
+	fixed bug in 'dnsbls' that did not increment localip[i]
+	when reporting multiple ip addresses for the local zone
+
+	fixed bug in ScriptSupport::dns2rblz v0.37 where multiple ip
+	ip addresses are not accumulated in the conversion to
+	rbldnsd format for zone dumps.
+
+0.75  Sun Sep 17 15:53:24 PDT 2006
+	added soa minimum ttl switch for negative caching
+	-s switch to DNSBLserver package 
+	config/dnsbls.conf.sample, rc.dnsbls, main.c, data.c
+
+NOTE: the first two of these must be installed MANUALLY
+
+	add MANIFEST.SKIP to DNSBLserver and BDBaccess
+
+0.74  Mon Sep 11 16:55:20 PDT 2006
+	'mkdir' compatability update for perl 5.0503
+
+0.73  Sun Sep 10 13:08:26 PDT 2006
+	modify contrib/update_sc.sh to allow selection
+	of 'bind', 'ip4set', and 'combined' data sets
+
+0.72  Sat Sep  9 20:38:22 PDT 2006
+	correct bugs in contrib/update_sc.sh
+
+	revised contrib/zonedump.pl to deprecate both
+	ip4set and ip4tset in favor of a 'combined' set
+	using ip4set format with an 'A' record added for
+	the base zone generated by the dnsbls
+
+	updated ScriptSupport.pm v0.36 to support above
+
+	updated all tests 'mkdir' statements for compatibility with Perl 5.0503
+
+0.71  Fri Aug 25 15:49:53 PDT 2006
+	add update_sc.sh to the contrib directory.
+	this script rsync's data for a mirror site
+
+	ScriptSupport v0.35
+	correct 'rbldnsd ip4set format' generation error
+	for data sets that contain non-default TXT lines
+
+0.70  Mon Aug 21 14:23:48 PDT 2006
+	add support for 'rbldnsd ip4set format' to 
+	ScriptSupport v0.34
+	and to 'contrib/zonedump.pl'.
+
+0.69  Fri Apr 28 16:27:02 PDT 2006
+	switch from NetAddr::IP to NetAddr::IP::Lite
+
+	correct typo in documentation index.pod
+
+	comment out code to detect null sender for 
+	postmaster && abuse in contrib/mimedefang-filter
+	let the sysadmin uncomment if wanted
+
+	update public_html/incl/spamlst.incl to change
+	wording of admin link and proto text
+
+	update public_html/incl/login.incl to place
+		*****'s in the text box while
+	waiting for the password action to complete
+
+0.68  Tue Jan 24 18:20:11 PST 2006
+	Corrected javascript 'undefined' variable detection in 
+	public_html/cannibal.cgi v2.04. Updated same to clear
+	'username' page upon successful password validation
+
+0.67  Fri Jan 20 18:53:52 PST 2006
+	update WebService v0.05 make_jsPOP_win(...) so that the javascript
+	function "popwin" that it returns takes a color argument.
+
+	updated Makefile.PL to change permissions on sc_web* instead of
+	sc_web.conf, etc.... during the install process. See note in Makefile
+
+	update scripts/sc_session.pl v1.10 to correctly retry password
+	entries multiple times as set in the config file
+
+	update public_html/cannibal.cgi v2.02 to pop a seperate password
+	window for login attempts
+
+	update incl/... top.incl, login.incl, passwd.incl to facilitate
+	seperate password window implementation
+
+0.66  Tue Jan 10 17:36:37 PST 2006
+	Corrected comment error in style sheet public_html/incl/top.incl
+
+	Update WebService.pm 0.04 to support multiple key/value returns with
+	the same name from a form. Update public_html/cannibal.cgi v2.01 to
+	provide multiple selected deletes from the admin lookup window.
+
+	Update Session.pm 0.04 to support split user/password login windows,
+	rename t/ses_val.t => ses_val.old.t to make sure old behavior
+	remains supported, add t/ses_val.t to test new behavior
+	Update scripts/sc_session.pl v1.09 and scripts/sc_remote.pl v1.05
+
+	Updated public_html/cannibal.cgi and config/sc_web.conf to 
+	support split user/password login windows. Updated 
+	public_html/incl/login.incl. Added public_html/incl/passwd.inc.
+
+0.65  Sun Jan  1 17:06:26 PST 2006
+	Replace the guts of Password.pm v0.03 with Data::Password::Manager
+	update the documentation tree to reflect the change
+
+	Correct a documentation typo in WEbService.pm v0.03
+	There were no code changes from v0.02
+
+	update public_html/cannibal.cgi v1.28 to remove CANCEL
+	from timeout alert pop-up
+
+	update contrib/mimedefang-filter to refuse mail to abuse@ and
+	postmaster@ from null sender <>
+
+0.64  Tue Nov 22 10:11:56 PST 2005
+	corrected several serious typo's introduced in the 0.31 update
+	of ScriptSupport v0.31. Updated version to ScriptSupport v0.32
+
+0.63  Mon Nov 21 10:11:43 PST 2005
+	update v0.31 of ScriptSupport.pm bl_Preen to check old 
+	'contrib' entries a minimum of every 30 days
+
+	updated public_html/spamlst.incl to add clickable
+	link that adds "spam" text to the text box
+
+	update scripts/sc_abuse.pl to add capabaility to send
+	abuse reports to multiple addresses for a configured 
+	abuse domain or to send to and abuse address that differs
+	from the offending domain.
+
+	update scripts/sc_abuse.pl to update SPAMCOUNT data in
+	the same manner as sc_mailfilter.pl
+
+	update sc_mailfilter.conf.sample to include necessary
+	ABUSE => parameters for sc_abuse.pl
+
+0.62  Sat May  7 22:13:11 PDT 2005
+	corrected type DNSBLserver/zonefile.c in 
+	rbldnsDEF zonefile line
+
+	ScriptSupport.pm v0.30, modified code to workaround
+	difference in perl version handling of $1, $2... variables.
+
+	Corrected type in ScriptSupport for db_watcher
+
+	corrected reversed ($gzip) test in contrib/zonedump.pl
+
+0.61  Fri May  6 19:25:04 PDT 2005
+	add script sc_dns2rbld.pl and supporting methods in
+	ScriptSupport v0.29 to convert dnsbls zone files to 
+	rbldns format
+
+	updated contrib/zonedump.pl to generate rbldns files
+	with the -r option
+
+	package DNSBLServer v0.41
+	corrected an error in zonefile.c and ns.c that incorrectly reported
+	the ip address during zone transfer or file creation in the text 
+	record of the form:
+
+	4.3.2.1.bl.spamcannibal.org     A       127.0.0.2
+					TXT     "some string  1.2.3.4"
+						 ^this was corrupted^
+
+0.60  Mon Apr 25 11:45:31 PDT 2005
+	Incorporate warning about perl 5.8.0 - 5.8.5
+	about @_ operation failures.
+
+0.59  Mon Apr 18 11:16:40 PDT 2005
+
+	add zonedump.pl
+	./zonedump.pl -h	for help
+
+	removed zone_cron.sh and zone_cron.pl
+
+    In DNSBLserver v0.40
+	add -C continuity flag, default '0', this is a BEHAVIOR CHANGE
+	For very large zones and multiple daemons constantly adding
+	and removing records, it is very difficult to get a contiguous
+	zone dump where the starting and ending serial number is constant.
+	Instead, re-sync the cursor to ignore BerkeleyDB's behavior of
+	renumbering the records after an insert or delete. This allows
+	a zone dump to proceed when record values that have already
+	been read are deleted or inserts are made to the area the cursor
+	has already transversed. More specifically, records ahead of the 
+	cursor will appear in the zone file as they are transversed, records
+	altered behind the cursor are not seen so effectively the zone is
+	frozen for dump purposes at the instant the cursor transverse it.
+	With "Continuity" set true, a single unperterbed snapshot of the
+	database is dumped to the zone file. However, this method will fail
+	if records are added or removed during the dump. The dump will
+	automatically retry 3 times. The practical aspect of this change
+	is that it is as if the zone was read a minute or two earlier in
+	the case of similtaneous database updates.
+
+	The old -C behavior is not desirable for large zones because it is
+	not practical for the database to remain static long enough for 
+	a complete zone dump. The behavior is deprecated, the -C flag is
+	provided to retain the old behavior if for some strange reason
+	you find it desirable.
+	
+	Removed redundant tests for 127.0.0.0 and 127.0.0.1
+	in ns.c and zonefile.c
+
+	corrected and old bug in zonefile.c that dumped 127.0.0.1
+	records to the zonefile
+
+
+0.58  Fri Apr 15 15:57:36 PDT 2005
+	In the DNSBLserver sub module:
+	left pointer indicator '&' out of statement and 
+	inadvertently commented out -L switch code in 0.38 release
+	duh!!!
+
+0.57  Thu Apr 14 13:02:58 PDT 2005
+	add test to sc_dbwatch to skip 'kill 9' during stop/restart
+	when daemon is not running.
+
+	DNSBLserver::zonefile.c
+	add -L switch to limit the zonefile build transfer rate
+	during a dnsbls zone dump. default 200,000 chars/sec
+
+0.56	Thu Mar 24 14:18:14 PST 2005
+	update public_html/cannibal.cgi to include version numbers for
+		Mail::SpamCannibal
+		Net::DNS::Codes
+		Net::DNS::ToolKit
+		IPTables::IPv4::DBTarpit
+
+
+0.55	Tue Mar  1 10:40:10 PST 2005
+	modify DNSBLserver/ns.c to always hide 127.0.0.0 AND 127.0.0.1 responses
+
+	updated contrib/robots.txt
+
+	updated public_html/cannibal.cgi to revisit the 'lookup'
+	page after a 'remove' operation instead of posting a
+	removed xxx.xxx.xxx.xxx message. script version 1.25
+
+	update contrib/mimedefang-filter to include '.rar' file
+	extension in bad extension list and to accept strings that
+	appear to be rDNS number failures that begin with 'mail'
+	(accomodate braindead Verizion mta's).
+
+	update contrib/mimedefang-filter sub 'filter_sender' to 
+	include test for known_bad_domains
+
+	update contrib/zone_cron.sh
+	add "search" feature to scripts/sc_admin.pl v1.05
+
+  ##### NOTE: this change is not compatible for previous version of 
+		public_html/incl/top.incl
+		public_html/cannibal.cgi
+	If you have modified these files, do a diff of cannibal.cgi
+	against the version in distro 0.54 and apply the diff to you file
+
+	split top.incl into two pieces -- top.incl, top2.incl
+	add a parameter "bgcolor" to sc_web.conf
+	modify cannibal.cgi to insert bgcolor from config file into pages
+
+0.54  Tue Jan 11 15:45:02 PST 2005
+	in DNSBLserver,
+	change query response for record not found 
+		from:   NOERROR + SOA
+		to:     NXDOMAIN + SOA
+	to conform to standard response of most other dnsbl's
+
+	update contrib/mimedefang-filter
+
+0.53  Sat Dec  7 16:36:58 PST 2004
+	correct typo in contrib/zone_cron.sh v1.04 (1.02,3 not released)
+	previous version would start several dnsbls to do a zone dump
+
+	updated dnsbl server so that zonedump child runs at the least
+	intrusive priority p=20. added 'siteconf' to check for the 
+	presence of 'setpriority' function.
+
+0.52  Fri Nov 26 13:52:54 PST 2004
+	updated scripts/sc_mailfilter.pl v1.08 to fix overcount of
+	error messages returned by the script to the debug facility
+
+	corrected DNSBL host lookup error in cannibal.cgi v1.24
+	check for valid DNSBL host would fail if 'dig -t ns hostname'
+	did not return NS records. What was really needed was
+	validation that an A record exists.
+
+	updated contrib/mimedefang-filter
+
+0.51  Sun Nov 14 22:12:03 PST 2004
+	update DNSBLserver v0.34
+	add the number of records dumped by zonfile.c comment
+	text in the zonefile. the form of the zonfile header is:
+
+	; Version: dnsbls 0.34, 11-14-04
+	; 375624 A records
+	; zone dump on Sun Nov 14 22:05:52 2004
+
+	add contrib/zone_cron.pl to compliment
+	contrib/zone_cron.sh and extract record count
+	from the zone file to make a web 'include' file
+
+0.50  Sat Nov 13 14:41:21 PST 2004
+	update config/sc_Blacklist.conf.example
+
+	correct Makefile.PL error in making IPTables-IPv4-DBTarpit-Inst.html
+
+	add fixuplinks.pl to correct L<link> text in online documentation
+
+0.49  Sat Oct 16 16:16:55 PDT 2004
+	added missing file in contrib directory that should have
+	been in rev 0.47
+		dnsbl_stats.shtml
+		nav.incl
+		robots.txt
+
+	update sc_mailfilter.pl v1.07 to optionally count files processed
+	update sample sc_mailfilter.conf.sample to include SPAMCOUNT for above
+
+0.48  Wed Oct  6 11:08:38 PDT 2004
+	updated docs
+
+0.47  Sat Oct  2 13:46:36 PDT 2004
+	update $ipattern in contrib/mimedefang-filter
+
+	correct BUG in DNSBLserver/zonefile.c that did not propagate 
+	IP address to the TXT record while dumping a zone file
+
+	DNSBLserver/data.c, minor document update
+
+0.46  Sat Sep 18 12:33:59 PDT 2004
+	Corrected description of "sub rfheaders" in ParseMessage.pm v0.07
+
+	Change SMTPsend v0.04 to use the Net::Cmd datasend, dataend calls instead
+	of $smtp->data(). This allows the passing of an optional filehandle
+	to SMTPsend that will be spooled to completion.
+
+	Add abuse_host to ScriptSupport v0.28
+	This subroutine supports abuse_host.pl + documentation
+
+	Add Quick Start documentation to document tree.
+	Thanks to "Jonathan Baker-Bates" <jonathan@bakerbates.com>
+	for the addition.
+
+	Update the SpamCannibal "home" page and add configurable
+	site blacklist reason.
+
+	Add configurable 'reason' to sc_web.conf
+	This allows the site user to customize the text at the end of the 
+	SpamCannibal home page so that it is specific for the local site.
+
+	Change public_html/cannibal.cgi v1.23 to support 'reason' in config file
+
+	Add dnsbl_stats.shtml to contrib directory. This page is from the
+	SpamCannibal web site and demonstrates how to include dynamic 
+	statistics files from rc.sc_BLcheck, mimedefang-filter, and
+	Net::DNSBL::MultiDaemon
+
+	Add mimedefang-filter to contrib directory. This filter is
+	configured to support spamassassin and SpamCannibal
+
+	Add nav.incl file from the SpamCannibal web site demonstrating the
+	addition of extra menu items
+
+	Add robots.txt file from the SpamCannibal web site
+
+0.45  Wed Sep  1 17:49:29 PDT 2004
+	Oops! left out reference to 
+	Net::DNS::Codes qw(
+		T_PTR
+		T_ANY
+	);
+	Net::DNS::ToolKit qw(
+		get16
+	);
+	when moving subroutines out of ScriptSupport.
+	These are needed by runtime scripts that remain.
+	Update to ScriptSupport v0.27
+
+0.44  Wed Sep  1 15:35:37 PDT 2004
+	moved from ScriptSupport v0.26 to Net::DNS::ToolKit::Utilities v0.20
+		id
+		question  
+		revIP   
+		query  
+		dns_udpsend
+		dns_udpresp
+		dns_ans
+		dns_ns
+		dns_ptr
+		rlook_send
+		rlook_rcv
+
+	modified cannible.cgi v1.22 to use Net::DNS::ToolKit::Utilities
+
+0.43  not released
+	in BDBaccess(v0.18)/CTest.xs and DNSBLserver(v0.30)/CTest.xs,
+	update CTest.xs to eliminate use of "putchar" which conflicts
+	with buffered/unbuffered use of IO in testing
+
+	Tune DNAT documentation.
+	Tune IPTABLES QUEUE documentation.
+	Tune spam_report.cgi.example summary screen comments.
+
+	Add additional test in cannibal.cgi v1.21 to detect 
+	undefined $query{query}.
+	Add missing 'document.name' qualifier to submit() function
+	(failed in Firefox 0.92 without the qualifier).
+
+	Add init file 'rc_debian_spamcannibal' to contrib
+
+	Update ScriptSupport::BLcheck v0.25 to count STATs for
+	WhiteList, BlackList and Passed
+
+0.42  Sun Jun 27 14:01:44 PDT 2004
+	updated the documentation to include bastion host DNAT
+	instructions for setting up a tarpit connection where 
+	the server is behind the bastion host
+
+0.41  Sun Jun 27 09:04:56 PDT 2004
+	DNSBLserver 0.29
+	Added 'stop' variable for testing in main.c to intercept
+	processing of the -T flag and stop STDOUT
+	# Something in perl 5.8 does not allow the redirection of
+	# STDOUT in an eval to a C program. The workaround is
+	# simply to abort the call to 'main' just prior to issuing
+	# the print statements since this is all tested elsewhere
+	#
+
+	DNSBLserver 0.28 - unreleased
+	added time tag to zone file dump in dnsbls::zonefile.c
+
+	changed test for zone dump so that it just checks for the
+	presence of a "zone_request" instead of no other activity + zone_request
+
+0.40  Sat Jun 26 12:09:14 PDT 2004
+	Update INSTALL document about BIND zone forward method
+
+0.39  Thu Jun 24 11:35:08 PDT 2004
+	oops! Fixed  PGP code in ScriptSupport::mailcheck v0.24 
+	that had been commented out for debugging
+
+0.38  not released to CPAN, but was on the web site for awhile
+	minor (annoying) bug fixes... my bad :-(
+
+	commented out several "use diagnostics" inadvertently remaining
+
+	corrected test at line 1624 of ScriptSupport.pm v0.23 which failed 
+	on undefined value, reversed order of test to detect undefined first
+
+0.37  Wed Jun 23 19:42:20 PDT 2004
+	Minor updates to the INSTALL document re: dnsbl installation
+
+	corrected major typo in sc_session.pl v1.08 that pointed to the dbhome
+	directory. The recent upgrade of IPTables... uncovered a missing
+	variable in the SiteConfig hash that was duplicated in IPTables
+	and did not (should not) exist in SpamCannibal SiteConfig.
+
+	added test in cannibal.cgi v1.20 to detect missing query and ignore.
+
+0.36  Wed Jun 23 13:10:52 PDT 2004
+	updated the documentation in ./config/sc_Blacklist.conf
+	to clarify problems with the timeouts in sendmail when using
+	Net::DNSBL::MultiDaemon
+
+	removed duplicate use [module] qw(inet_aton inet_ntoa);
+	in cannibal.cgi. Also, line 826
+			=~ spamlst...
+	should be	=~ /^spamlst/...
+	Thanks to "Jonathan Baker-Bates" <jonathan@bakerbates.com>
+	for spotting those two mistakes.
+
+    Changes to DNSBLserver 0.26
+	fixed bug in ns.c that prevented 127.xx.xx.xx response TXT strings
+	inserted by rc.dnsbls from being reported
+
+	added zonefile.c and zonedump.c so that dnsbls can
+	dump a zonefile to the dbhome directory on receipt
+	of a SIG_USR2
+
+	add script 'sc_zoneload' to load a BIND or 'dig' zone file
+	into the database.
+
+0.35  NOT RELEASED -- distributed for testing, changes included above
+
+0.34  Tue Jun  8 16:29:39 PDT 2004
+	updated rc.bdbaccess v0.06 and rc.dnsbls v0.10 to fix bug for
+	perl v5.8.3 where unshift does not work properly for default @_
+
+	update sc_recoverdb.pl v1.01 to remove environment on an update
+
+0.33  NOT RELEASED
+	updated SMTPsend.pm v0.03 to properly include To: and From: headers
+	instead of depending on the MTA to provide them. This is necessary
+	so that spamassassian does not flag messages as spam. and... I
+	overlooked it.
+
+	updated ScriptSupport.pm v0.22 to check mode, uid, gid of one of 
+	the db files to use for restoring db environment files.
+
+	added utility sc_recoverdb.pl + documentation
+
+0.32  Wed May 26 12:21:37 PDT 2004
+	corrected a code typo in ScriptSupport.pm v0.21 that returned an undef 
+	instead of the value expected -- not noticed because the expected 
+	return was "false"
+
+	updated internal call in ParseMessage.pm v0.06 sub _host2ip, to return
+	255.255.255.255 for hosts where the gethostbyname lookup fails.
+	This allows this forces all unknown hosts to fail certain test
+	instead of matching a ''.
+
+0.31  Sat May 22 10:45:37 PDT 2004
+	updated DNSBLserver and BDBaccess packages to remove
+	compiler dependent bug when extracting the C version 
+	from the primary *.PM file
+
+0.30  Mon May 10 19:34:54 PDT 2004
+	update ScriptSupport v0.20 'BLpreen' to check the
+	age of each tarpit entry and not bother to check
+	blcontrib entries that are older than 5x the CRON interval
+	for the BLpreen job. Last preen time is stored in the
+	mandatory 127.0.0.2 entry in the 'tarpit' database
+
+	Add the entry 'FORCE_PREEN' to the sc_BLacklist.conf file
+	to force the old behavior.
+
+	DNSBLserver v0.24, modified rc.dnsbls so that tarpit records
+	forceably added from the config file (such at 127.0.0.2, 
+	127.0.0.3, etc...) are tested first for existence and NOT 
+	added if they already exist. This preserves the data (time tag) 
+	on these records so that they can be used by other routines -- 
+	noteably, 127.0.0.2 which should always be present is used by 
+	sc_BLpreen.pl to determine it's own cron interval
+
+0.29  Sat May  1 15:37:43 PDT 2004
+	Moved Mail::SpamCannibal::PidUtil to Proc::PidUtil
+	PidUtil remains but imports all its functions from
+	the new module
+
+	correct documentation error in ScripSupport.pm
+	correct documentation error in WhoisIP.pm
+
+	add favicon.ico update top.incl
+	add warning popup to cannibal.cgi for 
+	admin login session expiration
+
+	altered the comments at the beginning of BDBaccess.pm
+	v0.15 and DNSBLserver.pm v0.23
+
+0.28  Sat Feb 21 11:42:10 PST 2004
+	add db write cacheing to BLpreen in ScriptSupport v0.18 
+	to reduce disk thrashing and speed preening process
+
+	correct cannibal.cgi v1.18 to display truncated character
+	after hotlink for IP address in secondary db display
+
+0.27  Mon Feb  9 16:20:27 PST 2004
+	Re-write 'restart' routines for:
+	DNSBLserver/rc.dnsbls v0.8
+	BDBaccess/rc.bdbaccess v0.5
+	scripts/rc.sc_lbdaemon v1.04
+
+	Change wording in cannibal.cgi v1.17 for LOOKUP warning to:
+	Automated lookups not allowed, click SUBMIT to continue.
+
+	Add 'lookup' link to 'Whois' page in 
+	cannibal.cgi v1.16, whois.incl v1.02
+
+	Add script sc_country_origin.pl to analyze the number
+	of IP's from a particular country in the tarpit
+
+0.26  Wed Feb  4 17:36:21 PST 2004
+	Oops! -- left debug statement
+	"print STDERR" 
+	in cannibal.cgi -- removed and bumped rev number
+
+	commented out SPEWS dnsbl from the
+	sc_blacklist.config.sample config file
+
+0.25  Fri Jan 30 18:04:25 PST 2004
+	uploaded defective distribution containing
+	a typo in ScriptSupport which resulted in no 
+	change from version 0.23
+
+0.24  Fri Jan 30 17:03:37 PST 2004
+	add in-addr.arpa CNAME -> PTR capability
+	in the ScriptSupport dns_ptr subroutine 
+	for cannibal.cgi
+
+0.23  Fri Jan 30 13:31:07 PST 2004
+	update sc_Blacklist.conf.sample to include 
+	completewhois.com
+
+	modify cannibal.cgi to not allow automated lookups
+	of the form http://www.myhost.com/?....
+
+	modify cannibal.cgi to pop a window
+	for IP lookups in the View DB page
+
+0.22  Thu Jan 15 11:18:33 PST 2004
+	Add domain name lookup to whois cannibal.cgi page
+	ScriptSupport.pm
+	  add dns_udpsend
+	  add dns_udpresp
+
+0.21  Wed Jan  7 11:52:56 PST 2004
+	Fixed typo in howitworks.pod 'in-definite-ly', thanks to Graham Barr
+	gbarr@pobox.com for spotting it.
+
+	Added "focus" to web pages for LOOKUP, WHOIS, UPDPASSWD, SPAMADD, BLKADD
+
+	Removed easynet.nl from the sample sc_Blacklist.conf file,
+	they went out of service 12-1-03
+
+	Removed dsbl.org from sample sc_Blacklist.conf file, this 
+	was an erroneous entry.
+
+	Update sc_Blacklist.conf to track Net::DNSBL::MultiDaemon
+
+0.20  Fri Dec  5 17:12:31 PST 2003
+	Require version 0.23 if IPTables::IPv4::DBtarpit which has
+	the workaround in tarpit.c for the memory leak in libnet.
+
+	Add 'tests' for NetAddr operation to ScriptSupport, update missing
+	variable test in ScriptSupport::matchNetAddr
+
+	Move NetAddr and config file routines to 
+	Net::DNSBL::Utilities
+	
+	Add BLOCK, BlockByCountry, and no reverse DNS checking
+	to ScriptSupport.pm for sc_BLcheck.pl and sc_BLpreen.pl
+
+	Update sc_BlackList.conf.sample to support above
+
+0.19  Sat Nov  8 18:45:03 PST 2003
+	update public_html/cannibal.cgi so that javascript will
+	insert the IP address into automated attempts for whois 
+	and lookup page request actions.
+
+	Add support to Whois and Lookup for country code and flag 
+	display if the optional Geo::xxx modules are installed
+
+0.18  Mon Oct 30 11:21:40 PDT 2003
+
+	changed syslog call in rc.sc_dbwatch to match prototype
+
+	update spamlst.incl, sc_session.pl, sc_remote.pl, cannibal.cgi
+	to include admin capability to add CIDR/24 -31 blocks of addresses
+
+	update public_html/index.html to behave better with robots
+
+	add sort logic to ScriptSupport::BLcheck to check DNSBL's in
+	the order of max hits to min hits and to optionally save 
+	a statistics file.
+
+	update the documentation for ScriptSupport::zone_def to 
+	describe 'timeout'
+
+	fix PidUtil to print on STDERR instead of STDOUT and add error 
+	messages if the pid write path is not found or not writable
+
+      update DNSBLserver 0.21
+	correct logic in ns.c to report 127.x.x.x codes in zone transfers.
+	add logic to main.c and ns.c to append the text of the IP address
+	to standard TXT responses if the error message is default and 
+	contains the character ? as in http://xxx.com?abc=
+
+0.17  Sat Oct 11 08:28:02 PDT 2003
+	squash a test bug in DNSBLserver
+
+	modifiy sc_session.pl to access database directly for CIDR/24
+	related IP lookups rather than have cannibal.cgi use BDBclient. 
+	The lookup time for 255 addresses over the remote link was 
+	much too long.
+
+	add remote commands to sc_remote.pl to support insEBLK, getC24 delBLK
+
+0.16  Fri Oct 10 13:46:42 PDT 2003
+
+	This release contains many bug fixes as well as some new features
+	in the admin interfac.
+	The following modules should be updated when installing this
+	release:
+
+		IPTables::IPv4::DBTarpit verion 0.22
+		Net::DNS::Codes 0.08
+		Net::DNS::ToolKit 0.14
+	and the optional
+		LaBrea::Tarpit version 1.20
+	---------------------------------------------------------------
+	add "add CIDR/24 and delete CIDR24" functions to admin tools
+
+	corrected bad use of 'clean' function in sc_session.pl
+	on non-strings such as netaddrs, addresses which end in '0'
+	like 1.2.3.10 are truncated by 'clean'. This function SHOULD always
+	be called on real strings or numbers, not string like objects such
+	as netaddrs.
+
+	add -x expires option to sc_cleanup.pl
+
+	add dbjob_xxx utilities to ScriptSupport.pm 0.10 for db watcher
+
+	add missing PidUtil qw(get_script_name) to sc_mailfilter.pl
+
+	update test suites to accomodate libdbtarpit change
+
+	add support for DB watcher to all daemons and scripts.
+	each daemon and script creates a PID file in the db environment 
+	directory and NOW removes the file on clean exit. The watcher script
+	periodically checks whether the files described by the pid's are
+	actually running and will signal the remaining jobs to exit, 
+	remove and recreate the environment and restart the jobs.
+
+	add administrative screen shots to document package
+
+	correct sc_web.conf.example for missing entry to 
+	support admin change password
+
+	change nav.incl a href for 'docs' to 'docs/' to 
+	for the web robots. This is comsmetic since the 
+	href is not used anyway, but the robots see it.
+
+	in cannibal.cgi, modify 'whois' and 'lookup' to insert the 
+	IP address into the text box when the web interface is used.
+	Correct typo *gt should be &gt
+
+	update DNSBL list in sc_BlackList.conf
+
+0.15  Tue Sep 30 10:01:08 PDT 2003
+
+	modify spam_report.cgi to do a better job of extracting
+	URL information from the DNSBL TXT records
+
+	add onUnLoad function to spam_report.cgi to
+	close popup window in multi-site environment.
+	Requires LaBrea::Tarpit::Report v 1.09
+
+0.14  Mon Sep 29 17:18:57 PDT 2003
+	Changes are to these files ONLY
+
+	deleted public/html/whois.cgi
+	Makefile.PL
+	public_html/spam_report.cgi.example
+		(needs LaBrea::Tarpit::Report v 1.08)
+		(found in LaBrea::Tarpit 1.18)
+
+    Makefile.PL
+	fixed install for $(SPAMCANNIBAL_HOME)/public_html/tmp
+	to remove directory contents after chowning so that
+	web daemon does not hang after a re-installation
+
+    spam_report.cgi.example
+	corrected variable name 'usr' should be 'url' in 
+	public_html/spam_report.cgi
+
+	correct the name of the 'dbtarpit' daemon displayed
+	by 'spam_report.cgi'
+
+	eliminate 'whois.cgi' as it does not work with MSIE in
+	the pop-up window. Add workaround in LaBrea::Tarpit::Report
+	which must be used with this version for all to work well.
+ 
+0.13  Sat Sep 27 03:57:27 PDT 2003
+	oops! left SpamCannibal.html out of the doc package
+
+FIRST BETA RELEASE
+0.12  Thu Sep 25 17:21:24 PDT 2003
+	add fixup script to do POD2HTML conversions for versions
+	of perl newer than 5.6 where this has been removed.
+
+0.11  Wed Sep 24 14:57:49 PDT 2003
+	modify BDBaccess and DNSBLserver to have 32/64 bit
+	platform independent code. See Changes in those 
+	subdirectories for additional information on 
+	OS independent modifications. No functional changes.
+
+0.10  Sat Sep 20 12:01:08 PDT 2003
+	upgrade to DNSBLserver 0.15
+
+0.09  Mon Sep 15 11:50:06 PDT 2003
+	missing file public_html/whois.cgi
+	added to archive
+
+0.08  Tue Sep  9 18:00:28 PDT 2003
+	DNSBLserver version 0.12
+	improve database use efficiency
+
+	DNSBLserver version 0.11
+	main.c -- modified the child network socket loop to fix a timing 
+	problem when interrogating the dnsbls from the local host via bind.
+
+	modify rc.dnsbls so that record 127.0.0.2 is 
+	forceably added without user intervention.
+
+	add conditional @fqdn to "to" address in SMTPsend version 0.02
+
+	fix LaBreaDaemon.pm to properly open the unix domain interface
+	to dbtarpit.
+	set LaBreaDaemon ps-string to script name
+
+	add report scripts for site statistics
+
+	correct verbose Exceptions reporting for
+	mailcheck in ScriptSupport.pm
+
+0.07  Sun Sep  7 19:38:28 PDT 2003
+	ScriptSupport 0.05 -- correct flaw in BLpreen check which did not
+	remove IP from tarpit when the blacklist host no longer has record.
+
+	sc_initdb.pl	chown environment directory to 
+	spamcannibal user,group
+
+	add UtilPid.pm for checking and managing PID files, etc...
+	add pid checking to sc_BLcheck.pl and sc_BLpreen.pl
+	add LaBreaDaemon.pm to support data collection and display
+
+	add sc_cleanup.pl to remove spurious records
+	add pods/recover.pod
+
+	updated cannibal.cgi to unmask html in the evidence record
+
+0.06  Wed Sep  3 16:35:13 PDT 2003
+	update prerequisite list and home page documentation
+	permissions on sc_web.conf.sample instead of sc_web.conf
+
+	dnsbls version 0.10
+	Add -N option for naming the localhost DNS object
+	Correct error in mungemacros.c where buffer size constraint
+	was MSGsize instead of IP_MAXPACKET
+	Add lookup in the evidence file to ns.c. Evidence must be
+	consulted before blcontrib to prevent non-reporting of
+	127.0.0.2 'A' records if they appear in both blcontrib and evidence.
+
+0.05  Fri Aug 29 14:55:27 PDT 2003
+	updates from first beta install including documentation corrections
+
+	modify usage for INADDR_NONE in cannibal.cgi
+
+	set submit false for ViewDB in cannibal.cgi to prevent
+	POSTs to index.html
+
+	modify Session.pm to support modperl across 'fork' operation
+
+	correct failure to skip tarpit operation for ignored hosts in
+
+	sc_BLcheck.pl (ScriptSupport::BLcheck).
+
+	set real to effective uid in sc_mailfilter.pl to accomodate
+	the suid from the local mail delivery agent
+
+	correct WebService to properly return query string elements
+	that contain '='
+
+0.04  Sat Aug 23 12:22:28 PDT 2003
+	added web support for users and admins
+
+0.03  Sat Aug  2 19:44:13 PDT 2003
+	updates
+
+0.02  Tue Jul 29 19:29:58 PDT 2003
+	move GoodPrivacy and ParseMessage
+	into lib/
+
+	add	scrpits/sc_initdb.pl
+		scripts/sc_addspam.pl
+	    	config/sc_addspam.conf.sample
+
+0.01  Thu Jul 23 15:13:03 PDT 2003
+	alpha release

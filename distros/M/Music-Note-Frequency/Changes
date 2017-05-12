@@ -1,0 +1,17 @@
+Revision history for Music-Note-Frequency
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02	2016-06-23
+	Fixed spelling errors in perldoc...
+
+0.03	2016-06-24
+	Fixed CPAN prerequisites in Makefile.PL and cpanfile
+
+0.04	2016-06-24
+	Fixed CPAN testing prerequisites in Makefile.PL...
+
+0.05	2016-06-25
+	Added ability to change base frequency value (i.e. value of A4, 
+	which defaults to 440Hz)

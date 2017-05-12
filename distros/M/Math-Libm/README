@@ -1,0 +1,14 @@
+Math::Libm - Perl extension for the C math library, libm
+
+This module is a translation of the C math.h file.
+It exports the following constants and functions:
+	M_1_PI M_2_PI M_2_SQRTPI M_E M_LN10 M_LN2 M_LOG10E
+	M_LOG2E M_PI M_PI_2 M_PI_4 M_SQRT1_2 M_SQRT2
+	acos acosh asin asinh atan atanh cbrt ceil cosh
+	erf erfc expm1 floor hypot j0 j1 jn lgamma_r
+	log10 log1p pow rint sinh tan tanh y0 y1 yn
+
+Only tested on AIX 4.2, FreeBSD 4.0, Linux 2.2.16, and Solaris 2.5.1.
+
+Daniel Lewart
+d-lewart@uiuc.edu

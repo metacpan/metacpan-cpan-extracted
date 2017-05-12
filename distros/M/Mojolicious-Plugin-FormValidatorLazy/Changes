@@ -1,0 +1,10 @@
+Revision history for Mojolicious::Plugin::FormValidatorLazy
+
+0.03 2015/12/22
+  - Updated dependent version of mojo to v6.38
+
+0.02 2015/02/27
+  - Updated internals in favor of Mojolicious v6.0
+
+0.01 2015/02/20
+  - initial release

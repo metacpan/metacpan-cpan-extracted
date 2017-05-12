@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/MassSpec-ViewSpectrum.t
+lib/MassSpec/ViewSpectrum.pm
+META.yml                                 Module meta-data (added by MakeMaker)

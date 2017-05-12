@@ -1,0 +1,80 @@
+DESCRIPTION
+
+    ESLIF is derived from perl's Marpa::R2, and has its own BNF, documented
+    in MarpaX::ESLIF::BNF.
+
+    The main features of this BNF are:
+
+    Sub-grammars
+
+      The number of sub grammars is unlimited.
+
+    Regular expressions
+
+      Native support of regular expression using the PCRE2
+      <http://www.pcre.org/> library (i.e. this is <not> exactly perl
+      regexps, although very closed).
+
+    Streaming
+
+      Native support of streaming input.
+
+    Beginners might want to look at MarpaX::ESLIF::Introduction.
+
+SYNOPSIS
+
+      use MarpaX::ESLIF;
+    
+      my $eslif = MarpaX::ESLIF->new();
+      printf "ESLIF library version: %s\n", $eslif->version;
+
+    With a logger, using Log::Any::Adapter::Stderr as an example:
+
+      use MarpaX::ESLIF;
+      use Log::Any qw/$log/;
+      use Log::Any::Adapter ('Stderr', log_level => 'trace' );
+    
+      my $eslif = MarpaX::ESLIF->new($log);
+      printf "ESLIF library version: %s\n", $eslif->version;
+
+    This class and its derivatives are thread-safe. Although there can be
+    many ESLIF instance, in practice a single instance is enough, unless
+    you want different logging interfaces. Once a MarpaX::ESLIF instance is
+    created, the user should create a MarpaX::ESLIF::Grammar instance to
+    have a working grammar.
+
+METHODS
+
+ MarpaX::ESLIF->new($loggerInterface)
+
+      my $loggerInterface = My::Logger::Interface->new();
+      my $eslif = MarpaX::ESLIF->new();
+
+    Returns an instance of MarpaX::ESLIF, noted $eslif below.
+
+    $loggerInterface is an optional parameter that, when set, must be an
+    object instance that can do the methods documented in
+    MarpaX::ESLIF::Logger::Interface.
+
+    An example of logging implementation can be a Log::Any adapter.
+
+ $eslif->version()
+
+      printf "ESLIF library version: %s\n", $eslif->version;
+
+    Returns a string containing the current underlying ESLIF library
+    version.
+
+NOTES
+
+    The perl interface is an all-in-one version of marpaESLIF
+    <https://github.com/jddurand/c-marpaESLIF> library, which means that
+    character conversion is using iconv (or iconv-like on Windows) instead
+    of ICU, even if the later is available on your system.
+
+SEE ALSO
+
+    MarpaX::ESLIF::Introduction, PCRE2 <http://www.pcre.org/>,
+    MarpaX::ESLIF::BNF, MarpaX::ESLIF::Logger::Interface,
+    MarpaX::ESLIF::Grammar, MarpaX::ESLIF::Recognizer.
+

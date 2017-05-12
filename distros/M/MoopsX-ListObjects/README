@@ -1,0 +1,56 @@
+NAME
+    MoopsX::ListObjects - Use Moops with List::Objects::WithUtils
+
+SYNOPSIS
+      package My::App;
+      use MoopsX::ListObjects;
+
+      class Foo {
+        has mylist => ( 
+          default => sub { array }, 
+          isa     => ArrayObj
+        );
+
+        has mydata => ( 
+          default => sub { +{} },
+          isa     => HashObj,
+          coerce  => 1
+        );
+
+        method add_items (@items) {
+          $self->mylist->push(@items)
+        }
+
+        method find_matches (Str $string) {
+          $self->mylist->grep(sub { $_ eq $string })
+        }
+      }
+
+      my $foo = Foo->new;
+
+      $foo->add_items(qw/ foo bar baz /);
+
+      my $matches = $foo->find_matches( 'foo' );
+
+DESCRIPTION
+    Extends Toby Inkster's Moops sugary class building syntax with
+    List::Objects::WithUtils objects.
+
+    Importing MoopsX::ListObjects is the same as importing Moops, but with
+    all of the objects available from List::Objects::WithUtils, as well as
+    the types and coercions from List::Objects::Types.
+
+SEE ALSO
+    Moops
+
+    List::Objects::WithUtils
+
+    List::Objects::Types
+
+    List::Objects::WithUtils::Role::Array
+
+    List::Objects::WithUtils::Role::Hash
+
+AUTHOR
+    Jon Portnoy <avenj@cobaltirc.org>
+

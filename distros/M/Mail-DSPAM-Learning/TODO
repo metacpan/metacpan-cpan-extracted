@@ -1,0 +1,43 @@
+Verifu that the mailbox is wel taken into account.
+
+Learning.pm
+dspam-learn
+Build.PL
+README
+./examples:
+./t:
+
+
+
+Make a config file
+ use of Config::Any ?
+        Config::Model
+	Config::Validate
+
+=>      Module::TestConfig
+
+	AppConfig
+
+Math/Inline-0.44.readme:to in your Config.pm) 
+MIME/Mail-IspMailGate-1.001.readme:        lib/Mail/IspMailGate/Config.pm
+HTML/HTML-FormEngine-0.7.1.readme:don
+
+File/File-Policy-1.005.readme:	Then, create a file File/Policy/Config.pm with:
+HTML/HTML-EP-Explorer-0.1005.readme:      lib/HTML/EP/Explorer/Config.pm
+RT/RT-Authen-CookieAuth-0.01.readme:
+RT/RT-Authen-ExternalAuth-0.01.readme:
+RT/RT-SimpleGPGVerify-0.04.readme:you
+RTx/RTx-Calendar-0.03.readme:
+RTx/RTx-EmailCompletion-0.02.readme:
+Template/Template-Parser-CET-0.01.readme:
+
+Build.PL
+
+Management of the config file in the installation process
+
+Tests
+
+
+10/8/2008 : setting the path in dspam-learn from settings in Build.PL
+            testing on real condition
+            documentation

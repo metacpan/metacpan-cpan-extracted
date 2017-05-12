@@ -1,0 +1,33 @@
+---
+abstract: 'Calculate PSNR (Peak Signal-to-Noise Ratio) and MSE (Mean Square Error).'
+author:
+  - 'moznion <moznion@gmail.com>'
+build_requires:
+  Test::Exception: 0.31
+  Test::More: 0.98
+  Test::Warn: 0.24
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Math-PSNR
+no_index:
+  directory:
+    - inc
+provides:
+  Math::PSNR:
+    file: lib/Math/PSNR.pm
+    version: 0.02
+requires:
+  Carp: 0
+  Mouse: 1.02
+  parent: 0
+  perl: 5.008001
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/moznion/p5-Math--PSNR.git
+version: 0.02

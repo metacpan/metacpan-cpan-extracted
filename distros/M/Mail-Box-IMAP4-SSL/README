@@ -1,0 +1,88 @@
+NAME
+    Mail::Box::IMAP4::SSL - handle IMAP4 folders with SSL
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+         # standalone
+         use Mail::Box::IMAP4::SSL;
+ 
+         my $folder = new Mail::Box::IMAP4::SSL(
+             username => 'johndoe',
+             password => 'wbuaqbr',
+             server_name => 'imap.example.com',
+         );
+ 
+         # with Mail::Box::Manager
+         use Mail::Box::Manager;
+ 
+         my $mbm = Mail::Box::Manager->new;
+         $mbm->registerType( imaps => 'Mail::Box::IMAP4::SSL' );
+ 
+         my $inbox = $mbm->open(
+             folder => 'imaps://johndoe:wbuaqbr@imap.example.com/INBOX',
+         );
+
+DESCRIPTION
+    This is a thin subclass of Mail::Box::IMAP4 to provide IMAP over SSL
+    (aka IMAPS). It hides the complexity of setting up Mail::Box::IMAP4 with
+    IO::Socket::SSL, Mail::IMAPClient and Mail::Transport::IMAP4.
+
+    In all other respects, it resembles Mail::Box::IMAP4. See that module
+    for documentation.
+
+INHERITANCE
+         Mail::Box::IMAP4::SSL
+           is a Mail::Box::IMAP4
+           is a Mail::Box::Net
+           is a Mail::Box
+           is a Mail::Reporter
+
+METHODS
+  "Mail::Box::IMAP4::SSL->new( %options )"
+         my $folder = new Mail::Box::IMAP4::SSL(
+             username => 'johndoe',
+             password => 'wbuaqbr',
+             server_name => 'imap.example.com',
+             %other_options
+         );
+
+    The "username", "password" and "server_name" options arguments are
+    required. The "server_port" option is automatically set to the standard
+    IMAPS port 993, but can be changed if needed. See Mail::Box::IMAP4 for
+    additional options.
+
+    Note: It is an error to provide a "transporter" options, as this class
+    exists only to create an SSL-secured "transporter" for
+    "Mail::Box::IMAP4".
+
+SEE ALSO
+    *   Mail::Box
+
+    *   Mail::Box::IMAP4
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Mail-Box-IMAP4-SSL/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Mail-Box-IMAP4-SSL>
+
+      git clone https://github.com/dagolden/Mail-Box-IMAP4-SSL.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

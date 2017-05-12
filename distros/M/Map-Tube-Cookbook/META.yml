@@ -1,0 +1,30 @@
+---
+abstract: 'Cookbook for Map::Tube library.'
+author:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+build_requires:
+  Test::More: '1.001014'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Map-Tube-Cookbook
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Map::Tube::Cookbook:
+    file: lib/Map/Tube/Cookbook.pm
+    version: '0.08'
+requires:
+  Data::Dumper: '0'
+  perl: '5.006'
+resources:
+  repository: https://github.com/manwar/Map-Tube-Cookbook.git
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

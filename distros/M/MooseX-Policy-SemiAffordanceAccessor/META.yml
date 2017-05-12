@@ -1,0 +1,24 @@
+---
+name: MooseX-Policy-SemiAffordanceAccessor
+version: 0.02
+author:
+  - 'Dave Rolsky, C<< <autarch@urth.org> >>'
+abstract: A policy to name accessors foo() and set_foo()
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Moose: 0
+  Moose::Policy: 0
+build_requires:
+  Test::More: 0
+provides:
+  MooseX::Policy::SemiAffordanceAccessor:
+    file: lib/MooseX/Policy/SemiAffordanceAccessor.pm
+    version: 0.02
+  MooseX::Policy::SemiAffordanceAccessor::Attribute:
+    file: lib/MooseX/Policy/SemiAffordanceAccessor.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,28 @@
+---
+abstract: 'Event Notifications for your Users'
+author:
+  - 'Nils Diewald'
+build_requires:
+  Test::Mojo::Session: '1.04'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Notifications
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '7.13'
+  perl: '5.010001'
+resources:
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/Akron/Mojolicious-Plugin-Notifications
+version: '1.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

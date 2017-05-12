@@ -1,0 +1,5 @@
+cover_db
+Makefile.old
+\.git.*
+\.gitignore$
+\.?.*\.swp$

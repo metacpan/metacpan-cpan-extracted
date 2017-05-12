@@ -1,0 +1,431 @@
+NAME
+    Makefile::Parser - A simple parser for Makefiles
+
+VERSION
+    This document describes Makefile::Parser 0.216 released on 18 November
+    2014.
+
+SYNOPSIS
+      use Makefile::Parser;
+
+      $parser = Makefile::Parser->new;
+
+      # equivalent to ->parse('Makefile');
+      $parser->parse or
+          die Makefile::Parser->error;
+
+      # get last value assigned to the specified variable 'CC':
+      print $parser->var('CC');
+
+      # get all the variable names defined in the Makefile:
+      @vars = $parser->vars;
+      print join(' ', sort @vars);
+
+      @roots = $parser->roots; # Get all the "root targets"
+      print $roots[0]->name;
+
+      @tars = $parser->targets;  # Get all the targets
+      $tar = join("\n", $tars[0]->commands);
+
+      # get the default target, say, the first target
+      # defined in Makefile:
+      $tar = $parser->target;
+
+      $tar = $parser->target('install');
+      # get the name of the target, say, 'install' here:
+      print $tar->name;
+
+      # get the dependencies for the target 'install':
+      @depends = $tar->depends;
+
+      # access the shell command used to build the current target.
+      @cmds = $tar->commands;
+
+      # parse another file using the same Parser object:
+      $parser->parse('Makefile.old') or
+        die Makefile::Parser->error;
+
+      # get the target who is specified by variable EXE_FILE
+      $tar = $parser->target($parser->var('EXE_FILE'));
+
+DESCRIPTION
+    This is a simple parser for Makefiles. At this very early stage, the
+    parser only supports a limited set of features, so it may not recognize
+    most of the advanced features provided by certain make tools like GNU
+    make. Its initial purpose is to provide basic support for another module
+    named Makefile::GraphViz, which is aimed to render the building process
+    specified by a Makefile using the amazing GraphViz library. The Make
+    module is not satisfactory for this purpose, so I decided to build one
+    of my own.
+
+    WARNING!!! This stuff is highly experimental and is currently at
+    pre-alpha stage, so production use is strongly discouraged. Right now
+    it's just a toy for parsing trivial makefiles.
+
+    IMPORTANT!!! If you're looking for something more serious for parsing
+    GNU makefiles, please see Makefile::Parser::GmakeDB instead. The GmakeDB
+    parser has passed 51% of GNU make's official test suite as of this
+    writing.
+
+    If you're looking for something that can parse makefiles losslessly,
+    take a look at the Makefile::DOM module which may fit your needs.
+
+  SYNTAX SUPPORTED
+    The current parser implementation has been trying to support a common
+    feature set of both MS NMAKE and GNU make. In the future, different
+    formats of Makefiles will be handled by individual subclasses such as
+    Makefile::Parser::Gmake.
+
+    Variable Definition
+            MIN_T_FILES = $(PAT_COVER_FILES) t\optest.t t\my_perl.exe.t t\types.cod.t \
+                t\catln.t t\exe2hex.t t\hex2bin.t t\bin2hex.t t\bin2asm.t t\ndisasmi.t \
+                t\Idu.t t\pat_tree.t t\state_mac.t t\Idu-Util.t t\cidu.t \
+                t\opname.t t\error.t t\operand.t t\01disasm.t t\02disasm.t t\03disasm.t \
+                t\disasm_cover.t t\ndisasm.t
+            T_FILES = t\main.cod.t t\bin2hex.exe.t t\hex2bin.exe.t $(MIN_T_FILES)
+            DIRFILESEP = ^\
+
+        "Simply expanded" variables' definition sytax in GUN make is also
+        supported:
+
+            FOO := blah blah blah
+
+        which is considered invalid in Win32 NMake. "Recursively expanded"
+        variables are currently treated as "simply expanded" variables.
+
+        Variable redefinition can be handled as well:
+
+            CC = cl
+
+            %.obj : %.c
+                $(CC) /nologo /c $<
+
+            CC = gcc
+
+            %.o : %.c
+                $(CC) -c $<
+
+        Variable expansion sytax
+
+            ${abc}
+
+        is accepted, whereas Win32 NMAKE will complain about it.
+
+        Currently, environment variables defined in the command-line are not
+        imported.
+
+        I have no idea what default value should be assigned to built-in
+        variables like $(MAKE) and $(CC). Currently they will be left
+        untouched if they're not set explicitly in the Makefile.
+
+        Due to the current implementation, expansion of unrecognized
+        built-in varaibles and variables not previously defined by Makefile
+        will NOT be performed. This behavior is different from any practial
+        make tools, but is reasonable at this early stage of this parser.
+
+    Explicit Rules
+            $(CIDU_DLL) : C\idu.obj C\idu.def
+                link /dll /nologo /debug /out:$@ /def:C\idu.def C\idu.obj
+
+            $(CIDU_LIB) : $(CIDU_DLL)
+
+            C\idu.obj : C\idu.c C\idu.h
+                cd C
+                cl /nologo /c /I . idu.c
+                cd ..
+
+            smoke : all pat_cover t\pat_cover.t \
+                    t/pat_cover.ast.ast
+                perl util\run-smoke.pl . smoke.html
+                perl txt2html.pl t\*.t t\*.ast
+
+            clean:
+                copy t\pat_cover.ast.ast.html ..\ /Y
+                $(RM_F) encoding.html encoding.pod state_mac.xml encoding.ast \
+                    pat_tree.ast state_mac.ast \
+                    main.cod pat_cover.pod pat_cover.html types.cod \
+                    hex2bin.exe hex2bin.obj
+
+        Specital variable $@ will be expanded using its value in the
+        context.
+
+    Implicit Rules
+
+        Pattern Rules
+                %.obj : %.asm
+                    masm /t $<;
+
+                %.exe : %.obj
+                    link /BATCH /NOLOGO $<;
+
+            The special varaibles $< and $* will be expanded according to
+            the context.
+
+        Old-Fashioned Suffix Rules
+            Currently only double-suffix rules are supported:
+
+                .SUFFIXES: .obj .asm .exe
+
+                .asm.obj :
+                    masm /t $<
+
+                .obj.exe :
+                    link /nologo $<
+
+            At this moment, .SUFFIXES is a no-op. So any suffix-like things
+            will be treated as suffixes, excluding the following example:
+
+                .c.o: foo.h
+                        $(CC) -c $(CFLAGS) $(CPPFLAGS) -o $@ $<
+
+            In suffix rules, no prerequisites are allowed according to most
+            make tools.
+
+    Substitution References
+            objects = foo.o bar.o baz.o
+            sources = $(objects:.o=.c)  # foo.c bar.c baz.c
+
+    Functions
+        Currently the following GNU make makefile builtin functions are
+        supported:
+
+        " $(subst from,to,text) "
+        " $(patsubst pattern,replacement,text) "
+        " $(strip string) "
+        " $(findstring find,text) "
+        " $(filter pattern...,text) "
+        " $(filter-out pattern...,text) "
+        " $(sort list) "
+        " $(word n,text) "
+        " $(words text) "
+        " $(wordlist s,e,text) "
+        " $(firstword names...) "
+        " $(lastword names...) "
+        " $(dir names...) "
+        " $(notdir names...) "
+        " $(suffix names...) "
+        " $(basename names...) "
+        " $(addsuffix suffix,names...) "
+        " $(addprefix prefix,names...) "
+        " $(join list1,list2) "
+        " $(wildcard pattern...) "
+        " $(realpath names...) "
+        " $(abspath names...) "
+        " $(if condition,then-part[,else-part]) "
+        " $(or condition1[,condition2[,condition3...]]) "
+        " $(and condition1[,condition2[,condition3...]]) "
+        " $(foreach var,list,text) "
+        " $(error argument...) "
+        " $(warning argument...) "
+        " $(info argument...) "
+        " $(shell cmd...) "
+
+        Please consult the GNU make Manual for details and also take a look
+        at the following file for some use cases:
+
+        <http://github.com/agentzh/makefile-dom-pm/tree/master/t/gmake/sanit
+        y/func-refs.t>
+
+    Commands after ';'
+            all : ; echo 'hello, world!'
+
+        Specital variable $@ will be expanded using its value in the
+        context.
+
+    For the list of features which will be added very soon, take a look at
+    the "TODO" section.
+
+The Makefile::Parser Class
+    This class provides the main interface to the Makefile parser.
+
+  METHODS
+    "$obj = Makefile::Parser->new()"
+        It's the constructor for the Parser class. You may provide the path
+        of your Makefile as the argument which . It is worth mentioning that
+        the constructor will *not* call ->parse method internally, so please
+        remember calling ->parse after you construct the parser object.
+
+    "$obj->parse()"
+    "$obj->parse($Makefile_name)"
+    "$obj->parse($Makefile_name, { var => value, ... })"
+        This method parse the specified Makefile (default to 'Makefile').
+
+        When an error occurs during the parsing procedure, "parse" will
+        return undef. Otherwise, a reference to Parser object itself is
+        returned. It is recommended to check the return value every time you
+        call this method. The detailed error info can be obtained by calling
+        the "error" method.
+
+        You can also pass a hash reference to specify initial variables and
+        their values. Note that these variables are treated as "defaults" so
+        assignments in the makefile have higher priority.
+
+    "$obj->error()"
+        It returns the error info set by the most recent failing operation,
+        such as a parsing failure.
+
+    "$obj->var($variable_name)"
+        The var method returns the value of the given variable. Since the
+        value of variables can be reset multiple times in the Makefile, so
+        what you get is always the last value set to the variable. It's
+        worth noting that variable reassignment can be handled appropriately
+        during parsing since the whole parsing process is a one-pass
+        operation compared to the multiple-pass strategy used by the CPAN
+        module Make.
+
+    "@vars = $obj->vars"
+        This will return all the variables defined in the Makefile. The
+        order may be quite different from the order they appear in the
+        Makefile.
+
+    "$obj->target($target_name)"
+        This method returns a Makefile::Target object with the name
+        specified. It will returns undef if the rules for the given target
+        is not described in the Makefile. It is worth noting that only
+        targets with a definition body will be considered as a *target*
+        here.
+
+        When $target_name is omitted, this method will return the default
+        target, say, the first target defined in Makefile, to the user. This
+        can be handy if you try to build a make tool on top of this module.
+
+        It is important not to send something like "$(MY_LIB)" as the target
+        name. Only raw values are acceptable. If you really want to do
+        something like this, please use the following code:
+
+            my $tar = $parser->target($parser->var('MY_LIB'));
+
+        but this code will break if you have reassigned values to variable
+        MY_LIB in your Makefile.
+
+    "@targets = $obj->targets()"
+        This returns all the targets in Makefile. The order can be
+        completely different from the order they appear in Makefile. So the
+        following code will not work if you want to get the default target
+        (the first target):
+
+            @tars = $parser->targets;
+            print $tars[0];
+
+        Please use the following syntax instead:
+
+            print $parser->target;
+
+        The type of the returned list is an array of Makefile::Target
+        objects.
+
+    "@roots = $obj->roots()"
+        The "roots" method returns the "root targets" in Makefile. The
+        targets which there're no other targets depends on are called the
+        *root targets*. For example, *install*, *uninstall*, and *veryclean*
+        are all root targets in the Makefile generated by the
+        *ExtUtils::MakeMaker* module. On the other hand, *clean* and *test*
+        are not, which may be somewhat counterintuitive. That's because
+        there're some other targets depend on *clean*, *test*, or both.
+
+        The type of the returned list is an array of Makefile::Target
+        objects.
+
+  PACKAGE VARIABLES
+    $Makefile::Parser::Strict
+        When this variable is set to true, the parser will sense syntax
+        errors and semantic errors in the Makefile. Default off.
+
+    $Makefile::Parser::Debug
+        When this variable is set to true, the parser will enter Debug Mode.
+        This variable is not supposed to be used directly by the user.
+
+INTERNAL METHODS
+    post_parse
+        Iterate the Makefile AST to apply implicit rules in the following
+        form:
+
+            %.o : %.c
+                $(CC) -c $<
+
+    solve_imp($depend)
+        Solve implicit rules as many as possible using one target name that
+        appears in other target's dependency list.
+
+The Makefile::Target Class
+    This class overloads the "" operator so its instances can be
+    automatically converted to strings using their names.
+
+  METHODS
+    "$class->new($target_name, $colon_type)"
+        This is the constructor for class Makefile::Target. The first
+        argument is the target name which can't be a Makefile variable, the
+        second one is a single colon or a double colon which is used by the
+        rule definition in Makefile.
+
+        This method is usually called internally by the Makefile::Parser
+        class. It doesn't make much sense to me if the user has a need to
+        call it manually.
+
+    "$obj->name()"
+        It will return the name of the current Target object.
+
+    "@prereqs = $obj->prereqs()"
+        You can get the list of prerequisites (or dependencies) for the
+        current target. If no dependency is specified in the Makefile for
+        the target, an empty list will be returned.
+
+    "@prereqs = $obj->depends()"
+        Alias to the "prereqs" method. This method is only preserved for the
+        sake of backward-compatibility. Please use "prereqs" instead.
+
+    "$obj->commands()"
+        This method returns a list of shell commands used to build the
+        current target. If no shell commands is given in the Makefile, an
+        empty array will be returned.
+
+CODE REPOSITORY
+    For the very latest version of this module, check out the source from
+    <http://github.com/agentzh/makefile-parser-pm>. There is anonymous
+    access to all.
+
+TODO
+    The following syntax will be implemented soon:
+
+    *   Add support the remaining GNU make makefile builtin functions:
+
+        "origin", "value", "call", "flavor", and "eval".
+
+    *   Add support for recursively-expanded variables.
+
+    *   Implement rules with multiple targets
+
+    *   Serious support for "Recursively expanded" variables in GUN make
+
+    *   Comments that span multiple lines via trailing backslash
+
+    *   Lines that don't contain just comments
+
+    *   Literal "#" escaped by a leading backslash
+
+    *   The include directive
+
+    *   Look for 'GNUmakefile' and 'makefile' automatically
+
+    *   MAKEFILES Variable
+
+    *   MAKEFILE_LIST Variable
+
+    *   .VARIABLES Variable
+
+BUGS
+    Please feel free to report bugs or send your wish-list to
+    <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Makefile-Parser>.
+
+SEE ALSO
+    plmake, makesimple, Makefile::Parser::GmakeDB, Makefile::GraphViz, Make.
+
+AUTHOR
+    Zhang "agentzh" Yichun, "<agentzh@gmail.com>"
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2005-2011 by Zhang "agentzh" Yichun (章亦春).
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

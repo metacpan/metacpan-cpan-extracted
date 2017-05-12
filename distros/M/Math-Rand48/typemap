@@ -1,0 +1,10 @@
+TYPEMAP
+seed_t	T_SEED
+
+INPUT
+T_SEED
+	$var = SVtoSeed($arg)
+
+OUTPUT
+T_SEED
+	SeedtoSV($arg,$var);

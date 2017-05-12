@@ -1,0 +1,132 @@
+NAME
+    Math::Random::OO - Consistent object-oriented interface for generating
+    random numbers
+
+VERSION
+    version 0.22
+
+SYNOPSIS
+      # Using factory functions
+      use Math::Random::OO qw( Uniform UniformInt );
+      push @prngs, Uniform(), UniformInt(1,6);
+ 
+      # Explicit creation of subclasses
+      use Math::Random::OO::Normal;
+      push @prngs, Math::Random::OO::Normal->new(0,2);
+ 
+      $_->seed(23) for (@prngs);
+      print( $_->next(), "\n") for (@prngs);
+
+DESCRIPTION
+    CPAN contains many modules for generating random numbers in various ways
+    and from various probability distributions using pseudo-random number
+    generation algorithms or other entropy sources. (The "SEE ALSO" section
+    has some examples.) Unfortunately, no standard interface exists across
+    these modules. This module defines an abstract interface for random
+    number generation. Subclasses of this model will implement specific
+    types of random number generators or will wrap existing random number
+    generators.
+
+    This consistency will come at the cost of some efficiency, but will
+    enable generic routines to be written that can manipulate any provided
+    random number generator that adheres to the interface. E.g., a
+    stochastic simulation could take a number of user-supplied parameters,
+    each of which is a Math::Random::OO subclass object and which represent
+    a stochastic variable with a particular probability distribution.
+
+USAGE
+  Factory Functions
+     use Math::Random::OO qw( Uniform UniformInt Normal Bootstrap );
+     $uniform = Uniform(-1,1);
+     $uni_int = UniformInt(1,6);
+     $normal  = Normal(1,1);
+     $boot    = Bootstrap( 2, 3, 3, 4, 4, 4, 5, 5, 5 );
+
+    In addition to defining the abstract interface for subclasses, this
+    module imports subclasses and exports factory functions upon request to
+    simplify creating many random number generators at once without typing
+    "Math::Random::OO::Subclass->new()" each time. The factory function
+    names are the same as the suffix of the subclass following
+    "Math::Random::OO". When called, they pass their arguments directly to
+    the "new" constructor method of the corresponding subclass and return a
+    new object of the subclass type. Supported functions and their
+    subclasses include:
+
+    *   "Uniform" -- Math::Random::OO::Uniform (uniform distribution over a
+        range)
+
+    *   "UniformInt" -- Math::Random::OO::UniformInt (uniform distribution
+        of integers over a range)
+
+    *   "Normal" -- Math::Random::OO::Normal (normal distribution with
+        specified mean and standard deviation)
+
+    *   "Bootstrap" -- Math::Random::OO::Bootstrap (bootstrap resampling
+        from a non-parameteric distribution)
+
+INTERFACE
+    All Math::Random::OO subclasses must follow a standard interface. They
+    must provide a "new" method, a "seed" method, and a "next" method.
+    Specific details are left to each interface.
+
+  "new"
+    This is the standard constructor. Each subclass will define parameters
+    specific to the subclass.
+
+  "seed"
+     $prng->seed( @seeds );
+
+    This method takes seed (or list of seeds) and uses it to set the initial
+    state of the random number generator. As some subclasses may optionally
+    use/require a list of seeds, the interface mandates that a list must be
+    acceptable. Generators requiring a single seed must use the first value
+    in the list.
+
+    As seeds may be passed to the built-in "srand()" function, they may be
+    truncated as integers, so 0.12 and 0.34 would be the same seed. Only
+    positive integers should be used.
+
+  "next"
+     $rnd = $prng->next();
+
+    This method returns the next random number from the random number
+    generator. It does not take (and must not use) any parameters.
+
+SEE ALSO
+    This is not an exhaustive list -- search CPAN for that -- but represents
+    some of the more common or established random number generators that
+    I've come across.
+
+    Math::Random -- multiple random number generators for different
+    distributions (a port of the C randlib)
+    Math::Rand48 -- perl bindings for the drand48 library (according to
+    perl56delta, this may already be the default after perl 5.005_52 if
+    available)
+    Math::Random::MT -- The Mersenne Twister PRNG (good and fast)
+    Math::TrulyRandom -- an interface to random numbers from interrupt
+    timing discrepancies
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/math-random-oo/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/math-random-oo>
+
+      git clone git://github.com/dagolden/math-random-oo.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

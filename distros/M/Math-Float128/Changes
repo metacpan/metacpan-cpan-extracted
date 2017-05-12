@@ -1,0 +1,59 @@
+0.12
+ - Fix typo ("Reinsterting") in Makefile.PL
+ - In Float128.xs fix alignment issue that arises on some -DDEBUGGING builds
+ - Attend to overloading of POK/NOK dualvars
+
+0.11
+ - Replace SvUV/SvIV/SvNV with SvUVX/SvIVX/SvNVX where appropriate. (In typemap, too.)
+ - Add code to Makefile.PL to ensure that '-lquadmath' doesn't get stripped
+   (Thanks to kent frederic.)
+
+0.10
+ - Fix overloading of comparison operators (for when operands are reversed).
+
+0.09
+ - Change default ouptut precision to 36 - which brings it into line with the mpfr
+   library.
+
+0.08
+ - In t/11stringification.t add a test to check that F128toSTR is, in fact, not
+   outputting insane values.
+ - Fix the problem that necessitated the addition of that F128toSTR test. For
+   defined(__MINGW32__) && !defined(__MINGW64__)
+   we now:
+   typedef __float128 float128 __attribute__ ((aligned(32)));
+   instead of simply:
+   typedef __float128 float128;
+
+0.07
+ - Allow for MinGW64-v4 (runtime) bugfixes in Float128.xs.
+
+0.06
+ - Have the Makefile.PL perform a test that works around the brokenness of
+   Bingos' NetBSD smoker(s).
+ - Add nnumflag(), set_nnum() and clear_nnum() functions. Also check for
+   non-numeric strings handed to strtoflt128()..
+
+0.05
+ - Allow UV, IV, NV and PV overloading, and alter accordingly the way that new() assigns
+   these types.
+
+0.04
+ - Add metadata to Makefile.PL.
+ - Add f128_bytes()
+ - Add extra quadmath.h functions
+ - Add typemap
+
+0.03
+ - Fix t/03arith.t, t/05cmp.t, t/08log_exp.t, t/11stringification.t, and t/13constants.t
+   to accommodate the possibility that the locale in use represents the decimal point
+   with a comma.
+
+0.02
+ - mingw64 compilers segfault on exp(). For these compilers we now have _overload_exp()
+   do e ** arg instead of doing exp(arg).
+ - Add constants defined in quadmath.h - and add t/13constants.t to check them.
+ - Define PERL_NO_GET_CONTEXT.
+
+0.01
+ - First release

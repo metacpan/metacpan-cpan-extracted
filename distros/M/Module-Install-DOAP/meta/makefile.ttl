@@ -1,0 +1,8 @@
+@prefix : <http://purl.org/NET/cpan-uri/terms#> .
+
+<http://purl.org/NET/cpan-uri/dist/Module-Install-DOAP/project>
+	:perl_version_from _:main ;
+	:version_from _:main ;
+	:readme_from _:main .
+
+_:main <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName> "lib/Module/Install/DOAP.pm" .

@@ -1,0 +1,94 @@
+2.2.2 - 2012-12-09
+  - fix JSON serializer to work with random has seeds introduced in perl 5.17.6
+
+2.2.1 - 2012-04-18
+  - fixed test on perl < 5.14
+
+2.2.0 - 2012-04-17
+  - better error reports on failed deflation/inflation
+
+2.1.11-TRIAL - 2012-02-22
+  - use JSON instead of JSON::XS directly
+
+2.1.10-TRIAL - 2012-02-21
+  - improve ::Registry code, find_deflator returns inlined deflators if it exists
+  - call deflators with the type constraint it is defined for,
+    i.e. given a deflator that is defined for HashRef[] and a TC MyType that is
+    defined as 'MyType, as HashRef[Str]', the deflator as passed the HashRef[Str]
+    constraint instead of MyType. This simplifies the deflator code because you
+    don't have to call ->parent on the type constraint until it is of the expected
+    type. See the diff for ::Moose and ::Structured.
+  - ::Moose now comes with a deflator and inflator for Bool types.
+  - $attr->is_inflated is now inlined for better performance
+  - renamed inline {} to inline_as {}
+
+2.1.9-TRIAL - 2012-01-20
+  - inline deflators and inflators
+    huge performance improvement
+
+2.1.8 - 2011-11-30
+  - fixed structured.t to work with latest moose
+
+2.1.7 - 2011-07-28
+  - performance improvement by removing redundant call to is_inflated (thanks timbunce)
+
+2.1.6 - 2011-06-20
+  - readded support for Moose 1.25
+  - added support for Moose 2.02 (doy)
+
+2.1.5 - 2011-06-08
+  - fixed is_inflated() returning false results when called
+    while the object is being created
+
+2.1.4 - 2011-04-12
+  - better diagnostics when inflation/deflation fails
+  - fixed bug where coercion didn't happen with Moose > 1.99
+
+2.1.2 - 2011-04-11
+  - added JSON prereq
+
+2.1.1 - 2011-04-05
+  - fixed role composition (doy)
+  - fixed bogus prereqs
+
+2.1.0 - 2011-03-17
+  - Deflating/Inflating attributes can now be defined in roles
+    and composed in a class that doesn't use LazyDeflator
+    directly.
+
+2.0.1 - 2011-03-17
+  - deflate/inflate return now the value of the attribute
+    even if no deflator/inflator could be found
+  - has_deflator/inflator now work correctly with typed constraints
+
+2.0.0
+  - Moose 2.0 compliant
+  - Moose 1.24 compliant (thanks doy)
+  - Made mutable classes behavior consistent with immutable
+  - Some speed improvement using inlining of code
+  - Allow attributes without type constraints
+
+1.130002 - 2011-02-13
+  - has_deflator/inflator return undef if there is no
+    type constraint
+
+1.130000 - 2010-10-10
+  - Fixed compat with Moose 1.15
+
+1.120001 - 2010-08-28
+  - Speed up inflation
+
+1.120000 - 2010-08-28
+  - Coerce and LazyInflator work as expected
+
+1.101670 - 2010-06-16
+  - Added is_inflated attribute meta class method
+  - Mark attributes as being inflated on construction
+    if they pass the type constraint
+
+1.101640 - 2010-06-13
+  - Added LazyInflator and test
+  - Refactored inflate/deflate and Registry for speed
+
+1.100990 - 2010-04-09
+  - Initial release

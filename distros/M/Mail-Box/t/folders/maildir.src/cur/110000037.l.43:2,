@@ -1,0 +1,80 @@
+Received: from ns.ATComputing.nl (ns.ATComputing.nl [195.108.229.25])
+	by atcmpg.ATComputing.nl (8.9.0/8.9.0) with ESMTP id SAA27465
+	for <markov@ATComputing.nl>; Mon, 24 Jul 2000 18:24:10 +0200 (MET DST)
+Received: (from nobody@localhost)
+	by ns.ATComputing.nl (8.8.8/8.8.8) id SAA20827
+	for <markov@ATComputing.nl>; Mon, 24 Jul 2000 18:24:09 +0200
+Received: from viper.oldcity.dca.net(216.158.38.4) by ns.ATComputing.nl via smap (V2.1)
+	id xma020823; Mon, 24 Jul 00 18:23:51 +0200
+Received: from unca-don.wizards.dupont.com ([204.183.81.133])
+	by viper.oldcity.dca.net (8.9.3/8.9.3/DCANET) with ESMTP id MAA20883;
+	Mon, 24 Jul 2000 12:23:50 -0400
+Received: (from majordomo@localhost)
+	by unca-don.wizards.dupont.com (8.9.3/8.9.3) id MAA01738
+	for magick-outgoing; Mon, 24 Jul 2000 12:07:32 -0400 (EDT)
+X-Authentication-Warning: unca-don.wizards.dupont.com: majordomo set sender to owner-magick@wizards.dupont.com using -f
+Message-ID: <397C6C6B.989E4BB2@catchword.com>
+Date: Mon, 24 Jul 2000 17:18:51 +0100
+From: Chris Wareham <chris.wareham@catchword.com>
+X-Mailer: Mozilla 4.73 [en] (X11; U; Linux 2.2.17pre13 i686)
+X-Accept-Language: en
+MIME-Version: 1.0
+To: magick@wizards.dupont.com
+Subject: core dump in simple ImageMagick example
+Content-Transfer-Encoding: 7bit
+Sender: owner-magick@wizards.dupont.com
+Precedence: bulk
+Reply-To: Chris Wareham <chris.wareham@catchword.com>
+Content-Type: text/plain; charset=us-ascii
+Status: RO
+X-Status: A
+Content-Length: 1736
+Lines: 47
+
+***********************************************************************
+This list is being decommissioned.  Please join one or more of the new
+ImageMagick mailing lists as described at
+http://www.imagemagick.org/www/magick-list.html.
+***********************************************************************
+
+The following snippet of code coew dumps on ReadImage():
+
+ GetExceptionInfo(&exception);
+ image_info = CloneImageInfo((ImageInfo *)NULL);
+
+ strcpy(image_info->filename, IMAGEDIR);
+ strcat(image_info->filename, "/");
+ strcat(image_info->filename, filename);
+
+ image = ReadImage(image_info, &exception);
+ if(image == (Image *)NULL) {
+   log_error("unable to read image '%s'", filename);
+   return;
+ }
+
+The debugger output is the following:
+
+ Program received signal SIGSEGV, Segmentation fault.
+ 0x403a0058 in _IO_getc (fp=0x67616d69) at getc.c:39
+ 39     getc.c: No such file or directory.
+ (gdb) bt
+ #0  0x403a0058 in _IO_getc (fp=0x67616d69) at getc.c:39
+ #1  0x4005eb8d in SetImageInfo () from /usr/local/lib/libMagick.so.5
+ #2  0x4003c91e in ReadImage () from /usr/local/lib/libMagick.so.5
+ #3  0x80491dd in process_image (dbm=0x804bea0, filename=0x806a157
+"00132aac.tif") at tif2png.c:107
+ #4  0x8048fd3 in convert_images (args=0xbffff9f4) at tif2png.c:55
+ #5  0x8048e6c in main (argc=1, argv=0xbffff9f4) at tif2png.c:21
+
+image_info->filename points to a valid TIFF image, so
+any ideas as to what gives???
+
+Chris
+
+***********************************************************************
+To remove yourself from this mailing list, send mail to:
+	majordomo@wizards.dupont.com
+
+Include the following command in the body of your message:
+	unsubscribe magick
+***********************************************************************

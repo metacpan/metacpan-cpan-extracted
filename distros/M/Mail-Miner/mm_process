@@ -1,0 +1,3 @@
+use Mail::Miner;
+undef $/; my $foo = <>;
+Mail::Miner::Mail->create($Mail::Miner::parser->parse_data($foo));

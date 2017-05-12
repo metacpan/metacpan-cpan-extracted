@@ -1,0 +1,346 @@
+From foo@bar.com  Tue Mar 25 12:39:56 2003
+Return-Path: <tony@soto.kasei.com>
+Received: from soto.kasei.com (soto.kasei.com [194.202.192.40])
+	by zero.twingle.net (Postfix) with ESMTP id 3841011F2
+	for <tony@twingle.net>; Tue, 21 Jan 2003 15:19:41 +0000 (UTC)
+Received: by soto.kasei.com (Postfix, from userid 1011)
+	id A24F61C173; Tue, 21 Jan 2003 15:17:56 +0000 (GMT)
+Resent-From: tony@soto.kasei.com
+Resent-Date: Tue, 21 Jan 2003 15:17:56 +0000
+Resent-Message-ID: <20030121151756.GD19235@soto.kasei.com>
+Resent-To: tony@twingle.net
+Received: by soto.kasei.com (Postfix, from userid 65534)
+	id 43A1C1C24A; Sat,  3 Aug 2002 04:03:59 +0100 (BST)
+Received: from penderel.state51.co.uk (penderel.state51.co.uk [193.82.57.128])
+	by soto.kasei.com (Postfix) with ESMTP id 021581C0B8
+	for <tony-london@kasei.com>; Sat,  3 Aug 2002 04:03:57 +0100 (BST)
+Received: from localhost ([127.0.0.1] helo=penderel.state51.co.uk)
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 17aozd-0000XB-00; Sat, 03 Aug 2002 03:50:13 +0100
+Received: from mail1.panix.com ([166.84.1.72])
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 17aoz6-0000Wh-00
+	for <london.pm@london.pm.org>; Sat, 03 Aug 2002 03:49:40 +0100
+Received: from panix2.panix.com (panix2.panix.com [166.84.1.2])
+	by mail1.panix.com (Postfix) with ESMTP
+	id DEFCF488E1; Fri,  2 Aug 2002 22:50:21 -0400 (EDT)
+Received: (from ziggy@localhost)
+	by panix2.panix.com (8.11.3nb1/8.8.8/PanixN1.0) id g732oL618629;
+	Fri, 2 Aug 2002 22:50:21 -0400 (EDT)
+From: Adam Turoff <ziggy@panix.com>
+To: london.pm@london.pm.org
+Subject: Re(2): Foo
+Message-ID: <ziggy@2.com>
+References: <chris@1.com>
+Mime-Version: 1.0
+In-Reply-To: <chris@1.com>
+User-Agent: Mutt/1.4i
+Sender: london.pm-admin@london.pm.org
+Errors-To: london.pm-admin@london.pm.org
+X-BeenThere: london.pm@london.pm.org
+X-Mailman-Version: 2.0.12
+Precedence: bulk
+Reply-To: london.pm@london.pm.org
+List-Help: <mailto:london.pm-request@london.pm.org?subject=help>
+List-Post: <mailto:london.pm@london.pm.org>
+List-Subscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=subscribe>
+List-Id: London.pm Perl M[ou]ngers <london.pm.london.pm.org>
+List-Unsubscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=unsubscribe>
+List-Archive: <http://london.pm.org/pipermail/london.pm/>
+X-Original-Date: Fri, 2 Aug 2002 22:50:21 -0400
+Date: Fri, 2 Aug 2002 22:50:21 -0400
+X-Spam-Status: No, hits=-2.3 required=5.0
+	tests=IN_REP_TO,DOUBLE_CAPSWORD
+	version=2.31
+X-Spam-Level: 
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
+Status: RO
+Content-Length: 1154
+Lines: 33
+
+On Fri, Aug 02, 2002 at 09:00:53PM -0400, Chris Devers wrote:
+> Not that Seattle is anywhere near London or anything, but recent
+> discussion asked for examples of Perl being used at big companies,
+> and it was pointed out that Amazon uses it but won't go on the
+> record as doing so.
+> 
+>     Web Developer, Amazon.com, full time salaried employee
+> 
+>     http://jobs.perl.org/job/402
+> 
+> Does this count as going on record now? :)
+
+Larry was in Seattle in the spring of 1998 or so I think.  It was
+where he presented the preliminary version of XML::Parser at an
+XML conference.
+
+On that trip, he was invited to visit Amazon because "the company
+/runs/ on Perl".  IIRC, when he walked into reception and said
+something like "Hi, I'm Larry Wall" and proceeded to get the royal
+treatment.
+
+I think Larry may have mentioned an annecdote or two from this
+trip.  Possibly in a keynote speech or something.  IAC, it's been
+common knowledge for years that Amazon uses a lot of Perl, even if
+they don't blast the trumpets about it.  It's probably been documented
+somewhere, mostly as a footnote or a passing observation.
+
+Ditto Yahoo!.
+
+Z.
+
+PS: Good catch.  
+
+From foo@bar.com  Tue Mar 25 12:39:56 2003
+Return-Path: <tony@soto.kasei.com>
+Received: from soto.kasei.com (soto.kasei.com [194.202.192.40])
+	by zero.twingle.net (Postfix) with ESMTP id C1F5111F1
+	for <tony@twingle.net>; Tue, 21 Jan 2003 15:19:40 +0000 (UTC)
+Received: by soto.kasei.com (Postfix, from userid 1011)
+	id 6E4BF1C16F; Tue, 21 Jan 2003 15:17:56 +0000 (GMT)
+Resent-From: tony@soto.kasei.com
+Resent-Date: Tue, 21 Jan 2003 15:17:56 +0000
+Resent-Message-ID: <20030121151756.GC19235@soto.kasei.com>
+Resent-To: tony@twingle.net
+Received: by soto.kasei.com (Postfix, from userid 65534)
+	id B45071C24A; Sat,  3 Aug 2002 02:09:53 +0100 (BST)
+Received: from penderel.state51.co.uk (penderel.state51.co.uk [193.82.57.128])
+	by soto.kasei.com (Postfix) with ESMTP id C2D991C0B8
+	for <tony-london@kasei.com>; Sat,  3 Aug 2002 02:09:52 +0100 (BST)
+Received: from localhost ([127.0.0.1] helo=penderel.state51.co.uk)
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 17anI5-0008B2-00; Sat, 03 Aug 2002 02:01:09 +0100
+Received: from [12.104.7.254] (helo=braintree.boston.com)
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 17anHn-0008Ah-00
+	for <london.pm@london.pm.org>; Sat, 03 Aug 2002 02:00:51 +0100
+Received: from localhost (braintree.boston.com [127.0.0.1])
+	by braintree.boston.com (8.11.6/8.11.6) with ESMTP id g7310ru08626
+	for <london.pm@london.pm.org>; Fri, 2 Aug 2002 21:00:53 -0400
+From: Chris Devers <cdevers@boston.com>
+To: London Perl Mongers <london.pm@london.pm.org>
+Subject: (1) Foo
+Message-ID: <chris@1.com>
+X-Message-Flag: DO NOT LEAVE IT IS NOT REAL
+MIME-Version: 1.0
+Sender: london.pm-admin@london.pm.org
+Errors-To: london.pm-admin@london.pm.org
+X-BeenThere: london.pm@london.pm.org
+X-Mailman-Version: 2.0.12
+Precedence: bulk
+Reply-To: london.pm@london.pm.org
+X-Reply-To: Chris Devers <cdevers@boston.com>
+List-Help: <mailto:london.pm-request@london.pm.org?subject=help>
+List-Post: <mailto:london.pm@london.pm.org>
+List-Subscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=subscribe>
+List-Id: London.pm Perl M[ou]ngers <london.pm.london.pm.org>
+List-Unsubscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=unsubscribe>
+List-Archive: <http://london.pm.org/pipermail/london.pm/>
+X-Original-Date: Fri, 2 Aug 2002 21:00:53 -0400 (EDT)
+Date: Fri, 2 Aug 2002 21:00:53 -0400 (EDT)
+X-Spam-Status: No, hits=0.0 required=5.0
+	tests=none
+	version=2.31
+X-Spam-Level: 
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
+Status: RO
+Content-Length: 375
+Lines: 18
+
+Not that Seattle is anywhere near London or anything, but recent
+discussion asked for examples of Perl being used at big companies,
+and it was pointed out that Amazon uses it but won't go on the
+record as doing so.
+
+
+    Web Developer, Amazon.com, full time salaried employee
+
+    http://jobs.perl.org/job/402
+
+
+Does this count as going on record now? :)
+
+
+
+-- 
+Chris Devers
+
+From foo@bar.com  Tue Mar 25 12:39:56 2003
+Return-Path: <tony@soto.kasei.com>
+Received: from soto.kasei.com (soto.kasei.com [194.202.192.40])
+	by zero.twingle.net (Postfix) with ESMTP id 89F1311F4
+	for <tony@twingle.net>; Tue, 21 Jan 2003 15:19:41 +0000 (UTC)
+Received: by soto.kasei.com (Postfix, from userid 1011)
+	id 327401C169; Tue, 21 Jan 2003 15:17:56 +0000 (GMT)
+Resent-From: tony@soto.kasei.com
+Resent-Date: Tue, 21 Jan 2003 15:17:56 +0000
+Resent-Message-ID: <20030121151756.GF19235@soto.kasei.com>
+Resent-To: tony@twingle.net
+Received: by soto.kasei.com (Postfix, from userid 65534)
+	id A047A1C24A; Sat,  3 Aug 2002 11:27:35 +0100 (BST)
+Received: from penderel.state51.co.uk (penderel.state51.co.uk [193.82.57.128])
+	by soto.kasei.com (Postfix) with ESMTP id AED251C039
+	for <tony-london@kasei.com>; Sat,  3 Aug 2002 11:27:34 +0100 (BST)
+Received: from localhost ([127.0.0.1] helo=penderel.state51.co.uk)
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 17aw5v-0004Aw-00; Sat, 03 Aug 2002 11:25:11 +0100
+Received: from smtp018.mail.yahoo.com ([216.136.174.115])
+	by penderel.state51.co.uk with smtp (Exim 3.35 #1 (Debian))
+	id 17aw5R-0004AP-00
+	for <london.pm@london.pm.org>; Sat, 03 Aug 2002 11:24:41 +0100
+Received: from public1-reig1-3-cust108.hers.broadband.ntl.com (HELO LTCONSULTING.yahoo.com) (patrickchamberlain@80.0.79.108 with login)
+  by smtp.mail.vip.sc5.yahoo.com with SMTP; 3 Aug 2002 10:25:24 -0000
+Message-Id: <patrick@4.com>
+X-Sender: patrickchamberlain@pop.mail.yahoo.com
+X-Mailer: QUALCOMM Windows Eudora Version 5.1.1
+To: london.pm@london.pm.org
+From: Patrick Chamberlain <patrickchamberlain@yahoo.com>
+Subject: Re(4): Foo
+In-Reply-To: <alex@3.com>
+References: <ziggy@2.com>
+ <chris@1.com>
+ <chris@1.com>
+Mime-Version: 1.0
+Sender: london.pm-admin@london.pm.org
+Errors-To: london.pm-admin@london.pm.org
+X-BeenThere: london.pm@london.pm.org
+X-Mailman-Version: 2.0.12
+Precedence: bulk
+Reply-To: london.pm@london.pm.org
+List-Help: <mailto:london.pm-request@london.pm.org?subject=help>
+List-Post: <mailto:london.pm@london.pm.org>
+List-Subscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=subscribe>
+List-Id: London.pm Perl M[ou]ngers <london.pm.london.pm.org>
+List-Unsubscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=unsubscribe>
+List-Archive: <http://london.pm.org/pipermail/london.pm/>
+X-Original-Date: Sat, 03 Aug 2002 11:23:53 +0100
+Date: Sat, 03 Aug 2002 11:23:53 +0100
+X-Spam-Status: No, hits=0.3 required=5.0
+	tests=IN_REP_TO,NORMAL_HTTP_TO_IP,SUPERLONG_LINE
+	version=2.31
+X-Spam-Level: 
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
+Status: RO
+Content-Length: 990
+Lines: 28
+
+
+http://194.203.155.78/minisites/theregister/jobdetails.asp?JobID=7554224&SiteID=67&IndustryID=1&Keywords=perl+linux&Titles=&Locations=1&JobType1=&JobType2=&JobType3=&JobType4=&JobType5=&JobType6=&JobType7=&JobType8=&JobType9=&JobType10=&RecordCount=2&CompanyID=&MarketID=14&PageNo=1&JobNo=1&Jobs=7554224%2C7554698
+
+mmm ... this sounds like www.assertahome.com (backed by CGNU/Norwich Union) 
+... although I might be wrong
+
+
+At 11:03 03/08/2002, you wrote:
+
+>>IAC, it's been
+>>common knowledge for years that Amazon uses a lot of Perl, even if
+>>they don't blast the trumpets about it.
+>
+>
+>I keep on hearing that if big companies really like a technology (eg perl) 
+>then they often see it as a business advantage to keep it to themselves 
+>so  they don't pass on the info to their competitors :-(
+>
+>Alex
+>
+>
+>
+>
+>Openweb Analysts Ltd, London.
+>Software For Complex Websites http://www.OWAL.co.uk/
+>Open Source Software Companies please register here 
+>http://www.OWAL.co.uk/oss_support/
+
+From foo@bar.com  Tue Mar 25 12:39:56 2003
+Return-Path: <tony@soto.kasei.com>
+Received: from soto.kasei.com (soto.kasei.com [194.202.192.40])
+	by zero.twingle.net (Postfix) with ESMTP id 5842411F3
+	for <tony@twingle.net>; Tue, 21 Jan 2003 15:19:41 +0000 (UTC)
+Received: by soto.kasei.com (Postfix, from userid 1011)
+	id 066151C172; Tue, 21 Jan 2003 15:17:56 +0000 (GMT)
+Resent-From: tony@soto.kasei.com
+Resent-Date: Tue, 21 Jan 2003 15:17:56 +0000
+Resent-Message-ID: <20030121151756.GE19235@soto.kasei.com>
+Resent-To: tony@twingle.net
+Received: by soto.kasei.com (Postfix, from userid 65534)
+	id 1FD041C24A; Sat,  3 Aug 2002 11:08:01 +0100 (BST)
+Received: from penderel.state51.co.uk (penderel.state51.co.uk [193.82.57.128])
+	by soto.kasei.com (Postfix) with ESMTP id 248421C039
+	for <tony-london@kasei.com>; Sat,  3 Aug 2002 11:07:59 +0100 (BST)
+Received: from localhost ([127.0.0.1] helo=penderel.state51.co.uk)
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 17avma-000411-00; Sat, 03 Aug 2002 11:05:12 +0100
+Received: from mta02-svc.ntlworld.com ([62.253.162.42])
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 17avmF-00040P-00
+	for <london.pm@london.pm.org>; Sat, 03 Aug 2002 11:04:51 +0100
+Received: from asimov.OWAL.co.uk ([80.1.127.26]) by mta02-svc.ntlworld.com
+          (InterMail vM.4.01.03.27 201-229-121-127-20010626) with ESMTP
+          id <20020803100535.UYBD290.mta02-svc.ntlworld.com@asimov.OWAL.co.uk>
+          for <london.pm@london.pm.org>; Sat, 3 Aug 2002 11:05:35 +0100
+Message-Id: <alex@3.com>
+X-Sender: 
+X-Mailer: QUALCOMM Windows Eudora Version 5.1
+To: london.pm@london.pm.org
+From: Alex McLintock <alex@OWAL.co.uk>
+Subject: Re(3): Foo
+In-Reply-To: <ziggy@2.com>
+References: <chris@1.com>
+ <chris@1.com>
+Mime-Version: 1.0
+Sender: london.pm-admin@london.pm.org
+Errors-To: london.pm-admin@london.pm.org
+X-BeenThere: london.pm@london.pm.org
+X-Mailman-Version: 2.0.12
+Precedence: bulk
+Reply-To: london.pm@london.pm.org
+List-Help: <mailto:london.pm-request@london.pm.org?subject=help>
+List-Post: <mailto:london.pm@london.pm.org>
+List-Subscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=subscribe>
+List-Id: London.pm Perl M[ou]ngers <london.pm.london.pm.org>
+List-Unsubscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=unsubscribe>
+List-Archive: <http://london.pm.org/pipermail/london.pm/>
+X-Original-Date: Sat, 03 Aug 2002 11:03:25 +0100
+Date: Sat, 03 Aug 2002 11:03:25 +0100
+X-Spam-Status: No, hits=-3.4 required=5.0
+	tests=IN_REP_TO
+	version=2.31
+X-Spam-Level: 
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
+Status: RO
+Content-Length: 515
+Lines: 20
+
+
+>IAC, it's been
+>common knowledge for years that Amazon uses a lot of Perl, even if
+>they don't blast the trumpets about it.
+
+
+I keep on hearing that if big companies really like a technology (eg perl) 
+then they often see it as a business advantage to keep it to themselves 
+so  they don't pass on the info to their competitors :-(
+
+Alex
+
+
+
+
+Openweb Analysts Ltd, London.
+Software For Complex Websites http://www.OWAL.co.uk/
+Open Source Software Companies please register here 
+http://www.OWAL.co.uk/oss_support/
+

@@ -1,0 +1,24 @@
+Revision history for MIME-BodyMunger
+
+0.006     2013-09-28 21:54:09 America/New_York
+          update repo and bugtracker links
+
+0.005     2013-06-18 17:41:32 America/New_York
+          add a test for non-rewriting of non-text messages
+
+          repackage
+
+0.004     2008-06-03
+          matching with qr/^foo$/m failed under 5.8, but not 5.10; huh?
+          removed the $ and it works
+
+0.003     2008-06-03
+          actually recurse into nested multipart messages
+          sheesh!
+
+0.002     2008-06-01
+          hack around Encode.pm to declare that charset=macintosh is MacRoman
+          rewrite unknown charsets without transcoding
+
+0.001     2008-05-12
+          first release

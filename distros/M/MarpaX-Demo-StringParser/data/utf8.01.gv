@@ -1,0 +1,9 @@
+digraph Perl
+{
+graph [ rankdir="TB" ]
+node [ shape="oval" ]
+edge [ color="grey" ]
+"From" [ color="green" label="Reichwaldstraße" ]
+"To" [ color="blue" label="Δ Lady" ]
+"From" -> "To" [ color="red" label="Πηληϊάδεω Ἀχιλῆος" ]
+}

@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         MDV-Repsys
+version:      1.00
+version_from: lib/MDV/Repsys.pm
+installdirs:  site
+requires:
+    Config::IniFiles:              
+    Date::Format:                  
+    Date::Parse:                   
+    File::Tempdir:                 
+    RPM4:                          
+    SVN::Client:                   
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

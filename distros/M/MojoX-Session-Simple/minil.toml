@@ -1,0 +1,6 @@
+name = "MojoX-Session-Simple"
+badges = ["travis"]
+authority="cpan:YOWCOW"
+
+module_maker="ModuleBuildTiny"
+

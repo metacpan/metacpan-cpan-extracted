@@ -1,0 +1,14 @@
+Revision history for Module::Reload::Selective
+
+1.02 2002-05-07
+
+	- Fixed build shortcoming.
+
+1.01 2002-05-05
+
+	- Upgraded build system.
+
+1.00 2002-03-22
+
+	- First public release.  Previously discussed and used as
+      Devel::Reloader but not previously released to public.

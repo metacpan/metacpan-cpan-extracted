@@ -1,0 +1,369 @@
+<maplat>
+	<!-- displayed Application name -->
+	<appname>Maplat WebGui</appname>
+	
+	<server>
+		<port>443</port>
+		
+		<!-- do we want a forking server?
+			 This feature is still in beta, but it's
+			 much better whenever a client would otherwise
+			 block the server
+		-->
+		<forking>1</forking>
+
+		<usessl>1</usessl>
+		<sslcert>ssl/server.cert</sslcert>
+		<sslkey>ssl/server.key</sslkey>
+	</server>
+
+	<!-- Template module -->
+	<module>
+		<modname>templates</modname>
+		<pm>TemplateCache</pm>
+		<options>
+			<path>Maplat/Web/Templates</path>
+			<!-- Layout-Template to use for complete pages -->
+			<layout>maplatlayout</layout>
+		</options>
+	</module>
+
+	<!-- images and static files -->
+	<module>
+		<modname>images</modname>
+		<pm>StaticCache</pm>
+		<options>
+			<path>Maplat/Web/Images</path>
+			<webpath>/pics/</webpath>
+			<cache_control>max-age=3600, must-revalidate</cache_control>
+			<expires>+1h</expires>
+		</options>
+	</module>
+	<module>
+		<modname>static</modname>
+		<pm>StaticCache</pm>
+		<options>
+			<path>Maplat/Web/Static</path>
+			<webpath>/static/</webpath>
+			<cache_control>max-age=3600, must-revalidate</cache_control>
+			<expires>+1h</expires>
+		</options>
+	</module>
+
+	<!-- Some default values for masks -->
+	<module>
+		<modname>defaultwebdata</modname>
+		<pm>StandardFields</pm>
+		<options>
+			<memcache>memcache</memcache>
+			<static>
+				<fields>
+					<toplink_width>140px</toplink_width>
+					
+					<!-- per host configuration -->
+					<hosts>
+						<W23is005a>
+							<!-- Display an info message when needed -->
+							<!--<header_message>Wartungsarbeiten - Es kann zu kurzen Ausfaellen kommen</header_message>-->
+						</W23is005a>
+						<WXPDEV>
+							<!-- Display an info message when needed -->
+							<header_message>Testsystem</header_message>
+						</WXPDEV>
+					</hosts>
+				</fields>
+			</static>
+			<memory>
+				<fields>
+					<WebGuiVersion>VERSION::Maplat WebGui</WebGuiVersion>
+					<WebGuiBuildNum>BUILD::Maplat WebGui</WebGuiBuildNum>
+					<WorkerVersion>VERSION::Maplat Worker</WorkerVersion>
+					<WorkerBuildNum>BUILD::Maplat Worker</WorkerBuildNum>
+					<AdmWorkerVersion>VERSION::MaplatAdm Worker</AdmWorkerVersion>
+					<AdmWorkerBuildNum>BUILD::MaplatAdm Worker</AdmWorkerBuildNum>
+				</fields>
+			</memory>
+		</options>
+	</module>
+
+	<!-- Database module (no webinterface itself at the moment) -->
+	<module>
+		<modname>maindb</modname>
+		<pm>PostgresDB</pm>
+		<options>
+			<dburl>dbi:Pg:dbname=MAPLAT_DB</dburl>
+			<dbuser>MAPLAT_Server</dbuser>
+			<dbpassword>MAPLAT</dbpassword>
+		</options>
+	</module>
+
+	<!-- Memcache module (just handles the memcache instance variable) -->
+	<module>
+		<modname>memcache</modname>
+		<pm>MemCache</pm>
+		<options>
+			<service>127.0.0.1:11211</service>
+			<namespace>MaplatMem</namespace>
+			<viewcommands>
+				<view>Maplat WebGui</view>
+				<view>Maplat Worker</view>
+				<view>MaplatAdm Worker</view>
+			</viewcommands>
+		</options>
+	</module>
+
+
+	<!-- Settings module: Save, retrieve and delete user setting to/from database -
+		Caching is implemented with the memcache module
+		
+		This module is primarily a variant/wrapper of Storable for the RBS database
+	-->
+	<module>
+		<modname>usersettings</modname>
+		<pm>UserSettings</pm>
+		<options>
+			<db>maindb</db>
+            <memcache>memcache</memcache>
+		</options>
+	</module>
+	
+	<!-- Mail module -->
+	<module>
+		<modname>sendmail</modname>
+		<pm>SendMail</pm>
+		<options>
+			<pagetitle>Sendmail</pagetitle>
+			<webpath>/admin/sendmail</webpath>
+			<mailserver>mail</mailserver>
+			<mailport>25</mailport>
+			<mailer_id>Maplat Notification System</mailer_id>
+			<sender>noreply@example.com</sender>
+			<subject_prefix>[Maplat]</subject_prefix>
+			<db>maindb</db>
+		</options>
+	</module>
+	
+	<!-- Login module -->
+	<module>
+		<modname>authentification</modname>
+		<pm>Login</pm>
+		<options>
+			<db>maindb</db>
+			<memcache>memcache</memcache>
+			<sendmail>sendmail</sendmail>
+			<expires>+1h</expires>
+			
+			<!-- Setting this flag to 1 enables the login module to
+				re-create the "admin" user if the table row does not
+				exist in the database - normally disabled because it
+				*might* be a security risk under certain circumstances -->
+			<check_admin_user>1</check_admin_user>
+		
+			<userlevels admin="is_admin">
+				<!-- Highest to lowest, first applicable will be used
+					as the users default view -->
+				<userlevel display="HelloWorld" db="has_world" defaultview="Hello" path="/helloworld/" />
+				<userlevel display="Admin" db="is_admin" defaultview="Admin" path="/admin/" />
+				<userlevel display="Dev Test" db="has_devtest" defaultview="Dev: Docs" path="/devtest/" />
+			</userlevels>
+		
+			<login>
+				<webpath>/user/login</webpath>
+				<pagetitle>Login</pagetitle>
+			</login>
+			<logout>
+				<webpath>/user/logout</webpath>
+				<pagetitle>Logout</pagetitle>
+			</logout>
+			<pwchange>
+				<webpath>/user/pwchange</webpath>
+				<pagetitle>Change Password</pagetitle>
+			</pwchange>
+			<useredit>
+				<webpath>/admin/useredit</webpath>
+				<pagetitle>Users</pagetitle>
+			</useredit>
+			<sessionrefresh>
+				<webpath>/user/sessionrefresh</webpath>
+				<pagetitle>Sessionrefresh</pagetitle>
+			</sessionrefresh>			
+			<viewselect>
+				<webpath>/user/viewselect</webpath>
+				<pagetitle>Changing view</pagetitle>
+				<views>
+					<view display="Hello" logodisplay="hello" path="/helloworld/"
+						  db="has_world" startpage="Hello World">
+						<menu display="Hello World" path="hello/" admin="0" />
+					</view>
+					<view display="Admin" logodisplay="admin" path="/admin/"
+						  db="is_admin" startpage="DirCleaner" class="admin">
+						<menu display="DirCleaner" path="dircleaner/" admin="1" />
+						<menu display="Sendmail" path="sendmail/" admin="1" />
+						<menu display="Variables" path="variablesadm/" admin="1" />
+						<menu display="Users" path="authentification/useredit" admin="1" />
+					</view>
+					<view display="Dev: Docs" logodisplay="devtest" path="/devtest/"
+						  db="has_devtest" startpage="Text" class="devel">
+						<menu display="Text" path="docswordprocessor/list" admin="0" />
+						<menu display="Table" path="docsspreadsheet/list" admin="0" />
+						<menu display="Search" path="docssearch/" admin="1" />
+					</view>
+				</views>
+			</viewselect>
+		</options>
+	</module>
+
+	<!-- Settings module: Save, retrieve and delete session setting to/from memcache -
+		This module is primarily a variant/wrapper of Storable for the RBS database
+	-->
+	<module>
+		<modname>sessionsettings</modname>
+		<pm>SessionSettings</pm>
+		<options>
+            <memcache>memcache</memcache>
+			<login>authentification</login>
+		</options>
+	</module>
+
+	<!-- Dynamic logo cache
+		Needs to be loaded AFTER the authentification module
+		because it depends on the "views" functionality
+		of the user managment (to be exact, on the
+		prefilter/get_defaultwebdata functions of that module)
+	-->
+	<module>
+		<modname>logo</modname>
+		<pm>LogoCache</pm>
+		<options>
+			<imgpath>Maplat/Web/Logo/Images</imgpath>
+			<layoutpath>Maplat/Web/Logo/Layout</layoutpath>
+			<imgwebpath>/logo/pics/</imgwebpath>
+			<webpath>/user/special</webpath>
+			<pagetitle>LogoDay</pagetitle>
+			<cache_control>max-age=3600, must-revalidate</cache_control>
+			<expires>+1h</expires>
+
+			<!-- The <today> tag forces the module to assume the given date as
+				the basis for displaying the "Logo of the day" -->
+			<!--<today>20090918</today>-->
+			
+			<views>
+				<view logodisplay="hello" />
+				<view logodisplay="admin" />
+				<view logodisplay="devtest" />
+				<view logodisplay="logout" />
+			</views>
+		</options>
+	</module>
+
+	<!-- ************ local module example *******************-->
+	<module>
+		<modname>hello</modname>
+		<pm>HelloWorld</pm>
+		<options>
+		    <webpath>/helloworld/example</webpath>
+		    <pagetitle>Hello World</pagetitle>
+		</options>
+	</module>
+
+
+    <!-- ************ Admin *******************-->
+
+	<module>
+		<modname>dircleaner</modname>
+		<pm>DirCleaner</pm>
+		<options>
+			<pagetitle>DirCleaner</pagetitle>
+			<webpath>/admin/dircleaner</webpath>
+			<memcache>memcache</memcache>
+		</options>
+	</module>
+
+	<module>
+		<modname>variablesadm</modname>
+		<pm>VariablesADM</pm>
+		<options>
+			<pagetitle>Variables</pagetitle>
+			<webpath>/admin/variables</webpath>
+			<memcache>memcache</memcache>
+		</options>
+	</module>
+
+	<!-- ************ DevTest: Development Test modules *******************-->
+	<module>
+		<modname>docswordprocessor</modname>
+		<pm>DocsWordProcessor</pm>
+		<options>
+			<list>
+				<pagetitle>WordProcessor</pagetitle>
+				<webpath>/devtest/word/list</webpath>
+			</list>
+			<open>
+				<pagetitle>WordProcessor</pagetitle>
+				<webpath>/devtest/word/open</webpath>
+			</open>
+			<db>maindb</db>
+			<memcache>memcache</memcache>
+            <session>sessionsettings</session>
+		</options>
+	</module>
+
+	<module>
+		<modname>docsspreadsheet</modname>
+		<pm>DocsSpreadSheet</pm>
+		<options>
+			<list>
+				<pagetitle>SpreadSheet</pagetitle>
+				<webpath>/devtest/spread/list</webpath>
+			</list>
+			<ajaxget>/dev/word/get</ajaxget>
+			<ajaxpost>/dev/word/post</ajaxpost>
+			<db>maindb</db>
+			<memcache>memcache</memcache>
+            <session>sessionsettings</session>
+		</options>
+	</module>
+
+	<module>
+		<modname>docssearch</modname>
+		<pm>DocsSearch</pm>
+		<options>
+            <pagetitle>Search</pagetitle>
+            <webpath>/devtest/search</webpath>
+			<db>maindb</db>
+			<memcache>memcache</memcache>
+            <session>sessionsettings</session>
+		</options>
+	</module>
+
+
+	<!-- Last Pre-Filter module: Set some default redirections -->
+	<module>
+		<modname>pathcorrection</modname>
+		<pm>PathRedirection</pm>
+		<options>
+			<redirect>
+				<source>/</source>
+				<destination>/helloworld/example</destination>
+				<statuscode>307</statuscode>
+				<statustext>Please use the helloworld module</statustext>
+			</redirect>
+		</options>
+	</module>
+
+	<!--
+		Workarounds (filters) for different browsers,
+		currently fixes problems with Firefox and return code 307
+	-->
+	
+	<module>
+		<modname>workarounds</modname>
+		<pm>BrowserWorkarounds</pm>
+		<options>
+			<pagetitle>Workarounds</pagetitle>
+		</options>
+	</module>
+
+</maplat>	
+	
+

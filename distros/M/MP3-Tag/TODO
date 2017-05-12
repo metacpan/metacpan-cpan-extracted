@@ -1,0 +1,54 @@
+MP3::Tag.pm
+===========
+
+* perhaps restructuring of this wrapper module, as it 
+  should be easier to say which Tag::modules should be used
+
+  Arguments in handlers
+
+  Direct handlers through __handler_read, __handler_write().  (To avoid security risks, writing-when-read-is-assumed etc.)
+  	Possibly needed on ID3v1/ID3v2 only (others cannot write yet).
+  Take into account that title() etc take arguments (write!).
+  	Be draconian when rejecting method calls; allow slack via config.
+  Allow Packages=*, pass through config.
+  Allow passing through field().
+
+* more testing
+
+MP3::Tag::ID3v1.pm
+==================
+
+* more testing
+
+
+
+MP3::Tag::ID3v2.pm
+==================
+
+* Encryption of frames (read and write)
+
+* Only first tag in front of file is read, tags inside mp3-data are ignored
+
+* Following frames are only supported in RAW mode:
+  - EQUA -> Equalization
+  - ETCO -> Event timing codes
+  - MLLT -> MPEG location lookup table
+  - POSS -> Position synchronisation frame
+  - SYLT -> Synchronized tempo codes
+  - RVAD -> Relative volume adjustment
+
+* more testing
+
+* reading of frames is very strict following rules of ID3v2 definition, but
+  a lot of programs seem to do this not, so some frames are not read right
+  (eg TMED of contains 'DIG, MD' instead of '(DIG/MD)', but only
+  '(DIG/MD)' is returned correctly as 'Other Digital Media, MiniDisc'
+  'DIG, MD' is returned as 'DIG, MD'
+
+* frames like TMED who have to be specially encoded, are doing this only
+  when the frame is read, not when it is written 
+
+* Support for v2.4 output (is input fully supported now?)
+
+* http://gabriel.mp3-tech.org/mp3infotag.html
+  http://web.archive.org/web/20010827032505/privatewww.essex.ac.uk/~djmrob/replaygain/rg_data_format.html

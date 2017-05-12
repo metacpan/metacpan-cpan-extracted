@@ -1,0 +1,15 @@
+Changes
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/libmogilefs-plugin-randomwrites-perl.docs
+debian/rules
+debian/watch
+lib/MogileFS/Plugin/RandomWrites.pm
+Makefile.PL
+MANIFEST			This list of files
+MogileFS-Plugin-RandomWrites-0.01.tar.gz
+README.md
+t/MogileFS-Plugin-RandomWrites.t
+META.yml                                 Module meta-data (added by MakeMaker)

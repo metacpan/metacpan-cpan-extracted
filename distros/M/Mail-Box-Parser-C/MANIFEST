@@ -1,0 +1,11 @@
+C.xs
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Mail/Box/Parser/C.pm
+lib/Mail/Box/Parser/C.pod
+t/01use.t
+META.json                                Module JSON meta-data (added by MakeMaker)

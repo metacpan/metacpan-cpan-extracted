@@ -1,0 +1,20 @@
+Revision history for Perl extension Mac::CoreMIDI.
+
+0.04  2005-06-06
+    - Added POD tests, updated POD
+
+0.03  2004-10-26
+    - Added parent functions for Entity and Endpoint
+    - Added Client and Port classes
+    - Added Update-callback
+    - Fixed bug in GetSources and GetDestinations
+    - Fixed bug in GetStringProperty
+    - Improved dump.pl
+
+0.02  2004-10-26
+    - Added GetParent methods
+    - Added FindObject
+    - Some documentation fixes
+
+0.01  2004-10-25
+    - Initial release

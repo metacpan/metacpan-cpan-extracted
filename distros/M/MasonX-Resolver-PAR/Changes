@@ -1,0 +1,15 @@
+Revision history for Perl extension MasonX::Resolver::PAR.
+
+0.01  Mon Feb  3 11:43:13 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n MasonX::Resolver::PAR
+0.1   Tue Feb 25 12:18:00 2003
+	- First public release. Seems to work, lacks tests.
+0.2   Thu Feb 27 12:27:00 2003
+	- Added more documentation
+	- Changed static files to be a parameter to PAR.pm
+	- Added MasonX::Component::ParBased
+	- Updated to use it instead of ::FileBased
+	- Updated source tree into lib/
+	- Added some basic tests
+

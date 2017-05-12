@@ -1,0 +1,86 @@
+Revision history for MooseX-UndefTolerant
+
+0.21      2016-10-23 01:05:18Z
+   * avoid failing tests when upstream modules warn
+
+0.20      2015-08-16 02:45:25Z
+   * repository migrated to the github moose organization
+
+0.19      2012-09-26 00:16:40Z
+   * fix incorrect version dependency on Test::NoWarnings
+
+0.18      2012-09-23 20:35:06Z
+   * avoid undef warning by not attempting to manipulate constructor data for
+     init_arg => undef attributes (thanks Damon Tkoch for the report!)
+
+0.17      2012-05-03 21:43:42Z
+    * re-release to fix dependency issue *again*! :)
+
+0.16      2012-05-02 22:13:01Z
+    * remove temporary dep, and increase the required version of
+      Dist::Zilla::Plugin::Test::CheckDeps, that now injects this dependency
+      automatically
+
+0.15      2012-05-02 19:56:59Z
+    * temporarily add missing dep on Test::CheckDeps
+
+0.14      2012-05-02 16:23:54Z
+    * re-release of 0.13 to fix a PAUSE indexing issue.
+
+0.13    2012-03-25
+    * unit test improvements - tighter TODO scopes, better diagnostics on
+      failure, Test::Moose for cleaner logic
+    * fix documentation referencing Moose changes that are still TBD
+    * undef attr values being stripped at construction time are now removed
+      from visibility of all attr initializations, not just the one being
+      updated at the time
+    * fixed case where an attribute on an immutable class was being stripped
+      of its undef value at construction time even if its type constraint
+      already can tolerate undef.
+
+0.12    2011-04-03
+    * This module can now be used in roles with Moose 1.9900+. (Jesse Luehrs)
+
+0.11    2011-03-19
+    * re-release to fix careless syntax error (whoops!) :)
+
+0.10    2011-03-18
+    * No longer apply UndefTolerant behaviour to attributes with a type
+      constraint that handles undef (or those with no type constraint at all).
+      (Karen Etheridge)
+
+0.09    2011-03-02
+    * Add missing test prereq on Test::Fatal. (Dave Rolsky)
+
+0.08    2011-02-27
+    * Additional (TODO) unit tests for immutable classes, and documentation
+      notes about these limitations. (Karen Etheridge)
+
+    * Added forward compatibility with Moose 1.9900+, but this module still
+      works with older Moose too. (Dave Rolsky)
+
+0.07    2010-10-21
+    * Don't do extra work by exists-ing before defined-ing (Chip Salzenberg)
+
+0.06    2010-10-11
+    * Add support for immutable classes (Chris Andrews)
+    * Be more careful avoiding warnings when the init_arg is undef (Chris Andrews)
+    * POD fixups
+
+0.05    2010-07-19
+    * Avoid warnings from Moose 1.09. (Dave Rolsky)
+
+0.04    2010-01-23
+    * Rather than skipping initialization all together, just pop off the undef
+      and let the init happen normally.  This makes default values work
+      properly. (Test provided by (and thanks to) Tom Heady)
+
+0.03    2009-12-03
+    * Fiddle with dependencies.
+
+0.02    2009-12-02
+    * Actually check the value properly, therefore setting it properly
+
+0.01    2009-12-01
+        First version, released on an unsuspecting world.
+

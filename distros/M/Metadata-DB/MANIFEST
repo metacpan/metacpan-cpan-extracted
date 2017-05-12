@@ -1,0 +1,19 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/Metadata/DB.pm
+lib/Metadata/DB/Base.pm
+t/00_regenerate_test-db_datafile.pl
+t/01_oo.t
+t/01_p_drop.t
+t/02.t
+t/14_record_entries_hashref.pl
+t/15_record_entries_hashref_method2.pl
+t/16_record_entries_hashref_method3.pl
+t/18_record_by_lookup.t
+t/20_autoid.t
+t/21_autoid_newdbaltogether.t
+t/99_cleanup_after_tests.pl
+t/dames.db
+t/testlib.pl
+META.yml                                 Module meta-data (added by MakeMaker)

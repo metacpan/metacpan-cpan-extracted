@@ -1,0 +1,7 @@
+Run the following to update the copy of the MIME database
+before distributing a new version:
+
+    lwp-mirror https://cgit.freedesktop.org/xdg/shared-mime-info/plain/freedesktop.org.xml.in
+
+# nasty, I know
+

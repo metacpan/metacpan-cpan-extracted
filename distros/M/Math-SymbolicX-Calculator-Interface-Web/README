@@ -1,0 +1,79 @@
+NAME
+    Math::SymbolicX::Calculator::Interface::Web - An AJAXy web interface to
+    the calculator
+
+SYNOPSIS
+      # simplest form of usage:
+      use Math::SymbolicX::Calculator::Interface::Web;
+      my $interface = Math::SymbolicX::Calculator::Interface::Web->new();
+      # But you probably want to use
+      # Math::SymbolicX::Calculator::Interface::Web::Server instead!
+
+DESCRIPTION
+    This module implements an AJAX-enabled web interface to the
+    Math::SymbolicX::Calculator.
+
+    This is alpha software!
+
+    You probably want to look at the "symbolic_calculator_web_server" script
+    or the Math::SymbolicX::Calculator::Interface::Web::Server module which
+    come with this distribution instead!
+
+METHODS
+  new
+    Returns a new web interface object.
+
+    Optional parameters: (default in parenthesis)
+
+      calc => a Math::SymbolicX::Calculator object to use
+
+  execute_expression
+    Runs a single expression.
+
+  calc
+    Returns the Calculator object of this Web Interface.
+
+  exit_hook
+    Call this before stopping the web interface. It runs all cleanup actions
+    such as those needed for a possible persistance.
+
+    This method doesn't actually kill your script, but returns after doing
+    the cleanup.
+
+  error
+    Used to issue a warning to the user. First argument must be an error
+    message to display. This is currently ignored for the web interface.
+    Investigating methods to pass this to the client in a reliable fashion.
+
+  _parse_command
+    Parses generic commands such as exit and print.
+
+    This might change. (Name and implementation)
+
+    First argument: Expression to parse.
+
+  _generic_out
+    Generic output routine: Print Formulas and messages alike
+
+    Subject to change and refactoring.
+
+SEE ALSO
+    Math::SymbolicX::Calculator::Interface::Web::Server
+
+    CGI::Ajax, HTTP::Server::Simple::CGI
+
+    Math::SymbolicX::Calculator,
+    Math::SymbolicX::Calculator::Interface::Shell
+
+    Math::Symbolic, Math::Symbolic::Custom::Transformation
+
+AUTHOR
+    Steffen Müller, <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2007 by Steffen Müller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.6 or, at your
+    option, any later version of Perl 5 you may have available.
+

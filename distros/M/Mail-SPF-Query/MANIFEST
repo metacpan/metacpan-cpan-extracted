@@ -1,0 +1,21 @@
+bin/spfd
+bin/spfquery
+CHANGES
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/rules
+debian/watch
+examples/exim-acl
+examples/postfix-policyd-spf
+examples/README
+examples/sendmail-milter
+examples/sendmail-milter-INSTALL.txt
+lib/Mail/SPF/Query.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/00_all.t
+t/test.dat

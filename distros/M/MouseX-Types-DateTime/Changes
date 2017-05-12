@@ -1,0 +1,7 @@
+Revision history for Perl extension MouseX::Types::DateTime
+
+0.02
+        - use Mouse 0.15 and MouseX::Types 0.01
+
+0.01
+        - original version

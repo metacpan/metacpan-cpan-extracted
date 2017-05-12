@@ -1,0 +1,45 @@
+---
+abstract: 'declare type constraints and coercions inline with coderefs'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+  - unknown
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.96'
+  Test::Requires: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-InlineTypes
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  MooseX::InlineTypes:
+    file: lib/MooseX/InlineTypes.pm
+    version: '0.003'
+  MooseX::InlineTypes::Trait::Attribute:
+    file: lib/MooseX/InlineTypes.pm
+requires:
+  Exporter::Tiny: '0.030'
+  Moose: '2.00'
+  MooseX::ErsatzMethod: '0'
+  Type::Tiny: '1.000000'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/MooseX-InlineTypes/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=MooseX-InlineTypes
+  homepage: https://metacpan.org/release/MooseX-InlineTypes
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-moosex-inlinetypes.git
+version: '0.003'

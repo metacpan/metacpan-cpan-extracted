@@ -1,0 +1,9 @@
+package MongoDBTest;
+
+use strict;
+use warnings;
+
+use Exporter 'import';
+
+our @EXPORT_OK = ( '$conn' );
+

@@ -1,0 +1,16 @@
+Revision history for Mojolicious::Plugin::INIConfig::Extended
+
+v0.02 Sat Feb 13 20:19:26 2016 -0500
+
+    * 6bfc16e (HEAD, tag: v0.02, origin/master, origin/HEAD, master) expose default.config_files key as part of $cfg
+
+v0.01 Fri Jul 3 14:07:49 2015 -0400
+
+    * e1f23c0 (tag: v0.01) update README, perldoc to correct documentation bug
+    * cab8815 update perldoc, README to reflect current state
+    * 7feb78c adds test suite from ::INIConfig::Extended
+    * eee3b61 add cpanfile, .gitignore local/
+    * 3309210 initial commit, INIConfig::Extended
+    * 90bbfe4 start to flesh out README
+    * eec5693 Initial commit
+

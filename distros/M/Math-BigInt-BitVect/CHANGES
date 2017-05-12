@@ -1,0 +1,140 @@
+2017-01-11 v1.13 pjacklam
+
+ * Reorder entries in CHANGES so newest entries are at the top.
+
+ * Sync test files with Math-BigInt-1.999808.
+
+ * Numerous bug fixes and speed improvements.
+
+2004-01-05 v1.12 Tels
+
+ * tests from BigInt v1.68 - 4572 tests
+
+ * require Math::BigInt v1.68
+
+ * hang in test 1635 due to _fac() not handling $x == 0 properly
+
+ * _lsft() created non-chunked sizes (thus failures in broot())
+
+ * streamlined code (removed return statements etc)
+
+ * _as_hex() and _as_bin() handle the $x == 0 case properly
+
+ * _pow() handles 0 ** Y properly
+
+ * __reduce() check for Y's size in _gcd() was wrongly checking $x->Size()
+
+ * _check() method checks for non-chunked sizes
+
+2002-09-30 v1.11_01 Tels (never released)
+
+ * require Bit::Vector 6.3
+
+ * removed unused binary GCD algorithmn
+
+ * removed unnecc. tests for $x or $y == 0 since Bit::Vector 6.3 handles these
+
+2002-03-24 v1.11 Tels
+
+ * tests from BigInt v1.60 - 4057 tests
+
+2002-03-24 v1.10 Tels
+
+ * tests from BigInt v1.55 - 3877 tests
+
+2002-02-21 v1.09 Tels
+
+ * tests from BigInt v1.51
+
+ * replaced _core_lib() by config()->{lib}
+
+2002-02-19 v1.08 Tels
+
+ * added _fac() for factorial speed improvements
+
+ * streamlined some functions (removed return)
+
+ * _mul() does no longer create a result of max($m,$n)*2, but a $m+$n+2 bits
+   Quite some performance gains when $m much is greater/smaller than $n.
+   The improvement for small numbers is due to the saved call to max()
+
+        Sat Feb 16 19:12:04 2002 Numbers are relative to v1.50_BitVect_v1.07,
+                                 100 denotes 100%.
+
+                            |    v1.50
+                            |  BitVect
+                            |    v1.08
+         -------------------+----------
+          1 * 1             |      105
+          2 * 2             |      103
+          12 * 12           |      103
+          123 * 123         |      101
+          1234 * 1234       |      104
+          12345 * 12345     |      103
+          123456*123456     |      100
+          1234567*1234567   |      101
+          12345678*12345678 |      102
+          12345679*12345679 |      102
+          12 * 2            |      100
+          123 * 2           |      104
+          1234 * 2          |      103
+          12345 * 2         |      102
+          123456 * 2        |      102
+          1234567 * 2       |      103
+          12345678 * 2      |      103
+          123456789 * 2     |      102
+          1e10 * 1e10       |      104
+          1e100 * 1e100     |      101
+          1e1000 * 1e1000   |      100
+          1 * -1            |      102
+          1e1000 * 1        |      108          <-- !
+          1e1000 * 10       |      112          <-- !
+          1e1000 * -10      |      110          <-- !
+         bmul:              |      103
+         ...................|..........
+
+2002-02-10 v1.07 Tels
+
+ * added _lsft() and _rsft() for more speed on shifting
+
+ * tests from MBI v1.50 (3685 vs. 2932 tests)
+
+2001-11-11 v1.06 Tels
+
+ * made _inc/_dec faster and added tests for them
+
+ * fixed bug in __reduce() that made it never  work (oups, forgot debug again)
+
+2001-11-01 v1.05 Tels
+
+ * testsuite from BigInt v1.45
+
+2001-09-03 v1.04 Tels
+
+ * _as_hex(), _as_bin()
+
+ * tests from MBI 1.42
+
+ * removed default exporting, added empty import()
+
+2001-08-03 v1.03 Tels
+
+ * added tests from MBI v1.40
+
+2001-07-22 v1.02 Tels (never released)
+
+ * removed $class/__PACKAGE__ checks entirely
+
+ * fixed 2 ** something to be more efficient
+
+ * made Bit::Vector a requirement
+
+2001-07-13 v1.01 Tels
+
+ * new testsuite from BigInt v1.37, tweaks to it to silence Exporter
+
+ * $class => __PACKAGE__
+
+2001-07-09 v1.00 Tels
+
+ * First release.

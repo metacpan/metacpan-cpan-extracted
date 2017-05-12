@@ -1,0 +1,32 @@
+-----------------------------------------------------
+
+0.08  2017-04-17
+  - Fix current_id helper. RE wasn't greedy enough so wouldn't work for paths
+    greater than a depth of 2. (Thanks Dragoș.)
+
+0.07  2017-02-15
+  - Renamed method_map to element_method_map and added a similar mapping
+    option to collections (collection_method_map).
+
+0.06  2017-02-14
+  - HTTP method map for elements.
+
+0.05  2017-02-07
+  - Added placeholder option when creating a collection.
+
+0.04  2017-02-03
+  - Breaking change. Renaming element method 'under' to 'resource_lookup' to
+    be less ambiguous. (Thanks Castaway.)
+  - Add collections using restify routers helper with an ARRAYREF.
+
+0.03  2016-06-20
+  - Testing against 5.22.
+  - Fixed bug when adding nested routes not honouring initial 'controller'
+    namespace. (Thanks Dragoș.)
+
+0.02  2015-05-28
+  - Rebuilding distribution. Version 0.01 was broken (oops).
+
+0.01  2015-05-28
+  - Adding .travis.yml.
+  - Production ready version of Mojolicious::Plugin::Restify.

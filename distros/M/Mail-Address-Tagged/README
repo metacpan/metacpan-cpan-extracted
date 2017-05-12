@@ -1,0 +1,85 @@
+Mail/Address/Tagged version 0.01
+================================
+
+This module is based on an application written in Python, details of
+that application are available here http://sourceforge.net/projects/tmda/
+
+This module implements objects that generate and validate tagged email
+addresses.  These are intended primarily for anti-spam applications.
+The module assumes that for a given user (user@domain.net) addresses
+of the form userTAG@domain.net will be delivered to the user (for all
+values of TAG).  qmail and courier are both capable of this kind fof
+delivery.
+
+The address generated contains extra information, e.g. the date when
+it will expire, who may use it to send you mail etc.  A cryptocraphic
+hash of this extra information is also included in in the address.
+This Hashed Message Authenticaion Code (HMAC RFC 2104) is your
+guarantee that the information contained in the address has not been
+tampered with.
+
+This module can deal with three different types of tagged address.
+They are all extensions of a users normal email address and are
+constructed in a similar manner.  Where the normal address is
+user@host.com, the tagged address takes the form
+user-tagtype-tag@host.com.
+
+The three supported address types are confirm, dated and sender.
+
+Confirm addresses must contain a time (in unixtime) and the process id
+of the process that generated them, they may also optionally contain a
+keyword.  They include the process id so that the system can deal with
+more than one message a second.  Addresses of this type are used to
+request verification that a message should be delivered.  Your mail
+filter sends a mail to the person you just received mail from asking
+them to reply to the confirm address.  If they reply within a given
+period of time then their mail is delivered as normal.  The point
+being that automated mailers are unlikely to be able to respond in
+this way so spam will not get through.  If a persistant spammer does
+reach your mailbox, then you can always black list the address they
+are using.  The keyword when it is supplied is the type of
+confirmation being asked for.  All three bits of information are
+combined and a cryptographic hash is taken of the result, these bits
+of info are then combined like this.
+
+  user-confirm-keyword.time.pid.HMAC@host.com
+
+When mail like this is received, the bits can be separated out and a
+new HMAC generated, if it matches the one in the address, then this is
+a valid address.
+
+Dated addresses have an expiry time and are used to accept mail up to
+a given time.  They end up in the format
+
+  user-dated-time.HMAC@host.com
+
+The third type of supported address is sender, this takes the form
+
+  user-sender-HMAC@host.com
+
+The HMAC here contains a hashed copy of an email address.  When mail
+of this form comes in, the sending address can be checked against the
+HMAC if they don't match then appropriate action can be taken
+(disposal or confirmation request etc.).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Test::More
+Digest::HMAC
+Digest::SHA1
+
+COPYRIGHT AND LICENCE
+
+This program may be distributed under the same conditions as perl.
+
+Copyright (C) 2001 Andrew Wilson
+

@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5af545c218bf29dd2f3c9202e292c2116254d035 Changes
+SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
+SHA1 1fa6b7ea8c048b3063fcac241cd1f422ba6ae4fe MANIFEST
+SHA1 3cc7e35dd3793cec186a38fc009fe1829c9674c1 META.json
+SHA1 4e2a4aaef9c66438b00af41473727bfb55d9f9c3 META.yml
+SHA1 59eed71701dd1516d11128bf408169867e2cbfd9 Makefile.PL
+SHA1 a87b8fecd75bd8e35fec385083405e32cae05352 README
+SHA1 7cad32b004757a806b7fab9a1fbc525e88c6196c eg/calc-forte-tensions
+SHA1 4c0c357c7420b50df500376ee0973c40e018b219 eg/compare-tensions
+SHA1 baa078d046c4ea11690287d92e45b36c6c56c789 eg/fit-tensions
+SHA1 56ff6b5464f3e437bad051009dd9416075eaac31 eg/gen-pl-nums
+SHA1 6bc53768e3bbbb8fa7728ae66b7b73497948214b lib/Music/Tension.pm
+SHA1 927939338b5174eddaac6a3f00b1536f245bc4ee lib/Music/Tension/Cope.pm
+SHA1 ae7d25585c24d0ca570b6cb45a53d64ce01e532a lib/Music/Tension/PlompLevelt.pm
+SHA1 87704f4cd40aa3dfb6c0dd2f73f67b53e7ce158c t/00-load.t
+SHA1 74a0937e074cb3488fb14a70a2427e78e052c90c t/Music-Tension-Cope.t
+SHA1 d0c366a2268df1350a66e10f3df1b9d63b9271d8 t/Music-Tension-PlompLevelt.t
+SHA1 5fd3f4b9e7f6cb8aa3e6a4c77be18d5dc9efb9af t/Music-Tension.t
+SHA1 3ef65383d82f059f56f43236663119c01974decb t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWRiYTAAoJEDTEVWqwTuCUDO4H/RL+u3LiRTCdYKL0DN7ZrPTE
+sYkuvL4RFvHbIoDhopwH7Efpojr7KX/RP83d/+amdvAyp+rJ9AjwkYVnYT93QKa9
+FG3FnrKnVYQl1pgfOXcamGmToFMkrYJEwaY3dKXe1v+tvxVmLMRqKHV3lzSlgRKE
+FRCVFNZMTbX0l2HEF1Nl/jeq0NGgBtO9Wsbuucd5piBmkmIhD+NJbEtcpm4yLZZh
+o4pSZxCJc2hhnSNTJSsVXFpAg0Ff3DLnL+hK+KICJxY3oyrtG4vq7aZUh7tBiF5F
+J9T/i4IuXjgTHvB9126eM1CUZwGrEY1v7jUkQ5ZcudEOiYVFdgMAa/dhKaJfuDI=
+=uvXv
+-----END PGP SIGNATURE-----

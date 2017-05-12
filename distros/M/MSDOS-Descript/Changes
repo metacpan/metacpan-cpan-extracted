@@ -1,0 +1,26 @@
+Revision history for Perl extension MSDOS::Descript.
+
+1.05   2014-09-20
+	- mention JP Software in documentation
+	- release tests moved to xt/
+
+1.04   2012-03-26
+	- localize $@ before eval
+	- now built with Dist::Zilla (includes v2 META.json)
+	- repository now publicly available on GitHub
+
+1.03   2008-05-04
+	- no functional changes
+	- minor clean up to documentation
+	- use Module::Build::DistVersion for packaging
+
+1.02   2007-03-17
+        - added the changed method
+        - converted to Module::Build
+        - updated my email address
+
+1.001  1998-10-25
+        - updated my email address
+
+1.000  1998-01-15
+	- First public release; created by h2xs 1.18

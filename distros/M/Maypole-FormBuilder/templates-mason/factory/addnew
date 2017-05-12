@@ -1,0 +1,6 @@
+<div id="addnew">
+<fieldset>
+<legend>Add a new <% $request->model_class->moniker %></legend>
+<% $request->as_form( 'addnew' )->render %>
+</fieldset>
+</div>

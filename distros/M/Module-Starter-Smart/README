@@ -1,0 +1,21 @@
+Module-Starter-Smart version 0.0.6
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make && make test && make install
+
+DEPENDENCIES
+
+ExtUtils::Command
+File::Spec
+Module::Starter::Simple
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006, 2011, 2012 Ruey-Cheng Chen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,116 @@
+This is Mac::Glue, for using Apple events with AppleScript vocabulary.
+It is handled all using Apple events; AppleScript itself is bypassed.
+With it, you can do cool stuff like this:
+
+    # empty trash
+    $finder->empty; 
+
+    # set song to first track of first library playlist
+    #   whose artist is "Bob Dylan"
+    # ... or more literally ...
+    # set song to (track 1 of (tracks whose artist is "Bob Dylan"))
+    #   of library playlist 1
+    my $song = $itunes->obj(
+        track            => 1,
+        tracks           => whose(artist => equals => "Bob Dylan"),
+        library_playlist => 1
+    );
+
+    # play song
+    $itunes->play($song);
+
+Please read this README and the POD documentation.  Mac::Glue is not
+self-explanatory.  Some assembly is required.  Mac::Glue comes with
+MacPerl 5.6.1 and later, and is compatible with MacPerl 5.2.0r4.
+
+If the Encode module is installed, Mac::Glue can send Unicode text.
+
+
+************************************************************************
+MAC OS X:
+
+Install all the prerequisites.  If using the CPAN shell, this is handled
+automatically.  Otherwise, you will need to follow the prerequisites
+listed in Makefile.PL, including all their prerequisites, and so on.
+
+You will need to have glues for your dialect and scripting additions
+created; the installation process (perl Makefile.PL; make; make install)
+should handle this automatically.  It will also create glues for two
+commonly used applications, Finder and System Events.
+
+To create glues for additional applications, pass them in as arguments
+to the gluemac program, which is installed.  Note that glues are
+installed with the module, so you may have to run as root or sudo
+(e.g., `sudo gluemac /Applications/iTunes.app`).
+
+Use gluedoc to get documentation for a glue (e.g., `gluedoc Finder`).
+gluedoc is a frontend to perldoc.
+
+
+************************************************************************
+OLD VERSIONS OF MACPERL:
+
+If using a MacPerl version lower than 5.6.1, the cpan-mac distribution
+(or the equivalent) is required.  It is available at:
+
+    http://sf.net/projects/cpan-mac/
+    http://www.cpan.org/authors/id/CNANDOR/
+
+Read the cpan-mac README for more information on it.  It contains
+all the modules you will need to use Mac::Glue (including
+some other really cool stuff), most notably Mac::AppleEvents::Simple
+and some updated versions of other Mac:: modules.
+
+Make sure that in your MacPerl Preferences you set site_perl as a
+Libraries path (so it will come before your main MacPerl lib directory).
+This is not necessary for MacPerl 5.6.1 and greater.
+
+
+************************************************************************
+ALL VERSIONS OF MACPERL:
+
+* NOTE: This version of Mac::Glue HAS NOT BEEN TESTED with MacPerl.  It
+* will be eventually.  If you have problems, revert to the old version.
+* Thanks/sorry in advance.
+
+If the module is not already installed, drop the Mac-Glue archive, or
+the unpacked folder, on the installme droplet that came with cpan-mac
+(or with MacPerl itself).
+
+After installing, you need to run the gluedialect program and then the
+gluescriptadds program.  These can be run just by double-clicking.
+
+Then, for each application you want to script, drop it on the gluemac
+droplet.  Applications should not be running, in general, when dropped
+on the droplet (though in some cases it will work anyway, and in some
+cases the droplet will launch the application for you to get the
+needed information).  The first program you should drop on the droplet is
+probably the Finder.  For each example script in this distribution you
+want to try, run the applications through the droplet first.
+
+Open glue PODs in Shuck for their documentation.
+
+
+************************************************************************
+ALL TOGETHER NOW:
+
+Read the Mac::Glue POD (`perldoc Mac::Glue`, or use Shuck) for all the
+gory details of Mac::Glue.  See the examples in ex/ for examples of use
+(note: some of the examples depend on certain prerequisites; see
+ex/00_README for details).
+
+If you have questions, please write to the macosx@perl.org mailing list
+(even if you are using MacPerl, though the macperl*@perl.org lists
+are acceptable too).  If there's an application or syntax issue you're
+having trouble with, ask the list.  See http://lists.perl.org/ for more
+information.
+
+
+************************************************************************
+For more information, including CVS, bug reporting, and more, see:
+
+    http://projects.pudge.net/
+
+Copyright (c) 1998-2004 Chris Nandor.  All rights reserved.  This program
+is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.

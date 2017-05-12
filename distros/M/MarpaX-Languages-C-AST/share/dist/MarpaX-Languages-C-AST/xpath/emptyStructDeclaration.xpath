@@ -1,0 +1,1 @@
+.//structDeclaration/SEMICOLON[not(preceding-sibling::*)]

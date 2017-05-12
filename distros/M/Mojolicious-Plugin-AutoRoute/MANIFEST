@@ -1,0 +1,27 @@
+Changes
+lib/Mojolicious/Plugin/AutoRoute.pm
+lib/Mojolicious/Plugin/AutoRoute/Util.pm
+Makefile.PL
+MANIFEST			This list of files
+MYMETA.json
+MYMETA.yml
+README
+t/basic.t
+t/templates/auto/foo.html.ep
+t/templates/auto/foo/bar.html.ep
+t/templates/auto/foo/bar/baz.html.ep
+t/templates/auto/index.html.ep
+t/templates/create.html.ep
+t/templates/json.html.ep
+t/templates/myauto/foo.html.ep
+t/templates/myauto/index.html.ep
+t/templates/myauto/myauto/foo.html.ep
+t/templates2/auto/foo2.html.ep
+t/templates3/auto/exc.html.ep
+t/templates3/auto/index.html.ep
+t/templates3/auto/json.html.ep
+t/templates3/auto/not.html.ep
+t/test2.pl
+t/test3.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

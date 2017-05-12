@@ -1,0 +1,32 @@
+Revision history for Module-Want
+
+0.6  Fri Oct 25 11:13:39 2013
+    - prevent benign eval from tripping potentially fatal sig handler
+
+0.5  Wed Oct 31 19:44:04 2012
+    - re-enabled strict/warnings
+    - make POD tests RELEASE_TESTING tests
+    - critic tests use RELEASE_TESTING instead of custom var
+    - rt 80523 POD typo
+    - rt 77417 add =encoding to POD
+    - rt 65793 Additional helper functions (get_all_use_require_in_text() doen in last version)
+        - get_relative_path_of_ns() alias of get_inc_key()
+        - normalize_ns() alias of get_clean_ns()
+        - get_inc_path_via_have_mod()
+        - search_inc_paths()
+    - added distname2ns() and ns2distname()
+    
+0.4  Wed Dec 21 22:53:38 2011
+    - add get_all_use_require_in_text()
+    - rt 68354 - make qw() (qw()) so tests don't emit warnings under perl 5.14
+    
+0.3  Tue Jan 11 23:10:12 2011
+    Added get_ns_regexp() convenience function
+    
+0.2  Thu Jul 22 22:55:15 2010
+    Added is_ns(), get_inc_key(), and get_clean_ns() convenience functions. 
+    (For an entire suite if name space utilities see Module::Util and friends)
+        
+0.1  Mon May 24 23:25:16 2010
+       Initial release.
+

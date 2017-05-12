@@ -1,0 +1,64 @@
+{
+   "abstract" : "Quick reference tool for the Reddit API",
+   "author" : [
+      "Curtis Brandt <curtis@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Command-snoodoc",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "6.0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aggrolite/Mojolicious-Command-snoodoc/issues"
+      },
+      "homepage" : "https://github.com/aggrolite/Mojolicious-Command-snoodoc",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/aggrolite/Mojolicious-Command-snoodoc.git",
+         "web" : "https://github.com/aggrolite/Mojolicious-Command-snoodoc"
+      }
+   },
+   "version" : "0.05"
+}
+

@@ -1,0 +1,51 @@
+---
+abstract: 'Mojolicious Lexicon Translation Generator'
+author:
+  - 'dokechin <>'
+build_requires:
+  JSON: '0'
+  Mojolicious: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Warn: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Command-generate-lexicont
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Lingua::Translate::BingWrapper:
+    file: lib/Lingua/Translate/BingWrapper.pm
+  Mojolicious::Command::generate::lexicont:
+    file: lib/Mojolicious/Command/generate/lexicont.pm
+    version: '0.05'
+requires:
+  Config::PL: '0'
+  Encode: '0'
+  Module::Load: '0'
+  Mojo::Base: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/dokechin/Mojolicious-Command-generate-lexicont/issues
+  homepage: https://github.com/dokechin/Mojolicious-Command-generate-lexicont
+  repository: git://github.com/dokechin/Mojolicious-Command-generate-lexicont.git
+version: '0.05'
+x_contributors:
+  - 'dokechin <ttatsumi@ra2.so-net.ne.jp>'
+  - 'dokechin <user@user-PC.(none)>'

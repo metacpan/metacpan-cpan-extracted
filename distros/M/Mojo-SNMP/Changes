@@ -1,0 +1,64 @@
+Revision history for perl distribution Mojo-SNMP
+
+0.12 2016-03-22T09:34:38+0100
+ - Fix bulk_walk against noSuchInstance identifier #10
+   Contributor: Oliver Gorwits
+ - Add bulk_walk #9
+   Contributor: Oliver Gorwits
+
+0.11 2015-11-30T14:06:11+0100
+ - Fix SNMPv3 discovery process #8
+   Contributors: Espen Tallaksen and Lewitzki Andreas
+ - Fix infinite bulk_walk and walk
+ - Fix retrieving data in correct order
+
+0.10 2014-12-18T17:16:48Z
+ - Fix multiple dispatcher objects can't coexist #7
+
+0.09 2014-12-17T09:55:46Z
+ - Need to emit error when a callback fail #6
+
+0.08 2014-12-13T12:21:52Z
+ - Fix concurrent logic #5
+
+0.07 2014-11-26T09:03:55Z
+ - Replace emit_safe() with emit(), since it is deprecated
+
+0.06 2014-03-12T18:24:56Z
+ - Fix memory cycle in 'walk' and 'bulk_walk' Contributor: Per Carlson
+   https://github.com/jhthorsen/mojo-snmp/pull/3
+
+0.0501 2014-03-04T07:15:53Z
+ - Improved documentation for get(), get_bulk(), get_next(), set() and
+   walk().
+
+0.05 2013-12-13T13:03:44Z
+ - Add methods with callbacks as an alternative to "response" event.
+ - Cleaned up Makefile.PL
+
+0.04 2013-09-26T15:36:37Z
+ - Add support for passing maxrepetitions to prepare()
+ - Add add_custom_request_method() method
+ - Add custom method bulk_walk() - Espen Tallaksen
+
+0.0301 2013-09-07T10:44:22Z
+ - Fix Makefile.PL
+ - Fix t/basic.t
+ - Change indentation to two spaces.
+
+0.03 2012-12-10T20:11:23Z
+ - Add support for prepare($host, ..., walk => $oid);
+ - Change "response" and "error" events also receive prepare() args.
+
+0.0201 2012-10-25T21:20:42Z
+ - Need to ignore ./local
+
+0.02 2012-10-18T00:07:55Z
+ - Add Joshua Keroes as author
+ - Extended the documentation and fixed bugs
+
+0.01 2012-10-17T23:38:47Z
+ - Add custom dispatcher
+ - Add prepare()
+ - Add wait()
+ - Started project

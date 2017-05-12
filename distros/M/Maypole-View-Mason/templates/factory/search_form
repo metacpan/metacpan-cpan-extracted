@@ -1,0 +1,26 @@
+<%args>
+</%args>
+<form method="get" action="<%$base%>/<%$classmetadata->{moniker}%>/search/">
+<fieldset class="search">
+<legend>Search</legend>
+    <input type="hidden" name="action" value="create">
+    <input type="hidden" name="class" value="<%$classmetadata->{name}%>">
+%foreach my $col (@{$classmetadata->{columns}}) {
+%   next if $col eq "id";
+    <label><span class="field"> <% $classmetadata->{colnames}->{$col} %> </span>
+        <%perl> 
+        my $element = $classmetadata->{cgi}->{$col};
+        if ($element->{tag} eq "select") {
+            $element = $element->unshift_content(
+                            HTML::Element->new("option", value =>" "));
+        }
+        </%perl>
+        <%$element->as_HTML%>
+	</label>
+%}
+    <input type="submit" name="search" value="search">
+    </fieldset>
+</form>
+<%once>
+use HTML::Element;
+</%once>

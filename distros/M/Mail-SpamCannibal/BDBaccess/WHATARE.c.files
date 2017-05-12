@@ -1,0 +1,14 @@
+	C files
+host_info.c	  local name lookup/storage utilities
+main.c		  MAIN
+  data.c	  included in main.c
+  godaemon.c	  included in main.c
+  misc.c	  included in main.c
+netio.c		  network io utilities
+util_pid.c	  pid file utilities
+
+	H files
+defines.h	  parameters for bdbreader
+misc_func.h	  description of some parts of misc.c
+netio_func.h	  description of netio.c
+util_pid_func.h	  description of util_pid.c

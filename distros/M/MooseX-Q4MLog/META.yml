@@ -1,0 +1,20 @@
+---
+abstract: 'Log Data To Q4M'
+author: ~
+distribution_type: module
+generated_by: 'Module::Install version 0.75'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: MooseX-Q4MLog
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 0
+  MooseX::ConfigFromFile: 0
+  MooseX::Daemonize: 0
+  Queue::Q4M: 0
+version: 0.00002

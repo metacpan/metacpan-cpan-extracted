@@ -1,0 +1,1 @@
+# Thas's how the test script knows if it can use the XS version of the module. The testing script is shared between both modules.

@@ -1,0 +1,38 @@
+---
+abstract: 'Find modules loaded by Perl code without running it.'
+author:
+  - 'Elliot Shank <perl@galumph.com>'
+build_requires:
+  Test::Deep: 0.098
+  Test::More: 0.72
+configure_requires:
+  Module::Build: 0.2808
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Used
+no_index:
+  directory:
+    - xt
+  file: []
+provides:
+  Module::Used:
+    file: lib/Module/Used.pm
+    version: v1.3.0
+requires:
+  Const::Fast: 0
+  English: 0
+  Exporter: 5.57
+  File::Next: 1.02
+  Module::Path: 0.01
+  PPI::Document: 1.205
+  strict: 0
+  utf8: 0
+  version: 0.74
+  warnings: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v1.3.0

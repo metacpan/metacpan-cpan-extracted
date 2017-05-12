@@ -1,0 +1,14 @@
+#
+# $Id: ChangeLog 155 2004-12-27 04:19:23Z james $
+#
+
+2003-12-15  v0.10
+            - initial release to CPAN
+
+2004-12-26  v0.11
+            - fix mixup where Build.PL was not part of the distribution,
+              leaving only a semi-functional Makefile.PL.  Should fix
+              cpantesters failure #115370.
+
+#
+# EOF

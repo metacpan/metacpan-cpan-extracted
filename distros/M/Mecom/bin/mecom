@@ -1,0 +1,411 @@
+#!/usr/bin/perl
+# -----------------------------------------------------------------------------
+# Molecular Evolution of Protein Complexes Contact Interfaces
+# -----------------------------------------------------------------------------
+# @Authors:  HŽctor Valverde <hvalverde@uma.es> and Juan Carlos Aledo
+# @Date:     May-2013
+# @Location: Depto. Biolog’a Molecular y Bioqu’mica
+#            Facultad de Ciencias. Universidad de M‡laga
+#
+# Copyright 2013 Hector Valverde and Juan Carlos Aledo.
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of either: the GNU General Public License as published
+# by the Free Software Foundation; or the Artistic License.
+#
+# See http://dev.perl.org/licenses/ for more information.
+# -----------------------------------------------------------------------------
+
+#                                   #---#                                    #
+
+# -----------------------------------------------------------------------------
+# Loading modules                                                      Chap.  1
+# -----------------------------------------------------------------------------
+use Mecom;
+use Getopt::Long;
+
+sub welcome{
+    
+    # Welcome
+    system("clear");
+    my $welcome = "";
+    
+    $welcome.= "\n---------------------------------------\n";
+    $welcome.= "\t RUNNING MECOM v".Mecom->get_version."\n";
+    $welcome.= " Hector Valverde and Juan Carlos Aledo\n";
+    $welcome.= " \tUniversity of Malaga\n";
+    $welcome.= "\t     May, 2013\n";
+    $welcome.= "---------------------------------------\n\n";
+    $welcome.= "NOTICE: This distribution is an alpha version.\n";
+    $welcome.= "Unexpected errors could be dumped. Contact with\n";
+    $welcome.= "authors anonymously from http://mecom.hval.es/contact\n\n";
+    $welcome.= "Type 'mecom --help' on the command line to get\n";
+    $welcome.= "a summarized manual.\n\n";
+    
+    return $welcome;
+    
+}
+
+sub help{
+    
+    # Help
+    my $help;
+    $help = "\n\tMECOM HELP v".Mecom->get_version."\n\n";
+    $help.= "\t*General usage:\n";
+    $help.= "\t--------------\n\n";
+    $help.= "\t\$ mecom [--pdb <pdbfile> --contactfile <strfile>]
+            --chain <chainid> --alignment <msafile> [ --proximityth
+            <float> --exposureth <float> --exposuretherror <float>
+            --informat <msaformat> --oformat <msaformat> --gc <int>
+            --ocontact <filepath> --report <htmlpath>] [--help] [--struct]\n\n";
+    $help.= "\t*Requested Options:\n";
+    $help.= "\t------------------\n\n";
+    $help.= "\t--pdb and/or --contactfile <file>: A valid *.pdb or *.str input file\n";
+    $help.= "\t--aligment <msafile>: A valid Multiple Sequence Alignment File\n";
+    $help.= "\t--chain <X>: The analyzed chain identifier\n\n";
+    $help.= "\t*Other options:\n";
+    $help.= "\t--------------\n\n";
+    $help.= "\t(see documentation to find default values)\n\n";
+    $help.= "\t--ocontact <file>: A file path where write structural data (*.str file)\n";
+    $help.= "\t--exposureth <float num>: Exposure threshold\n";
+    $help.= "\t--exposuretherror <float num>: Exposure threshold margin\n";
+    $help.= "\t--proximityth <float num>: Proximity threshold\n";
+    $help.= "\t--informat <msaformat>: MSA format for the input file\n";
+    $help.= "\t--oformat <msaformat>: MSA format for the output alignments\n";
+    $help.= "\t--gc <int>: Genetic code\n";
+    $help.= "\t--report <htmlfile>: A file path where write the output report\n";
+    $help.= "\t--help: Show this help\n";
+    $help.= "\t--struct: Carry out just the structural analysis\n";
+    $help.= "\n\n";
+    $help.= "For further information see the full documentation at man page or";
+    $help.= " user manual at authors website: http://mecom.hval.es/manual/\n\n";
+    $help.= " Copyright 2013 Hector Valverde and Juan Carlos Aledo.\n\n";
+    $help.= " This program is free software; you can redistribute it and/or modify it";
+    $help.= " under the terms of either: the GNU General Public License as published";
+    $help.= " by the Free Software Foundation; or the Artistic License.\n";
+    $help.= " See http://dev.perl.org/licenses/ for more information.\n\n";
+    
+    
+    return $help;
+}
+
+# -----------------------------------------------------------------------------
+#                                                                            1.
+
+#                                   #---#                                    #
+
+# -----------------------------------------------------------------------------
+# Variable initialization                                              Chap.  2
+# -----------------------------------------------------------------------------
+# Required:
+    my $pdb;            #or    # 1a. A valid path to pdb file or
+    my $contact_file;          # 1b. A valid contact file
+    my $chain_alignment;       # 2. The chain/s alignment/s
+    my $chain;                 # 3. Chain or chains to analyze
+# Optional:
+    my $pth;                   # 1. Proximity threshold (Angstroms)
+    my $sth;                   # 2. Exposition threshold (ASA fraction)
+    my $th_margin;             # 3. Exposition threshold margin
+    my $spec_chains;           # 4. Chains to contact with
+    my $informat;              # 5. Alignment format
+    my $oformat;               # 6. Output format for sub-alignments
+    my $gc;                    # 7. Genetic code
+    my $ocontact = "data.str"; # 8. Contact output data file
+    my $help;                  # 9. Help boolean
+    my $report;                # 10. HTML report
+    my $struct;                # 11. Boolean for launch just struct. anal.
+    
+GetOptions (                  # Getting options from command line                  
+    "pdb=s"              => \$pdb,                  # --pdb
+    "alignment=s"        => \$chain_alignment,      # --alignment
+    "proximityth=f"      => \$pth,                  # --proximityth
+    "exposureth=f"       => \$sth,                  # --exposureth
+    "chain=s"            => \$chain,                # --chain
+    "exposuretherror=f"  => \$th_margin,            # --exposuretherror
+    "contactfile=s"      => \$contact_file,         # --contactfile
+    "contactwith=s"      => \$spec_chains,          # --contactwith
+    "informat=s"         => \$informat,             # --informat
+    "oformat=s"          => \$oformat,              # --oformat
+    "gc=i"               => \$gc,                   # --gc
+    "ocontact=s"         => \$ocontact,             # --ocontact
+    "help"               => \$help,                 # --help
+    "report=s"           => \$report,               # --report
+    "struct"             => \$struct                # --struct
+);
+# -----------------------------------------------------------------------------
+#                                                                            2.
+
+#                                   #---#                                    #
+
+# -----------------------------------------------------------------------------
+# HELP and variable validation                                        Chap.  3
+# -----------------------------------------------------------------------------
+if($help){
+    print help();
+    exit;
+}elsif($struct){
+    print welcome();
+    Mecom::only_struct($pdb,$chain,$pth,$sth,$th_margin,$ocontact);
+    exit;
+}
+#if(!$chain || !($pdb || $contact_file) || !$chain_alignment){
+#    die("ERROR: Any requested option is missing. Type 'mecom --help' to view how to solve it\n");
+#}
+# -----------------------------------------------------------------------------
+#                                                                            3.
+
+#                                   #---#                                    #
+
+# -----------------------------------------------------------------------------
+# Run program for multiple chains                                     Chap.  4
+# -----------------------------------------------------------------------------
+print welcome();
+my @chains = split(/ /,$chain);
+# 1. Create the objects
+my @objs_list = ();
+if($#chains > 0){
+    
+    # The respective alignment files (also separated by commas)
+    my @alignments = split(/ /,$chain_alignment);
+    # Chains and align files number must be equal
+    if($#chains != $#alignments){
+        die("Invalid number of MSA files for specified input chains\n")
+    }
+    
+    for (my $i=0;$i<scalar(@chains);$i++){
+        #print $alignments[$i]."\n";
+        my $new_obj = Mecom->new(
+                                    pdb         => $pdb,
+                                    contactfile => $contact_file,
+                                    alignment   => $alignments[$i],
+                                    chain       => $chains[$i],
+                                    pth         => $pth,
+                                    sth         => $sth,
+                                    sthmargin   => $th_margin,
+                                    contactwith => $spec_chains,
+                                    informat    => $informat,
+                                    oformat     => $oformat,
+                                    gc          => $gc,
+                                    ocontact    => $chains[$i].".tmp.str"
+                                    );
+        
+        # Insert into the object list
+        push(@objs_list, $new_obj);
+        
+    }
+    
+    print "1. Running structural calcs\n";
+    # Run structural calcs
+    for my $obj (@objs_list){
+        
+        # Run structural calcs
+        print("Running structural calcs for chain: ".$obj->get_chain."\n");
+        $obj->run_struct;
+        
+    }
+    
+    # If $ocontact does not exists, create it
+    if(!-e $ocontact){
+        # Concatenate structural data into a single file
+        open CAT, ">>".$ocontact;
+        for my $obj (@objs_list){
+            
+            open FILE, $obj->get_ocontact;
+            while(<FILE>){
+                print CAT $_;
+            }
+            unlink($obj->get_ocontact);
+            $obj->set_ocontact($ocontact);
+            
+        }
+        close CAT;
+    }
+    
+    print "2. Filtering\n";
+    # Create the codon list
+    for my $obj (@objs_list){
+        
+        $obj->run_filtering;
+        
+    }
+    
+    print "3. Building subalignments\n";
+    # Create the sub-alignments
+    for my $obj (@objs_list){
+        
+        $obj->run_subalign;
+        
+    }
+    
+    print "4. Sub-alignments concatenation\n";
+    # Concatenate sub-alignments
+    # For each category within firs alignment
+    my %merged_alns;
+    for my $category (keys %{$objs_list[0]->get_subalns}){
+        
+        print "\t".$category."\n";
+        # @extalns is an array with Bio::SimpleAlign objects
+        my @extalns;
+        for my $obj (@objs_list){
+            push (@extalns, ${$obj->get_subalns}{$category});
+        }
+        
+        # Merged alignments within the same category
+        $merged_alns{$category} = Mecom->cat_aln(@extalns);
+        
+    }
+    
+    # Create a new object with the concatenated alignments
+    my $coe = Mecom->new(
+                                    pdb         => $pdb,
+                                    contactfile => $contact_file,
+                                    alignment   => $chain_alignment,
+                                    chain       => $chain,
+                                    pth         => $pth,
+                                    sth         => $sth,
+                                    sthmargin   => $th_margin,
+                                    contactwith => $spec_chains,
+                                    informat    => $informat,
+                                    oformat     => $oformat,
+                                    gc          => $gc,
+                                    ocontact    => $ocontact,
+                                    report      => $report
+                                    );
+    
+    
+    # Set the subalignment for the new object
+    $coe->set_subalns(%merged_alns);
+    
+    print "5. Running evolutive calcs\n";
+    # Yang
+    $coe->run_yang;
+    
+    print "6. Running statistics\n";
+    # Stats
+    $coe->run_stats1;
+    
+    print "7. Writting HTML report\n";
+    $coe->run_report;
+    
+    # open?
+    print "Do you want to open the generated report? [Y/n]: ";
+    my $userinput =  <STDIN>;
+    chomp ($userinput);
+    if($userinput =~ /y/i || $userinput =~ /yes/i || $userinput eq ""){
+        system("open ".$coe->get_report);
+    }
+    
+}
+
+
+else{
+# -----------------------------------------------------------------------------
+#                                                                            4.
+
+#                                   #---#                                    #
+
+# -----------------------------------------------------------------------------
+# Run program for a single chain                                      Chap.  5
+# -----------------------------------------------------------------------------
+# New object
+my $coe = Mecom->new(
+                                    pdb         => $pdb,
+                                    contactfile => $contact_file,
+                                    alignment   => $chain_alignment,
+                                    chain       => $chain,
+                                    pth         => $pth,
+                                    sth         => $sth,
+                                    sthmargin   => $th_margin,
+                                    contactwith => $spec_chains,
+                                    informat    => $informat,
+                                    oformat     => $oformat,
+                                    gc          => $gc,
+                                    ocontact    => $ocontact,
+                                    report      => $report
+                                    );
+
+    
+    # Run calcs
+    print "1. Running structural calcs\n";
+    # Structural data
+    $coe->run_struct;
+    print "2. Filtering\n";
+    # Filtering
+    $coe->run_filtering;
+    print "3. Building sub-alignments\n";
+    # Sub-alignments
+    $coe->run_subalign;
+    print "4. Running evolutive analysis\n";
+    # Yang
+    $coe->run_yang;
+    print "5. Running statistics\n";
+    # Stats
+    $coe->run_stats1;
+    
+    print "6. Writting HTML report\n";
+    # Report
+    $coe->run_report;
+    
+    # open?
+    print "Do you want to open the generated report? [Y/n]: ";
+    my $userinput =  <STDIN>;
+    chomp ($userinput);
+    if($userinput =~ /y/i || $userinput =~ /yes/i || $userinput eq ""){
+        system("open ".$coe->get_report);
+    }
+
+}
+    
+    print "---------------------------------------\n";
+    print "\t\tEND\n\n";
+# -----------------------------------------------------------------------------
+#                                                                            5.
+
+#                                   #---#                                    #
+
+
+sub only_struct{
+    
+    my ($self,$chain,$pth,$sth,$th_margin,$ocontact) = @_;
+    my @chains = split(/ /,$chain);
+    my @objs_list;
+    for my $chainid (@chains){
+        
+        my $coe = Mecom->new(
+                                        pdb         => $pdb,
+                                        alignment   => "-",
+                                        chain       => $chainid,
+                                        pth         => $pth,
+                                        sth         => $sth,
+                                        sthmargin   => $th_margin,
+                                        ocontact    => $ocontact."_".$chainid."_.tmp",
+                                        );
+        
+        print "\n Working for chain $chainid with a pth of $pth\n";
+        $coe->run_struct;
+        # Insert into the object list
+        push(@objs_list, $coe);
+        
+    }
+    
+    # If $ocontact does not exists, create it
+    if(!-e $ocontact){
+        # Concatenate structural data into a single file
+        open CAT, ">>".$ocontact;
+        for my $obj (@objs_list){
+            
+            open FILE, $obj->get_ocontact;
+            while(<FILE>){
+                print CAT $_;
+            }
+            unlink($obj->get_ocontact);
+            
+        }
+        close CAT;
+    }
+    
+}
+
+1;
+
+

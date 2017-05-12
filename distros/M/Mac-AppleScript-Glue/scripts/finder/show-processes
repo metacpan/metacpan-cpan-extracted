@@ -1,0 +1,25 @@
+#!/usr/bin/perl -w
+
+#
+# displays current system processes (according to the Finder)
+#
+
+use strict;
+use warnings;
+
+use Mac::AppleScript::Glue;
+
+my $finder = new Mac::AppleScript::Glue::Application('Finder');
+
+my $processes = $finder->processes;
+
+printf("%-30.30s %-48.48s\n", 'Name', 'File location');
+print '-' x 80, "\n";
+
+for my $process (@{$processes}) {
+
+    my $file = $process->file->posix_path;
+    my $name = $process->name;
+
+    printf("%-30.30s %-48.48s\n", $name, $file);
+}

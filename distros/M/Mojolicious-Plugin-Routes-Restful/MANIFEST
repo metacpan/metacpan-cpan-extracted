@@ -1,0 +1,25 @@
+Changes
+lib/Mojolicious/Plugin/Routes/Restful.pm
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/10-basic-routes.t
+t/20-basic-rest.t
+t/30-advanced-routes.t
+t/40-advanced-rest.t
+t/lib/RouteRestful.pm
+t/lib/RouteRestful/Controller/Api/Contacts.pm
+t/lib/RouteRestful/Controller/Api/Projects.pm
+t/lib/RouteRestful/Controller/Api/Users.pm
+t/lib/RouteRestful/Controller/Project.pm
+t/lib/RoutesAdvanced.pm
+t/lib/RoutesAdvanced/Controller/Detail.pm
+t/lib/RoutesAdvanced/Controller/Ipa/Papers.pm
+t/lib/RoutesAdvanced/Controller/Ipa/Project.pm
+t/lib/RoutesAdvanced/Controller/Ipa/Projects/User.pm
+t/lib/RoutesAdvanced/Controller/My/Lab.pm
+t/lib/RoutesAdvanced/Controller/My/Office.pm
+t/lib/RoutesAdvanced/Controller/My/Project.pm
+t/lib/RoutesAdvanced/Controller/My/User.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

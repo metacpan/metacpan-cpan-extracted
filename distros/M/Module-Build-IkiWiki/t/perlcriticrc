@@ -1,0 +1,26 @@
+theme = core + pbp + cosmetic + bugs + maintenance + complexity + security
+
+#
+#   I think that this is important
+#
+[TestingAndDebugging::RequireUseStrict]
+severity = 5
+
+[TestingAndDebugging::RequireUseWarnings]
+severity = 5
+
+#
+# I don't know other form of check for the module installation in the test scripts.
+#
+[-BuiltinFunctions::ProhibitStringyEval]
+
+#
+#   Ikiwiki uses subroutine prototypes
+[-Subroutines::ProhibitSubroutinePrototypes]
+
+#
+#   Config::Data is not under my control: excluding the tests ?
+
+#
+#   In some places i need declare local packages
+[-Modules::RequireFilenameMatchesPackage]

@@ -1,0 +1,6 @@
+Revision history for Perl extension MetaCode::Reader.
+
+0.01  Sat Mar 15 15:54:22 2003
+  - original version; created by h2xs 1.5 with options
+    -X -n MetaCode::Reader
+

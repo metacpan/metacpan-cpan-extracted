@@ -1,0 +1,16 @@
+Revision history for MooseX-Storage-IO-CHI
+
+0.05  2015-01-08 11:37:21 PST
+        - add expires_in
+        
+0.04  2015-01-05 13:25:34 PST
+        - add key_prefix
+
+0.03  2015-01-05 10:48:01 PST
+        - cleanup of some Dist::Milla stuff
+
+0.02  2015-01-05 10:05:27 PST
+        - fix some missing dependencies
+
+0.01  2015-01-02 20:40:20 PST
+        - Initial release

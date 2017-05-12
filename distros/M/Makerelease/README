@@ -1,0 +1,24 @@
+ABOUT
+
+  The makerelease script allows developers to perform an
+  partially-automated set of steps that a developer needs to perform in
+  order to release their software.  It checks the results at each step
+  and prompts the developer with any issues it runs into as it goes
+  along.
+
+INSTALLATION
+
+  perl Makefile.PL
+  make
+  make install
+
+HISTORY
+
+  The makerelease script derives in concept from one that was used to
+  simplify and standardize the process of releasing the Net-SNMP package.
+
+DOCUMENTATION
+
+  See the DOCUMENTATION.org or DOCUMENTATION.html files
+
+  Or: http://makerelease.sourceforge.net/

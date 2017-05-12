@@ -1,0 +1,127 @@
+#!/usr/bin/perl
+
+use 5.005;
+use strict;
+use Params::Util qw{ _CLASS _DRIVER _INSTANCE };
+use Getopt::Long ();
+
+use vars qw{$VERSION};
+BEGIN {
+	$VERSION = '0.07';
+}
+
+my $CGIPATH    = undef;
+my $CGIURI     = undef;
+my $STATICPATH = undef;
+my $STATICURI  = undef;
+
+Getopt::Long::GetOptions(
+	'cgipath=s'    => \$CGIPATH,
+	'cgiuri=s'     => \$CGIURI,
+	'staticpath=s' => \$STATICPATH,
+	'staticuri=s'  => \$STATICURI,
+);
+
+my $class = _CLASS(shift @ARGV);
+unless ( $class ) {
+	error("Did not provide a Module::CGI::Install sub-class");
+}
+my $driver;
+if ( _DRIVER("${class}::Install", 'Module::CGI::Install') ) {
+	$driver = "${class}::Install";
+
+} elsif ( _DRIVER($class, 'Module::CGI::Install') ) {
+	$driver = $class;
+
+} else {
+	error("Did not provide a Module::CGI::Install sub-class");
+}
+
+# Create an instance of the class
+my $installer = $driver->new(
+	cgi_path    => $CGIPATH,
+	cgi_uri     => $CGIURI,
+	static_path => $STATICPATH,
+	static_uri  => $STATICURI,
+);
+unless ( _INSTANCE($installer, 'Module::CGI::Install') ) {
+	croak("Failed to create installer");
+}
+unless ( $installer->prepare ) {
+	croak("Failed to prepare installer for execution");
+}
+unless ( $installer->run ) {
+	croak("Error during installation");
+}
+
+exit(0);
+
+sub error {
+	print $_[0] . "\n";
+	exit(255);
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+cgi_install - Command line script for installing web applications
+
+=head1 SYNOPSIS
+
+  cgi_install My::WebApp
+
+=head1 DESCRIPTION
+
+B<cgi_install> is a command line tool for installing web applications that
+come with L<Module::CGI::Install>-based install classes.
+
+The B<cgi_install> application takes a single parameter of the class name
+of the application to install (the application itself must implement support
+for Module::CGI::Install).
+
+The application will be told by the CGI application what it needs to install.
+
+Once the web application has told the installer what needs to be installed,
+the installer will ask a series of questions, and check the results.
+
+Primarily, it will ask for a local path to the CGI directory to install to,
+and the matching URI (this will then be tested) and in some cases a static
+non-cgi path to install images and other static content to, and a matching
+URI for that as well.
+
+Once the paths have been verified, the files will be installed and set to
+the appropriate permissions (based on the data from the CGI environment
+that was captured while validating the CGI path) and then the application
+is considered "installed", at which time you can point your browser at the
+final URI provided to you.
+
+=head1 SUPPORT
+
+All bugs should be filed via the bug tracker at
+
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Install>
+
+For other issues, or commercial enhancement or support, contact the author.
+
+=head1 AUTHORS
+
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+L<http://ali.as/>, L<CGI::Capture>
+
+=head1 COPYRIGHT
+
+Copyright 2007 Adam Kennedy.
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+=cut

@@ -1,0 +1,13 @@
+ * 1.15 - Audit against Rahn book tables + tests for such. Forte numbers
+   use Z instead of z to conform with said book (though [Zz] still
+   accepted in input). Better document half_prime_form vs. other *_form
+   methods.
+ * 1.14 added adjacent_interval_content().
+ * 1.12 mandatory POD tests, refaddr on nexti and cohorts in unlikely
+   event some object-but-array thingy is used. Makefile.PL
+   maukeification.
+ * 1.10 added mininterval().
+ * gen_melody, check_melody created in 1.03, might see future
+   changes in API.
+
+Otherwise, see the git repository.

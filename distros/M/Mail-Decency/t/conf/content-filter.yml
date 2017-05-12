@@ -1,0 +1,50 @@
+---
+
+include:
+    - defaults.yml
+
+spool_dir: set-in-test
+accept_scoring: 1
+policy_verify_key: sign.pub
+
+database:
+    type: MongoDB
+
+cache:
+    class: File
+    cache_root: /tmp/decency-cache
+    # class: FastMmap
+    # share_file: /tmp/decency.mmap
+    # expire_time: 1h
+    # cache_size: 20m
+
+server:
+    host: 127.0.0.1
+    port: 12346
+    instances: 3
+
+reinject:
+    bounce:
+        host: 127.0.0.1
+        port: 10260
+    deliver:
+        host: 127.0.0.1
+        port: 10250
+
+spam:
+    behavior: scoring
+    threshold: -150
+    handle: bounce
+    noisy_headers: 1
+
+virus:
+    notify: 0
+    handle: bounce
+    bounce_template: /etc/decency/virus-bounce.tmpl
+    notify_template:
+
+
+content_filter:
+
+
+

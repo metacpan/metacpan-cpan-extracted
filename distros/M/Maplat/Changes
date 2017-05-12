@@ -1,0 +1,178 @@
+Revision history for Perl extension Maplat.
+
+0.995 Mon Feb 07 11:00:00 2011
+     - Add option to backup as different user
+     - Worker can now do backups
+     - Fix command handling for commands without arguments (column = NULL)
+     - Added Admin Report
+     - Added File manager for VNC
+     - Added VNC subsystem
+     - Added basic tablefilter, added "acronis agent" flag
+     - Removed unused vars
+     - Also show PBP page number for Perl::Critic
+     - Added WebApps, switchable small tools and toys (currently implemented: Snow and Weather)
+     - Changed hard tabs to spaces
+     - Basic MapMaker function for computerdb
+     - Made graphical computer location work (alpha status)
+     - Fixed editing computers
+     - Use db instead of hardcoded domains
+     - Fixed cost unit mask
+     - Added is_active flag to globalprodlines mask
+     - Modernized user/admin handling of commandqueue
+     - Bugfix - return false on unknown user
+     - Bugfix deref
+     - Added multilanguage support
+     - Force "use English" to work properly
+     - Adapted perlcritic settings to correspond to my darkpan default
+     - Re-instating dynamic loading of modules
+     - Disable helloworld test by default. Depending on host configuration, this might block.
+     - Automatically require Net::SSLeay
+     - Added basic HTTPS support
+     - Add support for files in the root directory
+     - Add some missing mime types to StaticCache
+     - Prevent certain XSS attacks
+     - Merge plugin ComputerDB into main framework
+     - Merge Maplat::Logging into the main framework
+     - Add "loading" graphic
+     - Fixed perlcritic (heredoc terminator must be quotet)
+     - Fixed bug with undefined EXTRAINC
+     - More jquery magic, more forms. Also moved mapping.tt to its rightfull project
+     - Update to new jquery-ui 1.8.6
+     - Bugfix: Wrong handling of local copy of variable
+     - Switched back from YAML::XS to YAML::Syck - YAML::XS seems to have problems with complex reference structures
+     - Fixed missing "rollback", added more debug info
+     - Fixed lexical variable reuse
+     - Added optimized handling from memcachedb to session_settings
+     - Fixed POD coverage
+     - Bugfix: Return success on set if yamldata hasn't changed
+     - Lower the number of updates in memcachedb (only update if value has actually changed). Use YAML encoded data in realmemcache to do the checking.
+     - Fixed handling of lifeticks in MemCachePg (now pass-through wrapper to real memcache)
+     - Bugfixes for forking mode
+
+0.994 Sun Oct 17 20:40:00 2010
+    - Pass Perl::Critic level 3
+    - Perl::Critic Allow a max. of 7 arguments in function definitions (although varargs aren't counted)
+    - Allow newlines in strings (used mostly for SQL commands). In this, i disagree with Perl::Critic. 
+      While newlines in strings aren't pretty, they are WAY better than those awfull heredocs
+    - Fixed lexically reused variable names (found by Perl::Critic)
+    - Ingore Perl::Critic policy Variables::ProhibitPackageVars. I completly disagree with Conway on that, as long as they are used as defined interfaces.
+    - Allow "set" as function name in Perl::Critic (for our case, it isn't ambiguous)
+    - Fixed Perl:Critic "Capture variable used outside conditional"
+    - Use non-capturing groups where capture not required in regexp
+    - use croak() instead of die()
+    - Fixed "hard tab" issue for Perl::Critic
+    - Fixed ref problem
+    - Fixed debuglog
+    - Fixed FTPSync
+    - Fixed missing "use"
+    - Disable usage of broken HTML::FormatText. This might brake our online office modules
+    - Fixed POD format
+    - Added basic support for includes in config files
+    - PostgresDB can now include auth info from external XML file
+    - Fixed display of version/buildnum in web
+    - Switched from YAML::Syck to YAML::XS
+    - Updated copyright date
+    - Added MemCachePg support for workers
+    - Migrated webfrontend from Storable to YAML
+    - Fixed file endings to unix in all perl files
+
+0.993 Mon Aug 09 07:15:00 2010
+    - Fixed SendMail/sending of zipped files
+    - BF example
+    - RFC 2616: Fix status codes for unimplemented/unknown request methods
+    - Use texts from RFC 2616 as default for the HTTP status codes
+    - RFC 2616: Add Content-Length header, required for caching
+    - RFC 2616: Disallow body generation for some HTTP Status codes
+    - RFC 2616: BF for HEAD request
+    - RFC 2616: Respond properly to unsupported request methods.
+    - RFC 2616: Support HEAD request (§9.4) by disabling sending of the body
+
+0.992 Fri Jun 04 13:00:00 2010
+    - Emergency bugfix: test scripts fail because some functions
+      are not correctly documented (podcoverage)
+    - Fixed: Perlcritic fails due to "no critic" placed on incorrect line
+    - Fixed: Perlcritic tripped due to missing "return" at end of function setmylocaltime
+
+0.991 Fri Jun 04 09:20:00 2010
+	- Added some helper modules for cleaner code in main modules
+	- Added accesslog for webinterface
+	- fixed return codes according to HTTP specs
+	- Added database-backed version of MemCache called MemCachePg
+	⁻ Fix possible bug with un->finish'd DBI statement
+	- Added function to add offsets to ISO date
+	- Added workaround for wrong timezones on a few windows machines. This is basically only required when running as windows service, as far as i can tell.
+	- Changes to headers to try preventing clickjacking
+	- TemplateCache: Add function for HTML entity quoting
+	- Moved some templates to the correct plugin
+	- fixed some tests (that actually broke cpantesters tests)
+
+0.99  Mon Mar 17 14:00:00 2010
+	- Fixed missing requirements in Makefile.PL
+
+0.98  Mon Mar 15 13:00:00 2010
+	- Changed DBI/DBD::Pg tests to author tests
+	- Added Author test for Perl::Critic
+	- Modules now pass through Perl::Critic level 5 "gentle" (with a few changes to account for local policy)
+	- Modules now pass through Perl::Critic level 4 "stern" (with a few changes to account for local policy)
+	- Added support for jQuery-UI
+	- Added basic support for themes
+	- Slightly changed the way additional modules are handled (better support for future plugins)
+	- Disabled dynamic module loading via eval/require. Too much trouble with that one 8-)
+	- Fixed contact email address
+	- calculated buildnum is now stable across multiple calls within the same program run (state variable)
+	- TemplateCache now supports multiple directories (warning: config format change!)
+	- Fixed some LogoCache bugs
+	- Fixed StandardFields XML parsing
+	- Fixed configurability of "INSERT PROJECT NAME HERE" via XML/StandardFields
+	- Use MemCacheSim on helloworld tests
+	- Disabled prompt for pg_config binary in Makefile.PL (cause database tests don't run except explicitly enabled)
+
+0.97  Wed Jan 20 15:20:00 2010
+	- Fixed tests to also work on PostgreSQL 7.x (without enums)
+	- more internal testing for upcoming prefork version (currently WWW::Mechanize seems to be buggy)
+	- some changes on how a mail with multiple files is send (now creating a ZIP-File on the fly)
+
+0.96  Wed Jan 13 10:00:00 2010
+	- This is a bugfix release
+	- Add missing requirements to Makefile.PL
+	- Fixed some tests (tests were broken, not the modules)
+
+
+0.95  Sun Dec 19 16:00:00 2009
+	- This is a bugfix and "more tests" release
+	- Added POD syntax test
+	- Added POD coverage test
+	- Fixed POD in all modules (but have mostly still minimal documentation)
+	- Added memcached tests
+	- Added static web tests
+	- Added database (DBD::Pg) tests and test database
+	- Added dynamic tests incl. Authentification and user managment
+	- Added simple stress test
+
+0.94  Fri Dec 11 14:00:00 2009
+	- This is a bugfix release
+	- Fixed multiple multi-threading/PreFork issues in Web::
+	- Fixed broken Web::UserSettings module
+
+0.93  Wen Dec 09 16:00:00 2009
+	- This is a bugfix release
+	- Fixed bugs with ActiveState perlapp (compiler) under Windows
+	- Added example for Maplat as Windows service
+
+0.92  Mon Dec 01 18:20:00 2009
+	- This is a refactoring release
+	- Added (mostly untested) support for using Maplat::Web as preforking server
+	- Added (mostly untested) support for using SSL
+	- Removed Maplat::Server and switched back to HTTP::Server::Simple::CGI
+
+0.91  Mon Dec 01 14:18:00 2009
+	- This is a bugfix release
+	- Fixed some POD errors
+	- Fixed a template error (don't sessionrefresh on login/logout screens)
+	- StaticCache and TemplateCache now work even if only
+	  serving default data (without the local dirs existing)
+	- LogoCache is still broken (can't use default data)
+
+0.90  Mon Nov 16 11:58:59 2009
+	- first public release on CPAN
+

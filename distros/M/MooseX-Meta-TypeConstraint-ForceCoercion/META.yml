@@ -1,0 +1,11 @@
+--- 
+abstract: Force coercion when validating type constraints
+author: 
+  - Florian Ragwitz <rafl@debian.org>
+generated_by: Dist::Zilla::Plugin::MetaYaml version 1.004
+license: perl
+name: MooseX-Meta-TypeConstraint-ForceCoercion
+requires: 
+  Moose: 0
+  namespace::autoclean: 0
+version: 0.01

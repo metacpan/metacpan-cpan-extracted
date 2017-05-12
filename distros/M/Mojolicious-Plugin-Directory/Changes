@@ -1,0 +1,48 @@
+Revision history for Mojolicious-Plugin-Directory
+
+0.14 2017-04-30T04:13:45Z
+        - changed required version to Mojolicious 7.15 or higher.
+
+0.13 2017-04-30T03:54:40Z
+        - fixed issue #5. thanks plicease@github
+
+0.12 2016-07-22T02:21:24Z
+        - fixed to pass the test with Mojolicious 7.
+
+0.11 2015-04-28T03:13:29Z
+        - fixed a bug in the test.
+
+0.10 2015-04-27T13:56:32Z
+        - fixed the test because  Mojolicious::Types came get the json MIME type with charset.
+
+0.09 2015-01-29T02:20:25Z
+        - fixed to use Mojo::JSON with functional interface. thanks reneeb@github
+        - minillaize
+
+0.08  2013-06-09 16:34:06 JST
+        - added auto_index configuration. thanks ChinaXing@github
+        - added json configuration.
+
+0.07  2013-05-17 11:50:14 JST
+        - changed to Mojolicious::Controller#render from Mojolicious::Controller#render_data
+        - millaize
+
+0.06
+        - added dir_index configuration
+
+0.05
+        - modified the order of handler execution
+
+0.04
+        - fixed to get request path with Mojo::URL->path
+        - changed to "$cur_path" from "$cur_url" in dir_page tempalte
+
+0.03
+        - fixed to pass the test on Windows
+
+0.02
+        - added dir_page configuration
+        - added handler configuration
+
+0.01
+        - original version

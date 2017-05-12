@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+# 'rc_debian_spamcannibal'	version 1.00 7-10-04
+#
+# NOTE: rename this script "spamcannibal"
+#
+# Debian start/stop spamcannibal
+#
+# Contributed by "Jonathan Baker-Bates" <jonathan@bakerbates.com>
+#
+SCRIPT=/usr/local/spamcannibal/scripts/rc.sc_dbwatch
+CONF=/usr/local/spamcannibal/config/sc_dbwatch.conf
+
+test -f $SCRIPT || exit 0
+
+case "$1" in
+
+	start)	echo -n "Starting spamcannibal..."
+		$SCRIPT start $CONF
+		echo "."
+		;;
+	stop)	echo -n "Stopping spamcannibal..."
+		$SCRIPT stop $CONF
+		echo "."
+		;;
+	stop)	echo -n "Restarting spamcannibal..."
+		$SCRIPT restart $CONF
+		echo "."
+		;;
+	*)	echo "Usage: /etc/init.d/spamcannibal start|stop|restart"
+		exit 1
+		;;
+esac
+exit 0

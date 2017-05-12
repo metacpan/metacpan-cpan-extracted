@@ -1,0 +1,30 @@
+Revision history for Perl extension MIME::Lite::TT::Japanese
+0.08  Mon Mar 13 17:23:00 2006
+    - Mail header 'From' is also converted to MIME-Header.
+      reported and fixed by Tokuhiro Matsuno. Thank you.
+
+0.07  Wed Nov 16 21:56:13 2005
+    - now use DateTime::Format::Mail instead of Mail::Date. ( Mail::Date was disappeared from CPAN. )
+      reported and fixed by Daisuke Murase. Thank you.
+
+0.06  Sun Aug 07 23:57:21 2005
+    - implement auto linefeed.
+    - now Jcode is always used. no Encode.
+
+0.05  Wed Dec 15 20:32:24 2004
+    - set Japanese local-time at Date field by default.
+
+0.04  Wed Sep 08 18:00:07 2004
+	- MIME-Header encoding is now ISO-2022-JP even when over 5.8.0.
+	- Jcode is also required over 5.8.0.
+
+0.03  Sat Jul 31 15:30:49 2004
+    - now use Encode when the version of perl is 5.8.0 or more instead of Jcode.
+    - add MIME::Lite::TT into PREREQ_PM.
+	- fix document.
+
+0.02  Mon Jul 27 14:57:34 2004
+	- add Jcode into PREREQ_PM.
+
+0.01  Sun Jul 25 03:36:36 2004
+	- original version

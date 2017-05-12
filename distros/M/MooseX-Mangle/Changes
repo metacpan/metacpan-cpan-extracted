@@ -1,0 +1,9 @@
+Revision history for MooseX::Mangle
+
+0.02    1/21/2010
+    Propagate void context properly for mangle_return
+
+    use with_meta rather than with_caller, since that's deprecated
+
+0.01    5/27/2009
+    Initial release

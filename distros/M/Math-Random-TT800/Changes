@@ -1,0 +1,12 @@
+Revision history for Perl extension Math::(Random)::TT800.
+
+0.01  Sun Mar 30 11:26:24 1997
+	- original version; created by h2xs 1.16
+
+1.00  Sun Mar 30 17:02:50 MET DST 1997
+	- finished version.
+
+1.01  Wed Oct 23 17:36:34 CEST 2002
+	- renamed to Math::Random::TT800
+	- removed TT800.c vs. tt800.c clash
+	- initial CPAN upload

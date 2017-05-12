@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/MojoX/Log/Dispatch.pm
+t/00load.t
+t/01use.t
+t/02new.t
+t/04logdisp.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

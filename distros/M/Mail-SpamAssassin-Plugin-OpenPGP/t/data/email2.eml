@@ -1,0 +1,84 @@
+Return-Path: <dev-return-35195-dave=brondsema.net@spamassassin.apache.org>
+X-Original-To: dave@brondsema.net
+Delivered-To: brondsem@postalmail-mx2.g.dreamhost.com
+Received: from mail.apache.org (hermes.apache.org [140.211.11.2])
+	by postalmail-mx2.g.dreamhost.com (Postfix) with SMTP id E72C2CB3B4
+	for <dave@brondsema.net>; Thu, 21 Feb 2008 17:28:55 -0800 (PST)
+Received: (qmail 93860 invoked by uid 500); 22 Feb 2008 01:28:49 -0000
+Mailing-List: contact dev-help@spamassassin.apache.org; run by ezmlm
+Precedence: bulk
+list-help: <mailto:dev-help@spamassassin.apache.org>
+list-unsubscribe: <mailto:dev-unsubscribe@spamassassin.apache.org>
+List-Post: <mailto:dev@spamassassin.apache.org>
+List-Id: <dev.spamassassin.apache.org>
+Delivered-To: mailing list dev@spamassassin.apache.org
+Received: (qmail 93849 invoked by uid 99); 22 Feb 2008 01:28:49 -0000
+Received: from nike.apache.org (HELO nike.apache.org) (192.87.106.230)
+    by apache.org (qpsmtpd/0.29) with ESMTP; Thu, 21 Feb 2008 17:28:49 -0800
+X-ASF-Spam-Status: No, hits=-2.8 required=10.0
+	tests=RCVD_IN_DNSWL_MED,SPF_NEUTRAL
+Received-SPF: neutral (nike.apache.org: local policy)
+Received: from [67.91.233.27] (HELO eclectic.kluge.net) (67.91.233.27)
+    by apache.org (qpsmtpd/0.29) with ESMTP; Fri, 22 Feb 2008 01:28:01 +0000
+Received: by eclectic.kluge.net (Postfix, from userid 501)
+	id 4D1A2AF122; Thu, 21 Feb 2008 20:28:21 -0500 (EST)
+Date: Thu, 21 Feb 2008 20:28:21 -0500
+From: Theo Van Dinter <felicity@apache.org>
+To: Spamassassin Devel List <dev@spamassassin.apache.org>
+Subject: So who broke SA updates?
+Message-ID: <20080222012821.GG26040@kluge.net>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="8qjQX3lIKI8OJLo6"
+Content-Disposition: inline
+User-Agent: Mutt/1.4.2.3i
+X-GPG-Keyserver: http://pgp.mit.edu/
+X-GPG-Keynumber: 0x07248E3A
+X-GPG-Fingerprint: 4C1F D0B9 6F04 5A90 0C9B  5EC7 4670 30A1 0724 8E3A
+X-GPG-URL: http://www.kluge.net/~felicity/pgp.html
+X-Virus-Checked: Checked by ClamAV on apache.org
+
+
+--8qjQX3lIKI8OJLo6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+[updates]
+comment =3D SpamAssassin updates (updates.spamassassin.org)
+path =3D /var/www/buildbot.spamassassin.org/updatestage
+read only =3D true
+
+$ ls /var/www/buildbot.spamassassin.org/updatestage
+/var/www/buildbot.spamassassin.org/updatestage: No such file or directory
+
+
+It's related to:
+
+lrwxrwxrwx   1 root     root          23 Feb 21 12:36 buildbot.spamassassin=
+.org -> bbmass.spamassassin.org
+drwxr-xr-x   7 root     root         512 May  2  2007 buildbot.spamassassin=
+.org.NOLONGERUSED
+
+
+I rsynced the dirs from NOLONGERUSED into bbmass...
+
+--=20
+Randomly Selected Tagline:
+"When cryptography is outlawed, gjklj nbvmiou wtkj kd;ie4 skt klbjxdf."
+                   - Unknown
+
+--8qjQX3lIKI8OJLo6
+Content-Type: application/pgp-signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.8 (GNU/Linux)
+
+iD8DBQFHviU0RnAwoQckjjoRAr4qAJ9ofYFaIZgJuJ1OFeWz00hEvnPtGACgurI5
+9Wrlmgx3EltncF8GqaCiL/o=
+=H6H8
+-----END PGP SIGNATURE-----
+
+--8qjQX3lIKI8OJLo6--
+

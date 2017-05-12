@@ -1,0 +1,6 @@
+name = "Mackerel-Webhook-Receiver"
+# badges = ["travis"]
+authority="cpan:SONGMU"
+
+module_maker="ModuleBuildTiny"
+

@@ -1,0 +1,41 @@
+---
+abstract: 'generate META.yml data from DOAP'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+keywords:
+  - CPAN
+  - DOAP
+  - Metadata
+  - Packaging
+  - RDF
+  - 'Semantic Web'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Module::Install::DOAP
+name: Module-Install-DOAP
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Module::Install: 1.00
+  Module::Install::Admin::RDF: 0.004
+  Module::Install::RDF: 0.004
+  RDF::Trine: 0.133
+  perl: 5.8.0
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Module-Install-DOAP
+  homepage: https://metacpan.org/release/Module-Install-DOAP
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/tobyink/p5-module-install-doap
+version: 0.006

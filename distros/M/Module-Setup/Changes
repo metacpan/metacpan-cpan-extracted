@@ -1,0 +1,102 @@
+Revision history for Perl extension Module::Setup
+
+0.09    2010-02-09T13:57:09+09:00
+        - depended Module::Collect 0.06
+        - added to documents
+
+0.08    2010-02-08T14:24:55+09:00
+        - Core
+          added LWP::UserAgent dependency (RT #53093) (charsbar)
+        - Core for performance
+          Chache stringify in ::Path::Dir and ::Path::File (gfx)
+          s/Path::Class::/Module::Setup::/ (gfx)
+        - Tests
+          chdir to HOME at the end of the test program to avoid rmdir warnings (gfx)
+          fixed to dosen't work for Win32 (charsbar)
+
+0.07    2009-12-19T20:22:02+09:00
+        - added Flavor::GitHub
+        - added Flavor::XS
+        - Flavor::Default
+          use Module::Install::Repository on Makefile.PL
+          remove Test::Base dependency
+          chomp empty line on Module.pm
+          s/build_requires/test_requires/
+        - Flavor::CatalystStarter
+          fiexd script/myapp_create.pl bug
+        - Core
+          added Helper support
+          added shell method
+          fixed module-setup usage
+          fixed documentation for Module/Setup.pm
+
+0.06_01 2008-10-27T11:14:39+09:00
+        ** EXPERIMENTAL RELEASE **
+        - Add --devel option
+          $ module-setup --devel New::Flavor
+          $ cd New-Flavor
+            .. edit ..
+          $ module-setup --devel --test
+          $ module-setup --devel --pack > New/Flavor.pm
+          $ module-setup --devel --pack --executable > newflavorsetup.pl
+        - Add --executable option
+          $ module-setup --pack --executable Foo flavor > flavorsetup.pl
+          $ perl ./flavorsetup.pl New::Dist
+        - Add Flavor::CatalystStarter
+        - Add Flavor::PBP
+        - Add Flavor::SelectVC (version control system selector)
+        - Add Module::Setup::Test::Utils and Module::Setup::Test::Flavor
+        - add flavor template macros
+          distribute, module_unix_path
+        - fixed to safe module_path
+        - changed use flavor instance
+
+0.06    2008-10-22T23:02:34+09:00
+	- add Plugin::VC::SVK
+        - remove VC::SVN in Flavor::Default config
+	  However, version control system was selected in Flavor::Default
+
+0.05    2008-10-22T19:16:50+09:00
+	- additional template support
+	- binary file support
+        - fixed plugin (required use base 'M::P::Plugin' and config uses hash reference)
+        - fixed broken when there is not MODULE_SETUP_DIR
+
+0.04    2008-10-17T20:28:25+09:00
+	- add --flavor and --flavor-class options alias of --flavour and --flavour-class options in module-setup command
+	- add too many tests
+	- fixed default MODULE_SETUP dir is broken (hidek++)
+	- fixed plugin config is broken
+	- current directory returns to the original directory on run method
+
+0.03_03 2008-10-16T22:06:19+09:00
+        - add empty directory support on flavor
+	- portably perform operations on flavor
+        - pod fix
+
+0.03_02 2008-10-14T12:29:43+09:00
+        - add dependence File::HomeDir
+
+0.03_01 2008-10-10T20:29:36+09:00
+	- add module_setup_dir option
+        - add t/020_run/direct.t and t/020_run/pack.t
+        - Change to built-in api
+        - too many refactoring
+
+0.03    2008-10-07T20:01:05+09:00
+        - add flavor select option (core)
+        - add dependence to Module::Install::AuthorTests for Flavor::Default franck++
+        - add tests
+        - fixed spell test in Flavor::Default
+        - fixed Makefile.PL is ignored in .gitignore (Plugin::VC::Git)
+
+0.02    2008-10-02T11:34:28+09:00
+        - 0.01 is broken code
+          dependence Module::Collect 0.04
+        - pod fix
+        - add plugin trigger point
+          after_create_skeleton
+          finalize_create_skeleton
+
+0.01    2008-10-01T23:46:50+09:00
+        - original version

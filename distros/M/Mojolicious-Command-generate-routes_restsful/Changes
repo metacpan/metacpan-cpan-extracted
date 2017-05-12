@@ -1,0 +1,10 @@
+Revsion History for Mojolicious::Command::generate::routes_restsful
+
+0.01 Initial kick at the can. 
+
+0.02 Bug Fixes 
+    #1 RETREIVE should be RETRIEVE, From: Dave Baker, Fix: John scoles 
+    #2 PRIFIX should be PREFIX, From: William Lindley (https://github.com/lindleyw)  Fix: John Scoles
+    #3 Found bug on review had 'resource' ranther than 'RESOURCE' in code
+     
+     

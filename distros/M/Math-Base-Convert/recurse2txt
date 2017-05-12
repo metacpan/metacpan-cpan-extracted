@@ -1,0 +1,160 @@
+#!/usr/bin/perl
+#
+# recurse2txt routines
+#
+# version 1.08, 12-20-12, michael@bizsystems.com
+#
+# 10-3-11	updated to bless into calling package
+# 10-10-11	add SCALAR ref support
+# 1.06	12-16-12	add hexDumper
+# 1.07	12-19-12	added wantarray return of data and elements
+# 1.08	12-20-12	add wantarray to hexDumper
+#
+#use strict;
+#use diagnostics;
+
+use overload;
+
+# generate a unique signature for a particular hash
+#
+# Data::Dumper actually does much more than this, however, it
+# does not stringify hash's in a consistent manner. i.e. no SORT
+#
+# The routine below, while not covering recursion loops, non ascii
+# characters, etc.... does produce text that can be eval'd and is 
+# consistent with each rendering.
+#
+sub hexDumper {
+  if (wantarray) {
+    ($data,$count) = Dumper($_[0]);
+    $data =~ s/(\b\d+)/sprintf("0x%x",$1)/ge;
+    return ($data,$count);
+  }
+  (my $x = Dumper($_[0])) =~ s/(\b\d+)/sprintf("0x%x",$1)/ge;
+  $x;
+}
+
+sub Dumper {
+  unless (defined $_[0]) {
+    return ("undef\n",'undef') if wantarray;
+    return "undef\n";
+  }
+  my $ref = ref $_[0];
+  return "not a reference\n" unless $ref;
+  unless ($ref eq 'HASH' or $ref eq 'ARRAY' or $ref eq 'SCALAR') {
+    ($ref) = (overload::StrVal($_[0]) =~ /^(?:.*\=)?([^=]*)\(/);
+  }
+  my $p = {
+	depth		=> 0,
+	elements	=> 0,
+  };
+  (my $pkg = (caller(0))[3]) =~ s/(.+)::Dumper/$1/;
+  bless $p,$pkg;
+  my $data;
+  if ($ref eq 'HASH') {
+    $data = $p->hash_recurse($_[0],"\n");
+  }
+  elsif ($ref eq 'ARRAY') {
+    $data = $p->array_recurse($_[0]);
+  } else {
+#  return $ref ." unsupported\n";
+    $data = $p->scalar_recurse($_[0]);
+  }
+  $data =~ s/,\n$/;\n/;
+  return ($data,$p->{elements}) if wantarray;
+  return $p->{elements} ."\t= ". $data;
+}
+  
+# input:	pointer to scalar, terminator
+# returns	data
+#
+sub scalar_recurse {
+  my($p,$ptr,$n) = @_;
+  $n = '' unless $n;
+  my $data = "\\";
+  $data .= _dump($p,$$ptr);
+  $data .= "\n";
+}
+
+# input:	pointer to hash, terminator
+# returns:	data
+#
+sub hash_recurse {
+  my($p,$ptr,$n) = @_;
+  $n = '' unless $n;
+  my $data = "{\n";
+  foreach my $key (sort keys %$ptr) {
+    $data .= "\t'". $key ."'\t=> ";
+    $data .= _dump($p,$ptr->{$key},"\n");
+  }
+  $data .= '},'.$n;
+}
+
+# generate a unique signature for a particular array
+#
+# input:	pointer to array, terminator
+# returns:	data
+sub array_recurse {
+  my($p,$ptr,$n) = @_;
+  $n = '' unless $n;
+  my $data = '[';
+  foreach my $item (@$ptr) {
+    $data .= _dump($p,$item);
+  }
+  $data .= "],\n";
+}
+
+# input:	self, item, append
+# return:	data
+#
+sub _dump {
+  my($p,$item,$n) = @_;
+  $p->{elements}++;
+  $n = '' unless $n;
+  my $ref = ref $item;
+  if ($ref eq 'HASH') {
+    return tabout($p->hash_recurse($item,"\n"));
+  }
+  elsif($ref eq 'ARRAY') {
+    return $p->array_recurse($item,$n);
+  }
+  elsif($ref eq 'SCALAR') {
+ #   return q|\$SCALAR,|.$n;
+    return($p->scalar_recurse($item,$n)); 
+ }
+  elsif ($ref eq 'GLOB') {
+    my $g = *{$item};
+    return  "\\$g" .','.$n;
+  }
+  elsif(do {my $g = \$item; ref $g eq 'GLOB'}) {
+    return "$item" .','.$n;
+  }
+  elsif($ref eq 'CODE') {
+    return q|sub {'DUMMY'},|.$n;
+  }
+  elsif (defined $item) {
+    return wrap_data($item) .','.$n;
+  }
+  else {
+    return 'undef,'.$n;
+  }
+}
+
+sub tabout {
+  my @data = split(/\n/,shift);
+  my $data = shift @data;
+  $data .= "\n";
+  foreach(@data) {
+    $data .= "\t$_\n";
+  }
+  $data;
+}
+
+sub wrap_data {
+  my $data = shift;
+  return ($data =~ /\D/ || $data =~ /^$/)
+	? q|'|. $data .q|'|
+	: $data;
+}
+
+1;

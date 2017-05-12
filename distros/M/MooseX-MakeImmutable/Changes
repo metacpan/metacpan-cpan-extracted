@@ -1,0 +1,7 @@
+0.02 Thursday August 14 16:47:49 PDT 2008:
+    - Added lock_down/open_up for easier immutification
+    - Modernized boilerplate
+    - Added repository information
+
+0.01 Sunday May 04 11:53:31 PDT 2008:
+    - Initial release

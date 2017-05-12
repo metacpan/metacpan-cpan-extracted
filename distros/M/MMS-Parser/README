@@ -1,0 +1,40 @@
+MMS-Parser - A module for parsing binary MMS messages.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+DEPENDENCIES
+
+Parse::RecDescent, Path::Class and File::Slurp. And yes, the non-core
+but de-facto-standard version.
+
+Moreover, you'll need Test::More in order to correctly run the test
+suite.
+
+SEE ALSO
+
+Open Mobile Alliance (L<http://www.openmobilealliance.org/>), the standard
+body that rules over MMS.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Flavio Poletti
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

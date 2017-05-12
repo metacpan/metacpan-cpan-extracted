@@ -1,0 +1,20 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+SIGNATURE
+eg/brutecanon
+eg/conversion-charts
+lib/Music/Canon.pm
+t/00-load.t
+t/Music-Canon.t
+t/manifest.t
+t/modal-map-beyond-thunderdome.t
+t/modal-map.t
+t/pod-coverage.t
+t/pod.t
+t/steps.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,4 @@
+#!include_default
+.git
+.DS_Store
+.releaserc

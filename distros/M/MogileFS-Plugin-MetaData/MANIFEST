@@ -1,0 +1,6 @@
+CHANGES
+lib/MogileFS/Plugin/MetaData.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml                                 Module meta-data (added by MakeMaker)

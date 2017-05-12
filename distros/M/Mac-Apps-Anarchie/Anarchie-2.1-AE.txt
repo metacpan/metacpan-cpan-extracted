@@ -1,0 +1,108 @@
+on clear () { Çdelete selection
+	return (appleEvent (Arch.id, 'core', 'delo'))}
+
+on close () { Çclose the front window
+	return (appleEvent (Arch.id, 'core', 'clos'))}
+
+on closeall () { Çclose all the windows
+	return (appleEvent (Arch.id, 'core', 'Clos'))}
+
+on copyclip () { Çcopy selection
+	return (appleEvent (Arch.id, 'core', 'copy'))}
+
+on cut () { Çcut selection
+	return (appleEvent (Arch.id, 'core', 'cut '))}
+
+on fetch (file, host = nil, path = nil, name = nil, user = nil, password = nil, url = nil, viaFirewall = nil, viaSocks = nil, binary = nil, expandWith = nil) { Çfetch a file via ftp
+	return (appleEvent (Arch.id, 'Arch', 'Ftch', '----', alias (file), 'FTPh', string (host), 'FTPc', string (path), 'pnam', string (name), 'ArGU', string (user), 'ArGp', string (password), 'ArUR', string (url), 'ArGF', string (viaFirewall), 'ArGS', string (viaSocks), 'ArGB', boolean (binary), 'ArGE', string4 (expandWith)))}
+
+on find (s, server = nil, matches = nil, caseSensitivity = nil, regularExpression = nil, url = nil, window = nil) { Çquery archie server
+	return (appleEvent (Arch.id, 'Arch', 'Find', '----', string (s), 'ArFS', string (server), 'ArFM', long (matches), 'ArFC', boolean (caseSensitivity), 'ArFR', boolean (regularExpression), 'ArUR', string (url), 'ArFW', boolean (window)))}
+
+on frontwindowrecord () { Çreturns the record for the front window
+	return (appleEvent (Arch.id, 'Arch', 'Afwr'))}
+
+on geturl (s, geturlTo = nil) { Çfetch the url and display or save it
+	return (appleEvent (Arch.id, 'GURL', 'GURL', '----', string (s), 'dest', filespec (geturlTo)))}
+
+on help () { Çopen the help window
+	return (appleEvent (Arch.id, 'core', 'help'))}
+
+on index (host = nil, path = nil, user = nil, password = nil, url = nil, viaFirewall = nil, viaSocks = nil) { ÇDisplay an index listing
+	return (appleEvent (Arch.id, 'Arch', 'Indx', 'FTPh', string (host), 'FTPc', string (path), 'ArGU', string (user), 'ArGp', string (password), 'ArUR', string (url), 'ArGF', string (viaFirewall), 'ArGS', string (viaSocks)))}
+
+on isRunning () {
+	return (sys.appIsRunning (Arch.id))}
+
+on launch () {
+	return (app.startWithDocument ("Arch", ""))}
+
+on list (file, host = nil, path = nil, name = nil, user = nil, password = nil, url = nil, viaFirewall = nil, viaSocks = nil, window = nil) { Çlist files in a directory
+	return (appleEvent (Arch.id, 'Arch', 'List', '----', alias (file), 'FTPh', string (host), 'FTPc', string (path), 'pnam', string (name), 'ArGU', string (user), 'ArGp', string (password), 'ArUR', string (url), 'ArGF', string (viaFirewall), 'ArGS', string (viaSocks), 'ArFW', boolean (window)))}
+
+on macsearch (s) { Çsearch the Ambrosia server for Mac files
+	return (appleEvent (Arch.id, 'Arch', 'PQry', '----', string (s)))}
+
+on mkdir (host = nil, path = nil, user = nil, password = nil, url = nil, viaFirewall = nil, viaSocks = nil) { ÇMake directory
+	return (appleEvent (Arch.id, 'Arch', 'MkDr', 'FTPh', string (host), 'FTPc', string (path), 'ArGU', string (user), 'ArGp', string (password), 'ArUR', string (url), 'ArGF', string (viaFirewall), 'ArGS', string (viaSocks)))}
+
+on nlist (file, host = nil, path = nil, name = nil, user = nil, password = nil, url = nil, viaFirewall = nil, viaSocks = nil) { Çlist names of files in a directory
+	return (appleEvent (Arch.id, 'Arch', 'NLst', '----', alias (file), 'FTPh', string (host), 'FTPc', string (path), 'pnam', string (name), 'ArGU', string (user), 'ArGp', string (password), 'ArUR', string (url), 'ArGF', string (viaFirewall), 'ArGS', string (viaSocks)))}
+
+on open (file) { Çopen bookmark or folder
+	return (appleEvent (Arch.id, 'aevt', 'odoc', '----', alias (file)))}
+
+on openDocument (file) {
+	return (required.openDocument (Arch.id, file))}
+
+on paste () { Çpaste into selection
+	return (appleEvent (Arch.id, 'core', 'past'))}
+
+on printDocument (file) {
+	return (required.printDocument (Arch.id, file))}
+
+on quit () { ÇQuit Anarchie
+	return (appleEvent (Arch.id, 'aevt', 'quit'))}
+
+on remove (host = nil, path = nil, user = nil, password = nil, url = nil, viaFirewall = nil, viaSocks = nil) { Çdelete a file or directory
+	return (appleEvent (Arch.id, 'Arch', 'Rmve', 'FTPh', string (host), 'FTPc', string (path), 'ArGU', string (user), 'ArGp', string (password), 'ArUR', string (url), 'ArGF', string (viaFirewall), 'ArGS', string (viaSocks)))}
+
+on rename (host = nil, path = nil, user = nil, password = nil, url = nil, viaFirewall = nil, viaSocks = nil, newname) { Çrename file or directory
+	return (appleEvent (Arch.id, 'Arch', 'Rena', 'FTPh', string (host), 'FTPc', string (path), 'ArGU', string (user), 'ArGp', string (password), 'ArUR', string (url), 'ArGF', string (viaFirewall), 'ArGS', string (viaSocks), 'NewN', string (newname)))}
+
+on selectall () { Çselect all
+	return (appleEvent (Arch.id, 'core', 'slct'))}
+
+on sendcommand (host = nil, path = nil, user = nil, password = nil, url = nil, viaFirewall = nil, viaSocks = nil) { ÇSend a raw FTP command
+	return (appleEvent (Arch.id, 'Arch', 'SCmd', 'FTPh', string (host), 'FTPc', string (path), 'ArGU', string (user), 'ArGp', string (password), 'ArUR', string (url), 'ArGF', string (viaFirewall), 'ArGS', string (viaSocks)))}
+
+on showabout () { Çopen about menu
+	return (appleEvent (Arch.id, 'core', 'abou'))}
+
+on showarchie () { Çopen the archie input window
+	return (appleEvent (Arch.id, 'Arch', 'SArI'))}
+
+on showget () { Çopen the fetch input window
+	return (appleEvent (Arch.id, 'Arch', 'SFcI'))}
+
+on showlog () { Çopen the log window
+	return (appleEvent (Arch.id, 'Arch', 'SLog'))}
+
+on showmacsearch () { Çopen the MacSearch input window
+	return (appleEvent (Arch.id, 'Arch', 'SMSI'))}
+
+on showtips () { Çopen the Tips window
+	return (appleEvent (Arch.id, 'Arch', 'STip'))}
+
+on showtranscript () { Çopen the transcript window
+	return (appleEvent (Arch.id, 'Arch', 'STrn'))}
+
+on store (file, host = nil, path = nil, name = nil, user = nil, password = nil, url = nil, viaFirewall = nil, viaSocks = nil, binary = nil) { Çstore a file to an ftp site
+	return (appleEvent (Arch.id, 'Arch', 'Stor', '----', alias (file), 'FTPh', string (host), 'FTPc', string (path), 'pnam', string (name), 'ArGU', string (user), 'ArGp', string (password), 'ArUR', string (url), 'ArGF', string (viaFirewall), 'ArGS', string (viaSocks), 'ArGB', boolean (binary)))}
+
+on undo () { Çundo the last operation
+	return (appleEvent (Arch.id, 'core', 'undo'))}
+
+on updateserverlist () { ÇDownload the server lists and update Internet Config
+	return (appleEvent (Arch.id, 'Arch', 'UpSL'))}
+

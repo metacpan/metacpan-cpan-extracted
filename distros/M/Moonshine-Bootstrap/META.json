@@ -1,0 +1,486 @@
+{
+   "abstract" : "Shine.",
+   "author" : [
+      "Robert Acock <thisusedtobeanemail@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Moonshine-Bootstrap",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Moonshine::Test" : "0.06",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Module::Find" : "0.13",
+            "Moonshine::Component" : "0.06",
+            "Moonshine::Element" : "0.10",
+            "Moonshine::Magic" : "0.06",
+            "Moonshine::Util" : "0.06",
+            "feature" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Moonshine::Bootstrap" : {
+         "file" : "lib/Moonshine/Bootstrap.pm"
+      },
+      "Moonshine::Bootstrap::Component" : {
+         "file" : "lib/Moonshine/Bootstrap/Component.pm",
+         "version" : "0.02"
+      },
+      "Moonshine::Bootstrap::Component::Abbr" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Abbr.pm"
+      },
+      "Moonshine::Bootstrap::Component::Alert" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Alert.pm"
+      },
+      "Moonshine::Bootstrap::Component::Badge" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Badge.pm"
+      },
+      "Moonshine::Bootstrap::Component::BasicTemplate" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/BasicTemplate.pm"
+      },
+      "Moonshine::Bootstrap::Component::Breadcrumb" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Breadcrumb.pm"
+      },
+      "Moonshine::Bootstrap::Component::Button" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Button.pm"
+      },
+      "Moonshine::Bootstrap::Component::ButtonGroup" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/ButtonGroup.pm"
+      },
+      "Moonshine::Bootstrap::Component::ButtonToolbar" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/ButtonToolbar.pm"
+      },
+      "Moonshine::Bootstrap::Component::Caption" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Caption.pm"
+      },
+      "Moonshine::Bootstrap::Component::Caret" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Caret.pm"
+      },
+      "Moonshine::Bootstrap::Component::Clearfix" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Clearfix.pm"
+      },
+      "Moonshine::Bootstrap::Component::Col" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Col.pm"
+      },
+      "Moonshine::Bootstrap::Component::Container" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Container.pm"
+      },
+      "Moonshine::Bootstrap::Component::Dropdown" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Dropdown.pm"
+      },
+      "Moonshine::Bootstrap::Component::DropdownButton" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/DropdownButton.pm"
+      },
+      "Moonshine::Bootstrap::Component::DropdownHeaderLi" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/DropdownHeaderLi.pm"
+      },
+      "Moonshine::Bootstrap::Component::DropdownUl" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/DropdownUl.pm"
+      },
+      "Moonshine::Bootstrap::Component::EmbedRes" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/EmbedRes.pm"
+      },
+      "Moonshine::Bootstrap::Component::EmbedResponsive" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/EmbedResponsive.pm"
+      },
+      "Moonshine::Bootstrap::Component::EmbedResponsiveIframe" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/EmbedResponsiveIframe.pm"
+      },
+      "Moonshine::Bootstrap::Component::FormGroup" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/FormGroup.pm"
+      },
+      "Moonshine::Bootstrap::Component::Glyphicon" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Glyphicon.pm"
+      },
+      "Moonshine::Bootstrap::Component::Input" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Input.pm"
+      },
+      "Moonshine::Bootstrap::Component::InputGroup" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/InputGroup.pm"
+      },
+      "Moonshine::Bootstrap::Component::InputGroupAddon" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/InputGroupAddon.pm"
+      },
+      "Moonshine::Bootstrap::Component::Jumbotron" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Jumbotron.pm"
+      },
+      "Moonshine::Bootstrap::Component::LinkImage" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/LinkImage.pm"
+      },
+      "Moonshine::Bootstrap::Component::LinkedLi" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/LinkedLi.pm"
+      },
+      "Moonshine::Bootstrap::Component::LinkedLiSpan" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/LinkedLiSpan.pm"
+      },
+      "Moonshine::Bootstrap::Component::ListGroup" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/ListGroup.pm"
+      },
+      "Moonshine::Bootstrap::Component::ListGroupItem" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/ListGroupItem.pm"
+      },
+      "Moonshine::Bootstrap::Component::ListedGroup" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/ListedGroup.pm"
+      },
+      "Moonshine::Bootstrap::Component::ListedGroupItem" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/ListedGroupItem.pm"
+      },
+      "Moonshine::Bootstrap::Component::ListedGroupItemHeading" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/ListedGroupItemHeading.pm"
+      },
+      "Moonshine::Bootstrap::Component::ListedGroupItemText" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/ListedGroupItemText.pm"
+      },
+      "Moonshine::Bootstrap::Component::Media" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Media.pm"
+      },
+      "Moonshine::Bootstrap::Component::MediaLinkImage" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/MediaLinkImage.pm"
+      },
+      "Moonshine::Bootstrap::Component::MediaList" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/MediaList.pm"
+      },
+      "Moonshine::Bootstrap::Component::MediaObject" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/MediaObject.pm"
+      },
+      "Moonshine::Bootstrap::Component::Nav" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Nav.pm"
+      },
+      "Moonshine::Bootstrap::Component::NavItem" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/NavItem.pm"
+      },
+      "Moonshine::Bootstrap::Component::Navbar" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Navbar.pm"
+      },
+      "Moonshine::Bootstrap::Component::NavbarBrand" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/NavbarBrand.pm"
+      },
+      "Moonshine::Bootstrap::Component::NavbarButton" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/NavbarButton.pm"
+      },
+      "Moonshine::Bootstrap::Component::NavbarCollapse" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/NavbarCollapse.pm"
+      },
+      "Moonshine::Bootstrap::Component::NavbarForm" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/NavbarForm.pm"
+      },
+      "Moonshine::Bootstrap::Component::NavbarHeader" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/NavbarHeader.pm"
+      },
+      "Moonshine::Bootstrap::Component::NavbarNav" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/NavbarNav.pm"
+      },
+      "Moonshine::Bootstrap::Component::NavbarText" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/NavbarText.pm"
+      },
+      "Moonshine::Bootstrap::Component::NavbarTextLink" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/NavbarTextLink.pm"
+      },
+      "Moonshine::Bootstrap::Component::NavbarToggle" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/NavbarToggle.pm"
+      },
+      "Moonshine::Bootstrap::Component::PageHeader" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/PageHeader.pm"
+      },
+      "Moonshine::Bootstrap::Component::Pager" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Pager.pm"
+      },
+      "Moonshine::Bootstrap::Component::Pagination" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Pagination.pm"
+      },
+      "Moonshine::Bootstrap::Component::Panel" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Panel.pm"
+      },
+      "Moonshine::Bootstrap::Component::PanelBody" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/PanelBody.pm"
+      },
+      "Moonshine::Bootstrap::Component::PanelFooter" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/PanelFooter.pm"
+      },
+      "Moonshine::Bootstrap::Component::PanelHeader" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/PanelHeader.pm"
+      },
+      "Moonshine::Bootstrap::Component::PanelTitle" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/PanelTitle.pm"
+      },
+      "Moonshine::Bootstrap::Component::Progress" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Progress.pm"
+      },
+      "Moonshine::Bootstrap::Component::ProgressBar" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/ProgressBar.pm"
+      },
+      "Moonshine::Bootstrap::Component::Row" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Row.pm"
+      },
+      "Moonshine::Bootstrap::Component::SeparatorLi" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/SeparatorLi.pm"
+      },
+      "Moonshine::Bootstrap::Component::SubmitButton" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/SubmitButton.pm"
+      },
+      "Moonshine::Bootstrap::Component::TextLabel" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/TextLabel.pm"
+      },
+      "Moonshine::Bootstrap::Component::Thumbnail" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Thumbnail.pm"
+      },
+      "Moonshine::Bootstrap::Component::Ul" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Ul.pm"
+      },
+      "Moonshine::Bootstrap::Component::Well" : {
+         "file" : "lib/Moonshine/Bootstrap/Component/Well.pm"
+      },
+      "Moonshine::Bootstrap::Trait::Export" : {
+         "file" : "lib/Moonshine/Bootstrap/Trait/Export.pm"
+      },
+      "Moonshine::Bootstrap::v3" : {
+         "file" : "lib/Moonshine/Bootstrap/v3.pm"
+      },
+      "Moonshine::Bootstrap::v3::Abbr" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Abbr.pm"
+      },
+      "Moonshine::Bootstrap::v3::Alert" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Alert.pm"
+      },
+      "Moonshine::Bootstrap::v3::Badge" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Badge.pm"
+      },
+      "Moonshine::Bootstrap::v3::BasicTemplate" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/BasicTemplate.pm"
+      },
+      "Moonshine::Bootstrap::v3::Breadcrumb" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Breadcrumb.pm"
+      },
+      "Moonshine::Bootstrap::v3::Button" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Button.pm"
+      },
+      "Moonshine::Bootstrap::v3::ButtonGroup" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/ButtonGroup.pm"
+      },
+      "Moonshine::Bootstrap::v3::ButtonToolbar" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/ButtonToolbar.pm"
+      },
+      "Moonshine::Bootstrap::v3::Caption" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Caption.pm"
+      },
+      "Moonshine::Bootstrap::v3::Caret" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Caret.pm"
+      },
+      "Moonshine::Bootstrap::v3::Clearfix" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Clearfix.pm"
+      },
+      "Moonshine::Bootstrap::v3::Col" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Col.pm"
+      },
+      "Moonshine::Bootstrap::v3::Container" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Container.pm"
+      },
+      "Moonshine::Bootstrap::v3::Dropdown" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Dropdown.pm"
+      },
+      "Moonshine::Bootstrap::v3::DropdownButton" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/DropdownButton.pm"
+      },
+      "Moonshine::Bootstrap::v3::DropdownHeaderLi" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/DropdownHeaderLi.pm"
+      },
+      "Moonshine::Bootstrap::v3::DropdownUl" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/DropdownUl.pm"
+      },
+      "Moonshine::Bootstrap::v3::EmbedRes" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/EmbedRes.pm"
+      },
+      "Moonshine::Bootstrap::v3::EmbedResponsive" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/EmbedResponsive.pm"
+      },
+      "Moonshine::Bootstrap::v3::EmbedResponsiveIframe" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/EmbedResponsiveIframe.pm"
+      },
+      "Moonshine::Bootstrap::v3::FormGroup" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/FormGroup.pm"
+      },
+      "Moonshine::Bootstrap::v3::Glyphicon" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Glyphicon.pm"
+      },
+      "Moonshine::Bootstrap::v3::Input" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Input.pm"
+      },
+      "Moonshine::Bootstrap::v3::InputGroup" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/InputGroup.pm"
+      },
+      "Moonshine::Bootstrap::v3::InputGroupAddon" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/InputGroupAddon.pm"
+      },
+      "Moonshine::Bootstrap::v3::Jumbotron" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Jumbotron.pm"
+      },
+      "Moonshine::Bootstrap::v3::LinkImage" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/LinkImage.pm"
+      },
+      "Moonshine::Bootstrap::v3::LinkedLi" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/LinkedLi.pm"
+      },
+      "Moonshine::Bootstrap::v3::LinkedLiSpan" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/LinkedLiSpan.pm"
+      },
+      "Moonshine::Bootstrap::v3::ListGroup" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/ListGroup.pm"
+      },
+      "Moonshine::Bootstrap::v3::ListGroupItem" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/ListGroupItem.pm"
+      },
+      "Moonshine::Bootstrap::v3::ListedGroup" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/ListedGroup.pm"
+      },
+      "Moonshine::Bootstrap::v3::ListedGroupItem" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/ListedGroupItem.pm"
+      },
+      "Moonshine::Bootstrap::v3::ListedGroupItemHeading" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/ListedGroupItemHeading.pm"
+      },
+      "Moonshine::Bootstrap::v3::ListedGroupItemText" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/ListedGroupItemText.pm"
+      },
+      "Moonshine::Bootstrap::v3::Media" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Media.pm"
+      },
+      "Moonshine::Bootstrap::v3::MediaLinkImage" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/MediaLinkImage.pm"
+      },
+      "Moonshine::Bootstrap::v3::MediaList" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/MediaList.pm"
+      },
+      "Moonshine::Bootstrap::v3::MediaObject" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/MediaObject.pm"
+      },
+      "Moonshine::Bootstrap::v3::Nav" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Nav.pm"
+      },
+      "Moonshine::Bootstrap::v3::NavItem" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/NavItem.pm"
+      },
+      "Moonshine::Bootstrap::v3::Navbar" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Navbar.pm"
+      },
+      "Moonshine::Bootstrap::v3::NavbarBrand" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/NavbarBrand.pm"
+      },
+      "Moonshine::Bootstrap::v3::NavbarButton" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/NavbarButton.pm"
+      },
+      "Moonshine::Bootstrap::v3::NavbarCollapse" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/NavbarCollapse.pm"
+      },
+      "Moonshine::Bootstrap::v3::NavbarForm" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/NavbarForm.pm"
+      },
+      "Moonshine::Bootstrap::v3::NavbarHeader" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/NavbarHeader.pm"
+      },
+      "Moonshine::Bootstrap::v3::NavbarNav" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/NavbarNav.pm"
+      },
+      "Moonshine::Bootstrap::v3::NavbarText" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/NavbarText.pm"
+      },
+      "Moonshine::Bootstrap::v3::NavbarTextLink" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/NavbarTextLink.pm"
+      },
+      "Moonshine::Bootstrap::v3::NavbarToggle" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/NavbarToggle.pm"
+      },
+      "Moonshine::Bootstrap::v3::PageHeader" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/PageHeader.pm"
+      },
+      "Moonshine::Bootstrap::v3::Pager" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Pager.pm"
+      },
+      "Moonshine::Bootstrap::v3::Pagination" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Pagination.pm"
+      },
+      "Moonshine::Bootstrap::v3::Panel" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Panel.pm"
+      },
+      "Moonshine::Bootstrap::v3::PanelBody" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/PanelBody.pm"
+      },
+      "Moonshine::Bootstrap::v3::PanelFooter" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/PanelFooter.pm"
+      },
+      "Moonshine::Bootstrap::v3::PanelHeader" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/PanelHeader.pm"
+      },
+      "Moonshine::Bootstrap::v3::PanelTitle" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/PanelTitle.pm"
+      },
+      "Moonshine::Bootstrap::v3::Progress" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Progress.pm"
+      },
+      "Moonshine::Bootstrap::v3::ProgressBar" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/ProgressBar.pm"
+      },
+      "Moonshine::Bootstrap::v3::Row" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Row.pm"
+      },
+      "Moonshine::Bootstrap::v3::SeparatorLi" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/SeparatorLi.pm"
+      },
+      "Moonshine::Bootstrap::v3::SubmitButton" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/SubmitButton.pm"
+      },
+      "Moonshine::Bootstrap::v3::TextLabel" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/TextLabel.pm"
+      },
+      "Moonshine::Bootstrap::v3::Thumbnail" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Thumbnail.pm"
+      },
+      "Moonshine::Bootstrap::v3::Ul" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Ul.pm"
+      },
+      "Moonshine::Bootstrap::v3::Well" : {
+         "file" : "lib/Moonshine/Bootstrap/v3/Well.pm"
+      },
+      "Moonshine::Bootstrap::v4::Glyphicon" : {
+         "file" : "lib/Moonshine/Bootstrap/v4/Glyphicon.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/Moonshine-Bootstrap.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/Moonshine-Bootstrap"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

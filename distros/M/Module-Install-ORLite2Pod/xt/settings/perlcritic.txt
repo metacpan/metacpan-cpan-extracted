@@ -1,0 +1,52 @@
+verbose = %f:%l:%c:\n %p: %m\n
+theme = (core || more)
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = MooseX::Singleton metaclass MooseX::Types
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = MooseX::Singleton metaclass MooseX::Types
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 7
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print
+
+[Modules::PerlMinimumVersion]
+version = 5.006001
+
+[ControlStructures::ProhibitPostfixControls]
+flowcontrol = warn die carp croak cluck confess goto exit return
+
+# Temporary exclusions to use while cleaning up.
+#[-CodeLayout::RequireTidyCode]
+#[-CodeLayout::ProhibitTrailingWhitespace]
+
+# Exclusions
+#
+
+# I don't use RCS keywords.
+[-Miscellanea::RequireRcsKeywords]
+
+# Excluded because we filter out development versions.
+[-ValuesAndExpressions::RequireConstantVersion]
+
+# Excluded because we use 4-space tabs as our standard. 
+[-CodeLayout::ProhibitHardTabs]
+
+# Excluded because I do my pod my own way.
+[-Documentation::RequirePodSections]
+
+# I don't use Emacs, why use this?
+[-Editor::RequireEmacsFileVariables]
+
+# Default example code for Module::Install uses @ISA
+[-ClassHierarchies::ProhibitExplicitISA]
+
+# Makefiles. What can I say?
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
+
+# The purpose of this module is to get one long string where it's needed.
+[-ValuesAndExpressions::RestrictLongStrings]

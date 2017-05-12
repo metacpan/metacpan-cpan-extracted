@@ -1,0 +1,121 @@
+MAIL::AUDIT::CENTIPAID
+
+This is the 1.0 release of Mail::Audit::Centipaid
+
+
+OVERVIEW
+
+This is what Mail::Audit::Centipaid is all about:
+
+    NAME
+        Mail::Audit::Centipaid - Mail filter that detects and verifies email postage
+
+
+    HOW TO USE
+	Mail::Audit::Centipaid can be used by individuals or companies to designate 
+	one or more email accounts SPAM free.  This is done by installing a .forward
+	for these account, and use the enclosed centifilter.pl program to filter out
+	mail that does not contain valid postage.  Only paid email will be allowed
+	through the filter.
+
+	Centipaid supports two types of stamps.
+
+	1. CENTIPIX stamps, which are bought by the sender and used to make payments.
+	   Payment processing is deducted from the payment done by the sender.
+
+        2. EZPASS stamps, which are issued by the receiver and given to individuals
+	   he/she wants to grant them postage-free access the email account.
+	   Payment processing is paid by the recepient.
+	   
+	The module can also be used in conjunction with SpamAssassin to autoamtically
+	reject email messages with a certain spam ranking, and to be directed to pay 
+	for postage. 
+
+	Other uses include the designation of postage-requiered email accounts such 
+	as the ones used for consulting, support, business to business, etc..
+
+
+    SYNOPSIS
+       use Mail::Audit qw(Centipaid); my $mail = Mail::Audit->new;
+
+	# Configure the filter
+	%conf = (
+		'acct'   => "AEF001", 			# account_name merchant id 
+		'amount' =>  0.005, 			# amount to charge per email
+		'https'  => "http://pay.centipaid.com/",# payment url
+	 	'pass'   => "adonis",			# receipt_password
+	 	'lang'   => "en",			# language setting
+		'authserver' => "pay001.centipaid.com", # centipaid_receipt_server
+	 	'authport' => '2021',			# port of receipt server
+	 	'email' => 'you@domain.com',		# email assigned to accept paid postage emails
+		'debug' => 1 				# 1=show output, 0=supress output
+		);
+
+	# check mail for epostage
+	($code,$reason)= $mail->check_mail(%conf);
+
+	$reply_msg = qq{Your message here..};
+
+	# reject email without postage
+	if ( $code == 1 ) {
+		$mail->reply(from=>$mail->from, 
+			     subject=>"Email postage missing: could not deliver",
+			     body=>$reply_msg);
+		$mail->ignore;
+	}
+
+	# accept the ones that do have one
+	if ( $code == 0 ) {$mail->accept; }
+
+        ...
+
+
+    DESCRIPTION
+
+	This filter is intended to be called by MTAs prior to mail delivery
+    to determine if the message contains a valid email postage obtained
+    from centipaid.  If the message contains the stamp receipt and it is
+    acknowledged by centipaid as being valid for the recipient account, then
+    it is accepted, otherwise a custom reply is sent to the sender with
+    instructions on how to pay for postage, and a properly formatted url.
+
+
+INSTALLATION
+To install:
+
+1.  Compile the Mail::Audit::Centipaid module
+    cd Mail-Centipaid-x.xx
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+2. copy the example/centifilter.pl to a prefered location
+   We recommend /etc/smrsh
+
+3. Customize the reply message in centifilter.pl if you need to
+
+4. insert the command in the .forward or other methods used
+   by your MTA to pipe commands through the filter
+
+   | /etc/smrsh/cenfilter.pl
+
+5. Test the filter by sending email to the account, and watch
+   for the response letter.  If you are using the pre-shipped
+   demo account of centipaid, then you will need an EZPASS to use
+   for testing.  A copy is valid at centipaid.com
+
+   http://demo.centipaid.com/030108EZPASS8nxlp6NQ.jpg
+
+6. Once you get the filter to work with the demo account, register
+   for a merchant account with centipaid and edit the %conf hash 
+   with your account value.  
+
+7. Enjoy your spam free email account!!!
+
+
+BUG FIXES AND SUGGESTIONS
+
+Suggestions, patches, can be emailed to aelfakih /at/ cpan dot org or
+reported to the support forum at www.centipaid.com.
+

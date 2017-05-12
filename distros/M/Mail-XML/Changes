@@ -1,0 +1,11 @@
+Revision history for Perl extension Mail::XML.
+
+0.01  Sat May 20 18:03:53 2000
+	- original version; created by h2xs 1.19
+
+0.02 ??
+
+0.03  Wed Nov 21 8:00:00 2001
+	- Switched over to XML::Writer.
+	- XML encoding is now set to ISO-8859-1.
+ 

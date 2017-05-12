@@ -1,0 +1,280 @@
+=head1 NAME
+
+Mozilla::DOM::Window
+
+=head1 DESCRIPTION
+
+Mozilla::DOM::Window is a wrapper around an instance of Mozilla's
+nsIDOMWindow interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+ * The nsIDOMWindow interface is the primary interface for a DOM
+ * window object. It represents a single window object that may
+ * contain child windows if the document in the window contains a
+ * HTML frameset document or if the document contains iframe elements.
+ *
+ * This interface is not officially defined by any standard bodies, it
+ * originates from the defacto DOM Level 0 standard.
+
+Note: the GetScrollbars is not wrapped (non-trivial to do)
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::Window->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $document = $window->B<GetDocument>()
+
+=over
+
+   * Accessor for the document in this window.
+
+=back
+
+=head2 $window_collection = $window->B<GetFrames>()
+
+   * Accessor for the child windows in this window.
+
+In scalar context, returns a
+L<Mozilla::DOM::WindowCollection|Mozilla::DOM::WindowCollection>.
+
+In list context, returns a list of L<Mozilla::DOM::Window|Mozilla::DOM::Window>
+(I think... whatever $window_collection->Item($n) is.)
+
+=head2 $name = $window->B<GetName>()
+
+=over
+
+Get the name of this window.
+
+This corresponds to window.name in JavaScript.
+
+=back
+
+=head2 $window = $window->B<GetParent>()
+
+=over
+
+   * Accessor for this window's parent window, or the window itself if
+   * there is no parent, or if the parent is of different type
+   * (i.e. this does not cross chrome-content boundaries).
+
+=back
+
+=head2 $selection = $window->B<GetSelection>()
+
+=over
+
+   * Method for accessing this window's selection object.
+
+=back
+
+=head2 $num = $window->B<GetTextZoom>()
+
+=over
+
+   * Set/Get the document scale factor as a multiplier on the default
+   * size. When setting this attribute, a NS_ERROR_NOT_IMPLEMENTED
+   * error may be returned by implementations not supporting
+   * zoom. Implementations not supporting zoom should return 1.0 all
+   * the time for the Get operation. 1.0 is equals normal size,
+   * i.e. no zoom.
+
+=back
+
+=head2 $window = $window->B<GetTop>()
+
+=over
+
+   * Accessor for the root of this hierarchy of windows. This root may
+   * be the window itself if there is no parent, or if the parent is
+   * of different type (i.e. this does not cross chrome-content
+   * boundaries).
+   *
+   * This property is "replaceable" in JavaScript */
+
+=back
+
+=head2 $window->B<SetName>($name)
+
+=over
+
+=over
+
+=item * $name (string)
+
+=back
+
+Set the name of this window.
+
+"This attribute is 'replaceable' in JavaScript";
+where it corresponds to window.name.
+
+=back
+
+=head2 $window->B<SetTextZoom>($zoom)
+
+=over
+
+=over
+
+=item * $zoom (double)
+
+=back
+
+=back
+
+=head2 $window->B<SizeToContent>()
+
+=over
+
+   * Method for sizing this window to the content in the window.
+
+XXX: doesn't seem to work. Maybe window resize is disabled,
+or maybe Gtk2 prevents it.
+
+=back
+
+=begin comment
+
+  /**
+   * Accessor for the object that controls whether or not scrollbars
+   * are shown in this window.
+   *
+   * This attribute is "replaceable" in JavaScript
+   */
+  /* readonly attribute nsIDOMBarProp scrollbars; */
+#=for apidoc Mozilla::DOM::Window::GetScrollbars
+#
+#=for signature $window->GetScrollbars(nsIDOMBarProp * *aScrollbars)
+#
+#
+#
+#=cut
+#
+### GetScrollbars(nsIDOMBarProp * *aScrollbars)
+#somereturn *
+#moz_dom_GetScrollbars (window, aScrollbars)
+#	nsIDOMWindow *window;
+#	nsIDOMBarProp * *aScrollbars ;
+#    PREINIT:
+#
+#    CODE:
+#	window->GetScrollbars(&);
+#	RETVAL = ;
+#    OUTPUT:
+#	RETVAL
+
+=end comment
+
+=cut
+
+=head2 $x = $window->B<GetScrollX>()
+
+=over
+
+   * Accessor for the current x scroll position in this window in
+   * pixels.
+   *
+   * This attribute is "replaceable" in JavaScript
+
+=over
+
+=item * $x (double)
+
+=back
+
+=back
+
+=head2 $y = $window->B<GetScrollY>()
+
+=over
+
+   * Accessor for the current y scroll position in this window in
+   * pixels.
+   *
+   * This attribute is "replaceable" in JavaScript
+
+=over
+
+=item * $y (double)
+
+=back
+
+=back
+
+=head2 $window->B<ScrollTo>($xScroll, $yScroll)
+
+=over
+
+   * Method for scrolling this window to an absolute pixel offset.
+
+=over
+
+=item * $xScroll (double)
+
+=item * $yScroll (double)
+
+=back
+
+=back
+
+=head2 $window->B<ScrollBy>($xScrollDif, $yScrollDif)
+
+=over
+
+   * Method for scrolling this window to a pixel offset relative to
+   * the current scroll position.
+
+=over
+
+=item * $xScrollDif (double)
+
+=item * $yScrollDif (double)
+
+=back
+
+=back
+
+=head2 $window->B<ScrollByLines>($numLines)
+
+=over
+
+   * Method for scrolling this window by a number of lines.
+
+=over
+
+=item * $numLines (double)
+
+=back
+
+=back
+
+=head2 $window->B<ScrollByPages>($numPages)
+
+=over
+
+   * Method for scrolling this window by a number of pages.
+
+=over
+
+=item * $numPages (double)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut

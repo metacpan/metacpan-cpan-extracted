@@ -1,0 +1,110 @@
+{
+   "abstract" : "perl bindings for Apache Mesos",
+   "author" : [
+      "Mark Flickinger <maf@cpan.org>"
+   ],
+   "dynamic_config" : "0",
+   "generated_by" : "Module::Install version 1.16, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mesos",
+   "no_index" : {
+      "directory" : [
+         "bin",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Devel::PPPort" : "3.19",
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "Devel::PPPort" : "3.19",
+            "ExtUtils::CppGuess" : "0",
+            "ExtUtils::MakeMaker" : "6.59",
+            "ExtUtils::ParseXS" : "3.18",
+            "ExtUtils::Typemaps::ObjectMap" : "0",
+            "ExtUtils::Typemaps::STL" : "0",
+            "File::Temp" : "0",
+            "List::Util" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Async::Interrupt" : "0",
+            "ExtUtils::CppGuess" : "0",
+            "ExtUtils::ParseXS" : "3.18",
+            "ExtUtils::Typemaps" : "0",
+            "ExtUtils::Typemaps::ObjectMap" : "0",
+            "ExtUtils::Typemaps::STL" : "0",
+            "FindBin" : "0",
+            "Future::Mojo" : "0",
+            "IO::Async::Handle" : "0",
+            "List::Util" : "0",
+            "Module::Install::AuthorTests" : "0",
+            "Module::Install::CPANfile" : "0",
+            "Module::Install::ReadmePodFromPod" : "0",
+            "Module::Install::XSUtil" : "0",
+            "Mojolicious" : "0",
+            "POE" : "0",
+            "POE::Future" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Carp" : "0",
+            "Digest::SHA" : "0",
+            "Google::ProtocolBuffers" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "0",
+            "Scalar::Util" : "0",
+            "Scope::Guard" : "0",
+            "Type::Tiny" : "0",
+            "XSLoader" : "0.02",
+            "namespace::autoclean" : "0.16",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "AnyEvent::Future" : "0",
+            "Test::Class::Moose" : "0.55",
+            "Test::LeakTrace" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "Test::Strict" : "0",
+            "Try::Tiny" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mark-5/perl-mesos/issues"
+      },
+      "homepage" : "https://github.com/mark-5/perl-mesos",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/mark-5/perl-mesos.git"
+      }
+   },
+   "version" : "1.07.1",
+   "x_module_name" : "Mesos",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

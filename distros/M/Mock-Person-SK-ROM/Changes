@@ -1,0 +1,10 @@
+0.02 2015-10-27T11:36:54+01:00
+ - Fix comment (thanks Mohammad S Anwar).
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.01 2014-09-20T10:46:28+02:00
+ - First version.

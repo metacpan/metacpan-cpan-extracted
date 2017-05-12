@@ -1,0 +1,17 @@
+Revision history for Moonshine-Component
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02    30/01/2017
+        Adds Moonshine::Util to build_requires - Hopefully that fixes all the failing tests.
+
+0.03    31/01/2017
+        Magic the synopsis.
+
+0.04    01/02/2017
+        Remove things that should not be there.
+
+0.05    05/02/2017
+        Fix Dependencies and MIN_PERL_VERSION.
+

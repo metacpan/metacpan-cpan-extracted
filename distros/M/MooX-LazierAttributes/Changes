@@ -1,0 +1,33 @@
+Revision history for MooX-LazierAttributes
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.07    11/03/2017
+        - Add tests for using the constants with 'has'
+        - Acknowledge Haarg for taking the time to read my code and pointing me in the right direction.
+        - Point at MooseX::Has::Sugar - should I also be using Sub::Exporter::Progressive?
+        
+0.08    12/03/2017
+        - attributes can now be extended using '+';
+        - Add tests for extending *has* attributes
+        - Add tests for extending *attributes* attributes
+
+0.10    12/03/2017
+        - default to 'ro' if ro|rw is not passed as the first argument;
+        - Accept CODE refs as the default - attributes( shiny => [ sub { HTTP::Tiny->new } ] )
+
+0.11    13/03/2017
+        - Type::Tiny is nice, so 0.11 adds support for it. The second argument can now either be the 
+        value (default) or a Type::Tiny Object (isa).
+
+0.12    14/03/2017
+        - Add a little documentation.
+
+0.14    17/03/2017
+        - Increase test coverage.
+        - Add Moose example to Synopsis
+
+0.15   26/03/2017
+        - Fix for 00-load.t failing test reports.
+

@@ -1,0 +1,12 @@
+Revision history for MP3::Cut::Gapless
+
+0.03    2011-11-28
+        - Bug 17348, fixed offset calculation bug when processing a file with extra
+          data between the ID3v2 tag and the first MP3 frame.
+        - Bug 17441, croak if trying to process a non-MP3 file.
+
+0.02    2010-06-08 16:33:47
+        - Win32 fixes.
+
+0.01    2010-06-07 16:55:56
+        - Initial release.

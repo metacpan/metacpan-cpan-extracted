@@ -1,0 +1,338 @@
+Revision history for MetaCPAN-Client (previously MetaCPAN-API)
+
+2.012000    27.4.17
+            * Fixed 'email' field handling in Author objects (Mickey, GH#83)
+
+2.011000    18.4.17
+            * Added support for scroller time/size params (Mickey)
+            * Removed warning of scroller deletion failure (Mickey, GH#81)
+
+2.010000    3.4.17
+            * Added support for new 'permission' type (Mickey)
+
+2.009001    29.3.17
+            * Use Test::Needs to force a minimum
+              WWW::Mechanize::Cached version (Olaf Alders, GH#76)
+
+2.009000    24.3.17
+            * Bump WWW::Mechanize::Cached version to 1.50 (Olaf Alders, GH#76)
+            * Require LWP::Protocol::https in tests (Mickey, GH#79)
+            * Added 'changes' method for Release objects (Mickey, GH#57)
+            * Cleaner URLs - removed redundant slashes and 'v1' (Mickey)
+            * Created a role for user-agent handling for reuse (Mickey)
+
+2.008001    23.3.17
+            * Fixed a test (Mickey)
+
+2.008000    22.3.17
+            * Added metacpan_url method to the entity objects
+              (Mickey, #GH69)
+
+2.007000    8.3.17
+            * Update tests for newer Perl versions, to run without
+              '.' in @INC (Sawyer X, GH#72)
+
+2.006000    24.2.17
+            * Support '_source' filtering (Mickey, GH#70)
+            * Support debug-mode for detailed error messages (Mickey)
+
+2.005000    13.2.17
+            * Added the ascii_name and perlmongers fields to the Author object
+              (Dave Rolsky, GH #66)
+            * Fixed Author->dir to actually return something (Dave Rolsky, GH
+              #66)
+
+2.004000    30.12.16
+            * Speed up own scroller (Mickey)
+            * Fixed rev_deps (Mickey)
+
+2.004000-TRIAL 24.12.16
+            * Removed dependency: Search::Elasticsearch
+              in favor of an internal scroller (Mickey)
+            * Added Types class for 'isa' checks (Mickey)
+
+2.003000    19.12.16
+            * Escaped query to autocomplete (Mickey)
+            * Removed dependency: Try::Tiny (Mickey)
+
+2.002000    14.12.16
+            * Support 'autocomplete' endpoint (Mickey)
+
+2.001000    08.12.16
+            * Distribution: added 'rt' & 'github' methods (Mickey)
+            * Use Ref::Util for ref checks (Mickey)
+
+2.000000    18.11.16
+            * Major version: v1 full support
+              - removed support and default settings for v0
+              - corrected domain, base_url setting, using clientinfo
+              - code/tests updates and cleanup
+              (Mickey, Brad Lhotsky)
+            * Pinned Search::Elasticsearch version to 2.03 (Mickey)
+            * Use @Starter in dist.ini + cpanfile cleanup (Grinnz)
+
+1.028003    23.10.16
+            * Removed AutoPrereqs from dist.ini (Mickey)
+
+1.028002    23.10.16
+            * GH #53 a few small dist.ini tweaks (Karen Etheridge)
+            * Even more dist.ini tweaks (Mickey, thanks to Grinnz)
+
+1.028001    22.10.16
+            * GH #51 Adds eumm_version to dist.ini (Olaf Alders)
+            * GH #52 Stop excluding cpanfile from being copied to
+              build (Olaf Alders)
+
+1.028000    21.10.16
+            * GH #50 Remove hard-deps for HTTP::Tiny::Mech and
+              WWW::Mechanize::Cached (Paul Howarth)
+            * dist.ini: don't automatically update cpanfile (Mickey)
+
+1.027000    20.10.16
+            * GH #49 Convert values of JSON::PP::Boolean objects in output
+              so they are not skipped when expeting scalars (Mickey)
+
+1.026001    19.10.16
+            * Fixed version range for Search::Elasticsearch (Mickey)
+
+1.026000    19.10.16
+            * Moved distini prereqs to cpanfile (Mickey)
+            * Limit Search::Elasticsearch version to 2.02 (Mickey)
+            * Updated docs (Thomas Sibley)
+
+1.025000    30.8.16
+            * Added some version requirements to improve SSL over
+              HTTP::Tiny (Mickey)
+            * Added default values for distribution keys with no content
+              (Mickey, per Tux request)
+
+1.024000    28.08.16
+            * Try to fetch clientinfo from https://clientinfo.metacpan.org
+              to get default production version (Mickey)
+
+1.023000    27.08.16
+            * Added support for version by env METACPAN_VERSION (Mickey)
+            * Added tests for version argument (Mickey)
+
+1.022003    06.08.16
+            * Fixed a warning in $file->pod (Mickey)
+
+1.022002    06.08.16
+            * Added LWP::Protocol::https as test dependency (Mickey)
+
+1.022001    05.08.16
+            * check user provided UA for 'get' and 'post' methods (Mickey)
+            * document updates (Mickey)
+
+1.022000    04.08.16
+            * Rework type checking - enforce expected types, inc.
+              single-valued array-ref unwrapping; doesn't break
+              types that are expected to be array-refs (Mickey)
+
+1.021000    27.07.16
+            * Fix result values in v1 - single valued arrayref in ES
+              result will be turned to a scalar (Mickey)
+
+1.020000    12.07.16
+            * Added support for Author->release_count & Author->links methods (Mickey)
+            * Added support for url_prefix parameter for Pod (Mickey)
+
+1.019000    06.07.16
+            * Added missing 'download_url' attribute to file/module
+              result objects (Mickey)
+
+1.018000    06.07.16
+            * Added support for download_url endpoint (Mickey)
+            * Default domain set by providing 'version' -
+              makes it easy to work with v1 (Mickey)
+
+1.017000    28.06.16
+            * Fixed nodes list for Search::Elasticsearch (Mickey)
+            * Added support for 'aggregations' (Mickey)
+
+1.016000    27.06.16
+            * Added support for 'all' filters type 'files' (Mickey)
+            * http -> https (Mickey)
+
+1.015000    02.06.16
+            * Adding `source` method to MetaCPAN::Client::File (stevan)
+
+1.014000    29.04.16
+            * Fix warning on missing fields param (Mickey, Sawyer X)
+            * Switch to Search::Elasticsearch 2.0. (Sawyer X)
+            * You can test MetaCPAN::API with a different domain using the
+              environment variable "METACPAN_DOMAIN". (Mickey)
+
+1.013000    25.04.15
+            * GH #34 Use Travis for CI (oalders)
+            * GH #35 Improve Kwalitee + test improvements (oalders)
+
+1.012000    09.04.15
+            * GH #33 added Mirror type and support for mirrors search in 'all' queries (mickeyn)
+            * GH #33 support 'ratings' search in 'all' queries (mickeyn)
+            * more example scripts: facets, top favorites, all authors blogs (mickeyn)
+            * cleanup & doc updates (Gabor Szabo, mickeyn)
+
+1.011000    27.01.15
+            * support 'favorites' type and 'facets' key param in 'all' queries (mickeyn)
+
+1.010000    23.01.15
+            * support wildcard-only value in complex search (mickeyn)
+            * support raw Elasticsearch filters in 'all' queries (mickeyn)
+
+1.009000    11.01.15
+            * GH #25 (RT #99499): added support for 'fields' filtering (mickeyn, oalders)
+
+1.008001    01.01.15
+            * Happy new year!
+            * Correct Meta resources for the repo.
+            * Correct link in POD for the Pod element. (Alex Vandiver)
+
+1.008000    22.11.14
+            * RT #99498: added API for 'match_all' queries via all($type) (oalders, mickeyn)
+            * GH #21: make 'domain' and 'version' settable via new() (oalders)
+            * RT #94491: document nested queries (neilb, mickeyn)
+
+1.007001    09.10.14
+            * GH #18: HTTP::Tiny::Mech and WWW::Mechanize::Cached downgraded to being non-essential for tests (kentnl)
+            * GH #19: Include 'metadata' in known_fields for ::Release (kentnl)
+
+1.007000    14.08.14
+            * Ensure passing user specified ua values to all parts internally,
+              including to Elasticsearch (kentnl) GH #17 RT#95796
+            * Entity consuming roles now have a 'client' attribute which will lazy build,
+              or reference the MetaCPAN::Client that created them via new_from_request (kentnl) GH #17
+
+1.006000    24.06.14
+            * Add 'recent' functionality (latest releases)
+
+1.005000    09.06.14
+            * Add Pod object to allow direct POD fetching (reneeb)
+            * Support single element without wrapping arrayref in structures
+            * Updated documents - basic/complex search links and wording (tsibley)
+
+1.004001    27.05.14
+            * correct rev_deps query
+
+1.004000    27.05.14
+            * reworked ResultSet to allow RS in non-scrolled searches.
+
+1.003000    05.05.14
+            * Add proper POD fetching from module/file objects.
+            * GH #1: Switch from JSON.pm to JSON::MaybeXS.
+            * GH #2: Remove incorrect and unnecessary check for class names.
+            * Provide "ua" attribute in the main object to override user agent.
+            * Add some use-case examples (examples directory).
+            * Add 'releases' method to Author (not official so no docs yet).
+            * GH #4: Use example with hyphen.
+            * Related to GH #4, use Data::Printer instead of shotened name "DDP".
+
+1.002000    24.04.14
+            * Add 'not' support for complex queries
+            * Add reverse_dependencies method
+
+1.001001    15.04.14
+            * Fix the reading of scroller result when 'fields' param is passed.
+
+1.001000    09.04.14
+            * Add support for nested either/all queries
+            * Add tests for complex queries (two levels deep)
+            * Correct documentation on complex queries
+            * Update tests to work on older versions of perl
+
+1.000001    03.04.14
+            * changed Elasticsearch (deprecated) to Search::Elasticsearch (official)
+
+1.000000    02.04.14
+            ** Completely rewritten **
+            MetaCPAN::API has been completely rewritten as MetaCPAN::Client.
+
+            Other than the different name (to match MetaCPAN itself), the
+            following changes had been made:
+                * MetaCPAN::Client is officially part of MetaCPAN
+                * Semantic Versioning (semver) scheme
+                * Moo as object system
+                * All entities are now objects
+                * Using Elasticsearch.pm for complex queries
+                * Rich syntax for nested queries (AND/OR)
+                * Simple queries return entity objects
+                * Complex queries return resultset objects (with iterator)
+                * Support for scrolled searches
+                * Inline support for Elasticsearch facets
+                * Documentation, tests - all cleaned, rewritten
+
+0.43        05.04.12
+            * Add example in POD of advanced usage with cache by Kent Fredric.
+              (Gist: https://gist.github.com/1291928)
+            * Sort keys in param join - more predictable result.
+
+0.42        08.01.12
+            * Corrected documentation in MetaCPAN::API::Source.
+            * Updated Dist::Zilla configuration, added more tests.
+
+0.41        07.01.12
+            * Use Test::TinyMocker 0.02 syntax in tests to avoid test fails.
+
+0.40        06.01.12
+            * Fixed JSON encoding so ElasticSearch won't fail.
+              (Christian Walde)
+            * Documentation fixes (Logan - logie17).
+
+0.34        02.10.11
+            * Added MetaCPAN::API::Source (Renee Baecker).
+            * Fix of HTTP::Tiny content-type in options (Renee Baecker).
+            * Typo fix (Olaf Alders, reported by @doherty).
+
+0.33        24.08.11
+            * No functional changes.
+            * Skip t::lib in dzil.
+
+0.32        04.08.11
+            * Use a default agent string for requests.
+            * Use a default agent string for tests.
+
+0.31        02.08.11
+            * URL updates (thanks to Olaf Alders, OALDERS).
+            * Small mismatched quote in POD example.
+
+0.30        30.07.11
+            * Add POST query searches (RT #69814, GH #2).
+            (original code by Tim Bunce, thank you!)
+            * More tests.
+
+0.20        28.07.11
+            * Add complex (manual) searches to author()/release() + docs.
+            * Add file() as a synonym to module().
+            * Respect content-type.
+            * Allow setting additional params to fetch().
+            * Allow "pauseid" in author via key.
+            * Better check for content-type.
+
+0.11        24.07.11
+            * Correct the POD example and tests.
+            * Update to use a different API path.
+
+0.10        24.07.11
+            * Almost complete rewrite.
+            * Make use of the new beta API.
+            * Remove old API support.
+            * Remove DWIM methods for now.
+            * Include lots of tests.
+
+0.02        13.02.11
+            (First stable release!)
+            * Add docs (Sawyer X).
+
+0.01_03     10.02.11
+            * Immutable base_url (Olaf Alders, Sawyer X).
+
+0.01_02     10.02.11
+            * Make base_url 'rw' (Olaf Alders).
+            * Update module search URL (Olaf Alders).
+            * Refactoring using _http_req method (Sawyer X).
+            * Remove render_result method (Sawyer X).
+            * Remove unnecessary print (Sawyer X).
+
+0.01_01     05.02.11
+            * Module, Dist, POD, Author and CPANRatings are supported 100%.
+            * Still needs more refactoring, and some methods aren't used yet.

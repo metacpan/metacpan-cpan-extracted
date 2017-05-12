@@ -1,0 +1,13 @@
+Changes
+lib/MRO/Compat.pm
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST			This list of files
+t/10basic.t
+t/15pkg_gen.t
+t/20mros.t
+xt/pod.t
+xt/pod_coverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)

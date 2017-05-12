@@ -1,0 +1,35 @@
+Revision history for Perl module Mojolicious::Plugin::RevealJS
+
+0.10 2017-04-12
+  - Add HTML comment to section handling
+
+0.09 2017-04-12
+  - Add section handling (experimental)
+
+0.08 2017-03-25
+  - Fix the previously broken release
+
+0.07 2017-03-13
+  - Convert to Module::Built::Tiny via App::ModuleBuildTiny
+
+0.06 2017-03-13
+  - Use absolute paths for bundled files (mimosinnet)
+  - Fix deprecated use of Mojo::Util functions
+    - Bump dependency of Mojolicious to 7.15
+
+0.05 2015-06-11
+  - Added missing prereq on File::ShareDir
+
+0.04 2015-06-07
+  - Corrected utf8 abstract
+
+0.03 2015-06-07
+  - Added language handling to include_code
+
+0.02 2015-05-10
+  - Significantly improve customization possibilities
+  - Added an example of takahashi style presentations
+
+0.01 2015-05-06
+  - Initial release
+

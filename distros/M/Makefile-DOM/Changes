@@ -1,0 +1,29 @@
+0.008  2014-11-18
+* bugfix: fixed a regression in 0.007 which changed the API of MDOM::Document::Gmake
+  and broke backward-compatibility.
+
+0.007  2014-11-18
+* bugfix: The test file pod-coverage.t was failing. thanks ambs (Alberto Simões)
+  for the original patch.
+
+0.006  2011-08-28
+* Fixed a syntax error in the POD documentation. thanks Mikhail Gusarov.
+
+0.005  2011-08-10
+* Updated the author name, author email address, and code repository in the documentation.
+* Updated the bundled Module::Install to the latest version, 1.01.
+
+0.004  2008-03-10
+* Added pointer for Makefile::Parser::GmakeDB to Makefile::DOM's POD.
+
+0.003  2008-03-10
+* Removed script/pgmake and script/plmake from MANIFEST.
+* Tweaked the POD a bit.
+
+0.002  2008-03-07
+* Added comprehensive POD to Makefile::DOM.
+* Fixed the POD in MDOM::Dumper.
+
+0.001  2008-03-07
+* inital CPAN release
+

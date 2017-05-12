@@ -1,0 +1,12 @@
+lib/Music/Audioscrobbler/MPD.pm
+bin/musicmpdscrobble
+examples/gentoo_init_script
+examples/musicmpdscrobble_example.conf
+Makefile.PL
+MANIFEST
+README
+CHANGES
+t/1-simple.t
+t/2-pod.t
+t/3-pod-coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

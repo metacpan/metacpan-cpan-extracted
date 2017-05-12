@@ -1,0 +1,9 @@
+--------------------
+2017-01-08  v0.03
+--------------------
+* Fix problem with dist on CPAN
+
+--------------------
+2017-01-08  v0.02
+--------------------
+* Fix qr// deprication warning for unescaped "{" (issue #2). Thanks James E Keenan.

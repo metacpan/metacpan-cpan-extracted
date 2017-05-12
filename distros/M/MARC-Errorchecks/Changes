@@ -1,0 +1,209 @@
+Revision history for Perl extension MARC::Errorchecks.
+
+Version 1.18: Updated Oct. 8, 2012 to June 22, 2013. Released , 2013.
+
+ -Updated _check_music_bytes for MARC Update 16 (Sept. 2012), adding 'l' as valid for 008/20.
+
+Version 1.17: Updated Oct. 8, 2012 to June 22, 2013. Released June 23, 2013.
+
+ -Updated check_490vs8xx($record) to look only for 800, 810, 811, 830 rather than any 8XX.
+ -Added functionality to deal with RDA records.
+ -Updated parse008vs300b($illcodes, $field300subb, $record_is_RDA) to pass 3rd variable, "$record_is_RDA".
+ -Updated _check_music_bytes for MARC Update 15 (Sept. 2012), adding 'k' as valid for 008/20.
+
+Version 1.16: Updated May 16-Nov. 14, 2011. Released July 7, 2012.
+
+ -Removed MARC::Lint::CodeData and require MARC::Lint
+ -Turned off check_fieldlength($record) in check_all_subs()
+ -Turned off checking of floating hyphens in 520 fields in findfloatinghyphens($record)
+ -Updated validate008 subs (and 006) related to 008/24-27 (Books and Continuing Resources) for MARC Update no. 10, Oct. 2009 and Update no. 11, 2010; no. 12, Oct. 2010; and no. 13, Sept. 2011.
+ -Updated %ldrbytes with leader/18 'c' and redefinition of 'i' per MARC Update no. 12, Oct. 2010.
+
+Version 1.15: Updated June 24-August 16, 2009. Released , 2009.
+
+ -Updated checks related to 300 to better account for electronic resources.
+ -Revised wording in validate008($field008, $mattype, $biblvl) language code (008/35-37) for '   '/zxx.
+ -Updated validate008 subs (and 006) related to 008/24-27 (Books and Continuing Resources) for MARC Update no. 9, Oct. 2008.
+ -Updated validate008 sub (and 006) for Books byte 33, Literary form, invalidating code 'c' and referring it to 008/24-27 value 'c' .
+ -Updated video007vs300vs538($record) to allow Blu-ray in 538 and 's' in 07/04.
+
+Version 1.14: Updated Oct. 21, 2007, Jan. 21, 2008, May 20, 2008. Released May 25, 2008.
+
+ -Updated %ldrbytes with leader/19 per Update no. 8, Oct. 2007. Check for validity of leader/19 not yet implemented.
+ -Updated _check_book_bytes with code '2' ('Offprints') for 008/24-27, per Update no. 8, Oct. 2007.
+ -Updated check_245ind1vs1xx($record) with TODO item and comments
+ -Updated check_bk008_vs_300($record) to allow "leaves of plates" (as opposed to "leaves", when no p. or v. is present), "leaf", and "column"(s).
+ -Updated test in Errorchecks.t to remove check for LCCN starting with year greater than the current year. This was at 2008, which is no longer later. A test may be implemented in the future that will be less likely to break with the passage of time.
+
+Version 1.13: Updated Aug. 26, 2007. Released Oct. 3, 2007.
+
+ -Uncommented valid MARC 21 leader values in %ldrbytes to remove local practice. Libraries wishing to restrict leader values should comment out individual bytes to enable errors when an unwanted value is encountered.
+ -Added ldrvalidate.t.pl and ldrvalidate.t tests.
+ -Includes version 1.18 of MARC::Lint::CodeData.
+
+Version 1.12: Updated July 5-Nov. 17, 2006. Released Feb. 25, 2007.
+
+ -Updated check_bk008_vs_300($record) to look for extra p. or v. after parenthetical qualifier.
+ -Updated check_bk008_vs_300($record) to look for missing period after 'col' in subfield 'b'.
+ -Replaced $field-tag() with $tag in error message reporting in check_nonpunctendingfields($record).
+ -Turned off 50-field limit check in check_fieldlength($record).
+ -Updated parse008vs300b($illcodes, $field300subb) to look for /map[ \,s]/ rather than just 'map' when 008 is coded 'b'.
+ -Updated check_bk008_vs_bibrefandindex($record) to look for spacing on each side of parenthetical pagination.
+ -Updated check_internal_spaces($record) to report 10 characters on either side of each set of multiple internal spaces.
+ -Uncommented level-5 and level-7 leader values as acceptable. Level-3 is still commented out, but could be uncommented for libraries that allow it.
+ -Includes version 1.14 of MARC::Lint::CodeData.
+
+Version 1.11: Updated June 5, 2006. Released June 6, 2006.
+
+ -Implemented check_006($record) to validate 006 (currently only does length check).
+ --Revised validate008($field008, $mattype, $biblvl) to use internal sub for material specific bytes (18-34)
+ -Revised validate008($field008, $mattype, $biblvl) language code (008/35-37) to report new 'zxx' code availability when '   ' is the code in the record.
+ -Added 'mgmt.' to %abbexceptions for check_nonpunctendingfields($record).
+
+Version 1.10: Updated Sept. 5-Jan. 2, 2006. Released Jan. 2, 2006.
+
+ -Revised validate008($field008, $mattype, $biblvl) to use internal subs for material specific byte checking.
+ --Added: 
+ ---_check_cont_res_bytes($mattype, $biblvl, $bytes),
+ ---_check_book_bytes($mattype, $biblvl, $bytes),
+ ---_check_electronic_resources_bytes($mattype, $biblvl, $bytes),
+ ---_check_cartographic_bytes($mattype, $biblvl, $bytes),
+ ---_check_music_bytes($mattype, $biblvl, $bytes),
+ ---_check_visual_material_bytes($mattype, $biblvl, $bytes),
+ ---_check_mixed_material_bytes,
+ ---_reword_008(@warnings), and
+ ---_reword_006(@warnings).
+ --Updated Continuing resources byte 20 from ISSN center to Undefined per MARC 21 update of Oct. 2003.
+ -Updated wording in findfloatinghyphens($record) to report 10 chars on either side of floaters and check_floating_punctuation($record) to report some context if the field in question has more than 80 chars.
+ -check_bk008_vs_bibrefandindex($record) updated to check for 'p. ' following bibliographical references when pagination is present.
+ -check_5xxendingpunctuation($record) reports question mark or exclamation point followed by period as error.
+ -check_5xxendingpunctuation($record) now checks 505.
+ -Updated check_nonpunctendingfields($record) to account for initialisms with interspersed periods.
+ -Added check_floating_punctuation($record) looking for unwanted spaces before periods, commas, and other punctuation marks.
+ -Renamed findfloatinghyphens($record) to fix spelling.
+ -Revised check_bk008_vs_300($record) to account for textual materials on CD-ROM.
+ -Added abstract to name.
+
+
+Version 1.09: Updated July 18, 2005. Released July 19, 2005.
+
+ -Added check_010.t (and check_010.t.pl) tests for check_010($record).
+ -check_010($record) revisions.
+ --Turned off validation of 8-digit LCCN years. Code commented-out.
+ --Modified parsing of numbers to check spacing for 010a with valid non-digits after valid numbers.
+ --Validation of 10-digit LCCN years is based on current year.
+ -Fixed bug of uninitialized values for matchpubdates($record) 050 and 260 dates.
+ -Corrected comparison for year entered < 1980.
+ -Removed AutoLoader (which was a remnant of the initial module creation process)
+
+Version 1.08: Updated Feb. 15-July 11, 2005. Released July 16, 2005.
+
+ -Updated MARC::Lint::CodeData with new and changed codes.
+ -Added 008errorchecks.t (and 008errorchecks.t.txt) tests for 008 validation
+ -Added check of current year, month, day vs. 008 creation date, reporting error if creation date appears to be later than local time. Assumes 008 dates of 00mmdd to 70mmdd represent post-2000 dates.
+ --This is a change from previous range, which gave dates as 00-06 as 200x, 80-99 as 19xx, and 07-79 as invalid. 
+ -Added _get_current_date() internal sub to assist with check of creation date vs. current date.
+ -findemptysubfields($record) also reports error if period(s) and/or space(s) are the only data in a subfield.
+ -Revised wording of error messages for validate008($field008, $mattype, $biblvl)
+ -Revised parse008date($field008string) error message wording and bug fix.
+ -Bug fix in video007vs300vs538($record) for gathering multiple 538 fields.
+ -added check in check_5xxendingpunctuation($record) for space-semicolon-space-period at the end of 5xx fields.
+ -added field count check for more than 50 fields to check_fieldlength($record)
+ -added 'webliography' as acceptable 'bibliographical references' term in check_bk008_vs_bibrefandindex($record), even though it is discouraged. Consider adding an error message indicating that the term should be 'bibliographical references'?
+ -Code indenting changed from tabs to 4 spaces per tab.
+ -Misc. bug fixes including changing '==' to 'eq' for tag numbers, bytes in 008, and indicators.
+
+
+Version 1.07: Updated Dec. 11-Feb. 2005. Released Feb. 13, 2005.
+
+ -check_double_periods() skips field 856, where multiple punctuation is possible for URIs.
+ -added code in check_internal_spaces() to account for spaces between angle brackets in open dates in field 260c.
+ -Updated various subs to verify that 008 exists (and quietly return if not. check_008 will report the error).
+ -Changed #! line, removed -w, replaced with use warnings.
+ -Added error message to check_bk008_vs_bibrefandindex($record) if 008 book
+ index byte is not 0 or 1. This will result in duplicate errors if check_008 is
+ also called on the record.
+
+Version 1.05 and 1.06: Updated Dec. 6-7. Released Dec. 6-7, 2004.
+
+ -CPAN distribution fix.
+
+Version 1.04: Updated Nov. 4-Dec. 4, 2004. Released Dec. 5, 2004.
+
+ -Updated validate008() to use MARC::Lint::CodeData.
+ -Removed DATA section, since this is now in MARC::Lint::CodeData.
+ -Updated check_008() to use the new validate008().
+ -Revised bib. refs. check to require 'reference' to be followed by optional 's', optional period, and word boundary (to catch things like 'referenced'.
+
+Version 1.03: Updated Aug. 30-Oct. 16, 2004. Released Oct. 17. First CPAN version.
+
+ -Moved subs to MARC::QBIerrorchecks
+ --check_003($record)
+ --check_CIP_for_stockno($record)
+ --check_082count($record)
+ -Fixed bug in check_5xxendingpunctuation for first 10 characters.
+ -Moved validate008() and parse008date() from MARC::BBMARC (to make MARC::Errorchecks more self-contained).
+ -Moved readcodedata() from BBMARC (used by validate008)
+ -Moved DATA from MARC::BBMARC for use in readcodedata() 
+ -Remove dependency on MARC::BBMARC
+ -Added duplicate comma check in check_double_periods($record)
+ -Misc. bug fixes
+ Planned (future versions):
+ -Account for undetermined dates in matchpubdates($record).
+ -Cleanup of validate008
+ --Standardization of error reporting
+ --Material specific byte checking (bytes 18-34) abstracted to allow 006 validation.
+
+ 
+Version 1.02: Updated Aug. 11-22, 2004. Released Aug. 22, 2004.
+
+ -Implemented VERSION (uncommented)
+ -Added check for presence of 040 (check_040present($record)).
+ -Added check for presence of 2 082s in full-level, 1 082 in CIP-level records (check_082count($record)).
+ -Added temporary (test) check for trailing punctuation in 240, 586, 440, 490, 246 (check_nonpunctendingfields($record))
+ --which should not end in punctuation except when the data ends in such.
+ -Added check_fieldlength($record) to report fields longer than 1870 bytes.
+ --This should be rewritten to use the length in the directory of the raw MARC.
+ -Fixed workaround in check_bk008_vs_bibrefandindex($record) (Thanks again to Rich Ackerman).
+ 
+Version 1.01: Updated July 20-Aug. 7, 2004. Released Aug. 8, 2004.
+
+ -Temporary (or not) workaround for check_bk008_vs_bibrefandindex($record) and bibliographies.
+ -Removed variables from some error messages and cleanup of messages.
+ -Code readability cleanup.
+ -Added subroutines:
+ --check_240ind1vs1xx($record)
+ --check_041vs008lang($record)
+ --check_5xxendingpunctuation($record)
+ --findfloatinghypens($record)
+ --video007vs300vs538($record)
+ --ldrvalidate($record)
+ --geogsubjvs043($record)
+ ---has list of exceptions (e.g. English-speaking countries)
+ --findemptysubfields($record)
+ -Changed subroutines:
+ --check_bk008_vs_300($record): 
+ ---added cross-checking for codes a, b, c, g (ill., map(s), port(s)., music)
+ ---added checking for 'p. ' or 'v. ' or 'leaves ' in subfield 'a'
+ ---added checking for 'cm.', 'mm.', 'in.' in subfield 'c'
+ --parse008vs300b
+ ---revised check for 'm', phono. (which QBI doesn't currently use)
+ --Added check in check_bk008_vs_bibrefandindex($record) for 'Includes index.' (or indexes) in 504
+ ---This has a workaround I would like to figure out how to fix
+ 
+Version 1.00 (update to 0.95): First release July 18, 2004.
+
+ -Fixed bugs causing check_003 and check_010 subroutines to fail (Thanks to Rich Ackerman)
+ -Added to documentation
+ -Misc. cleanup
+ -Added skip of 787 fields to check_internal_spaces
+ -Added subroutines:
+ --check_end_punct_300($record)
+ --check_bk008_vs_300($record)
+ ---parse008vs300b
+ --check_490vs8xx($record)
+ --check_245ind1vs1xx($record)
+ --matchpubdates($record)
+ --check_bk008_vs_bibrefandindex($record)
+
+Version 1 (original version (actually version 0.95)): First release, June 22, 2004

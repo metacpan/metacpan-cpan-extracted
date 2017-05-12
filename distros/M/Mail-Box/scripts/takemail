@@ -1,0 +1,257 @@
+#! /usr/bin/perl -w
+
+use strict;
+use Getopt::Long;
+use lib '../../Mail';
+use Mail::Box::Manager;
+
+my $VERSION = '2.019';
+
+#-----------
+# prototypes
+#-----------
+sub open_mailboxes();
+sub create_outboxes();
+sub parse_mailboxes();
+sub compile_regex();
+sub configure_sigs();
+sub get_options();
+sub surpress_werr();
+sub trace($);
+sub usage($);
+
+my @Mailboxes;
+my $Outbox;
+my %option = (    verbose => 0, 
+                werr => 0, 
+             );
+get_options;
+
+
+usage 2 if not @ARGV;
+usage 0 if $option{help};
+
+surpress_werr if not $option{werr};
+compile_regex;
+
+my $Manager = Mail::Box::Manager->new;
+configure_sigs;
+$Outbox = create_outboxes;
+open_mailboxes;
+parse_mailboxes;
+$Manager->closeAllFolders;
+
+#-----
+# subs
+#-----
+
+sub open_mailboxes() {
+
+    for my $item (@ARGV) {
+    
+        # $item is a directory
+        if (-d $item) {
+            opendir DIR, $item or die "Error: Could not open $item: $!";
+            my @mboxes = readdir DIR;
+            for my $mb (@mboxes) {
+                next if $mb =~ /^\.\.?$/; 
+                trace "Opening folder $mb. ";
+
+                if(my $mbox = $Manager->open(
+                    folder => "$item/$mb", access => 'r', extract => 'LAZY',
+                    trace => 'NONE'))
+                {   trace "Success.\n";
+                    push @Mailboxes, $mbox;
+                }
+                else { trace "Failed! $item/$mb\n" }
+            }
+            closedir DIR;
+        }
+
+        # $item is a file
+        if (-f $item) {
+            trace "Opening folder $item. ";
+            my $mbox = $Manager->open(  folder => $item, 
+                                        access => 'r',
+                                        extract => 'LAZY',
+                                        trace   => 'NONE');
+            if ($mbox) {
+                    trace "Success.\n";
+                    push @Mailboxes, $mbox;
+            }
+            else { trace "Failed!\n" }
+        }
+    }
+}
+
+sub create_outboxes() {
+    my $outbox;
+    if ($option{outbox}) {
+        trace "Creating $option{outbox}. ";
+        $outbox = $Manager->open(   folder => $option{outbox}, 
+                                    access => 'w',
+                                    create => 1 );
+
+        if($outbox)   { trace "Success.\n" }
+        else          { trace "Failed!\n" }
+    }
+    return $outbox;
+}
+                    
+
+sub parse_mailboxes() {
+    for my $mbox (@Mailboxes) {
+        MESSAGE:
+        for my $msg ($mbox->messages) {
+
+            for my $h (keys %{$option{header}}) {
+                my $hd  = $msg->head->get($h);                
+                my $pat = $option{header}{$h};
+                next MESSAGE unless defined $hd && $hd =~ $pat; 
+            }
+            
+            for my $h (keys %{$option{nheader}}) {
+                my $hd  = $msg->head->get($h);
+                my $pat = $option{nheader}{$h};
+                last if not $hd; 
+                next MESSAGE if $hd =~ $pat;
+            }
+            
+            if($Outbox) { $Manager->copyMessage($Outbox, $msg) }
+            else        { $msg->write }
+            
+        }
+    }
+}
+            
+sub compile_regex() {
+    for my $h (keys %{$option{header}}) {
+        my $pat = $option{header}{$h};
+        $option{header}{$h} = qr($pat);
+    }
+    for my $h (keys %{$option{nheader}}) {
+        my $pat = $option{nheader}{$h};
+        $option{nheader}{$h} = qr($pat);
+    }
+}
+
+sub configure_sigs() {
+    $SIG{INT} = sub {
+        print "Received sigint\n";
+        $Manager->closeAllFolders;
+        exit;
+    }
+}
+
+sub get_options() {
+    use Getopt::Long;
+    my $res = GetOptions(\%option,
+                    'outdir=s',
+                    'outbox=s',
+                    'header=s%',
+                    'nheader=s%',
+                    'werr',
+                    'verbose',
+                    'help|?');
+}
+
+sub surpress_werr() {
+    $SIG{__WARN__} = 0;
+}
+
+sub trace($) {
+    print STDERR shift if $option{verbose};
+}
+
+sub usage($) {
+    my $ec = shift;
+
+    warn <<USAGE;
+Usage: $0 [options] mailbox/mailbox-dir
+options:
+    --outdir <dir>            create new mailboxes in <dir>
+    --outbox <mbox>           output to <mbox> (defaults to stdout)
+    --header <field>=<regex>  capture mails applying to <regexp> 
+                              in header-<field>
+    --nheader <field>=<regex> capture mails not applying to <regexp>
+                              in header-<field>
+    --verbose                 print what is done
+    --werr                    print warnings and errors as well
+    --help                    print this help
+USAGE
+
+    exit $ec;
+}
+
+__END__
+
+=head1 NAME
+
+takemail - walk through mailboxes and grep for something
+
+=head1 SYNOPSIS
+
+takemail [--outbox][--outdir][--header][--nheader]
+         [--verbose][--werr][--help] mailbox/mailbox-dir
+
+=head1 DESCRIPTION
+
+Dump mails applying to regular expressions either to stdout or into a
+newly created mailbox.
+
+Options:
+
+=over 4
+
+=item --outbox FILE
+
+(or C<-c>) Create a new mailbox FILE and write the found messages into it.
+If omitted, output goes to stdout.
+
+=item --outdir DIR
+
+Nothing yet.
+
+=item --header HEADER-FIELD=REGEX
+
+Only find messages whose HEADER-FIELD(s) conform to REGEX. REGEX is a
+standard Perl regular expression, without the leading and trailing slash
+'/'. Multiple key=value pairs can be given by separating them with
+whitespace. Example:
+
+ takemail --header subject=[Hh]ello from=peter\|john ~/Mail
+
+Care must be taken when specifying patterns with special shell characters,
+especially those used for piping. This means that '|' etc. will probably
+need to be escaped with a backslash '\'.
+
+=item --nheader HEADER-FIELD=REGEX
+
+Only find messages whose HEADER-FIELD(s) do not conform to REGEX. Same
+usage as --header.
+
+=item --verbose
+
+(or C<-v>) In addition to normal output, print a log of what is being done
+to stderr.
+
+=item --werr
+
+Nothing yet.
+
+=item --help
+
+(or C<-?>) Print a short summary of options.
+
+=back
+
+=head1 AUTHOR
+
+Tassilo v. Parseval (F<tassilo.parseval@post.rwth-aachen.de>).
+
+All rights reserved.  This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+=head1 VERSION
+
+This code is beta, version 2.019

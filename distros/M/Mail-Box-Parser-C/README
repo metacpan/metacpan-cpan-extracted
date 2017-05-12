@@ -1,0 +1,12 @@
+Mail/Box/Parser/C
+=================
+
+INSTALLATION
+
+To install (under UNIX/Linux) this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+

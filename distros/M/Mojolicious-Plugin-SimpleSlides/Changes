@@ -1,0 +1,22 @@
+Revision history for Perl module Mojolicious-Plugin-SimpleSlides
+
+0.06 2017-03-25
+  - Fix previously broken release (still deprecated, just fixed)
+
+0.05 2017-03-13
+  - Deprecate the dist
+    - There will be no further support given
+    - Adoption requests will be considered
+  - Fix tests broken by Mojolicious 7.0
+
+0.04 2016-04-02
+  - declare dependencies
+
+0.03  2016-03-30
+  - fix bad test
+
+0.02  2016-03-30
+  - update for Mojolicious 6.0 compat
+
+0.01  2013-05-17
+  - initial release

@@ -1,0 +1,18 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         MKDoc-ECommerce
+version:      0.01
+version_from: lib/MKDoc/ECommerce.pm
+installdirs:  site
+requires:
+    Digest::MD5:                   2.33
+    ExtUtils::MakeMaker:           
+    Geography::Countries:          
+    MKDoc::Control_List:           
+    MKDoc::Core:                   
+    MKDoc::XML:                    
+    Petal::Mail:                   
+    Test::More:                    0.47
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,14 @@
+Revision history for package Mojolicious-Plugin-Mango
+
+0.0.2 2015-02-03T09:53:27
+ [Huo Linhe]
+ - Use ->content_like in test to fix failures
+ - Fix typo in POD
+
+0.0.1 2015-01-21T05:12:52Z
+ [Huo Linhe]
+ - Add test for most simply usage
+ - Add test script for plugin Mango
+ - Add Mango helpers: db, coll, etc.
+ - Initialize gitrepo with `dzil new`
+

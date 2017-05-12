@@ -1,0 +1,230 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLTextAreaElement
+
+=for object Mozilla::DOM::HTMLTextAreaElement
+
+Mozilla::DOM::HTMLTextAreaElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLTextAreaElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLTextAreaElement interface is the interface to a
+ * [X]HTML textarea element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLTextAreaElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $htmltextareaelement->B<Blur>()
+
+=over
+
+=back
+
+=head2 $htmltextareaelement->B<Focus>()
+
+=over
+
+=back
+
+=head2 $htmltextareaelement->B<Select>()
+
+=over
+
+=back
+
+=head2 $form = $htmltextareaelement->B<GetForm>()
+
+=over
+
+=back
+
+=head2 $type = $htmltextareaelement->B<GetType>()
+
+=over
+
+=back
+
+=head2 $accesskey = $htmltextareaelement->B<GetAccessKey>()
+
+=over
+
+=back
+
+=head2 $htmltextareaelement->B<SetAccessKey>($accesskey)
+
+=over
+
+=over
+
+=item * $accesskey (string)
+
+=back
+
+=back
+
+=head2 $cols = $htmltextareaelement->B<GetCols>()
+
+=over
+
+=back
+
+=head2 $htmltextareaelement->B<SetCols>($cols)
+
+=over
+
+=over
+
+=item * $cols (integer (long))
+
+=back
+
+=back
+
+=head2 $defaultvalue = $htmltextareaelement->B<GetDefaultValue>()
+
+=over
+
+=back
+
+=head2 $htmltextareaelement->B<SetDefaultValue>($defaultvalue)
+
+=over
+
+=over
+
+=item * $defaultvalue (string)
+
+=back
+
+=back
+
+=head2 $bool = $htmltextareaelement->B<GetDisabled>()
+
+=over
+
+=back
+
+=head2 $htmltextareaelement->B<SetDisabled>($disabled)
+
+=over
+
+=over
+
+=item * $disabled (boolean)
+
+=back
+
+=back
+
+=head2 $name = $htmltextareaelement->B<GetName>()
+
+=over
+
+=back
+
+=head2 $htmltextareaelement->B<SetName>($name)
+
+=over
+
+=over
+
+=item * $name (string)
+
+=back
+
+=back
+
+=head2 $bool = $htmltextareaelement->B<GetReadOnly>()
+
+=over
+
+=back
+
+=head2 $htmltextareaelement->B<SetReadOnly>($readonly)
+
+=over
+
+=over
+
+=item * $readonly (boolean)
+
+=back
+
+=back
+
+=head2 $rows = $htmltextareaelement->B<GetRows>()
+
+=over
+
+=back
+
+=head2 $htmltextareaelement->B<SetRows>($rows)
+
+=over
+
+=over
+
+=item * $rows (integer (long))
+
+=back
+
+=back
+
+=head2 $tabindex = $htmltextareaelement->B<GetTabIndex>()
+
+=over
+
+=back
+
+=head2 $htmltextareaelement->B<SetTabIndex>($tabindex)
+
+=over
+
+=over
+
+=item * $tabindex (integer (long))
+
+=back
+
+=back
+
+=head2 $value = $htmltextareaelement->B<GetValue>()
+
+=over
+
+=back
+
+=head2 $htmltextareaelement->B<SetValue>($value)
+
+=over
+
+=over
+
+=item * $value (string)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

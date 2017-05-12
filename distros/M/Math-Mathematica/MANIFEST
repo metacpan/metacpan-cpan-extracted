@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/Math/Mathematica.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README.pod
+t/basic.t
+t/errors.t

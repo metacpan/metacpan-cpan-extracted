@@ -1,0 +1,63 @@
+{
+   "abstract" : "Plugin to Module::Build to add author tests",
+   "author" : [
+      "Diab Jerius E<lt>djeriuss@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Module-Build-Pluggable-AuthorTests",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.007"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.010",
+            "Test::CPAN::Changes" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0",
+            "Test::Fixme" : "0",
+            "Test::NoBreakpoints" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Module::Build::Pluggable" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Module::Build::Pluggable" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Module::Build::Pluggable::AuthorTests" : {
+         "file" : "lib/Module/Build/Pluggable/AuthorTests.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.html"
+      ],
+      "repository" : {
+         "url" : "https://github.com/djerius/module-build-pluggable-authortests"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

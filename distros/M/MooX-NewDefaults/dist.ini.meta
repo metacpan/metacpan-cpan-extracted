@@ -1,0 +1,18 @@
+; vim: syntax=dosini
+name    = MooX-NewDefaults
+author  = Kent Fredric <kentnl@cpan.org>
+author  = Chris Weyl <cweyl@alumni.drew.edu>
+license = LGPL_2_1
+copyright_holder = Chris Weyl <cweyl@alumni.drew.edu>
+copyright_year   = 2011
+
+
+[@Author::KENTNL]
+:version         = 2.016000
+toolkit          = eumm
+toolkit_hardness = soft
+normal_form      = numify
+mantissa         = 6
+bumpversions     = 1
+copyfiles        = LICENSE
+srcreadme        = pod

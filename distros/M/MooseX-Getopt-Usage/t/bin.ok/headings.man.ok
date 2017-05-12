@@ -1,0 +1,13 @@
+NAME
+    headings - Test headings option.
+
+SYNOPSIS
+    headings.pl [OPTIONS]
+
+OPTIONS
+    --help -? --usage
+        Display the usage message and exit
+
+    --man
+        Display man page
+

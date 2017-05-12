@@ -1,0 +1,20 @@
+MKDoc::ECommerce
+
+MKDoc is a content management system specialising in accessibility,
+usability and open standards.
+
+MKDoc-1.6 contains a fully functional shopping cart with online
+payment hooks.  For MKDoc-1.8, this was removed as part of the
+modularisation effort, this module contains the files that were
+removed.
+
+Some work may or may not be required to reintegrate this module with
+MKDoc-1.8.
+
+If you have any questions, suggestions or fixes - or just want to
+know the current status of this module, please contact the mkdoc-dev
+mailing list:
+
+    http://lists.webarch.co.uk/mailman/listinfo/mkdoc-dev
+
+Oct 2004 - Bruno Postle <bruno@mkdoc.com>

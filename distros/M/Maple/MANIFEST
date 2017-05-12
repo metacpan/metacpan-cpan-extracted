@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/Maple.pm
+lib/Maple/Class.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml
+META.json

@@ -1,0 +1,35 @@
+---
+-
+  - rusu.response.update
+  -
+    - domain: sex.ru
+      error_code:
+        - 'Authentication failed. - FATAL ERROR !'
+        - Access to object is denied!
+      req_id: 20080717161540.777392
+      rule_id: rusu.response.update.fail
+    - domain: sex170004536743.ru
+      req_id: 20080717161540.777392
+      rule_id: rusu.response.update.ok
+    - domain: xn--air_23-.ru
+      error_code:
+        - 'Invalid domain name - FATAL ERROR !'
+        - "Domain name contains forbidden character. Must be just letters, digits or `-'. "
+      req_id: 20080717161540.777392
+      rule_id: rusu.response.update.fail
+    - domain: trax.ru
+      error_code:
+        - "non-ASCII characters found (near <*> indicator at char 1 in '<*>дата') - FATAL ERROR !"
+        - Field 'birth-date' can not contain non-ASCII characters
+      req_id: 20080717161540.777392
+      rule_id: rusu.response.update.fail
+    - domain: don2000-1.ru
+      error_code: "Object 'DON2000-1.RU' not found - FATAL ERROR !"
+      req_id: 20080717161540.777392
+      rule_id: rusu.response.update.fail
+    - domain: upanishadi.ru
+      error_code:
+        - "non-ASCII characters found (near <*> indicator at char 1 in '<*>мыло') - FATAL ERROR !"
+        - Field 'e-mail' can not contain non-ASCII characters
+      req_id: 20080717161540.777392
+      rule_id: rusu.response.update.fail

@@ -1,0 +1,29 @@
+---
+name: MasonX-MiniMVC
+version: 0.03
+author:
+  - 'Kirrily "Skud" Robert <skud@cpan.org>'
+abstract: Very simple MVC framework for HTML::Mason
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Accessor: 0
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+provides:
+  MasonX::MiniMVC:
+    file: lib/MasonX/MiniMVC.pm
+    version: 0.03
+  MasonX::MiniMVC::Cookbook:
+    file: lib/MasonX/MiniMVC/Cookbook.pm
+  MasonX::MiniMVC::Dispatcher:
+    file: lib/MasonX/MiniMVC/Dispatcher.pm
+    version: 0.01
+  MasonX::MiniMVC::Installer:
+    file: lib/MasonX/MiniMVC/Installer.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

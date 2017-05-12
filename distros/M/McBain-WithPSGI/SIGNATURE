@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 2f27e95962a613cd503509b6c27ee024bb2d5938 Changes
+SHA1 d59850ff5533fb30dd25e1844622f4078670dff3 INSTALL
+SHA1 18b23aca8e4a23265eea414516fa260230dbf4f5 LICENSE
+SHA1 aec66f7b9cbc38d094f91d9e61512e8339de2ed4 MANIFEST
+SHA1 30776b9c8e871d2e3272821e9ceb28228b85de86 MANIFEST.SKIP
+SHA1 f69699c7fd068e075dabc05920b1bbe22dc6e689 META.json
+SHA1 5e43e55854593a574f2a36dc8a7f1aadb850357e Makefile.PL
+SHA1 97d2031d42e7da0788afc08f4d10af600298e865 README
+SHA1 6e76ca67a111bae9b99e4fee65c71c2409be2219 dist.ini
+SHA1 d2211c9bb217efe576b28ca45cba17fc40fe6580 lib/McBain/WithPSGI.pm
+SHA1 a228990a31893c0a9b54141bf7829d172faa9bf2 t/00-load.t
+SHA1 cfc1d982307cb1142fcc8a9042d9186425fe7c7a t/01-simple.t
+SHA1 7dfcae8399b19118c8a931720897300b5d14879e t/lib/Mendoza.pm
+SHA1 6a24b38d5fe6a486e2a82362822e4b619fdbb7e1 t/lib/Mendoza/Math.pm
+SHA1 d3f317af734cbe21130f8480c728d6e599b40112 t/lib/Mendoza/Math/Constants.pm
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iF4EAREIAAYFAlSoIh4ACgkQa4OHQAFM10cjSwD/a6xFraEk4LGX5sJrUJv3wfOJ
+G5UyJftXQNUcXFGEEWYA/0b477nbp/20AfPa5UFDzjv7jZRGCJQ6Irpbbx6Fy8Ss
+=PV2X
+-----END PGP SIGNATURE-----

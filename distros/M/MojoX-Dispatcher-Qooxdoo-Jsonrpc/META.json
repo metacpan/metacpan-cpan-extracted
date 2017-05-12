@@ -1,0 +1,41 @@
+{
+   "abstract" : "dispatch Qooxdoo applications with Mojo",
+   "author" : [
+      "Matthias Bloch <matthias at puffin ch>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MojoX-Dispatcher-Qooxdoo-Jsonrpc",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "5.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.96"
+}

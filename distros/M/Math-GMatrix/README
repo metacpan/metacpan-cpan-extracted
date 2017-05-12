@@ -1,0 +1,76 @@
+NAME
+    Math::GMatrix - Extension of Math::Matrix for (2D graphics-)vector
+    manipulation
+
+SYNOPSIS
+      use Math::GMatrix;
+
+
+DESCRIPTION
+    The following methods are available:
+
+  new
+
+    Constructor arguments are a list of references to arrays of the same
+    length. The arrays are copied. The method returns undef in case of
+    error.
+
+            $a = new Math::Matrix ([rand,rand,rand],
+                                   [rand,rand,rand],
+                                   [rand,rand,rand]);
+
+    As s special case you can pass a single argument 'I' for getting an
+    identity matrix.
+
+    If you call "new" as method, a zero filled matrix with identical
+    deminsions is returned.
+
+  xform
+
+    You can transform one or more vectors by calling:
+
+            @V1=(1.5,3.7);
+
+            @V2 = $M->xform(@V1);
+
+            @L1=( [1.5,3.7], [4.6,6.8], [5.1,-0.7] );
+
+            @L2 = $M->xform(@L1);
+
+
+  translate
+
+    You can pan (move by x and y offset) your graphics by calling:
+
+            $M2 = $M->translate(2.5,10.2);
+
+
+  rotate
+
+    You can rotate your graphics by calling:
+
+            $M2 = $M->rotate(-90);
+
+
+  scale
+
+    You can scale (factor_x and factor_y) your graphics by calling:
+
+            $M2 = $M->rotate(2,2);
+
+
+EXAMPLE
+            @ListOfVectors = [
+                    [0,1],
+                    [3,5],
+                    [2,7],
+                    [8,-1]
+            ];
+            $paperwidth = 21;               # DIN A4 is 21x29.7 cm
+            $M = new Math::Matrix('I');     # get an identity matrix
+            $M = $M->translate(-1,-1)->rotate(90)->translate($paperwidth-1,1);
+            @Result = $M->xform(@ListOfVectors);
+
+
+AUTHOR
+    A. Cester, <albert.cester@web.de>

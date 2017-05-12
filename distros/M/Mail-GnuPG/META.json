@@ -1,0 +1,48 @@
+{
+   "abstract" : "Process email with GPG.",
+   "author" : [
+      "Robert Spier <rspier@cpan.org>",
+      "David Bremner <ddb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mail-GnuPG",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "GnuPG::Interface" : "0",
+            "IO::Handle" : "0",
+            "MIME::Entity" : "0",
+            "MIME::Parser" : "0",
+            "Mail::Address" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mail::GnuPG" : {
+         "file" : "lib/Mail/GnuPG.pm",
+         "version" : "0.23"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://pivot.cs.unb.ca/git/?p=mail-gnupg.git;a=summary"
+   },
+   "version" : "0.23"
+}

@@ -1,0 +1,58 @@
+{
+   "abstract" : "Internationalization Plugin for Mojolicious",
+   "author" : [
+      "Anatoly Sharifulin <sharifulin@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "keywords" : [
+      "mojo",
+      "mojolicious",
+      "plugin",
+      "i18n",
+      "internationalization"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-I18N",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "I18N::LangTags" : "0.35",
+            "Mojolicious" : "5",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::I18N" : {
+         "file" : "lib/Mojolicious/Plugin/I18N.pm",
+         "version" : "1.6"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/sharifulin/Mojolicious-Plugin-I18N"
+      }
+   },
+   "version" : "1.6"
+}

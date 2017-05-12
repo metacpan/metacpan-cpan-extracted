@@ -1,0 +1,51 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+=cut
+
+This implements the following AppleScript code:
+
+tell application "InDesign 2.0.1"
+	set myDoc to make document
+	tell myDoc
+		tell spread 1 to make text frame
+		tell text frame 1 of spread 1
+			set geometric bounds to {0, 0, 3, 3}
+			set contents to name of first font
+		end tell
+	end tell
+end tell
+
+=cut
+
+use Mac::AppleScript::Glue;
+
+;;$Mac::AppleScript::Glue::Debug{SCRIPT} = 1;
+;;$Mac::AppleScript::Glue::Debug{RESULT} = 1;
+
+my $indesign = new Mac::AppleScript::Glue::Application('InDesign 2.0.1');
+
+# AppleScript:
+#	set myDoc to make document
+
+my $doc = $indesign->make_document
+	or die "can't make new document\n";
+
+# AppleScript:
+#	tell spread 1 to make text frame
+
+my $text_frame = $doc->spread(1)->make_text_frame
+	or die "can't get text frame\n";
+
+# AppleScript:
+#	tell text frame 1 of spread 1
+#	    set geometric bounds to {0, 0, 3, 3}
+#	    set contents to name of first font
+#	end tell
+
+$text_frame->set(
+	geometric_bounds => [0,0,3,3],
+	contents => $indesign->fonts->[0]->name,
+);

@@ -1,0 +1,21 @@
+# -*-c-*- 
+#
+# $Id: 30MQCONN,v 33.4 2012/09/26 16:10:02 jettisu Exp $
+#
+# (c) 1999-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+MQHCONN
+MQCONN(Name,CompCode,Reason)
+        MQCHAR48 Name
+        MQLONG   CompCode = NO_INIT
+        MQLONG   Reason = NO_INIT
+
+    CODE:
+        MQCONN(Name,&RETVAL,&CompCode,&Reason);
+    OUTPUT:
+        RETVAL
+        CompCode
+        Reason
+

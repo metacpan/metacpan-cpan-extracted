@@ -1,0 +1,62 @@
+{
+   "abstract" : "A simple parser for Makefiles",
+   "author" : [
+      "Zhang \"agentzh\" Yichun, C<< <agentzh@gmail.com> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.131490",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Makefile-Parser",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "IPC::Run3" : "0.036",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Fast" : "0",
+            "Class::Trigger" : "0.13",
+            "Cwd" : "0",
+            "File::Slurp" : "0",
+            "File::Spec" : "0",
+            "Filter::Util::Call" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Makefile::DOM" : "0.008",
+            "Text::Balanced" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "5.006001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/agentzh/makefile-parser-pm"
+      }
+   },
+   "version" : "0.216"
+}

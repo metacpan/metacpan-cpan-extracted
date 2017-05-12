@@ -1,0 +1,30 @@
+---
+abstract: 'Moose types for Global Trade Identifiers.'
+author:
+  - 'Dave Lambley <davel@state51.co.uk>'
+build_requires:
+  Class::Load: 0
+  File::Find: 0
+  File::Spec: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Types-GTIN
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Moose: 0
+  MooseX::Types::Moose: 0
+resources:
+  homepage: http://search.cpan.org/~dlambley/MooseX-Types-GTIN/
+  repository: https://github.com/davel/MooseX-Types-GTIN
+version: 0.03

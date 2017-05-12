@@ -1,0 +1,27 @@
+Model3D-Poser-GetStringRes version 0.01
+=======================================
+
+This module emulates Poser's GetStringRes function in English.
+See the POD in the module for more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This module has no dependencies.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c)2009 by XFX Publishing, LLC
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.006 or,
+at your option, any later version of Perl 5 you may have available.
+
+

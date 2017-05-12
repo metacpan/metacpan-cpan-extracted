@@ -1,0 +1,77 @@
+{
+   "abstract" : "Mango backend for Minion",
+   "author" : [
+      "Andrey Khozov <avkhozov@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Minion-Backend-Mango",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mango" : "1.20",
+            "Minion" : "5.05",
+            "Mojolicious" : "6.0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Minion::Backend::Mango" : {
+         "file" : "lib/Minion/Backend/Mango.pm",
+         "version" : "1.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/avkhozov/Minion-Backend-Mango/issues"
+      },
+      "homepage" : "https://github.com/avkhozov/Minion-Backend-Mango",
+      "repository" : {
+         "url" : "git://github.com/avkhozov/Minion-Backend-Mango.git",
+         "web" : "https://github.com/avkhozov/Minion-Backend-Mango"
+      }
+   },
+   "version" : "1.01",
+   "x_authority" : "cpan:AVKHOZOV",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

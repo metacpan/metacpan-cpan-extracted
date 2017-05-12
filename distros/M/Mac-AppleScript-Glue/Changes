@@ -1,0 +1,59 @@
+Revision history for Perl extension Mac::AppleScript::Glue.
+
+0.03 Sat Sep 14 22:32:48 PDT 2002
+
+        - removed usage of osascript(1) and replaced it with Dan
+          Sugalski's Mac::AppleScript, which does the same thing but
+          better and faster (you'll need to install Mac::AppleScript
+          first, from CPAN)
+
+        - simplified the notation of constants and simple
+          object-references -- instead of passing a reference to a
+          string (\'true'), now you can pass a string enclosed in
+          angle-brackets ('<true>') and it will be passed along
+          verbatim to AppleScript
+
+        - added an alternate calling form to
+          Mac::AppleScript::Object->objref(), in which you can pass
+          a pair of class and parameters (file => "foo") instead of
+          having to clump it all into one string ("file => \"foo\"")
+
+        - added the option to specify a remote machine when creating a
+          Mac::AppleScript::Application object (uses an "eppc:" URL)
+
+        - removed the SCRIPT_RESULT and EXEC debugging tags; now the
+          SCRIPT tag debugs both the script and the result, and EXEC
+          is unneeded since we don't exec osascript(1) anymore
+
+        - tried to make the AppleScript a little less verbose, since
+          it seems that Adobe InDesign has problems with
+          object-references that are too complicated
+
+        - fixed the internal number-recognizer so that "5.5.5" isn't
+          thought to be a valid number ;)
+
+        - cleaned up a bunch of the examples in "scripts/"
+
+        - added a pod-tester to the test suite, as seen in brian d
+          foy's Mac::iTunes
+
+        - added pre-requisites to the Makefile
+
+        - added copyright info
+
+        - various fixes to the POD documentation for clarity, etc.
+
+0.02 Sun Sep  1 08:35:53 PDT 2002
+
+        - renamed to Mac::AppleScript::Glue, so as play nicely with
+          other modules being written
+
+        - added all the documentation
+
+        - got rid of the ::Scripter class
+
+0.01 Fri Aug 30 06:51:17 2002
+
+	- original version; created by h2xs 1.2 with options
+		-X AppleScript
+

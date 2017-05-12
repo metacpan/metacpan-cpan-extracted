@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>MasonX::Request::WithMultiSession</title>
+<link rel="stylesheet" href="pod.css" type="text/css" />
+<link rev="made" href="mailto:test@cathy.beaucox.com" />
+</head>
+
+<body>
+<table class="hdrtable" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td>MasonX::Request::WithMultiSession</td></tr></table>
+
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<ul>
+
+		<li><a href="#parameters">Parameters</a></li>
+	</ul>
+
+	<li><a href="#usage">USAGE</a></li>
+	<li><a href="#support">SUPPORT</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="name">NAME</a><a name="__H1_1__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+</tr></table>
+<p>MasonX::Request::WithMultiSession - Multiple sub-sessions within one ``parent'' session</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="synopsis">SYNOPSIS</a><a name="__H1_2__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_1__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;NAME</td>
+</tr></table>
+<pre>
+  PerlSetVar  MasonRequestClass  MasonX::Request::WithMultiSession</pre>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="description">DESCRIPTION</a><a name="__H1_3__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_2__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;SYNOPSIS</td>
+</tr></table>
+<p>This module subclasses <code>MasonX::Request::WithApacheSession</code> in order
+to allow multiple ``sub-sessions'' to exist within one parent session.</p>
+<p>This can be quite useful for a web app where you want to allow the
+user to open multiple windows, each with a different session, but
+session ids are stored in a cookie.</p>
+<p>Like <code>MasonX::Request::WithApacheSession</code>, sub-sessions are shared
+between a request and any subrequests it creates.</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="methods">METHODS</a><a name="__H1_4__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_3__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;DESCRIPTION</td>
+</tr></table>
+<p>This class has an interface quite similar to that of
+<code>MasonX::Request::WithApacheSession</code>.</p>
+<ul>
+<li><strong><a name="item_session">session</a></strong><br />
+</li>
+The primary interface to this class is through the <a href="#item_session"><code>session()</code></a>
+method.  When this method is called without any parameters, the module
+looks for an existing sub-session specified by the sub-session id
+argument parameter (which can be in a query string or POST).  This
+value can be overridden by explicitly passing a ``sub_session_id''
+parameter.
+<p>If this parameter is found, an existing sub-session is returned.  If
+this parameter is not found, a new sub-session is created.</p>
+<p>If the <a href="#item_session"><code>session()</code></a> method is called as <a href="#item_session"><code>session( clone =&gt; 1 )</code></a>
+then a new sub-session will be created, and its contents will be the
+same as that of the current sub-session.  This is a shallow copy of
+the old session hash, so objects and references are shared between
+them.</p>
+<p>If <a href="#item_session"><code>session( new =&gt; 1 )</code></a> is called, then a new, empty,
+sub-session is created.</p>
+<p>You can specify the main session id to use via the ``session_id''
+parameter.</p>
+<p></p>
+<li><strong><a name="item_sub_session_id">sub_session_id</a></strong><br />
+</li>
+This method returns the currently active sub-session's id.  Use this
+method to put this id into URL parameters, forms, etc. as needed.
+<p>If given a ``sub_session_id'' parameter, it will set the current
+sub-session id.</p>
+<p></p>
+<li><strong><a name="item_delete_sub_session">delete_sub_session</a></strong><br />
+</li>
+By default, this simply defaults the current sub-session.  You can
+pass a ``sub_session_id'' parameter to delete a specific session.
+<p></p></ul>
+<p>
+</p>
+<table class="h2table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr>
+<td><a name="parameters">Parameters</a><a name="__H2_1__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_4__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;METHODS</td>
+</tr></table>
+
+<p>This module takes two parameters besides those inherited from
+<code>MasonX::Request::WithApacheSession</code>:</p>
+<ul>
+<li><strong><a name="item_multi_session_args_param__2f_multisessionargsparam">multi_session_args_param / MultiSessionArgsParam</a></strong><br />
+</li>
+This parameter can be used to specify which parameter contains the
+sub-session id.  By default, the module will look for a parameter
+called ``sub_session_id''.
+<p></p>
+<li><strong><a name="item_multi_session_expire__2f_multisessionexpire">multi_session_expire / MultiSessionExpire</a></strong><br />
+</li>
+This parameter specifies the number of seconds after a sub-session is
+accessed until it is purged.  If not specified, then sub-sessions are
+never purged.
+<p>Sub-sessions expiration is checked when the request object goes out of
+scope.</p>
+<p></p></ul>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="usage">USAGE</a><a name="__H1_5__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_4__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;METHODS</td>
+</tr></table>
+<p>You will need to manually set the sub-session id argument parameter
+for each request.  The easiest way to do this is to make sure that all
+URLs contain the sub-session id.  This can be done by using a <code>&lt;
+&lt;%filter</code> &gt;&gt; block in a top-level autohandler (although this won't
+catch redirects), or by making sure all URLs are generated by a single
+component/function.</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="support">SUPPORT</a><a name="__H1_6__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_5__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;USAGE</td>
+</tr></table>
+<p>Bug reports and requests for help should be sent to the mason-users
+list.  See <a href="http://www.masonhq.com/resources/mailing_lists.html">http://www.masonhq.com/resources/mailing_lists.html</a> for
+more details.</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="author">AUTHOR</a><a name="__H1_7__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_6__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;SUPPORT</td>
+</tr></table>
+<p>Dave Rolsky, &lt;<a href="mailto:autarch@urth.org">autarch@urth.org</a>&gt;</p>
+<p>Development funded by Marigold Technologies.</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="see_also">SEE ALSO</a><a name="__H1_8__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_7__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;AUTHOR</td>
+</tr></table>
+<p>HTML::Mason</p>
+<table class="hdrtable" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td>MasonX::Request::WithMultiSession</td></tr></table>
+
+
+</body>
+
+</html>

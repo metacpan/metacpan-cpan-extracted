@@ -1,0 +1,78 @@
+#
+# $Id: CONFIG,v 33.4 2012/09/26 16:09:59 jettisu Exp $
+#
+# (c) 1999-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+# Change these macros to affect the compilation of the MQSeries
+# module, customized for your environment.
+#
+
+#
+# This is the name of the queue manager to which to connect in the
+# tests.  
+#
+# If you don't support a client channel table file, and require the
+# use of the MQSERVER environment variable to connect as a client, you
+# need to set that environment variable *before* you run "make test".
+#
+# For example (ksh syntax, YMMV):
+#
+# export MQSERVER='SAT1/TCP/sasas12(16670)'
+#
+QUEUEMGR = YOURQM
+
+#
+# If you want the server tests to use the default queue manager
+# (i.e. a blank string for the queue manager name), then set this
+# parameter to 1
+#
+# USE_DEFAULT_QMGR = 1
+USE_DEFAULT_QMGR = 0
+
+#
+# This is the queue to test against.  This is used in both the client
+# and server tests.
+#
+QUEUE = PERL.MQI.TEST
+
+#
+# The Makefile.PL infrastructure does a decent job of figuring out
+# that you can't support the server API (if you only have client
+# libraries).  It does NOT figure out if you can't support the client
+# API (if your site simply chooses not to support clients).
+#
+# These variables allow you to completely control the build of either
+# the client or server API.  Note that if both end of being disabled,
+# you'll get a loud complaint from Makefile.PL
+#
+# NOCLIENT = 1
+# NOSERVER = 1
+#
+
+#
+# NOTE: Most of the stuff below this point usually doesn't need to be
+# changed, unless you have a non-standard installation (i.e. different
+# pathnames) of the MQSeries product.
+#
+
+#
+# This is the directory under which we can find the lib and inc (or
+# include, for those of you who choose to standardize the directory
+# name) directories of the MQSeries installation.  If this directory
+# isn't found, or isn't specified, then it defaults to /opt/mqm (or
+# /usr/lpp/mqm on AIX).
+#
+# MQMTOP = /ms/dist/3rd/PROJ/MQSeries/2.2.2
+# MQMTOP = /ms/dist/3rd/PROJ/MQSeries/2.2.1/opt/mqm
+# MQMTOP = /ms/dist/3rd/PROJ/MQSeries/5.0.7
+
+#
+# If you have installed the MQSeries locale files somewhere other than
+# the operating system default location (e.g. on Solaris,
+# /usr/lib/locale), then you can set this variable to the appropriate
+# pathname, and the MQSeries.pm module will automatically set the
+# NLSPATH environment variable for you.
+#
+# MQMLOCALE = /some/dir
+

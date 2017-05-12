@@ -1,0 +1,13 @@
+Changes
+MANIFEST			This list of files
+META.yml
+Makefile.PL
+README
+lib/MooseX/App/Cmd/Command/BashComplete.pm
+t/00-load.t
+t/lib/TestApp.pm
+t/lib/TestApp/Command/BashComplete.pm
+t/lib/TestApp/Command/TestCommand.pm
+t/main.t
+t/output.txt
+t/pod.t

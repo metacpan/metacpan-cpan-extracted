@@ -1,0 +1,29 @@
+---
+abstract: 'Pandigital number detection.'
+author:
+  - 'David Oswald <davido [@at] cpan [d.o.t] org>'
+build_requires:
+  English: 0
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Math-Pandigital
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Math::Pandigital:
+    file: lib/Math/Pandigital.pm
+    version: 0.04
+requires:
+  Moo: 1.000007
+  MooX::Types::MooseLike: 0.16
+  perl: 5.006002
+version: 0.04

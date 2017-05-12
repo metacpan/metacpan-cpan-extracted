@@ -1,0 +1,81 @@
+NAME
+    Math::SimpleVariable - simple representation of mathematical variables
+
+SYNOPSIS
+      use Math::SimpleVariable;
+
+      # Make a variable
+      my $foo = new Math::SimpleVariable(name => 'foo', value => 0.3);
+
+      # Some of the available accessors
+      # Note that many are identical, but you might want to change
+      # their behaviour in derived variable classes...
+      my $name = $foo->name();       # yields 'foo'
+      print $foo->stringify(), "\n"; # prints 'foo'
+      my $id = $foo->id();           # yields 'foo'
+      my $value = $foo->value();     # yields 0.3
+      print $foo->evaluate(), "\n";  # prints 0.3
+
+      # Make a second variable
+      my $bar = $foo->clone();
+      $bar->{name} = 'bar';      # changes the name (and as a consequence the id())
+      print $bar->value(), "\n"; # prints the same value, 0.3
+
+DESCRIPTION
+    Math::SimpleVariable is a simple representation of mathematical
+    variables, with an obligatory name and an optional value. This class on
+    itself might not seem very useful at first sight, but you might want to
+    derive different types of variables for some application. That way,
+    objects of the derived variable class can be accessed interchangeably
+    with the here provided protocols.
+
+    Math::SimpleVariable has two data fields - name and value - that can be
+    accessed and modified as if the variable object is a hash. E.g.
+
+        $var->{name} = 'foo';
+
+    sets the name of the object $var to 'foo', and
+
+        my $val = $var->{value};
+
+    reads the value of the $var object into $val.
+
+    In addition, the following accessor methods are available for
+    Math::SimpleVariable objects:
+
+    $var->name()
+        Returns $var->{name}
+
+    $var->id()
+        Returns $var->name() for Math::SimpleVariable objects. The purpose
+        of id() is to provide some unique identifier when using variables in
+        some higher level concept, e.g. a matrix representation of a set of
+        equations. Depending on your needs, you might want to change the
+        implementation of id() in derived classes.
+
+    stringify()
+        Returns a printable representation of the variable. For
+        Math::SimpleVariable objects, returns $var->name(). Again, you might
+        want to override this for derived classes.
+
+    value()
+        Returns $var->{value}
+
+    evaluate()
+        Returns a numerical evaluation of the variable. For
+        Math::SimpleVariable objects, returns $var->value(). You might want
+        to override this behaviour in derived classes, athough I cannot
+        think of any place where this might come in useful :-). evaluate()
+        is still there for reasons of orthogonality.
+
+SEE ALSO
+    perl(1).
+
+AUTHOR
+    Wim Verhaegen <wimv@cpan.org>
+
+COPYRIGHT
+    Copyright (C) 2001 Wim Verhaegen. All rights reserved. This program is
+    free software; you may redistribute and/or modify it under the same
+    terms as Perl itself.
+

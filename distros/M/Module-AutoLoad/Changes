@@ -1,0 +1,19 @@
+Revision history for Perl extension Module::AutoLoad.
+
+0.04  Sun Feb  8 10:00 2015
+ - More accurate t/01_network.t test for HTTP/0.9 support.
+ - Shortened MAGIC a few more characters.
+
+0.03  Sat Feb  7 23:00 2015
+ - More gracefully handle case where MANIFEST contains
+   prefix, but not the full stub, such as:
+   "MLEHMANN/common-sense-3.73/sense.pm"
+ - Adjust %INC assignment for sub modules found in lib.
+
+0.02  Tue Sep 13 14:00 2011
+ - Documental cleanup.
+ - No functional changes.
+
+0.01  Mon Sep  5 14:00 2011
+ - Initial release
+ - Created by h2xs -X Module::AutoLoad

@@ -1,0 +1,110 @@
+NAME
+    Medical::Growth - Basic tools for growth-dependent norms
+
+SYNOPSIS
+      use Medical::Growth;
+      my(@systems) = Medical::Growth->available_systems;
+      my $meas = Medical::Growth->measure_class_for(system => My::System,...)
+      my $z_score = $meas->value_to_z($value, @criteria);
+
+DESCRIPTION
+    Medical::Growth is designed as a common resource for implementing
+    systems of growth-dependent norms. It provides a set of basic tools for
+    operating on normally distributed data, as well as a common entry point
+    for users of Medical::Growth-compatible systems.
+
+    If you're interested in using a Medical::Growth-compatible measurement
+    system, read on. If you're interested in building a measurement system,
+    you may also want to see Medical::Growth::Base, which contains some
+    tools to facilitate the process.
+
+  USING MEASUREMENT SYSTEMS
+    In conceptual terms, a collection of methods that allows you to compare
+    a measured value to a set of norms is called a measurement system. For
+    instance, the models for anthropometric values based on the NHANES 2000
+    survey, from which growth charts in common use in pediatrics were
+    created, is a measurement system.
+
+    In pragmatic terms, a measurement system is a collection of classes that
+    present a common set of ways to compare a measurement to norms. Each
+    specific comparison is done via a measurement class, which provides an
+    interface for a specific set of norms. To continue the NHANES 2000
+    example, a measurement class would correspond to a single growth chart,
+    that is, the collection of norms to which you would compare a specific
+    value. Thus, weight for age in boys 2-20 years old would be a
+    measurement class, while length for age in girls under 3 would be a
+    separate measurement class. In some cases, such as these, a measurement
+    class will need to know only one value (here, age) in addition to the
+    measurement to return the normalized score. In others, it may need
+    several additional pieces of information. Where to draw the boundary
+    between different measurement classes and a single measurement class
+    using multiple indices may be different for different measurement
+    systems, and reflects the best interface design for common use.
+
+    Medical::Growth provides two methods to simplify interactions with
+    measurement systems:
+
+  METHODS
+    available_systems
+        Returns a list of the names of measurement systems installed in the
+        Medical::Growth hierarchy.
+
+    measure_class_for(*%criteria*)
+        Locate a measurement class that performs the function specified by
+        *%criteria*, and return a handle that allows you to call methods
+        from the measurement class. This is provided as a common entry point
+        to make finding measurement classes easier. Although nothing stops
+        you from hard-coding the name of the measurement class directly,
+        finding it via "measurement_class_for" may help keep your code more
+        readable, and may let you take advantage of shortcuts provided by
+        the measurement system.
+
+        Most of the work is done by the "measurement_class_for" method in
+        each measurement system, since it requires detailed knowledge of how
+        a particular measurement system is implemented. The Medical::Growth
+        version of this method uses the value in *%criteria* associated with
+        the key "system" to identify the measurement system you want. This
+        value can be the full name of a measurement system's top-level
+        class, as returned by available_systems, or it may be an abbreviated
+        name without the leading "Medical::Growth::". The top-level class
+        for the measurement system is loaded, if necessary, and its
+        "measurement_class_for" method is called, with *%criteria* as
+        arguments. It is up to the measurement system's
+        "measurement_class_for" to interpret the rest of *%criteria* and
+        return the appropriate handle.
+
+        If the "system" element is missing from *%criteria* or the class
+        cannot be loaded, an exception is thrown.
+
+  EXPORT
+    None.
+
+DIAGNOSTICS
+    Any message produced by an included package.
+
+    No measure_class_for() method found (F)
+        Medical::Growth::measure_class_for found a measurement system
+        matching the "system" specified and loaded its top-level module, but
+        that module didn't provide a system-specific "measure_class_for" to
+        pick a measurement class.
+
+BUGS AND CAVEATS
+    Are there, for certain, but have yet to be cataloged.
+
+VERSION
+    version 1.00
+
+AUTHOR
+    Charles Bailey <cbail@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2014 Charles Bailey.
+
+    This software may be used under the terms of the Artistic License or the
+    GNU General Public License, as the user prefers.
+
+ACKNOWLEDGMENT
+    The code incorporated into this package was originally written with
+    United States federal funding as part of research work done by the
+    author at the Children's Hospital of Philadelphia.
+

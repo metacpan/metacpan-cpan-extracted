@@ -1,0 +1,36 @@
+Math/BaseArith version 1.00
+===========================
+
+The inspiration for this module is a pair of functions in the APL
+programming language called encode (a.k.a. "representation") and decode
+(a.k.a. base-value). Their principal use is to convert numbers from one
+number base to another. Mixed number bases are permitted. 
+
+Arguments to the functions consist either of a scalar number or a list
+of numbers.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  strict
+  warnings
+  integer
+  Carp
+  Exporter
+
+
+Copyright (C) 2002 Gary Puckering
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

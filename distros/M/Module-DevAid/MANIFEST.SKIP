@@ -1,0 +1,35 @@
+# version control files
+\bRCS\b
+\bCVS\b
+,v$
+^_darcs/
+^\.binaries$
+^\.boring$
+^\.darcs-temp-log.text
+# archives
+.*\.tar\.gz$
+# the TODO file
+^\.todo$
+
+# DevAid files
+^darcs_prebuild.pl$
+^old_version.txt$
+^version.txt$
+
+# MakeMaker files
+^Makefile$
+^blib/
+^MakeMaker-\d
+pm_to_blib
+
+# Module::Build files
+^Build$
+^_build/
+
+# temp, old, backup files
+~$
+\.old$
+\.bak$
+\.#
+\.swp$
+^#.*#$

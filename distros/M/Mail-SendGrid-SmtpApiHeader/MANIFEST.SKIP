@@ -1,0 +1,8 @@
+.git
+.gitignore
+Mail-SendGrid-SmtpApiHeader-*
+blib
+Makefile
+Makefile.old
+pm_to_blib
+MYMETA.yml

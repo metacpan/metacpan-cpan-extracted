@@ -1,0 +1,9 @@
+.git
+blib/
+pm_to_blib
+Makefile.old
+MANIFEST.bak
+.author
+MYMETA.json
+MYMETA.yml
+.gz

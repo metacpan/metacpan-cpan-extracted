@@ -1,0 +1,9 @@
+Revision history for Module-Build-Prereqs-FromCPANfile
+
+0.02    2014-08-16
+        [DEPENDENCY UPDATE]
+        - Add dependency on CPAN::Meta::Prereqs because we need merged_requirements() method.
+
+0.01    2014-08-15
+        First version, released on an unsuspecting world.
+

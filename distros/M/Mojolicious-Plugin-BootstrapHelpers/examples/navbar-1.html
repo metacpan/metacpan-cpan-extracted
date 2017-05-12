@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Examples</title>
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    </head>
+
+    <body>
+        <div class="container">
+            
+
+<pre>&lt;%= navbar header =&gt; [&#39;The brand&#39;, [&#39;#&#39;], hamburger, toggler =&gt; &#39;bs-example-navbar-collapse-1&#39;] %&gt;</pre>
+<pre>&lt;nav class=&quot;navbar navbar-default&quot;&gt;
+    &lt;div class=&quot;container-fluid&quot;&gt;
+        &lt;div class=&quot;navbar-header&quot;&gt;
+            &lt;button class=&quot;collapsed navbar-toggle&quot; data-target=&quot;#bs-example-navbar-collapse-1&quot; data-toggle=&quot;collapse&quot; type=&quot;button&quot;&gt;
+                &lt;span class=&quot;icon-bar&quot;&gt;&lt;/span&gt;
+                &lt;span class=&quot;icon-bar&quot;&gt;&lt;/span&gt;
+                &lt;span class=&quot;icon-bar&quot;&gt;&lt;/span&gt;
+            &lt;/button&gt;
+            &lt;a class=&quot;navbar-brand&quot; href=&quot;#&quot;&gt;The brand&lt;/a&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/nav&gt;</pre>
+<div>    <nav class="navbar navbar-default">        <div class="container-fluid">            <div class="navbar-header">                <button class="collapsed navbar-toggle" data-target="#bs-example-navbar-collapse-1" data-toggle="collapse" type="button">                    <span class="icon-bar"></span>                    <span class="icon-bar"></span>                    <span class="icon-bar"></span>                </button>                <a class="navbar-brand" href="#">The brand</a>            </div>        </div>    </nav></div>
+<hr />
+<p>A simple navbar with a couple of links and a submenu:</p>
+<pre>&lt;%= navbar header =&gt; [&#39;The brand&#39;, [&#39;#&#39;], hamburger, toggler =&gt; &#39;bs-example-navbar-collapse-2&#39;],
+           nav =&gt; [ items =&gt; [
+                   [&#39;Link&#39;, [&#39;#&#39;] ],
+                   [&#39;Another link&#39;, [&#39;#&#39;], active ],
+                   [&#39;Menu&#39;, [&#39;#&#39;], caret, items =&gt; [
+                       [&#39;Choice 1&#39;, [&#39;#&#39;] ],
+                       [&#39;Choice 2&#39;, [&#39;#&#39;] ],
+                       [],
+                       [&#39;Choice 3&#39;, [&#39;#&#39;] ],
+                   ] ],
+               ]
+           ]
+%&gt;</pre>
+<pre>&lt;nav class=&quot;navbar navbar-default&quot;&gt;
+    &lt;div class=&quot;container-fluid&quot;&gt;
+        &lt;div class=&quot;navbar-header&quot;&gt;
+            &lt;button class=&quot;collapsed navbar-toggle&quot; data-target=&quot;#bs-example-navbar-collapse-2&quot; data-toggle=&quot;collapse&quot; type=&quot;button&quot;&gt;
+                &lt;span class=&quot;icon-bar&quot;&gt;&lt;/span&gt;
+                &lt;span class=&quot;icon-bar&quot;&gt;&lt;/span&gt;
+                &lt;span class=&quot;icon-bar&quot;&gt;&lt;/span&gt;
+            &lt;/button&gt;
+            &lt;a class=&quot;navbar-brand&quot; href=&quot;#&quot;&gt;The brand&lt;/a&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;collapse navbar-collapse&quot; id=&quot;bs-example-navbar-collapse-2&quot;&gt;
+            &lt;ul class=&quot;nav navbar-nav&quot;&gt;
+                &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Link&lt;/a&gt;&lt;/li&gt;
+                &lt;li class=&quot;active&quot;&gt;&lt;a href=&quot;#&quot;&gt;Another link&lt;/a&gt;&lt;/li&gt;
+                &lt;li class=&quot;dropdown&quot;&gt;
+                    &lt;a class=&quot;dropdown-toggle&quot; data-toggle=&quot;dropdown&quot; href=&quot;#&quot;&gt;Menu &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;&lt;/a&gt;
+                    &lt;ul class=&quot;dropdown-menu&quot;&gt;
+                        &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Choice 1&lt;/a&gt;&lt;/li&gt;
+                        &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Choice 2&lt;/a&gt;&lt;/li&gt;
+                        &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+                        &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Choice 3&lt;/a&gt;&lt;/li&gt;
+                    &lt;/ul&gt;
+                &lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/nav&gt;</pre>
+<div>    <nav class="navbar navbar-default">        <div class="container-fluid">            <div class="navbar-header">                <button class="collapsed navbar-toggle" data-target="#bs-example-navbar-collapse-2" data-toggle="collapse" type="button">                    <span class="icon-bar"></span>                    <span class="icon-bar"></span>                    <span class="icon-bar"></span>                </button>                <a class="navbar-brand" href="#">The brand</a>            </div>            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">                <ul class="nav navbar-nav">                    <li><a href="#">Link</a></li>                    <li class="active"><a href="#">Another link</a></li>                    <li class="dropdown">                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Menu <span class="caret"></span></a>                        <ul class="dropdown-menu">                            <li><a href="#">Choice 1</a></li>                            <li><a href="#">Choice 2</a></li>                            <li class="divider"></li>                            <li><a href="#">Choice 3</a></li>                        </ul>                    </li>                </ul>            </div>        </div>    </nav></div>
+<hr />
+<pre>&lt;%= navbar inverse, header =&gt; [&#39;The Brand&#39;, [&#39;#&#39;], hamburger, toggler =&gt; &#39;collapse-45821&#39;],
+           form =&gt; [
+                [[&#39;/login&#39;], method =&gt; &#39;post&#39;, left],
+                [
+                    formgroup =&gt; [
+                        text_field =&gt; [&#39;search-term&#39;, placeholder =&gt; &#39;Search&#39; ],
+                    ],
+                    submit_button =&gt; [&#39;Submit&#39;],
+                ]
+            ],
+            button =&gt; [&#39;A link&#39;, [&#39;#&#39;], left ],
+            nav =&gt; [ items =&gt; [
+                    [&#39;Another linkage&#39;, [&#39;#&#39;], -li =&gt; [ data =&gt; { stuff =&gt; &#39;inli&#39; } ], data =&gt; { item =&gt; 1 } ]
+                ]
+            ],
+            p =&gt; [&#39;Hello&#39;, right]
+%&gt;</pre>
+<pre>&lt;nav class=&quot;navbar navbar-inverse&quot;&gt;
+    &lt;div class=&quot;container-fluid&quot;&gt;
+        &lt;div class=&quot;navbar-header&quot;&gt;
+            &lt;button class=&quot;collapsed navbar-toggle&quot; data-target=&quot;#collapse-45821&quot; data-toggle=&quot;collapse&quot; type=&quot;button&quot;&gt;
+                &lt;span class=&quot;icon-bar&quot;&gt;&lt;/span&gt;
+                &lt;span class=&quot;icon-bar&quot;&gt;&lt;/span&gt;
+                &lt;span class=&quot;icon-bar&quot;&gt;&lt;/span&gt;
+            &lt;/button&gt;
+            &lt;a class=&quot;navbar-brand&quot; href=&quot;#&quot;&gt;The Brand&lt;/a&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;collapse navbar-collapse&quot; id=&quot;collapse-45821&quot;&gt;
+            &lt;form action=&quot;/login&quot; class=&quot;navbar-form navbar-left&quot; method=&quot;post&quot;&gt;
+                &lt;div class=&quot;form-group&quot;&gt;
+                    &lt;input class=&quot;form-control&quot; id=&quot;search-term&quot; name=&quot;search_term&quot; placeholder=&quot;Search&quot; type=&quot;text&quot; /&gt;
+                &lt;/div&gt;
+                &lt;button class=&quot;btn btn-default&quot; type=&quot;submit&quot;&gt;Submit&lt;/button&gt;
+            &lt;/form&gt;
+            &lt;a class=&quot;btn btn-default navbar-btn navbar-left&quot; href=&quot;#&quot;&gt;A link&lt;/a&gt;
+            &lt;ul class=&quot;nav navbar-nav&quot;&gt;
+                &lt;li data-stuff=&quot;inli&quot;&gt;&lt;a href=&quot;#&quot; data-item=&quot;1&quot;&gt;Another linkage&lt;/a&gt;&lt;/li&gt;
+            &lt;/ul&gt;
+            &lt;p class=&quot;navbar-right navbar-text&quot;&gt;Hello&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/nav&gt;</pre>
+<div>    <nav class="navbar navbar-inverse">        <div class="container-fluid">            <div class="navbar-header">                <button class="collapsed navbar-toggle" data-target="#collapse-45821" data-toggle="collapse" type="button">                    <span class="icon-bar"></span>                    <span class="icon-bar"></span>                    <span class="icon-bar"></span>                </button>                <a class="navbar-brand" href="#">The Brand</a>            </div>            <div class="collapse navbar-collapse" id="collapse-45821">                <form action="/login" class="navbar-form navbar-left" method="post">                    <div class="form-group">                        <input class="form-control" id="search-term" name="search_term" placeholder="Search" type="text" />                    </div>                    <button class="btn btn-default" type="submit">Submit</button>                </form>                <a class="btn btn-default navbar-btn navbar-left" href="#">A link</a>                <ul class="nav navbar-nav">                    <li data-stuff="inli"><a href="#" data-item="1">Another linkage</a></li>                </ul>                <p class="navbar-right navbar-text">Hello</p>            </div>        </div>    </nav></div>
+<hr />
+<pre>&lt;%= navbar inverse, container =&gt; &#39;normal&#39;, header =&gt; [&#39;The Brand&#39;, [&#39;#&#39;], hamburger, toggler =&gt; &#39;collapse-45821&#39;],
+           form =&gt; [
+                [[&#39;/login&#39;], method =&gt; &#39;post&#39;, left],
+                [
+                    formgroup =&gt; [
+                        text_field =&gt; [&#39;search-term&#39;, placeholder =&gt; &#39;Search&#39; ],
+                    ],
+                    submit_button =&gt; [&#39;Submit&#39;],
+                ]
+            ],
+            button =&gt; [&#39;A link&#39;, [&#39;#&#39;], left ],
+            nav =&gt; [ items =&gt; [
+                    [&#39;Another linkage&#39;, [&#39;#&#39;], -li =&gt; [ data =&gt; { stuff =&gt; &#39;inli&#39; } ], data =&gt; { item =&gt; 1 } ]
+                ]
+            ],
+            p =&gt; [&#39;Hello&#39;, right]
+%&gt;</pre>
+<pre>&lt;nav class=&quot;navbar navbar-inverse&quot;&gt;
+    &lt;div class=&quot;container&quot;&gt;
+        &lt;div class=&quot;navbar-header&quot;&gt;
+            &lt;button class=&quot;collapsed navbar-toggle&quot; data-target=&quot;#collapse-45821&quot; data-toggle=&quot;collapse&quot; type=&quot;button&quot;&gt;
+                &lt;span class=&quot;icon-bar&quot;&gt;&lt;/span&gt;
+                &lt;span class=&quot;icon-bar&quot;&gt;&lt;/span&gt;
+                &lt;span class=&quot;icon-bar&quot;&gt;&lt;/span&gt;
+            &lt;/button&gt;
+            &lt;a class=&quot;navbar-brand&quot; href=&quot;#&quot;&gt;The Brand&lt;/a&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;collapse navbar-collapse&quot; id=&quot;collapse-45821&quot;&gt;
+            &lt;form action=&quot;/login&quot; class=&quot;navbar-form navbar-left&quot; method=&quot;post&quot;&gt;
+                &lt;div class=&quot;form-group&quot;&gt;
+                    &lt;input class=&quot;form-control&quot; id=&quot;search-term&quot; name=&quot;search_term&quot; placeholder=&quot;Search&quot; type=&quot;text&quot; /&gt;
+                &lt;/div&gt;
+                &lt;button class=&quot;btn btn-default&quot; type=&quot;submit&quot;&gt;Submit&lt;/button&gt;
+            &lt;/form&gt;
+            &lt;a class=&quot;btn btn-default navbar-btn navbar-left&quot; href=&quot;#&quot;&gt;A link&lt;/a&gt;
+            &lt;ul class=&quot;nav navbar-nav&quot;&gt;
+                &lt;li data-stuff=&quot;inli&quot;&gt;&lt;a href=&quot;#&quot; data-item=&quot;1&quot;&gt;Another linkage&lt;/a&gt;&lt;/li&gt;
+            &lt;/ul&gt;
+            &lt;p class=&quot;navbar-right navbar-text&quot;&gt;Hello&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/nav&gt;</pre>
+<div>    <nav class="navbar navbar-inverse">        <div class="container">            <div class="navbar-header">                <button class="collapsed navbar-toggle" data-target="#collapse-45821" data-toggle="collapse" type="button">                    <span class="icon-bar"></span>                    <span class="icon-bar"></span>                    <span class="icon-bar"></span>                </button>                <a class="navbar-brand" href="#">The Brand</a>            </div>            <div class="collapse navbar-collapse" id="collapse-45821">                <form action="/login" class="navbar-form navbar-left" method="post">                    <div class="form-group">                        <input class="form-control" id="search-term" name="search_term" placeholder="Search" type="text" />                    </div>                    <button class="btn btn-default" type="submit">Submit</button>                </form>                <a class="btn btn-default navbar-btn navbar-left" href="#">A link</a>                <ul class="nav navbar-nav">                    <li data-stuff="inli"><a href="#" data-item="1">Another linkage</a></li>                </ul>                <p class="navbar-right navbar-text">Hello</p>            </div>        </div>    </nav></div>
+<hr />
+<p>This is (almost) identical to the <a href="http://getbootstrap.com/components/#navbar">Bootstrap documentation example</a>. The differences should be: The <code>form</code> has an action and the <code>input</code> has an <code>id</code> and a <code>name</code>:</p>
+<pre>&lt;%= navbar header =&gt; [&#39;Brand&#39;, [&#39;#&#39;], hamburger, toggler =&gt; &#39;collapse-4124&#39;],
+           nav =&gt; [ items =&gt; [
+                   [&#39;Link&#39;, [&#39;#&#39;], active ],
+                   [&#39;Link&#39;, [&#39;#&#39;] ],
+                   [&#39;Dropdown&#39;, [&#39;#&#39;], caret, items =&gt; [
+                       [&#39;Action&#39;, [&#39;#&#39;] ],
+                       [&#39;Another action&#39;, [&#39;#&#39;] ],
+                       [&#39;Something else here&#39;, [&#39;#&#39;] ],
+                       [],
+                       [&#39;Separated link&#39;, [&#39;#&#39;] ],
+                       [],
+                       [&#39;One more separated link&#39;, [&#39;#&#39;] ],
+                   ] ] ],
+            ],
+            form =&gt; [
+                [[&#39;/login&#39;], method =&gt; &#39;post&#39;, left],
+                [
+                    formgroup =&gt; [
+                        text_field =&gt; [&#39;the-search&#39;, placeholder =&gt; &#39;Search&#39; ],
+                    ],
+                    submit_button =&gt; [&#39;Submit&#39;],
+                ]
+            ],
+            nav =&gt; [
+                right,
+                items =&gt; [
+                    [&#39;Link&#39;, [&#39;#&#39;] ],
+                    [&#39;Dropdown&#39;, [&#39;#&#39;], caret, items =&gt; [
+                            [&#39;Action&#39;, [&#39;#&#39;] ],
+                            [&#39;Another action&#39;, [&#39;#&#39;] ],
+                            [&#39;Something else here&#39;, [&#39;#&#39;] ],
+                            [],
+                            [&#39;Separated link&#39;, [&#39;#&#39;] ],
+                        ],
+                    ]
+                ],
+            ]
+%&gt;</pre>
+<pre>&lt;nav class=&quot;navbar navbar-default&quot;&gt;
+    &lt;div class=&quot;container-fluid&quot;&gt;
+        &lt;div class=&quot;navbar-header&quot;&gt;
+            &lt;button type=&quot;button&quot; class=&quot;collapsed navbar-toggle&quot; data-toggle=&quot;collapse&quot; data-target=&quot;#collapse-4124&quot;&gt;
+                &lt;span class=&quot;icon-bar&quot;&gt;&lt;/span&gt;
+                &lt;span class=&quot;icon-bar&quot;&gt;&lt;/span&gt;
+                &lt;span class=&quot;icon-bar&quot;&gt;&lt;/span&gt;
+            &lt;/button&gt;
+            &lt;a class=&quot;navbar-brand&quot; href=&quot;#&quot;&gt;Brand&lt;/a&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;collapse navbar-collapse&quot; id=&quot;collapse-4124&quot;&gt;
+            &lt;ul class=&quot;nav navbar-nav&quot;&gt;
+                &lt;li class=&quot;active&quot;&gt;&lt;a href=&quot;#&quot;&gt;Link&lt;/a&gt;&lt;/li&gt;
+                &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Link&lt;/a&gt;&lt;/li&gt;
+                &lt;li class=&quot;dropdown&quot;&gt;
+                    &lt;a class=&quot;dropdown-toggle&quot; data-toggle=&quot;dropdown&quot; href=&quot;#&quot;&gt;Dropdown &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;&lt;/a&gt;
+                    &lt;ul class=&quot;dropdown-menu&quot;&gt;
+                        &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Action&lt;/a&gt;&lt;/li&gt;
+                        &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Another action&lt;/a&gt;&lt;/li&gt;
+                        &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Something else here&lt;/a&gt;&lt;/li&gt;
+                        &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+                        &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Separated link&lt;/a&gt;&lt;/li&gt;
+                        &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+                        &lt;li&gt;&lt;a href=&quot;#&quot;&gt;One more separated link&lt;/a&gt;&lt;/li&gt;
+                    &lt;/ul&gt;
+                &lt;/li&gt;
+            &lt;/ul&gt;
+            &lt;form action=&quot;/login&quot; class=&quot;navbar-form navbar-left&quot; method=&quot;post&quot;&gt;
+                &lt;div class=&quot;form-group&quot;&gt;
+                    &lt;input class=&quot;form-control&quot; id=&quot;the-search&quot; name=&quot;the_search&quot; placeholder=&quot;Search&quot; type=&quot;text&quot; /&gt;
+                &lt;/div&gt;
+                &lt;button class=&quot;btn btn-default&quot; type=&quot;submit&quot;&gt;Submit&lt;/button&gt;
+            &lt;/form&gt;
+            &lt;ul class=&quot;nav navbar-nav navbar-right&quot;&gt;
+                &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Link&lt;/a&gt;&lt;/li&gt;
+                &lt;li class=&quot;dropdown&quot;&gt;
+                    &lt;a class=&quot;dropdown-toggle&quot; data-toggle=&quot;dropdown&quot; href=&quot;#&quot;&gt;Dropdown &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;&lt;/a&gt;
+                    &lt;ul class=&quot;dropdown-menu&quot;&gt;
+                        &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Action&lt;/a&gt;&lt;/li&gt;
+                        &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Another action&lt;/a&gt;&lt;/li&gt;
+                        &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Something else here&lt;/a&gt;&lt;/li&gt;
+                        &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+                        &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Separated link&lt;/a&gt;&lt;/li&gt;
+                    &lt;/ul&gt;
+                &lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/nav&gt;</pre>
+<div>    <nav class="navbar navbar-default">        <div class="container-fluid">            <div class="navbar-header">                <button type="button" class="collapsed navbar-toggle" data-toggle="collapse" data-target="#collapse-4124">                    <span class="icon-bar"></span>                    <span class="icon-bar"></span>                    <span class="icon-bar"></span>                </button>                <a class="navbar-brand" href="#">Brand</a>            </div>            <div class="collapse navbar-collapse" id="collapse-4124">                <ul class="nav navbar-nav">                    <li class="active"><a href="#">Link</a></li>                    <li><a href="#">Link</a></li>                    <li class="dropdown">                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Dropdown <span class="caret"></span></a>                        <ul class="dropdown-menu">                            <li><a href="#">Action</a></li>                            <li><a href="#">Another action</a></li>                            <li><a href="#">Something else here</a></li>                            <li class="divider"></li>                            <li><a href="#">Separated link</a></li>                            <li class="divider"></li>                            <li><a href="#">One more separated link</a></li>                        </ul>                    </li>                </ul>                <form action="/login" class="navbar-form navbar-left" method="post">                    <div class="form-group">                        <input class="form-control" id="the-search" name="the_search" placeholder="Search" type="text" />                    </div>                    <button class="btn btn-default" type="submit">Submit</button>                </form>                <ul class="nav navbar-nav navbar-right">                    <li><a href="#">Link</a></li>                    <li class="dropdown">                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Dropdown <span class="caret"></span></a>                        <ul class="dropdown-menu">                            <li><a href="#">Action</a></li>                            <li><a href="#">Another action</a></li>                            <li><a href="#">Something else here</a></li>                            <li class="divider"></li>                            <li><a href="#">Separated link</a></li>                        </ul>                    </li>                </ul>            </div>        </div>    </nav></div>
+        </div>
+        <pre style="background-color: #fff; border-width: 0px;">
+
+
+
+        </pre>
+    </body>
+</html>

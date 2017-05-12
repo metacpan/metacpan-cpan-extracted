@@ -1,0 +1,83 @@
+Revision history for Mojolicious::Plugin::SemanticUI
+
+0.17 2015-05-09
+  - Updated with latest minified files from Semantic UI 1.12.2
+    https://github.com/Semantic-Org/Semantic-UI/archive/1.12.2.zip
+  - Components (*.min.*) are back to allow using only what is needed
+    and not everything.  
+
+0.16 2015-04-19
+  - Updated with latest minified files from Semantic UI 1.12.0
+    https://github.com/Semantic-Org/Semantic-UI/archive/1.12.0.zip
+
+0.15 2015-03-21
+  - Updated with latest minified files from Semantic UI 1.11.4
+    https://github.com/Semantic-Org/Semantic-UI/archive/1.11.4.zip
+
+0.14 2015-03-02
+  - Updated to Semantic UI 1.10.4 with latest minified files, downloaded from
+    https://github.com/Semantic-Org/Semantic-UI/archive/1.10.4.zip
+
+0.13 2015-02-28
+  - Updated to Semantic UI 1.10.2 with latest minified files, downloaded from
+    https://github.com/Semantic-Org/Semantic-UI/archive/1.10.2.zip
+
+0.12 2015-02-11
+  - Updated to Semantic UI 1.8.1 with latest minified files, downloaded from
+    https://github.com/Semantic-Org/Semantic-UI/archive/1.8.1.zip
+  - From this release onward we will distribute only
+    semantic.min.css, semantic.min.js and the themes folder.
+    This makes the file management much easier and saves a lot of
+    useless tests.
+
+
+0.11 2015-01-18
+  - Updated to Semantic UI 1.7.3 with latest minified files, downloaded from
+    https://github.com/Semantic-Org/Semantic-UI/archive/1.7.3.zip
+  - Semantic Release Notes:
+    https://github.com/Semantic-Org/Semantic-UI/blob/1.7.3/RELEASE-NOTES.md 
+
+0.10 2014-12-07
+  - Updated to Semantic UI 1.1.2 with latest minified files from the dist folder
+    in the zip file downloaded from https://github.com/Semantic-Org/Semantic-UI/tree/1.1.2.
+
+
+0.09 2014-11-28
+  - Updated to Semantic UI 1.0.0 with latest minified files from the dist folder
+    in the zip file downloaded from http://semantic-ui.com/.
+
+0.08 2014-11-17
+  - Updated to Semantic UI 1.0 with latest files from
+    http://beta.semantic-ui.com/
+  - Directory layout is changed so this update will brake previous
+    installations. You need to remove old installation completely and update paths
+    in your templates!
+
+0.07 2014-10-11
+  - Updated with latest files from http://beta.semantic-ui.com/
+  - Does not require but works with Mojolicious 5.49.  
+
+0.06 2014-09-21
+  - Requiring only Perl 5.10.1 in test files.
+  - Mentioned Ado.
+  - Updated with latest files from http://beta.semantic-ui.com/
+
+0.05 2014-09-11
+  - Updated static files:
+    https://github.com/Semantic-Org/Semantic-UI/issues/691#issuecomment-54922686
+  - Improved tests.
+
+0.04 2014-09-08
+  - Reduced package size by removing duplicate themes folder.
+  - Moved all the tree one level up.
+  - Static files now seem usable - no more changes here expected.
+  - Cleanups again, let's do some programming next time...
+
+0.03 2014-09-07
+  - More cleanups.
+
+0.02 2014-09-07
+  - Cleanups and work on CPAN related stuff.
+
+0.01 2014-09-06
+  - Initial release.

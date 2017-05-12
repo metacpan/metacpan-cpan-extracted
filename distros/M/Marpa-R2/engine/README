@@ -1,0 +1,38 @@
+# Copyright 2015 Jeffrey Kegler
+# This file is part of Marpa::R2.  Marpa::R2 is free software: you can
+# redistribute it and/or modify it under the terms of the GNU Lesser
+# General Public License as published by the Free Software Foundation,
+# either version 3 of the License, or (at your option) any later version.
+#
+# Marpa::R2 is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser
+# General Public License along with Marpa::R2.  If not, see
+# http://www.gnu.org/licenses/.
+
+This directory contains the Libmarpa code used in the basic installation
+method, the one supported by the CPAN infrasture.  It also contains
+documents describing alternative ways of using Libmarpa -- external
+static libraries and external shared libraries.
+
+The code in the "engine" subdirectory should *NOT* be used for building
+a separate Libmarpa.  It is specifically targeted at the needs of Perl
+builds, and may contain specials kludges and hacks.
+
+If you want to build your own separate Libmarpa, build a distribution, or
+build a distribution tar file, from Libmarpa's repository.  Instructions
+on how to build distribution directories and tar files are in the INSTALL
+file at the top level of the repository.  Libmarpa's repository is here:
+https://github.com/jeffreykegler/libmarpa
+
+As an advanced technique, Marpa::R2 can be linked with external static
+or shared Libmarpa libraries.  Use of external Libmapra libraries is
+*NOT* supported by the CPAN infrastructure, which does not deal well
+with non-Perl dependencies.
+
+For more on linking with an external static library, see the STATIC file
+in this directory.  For more on linking with an external shared library,
+see the SHARED file in this directory.

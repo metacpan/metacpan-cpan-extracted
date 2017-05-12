@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Array</key>
+	<array>
+		<string>a</string>
+		<string>b</string>
+		<string>c</string>
+	</array>
+	<key>Bool</key>
+	<true/>
+	<key>Data</key>
+	<data>
+	data
+	</data>
+	<key>Date</key>
+	<date>2006-02-05T13:06:40Z</date>
+	<key>Number</key>
+	<integer>42</integer>
+	<key>String</key>
+	<string>Gavin</string>
+	<key>SubDict</key>
+	<dict>
+		<key>Another String</key>
+		<string>Brock</string>
+	</dict>
+</dict>
+</plist>

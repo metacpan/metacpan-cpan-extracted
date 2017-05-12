@@ -1,0 +1,270 @@
+#!/usr/bin/perl -w
+# See copyright, etc in below POD section.
+######################################################################
+
+use Carp;
+use Config;
+use Getopt::Long;
+use IO::File;
+use File::Find;
+
+# For testing, we're being called from our release script directory, so
+use lib "../lib";
+use lib "blib/lib";
+
+use Module::LocalBuild;
+use strict;
+use vars qw ($Project $Debug $VERSION);
+
+$VERSION = '1.013';
+
+######################################################################
+
+my $opt_clean;
+my @Opt_Builds;
+my $Opt_Destdir;
+my $Opt_Locker;
+my @Opt_MakeFlags;
+
+#print join(' ',@ARGV),"\n";
+Getopt::Long::config ("no_auto_abbrev");
+if (!GetOptions (
+		 "help"		=> \&usage,
+		 "build=s"	=> sub { push @Opt_Builds, $_[1]; },
+		 "destdir=s"	=> \$Opt_Destdir,
+		 "clean!"	=> \$opt_clean,
+		 "debug"	=> sub { $Debug=1; },
+		 "locker=s"	=> \$Opt_Locker,
+		 "makeflag=s"	=> sub { push @Opt_MakeFlags, $_[1]; },
+		 "version"	=> sub { print "Version $VERSION\n"; exit(0); },
+		 "<>"		=> sub { die "%Error: Unknown parameter: $_[0]\n"; },
+		 )) {
+    die "%Error: Bad usage, try 'mlbuilder --help'\n";
+}
+
+my $action;
+if ($opt_clean) {
+    $action = 1;
+    clean();
+}
+if ($#Opt_Builds > -1) {
+    $action = 1;
+    all_build();
+}
+$action or die "%Error: Need --build or --clean action\n";
+
+exit(0);
+
+#----------------------------------------------------------------------
+
+sub usage {
+    eval { use Pod::Usage; };
+    print "Version $VERSION\n";
+    pod2usage(-verbose=>2, -exitval => 2);
+    exit (1);
+}
+
+######################################################################
+
+sub clean {
+    my $dir = shift || '.';
+    print "-"x20, " Clean\n";
+    _chmod_dir($dir);
+    foreach my $pkg (glob "$dir/*") {
+	_clean_package($pkg);
+    }
+}
+
+sub _clean_after_build {
+    my $dir = shift;
+    print "-"x20, " Clean\n";
+    _chmod_dir($dir);
+}
+
+sub _chmod_dir {
+    my $dir = shift;
+    run_system ("chmod -Rf og=u $dir", 1);  # Fix permissions
+}
+
+sub _clean_package {
+    my $pkg = shift;
+    if (-r "$pkg/Makefile") {
+	run_system ("cd $pkg && perl Makefile.PL && make clean", 1);
+    }
+    # Recursively remove Makefile.old's.  They might not just be directly under $pkg.
+    find ({wanted =>
+	       sub {
+		   (my $basename = $File::Find::name) =~ s!.*/!!;
+		   if ($basename eq 'Makefile.old'
+		       || $basename eq 'MANIFEST.bak'
+		       || $basename =~ /^\.objcache_/
+		       ) {
+		       unlink $File::Find::name;   # Ok if error
+		   }
+	       },
+	   follow => 0,
+	   no_chdir => 1,},
+	  $pkg);
+}
+
+######################################################################
+
+sub all_build {
+    print "\n";
+    print "-"x70,"\n";
+    print "Something in the perltools directory has changed.\n";
+    print "This will take a minute.\n\n";
+    print "Building perl into $\n" if $Debug;
+
+    my $built_file = "$Opt_Destdir/.built";
+
+    # Only one build at a time
+    my $pre_build_mtime = (stat($built_file))[9] || 0;
+
+    my $lock;
+    if ($Opt_Locker) {
+	eval "use $Opt_Locker; 1;"
+	    or die "%Error: mlbuilder can't load requested --locker module\n$@";
+	$lock = Locker::Site->lock(lock=>"mlbuilder__$Project");
+    }
+
+    my $post_build_mtime = (stat($built_file))[9] || 0;
+    if ($pre_build_mtime != $post_build_mtime) {
+	# Some other process built it for us while locked, we can simply fall thru
+	print " DONE Perltools Build: Another process beat us to it\n\n";
+    } else {
+	mkdir $Opt_Destdir, 0777;
+
+	#### Preclean... in case we aborted a build under a different os
+	# We can't check OS is the same, because 'make clean' doesn't
+	# work across different perl versions
+	foreach my $pkg (@Opt_Builds) {
+	    _clean_package($pkg);
+	}
+
+	foreach my $pkg (@Opt_Builds) {
+	    _build_package ($pkg);
+	}
+
+	run_system ("chmod -Rf a+w $Opt_Destdir", 1);  # Fix permissions, ok if error
+	foreach my $pkg (@Opt_Builds) {
+	    _install_package ($pkg, $Opt_Destdir)
+	}
+
+	_clean_after_build($Opt_Destdir);
+	foreach my $pkg (@Opt_Builds) {
+	    _clean_package($pkg);
+	}
+
+	run_system("touch $built_file");
+	print "-"x20, " DONE Perltools Build\n\n";
+    }
+
+    $lock->unlock() if $lock;
+}
+
+sub _build_package {
+    my $pkg = shift;
+    my $arch = $Config{archname};
+
+    (my $basepkg = $pkg) =~ s!.*/!!;
+    print "-"x20, " Build $basepkg (for $arch )\n";
+
+    if (!-r "$pkg/README") {
+	IO::File->new(">$pkg/README")->close;  # Prevent README not in MANIFEST errors
+    }
+    run_system ("cd $pkg && $^X Makefile.PL"
+		." && make ".(join ' ',@Opt_MakeFlags)." pure_all");
+}
+
+sub _install_package {
+    my $pkg = shift;
+    my $destdir = shift;
+
+    (my $basepkg = $pkg) =~ s!.*/!!;
+    print "-"x20, " Install $basepkg\n";
+
+    run_system("/bin/cp -rp $pkg/blib $destdir");
+}
+
+sub run_system {
+    my $command = shift;
+    my $nofail = shift;
+    print "\t$command\n";
+    local $! = undef;
+    system $command;
+    my $status = $?; my $msgx = $!;
+    ($status == 0 || $nofail) or croak "vbuild: %Error: Command Failed $status $msgx, stopped";
+}
+
+#######################################################################
+1;
+__END__
+
+=pod
+
+=head1 NAME
+
+mlbuilder - Build Perl Modules in a local way
+
+=head1 SYNOPSYS
+
+  mlbuilder --clean
+
+  or
+    use Module::LocalBuilder;
+    Module::LocalBuilder::need(...);
+
+=head1 DESCRIPTION
+
+Mlbuilder is called by Module::LocalBuild to execute Perl builds.  It
+may also be used with the --clean option.
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item --build I<package_directory>
+
+For use by Module::LocalBuild to execute Perl builds.  Build the specified
+package.  This option may be specified multiple times.
+
+=item --clean
+
+All Perl modules under the current directory will be entered, and 'make
+clean'ed.
+
+=item --locker I<lock_module>
+
+For use by Module::LocalBuild to execute Perl builds.  The module name for
+lock services.
+
+=item --makeflag I<flag>
+
+When building, add specified flags to the make line.  May be specified
+multiple times.
+
+=item --version
+
+Displays program version and exits.
+
+=back
+
+=head1 DISTRIBUTION
+
+Copyright 2000-2010 by Wilson Snyder.  This program is free software; you
+can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License Version 3 or the Perl Artistic License
+Version 2.0.
+
+=head1 AUTHORS
+
+Wilson Snyder <wsnyder@wsnyder.org>
+
+=head1 SEE ALSO
+
+L<Module::LocalBuild>
+
+=cut
+
+######################################################################

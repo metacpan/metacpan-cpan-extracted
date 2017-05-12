@@ -1,0 +1,32 @@
+SYNOPSIS
+
+    Use directly:
+
+     use Media::Info::Mediainfo qw(get_media_info);
+     my $res = get_media_info(media => '/home/steven/celine.avi');
+
+    or use via Media::Info.
+
+    Sample result:
+
+     [
+       200,
+       "OK",
+       {
+         audio_bitrate => 128000,
+         audio_format  => "aac",
+         audio_rate    => 44100,
+         duration      => 2081.25,
+       },
+       {
+         "func.raw_output" => "General\nComplete name   ...",
+       },
+     ]
+
+SEE ALSO
+
+    Media::Info
+
+    mediainfo program (including CLI, GUI, and shared library),
+    http://mediaarea.net/en/MediaInfo
+

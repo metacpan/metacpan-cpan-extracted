@@ -1,0 +1,71 @@
+SYNOPSIS
+
+     use Module::XSOrPP qw(
+         is_xs is_pp xs_or_pp
+     );
+    
+     say "Class::XSAccessor is an XS module" if is_xs("Class/XSAccessor.pm");
+     say "JSON::PP is a pure-Perl module" if is_pp("JSON::PP");
+     say "Params::Util is an XS module with PP fallback" if xs_or_pp("Class/XSAccessor.pm") =~ /^(xs|xs_or_pp)$/;
+
+DESCRIPTION
+
+FUNCTIONS
+
+ xs_or_pp($mod, \%opts) => str
+
+    Return either "xs", "pp", or "xs_or_pp" (XS with a PP fallback). Return
+    undef if can't determine which. $mod value can be in the form of
+    Package/SubPkg.pm or Package::SubPkg. The following ways are tried, in
+    order:
+
+      * Predetermined list
+
+      Some CPAN modules are XS with a PP fallback. This module maintains
+      the list.
+
+      * Looking at the .packlist
+
+      If a .{bs,so,dll} file is listed in the .packlist, then it is assumed
+      to be an XS module. This method will fail if there is no .packlist
+      available (e.g. core or uninstalled or when the package management
+      strips the packlist), or if a dist contains both pure-Perl and XS.
+
+      * Looking at the source file for usage of XSLoader or DynaLoader
+
+      If the module source code has something like use XSLoader; or <use
+      DynaLoader;> then it is assumed to be an XS module. This is currently
+      implemented using a simple regex, so it is somewhat brittle.
+
+      * Guessing from the name
+
+      If the module has "XS" in its name then it's assumed to be an XS
+      module. If the module has "PP" in its name, it's assumed to be a
+      pure-Perl module.
+
+      Known false positives will be prevented in the future.
+
+    Other methods will be added in the future (e.g. a database like in
+    Module::CoreList, consulting MetaCPAN, etc).
+
+    Options:
+
+      * warn => BOOL (default: 0)
+
+      If set to true, will warn to STDERR if fail to determine.
+
+      * debug => BOOL (default: 0)
+
+      If set to true will print debugging message to STDERR.
+
+ is_xs($mod, \%opts) => BOOL
+
+    Return true if module $mod is an XS module, false if a pure Perl
+    module, or undef if can't determine either. See xs_or_pp for more
+    details.
+
+ is_pp($mod, \%opts) => BOOL
+
+    Return true if module $mod is a pure Perl module or XS module with a PP
+    fallback. See is_xs for more details. See xs_or_pp for more details.
+

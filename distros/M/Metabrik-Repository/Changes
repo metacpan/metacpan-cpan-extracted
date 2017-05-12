@@ -1,0 +1,159 @@
+Revision history for Perl extension Metabrik::Repository.
+
+1.26.0 Sat  4 Feb 17:41:44 CET 2017
+   - new: server::logstash::indexer Brik
+   - new: server::logstash::oneshot Brik
+   - new: string::dump Brik
+   - new: system::zfs Brik
+   - new: format::number Brik
+
+1.25.1 Fri  4 Nov 07:16:27 CET 2016
+   - new: binjitsu::checksec Brik
+   - new: binjitsu::pattern Brik ( \o/ first contributed Brik by ZadYree, thanks to him)
+   - new: client::smbclient Brik
+   - new: remote::msoffice Brik
+   - new: remote::winwdows Brik
+   - new: remote::windiff Brik
+   - new: system::centos::package Brik
+   - new: system::centos::service Brik
+   - new: system::centos::user Brik
+   - new: server::kibana Brik
+   - new: server::logstash Brik
+   - new: server::redis Brik
+   - new: system::frebsd::iostat Brik
+   - new: system::frebsd::netstat Brik
+   - new: system::frebsd::top Brik
+   - new: system::frebsd::who Brik
+   - new: password::mirai Brik
+   - new: client::telnet Brik
+
+1.25.0 Tue 11 Oct 19:06:20 CEST 2016
+   - new: www::google Brik
+   - new: client::mongodb Brik
+
+1.24.0 Thu  6 Oct 19:12:32 CEST 2016
+   - new: system::debian::user Brik
+   - new: system::debian::service Brik
+   - new: system::debian::package Brik
+
+1.23.0 Tue  4 Oct 07:00:32 CEST 2016
+   - new: video::ffmpeg Brik
+   - new: xorg::xrandr Brik
+   - new: system::fsck Brik
+   - new: system::mount Brik
+   - new: system::gphotofs Brik
+   - new: string::hash Brik
+   - new: database::cvesearch Brik
+   - new: api::cvesearch Brik
+   - new: email::imap Brik
+
+1.22.0 Fri Apr 15 18:11:50 CEST 2016
+   - new: client::elasticsearch::query Brik
+
+1.21.2 N/A
+   - new: devel::mojo Brik
+   - new: worker::parallel Brik
+
+1.21.1 Wed Mar  2 07:46:01 CET 2016
+   - new: remote::ssh Brik
+   - new: string::syslog Brik
+   - new: client::splunk Brik
+   - new: system::freebsd::iocage Brik
+   - new: system::ubuntu::service Brik
+   - new: xorg::xlsclients Brik
+   - new: xorg::xwininfo Brik
+   - new: client::elasticsearch Brik
+   - new: server::elasticsearch Brik
+   - obsolete: www::splunk Brik
+
+1.21.0 Fri Feb  5 07:53:28 CET 2016
+   - new: server::syslogng Brik
+   - new: network::ping Brik
+   - new: network::freebsd::ping Brik
+   - new: network::linux::ping Brik
+
+1.20.5 N/A
+
+1.20.4 N/A
+   - new: log::syslog Brik
+   - new: format::lncs Brik
+
+1.20.1 N/A
+   - new: system::libvirt Brik
+   - new: system::virtualbox Brik
+   - new: system::ubuntu::user Brik
+   - new: string::psv Brik
+   - new: network::linux::iptables Brik
+   - new: remote::winexe Brik
+   - new: file::readelf Brik
+   - new: network::zmap Brik
+   - new: server::tor Brik
+   - new: devel::git Brik
+   - new: crypto::letsencrypt Brik
+   - new: log::file Brik
+   - new: lookup::alexa Brik
+   - obsolete: network::tor Brik
+
+1.20.0 Sat Jan  2 18:49:52 CET 2016
+   - MERGE: brik::search, perl::module, shell::command, shell::history, shell::rc
+            and shell::script moved to Repository away from Core
+   - new: www::shorten Brik
+   - new: brik::tool Brik
+   - new: system::file Brik
+   - new: client::tcpdump Brik
+   - new: forensic::scalpel Brik
+   - new: antivirus::clamav Brik
+   - new: forensic::volatility Brik
+   - new: image::exif Brik
+   - new: file::raw Brik
+   - new: forensic::dcfldd Brik
+   - new: devel::mercurial Brik
+   - new: file::type Brik
+   - new: remote::wmi Brik
+   - new: devel::subversion Brik
+   - new: image::convert Brik
+
+1.11 Sun Nov 22 17:46:43 CET 2015
+   - new: api::shodan Brik
+   - new: system::process Brik
+   - new: network::sinfp3::arpdiscover Brik
+   - new: server::tcp Brik
+   - new: proxy::ssh2tcp Brik
+   - new: client::openssh Brik
+   - new: server::rest Brik
+   - new: log::null Brik
+   - new: lookup::threatlist Brik
+   - new: system::docker Brik
+   - new: string::yara Brik
+   - new: network::grep Brik
+   - new: file::pcap Brik
+   - new: network::stream Brik
+
+1.10 Tue Oct 27 20:11:54 CET 2015
+   - update: version bump
+   - UPDATE: see UPDATING file
+
+1.09 N/A
+   - update: version bump
+   - UPDATE: see UPDATING file
+
+1.08 Thu Mar 19 06:46:02 CET 2015
+   - update: version bump
+   - UPDATE: see UPDATING file
+
+1.07 Sun Mar  8 17:52:48 CET 2015
+   - update: version bump
+   - UPDATE: see UPDATING file
+
+1.06 Fri Feb 27 07:18:52 CET 2015
+   - update: version bump
+   - UPDATE: see UPDATING file
+
+1.05 Tue Feb 10 08:01:53 CET 2015
+   - update: version bump
+   - UPDATE: see UPDATING file
+
+1.04 Sun Jan  4 13:32:53 CET 2015
+   - update: version bump
+   - UPDATE: see UPDATING file
+

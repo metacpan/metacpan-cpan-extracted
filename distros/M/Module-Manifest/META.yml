@@ -1,0 +1,36 @@
+---
+abstract: 'Parse and examine a Perl distribution MANIFEST file'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  Cwd: 0
+  ExtUtils::MakeMaker: 6.42
+  Test::Exception: 0.27
+  Test::More: 0.42
+  Test::Warn: 0.11
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.99'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Module::Manifest
+name: Module-Manifest
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  File::Basename: 0
+  File::Spec: 0.80
+  Params::Util: 0.10
+  perl: 5.00503
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/Module-Manifest
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/Module-Manifest
+version: 1.08

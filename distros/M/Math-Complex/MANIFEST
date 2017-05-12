@@ -1,0 +1,13 @@
+ChangeLog
+lib/Math/Complex.pm
+lib/Math/Trig.pm
+Makefile.PL
+MANIFEST
+t/Complex.t
+t/Trig.t
+t/pod.t
+t/pod-coverage.t
+t/underbar.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

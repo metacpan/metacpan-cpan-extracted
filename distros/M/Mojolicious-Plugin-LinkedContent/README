@@ -1,0 +1,78 @@
+mojolicious-plugin-linkedcontent
+
+This Mojolicious plugin provides four helpers: 
+
+        require_js
+        require_css
+        include_js
+        include_css
+
+Which allows you to manage poading external stuff to page by demand.
+
+Main idea is to load only required external content into html pages.
+For example, you have following template system:
+
+        @@ layouts/default.html.ep
+        <!doctype html>
+        <html>
+        <head>
+        <%== include_css 'main.css' %>
+        </head>
+        <body><%= content %></body>
+        </html>
+
+        @@ index.html.ep
+        % layout 'default';
+        % require_css 'ui.css', 'custom-that-requires-ui.css';
+        Yea baby!
+
+        @@ no-externals.html.ep
+        % layout 'default';
+        Clean page!
+
+After render 'index.html.ep' you will see:
+
+        <!doctype html>
+        <html>
+        <head>
+        <link rel='stylesheet' type='text/css' media='screen' href='/css/main.css' />
+        <link rel='stylesheet' type='text/css' media='screen' href='/css/ui.css' />
+        <link rel='stylesheet' type='text/css' media='screen' href='/css/custom-that-requires-ui.css' />
+
+        </head>
+        <body>Yea baby!
+        </body>
+        </html>
+
+But 'no-externals.html.ep' will give you only:
+
+        <!doctype html>
+        <html>
+        <head>
+        <link rel='stylesheet' type='text/css' media='screen' href='/css/main.css' />
+
+        </head>
+        <body>Clean page!
+        </body>
+        </html>
+
+Using LinkedContent plugin you can easy define default set of css/js resources and append required files
+from your templates (even included), actions, plugins, whatever else.
+
+Each resource will be included only once.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 - 2011, Yaroslav Korshak
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

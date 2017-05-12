@@ -1,0 +1,29 @@
+- - - - - - - - - - - - - - 
+README of the MTDB (Mark Thomson's DataBase)
+store multi-level hash structure in single level tied hash
+and save that to a flat text database optionally with encryption
+
+Contains code from MLDBM.pm written by Gurusamy Sarathy and Raphael Manfredi
+
+
+
+
+- - - - - - - - - - - - - - 
+INSTALLATION
+
+You must install the following packages first:
+
+  Data::Dumper
+  Crypt::Blowfish
+  Crypt::CBC  
+
+From the MTDB source directory:
+
+   perl Makefile.PL
+   make install
+
+is all that will be needed.
+
+
+Mark Ralf Thomson (mark-thomson at gmx dot net)
+Schwedt/Oder - Germany

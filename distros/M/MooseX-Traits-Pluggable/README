@@ -1,0 +1,116 @@
+NAME
+    MooseX::Traits::Pluggable - trait loading and resolution for Moose
+
+DESCRIPTION
+    See MooseX::Traits for usage information.
+
+    Use "new_with_traits" to construct an object with a list of traits and
+    "apply_traits" to apply traits to an instance.
+
+    Adds support for class precedence search for traits and some extra
+    attributes, described below.
+
+TRAIT SEARCH
+    If the value of "_trait_namespace" in MooseX::Traits starts with a "+"
+    the namespace will be considered relative to the "class_precedence_list"
+    (ie. @ISA) of the original class.
+
+    Example:
+
+      package Class1
+      use Moose;
+
+      package Class1::Trait::Foo;
+      use Moose::Role;
+      has 'bar' => (
+          is       => 'ro',
+          isa      => 'Str',
+          required => 1,
+      );
+
+      package Class2;
+      use parent 'Class1';
+      with 'MooseX::Traits';
+      has '+_trait_namespace' => (default => '+Trait');
+      has '+_traits_behave_like_roles' => (default => 1);
+
+      package Class2::Trait::Bar;
+      use Moose::Role;
+      has 'baz' => (
+          is       => 'ro',
+          isa      => 'Str',
+          required => 1,
+      );
+
+      package main;
+      my $instance = Class2->new_with_traits(
+          traits => ['Foo', 'Bar'],
+          bar => 'baz',
+          baz => 'quux',
+      );
+
+      $instance->does('Class1::Trait::Foo'); # true
+      $instance->does('Class2::Trait::Bar'); # true
+
+NAMESPACE ARRAYS
+    You can search multiple namespaces for traits, for example:
+
+      has '+_trait_namespace' => (
+          default => sub { [qw/+Trait +Role ExtraNS::Trait/] }
+      );
+
+    Will search in the "class_precedence_list" for "::Trait::TheTrait" and
+    "::Role::TheTrait" and then for "ExtraNS::Trait::TheTrait".
+
+CORRECT ROLE BEHAVIOR
+    By default, a method from a role will override a class method, this
+    however is not the behavior one expects when applying a Moose role using
+    the normal methods.
+
+    If you want the behavior to be consistent with Moose roles, then use
+    this configuration attribute in your class:
+
+      has '+_traits_behave_like_roles' => (default => 1);
+
+    This may or may not become the default in the future, for now you have
+    to ask for it for backward compatibility reasons.
+
+EXTRA ATTRIBUTES
+  _original_class_name
+    When traits are applied to your class or instance, you get an anonymous
+    class back whose name will be not the same as your original class. So
+    "ref $self" will not be "Class", but "$self->_original_class_name" will
+    be.
+
+  _traits
+    List of the (unresolved) traits applied to the instance.
+
+  _resolved_traits
+    List of traits applied to the instance resolved to full package names.
+
+SEE ALSO
+    MooseX::Traits, MooseX::Object::Pluggable, CatalystX::Component::Traits
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-moosex-traits-pluggable at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MooseX-Traits-Pluggable>
+    . I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+AUTHOR
+    Rafael Kitover "<rkitover@cpan.org>"
+
+CONTRIBUTORS
+    Tomas Doran, "<bobtfish@bobtfish.net>" Fitz Elliott,
+    "<fitz.elliott@gmail.com>" Andreas Marienborg,
+    "<andreas.marienborg@gmail.com>" Alexander Hartmaier,
+    "<abraxxa@cpan.org>"
+
+COPYRIGHT & LICENSE
+    Copyright (c) 2014 by the aforementioned "AUTHOR" and "CONTRIBUTORS".
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

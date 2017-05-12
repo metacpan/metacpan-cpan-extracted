@@ -1,0 +1,154 @@
+@import blueprint/reset.sass
+@import blueprint.sass
+@import blueprint/modules/scaffolding.sass
+@import compass/utilities.sass
+@import blueprint/modules/liquid.sass
+
++blueprint-typography("body.blueprint")
+
+// Maximize Width
+// .maximized-container
+//   max-width: 99%
+//   width: 99%
+
+=rounded
+  -moz-border-radius: 5px
+  -webkit-border-radius: 5px
+  border: 1px solid #000
+  color: #000
+  padding: 2px
+  margin: 5px 0px 5px 0px
+
+=mj-horizontal-list
+  +horizontal-list
+  border: 0px solid #777
+  padding: 3px
+  font-family: sans-serif
+  a
+    +rounded
+    background-color: #939396
+    text-decoration: none
+
+body
+  background: #083e61 url(images/bg.gif) repeat-x
+  color: #FFFFFF
+
+
+#container
+  +container
+  h1, h2, h3, h4
+    color: #1050A7
+    margin: 10px 0 10px  0
+  h1
+    font-size: 1.4em
+  h2
+    font-size: 1.3em
+  h3
+    font-size: 1.2em
+  h4
+    font-size: 1.1em
+  p
+    margin: 5px
+
+#header, #breadcrumbs, #toplinks, #pagenav, #content, #showtag, #tags, #bottomnav, #powered
+  +column(24)
+  margin: 10px
+
+#content_preview
+  +column(10)
+
+#edit_form
+  +column(10, true)
+
+#toplinks, #pagenav, #pageoptions, #bottomnav
+  +mj-horizontal-list
+
+
+
+#header
+  h1
+    color: #ADD8E6
+  h1:before
+    content: url(images/catalyst_logo.png)
+
+#breadcrumbs
+  padding: 10px
+  a
+    color: #6198E2
+
+
+#content
+  background: #aaa
+  color: #000  
+  border: 1px solid #bbb
+  a
+    +hover-link
+    +link-colors(#900, #900, #900, #900, #900)
+  #current
+    margin: 10px
+    padding: 0 2em 0 0
+    a
+      color: #900
+    p
+      margin: 0 0 10px 0
+    pre
+      -moz-border-radius: 10px
+      color: #F5DEB3
+      background: #083e61
+      padding: 10px
+      margin: 10px
+      border: 1px solid #000
+    em
+      font-style: italic
+    img
+      margin: 10px
+      float: left
+
+  pre
+    color: #000
+  .toc
+    background-color: #788086
+    border: 1px solid #000
+    padding: 10px
+    margin: 10px
+    float: right
+    position: relative
+    ul
+      margin: 0
+      padding: 0
+      margin-left: +1em
+    li
+      margin: 0
+      padding: 0
+      font-size: 1em
+
+#comments
+  margin: 10px
+  h4
+    color: #0F7815
+  .comment
+    +rounded
+    background: #DBDBE2
+
+table
+  border: 1px solid #000
+  padding: 10px
+  background: #9C9C9C
+  thead
+    tr
+      background: #8C8C8C 
+
+.filename
+  color: #0B5F18
+
+#nonexistent_pages
+  background-color: #E97064
+
+#powered
+  img
+    float: right
+    position: relative
+    margin: 10px
+
+.byline
+  color: #FFF

@@ -1,0 +1,39 @@
+  body {
+    color: #444444;
+    background-color: #FFFFFF;
+    font-family: Verdana, Geneva, Arial, Helvetica;
+  }
+  .headers {
+    border: 1px solid black;
+    color: black;
+    background-color: #dddddd;
+  }
+  .threads {
+    border: 1px solid black;
+    color: black;
+    background-color: #dddddd;
+    margin-top: 10px;
+  }
+  .thread {
+    list-style-image: none;
+    list-style-type: none;
+  }
+
+  table { 
+    border-collapse:collapse; 
+    border:hidden; 
+    table-layout:auto 
+  } 
+  tr { 
+    vertical-align:top; 
+    text-align:left; 
+    font-family:Arial, sans-serif; 
+    padding:0 
+  }
+  tr.row1 { 
+    background-color:#dddddd; 
+  }  /* even rows in mindex/thread/search tables */
+  tr.row2 { 
+    background-color:#eeeeee; 
+  }  /* odd rows in mindex/thread/search tables  */
+

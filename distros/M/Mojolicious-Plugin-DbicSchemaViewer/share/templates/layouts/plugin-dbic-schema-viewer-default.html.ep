@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>DbicSchemaViewer - <%= $title %></title>
+        %= bootstrap 'allq'
+        <link rel="stylesheet" href="/dbic-schema-viewer/svg.css" type="text/css" />
+    </head>
+    <body data-url-home="<%= url_for 'schema' %>">
+        <%= navbar  header => ['DbicSchemaViewer', ['home'], hamburger],
+                    container => 'normal',
+                    nav => [
+                        items => [
+                            ['Overview', ['overview']],
+                            ['Visualized', ['visualizer']],
+                            ['Schemas', ['#'], caret, items => [
+                                    (map { [$_, [url_for((current_route('error') ? 'overview' : current_route), schema => $_)] ] } (sort keys %{ $all_schemas })),
+                                    [],
+                                    ['Refresh all schemas', ['refresh', destination => current_route]],
+                                ],
+                            ],
+                        ],
+                    ],
+                    nav => [
+                        right,
+                        items => [
+                            ['Help', ['#'], id => 'help-opener', data => { toggle => 'modal', target => '#help-modal' } ],
+                        ],
+                    ],
+        %>
+        <%= content %>
+    </body>
+</html>

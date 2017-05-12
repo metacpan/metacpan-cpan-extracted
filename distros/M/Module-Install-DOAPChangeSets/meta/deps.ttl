@@ -1,0 +1,18 @@
+@prefix : <http://purl.org/NET/cpan-uri/terms#> .
+
+<http://purl.org/NET/cpan-uri/dist/Module-Install-DOAPChangeSets/project>
+	:recommends
+		"Module::Install::RDF 0.006",
+		"Module::Install::DOAP",
+		"Module::Package::RDF";
+	:requires
+		"File::Slurp" ,
+		"Module::Install 1.00" ,
+		"Perl::Version" ,
+		"RDF::Trine 0.112" ,
+		"RDF::Query 2.906" ,
+		"Text::Wrap" ,
+		"LWP::Simple" ,
+		"URI::file 4.0" ;
+	:test_requires
+		"Test::More 0.61" .

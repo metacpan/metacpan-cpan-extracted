@@ -1,0 +1,152 @@
+#!/usr/local/bin/perl
+#
+# $Id: psetfinfo,v 0.70 2005/08/09 15:47:00 dankogai Exp $
+#
+
+use strict;
+use MacOSX::File::Constants;
+use MacOSX::File::Spec;
+use MacOSX::File::Info;
+use POSIX qw(strftime);
+use Getopt::Std;
+
+our %Opt;
+getopts("a:t:c:d:m:v", \%Opt);
+
+sub str2time{
+    use Time::Local;
+    my $str = shift;
+    $str eq '.' and return time();
+    my ($mo,$dy,$yr,$hr,$mn,$sc,$ampm) = ();
+    $str =~ s,^(\d+)/(\d+),,io        and ($mo,$dy) = ($1, $2);
+    $str =~ s,^/(\d+),,io             and $yr = $1;
+    $str =~ s,^(?:\s+|\-)(\d+),,io    and $hr = $1;
+    $str =~ s,^:(\d+),,io             and $mn = $1;
+    $str =~ s,^:(\d+),,io             and $sc = $1;
+    $str =~ s,^(?:\s+|\-)(am|pm),,io  and $ampm = $1;
+    $mo -= 1;
+    $yr > 1900 and $yr -= 1900; 
+    lc($ampm) eq 'am' and $hr > 12 and $hr = ($hr - 12) % 24;
+    lc($ampm) eq 'pm' and $hr < 12 and $hr = ($hr + 12) % 24;
+    warn join(",", ($mo,$dy,$yr,$hr,$mn,$sc,$ampm));
+    return timegm($sc,$mn,$hr,$dy,$mo,$yr);
+}
+
+@ARGV or help();
+
+for my $path (@ARGV){
+    my $finfo = getfinfo($path) 
+	or (warn  "Error on getting $path: $MacOSX::File::OSErr\n"
+	    and next);
+    $Opt{t} and $finfo->type($Opt{t});
+    $Opt{c} and $finfo->creator($Opt{c});
+    $Opt{d} and $finfo->ctime(str2time($Opt{d}));
+    $Opt{m} and $finfo->mtime(str2time($Opt{m}));
+    $Opt{a} and $finfo->flags($Opt{a});
+
+    $finfo->set 
+	or warn "Error on setting $path : $MacOSX::File::OSErr\n";
+}
+
+sub help{
+    use File::Basename;
+    my $iam = basename($0);
+    print << "EOT";
+$0  [option...] file...
+ -a attributes # attributes (lowercase = 0, uppercase = 1)*
+ -t type       # file type
+ -c creator    # file creator
+ -d date       # creation date (mm/dd/[yy]yy [hh:mm[:ss] [AM | PM]])*
+ -m date       # modification date (mm/dd/[yy]yy [hh:mm[:ss] [AM | PM]])*
+ -v            # verbose output
+
+  Note: Period (.) represents the current date and time.
+  Note: [yy]yy < 100 assumes 20th century, e.g. 19yy
+  Note: The following attributes may be used with the -a option:
+    A   Alias file
+    V   Invisible*
+    B   Bundle
+    S   System (name locked)
+    T   Stationary
+    C   Custom icon*
+    L   Locked
+    I   Inited*
+    N   No INIT resources
+    M   Shared (can run multiple times)
+    E   Hidden extension*
+    D   Desktop*
+  Note: Options/attributes marked with an asterisk (*) are allowed 
+        with folders
+EOT
+}
+
+1;
+__END__
+=head1 NAME
+
+psetfinfo -- SetFile, implemented as perl script
+
+=head1 SYNOPSIS
+
+pgetfinfo [option...] path...
+
+=head1 DESCRIPTION
+
+When no switch is set, all avaible information on the path specified
+is printed to STDOUT.
+
+=item -a <attrib-letter>
+
+Prints attributes only.  When no attrib-letter is specified, it prints
+all attributes.  If spefifed, it prints "1" if any one the attribute
+is set or "0" otherwise.
+
+Attrib-letters are as follows;
+
+  A   Alias file
+  V   Invisible*
+  B   Bundle
+  S   System (name locked)
+  T   Stationary
+  C   Custom icon*
+  L   Locked
+  I   Inited*
+  N   No INIT resources
+  M   Shared (can run multiple times)
+  E   Hidden extension*
+  D   Desktop*
+
+Note: Options/attributes marked with an asterisk (*) are allowed with folders
+
+=item -t type
+
+sets type
+
+=item -c creator
+
+sets creator
+
+=item -d [dd/mm/yy[yy hh:mm:ss [am|pm]] .
+
+sets creation date.  use period for current time.
+
+=item -m [dd/mm/yy[yy hh:mm:ss [am|pm]] .
+
+sets content modification date.  use period for current time.
+
+=head1 AUTHOR
+
+Dan Kogai <dankogai@dan.co.jp>
+
+=head1 SEE ALSO
+
+L<File::Copy>
+L</Developer/Tools/GetFileInfo>
+L</Developer/Tools/SetFile>
+
+=head1 COPYRIGHT
+
+Copyright 2002-2005 Dan Kogai <dankogai@dan.co.jp>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.

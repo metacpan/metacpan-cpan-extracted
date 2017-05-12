@@ -1,0 +1,344 @@
+* v1.24 Sat Nov  8 17:05:15 PST 2008
+   * RT #13970: get_mp3info goes into infinite loop if no 0xFF byte in file 
+   * Fix VBR check for files that have Info header.
+   * Add VBRI check from KDF.
+   * Fix parsing of id3v2 APIC frame when it uses UTF8 encoding
+   * Support new WAV id3v2 block type, ID32 - Andy Grundman
+   * Handle ULT like USLT
+
+* v1.23 Thu Jul 26 14:11:08 2007
+
+   * Handle all tags with NULL delimited lists - Patch from Justin Fletcher <gerph (at) gerph.org>
+   * Fix MP3::Info for tag reading in AIF (and WAV, presumably) - kdf
+   * Read RVA2 (signed short) in big-endian order - andyg
+
+* v1.22 Tue Mar 13 16:16:59 2007
+
+   * Backwards compatibility changes for non-SlimServer callers of MP3::Info
+
+* v1.21 Thu Jan  4 13:41:42 PST 2007
+
+   * Use Module::Install
+   * Prefer Encode::Detect::Detector over Encode::Detect if available.
+   * Skip over Lyrics3 tags
+   * Pull out iTunes iTunNORM gain info.
+   * Handle Named genres separated by nulls & multiple genres
+   * Skip over broken iTunes ID3v2.2 frames that are in a ID3v2.3/2.4 header.
+   * Patch from Justin Fletcher <gerph (at) gerph.org> to fix ID3v2.4 header & footer parsing.
+
+* v1.20, Saturday, January 7, 2006
+
+   * New maintainer & Sponsor: 
+
+	Dan Sully - daniel | at | electricrain.com
+	Slim Devices, Inc - dan | at | slimdevices.com
+
+   * Read ReplayGain Information in:
+
+	- RVA, RVAD and RVA2 tags.
+	- COMM tags via J.River Media Center
+	- PRIV tags via Windows Media Player
+
+   * Unicode / Encode optimizations to only guess if the string isn't ascii.
+
+   * Proper numeric genre decoding, now in tune with the ID3 spec.
+
+   * Parse and return PIC & APIC data.
+
+   * Handle multiple COMM and TCON tags.
+
+   * Parse APE tags that are in the ID3v1 header space.
+
+   * Parse USLT - Lyrics tags, used by iTunes.
+
+* v1.13, Wednesday, March 10, 2005
+
+   Fix for UTF-16 handling.  (Wes Barris)
+
+* v1.12, Wednesday, March 9, 2005
+
+   Add OFFSET to info.  (Dan Sully)
+
+* v1.11, Friday, January 14, 2005
+
+   Fix for ID3v2 tags that happen to be UTF-16LE.  (Dan Sully)
+
+* v1.10, Thursday, December 30, 2004
+
+   Make utf8 enabled by default (if available).
+
+   perl 5.6 is now required.
+
+   Remove dependency on Symbol.pm.
+
+   Use three-arg open.  (Alex Marandon)
+
+   Make reading of genres a bit more nimble.  (Brian S. Stephan)
+
+   Fix frame counting.  (Ben Winslow, Anthony DiSante)
+
+   Fix syncsafe byte reading.  (Pierre-Yves Thoulon, et al)
+
+   Some Unicode fixes.  (Ilya Konstantinov)
+
+   More changes for Unicode.  Unicode::String no longer used; Encode is used
+   instead.  Encode::Guess used as last resort.  (Dan Sully)
+
+   Optimizations and other fixes.  (michael, Dan Sully)
+
+   Support for reading ID3v2 tags from WAV and AIFF files.  Not fully
+   supported.  (Dan Sully)
+
+* v1.02, Sunday, March 2, 2003
+
+   Fix broken argument parsing for use_mp3_utf8.  (Ben Gertzfield)
+
+   Document that UTF8 can be access in ":all" export tag.  (Ben Gertzfield)
+
+   Better document for new() method.
+
+   Add can() method.  (Ken Williams)
+
+   Stick failure warnings in $@.  (Jeffrey Friedl)
+
+   Added support for reasonable data from ID3v2 tags with RAW_V2 == 2.
+   (brian d foy and others)
+
+   Deal with broken iTunes comment frames in ID3v2.3.0/2.4.0.  (Many users)
+
+   remove_mp3tag() was reporting 128 bytes removed even if no bytes were
+   removed.  (scfc_de)
+
+   Allow calling methods on objects where tag does not exist (e.g., don't fail
+   if there is no comment but you call $mp3->comment).
+
+   Various bugfixes.
+
+
+* v1.01, Friday, February 26, 2002
+
+   That was less reasonable than previously thought.  Just strip off text
+   encoding bit, and then bytes for language and "up to first null" if COMM
+   field (COMM fields can have an extra comment about the comment, which is
+   terminated with a NULL, of course ...). Some encoders like to put in an
+   extra NULL at the end; plus, it was doing the wrong thing for
+   non-Latin-1 text.  (Ben Gertzfield)
+
+   Also make it work better with ID3v2.2 tags, and make a more reasonable
+   guess at which comment to use if there's more than one.
+
+   Add some support for ID3v2.4.0 and Unicode strings in tags; see 
+   use_mp3_utf8.  (Ben Gertzfield)
+
+   Add TAGVERSION to get_mp3tag result.
+
+
+* v1.00, Tuesday, January 22, 2002
+
+   Get more reasonable data out of ID3v2 tags by stripping up to
+   last null in tag.
+
+   Don't get FRAME_LENGTH if no FRAMES (Woodrow Hill).
+
+
+* v0.91, Saturday, February 10, 2001
+
+   Fix dumb bug with /o.  (David Reuteler)
+
+   Fix bug where get_mp3tag() would return an empty hashref instead of
+   undef if ID3v1 tag is asked for, and there is no ID3v1 tag, but there is
+   an ID3v2 tag.  (Stuart)
+
+
+* v0.90, Sunday, January 14, 2001
+
+   Added experimental OOP support for getting and setting data;
+   doesn't work for removing tags.
+
+   Made all functions optionally accept filehandle in place of filename.
+
+   Remove all croaks/dies and replace with simple returns or carps/warns.
+   (Jeffrey Sumler)
+
+   Fix various input data problems, bad warnings, division by zero, etc.
+
+   Undef $/ in set_mp3tag() so caller can't mess up the print.
+
+   Fix bitrate if ID == 0 and VBR.  (Kyle Farrell, Per Bolmstedt)
+
+   Split off _get_info() from get_mp3info(), so, eventually, programmers
+   can access that functionality without passing in a file or filehandle.
+   Not supported yet, but available for playing.
+
+   Added total frames, leftover milliseconds, and formatted time.
+
+   Fixed sample frequency for MPEG 2.5 files (perhaps not including
+   VBR, though ... see bug above).
+
+   Add in some additional genres.  (Peter Marschall)
+
+   Added ID3v2 tag removal.  (Ronan Waide)  NOTE: this is DANGEROUS.  It is
+   tested, but needs more testing.  The file is rewritten entirely.  Lots
+   of data moving around.
+
+   Added ID3v2.2.0 tag reading.  (Ronan Waide, Kee Hinckley)
+
+   Changed ID3v2 tag recognition to only match [A-Z0-9] instead of \w.
+   (Christoph Oberauer)
+
+
+* v0.80, Monday, March 6, 2000
+
+   Better stripping of bad data (after nulls) in ID3 tags (Dave O'Neill)
+
+   Fixed VERSION in get_mp3info to properly return 2 when appropriate.
+   (Bogdan Surdu)
+
+   Added VBR support.  Average bitrate is returned as BITRATE, and
+   minutes and seconds (MM and SS) should be accurate.
+   (Andy Waite for pointer to MP3Ext)
+
+   Made time calculation better overall.
+
+   Made MP3 header validation routines more comprehensive.
+   (Matthew Sachs for pointer to xmms source)
+
+   Changed name to MP3::Info (with wrapper still named MP3::Info).
+
+
+* v0.71, Thursday, July 8, 1999
+
+   Several fixes to ID3v2 support unpack unsigned instead
+   of signed, don't bail out after 4096-byte offsets on long ID3v2 headers.
+   Thanks much to Matthew Sachs.
+
+
+* v0.70, Saturday, July 3, 1999
+
+   Added preliminary ID3v2 reading support in get_mp3tag().  Thanks much
+   to Tom Brown.
+
+
+* v0.64, Thursday, July 1, 1999
+
+   Found bug in checking TRACKNUM parameter, used \d instead of \d+.
+   Only gives spurious warnings, doesn't affect anything else.
+
+   Cleaned up a bit, prepare for impending ID3v2 support.
+
+   NOTE: truncate() broken in some builds of ActivePerl (517, maybe
+   others).  No changes to module to fix problem.  (Brian Goodwin)
+
+
+* v0.63, Friday, April 30, 1999
+
+   Added ID3v1.1 support.  (Trond Michelsen, Pass F. B. Travis)
+
+   Added 255 (\xFF) as default genre.  (Andrew Phillips)
+
+   I think I fixed bug relating to spaces in ID3v2 headers.  (Tom Brown)
+
+
+* v0.62, Sunday, March 7, 1999
+
+   Doc updates.
+
+   Fix small unnoticable bug where ID3v2 offset is tag size plus 10,
+   not just tag size.
+
+   Not publickly released.
+
+
+* v0.61, Monday, March 1, 1999
+
+   Fixed problem of not removing nulls on return from get_mp3tag() (was
+   using spaces for padding before ... now trailing whitespace and
+   all nulls are removed before returning tag info).
+
+   Made tests more extensive (more for my own sanity when making all
+   these changes than to make sure it works on other platforms and
+   machines :).
+
+
+* v0.60, Sunday, February 28, 1999
+
+   Cleaned up a lot of stuff, added more comments, made get_mp3info()
+   much faster and much more reliable, and added recognition of ID3v2
+   headers.  (Tom Brown)
+
+
+
+* v0.52, Sunday, February 21, 1999
+
+   Fixed problem in get_mp3tag() that changed value of $_ in caller
+   (Todd Hanneken).
+
+
+* v0.51, Saturday, February 20, 1999
+
+   Fixed problem with %winamp_genres having the wrong numbers
+   (Matthew Sachs).
+
+
+* v0.50, Friday, February 19, 1999
+
+   Added remove_mp3tag().  Added VERSION to the hash returned by
+   get_mp3info(), and fixed a bug where STEREO was not being set
+   correctly.
+
+   Export all genre data structures on request.  Added use_winamp_genres()
+   to use WinAmp genres.  (Roland Steinbach)
+
+   Added a $MPEG::MP3Info::try_harder ($MP3::Info::try_harder)
+   variable that will try harder to find the MP3 header in a file.  False
+   by default. Can take a long time to fail, but should find most headers
+   at any offsets if set to true.
+
+   Thanks to Matthew Sachs for his input and fixes, and for mp3tools.
+
+
+* v0.20, Saturday, October 17, 1998
+
+   Changed name from MPEG::MP3Tag to MPEG::MP3Info, because it does
+   more than just TAG stuff now.
+
+   Made header stuff even more reliable.  Lots of help and testing from
+   Meng Weng Wong again.  :-)
+
+
+* v0.13, Thursday, October 8, 1998
+
+   Had some problems with header verification, got some code from Predrag
+   Supurovic with his mpgtools. Great stuff.  Also did some looping to find
+   a header if it is not in the "right" place.  I did what I think it is a
+   smart way to do it, since some files have the header as far down as 2
+   kbytes into the file.  First, I look at position 0, then at position 36
+   (a position where I have found many headers), then I start at 0 again
+   and jump in 128-byte chunks. Once I do that a bunch of times, I go back
+   at the beginning and try at 0 and go ahead in 1-byte chunks for a bunch
+   more times.
+
+   If you have an MP3 that has the header begin at an odd place like byte
+   761, then I suggest you strip out the junk before the header begins. :-)
+
+
+* v0.12, Friday, October 2, 1998
+
+   Added get_mp3info().  Thanks again to mp3tool source from
+   Johann Lindvall, because I basically stole it straight (after
+   converting it from C to Perl, of course).
+
+   I did everything I could to find the header info, but if
+   anyone has valid MP3 files that are not recognized, or has suggestions
+   for improvement of the algorithms, let me know.
+
+
+* v0.04, Tuesday, September 29, 1998
+
+   Changed a few things, replaced a regex with an unpack().
+   (Meng Weng Wong)
+
+
+* v0.03, Tuesday, September 8, 1998
+
+   First public release.

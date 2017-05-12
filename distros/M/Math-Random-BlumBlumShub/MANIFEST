@@ -1,0 +1,12 @@
+MANIFEST
+CHANGES
+README
+Makefile.PL
+BlumBlumShub.pm
+BlumBlumShub.xs
+typemap
+t/aab_basic.t
+t/bbs.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

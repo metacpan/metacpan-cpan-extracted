@@ -1,0 +1,35 @@
+CHANGES
+	Release Name: 0.4101 2010-08-16
+		*	Updated to use new method system
+
+		*	POD Changes
+
+	Release Name: 0.4001 2010-07-27
+		*	Started using git and github
+
+		*	Normalized version accross plugins.
+
+		*	POD Changes
+
+		*	Revised Testing
+		
+		*	Rearranged some code to use hash table
+
+		*	Capability methods
+
+		*	Bugfixes
+
+    Release Name: 0.30 2008-02-28
+        *   Changed license to allow option of GPL
+
+        *   Started using Pod::Readme
+
+	Release Name: 0.30 2008-02-22
+		*   Expanded pod / kwalitee improvments
+		*   You can now access the Audio::M4P::Quicktime object
+
+	Release Name: 0.29 
+		*   Tree::Simple now required
+
+    Release Name: 0.28 2008-02-11
+        *   Split off from Music::Tag distribution

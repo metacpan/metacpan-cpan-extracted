@@ -1,0 +1,90 @@
+Mail::Audit::Centipaid Troubleshooting FAQ
+Adonis El Fakih
+
+
+1) What do I need to do to get my Mail::Audit script installed and
+reading mail?
+
+This depends a little on your MTA - that's the software that delivers
+the mail on your server. If you're using exim or sendmail, you should
+be able to just pop
+
+    |~/myfilter.pl
+
+into a file called ".forward" in your home directory. (Assuming your
+filter is called "myfilter.pl", placed in your home directory, starts
+"#!/usr/bin/perl" or wherever Perl is, and is executable.)
+
+For qmail, the magic words
+
+    preline ~/myfilter.pl
+
+in a file called ".qmail" will do the trick.
+
+On Redhat with sendmail, the following steps needed to be done, to 
+enable .forward piping.
+
+a) copy the mail filter to /etc/smrsh.  Included with this module
+   are two filters.  sfilter.pl which uses Mail::Audit only to
+   check that mail->accept does indeed deliver to your mailbox.
+   And centifilter.pl which uses Mail::Audit::Centipaid with an
+   active Centipaid account that enables you to test the module.
+
+b) After copying the programs into /etc/smrsh, ensure that the
+   read-write permissions on the .forward are to the account owner
+   only. 
+
+   chmod 600 .forward
+
+   Most applications will give you a cryptic error if these steps
+   are not done. 
+
+
+2) Sendmail is bouncing mail when I put the above in my .forward
+
+Makre sure you did what is detailed above.  This is usually due to 
+something called the Sendmail Restricted Shell (smrsh), which 
+restricts the types of program that can execute in a
+.forward file. See the Procmail FAQ for more details.
+(http://www.sektorn.mooo.com/era/procmail/mini-faq.html)
+
+If you just want to hack it, install procmail, and arrange for procmail
+to pipe to your program.
+
+You can also refer to centipaid and visit the Knowledgebase and support
+forum for solutions to problems faced by others while installing
+Mail::Audit::Centipaid
+
+
+3) I'm using fetchmail.
+
+Don't do that, it's slow. Use popread instead which comes with 
+Mail::Audit. Doesn't work for IMAP yet, though.
+
+4) It still doesn't work.
+
+First, see if you can get procmail working instead. If procmail won't
+work, it's not a Mail::Audit/Mail::Audit::Centipaid problem. If procmail 
+works, try a very, very simple Mail::Audit script. Something just like
+    
+    use Mail::Audit;
+    Mail::Audit->new->accept; 
+    
+A copy of this script in included in the "examples" directory of this
+distribution.
+
+If that works, does your script compile? What happens if you run it
+under "perl -c"? 
+
+Turn on debugging by setting "Debug => 1" in the configuration hash
+%conf, and see if you see what the problem is.  Mail::Audit::Centipaid 
+script even being called? Is the mail bouncing? Does the bounce tell 
+you anything useful?
+
+5) It STILL doesn't work.
+
+OK. Time to tell us. Please go to http://www.centipaid.com/ and visit the
+Support forum, and submit your question and your Mail::Audit::Centipaid 
+script, the answers to the questions above, the bounce if there is one, and
+information about what MTA you are using.  We will try to figure out what's
+going on.

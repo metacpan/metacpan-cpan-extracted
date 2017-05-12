@@ -1,0 +1,9 @@
+Build.PL
+Changes
+ex/access.pl
+lib/Mojolicious/Plugin/Memorize.pm
+MANIFEST			This list of files
+META.json
+META.yml
+t/behavior.t
+t/main.t

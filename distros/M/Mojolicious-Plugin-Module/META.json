@@ -1,0 +1,76 @@
+{
+   "abstract" : "Mojolicious plugin for modular development.",
+   "author" : [
+      "Georgy Bazhukov <gosha@bugov.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "keywords" : [
+      "Plugin",
+      "Module",
+      "Mojolicious"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Module",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Copy::Recursive" : "0",
+            "Hash::Merge::Simple" : "0.051",
+            "Module::Load" : "0",
+            "Mojolicious" : "4",
+            "YAML" : "0",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Command::generate::module" : {
+         "file" : "lib/Mojolicious/Command/generate/module.pm",
+         "version" : 0
+      },
+      "Mojolicious::Plugin::Module" : {
+         "file" : "lib/Mojolicious/Plugin/Module.pm",
+         "version" : "0.04"
+      },
+      "Mojolicious::Plugin::Module::Abstract" : {
+         "file" : "lib/Mojolicious/Plugin/Module/Abstract.pm",
+         "version" : 0
+      },
+      "Mojolicious::Plugin::Module::Assets" : {
+         "file" : "lib/Mojolicious/Plugin/Module/Assets.pm",
+         "version" : 0
+      },
+      "Mojolicious::Plugin::Module::Manager" : {
+         "file" : "lib/Mojolicious/Plugin/Module/Manager.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/bugov/mojolicious-plugin-module"
+      }
+   },
+   "version" : "0.04"
+}

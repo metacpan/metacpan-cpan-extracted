@@ -1,0 +1,141 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use constant {
+    UP_TO_DATE => 1,
+    REBUILT    => 2,
+};
+use Makefile::Parser;
+use Getopt::Std;
+#use Smart::Comments;
+
+$Makefile::Parser::Runtime = 1;
+
+my $parser;
+
+sub get_rule_by_target ($) {
+    $parser->target($_[0]);
+}
+
+sub make ($);
+
+sub make ($) {
+    my $goal = shift;
+    my $rule = get_rule_by_target($goal);
+    if (!$rule) {
+        if (-f $goal) {
+            return UP_TO_DATE;
+        } else {
+            die "No rule to build target $goal";
+        }
+    }
+    my $out_of_date = !-f $goal;
+    for my $prereq ($rule->prereqs) {
+        my $res = make($prereq);
+        if ($res == REBUILT) {
+            $out_of_date = 1;
+        } elsif ($res == UP_TO_DATE) {
+            if (!$out_of_date) {
+                if (-M $prereq < -M $goal) {
+                    ### prereq file is newer: $prereq
+                    $out_of_date = 1;
+                }
+            }
+        } else {
+            die "Unexpected returned value: $res";
+        }
+    }
+    if ($out_of_date) {
+        $rule->run_commands;
+        return REBUILT;
+    }
+    return UP_TO_DATE;
+}
+
+my %opts;
+getopts('f:', \%opts);
+
+my $makefile = $opts{f} || 'Makefile';
+$parser = Makefile::Parser->new;
+#die $parser->var('TEST_VERBOSE');
+my %vars = %ENV;
+my @goals;
+for my $arg (@ARGV) {
+    if ($arg =~ /(.*?)=(.*)/) {
+        $vars{$1} = $2;
+    } else {
+        push @goals, $arg;
+    }
+}
+$parser->parse($makefile, \%vars) or
+    die Makefile::Parser->error;
+push @goals, $parser->target->name if !@goals;
+for my $goal (@goals) {
+    my $res = make($goal);
+    ### goal: $goal
+    ### result: $res
+}
+
+__END__
+
+=head1 NAME
+
+plmake - Experimental "make" utility based on Makefile::Parser
+
+=head1 VERSION
+
+This document describes plmake 0.14 released on March 10, 2007.
+
+=head1 SYNOPSIS
+
+    $ plmake
+    $ plmake test
+    $ plmake -f Makefile all
+
+=head1 DESCRIPTION
+
+This utility mainly serves as a quick check for what does and what does not
+work in L<Makefile::Parser>. Please don't use it in production.
+
+=head1 LIMITATIONS
+
+There are quite a lot of limitations in the underlying
+L<Makefile::Parser>:
+
+=over
+
+=item *
+
+Directives are not supported.
+
+=item *
+
+Double colon rules don't work
+
+=item *
+
+Multi-target rules are not supported.
+
+=item *
+
+.PHONY is not supported.
+
+=back
+
+=head1 AUTHOR
+
+Zhang "agentzh" Yichun E<lt>agentzh@gmail.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2007 by Zhang "agentzh" Yichun. All rights reserved.
+
+This program is free-software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Makefile::Parser>, L<gvmake>, L<pmake>.
+

@@ -1,0 +1,83 @@
+{
+   "abstract" : "Giving an easy Moo style way to make command organized CLI apps",
+   "author" : [
+      "Jens Rehsack <rehsack@cpan.org>",
+      "Torsten Raudssus <torsten@raudss.us>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooX-Cmd",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Module::CPANTS::Analyse" : "0.96",
+            "Test::CPAN::Changes" : "0",
+            "Test::CheckManifest" : "0",
+            "Test::Kwalitee" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "List::MoreUtils" : "0.406",
+            "Module::Pluggable" : "4.8",
+            "Module::Runtime" : "0",
+            "Moo" : "0.009013",
+            "Package::Stash" : "0.33",
+            "Params::Util" : "0.37",
+            "Regexp::Common" : "2011121001",
+            "Scalar::Util" : "0",
+            "Text::ParseWords" : "0",
+            "perl" : "v5.8.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-MooX-Cmd@rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Cmd"
+      },
+      "homepage" : "https://metacpan.org/release/MooX-Cmd",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com:Getty/p5-moox-cmd.git",
+         "web" : "https://github.com/Getty/p5-moox-cmd"
+      }
+   },
+   "version" : "0.015"
+}

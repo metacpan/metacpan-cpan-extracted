@@ -1,0 +1,151 @@
+---
+abstract: 'Translate a ECMAScript source to an AST'
+author:
+  - 'Jean-Damien Durand <jeandamiendurand@free.fr>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MarpaX-Languages-ECMAScript-AST
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - blog
+provides:
+  MarpaX::Languages::ECMAScript::AST:
+    file: lib/MarpaX/Languages/ECMAScript/AST.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Exceptions:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Exceptions.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Grammar:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Grammar.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Grammar::Base:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Grammar/Base.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Grammar::Base::DefaultSemanticsPackage:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Grammar/Base/DefaultSemanticsPackage.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Grammar::CharacterClasses:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Grammar/CharacterClasses.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Grammar::ECMAScript_262_5:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Grammar/ECMAScript_262_5.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Grammar::ECMAScript_262_5::Base:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Grammar/ECMAScript_262_5/Base.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Grammar::ECMAScript_262_5::CharacterClasses:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Grammar/ECMAScript_262_5/CharacterClasses.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Grammar::ECMAScript_262_5::JSON:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Grammar/ECMAScript_262_5/JSON.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Grammar::ECMAScript_262_5::Lexical::NumericLiteral:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Grammar/ECMAScript_262_5/Lexical/NumericLiteral.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Grammar::ECMAScript_262_5::Lexical::RegularExpressionLiteral:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Grammar/ECMAScript_262_5/Lexical/RegularExpressionLiteral.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Grammar::ECMAScript_262_5::Lexical::StringLiteral:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Grammar/ECMAScript_262_5/Lexical/StringLiteral.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Grammar::ECMAScript_262_5::Lexical::StringLiteral::Semantics:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Grammar/ECMAScript_262_5/Lexical/StringLiteral/Semantics.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Grammar::ECMAScript_262_5::Pattern:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Grammar/ECMAScript_262_5/Pattern.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Grammar::ECMAScript_262_5::Pattern::Semantics:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Grammar/ECMAScript_262_5/Pattern/Semantics.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Grammar::ECMAScript_262_5::Program:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Grammar/ECMAScript_262_5/Program.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Grammar::ECMAScript_262_5::Program::Semantics:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Grammar/ECMAScript_262_5/Program/Semantics.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Grammar::ECMAScript_262_5::SpacesAny:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Grammar/ECMAScript_262_5/SpacesAny.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Grammar::ECMAScript_262_5::StringNumericLiteral:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Grammar/ECMAScript_262_5/StringNumericLiteral.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Grammar::ECMAScript_262_5::StringNumericLiteral::NativeNumberSemantics:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Grammar/ECMAScript_262_5/StringNumericLiteral/NativeNumberSemantics.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Grammar::ECMAScript_262_5::Template:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Grammar/ECMAScript_262_5/Template.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Grammar::ECMAScript_262_5::URI:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Grammar/ECMAScript_262_5/URI.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Impl:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Impl.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Impl::Logger:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Impl/Logger.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Impl::Singleton:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Impl/Singleton.pm
+    version: '0.020'
+  MarpaX::Languages::ECMAScript::AST::Util:
+    file: lib/MarpaX/Languages/ECMAScript/AST/Util.pm
+    version: '0.020'
+requires:
+  CHI: '0'
+  Carp: '0'
+  Class::Singleton: '0'
+  Data::Compare: '0'
+  Data::Dumper: '0'
+  Data::Float: '0'
+  Digest::MD4: '0'
+  Encode: '0'
+  Exception::Class: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::HomeDir: '0.93'
+  File::Spec: '0'
+  Import::Into: '0'
+  List::Compare::Functional: '0.21'
+  Log::Any: '0'
+  Marpa::R2: '2.080000'
+  Math::BigFloat: '0'
+  Module::Util: '0'
+  SUPER: '0'
+  Scalar::Util: '0'
+  Scalar::Util::Numeric: '0'
+  Sereal: '0'
+  Unicode::Normalize: '0'
+  base: '0'
+  constant: '0'
+  diagnostics: '0'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  version: '0.77'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MarpaX-Languages-ECMAScript-AST
+  homepage: https://metacpan.org/release/MarpaX-Languages-ECMAScript-AST
+  repository: git://github.com/jddurand/marpax-languages-ecmascript-ast.git
+version: '0.020'
+x_contributors:
+  - 'jddurand <jeandamiendurand@free.fr>'

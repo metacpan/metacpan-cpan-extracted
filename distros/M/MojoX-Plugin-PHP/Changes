@@ -1,0 +1,20 @@
+Revision history for MojoX-Plugin-PHP
+
+0.01	2013-10-02
+	Initial release. A lot of features implemented and tested
+	already because a lot of code and ideas were borrowed from
+	more mature Catalyst-View-Template-PHP distribution.
+
+0.02	2013-11-02
+	Refactored path rewrite rules and simplified routing.
+	Implement use_index_php config parameter
+
+0.03	2014-05-10
+	Include examples/wp-on-mojo.pl demo script
+	Minor redesign of error output in MojoX::Template::PHP
+
+0.04	2015-08-28
+	Updates for Mojolicious 6.xx compatibilty
+
+0.05	2015-11-28	
+	Fix _mojoparams_to_phpparams for all Mojolicious versions

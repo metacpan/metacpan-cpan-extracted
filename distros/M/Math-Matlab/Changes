@@ -1,0 +1,42 @@
+Revision history for Math-Matlab.
+
+0.08  
+	NOTE: This version is incompatible with servers from previous versions.
+	      Local and Remote must both be running 0.08 or later.
+	- Improved error handling by using a Matlab wrapper that uses try/catch
+	  and evalc (suggested by Medi Montaseri <montaseri@gmail.com>).
+	- Updated to use -r and -logfile args to Matlab instead of STDIN and
+	  STDOUT. Using -logfile captures the STDERR as well as STDOUT.
+	- Removed create_cmd_file() and added remove_files() in Math::Matlab::Local.
+
+0.07  Mon, Oct 10, 2005
+
+	- Fixed another bug in t/01_local.t that was causing failures for cpan testers.
+
+0.06  Mon, Oct 10, 2005
+
+	- Fixed bug in t/01_local.t that was causing new test to fail for some.
+
+0.05  Fri, Oct 7, 2005
+
+	- Better error reporting when Matlab fails to start.
+	- Fixed logic in Matlab::Local::execute for restoring current working
+	  directory when only a relative working directory is given.
+	- Doc fixes in Pool.pm.
+
+0.04  Wed, Jun 2, 2004
+
+    - Updated to skip tests if there is not a properly configured local
+      Matlab. Avoids failures from automatic cpan testing.
+
+0.03  Wed, Jun 2, 2004
+
+    - added code to strip EDU>> prompts
+      (thanks to Alex Scouras)
+    - fixed some 'bugs' in docs for Math::Matlab::Local
+      (thanks to Adam Pirkle)
+
+
+0.02  Wed, Oct 30, 2002
+
+    - First public release

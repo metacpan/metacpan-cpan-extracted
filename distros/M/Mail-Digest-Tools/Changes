@@ -1,0 +1,33 @@
+Revision history for Perl extension Mail::Digest::Tools.
+
+xxxx  Sat Feb 14 10:27:53 2004
+	- original version; created by h2xs 1.20 with options
+		-X -n Mail::Digest::Tools
+
+2.04  Fri Mar  5 18:03:54 EST 2004
+      First version released to CPAN.
+
+2.05  Sun Mar  7 20:57:32 EST 2004
+      Fixed accidental deletion of incrementation of C<$message_count> in C<_strip_down()>.
+
+2.06  Wed Mar 10 17:45:00 EST 2004
+      Correction of errors in test suite.  Elimination of use of List::Compare
+      in test suite.
+
+2.07  Thu Mar 11 12:26:29 EST 2004
+      Correction of error in t/03.t
+
+2.08  Thu Mar 11 18:37:18 EST 2004
+      Correction in _clean_up_thread_title and in tests.
+
+2.09  Mon Mar 15 19:00:28 EST 2004
+      No changes to code; corrections to documentation and README only.
+
+2.10  Mon Jun 07 20:00:00 EDT 2004
+      Activated export tag group 'all'
+
+2.11  Sat Oct 23 00:00:00 EDT 2004
+      Fixed several errors which resulted in "Bizarre copy of hash in leave" error when running test suite under Devel::Cover.
+
+2.12  Sat May 14 22:49:31 EDT 2011
+      Added 'mirbsd' to lists of Unix-ish OSes.

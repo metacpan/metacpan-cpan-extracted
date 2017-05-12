@@ -1,0 +1,375 @@
+#!/usr/bin/perl -w
+#
+#   Usage: ./smonitor --help
+#
+#   Martin Senger <martin.senger@gmail.com>
+#   September 2011
+#
+# ABSTRACT: command-line tool for monitoring services
+# PODNAME: smonitor
+# -----------------------------------------------------------------
+
+package main;  # this is here to make Dist:Dzilla's PkgVersion happy
+
+use warnings;
+use strict;
+
+use Data::Dumper;
+use Monitor::Simple;
+use Log::Log4perl qw(:easy);
+
+our $VERSION = '0.2.8'; # VERSION
+
+# -----------------------------------------------------------------
+# Command-line arguments and script usage
+# -----------------------------------------------------------------
+my ($opt_h, $opt_help, $opt_m, $opt_v);
+my ($opt_config, $opt_showcfg);
+my ($opt_outfile, $opt_onlyerr, $opt_format, $opt_cssurl);
+my ($opt_logfile, $opt_loglevel, $opt_logformat, $opt_debug);
+my ($opt_npp, $opt_list_formats, @opt_filter, $opt_nonotif);
+BEGIN {
+    use Getopt::Long;
+    use Pod::Usage;
+
+    Getopt::Long::Configure ('no_ignore_case');
+    GetOptions ( h                    => \$opt_h,
+                 help                 => \$opt_help,
+                 man                  => \$opt_m,
+                 version              => \$opt_v,
+
+                 # configuration
+                 'showcfg'            => \$opt_showcfg,
+                 'cfg|config=s'       => \$opt_config,
+
+                 # results
+                 'outfile=s'          => \$opt_outfile,
+                 'format=s'           => \$opt_format,
+                 'onlyerrs'           => \$opt_onlyerr,
+                 'cssurl=s'           => \$opt_cssurl,
+
+                 # logging
+                 'logfile=s'          => \$opt_logfile,
+                 'loglevel=s'         => \$opt_loglevel,
+                 'logformat=s'        => \$opt_logformat,
+                 'debug'              => \$opt_debug,
+
+                 # other options
+                 'npp=i'              => \$opt_npp,
+                 'lf'                 => \$opt_list_formats,
+                 'services|filters=s' => \@opt_filter,
+                 'nn|nonotif'         => \$opt_nonotif,
+
+        ) or pod2usage (2);
+    pod2usage (-verbose => 0, -exitval => 0) if $opt_h;
+    pod2usage (-verbose => 1, -exitval => 0) if $opt_help;
+    pod2usage (-verbose => 2, -exitval => 0) if $opt_m;
+
+    @opt_filter = split (m{\s*,\s*}, join (',', @opt_filter));
+
+}  # end of BEGIN
+
+# -------------------- Show version and exit ----------------------
+if ($opt_v) {
+    ## no critic
+    no strict;    # because the $VERSION will be added only when
+    no warnings;  # the distribution is fully built up
+    print "$VERSION\n";
+    exit(0);
+}
+# -----------------------------------------------------------------
+
+$| = 1;  # flushing STDOUT
+
+# -----------------------------------------------------------------
+# Initiate logging
+# -----------------------------------------------------------------
+$opt_loglevel = 'debug' if $opt_debug;
+Monitor::Simple::Log->log_init ({ level  => $opt_loglevel,
+                                file   => $opt_logfile,
+                                layout => $opt_logformat });
+
+# -----------------------------------------------------------------
+# Find configuration telling us what will be monitored
+# -----------------------------------------------------------------
+my $config = Monitor::Simple::Config->get_config ($opt_config);  # this may croak
+my $config_file = Monitor::Simple::Config->resolve_config_file ($opt_config);
+
+# -----------------------------------------------------------------
+# Show configuration or list of available formats
+# -----------------------------------------------------------------
+if ($opt_showcfg) {
+    print STDOUT "Using configuration file '$config_file'\n";
+    print STDOUT Dumper ($config);
+    exit(0);
+}
+if ($opt_list_formats) {
+    my $formats = Monitor::Simple::Output->list_formats();
+    foreach my $key (sort keys %$formats) {
+        print STDOUT "$key\t" . $formats->{$key} . "\n";
+    }
+    exit(0);
+}
+
+# -----------------------------------------------------------------
+# The main job: checking services
+# -----------------------------------------------------------------
+my $loop_args = {
+    config_file => $config_file,
+    outputter   => Monitor::Simple::Output->new (outfile  => $opt_outfile,
+                                                 onlyerr  => $opt_onlyerr,
+                                                 'format' => $opt_format,
+                                                 cssurl   => $opt_cssurl,
+                                                 config   => $config),
+};
+# maximum number of child processes in parallel
+$loop_args->{npp} = $opt_npp if $opt_npp;
+
+# check only some services
+$loop_args->{filter} = [ @opt_filter ] if @opt_filter;
+
+# disable all notifications
+$loop_args->{nonotif} = $opt_nonotif if $opt_nonotif;
+
+Monitor::Simple->check_services ($loop_args);
+
+
+
+
+=pod
+
+=head1 NAME
+
+smonitor - command-line tool for monitoring services
+
+=head1 VERSION
+
+version 0.2.8
+
+=head1 SYNOPSIS
+
+   smonitor [-cfg <file>] [<output-options>] [<log-options>] [<other-options>]
+      where <output-options> are: -outfile <file>
+                                  -onlyerr
+                                  -format human | tsv | html
+                                  -cssurl <url>
+      where <log-options> are:    -logfile <file>
+                                  -loglevel debug | info | warn | error | fatal
+                                  -debug
+                                  -logformat <template>
+      where <other-options> are:  -npp <integer>
+                                  -service[s] <service-name> [<service-name>...]
+                                  -nonotif
+
+   smonitor -showcfg
+   smonitor -lf
+
+   smonitor -h
+   smonitor -help
+   smonitor -man
+   smonitor -version
+
+=head1 DESCRIPTION
+
+B<smonitor> is a command-line tool for monitoring (checking) various
+services and other parts of your IT infrastructure. In order to run
+it, you need to have a configuration file that defines what services
+to check and how to do the checking. Details how to create such
+configuration file are in the documentation of the Perl module
+I<Monitor::Simple>; just type:
+
+   perldoc Monitor::Simple
+
+=head1 OPTIONS
+
+The command-line arguments and options can be specified with single or
+double dash. Most of them can be abbreviated to the nearest unbiased
+length. They are case-sensitive.
+
+=head2 -cfg <config-file>
+
+It specifies what configuration file to use (read: what services to
+check). By default, it uses file F<monitor-simple-cfg.xml>.
+
+=head2 -service <service-name> [<service-name>...]
+
+By default, I<smonitor> checks all services specified in the
+configuration file. This parameter can select only some services. For
+example:
+
+   smonitor -cfg my.cfg -service synonia mrs
+
+=head2 -outfile <file>
+
+It specifies a file where the report about checking is written to. By
+default, it is written to standard output (but see also possible
+combinations with C<-onlyerr> option).
+
+A note about I<notifications>: This parameter C<-outfile> has nothing
+to do with notifications. The notifications are messages about the
+status of individual services and they are defined (if at all) in the
+configuration file (where it is also specified where to send them and
+how to format them). You cannot influence notifications by any
+parameter of the I<smonitor>. Well, it is not entirely true: You can
+use parameter C<-nonotif> to disable all notifications.
+
+=head2 -onlyerr
+
+This option influences what will be reported on the standard output
+(STDOUT). The overall behaviour depends on the combination of
+C<-outfile> and C<-onlyerr> parameters:
+
+   -outfile <file>    -onlyerr    what will be done
+   -----------------------------------------------------
+   yes                no         all output to <file>
+
+   yes                yes        all output to <file>
+                                 + errors also on STDOUT
+
+   no                 no         all output to STDOUT
+
+   no                 yes        only errors to STDOUT
+
+The variety of output destinations allows to run I<smonitor> as a
+"cron" job (a scheduled job) and to decide when the scheduling system
+reports the results. Just remember that these reports, sent by the
+scheduling system, are not the same as notifications defined in the
+configuration file - these two ways how to report status of services
+are independent and both can be used in the same time.
+
+=head2 -format human | tsv | html
+
+How the report will be formatted. Default is C<human>:
+
+   DATE                           SERVICE                 STATUS  MESSAGE
+   Tue Sep 27 10:40:15 2011       Memory Check                 2  Memory CRITICAL - 91.7% (1601124 kB) used
+   Tue Sep 27 10:40:15 2011       Current timestamp            0  Tue Sep 27 10:40:15 2011
+   Tue Sep 27 10:40:15 2011       Born To Be Killed            2  Plugin 'Monitor/Simple/plugins/born-to-be-killed.pl' died with signal 9
+
+   Tue Sep 27 10:40:15 2011       Synonia Bad Params           2  500 Can't connect to Xdb.cbrc.kaust.edu.sa:80...
+
+The C<tsv> is a TAB-separated output, without any header line. The
+C<html> format creates a simple HTML page with the report.
+
+=head2 -cssurl <url>
+
+This is used only when C<-format html> is used. It specifies a URL of
+a CSS-stylesheet that can change the look-and-feel of the HTML report
+page. See the source of the page for the CSS-classes names.
+
+=head2 -npp <integer>
+
+A not much used parameter, rather a technical one: it specifies
+maximum number of parallel checks. Because each check is done by a new
+process, the C<npp> parameter actually stands for "Number of Parallel
+Processes". Default is 10.
+
+=head2 -nonotif
+
+This options disables executing all notifications (as they are defined
+in the configuration file). It is, for example, useful when you are
+testing a new configuration file and you do not wish to send emails,
+etc.  about it
+
+=head2 Logging options
+
+Additional to the report about the status of services (parameters
+C<-outfile> and C<-onlyerr>) and to the notifications (defined in the
+configuration file) there is also a logging mechanism that helps to
+trace how the checking is done in more details. The logging is defined
+by few logging parameters - they all have reasonable default values.
+
+=over
+
+=item B<-logfile <logfile>>
+
+Where to put log records. By default, it appends records to the file
+F<smonitor.log> (which is created if it does not exist yet). You can
+also specify C<STDOUT> as the logfile:
+
+   -logfile STDOUT
+
+=item B<-loglevel debug | info | warn | error | fatal>
+
+Each log record has its level of importance (five possible levels:
+from C<debug> to C<fatal>). This parameter tells which log records
+(read: records of what importance) will be created. A level means also
+all levels "below" it. For example, level C<warn> includes C<warn>,
+C<error> and C<fatal> messages. Default level is C<info>.
+
+=item B<-debug>
+
+It is the same as C<-loglevel debug>.
+
+=item B<-logformat <string>>
+
+It specifies how to format log records. Default format is "S<%d (%r)
+%p> %m%n>" when the log records look like this:
+
+   2011/09/27 12:18:50 (97)  INFO> --- Checking started ---
+   2011/09/27 12:18:50 (100) DEBUG> Started: Monitor/Simple/plugins/check_mem.pl -u -w 55 -c 80
+   2011/09/27 12:18:50 (100) DEBUG> Started: Monitor/Simple/plugins/check-url.pl -cfg configs/simple-example-cfg.xml -service pubmed -logfile a.log -loglevel debug
+   2011/09/27 12:18:50 (30)  DEBUG> Invoking HTTP HEAD: http://www.ncbi.nlm.nih.gov/pubmed/
+   2011/09/27 12:18:51 (760) INFO> Done: pubmed 0 OK
+   2011/09/27 12:18:51 (971) INFO> --- Checking finished [0.872014999389648 s] ---
+
+The columns in this examples are: date (%d), number of milliseconds
+from the moment smonitor was started (%r), log level (%p) and log
+message (%m). More details about formats are in the Perl module
+I<Log::Log4perl>.
+
+=back
+
+=head2 -showcfg
+
+It prints the name of the used configuration file and its content and
+it exits. It is rather for debugging.
+
+=head2 -lf
+
+It prints the currently available formats (the values recognizable by
+the C<-format> parameter) and exits:
+
+   $> smonitor -lf
+   html    Formatted as an HTML document
+   human   Easier readable by humans
+   tsv     TAB-separated (good for machines)
+
+=head2 General options
+
+=over
+
+=item B<-h>
+
+Print a brief usage message and exits.
+
+=item B<-help>
+
+Print a brief usage message with options and exits.
+
+=item B<-man>
+
+Print a full usage message and exits.
+
+=item B<-version>
+
+Print the version and exits.
+
+=back
+
+=head1 AUTHOR
+
+Martin Senger <martin.senger@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Martin Senger, CBRC-KAUST (Computational Biology Research Center - King Abdullah University of Science and Technology) All Rights Reserved.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+
+__END__
+

@@ -1,0 +1,916 @@
+=for html <a href="https://travis-ci.org/jddurand/c-marpaWrapper"><img src="https://travis-ci.org/jddurand/c-marpaWrapper.svg?branch=master" alt="Travis CI build status" height="18"></a> <a href="https://badge.fury.io/gh/jddurand%2Fc-marpaWrapper"><img src="https://badge.fury.io/gh/jddurand%2Fc-marpaWrapper.svg" alt="GitHub version" height="18"></a> <a href="http://opensource.org/licenses/MIT" rel="nofollow noreferrer"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License MIT" height="18"></a>
+
+=head1 NAME
+
+marpaWrapper - alternate interface to libmarpa
+
+=head1 DESCRIPTION
+
+marpaWrapper is a thin interface on top of L<libmarpa|https://jeffreykegler.github.io/Marpa-web-site/libmarpa.html>. Alike the original, there are four explicit namespaces: the grammar, the recognizer, the value and the forest tree.
+
+=head1 SYNOPSIS
+
+  #include <marpaWrapper.h>
+
+=head1 GRAMMAR METHODS
+
+=head2 marpaWrapperGrammar_newp
+
+  typedef struct marpaWrapperGrammarOption {
+    genericLogger_t *genericLoggerp;             /* Default: NULL.                                      */
+    short            warningIsErrorb;            /* Default: 0. Have precedence over warningIsIgnoredb  */
+    short            warningIsIgnoredb;          /* Default: 0.                                         */
+    short            autorankb;                  /* Default: 0.                                         */
+  } marpaWrapperGrammarOption_t;
+
+  marpaWrapperGrammar_t *marpaWrapperGrammar_newp(marpaWrapperGrammarOption_t *marpaWrapperGrammarOptionp)
+
+Instanciate a grammar wrapper, and takes an eventual pointer to a C<marpaWrapperGrammarOption_t> structure describing grammar options. This structure contains the following members:
+
+=over
+
+=item genericLoggerp
+
+An eventual generic logger. If NULL, the grammar will never log.
+
+=item warningIsErrorb
+
+A flag saying that any grammar warning should be treated as an error. Any true value enable this flag. Only 0 can disable it. It has precedence over the next member:
+
+=item warningIsIgnoredb
+
+A flag saying that any grammar warning should be ignored. Any true value enable this flag. Only 0 can disable it.
+
+=item warningIsIgnoredb
+
+A flag saying that rules are automatically ranked. Then when a rule is created, its eventual initial rank is I<ignored>, and set automatically: rules sharing the same LHS have a decreasing rank as they are created.
+
+=item autorankb
+
+Automatic assign rule ranks. In such a cause the eventual rank number on a rule is always ignored. Rules are autoranked by their order of in the grammar. The latest the rule, the lower its rank.
+
+=back
+
+C<NULL> is returned in case of failure.
+
+=head2 marpaWrapperGrammar_clonep
+
+  typedef short (*marpaWrapperGrammar_grammarOptionSetter_t)(void *userDatavp, marpaWrapperGrammarOption_t *marpaWrapperGrammarOptionp);
+  typedef short (*marpaWrapperGrammar_symbolOptionSetter_t)(void *userDatavp, int symboli, marpaWrapperGrammarSymbolOption_t *marpaWrapperGrammarSymbolOptionp);
+  typedef short (*marpaWrapperGrammar_ruleOptionSetter_t)(void *userDatavp, int rulei, marpaWrapperGrammarRuleOption_t *marpaWrapperGrammarRuleOptionp);
+
+  typedef struct marpaWrapperGrammarCloneOption {
+    void                                      *userDatavp;           /* Default: NULL. User context */
+    marpaWrapperGrammar_grammarOptionSetter_t  grammarOptionSetterp; /* Default: NULL. Overwrite grammar option */
+    marpaWrapperGrammar_symbolOptionSetter_t   symbolOptionSetterp;  /* Default: NULL. Overwrite event symbol option */
+    marpaWrapperGrammar_ruleOptionSetter_t     ruleOptionSetterp;    /* Default: NULL. Overwrite event rule option */
+  } marpaWrapperGrammarCloneOption_t;
+
+  marpaWrapperGrammar_t *marpaWrapperGrammar_clonep(marpaWrapperGrammar_t *marpaWrapperGrammarOriginp, marpaWrapperGrammarCloneOption_t *marpaWrapperGrammarCloneOptionp);
+
+Clone a yet existing C<marpaWrapperGrammarOriginp> grammar. This clone is guaranteed to have the same symbol and rule ids as the original. The C<marpaWrapperGrammarCloneOptionp> can be C<NULL>, otherwise it is used to specify callback routines to modify symbol and rule options, leaving responsibility to the caller to have something that can be created.
+
+C<marpaWrapperGrammarCloneOptionp> content is:
+
+=over 
+
+=item C<userDatavp>
+
+User context that will be used as-us within the callbacks.
+
+=item C<grammarOptionSetterp>
+
+Grammar option callback setter. If it is C<NULL>, grammar is clone with the same options as the original, otherwise C<marpaWrapperGrammarOptionp> is an input/output variable pointer containing the options of the grammar.
+
+=item C<symbolOptionSetterp>
+
+Symbol option callback setter. If it is C<NULL>, symbols are cloned as the original, otherwise C<marpaWrapperGrammarSymbolOptionp> is an input/output variable pointer containing the options of the symbol C<symboli>.
+
+=item C<ruleOptionSetterp>
+
+Rule option callback setter. As for symbols, if it is C<NULL>, rules are also cloned as the original, otherwise C<marpaWrapperGrammarRuleOptionp> is an input/output variable pointer containing the options of the rule C<rulei>.
+
+=back
+
+=head2 marpaWrapperGrammar_newSymboli
+
+  typedef enum marpaWrapperGrammarEventType {
+    MARPAWRAPPERGRAMMAR_EVENTTYPE_NONE       = 0x00,
+    MARPAWRAPPERGRAMMAR_EVENTTYPE_COMPLETION = 0x01,
+    MARPAWRAPPERGRAMMAR_EVENTTYPE_NULLED     = 0x02,
+    MARPAWRAPPERGRAMMAR_EVENTTYPE_PREDICTION = 0x04,
+  } marpaWrapperGrammarEventType_t;
+
+  typedef struct marpaWrapperGrammarSymbolOption {
+    short  terminalb;             /* Default: 0. Eventually force symbol to be terminal         */
+    short  startb;                /* Default: 0. Eventually force symbol to be the start symbol */
+    int    eventSeti;             /* Default: MARPAWRAPPERGRAMMAR_EVENTTYPE_NONE.               */
+  } marpaWrapperGrammarSymbolOption_t;
+
+  marpaWrapperGrammar_newSymboli(marpaWrapperGrammar_t *marpaWrapperGrammarp,
+                                 marpaWrapperGrammarSymbolOption_t *marpaWrapperGrammarSymbolOptionp);
+
+Creates a new symbol. Takes an eventual pointer to a C<marpaWrapperGrammarSymbolOption_t> structure describing symbol options. Such structure contain:
+
+=over
+
+=item terminalb
+
+If this is a true value, it forces the grammar to treat this symbol as a terminal.
+
+=item startb
+
+If this is a true value, it forces the grammar to treat this symbol as the start symbol. Default is to take the very first symbol created as the starting point.
+
+=item eventSeti
+
+A bitwise mask of the following constant values:
+
+=over
+
+=item MARPAWRAPPERGRAMMAR_EVENTTYPE_COMPLETION
+
+This symbol can generate a completed event.
+
+=item MARPAWRAPPERGRAMMAR_EVENTTYPE_NULLED
+
+This symbol can generate a nulling event.
+
+=item MARPAWRAPPERGRAMMAR_EVENTTYPE_PREDICTION
+
+This symbol can generate a predicted event.
+
+=back
+
+A false value is equivalent to MARPAWRAPPERGRAMMAR_EVENTTYPE_NONE, i.e. no event set on this symbol at creation time.
+
+A positive integer is returned on success, -1 on failure. End-user can profit from the fact that the returned number always start at 0 for the very first symbol, and increases by one at every new symbol.
+
+The macro C<MARPAWRAPPERGRAMMAR_NEWSYMBOL(marpaWrapperGrammarp)> exist for convenience, and is stricly equivalent to the call C<marpaWrapperGrammar_newSymboli(marpaWrapperGrammarp, NULL)>.
+
+=back
+
+=head2 marpaWrapperGrammar_symbolPropertyb
+
+  typedef enum marpaWrapperSymbolProperty {
+    MARPAWRAPPER_SYMBOL_IS_ACCESSIBLE = 0x01,
+    MARPAWRAPPER_SYMBOL_IS_NULLABLE   = 0x02,
+    MARPAWRAPPER_SYMBOL_IS_NULLING    = 0x04,
+    MARPAWRAPPER_SYMBOL_IS_PRODUCTIVE = 0x08,
+    MARPAWRAPPER_SYMBOL_IS_START      = 0x10,
+    MARPAWRAPPER_SYMBOL_IS_TERMINAL   = 0x20
+  } marpaWrapperSymbolProperty_t;
+
+  short marpaWrapperGrammar_symbolPropertyb(marpaWrapperGrammar_t *marpaWrapperGrammarp, int symboli, int *marpaWrapperSymbolPropertyBitSetp);
+
+Inspect properties of symbol C<symboli>, putting a bitset result in the value pointed by C<marpaWrapperSymbolPropertyBitSetp>, which can be NULL. Bitset can have the following bits (quoted directly from marpa documentation):
+
+=over
+
+=item MARPAWRAPPER_SYMBOL_IS_ACCESSIBLE
+
+A symbol is I<accessible> if it can be reached from the start symbol.
+
+=item MARPAWRAPPER_SYMBOL_IS_NULLABLE
+
+A symbol is I<nullable> if it sometimes produces the empty string. A B<nulling> symbol is always a B<nullable> symbol, but not all B<nullable> symbols are B<nulling> symbols.
+
+=item MARPAWRAPPER_SYMBOL_IS_NULLING
+
+A symbol is I<nulling> if it always produces the empty string.
+
+=item MARPAWRAPPER_SYMBOL_IS_PRODUCTIVE
+
+A symbol is I<productive> if it can produce a string of terminals. All nullable symbols are considered productive.
+
+=item MARPAWRAPPER_SYMBOL_IS_START
+
+Symbol C<symboli> is the start symbol.
+
+=item MARPAWRAPPER_SYMBOL_IS_TERMINAL
+
+Symbol C<symboli> has been created explicitely as a I<terminal>.
+
+=back
+
+Returns 0 on failure, 1 on success.
+
+=head2 marpaWrapperGrammar_newSymbolExti
+
+  int marpaWrapperGrammar_newSymbolExti(marpaWrapperGrammar_t *marpaWrapperGrammarp,
+                                        short terminalb,
+                                        short startb,
+                                        int eventSeti);
+
+Alternate way to create a symbol, where all the options are explicitely given as parameters. C<terminalb>, C<startb> and C<eventSeti> have the same meaning as in the C<marpaWrapperGrammarSymbolOption_t> structure.
+
+=head2 marpaWrapperGrammar_newRulei
+
+  typedef struct marpaWrapperGrammarRuleOption {
+    int    ranki;          /* Default: 0. Rank                                        */
+    short  nullRanksHighb; /* Default: 0. Null variant pattern                        */
+    short  sequenceb;      /* Default: 0. Sequence ?                                  */
+    int    separatorSymboli; /* Default: -1. Eventual separator symbol                */
+    short  properb;        /* Default: 0. Proper flag                                 */
+    int    minimumi;       /* Default: 0. Mininimum - must be 0 or 1                  */
+  } marpaWrapperGrammarRuleOption_t;
+
+  int marpaWrapperGrammar_newRulei(marpaWrapperGrammar_t *marpaWrapperGrammarp,
+                                   marpaWrapperGrammarRuleOption_t *marpaWrapperGrammarRuleOptionp,
+                                   int lhsSymboli,
+                                   size_t rhsSymboll, int *rhsSymbolip);
+
+Creates a new rule, with LHS symbol C<lhsSymboli>, and C<rhsSymboll> symbols, stored in the array C<rhsSymbolip>. The pointer to an eventual C<marpaWrapperGrammarRuleOption_t> structure give the following options:
+
+=over
+
+=item ranki
+
+Rule priority.
+
+=item nullRanksHighb
+
+Null variants pattern. If 0, nulled symbols rank low, else nulled symbols rank high.
+
+=item sequenceb
+
+If a true value, identifies this rule as being a sequence. Then there must be one RHS symbol, and the following next members take effect:
+
+=item separatorSymboli
+
+If positive or zero, this is the symbol Id of a separator.
+
+=item properb
+
+When it is a true value, says that the separation is proper, i.e. trailing separator is not allowed.
+
+=item minimumi
+
+When it is 0 or '*', says the sequence repeats at least zero time. If 1 or '+', says it repeat at least one time.
+
+=back
+
+A positive integer is returned on success, -1 on failure. End-user can profit from the fact that the returned number always start at 0 for the very first rule, and increases by one at every new rule.
+
+=head2 marpaWrapperGrammar_rulePropertyb
+
+  typedef enum marpaWrapperRuleProperty {
+    MARPAWRAPPER_RULE_IS_ACCESSIBLE = 0x01,
+    MARPAWRAPPER_RULE_IS_NULLABLE   = 0x02,
+    MARPAWRAPPER_RULE_IS_NULLING    = 0x04,
+    MARPAWRAPPER_RULE_IS_LOOP       = 0x08,
+    MARPAWRAPPER_RULE_IS_PRODUCTIVE = 0x10
+  } marpaWrapperRuleProperty_t;
+
+  short marpaWrapperGrammar_rulePropertyb(marpaWrapperGrammar_t *marpaWrapperGrammarp, int rulei, int *marpaWrapperRulePropertyBitSetp);
+
+Inspect properties of rule C<rulei>, putting a bitset result in the value pointed by C<marpaWrapperRulePropertyBitSetp>, which can be NULL. Bitset can have the following bits (quoted directly from marpa documentation):
+
+=over
+
+=item MARPAWRAPPER_RULE_IS_ACCESSIBLE
+
+A rule is I<accessible> if it can be reached from the start symbol. A rule is accessible if and only if its LHS symbol is accessible. The start rule is always an accessible rule.
+
+=item MARPAWRAPPER_RULE_IS_NULLABLE
+
+A rule is I<nullable> if it sometimes produces the empty string. A B<nulling> rule is always a B<nullable> rule, but not all B<nullable> rules are B<nulling> rules.
+
+=item MARPAWRAPPER_RULE_IS_NULLING
+
+A rule is I<nulling> if it always produces the empty string.
+
+=item MARPAWRAPPER_RULE_IS_LOOP
+
+A rule is a loop rule if it non-trivially produces the string of length one which consists only of its LHS symbol. Such a derivation takes the parse back to where it started, hence the term "loop". "Non-trivially" means the zero-step derivation does not count - the derivation must have at least one step.
+
+The presence of a loop rule makes a grammar infinitely ambiguous, and applications will typically want to treat them as fatal errors. But nothing forces an application to do this, and Marpa will successfully parse and evaluate grammars with loop rules.
+
+=item MARPAWRAPPER_RULE_IS_PRODUCTIVE
+
+A rule is I<productive> if it can produce a string of terminals. A rule is productive if and only if all the symbols on its RHS are productive. The empty string counts as a string of terminals, so that a nullable rule is always a productive rule. For that same reason, an empty rule is considered productive.
+
+=back
+
+Returns 0 on failure, 1 on success.
+
+=head2 marpaWrapperGrammar_newRuleExti
+
+  int marpaWrapperGrammar_newRuleExti(marpaWrapperGrammar_t *marpaWrapperGrammarp,
+                                      int ranki,
+                                      short nullRanksHighb,
+                                      int lhsSymboli, ...);
+
+Alternate way to create a rule that is not sequence. The variadic parameter C<...> must end with -1 to identify the end of the RHS list.
+
+The macro C<MARPAWRAPPERGRAMMAR_NEWRULE(marpaWrapperGrammarp, lhsSymboli, ...)> exist for convenience, and is strictly equivalent to C<marpaWrapperGrammar_newRuleExti(marpaWrapperGrammarp, 0, 0, lhsSymboli, ...)>.
+
+=head2 marpaWrapperGrammar_newSequenceExti
+
+  int marpaWrapperGrammar_newSequenceExti(marpaWrapperGrammar_t *marpaWrapperGrammarp,
+                                          int ranki,
+                                          short nullRanksHighb,
+                                          int lhsSymboli,
+                                          int rhsSymboli,
+                                          int minimumi,
+                                          int separatorSymboli,
+                                          short properb);
+
+Alternate way to create a sequence.
+
+The macro C<MARPAWRAPPERGRAMMAR_NEWSEQUENCE(marpaWrapperGrammarp, lhsSymboli, rhsSymboli, minimumi)>, exist for convenience, and is equivalent to calling C<marpaWrapperGrammar_newSequenceExti(marpaWrapperGrammarp, 0, 0, lhsSymboli, rhsSymboli, minimumi, -1, 0)>.
+
+=head2 marpaWrapperGrammar_eventb
+
+  typedef struct marpaWrapperGrammarEvent {
+    enum {
+      MARPAWRAPPERGRAMMAR_EVENT_COMPLETED,
+      MARPAWRAPPERGRAMMAR_EVENT_NULLED,
+      MARPAWRAPPERGRAMMAR_EVENT_EXPECTED,
+      MARPAWRAPPERGRAMMAR_EVENT_EXHAUSTED
+    } eventType;
+    int symboli; /* -1 in case of exhaustion, symbolId otherwise */
+  } marpaWrapperGrammarEvent_t;
+
+  short marpaWrapperGrammar_eventb(marpaWrapperGrammar_t *marpaWrapperGrammarp, size_t *eventlp, marpaWrapperGrammarEvent_t **eventpp, short forceReloadb);
+
+Return the list of events. Number of events is stored in C<eventlp>, and C<eventpp> is the list itself. This list of owned by the grammar and must B<not> be freed by the caller. Events are always pre-fetched whenever necessary, that is the C<forceReloadb> parameter should be 0 in all situations. Nevertheless, a true value for C<forceReloadb> is allowed.
+
+Returns 0 on failure, 1 on success.
+
+=head2 marpaWrapperGrammar_precomputeb
+
+  short marpaWrapperGrammar_precomputeb(marpaWrapperGrammar_t *marpaWrapperGrammarp);
+
+Compute the grammar. Return 0 on failure, 1 on success. Eventual events are automatically fetched.
+
+=head2 marpaWrapperGrammar_precompute_startb
+
+  short marpaWrapperGrammar_precomputeb(marpaWrapperGrammar_t *marpaWrapperGrammarp, int starti);
+
+Compute the grammar by fixing beforehand the start symbol to C<starti>, regardless if a symbol was marked previously as being the start symbol or not. Return 0 on failure, 1 on success. Eventual events are automatically fetched.
+
+=head2 marpaWrapperGrammar_freev
+
+  void marpaWrapperGrammar_freev(marpaWrapperGrammar_t *marpaWrapperGrammarp);
+
+Destructor of the grammar wrapper pointed by C<marpaWrapperGrammarp>.
+
+=head1 RECOGNIZER METHODS
+
+There is one notion to know about in the recognizer: it has an internal I<position>, that is called below an I<Earley Set Id>: initially 0, every completion of alternatives advances that position. This notion exposes some internals of the wrapped L<libmarpa|https://jeffreykegler.github.io/Marpa-web-site/libmarpa.html>, that is an L<Earley Parser|https://en.wikipedia.org/wiki/Earley_parser>.
+
+=head2 marpaWrapperRecognizer_newp
+
+  typedef struct marpaWrapperRecognizerOption {
+    genericLogger_t *genericLoggerp;             /* Default: NULL. */
+    short            disableThresholdb;          /* Default: 0.    */
+    short            exhaustionEventb;           /* Default: 0.                                         */
+  } marpaWrapperRecognizerOption_t;
+
+   marpaWrapperRecognizer_t *marpaWrapperRecognizer_newp(marpaWrapperGrammar_t *marpaWrapperGrammarp,
+                                                         marpaWrapperRecognizerOption_t *marpaWrapperRecognizerOptionp);
+
+Instanciate a recognizer wrapper, using a grammar pointer that must be precomputed, and takes an eventual pointer to a C<marpaWrapperRecognizerOption_t> structure describing recognizer options. This structure contains the following members:
+
+=over
+
+=item genericLoggerp
+
+An eventual generic logger. If NULL, the recognizer will never log.
+
+=item disableThresholdb
+
+If this is a true value, disable Earley item warning threshold.
+
+=item exhaustionEventb
+
+Generate an MARPAWRAPPERGRAMMAR_EVENT_EXHAUSTED event when parse tree is exhausted. When not set, no exhaustion event is ever generated.
+
+=back
+
+C<NULL> is returned in case of failure.
+
+=head2 marpaWrapperRecognizer_alternativeb
+
+  short marpaWrapperRecognizer_alternativeb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp,
+                                            int symboli,
+                                            int valuei,
+                                            int lengthi);
+
+Pushes symbol number C<symboli> as an alternative, with a value C<valuei> that must be a positive integer (up to the end-user to associate this to something else - typically using C<valuei> as an index in an array of I<user-only-knows> other values), and a length C<lengthi> that must also be a positive integer. Please note that C<lengthi>, here, is I<not> the length in the input stream, but becayse Marpa has support to overlapping tokens, i.e. this is the length I<within> the grammar - almost any application will want to use the value C<1>.
+
+Returns 1 on success, 0 on failure.
+
+=head2 marpaWrapperRecognizer_completeb
+
+  short marpaWrapperRecognizer_completeb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp);
+
+Ends an alternative serie. Returns 1 on success, 0 on failure.
+
+=head2 marpaWrapperRecognizer_readb
+
+  short marpaWrapperRecognizer_readb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp,
+                                     int symboli,
+                                     int valuei,
+                                     int lengthi);
+
+Convenient method that is combining calls to C<marpaWrapperRecognizer_alternativeb> and C<marpaWrapperRecognizer_completeb> on a single symbol, useful when the end-user knows there is only one alternative.
+
+Returns 1 on success, 0 on failure.
+
+=head2 marpaWrapperRecognizer_latestb
+
+  short marpaWrapperRecognizer_latestb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp, int *earleySetIdip);
+
+Put the latest Earleme Set Id in the value pointed by C<earleySetIdip>, if it is not C<NULL>. The user is foreseen to keep track of any associated data, and use the methods C<marpaWrapperValue_value_startb()> and C<marpaWrapperValue_value_lengthb()> to process some Earleme Set Id related information during valuation.
+
+Returns 1 on success, 0 on failure.
+
+=head2 marpaWrapperRecognizer_readb
+
+  short marpaWrapperRecognizer_readb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp,
+                                     int symboli,
+                                     int valuei,
+                                     int lengthi);
+
+Convenient method that is combining calls to C<marpaWrapperRecognizer_alternativeb> and C<marpaWrapperRecognizer_completeb> on a single symbol, useful when the end-user knows there is only one alternative.
+
+Returns 1 on success, 0 on failure.
+
+=head2 marpaWrapperRecognizer_event_onoffb
+
+  short marpaWrapperRecognizer_event_onoffb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp,
+                                            int symboli,
+                                            marpaWrapperGrammarEventType_t eventSeti,
+                                            int onoffb);
+
+Sets on or off an event on symbol number C<symboli>, using a bit-wise C<eventSeti>, and a flag C<onoffb>. Any true value for C<onoffb> is interpreted as event being set, a false value (i.e. 0) meaning the event is unset. The parameter C<eventSeti> has the same meaning as when creating a symbol, i.e. it is a logical I<OR> between:
+
+A bitwise mask of the following constant values:
+
+=over
+
+=item MARPAWRAPPERGRAMMAR_EVENTTYPE_COMPLETION
+
+This symbol can generate a completed event.
+
+=item MARPAWRAPPERGRAMMAR_EVENTTYPE_NULLED
+
+This symbol can generate a nulling event.
+
+=item MARPAWRAPPERGRAMMAR_EVENTTYPE_PREDICTION
+
+This symbol can generate a predicted event.
+
+=back
+
+Returns 1 on success, 0 on failure.
+
+=head2 marpaWrapperRecognizer_expectedb
+
+  short marpaWrapperRecognizer_expectedb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp,
+                                         size_t *nSymbollp,
+                                         int **symbolArraypp);
+
+Gets the list of expected symbols, the number of them being stored in C<*nSymbollp> and their identifier in the C<*symbolArraypp> array. End-user must not free the array, it is owned by the recognizer wrapper.
+
+Returns 1 on success, 0 on failure.
+
+=head2 marpaWrapperRecognizer_exhaustedb
+
+  short marpaWrapperRecognizer_exhaustedb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp, short *exhaustedbp);
+
+Gets the exhaustion status of the recognizer into the value pointed by C<exhaustedbp> if it not C<NULL>. A true value means the recognizer is exhausted, a false value means it is not.
+
+Returns 1 on success, 0 on failure.
+
+=head2 marpaWrapperRecognizer_progressb
+
+  typedef struct marpaWrapperRecognizerProgress {
+    int earleySetIdi;
+    int earleySetOrigIdi;
+    int rulei;
+    int positioni;
+  } marpaWrapperRecognizerProgress_t;
+
+  short marpaWrapperRecognizer_progressb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp,
+                                         int starti,
+                                         int endi,
+                                         size_t *nProgresslp,
+                                         marpaWrapperRecognizerProgress_t **progresspp);
+
+Given two I<recognizer position set>s C<starti> and C<endi>, this method returns C<*nProgresslp> progress lines, each of them being indexed in the array C<*progresspp>. C<starti> and C<endi> follow the perl's L<splice|http://perldoc.perl.org/functions/splice.html> method conventions for an offset, i.e.: if the value is negative, start that far from the end of all positions. A full parse progress report is consequencly obtained by specifying C<0> for C<starti>, and C<-1> for C<endi>. Every progress line is a C<marpaWrapperRecognizerProgress_t> structure that contain:
+
+=over
+
+=item earleySetIdi
+
+Current I<earley position set>
+
+=item earleySetOrigIdi
+
+Original I<earley position set>
+
+=item rulei
+
+Rule identifier, as returned by C<marpaWrapperGrammar_newRulei>, C<marpaWrapperGrammar_newRuleExti> or C<marpaWrapperGrammar_newSequenceExti>
+
+=item positioni
+
+Position inside C<rulei>, where a value C<-1> means rule completion.
+
+=back
+
+Returns 1 on success, 0 on failure.
+
+=head2 marpaWrapperRecognizer_progressLogb
+
+  typedef char *(symbolDescriptionCallback_t)(void *userDatavp, int symboli);
+
+  marpaWrapperRecognizer_progressLogb(marpaWrapperRecognizer_t *marpaWrapperRecognizerp,
+                                      int starti, int endi,
+                                      genericLoggerLevel_t logleveli,
+                                      void *userDatavp,
+                                      symbolDescriptionCallback_t symbolDescriptionCallbackp);
+
+Convenient method that is using the eventual generic logger specified at object instance phase: if the generic logger is set, then this method will call it with the logging level C<logleveli>, using a symbol description returned by callback C<symbolDescriptionCallbackp>. C<userDatavp> is an opaque pointer, typically used to propagate a userspace context, the callback will be used for every symbol identifier C<symboli>. If no callback, or if the callback returns C<NULL>, the hardcoded symbol description C<?> is used.
+
+Every call to the generic logger will have this format: C<[%c%d@%d..%d] %s> where first C<%c> character is:
+
+=over
+
+=item 'F'
+
+Rule is finished
+
+=item 'R'
+
+Rule is being recognized
+
+=item 'P'
+
+Rule is being predicted
+
+=back
+
+The second item C<%d> is the current rule identifier. Then C<%d..%d> is the I<earleme identifier> corresponding to C<earleySetOrigIdi> followed by the I<earleme identifier> corresponding to C<earleySetIdi>. The rest is the rule description: there are as many calls to the logger as there are RHS. Position will show as the C<.> dot character. Please note that in the usual I<token-stream> model, the I<earleme identifier> is the same as the I<earley set identifier>.
+
+Returns 1 on success, 0 on failure.
+
+=head2 marpaWrapperRecognizer_freev
+
+  void marpaWrapperRecognizer_freev(marpaWrapperRecognizer_t *marpaWrapperRecognizerp);
+
+Destructor of the recognizer wrapper pointed by C<marpaWrapperRecognizerp>.
+
+=head1 VALUES METHODS
+
+=head2 marpaWrapperValue_newp
+
+  typedef struct marpaWrapperValueOption {
+    genericLogger_t                   *genericLoggerp;             /* Default: NULL */
+    short                              highRankOnlyb;              /* Default: 1 */
+    short                              orderByRankb;               /* Default: 1 */
+    short                              ambiguousb;                 /* Default: 0 */
+    short                              nullb;                      /* Default: 0 */
+    int                                maxParsesi;                 /* Default: 0 */
+  } marpaWrapperValueOption_t;
+
+  marpaWrapperValue_t *marpaWrapperValue_newp(marpaWrapperRecognizer_t *marpaWrapperRecognizerp,
+                                              marpaWrapperValueOption_t *marpaWrapperValueOptionp);
+
+Instanciate a value wrapper, and takes an eventual pointer to a C<marpaWrapperValueOption_t> structure describing value options. This structure contains the following members:
+
+=over
+
+=item genericLoggerp
+
+An eventual generic logger. If NULL, the grammar will never log.
+
+=item highRankOnlyb
+
+Only rules with highest rank will be considered.
+
+=item orderByRankb
+
+Different parse tree values are returned ordered by rank.
+
+=item ambiguousb
+
+Allows a parse to be ambiguous.
+
+=item nullb
+
+Allows a parse to be undefined.
+
+=item maxParsesi
+
+Limit the number of parse trees traversals. A value lower or equal to zero mean this is unlimited.
+
+=back
+
+C<NULL> is returned in case of failure.
+
+=head2 marpaWrapperValue_valueb
+
+  typedef short (*marpaWrapperValueRuleCallback_t)(void *userDatavp, int rulei, int arg0i, int argni, int resulti);
+  typedef short (*marpaWrapperValueSymbolCallback_t)(void *userDatavp, int symboli, int argi, int resulti);
+  typedef short (*marpaWrapperValueNullingCallback_t)(void *userDatavp, int symboli, int resulti);
+
+  short marpaWrapperValue_valueb(marpaWrapperValue_t               *marpaWrapperValuep,
+                                 void                              *userDatavp,
+                                 marpaWrapperValueRuleCallback_t    ruleCallbackp,
+                                 marpaWrapperValueSymbolCallback_t  symbolCallbackp,
+                                 marpaWrapperValueNullingCallback_t nullingCallbackp);
+
+Get the current parse tree value. It is recommended to set the three different callbacks to valid function pointers. Every callback will be called with C<userDatavp> as first argument, typically used to propagate user context, and with C<resulti> as last argument, which is the destination indice in a I<output> generic stack.
+
+The C<ruleCallbackp> callback also has:
+
+=over
+
+=item rulei
+
+Rule identifier
+
+=item arg0i
+
+low indice in the I<output> generic stack, used as input for this rule
+
+=item argni
+
+high indice in the I<output> generic stack, used as input for this rule
+
+=back
+
+The C<symbolCallbackp> callback has:
+
+=over
+
+=item symboli
+
+Symbol identifier
+
+=item argi
+
+indice in the I<input> generic stack
+
+=back
+
+The C<nullingCallbackp> callback has:
+
+=over
+
+=item symboli
+
+Symbol identifier
+
+=back
+
+A typical portable implemententation is using a generic stack that distinguishes between user input (i.e. the lexing phase) and parse tree values: user input has its own generic stack, and a parse tree value have its own as well. In such implemention, only the symbol callback should take data from the I<input> generic stack (at indice C<argi>>, and put result in the I<output>, i.e. the parse tree value, generic stack (at indice C<resulti>). All the other methods deal only with the I<output> generic stack.
+
+A typical usage is:
+
+  while (marpaWrapperValue_valueb(marpaWrapperValuep, ...) > 0) {
+    /* Output is in indice 0 of output stack */
+  }
+
+An example of generic stack with indice is the L<genericStack|https://github.com/jddurand/c-genericStack> package, used in the test-suite of marpaWrapper.
+
+Returns -1 on failure, 0 when there is no more parse value, and 1 on success.
+
+=head2 marpaWrapperValue_value_startb
+
+  short marpaWrapperValue_value_startb(marpaWrapperValue_t *marpaWrapperValuep, int *startip);
+
+Get the Start Earleme Set Id in the value pointed by C<startip>, if it is not C<NULL>.
+
+This method will always fail if it is called outside of a value callback. This mean that you have to arrange to get C<marpaWrapperValuep> via the opaque context of the callbacks.
+
+Returns a true value value, a false value on failure.
+
+=head2 marpaWrapperValue_value_lengthb
+
+  short marpaWrapperValue_value_lengthb(marpaWrapperValue_t *marpaWrapperValuep, int *lengthip);
+
+Get the number of Earleme Set Ids in the value pointed by C<lengthip>, if it is not C<NULL>.
+
+This method will always fail if it is called outside of a value callback. This mean that you have to arrange to get C<marpaWrapperValuep> via the opaque context of the callbacks.
+
+Returns a true value value, a false value on failure.
+
+=head2 marpaWrapperValue_freev
+
+  void marpaWrapperValue_freev(marpaWrapperValue_t *marpaWrapperValuep);
+
+Destructor of the value wrapper pointed by C<marpaWrapperValuep>.
+
+=head1 FOREST TREE METHODS
+
+User will nagivate in a parse tree forest, and will be able to get all possible alternatives at a given point, eventually rejecting those unwanted. Internally, the wrapper will maintain a node within the parse tree forest, from where nagivation goes on.
+
+=head2 marpaWrapperAsf_newp
+
+  typedef struct marpaWrapperAsfOption {
+    genericLogger_t *genericLoggerp;             /* Default: NULL. */
+    short            highRankOnlyb;              /* Default: 1 */
+    short            orderByRankb;               /* Default: 1 */
+    short            ambiguousb;                 /* Default: 0 */
+    int              maxParsesi;                 /* Default: 0 */
+  } marpaWrapperAsfOption_t;
+
+  marpaWrapperAsf_t *marpaWrapperAsf_newp(marpaWrapperRecognizer_t *marpaWrapperRecognizerp,
+                                          marpaWrapperAsfOption_t *marpaWrapperAsfOptionp);
+
+Instanciate a forest tree wrapper, and takes an eventual pointer to a C<marpaWrapperAsfOption_t> structure describing value options. This structure contains the following members:
+
+=over
+
+=item genericLoggerp
+
+An eventual generic logger. If NULL, the forest tree will never log.
+
+=item highRankOnlyb
+
+Only rules with highest rank will be considered.
+
+=item orderByRankb
+
+Different parse tree values are returned ordered by rank.
+
+=item ambiguousb
+
+Allows a parse to be ambiguous.
+
+=item maxParsesi
+
+Limit the number of parse trees traversals. A value lower or equal to zero mean this is unlimited.
+
+=back
+
+C<NULL> is returned in case of failure.
+
+=head2 marpaWrapperAsf_traverseb
+
+  typedef short (*traverserCallback_t)(marpaWrapperAsfTraverser_t *traverserp, void *userDatavp, int *valueip);
+
+  short marpaWrapperAsf_traverseb(marpaWrapperAsf_t *marpaWrapperAsfp,
+                                  traverserCallback_t traverserCallbackp,
+                                  void *userDatavp,
+                                  int *valueip);
+
+Call for a forest tree, using the C<traverserCallbackp> callback function pointer, the later C<userDatavp> as an opaque pointer, typically used to propagate user context. In case of failure, this method returns a false value, else it propagates the traverser callback value in the C<*valueip> integer pointer. This value is typically an indice in an output stack, managed in the user-space. Traverser itself returns a false value in case of failure, and fills its C<*valueip> argument otherwise.
+
+In the forest tree mode, it is important to talk about B<ASF token>s and B<ASF rule>s, instead of I<symbols> and I<rules>: a rule with no RHS is considered a I<trivial> node, and is identified as a B<token>. This mean that, in a forest tree, when we talk about a B<rule>, it is guaranteed that there is at least one RHS.
+
+=head2 marpaWrapperAsf_traverse_rh_lengthl
+
+  int marpaWrapperAsf_traverse_rh_lengthi(marpaWrapperAsfTraverser_t *traverserp);
+
+Returns the number of RHS symbols at the current node, -1 in case of failure. In particular, this will fail if it is called for a I<ASF token>.
+
+=head2 marpaWrapperAsf_traverse_symbolIdb
+
+  short marpaWrapperAsf_traverse_symbolIdb(marpaWrapperAsfTraverser_t *traverserp, int *symbolIdip);
+
+If it returns a true value, then current I<ASF token> Id is filled in C<*symbolIdip>.
+
+=head2 marpaWrapperAsf_traverse_ruleIdb
+
+  short marpaWrapperAsf_traverse_ruleIdb(marpaWrapperAsfTraverser_t *traverserp, int *ruleIdip);
+
+If it returns a true value, then current original rule Id is filled in C<*ruleIdip>. Please note that if current node is an I<ASF token>, it is not an application failure to get the value -1 in C<*ruleIdip>. Therefore, traversers will typically distinguish cases where C<*ruleIdip> is >= 0 or not: if C<*ruleIdip> is < 0, it is a nulling symbol (can be an LHS with no RHS), if C<*ruleIdip> is >= 0 it is a, LHS with at least one RHS.
+
+=head2 marpaWrapperAsf_traverse_nextb
+
+  short marpaWrapperAsf_traverse_nextb(marpaWrapperAsfTraverser_t *traverserp, short *nextbp);
+
+If it returns a true value, then C<*nextbp> contains a true value if there is another alternative, a false value otherwise.
+
+=head2 marpaWrapperAsf_traverse_rh_valueb
+
+  short marpaWrapperAsf_traverse_rh_valueb(marpaWrapperAsfTraverser_t *traverserp, int rhIxi, int *valueip, int *lengthip);
+
+If it returns a true value, then the indice in the user-space output stack of the RHS number C<rhIxi> is set in C<*valueip> for the current node. When current node is an I<ASF token>, C<rhIxi> is ignored. C<*lengthip> is the number of RHS if current node is an I<ASF rule> (guaranteed to be greater than zero), the length (in unit of Earley Set) in the input stream if current node is an I<ASF token>. If C<*lengthip> is zero, it indicates a nullable I<ASF token> (i;e. a rule with no RHS, or a nullable symbol).
+
+=head2 marpaWrapperAsf_recognizerp
+
+  marpaWrapperRecognizer_t *marpaWrapperAsf_recognizerp(marpaWrapperAsf_t *marpaWrapperAsfp);
+
+Convenient method that returns the recognizer wrapper, C<NULL> if failure.
+
+=head2 marpaWrapperAsf_genericLoggerp
+
+  short marpaWrapperAsf_genericLoggerp(marpaWrapperAsf_t *marpaWrapperAsfp, genericLogger_t **genericLoggerpp);
+
+Convenient method that returns the generic logger wrapper in the value pointed by C<genericLoggerpp>. Return a true value on success, a false value on failure .
+
+=head2 marpaWrapperAsfValue_newp
+
+  marpaWrapperAsfValue_t *marpaWrapperAsfValue_newp(marpaWrapperRecognizer_t *marpaWrapperRecognizerp, marpaWrapperAsfOption_t *marpaWrapperAsfOptionp);
+
+Instanciate a new valuator using the ASF. Returns C<NULL> on failure.
+
+=head2 marpaWrapperAsfValue_valueb
+
+  typedef short (*marpaWrapperAsfOkRuleCallback_t)(void *userDatavp, genericStack_t *parentRuleiStackp, int rulei, int arg0i, int argni);
+  typedef short (*marpaWrapperAsfOkSymbolCallback_t)(void *userDatavp, genericStack_t *parentRuleiStackp, int symboli, int argi);
+  typedef short (*marpaWrapperAsfOkNullingCallback_t)(void *userDatavp, genericStack_t *parentRuleiStackp, int symboli);
+
+  marpaWrapperAsfValue_t *marpaWrapperAsfValue_valueb(marpaWrapperAsfValue_t               *marpaWrapperAsfValuep,
+                                                      void                                 *userDatavp,
+                                                      marpaWrapperAsfOkRuleCallback_t       okRuleCallbackp,
+                                                      marpaWrapperAsfOkSymbolCallback_t     okSymbolCallbackp,
+                                                      marpaWrapperAsfOkNullingCallback_t    okNullingCallbackp,
+                                                      marpaWrapperValueRuleCallback_t       valueRuleCallbackp,
+                                                      marpaWrapperValueSymbolCallback_t     valueSymbolCallbackp,
+                                                      marpaWrapperValueNullingCallback_t    valueNullingCallbackp);
+
+This method instanciates a valuation opaque pointer that will allow the user to use the ASF and perform valuation, as if he was using a C<marpaWrapperValue_t> instance. The difference is that the user have the control on which rule or symbol is valid:
+
+=over
+
+=item C<okRuleCallackp>
+
+Return 0 in case of failure, a positive value if success, a negative value if reject. Stack of parent rule IDs is in <parentRuleiStackp>. C<rulei> is the rule number, C<arg0i> and C<argni> are the stack indices.
+
+=item C<okSymbolCallackp>
+
+Return 0 in case of failure, a positive value if success, a negative value if reject. Stack of parent rule IDs is in <parentRuleiStackp>. C<symboli> is the symbol number, and C<argi> is the stack number.
+
+=item C<okNullingCallackp>
+
+Return 0 in case of failure, a positive value if success, a negative value if reject. Stack of parent rule IDs is in <parentRuleiStackp>. C<symboli> is the symbol number.
+
+=item C<valueRuleCallbackp>
+
+Same semantic as for C<marpaWrapperValue_valueb>.
+
+=item C<valueSymbolCallbackp>
+
+Same semantic as for C<marpaWrapperValue_valueb>.
+
+=item C<valueNullingCallbackp>
+
+Same semantic as for C<marpaWrapperValue_valueb>.
+
+=back
+
+C<NULL> is returned in case of failure.
+
+=head2 marpaWrapperAsfValue_valueb
+
+  short marpaWrapperAsfValue_valueb(marpaWrapperAsfValue_t *marpaWrapperAsfValuep);
+
+An example of how to use the ASF API. This method simulate the marpaWrapperValue_valueb() behaviour, but using the ASF, i.e. it returns -1 on failure, 0 when there is no more parse value, and 1 on success.
+
+=head2 marpaWrapperAsfValue_value_startb
+
+  short marpaWrapperAsfValue_value_startb(marpaWrapperAsfValue_t *marpaWrapperAsfValuep, int *startip);
+
+Get the Start Earleme Set Id in the value pointed by C<startip>, if it is not C<NULL>.
+
+This method will always fail if it is called outside of an ASF callback. This mean that you have to arrange to get C<marpaWrapperAsfValuep> via the opaque context of the callbacks.
+
+Returns a true value value, a false value on failure.
+
+=head2 marpaWrapperAsfValue_value_lengthb
+
+  short marpaWrapperAsfValue_value_lengthb(marpaWrapperAsfValue_t *marpaWrapperAsfValuep, int *lengthip);
+
+Get the number of Earleme Set Ids in the value pointed by C<lengthip>, if it is not C<NULL>.
+
+This method will always fail if it is called outside of an ASF callback. This mean that you have to arrange to get C<marpaWrapperAsfValuep> via the opaque context of the callbacks.
+
+Returns a true value value, a false value on failure.
+
+=head2 marpaWrapperAsfValue_freev
+
+  void marpaWrapperAsfValue_freev(marpaWrapperAsfValue_t *marpaWrapperAsfValuep);
+
+Destructor of the ASF value instance pointed by C<marpaWrapperAsfValuep>.
+
+=head2 marpaWrapperAsf_freev
+
+  void marpaWrapperAsf_freev(marpaWrapperAsf_t *marpaWrapperAsfp)
+
+Destructor of the ASF instance pointed by C<marpaWrapperAsfp>.
+
+=head1 NOTES
+
+=over
+
+=item Vaue and Forest Tree methods
+
+They are both exclusive. I.e. once you enter the value method, you cannot call for a forest tree, vice and versa.
+
+=item Forest Tree constraint
+
+A technical limitation on getting the value associated to a lexeme imposes that forest tree is possible only if C<lengthi> parameter of any call to C<marpaWrapperRecognizer_alternativeb> is the value C<1>. This is the case for almost any application.
+
+=back
+
+=head1 SEE ALSO
+
+L<libmarpa|https://jeffreykegler.github.io/Marpa-web-site/libmarpa.html>, L<genericLogger|https://github.com/jddurand/c-genericLogger>, L<genericStack|https://github.com/jddurand/c-genericStack>

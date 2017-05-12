@@ -1,0 +1,56 @@
+Revision history for Perl module Math::NV
+ 1.01
+    - Correct tests in t/07nv_mpfr.t.
+
+ 1.0
+    - Add nv_mpfr() and is_eq_mpfr() functions. (Also added $Math::NV::no_mpfr.)
+    - Add $Math::NV::no_warn; and check is_arg(), is_arg_mpfr(), nv_mpfr() and nv()
+      for non-string args.
+
+0.08
+    - Change tack to concentrate on simply checking that the Math::NV functions
+      work correctly, and don't worry about trying to uncover discrepancies between
+      respective values assigned by perl and C. (This calls for a major change of
+      the test suite, and a small change to the documentation.)
+    - Remove Data::Float dependency.
+    - Remove mant2binary() and mant_str2binary(). (They were incorrect, and unnecessary.)
+
+0.07
+    - Make corrections to POD documentation.
+    - Remove Data::Float::DoubleDouble from list of prereqs on doubledouble builds
+      (as that module already lists this module as a prereq).
+
+0.06
+    - Accommodate nvtype of __float128
+    - Remove the 2nd arg (flag) from ld2binary() and ld_str2binary(). (Now takes
+      only one argument.)
+    - In t/07ld2binary.t, attempt to make allowances for locale settings of
+      decimal point.
+    - Add t/07ld2binary_doubledouble.t
+
+0.05
+    - Add extra diagnostics to t/07ld2binary.t in an attempt to determine
+      the cause of the failures that occur on some machines.
+
+0.04
+    - Minor rewrite of _ld2binary and _ld_str2binary to work with doubles
+      as well as long doubles
+    - Add bin2val function
+    - Add Cprintf and Csprintf functions
+
+0.03
+    - Add t/10exponent_0_to_12.t.
+    - Define PERL_NO_GET_CONTEXT.
+    - Add metadata to Makefile.PL.
+
+0.02
+    - Add 08compiler_bugs.t and 09list_context.t.
+    - Add is_eq(), mant2binary() and mant_str2binary() functions,
+      along with test scripts 06is_eq.t and 07mant2binary.t.
+    - Rewrite 04mpfr_str_checks.t and 05mpfr_nv_checks.t.
+    - nv() can now be called in either scalar or array context,
+      like POSIX::strtod().
+
+0.01 2013-11-01
+    - First release to CPAN
+

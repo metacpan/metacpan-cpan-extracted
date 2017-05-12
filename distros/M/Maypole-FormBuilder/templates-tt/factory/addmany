@@ -1,0 +1,16 @@
+[% INCLUDE header %]
+[% PERL %]
+	$stash->set('a_moniker', $stash->get('add_to')->moniker);
+[% END %]
+
+<h1>Add [% how_many %] [% mclass.plural_moniker %] to [% a_moniker %]: [% add_to %]</h1>
+
+<div class="AddMany" style="float:left">
+<fieldset>
+[% request.as_multiform( 'addmany', 
+	'how_many', how_many, 
+	'mode_args',  { addto =  add_to, how_many = how_many }
+).render %]
+</fieldset>
+</div>
+[% INCLUDE footer %]

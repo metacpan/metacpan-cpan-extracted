@@ -1,0 +1,13 @@
+---
+
+include:
+    - defaults.yml
+
+syslog:
+    style: Postfix
+    file: set-in-tests
+
+parser:
+    - Stats: log-parser/stats.yml
+    - Aggregator: log-parser/aggregator.yml
+

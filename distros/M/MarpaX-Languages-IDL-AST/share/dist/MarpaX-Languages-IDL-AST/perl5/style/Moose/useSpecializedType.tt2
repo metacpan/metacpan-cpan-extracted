@@ -1,0 +1,8 @@
+[%~ SWITCH type ~%]
+  [%~ CASE ['ArrayRef', 'Int'] ~%]
+    [%~ moosexTypesMoosePerScope.$currentFullyQualifiedScopedName.$type = 1 ~%]
+  [%~ CASE 'Dict' ~%]
+    [%~ moosexTypesStructuredPerScope.$currentFullyQualifiedScopedName.$type = 1 ~%]
+  [%~ CASE ~%]
+    [%~ moosexTypesPerScope.$currentFullyQualifiedScopedName.$type = 1 ~%]
+[%~ END ~%]

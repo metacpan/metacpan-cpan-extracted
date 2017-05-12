@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/pwb
+lib/MediaWiki/Bot/Shell.pm
+t/00_initialize.t
+xt/release/distmeta.t
+xt/release/eol.t
+xt/release/has-version.t
+xt/release/no-tabs.t
+xt/release/pod-syntax.t
+xt/release/synopsis.t

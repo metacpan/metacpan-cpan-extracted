@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist SYSTEM "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="0.9">
+<dict>
+	<key>Applications</key>
+	<array>
+		<dict>
+			<key>Opacity</key>
+			<integer>15</integer>
+			<key>StyleCmdM</key>
+			<integer>5</integer>
+			<key>StyleControlClick</key>
+			<integer>2</integer>
+			<key>StyleDoubleClick</key>
+			<integer>1</integer>
+			<key>StyleWidget</key>
+			<integer>5</integer>
+		</dict>
+	</array>
+	<key>RegCode</key>
+	<data>
+	a2lsbGluZ2x5
+	</data>
+	<key>RegName</key>
+	<data>
+	YnJpYW4gZCBmb3k=
+	</data>
+	<key>RegPass</key>
+	<data>
+	Y29tZG9nQHBhbml4LmNvbQ==
+	</data>
+	<key>RegValid</key>
+	<true/>
+	<key>Sounds</key>
+	<true/>
+</dict>
+</plist>

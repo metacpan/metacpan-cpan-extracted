@@ -1,0 +1,28 @@
+Revision history for Mail-GcalReminder
+
+0.5  Sun Dec 28 21:29:11 2014
+    - fix prereq NS
+    - Switch full/ Atom to use ical for reliability
+    - deprecate date_format_obj() since it was needed for Atom data
+
+0.4  Mon Jun  7 10:17:53 2014
+    - Switch from basic/ Atom to full/ Atom for reliability
+
+0.3  Sun Feb  9 21:21:03 2014
+    - add date to v0.2 Changes entry
+    - POD sigil
+    - handle second date format, note other TODOs regarding similar limits
+
+0.2  Fri Feb  7 19:54:19 2014
+    - POD example typo fix
+    - TODO about config file
+    - essg_hax_ver version update
+    - Add time_zone attribute
+    - Add desc key to "hashref of event details"
+    - warn/skip when $date is not parsed
+    - use Test::Deep to make test 02 more reliable
+    - add include_event_dt_obj attribute and event_dt_obj "hashref of event details" entry
+
+0.1  Thu Apr 11 10:18:19 2013
+       Initial release.
+

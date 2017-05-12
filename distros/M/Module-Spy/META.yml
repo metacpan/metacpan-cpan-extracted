@@ -1,0 +1,51 @@
+---
+abstract: 'Spy for Perl5'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Spy
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Module::Spy:
+    file: lib/Module/Spy.pm
+    version: '0.07'
+  Module::Spy::Base:
+    file: lib/Module/Spy.pm
+  Module::Spy::Class:
+    file: lib/Module/Spy.pm
+  Module::Spy::Object:
+    file: lib/Module/Spy.pm
+  Module::Spy::Sub:
+    file: lib/Module/Spy.pm
+requires:
+  Class::Load: '0'
+  Scalar::Util: '0'
+  parent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/tokuhirom/Module-Spy/issues
+  homepage: https://github.com/tokuhirom/Module-Spy
+  repository: git://github.com/tokuhirom/Module-Spy.git
+version: '0.07'
+x_contributors:
+  - 'Pine Mizune <pinemz@gmail.com>'
+  - 'aereal <aereal@aereal.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

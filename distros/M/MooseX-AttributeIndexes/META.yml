@@ -1,0 +1,68 @@
+---
+abstract: 'Advertise metadata about your Model-Representing Classes to Any Database tool.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+  - 'Jesse Luehrs <doy@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Moose: '0'
+  Test::More: '0.92'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-AttributeIndexes
+provides:
+  Moose::Meta::Attribute::Custom::Trait::Indexed:
+    file: lib/Moose/Meta/Attribute/Custom/Trait/Indexed.pm
+    version: '2.000001'
+  MooseX::AttributeIndexes:
+    file: lib/MooseX/AttributeIndexes.pm
+    version: '2.000001'
+  MooseX::AttributeIndexes::Meta::Attribute::Trait::Indexed:
+    file: lib/MooseX/AttributeIndexes/Meta/Attribute/Trait/Indexed.pm
+    version: '2.000001'
+  MooseX::AttributeIndexes::Meta::Role:
+    file: lib/MooseX/AttributeIndexes/Meta/Role.pm
+    version: '2.000001'
+  MooseX::AttributeIndexes::Meta::Role::ApplicationToClass:
+    file: lib/MooseX/AttributeIndexes/Meta/Role/ApplicationToClass.pm
+    version: '2.000001'
+  MooseX::AttributeIndexes::Meta::Role::ApplicationToRole:
+    file: lib/MooseX/AttributeIndexes/Meta/Role/ApplicationToRole.pm
+    version: '2.000001'
+  MooseX::AttributeIndexes::Meta::Role::Composite:
+    file: lib/MooseX/AttributeIndexes/Meta/Role/Composite.pm
+    version: '2.000001'
+  MooseX::AttributeIndexes::Provider:
+    file: lib/MooseX/AttributeIndexes/Provider.pm
+    version: '2.000001'
+  MooseX::AttributeIndexes::Provider::FromAttributes:
+    file: lib/MooseX/AttributeIndexes/Provider/FromAttributes.pm
+    version: '2.000001'
+recommends:
+  Moose: '2.000'
+requires:
+  Moose: '0.94'
+  Moose::Exporter: '0'
+  Moose::Role: '0'
+  Moose::Util::MetaRole: '0'
+  MooseX::Types::Moose: '0.19'
+  Scalar::Util: '0'
+  namespace::clean: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/MooseX-AttributeIndexes/issues
+  homepage: https://github.com/kentnl/MooseX-AttributeIndexes
+  repository: https://github.com/kentnl/MooseX-AttributeIndexes.git
+version: '2.000001'

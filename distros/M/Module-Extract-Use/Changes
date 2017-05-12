@@ -1,0 +1,59 @@
+Revision history for Perl module Module::Extract::Use
+
+1.043 2017-02-03T03:24:02Z
+	* Clarified license (GitHub issue #3 https://github.com/briandfoy/module-extract-use/issues/3)
+
+1.042 2017-02-01T02:46:27Z
+	* The -l and -j options work on the list of namespaces from all 
+	files together instead of the list per file. Otherwise strict 
+	and warnings always show up multiple times!
+
+1.041 2017-02-01T01:58:04Z
+	* Add JSON and simple list outputs for examples/extract_modules
+
+1.04 - 2014-01-04
+	* Get rid of MYMETA
+	* Update test data structures for latest behavior
+
+1.03 - 2012-08-02
+	* Note the "pragma" field in the module details (RT 78728)
+
+1.02 - 2011-11-01
+	* Adjusted no_index. No code changes.
+
+1.01 - 2011-03-30
+	* Promote to a stable version
+	* Some files moved around, and I updated the copyright statements
+	for downstream ease.
+
+0.18 - 2011-03-21
+	Implemented get_modules_with_details to extract the
+	version and import lists for a use().
+
+0.16 - 2009-06-10
+	* Small distro cleanups and new META_MERGE hotness. No need
+	to upgrade.
+
+0.15 - 2009-05-31
+	* Debian wants the man pages, so I guess I'll make them
+	after all
+
+0.14 - 2009-05-20
+	* Adjust PPI bits to look for 'require' bits too
+	* Add extract_modules example from Jonathan Yu
+
+0.13 - 2008-10-29
+	* Only return unique elements, so remove the duplicates
+	from the return list
+
+0.12 - 2008-10-29
+	* No more carping. Check the value of $object->error after a call
+	to see if anything bad happened.
+
+0.11 - 2008-10-28
+	* Bump to a release version
+
+0.10_01 - 2008-08-15
+	* First release of a module to pull out the package names
+
+

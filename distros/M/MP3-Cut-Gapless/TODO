@@ -1,0 +1,3 @@
+Write ID3 tags in Track::write()
+Command-line tool to split using a cue sheet
+Change cache_dir structure to multi-level

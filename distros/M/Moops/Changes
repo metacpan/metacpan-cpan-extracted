@@ -1,0 +1,347 @@
+Moops
+=====
+
+Created:      2013-06-30
+Home page:    <https://metacpan.org/release/Moops>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Moops>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.034	2014-10-12
+
+ [ Bug Fixes ]
+ - Fix enormous memory leak leading to segfault caused when a role
+   application in a scope guard threw an exception.
+   Fixes RT#99389.
+   Fixes RT#99409.
+   Ben Goldberg++
+   Lukas Atkinson++
+   Søren Døssing++
+   <https://rt.cpan.org/Ticket/Display.html?id=99389>
+   <https://rt.cpan.org/Ticket/Display.html?id=99409>
+   <http://purl.org/NET/cpan-uri/rt/ticket/99438>
+
+ [ Documentation ]
+ - Bundle a multimethod example (stolen from MooseX:MultiMethods).
+ - Improvements to the SUPPORT and SEE ALSO sections of the documentation.
+ - Warn about some planned changes.
+
+ [ Test Suite ]
+ - Test that `use true` is imported by Moops.
+
+ [ Packaging ]
+ - Remove outdated dependency on Sub::Name from packaging metadata.
+
+ [ Other ]
+ - Updated: namespace::autoclean now supports Moo enough that we can start
+   using it instead of namespace::sweep.
+
+0.033	2014-08-16
+
+ [ Bug Fixes ]
+ - Fix bugs introduced in 0.032 with role application via guards.
+
+ [ Other ]
+ - Updated: Take advantage of improvements in Type::Library/Type::Registry
+   1.000000.
+
+0.032	2014-08-13
+
+ [ BACK COMPAT ]
+ - Role composition is now delayed to the end of a class declaration.
+   Matt S Trout++
+
+ [ Documentation ]
+ - Fix a typo in Moops::Manual::Objects101.
+   Fixes RT#93553.
+   Ron Savage++
+   <https://rt.cpan.org/Ticket/Display.html?id=93553>
+
+ [ Packaging ]
+ - PerlX::Assert is no longer bundled with Moops; it has been split out
+   into a separate distribution.
+
+0.031	2014-03-23
+
+ [ Documentation ]
+ - Fix typo in manual.
+   Fixes RT#93553.
+   Ron Savage++
+   <https://rt.cpan.org/Ticket/Display.html?id=93553>
+ - Use the `true` constant instead of the number 1 in the cli-app.pl
+   example.
+
+ [ Test Suite ]
+ - Test Moops in threaded Perls.
+   Aaron James Trevena++
+
+ [ Other ]
+ - Added: The new import parameter `-strict` enables loading strictures.pm
+   within Moops scopes.
+ - Avoid returning 0 from `assert` statements (PerlX::Assert).
+ - Use Parse::Keyword instead of Devel::Pragma in order to establish the
+   currently compiling package name. Devel::Pragma has issues under
+   ithreads.
+   Piers Cawley++
+
+0.030	2014-01-30
+
+ [ Documentation ]
+ - Include an example using Moops to write a command-line app.
+   Maurice Mengel++
+   <https://github.com/tobyink/p5-moops/pull/1>
+
+ [ Packaging ]
+ - Require at least version 0.027 of Kavorka; this resolves a conflict
+   using Moops with MooX::Options.
+
+ [ Other ]
+ - Hard-code a list of warnings categories to fatalize; this means that
+   warnings categories added to future versions of Perl will not magically
+   become fatal in Moops.
+
+0.029	2014-01-04
+
+ [ Bug Fixes ]
+ - Fix availability of Lexical::Accessor within class {} blocks.
+
+ [ Documentation ]
+ - Copyright 2014.
+
+0.028	2013-12-18
+
+ [ Documentation ]
+ - Demonstrate `is override` trait in Moops::Manual::Objects101.
+
+ [ Packaging ]
+ - Indicate conflict with MooseX::Types::Common 0.001011.
+ - Indicate conflict with MooseX::Types::URI 0.05.
+
+0.027	2013-12-16
+
+ [ Documentation ]
+ - Include an example using multi methods to implement a class method and
+   object method with the same name as each other.
+ - Moops::Manual::Objects101.
+
+ [ Other ]
+ - Added: Private attributes via Lexical::Accessor.
+ - Moose/Mouse classes/roles now have override/augment method modifier
+   keywords.
+
+0.026	2013-11-18
+
+ - Replace Function::Parameters with Kavorka.
+
+0.025	2013-10-09
+
+ [ Documentation ]
+ - Note that a future version of Moops may replace Function::Parameters
+   with Kavorka.
+
+ [ Other ]
+ - Updated: Use Exporter::Tiny.
+
+0.024	2013-09-27
+
+ [ Test Suite ]
+ - Keyword::Simple 0.02 has been released; no longer need to skip
+   t/03lines.t.
+
+0.023	2013-09-26
+
+ [ Bug Fixes ]
+ - Much improved (though not completely perfect) line number accounting.
+
+ [ Documentation ]
+ - Bundle an example of using Moops with Method::Signatures.
+
+0.022	2013-09-16
+
+ - Minor updates to work with Function::Parameters 1.0301.
+
+0.021	2013-09-12
+
+ - Allow version numbers to be specified for the `with`, `extends` and
+   `types` options.
+
+0.020	2013-09-11
+
+ [ BACK COMPAT ]
+ - Moops->import now takes a hash of options (including the `imports`
+   option) rather than an arrayref of modules to import.
+
+ [ Packaging ]
+ - List Moose/Mouse/Moo/Class::Tiny dependencies as optional_features in
+   META.json.
+
+ [ Other ]
+ - Improve Moops' extensibility via parser traits.
+
+0.019	2013-08-30
+
+ - Removed: Removed Class::Tiny::Antlers; this is now a separate CPAN
+   distribution.
+
+0.018	2013-08-27
+
+ - Added: Add a `library` keyword for declaring type libraries.
+ - Declared packages now get an implied BEGIN {...} block around
+   themselves.
+
+0.017	2013-08-21
+
+ - Updated: Support Class::Tiny 0.004.
+
+0.016	2013-08-21
+
+ - Added: Provide a `types` option for loading type constraint libraries
+   into classes, roles and namespaces.
+
+0.015	2013-08-21
+
+ [ Bug Fixes ]
+ - Fix a reference to Moops::DefineKeyword which will only work if you
+   happen to have installed Moops over the top of a pre-0.012 version of
+   Moops.
+ - Load feature.pm so that it's consistently exported to the outer scope.
+
+0.014	2013-08-21
+
+ [ Documentation ]
+ - Document Class::Tiny::Antlers.
+
+ [ Other ]
+ - Added: MooseX::FunctionParametersInfo
+ - Class::Tiny::Antlers now supports has \@attrs like Moose.
+
+0.013	2013-08-20
+
+ [ Bug Fixes ]
+ - Fix test that uses Role::Tiny and Class::Tiny without declaring them
+   (Test::Requires).
+
+0.012	2013-08-20
+
+ [ Documentation ]
+ - Various documentation improvements.
+
+ [ Other ]
+ - Added: PerlX::Assert
+ - Rename Moops::DefineKeyword -> PerlX::Define.
+
+0.011	2013-08-20
+
+ [ Documentation ]
+ - Document Attribute::Handlers-style attributes as an extensibility
+   mechanism.
+
+ [ Other ]
+ - Added: Class::Tiny::Antlers
+ - Added: Moops::TraitFor::Keyword::dirty
+ - Added: Moops::TraitFor::Keyword::mutable
+ - Added: Moops::TraitFor::Keyword::ro
+ - Added: Moops::TraitFor::Keyword::rw
+ - Added: Moops::TraitFor::Keyword::rwp
+ - Added: Support classes built `using Class::Tiny`.
+ - Moose classes will now `use Moose::XSAccessor` if possible.
+ - Use MooseX::MungeHas to 0.002 smooth over more differences between Moo,
+   Mouse and Moose.
+
+0.010	2013-08-19
+
+ - Added: Parse Attribute::Handlers-style attributes attached to package
+   declarations; treat these as traits for the code generator.
+ - Much refactoring.
+ - Rename Moops::CodeGenerator -> Moops::Keyword.
+
+0.009	2013-08-19
+
+ [ Bug Fixes ]
+ - Fix at-runtime hook (used for method modifiers).
+
+ [ Packaging ]
+ - The test suite is now in a reasonable state.
+
+0.008	2013-08-18
+
+ [ Bug Fixes ]
+ - Fix custom imports feature.
+ - Found a remaining hard-coded list of keywords that was breaking
+   extensibility mechanism.
+ - Stop using constant.pm (though it's still required via Moo); this allows
+   `true` and `false` to be correcting swept by namespace::sweep.
+
+ [ Documentation ]
+ - Bundle an example showing how to extend Moops.
+
+ [ Packaging ]
+ - Add Mouse and Moose as 'runtime suggests' dependencies.
+ - Add Perl 5.14 as an explicit dependency.
+ - More test suite improvements; still more to do.
+
+0.007	2013-08-18
+
+ [ Bug Fixes ]
+ - Fix parsing for the `namespace` keyword that was broken in 0.005.
+
+ [ Packaging ]
+ - Dependency - runtime suggestion for MooX::HandlesVia.
+ - More test suite improvements; still more to do.
+
+ [ Other ]
+ - Help Class::Load (and thus Moose) notice that empty roles are loaded by
+   setting $VERSION to an empty string when no version is specified.
+
+0.006	2013-08-16
+
+ [ Documentation ]
+ - Much improved documentation.
+
+ [ Packaging ]
+ - Some test suite improvements; more to come.
+
+ [ Other ]
+ - Call __PACKAGE__->meta->make_immutable on Moose/Mouse classes.
+ - Rename MooX::Aspartame -> Moops.
+
+0.005	2013-08-14
+
+ [ REGRESSIONS ]
+ - Broke `namespace` keyword.
+
+ [ Other ]
+ - Improvements handling comments when parsing.
+ - Massive amounts of refactoring to simplify maintenance and make
+   subclassing easier.
+
+0.004	2013-08-14
+
+ - Added: Implement `before`, `after` and `around` method modifiers.
+ - Added: Implement `define` keyword to declare constants.
+ - Removed: Drop the `classmethod` keyword; it's better to use `method` and
+   give the invocant an explicit variable name.
+ - Removed: Drop the `exporter` keyword; it is better to explicitly create
+   a class extending Exporter::TypeTiny or Exporter.
+ - The `method` keyword is only available in classes and roles; not plain
+   namespaces.
+
+0.003	2013-08-13
+
+ [ Packaging ]
+ - use Dist::Inkt.
+
+ [ Other ]
+ - Added: New keyword `namespace`.
+ - Don't export Try::Tiny to the outer scope, as it's not lexical.
+ - Misc internal refactoring.
+ - Re-implement relative package names, in a new, saner way.
+ - Updated: use Function::Parameters 1.0201, because it has configurable
+   type constraint reification.
+
+0.002	2013-07-17
+
+ - Added: use MooX::late 0.014.
+ - Misc internal refactoring.
+ - Updated: use Moo 1.003000.
+
+0.001	2013-07-01	Initial release

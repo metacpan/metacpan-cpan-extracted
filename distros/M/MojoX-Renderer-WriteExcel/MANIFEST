@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/MojoX/Renderer/WriteExcel.pm
+lib/Mojolicious/Plugin/WriteExcel.pm
+t/00-load.t
+t/author-critic.t
+t/manifest.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/release-renderer.t
+t/renderer.t

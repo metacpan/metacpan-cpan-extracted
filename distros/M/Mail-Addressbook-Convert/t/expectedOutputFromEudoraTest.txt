@@ -1,0 +1,11 @@
+alias Harry_Shetty "Harry Shetty"<harry@wipsys.spl.net>
+alias jhd-2 "Joe Davidson2a"<j.davidson@ieee.org>
+alias jhd1 "Joe Davidson1"<jhd@radix.net>
+alias jhd2 "Joe Davidson2"<jdavidson@interguru.com>
+alias jhd3 "Joe Davidson3"<jdavidson@interguru.com>
+alias Mathew_King "Mathew King"<mjoseph@wipsys.slp.net>
+alias Sameer_Jones "Sameer Jones"<sameer@pardo.com>
+alias list1 jhd3a,jhd1,jhd2
+alias list2 jhd1,jhd2,list1
+alias list3 Sameer_Jones,Harry_Shetty,mathewking
+

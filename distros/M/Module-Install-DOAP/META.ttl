@@ -1,0 +1,137 @@
+@prefix cpan:  <http://purl.org/NET/cpan-uri/person/> .
+@prefix cpant: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix dcs:   <http://ontologi.es/doap-changeset#> .
+@prefix deps:  <http://ontologi.es/doap-deps#> .
+@prefix dist:  <http://purl.org/NET/cpan-uri/dist/Module-Install-DOAP/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix nfo:   <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+dist:project
+	a                 doap:Project;
+	doap:name         "Module-Install-DOAP";
+	cpant:perl_version_from _:B1;
+	cpant:readme_from _:B1;
+	cpant:version_from _:B1;
+	deps:runtime-requirement [ deps:on "Module::Install 1.00"^^deps:CpanId ];
+	deps:runtime-requirement [
+		deps:on "Module::Install::RDF 0.004"^^deps:CpanId;
+	];
+	deps:runtime-requirement [
+		deps:on "Module::Install::Admin::RDF 0.004"^^deps:CpanId;
+	];
+	deps:runtime-requirement [ deps:on "RDF::Trine 0.133"^^deps:CpanId ];
+	deps:test-requirement [ deps:on "Test::More 0.96"^^deps:CpanId ];
+	doap:bug-database <http://rt.cpan.org/Dist/Display.html?Queue=Module-Install-DOAP>;
+	doap:category     [ rdfs:label "RDF" ];
+	doap:category     [ rdfs:label "Semantic Web" ];
+	doap:category     [ rdfs:label "CPAN" ];
+	doap:category     [ rdfs:label "DOAP" ];
+	doap:category     [ rdfs:label "Metadata" ];
+	doap:category     [ rdfs:label "Packaging" ];
+	doap:created      "2011-09-30"^^xsd:date;
+	doap:developer    <http://tobyinkster.co.uk/#i>;
+	doap:documenter   <http://tobyinkster.co.uk/#i>;
+	doap:download-page <https://metacpan.org/release/Module-Install-DOAP>;
+	doap:homepage     <https://metacpan.org/release/Module-Install-DOAP>;
+	doap:license      <http://dev.perl.org/licenses/>;
+	doap:maintainer   <http://tobyinkster.co.uk/#i>;
+	doap:programming-language "Perl";
+	doap:release      dist:v_0-001;
+	doap:release      dist:v_0-002;
+	doap:release      dist:v_0-003;
+	doap:release      dist:v_0-004;
+	doap:release      dist:v_0-005;
+	doap:release      dist:v_0-006;
+	doap:repository   [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-module-install-doap>;
+	];
+	doap:shortdesc    "generate META.yml data from DOAP"@en;
+	doap:tester       <http://tobyinkster.co.uk/#i>.
+
+dist:v_0-001
+	a                 doap:Version;
+	rdfs:label        "Initial release";
+	dc:issued         "2011-10-01"^^xsd:date;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAP-0.001.tar.gz>;
+	doap:revision     "0.001"^^xsd:string.
+
+dist:v_0-002
+	a                 doap:Version;
+	dc:issued         "2011-10-06"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Packaging;
+			rdfs:label "Upgrade Module::Package::RDF version."@en;
+		];
+		dcs:versus dist:v_0-001;
+	];
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAP-0.002.tar.gz>;
+	doap:revision     "0.002"^^xsd:string.
+
+dist:v_0-003
+	a                 doap:Version;
+	dc:issued         "2011-11-26"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			rdfs:label "Use Module::Install::RDF's new heuristics for detecting the doap:Project URI."@en;
+		];
+		dcs:item [ a dcs:Regression; rdfs:label "use parent" ];
+		dcs:versus dist:v_0-002;
+	];
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAP-0.003.tar.gz>;
+	doap:revision     "0.003"^^xsd:string.
+
+dist:v_0-004
+	a                 doap:Version;
+	dc:issued         "2011-12-03"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [ a dcs:Bugfix; rdfs:label "use base" ];
+		dcs:versus dist:v_0-003;
+	];
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAP-0.004.tar.gz>;
+	doap:revision     "0.004"^^xsd:string.
+
+dist:v_0-005
+	a                 doap:Version;
+	dc:issued         "2013-07-31"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Update;
+			rdfs:label "Support http://ontologi.es/doap-deps, and deprecate old dependency predicates.";
+		];
+		dcs:versus dist:v_0-004;
+	];
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAP-0.005.tar.gz>;
+	doap:revision     "0.005"^^xsd:string.
+
+dist:v_0-006
+	a                 doap:Version;
+	dc:issued         "2013-07-31"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Bugfix;
+			a dcs:Packaging;
+			rdfs:label "Oops; hyphens.";
+		];
+		dcs:versus dist:v_0-005;
+	];
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-DOAP-0.006.tar.gz>;
+	doap:revision     "0.006"^^xsd:string.
+
+<http://tobyinkster.co.uk/#i>
+	a                 foaf:Person;
+	foaf:name         "Toby Inkster";
+	foaf:homepage     <http://tobyinkster.co.uk/>;
+	foaf:mbox         <mailto:tobyink@cpan.org>;
+	foaf:page         <https://metacpan.org/author/TOBYINK>;
+	owl:sameAs        cpan:tobyink.
+
+_:B1
+	nfo:fileName      "lib/Module/Install/DOAP.pm".
+

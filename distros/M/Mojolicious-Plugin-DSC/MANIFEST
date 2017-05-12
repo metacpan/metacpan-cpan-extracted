@@ -1,0 +1,20 @@
+.perltidyrc
+Changes
+lib/Mojolicious/Plugin/DSC.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/advanced.t
+t/basic.t
+t/lib/My.pm
+t/lib/My/Groups.pm
+t/lib/My/User.pm
+t/lib/Very.pm
+t/lib/Very/Bad.pm
+t/lib/Your.pm
+t/lib/Your/Bad.pm
+t/lib/Your/User.pm
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

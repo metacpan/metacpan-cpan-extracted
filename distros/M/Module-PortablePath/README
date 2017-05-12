@@ -1,0 +1,41 @@
+Module::PortablePath
+====================
+
+Module::PortablePath modifies @INC according to a configuration file (by default /etc/perlconfig.ini)
+
+The configuration file format is:
+[libs]
+something = /path/to/something/modules
+web       = /path/to/web/modules
+core      = /path/to/general/modules
+;etc..
+
+The purpose of this module is to provide path independence if you have code which pulls in modules that don't live in your core perl installation and that runs on multiple machines from different paths.
+
+For example -
+machine1:/usr/local/bin/perl5.6.1
+myapp modules are installed in /data1/mywebserver/applications/myapp/lib
+
+machine2:/usr/local/bin/perl5.8.6
+myapp modules are installed in /home/www/webapps/libraries/myapp
+
+You should be able to run the same myapp code unmodified on both machines without creating any symlinks if the code contains:
+use Module::PortablePath qw(myapp);
+
+Then the machine1 /etc/perlconfig.ini file has
+[libs]
+myapp = /data1/mywebserver/applications/myapp/lib
+
+and machine2 has:
+[libs]
+myapp = /home/www/webapps/libraries/myapp
+
+I have found this very useful in maintaining the same codebase on development and live websites migrating across different platforms with different perl versions.
+
+INSTALLATION
+
+To install this module type the following:
+
+   make
+   make test
+   make install

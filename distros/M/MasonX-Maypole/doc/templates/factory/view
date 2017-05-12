@@ -1,0 +1,38 @@
+<%doc>
+
+=for doc
+
+The C<view> template takes some objects (usually just one) from
+C<objects> and displays the object's properties in a table.
+
+=cut
+
+</%doc>
+
+% foreach my $item ( @$objects ) {
+
+<& view_item, item => $item &>
+
+<%doc>
+
+=for doc
+
+The C<view> template also displays a list of other objects related to the first
+one via C<has_many> style relationships; this is done by calling the
+C<related_accessors> method - see L<Model/related_accessors> - to return
+a list of has-many accessors. Next it calls each of those accessors, and
+displays the results in a table.
+
+=cut
+
+</%doc>
+
+<br /><a href="<% $base %>/<% $item->table %>/list">Back to listing</a>
+
+<& view_related, object => $item &>
+
+<& button, obj => $item, action => "edit" &>
+<& button, obj => $item, action => "delete" &>
+
+% }
+

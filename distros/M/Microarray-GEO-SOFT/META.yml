@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               Microarray-GEO-SOFT
+version:            0.20
+abstract:           Reading microarray data in SOFT format from GEO database
+author:
+    - Zuguang Gu <jokergoo@gmail.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                 0
+    Cwd:                  0
+    File::Basename:       0
+    Getopt::Long:         0
+    List::Vectorize:      1.00
+    LWP::UserAgent:       0
+    Microarray::ExprSet:  0.11
+    Test::More:           0
+    Time::HiRes:          0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

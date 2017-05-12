@@ -1,0 +1,8 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README.pod
+dist.ini
+lib/Mojolicious/Plugin/ZombieApocalypse.pm
+t/detect.t

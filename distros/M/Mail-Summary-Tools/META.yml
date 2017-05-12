@@ -1,0 +1,51 @@
+--- 
+abstract: Tools for mailing list summarization.
+author: Yuval Kogman, <nothingmuch@woobling.org>
+build_requires: 
+  File::Temp: 0
+  Test::More: 0
+  Test::use::ok: 0
+distribution_type: module
+generated_by: Module::Install version 0.67
+license: MIT
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Mail-Summary-Tools
+no_index: 
+  directory: 
+    - inc
+    - t
+recommends: 
+  YAML: 0.62
+requires: 
+  App::Cmd: 0.005
+  Class::Autouse: 0
+  Date::Manip: 0
+  Date::Range: 0
+  DateTime: 0
+  DateTime::Format::DateManip: 0
+  DateTime::Format::Mail: 0
+  File::Save::Home: 0
+  File::Slurp: 9999.12
+  File::Temp: 0
+  FindBin: 0
+  HTML::Entities: 0
+  List::MoreUtils: 0
+  Mail::Box: 0
+  Mail::ListDetector: 0
+  Moose: 0.11
+  Net::NNTP: 0
+  Path::Class: 0
+  Proc::InvokeEditor: 0
+  Sub::Exporter: 0
+  Template: 0
+  Text::Markdown: 0
+  Text::Wrap: 0
+  URI::Escape: 0
+  URI::QueryParam: 0
+  WWW::Mechanize: 0
+  WWW::Shorten: 0
+  YAML::Syck: 0.67
+  perl: 5.8.0
+version: 0.06

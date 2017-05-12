@@ -1,0 +1,249 @@
+=head1 The Default constructor
+
+The Default constructor will accept any named parameters defined by 'construct_with'. In the absence of a 'construct_with'
+declaration, any parameters passed to the default constructor are ignored.
+
+The example counter in the L<Minions/SYNOPSIS> always starts at zero. Let's upgrade it to start from a user supplied value, so we can use it this way
+
+    use Test::More tests => 3;
+    use Example::Construction::Counter;
+
+    my $counter = Example::Construction::Counter->new(start => 10);
+
+    is $counter->next => 10;
+    is $counter->next => 11;
+    is $counter->next => 12;
+
+To make this work, we change the interface to accept a starting value when constructing the counter,
+and we change the implementation to make use of this starting value.
+
+    package Example::Construction::Counter;
+
+    use Minions
+        interface => [ qw( next ) ],
+
+        construct_with => {
+            start => {
+                assert => {
+                    is_integer => sub { $_[0] =~ /^\d+$/ }
+                },
+            },
+        },
+        implementation => 'Example::Construction::Acme::Counter';
+
+    1;
+
+    package Example::Construction::Acme::Counter;
+
+    use Minions::Implementation
+        has  => {
+            count => { init_arg => 'start' },
+        }, 
+    ;
+
+    sub next {
+        my ($self) = @_;
+
+        $self->{$__count}++;
+    }
+
+    1;
+
+Here the 'count' attribute is bound to the 'start' constructor parameter using the init_arg declaration. We also used an assert declaration
+to constrain the value of the 'start' parameter.
+
+=head2 Positional parameters
+
+Sometimes, we'd like our constructor to take positional parameters. Consider a set object that we'd create by passing a list of items.
+
+    use Test::More tests => 3;
+    use Example::Construction::Set_v1;
+
+    my $set = Example::Construction::Set_v1->new(1 .. 4);
+
+    ok $set->has(1);
+    ok ! $set->has(5);
+    $set->add(5);
+    ok $set->has(5);
+
+This can be acheieved using the "build_args" declaration, with which we use a sub to wrap the argument array in a hash. This sub is itself wrapped around the default constructor, so that the positional arguments given by a user are passed to the constructor in the keyword style it expects.
+
+    package Example::Construction::Set_v1;
+
+    use Minions
+        interface => [qw( add has )],
+
+        construct_with => { items => {} },
+
+        build_args => sub {
+            my ($class, @items) = @_;
+
+            return { items => \@items };
+        },
+
+        implementation => 'Example::Construction::Acme::Set_v1',
+    ;
+
+    1;
+
+In the implementation, we convert the argument array to a hash
+
+    package Example::Construction::Acme::Set_v1;
+
+    use Minions::Implementation
+        has => { 
+            set => { 
+                default => sub { {} },
+                init_arg => 'items',
+                map_init_arg => sub { return { map { $_ => 1 } @{ $_[0] } } },
+            } 
+        },
+    ;
+
+    sub has {
+        my ($self, $e) = @_;
+
+        exists $self->{$__set}{$e};
+    }
+
+    sub add {
+        my ($self, $e) = @_;
+
+        ++$self->{$__set}{$e};
+    }
+
+    1;
+
+
+=head2 BUILD
+
+If this subroutine is defined, it will be called by the default constructor and
+will receive (as its 2nd and 3rd arguments) the object and a hashref of named parameters that were passed to the constructor.
+
+This is useful for carrying out any post-construction logic e.g. object validation.
+
+BUILD can be used for validating the relation between attributes
+
+    package My::Game::Implementation;
+
+    sub BUILD {
+        my (undef, $self) = @_;
+
+        $self->{-team1} != $self->{-team2}
+          or confess "Teams must be different";
+
+        $self->{-team1}->number_of_players 
+          == 
+        $self->{-team2}->number_of_players
+          or confess "Teams must have the same number of players";
+    }
+
+    ...
+
+It can also be used to process constructor arguments, e.g. the counter implementation
+above can also be written using BUILD instead of init_arg (though init_arg 
+is preferable due being more concise).
+
+    package Example::Construction::Acme::Counter_v2;
+
+    use Minions::Implementation
+        has  => {
+            count => { },
+        }, 
+    ;
+
+    sub BUILD {
+        my (undef, $self, $arg) = @_;
+
+        $self->{$__count} = $arg->{start};
+    }
+
+    ...
+
+=head1 Writing your own constructor
+
+If the default constructor is not flexible enough and you need to write your own constructor, this can be done with the aid of the utility class.
+
+=head2 The utility class
+
+Each class has a corresponding utility class. Within a class method, the utility class
+is obtained by calling the C<utility_class> routine (see example below). 
+
+The utility_class has the following construction related methods
+
+=head3 new_object
+
+This creates a new instance, in which attributes with declared defaults are populated with those defaults,
+and all others are populated with undef.
+
+=head3 build
+
+This can be used in a class method to invoke the semiprivate BUILD routine for an object after the object
+is created.
+
+=head3 assert
+
+Given the name of a declared attribute and a value, this routine validates the value using any assertions
+declared with the attribute.
+
+=head2 Examples
+
+We'll rewrite the counter example above and also show the more manual way of using Minions
+
+    package Example::Construction::Counter_v2;
+
+    use strict;
+    use Minions ();
+
+    our %__meta__ = (
+        interface => [ qw( next ) ],
+
+        construct_with => {
+            start => {
+                assert => {
+                    is_integer => sub { $_[0] =~ /^\d+$/ }
+                },
+            },
+        },
+        implementation => 'Example::Construction::Acme::Counter',
+    );
+
+    sub new {
+        my ($class, $start) = @_;
+
+        my $util = Minions::utility_class($class);
+        $util->assert(start => $start);
+        my $obj = $util->new_object({count => $start});
+        return $obj;
+    }
+
+    Minions->minionize;
+
+This can be simplified using the 'class_methods' declaration
+
+    package Example::Construction::Counter_v3;
+
+    use Minions
+        interface => [ qw( next ) ],
+
+        construct_with => {
+            start => {
+                assert => {
+                    is_integer => sub { $_[0] =~ /^\d+$/ }
+                },
+            },
+        },
+        class_methods => {
+            new => sub {
+                my ($class, $start) = @_;
+
+                my $util = Minions::utility_class($class);
+                $util->assert(start => $start);
+                my $obj = $util->new_object({count => $start});
+                return $obj;
+            },
+        },
+
+        implementation => 'Example::Construction::Acme::Counter';
+
+    1;

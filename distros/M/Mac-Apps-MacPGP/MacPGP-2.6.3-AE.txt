@@ -1,0 +1,85 @@
+on add (file, keyRing = nil) ÇAdd one or more keys to a key ring
+	return (appleEvent (MPGP.id, 'MPGP', 'addk', '----', alias (file), 'keyr', filespec (keyRing)))
+
+on asciify (file, reading = nil, isolatin1 = nil, wrapping = nil, armorlines = nil, expandtabs = nil) ÇAsciify a file to send it via EMail
+	return (appleEvent (MPGP.id, 'MPGP', 'asci', '----', filespec (file), 'read', reading, 'lati', boolean (isolatin1), 'wrap', short (wrapping), 'alns', short (armorlines), 'tabx', short (expandtabs)))
+
+on cencrypt (file, userId = nil, signature = nil, reading = nil, writing = nil, wipesource = nil, isolatin1 = nil, wrapping = nil, armorlines = nil, cpassword = nil, password = nil, coptions = nil, expandtabs = nil, messageDigest = nil) 
+	Conventionally encrypt a file, using the IDEA algorithm.
+	return (appleEvent (MPGP.id, 'MPGP', 'cncr', '----', alias (file), 'usid', string (userId), 'sign', signature, 'read', reading, 'outp', writing, 'wsrc', boolean (wipesource), 'lati', boolean (isolatin1), 'wrap', short (wrapping), 'alns', short (armorlines), 'cpas', string (cpassword), 'pass', string (password), 'copt', coptions, 'tabx', short (expandtabs), 'mdal', messageDigest))
+
+on certify (s, keyRing = nil, userId = nil) ÇSign a public key
+	return (appleEvent (MPGP.id, 'MPGP', 'crfy', '----', string (s), 'keyr', filespec (keyRing), 'usid', string (userId)))
+
+on checksignresult () ÇCheck signature result from previous decryptData event.
+	return (appleEvent (MPGP.id, 'MPGP', 'cksg'))
+
+on clip2file (s) Ç Copy Clipboard to file
+	return (appleEvent (MPGP.id, 'MPGP', 'sc2f', '----', string (s)))
+
+on countkeys (s, keyRing = nil) ÇCount the number of keys in a keyring whose userid match a given string.
+	return (appleEvent (MPGP.id, 'MPGP', 'ckey', '----', string (s), 'keyr', alias (keyRing)))
+
+on create (s) Çcreate a new temporary scratch file
+	return (appleEvent (MPGP.id, 'MPGP', 'crea', '----', string (s)))
+
+on decrypt (file, toscreen = nil, decryptTo = nil, password = nil, nosignalert = nil, appliesto = nil) ÇDecrypt a given message, check signature etc.
+	return (appleEvent (MPGP.id, 'MPGP', 'decr', '----', alias (file), 'scre', boolean (toscreen), 'recv', filespec (decryptTo), 'pass', string (password), 'nsig', boolean (nosignalert), 'apl2', alias (appliesto)))
+
+on decryptdata (s, toscreen = nil, password = nil, nosignalert = nil, appliesto = nil) ÇDecrypt data in memory
+	return (appleEvent (MPGP.id, 'MPGP', 'dcrd', '----', string (s), 'scre', boolean (toscreen), 'pass', string (password), 'nsig', boolean (nosignalert), 'apl2', alias (appliesto)))
+
+on destealthify (file, savingIn, destealthifyTo = nil, conventional = nil, decrypt = nil, password = nil) ÇDestealthify a stealthed file, adding back PGP headers. 
+	return (appleEvent (MPGP.id, 'MPGP', 'dstl', '----', alias (file), 'save', filespec (savingIn), 'recv', string (destealthifyTo), 'conv', conventional, 'decr', boolean (decrypt), 'pass', string (password)))
+
+on encrypt (file, encryptTo, userId = nil, signature = nil, reading = nil, writing = nil, wipesource = nil, isolatin1 = nil, wrapping = nil, armorlines = nil, password = nil, expandtabs = nil, messageDigest = nil) 
+	Encrypt a file  
+	return (appleEvent (MPGP.id, 'MPGP', 'encr', '----', alias (file), 'recv', string (encryptTo), 'usid', string (userId), 'sign', signature, 'read', reading, 'outp', writing, 'wsrc', boolean (wipesource), 'lati', boolean (isolatin1), 'wrap', short (wrapping), 'alns', short (armorlines), 'pass', string (password), 'tabx', short (expandtabs), 'mdal', messageDigest))
+
+on encryptdata (s, encryptdataTo, userid = nil, signature = nil, reading = nil, writing = nil, isolatin1 = nil, wrapping = nil, armorlines = nil, password = nil, expandtabs = nil, messageDigest = nil) 
+	Encrypt data in memory
+	return (appleEvent (MPGP.id, 'MPGP', 'ncrd', '----', string (s), 'recv', string (encryptdataTo), 'usid', string (userid), 'sign', boolean (signature), 'read', reading, 'outp', writing, 'lati', boolean (isolatin1), 'wrap', string (wrapping), 'alns', short (armorlines), 'pass', string (password), 'tabx', short (expandtabs), 'mdal', messageDigest))
+
+on execute (s, isolatin1 = nil, wrapping = nil, armorlines = nil, password = nil, expandtabs = nil, messageDigest = nil) ÇExecute a DOS-like command line
+	return (appleEvent (MPGP.id, 'MPGP', 'exec', '----', string (s), 'lati', boolean (isolatin1), 'wrap', short (wrapping), 'alns', short (armorlines), 'pass', string (password), 'tabx', short (expandtabs), 'mdal', messageDigest))
+
+on extract (s, extractTo, keyRing = nil, writing = nil) ÇTake a key from a key ring and save it into a file
+	return (appleEvent (MPGP.id, 'MPGP', 'extr', '----', string (s), 'recv', filespec (extractTo), 'keyr', filespec (keyRing), 'outp', writing))
+
+on file2clip (s) ÇCopy given file to Clipboard
+	return (appleEvent (MPGP.id, 'MPGP', 'f2sc', '----', string (s)))
+
+on fingerprint (s, keyRing = nil) ÇCalculate a key's fingerprint
+	return (appleEvent (MPGP.id, 'MPGP', 'fing', '----', string (s), 'keyr', filespec (keyRing)))
+
+on generate (s, length = nil, keybits = nil, ebits = nil) ÇGenerate a public/secret key pair
+	return (appleEvent (MPGP.id, 'MPGP', 'gene', '----', string (s), 'leng', length, 'kbit', short (keybits), 'ebit', short (ebits)))
+
+on getlasterror () ÇGet error message from previous MacPGP Apple Event
+	return (appleEvent (MPGP.id, 'MPGP', 'gler'))
+
+on getversion () ÇGet version string.
+	return (appleEvent (MPGP.id, 'MPGP', 'gver'))
+
+on logfile (flag, logfileTo = nil) ÇEcho PGP window to a log file
+	return (appleEvent (MPGP.id, 'MPGP', 'logf', '----', boolean (flag), 'recv', alias (logfileTo)))
+
+on remove (s, keyRing = nil) ÇRemove a key from a key ring
+	return (appleEvent (MPGP.id, 'MPGP', 'remv', '----', string (s), 'keyr', filespec (keyRing)))
+
+on selectakey (s, keyRing = nil) ÇThis AE causes a key selection dialog to be displayed. The selected userid is returned. (The empty string is returned if the dialog is cancelled.)
+	return (appleEvent (MPGP.id, 'MPGP', 'selk', '----', string (s), 'keyr', alias (keyRing)))
+
+on sign (file, userId = nil, signature = nil, reading = nil, writing = nil, isolatin1 = nil, wrapping = nil, armorlines = nil, password = nil, expandtabs = nil, textflag = nil, messageDigest = nil) 
+	Sign a file
+	return (appleEvent (MPGP.id, 'MPGP', 'sign', '----', alias (file), 'usid', string (userId), 'sign', signature, 'read', reading, 'outp', writing, 'lati', boolean (isolatin1), 'wrap', short (wrapping), 'alns', short (armorlines), 'pass', string (password), 'tabx', short (expandtabs), 'stxf', boolean (textflag), 'mdal', messageDigest))
+
+on signdata (s, userId = nil, signature = nil, reading = nil, writing = nil, isolatin1 = nil, wrapping = nil, armorlines = nil, password = nil, expandtabs = nil, textflag = nil, messageDigest = nil) 
+	Sign data in memory.
+	return (appleEvent (MPGP.id, 'MPGP', 'sigd', '----', string (s), 'usid', string (userId), 'sign', signature, 'read', reading, 'outp', writing, 'lati', boolean (isolatin1), 'wrap', short (wrapping), 'alns', short (armorlines), 'pass', string (password), 'tabx', short (expandtabs), 'stxf', boolean (textflag), 'mdal', messageDigest))
+
+on stealthify (file, savingIn) ÇStealthify a file.
+	return (appleEvent (MPGP.id, 'MPGP', 'stlh', '----', alias (file), 'save', filespec (savingIn)))
+
+on window (x) ÇShow or hide the PGP Messages window while processing AppleScript 
+	return (appleEvent (MPGP.id, 'MPGP', 'wind', '----', x))

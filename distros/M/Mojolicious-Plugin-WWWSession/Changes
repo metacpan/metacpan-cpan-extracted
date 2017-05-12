@@ -1,0 +1,14 @@
+Revision history for Mojolicious-Plugin-WWWSession
+
+0.01    2011-04-25
+        First version
+0.02	2011-04-26
+		Improved POD
+0.03	2011-04-27
+		More POD improvements
+0.04	2011-05-04
+		Switched from OO to TIEHASH interface
+0.05	2011-05-04
+		Removed broken after_dispatch hook
+0.06	2013-05-05
+		Applied a patch to correctly set expiration time

@@ -1,0 +1,51 @@
+<!-- this file demonstrates some of the error handling in makerelease;
+     it actually contains a bunch of errors (missing attributes, etc). -->
+<makerelease>
+  <steps>
+
+    <step type="system" title="no commands">
+    </step>
+    <step type="system" title="no commands inside commands">
+      <commands>
+      </commands>
+    </step>
+
+    <step type="section" title="no steps">
+    </step>
+    <step type="section" title="no steps inside steps">
+      <steps>
+      </steps>
+    </step>
+
+    <step type="section" title="no steps">
+    </step>
+    <step type="section" title="no steps inside steps">
+      <steps>
+	<step type="system" title="no commands inside a sub-step">
+	</step>
+      </steps>
+    </step>
+
+    <step type="modify" title="modify test">
+    </step>
+
+    <step type="modify" title="modify test">
+      <modifications>
+      </modifications>
+    </step>
+
+    <step type="modify" title="modify test">
+      <modifications>
+	<modify>
+	</modify>
+      </modifications>
+    </step>
+
+    <step type="modify" title="modify test">
+    </step>
+
+    <step type="prompt" title="prompt test">
+    </step>
+
+  </steps>
+</makerelease>

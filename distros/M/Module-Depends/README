@@ -1,0 +1,73 @@
+README for Module::Depends 0.13
+
+=head1 NAME
+
+Module::Depends - identify the dependencies of a distribution
+
+=head1 SYNOPSIS
+
+ use YAML;
+ use Module::Depends;
+ my $deps = Module::Depends->new->dist_dir( '.' )->find_modules;
+ print "Our dependencies:\n", Dump $deps->requires;
+
+
+=head1 DEPENDENCIES
+
+This module has external dependencies on the following modules:
+
+ Class::Accessor::Chained
+ File::Spec
+ YAML
+
+=head1 INSTALLATION
+
+ perl Build.PL
+ perl Build test
+
+and if all goes well
+
+ perl Build install
+
+=head1 HISTORY
+
+What changed over the last 3 revisions
+
+=over
+
+=item 0.13 Tuesday 26th June, 2007
+
+    File::chdir 0.08 changed its behaviour and is not backwards
+    compatible - avoid using it.
+
+
+=item 0.12 Thursday 1st March, 2007
+
+	Implement a y_n for the Module::Build fakery
+
+
+=item 0.11 Saturday 3rd February, 2007
+
+	Fixed the emulation of Module::Install::require
+	Change the base test case so that it doesn't need a 
+        ./Build dist first (for when building out of SVN rather 
+       than a released dist)
+
+=back
+
+=head1 AUTHOR
+
+Richard Clamp, based on code extracted from the Fotango build system
+originally by James Duncan and Arthur Bergman.
+
+=head1 COPYRIGHT
+
+Copyright 2004,2007 Fotango.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Module::Depends::Intrusive>
+

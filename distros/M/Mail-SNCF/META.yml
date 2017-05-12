@@ -1,0 +1,29 @@
+---
+abstract: 'A parser for booking messages sent by the French rail company'
+author:
+  - 'Olivier Schwander, C<< <iderrick at cpan.org> >>'
+build_requires:
+  Test::Dependencies: 0
+  Test::More: 0.42
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mail-SNCF
+no_index:
+  directory:
+    - inc
+    - t
+    - examples
+requires:
+  Data::Dump: 0
+  Data::ICal: 0
+  Data::ICal::Entry::Event: 0
+  Date::ICal: 0
+  DateTime: 0
+  Email::Folder: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

@@ -1,0 +1,46 @@
+---
+global:
+  name: Module-Changes
+releases:
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - added requirement for DateTime::Format::DateParse
+    date: 2007-11-09T16:31:03Z
+    tags:
+      - BUGFIX
+    version: 0.05
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - changed YAML schema again to make it simpler
+      - added YAML schema for Kwalify
+      - added Module::Changes::Validator::YAML
+      - Fixed a bug in Module::Changes::Formatter::Free
+    date: 2007-11-09T09:59:43Z
+    tags:
+      - APIBREAK
+      - NEWFEATURE
+      - BUGFIX
+    version: 0.04
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - 'slightly different YAML format: more structured, and maybe usable with Kwalify'
+      - added Module::Changes::Parser::Free and eg/convert_changes_free2yaml.pl
+    date: 2007-11-09T09:06:12Z
+    tags:
+      - APIBREAK
+      - NEWFEATURE
+    version: 0.03
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - 'improved version_as_string, is now a method of Module::Changes::Release'
+      - added more tests
+    date: 2007-11-08T20:03:15Z
+    tags:
+      - NEWFEATURE
+    version: 0.02
+  - author: 'Marcel Gruenauer <marcel@cpan.org>'
+    changes:
+      - original version
+    date: 2007-11-08T15:51:54Z
+    tags: []
+    version: 0.01

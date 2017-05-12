@@ -1,0 +1,229 @@
+Revision history for Math-BigNum
+
+0.20    2017-03-25
+
+        [ADDED]
+
+        - Added the `remove(n,k)` and `bremove(n,k)` methods, for removing all occurrences of the factor k from integer n.
+
+        [IMPROVEMENTS]
+
+        - Re-implemented the `mod` method based on the identity: x % y = x - y*floor(x/y), which always returns the exact result, assuming that x and y are rational numbers.
+
+        [FIXES]
+
+        - Fixed a special case in modpow(x, y, z) when y < 0 and gcd(x, z) != 1.
+        - Fixed a minor issue in broot(x, y) when y is not an integer.
+        - Fixed a minor issue in bfpow(x, y) when y is a non-numeric scalar.
+
+0.19    2017-01-21
+
+        [PERFORMANCE IMPROVEMENTS]
+
+        - `fsub()`, `fadd()`, `fmul()` and `fdiv()` are all slightly faster (including their `b*` versions).
+
+        Instead of converting the second argument to a new MPFR object (which always has a type of mpq), we now pass it directly, using a corresponding `Rmpfr_*_q()` function.
+
+        [FIXES]
+
+        - The integer limits from Math::GMPq are used only when they are defined, otherwise they are computed with pack() and unpack().
+
+0.18    2017-01-01
+
+        [FIXES]
+
+        - Removed some tests for irootrem() that fail under old versions of GMP (< 5.1.0).
+
+0.17    2017-01-01
+
+        [ADDED]
+
+        - isqrtrem(n)   : the integer square root and the remainder.
+        - irootrem(n)   : the integer nth root and the remainder.
+        - eta(n)        : the Dirichlet eta function at n.
+        - beta(x,y)     : the beta function (for x > 0 and y > 0).
+        - lambert_w(x)  : the Lambert W function (for x >= -1/e)
+        - rad2deg(n)    : converts radians to degrees
+        - deg2rad(n)    : converts degrees to radians
+        - bessel_j(x,n) : the first order Bessel function: J_n(x).
+        - bessel_y(x,n) : the second order Bessel function: Y_n(x).
+
+        [FIXES]
+
+        - Fixed the accuracy in the method bernreal() for small n.
+        - Fixed a special case in the method irand() when the self value is 0.
+
+            + irand(0) = 0
+
+        [OTHER]
+
+        - Minor optimization in the decimal expansion of non-integers.
+
+0.16    2016-12-11
+
+        [ADDED]
+
+        - Added two methods for computing the nth-Harmonic number:
+
+            + harmfrac(n)
+            + harmreal(n)
+
+        - Added two methods for reseeding the pseudorandom number generator:
+
+            + seed(n)
+            + iseed(n)
+
+        [IMPROVEMENTS]
+
+        - Extended the method digits() to accept an optional base.
+
+            + digits(4095, 16)  #=> ('f', 'f', 'f')
+
+        [BUG FIXES]
+
+        - Using threads in some parts of the program, will no longer cause a segmentation fault.
+
+        However, Math::BigNum is not thread-safe, therefore using Math::BigNum objects inside threads, still causes a segmentation fault.
+
+0.15    2016-10-24
+
+        [ADDED]
+
+        - Unimport support.
+
+            no Math::BigNum;     # disables the `:constant` behavior in the current scope
+
+        - Added the `new_int()` and `new_uint()` methods for setting signed and unsigned native integers.
+
+        [PERFORMANCE IMPROVEMENTS]
+
+        - Noticeable optimizations in method `is_pow`. (Thanks to Dana Jacobsen)
+        - Minor optimization in `bernfrac()` for values of n < 50.
+        - Faster algorithm in `bernfrac()` for values of `n` >= 50. (based on the Zeta function)
+        - Faster algorithm in `bernreal()`, using positive values of the Zeta function. (before, negative values were used)
+
+        [BUG FIXES]
+
+        - When a base is specified, special values, such "Inf" and "NaN", are no longer parsed specially.
+
+            + Math::BigNum->new('inf', 36) == 24171
+            + Math::BigNum->new('nan', 36) == 30191
+
+        [OTHER]
+
+        - Documentation improvements.
+
+0.14    2016-10-07
+        - Fixed a minor bug inside the method `n->is_pow(p)` when `n` is negative (for old versions of GMP).
+
+0.13    2016-10-07
+        - Added the `bernfrac` method, powered by an improved version of Seidel's algorithm.
+        - Stricter validation of the precision specified as an import value.
+        - Minor bug-fix in the method `is_pow` for `is_pow(-1, odd_n)` -- it now returns true.
+        - Fixed some special cases in the method `iroot`.
+        - Fixed a special case in the method `valuation` when the second argument is `0`.
+
+0.12    2016-10-05
+        - Decreased the default floating-point precision from 256 bits, to 200 bits.
+        - Added support for specifying the default precision as an import value.
+
+            Example:
+                use Math::BigNum PREC => 1024;
+
+        - Fixed a minor-bug in the method `is_pow` for some special cases.
+        - Minor POD fixes.
+
+0.11    2016-10-04
+        - Added the `$n->parts` method, which returns the numerator and the denominator as BigNum objects.
+        - Increased the default accuracy value for the method `is_prime` from 12 to 20.
+        - Support for rational exponentiation with an integer power.
+
+            Example:
+                (3/5)**3 == 27/125
+
+        - Added the `$x->li` method for computing the logarithmic integral of `$x`.
+        - Optimized the `$k->root($n)` method for positive integer values of `$n`.
+        - Added the `$n->bernreal` method, which returns the nth-Bernoulli number as a floating-point value.
+        - Added the `$n->kronecker($k)` method, which returns the Kronecker symbol (n|k).
+        - Added the following exportable functions:
+
+                + factorial(n)       # product of first n integers: n!
+                + primorial(n)       # product of primes <= n
+                + binomial(n,k)      # binomial coefficient
+                + fibonacci(n)       # nth-Fibonacci number
+                + lucas(n)           # nth-Lucas number
+                + ipow(a,k)          # integer exponentiation: a^k
+
+        - Added the method `$n->popcount`, which returns the number of 1s in the binary representation of `$n`.
+        - Changed the return values of the `sign` method from ("-", "", "+") to (-1, 0, 1).
+        - Added the `:all` option to export anything that is exportable (functions + constants).
+        - Added the `$n->valuation($k)` method, which returns the number of times `$n` is divisible by `$k`.
+        - Extended the method `float` to accept an optional argument with the number of bits of precision.
+        - Added the `$x->bfloat` method, which truncates `$x` in-place to a floating-point value.
+        - Added the method `$n->is_pow($k)`, which returns true iff `a^k = n` for some integer `a`.
+        - Added the method `$x->lgrt`, which returns the logarithmic-root of `$x`.
+
+               +  100->lgrt       # solves for x in `x**x = 100` and returns: `3.59728...`
+
+        - Added the following floating-point methods:
+
+                + (b)fadd
+                + (b)fsub
+                + (b)fmul
+                + (b)fdiv
+                + (b)fmod
+                + (b)fpow
+
+        - Increased the default precision of floating-point numbers from 128 to 256 bits.
+        - Some minor bug-fixes and documentation improvements.
+
+0.10    2016-08-17
+        - Faster creation of MPFR objects from scalar integer values.
+        - Conversion of scalar values to MPFR objects is done more strictly, by validating each conversion.
+        - Added the missing `[b|i]mul` methods in the `Nan` class.
+        - Minor overall performance improvements, by taking advantage of some commutative properties.
+        - Added the `bln()` method, which calculates the natural logarithm in-place.
+        - Stricter definitions for the `log` and `blog` methods when one of the arguments is +/-Infinity.
+        - Require Math::GMPz >= 0.39 (for Rmpz_bin_si).
+        - Use Math::GMPq's (>=0.41) `_ulong_max()` and `_long_min()` to determine the integer limits.
+
+0.09    2016-08-15
+        - Better support for scalar values.
+        - Better performance for `idiv()` and `bidiv()` when called with negative scalar integers.
+        - Faster creation of Math::BigNum objects with scalar integer values.
+        - Scalar values passed to `(b)i*` methods are now validated or converted correspondingly.
+
+0.08    2016-08-13
+        - Added support for `+inf`, `-inf` and `nan`, each represented as a scalar value.
+        - Improved the support for infinity to work with any numerical object and any special scalar values.
+
+0.07    2016-08-06
+        - Fixed a critical bug in the stringification of very small floating-point values
+
+0.06    2016-08-06
+        - Fixed bpow(0, Inf) to return `0` and bpow(0, -Inf) to return `Inf`
+        - Added more tests for bpow() and bipow()
+        - Added the irand() method, which returns a random integer
+        - Slightly faster stringification of floating-point numbers
+
+0.05    2016-05-26
+        - 5% optimization in pow(), mod() and is_div() with integer arguments.
+        - Fixed `0**Inf` to return `0` and `0**(-Inf)` to return `Inf`
+
+0.04    2016-03-16
+        - Added more multimethods to support any kind of numerical object, such as Math::BigInt, Math::BigFloat, etc...
+        - Improved the support for infinity.
+        - `BigNum <=> NaN` will now return `undef` instead of `0`.
+
+0.03    2016-02-08
+        - Minor performance improvement in the creation of BigNum objects with integers or fractions.
+        - Changed the result of `(-Inf)**(Float)` from `NaN` to `Inf`.
+        - Changed the result of `sqrt(-Inf)` from `NaN` to `Inf`.
+        - Improved the documentation.
+
+0.02    2016-02-06
+        - Support for decimal numbers with underscores (`_`)
+        - Fixed a non-portable test.
+
+0.01    2016-02-05
+        - First version, released on an unsuspecting world.

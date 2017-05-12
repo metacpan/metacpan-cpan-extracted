@@ -1,0 +1,90 @@
+<%doc>
+    The easiest way to use this template is to create your 
+    own 'edit' template that just says
+    
+    <& edit_with_cache &>
+    
+    The cached items are configured to expire whenever the template file is updated, 
+    but remember to empty the cache whenever the database structure is modified, 
+    or the CGI::FormBuilder settings are changed.
+    
+    The cached items will also expire whenever whenever the object is updated, 
+    **but** this relies on 1) the object havin a timestamp column called 'last_update' ,
+    and 2) this column inflates to a Time::Piece object (or anything else with a suitable 
+    epoch() method)
+    
+</%doc>
+
+% my $item = $objects->[0];
+
+<h2>Edit <% $request->model_class->moniker %>: <% $item %></h2>
+
+<div class="fleft">
+<fieldset>
+<legend><% $item->stringify_self %></legend>
+
+<& .mainform &>
+
+% if ( $item->edit_fields ) {
+<h2>Add related records</h2>
+
+% foreach my $related ( $item->edit_fields ) {
+<& addto_with_cache, add_to => $item, field => $related &>
+% }
+% }
+
+</fieldset>
+
+% # this form does *not* work yet - it's just a placeholder for when CDBI::FB implements this
+% # <& edit_with_related, item => $item &>
+
+</div>
+
+<& edit_all_has_a_with_cache, object => $item &>
+
+<%def .mainform>
+    <%init>
+        my $file = $m->current_comp->owner->source_file;
+        
+        my $object = $request->objects->[0];
+        
+        # 2005-05-27 16:52:13
+        my $tp = Time::Piece->strptime( $object->last_update, '%Y-%m-%d %H:%M:%S' );
+        
+        my $template_updated = sub { $_[0]->get_created_at < (stat($file))[9] };
+        my $object_updated   = sub { $_[0]->get_created_at < $tp->epoch };
+        my $out_of_date      = sub { $form_failed_validation  or 
+                                     $object_updated->($_[0]) or 
+                                     $template_updated->($_[0])
+                                     };
+        
+        my $key = join ':', $object->table, $object->id;
+        
+        my $html = $m->cache->get( $key, expire_if => $out_of_date );
+        
+        if ( ! $html )
+        {
+            my $form = $request->as_form;
+            
+            # must call validate() to set up error reporting 
+            $form->validate if $form_failed_validation->{edit}->{ $object->table }->{ $object->id };
+            
+            $html = $form->render;
+            
+            $m->cache->set( $key => $html ) unless $form_failed_validation->{edit}->{ $object->table }->{ $object->id };
+        }
+    </%init>
+    <% $html %>
+    <%filter>
+        my $object = $request->objects->[0];
+        
+        $_ = HTML::FillInForm->new->fill( scalarref => \$_,
+                                          fobject   => $object,
+                                          );
+                                          
+    </%filter>
+</%def>
+
+<%once>
+    use HTML::FillInForm;
+</%once>

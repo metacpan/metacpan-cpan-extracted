@@ -1,0 +1,26 @@
+.travis.yml
+Changes
+config/database.yml
+lib/Mojolicious/Command/sql.pm
+lib/Mojolicious/Plugin/Mysql.pm
+lib/MojoX/Mysql.pm
+lib/MojoX/Mysql/DB.pm
+lib/MojoX/Mysql/Result.pm
+lib/MojoX/Mysql/Util.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/01-connect.t
+t/02-query-do.t
+t/03-async.t
+t/04-util.t
+t/05-mojolicious.t
+t/06-type.t
+t/07-command.t
+t/migration/default.pm
+t/migration/default01.pm
+t/migration/default02.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

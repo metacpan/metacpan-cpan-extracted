@@ -1,0 +1,26 @@
+Changes
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/MooseX/Types/Vehicle.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+MYMETA.json
+MYMETA.yml
+README
+t/00-load.t
+t/01-vin_test.t
+t/02-in_moose.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

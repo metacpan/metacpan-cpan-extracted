@@ -1,0 +1,54 @@
+Math::MatrixReal::Ext1 is an extension that adds the methods
+
+    new_from_cols
+    new_from_rows
+
+to Math::MatrixReal.  The basic idea is to have a way of creating a matrix
+from array refs rather than just the current new_from_string methods (see
+the code examples below).  I just called it Ext1 (Math::MatrixReal::Ext1)
+for "extension 1" because I couldn't think of a better name (I thought
+of a few--"NewNews", for example, but didn't think that everyone else
+would find that funny).
+
+This extension is available on my website at
+
+    http://fulcrum.org/personal/msouth/code
+
+where you will also find an html version of the pod, some of which 
+I have pasted in below.  The new_from_* functions also take row 
+and column vectors of type Math::MatrixReal and create matrices
+from them.  
+
+At the time I wrote this (2001) Math::MatrixReal was abandoned, but 
+someone has since adopted it.  My recent (2005) updates will also
+hopefully go into Math::MatrixReal, but for now I'm putting them
+here because I just can't stand having this stuff out there
+uncorrected.  Once the most recent changes are in the main 
+line, I will deprecate this module and then it will completely
+disappear, probably some time in 2006.
+
+As I mention in the full documentation, if you are thinking of using this
+module, you might want to check out Math::Pari for a more powerful
+and extensive mathematics package.
+
+It installs with the standard make, make test, make install sequence.
+
+Here is a snippet of the pod:
+
+NAME
+
+Math::MatrixReal::Ext1 - Minor extensions to Math::MatrixReal 
+
+
+SYNOPSIS
+
+  use Math::MatrixReal::Ext1;
+
+  $ident3x3 = Math::MatrixReal::Ext1->new_from_cols( [ [1,0,0],[0,1,0],[0,0,1] ] );
+  $upper_tri = Math::MatrixReal::Ext1->new_from_rows( [ [1,1,1],[0,1,1],[0,0,1] ] );
+
+  $col1 = Math::MatrixReal->new_from_string("[ 1 ]\n[ 3 ]\n[ 5 ]\n");
+  $col2 = Math::MatrixReal->new_from_string("[ 2 ]\n[ 4 ]\n[ 6 ]\n");
+
+  $mat = Math::MatrixReal::Ext1->new_from_cols( [ $col1, $col2 ] );
+

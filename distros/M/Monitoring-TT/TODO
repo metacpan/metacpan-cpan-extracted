@@ -1,0 +1,15 @@
+== TODO
+
+=== implement warnings
+
+  - unused tags, types, apps
+  - conflict with static files
+
+=== add documentation
+
+  - tt in input files
+
+=== coding
+
+  - tt support for csv?
+  - change tt support for nagios to parsed files

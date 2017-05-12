@@ -1,0 +1,16 @@
+Revision history for Mason-Plugin-HTMLFilters
+
+** denotes an incompatible change
+
+0.03  Jun 11, 2012
+
+- Document FillInForm and allow it to take options hash
+
+0.02  Feb 20, 2011
+
+- Require Mason
+
+0.01  Feb 16, 2011
+
+- Initial version
+

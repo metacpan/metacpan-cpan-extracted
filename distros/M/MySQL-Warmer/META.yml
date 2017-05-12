@@ -1,0 +1,47 @@
+---
+abstract: 'execute warming up queries for InnoDB'
+author:
+  - 'Songmu <y.songmu@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.7, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MySQL-Warmer
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MySQL::Warmer:
+    file: lib/MySQL/Warmer.pm
+    version: '0.02'
+  MySQL::Warmer::CLI:
+    file: lib/MySQL/Warmer/CLI.pm
+requires:
+  DBI: '0'
+  DBIx::Inspector: '0'
+  Getopt::Long: '0'
+  Moo: '0'
+  Pod::Usage: '0'
+  Term::ReadKey: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Songmu/p5-MySQL-Warmer/issues
+  homepage: https://github.com/Songmu/p5-MySQL-Warmer
+  repository: git://github.com/Songmu/p5-MySQL-Warmer.git
+version: '0.02'
+x_contributors:
+  - 'Teppei Yano <buckelwal@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

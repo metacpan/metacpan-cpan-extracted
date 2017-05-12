@@ -1,0 +1,14 @@
+.perltidyrc
+.ship.conf
+Changes
+cpanfile
+lib/Mojo/APNS.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-basic.t
+t/basic.t
+t/feedback.t
+t/send.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

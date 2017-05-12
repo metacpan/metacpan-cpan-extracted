@@ -1,0 +1,63 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f7a235423291758a0c297569b55923aafe03b679 Changes
+SHA1 882221895a73bad18eb9f16a0ce523a968a932c1 LICENSE.artistic_2
+SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE.bsd
+SHA1 18da245f789da679b40ad4cd1c2bc4df41d9c1d9 MANIFEST
+SHA1 afb3b6bf40df8a0aebbb1efda3d03ee5528b3324 META.yml
+SHA1 903dd23c946e1c4a28c8a5bdcb31448a7960e47a Makefile.PL
+SHA1 dbd6fb7146efab4b992066e883e8e33ce9511c79 README
+SHA1 5a34b178c04e589f8027e7ce3b17457a216d8b66 Tbilisi.pm
+SHA1 2c1fee78cddd51863a5056c401ceb66c66c26249 examples/ex1.pl
+SHA1 ba9eca4bf103c6c499ee06bfc42a414d1bcf8953 examples/ex2.pl
+SHA1 c31589ec17d1cb35d62c8956a07f20bf362f2e57 examples/ex3.pl
+SHA1 c366d6209419479e940081d91012a50cb55a96d0 examples/ex4.pl
+SHA1 34cf08548f9873e1931a85507e3140436c1bcf2d images/ex3.png
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 42de62df31eaf796d8bfd49a11fdc9cff1b50b74 inc/Module/Install/Share.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 4d7c384f55295c44e14d91df9b32314134c3d56e share/tbilisi-map.xml
+SHA1 846954c33fcacd8c8d92fa55b27fe0b4348f4332 t/Map-Tube-Tbilisi/01-use.t
+SHA1 55cdb111504c6ca80f369c0a717da378648a970f t/Map-Tube-Tbilisi/02-version.t
+SHA1 855ba54ff15ce7a1562f9755f7372b04d96c04a6 t/Map-Tube-Tbilisi/03-map.t
+SHA1 fb732cfdbe0282879c1018c140f75ebf6759a598 t/Map-Tube-Tbilisi/04-get_node_by_id.t
+SHA1 38959894b2421c539898a9a9ca37ffe7fffe0d99 t/Map-Tube-Tbilisi/05-get_node_by_name.t
+SHA1 055b815a2e47a80b1ad9d65832c9c867e14bc89f t/Map-Tube-Tbilisi/06-get_shortest_route.t
+SHA1 c4ff7e72e83b31d61104cafb3914fe99ab4fdb5a t/Map-Tube-Tbilisi/07-name.t
+SHA1 e89373474364415a298d572b6ef883d93d68e28f t/Map-Tube-Tbilisi/08-xml.t
+SHA1 05edeec779cd9bcae886f8ce06f9552ab264a9c4 xt/Map-Tube-Tbilisi/01-pod_coverage.t
+SHA1 9f7d75e1dbe72a431cbcd2a1eacdfe36589afcf5 xt/Map-Tube-Tbilisi/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWIMk5AAoJEJe+XXKaIuTl4EwH/25vzmK/dMTDtBUFO2rQy+UF
+p7pbMBjJuPW4cQheKwBm2P1r9IuoHWsdtJpRAwCsjbSFXVQctfG6LGpU8HR+GJfY
+NjGjhQTwA853EZH0ZSlZYA0c2xzNuiLZ4+gSzP8JVMegLyd9p+zIZ0pd/E7dZ+zr
+ld7lS2dPOjhqkivrKopYASoKp0dGVF9/JLU+bEMLXbclxAaoNtBvU3tEikyaeBY6
+D/jCfVSDYhCL2gRHHWKB9EzbyLrD3mGHTHAbZiJyPB3fh7014XhFHZ+n2xW2HlR0
+fqBZvAB4S+OhWBXwETiPMXhuGbnoUxLyr0TRtp2bj4xwnpHZNvxivFHgl8jF1Ew=
+=cMrc
+-----END PGP SIGNATURE-----

@@ -1,0 +1,9 @@
+Revision history for Perl extension Math::SymbolicX::BigNum.
+
+0.01  Sat Jul 17 17:35:05 2004
+	- original version; created by h2xs 1.21 with options
+		-AX Math::SymbolicX::BigNum
+
+0.02  Thu Jul 22 11:17:58 2004
+	- Revamped tests to not rely on string equality of BigInts
+

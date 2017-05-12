@@ -1,0 +1,74 @@
+Revision history for Perl extension Math::Random::MTwist.
+
+0.17  2014-08-04
+* Fixed version mismatch.
+
+0.16  2014-05-27
+* get_seeds_from_av(): av_len() returns an SSize_t since Perl 5.20.
+
+0.15  2014-05-24
+* randstr() cleanup.
+
+0.14  2014-05-16
+* Added randstr().
+* Some optimizations.
+* More tests.
+* POD update.
+
+0.13  2014-05-11
+* Check setstate() input more thoroughly.
+* POD update.
+
+0.12  2014-05-08
+* Added getstate() and setstate().
+* More tests.
+* POD update.
+
+0.11  2014-05-02
+* Added :all export tag.
+* Some optimizations. In particular, we let the compiler know that we know that
+  the state argument cannot be NULL. This way we can efficiently inline some
+  functions.
+
+0.10  2014-04-13
+* Added optional argument to rd_double().
+* Code cleanup.
+* More tests.
+* POD update.
+
+0.09  2014-04-11
+* Code cleanup.
+* On Win32 use timeseed() for fast/good/bestseed() and srand() because there is
+  no /dev/(u)random and we don't want mtwist's millisecond-resolution fallback.
+
+0.08  2014-04-05
+* Moved timeseed() from MTwist.pm to MTwist.xs.
+* Removed Safefree() call from get_seeds_from_av(): Was unnecessary because we
+  croak() anyway and silly because we can't free stack addresses ...
+* More tests.
+
+0.07  2014-04-01
+* Added rd_double().
+* Win32 seems to need dTHX in some places in mtwist.c and randistrs.c.
+* Changed =head2 to =item in POD to keep TOC on CPAN small.
+
+0.06  2014-03-29
+* FIX: MTwist.xs: srand() minimum items is 1 not 0.
+
+0.05  2014-03-29
+* Added missing _timeseed().
+* Moved savestate() and loadstate() from MTwist.pm to MTwist.xs.
+
+0.04  2014-03-28
+* Added a function-oriented interface.
+* Renamed rds_* to rd_*.
+* Added get_seeds_from_av() to fill the seed array for seedfull().
+* More tests.
+
+0.03  2014-03-27
+* Moved most methods from MTwist.pm to MTwist.xs for even more speed.
+
+0.02  2014-03-26
+* Initial release
+
+0.01  Unreleased

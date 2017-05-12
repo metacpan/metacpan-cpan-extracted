@@ -1,0 +1,9 @@
+in sub message:
+in close_match iteration using $instance_name
+the $interval_time loop needs to only iterate over intevals that we have
+entered over time, not all of them.
+
+
+_handle_tick is called for every message, which could be very fast, and
+right now, it iterates over all of the allocated instances every time.
+That's kind of insane.  Optimize later.

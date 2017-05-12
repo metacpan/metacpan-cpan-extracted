@@ -1,0 +1,2 @@
+[{"children":[{"children":[],"values":["Quux"],"key":"OutputClass"},{"children":[{"children":[],"values":["Bar"],"key":"Foo"}],"values":[],"key":"OutputClassOptions"}],"values":["Write::Message::Passing"],"key":"Plugin"}]
+

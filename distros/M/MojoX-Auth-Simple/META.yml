@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:               MojoX-Auth-Simple
+version:            0.04.02
+abstract:           Perl extension for simple login authentication for Mojolicious web applications
+author:
+    - Kim Hawtin <kim@hawtin.net.au>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    MojoX::Session: 0
+    Mojo:           0.999914
+    Test::More:     0
+no_index:
+    directory:
+        - t
+        - inc
+

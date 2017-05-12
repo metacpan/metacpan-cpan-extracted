@@ -1,0 +1,6 @@
+<div id="search">
+<fieldset>
+<legend>Search for [% mclass.plural_moniker %]</legend>
+[% request.search_form.render %]
+</fieldset>
+</div>

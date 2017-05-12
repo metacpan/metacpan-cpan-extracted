@@ -1,0 +1,11 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/Music/Note.pm
+t/001_load.t
+t/002_create.t
+t/003_methods.t
+t/004_format.t
+Makefile.PL

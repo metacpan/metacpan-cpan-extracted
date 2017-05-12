@@ -1,0 +1,28 @@
+---
+abstract: 'Syntax sugar for authorized methods by MooseX::Role'
+author:
+  - 'John Scoles <byterock@h...mail.come>'
+build_requires:
+  Moose::Util: 0
+  Test::Moose::More: 0
+  Test::More: 0
+  perl: 5.010
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-AuthorizedMethodRoles
+requires:
+  Data::Dumper: 0
+  Moose: 0
+  Moose::Exporter: 0
+  Moose::Role: 0
+  Moose::Util::MetaRole: 0
+  Sub::Name: 0
+  strict: 0
+  warnings: 0
+version: 0.001

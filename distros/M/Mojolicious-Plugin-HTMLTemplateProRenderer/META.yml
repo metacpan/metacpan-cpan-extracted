@@ -1,0 +1,26 @@
+---
+abstract: 'A Mojoliciuos plugin to render templates using HTML::Template::Pro module'
+author:
+  - 'Emiliano Bruni (info@ebruni.it)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-HTMLTemplateProRenderer
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTML::Template::Pro: '0.10'
+  HTML::Template::Pro::Extension: '0.11'
+  Mojolicious: '4.0'
+  Test::Simple: '0.44'
+  perl: '5.006'
+version: '0.05'

@@ -1,0 +1,23 @@
+#!perl -w
+use strict;
+use Mac::MoreFiles;
+
+my($lib, $script) = @ARGV;
+my @apps = 'MACS'; # Finder
+# System Events, Image Events
+# had DiskImageMounter in here ... but app won't stay open long enough to get AETE ...
+push @apps, 'sevs', 'imev' if $^O ne 'MacOS';
+my @paths = map { $Application{$_} } @apps;
+
+system($^X, $lib, "$script/gluedialect", '-I');
+
+my $aout = `$^X $lib $script/gluescriptadds -I 2>&1`;
+while ($aout =~ s!(?:^|\n).+does not appear to be an addition.+?\n  Try: blib/script/gluemac '(.+?)'\n!\n!) {
+	push @paths, $1;
+}
+$aout =~ s/^\n+//;
+print $aout;
+
+system($^X, $lib, "$script/gluemac", '-I', @paths);
+
+__END__

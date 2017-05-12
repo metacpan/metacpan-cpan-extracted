@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+use Mojolicious::Lite;
+
+# To launch this app, type in your console:
+#
+#  morbo ExampleApp
+#
+# and try to open several urls
+#
+#  http://127.0.0.1:3000
+#  http://127.0.0.123:3000
+#
+# you'll be redirected to http://localhost:3000
+#
+# Keep in mind, if you are going to change host to 'google.com', you will be redirected to the http://google.com:3000 (to nothing)
+# But you can tell morbo to listen :80 (may require root privileges, depending on your OS)
+#
+#  morbo -l 'http://*:80' WithPlugin
+
+plugin RedirectHost => {host => 'localhost', code => 302};
+
+get '/' => sub {
+  my $self = shift;
+  $self->render(text => "Your request is ${\$self->req->url->to_abs}");
+};
+
+app->start;
+
+

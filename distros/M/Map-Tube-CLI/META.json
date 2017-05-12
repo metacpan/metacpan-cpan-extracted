@@ -1,0 +1,67 @@
+{
+   "abstract" : "Command Line Interface for Map::Tube::* map.",
+   "author" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Map-Tube-CLI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0.28",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MIME::Base64" : "3.14",
+            "Map::Tube::Exception" : "3.08",
+            "Module::Pluggable" : "5.1",
+            "Moo" : "2.000000",
+            "MooX::Options" : "4.023",
+            "Types::Standard" : "1.000005",
+            "namespace::clean" : "0.24",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Map::Tube::CLI" : {
+         "file" : "lib/Map/Tube/CLI.pm",
+         "version" : "0.24"
+      },
+      "Map::Tube::CLI::Option" : {
+         "file" : "lib/Map/Tube/CLI/Option.pm",
+         "version" : "0.24"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/Map-Tube-CLI.git",
+         "web" : "https://github.com/manwar/Map-Tube-CLI"
+      }
+   },
+   "version" : "0.24",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

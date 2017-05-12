@@ -1,0 +1,5 @@
+//logonid1 JOB account,'TEST',CLASS=W,MSGCLASS=X,MSGLEVEL=(0,0)
+//*LOGONID  logonid
+//*PASSWORD password
+/*ROUTE    PRINT node.logonid
+//STEP001  EXEC PGM=IEFBR14

@@ -1,0 +1,217 @@
+Revision history for Perl module MIME::EncWords
+
+1.014.3 2014-09-27  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * Fix: CPAN RT#99160: encode_mimewords() ignores the word "0".
+
+1.014.2 2013-08-26  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * No new features.
+    * Reformat Changes file: CPAN RT#88096.
+
+1.014.1 2013-08-25  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * No new features.
+    * Move Japanese documentations under POD2::JA.
+
+1.014 2013-04-27  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * No changes.
+
+1.013_02 2013-04-14  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * Fix: CPAN RT#84295: MaxLineLen fixes to the value set at the first
+      time.
+    * Imp: encode_mimewords() supports UTF-16, UTF-32 and their flavors.
+      They will be encoded as UTF-8.
+    * Requires MIME-Charset >= 1.010.
+
+1.012.6 2012-10-01  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * No changes.
+
+1.012_5 2012-09-05  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * Minor Fix: After ASCII words extending over multiple lines,
+      line length was estimated shorter.  CPAN RT #79399.
+    * Doc: corrected typo.
+
+1.012.4 2011-10-26  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * Chg: encode_mimewords(): 'B' was advantageous over 'Q' by 4/3 byte
+      on average...
+    * Updated address of FSF.
+
+1.012.3 2011-06-05  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * Fix: encode_mimewords(): inproper handling of Encoding => 'S'.
+    * Imp: decode_mimewords(): Broken "Q" encoding also warned: "=" not
+      leading two hexdigits (raw " " and "\t" are allowed).
+    * Imp: encode_mimewords(): negative MaxLineLen allows unlimited length
+      of line.
+    * Encode::MIME::EncWords: Rewritten. 0.03.
+      - Any newlines not forming folding white space are preserved.
+        cf. CPAN RT #68582 for standard encodings.
+      - Error handling.
+    * Doc: typos etc.
+
+1.012.2 2011-06-01  Hatuka*nezumi - IKEDA Soji   <hatuka@nezumi.nu>
+
+    * Chg: encode_mimewords(): By 'A' or 'S' encodings, 'Q' will be used
+      more often: When number of bytes to be encoded exceeds 6th of
+      entire bytes, words may be encoded by 'B'.  In other words,
+      ``S encoding'' is to choose shorter one of 'B' or 'Q' according to
+      length of maximally-encoded result.
+    * Fix: encode_mimewords(): Pure ASCII words containing unsafe sequence
+      ignored Encoding option; encoded by header_encoding() of its charset.
+    * Updated Encode::MIME::EncWords.
+    * Added test #03 & #04.  Added UTF-8 cases to #02.
+
+1.012.1 2011-05-29  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * Unicode/multibyte support on Perl 5.7.3 (experimental).
+    * New: Encode::MIME::EncWords [alpha release] - Encode module for
+      "MIME-EncWords", "MIME-EncWords-B", "MIME-EncWords-Q" and
+      "MIME-EncWords-ISO_2022_JP".
+    * Requires MIME::Charset >= 1.008.2.
+
+1.012 2010-06-17  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * encode_mimewords(): New option Minimal => 'DISPNAME' to help
+      encoding RFC5322 name-addr.
+
+1.011.1 2009-06-16  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * no new features.
+    * Fix: Perl <= 5.6.x - skip tests with older POD::Simple.
+    * MIME::Charset >= 1.007.1 is required.
+
+1.011 2009-05-17  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * not really released.
+
+1.011_01 2009-05-11  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * no new features.
+    * Supports Perl 5.8.0.
+    * MIME::Charset >= 1.007 is required.
+
+1.010.101 2008-04-19  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * tidinesses only; no new features.
+    * CPAN RT #34909, #35070 (depends on #35120):
+      Perl >= 5.8.1 requires MIME::Charset >= 1.006.2.
+    * Perl 5.11.0: Suppress ``Use of uninitialized value
+      within @_ in lc'' warnings.
+    * Perl <= 5.6.2: Suppress ``Useless use of a constant in
+      void context'' warnings.
+    * Correct META.yml & MANIFEST.
+
+1.010 2008-04-12  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * encode_mimeword(): Restrict characters in encoded-words
+      according to RFC 2047 section 5 (3).
+      Note: length(encode_mimeword()) may not be equal to
+      encoded_header_len() of MIME::Charset 1.004 or earlier.
+    * Bug Fix: Texts with ``US-ASCII transformation'' charsets,
+      HZ-GB-2312 (RFC 1842) and UTF-7 (RFC 2152), were treated
+      as US-ASCII.
+    * Fix: encoded-words exceeding line length can be generated.
+    * encode_mimewords(): Improved encoding of unsafe ASCII
+      sequences (words exceeding line length or including ``=?'').
+    * encode_mimeword(): can take charset object argument.
+      In this case RAW can be Unicode string.
+    * Modified / added tests for multibyte / singlebyte / unsafe
+      ASCII.
+
+1.009 2008-03-30  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * Bug Fix: Perl <=5.6.x: encode_mimewords(): ASCII words
+      are encoded.
+    * Bug Fix: Perl <=5.005: our is ``deprecated''.
+
+1.007 2008-03-21  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * encode_mimewords(): New option 'Folding' defaults to
+      be "\n" which may break conformance to RFC 2822 / MIME.
+    * Improve handling of linear-white-spaces: preserve
+      multiple whitespace sequences.
+    * Fix: decode_mimewords(): excessive spaces are inserted
+      on pre-Encode environments (e.g. 5.6.x).
+    * Fix: decode_mimewords(): no 'Charset' option must be
+      no conversion to keep compatible with MIME::Words.
+    * Remove multibyte tests on pre-Encode environments
+      where it cannot be supported exactly.
+    * Restructured processing of option parameters.
+    * Added tests for decoding multibyte and encoding singlebyte.
+
+1.005 2008-03-16  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * Fix: Injected bug on _UNICODE_ conversion.
+    * Fix: decode_mimewords(): line folding of encoded text
+      is preserved in the result.
+
+1.004 2008-03-16  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * withdrawn.
+    * By this release we require OO interface of MIME::Charset
+      1.001 or later.
+    * Fix: encode_mimewords(): Newlines were encoded when
+      original text includes them.
+    * New feature: MIME/EncWords/Defaults.pm: If it exists,
+      built-in defaults for option parameters of methods can be
+      overridden.
+    * encode_mimewords(): Built-in default for "Encoding"
+      option has been changed from "Q" to "A".
+    * encode_mimewords(): New option "MaxLineLen" which defaults
+      to be 76, and "Mapping" which defaults to be "EXTENDED".
+    * decode_mimewords(): New option "Mapping" which defaults
+      to be "EXTENDED".
+    * Added tests for multibyte.
+    * Clean-up PODs and codes.
+
+1.003 2008-03-14  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * encode_mimewords(): Fix: Minimal option won't affect when Encoding
+      options is not "A".
+    * decode_mimewords(): Support RFC 2231 section 5 extension.
+
+1.000 2008-03-08  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * decode_mimewords(): New option 'Detect7bit', enabled by default.
+    * encode_mimewords(): New option 'Replacement.
+
+0.040 2006-11-16  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * encode_mimewords(): New option 'Minimal' to control
+      minimal encoding behavior.
+      NOTE: Default behavior was changed from "NO" to "YES".
+
+0.032 2006-10-22  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * More documentation changes.
+
+0.03.1 2006-10-20  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * not really released
+    * Documentation changes only: Note on modifications, clarifications
+      about compatibility with MIME::Words.
+
+0.03 2006-10-17  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * decode_mimewords: allow Unicode input.
+    * decode_mimewords: don't collapse spaces between '?='...'=?'.
+    * Bug fix: cannot encode null string.
+    * Handle wide characters exactly.
+    * Change die to croak.
+
+0.02 2006-10-13  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * decode_mimewords: Fix bug about default charset.
+    * Supports Perl 5.005 or later.
+      Unicode/multibyte handling will be enabled on Perl 5.8.1 or later.
+    * Added test cases for encode_mimewords (only for singlebyte).
+
+0.01 2006-10-11  Hatuka*nezumi - IKEDA Soji  <hatuka@nezumi.nu>
+
+    * Initial CPAN upload.

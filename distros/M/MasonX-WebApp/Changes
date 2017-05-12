@@ -1,0 +1,96 @@
+0.12  2007-02-01
+
+- Tweaked the internals so that it will work with either mod_perl 1 or
+  2.
+
+
+0.11  2005-07-18
+
+- Clarified and improved the docs (I hope).
+
+- MasonX::WebApp::ApacheHandler->request_args() now requires an
+Apache::Request object unless args_method is set to "CGI".
+
+
+0.10  2005-07-17
+
+- The handler() sub provided by MasonX::WebApp was broken, as was the
+version in the docs.  Reported by George Hartzell.
+
+- If your subclass did not call $class->ApacheHandlerParams() and set
+some parameters, then MasonX::WebApp's default handler() would fail.
+Reported by Lee Carmichael.
+
+- Fix handling of MasonGlobalName.  Reported by George Hartzell.
+
+- Shut up annoying "subroutine redefined" warnings from
+MasonX::WebApp.
+
+- Added some real tests
+
+- Require Perl 5.6.0+
+
+
+0.09  2005-05-25
+
+- Documented RequireAbortAfterAction declarative parameter.
+
+- Added overridable method _is_valid_action() to allow for more
+fine-grained control over what methods are exposed via URIs.
+
+- Made ActionURIPrefixRegex public.  This allows for more control over
+what can come before an action name in a URI.
+
+
+0.08  2004-08-16
+
+- Added abort() and abort_status() methods, to allow you to abort
+processing without redirecting.
+
+- The redirected() method is now deprecated, as it has been
+re-implemented to use the new abort() method.
+
+
+0.07  2004-08-11
+
+- Allow the error parameter to _handle_error() to be an array
+reference of error messages.
+
+
+0.06  2004-08-06  (from Taiwan to you)
+
+- Arguments given new() besides apache_req and args are now passed
+through to the _init() method.
+
+
+0.05  2004-05-29
+
+- The handler method was broken.
+
+- Added a warning about being careful to make sure that the app object
+goes out of scope at the end of the request, because if you make it a
+global via the Mason Interp object's set_global() method, it can
+persist across requests.
+
+
+0.04  2004-05-13
+
+- Calling clean_request_args() on the ApacheHandler object at the end
+of the request is no longer needed.  Thanks to Ken Williams for
+suggesting that I use $r->pnotes().  But why didn't I think of that?
+
+
+0.03  2004-05-12
+
+- _LoadActions was broken, and didn't work at all.
+
+
+0.02  2004-05-12
+
+- Fix a dumb syntax error that broke the session_wrapper() method.
+Reported by Michael Alan Dorman.
+
+
+0.01  2004-05-11
+
+- First release.

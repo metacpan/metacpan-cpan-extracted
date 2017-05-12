@@ -1,0 +1,127 @@
+<html>
+<head>
+<title>MHonArc Resources: USINGLASTPG</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="uselocaltime.html">USELOCALTIME</a>]</td><td><nobr>[<a href="../resources.html#usinglastpg">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="varregex.html">VARREGEX</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>USINGLASTPG</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p><code>M2H_USINGLASTPG=</code> [ <code>0</code> | <code>1</code> ]
+</p>
+</dd>
+
+<dt><strong>Element(s)</strong><dt>
+<dd><p><code>&lt;USINGLASTPG&gt;</code><br>
+<code>&lt;NOUSINGLASTPG&gt;</code><br>
+</p>
+</dd>
+
+<dt><strong>Command-line Option(s)</strong><dt>
+<dd><p>N/A
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>USINGLASTPG is a boolean resource to tell MHonArc if the
+<b>$LASTPG$</b> resource variable is in use.
+</p>
+<p>The usage of this resource is only applicable if
+<a href="multipg.html">MULTIPG</a> is set.  By default, MHonArc
+will regenerate all pages of a multi-page index if a new page
+gets added to the archive.  This is done to insure that any
+links to the last page of the index (via $PG(LAST)$) gets updated.
+</p>
+<p>If you want to save processing time, and you know you are not
+using <b>$LASTPG$</b> in any resource (or have a helper CGI
+program to link to the last page), set USINGLASTPG to 0.
+Any new page added will only cause the new page and previous
+page to be written/updated, assuming that added messages always
+appear at the end of message listings.  MHonArc will
+still update relevant index pages if message listing order dictates
+such an action.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<p>1
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>None.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>2.1.2
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p><a href="multipg.html">MULTIPG</a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="uselocaltime.html">USELOCALTIME</a>]</td><td><nobr>[<a href="../resources.html#usinglastpg">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="varregex.html">VARREGEX</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2003/10/06 22:04:23 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"
+><strong>MHonArc</strong></a><br>
+Copyright &#169; 1998, <a href="http://www.earlhood.com/"
+>Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org"
+>mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

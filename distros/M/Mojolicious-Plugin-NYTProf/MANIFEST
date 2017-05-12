@@ -1,0 +1,21 @@
+Changes
+Makefile.PL
+README.md
+README.pod
+lib/Mojolicious/Plugin/NYTProf.pm
+MANIFEST
+t/000_prerequisites.t
+t/001_compiles_pod.t
+t/003_changes.t
+t/005_plugin_not_configured.t
+t/010_nytprof.t
+t/015_no_static.t
+t/020_no_production.t
+t/025_nytprof_env.t
+t/030_config_hooks.t
+t/public/some_static_file
+t/test_app.pl
+t/nytprof/profiles/.exists
+t/nytprof/html/.exists
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

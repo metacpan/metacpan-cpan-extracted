@@ -1,0 +1,59 @@
+Mail-Pegasus v1.04
+==================
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+IO::Scalar
+Mail::Internet
+
+Other modules will be implied by Mail::Internet
+
+COPYRIGHT AND LICENSE
+
+     Copyright (c) 2004 Matthew Sullivan & Rodney McDuff. All
+     rights reserved.  This program is free software; you can
+     redistribute it and/or modify it under the same terms as
+     Perl itself.
+
+CONTACT INFO
+
+     Matthew Sullivan <sorbs@cpan.org>
+
+EXAMPLE
+
+     This example will show the Data and Subject of every folder
+     of a user, then it will show the first message of the INBOX
+     for the same user and finally it will return the status of
+     the first message in the INBOX.
+
+         my $mailbox = Mail::Pegasus->new(Directory => "$ENV{USER}/pmail");
+         foreach my $mailFolder (@{$mailbox->list_folders()})
+         {
+             $mailbox->select($mailFolder);
+             print "Selected $mailFolder [" . $mailbox->messages() . " messages]\n";
+             $mailbox->list_messages();
+         }
+
+         $mailbox->select("INBOX");
+         print $mailbox->get_message("1");
+         my $status = $mailbox->get_message_status("1");
+
+         if (defined($status))
+         {
+             print "Message has " . ($status ? "" : "not ") . "been read!\n";
+         } else {
+             print "Unable to determine the message status!\n";
+         }
+
+

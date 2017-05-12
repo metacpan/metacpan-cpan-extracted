@@ -1,0 +1,11 @@
+The image included here for testing should be demacbinarized before 
+testing.  If you use Chris Nandor's untargzipme.plx and MacPerl to unpack 
+this archive, it should be that way when you read this.  Otherwise, use any 
+MacBinary decoder to decode this before testing, and then move the 
+original .bin file from the testfiles folder.
+
+This particular picture was chosen because it caught a couple of bugs while 
+Eryq was developing Convert::BinHex.  It's the famous "Earthrise" picture 
+from Apollo 8.
+
+

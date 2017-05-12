@@ -1,0 +1,40 @@
+NAME
+    MooX::TypeTiny - Optimized type checks for Moo + Type::Tiny
+
+SYNOPSIS
+      package Some::Moo::Class;
+      use Moo;
+      use MooX::TypeTiny;
+      use Types::Standard qw(Int);
+
+      has attr1 => (is => 'ro', isa => Int);
+
+DESCRIPTION
+    This module optimizes Moo type checks when used with Type::Tiny to
+    perform better. It will automatically apply to isa checks and coercions
+    that use Type::Tiny. Non-Type::Tiny isa checks will work as normal.
+
+    This is done by inlining the type check in a more optimal manner that is
+    specific to Type::Tiny rather than the general mechanism Moo usually
+    uses.
+
+    With this module, setters with type checks should be as fast as an
+    equivalent check in Moose.
+
+    It is hoped that eventually this type inlining will be done
+    automatically, making this module unnecessary.
+
+AUTHOR
+    haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+CONTRIBUTORS
+    None so far.
+
+COPYRIGHT
+    Copyright (c) 2015 the MooX::TypeTiny "AUTHOR" and "CONTRIBUTORS" as
+    listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself. See <http://dev.perl.org/licenses/>.
+

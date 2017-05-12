@@ -1,0 +1,58 @@
+#! /usr/bin/env python
+# encoding: utf-8
+
+def build(bld):
+  source_files = """
+  emitters/szlunique.cc
+  emitters/top.cc
+  emitters/quantile.cc
+  utilities/hashutils.cc
+  """
+  
+  bld(source = source_files,
+      features ='cxx cxxshlib',
+      name     = 'szaru',
+      target   = 'szaru',
+      lib = 'crypto',
+      includes     = '. ../build')
+
+  bld(source = source_files,
+      features ='cxx cxxstlib',
+      name     = 'szaru',
+      target   = 'szaru',
+      lib = 'crypto',
+      includes     = '. ../build')
+
+  bld.install_files('${PREFIX}/include', "szaru.h")
+ 
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

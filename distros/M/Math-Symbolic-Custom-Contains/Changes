@@ -1,0 +1,13 @@
+Revision history for Perl extension Math::Symbolic::Custom::Contains.
+
+1.01  Wed Jun 05 07:57 2013
+  - POD encoding fix.
+  - Do not depend on Pod::* for tests.
+
+1.00  Wed Sep 27 15:05 2006
+  - Switch to using Module::Build.
+  - Module is stable => 1.00 release.
+  - Optional POD tests
+
+0.10  Tue Mar 08 15:05 2004
+  - original version as uploaded to CPAN

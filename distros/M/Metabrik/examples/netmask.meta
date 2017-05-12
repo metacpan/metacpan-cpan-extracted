@@ -1,0 +1,9 @@
+run core::log info "Running script network::address"
+
+use network::address
+
+set network::address subnet 192.168.0.0/24
+run network::address ipv4_list
+
+set core::shell echo 1
+$RUN

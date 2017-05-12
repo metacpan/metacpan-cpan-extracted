@@ -1,0 +1,24 @@
+Revision history for MooseX-OmniTrigger
+
+0.01    2011-12-22
+        First version, released on an unsuspecting world.
+
+0.02    2011-12-22
+        Second first version, released on an unsuspecting world.
+
+0.03    2011-12-23
+        * Minor doc changes.
+
+0.04    2011-12-25
+        * Fixed tests:
+            t/050-moosex-declare.t
+            t/052-moosex-lazy_require.t
+        * Added test:
+            t/051-moosex-attribute-env.t
+        * Minor doc changes.
+
+0.05    2011-12-26
+        * Removed dependency in test 001-basic.t.
+
+0.06    2011-12-28
+        * Added build requirement: Hash::Util::FieldHash.

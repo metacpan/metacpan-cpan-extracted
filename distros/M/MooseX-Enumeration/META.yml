@@ -1,0 +1,60 @@
+---
+abstract: 'a native attribute trait for enums'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.92'
+  Test::Requires: '0.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-Enumeration
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Moose::Meta::Attribute::Custom::Trait::Enum:
+    file: lib/Moose/Meta/Attribute/Custom/Trait/Enum.pm
+    version: '0.005'
+  Moose::Meta::Attribute::Custom::Trait::Enumeration:
+    file: lib/Moose/Meta/Attribute/Custom/Trait/Enumeration.pm
+    version: '0.005'
+  MooseX::Enumeration:
+    file: lib/MooseX/Enumeration.pm
+    version: '0.005'
+  MooseX::Enumeration::Meta::Attribute::Native::Trait::Enumeration:
+    file: lib/MooseX/Enumeration/Meta/Attribute/Native/Trait/Enumeration.pm
+    version: '0.005'
+  MooseX::Enumeration::Meta::Method::Accessor::Native::Enumeration::assign:
+    file: lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/assign.pm
+    version: '0.005'
+  MooseX::Enumeration::Meta::Method::Accessor::Native::Enumeration::is:
+    file: lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/is.pm
+    version: '0.005'
+recommends:
+  Type::Tiny::Enum: '0.030'
+  match::simple::XS: '0'
+requires:
+  Module::Runtime: '0'
+  Moose: '1.15'
+  match::simple: '0'
+  perl: '5.008001'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/MooseX-Enumeration/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Enumeration
+  homepage: https://metacpan.org/release/MooseX-Enumeration
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-moosex-enumeration.git
+version: '0.005'

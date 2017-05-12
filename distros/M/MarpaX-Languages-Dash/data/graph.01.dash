@@ -1,0 +1,6 @@
+# Ends with edge without attributes. OK.
+[node.1]{color: red; label: Node A}
+->{color: green; label: Edge B;}
+->{color: red; label: Edge C C ; }
+[node.2]
+->

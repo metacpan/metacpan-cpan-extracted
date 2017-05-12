@@ -1,0 +1,168 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+=head1 NAME
+
+download-sources - search Google for Mac Programming result codes
+
+=head1 SYNOPSIS
+
+	% download-errors sources.dat
+	
+=head1 DESCRIPTION
+
+This script reads a list of URLs from the file named as the first
+command line argument. The URLs point to Apple's programmer web site.
+
+For each URL, the script fetches the file, parses it, and extracts
+the result codes.
+
+It prints the results to standard output.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005, Salvatore Domenick Desiano C<< <sal@email.arc.nasa.gov> >
+
+You may use this software under the same terms as Perl itself
+
+=cut
+
+use LWP::Simple qw(get);
+
+my $source_list = $ARGV[0];
+
+open my $source_fh, "<", $source_list 
+	or die "Unable to read $source_list: $!" ;
+
+while( <$source_fh> )
+	{
+    s/[\012\015]*$//;
+
+    print STDERR "Fetching $_\n";
+    my $result = get( $_ );
+	do { print STDERR "\tskipping...\n"; next } unless $result;
+
+    my( $section_title ) = get_section_title( \$result );
+    my( $section_desc )  = get_section_description( \$result );
+
+	clean_result( \$result );
+
+	next unless $result;
+	
+    print "\tTitle: $section_title\n";
+    print "\tSource: $_\n";
+    print "\tDescription: $section_desc\n";
+	
+    foreach my $bit ( split /<tr>/i, $result )
+		{		
+        next if $bit =~ /^\s+$/;
+
+		my( $symbol, $code, $description ) = extract_bits( \$bit );
+				
+		print "$symbol $code $description\n";
+		}
+   	}
+
+sub extract_bits
+	{
+	my $bit = shift;
+	
+	my( $symbol, $code, $description ) = $$bit =~ m|
+		<code.*?>(.*?)</code>
+		.*?
+		class="content_text">(.*?)</td>
+		.*?
+		class="content_text">(.*?)\.?</td>
+		|xigs;
+		
+	$symbol = clean_text( \$symbol, 'symbol' );
+	$code   = clean_text( \$code, 'code' );
+	$code   =~ s/^-//;
+
+	my @descs = map clean_text( \$_, 'description' ),
+			grep { $_ ne '' } split /<p>/, ( $description || '' );
+			
+	$description = join( '', @descs ) || '';
+	( $symbol, $code, $description )
+	}
+	
+sub clean_result
+	{
+	my $result = shift;
+	
+    $$result =~ s/^.*<\/h1>.*?<table .*?>.*?<\/tr>//msi;
+    $$result =~ s/<!-- START FOOTER.*$//ms;
+    $$result =~ s/<\/table>.*$//msi;
+	}
+	
+sub get_section_title
+	{
+	my $result = shift;
+	
+    my( $section_title ) = $$result =~ /^.*?<h1>(.*?)<\/h1>/msi;
+    $section_title = clean_text( \$section_title, 'section title' );
+	}
+	
+sub get_section_description
+	{
+	my $result = shift;
+	
+    my( $section_desc ) = $$result =~ /<\/h1>.*?<p>(.*?)<\/p>/msi;
+    $section_desc = clean_text( \$section_desc, 'section description' );
+	}
+	
+sub clean_text
+	{
+    my( $text, $type ) = @_;
+    
+    return unless $$text;
+    
+    $$text =~ s/[\012\015]/ /g;
+
+	my $strip_patterns = <<"PATTERNS";
+<[bi]>
+<\/[abip]>
+<\/?(?:tt|code|span)>
+<!--.*?-->
+<a href=\"[^\"]+\"(?: target="_top")?>
+<a name="\/\/[^\"]+">
+<span class="[^\"]+">
+PATTERNS
+
+	my %entities = do { no warnings;
+		 qw(
+			&#8211;		-
+			&#8212;		--
+			&#8217;		'
+			&#8220;		"
+			&#8221;		"
+			&quot;		"
+			&gt;		>
+			&lt;        <
+			&amp;       &
+			);
+		};
+ 	
+	my @strip_patterns = map { s/^\s+|\s+$//g; $_ } 
+		split /$/m, $strip_patterns;
+	
+	foreach my $pattern ( @strip_patterns ) { $$text =~ s/$pattern//gi }
+
+    $$text =~ s/&nbsp;/ /g;
+	$$text =~ s/ +/ /g;
+		
+    $$text =~ s/^\s*(.*)\s*$/$1/;
+
+ 	foreach my $key ( keys %entities )
+ 		{
+ 		$$text =~ s/\Q$key/$entities{$key}/gi;
+ 		}
+   
+    
+    die("unprocessed $type tag: $text") if ($text =~ /</);
+    $text =~ s/&lt;/</g;
+    die("unknown $type escape: $text") if ($text =~ /&/);
+    $text =~ s/&amp;/&/g;
+    return $$text;
+	}	

@@ -1,0 +1,7 @@
+#!/usr/bin/perl -w
+#   LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\" %T %v"
+
+use Munin::Plugin::ApacheRequest;
+
+my ($VHOST) = ($0 =~ /_([^_]+)$/);
+Munin::Plugin::ApacheRequest::Run($VHOST,1000);

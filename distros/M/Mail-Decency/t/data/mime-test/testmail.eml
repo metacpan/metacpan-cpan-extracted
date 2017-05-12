@@ -1,0 +1,16 @@
+From: Sender Name <sender@domain.tld>
+Content-Type: text/plain;
+	charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+Subject: This is the Subject
+X-Universally-Unique-Identifier: 12345678-1234-1234-1234-123456789012
+Date: Mon, 10 May 2010 18:01:01 +0200
+Message-Id: <12345678-1234-1234-1234-123456789012@domain.tld>
+To: Recipient Name <recipient@other-domain.tld>
+Mime-Version: 1.0 (Apple Message framework v1078)
+
+Hello yadda,
+
+This is my MIME MAIL
+
+

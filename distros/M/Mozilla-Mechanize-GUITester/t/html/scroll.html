@@ -1,0 +1,34 @@
+<html>
+<head>
+<title>Simple GUI</title>
+<style>
+#but {
+	position: absolute;
+	left: 500px;
+	top: 500px;
+}
+#but2 {
+	position: absolute;
+	left: 599px;
+	top: 599px;
+}
+</style>
+</head>
+<body>
+<div id="long_div" style="position: absolute; width: 1000px; height: 2000px"></div>
+<div id="div1" style="position: absolute; left: 800px; top: 800px; width: 10px; height: 10px">
+</div>
+<div id="div2" style="position: absolute; left: 810px; top: 810px; width: 10px; height: 10px">
+</div>
+<input id="but" type="button" value="Hello" onclick="alert('clicked');" />
+<input id="but2" type="button" value="Hello" onclick="alert('clicked 2');" />
+<script>
+document.getElementById("long_div").addEventListener("click", function(e) {
+	alert("long_div click " + e.clientX + " " + e.clientY);
+}, true);
+document.getElementById("div1").addEventListener("click", function(e) {
+	alert("div1 click");
+}, true);
+</script>
+</body>
+</html>

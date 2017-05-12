@@ -1,0 +1,12 @@
+diff -Naur MP3-Tag-0.9709/Tag/ID3v2.pm MP3-Tag-0.9709-E3/Tag/ID3v2.pm
+--- MP3-Tag-0.9709/Tag/ID3v2.pm	2006-12-17 19:46:04.000000000 -0800
++++ MP3-Tag-0.9709-E3/Tag/ID3v2.pm	2007-12-09 10:38:57.938421152 -0800
+@@ -1692,7 +1692,7 @@
+ 		# extract the header data
+ 		my ($major, $revision, $pflags) = unpack ("x3CCC", $header);
+ 		# check the version
+-		if ($major >= $#supported_majors or $supported_majors[$major] == 0) {
++		if ($major > $#supported_majors or $supported_majors[$major] == 0) {
+ 			warn "Unknown ID3v2-Tag version: v2.$major.$revision\n";
+ 			print "| $major > ".($#supported_majors)." || $supported_majors[$major] == 0\n";
+ 			print "| ",join(",",@supported_majors),"n";

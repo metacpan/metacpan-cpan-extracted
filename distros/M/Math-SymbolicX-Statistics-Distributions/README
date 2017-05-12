@@ -1,0 +1,43 @@
+Math::SymbolicX::Statistics::Distributions version 1.02
+=======================================================
+
+This module offers easy access to formulas for a few often-used
+distributions. For that, it uses the Math::Symbolic module which gives the
+user an opportunity to manufacture distributions to his liking.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Math::Symbolic (version 0.128 and up)
+  Test::LectroTest (tested with 0.3200, 0.3300 suggested!)
+  Math::SymnbolicX::ParserExtensionFactory (version 0.01 and up)
+
+NOTES
+
+Test::LectroTest prior to 0.3300 contained a bug that caused the call
+of the Makefile.PL script to fail due to its dependency check.
+
+The call to Makefile.PL, however, results in a Makefile being correctly
+written nonetheless. Just ignore the warning from Test::LectroTest!
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005, 2006 by Steffen Mueller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

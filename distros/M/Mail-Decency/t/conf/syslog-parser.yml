@@ -1,0 +1,36 @@
+---
+
+enable_syslog: 1
+enable_warn: 1
+log_level: 20
+
+syslog:
+    file: /var/log/mail.log
+
+database:
+    type: dbd
+    args:
+        - 'dbi:SQLite:dbname=/tmp/decency.db'
+
+cache:
+    class: File
+    cache_root: /tmp/decency-cache
+    # class: FastMmap
+    # share_file: /tmp/decency.mmap
+    # expire_time: 1h
+    # cache_size: 20m
+
+parser:
+    -
+        Stats:
+            disable: 0
+            use_date_interval: 0
+            intervals:
+                - 10
+                - 600
+                - 86400
+            csv_log:
+                file: /tmp/decency-csv
+                classes:
+                    - rejects
+                    - connections

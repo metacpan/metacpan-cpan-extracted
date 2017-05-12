@@ -1,0 +1,11 @@
+Changes
+LibMPEG3.pm
+Makefile.PL
+MANIFEST
+README
+test.pl
+libmpeg3.i
+libmpeg3.c
+libmpeg3.o
+eg/cdxa-fix.mpg
+eg/t.mpg

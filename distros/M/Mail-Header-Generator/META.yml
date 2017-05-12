@@ -1,0 +1,26 @@
+---
+abstract: 'Generate various email headers.'
+author:
+  - 'Dave O''Neill, <dmo at roaringpenguin.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Class: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.95'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mail-Header-Generator
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Time::Local: 0
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 0.301

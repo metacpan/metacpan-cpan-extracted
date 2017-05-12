@@ -1,0 +1,124 @@
+#! /usr/bin/perl
+#########################################################################
+#        This Perl script is Copyright (c) 2002, Peter J Billam         #
+#               c/o P J B Computing, www.pjb.com.au                     #
+#                                                                       #
+#     This script is free software; you can redistribute it and/or      #
+#            modify it under the same terms as Perl itself.             #
+#########################################################################
+
+eval "require 'Math/Evol.pm';";
+if ($@) { require 'Evol.pm'; }
+import Math::Evol;
+
+eval "require 'Term/Clui.pm';";
+if ($@) { require 'Clui'; }
+import Term::Clui;
+
+$tmpfile = "/tmp/ps_evol_$$.ps";
+
+sub choose_best_text {
+	if (! open (T, "> $tmpfile")) { die "can't open $tmpfile: $!\n"; }
+	print T @prolog;
+	print T <<EOT;
+(Helvetica-Bold) findfont 14 scalefont setfont
+gsave 207 289 translate 5 5 moveto (5) show 0.30 dup scale
+$_[0]
+grestore gsave  20 550 translate 5 5 moveto (1) show 0.30 dup scale
+$_[1]
+grestore gsave 207 550 translate 5 5 moveto (2) show 0.30 dup scale
+$_[2]
+grestore gsave 394 550 translate 5 5 moveto (3) show 0.30 dup scale
+$_[3]
+grestore gsave  20 285 translate 5 5 moveto (4) show 0.30 dup scale
+$_[4]
+grestore gsave 394 285 translate 5 5 moveto (6) show 0.30 dup scale
+$_[5]
+grestore gsave  20  20 translate 5 5 moveto (7) show 0.30 dup scale
+$_[6]
+grestore gsave 207  20 translate 5 5 moveto (8) show 0.30 dup scale
+$_[7]
+grestore gsave 394  20 translate 5 5 moveto (9) show 0.30 dup scale
+$_[8]
+grestore showpage
+%%EOF
+EOT
+close T;
+	my $preference = &choose('Re-Load. Now which drawing do you prefer ?',
+		'1','2','3','4','5','6','7','8','9');
+	my $continue   = &confirm('Continue ?');
+	if ($preference eq '5') { $preference = 0;
+	} elsif ((0+$preference) > 5) { $preference = -1 + $preference;
+	} else { $preference = 0 + $preference;
+	}
+	return ($preference, $continue);
+}
+while (<>) { push @prolog, $_; if (/EndProlog/) { last; } }
+while (<>) { push @prolog, $_; if (/EndPageSetup/) { last; } }
+while (<>) { if (/showpage/)  { last; } push @page, $_; }
+&inform ("Use GhostView or equivalent to view $tmpfile");
+my $new_page = &text_evol(join ('', @page), \&choose_best_text, 8);
+print join('', @prolog), $new_page, "showpage\n%%EOF\n";
+&confirm("OK to remove $tmpfile ?") && unlink $tmpfile;
+exit 0;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+ps_evol - Perl script to fine-tune A4 PostScript drawings
+
+=head1 SYNOPSIS
+
+ vi plant.ps
+ ps_evol plant.ps > p2.ps
+
+=head1 DESCRIPTION
+
+I<ps_evol> is mainly intended as a demo script
+illustrating the I<text_evol> funtion in Math::Evol.pm.
+It assumes you have something like GhostView
+which allows you to view PostScript files.
+
+It creates a temporary PostScript file,
+then repeatedly generates eight variants of the original file,
+scales them smaller, numbers them, and displays them in a 3x3 array.
+The original is in the middle, as number 5.
+It asks the user which variant they prefer,
+then uses that as the original for the next iteration.
+When the user decides to call a halt,
+the latest preferred variant is written to the standard output.
+
+The parameters to be varied in the PostScript file
+must be marked out by special comments, such as
+
+ /gray_sky .87 def % evol step 0.05 min 0.0 max 1.0
+
+See I<perldoc Math::Evol> for more details,
+and as an example the PostScript file I<plant.ps>,
+included with the distribution.
+
+Version 1.05,
+#COMMENT#
+
+=head1 DEPENDENCIES
+
+Uses the CPAN module Term::Clui.pm to dialogue with the user.
+
+=head1 AUTHOR
+
+Peter J Billam, www.pjb.com.au/comp/contact.html
+
+=head1 CREDITS
+
+Based on Math::Evol.pm, and conceptually on
+Richard Dawkin's I<Blind Watchmaker> software.
+
+=head1 SEE ALSO
+
+Math::Evol.pm, Term::Clui.pm, http://www.pjb.com.au/, perl(1).
+
+=cut
+

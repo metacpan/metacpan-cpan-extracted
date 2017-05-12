@@ -1,0 +1,17 @@
+Changes
+Glue.pm
+Glue/Application.pm
+Glue/Object.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+Makefile.PL
+README
+scripts/dumper
+scripts/finder/open-insertion-location
+scripts/finder/open-textedit
+scripts/finder/show-processes
+scripts/indesign/makedoc
+t/basic.t
+t/finder.t
+t/pod.t
+t/quicktime.t

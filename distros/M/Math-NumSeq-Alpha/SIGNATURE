@@ -1,0 +1,67 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 67dbf29f0b29dd613635b5eaa81b7d510db2930e Changes
+SHA1 942d782db2e1d3a071e03aedd360443de8d63c63 MANIFEST
+SHA1 d73f6910c2283dca6aa23a5d820950745dcb76f6 MANIFEST.SKIP
+SHA1 3c6c69fee29eba3556de3fd73bfc32dd7471f503 META.json
+SHA1 febdf6be11d9d95f7f3e6ef15d4cbb3c2ac4af90 META.yml
+SHA1 972f679d54b87b6cc3a46047cc0cc855699d06a6 Makefile.PL
+SHA1 1234b84f444ed336f58327710c9c2f997e77b397 debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 7656d71f12724a8adf26fc7f27d86fc8fcb10cc9 debian/control
+SHA1 db093390d4cb6d682671247eb83a2cc9335e8c92 debian/copyright
+SHA1 1750438686be8d50d3fee39329caa887873d67fc debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 80314d2a43dc0d35a79910650f9ef6a5e23ba569 debian/watch
+SHA1 e7f8e391bd5663837a88c310781ed2d3bd2349f5 devel/alphabetical-length.pl
+SHA1 deed94abd3bf39ce9dabbaf2d2275bcd850b61a5 devel/lib/Math/NumSeq/numseq-oeis.t
+SHA1 19fb75dc537dc8b01948df704bd0094b0e0460d0 lib/Math/NumSeq/AlphabeticalLength.pm
+SHA1 49da1965bb0656baafa9945381bf9c5ddd550327 lib/Math/NumSeq/AlphabeticalLengthSteps.pm
+SHA1 05e4adccc1a8a467e85da2daeb43cbec7f192602 lib/Math/NumSeq/OEIS/Catalogue/Plugin/Alpha.pm
+SHA1 e43e51c0a5d301cdad7599cef0de391bd8f7570d lib/Math/NumSeq/SevenSegments.pm
+SHA1 9b55b7dfb221d2ca342c3c8e8f5edb0ba87708a6 t/AlphabeticalLength-load.t
+SHA1 a3cdb2edc6cd4579bedc3602a34fe3f4348f912c t/AlphabeticalLengthSteps-load.t
+SHA1 3855de075da37f5bc4e6a5534b2f00cc14872a98 t/MyTestHelpers.pm
+SHA1 119602ca7014ce805f099140447a62177186d7a3 t/NumSeq-Alpha.t
+SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
+SHA1 63abbc3297914cd38081e95588fd794f9d1f0306 xt/0-Test-YAML-Meta.t
+SHA1 1cafa4e23b7a691e09161c0927e6920dd663e2ce xt/0-examples-xrefs.t
+SHA1 7bc810750906ae91a13b16c7bd833dd6e1c9741b xt/0-file-is-part-of.t
+SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
+SHA1 7400dd77e0ce2dd7ba9629eab7790d2f9b4f9ab5 xt/MyOEIS.pm
+SHA1 cf6cdaea6420a4f9fb382f124f5223ac4b8972a8 xt/oeis/AlphabeticalLength-oeis.t
+SHA1 dec96f41891de7a26c7e2299de154fba3b41041a xt/oeis/NumSeq-Alpha-oeis.t
+SHA1 cd18ddee73ad0007ba667f0e472ea9d73d0dfa89 xtools/my-check-copyright-years.sh
+SHA1 b12199bcc70c569ff43f8d8e2ea1c896f587c62f xtools/my-check-spelling.sh
+SHA1 fa07c8e559adbd1af5ba613e021991b0819fc7ba xtools/my-deb.sh
+SHA1 2db0a23176de55a8ee8f1643f239aeaa2bcf4fa1 xtools/my-diff-prev.sh
+SHA1 6c48137d49c3619eca39796d49f26332eea55d4a xtools/my-kwalitee.sh
+SHA1 e4a15f9b4bcf1d087de2d9ed8e87bf92b0469a6c xtools/my-manifest.sh
+SHA1 830acfc76ae9239a2c36143c437a3ec7c6736a0a xtools/my-pc.sh
+SHA1 7b1e948c88915689b3782d872ef9b92a2912c593 xtools/my-tags.sh
+SHA1 f90084e1d6f95abb12eea896cd1cc850402d7726 xtools/my-wunused.sh
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iD8DBQFVbWAuLFMCIV9q3ToRAh4AAJ4lpFW4VH2vX0V7XZrEibVwrzUH0ACgnpJI
+xsfzjn/FqMrN6VaQBzou/WE=
+=JmDP
+-----END PGP SIGNATURE-----

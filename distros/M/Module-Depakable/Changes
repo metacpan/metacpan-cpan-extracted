@@ -1,0 +1,42 @@
+Revision history for Module-Depakable
+
+0.007   2016-08-11 (PERLANCAR)
+
+	- Return all errors (including in result metadata in func.raw key).
+
+
+0.006   2016-05-19 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Revise the description again, I think it's clearer this
+	  time.
+
+
+0.005   2016-05-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Rewrite description.
+
+
+0.004   2016-05-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Remove extraneous (copy-pasted) description.
+
+
+0.003   2016-05-18 (PERLANCAR)
+
+	- Add prereq_depakable().
+
+
+0.002   2016-05-18 (PERLANCAR)
+
+	- Tweak/fix Rinci metadata.
+
+
+0.001   2016-05-18 (PERLANCAR)
+
+        - First release.

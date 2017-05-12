@@ -1,0 +1,81 @@
+#!perl
+use strict;
+use warnings;
+use Mojo::WebService::Twitter;
+use Mojo::WebService::Twitter::Util 'twitter_authorize_url';
+
+our $VERSION = '0.002';
+
+my $api_key = $ENV{TWITTER_API_KEY};
+my $api_secret = $ENV{TWITTER_API_SECRET};
+
+my $twitter = Mojo::WebService::Twitter->new;
+unless (defined $api_key and defined $api_secret) {
+	print "Enter Twitter API key: ";
+	chomp($api_key = readline STDIN);
+	print "Enter Twitter API secret: ";
+	chomp($api_secret = readline STDIN);
+}
+$twitter->api_key($api_key);
+$twitter->api_secret($api_secret);
+
+my $res = $twitter->request_oauth('oob');
+my $request_token = $res->{oauth_token};
+print "Please go to the following URL to authorize this Twitter application to make requests on your behalf.\n";
+print twitter_authorize_url($request_token) . "\n";
+
+print "Enter authorization PIN: ";
+chomp(my $pin = readline STDIN);
+
+$res = $twitter->verify_oauth($pin, $request_token);
+my ($access_token, $access_token_secret) = @$res{'oauth_token','oauth_token_secret'};
+my $user = $twitter->authentication(oauth => $access_token, $access_token_secret)->verify_credentials;
+
+print "OAuth credentials for \@" . $user->screen_name . ":\n";
+print "Access token: $access_token\n";
+print "Access token secret: $access_token_secret\n";
+
+=head1 NAME
+
+twitter_oauth_creds - Script to retrieve OAuth 1.0 credentials for a Twitter
+application
+
+=head1 SYNOPSIS
+
+ $ twitter_oauth_creds
+
+=head1 DESCRIPTION
+
+L<twitter_oauth_creds> is an interactive script for retrieving OAuth 1.0
+credentials to authorize a Twitter application to act on behalf of a user. It
+implements Twitter's L<PIN-based authorization flow|https://dev.twitter.com/oauth/pin-based>.
+
+The script will first prompt for your application's Twitter API key and secret,
+which you can obtain L<here|https://apps.twitter.com>. The API key and secret
+can also be passed as environment variables C<TWITTER_API_KEY> and
+C<TWITTER_API_SECRET>. It will then print an authorization URL which the user
+should go to in order to authorize the application. The user will receive a PIN
+after authorizing, which should be entered back into the script to receive an
+access token and secret. The token and secret can be stored and used to
+authorize the application on behalf of that user in the future, such as with
+L<Mojo::WebService::Twitter>.
+
+=head1 BUGS
+
+Report any issues on the public bugtracker.
+
+=head1 AUTHOR
+
+Dan Book <dbook@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015 by Dan Book.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=head1 SEE ALSO
+
+L<Mojo::WebService::Twitter>, L<WWW::OAuth>

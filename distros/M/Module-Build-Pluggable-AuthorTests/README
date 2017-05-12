@@ -1,0 +1,67 @@
+Module::Build::Pluggable::AuthorTests - Plugin to Module::Build to add author tests
+
+SYNOPSIS
+
+  # Build.PL
+  use strict;
+  use warnings;
+  use Module::Build::Pluggable qw[ AuthorTests ];
+
+  my $builder = Module::Build::Pluggable->new(
+      ...
+  );
+  $builder->create_build_script();
+
+
+DESCRIPTION
+
+  This Module::Build::Pluggable plugin adds an authortest action
+  which recursively runs tests in both the normal test directory
+  t, as well as in author-only test directories (by default xt ).
+
+  To specify alternate author-only test directories, pass the
+  "test_dirs" option when loading the module, e.g.
+
+    use Module::Build::Pluggable ( AuthorTests =>
+				    { test_dirs => 'xtt' } );
+
+  "test_dirs" will accept either a scalar or an array of directories.
+
+  To run the tests,
+
+    ./Build authortest
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Module::Build::Pluggable::AuthorTests
+
+
+COPYRIGHT AND LICENCE
+
+--8<--8<--8<--8<--
+
+This file is part of Module-Build-Pluggable-AuthorTests
+
+Copyright (c) 2016 The Smithsonian Astrophysical Observatory
+
+Copyright (c) 2016 Diab Jerius
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+-->8-->8-->8-->8--

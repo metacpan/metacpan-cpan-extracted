@@ -1,0 +1,26 @@
+Change log for Perl module MegaDistro
+
+0.02-4  Sun Jan 15 03:55:31 EST 2006
+      * Fourth release of 0.02
+      * Altered Changes file to reflect information on a per-release basis
+      - All previous dependencies on `tar` have now been replaced with
+        appropriate implementations using Archive::Tar.
+
+0.02-3  Mon Jan  9 00:32:45 EST 2006
+      - Added this Changes file. 
+
+0.02-2  Thu Jan  5 02:40:03 EST 2006
+      * Second release of 0.02
+      * MegaDistro::RpmMaker::SpecFile now uses BuildArch again.
+      - Fixed rpm builing bug; rpm should now build properly,
+        on any x86-compat system, and on fedora distributions of linux.
+
+0.02-1  Wed Jan  3 23:33:41 EST 2006
+      - Replaced mkdir -p system calls with File::Path::mkpath,
+        replaced rm -rf system calls with File::Path::rmtree, and
+        uses File::Spec::Functions::catdir instead of manual directory
+        manipulation.
+      - Cleaned up a bit of the documentation to reflect the changes made.
+
+0.01    Tue Sep  6 22:49:18 EST 2005
+      - First working version released to CPAN.

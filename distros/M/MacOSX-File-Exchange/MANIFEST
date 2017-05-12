@@ -1,0 +1,10 @@
+Changes
+Exchange.xs
+MANIFEST
+Makefile.PL
+README
+typemap
+lib/MacOSX/File/Exchange.pm
+t/MacOSX-File-Exchange.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

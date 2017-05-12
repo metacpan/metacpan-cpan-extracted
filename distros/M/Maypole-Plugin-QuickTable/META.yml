@@ -1,0 +1,19 @@
+---
+name: Maypole-Plugin-QuickTable
+version: 0.422
+author:
+  - David Baird <cpan@riverside-cms.co.uk>
+abstract: HTML::QuickTable convenience
+license: perl
+requires:
+  HTML::QuickTable: 0
+  Maypole::Config: 0
+  Maypole::Plugin::LinkTools: 0
+  NEXT: 0
+  Test::More: 0
+  URI: 0
+provides:
+  Maypole::Plugin::QuickTable:
+    file: lib/Maypole/Plugin/QuickTable.pm
+    version: 0.422
+generated_by: Module::Build version 0.2609

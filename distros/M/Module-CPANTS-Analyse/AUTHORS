@@ -1,0 +1,40 @@
+=encoding UTF-8
+
+=head1 NAME
+
+AUTHORS - Authors of and contributors to Module-CPANTS-Analyse
+
+=head2 Principal authors
+
+=over
+
+=item L<Thomas Klausner|https://metacpan.org/author/domm>
+
+=item L<Gábor Szabó|https://metacpan.org/author/szabgab>
+
+=item L<Steffen Müller|https://metacpan.org/author/smueller>
+
+=item L<Lars Dɪᴇᴄᴋᴏᴡ|https://metacpan.org/author/daxim>
+
+=item L<Kenichi Ishigaki|https://metacpan.org/author/ishigaki>
+
+=back
+
+=head2 Contributors
+
+=over
+
+=item L<Alexandr Ciornii|https://metacpan.org/author/chorny>
+
+=item L<David Golden|https://metacpan.org/author/dagolden>
+
+=item L<Jérôme Quelin|https://metacpan.org/author/jquelin>
+
+=item L<Mike Doherty|https://metacpan.org/author/mdoherty>
+
+=item L<Reini Urban|https://metacpan.org/author/rurban>
+
+=back
+
+Many other people who provided unattributed patches, advice and bug reports are
+mentioned in the F<Changes> file.

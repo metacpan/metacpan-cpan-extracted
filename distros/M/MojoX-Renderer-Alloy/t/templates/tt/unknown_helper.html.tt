@@ -1,0 +1,1 @@
+[% h.unknown_helper('foo') %]

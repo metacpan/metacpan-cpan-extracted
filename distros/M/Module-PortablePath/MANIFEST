@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+META.json
+MYMETA.json
+Makefile
+README
+eg/siteexample.pm
+lib/Module/PortablePath.pm
+spec.header
+t/00-critic.t
+t/00-pod.t
+t/00-podcoverage.t
+t/Module-PortablePath.t
+t/distribution.t
+Build.PL
+META.yml

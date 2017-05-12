@@ -1,0 +1,287 @@
+<HTML>
+<HEAD>
+<TITLE>MHonArc Reference -- Appendix: Diagnostics</TITLE>
+<link rel="stylesheet" type="text/css" href="docstyles.css">
+</HEAD>
+<BODY>
+
+<!--X-NavButtons-Start-->
+<table width="100%">
+<tr valign="top">
+<td align="left"><nobr><a href="app-rcfileexs.html"><img src="prev.png"border=0 alt="[Prev]"></a>&nbsp;&nbsp;&nbsp;</nobr></td><td align="center" width="99%"><a href="mhonarc.html"><img src="up.png" border=0 alt="[TOC]"></a><a href="faq/faq.html"><img src="faq.png" border=0 alt="[FAQ]"></a><a href="app-bugs.html"><img src="bug.png" border=0 alt="[Bugs]"></a><a href="http://www.mhonarc.org/"><img src="home.png" border=0 alt="[Home]"></a></td><td align="right"><nobr>&nbsp;&nbsp;&nbsp;<a href="app-utilsprg.html"><img src="next.png" border=0 alt="[Next]"></a></nobr></td></tr></table>
+<!--X-NavButtons-End-->
+
+<HR>
+
+<H1><A NAME="diagnostics">Appendix: Diagnostics</A></H1>
+
+<P>Three types of messages exist in MHonArc:
+<EM>Informative</EM> messages, <EM>Warnings</EM>, and
+<EM>Errors</EM>. <EM>Informative</EM> messages give you the
+current status of MHonArc's execution.  <EM>Warnings</EM>
+signify undesired conditions, but are <EM>not</EM> critical in
+MHonArc's exection.  <EM>Errors</EM> signify critical
+conditions that inhibit MHonArc from finishing its task.  </P>
+
+<P>Another set of messages exists that are generated from the Perl
+interpreter itself.  MHonArc tries its best to catch any
+conditions that may cause Perl to abnormally abort, but conditions
+may arise where this is not possible.  </P> <P>This section describes
+the various diagnostics MHonArc may produce and messages
+Perl may produce.  </P>
+
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#infomsgs">Informative messages</a>
+<li><a href="#warnings">Warnings</a>
+<li><a href="#errors">Errors</a>
+<li><a href="#perlmsgs">Perl Messages</a>
+</ul>
+<!--X-TOC-End-->
+
+<hr>
+<H2><A NAME="infomsgs">Informative messages</A></H2>
+
+<P>Informative messages may be suppressed via the
+<A HREF="resources/quiet.html">QUIET</A> resource.
+Only the more important Informative messages are listed here.  </P>
+
+<h4>No new messages</h4>
+
+<P>No new mail messages exist when performing an add operation to an
+archive. This can occur if an empty <EM>MH</EM> mail folder, or empty
+mailbox file, is passed to MHonArc; or the folder
+contains messages already in the archive.
+</P>
+
+<h4>Trying to lock mail archive ...</h4>
+
+<P>The statement means that a lock file is in place for the archive
+you are trying to update.  Normally, an existing lock file implies
+that another MHonArc process is currently using the archive,
+and other MHonArc processes will wait awhile to see if the
+archive will be unlocked.
+The time MHonArc waits can be modified
+by the <a href="resources/locktries.html">LOCKTRIES</a> and
+<a href="resources/lockdelay.html">LOCKDELAY</a> resources.
+</P>
+
+<P>There are times when a lock file exists, but no
+MHonArc process is modifying the archive. This can occur
+if MHonArc is abnormally terminated.  If you know that no
+other MHonArc process is editing the archive you are
+try to modify, then manually remove the lock file or use the
+<A HREF="force.html">FORCE</A> resource.
+</P>
+<table class="caution" width="100%">
+<tr valign=top>
+<td><strong style="color: red">WARNING</strong></td>
+<td width="100%"><p>If <a href="resources/lockmethod.html">LOCKMETHOD</a>
+is set to <tt>flock</tt>, then the lock file should never be
+manually deleted.  When MHonArc abnormally terminates, then the
+lock will be automatically released when the <tt>flock</tt> method
+is used.  A stale lock can still occur under the <tt>flock</tt>
+method if for some reason a MHonArc
+process hangs.  In this case, just kill the offending process and
+the lock will automatically be released.
+</p>
+</td>
+</tr>
+</table>
+
+<hr>
+<H2><A NAME="warnings">Warnings</A></H2>
+
+<P>Warning messages denote some undesired event occurred, but the
+event is not severe enough to cause program termination.  </P>
+
+<h4>Warning: Could not find date for message</h4>
+
+<P>MHonArc was unable to find a date for a
+mail message, or could not parse the date if the date is not
+in a common format.  The message is given the current date
+if no date is found.
+</P>
+
+<h4>Warning: Database (<var>dbversion</var>)
+!= program (<var>prgversion</var>) version</h4>
+
+<P>Indicates that the version of MHonArc updating an archive
+is different from the version of MHonArc that created the
+database file. Problems can arise if the database file changes in
+format from different version of MHonArc. See the release
+notes of the MHonArc distribution if changes in the databse
+format will effect older archives.  </P>
+
+<h4>Warning: Unable to create <var>outdir/dbfile</var></h4>
+
+<P>Indicates MHonArc was unable to create the
+database file <var>dbfile</var> for the mail archive
+created/modified in <var>outdir</var>. This message can occur if
+<var>outdir</var> permissions changed during MHonArc
+execution, the existing <var>dbfile</var> is read-only, or the
+file system is full.  </P>
+
+<P>This warning can be severe because no future add operations can
+be performed to the archive.  </P>
+
+<h4>Warning: Unable to open footer: <var>footer</var></h4>
+
+<P>MHonArc was unable to open the footer file,
+<var>footer</var>, for inclusion into the index page. Make sure
+<var>footer</var> exists, and is readable by you.  </P>
+
+<h4>Warning: Unable to open header: <var>header</var>
+</h4>
+
+<P>MHonArc was unable to open the header file,
+<var>header</var>, for inclusion into the index page. Make sure
+<var>header</var> exists, and is readable by you.  </P>
+
+<h4>Warning: Unable to open <var>folder</var></h4>
+
+<P>MHonArc was unable to open the specified mail
+<var>folder</var> for reading. Make sure <var>folder</var>
+exists and is readable (and executable if a directory) by you.  </P>
+
+<h4>Warning: Unable to open message: <var>folder/message</var>
+</h4>
+
+<P>MHonArc was unable to open the specified <EM>MH</EM>
+mail message <var>folder/message</var> for reading. Make sure
+<var>folder/message</var> exists and is readable by you.  </P>
+
+<h4>Warning: Unable to open resource file: <var>file</var>
+</h4>
+
+<P>MHonArc was unable to open the resource file,
+<var>file</var>, for reading. Make sure <var>file</var> exists, and
+is readable by you.  </P>
+
+<h4>Warning: Undefined time zone: "<var>timezone</var>"
+</h4>
+
+<P>MHonArc has found an unrecognized timezone
+acronym, <var>timezone</var>, in a mail
+message. You can tell MHonArc about other timezone
+acronyms, and their hour offset to UTC, by using the <A
+HREF="resources/timezones.html">TIMEZONES</A> resource
+</P>
+
+<P>The timezone UTC (or GMT) is used for an undefined timezone acronyms.
+</P>
+
+<hr>
+<H2><A NAME="errors">Errors</A></H2>
+
+<P>Errors denote conditions that cause MHonArc to abort
+execution.  </P>
+
+<P>Some error conditions may cause the MHonArc archive to
+become corrupted. If the error occurs when MHonArc is writing
+files, you may have to recreate the archive from the original messages.
+</P>
+
+<h4>ERROR: Database read error of <var>dbfile</var></h4>
+
+<P>An error occured when trying to read an archive's database. The
+error can occur if the database file is not readable or the file
+got corrupted.  </P>
+
+<h4>ERROR: Unable to create <var>file</var></h4>
+
+<P>MHonArc was unable to create <var>file</var>. This
+message can occur if the directory being written to is not writable, a
+read-only file with the same name exists, or the file system is full.
+</P>
+
+<h4>ERROR: Unable to create lockfile after <var>#</var> tries
+</h4>
+
+<P>The statement means that MHonArc timed-out trying to obtain a
+lock on the archive.  You may be able to avoid time-out problems
+by modifying the <a href="resources/locktries.html">LOCKTRIES</a> and
+<a href="resources/lockdelay.html">LOCKDELAY</a> resources.
+</P>
+
+<P>Sometimes a lock file exists, but no MHonArc
+process is modifying the archive. This can occur if
+MHonArc is abnormally terminated.  If you know that no
+other MHonArc process is editting the archive you are
+try to modify, then manually remove the lock file or use the
+<a href="resources/force.html">FORCE</a> resource.
+</P>
+
+<table class="caution" width="100%">
+<tr valign=top>
+<td><strong style="color: red">WARNING</strong></td>
+<td width="100%"><p>If <a href="resources/lockmethod.html">LOCKMETHOD</a>
+is set to <tt>flock</tt>, then the lock file should never be
+manually deleted.  When MHonArc abnormally terminates, then the
+lock will be automatically released when the <tt>flock</tt> method
+is used.  A stale lock can still occur under the <tt>flock</tt>
+method if for some reason a MHonArc
+process hangs.  In this case, just kill the offending process and
+the lock will automatically be released.
+</p>
+</td>
+</tr>
+</table>
+
+<h4>ERROR: Unable to open <var>file</var></h4>
+
+<P>MHonArc was unable to open <var>file</var> for reading. Make
+sure <var>file</var> exists, and is readable by you.  </P>
+
+<h4>ERROR: Unable to require <var>perl-library</var></h4>
+
+<p>Make sure you properly installed MHonArc.  Also
+make sure Perl is installed properly if the library is a standard
+Perl library.
+</p>
+
+<hr>
+<H2><A NAME="perlmsgs">Perl Messages</A></H2>
+
+<P>Generally, if execution is aborted and the following error messages
+appear, then you will have to manually delete the lock file since
+MHonArc will not have the chance to delete the file.  </P>
+
+<h4>Can't locate file in <!--
+-->&#64;<!--
+-->INC at <var>file</var> line number.
+</h4>
+
+<P>A library that MHonArc tried to load was not found
+in the Perl include search paths. This error usually implies
+that MHonArc was not installed correctly. Make sure that
+MHonArc was installed via the <CODE>install.me</CODE> program
+that is provided in the MHonArc distribution.  </P>
+
+<h4><var>file</var> did not return a true value at file line number.</h4>
+
+<P>If you are using your own MIME filters with MHonArc, make
+sure the library files return a true value, like <tt>1</tt>.  </P>
+
+<HR>
+<!--X-NavButtons-Start-->
+<table width="100%">
+<tr valign="top">
+<td align="left"><nobr><a href="app-rcfileexs.html"><img src="prev.png"border=0 alt="[Prev]"></a>&nbsp;&nbsp;&nbsp;</nobr></td><td align="center" width="99%"><a href="mhonarc.html"><img src="up.png" border=0 alt="[TOC]"></a><a href="faq/faq.html"><img src="faq.png" border=0 alt="[FAQ]"></a><a href="app-bugs.html"><img src="bug.png" border=0 alt="[Bugs]"></a><a href="http://www.mhonarc.org/"><img src="home.png" border=0 alt="[Home]"></a></td><td align="right"><nobr>&nbsp;&nbsp;&nbsp;<a href="app-utilsprg.html"><img src="next.png" border=0 alt="[Next]"></a></nobr></td></tr></table>
+<!--X-NavButtons-End-->
+
+<HR>
+<address>
+$Date: 2003/10/06 22:04:14 $ <br>
+<img align="top" src="monicon.png" alt="">
+<a href="http://www.mhonarc.org"
+><strong>MHonArc</strong></a><br>
+Copyright &#169; 1997-2000, <a href="http://www.mhonarc.org/~ehood/"
+>Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org"
+>mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</BODY>
+</HTML>

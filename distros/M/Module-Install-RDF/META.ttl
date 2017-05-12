@@ -1,0 +1,206 @@
+@prefix cpan:  <http://purl.org/NET/cpan-uri/person/> .
+@prefix cpant: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix dcs:   <http://ontologi.es/doap-changeset#> .
+@prefix dist:  <http://purl.org/NET/cpan-uri/dist/Module-Install-RDF/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix nfo:   <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+dist:project
+	a                 doap:Project;
+	doap:name         "Module-Install-RDF";
+	cpant:perl_version_from [
+		a nfo:FileDataObject;
+		a nfo:SourceCode;
+		rdfs:label "Module::Install::RDF";
+		nfo:fileName "lib/Module/Install/RDF.pm";
+		nfo:programmingLanguage "Perl";
+	];
+	cpant:readme_from [
+		a nfo:FileDataObject;
+		a nfo:SourceCode;
+		rdfs:label "Module::Install::RDF";
+		nfo:fileName "lib/Module/Install/RDF.pm";
+		nfo:programmingLanguage "Perl";
+	];
+	cpant:requires    "Module::Install 1.00"^^cpant:dsWithVersion;
+	cpant:requires    "Module::Runtime"^^cpant:dsWithoutVersion;
+	cpant:requires    "Object::ID"^^cpant:dsWithoutVersion;
+	cpant:requires    "RDF::TriN3 0.201"^^cpant:dsWithVersion;
+	cpant:requires    "RDF::Trine 0.135"^^cpant:dsWithVersion;
+	cpant:requires    "URI::file 4.0"^^cpant:dsWithVersion;
+	cpant:test_requires "Test::More 0.61"^^cpant:dsWithVersion;
+	cpant:version_from [
+		a nfo:FileDataObject;
+		a nfo:SourceCode;
+		rdfs:label "Module::Install::RDF";
+		nfo:fileName "lib/Module/Install/RDF.pm";
+		nfo:programmingLanguage "Perl";
+	];
+	dc:contributor    cpan:tobyink;
+	doap:bug-database <http://rt.cpan.org/Dist/Display.html?Queue=Module-Install-RDF>;
+	doap:category     [ rdfs:label "Semantic Web" ];
+	doap:category     [ rdfs:label "Packaging" ];
+	doap:created      "2011-09-30"^^xsd:date;
+	doap:developer    cpan:tobyink;
+	doap:documenter   cpan:tobyink;
+	doap:download-page <https://metacpan.org/release/Module-Install-RDF>;
+	doap:homepage     <https://metacpan.org/release/Module-Install-RDF>;
+	doap:license      <http://dev.perl.org/licenses/>;
+	doap:maintainer   cpan:tobyink;
+	doap:programming-language "Perl";
+	doap:release      dist:v_0-001;
+	doap:release      dist:v_0-002;
+	doap:release      dist:v_0-003;
+	doap:release      dist:v_0-004;
+	doap:release      dist:v_0-005;
+	doap:release      dist:v_0-006;
+	doap:release      dist:v_0-007;
+	doap:release      dist:v_0-008;
+	doap:release      dist:v_0-009;
+	doap:repository   [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-module-install-rdf>;
+	];
+	doap:shortdesc    "advanced metadata for your distribution"@en;
+	doap:tester       cpan:tobyink.
+
+dist:v_0-001
+	a                 doap:Version;
+	rdfs:label        "Initial release";
+	dc:identifier     "Module-Install-RDF-0.001"^^xsd:string;
+	dc:issued         "2011-10-01"^^xsd:date;
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-RDF-0.001.tar.gz>;
+	doap:revision     "0.001"^^xsd:string.
+
+dist:v_0-002
+	a                 doap:Version;
+	dc:identifier     "Module-Install-RDF-0.002"^^xsd:string;
+	dc:issued         "2011-10-06"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Packaging;
+			rdfs:label "Upgrade Module::Package::RDF version.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-RDF-0.002.tar.gz>;
+	doap:revision     "0.002"^^xsd:string.
+
+dist:v_0-003
+	a                 doap:Version;
+	dc:identifier     "Module-Install-RDF-0.003"^^xsd:string;
+	dc:issued         "2011-11-26"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [ a dcs:Regression; rdfs:label "use parent" ];
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "rdf_project_uri function which provides heuristics to determine the URI of the primary doap:Project described in the meta directory.";
+		];
+		dcs:item [
+			a dcs:Change;
+			rdfs:label "Use Object::ID::object_id instead of Scalar::Util::refaddr to uniquely identity Module::Install objects. (Though in a typical installation scenario, this shouldn't matter much.)";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-RDF-0.003.tar.gz>;
+	doap:revision     "0.003"^^xsd:string.
+
+dist:v_0-004
+	a                 doap:Version;
+	dc:identifier     "Module-Install-RDF-0.004"^^xsd:string;
+	dc:issued         "2011-12-03"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [ a dcs:Bugfix; rdfs:label "use base" ];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-RDF-0.004.tar.gz>;
+	doap:revision     "0.004"^^xsd:string.
+
+dist:v_0-005
+	a                 doap:Version;
+	dc:identifier     "Module-Install-RDF-0.005"^^xsd:string;
+	dc:issued         "2012-07-04"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "Support metadata written in Pretdsl.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-RDF-0.005.tar.gz>;
+	doap:revision     "0.005"^^xsd:string.
+
+dist:v_0-006
+	a                 doap:Version;
+	dc:identifier     "Module-Install-RDF-0.006"^^xsd:string;
+	dc:issued         "2012-07-04"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Packaging;
+			rdfs:label "Add Module::Runtime dependency.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-RDF-0.006.tar.gz>;
+	doap:revision     "0.006"^^xsd:string.
+
+dist:v_0-007
+	a                 doap:Version;
+	rdfs:label        "Bond, James Bond";
+	dc:identifier     "Module-Install-RDF-0.007"^^xsd:string;
+	dc:issued         "2012-07-05"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Packaging;
+			rdfs:label "Bump RDF::TriN3 dependency to 0.201.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-RDF-0.007.tar.gz>;
+	doap:revision     "0.007"^^xsd:string.
+
+dist:v_0-008
+	a                 doap:Version;
+	dc:identifier     "Module-Install-RDF-0.008"^^xsd:string;
+	dc:issued         "2013-03-16"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "write_meta_ttl method.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-RDF-0.008.tar.gz>;
+	doap:revision     "0.008"^^xsd:string.
+
+dist:v_0-009
+	a                 doap:Version;
+	dc:identifier     "Module-Install-RDF-0.009"^^xsd:string;
+	dc:issued         "2013-07-31"^^xsd:date;
+	dcs:changeset     [
+		dcs:item [
+			a dcs:Update;
+			rdfs:label "Add a hard-coded prefix for doap-deps.";
+		];
+		dcs:item [
+			a dcs:Change;
+			rdfs:label "Change the hard-coded prefix for doap-bugs.";
+		];
+	];
+	dcs:released-by   cpan:tobyink;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Install-RDF-0.009.tar.gz>;
+	doap:revision     "0.009"^^xsd:string.
+
+cpan:tobyink
+	a                 foaf:Person;
+	foaf:name         "Toby Inkster";
+	foaf:homepage     <http://tobyinkster.co.uk/>;
+	foaf:mbox         <mailto:tobyink@cpan.org>;
+	foaf:nick         "tobyink";
+	foaf:page         <https://metacpan.org/author/TOBYINK>.
+

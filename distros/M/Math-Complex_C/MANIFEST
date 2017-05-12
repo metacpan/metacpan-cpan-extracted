@@ -1,0 +1,28 @@
+CHANGES
+Complex_C.pm
+Complex_C.xs
+Makefile.PL
+MANIFEST
+README
+try.in
+t/01load.t
+t/abs_arg.t
+t/arith.t
+t/bool.t
+t/conj_proj.t
+t/log_exp.t
+t/nan.t
+t/new.t
+t/nnum.t
+t/overload_string.t
+t/overload_xtra.t
+t/pod.t
+t/pow.t
+t/prec.t
+t/trig.t
+
+
+
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Math::Fractal::Noisemaker;
+
+Math::Fractal::Noisemaker::make(@ARGV);

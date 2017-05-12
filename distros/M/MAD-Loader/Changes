@@ -1,0 +1,51 @@
+Revision history for MAD-Loader
+
+3.1.3   2015-02-27
+            - Updating dependency list
+            - Some housekeeping
+
+3.1.2   2014-10-06
+            - Removing redundant tests that failed in some archs.
+            These tests are unnecessary.
+            - Fixed some documentation issues.
+            - Setting a minimum perl version.
+
+3.1.1   2014-10-01
+            - Fixed wrong interpolation in some tests
+
+3.1.0   2014-09-15
+            - Added new function 'load_and_new' to functional interface
+
+3.0.0   2013-08-04
+            - New attributes
+            - New functional interface
+            - Changing from Test::More to Test::Most
+            - Incompatible with 2.x series
+
+2.0.3   2013-03-02
+            - Setting minimum version of Carp as dependency
+
+2.0.2   2013-02-14
+            - Fix on some eval/$@ issues
+            - Fix on pod typo
+
+2.0.1   2013-02-12
+            - Correcting pod typo
+
+2.0.0   2013-02-12
+            - Full rewrite of the module.
+
+1.0.0   2013-01-24
+            - Adding option on_error
+            - Adding option no_import
+            - Retrieving initializer return values
+
+0.0.3   2012-09-25
+            - Correcting typo
+
+0.0.2   2012-09-11
+            - A bit more Kwalitee compliance
+
+0.0.1   2012-08-29
+        First version, released on an unsuspecting world.
+

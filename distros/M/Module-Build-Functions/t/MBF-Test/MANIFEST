@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/MBF/Test.pm
+MANIFEST			This list of files
+share/T/Test.pod
+share/Test.pod
+share_mod1/T/Test.pod
+share_mod1/Test.pod
+share_mod2/T/Test.pod
+share_mod2/Test.pod

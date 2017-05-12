@@ -1,0 +1,37 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+examples/matrix.pl
+examples/scramble.pl
+lib/Math/ModInt.pm
+lib/Math/ModInt/BigInt.pm
+lib/Math/ModInt/ChineseRemainder.pm
+lib/Math/ModInt/Event.pm
+lib/Math/ModInt/Event/Trap.pm
+lib/Math/ModInt/GF2.pm
+lib/Math/ModInt/GF3.pm
+lib/Math/ModInt/Perl.pm
+lib/Math/ModInt/Trivial.pm
+t/01_basics.t
+t/02_trivial.t
+t/03_gf2.t
+t/04_perl.t
+t/05_bigint.t
+t/06_validation.t
+t/07_platform.t
+t/09_gf3.t
+t/10_bigrat.t
+t/11_chinese_rem.t
+t/12_event.t
+t/90_pod.t
+t/91_pod_cover_cp.t
+t/92_consistency.t
+t/93_examples.t
+t/95_versions.t
+t/99_signature.t
+t/data/KNOWN_VERSIONS
+t/lib/Test/MyUtils.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

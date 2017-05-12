@@ -1,0 +1,78 @@
+Catalyst::Plugin::ForwardChained
+
+Forwarding to "Chain"-Actions in Catalyst
+
+01. INSTALLATION
+
+To install this module perform the typical four-part Perl salute:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+02. MODULE REQUIREMENTS
+
+    Archive::Tar >= 1.40
+    Cache::FastMmap
+    Cache::File
+    Cache::Memcached
+    Crypt::OpenSSL::RSA
+    DateTime
+    DBD::SQLite
+    DBI
+    DBIx::Connector
+    Email::Valid
+    Getopt::Long
+    IO::File
+    IO::Handle
+    IO::Pipe
+    IO::Socket
+    IO::YAML >= 0.08
+    IPC::Semaphore >= 2.01
+    IPC::SysV >= 2.01
+    Mail::DKIM >= 0.38
+    Mail::SPF
+    MIME::Base64
+    MIME::Lite
+    MIME::Parser
+    MIME::QuotedPrint
+    Moose >= 1.00
+    Net::Domain::TLD
+    Net::DNS
+    Net::DNSBL::Client
+    Net::LMTP
+    Net::Milter
+    Net::Netmask
+    Net::SMTP
+    POE
+    POE::Filter::Postfix::Plain
+    POE::Wheel::FollowTail
+    POE::Wheel::ReadWrite
+    POE::Wheel::SocketFactory
+    Regexp::Common
+    SQL::Abstract
+    Throwable
+    version >= 0.74
+    YAML
+
+To use the Policy GeoWeight module, you have to install Geo::IP, which relys on OS libraries.
+
+03. TODO
+
+* Export DSPAM LMTP client in external Module
+* Export SpamAssassin client in external Module
+
+04. COPYRIGHT AND LICENCE
+
+Copyright (c) 2010 Ulrich Kautz.
+
+This library is free software and may be distributed under the same terms as perl itself.
+
+05. AUTHORS
+
+Ulrich Kautz <uk@fortrabbit.de>
+
+06. LINKS
+
+http://blog.foaa.de/decency

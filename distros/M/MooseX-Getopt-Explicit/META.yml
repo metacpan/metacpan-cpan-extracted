@@ -1,0 +1,30 @@
+---
+abstract: 'MooseX::Getopt, but without implicit option generation [DEPRECATED]'
+author:
+  - 'Rob Hoelz <rob@hoelz.ro>'
+build_requires:
+  Capture::Tiny: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  autodie: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-Getopt-Explicit
+requires:
+  MooseX::Getopt: '0'
+  perl: v5.8.8
+resources:
+  bugtracker: https://github.com/hoelzro/moosex-getopt-explicit/issues
+  homepage: https://github.com/hoelzro/moosex-getopt-explicit
+  repository: https://github.com/hoelzro/moosex-getopt-explicit.git
+version: '0.03'
+x_deprecated: 1

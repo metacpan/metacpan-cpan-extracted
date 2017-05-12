@@ -1,0 +1,10 @@
+Changes
+lib/Math/EWMA.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/01base.t
+t/02core.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

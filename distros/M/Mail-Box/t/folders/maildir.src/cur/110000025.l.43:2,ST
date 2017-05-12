@@ -1,0 +1,59 @@
+Received: from ns.ATComputing.nl (ns.ATComputing.nl [195.108.229.25])
+	by atcmpg.ATComputing.nl (8.9.0/8.9.0) with ESMTP id SAA28006
+	for <markov@ATComputing.nl>; Wed, 14 Jun 2000 18:04:59 +0200 (MET DST)
+Received: (from nobody@localhost)
+	by ns.ATComputing.nl (8.8.8/8.8.8) id SAA12272
+	for <markov@ATComputing.nl>; Wed, 14 Jun 2000 18:04:58 +0200
+Received: from gatekeeper.es.dupont.com(192.26.233.2) by ns.ATComputing.nl via smap (V2.1)
+	id xma012268; Wed, 14 Jun 00 18:04:47 +0200
+Received: from eplrx7.es.dupont.com (eplrx7.es.dupont.com [138.196.252.7])
+	by gatekeeper.es.dupont.com (8.9.3/8.9.3) with ESMTP id MAA26850
+	for <markov@ATComputing.nl>; Wed, 14 Jun 2000 12:04:46 -0400 (EDT)
+Received: from fantasia.es.dupont.com (fantasia.es.dupont.com [138.196.253.22])
+	by eplrx7.es.dupont.com (8.9.3/8.9.3) with ESMTP id MAA06403
+	for <markov@ATComputing.nl>; Wed, 14 Jun 2000 12:04:45 -0400 (EDT)
+Received: by fantasia.es.dupont.com (8.9.3+Sun) id MAA01601; Wed, 14 Jun 2000 12:03:33 -0400 (EDT)
+From: Cristy <cristy@eplrx7.es.dupont.com>
+Date: Wed, 14 Jun 2000 12:03:33 -0400 (EDT)
+Message-ID: <1600.960998613@fantasia>
+Mime-Version: 1.0
+To: markov@ATComputing.nl
+Content-Type: multipart/mixed; boundary="-"
+Status: RO
+Content-Length: 2009
+Lines: 34
+
+This is a MIME encoded message.  Decode it with "munpack"
+or any other MIME reading software.  Mpack/munpack is available
+via anonymous FTP in ftp.andrew.cmu.edu:pub/mpack/
+---
+Content-Type: application/octet-stream; name="gravity.pl"
+Content-Transfer-Encoding: base64
+Content-Disposition: inline; filename="gravity.pl"
+Content-MD5: faVMCotdBUpHJCDAv7HACA==
+
+IyEvdXNyL2xvY2FsL2Jpbi9wZXJsCgp1c2UgSW1hZ2U6Ok1hZ2ljazsKCiRwaWMgPSBJbWFn
+ZTo6TWFnaWNrLT5uZXcoc2l6ZT0+IjQwMHg0MDAiKTsKJHBpYy0+UmVhZCgieGM6d2hpdGUi
+KTsKCiR4ID0gMTAwOwokeSA9IDEwMDsKJHBpYy0+RHJhdyhwcmltaXRpdmU9PidsaW5lJyxw
+b2ludHM9PiIyMDAsMTAwIDIwMCwzMDAiLHN0cm9rZT0+J2JsYWNrJyk7CiRwaWMtPkRyYXco
+cHJpbWl0aXZlPT4nbGluZScscG9pbnRzPT4iMTAwLDIwMCAzMDAsMjAwIixzdHJva2U9Pidi
+bGFjaycpOwokcGljLT5EcmF3KHByaW1pdGl2ZT0+J3JlY3RhbmdsZScscG9pbnRzPT4iMTAw
+LDEwMCAzMDAsMzAwIixzdHJva2U9PidibGFjaycpOwokcGljLT5Bbm5vdGF0ZShwb2ludHNp
+emU9PjI0LGZvbnQ9PidUaW1lcycsdGV4dD0+Ii1OVy0iLGdyYXZpdHk9PiJOb3J0aFdlc3Qi
+LHg9PiR4LHk9PiR5KTsKJHBpYy0+QW5ub3RhdGUocG9pbnRzaXplPT4yNCxmb250PT4nVGlt
+ZXMnLHRleHQ9PiItTi0iLGdyYXZpdHk9PiJOb3J0aCIseD0+JHgseT0+JHkpOwokcGljLT5B
+bm5vdGF0ZShwb2ludHNpemU9PjI0LGZvbnQ9PidUaW1lcycsdGV4dD0+Ii1ORS0iLGdyYXZp
+dHk9PiJOb3J0aEVhc3QiLHg9PiR4LHk9PiR5KTsKJHBpYy0+QW5ub3RhdGUocG9pbnRzaXpl
+PT4yNCxmb250PT4nVGltZXMnLHRleHQ9PiItRS0iLGdyYXZpdHk9PiJFYXN0Iix4PT4keCx5
+PT4keSk7CiRwaWMtPkFubm90YXRlKHBvaW50c2l6ZT0+MjQsZm9udD0+J1RpbWVzJyx0ZXh0
+PT4iLUMtIixncmF2aXR5PT4iQ2VudGVyIix4PT4keCx5PT4keSk7CiRwaWMtPkFubm90YXRl
+KHBvaW50c2l6ZT0+MjQsZm9udD0+J1RpbWVzJyx0ZXh0PT4iLVNFLSIsZ3Jhdml0eT0+IlNv
+dXRoRWFzdCIseD0+JHgseT0+JHkpOwokcGljLT5Bbm5vdGF0ZShwb2ludHNpemU9PjI0LGZv
+bnQ9PidUaW1lcycsdGV4dD0+Ii1TLSIsZ3Jhdml0eT0+IlNvdXRoIix4PT4keCx5PT4keSk7
+CiRwaWMtPkFubm90YXRlKHBvaW50c2l6ZT0+MjQsZm9udD0+J1RpbWVzJyx0ZXh0PT4iLVNX
+LSIsZ3Jhdml0eT0+IlNvdXRoV2VzdCIseD0+JHgseT0+JHkpOwokcGljLT5Bbm5vdGF0ZShw
+b2ludHNpemU9PjI0LGZvbnQ9PidUaW1lcycsdGV4dD0+Ii1XLSIsZ3Jhdml0eT0+Ildlc3Qi
+LHg9PiR4LHk9PiR5KTsKCiRwaWMtPldyaXRlKGZpbGVuYW1lPT4idGVzdC5naWYiKTsKc3lz
+dGVtKCJkaXNwbGF5IHRlc3QuZ2lmIik7Cg==
+
+-----

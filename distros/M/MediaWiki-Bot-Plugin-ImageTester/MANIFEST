@@ -1,0 +1,16 @@
+INSTALL
+LICENSE
+Makefile.PL
+MANIFEST
+README
+CHANGES
+lib/MediaWiki/Bot/Plugin/ImageTester.pm
+gpl.txt
+META.yml
+t/00_initialize.t
+t/01_basic.t
+t/02_regressions.t
+t/03_rules.t
+t/97_pod.t
+t/98_pod_coverage.t
+t/99_pod_kwalitee.t

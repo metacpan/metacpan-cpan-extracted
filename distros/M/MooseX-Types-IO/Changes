@@ -1,0 +1,14 @@
+Revision history for MooseX-Types-IO
+
+0.04    2014-03-02
+        apply patches from SPACEBAT (RT #94381)
+
+0.03    2009.05.19
+        thank (rkitover) for the patches on RT 46194
+
+0.02
+        pod fix
+
+0.01    2008.10.19
+        First version, released on an unsuspecting world.
+

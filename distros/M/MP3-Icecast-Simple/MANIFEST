@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/MP3-Icecast-Simple.t
+lib/MP3/Icecast/Simple.pm
+META.yml                                 Module meta-data (added by MakeMaker)

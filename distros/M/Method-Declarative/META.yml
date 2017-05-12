@@ -1,0 +1,21 @@
+---
+name: Method-Declarative
+version: 0.03
+author:
+  - 'Jim Schneider <perl@jrcsdevelopment.com>'
+abstract: Create methods with declarative syntax
+license: perl
+requires:
+  Module::Build: 0.28
+  Test::More: 0
+  perl: 5.6.0
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Method::Declarative:
+    file: lib/Method/Declarative.pm
+    version: 0.03
+resources:
+  license: http://dev.perl.org/licenses/

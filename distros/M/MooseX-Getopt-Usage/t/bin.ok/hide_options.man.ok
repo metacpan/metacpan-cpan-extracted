@@ -1,0 +1,12 @@
+NAME
+    hide_options - Test hiding options.
+
+SYNOPSIS
+     hide_options.pl [OPTIONS] [MANS]
+
+DESCRIPTION
+    Test hiding the OPTIONS section (auto generated) via selector.
+
+AUTHOR
+    Invader Flobee
+

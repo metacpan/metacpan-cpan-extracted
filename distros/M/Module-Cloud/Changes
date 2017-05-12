@@ -1,0 +1,51 @@
+Revision history for Perl extension Module-Cloud
+
+1.100861  2010-03-27 14:26:23 Europe/Vienna
+    - fixed bin/module_cloud
+
+1.100860  2010-03-27 12:54:56 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.10  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+
+0.09  Thu, 29 May 2008 12:06:01 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - Converted Changes file to YAML style
+    - .shipit: added Twitter step
+    - Makefile.PL: added auto_install() and process_templates()
+    - lib/*: converted to template
+    - updated MANIFEST
+    - added t/perlcriticrc
+    - updated MANIFEST
+    - moved generated documentation of interited methods to after documentation
+      of this class' methods so the manpage is more readable
+    - .shipit: fixed svk.tagpattern
+    - tags: NEWFEATURE
+
+0.08  Sat, 03 Nov 2007 17:26:44 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+    - exclude pod coverage tests
+
+0.07  Sat, 20 Oct 2007 22:32:19 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - simplified accessor declaration
+
+0.06  Thu, 18 Oct 2007 10:09:39 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - fixed version requirement of Test::More
+
+0.05  Sun, 23 Sep 2007 11:41:07 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - fixed documentation
+    - now uses Module::Install::StandardTests
+
+0.04  Fri, 07 Sep 2007 21:53:41 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - keep shipit happy (actually, fixed MANIFEST)
+
+0.03  Fri, 07 Sep 2007 22:00:45 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - added t/01_this_dist_cloud.t
+    - fixed some bugs
+
+0.02  Fri, 07 Sep 2007 21:18:42 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - added boilerplate code, getting ready to ship
+
+0.01  Tue, 08 May 2007 04:05:59 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

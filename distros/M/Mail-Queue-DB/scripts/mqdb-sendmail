@@ -1,0 +1,84 @@
+#!/usr/bin/perl -w
+#
+#   mqdb-sendmail - cache outgoing mail locally to a Berkely DB
+#
+#   Copyright (C) 2004  S. Zachariah Sprackett <zacs@cpan.org>
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# Mailer Configuration:
+# muttrc: set sendmail="/usr/bin/zsendmail -oem -oi"
+# pinerc: sendmail-path=/usr/bin/zsendmail -oem -t -oi
+
+=head1 NAME
+
+mqdb-sendmail - part of the Mail::Queue::DB suite
+
+=head1 SYNOPSIS
+
+mqdb-sendmail <sendmail options>
+
+=head1 DESCRIPTION
+
+mqdb-sendmail accepts a mail on standard input and writes it, as well as the 
+sendmail options it receives on the commandline to a Berkley Database.
+
+The default database location is $HOME/.mqdb_email.db but this can
+be overridden by setting the environment variable $MQDB_DB
+
+Typically you would tell your mail client to use mqdb-sendmail for sending 
+email, through its configuration file... examples for pine and mutt are:
+
+muttrc: set sendmail="/usr/bin/mqdb-sendmail -oem -oi"
+
+pinerc: sendmail-path=/usr/bin/mqdb-sendmail -oem -t -oi
+
+=cut
+
+use strict;
+use Mail::Queue::DB;
+
+my $file;
+if (exists $ENV{MQDB_DB}) {
+  $file = $ENV{MQDB_DB};
+} else {
+  $file = $ENV{HOME} . "/.mqdb_email.db";
+}
+
+die "Must be called with sendmail arguments.\n" unless scalar @ARGV;
+
+my $z = new Mail::Queue::DB(db_file => $file);
+my $args = join(" ", @ARGV);
+my $msg  = join('', (<STDIN>));
+
+exit $z->queue_mail($args, $msg);
+
+__END__
+
+=head1 AUTHOR
+
+S. Zachariah Sprackett <zacs@cpan.org>
+
+=head1 COPYRIGHT
+
+(C) Copyright 2004, S. Zachariah Sprackett <zacs@cpan.org>
+
+Distributed under the terms of the GPL version 2 or later.
+
+=head1 SEE ALSO
+
+L<Mail::Queue::DB>, L<mqdb-list>, L<mqdb-rm>, L<mqdb-flush>
+
+=cut

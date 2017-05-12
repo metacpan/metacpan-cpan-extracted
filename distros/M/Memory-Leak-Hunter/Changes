@@ -1,0 +1,8 @@
+
+v0.02 2013.12.14
+    - After the initial failure reports from the CPANTESTERS
+      Involve Test::Deep and try to find the results in ranges.
+
+v0.01 2013.12.13
+
+    - Initial version

@@ -1,0 +1,6 @@
+Revision history for Perl extension Music::Chord::Namer.
+
+0.01  Tue Mar 14 19:59:01 2006
+	- original version; created by h2xs 1.23 with options
+		-XA -n Music::Chord::Namer
+

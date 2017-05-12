@@ -1,0 +1,11 @@
+\.old$
+\.bak$
+\.tmp$
+\.txt$
+\.1p$
+\.3pm$
+\.html$
+\.gz$
+^\.
+^[Mm]akefile$
+TODO

@@ -1,0 +1,99 @@
+Math::Symbolic
+==============
+
+Math::Symbolic is intended to offer symbolic calculation capabilities
+to the Perl programmer without using external (and commercial) libraries
+and/or applications.
+
+Unless, however, some interested and knowledgable developers turn up to
+participate in the development, the library will be severely limited by
+my experience in the area. Symbolic calculations are an active field of
+research in computer science.
+
+The module supports compiling Math::Symbolic trees to fast Perl or C code.
+
+Version 0.116 of this module has been used in conjunction with Math::Complex
+to offer symbolic calculation with complex numbers. Please have a look at
+the enclosed example scripts.
+
+Version 0.119 introduced some calculus related subroutines including
+the symbolic computation of Taylor Polynomials and the associated errors from
+Math::Symbolic trees.
+
+Vectorial calculus including gradients, divergence, rotation, Jacobi- and
+Hesse matrices, Wronskian Determinants, directional derivatives, total
+differentials, and two dimensional Taylor Polynomials is supported by the
+Math::Symbolic::VectorCalculus module which is part of the distribution but
+not loaded by default.
+
+Similarily, algebra related functions like determinants are offered by
+Math::Symbolic::MiscAlgebra.
+
+Using the Math::Symbolic::Custom::LaTeXDumper distribution from CPAN, it is
+possible to dump Math::Symbolic trees as LaTeX formulae!
+
+You are encouraged to visit http://search.cpan.org and search for
+'Math::Symbolic'. You will find various extension modules!
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+On platforms that don't support the "./" notation, that would be:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+If you wish, you may use the old MakeMaker style instead:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Since version 0.501, we include support for a new, faster
+Parse::Yapp based parser. By default we use the old parser, but
+if you would like to test the new parser, run the tests as
+follows:
+
+  TEST_YAPP_PARSER=1 ./Build test
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+  Exporter
+  Parse::RecDescent
+  Memoize
+
+SEE ALSO
+
+Current versions of this module may be found on http://steffen-mueller.net or
+CPAN. The development takes place on Sourceforge at
+http://sourceforge.net/projects/math-symbolic
+
+Please send your suggestions, inquiries, and feedback to
+math-symbolic-support at lists dot sourceforge dot net. Feel free to
+subscribe to the developers mailing list:
+math-symbolic-develop at lists dot sourceforge dot net
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2013 Steffen Mueller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl (5) itself. 
+
+CONTRIBUTIONS
+
+Steffen Müller, symbolic-module at steffen-mueller dot net
+Stray Toaster, mwk at users dot sourceforge dot net
+Oliver Ebenhöh

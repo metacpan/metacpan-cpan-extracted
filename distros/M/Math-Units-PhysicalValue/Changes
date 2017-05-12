@@ -1,0 +1,115 @@
+1.009: Thu Feb 11 2016
+   - Maybe Slaven's patch will do the trick. Here's hoping.
+
+1.008: Tue Feb 09 2016
+   - trying to resolve the test failures that result from LC_NUMERIC differing from USian ($3,000.14)
+   - also, try to impose alphabetical ordering on kg*m vs m*kg
+
+1.007: Fri May 15 07:19:12 EDT 2009
+   - Math::Round apparently started detecting overflows...  I was unaware of
+     them myself -- so that seems like a very good thing.
+
+1.005: Tue Mar 31 11:18:27 EDT 2009
+   - Failed to account for the fact that splitting out PV::AU
+     would necessitate versioning the file... *sigh*
+
+1.001: Tue Mar 31 09:30:54 EDT 2009
+   - This is pretty mature and has worked well for me for years. 1.0
+   - added chorny's META.yml stuff
+   - added pv to the list of exports PV() is good, pv() is
+     easier.
+   - split the auto units module
+   - split the pod
+
+0.71.0: Mon May 26 16:00:12 EDT 2008
+   - user version needs to be on the same line as VERSION for
+     older EUMM
+
+0.71.0: Mon May 26 16:00:12 EDT 2008
+   - added version.pm
+
+0.71:  Mon Nov  5 07:33:56 EST 2007
+   - jettero fixed a bunch of bugs simultaneously by using Math::BigFloat. Why didn't I use that before?
+
+0.68:  Mon Mar  5 13:14:55 EST 2007
+   - jettero fixed a problem with num_eq, by using string comparisons...
+
+0.67:  Sun Aug 13 07:37:44 EDT 2006
+   - jettero fixed an enormous bug in PV.pm where some operations could be
+     reversed if the LHS is unblessed.
+
+0.66:  Wed May 17 21:08:59 EDT 2006
+   - jettero added limited support for auto plurals ... the interface may well
+     change, but I'm happy with it for now.
+
+0.53:  Tue May 16 10:45:25 EDT 2006
+   - jettero added numeric and string comparison overloads. How were these not
+     in here before? Has nobody sorted a PV? I certainly hadn't.  I wonder if
+     anyone uses this...
+
+0.52:  Wed Apr 12 13:31:27 EDT 2006
+   - jettero added pv_str_ne
+
+0.51:  Sun Dec 11 08:28:15 EST 2005
+   - jettero added sqrt overloads...  How did I not have this before?
+
+0.50:  Wed Dec  7 16:18:26 EST 2005
+   - jettero added the scalar-0 hack
+
+0.49:  Thu Feb 10 11:06:09 EST 2005
+   - jettero added boolean support (eg, print "no mass!\n" unless PV("0 g"))
+
+0.48:  Mon Jan 31 07:06:15 EST 2005
+   - jettero fixed a log(0) bug in the &sci function.
+
+0.47:  Mon Jan 24 13:46:45 EST 2005
+   - jettero made PV understand leading and trailing spaces better
+
+0.46:  Thu Jan 20 10:46:50 EST 2005
+   - jettero added ** (exponent) support... how did I overlook that? Seriously.
+
+0.45:  Sun Jan 16 10:26:51 EST 2005
+   - jettero added a stupid sci() to return huge numbers in exponential format
+
+0.44:  Fri Jan 14 16:04:30 EST 2005
+   - jettero added reduction to scalar support ... I thought that was working.
+     I guess thats what the tests are for.  (well, they were, but they were a
+     touch flakey in spots)
+
+0.43:  Fri Jan 14 15:49:40 EST 2005
+   - jettero added the deunit() function
+
+0.42:  Fri Jan 14 15:34:38 EST 2005
+   - jettero improved the number formatting for huge numbers
+
+0.41:  Fri Jan 14 13:50:44 EST 2005
+   - jettero found some exponent related bugs
+
+0.4:  Fri Jan 14 13:06:14 EST 2005
+   - jettero made a temporary fix for a Number::Format issue (ie poor handling
+     of scientific notation) and also fixed a nasty bug in the unit regexp
+     where capital letters went unrecognized.
+
+0.39:  Fri Jan 14 11:00:41 EST 2005
+   - jettero added exponential matching to new (eg 1.99e3) ... woops.
+
+0.38:  Thu Jan 13 15:26:13 EST 2005
+   - jettero found that metric units work well (by adding a test).
+
+0.37:  Thu Jan 13 10:29:14 EST 2005
+   - jettero added the readme
+
+0.36:  Thu Jan 13 07:16:08 EST 2005
+   - jettero better docs
+
+0.35:  Wed Jan 12 19:58:11 EST 2005
+   - jettero added a huge amount of documentation
+
+0.34:  Wed Jan 12 16:27:12 EST 2005
+   - jettero added some equivalence overloads
+
+0.33:  Wed Jan 12 15:21:46 EST 2005
+   - jettero add some num/str eq overloads
+
+0.32:  Wed Jan 12 15:12:24 EST 2005
+   - jettero made this

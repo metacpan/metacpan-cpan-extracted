@@ -1,0 +1,18 @@
+Revision history for Media-LibMTP
+
+0.04   2014-05-31
+	- Document the memory managment change made in 0.03
+	- Media type audio/mp4 now maps to LIBMTP_FILETYPE_M4A
+	  instead of LIBMTP_FILETYPE_MP4
+
+0.03   2012-07-04
+	- Improve memory managment
+	  The new SubObject class automatically maintains the parent
+	  object until it's no longer needed.
+	- Add examples/delete-folder.pl
+
+0.02   2012-05-14
+	- Document that libmtp 1.1.0 or newer is required
+
+0.01   2012-05-12
+	- Initial release

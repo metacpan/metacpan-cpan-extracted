@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Mail/Stats.pm
+lib/Mail/Stats/Record.pm
+lib/Mail/Stats/Parser.pm
+lib/Mail/Stats/Config.pm
+countmail
+countmailrc.sample
+test.pl

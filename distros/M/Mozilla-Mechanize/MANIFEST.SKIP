@@ -1,0 +1,16 @@
+^dist.sh$
+^MANIFEST\.SKIP$
+^_build
+^Build$
+^blib
+~$
+\.bak$
+\.orig$
+\.svn
+^Mozilla-
+^releases
+^tmp
+CVS
+^.git
+Makefile
+browser_child.cc

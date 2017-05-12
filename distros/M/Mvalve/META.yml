@@ -1,0 +1,40 @@
+---
+abstract: 'Generic Q4M Powered Message Pipe'
+author:
+  - 'Daisuke Maki C<< <daisuke@endeworks.jp> >>'
+build_requires:
+  Test::More: 0
+  Test::UseAllModules: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mvalve
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Cache::Memcached: 0
+  Config::Any: 0
+  DBI: 0
+  Data::Serializer: 0
+  Data::Valve: 0.00007
+  Digest::SHA1: 0
+  Exporter: 5.61
+  HTTP::Headers: 0
+  Moose: 0
+  MooseX::App::Cmd: 0.03
+  MooseX::ClassAttribute: 0
+  MooseX::ConfigFromFile: 0
+  MooseX::KeyedMutex: 0
+  MooseX::Q4MLog: 0
+  Queue::Q4M: 0.00009
+  Sys::Hostname: 0
+  Time::HiRes: 0
+  UNIVERSAL::require: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.00014

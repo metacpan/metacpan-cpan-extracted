@@ -1,0 +1,4 @@
+name = "MapReduce-Framework-Simple"
+badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

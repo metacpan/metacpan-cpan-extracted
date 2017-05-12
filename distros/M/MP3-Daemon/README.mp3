@@ -1,0 +1,205 @@
+NAME
+    mp3 - an mpg123 front-end for UNIX::Philosophers
+
+SYNOPSIS
+    General syntax
+
+        mp3 [COMMAND] [PARAMETER]...
+
+    Building the playlist
+
+        mp3 add Blue_Six-Conga_Lounge_Mix.mp3
+        mp3 add /c/mp3/*.mp3
+        mp3 add http://132.216.57.19:15005/3/motw141.mp3
+        mp3 del 0 2 4 -1
+
+    Playing from the list
+
+        mp3 play 5
+        mp3 next
+        mp3 prev
+
+    Other controls
+
+        mp3 rw 2.00
+        mp3 ff 32.32
+        mp3 jump 420
+        mp3 pause
+        mp3 stop
+        mp3 rand
+        mp3 loop single
+
+    Getting information
+
+        mp3 time
+        mp3 info
+        mp3 ls
+        mp3 help
+
+    Unloading the daemon
+
+        mp3 quit
+        mp3 kill
+
+DESCRIPTION
+    I have combined my favourite features of dcd, cdcd, and mpg123 to create
+    Yet Another Front-End For Mpg123. Mine is special, though. ;-)
+
+    From dcd, I derived the ability to fork itself into the background.
+
+    From cdcd, I derived its intuitive interface.
+
+    With mpg123, I do the CPU-intensive work of actually playing the mp3s.
+
+    The end result is an MP3 player that is compliant with the
+    UNIX::Philosophy. Note that mp3 does not have a Captive User Interface.
+    Requests are made by mp3 to an MP3::Daemon::Simple and mp3 returns
+    immediately after getting a reply. The commands that generate output do
+    so on STDOUT. This makes mp3 easy to combine with other Unix utilities
+    via pipes and filters.
+
+COMMANDS
+    Most of these commands are self-explanatory. One thing that may confuse
+    some people is that the playlist has a zero-based index. Otherwise, if
+    you're familiar with the cdcd interface, this should feel vaguely
+    familiar.
+
+    add     This adds mp3s to the playlist. Multiple files may be specified.
+
+    del     This deletes items from the playlist by index. More than one
+            index may be specified. If no index is specified, the current
+            mp3 in the playlist is removed. Indices may also be negative in
+            which case they count from the end of the playlist.
+
+    play    This plays the current mp3 if no other parameters are given.
+            This command also takes an optional parameter where the index of
+            an mp3 in the playlist may be given.
+
+    next    This loads the next mp3 in the playlist.
+
+    prev    This loads the previous mp3 in the playlist.
+
+    pause   This pauses the currently playing mp3. If the mp3 was already
+            paused, this will unpause it. Note that using the play command
+            on a paused mp3 makes it start over from the beginning.
+
+    rw      This rewinds an mp3 by the specified amount of seconds.
+
+    ff      This fastforwards an mp3 by the specified amount of seconds.
+
+    jump    This will go directly to a part of an mp3 specified by seconds
+            from the beginning of the track. If the number of seconds is
+            prefixed with either a "-" or a "+", a relative jump will be
+            made. This is another way to rewind or fastforward.
+
+    stop    This stops the player.
+
+    time    This sends back the index of the current track, the amount of
+            time that has elapsed, the amount of time that is left, and the
+            total amount of time. All times are reported in seconds.
+
+    info    This sends back information about the current track.
+
+    ls [-fl] [REGEX]
+            First, a warning -- I'm beginning to realize how GNU/ls became
+            so bloated. The "ls" interface should not be considered stable.
+            I'm still playing with it.
+
+            This sends back a list of the titles of all mp3s currently in
+            the playlist. The current track is denoted by a line matching
+            the regexp /^>/.
+
+            -f      This makes "ls" return a listing with index and
+                    filename.
+
+            -l      This makes "ls" return a long listing that includes
+                    index, title, and filename.
+
+            [REGEX] This allows one to filter the playlist for only titles
+                    matching this regex. Of course, one may use grep,
+                    instead.
+
+    rand    Calling this with no parameters toggles the random play feature.
+            Randomness can be set to be specifically "on" or "off" by
+            passing the scalar "on" or "off" to this method.
+
+    loop    This option controls the playlist's looping behaviour. When
+            called with a parameter, loop can be set to "all", "single", or
+            "off". Calling this with no parameters displays the current
+            looping status.
+
+    quit    This unloads the MP3::Daemon::Simple that was automagically
+            spawned when you first invoked mp3.
+
+    kill    If for some reason the daemon hangs on you, you can use this as
+            a last resort.
+
+  The UNIX::Philosophy In Action
+
+    Saving playlists
+
+        mp3 ls -f | perl -pe 's/.*\d+ //' > playlist
+
+    Loading a playlist
+
+        xargs mp3 add < playlist
+
+    Deleting songs 6..12
+
+        mp3 del `seq 6 12`
+
+    Sorting your playlist from shortest to longest mp3
+
+        mp3 ls -l | sed 's/^>/ /' | sed 's/:/./' | sort -g -k 2
+
+    Playing part of an mp3 over and over again
+
+        while true ; do mp3 j 1300 ; sleep 386 ; done
+
+    Monitoring the progress of the daemon
+
+        watch mp3 time
+        watch mp3 info
+
+FILES
+    $HOME/.mp3/mp3_socket
+        This is the socket used to communicate with the daemon. In the event
+        that the daemon is not cleanly shut down, this file may need to be
+        deleted before another MP3::Daemon::Simple can be started up.
+
+    $HOME/.mp3/mp3.pid
+        This is the pid of the daemonized process.
+
+COPYLEFT
+    Copyleft (!c) 2001 John BEPPU. All rights reversed. This program is free
+    software; you can redistribute it and/or modify it under the same terms
+    as Perl itself.
+
+AUTHOR
+    John BEPPU <beppu@ax9.org>
+
+SEE ALSO
+    My inspirations
+        dcd(1), cdcd(1), mpg123(1)
+
+    Other perl modules
+        Audio::Play::MPG123(3pm), MP3::Daemon::Simple(3pm), MP3::Daemon(3pm)
+
+    The UNIX Philosophy
+        If you want to know what UNIX is all about, check this book out.
+        It's only 151 pages, and it's really easy and fun to read. Some
+        parts are a little biased and/or dated, but there is still a lot of
+        wisdom in it. I highly recommend it.
+
+            {
+                title  => 'The UNIX Philosophy',
+                author => 'Mike Gancarz',
+                isbn   => '1-55558-123-4',
+            }
+
+    cvsweb
+            http://lbox.org/cgi-bin/cvsweb.cgi/pm/MP3-Daemon/
+
+    the web site
+            http://beppu.lbox.org/proj/mp3-daemon.html
+

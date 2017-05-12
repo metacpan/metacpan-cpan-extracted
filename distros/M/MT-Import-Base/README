@@ -1,0 +1,166 @@
+NAME
+    MT::Import::Base - base class for importing "stuff" into Movable Type.
+
+SYNOPSIS
+     package MT::Import::Fubar;
+     use base qw (MT::Import::Fubar);
+
+DESCRIPTION
+    Base class for importing "stuff" into Movable Type.
+
+PACKAGE METHODS
+  __PACKAGE__->new($cfg)
+    Options are passed to MT::Import::Base using a Config::Simple object or
+    a valid Config::Simple config file. Options are grouped by "block".
+
+  importer
+    * verbose
+        Boolean.
+
+        Enable verbose logging for both this package and *MT::Import::Mbox*
+
+    * force
+        Boolean.
+
+        Force an entry to be reindexed, including any trackback pings and
+        attachments.
+
+        Default is *false*
+
+  mt
+    * root
+        String. *required*
+
+        The path to your Movable Type installation.
+
+    * blog_id
+        Int. *required*
+
+        The numberic ID of the Movable Type weblog you are posting to.
+
+    * blog_ownerid
+        Int. *required*
+
+        The numberic ID of a Movable Type author with permissions to add new
+        authors to the Movable Type weblog you are posting to.
+
+    * author_pass
+        String.
+
+        The password to assign to any new authors you add to the Movable
+        Type weblog you are posting to.
+
+        Default is "*none*".
+
+    * author_perms
+        Int.
+
+        The permissions set to grant any new authors you add to the Movable
+        Type weblog you are posting to.
+
+        Default is *514*, or the ability to add new categories.
+
+OBJECT METHODS
+  $obj->verbose($bool)
+    Returns true or false, indicating whether or not *debug* events would be
+    logged.
+
+  $obj->log()
+    Returns a *Log::Dispatch* object.
+
+  $obj->imported($id)
+    If *$id* is defined, stores the ID in the object's internal cache of
+    entry's that have been imported.
+
+    Otherwise, the method returns a list or array reference of imported
+    entries depending on whether or not the method was called in a
+    *wantarray* context.
+
+  $obj->rebuild()
+    Rebuild all of the entries returned by the object's *imported* method.
+    Indexes are rebuilt afterwards.
+
+    Returns true or false.
+
+  $obj->rebuild_indexes()
+    Rebuild all of the indexes for the blog defined mt.blog_id.
+
+    Returns true or false.
+
+  $obj->rebuild_entry($id)
+    Rebuild an individual entry. If the entry has neighbouring entries, they
+    will be added to the object's internal "imported" list.
+
+    Returns true or false.
+
+  $obj->mk_category($label,$parent_id,$author_id)
+    If it does not already exist for the blog defined by mt.blog_id creates
+    a new Movable Type category for *$label*.
+
+    *$parent_id* is the numeric ID for another MT category and is not
+    required.
+
+    Returns a *MT::Category* object on success or undef if there was an
+    error.
+
+  $obj->mk_author($name,$email)
+    If it does not already exist for the blog defined by mt.blog_id creates
+    a new Movable Type author for *$name*.
+
+    Leading and trailing space will be trimmed from *$name*.
+
+    Returns a *MT::Author* object on success or undef if there was an error.
+
+  $obj->place_category(MT::Entry, MT::Category, $is_primary)
+    If it does not already exist for the combined entry object and category
+    object creates a new Movable Type placement entry for the pair.
+
+    Returns a *MT::Placement* object on success or undef if there was an
+    error.
+
+  $obg->mk_date($date_str)
+    Returns a MT specific datetime string. =cut
+
+    sub mk_date { my $self = shift; my $str = shift; my $time =
+    str2time($str); my $dt = time2str("%Y-%m-%d%H:%M:%S",$time); $dt =~
+    s/(?:-|:)//g; return $dt; }
+
+  $obj->upload_file(\*$fh, $path)
+    Wrapper method for storing an file outside of Movable Type using the
+    blog engine's file manager.
+
+    Returns true or false.
+
+  $obj->blog_id()
+    Wrapper method for calling $obj->{cfg}->param("mt.blog_id")
+
+  $obj->ping_for_reply(MT::Entry, $reply_basename, $from)
+    Wrapper method pinging another entry.
+
+    The entry object is the post doing the pinging. *$reply_basename* is the
+    post that is being pinged. *$from* is a label indicating where the ping
+    is coming from.
+
+    The entry being pinged is fetched by where the entry's basename matches
+    I$<basename> and it's blog_id matches mt.blog_id.
+
+    Returns true or false.
+
+VERSION
+    1.01
+
+DATE
+    $Date: 2005/12/03 18:46:21 $
+
+AUTHOR
+    Aaron Straup Cope <ascope@cpan.org>
+
+BUGS
+    Please report all bugs via : http://rt.cpan.org
+
+LICENSE
+    Copyright (c) 2005 Aaron Straup Cope. All Rights Reserved.
+
+    This is free software, you may use it and distribute it under the same
+    terms as Perl itself.
+

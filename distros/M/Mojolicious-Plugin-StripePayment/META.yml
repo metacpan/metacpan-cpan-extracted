@@ -1,0 +1,27 @@
+---
+abstract: 'Make payments using stripe.com'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-StripePayment
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::Socket::SSL: '1.94'
+  Mojolicious: '6.0'
+resources:
+  bugtracker: https://github.com/jhthorsen/mojolicious-plugin-stripepayment/issues
+  homepage: https://github.com/jhthorsen/mojolicious-plugin-stripepayment
+  repository: https://github.com/jhthorsen/mojolicious-plugin-stripepayment.git
+version: '0.03'

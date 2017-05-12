@@ -1,0 +1,44 @@
+NAME
+    MIME::Lite::TT::HTML::Japanese - Create html mail with MIME::Lite and TT
+
+SYNOPSIS
+        use MIME::Lite::TT::HTML::Japanese;
+    
+        my $msg = MIME::Lite::TT::HTML::Japanese->new(
+            From        => 'from@example.com',
+            To          => 'to@example.com',
+            Subject     => 'Subject',
+            Template    => {
+                html => 'mail.html',
+                text => 'mail.txt',
+            },
+            Icode       => 'euc', # input code (Jcode Format)
+            TmplIcode   => 'jis', # Template input code (Optional)
+            TmplOptions => \%options,
+            TmplParams  => \%params,
+        );
+    
+        $msg->send;
+
+DESCRIPTION
+    This module provide easy interface to make MIME::Lite object with html
+    formatted mail.
+
+METHODS
+  new
+    return MIME::Lite object with Japanese html mail format.
+
+  encode_subject
+  encode_body
+  generate_text
+  remove_utf8_flag
+SEE ALSO
+    MIME::Lite, Template, MIME::Lite::TT::Japanese
+
+AUTHOR
+    Daisuke Murase <typester@cpan.org>
+
+LICENSE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

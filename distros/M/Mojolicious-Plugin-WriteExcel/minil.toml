@@ -1,0 +1,3 @@
+name = "Mojolicious-Plugin-WriteExcel"
+module_maker = "ModuleBuildTiny"
+tag_format = "v%v"

@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Message/Transform.pm
+t/00perlcritic.t
+t/00perlcriticprogressive.t
+t/00perltidy.t
+t/00pod.t
+t/00podcover.t
+t/basic.t

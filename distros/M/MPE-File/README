@@ -1,0 +1,34 @@
+MPE::File - Perl access to following MPE file intrinsics
+  $file = MPE::File->hpfopen(2, "FRED.PUB", 3, 1, 11, 0)
+  $file = MPE::File->fopen("FRED.PUB", 1, 0)
+  $rec = $file->readrec();   # use this instead of fread
+
+  $rec = $file->freadbykey($key, $keyloc);
+  $rec = $file->freadlabel( [$labelid] );
+  $rec = $file->freaddir($lrecnum);
+  $rec = $file->freadc();
+  $file->fread($buffer, $bufsize);
+
+
+  $file->writerec($buffer, [$controlcode] )   # use this instead of fwrite
+
+  $file->fupdate($buffer);
+  $file->fwritedir($buffer, $lrecnum);
+  $file->fwritelabel ($buffer, [$labelid] )
+  $file->fwrite($buffer, $length, $controlcode)
+
+  $file->fpoint($lrecnum);
+  $file->fcontrol($itemnum, $item);
+  $file->fdelete( [$lrecnum] );
+  $file->fsetmode($modeflags);
+  $file->fremove();
+  $file->fgetkeyinfo($param, $control);
+  $file->ffindbykey($value, $location, $length, $relop);
+  $file->printfileinfo();
+
+  @info = $file->ffileinfo(1, 3, 7, 9);
+
+  @info = flabelinfo("FRED.PUB", $mode, 1, 3, 7, 9);
+
+  $errmsg = ferrmsg($fserrcode);
+  hperrmsg($displaycode,...)

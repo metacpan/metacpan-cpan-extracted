@@ -1,0 +1,18 @@
+% use Mojo::ByteStream qw/b/;
+
+This is the page for <%= $tab %> for
+<%= $object %> <%= $key %>.
+<pre class="toto_code">
+get '/<%= $object %>/<%= $tab %>/*key' => sub {
+% if ($self->app->routes->namespaces) {
+    # or define <%= $self->app->routes->namespaces->[0] %>::<%= b($object)->camelize %>::<%= $tab %>()
+% }
+    ...
+} => '<%= $object %>/<%= $tab %>';
+
+# templates/<%= $object %>/<%= $tab %>.html.ep
+This is the page for
+&lt%= $tab %&gt; for &lt;%= $object %&gt;
+&lt;%= $<%= $object %>-&gt;key %&gt;
+</pre>
+

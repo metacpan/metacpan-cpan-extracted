@@ -1,0 +1,37 @@
+--- randistrs.c.orig	2013-01-05 10:18:52.000000000 +0100
++++ randistrs.c	2014-04-01 17:43:08.978287310 +0200
+@@ -4,8 +4,10 @@
+ #else
+ #define ATTRIBUTE(attrs)
+ #endif
++/*
+ static char Rcs_Id[] ATTRIBUTE((used)) =
+     "$Id: randistrs.c,v 1.12 2013-01-05 01:18:52-08 geoff Exp $";
++*/
+ #endif
+ 
+ /*
+@@ -883,6 +885,11 @@
+     const double*	probs,		/* Probability (weight) table */
+     const double*	values)		/* Value for floating distributions */
+     {
++
++#ifdef WIN32
++    dTHX;
++#endif
++
+     rd_empirical_control* control;	/* Control structure we'll build */
+     size_t		i;		/* General loop index */
+     size_t		j;		/* Element from stack_high */
+@@ -1031,6 +1038,11 @@
+ void rd_empirical_free(
+     rd_empirical_control* control)	/* Structure to free */
+     {
++
++#ifdef WIN32
++    dTHX;
++#endif
++
+     if (control == NULL)
+ 	return;
+     if (control->cutoff != NULL)

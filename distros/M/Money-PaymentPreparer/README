@@ -1,0 +1,40 @@
+Money-PaymentPreparer version 0.03
+==================================
+
+This module change sum (i.e. payment) to collection of bills and coins
+and keep it all in one hash.
+For example if you have to pay 2 persons 148$ and $52 you can't get from
+bank $200. Use Money::PaymentPreparer, define bills and coins and
+split this sum (148 and 52) into:
+
+$148 = $100 + 2x$20 + $5 + $2 + $1
+$52 = $50 + $2.
+
+And now you know - you need:
+
+100 - 1
+50  - 1
+20  - 2
+10  - 0
+5   - 1
+2   - 2
+1   - 1
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright(C) 2004, 2005 by £ukasz M±drzycki, <uksza@cpan.org>.
+
+All rights reserved. This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+

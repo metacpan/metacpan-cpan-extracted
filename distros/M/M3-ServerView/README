@@ -1,0 +1,82 @@
+NAME
+    M3::ServerView - Perl extension for communicating with M3 ServerView
+
+SYNOPSIS
+     use M3::ServerView;
+     
+ my $conn = M3::ServerView->connect_to(
+       "http://m3.company.com:6600/", 
+       user => "admin", 
+       password => "s3kr1t"
+     );
+      
+ my $root = $conn->root();
+     my $rs = $root->search({ status => "Down"});
+     while (defined (my $system = $rs->next)) {
+       print "System '", $system->type, "' is reported to be down\n";
+     }
+
+DESCRIPTION
+    This module provides a interface to the ServerView web-based monitoring
+    service for M3.
+
+INTERFACE
+  CLASS METHODS
+    connect_to ( URL [, user => USER ] [, password => PASSWORD ] )
+        Connects to the M3 ServerView at *URL*. Argument *URL* can be either
+        a string or an "URI"-instance. Optionally a user and password may be
+        defined.
+
+  INSTANCE METHODS
+    base_uri
+        Returns the base URI for the interface.
+
+    user
+        Returns the username to connect as or undef if a user wasn't
+        defined.
+
+    password
+        Returns the password for the user to connect as or undef if the
+        password wasn't defined.
+
+    root
+        Returns the root view - M3::ServerView::RootView.
+
+BUGS AND LIMITATIONS
+    Please report any bugs or feature requests to
+    "bug-m3-serverview@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
+
+AUTHOR
+    Martin Wilderoth, Linserv AB "<marwil@cpan.org>"
+
+    Claes Jakobsson, Versed Solutions "<claes@versed.se>"
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2007, Linserv AB "<marwil@cpan.org>". All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

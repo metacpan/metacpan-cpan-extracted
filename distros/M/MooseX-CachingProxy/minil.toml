@@ -1,0 +1,6 @@
+name = "MooseX-CachingProxy"
+license = "perl_5"
+badges = ["travis", "coveralls"]
+module_maker = "ModuleBuildTiny"
+authority = "cpan:KABLAMO"
+

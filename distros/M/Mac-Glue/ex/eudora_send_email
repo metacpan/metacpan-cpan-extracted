@@ -1,0 +1,40 @@
+#!perl -w
+use Mac::InternetConfig;
+use Mac::Glue ':glue';
+use strict;
+
+my $e = new Mac::Glue 'Eudora';
+$e->ERRORS(sub {
+	my($err) = @_;
+	die "$err->{errs} at $err->{filename} line $err->{line}/\n";
+});
+
+
+my $box = $e->obj(mailbox => 'Out');
+$e->activate;
+
+my $mail = $e->make(
+	new => 'message',
+	at => location(end => $box)
+);
+
+(my $msg = <<EOT) =~ s/\012/\015/g;  # blame AppleScript, not me
+Dear $InternetConfig{kICRealName()},
+
+I love Mac::Carbon and Mac::Glue.  They make me happy.
+I want to use it for everything and write tests and
+supply patches for it.
+
+Love,
+$InternetConfig{kICRealName()}
+EOT
+
+$mail->obj(field => 'Subject:')->set(to => 'Alert');
+$mail->obj(field => 'To:'     )->set(to => $InternetConfig{kICEmail()});
+$mail->prop('body')->set(to => $msg);
+
+$e->queue($mail);
+
+$e->connect(sending => 1, checking => 0);
+
+__END__

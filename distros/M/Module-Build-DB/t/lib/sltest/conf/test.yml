@@ -1,0 +1,5 @@
+---
+dbi:
+  dsn: dbi:SQLite:dbname=foo_test.db
+  username: ''
+  password: ''

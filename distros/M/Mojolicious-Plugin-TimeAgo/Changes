@@ -1,0 +1,18 @@
+Revision history for Mojolicious-Plugin-TimeAgo
+
+0.01    2014-01-23
+        first version, alpha release
+        simple api to convert datetime to timeago.
+
+0.02    2014-05-06
+        added language support (see DateTimeX::Format::Ago).
+
+0.03    2014-05-19
+        test fixes.
+
+0.06    2016-04-29
+        module improvements
+        add cpanfile 
+        fix bug #109311
+        fix bug #108242
+        fix bug #108091

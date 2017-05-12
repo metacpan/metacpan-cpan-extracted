@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/MooseX/SingletonMethod.pm
+lib/MooseX/SingletonMethod/Role.pm
+MANIFEST
+META.yml
+README
+t/00-load.t
+t/01-basic.t
+t/02-basic-role.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

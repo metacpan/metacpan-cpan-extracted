@@ -1,0 +1,34 @@
+---
+abstract: 'Monitis.com API Perl interface'
+author:
+  - 'Yaroslav Korshak  C<< <yko@cpan.org> >>'
+build_requires:
+  Digest::SHA: 0
+  ExtUtils::MakeMaker: 6.42
+  File::Path: 0
+  File::Spec: 0
+  File::Temp: 0
+  HTTP::Headers: 0
+  HTTP::Request: 0
+  HTTP::Request::Common: 0
+  IPC::Open3: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Symbol: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+distribution_type: module
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.57_05'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Monitis
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+version: 0.9

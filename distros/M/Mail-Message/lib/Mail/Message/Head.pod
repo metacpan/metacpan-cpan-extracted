@@ -1,0 +1,506 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Message::Head - the header of one message
+
+=head1 INHERITANCE
+
+ Mail::Message::Head
+   is a Mail::Reporter
+
+ Mail::Message::Head is extended by
+   Mail::Message::Head::Complete
+
+=head1 SYNOPSIS
+
+ my $head = Mail::Message::Head->new;
+ $head->add('From: me@localhost');
+ $head->add(From => 'me@localhost');
+ $head->add(Mail::Message::Field->new(From => 'me'));
+ my $subject = $head->get('subject');
+ my @rec = $head->get('received');
+ $head->delete('From');
+
+=head1 DESCRIPTION
+
+C<Mail::Message::Head> MIME headers are part of L<Mail::Message|Mail::Message> messages,
+which are grouped in Mail::Box folders.
+
+B<ATTENTION!!!> most functionality about e-mail headers is described
+in L<Mail::Message::Head::Complete|Mail::Message::Head::Complete>, which is a matured header object.
+Other kinds of headers will be translated to that type when time comes.
+
+On this page, the general methods which are available on any header are
+described.  Read about differences in the sub-class specific pages.
+
+Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
+ 
+=head1 OVERLOADED
+
+=over 4
+
+=item overload: B<"">
+
+(stringifaction) The header, when used as string, will format as if
+L<Mail::Message::Head::Complete::string()|Mail::Message::Head::Complete/"Access to the header"> was called, so return a
+nicely folder full header.  An exception is made for Carp, which will
+get a simplified string to avoid unreadible messages from C<croak>
+and C<confess>.
+
+example: using a header object as string
+
+ print $head;     # implicit stringification by print
+ $head->print;    # the same
+
+ print "$head";   # explicit stringication
+
+=item overload: B<bool>
+
+When the header does not contain any lines (which is illegal, according
+to the RFCs), false is returned.  In all other cases, a true value is
+produced.
+
+=back
+
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Reporter|Mail::Reporter/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
+ 
+=over 4
+
+=item Mail::Message::Head-E<gt>B<build>( [PAIR|$field]-LIST )
+
+A fast way to construct a header with many lines.
+The PAIRs are C<(name, content)> pairs of the header, but it is also possible
+to pass L<Mail::Message::Field|Mail::Message::Field> objects.   A
+L<Mail::Message::Head::Complete|Mail::Message::Head::Complete> header is created by simply calling
+L<Mail::Message::Head::Complete::build()|Mail::Message::Head::Complete/"Constructors">, and then each field
+is added.  Double field names are permitted.
+
+example: 
+
+ my $subject = Mail::Message::Field->new(Subject => 'xyz');
+
+ my $head = Mail::Message::Head->build
+  ( From     => 'me@example.com'
+  , To       => 'you@anywhere.aq'
+  , $subject
+  , Received => 'one'
+  , Received => 'two'
+  );
+
+ print ref $head;
+  # -->  Mail::Message::Head::Complete
+
+=item Mail::Message::Head-E<gt>B<new>(%options)
+
+Create a new message header object.  The object will store all the
+fields of a header.  When you get information from the header, it
+will be returned to you as L<Mail::Message::Field|Mail::Message::Field> objects, although
+the fields may be stored differently internally.
+
+If you try to instantiate a L<Mail::Message::Head|Mail::Message::Head>, you will automatically
+be upgraded to a L<Mail::Message::Head::Complete|Mail::Message::Head::Complete> --a full head.
+
+ -Option    --Defined in     --Default
+  field_type                   Mail::Message::Field::Fast
+  log         Mail::Reporter   'WARNINGS'
+  message                      undef
+  modified                     <false>
+  trace       Mail::Reporter   'WARNINGS'
+
+=over 2
+
+=item field_type => CLASS
+
+The type of objects that all the fields will have.  This must be
+an extension of L<Mail::Message::Field|Mail::Message::Field>.
+
+=item log => LEVEL
+
+=item message => MESSAGE
+
+The MESSAGE where this header belongs to.  Usually, this is not known
+at creation of the header, but sometimes it is.  If not, call the
+message() method later to set it.
+
+=item modified => BOOLEAN
+
+=item trace => LEVEL
+
+=back
+
+=back
+
+=head2 The header
+
+=over 4
+
+=item $obj-E<gt>B<isDelayed>()
+
+Headers may only be partially read, in which case they are called delayed.
+This method returns true if some header information still needs to be
+read. Returns false if all header data has been read.
+Will never trigger completion.
+
+=item $obj-E<gt>B<isEmpty>()
+
+Are there any fields defined in the current header?  Be warned that
+the header will not be loaded for this: delayed headers will return
+true in any case.
+
+=item $obj-E<gt>B<isModified>()
+
+Returns whether the header has been modified after being read.
+
+example: 
+
+ if($head->isModified) { ... }
+
+=item $obj-E<gt>B<knownNames>()
+
+Like L<Mail::Message::Head::Complete::names()|Mail::Message::Head::Complete/"Access to the header">, but only returns the known
+header fields, which may be less than C<names> for header types which are
+partial.  C<names()> will trigger completion, where C<knownNames()> does not.
+
+=item $obj-E<gt>B<message>( [$message] )
+
+Get (after setting) the message where this header belongs to.
+This does not trigger completion.
+
+=item $obj-E<gt>B<modified>( [BOOLEAN] )
+
+Sets the modified flag to BOOLEAN.  Without value, the current setting is
+returned, but in that case you can better use L<isModified()|Mail::Message::Head/"The header">.
+Changing this flag will not trigger header completion.
+
+example: 
+
+ $head->modified(1);
+ if($head->modified) { ... }
+ if($head->isModified) { ... }
+
+=item $obj-E<gt>B<orderedFields>()
+
+Retuns the fields ordered the way they were read or added.
+
+=back
+
+=head2 Access to the header
+
+=over 4
+
+=item $obj-E<gt>B<get>( $name, [$index] )
+
+Get the data which is related to the field with the $name.  The case of the
+characters in $name does not matter.
+
+If there is only one data element defined for the $name, or if there is an
+$index specified as the second argument, only the specified element will be
+returned. If the field $name matches more than one header the return value
+depends on the context. In LIST context, all values will be returned in
+the order they are read. In SCALAR context, only the last value will be
+returned.
+
+example: 
+
+ my $head = Mail::Message::Head->new;
+ $head->add('Received: abc');
+ $head->add('Received: xyz');
+ $head->add('Subject: greetings');
+
+ my @rec_list   = $head->get('Received');
+ my $rec_scalar = $head->get('Received');
+ print ",@rec_list,$rec_scalar,"     # ,abc xyz, xyz,
+ print $head->get('Received', 0);    # abc
+ my @sub_list   = $head->get('Subject');
+ my $sub_scalar = $head->get('Subject');
+ print ",@sub_list,$sub_scalar,"     # ,greetings, greetings,
+
+=item $obj-E<gt>B<study>( $name, [$index] )
+
+Like L<get()|Mail::Message::Head/"Access to the header">, but puts more effort in understanding the contents of the
+field.  L<Mail::Message::Field::study()|Mail::Message::Field/"Access to the content"> will be called for the field
+with the specified FIELDNAME, which returns L<Mail::Message::Field::Full|Mail::Message::Field::Full>
+objects. In scalar context only the last field with that name is returned.
+When an $index is specified, that element is returned.
+
+=back
+
+=head2 About the body
+
+=over 4
+
+=item $obj-E<gt>B<guessBodySize>()
+
+Try to estimate the size of the body of this message, but without parsing
+the header or body.  The result might be C<undef> or a few percent of
+the real size.  It may even be very far of the real value, that's why
+this is a guess.
+
+=item $obj-E<gt>B<isMultipart>()
+
+Returns whether the body of the related message is a multipart body.
+May trigger completion, when the C<Content-Type> field is not defined.
+
+=back
+
+=head2 Internals
+
+=over 4
+
+=item $obj-E<gt>B<addNoRealize>($field)
+
+Add a field, like L<Mail::Message::Head::Complete::add()|Mail::Message::Head::Complete/"Access to the header"> does, but
+avoid the loading of a possibly partial header.  This method does not
+test the validity of the argument, nor flag the header as changed.
+This does not trigger completion.
+
+=item $obj-E<gt>B<addOrderedFields>($fields)
+
+=item $obj-E<gt>B<fileLocation>()
+
+Returns the location of the header in the file, as a pair begin and end.  The
+begin is the first byte of the header.  The end is the first byte after
+the header.
+
+=item $obj-E<gt>B<load>()
+
+Be sure that the header is loaded.  This returns the loaded header
+object.
+
+=item $obj-E<gt>B<moveLocation>($distance)
+
+Move the registration of the header in the file.
+
+=item $obj-E<gt>B<read>($parser)
+
+Read the header information of one message into this header structure.  This
+method is called by the folder object (some Mail::Box sub-class), which
+passes the $parser as an argument.
+
+=item $obj-E<gt>B<setNoRealize>($field)
+
+Set a field, but avoid the loading of a possibly partial header as set()
+does.  This method does not test the validity of the argument, nor flag the
+header as changed.  This does not trigger completion.
+
+=back
+
+=head2 Error handling
+
+Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
+ 
+=over 4
+
+=item $obj-E<gt>B<AUTOLOAD>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<addReport>($object)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+=item Mail::Message::Head-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<errors>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<log>( [$level, [$strings]] )
+
+=item Mail::Message::Head-E<gt>B<log>( [$level, [$strings]] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logPriority>($level)
+
+=item Mail::Message::Head-E<gt>B<logPriority>($level)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<notImplemented>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<report>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<reportAll>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<trace>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<warnings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=back
+
+=head2 Cleanup
+
+Extends L<"Cleanup" in Mail::Reporter|Mail::Reporter/"Cleanup">.
+ 
+=over 4
+
+=item $obj-E<gt>B<DESTROY>()
+
+Inherited, see L<Mail::Reporter/"Cleanup">
+
+=back
+
+=head1 DETAILS
+
+=head2 Ordered header fields
+
+Many Perl implementations make a big mistake by disturbing the order
+of header fields.  For some fields (especially the I<resent groups>,
+see L<Mail::Message::Head::ResentGroup|Mail::Message::Head::ResentGroup>) the order shall be
+maintained.
+
+MailBox will keep the order of the fields as they were found in the
+source.  When your add a new field, it will be added at the end.  If
+your replace a field with a new value, it will stay in the original
+order.
+
+=head2 Head class implementation
+
+The header of a MIME message object contains a set of lines, which are
+called I<fields> (by default represented by L<Mail::Message::Field|Mail::Message::Field>
+objects).  Dependent on the situation, the knowledge about the fields can
+be in one of three situations, each represented by a sub-class of this
+module:
+
+=over 4
+
+=item * L<Mail::Message::Head::Complete|Mail::Message::Head::Complete>
+
+In this case, it is sure that all knowledge about the header is available.
+When you L<get()|Mail::Message::Head/"Access to the header"> information from the header and it is not there, it will
+never be there.
+
+=item * Mail::Message::Head::Subset
+
+There is no certainty whether all header lines are known (probably not).  This
+may be caused as result of reading a fast index file, as described in
+Mail::Box::MH::Index.  The object is automatically transformed
+into a L<Mail::Message::Head::Complete|Mail::Message::Head::Complete> when all header lines must be known.
+
+=item * L<Mail::Message::Head::Partial|Mail::Message::Head::Partial>
+
+A partial header is like a subset header: probably the header is incomplete.
+The means that you are not sure whether a L<get()|Mail::Message::Head/"Access to the header"> for a field fails because
+the field is not a part of the message or that it fails because it is not
+yet known to the program.  Where the subset header knows where to get the
+other fields, the partial header does not know it.  It cannot hide its
+imperfection.
+
+=item * Mail::Message::Head::Delayed
+
+In this case, there is no single field known.  Access to this header will
+always trigger the loading of the full header.
+
+=back
+
+=head2 Subsets of header fields
+
+Message headers can be quite large, and therefore MailBox provides
+simplified access to some subsets of information.  You can grab these
+sets of fields together, create and delete them as group.
+
+On the moment, the following sets are defined:
+
+=over 4
+
+=item * L<Mail::Message::Head::ResentGroup|Mail::Message::Head::ResentGroup>
+
+A I<resent group> is a set of fields which is used to log one step
+in the transmission of the message from the original sender to the
+destination.
+
+Each step adds a set of headers to indicate when the message was received
+and how it was forwarded (without modification).  These fields are
+best created using L<Mail::Message::bounce()|Mail::Message::Construct::Bounce/"Constructing a message">.
+
+=item * L<Mail::Message::Head::ListGroup|Mail::Message::Head::ListGroup>
+
+Fields which are used to administer and log mailing list activity.  Mailing
+list software has to play trics with the original message to be able to
+get the reply on that message back to the mailing list.  Usually a large
+number of lines are added.
+
+=item * L<Mail::Message::Head::SpamGroup|Mail::Message::Head::SpamGroup>
+
+A set of fields which contains header fields which are produced by
+spam detection software.  You may want to remove these fields when
+you store a message for a longer period of time.
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Message distribution version 3.000,
+built on February 02, 2017.
+
+Do not forget to read
+L</Mail::Box-Overview>,
+L</Mail::Box-Cookbook>, and
+L</Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L</Mail::Message>,
+L</Mail::Box>,
+L</Mail::Box::IMAP4>,
+L</Mail::Box::POP3>,
+L</Mail::Box::Parser::C>,
+L</Mail::Box::Dbx> (unpublished),
+L</Mail::Transport>,
+L</Object::Realize::Later>, and
+L</User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,12 @@
+# -*- yaml -*-
+# Revision history for Markapl-FromHTML
+
+0.03:
+  - indent the produced code.
+  - use "outs" function to output text when there is a inline element in the block.
+
+0.02:
+  - attributes are now converted
+
+0.01:
+  - Initial release.

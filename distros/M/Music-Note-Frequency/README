@@ -1,0 +1,219 @@
+Music-Note-Frequency
+
+There aren't any special instructions for installing the module, except
+that it requires Music::Note from here: http://search.cpan.org/dist/Music-Note.
+
+This module extends Music::Note to provide frequency values in Hertz (Hz) for
+the note defined by the Music::Note object.  Frequencies are currently only
+available for equal-temperament.  The formula used to generate the frequency
+values from the MIDI pitch values is:
+
+        f(n) = 2**((n-69)/12) * 440 Hz
+
+This is a table of generated values listed with MIDI pitch values and note
+names, just because:
+
+   MIDI    note    frequency 
+--------------------------------------
+      0     C-1    8.17579891564371
+      1    C#-1    8.66195721802725
+      2     D-1    9.17702399741899
+      3    D#-1    9.72271824131503
+      4     E-1    10.3008611535272
+      5     F-1    10.9133822322814
+      6    F#-1    11.5623257097386
+      7     G-1    12.2498573744297
+      8    G#-1    12.9782717993733
+      9     A-1    13.75
+     10    A#-1    14.5676175474403
+     11     B-1    15.4338531642539
+     12      C0    16.3515978312874
+     13     C#0    17.3239144360545
+     14      D0    18.354047994838
+     15     D#0    19.4454364826301
+     16      E0    20.6017223070544
+     17      F0    21.8267644645627
+     18     F#0    23.1246514194771
+     19      G0    24.4997147488593
+     20     G#0    25.9565435987466
+     21      A0    27.5
+     22     A#0    29.1352350948806
+     23      B0    30.8677063285078
+     24      C1    32.7031956625748
+     25     C#1    34.647828872109
+     26      D1    36.7080959896759
+     27     D#1    38.8908729652601
+     28      E1    41.2034446141087
+     29      F1    43.6535289291255
+     30     F#1    46.2493028389543
+     31      G1    48.9994294977187
+     32     G#1    51.9130871974931
+     33      A1    55
+     34     A#1    58.2704701897612
+     35      B1    61.7354126570155
+     36      C2    65.4063913251497
+     37     C#2    69.295657744218
+     38      D2    73.4161919793519
+     39     D#2    77.7817459305202
+     40      E2    82.4068892282175
+     41      F2    87.307057858251
+     42     F#2    92.4986056779086
+     43      G2    97.9988589954373
+     44     G#2    103.826174394986
+     45      A2    110
+     46     A#2    116.540940379522
+     47      B2    123.470825314031
+     48      C3    130.812782650299
+     49     C#3    138.591315488436
+     50      D3    146.832383958704
+     51     D#3    155.56349186104
+     52      E3    164.813778456435
+     53      F3    174.614115716502
+     54     F#3    184.997211355817
+     55      G3    195.997717990875
+     56     G#3    207.652348789973
+     57      A3    220
+     58     A#3    233.081880759045
+     59      B3    246.941650628062
+     60      C4    261.625565300599
+     61     C#4    277.182630976872
+     62      D4    293.664767917408
+     63     D#4    311.126983722081
+     64      E4    329.62755691287
+     65      F4    349.228231433004
+     66     F#4    369.994422711634
+     67      G4    391.995435981749
+     68     G#4    415.304697579945
+     69      A4    440
+     70     A#4    466.16376151809
+     71      B4    493.883301256124
+     72      C5    523.251130601197
+     73     C#5    554.365261953744
+     74      D5    587.329535834815
+     75     D#5    622.253967444162
+     76      E5    659.25511382574
+     77      F5    698.456462866008
+     78     F#5    739.988845423269
+     79      G5    783.990871963499
+     80     G#5    830.60939515989
+     81      A5    880
+     82     A#5    932.32752303618
+     83      B5    987.766602512248
+     84      C6    1046.50226120239
+     85     C#6    1108.73052390749
+     86      D6    1174.65907166963
+     87     D#6    1244.50793488832
+     88      E6    1318.51022765148
+     89      F6    1396.91292573202
+     90     F#6    1479.97769084654
+     91      G6    1567.981743927
+     92     G#6    1661.21879031978
+     93      A6    1760
+     94     A#6    1864.65504607236
+     95      B6    1975.5332050245
+     96      C7    2093.00452240479
+     97     C#7    2217.46104781498
+     98      D7    2349.31814333926
+     99     D#7    2489.01586977665
+    100      E7    2637.02045530296
+    101      F7    2793.82585146403
+    102     F#7    2959.95538169308
+    103      G7    3135.96348785399
+    104     G#7    3322.43758063956
+    105      A7    3520
+    106     A#7    3729.31009214472
+    107      B7    3951.06641004899
+    108      C8    4186.00904480958
+    109     C#8    4434.92209562995
+    110      D8    4698.63628667852
+    111     D#8    4978.03173955329
+    112      E8    5274.04091060592
+    113      F8    5587.65170292806
+    114     F#8    5919.91076338615
+    115      G8    6271.92697570799
+    116     G#8    6644.87516127912
+    117      A8    7040
+    118     A#8    7458.62018428944
+    119      B8    7902.13282009799
+    120      C9    8372.01808961916
+    121     C#9    8869.84419125991
+    122      D9    9397.27257335704
+    123     D#9    9956.06347910659
+    124      E9    10548.0818212118
+    125      F9    11175.3034058561
+    126     F#9    11839.8215267723
+    127      G9    12543.853951416
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Music::Note::Frequency
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Music-Note-Frequency
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Music-Note-Frequency
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Music-Note-Frequency
+
+    Search CPAN
+        http://search.cpan.org/dist/Music-Note-Frequency/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2016 Mike Kroh
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

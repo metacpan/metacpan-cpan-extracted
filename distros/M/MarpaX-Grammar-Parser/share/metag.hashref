@@ -1,0 +1,570 @@
+default_rule =>
+{
+    ':default' => 1,
+    adverb_list =>
+    {
+        adverb_list_items =>
+        {
+            adverb_item =>
+            {
+                action =>
+                {
+                    action_name =>
+                    {
+                        array_descriptor =>
+                        {
+                            '[start,length,values]' => 1,
+                        },
+                    },
+                },
+                blessing =>
+                {
+                    blessing_name =>
+                    {
+                        reserved_blessing_name =>
+                        {
+                            '::lhs' => 1,
+                        },
+                    },
+                },
+            },
+        },
+    },
+    op_declare_bnf =>
+    {
+        '::=' => 1,
+    },
+},
+discard_rule =>
+{
+    single_symbol =>
+    {
+        symbol =>
+        {
+            symbol_name =>
+            {
+                bare_name =>
+                {
+                    whitespace => 1,
+                },
+                bracketed_name =>
+                {
+                    '<hash comment>' => 1,
+                },
+            },
+        },
+    },
+},
+lexeme_default_statement =>
+{
+    adverb_list =>
+    {
+        adverb_list_items =>
+        {
+            adverb_item =>
+            {
+                action =>
+                {
+                    action_name =>
+                    {
+                        array_descriptor =>
+                        {
+                            '[start,length,value]' => 1,
+                        },
+                    },
+                },
+                blessing =>
+                {
+                    blessing_name =>
+                    {
+                        reserved_blessing_name =>
+                        {
+                            '::name' => 1,
+                        },
+                    },
+                },
+                latm_specification =>
+                {
+                    boolean => 1,
+                },
+            },
+        },
+    },
+},
+priority_rule =>
+{
+    lhs =>
+    {
+        symbol_name =>
+        {
+            bare_name =>
+            {
+                action      => 1,
+                alternative => 1,
+                boolean     => 1,
+                lhs         => 1,
+                quantifier  => 1,
+                statement   => 1,
+                symbol      => 1,
+            },
+            bracketed_name =>
+            {
+                '<action name>'                      => 1,
+                '<adverb item>'                      => 1,
+                '<adverb list>'                      => 1,
+                '<alternative name>'                 => 1,
+                '<array descriptor left bracket>'    => 1,
+                '<array descriptor right bracket>'   => 1,
+                '<array descriptor>'                 => 1,
+                '<before or after>'                  => 1,
+                '<blessing name>'                    => 1,
+                '<blessing>'                         => 1,
+                '<bracketed name>'                   => 1,
+                '<cc element>'                       => 1,
+                '<character class modifier>'         => 1,
+                '<character class>'                  => 1,
+                '<completion event declaration>'     => 1,
+                '<current lexer statement>'          => 1,
+                '<default rule>'                     => 1,
+                '<discard rule>'                     => 1,
+                '<double colon>'                     => 1,
+                '<empty rule>'                       => 1,
+                '<escaped cc character>'             => 1,
+                '<event name>'                       => 1,
+                '<event specification>'              => 1,
+                '<group association>'                => 1,
+                '<hash comment char>'                => 1,
+                '<hash comment>'                     => 1,
+                '<horizontal character>'             => 1,
+                '<inaccessible statement>'           => 1,
+                '<inaccessible treatment>'           => 1,
+                '<latm specification>'               => 1,
+                '<left association>'                 => 1,
+                '<lexeme default statement>'         => 1,
+                '<lexeme rule>'                      => 1,
+                '<lexer name>'                       => 1,
+                '<naming>'                           => 1,
+                '<negated posix char class>'         => 1,
+                '<null adverb>'                      => 1,
+                '<null ranking constant>'            => 1,
+                '<null ranking specification>'       => 1,
+                '<null statement>'                   => 1,
+                '<nulled event declaration>'         => 1,
+                '<op declare bnf>'                   => 1,
+                '<op declare match>'                 => 1,
+                '<op declare>'                       => 1,
+                '<op equal priority>'                => 1,
+                '<op loosen>'                        => 1,
+                '<parenthesized rhs primary list>'   => 1,
+                '<pause specification>'              => 1,
+                '<posix char class>'                 => 1,
+                '<prediction event declaration>'     => 1,
+                '<priority rule>'                    => 1,
+                '<priority specification>'           => 1,
+                '<proper specification>'             => 1,
+                '<quantified rule>'                  => 1,
+                '<rank specification>'               => 1,
+                '<reserved action name>'             => 1,
+                '<reserved blessing name>'           => 1,
+                '<result item descriptor separator>' => 1,
+                '<result item descriptor>'           => 1,
+                '<rhs primary>'                      => 1,
+                '<right association>'                => 1,
+                '<safe cc character>'                => 1,
+                '<separator specification>'          => 1,
+                '<sign>'                             => 1,
+                '<signed integer>'                   => 1,
+                '<single quoted name>'               => 1,
+                '<single quoted string>'             => 1,
+                '<single symbol>'                    => 1,
+                '<standard name>'                    => 1,
+                '<start rule>'                       => 1,
+                '<statement group>'                  => 1,
+                '<symbol name>'                      => 1,
+                '<terminated hash comment>'          => 1,
+                '<unterminated final hash comment>'  => 1,
+                '<vertical space char>'              => 1,
+            },
+        },
+    },
+    op_declare =>
+    {
+        op_declare_bnf =>
+        {
+            '::=' => 1,
+        },
+        op_declare_match =>
+        {
+            '~' => 1,
+        },
+    },
+    priorities =>
+    {
+        alternatives =>
+        {
+            alternative =>
+            {
+                adverb_list => 1,
+                rhs =>
+                {
+                    rhs_primary =>
+                    {
+                        parenthesized_rhs_primary_list =>
+                        {
+                            rhs_primary_list =>
+                            {
+                                rhs_primary =>
+                                {
+                                    single_quoted_string =>
+                                    {
+                                        '('            => 1,
+                                        ')'            => 1,
+                                        ':discard'     => 1,
+                                        ':lexeme'      => 1,
+                                        ':start'       => 1,
+                                        '='            => 1,
+                                        '=>'           => 1,
+                                        'action'       => 1,
+                                        'assoc'        => 1,
+                                        'bless'        => 1,
+                                        'by'           => 1,
+                                        'completed'    => 1,
+                                        'current'      => 1,
+                                        'default'      => 1,
+                                        'event'        => 1,
+                                        'forgiving'    => 1,
+                                        'group'        => 1,
+                                        'inaccessible' => 1,
+                                        'is'           => 1,
+                                        'latm'         => 1,
+                                        'left'         => 1,
+                                        'lexeme'       => 1,
+                                        'lexer'        => 1,
+                                        'name'         => 1,
+                                        'null'         => 1,
+                                        'null-ranking' => 1,
+                                        'nulled'       => 1,
+                                        'pause'        => 1,
+                                        'predicted'    => 1,
+                                        'priority'     => 1,
+                                        'proper'       => 1,
+                                        'rank'         => 1,
+                                        'right'        => 1,
+                                        'separator'    => 1,
+                                        'start'        => 1,
+                                        'symbol'       => 1,
+                                        '{'            => 1,
+                                    },
+                                    single_symbol =>
+                                    {
+                                        symbol =>
+                                        {
+                                            symbol_name =>
+                                            {
+                                                bracketed_name =>
+                                                {
+                                                    '<op declare bnf>'   => 1,
+                                                    '<op declare match>' => 1,
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        single_quoted_string =>
+                        {
+                            ' =>
+                            {
+                                '' =>
+                                {
+                                    ' => 1,
+                                },
+                                ' => 1,
+                            },
+                            '#' => 1,
+                            '*' => 1,
+                            '+' => 1,
+                            ',' => 1,
+                            '::' => 1,
+                            '::=' => 1,
+                            ':]' => 1,
+                            ':default' => 1,
+                            ':i' => 1,
+                            ':ic' => 1,
+                            ';' => 1,
+                            '<' => 1,
+                            '>' => 1,
+                            '[' => 1,
+                            '[:' => 1,
+                            '[:^' => 1,
+                            '\' => 1,
+                            ']' => 1,
+                            'after' => 1,
+                            'before' => 1,
+                            'fatal' => 1,
+                            'high' => 1,
+                            'length' => 1,
+                            'lhs' => 1,
+                            'low' => 1,
+                            'name' => 1,
+                            'ok' => 1,
+                            'rule' => 1,
+                            'start' => 1,
+                            'symbol' => 1,
+                            'value' => 1,
+                            'values' => 1,
+                            'warn' => 1,
+                            '}' => 1,
+                            '~' => 1,
+                        },
+                        single_symbol =>
+                        {
+                            character_class =>
+                            {
+                                '[']'                                                       => 1,
+                                '[+-]'                                                      => 1,
+                                '[,]'                                                       => 1,
+                                '[01]'                                                      => 1,
+                                '[\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]'                    => 1,
+                                '[^\x{5d}\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]' => 1,
+                                '[^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]'                   => 1,
+                                '[a-zA-Z]'                                                  => 1,
+                            },
+                            symbol =>
+                            {
+                                symbol_name =>
+                                {
+                                    bare_name =>
+                                    {
+                                        action     => 1,
+                                        blessing   => 1,
+                                        boolean    => 1,
+                                        lhs        => 1,
+                                        naming     => 1,
+                                        priorities => 1,
+                                        quantifier => 1,
+                                        rhs        => 1,
+                                        statements => 1,
+                                        symbol     => 1,
+                                        whitespace => 1,
+                                    },
+                                    bracketed_name =>
+                                    {
+                                        '<Perl name>'                                     => 1,
+                                        '<action name>'                                   => 1,
+                                        '<adverb list items>'                             => 1,
+                                        '<adverb list>'                                   => 1,
+                                        '<alternative name>'                              => 1,
+                                        '<array descriptor left bracket>'                 => 1,
+                                        '<array descriptor right bracket>'                => 1,
+                                        '<array descriptor>'                              => 1,
+                                        '<bare name>'                                     => 1,
+                                        '<before or after>'                               => 1,
+                                        '<blessing name>'                                 => 1,
+                                        '<bracketed name string>'                         => 1,
+                                        '<bracketed name>'                                => 1,
+                                        '<cc elements>'                                   => 1,
+                                        '<character class modifiers>'                     => 1,
+                                        '<character class>'                               => 1,
+                                        '<completion event declaration>'                  => 1,
+                                        '<current lexer statement>'                       => 1,
+                                        '<default rule>'                                  => 1,
+                                        '<discard rule>'                                  => 1,
+                                        '<empty rule>'                                    => 1,
+                                        '<escaped cc character>'                          => 1,
+                                        '<event name>'                                    => 1,
+                                        '<event specification>'                           => 1,
+                                        '<group association>'                             => 1,
+                                        '<hash comment body>'                             => 1,
+                                        '<horizontal character>'                          => 1,
+                                        '<inaccessible statement>'                        => 1,
+                                        '<inaccessible treatment>'                        => 1,
+                                        '<integer>'                                       => 1,
+                                        '<latm specification>'                            => 1,
+                                        '<left association>'                              => 1,
+                                        '<lexeme default statement>'                      => 1,
+                                        '<lexeme rule>'                                   => 1,
+                                        '<lexer name>'                                    => 1,
+                                        '<negated posix char class>'                      => 1,
+                                        '<null adverb>'                                   => 1,
+                                        '<null ranking constant>'                         => 1,
+                                        '<null ranking specification>'                    => 1,
+                                        '<null statement>'                                => 1,
+                                        '<nulled event declaration>'                      => 1,
+                                        '<one or more word characters>'                   => 1,
+                                        '<op declare bnf>'                                => 1,
+                                        '<op declare match>'                              => 1,
+                                        '<op declare>'                                    => 1,
+                                        '<parenthesized rhs primary list>'                => 1,
+                                        '<pause specification>'                           => 1,
+                                        '<posix char class name>'                         => 1,
+                                        '<posix char class>'                              => 1,
+                                        '<prediction event declaration>'                  => 1,
+                                        '<priority rule>'                                 => 1,
+                                        '<priority specification>'                        => 1,
+                                        '<proper specification>'                          => 1,
+                                        '<quantified rule>'                               => 1,
+                                        '<rank specification>'                            => 1,
+                                        '<reserved action name>'                          => 1,
+                                        '<reserved blessing name>'                        => 1,
+                                        '<result item descriptor list>'                   => 1,
+                                        '<rhs primary list>'                              => 1,
+                                        '<right association>'                             => 1,
+                                        '<safe cc character>'                             => 1,
+                                        '<separator specification>'                       => 1,
+                                        '<sign>'                                          => 1,
+                                        '<signed integer>'                                => 1,
+                                        '<single quoted name>'                            => 1,
+                                        '<single quoted string>'                          => 1,
+                                        '<single symbol>'                                 => 1,
+                                        '<standard name>'                                 => 1,
+                                        '<start rule>'                                    => 1,
+                                        '<statement group>'                               => 1,
+                                        '<string without single quote or vertical space>' => 1,
+                                        '<symbol name>'                                   => 1,
+                                        '<terminated hash comment>'                       => 1,
+                                        '<unterminated
+   final hash comment>'            => 1,
+                                        '<vertical space char>'                           => 1,
+                                        '<zero or more word characters>'                  => 1,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+},
+quantified_rule =>
+{
+    adverb_list =>
+    {
+        adverb_list_items =>
+        {
+            adverb_item =>
+            {
+                proper_specification =>
+                {
+                    boolean => 1,
+                },
+                separator_specification =>
+                {
+                    single_symbol =>
+                    {
+                        symbol =>
+                        {
+                            symbol_name =>
+                            {
+                                bracketed_name =>
+                                {
+                                    '<double colon>'                     => 1,
+                                    '<op equal priority>'                => 1,
+                                    '<op loosen>'                        => 1,
+                                    '<result item descriptor separator>' => 1,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+    lhs =>
+    {
+        symbol_name =>
+        {
+            bare_name =>
+            {
+                alternatives => 1,
+                priorities   => 1,
+                rhs          => 1,
+                statements   => 1,
+                whitespace   => 1,
+            },
+            bracketed_name =>
+            {
+                '<Perl identifier>'                               => 1,
+                '<Perl name>'                                     => 1,
+                '<adverb list items>'                             => 1,
+                '<bare name>'                                     => 1,
+                '<bracketed name string>'                         => 1,
+                '<cc elements>'                                   => 1,
+                '<character class modifiers>'                     => 1,
+                '<hash comment body>'                             => 1,
+                '<integer>'                                       => 1,
+                '<one or more word characters>'                   => 1,
+                '<posix char class name>'                         => 1,
+                '<result item descriptor list>'                   => 1,
+                '<rhs primary list>'                              => 1,
+                '<string without single quote or vertical space>' => 1,
+                '<zero or more word characters>'                  => 1,
+            },
+        },
+    },
+    op_declare =>
+    {
+        op_declare_bnf =>
+        {
+            '::=' => 1,
+        },
+        op_declare_match =>
+        {
+            '~' => 1,
+        },
+    },
+    quantifier =>
+    {
+        '*' => 1,
+        '+' => 1,
+    },
+    single_symbol =>
+    {
+        character_class =>
+        {
+            '[[:alnum:]]'                                          => 1,
+            '[\d]'                                                 => 1,
+            '[\s\w]'                                               => 1,
+            '[\s]'                                                 => 1,
+            '[\w]'                                                 => 1,
+            '[^'\x{0A}\x{0B}\x{0C}\x{0D}\x{0085}\x{2028}\x{2029}]' => 1,
+        },
+        symbol =>
+        {
+            symbol_name =>
+            {
+                bare_name =>
+                {
+                    alternative  => 1,
+                    alternatives => 1,
+                    statement    => 1,
+                },
+                bracketed_name =>
+                {
+                    '<Perl identifier>'          => 1,
+                    '<adverb item>'              => 1,
+                    '<cc element>'               => 1,
+                    '<character class modifier>' => 1,
+                    '<hash comment char>'        => 1,
+                    '<result item descriptor>'   => 1,
+                    '<rhs primary>'              => 1,
+                },
+            },
+        },
+    },
+},
+start_rule =>
+{
+    symbol =>
+    {
+        symbol_name =>
+        {
+            bare_name =>
+            {
+                statements => 1,
+            },
+        },
+    },
+},

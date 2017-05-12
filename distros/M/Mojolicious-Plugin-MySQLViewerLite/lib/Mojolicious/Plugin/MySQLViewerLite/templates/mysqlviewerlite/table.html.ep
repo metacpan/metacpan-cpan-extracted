@@ -1,0 +1,9 @@
+% layout "$controller/common", title => "$table in $database";
+<h2>Table <i><%= $table %></i> in <%= $database %></h2>
+<h3>show create table</h3>
+<pre><%= $table_def %></pre>
+
+<h3>Query</h3>
+<ul>
+  <li><a href="<%= url_for("/$prefix/select")->query(database => $database, table => $table) %>">select * from <%= $table %></a></li>
+</ul>

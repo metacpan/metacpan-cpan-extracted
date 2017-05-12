@@ -1,0 +1,41 @@
+This file documents the revision history for Perl extension MooseX::Role::BuildInstanceOf.
+
+0.08 09 November 2011
+    - Everything mentioned in the removed 0.07 release (from Nov 2011)
+    - Restored the stuff I blew away that was in the original 0.07 release
+    - Included a documentation patch (eilara++)
+
+0.07 08 November 2011
+    - (RELEASE REMOVED FROM CPAN DUE TO BORKED RELEASE)
+    - Documention typo and errors fixed (yanick++)
+    - Fixed broken Makefile.PL
+    - fixed broken test case by removing incorrect use of coercion
+    - allow you to 'inherit' args from the consuming class into the target role
+      (yanick++)
+
+0.07 10 August 2010
+    - Avoid warnings from recent Moose versions by not asking it to coerce
+      values if there's no coercions on the types.
+    - Convert to Dist::Zilla.
+
+0.06 09 March 2010
+    - removed some debug code that got left in place accidentally
+
+0.05 09 March 2010
+    - Documentation fixes (included fix for missing change delta)
+    - Some work toward cleaning up the test cases.
+
+0.03 - 0.04 (unknown)
+    - Missing changelog.  Repository indicates bugs fixes in the way the default
+    - namespace feature (::Class and ~Class) work
+
+0.02  18 January 2010
+    - Various formating and syntax updates to more modern Perl standards
+    - Removed deprecated practice of using '.' in custom Moose type names
+    - Be less crazy about how we declare delegations.
+    - Make the auto-loading type anonymous.
+    - add rafl as a contributor
+
+0.01  02 November 2009
+    - First usable version released.  Contains docs, code and tests.
+

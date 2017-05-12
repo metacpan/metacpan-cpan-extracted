@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<title>Select</title>
+<script>
+
+function on_change(e) {
+	alert("changed");
+}
+
+function on_load() {
+	var element = document.getElementById("sel");
+	element.addEventListener("change", on_change, false);
+}
+
+window.addEventListener("load", on_load, false);
+</script>
+</head>
+<body>
+<p>
+Select:
+<select id="sel">
+<option value="1">Lorem</option>
+<option value="2">ipsum</option>
+<option value="3">dolor</option>
+<option value="4">sit</option>
+</select>
+</p>
+</body>
+</html>

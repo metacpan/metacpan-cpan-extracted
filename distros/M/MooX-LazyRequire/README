@@ -1,0 +1,32 @@
+NAME
+    MooX::LazyRequire - Required attributes which fail only when trying to
+    use them
+
+SYNOPSIS
+      package MyClass;
+      use Moo;
+      use MooX::LazyRequire;
+
+      has attr => ( is => 'rw', lazy_required => 1 );
+
+DESCRIPTION
+    MooX::LazyRequire creates attributes that are required, but will fail on
+    use rather that on object creation.
+
+SEE ALSO
+    MooseX::LazyRequire
+
+AUTHOR
+    haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+  CONTRIBUTORS
+    None so far.
+
+COPYRIGHT
+    Copyright (c) 2014 the MooX::LazyRequire "AUTHOR" and "CONTRIBUTORS" as
+    listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

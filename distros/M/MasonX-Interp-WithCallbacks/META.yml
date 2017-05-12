@@ -1,0 +1,34 @@
+---
+abstract: 'Mason callback support via Params::CallbackRequest.'
+author:
+  - 'David E. Wheeler <david@justatheory.com>'
+build_requires:
+  Module::Build: 0.2701
+  Test::More: 0.17
+configure_requires:
+  Module::Build: 0.2701
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MasonX-Interp-WithCallbacks
+provides:
+  MasonX::Interp::WithCallbacks:
+    file: lib/MasonX/Interp/WithCallbacks.pm
+    version: 1.19
+recommends:
+  Apache::TestMB: 0
+  Test::Pod: 1.20
+requires:
+  Class::Container: 0.09
+  HTML::Mason: 1.23
+  Params::CallbackRequest: 1.15
+  Test::Simple: 0.17
+resources:
+  bugtracker: http://github.com/theory/masonx-interp-withcallbacks/issues/
+  homepage: http://search.cpan.org/dist/MasonX-Interp-WithCallbacks/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/theory/masonx-interp-withcallbacks/
+version: 1.19

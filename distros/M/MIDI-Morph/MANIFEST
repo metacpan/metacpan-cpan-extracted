@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/MIDI/Morph.pm
+t/00-load.t
+t/01-instantiate.t
+t/02-simple.t
+t/03-simple_2.t
+t/04-multiple_events.t
+t/05-event-distance.t
+t/pod-coverage.t
+t/pod.t
+examples/01_chords.pl

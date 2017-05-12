@@ -1,0 +1,26 @@
+This is the debian package for the Module-Build-IkiWiki module.
+It was created by Victor Moral <victor@taquiones.net> using dh-make-perl.
+
+It was downloaded from http://search.cpan.org/dist/Module-Build-IkiWiki/
+
+The upstream author is: "Víctor Moral" <victor@taquiones.net>.
+
+ Copyright 2008 Víctor Moral
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 2 or later of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License with the
+ along with this program; if not, see <http://www.gnu.org/licenses/>.
+
+ On Debian systems, the complete text of the GNU General Public License,
+ version 2, can be found in /usr/share/common-licenses/GPL.
+
+The Debian packaging is (C) 2008, Victor Moral <victor@taquiones.net> and
+is licensed under the same terms as the software itself (see above).

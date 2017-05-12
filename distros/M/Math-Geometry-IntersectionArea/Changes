@@ -1,0 +1,6 @@
+Revision history for Perl extension Math::Geometry::IntersectionArea.
+
+0.01  Sun Mar  2 19:52:34 2014
+	- original version; created by h2xs 1.23 with options
+		-AXn Math::Geometry::IntersectionArea
+

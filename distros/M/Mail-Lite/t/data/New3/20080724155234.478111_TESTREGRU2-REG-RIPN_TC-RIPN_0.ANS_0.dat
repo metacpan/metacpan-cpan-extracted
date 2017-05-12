@@ -1,0 +1,71 @@
+---
+-
+  - rusu.response.new
+  -
+    - domain: oretest1.ru
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.ok
+    - domain: oretest14.ru
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.ok
+    - domain: oretest11.ru
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.ok
+    - domain: oretest2.ru
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.ok
+    - domain: oretest17.ru
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.ok
+    - domain: oretest15.ru
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.ok
+    - domain: oretest8.ru
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.ok
+    - domain: oretest7.ru
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.ok
+    - domain: oretest10.ru
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.ok
+    - domain: oretest20.ru
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.ok
+    - domain: oretest5.ru
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.ok
+    - domain: oretest9.ru
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.ok
+    - domain: oretest22.ru
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.ok
+    - domain: oretest6.ru
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.ok
+    - domain: oretest18.ru
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.ok
+    - domain: oretest4.ru
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.ok
+    - domain: oretest3.ru
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.ok
+    - domain: oretest21.ru
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.ok
+    - domain: oretest19.ru
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.ok
+    - domain: oretest13.ru
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.ok
+    - domain: oretest12.ru
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.ok
+    - domain: oretest16.ru
+      error_code: 'Too many templates in request (max. ) - FATAL ERROR !'
+      req_id: 20080724155232.057165
+      rule_id: rusu.response.new.fail

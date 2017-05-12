@@ -1,0 +1,76 @@
+== README   Mail::Box v2
+Last update: 2008-09-26
+
+The Mail::Box folder is a modern mail-folder manager --at least at the
+moment of this writing ;)  It is written to be a replacement of MailTools
+and Mail::Folder, an alternative to the Email::* set of modules.
+
+The most important modules are Mail::Box::Manager, Mail::Box, and
+Mail::Message.  Their documentation explain the features in more detail
+than this document.  The Mail::Box-Overview page describe each set of
+modules in more detail.
+Start reading at http://perl.overmeer.net/mailbox/html/Mail_Box-Index/
+
+Other descriptive documents in this module:
+    README.FAQ           Frequently asked questions
+    README.todo          Thoughts about possible extensions
+
+Mail::Box version 1.xxx (developed in 2000 and 2001) runs on perl 5.005
+and up, Mail::Box version 2.xxx is much faster and more flexible, but
+only runs on perl 5.6.1 and up.
+
+===== Contributors
+
+A full list of contributors can be found in the Changelog, but a few
+people have to mentioned in special:
+
+* Mark Overmeer
+  - 99% of the code
+  - initial version of documentation
+* David Coppit
+  - massive corrections and additions in all documentation
+  - many valid suggestions to the design and parts of the implementation
+    -- and some invalid ones ;) --  you really must know what you are
+    talking about to convince stubborn Mark.
+* Tassilo von Parseval
+  - scripts/takemail
+  - contributions to the design
+* Liz Mattijsen for the POP3 implementation
+
+===== Status
+
+This module has been used by dozens of people, on many different
+platforms.  Some problems do surface sometimes:
+
+  . on Windows, some methods (like moving messages between some
+    kinds of folders) do not work.  Windows can not rename a file
+    which is locked, for instance... so where this is used you may
+    get hurt.  No Windows specialist has provided a patch to solve
+    this correctly.
+
+  . the IMAP implementation got stalled when Mail::IMAPClient was
+    not maintained.  I lack the time to complete it.
+
+===== Features
+
+The Mail::Box modules try to keep messages stored in the mailbox
+file(s) for as long as possible.  The message is read from file and
+parsed only if the user really needs the contents of the message.
+This is called 'delay loading'.
+
+Demand- or delayed-loading of messages is implemented using the
+standard AUTOLOAD mechanism, which means that it is not visible to
+the user of the folder!  This mechanism also reduces the memory
+footprint of the program enormously.
+
+For some folder types, not only the content (body) of the message is
+delayed, but even the header.  In those cases, the opening of a folder
+is just counting the messages: really fast.
+
+The implementation also avoids parsing and then unparsing mail messages.
+If you read from a folder, then use it and write to it to a different
+folder, unmodified messages are not reformatted from memory. Instead they
+are copied from the old folder into a new one byte-by-byte.  When you
+open a folder with 1000 messages, and modify two messages, only those
+two get parsed and recomposed.  All 998 other messages are simple
+byte-by-byte copied into the replacement file.

@@ -1,0 +1,22 @@
+NAME
+    Sorted - Custom sort function works.
+
+SYNOPSIS
+    sorted.pl [OPTIONS]
+
+DESCRIPTION
+    Make sure custom sort func gets used.
+
+OPTIONS
+    -a
+    -b
+    -c
+    --help -? --usage
+        Display the usage message and exit
+
+    --man
+        Display man page
+
+AUTHOR
+    Invader Flobee
+

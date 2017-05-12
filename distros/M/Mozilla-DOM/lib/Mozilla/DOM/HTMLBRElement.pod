@@ -1,0 +1,52 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLBRElement
+
+=for object Mozilla::DOM::HTMLBRElement
+
+Mozilla::DOM::HTMLBRElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLBRElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLBRElement interface is the interface to a [X]HTML br
+ * element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLBRElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $clear = $htmlbrelement->B<GetClear>()
+
+=head2 $htmlbrelement->B<SetClear>($clear)
+
+=over
+
+=over
+
+=item * $clear (string)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

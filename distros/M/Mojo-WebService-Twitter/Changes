@@ -1,0 +1,6 @@
+0.002     2016-02-09 00:54:31 EST
+  - Fix setting authentication based on returned hashrefs
+  - Documentation fixes
+
+0.001     2016-02-08 23:39:02 EST
+  - First release

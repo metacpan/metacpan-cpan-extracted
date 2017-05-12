@@ -1,0 +1,50 @@
+Math::GrahamFunction
+
+This is a Perl module to calculate the Graham's Function of a natural number.
+For more information about Graham's Function see:
+
+http://www.shlomifish.org/lecture/Perl/Graham-Function/
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Or alternatively from the command line type:
+
+    perl -MCPANPLUS -e "install Math::GrahamFunction";
+
+Or:
+
+    perl -MCPAN -e "install Math::GrahamFunction";
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Math::GrahamFunction
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Math::GrahamFunction
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math::GrahamFunction
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Math::GrahamFunction
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Math::GrahamFunction
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Shlomi Fish
+
+This program is released under the following license: MIT X11.
+

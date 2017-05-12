@@ -1,0 +1,38 @@
+
+PerlSwitches -I@ServerRoot@/../lib -I@ServerRoot@/../t/tlib
+PerlLoadModule  ModPerl::PackageRegistry
+
+<Files "*.test-reg">
+    SetHandler              perl-script
+    PerlResponseHandler     ModPerl::PackageRegistry
+</Files>
+
+<Location /test/package-registry/good>
+    PackageNamespace        TestRegistry::pages
+    PackageBase             /test/package-registry/good
+</Location>
+
+<Location /test/package-registry/default>
+    SetHandler              perl-script
+    PerlResponseHandler     ModPerl::PackageRegistry
+    PackageNamespace        TestRegistry::pages
+    PackageBase             /test/package-registry/default
+</Location>
+
+<Location /test/package-registry/bad>
+
+</Location>
+
+<Location /test/package-registry/indexed-methods>
+    SetHandler              perl-script
+    PerlResponseHandler     ModPerl::PackageRegistry
+    PackageNamespace        TestRegistry::pages
+    PackageBase             /test/package-registry/indexed-methods
+    PackageIndex            index
+    PackageHandler          ->handler
+</Location>
+
+<Location /test/package-registry/unrelated>
+    PackageBase             /test/package-registry/good
+    PackageNamespace        TestRegistry::pages
+</Location>

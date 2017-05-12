@@ -1,0 +1,27 @@
+Changes
+lib/MooseFS.pm
+lib/MooseFS/CheckInfo.pm
+lib/MooseFS/Matrix.pm
+lib/MooseFS/ChunkInfo.pm
+lib/MooseFS/Info.pm
+lib/MooseFS/Disk.pm
+lib/MooseFS/Server.pm
+lib/MooseFS/Exports.pm
+lib/MooseFS/Mounts.pm
+lib/MooseFS/Operations.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-info.t
+t/02-server.t
+t/03-checkinfo.t
+t/04-chunkinfo.t
+t/05-matrix.t
+t/06-disk.t
+t/07-exports.t
+t/08-mounts.t
+t/09-operations.t
+examples/check_mfs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

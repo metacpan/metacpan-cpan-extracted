@@ -1,0 +1,17 @@
+lib/Mobile/Ads.pm
+lib/Mobile/Ads/AdMob_v1.pm
+lib/Mobile/Ads/AdMob_v2.pm
+lib/Mobile/Ads/AdModa.pm
+lib/Mobile/Ads/AdSense.pm
+lib/Mobile/Ads/Adsgr.pm
+lib/Mobile/Ads/AdultModa.pm
+lib/Mobile/Ads/Buzzcity.pm
+lib/Mobile/Ads/Decktrade.pm
+lib/Mobile/Ads/GetMobile.pm
+lib/Mobile/Ads/MoJiva.pm
+lib/Mobile/Ads/Zestadz.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+t/1.t

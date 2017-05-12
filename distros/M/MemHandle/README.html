@@ -1,0 +1,162 @@
+<HTML>
+<HEAD>
+<TITLE>MemHandle - supply memory-based FILEHANDLE methods</TITLE>
+<LINK REV="made" HREF="mailto:bryan@yahoo-inc.com">
+</HEAD>
+
+<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#NAME">NAME</A>
+	<LI><A HREF="#SYNOPSIS">SYNOPSIS</A>
+	<LI><A HREF="#DESCRIPTION">DESCRIPTION</A>
+	<LI><A HREF="#CONSTRUCTOR">CONSTRUCTOR</A>
+	<LI><A HREF="#METHODS">METHODS</A>
+	<LI><A HREF="#AUTHOR">AUTHOR</A>
+	<LI><A HREF="#SEE_ALSO">SEE ALSO</A>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="NAME">NAME</A></H1>
+<P>
+MemHandle - supply memory-based FILEHANDLE methods
+
+<P>
+<HR>
+<H1><A NAME="SYNOPSIS">SYNOPSIS</A></H1>
+<P>
+<PRE>    use MemHandle;
+    use IO::Seekable;
+</PRE>
+<P>
+<PRE>    my $mh = new MemHandle;
+    print $mh &quot;foo\n&quot;;
+    $mh-&gt;print( &quot;bar\n&quot; );
+    printf $mh &quot;This is a number: %d\n&quot;, 10;
+    $mh-&gt;printf( &quot;a string: \&quot;%s\&quot;\n&quot;, &quot;all strings come to those who wait&quot; );
+</PRE>
+<P>
+<PRE>    my $len = $mh-&gt;tell();  # Use $mh-&gt;tell();
+                            # tell( $mh ) will NOT work!
+    $mh-&gt;seek(0, SEEK_SET); # Use $mh-&gt;seek($where, $whence)
+                            # seek($mh, $where, $whence)
+                            # will NOT work!
+</PRE>
+<P>
+<PRE>    my $memory = $mh-&gt;mem();
+</PRE>
+<P>
+<PRE>    Here's the real meat:
+</PRE>
+<P>
+<PRE>    my $mh = new MemHandle;
+    my $old = select( $mh );
+    .
+    .
+    .
+    print &quot;foo bar\n&quot;;
+    print &quot;baz\n&quot;;
+    &amp;MyPrintSub();
+    select( $old );
+</PRE>
+<P>
+<PRE>    print &quot;here it all is: &quot;, $mh-&gt;mem(), &quot;\n&quot;;
+</PRE>
+<P>
+<HR>
+<H1><A NAME="DESCRIPTION">DESCRIPTION</A></H1>
+<P>
+Generates inherits from <CODE>IO::Handle</CODE> and <CODE>IO::Seekable</CODE>. It provides an interface to the file routines which uses memory instead.
+See perldoc IO::Handle, and perldoc IO::Seekable as well as <EM>perlfunc</EM>
+for more detailed descriptions of the provided built-in functions:
+
+<P>
+<PRE>    print
+    printf
+    readline
+    sysread
+    syswrite
+    getc
+    gets
+</PRE>
+<P>
+The following functions are provided, but tie doesn't allow them to be tied
+to the built in functions. They should be used by calling the appropriate
+method on the MemHandle object.
+
+<P>
+<PRE>    seek
+    tell
+</PRE>
+<P>
+call them like this:
+
+<P>
+<PRE>    my $mh = new MemHandle();
+    .
+    .
+    .
+    my $pos = $mh-&gt;tell();
+    $mh-&gt;seek( 0, SEEK_SET );
+</PRE>
+<P>
+<HR>
+<H1><A NAME="CONSTRUCTOR">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new( [mem] )</A></STRONG><DD>
+<P>
+Creates a <CODE>MemHandle</CODE>, which is a reference to a newly created symbol (see the <CODE>Symbol</CODE> package). It then ties the FILEHANDLE to
+<CODE>MemHandle::Tie</CODE> (see <EM>perltie</EM>). Tied methods in <CODE>MemHandle::Tie</CODE>
+translate file operations into reads/writes into a string, which can be
+accessed by calling <CODE>MemHandle::mem</CODE>.
+
+</DL>
+<P>
+<HR>
+<H1><A NAME="METHODS">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_seek">seek( POS, WHENCE )</A></STRONG><DD>
+<P>
+Sets the read/write position to WHENCE + POS. WHENCE is one of the
+constants which are available from IO::Seekable or POSIX:
+
+<P>
+<PRE>    SEEK_SET # absolute position from the beginning.
+    SEEK_CUR # offset from the current location.
+    SEEK_END # from the end (POS can be negative).
+</PRE>
+<DT><STRONG><A NAME="item_tell">tell()</A></STRONG><DD>
+<P>
+Returns the current position of the mem-file, similiar to the way tell
+would. (See <EM>perlfunc</EM>).
+
+<DT><STRONG><A NAME="item_mem">mem( [mem] )</A></STRONG><DD>
+<P>
+gets or sets the memory. If called with a parameter, it copies it to the
+memory and sets the position to be immediately after (so if you write more
+to it, you append the string). Returns the current value of memory.
+
+</DL>
+<P>
+<HR>
+<H1><A NAME="AUTHOR">AUTHOR</A></H1>
+<P>
+``Sheridan C. Rawlins'' &lt;<A
+HREF="mailto:scr14@cornell.edu">scr14@cornell.edu</A>&gt;
+
+<P>
+<HR>
+<H1><A NAME="SEE_ALSO">SEE ALSO</A></H1>
+<P>
+<EM>perl</EM>.
+<EM>perlfunc</EM>.
+<EM>perltie</EM>. perldoc IO::Handle. perldoc IO::Seekable. perldoc Symbol.
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,193 @@
+[%#
+
+=head1 MACROS
+
+These are some default macros which are used by various templates in the
+system.
+
+=head2 link
+
+This creates an <A HREF="..."> to a command in the Apache::MVC system by
+catenating the base URL, table, command, and any arguments.
+
+arguments are table, command, additional, label, target.
+
+target specifies a target for the link if provided.
+
+#%]
+[%
+MACRO link(table, command, additional, label, target) BLOCK;
+    SET lnk = base _ "/" _ table _ "/" _ command _ "/" _ additional;
+    lnk = lnk | uri ;
+    IF target ;
+	'<a href="' _ lnk _ '" target="' _ target _'">';
+    ELSE;
+	'<a href="' _ lnk _ '">';
+    END;
+    label | html;
+    "</a>";
+END;
+%]
+
+[%#
+
+=head2 maybe_link_view
+
+C<maybe_link_view> takes something returned from the database - either
+some ordinary data, or an object in a related class expanded by a
+has-a relationship. If it is an object, it constructs a link to the view
+command for that object. Otherwise, it just displays the data.
+
+#%]
+
+[%
+MACRO maybe_link_view(object) BLOCK;
+    IF object.isa('Maypole::Model::Base');
+        link(object.table, "view", object.id.join('/'), object);
+    ELSE;
+        object | html ;
+    END;
+END;
+%]
+
+[%#
+
+=head2 display_line
+
+C<display_line> is used in the list template to display a row from the
+database, by iterating over the columns and displaying the data for each
+column. It misses out the C<id> column by default, and magically
+URLifies columns called C<url>. This may be considered too much magic
+for some.
+
+#%]
+[% MACRO display_line(item) BLOCK;
+    FOR col = classmetadata.list_columns;
+	NEXT IF col == "id" OR col == classmetadata.table _ "_id";
+	col_obj = item.find_column(col);
+        "<td>";
+        IF col == "url" AND item.url;
+            '<a href="'; item.url | html ; '"> '; item.url; '</a>';
+        ELSIF col == classmetadata.stringify_column;
+            maybe_link_view(item);
+ 		ELSIF col_obj; # its a real column
+            accessor = item.accessor_name_for(col_obj) || item.accessor_name(col_obj); # deprecated in cdbi
+            maybe_link_view(item.$accessor);
+        ELSE; 
+            item.$col;
+        END;
+
+        "</td>";
+    END;
+    '<td class="actions">';
+    button(item, "edit");
+    button(item, "delete");
+    "</td>";
+END %]
+[%#
+
+=head2 button
+
+This is a generic button, which performs an action on an object.
+
+=cut
+
+#%]
+[% MACRO button(obj, action) BLOCK; %]
+[% IF obj.is_public(action) %]
+<form class="actionform" action="[% base %]/[% obj.table %]/[% action %]/[% obj.id.join('/') %]" method="post">
+<div class="field"><input class="actionbutton" type="submit" value="[% action %]" /></div></form>
+[% END %]
+[% END %]
+[%#
+
+=head2 view_related
+
+This takes an object, and looks up the C<related_accessors>; this should
+give a list of accessors that can be called to get a list of related
+objects. It then displays a title for that accessor, (i.e. "Beers" for a
+brewery) calls the accesor, and displays a list of the results. 
+
+=cut
+
+#%]
+[% 
+MACRO view_related(object) BLOCK;
+    FOR accessor = classmetadata.related_accessors.list;
+        "<div id=\"subtitle\">"; accessor | ucfirst; "</div>\n";
+        "<ul id=\"vlist\">";
+        FOR thing = object.$accessor;
+            "<li>"; maybe_link_view(thing); "</li>\n";
+        END;
+        "</ul>";
+    END; 
+END;
+
+MACRO test_xxxx(myblock) BLOCK;
+    FOR col = classmetadata.columns;
+        NEXT IF col == "id";
+        myblock;
+    END;
+END;
+%]
+[%#
+
+=head2 view_item
+
+This takes an object and and displays its properties in a table. 
+
+=cut
+
+#%]
+[% MACRO view_item(item) BLOCK; %]
+    [% SET string = classmetadata.stringify_column %]
+    <div id="title"> [% item.$string | html %]</div>
+    [% INCLUDE navbar %]
+    <table class="view">
+        <tr>
+            <td class="field">[% classmetadata.colnames.$string  %]</td>
+            <td>[% item.$string | html %]</td>
+        </tr>
+        [% FOR col = classmetadata.columns.list;
+            NEXT IF col == "id" OR col == string OR col == classmetadata.table _ "_id";;
+            NEXT UNLESS item.$col;
+        %]
+[%# 
+
+=for doc
+
+It gets the displayable form of a column's name from the hash returned
+from the C<column_names> method:
+
+#%]
+            <tr>
+                <td class="field">[% classmetadata.colnames.$col || 
+                     col | ucfirst | replace('_',' '); %]</td>
+                <td>
+                    [% IF col == "url" && item.url;  # Possibly too much magic.
+                        '<a href="'; item.url | html ; '"> '; item.url; '</a>';
+					ELSIF item.$col.size > 1; # has_many column
+						FOR thing IN item.$col; 
+							maybe_link_view(thing);",  ";
+						 END;
+
+                    ELSE;
+					
+                        maybe_link_view(item.$col); 
+                    END; %]
+[%#
+
+This tests whether or not the returned value is an object, and if so,
+creates a link to a page viewing that object; if not, it just displays
+the text as normal. The object is linked using its stringified name;
+by default this calls the C<name> method, or returns the object's ID
+if there is no C<name> method or other stringification method defined.
+
+=cut
+
+#%] 
+                </td>
+            </tr>
+        [% END; %]
+    </table>
+[% END %]

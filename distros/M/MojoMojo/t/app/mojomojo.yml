@@ -1,0 +1,6 @@
+---
+name: MojoMojo Selenium Test Suite
+Model::DBIC:
+  connect_info:
+    - dbi:SQLite:t/app/mojomojo.db
+attachment_dir: __path_to(t/app/uploads)__

@@ -1,0 +1,31 @@
+NAME
+-----
+
+Markdown::Pod - Convert Markdown to POD
+
+
+VERSION
+--------
+
+version 0.003
+
+
+SYNOPSIS
+---------
+
+    use Markdown::Pod;
+    
+    my $m2p = Markdown::Pod->new;
+    my $pod = $m2p->markdown_to_pod(
+        markdown => $markdown,
+    );
+
+
+DESCRIPTION
+------------
+
+This module parses Markdown text and return POD text.
+It uses Markdent module to parse Markdown.  
+Due to POD doesn't support blockquoted HTML tag,
+so quoted text of Markdown will not be handled properly.  
+Quoted text will be converted to POD verbatim section.

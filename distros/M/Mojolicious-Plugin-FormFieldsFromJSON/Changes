@@ -1,0 +1,227 @@
+Release history for Mojolicious::Plugin::FormFieldsFromJSON
+===========================================================
+
+0.32 2016-04-26
+
+  [IMPROVEMENT]
+  * now you can pass an arrayreference for the directories where the JSON files are stored
+    (thanks to csroli #4)
+
+0.31 2015-11-13
+
+  [MISC]
+  * fix test failures with Mojolicious >= 6.16
+  * fix typos (thanks to wollmers #1)
+
+0.30 2015-04-08
+
+  [IMPROVEMENT]
+  * pass info and msg to the template
+
+0.29 2015-03-02
+
+  [BUGFIX]
+  * Mojolicious 6.0 removed name listing support for "param" in Mojolicious::Controller. This broke the
+    validation helper of this plugin.
+
+0.28 2015-03-01
+
+  [MISC]
+  * 0.27 archive had too many files
+
+0.27 2015-03-01
+
+  [IMPROVEMENT]
+  * fields() can now return a list of fields where each element is a hashref with name and label of the field.
+
+0.26 2015-01-25
+
+  [TESTS]
+  * Actually it was Mojolicious 5.73 where the element generation was changed
+
+0.25 2015-01-25
+
+  [TESTS]
+  * as of Mojolicious 5.74 generates valid HTML5 elements, thus <input ... /> => <input ...>
+
+0.24 2015-01-09
+
+  [DOCUMENTATION]
+  * document "dynamic config"
+
+0.23 2015-01-08
+
+  [DOCUMENTATION]
+  * document additional types
+
+0.22 2015-01-07
+
+  [DOCUMENTATION]
+  * improve documentation of common config settings
+
+0.21 2015-01-06
+
+  [IMPROVEMENTS]
+  * Now the fields config can be passed to form_fields(). That
+    way you can create your forms dynamically.
+
+0.20 2015-01-01
+
+  [IMPROVEMENTS]
+  * use param() and every_param() to get the values for validation.
+    This allows the programmer to change the value before validation
+    and route parameters etc. are respected.
+
+0.19 2014-12-29
+
+  [IMPROVEMENTS]
+  * allow additional types
+
+0.18 2014-12-16
+
+  [DOCUMENTATION]
+  * document "sublabel" translation
+  * document "data" definition key
+
+  [MISC]
+  * Add example for I18N
+
+0.17 2014-12-15
+
+  [BUGFIX]
+  * data passed in code were not used
+
+0.16 2014-12-15
+
+  [IMPROVEMENTS]
+  * translate labels if requested
+  * translate values (when used as labels) of radiobuttons/checkboxes if requested
+
+0.15 2014-12-14
+
+  [IMPROVEMENTS]
+  * add config option to show labels at radiobuttons and checkboxes
+
+0.14 2014-12-12
+
+  [BUGFIX]
+  * When global_attributes defined attributes that didn't exist in field config, an unnecessary
+    space was in the value. That can lead to some trouble.
+
+0.13 2014-12-12
+
+  [IMPROVEMENTS]
+  * add "after_element" config option for checkboxes and radiobuttons that
+    allows to add arbitrary HTML code after every field in the given group
+  * enhance validations config option to allow hashref as value for a check
+    to provide error messages
+
+  [BUGFIX]
+  * an error was reported for optional fields when additional checks were defined
+  * is_valid is false for unset optional fields -> switched to has_error
+
+  [TESTS]
+  * add more tests for validation feature
+
+0.12 2014-12-11
+
+  [IMPROVEMENTS]
+  * allow aliases to define own types of fields
+
+  [DOCUMENTATION]
+  * document global_attributes feature
+
+0.11 2014-12-11
+
+  [BUGFIX]
+  * global attributes were added every request, now it checks if the value
+    is already present.
+
+0.10 2014-12-10
+
+  [IMPROVEMENTS]
+  * add global_attributes config to add attributes to all
+    fields (except hidden fields)
+
+  [MISC]
+  * add configuration for travis-ci
+
+0.09 2014-12-07
+
+  [DOCUMENTATION]
+  * document checkbox fields
+  * document validation feature
+
+0.08 2014-12-06
+
+  [IMPROVEMENTS]
+  * add support for checkboxes
+
+  [DOCUMENTATION]
+  * document forms()
+  * document fields( $form )
+
+0.07 2014-12-05
+
+  [TESTS]
+  * add tests for disabled radiobuttons
+  * add tests for preselected radiobuttons
+
+  [DOCUMENTATION]
+  * More radiobutton examples
+  * Document template variables
+
+0.06 2014-12-04
+
+  [FIXES]
+  * 0.05 included too many files
+
+0.05 2014-12-04
+
+  [IMPROVEMENTS]
+  * add support for password fields
+  * add support for textareas
+  * add support for radiobuttons
+  * add helper forms() to return a list of json files in configured directory
+  * add helper fields() to return a list of fields of a given form
+
+0.04 2014-12-04
+
+  [IMPROVEMENTS]
+  * add support for different templates per input type
+  * add support for templates for a single form field
+
+  [TESTS]
+  * add tests for additional attributes for form fields
+  * add test: templates for two fields
+
+  [DOCUMENTATION]
+  * document configuration of plugin
+  * document template feature
+  * add examples for text fields
+
+0.03 2014-12-03
+
+  [IMPROVEMENTS]
+  * add support for templates: you can define an .epl template where the fields are embedded. That helps to use this plugin with frameworks like bootstrap
+  * add support for hidden fields
+
+  [TESTS]
+  * add test for select field with umlauts
+
+0.02 2014-11-28
+
+  [FIXES]
+  * A newer Mojolicious version is required as "every_param" is used
+
+  [IMPROVEMENTS]
+  * handle data in hashreferences for select fields
+  * add possibility to create optgroups for select fields
+
+  [TESTS]
+  * tests for disabled select options
+
+0.01 2014-11-27
+
+  * initial release
+

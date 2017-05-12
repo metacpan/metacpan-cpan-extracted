@@ -1,0 +1,32 @@
+MIDI/Trans version 0.15
+=======================
+
+A simple interface for rapid developement of
+text to MIDI conversion systems.
+
+See scripts/ for example scripts.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  MIDI::Simple
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2002 C. Church <church@digitalkoma.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

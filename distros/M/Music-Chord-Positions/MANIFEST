@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+SIGNATURE
+eg/mcp-progressions
+eg/mcp2ly
+lib/Music/Chord/Positions.pm
+t/Music-Chord-Positions.t
+t/Schoenberg.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

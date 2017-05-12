@@ -1,0 +1,30 @@
+---
+abstract: 'Email address validation type constraint for Moo.'
+author:
+  - 'hayajo <hayajo@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooX-Types-MooseLike-Email
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Email::Abstract: 0
+  Email::Valid: 0
+  Email::Valid::Loose: 0
+  MooX::Types::MooseLike: 0.16
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hayajo/p5-MooX-Types-MooseLike-Email.git
+version: 0.03

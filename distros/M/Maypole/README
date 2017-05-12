@@ -1,0 +1,39 @@
+NAME
+    Maypole - MVC web application framework
+
+DESCRIPTION
+    Maypole is a Perl framework for MVC-oriented web applications, similar
+    to Jakarta's Struts or Ruby on Rails. Maypole is designed to minimize 
+    coding requirements for creating simple web interfaces to databases, 
+    while remaining flexible enough to support enterprise web applications.
+
+QUICK START
+    Maypole ships with a basic demo application, the Beer Database.
+    Please see the Maypole manual. You can access the manual by executing the
+    following command after installing Maypole:
+
+        perldoc Maypole::Manual
+
+    Or try the following URL:
+
+        http://search.cpan.org/perldoc?Maypole::Manual
+
+SUPPORT
+    Maypole is supported by a community of users on the Maypole mailing lists.
+
+    Join the mailing list at:
+
+        http://lists.sourceforge.net/lists/listinfo/maypole-users
+
+LINKS
+    http://maypole.perl.org - Maypole's home. tips & tricks, mailing list
+
+AUTHOR
+    Maypole is currently maintained by Aaron Trevena, C<aaron.trevena#gmail.com>
+
+AUTHOR EMERITUS
+    Simon Cozens, C<simon#cpan.org>
+
+LICENSE
+    You may distribute this code under the same terms as Perl itself.
+

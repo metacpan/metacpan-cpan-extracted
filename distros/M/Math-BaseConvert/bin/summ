@@ -1,0 +1,3 @@
+#!/usr/bin/perl
+# 446KXxq - summ created by Pip Stuart <Pip@CPAN.Org> to calculate summations down to one iteratively as part of the Math::BaseConvert package
+use strict; use warnings; use Math::BaseConvert qw(summ); print summ(shift) || die "USAGE: `summ <NumToComputeSummDownToOneOf>`\n";

@@ -1,0 +1,27 @@
+---
+abstract: "Wrap a ScalarRef attribute's accessors to re-use a reference"
+author:
+  - 'Alex Becker <c a p f a n at g m x write_Adot-here d e>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Traits-SetScalarByRef
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ExtUtils::MakeMaker: 6.6302
+  Moose: 2.0604
+  Moose::Util::TypeConstraints: 2.0604
+  Scalar::Util: 1.27
+  Test::More: 0.98
+  perl: 5.01
+version: 0.02

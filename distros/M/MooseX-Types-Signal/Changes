@@ -1,0 +1,14 @@
+Change history for MooseX-Types-Signal:
+
+1.101932 Wed Dec 28 01:54:07 CST 2011
+ - release to fix the changelog :)
+
+1.101931 Wed Dec 28 01:52:48 CST 2011
+ - patch from autarch to make this work on new Moosen
+
+1.101930     Mon Jul 12 05:52:20 CDT 2010
+
+1.101920     Sun Jul 11 07:25:42 CDT 2010
+
+1.101880     Wed Jul 7 06:01:10 CDT 2010
+ - initial release

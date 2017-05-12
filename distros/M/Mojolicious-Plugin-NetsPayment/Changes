@@ -1,0 +1,20 @@
+Revision history for Mojolicious-Plugin-NetsPayment
+
+0.04     Fri Jan  2 13:19:38 2015
+       * Fix changing to production mode base_url
+       * Compatible with Mojolicious 5.48
+
+0.03     Mon Jun  9 14:40:59 2014
+       * Replace MOJO_NETS_SELF_CONTAINED=1 with special "token"
+       * Fix dependencies
+
+0.02     Mon Jun  9 08:27:55 2014
+       * Add documentation for $res in callbacks
+       * Add "/nets" prefix to self contained routes
+       * Change path to self contained templates
+       * Error messages are stored in $res->param(...)
+       * Implemented query_payment()
+
+0.01     Sat Jun  7 18:43:48 2014
+       * Started project
+       * Add cool feature

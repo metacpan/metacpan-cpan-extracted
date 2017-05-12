@@ -1,0 +1,19 @@
+---
+abstract: 'Render JSONP with transparent fallback to JSON'
+author:
+  - 'Glen Hinkle'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-JSONP
+requires:
+  Mojolicious: '5.0'
+resources:
+  repository: git://github.com/tempire/mojolicious-plugin-jsonp.git
+version: '0.04'

@@ -1,0 +1,30 @@
+---
+abstract: 'enable all of the features of Modern Perl with one import'
+author:
+  - chromatic
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Modern-Perl
+requires:
+  IO::File: '0'
+  IO::Handle: '0'
+  autodie: '2.22'
+  feature: '0'
+  mro: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/chromatic/Modern-Perl
+  repository: https://github.com/chromatic/Modern-Perl.git
+version: '1.20170117'

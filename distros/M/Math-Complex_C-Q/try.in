@@ -1,0 +1,33 @@
+/*
+Check whether ctanq and ctanhq have a known bug. No need
+for this check on Win32 as the XS file handles this bug
+for mingw compilers.
+*/
+
+#include <stdio.h>
+#include <quadmath.h>
+
+int main(void) {
+
+#if defined(__MINGW64_VERSION_MAJOR) && __MINGW64_VERSION_MAJOR < 4
+
+   printf("Skipping for all mingw-w64 compilers, runtime version < 4\n");
+
+#else
+
+ __complex128 op, rop;
+
+ __real__ op = 2.0Q;
+ __imag__ op = 2.0Q;
+
+ rop = ctanq(op);
+
+ if(__real__ rop < -0.0662Q && __real__ rop > -0.06621Q) printf("bugginess detected\n");
+ else printf("known bug not detected\n");
+
+#endif
+
+ return 0;
+
+}
+

@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Simple.pm
+t/javascript.t
+t/load.t
+t/osashell.t

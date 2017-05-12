@@ -1,0 +1,27 @@
+Revision history for Perl extension MouseX::AttributeHelpers
+
+0.07
+        - Fix ImmutableHash's get problem (kzys)
+
+0.06
+        - Make submodules auto-loaded (gfx)
+        - Make metaclasses immutable (gfx)
+        - Call associate_method() for attributes (gfx)
+
+0.05
+        - Modernize the code for new Mouse (gfx)
+        - use Mouse 0.40 (gfx)
+
+0.04
+        - use Mouse 0.37, thanks to Goro Fuji (gfx)
+
+0.03
+        - no functional changes, no need to update
+        - moved Any::Moose dependency to test_requires section
+
+0.02
+        - added test for Any::Moose
+        - works with 'ro', 'builder' and 'lazy_build' attributes
+
+0.01
+        - original version

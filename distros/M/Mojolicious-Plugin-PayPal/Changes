@@ -1,0 +1,26 @@
+Revision history for perl distribution Mojolicious-Plugin-PayPal
+
+0.07 2017-04-29T13:38:14+0200
+ - Allow overriding redirect_url in register_payment #2
+
+0.06 2015-11-06T20:10:53+0100
+ - Fix 'Use of "shift" without parentheses is ambiguous' warning #1
+
+0.05 2015-01-02T13:22:38Z
+ - Compatible with Mojolicious 5.48
+
+0.04 2014-08-01T12:47:59Z
+ - Add IO::Socket::SSL as dependency
+ - Add Yu Pan as contributor
+
+0.03 2014-07-30T16:38:03Z
+ - Fix getting access token and using it
+
+0.02 2014-06-15T21:20:36Z
+ - Add SYNOPSIS
+ - Handle "cancel" callback
+
+0.01 2014-06-15T19:50:12Z
+ - Add register_payment()
+ - Add process_payment()
+ - Add dummy routes

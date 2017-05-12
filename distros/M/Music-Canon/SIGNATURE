@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 176b8b942af41a7c186d827794b1688d10af9d8f Changes
+SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
+SHA1 70704c703e1cbef0255cb207e61bd741733424d1 MANIFEST
+SHA1 1c7503d5b58892922fb7096a9295dd3a9c589250 MANIFEST.SKIP
+SHA1 ee7d1c15c5d385ee8d96095a8b94d3a3280dea58 META.json
+SHA1 3d9263f61befdb5c1720c6450a77be9d2101d84e META.yml
+SHA1 2d011c7f1d845c90116382595b8bb9b2029919b1 Makefile.PL
+SHA1 ac7092cd1d54e01cd184e19c515fc6b79025b49c README
+SHA1 06a85ce35b73317c1a17bddb2782f89c5e8de6f2 eg/brutecanon
+SHA1 fb9859e59dc261061ac162ca211d20e4f1391a65 eg/conversion-charts
+SHA1 c92bc737ae04d7ddf98fd5e262c36d25d3d0fff6 lib/Music/Canon.pm
+SHA1 34aaf8bcc3405b9b30be370ee8c8edd26a1f4d0e t/00-load.t
+SHA1 517e0993ea7bc64b2535855c4be7fb54e5cb921c t/Music-Canon.t
+SHA1 f95e02e66ceb4456ef3a95214f77a964797c5e06 t/manifest.t
+SHA1 3325904e2fe879968bbee7e9fc4cd7898fbf3075 t/modal-map-beyond-thunderdome.t
+SHA1 c24778557818570436c6f05c25d85af4d45c38ac t/modal-map.t
+SHA1 e7eb9408df081ef62272bf6385511102be2bbf0b t/pod-coverage.t
+SHA1 ba82eebd5adee352b14b0121141fb8404764a808 t/pod.t
+SHA1 800188cc5cfe644153c26b3f47c501035874c769 t/steps.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJXi6NoAAoJEKSYBH5dablgayYH/jb/3iMaj2xoUNWr9elh6+R7
+wVNnzIpaKyoTd10OfmCUdzBenXY2ofaLBOUzFADwxhHuYCcjtcIW0JTZuWZW7AuK
+cVoBcWGH+CorNcaPsvWQkq78d/JnQ5qWGOACpur0PkN6YcSi8kwUp0IjxYHolOPy
+p7sIDSrfToPPF8fXeLZSA9ZhlxCNZxz30zgn2Kmk2PRVcXC3l59ahC38qDI0/2NF
+65cp/bPTBksGgU5y3ujaNB2WnP7KV4Q9GlgMzYJUrhm5exOBLfiGvoAhKMr/3Wqy
+f8n/qHIxW5xG7tyWR6MamR5Max6jxNZGJ1fHmhHJyZEv/v/5Dh4I4jRxoUJx8c0=
+=39Q3
+-----END PGP SIGNATURE-----

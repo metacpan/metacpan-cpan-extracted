@@ -1,0 +1,65 @@
+=head1 NAME
+
+MooseX::Interface::Tutorial - random thoughts that might one day become a proper tutorial
+
+=head1 EXAMPLES
+
+=head2 Describing your object's attributes with interfaces
+
+Here's a good way of using interfaces. Rather than saying that your
+website's logger must be an instance of a particular class (C<isa>),
+specify an interface that the object must implement (C<does>).
+
+The object can be tested against the interface at run time.
+
+  package Website
+  {
+    use Moose;
+    
+    has logger => (
+      is    => 'ro',
+      does  => 'Website::LoggerAPI',
+    );
+    
+    sub BUILD {
+      my $self = shift;
+      Website::LoggerAPI->meta->test_implementation($self->logger)
+        or confess "logger does not implement Website::LoggerAPI";
+    }
+    
+    ...;
+  }
+  
+  package Website::LoggerAPI
+  {
+    use MooseX::Interface;
+    requires 'log_message';
+    test_case { ... };
+  }
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Interface>.
+
+=head1 SEE ALSO
+
+L<MooseX::Interface>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2012 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,0 +1,38 @@
+This directory contains examples of using Mozilla::DOM
+with Gtk2::MozEmbed. You need to have installed Gtk2::MozEmbed
+after installing Mozilla::DOM so that Gtk2::MozEmbed would have
+linked to code in Mozilla::DOM.
+
+The examples are all started with `startapp.pl'. This uses
+one of the modules in the current directory, such as Minilla.pm.
+You start a particular example by passing the module name as
+a command-line argument. For example,
+
+  ./startapp.pl Minilla.pm
+
+(The .pm suffix is optional.)
+
+A brief description of the examples follows. I recommend looking
+at them in order.
+
+Minilla: minimal example of using Gtk2::MozEmbed
+
+Signals: all the signals in Gtk2::MozEmbed
+
+Elements: DOM manipulation, e.g. inserting text and changing attributes
+
+Scroll: shows some Scroll* window methods
+
+Events: firing DOM events, such as mouse clicks
+
+HTMLElements: demonstrates HTML*Element classes
+
+EventListeners: add DOM event handlers, but in Perl instead of JavaScript
+
+BrowserObjects: shows Navigator, History, Location (and Screen)
+
+WebNav: shows WebNavigator, which is similar to the browser objects
+
+Range: set range boundaries, select nodes
+
+InnerHTML: print out HTML nodes as text

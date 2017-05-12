@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               Mock-Person-SV
+version:            0.03
+abstract:           Generate random sets of Swedish names
+author:
+    - Magnus Woldrich <m@japh.se>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Mock::Person:  0
+resources:
+    bugtracker:  https://github.com/trapd00r/Mock-Person-SV/issues
+    repository:  https://github.com/trapd00r/Mock-Person-SV
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

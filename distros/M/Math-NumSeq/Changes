@@ -1,0 +1,327 @@
+Copyright 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+
+This file is part of Math-NumSeq.
+
+Math-NumSeq is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+Math-NumSeq is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Math-NumSeq.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 72, July 2016
+    - Expression incompatible changes in Language::Expr
+
+Version 71, June 2014
+    - new Xenodromes
+    - OEIS also use text files "A123456.internal.txt"
+
+Version 70, April 2014
+    - new FibonacciRepresentations
+    - Pell new seek_to_i(), negative ith()
+    - Fibonacci document negative ith()
+
+Version 69, February 2014
+    - Fibonacci fix ith() automatic BigInt, as exposed by long-double
+      tests RT#92528
+
+Version 68, January 2014
+    - new ith_pair()
+
+Version 67, November 2013
+    - CollatzSteps new on_values="odd","even"
+    - SternDiatomic iterate by method of Moshe Newman
+    - new examples/other/haferman-carpet-x11.pl
+
+Version 66, October 2013
+    - Abundant avoid infinite loop if bad abundant_type, as reported
+      by Dana Jacobsen
+
+Version 65, October 2013
+    - fix Abundant "primitive" pred() wrong results
+    - Abundant new abundant_type="non-primitive"
+    - Abundant, DivisorCount, LiouvilleFunction, MobiusFunction,
+      PowerPart, PrimeFactorCount don't use sieve for next() as memory
+      use can be excessive and is scarcely faster than ith(), as
+      reported by Dana Jacobsen.
+
+Version 64, September 2013
+    - new HafermanCarpet
+
+Version 63, August 2013
+    - OEIS new ith() on files
+    - LuckyNumbers speedup per Dana Jacobsen RT#83581 but by a
+      progressive algorithm rather than a sieve for now
+    - FibonacciWord,ProthNumbers fixes for seek_to_i()
+    - ErdosSelfridgeClass,ReReplace,Runs remove bad undocumented seek_to_i()
+    - Fibbinary new value_to_i_ceil(), value_to_i(), seek_to_value()
+
+Version 62, August 2013
+    - PREREQ_PM of Module::Pluggable, as reported by Dana Jacobsen RT#87529
+
+Version 61, May 2013
+    - BalancedBinary fix value_to_i_estimate() on oldish Math::BigInt
+
+Version 60, May 2013
+    - UndulatingNumbers value_to_i_floor() fixes for Math::BigInt
+    - LucasNumbers new seek_to_i();
+      value_to_i_estimate() fix return to be integer on BigInt value
+
+Version 59, March 2013
+    - new value_to_i()
+    - BalancedBinary fix value_to_i_ceil() on non-integer
+    - docs typo tell_i() doesn't take any parameters
+
+Version 58, March 2013
+    - Totient etc use prime_factors() rather than sieve, since the
+      sieve is no faster and uses a lot of memory.  As reported by
+      Dana Jacobsen RT#83578.
+
+Version 57, March 2013
+    - Fibbinary new seek_to_i()
+    - FibbinaryBitCount new option digit=>"0","00"
+
+Version 56, February 2013
+    - DigitSumModulo fixes for values_max() and oeis_anum() if modulus!=radix
+
+Version 55, October 2012
+    - tests Fibbinary don't assume sprintf NV is exact
+
+Version 54, October 2012
+    - new AlgebraicContinued, PisanoPeriod, PisanoPeriodSteps
+
+Version 53, October 2012
+    - new Catalan, BalancedBinary
+    - document Math::NumSeq::Base::IterateIth, Math::NumSeq::Base::IteratePred
+
+Version 52, September 2012
+    - LiouvilleFunction new parameter values_type=>"0,1" and "1,0"
+
+Version 51, September 2012
+    - GolayRudinShapiro new parameter values_type=>"0,1"
+
+Version 50, August 2012
+    - new RadixConversion
+
+Version 49, August 2012
+    - Runs new runs_type="0to2N"
+    - document Math::NumSeq::OEIS::Catalogue::Plugin info_arrayref()
+
+Version 48, July 2012
+    - fix Fibonacci seek_to_i()
+
+Version 47, June 2012
+    - new DuffinianNumbers
+    - SophieGermainPrimes faster noticed by Dana Jacobsen
+
+Version 46, June 2012
+    - oops, DivisorCountLow missing digit parameter info
+
+Version 45, June 2012
+    - new PowerFlip
+
+Version 44, June 2012
+    - tests Fibbinary diagnostics
+
+Version 43, June 2012
+    - GolombSequence squares,primes missing from parameter_info_array
+     (but otherwise working)
+
+Version 42, June 2012
+    - new AllPrimeFactors, DigitProductSteps, MaxDigitCount
+
+Version 41, May 2012
+    - Repdigits new value_to_i_ceil(),value_to_i_floor(),value_to_i_estimate()
+    - fix Repdigits next() for radix=2
+
+Version 40, May 2012
+    - new SpiroFibonacci
+    - tests fix for Fibonacci
+
+Version 39, May 2012
+    - new PrimeIndexOrder, PrimeIndexPrimes
+
+Version 38, April 2012
+    - new ErdosSelfridgeClass, GolayRudinShapiro,
+      GolayRudinShapiroCumulative, LuckyNumbers, MoranNumbers,
+      SelfLengthCumulative
+    - new tell_i(), possible seek_to_i(), seek_to_value(), value_to_i_ceil()
+    - OEIS fix next() $i from .html and .internal files
+    - ReRound fix value_to_i_estimate() for large extra_multiples
+    - FractionDigits new ith()
+    - Totient new pred()
+    - GoldbachCount new option on_values=>"even"
+    - LemoineCount new option on_values=>"odd"
+    - ReReplace new option stage=>123
+    - OEIS allow leading whitespace in b-files
+    - Fibonacci, LucasNumbers ith() by powering
+    - Pell, ProthNumbers, Tribonacci next() give BigInt when necessary
+    - Tetrahedral, Fibbinary, Factorials, Primorials,
+      DigitLengthCumulative, WoodallNumbers new value_to_i_floor(),
+      value_to_i_estimate()
+    - ConcatNumbers new value_to_i_estimate()
+    - Runs new runs_type=>"1toFib","1to2N+1"
+
+Version 37, March 2012
+    - new DeletablePrimes
+    - new characteristic("value_is_radix")
+    - GolombSequence new using_values=>all,odd,even,3k,squares,primes
+
+Version 36, March 2012
+    - new ConcatNumbers, DedekindPsiCumulative, DedekindPsiSteps
+    - FibonacciWord new fibonacci_word_type=>"dense"
+    - Totient, TotientPerfect, TotientSteps, TotientStepsSum use prime
+      factorization for bigger range in ith() and pred()
+
+Version 35, February 2012
+    - OEIS read a-file or b-file progressively, not all into array
+    - TwinPrimes new value_to_i_estimate()
+
+Version 34, February 2012
+    - new HofstadterFigure, Runs, UndulatingNumbers
+
+Version 33, February 2012
+    - new GoldbachCount, LemoineCount, ReReplace
+    - OEIS description() utf-8 and more entities from downloaded files
+
+Version 32, February 2012
+    - PrimeFactorCount new prime_type options twin,SG,safe
+
+Version 31, January 2012
+    - tests fix for DBL_MAX constant in Perl 5.8
+
+Version 30, January 2012
+    - ReverseAdd fixes for past Math::BigInt
+
+Version 29, January 2012
+    - new ReRound, PythagoreanHypots, UlamSequence
+    - new value_to_i_floor(), value_to_i_estimate() in some classes
+    - CullenNumbers, WoodallNumbers, ReverseAdd next() give BigInt
+      when necessary
+    - ReverseAdd new pred()
+    - LucasNumbers next() fix for BigInt
+    - PrimeFactorCount new prime_type all,odd,4k+1,4k+3
+
+Version 28, January 2012
+    - new PowerPart
+
+Version 27, January 2012
+    - RepdigitRadix faster ith()
+
+Version 26, January 2012
+    - new Powerful
+
+Version 25, December 2011
+    - new PolignacObstinate
+    - Squares, Pronic, Triangular, Polygonal fixes for pred() on Math::BigInt
+
+Version 24, December 2011
+    - new Abundant, SqrtContinuedPeriod
+
+Version 23, December 2011
+    - new AllDigits, Perrin
+    - new characteristic("integer")
+
+Version 22, December 2011
+    - new characteristic() smaller, increasing, non_decreasing,
+      increasing_from_i, non_decreasing_from_i
+
+Version 21, December 2011
+    - LucasNumbers,TotientCumulative fixes for ith()
+    - DigitLength fix values_max()
+    - FractionDigits automatic BigInt where necessary
+
+Version 20, December 2011
+    - new TotientStepSum
+    - Expression workaround for Safe.pm vs regexp named captures
+    - SqrtDigits allow for older BigInt without as_oct()
+
+Version 19, November 2011
+    - RepdigitRadix fix next() i=0,1,2 returns
+
+Version 18, November 2011
+    - new RepdigitRadix, FibbinaryBitCount
+
+Version 17, November 2011
+    - new HappySteps
+
+Version 16, November 2011
+    - document $seq->characteristic("count")
+    - new DigitCountLow, DigitCountHigh, RepdigitSome, SqrtEngel
+    - DigitCount document digit=-1 means radix-1
+
+Version 15, November 2011
+    - new FibonacciWord
+    - Fibbinary better next()
+
+Version 14, October 2011
+    - new AlmostPrimes, MephistoWaltz
+    - Primorials new ith()
+
+Version 13, October 2011
+    - new GolombSequence, Kolakoski, JugglerSteps, LiouvilleFunction,
+      Totient, TotientCumulative, TotientSum, TotientPerfect
+    - DigitCount fix values_max() 
+    - OEIS-File allow for CRLF line endings in b000000.txt files
+
+Version 12, October 2011
+    - new AsciiSelf, DivisorCount
+
+Version 11, October 2011
+    - new KlarnerRado
+
+Version 10, October 2011
+    - new BaumSweet, Pell
+
+Version 9, October 2011
+    - CollatzSteps use Math::BigInt if necessary
+
+Version 8, October 2011
+    - new Fibbinary, NumAronson, ReverseAdd, Tribonacci
+    - Polygonal new pairs=>"average" parameter
+
+Version 7, October 2011
+    - RadixWithoutDigit pred() fix for digit=-1
+    - various better inf/nan handling
+    - Tetrahedral new pred() which was in the pod but not implemented
+    - DigitSum new power parameter
+    - new All, HappyNumbers
+
+Version 6, September 2011
+    - new Expression, MobiusFunction, PrimeFactorCount
+    - Polygonal, RadixWithoutDigit, TwinPrimes fix for rewind()
+
+Version 5, September 2011
+    - new DigitSumModulo
+
+Version 4, September 2011
+    - new Primes, TwinPrimes, SophieGermainPrimes, Emirps, DigitCount,
+      SternDiatomic
+    - document parameter_info_array() and parameter_info_list()
+
+Version 3, August 2011
+    - tests skip bigint bsqrt() not in perl 5.6.0
+
+Version 2, August 2011
+    - new DigitSum, DigitProduct
+
+Version 1, August 2011
+    - the first version, including
+      Squares, Pronic, Triangular, Polygonal,
+      Cubes, Tetrahedral, StarNumbers,
+      Odd, Even,
+      FractionDigits, SqrtDigits,
+      HarshadNumbers
+      Fibonacci, LucasNumbers, Factorials, Primorials,
+      Repdigits, Palindromes, Beastly, CollatzSteps, File,
+      DigitLength, DigitLengthCumulative, RadixWithoutDigit,
+      ProthNumbers,  CullenNumbers,  WoodallNumbers,
+      OEIS,  OEIS::Catalogue

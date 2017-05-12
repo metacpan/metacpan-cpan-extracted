@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Sample page</title>
+        <style type="text/css">
+            .bg-brick {
+                width: 200px;
+                height: 32px;
+                background: url('/icons/small/Brick.png') repeat-x;
+            }
+            .spr {
+                display: -moz-inline-stack;
+                display: inline-block;
+                zoom: 1;
+                *display: inline;
+                background-repeat: no-repeat;
+            }
+        </style>
+    </head>
+    <body>
+        <h3>Sample page</h3>
+        <p><a href="/">Turn ON sprites</a></p>
+        <p><a href="/?no_sprites=1">Turn OFF sprites</a></p>
+        <div>
+            <h5>Image 32x32</h5>
+            <img src="icons/small/Add.png" alt="" />
+        </div>
+        <div>
+            <h5>Image 48x48</h5>
+            <img src="icons/medium/Close.png" alt="" />
+        </div>
+        <div>
+            <h5>Image 48x48</h5>
+            <img src="icons/medium/Calender.png" alt="" />
+        </div>
+        <div>
+            <h5>Image 48x48</h5>
+            <img src="icons/medium/CD.png" alt="" />
+        </div>
+        <div>
+            <h5>Image 48x48</h5>
+            <img src="icons/medium/Chat.png" alt="" />
+        </div>
+        <div>
+            <h5>Image 48x48</h5>
+            <img src="icons/medium/Folder_Open.png" alt="" />
+        </div>
+        <div>
+            <h5>Background image 32x32 repeat-X</h5>
+            <div class="bg-brick"/>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+Changes
+lib/Mojolicious/Plugin/Pingen.pm
+t/01async.t
+t/02sync.t
+t/03apikey.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

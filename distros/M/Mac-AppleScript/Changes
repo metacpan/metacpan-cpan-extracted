@@ -1,0 +1,10 @@
+Revision history for Perl extension Mac::AppleScript.
+
+0.01  Thu Aug 29 13:34:14 2002
+	- original version; created by h2xs 1.2 with options
+		-n Mac::AppleScript -c -k
+
+0.04  Sat Feb 22 14:21:00 2003
+        - Made a UTF8 change--perl can do UTF data, but we weren't telling
+	  OS X that we were sending UTF data if we were. Very naughty of us.
+	  Patch courtesy of  "J. Mayes" <mr_rosewater@ameritech.net>

@@ -1,0 +1,135 @@
+
+  myco
+
+
+README
+
+$Id: README,v 1.1.1.1 2004/11/22 19:16:00 owensc Exp $
+
+
+* Welcome to myco and The myco Project!
+
+The purpose of The myco Project is to create and sustain a rich framework
+that provides end-to-end support for the perl object-oriented application
+developer, freeing them to focus more effectively on application-specific
+end-user features.  Via this framework we supply a set of software tools
+and also attempt to promote and facilitate best (or at least patently
+"good") practices in software development.
+
+
+* Features
+
+The myco framework supports:
+
+    * Object "lifecycle" services:
+          o accessors
+          o data validation
+          o persistence
+          o templates (vaguely akin to Java interfaces)
+          o metadata (a.k.a. "introspection"), with metadata inheritance
+          o role-based access control
+          o logging
+    * Unit testing
+    * Metadata driven user interfaces
+      (a Model-View-Controller implementation, usable in both HTML::Mason
+       and cgi script contexts)
+    * And more... ("but wait...that's not all")
+
+
+* Status
+
+The myco framework has been in production use within Eastern Nazarene College
+for about two years.  Publishing to CPAN has always been our intention... but
+life intervenes.
+
+This initial release is extremely rough.   This is the "get it out the door
+AS-IS" release.  I hope to release something a bit more polished before
+too long, and then put the CVS repository up on Sourceforge.
+
+The core of the system works and works well, but is not anywhere near the
+place where it can really live up to its core goal:  drop it in and get
+coding effectively.  The framework up until now has been very much enmeshed
+with the applications for which it was originally developed to support (a CRM, and more recently, "identiprov").  This release represents the first major
+attempt to have myco stand on its own, and thus potentially be of value to
+a broader audience.
+
+Next steps / goals:
+   * Docs -- beginners tutorial
+   * Improved installer
+   * Test infrastructure reworked to use Test::More and friends
+   * Lots more ideas... look for TODO doc in next release
+
+
+* Getting Started
+
+We're more than a bit lean on documentation at present.
+Newer classes now have POD documentation firmly embedded.  To access:
+
+	cd lib
+	perldoc CLASS
+
+Recommended initial reading:
+
+  Installation and administration (largely accurate)
+   * Myco::Admin
+
+  Key framework base classes
+   * Myco::Base::Entity
+   * Myco::Test::EntityTest
+
+  Clean example of Entity class:
+   * Myco::Base::Entity::SampleEntityAddress
+
+
+
+Key 3rd-party components
+   * Perl - http://www.perl.com
+   * Tangram - http://soundobjectlogic.com
+   * Class::Tangram
+   * HTML::Mason - http://www.masonhq.com
+   * mod_perl (1.x thus far) - http://perl.apache.org
+
+
+* Requirements
+
+The myco framework should function under most any modern UNIX-like operating
+system where perl 5.6 or greater is available.  Data persistence and
+user interface functionality is limited to platforms that support the
+related 3rd-party components (Tangram, mod_perl, HTML::Mason).
+
+The myco framework has been used successfully on these platforms:
+
+   * FreeBSD (4.8+, 5.1+)
+   * MacOS X
+
+myco framework object services (except data persistence) have been used
+also within Cygwin (http://www.cygwin.com)
+
+
+* Support
+
+  myco homepage (hopefully appearing soon):
+
+    http://www.myco.ws
+
+  myco project page (very little here thus far):
+
+    http://sourceforge.net/projects/myco/
+
+  A user mailing list exists at 
+
+    http://lists.sourceforge.net/lists/listinfo/myco-users
+
+
+
+* Build a better myco
+
+Comments, suggestions, patches... all are welcome!
+
+
+
+Thanks for your interest and participation!
+
+Charles N. Owens,
+Senior Technology Officer
+Eastern Nazarene College

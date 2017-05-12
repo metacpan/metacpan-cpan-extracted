@@ -1,0 +1,9 @@
+Revision history for Perl extension Math::SparseVector.
+
+0.03  June 18, 2006
+	original version; created by h2xs 1.23 with options 
+    -AXc -n Math::SparseVector. Code and documentation used from
+    existing Sparse::Vector v0.03 module, with minimal changes.
+
+0.03  June 30, 2006
+    Fixed typos in documentation

@@ -1,0 +1,44 @@
+2003-12-08  Norbert Gövert  <goevert@ls6.cs.uni-dortmund.de>
+
+	*** 0.006
+
+	* Makefile.PL: create README for CPAN on the fly
+
+	* lib/Mrequire.pm (POD): added copyright statement
+
+2003-06-13  Norbert Gövert  <goevert@ls6.cs.uni-dortmund.de>
+
+	*** 0.005
+
+	* transfer prcs -> cvs done
+
+2001-07-27  Norbert Gövert  <goevert@ls6.cs.uni-dortmund.de>
+
+	*** 0.004
+
+	* ChangeLog: renamed file from Changes
+
+	* MANIFEST.SKIP: new file
+
+	* Makefile.PL: clean target
+
+2001-01-26  Norbert Gövert  <goevert@ls6.cs.uni-dortmund.de>
+
+	*** 0.003
+
+	* Makefile.PL (MY::postamble): ftpdist
+
+	* Mrequire.prj: Prcs emacs mode
+
+1998-12-03  Norbert Goevert  <goevert@ls6.cs.uni-dortmund.de>
+
+	*** 0.002
+
+	* lib/Mrequire.pm (mrequire): mrequire now has a valid return
+	value; also $@ is captured
+
+1998-07-14  Norbert Goevert  <goevert@ls6.cs.uni-dortmund.de>
+
+	*** 0.001
+
+	* original version; created by ls6h2xs 1.008

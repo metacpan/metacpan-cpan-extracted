@@ -1,0 +1,2 @@
+- make (handles => $rolename) work for Moo classes consuming Moose roles.
+	- mst has given me the go-ahead to do this in Moo directly rather than here

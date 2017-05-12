@@ -1,0 +1,327 @@
+NAME
+    MAD::Loader - A tiny module loader
+
+VERSION
+    version 3.001003
+
+SYNOPSIS
+    MAD::loader is a module loader and object builder for situations when
+    you want several modules being loaded dynamically.
+
+    For each module loaded this way a builder method may be called with or
+    without arguments. You may also control where the loader will search for
+    modules, you may prefix the module names with a custom namespace and you
+    may change how it will behave on getting errors.
+
+        ## Procedural interface, for handling one module each time
+        use MAD::Loader qw{ fqn load_module build_object };
+    
+        my $fqn = fqn( 'My::Module', 'My::Prefix' );
+        # $fqn is 'My::Prefix::My::Module'
+    
+        my $module = load_module(
+            module      => 'Bar',
+            prefix      => 'Foo',
+            inc         => [ 'my/local/lib' ],
+            on_error    => \&error_handler,
+        );
+        # $module is 'Foo::Bar' if Foo::Bar was successfully loaded
+        # error_handler() will be called in case of error
+    
+        my $object = build_object(
+            module      => 'Foo::Bar',
+            builder     => 'new',
+            args        => [ 123, 456 ],
+            on_error    => \&error_handler,
+        );
+        # Foo::Bar must be already loaded
+        # $object = Foo::Bar->new( 123, 456 );
+    
+        ## OO interface, for handling many modules each time
+        use MAD::Loader;
+
+        my $loader = MAD::Loader->new(
+            prefix      => 'Foo',
+            set_inc     => [ 'my/module/dir' ],
+            builder     => 'new',
+            args        => [ 123, 456 ],
+            on_error    => \&error_handler,
+        );
+    
+        my $loaded = $loader->load( qw{ Bar Etc 123 } );
+        # Same as:
+        use Foo::Bar;
+        use Foo::Etc;
+        use Foo::123;
+    
+        my $built = $loader->build( qw{ Foo::Bar Foo::Etc Foo::123 } );
+        # Same as:
+        my $built = {
+            Foo::Bar => Foo::Bar->new( 123, 456 ),
+            Foo::Etc => Foo::Etc->new( 123, 456 ),
+            Foo::123 => Foo::123->new( 123, 456 ),
+        }
+    
+        my $built = $loader->load_and_build( qw{ Bar Etc 123 } );
+        # Same as:
+        use Foo::Bar;
+        use Foo::Etc;
+        use Foo::123;
+    
+        my $built = {
+            Foo::Bar => Foo::Bar->new( 123, 456 ),
+            Foo::Etc => Foo::Etc->new( 123, 456 ),
+            Foo::123 => Foo::123->new( 123, 456 ),
+        }
+
+FUNCTIONS
+  fqn( $module [, $prefix] )
+    This method is used to validate the full name of a $module. If an
+    optional $prefix is given, it will be prepended to the $module before
+    being validated.
+
+    The fqn is validated against the regular expression in
+    $MODULE_NAME_REGEX which is "qr{^[_[:upper:]]\w*(::\w+)*$}".
+
+    If a valid fqn can not be found then an empty string is returned.
+
+    Note that only the non-ascii characters recognized by "[:upper:]" and
+    "\w" can be part of the module name or prefix.
+
+    Numbers are valid except for the first character of the fqn.
+
+  load_module( %args )
+    Tries to load a single module.
+
+    Receives as argument a hash containing the following keys:
+
+   module (Mandatory)
+    The module name.
+
+   inc (Mandatory)
+    An ArrayRef with the list of directories where to look for the module.
+    This replaces locally the array @INC.
+
+   prefix (Optional)
+    A namespace to prefix the module name. Defaults to ''.
+
+   on_error (Optional)
+    An error handler to be executed when found errors. Defaults to
+    "\&Carp::croak".
+
+  build_object( %args )
+    Tries to build an object from a loaded module.
+
+    Receives as argument a hash containing the following keys:
+
+   module (Mandatory)
+    The module name.
+
+   builder (Mandatory)
+    The name of method used to build the object.
+
+   args (Optional)
+    An ArrayRef of parameters to be passed to the builder method.
+
+   on_error (Optional)
+    An error handler to be executed when found errors. Defaults to
+    "\&Carp::croak".
+
+  load_and_new( %args )
+    A shortcut for "load_module" then "build_object" with some predefined
+    args.
+
+    "inc" is set to @INC and c<builder> to 'new'. It is expected to deal
+    only with module, prefix and builder args.
+
+METHODS
+  new( %params )
+    Creates a loader object.
+
+    You may provide any optional arguments: prefix, builder, args, add_inc,
+    set_inc and on_error.
+
+   prefix
+    The namespace that will be prepended to the module names.
+
+    The default value is '' (empty string) meaning that no prefix will be
+    used.
+
+        my $loader = MAD::Loader->new( prefix => 'Foo' );
+        $loader->load(qw{ Bar Etc 123 });
+    
+        ## This will load the modules:
+        ##  * Foo::Bar
+        ##  * Foo::Etc
+        ##  * Foo::123
+
+   builder
+    The name of the method used to create a new object or to initialize the
+    module.
+
+    The default value is '' (empty string).
+
+    When an "builder" is defined the loader will try to call it like as a
+    constructor passing the array "args" as argument.
+
+    The code below:
+
+        my $loader = MAD::Loader->new(
+            builder => 'init',
+            args    => [ 1, 2, 3 ],
+        );
+        $loader->load( 'Foo' );
+        $loader->build( 'Foo' );
+
+    Will cause something like this to occur:
+
+        use Foo;
+        Foo->init( 1, 2, 3 );
+
+   args
+    An ArrayRef with the arguments provided to all builders.
+
+    Note that although "args" is an ArrayRef, it will be passed as an array
+    to "builder".
+
+    When several modules are loaded together, the same "args" will be passed
+    to their builders.
+
+   add_inc
+    An ArrayRef with directories to be prepended to @INC.
+
+    The array @INC will be localized before the loader add these
+    directories, so the original state of @INC will be preserved out of the
+    loader.
+
+    The default value is "undef" meaning that original value of @INC will be
+    used.
+
+   set_inc
+    An ArrayRef of directories used to override @INC.
+
+    This option has priority over "add_inc", that is, if "set_inc" is
+    defined the value of "add_inc" will be ignored.
+
+    Again, @INC will be localized internally so his original values will be
+    left untouched.
+
+   on_error
+    An error handler called when a module fails to load or build an object.
+    His only argument will be the exception thrown.
+
+    This is a coderef and the default value is "\&Carp::croak".
+
+  load( @modules )
+    Takes a list of module names and tries to load all of them in order.
+
+    For each module that fails to load, the error handler "on_error" will be
+    called. Note that the default error handler is an alias to "Carp::croak"
+    so in this case at the first fail, an exception will be thrown.
+
+    All module names will be prefixed with the provided "prefix" and the
+    loader will try to make sure that they all are valid before try to load
+    them. All modules marked as "invalid" will not be loaded.
+
+    The term "invalid" is subject of discussion ahead.
+
+    The loader will search for modules into directories pointed by @INC
+    which may be changed by attributes "add_inc" and "set_inc".
+
+    In the end, if no exception was thrown, the method "load" will return a
+    HashRef which the keys are the module names passed to it (without
+    prefix) and the values are the fqn (with prefix) of the module if it was
+    loaded or an empty string if it was not loaded.
+
+  build( @modules )
+    Takes a list of modules (fqn) already loaded and for each one, tries to
+    build an object calling the method indicated by "builder", passing to it
+    the arguments in "args".
+
+    Returns a HashRef which the keys are the names of the modules and the
+    values are the objects.
+
+  load_and_build( @modules )
+    A mix of "load" and "build". Receives a list of modules, tries to
+    prepend them with "prefix", load all and finally build an object for
+    each one.
+
+    Returns the same as "build".
+
+  prefix
+    Returns the namespace "prefix" as described above.
+
+  builder
+    Returns the name of the "builder" as described above.
+
+  args
+    Returns an ArrayRef with the "args" provided to all builders.
+
+  add_inc
+    Returns the ArrayRef of directories prepended to @INC.
+
+  set_inc
+    Returns the ArrayRef of directories used to override @INC.
+
+  inc
+    Returns the ArrayRef of directories that represents the content of @INC
+    internally into the loader.
+
+  on_error
+    Returns the CodeRef of the error handler.
+
+LIMITATIONS
+  Valid Module Names
+    This module tries to define what is a valid module name. Arbitrarily we
+    consider a valid module name whatever module that matches with the
+    regular expression "qr{^[_[:upper:]]\w*(::\w+)*$}".
+
+    This validation is to avoid injection of arbitrarily code as fake module
+    names and the regular expression above should be changed in future
+    versions or a better approach may be considered.
+
+    Therefore some valid module names are considered invalid within
+    "MAD::Loader" as names with some UTF-8 characters for example. These
+    modules cannot be loaded by "MAD::Loader" yet. For now this IS
+    intentional.
+
+    The old package delimiter "'" (single quote) is also intentionally
+    ignored in favor of "::" (double colon). Modules with single quote as
+    package delimiter cannot be loaded by "MAD::Loader".
+
+CAVEATS
+    The options "add_inc" and "set_inc" are used to isolate the environment
+    where the search by modules is made, allowing you precisely control
+    where MAD::Loader will look for modules.
+
+    You may use this features when your application must load plugins and
+    you must assure that only modules within specific directories can be
+    valid plugins for example.
+
+    A collateral effect is that when a module loaded by MAD::Loader tries to
+    dynamically load another module, this module will be searched only
+    within the directories known by MAD::Laoder.
+
+    If you use the option "set_inc" to limitate MAD::Loader to search only
+    within the directory "/my/plugins" for example, and some plugin tries to
+    load a module placed out of this path, your plugin will fail like this:
+
+        Can't locate SomeModule.pm in @INC (@INC contains: /my/plugins) at
+        /my/plugins/Myplugin.pm line 42.
+
+    Note that actually this is a feature, not a bug. If you isolate the
+    search path with MAD::Loader you will be sure that no module will bypass
+    your limitation, except if it know the search path of his sub-modules by
+    itself (in this case, there is little to do :) ).
+
+    See <https://github.com/blabos/MAD-Loader/issues/1> for an example.
+
+AUTHOR
+    Blabos de Blebe <blabos@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Blabos de Blebe.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

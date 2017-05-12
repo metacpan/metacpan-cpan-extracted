@@ -1,0 +1,160 @@
+Revision history for Map::Tube::NYC
+
+0.38  Sun Mar 19 19:55:00 2017
+      - Upgraded to use Test::Map::Tube v0.25.
+
+0.37  Sat Mar 11 11:10:00 2017
+      - Upgraded to use Map::Tube v3.28.
+
+0.36  Tue Oct 25 14:25:00 2016
+      - Upgraded to use Map::Tube v3.21.
+      - Upgraded to use Test::Map::Tube v0.17.
+
+0.35  Sat Aug 20 12:45:00 2016
+      - Upgraded to use Map::Tube v3.18.
+
+0.34  Tue Jun 28 10:20:00 2016
+      - Upgraded to use Map::Tube v3.15.
+      - Consolidated routes testing functions using method ok_map_routes().
+
+0.33  Wed Apr 13 12:10:00 2016
+      - Added test script for Line IRT Lexington Avenue.
+      - Fixed typo in the pod document.
+      - Updated map data w.r.t. "Spring Street" station.
+
+0.32  Tue Apr 05 10:40:00 2016
+      - Added package Map::Tube::NYC::Line::IRTLexingtonAvenue
+      - Added map image for IRT Lexington Avenue line.
+      - Updated NYC Submap map image.
+      - Updated effected other line map image.
+      - Updated unit test t/00-load.t
+      - Updated map data w.r.t. "Grand Central" station.
+
+0.31  Fri Apr 01 16:15:00 2016
+      - Fixed typo in the package name.
+      - Updated test scripts.
+      - Updated copyright year.
+
+0.30  Tue Mar 29 15:25:00 2016
+      - Added map data for line 'IRT Lexington Avenue'.
+
+0.29  Fri Mar 11 11:05:00 2016
+      - Added map for BMT Nassau Street line.
+      - Added unit test for BMT Nassau Street line.
+
+0.28  Sun Feb 28 09:45:00 2016
+      - Updated NYC Subway map.
+      - Added map for BMT Canarsie line.
+      - Added unit test for BMT Canarsie line.
+
+0.27  Fri Feb 26 18:10:00 2016
+      - Added line BMT Canarsie.
+
+0.26  Fri Nov 06 11:15:00 2015
+      - Fixed the error reported by CPANT Testers.
+      - Upgraded to use Map::Tube v3.12.
+
+0.25  Fri Sep 25 10:20:00 2015
+      - Upgraded to use Map::Tube v3.01.
+
+0.24  Sun Jul 26 12:00:00 2015
+      - Upgraded to use Map::Tube v3.00.
+
+0.23  Mon Mar 30 09:00:00 2015
+      - Fixed the station '23rd Street' data in the xml file.
+
+0.22  Thu Feb 26 16:30:00 2015
+      - Added package to list subway stations for "IRT Flushing Line".
+      - Added unit test for the "IRT Flushing Line".
+      - Added map for the "IRT Flushing Line".
+      - Updated NYC Subway map.
+
+0.21  Thu Feb 26 11:25:00 2015
+      - Added File::ShareDir::Install as configure requires in the Makefile.PL file.
+
+0.20  Wed Feb 25 17:40:00 2015
+      - Updated description for method get_shortest_route() in the pod document.
+
+0.19  Wed Feb 25 17:15:00 2015
+      - Tidied up the pod document.
+
+0.18  Wed Feb 25 15:25:00 2015
+      - Upgraded to use Map::Tube v2.87.
+      - Added package to list subway stations for "IND Crosstown Line".
+      - Added unit test for the "IND Crosstown Line".
+      - Added map for the "IND Crosstown Line".
+      - Updated NYC Subway map.
+
+0.17  Mon Feb 16 17:50:00 2015
+      - Upgraded to use Map::Tube v2.83.
+      - Updated visual settings in the pod document for IND Sixth Avenue line map.
+      - Updated sample code in the pod document.
+
+0.16  Mon Feb 16 15:25:00 2015
+      - Updated link information for the station "West Fourth Street" in the xml data file.
+      - Updated station "Rockefeller Center" in the xml data file.
+      - Added unit test for the IND Sixth Avenue line.
+      - Added NYC Subway map.
+      - Added IND Sixth Avenue line map.
+      - Updated IND Eighth Avenue line map.
+
+0.15  Mon Feb 16 12:55:00 2015
+      - Added package to list subway stations for "IND Sixth Avenue".
+      - Updated xml data and added stations for the above line.
+      - Updated pod document for Map::Tube::NYC about the above changes.
+
+0.14  Tue Feb 10 12:10:00 2015
+      - Added tube name to the map xml data file.
+
+0.13  Fri Feb 06 17:30:00 2015
+      - Upgraded to use Map::Tube v2.78.
+      - Added map for IND Eighth Avenue line.
+      - Added line informations to the xml map data.
+
+0.12  Tue Jan 13 15:15:00 2015
+      - Upgraded to use Map::Tube v2.62.
+      - Tidied up the test scripts.
+
+0.11  Fri Jan 09 14:45:10 2015
+      - Upgraded to use Map::Tube v2.61 as it brings in new fix and feature.
+
+0.10  Wed Jan 07 13:50:25 2015
+      - Tidied up the test scripts meta-yml.t and meta-json.t.
+
+0.09  Tue Jan 06 12:10:15 2015
+      - Fixed the MANIFEST.SKIP file regarding _eumm folder.
+
+0.08  Mon Jan 05 11:05:10 2015
+      - Upgraded to use Map::Tube v2.57 as it brings in new fix and feature.
+      - Updated Makefile.PL to generate the key 'provides' for META file correctly.
+      - Added unit test to test META files.
+      - Added LICENSE file.
+      - Updated Copyright year information.
+
+0.07  Sat Dec 20 09:45:00 2014
+      - Upgraded to use Map::Tube v2.46.
+      - Added package to list subway stations for "IND Eighth Avenue".
+      - Updated pod document for Map::Tube::NYC about the above changes.
+
+0.06  Sat Dec 06 22:52:11 2014
+      - Upgraded to use Map::Tube v2.34.
+      - Removed stations name from the pod document as it is becoming too noisy.
+
+0.05  Fri Dec 05 20:43:10 2014
+      - Upgraded to use Map::Tube v2.33 as it brings in new fix and feature.
+      - Updated unit test to reflect the changes in Map::Tube v2.33.
+
+0.04  Fri Dec 05 11:00:10 2014
+      - Updated the description of method get_shortest_route().
+
+0.03  Thu Dec 04 20:50:10 2014
+      - Updated unit test to make use of new class provided by Map::Tube role.
+      - Updated description of method get_shortest_route() in the pod document.
+
+0.02  Wed Dec 03 21:37:10 2014
+      - Upgraded to use Map::Tube v2.31 as it brings in new fix and feature.
+      - Added test case for case insensitive station name.
+      - Removed SIGNATURE file.
+
+0.01  Sun Nov 30 11:17:01 2014
+      - First version, released.

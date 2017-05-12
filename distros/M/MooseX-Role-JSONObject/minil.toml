@@ -1,0 +1,9 @@
+name = "MooseX-Role-JSONObject"
+# badges = ["travis"]
+authority="cpan:ROAM"
+
+module_maker="ModuleBuildTiny"
+
+no_github_issues=true
+sign_tags=true
+

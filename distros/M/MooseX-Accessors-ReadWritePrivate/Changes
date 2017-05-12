@@ -1,0 +1,38 @@
+Revision history for MooseX::Accessors::ReadWritePrivate.
+
+v1.4.0 2011/5/3
+
+    Awesome patch from Dave Rolsky to deal with Moose v2 changes.
+
+
+v1.3.0  2010/7/21
+
+    Support non-public selectors.
+
+    Deal with deprecations in Moose.
+
+
+v1.2.1  2009/7/26
+
+    Change minimum Moose version requirement to 0.84 in order to allow for
+    "bare" in the tests.
+
+
+v1.2.0  2009/7/20
+
+    Handle "is => 'bare'" attributes.
+
+
+v1.1.0  2009/4/20
+
+    Treat Maybe[Bool] attributes the same way as Bool ones.
+
+
+v1.0.1  2009/4/18
+
+    Ack!  Listed dependencies were completely wrong.
+
+
+v1.0.0  2009/4/18
+
+    Initial release.

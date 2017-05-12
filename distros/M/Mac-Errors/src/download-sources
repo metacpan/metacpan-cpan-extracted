@@ -1,0 +1,67 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+=head1 NAME
+
+download-sources - search Google for Mac Programming result codes
+
+=head1 SYNOPSIS
+
+	% download-sources >> sources.dat
+	
+=head1 DESCRIPTION
+
+This script uses Google's Developer API to search for Mac OS X
+programming result codes. It extracts the URLs from the results
+and prints them.
+
+You must set the GOOGLE_KEY environment variable to use this. The
+script will die, telling you the same thing, if you don't.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005, Salvatore Domenick Desiano C<< <sal@email.arc.nasa.gov> >
+
+You may use this software under the same terms as Perl itself
+
+=cut
+
+use SOAP::Lite;
+
+my $google = SOAP::Lite->service('http://api.google.com/GoogleSearch.wsdl');
+my $key = $ENV{GOOGLE_KEY} || die <<"DIE";
+Set the GOOGLE_KEY environment variable with your Google
+Developers Key so this script ($0) can search Google
+DIE
+
+my $query = 'site:developer.apple.com intitle:"Result Codes"';
+
+my $end_index = 0;
+my $per_query = 10;
+
+for (my $offset = $end_index, my $page = 1; 
+     $offset == $end_index; 
+     $offset += $per_query, ++$page)
+	{
+    print STDERR "Google search page $page...\n";
+	print STDERR "\tfound " . @{$result->{resultElements}} . " results\n";
+    my $result = $google->doGoogleSearch(
+    	$key, $query, $offset, $per_query,
+		SOAP::Data->type(boolean => 'false'), '',
+		SOAP::Data->type(boolean => 'false'), '',
+		'latin1',
+		'latin1'
+		);
+		
+    $end_index = $result->{endIndex};
+
+	my %urls = ();
+    foreach my $entry ( @{$result->{resultElements}} )
+		{
+		my $url = $entry->{URL};
+		next if( $url !~ /section_1.html$/ || exists $urls{$url} );
+		$urls{$url} = 1;
+		print "$url\n";
+		}
+	}

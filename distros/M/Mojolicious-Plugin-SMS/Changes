@@ -1,0 +1,7 @@
+Revision history for Mojolicious-Plugin-SMS
+
+0.1   2011-11-06
+	First public version
+
+0.2   2015-03-09
+	Set minimal supported version of Mojolicious to 4.0

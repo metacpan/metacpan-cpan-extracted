@@ -1,0 +1,10 @@
+
+* arbitrary precision for deep-zooming
+* OO: create a new object, set the values, get them and the do the calc. Right
+  now all parameters are stored global (well, it is easier and faster and who
+  needs alternating between two different sets?)
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

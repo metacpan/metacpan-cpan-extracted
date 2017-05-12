@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Mojolicious/Plugin/LeakTracker.pm
+t/000-compile.t
+t/release-cpan-changes.t
+weaver.ini

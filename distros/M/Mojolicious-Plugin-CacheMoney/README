@@ -1,0 +1,91 @@
+NAME
+
+    Mojolicious::Plugin::CacheMoney - Bling bling
+
+VERSION
+
+    version 0.03
+
+USAGE
+
+        package App;
+        use Mojo::Base 'Mojolicious';
+    
+        sub startup {
+            my $self = shift;
+            # ...
+            $self->plugin( 'Mojolicious::Plugin::CacheMoney' );
+        }
+        sub startup {
+            my $self = shift;
+            # ...or fine-tuned (below are the defaults if no options are passed):
+            $self->plugin( 'Mojolicious::Plugin::CacheMoney', {
+                -chi => {
+                    driver => 'Memcached::Fast'
+                    , servers => [ "127.0.0.1:11211" ]
+                    , compress_threshold => 16 * 1024
+                    , namespace => decamelize( ref $self ) .':'. $self->mode
+                    , serializer => { serializer => 'JSON::XS', compress => 1 }
+                }
+            } );
+        }
+
+    then
+
+        package App::Example;
+        use Mojo::Base 'Mojolicious::Controller';
+    
+        sub test {
+            my $self = shift;
+            my $res1 = $self->cache( 'aprettycachekey' => sub {
+                my $res = $self->do_some_database_calls_get_some_results;
+                return $res;
+            } );
+            my $res2 = $self->cache( 'anothercachekey' => sub {
+                my $res = $self->do_some_database_calls_get_some_results;
+                return $res;
+            }, expires_at => time + 600 );
+            my $also_res1 = $self->cache( 'aprettycachekey' );
+            my $res3 = $self->cache( 't minus 60 seconds until kaboom' => sub {
+                my $res = $self->do_some_database_calls_get_some_results;
+                return $res;
+            }, expires_in => 60 );
+            return $self->render( json => { res1 => $res1, res3 => $res3, also_res1 => $also_res1, res2 => $res2 } );
+        }
+
+    See CHI for parameters you can pass after the code ref, especially
+    parameters around get and set (particularly see "Removing and expiring"
+    in CHI).
+
+SUPPORT
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests through the issue tracker at
+    https://github.com/sharabash/mojolicious-plugin-cachemoney/issues. You
+    will be notified automatically of any progress on your issue.
+
+ Source Code
+
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    https://github.com/sharabash/mojolicious-plugin-cachemoney
+
+      git clone git://github.com/sharabash/mojolicious-plugin-cachemoney.git
+
+AUTHOR
+
+    Nour Sharabash <amirite@cpan.org>
+
+CONTRIBUTOR
+
+    Nour Sharabash <nour.sharabash@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Nour Sharabash.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

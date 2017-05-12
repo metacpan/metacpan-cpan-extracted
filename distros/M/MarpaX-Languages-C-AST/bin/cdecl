@@ -1,0 +1,79 @@
+#!perl
+use strict;
+use warnings FATAL => 'all';
+use diagnostics;
+use File::Spec;
+use File::Basename;
+use IPC::Cmd qw/run/;
+BEGIN {
+  $ENV{PERL5LIB} ||= '';
+}
+use Env qw/@PERL5LIB/;
+use POSIX qw/EXIT_SUCCESS EXIT_FAILURE/;
+
+# ABSTRACT: C gibberish into english
+
+our $VERSION = '0.47'; # VERSION
+
+# PODNAME: cdecl
+
+#
+# cdecl is nothing else but cscan --get cdecl
+#
+my $bindir = dirname($0);
+my $cscan = File::Spec->catfile($bindir, 'cscan');
+my $pkgdir = dirname($bindir);
+my $INC = File::Spec->catdir($pkgdir, 'lib');
+push(@PERL5LIB, $INC);
+my @cmd = ($^X, $cscan, '--get', 'cdecl', @ARGV);
+my ($success, $error_code, undef, $stdout_bufp, $stderr_bufp) = run(command => \@cmd);
+
+print STDOUT join('',@{$stdout_bufp});
+print STDERR join('',@{$stderr_bufp});
+
+exit($success ? EXIT_SUCCESS : EXIT_FAILURE);
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cdecl - C gibberish into english
+
+=head1 VERSION
+
+version 0.47
+
+=head1 AUTHOR
+
+Jean-Damien Durand <jeandamiendurand@free.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Jean-Damien Durand.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+__DATA__
+
+# --------------------------------------------------------------------------------------
+
+=head1 NAME
+
+cdecl - C gibberish into english
+
+=head1 SYNOPSIS
+
+ cdecl [options] [file]
+
+=head1 NOTES
+
+cdecl is an alias to cscan --get cdecl.
+
+=head1 SEE ALSO
+
+L<cscan>

@@ -1,0 +1,52 @@
+Math-CPWLF
+
+Define nested continuous piece-wise linear functions with interpolation support.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Math::CPWLF
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-CPWLF
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Math-CPWLF
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Math-CPWLF
+
+    Search CPAN
+        http://search.cpan.org/dist/Math-CPWLF/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Dan Boorstein
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

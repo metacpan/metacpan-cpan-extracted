@@ -1,0 +1,57 @@
+{
+   "abstract" : "Collection of roles useful to MetaCPAN project",
+   "author" : [
+      "Leo Lapworth"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MetaCPAN-Role",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "CatalystX::Fastly::Role::Response" : "0.04",
+            "Moose::Role" : "0",
+            "MooseX::Fastly::Role" : "0.01",
+            "Net::Fastly" : "1.05"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/metacpan/p5-metacpan-role/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/metacpan/p5-metacpan-role",
+         "web" : "https://github.com/metacpan/p5-metacpan-role"
+      }
+   },
+   "version" : "0.06"
+}
+

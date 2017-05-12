@@ -1,0 +1,10 @@
+,v$
+~$
+\#$
+^Makefile$
+\.bak$
+\.body$
+\.env$
+^blib
+^Mail-Qmail-Queue-
+^pm_to_blib$

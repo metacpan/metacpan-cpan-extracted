@@ -1,0 +1,42 @@
+[% PROCESS header.tt2 title = message.subject %]
+[% USE Mariachi %]
+
+<h1>[% message.subject | html | mariachi %]</h1>
+
+<p>
+[<a href="[% base %][% message.prev.filename %]">prev</a>]
+[<a href="[% base %][% message.linked.thread %]#[% message.filename %]">thread</a>]
+[<a href="[% base %][% message.next.filename %]">next</a>]
+
+[% IF message.linked.lurker %][<a href="[% base %][% message.linked.lurker %]#[% message.filename %]">lurker</a>][% END %]
+
+[Date index for <a href="[% base %][% message.year %]">[% message.ymd.0 | format('%04d') %]</a>/<a href="[% base %][% message.month %]">[% message.ymd.1 | format('%02d') %]</a>/<a href="[% base %][% message.day %]">[% message.ymd.2 | format('%02d') %]</a>]
+</p>
+
+<div class=headers>
+<b>From:</b> [% message.from | mariachi | html %]<br />
+<b>Subject:</b> [% message.subject | mariachi | html %]<br />
+<b>Date:</b> [% date.format(message.epoch_date) %]<br />
+</div>
+
+<pre>[% message.body_sigless | html | mariachi  %][% IF message.sig -%]
+-- <i>
+[% message.sig | html | mariachi %][% END %]</i></pre>
+
+[%# INCLUDE prevnext.tt2 %]
+[%
+	maxdepth = 1 ;
+ 	thread = container ;
+	IF thread.parent ;
+		maxdepth = maxdepth + 1 ;
+		thread = thread.parent ;
+	END ;
+%]
+[% IF thread.parent %]
+There's stuff above here</li>
+[% END %]
+<ul class="threads">
+[% INCLUDE thread.tt2 depth=0 %]
+</ul>
+
+[% PROCESS footer.tt2 %]

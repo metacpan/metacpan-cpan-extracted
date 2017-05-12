@@ -1,0 +1,224 @@
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Mason::Manual::Plugins - Mason plugins
+
+=head1 DESCRIPTION
+
+A Mason plugin modifies behavior in one or more of Mason's main classes
+simultaneously, using Moose roles. Many Mason features, even some that might be
+considered "core", are implemented with plugins.
+
+=head1 FINDING PLUGINS
+
+By convention plugins live in the "Mason::Plugin::*" namespace, and plugin
+bundles live in the "Mason::PluginBundle::*" namespace. You can find both with
+this search:
+
+    http://search.cpan.org/search?query=Mason%3A%3APlugin&mode=all
+
+=head1 USING PLUGINS
+
+Pass a list of plugin specs to the Mason constructor:
+
+    Mason->new(plugins =>
+            [
+             'OnePlugin', 
+             'AnotherPlugin',
+             '+My::Mason::Plugin::AThirdPlugin',
+             '@APluginBundle',
+             '+My::Mason::PluginBundle::AnotherBundle',
+             '-PluginIDontLike',
+            ]);
+
+Each plugin spec can be one of the following;
+
+=over
+
+=item *
+
+A simple name, which will have "Mason::Plugin::" prepended to it.
+
+=item *
+
+A bundle name, prefixed with '@', which will have "Mason::PluginBundle::"
+prepended to it.
+
+=item *
+
+A full plugin or bundle class name prefixed with '+'.
+
+=item *
+
+Any spec prefixed with '-', which means do not include these plugin(s) in the
+final list.
+
+=back
+
+See Mason::t::Plugins::test_plugin_specs in the Mason distribution for some
+examples.
+
+=head1 DEFAULT PLUGINS
+
+Mason will always add the L<@Default|Mason::PluginBundle::Default> bundle
+regardless of whether you pass your own list. You can remove individual default
+plugins that you don't like:
+
+    plugins => ['-DollarDot', ...]
+
+or the whole list:
+
+    plugins => ['-@Default', ...]
+
+=head1 CREATING PLUGINS
+
+Note: If you want to modify behavior for a particular application only, it
+might be more convenient to create L<subclasses|Mason::Manual::Subclasses>.
+
+A plugin consists of the main plugin class and one or more roles. The main
+class currently looks like this:
+
+    package Mason::Plugin::MyPlugin;
+    use Moose;
+    with 'Mason::Plugin';
+
+    # Optional: declare other plugin dependencies
+    method requires_plugins { qw(A @D) }
+
+    1;
+
+    __END__
+
+    =pod
+
+    =head1 NAME
+
+    Mason::Plugin::MyPlugin - My plugin
+
+    ....
+
+Its main responsibilities are to include the role 'Mason::Plugin' and document
+itself. It may also specify a C<requires_plugins> that returns a list of
+dependencies with the same syntax as the C<plugins> parameter to C<Mason->new>.
+
+The real action is in the role classes, which live underneath, and each modify
+a single Mason class:
+
+    package Mason::Plugin::MyPlugin::Interp;
+    use Mason::PluginRole;
+
+    # Modify Mason::Interp
+
+    ...
+
+    package Mason::Plugin::MyPlugin::Compilation;
+    use Mason::PluginRole;
+
+    # Modify Mason::Compilation
+
+    ...
+
+When a plugin is applied, each of its roles will be automatically applied to
+the appropriate Mason class. For example, in the example above
+C<Mason::Plugin::MyPlugin::Interp> and C<Mason::Plugin::MyPlugin::Compilation>
+will be applied to Mason::Interp and Mason::Compilation respectively.
+
+=head2 Pluggable Mason classes
+
+As of this writing the following Mason classes can be modified with plugins:
+
+    Mason::CodeCache
+    Mason::Compilation
+    Mason::Component
+    Mason::Component::ClassMeta
+    Mason::Component::Import
+    Mason::Component::Moose
+    Mason::Interp
+    Mason::Request
+    Mason::Result
+
+=head2 Extra classes in plugin
+
+If you have extra classes in your plugin that aren't automatically providing a
+role to a Mason class, put them in C<Extra.pm> or the C<Extra> subdirectory,
+e.g.
+
+   package Mason::Plugin::MyPlugin::Extra::Utils;
+   ...
+
+That will ensure that your classname will not conflict with a future Mason
+class name.
+
+=head1 CREATING PLUGIN BUNDLES
+
+A plugin bundle just collects one or more plugins and/or other bundles. It
+looks like this:
+
+    package Mason::PluginBundle::MyBundle
+    use Moose;
+    with 'Mason::PluginBundle';
+    
+    sub requires_plugins {
+        return (
+            'A',
+            'B',
+            '+My::Plugin::C',
+            '@D',
+            '+My::PluginBundle::E',
+            );
+    }
+    
+    1;
+    
+    __END__
+    
+    =pod
+    
+    =head1 NAME
+    
+    Mason::PluginBundle::MyBundle - My plugin bundle
+    
+    =head1 INCLUDED PLUGINS
+    
+    =over
+    
+    =item A
+    =item B
+    =item +My::Plugin::C
+    =item @D
+    =item +My::PluginBundle::E
+    
+    =back
+    
+    ....
+
+The C<requires_plugins> method returns a list of entries, with the same syntax
+as the C<plugins> parameter to C<Mason->new>.
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Ricardo Signes <rjbs@cpan.org> for L<Dist::Zilla|Dist::Zilla> and
+L<Pod::Weaver|Pod::Weaver>, which got me thinking in plugins and lent the
+plugin and bundle name syntax.
+
+=head1 SEE ALSO
+
+L<Mason|Mason>
+
+=head1 AUTHOR
+
+Jonathan Swartz <swartz@pobox.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Jonathan Swartz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

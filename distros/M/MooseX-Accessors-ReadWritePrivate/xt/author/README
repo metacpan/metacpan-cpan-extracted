@@ -1,0 +1,3 @@
+This directory contains tests that should only be run on a developer's machine because they aren't relevant during installation or that they are likely to fail anywhere other than the developer's machine.
+
+For example, using Test::Perl::Critic can produce errors when the locally installed version of Perl::Critic is different than the one on the developer's machine.

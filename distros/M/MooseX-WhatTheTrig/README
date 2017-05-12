@@ -1,0 +1,67 @@
+NAME
+    MooseX::WhatTheTrig - what attribute triggered me?
+
+SYNOPSIS
+       use v5.14;
+   
+       package Goose {
+          use Moose;
+          use MooseX::WhatTheTrig;
+      
+          has foo => (
+             traits  => [ WhatTheTrig ],
+             is      => 'rw',
+             trigger => sub {
+                my $self = shift;
+                my $attr = Moose::Util::find_meta($self)->triggered_attribute;
+                say "Triggered $attr";
+             },
+          );
+       }
+   
+       my $obj = Goose->new(foo => 42);    # says "Triggered foo"
+       $obj->foo(999);                     # says "Triggered foo"
+
+DESCRIPTION
+    Moose trigger subs get passed two (sometimes three) parameters:
+
+    *   The object itself.
+
+    *   The new attribute value.
+
+    *   The old attribute value (if any).
+
+    The sub doesn't get told which attribute triggered it. This may present a
+    problem if you wish to have the same coderef triggered from several
+    different attributes.
+
+    This module adds a `$meta->triggered_attribute` method to your class'
+    metaobject, which allows you to check which attribute has been triggered.
+
+    Yes, it works if you trigger one attribute from another attribute.
+
+    Yes, it works in roles.
+
+    Yes, it works with inheritance.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-WhatTheTrig>.
+
+SEE ALSO
+    <http://stackoverflow.com/questions/22306330/moose-trigger-caller>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

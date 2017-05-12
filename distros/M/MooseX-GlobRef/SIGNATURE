@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7a282fc0467663c85c3f59e86a003ab4694bc083 Build.PL
+SHA1 d86afb25f27b837091f8906c4b032836167e43aa Changes
+SHA1 5950466527e2531cd61c2957baca524c16f62a24 Incompatibilities
+SHA1 da7d205cfd1b79b38c7a6d18ca55373470086825 LICENSE
+SHA1 2adea877c1a64f083dcdf86a1b1372ab7822830c MANIFEST
+SHA1 4e1b00d61265c6c39a6f571c0f61f74226005ffb MANIFEST.SKIP
+SHA1 ad281d1d4e4bd5e133a88ea02536daf2099826d8 META.yml
+SHA1 76756a991860f0e874ee1db6f84c63d174d9a948 Makefile.PL
+SHA1 72d9feac241faeba14d2c23238e8368a51fd9f9b README
+SHA1 fceef476c4bb4702155dcb45ac030eed11f32cd2 eg/extends_io_file.pl
+SHA1 e6a109b4b38899b6056523dea332450d1661614c eg/my_io.pl
+SHA1 07c8688af358fe069b916882d195b507a74b2e59 lib/MooseX/GlobRef.pm
+SHA1 2cd53f4a3ae65a75e26cf9ac49cc41443aedbe1b lib/MooseX/GlobRef/Object.pm
+SHA1 b77aa356a3f7538010e15bbe1b1147609377f0d8 lib/MooseX/GlobRef/Role/Meta/Instance.pm
+SHA1 e6154aa849f119298337cdb7e5eaa9af791d97a4 lib/MooseX/GlobRef/Role/Object.pm
+SHA1 911526ec5bb16d2e1188562ec17799cb44de446a t/all_tests.t
+SHA1 d922d419974ea2a46afb7b2bcf976aec2ac00e24 t/test.pl
+SHA1 2dbe2947737d1c727fc827eaed7b549559858624 t/tlib/MooseX/GlobRef/ObjectImmutableTest.pm
+SHA1 5ad50f18455ea7aa75593c2f5987388579e3168b t/tlib/MooseX/GlobRef/ObjectTest.pm
+SHA1 3c8c7302d8425fcbcce256e7486252e7fd1a87de t/tlib/MooseX/GlobRefImmutableTest.pm
+SHA1 6b223cb73a62c62c67d88893ca4ae8978ac1a06f t/tlib/MooseX/GlobRefTest.pm
+SHA1 262b094511d140d23999592d498a964ffaa6213a t/tlib/MooseX/GlobRefTestBase.pm
+SHA1 90353a99ac0f719b6f3e58029804d8556cedc2ab xt/check_changes.t
+SHA1 a56d0c02b6c992e04a77d13a6ee89504bd718572 xt/consistent_version_numbers.t
+SHA1 67bb4c141ea95809f3db2d526ce91d9e6d894756 xt/copyright.t
+SHA1 650dccfa9b6f5a98cf731c89041bea8935dbc623 xt/cover.pl
+SHA1 f5aac658ae1888964274e68d179413782082b7ad xt/distribution.t
+SHA1 44147122d52fef90ab3a2c65ebba4f89342174f8 xt/kwalitee.t
+SHA1 6e7f9dde7560793bcb40acc41561e07d163ad6d1 xt/minimumversion.t
+SHA1 e8daa0c73cfc304c240fad2d2c2b1b628175a89d xt/perlcritic.t
+SHA1 0fb86301cacc373b33a51d85dc55c62f3d95e080 xt/perlcriticrc
+SHA1 775b3ac02805b6d703614f42608732fb43af2a41 xt/pod_coverage.t
+SHA1 bef7d46eb5cbc3e67956d4e823ec199f41ab9268 xt/pod_spell.t
+SHA1 511b6a951c5f304e24f0ec832faf1a1f265ccb5c xt/pod_spellrc
+SHA1 2c579b58def8daec94f41b628ac81c256faaa2b1 xt/pod_syntax.t
+SHA1 a38994922fda6d64e2ee75198fadc464a221fea9 xt/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkybvSkACgkQhMHHe8CxClvM8ACgv9REAxr9yez7aU8HCekWEKkQ
+EBkAoNNnaix/C0us9U1VI6kCvAVkmSKl
+=EnIi
+-----END PGP SIGNATURE-----

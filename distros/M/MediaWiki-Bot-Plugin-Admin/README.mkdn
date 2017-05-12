@@ -1,0 +1,195 @@
+# NAME
+
+MediaWiki::Bot::Plugin::Admin - A plugin to MediaWiki::Bot providing admin functions
+
+# VERSION
+
+version 3.004000
+
+# SYNOPSIS
+
+    use MediaWiki::Bot;
+
+    my $bot = MediaWiki::Bot->new('Account');
+    $bot->login('Account', 'password');
+    my @pages = ('one', 'two', 'three');
+    foreach my $page (@pages) {
+        $bot->delete($page, 'Deleting [[:Category:Pages to delete]] en masse');
+    }
+
+# DESCRIPTION
+
+A plugin to the MediaWiki::Bot framework to provide administrative
+functions to a bot.
+
+# METHODS
+
+## import()
+
+Calling import from any module will, quite simply, transfer these
+subroutines into that module's namespace. This is possible from any
+module which is compatible with MediaWiki::Bot. Typically, you will
+`use MediaWiki::Bot` and nothing else. Just use the methods,
+MediaWiki::Bot automatically imports plugins if found.
+
+## rollback($pagename, $username[,$summary[,$markbot]])
+
+Uses rollback to revert to the last revision of $pagename not edited
+by the latest editor of that page. If $username is not the last editor
+of $pagename, you will get an error; that's why it is a _very good
+idea_ to set this. If you do not, the latest edit(s) will be rolled
+back, and you could end up rolling back something you didn't intend
+to. Therefore, $username should be considered __required__. The
+remaining parameters are optional: $summary (to set a custom rollback
+edit summary), and $markbot (which marks both the rollback and the
+edits that were rolled back as bot edits).
+
+    $bot->rollback("Linux", "Some Vandal");
+    # OR
+    $bot->rollback("Wikibooks:Sandbox", "Mike.lifeguard", "rvv", 1);
+
+## delete($page[,$summary])
+
+Deletes the page with the specified summary. If you omit $summary,
+a generic one will be used.
+
+    my @pages = ('Junk page 1', 'Junk page 2', 'Junk page 3');
+    foreach my $page (@pages) {
+        $bot->delete($page, 'Deleting junk pages');
+    }
+
+## undelete($page[,$summary])
+
+Undeletes $page with $summary. If you omit $summary, a generic one
+will be used.
+
+    $bot->undelete($page);
+
+## delete_archived_image($archivename, $summary)
+
+Deletes the specified revision of the image with the specified summary.
+A generic summary will be used if you omit $summary.
+
+    # Get the archivename somehow (from iiprop)
+    $bot->delete_archived_image('20080606222744!Albert_Einstein_Head.jpg', 'test');
+
+## block($options_hashref)
+
+Blocks the user with the specified options. All options optional except
+user and length. Anononly, autoblock, blockac, blockemail and blocktalk
+are true/false. Defaults to a generic summary, with all options disabled.
+
+    $bot->block({
+        user        => 'Vandal account 2',
+        length      => 'indefinite',
+        summary     => '[[Project:Vandalism|Vandalism]]',
+        anononly    => 1,
+        autoblock   => 1,
+    });
+
+For backwards compatibility, you can still use this deprecated method call:
+
+    $bot->block('Vandal account', 'infinite', 'Vandalism-only account', 1, 1, 1, 0, 1);
+
+## unblock($user[,$summary])
+
+Unblocks the user with the specified summary.
+
+    $bot->unblock('Jimbo Wales', 'Blocked in error');
+
+## unprotect($page, $reason)
+
+Unprotects a page. You can also set parameters for protect() such that 
+the page is unprotected.
+
+    my @obsolete_protections = ('Main Page', 'Project:Community Portal', 'Template:Tlx');
+    foreach my $page (@obsolete_protections) {
+        $bot->unprotect($page, 'Removing old obsolete page protection');
+    }
+
+## protect($page, $reason, $editlvl, $movelvl, $time, $cascade)
+
+Protects (or unprotects) the page. $editlvl and $movelvl may be 'all',
+'autoconfirmed', or 'sysop'. $cascade is true/false.
+
+## transwiki_import($options_hashref)
+
+Do a _transwiki_ import of a page specified in the hashref.
+
+- prefix must be a valid interwiki on the wiki you're importing to. It
+specifies where to import from.
+- page is the title to import from the remote wiki, including namespace
+- ns is the namespace _number_ to import _to_. For example, some wikis
+have a "Transwiki" namespace to import into where cleanup happens before
+pages are moved into the main namespace. This defaults to 0.
+- history specifies whether or not to include the full page history. Defaults
+to 1. In general, you should import the full history, but on very large page
+histories, this may not be possible. In such cases, try disabling this, or
+do an [XML import](#xml_import).
+- templates specifies whether or not to include templates. Defaults to 0;
+
+## xml_import
+
+    $bot->xml_import($filename);
+
+Import an XML file to the wiki. Specify the filename of an XML dump.
+
+## set_usergroups
+
+Sets the user's group membership to the given list. You cannot change membership in
+*, user, or autoconfirmed, so you don't need to list them. There may also be other
+limits on which groups you can set/unset on a given wiki with a given account which
+may result in an error. In an error condition, it is undefined whether any group
+membership changes are made.
+
+The list returned is the user's new group membership.
+
+    $bot->set_usergroups('Mike.lifeguard', ['sysop'], "He deserves it");
+
+## add_usergroups
+
+Add the user to the specified usergroups:
+
+    $bot->add_usergroups('Mike.lifeguard', ['sysop', 'editor'], "for fun");
+
+Returns the list of added usergroups, not the full group membership list like set_usergroups does.
+
+## remove_usergroups
+
+Revoke the user's membership in the listed groups:
+
+    $bot->remove_usergroups('Mike.lifeguard', ['sysop', 'editor'], "Danger to himself & others");
+
+Returns the list of removed groups, not the full group membership list like set_usergroups does.
+
+# AVAILABILITY
+
+The project homepage is [https://metacpan.org/module/MediaWiki::Bot::Plugin::Admin](https://metacpan.org/module/MediaWiki::Bot::Plugin::Admin).
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit [http://www.perl.com/CPAN/](http://www.perl.com/CPAN/) to find a CPAN
+site near you, or see [https://metacpan.org/module/MediaWiki::Bot::Plugin::Admin/](https://metacpan.org/module/MediaWiki::Bot::Plugin::Admin/).
+
+# SOURCE
+
+The development version is on github at [http://github.com/MediaWiki-Bot/MediaWiki-Bot-Plugin-Admin](http://github.com/MediaWiki-Bot/MediaWiki-Bot-Plugin-Admin)
+and may be cloned from [git://github.com/MediaWiki-Bot/MediaWiki-Bot-Plugin-Admin.git](git://github.com/MediaWiki-Bot/MediaWiki-Bot-Plugin-Admin.git)
+
+# BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at [https://github.com/MediaWiki-Bot/MediaWiki-Bot-Plugin-Admin/issues](https://github.com/MediaWiki-Bot/MediaWiki-Bot-Plugin-Admin/issues).
+
+# AUTHORS
+
+- Dan Collins <en.wp.2t47@gmail.com>
+- Mike.lifeguard <mike.lifeguard@gmail.com>
+- patch and bug report contributors
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by the MediaWiki::Bot team <perlwikibot@googlegroups.com>.
+
+This is free software, licensed under:
+
+    The GNU General Public License, Version 3, June 2007

@@ -1,0 +1,30 @@
+Revision history for Perl extension MouseX::Types::Path::Class
+
+0.07
+        - use Module::Install 1.06
+        - added inc/Module/Install/Repository.pm (RT:75534)
+
+0.06
+        - require Mouse 0.39
+        - require MouseX::Types 0.02
+        - recommends MouseX::Getopt 0.2200 
+        - removed Any::Moose test case
+
+0.05
+        - no functional changes
+        - use Mouse 0.19
+        - added Any::Moose test case
+
+0.04
+        - no functional changes
+        - changed version format for avoid warnings (thanks tokuhirom)
+
+0.03
+        - use Mouse 0.15 and MouseX::Types 0.01
+
+0.02
+        - no functional changes, no need to upgrade
+        - fix POD
+
+0.01
+        - original version

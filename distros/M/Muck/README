@@ -1,0 +1,9 @@
+
+Basic install process:
+
+perl Makefile.PL
+make
+make test
+make install
+
+See the INSTALL file for instructions on bringing up the whole environement.

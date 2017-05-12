@@ -1,0 +1,29 @@
+---
+abstract: 'Base32 encoder and decoder'
+author:
+  - 'Daniel Peder <Daniel.Peder@InfoSet.COM>'
+build_requires:
+  Test::More: '0.9'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MIME-Base32
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  utf8: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=MIME-Base32
+  homepage: https://metacpan.org/release/MIME-Base32
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/perl5-utils/MIME-Base32.git
+version: '1.301'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

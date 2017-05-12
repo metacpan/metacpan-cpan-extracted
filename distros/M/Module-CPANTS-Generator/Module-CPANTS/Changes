@@ -1,0 +1,59 @@
+Revision history for Perl module Module::CPANTS:
+
+0.20030725 Sun Jul 27 18:34:46 BST 2003
+	- more recent data
+        - bug fixes for win32 POD
+	- report POD errors
+	- use Pod::Simple::TextContent to properly parse POD and
+	  get an accurate count of the lines - this means that pod
+	  commands now count as code lines
+
+Sun Jul 20 15:09:57 BST 2003
+	- more recent data
+	- now include number of tests (only partial)
+	- now include modules "used" (thanks to Thomas Klausner)
+
+Sat Jun 28 10:52:39 BST 2003
+	- took CPANPLUS out of the prerequisites - it's useful, but
+	  not necessary
+	- fixed typo in POD, noticed by Simon Cozens
+	- now include packed and unpacked distribution size 
+	- now include the total number of releases of that distribution
+	- more recent testers data
+	- more recent data
+	- dedicated to Jos and Elaine
+
+0.20030525 Sun May 25 15:47:56 BST 2003
+	- more recent data
+
+0.20030426 Sun Apr 27 10:43:07 BST 2003
+	- more recent data
+	- now include lines of comments, thanks to Casey West
+
+0.20030421 Wed Apr 23 21:10:11 BST 2003
+	- more recent data
+	- now includes lines of pod / non-pod, thanks to Richard Clamp
+
+0.005 Sun Apr 13 15:59:42 BST 2003
+	- more recent data
+	- now includes CPAN testers data (the number of PASSes
+	  and FAILs)
+
+0.004 Wed Apr  2 22:02:59 BST 2003
+	- more recent data
+	- now include description even for distributions not in
+	  the modules list
+
+0.003 Sat Mar 29 16:30:26 GMT 2003
+	- split into Module::CPANTS and Module::CPANTS::Generator
+	- added interesting files
+
+0.002 Tue Mar 25 21:16:54 GMT 2003
+	- patches by Richard Clamp to make Makefile.PL
+	  work better and also examples/graph_deps.pl
+	- reworking of data structures, see Module::CPANTS
+	- added author and description fields
+
+0.001 Mon Mar 24 22:25:12 GMT 2003
+	- released initial version
+

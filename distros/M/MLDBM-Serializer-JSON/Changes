@@ -1,0 +1,10 @@
+Revision history for MLDBM-Serializer-JSON
+
+0.002 2013-09-11
+ - Move repository to github
+ - Update Metadata
+ - Move AUTHOR tests to xt/
+ - Adjust requirements to recent environments (Perl 5.14 is the new 5.8 ^^)
+
+0.001 2010-07-15
+ - First version, released on an unsuspecting world.

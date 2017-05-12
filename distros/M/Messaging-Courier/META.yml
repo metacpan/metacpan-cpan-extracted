@@ -1,0 +1,44 @@
+--- #YAML:1.0
+name: Messaging-Courier
+version: 0.42
+license: perl
+distribution_type: module
+requires:
+  Class::Accessor::Chained: 0.01
+  Clone: 0.01
+  Data::UUID: 0.01
+  DateTime: 0.01
+  File::HomeDir: 0.01
+  Regexp::Common: 0.01
+  Spread: 0.01
+  Term::ReadKey: 0.01
+  Test::Exception: 0.01
+  XML::LibXML: 0.01
+  XML::asData: 0
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Messaging::Courier:
+    file: lib/Messaging/Courier.pm
+    version: 0.42
+  Messaging::Courier::ApacheGateway:
+    file: lib/Messaging/Courier/ApacheGateway.pm
+  Messaging::Courier::ChatMessage:
+    file: lib/Messaging/Courier/ChatMessage.pm
+  Messaging::Courier::Config:
+    file: lib/Messaging/Courier/Config.pm
+  Messaging::Courier::ExampleMessage:
+    file: lib/Messaging/Courier/ExampleMessage.pm
+  Messaging::Courier::ExampleReply:
+    file: lib/Messaging/Courier/ExampleReply.pm
+  Messaging::Courier::Frame:
+    file: lib/Messaging/Courier/Frame.pm
+  Messaging::Courier::Message:
+    file: lib/Messaging/Courier/Message.pm
+  Messaging::Courier::TextMessage:
+    file: lib/Messaging/Courier/TextMessage.pm
+  Messaging::Courier::Wiretap:
+    file: lib/Messaging/Courier/Wiretap.pm
+    version: 0.42
+generated_by: Module::Build version 0.21

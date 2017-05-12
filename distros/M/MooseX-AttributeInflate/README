@@ -1,0 +1,41 @@
+MooseX-AttributeInflate
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc MooseX::AttributeInflate
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooseX-AttributeInflate
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/MooseX-AttributeInflate
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/MooseX-AttributeInflate
+
+    Search CPAN
+        http://search.cpan.org/dist/MooseX-AttributeInflate
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2009 Jeremy Stashewsky
+Copyright 2009 Socialtext Inc., all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,21 @@
+/*
+Check whether erfl and isnanl can be linked.
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+int main(int argc, char *argv[]) {
+ long double rop, op = strtold(argv[1], NULL);
+ int ret;
+
+ rop = erfl(op);
+ ret = isnanl(op);
+
+ if(rop > 0.6038L && rop < 0.6039L) printf("rop is set to a sane value\n");
+ if(!ret) printf("op is set to the correct value\n");
+
+ return 0;
+}
+

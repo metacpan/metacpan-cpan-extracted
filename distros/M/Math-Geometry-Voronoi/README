@@ -1,0 +1,49 @@
+Math::Geometry::Voronoi
+=======================
+
+This module computes Voronoi diagrams from a set of input points.
+Info on Voronoi diagrams can be found here:
+
+  http://en.wikipedia.org/wiki/Voronoi_diagram
+
+This module is a wrapper around a C implementation found here:
+
+  http://www.derekbradley.ca/voronoi.html
+
+Which is itself a modification of code by Steve Fortune, the inventor
+of the algorithm used (Fortune's algorithm):
+
+  http://cm.bell-labs.com/who/sjf/
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+     Params::Validate
+     Scalar::Util
+     List::Util      
+
+AUTHOR
+
+Sam Tregar <sam@tregar.com>
+
+COPYRIGHT AND LICENSE
+
+As far as I can tell the underlying C code used here never had a
+license attached to it, or if it did I couldn't find any trace of it.
+If this worries you please contact Steve and Derek through the links
+above.
+
+The Perl and XS code in this library is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself,
+either Perl version 5.8.5 or, at your option, any later version of
+Perl 5 you may have available.

@@ -1,0 +1,123 @@
+NAME
+    HTML::Mason::ApacheHandler - Mason/mod_perl interface
+
+SYNOPSIS
+        use HTML::Mason::ApacheHandler;
+
+        my $ah = HTML::Mason::ApacheHandler->new (..name/value params..);
+        ...
+        sub handler {
+            my $r = shift;
+            $ah->handle_request($r);
+        }
+
+DESCRIPTION
+    The ApacheHandler object links Mason to mod_perl, running components in
+    response to HTTP requests. It is controlled primarily through parameters
+    to the new() constructor.
+
+    handle_request() is not a user method, but rather is called from the
+    HTML::Mason::handler() routine in handler.pl.
+
+PARAMETERS TO THE new() CONSTRUCTOR
+    apache_status_title
+        Title that you want this ApacheHandler to appear as under
+        Apache::Status. Default is "HTML::Mason status". This is useful if
+        you create more than one ApacheHandler object and want them all
+        visible via Apache::Status.
+
+    args_method
+        Method to use for unpacking GET and POST arguments. The valid
+        options are 'CGI' and 'mod_perl'; these indicate that a "CGI.pm" or
+        "Apache::Request" object (respectively) will be created for the
+        purposes of argument handling.
+
+        'mod_perl' is the default and requires that you have installed the
+        "Apache::Request" package.
+
+        If args_method is 'mod_perl', the $r global is upgraded to an
+        Apache::Request object. This object inherits all Apache methods and
+        adds a few of its own, dealing with parameters and file uploads. See
+        "Apache::Request" for more information.
+
+        If the args_method is 'CGI', the Mason request object ($m) will have
+        a method called "cgi_object" available. This method returns the CGI
+        object used for argument processing.
+
+        While Mason will load "Apache::Request" or "CGI" as needed at
+        runtime, it is recommended that you preload the relevant module
+        either in your httpd.conf or handler.pl file, as this will save some
+        memory.
+
+    decline_dirs
+        True or false, default is true. Indicates whether Mason should
+        decline directory requests, leaving Apache to serve up a directory
+        index or a "FORBIDDEN" error as appropriate. See the allowing
+        directory requests section of the administrator's manual for more
+        information about handling directories with Mason.
+
+    interp
+        The interpreter object to associate with this compiler. By default a
+        new object of the specified interp_class will be created.
+
+    interp_class
+        The class to use when creating a interpreter. Defaults to
+        HTML::Mason::Interp.
+
+ACCESSOR METHODS
+    All of the above properties, except interp_class, have standard accessor
+    methods of the same name: no arguments retrieves the value, and one
+    argument sets it, except for args_method, which is not settable. For
+    example:
+
+        my $ah = HTML::Mason::ApacheHandler->new;
+        my $decline_dirs = $ah->decline_dirs;
+        $ah->decline_dirs(1);
+
+OTHER METHODS
+    The ApacheHandler object has a few other publically accessible methods
+    that may be of interest to end users.
+
+    handle_request ($r)
+        This method takes an Apache object representing a request and
+        translates that request into a form Mason can understand. It's
+        return value is an Apache status code.
+
+    prepare_request ($r)
+        This method takes an Apache object representing a request and
+        returns a new Mason request object or an Apache status code. If it
+        is a request object you can manipulate that object as you like, and
+        then call the request object's "exec" method to have it generate
+        output.
+
+        If this method returns an Apache status code, that means that it
+        could not create a Mason request object.
+
+        This method is useful if you would like to have a chance to decline
+        a request based on properties of the Mason request object or a
+        component object. For example:
+
+            my $req = $ah->prepare_request($r);
+            # $req must be an Apache status code if it's not an object
+            return $req unless ref($req);
+
+            return DECLINED
+                unless $req->request_comp->source_file =~ /\.html$/;
+
+            $req->exec;
+
+    request_args ($r)
+        Given an Apache request object, this method returns a three item
+        list. The first item is a hash reference containing the arguments
+        passed by the client's request.
+
+        The second is an Apache request object. This is returned for
+        backwards compatibility from when this method was responsible for
+        turning a plain Apache object into an Apache::Request object.
+
+        The third item may be a CGI.pm object or "undef", depending on the
+        value of the args_method parameter.
+
+SEE ALSO
+    HTML::Mason, HTML::Mason::Admin, HTML::Mason::Interp
+

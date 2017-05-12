@@ -1,0 +1,52 @@
+0.011
+    - Add Socket dependency which is a core module but older versions lack
+      getnameinfo (thanks CPAN Testers!)
+
+0.010
+    - Use Parse::Syslog::Line for parsing of syslog messages in Input::Syslog
+    - Remove remote_hostname attribute in Input::Syslog because RFC5426 states
+      in section 3.4:
+      The source IP address of the UDP datagrams SHOULD NOT be interpreted
+      as the identifier for the host that originated the syslog message.
+      Instead the IPv4 or IPv6 address is always stored in the received_from
+      field.
+
+0.009
+    - Change remote_hostname to return the remote IP address
+      rather than doing a reverse DNS lookup per syslog packet
+    - Add example of the Input::Syslog message format
+
+0.008
+    - Add remote_hostname attribute to Input::Syslog (abraxxa)
+
+0.007
+    - Add tests (perigrin)
+    - Add an output (perigrin)
+
+0.006
+    - Stop forcing AnyEvent model to POE.
+
+0.005
+    - Fix dependencies by requiring Time::ParseDate
+
+0.004
+    - Drop need for POE by implementing in plain AnyEvent
+      (POE and AnyEvent aren't getting on nicely for me in a
+      real environment)
+    - Drop support for TCP syslog as I'm not using it / can't test
+      it currently.
+
+0.003
+    - Change 'host' command line option to 'hostname' to fit in
+      with other adaptors
+
+0.002
+    - Fix docs
+    - Note output does not yet work.
+
+0.001_01
+    - Rename
+
+0.001
+    - Initial version
+

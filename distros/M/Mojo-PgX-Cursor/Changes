@@ -1,0 +1,52 @@
+Revision history for Perl extension Mojo-PgX-Cursor
+
+0.502001 2016-02-06T18:52:14Z
+
+    - Fix "circular reference" that prevented proper destruction of
+      Mojo::PgX::Cursor cursors.  See `t/scope-destroy-example.t`.
+
+0.502000 2015-10-26T02:44:54Z
+
+    - Add `wait` method on Mojo::PgX::Cursor::Results.
+    - Remove `fetch_count` attribute on Mojo::PgX::Cursor::Results in favor of
+      overloading `rows` to set the fetch count.
+
+0.501000 2015-10-25T03:27:57Z
+
+    - Rename `fetch` attribute on Mojo::PgX::Cursor::Results to `fetch_count`.
+    - Documentation improvements.
+
+0.500001 2015-10-24T21:49:36Z
+
+    - Fix race condition when trying to access `rows` or `columns` before
+      results have been fetched.
+
+0.500000 2015-10-24T07:08:26Z
+
+    - Add documentation about versioning.
+    - Suppress PostgreSQL notices in tests.
+
+0.04 2015-10-24T06:42:44Z
+
+    - Specify implicit dependencies.
+    - Specify required versions of dependencies.
+
+0.03 2015-10-24T05:28:43Z
+
+    - Manually created cursors now also default to fetching 100 row iterations.
+    - Fix warning during cursor destruction.
+    - Documentation cleanup.
+    - Internal code cleanup.
+
+0.02 2015-10-24T03:56:38Z
+
+    - Results pre-fetch next batch immediately rather than waiting for first
+      row of current batch to be pulled off.
+    - Increase default fetch size to 100.
+    - Remove the 'reload_at' attribute; it was unnecessary complexity.
+    - Remove the 'monkey_patch' import option.  If you wish to monkey patch
+      Mojo::Pg then see the documentation on how to do so.
+
+0.01 2015-10-23T02:15:50Z
+
+    - original version

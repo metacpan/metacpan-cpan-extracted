@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Module-TestConfig
+version:             0.05
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Config::Auto:                  0.03
+    Params::Validate:              0.58
+    Term::ReadKey:                 2.21
+    Test::Warn:                    0.07
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

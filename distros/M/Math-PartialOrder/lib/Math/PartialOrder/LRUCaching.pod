@@ -1,0 +1,134 @@
+=head1 NAME
+
+Math::PartialOrder::LRUCaching -
+class for partial orders using the Tie::Cache module to cache lookup
+results.
+
+=head1 SYNOPSIS
+
+  use Math::PartialOrder::LRUCaching;
+
+  ...
+
+=head1 REQUIRES
+
+Tie::Cache,
+Math::PartialOrder,
+Math::PartialOrder::Std,
+Math::PartialOrder::Caching.
+
+=head1 DESCRIPTION
+
+Math::PartialOrder::LRUCaching is a Math::PartialOrder::Base implementation for
+rooted finite partial orders (datatype hierarchies) which caches
+the results of inheritance- and type-operation-lookups
+in a C<Tie::Cache> object, which implements an LRU (least recently used)
+cache.  It inherits from Math::PartialOrder::Caching.
+
+Math::PartialOrder::LRUCaching supports all methods
+described in L<Math::PartialOrder::Base>.
+
+=pod
+
+=head1 PACKAGE-GLOBAL VARIABLES
+
+=over 4
+
+=item * C<$CACHE_KEY_SEP>
+
+This variable is imported from Math::PartialOrder::Caching.
+Its value is a perl string which will
+be used as a separator between operation- and/or
+type-identifiers for
+purposes of placing them in the cache.
+
+
+=item * C<$IN_CACHE_ATTRS>
+
+A hash reference used to generate the inheritance-cache
+for objects created with the C<new()> method.
+The default value is:
+
+  { MaxCount => 5000 }
+
+=item * C<$OP_CACHE_ATTRS>
+
+A hash reference used to generate the operations-cache
+for objects created with the C<new()> method.
+The default value is:
+
+  { MaxCount => 5000 }
+
+=back
+
+
+
+
+=head1 METHODS
+
+=head2 Construction & Initialization
+
+=over 4
+
+=item * C<new(\%args)>
+
+Creates and returns a new Math::PartialOrder::LRUCaching object.
+Recognized keys for \%args are:
+
+=over 4
+
+=item * C<< root =E<gt> $r >>
+
+Root the new partial order at $r.  Default is 'BOTTOM'.
+
+=item * C<< incache_attrs =E<gt> \%attrs >>
+
+Use \%attrs as the attribute-arguments to C<tie()> for
+the inheritance-cache.  Default is C<$IN_CACHE_ATTRS>.
+
+=item * C<< opcache_attrs =E<gt> \%attrs >>
+
+Use \%attrs as the attribute-arguments to C<tie()> for
+the operations-cache.  Default is C<$OP_CACHE_ATTRS>.
+
+=back
+
+
+=pod
+
+=back
+
+=head2 Additional Methods
+
+None.
+
+
+=head1 ACKNOWLEDGEMENTS
+
+perl by Larry Wall.
+
+Tie::Cache by Joshua Chamas E<lt>chamas@alumni.stanford.orgE<gt>.
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>jurish@ling.uni-potsdam.deE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001, Bryan Jurish.  All rights reserved.
+
+This package is free software.  You may redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+perl(1).
+Math::PartialOrder(3pm).
+Math::PartialOrder::Base(3pm).
+Math::PartialOrder::Std(3pm).
+Math::PartialOrder::Caching(3pm).
+Math::PartialOrder::CMasked(3pm).
+Math::PartialOrder::CEnum(3pm).
+Math::PartialOrder::Loader(3pm).
+Tie::Cache(3pm).
+

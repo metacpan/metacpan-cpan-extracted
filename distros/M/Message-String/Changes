@@ -1,0 +1,50 @@
+0.1.9     2015-10-05 20:47:53+01:00 Europe/London
+    - Some of the CPANTS test nodes running Windows Strawberry Perl are 
+      reporting dubious test results due to broken TAP stream which results
+      from errors emanating from Term::ReadKey on that platform only -
+      
+      GetConsoleMode failed, LastError=|6| at C:/Strawberry201/perl/site/lib/Term/ReadKey.pm line 334.
+      
+      Rather than dismiss it, I've switched from Term::ReadKey to IO::Stty
+      in order to switch off echo for password entry. Hopefully it works.
+      We'll see.
+      
+    - Minor comment changes
+    
+    - CI green lights Perl v5.8 thru v5.23 and coverage is at 100%;
+      releasing to CPAN.
+
+0.1.8     2015-10-05 00:17:54+01:00 Europe/London
+    - Remove dependency on Syntax::Feature::Void as this was placing a 
+      limit of 5.14 on the minimum supported Perl version, with CI tests
+      only passing for 5.14 thru 5.20.
+    
+    - Remove seemingly benign duplicate use of "my" at line 1022 in a list
+      declaration. Highlighted by CI tests for bleeding edge Perl 5.
+      
+    - CI passes for Perl 5.8 thru 5.22 and blead (5.23).
+      
+0.1.7     2015-10-01 23:46:16+01:00 Europe/London
+    - Documentation fixed and expanded in places.
+    
+0.1.6     2015-10-01 22:18:49+01:00 Europe/London
+    - Fix: errors trigger a Carp::croak in void context, rather than just
+      being printed to STDERR.
+      
+0.1.5     2015-10-01 12:15:09+01:00 Europe/London
+    - REGEX date match fixed in 00-load.t 
+
+0.1.4
+    - Actually fix dependency issue :-)
+
+0.1.3
+    - Attemp to fix dependency issue
+
+0.1.2
+    - Removed cover_db/* which was appearing on CPAN as Other Files
+
+0.1.1     2015-09-29 12:13:34+01:00 Europe/London
+    - Additional documentation added
+    
+0.1.0     2015-09-29 12:08:36+01:00 Europe/London
+    - Original version released to CPAN

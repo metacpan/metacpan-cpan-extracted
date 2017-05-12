@@ -1,0 +1,28 @@
+TYPEMAP
+track_t	*	O_OBJECT_TRACK
+ipc_t *		O_OBJECT_IPC
+
+OUTPUT
+O_OBJECT_TRACK
+	sv_setref_pv( $arg, "MP3::Player::PktConcert::Track", (void *)$var );
+
+O_OBJECT_IPC
+	sv_setref_pv( $arg, "MP3::Player::PktConcert", (void *)$var );
+
+INPUT
+O_OBJECT_TRACK
+	if( sv_isobject( $arg ) && (SvTYPE(SvRV($arg)) == SVt_PVMG )) {
+		$var = ($type) SvIV((SV*) SvRV($arg));
+	} else {
+		warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\");
+		XSRETURN_UNDEF;
+	}
+
+O_OBJECT_IPC
+	if( sv_isobject( $arg ) && (SvTYPE(SvRV($arg)) == SVt_PVMG )) {
+		$var = ($type) SvIV((SV*) SvRV($arg));
+	} else {
+		warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\");
+		XSRETURN_UNDEF;
+	}
+

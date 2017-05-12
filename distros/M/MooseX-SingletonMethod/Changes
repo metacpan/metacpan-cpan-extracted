@@ -1,0 +1,13 @@
+Revision history for MooseX-SingletonMethod
+
+0.01    Weds July 15, 2009
+    * First version, released on an unsuspecting world.
+
+0.02    Fri July 31, 2009
+    * API changes
+      - Role moved....  renamed MX::SingletonMethod to MX::SingletonMethod Role
+      - MX::SingletonMethod is now a class giving you Moose with SingletonMethod attached
+
+0.03    Mon August 3, 2009
+    * Bumped version to 0.03 because of strange POD issues
+      - MX::SM::Role had just MX::SM in it pod... it this the cause of problem?

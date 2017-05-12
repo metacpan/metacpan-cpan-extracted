@@ -1,0 +1,1529 @@
+=head1 NAME
+
+Math::PartialOrder::Base -
+abstract base class for partial orders, especially datatype hierarchies.
+
+
+=head1 SYNOPSIS
+
+  use Math::PartialOrder::Base;
+
+  #
+  # Package Variables
+  #
+  $Math::PartialOrder::Base::TYPE_TOP = '__TOP__';   # marks broken joins
+  $Math::PartialOrder::Base::VERBOSE = 2;            # how much should we carp?
+  $Math::PartialOrder::Base::WANT_USER_HOOKS = 1;    # run the user hooks?
+
+  #
+  # Construction & Initialization
+  #
+  $h = Math::PartialOrder::MyClass->new(%args);   # (req) new partial order
+
+  #
+  # Hierarchy Manipulation
+  #
+  $newroot  = $h->root($typ);             # (req) set root-type
+
+  $h = $h->add($typ, @parents);           # (req) add $typ under @parents
+  $h = $h->move($typ, @parents);          # (req) move $typ to under @parents
+  $h = $h->remove(@types);                # (req) delete all given @types
+
+  $h = $h->add_parents($typ, @parents);   # (opt) add @parents over $typ
+  $h = $h->replace($old, $new);           # (opt) replace $old with $new
+  $h1->ensure_types(@types);              # (opt) ensure that @types are defined
+
+  $h = $h->clear();                       # (opt) clear hierarchy
+  $h2 = $h1->clone();                     # (opt) exact copy
+  $h1 = $h1->assign($h2);                 # (opt) information-cloning
+  $h1 = $h1->merge($h2, $h3, ...);        # (opt) merge hierarchies
+
+  #
+  # Hierarchy Information
+  #
+  $size = $h->size();                     # (opt) number of types defined
+  $root = $h->root();                     # (req) get root-type
+  @leaves = $h->leaves();                 # (opt) list of leaf-types
+  @types = $h->types();                   # (req) list of all types
+
+  $bool = $h1->is_equal($h2);             # (opt) test structural equivalence
+  $bool = $h->is_circular();              # (opt) test for circularity
+  $bool = $h->is_deterministic();         # (opt) test for determinism
+  ($t1,$t2) = $h->get_nondet_pair();      # (opt) get non-deterministic type-pair
+  $bool = $h->is_treelike();              # (opt) test for tree-structure
+  $typ = $h->get_multiparent_type();      # (opt) get type with multiple parents
+
+  @types = $h->parents($typ);             # (req) return all parents of $typ
+  @types = $h->children($typ);            # (req) return all children of $typ
+  @types = $h->ancestors($typ);           # (opt) return all ancestors of $typ
+  @types = $h->descendants($typ);         # (opt) return all descendants of $typ
+
+  $bool = $h->has_type($typ);                    # (opt) boolean type-check
+  $bool = $h->has_types(@types);                 # (opt) boolean type-check
+  $bool = $h->has_parent($typ, $parent);         # (opt) boolean parent-check
+  $bool = $h->has_child($typ, $child);           # (opt) boolean child-check
+  $bool = $h->has_ancestor($typ, $ancestor);     # (opt) boolean ancestor-check
+  $bool = $h->has_descendant($typ, $descendant); # (opt) boolean descendant-check
+
+  #
+  # Inheritance Operations
+  #
+  $bool = $h->subsumes($t1,$t2);                   # (opt) inheritance '<='
+  $bool = $h->properly_subsumes($t1,$t2);          # (opt) inheritance '<'
+  $bool = $h->extends($t1,$t2);                    # (opt) inheritance '>='
+  $bool = $h->properly_extends($t1,$t2);           # (opt) inheritance '>'
+
+  @lubs = $h->least_upper_bounds($t1,$t2);         # (opt) lub operation
+  @mcds = $h->min_common_descendants($typ1,$typ2); # (opt) nontrivial lubs
+  $join = $h->njoin($t1,$t2,...);                  # (opt) determ. n-ary lub
+  $join = $h->type_join($typ1,$typ2,...);          # (opt) ... for types only
+
+  @glbs = $h->greatest_lower_bounds($t1,$t2);      # (opt) glb operation
+  @mcas = $h->max_common_ancestors($typ1,$typ2);   # (opt) nontrivial glbs
+  $meet = $h->nmeet($t1,$t2,...);                  # (opt) determ. n-ary glb
+  $meet = $h->type_meet($typ1,$typ2);              # (opt) ... for types only
+
+  #
+  # User-Defined Attributes
+  #
+  $hashref = $h->_attributes($typ);            # (rcm) get user type-data hash
+  $h->_attributes($typ,$hashref);              # (rcm) set user type-data hash
+
+  $hashref = $h->_hattributes();               # (rcm) hierarchy attributes
+  $h->_hattributes($hashref);                  # (rcm) set hierarchy attributes
+
+  $hashref = $h->get_attributes($typ);         # (opt) user type-data
+  $val = $h->get_attribute($typ, $attr);       # (opt) get user type-data
+  $val = $h->set_attribute($typ, $attr, $val); # (opt) set user type-data
+
+  $val = $h->get_hattribute($attr);            # (opt) get user hierarchy-data
+  $val = $h->set_hattribute($attr, $val);      # (opt) set user hierarchy-data
+
+  #
+  # Sorting and Comparison
+  #
+  $val = $h->compare($t1,$t2);            # (opt) $val is -1, 0, 1, or undef
+  $val = $h->_compare($typ1,$typ2);       # (opt) ... for types only
+
+  @youngest = $h->min(@types);            # (opt) minimal types in @types
+  @eldest   = $h->max(@types);            # (opt) maximal types in @types
+
+  @min = $h->min_extending($base,@types); # (opt) minimal extending $base
+  @max = $h->max_subsuming($base,@types); # (opt) maximal subsuming $base
+
+  @sorted = $h->subsort(@types);          # (opt) sort by type-subsumption
+  @strata = $h->stratasort(@types);       # (opt) stratify by type-subsumption
+  $strata = $h->get_strata(@types);       # (opt) get stratification-hash
+
+  #
+  # Compiling-Hierarchy Conventions
+  #
+  $bool = $h->compiled()              # (opt) for compilable hierarchies
+  $bool = $h->compiled($bool2)        # (opt) ensure (not) compiled
+  $bool = $h->compile();              # (opt) force compilation
+
+  #
+  # Iteration Utilities
+  #
+  $h->iterate(\&next,\&callback,\%args);          # (opt) abstract iterator
+  $h->iterate_step(\&next,\&callback,\%args);     # (opt) abstract iterator
+  $h->iterate_tracking(\&next,\&callback,\%args); # (opt) abstract iterator
+  $h->iterate_strata(\&next,\&callback,\%args);   # (opt) abstract iterator
+
+  $h->iterate_pc(\&callback,\%args);              # (opt) parent-to-child
+  $h->iterate_cp(\&callback,\%args);              # (opt) child-to-parent
+  $h->iterate_pc_step(\&callback,\%args);         # (opt) parent-to-child
+  $h->iterate_cp_step(\&callback,\%args);         # (opt) child-to-parent
+
+  #
+  # Miscellaneous Utilities
+  #
+  $h->dump();                  # (opt) return a dump of hierarchy contents
+
+
+=head1 REQUIRES
+
+Carp, Exporter
+
+=head1 DESCRIPTION
+
+This package is just an abstract placeholder for partial orders, especially
+"datatype hierarchies".  It was formerly called "QuD::Hierarchy".
+It declares some abstract functions, which themselves call methods
+which should be defined by any class inheriting from Math::PartialOrder::Base.
+
+=head1 PACKAGE VARIABLES
+
+=over 4
+
+=item * C<$Math::PartialOrder::Base::TYPE_TOP>
+
+Aliases: C<$Math::PartialOrder::Base::TYPE_NONE>
+
+The value of this package variable is used as a return value
+for failing deterministic type-join operations.  It is
+exportable.  The default value is C<'__TOP__'>.
+
+=item * C<$Math::PartialOrder::Base::VERBOSE>
+
+The value of this package variable is used to determine
+the amount of warning information produced when an attempt
+is made to perform a deterministic hierarchy operation
+(such as C<nmeet()> or C<njoin()>) on a non-deterministic
+hierarchy.
+
+Recognized values are 0 (no warnings), 1 (warn with C<carp>) and
+2 (warn with C<cluck> -- prints stack backtrace).
+The default value is 1.
+
+Note that warnings will only be printed to STDERR if
+C<$^W> (C<$WARNING>, if you C<use English>) is in effect.
+
+See Also: L<Carp>, L<perlvar>.
+
+
+=item * C<$Math::PartialOrder::Base::WANT_USER_HOOKS>
+
+The value of this variable determines whether the
+user-defined hooks will be called during high-level hierarchy
+lookup operations such as C<subsumes()>, C<properly_subsumes()>,
+C<lub()>, and C<glb()>.  The default value is C<1> (true).
+
+=back
+
+=cut
+
+
+#--------------------------------------------------------------
+# Methods
+#--------------------------------------------------------------
+=pod
+
+=head1 METHODS
+
+Below is a list of abstract methods which define the interface
+to Math::PartialOrder::Base objects and their descendants.
+
+All methods are defined in Math::PartialOrder::Base, and can be optionally
+overridden by subclasses unless otherwise noted.
+
+=cut
+
+#----------------------------------------------------------------
+# Construction
+#----------------------------------------------------------------
+=pod
+
+=head2 Construction and Initialization
+
+=pod
+
+=over 4
+
+=item * C<new(\%args)>
+
+I<Status: Required>
+
+Returns a new Math::PartialOrder::Base object.  This method should
+recognize the following keyword arguments in the
+hashref \%args:
+
+=over 4
+
+=item * C<< root =E<gt> $root >>
+
+Set the initial hierarchy-root to '$root'.  This implies
+that $root is subsequently defined as a type in the
+hierarchy.
+
+=back
+
+
+
+=back
+
+=cut
+
+#----------------------------------------------------------------
+# Manipulation
+#----------------------------------------------------------------
+=pod
+
+=head2 Hierarchy Manipulation
+
+=over 4
+
+=item * C<add($typ, @parents)>
+
+I<Status: Required>
+
+Adds a type named $typ with parent-types @parents (which are also
+added if they do not already exist).  Returns the hierarchy.
+
+
+=item * C<move($typ, @parents)>
+
+I<Status: Required>
+
+Re-assigns a parent-types of $typ to @parents.  Returns the hierarchy.
+
+
+=item * C<remove($typ1, $typ2, ...)>
+
+I<Status: Required>
+
+Removes the types $typ1,$typ2,... from the hierarchy.
+Returns the hierarchy.
+
+'orhpaned' children of $typ1, $typ2, etc. should be
+'adopted' by some type remaining in the hierarchy -- in
+other words, calling this method should not alter
+existing ancestor-descendant relationships for
+types remaining in the hierarchy.
+
+
+=item * C<add_parents($typ, @parents)>
+
+
+
+Adds @parents to the list of parents for the type $typ. Returns the hierarchy.
+
+=item * C<replace($old, $new)>
+
+
+
+Inserts the (possibly new) type $new in the hierarchy in the
+same position as previously occupied by $old, removing $old
+from the hierarchy.  Returns the hierarchy.
+
+
+=item * C<ensure_types(@types)>
+
+Ensures that all types in @types are defined.  Types added
+by this method will be direct children of the hierarchy-root.
+Returns either @types, or, if @types is an empty list,
+returns ($self-E<gt>root).
+
+
+=item * C<clear()>
+
+
+
+Clears the hierarchy.  Returns the newly-cleared hierarchy.
+
+
+=item * C<clone>
+
+Returns a new hierarchy object informationally identical
+to the first.
+
+
+=item * C<$h1-E<gt>assign($h2)>
+
+
+
+Makes $h1 and $h2 informationally identical.  Returns $h1.
+
+
+=item * C<$h1-E<gt>merge($h2, $h3, ...)>
+
+
+
+Merges the information from hierarchies $h2,$h3,... into
+the hierarchy $h1.  Returns $h1 on success, undef on failure.
+
+B<WARNING>: Attribute-values from $h2 override existing values
+in $h1 for any type-attribute pairs which exist in both hierarchies.
+
+
+
+=back
+
+=cut
+
+
+
+#----------------------------------------------------------------
+# Information
+#----------------------------------------------------------------
+=pod
+
+=head2 Hierarchy Information
+
+=over 4
+
+=item * C<size()>
+
+
+
+
+Returns the number of types in the hierarchy.
+
+=item * C<root()>, C<root($typ)>
+
+I<Status: Required>
+
+With no arguments,
+returns the type representing the root of the hierarchy.
+With an argument,
+set the the root of the hierarchy to $typ.  Returns
+the new hierarchy root.
+
+
+=item * C<leaves()>
+
+
+
+Returns the types in the hierarchy which have no children.
+The default implementation scans the whole hierarchy.
+
+
+=item * C<types()>
+
+I<Status: Required>
+
+Returns a list of all types in the hierarchy.
+
+
+=item * C<< $h1-E<gt>is_equal($h2) >>
+
+
+
+Returns a true value if $h1 and $h2 are informationally
+equivalent, false otherwise.
+
+=item * C<is_circular()>, C<is_cyclic()>
+
+
+
+Returns a true value if the hierarchy contains some type
+which is an ancestor of itself, false otherwise.
+
+
+=item * C<is_deterministic()>
+
+
+
+Returns a true value if the hierarchy is a deterministic
+one, also known as a "consistently complete partial order".
+Really, this method just checks whether the hierarchy
+contains a non-deterministic lub-pair.
+
+=item * C<get_nondet_pair()>
+
+Iterates over each pair of types in the hierarchy
+and returns the first pair ($t1,$t2)
+for which a call to C<lub($t1,$t2)> returns a list
+with more than one element.  Returns an empty list
+if no such pair of types is found.
+
+=item * C<is_tree()>
+
+Returns a true value if the hierarchy has a tree-like
+structure, i.e. if no type has more than one parent.
+Such hierarchies are automatically deterministic,
+and this method is much faster than the more general
+C<is_deterministic()> method.
+
+=item * C<get_multiparent_type()>
+
+Iterates over each type in the hierarchy and returns the
+first type with more than one parent.  Returns C<undef>
+if no type with multiple parents was found.
+
+
+=item * C<parents($typ)>
+
+I<Status: Required>
+
+Returns the list of parent-types for $typ.
+
+=item * C<ancestors($typ)>
+
+
+
+Returns the list of all ancestor-types for $typ, in
+breadth-first child-to-parent order.  Ancestors accessible
+by multiple paths may appear only once in the
+returned list.
+
+=item * C<children($typ)>
+
+I<Status: Required>
+
+Returns the list of child-types for $typ.
+
+=item * C<descendants($typ)>
+
+
+
+Returns the list of all descendant-types for $typ, in
+breadth-first parent-to-child order.  Descendants accessible
+via multiple paths may appear only once in the returned
+list.
+
+=item * C<has_type($typ)>
+
+
+
+Returns a true value if the hierarchy contains the type $typ, 
+and a false value otherwise.
+
+=item * C<has_types(@types)>
+
+Returns a true value if all of the @types are defined in
+the hierarchy, false otherwise.
+
+=item * C<has_parent($typ, $parent)>
+
+
+
+Returns true if $parent is a direct parent of $typ, undef otherwise.
+
+=item * C<has_child($typ, $child)>
+
+
+
+Returns true if $child is a direct child of $typ, undef otherwise.
+
+=item * C<has_ancestor($typ, $ancestor)>
+
+
+
+Returns true if $parent is an ancestor of $typ, undef otherwise.
+
+=item * C<has_descendant($typ, $descendant)>
+
+Returns true if $parent is a descendant of $typ, undef otherwise.
+
+
+=back
+
+=cut
+
+#----------------------------------------------------------------
+# Type-Operations
+#----------------------------------------------------------------
+=pod
+
+=head2 Inheritance Operations
+
+=over 4
+
+
+=item * C<subsumes($t1,$t2)>, C<le($t1,$t2)>
+
+Returns a true value if $typ1 is at least as general as $typ2,
+false otherwise.  May also be called as a class-method.
+
+Type-subsumption is determined by the following
+rules:
+
+=over 4
+
+=item 1.
+
+Subsumption and C<undef>
+
+C<undef> implicitly subsumes everything, and
+nothing but C<undef> subsumes C<undef>.
+
+This rule is implemented in the exportable subroutine
+C<_subsumes_trivial($t1,$t2)>.
+
+=item 2.
+
+Subsumption and string-equality
+
+Otherwise, if C<$t1> and C<$t2> are string-identical
+(C<$t1 eq $t2>), a true value is returned.
+
+This rule is implemented in the exportable subroutine
+C<_subsumes_trivial($t1,$t2)>.
+
+=item 3.
+
+Subsumption and C<$TYPE_TOP>
+
+Everything subsumes C<$TYPE_TOP>, and
+C<$TYPE_TOP> subsumes nothing but C<$TYPE_TOP>.
+
+This rule is implemented in the exportable subroutine
+C<_subsumes_trivial($t1,$t2)>.
+
+=item 4.
+
+User-defined subsumption
+
+If C<$t1> is a C<CODE> reference, then
+it is called with the string 'subsumes' and
+C<$t2> as its arguments:
+
+  $bool = &$t1('subsumes',$t2);
+
+$t1 should return a defined boolean
+value: true if $t2 is to be considered at least as
+specific as $t1, false otherwise.
+
+Otherwise, if C<$t1> is the name of a package which defines or
+inherites a method C<subsumes>, or a reference blessed
+into such a package, then C<subumes()> returns whatever
+C<$t1-E<gt>subsumes($t2)> returns.
+
+This rule is implemented in the exportable subroutine
+C<_subsumes_user($t1,$t2)>, and is only evaluated
+if C<$WANT_USER_HOOKS> is set to a true value.
+
+=item 5.
+
+Subsumption as a class method
+
+Otherwise, returns false if C<subsumes()> was
+called as a class method.
+
+=item 6.
+
+Subsumption type-check
+
+If C<subsumes()> was called as an instance
+method, returns false unless both $t1 and
+$t2 are defined in the hierarchy instance.
+
+=item 7.
+
+Subsumption lookup
+
+Otherwise,
+returns true if and only if $t1 has $t2
+as a descendant in the hierarchy.
+
+=back
+
+The exportable subroutines C<_subsumes_trivial()> and C<_subsumes_user()>
+return a defined boolean value if a trivial (respectively, user-defined)
+solution is possible, and C<undef> otherwise.
+
+
+
+=item * C<properly_subsumes($t1,$t2)>
+
+Aliases: C<psubsumes()>, C<lt()>
+
+Similar to C<subsumes()>, with the following differences:
+
+=over 4
+
+=item 1.
+
+Proper subsumption and C<undef>
+
+Returns false if  both C<$t1> and C<$t2> are undefined.
+
+This rule is implemented by the exportable subroutine
+C<_properly_subsumes_trivial($t1,$t2)>.
+
+
+=item 2.
+
+Proper subsumption and string-equality
+
+Returns false if C<$t1> is string-identical to C<$t2>.
+
+This rule is implemented by the exportable subroutine
+C<_properly_subsumes_trivial($t1,$t2)>.
+
+
+=item 3.
+
+Proper subsumption and C<$TYPE_TOP>
+
+Returns true if C<$t2 eq $TYPE_TOP>.
+
+This rule is implemented by the exportable subroutine
+C<_properly_subsumes_trivial($t1,$t2)>.
+
+
+=item 4.
+
+User-defined proper subsumption
+
+If C<$t1> is a C<CODE> reference then it
+is evaluated with the string 'properly_subsumes' and C<$t2>
+as its arguments:
+
+  $bool = &$t1('properly_subsumes', $t2);
+
+&$t1 should return a defined boolean value indicating
+the outcome of the proper-subsumption test.
+
+Otherwise, the lookup is delegated to the method
+C<$t1-E<gt>properly_subsumes($t2)>, if $t1 is a package
+or blessed reference for which such a method is defined.
+
+This rule is implemented by the exportable subroutine
+C<_properly_subsumes_user($t1,$t2)>, and is only evaluated
+if C<$WANT_USER_HOOKS> is set to a true value.
+
+
+=item 5.
+
+Proper subsumption as a class method
+
+Otherwise, returns false if C<properly_subsumes()> was called as
+class method.
+
+=item 6.
+
+Proper subsumption type-check
+
+If C<properly_subsumes> was called as
+an instance method, returns false unless both $t1 and $t2
+are defined in the hierarchy.
+
+=item 7.
+
+Proper subsumption lookup
+
+Returns true if and only if $t1 has $t2
+as a descendant in the hierarchy instance.
+
+
+=back
+
+The exportable subroutines C<_properly_subsumes_trivial()>
+and C<_properly_subsumes_user()>
+return a defined boolean value if a trivial (respectively, user-defined)
+solution is possible, and C<undef> otherwise.
+
+
+
+=item * C<extends($t1,$t2)>
+
+Aliases: C<ge()>
+
+Really just an alias for C<subsumes($t2,$t1)>.
+
+
+
+=item * C<properly_extends($t1,$t2)>
+
+Aliases: C<pextends()>, C<gt()>
+
+Really just an alias for C<properly_subsumes($t2,$t1)>.
+
+
+
+
+
+=item * C<least_upper_bounds($t1,$t2)>
+
+Aliases: C<lub()>
+
+Returns the least upper bound(s) of the types $t1 and $t2 as a list.
+The "least upper bounds" of two types $t1 and $t2
+are defined as those subsumption-minimal types subsumed by both
+$t1 and $t2. May also be called as a class method.
+
+Least upper bounds are computed by
+the following rules:
+
+=over 4
+
+=item 1.
+
+LUB and C<undef>
+
+The least upper bound of C<undef> and any value $x is $x.
+
+This rule is implemented by the exportable subroutine
+C<_lub_trivial($t1,$t2)>.
+
+
+=item 2.
+
+LUB and C<$TYPE_TOP>
+
+The least upper bound of C<$TYPE_TOP> and any value
+is C<$TYPE_TOP>.
+
+This rule is implemented by the exportable subroutine
+C<_lub_trivial($t1,$t2)>.
+
+
+=item 3.
+
+LUB and string-equality
+
+If $t1 and $t2 are string-identical, then a list
+containing the single element C<($t1)> is returned.
+
+
+=item 4.
+
+User-defined LUB (functional)
+
+If $t1 is a C<CODE> reference, then it is evaluated
+with the string 'lub' and C<$t2> as its arguments:
+
+  @lubs = &$t1('lub',$t2);
+
+C<lub()> then returns whatever C<&$t1()> returned.
+
+Otherwise, if C<$t2> is a C<CODE> reference, then it
+is evaluated with arguments C<('lub',$t1)>, and
+C<lub()> returns whatever C<&$t2()> returned.
+
+This rule is implemented by the
+exportable subroutine C<_lub_user($t1,$t2)>.
+It is only evaluated if C<$WANT_USER_HOOKS> is set
+to a true value.
+
+
+=item 5.
+
+User-defined LUB (object-oriented)
+
+If $t1 is a package which defines or inherits a method
+named C<lub>, or a reference blessed into such a package,
+then C<lub()> returns whatever C<< $t1-E<gt>lub($t2) >>
+returns.
+
+Otherwise, if $t2 is such a package or reference,
+then C<lub()> returns whatever C<< $te2-E<gt>lub($t1) >>
+returns.
+
+User-defined methods, like user-defined subroutines,
+are evaluated in list context.
+
+This rule is implemented by the
+exportable subroutine C<_lub_user($t1,$t2)>.
+It is only evaluated if C<$WANT_USER_HOOKS> is set
+to a true value.
+
+
+=item 6.
+
+LUB as a class method
+
+Otherwise, returns an empty list if C<lub()> was called as
+a class method.
+
+=item 7.
+
+LUB type-check
+
+If if C<lub()> was called as an instance-method,
+returns false unless both $t1 and $t2 are defined
+in the hierarchy.
+
+=item 8.
+
+LUB hierarchy lookup
+
+Otherwise, the hierarchy information is consulted
+and those types satisfying the criteria for least
+upper bounds are returned as a list (empty on failure).
+
+This rule is implemented by the instance-method C<_lub($t1,$t2)>.
+
+=back
+
+The exportable subroutines C<_lub_trivial()> and C<_lub_user()>
+return array-references if a trivial (respectively, user-defined)
+lub is possible, and C<undef> otherwise.
+
+The hierarchy instance-method C<_lub()> returns a list.
+
+
+
+=item * C<minimal_common_descendants($typ1,$typ2)>
+
+Aliases: C<mcd()>
+
+Returns the minimal common descendants of $typ1 and $typ2
+in the hierarchy as a list.  Returns the empty list on
+failure.
+
+
+
+
+=item * C<njoin($t1,$t2,...)>
+
+Attempts to find and return
+a single least upper bound for all the C<$t1,$t2,...>
+in @types by successive calls to C<lub()>.
+
+This method proceeds deterministically, and
+will produce warnings if some call to C<lub()> returns
+a list with more than one element.
+
+If some call to C<lub()> returns an empty list, this
+method returns the current value of
+C<$Math::PartialOrder::Base::TYPE_TOP>.
+
+
+
+
+=item * C<type_join($typ1,$typ2,...)>
+
+Like C<njoin()>, but assumes that all of the
+C<$typ1,...> arguments are types defined in the
+hierarchy, bypassing C<lub()> and calling
+C<_lub()> directly.
+
+
+
+
+=item * C<greatest_lower_bounds($t1,$t2)>
+
+Aliases: C<glb()>
+
+Returns the greatest lower bound(s) of the types $t1 and $t2 as a list:
+the greatest lower bounds are defined as the maximal common ancestors
+of $t1 and $t2.  May also be called as a class-method.
+
+
+Rules for determining the glbs of $t1 and $t2
+are as follows:
+
+=over 4
+
+=item 1.
+
+GLB and C<undef>
+
+If either $t1 or $t2 is C<undef>, then C<(undef)>
+is returned.
+
+This rule is implemented by the exportable subroutine
+C<_glb_trivial($t1,$t2)>.
+
+
+=item 2.
+
+GLB and string-equality
+
+If $t1 and $t2 are string-identical (C<eq>), then
+C<($t1)> is returned.
+
+This rule is implemented by the exportable subroutine
+C<_glb_trivial($t1,$t2)>.
+
+
+=item 3.
+
+GLB and C<$TYPE_TOP>
+
+If either $t1 or $t2 is $TYPE_TOP, then a list
+containing only the other value is returned.
+
+This rule is implemented by the exportable subroutine
+C<_glb_trivial($t1,$t2)>.
+
+
+=item 4.
+
+User-defined GLB (functional)
+
+If $t1 is a C<CODE> reference, then it is evaluated
+with C<$t2> as its argument,
+and C<glb()> returns whatever C<&$t1($t2)> returned.
+Otherwise, if C<$t2> is a C<CODE> reference, then it
+is evaluated with C<$t1> as its argument, and
+C<glb()> returns whatever C<&$t2($t1)> returned.
+
+User-defined GLB methods and subroutines are evaluated
+in list context.
+
+This rule is implemented by the
+exportable subroutine C<_glb_user($t1,$t2)>.
+It is only evaluated if C<$WANT_USER_HOOKS> is set to
+a true value.
+
+
+=item 5.
+
+User-defined GLB (object-oriented)
+
+If $typ1 is a package which defines or inherits a method
+named C<glb>, or a reference blessed into such a package,
+then C<glb()> returns whatever C<< $typ1-E<gt>glb($typ2) >>
+returns.
+
+Otherwise, if $typ2 is a such a package or reference,
+then C<glb()> returns whatever C<< $typ2-E<gt>glb($typ1) >>
+returns.
+
+This rule is implemented by the
+exportable subroutine C<_glb_user($t1,$t2)>.
+It is only evaluated if C<$WANT_USER_HOOKS> is set to
+a true value.
+
+
+=item 6.
+
+GLB as a class method
+
+Otherwise, returns an empty list if C<glb()> was called as
+a class method.
+
+
+=item 7.
+
+GLB type-check.
+
+If if C<glb()> was called as an instance-method,
+returns false unless both $t1 and $t2 are defined
+in the hierarchy.
+
+
+=item 8.
+
+GLB lookup
+
+Otherwise, if C<glb()> was called as an
+instance-method, then the hierarchy information is consulted
+and those types satisfying the criteria for greatest
+lower bounds are returned as a list, which is empty
+on failure.
+
+This rule is implemented by the method C<_glb($t1,$t2)>.
+
+
+=back
+
+The exportable subroutines C<_glb_trivial()> and C<_glb_user()>
+return array-references if a trivial (respectively, user-defined)
+glb is possible, and C<undef> otherwise.
+
+The hierarchy instance-method C<_glb()> returns a list.
+
+
+
+
+=item * C<maximal_common_ancestors($typ1,$typ2)>
+
+Aliases: C<mca()>
+
+Returns the maximal common ancestors of $typ1 and $typ2
+in the hierarchy as a list.  Returns an empty list
+on failure.
+
+
+
+=item * C<nmeet($t1,$t2,...)>
+
+Attempts to find and return the single greatest lowser
+bound of all the C<$t1,$t2,...> arguments by successive
+calls to C<glb()>.
+
+This method proceeds deterministically, and
+will produce warnings if some call to C<glb()> returns
+a list with more than one element.
+
+If some call to C<glb()> returns an empty list, this
+method returns C<undef>.
+
+
+
+=item * C<type_meet($typ1,$typ2,...)>
+
+Like C<nmeet()>, but assumes that all of the
+C<$typ1,...> arguments are types defined in the
+hierarchy, bypassing C<glb()> and calling
+C<_glb()> directly.
+
+
+
+=back
+
+=cut
+
+#----------------------------------------------------------------
+# Attributes (User-Defined Attributes)
+#----------------------------------------------------------------
+=pod
+
+=head2 User-Defined Attributes
+
+=over 4
+
+=item * C<get_attributes($typ)>
+
+
+
+Returns a hashref representing all the type-attributes of $typ,
+or C<undef> if no attributes are defined.
+
+
+=item * C<get_attribute($typ, $attr)>
+
+
+
+Returns the value of the type-attribute $attr for the type $typ.
+No attributes are assigned to any type by default.
+
+
+=item * C<set_attribute($typ, $attr, $val)>
+
+
+
+Sets the type-attribute $attr for type $typ to $val.  Returns $val.
+
+
+=item * C<get_hattribute($attr)>
+
+Gets the value of the hierarchy-attribute $attr.
+
+=item * C<set_hattribute($attr, $val)>
+
+Sets the value of the hierarchy-attribute $attr to $val.
+
+
+
+=item * C<_attributes($typ)>, C<_attributes($typ, $hashref)>
+
+I<(Recommended)>
+
+With 1 argument, returns a hashref representing all the attributes of $typ,
+or C<undef> if no attributes are defined for $typ. With 2 arguments,
+sets the attributes for $typ to $hashref.
+
+
+
+=item * C<< $h-E<gt>_hattributes() >>, C<< $h-E<gt>_hattributes(\%attrs) >>
+
+I<(Recommended)>
+
+With no arguments, returns a hashref representing the
+attributes not specific to any type in the hierarchy.  With
+an argument, sets the attributes for the whole hierarchy to
+\%attrs.  The default implementation simply calls
+C<< $h-E<gt>_attributes("$h",\%attrs) >>, which may
+cause difficulties if your hierarchy contains itself
+as a type.
+
+Alias: C<_hattrs>
+
+
+=back
+
+=cut
+
+
+#----------------------------------------------------------------
+# Sorting and Comparison
+#----------------------------------------------------------------
+=pod
+
+=head2 Sorting and Comparison
+
+=over 4
+
+=item * C<compare($t1, $t2)>
+
+
+
+Subsumption-comparison:
+
+=over 4
+
+=item 1.
+
+Returns 0 if $t1 and $t2 are both undefined, or
+if $t1 is C<eq> to $t2.
+
+=item 2.
+
+Returns -1 if $t1 properly subsumes $t2.
+
+=item 3.
+
+Returns 1 if $t2 properly subsumes $t1.
+
+=item 4.
+
+Otherwise, returns C<undef>.
+
+=back
+
+
+=item * C<_compare($t1, $t2)>
+
+Like C<_compare()>, but only checks hierarchy information.
+
+
+=item * C<min(@types)>
+
+
+
+Returns the minimal types in @types: a type $t1 in @types is considered
+minimal if there is no type $t2 in @types such that $t2
+properly subsumes $t1.  See also: C<properly_subsumes()>.
+
+=pod
+
+=item * C<max(@types)>
+
+
+
+Returns the maximal types in @types: a type $t1 in @types is considered
+maximal if there is no type $t2 in @types such that $t1 properly subsumes
+$t2. See also: C<properly_subsumes()>.
+
+
+=item * C<min_extending($base,@types)>
+
+
+
+Returns the minimal types in C<@types> which extend the type C<$base>.
+See also: C<min()>, C<extends()>.
+
+=item * C<max_subsuming($base,@types)>
+
+
+
+Returns the maximal types in C<@types> which subsume C<base()>.
+See also: C<max()>, C<subsumes()>.
+
+
+
+=pod
+
+=item * C<subsort(@types)>
+
+
+
+Retuns a sorted list containing the types in @types in
+subsumption-order (oldest first).  Each type in @types
+occurs in the returned list exactly once.
+
+
+=item * C<stratasort(@types)>
+
+
+
+Returns a reference a list of list-references of the form
+
+  @strata = [ \@stratum1, \@stratum2, ... ]
+
+The \@stratum listrefs contain all the types in @types; each
+type in @types occurs in exactly one stratum.  Types within
+a single stratum are subsumption-incomparable (read: "parallel").
+Strata are ordered according to disjunctive subsumption:
+the types in \@stratum1 are the minimal types of @types,
+whereas each type in \@stratum2 is properly subsumed by some type
+in \@stratum1, etc.  Types in @types not defined in the
+hierarchy will be in the final stratum.
+
+=item * C<get_strata(@types)>
+
+
+
+Used by C<stratasort()>, this method should return a reference
+to a hash of (not neccessarily consecutive) strata
+(natural numbers, later used to order the strata),
+indexed by type-name.  The hash returned may include more
+keys than just those defined in @types.
+
+=back
+
+=cut
+
+
+
+#----------------------------------------------------------------
+# Compiled-Hierarchy Conventions
+#----------------------------------------------------------------
+=pod
+
+=head2 Compiled-Hierarchy Conventions
+
+Hierarchies requiring internal compilation should override
+the methods described in this section.  The default implementations
+defined in Math::PartialOrder::Base do nothing at all.
+
+=over 4
+
+=item * C<compiled()>, C<compiled($bool)>
+
+If called with no arguments (1st form),
+returns a true value if the hierarchy has been compiled.
+Called with a true argument, attempts to compile the hierarchy
+if it is not already compiled, and returns whatever compile()
+returns.  Called with a false argument, attempts to
+de-compile the heirarchy if it is currently compiled, returning
+C<undef> on failure.
+
+The default implementation always returns 0.
+
+=pod
+
+=item * C<compile()>
+
+Force compilation of compilable hierarchies.  Returns
+a true value on success, false otherwise.  The
+default implementation simply returns 1.
+
+=back
+
+=cut
+
+
+#----------------------------------------------------------------
+# Iteration Utilities
+#----------------------------------------------------------------
+=pod
+
+=head2 Iteration Utilities
+
+=over 4
+
+=item * C<< $h-E<gt>iterate(\&next,\&callback,\%args); >>
+
+
+
+Iterate over all each type in the hierarchy, calling
+calling C<&callback($h, $t, \%args)> for each type $t in
+the hierarchy.  The iteration begins at the types contained
+in the array-ref $args{start}, and proceeds from
+these types to whatever C<\&next($h,$typ)> returns
+(usually a list of types), ad infinitum.
+
+C<$args{start}> may also be a simple scalar,
+and defaults to C<< $h-E<gt>root >>.
+
+If for any call C<&callback()> returns
+a value other than C<undef>, the iteration is broken off and this
+value is returned immediately.
+Otherwise, returns the value of $args{return} at the end of
+the iteration.
+
+=pod
+
+=item * C<< $h-E<gt>iterate_step(\&next,\%args); >>
+
+
+
+Like iterate(), but visits each type at most once, and
+additionally maintains the following keys of \%args:
+
+=over 4
+
+=item * C<< step =E<gt> $i >>
+
+The iteration-step: $i will be 0 (zero) for the elements of
+C<< $args-E<gt>{start} >>, and will be 1 for types returned
+by a call to C<&next()> for those types, 2 for types returned
+by a call to C<&next()> for the types for which $i was
+1, etc.
+
+=item * C<< visited =E<gt> $visited >>
+
+A hashref to the types already visited.  Keys are names of types
+which will not be visited by the iteration.
+
+=back
+
+=pod
+
+=item * C<< $h-E<gt>iterate_tracking(\&next,\%args); >>
+
+
+
+Like C<iterate()>, but additionally maintains the following
+keys of \%args:
+
+=over 4
+
+=item * C<< step =E<gt> $step >>
+
+A natural number as for C<iterate_step()>.
+
+=item * C<< prev =E<gt> $prev >>
+
+A hashref indexed by type-name whose values are hashrefs keyed by
+the immediate predeccessors of that type.
+
+=back
+
+Also, C<iterate_tracking()> recognizes the following additional
+keys of \%args:
+
+=over 4
+
+=item * C<< ignore =E<gt> $ignored >>
+
+A hashref of types for which which should be skipped --
+&$args{callback} and &$args{next} will not be called
+for types which exist as keys of C<%$ignored>.
+
+=back
+
+=pod
+
+=item * C<< $h-E<gt>iterate_strata(\&next,\%args); >>
+
+
+
+Like C<iterate()>, but additionally maintains the following
+keys of \%args:
+
+=over 4
+
+=item * C<< step =E<gt> $thestep >>
+
+A natural number as for C<iterate_step()>.
+
+=item * C<< prev =E<gt> $theprev >>
+
+A hasref as for C<iterate_tracking()>.
+
+=back
+
+=pod
+
+=item * C<< $h-E<gt>iterate_pc( \%args ); >>
+
+
+
+Calls C<iterate()> using the 'children' method for
+update: iteration proceeds from
+parent-types to child-types.
+
+=pod
+
+=item * C<< $h-E<gt>iterate_pc_step( \%args ); >>
+
+
+
+Like C<iterate_pc()>, but uses the C<iterate_step()> method
+for iteration.
+
+=pod
+
+=item * C<$h-E<gt>iterate_cp( \%args );>
+
+Like iterate_pc(), but iterates from children to their ancestors.
+The default value for $args{start} is C<< $h-E<gt>leaves >> .
+
+=pod
+
+=item * C<$h-E<gt>iterate_cp_step( \%args );>
+
+
+
+Like iterate_cp(), but uses the C<iterate_step()> method
+for iteration.
+
+=back
+
+=cut
+
+
+#----------------------------------------------------------------
+# Miscellaneous
+#----------------------------------------------------------------
+=pod
+
+=head2 Miscellaneous Utilities
+
+=over 4
+
+=item * C<dump>
+
+Returns a string representing the internal structure of
+the object.  Default behavior uses Data::Dumper.
+
+=back
+
+=cut
+
+#----------------------------------------------------------------
+# Miscellaneous
+#----------------------------------------------------------------
+=pod
+
+=head1 EXPORTS
+
+=over 4
+
+=item * :typevars
+
+The following package-variables may be imported individually,
+or all at once by specifying the C<:typevars> tag to the
+C<use> directive:
+
+  $TYPE_TOP
+
+=item * :trivialities
+
+The following subroutines may be imported individually,
+or all at once by specifying the C<:trivialities> tag
+to the C<use> directive:
+
+   &_subsumes_trivial
+   &_psubsumes_trivial
+   &_lub_trivial
+   &_glb_trivial
+
+=item * :userhooks
+
+The following subroutines may be imported individually,
+or all together by specifying the C<:userhooks> tag
+to the C<use> directive:
+
+   &_subsumes_user
+   &_psubsumes_user
+   &_lub_user
+   &_glb_user
+   &_binop_user
+
+C<_binop_user> is a low-level subroutine which is called by the
+C<_lub_user()> and C<_glb_user()> methods.
+
+=back
+
+Nothing is exported by default.
+
+See also:
+L<PACKAGE VARIABLES>,
+C<subsumes()>,
+C<properly_subsumes()>,
+C<lub()>,
+C<glb()>.
+
+=cut
+
+
+#----------------------------------------------------------------
+# Footer
+#----------------------------------------------------------------
+=pod
+
+=head1 ACKNOWLEDGEMENTS
+
+perl by Larry Wall.
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>jurish@ling.uni-potsdam.deE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001, Bryan Jurish.  All rights reserved.
+
+This package is free software.  You may redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+perl(1).
+Math::PartialOrder(3pm).
+Math::PartialOrder::Loader(3pm).
+Math::PartialOrder::Std(3pm).
+Math::PartialOrder::Caching(3pm).
+Math::PartialOrder::LRUCaching(3pm).
+Math::PartialOrder::CMasked(3pm).
+Math::PartialOrder::CEnum(3pm).
+Data::Dumper(3pm).

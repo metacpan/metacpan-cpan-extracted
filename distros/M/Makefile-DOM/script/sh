@@ -1,0 +1,223 @@
+#!perl
+#: sh
+#: Perl simulator for /bin/sh (Bourne Shell)
+#: 2006-02-01 2006-02-13
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/..";
+use lib "$FindBin::Bin/../t/lib";
+use Test::Util::Base;
+#use Smart::Comments;
+
+use Getopt::Std;
+use Time::HiRes qw( sleep );
+
+my %opts;
+getopts('c', \%opts);
+
+my $ExitCode = 0;
+my $RedirectIndex;
+
+$| = 1;
+
+if ($opts{c}) {
+    eval {
+        process_shell(join ' ', @ARGV);
+    };
+    warn $@ if $@;
+    exit($ExitCode);
+} else {
+    print '$ ';
+    process_prompt();
+    exit(0);
+}
+
+sub process_prompt {
+    while (<STDIN>) {
+        chomp;
+        ### Got shell: $_
+        last if /^\s*exit(?:\s+\d+)?\s*$/;
+        eval {
+            process_shell($_);
+        };
+        if ($@) {
+            warn "$@\n";
+            warn "[Error code $ExitCode returned.]\n";
+        }
+        print '$ ';
+    }
+}
+
+sub process_shell {
+    my $cmd = shift;
+    #warn Dumper($cmd);
+
+    $cmd =~ s/\n+/ /gso;
+    my @raw_args = split_arg($cmd);
+	### @raw_args
+    my @args = process_args(0, @raw_args);
+    return eval_cmd(@args);
+}
+
+sub process_args ($$) {
+    #warn "!!!!!!!!!!!!!!!!!!!!!!";
+    my $level = shift;
+    my @raw_args = @_;
+    my @args;
+    foreach (@raw_args) {
+        #warn "----------\n";
+        #warn Dumper(@args, $_, @raw_args);
+        #warn "----------\n";
+        if ($_ eq ';') {
+            eval_cmd(@args);
+            @args = ();
+        } elsif ($_ eq '>' or $_ eq '>>' or $_ eq '<') {
+            $RedirectIndex = $#args;
+            push @args, $_;
+        } elsif ($_ eq '&&') {
+            eval_cmd(@args);
+            return if $ExitCode != 0;
+            @args = ();
+        } elsif ($_ eq '||') {
+            eval_cmd(@args);
+            return if $ExitCode == 0;
+            $ExitCode = 0;
+            @args = ();
+        } elsif (/^"(.*)"$/o) {
+            #warn "---------";
+            #warn qq{Pusing "$1" into args\n};
+            my $s = $1;
+            process_escape( $s, q{\\@$\#} );
+            #warn "$s";
+            subs_env($s);
+            push @args, $s if $s ne '';
+        } elsif (/^'(.*)'$/o) {
+            #warn "  Pusing '$1' into args\n";
+            push @args, $1 if $1 ne '';
+        } elsif (/^['"]/o) {
+            $ExitCode = 1;
+            die "sh: unexpected EOF while looking for matching `$&'\n";
+        } else {
+            #warn "  Remaining: $_\n";
+            my $s = $_;
+            if ($level == 0 and $s =~ /^\#/o) {
+                return @args;
+            }
+            process_unquoted($s, $level, \@args);
+            #warn "~~~~~~~~~~~~~~\n";
+            #warn Dumper(@args, $_, @raw_args);
+            #warn "~~~~~~~~~~~~~~\n";
+        }
+    }
+    return @args;
+}
+
+sub process_unquoted {
+    my ($s, $level, $rargs) = @_;
+    return if $s eq '';
+	## before: $s
+    $s =~ s/\\(.)/$1/gso;
+	## after: $s
+    subs_env($s);
+    my @subargs = split_arg($s) if $s =~ / /o;
+    #warn Dumper(@subargs);
+    if (@subargs > 1) {
+        push @$rargs, process_args ($level+1, @subargs);
+    } else {
+        my @files = glob $s;
+        if (@files > 1) {
+            push @$rargs, @files;
+        } else {
+            push @$rargs, $s if $s ne '';
+        }
+    }
+}
+
+sub subs_env {
+    $_[0] =~ s/\$(\w+)/defined $ENV{$1} ? "$ENV{$1}" : ''/geo;
+}
+
+sub touch (@) {
+    my @files = @_;
+    foreach my $file (@files) {
+        my $in;
+        open $in, ">>$file" and
+            print $in '' and close $in or
+            die "Can't touch $file: $!";
+    }
+}
+
+sub eval_cmd {
+    my @args = @_;
+    return 0 if not @args;
+    my $redir = $RedirectIndex;
+    undef $RedirectIndex;
+	my $exec = shift @args;
+	if ($exec =~ /^\s+$/) {
+		$exec = shift @args;
+	}
+    ### Got exec: $exec
+	### Got args: @args
+	if ($exec eq 'echo') {
+        if ($redir) {
+            my $op = $args[$redir];
+            my @elems = @args[0..$redir-1];
+            if ($op eq '>') {
+                my $file = $args[$redir+1];
+                open my $out, "> $file" or
+                    die "Can't open $file for writing: $!\n";
+                print $out "@elems\n";
+                close $out;
+            } elsif ($op eq '>>') {
+                my $file = $args[$redir+1];
+                open my $out, ">> $file" or
+                    die "Can't open $file for writing: $!\n";
+                print $out "@elems\n";
+                close $out;
+            } elsif ($op eq '<') {
+                print "@elems\n";
+            } else {
+                die "Unexpected redirection operator: $op";
+            }
+        } else {
+            print "@args\n";
+        }
+        return 0;
+    } elsif ($exec eq 'rm') {
+        foreach my $file (@args) {
+            $file =~ s/\s+$//;
+            if (not unlink $file) {
+                warn "rm: cannot lstat `$file': $!\n";
+                $ExitCode = 1;
+                return;
+            }
+        }
+        return 0;
+    } elsif ($exec eq 'sleep') {
+        sleep ($args[0]);
+    } elsif ($exec eq 'pwd') {
+        require 'Cwd.pm';
+        print Cwd::cwd(), "\n";
+    } elsif ($exec eq 'cd') {
+        chdir $args[0];
+    } elsif ($exec eq 'touch') {
+        touch(@args);
+        $ExitCode = 0;
+        return;
+    } elsif ($exec eq ':') {
+        return;
+    } elsif ($exec eq 'exit') {
+        $ExitCode = $args[0] if defined $args[0];
+        exit($ExitCode);
+    } elsif ($exec =~ /make/i or ($args[0] and $args[0] =~ /make/i)) {
+        $ExitCode = system $exec, @args;
+        return;
+    } else {
+        warn "sh: unknown shell command: $exec";
+        $ExitCode = 1;
+        return;
+    }
+}

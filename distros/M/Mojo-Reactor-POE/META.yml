@@ -1,0 +1,31 @@
+---
+abstract: 'POE backend for Mojo::Reactor'
+author:
+  - 'Dan Book <dbook@cpan.org>'
+build_requires:
+  IO::Socket::INET: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-Reactor-POE
+provides:
+  Mojo::Reactor::POE:
+    file: lib/Mojo/Reactor/POE.pm
+    version: '0.009'
+requires:
+  Carp: '0'
+  Mojolicious: '5.70'
+  POE: '1.366'
+  Scalar::Util: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/Grinnz/Mojo-Reactor-POE/issues
+  homepage: https://github.com/Grinnz/Mojo-Reactor-POE
+  repository: https://github.com/Grinnz/Mojo-Reactor-POE.git
+version: '0.009'

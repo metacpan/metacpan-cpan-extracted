@@ -1,0 +1,18 @@
+0.4       2014-02-15 17:24:54 Europe/Paris
+
+0.3       2012-12-01 16:00:56 Europe/Paris
+
+    * update meta
+    * move to Author::Celogeek Plugin bundle
+
+0.2 - 2012-06-08 23:00
+===
+
+   * Change author name
+
+0.1 - 2011-11-16 17:00
+===
+
+   * First release
+     add underscore_to_module
+     add module_to_underscore

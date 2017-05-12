@@ -1,0 +1,11 @@
+define package Mail::Bulkmail::Server
+
+#we've already set up the server defaults in sample.cfg.file, so here we
+#just need to define a list of Smtp servers
+
+Smtp @= smtp1.mydomain.com
+Smtp @= smtp2.mydomain.com
+Smtp @= smtp3.mydomain.com
+
+#of course, you may add as many smtp servers as you'd like. 3 isn't a magic number or anything.
+

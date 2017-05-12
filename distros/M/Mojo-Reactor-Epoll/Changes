@@ -1,0 +1,20 @@
+0.006     2016-06-23 21:40:36 EDT
+  - Switch installer to Module::Build::Tiny
+  - Use Linux::Epoll instead of IO::Epoll
+
+0.005     2015-04-27 18:44:15 EDT
+  - Support sequential next_tick
+
+0.004     2015-04-16 14:43:05 EDT
+  - Avoid some floating-point issues in poll timeouts
+
+0.003     2015-03-21 15:39:44-04:00 America/New_York
+  - Updated again and watch methods to croak on inactive watchers
+
+0.002     2015-02-23 14:00:11-05:00 America/New_York
+  - Remove deprecated is_readable method from tests
+  - Set default Mojo::Reactor
+  - Add hypnotoad example to synopsis
+
+0.001     2015-02-13 01:57:29-05:00 America/New_York
+  - First release

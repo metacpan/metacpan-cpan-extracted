@@ -1,0 +1,7 @@
+ [
+    {
+        "label" : "Name",
+        "type" : "checkbox",
+        "name" : "type"
+    }
+ ]

@@ -1,0 +1,42 @@
+This module requires a C compiler to build. To install the 
+module, first edit libmd/mconf.h to suit your system (the 
+default settings are for Linux/Win32). Then execute the sequence
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you do not have permission to install modules in the
+Perl site tree on your system, you can install this in
+your own library by
+
+   perl Makefile.PL PREFIX=/home/me/perl \
+     INSTALLMAN1DIR=/home/me/man/man1 \
+     INSTALLMAN3DIR=/home/me/man/man3
+   make
+   make test
+   make install
+
+To use modules in this location, either set the PERL5LIB
+environment variable to include your private module
+directory, or else put
+
+   use lib '/home/me/perl/path/to/lib';
+
+at the top of your script.
+
+If you need to alter libmd/mconf.h to work on your
+system, I would be interested in knowing what settings
+were required, so as to make this configuration more portable.
+
+A Win32 ppm package, suitable for use with ActivePerl
+compatible Perl packages (builds 6xx) is available at
+      http://theoryx5.uwinnipeg.ca/ppmpackages/
+To install, within the ppm shell set the repository to
+      http://theoryx5.uwinnipeg.ca/cgi-bin/ppmserver?urn:/PPMServer
+and then
+      ppm> install Math-Cephes
+
+Randy Kobes <randy@theoryx5.uwinnipeg.ca>
+

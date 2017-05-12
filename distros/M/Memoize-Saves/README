@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Memoize-Saves,
+version 0.67:
+
+  Plug-in module to specify which return values should be memoized
+
+This software is copyright (c) 2010 by Joshua Gerth.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

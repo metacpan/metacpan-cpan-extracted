@@ -1,0 +1,59 @@
+Module-Versions version 0.02
+============================
+
+DESCRIPTION
+
+Module::Versions handles versions of loaded modules with a flexible result
+interface. The main goal is to get as much version informations as possible
+about a module or module list with a simple call interface and an absolutely
+flexible result interface. Module::Versions handles *loaded* and *loadable*
+modules.
+
+The motivation for writing this module was the need for better support
+facilities to get  informations about the used modules and versions in the
+productivity environment. Module::Versions allows shipping applications
+basically with something like a '-version' option (See Getopt::Long) but
+with expanded functions.
+
+Module::Versions tries to read the loaded/loadable module's $VERSION. For
+extended purposes any private project 'version variables' can be fetched
+($_VERSION, $version, $REV, etc.).
+
+Module::Versions has a flexible result interface to satisfy different needs:
+results can be lists and data structures with different formats - pre-formed
+ARRAY, HASH, SCALAR, CSV, XML/XSD/DTD and a full flexible user callback
+interface.
+
+It is for example very simple to print a good formatted version list to the
+console and save a version.xml file (in conjunction with an xsd-schema) at
+the same time with an absolutely minimum of coding.
+
+Module::Versions tries to load 'version.pm' to support Perl 5.10.0's $VERSION
+formatting.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  IO::Handle
+  Data::Dumper
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2006 Thomas Walloschke (thw@cpan.org). All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available. See
+perlartistic.
+
+

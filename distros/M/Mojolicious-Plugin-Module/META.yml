@@ -1,0 +1,47 @@
+---
+abstract: 'Mojolicious plugin for modular development.'
+author:
+  - 'Georgy Bazhukov <gosha@bugov.net>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+keywords:
+  - Plugin
+  - Module
+  - Mojolicious
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-Module
+provides:
+  Mojolicious::Command::generate::module:
+    file: lib/Mojolicious/Command/generate/module.pm
+    version: 0
+  Mojolicious::Plugin::Module:
+    file: lib/Mojolicious/Plugin/Module.pm
+    version: 0.04
+  Mojolicious::Plugin::Module::Abstract:
+    file: lib/Mojolicious/Plugin/Module/Abstract.pm
+    version: 0
+  Mojolicious::Plugin::Module::Assets:
+    file: lib/Mojolicious/Plugin/Module/Assets.pm
+    version: 0
+  Mojolicious::Plugin::Module::Manager:
+    file: lib/Mojolicious/Plugin/Module/Manager.pm
+    version: 0
+requires:
+  Carp: 0
+  File::Copy::Recursive: 0
+  Hash::Merge::Simple: 0.051
+  Module::Load: 0
+  Mojolicious: 4
+  YAML: 0
+  perl: 5.014
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/bugov/mojolicious-plugin-module
+version: 0.04

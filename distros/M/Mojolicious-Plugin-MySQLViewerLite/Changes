@@ -1,0 +1,40 @@
+0.16 (DEPRECATED)
+  - fix test bug
+0.15 (DEPRECATED)
+  - this module is merged into Mojolicious::Plugin::DBViewer.
+  - this module is DEPRECATED and will be removed from CPAN in 2018/4/1.
+0.14
+  - removed Mojolicious waypoint logic because waypoint is deprecated.
+0.13
+  - catch up DBIx::Custom 0.25 version up
+0.12
+  - improved show create table page design.
+  - improved select page design. 
+0.11
+  - improved design
+  - added show select tables page
+0.10
+  - added dbi option
+0.09
+  - fixed test
+0.08
+  - added simple table search
+  - added connector option
+  - added page navigation
+0.07
+  - cleanup modules
+0.06
+  - added show create tables page
+0.05
+  - fixed bug that 'select * from TABLE' is not displayed
+    if database is not current database
+0.04
+  - improved design, removed primary key last commma.
+  - display charsets in all talbes.
+  - suppress warnings
+0.03
+  - move README.pod to README.
+0.02
+  - added more tests.
+0.01
+  - First release.

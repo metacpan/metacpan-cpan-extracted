@@ -1,0 +1,132 @@
+/* ================================================================== */
+/* THEME: Turkwoise
+ */
+/* ================================================================== */
+/* THEME: Turkwoise - fonts
+ */
+/* ------------------------------------------------------------------ */
+/* Fonts */
+h1, h2, h3, h4 {
+  font-family: Arabia, ArnoldBoecklin, Becker, Aduren, Abbey-Medium, verdana, helvetica, arial, sans-serif;
+  font-weight: normal;
+  color: black;
+}
+
+/* ================================================================== */
+/* ICONS - light on dark
+ * Nav arrows with transparent backgrounds
+ */
+.side nav li > ul {
+  list-style-image: url(nav_white.png);
+}
+
+/* ================================================================== */
+/* General */
+.verge, header,
+footer, .side, .fancy {
+  color: #002233;
+  background: #66aacc;
+  border-color: navy;
+}
+
+header,
+footer {
+  background-image: url(turk1.jpg);
+}
+
+.side {
+  background-image: url(turk2.jpg);
+}
+
+body {
+  color: #000033;
+  background: #aaaadd;
+}
+
+a:link {
+  color: #003366;
+}
+
+a:visited {
+  color: #330066;
+}
+
+header a:link,
+footer a:link,
+.side a:link,
+.verge a:link,
+header a:link,
+footer a:link,
+.side a:link,
+.fancy a:link {
+  color: #006655;
+}
+
+header a:visited,
+footer a:visited,
+.side a:visited,
+.verge a:visited,
+header a:visited,
+footer a:visited,
+.side a:visited,
+.fancy a:visited {
+  color: #001166;
+}
+
+.fancy {
+  color: #002233;
+  background-image: url("turk2.jpg");
+  border: 5px double #297aa3;
+  padding: 0;
+}
+.fancy li {
+  padding: 0.5em;
+  margin: 5px;
+  border: 5px solid #297aa3;
+  background-color: #66aacc;
+  background: linear-gradient(#66aacc, #39a3ac);
+}
+.fancy li a:link {
+  color: #006655;
+}
+.fancy li a:visited {
+  color: #001166;
+}
+
+.button, input[type=submit], header nav a,
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: #e0e7eb;
+  border-color: #006666;
+  background-color: #337799;
+}
+
+.button a:link, input[type=submit] a:link, header nav a a:link,
+header nav .selflink a:link,
+header nav em a:link,
+header nav .current a a:link, a.button:link, header nav a:link {
+  color: #e0e7eb;
+}
+
+.button a:visited, input[type=submit] a:visited, header nav a a:visited,
+header nav .selflink a:visited,
+header nav em a:visited,
+header nav .current a a:visited, a.button:visited, header nav a:visited {
+  color: #a3b1f5;
+}
+
+header nav a:visited {
+  color: #a3b1f5;
+}
+
+header nav li {
+  border-color: #006666;
+}
+
+header nav .selflink,
+header nav em,
+header nav .current a {
+  background-color: #aaaadd;
+  color: #660000;
+}

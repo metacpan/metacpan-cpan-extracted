@@ -1,0 +1,9 @@
+set autoprint metoo
+set folder=/home/kaye/notes
+
+
+alias george george@nowhere.com
+alias bill "Bill Smith"<george@nowhere.com>
+alias mygroup bob@nowhere.com, george, bill
+
+

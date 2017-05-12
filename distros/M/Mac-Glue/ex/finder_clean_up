@@ -1,0 +1,22 @@
+#!perl -w
+
+BEGIN {
+	if ($^O eq 'darwin') {
+		print <<'EOT';
+Current Finder aete says this is not available yet for Mac OS X.
+EOT
+		exit;
+	}
+}
+
+use Mac::Glue;
+$f = new Mac::Glue 'Finder';
+
+$window = $f->obj(window => 1);
+
+$f->activate;
+$f->open($f->prop('startup disk'));
+$f->clean_up($window);
+#$f->close($window);
+
+__END__

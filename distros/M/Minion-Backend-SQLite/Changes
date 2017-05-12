@@ -1,0 +1,41 @@
+1.000     2017-04-14 14:54:28 EDT
+  - Support retrying active jobs in retry_job.
+  - Support sharing worker status information in register_worker and
+    worker_info.
+
+0.009     2016-12-19 20:34:58 EST
+  - Increase dependency on Mojo::SQLite for memory leak fix
+
+0.008     2016-12-16 22:36:53 EST
+  - Correct ordering of dequeued jobs that are created in the same second.
+
+0.007     2016-09-19 20:30:32 EDT
+  - Add support for worker remote control commands with broadcast and receive
+    methods.
+  - Fix tests for compatibility with Minion 6.0.
+
+0.006     2016-09-06 23:22:20 EDT
+  - Add support for EXPERIMENTAL enqueued_jobs field in stats method.
+
+0.005     2016-07-02 20:46:32 EDT
+  - Add support for EXPERIMENTAL delayed_jobs field in stats method.
+  - Add queue option to list_jobs method.
+  - Add support for job dependencies.
+  - Add parents option to enqueue method.
+  - Add children and parents fields to job_info method.
+
+0.004     2016-03-16 21:52:15 EDT
+  - Bump Mojo::SQLite dependency to 0.020 for JSON1 support
+  - Use JSON1 fields for job args and result
+  - Use new Mojo::SQLite auto_migrate feature
+  - Various optimizations from Minion::Backend::Pg including much faster dequeue
+
+0.003     2015-11-13 20:19:45 EST
+  - Updated to support Minion 4.0
+  - Allow retry methods to change options for already inactive jobs
+
+0.002     2015-10-30 17:35:29 EDT
+  - Added support for retrying failed jobs automatically in Minion 3.01
+
+0.001     2015-10-28 21:59:55 EDT
+  - First release

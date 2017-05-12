@@ -1,0 +1,211 @@
+0.23  2009-11-03 | find us some libraries
+  - added 'xulrunner-xpcom' to the list of pkg-config packages to try
+  - added note to user in Makefile.PL and also overrode MY::test in order
+    to set LD_LIBRARY_PATH so that the tests can find libxul.so
+    (thanks to Vincent Pit for the tip on overriding MY::test)
+
+0.22  2009-10-10 | updated to Gecko 1.9 (latest xulrunner/firefox)	 
+  - patch (in 2008, sorry...) from Boris Sukholitko to make install
+    work on Ubuntu Hardy
+  - reworked install more
+  - decided to only support Gecko 1.9 (I think), which means removing
+    (see https://developer.mozilla.org/en/Gecko_1.9_Changes_affecting_websites )
+	- NSEvent: preventBubble
+	- NSRange: IntersectsNode, CompareNode, NSDetach
+	- NSHTMLDocument: captureEvents, releaseEvents, routeEvent
+  - if there are problems finding libxul.so, see the README
+
+0.21  2007-06-07
+  - Really sorry about the delay - in addition to me being lazy,
+    gtkmozembed was segfaulting on Ubuntu!
+    If you have this problem, see the Troubleshooting section of README.
+  - patch from Boris Sukholitko for Mozilla::DOM::NSHTMLDocument open.
+    Note: this only works with newer Firefox now, where apparently the API
+    changed. I can add #ifdef to support the old version, but I'm not
+    sure which version it changed in (let me know)
+  - another patch from Boris for Mozilla::DOM::Window ScrollTo.
+    (other Scroll* methods could be wrapped). While I was at it,
+    I also wrapped GetScrollX, GetScrollY, ScrollBy, ScrollByLines,
+    ScrollByPages (all but GetScrollbars, which is too hard)
+  - minor edits of examples, docs; added Scroll example
+  - really fixed META.yml no_index this time (I think),
+    so hopefully modules in 'examples' directory aren't indexed on CPAN
+
+0.20  2005-09-29
+  - patch from José Auguste-Etienne for installing with Firefox on Mandriva
+  - made certain methods perlish, by returning lists in list context:
+    o  HTMLCollection
+       - HTMLFormElement: GetElements
+       - HTMLMapElement: GetAreas
+       - HTMLTableElement: GetRows, GetTBodies
+       - HTMLTableRowElement: GetCells
+       - HTMLTableSectionElement: GetRows
+       - NSHTMLDocument: GetEmbeds, GetPlugins
+    o  HTMLOptionsCollection
+       - HTMLSelectElement: GetOptions
+    o  NamedNodeMap
+       - Node: GetAttributes
+       - DocumentType: GetEntities, GetNotations
+    o  NodeList
+       - Node: GetChildNodes
+       - Document: GetElementsByTagName, GetElementsByTagNameNS
+       - Element: GetElementsByTagName, GetElementsByTagNameNS
+    o  WindowCollection
+       - Window: GetFrames
+    See the documentation of each method for details.
+
+0.19  2005-09-27
+  - added interfaces: Entity, Notation, NSRange, NSEvent, NSUIEvent,
+    NSHTMLAnchorElement, NSHTMLAreaElement, NSHTMLButtonElement,
+    NSHTMLDocument, NSHTMLFormElement, NSHTMLFrameElement, NSHTMLHRElement,
+    NSHTMLImageElement, NSHTMLInputElement, NSHTMLOptionElement,
+    NSHTMLSelectElement, NSHTMLTextAreaElement
+
+0.18  2005-09-25
+  - added interfaces:
+    o  DocumentRange (for creating a Range, whose ToString allows
+       something like get_text in HTML::TokeParser)
+    o  NSHTMLElement (innerHTML (no outerHTML unfortunately))
+    o  NSDocument (content-type, referer, etc.)
+  - added Range (incomplete) and InnerHTML examples
+
+0.17  2005-09-15
+  - fixed constants: see DOMException (unsupported yet), Event, KeyEvent,
+    MutationEvent, Node, Range, and WebNavigation (partially supported)
+  - removed backwards-compatibility underscore_style aliases (see 0.06 below)
+
+0.16  2005-09-05
+  - added support for Firefox to Makefile.PL (copied from Gtk2::MozEmbed;
+    untested, please report success or failure)
+  - added no_index to META.yml to suppress indexing the examples on CPAN.
+    Thanks to Adam Kennedy for pointing that out.
+
+0.15  2005-09-04
+  - moved POD from xs/DOM.xs into lib/Mozilla/DOM/*.pod. At the expense of
+    the POD no longer being auto-generated, people can now read the POD
+    without having to install the module (e.g. on CPAN), install time
+    is slightly reduced, and I have better control over the POD output.
+    (Still need to clean up the POD...)
+    I also suppressed generating separate man pages because I don't see
+    the point (you should delete any existing man/man3/Mozilla*.3pm files
+    if you've installed this module before).
+  - removed Glib dependency
+
+0.14  2005-08-29
+  - added most of WebNavigation, with an example WebNav.pm
+  - require specifically enabling EventListener, using
+    `perl Makefile.PL DEFINE="-DMDEXP_EVENT_LISTENER"`,
+    after Torsten Schoenfeld reported that compiling Gtk2::MozEmbed
+    was giving warnings (need help of a C++ expert)
+
+0.13  2005-04-21
+  - added browser object interfaces
+    o  Navigator, History, Location, and Screen
+    o  Window2 and WindowInternal, to get the browser objects
+  - added the example BrowserObjects.pm
+  - fixed the EventListener example
+
+0.12  2005-04-20
+  - keep in mind that Mozilla::DOM is alpha software, subject to change:
+    o  added experimental EventListener support, with an example
+       EventListeners.pm
+    o deprecated all constants, although I didn't reimplement them
+      correctly yet :/
+
+0.11  2005-04-18
+  - wrapped more interfaces (total is 88 now; there are >260 in Mozilla)
+    o  54 HTML*Element classes
+    o  HTMLCollection and HTMLOptionsCollection
+  - added HTMLElements example
+  - added the gendomxsubs.pl script which I use to generate XSUBs
+    from Mozilla headers
+  - fixed GetIID POD (but not yet the warnings during `make`)
+
+0.10  2005-04-16
+  - implemented Supports (QueryInterface method, plus GetIID class method
+    for all interfaces), which means we can now create events!
+  - added the Events example, showing mouse clicks and key presses
+  - Uwe Voelker pointed me to the CPAN Forum. I registered to receive
+    notification of posts, so you can post there if you want. See the
+    'Contact' section of the README for details.
+
+0.09  2005-04-11
+  - added Elements example, demoing the tedium of DOM manipulation
+
+0.08  2005-04-10
+  - header includes - added two directories to set_inc in Makefile.PL:
+    o  Torsten Schoenfeld noted that nsIWebBrowser.h is under the 'webbrwsr'
+       directory on his system, so added that to the includes in Makefile.PL.
+    o  another Gentoo user (Y. Selkowitz?) found that nsISelection.h was
+       in the 'contents' directory
+  - added Credits file
+
+0.07  2005-04-10
+  - wrapped methods for: MutationEvent, NamedNodeMap, Attr,
+    ProcessingInstruction, CharacterData, Text, DocumentType,
+    DOMImplementation, Selection, Range
+  - made everything inherit from Supports, though QueryInterface still
+    needs to be implemented
+  - added some examples in 'examples' directory:
+    o  Minilla - minimal Gtk2::MozEmbed
+    o  Signals - demo signals in Gtk2::MozEmbed
+  - changed several doctypes to something more comprehensible
+
+0.06  2005-04-08
+  - switched method names to StudlyCaps style instead of under_score,
+    because it was too tedious when reading/creating documentation
+    and XSUBs; provided aliases for KeyEvent, MouseEvent, and WebBrowser.
+    Otherwise, they should be considered deprecated (not that anyone is
+    actually using this module yet).
+  - wrapped methods:
+    o  Element: GetTagName, GetAttribute, GetElementsByTagName, ...
+    o  Node: GetNode(Name|Value|Type), GetChildNodes, InsertBefore, ...
+    o  NodeList: GetLength, Item
+    With these, you're now able to insert elements (e.g. text)
+    into the document (e.g. from within Gtk2::MozEmbed's new_window
+    signal handler).
+  - fixed Document::GetImplementation args
+
+0.05  2005-04-07
+  - made typemaps for nsAString args (nsEmbedString),
+    which simplifies making XSUBs
+  - wrapped methods:
+    o  Document: get_element_by_id/tag_name, create_element, ...
+    o  EventTarget: add_event_listener, remove_event_listener,
+       dispatch_event
+    o  Window: get_document, get_frames, get_parent, get_top (not done)
+    o  WindowCollection: get_length, item, named_item
+
+0.04  2005-04-06
+  - added support for creating events
+    o  wrapped the DocumentEvent class, namely its create_event method
+    o  added MutationEvent; still need to wrap methods
+    o  wrapped Init* methods: init_event, init_uievent, init_mouseevent,
+       init_keyevent, init_mutationevent
+  - added 'types' constants to Node class
+  - added WebBrowser
+  - wrapped a couple Window methods: get_name, set_name, size_to_content
+
+0.03  2005-04-05
+  - added typemapping support so that gtk_moz_embed_get_nsIWebBrowser
+    can be wrapped in Gtk2::MozEmbed, and thus nsIWebBrowser's
+    GetContentDOMWindow method can be wrapped
+  - wrapped the following nsIDOM* classes: UIEvent, AbstractView,
+    DocumentView
+  - copied documentation in place and added typemap conversions for:
+    EventTarget, EventListener, Window, WindowCollection, Document,
+    Node, NodeList, Element, EntityReference, Attr, ProcessingInstruction,
+    CDATASection, Comment, CharacterData, Text, DocumentFragment,
+    DocumentType, DOMImplementation
+
+0.02  2005-04-03
+  - changed mozilla-gtkmozembed dependency to mozilla-xpcom
+    so that GtkMozEmbed is no longer required
+  - finished event class methods except for the "Init*" methods
+    o  added get_type and get_time_stamp to the Event class
+    o  added get_related_target to the MouseEvent class
+  - added `get_key_code' constants to the KeyEvent class
+
+0.01  2005-04-02
+  - initial release, with much help from Torsten Schoenfeld
+    o  wrappings for nsIDOMKeyEvent and nsIDOMMouseEvent

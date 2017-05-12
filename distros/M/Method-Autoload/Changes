@@ -1,0 +1,6 @@
+Revision history for Perl module Method::Autoload
+
+0.02 2010-01-21
+  - Documention update to hide test package from CPAN index.
+0.01 2009-10-04
+  -original version

@@ -1,0 +1,10 @@
+lib/Mojolicious/Plugin/WebFinger.pm
+t/WebFinger.t
+examples/webfingerapp
+examples/webfingerapp-async
+Changes
+MANIFEST
+LICENSE
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

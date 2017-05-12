@@ -1,0 +1,46 @@
+--- #YAML:1.0
+name: Module-CPANTS-Generator
+version: 0.006
+license: perl
+distribution_type: module
+requires:
+  CPANPLUS: 0.042
+  DBD::SQLite: 0.01
+  File::Find::Rule: 0.01
+  LWP::Simple: 0.01
+  Pod::POM: 0.01
+  Pod::Simple: 0.01
+  String::Approx: 0.01
+  Template: 2.08
+  Test::More: 0.01
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Module::CPANTS::Generator:
+    file: lib/Module/CPANTS/Generator.pm
+    version: 0.006
+  Module::CPANTS::Generator::Backpan:
+    file: lib/Module/CPANTS/Generator/Backpan.pm
+    version: 0.004
+  Module::CPANTS::Generator::Files:
+    file: lib/Module/CPANTS/Generator/Files.pm
+    version: 0.004
+  Module::CPANTS::Generator::ModuleInfo:
+    file: lib/Module/CPANTS/Generator/ModuleInfo.pm
+    version: 0.005
+  Module::CPANTS::Generator::Pod:
+    file: lib/Module/CPANTS/Generator/Pod.pm
+  Module::CPANTS::Generator::Prereq:
+    file: lib/Module/CPANTS/Generator/Prereq.pm
+    version: 0.005
+  Module::CPANTS::Generator::Testers:
+    file: lib/Module/CPANTS/Generator/Testers.pm
+    version: 0.006
+  Module::CPANTS::Generator::Unpack:
+    file: lib/Module/CPANTS/Generator/Unpack.pm
+    version: 0.004
+  Module::CPANTS::Generator::Uses:
+    file: lib/Module/CPANTS/Generator/Uses.pm
+    version: 0.004
+generated_by: Module::Build version 0.19

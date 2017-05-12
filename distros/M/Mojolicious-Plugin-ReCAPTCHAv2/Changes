@@ -1,0 +1,36 @@
+
+0.4       2016-01-20 23:22:22+01:00 Europe/Berlin
+	  - Make sure the internal template is always processed with 
+	    EPRenderer and not by whatever template engine the
+	    current app defaults to.
+	    Issue reported and patch provided by LEEJO.
+
+0.3       2015-10-01 11:52:49+02:00 Europe/Berlin
+      - Fix compatibility with older versions of Mojo::JSON API
+
+0.2       2015-09-30 13:17:55+02:00 Europe/Berlin
+      - Fix compatibility with Mojolicious 6.22
+
+0.1       2015-08-04 11:44:44+02:00 Europe/Berlin
+      - Fix compatibility with older Mojolicious versions
+        (hopefully back to 3.02 or even older)
+      - Add IO::Socket::SSL as prerequisite
+
+0.04      2015-07-30 22:27:10+02:00 Europe/Berlin
+      - API CHANGE! recaptcha_verify() now only returns 
+        either "0" or "1"; former return value "-1" is 
+        now subsumed under "0" and can be distinguished by
+        analyzing the error codes
+      - Added tests (pgraemer)
+      - POD fix and some code reformatting (pgraemer)
+      - Fix error handling for failed verification requests
+
+0.03      2015-07-03 16:55:43+02:00 Europe/Berlin
+      - Remove duplicate (auto-generated) POD sections
+
+0.02      2015-07-03 15:05:58+02:00 Europe/Berlin
+      - Updated distribution metadata
+      - Updated Dist::Zilla configuration
+
+0.01
+      - initial version

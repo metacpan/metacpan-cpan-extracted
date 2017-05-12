@@ -1,0 +1,64 @@
+____________________________________________________________________________
+[ 10936] By: autrijus                              on 2004/06/22  14:43:01
+        Log: * This be 0.06.
+             * Minor POD typo fixes.
+             * Call Time::HiRes::time() directly instead of importing
+	       it.
+             * Correctly detect remote address under CGIHandler
+             and Apache2Handler.
+	   ! lib/MasonX/Profiler.pm
+____________________________________________________________________________
+[ 10888] By: autrijus                              on 2004/06/17  00:16:20
+        Log: * This be 0.05.
+             * Documentation cleanups; fix copyright years.
+             * Emcee Lam suggested to mention that the time unit
+             is measured in seconds.
+	   ! README lib/MasonX/Profiler.pm
+____________________________________________________________________________
+[ 10428] By: autrijus                              on 2004/03/18  08:17:20
+        Log: * This be 0.04.
+             * Use Vim folding markers instead of <<< and >>> to mark
+             entry and leaving of components.  Contributed by LCamel. 
+	   ! MANIFEST lib/MasonX/Profiler.pm
+____________________________________________________________________________
+[ 10396] By: autrijus                              on 2004/03/16  10:55:14
+        Log: * This be 0.03.
+             * update to newer M::I and signature dists.
+             * now implements ">>>>"-marked entrance logs, implemented
+             by jihuang and lcamel.
+	   ! Makefile.PL lib/MasonX/Profiler.pm
+	   ! t/0-signature.t
+____________________________________________________________________________
+[  8452] By: autrijus                              on 2003/10/17  10:52:28
+        Log: * This be 0.02.
+             * fix a trivial typo.
+	   ! lib/MasonX/Profiler.pm
+____________________________________________________________________________
+[  8451] By: autrijus                              on 2003/10/17  10:50:45
+        Log: * add ENDS support
+	   ! lib/MasonX/Profiler.pm
+____________________________________________________________________________
+[  8449] By: autrijus                              on 2003/10/17  10:37:56
+        Log: * change the idiom from MasonX::Profile->init(my($p), $m,
+	       $r) to
+             my $p = MasonX::Profiler->new($m, $r)
+             * the old (0.01) calling style is still supported.
+             * no longer refuses to profile if the remote IP is unknown.
+             instead, '*' is used by default.
+             * calling-stack depth tracing is now handler in a per-ip,
+             per-uri basis, which should eliminate race conditions.
+	   ! lib/MasonX/Profiler.pm
+____________________________________________________________________________
+[  8433] By: autrijus                              on 2003/10/16  11:35:50
+        Log: * add example about MasonPreamble
+	   ! lib/MasonX/Profiler.pm
+____________________________________________________________________________
+[  8432] By: autrijus                              on 2003/10/16  11:24:29
+        Log: * add changes
+	   ! MANIFEST
+____________________________________________________________________________
+[  8431] By: autrijus                              on 2003/10/16  11:21:57
+        Log: * This be MasonX::Profiler 0.01, initial release.
+	   + MANIFEST Makefile.PL README
+	   + lib/MasonX/Profiler.pm t/0-signature.t
+	   + t/1-basic.t

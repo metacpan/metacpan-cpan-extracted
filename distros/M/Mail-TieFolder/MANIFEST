@@ -1,0 +1,8 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+TieFolder.pm
+t/Mail/TieFolder/baddummy.pm
+t/Mail/TieFolder/dummy.pm
+t/hash.t
+t/supported.t

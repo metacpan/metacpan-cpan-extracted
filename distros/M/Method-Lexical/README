@@ -1,0 +1,31 @@
+Method-Lexical version 0.30
+===========================
+
+Method::Lexical is a lexically-scoped pragma that implements lexical methods i.e. methods whose use is restricted to the lexical scope in which they are imported or declared.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    B::Hooks::EndOfScope
+    B::Hooks::OP::Check
+    B::Hooks::OP::Annotation
+    Devel::Pragma
+    ExtUtils::Depends
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2013 by chocolateboy
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.

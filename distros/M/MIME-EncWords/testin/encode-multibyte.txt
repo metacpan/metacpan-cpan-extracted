@@ -1,0 +1,36 @@
+GOOD
+("Perl:\x1B\x24BIBE*\x40^Co<g5AE*GQJ*=PNO4o\x1B(B(Pathologically Eclectic Rubbish Lister)", Charset => "iso-2022-jp", Field => "Subject")
+=?ISO-2022-JP?B?UGVybDobJEJJQkUqQF5DbzxnNUFFKkdRSio9UE5PNG8bKEIo?=
+ =?ISO-2022-JP?B?UGF0aG9sb2dpY2FsbHk=?= Eclectic Rubbish Lister)
+
+GOOD
+("Perl:\xC9\xC2\xC5\xAA\xC0\xDE\xC3\xEF\xBC\xE7\xB5\xC1\xC5\xAA\xC7\xD1\xCA\xAA\xBD\xD0\xCE\xCF\xB4\xEF(Pathologically Eclectic Rubbish Lister)", Charset => "euc-jp", Field => "Subject")
+=?ISO-2022-JP?B?UGVybDobJEJJQkUqQF5DbzxnNUFFKkdRSio9UE5PNG8bKEIo?=
+ =?ISO-2022-JP?B?UGF0aG9sb2dpY2FsbHk=?= Eclectic Rubbish Lister)
+
+GOOD
+([["Perl: "], ["\x1B\x24BIBE*\x40^Co<g5AE*GQJ*=PNO4o\x1B(B", "ISO-2022-JP"], [" (Pathologically Eclectic Rubbish Lister)"]], Field => "Subject")
+Perl: =?ISO-2022-JP?B?GyRCSUJFKkBeQ288ZzVBRSpHUUoqPVBOTzRvGyhC?=
+ (Pathologically Eclectic Rubbish Lister)
+
+GOOD
+("Perl: \x1B\x24BIBE*\x40^Co<g5AE*GQJ*=PNO4o\x1B(B (Pathologically Eclectic Rubbish Lister)", Charset => "iso-2022-jp", Field => "Subject")
+Perl: =?ISO-2022-JP?B?GyRCSUJFKkBeQ288ZzVBRSpHUUoqPVBOTzRvGyhC?=
+ (Pathologically Eclectic Rubbish Lister)
+
+GOOD
+("Perl: \x1B\x24BIBE*\x40^Co<g5AE*GQJ*=PNO4o\x1B(B\n (Pathologically Eclectic Rubbish Lister)", Charset => "iso-2022-jp", Field => "Subject")
+Perl: =?ISO-2022-JP?B?GyRCSUJFKkBeQ288ZzVBRSpHUUoqPVBOTzRvGyhC?=
+ (Pathologically Eclectic Rubbish Lister)
+
+GOOD
+("Perl - Pathologically Eclectic Rubbish Lister \x1b\x24BIBE*\x40^Co<g5AE*GQJ*=PNO4o\x24r<B8=\x249\x24k8\x408l\x1b(B", Charset => "iso-2022-jp", Field => "")
+Perl - Pathologically Eclectic Rubbish Lister =?ISO-2022-JP?B?GyRCSUIbKEI=?=
+ =?ISO-2022-JP?B?GyRCRSpAXkNvPGc1QUUqR1FKKj1QTk80byRyPEI4PSQ5JGs4QDhsGyhC?=
+
+GOOD
+("Perl -- Pathologically Eclectic Rubbish Lister \x1b\x24BIBE*\x40^Co<g5AE*GQJ*=PNO4o\x24r<B8=\x249\x24k8\x408l\x1b(B", Charset => "iso-2022-jp", Field => "")
+Perl -- Pathologically Eclectic Rubbish Lister
+ =?ISO-2022-JP?B?GyRCSUJFKkBeQ288ZzVBRSpHUUoqPVBOTzRvJHI8Qjg9JDkkazhAGyhC?=
+ =?ISO-2022-JP?B?GyRCOGwbKEI=?=
+

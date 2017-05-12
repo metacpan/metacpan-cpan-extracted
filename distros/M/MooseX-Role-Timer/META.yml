@@ -1,0 +1,22 @@
+---
+abstract: 'Measure times with your object.'
+author:
+  - 'Michael Langner'
+build_requires:
+  Moo: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-Role-Timer
+requires:
+  Moo::Role: '0'
+  Time::HiRes: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.05'

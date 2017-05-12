@@ -1,0 +1,9 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Moose/Micro.pm
+t/001_basic.t
+t/002_builder.t

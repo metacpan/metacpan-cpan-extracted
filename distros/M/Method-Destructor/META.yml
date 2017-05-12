@@ -1,0 +1,27 @@
+---
+abstract: 'Cumulative destructors'
+author:
+  - 'Goro Fuji <gfuji(at)cpan.org>.'
+build_requires:
+  Test::LeakTrace: 0.08
+  Test::More: 0.62
+  parent: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.44
+distribution_type: module
+generated_by: 'Module::Install version 0.79'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Method-Destructor
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  MRO::Compat: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

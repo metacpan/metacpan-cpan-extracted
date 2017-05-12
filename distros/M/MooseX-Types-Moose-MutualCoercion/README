@@ -1,0 +1,54 @@
+NAME
+----
+
+MooseX-Types-Moose-MutualCoercion (Perl module MooseX::Types::Moose::MutualCoercion)
+
+INSTALLATION
+------------
+
+To install this distribution,
+
+first, to make Makefile, build this distribution and run tests
+by the following command:
+
+    % cpan -t .
+
+next, to deploy this distribution
+by the following command:
+
+    % cpan -i .
+
+DEPENDENCIES
+------------
+
+See "Makefile.PL".
+
+DOCUMENTATION
+-------------
+
+MooseX::Types::Moose::MutualCoercion documentation is available as in POD.
+So you can do:
+
+    % perldoc MooseX::Types::Moose::MutualCoercion
+
+to read the documentation online with your favorite pager.
+
+AUTHOR
+------
+
+MORIYA Masaki, alias Gardejo
+
+    <moriya at cpan dot org>,
+    http://gardejo.org/
+
+COPYRIGHT AND LICENSE
+---------------------
+
+Copyright (c) 2010 MORIYA Masaki, alias Gardejo
+
+This distribution is free software;
+you can redistribute it and/or modify it under the same terms as Perl itself.
+See perlgpl and perlartistic.
+
+The full text of the license can be found in the "LICENSE" file
+included with this distribution.

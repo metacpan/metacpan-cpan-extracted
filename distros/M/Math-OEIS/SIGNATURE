@@ -1,0 +1,67 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4bff2464b268ff5f213efe8b869b8b45c602165d Changes
+SHA1 73425b14c2985b6f1cc01b01dbb12804557af0ee MANIFEST
+SHA1 9b875407d60f086714a3ca39de8ef195c106d889 MANIFEST.SKIP
+SHA1 330dbe8277cf4a8c111739e8fa2f9151e5e42556 META.json
+SHA1 8c9d2c5ee35cf204126656bf88e3a10c0cb9662c META.yml
+SHA1 e1546ceac917da4b84f7a75727ad05dce4be876e Makefile.PL
+SHA1 938b608a1bad8a753874bb7667613b7be94b3473 debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 9f8a908f60f9ae8c1e56c4d8794434af6c852332 debian/control
+SHA1 acea1dd7fda2970edb8ace5300c61fc981c1e442 debian/copyright
+SHA1 b23c2a62de2a954a2e900a197193c81d42b360d3 debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 56bff9e42ee2c57b5ed3d48eecd090b4d3f00ab2 debian/watch
+SHA1 52ef39eb14c0f537f251556ccea30b59ea0071cc devel/grep.pl
+SHA1 7cc6506201e7b0e2cef5176ab0bb574a7c007d21 devel/speed.pl
+SHA1 06303c7a576a40c1a71443c5a279a375b9a8358e devel/uninteresting.pl
+SHA1 4321ae4a378b1063250feca9c48acbadf58884f0 lib/Math/OEIS.pm
+SHA1 7a03a0c613157eeb43aef2adeae660448e2a028c lib/Math/OEIS/Grep.pm
+SHA1 a4e3a1723847564761fa4e0604c4ec552e9775f6 lib/Math/OEIS/Names.pm
+SHA1 9babc105ddf1b49c4899e8d5f491800cfdc1a18d lib/Math/OEIS/SortedFile.pm
+SHA1 aabe6e0b8fb13854ceaa67f4ecb87fea1afac2b6 lib/Math/OEIS/Stripped.pm
+SHA1 0f3d1c8681ad2d09f1406553485e38561140dcc5 t/Grep.t
+SHA1 47ebbf1d71ebdc462f51055161de9cd0838f45dc t/MyTestHelpers.pm
+SHA1 fd9bd95804f72be4ca10f7bff9e189d32e7b7351 t/Names.t
+SHA1 f344542f4d3aee4b96c0e7d7d429b144ddd208e5 t/OEIS.t
+SHA1 de47e9cda73fbf38abf2f020aa9d6529e84551c4 t/SortedFile.t
+SHA1 01b4d36afcb250100f731b04fbd010e9cf3914b7 t/Stripped.t
+SHA1 6a533dbde3f663018849bba4fb972c7e92f92e08 t/taint.t
+SHA1 e3919283466cd487fbe53ca8aa2468f1d9678b5f t/test-names
+SHA1 643c8ce3e77e97c0bee6fa986aa8196684e0f0fb t/test-stripped
+SHA1 45ff0026ecf34681dd6d1769f64788b39a2353c7 xt/0-Test-CheckChanges.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
+SHA1 63abbc3297914cd38081e95588fd794f9d1f0306 xt/0-Test-YAML-Meta.t
+SHA1 51069b694ce78fde7d42ed539322fae579948d40 xtools/my-check-copyright-years.sh
+SHA1 5c2017c5ddf98ca4ee52cd5ca1096ee2e703b624 xtools/my-check-spelling.sh
+SHA1 d76762639d4ac9a709b1de9d0ad61974aa5026b2 xtools/my-deb.sh
+SHA1 2db0a23176de55a8ee8f1643f239aeaa2bcf4fa1 xtools/my-diff-prev.sh
+SHA1 e4a15f9b4bcf1d087de2d9ed8e87bf92b0469a6c xtools/my-manifest.sh
+SHA1 eec6a78c6ed57242d151597b048df6ea5efc5cc4 xtools/my-pc.sh
+SHA1 7b1e948c88915689b3782d872ef9b92a2912c593 xtools/my-tags.sh
+SHA1 5c86dd9ca3d2ecf3ee9d90da1537b71e56c8b321 xtools/my-wunused.sh
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAld4nX0ACgkQLFMCIV9q3Tp1/QCeOfDH2NKbQvTEPx6Fl32Cnpih
+zhMAoIuhI2Kqmm506cfFViupdR6eEP4h
+=ChQ/
+-----END PGP SIGNATURE-----

@@ -1,0 +1,31 @@
+---
+abstract: 'modular integer arithmetic'
+author:
+  - 'Martin Becker <becker-cpan-mp@cozap.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Scalar::Util: '0'
+  Test: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-ModInt
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  Math::BigInt::GMP: '0'
+  Math::BigRat: '0'
+requires:
+  Carp: '0'
+  Math::BigInt: '1.991'
+  overload: '0'
+  perl: '5.006'
+version: '0.011'

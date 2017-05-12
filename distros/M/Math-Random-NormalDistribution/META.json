@@ -1,0 +1,31 @@
+{
+   "abstract" : "Normally distributed random numbers.",
+   "author" : [
+      "Oleg Alistratov <zero@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-Random-NormalDistribution",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/alistratov/math-random-normaldistribution.git",
+         "web" : "https://github.com/alistratov/math-random-normaldistribution"
+      }
+   },
+   "version" : "0.01"
+}

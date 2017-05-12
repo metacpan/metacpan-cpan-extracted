@@ -1,0 +1,212 @@
+Revision history for Map::Tube::Delhi
+
+0.54  Tue Mar 21 12:30:00 2017
+      - Tidied up test scripts and removed "-T" switch.
+
+0.53  Wed Mar 15 13:40:00 2017
+      - Built using Dist::Zilla::Plugin::Test::Map::Tube v0.14
+
+0.52  Wed Mar 08 12:20:00 2017
+      - Upgraded to use Map::Tube v3.28.
+
+0.51  Wed Feb 09 10:20:00 2017
+      - Upgraded to use Map::Tube v3.22.
+      - Changed map data file format to JSON.
+
+0.50  Fri Feb 03 15:00:00 2017
+      - Auto generated LICENSE file using dzil plugin [License].
+      - Added copyright year information in the dist.ini file.
+
+0.49  Wed Dec 28 04:00:00 2016
+      - Removed dzil plugin [MetaResource] from dist.ini file.
+      - Built using Dist::Zilla::PluginBundle::MANWAR v0.07
+
+0.48  Sun Dec 25 15:00:00 2016
+      - Built using Dist::Zilla::Plugin::Test::Map::Tube v0.12
+
+0.47  Sun Oct 23 07:45:00 2016
+      - Upgraded to use Map::Tube v3.21.
+
+0.46  Thu Sep 22 10:35:00 2016
+      - Updated unit test scripts (t/meta-json.t and t/meta-yml.t).
+      - Cosmetics changes to the pod.
+
+0.45  Wed Aug 17 08:15:00 2016
+      - Upgraded to use Map::Tube v3.18.
+
+0.44  Fri Jul 29 10:35:00 2016
+      - Used dzil plugin bundle [@MANWAR].
+
+0.43  Sun Jun 26 09:50:00 2016
+      - Upgraded to use Map::Tube v3.15 to address the CPAN Tester Fail Report:
+        http://www.cpantesters.org/cpan/report/0822a204-38a5-11e6-a16d-92a790c50306
+
+0.42  Mon Jun 13 09:50:00 2016
+      - Added section "SEE ALSO" to the pod document.
+      - Added more information about Map::Tube::CLI.
+      - Updated README file.
+
+0.41  Tue May 31 07:40:00 2016
+      - Consolidated routes test file into one.
+      - Updated copyright year information.
+      - Used dzil plugin [RunExtraTests].
+
+0.40  Sat Feb 20 09:15:00 2016
+      - Added plugin [Prereqs / TestRequires] to the dist.ini file.
+
+0.39  Fri Feb 19 16:10:00 2016
+      - Added dzil plugins [PkgVersion], [PodVersion] and [PkgAuthority] to the dist.ini file.
+      - Removed hardcoded $VERION and section "VERSION" from all the packages.
+      - Removed hardcoded $AUTHORITY from all the packages.
+
+0.38  Fri Dec 04 09:50:00 2015
+      - Fixed issue RT: 110062 raised by SREZIC.
+
+0.37  Thu Dec 03 16:10:00 2015
+      - Upgraded to use Dist::Zilla, my first attempt.
+      - Used plugin Dist::Zilla::Plugin::Test::Map::Tube to add unit test script xt/map.t.
+
+0.36  Sat Oct 24 02:40:00 2015
+      - Upgraded to use Map::Tube v3.11.
+      - Added station index to the map data.
+
+0.35  Thu Sep 24 10:30:00 2015
+      - Upgraded to use Map::Tube v3.01.
+
+0.34  Fri Jul 24 12:00:00 2015
+      - Upgraded to use Map::Tube v3.00.
+
+0.33  Sun Mar 01 11:30:00 2015
+      - Added File::ShareDir::Install as configure requires in the Makefile.PL file.
+
+0.32  Mon Feb 23 19:35:00 2015
+      - Upgraded to use Map::Tube v2.87.
+      - Added unit test map.t script.
+      - Added Delhi metro map image.
+      - Tidied up pod document.
+
+0.31  Mon Feb 09 13:40:00 2015
+      - Upgraded to use Map::Tube v2.78.
+      - Fixed the link information for the stations 'Akshardham' and 'Lakshmi Nagar'.
+
+0.30  Mon Feb 02 20:50:00 2015
+      - Updated link informations for the stations 'Kirti Nagar'.
+      - Updated line informations for the stations 'Kirti Nagar'.
+      - Updated link informations for the station 'Satguru Ram Singh Marg'.
+      - Further tweaked cosmetic changes to the pod document of Blue and Yellow line.
+
+0.29  Mon Feb 02 17:35:00 2015
+      - Minor cosmetic changes to the pod document of Blue and Yellow line.
+
+0.28  Mon Feb 02 14:20:00 2015
+      - Upgraded to use Map::Tube v2.77.
+      - Added map image for all Delhi Metro lines.
+      - Added section "MAP" to all pod documents of Map::Tube::Delhi::Line::* family.
+      - Documented method as_image() in the pod document of Map::Tube::Delhi.
+
+0.27  Tue Jan 13 15:50:00 2015
+      - Tidied up unit test scripts.
+
+0.26  Tue Jan 13 14:58:00 2015
+      - Upgraded to use Map::Tube v2.62.
+
+0.25  Fri Jan 09 14:50:20 2015
+      - Upgraded to use Map::Tube v2.61 as it brings in new fix and feature.
+
+0.24  Wed Jan 07 12:15:20 2015
+      - Added line 'use strict; use warnings;' to all the packages Map::Tube::Delhi::Line::*.pm file.
+
+0.23  Wed Jan 07 12:00:20 2015
+      - Upgraded to use Map::Tube v2.60 as it brings in new fix and feature.
+      - Updated Makefile.PL to generate the key 'provides' for META file correctly.
+      - Added unit test to test META files.
+      - Added LICENSE file.
+      - Updated Copyright year information.
+
+0.22  Thu Dec 11 23:50:20 2014
+      - Added section "NOTE" for linked stations.
+
+0.21  Thu Dec 11 12:39:20 2014
+      - Tidied up linked stations.
+      - Fixed the typo in station names of Blue Line.
+
+0.20  Thu Dec 11 00:30:20 2014
+      - Marked and linked stations with multiple lines.
+
+0.19  Wed Dec 10 21:15:20 2014
+      - Added missing links to the Blue Line.
+      - Fixed the typo in station name of Green Line.
+      - General tidied up the description of Map::Tube::Delhi::Line::*.pm
+
+0.18  Wed Dec 10 18:28:20 2014
+      - Corrected station for "Mayur Vihar I"
+      - Added station names of each line as a seperate package Map::Tube::Delhi::Line::*.pm
+      - Updated the pod document of package Map::Tube::Delhi and linked them.
+
+0.17  Tue Dec 09 21:28:19 2014
+      - Added 'Blue' line route to the map, which completes the entire Delhi Metro.
+      - Added new test script for the newly added line 'Blue'.
+
+0.16  Mon Dec 08 20:33:15 2014
+      - Upgraded to use Map::Tube v2.42.
+      - Added 'Orange' line stations to the map data.
+      - Added new test script for the newly added line 'Orange'.
+
+0.15  Sun Dec 07 19:30:15 2014
+      - Upgraded to use Map::Tube v2.40.
+      - Added 'Violet' line stations to the map data.
+      - Added new attribute "name" to the node "tube" in the map data.
+      - Added new test script for the newly added line 'Violet'.
+
+0.14  Sat Dec 06 22:39:11 2014
+      - Upgraded to use Map::Tube v2.34.
+      - Removed stations name from the pod document as it is becoming too noisy.
+
+0.13  Fri Dec 05 20:33:10 2014
+      - Upgraded to use Map::Tube v2.33 as it brings in new fix and feature.
+      - Updated unit test to reflect the changes in Map::Tube v2.33.
+
+0.12  Fri Dec 05 10:55:10 2014
+      - Updated the description of method get_shortest_route().
+
+0.11  Thu Dec 04 20:25:10 2014
+      - Updated unit test to make use of new class provided by Map::Tube role.
+      - Updated description of method get_shortest_route() in the pod documemt.
+
+0.10  Wed Dec 03 21:14:10 2014
+      - Upgraded to use Map::Tube v2.31 as it brings in new fix and feature.
+      - Added test case for case insensitive station name.
+      - Removed SIGNATURE file.
+
+0.09  Sun Nov 30 11:32:00 2014
+      - Upgraded to use Map::Tube v2.27 as it brings in new fix and feature.
+      - Updated test case to comply with the updated package Map::Tube.
+
+0.08  Sat Nov 29 10:00:00 2014
+      - Updated the link to the Delhi Metro Map in the pod document.
+
+0.07  Fri Nov 28 23:36:00 2014
+      - Corrected station id of some of the Green Line stations.
+      - Added Yellow line stations to the map.
+      - Added test script for Red and Yellow Lines stations.
+      - Added Yellow Lines station details to the pod document.
+
+0.06  Wed Nov 26 23:13:20 2014
+      - Moved out the junction "Ashok Park Main".
+      - Added Red and Green line stations to the pod document.
+
+0.05  Tue Nov 25 22:40:20 2014
+      - Updated manifest.t script to run even when the author is running the test.
+      - Tidied up map data and remove the word 'Line' from the line attribute of the station node.
+
+0.04  Mon Nov 24 23:09:05 2014
+      - Restructed the map and organised junction station correctly.
+
+0.03  Fri Nov 14 20:17:10 2014
+      - Added test script test-case-01.t.
+
+0.02  Thu Nov 13 20:28:10 2014
+      - Added test script test-case-00.t.
+
+0.01  Sun Nov 09 01:00:01 2014
+      - First version, released.

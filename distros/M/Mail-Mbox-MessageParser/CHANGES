@@ -1,0 +1,318 @@
+Version 1.5105: Sat May 2 2015
+- Prevent CPAN from indexing private-lib
+
+Version 1.5104: Mon Apr 20 2015
+- Remove unused File::Cat import
+
+Version 1.5103: Mon Apr 20 2015
+- Add File::Path dependency for testing. Thanks to Paul Howarth
+  <paul@city-fan.org> for the info.
+  https://rt.cpan.org/Ticket/Display.html?id=103482
+- Don't install private Module::Install extension. Thanks to Paul Howarth
+  <paul@city-fan.org> for the bug report.
+  https://rt.cpan.org/Ticket/Display.html?id=103482
+- Clarify licensing terms
+- Move verbose testing to a private module, and implement it in a way that
+  doesn't require editing the Makefile after it is generated.
+- Require File::Slurp instead of including it, to avoid potential problems
+  like this:
+  http://www.cpantesters.org/cpan/report/86a0145a-e52b-11e4-a1d1-8536eb4f9f07
+- Improve the ability of the test suite to be run in parallel
+- Fix Windows test incompatibilities, such as:
+  http://www.cpantesters.org/cpan/report/12187014-af8d-1014-92d8-fdf72a825c07
+  http://www.cpantesters.org/cpan/report/12187014-af8d-1014-92d8-fdf72a825c07
+
+Version 1.5102: Sun Apr 12 2015
+- Fix xz and lzip test skip for when tools are not installed
+- Enable verbose testing for CPAN-testers
+- Use proper temp dir instead of t/temp
+- Consolidate issue tracking at rt.cpan.org
+
+Version 1.5101: Sat Apr 4 2015
+- Add a version check for lzip, to make sure the .lz file can be decompressed
+  properly during testing. Thanks to Paul Howarth <paul@city-fan.org> for the
+  suggestion.
+- Fix warning about deleting nonexistent test cache
+- Enhance "make test TEST_VERBOSE=1" to dump debug information
+- Work around a POD-stripping bug that would cause module load to fail on some
+  platforms
+
+Version 1.5100: Sun Mar 22 2015
+- Moved code to github
+- Added xz support.
+  https://rt.cpan.org/Ticket/Display.html?id=68286
+  Thanks to sascha@trimind.de for initial patches.
+- Added lzip support.
+  Thanks to an anonymous submitter for the idea.
+  http://sourceforge.net/p/grepmail/patches/8/
+- Added POD test
+- Fixed hang in pure Perl implementation for a malformed mbox file scenario.
+  Thanks to Jason Brooks <jason@petting-zoo.org> for providing an mbox
+  that found this bug.
+- Fixed $OLDSTDERR used only once warning.
+  https://rt.cpan.org/Ticket/Display.html?id=58053
+  Thanks to paul@city-fan.org for the bug report and patch.
+- Fixed enabling of warnings.
+  https://rt.cpan.org/Ticket/Display.html?id=79898
+  Thanks to atourbin@cpan.org for the bug report and patch.
+- Fixed a division by zero error for malformed mbox files that start with a
+  newline.
+  https://rt.cpan.org/Ticket/Display.html?id=69469
+  Thanks to vadz@cpan.org for the bug report.
+- Fix bug in M::M::Perl documentation.
+  Thanks to Christopher Orsolits <chris@s7logic.com> for spotting it.
+- Add more cache file validation.
+  Thanks to Richard Higson <richard.higson@gt.owl.de> for reporting the
+  problem.
+
+Version 1.5002: Sun Aug 9 2009
+- Disabled the grep interface, which has had some tricky bugs that I don't
+	have time to figure out.
+- Fixed infinite loop that occurred for emails of less than 200 characters.
+	(Thanks to Julian Ladisch <bitcard.org-prt@ladisch.de> for the bug report.)
+- Updated Makefile.PL to be compatible with versions of Module::Install >
+	0.88.
+- Instead of returning an error for an empty mailbox, a valid mailbox is
+	returned that will immediately fail the end_of_mailbox check. This should
+	simplify people's code. (Thanks to Daniel Maher <dma@witbe.net> for a bug
+	report that suggested this change in semantics.)
+- More updates for the missing "m" modifier issue exposed by Perl 5.10.
+	(Thanks to Tom Callawa <tcallawa@redhat.com> for the bug report, and Andreas
+	König <andreas.koenig@anima.de> for the patch.)
+- Added some debugging information for the "cache data not validated" error.
+	Hopefully this will help catch the bug in the act.
+
+Version 1.5001: Sun Jul 20 2008
+- Added the missing "m" modifier to a number of regular expressions. A change
+	in Perl 5.10 exposed this issue. (Thanks to Anicka Bernathova
+	<anicka@suse.cz> for the patch.)
+- Fixed an off-by-one error that would sometimes cause warnings about
+	undefined values.
+- Added a hack to Makefile.PL to force Module::AutoInstall to be included for
+	Module::Install::CheckOptional.
+- Fixed a problem in the PREOP rewriting that would cause it to fail on
+	Windows.
+
+Version 1.5000: Thu Jan 11 2007
+- The Cache and Grep implementations now detect when changes have occurred to
+  the file being parsed, and automatically invalidate their cache values and
+  revert to the Perl implementation. NOTE: This works well for appending to
+  the mailbox, but undefined behavior occurs if modifications are made to the
+  mailbox at locations earlier than the current position. (Thanks to Armin
+  Obersteiner <armin@xos.net> for the feature suggestion.)
+- Changed the reset test so that it doesn't create output with inconsistent
+  line endings in the case of a dos mailbox.
+- Fixed a bug where occasionally the reading of the next email will go into an
+  infinite loop when reading from standard input. (Thanks to
+  <hpeberhard@users.sourceforge.net> for the bug report and sample input.)
+- read_next_email now returns undef on end of file. (Thanks to Lucas Nussbaum
+  <lucas@lucas-nussbaum.net> for first reporting the bug. Thanks to Stephen
+  Gran <sgran@debian.org>, Frank Lichtenheld <djpig@debian.org>, Steinar
+  H. Gunderson <sgunderson@bigfoot.com>, Christian Hammers <ch@debian.org>,
+  gregor herrmann <gregor+debian@comodo.priv.at>, and Joey Hess
+  <joeyh@debian.org> for their efforts to fix or work around the bug. Finally,
+  thanks to Tassilo von Parseval <Tassilo.von.Parseval@rwth-aachen.de> for
+  (mis)using the module in an intuitive way that prompted the solution.)
+- Simplified code by removing end_of_file attribute of parser objects.
+
+Version 1.4005: Thu Aug 24 2006
+- Fixed a bug where emails with a line near the end that start with "From "
+  would cause the Grep implementation to go into an infinite loop. (Thanks to
+  Volker Kuhlmann <VolkerKuhlmann@gmx.de> for the bug report.)
+- Fixed some minor coding style issues.
+
+Version 1.4004: Tue Jul 11 2006
+- Fixed a bug where, when emails are incomplete, the Perl parser would cache
+  incorrect information, causing the Cache implementation to go into an
+  infinite loop when it tried to use the invalid information.
+- Improved the behavior for multi-part emails that lack a valid ending
+  boundaries. Instead of treating the rest of the mailbox as part of the
+  email, the Perl and Grep parsers now find the end of the email using (1) a
+  Content-Length header if it is present, or (2) the next valid "^From " line
+  after the email's header. (Many thanks to Volker Kuhlmann
+  <VolkerKuhlmann@gmx.de>, Eduard Bloch <edi@gmx.de>, and Joey Hess
+  <joeyh@debian.org> for their efforts to track down the cause of the bug.
+  Special thanks to Volker for suggesting the right behavior. :)
+- Simplified the code some
+
+Version 1.4003: Sun May 21 2006
+- Fixed a bug where multi-part emails having boundaries containing characters
+  like " " and "+" would cause the remainder of the mailbox to be treated as
+  part of the email with the boundary. (Thanks to Volker Kuhlmann
+  <VolkerKuhlmann@gmx.de> for first reporting the bug, and thanks to Joey Hess
+  <joeyh@debian.org> for the bugfix.)
+- Fixed a previously unrevealed fault in the mailbox for the separators test.
+  (The last message's separator wasn't used correctly.)
+
+Version 1.4002: Thu Feb  9 2006
+- Dropped tzip support. The program seems poorly supported and buggy. (I can't
+  get it to run right on Mac, for example.)
+- An invalid cache is detected and overwritten. This can occur if one changes
+  architectures, or if the cache is otherwise corrupted. (Thanks to Volker
+  Kuhlmann <VolkerKuhlmann@gmx.de> for the feature suggestion.)
+- Fixed a major memory consumption bug in the Perl implementation, where the
+  read buffer would grow exponentially. This caused the module to use memory
+  proportional to the size of the mailbox, rather than the size of the largest
+  email. (Thanks to David Cantrell <david@cantrell.org.uk> for the bug
+  report.)
+
+Version 1.4001: Tue Aug 2 2005
+- Fixed a bug where emails involving time zones of length more than 3
+  characters (e.g. "WETDST") would not be processed correctly.  (Thanks to
+  Hans F. Nordhaug <Hans.F.Nordhaug@hiMolde.no> for the bug report.)
+- Fixed some undefined value warnings for some test cases.
+- Fixed a bug where mailboxes having emails with rfc822 attachments would not
+  be parsed correctly
+
+Version 1.4000: Thu Jul 7 2005
+- Fixed a long-standing bug in the parsing of mail messages containing mail
+  attachments. (Thanks to Brian May <bam@debian.org> for the bug report.)
+- Dropped X-From-Line support for two reasons: (1) it seems to have
+  disappeared from newer versions of Gnus, and (2) this module is for mbox
+  format. (Thanks to Brian May <bam@debian.org> for prompting this.)
+- Changed the mail parsing so that a blank line *must* separate mail messages,
+  as per mail(5) (http://www.qmail.org/man/man5/mbox.html). Lack of a blank
+  line will cause the second email to be considered to be part of the
+  preceding email.
+
+Version 1.3001: Mon Jun 6 2005
+- Changed the testing code to use a more aggressive technique for clearing any
+  existing cache, even if it is not readable.
+- Fixed a problem with the grep implementation where locale settings (LC_ALL,
+  LC_COLLATE, LANG, LC_CTYPE, LC_MESSAGES) would cause it to fail. (Thanks to
+  Joey Hess <joey@kitenet.net> for the bug report.)
+
+Version 1.3000: Mon Mar 14 2005
+- Merged the internal caches used by the different mailbox parser
+  implementations. This allows sharing of caching information. NOTE: Tighter
+  integration of the classes means that you can no longer instantiate any of
+  the implementations directly; you must use Mail::Mbox::MessageParser only.
+- Fixed goofy version dependency for Benchmark::Timer.
+- Fixed improper identification of mailboxes whose first email has a body
+  containing a large number of foreign characters. (Thanks to Nigel Horne
+  <njh@bandsman.co.uk> for the bug report and sample data.)
+- Fixed a spurious warning in a test case. (Thanks to Nigel Horne
+  <njh@bandsman.co.uk> for the bug report.)
+- Fixed a test code bug that would cause some failed tests to incorrectly
+  pass.
+- Fixed a bug where emails with attachments would cause the mailbox parser to
+  enter an infinite loop. (Thanks once again to Joey Hess <joey@kitenet.net>
+  for the excellent bug report.)
+- Fixed a bug where the cache would not be saved to disk when the file was
+  finished being read.
+- Fixed a bug in the test cases where some differences in test output would
+  not be detected.
+- Fixed a bug in Mbox::Mail::MessageParser::Grep that would cause it to
+  improperly identify separate emails in a mailbox if the "From " line looked
+  like "From klopp Mon Jan  5 08:50:15 +0100 2004". (Thanks to Frederic Klopp
+  <klopp@math.univ-paris13.fr>" for the bug report and sample mailbox.)
+
+Version 1.2130: Tue Dec 21 2004
+- Fixed version numbers, which were incompatible with some modules. (Thanks to
+  Tassilo von Parseval <tassilo.von.parseval@rwth-aachen.de> for the bug
+  report)
+
+Version 1.21.2:
+- Fixed a dependency version error for Benchmark::Timer
+- Switched to Test::More for better error reporting
+- Improved test failure reporting
+- Fixed a bug where messages embedded in other messages as RFC 822 attachments
+  would be treated as separate emails. (Thanks to Will Fiveash
+  <william.fiveash@sun.com> for the bug report.)
+- Moved all configuration data to M::M::MP::Config
+
+Version 1.21.1: Thu Sep 16 2004
+- Fixed broken dependency specification in Makefile.PL
+- Removed Module::Install extension dependency code from Makefile.PL. (Not
+  needed with fixed extensions.)
+
+Version 1.21.0: Wed Sep 15 2004
+- Fixed missing file warnings from "make distcheck" resulting from a
+  workaround for a MakeMaker bug. (Thanks to Ed Avis <ed.avis@kbcfp.com> for
+  the bug report.)
+- Dropped force_processing in M::M::Grep (all files treated as text), since
+  M::MessageParser detects file types. This fixes a Perl warning issued when
+  force_processing is false and M::MessageParser determines that the file is
+  text, but it contains a binary character. (Thanks to Jason Brunette 
+  <jbrunette@users.sourceforge.net> for the bug report.)
+- Updated Makefile.PL to use Module::Install
+
+Version 1.20:
+- More robust use of GNU grep to find emails on DOS systems (Thanks to Martin
+  Hosken <martin_hosken@sil.org> for the initial patch)
+- Fixed an uninitialized value warning in Cache.pm
+- Made everything work with DOS-style line endings. Added endline() function
+  to return the detected line ending
+
+Version 1.15:
+- Now keeps reading the first paragraph until a maximum number of bytes have
+  been read. This should help people who use MUAs that add a lot of extra
+  header information to the first email in a mailbox. (Thanks to Graham Gough
+  <graham@cs.man.ac.uk> for pointing out the problem with VM under Emacs.)
+
+Version 1.14:
+- At installation, you no longer have to provide a full path to the external
+  programs. (Thanks to Ed Avis <ed.avis@kbcfp.com> for the suggestion.)
+- Fixed _print_debug_information so that it prints the values of options
+  correctly. (Thanks to Jason Brunette <jbrunette@users.sourceforge.net> for
+  the great bug report.)
+- Fixed a file handle leak when processing non-mailbox files. (Thanks to Jason
+  Brunette <jbrunette@users.sourceforge.net> for the great bug report.)
+
+Version 1.13:
+- Fixed portability issues for Windows. (It should now work under the normal
+  Windows command shell.) Note that this requires the use of a temporary file
+  for decompression of file handles on Windows--a minor security risk.
+- Makefile.PL version detection for GNU grep now works correctly for version
+  numbers which end with letters. (Thanks to David Dyck <david.dyck@fluke.com>
+  for the bug report.)
+- Fixed typo bugs in a couple test cases.
+
+Version 1.12:
+- Added "perl Makefile.PL" version checks for external programs like grep.
+  (Suggestion by David N. Blank-Edelman <dnb@ccs.neu.edu>)
+- Fixed a typo in the documented synopsis (Thanks to Christophe Nowicki
+  <nowick_c@epita.fr> for the report.)
+- Implemented a portable ungetc version of FileHandle, and changed this module
+  to use it instead of IO::String. This will hopefully fixed the
+  system-dependent bugs in the last release. (Thanks to David N.
+  Blank-Edelman <dnb@ccs.neu.edu> for providing a test environment.)
+- Improved compatibility with Windows. (Cygwin works, but we're still not
+  there yet for Windows command shell.)
+- Streamlined installation for cases where caching is not enabled in
+  Mail::Mbox::MessageParser.
+
+Version 1.11:
+- Added test cases with spaces in the mailbox names. (Thanks to Johan Ekenberg
+  <johan@fsdata.se> for finding the bug and submitting a partial patch.)
+- Fixed line ending bugs for MS-DOS/Windows (Tests now pass under cygwin)
+- Fixed mailbox detection problem with mailboxes whose first email is a
+  pseudo-email used to store mailbox state information. (Thanks to Johan
+  Ekenberg <johan@fsdata.se> for the bug report.)
+- Fixed a bug on freebsd where mailboxes of size less than 2000 bytes would be
+  incorrectly processed. (This fix is a less-than-optimal one which requires
+  IO::String. I may later get the gumption to do it right using PerlIO::var)
+
+Version 1.10:
+- Testing modules are no longer (accidentally) installed.
+- External programs are now queried during installation instead of just using
+  whatever is in your path (a security risk). (Thanks to David N.
+  Blank-Edelman <dnb@ccs.neu.edu> for the bug report.)
+- Changed testing to use PERLRUN instead of FULLPERLRUN, which is not
+  available with older versions of MakeMaker that ship with older versions of
+  Perl. (Thanks to Ed Avis <ed.avis@kbcfp.com> for catching this.)
+- Cache file permissions are now set to protect against prying eyes. (Patch by
+  Joey Hess <joey@kitenet.net>)
+- Improved speed testing.
+- Added support for opening of files, and decompressing files or filehandles.
+- Restructured test cases.
+- Fixed a bug in _PUT_BACK_STRING which would cause major failures on Solaris.
+- Fixed compatibility problems with perl 5.005_01
+- Fixed grep implementation for filenames with spaces in them. (Thanks to
+  Johan Ekenberg <johan@fsdata.se> for the bug report and patch.)
+- Added "force_processing" option to force processing of files even if they
+  look to be binary or non-mailboxes.
+
+Version 1.00:
+- Initial version, with caching and grep support. Code taken from version 5.00
+  of grepmail

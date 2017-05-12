@@ -1,0 +1,24 @@
+Changes for Module::TestConfig
+
+0.05  Fri Dec 19 18:48:40 PST 2008
+	- fixed a STDIN warning in save_defaults()
+	- requiring perl 5.8.0 because we need to disable warnings for "io".
+
+0.04  Thu Aug 28 18:53:31 2003
+	- major validate bug fixed
+	- added more examples to the docs
+	- Internal changes to Question.pm
+	- 4 modules are now only loaded on use
+	- report() will suffice without Text::FormatTable
+	- reports are indented
+	- prompt() just returns an answer, it doesn't actually set it.
+
+0.03  Tue Aug 26 12:09:33 2003
+	- fix bug in the SYNOPSIS code example
+	- added save_defaults()
+
+0.02  Mon Aug 25 05:16:47 2003
+	- initial public version
+
+0.01  Fri Aug  8 13:50:37 2003
+	- initial version - internal only

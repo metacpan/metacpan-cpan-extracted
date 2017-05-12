@@ -1,0 +1,12 @@
+\.o$
+^blib
+pm_to_blib
+^misc
+^\.
+\.bak$
+\.bs$
+^mplib_patched
+Mplib\.c
+^(mplib\/)?Makefile\.old$
+^(mplib\/)?Makefile$
+\.swp$

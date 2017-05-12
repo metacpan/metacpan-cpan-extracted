@@ -1,0 +1,51 @@
+
+Frequently Asked Questions  (FAQ)
+
+This page may give an answer to your questions.  I hope you have
+contributions
+
+ 1) Why should I use the Mail::Box::Manager?
+
+    You can process folders using the Mail::Box::Mbox and Mail::Box::MH
+    objects, without a Mail::Box::Manager.  However, using the manager, your
+    application will work for any kind of folder because the manager will
+    autodetect the type, and because all folder objects share the same
+    interface!
+
+    Besides, the manager protects you from opening the same folder
+    twice (which may cause `inconvenience'), and can create
+    message threads.
+
+ 2) What are threads?
+
+    Very confusing, the word `thread' in mail folders has nothing to
+    do with the threads of Perl and UNIX.  Some operating systems (and
+    Perl) have give one program the possibility to start multiple
+    sub-programs within itself.  These are called `process-threads',
+    or `threads' for short.
+
+    However, in our context, we speak about `message-threads', which
+    describe the relationships between messages.  Each message may
+    contain the message-id of a message it is in reply to.  Usually
+    they also contain a list of references to all messages with the
+    same subject and a logical follow-up.
+
+    Mail::Box is able to give simplified access to `message threads'
+    (`threads' for short) via the Mail::Box::Manager.
+
+ 3) How can it be that Mail::Box folders show less messages in the
+    folder than other applications do?
+
+    Because Mail::Box has support for reading e-mail per thread, it
+    keeps an index based on message-id.  Every message shall have
+    a unique message-id, so when the same id is found again, that
+    message considered to be a copy and ignored.
+
+    By the way: this may remove a lot of spam ;)
+
+ 4) How can I fight SPAM?
+
+    Mail::Classifier is a package based on Mail::Box, which can be
+    trained to recognize Spam.  SpamAssassin is a rule based spam filter,
+    and can be used via Mail::Box::Search::SpamAssassin
+    

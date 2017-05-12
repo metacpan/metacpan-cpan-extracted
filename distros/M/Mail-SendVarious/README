@@ -1,0 +1,150 @@
+NAME
+     Mail::SendVarious - send mail via STMP and sendmail
+
+SYNOPSIS
+     use Mail::SendVarious;
+
+     sendmail(
+            from    => 'user@host', 
+            From    => 'First Last', 
+            to      => 'user@host, user@host',
+            cc      => 'user@host, user@host',
+            xheader => 'Some header stuff',
+            body    => 'Some body stuff here'
+     );
+
+     sendmail(
+            envelope_to     => 'user@host, user@host',
+            message         => 'Complete header and body stuff',
+     );
+
+     sendmail(
+            envelope_to     => 'user@host, user@host',
+            header          => 'Complete header stuff',
+            body            => 'Complete body stuff',
+     );
+
+     use Mail::SendVarious qw(make_message);
+     ($from, $message, @envelope_to) = make_message(%args);
+
+DESCRIPTION
+    Mail::SendVarious will try to send mail multiple ways. First it tries
+    via SMTP. If that doesn't work then it tries using "/usr/sbin/sendmail".
+
+    The "sendmail()" function can put together a message header or you can
+    hand it one. Here are the options it can take:
+
+    envelope_from  Sets the sender email address. If creating a header, also
+                   sets the email address in the "From:" header if there is
+                   no "from" option.
+
+    from           Sets the envelope sender email address if "envelope_from"
+                   isn't set. If creating a header, also sets the email
+                   address in the "From:" header.
+
+    From           Set the name over the sender in the "From:" header.
+
+    envelope_to    Sets who the message is sent to.
+
+    to             Sets the "To:" header. Also sets who the message is sent
+                   to if "envelope_to" isn't set.
+
+    cc             Sets the "Cc:" header. Also adds who the message is sent
+                   to if "envelope_to" isn't set.
+
+    bcc            Adds to who the message is sent to.
+
+    subject        Specifies the "Subject:" header.
+
+    xheader        Specifies extra header lines to be added if a header is
+                   generated.
+
+    header         Specifies the complete message header. "xheader" will be
+                   ignored. No "To:", "From:", "Cc:" or "Subject:" header
+                   will be generated.
+
+    body           Specifies the complete message body.
+
+    message        Specifies the complete message. "header" and "body"
+                   arguments will be ignored. No "To:", "From:", "Cc:" or
+                   "Subject:" header will be generated.
+
+    build_header   Specifies if a header should be generated with "To:",
+                   "From:", "Cc:" and "Subject:". This overrides what what
+                   otherwise might happen.
+
+    debuglogger    Specifies a function to call for debug output. If not
+                   set, no debug output is generated.
+
+    errorlogger    Specifies a function to call for error output. If not
+                   set, errors are reported on "STDERR".
+
+    hostlist       Specifies a list of hosts to try to send to via SMTP.
+                   This should be an array refrence. If not set,
+                   @Mail::SendVarious::mail_hostlist is used. The default
+                   for @Mail::SendVarious::mail_hostlist is 127.0.0.1.
+
+    mail_command   Specifies a command to use if sending via SMTP fails.
+                   This should be an array refrence. If not set,
+                   @Mail::SendVarious::mail_command is used. The default for
+                   @Mail::SendVarious::mail_command is "/usr/sbin/sendmail
+                   -oeml -i".
+
+    no_rejects     Normally when sending via SMTP, Mail::SendVarious will
+                   skip over any recipients that are rejected. Sent
+                   "no_rejects" and the SMTP server will be skipped instead.
+                   If "no_rejects" is not set, then any rejected recipients
+                   will end up in @Mail::SendVarious::to_rejected.
+
+    The return value from "sendmail()" is true if the message was sent and
+    false otherwise. If the message was not sent, then the variable
+    "Mail::SendVarious::mail_error" will be set to a description of the
+    problem.
+
+EXPORT_OK
+    In addition to the standard export item of the "sendmail()" function,
+    the following are available explicitly:
+
+    $mail_error    The last error.
+
+    make_message() An additional function "make_message()" is provided. It
+                   takes the same arguemtns as "sendmail()" but does not
+                   send mail. It just generates the message.
+
+                   The following two snippets do the same thing:
+
+                    {
+                           my ($from, $message, @envelope_to) = make_message(%args);
+                           sendmail(
+                                   envelope_from   => $from,
+                                   envelope_to     => \@envelope_to,
+                                   message         => $message,
+                           );
+                    }
+
+                   and
+
+                    sendmail(%args);
+
+    @to_rejected   Any recipients that were rejected by the SMTP server.
+                   (Only if "no_rejects" isn't set).
+
+    @mail_hostlist "(qw(127.0.0.1))"
+
+    @mail_command  "(qw(/usr/sbin/sendmail -oeml -i))"
+
+OTHER MODULES THAT DO SIMILAR THINGS
+    Send mail via SMTP: Mail::SMI, Mail::Transport::SMTP, Mail::SendEasy,
+    Mail::Sender, Mail::Send, Mail::Sendmail.
+
+    Send mail via /usr/sbin/sendmail: Mail::Transport::Sendmail.
+
+    Send via various methods (but only one at a time): Mail::Mailer.
+
+    Manage an outgoing mail spool: Mail::Spool.
+
+AUTHOR
+    Copyright (C) 2002-2006, David Muir Sharnoff <muir@idiom.com> Copyright
+    (C) 2011-2012, Google Inc. This module may be used and copied on the
+    same terms as Perl itself.
+

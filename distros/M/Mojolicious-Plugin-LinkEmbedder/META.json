@@ -1,0 +1,53 @@
+{
+   "abstract" : "Convert a URL to embedded content",
+   "author" : [
+      "Jan Henning Thorsen <jhthorsen@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-LinkEmbedder",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Find" : "0",
+            "Module::Find" : "0",
+            "Test::More" : "0.90"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "5.00"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jhthorsen/mojolicious-plugin-linkembedder/issues"
+      },
+      "homepage" : "https://github.com/jhthorsen/mojolicious-plugin-linkembedder",
+      "repository" : {
+         "url" : "https://github.com/jhthorsen/mojolicious-plugin-linkembedder.git"
+      }
+   },
+   "version" : "0.24",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

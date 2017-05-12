@@ -1,0 +1,28 @@
+---
+abstract: 'Mojolicious integration for humane.js'
+author:
+  - 'Joel A. Berger <joel.a.berger@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Humane
+no_index:
+  file:
+    - README.pod
+provides:
+  Mojolicious::Plugin::Humane:
+    file: lib/Mojolicious/Plugin/Humane.pm
+    version: '0.07'
+requires:
+  File::ShareDir: '1.00'
+  Mojolicious: '4.77'
+resources:
+  bugtracker: http://github.com/jberger/Mojolicious-Plugin-Humane/issues
+  repository: http://github.com/jberger/Mojolicious-Plugin-Humane
+version: '0.07'

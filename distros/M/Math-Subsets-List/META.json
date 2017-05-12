@@ -1,0 +1,36 @@
+{
+   "abstract" : "Generate all the subsets of a list.",
+   "author" : [
+      "PhilipRBrenan@appaapps.com.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-Subsets-List",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      }
+   },
+   "provides" : {
+      "Math::Subsets::List" : {
+         "file" : "lib/Math/Subsets/List.pm",
+         "version" : "1.008"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.008"
+}

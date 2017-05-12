@@ -1,0 +1,42 @@
+---
+abstract: 'Base class for RPC Services'
+author:
+  - 'mudler <mudler@dark-lab.net>, vytas <vytas@cpan.org>'
+build_requires:
+  Mojolicious::Lite: '0'
+  Test::Mojo: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MojoX-JSON-RPC-Service-AutoRegister
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MojoX::JSON::RPC::Service::AutoRegister:
+    file: lib/MojoX/JSON/RPC/Service/AutoRegister.pm
+    version: '0.001'
+requires:
+  Mojo::Base: '0'
+  MojoX::JSON::RPC::Service: '0'
+  perl: 5.008_005
+resources:
+  bugtracker: https://github.com/IntelliHome/MojoX-JSON-RPC-Service-AutoRegister/issues
+  homepage: https://github.com/IntelliHome/MojoX-JSON-RPC-Service-AutoRegister
+  repository: git://github.com/IntelliHome/MojoX-JSON-RPC-Service-AutoRegister.git
+version: '0.001'
+x_contributors:
+  - 'Vytas Dauksa <vytdau@gmail.com>'

@@ -1,0 +1,19 @@
+Revision history for MooX-InsideOut
+
+0.001004 - 2016-10-31
+  - bump prerequisite on Moo to fix clearer and predicate (RT#118453)
+
+0.001003 - 2016-10-15
+  - dropped strictures prerequisite
+  - various internal cleanups
+  - internal role renamed
+  - additional testing
+
+0.001002 - 2013-04-15
+  - fix perl prerequisite
+
+0.001001 - 2013-02-07
+  - fix prerequisite versions
+
+0.001000 - 2013-02-03
+  - initial release

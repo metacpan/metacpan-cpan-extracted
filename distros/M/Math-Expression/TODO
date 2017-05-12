@@ -1,0 +1,49 @@
+TODO for perl module Math::Expression
+
+This is as much things that I don't think should be added as well
+as things that I would/might like to.
+
+It is understood that any contribution that is sent in for distribution
+with this module shall have copyright assigned to addw who will release
+it under the same licence as the rest of the module. Contributions will
+be acknowledged.
+
+
+Comments to Alain Williams <addw@phcomp.co.uk>
+
+SCCS: @(#)TODO	1.5 07/21/16 00:56:07
+
+Evaluation of trees is slow, should all/part of this be rewritten in C ?
+To do so would make it more difficult to integrate into a perl program.
+I am thinking from the point of view of functions - ie with a FuncEval
+and access to hashes. Maybe the code can be speeded up by someone that
+is better at perl than I am -- hint, hint !
+
+
+The functions that I have chosen have been those that I wanted.
+
+
+if() { ... } is implemented.
+An else clause needed: if() { ... } else { ... }
+
+
+User defined functions. OK if written in perl, but within this language - I don't think so.
+
+
+Comments elsewhere addressed:
+
+Better array handling. The use of an array index would not
+be difficult, but is not really that useful without loops.
+As for syntax: steal this straight from C/Perl:
+	Foo[IndexExpression]
+
+
+More test cases would not go amiss, especially if they show a way
+of doing something - test programs make great examples.
+
+
+
+
+The PrintError() method ought to set an error flag or property that can be
+tested by the calling program. At the moment: if something goes wrong an
+error will be printed and the calling code not know that it happened.

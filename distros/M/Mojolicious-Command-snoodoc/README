@@ -1,0 +1,37 @@
+NAME
+
+    Mojolicious::Command::snoodoc - Quick reference tool for the Reddit API
+
+SYNOPSIS
+
+      $ mojo snoodoc /api/save | less
+      $ mojo snoodoc /api/v1/me/prefs | less
+      $ mojo snoodoc --all
+
+DESCRIPTION
+
+    Easily print out documentation of specific Reddit API endpoints. Output
+    shows a description of the given endpoint, along with any OAuth scopes
+    and parameters.
+
+    See the reddit documentation <http://www.reddit.com/dev/api> for
+    details.
+
+AUTHOR
+
+    Curtis Brandt <curtis@cpan.org>
+
+COPYRIGHT
+
+    Copyright 2015- Curtis Brandt
+
+LICENSE
+
+    The (two-clause) FreeBSD License. See LICENSE for details.
+
+SEE ALSO
+
+    Mojo::Snoo
+
+    reddit documentation <http://www.reddit.com/dev/api>
+

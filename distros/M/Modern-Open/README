@@ -1,0 +1,56 @@
+NAME
+
+  Modern::Open - Three-argument open and Autovivification support
+
+SYNOPSIS
+
+  use Modern::Open;
+
+DESCRIPTION
+
+  Modern::Open provides three-argument open and autovivification support of
+  open, opendir, sysopen, pipe, socket, and accept, on perl 5.00503.
+  This is a module to help writing portable programs and modules across
+  recent and old versions of Perl.
+
+INSTALLATION
+
+  1. Copy Modern/Open.pm to @INC directory.
+
+SEE ALSO
+
+  open - Perl Programming Documentation
+  http://perldoc.perl.org/functions/open.html
+
+  Three-arg open() (Migrating to Modern Perl) - Modern Perl Programming
+  http://modernperlbooks.com/mt/2010/04/three-arg-open-migrating-to-modern-perl.html
+
+  Pre-Modern Perl VS Post-Modern Perl: FIGHT! - A blog about the Perl programming language
+  http://blogs.perl.org/users/buddy_burden/2013/06/pre-modern-perl-vs-post-modern-perl-fight.html
+
+  perl - open my $fh, "comand |"; # isn't modern - 404 Blog Not Found
+  http://blog.livedoor.jp/dankogai/archives/51176081.html
+
+  Migrating scripts back to Perl 5.005_03
+  http://www.perlmonks.org/?node_id=289351
+
+  Goodnight, Perl 5.005
+  http://www.oreillynet.com/onlamp/blog/2007/11/goodnight_perl_5005.html
+
+  Perl 5.005_03 binaries
+  http://guest.engelschall.com/~sb/download/win32/
+
+  Welcome to CP5.5.3AN
+  http://cp5.5.3an.barnyard.co.uk/
+
+  Strict::Perl
+  http://search.cpan.org/dist/Strict-Perl/
+
+  japerl - CPAN
+  http://search.cpan.org/dist/japerl/
+
+  ina - CPAN
+  http://search.cpan.org/~ina/
+
+  BackPAN - A Complete History of CPAN
+  http://backpan.perl.org/authors/id/I/IN/INA/

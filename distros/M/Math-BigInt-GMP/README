@@ -1,0 +1,92 @@
+Math-BigInt-GMP
+
+Math::BigInt::GMP is a replacement library for Math::BigInt::Calc that
+reimplements some of the Math::BigInt::Calc functions in XS. It can be used
+via:
+
+    use Math::BigInt lib => 'GMP';
+
+This package contains a replacement (drop-in) module for Math::BigInt's core,
+Math::BigInt::Calc.pm.
+
+INSTALLATION
+
+You need to install the Gnu MP library aka libgmp to compile this module.
+
+How to install (replace the version below with the current one):
+
+    tar -xzf Math-BigInt-GMP-1.12.tar.gz
+    cpansign --verify
+
+If the signature does not verify ok, you might to install Module::Signature.
+If the signature still does not verify okay, notify me. DO NO INSTALL this
+package when the signature is BAD - your system might get compromised!
+
+If the signature is good, do:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If you have trouble compiling this package because the GMP library is
+installed in a non-standard location, try to pass the INC and LIBS
+arguments to Makefile.PL with the appropriate information. Here
+is an example:
+
+        perl Makefile.PL\
+         INC="-I/apps/perl588/site/gmp-4.2.1/include"\
+         LIBS="-L/apps/perl588/site/gmp-4.2.1/lib -lgmp"
+
+To use this module, replace:
+
+    use Math::BigInt;
+
+with this:
+
+    use Math::BigInt lib => 'GMP';
+
+or alternatively something like:
+
+    use Math::BigInt lib => 'GMP,Pari,FastCalc';
+
+Please read the documentation under PERFORMANCE in Math::BigInt on when to use
+this module and when not. As of v1.10 and Math::BigInt v1.64/v1.64, using "lib
+=> 'GMP'" will actually reduce the memory consumption of your program, and
+thanks to the fact that we no longer use Math::GMP but have our own XS code,
+almost all operations should be faster than just using Calc (the default
+pure-perl library used in Math::BigInt).
+
+So, the following:
+
+    use Math::BigInt lib => 'GMP';
+
+can be heartily recommended.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for these modules with the
+perldoc command.
+
+    perldoc Math::BigInt::GMP
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-BigInt-GMP
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Math-BigInt-GMP
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Math-BigInt-GMP
+
+    Search CPAN
+        http://search.cpan.org/dist/Math-BigInt-GMP
+
+COPYRIGHT AND LICENCE
+
+Copyright 2007-2010 Peter John Acklam <pjacklam@online.no>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,131 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use Error ':try';
+
+use Mail::SPF::Test;
+use Mail::SPF;
+use Net::DNS::Resolver::Programmable;
+
+use constant test_case_overrides => {};
+#use constant test_case_overrides => {
+#    'cidr6-0-ip4'   => 'SKIP: Test case is disputed',
+#    'cidr6-ip4'     => 'SKIP: If cidr6-0-ip4 prevails, test case is disputed; otherwise, test case should be modified to use "ip6:::ffff:1.2.3.4" and an IPv4 address of 1.2.3.4'
+#};
+
+$Error::Debug = 1;  # Generate detailed stack trace on error.
+
+print("SPF test suite driver\n");
+
+my $yaml = do { local $/; <> };
+
+my $test_suite = Mail::SPF::Test->new_from_yaml($yaml);
+
+print("\n");
+
+my $scenario_id             = 0;
+my $scenarios_count         = scalar($test_suite->scenarios);
+my $total_test_cases_count  = 0;
+
+foreach my $scenario ($test_suite->scenarios) {
+    $scenario_id++;
+    printf("Scenario: %s (#%d/%d)\n", $scenario->description, $scenario_id, $scenarios_count);
+    my $test_case_id        = 0;
+    my $test_cases_count    = scalar($scenario->test_cases);
+    
+    my $server = Mail::SPF::Server->new(
+        dns_resolver => Net::DNS::Resolver::Programmable->new(
+            resolver_code => sub {
+                my ($domain, $rr_type) = @_;
+                my $rcode = 'NOERROR';
+                my @rrs;
+                push(@rrs, $scenario->records_for_domain($domain, $rr_type));
+                push(@rrs, $scenario->records_for_domain($domain, 'CNAME'))
+                    if not @rrs and $rr_type ne 'CNAME';
+                if (@rrs == 0) {
+                    $rcode = 'NXDOMAIN';
+                }
+                elsif ($rrs[0] eq 'TIMEOUT') {
+                    return 'query timed out';
+                }
+                return ($rcode, undef, @rrs);
+            }
+        ),
+        default_authority_explanation => 'DEFAULT'
+    );
+    
+    TEST_CASE:
+    foreach my $test_case ($scenario->test_cases) {
+        $test_case_id++;
+        $total_test_cases_count++;
+        printf("  Test: %s\n", $test_case->name);
+        
+        if (defined(my $test_case_override = test_case_overrides->{$test_case->name})) {
+            if ($test_case_override =~ /^SKIP(?:: (.*))/) {
+                print("    SKIPPING due to override\n");
+                print("    Reason: $1\n") if defined($1);
+                print("\n");
+                next TEST_CASE;
+            }
+        }
+        
+        my $request = Mail::SPF::Request->new(
+            scope           => $test_case->scope,
+            identity        => $test_case->identity,
+            ip_address      => $test_case->ip_address,
+            helo_identity   => $test_case->helo_identity
+        );
+        my $result;
+        try {
+            $result = $server->process($request);
+        }
+        catch Error with {
+            print("UNCAUGHT ERROR: ", shift->stacktrace);
+            exit(255);
+        };
+        printf("    Result: %s\n", $result);
+        printf("    %s\n", $result->received_spf_header);
+        
+        # Compliance check:
+        my $error;
+        if (not $test_case->is_expected_result($result->code)) {
+            $error = "Expected result: " . join(' or ', $test_case->expected_results);
+        }
+        elsif (
+            $result->is_code('fail') and
+            defined($test_case->expected_explanation) and
+            lc($result->authority_explanation) ne lc($test_case->expected_explanation)
+        ) {
+            $error = "Expected explanation: " . $test_case->expected_explanation . "\n" .
+                     "     Got explanation: " . $result->authority_explanation;
+        }
+        
+        #{
+        #    my @records;
+        #    my $request = $result->request;
+        #    while (defined($request)) {
+        #        my $record = $request->record;
+        #        unshift(@records, defined($record) ? $record : '(none)');
+        #        $request = $request->super_request;
+        #    }
+        #    my $level = 0;
+        #    print('    ', ' ' x (2 * $level++), "Record: $_\n")
+        #        foreach @records;
+        #}
+        #print("    Root-R: ", $result->request->root_request->record, "\n")
+        #    if defined($result->request->root_request->record);
+        
+        if (not defined($error)) {
+            print("    OK\n");
+        }
+        else {
+            print("    ERROR: $error\n");
+            print("    Description: ", $test_case->description || '(none)', "\n");
+            exit(1);
+        }
+        
+        print("\n");
+    }
+}

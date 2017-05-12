@@ -1,0 +1,52 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLQuoteElement
+
+=for object Mozilla::DOM::HTMLQuoteElement
+
+Mozilla::DOM::HTMLQuoteElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLQuoteElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLQuoteElement interface is the interface to a [X]HTML
+ * q element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLQuoteElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $cite = $htmlquoteelement->B<GetCite>()
+
+=head2 $htmlquoteelement->B<SetCite>($cite)
+
+=over
+
+=over
+
+=item * $cite (string)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

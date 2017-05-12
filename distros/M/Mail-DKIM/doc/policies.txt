@@ -1,0 +1,93 @@
+Policy lookup
+=============
+
+With DomainKeys and DKIM you have two different ideas of
+sender signing policies. Luckily, they are published at slightly
+different locations in DNS, so it might work to have them complement
+each other. This text file is just a place to dump some ideas about
+this.
+
+Here is a description of the two different sender signing policies:
+* rfc4870(historical) - the DomainKeys policy
+   - this policy addresses emails in which the sender's domain appears
+     in the "Sender" header (or the "From" header if no Sender).
+     As such, it could be useful for mailing lists (which break the
+     author's signature but add a Sender header to indicate where
+     it's coming from) or third party mailers (which cannot sign for
+     the From address but can add a Sender address). The downside is
+     that most MUAs don't show the Sender header, so recipients still
+     think the message is coming from whatever address is in the From
+     header.
+
+* draft-allman-dkim-ssp - the work-in-progress IETF DKIM policy
+   - this policy addresses the "From" address only.
+     This would be useful for domains with low tolerances for forgeries.
+     They could ensure that whenever their domain appears in the From
+     field, DKIM-SSP-aware agents can throw away forgeries.
+     The downside is mailing lists and third-parties can't really use
+     it, and users of those critical domains can't participate in
+     mailing lists or use third-party mailers.
+
+
+Example A
+---------
+
+From:   Jason <jason@bigbank.com>
+Sender: Bad guy <badguy@example.org>
+
+In this case, bigbank.com wants to provide a way for recipients
+to recognize forgories or altered messages coming from their domain.
+
+They publish a draft-allman-dkim-ssp policy record in their DNS
+
+  bigbank.com.      DKIMP  "p=strict"
+
+With such a policy, bigbank.com's users cannot send mail through
+mungling mailing lists, or through their other ISPs mail servers.
+In the first case, the signature would become invalid. In the second
+case, the message won't have a signature. In both cases, the policy
+for bigbank.com says to reject the message.
+
+
+Example B
+---------
+
+From:   Jason <jlong@messiah.edu>
+Sender: My list <discuss@list.example.com>
+
+In this example, messiah.edu allows their users to send messages through
+mailing lists, so it has no need for a p=strict policy like example A.
+However, this means messages can be trivially forged.
+
+But maybe they could use a rfc4870(historical) policy to indicate that
+whenever the "sender" of the message is a messiah.edu address, the
+message will contain a messiah.edu signature. So...
+
+  _domainkey.messiah.edu.  TXT  "o=-"
+
+When this message comes through, it is allowed despite not having a valid
+messiah.edu signature because the message itself doesn't claim to have
+come from messiah.edu (although some recipients may not know this because
+their MUA doesn't show it).
+
+But if the only originator address found in the message was
+jlong@messiah.edu, the above policy would require a valid messiah.edu
+signature.
+
+
+Example C
+---------
+
+From:   George <george@example.com>
+Sender: Discuss <discuss@listserv.messiah.edu>
+
+This time I'm interested in the perspective of the Listserv operator.
+The Listserv operator wants to ensure that messages going out to the
+list have a listserv.messiah.edu signature, and wants to communicate
+to recipients that unsigned messages claiming to be from the list are
+forgories.
+
+Once again, a rfc4870(historical) policy seems the most useful:
+
+  _domainkey.listserv.messiah.edu.   TXT   "o=-"
+

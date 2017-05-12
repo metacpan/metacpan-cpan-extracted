@@ -1,0 +1,40 @@
+Math-Random-MTwist
+==================
+
+PREREQUISITES
+
+Perl >= 5.10.0
+Test::More
+
+Why Perl 5.10? mtwist needs a fairly "modern" compiler (see mtwist.h). Now
+what's the oldest Perl shipped together with a sufficiently recent compiler?
+When it comes to "old", Debian is the first choice. The oldest Debian capable
+of compiling mtwist is Lenny. Lenny ships Perl 5.10.0.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+USAGE
+
+See POD documentation in MTwist.pm
+
+
+COPYRIGHT
+
+Perl and XS portion: Copyright © 2014 by Carsten Gaebler.
+mtwist C library: Copyright © 2001, 2002, 2010, 2012, 2013 by Geoff Kuenning.
+
+
+LICENSE
+
+Perl and XS portion: WTFPL (http://wtfpl.net/).
+
+mtwist C library: LGPL (https://gnu.org/licenses/lgpl.html).

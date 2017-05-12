@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+#
+# Calculates Cope tension for each Forte Number.
+
+use strict;
+use warnings;
+
+use Music::AtonalUtil    ();
+use Music::Tension::Cope ();
+use POSIX qw/strftime/;
+
+my $atu     = Music::AtonalUtil->new;
+my $tension = Music::Tension::Cope->new;
+
+print "# ForteN PCS ICC Tension Min Max\n";
+print "# Via Music::Tension::Cope v.$Music::Tension::Cope::VERSION as of ",
+  strftime( "%Y-%m-%d", gmtime(time) ), "\n";
+
+my $fnums = $atu->fnums;
+for my $fn ( sort keys %$fnums ) {
+  my $icc = $atu->interval_class_content( $fnums->{$fn} );
+  my ( $t, $min, $max ) = $tension->vertical( $fnums->{$fn} );
+  printf "%s\t%-16s\t%-8s\t%.03f  %.03f  %.03f\n", $fn,
+    join( ',', @{ $fnums->{$fn} } ),
+    join( '', @$icc ), $t, $min, $max;
+}

@@ -1,0 +1,10 @@
+Revision history for MooseX-FileAttribute
+
+0.03      2017-04-07 00:53:42Z
+        - dzilify, and move git repository to the GitHub moose organization
+
+0.02    2009-12-22 04:47:21Z
+     - fix tests on Win32, etc.
+
+0.01    2009-11-12
+     - Initial Release

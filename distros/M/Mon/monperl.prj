@@ -1,0 +1,31 @@
+;; -*- Prcs -*-
+(Created-By-Prcs-Version 1 2 15)
+(Project-Description "perl API to mon protocol")
+(Project-Version monperl monperl-0-11 2)
+(Parent-Version monperl monperl-0-11 1)
+(Version-Log "")
+(New-Version-Log "")
+(Checkin-Time "Thu, 11 Jan 2001 08:42:17 -0800")
+(Checkin-Login trockij)
+(Populate-Ignore ())
+(Project-Keywords)
+(Files
+;; This is a comment.  Fill in files here.
+;; For example:  (prcs/checkout.cc ())
+
+;; Files added by populate at Mon, 21 Aug 2000 08:30:41 -0700,
+;; to version 0.0(w), by trockij:
+
+  (COPYRIGHT (monperl/0_COPYRIGHT 1.1 644))
+  (VERSION (monperl/1_VERSION 1.2 664))
+  (test.pl (monperl/2_test.pl 1.1 755))
+  (README (monperl/3_README 1.1 664))
+  (Makefile.PL (monperl/4_Makefile.P 1.3 644))
+  (Mon/SNMP.pm (monperl/5_SNMP.pm 1.3 664))
+  (Mon/Protocol.pm (monperl/6_Protocol.p 1.3 644))
+  (Mon/Client.pm (monperl/7_Client.pm 1.4 644))
+  (CHANGES (monperl/8_CHANGES 1.2 644))
+  (COPYING (monperl/9_COPYING 1.1 644))
+)
+(Merge-Parents)
+(New-Merge-Parents)

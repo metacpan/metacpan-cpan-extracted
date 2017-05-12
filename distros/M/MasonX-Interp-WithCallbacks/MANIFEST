@@ -1,0 +1,22 @@
+Build.PL
+Changes
+lib/MasonX/Interp/WithCallbacks.pm
+MANIFEST			This list of files
+README.md
+t/01basic.t
+t/02priority.t
+t/03keys.t
+t/04errors.t
+t/05object.t
+t/06object_request.t
+t/07combined.t
+t/08apache.t
+t/09cgi.t
+t/10pod.t
+t/conf/extra.conf.in
+t/htdocs/alt.mc
+t/htdocs/dhandler
+t/lib/TestCallbacks.pm
+t/lib/TieOut.pm
+META.yml
+META.json

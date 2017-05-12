@@ -1,0 +1,24 @@
+Revision history for Perl extension Modem::VBox
+
+0.051 Thu Mar  3 18:00:52 CET 2005
+	- change of contact address.
+
+0.05  Fri Oct  5 15:21:52 CEST 2001
+	- more bugfixes, do not exit on hangup, leave the
+          event loop on hangup etc..
+
+0.04  Wed Nov 24 18:48:28 CET 1999
+	- avon searching in the example script was not working.
+          (in general this requires more tweaking, reading regs etc..)
+
+0.03  Sat Nov 13 22:20:52 CET 1999
+	- updated to Event-0.57 api.
+        - fixed many bugs
+        - now runs my answering machine on +49/721/9377358
+
+0.02  Wed Jun 23 21:18:58 CEST 1999
+	- first release.
+
+0.01  Mon May 24 12:25:33 CEST 1999
+	- original version; created by hand(!)
+

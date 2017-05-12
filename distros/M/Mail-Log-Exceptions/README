@@ -1,0 +1,69 @@
+NAME
+    Mail::Log::Exceptions - Exceptions for the Mail::Log::* modules.
+
+SYNOPSIS
+      use Mail::Log::Exceptions;
+
+      Mail::Log::Exceptions->throw(q{Error description});
+
+DESCRIPTION
+    This is a generic Exceptions module, supporting exceptions for the
+    Mail::Log::* modules. At the moment it's just a thin wrapper around
+    Exception::Class, with appropriate class names for this use.
+
+    Current exceptions in this module:
+
+    Mail::Log::Exceptions
+        The root level Exception class. Generic: Avoid using.
+
+    Mail::Log::Exceptions::InvalidParameter
+        Errors due to passing the data types, not passing required data, or
+        other mistakes in calling method.
+
+    Mail::Log::Exceptions::Unimplemented
+        Exception to be thrown when a called method has not been
+        implimented. Typically used by base classes when defining a method
+        for subclasses to override.
+
+    Mail::Log::Exceptions::Logfile
+        Errors having to do with the logfile itself: Errors opening,
+        reading, etc.
+
+    Mail::Log::Exceptions::Message
+        Errors having to do with message information: Something is
+        unreadable, or missing, or in bad format, etc.
+
+    Mail::Log::Exceptions::Message::IncompleteLog
+        Errors due to there being a logfile that is incomplete, or a message
+        that is not entirely within this logfile.
+
+    Classes in the module tree may define sub-classes of the above
+    exceptions.
+
+USAGE
+    See Exception::Class
+
+REQUIRES
+    Exception::Class
+
+AUTHOR
+    Daniel T. Staal
+
+    DStaal@usa.net
+
+SEE ALSO
+    Exception::Class
+
+HISTORY
+    Nov 22, 2008 - Added
+
+    Oct 9, 2008 - Inital version.
+
+COPYRIGHT and LICENSE
+    Copyright (c) 2008 Daniel T. Staal. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+    This copyright will expire in 30 years, or 5 years after the author's
+    death, whichever is longer.
+

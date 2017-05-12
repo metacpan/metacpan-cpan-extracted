@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Math-Vector-Real-MultiNormalMixture.t
+lib/Math/Vector/Real/MultiNormalMixture.pm
+META.yml                                 Module meta-data (added by MakeMaker)

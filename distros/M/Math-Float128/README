@@ -1,0 +1,13 @@
+Build with:
+
+perl Makefile.PL
+make test
+make install
+
+Note that quadmath.h and -lquadmath need to be found, and do exist in recent versions of
+the GNU C compiler (gcc).
+However, perl may not be aware of the location of libquadmath,  so you may need to help
+it along by starting with:
+
+perl Makefile.PL LIBS="-L/location/of/quadmath_library -lquadmath"
+

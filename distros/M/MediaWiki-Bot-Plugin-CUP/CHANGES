@@ -1,0 +1,12 @@
+Revision history for CUP
+
+Unreleased version
+0.3.1 DCOLLINS February 2 2009
+	* Fixed crashing issues when override was not used
+0.3.0 DCOLLINS January 26 2009
+	* Added a config parameter to allow the use of an on-wiki 'override' page for user-specific regexen or point values
+0.2.1 DCOLLINS January 1 2009
+	* Changed the edit cutoff to be 0:00 today
+	* Changed regexen to not count the 'placeholder' lines that I was using for testing
+0.2.0 DCOLLINS December 30 2008
+	* Initial version

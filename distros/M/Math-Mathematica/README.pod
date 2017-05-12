@@ -1,0 +1,85 @@
+=head1 NAME
+
+Math::Mathematica - A Simple PTY connection to Wolfram's Mathematica
+
+=head1 SYNOPSIS
+
+ use Math::Mathematica;
+ my $math = Math::Mathematica->new;
+ my $result = $math->evaluate('Integrate[Sin[x],{x,0,Pi}]'); # 2
+
+=head1 DESCRIPTION
+
+Although there are more clever mechanisms to interact with Wolfram's Mathematica (namely MathLink) they are very hard to write. L<Math::Mathematica> simply starts a PTY, runs the command line C<math> program, and manages input/output via string transport. While a MathLink client for Perl would be ideal, this module gets the job done.
+
+This module does not contain a Mathematica interpreter. Mathematica must be installed on the computer before installing/using L<Math::Mathematica>.
+
+=head1 METHODS
+
+=head2 new
+
+Constructor method. Takes hash or hashreference of options:
+
+=over 
+
+=item *
+
+log - If set to a true value (true by default), the full log will be available via the C<log> method.
+
+=item *
+
+command - The command to invoke to start the Mathematica interpreter. The default is C<math>.
+
+=item *
+
+warn_after - Number of seconds to wait before warning when waiting for a response from the Mathematica interpreter. After this time, a warning is issued, which one might want to trap.
+
+=item *
+
+pty - An L<IO::Pty::Easy> object (or one which satisfies its api). If this is not specified, one will be created.
+
+=item *
+
+debug - If set to true (or if C<PERL_MATHEMATICA_DEBUG> environment variable is true) then some debug statements are printed to C<STDERR>.
+
+=back
+
+=head2 evaluate
+
+Takes a string to pass to the Mathematica interpreter for evaluation. Returns a string of results. Prompt makers are stripped from the result.
+
+=head2 log
+
+If the C<log> constructor option was set, this accessor will contain the full I/O log of the PTY connection, including Mathematica prompts.
+
+=head2 pty
+
+Accessor method which returns the active L<IO::Pty::Easy> object. This object will be closed when the L<Math::Mathematica> object is destroyed.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<IO::Pty::Easy>
+
+=item L<IO::Pty>
+
+=back
+
+=head1 SOURCE REPOSITORY
+
+L<http://github.com/jberger/Math-Mathematica>
+
+=head1 AUTHOR
+
+Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Joel Berger
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Mathematica, MathLink and Wolfram are trademarks of Wolfram Research, Inc. L<http://www.wolfram.com>
+

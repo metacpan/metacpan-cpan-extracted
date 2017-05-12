@@ -1,0 +1,180 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Server::IMAP4::List - folder related IMAP4 answers
+
+=head1 SYNOPSIS
+
+ my $imap = Mail::Server::IMAP4::List->new
+   ( folders   => $folders   # Mail::Box::Identity
+   , inbox     => $inbox     # Mail::Box
+   , delimiter => '#'
+   );
+
+ my $imap = Mail::Server::IMAP4::List->new(user => $user);
+ print $imap->list(...);        # for LIST command
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Mail::Server::IMAP4::List-E<gt>B<new>($user)
+
+Create a (temporary) object to handle the LIST requests for
+a certain user, based upon a set of folders.  The data is kept by
+L<Mail::Box::Identity|Mail::Box::Identity> and L<Mail::Box::Collection|Mail::Box::Collection> objects, which
+mean that the folders will not be opened to answer these questions.
+
+ -Option   --Default
+  delimeter  '/'
+  folders    <from user>
+  inbox      <from user>
+  user       <undef>
+
+=over 2
+
+=item delimeter => STRING|CODE
+
+Either the constant delimiter, or a code reference which will get passed
+a folder name and should return the delimiter string used in that name.
+If that folder name is empty, the default delimiter must be reported.
+See L<delimiter()|Mail::Server::IMAP4::List/"Attributes"> for an example.
+
+=item folders => OBJECT
+
+You need to specify either a set of folders explicitly or via the
+user. Some L<Mail::Box::Identity|Mail::Box::Identity> OBJECT is needed.
+
+=item inbox => BOOLEAN
+
+For now, only used to see whether there is an inbox, so a truth value will
+do.  This may change in the future.  By default, the flag is set if
+C<$user->inbox> is defined.
+
+=item user => OBJECT
+
+A L<Mail::Box::Manage::User|Mail::Box::Manage::User> OBJECT, representing the user who's folders
+must get reported.
+
+=back
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<delimiter>( [$foldername] )
+
+Returns the delimiter string.  The foldername is only required when a
+CODE reference was specified at initiation.
+
+example: setting-up an IMAP4 delimeter
+
+ sub delim($)
+ {   my $path = shift;
+     my ($delim, $root)
+       = $path =~ m/^(#news\.)/ ? ('.', $1)
+       = $path =~ m!^/!         ? ('/', '/')
+       :                          ('/', '');
+
+     wantarray ? ($delim, $root) : $delim;
+ }
+
+ my $list = Mail::Server::IMAP4::List->new(delimiter => \&delim, ...);
+ print $list->delimiter('abc/xyz');      # returns a / (slash) and ''
+ print $list->delimiter('#news.feed');   # returns a . (dot)   and $news.
+ print $list->delimiter('');             # returns default delimiter
+
+=item $obj-E<gt>B<folders>()
+
+Returns the L<Mail::Box::Identity|Mail::Box::Identity> of the toplevel folder.
+
+=item $obj-E<gt>B<inbox>()
+
+Returns the L<Mail::Box|Mail::Box> or filename of the INBOX.
+
+=item $obj-E<gt>B<user>()
+
+Returns the L<Mail::Box::Manage::User|Mail::Box::Manage::User> object, if defined.
+
+=back
+
+=head2 IMAP Commands
+
+=over 4
+
+=item $obj-E<gt>B<list>($base, $pattern)
+
+IMAP's LIST command.  The request must be partially decoded, the answer
+will need to be encoded.
+
+example: using IMAP list
+
+ my $imap  = Mail::Server::IMAP4::List->new(delimiter => \&delim, ...);
+ local $"  = ';';
+
+ my @lines = $imap->list('', '');  # returns the default delimiter
+ print ">@{$lines[0]}<";           #  >(\Noselect);/;<
+
+ my @lines = $imap->list('#news',''); # specific delimiter
+ print ">@{$lines[0]}<";           #  >(\Noselect);.;<
+
+ my @lines = $imap->list('top/x/', '%');
+ print ">@$_<," foreach @lines;    #  >();/;/tmp/x/y<,>(\Marked);/;/tmp/x/z<
+
+=back
+
+=head1 DETAILS
+
+See
+
+=over 4
+
+=item RFC2060: "Internet Message Access Protocol IMAP4v1"
+
+sections 6.3.8 (LIST question) and 7.2.2 (LIST answer)
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Box-IMAP4 distribution version 3.001,
+built on February 02, 2017.
+
+Do not forget to read
+L</Mail::Box-Overview>,
+L</Mail::Box-Cookbook>, and
+L</Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L</Mail::Message>,
+L</Mail::Box>,
+L</Mail::Box::IMAP4>,
+L</Mail::Box::POP3>,
+L</Mail::Box::Parser::C>,
+L</Mail::Box::Dbx> (unpublished),
+L</Mail::Transport>,
+L</Object::Realize::Later>, and
+L</User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,8 @@
+Revision history for Perl extension Money::Chinese.
+
+v1.09  Fri Aug 28 23:32:57 2009
+	-Fix one bug in test case 03.
+
+v1.10  Fri Aug 31 2:02:57 2009
+	-Fix bugs in Makefile.PL.
+

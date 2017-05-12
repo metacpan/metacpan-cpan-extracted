@@ -1,0 +1,24 @@
+/*
+Check whether sincosl can be linked.
+*/
+
+#ifdef __MINGW32__
+#ifndef __USE_MINGW_ANSI_STDIO
+#define __USE_MINGW_ANSI_STDIO 1
+#endif
+#endif
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+int main(int argc, char *argv[]) {
+ long double sine, cosine, op = strtold(argv[1], NULL);
+
+ sincosl(op, &sine, &cosine);
+
+ printf("output: %Le %Le\n", sine, cosine);
+
+ return 0;
+}
+

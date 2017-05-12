@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name: Math-Fractal-DLA
+version: 0.21
+author:
+  - Wolfgang Gruber, w.gruber@urldirect.at
+abstract: Diffusion Limited Aggregation (DLA) Generator
+license: perl
+requires:
+  GD: '>= 1.30'
+  Log::LogLite: '>= 0.8'
+  Test::More: '>= 0.54'
+  perl: '>= 5'
+provides:
+  Math::Fractal::DLA:
+    file: lib/Math/Fractal/DLA.pm
+    version: 0.21
+  Math::Fractal::DLA::Explode:
+    file: lib/Math/Fractal/DLA/Explode.pm
+    version: 0.21
+  Math::Fractal::DLA::GrowUp:
+    file: lib/Math/Fractal/DLA/GrowUp.pm
+    version: 0.21
+  Math::Fractal::DLA::Race2Center:
+    file: lib/Math/Fractal/DLA/Race2Center.pm
+    version: 0.21
+  Math::Fractal::DLA::Surrounding:
+    file: lib/Math/Fractal/DLA/Surrounding.pm
+    version: 0.21
+generated_by: Module::Build version 0.2607

@@ -1,0 +1,49 @@
+NAME
+    Module::Package::Ingy - Ingy's Module::Package Plugins
+
+SYNOPSIS
+    In your Makefile.PL:
+
+        use inc::Module::Package 'Ingy:modern';
+
+DESCRIPTION
+    This module defines the standard configurations for Module::Package
+    based Makefile.PLs, used by Ingy döt Net. You don't have to be Ingy to
+    use it. If you write a lot of CPAN modules, you might want to copy or
+    subclass it under a name matching your own CPAN id.
+
+FLAVORS
+    Currently this module only defines the ":modern" flavor.
+
+  :modern
+    In addition to the inherited behavior, this flavor uses the following
+    plugins:
+
+        - Stardoc
+        - ReadmeFromPod
+        - AckXXX
+        - VersionCheck
+
+    It also conditionally uses these plugins if you need them:
+
+        - TestBase
+        - TestML
+
+OPTIONS
+    This module does not add any usage options of than the ones inherited
+    from Module::Package::Plugin.
+
+SEE ALSO
+    *   Module::Package
+
+AUTHOR
+    Ingy döt Net <ingy@ingy.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2011. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

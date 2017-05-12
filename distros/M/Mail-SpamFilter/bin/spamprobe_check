@@ -1,0 +1,56 @@
+#!/usr/bin/perl
+#############################################################################
+## spamprobe_check
+## Copyright (C) 2004  Martin Ward  http://www.cse.dmu.ac.uk/~mward/
+## Email: martin@gkc.org.uk
+##
+## This program is free software; you can redistribute it and/or modify
+## it under the same terms as Perl itself, either Perl version 5.8.1 or, at
+##
+#############################################################################
+# Read an email, run "spamprobe train" on it
+# Add an X-SpamProbe: header with the result
+#
+
+use strict;
+use warnings;
+use Mail::SpamFilter ':all';
+
+my $tag = "X-SpamProbe";
+
+# Slurp message from command line or STDIN:
+undef $/;
+my $msg = <>;
+die "$!\n" unless defined($msg);
+
+if (length($msg) > 1000000) {
+  # Don't run checks due to timeout
+  print $msg;
+  exit(0);
+}
+
+$msg =~ s/\n$tag:.*//g;
+
+my ($header, $body) = extract_header($msg);
+
+my $cmd = "spamprobe train";
+my ($in_fh, $out_fh);
+unless(open($in_fh, "-|")) {
+  open($out_fh, "|$cmd")
+    or die "Can't run $cmd: $!\n";
+  print $out_fh $msg;
+  close($out_fh);
+  exit(0);
+}
+my $result = join("", <$in_fh>);
+close($in_fh);
+chomp($result);
+
+if ($result eq "") {
+  print $msg;
+} else {
+  print $header;
+  print "$tag: $result\n";
+  print $body;
+}
+

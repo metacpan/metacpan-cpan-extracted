@@ -1,0 +1,163 @@
+###############################################################################
++ mbox interface (mbox is a B<really> bletcherous way for email to be stored)
+    * add test to make sure the temp directory is being cleaned up
+    * implement temp file without splitting into multiple message files
+    + optionally read entire folder into memory instead of into a temp dir
+    + add regression tests for labels (once X-Mailfolder-Labels is available)
+    + use message-id in sync method to determine whether a message is new
+    + there are few more chars in the 'Status' field that we could understand
+	U not downloaded and not deleted.
+	D to be deleted.
+	N new
+      Does anyone actually know of instances of these being used?
+
++ maildir interface
+    * migrate files from 'new' to 'cur' more intelligently, instead of
+      blindly moving them regardless of 'seen'ness.
+    * migration from 'new' to 'cur' should add/update 'uniqpart'.
+    * append_message should drop the message into 'cur' only if the 'seen'
+      flag is set, otherwise it should drop it into 'new'.
+    * maybe have update_message and append_message queue into 'tmp' for
+      subsequent placement into 'new' or 'cur' by the sync method
+    + add regression test for Return-Path coercion.
+      This currently has problems - deleting the Return-Path field in
+      the regression test causes an error in Mail::Header.  I'm
+      investigating this.
+    + synthesize Delivered-To (can sometimes use 'for' clause in final
+      Received line)
+    + make sure any 'tmp' files we create are being cleaned up if we
+      error-out
+    + regression test still needs to check correct use of 'tmp' and 'new'
+    + decide whether update_message should migrate the mail to another
+      file.  Cary thinks that maybe maildir doesn't understand the
+      concept of updating a mail message - so maybe we should move to
+      a different filename to implement it.
+
++ emaul interface
+    * have update, refile, and pack(?) queue operations for later syncing
+    * logic for readonlyness is wrong
+    * option for whether it makes backup copies of modified messages
+    + improve folder locking
+
++ nntp interface
+    * figure out best way to handle currently unimplemented methods
+    * figure how to write regression tests
+    * implement sync
+    * add support for News::Article
+    + need to handle idle disconnect
+    + implement authinfo command
+###############################################################################
+X eliminate update_message - this might annoy some folks, but most
+  mail folder formats don't tolerate the concept of updating a message -
+  update_message is causing some implementation problems.
+
+X consolidate get_message, get_mime_message, and get_message_file
+
+X consolidate get_header and get_mime_header
+
+X consolidate:
+	first_labeled_message -> first_message
+	last_labeled_message  -> last_message
+	next_labeled_message  -> next_message
+	prev_labeled_message  -> prev_message
+
+X decide whether all current fatal errors should actually be fatal and
+  whether some of the current non-fatal errors should be fatal.
+
+X error returns and fatal errors need to be cleaned up big time
+
+X make the point in time where updates and appends are performed more
+  consistent between the interfaces
+
+X Some of the methods might benefit from being able to be passed lists
+  of certain items.  This would change the order of arguments in some
+  of the methods.  It would also change some of the return codes.  I
+  haven't made up my mind.  Input is welcome.
+    + refile		(reorder)
+    + dup		(reorder)
+    + add_label		(reorder)
+    + delete_label	(reorder)
+    + clear_label
+
+X some of the methods should be renamed
+
+X sync up with IMAP interface model
+-------------------------------------------------------------------------------
+* finish incorporating documentation edits from PRK
+
+* add ability to define scanning order when autodetecting folder type
+
+* migrate some of the stuff in 'new' to 'open'
+
+* for folders with no support for persistent labels add an option to
+  synthesize them by using a X-Mailfolder-Labels in the header
+
+* reintroduce flock locking
+
+* need a method to append to a folder without opening it
+
+* need to work out the best way to handle 'New' vs. 'Old' messages.
+  (eg: 'O' char in the mbox 'Status:' field, and migrating messages
+   from 'new' to 'cur' in maildir)
+
+* add folder attributes as hints to MailFolder and to users of MailFolder
+    + no_persistent_labels
+    + no_persistent_current_message
+
+* add a version of open that only snarfs out headers and some summary info.
+  This would help for various types of tasks that don't need full access
+  to the body of all of the messages in a folder.
+
+* maybe 'open' needs to return undef on failure instead of 0 and have
+  it return qty of messages imported (where 0 == '0 but true')
+
+* add ability to tally the number of messages in a folder that hasn't
+  been opened.
+
++ package it as a CPAN Bundle.  This will be done once the dependancy
+  list is more stable.
+###############################################################################
++ methods to add:
+    + replace_head (or provide something equivalent)
+      Have sync and update_message merge in the cached header.
+    + sort_physical_folder
+    + create_digest
+    + threaded_sort
+    + delete_folder
+    + list_folders
+    + select (similar in style to the imap equivalent)
+###############################################################################
++ maybe refile should set a label like delete does
+
++ in general, we should navigate via message-id when evaluating folder
+  additions, this will make us more immune to having other folder
+  manglers reorder the folder out from underneath us
+
++ revamp how folder-locking style is specified
+
++ Add Size member to Messages structure and have folder interfaces
+  fill in the information.
+
++ there are a few hard-coded constants that should be config variables
+
++ Provide additional methods to alleviate direct access of $self
+  members by folder interface coders.
+
++ autoloader
+
++ Handle hard errors better.
+  Use an internal function that can be replaced using a method.
+  Maybe use exception processing (this would help Mbox->sync).
+
++ sprinkle in some debug_print calls
+
++ profile the code
+###############################################################################
++ Various folder interfaces:
+    + various gnus folder formats (interface via gnuserv?)
+    + mbx
+    + imap (not until 1.0 is released - stay tuned)
+
++ more example scripts:
+    + a simple folder->html converter (any volunteers?)
+###############################################################################

@@ -1,0 +1,24 @@
+---
+abstract: 'Help to find memory leaks'
+author:
+  - 'Gabor Szabo <szabgab@cpan.org>'
+build_requires:
+  Test::Deep: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Memory-Leak-Hunter
+requires:
+  Data::Dumper: 0
+  Devel::Gladiator: 0.04
+resources:
+  repository: https://github.com/szabgab/Memory-Leak-Hunter.git
+version: 0.02
+x_contributors:
+  - SZABGAB

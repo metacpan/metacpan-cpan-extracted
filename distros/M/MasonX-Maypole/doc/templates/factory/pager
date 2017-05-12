@@ -1,0 +1,57 @@
+<%doc>
+
+=head1 pager
+
+This controls the pager display at the bottom (by default) of the list
+and search views. It expects a C<pager> template argument which responds
+to the L<Data::Page> interface.
+
+</%doc>
+
+% return unless $pager and ( $pager->first_page != $pager->last_page );
+
+<p class="pager">Pages:
+
+<%perl>
+    my $begin_page = $pager->current_page - 10;
+    $begin_page = $pager->first_page if $begin_page < 1;
+
+    my $end_page = $pager->current_page + 10;
+    $end_page = $pager->last_page if $pager->last_page < $end_page;
+
+    foreach my $num ( $begin_page .. $end_page )
+    {
+        if ( $num == $pager->current_page )
+        {
+</%perl>
+<span class="current-page"><% $num %></span>
+<%perl>
+        }
+        else
+        {
+            my $args = "?page=$num";
+
+            $args .= "&order=" . $request->params->{order} if $request->params->{order};
+
+            $args .= "&o2=desc" if $request->params->{o2} eq "desc";
+
+            my $action = "list";
+
+            foreach my $col ( @{ $classmetadata->{columns} } )
+            {
+                if ( $request->params->{ $col } )
+                {
+                    $args .= "&$col=" . $request->params->{ $col };
+                    $action = "search";
+                }
+            }
+</%perl>
+<& link, table      => $classmetadata->{table},
+         command    => $action,
+         additional => $args,
+         label      => $num &>
+% }
+% }
+</p>
+
+

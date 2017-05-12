@@ -1,0 +1,9 @@
+bin/make-noise
+Changes
+INSTALL
+lib/Math/Fractal/Noisemaker.pm
+Makefile.PL
+MANIFEST
+README
+t/Noisemaker.t
+META.yml                                 Module meta-data (added by MakeMaker)

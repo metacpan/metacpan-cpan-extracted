@@ -1,0 +1,163 @@
+Revision history for Module-Metadata
+
+1.000033  2016-07-24 23:32:58Z
+  - fix file operation in tests for VMS
+
+1.000032  2016-04-23 22:36:24Z (TRIAL RELEASE)
+  - use a more strict matching heuristic when attempting to infer the
+    "primary" module name in a parsed .pm file
+  - only report "main" as the module name if code was seen outside another
+    namespace, fixing bad results for pod files (RT#107525)
+
+1.000031  2015-11-24 03:57:55Z (TRIAL RELEASE)
+  - be less noisy on failure when building as part of perl core (see perl
+    RT#126685)
+
+1.000030  2015-11-20 03:03:24Z (TRIAL RELEASE)
+  - temp dirs cleaned up during tests (Steve Hay)
+  - more accurately mark tests as TODO, so as to have a quieter and less
+    confusing test run without passing TODO tests. This release is primarily
+    intended for the perl 5.23.5 release.
+
+1.000029  2015-09-11 16:25:43Z (TRIAL RELEASE)
+  - fix missing "use" statement in refactored test helper (only affected older
+    perls, due to other module interactions)
+
+1.000028  2015-09-11 04:24:39Z (TRIAL RELEASE)
+  - refactored and expanded test cases
+  - fixed a $VERSION extraction issue on perl 5.6.2 (RT#105978, PR#17)
+  - fix the detection of package Foo when $Foo::VERSION is set (RT#85961)
+
+1.000027  2015-04-11 00:21:26Z
+  - work around issues with an unconfigured Log::Contextual (Kent Fredric)
+  - allow tests to pass in a perl with no taint support (James Raspass)
+
+1.000026  2015-01-17 19:22:34Z
+  - patched tests to be less noisy in blead builds (Dave Mitchell, RT#101491)
+
+1.000025  2015-01-04 18:56:00Z
+  - evaluate version assignment in a clean environment, to fix assignment in a
+    block (RT#101095)
+
+1.000024  2014-06-03 01:52:46Z
+  - fix inaccurate prerequisite declaration on Test::More (in 1.000023)
+
+1.000023  2014-06-02 02:37:17Z
+  - support installations on older perls with an ExtUtils::MakeMaker earlier
+    than 6.63_03
+
+1.000022 - 2014-04-29
+  - work around change in comparison behaviour in Test::More 0.95_01 by being
+    more explicit with our tests - now explicitly checking the string form of
+    the extracted version, rather than the entire version object
+  - ensure the extracted version is returned as a version object in all cases
+    (RT#87782, Randy Stauner)
+
+1.000021 - 2014-04-29
+  - fix use of newer interface from File::Path, to avoid another prereq on
+    older perls (Graham Knop, PR#7)
+  - fixed all out of date prereq declarations
+
+1.000020 - 2014-04-27
+  - new is_indexable() object method (ether, RT#84357)
+  - eliminated dependency on IO::File (and by virtue, XS) - thanks, leont!
+  - removed cruft in test infrastructure left behind from separation from
+    Module::Build (ether)
+  - repository moved to https://github.com/Perl-Toolchain-Gang/Module-Metadata
+  - .pm file is now wholly ascii, for nicer fatpacking (RT#95086)
+  - some code micro-optimizations (Olivier Mengué, PR#4)
+
+1.000019 - 2013-10-06
+  - warnings now disabled inside during the evaluation of generated version
+    sub (BinGOs, RT#89282)
+
+1.000018 - 2013-09-11
+  - re-release of detainting fix without unstated non-core test dependencies
+
+1.000017 - 2013-09-10
+  - detaint version, if needed (RT#88576, Chris Williams)
+
+1.000016 - 2013-08-21
+  - Re-release to fix prereqs and other metadata
+
+1.000015 - 2013-08-21
+  - Change wording about safety/security to satisfy CVE-2013-1437
+
+1.000014 - 2013-05-09
+  - Remove "now installs to 'site' for perl 5.12+" from last version
+
+1.000013 - 2013-05-08
+  - Fix reliance on recent Test::Builder
+  - Make tests perl 5.6 compatible
+  - now installs to 'site' for perl 5.12+, as per p5p recommendation
+
+1.000012 - 2013-05-04
+  - improved package detection heuristics (thanks, Edward Zborowski!)
+  - fix ->contains_pod (RT#84932, Tokuhiro Matsuno)
+  - fix detection of pod after __END__ (RT79656, Tokuhiro Matsuno)
+
+1.000011 - 2012-08-16
+  - LEONT++ hasn't found any issues with my changes; mark it done (or at
+    least ready for smoking). (APEIRON)
+
+1.000010_003 - 2012-08-16 01:00:00
+  - Remove other spurious message (APEIRON)
+
+1.000010_002 - 2012-08-15 20:15:00
+  - APEIRON is an idiot (APEIRON)
+
+1.000010_001 - 2012-08-15 20:00:00
+  - Dev release to test removing a warning about modules not using the
+    'eval $VERSION' syntax which causes lots of spew. (APEIRON)
+
+1.000010 - 2012-07-29 19:30:00
+  - Performance improvement: the creation of a Module::Metadata object
+    for a typical module file has been sped up by about 40% (VPIT)
+  - Fix t/metadata.t failure under Cygwin (JDHEDDEN)
+  - Portability fix-ups for new_from_module() and test failures on VMS (CBERRY)
+
+1.000009 - 2012-02-08 12:00:00
+  - API of 'provides' changed to require a 'version' argument to future
+    proof the function against CPAN Meta Spec changes (DAGOLDEN)
+  - Fatal errors now use 'croak' instead of 'die'; Carp added as
+    prerequisite (DAGOLDEN)
+
+1.000008 - 2012-02-07 22:30:00
+  - Adds 'provides' method to generate a CPAN META provides data structure
+    correctly; use of package_versions_from_directory is discouraged (DAGOLDEN)
+
+1.000007 - 2011-09-07 12:00:00
+  - Apply VMS fixes backported from blead (Craig A. Berry)
+
+1.000006 - 2011-08-29 04:00:00
+  - Support PACKAGE BLOCK syntax (VPIT)
+
+1.000005 - 2011-08-02 09:45:00
+  - Localize $package::VERSION during version discovery (MIYAGAWA)
+  - Fix references to Module::Build::ModuleInfo [RT #66133] (DAGOLDEN)
+  - Added 'new_from_handle()' method [RT #68875] (DAGOLDEN)
+  - Improved documentation (SYNOPSIS, broke out class/object method, and
+    other minor edits) (DAGOLDEN)
+
+1.000004 - 2011-02-03 07:55:00
+  - Fix broken metadata.t when @INC has relative paths (JJORE)
+
+1.000003 - 2011-01-06 21:35:00
+  - Pod cleanup (DAGOLDEN)
+
+1.000002 - 2010-12-10 12:00:00
+  - Remove Module::Metadata::Version and depend directly on version.pm
+    (DAGOLDEN)
+  - Munge versions that fail even "lax" version number rules to try
+    to return something sensible (DAGOLDEN)
+
+1.000001 - 2010-07-09 00:52:37
+  - fix build code to prevent Author.PL being mistakenly run during make
+    and add some extra author-side tools (MSTROUT)
+
+1.000000 - 2010-07-07
+  - Initial release (MSTROUT)
+  - Code extracted from Module::Build + Module::Build::Version (MSTROUT)
+  - Tests extracted from Module::Build (DAGOLDEN)
+  - POD coverage (MSTROUT)
+  - Use of Log::Contextual when loaded with fallback to warn() (MSTROUT)

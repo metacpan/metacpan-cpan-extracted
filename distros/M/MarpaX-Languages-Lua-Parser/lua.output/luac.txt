@@ -1,0 +1,188 @@
+chunk
+stat list
+stat list
+stat list
+stat list
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+exp
+var
+prefixexp
+var
+Name
+arg
+[
+exp
+Number
+1
+]
+~=
+exp
+keyword nil
+nil
+keyword and
+and
+exp
+exp
+var
+prefixexp
+var
+Name
+arg
+[
+exp
+Number
+2
+]
+==
+exp
+keyword nil
+nil
+exp
+String
+double quoted string
+"usage: lua luac.lua file.lua"
+)
+stat
+varlist
+var
+Name
+f
+=
+explist
+exp
+exp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+open
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+"luac.out"
+exp
+String
+double quoted string
+"wb"
+)
+)
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+var
+Name
+f
+:
+Name
+write
+args
+(
+optional explist
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+string
+.
+Name
+dump
+args
+(
+optional explist
+explist
+exp
+exp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+var
+Name
+loadfile
+args
+(
+optional explist
+explist
+exp
+var
+prefixexp
+var
+Name
+arg
+[
+exp
+Number
+1
+]
+)
+)
+)
+)
+)
+stat
+functioncall
+prefixexp
+var
+Name
+assert
+args
+(
+optional explist
+explist
+exp
+exp
+var
+Name
+f
+:
+Name
+close
+args
+(
+optional explist
+)
+)

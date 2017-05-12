@@ -1,0 +1,26 @@
+Revision history for Perl extension Module::Install::PrePAN
+
+0.05    2012-08-31
+
+        - adjust key names according to the discussion at http://prepan.org/module/429En4oFdp
+
+0.04    2011-11-23
+
+        [TESTING ISSUE]
+        - removed unused module: Test::Fatal
+
+0.03    2011-11-10
+
+        [TRIVIAL CHANGE]
+        - fixed document
+
+0.02    2011-11-10
+
+        [API CHANGE]
+        - prepan_url -> prepan and the method now takes a hash
+
+        [INTENAL CHANGE]
+        - use $meta.resources.X_prepan instead of $meta.resources.PrePAN
+
+0.01    2011-11-09
+        - original version

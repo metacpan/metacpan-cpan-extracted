@@ -1,0 +1,14 @@
+Artistic
+CHANGES
+Copying
+eg/azinfo.pl
+lib/Music/Tag/Amazon.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/1-amazon.t
+t/2-pod.t
+t/3-pod-coverage.t
+t/canned/artist.xml
+t/init.pl

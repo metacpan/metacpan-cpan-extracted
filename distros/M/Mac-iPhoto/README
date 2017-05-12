@@ -1,0 +1,137 @@
+This is Mac::iPhoto for reading MacOSX iPhoto XML files. Module reads
+is AlbumData.xml file created by Apple's iPhoto program and pareses it
+into perl hash.
+
+**********************************************************************
+
+Installation:
+
+	1) perl Makefile.PL
+	2) make install
+
+Usage/Documentaion:
+
+	1) pod2text iPhoto.pm
+
+Licensing:
+
+	GNU GPL 2.0 or later
+
+**********************************************************************
+
+NAME
+    iPhoto - reads in photo albums plist files of iPhoto.app on MacOS X and
+    presents them as perl data structure.
+
+SYNOPSIS
+    use Mac::iPhoto;
+
+    my $a = new Mac::iPhoto("./AlbumData.xml");
+
+    $a->parse;
+
+DESCRIPTION
+    Reads in photo albums plist files of iPhoto.app on MacOS X and presents
+    them as perl data structure.
+
+FUNCTIONS
+  &new();
+        my $AlbumData = Mac::iPhoto->new( "/Users/Shared/Photo/AlbumData.xml" );
+
+        Creates new data object. Takes one parameter - UNIX path to
+        AlbumData.xml file.
+
+  &parse()
+        $AlbumData->&parse();
+
+        Parses XML file and populates data structure $AlbumData->{'Data'}.
+
+Structure of the data format of iPhoto.pm
+    Mac::iPhoto->parse() populates a hash iPhoto->{Data} that has following
+    structure:
+
+        {
+         Properties => \%Properties,
+         Albums     => \@Albums,
+         Images     => \@Images
+        }
+
+  %Properties is hash of the top-level properties in the AlbumData.xml file.
+    %Properties has following structure:
+
+        {
+         'Application Version' => string,
+         'Archive Path'        => string,
+         'Major Version'       => string,
+         'Minor Version'       => string,
+        }
+
+  @Albums - array describing all albums in parsed XML file.
+    @Albums has following structure:
+
+        {
+          'AlbumName'          => string,
+          'BookDesignName'     => string,
+          'RepeatSlideShow'    => string,
+          'SecondsPerSlide'    => string,
+          'SongPath'           => string,
+          'KeyList'            => \@KeyList,
+        }
+
+  @Images - array describing all images in the AlbumData.xml file.
+    @Images has following structure:
+
+          (
+           'ImagePath'        => string,
+           'Caption'          => string,
+           'Comment'          => string,
+           'Date'             => string,
+           'ThumbPath'        => string,
+           'ModificationDate' => string,
+          );
+
+CHANGES
+    Nov 19, 2003 - 1st actually working version of module.
+
+EXAMPLE
+    use Mac::iPhoto;
+
+    my $a = new Mac::iPhoto("./AlbumData.xml");
+
+    $a->parse;
+
+    printf "Created by iTunes v. %s / maj.%s / min.%s\n",
+    $a->{'Properties'}->{'Application Version'}, $a->{Properties}->{'Major
+    Version'}, $a->{Properties}->{'Minor Version'};
+
+    printf "Album path: %s\n", $a->{Properties}->{'Archive Path'};
+
+    for my $album (@{$a->{Data}->{Albums}}) {
+
+      printf "Name: %s \n", $album->{'AlbumName'};
+      printf "BookDesignName: %s \n", $album->{'BookDesignName'};
+      for my $key ( @{$album->{'KeyList'}}) {
+        print $key, ": \n";
+        printf "\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n\t%s\n",
+          $a->{Data}->{Images}->[$key]->{'Date'},
+          $a->{Data}->{Images}->[$key]->{'ImagePath'},
+          $a->{Data}->{Images}->[$key]->{'ThumbPath'},
+          $a->{Data}->{Images}->[$key]->{'Caption'},
+          $a->{Data}->{Images}->[$key]->{'Comment'},
+          $a->{Data}->{Images}->[$key]->{'ModificationDate'};
+      }
+    }
+
+CREDITS
+    Mac::iPhoto relies on Mac::PropertyList module for actual parsing of XML
+    file. Thanks for Brian D Foy, <bdfoy@cpan.org> for developing it.
+
+AUTHOR
+    Dmytro Kovalov, 2003. kov at tokyo dot email dot ne dot jp.
+    Homepage: 
+	      http://yarylo.sytes.net/
+	      http://www.asahi-net.or.jp/~as9d-kvlv
+
+SEE ALSO
+    https://sourceforge.net/projects/brian-d-foy/
+

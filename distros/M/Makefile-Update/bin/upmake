@@ -1,0 +1,155 @@
+#!/usr/bin/env perl
+
+# PODNAME: upmake
+#
+# ABSTRACT: Simple script to update list of files in a make or project file.
+#
+our $VERSION = '0.3'; # VERSION
+
+
+use strict;
+use warnings;
+use autodie;
+
+use Getopt::Long;
+
+# Allow running this script even without installing it.
+use File::Spec::Functions qw(catdir updir);
+use FindBin qw($Bin);
+use lib catdir($Bin, updir, 'lib');
+
+use Makefile::Update;
+use Makefile::Update::Bakefile0;
+use Makefile::Update::Makefile;
+use Makefile::Update::MSBuild;
+use Makefile::Update::VCProj;
+
+my $verbose = 0;
+my $quiet = 0;
+my $dryrun = 0;
+
+GetOptions(
+        'version'        => sub { print "$0 version $Makefile::Update::VERSION.\n"; exit },
+        'verbose|v'      => \$verbose,
+        'quiet|q'        => \$quiet,
+        'dry-run|n'      => \$dryrun,
+    ) and (@ARGV > 0) or die <<EOF
+Usage: $0 [--version] [--verbose] [--quiet] [--dry-run|-n] <file-to-update...>
+
+Update the sources and headers files used in the specified make/project
+file(s) from the list of files in "files" file in the current directory.
+
+If --dry-run option is specified, the files are not really updated, but the
+script just indicates where they would be changed and, if --verbose is also
+specified, outputs the diff.
+EOF
+;
+
+my $files_list = 'files';
+
+open my $files, '<', $files_list;
+my $vars = read_files_list($files);
+
+# Find sources and headers variables for a project file with the given name.
+sub get_project_sources_and_headers
+{
+    my ($proj) = @_;
+
+    my $sources = $vars->{"${proj}_sources"} || $vars->{$proj} || $vars->{sources};
+    if (!defined $sources) {
+        die qq|No sources specified, define "${proj}_sources" or "sources" | .
+            qq|variable in the "$files_list" file.\n|
+    }
+
+    my $headers = $vars->{"${proj}_headers"} || $vars->{headers};
+
+    return ($sources, $headers)
+}
+
+my $options = {
+        verbose => $verbose,
+        quiet   => $quiet,
+        dryrun  => $dryrun,
+    };
+
+foreach my $fname (@ARGV) {
+    $options->{file} = $fname;
+
+    # What kind of file is it?
+    if ($fname =~ /\.bkl$/) {
+        if (upmake($options, \&update_bakefile_0, $vars)) {
+            print qq{Don't forget to run bakefile or bakefile_gen now.\n} if $verbose;
+        }
+    } elsif ($fname =~ /(.*)\.vcxproj$/) {
+        my ($sources, $headers) = get_project_sources_and_headers($1);
+        upmake($options, \&update_msbuild, $sources, $headers);
+
+        $options->{file} = "$fname.filters";
+        upmake($options, \&update_msbuild_filters, $sources, $headers);
+    } elsif ($fname =~ /(.*)\.vcproj$/) {
+        upmake($options, \&update_vcproj, get_project_sources_and_headers($1));
+    } elsif ($fname =~ /^[Mm]akefile/ || $fname =~ /\.make?$/) {
+        upmake($options, \&update_makefile, $vars);
+    } else {
+        die qq{File "$fname" is of unknown type, can't update.\n}
+    }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+upmake - Simple script to update list of files in a make or project file.
+
+=head1 VERSION
+
+version 0.3
+
+=head1 SYNOPSIS
+
+upmake <file-to-update> [<file-to-update>...]
+
+For example:
+
+  upmake GNUmakefile myproject.vcxproj
+
+to update the source/header files listed in the makefile and project file
+from the master file list in the "files" file.
+
+=head1 DESCRIPTION
+
+This script can be used to update the list of source and possible header files
+in make and/or project files. It is useful for projects that can be built by
+different tools as it allows to have a single master list of the files used in
+the project and update all the rest automatically.
+
+The master list of files is assumed to be in the file named just C<"files"> in
+the current working directory.
+
+=head1 OPTIONS
+
+C<--quiet> and C<--verbose> options control the script output in the expected
+way. The latter modifies the behaviour of C<--dry-run> option which on its own
+would just output if the files would be updated or not, to show a unified diff
+with the changes that would be done to them.
+
+=head1 SEE ALSO
+
+L<Makefile::Update>
+
+=head1 AUTHOR
+
+Vadim Zeitlin <vz-cpan@zeitlins.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Vadim Zeitlin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

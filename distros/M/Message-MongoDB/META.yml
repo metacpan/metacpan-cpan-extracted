@@ -1,0 +1,26 @@
+---
+abstract: 'Message-oriented interface to MongoDB'
+author:
+  - 'Dana M. Diederich <dana@realms.org>'
+build_requires:
+  Data::Dumper: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Message-MongoDB
+requires:
+  MongoDB: 0
+  Test::More: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/dana/perl-Message-MongoDB/issues
+  homepage: https://github.com/dana/perl-Message-MongoDB
+  repository: https://github.com/dana/perl-Message-MongoDB.git
+version: 1.142810

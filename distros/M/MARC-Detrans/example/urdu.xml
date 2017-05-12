@@ -1,0 +1,2162 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes" ?>
+
+<config>
+
+        <!-- the language we are detransliterating -->
+        <language name="Urdu" code="urd" />
+        <script name="Arabic" code="(3" orientation="r" />
+        <!-- which fields/subfields to detransliterate -->
+        <detrans-fields>            
+            <field  tag="100">
+                <subfield code="a" />
+                <subfield code="q" />
+	<subfield code="d"  copy="true" />
+                <subfield code="n"  copy="true" />
+            </field> 
+            <field  tag="110">
+                <subfield code="a" />
+                <subfield code="b" />
+            </field> 
+            <field  tag="111">
+                <subfield code="a" />
+                <subfield code="e" />
+            </field> 
+            <field  tag="130">
+                <subfield code="a" />
+                <subfield code="p" />
+            </field> 
+            <field  tag="245">
+                <subfield code="a" />
+                <subfield code="b" />
+                <subfield code="p" />
+                <subfield code="c" />
+            </field> 
+            <field  tag="246">
+                <subfield code="a" />
+                <subfield code="b" />
+                <subfield code="p" />
+            </field> 
+            <field  tag="250">
+                <subfield code="a" />
+            </field> 
+            <field  tag="260">
+                <subfield code="a" />
+                <subfield code="b" />
+                <subfield code="c"  copy="true" />
+            </field> 
+            <field  tag="440">
+                <subfield code="a" />
+                <subfield code="p" />
+                <subfield code="v"  copy="true" />
+            </field>   
+            <field  tag="490">
+                <subfield code="a" />
+                <subfield code="v"  copy="true" />
+            </field> 
+            <field  tag="505">
+                <subfield code="a" />
+                <subfield code="t" />
+                <subfield code="g"  copy="true" />
+            </field> 
+            <field  tag="700">
+                <subfield code="a" />
+                <subfield code="q" />
+                <subfield code="t" />
+                <subfield code="p" />
+	<subfield code="d"  copy="true" />
+                <subfield code="n"  copy="true" />
+            </field>   
+            <field  tag="710">
+                <subfield code="a" />
+                <subfield code="q" />
+                <subfield code="t" />
+                <subfield code="p" />
+                <subfield code="n"  copy="true" />
+            </field>  
+            <field  tag="711">
+                <subfield code="a" />
+                <subfield code="e" />
+                <subfield code="t" />
+                <subfield code="p" />
+            </field> 
+            <field  tag="730">
+                <subfield code="a" />
+                <subfield code="p" />
+            </field> 
+            <field  tag="740">
+                <subfield code="a" />
+            </field> 
+            <field  tag="800">
+                <subfield code="a" />
+                <subfield code="q" />
+                <subfield code="t" />
+                <subfield code="p" />
+                <subfield code="n"  copy="true" />
+		<subfield code="d"  copy="true" />
+            </field>  
+            <field  tag="830">
+                <subfield code="a" />
+                <subfield code="p" />
+                <subfield code="n"  copy="true" />
+                <subfield code="v"  copy="true" />
+            </field> 
+        </detrans-fields> 
+
+
+        <!-- space character mapping -->
+        <rule>
+            <roman> </roman>
+            <marc escape="(3"> </marc>
+        </rule>
+        <!-- a single character mapping -->
+        <rule>
+            <roman>0</roman>
+            <marc escape="(3">0</marc>
+        </rule>
+        <rule>
+            <roman>1</roman>
+            <marc escape="(3">1</marc>
+        </rule>
+        <rule>
+            <roman>2</roman>
+            <marc escape="(3">2</marc>
+        </rule>
+        <rule>
+            <roman>3</roman>
+            <marc escape="(3">3</marc>
+        </rule>
+        <rule>
+            <roman>4</roman>
+            <marc escape="(3">4</marc>
+        </rule>
+        <rule>
+            <roman>5</roman>
+            <marc escape="(3">5</marc>
+        </rule>
+        <rule>
+            <roman>6</roman>
+            <marc escape="(3">6</marc>
+        </rule>
+        <rule>
+            <roman>7</roman>
+            <marc escape="(3">7</marc>
+        </rule>
+        <rule>
+            <roman>8</roman>
+            <marc escape="(3">8</marc>
+        </rule>
+        <rule>
+            <roman>9</roman>
+            <marc escape="(3">9</marc>
+        </rule>
+       <!-- ayn -->
+        <rule>
+           <roman>°</roman>
+            <marc escape="(3">Y</marc>
+        </rule>
+        <!-- alif -->
+        <rule position="initial">
+            <roman>®A</roman>
+            <marc escape="(3">C</marc>
+        </rule>
+       <rule position="initial">
+            <roman>®a</roman>
+            <marc escape="(3">C</marc>
+        </rule>
+       <rule position="initial">
+            <roman>®U</roman>
+            <marc escape="(3">C</marc>
+        </rule>
+       <rule position="initial">
+            <roman>®u</roman>
+            <marc escape="(3">C</marc>
+        </rule>
+       <rule position="initial">
+            <roman>®u</roman>
+            <marc escape="(3">C</marc>
+        </rule>
+        <rule position="medial">
+            <roman>®åU</roman>
+            <marc escape="(3">D</marc>
+        </rule>
+        <rule>
+            <roman>®åU</roman>
+            <marc escape="(3">D</marc>
+        </rule>
+        <rule>
+            <roman>®åu</roman>
+            <marc escape="(3">D</marc>
+        </rule>
+       <rule position="initial">
+            <roman>®I</roman>
+            <marc escape="(3">E</marc>
+        </rule>
+       <rule position="initial">
+            <roman>®i</roman>
+            <marc escape="(3">E</marc>
+        </rule>
+       <rule position="medial">
+            <roman>®I</roman>
+            <marc escape="(3">Fj</marc>
+        </rule>
+       <rule position="medial">
+            <roman>®i</roman>
+            <marc escape="(3">Fj</marc>
+        </rule>
+       <rule position="final">
+            <roman>®I</roman>
+            <marc escape="(3">Fj</marc>
+        </rule>
+       <rule position="final">
+            <roman>®i</roman>
+            <marc escape="(3">Fj</marc>
+        </rule>
+       <rule position="medial">
+            <roman>®E</roman>
+            <marc escape="(4">x</marc>
+        </rule>
+       <rule position="medial">
+            <roman>®e</roman>
+            <marc escape="(4">x</marc>
+        </rule>
+       <rule position="final">
+            <roman>®E</roman>
+            <marc escape="(4">x</marc>
+        </rule>
+       <rule position="final">
+            <roman>®e</roman>
+            <marc escape="(4">x</marc>
+        </rule>       
+        <rule position="initial">
+            <roman>®</roman>
+            <marc escape="(3"></marc>
+        </rule>
+       <rule position="medial">
+            <roman>®</roman>
+            <marc escape="(3"></marc>
+        </rule>
+            <rule position="final">
+            <roman>®</roman>
+            <marc escape="(3"></marc>
+        </rule>
+        <!-- rule macron -->
+        <rule position="initial">
+            <!-- Alif maddah -->
+            <roman>åA</roman> 
+            <marc escape="(3">B</marc>
+        </rule>
+        <rule position="medial">
+            <roman>åA</roman>
+            <marc escape="(3">G</marc>
+        </rule>
+        <rule position="final">
+            <roman>åA</roman>
+            <marc escape="(3">G</marc>
+        </rule>
+        <rule position="initial">
+            <roman>åa</roman>
+            <marc escape="(3">B</marc>
+        </rule>
+        <rule position="medial">
+            <roman>åa</roman>
+            <marc escape="(3">G</marc>
+        </rule>
+        <rule position="final">
+            <roman>åa</roman>
+            <marc escape="(3">G</marc>
+        </rule>
+        <rule position="medial">
+            <roman>åao</roman>
+            <marc escape="(3">D</marc>
+        </rule>
+        <rule position="final">
+            <roman>åao</roman>
+            <marc escape="(3">D</marc>
+        </rule>
+        <rule>
+            <roman>åa-e-</roman>
+            <marc escape="(3">i </marc>
+        </rule>
+        <rule position="final">
+            <roman>-yi </roman>
+            <marc escape="(3">i </marc>
+        </rule>
+        <rule position="medial">
+            <roman>åaåu</roman>
+            <marc escape="(3">D</marc>
+        </rule>
+        <rule position="final">
+            <roman>åaåu</roman>
+            <marc escape="(3">D</marc>
+        </rule>
+        <rule position="medial">
+            <roman>åaåi</roman>
+            <marc escape="(3">GF</marc>
+        </rule>
+        <rule position="final">
+            <roman>åaåi</roman>
+            <marc escape="(3">GF</marc>
+        </rule>
+        <rule position="medial">
+            <roman>åai</roman>
+            <marc escape="(3">GF</marc>
+        </rule>
+        <rule position="final">
+            <roman>åai</roman>
+            <marc escape="(3">GF</marc>
+        </rule>
+        <rule>
+            <roman>åi-e-</roman>
+            <marc escape="(3">F</marc>
+        </rule>
+        <rule>
+            <roman>åi-yi</roman>
+            <marc escape="(3">F</marc>
+        </rule>
+        <rule>
+            <roman>åiy</roman>
+            <marc escape="(3">i</marc>
+        </rule>
+        <rule position="initial">
+            <roman>åI</roman>
+            <marc escape="(3">Gi</marc>
+        </rule>
+        <rule position="medial">
+            <roman>åI</roman>
+            <marc escape="(3">i</marc>
+        </rule>
+        <rule position="final">
+            <roman>åI</roman>
+            <marc escape="(3">i</marc>
+        </rule>
+        <rule position="medial">
+            <roman>åiu</roman>
+            <marc escape="(3">D</marc>
+        </rule>
+        <rule  position="final">
+            <roman>åiu</roman>
+            <marc escape="(3">D</marc>
+        </rule>
+        <rule position="initial">
+            <roman>åi</roman>
+            <marc escape="(3">Gi</marc>
+        </rule>
+        <rule  position="medial">
+            <roman>åi</roman>
+            <marc escape="(3">i</marc>
+        </rule>
+        <rule  position="final">
+            <roman>åi</roman>
+            <marc escape="(3">i</marc>
+        </rule>
+       <rule position="initial">
+            <roman>åU</roman>
+            <marc escape="(3">GD</marc>
+        </rule>
+       <rule position="medial">
+            <roman>åU</roman>
+            <marc escape="(3">D</marc>
+        </rule>
+       <rule position="final">
+            <roman>åU</roman>
+            <marc escape="(3">D</marc>
+        </rule>
+        <rule position="medial">
+            <roman>åuo</roman>
+            <marc escape="(3">hD</marc>
+        </rule>
+        <rule position="final">
+            <roman>åuo</roman>
+            <marc escape="(3">hD</marc>
+        </rule>
+        <rule>
+            <roman>åu-e-</roman>
+            <marc escape="(3">i </marc>
+        </rule>
+        <rule>
+            <roman>åu-yi</roman>
+            <marc escape="(3">i </marc>
+        </rule>
+       <rule position="initial">
+            <roman>åu</roman>
+            <marc escape="(3">Gh</marc>
+        </rule>
+       <rule position="medial">
+            <roman>åu</roman>
+            <marc escape="(3">h</marc>
+        </rule>
+        <rule position="final">
+            <roman>åu</roman>
+            <marc escape="(3">D</marc>
+        </rule>
+        <rule position="initial">
+            <roman>Ai</roman>
+            <marc escape="(3">Gi</marc>
+        </rule>
+        <rule position="medial">
+            <roman>Ai</roman>
+            <marc escape="(3">i</marc>
+        </rule>
+        <rule position="final">
+            <roman>Ai</roman>
+            <marc escape="(4">w</marc>
+        </rule>
+        <rule position="initial">
+            <roman>ai</roman>
+            <marc escape="(3">Gi</marc>
+        </rule>
+        <rule position="medial">
+            <roman>ai</roman>
+            <marc escape="(3">i</marc>
+        </rule>
+        <rule position="final">
+            <roman>ai</roman>
+            <marc escape="(4">x</marc>
+        </rule>
+        <rule position="initial">
+            <roman>Au</roman>
+            <marc escape="(3">Gh</marc>
+        </rule>
+       <rule position="medial">
+            <roman>Au</roman>
+            <marc escape="(3">F</marc>
+        </rule>
+        <rule position="final">
+            <roman>Au</roman>
+            <marc escape="(3">F</marc>
+        </rule>
+        <rule position="initial">
+            <roman>au</roman>
+            <marc escape="(3">Gh</marc>
+        </rule>
+        <rule position="medial">
+            <roman>au</roman>
+            <marc escape="(3">h</marc>
+        </rule>
+        <rule position="final">
+            <roman>au</roman>
+            <marc escape="(3">h</marc>
+        </rule>
+        <rule position="final">
+            <roman>a®åi</roman>
+            <marc escape="(3">Fi</marc>
+        </rule>
+        <rule position="initial">
+            <roman>Al-</roman>
+            <marc escape="(3">Gd</marc>
+        </rule>
+        <rule position="initial">
+            <roman>al-</roman>
+            <marc escape="(3">Gd</marc>
+        </rule>
+        <rule position="initial">
+            <roman>as-</roman>
+            <marc escape="(3">Gd</marc>
+        </rule>
+        <rule position="initial">
+            <roman>A</roman>
+            <marc escape="(3">G</marc>
+        </rule>
+        <rule>
+            <roman>ah</roman>
+            <marc escape="(3">g</marc>
+        </rule>
+        <rule position="medial">
+            <roman>aåi</roman>
+            <marc escape="(3">F</marc>
+        </rule>
+        <rule position="final">
+            <roman>aåi</roman>
+            <marc escape="(3">F</marc>
+        </rule>
+        <rule position="medial">
+            <roman>ae</roman>
+            <marc escape="(3">F</marc>
+        </rule>
+        <rule position="final">
+            <roman>ae</roman>
+            <marc escape="(3">F</marc>
+        </rule>
+        <rule position="medial">
+            <roman>a</roman>
+            <marc escape="(3"></marc>
+        </rule>
+        <rule position="final">
+            <roman>a</roman>
+            <marc escape="(3"></marc>
+        </rule>
+        <rule>
+            <roman>a</roman>
+            <marc escape="(3">G</marc>
+        </rule>
+        <rule  position="initial">
+            <roman>E</roman>
+            <marc escape="(3">Gi</marc>
+        </rule>
+        <rule position="medial">
+            <roman>E</roman>
+            <marc escape="(3">i</marc>
+        </rule>
+        <rule position="final">
+            <roman>E</roman>
+            <marc escape="(3"></marc>
+        </rule>
+        <rule position="initial">
+            <roman>e</roman>
+            <marc escape="(3">Gi</marc>
+        </rule>
+        <rule position="medial">
+            <roman>e</roman>
+            <marc escape="(3">i</marc>
+        </rule>
+        <rule position="final">
+            <roman>e</roman>
+            <marc escape="(4">w</marc>
+        </rule>
+        <rule position="initial">
+            <roman>I</roman>
+            <marc escape="(3">G</marc>
+        </rule>
+        <rule position="medial">
+            <roman>I</roman>
+            <marc escape="(3"></marc>
+        </rule>
+        <rule position="final">
+            <roman>I</roman>
+            <marc escape="(3"></marc>
+        </rule>
+        <rule position="initial">
+            <roman>i</roman>
+            <marc escape="(3">G</marc>
+        </rule>
+        <rule position="medial">
+            <roman>i</roman>
+            <marc escape="(3"></marc>
+        </rule>
+        <rule position="final">
+            <roman>i</roman>
+            <marc escape="(3"></marc>
+        </rule>
+        <rule position="medial">
+            <roman>ie</roman>
+            <marc escape="(4">x</marc>
+        </rule>
+        <rule position="final">
+            <roman>ie</roman>
+            <marc escape="(4">x</marc>
+        </rule>
+        <rule position="initial">
+            <roman>U</roman>
+            <marc escape="(3">G</marc>
+        </rule>
+        <rule position="medial">
+            <roman>U</roman>
+            <marc escape="(3"></marc>
+        </rule>
+        <rule position="final">
+            <roman>U</roman>
+            <marc escape="(3"></marc>
+        </rule>
+       <rule position="initial">
+            <roman>u</roman>
+            <marc escape="(3">G</marc>
+        </rule>
+       <rule position="medial">
+            <roman>u</roman>
+            <marc escape="(3"></marc>
+        </rule>
+       <rule position="final">
+            <roman>u</roman>
+            <marc escape="(3"></marc>
+        </rule>
+        <rule position="initial">
+            <roman>Y</roman>
+            <marc escape="(3">i</marc>
+        </rule>
+       <rule position="initial">
+            <roman>y</roman>
+            <marc escape="(3">i</marc>
+        </rule>
+        <rule position="initial">
+            <roman>O</roman>
+            <marc escape="(3">Gh</marc>
+        </rule>
+       <rule position="medial">
+            <roman>O</roman>
+            <marc escape="(3">h</marc>
+        </rule>
+       <rule position="final">
+            <roman>O</roman>
+            <marc escape="(3">h</marc>
+        </rule>
+       <rule position="initial">
+            <roman>o</roman>
+            <marc escape="(3">Gh</marc>
+        </rule>
+       <rule position="medial">
+            <roman>o</roman>
+            <marc escape="(3">h</marc>
+        </rule>
+       <rule position="final">
+            <roman>o</roman>
+            <marc escape="(3">h</marc>
+        </rule>
+        <rule position="alone">
+            <roman> O </roman>
+            <marc escape="(3"> h </marc>
+        </rule>
+        <rule position="alone">
+            <roman> o </roman>
+            <marc escape="(3"> h </marc>
+        </rule>
+        <rule position="final">
+            <roman>-yi</roman>
+            <marc escape="(3"></marc>
+        </rule>
+        <rule>
+            <roman>-i</roman>
+            <marc escape="(3"></marc>
+        </rule>
+        <rule>
+            <roman>-e-</roman>
+            <marc escape="(3">i</marc>
+        </rule>
+        <rule>
+            <roman>-</roman>
+            <marc escape="(3"></marc>
+        </rule>
+        <rule>
+            <roman>âA</roman>
+            <marc escape="(3">i</marc>
+        </rule>
+        <rule position="initial">
+            <roman>âa</roman>
+            <marc escape="(3">ti</marc>
+        </rule>
+        <rule position="medial">
+            <roman>âa</roman>
+            <marc escape="(3">ti</marc>
+        </rule>
+        <rule position="final">
+            <roman>âa </roman>
+            <marc escape="(3">ti </marc>
+        </rule>
+        <rule position="final">
+            <roman>âa</roman>
+            <marc escape="(3">ti</marc>
+        </rule>
+        <rule position="final">
+            <roman>âa, </roman>
+            <marc escape="(3">ti, </marc>
+        </rule>
+        <rule position="final">
+            <roman>âa. </roman>
+            <marc escape="(3">ti. </marc>
+        </rule>
+        <rule>
+            <roman>B</roman>
+            <marc escape="(3">H</marc>
+        </rule>
+        <rule>
+            <roman>b</roman>
+            <marc escape="(3">H</marc>
+        </rule>
+        <rule>
+            <roman>Bhbh</roman>
+            <marc escape="(3">qHg</marc>
+        </rule>
+        <rule>
+            <roman>bhbh</roman>
+            <marc escape="(3">qHg</marc>
+        </rule>
+        <rule>
+            <roman>bb</roman>
+            <marc escape="(3">qH</marc>
+         </rule>
+        <rule>
+            <roman>C</roman>
+            <marc escape="(4">1</marc>
+        </rule>
+        <rule>
+            <roman>c</roman>
+            <marc escape="(4">1</marc>
+        </rule>
+        <rule>
+            <roman>D</roman>
+            <marc escape="(3">O</marc>
+        </rule>
+        <rule>
+            <roman>d</roman>
+            <marc escape="(3">O</marc>
+        </rule>
+        <rule>
+            <roman>dd</roman>
+            <marc escape="(3">qO</marc>
+        </rule>
+        <rule>
+            <roman>Dhdh</roman>
+            <marc escape="(3">qOg</marc>
+        </rule>
+        <rule>
+            <roman>dhdh</roman>
+            <marc escape="(3">qOg</marc>
+        </rule>
+        <rule>
+            <roman>òD</roman>
+            <marc escape="(4">7</marc>
+        </rule>
+        <rule>
+            <roman>òd</roman>
+            <marc escape="(4">7</marc>
+        </rule>
+        <rule>
+            <roman>F</roman>
+            <marc escape="(3">a</marc>
+        </rule>
+        <rule>
+            <roman>f</roman>
+            <marc escape="(3">a</marc>
+        </rule>
+        <rule>
+            <roman>ff</roman>
+            <marc escape="(3">qa</marc>
+        </rule>        <rule>
+            <roman>G</roman>
+            <marc escape="4">^</marc>
+        </rule>
+        <rule>
+            <roman>g</roman>
+            <marc escape="4">^</marc>
+        </rule>
+
+        <rule>
+            <roman>gg</roman>
+            <marc escape="(4">q^</marc>
+        </rule>
+        <rule>
+            <roman>Ghgh</roman>
+            <marc escape="(3">q^g</marc>
+        </rule>
+        <rule>
+            <roman>ghgh</roman>
+            <marc escape="(3">q^g</marc>
+        </rule>           
+        <rule>
+            <roman>öGöh</roman>
+            <marc escape="(3">Z</marc>
+        </rule>
+        <rule>
+            <roman>ögöh</roman>
+            <marc escape="(3">Z</marc>
+        </rule>
+        <rule>
+            <roman>ögöhögöh</roman>
+            <marc escape="(3">qZ</marc>
+        </rule>
+        <rule>
+            <roman>öS</roman>
+            <marc escape="(4">K</marc>
+        </rule>
+        <rule>
+            <roman>ös</roman>
+            <marc escape="(4">K</marc>
+        </rule>
+        <rule>
+            <roman>H</roman>
+            <marc escape="(3">g</marc>
+        </rule>
+        <rule>
+            <roman>h</roman>
+            <marc escape="(3">g</marc>
+        </rule>
+        <rule>
+            <roman>hh</roman>
+            <marc escape="(3">qg</marc>
+        </rule>
+        <rule>
+            <roman>h-e-</roman>
+            <marc escape="(4">n </marc>
+        </rule>
+        <rule>
+            <roman>h-i</roman>
+            <marc escape="(4">n </marc>
+        </rule>
+        <rule>
+            <roman>h-yi</roman>
+            <marc escape="(3"></marc>
+        </rule>
+        <rule>
+            <roman>òH</roman>
+            <marc escape="(3">M</marc>
+        </rule>
+        <rule>
+            <roman>òh</roman>
+            <marc escape="(3">M</marc>
+        </rule>
+        <rule>
+            <roman>òhòh</roman>
+            <marc escape="(3">qM</marc>
+        </rule>
+        <rule>
+            <roman>J</roman>
+            <marc escape="(3">L</marc>
+        </rule>
+        <rule>
+            <roman>j</roman>
+            <marc escape="(3">L</marc>
+        </rule>
+        <rule>
+            <roman>jj</roman>
+            <marc escape="(3">qL</marc>
+        </rule>
+        <rule>
+            <roman>Jhjh</roman>
+            <marc escape="(3">qLg</marc>
+        </rule>
+        <rule>
+            <roman>jhjh</roman>
+            <marc escape="(3">qLg</marc>
+        </rule>
+        <rule>
+            <roman>K</roman>
+            <marc escape="(4">X</marc>
+        </rule>
+        <rule>
+            <roman>k</roman>
+            <marc escape="(4">X</marc>
+        </rule>
+        <rule>
+            <roman>Khkh</roman>
+            <marc escape="(3">qcg</marc>
+        </rule>
+        <rule>
+            <roman>khkh</roman>
+            <marc escape="(3">qcg</marc>
+        </rule>
+        <rule>
+            <roman>öKöh</roman>
+            <marc escape="(3">N</marc>
+        </rule>
+        <rule>
+            <roman>ököh</roman>
+            <marc escape="(3">N</marc>
+        </rule>
+        <rule>
+            <roman>ököhököh</roman>
+            <marc escape="(3">qN</marc>
+        </rule>
+        <rule>
+            <roman>L</roman>
+            <marc escape="(3">d</marc>
+        </rule>
+        <rule>
+            <roman>l</roman>
+            <marc escape="(3">d</marc>
+        </rule>
+        <rule>
+            <roman>ll</roman>
+            <marc escape="(3">qd</marc>
+        </rule>
+        <rule>
+            <roman>M</roman>
+            <marc escape="(3">e</marc>
+        </rule>
+        <rule>
+            <roman>m</roman>
+            <marc escape="(3">e</marc>
+        </rule>
+        <rule>
+            <roman>mm</roman>
+            <marc escape="(3">qe</marc>
+        </rule>
+        <rule>
+            <roman>N</roman>
+            <marc escape="(3">f</marc>
+        </rule>
+        <rule>
+            <roman>n</roman>
+            <marc escape="(3">f</marc>
+        </rule>
+        <rule>
+            <roman>nn</roman>
+            <marc escape="(3">qf</marc>
+        </rule>
+        <rule>
+            <roman>öN</roman>
+            <marc escape="(4">h</marc>
+        </rule>
+        <rule>
+            <roman>ön</roman>
+            <marc escape="(4">h</marc>
+        </rule>
+        <rule>
+            <roman>P</roman>
+            <marc escape="(4">)</marc>
+        </rule>
+        <rule>
+            <roman>p</roman>
+            <marc escape="(4">)</marc>
+        </rule>
+        <rule>
+            <roman>Q</roman>
+            <marc escape="(3">b</marc>
+        </rule>
+        <rule>
+            <roman>q</roman>
+            <marc escape="(3">b</marc>
+        </rule>
+        <rule>
+            <roman>qq</roman>
+            <marc escape="(3">qb</marc>
+        </rule>
+        <rule>
+            <roman>R</roman>
+            <marc escape="(3">Q</marc>
+        </rule>
+        <rule>
+            <roman>r</roman>
+            <marc escape="(3">Q</marc>
+        </rule>
+        <rule>
+            <roman>rr</roman>
+            <marc escape="(3">qQ</marc>
+        </rule>
+        <rule>
+            <roman>òR</roman>
+            <marc escape="(4">=</marc>
+        </rule>
+        <rule>
+            <roman>òr</roman>
+            <marc escape="(4">=</marc>
+        </rule>
+        <rule>
+            <roman>S</roman>
+            <marc escape="(3">S</marc>
+        </rule>
+        <rule>
+            <roman>s</roman>
+            <marc escape="(3">S</marc>
+        </rule>
+        <rule>
+            <roman>ss</roman>
+            <marc escape="(3">qS</marc>
+        </rule>
+        <rule>
+            <roman>òS</roman>
+            <marc escape="(3">U</marc>
+        </rule>
+        <rule>
+            <roman>òs</roman>
+            <marc escape="(3">U</marc>
+        </rule>
+        <rule>
+            <roman>òsòs</roman>
+            <marc escape="(3">qU</marc>
+        </rule>
+        <rule>
+            <roman>Sh</roman>
+            <marc escape="(3">T</marc>
+        </rule>
+        <rule>
+            <roman>sh</roman>
+            <marc escape="(3">T</marc>
+        </rule>
+        <rule>
+            <roman>shsh</roman>
+            <marc escape="(3">qT</marc>
+        </rule>
+        <rule>
+            <roman>âS</roman>
+            <marc escape="(3">T</marc>
+        </rule>
+        <rule>
+            <roman>âs</roman>
+            <marc escape="(3">T</marc>
+        </rule>
+        <rule>
+            <roman>âsâs</roman>
+            <marc escape="(3">qT</marc>
+        </rule>
+        <rule>
+            <roman>T</roman>
+            <marc escape="(3">J</marc>
+        </rule>
+        <rule>
+            <roman>t</roman>
+            <marc escape="(3">J</marc>
+        </rule>
+        <rule>
+            <roman>tt</roman>
+            <marc escape="(3">qJ</marc>
+        </rule>
+        <rule>
+            <roman>Thth</roman>
+            <marc escape="(3">qJg</marc>
+        </rule>
+        <rule>
+            <roman>thth</roman>
+            <marc escape="(3">qJg</marc>
+        </rule>
+        <rule>
+            <roman>óT</roman>
+            <marc escape="(3">W</marc>
+        </rule>
+        <rule>
+            <roman>ót</roman>
+            <marc escape="(3">W</marc>
+        </rule>
+        <rule>
+            <roman>ótót</roman>
+            <marc escape="(3">qW</marc>
+        </rule>
+        <rule>
+            <roman>óThóth</roman>
+            <marc escape="(3">qWg</marc>
+        </rule>
+        <rule>
+            <roman>óthóth</roman>
+            <marc escape="(3">qWg</marc>
+        </rule>
+        <rule>
+            <roman>òT</roman>
+            <marc escape="(4">i</marc>
+        </rule>
+        <rule>
+            <roman>òt</roman>
+            <marc escape="(4">i</marc>
+        </rule>
+        <rule>
+            <roman>V</roman>
+            <marc escape="(3">h</marc>
+        </rule>
+        <rule>
+            <roman>v</roman>
+            <marc escape="(3">h</marc>
+        </rule>
+        <rule>
+            <roman>vv</roman>
+            <marc escape="(3">qh</marc>
+        </rule>
+        <rule>
+            <roman>W</roman>
+            <marc escape="(3">h</marc>
+        </rule>
+        <rule>
+            <roman>w</roman>
+            <marc escape="(3">h</marc>
+        </rule>
+        <rule>
+            <roman>Y</roman>
+            <marc escape="(3">i</marc>
+        </rule>
+        <rule>
+            <roman>y</roman>
+            <marc escape="(3">i</marc>
+        </rule>
+        <rule>
+            <roman>yy</roman>
+            <marc escape="(3">qi</marc>
+        </rule>
+        <rule>
+            <roman>Z</roman>
+            <marc escape="(3">R</marc>
+        </rule>
+        <rule>
+            <roman>z</roman>
+            <marc escape="(3">R</marc>
+        </rule>
+        <rule>
+            <roman>ZZ</roman>
+            <marc escape="(3">qR</marc>
+        </rule>
+        <rule>
+            <roman>zz</roman>
+            <marc escape="(3">qR</marc>
+        </rule>
+        <rule>
+            <roman>óZ</roman>
+            <marc escape="(3">V</marc>
+        </rule>
+        <rule>
+            <roman>óz</roman>
+            <marc escape="(3">V</marc>
+        </rule>
+        <rule>
+            <roman>ózóz</roman>
+            <marc escape="(3">qV</marc>
+        </rule>
+        <rule>
+            <roman>òZ</roman>
+            <marc escape="(3">X</marc>
+        </rule>
+        <rule>
+            <roman>òz</roman>
+            <marc escape="(3">X</marc>
+        </rule>
+        <rule>
+            <roman>òZòZ</roman>
+            <marc escape="(3">qX</marc>
+        </rule>
+        <rule>
+            <roman>òzòz</roman>
+            <marc escape="(3">qX</marc>
+        </rule>
+        <rule>
+            <roman>öZ</roman>
+            <marc escape="(3">P</marc>
+        </rule>
+        <rule>
+            <roman>öz</roman>
+            <marc escape="(3">P</marc>
+        </rule>
+        <rule>
+            <roman>özöz</roman>
+            <marc escape="(3">qP</marc>
+        </rule>
+        <rule>
+            <roman>Zh</roman>
+            <marc escape="(4">D</marc>
+        </rule>
+        <rule>
+            <roman>zh</roman>
+            <marc escape="(4">D</marc>
+        </rule>
+        <!--  punctuation  -->
+        <rule>
+            <roman>--</roman>
+            <marc escape="(B">--</marc>
+        </rule>       
+        <rule>
+            <roman>!</roman>
+            <marc escape="(3">!</marc>
+        </rule>
+        <rule>
+            <roman>"</roman>
+            <marc escape="(3">"</marc>
+        </rule>
+        <rule>
+            <roman>#</roman>
+            <marc escape="(3">#</marc>
+        </rule>
+        <rule>
+            <roman>$</roman>
+            <marc escape="(3">$</marc>
+        </rule>
+        <rule>
+            <roman>%</roman>
+            <marc escape="(3">%</marc>
+        </rule>
+        <rule>
+            <roman>'</roman>
+            <marc escape="(3">'</marc>
+        </rule>
+        <rule>
+            <roman>(</roman>
+            <marc escape="(3">(</marc>
+        </rule>
+        <rule>
+            <roman>)</roman>
+            <marc escape="(3">)</marc>
+        </rule>
+        <rule>
+            <roman>*</roman>
+            <marc escape="(3">*</marc>
+        </rule>
+        <rule>
+            <roman>+</roman>
+            <marc escape="(3">+</marc>
+        </rule>
+        <rule>
+            <roman>,</roman>
+            <marc escape="(3">,</marc>
+        </rule>
+        <rule>
+            <roman>.</roman>
+            <marc escape="(3">.</marc>
+        </rule>
+        <rule>
+            <roman>:</roman>
+            <marc escape="(3">:</marc>
+        </rule>
+        <rule>
+            <roman>;</roman>
+            <marc escape="(3">;</marc>
+        </rule>
+        <rule>
+            <roman>=</roman>
+            <marc escape="(3">=</marc>
+        </rule>
+        <rule>
+            <roman>?</roman>
+            <marc escape="(3">?</marc>
+        </rule>
+        <rule>
+            <roman>[</roman>
+            <marc escape="(3">[</marc>
+        </rule>
+        <rule>
+            <roman>]</roman>
+            <marc escape="(3">]</marc>
+        </rule>
+        <rule>
+            <roman>.</roman>
+            <marc escape="(3">.</marc>
+        </rule>
+        <rule>
+            <roman>/</roman>
+            <marc escape="(3">/</marc>
+        </rule>
+       <!--  other troublesome words and phrases  --> 
+        <rule>
+            <roman>Delhi</roman> 
+  	<marc escape="(3">fFi Ogdi</marc> 
+        </rule>
+        <rule>
+            <roman>New Delhi</roman> 
+  	<marc escape="(3">fFi Ogdi</marc> 
+        </rule>
+        <rule>
+            <roman>Mumba®åi</roman> 
+            <marc escape="(3">eeHFi</marc> 
+        </rule>
+        <rule>
+            <roman>Mumba°åi</roman> 
+            <marc escape="(3">eeHFi</marc> 
+        </rule>
+        <rule>
+            <roman>Håa°åus</roman> 
+            <marc escape="(3">gGDS</marc> 
+        </rule>
+        <rule>
+            <roman>Håa®åus</roman> 
+            <marc escape="(3">gGDS</marc> 
+        </rule>
+        <rule>
+            <roman>1st</roman> 
+            <marc escape="(3">1</marc> 
+        </rule>
+        <rule>
+            <roman>2nd</roman> 
+            <marc escape="(3">2</marc> 
+        </rule>
+        <rule>
+            <roman>3rd</roman> 
+            <marc escape="(3">3</marc> 
+        </rule>
+        <rule>
+            <roman>4th</roman> 
+            <marc escape="(3">4</marc> 
+        </rule>
+<!--  character set shifts  -->
+
+
+        <rule>
+            <roman>kk</roman>
+            <marc>^ESC(3q^ESC(4X</marc>
+        </rule> 
+        <rule>
+            <roman>Cc</roman> 
+            <marc>^ESC(3q^ESC(41</marc> 
+        </rule>
+        <rule>
+            <roman>cc</roman> 
+            <marc>^ESC(3q^ESC(41</marc> 
+        </rule>
+
+        <rule>
+            <roman>Pp</roman>
+            <marc>^ESC(3q^ESC(4)</marc>
+        </rule>    
+        <rule>
+            <roman>pp</roman>
+            <marc>^ESC(3q^ESC(4)</marc>
+        </rule>    
+        
+        <rule>
+            <roman>òdòd</roman>
+            <marc>^ESC(3q^ESC(47</marc>
+        </rule>
+
+        <rule>
+            <roman>òRòr</roman>
+            <marc>^ESC(3q^ESC(4=^ESC(3h</marc>
+        </rule>
+        <rule>
+            <roman>òròr</roman>
+            <marc>^ESC(3q^ESC(4=^ESC(3h</marc>
+        </rule>
+        <rule>
+            <roman>òRhòrh</roman>
+            <marc>^ESC(3q^ESC(4=^ESC(3h</marc>
+        </rule>
+        <rule>
+            <roman>òrhòrh</roman>
+            <marc>^ESC(3q^ESC(4=^ESC(3h</marc>
+        </rule>
+        <rule>
+            <roman>Publishing</roman> 
+            <marc>^ESC(4(^ESC(3HdTf^ESC(4</marc> 
+        </rule>
+        <rule>
+            <roman>öNön</roman>
+            <marc>^ESC(3q^ESC(4h</marc>
+        </rule>
+        <rule>
+            <roman>önön</roman>
+            <marc>^ESC(3q^ESC(4hs^</marc>
+        </rule>
+
+        <rule>
+            <roman>òDipo</roman> 
+            <marc>^ESC(47)^ESC(3h</marc> 
+        </rule>
+        <rule>
+            <roman>òDipåu</roman> 
+            <marc>^ESC(47)^ESC(3h</marc> 
+        </rule>
+
+        <rule>
+            <roman>Bukòdipo</roman> 
+            <marc>^ESC(3aQiO^ESC(47)^ESC(3h</marc> 
+        </rule>
+        <rule>
+            <roman>edition</roman> 
+            <marc>^ESC(3 Gi^ESC(47^ESC(3iTf</marc> 
+        </rule>
+        <rule>
+            <roman> ed.</roman>
+	    <marc>^ESC(3 Gi^ESC(47^ESC(3iTf.</marc> 
+        </rule>
+        <rule>
+            <roman>meön</roman> 
+            <marc>^ESC(3ei^ESC(4h^</marc> 
+        </rule>        
+        <!-- a single authority mapping -->
+
+       	<name>
+   	 	<roman>$aPremacanda,$d1881-1936.</roman>
+    		<marc>$a^ESC(4)^ESC(3Qie^ESC(41^ESC(3fO,^ESC(B$d1881-1936.</marc>
+    
+	</name>
+	<name>
+   	 	<roman>$a°Abduòsòsamad.</roman>
+    		<marc>$a^ESC(3YHOGdqUeO.^ESC(B</marc>                        
+	</name>
+	<name>
+   	 	<roman>$aIbne òSafåi.</roman>
+    		<marc>$a^ESC(3GHf Uai.^ESC(B</marc>                        
+	</name>	
+        <name>
+   	 	<roman>$aIbn-i-òSafåi,$d1928-1980</roman>
+    		<marc>$a^ESC(3GHf Uai.^ESC(B</marc>                        
+	</name>
+
+</config>		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

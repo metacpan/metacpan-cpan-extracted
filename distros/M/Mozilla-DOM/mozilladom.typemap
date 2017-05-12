@@ -1,0 +1,230 @@
+TYPEMAP
+
+nsIWebBrowser *			T_MOZDOM_GENERIC_WRAPPER
+nsIWebNavigation *		T_MOZDOM_GENERIC_WRAPPER
+nsIURI *			T_MOZDOM_GENERIC_WRAPPER
+nsISelection *			T_MOZDOM_GENERIC_WRAPPER
+nsISupports *			T_MOZDOM_GENERIC_WRAPPER
+
+nsIDOMAbstractView *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMDocumentView *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMEvent *			T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNSEvent *			T_MOZDOM_GENERIC_WRAPPER
+nsIDOMUIEvent *			T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNSUIEvent *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMDocumentEvent *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMMutationEvent *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMKeyEvent *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMMouseEvent *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMEventTarget *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMEventListener *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMWindow *			T_MOZDOM_GENERIC_WRAPPER
+nsIDOMWindow2 *			T_MOZDOM_GENERIC_WRAPPER
+nsIDOMWindowInternal *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMWindowCollection *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMDocument *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNSDocument *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMDocumentFragment *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMDocumentRange *           T_MOZDOM_GENERIC_WRAPPER
+nsIDOMDocumentType *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNode *			T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNodeList *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNamedNodeMap *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMElement *			T_MOZDOM_GENERIC_WRAPPER
+nsIDOMEntity *			T_MOZDOM_GENERIC_WRAPPER
+nsIDOMEntityReference *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMAttr *			T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNotation *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMProcessingInstruction *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMCDATASection *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMComment *			T_MOZDOM_GENERIC_WRAPPER
+nsIDOMCharacterData *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMText *			T_MOZDOM_GENERIC_WRAPPER
+nsIDOMDOMImplementation *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMRange *			T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNSRange *                 T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHistory *			T_MOZDOM_GENERIC_WRAPPER
+nsIDOMLocation *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNavigator *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMScreen *			T_MOZDOM_GENERIC_WRAPPER
+
+nsIDOMHTMLAreaElement *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNSHTMLAreaElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLAnchorElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNSHTMLAnchorElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLAppletElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLBRElement *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLBaseElement *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLBaseFontElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLBodyElement *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLButtonElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNSHTMLButtonElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLCollection *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLDListElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLDirectoryElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLDivElement *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNSHTMLDocument *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLElement *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNSHTMLElement *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLEmbedElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLFieldSetElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLFontElement *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLFormElement *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNSHTMLFormElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLFrameElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNSHTMLFrameElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLFrameSetElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLHRElement *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNSHTMLHRElement *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLHeadElement *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLHeadingElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLHtmlElement *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLIFrameElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLImageElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNSHTMLImageElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLInputElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNSHTMLInputElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLIsIndexElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLLIElement *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLLabelElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLLegendElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLLinkElement *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLMapElement *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLMenuElement *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLMetaElement *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLModElement *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLOListElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLObjectElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLOptGroupElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLOptionElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNSHTMLOptionElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLOptionsCollection *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLParagraphElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLParamElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLPreElement *		T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLQuoteElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLScriptElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLSelectElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNSHTMLSelectElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLStyleElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLTableCaptionElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLTableCellElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLTableColElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLTableElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLTableRowElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLTableSectionElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLTextAreaElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMNSHTMLTextAreaElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLTitleElement *	T_MOZDOM_GENERIC_WRAPPER
+nsIDOMHTMLUListElement *	T_MOZDOM_GENERIC_WRAPPER
+
+
+PRUint32	T_UV
+PRUint16	T_UV
+PRInt32	T_IV
+PRInt16	T_UV
+PRBool	T_BOOL
+DOMTimeStamp	T_UV
+
+# Use this for methods with "const nsAString &" arguments;
+# e.g. for InitEvent(const nsAString &evtType, ...)
+# do something like
+# void
+# moz_dom_init_event (event, type, ...)
+# 	nsIDOMEvent *event;
+# 	nsEmbedString type;
+# 	...
+#     CODE:
+# 	event->InitEvent(type, ...)
+nsEmbedString	T_NSASTRING
+nsEmbedCString	T_NSACSTRING
+
+nsIID	T_NSIID
+
+# O_OBJECT is from `perldoc perlxs`
+MozDomEventListener *	O_OBJECT
+
+
+INPUT
+
+# (T_GPERL_GENERIC_WRAPPER from Glib/typemap; I wasn't sure if having the
+# same name would conflict or something)
+# a general-purpose typemap... strips any trailing star and/or leading "const",
+# leaving only the type name in the form SvMyType.  this allows you to make a
+# typedef such as "typedef MyType MyType_ornull", and SvMyType_ornull will be
+# called for those.
+T_MOZDOM_GENERIC_WRAPPER
+	$var = Sv${(my $ntype = $type) =~ s/(?:const\s+)?([:\w]+)(?:\s*\*)$/$1/x;
+		   \$ntype} ($arg);
+
+
+# For an `nsEmbedString' arg, this converts the incoming SV* arg
+# to a UTF-16 nsEmbedString, suitable for "const nsAString &"
+# input parameters.
+
+T_NSASTRING
+	char * str$var = (char *) SvPV_nolen($arg);
+	nsEmbedCString u8$var(str$var);
+	NS_CStringToUTF16(u8$var, NS_CSTRING_ENCODING_UTF8, $var);
+
+# Same but UTF-8 version
+T_NSACSTRING
+	char * str$var = (char *) SvPV_nolen($arg);
+	$var = str$var;
+
+T_NSIID
+	char * str$var = (char *) SvPV_nolen($arg);
+	$var.Parse(str$var);
+
+O_OBJECT
+	if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
+		$var = ($type) SvIV((SV *) SvRV($arg));
+	else {
+		warn(\"${Package}::$func_name() -- $var is not a blessed SV reference\");
+		XSRETURN_UNDEF;
+	}
+
+
+OUTPUT
+
+T_MOZDOM_GENERIC_WRAPPER
+	$arg = newSV${(my $ntype = $type) =~ s/(?:const\s+)?([:\w]+)(?:\s*\*)$/$1/;
+		      \$ntype} ($var);
+
+
+# For a `nsEmbedString' return value, takes care of converting
+# a UTF-16 nsEmbedString to a UTF-8 SV * (const char *).
+# Generally this is necessary for methods with "nsAString &"
+# arguments that are passed in by reference; for example,
+# GetType(nsAString &type):
+#
+# nsEmbedString
+# moz_dom_get_type (event)
+# 	nsIDOMEvent *event;
+#     PREINIT:
+# 	nsEmbedString type;
+#     CODE:
+#	event->GetType(type);
+# 	RETVAL = type;
+#     OUTPUT:
+# 	RETVAL
+
+T_NSASTRING
+	nsEmbedCString u8$var;
+	const char * u8str$var;
+	NS_UTF16ToCString($var, NS_CSTRING_ENCODING_UTF8, u8$var);
+	u8str$var = u8$var.get();
+	sv_setpv((SV *)$arg, u8str$var);
+
+# Same but UTF-8 version
+T_NSACSTRING
+	const char * str$var;
+	str$var = $var.get();
+	sv_setpv((SV *)$arg, str$var);
+
+# XXX: I think ToString leaks since I don't free the string
+T_NSIID
+	sv_setpv((SV*)$arg, $var.ToString());
+
+O_OBJECT
+	sv_setref_pv($arg, CLASS, (void *) $var);

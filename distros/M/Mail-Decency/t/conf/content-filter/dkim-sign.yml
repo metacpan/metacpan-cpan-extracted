@@ -1,0 +1,6 @@
+---
+
+disable: 0
+
+enable_sign: 1
+sign_key: "dkim/sign.key"

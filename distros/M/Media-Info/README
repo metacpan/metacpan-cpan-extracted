@@ -1,0 +1,39 @@
+SYNOPSIS
+
+     use Media::Info qw(get_media_info);
+     my $res = get_media_info(media => '/path/to/celine.mp4');
+
+    Sample result:
+
+     [
+       200,
+       "OK",
+       {
+         audio_bitrate => 128000,
+         audio_format  => 85,
+         audio_rate    => 44100,
+         duration      => 2081.25,
+         num_channels  => 2,
+         num_chapters  => 0,
+       },
+       {
+         "func.raw_output" => "ID_AUDIO_ID=0\n...",
+       },
+     ]
+
+DESCRIPTION
+
+    This module provides a common interface for Media::Info::* modules,
+    which you can use to get information about a media file (like video,
+    music, etc) using specific backends. Currently the available backends
+    include Media::Info::Mplayer, Media::Info::Ffmpeg,
+    Media::Info::Mediainfo.
+
+SEE ALSO
+
+    Video::Info - This module is first written because I couldn't install
+    Video::Info. That module doesn't seem maintained (last release is in
+    2003 at the time of this writing), plus I want a per-backend namespace
+    organization instead of per-format one, and a simple functional
+    interface instead of OO interface.
+

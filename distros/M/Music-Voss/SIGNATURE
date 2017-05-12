@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 08d95f869f59cda46f510cbbceb35bdbfc7b12c4 Changes
+SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
+SHA1 29ad181c26c0535a5535a57e66825fec49518d2f MANIFEST
+SHA1 f5aa0dfe73ae5af9a71101a6cc1256a9b4155976 META.json
+SHA1 77c7b81e74323507019902822369b9d5bbc48456 META.yml
+SHA1 88b26cfa2f84444e548e9373eaf29cdfc3e22699 Makefile.PL
+SHA1 a1c7539d71bc8eb9ab675e220570044d23cbeeb4 README
+SHA1 9f095ae1591bd6bd2a2e449699433b3ca50733f1 eg/make-rhythm
+SHA1 9b56722669606ac2bc7695c6ba05297904c435a2 lib/Music/Voss.pm
+SHA1 2745ba913f8901bd31112123bffbc001a22cf5a3 t/00-load.t
+SHA1 9a6d6437f68b88bfaf1d8163bdf608bc7cfb8b86 t/10-powers.t
+SHA1 ef4b8407cbe87835e3f3e1e0b1076302ae2d08b5 t/11-bitchange.t
+SHA1 73974d5bdf7a87b472bde10c06e0cdf5363abbff t/manifest.t
+SHA1 754b1649c578b42b74aa4c0238950a0d473c6155 t/pod-coverage.t
+SHA1 0062f84bfb49b275b13bd1136a746a32f96c0df7 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJXHYtlAAoJEKSYBH5dablg4GoH/A72wJJAnWVz2CdOT3C2GCz3
+LsTV2Epk3HMcaVzEAZnAZmA/JWD1SgW9OS8J5qnemYNtb8/FY7OYZdttXwETMPW+
+v+fUlv6fE5O9sbfiJSZnvu5LCkcszu+X8ZcTJeAQdyllRUax5+0oAiowjhaGlPH/
+kIhKCnXUNYBrwZLyOF9YiIG6kHa2hi+UqOksDQIe42WO8p1RTDLsw5Af81P2igkd
+jU2yirjwz+vFY8OYsvVJ71KpnwYAausGkwTRpbgUQYNp540Bz+7RgVCi8UMZ/AtU
+5RUR/+ukjVdmiO3fQ+he/zrJgUcLOVIx5YBoknivx/nvko8Y7RaN8BrX3XXa6ak=
+=if/7
+-----END PGP SIGNATURE-----

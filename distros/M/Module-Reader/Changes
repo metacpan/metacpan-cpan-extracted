@@ -1,0 +1,53 @@
+Revision history for Module-Reader
+
+0.003002 - 2016-12-14
+  - releasing as stable
+
+0.003_001 - 2016-11-30
+  - fix links and formatting in pod
+  - fix some edge cases with arrayref hooks
+  - fix tests on Win32
+  - fix 5.6 support
+  - fix cperl support
+
+0.003_000 - 2016-11-27
+  * Features
+    - add new object based interface, with more controls
+    - result objects include more information, including found filenames and
+      the @INC entry found in
+    - searches can be performed by filename rather than module name
+    - handle ./ and ../ like perl core for file searches
+    - list of all findable files can be returned
+
+  * Bug Fixes
+    - fix @INC hook edge case
+    - adjust error messages to match perl core
+    - handle special files (character devices, fifos) correctly
+    - handle permission denied errors correctly
+    - support pmc files
+    - ignore -C/PERL_UNICODE layers, as perl does
+
+0.002003 - 2014-08-21
+  - fix dist name in meta files
+
+0.002002 - 2014-08-16
+  - include README in dist
+  - include additional metadata
+
+0.002001 - Nov 23, 2013
+  - fix module NAME in Makefile.PL
+  - minor doc corrections
+  - fix in-memory file test on perl 5.6
+
+0.002000 - Feb 11, 2013
+  - Improve documentation.
+  - Add 'found' option for always loading from specific files.
+
+0.001002 - Feb 2, 2013
+  - fix copyright attribution
+
+0.001001 - Feb 1, 2013
+  - fix version number format
+
+0.001000 - Feb 1, 2013
+  - initial version

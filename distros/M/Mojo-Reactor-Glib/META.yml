@@ -1,0 +1,25 @@
+---
+abstract: 'Glib::MainLoop backend for Mojo'
+author:
+  - 'Ralesk <ralesk@cpan.org>'
+build_requires:
+  Test::More: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojo-Reactor-Glib
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Glib: 0
+  Mojolicious: 0
+  perl: 5.01
+resources:
+  bugtracker: https://bitbucket.org/ralesk/mojo-reactor-glib/issues
+  repository: https://bitbucket.org/ralesk/mojo-reactor-glib
+version: 0.002

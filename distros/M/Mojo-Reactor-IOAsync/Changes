@@ -1,0 +1,17 @@
+0.005     2015-04-27 18:43:55 EDT
+  - Support sequential next_tick
+
+0.004     2015-03-21 15:32:22-04:00 America/New_York
+  - Updated again and watch methods to croak on inactive watchers
+
+0.003     2015-02-23 13:54:03-05:00 America/New_York
+  - Remove deprecated is_readable method from tests
+  - Set default Mojo::Reactor
+  - Add hypnotoad example to synopsis
+
+0.002     2015-02-15 13:20:18-05:00 America/New_York
+  - More efficiency when overwriting existing I/O callback
+  - Update IO::Async requirement to 0.65 for select bugfix RT#101919
+
+0.001     2015-02-01 16:49:26-05:00 America/New_York
+  - First release

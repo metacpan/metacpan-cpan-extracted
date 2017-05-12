@@ -1,0 +1,46 @@
+Revision history for Perl extension Mediainfo.
+
+0.01  Fri Jun 17 16:53:10 2011
+	- original version; created by h2xs 1.23 with options
+		-XA -n Mediainfo
+
+0.02  Wed Jul  6 14:18:29 2011
+	- update doc and test
+
+0.03  Thu Aug 18 17:00:28 2011
+	- add audio_language attr
+
+0.04  Tue Aug 23 17:28:22 2011
+	- bugfix
+
+0.05  Thu Aug 25 14:46:15 2011
+	- bugfix
+
+0.06  Mon Jan  9 11:05:12 2012
+	- test script fix (compatible with MediaInfoLib - v0.7.52)
+
+0.07  Mon Jan 16 18:06:52 2012
+	- fix "Duration" number with dot
+
+0.08  Thu Feb 23 17:29:06 2012
+	- add "rotation"
+	- add "video_codec_profile"
+	- add "video_format_profile"
+
+0.09  Mon Jun 11 18:25:15 2012
+	- increase the compatibility of win32
+
+0.10  Tue Aug 28 22:18:22 2012
+	- fix the wrong way open3 is being used.
+	- add "title"
+	- add "album"
+	- add "track_name"
+	- add "performer"
+
+0.11  Wed May 28 23:21:49 2014
+	- auto find mediainfo_exec
+	- fix bug in crontab
+
+0.12  Mon Dec 22 16:49:01 2014
+  - add audio channel by @owen
+

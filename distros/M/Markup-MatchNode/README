@@ -1,0 +1,76 @@
+NAME
+    Markup::MatchNode - Comparison object of Markup::TreeNode.
+
+SYNOPSIS
+            use Markup::MatchNode;
+
+            my $node = Markup::MatchNode->new( tagname => 'p', attr => { align => 'center' } );
+            $_ = $node->compare_to(Markup::TreeNode->new( tagname => 'p', attr => { align => 'left' } ));
+
+            print "Percent correct: $_\n";
+
+DESCRIPTION
+    Pretty much exactly the same as Markup::TreeNode. The major difference
+    is the "compare_to" method. Likely you won't need this module
+    explicitly. It is mostly used with Markup::Content.
+
+METHODS
+    All the same as Markup::TreeNode with the notable exception of
+    "compare_to", listed below.
+
+    Please note the following terminology:
+
+    A Major Error occurs when one of the following tag nodes is out of
+    place: table, td, tr, tbody, map, object, img, body, head, title, and
+    html.
+
+    A Minor Error is any error that is not a Major Error. This could be
+    unmatched text an unmatched attribute, an unmatched tag node or any
+    other error.
+
+    compare_to (Markup::TreeNode)
+        This compares the current MatchNode to the specified TreeNode.
+        Generally you won't need to explicitly call this method or use this
+        module unless you are performing some custom matching routines.
+
+        Returns: In scalar context it returns the percentage correct. The
+        example under SYNOPSIS should yeild 75. In list context two
+        references to arrays are returned. The first index is the complete
+        stats on the minor errors. Index zero of this array reference is the
+        total number of possible correct points. The second index is the
+        total correct points. The following index is the percent correct.
+        The last index of the array reference is a colon(:)-seperated list
+        of reasons why the nodes did not match. The second array reference
+        represents the major errors and the array indices exactly mirror the
+        minor errors.
+
+        Example:
+
+                my $node = Markup::MatchNode->new( tagname => 'p', attr => { align => 'center' } );
+
+                # scalar context
+                $_ = $node->compare_to(Markup::TreeNode->new( tagname => 'p', attr => { align => 'left' } ));
+                print "Percent correct: $_%\n";
+
+                # list context
+                @_ = $node->compare_to(Markup::TreeNode->new( tagname => 'p', attr => { align => 'left' } ));
+                $_[0]->[3] =~ s/:/\n\t\t\t\t\t/g;
+                $_[1]->[3] =~ s/:/\n\t\t\t\t\t/g;
+                $_ = int((($_[0]->[2] + $_[1]->[2]) / 2));
+                print <<EOF;
+
+                Error   Correct         Total   Percent Reasons
+                ------------------------------------------------------------------------
+                Minor   $_[0]->[1]      of      $_[0]->[0]      ($_[0]->[2]%)   $_[0]->[3]
+                Major   $_[1]->[1]      of      $_[1]->[0]      ($_[1]->[2]%)   $_[1]->[3]
+                Total                           ($_%)
+                EOF
+
+SEE ALSO
+    Markup::TreeNode, Markup::MatchTree, Markup::Tree, Markup::Content
+
+AUTHOR
+    BPrudent (Brandon Prudent)
+
+    Email: xlacklusterx@hotmail.com
+

@@ -1,0 +1,217 @@
+#! /usr/bin/perl
+#########################################################################
+#        This Perl script is Copyright (c) 2011, Peter J Billam         #
+#                          www.pjb.com.au                               #
+#                                                                       #
+#     This script is free software; you can redistribute it and/or      #
+#            modify it under the same terms as Perl itself.             #
+#########################################################################
+my $Version       = '1.2';
+my $VersionDate   = '03nov2011';
+use open ':locale';
+
+my $InputPort = '';
+while ($ARGV[$[] =~ /^-([a-z])/) {
+	if ($1 eq 'v')      { shift;
+		my $n = $0; $n =~ s{^.*/([^/]+)$}{$1};
+		print "$n version $Version $VersionDate\n";
+		exit 0;
+	} elsif ($1 eq 'p' or $1 eq 'i') { shift; $InputPort = shift;
+	} else {
+		print "usage:\n";  my $synopsis = 0;
+		while (<DATA>) {
+			if (/^=head1 SYNOPSIS/)     { $synopsis = 1; next; }
+			if ($synopsis && /^=head1/) { last; }
+			if ($synopsis && /\S/)      { s/^\s*/   /; print $_; next; }
+		}
+		exit 0;
+	}
+}
+if (!$InputPort) { $InputPort = $ENV{'ALSA_INPUT_PORTS'}; }
+if (!$InputPort) { die "-p not specified and ALSA_INPUT_PORTS not set\n"; }
+
+use Data::Dumper; $Data::Dumper::Indent = 0; $Data::Dumper::Sortkeys = 1;
+eval 'require MIDI'; if ($@) {
+	die "you'll need to install the MIDI-Perl module from www.cpan.org\n";
+}
+eval 'require MIDI::ALSA'; if ($@) {
+	die "you'll need to install the MIDI::ALSA module from www.cpan.org\n";
+}
+
+MIDI::ALSA::client("$0 MIDI::ALSA client", 1, 0, 1) or die "client failed";
+foreach my $cl_po (split /,/, $InputPort) {
+    if (! MIDI::ALSA::connectfrom( 0, $cl_po )) {
+        die "can't connect from ALSA client $cl_po\n";
+    }
+}
+MIDI::ALSA::start() or die "start failed";
+
+my @score = (1000, [['set_tempo',0,1000000],]);
+sub discon {
+	warn " Writing to file $ARGV[$[]\n";
+	score2file($ARGV[$[], @score);
+	exit 0;
+};
+$SIG{INT} = \&discon;
+$SIG{QUIT} = \&discon;
+
+while (1) {
+	# must exit the loop on SIGINT ...
+	@alsaevent = MIDI::ALSA::input();
+	if (!@alsaevent) { warn "interrupted\n"; last; }
+	if ($alsaevent[0]==MIDI::ALSA::SND_SEQ_EVENT_PORT_UNSUBSCRIBED()) {
+		warn "unsubscribed\n"; last;
+	}
+	my @scoreevent = MIDI::ALSA::alsa2scoreevent(@alsaevent);
+	if (@scoreevent) { push @{$score[1]}, \@scoreevent; }
+}
+warn " Writing to file $ARGV[$[]\n";
+score2file($ARGV[$[], @score);
+exit 0;
+
+#--------------------- Encoding stuff from midisox_pl -------------------
+
+sub opus2file {
+	my ($filename, @opus) = @_;
+	# print "opus2file: filename=$filename opus = ", Dumper(@opus);
+	my $format = 1;
+	if (2 == @opus) { $format = 0; }
+	my $cpan_opus = MIDI::Opus->new(
+		{'format'=>$format, 'ticks'  => 1000, 'tracks' => []});
+	# my $tracks_r = $cpan_opus->tracks_r();
+	my @list_of_tracks = ();
+	my $itrack = $[+1;
+	while ($itrack <= $#opus) {
+		push @list_of_tracks,
+		 MIDI::Track->new({ 'type' => 'MTrk', 'events' => $opus[$itrack]});
+		$itrack += 1;
+	}
+	# print "opus2file: list_of_tracks = ", Dumper(@list_of_tracks);
+	$cpan_opus->tracks(@list_of_tracks);
+	# $cpan_opus->dump({'dump_tracks'=>1});
+	if ($filename eq '-') {
+		$cpan_opus->write_to_file( '>-' );
+		# $cpan_opus->write_to_handle({'to_handle' => *STDOUT{IO}});
+	} elsif ($filename eq '-d') {
+		$PID = fork;
+		if (! $PID) {
+			if (!open(P, '| aplaymidi -')) { die "can't run aplaymidi: $!\n"; }
+			$cpan_opus->write_to_handle( *P{IO}, {} );
+			close P;
+			exit 0;
+		}
+	} else {
+		$cpan_opus->write_to_file($filename);
+	}
+}
+
+sub score2opus {
+	if (2 > @_) { return (1000, []); }
+	my ($ticks, @tracks) = @_;
+	# print "score2opus: tracks is ", Dumper(@tracks);
+	my @opus = ($ticks,);
+	my $itrack = $[;
+	while ($itrack <= $#tracks) {
+		# MIDI::Score::dump_score( $_[$itrack] );
+		# push @opus, MIDI::Score::score_r_to_events_r($_[$itrack]);
+		my %time2events = ();
+		foreach my $scoreevent_ref (@{$tracks[$itrack]}) {
+			my @scoreevent = @{$scoreevent_ref};
+			# print "score2opus: scoreevent = @scoreevent\n";
+			if ($scoreevent[0] eq 'note') {
+				my @note_on_event = ('note_on',$scoreevent[1],
+				 $scoreevent[3],$scoreevent[4],$scoreevent[5]);
+				my @note_off_event = ('note_off',$scoreevent[1]+$scoreevent[2],
+				 $scoreevent[3],$scoreevent[4],$scoreevent[5]);
+				if ($time2events{$note_on_event[1]}) {
+				   push @{$time2events{$note_on_event[1]}}, \@note_on_event;
+				} else {
+				   @{$time2events{$note_on_event[1]}} = (\@note_on_event,);
+				}
+				if ($time2events{$note_off_event[1]}) {
+				   push @{$time2events{$note_off_event[1]}}, \@note_off_event;
+				} else {
+				   @{$time2events{$note_off_event[1]}} = (\@note_off_event,);
+				}
+			} elsif ($time2events{$scoreevent[1]}) {
+			   push @{$time2events{$scoreevent[1]}}, \@scoreevent;
+			} else {
+			   @{$time2events{$scoreevent[1]}} = (\@scoreevent,);
+			}
+		}
+
+		my @sorted_events = (); # list of event_refs sorted by time
+		for my $time (sort {$a <=> $b} keys %time2events) {
+			push @sorted_events, @{$time2events{$time}};
+		}
+
+		my $abs_time = 0;
+		for my $event_ref (@sorted_events) {  # convert abs times => delta times
+			my $delta_time = ${$event_ref}[1] - $abs_time;
+			$abs_time = ${$event_ref}[1];
+			${$event_ref}[1] = $delta_time;
+		}
+		push @opus, \@sorted_events;
+		$itrack += 1;
+	}
+	return (@opus);
+}
+
+sub score2file { my ($filename, @score) = @_;
+	my @opus = score2opus(@score);
+	return opus2file($filename, @opus);
+}
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+armid - rough arecordmidi work-alike, to demonstrate MIDI::ALSA
+
+=head1 SYNOPSIS
+
+ armid -p 28 out.mid
+
+=head1 DESCRIPTION
+
+This script is a rough arecordmidi work-alike, to demonstrate MIDI::ALSA
+
+=head1 OPTIONS
+
+=over 3
+
+=item I<-p 28:0,32:0>
+
+Records from the ALSA clients 28 and 32;
+the default is the envronment variable ALSA_INPUT_PORTS
+
+=item I<-v>
+
+Prints version number.
+
+=back
+
+=head1 CHANGES
+
+ 20111103  1.2  use the new MIDI-ALSA 1.11 to handle portnames
+ 20111031  1.1  connects from multiple (comma-separated) ports
+ 20110310  1.0  first working version
+
+=head1 AUTHOR
+
+Peter J Billam   http://www.pjb.com.au/comp/contact.html
+
+=head1 CREDITS
+
+Based on
+
+=head1 SEE ALSO
+
+ http://www.pjb.com.au/
+ perl(1).
+
+=cut
+

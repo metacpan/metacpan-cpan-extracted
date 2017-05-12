@@ -1,0 +1,16 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Monkey/Patch.pm
+lib/Monkey/Patch/Handle.pm
+lib/Monkey/Patch/Handle/Class.pm
+lib/Monkey/Patch/Handle/Object.pm
+t/01-basic.t
+t/02-stacked.t
+t/03-no-sub.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

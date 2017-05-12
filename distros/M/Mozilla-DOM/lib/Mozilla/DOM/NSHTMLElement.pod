@@ -1,0 +1,99 @@
+=head1 NAME
+
+Mozilla::DOM::NSHTMLElement
+
+Mozilla::DOM::NSHTMLElement is a wrapper around an instance of Mozilla's
+nsIDOMNSHTMLElement interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::NSHTMLElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $offsettop = $nshtmlelement->B<GetOffsetTop>()
+
+=head2 $offsetleft = $nshtmlelement->B<GetOffsetLeft>()
+
+=head2 $offsetwidth = $nshtmlelement->B<GetOffsetWidth>()
+
+=head2 $offsetheight = $nshtmlelement->B<GetOffsetHeight>()
+
+=head2 $offsetparent = $nshtmlelement->B<GetOffsetParent>()
+
+=head2 $innerhtml = $nshtmlelement->B<GetInnerHTML>()
+
+=head2 $nshtmlelement->B<SetInnerHTML>($innerhtml)
+
+=over
+
+=over
+
+=item * $innerhtml (string)
+
+=back
+
+=back
+
+=head2 $scrolltop = $nshtmlelement->B<GetScrollTop>()
+
+=head2 $nshtmlelement->B<SetScrollTop>($scrolltop)
+
+=over
+
+=over
+
+=item * $scrolltop ((long) integer)
+
+=back
+
+=back
+
+=head2 $scrollleft = $nshtmlelement->B<GetScrollLeft>()
+
+=head2 $nshtmlelement->B<SetScrollLeft>($scrollleft)
+
+=over
+
+=over
+
+=item * $scrollleft ((long) integer)
+
+=back
+
+=back
+
+=head2 $scrollheight = $nshtmlelement->B<GetScrollHeight>()
+
+=head2 $scrollwidth = $nshtmlelement->B<GetScrollWidth>()
+
+=head2 $clientheight = $nshtmlelement->B<GetClientHeight>()
+
+=head2 $clientwidth = $nshtmlelement->B<GetClientWidth>()
+
+=head2 $nshtmlelement->B<ScrollIntoView>($top)
+
+=over
+
+=over
+
+=item * $top (boolean)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut

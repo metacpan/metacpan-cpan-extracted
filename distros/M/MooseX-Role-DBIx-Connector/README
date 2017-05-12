@@ -1,0 +1,89 @@
+NAME
+    MooseX::Role::DBIx::Connector - give your Moose class DBIx::Connector
+    powers
+
+SYNOPSIS
+      package MyClass;
+      use Moose;
+      with 'MooseX::Role::DBIx::Connector';
+
+      package main;
+
+      my $c = MyClass->new(
+          db_dsn  => 'dbi:Pg:dbname=foo;host=bar',
+          db_user => 'mikey',
+          db_password => 'seekrit',
+          db_attrs => { Foo => 'Bar' },
+         );
+
+      $c->db_conn->dbh->selectall_arrayref( ... );
+
+      $c->db_conn->txn( fixup => sub { ... } );
+
+
+      ### more advanced usage
+
+      package BigClass;
+      use Moose;
+      with 'MooseX::Role::DBIx::Connector' => { connection_name => 'itchy'    };
+      with 'MooseX::Role::DBIx::Connector' => { connection_name => 'scratchy' };
+
+      package main;
+
+      my $c = BigClass->new(
+          itchy_dsn  => 'dbi:Pg:dbname=foo;host=bar',
+          itchy_user => 'mikey',
+          itchy_password => 'seekrit',
+
+          scratchy_dsn   => 'dbi:SQLite:dbname=somefile',
+         );
+
+      $c->itchy_conn->dbh->selectall_arrayref( ... );
+      $c->scratchy_conn->txn( fixup => sub { ... } );
+
+DESCRIPTION
+    Generic parameterized Moose role to give your class accessors to manage
+    one or more DBIx::Connector connections.
+
+ROLE PARAMETERS
+connection_name
+    Name for this connection, which is the prefix for all the generated
+    accessors. Default 'db', which means that you get the accessors
+    "db_dsn", "db_user", "db_password", "db_attrs", and "db_conn".
+
+connection_description
+    Plaintext description of this connection. Only used in generating
+    "documentation" for each of the generated accessors.
+
+accessor_options
+    Hashref of additional options to pass to the generated accessors, e.g.
+
+      package MyClass;
+      use Moose;
+      with 'MooseX::Role::DBIx::Connector' => {
+        connection_name  => 'itchy',
+        accessor_options => { 'itchy_dsn'  => [ traits => ['GetOpt'], ],
+                              'itchy_user' => [ default => 'minnie_the_moocher' ],
+                            }
+      };
+
+ATTRIBUTES
+  (connection_name)_conn
+    Get a DBIx::Connector connection object for the given connection info.
+
+  (connection_name)_dsn
+    DBI DSN for your connection. Required.
+
+  (connection_name)_user
+    Username for the connection.
+
+  (connection_name)_password
+    Password for the connection.
+
+  (connection_name)_attrs
+    Hashref of DBI attributes for the connection. Passed to DBIx::Connector,
+    which passes them to DBI's connect()
+
+AUTHOR
+    Robert Buels, <rmb32@cornell.edu>
+

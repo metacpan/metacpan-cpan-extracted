@@ -1,0 +1,15 @@
+KNOWN BUGS
+
+
+There seems to be a memory leak if you do this kind of thing
+
+my $md=new Metadata::IAFA;
+
+while(<$fh>) {
+  $md->read($fh);
+
+  ... do something
+
+}
+
+I suspect a circular reference that perl can't detect and return memory.

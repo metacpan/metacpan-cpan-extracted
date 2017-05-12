@@ -1,0 +1,77 @@
+Revision history for MooseX-Role-MongoDB
+
+0.010     2016-12-12 11:24:46-05:00 America/New_York
+
+    [CHANGED]
+
+    - Requires MongoDB v1.0.0 or later.
+
+    [FIXED]
+
+    - Tests no longer fail under MongoDB v1.6.0, which adds deprecation
+      warnings to legacy functions.
+
+0.009     2015-08-13 17:53:07-04:00 America/New_York
+
+    [FIXED]
+
+    - Support MongoDB v1.0.0 release candidate driver
+
+0.008     2015-03-23 20:21:39-04:00 America/New_York
+
+    [FIXED]
+
+    - Ensured MongoDB XS components are loaded before MongoDB::MongoClient
+
+    - Support MongoDB alpha driver
+
+0.007     2014-01-24 23:09:53-05:00 America/New_York
+
+    [FIXED]
+
+    - Added test dependency on MooseX::Role::Logger 0.002
+
+0.006     2014-01-24 22:58:42-05:00 America/New_York
+
+    [INCOMPATIBLE CHANGES]
+
+    - Role now provides private methods ("_mongo_database") instead of
+      public ones ("mongo_database") so as not to pollute the consuming
+      class' API (thanks, mst)
+
+0.005     2013-11-22 14:41:42 America/New_York
+
+    [ADDED]
+
+    - Added 'mongo_clear_caches' method
+
+0.004     2013-11-20 18:49:31 America/New_York
+
+    [FIXED]
+
+    - Checks that the database connection is still live and clears
+      the caches if it is not
+
+0.003     2013-10-15 19:32:08 America/New_York
+
+    [CHANGED]
+
+    - Implemented logging by requiring a 'logger' method from the consumer;
+      recommends (and tests with) MooseX::Role::Logger
+
+0.002     2013-10-14 13:55:42 America/New_York
+
+    [CHANGED]
+
+    - If a 'host' attributes is provided in the client options hash, any
+      hostnames will be converted to IP addresses to work around a MongoDB
+      client bug involving replica sets and SSL
+
+    [INTERNAL]
+
+    - Added optional debug-level logging via Log::Any
+
+0.001     2013-09-21 23:27:05 America/New_York
+
+    - First release
+

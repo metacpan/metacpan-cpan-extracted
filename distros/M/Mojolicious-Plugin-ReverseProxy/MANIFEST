@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+example/CookieWrapper.pm
+lib/Mojolicious/Plugin/ReverseProxy.pm
+setup/sdbs.inc
+setup/build-perl-modules.sh
+t/simple.t
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

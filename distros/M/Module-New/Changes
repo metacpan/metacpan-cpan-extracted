@@ -1,0 +1,67 @@
+Revision history for Module-New
+
+0.15 2015/04/19
+  - 0.14 had a packaging issue
+
+0.14 2015/04/19
+  - not to inherit Time::Piece (dolmen++)
+
+0.13 2014/12/23
+  - fixed license notice in generated README
+
+0.12 2014/11/20
+  - ignore Software::License:: packages that don't have
+    necessary license infomation (reported by ANDK++)
+
+0.11 2014/09/05
+  - added a feature to bump up VERSIONs
+  - added a feature to create README from a pod
+  - switched to Path::Tiny, and subtest
+
+0.10 2013/10/08
+  - added a feature to generate LICENSE
+  - refactored ::License (sorry for backward-incompatibility)
+
+0.09 2013/09/27
+  - bumped up ExtUtils::MakeMaker::CPANfile requirement to 0.04
+
+0.08 2013/09/22
+  - slightly modernized templates
+  - dropped support for Module::Install
+  - switched to ExtUtils::MakeMaker::CPANfile
+
+0.07 2012/11/22
+  - do not exec editor while testing
+
+0.06 2012/11/10
+  - always open a newly created file (if an editor is available)
+  - no trunk/branch/tag layout anymore
+  - switched to YAML::Tiny
+
+0.05 2010/01/31
+  - Test::* modules should be declared with "test_requires"
+    at least when we use Module::Install (Adam Kennedy's suggestion)
+  - removed auto_install from the template for Module::Install.
+    It's useful for applications but it's also an unblessed
+    feature, and be avoided for modules. (Adam Kennedy's suggestion)
+  - added XS support
+  - added several context accessors
+
+0.04 2009/08/06
+  - no new features
+  - bumped up the version req of Text::MicroTemplate to 0.06.
+    note that it (silently) removed a "raw_expression_mark"
+    option. if your templates relied on it, please fix them.
+
+0.03 2009/03/28
+  - bumped up the version req of Log::Dump to 0.03
+  - added missing "no_prompt" for a config test
+    (which must be the cause of the hang)
+  - removed a broken piece of a test (deprecated option)
+
+0.02 2009/03/26
+  - initial CPAN release. totally refactored.
+
+0.01 2007/11/21
+  - initial coderepos release
+

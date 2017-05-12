@@ -1,0 +1,7 @@
+name = "Mac-OSVersion-Lite"
+badges = ["travis", "appveyor", "codecov"]
+authority="cpan:PINE"
+license="mit"
+
+module_maker="ModuleBuildTiny"
+

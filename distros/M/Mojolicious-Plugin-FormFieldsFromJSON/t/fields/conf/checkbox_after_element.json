@@ -1,0 +1,9 @@
+ [
+    {
+        "label" : "Name",
+        "type" : "checkbox",
+        "name" : "type",
+        "after_element" : "<br />",
+        "data" : ["internal", "external","unknown" ]
+    }
+ ]

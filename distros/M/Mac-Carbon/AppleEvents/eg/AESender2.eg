@@ -1,0 +1,27 @@
+Perl -Sx "{0}" {"Parameters"}; Exit {Status}
+
+#!perl
+#
+# AESender.t - Demonstrate how to build and send a very simple AppleEvent.
+#              To use it, first start AEReceiver.t under MPW and then this
+#              script.
+#
+
+# DOESN'T WORK
+
+use Data::Dumper;
+use Mac::AppleEvents::Simple ':all';
+
+my $evt = build_event('misc', 'actv', { typeKernelProcessID() => pack_pid(6660) }) or die $^E;
+my $rep = $evt->send_event(kAEWaitReply, kAENormalPriority, 600);
+print Dumper $rep;
+
+__END__
+$evt = AEBuildAppleEvent("aevt", "odoc", typeKernelProcessID, 378, 0, 0, "") or die $^E;
+$rep = AESend($evt, kAEWaitReply) or die $^E;
+
+print "Reply was: ", AEPrint($rep), "\n";
+
+AEDisposeDesc $evt;
+AEDisposeDesc $rep;
+

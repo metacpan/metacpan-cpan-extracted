@@ -1,0 +1,59 @@
+Name: jdel@noplace.net
+Locn: L
+Addr: lzz_Internet
+Cmts: Personal Internet address
+Name: Doe, John
+Locn: L
+Addr: Internet "John Doe" <JDoe@lzz.com>
+Cmts:
+
+Name: Bobbit_Lorena
+Locn: L
+Addr: P-PostOffice3 lb%smtpgate@lou_mail.nosl.sea06.navy.mil
+Cmts:
+
+Name: Networking Group
+Locn: L
+Addr: QBC_PO2 networking-group@goldfish.sb.qdc.com at Internet-Mail
+Cmts: Networking SIG
+
+
+
+Name: JDoe2@lzz.com
+Locn: L
+Addr: Internet
+Cmts:
+Name: Albert, Fat
+Locn: L
+Addr: lzz_Internet FAlbert@lzz.com
+Cmts:
+Name: Maryland, Laurel
+Locn: L
+Addr: lzz_Internet LMaryland@lzz.com
+Cmts:
+Name: Bobbit_Lorena
+Locn: L
+Addr: P-PostOffice3 lb%smtpgate@lou_mail.nosl.sea06.army.mil
+Cmts:
+Name: Networking Group
+Locn: L
+Addr: lzz_PO2 networking-group@goldfish.lzzd.com at Internet-Mail
+Cmts: Networking SIG
+Name: Jones_Sam
+Locn: L
+Addr: P-PostOffice2 Jones@f2groups.fsd.siwash.edu
+Cmts: Siwash University
+Name: TWISTED_SISTER (on DDN)
+Locn: L
+Addr: P-PostOffice3 twisted_sister/cisw1_pp@nos850.nosl.sea06.army.mil
+Cmts:
+Name: Simpson, OJ
+Locn: L
+Addr: lzz_LA OJ_Simpson@quickmail at Internet-Mail
+Cmts: OJ Simpson, QW Operations
+
+
+Name: Ricardo, Rick
+Locn: L
+Addr: lzz-PO
+Cmts:

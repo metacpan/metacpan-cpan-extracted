@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<title>Keys</title>
+<script>
+
+function on_click(e) {
+	alert("clicked with " + e.ctrlKey);
+}
+
+function on_press(e) {
+	alert(e.keyCode);
+}
+
+function on_load() {
+	var element = document.getElementById("td");
+	document.addEventListener("keydown", on_press, false);
+	element.addEventListener("click", on_click, false);
+}
+
+window.addEventListener("load", on_load, false);
+</script>
+</head>
+<body>
+<div id="td" style="
+	position: absolute;
+	left: 20px;
+	top: 20px;
+	width: 30px;
+	height: 30px;
+	background-color: blue;
+" />
+</body>
+</html>

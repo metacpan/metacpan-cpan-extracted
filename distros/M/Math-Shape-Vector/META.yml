@@ -1,0 +1,30 @@
+---
+abstract: 'A 2d vector library in cartesian space'
+author:
+  - 'David Farrell <dfarrell@cpan.org>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Shape-Vector
+requires:
+  Carp: '0'
+  Exporter: '0'
+  List::Util: '0'
+  Math::Trig: '0'
+  base: '0'
+  overload: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/sillymoose/Math-Shape-Vector
+  repository: https://github.com/sillymoose/Math-Shape-Vector.git
+version: '0.15'

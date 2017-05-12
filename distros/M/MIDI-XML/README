@@ -1,0 +1,44 @@
+MIDI-XML version 0.03
+=====================
+
+MIDI-XML is a suite of Perl modules that provide the capability to convert 
+MIDI files to XML and XML to MIDI files.  It builds on the foundation provided
+by MIDI-Perl which provides the capability to read and write MIDI files.  This
+release provides the ability to read and write MidiXML files and to import and 
+export standard MIDI files. 
+
+MIDI-XML also provides built-in collections of the the various MIDI events and
+derivable collections, such as measures.
+
+MIDI-XML-Editor has been added which, although primitive at this time, will 
+be the focus of my improvements.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Carp
+   Class::ISA
+   XML::DOM
+   XML::Parser
+   Tk 800.000
+   Tk::Tree
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Brian M. Ames
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

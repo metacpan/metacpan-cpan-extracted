@@ -1,0 +1,839 @@
+=head1 NAME
+
+Maypole::Manual::Cookbook - Maypole Cookbook
+
+=head1 DESCRIPTION
+
+Hacks; design patterns; recipes: call it what you like, this chapter is a
+developing collection of techniques which can be slotted in to Maypole
+applications to solve common problems or make the development process easier.
+
+As Maypole developers, we don't necessarily know the "best practice" for
+developing Maypole applications ourselves, in the same way that Larry Wall
+didn't know all about the best Perl programming style as soon as he wrote
+Perl. These techniques are what we're using at the moment, but they may
+be refined, modularized, or rendered irrelevant over time. But they've
+certainly saved us a bunch of hours work.
+
+=head2 Frontend hacks
+
+These hacks deal with changing the way Maypole relates to the outside world;
+alternate front-ends to the Apache and CGI interfaces, or subclassing chunks
+of the front-end modules to alter Maypole's behaviour in particular ways.
+
+=head3 Separate model class modules
+
+You want to put all the C<BeerDB::Beer> routines in a separate module,
+so you say:
+
+    package BeerDB::Beer;
+    BeerDB::Beer->has_a(brewery => "BeerDB::Brewery");
+    sub foo :Exported {}
+
+And in F<BeerDB.pm>, you put:
+
+    use BeerDB::Beer;
+
+It doesn't work.
+
+B<Solution>: It doesn't work because of the timing of the module loading.
+C<use BeerDB::Beer> will try to set up the C<has_a> relationships
+at compile time, when the database tables haven't even been set up,
+since they're set up by
+
+    BeerDB->setup("...")
+
+which does its stuff at runtime. There are two ways around this; you can
+either move the C<setup> call to compile time, like so:
+
+    BEGIN { BeerDB->setup("...") }
+
+or move the module loading to run-time (my preferred solution):
+
+    BeerDB->setup("...");
+    BeerDB::Beer->require;
+
+=head3 Redirecting to SSL for sensitive information
+
+You have a website with forms that people will be entering sensitive information into,
+such as credit cards or login details. You want to make sure that they aren't sent
+in plain text but over SSL instead.
+
+B<Solution>
+
+The solution is a bit tricky for 2 reasons :
+
+Firstly -- Many browsers and web clients will change a redirected 
+POST request into a GET request (which displays all that sensitive information in the
+browser, or access logs and possibly elsewhere) and/or drops the values on the floor.
+
+Secondly -- If somebody has sent that sensitive information in plain text already, then
+sending it again over SSL won't solve the problem.
+
+Redirecting a request is actually rather simple :
+
+$r->redirect_request('https://www.example.com/path'); # perldoc Maypole for API
+
+.. as is checking the protocol :
+
+$r->get_protocol(); # returns 'http' or 'https'
+ 
+You should check that the action that generates the form that people will enter
+the sensitive information into is https and redirect if not.
+
+You should also check that no information is lost when redirecting, possibly by 
+storing it in a session and retrieving it later - see Maypole::Plugin::Session
+
+=head3 Debugging with the command line
+
+You're seeing bizarre problems with Maypole output, and you want to test it in
+some place outside of the whole Apache/mod_perl/HTTP/Internet/browser circus.
+
+B<Solution>: Use the L<Maypole::CLI> module to go directly from a URL to
+standard output, bypassing Apache and the network altogether.
+
+L<Maypole::CLI> is not a standalone front-end, but to allow you to debug your
+applications without having to change the front-end they use, it temporarily
+"borgs" an application. If you run it from the command line, you're expected
+to use it like so:
+
+    perl -MMaypole::CLI=Application -e1 'http://your.server/path/table/action'
+
+For example:
+
+    perl -MMaypole::CLI=BeerDB -e1 'http://localhost/beerdb/beer/view/1?o2=desc'
+
+You can also use the C<Maypole::CLI> module programatically to create
+test suites for your application. See the Maypole tests themselves or
+the documentation to C<Maypole::CLI> for examples of this.
+
+Don't forget also to turn on debugging output in your application:
+
+    package BeerDB;
+    use strict;
+    use warnings;
+    use Maypole::Application qw(-Debug);
+
+=head3 Changing how URLs are parsed
+
+You don't like the way Maypole URLs look, and want something that either
+fits in with the rest of your site or hides the internal workings of the
+system.
+
+B<Solution>: So far we've been using the C</table/action/id/args> form
+of a URL as though it was "the Maypole way"; well, there is no Maypole
+way. Maypole is just a framework and absolutely everything about it is 
+overridable. 
+
+If we want to provide our own URL handling, the method to override in
+the driver class is C<parse_path>. This is responsible for taking
+C<$r-E<gt>path> and filling the C<table>, C<action> and C<args> slots
+of the request object. Normally it does this just by splitting the path
+on 'C</>' characters, but you can do it any way you want, including
+getting the information from C<POST> form parameters or session variables. 
+
+For instance, suppose we want our URLs to be of the form
+C<ProductDisplay.html?id=123>, we could provide a C<parse_path> method
+like so:
+
+    sub parse_path {
+        my $r = shift;
+        $r->path("ProductList.html") unless $r->path;
+        ($r->path =~ /^(.*?)([A-Z]\w+)\.html/);
+        $r->table(lc $1);
+        $r->action(lc $2);
+        my %query = $r->ar->args;
+        $self->args([ $query{id} ]);
+    }
+
+This takes the path, which already has the query parameters stripped off
+and parsed, and finds the table and action portions of the filename,
+lower-cases them, and then grabs the C<id> from the query. Later methods
+will confirm whether or not these tables and actions exist.
+
+See the L<iBuySpy Portal|Maypole::Manual::BuySpy> for another
+example of custom URL processing.
+
+=head3 Maypole for mobile devices
+
+You want Maypole to use different templates to display on particular
+browsers.
+
+B<Solution>: There are several ways to do this, but here's the neatest
+we've found. Maypole chooses where to get its templates either by
+looking at the C<template_root> config parameter or, if this is not
+given, calling the C<get_template_root> method to ask the front-end to
+try to work it out. We can give the front-end a little bit of help, by
+putting this method in our driver class:
+
+    sub get_template_root {
+        my $r = shift;
+        my $browser = $r->headers_in->get('User-Agent');
+        if ($browser =~ /mobile|palm|nokia/i) {
+            "/home/myapp/templates/mobile";
+        } else {
+            "/home/myapp/templates/desktop";
+        }
+    }
+
+(Maybe there's a better way to detect a mobile browser, but you get the
+idea.)
+
+=head2 Content display hacks
+
+These hacks deal primarily with the presentation of data to the user,
+modifying the F<view> template or changing the way that the results of
+particular actions are displayed.
+
+=head3 Null Action
+
+You need an "action" which doesn't really do anything, but just formats
+up a template.
+
+B<Solution>: There are two ways to do this, depending on what precisely
+you need. If you just need to display a template, C<Apache::Template>
+style, with no Maypole objects in it, then you don't need to write any
+code; just create your template, and it will be available in the usual
+way.
+
+If, on the other hand, you want to display some data, and what you're
+essentially doing is a variant of the C<view> action, then you need to
+ensure that you have an exported action, as described in the
+L<templates and actions|Maypole::Manual::StandardTemplates/"C<view> and C<edit>">
+chapter:
+
+    sub my_view :Exported { }
+
+=head3 Template Switcheroo
+
+An action doesn't have any data of its own to display, but needs to display
+B<something>.
+
+B<Solution>: This is an B<extremely> common hack. You've just issued an
+action like C<beer/do_edit>, which updates the database. You don't want
+to display a page that says "Record updated" or similar. Lesser
+application servers would issue a redirect to have the browser request
+C</beer/view/I<id>> instead, but we can actually modify the Maypole
+request on the fly and, after doing the update, pretend that we were
+going to C</beer/view/I<id>> all along. We do this by setting the
+objects in the C<objects> slot and changing the C<template> to the
+one we wanted to go to.
+
+In this example from L<Flox|Maypole::Manual::Flox>, we've just
+performed an C<accept> method on a C<Flox::Invitation> object and we
+want to go back to viewing a user's page.
+
+    sub accept :Exported {
+        my ($self, $r) = @_;
+        my $invitation = $r->objects->[0];
+        # [... do stuff to $invitation ...]
+        $r->objects([$r->user]);
+        $r->model_class("Flox::User");
+        $r->template("view");
+    }
+
+This hack is so common that it's expected that there'll be a neater
+way of doing this in the future.
+
+=head3 XSLT
+
+Here's a hack I've used a number of times. You want to store structured
+data in a database and to abstract out its display.
+
+B<Solution>: You have your data as XML, because handling big chunks of
+XML is a solved problem. Build your database schema as usual around the
+important elements that you want to be able to search and browse on. For
+instance, I have an XML format for songs which has a header section of
+the key, title and so on, plus another section for the lyrics and
+chords:
+
+    <song>
+        <header>
+            <title>Layla</title>
+            <artist>Derek and the Dominos</artist>
+            <key>Dm</key>
+        </header>
+        <lyrics>
+          <verse>...</verse>
+          <chorus>
+            <line> <sup>A</sup>Lay<sup>Dm</sup>la <sup>Bb</sup> </line> 
+            <line> <sup>C</sup>Got me on my <sup>Dm</sup>knees </line> 
+            ...
+
+I store the title, artist and key in the database, as well as an "xml"
+field which contains the whole song as XML.
+
+To load the songs into the database, I can C<use> the driver class for
+my application, since that's a handy way of setting up the database classes
+we're going to need to use. Then the handy L<XML::TreeBuilder> will handle
+the XML parsing for us:
+
+    use Songbook;
+    use XML::TreeBuilder;
+    my $t = XML::TreeBuilder->new;
+    $t->parse_file("songs.xml");
+
+    for my $song ($t->find("song")) {
+        my ($key) = $song->find("key"); $key &&= $key->as_text;
+        my ($title) = $song->find("title"); $title = $title->as_text;
+        my ($artist) = $song->find("artist"); $artist = $artist->as_text;
+        my ($first_line) = $song->find("line");
+        $first_line = join "", grep { !ref } $first_line->content_list;
+        $first_line =~ s/[,\.\?!]\s*$//;
+        Songbook::Song->find_or_create({
+            title => $title,
+            first_line => $first_line,
+            song_key => Songbook::SongKey->find_or_create({name => $key}),
+            artist => Songbook::Artist->find_or_create({name => $artist}),
+            xml => $song->as_XML
+        });
+    }
+
+Now we need to set up the custom display for each song; thankfully, with
+the L<Template::Plugin::XSLT> module, this is as simple as putting the
+following into F<templates/song/view>:
+
+    [%
+        USE transform = XSLT("song.xsl");
+        song.xml | $transform
+    %]
+
+We essentially pipe the XML for the selected song through to an XSL
+transformation, and this will fill out all the HTML we need. Job done.
+
+=head3 Displaying pictures
+
+You want to serve a picture, a Word document, or something else which
+doesn't have a content type of C<text/html>, out of your database.
+
+B<Solution>: Fill the content and content-type yourself.
+
+Here's a subroutine which displays the C<photo> for either a specified
+user or the currently logged in user. We set the C<output> slot of the
+Maypole request object: if this is done then the view class is not called
+upon to process a template, since we already have some output to display.
+We also set the C<content_type> using one from the database.
+
+    sub view_picture :Exported {
+        my ($self, $r) = @_;
+        my $user = $r->objects->[0];
+        $r->content_type($user->photo_type);
+        $r->output($user->photo);
+    }
+
+Of course, the file doesn't necessarily need to be in the database
+itself; if your file is stored in the filesystem, but you have a file
+name or some other pointer in the database, you can still arrange for
+the data to be fetched and inserted into C<$r-E<gt>output>.
+
+=head3 REST
+
+You want to provide a programmatic interface to your Maypole site.
+
+B<Solution>: The best way to do this is with C<REST>, which uses a
+descriptive URL to encode the request. For instance, in
+L<Flox|Maypole::Manual::Flox> we
+describe a social networking system. One neat thing you can do with
+social networks is to use them for reputation tracking, and we can use
+that information for spam detection. So if a message arrives from
+C<person@someco.com>, we want to know if they're in our network of
+friends or not and mark the message appropriately. We'll do this by
+having a web agent (say, L<WWW::Mechanize> or L<LWP::UserAgent>) request
+a URL of the form
+C<http://flox.simon-cozens.org/user/relationship_by_email/person%40someco.com>.
+Naturally, they'll need to present the appropriate cookie just like a
+normal browser, but that's a solved problem. We're just interested in
+the REST request.
+
+The request will return a single integer status code: 0 if they're not
+in the system at all, 1 if they're in the system, and 2 if they're our
+friend.
+
+All we need to do to implement this is provide the C<relationship_by_email>
+action, and use it to fill in the output in the same way as we did when
+displaying a picture. Since C<person%40someco.com> is not the ID of a
+row in the user table, it will appear in the C<args> array:
+
+    use URI::Escape;
+    sub relationship_by_email :Exported {
+        my ($self, $r) = @_;
+        my $email = uri_unescape($r->args->[0]);
+        $r->content_type("text/plain");
+        my $user;
+        unless (($user) = Flox::User->search(email => $email)) {
+            $r->content("0\n"); return;
+        }
+
+        if ($r->user->is_friend($user)) { $r->contenti("2\n"); return; };
+        $r->content("1\n"); return;
+    }
+
+=head3 Component-based Pages
+
+You're designing something like a portal site which has a number of
+components, all displaying different bits of information about different
+objects. You want to include the output of one Maypole request call while
+building up another. 
+
+B<Solution>: Use L<Maypole::Plugin::Component>. By inheriting like this:
+
+    package BeerDB;
+    use Maypole::Application qw(Component);
+
+you can call the C<component> method on the Maypole request object to
+make a "sub-request". For instance, if you have a template
+
+    <DIV class="latestnews">
+    [% request.component("/news/latest_comp") %]
+    </DIV>
+
+    <DIV class="links">
+    [% request.component("/links/list_comp") %]
+    </DIV>
+
+then the results of calling the C</news/latest_comp> action and template
+will be inserted in the C<latestnews> DIV, and the results of calling
+C</links/list_comp> will be placed in the C<links> DIV. Naturally, you're
+responsible for exporting actions and creating templates which return 
+fragments of HTML suitable for inserting into the appropriate locations.
+
+Alternatively, if you've already got all the objects you need, you can
+probably just C<[% PROCESS %]> the templates directly.
+
+=head3 Bailing out with an error
+
+Maypole's error handling sucks. Something really bad has happened to the
+current request, and you want to stop processing now and tell the user about
+it.
+
+B<Solution>: Maypole's error handling sucks because you haven't written it
+yet. Maypole doesn't know what you want to do with an error, so it doesn't
+guess. One common thing to do is to display a template with an error message
+in it somewhere.
+
+Put this in your driver class:
+
+    sub error { 
+        my ($r, $message) = @_;
+        $r->template("error");
+        $r->template_args->{error} = $message;
+        return OK;
+    }
+
+And then have a F<custom/error> template like so:
+
+    [% PROCESS header %]
+    <H2> There was some kind of error... </H2>
+    <P>
+    I'm sorry, something went so badly wrong, we couldn't recover. This
+    may help:
+    </P>
+    <DIV CLASS="messages"> [% error %] </DIV>
+
+Now in your actions you can say things like this:
+
+    if (1 == 0) { return $r->error("Sky fell!") }
+
+This essentially uses the template switcheroo hack to always display the
+error template, while populating the template with an C<error> parameter.
+Since you C<return $r-E<gt>error>, this will terminate the processing
+of the current action.
+
+The really, really neat thing about this hack is that since C<error>
+returns C<OK>, you can even use it in your C<authenticate> routine:
+
+    sub authenticate {
+        my ($self, $r) = @_;
+        $r->get_user;
+        return $r->error("You do not exist. Go away.")
+            if $r->user and $r->user->status ne "real";
+        ...
+    }
+
+This will bail out processing the authentication, the model class, and
+everything, and just skip to displaying the error message. 
+
+Non-showstopper errors or other notifications are best handled by tacking a
+C<messages> template variable onto the request:
+
+    if ((localtime)[6] == 1) {
+        push @{$r->template_args->{messages}}, "Warning: Today is Monday";
+    }
+
+Now F<custom/messages> can contain:
+
+    [% IF messages %]
+    <DIV class="messages">
+    <UL>
+        [% FOR message = messages %]
+           <LI> [% message %] </LI>
+        [% END %]
+    </UL>
+    </DIV>
+    [% END %]
+
+And you can display messages to your user by adding C<PROCESS messages> at an
+appropriate point in your template; you may also want to use a template
+switcheroo to ensure that you're displaying a page that has the messages box in
+it.
+
+=head2 Authentication and Authorization hacks
+
+The next series of hacks deals with providing the concept of a "user" for
+a site, and what you do with one when you've got one.
+
+=head3 Logging In
+
+You need the concept of a "current user".
+
+B<Solution>: Use something like
+L<Maypole::Plugin::Authentication::UserSessionCookie> to authenticate
+a user against a user class and store a current user object in the
+request object.
+
+C<UserSessionCookie> provides the C<get_user> method which tries to get
+a user object, either based on the cookie for an already authenticated
+session, or by comparing C<user> and C<password> form parameters
+against a C<user> table in the database. Its behaviour is highly
+customizable and described in its documentation.
+
+=head3 Pass-through login
+
+You want to intercept a request from a non-logged-in user and have
+them log in before sending them on their way to wherever they were
+originally going. Override C<Maypole::authenticate> in your driver
+class, something like this:
+
+B<Solution>:
+
+    use Maypole::Constants; # Otherwise it will silently fail!
+
+    sub authenticate {
+        my ($self, $r) = @_;
+        $r->get_user;
+        return OK if $r->user;
+        # Force them to the login page.
+        $r->template("login");
+        return OK;
+    }
+
+This will display the C<login> template, which should look something
+like this:
+
+    [% INCLUDE header %]
+
+      <h2> You need to log in </h2>
+
+    <DIV class="login">
+    [% IF login_error %]
+       <FONT COLOR="#FF0000"> [% login_error %] </FONT>
+    [% END %]
+      <FORM ACTION="[% base ; '/' ; request.path %]" METHOD="post">
+    Username: 
+        <INPUT TYPE="text" NAME="[% config.auth.user_field || "user" %]"><BR>
+    Password: <INPUT TYPE="password" NAME="password"> <BR>
+    <INPUT TYPE="submit">
+    </FORM>
+    </DIV>
+    [% INCLUDE footer %]
+
+Notice that this request gets C<POST>ed back to wherever it came from, using
+C<request.path>. This is because if the user submits correct credentials,
+C<get_user> will now return a valid user object, and the request will pass
+through unhindered to the original URL.
+
+=head3 Logging Out
+
+Now your users are logged in, you want a way of having them log out
+again and taking the authentication cookie away from them, sending
+them back to the front page as an unprivileged user.
+
+B<Solution>: Just call the C<logout> method of
+C<Maypole::Plugin::Authentication::UserSessionCookie>. You may also want
+to use the template switcheroo hack to send them back to the frontpage.
+
+=head3 Multi-level Authorization
+
+You have both a global site access policy (for instance, requiring a
+user to be logged in except for certain pages) and a policy for
+particular tables. (Only allowing an admin to delete records in some
+tables, say, or not wanting people to get at the default set of methods
+provided by the model class.) 
+
+You don't know whether to override the global C<authenticate> method or
+provide one for each class.
+
+B<Solution>: Do both.
+Maypole checks whether there is an C<authenticate> method for the model
+class (e.g. BeerDB::Beer) and if so calls that. If there's no such
+method, it calls the default global C<authenticate> method in C<Maypole>,
+which always succeeds. You can override the global method as we saw
+above, and you can provide methods in the model classes.
+
+To use per-table access control you can just add methods to your model
+subclasses that specify individual policies, perhaps like this:
+
+    sub authenticate { # Ensure we can only create, reject or accept
+        my ($self, $r) = @_;
+        return OK if $r->action =~ /^(issue|accept|reject|do_edit)$/;
+        return; # fail if any other action
+    }
+
+If you define a method like this, the global C<authenticate> method will
+not be called, so if you want it to be called you need to do so
+explicitly:
+
+    sub authenticate { # Ensure we can only create, reject or accept
+        my ($self, $r) = @_;
+        return unless $r->authenticate($r) == OK; # fail if not logged in
+        # now it's safe to use $r->user
+        return OK if $r->action =~ /^(accept|reject)$/
+            or ($r->user eq 'fred' and $r->action =~ /^(issue|do_edit)$/);
+        return; # fail if any other action
+    }
+
+=head2 Creating and editing hacks
+
+These hacks particularly deal with issues related to the C<do_edit>
+built-in action.
+
+=head3 Limiting data for display
+
+You want the user to be able to type in some text that you're later
+going to display on the site, but you don't want them to stick images in
+it, launch cross-site scripting attacks or otherwise insert messy HTML.
+
+B<Solution>: Use the L<CGI::Untaint::html> module to sanitize the HTML
+on input. C<CGI::Untaint::html> uses L<HTML::Sanitizer> to ensure that
+tags are properly closed and can restrict the use of certain tags and
+attributes to a pre-defined list.
+
+Simply replace:
+
+    App::Table->untaint_columns(
+        text      => [qw/name description/]
+    );
+
+with:
+
+    App::Table->untaint_columns(
+        html      => [qw/name description/]
+    );
+
+And incoming HTML will be checked and cleaned before it is written to
+the database.
+
+=head3 Getting data from external sources
+
+You want to supplement the data received from a form with additional
+data from another source.
+
+B<Solution>: Munge the contents of C< $r-E<gt>params > before jumping
+to the original C<do_edit> routine. For instance, in this method,
+we use a L<Net::Amazon> object to fill in some fields of a database row
+based on an ISBN:
+
+    use Net::Amazon;
+    my $amazon = Net::Amazon->new(token => 'YOUR_AMZN_TOKEN');
+
+    ...
+
+    sub create_from_isbn :Exported {
+       my ($self, $r) = @_;
+       my $book_info = $amazon->search(asin => $r->params->{isbn})->properties;
+
+       # Rewrite the CGI parameters with the ones from Amazon
+       $r->params->{title} = $book_info->title;
+       $r->params->{publisher} = $book_info->publisher;
+       $r->params->{year} = $book_info->year;
+       $r->params->{author} = join('and', $book_info->authors());
+ 
+       # And jump to the usual edit/create routine
+       $self->do_edit($r);
+    }
+
+The request will carry on as though it were a normal C<do_edit> POST, but
+with the additional fields we have provided.
+You might also want to add a template switcheroo so the user can verify
+the details you imported.
+
+=head3 Catching errors in a form
+
+A user has submitted erroneous input to an edit/create form. You want to
+send him back to the form with errors displayed against the erroneous
+fields, but have the other fields maintain the values that the user
+submitted.
+
+B<Solution>: This is basically what the default C<edit> template and
+C<do_edit> method conspire to do, but it's worth highlighting again how
+they work. 
+
+If there are any errors, these are placed in a hash, with each error
+keyed to the erroneous field. The hash is put into the template as
+C<errors>, and we process the same F<edit> template again:
+
+        $r->template_args->{errors} = \%errors;
+        $r->template("edit");
+
+This throws us back to the form, and so the form's template should take
+note of the errors, like so:
+
+     FOR col = classmetadata.columns;
+        NEXT IF col == "id";
+        "<P>";
+        "<B>"; classmetadata.colnames.$col; "</B>";
+        ": ";
+            item.to_field(col).as_HTML;
+        "</P>";
+        IF errors.$col;
+            "<FONT COLOR=\"#ff0000\">"; errors.$col; "</FONT>";
+        END;
+    END;
+
+If we're designing our own templates, instead of using generic ones, we
+can make this process a lot simpler. For instance:
+
+    <TR><TD>
+    First name: <INPUT TYPE="text" NAME="forename">
+    </TD>
+    <TD>
+    Last name: <INPUT TYPE="text" NAME="surname">
+    </TD></TR>
+
+    [% IF errors.forename OR errors.surname %]
+        <TR>
+        <TD><SPAN class="error">[% errors.forename %]</SPAN> </TD>
+        <TD><SPAN class="error">[% errors.surname %]</SPAN> </TD>
+        </TR>
+    [% END %]
+
+The next thing we want to do is to put the originally-submitted values
+back into the form. We can do this relatively easily because Maypole
+passes the Maypole request object to the form, and the POST parameters
+are going to be stored in a hash as C<request.params>. Hence:
+
+    <TR><TD>
+    First name: <INPUT TYPE="text" NAME="forename"
+    VALUE="[%request.params.forename%]">
+    </TD>
+    <TD>
+    Last name: <INPUT TYPE="text" NAME="surname"
+    VALUE="[%request.params.surname%]"> 
+    </TD></TR>
+
+Finally, we might want to only re-fill a field if it is not erroneous, so
+that we don't get the same bad input resubmitted. This is easy enough:
+
+    <TR><TD>
+    First name: <INPUT TYPE="text" NAME="forename"
+    VALUE="[%request.params.forename UNLESS errors.forename%]">
+    </TD>
+    <TD>
+    Last name: <INPUT TYPE="text" NAME="surname"
+    VALUE="[%request.params.surname UNLESS errors.surname%]"> 
+    </TD></TR>
+
+=head3 Uploading files and other data
+
+You want the user to be able to upload files to store in the database.
+
+B<Solution>: It's messy.
+
+First, we set up an upload form, in an ordinary dummy action. Here's
+the action:
+
+    sub upload_picture : Exported {}
+
+And here's the F<custom/upload_picture> template:
+
+    <FORM action="/user/do_upload" enctype="multipart/form-data" method="POST">
+
+    <P> Please provide a picture in JPEG, PNG or GIF format:
+    </P>
+    <INPUT TYPE="file" NAME="picture">
+    <BR>
+    <INPUT TYPE="submit">
+    </FORM>
+
+(Although you'll probably want a bit more HTML around it than that.)
+
+Now we need to write the C<do_upload> action. At this point we have to get a
+little friendly with the front-end system. If we're using L<Apache::Request>,
+then the C<upload> method of the C<Apache::Request> object (which
+L<Apache::MVC> helpfully stores in C<$r-E<gt>{ar}>) will work for us:
+
+    sub do_upload :Exported {
+        my ($class, $r) = @_;
+        my $user = $r->user;
+        my $upload = $r->ar->upload("picture");
+
+This returns a L<Apache::Upload> object, which we can query for its
+content type and a file handle from which we can read the data. It's
+also worth checking the image isn't going to be too massive before we
+try reading it and running out of memory, and that the content type is
+something we're prepared to deal with. 
+
+    if ($upload) {
+        my $ct = $upload->info("Content-type");
+        return $r->error("Unknown image file type $ct")
+            if $ct !~ m{image/(jpeg|gif|png)};
+        return $r->error("File too big! Maximum size is ".MAX_IMAGE_SIZE)
+            if $upload->size > MAX_IMAGE_SIZE;
+
+        my $fh = $upload->fh;
+        my $image = do { local $/; <$fh> };
+
+Don't forget C<binmode()> in there if you're on a platform that needs it.
+Now we can store the content type and data into our database, store it
+into a file, or whatever:
+
+        $r->user->photo_type($ct);
+        $r->user->photo($image);
+    }
+
+And finally, we use our familiar template switcheroo hack to get back to
+a useful page:
+
+        $r->objects([ $user ]);
+        $r->template("view");
+    }
+
+Now, as we've mentioned, this only works because we're getting familiar with
+C<Apache::Request> and its C<Apache::Upload> objects. If we're using
+L<CGI::Maypole> instead, we can write the action in a similar style:
+
+    sub do_upload :Exported {
+        my ($class, $r) = @_;
+        my $user = $r->user;
+        my $cgi = $r->cgi;
+        if ($cgi->upload == 1) { # if there was one file uploaded
+            my $filename = $cgi->param('picture');
+            my $ct = $cgi->upload_info($filename, 'mime');
+            return $r->error("Unknown image file type $ct")
+                if $ct !~ m{image/(jpeg|gif|png)};
+            return $r->error("File too big! Maximum size is ".MAX_IMAGE_SIZE)
+                if $cgi->upload_info($filename, 'size') > MAX_IMAGE_SIZE;
+            my $fh = $cgi->upload($filename);
+            my $image = do { local $/; <$fh> };
+            $r->user->photo_type($ct);
+            $r->user->photo($image);
+        }
+
+        $r->objects([ $user ]);
+        $r->template("view");
+    }
+
+It's easy to adapt this to upload multiple files if desired.
+You will also need to enable uploads in your driver initialization,
+with the slightly confusing statement:
+
+    $CGI::Simple::DISABLE_UPLOADS = 0; # enable uploads
+
+Combine with the "Displaying pictures" hack above for a happy time.
+
+=head2 Links
+
+L<Contents|Maypole::Manual>,
+Next L<Flox|Maypole::Manual::Flox>,
+Previous L<The Beer Database, Twice|Maypole::Manual::Beer>
+

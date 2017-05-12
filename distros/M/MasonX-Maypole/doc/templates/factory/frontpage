@@ -1,0 +1,20 @@
+<%doc>
+
+=head1 frontpage
+
+This is the frontpage for your Maypole application.
+It shows a list of all tables it is allowed to display.
+
+=cut
+
+</%doc>
+
+<div id="frontpage_list">
+<ul>
+% foreach my $table ( @{ $config->display_tables } ) {
+<li><a href="<% "$base/$table" %>/list">List by <% $table %></a></li>
+% }
+</ul>
+</div> 
+
+<& maypole &>

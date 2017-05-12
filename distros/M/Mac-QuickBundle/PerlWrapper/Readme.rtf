@@ -1,0 +1,170 @@
+{\rtf1\ansi\ansicpg1252\cocoartf949\cocoasubrtf540
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 LucidaGrande;}
+{\colortbl;\red255\green255\blue255;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww12620\viewh11260\viewkind0
+\pard\tx565\tx1133\tx1700\tx2266\tx2832\tx3401\tx3967\tx4535\tx5102\tx5669\tx6235\tx6802\ql\qnatural
+
+\f0\b\fs48 \cf0 \
+\pard\tx565\tx1133\tx1700\tx2266\tx2832\tx3401\tx3967\tx4535\tx5102\tx5669\tx6235\tx6802\qc
+\cf0 PerlWrapper 0.3\
+\
+\pard\tx565\tx1133\tx1700\tx2266\tx2832\tx3401\tx3967\tx4535\tx5102\tx5669\tx6235\tx6802\ql\qnatural
+
+\b0\fs28 \cf0 This is an early release of PerlWrapper. Use at your own risk.\
+PerlWrapper has been tested on Mac OS X 10.4, (\'93Tiger\'94), 10.5 ("Leopard") and 10.6 ("Snow Leopard").\
+\
+PerlWrapper is a Makefile that allows you to bundle your Perl applications together with the libraries needed inside a Mac OS X application bundle (.app). It has been tested using applications that use wxPerl.\
+\
+\
+
+\b Problems in distributing Perl applications
+\b0 \
+PerlWrapper was created to circument a few problems that Perl programmers encounter when trying to distribute applications for Mac OS X:\
+\
+\pard\tx205\tx1133\tx1700\tx2266\tx2832\tx3401\tx3967\tx4535\tx5102\tx5669\tx6235\tx6802\li200\fi-200\ql\qnatural
+\cf0 -	Mac users detest ungainly heaps of files that needed to be copied in order for an application to run. However, for your Perl application, you need the main perl file, your own libraries, other libraries, additional resources etc. \
+\
+-	If you depend on other libraries, you will have to either require the user to install them, or keep them in a subdirectory.\
+\
+-	If you depend on external dynamic libraries or framework, the user will have to install them first before running your application.\
+\
+- The user might have different versions of your required modules or libraries installed, causing your application to fail.\
+\
+- Perl source files are not easily started by the user on Mac OS X, unless they are familiar with using a terminal.\
+\
+-	All of these problems should be solved in a way that the application can still be distributed on other platforms (using e.g. PAR). PerlWrapper was created to make it easier to distribute applications using wxPerl, amongst others.\
+\
+\pard\tx565\tx1133\tx1700\tx2266\tx2832\tx3401\tx3967\tx4535\tx5102\tx5669\tx6235\tx6802\ql\qnatural
+\cf0 \
+
+\b Bundling your own application with PerlWrapper
+\b0 \
+I suggest you open the Makefile first and take a look at the sample application to get a feel for what is going on. To create your own application bundle, follow these steps:\
+\
+\pard\tx345\tx1133\tx1700\tx2266\tx2832\tx3401\tx3967\tx4535\tx5102\tx5669\tx6235\tx6802\li340\fi-340\ql\qnatural
+\cf0 1.	Duplicate the PerlWrapper folder and name it accordingly.\
+\
+2.	Copy your Perl source code inside the 
+\i Perl-Source
+\i0  directory, including your libraries\
+\
+3.	Make sure your main Perl file is called 
+\i main.pl
+\i0 .\
+\
+4.	Make sure your main Perl file returns a true value (if in doubt, add 
+\i 1;
+\i0  as last line).\
+\
+5.	Copy any third-party Perl libraries that your application depends on inside the 
+\i Perl-Libraries
+\i0  directory. Make sure you include the XS files for those modules that use it.\
+\
+	
+\b Note:
+\b0  Both 
+\i Perl-Source
+\i0  and 
+\i Perl-Libraries
+\i0  may contain libraries, the distinction is merely made to help you distinguish between your own libraries and those of others.\
+\
+6.	Copy any dynamic libraries that your application depends on inside the 
+\i Libraries
+\i0  directory (e.g. the wxWidgets libraries from 
+\i /usr/local/lib
+\i0 ).\
+\
+\pard\tx345\tx1133\tx1700\tx2266\tx2832\tx3401\tx3967\tx4535\tx5102\tx5669\tx6235\tx6802\ql\qnatural
+\cf0 Whew! Now you have included all the files that you need, excluding your resource files. What remains is to change the settings for your project and build it:\
+\pard\tx345\tx1133\tx1700\tx2266\tx2832\tx3401\tx3967\tx4535\tx5102\tx5669\tx6235\tx6802\li340\fi-340\ql\qnatural
+\cf0 \
+1.	Add any files that your application needs to the Perl-
+\i Resources
+\i0  directory.\
+\
+2.	Double click on the target \'93PerlWrapper\'94. In \'93Build\'94, change the product name to your desired name. In \'93Properties\'94, change all settings according to your needs (executable name, identifier, icon file name, version, etc.).\
+\
+3.	Edit the file 
+\i InfoPlist.strings
+\i0  according to your needs. Remember to copy the file over into the other localization directories or change the localizations for this file.\
+\
+\pard\tx565\tx1133\tx1700\tx2266\tx2832\tx3401\tx3967\tx4535\tx5102\tx5669\tx6235\tx6802\ql\qnatural
+\cf0 This should be it. Press 
+\f1 \uc0\u8984 
+\f0 B to build your project and 
+\f1 \uc0\u8984 
+\f0 R to run it.\
+\
+For future builds, Xcode sometimes will not notice when you updated any files that will reside inside the Resources directory (Perl source code, resource files etc.). To ensure a correctly built project, first press 
+\f1 \uc0\u8679 \u8984 
+\f0 K to clean the build files (or delete the 
+\i Build
+\i0  directory), then build the project.\
+\
+\
+
+\b Environment supplied by PerlWrapper
+\b0 \
+Before your application is started, PerlWrapper does the following:\
+\
+\pard\tx205\tx1133\tx1700\tx2266\tx2832\tx3401\tx3967\tx4535\tx5102\tx5669\tx6235\tx6802\li200\fi-200\ql\qnatural
+\cf0 -	The current directory is set to your application bundle path. This is necessary for the dynamic libraries to be found.\
+\
+-	
+\i $PerlWrapper::Version
+\i0  is set to the PerlWrapper version number (\'91
+\i 0.1
+\i0 \'92).\
+\
+-	
+\i $PerlWrapper::BundlePath
+\i0  is set to the application bundle path.\
+\
+- 
+\i $PerlWrapper::ResourcesPath
+\i0  is set to the path of the 
+\i Resources
+\i0  directory inside the bundle.\
+\
+-	The bundle contains localization folders for all languages supported by Mac OS X, so that the application menu and file names in file dialogs will appear localized.\
+\
+\
+\pard\tx205\tx1133\tx1700\tx2266\tx2832\tx3401\tx3967\tx4535\tx5102\tx5669\tx6235\tx6802\li200\fi-200\ql\qnatural
+
+\b \cf0 Alternatives to PerlWrapper
+\b0 \
+\pard\tx205\tx1133\tx1700\tx2266\tx2832\tx3401\tx3967\tx4535\tx5102\tx5669\tx6235\tx6802\ql\qnatural
+\cf0 CamelBones lets you develop Perl applications using Xcode. As far as I know, it allows you to bundle the framework inside the application. See http://camelbones.sourceforge.net/ for more information.\
+\pard\tx205\tx1133\tx1700\tx2266\tx2832\tx3401\tx3967\tx4535\tx5102\tx5669\tx6235\tx6802\li200\fi-200\ql\qnatural
+\cf0 \
+\
+\pard\tx565\tx1133\tx1700\tx2266\tx2832\tx3401\tx3967\tx4535\tx5102\tx5669\tx6235\tx6802\ql\qnatural
+
+\b \cf0 Homepage
+\b0 \
+For more information and future releases, see the PerlWrapper homepage:\
+http://www.web42.com/software/perlwrapper/\
+\
+\
+
+\b License
+\b0 \
+Copyright \'a9 2004 Christian Renz <crenz@web42.com>. All rights reserved.\
+Copyright \'a9 2009 Mattia Barbon <mattia@barbon.org>. All rights reserved.\
+\
+PerlWrapper is free software; you can redistribute it and/or modify it under the same terms as Perl itself.\
+\
+
+\b Version history
+\b0 \
+0.1 (2004-06-12)\
+	- Initial release\
+0.2 (2004-10-23) \
+	- Display errors if perl program fails\
+0.3\
+	- Build in 64 bit mode.\
+	- Build with Perl 5.10.\
+\
+\pard\tx565\tx1133\tx1700\tx2266\tx2832\tx3401\tx3967\tx4535\tx5102\tx5669\tx6235\tx6802\ql\qnatural
+
+\i \cf0 $Id: Readme.rtf 13 2004-10-23 10:47:29Z crenz $}

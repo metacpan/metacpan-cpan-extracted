@@ -1,0 +1,72 @@
+NAME
+    Mac::KeyboardMaestro - Run Keyboard Maestro macros
+
+SYNOPSIS
+       use Mac::KeyboardMaestro qw(km_macro km_set km_get);
+
+       # set a Keybaord Maestro variable
+       km_set "VarName", $value;
+
+       # run a Keyboard Maestro macro
+       km_macro "Reticulate Splines";
+
+       # get a Keboard Maestro variable
+       my $result = km_get "OtherVar";
+
+DESCRIPTION
+    This module is a simple interface to the OS X keyboard macro program
+    Keyboard Maestro.
+
+    The standard way recommended by the Keyboard Maestro application to talk
+    to it via Perl is to shell out to "osascript" and pass that an
+    AppleScript program that calls Keyboard Maestro. This module avoids this
+    and talks the same AppleScript directly in process (which is quicker)
+    and handles all the character escaping necessary to avoid executing
+    parts of your macro/varible names and values as AppleScript by mistake.
+
+  Functions
+    These functions can be imported, or you can use them fully qualified.
+    All functions throw exceptions if the AppleScript interface to Keyboard
+    Maestro returns an error.
+
+    km_macro $macro_name
+    km_macro $macro_uuid
+        Execute the named macro / macro with the passed uuid. Returns an
+        empty list.
+
+    km_set $varname, $value
+        Sets the value of the corrisponding Keyboard Maestro variable.
+        $value will be automatically stringified. Returns an empty list.
+
+    km_get $varname
+        Gets the current value of the corrisponding Keyboard Maestro
+        variable. Returns an empty string if the variable does not exist.
+
+    km_delete $varname
+        Deletes the corrisponding Keyboard Maestro variable. Returns an
+        empty list.
+
+AUTHOR
+    Written by Mark Fowler <mark@twoshortplanks.com>
+
+COPYRIGHT
+    Copyright Mark Fowler 2012. All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    Keyboard Maestro itself is copyright Stairways Software Pty Ltd. Neither
+    Mark Fowler nor this Perl library is associated with Keyboard Maestro or
+    Stairways Software Pty Ltd.
+
+BUGS
+    Bugs should be reported via this distribution's CPAN RT queue. This can
+    be found at <https://rt.cpan.org/Dist/Display.html?Mac-KeyboardMaestro>
+
+    You can also address issues by forking this distribution on github and
+    sending pull requests. It can be found at
+    <http://github.com/2shortplanks/Mac-KeyboardMaestro>
+
+SEE ALSO
+    Mac::AppleScript, <http://www.keyboardmaestro.com/>
+

@@ -1,0 +1,124 @@
+Here is a list of components of Mail::DKIM, and the parts of the DKIM spec.
+they implement:
+
+http://mipassoc.org/dkim/specs/draft-allman-dkim-base-01.txt
+
+  Canonicalization/DkimCommon.pm -- 5.4
+  Canonicalization/simple.pm     -- 3.4.1 and 3.4.3
+  Canonicalization/relaxed.pm    -- 3.4.2 and 3.4.4
+
+
+http://mipassoc.org/mass/specs/draft-allman-dkim-base-00-10dc.html
+
+  Algorithm/rsa_sha1.pm      -- 3.3.1
+  Canonicalization/nowsp.pm  -- 3.4.2
+  Signature.pm               -- 3.5
+  Signer.pm                  -- 5
+  Verifier.pm                -- 6
+
+--
+
+New version - update version numbers in these files:
+  lib/Mail/DKIM.pm
+  lib/Mail/DKIM/Verifier.pm
+  lib/Mail/DKIM/Signer.pm
+  lib/Mail/DKIM/Common.pm
+  README
+
+--
+
+New algorithm:
+  create new algorithm class by copying and editing
+    lib/Mail/DKIM/Algorithm/rsa_sha1.pm
+  edit lib/Mail/DKIM/Common.pm:
+    get_algorithm_class() - add a check for your new algorithm and return
+      the name of your new algorithm class
+    add a "use" line at the top of this file so that your algorithm class
+      gets imported
+
+--
+
+How the Verifier Works:
+
+First, the message headers are fed into the verifier object, where they
+are stored into a buffer until all headers have been seen.
+
+  message +----------+
+  ------> | Verifier |
+          +----------+
+
+When the blank line separating the header from the body has been seen,
+the verifier looks at the headers, picking out and parsing each DKIM
+and DomainKey signature for verification. The signature specifies which
+algorithm and canonicalization method the verifier should use. The
+verifier creates an "algorithm object" corresponding to each signature.
+Each algorithm object will perform the verification for one signature.
+
+Now the verifier feeds the message headers from its buffer into each
+newly-constructed algorithm object, which in turn feeds the headers into
+the header canonicalizer, which canonicalizes the headers and feeds the
+result into a Digest object, which will compute the SHA-1 or SHA-256
+digest.
+
+  +----------+         +-----------+     +---------+   can.  +--------+
+  | Verifier | headers | Algorithm |     | Canoni- | headers | Header |
+  |          | ------> |           | --> | calizer | ------> | Digest |
+  +----------+         +-----------+     +---------+         +--------+
+
+Now the verifier accepts the rest of the message (i.e. the body). The
+body is not buffered in memory; it gets piped through the algorithm,
+the body canonicalizer, and into the body digest.
+
+  message +----------+   +-----------+   +---------+ can. +--------+
+  body    | Verifier |   | Algorithm |   | Canoni- | body |  Body  |
+  ------> |          | > |           | > | calizer | ---> | Digest |
+          +----------+   +-----------+   +---------+      +--------+
+
+Now the whole message has been read.
+
+The DKIM signature, minus the contents of the b= tag, is fed into the
+header canonicalizer, which gets fed into the header digest.
+
+            modified DKIM +---------+  can.  +--------+
+              signature   | Canoni- | header | Header |
+            ------------> | calizer | -----> | Digest |
+                          +---------+        +--------+
+
+The header digest is computed, and the algorithm verifies it against
+the value of the b= tag in the signature. If it fails to match, the
+signature has "failed".
+
+Next, the body digest is computed, and compared with that in the
+signature. If it fails to match, the signature has "failed".
+
+Otherwise, the signature has "passed".
+
+--
+
+Asynchronous DNS lookups
+
+In the dkimproxy case, as the message is received it is being "fed"
+into the DKIM verifier. The DKIM verifier can emit the DNS queries
+as soon as the header is read and parsed. Each signature is assumed
+to have a valid public key. When the entire message is finished,
+the DKIM verifier will wait for any DNS queries that haven't finished,
+then verify the signatures.
+
+In the SpamAssassin case, the message is already in memory.
+SpamAssassin will want to create the DKIM verifier and give it the
+message header early so that the DNS queries can be emitted. Then
+when the DNS responses are received, it can come back and give the
+verifier the rest of the message.
+
+Considering this, it might be useful to provide a slightly different
+API for SpamAssassin. One that explicitly specifies the header
+boundaries (when it expects DNS queries to be emitted), and the
+end of message (when the DNS responses are ready, or it's ok to block
+until they are). E.g.
+
+  $dkim = Verifier->new(Resolver => $my_custom_resolver);
+  $dkim->process_header($entire_header);
+  $dkim->process_body($entire_message_body);
+  $my_custom_resolver->wait_for_responses();
+  $dkim->do_verification();
+  my $result = $dkim->result;

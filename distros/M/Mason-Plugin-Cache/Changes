@@ -1,0 +1,27 @@
+Revision history for Mason-Plugin-Cache
+
+** denotes an incompatible change
+
+0.05  Oct 29, 2012
+
+- Make sure cache memoization works across requests - perl-mason-plugin-cache/pull/1
+  (Pedro Melo)
+
+0.04  Jun 23, 2011
+
+- Switch to new line-based filter syntax (Mason 2.08+)
+- Use key 'Default' if none specified in $.Cache() filter
+- Add $m->cache, which delegates to $class->cache for the current component class
+
+0.03  Mar 7, 2011
+
+- Specify is=>'ro' explicitly; MooseX::HasDefaults only seems to transfer from base class some of the time
+
+0.02  Mar 6, 2011
+
+- Use new Mason 2.05 default file extensions in tests
+
+0.01  Feb 16, 2011
+
+- Initial version
+

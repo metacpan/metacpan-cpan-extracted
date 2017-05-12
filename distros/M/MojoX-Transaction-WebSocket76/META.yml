@@ -1,0 +1,29 @@
+---
+abstract: 'WebSocket version hixie-76 transaction container'
+author:
+  - 'Denis Ibaev <dionys@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MojoX-Transaction-WebSocket76
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  Mojolicious: '2.52'
+  perl: '5.010001'
+resources:
+  bugtracker: http://github.com/dionys/mojox-transaction-websocket76/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/dionys/mojox-transaction-websocket76
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

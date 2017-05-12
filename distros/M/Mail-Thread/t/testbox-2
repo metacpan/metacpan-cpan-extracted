@@ -1,0 +1,155 @@
+From <googleartist@yahoo.com> Wed Jan  1 21:02:58 2003
+Received: from onion.valueclick.com ([64.70.54.95] helo=onion.perl.org)
+	by deep-dark-truthful-mirror.pad with smtp (Exim 3.36 #1 (Debian))
+	id 18Tq1C-0003A4-00
+	for <fwp@simon-cozens.org>; Wed, 01 Jan 2003 21:03:15 +0000
+Received: (qmail 18678 invoked by uid 1005); 1 Jan 2003 21:03:00 -0000
+Mailing-List: contact fwp-help@perl.org; run by ezmlm
+Precedence: bulk
+List-Post: <mailto:fwp@perl.org>
+List-Help: <mailto:fwp-help@perl.org>
+List-Unsubscribe: <mailto:fwp-unsubscribe@perl.org>
+List-Subscribe: <mailto:fwp-subscribe@perl.org>
+Delivered-To: mailing list fwp@perl.org
+Received: (qmail 18662 invoked by uid 76); 1 Jan 2003 21:02:59 -0000
+Received: from web20805.mail.yahoo.com (HELO web20805.mail.yahoo.com) (216.136.226.194) by onion.perl.org (qpsmtpd/0.20) with SMTP; 2003-01-01 21:02:59Z
+Message-ID: <20030101210258.63148.qmail@web20805.mail.yahoo.com>
+Received: from [68.37.117.130] by web20805.mail.yahoo.com via HTTP; Wed, 01 Jan 2003 13:02:58 PST
+Date: Wed, 1 Jan 2003 13:02:58 -0800 (PST)
+From: artist google <googleartist@yahoo.com>
+Subject: sort numbers
+To: fwp@perl.org
+MIME-Version: 1.0
+X-SMTPD: qpsmtpd/0.20, http://develooper.com/code/qpsmtpd/
+Content-Type: text/plain; charset="us-ascii"
+Content-Length: 398
+Lines: 16
+Content-Transfer-Encoding: 8bit
+Status: 
+
+Hi,
+ I have this puzzle.
+ Given N numbers, N>4, you have to sort the numbers.
+ The only operation permitted is you can rotate any
+sequencial 4 numbers in reverse order. or you can
+roate the entire list sequencially.
+
+How do u approach this??
+
+Artist
+
+__________________________________________________
+Do you Yahoo!?
+Yahoo! Mail Plus - Powerful. Affordable. Sign up now.
+http://mailplus.yahoo.com
+
+
+From unknown Wed Jan  1 22:20:42 2003
+Received: from onion.valueclick.com ([64.70.54.95] helo=onion.perl.org)
+	by deep-dark-truthful-mirror.pad with smtp (Exim 3.36 #1 (Debian))
+	id 18Tr8l-0003V8-00
+	for <fwp@simon-cozens.org>; Wed, 01 Jan 2003 22:15:07 +0000
+Received: (qmail 15096 invoked by uid 1005); 1 Jan 2003 22:15:03 -0000
+Mailing-List: contact fwp-help@perl.org; run by ezmlm
+Precedence: bulk
+List-Post: <mailto:fwp@perl.org>
+List-Help: <mailto:fwp-help@perl.org>
+List-Unsubscribe: <mailto:fwp-unsubscribe@perl.org>
+List-Subscribe: <mailto:fwp-subscribe@perl.org>
+Delivered-To: mailing list fwp@perl.org
+Received: (qmail 15077 invoked by uid 76); 1 Jan 2003 22:15:03 -0000
+Received: from smtpzilla2.xs4all.nl (HELO smtpzilla2.xs4all.nl) (194.109.127.138) by onion.perl.org (qpsmtpd/0.20) with SMTP; 2003-01-01 22:15:03Z
+Received: from quasar.home.lunix (a80-127-244-98.dial.xs4all.nl [80.127.244.98])	by smtpzilla2.xs4all.nl (8.12.0/8.12.0) with SMTP id h01MEvvT030054	for <fwp@perl.org>; Wed, 1 Jan 2003 23:14:58 +0100 (CET)
+Received: (qmail 14965 invoked from network); 1 Jan 2003 22:20:45 -0000
+Received: from ns.home.lunix (HELO quasar) (@10.0.0.20)  by ns.home.lunix with SMTP; 1 Jan 2003 22:20:45 -0000
+Received: (qmail 14956 invoked from network); 1 Jan 2003 22:20:44 -0000
+Received: from quasar.home.lunix (HELO localhost.localdomain) (@10.0.0.20)    by quasar.home.lunix with SMTP; 1 Jan 2003 22:20:44 -0000
+Path: Home.Lunix!not-for-mail
+Subject: Re: sort numbers
+Date: Wed, 1 Jan 2003 22:20:42 +0000 (UTC)
+Organization: lunix confusion services
+References: <20030101210258.63148.qmail@web20805.mail.yahoo.com>
+NNTP-Posting-Host: kali.eth
+MIME-Version: 1.0
+X-Trace: quasar.home.lunix 1041459642 14766 10.253.0.3 (1 Jan 2003    22:20:42 GMT)
+X-Complaints-To: abuse-0@ton.iguana.be
+NNTP-Posting-Date: Wed, 1 Jan 2003 22:20:42 +0000 (UTC)
+X-Newsreader: knews 1.0b.0
+Xref: Home.Lunix mail.perl.fun:4120
+X-Mailer: Perl5 Mail::Internet v1.51
+Sender: Usenet News <news@quasar.home.lunix>
+Message-Id: <auvpjq$ede$1@post.home.lunix>
+From: fun_with_perl@ton.iguana.be (Ton Hospel)
+To: fwp@perl.org
+Reply-To: fun_with_perl@ton.iguana.be (Ton Hospel)
+X-SMTPD: qpsmtpd/0.20, http://develooper.com/code/qpsmtpd/
+Content-Type: text/plain; charset="us-ascii"
+Content-Length: 414
+Lines: 12
+Content-Transfer-Encoding: 8bit
+Status: 
+
+In article <20030101210258.63148.qmail@web20805.mail.yahoo.com>,
+	artist google <googleartist@yahoo.com> writes:
+> Hi,
+>  I have this puzzle.
+>  Given N numbers, N>4, you have to sort the numbers.
+>  The only operation permitted is you can rotate any
+> sequencial 4 numbers in reverse order. or you can
+> roate the entire list sequencially.
+> 
+> How do u approach this??
+> 
+What is a reverse/sequential rotation ?
+
+From <Philip.Newton@gmx.net> Thu Jan  2 05:13:55 2003
+Received: from onion.valueclick.com ([64.70.54.95] helo=onion.perl.org)
+	by deep-dark-truthful-mirror.pad with smtp (Exim 3.36 #1 (Debian))
+	id 18TxgI-0005i6-00
+	for <fwp@simon-cozens.org>; Thu, 02 Jan 2003 05:14:10 +0000
+Received: (qmail 14955 invoked by uid 1005); 2 Jan 2003 05:14:02 -0000
+Mailing-List: contact fwp-help@perl.org; run by ezmlm
+Precedence: bulk
+List-Post: <mailto:fwp@perl.org>
+List-Help: <mailto:fwp-help@perl.org>
+List-Unsubscribe: <mailto:fwp-unsubscribe@perl.org>
+List-Subscribe: <mailto:fwp-subscribe@perl.org>
+Delivered-To: mailing list fwp@perl.org
+Received: (qmail 14936 invoked by uid 76); 2 Jan 2003 05:14:00 -0000
+Received: from ns.picon.de (HELO mail.picon.de) (62.214.2.234) by onion.perl.org (qpsmtpd/0.20) with SMTP; 2003-01-02 05:14:00Z
+Received: (qmail 2040 invoked from network); 2 Jan 2003 05:13:56 -0000
+Received: from free176-x174.dialo.tiscali.de (62.246.176.174)  by mail.picon.de with SMTP; 2 Jan 2003 05:13:56 -0000
+From: Philip Newton <Philip.Newton@gmx.net>
+To: fwp@perl.org
+Subject: Re: sort numbers
+Date: Thu, 02 Jan 2003 06:13:55 +0100
+Organization: very little
+Message-ID: <r3i71vcul4g95orb58173qj6b8dus6pnch@4ax.com>
+References: <20030101210258.63148.qmail@web20805.mail.yahoo.com>
+In-Reply-To: <20030101210258.63148.qmail@web20805.mail.yahoo.com>
+X-Mailer: Forte Agent 1.92/32.572
+MIME-Version: 1.0
+X-SMTPD: qpsmtpd/0.20, http://develooper.com/code/qpsmtpd/
+Content-Type: text/plain; charset="us-ascii"
+Content-Length: 438
+Lines: 16
+Content-Transfer-Encoding: 8bit
+Status: 
+
+On Wed, 1 Jan 2003 13:02:58 -0800 (PST), googleartist@yahoo.com (Artist
+Google) wrote:
+
+> Hi,
+>  I have this puzzle.
+>  Given N numbers, N>4, you have to sort the numbers.
+>  The only operation permitted is you can rotate any
+> sequencial 4 numbers in reverse order. or you can
+> roate the entire list sequencially.
+
+You're not allowed to compare numbers? That will make it difficult to
+find out when the list is sorted.
+
+Cheers,
+Philip
+
+

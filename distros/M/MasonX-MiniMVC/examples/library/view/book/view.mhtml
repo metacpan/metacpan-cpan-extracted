@@ -1,0 +1,9 @@
+<h1>View sample book</h1>
+
+<p>
+You are viewing a book with the id number <b><% $book_id %></b>.
+</p>
+
+<%args>
+$book_id => undef;
+</%args>

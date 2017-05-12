@@ -1,0 +1,5 @@
+1.01 - 2013-03-08
+     - Adjust dependencies
+
+1.00 - 2013-03-07
+     - Extracted from MooX::Types::MooseLike as its own distribution

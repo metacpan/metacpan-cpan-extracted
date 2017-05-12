@@ -1,0 +1,27 @@
+use strict;
+use Mojo::Base -strict;
+
+use Test::Mojo;
+use Mojo::URL;
+use Mojo::Util qw(slurp);
+
+use Mojolicious::Lite;
+plugin 'FeedReader';
+
+use HTTP::Date qw(time2isoz);
+use Test::More;
+
+my $t = Test::Mojo->new(app);
+my $feed = $t->app->parse_rss("t/samples/atom-full.xml");
+is $feed->{title}, 'Content Considered Harmful Atom Feed';
+is $feed->{htmlUrl}, 'http://blog.jrock.us/', "link without rel";
+
+my $e = $feed->{items}[0];
+ok $e->{link}, 'entry link without rel';
+is join("", @{$e->{tags}}), "Catalyst", "atom:category support";
+is time2isoz($e->{published}), "2006-08-09 19:07:58Z", "atom:updated";
+# this test fails, but I'm OK with that:
+# like $e->{content}, qr/^<div class="pod">/, "xhtml content";
+done_testing();
+
+

@@ -1,0 +1,11 @@
+Makefile.PL
+MANIFEST
+Changes
+
+lib/Module/InstalledVersion.pm
+
+t/miv.t
+
+modversion
+
+

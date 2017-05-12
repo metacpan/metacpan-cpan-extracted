@@ -1,0 +1,28 @@
+0.031 2017-04-01
+  - Add 'query' to the logged entry.
+  - Update to use Mojo::File (version).
+
+0.023 2014-05-01
+  - Correct notes on other plugins.
+
+0.021 2014-04-28
+  - Add redirection tests.
+  - Remove ref to non-existent homepage.
+
+0.014 2014-04-04
+  - Tweaked documentation.
+
+0.013 2014-04-03
+  - Document combining with Mojar::Log.
+
+0.012 2014-04-02
+  - Better documentation.
+
+0.011 2014-04-01
+  - Add test for GET.
+
+0.003 2014-03-29
+  - Fix syntax and basic tests.
+
+0.001 2014-03-18
+  - Initial packaging.

@@ -1,0 +1,45 @@
+#header dl,
+#header dt,
+#header dd,
+#header ul,
+#header ol,
+#header li,
+#toplinks li,
+#toplinks ul,
+#pagenav ul,
+#pagenav li,
+#bottomnav ul,
+#bottomnav li,
+#breadcrumbs ul,
+#breadcrumbs li,
+#pageoptions ul,
+#pageoptions li
+#header h1,
+form {
+    margin: 0;
+    padding:0 ;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+fieldset,img {
+    border: 0;
+}
+address, caption, cite, code, dfn, em, strong, th, var:not(#content) {
+    font-style: normal;
+    font-weight: normal;
+}
+
+ol,ul {
+    list-style: none;
+}
+caption,th {
+    text-align: left;
+}
+q:before,q:after {
+    content: '';
+}
+abbr,acronym {
+    border: 0;
+}

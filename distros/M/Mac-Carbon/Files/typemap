@@ -1,0 +1,17 @@
+TYPEMAP
+CatInfo			T_PTROBJ
+FInfo			T_RECORDOBJ
+DInfo			T_RECORDOBJ
+FXInfo			T_RECORDOBJ
+DXInfo			T_RECORDOBJ
+RealFSSpec		T_REALFSSPEC
+
+INPUT
+T_REALFSSPEC
+	if (GUSIPath2FSp((char *) SvPV_nolen($arg), &$var))
+		croak(\"$var is not a valid file specification\");
+	else
+		0
+OUTPUT
+T_REALFSSPEC
+	MP_GUSIFSp2Encoding(&$var, $arg);

@@ -1,0 +1,13 @@
+Return-path: <user@example.com>
+Message-id: <12345678.0000000@example.com>
+Date: Sat, 13 Apr 2013 23:27:39 +0900
+From: me@example.com
+MIME-version: 1.0
+To: you@exapmpe.com
+Subject: test
+Content-type: text/plain; charset=ISO-2022-JP
+Content-transfer-encoding: 7bit
+
+MIME::Expander
+
+

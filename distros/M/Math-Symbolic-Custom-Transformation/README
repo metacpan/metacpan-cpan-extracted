@@ -1,0 +1,266 @@
+NAME
+    Math::Symbolic::Custom::Transformation - Transform Math::Symbolic trees
+
+SYNOPSIS
+      use Math::Symbolic::Custom::Transformation;
+      my $trafo = Math::Symbolic::Custom::Transformation->new(
+        'TREE_x + TREE_x' => '2 * TREE_x'
+      );
+      
+  my $modified = $trafo->apply($math_symbolic_tree);
+      if (defined $modified) {
+        print "Outermost operator is a sum of two identical trees.\n";
+            print "Transformed it into a product. ($modified)\n";
+      }
+      else {
+        print "Transformation could not be applied.\n";
+      }
+      
+  # shortcut: new_trafo
+      use Math::Symbolic::Custom::Transformation qw/new_trafo/;
+
+      # use the value() function to have the transformation compute the value
+      # of the expression after the replacements. simplify{} works similar.
+      my $another_trafo = new_trafo(
+        'TREE_foo / CONST_bar' => 'value{1/CONST_bar} * TREE_foo'
+      );
+      
+  # If you'll need the same transformation but don't want to keep it around in
+      # an object, just do this:
+      use Memoize;
+      memoize('new_trafo');
+      # Then, passing the same transformation strings will result in a speedup of
+      # about a factor 130 (on my machine) as compared to complete recreation
+      # from strings. This is only 20% slower than using an existing
+      # transformation.
+
+DESCRIPTION
+    Math::Symbolic::Custom::Transformation is an extension to the
+    Math::Symbolic module. You're assumed to be remotely familiar with that
+    module throughout the documentation.
+
+    This package implements transformations of Math::Symbolic trees using
+    Math::Symbolic trees. I'll try to explain what this means in the
+    following paragraphs.
+
+    Until now, in order to be able to inspect a Math::Symbolic tree, one had
+    to use the low-level Math::Symbolic interface like comparing the top
+    node's term type with a constant (such as "T_OPERATOR") and then its
+    operator type with more constants. This has changed with the release of
+    Math::Symbolic::Custom::Pattern.
+
+    To modify the tree, you had to use equally low-level or even
+    encapsulation-breaking methods. This is meant to be changed by this
+    distribution.
+
+  EXAMPLE
+    Say you want to change any tree that is a sum of two identical trees
+    into two times one such tree. Let's assume the original object is in the
+    variable $tree. The old way was: (strictures and warnings assumed)
+
+      use Math::Symbolic qw/:all/;
+      
+  sub sum_to_product {
+        if ( $tree->term_type() == T_OPERATOR
+             and $tree->type() == B_SUM
+             and $tree->op1()->is_identical($tree->op2()) )
+        {
+          $tree = Math::Symbolic::Operator->new(
+            '*', Math::Symbolic::Constant->new(2), $tree->op1()->new()
+          );
+        }
+        return $tree;
+      }
+
+    What you'd do with this package is significantly more readable:
+
+      use Math::Symbolic::Custom::Transformation qw/new_trafo/;
+      
+  my $Sum_To_Product_Rule = new_trafo('TREE_a + TREE_a' => '2 * TREE_a');
+      
+  sub sum_to_product {
+        my $tree = shift;
+        return( $Sum_To_Product_Rule->apply($tree) || $tree );
+      }
+
+    Either version could be shortened, of course. The significant
+    improvement, however, isn't shown by this example. If you're doing
+    introspection beyond the outermost operator, you will end up with giant,
+    hardly readable if-else blocks when using the old style transformations.
+    With this package, however, such introspection scales well:
+
+      use Math::Symbolic::Custom::Transformation qw/new_trafo/;
+      
+  my $Sum_Of_Const_Products_Rule = new_trafo(
+        'CONST_a * TREE_b + CONST_c * TREE_b'
+        => 'value{CONST_a + CONST_c} * TREE_b'
+      );
+      
+  sub sum_to_product {
+        my $tree = shift;
+        return( $Sum_Of_Const_Products_Rule->apply($tree) || $tree );
+      }
+
+    For details on the "value{}" construct in the transformation string, see
+    the "SYNTAX EXTENSIONS" section.
+
+  EXPORT
+    None by default, but you may choose to import the "new_trafo" subroutine
+    as an alternative constructor for Math::Symbolic::Custom::Transformation
+    objects.
+
+  PERFORMANCE
+    The performance of transformations isn't astonishing by itself, but if
+    you take into account that they leave the original tree intact, we end
+    up with a speed hit of only 16% as compared to the literal code. (That's
+    the huge if-else block I was talking about.)
+
+    You may be tempted to recreate the transformation objects from strings
+    whenever you need them. There's one thing to say about that: Don't! The
+    construction of transformations is really slow because they have been
+    optimised for performance on application, not creation. (Application
+    should be around 40 times faster than creation from strings!)
+
+    *Note:* Starting with version 2.00, this module also supports the
+    new-ish Math::Symbolic::Parser::Yapp parser implementation which is
+    significantly faster than the old Parse::RecDescent based
+    implementation. Replacement strings are parsed using Yapp by default
+    now, which means a performance increase of about 20%. The search
+    patterns are still parsed using the default Math::Symbolic parser which
+    will be switched to Yapp at some point in the future. If you force the
+    use of the Yapp parser globally, the parser performance will improve by
+    about an order of magnitude! You can do so by adding the following
+    before using Math::Symbolic::Custom::Transformation:
+
+      use Math::Symbolic;
+      BEGIN {
+        $Math::Symbolic::Parser = Math::Symbolic::Parser->new(
+          implementation => 'Yapp'
+        );
+      }
+      use Math::Symbolic::Custom::Transformation;
+      #...
+
+    If you absolutely must include the source strings where the
+    transformation is used, consider using the Memoize module which is part
+    of the standard Perl distribution these days.
+
+      use Memoize;
+      use Math::Symbolic::Custom::Transformation qw/new_trafo/;
+      memoize('new_trafo');
+
+      sub apply_some_trafo {
+        my $source = shift;
+            my $trafo = new_trafo(...some pattern... => ...some transformation...);
+            return $trafo->apply($source);
+      }
+
+    This usage has the advantage of putting the transformation source
+    strings right where they make the most sense in terms of readability.
+    The memoized subroutine "new_trafo" only constructs the transformation
+    the first time it is called and returns the cached object every time
+    thereafter.
+
+  SYNTAX EXTENSIONS
+    The strings from which you can create transformations are basically
+    those that can be parsed as Math::Symbolic trees. The first argument to
+    the transformation constructor will, in fact, be parsed as a
+    Math::Symbolic::Custom::Pattern object. The second, however, may include
+    some extensions to the default Math::Symbolic syntax. These extensions
+    are the two functions "value{...}" and "simplify{...}". The curly braces
+    serve the purpose to show the distinction from algebraic parenthesis.
+    When finding a "value{EXPR}" directive, the module will calculate the
+    value of "EXPR" when the transformation is applied. (That is, after the
+    "TREE_foo", "CONST_bar" and "VAR_baz" placeholders have been inserted!)
+    The result is then inserted into the transformed tree.
+
+    Similarily, the "simplify{EXPR}" directive will use the Math::Symbolic
+    simplification routines on "EXPR" when the transformation is being
+    applied (and again, after replacing the placeholders with the matched
+    sub-trees.
+
+  METHODS
+    This is a list of public methods.
+
+    new
+      This is the constructor for Math::Symbolic::Custom::Transformation
+      objects. It takes two arguments: A pattern to look for and a
+      replacement.
+
+      The pattern may either be a Math::Symbolic::Custom::Pattern object
+      (fastest), or a Math::Symbolic tree which will internally be
+      transformed into a pattern or even just a string which will be parsed
+      as a pattern.
+
+      The replacement for the pattern may either be a Math::Symbolic tree or
+      a string to be parsed as such.
+
+    apply
+      Applies the transformation to a Math::Symbolic tree. First argument
+      must be a Math::Symbolic tree to transform. The tree is not
+      transformed in-place, but its matched subtrees are contained in the
+      transformed tree, so if you plan to use the original tree as well as
+      the transformed tree, take care to clone one of the trees.
+
+      "apply()" returns the transformed tree if the transformation pattern
+      matched and a false value otherwise.
+
+      On errors, it throws a fatal error.
+
+    apply_recursive
+      "Recursively" applies the transformation. The Math::Symbolic tree
+      passed in as argument will be modified in-place.
+
+      Hold on: This does not mean that the transformation is applied again
+      and again, but that the Math::Symbolic tree you are applying to is
+      descended into and while walking back up the tree, the transformation
+      is tried for every node.
+
+      Basically, it's applied bottom-up. Top-down would not usually make
+      much sense. If the application to any sub-tree throws a fatal error,
+      this error is silently caught and the application to other sub-trees
+      is continued.
+
+      Usage is the same as with the "shallow" "apply()" method.
+
+    to_string
+      Returns a string representation of the transformation. In presence of
+      the "simplify" or "value" hooks, this may fail to return the correct
+      represenation. It does not round-trip!
+
+      (Generally, it should work if only one hook is present, but fails if
+      more than one hook is found.)
+
+  SUBROUTINES
+    This is a list of public subroutines.
+
+    new_trafo
+      This subroutine is an alternative to the "new()" constructor for
+      Math::Symbolic::Custom::Transformation objects that uses a hard coded
+      package name. (So if you want to subclass this module, you should be
+      aware of that!)
+
+    new_trafo_group
+      This subroutine is the equivalent of "new_trafo", but for creation of
+      new transformation groups. See
+      Math::Symbolic::Custom::Transformation::Group.
+
+SEE ALSO
+    New versions of this module can be found on http://steffen-mueller.net
+    or CPAN.
+
+    This module uses the Math::Symbolic framework for symbolic computations.
+
+    Math::Symbolic::Custom::Pattern implements the pattern matching
+    routines.
+
+AUTHOR
+    Steffen Müller, <symbolic-module at steffen-mueller dot net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006-2008 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.6.1 or, at
+    your option, any later version of Perl 5 you may have available.
+

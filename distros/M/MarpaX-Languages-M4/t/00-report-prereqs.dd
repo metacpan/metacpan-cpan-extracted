@@ -1,0 +1,82 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => '5.010'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::CPAN::Meta::JSON' => '0.16',
+                                      'Test::EOL' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::More' => '0.88',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Spelling' => '0.12',
+                                      'Test::Synopsis' => '0',
+                                      'Test::Version' => '1'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Bit::Vector' => '0',
+                                      'Carp' => '0',
+                                      'Encode' => '0',
+                                      'Encode::Locale' => '0',
+                                      'Env::Path' => '0',
+                                      'File::Find' => '0',
+                                      'File::Spec' => '0',
+                                      'File::Temp' => '0',
+                                      'IO::CaptureOutput' => '0',
+                                      'IO::File' => '0',
+                                      'IO::Handle' => '0',
+                                      'IO::Interactive' => '0',
+                                      'IO::Scalar' => '0',
+                                      'Log::Any' => '0',
+                                      'Log::Any::Adapter' => '0',
+                                      'Log::Any::Adapter::Callback' => '0',
+                                      'Marpa::R2' => '0',
+                                      'MooX::HandlesVia' => '0',
+                                      'MooX::Options' => '0',
+                                      'MooX::Role::Logger' => '0',
+                                      'Moops' => '0',
+                                      'POSIX' => '0',
+                                      'Perl::OSType' => '0',
+                                      'Scalar::Util' => '0',
+                                      'Throwable::Factory' => '0',
+                                      'Try::Tiny' => '0',
+                                      'Types::Common::Numeric' => '0',
+                                      'diagnostics' => '0',
+                                      'filetest' => '0',
+                                      'integer' => '0',
+                                      'perl' => '5.010',
+                                      're::engine::GNU' => '0.019',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Data::Section' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Temp' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Log::Any::Adapter::Handler' => '0',
+                                   'Log::Handler' => '0',
+                                   'Test::More' => '0',
+                                   'perl' => '5.010'
+                                 }
+                 }
+     };
+  $x;
+ }

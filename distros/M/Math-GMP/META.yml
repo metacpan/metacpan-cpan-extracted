@@ -1,0 +1,41 @@
+---
+abstract: 'High speed arbitrary size integer math'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  Data::Dumper: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+configure_requires:
+  Devel::CheckLib: '0.9'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-GMP
+provides:
+  Math::GMP:
+    file: lib/Math/GMP.pm
+    version: '2.14'
+requires:
+  AutoLoader: '0'
+  Carp: '0'
+  DynaLoader: '0'
+  Exporter: '0'
+  overload: '0'
+  perl: '5.006'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Math-GMP
+  repository: https://github.com/turnstep/perl-Math-GMP.git
+version: '2.14'
+x_serialization_backend: 'YAML::Tiny version 1.70'

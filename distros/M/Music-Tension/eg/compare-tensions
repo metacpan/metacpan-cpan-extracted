@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+#
+# Generate tensions for various pitches using both Cope and Plomp-Levelt
+# methods, presumably for comparison elsewhere. Alternative: generate
+# the P-L numbers for a range of frequencies, then put that graph on top
+# of the discrete Cope points.
+
+use strict;
+use warnings;
+
+use File::Basename qw/basename/;
+use List::Util qw/max/;
+use Music::Tension::Cope        ();
+use Music::Tension::PlompLevelt ();
+
+my $Prog_Name = basename($0);
+
+my @Tension_Obj = (
+  { name => 'cope', obj => Music::Tension::Cope->new, },
+  { name => 'pllt', obj => Music::Tension::PlompLevelt->new },
+  # see Music/Tension/PlompLevelt.pm for available options
+  #{ name => 'pllt',
+  #  obj  => Music::Tension::PlompLevelt->new(
+  #    amplitudes          => { custom => [qw/0.699 0.829 0.112 0.546 0.094 0.898 0.014 0.167 0.100 0.085 0.787 0.268/] },
+  #    default_amp_profile => 'custom',
+  #  )
+  #},
+);
+
+my $base_pitch = 60;
+for my $o (@Tension_Obj) {
+  open my $fh, '>', $o->{name} . ".out"
+    or die "$Prog_Name: could not write output file '"
+    . $o->{name}
+    . ".out': $!\n";
+  my @results;
+  for my $pitch ( $base_pitch .. $base_pitch + 12 * 1 ) {
+    push @results, [ $pitch, $o->{obj}->pitches( $base_pitch, $pitch ) ];
+  }
+  my $max = max map $_->[1], @results;
+  for my $r (@results) {
+    printf $fh "%d %.3f\n", $r->[0], $r->[1] / $max;
+  }
+}

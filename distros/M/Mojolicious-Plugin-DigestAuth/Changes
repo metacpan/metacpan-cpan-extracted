@@ -1,0 +1,37 @@
+-------------------------
+2015-05-08	v0.09
+* Added call to routes->under() when routes->bridge() is not available (Bug #8)
+
+-------------------------
+2014-05-13	v0.08
+* Forgot to deference array returned from app->secrets(); this was caused by too much ruby programming :) (Bug #7, thanks Roberto Frenna)
+
+-------------------------
+2014-05-12	v0.07
+* Added call to app->secrets() when app->secret() is not available (Bug #6)
+
+-------------------------
+2013-05-27	v0.06
+* Set content type to text/plain for 400 and 401 replies
+* Small change to make tests run on Mojolicious 4 (Bug #4, thanks Per Carlson)
+
+-------------------------
+2012-12-14	v0.05
+-------------------------
+* Fixed implicit return causing digest_auth() to always return true in Mojolicious >= 3.64
+
+-------------------------
+2012-09-13	v0.04
+-------------------------
+* Removed some methods from Util used for Mojo::Util backwards compatibility
+* Fixed 00db.t, now passes on non en-US locale boxes (Bug #2, thanks Dmitriy Shalashov & Alexander Bendo)
+
+-------------------------
+2011-12-12	v0.03
+-------------------------
+* Fixed URL comparison (Bug #1)
+* Fixed various things broken by new releases of Mojolicious
+* Fixed uninitialized value warnings from checksum()
+* Changed how the current request's URL is determined
+* Added check for X-HTTP_AUTHORIZATION
+* Added option 'support_broken_browsers'

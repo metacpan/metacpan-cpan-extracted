@@ -1,0 +1,10 @@
+ [
+    {
+        "label" : "Name",
+        "type" : "text",
+        "validation" : {
+            "size" : [ 2, 5 ]
+        },
+        "name" : "name"
+    }
+ ]

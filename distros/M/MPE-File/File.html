@@ -1,0 +1,125 @@
+<HTML>
+<HEAD>
+<TITLE>MPE::File - Perl extension for accessing MPE File intrinsics</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+<!--
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#export">EXPORT</A></LI>
+	</UL>
+
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+-->
+<!-- INDEX END -->
+
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>MPE::File - Perl extension for accessing MPE File intrinsics</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use MPE::File;
+  $file = MPE::File-&gt;new(&quot;FRED.PUB,old;acc=in&quot;)
+    or die &quot;Cannot open FRED.PUB: $MPE_error\n&quot;;
+  OR
+  $file = MPE::File-&gt;hpfopen(2, &quot;FRED.PUB&quot;, 3, 1, 11, 0)
+    or die &quot;Cannot open FRED.PUB: $MPE_error\n&quot;;
+  OR
+  $file = MPE::File-&gt;fopen(&quot;FRED.PUB&quot;, 1, 0)
+    or die &quot;Cannot open FRED.PUB: $MPE_error\n&quot;;</PRE>
+<PRE>
+  $rec = $file-&gt;readrec();   # use this instead of fread</PRE>
+<PRE>
+  $rec = $file-&gt;freadbykey($key, $keyloc);
+  $rec = $file-&gt;freadlabel( [$labelid] );
+  $rec = $file-&gt;freaddir($lrecnum);
+  $rec = $file-&gt;freadc();
+  $file-&gt;fread($buffer, $bufsize);</PRE>
+<PRE>
+  $file-&gt;writerec($buffer, [$controlcode] )   # use this instead of fwrite</PRE>
+<PRE>
+  $file-&gt;fupdate($buffer);
+  $file-&gt;fwritedir($buffer, $lrecnum);
+  $file-&gt;fwritelabel ($buffer, [$labelid] )
+  $file-&gt;fwrite($buffer, $length, $controlcode)</PRE>
+<PRE>
+  $file-&gt;fpoint($lrecnum);
+  $file-&gt;fcontrol($itemnum, $item);
+  $file-&gt;fdelete( [$lrecnum] );
+  $file-&gt;fsetmode($modeflags);
+  $file-&gt;fremove();
+  $file-&gt;fgetkeyinfo($param, $control);
+  $file-&gt;ffindbykey($value, $location, $length, $relop);
+  $file-&gt;printfileinfo();</PRE>
+<PRE>
+  @info = $file-&gt;ffileinfo(1, 3, 7, 9);</PRE>
+<PRE>
+  @info = flabelinfo(&quot;FRED.PUB&quot;, $mode, 1, 3, 7, 9);</PRE>
+<PRE>
+  $errmsg = ferrmsg($fserrcode);
+  hperrmsg($displaycode,...)</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<PRE>
+  The primary reference should be the MPE/iX Intrinsic Reference Manual
+  (available at <A HREF="http://docs.hp.com/mpeix/all/index.html">http://docs.hp.com/mpeix/all/index.html</A>)</PRE>
+<PRE>
+  Notice that there are some difference in parameters.
+  For example, I take care of all the delimited strings in HPFOPEN
+  Subroutines return 0 or undef on failure; check $MPE_error for
+  the error number and/or string (both should be valid).</PRE>
+<PRE>
+  MPE::File-&gt;new($x) is the same as MPE::File-&gt;hpfopen(52, $x)
+  which, to quote the Intrinsic manual:
+    &quot;Passes a character string that matches the file equation
+    specification syntax exactly.&quot;</PRE>
+<PRE>
+  You can pass other HPFOPEN parameter pairs after the first
+  one, although almost all can be specified in the file equation.
+</PRE>
+<PRE>
+
+  One that can't be is to save a file right away, on HPFOPEN, instead
+  of waiting until FCLOSE.  You can do that like this:
+  $file = MPE::File-&gt;new(&quot;FRED,new;rec=-80,,f,ascii;msg;acc=in&quot;, 3, 4)
+     or die &quot;Cannot open FRED: $MPE_error\n&quot;;
+  (Notice the 3, 4 pair at the end.)</PRE>
+<PRE>
+  If you use FFREADBYKEY, remember to pad out your keys to the full
+  length.  Also, if they are binary keys, you'll need to use pack,
+  otherwise a number will be converted to its string equivalent.</PRE>
+<PRE>
+  This documentation will be expanded at some point; feel free to
+  send me suggestions (or completed paragraphs).</PRE>
+<P>
+<H2><A NAME="export">EXPORT</A></H2>
+<P>flabelinfo $MPE_error</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Ken Hirsch &lt;<EM><A HREF="mailto:kenhirsch@myself.com">kenhirsch@myself.com</A></EM>&gt;</P>
+<P>This module may be used and distributed on the same terms as Perl.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>perl(1).</P>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,17 @@
+Revision history for Perl extension Math::GMPn.
+
+0.03  Feb 24, 2011
+        - implement GMP mpn_neg from scratch as it is not yet widely
+          available
+        - add mpn_not operation
+        - mpn_ior_uint was not properly handling the case where the
+          first argument was an empty string.
+        - base autodetection on mpn_set_str was broken
+
+0.02  Feb 23, 2011
+        - bug on mpn_ior_uint and family corrected
+
+0.01  Wed Feb 16 18:26:52 2011
+	- original version; created by h2xs 1.23 with options
+		-An Math::GMPn
+

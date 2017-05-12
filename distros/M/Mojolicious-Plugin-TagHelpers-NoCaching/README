@@ -1,0 +1,34 @@
+Mojolicious::Plugin::TagHelpers::NoCaching
+==========================================
+
+When you updating your project on production with new version,
+new version often contains changed styles, javascript, images.
+You fetched all new files from the repository, restarted application,
+but browsers still shows you old images, your html looks like a
+shit (because of old styles on new html), javascript events doesn't
+work (because of the old javascript). All of this because your browser
+cached old version of included files and don't want to reload it.
+
+If you ever come across this, this module will help you.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Mojolicious
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 by Oleg G
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

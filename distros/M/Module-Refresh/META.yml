@@ -1,0 +1,27 @@
+---
+abstract: 'Refresh %INC files when updated on disk'
+author:
+  - 'Jesse Vincent <jesse@bestpractical.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Temp: 0.19
+  Path::Class: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Refresh
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.17

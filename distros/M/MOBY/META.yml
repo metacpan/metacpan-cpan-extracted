@@ -1,0 +1,51 @@
+---
+abstract: 'This distribution is for communicating with or creating your own MOBY Central registry'
+author:
+  - 'Mark Wilkinson (markw@illuminae.com)'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.42
+  Test::Simple: 0.44
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MOBY
+no_index:
+  directory:
+    - bin/scripts
+    - inc
+    - share
+    - t
+requires:
+  Carp: 0
+  Class::Inspector: 1.17
+  DBD::mysql: 0.01
+  DBI: 0.01
+  File::HomeDir: 0.8
+  File::ShareDir: 0.05
+  File::Spec: 0.80
+  HTML::Entities: 0.01
+  IO::Prompt: 0.99.2
+  IO::Stringy: 2.110
+  IPC::Shareable: 0.6
+  LS: 1.1.7
+  RDF::Core: 0.51
+  SOAP::Lite: 0.69
+  Template: 0
+  Text::Shellwords: 1.00
+  Unicode::String: 2.09
+  WSRF::Lite: 0.8.2.5
+  Want: 0
+  XML::LibXML: 1.62
+  XML::LibXML::Common: 0.13
+  XML::SemanticCompare: 0
+  XML::Simple: 2.18
+  XML::XPath: 1.12
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.16

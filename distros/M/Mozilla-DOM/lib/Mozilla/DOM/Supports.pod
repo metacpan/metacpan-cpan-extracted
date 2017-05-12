@@ -1,0 +1,51 @@
+=head1 NAME
+
+Mozilla::DOM::Supports
+
+=for object Mozilla::DOM::Supports
+
+Mozilla::DOM::Supports is a wrapper around an instance of Mozilla's
+nsISupports interface, from which everything else inherits.
+
+=head1 METHODS
+
+=head2 $obj = $supports->B<QueryInterface>($uuid);
+
+=over
+
+=over
+
+=item * $uuid (Mozilla::DOM::IID)
+
+=back
+
+This is how you can get different interfaces from
+an object. Basically that means a way to get different
+methods from the same object.
+
+The $obj return value will be blessed into the class corresponding to
+whatever interface you requested.
+
+The $uuid argument is just a string which looks something like
+
+  {69e5df00-7b8b-11d3-af61-00a024ffc08c}
+
+which you can find in the Mozilla header files, but it's
+better to use a GetIID class method, like
+
+  $uuid = Mozilla::DOM::EventTarget->GetIID();
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

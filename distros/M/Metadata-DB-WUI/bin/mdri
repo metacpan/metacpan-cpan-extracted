@@ -1,0 +1,174 @@
+#!/usr/bin/perl
+use Carp;
+use strict;
+use lib './lib';
+use vars qw($DBH);
+use base 'LEOCHARRE::CLI';
+use Metadata::DB::Search::InterfaceHTML;
+use LEOCHARRE::DBI;
+use Metadata::DB::CLI ':all';
+
+my $o = gopts('c:D:U:P:H:a:CAM:');
+
+$o->{M}||=100;
+
+cli_consolidate_params($o);
+
+sub usage {
+   return qq{
+$0 - Metadata Database Regenerate Interface
+
+DESCRIPTION
+
+Regenerate form interface for the Metadata search
+prints to STDOUT
+   
+PARAMETERS
+
+ cli  | conf          -  meaning
+
+   -D | DBNAME        - database name
+   -U | DBBUSER       - database user
+   -P | DBPASSWORD    - database password
+   -H | DBHOST        - database host
+   -a | DBABSPATH     - abs path to sqlite db instead of using U D P and H
+   -n | ABSCONVENTION - abs path to file holding file naming conventions (like autosort's)
+   -R | DOCUMENT_ROOT - set document root, default is ENV HOME
+   -f | ABSSEARCHFORM - abs path to search form to output, instead of to STDOUT
+
+   -c abs path to conf file
+
+   -M max option list, 100 is default
+   -C print template code instead of static html output
+   -A view an analysis of the metadata db instead
+
+USAGE EXAMPLES
+
+   $0 -D 'databasename' -U 'mysqlusername' -P 'pazzwerd' > /var/www/cgi-gin/mdw.search.html
+   
+   $0  -a ./to/stuff.db > /var/www/cgi-bin/mdw.search.html
+
+   $o -c /var/www/cgi-bin/mdw.conf
+
+AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+SEE ALSO
+
+Metadata::DB::WUI
+Metadata::DB::CLI
+
+   };
+}
+
+
+
+$DBH = cli_get_dbh($o);
+
+my $i = Metadata::DB::Search::InterfaceHTML->new({DBH=>$DBH});
+
+only_view_analysis();
+
+output_html();
+
+exit(0);
+
+
+
+
+
+
+sub only_view_analysis {
+   $o->{A} or return;
+   
+   _analize_tables($i);  
+
+   exit(0);
+}
+
+sub _analize_tables {
+   my $a = shift;
+
+
+   
+
+   print "Metadata Attribute Analysis.\n-----------------------\n";
+
+   printf "Total record entries: %s\n\n", $a->get_records_count;
+
+
+   print "What is the ratio of the attributes compared to each other?\n";
+   my $ratios = $a->get_attributes_ratios;
+   print _dumphash($ratios);
+
+   print "What is the order of the attributes by ratio/occurrence?\n";
+   my $cratios = $a->get_attributes_by_ratio;
+   print " @$cratios\n";
+
+
+
+   my $attribute_counts = $a->get_attributes_counts;
+   my @atts = sort grep { !/^all$/ } keys %$attribute_counts;
+   
+
+   printf "%25s : %-15s : %s\n", '(attribute)','(uniq vals)','(is#)';
+
+
+   for my $att(@atts){
+      my $is_number = $a->attribute_type_is_number($att);
+      my $count = $attribute_counts->{$att};
+      printf "%25s : %-15s : %s\n", $att, $count, $is_number;
+   }
+      
+
+}
+
+
+
+sub output_html {
+   
+
+   my $html_out;
+
+   if( !$o->{C} ){
+
+      $i->attribute_option_list_limit_set($o->{M});
+      $html_out = $i->search_form_template_output;
+   
+   }
+   elsif( $o->{C} ){
+
+      $html_out =$i->search_form_template_code; 
+   }
+
+   if( $o->{f} ){
+      open(FILE,'>',$o->{f}) or die("cant open $$o{f} for writing, $!");
+      print FILE $html_out;
+      close FILE;
+      print STDERR "saved:\n$$o{f}\n";
+      return;
+   }
+
+   print $html_out;
+   debug('output done');
+   
+}
+
+
+
+sub _dumphash {
+   my($hashref)=@_;
+   my $o;
+   for my $k ( keys %$hashref ){
+      my $v = $hashref->{$k};
+      if (ref $v eq 'ARRAY'){
+         $v = "@$v";
+      }
+      $o.= "  - $k:$v\n";
+   }
+   $o.="\n";
+   return $o;
+}
+
+

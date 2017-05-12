@@ -1,0 +1,28 @@
+---
+abstract: 'Some sweet stuff for Mojolicious'
+author:
+  - 'Pavel A. Karoukin <pavel@karoukin.us>'
+build_requires:
+  Module::Build: 0.3601
+  Mojolicious::Lite: 0
+  Test::Mojo: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-Sugar
+requires:
+  Data::Types: 0
+  Mojo::Base: 0
+  Scalar::Util: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/hippich/perl-mojolicious-plugin-sugar.git
+version: 0.002

@@ -1,0 +1,20 @@
+---
+version : 0.0.4
+date    : 2007-05-29T20:22:28Z
+changes :
+    - stop including the signature test
+---
+version : 0.0.3
+date    : 2006-09-15T19:42:02Z
+changes :
+    - Fix a bug where 'instantiate' was handled incorrectly
+---
+version : 0.0.2
+date    : 2006-09-15T19:25:02Z
+changes :
+    - Bundle all the testing modules
+---
+version : 0.0.1
+date    : 2006-09-15T15:44:33Z
+changes :
+    - First version

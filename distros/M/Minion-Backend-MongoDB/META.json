@@ -1,0 +1,74 @@
+{
+   "abstract" : "MongoDB backend for Minion",
+   "author" : [
+      "Andrey Khozov <avkhozov@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Minion-Backend-MongoDB",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Minion" : "1.15",
+            "MongoDB" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Minion::Backend::MongoDB" : {
+         "file" : "lib/Minion/Backend/MongoDB.pm",
+         "version" : "0.97"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/avkhozov/Minion-Backend-MongoDB/issues"
+      },
+      "homepage" : "https://github.com/avkhozov/Minion-Backend-MongoDB",
+      "repository" : {
+         "url" : "git://github.com/avkhozov/Minion-Backend-MongoDB.git",
+         "web" : "https://github.com/avkhozov/Minion-Backend-MongoDB"
+      }
+   },
+   "version" : "0.97",
+   "x_authority" : "cpan:AVKHOZOV"
+}

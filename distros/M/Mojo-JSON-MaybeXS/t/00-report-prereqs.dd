@@ -1,0 +1,39 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'Module::Build::Tiny' => '0.034'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Cpanel::JSON::XS' => '3.0214',
+                                      'JSON::PP' => '0',
+                                      'JSON::XS' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Without::Module' => '0.17'
+                                    }
+                    },
+       'runtime' => {
+                      'recommends' => {
+                                        'Cpanel::JSON::XS' => '3.0207'
+                                      },
+                      'requires' => {
+                                      'JSON::MaybeXS' => '1.001',
+                                      'Mojolicious' => '5.66',
+                                      'perl' => '5.010001'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'File::Spec' => '0',
+                                   'Module::Metadata' => '0',
+                                   'Scalar::Util' => '0',
+                                   'Test::More' => '0.88'
+                                 }
+                 }
+     };
+  $x;
+ }

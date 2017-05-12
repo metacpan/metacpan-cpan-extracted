@@ -1,0 +1,155 @@
+#!/bin/env perl
+
+package MySQL::Slurp::App;
+
+  use Moose;
+  use self;
+  use Pod::Usage;
+    extends 'MySQL::Slurp';
+
+
+  # Enable pass_through
+  #   This is important since we will pass_through 
+  #   remaining options to mysqlimport.
+  #
+  # print Dumper &Getopt::Long::Configure;
+    &Getopt::Long::Configure( qw( pass_through auto_version ) );
+
+  # ensure that mysqlimport is used as the import method
+    has '+method' => ( default => 'mysqlimport' );
+
+    has 'database' => (
+        is          => 'rw' ,
+        isa         => 'Str' ,
+        required    => 1 ,
+        metaclass   => 'MooseX::Getopt::Meta::Attribute' ,  
+        cmd_aliases => [ 'D' ] ,
+        documentation => 'Database' 
+    );
+
+
+    has 'table' => (
+        is            => 'rw' ,
+        isa           => 'Str' ,
+        required      => 1 ,
+        metaclass     => 'MooseX::Getopt::Meta::Attribute' ,  
+        documentation => 'Table' 
+    );    
+
+
+    has 'args' => ( 
+            is       => 'rw' , 
+            isa      => 'ArrayRef' , 
+            required => 0 , 
+            lazy     => 1 ,
+            default  => sub { self->extra_argv } , # sub { $_[0]->extra_argv  } ,
+            documentation => 'Options passed to mysqlimport' 
+    );
+
+
+    has 'usage' => (
+        is          => 'rw' ,
+        isa         => 'Bool' ,
+        required    => 0 ,
+        trigger     => sub { pod2usage } ,
+        metaclass   => 'MooseX::Getopt::Meta::Attribute' ,  
+        cmd_aliases => [ 'help', '?' ] ,
+        documentation => 'Print usage information and exit' ,
+    );
+
+
+    has 'man' => ( 
+        is          => 'rw' ,
+        isa         => 'Bool' ,
+        required    => 0 ,
+        trigger     => sub { pod2usage( -verbose => 3 ) } ,
+        documentation => 'Print man page and exit' ,
+    );
+
+
+
+package main;
+
+    our $VERSION = '0.90';
+    my $slurp = MySQL::Slurp::App->new_with_options;
+
+    $slurp->open;
+    $slurp->slurp; 
+    $slurp->close;
+
+
+__END__
+
+=head1 NAME
+
+mysqlslurp - slurp <STDIN> into a MySQL table
+
+=head1 SYNOPSIS
+
+  mysqlslurp 
+      -D | --database                   Database    
+      --table                           Table
+      [--tmp | --tmpdir | --temp ]      Temporary Directory
+
+      [ --usage ]                       Prints this synopsis
+      [ --man ]                         Prints full man page
+
+      [options passed to mysqlimport] 
+      ( see mysqlimport --help for a list of options )
+
+
+  Example: 
+    cat file | mysqlslurp --database=my_db --table=my_table
+
+
+=head1 DESCRIPTION
+
+mysqlslurp reads from <STDIN> and writes to directly to a MySQL
+table.  Parameters --database and --table are 
+required.  Specifying a --tmp directory where the FIFO pipe will be 
+created is optional.  All other options are passed to B<mysqlimport> 
+unchanged.
+
+=head1 ADVANTAGES
+
+=over 4
+
+=item Speed
+
+mysqlslurp wraps mysqlimport, the fastest way to import data into
+MySQL tables.  Especially with the --use-threads option.
+
+=item Data in Motion
+
+Unlike B<mysqlimport>, B<mysqlslurp> does not require that the data be
+resident in a file on disk. This is handy in multiple server setups.
+
+=item Good Defaults
+
+Mostly just works.  
+
+=head1 SEE ALSO
+
+L<MySQL::Slurp>
+
+mysqlimport at L<http://mysql.com>, currently 
+L<http://dev.mysql.com/doc/refman/5.1/en/mysqlimport.html>   
+
+
+=head1 AUTHOR
+
+Christopher Brown, E<lt>ctbrown@cpan.org<gt>
+
+L<http://www.opendatagroup.com>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2008 by Open Data
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut        

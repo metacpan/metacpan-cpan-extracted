@@ -1,0 +1,98 @@
+[%# A template for a data type.
+    ===========================
+
+    Expected/recognized parameters:
+
+      obj       ... a data type definition, type MOSES::MOBY::Def::DataType
+      full_source . generate the full source code if this boolean
+                    parameter is 1
+-%]      
+#-----------------------------------------------------------------
+# [% obj.module_name %]
+# Generated: [% USE Date (format = '%d-%b-%Y %H:%M:%S %Z') %][% Date.format %]
+# Contact: Martin Senger <martin.senger@gmail.com> or
+#          Edward Kawas <edward.kawas@gmail.com>
+#-----------------------------------------------------------------
+package [% obj.module_name %];
+no strict;
+use vars qw( @ISA );
+@ISA = qw( [% obj.module_parent %] );
+use strict;
+
+use MOSES::MOBY::Data::Object;
+use MOSES::MOBY::Data::String;
+use MOSES::MOBY::Data::Integer;
+use MOSES::MOBY::Data::Float;
+use MOSES::MOBY::Data::Boolean;
+use MOSES::MOBY::Data::DateTime;
+
+#-----------------------------------------------------------------
+# accessible attributes
+#-----------------------------------------------------------------
+{
+    my %_allowed =
+	([% FOREACH child IN obj.children %]
+         '[% child.memberName %]' => {type => '[% child.module_datatype %]'
+	                                       [%- IF child.relationship == 'HAS' %], is_array => 1
+	                                       [%- END %]},[% END %]
+	 );
+
+    sub _accessible {
+	my ($self, $attr) = @_;
+	exists $_allowed{$attr} or $self->SUPER::_accessible ($attr);
+    }
+    sub _attr_prop {
+	my ($self, $attr_name, $prop_name) = @_;
+	my $attr = $_allowed {$attr_name};
+	return ref ($attr) ? $attr->{$prop_name} : $attr if $attr;
+	return $self->SUPER::_attr_prop ($attr_name, $prop_name);
+    }
+}
+
+# here we ensure that we set the mobyname (used in XML genesis)
+sub init {
+    my ($self) = shift;
+    $self->SUPER::init();
+    [% IF obj.name %]
+    $self->mobyname('[% obj.name %]');
+    [% END %]
+    
+}
+
+[% IF full_source %]
+1;
+__END__
+=head1 NAME
+
+[% obj.module_name %] - a BioMoby data type
+
+=head1 SYNOPSIS
+
+  use [% obj.module_name %];
+
+=head1 DESCRIPTION
+
+[% obj.description %]
+
+I<Inherits from>: L<[% obj.parent %]|[% obj.module_parent %]>
+
+I<Direct HASA members>: [% FOREACH child IN obj.children %]
+                        [%- IF child.relationship == 'HASA' %]L<
+                        [%- child.memberName %]|[% child.module_datatype %]> (
+                        [%- child.module_datatype %])
+                        [%- UNLESS loop.last %], [% END %][% END %][% END %]
+
+I<Direct HAS members>: [% FOREACH child IN obj.children %]
+                       [%- IF child.relationship == 'HAS' %]L<
+                       [%- child.memberName %]|[% child.module_datatype %]> (
+                       [%- child.module_datatype %])
+                       [%- UNLESS loop.last %], [% END %][% END %][% END %]
+
+=head1 CONTACT
+
+B<Authority>: [% obj.authority %]
+
+B<Email>: [% obj.email %]
+
+=cut
+[% END %]

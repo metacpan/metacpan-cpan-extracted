@@ -1,0 +1,37 @@
+SINCE VERSION | TBD VERSION | COMMENT
+
+-- next --
+
+-- backlog --
+0.16    0.20    MOD Oauth2 example/helper
+0.16    0.20    MOD OpenAPI plugin: model+in-spec+out-spec => swagger.txt+routes
+0.09    0.20    MOD Add form defaults populating BOTH raw and data
+0.14    0.20    API Add param regex to route defn
+0.16    0.20    TPL view default directory layout (./tpl or smth)
+0.02    0.20    DOC HOWTO add dumper to TT view (pre-render)
+0.12    0.30    MOD static file_regex, dir_regex
+0.16    0.30    API Add -charset for content encoding, cleanup -type handling
+0.10    0.30    DOC HOWTO SQL transactions via pre-logic/pre-content hooks
+0.15    0.30    DOC Make fun sugar main API, OO as backup
+0.16    0.30    MOD rewrite performance stats
+0.16    0.30    API Param strict mode - die 422 if bad params
+0.13    0.30    MOD static: X-Accel-Redirect (@cono)
+0.09    0.30    MOD Add predefined regexps to default FORM impl
+0.14    0.30    DEV iterate through get_routes w/callback
+0.08    0.30    API Req->reply to return immediately
+0.08    0.30    API Add Req alias methods for -dashed -return -keys
+0.07    0.30    MOD Add "cleanup" method to X::Session - for offline cleanups
+0.13    0.90    NET Add FastCGI support
+0.13    0.90    TPL Add XSLate support
+0.04    0.90    REF Req https detection: change to is_secure? http:https.
+0.06    0.90    NET POST/PUT request HMAC via HTTP header
+0.07    0.90    API Periodic actions in webapp
+0.04    0.90    DEV CGI wrapper: use wrapper; route(/) {...}; run();
+0.01    0.99    DEV REPL - term::readline + neaf->run_test
+
+-- think --
+0.14    0.30    API Add forms to route defn (how? named? array?)
+0.14    0.90    NET Generate schema from app conf (@cono)
+0.05    0.90    API Add ability to deploy existing app under unoccupied path
+0.06    0.90    TPL TT View - prepend configurable path to ALL links (mason)
+

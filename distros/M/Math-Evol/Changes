@@ -1,0 +1,17 @@
+20021019 Math-Evol-1.00 Evolution Search Optimisation
+20021020 right version in Install, some doc fixes
+20021021 1.01 select_evol gets step size adjustment the right way round !
+20021021 new_text not newtext in sub choosebest in sub text_evol
+20021021 bug fixed retrieving @_ in sub text_evol
+20021021 1.02 debug switched off in text_evol
+20021021 minor pod tweaks
+20030701 FreeBSD bug corrected ($^O now gives freebsd)
+20030905 1.03 email replaced by contact.html for improved longevity
+20040809 1.04 'perl Install' works better on solaris without Term::Size
+20050122 1.05 test.pl uses Test::Simple
+20051104 1.06 reject 1st rand call, minor pod improvements
+20090617 1.07 convergence criteria documented, and can be undefined
+20090618 1.08 one bugfix and four extra tests
+20090619 1.09 minor pod-formatting fix
+20090620 1.10 fix perl-syntax-errors in pod SYNOPSIS and examples
+20100523 1.11 fix BUG #44777: Log of zero error

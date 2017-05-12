@@ -1,0 +1,166 @@
+NAME
+    Mojolicious::Plugin::LinkEmbedder - Convert a URL to embedded content
+
+VERSION
+    0.24
+
+DESCRIPTION
+    This module can transform a URL to an iframe, image or other embeddable
+    content.
+
+SYNOPSIS
+  Simple version
+      use Mojolicious::Lite;
+      plugin LinkEmbedder => { route => '/embed' };
+
+  Full control
+      plugin 'LinkEmbedder';
+
+      get '/embed' => sub {
+        my $c = shift;
+
+        $c->delay(
+          sub {
+            my ($delay) = @_;
+            $c->embed_link($c->param('url'), $delay->begin);
+          },
+          sub {
+            my ($delay, $link) = @_;
+
+            $c->respond_to(
+              json => {
+                json => {
+                  media_id => $link->media_id,
+                  url => $link->url->to_string,
+                },
+              },
+              any => { text => $link->to_embed }
+            );
+          }
+        );
+      };
+
+  Example with caching
+      plugin 'LinkEmbedder';
+
+      get '/embed' => sub {
+        my $c = shift;
+        my $url = $c->param('url');
+        my $cached;
+
+        $c->delay(
+          sub {
+            my ($delay) = @_;
+            return $delay->pass($cached) if $cached = $c->cache->get($url);
+            return $c->embed_link($c->param('url'), $delay->begin);
+          },
+          sub {
+            my ($delay, $link) = @_;
+
+            $link = $link->TO_JSON if UNIVERSAL::can($link, 'TO_JSON');
+            $c->cache->set($url => $link);
+
+            $c->respond_to(
+              json => {
+                json => {
+                  media_id => $link->{media_id},
+                  url => $link->{url},
+                },
+              },
+              any => { text => $link->{html} }
+            );
+          }
+        );
+      };
+
+SUPPORTED LINKS
+    *   Mojolicious::Plugin::LinkEmbedder::Link
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Game::_2play
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Image
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Image::Imgur
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Image::Instagram
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Image::Xkcd
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Video
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Music::Spotify
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Video::AppearIn
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Video::Dbtv
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Video::Collegehumor
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Video::Dagbladet
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Video::Ted
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Video::Vimeo
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Video::Youtube
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Text
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Text::HTML
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Text::Github
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Text::GistGithub
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Text::Ix
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Text::Metacpan
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Text::Pastebin
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Text::Pastie
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Text::PasteScsysCoUk
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Text::Twitter
+
+    *   Mojolicious::Plugin::LinkEmbedder::Link::Text::Travis
+
+METHODS
+  embed_link
+    See "SYNOPSIS".
+
+  register
+      $app->plugin('LinkEmbedder' => \%config);
+
+    Will register the "embed_link" helper which creates new objects from
+    Mojolicious::Plugin::LinkEmbedder::Default. %config is optional but can
+    contain:
+
+    *   route => $str|$obj
+
+        Use this if you want to have the default handler to do link
+        embedding. The default handler is shown in "SYNOPSIS". $str is just
+        a path, while $obj is a Mojolicious::Routes::Route object.
+
+DISCLAIMER
+    This module might embed javascript from 3rd party services.
+
+    Any damage caused by either evil DNS takeover or malicious code inside
+    the javascript is not taken into account by this module.
+
+    If you are aware of any security risks, then please let us know.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014, Jan Henning Thorsen
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+AUTHOR
+    Jan Henning Thorsen - "jhthorsen@cpan.org"
+
+    Joel Berger, jberger@cpan.org
+
+    Marcus Ramberg - "mramberg@cpan.org"
+

@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/MHA/AWS.pm
+lib/MHA/AWS/MasterIpFailover.pm
+lib/MHA/AWS/MasterIpOnlineChange.pm
+lib/MHA/AWS/Shutdown.pm
+minil.toml
+script/mhaws
+t/00_compile.t
+META.yml
+MANIFEST

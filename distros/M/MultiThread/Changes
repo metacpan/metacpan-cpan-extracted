@@ -1,0 +1,11 @@
+Revision history for MultiThread
+
+0.9    Dec 3, 2008
+        - Added ability to nest WorkerPools inside of a Pipeline.
+        - Added worker_count method to MultiThread::WorkerPool.
+        - $$ticket{Response} from get_response() will now be an arrayref
+            containing the return values as returned by the final worker sub. 
+            Previously this only handled a single return value.
+        - Several documentation fixes and additions. 
+        
+

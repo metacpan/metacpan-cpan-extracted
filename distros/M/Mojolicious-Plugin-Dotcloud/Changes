@@ -1,0 +1,7 @@
+Revision history for perl module Mojolicious-Plugin-Dotcloud
+
+1.01      2012-09-11 23:59:59 Asia/Jakarta
+    Like a schmuck, forgot to inherit Mojolicious::Plugin... oopsie!
+
+1.00      2012-09-02 18:49:51 Asia/Jakarta
+    Initial release

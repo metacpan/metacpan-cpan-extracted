@@ -1,0 +1,45 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use Math::SymbolicX::Calculator::Interface::Web::Server;
+
+our $VERSION = '0.01';
+
+my $source;
+GetOptions(
+    'man'        => sub { pod2usage(-verbose => 2, -exitstatus => 0) },
+    'h|help'    => sub { pod2usage(-verbose => 1, -exitstatus => 0) },
+);
+
+my $server = Math::SymbolicX::Calculator::Interface::Web::Server->new();
+
+$server->run();
+
+__END__
+
+=head1 NAME
+
+symbolic_calculator_web_server
+
+=head1 SYNOPSIS
+
+  symbolic_calculator_web_server [--man] [--help]
+
+=head1 OPTIONS
+
+  --man
+    Display the full manual (which is currently rather lacking).
+  -h or --help
+    Display (this) short help.
+
+=head1 DESCRIPTION
+
+This is a web interface for the Math::SymbolicX::Calculator Perl module.
+(See also "perldoc Math::SymbolicX::Calculator::Interface::Web")
+
+Running this will start its own Web Server on port 8080.
+
+=cut

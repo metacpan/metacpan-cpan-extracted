@@ -1,0 +1,24 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/GithubMeta.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/MooseX/Attributes/Curried.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/001-basic.t
+t/002-customize.t
+t/003-rename.t
+t/004-multi-attr.t
+t/005-multi-curry.t
+t/006-coderef.t
+t/007-smart-has.t
+t/lib/MyAttrs.pm
+t/lib/MyCodeAttrs.pm
+t/lib/MySmartAttrs.pm

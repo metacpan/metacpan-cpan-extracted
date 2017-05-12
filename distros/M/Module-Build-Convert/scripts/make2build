@@ -1,0 +1,106 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long qw(:config no_ignore_case);
+use Module::Build::Convert;
+
+my $params = parse_switches() if @ARGV;
+convert($params);
+
+sub parse_switches {
+    my %opts;
+    GetOptions(\%opts,'c','d','e','h','l=i','n','p','rc','v','vv','V') or usage();
+
+    if ($opts{c} && $opts{p}) {
+        print "Can't process code while in PPI mode\n";
+        usage();
+    }
+    if ($opts{d} && $opts{e}) {
+        print "Can't debug while in executing Makefile.PL mode\n";
+        usage();
+    }
+    if ($opts{d} && $opts{p}) {
+        print "Can't debug while parsing in PPI mode\n";
+        usage();
+    }
+    if ($opts{v} && $opts{vv}) {
+        print "Can't use both -v and -vv switches\n";
+        usage();
+    }
+
+    usage()   if $opts{h};
+    version() if $opts{V};
+
+    return { Path             => $ARGV[0],
+             Process_Code     => $opts{c},
+             Debug            => $opts{d},
+             Exec_Makefile    => $opts{e}, 
+             Len_Indent       => $opts{l},
+             Use_Native_Order => $opts{n},
+             Parse_PPI        => $opts{p},
+             Create_RC        => $opts{rc},
+             Verbose          => $opts{v} ? 1 : $opts{vv} ? 2 : undef };
+}
+
+sub usage {
+    print <<USAGE;
+Usage: $0 [switches] [path-to-distribution]
+  -c           process code (within the arguments list)
+  -d           debug the parsing process
+  -e           execute Makefile.PL
+  -h           help screen
+  -l length    indentation length
+  -n           native ordering of build arguments
+  -p           PPI parse mode
+  -rc          create RC-file in homedir
+  -v(v)        verbosity level
+  -V           print version
+USAGE
+    exit;
+}
+
+sub version {
+    print "  Module::Build::Convert $Module::Build::Convert::VERSION\n";
+    exit;
+}
+
+sub convert {
+    my $make = Module::Build::Convert->new(%{$_[0]});
+    $make->convert;
+}
+
+=head1 NAME
+
+make2build - frontend to Module::Build::Convert
+
+=head1 SYNOPSIS
+
+ make2build         # In the root directory of an
+                    # ExtUtils::MakeMaker based distribution
+
+ Usage: make2build [switches] [path-to-distribution]
+   -c           process code (within the arguments list)
+   -d           debug the parsing process
+   -e           execute Makefile.PL
+   -h           help screen
+   -l length    indentation length
+   -n           native ordering of build arguments
+   -p           PPI parse mode
+   -rc          create RC-file in homedir
+   -v(v)        verbosity level
+   -V           version
+
+=head1 AUTHOR
+
+Steven Schubiger <schubiger@cpan.org>
+
+=head1 LICENSE
+
+This program is free software; you may redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut

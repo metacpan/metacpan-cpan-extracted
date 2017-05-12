@@ -1,0 +1,44 @@
+---
+abstract: 'Pipelined State Machine Plack Middleware Framework'
+author:
+  - 'Kip Hampton <kip.hampton@tamarou.com>'
+  - 'Chris Prather <chris.prather@tamarou.com>'
+build_requires:
+  HTTP::Request::Common: '6.02'
+  Test::Requires: '0'
+  Test::Simple: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Magpie
+recommends:
+  CHI: '0.50'
+  JSON::Any: '1.29'
+  KiokuDB: '0.52'
+  KiokuDB::Backend::DBI: '1.21'
+  KiokuX::Model: '0.02'
+  XML::LibXML: '1.90'
+requires:
+  Bread::Board: '0.25'
+  Carp: '1.24'
+  Class::Load: '0.20'
+  Data::Printer: '0'
+  HTTP::Negotiate: '6.00'
+  HTTP::Throwable: '0.016'
+  Moose: '2.0402'
+  MooseX::Role::Parameterized: '0'
+  MooseX::Traits: '0.11'
+  MooseX::Types::Path::Class: '0.05'
+  Plack: '0.9985'
+  Scalar::Util: '1.23'
+  Try::Tiny: '0.11'
+  URI: '1.59'
+resources:
+  repository: git://github.com/tamarou/magpie.git
+version: '1.163200'
+x_serialization_backend: 'YAML::Tiny version 1.62'

@@ -1,0 +1,29 @@
+Revision history for MooseX-Util
+
+0.006     2015-06-26 11:32:06 PDT-0700
+	* Drop MXAS, as we don't need it.
+
+0.005     2015-05-15 09:38:31 PDT-0700
+	* add a stub find_meta...  ...as apparently a number of items calling this
+	  as MooseX::Util::find_meta() were breaking after the 0.004 changes.
+
+0.004     2015-05-07 21:58:06 PDT-0700
+	* add: is_private()
+
+0.003     2014-05-22 12:30:56 PDT-0700
+	* MooseX::TraitFor::Meta::Class::BetterAnonClassNames has been split into
+	  its own dist, so let's require the first version of the module present
+	  in that dist (and drop it here, naturally).
+
+0.002     2014-03-03 12:17:31 PST-0800
+	* Drop Reindeer as a prereq (oops)
+	* Add a cpanfile
+	* Mark v5.10 as the, ah, maximum minimum version of Perl
+
+0.001     2012-10-29 11:20:28 PST8PDT
+	* Initial release
+	* we only override with_traits() at this point (in MX::Utils), in order to
+	  use our slightly nicer set of anonymous role name picking
+	* also includes MooseX::Traitor, and the various meta-bits needed to do
+	  the above.  Traitor aims to be a MX::Traits alternate, but right now
+	  it's pretty limited.

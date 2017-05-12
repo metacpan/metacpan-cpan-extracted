@@ -1,0 +1,32 @@
+---
+abstract: 'Plugin for Module::Build to compile Fortran C<.f> files'
+author:
+  - 'Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.4005
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Build-Pluggable-Fortran
+provides:
+  Module::Build::Pluggable::Fortran:
+    file: lib/Module/Build/Pluggable/Fortran.pm
+    version: 0.26
+requires:
+  ExtUtils::F77: 0
+  Module::Build::Pluggable::Base: 0
+  perl: 5.008
+resources:
+  bugtracker: https://github.com/mvgrimes/mb-pluggable-fortran/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/mvgrimes/mb-pluggable-fortran
+version: 0.26
+x_test_requires:
+  IPC::Cmd: 0
+  List::MoreUtils: 0
+  Path::Class: 0
+  Test::More: 0.87

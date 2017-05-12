@@ -1,0 +1,6 @@
+This modules requires Imager and Math::Trig.
+
+Install by hand or from CPAN.
+
+  perl -MCPAN -e 'install Math::Fractal::Noisemaker'
+

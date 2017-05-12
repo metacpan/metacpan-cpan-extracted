@@ -1,0 +1,14 @@
+This file documents the revision history for Mojo-Server-FastCGI.
+
+0.4     October 25, 2012
+        - Fixed compatibility with mojolicious +3.21 (sri, oetiker)
+
+0.3     July 13, 2012
+        - Compatibility with Mojolicious 3.x (oetiker)
+
+0.2     November 02, 2011
+        - Compatibility with Mojolicious 2.x (sri)
+        - Change log level for empty connection messages (pboyd)
+
+0.1     September 27, 2011
+        - First release as a separate distribution

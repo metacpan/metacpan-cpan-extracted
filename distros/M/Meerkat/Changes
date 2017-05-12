@@ -1,0 +1,108 @@
+Revision history for Meerkat
+
+0.015     2016-12-12 12:36:52-05:00 America/New_York
+
+    [FIXED]
+
+    - No longer issues deprecation warnings (or fails tests) with
+      MongoDB v1.6.0, which warns when using deprecated legacy methods.
+
+    [PREREQS]
+
+    - Requires MongoDB Perl Driver v1.0.0 or later
+
+0.014     2016-02-27 08:20:44-05:00 America/New_York
+
+    [ADDED]
+
+    - Adds support for 'immortal' to cursors
+
+    [PREREQS]
+
+    - Made DateTime::Tiny optional
+
+0.012     2015-11-03 06:31:33-05:00 America/New_York
+
+    [FIXED]
+
+    - Tests skip properly with MongoDB v1.x and no mongod running
+
+0.011     2015-08-14 13:16:59-04:00 America/New_York
+
+    [PREREQS]
+
+    - Bumped MooseX::Role::MongoDB prerequisite to 0.009 for
+      MongoDB driver v1.0.0 support
+
+0.010     2014-05-30 16:54:28-04:00 America/New_York
+
+    [FIXED]
+
+    - Work around MongoDB ensure_index bug for non-numeric index types
+
+0.009     2014-02-16 00:43:06-05:00 America/New_York
+
+    [FIXED]
+
+    - Retry failures should now properly throw errors
+
+0.008     2014-01-24 23:24:08-05:00 America/New_York
+
+    [FIXED]
+
+    - Fixed for changes in MooseX::Role::MongoDB 0.006
+
+0.007     2013-11-22 17:07:03 America/New_York
+
+    [ADDED]
+
+    - MongoDB operations will retry with exponential backoff if Meerkat
+      detects that the database connection has been lost
+
+0.006     2013-10-16 11:47:06 America/New_York
+
+    [FIXES]
+
+    - Added MooseX::Role::Logger as required by new MooseX::Role::MongoDB
+
+0.005     2013-10-14 15:12:25 America/New_York
+
+    [PREREQS]
+
+    - Bump MooseX::Role::MongoDB prerequisite to 0.002
+
+    - Move some test prereqs to develop prereqs
+
+0.004     2013-09-24 19:51:46 America/New_York
+
+    [FIXES]
+
+    - Fixes crash searching for non-existent documents
+
+0.003     2013-09-21 23:29:17 America/New_York
+
+    [INTERNAL]
+
+    - Extracted MongoDB object management to MooseX::Role::MongoDB
+
+0.002     2013-09-20 13:02:36 America/New_York
+
+    [INCOMPATIBLE CHANGES]
+
+    - The required 'namespace' parameter was renamed 'model_namespace'
+      for consistency with the new 'collection_namespace' parameter.
+
+    [NEW FEATURES]
+
+    - Allows specifying a 'collection_namespace' to use custom collection
+      classes that extend Meerkat::Collection
+
+    [INTERNAL]
+
+    - Replaced Class::Load with Module::Runtime; now also using
+      Module::Runtime for composing namespaces and class suffixes
+
+0.001     2013-09-19 19:40:32 America/New_York
+
+    - First release
+

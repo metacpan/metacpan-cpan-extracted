@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 20f4d5b648704115957946958df3ecebfb03f124 Build.PL
+SHA1 f8f01ee56437b3d1c5cc2d0ba13d5ec5130f81c5 Changes
+SHA1 e68565d5cbd1ba5d92de6a39a65b182bfb71b278 MANIFEST
+SHA1 4354c984beb4dc73f1bf81dbece30f48c620a43f META.json
+SHA1 60e945a2831699b714fa054a7d2c7acf521d1085 Makefile.PL
+SHA1 d4ea6878728a3442bdaaada52ffae28e465a2ef5 README
+SHA1 a377375f94d5ee94386ef07b1c9696ab04c9d867 lib/Medical/Growth.pm
+SHA1 13ec18b2da2e3be6100958be09606da8829fe017 lib/Medical/Growth/Base.pm
+SHA1 e1b2f3fdbe1a8503557aa33d137955dce733f2ab t/base.t
+SHA1 90349b2d13ee93bb9be60b9deb7c2ecce93f76f1 t/lib/Medical/Growth/Skip/Notme.pm
+SHA1 4fe578eb5ca0bcfe961f837a0d63af1385aeaa91 t/lib/Medical/Growth/TestFail.pm
+SHA1 b25d1e0255ef92d5aef6b4647d6cffc47ca2e774 t/lib/Medical/Growth/Testme.pm
+SHA1 2b0e6c60fb1b570cd96d454849299f08b7b849ca t/lib/testdata.txt
+SHA1 ca37d7b91c2299a98877a6f36d3fab51e8dd906f t/release-pod-coverage.t
+SHA1 e7fc4d8f3f29ee522cb53914648393524fc7a6d4 t/release-pod-syntax.t
+SHA1 8c2a7169a536d5449e929d8c828a8d3f833e414b t/systems.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJUVpjnAAoJEFXmkwhreRSJQ+IH/02P38GLfFtpp19COk4SjetI
+uvNPYZptj5HEyDnZ8cu2Gixfl1ARpDquO1TtdRiyZVAo5u5znaCbdXYGV84Ex2Pz
+pNboaBMoNlrfVFB94Xw+OTQ6CR8//DpSzi1nHUwdE4wttkthlUHxXFIIUCmBKQxm
+9hD4MEu7NI8Es8bPjALoRBHrvF+tVoccmUk2BFLcv7Hpo9tKmmxr5NBzR23Hpb7L
+4ndpE+2PEr+hiWm1n78zlz4sHJve3TS7il1nQVHU0wxeSSm4iOMZEtPpGtIcp6eC
+NO37FrFfqiaLO60HRXeJzRVCZOkxux8lYZwXVd4gvdIFSxK5XDoulsgUEbxW9xw=
+=NRBL
+-----END PGP SIGNATURE-----

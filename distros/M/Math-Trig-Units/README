@@ -1,0 +1,30 @@
+Math/Trig/Units version 0.02
+=============================
+
+INSTALLATION
+
+To install this module type the following at the shell prompt:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+On Windows use nmake instead of make
+
+DEPENDENCIES
+
+None
+
+DOCUMENTATION
+
+See the pod in the Units.pm or the HTML version in ./html
+
+COPYRIGHT AND LICENCE
+
+This package is free software and is provided "as is" without express or
+implied warranty. It may be used, redistributed and/or modified under the terms
+of the Perl Artistic License (see http://www.perl.com/perl/misc/Artistic.html)
+
+Copyright (C) 2001 Dr James Freeman
+

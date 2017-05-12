@@ -1,0 +1,21 @@
+[% USE element_maker = Class("HTML::Element") %]
+<div id="addnew">
+<form method="post" action="[% base %]/[% classmetadata.moniker %]/do_edit/">
+<fieldset>
+<legend>Add a new [%classmetadata.moniker%]</legend>
+    <input type="hidden" name="action" value="create"/>
+    <input type="hidden" name="class" value="[% classmetadata.name %]"/>
+        [% FOR col = classmetadata.columns;
+            NEXT IF col == "id";
+            SET element = classmetadata.cgi.$col;
+            %]
+	<label>
+                <span class="field">[% classmetadata.colnames.$col; %]</span>
+                [% element.as_XML; %]</label>
+		
+        [% END; %]
+	
+    <input type="submit" name="create" value="create"/>
+    </fieldset>
+</form>
+</div>

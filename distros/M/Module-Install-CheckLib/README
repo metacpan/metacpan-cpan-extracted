@@ -1,0 +1,69 @@
+NAME
+    Module::Install::CheckLib - A Module::Install extension to check that a
+    library is available
+
+SYNOPSIS
+      # In Makefile.PL
+
+      use inc::Module::Install;
+      checklibs lib => 'jpeg', header => 'jpeglib.h';
+
+    The Makefile.PL will exit unless library or header is found.
+
+DESCRIPTION
+    Module::Install::CheckLib is a Module::Install extension that integrates
+    Devel::CheckLib so that CPAN authors may stipulate which particular C
+    library and its headers they want available and to exit the
+    "Makefile.PL" gracefully if they aren't.
+
+    The author specifies which C libraries, etc, they want available.
+    Devel::CheckLib is copied to the "inc/" directory along with the
+    Module::Install files.
+
+    On the module user side, the bundled "inc/" Devel::CheckLib determines
+    whether the current environment is supported or not and will exit
+    accordingly.
+
+COMMANDS
+    This plugin adds the following Module::Install command:
+
+    "checklibs"
+        Requires a list of parameters. These are passed directly to
+        Devel::CheckLib "check_lib_or_exit" function. Please consult the
+        documentation for Devel::CheckLib for more details on what these
+        parameters are.
+
+        This is generally the function one should use in Makefile.PL, as it
+        exits gracefully and plays nice with CPAN Testers.
+
+    "assertlibs"
+        The same as "checklibs" but uses Devel::CheckLib "assert_lib"
+        instead. "assert_lib" dies instead of exiting gracefully. It is
+        provided for completeness, please use "checklibs".
+
+    By default, the module skips calls to Devel::CheckLibs subroutines when
+    called from the author side. The extra option "run_checks_as_author" can
+    be given to both "checklibs" and "assertlibs" to enable those checks
+    even in author mode.
+
+    Example:
+
+      checklibs lib => libfoo, run_checks_as_author => 1;
+
+AUTHOR
+    Chris "BinGOs" Williams
+
+    Based on use-devel-checklib by David Cantrell
+
+LICENSE
+    Copyright © Chris Williams and David Cantrell
+
+    This module may be used, modified, and distributed under the same terms
+    as Perl itself. Please see the license that came with your Perl
+    distribution for details.
+
+SEE ALSO
+    Module::Install
+
+    Devel::CheckLib
+

@@ -1,0 +1,24 @@
+Build.PL
+Changes
+lib/Mail/GnuPG.pm
+MANIFEST
+README
+t/00.signature.t
+t/05.load.t
+t/20.inline-verify.t
+t/25.multipart-verify.t
+t/30.inline-decrypt.t
+t/35.has-public-key.t
+t/99.pod.t
+t/agent.t
+t/base.t
+t/import_keys.pl
+t/msg/inline-encrypted-qp.eml
+t/msg/inline-signed-qp.eml
+t/msg/multipart-signed-qp.eml
+t/pubkeys.asc
+t/round-trip.t
+t/test-key.pgp
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Mail-Sender-Easy
+version:      v0.0.5
+version_from: Easy.pm
+installdirs:  site
+requires:
+    File::Spec:                    0
+    Mail::Sender:                  0
+    version:                       0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

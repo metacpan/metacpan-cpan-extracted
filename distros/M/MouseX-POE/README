@@ -1,0 +1,122 @@
+SYNOPSIS
+
+        package Counter;
+        use MouseX::POE;
+    
+        has count => (
+            isa     => 'Int',
+            is      => 'rw',
+            lazy    => 1,
+            default => sub { 0 },
+        );
+    
+        sub START {
+            my ($self) = @_;
+            $self->yield('increment');
+        }
+    
+        event increment => sub {
+            my ($self) = @_;
+            print "Count is now " . $self->count . "\n";
+            $self->count( $self->count + 1 );
+            $self->yield('increment') unless $self->count > 3;
+        };
+    
+        no MouseX::POE;
+    
+        Counter->new();
+        POE::Kernel->run();
+
+DESCRIPTION
+
+    MouseX::POE is a Mouse wrapper around a POE::Session.
+
+KEYWORDS
+
+    Create an event handler named $name.
+
+METHODS
+
+    Default POE-related methods are provided by
+    MouseX::POE::Meta::Trait::Object which is applied to your base class
+    (which is usually Mouse::Object) when you use this module. See that
+    module for the documentation for it. Below is a list of methods on that
+    class so you know what to look for:
+
+    Get the internal POE Session ID, this is useful to hand to other POE
+    aware functions.
+
+    A cheap alias for the same POE::Kernel function which will gurantee
+    posting to the object's session.
+
+SEE ALSO
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 36:
+
+      Unknown directive: =method
+
+    Around line 47:
+
+      Unknown directive: =method
+
+    Around line 52:
+
+      Unknown directive: =method
+
+    Around line 54:
+
+      Unknown directive: =method
+
+    Around line 56:
+
+      Unknown directive: =method
+
+    Around line 58:
+
+      Unknown directive: =method
+
+    Around line 60:
+
+      Unknown directive: =method
+
+    Around line 62:
+
+      Unknown directive: =method
+
+    Around line 64:
+
+      Unknown directive: =method
+
+    Around line 66:
+
+      Unknown directive: =method
+
+    Around line 68:
+
+      Unknown directive: =method
+
+    Around line 70:
+
+      Unknown directive: =method
+
+    Around line 72:
+
+      Unknown directive: =method
+
+    Around line 74:
+
+      Unknown directive: =method
+
+    Around line 78:
+
+      Unknown directive: =method
+
+    Around line 80:
+
+      Unknown directive: =method
+

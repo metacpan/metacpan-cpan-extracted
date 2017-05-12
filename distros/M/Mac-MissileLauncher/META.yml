@@ -1,0 +1,16 @@
+abstract: interface to toy USB missile launchers for Mac
+author: Kazuhiro Osawa <ko@yappo.ne.jp>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Mac-MissileLauncher
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Carp: 0
+  Inline::C: 0
+version: 0.01

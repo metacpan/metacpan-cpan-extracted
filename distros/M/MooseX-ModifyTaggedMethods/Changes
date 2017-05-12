@@ -1,0 +1,31 @@
+MooseX-ModifyTaggedMethods
+==========================
+
+Created:      2012-10-19
+Home page:    <https://metacpan.org/release/MooseX-ModifyTaggedMethods>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-ModifyTaggedMethods>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.004	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.003	2013-05-28
+
+ - General tidy-up.
+ - Updated: Use match::simple instead of smartmatch.
+
+0.002	2013-05-13
+
+ [ Documentation ]
+ - Explain relationship with Sub::Talisman.
+
+ [ Packaging ]
+ - No longer support Perl 5.10.0.
+
+ [ Other ]
+ - Added: Add test case for 'after' modifier.
+ - Removed: Stop using Test::NoWarnings.
+
+0.001	2012-10-19	Initial release

@@ -1,0 +1,25 @@
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:    <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf:   <http://xmlns.com/foaf/0.1/> .
+@prefix bio:    <http://purl.org/vocab/bio/0.1/> .
+@prefix schema: <http://schema.org/> .
+
+<alice>
+	a foaf:Person ;
+	foaf:name "Alice" ;
+    foaf:knows _:b1 ;
+	bio:olb "My name is Alice" .
+
+_:b1
+    a foaf:Person ;
+    foaf:name "Bob" .
+
+<alice-inline>
+    a foaf:person ;
+    foaf:name "Alice Inline" ;
+    foaf:knows [
+        a foaf:person ;
+        foaf:name "Bob Inline" 
+    ] .

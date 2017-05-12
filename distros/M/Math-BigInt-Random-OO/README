@@ -1,0 +1,34 @@
+Math-BigInt-Random-OO version 0.03
+==================================
+
+A module for generating uniformly distributed Math::BigInt objects.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no modules that are not a part of the standard Perl
+distribution.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Math::BigInt::Random::OO
+
+COPYRIGHT AND LICENCE
+
+Copyright 2010 by Peter John Acklam <pjacklam@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+

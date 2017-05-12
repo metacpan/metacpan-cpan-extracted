@@ -1,0 +1,66 @@
+SYNOPSIS
+
+            use Moose;
+            use Class::Load 0.20 'load_class';
+            use MooseX::Types::LogAny qw( LogAny );
+    
+            has log => (
+                    isa     => LogAny,
+                    is      => 'ro',
+                    lazy    => 1,
+                    default => sub { load_class('Log::Any')->get_logger },
+            );
+
+DESCRIPTION
+
+    This module is no longer recommended, the reason for its existence has
+    been resolved in recent versions of Log::Any see it's documentation for
+    how to use Log::Any with Moose.
+
+    The motivation behind this modules is that Log::Any::Adapter::Null does
+    not inherit from Log::Any::Adapter::Base which all of the other
+    adapters do. Moose will not allow a type union of undefined types
+    unless they are Moose classes. This module allows you to simply use the
+    LogAny type which has done the union for you.
+
+    Type union of LogAnyNull and LogAnyBase
+
+    Class Log::Any::Adapter::Null
+
+    Class Log::Any::Adapter::Base
+
+    Class Log::Any::Proxy
+
+SEE ALSO
+
+    MooseX::Types
+
+    Log::Any
+
+    Log::Any::Adapter
+
+ACKNOWLEDGMENTS
+
+    Development sponsored by HostGator.com <http://hostgator.com>
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 26:
+
+      Unknown directive: =sub
+
+    Around line 30:
+
+      Unknown directive: =sub
+
+    Around line 34:
+
+      Unknown directive: =sub
+
+    Around line 38:
+
+      Unknown directive: =sub
+

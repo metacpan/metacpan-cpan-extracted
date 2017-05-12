@@ -1,0 +1,32 @@
+
+=head1 NAME
+
+number_four
+
+=head1 DESCRIPTION
+
+this is table four
+
+=head1 FIELDS
+
+ x (integer) - this is the x coordinate
+ y (integer) - this is the y coordinate
+ z (integer) - 
+ t (integer) - this is time!
+
+
+=head1 SCHEMA
+
+                       Table "doo.number_four"
+  Column |  Type   | Modifiers | Storage |       Description        
+ --------+---------+-----------+---------+--------------------------
+  x      | integer |           | plain   | this is the x coordinate
+  y      | integer |           | plain   | this is the y coordinate
+  z      | integer |           | plain   | 
+  t      | integer |           | plain   | this is time!
+ Has OIDs: no
+ 
+
+=cut
+
+

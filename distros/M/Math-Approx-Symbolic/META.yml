@@ -1,0 +1,11 @@
+--- #YAML:1.0
+name: Math-Approx-Symbolic
+version: 0.100
+abstract: Symbolic representation of interpolated polynomials
+license: perl
+distribution_type: module
+requires:
+  Test::More: 0
+  Math::Approx: 0.200
+  Math::Symbolic: 0.123
+dynamic_config: 0

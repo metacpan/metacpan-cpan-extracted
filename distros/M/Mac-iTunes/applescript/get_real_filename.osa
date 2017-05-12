@@ -1,0 +1,6 @@
+tell application "iTunes"
+	set myList to "Mac-iTunes test"
+	set view of front window to user playlist myList
+	set thisTrack to track 1 of user playlist myList
+	return name of (get info for (location of thisTrack as alias))
+end tell

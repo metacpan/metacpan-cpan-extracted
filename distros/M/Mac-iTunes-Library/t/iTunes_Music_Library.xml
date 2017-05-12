@@ -1,0 +1,632 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+This test library contains 18 tracks and two playlists.  One of the playlists
+is a smart playlist, the other is normal, both contain all 18 tracks.  The smart
+playlist data is a farce.  The total size of the library is 85.93 MB, the total
+time is 70m9s.
+
+	-->
+<plist version="1.0">
+<dict>
+	<key>Major Version</key><integer>1</integer>
+	<key>Minor Version</key><integer>1</integer>
+	<key>Application Version</key><string>7.4.2</string>
+	<key>Features</key><integer>1</integer>
+	<key>Show Content Ratings</key><true/>
+	<key>Music Folder</key><string>file://localhost/Users/dinomite/Music/iTunes/iTunes%20Music/</string>
+	<key>Library Persistent ID</key><string>E68DAC8D289AF116</string>
+	<key>Tracks</key>
+	<dict>
+		<key>1785</key>
+		<dict>
+			<key>Track ID</key><integer>1785</integer>
+			<key>Name</key><string>Push the Limits</string>
+			<key>Artist</key><string>ATB</string>
+			<key>Genre</key><string>Trance</string>
+			<key>Kind</key><string>MPEG audio file</string>
+			<key>Size</key><integer>6674914</integer>
+			<key>Total Time</key><integer>456489</integer>
+			<key>Year</key><integer>2000</integer>
+			<key>Date Modified</key><date>2005-07-11T22:00:25Z</date>
+			<key>Date Added</key><date>2004-11-18T15:00:41Z</date>
+			<key>Bit Rate</key><integer>116</integer>
+			<key>Sample Rate</key><integer>44100</integer>
+			<key>Play Count</key><integer>5</integer>
+			<key>Play Date</key><integer>3271231422</integer>
+			<key>Play Date UTC</key><date>2007-08-29T15:23:42Z</date>
+            <key>Skip Count</key><integer>1024</integer>
+            <key>Skip Date</key><date>2008-01-02T02:32:48Z</date>
+			<key>Rating</key><integer>60</integer>
+            <key>Album Rating</key><integer>60</integer>
+            <key>Album Rating Computed</key><true/>
+            <key>Compilation</key><true/>
+			<key>Persistent ID</key><string>DAC2FC501CCA2031</string>
+			<key>Track Type</key><string>File</string>
+			<key>Location</key><string>file://localhost/Users/dinomite/Music/iTunes/iTunes%20Music/ATB/Unknown%20Album/Push%20the%20Limits.mp3</string>
+			<key>File Folder Count</key><integer>4</integer>
+			<key>Library Folder Count</key><integer>1</integer>
+		</dict>
+		<key>1786</key>
+		<dict>
+			<key>Track ID</key><integer>1786</integer>
+			<key>Name</key><string>Endangered Species</string>
+			<key>Artist</key><string>Deep Forest</string>
+			<key>Album</key><string>Music Detected</string>
+			<key>Genre</key><string>New Age</string>
+			<key>Kind</key><string>MPEG audio file</string>
+			<key>Size</key><integer>9579737</integer>
+			<key>Total Time</key><integer>376868</integer>
+			<key>Year</key><integer>2002</integer>
+			<key>Date Modified</key><date>2005-02-21T12:40:15Z</date>
+			<key>Date Added</key><date>2004-11-18T15:00:41Z</date>
+			<key>Bit Rate</key><integer>203</integer>
+			<key>Sample Rate</key><integer>44100</integer>
+			<key>Play Count</key><integer>15</integer>
+			<key>Play Date</key><integer>3264536094</integer>
+			<key>Play Date UTC</key><date>2007-06-13T03:34:54Z</date>
+			<key>Rating</key><integer>80</integer>
+			<key>Persistent ID</key><string>DAC2FC501CCA2032</string>
+			<key>Track Type</key><string>File</string>
+			<key>Location</key><string>file://localhost/Users/dinomite/Music/iTunes/iTunes%20Music/Deep%20Forest/Music%20Detected/Endangered%20Species.mp3</string>
+			<key>File Folder Count</key><integer>4</integer>
+			<key>Library Folder Count</key><integer>1</integer>
+		</dict>
+		<key>1787</key>
+		<dict>
+			<key>Track ID</key><integer>1787</integer>
+			<key>Name</key><string>Future Sound Of London - Speed Deep</string>
+			<key>Artist</key><string>Deep Forest</string>
+			<key>Genre</key><string>New Age</string>
+			<key>Kind</key><string>MPEG audio file</string>
+			<key>Size</key><integer>7035008</integer>
+			<key>Total Time</key><integer>439562</integer>
+			<key>Date Modified</key><date>2005-11-14T16:18:19Z</date>
+			<key>Date Added</key><date>2004-11-18T15:00:41Z</date>
+			<key>Bit Rate</key><integer>128</integer>
+			<key>Sample Rate</key><integer>44100</integer>
+			<key>Play Count</key><integer>3</integer>
+			<key>Play Date</key><integer>3230813084</integer>
+			<key>Play Date UTC</key><date>2006-05-18T20:04:44Z</date>
+			<key>Skip Count</key><integer>1</integer>
+			<key>Skip Date</key><date>2007-10-07T18:30:42Z</date>
+			<key>Rating</key><integer>60</integer>
+			<key>Persistent ID</key><string>DAC2FC501CCA2033</string>
+			<key>Track Type</key><string>File</string>
+			<key>Location</key><string>file://localhost/Users/dinomite/Music/iTunes/iTunes%20Music/Deep%20Forest/Unknown%20Album/Future%20Sound%20Of%20London%20-%20Speed%20Deep.mp3</string>
+			<key>File Folder Count</key><integer>4</integer>
+			<key>Library Folder Count</key><integer>1</integer>
+		</dict>
+		<key>1788</key>
+		<dict>
+			<key>Track ID</key><integer>1788</integer>
+			<key>Name</key><string>Sweet Lullaby</string>
+			<key>Artist</key><string>Deep Forest</string>
+			<key>Album</key><string>Pure Moods</string>
+			<key>Genre</key><string>New Age</string>
+			<key>Kind</key><string>MPEG audio file</string>
+			<key>Size</key><integer>3688448</integer>
+			<key>Total Time</key><integer>230426</integer>
+			<key>Track Number</key><integer>3</integer>
+			<key>Year</key><integer>1996</integer>
+			<key>Date Modified</key><date>2005-02-21T12:40:15Z</date>
+			<key>Date Added</key><date>2004-11-18T15:00:41Z</date>
+			<key>Bit Rate</key><integer>128</integer>
+			<key>Sample Rate</key><integer>44100</integer>
+			<key>Play Count</key><integer>16</integer>
+			<key>Play Date</key><integer>3264536324</integer>
+			<key>Play Date UTC</key><date>2007-06-13T03:38:44Z</date>
+			<key>Skip Count</key><integer>4</integer>
+			<key>Skip Date</key><date>2007-07-24T22:02:01Z</date>
+			<key>Rating</key><integer>80</integer>
+			<key>Persistent ID</key><string>DAC2FC501CCA2034</string>
+			<key>Track Type</key><string>File</string>
+			<key>Location</key><string>file://localhost/Users/dinomite/Music/iTunes/iTunes%20Music/Deep%20Forest/Pure%20Moods/03%20Sweet%20Lullaby.mp3</string>
+			<key>File Folder Count</key><integer>4</integer>
+			<key>Library Folder Count</key><integer>1</integer>
+		</dict>
+		<key>1789</key>
+		<dict>
+			<key>Track ID</key><integer>1789</integer>
+			<key>Name</key><string>The Sound Of Africa</string>
+			<key>Artist</key><string>Deep Forest</string>
+			<key>Genre</key><string>New Age</string>
+			<key>Kind</key><string>MPEG audio file</string>
+			<key>Size</key><integer>3569983</integer>
+			<key>Total Time</key><integer>223111</integer>
+			<key>Date Modified</key><date>2005-02-21T12:40:16Z</date>
+			<key>Date Added</key><date>2004-11-18T15:00:41Z</date>
+			<key>Bit Rate</key><integer>128</integer>
+			<key>Sample Rate</key><integer>44100</integer>
+			<key>Play Count</key><integer>17</integer>
+			<key>Play Date</key><integer>3269672620</integer>
+			<key>Play Date UTC</key><date>2007-08-11T14:23:40Z</date>
+			<key>Skip Count</key><integer>1</integer>
+			<key>Skip Date</key><date>2007-10-04T16:22:14Z</date>
+			<key>Rating</key><integer>80</integer>
+			<key>Sort Name</key><string>Sound Of Africa</string>
+			<key>Persistent ID</key><string>DAC2FC501CCA2035</string>
+			<key>Track Type</key><string>File</string>
+			<key>Location</key><string>file://localhost/Users/dinomite/Music/iTunes/iTunes%20Music/Deep%20Forest/Unknown%20Album/The%20Sound%20Of%20Africa.mp3</string>
+			<key>File Folder Count</key><integer>4</integer>
+			<key>Library Folder Count</key><integer>1</integer>
+		</dict>
+		<key>1790</key>
+		<dict>
+			<key>Track ID</key><integer>1790</integer>
+			<key>Name</key><string>Freedom Cry</string>
+			<key>Artist</key><string>Deep Forest</string>
+			<key>Album</key><string>Boheme</string>
+			<key>Genre</key><string>New Age</string>
+			<key>Kind</key><string>MPEG audio file</string>
+			<key>Size</key><integer>3201107</integer>
+			<key>Total Time</key><integer>200045</integer>
+			<key>Track Number</key><integer>8</integer>
+			<key>Track Count</key><integer>18</integer>
+			<key>Date Modified</key><date>2005-02-21T12:40:15Z</date>
+			<key>Date Added</key><date>2004-11-18T15:00:41Z</date>
+			<key>Bit Rate</key><integer>128</integer>
+			<key>Sample Rate</key><integer>44100</integer>
+			<key>Play Count</key><integer>8</integer>
+			<key>Play Date</key><integer>3261576456</integer>
+			<key>Play Date UTC</key><date>2007-05-09T21:27:36Z</date>
+			<key>Skip Count</key><integer>1</integer>
+			<key>Skip Date</key><date>2007-06-11T22:37:13Z</date>
+			<key>Rating</key><integer>80</integer>
+			<key>Persistent ID</key><string>DAC2FC501CCA2036</string>
+			<key>Track Type</key><string>File</string>
+			<key>Location</key><string>file://localhost/Users/dinomite/Music/iTunes/iTunes%20Music/Deep%20Forest/Boheme/08%20Freedom%20Cry.mp3</string>
+			<key>File Folder Count</key><integer>4</integer>
+			<key>Library Folder Count</key><integer>1</integer>
+		</dict>
+		<key>1791</key>
+		<dict>
+			<key>Track ID</key><integer>1791</integer>
+			<key>Name</key><string>The First Twilight</string>
+			<key>Artist</key><string>Deep Forest</string>
+			<key>Genre</key><string>New Age</string>
+			<key>Kind</key><string>MPEG audio file</string>
+			<key>Size</key><integer>2512572</integer>
+			<key>Total Time</key><integer>198243</integer>
+			<key>Date Modified</key><date>2005-02-21T12:40:16Z</date>
+			<key>Date Added</key><date>2004-11-18T15:00:41Z</date>
+			<key>Bit Rate</key><integer>101</integer>
+			<key>Sample Rate</key><integer>44100</integer>
+			<key>Play Count</key><integer>5</integer>
+			<key>Play Date</key><integer>3217863443</integer>
+			<key>Play Date UTC</key><date>2005-12-19T22:57:23Z</date>
+			<key>Rating</key><integer>60</integer>
+			<key>Sort Name</key><string>First Twilight</string>
+			<key>Persistent ID</key><string>DAC2FC501CCA2037</string>
+			<key>Track Type</key><string>File</string>
+			<key>Location</key><string>file://localhost/Users/dinomite/Music/iTunes/iTunes%20Music/Deep%20Forest/Unknown%20Album/The%20First%20Twilight.mp3</string>
+			<key>File Folder Count</key><integer>4</integer>
+			<key>Library Folder Count</key><integer>1</integer>
+		</dict>
+		<key>1792</key>
+		<dict>
+			<key>Track ID</key><integer>1792</integer>
+			<key>Name</key><string>Myth feat. Enigma</string>
+			<key>Artist</key><string>Deep Forest</string>
+			<key>Album</key><string>Myth (Chorus Of Tribes)</string>
+			<key>Genre</key><string>New Age</string>
+			<key>Kind</key><string>MPEG audio file</string>
+			<key>Size</key><integer>2080389</integer>
+			<key>Total Time</key><integer>173322</integer>
+			<key>Track Number</key><integer>10</integer>
+			<key>Date Modified</key><date>2005-07-11T22:00:25Z</date>
+			<key>Date Added</key><date>2004-11-18T15:00:41Z</date>
+			<key>Bit Rate</key><integer>96</integer>
+			<key>Sample Rate</key><integer>44100</integer>
+			<key>Play Count</key><integer>4</integer>
+			<key>Play Date</key><integer>3236837932</integer>
+			<key>Play Date UTC</key><date>2006-07-27T13:38:52Z</date>
+			<key>Skip Count</key><integer>1</integer>
+			<key>Skip Date</key><date>2007-06-11T22:26:14Z</date>
+			<key>Rating</key><integer>60</integer>
+			<key>Persistent ID</key><string>DAC2FC501CCA2038</string>
+			<key>Track Type</key><string>File</string>
+			<key>Location</key><string>file://localhost/Users/dinomite/Music/iTunes/iTunes%20Music/Deep%20Forest/Myth%20(Chorus%20Of%20Tribes)/10%20Myth%20feat.%20Enigma.mp3</string>
+			<key>File Folder Count</key><integer>4</integer>
+			<key>Library Folder Count</key><integer>1</integer>
+		</dict>
+		<key>1793</key>
+		<dict>
+			<key>Track ID</key><integer>1793</integer>
+			<key>Name</key><string>American Hearts</string>
+			<key>Artist</key><string>Piebald</string>
+			<key>Album</key><string>We Are The Only Friends We Hav</string>
+			<key>Genre</key><string>Rock</string>
+			<key>Kind</key><string>MPEG audio file</string>
+			<key>Size</key><integer>4608754</integer>
+			<key>Total Time</key><integer>191947</integer>
+			<key>Track Number</key><integer>3</integer>
+			<key>Year</key><integer>2002</integer>
+			<key>Date Modified</key><date>2005-10-23T09:16:43Z</date>
+			<key>Date Added</key><date>2004-11-18T15:00:41Z</date>
+			<key>Bit Rate</key><integer>192</integer>
+			<key>Sample Rate</key><integer>44100</integer>
+			<key>Play Count</key><integer>5</integer>
+			<key>Play Date</key><integer>3252674508</integer>
+			<key>Play Date UTC</key><date>2007-01-26T20:41:48Z</date>
+			<key>Rating</key><integer>60</integer>
+			<key>Persistent ID</key><string>DAC2FC501CCA203A</string>
+			<key>Track Type</key><string>File</string>
+			<key>Location</key><string>file://localhost/Users/dinomite/Music/iTunes/iTunes%20Music/Piebald/We%20Are%20The%20Only%20Friends%20We%20Hav/03%20American%20Hearts.mp3</string>
+			<key>File Folder Count</key><integer>4</integer>
+			<key>Library Folder Count</key><integer>1</integer>
+		</dict>
+		<key>1794</key>
+		<dict>
+			<key>Track ID</key><integer>1794</integer>
+			<key>Name</key><string>The Monkey Versus the Robot</string>
+			<key>Artist</key><string>Piebald</string>
+			<key>Album</key><string>We Are The Only Friends We Hav</string>
+			<key>Genre</key><string>Rock</string>
+			<key>Kind</key><string>MPEG audio file</string>
+			<key>Size</key><integer>4457034</integer>
+			<key>Total Time</key><integer>185626</integer>
+			<key>Track Number</key><integer>6</integer>
+			<key>Year</key><integer>2002</integer>
+			<key>Date Modified</key><date>2005-10-23T09:16:59Z</date>
+			<key>Date Added</key><date>2004-11-18T15:00:41Z</date>
+			<key>Bit Rate</key><integer>192</integer>
+			<key>Sample Rate</key><integer>44100</integer>
+			<key>Play Count</key><integer>13</integer>
+			<key>Play Date</key><integer>3260956109</integer>
+			<key>Play Date UTC</key><date>2007-05-02T17:08:29Z</date>
+			<key>Rating</key><integer>80</integer>
+			<key>Sort Name</key><string>Monkey Versus the Robot</string>
+			<key>Persistent ID</key><string>DAC2FC501CCA203B</string>
+			<key>Track Type</key><string>File</string>
+			<key>Location</key><string>file://localhost/Users/dinomite/Music/iTunes/iTunes%20Music/Piebald/We%20Are%20The%20Only%20Friends%20We%20Hav/06%20The%20Monkey%20Versus%20the%20Robot.mp3</string>
+			<key>File Folder Count</key><integer>4</integer>
+			<key>Library Folder Count</key><integer>1</integer>
+		</dict>
+		<key>1795</key>
+		<dict>
+			<key>Track ID</key><integer>1795</integer>
+			<key>Name</key><string>Come on Eileen</string>
+			<key>Artist</key><string>Save Ferris</string>
+			<key>Album</key><string>It Means Everything</string>
+			<key>Genre</key><string>Ska</string>
+			<key>Kind</key><string>MPEG audio file</string>
+			<key>Size</key><integer>3977409</integer>
+			<key>Total Time</key><integer>248450</integer>
+			<key>Track Number</key><integer>4</integer>
+			<key>Date Modified</key><date>2005-10-23T10:09:08Z</date>
+			<key>Date Added</key><date>2004-11-18T15:00:41Z</date>
+			<key>Bit Rate</key><integer>128</integer>
+			<key>Sample Rate</key><integer>44100</integer>
+			<key>Play Count</key><integer>14</integer>
+			<key>Play Date</key><integer>3266034748</integer>
+			<key>Play Date UTC</key><date>2007-06-30T11:52:28Z</date>
+			<key>Rating</key><integer>60</integer>
+			<key>Persistent ID</key><string>DAC2FC501CCA203C</string>
+			<key>Track Type</key><string>File</string>
+			<key>Location</key><string>file://localhost/Users/dinomite/Music/iTunes/iTunes%20Music/Save%20Ferris/It%20Means%20Everything/04%20Come%20on%20Eileen.mp3</string>
+			<key>File Folder Count</key><integer>4</integer>
+			<key>Library Folder Count</key><integer>1</integer>
+		</dict>
+		<key>1796</key>
+		<dict>
+			<key>Track ID</key><integer>1796</integer>
+			<key>Name</key><string>Spam</string>
+			<key>Artist</key><string>Save Ferris</string>
+			<key>Album</key><string>It Means Everything</string>
+			<key>Genre</key><string>Ska</string>
+			<key>Kind</key><string>MPEG audio file</string>
+			<key>Size</key><integer>5954041</integer>
+			<key>Total Time</key><integer>148819</integer>
+			<key>Track Number</key><integer>9</integer>
+			<key>Date Modified</key><date>2005-10-23T10:10:25Z</date>
+			<key>Date Added</key><date>2004-11-18T15:00:41Z</date>
+			<key>Bit Rate</key><integer>320</integer>
+			<key>Sample Rate</key><integer>44100</integer>
+			<key>Play Count</key><integer>17</integer>
+			<key>Play Date</key><integer>3273587054</integer>
+			<key>Play Date UTC</key><date>2007-09-25T21:44:14Z</date>
+			<key>Rating</key><integer>60</integer>
+			<key>Persistent ID</key><string>DAC2FC501CCA203E</string>
+			<key>Track Type</key><string>File</string>
+			<key>Location</key><string>file://localhost/Users/dinomite/Music/iTunes/iTunes%20Music/Save%20Ferris/It%20Means%20Everything/09%20Spam.mp3</string>
+			<key>File Folder Count</key><integer>4</integer>
+			<key>Library Folder Count</key><integer>1</integer>
+		</dict>
+		<key>1797</key>
+		<dict>
+			<key>Track ID</key><integer>1797</integer>
+			<key>Name</key><string>Everything I Want To Be</string>
+			<key>Artist</key><string>Save Ferris</string>
+			<key>Album</key><string>It Means Everything</string>
+			<key>Genre</key><string>Ska</string>
+			<key>Kind</key><string>MPEG audio file</string>
+			<key>Size</key><integer>9186739</integer>
+			<key>Total Time</key><integer>229616</integer>
+			<key>Track Number</key><integer>11</integer>
+			<key>Date Modified</key><date>2005-10-19T03:29:41Z</date>
+			<key>Date Added</key><date>2004-11-18T15:00:41Z</date>
+			<key>Bit Rate</key><integer>320</integer>
+			<key>Sample Rate</key><integer>44100</integer>
+			<key>Play Count</key><integer>5</integer>
+			<key>Play Date</key><integer>3265358380</integer>
+			<key>Play Date UTC</key><date>2007-06-22T15:59:40Z</date>
+			<key>Rating</key><integer>60</integer>
+			<key>Persistent ID</key><string>DAC2FC501CCA203F</string>
+			<key>Track Type</key><string>File</string>
+			<key>Location</key><string>file://localhost/Users/dinomite/Music/iTunes/iTunes%20Music/Save%20Ferris/It%20Means%20Everything/11%20Everything%20I%20Want%20To%20Be.mp3</string>
+			<key>File Folder Count</key><integer>4</integer>
+			<key>Library Folder Count</key><integer>1</integer>
+		</dict>
+		<key>1798</key>
+		<dict>
+			<key>Track ID</key><integer>1798</integer>
+			<key>Name</key><string>Nobody But Me</string>
+			<key>Artist</key><string>Save Ferris</string>
+			<key>Album</key><string>It Means Everything</string>
+			<key>Genre</key><string>Ska</string>
+			<key>Kind</key><string>MPEG audio file</string>
+			<key>Size</key><integer>7502180</integer>
+			<key>Total Time</key><integer>187506</integer>
+			<key>Track Number</key><integer>2</integer>
+			<key>Date Modified</key><date>2005-10-21T19:13:11Z</date>
+			<key>Date Added</key><date>2004-11-18T15:00:41Z</date>
+			<key>Bit Rate</key><integer>320</integer>
+			<key>Sample Rate</key><integer>44100</integer>
+			<key>Play Count</key><integer>15</integer>
+			<key>Play Date</key><integer>3274874611</integer>
+			<key>Play Date UTC</key><date>2007-10-10T19:23:31Z</date>
+			<key>Rating</key><integer>60</integer>
+			<key>Persistent ID</key><string>DAC2FC501CCA2040</string>
+			<key>Track Type</key><string>File</string>
+			<key>Location</key><string>file://localhost/Users/dinomite/Music/iTunes/iTunes%20Music/Save%20Ferris/It%20Means%20Everything/02%20Nobody%20But%20Me.mp3</string>
+			<key>File Folder Count</key><integer>4</integer>
+			<key>Library Folder Count</key><integer>1</integer>
+		</dict>
+		<key>1799</key>
+		<dict>
+			<key>Track ID</key><integer>1799</integer>
+			<key>Name</key><string>The World Is New</string>
+			<key>Artist</key><string>Save Ferris</string>
+			<key>Album</key><string>It Means Everything</string>
+			<key>Genre</key><string>Ska</string>
+			<key>Kind</key><string>MPEG audio file</string>
+			<key>Size</key><integer>2106122</integer>
+			<key>Total Time</key><integer>131552</integer>
+			<key>Track Number</key><integer>1</integer>
+			<key>Date Modified</key><date>2005-10-21T21:22:28Z</date>
+			<key>Date Added</key><date>2004-11-18T15:00:42Z</date>
+			<key>Bit Rate</key><integer>128</integer>
+			<key>Sample Rate</key><integer>44100</integer>
+			<key>Play Count</key><integer>42</integer>
+			<key>Play Date</key><integer>3274983983</integer>
+			<key>Play Date UTC</key><date>2007-10-12T01:46:23Z</date>
+			<key>Skip Count</key><integer>4</integer>
+			<key>Skip Date</key><date>2006-10-12T15:52:31Z</date>
+			<key>Rating</key><integer>80</integer>
+			<key>Sort Name</key><string>World Is New</string>
+			<key>Persistent ID</key><string>DAC2FC501CCA2041</string>
+			<key>Track Type</key><string>File</string>
+			<key>Location</key><string>file://localhost/Users/dinomite/Music/iTunes/iTunes%20Music/Save%20Ferris/It%20Means%20Everything/01%20The%20World%20Is%20New.mp3</string>
+			<key>File Folder Count</key><integer>4</integer>
+			<key>Library Folder Count</key><integer>1</integer>
+		</dict>
+		<key>1800</key>
+		<dict>
+			<key>Track ID</key><integer>1800</integer>
+			<key>Name</key><string>Superspy</string>
+			<key>Artist</key><string>Save Ferris</string>
+			<key>Album</key><string>It Means Everything</string>
+			<key>Genre</key><string>Ska</string>
+			<key>Kind</key><string>MPEG audio file</string>
+			<key>Size</key><integer>2805245</integer>
+			<key>Total Time</key><integer>175229</integer>
+			<key>Track Number</key><integer>3</integer>
+			<key>Date Modified</key><date>2005-10-19T03:28:09Z</date>
+			<key>Date Added</key><date>2004-11-18T15:00:42Z</date>
+			<key>Bit Rate</key><integer>128</integer>
+			<key>Sample Rate</key><integer>44100</integer>
+			<key>Play Count</key><integer>27</integer>
+			<key>Play Date</key><integer>3275322487</integer>
+			<key>Play Date UTC</key><date>2007-10-15T23:48:07Z</date>
+			<key>Skip Count</key><integer>1</integer>
+			<key>Skip Date</key><date>2007-05-23T22:32:39Z</date>
+			<key>Rating</key><integer>80</integer>
+			<key>Persistent ID</key><string>DAC2FC501CCA2042</string>
+			<key>Track Type</key><string>File</string>
+			<key>Location</key><string>file://localhost/Users/dinomite/Music/iTunes/iTunes%20Music/Save%20Ferris/It%20Means%20Everything/03%20Superspy.mp3</string>
+			<key>File Folder Count</key><integer>4</integer>
+			<key>Library Folder Count</key><integer>1</integer>
+		</dict>
+		<key>1801</key>
+		<dict>
+			<key>Track ID</key><integer>1801</integer>
+			<key>Name</key><string>Goodbye</string>
+			<key>Artist</key><string>Save Ferris</string>
+			<key>Album</key><string>It Means Everything</string>
+			<key>Genre</key><string>Ska</string>
+			<key>Kind</key><string>MPEG audio file</string>
+			<key>Size</key><integer>3562670</integer>
+			<key>Total Time</key><integer>222563</integer>
+			<key>Track Number</key><integer>5</integer>
+			<key>Date Modified</key><date>2005-10-19T03:28:19Z</date>
+			<key>Date Added</key><date>2004-11-18T15:00:42Z</date>
+			<key>Bit Rate</key><integer>128</integer>
+			<key>Sample Rate</key><integer>44100</integer>
+			<key>Play Count</key><integer>4</integer>
+			<key>Play Date</key><integer>3273389991</integer>
+			<key>Play Date UTC</key><date>2007-09-23T14:59:51Z</date>
+			<key>Skip Count</key><integer>1</integer>
+			<key>Skip Date</key><date>2007-03-03T20:30:14Z</date>
+			<key>Rating</key><integer>60</integer>
+			<key>Persistent ID</key><string>DAC2FC501CCA2043</string>
+			<key>Track Type</key><string>File</string>
+			<key>Location</key><string>file://localhost/Users/dinomite/Music/iTunes/iTunes%20Music/Save%20Ferris/It%20Means%20Everything/05%20Goodbye.mp3</string>
+			<key>File Folder Count</key><integer>4</integer>
+			<key>Library Folder Count</key><integer>1</integer>
+		</dict>
+		<key>1802</key>
+		<dict>
+			<key>Track ID</key><integer>1802</integer>
+			<key>Name</key><string>Sorry My Friend</string>
+			<key>Artist</key><string>Save Ferris</string>
+			<key>Album</key><string>It Means Everything</string>
+			<key>Genre</key><string>Ska</string>
+			<key>Kind</key><string>MPEG audio file</string>
+			<key>Size</key><integer>7600803</integer>
+			<key>Total Time</key><integer>189988</integer>
+			<key>Track Number</key><integer>6</integer>
+			<key>Date Modified</key><date>2005-10-23T10:09:39Z</date>
+			<key>Date Added</key><date>2004-11-18T15:00:42Z</date>
+			<key>Bit Rate</key><integer>320</integer>
+			<key>Sample Rate</key><integer>44100</integer>
+			<key>Play Count</key><integer>14</integer>
+			<key>Play Date</key><integer>3265081896</integer>
+			<key>Play Date UTC</key><date>2007-06-19T11:11:36Z</date>
+			<key>Rating</key><integer>60</integer>
+			<key>Persistent ID</key><string>DAC2FC501CCA2044</string>
+			<key>Track Type</key><string>File</string>
+			<key>Location</key><string>file://localhost/Users/dinomite/Music/iTunes/iTunes%20Music/Save%20Ferris/It%20Means%20Everything/06%20Sorry%20My%20Friend.mp3</string>
+			<key>File Folder Count</key><integer>4</integer>
+			<key>Library Folder Count</key><integer>1</integer>
+		</dict>
+	</dict>
+	<key>Playlists</key>
+	<array>
+		<dict>
+			<key>Name</key><string>5 Stars</string>
+			<key>Playlist ID</key><integer>10073</integer>
+			<key>Playlist Persistent ID</key><string>2E2D1396AF1DED73</string>
+			<key>All Items</key><true/>
+			<key>Smart Info</key>
+			<data>
+			AQEAAwAAAAIAAAAZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+			AAAAAA==
+			</data>
+			<key>Smart Criteria</key>
+			<data>
+			U0xzdAABAAEAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABkAAAABAAAAAAAAAAAAAAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABEAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAAB
+			AAAAAAAAAGQAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+			</data>
+			<key>Playlist Items</key>
+			<array>
+				<dict>
+					<key>Track ID</key><integer>1785</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1786</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1787</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1788</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1789</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1791</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1792</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1793</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1794</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1795</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1796</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1797</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1798</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1799</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1800</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1801</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1802</integer>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>Name</key><string>A-ardvark</string>
+			<key>Playlist ID</key><integer>10737</integer>
+			<key>Playlist Persistent ID</key><string>782DB9FAF7FC8842</string>
+			<key>All Items</key><true/>
+			<key>Playlist Items</key>
+			<array>
+				<dict>
+					<key>Track ID</key><integer>1785</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1786</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1787</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1788</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1789</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1791</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1792</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1793</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1794</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1795</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1796</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1797</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1798</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1799</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1800</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1801</integer>
+				</dict>
+				<dict>
+					<key>Track ID</key><integer>1802</integer>
+				</dict>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

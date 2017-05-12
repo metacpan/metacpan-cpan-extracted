@@ -1,0 +1,35 @@
+---
+abstract: 'A Module::Install extension that checks to see if an optional dependency is satisfied'
+author:
+  - 'David Coppit <david@coppit.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  IO::CaptureOutput: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+  URI::Escape: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: gpl2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Module::Install::CheckOptional
+name: Module-Install-CheckOptional
+no_index:
+  directory:
+    - inc
+    - private-lib
+    - t
+requires:
+  Module::AutoInstall: 0.88
+  Module::Install: 0
+  perl: '5.005'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Module-Install-CheckOptional
+  homepage: https://github.com/coppit/module-install-checkoptional/
+  license: http://opensource.org/licenses/gpl-2.0.php
+  repository: https://github.com/coppit/module-install-checkoptional.git
+version: '0.1101'

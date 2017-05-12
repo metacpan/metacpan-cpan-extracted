@@ -1,0 +1,23 @@
+---
+abstract: 'Redirects requests from mirrors to the main host (useful for SEO)'
+author:
+  - 'alexbyk <alex@alexbyk.com>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-RedirectHost
+requires:
+  Mojolicious: '3.0'
+  perl: v5.10.1
+resources:
+  bugtracker: http://github.com/alexbyk/Mojolicious-Plugin-RedirectHost/issues
+  repository: http://github.com/alexbyk/Mojolicious-Plugin-RedirectHost
+version: '1.07'
+x_serialization_backend: 'YAML::Tiny version 1.69'

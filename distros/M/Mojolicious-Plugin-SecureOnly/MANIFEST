@@ -1,0 +1,13 @@
+Changes
+cpanfile
+lib/Mojolicious/Plugin/SecureOnly.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/basic.t
+t/modes.t
+t/not_modes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

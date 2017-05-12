@@ -1,0 +1,11 @@
+/.build
+/MooseX-Has-Sugar-*
+/tmp/
+/META.json
+/MYMETA.json
+/MYMETA.yml
+/META.yml
+/Makefile
+/Makefile.old
+/blib/
+/pm_to_blib

@@ -1,0 +1,65 @@
+{
+   "abstract" : "This is a library of tools for managing podcast subscriptions. It comes with a command-line tool, fetch_pods.pl, that can run under Cron to keep a directory of subscribed Podcasts feeds up to date.",
+   "author" : [
+      "Lincoln Stein E<lt>lstein@cshl.orgE<gt>."
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MP3-PodcastFetch",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::IniFiles" : "2.00",
+            "Date::Parse" : "2.20",
+            "HTML::Parser" : "3.50",
+            "LWP" : "5.8",
+            "URI::Escape" : 0
+         }
+      }
+   },
+   "provides" : {
+      "MP3::PodcastFetch" : {
+         "file" : "lib/MP3/PodcastFetch.pm",
+         "version" : "1.05"
+      },
+      "MP3::PodcastFetch::Feed" : {
+         "file" : "lib/MP3/PodcastFetch/Feed.pm",
+         "version" : 0
+      },
+      "MP3::PodcastFetch::Feed::Channel" : {
+         "file" : "lib/MP3/PodcastFetch/Feed/Channel.pm",
+         "version" : 0
+      },
+      "MP3::PodcastFetch::Feed::Item" : {
+         "file" : "lib/MP3/PodcastFetch/Feed/Item.pm",
+         "version" : 0
+      },
+      "MP3::PodcastFetch::TagManager" : {
+         "file" : "lib/MP3/PodcastFetch/TagManager.pm",
+         "version" : 0
+      },
+      "MP3::PodcastFetch::XML::SimpleParser" : {
+         "file" : "lib/MP3/PodcastFetch/XML/SimpleParser.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.05"
+}

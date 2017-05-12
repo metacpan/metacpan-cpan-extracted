@@ -1,0 +1,89 @@
+Revision history for Perl extension Monitoring::Generator::TestConfig.
+
+0.46  Mon Dec 26 19:57:30 CET 2016
+	fix tests on later perl versions
+
+0.44  Tue Oct  9 20:47:03 CEST 2012
+	added receiver to shinken init script
+	added option to fixed size hostnames / descriptions
+
+0.42  Fri Dec 30 11:24:48 CET 2011
+	preserve 'use lib' lines in recreate.pl
+	made host/service check plugins epn compliant
+	renamed default template to avoid naming conflicts with existing templates
+
+0.40  Fri Jul  1 16:19:55 CEST 2011
+	added host/servicecheck cmd line option to override check cmd
+	installation on omd works now out of the box
+
+0.38  Sat Apr 16 15:39:33 CEST 2011
+	updated shinken init script
+
+0.36  Sun Mar 20 12:56:50 CET 2011
+	added omd layout
+
+0.34  Wed Nov 17 14:05:42 CET 2010
+	added init script for shinken layout
+	added sample service dependencys
+
+0.32  Thu Sep  2 13:26:43 CEST 2010
+	added verbose output to init scripts config check
+	added perfdata to service checks (thanks Jörg)
+
+0.30  Thu Aug 19 21:01:57 CEST 2010
+	added blocking type
+
+0.28  Thu Apr  8 09:24:20 CEST 2010
+	added shinken layout (thanks Gerhard)
+    fixed tests for windows
+    added multiline and html plugin output to random checks
+
+0.26  Fri Jan  8 11:13:16 CET 2010
+	fixed way of searching for binarys
+	fixed config test when there is no binary found
+
+0.24  Wed Jan  6 17:38:04 CET 2010
+	renamed to Monitoring::Generator::TestConfig
+	added switch to set layout (nagios/icinga for the moment)
+
+0.22  Tue Jan  5 21:09:50 CET 2010
+	fixed host/service config
+	fixed problem with newlines in resource.cfg
+
+0.20  Sun Dec 13 00:55:33 CET 2009
+	added init script
+	added prefix option
+
+0.18  Sat Dec  5 15:33:10 CET 2009
+	added support for parent router
+
+0.16  Wed Dec  2 11:39:50 CET 2009
+	added large installation tweaks for installations > 2000 services
+
+0.15  Sun Nov 15 16:56:04 CET 2009
+	- added possibility to override all host / service settings
+	- rewritten host / service plugins in perl
+	- moved service / hostplugin data to extra module
+	- added sample host / servicegroups
+	- added possibility to set types of hosts/services
+
+0.14  Fri Nov 13 21:42:55 CET 2009
+	- added possibility to override all nagios.cfg settings
+	- added Test::Perl::Critic tests
+	- added Test::Pod::Coverage tests
+
+0.13  Tue Nov 10 09:35:29 CET 2009
+	- fixed tests, now uses File::Which
+
+0.12  Sat Nov  7 14:37:37 CET 2009
+	- changed way of passing options
+
+0.11  Thu Nov  5 23:57:17 CET 2009
+	- fixed tests on solaris
+
+0.10  Wed Nov  4 20:15:25 CET 2009
+	- initial release, generates working nagios config
+
+0.01  Tue Nov  3 18:45:19 2009
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Nagios::Generator::TestConfig

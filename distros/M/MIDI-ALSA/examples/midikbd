@@ -1,0 +1,1062 @@
+#! /usr/bin/perl
+#########################################################################
+#        This Perl script is Copyright (c) 2010, Peter J Billam         #
+#                          www.pjb.com.au                               #
+#                                                                       #
+#     This script is free software; you can redistribute it and/or      #
+#            modify it under the same terms as Perl itself.             #
+#########################################################################
+# 20150529  a UI change to include the other pedals ?
+# F1,F2=Una-corda F3,F4=Tre-corde  F5,F6=Sos-pedal F7,F8=Sos-pedal-off
+#   F9,F10=Pedal F11,F12=Pedal-off  ?
+# ^[[15~^[OP^[OQ^[OR^[OS ^[[15~^[[17~^[[18~^[[19~ ^[[20~^[[21~^[[23~^[[24~
+# F1,F2=Una F3,F4=Tre  F5,F6=Sos F7,F8=*Sos  F9,F10=Ped F11,F12=*Ped
+
+use Term::ReadKey;
+use bytes;
+#use Term::Size(); my ($Xmax, $Ymax) = Term::Size::chars;
+my ($Xmax, $Ymax) = Term::ReadKey::GetTerminalSize;
+# warn "Xmax=$Xmax Ymax=$Ymax\n";
+eval 'require MIDI::ALSA'; if ($@) { die
+	"you'll need to install the MIDI::ALSA module from www.cpan.org\n";
+}
+eval 'require Term::Clui'; if ($@) { die
+	"you'll need to install the Term::Clui module from www.cpan.org\n";
+}
+my $CurrentX; my $CurrentY;
+my $Version      = '5.8';  # X and Y mouse-control of pitchwheel displayed
+my $VersionDate  = '03jun2015';
+my $Channel    = 0;
+my $Volume     = 100;
+my $Pan        = 64;
+my $Transpose  = 0;
+my $Quiet      = 0;
+my $PedalIsOn  = 0;
+my $SosPedIsOn = 0;
+my $UnaPedIsOn = 0;
+my $PedalLineNum;
+my $KeyMap     = 'augmented';
+my %KeyMaps    = (   # 4.0
+	a=>'augmented', d=>'drumkit', h=>'harmonic', p=>'piano', w=>'wholetone',
+);
+my %Cha2patch;
+my %Cha2pan;
+my $LastTra;   # the last (transposed) note that's been played.
+my $OutputPort;
+my @Synopsis; my %Keystrokes;
+my $CursorRow = 6;
+# vt100 globals
+my $Irow = 1;
+my $Icol = 1;
+my $MidCol = 32;
+# mouse-related stuff, version 3.6
+my %Cha2Xcontroller = ();
+my %Cha2Ycontroller = ();
+# remember the Controllers that have been set
+my @Cha2cc = ();   # list of hashes
+
+# http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+# use bytes;
+# print STDERR "\e[?1003h";   # sets  SET_ANY_EVENT_MOUSE  mode
+# ^[[M#XY    where X is (chr(32+x)) and Y is (chr(32+y)), top-left is !!=1,1
+# and LeftButtonPress = ^[[M XY  Mid = ^[[M!XY   Right = ^[[M"XY
+# print STDERR "\e[?1003l";   # resets  SET_ANY_EVENT_MOUSE  mode
+
+while ($ARGV[$[] =~ /^-([CPa-z])([adhpw]?)/) {
+	my $opt = $1;
+	if ($opt eq 'v')      { shift;
+		my $n = $0; $n =~ s{^.*/([^/]+)$}{$1};
+		print "$n version $Version $VersionDate\n";
+		exit 0;
+	} elsif ($opt eq 'd' or $opt eq 'o') { shift; $OutputPort = shift;
+	} elsif ($opt eq 'p') { shift; $OutputPort = shift;
+	} elsif ($opt eq 'C') { shift;
+		warn "warning: -C option is now deprecated; see perldoc midikbd\n";
+		while (my $next_arg = shift) { process_channel_spec($next_arg); }
+	} elsif ($opt eq 'P') { shift; $Cha2patch{$Channel} = 0+shift;
+	} elsif ($opt eq 'k') {
+		shift;
+		if ($KeyMaps{$2}) { $KeyMap = $KeyMaps{$2};
+		} else { $KeyMap  = shift;
+		}
+	} elsif ($opt eq 'q') { shift; $Quiet   = 1;
+	} else {  print "usage:\n";  my $synopsis = 0;
+		while (<DATA>) {
+			if (/^=head1 SYNOPSIS/) { push @Synopsis,$_; $synopsis=1; next; }
+			if ($synopsis && /^=head1/) { last; }
+			if ($synopsis)      { print $_; next; }
+		}
+		exit 1;
+	}
+}
+foreach my $channel_spec (@ARGV) { process_channel_spec($channel_spec); }
+
+sub debug {
+    open (T, '>>', '/tmp/debug');
+    print T $_[$[],"\n";
+    close T;
+}
+
+my $in_syn; my $in_keys;
+while (<DATA>) {
+	if (/^ +Q = Quit/)     {
+		if ($KeyMap eq 'drumkit') { push @Synopsis, " Q = Quit\n";
+		} else { push @Synopsis, $_;
+		}
+		$in_syn = 1; next;
+	}
+	if ($in_syn && /^$/) { last; }
+	if ($in_syn) {
+		if (/octave|semitone/ && ($KeyMap eq 'drumkit')) { next; }
+		push @Synopsis, $_;
+	}
+}
+while (<DATA>) {
+	if (/^ the "$KeyMap" keymap/)     {
+		$in_keys = 1; push @{$Keystrokes{$KeyMap}}, $_; next;
+	}
+	if ($in_keys && /^$/) { last; }
+	if ($in_keys) { push @{$Keystrokes{$KeyMap}}, $_; }
+}
+my %Char2note = char2note($KeyMap);
+
+# MIDI::ALSA::client( "midikbd pid=$$", 0, 1, 0 );
+MIDI::ALSA::client( "midikbd", 0, 1, 0 );   # workaraound for alsa-lib 1.0.24
+
+if ($OutputPort ne '0') {   # 5.4
+	if (!$OutputPort) { $OutputPort = $ENV{'ALSA_OUTPUT_PORTS'}; }
+	if (!$OutputPort) {
+		warn "OutputPort not specified and ALSA_OUTPUT_PORTS not set\n";
+	}
+	foreach my $cl_po (split /,/, $OutputPort) {  # 5.0
+		if (! MIDI::ALSA::connectto( 0, $cl_po )) {
+			die "can't connect to ALSA client $cl_po\n";
+		}
+	}
+}
+
+$SIG{'INT'} = sub { exit 0; };  # so that after ^C the END-blocks run
+
+# In this ALSA version, we don't need to be able to write to stdout...
+
+ReadMode(4, STDIN);
+# should do this for all keys of %Cha2patch, e.g. for feeding into midiecho
+# if (defined $Cha2patch{$Channel}) { new_patch($Cha2patch{$Channel}); }
+foreach my $c (keys %Cha2patch) { set_patch($c, $Cha2patch{$c}); }
+foreach my $c (keys %Cha2pan)   {  set_pan( $c,  $Cha2pan{$c}); }
+display_alsa();
+if ($KeyMap ne 'drumkit') {
+	display_channel(); display_patch(); display_transpose();
+}
+display_note(); display_volume(); display_pan();
+display_midi_controllers();   # 4.9
+if (!$Quiet) { display_keystrokes(); }
+
+if (%Cha2Xcontroller or %Cha2Ycontroller) { set_mouse_mode(); }  # 3.6
+
+while (1) {
+	my $c = ReadKey(0, STDIN);
+	# reserve S=SustainPed B=Bank G=GeneralMidi M=Monophonic K=KeyMap
+	if      ($c eq "Q")  { note_off();  last;
+	} elsif ($c eq "P")  { new_patch();  next;
+	} elsif ($c eq "C")  { new_channel(); next;
+	} elsif ($c eq "U")  {  # 3.2
+		if ($KeyMap ne 'drumkit') { $Transpose += 1; display_transpose(); }
+		next;
+	} elsif ($c eq "D")  {  # 3.2
+		if ($KeyMap ne 'drumkit') { $Transpose -= 1; display_transpose(); }
+		next;
+	} elsif ($c eq 'M')  { new_midi_controller(); next;  # 4.2
+	} elsif ($c eq 'X')  { new_Xcontroller();     next;  # 4.3
+	} elsif ($c eq 'Y')  { new_Ycontroller();     next;  # 4.3
+	} elsif ($c eq "\e") { escape_seq();          next;
+	} elsif ($c eq "A")  { new_alsa();            next;   # 4.6
+	}
+	my $note = $Char2note{$c};
+	my $tra = $note + $Transpose ;
+	if ($tra > 127 ) { $tra = 127;
+	} elsif ($tra < 0) { $tra = 0;
+	}
+	# my $b = chr($tra);
+	note_off();
+	if (defined $note) {
+		MIDI::ALSA::output(MIDI::ALSA::noteonevent($Channel,$tra,$Volume));
+		$LastTra = $tra;
+	}
+	display_note($note, $tra);
+	# else { warn "c is ".ord($c)."\n"; }
+}
+if (!$Quiet) { clean_screen(); }
+if ($PedalIsOn) {
+	# my $b = chr(0xB0 + $Channel); print $OFH "$b\x40\x00";
+	MIDI::ALSA::output(MIDI::ALSA::controllerevent($Channel,64,0));
+}
+close $OFH;
+ReadMode(0, STDIN);
+
+# ------------------- infrastructure -------------------
+sub display_alsa {
+	my @ConnectedTo = ();
+	my $id = MIDI::ALSA::id();
+	foreach (MIDI::ALSA::listconnectedto()) {
+		my @cl = @$_;
+		push @ConnectedTo, "$cl[1]:$cl[2]"
+	}
+	gotoxy(1,1);
+	my $s = "ALSA client $id, midikbd pid=$$";
+	if (@ConnectedTo) {
+		puts_clr("$s, connected to ".join(',',@ConnectedTo));
+	} else {
+		puts_clr("$s, not connected to anything");
+	}
+	gotoxy(1,$CursorRow);
+}
+sub display_channel {
+	gotoxy(1,2); puts_30c("Channel is $Channel"); gotoxy(1,$CursorRow);
+}
+sub display_patch {
+	gotoxy($MidCol,2);
+	if (defined $Cha2patch{$Channel}) {
+		puts_clr("Patch is $Cha2patch{$Channel}");
+	} else {
+		puts_clr("Patch hasn't been reset yet");
+	}
+	gotoxy(1,$CursorRow);
+}
+sub display_transpose {
+	if ($Transpose < -48) { $Transpose = -48;
+	} elsif ($Transpose >48) { $Transpose = 48;
+	}
+	gotoxy(1,3);
+	if ($Transpose > 0) { puts_30c("Transpose is +$Transpose");
+	} else {              puts_30c("Transpose is $Transpose");
+	}
+	gotoxy(1,$CursorRow);
+}
+sub display_note { my ($note, $transposed) = @_;
+	if ($KeyMap eq 'drumkit') {gotoxy($MidCol,2);} else {gotoxy($MidCol,3);}
+	if (! defined $note) { puts_clr("Note is off");
+	} elsif ($transposed == $note) { puts_clr("Note is $note");
+	} else { puts_clr("Note is $note transposed to $transposed");
+	}
+	gotoxy(1,$CursorRow);
+}
+sub display_volume {
+	if ($KeyMap eq 'drumkit') { gotoxy(1,3); } else { gotoxy(1,4); }
+	puts_30c("Volume is $Volume");
+	gotoxy(1,$CursorRow);
+}
+sub display_pan {
+	if ($KeyMap eq 'drumkit') {gotoxy($MidCol,3);} else {gotoxy($MidCol,4);}
+	# if ($AutoPan{$Channel}) { puts_clr("$AutoPan{$Channel} AutoPan");
+	if ($Cha2Xcontroller{$Channel} == 10) {   # 4.9
+		puts_clr("Pan is controlled by X-mouse");
+	} elsif ($Cha2Ycontroller{$Channel} == 10) {  # 4.9
+		puts_clr("Pan is controlled by Y-mouse");
+	} elsif (defined $Cha2pan{$Channel}){
+		puts_clr("Pan is $Cha2pan{$Channel}");
+	} else { puts_clr("Pan hasn't been reset yet");
+	}
+	gotoxy(1,$CursorRow);
+}
+sub display_midi_controllers {
+	gotoxy(1,5);
+	my @items= ();
+	foreach $controller (sort keys %{$Cha2cc[$Channel]}) {
+		my $v = $Cha2cc[$Channel]{$controller};
+		if ($controller == 1000) { push @items, "pitchwheel=$v";  # 5.8
+		} else { push @items, "cc$controller=$v";
+		}
+	}
+	#my $x = $Cha2Xcontroller{$Channel}; if ($x) { push @items, "X=$x"; }
+	#my $y = $Cha2Ycontroller{$Channel}; if ($y) { push @items, "Y=$y"; }
+	puts_clr(join(q{ }, @items));
+	gotoxy(1,$CursorRow);
+}
+sub display_keystrokes {
+	my @s = (@{$Keystrokes{$KeyMap}},"\n",@Synopsis);
+	$PedalLineNum = $CursorRow-1;   # ??
+	foreach (@{$Keystrokes{$KeyMap}},@Synopsis) {
+		if (/F1,F2/) { break; }
+		$PedalLineNum += 1;
+	}
+	gotoxy(1,$CursorRow+1); puts(@s);
+	gotoxy(1,$PedalLineNum);
+	puts_clr(" F1,F2=Una             F5,F6=Sos              F9,F10=Ped");
+	gotoxy(1,$CursorRow);
+}
+sub clean_screen {
+	my @s = (@{$Keystrokes{$KeyMap}},"\n",@Synopsis);
+	if ($KeyMap eq 'drumkit') {
+		for my $y (2 .. ($CursorRow+1+@s)) {
+			gotoxy(1,$y); print STDERR "\e[K";
+		}
+		gotoxy(1,2);
+	} else {
+		for my $y ($CursorRow+1 .. ($CursorRow+1+@s)) {
+			gotoxy(1,$y); print STDERR "\e[K";
+		}
+		gotoxy(1,$CursorRow);
+	}
+}
+sub set_mouse_mode {
+	print STDERR "\e[?1003h";   # sets  SET_ANY_EVENT_MOUSE  mode
+	eval 'sub END { print STDERR "\e[?1003l"; }';  # reset on exit
+	if ($@) { warn "can't eval: $@\n"; }
+}
+
+sub set_pan { my ($c,$p) = @_;
+	if ($p >112)  { $p = 112; } else { $p -= 16; }
+	if ($p < 1)   { $p = 1; }
+	# my $b = chr(0xB0 + $c);  $p = chr($p); print $OFH "$b\x0A$p";
+	MIDI::ALSA::output(MIDI::ALSA::controllerevent($c,10,$p));
+}
+sub set_patch { my ($c,$p) = @_;
+	if (! defined $p) { return; }
+	# my $b1 = chr(0xC0 + $c); my $b2 = chr(0+$p); print $OFH "$b1$b2";
+	MIDI::ALSA::output(MIDI::ALSA::pgmchangeevent($c,$p));
+}
+sub new_patch { 
+	if ($KeyMap eq 'drumkit') { return; }
+	my $p;
+	if (defined $_[$[]) { $p = $_[$[]; } else { $p = get_int('Patch'); }
+	if (! defined $p) { display_patch(); return; }
+	# my $b1 = chr(0xC0 + $Channel); my $b2 = chr($p); print $OFH "$b1$b2";
+	MIDI::ALSA::output(MIDI::ALSA::pgmchangeevent($Channel,$p));
+	$Cha2patch{$Channel} = $p;
+	display_patch();
+}
+sub new_channel {
+	if ($KeyMap eq 'drumkit') { return; }
+	my $c = get_int('Channel');
+	if (! defined $c) { display_channel(); return; }
+	$Channel = $c;
+	note_off();
+	display_channel(); display_note();
+	display_patch(); display_pan(); display_midi_controllers();
+}
+sub new_midi_controller {
+	my $c = get_int('MIDI-Controller');
+	if (! defined $c) { display_midi_controllers(); return; }
+	my $v = get_int("MIDI-Controller $c = ");
+	if (! defined $v) { display_midi_controllers(); return; }
+	$Cha2cc[$Channel]{$c} = $v;
+	if ($Cha2Xcontroller{$Channel}==$c) { delete $Cha2Xcontroller{$Channel}; }
+	if ($Cha2Ycontroller{$Channel}==$c) { delete $Cha2Ycontroller{$Channel}; }
+	if ($c == 10) { $Cha2pan{$Channel} = $v; display_pan(); }
+	# my $b=chr(0xB0+$Channel); $c=chr($c); $v=chr($v); print $OFH "$b$c$v";
+	MIDI::ALSA::output(MIDI::ALSA::controllerevent($Channel,$c,$v));
+	display_midi_controllers();
+}
+sub new_alsa { 
+	my %id2client = MIDI::ALSA::listclients();
+	my %client2id = reverse %id2client;
+	
+	foreach my $cl1 (keys %client2id) {
+		my $cl = $cl1;
+		if ($cl =~ /^System/i or $cl =~ /^midikbd/) {
+			delete $id2client{$client2id{$cl}};
+			delete $client2id{$cl};
+		}
+	}
+	# OK. clear the doc, use choose listclients, up 1,
+	# dipslay_alsa(), display_keystrokes(),
+	my @keystroke_rows = @{$Keystrokes{$KeyMap}};
+	gotoxy(1,$CursorRow+@keystroke_rows+2);
+	print STDERR "\e[J";
+	my @new_to = Term::Clui::choose(
+		'Connect to which ALSA clients ?', sort keys %client2id
+	);
+	if (@new_to) {
+		print STDERR "\e[A\e[K";  # up, clrtoeos
+		my %new_ids = ();
+		foreach my $cl (@new_to) {
+			$new_ids{0+$client2id{$cl}} = 1;
+		}
+		my @old_clients = MIDI::ALSA::listconnectedto();
+		foreach my $old_client_ref (@old_clients) {
+			my @old_client = @$old_client_ref;
+			if ($new_ids{0+$old_client[1]}) {
+				delete $new_ids{0+$old_client[1]};
+			} else { 
+				MIDI::ALSA::disconnectto(@old_client); #  or warn "FAIL\r\n";
+			}
+		}
+		foreach my $new_id (keys %new_ids) {
+			MIDI::ALSA::connectto(0,$new_id,0);
+		}
+	}
+	display_alsa(); display_keystrokes();
+}
+sub new_Xcontroller {
+	my $cc = get_int('MIDI-Controller for X-mouse');
+	if (! defined $cc) { display_midi_controllers(); return; }
+	if ($cc == 0) { $cc = 1000; }  # 5.8 but '-0' ?
+	if (!%Cha2Xcontroller and !%Cha2Ycontroller) { set_mouse_mode(); }
+	delete $Cha2cc[$Channel]{$Cha2Xcontroller{$Channel}};   # 5.2
+	$Cha2Xcontroller{$Channel} = 0+$cc;
+	$Cha2cc[$Channel]{$cc} = 'X';
+	if ($cc == 10) { display_pan(); }
+	#foreach (sort keys %Cha2Xcontroller) {
+	#	warn "Cha2Xcontroller{$_} = $Cha2Xcontroller{$_}\n";
+	#}
+	display_midi_controllers(); return;
+}
+sub new_Ycontroller {
+	my $cc = get_int('MIDI-Controller for Y-mouse');
+	if (! defined $cc) { display_midi_controllers(); return; }
+	if ($cc == 0) { $cc = 1000; }  # 5.8 but '-0' ?
+	if (!%Cha2Xcontroller and !%Cha2Ycontroller) { set_mouse_mode(); }
+	delete $Cha2cc[$Channel]{$Cha2Ycontroller{$Channel}};   # 5.2
+	$Cha2Ycontroller{$Channel} = 0+$cc;
+	$Cha2cc[$Channel]{$cc} = 'Y';
+	if ($cc == 10) { display_pan(); }
+	#foreach (sort keys %Cha2Ycontroller) {
+	#	warn "Cha2Ycontroller{$_} = $Cha2Ycontroller{$_}\n";
+	#}
+	display_midi_controllers(); return;
+}
+
+sub escape_seq {
+	my $c = ReadKey(0, STDIN);
+	if ($c eq 'O') {  # a FunctionKey F1..F4, 5.6 now UnaCorda/TreCorde
+		$c = ReadKey(0, STDIN);  # P,Q,R,S
+		if ($c eq 'P' or $c eq 'Q') {  # take or renew pedal 3.5
+			if ($UnaPedIsOn) {
+				MIDI::ALSA::output(MIDI::ALSA::controllerevent($Channel,67,0));
+			} else {
+				$UnaPedIsOn = 1;
+				if (!$Quiet) { gotoxy(12,$PedalLineNum); puts('F3,F4=Tre'); }
+			}
+			MIDI::ALSA::output(MIDI::ALSA::controllerevent($Channel,67,127));
+		} else {   # pedal off
+			if ($UnaPedIsOn) {
+				MIDI::ALSA::output(MIDI::ALSA::controllerevent($Channel,67,0));
+				$UnaPedIsOn = 0;
+				if (!$Quiet) { gotoxy(12,$PedalLineNum); puts('         '); }
+			}
+		}
+		gotoxy(1,$CursorRow); return;
+	}
+	if ($c ne '[') { return; }
+	$c = ReadKey(0, STDIN);
+	if      ($c eq '5') {  # PageUp,
+		if ($KeyMap ne 'drumkit') {
+			$Transpose += 12; display_transpose(); return;
+		}
+	} elsif ($c eq '6') {  # PageDown
+		if ($KeyMap ne 'drumkit') {
+			$Transpose -= 12; display_transpose(); return;
+		}
+	} elsif ($c eq 'A') {  # 3.2 ArrowUp, ArrowDown are now volume
+		if ($Volume < 10)  { $Volume = 10; } else { $Volume += 10; }
+		if ($Volume > 127) { $Volume = 127; }
+		display_volume();
+	} elsif ($c eq 'B') {
+		if ($Volume >120)  { $Volume = 120; } else { $Volume -= 10; }
+		if ($Volume < 1)   { $Volume = 1; }
+		display_volume();
+	} elsif ($c eq 'C') { # 3.2 ArrowRight is now Pan
+		my $Pan = $Cha2pan{$Channel} || 64;
+		if ($Pan < 16)  { $Pan = 16; } else { $Pan += 16; }
+		if ($Pan > 127) { $Pan = 127; }
+		$Cha2pan{$Channel} = $Pan;
+		MIDI::ALSA::output(MIDI::ALSA::controllerevent($Channel,10,$Pan));
+		display_pan();
+	} elsif ($c eq 'D') {  # 3.2 ArrowLeft is now Pan
+		my $Pan = $Cha2pan{$Channel} || 64;
+		if ($Pan >112)  { $Pan = 112; } else { $Pan -= 16; }
+		if ($Pan < 1)   { $Pan = 1; }
+		$Cha2pan{$Channel} = $Pan;
+		MIDI::ALSA::output(MIDI::ALSA::controllerevent($Channel,10,$Pan));
+		display_pan();
+	} elsif ($c eq 'F') { all_sounds_off();
+	} elsif ($c eq 'H') { reset_all_controllers();
+	} elsif ($c eq '1') {   # 5.6
+		$c = ReadKey(0, STDIN);  # 5,7,8,9
+		if ($c eq '5' or $c eq '7') {  # Sos
+			if ($SosPedIsOn) {
+				MIDI::ALSA::output(MIDI::ALSA::controllerevent($Channel,66,0));
+			} else {
+				$SosPedIsOn = 1;
+				if (!$Quiet) { gotoxy(34,$PedalLineNum); puts('F7,F8=*Sos'); }
+			}
+			MIDI::ALSA::output(MIDI::ALSA::controllerevent($Channel,66,127));
+		} elsif ($c eq '8' or $c eq '9') {  # *Sos
+			MIDI::ALSA::output(MIDI::ALSA::controllerevent($Channel,66,0));
+			$SosPedIsOn = 0;
+			if (!$Quiet) { gotoxy(34,$PedalLineNum); puts('          '); }
+		}
+		$c = ReadKey(0, STDIN);  # throw away trailing tilde
+		gotoxy(1,$CursorRow);  return;
+	} elsif ($c eq '2') {   # 5.6
+		$c = ReadKey(0, STDIN);  # 0,1,3,4
+		if ($c eq '0' or $c eq '1') {  # Ped
+			if ($PedalIsOn) {
+				MIDI::ALSA::output(MIDI::ALSA::controllerevent($Channel,64,0));
+			} else {
+				$PedalIsOn = 1;
+				if (!$Quiet) {gotoxy(58,$PedalLineNum); puts('F11,F12=*Ped');}
+			}
+			MIDI::ALSA::output(MIDI::ALSA::controllerevent($Channel,64,127));
+		} elsif ($c eq '3' or $c eq '4') {  # *Ped
+			MIDI::ALSA::output(MIDI::ALSA::controllerevent($Channel,64,0));
+			$PedalIsOn = 0;
+			if (!$Quiet) { gotoxy(58,$PedalLineNum); puts('            '); }
+		}
+		$c = ReadKey(0, STDIN);  # throw away trailing tilde
+		gotoxy(1,$CursorRow);  return;
+	} elsif ($c eq 'M') {   # 3.6
+		# ^[[M#XY  where X is (chr(32+x)), Y is (chr(32+y)), top-left is !!=1,1
+		# and LeftButtonPress = ^[[M XY  Mid = ^[[M!XY   Right = ^[[M"XY
+		my $c = ReadKey(0, STDIN);
+		my $x = ReadKey(0, STDIN);
+		my $y = ReadKey(0, STDIN);
+		next unless $c eq '#' or $c eq 'C'; # 5.7 20150531 but c is now 'C'!?
+		$x = round ((ord($x)-32) * 127.8 / $Xmax);
+        if ($x >127) { $x = 127; }
+        $y = 126 - round ((ord($y)-33) * 127.8 / $Ymax);
+        if ($y >127) { $y = 127; }   #warn "x=$x y=$y\n";
+        if ($x != $CurrentX) { x_controllers($x); $CurrentX = $x; }
+        if ($y != $CurrentY) { y_controllers($y); $CurrentY = $y; }
+	} else { gotoxy(1,$CursorRow); return;
+	}
+}
+sub get_int { my $s = $_[$[];
+	my $max_int = 127;
+	my $row = 1;
+	my $col = 1;
+	if ($s =~ /channel/i) { $max_int = 15; $row = 2;
+	} elsif ($s =~ /controller/i) { $row = 5;
+	} elsif ($s =~ /patch/i) { $col = $MidCol; $row = 2;
+	}
+	ReadMode(0, STDIN);
+	my $int;
+	while (1) {
+		gotoxy($col,$row);
+		if ($s =~ /channel/i) {
+			puts_30c("new $s (0..$max_int) ? ");
+		} else {
+			puts_clr("new $s (0..$max_int) ? ");
+		}
+		$int = <STDIN>; print STDERR "\e[A";
+		if ($int =~ /^[0-9]+$/ and $int <= $max_int) {
+			ReadMode(4, STDIN); gotoxy(1,$row); return 0+$int;
+		}
+		if ($int =~ /^\s*$/) {
+			ReadMode(4, STDIN); gotoxy(1,$row); return undef;
+		}
+	}
+}
+sub note_off {  # 1.9
+	if (defined $LastTra) {
+		MIDI::ALSA::output(MIDI::ALSA::noteoffevent($Channel,$LastTra,$Volume));
+		undef $LastTra; # XXX
+	}
+}
+sub all_sounds_off {
+	foreach my $c (0..15) {
+		MIDI::ALSA::output(MIDI::ALSA::controllerevent($c,120,0));
+	}
+}
+sub reset_all_controllers {
+	foreach my $c (0..15) {
+		MIDI::ALSA::output(MIDI::ALSA::controllerevent($c,121,0));
+	}
+	@Cha2cc = ();  # a blunt instrument
+	# must rescue the mouse-movement, which will still get generated..
+	foreach (keys %Cha2Xcontroller) {
+		$Cha2cc[$_]{$Cha2Xcontroller{$_}} = 'X';
+	}
+	foreach (keys %Cha2Ycontroller) {
+		$Cha2cc[$_]{$Cha2Ycontroller{$_}} = 'Y';
+	}
+	display_midi_controllers();
+}
+
+sub char2note {  my $keymap = $_[$[];
+	if ($keymap eq 'piano' or !defined $keymap) { return (
+		a=>47,z=>48,s=>49,x=>50,d=>51,c=>52,v=>53,g=>54,b=>55,
+		h=>56,n=>57,j=>58,m=>59,','=>60,l=>61,'.'=>62,';'=>63,"/"=>64,
+		"'"=>65,'`'=>64,
+		"\t"=>65,'1'=>66,q=>67,'2'=>68,w=>69,'3'=>70,e=>71,
+		r=>72,'5'=>73,t=>74,'6'=>75,y=>76,u=>77,'8'=>78,i=>79,
+		'9'=>80,o=>81,'0'=>82,p=>83,'['=>84,'='=>85,']'=>86,
+		"\cH"=>87,"\x7F"=>87,'\\'=>88,);
+	} elsif ($keymap eq 'wholetone') { return (
+ '`'=>55,'1'=>57,'2'=>,59,'3'=>,61,'4'=>,63,'5'=>65,'6'=>67,'7'=>69,
+    '8'=>71,'9'=>73,'0'=>75,"-"=>77,'='=>79,"\cH"=>81,"\x7F"=>81,
+  "\t"=>56,q=>58,w=>60,e=>62,r=>64,t=>66,y=>68,u=>70,
+	 i=>72,o=>74,p=>76,"["=>78,']'=>80,'\\'=>82,
+   a=>35,s=>37,d=>39,f=>41,g=>43,h=>45,j=>47,k=>49,l=>51,';'=>53,"'"=>55,
+    z=>36,x=>38,c=>40,v=>42,b=>44,n=>46,m=>48,','=>50,'.'=>52,'/'=>54,);
+	} elsif ($keymap eq 'augmented') { return (
+ '`'=>34,'1'=>36,'2'=>,40,'3'=>,44,'4'=>,48,'5'=>52,'6'=>56,'7'=>60,
+    '8'=>64,'9'=>68,'0'=>72,"-"=>76,'='=>79,"\cH"=>81,"\x7F"=>81,
+  "\t"=>35,q=>37,w=>41,e=>45,r=>49,t=>53,y=>57,u=>61,
+	 i=>65,o=>69,p=>73,"["=>77,']'=>80,'\\'=>82,
+   a=>38,s=>42,d=>46,f=>50,g=>54,h=>58,j=>62,k=>66,l=>70,';'=>74,"'"=>78,
+    z=>39,x=>43,c=>47,v=>51,b=>55,n=>59,m=>63,','=>67,'.'=>71,'/'=>75,);
+	} elsif ($keymap eq 'harmonic') { return (
+ '1'=>63,'2'=>67,'3'=>,70,'4'=>,74,'5'=>77,'6'=>81,'7'=>84,
+    '8'=>88,'9'=>91,'0'=>95,'-'=>98,"="=>102,"\cH"=>105,"\x7F"=>105,
+  q=>58,w=>62,e=>65,r=>69,t=>72,y=>76,u=>79,i=>83,o=>86,p=>90,"["=>93,']'=>97,
+   a=>53,s=>57,d=>60,f=>64,g=>67,h=>71,j=>74,k=>78,l=>81,';'=>85,"'"=>88,
+    z=>48,x=>52,c=>55,v=>59,b=>62,n=>66,m=>69,','=>73,'.'=>76,'/'=>80,);
+	} elsif ($keymap eq 'drumkit') { $Channel = 9; $CursorRow = 4; return (
+# 35 bassdrum, 40 snare, 44 hihat, 49 57 splash, 51 59 ride, 43 45 47 48 toms
+'1'=>39,'2'=>56,'3'=>,67,'4'=>,68,'5'=>74,'6'=>75,'7'=>77,
+    '8'=>60,'9'=>61,'0'=>62,'-'=>63,"="=>64,"\cH"=>81,"\x7F"=>81,
+q=>42,w=>42,e=>44,r=>44,t=>46,y=>46,u=>51,i=>59,o=>49,p=>57,'['=>55,']'=>53,
+ a=>37,s=>37,d=>40,f=>40,g=>38,h=>38,j=>41,k=>43,l=>45,';'=>47,';'=>48,"'"=>50,
+	z=>33,x=>34,c=>35,v=>35,b=>35,n=>35,m=>36,','=>36,'.'=>36,'//'=>36,
+		);
+	} else {
+		die "unrecognised KeyMap: $keymap\n"
+		 . " must be: piano, wholetone, harmonic, augmented or drumkit.\n";
+	}
+}
+
+# ---------------------- infrastructure for 3.6 ---------------------
+sub process_channel_spec { my $arg = $_[$[];
+	# warn "process_channel_spec arg=$arg\n";
+	if ($arg !~ /^[-xy:,\d]+$/) { unshift @ARGV, $arg; last; }
+	my ($cha,@a) = split(':', $arg);
+	if (!length $cha) { next; }
+	$Channel = 0+$cha;
+	if ($Channel<0 or $Channel>15) {
+		die "channel must be between 0 and 15, but was $Channel\n";
+	}
+	my $i = 1; foreach my $a (@a) {
+		if ($a =~ /^x(-?\d+)/) {   # 3.6
+			my $con = $1;   # controller-number
+			if($con<-127 or $con>127){
+                  	die "-x channel $Channel controller must be "
+				 . "between 0 and 127, but was $con\n";
+			}
+			if     ($con eq '-0') {
+				$Cha2Xcontroller{$Channel} = -1000;
+				$Cha2cc[$Channel]{-1000} = 'X';  # 5.8 XXX
+			} elsif ($con eq '0') {
+				$Cha2Xcontroller{$Channel} = 1000;
+				$Cha2cc[$Channel]{1000} = 'X';  # 5.8
+			} else {
+				$Cha2Xcontroller{$Channel} = 0+$con;
+				$Cha2cc[$Channel]{$con} = 'X';  # 4.9
+			}
+		} elsif ($a =~ /^y(-?\d+)/) {   # 3.6
+			my $con = $1;   # controller-number
+			if($con<-127 or $con>127){
+                  	die "-y channel $Channel controller must be "
+				 . "between 0 and 127, but was $con\n";
+			}
+			if     ($con eq '-0') {
+				$Cha2Ycontroller{$Channel} = -1000;
+				$Cha2cc[$Channel]{-1000} = 'Y';  # 5.8
+			} elsif ($con eq '0'){
+				$Cha2Ycontroller{$Channel} = 1000;
+				$Cha2cc[$Channel]{1000} = 'Y';  # 5.8
+			} else {
+				$Cha2Ycontroller{$Channel} = 0+$con;
+				$Cha2cc[$Channel]{$con} = 'Y';  # 4.9
+			}
+		} elsif ($i == 1 and length $a) { $Cha2patch{$Channel} = 0+$a;
+		} elsif ($i == 2 and length $a) { $Cha2pan{$Channel} = 0+$a;
+		}
+		$i += 1;
+	}
+}
+sub round { my $x = $_[$[];
+	if ($x > 0.0) { return int ($x + 0.5); }
+	if ($x < 0.0) { return int ($x - 0.5); }
+	return 0;
+}
+sub x_controllers { my $x = $_[$[];
+	if ($x > 127) { $x = 127; } elsif ($x < 0) { $x = 0; }
+	while (my ($cha, $con) = each %Cha2Xcontroller) {
+		if ($con < 0) { $con = 0-$con; $x = 127-$x; }
+		if ($con == 1000) {  # special-cased for Pitch-Bend
+			$x = 128*$x + $x - 8192 ;   # two bytes full, -8192..+8191
+			# my $b = chr(0xE0 + $cha); print $OFH "$b$xc$xc";
+			MIDI::ALSA::output(MIDI::ALSA::pitchbendevent($cha,$x));
+		} else {
+			# my $b = chr(0xB0+$cha); my $c = chr($con); print $OFH "$b$c$xc";
+			MIDI::ALSA::output(MIDI::ALSA::controllerevent($cha,$con,$x));
+		}
+	}
+}
+sub y_controllers { my $y = $_[$[];
+	if ($y > 127) { $y = 127; } elsif ($y < 0) { $y = 0; }
+	while (my ($cha, $con) = each %Cha2Ycontroller) {
+		if ($con < 0) { $con = 0-$con; $y = 127-$y; }
+		if ($con == 1000) {  # special-cased for Pitch-Bend
+			$y = 128*$y + $y - 8192;   # two bytes full, -8192..+8191
+			# my $b = chr(0xE0 + $cha); print $OFH "$b$yc$yc";
+			MIDI::ALSA::output(MIDI::ALSA::pitchbendevent($cha,$y));
+		} else {
+			# my $b = chr(0xB0+$cha); my $c = chr($con); print $OFH "$b$c$yc";
+			MIDI::ALSA::output(MIDI::ALSA::controllerevent($cha,$con,$y));
+		}
+	}
+}
+
+# --------------- vt100 stuff, evolved from Term::Clui ---------------
+sub puts   { my $s = join q{}, @_;
+	$Irow += ($s =~ tr/\n/\n/);
+	if ($s =~ /\r\n?$/) { $Icol = 0;
+	} else { $Icol += length($s);   # BUG, wrong on multiline strings!
+	}
+	print STDERR $s;
+}
+sub puts_30c {  my $s = $_[$[];   # assumes no newlines
+	my $rest = 30-length($s);
+	print STDERR $s, " "x$rest, "\e[D"x$rest;
+	$Icol += length($s);
+}
+sub puts_clr {  my $s = $_[$[];   # assumes no newlines
+	print STDERR "$s\e[K";
+	$Icol += length($s);
+}
+sub clrtoeol {
+	print STDERR "\e[K";
+}
+sub up    {
+	# if ($_[$[] < 0) { down(0 - $_[$[]); return; }
+	print STDERR "\e[A" x $_[$[]; $Irow -= $_[$[];
+}
+sub down  {
+	# if ($_[$[] < 0) { up(0 - $_[$[]); return; }
+	print STDERR "\n" x $_[$[]; $Irow += $_[$[];
+}
+sub right {
+	# if ($_[$[] < 0) { left(0 - $_[$[]); return; }
+	print STDERR "\e[C" x $_[$[]; $Icol += $_[$[];
+}
+sub left  {
+	# if ($_[$[] < 0) { right(0 - $_[$[]); return; }
+	print STDERR "\e[D" x $_[$[]; $Icol -= $_[$[];
+}
+sub gotoxy { my $newcol = shift; my $newrow = shift;
+	if ($newrow > $Irow)      { down($newrow-$Irow);
+	} elsif ($newrow < $Irow) { up($Irow-$newrow);
+	}
+	if ($newcol == 0) { print STDERR "\r" ; $Icol = 0;
+	} elsif ($newcol > $Icol) { right($newcol-$Icol);
+	} elsif ($newcol < $Icol) { left($Icol-$newcol);
+	}
+}
+
+
+__END__
+formerly:
+ F1,F2  = take new pedal       F3,F4     = remove pedal
+
+=pod
+
+=head1 NAME
+
+midikbd - a simple monophonic ascii-midi-keyboard
+
+=head1 SYNOPSIS
+
+ midikbd [-o output] [-ka|-kd|-kh|-kp|-kw] [-q] <ChannelSpec>...
+ midikbd -o 128:0       # plays to ALSA-port 128:0
+ midikbd 3              # plays to MIDI-Channel 3 (out of 0..15)
+ midikbd 3:0:80 0:73:20 # sets Channel:Patch:Pan, and plays to 0
+ midikbd 3:92:x10:y1 # mouse X-motion controls pan, Y modulation
+ midikbd -ka                # selects the "augmented" keymapping
+ midikbd -q         # Quiet mode: doesn't display keystroke help
+ xterm -geometry 72x18-1-1 -exec 'midikbd -kd' &
+ xterm -geometry 72x24-1-1 -exec 'midikbd -ka' &
+
+ perldoc midikbd
+
+ the "piano" keymap (bottom 2 rows round middleC, top 2 treble clef):
+    1    2    3        5    6       8    9    0        =   Back
+ F  F# G G# A Bb B   C C# D Eb E  F F# G G# A Bb B   c c# d eb e
+ Tab   q    w    e   r    t    y  u    i    o    p   [    ]    \
+              s    d        g    h    j       l    ; 
+            C C# D Eb  E  F F# G G# A Bb B  C C# D Eb E
+            z    x     c  v    b    n    m  ,    .    /
+
+ Q = Quit        C = new Channel        P = new Patch        A = ALSA
+ U/D = Up/Down a semitone      PageUp/Down  = Up/Down an octave
+ UpArrow    = Volume +10       DownArrow = Volume -10
+ RightArrow = Pan +16          LeftArrow = Pan -16  
+ F1,F2=Una F3,F4=Tre   F5,F6=Sos F7,F8=*Sos   F9,F10=Ped F11,F12=*Ped
+ M    = set a MIDI-Controller  X/Y = govern a Controller by mouse X/Y
+ Home = reset all controllers  End = all sounds off
+
+=head1 DESCRIPTION
+
+This script allows the use of the computer keyboard
+as a simple monophonic MIDI keyboard.
+
+Arguments are interpreted as ChannelSpecs, so the -C option has been removed.
+In version 4.0 the command-line syntax has been made neater,
+and more consistent with I<midiecho>,
+and version 4.5 uses the MIDI::ALSA module to start its own ALSA client,
+and therefore no longer needs to hijack a Virtual MIDI client.
+
+I<Midikbd> is monophonic because of the impracticality
+of detecting KeyUp and KeyDown events in an xterm.
+If the <Space> bar is pressed
+(or any other ascii-key which does not map to a note),
+then the current note is stopped;
+otherwise, each note lasts until the next note is played.
+
+This also means that if you hold a key down (as you would on,
+say, an organ keyboard) the key-repeat mechanism will start up;
+this may sound, er, unexpected.
+
+If the B<-o> option is not given then I<midikbd> writes to the
+port specified by the I<ALSA_OUTPUT_PORTS> environment variable.
+
+=head1 OPTIONS
+
+=over 3
+
+=item I<-o 128:0> or I<-o TiMidity>
+
+This example plays into the ALSA B<p>ort I<128:0>,
+or into the I<TiMidity> client..
+It does this by using the I<MIDI::ALSA> Perl CPAN module.
+When I<midikbd> exits the connection is automatically deleted.
+
+This option allows I<midikbd> to use the same port-specification
+as the other alsa-utils, e.g. I<aplaymidi> and I<aconnect>.
+An ALSA-port is specified by its number; for port 0 of a client,
+the ":0" part of the port specification can be omitted.
+The output port is taken from the I<ALSA_OUTPUT_PORTS>
+environment variable if none is given on the command line.
+
+Since Version 5.0,
+you may supply a comma-separated list of ports, e.g. I<-o 20,128:1>
+
+Since Version 5.4,
+the particular port value zero e.g. I<-o 0> is taken
+as an instruction to not connect to anything at all.
+This is useful if you want the output to go into another program like
+I<midiecho> or I<midichord>;
+you no longer have to go through a MIDI-Through client.
+In separate I<xterm>s:
+  midikbd -o 0
+
+and then
+  midiecho -i midikbd -c 0 -d 250,450 -s 45 -e 1,2
+
+=item I<-ka> or I<-kd> or I<-kh> or I<-kp> or I<-kw>
+
+=item I<-k augmented> or I<-k drumkit> etc.
+
+Selects the B<k>eymap: possible keymaps are I<augmented> (the default),
+I<drumkit>, I<harmonic>, I<piano> and I<wholetone>.
+All keymappings are aimed at the US-keyboard; this could be seen as a bug.
+The I<augmented> keymap is particularly good for improvisation.
+The I<drumkit> keymap preselects Channel 9; in this mode,
+it is pointless to change the Patch or the Transposition.
+The I<harmonic> keymap is sort of inspired by accordion buttons,
+and makes it very easy to play major and minor triads;
+this is unfortunately not very useful as I<midikbd> is only monophonic,
+which could also be seen as a bug.
+
+ the "piano" keymap (bottom 2 rows round middleC, top 2 treble clef):
+    1    2    3        5    6       8    9    0        =   Back
+ F  F# G G# A Bb B   C C# D Eb E  F F# G G# A Bb B   c c# d eb e
+ Tab   q    w    e   r    t    y  u    i    o    p   [    ]    \
+              s    d        g    h    j       l    ; 
+            C C# D Eb  E  F F# G G# A Bb B  C C# D Eb E
+            z    x     c  v    b    n    m  ,    .    /
+
+ the "wholetone" keymap (bottom 2 rows bass, top 2 treble):
+ `    1    2   3    4    5    6    7    8    9    0    -    =   Back
+ G G# A Bb B C C# D Eb E F F# G G# A Bb B c c# d  eb e f f# g g# a bb
+   Tab  q    w    e    r   t    y    u    i    o     p   [    ]    \
+          a    s    d    f    g    h    j   k    l    ;    '
+          B_ C C# D Eb E F F# G G# A Bb B C C# D Eb E F F# G
+             z    x    c   v    b    n    m    ,    .   /
+
+ the "augmented" keymap (all 4 rows, starting from top left):
+ `    1    2   3    4    5    6    7    8    9    0    -    =   Back
+ Bb   C    E   G#   C    E    G#   c    e    g#   c    e    g    a
+   Tab  q    w    e    r   t    y    u    i    o     p   [    ]    \
+    B   C#   F    A    C#  F    A    c#   f    a     c#  f    g#   bb
+          a    s    d    f    g    h    j   k    l    ;    '
+          D    F#   Bb   D    F#   Bb   d   f#   bb   d    f#
+             z    x    c   v    b    n    m    ,    .   /
+             Eb   G    B   Eb   G    B    eb   g    b   eb
+
+ the "harmonic" keymap (rightwards, alternate maj and min 3rds):
+   1     2   3    4   5   6   7    8    9     0    -     =    Back
+   Eb Bb G D Bb F D A F C A E C G  E B  G  D  B F# D  A  F# C# A
+      q    w    e   r   t   y   u    i     o    p     [     ]
+         a    s   d   f   g   h    j    k     l    ;     '
+         F  C A E C G E B G D B F# D A  F# C# A E  C# G# E
+            z   x   c   v   b   n    m     ,    .     /
+
+ the "drumkit" keymap (for General-MIDI channel 9):
+ Perc  1   2   3   4   5   6   7   8   9   0   -   =    Congas
+ HiHat   q   w   e   r   t   y   u   i   o   p   [   ] Cymbals
+ Snare     a   s   d   f   g   h   j   k   l   ;   '   TomToms
+ Metronome   z   x   c   v   b   n   m   ,   .       BassDrums
+
+=item I<-q>
+
+B<q>uiet mode: doesn't display keystroke help
+
+=item I<-h>
+
+Prints B<h>elpful usage information.
+
+=item I<-v>
+
+Prints B<v>ersion number.
+
+=back
+
+=head1 CHANNELSPEC
+
+After the options, the remaining command-line arguments are ChannelSpecs,
+which specify how the MIDI-Channels are to be set up. For example:
+
+B< 5>
+
+This first example preselects B<C>hannel number 5 (out of 0..15).
+
+B< 5:91:120 4:14:120 3:91:8 2:14:8 1:91:64 0:14:64>
+
+The second example sets up I<Channel:Patch:Pan> on a number of channels,
+and leaves I<midikbd> playing on the last channel mentioned.
+A list of General-MIDI Patch-numbers is at
+http://www.pjb.com.au/muscript/gm.html#patch
+in separate xterm's:
+
+  midikbd -o 0 5:91:120 4:14:120 3:91:8 2:14:8 1:29:64 0:14:64 &
+
+and
+
+  midiecho -i midikbd -d 1,2200,2201,4400,4401 -q 5 -e 1,2,3,4,5
+
+B< 3:91:y0 2:92:y-0 1:93:x-10 0:94:x10>
+
+The third example uses mouse movement X,Y
+within its window to drive MIDI-controllers, with an B<x> or a B<y>
+followed by a Controller-number.
+A list of MIDI-Controller numbers is at
+http://www.pjb.com.au/muscript/gm.html#cc
+and if the number is preceded by a minus sign then I<midikbd> reverses the
+direction of drive, so that right- or up-motions decrease the parameter
+rather than increase it as they do normally.
+
+Controller number zero is re-interpreted by I<midikbd> to mean Pitch-Bend,
+which is not technically a real MIDI-controller, but is very useful.
+(The real MIDI-controller number zero is a Bank-Select, which is a
+slow and discontinuous operation not useful under a mouse.)
+
+B<midikbd -o 14 3:91:y0 2:92:y-0 1:93:x-11 0:94:x11 >
+
+This fourth example leaves I<midikbd> transmitting
+to patch 94 on channel 0, after having set patch 91 on channel 3, and 92 on 2,
+and 93 on channel 1;
+and the X-motions of the mouse cross-fade from patch 93 to 94,
+and the Y-motions raise and lower patches 91 and 92 in opposite directions.
+
+Previously, in a different I<xterm>, you have to be running:
+
+ midiecho -i 14 -d 1,1,1 -s 1,1,1 -e 1,2,3
+
+to duplicate channel 0 onto channels 1,2, and 3 (very wild :-).
+
+I<Midikbd> detects mouse-motion events from the I<xterm>,
+by using the DECSET SET_ANY_EVENT_MOUSE command: \e[?1003h
+(An earlier version ran I<xev> and parsed its output).
+
+=head1 SUPERSEDED OPTIONS
+
+=over 3
+
+=item I<-p>
+
+Specifies the output ALSA-port.  Just use B<-o> instead.
+
+=item I<-C>
+
+Preselect the MIDI-channel.Just specify the I<ChannelSpec>
+arguments after the options on the command-line.
+
+=item I<-P 32>
+
+Preselects B<P>atch number 32 on whatever the current channel is.
+This option is superseded by the I<ChannelSpec> arguments.
+
+=back
+
+=head1 CHANGES
+
+ 20150603  5.8  X and Y mouse-control of pitchwheel displayed helpfully
+ 20150531  5.7  X and Y mouse-control fixed
+ 20150529  5.6  UI change: F1-F4=Una/Tre  F5-F8=Sos/*Sos  F9-F12=Ped
+ 20150528  5.5  the Synopsis responds to Pedal on/off
+ 20130225  5.4  -o 0 doesn't connect to anything
+ 20120407  5.3  the Y-controller works correctly
+ 20120401  5.2  changing the X- or Y-controller is displayed correctly
+ 20111103  5.1  use the new MIDI-ALSA 1.11 to handle portnames
+ 20111028  5.0  OutputPort can be a comma-separated list
+ 20110917  4.9  Pan controlled by mouse is not falsely displayed
+ 20110620  4.8  drumkit offers z,x = metronome
+ 20110509  4.7  quit from drumkit mode cleans up screen properly
+ 20110414  4.6  keystroke A changes ALSA connections
+ 20110321  4.5  now uses MIDI::ALSA, not writing to /dev/snd/midi*
+ 20101213  4.4  display more compact; Controllers now displayed
+ 20101117  4.3  keystrokes X and Y map X and Y mouse at run-time
+ 20101017  4.2  keystroke M sets MIDI-Controller
+ 20101017  4.2  AutoPan is cancelled by Pan, but still unimplemented
+ 20100819  4.1  CursorRow set correctly for drumkit keymap
+ 20100419  4.0  -C deprecated, -p and -d subsumed into -o
+ 20100417  3.6  X and Y mouse movements govern controllers 
+ 20100402  3.5  F1,F2 take new pedal; F3,F4 remove pedal
+ 20100326  3.4  -C accepts the Channel:Patch:Pan format
+ 20100325  3.3  handles multiple -C nn -P nn -C nn -P nn settings
+ 20100325  3.2  Left&Right pan; U&D transpose, Up&Down vol
+ 20100318  3.1  -d -  outputs to stdout, e.g. to pipe into midiecho -i -
+ 20100215  3.0  -C and -P, and -p now means ALSA-port
+ 20100206  2.9  augmented keymapping
+ 20100202  2.8  uses aconnect to show "connected to" info for virmidi
+ 20100202  2.7  -d option
+ 20100130  2.6  in drumkit mode, no Channel, Patch or Transpose
+ 20100130  2.5  fixed -h option
+ 20100130  2.4  drumkit keymapping
+ 20100129  2.3  piano, wholetone and harmonic keymappings; -k option
+ 20100128  2.2  Quiet mode: doesn't display keystroke help
+ 20100127  2.1  display_note()
+ 20100127  2.0  different key2note mapping, starting from z=C
+ 20100126  1.9  bug fixed with note-off for bass c
+ 20100126  1.8  End = sounds off,  Home = reset controllers
+ 20100126  1.7  looks through /dev/snd for midiC* files
+ 20100126  1.6  remembers Patch per Channel
+ 20100125  1.5  proper little Clui-style state display
+ 20100125  1.4  Left and Right arrows change volume
+ 20100125  1.3  the -p option works
+ 20100125  1.2  sub note_off; channel change stops last note
+ 20100125  1.1  PageUp,PageDown,Up,Down change transpose
+ 20100125       P changes patch, C changes channel
+ 20100124  1.0  first working version
+
+=head1 AUTHOR
+
+Peter J Billam   http://www.pjb.com.au/comp/contact.html
+
+=head1 REQUIREMENTS
+
+Uses the CPAN modules Term::ReadKey and MIDI::ASLA.
+
+=head1 SEE ALSO
+
+ Term::ReadKey
+ MIDI::ALSA
+ http://www.pjb.com.au/midi
+ http://www.pjb.com.au/muscript/gm.html
+ http://vmpk.sourceforge.net
+ perl(1).
+
+=cut

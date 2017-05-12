@@ -1,0 +1,4 @@
+---
+dsn: dbi:mysql:foobar_development
+user: root
+# password: mys3kr3tp4zz

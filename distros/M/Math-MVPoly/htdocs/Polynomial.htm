@@ -1,0 +1,217 @@
+<HTML>
+<HEAD>
+<TITLE>Polynomial - Perl module implementing an algebraic polynomial</TITLE>
+<LINK REV="made" HREF="mailto:bguarrac@hotmail.com">
+</HEAD>
+
+<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#NAME">NAME</A>
+	<LI><A HREF="#DESCRIPTION">DESCRIPTION</A>
+	<LI><A HREF="#AUTHOR">AUTHOR</A>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="NAME">NAME</A></H1>
+<P>
+Polynomial - Perl module implementing an algebraic polynomial
+
+<P>
+<HR>
+<H1><A NAME="DESCRIPTION">DESCRIPTION</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new</A></STRONG><DD>
+<P>
+Create a new zero polynomial and return it to the caller.
+
+<p>
+
+<DT><STRONG><A NAME="item_copy">copy OBJREF</A></STRONG><DD>
+<P>
+Perform a deep copy of the polynomial object referenced by OBJREF.
+
+<p>
+
+<DT><STRONG><A NAME="item_monOrder">monOrder</A></STRONG><DD>
+<DT><STRONG>monOrder STRING</STRONG><DD>
+<P>
+Return the current monomial ordering. If an argument is passed, it is
+assigned as the new monomial ordering. The valid orderings are: 
+
+<P>
+<PRE>        tdeg            - total degree (single variable case only)
+        lex             - pure lexicographic ordering
+        grlex           - graded lex
+        grevlex         - graded reverse lex
+</PRE>
+<p>
+
+<DT><STRONG><A NAME="item_varOrder">varOrder</A></STRONG><DD>
+<DT><STRONG>varOrder ARRAYREF</STRONG><DD>
+<P>
+Return the current variable ordering as an array reference. If an argument
+is passed, it is assigned as the new variable ordering. For example,
+
+<P>
+<PRE>        $poly-&gt;varOrder(['x','y','z']);
+</PRE>
+<P>
+assigns the variable ordering x &gt; y &gt; z.
+
+<p>
+
+<DT><STRONG><A NAME="item_monomials">monomials</A></STRONG><DD>
+<DT><STRONG>monomials HASHREF</STRONG><DD>
+<P>
+Returns the current collection of monomials. If an argument is passed, it
+is assigned as the new collection of monomials.
+
+<p>
+
+<DT><STRONG><A NAME="item_insertMonomial">insertMonomial OBJREF</A></STRONG><DD>
+<P>
+Performs a copy of the monomial referred to by OBJREF and inserts it into
+the monomial collection.
+
+<p>
+
+<DT><STRONG><A NAME="item_simplify">simplify</A></STRONG><DD>
+<P>
+Attempt to unify monomials with the same 'signature' (see getSignature)
+through addition.
+
+<p>
+
+<DT><STRONG><A NAME="item_fromString">fromString STRING</A></STRONG><DD>
+<P>
+Construct the state of the polynomial from the algebraic expressin
+represented in STRING. For example,
+
+<P>
+<PRE>        $poly-&gt;fromString(&quot;xyz+x^2y^4+x+2&quot;);
+</PRE>
+<P>
+would create four monomials: xyz, x^2y^4, x, and 2. The previous monomials
+contained in the polynomial are destroyed.
+
+<p>
+
+<DT><STRONG><A NAME="item_toString">toString</A></STRONG><DD>
+<P>
+Convert the current state of the polynomial into a string and return it to
+the caller. This string can be sent back in via fromString and be used to
+reconstruct the polynomial.
+
+<p>
+
+<DT><STRONG><A NAME="item_applyOrder">applyOrder</A></STRONG><DD>
+<P>
+Order the monomials according to the current monomial ordering setting.
+
+<p>
+
+<DT><STRONG><A NAME="item_SortByLexOrder">SortByLexOrder</A></STRONG><DD>
+<P>
+(Internal) Perform sort.
+
+<p>
+
+<DT><STRONG><A NAME="item_SortByGrevLex">SortByGrevLex</A></STRONG><DD>
+<P>
+(Internal) Perform sort.
+
+<p>
+
+<DT><STRONG><A NAME="item_SortByGrLex">SortByGrLex</A></STRONG><DD>
+<P>
+(Internal) Perform sort.
+
+<p>
+
+<DT><STRONG><A NAME="item_SortByTotalDegree">SortByTotalDegree</A></STRONG><DD>
+<P>
+(Internal) Perform sort.
+
+<p>
+
+<DT><STRONG><A NAME="item_getLT">getLT</A></STRONG><DD>
+<P>
+Get the leading term of the polynomial and return it to the caller.
+
+<p>
+
+<DT><STRONG><A NAME="item_isNotZero">isNotZero</A></STRONG><DD>
+<P>
+Return a boolean indiciating wether or not the polynomial is a zero
+polynomial or not.
+
+<p>
+
+<DT><STRONG><A NAME="item_mult">mult OBJREF</A></STRONG><DD>
+<P>
+Perform polynomial multiplication using this polynomial and the one
+referred to by OBJREF. Return a new polynomial containing the product.
+
+<p>
+
+<DT><STRONG><A NAME="item_add">add OBJREF</A></STRONG><DD>
+<P>
+Perform polynomial addition using this polynomial and the one referred to
+by OBJREF. Return a new polynomial containing the sum.
+
+<p>
+
+<DT><STRONG><A NAME="item_subtract">subtract OBJREF</A></STRONG><DD>
+<P>
+Perform polynomial subtraction using this polynomial and the one referred
+to by OBJREF. Return a new polynomial containing the difference.
+
+<p>
+
+<DT><STRONG><A NAME="item_divide">divide OBJREF</A></STRONG><DD>
+<P>
+Perform polynomial division using this polynomial and the one referred to
+by OBJREF. Return an array reference containing the quotients and the
+remainder.
+
+<p>
+
+<DT><STRONG><A NAME="item_gcd">gcd OBJREF</A></STRONG><DD>
+<P>
+Determine the polynomial greatest common divisor with respect to this
+polynomial and the one referred to by OBJREF. Return a new polynomial
+containing the gcd.
+
+<p>
+
+<DT><STRONG><A NAME="item_reduce">reduce</A></STRONG><DD>
+<P>
+Attempt to achieve two goals: 
+
+<P>
+<PRE>        1) Get as many 1's as coefficients as possible
+        2) If the leading term's coefficient is negative multiply all the coefficients by -1.
+</PRE>
+<p>
+
+<DT><STRONG><A NAME="item_spoly">spoly</A></STRONG><DD>
+<P>
+Determine the polynomial SPOLY with respect to this polynomial and the one
+referred to by OBJREF. Return a new polynomial containing the SPOLY.
+
+</DL>
+<P>
+<HR>
+<H1><A NAME="AUTHOR">AUTHOR</A></H1>
+<P>
+Brian Guarraci &lt;<A
+HREF="mailto:bguarrac@hotmail.com">bguarrac@hotmail.com</A>&gt;
+</BODY>
+
+</HTML>

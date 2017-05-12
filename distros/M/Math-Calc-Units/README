@@ -1,0 +1,32 @@
+Examples:
+
+It won't take *that* long to download this 650MB cd image over Mom's
+33.6Kbps modem, will it? I can just let it run all night.
+
+    % ucalc "650MB/33.6Kbps"
+    1.834 day
+
+What's the throughput for random 8KB reads, using a hard disk with
+20MB/sec transfers and an average access latency of 15ms?
+
+    % perl -MMath::Calc::Units=readable -le 'print foreach (readable("8KB / (8KB/(20MB/sec) + 15ms)"))'
+
+    532.3 byte / millisec
+    1.785 gigabyte / hour
+    42.83 gigabyte / day
+    519.8 kilobyte / sec
+    30.46 megabyte / minute
+
+Note: ucalc is a thin wrapper script that pretty much does what the
+one-liner above does.
+
+Installing:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Documentation: perldoc Math::Calc::Units
+
+Author: Steve Fink <sfink@cpan.org>

@@ -1,0 +1,33 @@
+0.008
+  - Convert to Moo
+
+0.007
+   - Add Content-Type: application/json
+
+0.006
+   - Should be Null not Message::Passing::Output::Null in WebHooks.pm
+
+   - Fix docs and spelling tests
+
+0.005
+   - Update documentation to include more details about logging
+
+   - Fix for Message::Passing 0.006
+
+0.004
+   - Rename script to be consistent
+
+0.003
+    - Doc fixes
+
+0.002_01
+    - Rename
+
+0.002
+    - Fix log_chain now returning an array.
+    - Make sure to build the logger chain at startup
+    - Fix getting message which contains bad data crashing the server.
+
+0.001
+    - Initial version
+

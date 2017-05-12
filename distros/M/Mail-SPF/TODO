@@ -1,0 +1,28 @@
+# Legend:
+# --- = A new release
+#   + = Add a feature (in a backwards compatible way)
+#   ! = Change something significant, or remove a feature
+#   * = Fix a bug, or make a minor improvement
+
+--- ?
+
+  Mail::SPF:
+  + Implement "policy source" concept in mechanisms.  Make the policy source
+    accessible from Mail::SPF::Result.
+  * Implement DNS cache?  If so, revert changes to the Mail::SPF::Server's
+    "DESCRIPTION" POD section in r36.
+  * Remove or conditionalize debug output generation.  Add more debug code?
+  ! Resolve remaining XXXs, FIXMEs, and TODOs:
+    grep -rn 'XXX\|TODO\|FIXME' lib | grep -v '\.svn' | less
+
+  spfquery:
+  + Enable/implement 'debug' option.
+  + Implement black magic options.
+
+  spfd:
+  + Implement black magic options.
+
+  Please DO report documentation bugs!
+
+# $Id: TODO 57 2012-01-30 08:15:31Z julian $
+# vim:tw=79 sts=2 sw=2

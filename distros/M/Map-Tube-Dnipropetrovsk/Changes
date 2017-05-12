@@ -1,0 +1,35 @@
+0.05 2015-10-15T23:29:54+02:00
+ - Add EXAMPLE4 to doc.
+ - Update to Map::Tube 3.06.
+
+0.04 2015-10-03T12:28:34+02:00
+ - Add get_line_by_id() and get_line_by_name() methods to doc.
+ - Add tests for get_node_by_id() and get_node_by_name() methods.
+ - Move author tests to xt/ directory.
+ - Rewrite SEE ALSO section to new style.
+ - Update Module::Install to 1.16 version.
+
+0.03 2015-03-13T04:54:13+01:00
+ - Add <?xml> header to XML document.
+ - Add Map::Tube::Graph to SEE ALSO section in doc.
+ - Add Map::Tube::Plugin::Graph to SEE ALSO section in doc.
+ - Add Map::Tube::Singapore to SEE ALSO section in doc.
+ - Add lines to XML document.
+ - Add test of map validity.
+ - Remove driver from EXAMPLE3 section in doc. neato is default driver.
+ - Remove obsolete code from EXAMPLE2 section in doc.
+ - Update README file.
+
+0.02 2015-01-02T05:08:09+01:00
+ - Add EXAMPLE3 section to doc.
+ - Add Map::Tube::GraphViz, Map::Tube::Text::Table, Task::Map::Tube,
+   Map::Tube::Bucharest, Map::Tube::Budapest, Map::Tube::Kazan,
+   Map::Tube::Nanjing, Map::Tube::Novosibirsk, Map::Tube::Prague,
+   Map::Tube::Vienna and Map::Tube::Yekaterinburg to SEE ALSO section in
+   doc.
+ - Add get_lines() method to doc.
+ - Add get_stations() method to doc.
+ - Update copyright years to 2015.
+
+0.01 2014-12-20T05:07:25+01:00
+ - First version

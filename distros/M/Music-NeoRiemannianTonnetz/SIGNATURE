@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5af545c218bf29dd2f3c9202e292c2116254d035 Changes
+SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
+SHA1 7fdbd297f6d2c0fd4ab10dca136c076a4745c1e2 MANIFEST
+SHA1 283a6eac305b7ef66804643522ea3f42fff1a4b5 META.json
+SHA1 aa92ffeea4463d71bfab0fbdba05735f87c47fc8 META.yml
+SHA1 06533c642a34ca0b63d5d125ad6719083d710aad Makefile.PL
+SHA1 63b00070e432b398f364eaecaf313975c94b4ee0 README
+SHA1 153f7b421fd611798d5774e37bfb96fcc6f21bb6 eg/nrt-normalize-notes
+SHA1 ff73b05221a94f75913669020ad23dc8173b6eaa eg/nrt-primes-to-normalized
+SHA1 705233a52532819001ca87db9dcc227221798c63 eg/nrt-study-setclass
+SHA1 e9a3ac97914cc133c61b98b79ada26e8ede90932 lib/Music/NeoRiemannianTonnetz.pm
+SHA1 5b7955ebb0dd529ccdd461e31bdf823ff4d7c552 t/Music-NeoRiemannianTonnetz.t
+SHA1 3ef65383d82f059f56f43236663119c01974decb t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJU0YdoAAoJEDTEVWqwTuCUJjkH/j7gTcKf7PwhSFeUnoCi6DPo
+jXYJLIP+XwHsYo2ZUm4UFFOBNhei+93G+DtQBd1ocDV55PaBdjVVcQd1LgJnbSsY
+jwRHLPnwO3Q9Dc9AtxonCU39pW/ZHqH/4f0KRuX/kOFQRPqptzDsll5Vdvx5s5pk
+8SojdV8bpjI10RBY3l3CI2OFDJhrhKDHdtTnsyQsiWHcqSheY8TzCmSI7/51lYgK
+fXW1PP0Qy7EKkvR78zXIPmdGxYmQZ/338fNa3316lUY1w860PejzZZWyZ/BPVjYh
+PDPidaOp1qNt1Lnd+ioRed3jCn7D6lgxeZR13eqxVGp9RfQvdjGWjrNulRptZUU=
+=+7ag
+-----END PGP SIGNATURE-----

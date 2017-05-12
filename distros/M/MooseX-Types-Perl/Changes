@@ -1,0 +1,13 @@
+Revision history for MooseX-Types-Perl
+
+0.101343  2014-02-01 19:21:28-05:00 America/New_York
+          documentation patch for Identifiers (thanks, Karen Etheridge)
+
+0.101342  2013-10-05 09:13:49 America/New_York
+          update bugtracker and repo
+
+0.101341  2011-12-23 17:18:04 America/New_York
+          forbid non-ASCII in pkg, dist, module
+
+0.101340  2010-05-14 23:08:06 America/New_York
+          first release!

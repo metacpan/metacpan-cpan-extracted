@@ -1,0 +1,55 @@
+README for Mail::Field::Received
+
+                           Mail::Field::Received
+                           =====================
+
+Mail::Field::Received is a parser of `Received' headers in e-mails.
+It mostly complies with RFC822, but deviates to accomodate a number of
+broken MTAs which are in common use.
+
+Uses
+----
+
+Any program which requires detailed information about the journey an
+e-mail took in order to arrive at its present location should find
+this parser very handy.
+
+See <http://adamspiers.org/> for an e-mail filter which uses this
+module as part of its spam detection heuristics.
+
+Prerequisites
+-------------
+
+This suite requires Perl 5.005 or higher.  Mail::Field::Received also needs
+Mail::Field.
+
+Installation
+------------
+
+See INSTALL.
+
+Documentation
+-------------
+
+POD-format documentation is included in Received.pm.  POD is readable
+with the 'perldoc' utility.
+
+Support
+-------
+
+Questions, bug reports, useful code bits, and suggestions for
+Mail::Field::Received should just be sent to me at <adam@spiers.net>.
+
+Availability
+------------
+
+The latest version of Mail::Field::Received is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN> to find a CPAN site near you.
+
+Copyright
+---------
+
+(c) 1999, Adam Spiers <adam@spiers.net>, all rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

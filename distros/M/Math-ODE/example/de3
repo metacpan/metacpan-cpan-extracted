@@ -1,0 +1,29 @@
+#!/usr/bin/perl -w
+
+# Example 1:  Solve
+#   f'' - g' = 0
+#   g'' + f*g' - f'*g = 0
+#   f(0)=0,f'(0)=1,f''(0)=-1,g(0)=1
+#   Solution: f = 1 - exp(-x)
+#   g = exp(-x)
+
+use Math::ODE;
+
+my $o = new Math::ODE ( file => 'data',
+                        step => 0.1,
+                        initial => [0,1,-1,1],
+                        ODE => [ \&DE1, \&DE2 , \&DE3, \&DE4 ],
+                        t0 => 0,
+                        tf => 20 );
+$o->evolve;
+system("gnuplot -persist gnuplot.3");
+
+
+
+sub DE1 { my ($t,$y) = @_; $y->[1]; }
+sub DE2 { my ($t,$y) = @_; $y->[2]; }
+sub DE3 { my ($t,$y) = @_; $y->[1] * $y->[3] - $y->[0] * $y->[2]; }
+sub DE4 { my ($t,$y) = @_; $y->[2]; }
+
+
+

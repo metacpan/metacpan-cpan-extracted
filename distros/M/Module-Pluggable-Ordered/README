@@ -1,0 +1,52 @@
+NAME
+    Module::Pluggable::Ordered - Call module plugins in a specified order
+
+SYNOPSIS
+        package Foo;
+        use Module::Pluggable::Ordered;
+
+        Foo->call_plugins("some_event", @stuff);
+
+    Meanwhile, in a nearby module...
+
+        package Foo::Plugin::One;
+        sub some_event_order { 99 } # I get called last of all
+        sub some_event { my ($self, @stuff) = @_; warn "Hello!" }
+
+    And in another:
+
+        package Foo::Plugin::Two;
+        sub some_event_order { 13 } # I get called relatively early
+        sub some_event { ... }
+
+DESCRIPTION
+    This module behaves exactly the same as "Module::Pluggable", supporting
+    all of its options, but also mixes in the "call_plugins" method to your
+    class. "call_plugins" acts a little like "Class::Trigger"; it takes the
+    name of a method, and some parameters. Let's say we call it like so:
+
+        __PACKAGE__->call_plugins("my_method", @something);
+
+    "call_plugins" looks at the plugin modules found using
+    "Module::Pluggable" for ones which provide "my_method_order". It sorts
+    the modules numerically based on the result of this method, and then
+    calls "$_->my_method(@something)" on them in order. This produces an
+    effect a little like the System V init process, where files can specify
+    where in the init sequence they want to be called.
+
+SEE ALSO
+    Module::Pluggable, Class::Trigger
+
+AUTHORS
+    Simon Cozens, <simon@cpan.org> (author emeritus)
+    Christopher Nehren, <apeiron@cpan.org> (current maintainer)
+
+COPYRIGHT AND LICENSE
+    Copyright 2004 by Simon Cozens
+    Copyright 2004 by Christopher Nehren (current copyright holder)
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+ACKNOWLEDGEMENTS
+	Thanks to Simon Cozens for originally writing this module.

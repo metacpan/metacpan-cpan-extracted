@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/MARC-Utils-MARC2Ini.t
+lib/MARC/Utils/MARC2Ini.pm
+META.yml                                 Module meta-data (added by MakeMaker)

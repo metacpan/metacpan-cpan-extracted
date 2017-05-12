@@ -1,0 +1,15 @@
+Revision history for Moonshine-Magic
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02    31/01/2017
+        Stop the warnings :)
+
+0.03    31/01/2017
+        lazy_components (qw/span p div/);
+
+0.06    11/02/2017
+        a poor mans *with*. 
+
+

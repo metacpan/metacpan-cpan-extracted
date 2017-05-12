@@ -1,0 +1,25 @@
+---
+abstract: 'Mojolicious routes as Angular javascript module.'
+author:
+  - 'Viktor Turskyi <koorchik@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-JSUrlFor-Angular
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '7.00'
+resources:
+  repository: https://github.com/mche/Mojolicious-Plugin-JSUrlFor-Angular
+version: '0.18'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

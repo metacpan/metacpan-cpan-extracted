@@ -1,0 +1,17 @@
+Revision history for Microarray-GeneXplorer
+
+0.11 Thu Jul 15 07:38:53 2004
+
+     Updated the README to provide more clarity as to how to link
+     genes to external URLs in GeneXplorer.
+
+     Modified makeMicroarrayDataset.pl to allow a user to provide a
+     correlation cutoff.
+
+     Modified correlations.c to not limit the number of correlations
+     to output for a given gene.
+
+0.1  Thu May 20 09:35:25 2004
+
+	- original version; created by h2xs 1.21 with options
+		-n Microarray-GeneXplorer -X

@@ -1,0 +1,7 @@
+# Dzil build directorys
+/Mojolicious-Plugin-Mango*
+[._][Bb]uild/
+release*
+*.bak$
+*.swp$
+.gitnxtver_cache

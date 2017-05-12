@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?><XMI xmlns:UML="href://org.omg/UML/1.3" xmi.version="1.1">
+<XMI.header>
+<XMI.metamodel xmi.name="UML" xmi.version="1.3"/>
+</XMI.header>
+<XMI.content>
+<UML:Model name="PlantUML" xmi.id="model1">
+<UML:Namespace.ownedElement>
+<UML:Class name="My::Example::Baseclass" namespace="model1" xmi.id="cl0002">
+<UML:Classifier.feature>
+<UML:Operation name="method_in_baseclass()" xmi.id="att36"/>
+</UML:Classifier.feature>
+</UML:Class>
+<UML:Class name="My::Example::Class" namespace="model1" xmi.id="cl0003">
+<UML:Classifier.feature>
+<UML:Attribute name="attribute_in_class" xmi.id="att37"/>
+<UML:Operation name="method_in_example_class()" xmi.id="att38"/>
+</UML:Classifier.feature>
+</UML:Class>
+<UML:Class name="My::Example::Role::Buffy" namespace="model1" xmi.id="cl0004">
+<UML:Classifier.feature>
+<UML:Attribute name="buffy" xmi.id="att39"/>
+<UML:Attribute name="giles" xmi.id="att40"/>
+<UML:Attribute name="willow" xmi.id="att41"/>
+<UML:Attribute name="xander" xmi.id="att42"/>
+<UML:Operation name="slay()" xmi.id="att43"/>
+</UML:Classifier.feature>
+</UML:Class>
+<UML:Class name="My::Example::Role::Flintstones" namespace="model1" xmi.id="cl0005">
+<UML:Classifier.feature>
+<UML:Attribute name="fred" xmi.id="att44"/>
+<UML:Attribute name="wilma" xmi.id="att45"/>
+<UML:Operation name="have_a_yabba_do_time()" xmi.id="att46"/>
+</UML:Classifier.feature>
+</UML:Class>
+<UML:Class name="My::Example::Role::JackBlack" namespace="model1" xmi.id="cl0006">
+<UML:Classifier.feature>
+<UML:Operation name="get_dragon_scroll()" xmi.id="att47"/>
+<UML:Operation name="play_best_song_in_the_world()" xmi.id="att48"/>
+<UML:Operation name="teach_school_of_rock()" xmi.id="att49"/>
+</UML:Classifier.feature>
+</UML:Class>
+<UML:Class name="My::Example::Role::PickRandom" namespace="model1" xmi.id="cl0007">
+<UML:Classifier.feature/>
+</UML:Class>
+<UML:Class name="My::Example::Role::PickRandom" namespace="model1" xmi.id="cl0008">
+<UML:Classifier.feature>
+<UML:Operation name="dice_roll()" xmi.id="att50"/>
+</UML:Classifier.feature>
+</UML:Class>
+<UML:Class name="My::Example::Role::PickRandom" namespace="model1" xmi.id="cl0009">
+<UML:Classifier.feature>
+<UML:Operation name="coin_flip()" xmi.id="att51"/>
+</UML:Classifier.feature>
+</UML:Class>
+<UML:Class name="My::Example::Role::RandomValue" namespace="model1" xmi.id="cl0010">
+<UML:Classifier.feature>
+<UML:Operation name="random_value()" xmi.id="att52"/>
+</UML:Classifier.feature>
+</UML:Class>
+<UML:Class name="My::Example::Role::ShedColor" namespace="model1" xmi.id="cl0011">
+<UML:Classifier.feature/>
+</UML:Class>
+<UML:Class name="My::Example::Role::ShedColor" namespace="model1" xmi.id="cl0012">
+<UML:Classifier.feature>
+<UML:Attribute name="color" xmi.id="att53"/>
+<UML:Operation name="paint()" xmi.id="att54"/>
+</UML:Classifier.feature>
+</UML:Class>
+<UML:Class name="My::Example::Role::StarTrek" namespace="model1" xmi.id="cl0013">
+<UML:Classifier.feature>
+<UML:Attribute name="checkov" xmi.id="att55"/>
+<UML:Attribute name="kirk" xmi.id="att56"/>
+<UML:Attribute name="mccoy" xmi.id="att57"/>
+<UML:Attribute name="scotty" xmi.id="att58"/>
+<UML:Attribute name="spock" xmi.id="att59"/>
+<UML:Attribute name="sulu" xmi.id="att60"/>
+<UML:Attribute name="uhura" xmi.id="att61"/>
+<UML:Operation name="beam_me_up()" xmi.id="att62"/>
+</UML:Classifier.feature>
+</UML:Class>
+<UML:Class name="My::Example::Role::TVSeries" namespace="model1" xmi.id="cl0014">
+<UML:Classifier.feature>
+<UML:Attribute name="actor_factory" xmi.id="att63"/>
+<UML:Operation name="get_actor_for_character()" xmi.id="att64"/>
+</UML:Classifier.feature>
+</UML:Class>
+<UML:Class name="My::Example::Role::Tribute" namespace="model1" xmi.id="cl0015">
+<UML:Classifier.feature/>
+</UML:Class>
+<UML:Class name="My::Example::Role::Tribute" namespace="model1" xmi.id="cl0016">
+<UML:Classifier.feature/>
+</UML:Class>
+<UML:Class name="My::Example::Superclass" namespace="model1" xmi.id="cl0017">
+<UML:Classifier.feature>
+<UML:Attribute name="attribute_in_superclass" xmi.id="att65"/>
+<UML:Operation name="method_in_superclass()" xmi.id="att66"/>
+</UML:Classifier.feature>
+</UML:Class>
+</UML:Namespace.ownedElement>
+</UML:Model>
+</XMI.content>
+</XMI>

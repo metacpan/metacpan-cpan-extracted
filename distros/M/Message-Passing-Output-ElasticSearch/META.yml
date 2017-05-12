@@ -1,0 +1,41 @@
+---
+abstract: 'output logstash messages into ElasticSearch.'
+author:
+  - 'Tomas (t0m) Doran <bobtfish@bobtfish.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Message::Passing::Output::ElasticSearch
+name: Message-Passing-Output-ElasticSearch
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  AnyEvent: 0
+  ElasticSearch: 0
+  ElasticSearch::Transport::AEHTTP: 0
+  JSON: 0
+  Message::Passing: 0.001
+  Moose: 0
+  MooseX::Types: 0
+  MooseX::Types::DateTime: 0
+  MooseX::Types::ISO8601: 0
+  MooseX::Types::Moose: 0
+  Scalar::Util: 0
+  Try::Tiny: 0
+  aliased: 0
+  namespace::autoclean: 0
+resources:
+  repository: git://github.com/suretec/Message-Passing-Output-ElasticSearch.git
+version: 0.004
+x_authority: GHENRY

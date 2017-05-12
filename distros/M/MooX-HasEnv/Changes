@@ -1,0 +1,77 @@
+==================================================
+Changes from 1739-07-07 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.004 at 2013-04-20 23:41:48 +0000
+------------------------------------------
+
+  Change: 71d09121690c77876d8ad25c61aed92fabc75acb
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-04-21 01:41:20 +0000
+
+    Added .travis.yml, switched to Author::GETTY 
+
+  Change: d797f970c4da2950522409180086644a8f5aa7a6
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-04-09 18:43:03 +0000
+
+    v0.003 
+
+  Change: e533d75475b3e91c186595a07865e49f833d8544
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-04-09 18:42:22 +0000
+
+    Removed Package Stash usage for getting coderef of has 
+
+  Change: f44b23ee9e03125f32d70b2ea3cff9444e172132
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-04-09 18:22:53 +0000
+
+    Fixed lazy_build => lazy, i will never make that right... 
+
+  Change: bc10f52719a50f3ebf63d3f9a9e588e1d8b65557
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-04-09 17:49:17 +0000
+
+    v0.002 
+
+  Change: 8e8690042ef99d33cb4e2383429647fa657fc7fc
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-04-09 16:27:28 +0000
+
+    Added documentation 
+
+  Change: d0c62ff223caf49d624f8ab1cbe706a7b58a95e0
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-04-09 16:15:25 +0000
+
+    Added 0 and undef handling finetuning 
+
+  Change: 560c89952d482a4e7266e6012542f602048b7e71
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-04-09 02:40:26 +0000
+
+    v0.001 
+
+  Change: f82b0c49de26f0f5a032783a8af2c590fdc4af90
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-04-09 02:37:56 +0000
+
+    Added ABSTRACT 
+
+  Change: 7cff1001cfd0f25114c175ed1b1d48c26db7674e
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-04-09 02:35:37 +0000
+
+    First implementation 
+
+  Change: d2d85635cd106348a847621a88e6cbbc362d3362
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-04-09 00:47:49 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

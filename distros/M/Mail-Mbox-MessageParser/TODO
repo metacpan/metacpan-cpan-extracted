@@ -1,0 +1,25 @@
+- Detect mix of dos and unix line endings and fail with an error
+- Tolerate a mix of dos and unix line endings
+- read_until_match() is slow when it has to read more data, because it
+  restarts the search at the top of the buffer, leading to exponential
+  slowdown
+- The above 3 issues were observed while investigating an email from
+  Pali Rohár <pali.rohar@gmail.com>
+
+- After Module::Install support CPAN::Meta 2.0, specify gpl_2 as the license.
+  Suggested by Paul Howarth <paul@city-fan.org>
+- After Module::Install support CPAN::Meta 2.0, add info for repository URL
+  and bug tracker. Suggested by Paul Howarth <paul@city-fan.org>
+- Wrong assumption parsing Multipart/Mixed messages
+  https://rt.cpan.org/Ticket/Display.html?id=19817
+- thousands of warnings during tests
+  https://rt.cpan.org/Ticket/Display.html?id=13134
+- Add compression support to grep
+- Add random access (email Tassilo von Parseval
+  <tassilo.parseval@post.rwth-aachen.de>)
+- Cache, Cache::Cache
+- When the subclasses call read_next_email, shouldn't the entry be validated?
+- Version the cache file, so that we can invalidate it if a release of the
+  module fixes a bug.
+- As it is now, if we re-initialize the cache, we start all caching over. Fix
+  this so that we can use partial cache information. See MetaInfo.pm

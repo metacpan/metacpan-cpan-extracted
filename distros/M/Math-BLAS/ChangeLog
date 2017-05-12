@@ -1,0 +1,6 @@
+2011-04-19  Ralph Schleicher  <rs@ralph-schleicher.de>
+
+	* MANIFEST: Update file.
+	* MANIFEST.SKIP: Likewise.
+
+	* NEWS: Record user-visible changes.

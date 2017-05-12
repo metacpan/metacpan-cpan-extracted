@@ -1,0 +1,33 @@
+######################################################################
+Revision history for Perl extension Mail::DWIM
+
+0.08  (2014/10/24)
+    (ms) Added SASL auth for SMTP servers, specify 'user' and 'password'.
+    (ms) Compensated for MIME::Lite shortcomings and added 'boundary' to 
+         content-type header on html emails.
+
+0.07  (2014/06/19)
+    (ms) Added smtp_port parameter (defaults to 25).
+    (ms) Now setting ENV var MAILADDRESS for smtp transport
+
+0.06  2010/02/03
+    (ms) Splitting 'to' field on comma separators because for SMTP hosts,
+         as SMTP protocol doesn't support comma-separated recipient lists.
+
+0.05  2008/10/10
+    (ms) Additional fix by Wolfgang Kinkeldei for the date header.
+
+0.04  2008/10/09
+    (ms) Applied patch by Wolfgang Kinkeldei to guess the {date} 
+         header (http://rt.cpan.org/Ticket/Display.html?id=39911).
+
+0.03  2008/09/17
+    (ms) Added 'mail' transport using the 'mail' command line utility.
+    (ms) Fixed test problem reported by Volker Schering with undefined
+         $Config{mydomain}.         
+
+0.02  2007/07/21
+    (ms) Added 'attach'
+
+0.01  2007/07/13
+    (ms) Where it all began.

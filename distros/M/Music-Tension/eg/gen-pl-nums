@@ -1,0 +1,54 @@
+#!/usr/bin/env perl
+#
+# Generates tension data over a range of frequencies. For example:
+#
+#   $ perl -- gen-pl-nums --start=440 --end=880 > blah
+#   $ R
+#   > diss=read.table('blah')
+#   > names(diss)=c('frequency','diss')
+#   > max(diss$diss)
+#   [1] 5.46
+#   > plot(diss,type='l')
+
+use strict;
+use warnings;
+
+use Getopt::Long qw(GetOptions);
+use List::Util qw/max/;
+use Music::Tension::PlompLevelt ();
+
+my $amp_profile = 'pianowire-medium';
+
+GetOptions(
+  'amp=s'   => \$amp_profile,
+  'camp=s'  => \my $custom_amp_profile,
+  'end=f'   => \my $end_freq,
+  'start=f' => \my $start_freq,
+) or die "invalid options\n";
+
+die "start must be lower than end"
+  if !defined $start_freq
+    or !defined $end_freq
+    or $start_freq > $end_freq;
+
+my @custom_amp;
+if ( defined $custom_amp_profile ) {
+  $amp_profile = 'custom';
+  @custom_amp = split /[ ,]+/, $custom_amp_profile;
+}
+
+my $tension = Music::Tension::PlompLevelt->new(
+  amplitudes          => { custom => \@custom_amp },
+  default_amp_profile => $amp_profile,
+);
+
+# Collect and normalize output so most dissonant has value of 1.0, most
+# consonant approaching 0.0.
+my @results;
+for ( my $f = $start_freq; $f <= $end_freq; $f += 0.2 ) {
+  push @results, [ $f, $tension->frequencies( $start_freq, $f ) ];
+}
+my $max = max map $_->[1], @results;
+for my $r (@results) {
+  printf "%.1f %.3f\n", $r->[0], $r->[1] / $max;
+}

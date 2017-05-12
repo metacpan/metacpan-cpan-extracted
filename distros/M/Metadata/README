@@ -1,0 +1,62 @@
+Metadata - classes for simple metadata
+======================================
+
+Copyright (C) 1997-2001 Dave Beckett.  All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+WARNING: THIS IS BETA SOFTWARE.  IT HAS BEEN TESTED AND USED BUT
+MAY STILL BE UNRELIABLE.
+Beta also means that the interface is unlikely to change.
+
+This collection of modules provide an implementation of Dublin Core
+compatible metadata and subclasses for IAFA Templates, SOIF (Harvest)
+and should be easily extendible to similar (fairly flat) metadata
+formats.
+
+CONTENTS in perl module list form
+
+Name           DSLI  Description                                  Info
+-------------  ----  -------------------------------------------- -----
+Metadata::
+::Base         bdpO  Base metadata functionality                  DJBECKETT
+::IAFA         bdpO  IAFA templates metadata                      DJBECKETT
+::SOIF         bdpO  Harvest SOIF metadata                        DJBECKETT
+::HTTP         adpO  Metadata record for an HTTP log record       DJBECKETT
+
+
+
+BEFORE BUILDING, TESTING AND INSTALLING this you will need to:
+
+    Build, test and install Perl 5 (at least version 5.004).
+
+
+BUILDING
+
+    perl Makefile.PL
+    make
+    make test
+    make install (if the tests look okay)
+
+
+EXTRAS
+
+lib/Metadata/HTTP wraps an HTTP log line (in common / extended log
+format) which may be useful.
+
+The examples directory contains some programs that may be interesting:
+  gather
+    A sort-of replacement for the Harvest gather program using these
+    modules.
+
+  htdig-dump
+    dumps an ht://dig search docs database into a Harvest-compatible
+    SOIF format (untested).  It should be trivial to convert this
+    into a real harvest gatherd.
+
+  scan-log
+    HTTP log scanning example attempting to identify robot requests
+
+Dave Beckett
+http://purl.org/net/dajobe/

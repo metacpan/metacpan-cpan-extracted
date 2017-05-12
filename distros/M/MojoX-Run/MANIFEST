@@ -1,0 +1,18 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/MojoX/Run.pm
+lib/MojoX/HandleRun.pm
+lib/MojoX/_Open3.pm
+t/00-load.t
+t/manifest.t
+t/pod.t
+t/mojox-run-long-running.t
+t/mojox-run-max-limit.t
+t/mojox-run-sleep.t
+t/mojox-run-perlsub.t
+t/mojox-run-singleton.t
+t/mojox-run-stdin-close.t
+t/stdin-test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+
+# sc_dbwatch.conf
+# Configuration for sc_dbwatch
+#
+# version 1.01, 11-16-08
+#
+my $DBWATCH = {
+
+## additional KEYS may be included with an INCLUDE statement of the form:
+#
+#  INCLUDE => 'path/to/file.conf',
+#
+#  this file may include an INCLUDE statement, as may the next, etc...
+#
+#
+# how often to recheck for a crashed db task
+
+  RECHECK	=> '5m',	# automatically set to 60 seconds if smaller
+
+# the maximum time to wait for a running DB job to terminate gracefully
+
+  GRACE_PERIOD	=> '5m',
+
+# daemon start commands
+# items without an absolute path name will be run from the 
+# spamcannibal ..../bin directory
+#
+
+# OPTIONAL syslog. Specify the facility, one of: 
+# LOG_EMERG LOG_ALERT LOG_CRIT LOG_ERR LOG_WARNING LOG_NOTICE LOG_INFO LOG_DEBUG
+
+# SYSLOG	=> 'LOG_WARNING',
+
+# put these tasks in the order you would like them started / stopped
+
+  START		=> [
+
+# daemon /path/name		command line
+	'rc.dbtarpit'		=> 'start',
+#	'rc.sc_lbdaemon'	=> 'start',
+	'rc.dnsbls'		=> 'start',
+#	'rc.dnsbls'		=> 'start -p 10053',	# remote access
+	'rc.bdbaccess'		=> 'start',
+#	'rc.bdbaccess'		=> 'start -p 10026',	# remote access
+  ],
+
+# daemon stop commands
+
+  STOP		=> [
+#	'rc.sc_lbdaemon'	=> 'stop',
+	'rc.dbtarpit'		=> 'stop',
+	'rc.dnsbls'		=> 'stop',
+	'rc.bdbaccess'		=> 'stop',
+#	'rc.bdbaccess'		=> 'stop -p 10026',	# remote access require some port number
+  ],
+
+#########################################################################
+# The default site configuration is shown below. If for some reason     #
+# Mail::SpamCannibal::SiteConfig does not provide the configuration     #
+# needed for THIS INSTANCE of sc_dbwatch, then uncomment and edit       #
+# the hash below. See the man page Mail::SpamCannibal::SiteConfig       #
+# for the defaults for your site.                                       #
+#########################################################################
+#
+# SiteConfig = {
+#	'SPMCNBL_DB_ARCHIVE'	=> 'archive',
+#	'SPMCNBL_DB_CONTRIB'	=> 'blcontrib',
+#	'SPMCNBL_DB_EVIDENCE'	=> 'evidence',
+#	'SPMCNBL_DB_TARPIT'	=> 'tarpit',
+#	'SPMCNBL_ENVIRONMENT'	=> '/var/run/dbtarpit',
+#	'SPMCNBL_SCRIPT_DIR'	=> '/usr/local/spamcannibal/scripts',
+#	'SPMCNBL_CONFIG_DIR'	=> '/usr/local/spamcannibal/config',
+# },
+
+};

@@ -1,0 +1,33 @@
+COPYING
+INSTALLING
+LICENSE
+MANIFEST
+Makefile.PL
+README
+contrib/MailTool.pm
+contrib/README
+examples/mime_fwd
+examples/mime_gif
+examples/mime_hack
+examples/mime_longlines
+examples/mime_postcard
+examples/nodisp
+lib/MIME/Lite.pm
+t/ExtUtils/TBone.pm
+t/Utils.pm
+t/addrs.t
+t/data.t
+t/head.t
+t/mime-version.t
+t/parts.t
+t/pod.t
+t/pod-coverage.t
+t/sendmail.t
+t/verify.t
+t/types.t
+testin/README
+testin/hello
+testin/test.html
+changes.pod
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

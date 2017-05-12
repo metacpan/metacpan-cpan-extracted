@@ -1,0 +1,72 @@
+{
+   "abstract" : "Store and retrieve Moose objects to a cache, via L<CHI>.",
+   "author" : [
+      "Steve Caldwell <scaldwell@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.029, Dist::Milla version v1.0.9, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Storage-IO-CHI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.9",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CHI" : "0",
+            "Moose" : "0",
+            "MooseX::Role::Parameterized" : "0",
+            "MooseX::Storage" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0",
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stevecaldwell77/MooseX-Storage-IO-CHI/issues"
+      },
+      "homepage" : "https://github.com/stevecaldwell77/MooseX-Storage-IO-CHI",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stevecaldwell77/MooseX-Storage-IO-CHI.git",
+         "web" : "https://github.com/stevecaldwell77/MooseX-Storage-IO-CHI"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Stephen Caldwell <steve@campusexplorer.com>"
+   ]
+}
+

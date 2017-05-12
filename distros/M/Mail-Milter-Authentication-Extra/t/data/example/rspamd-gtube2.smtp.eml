@@ -1,0 +1,54 @@
+EHLO server.example.com
+XFORWARD HELO=mail-we0-f171.google.com
+XFORWARD ADDR=74.125.82.171
+XFORWARD NAME=mail-we0-f171.google.com
+MAIL FROM:marc@marcbradshaw.net
+RCPT TO:recipient2@example.net
+DATA
+Received: from test.module (localhost [127.0.0.1])
+    by server.example.com (Authentication Milter) with ESMTP
+Authentication-Results: server.example.com;
+    x-local-user=pass;
+    x-rspam=fail score=15.00 required=15.00
+X-Spam-Action: reject
+X-Spam-Status: Yes, score=15.00 required=15.00
+X-Spam-score: 15.00
+Subject: Test spam mail (GTUBE)
+Message-ID: <GTUBE1.1010101@example.net>
+Date: Wed, 23 Jul 2003 23:30:00 +0200
+From: Sender <sender@example.net>
+To: Recipient <recipient2@example.net>
+Precedence: junk
+MIME-Version: 1.0
+X-spam-hits: NOT_SPAM
+X-Spam-hits: NOT_SPAM
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Received-X-Spam-Status: (Received X-Spam-Status header removed by server.example.com)
+    Yes, score=-500.00 required=5.00
+X-Received-X-Spam-score: (Received X-Spam-score header removed by server.example.com)
+    -500.00
+X-Received-X-Spam-Status: (Received X-Spam-Status header removed by server.example.com)
+    Yes, score=-500.00 required=5.00
+X-Received-X-Spam-score: (Received X-Spam-score header removed by server.example.com)
+    -500.00
+
+This is the GTUBE, the
+        Generic
+        Test for
+        Unsolicited
+        Bulk
+        Email
+
+If your spam filter supports it, the GTUBE provides a test by which you
+can verify that the filter is installed correctly and is detecting incoming
+spam. You can send yourself a test mail containing the following string of
+characters (in upper case and with no white spaces and line breaks):
+
+XJS*C4JDBQADN1.NSBN3*2IDNEN*GTUBE-STANDARD-ANTI-UBE-TEST-EMAIL*C.34X
+
+You should send this test mail from an account outside of your network.
+
+
+.
+QUIT

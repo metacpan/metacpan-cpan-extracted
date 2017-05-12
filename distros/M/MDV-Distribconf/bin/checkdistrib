@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+
+# $Id: checkdistrib 56937 2006-08-21 10:19:01Z nanardon $
+
+use strict;
+use warnings;
+use MDV::Distribconf::Build;
+use Getopt::Long;
+
+GetOptions(
+) or die "Error parsing command line argument\n";
+
+my @distribs = @ARGV;
+
+my $error = 0;
+
+foreach my $tree (@distribs) {
+    my $mdc = MDV::Distribconf::Build->new($tree);
+    if(!$mdc->load) {
+        print "\nCannot locate a distrib in $tree\n";
+        next;
+    } else {
+        printf(
+            "\nChecking distrib in %s (%s for %s)\n",
+            $tree,
+            $mdc->getvalue(undef, 'version') || 'unknown',
+            $mdc->getvalue(undef, 'arch') || 'unknown',
+        );
+    }
+    
+    $error += $mdc->checkdistrib(\*STDOUT);
+}
+
+exit($error);

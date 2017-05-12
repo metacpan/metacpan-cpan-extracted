@@ -1,0 +1,16 @@
+Revision history
+
+0.95	20060502
+	Clarified some documentation.  Updated to be compatible with recent HTML::Mason
+0.9	20050210
+	Some internal consistancy cleanup
+0.8	20041203
+	Stash original $r->uri in pnotes('POLYGLOT_URI')
+0.7	20041006
+	Added a way to specify the default URL language
+	Made the chosen language available to a component via $r->pnotes('POLYGLOT_LANG') 
+0.6	20040317
+	Corrected and expanded the documentation.
+	Fixed bug in loading HTML::Mason::Resolver::File::ApacheHandler
+0.5	20040314
+	First public release.  Functional.

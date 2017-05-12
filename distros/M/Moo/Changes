@@ -1,0 +1,574 @@
+Revision history for Moo
+
+2.003002 - 2017-03-28
+    - ensure tarball does not contain SCHILY headers
+
+2.003001 - 2017-03-06
+  - fix +attributes replacing builder subs if parent attribute was defined with
+    builder => $subref
+  - fix trigger with a default value and init_arg of undef
+
+2.003000 - 2016-12-09
+  - fix create_class_with_roles being used multiple times with the same packages
+  - fix edge case with @ISA assignment on perl 5.10.0
+  - minor test adjustments
+  - fix handles on oddly named attributes
+  - make has options linkable in documentation
+  - Sub::Quote and Sub::Defer have been split into a separate dist
+
+2.002005 - 2016-10-31
+  - fix accessor extensions that need captured variables for clearers and
+    predicates. (RT#118453)
+  - avoid relying on '.' being in @INC in tests
+  - fix Sub::Quote test when run with perl -C or PERL_UNICODE on perl 5.10
+    (RT#117844)
+  - improved error messages for invalid sub names in Sub::Quote (RT#116416,
+    RT#117711)
+  - clarify meta method documentation
+  - bump Role::Tiny prereq version to get stub in role fix (RT#116674)
+
+2.002004 - 2016-06-28
+  - fixed another case of local functions interfering with generated code.
+    (RT#115655)
+  - prevent infinite recursion on some Moose metaclass inflation errors.
+
+2.002003 - 2016-06-23
+  - prevent local functions with same names as core functions from interfering
+    with generated code (RT#115529)
+  - Work around nmake bug that corrupts commands that include slashes
+    (RT#115518)
+  - Fix tests to work when lexical features are enabled outside of our control
+    (such as with cperl)
+  - Fix tests on perl 5.6
+
+2.002002 - 2016-06-21
+  - fix handling of Carp < 1.12
+
+2.002_001 - 2016-06-17
+  - added Sub::Quote::sanitize_identifier to generate an identifier from an
+    arbitrary string.
+  - Sub::Defer::defer_info is now exportable.
+  - improved documentation for Sub::Quote.
+  - fix quoted subs with no_defer ignoring no_install option. (RT#114605)
+  - internals of Sub::Quote were refactored.
+  - error message when @ISA changes now includes the location that the
+    constructor was generated.
+  - original invoker will be used when calling a non-Moo parent constructor.
+    (RT#115189)
+  - added testing for preserving context into quote_sub subs. (RT#114511)
+  - quote_sub context options will be used even when zero. (RT#114512)
+  - Sub::Defer::defer_sub gained attributes option to specify sub attributes.
+  - Sub::Quote::quote_sub gained attributes option to specify sub attributes.
+
+2.002_000 - 2016-05-18
+  - Use Carp::croak rather than die to improve reported error locations
+    (RT#109844, RT#109632, RT#102622)
+  - removed Method::Inliner module.  It was never intended to ship with Moo,
+    and was undocumented, untested, and unused on CPAN.
+  - require Role::Tiny 2.000002 for fixes to method modifiers being applied
+    via multiple role composition paths (RT#106668)
+  - Delay loading Class::Method::Modifiers until we actually need it
+  - Fix an explosion that could happen if meta inflation was attempted part way
+    through Moo's bootstrapping process, which was possible via a
+    CORE::GLOBAL::bless override (RT#113743)
+  - Accessor subs will be generated immediately, rather than being partially
+    deferred.  The deferal added extra sub layers and the delayed compilation
+    didn't provide any real benefit for them.
+  - Numeric values used as defaults will be inlined as numbers rather than
+    strings.
+  - Numerous test cleanups and additional test coverage
+  - Fixed a typo in Sub::Defer docs (RT#113416)
+  - Deferred subs (including constructors) will always be named properly, even
+    if neither Sub::Name nor Sub::Util are available.  This improves
+    compatibility with namespace::autoclean, among other things.  Once the sub
+    is undeferred, it may not be given a correct name if Sub::Name or Sub::Util
+    aren't available.
+
+2.001001 - 2016-03-04
+  - Fixed order of attribute value being set and trigger running when there is
+    an isa check present. (RT#112677)
+  - Corrected LIFECYCLE METHODS to be a head1 section rather than head2.
+
+2.001000 - 2016-02-29
+  * Documentation
+    - Added documentation for has's ability to accept an arrayref of attribute
+      names to create with the same options.
+    - Removed mention that we may not call BUILDARGS, since that behavior was
+      removed in 2.000002.
+    - Reorganized documentation of class methods to separate those provided as a
+      public API (new/does/meta) from those used by Moo in the object lifecycle
+      (BUILDARGS/FOREIGNBUILDARGS/BUILD/DEMOLISH).
+    - Updated documentation of most class methods for clarity.
+    - Updated BUILDARGS documentation to show an around rather than just
+      overriding.
+    - Added examples to FOREIGNBUILDARGS and BUILD.
+    - Added explicit documentation for DOES and meta methods.
+
+  * Fixes
+    - Fixed grammar in error message when @ISA is changed unexpectedly before
+      a constructor is fully generated.
+    - Fixed Moo classes and Sub::Quote subs in packages that are nearly 252
+      characters long.
+    - Fixed Sub::Defer::undefer_package emitting warnings.
+    - Fixed detection of constructors that have already been inlined.
+
+  * Performance
+    - The generated code in constructors and setters has had a number of
+      microoptimizations applied.
+    - Deferred subs (and quoted subs like some accessors) in roles will be
+      undefered before copying them to classes.  This prevents the need for a
+      goto on every call that would slow down the subs.
+    - Fixed Moose inflation code resulting in constructors with deferred
+      wrappers.
+
+  * Other
+    - Recommend Sub::Name 0.08, which fixes a memory leak.
+    - The values given to BUILD subs will be the original values passed to new,
+      rather than after coercions have been applied.  This brings the behavior
+      in line with Moose.
+
+2.000002 - 2015-07-24
+  - BUILDARGS will now always be called on object creation, even if no
+    attributes exist
+  - fix required attributes with spaces or other odd characters in init_arg
+  - fix (is => 'lazy', required => 1, init_arg => undef), which previously
+    didn't think it provided a builder
+  - under 'no Moo::sification', prevent automatic Moose metaclass inflation
+    from ->meta calls
+  - don't load Moo::Role for a ->does check if no roles could exist
+  - make global destruction test more robust from outside interference
+  - fix false default values satisfying required attributes
+  - Fix Moose attribute delegation to a Moo class via a wildcard
+  - work around case where Sub::Util is loadable but doesn't provide
+    Sub::Util::set_subname
+  - skip thread tests on perl 5.8.4 and below where threads are extremely
+    unreliable
+  - Allow stub methods (e.g. sub foo;) to be overwritten by accessors or other
+    generated methods. (RT#103804)
+
+2.000001 - 2015-03-16
+  - Fix how we pick between Sub::Name and Sub::Util if they are both loaded.
+    This fixes how we interact with Moose in some cases. (RT#102729) (GH#15)
+
+2.000000 - 2015-03-02
+  * Incompatible Changes
+    - Fatal warnings and the other additional checks from the strictures
+      module will no longer be applied to modules using Moo or Moo::Role.  We
+      now only apply strict and (non-fatal) warnings, matching the behavior of
+      Moose.
+    - Classes without attributes used to store everything passed to ->new
+      in the object.  This has been fixed to not store anything in the object,
+      making it consistent with classes that had attributes.
+    - Moo will now pass __no_BUILD__ to parent constructors when inheriting
+      from a Moose or Class::Tiny class, to prevent them from calling BUILD
+      functions.  Moo calls the BUILD functions itself, which previously led
+      to them being called multiple times.
+    - Attempting to replace an existing constructor, or modify one that has
+      been used, will throw an error.  This includes adding attributes.
+      Previously, this would result in some attributes being silently ignored
+      by the constructor.
+    - If a class's @ISA is modified without using 'extends' in a way that
+      affects object construction, Moo will detect this and throw an error.
+      This can happen in code that uses ->load_components from
+      Class::C3::Componentised, which is common in DBIx::Class modules.
+
+  * Bug Fixes
+    - Fix calling class methods on Moo::HandleMoose::FakeMetaClass, such as
+      modules scanning all classes
+
+  * Miscellaneous
+    - use Sub::Util instead of Sub::Name if available
+
+1.007000 - 2015-01-21
+  - fix Moose metaclass inflation of Method::Generate::Constructor (RT#101111)
+  - clarify behavior of clearers for non-lazy attribute defaults
+  - add Sub::Defer::undefer_package to undefer all subs from a given package
+  - existing attributes will no longer be overwritten when composing roles.
+    Previously, the attribute configuration used by the constructor would be
+    overridden, but the attribute methods would not be.  This caused a mismatch
+    in attribute behavior.
+  - link to Type::Tiny in docs rather than MooX::Types::MooseLike
+  - document exports of Sub::Defer
+  - fix capture_unroll usage in inlinify example
+  - fix needless re-assigning of variables in generated Sub::Quote subs
+  - fix global destruction test to work when perl path has spaces
+
+1.006001 - 2014-10-22
+  - Name the ->DOES method installed by Role::Tiny
+  - don't apply threading workarounds on non-threaded perls, even if module for
+    it is loaded by something
+  - avoid loading base.pm and just set @ISA manually
+  - fix some Pod links to Class::Method::Modifiers
+  - fix applying roles with multiple attributes with defaults to objects
+    (RT#99217)
+  - fix Moose inheriting from a Moo class that inherits from a non-M* class
+    when the Moose class is not made immutable
+  - fix ->does method on Moose child classes of Moo classes
+
+1.006000 - 2014-08-16
+  - support coerce => 1 in attributes, taking the coercion from the isa option
+    if it is an object that supports the coerce or coercion method.
+  - add attribute information to type check errors by trapping with an eval
+    rather than overriding the global __DIE__ handler
+  - bump Module::Runtime prerequisite to fix error messages when there is a
+    missing module used by a role loaded using 'with' or similar (rt#97669)
+
+1.005000 - 2014-06-10
+  - add qsub to Sub::Quote as a prototyped alternative to quote_sub, accepting
+    only the sub body
+  - avoid testing UTF-8 on perl 5.6
+
+1.004006 - 2014-05-27
+  - fix quotify for characters in the \x80-\xFF range when used under the utf8
+    pragma.  Also fixes some cases of constructor generation with the pragma.
+
+1.004005 - 2014-05-23
+  - releasing 1.004_004 as stable
+
+1.004_004 - 2014-05-12
+  - stop internally depending on Moo::Object::new including all inputs in
+    constructed object
+  - be more careful when munging code for inlining
+  - fix maintaining source of quoted sub for lifetime of sub
+  - redo foreign C3 compatibility, fixing constructors without changing behavior
+    for Moo constructors
+  - don't build Moose metaclass when checking Moo classes with ->is_role
+  - include Sub::Name in recommendations metadata
+
+1.004_003 - 2014-04-13
+  - always maintain source of quoted subs for the lifetime of the sub
+  - fix Sub::Quote and Sub::Defer leaking memory
+  - Class::XSAccessor is now listed as a recommended prerequisite
+  - fix generating a subclass with roles when using a non-standard accessor
+  - use alternate quoting routine, which is faster and saves memory by not
+    loading B.pm
+  - fix default of undef
+  - fix inheriting from a class with a prototype on new
+  - use ->is_role internally to check if a package is a role
+  - minimise Role::Tiny coupling outside Moo::Role
+  - fix calling parent constructor when C3 multiple inheritance is in use
+    (such as when combining with DBIx::Class)
+  - return true from Moo::Role->is_role for all loaded Moose roles
+  - improved test coverage
+  - fix strictures author test when PERL_STRICTURES_EXTRA is set
+  - remove Dist::CheckConflicts prerequisite and replace with a test to report
+    known broken downstream modules
+  - fix x_breaks metadata
+
+1.004002 - 2013-12-31
+  - fix type inflation in threads when types are inserted by manually
+    stringifying the type first (like Type::Tiny)
+  - add undefer_all to Sub::Defer
+
+1.004001 - 2013-12-27
+  - fix repository links in pod
+  - add missing changelog entry regarding strictures to 1.004000 release
+
+1.004000 - 2013-12-26
+  - strictures will now be applied to modules using Moo just as if they
+    included "use strictures" directly.  This means that strictures extra
+    checks will now apply to code in checkouts.
+  - fix handling of type inflation when used with threads
+  - don't include meta method when consuming Mouse roles
+  - inhale Moose roles for has attr => ( handles => "RoleName" )
+  - provide useful error if attribute defined as required but with
+    init_arg => undef
+  - document that BUILDARGS isn't called when there are no attributes
+  - omit sub imported before use Moo from Moose method inflation
+  - check for FOREIGNBUILDARGS only once per class instead of on each
+    instantiation
+  - take advantage of XS predicates from newer versions of Class::XSAccessor
+  - always try to load superclasses and roles, and only fall back on the
+    heuristic of checking for subs if the file doesn't exist
+  - fix handling of attributes with names that aren't valid identifiers
+  - Quoted subs now preserve the package and pragmas from their calling code
+  - the official Moo git repository has moved to the Moose organization on
+    GitHub: https://github.com/moose/Moo
+
+1.003001 - 2013-09-10
+  - abbreviate class names from created by create_class_with_roles if they are
+    too long for perl to handle (RT#83248)
+  - prevent destructors from failing in global destruction for certain
+    combinations of Moo and Moose classes subclassing each other (RT#87810)
+  - clarify in docs that Sub::Quote's captured variables are copies, not aliases
+  - fix infinite recursion if an isa check fails due to another isa check
+    (RT#87575)
+  - fix Sub::Quote and Sub::Defer under threads (RT#87043)
+  - better diagnostics when bad parameters given to has
+
+1.003000 - 2013-07-15
+  - fix composing roles that require methods provided by the other (RT#82711)
+  - document optional use of Class::XSAccessor with caveats
+  - fix constructor generated when creating a class with
+    create_class_with_roles when the superclass constructor hasn't been
+    generated yet
+  - fix extending the constructor generator using Moo classes/roles
+  - non-lazy attribute defaults are used when applying a role to an object
+  - updated META files to list prerequisites in proper phases
+  - $Method::Generate::Accessor::CurrentAttribute hashref contains
+    information about attribute currently being processed (available
+    to exception objects thrown by "isa" and "coerce")
+  - properly die when composing a module that isn't a Role
+  - fix passing attribute parameters for traits when inflating to Moose
+  - fix inflating method modifiers applied to multiple methods
+  - fix documentation for Sub::Quote::capture_unroll
+  - add documentation noting Sub::Quote's use of strictures
+  - fix FOREIGNBUILDARGS not being called if no attributes created
+
+1.002000 - 2013-05-04
+  - add 'moosify' attribute key to provide code for inflating to Moose
+  - fix warnings about unknown attribute parameters on metaclass inflation
+  - don't pass 'handles' down when doing 'has +' to avoid unDWIMmy explosions
+  - throw a useful exception when typemap doesn't return a value
+  - avoid localising @_ when not required for Sub::Quote
+  - successfully inflate a metaclass for attributeless classes (RT#86415)
+  - fix false default values used with non-lazy accessors
+  - stop built values that fail isa checks still getting stored in the object
+  - stop lazy+weak_ref accessors re-building their value on every call
+  - make lazy+weak_ref accessors return undef if built value isn't already
+    stored elsewhere (Moose compatibility)
+  - stop isa checks being called on every access for lazy attributes
+  - bump Devel::GlobalDestruction dependency to fix warning on cleanup
+    when run under -c (RT#78617)
+  - document Moose type constraint creation for roles and classes
+    (actually fixed in 1.001000)
+
+1.001000 - 2013-03-16
+  - add support for FOREIGNBUILDARGS when inheriting from non-Moo classes
+  - non-ref default values are allowed without using a sub
+  - has will refuse to overwrite locally defined subs with generated
+    accessors.
+  - added more meta resources and added more support relevant links into
+    the POD documentation
+  - clarify in docs that default and built values won't call triggers
+    (RT#82310)
+  - expand is => 'lazy' doc to make it clear that you can make rw lazy
+    attributes if you really want to
+  - handles => "RoleName" tries to load the module
+  - fix delegation to false/undef attributes (RT#83361)
+
+1.000008 - 2013-02-06
+  - Re-export on 'use Moo' after 'no Moo'
+  - Export meta() into roles (but mark as non-method to avoid composing it)
+  - Don't generate an accessor for rw attributes if reader+writer both set
+  - Support builder => sub {} ala MooseX::AttributeShortcuts
+  - Fix 'no Moo;' to preserve non-sub package variables
+  - Switch to testing for Mouse::Util->can('find_meta') to avoid
+    exploding on ancient Mouse installs
+  - Fix loading order bug that results in _install_coderef being treated
+    as indirect object notation
+
+1.000007 - 2012-12-15
+  - Correctly handle methods dragged along by role composition
+  - Die if Moo and Moo::Role are imported into the same package
+
+1.000006 - 2012-11-16
+  - Don't use $_ as loop variable when calling arbitrary code (RT#81072)
+  - Bump Role::Tiny prereq to fix method modifier breakage on 5.10.0
+
+1.000005 - 2012-10-23
+  - fix POD typo (RT#80060)
+  - include init_arg name in constructor errors (RT#79596)
+  - bump Class::Method::Modifiers dependency to avoid warnings on 5.8
+
+1.000004 - 2012-10-03
+  - allow 'has \@attributes' like Moose does
+
+1.000003 - 2012-08-09
+  - make setter for weak_ref attributes return the value
+
+1.000002 - 2012-08-04
+  - remove Devel::GlobalDestruction fallback inlining because we can now
+    depend on 0.08 which uses Sub::Exporter::Progressive
+  - honour BUILDARGS when calling $meta->new_object on behalf of Moose
+  - throw an error on invalid builder (RT#78479)
+  - fix stupid typo in new Sub::Quote section
+
+1.000001 - 2012-07-21
+  - documentation tweaks and cleanup
+  - ignore required when default or builder is present
+  - document Moo versus Any::Moose in brief with article link
+  - remove quote_sub from SYNOPSIS and has docs, expand Sub::Quote section
+  - localize @_ when inlining quote_sub'ed isa checks (fixes lazy+isa+default)
+  - ensure constructor gets regenerated if forced early by metaclass inflation
+
+1.000000 - 2012-07-18
+  - clean up doc language and expand on Moo and Moose
+  - error prefixes for isa and coerce exceptions
+  - unmark Moo and Moose as experimental since it's relatively solid now
+  - convert isa and coerce info from external role attributes
+  - clear method cache after metaclass generation to fix autoclean bug
+
+0.091014 - 2012-07-16
+  - load overload.pm explicitly for overload::StrVal
+
+0.091013 - 2012-07-15
+  - useful and detailed errors for coerce in attrib generation
+
+0.091012 - 2012-07-15
+  - useful and detailed errors for default checker in attrib generation
+  - throw an error when trying to extend a role
+
+0.091011 - 2012-06-27
+  - re-add #web-simple as development IRC
+  - don't assume Scalar::Util is imported into the current package
+
+0.091010 - 2012-06-26
+  - isa checks on builders
+  - additional quote_sub docs
+  - remove multi-populate code to fix exists/defined new() bug
+  - document move to #moose and include repository metadata
+  - no Moo and no Moo::Role
+  - squelch used only once warnings for $Moo::HandleMoose::MOUSE
+  - MooClass->meta
+  - subconstructor handling for Moose classes
+
+0.091009 - 2012-06-20
+  - squelch redefine warnings in the coderef installation code
+
+0.091008 - 2012-06-19
+  - bump Role::Tiny dependency to get working modifiers under composition
+  - handle "has '+foo'" for attrs from superclass or consumed role
+  - document override -> around translation
+  - use D::GD if installed rather than re-adding it as a requirement
+
+0.091007 - 2012-05-17
+  - remove stray reference to Devel::GlobalDestruction
+
+0.091006 - 2012-05-16
+  - drop a couple of dependencies by minor releases we don't strictly need
+
+0.091005 - 2012-05-14
+  - temporary switch to an inlined in_global_destruction to avoid needing
+    to fatpack Sub::Exporter for features we don't use
+  - re-order is documentation to give readonly styles more prominence
+  - a weakened value should still be returned on set (fixes lazy + weak_ref)
+  - add an explicit return to all exported subs so people don't accidentally
+    rely on the return value
+
+0.091004 - 2012-05-07
+  - also inhale from Mouse
+  - clarify how isa and coerce interact
+  - support isa and coerce together for Moose
+  - guard _accessor_maker_for calls in Moo::Role in case Moo isn't loaded
+  - reset handlemoose state on mutation in case somebody reified the
+    metaclass too early
+
+0.091003 - 2012-05-06
+  - improve attribute option documentation
+  - update the incompatibilities section since we're less incompatible now
+  - fix coderef naming to avoid confusing autoclean
+
+0.091002 - 2012-05-05
+  - exclude union roles and same-role-as-self from metaclass inflation
+  - inhale Moose roles before checking for composition conflicts
+  - enable Moo::sification if only Moo::Role is loaded and not Moo
+  - preserve attribute ordering
+  - factor out accessor generation code a bit more to enable extension
+
+0.091001 - 2012-05-02
+  - bump Role::Tiny dependency to require de-strictures-ed version
+  - fix test failure where Class::XSAccessor is not available
+
+0.091000 - 2012-04-27
+  - document MX::AttributeShortcuts 009+ support
+  - documentation for the metaclass inflation code
+  - better error message for broken BUILDARGS
+  - provide 'no Moo::sification' to forcibly disable metaclass inflation
+  - switch to Devel::GlobalDestruction to correctly disarm the
+    Moo::sification trigger under threads
+  - make extends after has work
+  - name subs if Sub::Name is available for better stracktraces
+  - undefer all subs before creating a concrete Moose metaclass
+  - fix bug in _load_module where global vars could cause mis-detection
+    of the module already being loaded
+
+0.009_017 - 2012-04-16
+  - mangle constructor meta-method on inflation so make_immutable works
+  - fix possible infinite loop caused by subconstructor code
+
+0.009_016 - 2012-04-12
+  - don't accidentally load Moo::HandleMoose during global destruction
+  - better docs for trigger (and initializer's absence)
+
+0.009_015 - 2012-04-11
+  - Complete support for MooseX::AttributeShortcuts 0.009
+  - Allow Moo classes to compose Moose roles
+  - Introduce Moo::HandleMoose, which should allow Moo classes and roles
+    to be treated as Moose classes/roles. Supported so far:
+    - Some level of attributes and methods for both classes and roles
+    - Required methods in roles
+    - Method modifiers in roles (they're already applied in classes)
+    - Type constraints
+
+0.009014 - 2012-03-29
+  - Split Role::Tiny out into its own dist
+  - Fix a bug where coercions weren't called on lazy default/builder returns
+  - Switch Moo::Utils to using Module::Runtime, and add the 5.8 %INC
+    leakage fix into Role::Tiny's _load_module to provide partial parity
+  - Update incompatibilities with Moose documentation
+  - Remove Sub::Quote's outstanding queue since it doesn't actually slow
+    things down to do it this way and makes debugging easier.
+  - Revert 'local $@' around require calls to avoid triggering Unknown Error
+  - Explicitly require Role::Tiny in Role::Tiny::With (RT#70446)
+  - Fix spurious 'once' warnings under perl -w
+
+0.009013 - 2011-12-23
+  - fix up Class::XSAccessor version check to be more robust
+  - improved documentation
+  - fix failures on perls < 5.8.3
+  - fix test failures on cygwin
+
+0.009012 - 2011-11-15
+  - make Method::Generate::Constructor handle $obj->new
+  - fix bug where constants containing a reference weren't handled correctly
+    (ref(\[]) is 'REF' not 'SCALAR', ref(\v1) is 'VSTRING')
+
+0.009011 - 2011-10-03
+  - add support for DEMOLISH
+  - add support for BUILDARGS
+
+0.009010 - 2011-07-20
+  - missing new files for Role::Tiny::With
+
+0.009009 - 2011-07-20
+  - remove the big scary warning because we seem to be mostly working now
+  - perl based getter dies if @_ > 1 (XSAccessor already did)
+  - add Role::Tiny::With for use in classes
+  - automatically generate constructors in subclasses when required so that
+    subclasses with a BUILD method but no attributes get it honoured
+  - add coerce handling
+
+0.009008 - 2011-06-03
+  - transfer fix to _load_module to Role::Tiny and make a note it's an inline
+  - Bring back 5.8.1 compat
+
+0.009007 - 2011-02-25
+  - I botched the copyright. re-disting.
+
+0.009006 - 2011-02-25
+  - handle non-lazy default and builder when init_arg is undef
+  - add copyright and license info for downstream packagers
+  - weak ref checking for Sub::Quote to avoid bugs on refaddr reuse
+  - Switch composed role names to be a valid package name
+
+0.9.5 Tue Jan 11 2011
+  - Fix clobberage of runtime-installed wrappers by Sub::Defer
+  - Fix nonMoo constructor firing through multiple layers of Moo
+  - Fix bug where nonMoo is mistakenly detected given a Moo superclass
+    with no attributes (and hence no own constructor)
+
+0.9.4 Mon Dec 13 2010
+  - Automatic detection on non-Moo superclasses
+
+0.9.3 Sun Dec 5 2010
+  - Fix _load_module to deal with pre-existing subpackages
+
+0.9.2 Wed Nov 17 2010
+  - Add explanation of Moo's existence
+  - Change @ISA setting mechanism to deal with a big in 5.10.0's get_linear_isa
+  - Change 5.10 checks to >= to not try and load MRO::Compat on 5.10.0
+  - Make 'perl -Moo' DTRT
+
+0.9.1 Tue Nov 16 2010
+  - Initial release

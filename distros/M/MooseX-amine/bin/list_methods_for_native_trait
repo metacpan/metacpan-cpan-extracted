@@ -1,0 +1,107 @@
+#! /opt/perl/bin/perl
+
+# ABSTRACT: List available delegation targets for Moose native traits
+# PODNAME: list_methods_for_native_trait
+
+
+use autodie;
+use strict;
+use warnings;
+use 5.010;
+
+use Module::Info;
+
+my $trait = shift
+  or _list_available_traits();
+
+_list_methods_for_trait( $trait );
+
+sub _list_methods_for_trait {
+  my $trait = shift;
+  $trait = ucfirst( $trait );
+
+  my $trait_dir = _get_native_accessor_dir();
+  $trait_dir .= "/$trait";
+
+  if ( ! -d $trait_dir ) {
+    say STDERR "That's not a valid trait name!";
+    exit(1);
+  }
+
+  opendir( my $DIR , $trait_dir );
+  my @methods = grep { ! /^\./ and /^[a-z]/ and s/\.pm$// } readdir( $DIR );
+  closedir( $DIR );
+
+  say "METHODS FOR ",uc($trait);
+  say "  * $_" foreach @methods;
+  say '';
+
+  exit(0);
+}
+
+sub _list_available_traits {
+  my $accessor_dir = _get_native_accessor_dir();
+
+  opendir( my $DIR , $accessor_dir );
+  my @traits = grep { ! /^\./ and -d "$accessor_dir/$_" } readdir( $DIR );
+  closedir( $DIR );
+
+  say "AVAILABLE TRAITS";
+  say "  * $_" foreach @traits;
+  say '';
+  say "Run '$0 TRAITNAME' to list delegation target methods for that trait.";
+
+  exit(0);
+}
+
+sub _get_native_accessor_dir {
+  my $file = Module::Info->new_from_module( 'Moose' )->file;
+  my $dir  = $file;
+
+  $dir =~ s/.pm$//;
+  return $dir .= '/Meta/Method/Accessor/Native/';
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+list_methods_for_native_trait - List available delegation targets for Moose native traits
+
+=head1 VERSION
+
+version 0.6
+
+=head1 SYNOPSIS
+
+    # see available traits
+    list_methods_for_native_trait
+
+    # see available delegation targets for Hash traits
+    list_methods_for_native_trait Hash
+
+=head1 DESCRIPTION
+
+Love native traits but can't remember the names of the methods you need to
+delegate to in your C<handles> statement? This script will help.
+
+=head1 SEE ALSO
+
+You may also be interested in mex(1) - a console-based Moose class inspector.
+
+=head1 AUTHOR
+
+John SJ Anderson <genehack@genehack.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by John SJ Anderson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,30 @@
+NAME
+    MooX::InsideOut - Inside out objects for Moo
+
+SYNOPSIS
+      package MyClass;
+      use Moo;
+      use MooX::InsideOut;
+
+DESCRIPTION
+    MooX::InsideOut causes all accessors generated to be stored outside the
+    object itself. This is useful for extending non-Moo classes whose
+    internals you don't want to change, or which aren't hash based.
+
+    Inside out objects are not recommended for general use aside from where
+    they are specifically required.
+
+AUTHOR
+    haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+  CONTRIBUTORS
+    None so far.
+
+COPYRIGHT
+    Copyright (c) 2013 the MooX::InsideOut "AUTHOR" and "CONTRIBUTORS" as
+    listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

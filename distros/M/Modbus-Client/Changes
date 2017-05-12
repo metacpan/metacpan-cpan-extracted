@@ -1,0 +1,20 @@
+Revision 1.00
+date: 2007/03/18 14:05:00
+Finally ready for CPAN
+
+Revision 1.01
+date: 2007/04/15 12:12:00
+1) Improved behavior when using the $fd argument to the "new" method
+2) Improved behavior for Windoze use
+3) Slightly better documentation
+
+Revision 1.02
+date: 2007/04/15 12:15:00
+No changes - I just got the version information wrong in the upload
+
+Revision 1.03
+date: 2007/05/08 19:15:00
+With help from "Steven" (Sintsu), I now have the code tested for both 
+'Read Input Status' and 'Read Coil Status', as well as adding exception
+testing and error codes.
+

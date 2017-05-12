@@ -1,0 +1,96 @@
+mercury
+
+This is a message broker that enables some common messaging patterns
+over WebSockets.
+
+WebSockets are a powerful tool, enabling many features previously
+impossible, difficult, or ugly for web developers to implement. Where
+once only an HTTP request could get data from a server, now a persistent
+socket can allow the server to send updates without the client needing
+to specifically request it.
+
+  Server-side Communication
+
+WebSockets do not need to be a communication channel purely between
+browser and server. The Mojolicious web framework has excellent support
+for WebSockets. Using that support, we can communicate between different
+server processes.
+
+This solves the problem with client-to-client communication in a
+parallelized web server where all clients may not be connected to the
+same server process. The server processes can use a central message
+broker to coordinate and pass messages from one client to another.
+
+  Message Bus
+
+A message bus allows for all connected peers to send and receive
+messages in a group.
+
+Requesting a WebSocket from the URL "/bus/fry" joins the peer-to-peer
+message bus topic "fry". All peers joined to the same topic will receive
+all the messages published to that topic by other peers.
+
+This is useful for sharing state changes between multiple peers, for
+example, in a forking web app server like Hypnotoad or Starman.
+
+  Pub/Sub Messaging
+
+The pub/sub pattern allows for 1-to-many delivery of messages from one
+publisher to any number of active subscribers.
+
+Requesting a WebSocket from the URL "/sub/leela" creates a subscription
+to the topic "leela". Requesting a WebSocket from the URL "/pub/leela"
+allows sending messages to the "leela" topic, which are then received by
+all the subscribers.
+
+Topics are heirarchical to allow for broad subscriptions without
+requring more sockets. A subscription to the topic "wong" receives all
+messages published to the topic "wong" or any child topic like
+"wong/amy" or "wong/leo".
+
+This pattern is useful for keeping clients informed of backend
+processes, tapping into an event or logging stream.
+
+  Push/Pull
+
+Push/pull deals out messages in a round-robin manner. Pushers send
+messages which are handled by a single puller.
+
+Handlers request WebSockets from the URL "/pull/bender". Senders request
+WebSockets from the URL "/push/bender". Senders send messages which will
+be received by a single handler.
+
+This pattern is useful for load balancing incoming updates, or creating
+processing pipelines using multiple push/pull endpoints.
+
+  Example App
+
+In "development" mode (the default), the broker provides an example
+application to test the messaging patterns.
+
+You can change the mode by using the "-m" flag to the "mercury broker"
+command or the "MOJO_MODE" environment variable.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

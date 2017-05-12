@@ -1,0 +1,3 @@
+* Excludes must add to 'requires'
+* Includes
+* Die on composition failure

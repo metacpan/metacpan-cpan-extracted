@@ -1,0 +1,72 @@
+0.52    Wednesday 3rd December, 2003
+        Now we depend on perl 5.6.  This makes some of the code a bit cleaner.
+
+        Cosmetic tweaks to the base templates.
+
+        --reverse commandline option, to put the root threads into
+        their natural order.
+
+
+0.51    Tuesday 2nd September, 2003
+        Template tweaks - apply the anonymising mariachi filter to subject
+        lines
+
+        Correct a MANIFEST booboo and ship templates/css.tt2
+
+
+0.50    Friday 29th August, 2003
+        Split some code out into Text::Original
+
+        Added a --class option to allow dynamic selection of the main class
+        from the command line.
+
+        Split some of the default templates up.
+
+
+0.41    Friday 27th June, 2003
+        Last release had a screwed up SIGNATURE file.  Since they keep biting
+        me we'll stop shipping them for a while.
+
+0.4     Thursday 26th June, 2003
+        Now we ship with a lurker-style output.
+
+        template paths are specifyable
+
+        template directories will be scanned for non-template files,
+        and those that exist will be copied into the output tree
+
+        Mariachi::Message now has first_line, first_sentence and
+        others, to allow extra context in the thread index pages.
+
+        INCOMPATIBLE CHANGES:
+
+        Command line interface changed.  Now instead of positional
+        parameters we use named ones.
+
+        Mariach->{list_name,input,output,threads_per_page} have all been
+        replaced with a single AppConfig instance, C<config>
+
+0.31    23rd May, 2003
+        New distribution, without the failing t/0signature.t
+
+0.3     23rd May, 2003
+        Fixed Message->from
+
+        Tweaks to thread output - only display subject where it's
+        different from the previous one
+
+        Italicise quoted sections of email
+
+        Added new body_sigless and sig methods in message.
+
+        INCOMPATIBLE CHANGE: Filename generation has changed from
+        using md5_base64 to md5_hex for aesthetic reasons. This will
+        break links for existing installations.
+
+        Distribution includes a passthrough Makefile.PL for CPAN.pm users
+
+0.2     Friday 2nd May, 2003
+        fixed distribution - now includes Siesta::Build
+
+0.1     Friday 2nd May, 2003
+        initial CPAN release

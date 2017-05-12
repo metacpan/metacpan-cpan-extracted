@@ -1,0 +1,152 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Server::IMAP4::Fetch - message info for IMAP protocol speed-up
+
+=head1 SYNOPSIS
+
+ my $imap = Mail::Server::IMAP4::Fetch->new($msg);
+ print $imap->fetchBody(1);   # for FETCH BODYSTRUCTURE
+ print $imap->fetchBody;      # for FETCH BODY
+ print $imap->fetchEnvelope;  # for FETCH ENVELOPE
+ print $imap->fetchSize;
+
+=head1 DESCRIPTION
+
+Create a new object hierarchy, which contains information to capture
+the most important details about the message.  The object can be used
+to speed-up IMAP-server implementations, as L<Mail::Box::Netzwert>.
+
+The object used here is a simplified representation of a
+L<Mail::Box::Message|Mail::Box::Message> object.  It does not maintain headers and does
+not refer to the folder.  It only works with messages stored in a file.
+Therefore, this object can be frozen by L<Storable> if you want to.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Mail::Server::IMAP4::Fetch-E<gt>B<new>( <$message|$part>, %options )
+
+ -Option      --Default
+  md5checksums  0
+
+=over 2
+
+=item md5checksums => BOOLEAN
+
+=back
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<bodyLocation>()
+
+=item $obj-E<gt>B<headLocation>()
+
+=item $obj-E<gt>B<partLocation>()
+
+=back
+
+=head2 IMAP Commands
+
+=over 4
+
+=item $obj-E<gt>B<fetchBody>($extended)
+
+Returns one string, representing the message's structure as defined by
+the IMAP protocol.  The boolean argument indicates whether you like to
+have the $extended information, as the imap command 'FETCH BODYSTRUCTURE'
+defines or the limited information of 'FETCH BODY'.
+
+=item $obj-E<gt>B<fetchEnvelope>()
+
+Returns a string representation of some header information.
+
+=item $obj-E<gt>B<fetchSize>()
+
+Returns the size of the message body.
+
+=item $obj-E<gt>B<part>( [$partnr] )
+
+The partnummer is a list of dot-separated positive integers, numbering
+(nested) parts in multi-part message bodies.  By default, the info of
+the main message is returned.
+
+example: 
+
+ my $partinfo = $msg->info->part('1.2.1');
+ print $msg->info->part('3.3')->fetchBody;
+
+=item $obj-E<gt>B<printStructure>( [<$fh|undef>, [$number]] )
+
+Print the structure of the fetch data to the specified $fh or the
+selected filehandle.  When explicitly C<undef> is specified as handle,
+then the output will be returned as string.  
+Only a limited set of the information is displayed.
+
+example: 
+
+ my $imap = ...;
+ $imap->printStructure(\*OUTPUT);
+ $imap->printStructure;
+ my $struct = $imap->printStructure(undef);
+
+=back
+
+=head2 Internals
+
+=head1 DETAILS
+
+See
+
+=over 4
+
+=item RFC2060: "Internet Message Access Protocol IMAP4v1" section 7.4.2
+
+=item RFC2045: "MIME Part One: Format of Internet Message Bodies".
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Box-IMAP4 distribution version 3.001,
+built on February 02, 2017.
+
+Do not forget to read
+L</Mail::Box-Overview>,
+L</Mail::Box-Cookbook>, and
+L</Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L</Mail::Message>,
+L</Mail::Box>,
+L</Mail::Box::IMAP4>,
+L</Mail::Box::POP3>,
+L</Mail::Box::Parser::C>,
+L</Mail::Box::Dbx> (unpublished),
+L</Mail::Transport>,
+L</Object::Realize::Later>, and
+L</User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

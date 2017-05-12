@@ -1,0 +1,33 @@
+Changes
+getting-started.html
+MANIFEST
+Makefile.PL
+README
+
+bin/module-starter
+lib/Module/Starter.pm
+lib/Module/Starter/App.pm
+lib/Module/Starter/Simple.pm
+lib/Module/Starter/BuilderSet.pm
+lib/Module/Starter/Plugin.pod
+lib/Module/Starter/Plugin/Template.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/module-starter.t
+t/test-dist.t
+t/BuilderSet.t
+t/lib/Module/Starter/TestPlugin.pm
+t/data/templates/Module.pm
+t/data/templates/t/boilerplate.t
+t/data/templates/t/pod.t
+t/data/templates/t/pod-coverage.t
+t/data/templates/t/00-load.t
+t/data/templates/Makefile.PL
+t/data/templates/Changes
+t/data/templates/Build.PL
+t/data/templates/README
+t/test-dist.t
+perlcriticrc
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

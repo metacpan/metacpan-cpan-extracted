@@ -1,0 +1,116 @@
+<mediawiki xmlns="http://www.mediawiki.org/xml/export-0.3/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mediawiki.org/xml/export-0.3/ http://www.mediawiki.org/xml/export-0.3.xsd" version="0.3" xml:lang="simple">
+<siteinfo>
+  <sitename>Sitename Test Value</sitename>
+  <base>Base Test Value</base>
+  <generator>Generator Test Value</generator>
+  <case>Case Test Value</case>
+  <namespaces>
+    <namespace key="-2">Media</namespace>
+    <namespace key="-1">Special</namespace>
+    <namespace key="0" />
+    <namespace key="1">Talk</namespace>
+    <namespace key="2">User</namespace>
+    <namespace key="3">User talk</namespace>
+    <namespace key="4">Wikipedia</namespace>
+    <namespace key="5">Wikipedia talk</namespace>
+    <namespace key="6">Image</namespace>
+    <namespace key="7">Image talk</namespace>
+    <namespace key="8">MediaWiki</namespace>
+    <namespace key="9">MediaWiki talk</namespace>
+    <namespace key="10">Template</namespace>
+    <namespace key="11">Template talk</namespace>
+    <namespace key="12">Help</namespace>
+    <namespace key="13">Help talk</namespace>
+    <namespace key="14">Category</namespace>
+    <namespace key="15">Category talk</namespace>
+  </namespaces>
+</siteinfo>
+<page>
+  <title>Talk:Title Test Value</title>
+  <id>1</id>
+    <revision>
+      <id>47084</id>
+      <timestamp>2005-07-09T18:41:10Z</timestamp>
+      <contributor><username>Username Test Value 1</username><id>1292</id></contributor>
+      <minor/>
+      <comment>Comment Test Value 1</comment>
+      <text xml:space="preserve">Text Test Value 1
+</text>
+    </revision>
+</page>
+
+<page>
+  <title>Title Test Value #2</title>
+  <id>2</id>
+    <revision>
+      <id>47085</id>
+      <timestamp>2006-07-09T18:41:10Z</timestamp>
+      <contributor><username>Username Test Value 2</username><id>12</id></contributor>
+      <comment>Comment Test Value 2</comment>
+      <text xml:space="preserve">#redirect : [[fooooo]]</text>
+      <minor/>
+    </revision>
+    <revision>
+      <id>47086</id>
+      <timestamp>2005-07-09T18:41:10Z</timestamp>
+      <contributor><username>Username Test Value</username><id>1292</id></contributor>
+      <comment>Comment Test Value</comment>
+      <text xml:space="preserve">#redirect [[fooooo]]
+</text>
+    </revision>
+</page>
+
+<page>
+  <title>NotANameSpace:Bar</title>
+  <id>4</id>
+    <revision>
+      <id>47088</id>
+      <timestamp>2005-07-09T18:41:10Z</timestamp>
+      <contributor><username>Username Test Value</username><id>1292</id></contributor>
+      <comment>Comment Test Value</comment>
+      <text xml:space="preserve">
+        test for bug #36255 -
+	Parse::MediaWikiDump::page::namespace may return a string 
+	which is not really a namespace
+      </text>
+    </revision>
+</page>
+
+<page>
+  <title>Bug 50092 Test</title>
+  <id>5</id>
+    <revision>
+      <id>47089</id>
+      <timestamp>2005-07-09T18:41:10Z</timestamp>
+      <contributor><username>Username Test Value</username><id>1292</id></contributor>
+      <comment>Comment Test Value</comment>
+      <text xml:space="preserve"/>
+    </revision>
+</page>
+
+<page>
+	<title>Test for bug 53361</title>
+	<id>145</id>
+
+	<revision>
+		<id>38841</id>
+		<timestamp>2002-09-08T22:15:32Z</timestamp>
+		<contributor>
+			<username>Ben-Zin</username>
+			<id>9</id>
+		</contributor>
+	<minor/>
+	<comment>en: </comment>
+	<text id="38841" />
+	</revision>
+	<revision>
+		<id>38847</id>
+		<timestamp>2002-10-31T14:53:37Z</timestamp>
+		<contributor>
+			<ip>62.104.212.74</ip>
+		</contributor>
+		<text id="38847" />
+	</revision>
+</page>
+
+</mediawiki>

@@ -1,0 +1,163 @@
+Send Perl-Win32-Users mailing list submissions to
+perl-win32-users@listserv.ActiveState.com
+
+To subscribe or unsubscribe via the World Wide Web, visit
+http://listserv.ActiveState.com/mailman/listinfo/perl-win32-users
+or, via email, send a message with subject or body 'help' to
+perl-win32-users-request@listserv.ActiveState.com
+
+You can reach the person managing the list at
+perl-win32-users-admin@listserv.ActiveState.com
+
+When replying, please edit your Subject line so it is more specific
+than "Re: Contents of Perl-Win32-Users digest..."
+
+
+Today's Topics:
+
+  1. RE: Net::SSH::Perl (John_Ramrod)
+  2. Perl and delphi interaction query. (Baker Richard-qswi266)
+  3. RE: Perl and delphi interaction query. (Goldenrod, Christopher J)
+
+----------------------------------------------------------------------
+
+Message: 1
+Subject: RE: Net::SSH::Perl
+Date: Tue, 10 Feb 2004 16:55:16 -0000
+From: "John_Ramrod" <john_ramrod@some.web.address.com>
+To: "Steve Keith" <steve@some.web.address.com>,
+       <perl-win32-users@listserv.ActiveState.com>
+Cc: <RonaldMu@nedcor.com>
+
+
+I'm only guessing, but wouldn't anything requiring Math::Pari
+work as well with Math::BigInt::Calc instead?
+
+Math::Pari, or native PARI, is used more by the mathematical
+'heavy mob' to do advanced number theoretic calculations, and
+I'd have thought that using it just to multiply a few 128-bit
+numbers or similar was like using a hammer to crack a nut
+(unless tip-top performance is vital, which I suppose it
+might be if one is encrypting a long data stream).
+
+Just out of curiosity, in what sense did you find Math::Pari
+a PoC?
+
+Did you have trouble building it? I did a quick web search,
+and saw a couple of plaintive posts by people having trouble
+building it on AIX. I'm just wondering in case I ever need to
+use it.
+
+
+Cheers
+
+John Ramrod (john_ramrod@some.web.address.com)
+
+
+-----Original Message-----
+From: Steve Keith [mailto:steve@some.web.address.com]
+Sent: 09 February 2004 20:31
+To: perl-win32-users@listserv.ActiveState.com
+Subject: Re: Net::SSH::Perl
+
+
+Please let me know if you get it going  - I gave up
+
+I think I got as far as Math::Pari or something like that - boy was
+that a piece of crap IMO.
+
+
+------------------------------
+
+Message: 2
+From: Baker Richard-qswi266 <Richard.Baker@some.web.address.com>
+To: "'Perl-Win32-Users@listserv.ActiveState.com'"
+ <Perl-Win32-Users@listserv.ActiveState.com>
+Subject: Perl and delphi interaction query.
+Date: Tue, 10 Feb 2004 17:13:29 -0000
+
+Guys,
+
+I inherited a delphi GUI, which is too complicated to even consider
+re-writing.
+
+So, I added a button that fires of a perl .exe, made with perlapp.
+
+The perl .exe works perfectly when run alone. It uses Tk and a ROText widget
+to display the progress of the script, and I changed the Tk icon in the
+corner to my own, like this...
+
+my $mw = MainWindow -> new (-title => "   $title $version");
+$mw -> withdraw;
+$mw -> minsize (qw(600 400));
+my $status = $mw -> ROText()->pack(-expand, 1, -fill, 'both');
+my $button = $mw -> Button (
+-text , 'Cancel',
+-command, \&finished,
+) -> pack (-side, 'bottom');
+my $icon = $mw->Photo(-file => 'SpikeWare.gif');
+$mw->idletasks;
+$mw->iconimage($icon);
+$mw -> Popup;
+$mw -> focus;
+
+However, when I run this by clicking on the button from the delphi created
+gui, the script just dies.
+
+If I then remove the 3 lines that change the icon:
+my $icon = $mw->Photo(-file => 'SpikeWare.gif');
+$mw->idletasks;
+$mw->iconimage($icon); <- this seems to be the main culprit.
+
+It works perfectly under all circumstances.
+
+I really want to use my icon, so does anyone know why it won't run when
+fired off from delphi?
+
+THanks,
+
+R.
+
+------------------------------
+
+Message: 3
+From: "Goldenrod, Christopher J" <Christopher.J.Goldenrod@some.web.address.com>
+To: "'Baker Richard-qswi266'" <Richard.Baker@some.web.address.com>,
+       "'Perl-Win32-Users@listserv.ActiveState.com'" <Perl-Win32-Users@listserv.activestate.com>
+Subject: RE: Perl and delphi interaction query.
+Date: Tue, 10 Feb 2004 14:16:01 -0500
+
+> -----Original Message-----
+> From: Baker Richard-qswi266 [mailto:Richard.Baker@some.web.address.com]
+> Sent: Tuesday, February 10, 2004 12:13
+> 
+> If I then remove the 3 lines that change the icon:
+> my $icon = $mw->Photo(-file => 'SpikeWare.gif');
+> $mw->idletasks;
+> $mw->iconimage($icon); <- this seems to be the main culprit.
+> 
+> It works perfectly under all circumstances.
+> 
+> I really want to use my icon, so does anyone know why it won't run when
+> fired off from delphi?
+
+Richard,
+
+Can you provide the Delphi code that you are using to launch the PerlApp?
+
+Chris
+
+
+LEGAL NOTICE
+Unless expressly stated otherwise, this message is confidential and may be privileged. It is intended for the addressee(s) only. Access to this E-mail by anyone else is unauthorized. If you are not an addressee, any disclosure or copying of the contents of this E-mail or any action taken (or not taken) in reliance on it is unauthorized and may be unlawful. If you are not an addressee, please inform the sender immediately.
+
+
+------------------------------
+
+_______________________________________________
+Perl-Win32-Users mailing list
+Perl-Win32-Users@listserv.ActiveState.com
+To unsubscribe: http://listserv.ActiveState.com/mailman/mysubs
+
+
+End of Perl-Win32-Users Digest

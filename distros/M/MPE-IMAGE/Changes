@@ -1,0 +1,39 @@
+Revision history for Perl extension MPE::IMAGE.
+
+0.98a 26 Sep 2002
+        - New maintainer
+
+0.98  21 Dec 2001
+        - Bug fix in DbLock
+        - Allow dataset to be given before mode in DbGet
+
+0.97  19 Oct 2001
+        - Added DbLock, DbUnlock, DbPut, DbUpdate and DbDelete
+        - Removed slow memory leak (thanks to Ken Hirsch for spotting it)
+        - More TPI-related touchup to DbFind
+
+0.05  02 Sep 2001
+        - Fixed up handling of default list when it is omitted.
+        - Allow 4-argument form of DbGet mode 4, 7 or 8 (list omitted)
+        - Some touch-up to DbFind for TPI
+        - use Carp;
+
+0.04  09 Jul 2001
+        - DbClose now assumes mode 1 if the mode is not specified
+        - Some documentation fixes
+        - Catch DbInfo failure in item_info
+        - DbFind was erroneously passing item names to item_info
+
+0.03  05 Apr 2001
+        - Tested and documented DbBegin, DbEnd, DbMemo, and DbX*
+        - Added the remaining DbInfo modes
+        - Added DbControl
+        - Deal with whitespace after the commas in an item list.
+
+0.02  29 Mar 2001
+        - Added documentation and finished up DBBEGIN & friends (yet to be
+          documented or tested).
+
+0.01  Thu Feb  1 08:58:25 2001
+	- original version; created by h2xs 1.20 with options
+		-AXn MPE::IMAGE

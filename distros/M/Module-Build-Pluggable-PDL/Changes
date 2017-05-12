@@ -1,0 +1,20 @@
+Changes for Module::Build::Pluggable::PDL
+
+0.23 - Thu May 30 08:35:46 EDT 2013
+    Bug fix RT#85721: Fixes typo in Module::Build required version
+    (Thanks ANDK++ for tracking this down.)
+
+0.22 - Mon May 20 10:06:46 EDT 2013
+    Fixes issues in smoke testing and on alternate OSes
+    - Adds missing prereqs
+    - Processes pod with Pod::Perldoc rather than external call to perldoc
+      and shell piping (hopefully this will work better on alternate OSes)
+    - Ensures we are using the current perl to run things under tests
+
+    Moves actual conversion code to its own sub
+
+0.21 - Thu May 16 11:28:21 EDT 2013
+    Fixes bug in add_extra_linker_flags
+
+0.20 - Thu May 16 10:36:21 EDT 2013
+    Initial release of Module::Build::Pluggable::PDL

@@ -1,0 +1,130 @@
+=head1 NAME
+
+Message::Passing::Manual::Concepts - The concepts behind the framework
+
+=head1 DESCRIPTION
+
+This framework tries to be a simplifying layer over message passing, allowing you to easily
+make the networking parts of message passing become just configuration. This allows you to concentrate
+on the hard parts (i.e. your application, not the message passing).
+
+=head1 COMPONENTS AND CHAINS
+
+There are only a few core concepts to grasp to use the framework. We'll start with the component types, and then
+move onto chains.
+
+There are only three types of components:
+
+=head2 OUTPUTS
+
+An output is simply a class with a C<consume> method. This will be called with a message
+as it's only parameter, like this:
+
+    $output->consume($message);
+
+Outputs are expected to compose L<Message::Passing::Role::Output>.
+
+=head2 INPUTS
+
+An input is simply a class with an C<output_to> attribute. Your code just calls the consume
+method on it's output, like this:
+
+    $self->output_to->consume($message);
+
+Inputs are expected to compose L<Message::Passing::Role::Input> which provides this attribute, and
+use the C<BUILD> method from L<Moo> to do any work needed to start listening for events.
+
+=head2 FILTER
+
+A filter is just a combination of an output and input. Some (or all) of the messages consumed
+by the input are sent on to the output.
+
+An optional L<Message::Passing::Role::Filter> is supplied, allowing you to provide a simple filter
+method:
+
+    with 'Message::Passing::Role::Filter';
+
+    sub filter {
+        my ($self, $message) = @_;
+        return $message; # Or return undef to drop it
+    }
+
+
+However, you can write a filter manually as:
+
+    with qw/
+        Message::Passing::Role::Input
+        Message::Passing::Role::Output
+    /;
+
+    sub consume {
+        my ($self, $message) = @_;
+        # Do something to $message here
+        $self->output_to->consume($message);
+    }
+
+As you've hopefully guessed now, a C<chain> is just an input, outputting to zero or more filters, which output to
+an output.
+
+=head1 DSL
+
+So, this is all pretty easy, and you already know enough to pick up some components and use them! For example:
+
+    use Message::Passing::Input::FileTail;
+    use Message::Passing::Output::STDOUT;
+
+    Message::Passing::Input::FileTail->new(
+        filename => $ARGV[0],
+        output_to => Message::Passing::Output::STDOUT->new,
+    );
+    AnyEvent->condvar->recv; # Enter event loop
+
+There you go - you're tailing a file to screen - however you could just as easily by sending it over
+the network with ZeroMQ or any other output.
+
+This is, however, a bit ugly! If you're building a chain of several filters, or
+you have several inputs being multiplexed into one output, then the code gets ugly fast.
+
+To make it easy to build chains of processing, and your own scripts, a simple DSL is provided.
+The example above becomes:
+
+    use Message::Passing::DSL;
+
+    run_message_server message_chain {
+        input file => (
+            class => 'FileTail',
+            output_to => 'stdout',
+        );
+        output stdout => (
+            class => 'STDOUT',
+        );
+    };
+
+=head1 Event loop
+
+L<AnyEvent> has been mentioned, and it's expected that scripts will use a supported event
+loop. This implies that your code is asynchronous, which is generally fine - however it should
+be noted that doing any long operation (non trivial database queries) will block the entire server - meaning
+no events will be processed.
+
+In cases such as these, running a pool of worker processes to distribute the blocking jobs is more appropriate,
+and easy to wire up (on one or more hosts). This is documented more fully in L<Message::Passing::Manual::Workers>
+
+=head1 ZeroMQ
+
+L<ZeroMQ> is the recommended transport for messages, and L<Message::Passing::Output::ZeroMQ> is designed to work
+inside a traditional synchronous application. This means that you can emit messages into ZeroMQ without blocking your
+application, or having to use or run the AnyEvent event loop.
+
+=head1 SEE ALSO
+
+=head2 L<Message::Passing::Manual::Cookbook>
+
+Recipies for achieving common tasks
+
+=head1 AUTHOR, COPYRIGHT & LICENSE
+
+See L<Message::Passing>.
+
+=cut
+

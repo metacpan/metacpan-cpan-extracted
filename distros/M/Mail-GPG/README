@@ -1,0 +1,107 @@
+NAME
+    Mail::GPG - Handling of GnuPG encrypted / signed mails
+
+SYNOPSIS
+      use Mail::GPG;
+
+      my $mg = Mail::GPG->new;
+
+      my %keys_id2mail = $mg->query_keyring (
+        search => 'joern@zyn.de',
+      );
+
+      my $entity = MIME::Entity->build (
+        From     => 'joern@zyn.de',
+        Subject  => "Mail::GPG Testmail",
+        Data     => [ "Hiho, a nice encrypted mail" ],
+        Encoding => "quoted-printable",
+        Charset  => "iso-8859-1",
+      );
+
+      my $encrypted_entity = $mg->mime_sign_encrypt (
+        entity     => $entity,
+        key_id     => $key_id,
+        password   => 'topsecret',
+        recipients => [ 'niceguy@zyn.de' ],
+      );
+
+      my $mail_text = $encrypted_entity->as_string;
+
+      # and a lot more...
+
+      $mg->mime_sign ( ... );
+      $mg->mime_encrypt ( ... );
+      $mg->mime_sign_encrypt ( ... );
+
+      $mg->armor_sign ( ... );
+      $mg->armor_encrypt ( ... );
+      $mg->armor_sign_encrypt ( ... );
+
+      $mg->parse ( ... );
+
+      $mg->decrypt ( ... );
+      $mg->verify ( ... );
+
+      $mg->is_encrypted ( ... );
+      $mg->is_signed ( ... );
+      $mg->is_signed_quick ( ... );
+
+      $mg->get_decrypt_key ( ... );
+      $mg->get_key_trust ( ... );
+
+DESCRIPTION
+    This Perl modules handles all the details of encrypting and signing
+    Mails using GnuPG according to RFC 3156 and RFC 2440, that is OpenPGP
+    MIME and traditional armor signed/encrypted mails.
+
+PREREQUISITES
+      Perl              >= 5.00503
+      MIME-tools        >= 5.419
+      MIME::QuotedPrint >= 2.20  (part of MIME-Base64 distribution)
+      GnuPG::Interface  >= 0.52
+      Event             >= 1.24
+      List::MoreUtils   >= 0.410
+
+    Since version 1.0.7 the Event module is loaded when present. This gives
+    a small performance boost when handling big entities. If you like to
+    fallback to the old IO::Select based behaviour set either
+
+      $Mail::GPG::SKIP_EVENT    = 1
+      $ENV{MAIL_GPG_SKIP_EVENT} = 1
+
+    before loading Mail::GPG.
+
+INSTALLATION
+    Then install Mail::GPG
+
+      % cd ../Mail-GPG-x.xx
+      % perl Makefile.PL
+      % make test
+      % make install
+
+    Mail::GPG has a bunch of tests which will create a temporary gpg keyring
+    to be able to do real encryption and stuff. You need to have gpg in your
+    path for the tests to succeed, otherwise all useful tests will be
+    skipped.
+
+    Note that the test 04.big needs some time, on an Athlon 1800XP about 12
+    seconds, so be patient ;)
+
+KNOWN BUGS
+    Currently none. Please report any bugs to the author: Joern Reder <joern
+    AT zyn.de>.
+
+AUTHOR
+    Joern Reder <joern AT zyn.de>
+
+CONTACT
+    You can contact me by email. Please place the module name "Mail::GPG"
+    somewhere in the subject, because I filter my mails that way. I'm a
+    native German speaker, but you can contact me in english as well.
+
+COPYRIGHT
+    Copyright (C) 2004-2006 by Joern Reder, All Rights Reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

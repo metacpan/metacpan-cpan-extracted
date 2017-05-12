@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Examples</title>
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    </head>
+
+    <body>
+        <div class="container">
+            
+
+<p>A basic table:</p>
+<pre>&lt;%= table begin %&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th&gt;th 1&lt;/th&gt;
+            &lt;th&gt;th 2&lt;/th&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 1&lt;/td&gt;
+            &lt;td&gt;Cell 2&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 1&lt;/td&gt;
+            &lt;td&gt;Cell 2&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;% end %&gt;</pre>
+<pre>&lt;table class=&quot;table&quot;&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th&gt;th 1&lt;/th&gt;
+            &lt;th&gt;th 2&lt;/th&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 1&lt;/td&gt;
+            &lt;td&gt;Cell 2&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 1&lt;/td&gt;
+            &lt;td&gt;Cell 2&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;</pre>
+<div>    <table class="table">        <thead>            <tr>                <th>th 1</th>                <th>th 2</th>        </thead>        <tbody>            <tr>                <td>Cell 1</td>                <td>Cell 2</td>            </tr>            <tr>                <td>Cell 1</td>                <td>Cell 2</td>            </tr>        </tbody>    </table></div>
+<hr />
+<p>Several classes applied to the table:</p>
+<pre>%= table hover, striped, condensed, begin
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th&gt;th 1&lt;/th&gt;
+            &lt;th&gt;th 2&lt;/th&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 1&lt;/td&gt;
+            &lt;td&gt;Cell 2&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 1&lt;/td&gt;
+            &lt;td&gt;Cell 2&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+%  end</pre>
+<pre>&lt;table class=&quot;table table-condensed table-hover table-striped&quot;&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th&gt;th 1&lt;/th&gt;
+            &lt;th&gt;th 2&lt;/th&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 1&lt;/td&gt;
+            &lt;td&gt;Cell 2&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 1&lt;/td&gt;
+            &lt;td&gt;Cell 2&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;</pre>
+<div>    <table class="table table-condensed table-hover table-striped">        <thead>            <tr>                <th>th 1</th>                <th>th 2</th>        </thead>        <tbody>            <tr>                <td>Cell 1</td>                <td>Cell 2</td>            </tr>            <tr>                <td>Cell 1</td>                <td>Cell 2</td>            </tr>        </tbody>    </table></div>
+<hr />
+<p>A <code>condensed</code> table with an <code>id</code> wrapped in a <code>success</code> panel:</p>
+<pre>%= table &#39;Heading Table 4&#39;, panel =&gt; { success }, condensed, id =&gt; &#39;the-table&#39;, begin
+        &lt;thead&gt;
+            &lt;tr&gt;
+                &lt;th&gt;th 1&lt;/th&gt;
+                &lt;th&gt;th 2&lt;/th&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+            &lt;tr&gt;
+                &lt;td&gt;Cell 1&lt;/td&gt;
+                &lt;td&gt;Cell 2&lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+                &lt;td&gt;Cell 1&lt;/td&gt;
+                &lt;td&gt;Cell 2&lt;/td&gt;
+            &lt;/tr&gt;
+        &lt;/tbody&gt;
+%  end</pre>
+<pre>&lt;div class=&quot;panel panel-success&quot;&gt;
+    &lt;div class=&quot;panel-heading&quot;&gt;
+        &lt;h3 class=&quot;panel-title&quot;&gt;Heading Table 4&lt;/h3&gt;
+    &lt;/div&gt;
+    &lt;table class=&quot;table table-condensed&quot; id=&quot;the-table&quot;&gt;
+        &lt;thead&gt;
+            &lt;tr&gt;
+                &lt;th&gt;th 1&lt;/th&gt;
+                &lt;th&gt;th 2&lt;/th&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+            &lt;tr&gt;
+                &lt;td&gt;Cell 1&lt;/td&gt;
+                &lt;td&gt;Cell 2&lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+                &lt;td&gt;Cell 1&lt;/td&gt;
+                &lt;td&gt;Cell 2&lt;/td&gt;
+            &lt;/tr&gt;
+        &lt;/tbody&gt;
+    &lt;/table&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="panel panel-success">        <div class="panel-heading">            <h3 class="panel-title">Heading Table 4</h3>        </div>        <table class="table table-condensed" id="the-table">            <thead>                <tr>                    <th>th 1</th>                    <th>th 2</th>            </thead>            <tbody>                <tr>                    <td>Cell 1</td>                    <td>Cell 2</td>                </tr>                <tr>                    <td>Cell 1</td>                    <td>Cell 2</td>                </tr>            </tbody>        </table>    </div></div>
+<hr />
+<pre>&lt;%= table begin %&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th&gt;th 1&lt;/th&gt;
+            &lt;th&gt;th 2&lt;/th&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 1&lt;/td&gt;
+            &lt;td&gt;Cell 2&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 1&lt;/td&gt;
+            &lt;td&gt;Cell 2&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;% end %&gt;</pre>
+<pre>&lt;table class=&quot;table&quot;&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th&gt;th 1&lt;/th&gt;
+            &lt;th&gt;th 2&lt;/th&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 1&lt;/td&gt;
+            &lt;td&gt;Cell 2&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 1&lt;/td&gt;
+            &lt;td&gt;Cell 2&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;</pre>
+<div>    <table class="table">        <thead>            <tr>                <th>th 1</th>                <th>th 2</th>        </thead>        <tbody>            <tr>                <td>Cell 1</td>                <td>Cell 2</td>            </tr>            <tr>                <td>Cell 1</td>                <td>Cell 2</td>            </tr>        </tbody>    </table></div>
+<hr />
+<pre>%= table hover, striped, condensed, begin
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th&gt;th 1&lt;/th&gt;
+            &lt;th&gt;th 2&lt;/th&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 1&lt;/td&gt;
+            &lt;td&gt;Cell 2&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 1&lt;/td&gt;
+            &lt;td&gt;Cell 2&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+%  end</pre>
+<pre>&lt;table class=&quot;table table-condensed table-hover table-striped&quot;&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th&gt;th 1&lt;/th&gt;
+            &lt;th&gt;th 2&lt;/th&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 1&lt;/td&gt;
+            &lt;td&gt;Cell 2&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 1&lt;/td&gt;
+            &lt;td&gt;Cell 2&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;</pre>
+<div>    <table class="table table-condensed table-hover table-striped">        <thead>            <tr>                <th>th 1</th>                <th>th 2</th>        </thead>        <tbody>            <tr>                <td>Cell 1</td>                <td>Cell 2</td>            </tr>            <tr>                <td>Cell 1</td>                <td>Cell 2</td>            </tr>        </tbody>    </table></div>
+<hr />
+<pre>%= table &#39;Heading Table 3&#39;, hover, striped, condensed, begin
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th&gt;th 1&lt;/th&gt;
+            &lt;th&gt;th 2&lt;/th&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 1&lt;/td&gt;
+            &lt;td&gt;Cell 2&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cell 1&lt;/td&gt;
+            &lt;td&gt;Cell 2&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+%  end</pre>
+<pre>&lt;div class=&quot;panel panel-default&quot;&gt;
+    &lt;div class=&quot;panel-heading&quot;&gt;
+        &lt;h3 class=&quot;panel-title&quot;&gt;Heading Table 3&lt;/h3&gt;
+    &lt;/div&gt;
+    &lt;table class=&quot;table table-condensed table-hover table-striped&quot;&gt;
+        &lt;thead&gt;
+            &lt;tr&gt;
+                &lt;th&gt;th 1&lt;/th&gt;
+                &lt;th&gt;th 2&lt;/th&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+            &lt;tr&gt;
+                &lt;td&gt;Cell 1&lt;/td&gt;
+                &lt;td&gt;Cell 2&lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+                &lt;td&gt;Cell 1&lt;/td&gt;
+                &lt;td&gt;Cell 2&lt;/td&gt;
+            &lt;/tr&gt;
+        &lt;/tbody&gt;
+    &lt;/table&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="panel panel-default">        <div class="panel-heading">            <h3 class="panel-title">Heading Table 3</h3>        </div>        <table class="table table-condensed table-hover table-striped">            <thead>                <tr>                    <th>th 1</th>                    <th>th 2</th>            </thead>            <tbody>                <tr>                    <td>Cell 1</td>                    <td>Cell 2</td>                </tr>                <tr>                    <td>Cell 1</td>                    <td>Cell 2</td>                </tr>            </tbody>        </table>    </div></div>
+        </div>
+        <pre style="background-color: #fff; border-width: 0px;">
+
+
+
+        </pre>
+    </body>
+</html>

@@ -1,0 +1,24 @@
+BUGS
+CHANGES
+CREDITS
+examples/1000.txt
+examples/bigprimes.pl
+examples/fib.pl
+examples/hailstone.pl
+examples/prime.pl
+lib/Math/Big.pm
+lib/Math/Big/Factors.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+NEW
+README
+t/bigpm.t
+t/factorspm.t
+t/pod.t
+t/pod_cov.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

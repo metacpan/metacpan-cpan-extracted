@@ -1,0 +1,94 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-InlineTypes/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "Moose 2.00"^^doap-deps:CpanId ], [
+		doap-deps:on "Type::Tiny 1.000000"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Exporter::Tiny 0.030"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "MooseX::ErsatzMethod"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-InlineTypes>;
+	doap:created         "2013-02-22"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/MooseX-InlineTypes>;
+	doap:homepage        <https://metacpan.org/release/MooseX-InlineTypes>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "MooseX-InlineTypes";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooseX-InlineTypes/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooseX-InlineTypes/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooseX-InlineTypes/v_0-003>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-moosex-inlinetypes>;
+	];
+	doap:shortdesc       "declare type constraints and coercions inline with coderefs".
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-InlineTypes/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "MooseX-InlineTypes-0.001"^^xsd:string;
+	dc:issued            "2013-02-22"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-InlineTypes-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-InlineTypes/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "MooseX-InlineTypes-0.002"^^xsd:string;
+	dc:issued            "2013-02-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Regexps in test cases were too strict matching exception texts - failed on some versions of Moose.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-InlineTypes-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-InlineTypes/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "MooseX-InlineTypes-0.003"^^xsd:string;
+	dc:issued            "2014-09-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Instead of Sub::Install + Sub::Exporter + namespace::clean faff, just use Exporter::Tiny.";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Delegate most type munging stuff to Type::Tiny.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "use Dist::Inkt.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Adjust tests to pass on newer releases of Moose.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Use MooseX::ErsatzMethod to make Moose::Meta::Attribute::Native::Trait happy.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-InlineTypes-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

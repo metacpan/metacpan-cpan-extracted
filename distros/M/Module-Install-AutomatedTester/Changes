@@ -1,0 +1,8 @@
+Changelog for Module-Install-AutomatedTesters
+=============================================
+
+0.04  Fri Feb 17 13:29:22 GMT 2017
+  - Handle perls without dot in @INC
+
+0.02
+	- Initial CPAN Release

@@ -1,0 +1,38 @@
+The Math::FFT module provides an interface to various
+Fast Fourier Transform (FFT) routines of the C routine of fft4g.c,
+available at http://momonga.t.u-tokyo.ac.jp/~ooura/fft.html.
+The one-dimensional data sets, of size 2^n, are assumed
+to be sampled at a constant rate.
+
+The FFT methods available are
+- cdft: Complex Discrete Fourier Transform
+- rdft: Real Discrete Fourier Transform
+- ddct: Discrete Cosine Transform
+- ddst: Discrete Sine Transform
+- dfct:  Cosine Transform of RDFT (Real Symmetric DFT)
+- dfst:  Sine Transform of RDFT (Real Symmetric DFT)
+as well as their inverses.
+
+Also available are some methods to implement some common
+applications of FFTs for real data sets. These are
+- correl: Find the correlation between two data sets
+- convlv: Find the convolution of one data set with another
+- deconvlv: Find the deconvolution of one data set with another
+- spctrm: Find the power spectrum of a data set, including
+  application of a windowing function and segmentation of the data.
+
+Finally, for convenience some common statistical methods are
+included for analyzing real data sets. These are
+- mean: Find the mean of a data set
+- stdev: Find the standard deviation of a data set
+- range: Find the minimum and maximum values of a data set
+- median: Find the median of a data set
+- rms: Find the root mean square of a data set
+
+The C code for the FFT routines of fft4g.c is copyrighted 1996-99
+by Takuya OOURA. The file arrays.c included here to handle
+passing arrays to and from C comes from the PGPLOT module
+of Karl Glazebrook <kgb@aaoepp.aao.gov.au>. The perl
+interface of the Math::FTT module is Copyright 2000,2005
+by Randy Kobes <r.kobes@uwinnipeg.ca>, and may be
+distributed under the same terms as Perl itself.

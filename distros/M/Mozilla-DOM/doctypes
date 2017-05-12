@@ -1,0 +1,133 @@
+nsIWebBrowser			Mozilla::DOM::WebBrowser
+nsIWebNavigation		Mozilla::DOM::WebNavigation
+nsIURI				Mozilla::DOM::URI
+nsISelection			Mozilla::DOM::Selection
+nsISupports			Mozilla::DOM::Supports
+
+nsIID				Mozilla::DOM::IID
+nsEmbedString			string
+nsEmbedCString			string
+
+nsIDOMAbstractView		Mozilla::DOM::AbstractView
+nsIDOMDocumentView		Mozilla::DOM::DocumentView
+nsIDOMEvent			Mozilla::DOM::Event
+nsIDOMNSEvent			Mozilla::DOM::NSEvent
+nsIDOMUIEvent			Mozilla::DOM::UIEvent
+nsIDOMNSUIEvent			Mozilla::DOM::NSUIEvent
+nsIDOMDocumentEvent		Mozilla::DOM::DocumentEvent
+nsIDOMMutationEvent		Mozilla::DOM::MutationEvent
+nsIDOMKeyEvent			Mozilla::DOM::KeyEvent
+nsIDOMMouseEvent		Mozilla::DOM::MouseEvent
+nsIDOMEventTarget		Mozilla::DOM::EventTarget
+nsIDOMEventListener		Mozilla::DOM::EventListener
+nsIDOMWindow			Mozilla::DOM::Window
+nsIDOMWindow2			Mozilla::DOM::Window2
+nsIDOMWindowInternal		Mozilla::DOM::WindowInternal
+nsIDOMWindowCollection		Mozilla::DOM::WindowCollection
+nsIDOMDocument			Mozilla::DOM::Document
+nsIDOMNSDocument		Mozilla::DOM::NSDocument
+nsIDOMDocumentFragment		Mozilla::DOM::DocumentFragment
+nsIDOMDocumentRange		Mozilla::DOM::DocumentRange
+nsIDOMDocumentType		Mozilla::DOM::DocumentType
+nsIDOMDOMException		Mozilla::DOM::Exception
+nsIDOMNode			Mozilla::DOM::Node
+nsIDOMNodeList			Mozilla::DOM::NodeList
+nsIDOMNamedNodeMap		Mozilla::DOM::NamedNodeMap
+nsIDOMElement			Mozilla::DOM::Element
+nsIDOMEntity			Mozilla::DOM::Entity
+nsIDOMEntityReference		Mozilla::DOM::EntityReference
+nsIDOMAttr			Mozilla::DOM::Attr
+nsIDOMProcessingInstruction	Mozilla::DOM::ProcessingInstruction
+nsIDOMCDATASection		Mozilla::DOM::CDATASection
+nsIDOMComment			Mozilla::DOM::Comment
+nsIDOMCharacterData		Mozilla::DOM::CharacterData
+nsIDOMNotation			Mozilla::DOM::Notation
+nsIDOMText			Mozilla::DOM::Text
+nsIDOMDOMImplementation		Mozilla::DOM::DOMImplementation
+nsIDOMRange			Mozilla::DOM::Range
+nsIDOMNSRange			Mozilla::DOM::NSRange
+nsIDOMHistory			Mozilla::DOM::History
+nsIDOMLocation			Mozilla::DOM::Location
+nsIDOMNavigator			Mozilla::DOM::Navigator
+nsIDOMScreen			Mozilla::DOM::Screen
+
+nsIDOMHTMLAreaElement		Mozilla::DOM::HTMLAreaElement
+nsIDOMNSHTMLAreaElement		Mozilla::DOM::NSHTMLAreaElement
+nsIDOMHTMLAnchorElement		Mozilla::DOM::HTMLAnchorElement
+nsIDOMNSHTMLAnchorElement	Mozilla::DOM::NSHTMLAnchorElement
+nsIDOMHTMLAppletElement		Mozilla::DOM::HTMLAppletElement
+nsIDOMHTMLBRElement		Mozilla::DOM::HTMLBRElement
+nsIDOMHTMLBaseElement		Mozilla::DOM::HTMLBaseElement
+nsIDOMHTMLBaseFontElement	Mozilla::DOM::HTMLBaseFontElement
+nsIDOMHTMLBodyElement		Mozilla::DOM::HTMLBodyElement
+nsIDOMHTMLButtonElement		Mozilla::DOM::HTMLButtonElement
+nsIDOMNSHTMLButtonElement	Mozilla::DOM::NSHTMLButtonElement
+nsIDOMHTMLCollection		Mozilla::DOM::HTMLCollection
+nsIDOMHTMLDListElement		Mozilla::DOM::HTMLDListElement
+nsIDOMHTMLDirectoryElement	Mozilla::DOM::HTMLDirectoryElement
+nsIDOMHTMLDivElement		Mozilla::DOM::HTMLDivElement
+nsIDOMNSHTMLDocument		Mozilla::DOM::NSHTMLDocument
+nsIDOMHTMLElement		Mozilla::DOM::HTMLElement
+nsIDOMNSHTMLElement		Mozilla::DOM::NSHTMLElement
+nsIDOMHTMLEmbedElement		Mozilla::DOM::HTMLEmbedElement
+nsIDOMHTMLFieldSetElement	Mozilla::DOM::HTMLFieldSetElement
+nsIDOMHTMLFontElement		Mozilla::DOM::HTMLFontElement
+nsIDOMHTMLFormElement		Mozilla::DOM::HTMLFormElement
+nsIDOMNSHTMLFormElement		Mozilla::DOM::NSHTMLFormElement
+nsIDOMHTMLFrameElement		Mozilla::DOM::HTMLFrameElement
+nsIDOMNSHTMLFrameElement	Mozilla::DOM::NSHTMLFrameElement
+nsIDOMHTMLFrameSetElement	Mozilla::DOM::HTMLFrameSetElement
+nsIDOMHTMLHRElement		Mozilla::DOM::HTMLHRElement
+nsIDOMNSHTMLHRElement		Mozilla::DOM::NSHTMLHRElement
+nsIDOMHTMLHeadElement		Mozilla::DOM::HTMLHeadElement
+nsIDOMHTMLHeadingElement	Mozilla::DOM::HTMLHeadingElement
+nsIDOMHTMLHtmlElement		Mozilla::DOM::HTMLHtmlElement
+nsIDOMHTMLIFrameElement		Mozilla::DOM::HTMLIFrameElement
+nsIDOMHTMLImageElement		Mozilla::DOM::HTMLImageElement
+nsIDOMNSHTMLImageElement	Mozilla::DOM::NSHTMLImageElement
+nsIDOMHTMLInputElement		Mozilla::DOM::HTMLInputElement
+nsIDOMNSHTMLInputElement	Mozilla::DOM::NSHTMLInputElement
+nsIDOMHTMLIsIndexElement	Mozilla::DOM::HTMLIsIndexElement
+nsIDOMHTMLLIElement		Mozilla::DOM::HTMLLIElement
+nsIDOMHTMLLabelElement		Mozilla::DOM::HTMLLabelElement
+nsIDOMHTMLLegendElement		Mozilla::DOM::HTMLLegendElement
+nsIDOMHTMLLinkElement		Mozilla::DOM::HTMLLinkElement
+nsIDOMHTMLMapElement		Mozilla::DOM::HTMLMapElement
+nsIDOMHTMLMenuElement		Mozilla::DOM::HTMLMenuElement
+nsIDOMHTMLMetaElement		Mozilla::DOM::HTMLMetaElement
+nsIDOMHTMLModElement		Mozilla::DOM::HTMLModElement
+nsIDOMHTMLOListElement		Mozilla::DOM::HTMLOListElement
+nsIDOMHTMLObjectElement		Mozilla::DOM::HTMLObjectElement
+nsIDOMHTMLOptGroupElement	Mozilla::DOM::HTMLOptGroupElement
+nsIDOMHTMLOptionElement		Mozilla::DOM::HTMLOptionElement
+nsIDOMNSHTMLOptionElement	Mozilla::DOM::NSHTMLOptionElement
+nsIDOMHTMLOptionsCollection	Mozilla::DOM::HTMLOptionsCollection
+nsIDOMHTMLParagraphElement	Mozilla::DOM::HTMLParagraphElement
+nsIDOMHTMLParamElement		Mozilla::DOM::HTMLParamElement
+nsIDOMHTMLPreElement		Mozilla::DOM::HTMLPreElement
+nsIDOMHTMLQuoteElement		Mozilla::DOM::HTMLQuoteElement
+nsIDOMHTMLScriptElement		Mozilla::DOM::HTMLScriptElement
+nsIDOMHTMLSelectElement		Mozilla::DOM::HTMLSelectElement
+nsIDOMNSHTMLSelectElement	Mozilla::DOM::NSHTMLSelectElement
+nsIDOMHTMLStyleElement		Mozilla::DOM::HTMLStyleElement
+nsIDOMHTMLTableCaptionElement	Mozilla::DOM::HTMLTableCaptionElement
+nsIDOMHTMLTableCellElement	Mozilla::DOM::HTMLTableCellElement
+nsIDOMHTMLTableColElement	Mozilla::DOM::HTMLTableColElement
+nsIDOMHTMLTableElement		Mozilla::DOM::HTMLTableElement
+nsIDOMHTMLTableRowElement	Mozilla::DOM::HTMLTableRowElement
+nsIDOMHTMLTableSectionElement	Mozilla::DOM::HTMLTableSectionElement
+nsIDOMHTMLTextAreaElement	Mozilla::DOM::HTMLTextAreaElement
+nsIDOMNSHTMLTextAreaElement	Mozilla::DOM::NSHTMLTextAreaElement
+nsIDOMHTMLTitleElement		Mozilla::DOM::HTMLTitleElement
+nsIDOMHTMLUListElement		Mozilla::DOM::HTMLUListElement
+
+PRBool				boolean
+PRUint64			integer (long long)
+PRUint32			integer (long)
+PRUint16			integer (short)
+PRInt32				integer (long)
+PRInt16				integer (long)
+I32				integer (long)
+DOMTimeStamp			milliseconds from Unix epoch
+
+MozDomEventListener		Mozilla::DOM::EventListener

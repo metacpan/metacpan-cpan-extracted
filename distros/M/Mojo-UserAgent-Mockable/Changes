@@ -1,0 +1,88 @@
+1.53      2017-02-27 15:58:55-06:00 America/Chicago
+
+- Fixed dependencies screwed up in v1.52
+
+1.52      2017-02-27 10:21:36-06:00 America/Chicago
+
+- Updated dependencies - no functional changes
+
+1.51      2017-02-24 14:49:29-06:00 America/Chicago
+
+- Sessions going through a CONNECT proxy can now be played back properly (issue #9). 
+- Added option to disable userinfo comparision
+- Mojo::Util::slurp has been removed in favor of Path::Tiny::slurp in tests
+
+1.42      2016-07-29 10:35:40-05:00 America/Chicago
+
+- Added minimum Mojlicious version of 6. Renamed all numbered tests (save one) to unnumbered tests.
+
+1.41      2016-07-28 10:23:13-05:00 America/Chicago
+
+- Added quota checking for all calls to random.org. 
+
+1.40      2016-07-27 18:34:19-05:00 America/Chicago
+
+- Updated to work with Mojolicious 7.0
+
+1.30      2016-07-05 10:34:05-05:00 America/Chicago
+
+- Added support for normalizing requests. Patch courtesy of Johan Lindstrom 
+  <johanl@cpan.org>. 
+
+1.24      2016-04-20 15:52:26-05:00 America/Chicago
+
+- Fix broken dist.ini 
+
+1.23      2016-04-13 14:44:41-05:00 America/Chicago
+
+- Update tests to deal with failures due to missing / old versions of 
+  IO::Socket::SSL 
+
+1.22      2016-04-13 13:03:44-05:00 America/Chicago
+
+- Auto-add "provides" to META.* by means of 
+  Dist::Zilla::Plugin::MetaProvides::Package. Submitted by Mohammad Anwar
+  (https://github.com/Manwar).
+
+1.21      2015-12-28 11:54:21-06:00 America/Chicago
+
+- Version bump with fixed Changes file and two digit version.
+
+1.2       2015-12-23 11:23:24-06:00 America/Chicago
+
+- Added 'ignore_body' option
+
+1.11      2015-12-01 15:33:54-08:00 America/Los_Angeles
+
+- Added missing 'use Mojolicious'. 
+
+1.10      2015-11-23 22:00:19-06:00 America/Chicago
+
+- If we played back a transaction containing an instance of Mojo::URL, that URL 
+  would be rewritten during playback. No big deal, except when you want to then
+  use that URL for something else.
+
+1.04      2015-11-16 10:51:00-05:00 America/Chicago 
+ 
+- Updated unit tests again to completely remove dependency on PK value from Object 1
+  from Victoria and Albert Museum.
+
+1.03      2015-11-10 10:51:00-05:00 America/Chicago 
+
+- Updated unit tests to deal with changed PK value for object 1 from Victoria and 
+  Albert Museum.
+
+1.02      2015-10-22 09:33:02-05:00 America/Chicago
+
+- Removed all dependencies on File::Slurp, replaced with File::Slurper or
+  Mojo::Util. See 
+  http://blogs.perl.org/users/leon_timmermans/2015/08/fileslurp-is-broken-and-wrong.html
+
+1.01      2015-10-12 09:33:02-05:00 America/Chicago
+
+- Tests were referencing a file local to my work machine that was not in the
+  distribution. Oops.
+
+1.00      2015-10-09 12:50:20-05:00 America/Chicago
+
+- Initial revision

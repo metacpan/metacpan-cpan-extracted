@@ -1,0 +1,21 @@
+adm/podok
+Changes
+eg/module-rename
+lib/Module/Rename.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/001Basic.t
+t/002Git.t
+t/sandbox/Foo-Bar/Bar.pm
+t/sandbox/Foo-Bar/Changes
+t/sandbox/Foo-Bar/eg/remove_me
+t/sandbox/Foo-Bar/lib/Foo/Bar.pm
+t/sandbox/Foo-Bar/Makefile.PL
+t/sandbox/Foo-Bar/MANIFEST.SKIP
+t/sandbox/Foo-Bar/README
+t/sandbox/Foo-Bar/t/001Basic.t
+t/sandbox/utils/Utils.pm
+META.json                                Module JSON meta-data (added by MakeMaker)

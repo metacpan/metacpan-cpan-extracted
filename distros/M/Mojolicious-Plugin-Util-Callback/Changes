@@ -1,0 +1,17 @@
+0.05 2017-01-12
+        - Removed experimental smartmatch operator.
+
+0.04 2014-05-29
+        - Fixed License issue (now coherent Artistic License 2.0).
+
+0.03 2013-04-09
+        - Makes it possible to set '-once'
+          as a signature on initialization.
+        - Improved test suite.
+
+0.02 2013-03-04
+        - Improved docs by creating an example.
+
+0.01 2013-03-03
+        - Added establishment of multiple callbacks.
+        - Separation from Sojolicious.

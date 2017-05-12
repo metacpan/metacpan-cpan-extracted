@@ -1,0 +1,6 @@
+[-OTRS::RequireParensWithMethods]
+[-OTRS::RequireCamelCase]
+[-OTRS::ProhibitRequire]
+[-OTRS::RequireTrueReturnValueForModules]
+[-OTRS::ProhibitLowPrecendeceOps]
+[-OTRS::ProhibitOpen]

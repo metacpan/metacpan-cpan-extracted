@@ -1,0 +1,133 @@
+
+=head1 NAME
+
+SpamCannibal - How It Works
+
+=for html <!-- last updated 4-13-11 -->
+<font size="+1">What is SpamCannibal?</font>
+<p>
+SpamCannibal is a free software toolkit to help stop UBE (Unsolicited Bulk
+Email), UCE (Unsolicited Commercial Email), and other spam from reaching your mail server.
+A subset of SpamCannibal's modules can be used to mount and effective
+defense against DoS attacks.
+SpamCannibal is published under the GNU General Public License and is
+available for download from <b>CPAN</b>. For specific download instructions
+and links, click the <a href="#top" onMouseOver="title='DOWNLOAD';return true;" onMouseOut="title='';return true;"
+onClick="self.location = location.pathname + '/../?page=download';return false;">Download</a> link.
+<p>
+SpamCannibal's primary functional modules are:
+<ul>
+<li><a href=IPTables-IPv4-DBTarpit.html>IPTables::IPv4::DBTarpit</a>, a database backed TCP/IP connection tarpit and IP
+address collection daemon written in 'C' that uses Linux iptables QUEUE service.
+<p>
+<li><a href=IPTables-IPv4-DBTarpit-Tools.html>IPTables::IPv4::DBTarpit::Tools</a>, database management tools for DBTarpit,
+written in Perl. These tools may be used to directly interface spam filter
+programs with the database tarpit.
+<p>
+<li><a href=scripts.html>sc_BLcheck.pl</a> and <a href=scripts.html>sc_BLpreen.pl</a>, scripts run by a cron job to
+automatically add and remove IP addresses to/from the tarpit based on
+interrogation of remote DNSBL servers.
+<p>
+<li><a href=scripts.html>sc_mailfilter.pl</a>, a mail reception client to which you can email a
+"spam" header and message. sc_mailfilter.pl will strip out the sending MTA
+IP address and add it to the tarpit database, adding the headers and message
+to the "evidence" database.
+<p>
+<li><a href=Mail-SpamCannibal-DNSBLserver.html>Mail::SpamCannibal::DNSBLserver</a>, a lightweight DNSBL server written
+entirely in 'C' that reports status for the 'tarpit' database IP addresses when 
+interrogated. This is a full function DNSBL run entirely out of a database 
+that can be managed with the Perl toolset,
+a web interface or automatically by the above scripts. DNSBLserver is
+specifically designed to work cooperatively with other DNSBLserver daemons
+to share 'tarpit' data without recursive feedback of IP address information.
+<p>
+<li><b>spam_report.cgi</b>, a web page report generator that interfaces to the
+LaBrea::Tarpit::Report module to present statistics and activity information
+about the current activity of spam sites contacting your host and the dbtarpit daemon. 
+<b>spam_report.cgi</b> can be run as a standard cgi module or it can take advantage 
+of a mod-perl enhanced Apache installation.
+</ul>
+In addition, there are a number of additonal web tools modules and scripts to assist with
+administration and user services.
+<p>
+<font size="+1">How does SpamCannibal Work?</font>
+<p>
+The SpamCannibal tool suite uses the Berkeley DB database found on almost all
+unix based operating systems. It maintains four database files; 'tarpit',
+'archive', 'blcontrib', and 'evidence'.
+<p>
+<ul>
+<li><b>tarpit</b> is a list of IP addresses of hosts that are
+to be refused access to port 25 (or any port defended against DoS attacks)
+and the time of their last access attempt.
+<p>
+<li><b>archive</b> contains the IP address and time of last contact for every host
+accessing port 25 (or any port defended against DoS attacks)
+that is NOT in the tarpit database. The archive database is
+subsequently examined by the  BLcheck screening script to check the IP addresses against various 
+DNSBL servers for known spam activity.
+<p>
+<li><b>blcontrib</b> is a list of IP addresses of every host that has been added
+to the tarpit because it was found in a remote DNSBL database and identified
+as a spam source. The responding DNSBL TXT record, zone name and A response
+record are stored for use by the 'BLpreen' script and to provide 'reason'
+information for the web lookup client.
+<p>
+<li><b>evidence</b> contains the IP address of every host added to the
+tarpit database directly by the local hosting site. In addition to the offending IP
+address, the database contains the mail headers and message constituting the
+reason for addition to the tarpit banned list.
+</ul>
+<center>
+<img src=../images/spamcbl1.gif>
+</center>
+<ul>
+<li>The <a href=IPTables-IPv4-DBTarpit.html>dbtarpit</a> daemon interfaces directly with  Linux iptables. All
+connection attempts to port 25 (or any port defended against DoS attacks) 
+are examined by dbtarpit prior to network connection.
+Incoming IP addresses are checked against the 'tarpit' database
+and if found in the database tarpitted if TCP/IP or dropped if another protocol. Optionally, TCP/IP connections can be
+dropped instead of tarpitting. If an address is not found in the 'tarpit' database it is saved in the
+'archive' database for subsequent processing by the script that checks against
+remote DNSBL servers. The packet is then passed transparently through to its
+destination as if the dbtarpit daemon were not present.
+<p>
+<li>Activated by a cron job, <a href=scripts.html>sc_BLcheck.pl</a> processes the 'archive' database and checks each
+IP address against the list of DNSBL servers in its configuration file.
+Addresses found in a remote DNSBL database that meet the necessary match
+criteria are added to the 'tarpit' database. The TXT record (if any) or a
+default TXT record from the config file is added to the 'blcontrib' database
+along with the identity of the remote DNSBL for use by the DNSBLserver
+daemon and web server client.
+<p>
+<li>Spam that is not identified by the automated tools that get's
+through to your desktop is handled by the <a href=scripts.html>sc_mailfilter.pl</a> mail client.
+This script accepts mail sent to it as a designated 'robot' user. Its
+configuration file contains the known mail servers and aliases within your
+domain(s). Simply email a copy of the headers and message to the 'robot' spam
+account from your PGP enabled (optional for security) mail client. It will
+be decrypted by sc_maifilter.pl and the first originating server in the 
+Received-from: headers that is not a known-acceptable mail host is extracted 
+and added to the 'tarpit' database. The headers and message content are added 
+to the 'evidence' database for use by the web client.
+</ul>
+<p>
+<font size=+1>What's a TARPIT and how does it work?</font>
+<p>
+A TCP/IP tarpit is a program that sets the flow control settings to inhibit
+communication rather than facilitate it. It sets the packet data and packet 
+window size parameters to very low values which slows the transmission rate 
+to a trickle. Then it never acknowledges packets, so transmission will be 
+retried over and over, ideally bringing the transmitting program 
+(the spam server, scanning tool or worm) to a virtual
+halt for several hours or perhaps indefinitely. Tarpits maintained on our
+firewall servers hold some threads for months.
+<p>
+More information on tarpits is available on the labrea, Sourceforge labrea, and LaBrea::Tarpit
+websites at:<br>
+<blockquote>
+<a href="http://www.hackbusters.net/LaBrea/">http://www.hackbusters.net/LaBrea</a><br>
+<a href="http://sourceforge.net/projects/labrea/">http://sourceforge.net/projects/labrea/</a><br>
+<a href="http://scans.bizsystems.net/">http://scans.bizsystems.net</a><br>
+</blockquote>
+ ...these sites are required reading. 

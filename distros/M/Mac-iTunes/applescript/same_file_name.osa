@@ -1,0 +1,10 @@
+(* $Id$ *)
+
+tell application "iTunes"
+	set myList to playlist "Library"
+	set myTrack to file track 1 of myList
+	copy location of myTrack to myLoc
+	set myName to name of myTrack
+	copy (get info for myLoc) to myInfo
+	return myLoc
+end tell

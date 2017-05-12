@@ -1,0 +1,34 @@
+--- #YAML:1.0
+name:               MetaTrans
+version:            1.01
+abstract:           Class for creating multilingual meta-translators
+author:
+    - Jan Pomikalek <xpomikal@fi.muni.cz>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Config::Find:     0
+    Config::General:  0
+    HTML::Entities:   0
+    HTTP::Request:    0
+    HTTP::Response:   0
+    LWP::UserAgent:   0
+    Proc::SyncExec:   0
+    Tk:               804.027
+    Tk::BrowseEntry:  0
+    Tk::DialogBox:    0
+    Tk::HList:        0
+    Tk::ItemStyle:    0
+    Tk::LabFrame:     0
+    Tk::ROText:       0
+    URI::Escape:      0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

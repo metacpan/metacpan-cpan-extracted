@@ -1,0 +1,50 @@
+NAME
+    MATH::simpleRNG - simple Random Number Generator
+
+SYNOPSIS
+      use Math::simpleRNG qw (sRNG);
+      $random = sRNG('seed1','seed2');
+
+DESCRIPTION
+    This function uses George Marsaglia's Multiply With Carry algorithm to
+    produce uniformly distributed unsigned integers.
+
+    * $random = sRNG('seed1','seed2')
+          input:        seed1   [optional]
+                        seed2   [optional]
+
+          return:       an unsigned random integer 1 -> 2^32 -1
+
+          Starting from a known set of non-zero seeds, the RNG
+          will return a repeating set of pseudo random numbers.
+
+          You may alter the pattern by periodically supplying 
+          additional seed(s). If no seed is supplied or the seed
+          integer portion of the seed is zero, system time() is
+          used to seed the algorithm.
+
+        Note: for smaller numbers, i.e. 3-4 digit
+
+          my $num = sRNG int(sRNG()/5000000);
+
+AUTHOR
+    Michael Robinton <michael@bizsystems.com>
+
+COPYRIGHT & LICENSE
+    Copyright 2013-2014, Michael Robinton <michael@bizsystems.com>
+
+    This module is licensed under the Code Project Open License (CPOL) a
+    copy of which is included with this distribution. A copy may also be
+    obtained at http://www.codeproject.com/info/cpol10.aspx
+
+ACKNOWLEDGEMENTS
+    Thanks to John D. Cook for his article on the Simple RNG found here:
+    http://www.codeproject.com/Articles/25172/Simple-Random-Number-Generatio
+    n
+
+EXPORT_OK
+            sRNG
+
+DEPENDENCIES
+            none
+

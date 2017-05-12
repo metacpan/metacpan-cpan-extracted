@@ -1,0 +1,123 @@
+NAME
+    Module::Install::AggressiveInclude - A more aggressive include
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+    At times Module::Install's include() function may not be enough for you.
+    In that case Module::Install::AggressiveInclude may be what you need.
+
+    Often for local development I tend to shy away from installing packages
+    I may be working on so when working with packages that have multiple
+    local dependencies I find my self writing this Makefile.PL code a lot:
+
+        # use lib for my local libraries somewhere around here
+        # ...
+    
+        build_requires 'Module::Find';
+        require Module::Find;
+    
+        include 'FooPackage';
+        include $_ foreach Module::Find::findallmod 'FooPackage::*';
+    
+        # so on and so forth
+
+    Why? You may ask when Module::Install has a support for glob matching of
+    packages. Well, because for my (and maybe yours) it is not powerful
+    enough when it comes to deep includes.
+
+    For example say we have a lot of modules we want to include from the
+    same namespace:
+
+        FooPackage
+        FooPackage::Alpha
+        FooPackage::Alpha::I
+        FooPackage::Alpha::II
+        FooPackage::Beta
+        FooPackage::Beta::I
+        FooPackage::Beta::II
+        FooPackage::Gamma
+        FooPackage::Gamma::I
+        FooPackage::Gamma::II
+
+    If we use Module::Install's include function like this:
+
+        include 'FooPackage::*';
+
+    Only these packages will get included:
+
+        FooPackage::Alpha
+        FooPackage::Beta
+        FooPackage::Gamma
+        # Not even plain ol' FooPackage is included
+
+    In my opinion this lacks some DWIM functionality. So instead we do:
+
+        include_aggressive 'FooPackage';
+
+    And we will get the base package as well as every class under it's
+    namespace.
+
+METHODS
+  include_aggressive PACKAGE
+    Aggressively include PACKAGE and all the modules/packages that fall
+    under it
+
+  include_findallmod
+    Ties Module::Find::findallmod to Module::Install::include.
+
+  include_findsubmod
+    Ties Module::Find::findsubmod to Module::Install::include.
+
+  include_followsymlinks
+    Interface with Module::Find::followsymlinks.
+
+  include_ignoresymlinks
+    Interface with Module::Find::ignoresymlinks.
+
+AUTHOR
+    Jason M Mills, "<jmmills at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-module-install-aggressiveinclude at rt.cpan.org", or through the
+    web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Module-Install-Aggressiv
+    eInclude>. I will be notified, and then you'll automatically be notified
+    of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Module::Install::AggressiveInclude
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Module-Install-AggressiveI
+        nclude>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Module-Install-AggressiveInclude>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Module-Install-AggressiveInclude>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Module-Install-AggressiveInclude/>
+
+ACKNOWLEDGEMENTS
+LICENSE AND COPYRIGHT
+    Copyright 2010 Jason M Mills.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

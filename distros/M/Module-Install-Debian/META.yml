@@ -1,0 +1,31 @@
+---
+abstract: 'Require debian packages to be installed on the system'
+author:
+  - 'Bjørn-Olav Strand <bo@startsiden.no>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Copy: 0
+  File::Remove: 0
+  File::Spec: 0
+  File::Temp: 0
+  File::chdir: 0
+  Test::Perl::Critic: 0
+  Test::Pod: 1.14
+  Test::Pod::Coverage: 1.04
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.92'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Install-Debian
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.030

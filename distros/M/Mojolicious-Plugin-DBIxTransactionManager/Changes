@@ -1,0 +1,8 @@
+Revision history for Mojolicious-Plugin-DBIxTransactionManager
+
+0.02    Wed Dec  5 11:50:35 JST 2012
+        Add Mojolicious module Makefile.PL.
+
+0.01    Fri Nov 23 13:14:54 JST 2012
+        First version, released on an unsuspecting world.
+

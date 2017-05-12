@@ -1,0 +1,66 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLModElement
+
+=for object Mozilla::DOM::HTMLModElement
+
+Mozilla::DOM::HTMLModElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLModElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLModElement interface is the interface to a [X]HTML
+ * ins and del element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLModElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $cite = $htmlmodelement->B<GetCite>()
+
+=head2 $datetime = $htmlmodelement->B<GetDateTime>()
+
+=head2 $htmlmodelement->B<SetCite>($cite)
+
+=over
+
+=over
+
+=item * $cite (string)
+
+=back
+
+=back
+
+=head2 $htmlmodelement->B<SetDateTime>($datetime)
+
+=over
+
+=over
+
+=item * $datetime (string)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

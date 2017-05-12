@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Math/Symbolic/MaximaSimple.pm
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+example/ex1.pl
+example/ex2.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

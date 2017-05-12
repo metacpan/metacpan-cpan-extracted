@@ -1,0 +1,41 @@
+0.15  2015-12-24 11:45:27 EST
+    - Support submitting text and links
+
+0.14  2015-07-13 19:47:02 PDT
+    - Support /api/subscribe
+
+0.13  2015-07-06 13:50:13 PDT
+    - Run callbacks for most methods doing HTTP requests
+    - Better documentation
+    - More test coverage
+
+0.12  2015-06-11 05:15:51 PDT
+    - Require Moo v2.000001
+
+0.11  2015-06-08 07:27:40 PDT
+    - Explain why Mojo::Reddit was used over Mojo::Snoo
+
+0.10  2015-06-07 11:54:45 PDT
+    (major)
+    - Add ojo::Snoo
+    - Rename Mojo::Snoo::Thing as Mojo::Snoo::Link
+    - Bring back Mojo::Snoo::Thing as wrapper for “Things" (Hunter McMillen)
+    - Require Mojolicious v5.73
+
+    (minor)
+    - Add author key to Mojo::Snoo::Link
+    - Remove unused Mojo::Util::dumper import
+
+    (docs)
+    - Explain Snoo
+    - Reference ojo::Snoo (Stefan Adams)
+
+
+0.03  2015-06-03 20:13:33 PDT
+    - Add Test::Exception as dependency
+
+0.02  2015-06-03 10:17:07 PDT
+    - And now a CPAN release
+
+0.01  2015-06-03 10:14:06 PDT
+    - Initial ALPHA release

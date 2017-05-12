@@ -1,0 +1,26 @@
+<!-- warning, this XML is entirely for well-formness tests.
+     it's not supposed to be valid in any way.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:dcterms="http://purl.org/dc/terms/"
+         xmlns:dctype="http://purl.org/dc/dcmitype/">
+
+  <!-- let's have a comment --> 
+  <dctype:Text rdf:about="http://mkdoc.com/">
+
+    <dc:identifier rdf:resource="http://mkdoc.com/" />
+
+    <dc:language>
+      <dcterms:RFC1766>
+        <rdf:value>en-gb</rdf:value>
+        <rdfs:label>English (United Kingdom)</rdfs:label>
+
+      </dcterms:RFC1766>
+    </dc:language>
+
+    <dc:title xml:lang="en-gb">MKDoc</dc:title>
+</rdf:RDF>

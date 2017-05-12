@@ -1,0 +1,23 @@
+--
+-- Dumping data for table `object`
+--
+
+
+INSERT INTO object VALUES (1,'urn:lsid:biomoby.org:objectclass:Object','Object','an object','openinformatics.com','jason@openinformatics.com');
+INSERT INTO object VALUES (2,'urn:lsid:biomoby.org:objectclass:Integer','Integer','an int','openinformatics.com','jason@openinformatics.com');
+INSERT INTO object VALUES (3,'urn:lsid:biomoby.org:objectclass:String','String','a string','openinformatics.com','jason@openinformatics.com');
+INSERT INTO object VALUES (4,'urn:lsid:biomoby.org:objectclass:Float','Float','a floating point number','openinformatics.com','jason@openinformatics.com');
+INSERT INTO object VALUES (5,'urn:lsid:biomoby.org:objectclass:DateTime','DateTime','a date or time in ISO-8601 format','openinformatics.com','jason@openinformatics.com');
+INSERT INTO object VALUES (6,'urn:lsid:biomoby.org:objectclass:Boolean','Boolean','An object representing a boolean logic value (either "true" or "false")','openinformatics.com','jason@openinformatics.com');
+
+--
+-- Dumping data for table `object_term2term`
+--
+
+
+INSERT INTO object_term2term VALUES (1,'urn:lsid:biomoby.org:objectrelation:isa',2,1,NULL);
+INSERT INTO object_term2term VALUES (2,'urn:lsid:biomoby.org:objectrelation:isa',3,1,NULL);
+INSERT INTO object_term2term VALUES (3,'urn:lsid:biomoby.org:objectrelation:isa',4,1,NULL);
+INSERT INTO object_term2term VALUES (4,'urn:lsid:biomoby.org:objectrelation:isa',5,1,NULL);
+INSERT INTO object_term2term VALUES (5,'urn:lsid:biomoby.org:objectrelation:isa',6,1,NULL);
+

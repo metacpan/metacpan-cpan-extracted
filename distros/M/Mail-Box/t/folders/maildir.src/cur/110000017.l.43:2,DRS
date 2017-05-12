@@ -1,0 +1,49 @@
+Date: Wed, 14 Jun 2000 17:43:34 +0200
+From: Mark Overmeer <markov@ATComputing.nl>
+To: Cristy <cristy@mystic.es.dupont.com>
+Subject: Re: your mail
+Message-ID: <20000614174334.G22766@atcmpg.ATComputing.nl>
+References: <8172.960997992@mystic>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+X-Mailer: Mutt 1.0pre4i
+In-Reply-To: <8172.960997992@mystic>; from cristy@mystic.es.dupont.com on Wed, Jun 14, 2000 at 11:53:11AM -0400
+Status: RO
+X-Status: A
+Content-Length: 1403
+Lines: 34
+
+* Cristy (cristy@mystic.es.dupont.com) [000614 17:23]:
+>    $img->Read("logo:");
+>    $text="I am a LumberJack";
+>    $poinsize=40;
+>    my ($width, $height) = $img->Get('width', 'height');
+>    $img->Annotate
+>       ( fill    => 'yellow'
+>       , text      => $text
+>       , font      =>
+> '-bitstream-charter-medium-r-normal--40-0-0-0-p-0-iso8859-1'
+>       , gravity   => 'SouthEast'
+>       , 'x'       => 5
+>       , 'y'       => $poinsize+5
+>       );
+>    $img->Write(filename  => "test.gif");
+
+So: gravity work differently from my well known "anchor", where
+x,y defines a point and anchor the location of the point wrt the
+item to be put on the background.  It was not clear from the docs.
+
+It what you propose a feature or a designed thing?  You specify the
+coordinate of the right-top (NorthEast) wrt to the right-bottom
+(SouthEast).  I expect that x=0,y=0,SouthWest will work wrt to
+NorthWest.  It is not logical for me to treat North/South differently
+from East/West (designed before the fall of the Iron curtain?)
+
+And also: the text still appears in black.
+-- 
+               MarkOv       %-]
+
+------------------------------------------------------------------------
+drs Mark A.C.J. Overmeer                           markov@ATComputing.nl
+AT Computing, UNIX Training and Consultancy    http://www.ATComputing.nl
+http://www.dhp.nl/~markov/                         http://satfoto.dhp.nl

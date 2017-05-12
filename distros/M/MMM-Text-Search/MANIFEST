@@ -1,0 +1,10 @@
+Changes
+README
+MANIFEST
+Makefile.PL
+Search.pm
+test.pl
+eg/cgi_search.pl
+eg/html_indexer.pl
+Search/Inet.pm
+META.yml                                 Module meta-data (added by MakeMaker)

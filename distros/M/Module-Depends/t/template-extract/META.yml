@@ -1,0 +1,15 @@
+name: Template-Extract
+version: 0.38
+abstract: Use TT2 syntax to extract data from documents
+author: Autrijus Tang <autrijus@autrijus.org>
+license: perl
+distribution_type: module
+build_requires:
+  Test::More: 0
+requires:
+  perl: 5.6.0
+  Template: 2
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.35

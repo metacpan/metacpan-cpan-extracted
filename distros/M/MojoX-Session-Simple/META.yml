@@ -1,0 +1,49 @@
+---
+abstract: 'Plack::Middleware::Session::Simple adapter for Mojolicious'
+author:
+  - 'yowcow <yowcow@cpan.org>'
+build_requires:
+  Cache::Memory::Simple: '0'
+  HTTP::CookieJar: '0'
+  HTTP::Request::Common: '0'
+  Test::More: '0.98'
+  Test::Pretty: '0'
+  Test::TCP: '2.07'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MojoX-Session-Simple
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MojoX::Session::Simple:
+    file: lib/MojoX/Session/Simple.pm
+    version: '0.06'
+requires:
+  Mojolicious: '4.0'
+  Plack::Middleware::Session::Simple: '0.01'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/yowcow/p5-MojoX-Session-Simple/issues
+  homepage: https://github.com/yowcow/p5-MojoX-Session-Simple
+  repository: git://github.com/yowcow/p5-MojoX-Session-Simple.git
+version: '0.06'
+x_authority: cpan:YOWCOW
+x_contributors:
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'yowcow <yowcow@gmail.com>'
+  - 'Yoko OYAMA <yowcow@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

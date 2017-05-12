@@ -1,0 +1,20 @@
+CHANGES
+lib/Module/Load/Conditional.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01_Module_Load_Conditional.t
+t/test_lib/a/X.pm
+t/test_lib/b/X.pm
+t/to_load/AutoLoad.pm
+t/to_load/NotAutoLoad.pm
+t/to_load/Commented.pm
+t/to_load/InPod.pm
+t/to_load/LoadIt.pm
+t/to_load/LoadMe.pl
+t/to_load/MustBe/Loaded.pm
+t/to_load/NotMain.pm
+t/to_load/NotX.pm
+t/to_load/ToBeLoaded
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

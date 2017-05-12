@@ -1,0 +1,78 @@
+[%#
+
+=head1 pager
+
+This controls the pager display at the bottom (by default) of the list
+and search views. It expects a C<pager> template argument which responds
+to the L<Data::Page> interface.
+
+#%]
+
+[% BLOCK pager_link; %]
+[%
+          SET label = page_num;
+            SET args = "?page=" _ page_num;
+	    SET args = args _ "&order=" _ request.params.order IF request.params.order;
+	    SET args = args _ "&amp;o2=desc" IF request.params.o2 == "desc";
+            FOR col = pager_columns;
+              IF request.params.$col;
+                SET args = args _ "&" _ col _ "=" _ request.params.$col;
+                SET action = "search";
+              END;
+            END;
+            link(classmetadata.table, action, args, label);
+%]
+[% END; %]
+
+
+[% IF pager %]
+<p class="pager">
+Page 
+[% IF pager.first_page == pager.last_page; %]
+1 of 1
+[% ELSE %]
+[% pager.current_page %] of [% pager.last_page %] &nbsp; | &nbsp;
+[%
+    UNLESS pager_action;
+	SET pager_action = request.action;
+    END;
+   
+   UNLESS pager_columns;
+        SET pager_columns = classmetadata.columns.list;
+   END;
+
+    SET end_page = pager.current_page + 5;
+    SET begin_page = pager.current_page - 5;
+    IF begin_page < 1;
+        SET begin_page = 1;
+	SET end_page = 10;
+    END;
+
+    IF pager.last_page < end_page;
+        SET end_page = pager.last_page;
+	IF (end_page - 10) > 1;
+	  begin_page = end_page - 10;
+	END;
+    END;
+
+    IF begin_page > 1;
+	    PROCESS pager_link page_num = 1, action = pager_action;
+    END;
+
+     FOREACH num = [begin_page .. end_page];
+          IF num == pager.current_page;
+            "<span class='current-page'>"; num; "</span>";
+          ELSE;
+	    PROCESS pager_link page_num = num, action = pager_action;
+          END;
+     END;
+
+     IF end_page < pager.last_page;
+       PROCESS pager_link page_num = pager.last_page, action = pager_action;
+     END;
+
+END;
+%]
+</p>
+[% END %]
+

@@ -1,0 +1,5 @@
+=encoding utf8
+
+=head1 NAME
+
+[% module_name %] - [% abstract %]

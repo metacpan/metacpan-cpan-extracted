@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9eeaacdc87c8d436142e5b6a3f50d333afc5d508 ANDK2015.pub
+SHA1 da1a023f132d3be27f2a8c56d487ae9320d69b85 AUDREYT2015.pub
+SHA1 b6d1dc79056f7912070c84e3b8d5cec519a568dd AUTHORS
+SHA1 f1220288267a64ea706a3bda21c10d4806509c9c Changes
+SHA1 6b0e3686874e9845396973b16bf5aad6aa291496 MANIFEST
+SHA1 af1667da11736451592aeba46d34e38c47a7201c MANIFEST.SKIP
+SHA1 7a8cace7253b42802f5b698c3804eafa8ad5ef67 META.yml
+SHA1 d7974085e99fdbde7d13a265693860105fd923eb Makefile.PL
+SHA1 dad70cafbd8df2bd8489b0c06daf2096fbb5bdae PAUSE2017.pub
+SHA1 a8423736492ba8e44db6e87e96ac1f52fed4c995 README
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 8886edb2f956ac9474c7c1018ed8b8263a28a171 inc/Module/Install/External.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 01978a56e76a58399af3bd4d022aa990b9669bee inc/Module/Install/Scripts.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 a8184988c7820dde3546fa0cc158e35489a7d379 lib/Module/Signature.pm
+SHA1 fbd7d7bc258c0ebf8ae5627ec4489131d7ec90ff script/cpansign
+SHA1 3ec6171779122b0bdc69937c283be11b2a15dd89 t/0-signature.t
+SHA1 307a744384e704d94031df73233f24174b843bc8 t/1-basic.t
+SHA1 0177dcafa00571440541d6495fce6d3b61f81039 t/2-cygwin.t
+SHA1 a3bea1f17370e89ccb1c3becf5c1d072d6857fd4 t/3-verify.t
+SHA1 69614dfba33a1ef498a2161f9e4718092652857c t/wrap.pl
+SHA1 61377898e9d7cb06d370f45167a925e16736de70 t/wrapped-tests.bin
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlfNEucACgkQtLPdNzw1AaCvkACgmndVq/G6i8LySs2qUt4NuLDe
+D/EAnRrEJ5FBoZ6lYq1Xe9IlPjZXitYk
+=+0xx
+-----END PGP SIGNATURE-----

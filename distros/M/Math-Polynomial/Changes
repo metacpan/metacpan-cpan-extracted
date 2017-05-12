@@ -1,0 +1,260 @@
+Revision history for Perl extension Math::Polynomial.
+
+                    Math::Polynomial Version 1.011
+                    ------------------------------
+
+- Release date: 2016-08-08
+
+- Metadata now recommends Math::BigRat 0.260804.
+
+- Improved test diagnostics addressing a Math::BigRat issue
+  [rt.cpan.org #114004].
+
+                    Math::Polynomial Version 1.010
+                    ------------------------------
+
+- Not released.
+
+                    Math::Polynomial Version 1.009
+                    ------------------------------
+
+- Release date: 2016-07-28
+
+- Improved metadata.
+
+- Added deprecation warning to Math::Polynomial::Generic.
+
+                    Math::Polynomial Version 1.008
+                    ------------------------------
+
+- Release date: 2015-04-18
+
+- Added wrap parameter for string_configuration.
+
+                    Math::Polynomial Version 1.007
+                    ------------------------------
+
+- Release date: 2015-03-13
+
+- Added exp_mod() method.
+
+- Scheduled Math::Polynomial::Generic for deprecation.
+
+                    Math::Polynomial Version 1.006
+                    ------------------------------
+
+- Release date: 2013-05-28
+
+- Small documentation fixes.
+
+                    Math::Polynomial Version 1.005
+                    ------------------------------
+
+- Release date: 2012-09-23
+
+- Lifted a limitation on coefficients for differentiate() and integrate().
+
+- Added an optimization for pow() and pow_mod().
+
+                    Math::Polynomial Version 1.004
+                    ------------------------------
+
+- Release date: 2010-09-26
+
+- Eliminated a perl-5.10-ism that had slipped into the test suite.
+
+                    Math::Polynomial Version 1.003
+                    ------------------------------
+
+- Release date: 2010-09-08
+
+- Added optimization for monic denominators to mmod.
+
+- Added small optimization to nest.
+
+- Deprecated optional parameter of div_root.
+
+- Added as_horner_tree and as_power_sum_tree methods, discussed in
+  [rt.cpan.org #46575].
+
+- Added tests covering tree conversion methods.
+
+- Added sign_of_coeff parameter for stringification and tree conversions.
+
+- Simplified Horner example script.
+
+- Added example script demonstrating Math::Symbolic interoperability.
+
+- Added test covering Math::ModInt interoperability.
+
+                    Math::Polynomial Version 1.002
+                    ------------------------------
+
+- Release date: 2009-06-11
+
+- Improved interpolation polynomial calculation by one order of
+  magnitude (O(n**3) => O(n**2)).
+
+- Added optimization for monic denominators to div / mod / divmod.
+
+- Added from_roots constructor and mul_root / div_root / divmod_root
+  methods suggested by Kevin Ryde [rt.cpan.org #46427].
+
+                    Math::Polynomial Version 1.001
+                    ------------------------------
+
+- Release date: 2009-05-19
+
+- Repackaged after Math-Polynomial-1.000.tar.gz had file transmission
+  problems on its way to CPAN.
+
+                    Math::Polynomial Version 1.000
+                    ------------------------------
+
+- Release date: 2009-05-19
+
+- Author: Martin Becker
+
+- Rewritten from scratch, using
+  h2xs 1.23 with options -X -A -b 5.6.0 Math::Polynomial
+
+- Usable coefficient spaces are now any object classes with
+  well-defined basic arithmetic operations and equality checks.
+
+- Objects are now essentially immutable.  The only property that
+  may be changed dynamically configures formatting defaults.
+  Thus, cloning is hardly ever necessary.
+
+- Removed tidy() and size() methods and dropped tidiness concept, as it
+  bore no mathematical significance.
+
+- Degrees of coefficients in new() are now in ascending order and
+  therefore equivalent to array indexes.
+
+- Added monomial constructor.
+
+- Changed Lagrange interpolation to take arrays of x- and y-values.
+
+- Extended constructors to borrow coefficient space and stringification
+  attributes when used as object methods.
+
+- Added usage of coeff() without parameter, yielding list of all coefficients.
+
+- Added coefficients() method, yielding non-empty list of coefficients.
+
+- Added coeff_zero() and coeff_one() methods, yielding zero and unit
+  elements of coefficient space.
+
+- Added proper_degree() method yielding undef for zero polynomials.
+
+- Added is_zero() method yielding true for zero polynomials.
+
+- Renamed quotrem() operator to divmod().
+
+- Added overloaded operators: bool ! ** << >> == !=
+
+- Added methods: is_nonzero(), is_equal(), is_unequal(), is_monic(),
+  add_const(), sub_const(), mul_const(), div_const(), pow(), pow_mod(),
+  inv_mod(), shift_up(), shift_down(), slice(), monize(), mmod(), gcd(),
+  xgcd(), differentiate(), integrate(), definite_integral().
+
+- Renamed eval() method to evaluate() and sub() method to sub_().
+
+- Removed configure() class method, renamed to_string() method to
+  as_string() and added optional configuration parameter.
+
+- Added lots of configuration options for string representation.
+
+- Added string_config() method to configure as_string default behaviour
+  globally and per object.
+
+- Added $max_degree class variable to configure parameter sanity tests.
+
+- Changed internal object structure to improve extensibility.
+
+- Reworked test suite and examples.
+
+- Reworked pod documentation.
+
+- Added experimental module Math::Polynomial::Generic.
+
+
+                    Math::Polynomial Version 0.04
+                    -----------------------------
+
+- Release date: 2007-07-12
+
+- New maintainer: Martin Becker.
+
+- Bugfix [rt.cpan.org #4788] (reported 2003 by prospective maintainer):
+  Method tidy() looped endlessly on zero polynomials.
+
+- Bugfix: Crashed on adding a constant.
+
+- Bugfix: Crashed on negating via overloaded unary minus.
+
+- Bugfix: Division of polynomials of equal degree gave wrong results.
+
+- Bugfix: Division crashed with non-"tidy" polynomials.
+
+- Bugfix: Division failed to catch zero denominator.
+
+- Bugfix: Verbose stringification produced lots of warnings under -W.
+
+- Added more test cases.
+
+- Renamed example directory, fixed imports and added table of contents
+  there.
+
+- Added some metadata to Makefile.PL.
+
+- Added documentation of exportable subroutines, moved quotrem to
+  subroutines section, clarified some definitions.
+
+- Moved all imports to top of the module.
+
+- Added more standard sections to POD, like VERSION, DIAGNOSTICS, LICENSE.
+
+- Added development status notice to README.
+
+                    Math::Polynomial Version 0.03
+                    -----------------------------
+
+- Release date: 2001-02-23.
+
+- Added more text about interpolation in general and Math::Polynomial
+  specifically to the distribution.
+
+- Fixed a bug where the last constant was omitted if it was one. This
+  bug was reported independently by Sergey V. Kolychev, John Hurst,
+  and Jeffrey S. Haemer (Minolta-QMS).
+
+- By a suggestion from Jeffrey S. Haemer (Minolta-QMS) I also changed
+  the verbose format slightly to print 'x + -1' as 'x - 1' (and
+  similarly for all negative coefficients). For the special case,
+  where the first coefficient is negative, the minus sign is still
+  printed as if it was part of the coefficient; e.g., '-3*x + 4' is
+  still printed as '-3*x + 4'.
+
+- By suggestion from John Gamble I moved Math::Interpolate to inside
+  the Math::Polynomial package---the subroutine is very small and
+  tightly coupled to the Math::Polynomial package.
+
+
+                    Math::Polynomial Version 0.02
+                    -----------------------------
+
+- Release date: 1998-08-13.
+
+- Fixed a bug that caused erroneous behaviour when 0 was used in the
+  interpolation routine.
+
+                    Math::Polynomial Version 0.01
+                    -----------------------------
+
+- Release date: 1997-09-11.
+
+- Author: Mats Kindahl
+
+- Initial release.
+

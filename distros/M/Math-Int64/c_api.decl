@@ -1,0 +1,15 @@
+
+max_version = 2
+
+module_h_template_filename = templates/module_h.temp
+module_c_template_filename = templates/module_c.temp
+c_api_h_template_filename  = templates/c_api_h.temp
+
+SV *     newSVi64 (pTHX_ int64_t)
+SV *     newSVu64 (pTHX_ uint64_t)
+int64_t  SvI64    (pTHX_ SV*)
+uint64_t SvU64    (pTHX_ SV*)
+int      SvI64OK  (pTHX_ SV*)
+int      SvU64OK  (pTHX_ SV*)
+uint64_t randU64  (pTHX)
+

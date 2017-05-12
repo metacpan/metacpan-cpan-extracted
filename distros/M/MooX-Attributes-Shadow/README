@@ -1,0 +1,62 @@
+MooX::Attributes::Shadow
+
+NAME
+
+    MooX::Attributes::Shadow - shadow attributes of contained objects
+
+DESCRIPTION
+
+    This module provides utility functions (and a role) to 
+    easy for a container class to shadow contained classes'
+    attributes.
+
+
+DEPENDENCIES
+
+    Moo
+    Moo::Role
+    MooX::Types::MooseLike
+
+INSTALLATION
+
+
+    To compile, test and install:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+CHANGES
+
+    See the Changes file for more details
+
+COPYRIGHT
+
+
+--8<--8<--8<--8<--
+
+Copyright (C) 2012 Smithsonian Astrophysical Observatory
+
+This file is part of MooX-Attributes-Shadow
+
+MooX-Attributes-Shadow is free software: you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->8-->8-->8-->8--
+
+AUTHOR
+
+    Diab Jerius (djerius@cpan.org)
+

@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:               Mail-Address-MobileJp
+version:            0.09
+abstract:           ~
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Mail::Address:  0
+    Test::More:     0.32
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

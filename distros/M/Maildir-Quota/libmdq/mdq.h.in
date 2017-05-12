@@ -1,0 +1,58 @@
+/* -*- C -*- */
+/*
+   Copyright 2000, 2001, 2002, 2003 Laurent Wacrenier
+
+   This file is part of PLL mdq.
+
+   PLL mdq is free software; you can redistribute it and/or modify
+   it under the terms of the GNU Lesser Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   PLL mdq is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser Public License for more details.
+
+   You should have received a copy of the GNU Lesser Public License
+   along with PLL mdq; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+*/
+
+#define MDQ_H_RCSID "$Id: mdq.h.in,v 1.3 2005/01/31 17:38:07 lwa Exp $"
+#include <stdarg.h>
+
+void (*mdq_error)(const char *message, va_list args);
+extern int mdq_trash_quota;
+
+typedef struct _maildir_quota {
+  int fd;
+  long max_bytes;
+  long max_files;
+  int need_checksize;
+  int has_recalculate;
+  long bytes;
+  long files;
+  long added_bytes;
+  long added_files;
+  char *dir;
+} MDQ;
+
+/* for mdq_get() */
+#define MDQ_BYTES_CURRENT   1
+#define MDQ_BYTES_MAX       2
+#define MDQ_FILES_CURRENT   3
+#define MDQ_FILES_MAX       4
+
+
+
+MDQ *mdq_open(char *dir, char *quotastr);
+void mdq_add(MDQ *q, long bytes, long files);
+int mdq_test(MDQ *q, long bytes, long files);
+long mdq_get(MDQ *q, int what);
+void mdq_close(MDQ *q);
+
+#define MDQ_VERSION_MAJOR  @MDQ_VERSION_MAJOR@
+#define MDQ_VERSION_MINOR  @MDQ_VERSION_MINOR@
+#define MDQ_VERSION        @MDQ_VERSION@

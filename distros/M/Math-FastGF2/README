@@ -1,0 +1,66 @@
+Math-FastGF2 version 0.04
+=========================
+
+Math::FastGF2 - Perl extension for fast Galois Field arithmetic
+
+Minimal, optimised library to do modular arithmetic in Galois Fields
+of size 8, 16 and 32 bits. Once the program has been installed, for
+full documentation use
+
+  perldoc Math::FastGF2
+  perldoc Math::FastGF2::Matrix
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+To install to a different directory (say, because you don't have
+permission to write to the system directories), use:
+
+   perl Makefile.PL INSTALL_BASE=/path/to/install
+   make
+   make test
+   make install
+
+If you install to a non-standard location, don't forget to use the -I
+option to perl or set/modify the PERLLIB environment variable to
+include the correct install path. See perlrun for details.
+
+DEPENDENCIES
+
+  Exporter
+  XSLoader
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Declan Malone
+
+This package is free software; you can redistribute it and/or modify
+it under the terms of the the "GNU General Public License" ("GPL").
+
+The C code at the core of this Perl module can additionally be
+redistributed and/or modified under the terms of the "GNU Library
+General Public License" ("LGPL"). For the purpose of that license, the
+"library" is defined as the unmodified C code in the clib/ directory
+of this distribution. You are permitted to change the typedefs and
+function prototypes to match the word sizes on your machine, but any
+further modification (such as removing the static modifier for
+non-exported function or data structure names) are not permitted under
+the LGPL, so the library will revert to being covered by the full
+version of the GPL.
+
+Please refer to the files "GNU_GPL.txt" and "GNU_LGPL.txt" in this
+distribution for details.
+
+DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.

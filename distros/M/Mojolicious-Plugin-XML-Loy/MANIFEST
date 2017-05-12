@@ -1,0 +1,8 @@
+lib/Mojolicious/Plugin/XML/Loy.pm
+t/XML-Loy.t
+Changes
+MANIFEST
+LICENSE
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

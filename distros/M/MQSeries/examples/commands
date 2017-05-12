@@ -1,0 +1,104 @@
+#!/usr/bin/perl
+#
+# $Id: commands,v 33.5 2012/09/26 16:15:21 jettisu Exp $
+#
+# (c) 2009-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+# This example walks through the various ways to inquire data using
+# MQSeries::Command, using the object types for distributed queue
+# managers.  Use of Data::Dumper on the results is recommended.  This
+# gets you 95% to ebing able to abckup a queue manager configuration.
+#
+
+use strict;
+use warnings;
+
+use Data::Dumper;
+use MQSeries qw(:functions);
+use MQSeries::QueueManager;
+use MQSeries::Command;
+
+my $qmgr = MQSeries::QueueManager->
+  new('QueueManager'  => 'Some.Queue.Manager',
+      'AutoConnect'   => 0) ||
+  die "Cannot create QueueManager object";
+$qmgr->Connect() ||
+  die("Cannot connect to queue manager: CompCode=", $qmgr->CompCode(),
+      ", Reason=", $qmgr->Reason());
+
+my $cmd = MQSeries::Command::->
+  new('QueueManager'   => $qmgr,
+      'Type'           => 'PCF',
+     ) ||
+  die "Cannot create command";
+
+#
+# Use 'InquireQueueManager' to get queue manager information.  We
+# retain this, as we need the command level later to test MQ v6 and MQ
+# v7 specific commands.
+#
+my $qmgr_info = $cmd->InquireQueueManager();
+if ($qmgr_info->{CommandLevel} >= 600) {
+    #
+    # Starting with MQ v6, you can ask for groups of attributes other
+    # than 'All'.  Starting with MQ v7, the group 'pub/sub attributes'
+    # was added.
+    #
+    my @groups = qw(ClusterAttrs
+                    DistributedQueueingAttrs
+                    EventAttrs
+                    SystemAttrs);
+    if ($qmgr_info->{CommandLevel} >= 700) {
+        push @groups, 'PubSubAttrs';
+    }
+    foreach my $group (@groups) {
+        my $qmgr_info = $cmd->InquireQueueManager(QMgrAttrs => [ $group ]);
+    }
+}
+
+#
+# Use the 'InquireQueueManagerStatus' command
+#
+if ($qmgr_info->{CommandLevel} >= 600) {
+    my $qmgr_status = $cmd->InquireQueueManagerStatus();
+}
+
+#
+# Test Inquire XXX Names and Inquire XXX for all object types
+#
+my @types = qw(Queue Channel Process);
+if ($qmgr_info->{CommandLevel} >= 600) {
+    push @types, qw(AuthInfo Namelist);
+    if ($qmgr_info->{CommandLevel} >= 700) {
+        push @types, qw(Subscription Topic);
+    }
+}
+foreach my $type (@types) {
+    unless ($type eq 'Subscription') {  # No InquireSubscriptionNames
+        my $method = 'Inquire' . $type . 'Names';
+        my @names = $cmd->$method();
+        print "Have ", scalar(@names), " $type names\n";
+    }
+
+    my $method = 'Inquire' . $type;
+    my @objects = $cmd->$method();
+    print "Have ", scalar(@objects), " $type objects\n";
+}
+
+
+#
+# Test Inquire XXX Status for supported object types
+#
+@types = ();
+if ($qmgr_info->{CommandLevel} >= 600) {
+    push @types, qw(Channel);
+    if ($qmgr_info->{CommandLevel} >= 700) {
+        push @types, qw(Subscription Topic);
+    }
+}
+foreach my $type (@types) {
+    my $method = 'Inquire' . $type . 'Status';
+    my @status = $cmd->$method();
+    print "Have ", scalar(@status), " $type status\n";
+}

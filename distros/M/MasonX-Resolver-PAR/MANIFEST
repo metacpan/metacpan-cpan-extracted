@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+lib/MasonX/Resolver/PAR.pm
+lib/MasonX/Component/ParBased.pm
+README
+t/1.t
+sample/htdocs/index.html
+sample/htdocs/autohandler
+sample/htdocs/dhandler
+sample/web.conf
+sample.par

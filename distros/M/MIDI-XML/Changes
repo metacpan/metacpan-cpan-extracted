@@ -1,0 +1,23 @@
+Revision history for Perl extension MIDI::XML.
+
+0.03  Sun Jun 29 00:56:40 2008
+	- complete rewrite; created by h2xs 1.23 with options
+		-A -X -n MIDI::XML
+		
+		* eliminated dependency on MIDI-Perl
+		* Now subclasses XML::DOM
+		* Created MIDI::XML::Editor, a Perl/Tk-based GUI
+
+2003-01-24  Brian M. Ames  bmames@apk.net
+
+	* Release 0.02
+
+    * corrected MidiFile.pm, Makefile.PL, and test.pl
+
+2003-01-20  Brian M. Ames  bmames@apk.net
+
+	* Release 0.01
+
+	* Initial release
+
+	* MidiXML support.

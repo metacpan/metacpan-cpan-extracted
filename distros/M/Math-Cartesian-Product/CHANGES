@@ -1,0 +1,5 @@
+Change Log
+1.006 18 Apr 2009 Initial release
+1.007 26 Jan 2015 Break memory loop, empty cartesian products and additional tests per Philipp Rumpf
+1.008 28 Jan 2015 Improved documentation and tests on the empty product per Philipp Rumpf
+1.009 18 Aug 2015 Results array not built in void or scalar context per Justin Case

@@ -1,0 +1,14 @@
+____________________________________________________________________________
+[   685] By: autrijus                              on 2002/08/17  08:59:09
+        Log: * this be 0.02.
+             * oops. the module namespace was way wrong.
+             * regene manifest.
+	   ! CryptSource.pm MANIFEST
+____________________________________________________________________________
+[   676] By: autrijus                              on 2002/08/16  19:25:48
+        Log: * changes and signature.
+	   + Changes SIGNATURE
+____________________________________________________________________________
+[   675] By: autrijus                              on 2002/08/16  19:24:21
+        Log: * salvaged from the back drawer and released.
+	   + CryptSource.pm MANIFEST Makefile.PL README t/1-basic.t

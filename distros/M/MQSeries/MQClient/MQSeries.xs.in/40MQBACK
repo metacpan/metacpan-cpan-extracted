@@ -1,0 +1,21 @@
+# -*-c-*-
+#
+# $Id: 40MQBACK,v 33.4 2012/09/26 16:10:06 jettisu Exp $
+#
+# (c) 1999-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+void
+MQBACK(Hconn,CompCode,Reason)
+	MQHCONN	Hconn
+	MQLONG	CompCode = NO_INIT
+	MQLONG	Reason = NO_INIT
+
+    CODE:
+	MQBACK(Hconn,&CompCode,&Reason);
+    OUTPUT:
+	Hconn
+	CompCode
+	Reason
+

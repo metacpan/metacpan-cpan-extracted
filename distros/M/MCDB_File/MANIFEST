@@ -1,0 +1,13 @@
+MCDB_File.pm
+MCDB_File.xs
+COPYRIGHT
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+mcdb.tar.gz
+perlext.map
+t/01main.t
+t/02last.t
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

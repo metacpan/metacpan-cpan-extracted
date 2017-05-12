@@ -1,0 +1,44 @@
+Music::Tag::MusicBrainz version 
+===============================
+
+Music::Tag::MusicBrainz is a plugin for Music::Tag which gets info from 
+MusicBrainz site. Uses WebService::MusicBrainz.
+
+Note:  As of version 0.28, Music-Tag is distributed as seperate packages.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   MP3::Tag
+   WebService::MusicBrainz
+
+I strongly recommend the following to improve web searches:
+
+   Lingua::EN::Inflect
+   Lingua::Stem
+   Text::LevenshteinXS
+   Text::Unaccent 
+
+TEST FILES
+
+Are based on the sample file for Audio::M4P.  For testing only.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Edward J. Allen III
+ealleniii _at_ cpan _dot_ org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+

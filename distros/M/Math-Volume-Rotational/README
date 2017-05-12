@@ -1,0 +1,38 @@
+Math::Volume::Rotational version 0.11
+=====================================
+
+This module calculates the volume of rotational bodies. These are bodies
+resulting from the rotation of a portion of a 2D function around an axis.
+
+Please note that rotations around an axis other than either x- or y-axis
+are considered highly experimental at this point.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Math::Integral::Romberg: 0.02
+  Test::More: 0.44
+  Math::Symbolic: 0.129
+
+SEE ALSO
+
+New versions of this module can be found on http://steffen-mueller.net or
+on CPAN.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Steffen Mueller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

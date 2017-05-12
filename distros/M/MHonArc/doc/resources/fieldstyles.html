@@ -1,0 +1,149 @@
+<html>
+<head>
+<title>MHonArc Resources: FIELDSTYLES</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="fieldstore.html">FIELDSTORE</a>]</td><td><nobr>[<a href="../resources.html#fieldstyles">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="fileperms.html">FILEPERMS</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>FIELDSTYLES</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p>
+<code>&lt;FIELDSTYLES&gt;<br></code>
+<VAR>field_name</VAR><CODE>:</CODE><VAR>html_element</VAR><br>
+<VAR>field_name</VAR><CODE>:</CODE><VAR>html_element</VAR><br>
+...<br>
+<code>&lt;/FIELDSTYLES&gt;<br></code>
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>The FIELDSTYLES resource is set via the <CODE>FIELDSTYLES</CODE>
+element.  Each line in the <CODE>FIELDSTYLES</CODE> element
+defines HTML elements to wrap around the field text in
+mail headers (e.g. "<CODE>To:</CODE><VAR> field text</VAR>",
+"<CODE>From:</CODE><VAR> field text</VAR>"). The format of each line
+is "<VAR>field_name</VAR><CODE>:</CODE><VAR>html_element</VAR>". This
+specifies to wrap <VAR>html_element</VAR> around the text associated with
+<VAR>field_name</VAR>. If <VAR>html_element</VAR> is empty, then the field
+text is not wrapped in any element.  </P>
+ 
+<P>MHonArc defines
+a special <VAR>field_name</VAR> called "<CODE>-default-</CODE>". This
+is default HTML element to wrap field text in if no explicit specific
+element is defined for the label.  </P>
+
+<P><VAR>field_name</VAR> must
+be the exact name of a header field name, but character case is ignored.
+</P>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<PRE>
+<b>&lt;FieldStyles&gt;</b>
+-default-
+<b>&lt;/FieldStyles&gt;</b>
+</PRE>
+
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>The following causes the subject text to appear in bold and
+all other field text to be in italics:
+</p>
+
+<PRE>
+<b>&lt;FieldStyles&gt;</b>
+subject:b
+-default-:i
+<b>&lt;/FieldStyles&gt;</b>
+</PRE>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>1.0
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+<a href="excs.html">EXCS</a>,
+<a href="fieldorder.html">FIELDORDER</a>,
+<a href="fieldsbeg.html">FIELDSBEG</a>,
+<a href="fieldsend.html">FIELDSEND</a>,
+<a href="fldbeg.html">FLDBEG</a>,
+<a href="fldend.html">FLDEND</a>,
+<a href="labelbeg.html">LABELBEG</a>,
+<a href="labelend.html">LABELEND</a>,
+<a href="labelstyles.html">LABELSTYLES</a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="fieldstore.html">FIELDSTORE</a>]</td><td><nobr>[<a href="../resources.html#fieldstyles">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="fileperms.html">FILEPERMS</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2003/10/06 22:04:16 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"><strong>MHonArc</strong></a><br>
+Copyright &#169; 1997-1998, <a href="http://www.earlhood.com/">Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org">mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

@@ -1,0 +1,39 @@
+MobileDetect version 1.21
+=========================
+
+Check a given string against the Mobile Detect Library that can be found here: https://github.com/serbanghita/Mobile-Detect
+I have prepared a Perl Version, because there is no such thing in perl and i also want to show my support for Mr. Șerban Ghiță
+and his fine piece of PHP Software.
+
+This is the Perl Version. You need to setup LWP with HTTPS Support before (needed to regulary update the Mobile_Detect.json file
+from github).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+use JSON;
+use LWP::Protocol::https;
+use LWP::UserAgent;
+use Storable;
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2014 by Sebastian Enger, C<< <sebastian.enger at gmail.com> >>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

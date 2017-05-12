@@ -1,0 +1,65 @@
+Mail::Miner version 2.1
+=======================
+
+If you install Mail::Miner and set it up so that mail is routed through
+Mail::Audit::Miner (see the documentation) or piped through mm_process,
+then attachments will be replaced by instructions about how to use the
+"mm" command-line utility to detach them. You also have a handy database
+of all your email that you can prod. :)
+
+See the "mm" tool for more details of how you can search this database
+for email addresses, phone numbers, physical addresses, and so on.
+
+INSTALLATION
+
+You will need mysql installed.
+
+To install this module, create a new mysql database according to the
+schema in miner.sql, and give yourself access to it. Then type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Now you have to make sure your incoming mail gets processed by
+Mail::Miner. You can do this by putting a pipe to mm_process in your
+procmailrc, or, if you're using Mail::Audit, by using
+Mail::Audit::Miner. (Included in this distribution.) See the
+documentation for that module for more details. 
+
+Next you'll need to ensure that you've set the MM_DATABASE, MM_USER and
+MM_PASSWORD environment variables. If MM_PASSWORD happens to start with
+a / or a . and a file of that name exists, the password will be read
+from a file; if it happens to be a directory, then the password will be
+read from $MM_PASSWORD/$MM_USER.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+        MIME::Parser
+        Date::Manip
+        Mail::Address
+        Class::DB::mysql
+        Lingua::EN::Keywords
+
+SUPPORT
+
+I've released this software because I find it useful, and I hope you
+might too. But I am a being of finite time and I'd like to spend more of
+it writing cool modules like this and less of it answering email, so
+please excuse me if the support isn't as great as you'd like.
+
+Nevertheless, there is a general discussion list for users of all my
+modules, to be found at
+http://lists.netthink.co.uk/listinfo/module-mayhem
+
+If you have a problem with this module, someone there will probably have
+it too.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002-2003 Simon Cozens.
+GPL & AL.
+

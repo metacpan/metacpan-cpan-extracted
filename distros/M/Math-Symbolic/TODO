@@ -1,0 +1,57 @@
+This file contains the TODO milestones for Math::Symbolic.
++ => Met
+- => Not met
+
+Sooner-than-later:
+	- Better testsuite as in: bring in some order and better coverage.
+	- Clean up documentation.
+	
+	- Update TODO and clean it.
+	- Make sure TODO and sourceforge task/issue/whatever trackers are in
+	  sync.
+	
+	- Write a coherent, easy-to-understand, central section on variable
+	  signatures and their purpose.
+	
+	- Should the operators/functions really be listed in the MS::Operator
+	  man page or should they be listed in a more central place like
+	  the main man page? Or both? (Duplicate docs are bad!)
+	- Whatever's done about that last point, make sure the docs refer to
+	  the correct portion about the operator list.
+
+Random and unordered thoughts and ideas:
+	- Differentials
+	- Vector operations
+	- Vector analysis
+	- Equations
+	- Symbolic calculator
+	- Some idea of types/contexts?
+	- n-ary operators
+	- Equation solver
+	- Canonical form
+	- Improved term simplification! MUCH IMPROVED!
+	- Integration (*laugh*)
+	- Matrices
+
+Version 0.120: (erm, we're past 0.120, sadly.)
+	- Major change to MS::Operator guts:
+	  - Separate ordinary operands such as the ones found with
+	    arithmetic operators and the special operands such as the
+	    deriving variable with derivatives.
+	    Ordinary operands are to stay in the {operands} hash entry.
+	    Special operands are to be put into a new {special} hash entry.
+	    {special} is an array ref containing the special operands.
+	    These are hashes themselves. They contain certain keys:
+	    - type: The type of operand. May be "variable", "tree", "constant",
+	      etc. ("identifier" even).
+	    - value: The "payload".
+	  - All code must be adapted to be aware of this change.
+	  - This fixes the trouble one may have when "implementing" a
+	    variable used for deriving, etc.
+	  - Makes summation possible as a new operator. The function would
+	    be the only ordinary operand. Lower, upper, and index variable
+	    would all be special.
+	- Documentation for the changes.
+	- Tests for the changes.
+
+

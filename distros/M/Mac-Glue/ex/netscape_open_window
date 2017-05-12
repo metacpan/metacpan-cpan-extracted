@@ -1,0 +1,6 @@
+#!perl -w
+use Mac::Glue;
+my $n = new Mac::Glue 'Netscape_Communicator';
+$n->activate;
+$n->make(new => 'window');
+$n->GetURL('http://pudge.net/macperl/');

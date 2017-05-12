@@ -1,0 +1,35 @@
+---
+abstract: 'Postmodern Perl Module Packaging'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Module::Package
+name: Module-Package
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Cwd: 0
+  File::Find: 0
+  IO::All: 0.41
+  Module::Install: 1.01
+  Module::Install::AuthorRequires: 0.02
+  Module::Install::ManifestSkip: 0.19
+  Moo: 0.009008
+  perl: 5.8.3
+resources:
+  homepage: http://github.com/ingydotnet/module-package-pm/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ingydotnet/module-package-pm.git
+version: 0.30

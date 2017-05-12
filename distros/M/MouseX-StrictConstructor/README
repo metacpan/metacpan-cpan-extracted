@@ -1,0 +1,36 @@
+This is Perl module MouseX::StrictConstructor.
+
+NAME
+
+MouseX::StrictConstructor - Makes your constructors strict
+
+INSTALLATION
+
+MouseX::StrictConstructor installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    $ cpan MouseX::StrictConstructor
+
+Download it, unpack it, then build it as per the usual:
+
+    $ perl Makefile.PL
+    $ make && make test
+
+Then install it:
+
+    $ make install
+
+DOCUMENTATION
+
+MouseX::StrictConstructor documentation is available as in POD. So you can do:
+
+    $ perldoc MouseX::StrictConstructor
+
+to read the documentation online with your favorite pager.
+
+LICENSE AND COPYRIGHT
+
+Copyright (c) 2010, Fuji, Goro (gfx). All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

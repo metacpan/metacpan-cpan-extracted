@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tube name="métro de Lyon">
+  <lines>
+    <line id="A" name="A" color="#E1001A"/>
+    <line id="B" name="B" color="#0094D7"/>
+    <line id="C" name="C" color="#F19400"/>
+    <line id="D" name="D" color="#008F36"/>
+  </lines>
+  <stations>
+    <station id="S01" name="Perrache" line="A" link="S02"/>
+    <station id="S02" name="Ampère - Victor Hugo" line="A" link="S03,S01"/>
+    <station id="S03" name="Bellecour" line="A,D" link="S04,S02,S33,S35"/>
+    <station id="S04" name="Cordeliers" line="A" link="S05,S03"/>
+    <station id="S05" name="Hôtel de Ville - Louis Pradel" line="A,C" link="S06,S04,S26"/>
+    <station id="S06" name="Foch" line="A" link="S07,S05"/>
+    <station id="S07" name="Masséna" line="A" link="S08,S06"/>
+    <station id="S08" name="Charpennes - Charles Hernu" line="A,B" link="S09,S07,S16"/>
+    <station id="S09" name="République - Villeurbanne" line="A" link="S10,S08"/>
+    <station id="S10" name="Gratte-Ciel" line="A" link="S11,S09"/>
+    <station id="S11" name="Flachet" line="A" link="S12,S10"/>
+    <station id="S12" name="Cusset" line="A" link="S13,S11"/>
+    <station id="S13" name="Laurent-Bonnevay - Astroballe" line="A" link="S14,S12"/>
+    <station id="S14" name="Vaulx-en-Velin - La Soie" line="A" link="S13"/>
+
+    <station id="S16" name="Brotteaux" line="B" link="S08,S17"/>
+    <station id="S17" name="Part-Dieu" line="B" link="S18,S16"/>
+    <station id="S18" name="Place Guichard - Bourse du Travail" line="B" link="S19,S17"/>
+    <station id="S19" name="Saxe - Gambetta" line="B,D" link="S20,S18,S35,S37"/>
+    <station id="S20" name="Jean Macé" line="B" link="S21,S19"/>
+    <station id="S21" name="Place Jean Jaurès" line="B" link="S22,S20"/>
+    <station id="S22" name="Debourg" line="B" link="S23,S21"/>
+    <station id="S23" name="Stade de Gerland" line="B" link="S24,S22"/>
+    <station id="S24" name="Gare d'Oullins" line="B" link="S23"/>
+
+    <station id="S26" name="Croix-Paquet" line="C" link="S05,S27"/>
+    <station id="S27" name="Croix-Rousse" line="C" link="S28,S26"/>
+    <station id="S28" name="Hénon" line="C" link="S29,S27"/>
+    <station id="S29" name="Cuire" line="C" link="S28"/>
+
+    <station id="S30" name="Gare de Vaise" line="D" link="S31"/>
+    <station id="S31" name="Valmy" line="D" link="S32,S30"/>
+    <station id="S32" name="Gorge de Loup" line="D" link="S33,S31"/>
+    <station id="S33" name="Vieux Lyon - Cathédrale Saint-Jean" line="D" link="S03,S32"/>
+    <station id="S35" name="Guillotière - Gabriel Péri" line="D" link="S19,S03"/>
+    <station id="S37" name="Garibaldi" line="D" link="S38,S19"/>
+    <station id="S38" name="Sans Souci" line="D" link="S39,S37"/>
+    <station id="S39" name="Monplaisir - Lumière" line="D" link="S40,S38"/>
+    <station id="S40" name="Grange Blanche" line="D" link="S41,S39"/>
+    <station id="S41" name="Laënnec" line="D" link="S42,S40"/>
+    <station id="S42" name="Mermoz - Pinel" line="D" link="S43,S41"/>
+    <station id="S43" name="Parilly" line="D" link="S44,S42"/>
+    <station id="S44" name="Gare de Vénissieux" line="D" link="S43"/>
+  </stations>
+</tube>

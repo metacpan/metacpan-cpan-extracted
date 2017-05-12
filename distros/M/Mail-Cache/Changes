@@ -1,0 +1,15 @@
+Revision history for Mail-Cache
+
+0.1.2	2010-02-20/06:00
+		-Fix writing the size information.
+
+0.1.1	2009-07-08/6:30
+		-Fix getSubject, getSizes, and getDates.
+
+0.1.0	2009-07-06/12:30
+		-Clean up a bit and fix a few errors.
+		-Add removeUIDs.
+
+0.0.0   2009-07-01/12:50
+        First version, released on an unsuspecting world.
+

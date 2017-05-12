@@ -1,0 +1,354 @@
+=encoding utf-8
+
+=head1 NAME / 名称
+
+MooseX::Types::Moose::MutualCoercion::JA - (ja) Mooseの一般的な型制約のための相互型変換
+
+=head1 バージョン
+
+この文書はL<MooseX::Types::Moose::MutualCoercion|MooseX::Types::Moose::MutualCoercion>のバージョンC<0.04>について記述しています。
+
+=head1 概要
+
+    {
+        package Foo;
+        use Moose;
+        use MooseX::Types::Moose::MutualCoercion
+            qw(StrToArrayRef ArrayRefToHashKeys);
+        has 'thingies' =>
+            (is => 'rw', isa => StrToArrayRef, coerce => 1);
+        has 'lookup_table' =>
+            (is => 'rw', isa => ArrayRefToHashKeys, coerce => 1);
+        1;
+    }
+
+    my $foo = Foo->new( thingies => 'bar' );
+    print $foo->thingies->[0];                              # 'bar'
+
+    $foo->lookup_table( [qw(baz qux)] );
+    print 'eureka!'                                         # 'eureka!'
+        if grep {
+            exists $foo->lookup_table->{$_};
+        } qw(foo bar baz);
+
+
+=head1 翻訳
+
+L<MooseX::Types::Moose::MutualCoercion|MooseX::Types::Moose::MutualCoercion>の文書の大部分は他の言語に翻訳されています。
+
+=over 4
+
+=item en: 英語
+
+L<MooseX::Types::Moose::MutualCoercion|MooseX::Types::Moose::MutualCoercion>
+
+=item ja: 日本語
+
+L<MooseX::Types::Moose::MutualCoercion::JA|MooseX::Types::Moose::MutualCoercion::JA>
+(この文書)
+
+=back
+
+=head1 解説
+
+このモジュールは型変換付きのいくつかのL<Moose::Util::TypeConstraints|Moose::Util::TypeConstraints>型制約をまとめたものです。
+L<Moose|Moose>でよく知られている組み込みおよび一般的な型を相互に型変換するために設計されています。
+
+=head1 型制約と型変換
+
+B<註>: これらの型制約はデフォルトでは何もエクスポートされません。
+以下のようにインポートリストを使ってインポートしてください:
+
+    use MooseX::Types::Moose::MutualCoercion qw(NumToInt ScalarRefToStr);
+
+=head2 C<< Int >>へ
+
+=over 4
+
+=item C<< NumToInt >>
+
+C<< Int >>のサブタイプです。
+C<< coerce >>を有効にした場合、C<< Num >>は整数になります。
+例えば、C<< 3.14 >>はC<< 3 >>に変換されます。
+
+=back
+
+=head2 C<< Str >>へ
+
+=over 4
+
+=item C<< ScalarRefToStr >>
+
+C<< Str >>のサブタイプです。
+C<< coerce >>を有効にした場合、C<< ScalarRef[Str] >>はデリファレンスされた文字列になります。
+例えば、C<< \do{'foo'} >>はC<< foo >>に変換されます。
+
+=item C<< ArrayRefToLines >>
+
+C<< Str >>のサブタイプです。
+C<< coerce >>を有効にした場合、C<< ArrayRef[Str] >>の全ての要素はC<< $/ >>で結合されます。
+例えば、C<< [qw(foo bar baz)] >>はC<< foo\nbar\nbaz\n >>に変換されます。
+
+B<註>: 最後の要素にもC<< $/ >>が付加されます。
+
+=back
+
+=head2 C<< ClassName >>へ
+
+=over 4
+
+=item C<< StrToClassName >>
+
+B<警告>: この型制約・型変換は非推奨です。
+これの代わりに、L<MooseX::Types::LoadableClassのLodableClass
+|MooseX::Types::LoadableClass/LoadableClass>を使ってください。
+さらに、L<MooseX::Types::LoadableClass|MooseX::Types::LoadableClass>
+にはL<LodableRole|MooseX::Types::LoadableClass/LoadableRole>も備わっています。
+
+C<< ClassName >>のサブタイプです。
+C<< coerce >>を有効にした場合、L<MooseX::Types::Common::String|MooseX::Types::Common::String>由来のC<< NonEmptyStr >>はクラス名として扱われます。
+それがまだロードされていなければ、L<< Class::Load::load_class()|Class::Load >>によってロードされます。
+
+=back
+
+=head2 C<< ScalarRef >>へ
+
+=over 4
+
+=item C<< StrToScalarRef >>
+
+C<< ScalarRef[Str] >>のサブタイプです。
+C<< coerce >>を有効にした場合、C<< Str >>はリファレンスになります。
+例えば、C<< foo >>はC<< \do{'foo'} >>に変換されます。
+
+=back
+
+=head2 C<< ArrayRef >>へ
+
+=over 4
+
+=item C<< StrToArrayRef >>
+
+C<< ArrayRef >>のサブタイプです。
+C<< coerce >>を有効にした場合、C<< Str >>は配列リファレンスの最初の要素に割り当てられます。
+例えば、C<< foo >>はC<< [qw(foo)] >>に変換されます。
+
+=item C<< LinesToArrayRef >>
+
+C<< ArrayRef >>のサブタイプです。
+C<< coerce >>を有効にした場合、C<< Str >>はC<< $/ >>によって分割され、配列リファレンスの各要素に割り当てられます。
+例えば、C<< foo\nbar\nbaz\n >>はC<< ["foo\n", "bar\n", "baz\n"] >>に変換されます。
+
+B<註>: C<< $/ >>は取り除かれません。
+
+=item C<< HashRefToArrayRef >>
+
+C<< ArrayRef >>のサブタイプです。
+C<< coerce >>を有効にした場合、C<< HashRef >>は平坦化されて配列リファレンスになります。
+例えば、C<< {foo => 0, bar => 1} >>はC<< [qw(bar 1 foo 0)] >>に変換されます。
+
+B<註>: キー/値の順番は辞書順に並べ替えられたキーと同じです。
+
+=item C<< HashKeysToArrayRef >>
+
+C<< ArrayRef >>のサブタイプです。
+C<< coerce >>を有効にした場合、C<< HashRef >>の辞書順に並び替えられたキーのリストは配列リファレンスになります。
+例えば、C<< {foo => 0, bar => 1} >>はC<< [qw(bar foo)] >>に変換されます。
+
+=item C<< HashValuesToArrayRef >>
+
+C<< ArrayRef >>のサブタイプです。
+C<< coerce >>を有効にした場合、C<< HashRef >>の値のリストは配列リファレンスになります。
+例えば、C<< {foo => 0, bar => 1} >>はC<< [qw(1 0)] >>に変換されます。
+
+B<註>: 値の順番は辞書順に並べ替えられたキーと同じです。
+
+=item C<< OddArrayRef >>
+
+C<< ArrayRef >>のサブタイプで、要素が奇数個であるという制約が加えられています。
+C<< coerce >>を有効にした場合、偶数個の要素を持つC<< ArrayRef >>へはその最後の要素としてC<< undef >>が付け加えられます。
+例えば、C<< [qw(foo bar)] >>はC<< [qw(foo bar), undef] >>に変換されます。
+
+=item C<< EvenArrayRef >>
+
+C<< ArrayRef >>のサブタイプで、要素が偶数個であるという制約が加えられています。
+C<< coerce >>を有効にした場合、奇数個の要素を持つC<< ArrayRef >>へはその最後の要素としてC<< undef >>が付け加えられます。
+例えば、C<< [qw(foo)] >>はC<< [qw(foo), undef] >>に変換されます。
+
+=back
+
+=head2 C<< HashRef >>へ
+
+=over 4
+
+=item C<< ArrayRefToHashRef >>
+
+C<< HashRef >>のサブタイプです。
+C<< coerce >>を有効にした場合、C<< EvenArrayRef >>の全ての要素はハッシュリファレンスに代入されます。
+例えば、C<< [qw(foo 0 bar 1)] >>はC<< {foo => 0, bar => 1} >>に変換されます。
+
+=item C<< ArrayRefToHashKeys >>
+
+C<< HashRef >>のサブタイプです。
+C<< coerce >>を有効にした場合、C<< ArrayRef >>の全ての要素はハッシュリファレンスのキーに代入されます。
+例えば、C<< [qw(foo bar baz)] >>はC<< {foo => undef, bar => undef, baz => undef} >>に変換されます。
+
+=back
+
+=head2 C<< RegexpRef >>へ
+
+=over 4
+
+=item C<< ArrayRefToRegexpRef >>
+
+C<< RegexpRef >>のサブタイプです。
+C<< coerce >>を有効にした場合、C<< ArrayRef >>の全ての要素はC<< | >>(代替を示すメタ文字)で結合され、正規表現リファレンスになります。
+例えば、C<< [qw(foo bar baz)] >>はC<< qr{foo|bar|baz} >>に変換されます。
+
+B<註>: L<Regexp::Assemble|Regexp::Assemble>を動的に(つまり実行時に)ロード出来る場合、正規表現リファレンスはそのモジュールを用いて構築されます。
+例えば、C<< [qw(foo bar baz)] >>はC<< qr{(?:ba[rz]|foo)} >>に変換されます。
+
+=back
+
+=head1 関連情報
+
+=over 4
+
+=item *
+
+L<Moose::Manual::Types|Moose::Manual::Types>
+
+=item *
+
+L<MooseX::Types|MooseX::Types>
+
+=item *
+
+L<MooseX::Types::Moose|MooseX::Types::Moose>
+
+=item *
+
+L<MooseX::Types::LoadableClass|MooseX::Types::LoadableClass>
+
+=item *
+
+L<MooseX::Types::Common|MooseX::Types::Common>
+
+=item *
+
+特殊変数C<< $/ >>(C<< $RS >>, C<< $INPUT_RECORD_SEPARATOR >>)について。
+
+L<perlvar|perlvar>
+
+=back
+
+=head1 非互換性
+
+互換性のない変更点はありません。
+
+=head1 バグと制約事項
+
+バグは報告されていません。
+
+=head2 提案やバグ報告の方法
+
+何かバグを発見されたら、機能のご要望がありましたら、または改善のためのご意見がありましたら、メール(C<< <bug-moosex-types-moose-mutualcoercion at rt.cpan.org> >>宛)で報告してください。
+または、Webインターフェース(L<http://rt.cpan.org/Public/Bug/Report.html?Queue=MooseX-Types-Moose-MutualCoercion>)を使って報告してください。
+これによって、その報告内容が開発者へ通知されます。
+さらに、バグや要望の対応状況について、報告者が通知を自動的に受けることも出来ます。
+
+バグを報告いただく際には、もし可能であれば、バグを再現するための出来るだけ少量のサンプルコードを添えてください。
+提案やパッチは勿論歓迎します。
+
+=head1 サポート
+
+このモジュールの文書はC<perldoc>コマンドで閲覧出来ます。
+
+    % perldoc MooseX::Types::Moose::MutualCoercion
+
+日本語版はL<Pod::PerldocJp|Pod::PerldocJp>を使ったC<perldocjp>コマンドで閲覧出来ます。
+
+    % perldocjp MooseX::Types::Moose::MutualCoercion::JA
+
+また、以下の場所も参照してください:
+
+=over 4
+
+=item RT: CPAN's request tracker
+
+L<http://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Types-Moose-MutualCoercion>
+
+=item AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/MooseX-Types-Moose-MutualCoercion>
+
+=item Search CPAN
+
+L<http://search.cpan.org/dist/MooseX-Types-Moose-MutualCoercion>
+
+=item CPAN Ratings
+
+L<http://cpanratings.perl.org/dist/MooseX-Types-Moose-MutualCoercion>
+
+=back
+
+=head1 バージョン管理
+
+このモジュールはI<Git>を使って保守されています。
+
+最新版はL<git://github.com/gardejo/p5-moosex-types-moose-mutualcoercion.git>にあります。
+
+=head1 今後の予定
+
+=over 4
+
+=item *
+
+テストの拡充
+
+=back
+
+=head1 著者
+
+=over 4
+
+=item 守屋 雅樹 (Gardejo) (en: MORIYA Masaki, alias Gardejo)
+
+C<< <moriya at cpan dot org> >>,
+L<http://gardejo.org/>
+
+=back
+
+=head2 訳註: 訳者
+
+=over 4
+
+=item 守屋 雅樹 (Gardejo) (en: MORIYA Masaki, alias Gardejo)
+
+C<< <moriya at cpan dot org> >>,
+L<http://gardejo.org/>
+
+=back
+
+=head1 著作権と使用許諾条件
+
+著作権保有 (c) 2010 守屋 雅樹 (Gardejo)
+
+このモジュールはフリーソフトウェアです。
+あなたはこれをPerlと同じように自由に再配布・改変することが出来ます。
+詳しくはL<perlgpl|perlgpl>およびL<perlartistic|perlartistic>を参照してください。
+
+使用許諾条件の全文はこのディストリビューションに同梱されているF<LICENSE>ファイルにあります。
+
+=head2 訳註: 著作権と使用許諾条件の原文
+
+Copyright (c) 2010 MORIYA Masaki, alias Gardejo
+
+This module is free software;
+you can redistribute it and/or modify it under the same terms as Perl itself.
+See L<perlgpl|perlgpl> and L<perlartistic|perlartistic>.
+
+The full text of the license can be found in the F<LICENSE> file
+included with this distribution.
+
+=cut

@@ -1,0 +1,69 @@
+=head1 NAME
+
+INSTALL Installation instructions for Math::SparseMatrix
+
+=head1 DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Math::SparseVector
+
+=head1 SYNOPSIS
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+The exact location of where Math::SparseMatrix will be installed depends
+on your system configuration.
+
+If you do not have authority to write into system directories, you can
+install Math::SparseMatrix in a local directory that you own and have 
+permissions to read and write into as follows:
+
+    perl Makefile.PL PREFIX=/YOUR/DIR
+    make
+    make test
+    make install
+
+This will install the module into
+
+    /YOUR/DIR/lib/perl5/site_perl/Math/SparseMatrix.pm
+
+If you install Math::SparseMatrix in a local directory, you will have to 
+explicitly set your PERL5LIB environment variable to include:
+
+    /YOUR/DIR/lib/perl5/site_perl
+
+if this directory was not already included.
+
+=head1 Authors
+
+Ted Pedersen, University of Minnesota, Duluth.
+tpederse at d.umn.edu
+
+Mahesh Joshi, Carnegie Mellon University
+maheshj at cmu.edu
+
+=head1 COPYRIGHT
+
+Copyright (c) 2006-2008, Ted Pedersen and Mahesh Joshi
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to
+
+ The Free Software Foundation, Inc.,
+ 59 Temple Place - Suite 330,
+ Boston, MA  02111-1307, USA.

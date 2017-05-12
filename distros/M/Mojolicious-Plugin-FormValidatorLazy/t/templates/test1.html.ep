@@ -1,0 +1,200 @@
+<html>
+    <body>
+        <form action="/receptor1" method="post">
+            <fieldset>
+                <legend>
+                    Some hidden fields and multiple buttons.
+                </legend>
+                <input type="text" name="foo" value="fooValue">
+                <input type="text" name="bar" value="barValue">
+                <input type="hidden" name="baz" value="bazValue">
+                <input type="hidden" name="yada" value="yadaValue" disabled="disabled">
+                <input type="submit" name='btn' value="send">
+                <input type="submit" name='btn' value="send2">
+                <input type="submit" name='btn3' value="send3">
+            </fieldset>
+        </form>
+        <form action="/receptor1" method="post">
+            <fieldset>
+                <legend>
+                    Simple form.
+                </legend>
+                <input type="text" name="foo" value="fooValue">
+                <input type="submit" value="send">
+            </fieldset>
+        </form>
+        <form action="/receptor2" method="post">
+            <fieldset>
+                <legend>
+                    Post to receptor2.
+                </legend>
+                <input type="text" name="foo" value="fooValue">
+                <input type="submit" value="send">
+            </field>
+        </form>
+        <form action="/receptor1" method="post">
+            <fieldset>
+                <legend>
+                    Disabled attributes.
+                </legend>
+                <input type="radio" name="foo" value="fooValue1" disabled="disabled"> fooValue1
+                <input type="radio" name="foo" value="fooValue2"> fooValue2
+                <input type="radio" name="foo" value="fooValue3"> fooValue3
+                <input type="radio" name="foo" value="fooValue4" disabled="disabled"> fooValue4
+                <input type="submit" value="send">
+            </field>
+        </form>
+        <form action="/receptor1" method="post">
+            <fieldset>
+                <legend>
+                    Disabled attributes.
+                </legend>
+                <input type="checkbox" name="foo" value="fooValue1" disabled="disabled"> fooValue1
+                <input type="checkbox" name="foo" value="fooValue2"> fooValue2
+                <input type="checkbox" name="foo" value="fooValue3"> fooValue3
+                <input type="checkbox" name="foo" value="fooValue4" disabled="disabled"> fooValue4
+                <input type="submit" value="send">
+            </fieldset>
+        </form>
+        <form action="/receptor1">
+            <fieldset>
+                <legend>
+                    Action is not specified.
+                </legend>
+                <input type="checkbox" name="foo" value="fooValue1"> fooValue1
+                <input type="checkbox" name="foo" value="fooValue2"> fooValue2
+                <input type="submit" value="send">
+            </fieldset>
+        </form>
+        <form action="/receptor1" method="post">
+            <fieldset>
+                <legend>
+                    Radio button with same named hidden for setting default value.
+                </legend>
+                <input type="hidden" name="foo" value="">
+                <input type="radio" name="foo" value="fooValue1"> fooValue1
+                <input type="radio" name="foo" value="fooValue2"> fooValue2
+                <input type="submit" value="send">
+            </fieldset>
+        </form>
+        <form action="/receptor1" method="post">
+            <fieldset>
+                <legend>
+                    maxlength.
+                </legend>
+                <input type="text" name="foo1" value="" maxlength="32" placeholder='32 letters or shorter'>
+                <input type="text" name="foo2" value="" maxlength="0" placeholder='0 letters or shorter'>
+                <input type="text" name="foo3" value="">
+                <input type="submit" value="send">
+            </fieldset>
+        </form>
+        <form action="/receptor1" method="post">
+            <fieldset>
+                <legend>
+                    Required htt5 attribute.
+                </legend>
+                <input type="text" name="foo1" value="" required  placeholder='required'>
+                <input type="submit" value="send">
+            </fieldset>
+        </form>
+        <form action="/receptor1" method="post">
+            <fieldset>
+                <legend>
+                    Default checked radio set.
+                </legend>
+                <input type="radio" name="foo" value="fooValue1"> fooValue1
+                <input type="radio" name="foo" value="fooValue2" checked> fooValue2
+                <input type="radio" name="foo" value="fooValue3"> fooValue3
+                <input type="submit" value="send">
+            </fieldset>
+        </form>
+        <form action="/receptor1" method="post">
+            <fieldset>
+                <legend>
+                    select.
+                </legend>
+                <select name="foo">
+                    <option value="">a</option>
+                    <option value="fooValue1">a</option>
+                    <option value="fooValue2">b</option>
+                    <option value="a&quot;b">b</option>
+                    <option value="a/b">b</option>
+                </select>
+                <input type="submit" value="send">
+            </fieldset>
+        </form>
+        <form action="/receptor1" method="post">
+            <fieldset>
+                <legend>
+                    Pattern html5 attribute.
+                </legend>
+                <input type="text" name="foo" value="" pattern="\d\d\d">
+                <input type="submit" value="send">
+            </fieldset>
+        </form>
+        <form action="/receptor1" method="post">
+            <fieldset>
+                <legend>
+                    Set type to number.
+                </legend>
+                <input type="number" name="foo" value="" min="5" max="10">
+                <input type="submit" value="send">
+            </fieldset>
+        </form>
+        <form action="/receptor3" method="post">
+        </form>
+        <form action="/receptor1" method="post">
+            <fieldset>
+                <legend>
+                    File.
+                </legend>
+                <input type="text" name="foo" value="">
+                <input type="file" name="bar">
+                <input type="submit" value="send">
+            </fieldset>
+        </form>
+        <form action="/receptor1" method="post">
+            <fieldset>
+                <legend>
+                    Select with same named hidden field.
+                </legend>
+                <input type="hidden" name="foo" value="value1">
+                <select name="foo">
+                    <option value="value2">a</option>
+                </select>
+                <input type="submit" value="send">
+            </fieldset>
+        </form>
+        <form action="/receptor1" method="post">
+            <fieldset>
+                <legend>
+                    Special chars.
+                </legend>
+                <input type="submit" name="foo" value="やったー">
+            </fieldset>
+        </form>
+        <form action="/receptor1" method="post">
+            <fieldset>
+                <legend>
+                    Disabled.
+                </legend>
+                <input type="radio" name="foo" value="fooValue1"> fooValue1
+                <input type="radio" name="foo" value="fooValue2" checked disabled="disabled"> fooValue2
+                <input type="radio" name="foo" value="fooValue3"> fooValue3
+                <input type="submit" value="send">
+            </fieldset>
+        </form>
+        <form action="/receptor1" method="post">
+            <fieldset>
+                <legend>
+                    Textareas.
+                </legend>
+                <textarea name="foo">foo default</textarea>
+                <textarea name="bar" disabled>bar default</textarea>
+                <textarea name="baz" required>baz default</textarea>
+                <input type="submit" value="send">
+            </fieldset>
+        </form>
+        <span id="jp">やったー</span>
+    </body>
+</html>

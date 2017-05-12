@@ -1,0 +1,6 @@
+name = "MouseX-Types-Data-Monad"
+badges = ["travis", "coveralls"]
+authority="cpan:AEREAL"
+
+module_maker="ModuleBuildTiny"
+

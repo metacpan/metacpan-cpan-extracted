@@ -1,0 +1,49 @@
+Revision history for Perl module P
+
+
+
+Bugs Fixed since 1.0.20
+(for more info, see: 
+https://rt.cpan.org/Dist/Display.html?Status=Resolved;Queue=P
+)
+rt#89046 rt#89047 rt#85050 rt#89051 rt#89052 rt#89054 rt#89055
+rt#89056 rt#89057 rt#89058 rt#89059 rt#89060 rt#89063 rt#89064
+rt#89065 rt#89066 rt#89067 rt#89069 rt#89071
+----
+
+Feature changes / additions:
+
+*	- P now prints {…} instead of HASH(0x12356892) and […] for arrays
+	  (brackets for type, and ellipses between them).
+* - Hash prints are sorted on output to have non-refs sorted before
+		refs
+*	- switch parsing in object-mode calls expanded to allow specifying a
+		max string length to print
+* - type 'REF' is detected and printed
+* - Detect recursive data structure references when expanding a single
+		a single call and use '🔁 ' (U+1F500) (reverse rotating loop) to
+		indicate such and resort to old style memory address listing.
+* - instead of taking up 7 spaces with "(undef)", use the Unicode symbol
+		for "there does not exist"  (∄) (U+2204), which looks like a backwards
+		capital 'E' with a diagonal slash drawn through it.
+* - Cleaned up prototypes for Pe and P -- both try to take an array argument.
+		This should prevent any incoming args being turned into integers.
+* - Pod cleanups
+* - Fix for using 0x83 as "line feed" supression char.  Check if it is
+		already encoded in unicode OR not.
+* - Handle case of non-arabic numerals that match "\d", giving a warning
+		message when trying to format them with sprintf's "%d".  
+		
+		This caused problems when trying to print shortened floats (only 2 
+		digits to right of decimal point): "%.2f" complained about UTF8
+		numeric chars not being numbers.  P detects such and prints the 
+		result as a string instead of using "%f" or "%d".
+* - Beef up tests in self-test to test instances of some of the bugs
+		that also work as examples.
+
+
+Dependency Change:
+*  - execution depends on 'mem' due to having included unpublished
+		 code from a Types module.
+
+	

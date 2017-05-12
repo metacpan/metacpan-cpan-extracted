@@ -1,0 +1,35 @@
+---
+abstract: 'Pull out the modules a module explicitly uses'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Test::More: '0.94'
+  Test::Output: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - ppi
+  - parsing
+  - static-analysis
+  - modules
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Extract-Use
+no_index:
+  directory:
+    - corpus
+requires:
+  Getopt::Std: '0'
+  PPI: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/briandfoy/module-extract-use/issues
+  homepage: https://github.com/briandfoy/module-extract-use
+  repository: https://github.com/briandfoy/module-extract-use.git
+version: '1.043'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

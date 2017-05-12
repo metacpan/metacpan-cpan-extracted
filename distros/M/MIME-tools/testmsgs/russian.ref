@@ -1,0 +1,12 @@
+{
+  "Msg" => {
+    "Subject" => "Greetings",
+    "Type" => "text/plain",
+    "Filename" => "\x{421}\x{43f}\x{438}\x{441}\x{43e}\x{43a}.doc",
+  },
+  "Parser" => {
+    "Message" => "testmsgs/russian.msg",	
+    "OutputToCore" => "0",
+    "Charset" => "KOI8-R",
+  }
+}

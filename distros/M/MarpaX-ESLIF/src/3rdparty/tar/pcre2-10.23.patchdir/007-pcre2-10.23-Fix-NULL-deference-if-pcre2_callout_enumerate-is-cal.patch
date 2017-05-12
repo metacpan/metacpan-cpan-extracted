@@ -1,0 +1,37 @@
+From d5790ad94d486405ecaac3d8f5796f642e57bf06 Mon Sep 17 00:00:00 2001
+From: ph10 <ph10@6239d852-aaf2-0410-a92c-79f79f948069>
+Date: Tue, 21 Mar 2017 16:31:54 +0000
+Subject: [PATCH] Fix NULL deference if pcre2_callout_enumerate() is called
+ with a NULL pattern when Unicode support is available (Bugzilla 2076).
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+git-svn-id: svn://vcs.exim.org/pcre2/code/trunk@694 6239d852-aaf2-0410-a92c-79f79f948069
+
+Petr Písař: Ported to 10.23.
+
+diff --git a/src/pcre2_pattern_info.c b/src/pcre2_pattern_info.c
+index 0392a0b..5dd8ac5 100644
+--- a/src/pcre2_pattern_info.c
++++ b/src/pcre2_pattern_info.c
+@@ -261,11 +261,15 @@ pcre2_real_code *re = (pcre2_real_code *)code;
+ pcre2_callout_enumerate_block cb;
+ PCRE2_SPTR cc;
+ #ifdef SUPPORT_UNICODE
+-BOOL utf = (re->overall_options & PCRE2_UTF) != 0;
++BOOL utf;
+ #endif
+ 
+ if (re == NULL) return PCRE2_ERROR_NULL;
+ 
++#ifdef SUPPORT_UNICODE
++utf = (re->overall_options & PCRE2_UTF) != 0;
++#endif
++
+ /* Check that the first field in the block is the magic number. If it is not,
+ return with PCRE2_ERROR_BADMAGIC. */
+ 
+-- 
+2.7.4
+

@@ -1,0 +1,29 @@
+---
+abstract: 'is a plugin to support simple XML response from HASH.'
+author:
+  - 'Roman V. Nikolaev <rshadow@rambler.ru>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-XML-LX
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '4.72'
+  XML::Hash::LX: '0.0603'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/rshadow/mojolicious-plugin-lx/issues
+  homepage: https://github.com/rshadow/mojolicious-plugin-lx
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com:rshadow/mojolicious-plugin-lx.git
+version: '1.0'

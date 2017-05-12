@@ -1,0 +1,11 @@
+Revision history for Mojolicious-Plugin-Responsinator
+
+0.03     Sun Apr 13 15:17:59 2014
+       * Add local/ to MANIFEST.SKIP
+
+0.02     Mon Mar 24 11:50:32 2014
+       * Fix removing default layout when rendering iframe
+
+0.01     Thu Mar 20 22:08:11 2014
+       * Started project
+       * Add cool feature

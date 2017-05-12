@@ -1,0 +1,45 @@
+Mail::SpamAssassin::SpamCopURI
+===========
+
+SpamCopURI is a hacked plugin to fit in to SA.
+
+
+This module currently interacts with sc.surbl.org,
+which pulls its data from spamcop at 
+http://www.spamcop.net/w3m?action=inprogress&type=www
+
+to determine whether a URL is spam or not.
+
+Currently you can assign scores when a URL's domain is detected
+as being spammy.  The following 
+are the recommended settings.
+
+    uri SPAMCOP_URI_RBL           eval:check_spamcop_uri_rbl('sc.surbl.org','127.0.0.2')
+    describe SPAMCOP_URI_RBL      URI's domain appears in spamcop database at sc.surbl.org
+    tflags SPAMCOP_URI_RBL	net
+
+    score SPAMCOP_URI_RBL  3.0
+
+
+An experimental option was added that will resolve open redirects to 
+handle spammers that hide behind sites such as rd.yahoo.com and snipurl.com.
+
+This is disabled by default, but can be enabled with the following settings:
+
+  spamcop_uri_resolve_open_redirects 1 
+  open_redirect_list_spamcop_uri   rd.yahoo.com
+
+This will attempt to get the Location header from rd.yahoo.com, but
+it will not follow the redirect.  If several open redirects are chained 
+together, this will recurse up to 4 times in attempting to resolve the 
+Location header.  This setting is dependent upon LWP and will simply
+return false if LWP is not found.  The LWP timeout is set to 5 seconds.
+I can make this a configuration option if anyone feels the need to tweak
+this in some way.
+
+See the rules file for more examples of open redirect sites.
+
+Limitations:
+  Currently, either rule can only be hit once because of the way SA
+  does its rule processing.  Future versions may generate a some sort of
+  dynamic name based on the URL.

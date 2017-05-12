@@ -1,0 +1,53 @@
+{
+   "abstract" : "Provide compnent cache object and filter",
+   "author" : [
+      "Jonathan Swartz <swartz@pobox.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200008, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mason-Plugin-Cache",
+   "no_index" : {
+      "directory" : [
+         "lib/Mason/Plugin/Cache"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CHI" : 0,
+            "Mason" : "2.09"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Class::Most" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-mason-plugin-cache@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mason-Plugin-Cache"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jonswar/perl-mason-plugin-cache.git",
+         "web" : "https://github.com/jonswar/perl-mason-plugin-cache"
+      }
+   },
+   "version" : "0.05"
+}
+

@@ -1,0 +1,15 @@
+Revision history for Markaya
+
+0.40
+- YAML::LibYAML Renamed to YAML::XS
+
+0.0.3  Mon Jun 18 08:34:42 CST 2007
+- documenting
+
+0.0.2  Mon Jun  4 03:59:48 CST 2007
+- Dump Moose
+- Lower required Perl to 5.8.3 to fit ingy's need..
+
+0.0.1  Sat Jun  2 14:59:05 2007
+       Initial release.
+

@@ -1,0 +1,12 @@
+Revision history for Perl extension Mac::Tie::PList.
+
+0.03  Thu Nov 18 12:36:46 2009
+    - Fixed email in Makefile - Sorry Gavin!!
+
+0.02  Thu Apr  2 21:59:45 2003
+    - Fixed NSCFDate bug on leopard - thanks to "David" and "Matisse Enzer"
+    
+0.01  Sat Feb  4 21:21:45 2006
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Mac::Tie::PList
+

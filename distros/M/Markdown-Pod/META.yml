@@ -1,0 +1,60 @@
+---
+abstract: 'Convert Markdown to POD'
+author:
+  - '김도형 - Keedi Kim <keedi@cpan.org>'
+build_requires:
+  Exporter: '5.57'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Markdown-Pod
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Markdown::Pod:
+    file: lib/Markdown/Pod.pm
+    version: '0.006'
+  Markdown::Pod::Handler:
+    file: lib/Markdown/Pod/Handler.pm
+    version: '0.006'
+  Markdown::Pod::script:
+    file: lib/Markdown/Pod/script.pm
+    version: '0.006'
+requires:
+  Getopt::Long: '0'
+  List::Util: '0'
+  Markdent: '0.25'
+  Moose: '0'
+  MooseX::Params::Validate: '0'
+  MooseX::SemiAffordanceAccessor: '0'
+  MooseX::StrictConstructor: '0'
+  Text::Table::Tiny: '0'
+  constant: '0'
+  namespace::autoclean: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/keedi/Markdown-Pod/issues
+  homepage: https://github.com/keedi/Markdown-Pod
+  repository: https://github.com/keedi/Markdown-Pod.git
+version: '0.006'
+x_authority: cpan:KEEDI
+x_contributors:
+  - 'Andrew Speer (ASPEER) <andrew@webdyne.org>'
+  - 'Jason McIntosh (JMAC) <jmac@jmac.org>'
+  - 'Zakariyya Mughal (ZMUGHAL) <zmughal@cpan.org>'

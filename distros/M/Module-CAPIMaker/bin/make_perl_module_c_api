@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+use Module::CAPIMaker;
+make_c_api;
+
+=head1 NAME
+
+make_perl_module_c_api - generate a C API for a Perl module
+
+=head1 SYNOPSIS
+
+  make_perl_module_c_api key=value key1=value1 ...
+
+=head1 DESCRIPTION
+
+This program is part of the L<Module::CAPIMaker> Perl module.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Salvador FandiE<ntilde>o,
+E<lt>sfandino@yahoo.comE<gt>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

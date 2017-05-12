@@ -1,0 +1,60 @@
+set core::shell echo 0
+
+set core::log level 3
+
+# Change terminal title
+use terminal::control
+run terminal::control title "meta: The Metabrik Shell"
+
+my $home = $ENV{HOME}
+my $user = $ENV{USER}
+
+my $datadir = $home."/metabrik"
+
+set core::global datadir $datadir
+set core::global ctimeout 20
+set core::global rtimeout 20
+
+use brik::search
+use shell::history
+use client::www
+use file::read
+use file::write
+use file::csv
+use proxy::http
+
+my $publickey = $home."/.ssh/id_rsa.pub"
+my $privatekey = $home."/.ssh/id_rsa"
+
+use remote::ssh2
+set remote::ssh2 debug 1
+set remote::ssh2 host localhost
+set remote::ssh2 username $user
+set remote::ssh2 publickey $publickey
+set remote::ssh2 privatekey $privatekey
+
+my $vfeed = $home."/metabrik/data/vfeed.db"
+
+use database::vfeed
+set database::vfeed db $vfeed
+
+# Use your own private briks
+use lib "$ENV{HOME}/path/to/lib"
+run core::context update_available
+
+use category::mybrik
+
+# Define your aliases
+alias w "run shell::command capture w"
+alias l "run shell::command capture ls -lF"
+alias perldoc "run shell::command system perldoc"
+alias top "run shell::command system top"
+alias system "run shell::command system"
+
+# Load some more Perl modules
+use Data::Dumper
+
+# If you want history to be enabled
+use shell::history
+
+set core::shell echo 1

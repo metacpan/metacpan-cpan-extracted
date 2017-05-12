@@ -1,0 +1,414 @@
+
+=head2 NAME
+
+SpamCannibal Quick Install
+
+  Jonathan Baker-Bates E<lt>jonathan_AT_bakerbates.comE<gt>
+  Michael Robinton E<lt>michael@bizsystems.comE<gt>
+
+  Last Update - February 11, 2009
+
+=head2 DESCRIPTION
+
+This describes how to install SpamCannibal on a machine running as a
+mail server behind a firewall (e.g. on a DMZ), or running as a mail
+gateway: passing incoming mail through to the main mail server after
+connections have been filtered by SpamCannibal. These instructions have
+been tested on Debian (Sarge) and Red Hat Enterprise Linux 3.1. Your
+mileage may vary.
+
+You may also want to consult further information
+(http://www.spamcannibal.org/docs/install.html) on configuration
+options, other functions and features of the SpamCannibal package that
+are not covered here.
+
+=head2 X<1>1. Check Your Kernel
+
+You'll need a Linux kernel version 2.4 or higher (i.e. it must support
+iptables), with the C<CONFIG_NETFILTER> flag turned on (have a look at
+C</boot/config-2.4.XX-XX-386> on your system)
+
+You should have the following turned on:
+
+ CONFIG_IP_NF_CONNTRACK
+ CONFIG_IP_NF_QUEUE
+ 	  
+
+If you are going to be processing a lot of connections on a very
+low-powered box (e.g. a P90 with E<lt>64Mb), you may want to turn them
+off, or have them as loadable modules in case the work of tracking
+connections becomes too much. But this has not been reported as a
+problem.
+
+The above are turned on by default in most recent distros so you
+shouldn't need to do anything. If not, then you'll have to re-compile
+your kernel. Come back here when you're done...
+
+=head2 X<2>2. Install the Dependencies
+
+=head3 Iptables
+
+You will probably have it installed already, but in case you don't...
+do this and come back here when you're done.
+
+You'll also need the iptables development headers in installed. If you
+have a file called libipq.h then you'll be fine. If not, install
+iptables-devel (Red Hat) or iptables-dev (Debian).
+
+=head3 libnet
+
+Get this from: www.packetfactory.net/libnet
+(http://www.packetfactory.net/libnet) , unpack and run:
+
+ ./configure
+ make
+ make install
+
+=head3 Required perl modules
+
+The easiest way of installing these is with the CPAN utility, which
+comes with most perl installations. Run this (as root):
+
+ perl -MCPAN -e shell
+ o conf prerequisites_policy ask
+
+Then install the following if you don't already have them:
+
+ Test::Harness
+ Test::More
+ MIME::Base64
+ Digest::MD5
+ Unix::Syslog
+ Net::DNS::Codes
+ Net::DNS::ToolKit
+ NetAddr::IP::Lite
+ Net::SMTP -- part of standard perl
+ Net::Whois::IP
+ Proc::PidUtil
+ Sys::Hostname::FQDN
+ Net::Netmask
+ Net::DNSBL::MultiDaemon
+
+=head3 GeoIP
+
+This is optional, but recommended if you are also going to be running
+the web management interface.
+
+B<NOTE: BEFORE INSTALLING GEOIP WITH CPAN>
+
+Get the GeoIP database
+(http://www.maxmind.com/download/geoip/database/GeoIP.dat.gz) and
+unpack this file to:
+
+C</usr/local/share/GeoIP> (and C< chmod 777> ).
+
+If you don't do this, the perl module compile tests will fail with a
+totally cryptic error that Larry Wall himself would be hard pushed to
+work out.
+
+Now install the following with CPAN:
+
+ Geo::CountryFlags
+ Geo::IP::PurePerl
+
+=head3 A web server
+
+A web server is needed so that you can get reports and stuff through a
+web interface. Note that you do not have to have the web server on the
+same machine as SpamCannibal if you don't want to, but this quick guide
+assumes you do. See the full docs for more details.
+
+
+=head2 X<3>3. Create the spam user
+
+Create a user on the system called "spam" in group "spam." Give it a
+shell and a home directory of C</usr/local/spamcannibal>
+
+=head2 X<4>4. Install DBTarpit
+
+Make a note of where your C libraries and headers are installed. On Red
+Hat and Debian they are:
+
+ /usr/lib
+ /usr/include
+
+But they may be different on your system.
+
+Now, sticking with CPAN, install C<IPTables::IPv4::DBTarpit>
+
+When asked by the installer, enter the path to the "dbtarpit daemon
+install directory" as C</usr/local/spamcannibal/bin>
+
+Enter the paths to the shared libraries and headers on your system as
+noted above, and leave the other options as their defaults.
+
+=head2 X<5>5. Install SpamCannibal
+
+With CPAN, install C<Mail::SpamCannibal>
+
+The defaults paths and stuff should be fine.
+
+Finally, and again with CPAN, install C<LaBrea::Tarpit>
+
+=head2 X<6>6. Configure SpamCannibal
+
+Go to C</usr/local/spamcannibal/config> and edit the following files.
+You will need to rename them from their defaults first: e.g. C<cp
+dnsbls.conf.sample dnsbls.conf>
+
+=head3 i) sc_dbwatch.conf
+
+Un-comment the line to activate the LeBrea Tarpit stats daemon:
+
+ 'rc.sc_lbdaemon'        => 'start',
+
+=head3 ii) dnsbls.conf
+
+Un-comment the "zonename" line and give the host that your SpamCannibal
+setup is running on:
+
+ zonename        => 'myhost.mydomain.com',
+
+Similarly, edit the C<host> line:
+
+ host    => {                    # ip address or blank ''
+ 'myhost.mydomain.com' => '192.168.10.1',
+ },
+
+=head3 iii. sc_BlackList.conf
+
+Add any hosts that you need in the IGNORE section. See the notes in the
+config file for details, but in particular the machine's local
+interface addresses and 127.0.0.1. I have my two secondary mail servers
+as well, like this:
+
+ 'IGNORE'      => [
+ # local addresses:
+ '127.0.0.1',
+ '192.168.10.5',
+ '128.23.28.5',
+ # seconadary MX servers:
+ '195.149.39.130',
+ '195.149.39.122',
+
+Set the C<REJECT> section to point to a public URL. This should be a
+page explaining why the host has been rejected. You are advised to be
+simple and polite - don't taunt spammers - being in your tarpit will
+screw them up enough.
+
+=head3 iv. sc_web.conf
+
+Set the C<email> line to your admin mailing address.
+
+Now make sure the permissions on all the above config files are OK.
+They should all be owned by "spam" group "spam" and chmod-ed 640 for
+all except C<sc_web.conf> which should be 644.
+
+=head2 X<7>7. Initialize the Database
+
+As the B<spam user> , go to C< /usr/local/spamcannibal/script> and run
+C<sc_initdb.pl> to set up the necessary database tables.
+
+=head2 X<8>8. Start the Daemons
+
+First, copy the tarpit database startup script (part of the DBTarpit
+module sources) to the Spamcannibal scripts directory. If you've been
+using CPAN it'll be in the build directory:
+
+ cp /root/.cpan/build/IPTables-IPv4-DBTarpit-0.33/rc.dbtarpit /usr/local/spamcannibal/scripts
+
+Then, in the Spamcannibal scrips directory, rename the following file
+to activate it:
+
+ cp rc.sc_lbdaemon.sample rc.sc_lbdaemon
+
+Then to start it all up, run the following B<as root> (with absolute
+paths to avoid confusion):
+
+ /usr/local/spamcannibal/scripts/rc.sc_dbwatch start /usr/local/spamcannibal/config/sc_dbwatch.conf
+
+Check that the following are running:
+
+ rc.sc_lbdaemon
+ bdbaccess
+ dnsbls
+
+Assuming you saw no errors, Spamcannibal will now be running. To make
+sure that Spamcannibal starts when the systems reboots, you can use the
+following script:
+
+ #!/bin/sh
+ # Start/stop spamcannibal
+ 
+ SCRIPT=/usr/local/spamcannibal/scripts/rc.sc_dbwatch
+ CONF=/usr/local/spamcannibal/config/sc_dbwatch.conf
+ 
+ 
+ test -f /usr/local/spamcannibal/bin/dbtarpit || exit 0
+ 
+ case "$1" in
+ start)  echo -n "Starting spamcannibal"
+ $SCRIPT start $CONF
+ echo "."
+ ;;
+ stop)   echo -n "Stopping spamcannibal"
+ $SCRIPT stop $CONF
+ echo "."
+ ;;
+ stop)   echo -n "Restarting spamcannibal"
+ $SCRIPT restart $CONF
+ echo "."
+ ;;
+ *)      echo "Usage: /etc/init.d/spamcannibal start|stop|restart"
+ exit 1
+ ;;
+ esac
+ exit 0
+
+On Red Hat, put this script in C</etc/init.d> and set it up with:
+
+C<chkconfig -add spamcannibal>
+
+On Debian, put this script in /etc/init.d and set it up with:
+
+C<update-rc.d spamcannibal defaults>
+
+=head2 X<9>9. Set a crontab up for the spam user
+
+Add the following entries to the "spam" users crontab:
+
+ # check accumulated archive IP addresses every 15 minutes file
+ */4 * * * * /usr/bin/nice -n 20 ./scripts/sc_BLcheck.pl ./config/sc_BlackList.conf
+ 
+ # check valid blcontrib every few days
+ 21 0 */4 * * /usr/bin/nice -n 20 ./scripts/sc_BLpreen.pl ./config/sc_BlackList.conf
+ 
+ # check valid blcontrib every few days
+ 21 0 */4 * * /usr/bin/nice -n 20 ./scripts/sc_cleanup.pl -q
+
+=head2 X<10>10. Configure iptables
+
+At this point, although Spamcannibal will be running, you need to get
+it to start filtering incoming connections on port 25. To do this, add
+the following lines to your iptables startup script (note the path to
+iptables - it needs to be correct!):
+
+ IPTABLES="/sbin/iptables"
+ ANYWHERE="0/0"
+ $IPTABLES -A INPUT -p tcp -s $ANYWHERE --dport 25 -j QUEUE
+
+B<If you are already using iptables on the machine> , then make sure
+this rule is the first entry in the INPUT chain. Do not insert other
+entries ahead of this rule.
+
+B<NOTE: MAKE SURE THE C< ip_queue> KERNEL MODULE IS LOADED>
+
+Check this with C< lsmod | grep ip_queue> . If it's not running, load
+it with C< modprobe ip_queue> . In future, make sure it's loaded when
+iptables loads (either by adding C< modprobe ip_queue> to the iptables
+ruleset, startup script, or other method).
+
+Start (or restart) the iptables script. Assuming you saw no errors,
+then Spamcannibal will now be tarpitting.
+
+B<WARNING> If the dbtarpit daemon is not running, packets destined for
+port 25 are silently dropped by iptables. You will need to stop
+iptables (or remove the rule) to get things back to normal.
+
+=head2 X<11>11. [OPTIONAL] Configure the mail server
+
+If you want, you can configure your mail server as a gateway to pass
+mail through to another server after SpamCannibal (and any other
+filters, like the devastatingly good MailScanner
+(http://www.mailscanner.info) ) has done its work. This is a good
+approach if you handle a lot of mail. If not, then you can skip this
+step and mail will be delivered to the local machine in the normal way.
+
+First, make sure the mail server you want to handle the mail is
+configured correctly to handle mail for your desired domains.
+
+Then, configure the mail server on the machine that Spamcannibal is
+running on as follows. No other configuration should be required.
+
+Sendmail has a file C</etc/mail/mailertable> , and postfix has a file
+C</etc/postfix/transport> into which you can put the following line for
+each domain you wish to pass through to the "real" mail server:
+
+ mydomain.com smtp:[192.168.20.102]
+
+(where C<mydomain.com> is the domain you are handling mail for, and
+C<192.168.20.102> is the address of the mail server you want to hand
+the mail off to once Spamcannibal has done its thing)
+
+Don't forget to rebuild the config databases (for sendmail, go to C<
+/etc/mail> and type "make." For postfix go to C< /etc/postfix> run
+C<postmap transport> ).
+
+Restart the mail daemon to make sure it's got the new configuration OK
+and make sure you can send a mail though your system OK before
+proceeding.
+
+=head2 X<12>12. Configure the web server and check the web interface
+
+Spamcannibal comes with some cgi scripts that let you view what's going
+on in your tarpit, and other things. To enable this, tell your web
+server to execute scripts in /usr/local/spamcannibal/public_html
+
+For apache, add the following in C<httpd.conf> :
+
+ Alias /tarpit/ /usr/local/spamcannibal/public_html/
+ 
+ <Directory /usr/local/spamcannibal/public_html/>
+ AllowOverride None
+ Options ExecCGI -MultiViews +SymLinksIfOwnerMatch
+ Order allow,deny
+ Allow from all
+ </Directory>
+
+(You should really tweak the "Allow from" directory suit your setup.)
+
+Note: you might also need the following line if you don't already have
+it:
+
+ AddHandler cgi-script .cgi
+
+=head2 X<13>13. Set up the Admin Web Interface
+
+Activate the admin script by renaming it and setting up the password:
+
+ cd /usr/local/spamcannibal/public_html
+ cp spam_report.cgi.exmple to spam_report.cgi
+ cd ../private
+ cp passwd.initial passwd
+ chown spam:spam passwd
+ chmod 600 passwd
+
+(the passwd file must be owned by the C<spam> user)
+
+Set the admin password (default is blank):
+
+ htpasswd /usr/local/spamcannibal/private/passwd admin
+
+Reload apache, and go to the admin interface at:
+
+ http://www.yourserver.com/tarpit/admin.cgi
+
+Click on "View DB" and have a look around. You should start to see a
+few addresses being logged in various states. Whether you'll see any
+tarpitting activity depends on the amount of mail you handle.
+
+Assuming you encountered no errors, congratulations! You are now
+running a fully-fledged tarpit!
+
+For a general overview of what's going on, go to:
+
+ http://www.yourserver.com/tarpit/spam_report.cgi
+
+=cut
+
+#Pod::HTML2Pod conversion notes:
+#From file sc_install.html
+# 18807 bytes of input
+#Fri Sep 17 23:47:14 2004 gilgongo
+# Will try to render <a name='...'>
+# Will try to render <a href='...'>

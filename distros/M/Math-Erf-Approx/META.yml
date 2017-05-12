@@ -1,0 +1,38 @@
+---
+abstract: 'pure Perl approximate implementation of the error function'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+  - 'TOBYINK <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.61'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Moose::Meta::Class::__ANON__::SERIAL::6 version , CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Erf-Approx
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Math::Erf::Approx:
+    file: lib/Math/Erf/Approx.pm
+    version: '0.002'
+requires:
+  Sub::Exporter: '0'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/Math-Erf-Approx/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Math-Erf-Approx
+  homepage: https://metacpan.org/release/Math-Erf-Approx
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-math-erf-approx.git
+version: '0.002'

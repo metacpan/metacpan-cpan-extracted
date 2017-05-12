@@ -1,0 +1,31 @@
+Revision history for Mojo-PDF
+
+1.004002  2015-09-29
+  - "text" now respects "\n" and renders on several lines
+    (applies to Table primitive as well)
+  - Table's "str_width_mult" now accepts a hashref of different multipliers
+      for different line lengths
+
+1.003002  2015-09-28
+  - Added "padding" option to Table primitive.
+
+1.003001  2015-09-26
+  - Changed behaviour of table's 'max_height'
+    to use callback for overflown rows
+  - Added "rule" method
+
+1.002001  2015-09-24
+  [Table primitive]
+    - Added 'header' and 'max_height' options
+    - Blank cells are no longer drawn
+    - 'min_width' and 'border' are now optional
+    - Fixed bug where 'border' failed to accept RGB tuples
+  [Misc]
+    - "page" now correctly returns its invocant
+    - Fixed unwanted warnings when outputting falsy strings
+    - Documentation corrections and clarifications (#1, #2, #3, #4, #5)
+
+1.001001  2015-09-23
+  - First version released on an unsuspecting world
+
+

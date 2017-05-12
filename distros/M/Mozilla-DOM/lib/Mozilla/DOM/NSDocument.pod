@@ -1,0 +1,58 @@
+=head1 NAME
+
+Mozilla::DOM::NSDocument
+
+=for object Mozilla::DOM::NSDocument
+
+Mozilla::DOM::NSDocument is a wrapper around an instance of Mozilla's
+nsIDOMNSDocument interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::NSDocument->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $characterset = $nsdocument->B<GetCharacterSet>()
+
+=head2 $dir = $nsdocument->B<GetDir>()
+
+=head2 $nsdocument->B<SetDir>($dir)
+
+=head2 $location = $nsdocument->B<GetLocation>()
+
+$location (Mozilla::DOM::Location)
+
+=head2 $title = $nsdocument->B<GetTitle>()
+
+=head2 $nsdocument->B<SetTitle>($title)
+
+=head2 $contenttype = $nsdocument->B<GetContentType>()
+
+=head2 $lastmodified = $nsdocument->B<GetLastModified>()
+
+=head2 $referrer = $nsdocument->B<GetReferrer>()
+
+=head2 $retval = $nsdocument->B<GetBoxObjectFor>($elt)
+
+XXX: not implemented (nsIBoxObject not wrapped)
+
+=head2 $nsdocument->B<SetBoxObjectFor>($elt, $boxobject)
+
+XXX: not implemented (nsIBoxObject not wrapped)
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

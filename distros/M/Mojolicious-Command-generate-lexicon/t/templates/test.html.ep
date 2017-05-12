@@ -1,0 +1,5 @@
+Test <%==l 'lexemes' %>
+Very <%=l 'hard
+test' %>.
+And <%=l 'variables test [_1]', 'test' %>
+%= link_to( l( 'link_to' ) )

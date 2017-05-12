@@ -1,0 +1,8 @@
+* better way to store values than %.12f
+    - Using an array ref for $self->{values} would probably give a 20% speedup
+
+* implement predictor/corrector methods from Hamming
+
+* detect stiff ODE's and other pathological cases and give some kind of warning
+
+* routines for 2nd order BVP's using the Shooting Method

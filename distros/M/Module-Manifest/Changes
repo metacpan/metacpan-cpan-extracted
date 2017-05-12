@@ -1,0 +1,40 @@
+Revision history for Perl extension Module-Manifest
+
+1.08 Tue 15 Jun 2010
+	- Updated to Module::Install::DSL 0.99
+	- Updated documentation
+	- Changed to a production version
+
+0.07 Mon 20 Apr 2009
+	- Upgrading to Module::Install::DSL 0.83
+	- Fixes for Win32
+	- Removing distribution-specific skip file (the shared on works fine)
+	- Removing custom README file (the generated one is the same)
+
+0.06 Thu 12 Mar 2009
+	- Adding a missing Test::Warn dependency
+	- Updated Module::Install to 0.79
+
+0.05 Sat 20 Dec 2008
+	- Added option for file-less parsing
+	- Clarified the docs
+		o Added a synopsis
+		o Added compatibility notes
+		o Changed duplicate fatal error to a warning (cluck vs carp)
+	- Added myself (Jonathan Yu) as a developer
+	- Added a README file made by hand from the perldoc
+	- Added a bunch of test files
+
+0.04 Thu 11 Dec 2008
+	- Upgrading Module::Install to 0.77
+	- Adding a missing use Carp (Jonathan Yu)
+
+0.03 Mon  5 May 2008
+	- Upgrading Module::Install
+	- Fixing a broken META.yml
+
+0.02 Mon 25 Sep 2006
+	- Fixing a major POD bug (got the name wrong) :(
+
+0.01 Sun 24 Sep 2006
+	- original version

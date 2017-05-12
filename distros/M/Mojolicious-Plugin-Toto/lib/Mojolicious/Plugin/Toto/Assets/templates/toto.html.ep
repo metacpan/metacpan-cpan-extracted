@@ -1,0 +1,7 @@
+% use File::Basename qw/basename/;
+<center>
+<br>
+Welcome, to <%= basename($ENV{MOJO_EXE}) %><br>
+Please choose a menu item.
+</center>
+

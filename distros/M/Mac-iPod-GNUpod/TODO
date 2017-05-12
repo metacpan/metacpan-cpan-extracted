@@ -1,0 +1,9 @@
+=============================
+v. 0.1
+ - Add methods for manipulating playlists
+ - Add support for more filetypes
+ - Find CPAN modules for some icky sections of code
+ - Speed up read/write of iTunesDB
+=============================
+v. 1.2
+ - Still add support for .mp4/.m4a files

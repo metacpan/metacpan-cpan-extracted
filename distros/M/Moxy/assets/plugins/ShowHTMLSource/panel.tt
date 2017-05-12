@@ -1,0 +1,3 @@
+<div id="moxy_show_html_source">
+    <pre>[% html | html %] [% response.body | html %]</pre>
+</div>

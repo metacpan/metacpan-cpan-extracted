@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<config>
+  <!-- Type: Explode, GrowUp, Race2Center, Surrounding -->
+  <property key="type" value="Explode" />
+
+  <!-- Log File -->
+  <!-- property key="log" value="dla.log" / -->
+
+  <!-- Image Size -->
+  <property key="width" value="640" />
+  <property key="height" value="480" />
+
+  <!-- Number of points of the DLA -->
+  <property key="points" value="50000" />
+
+  <!-- File name of the image -->
+  <property key="file" value="myDLA.png" />
+
+  <!-- Position where the DLA starts to grow (Explode only) -->
+  <property key="startX" value="320" />
+  <property key="startY" value="240" />
+
+  <!-- Background Color -->
+  <property key="background" value="255,255,255" />
+
+  <!-- Base Color -->
+  <property key="base" value="0,100,100" />
+
+  <!-- Color values to add to the base color -->
+  <property key="interval" value="50,0,0" />
+
+  <!-- Number of different colors -->
+  <property key="colors" value="5" />
+
+</config>
+
+

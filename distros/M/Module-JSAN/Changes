@@ -1,0 +1,17 @@
+Revision history for Module-JSAN
+
+0.04    01/27/2010
+        - Corrected manifest (META.json was added to test suite,
+          causing failurs on Windows)
+
+0.03    01/25/2010
+        - Corrected manifest (Module::Build::JSAN::Installable 
+          was added to 'provide' section of metadata)
+
+0.02    01/24/2010
+        - Updated dependencies versions
+        - Improved tests 
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

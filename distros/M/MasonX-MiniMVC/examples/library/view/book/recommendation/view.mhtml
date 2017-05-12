@@ -1,0 +1,9 @@
+<h1>View sample recommendation</h1>
+
+<p>
+You are viewing a recommendation with the id number <b><% $recommendation_id %></b>.
+</p>
+
+<%args>
+$recommendation_id => undef;
+</%args>

@@ -1,0 +1,118 @@
+#include "myxshead.h"
+
+%module{Math::SZaru};
+
+%name{Math::SZaru::UniqueEstimator}
+class UniqueEstimator {
+
+  // FIXME this order of type/keyword/decorator simply must be a bug in XS++
+  static
+  %name{new}
+  UniqueEstimator*
+  Create(const char *CLASS, int nElemes)
+    %code{%
+      RETVAL = UniqueEstimator::Create(nElemes);
+    %};
+
+  // Redundant interface
+  // %name{add_elem} virtual void AddElemInCIF(const char *data, size_t %length{data});
+
+  %name{add_elem} virtual void AddElem(const std::string& elm);
+
+  %name{estimate} virtual int64_t Estimate() const;
+  %name{tot_elems} virtual uint64_t TotElems() const;
+  ~UniqueEstimator();
+
+// Pure XS implementation of multi-element add for performance
+{%
+void
+add_elems(UniqueEstimator *THIS, ...)
+  CODE:
+    char *str;
+    STRLEN len;
+    for (unsigned int i = 1; i < items; ++i) {
+      str = SvPV(ST(i), len);
+      THIS->AddElem(std::string(str, len));
+    }
+%}
+
+}; // End of UniqueEstimator
+
+
+
+%name{Math::SZaru::TopEstimator}
+class PTopEstimator {
+  ~PTopEstimator();
+  PTopEstimator(uint64_t numTops);
+  void add_elem(const std::string& elm);
+  void add_weighted_elem(const std::string& elem, double weight);
+  uint64_t tot_elems();
+
+  AV *
+  estimate()
+    %code{%
+      RETVAL = newAV();
+      sv_2mortal((SV *)RETVAL);
+      std::vector< SZaru::TopEstimator<double>::Elem > v;
+      THIS->estimate(v);
+      av_extend(RETVAL, v.size()-1);
+      for (unsigned int i = 0; i < v.size(); ++i) {
+        AV *iav = newAV();
+        const std::string &str = v[i].value;
+        av_store(iav, 0, newSVpvn(str.c_str(), str.length()));
+        av_store(iav, 1, newSVnv(v[i].weight));
+        av_store(RETVAL, i, newRV_noinc((SV *)iav));
+      }
+    %};
+
+// Pure XS implementation of multi-element add for performance
+{%
+void
+add_elems(PTopEstimator *THIS, ...)
+  CODE:
+    char *str;
+    STRLEN len;
+    for (unsigned int i = 1; i < items; ++i) {
+      str = SvPV(ST(i), len);
+      THIS->add_elem(std::string(str, len));
+    }
+
+void
+add_weighted_elems(PTopEstimator *THIS, ...)
+  CODE:
+    char *str;
+    STRLEN len;
+    if (items % 2 == 0) /* params PLUS invocant! */
+      croak("Need an even number of arguments: (string, weight, string, weight, ...)");
+
+    for (unsigned int i = 1; i < items; i += 2) {
+      str = SvPV(ST(i), len);
+      THIS->add_weighted_elem(std::string(str, len), SvNV(ST(i+1)));
+    }
+%}
+}; // End of TopEstimator
+
+
+%name{Math::SZaru::QuantileEstimator}
+class PQuantileEstimator {
+  ~PQuantileEstimator();
+  PQuantileEstimator(uint32_t numQuantiles);
+  void add_elem(const double elm);
+  uint64_t tot_elems();
+
+  std::vector<double>
+  estimate()
+    %code{% THIS->estimate(RETVAL); %};
+
+// Pure XS implementation of multi-element add for performance
+{%
+void
+add_elems(PQuantileEstimator *THIS, ...)
+  CODE:
+    for (unsigned int i = 1; i < items; ++i) {
+      THIS->add_elem(SvNV(ST(i)));
+    }
+%}
+
+}; // End of QuantileEstimator
+

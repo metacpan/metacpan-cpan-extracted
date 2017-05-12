@@ -1,0 +1,41 @@
+This original documentation for Mail::SRS version 0.10 is no longer
+relevant to newer versions of this module, but it is preserved here
+for posterity just in case of questions. See also OLD-DOCS.
+
+-- begin --
+
+Mail/SRS version 0.10
+=====================
+
+Sender Rewriting Scheme helps email forwarding (think
+.forward or /etc/aliases) continue to work in an
+SPF-compliant world.
+
+Please see http://spf.pobox.com/srs.html
+
+You should install this module through CPAN.
+
+It is meant to cooperate with Mail::SPF::Query.
+
+This entire module is PIPING HOT and VERY ALPHA.  It is
+brand new and needs a fair amount of TLC from developers.
+
+I expect a lot of people will look at this as a prototype
+and write their own C versions for their MTAs.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Opensource license.
+
+Copyright (C) 2004 IC Group, Inc.
+home of pobox.com and listbox.com
+

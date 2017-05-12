@@ -1,0 +1,249 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Data::Dumper;
+use Mail::Karmasphere::Client qw(:all);
+# use Carp qw(cluck);
+# $SIG{__WARN__} = sub { cluck @_; };
+
+$Data::Dumper::Indent = 1;
+
+my ($username, $password);
+my ($host, $port, $tcp, $single, $debug, $version);
+my (@feeds, @composites, @combiners);
+my (@ip4, @ip6, @domain, @url, @email);
+my $flags = FL_FACTS;
+
+my $result = GetOptions(
+	"debug"			=> \$debug,
+	"host=s"		=> \$host,
+	"port=i"		=> \$port,
+	"feed=s"		=> \@feeds,
+	"composite=s"	=> \@composites,
+	"combiner=s"	=> \@combiners,
+	"ip4=s"			=> \@ip4,
+	"ip6=s"			=> \@ip6,
+	"domain=s"		=> \@domain,
+	"url=s"			=> \@url,
+	"email=s"		=> \@email,
+	"username=s"	=> \$username,
+	"password=s"	=> \$password,
+	"flags=i"		=> \$flags,
+	"tcp"			=> \$tcp,
+	"single"		=> \$single,
+	"version"		=> \$version,
+);
+
+if (!$result){
+	print << "EOH";
+Usage: $0
+	[--username=xxx --password=yyy]
+    [--host=<query.karmasphere.com>] [--port=<portnum>]
+    [--tcp]
+	[--feed=<feedname> ...]
+	[--composite=<compositename> ...]
+	[--combiner=<combinername> ...]
+    [--ip4=<ip4_addr>[=tag] ...] [--ip6=<ip6_addr>[=tag] ...]
+    [--domain=<domain_name>[=tag] ...]
+	[--url=<url>[=tag] ...] [--email=<email_addr>[=tag] ...]
+	[--flags=<flags> ] [--version]
+
+Example:
+  Query for an IP4 address and a domain in one packet:
+    $0 --username=guest --password=guest --ip4=123.45.6.7 --domain=spammer.com
+EOH
+	exit 1;
+}
+
+if ($version) {
+	print "Mail::Karmasphere::Client $Mail::Karmasphere::Client::VERSION\n";
+	exit;
+}
+
+@feeds = map { split(/[,:\s]/, $_) } @feeds;
+@combiners = map { split(/[,:\s]/, $_) } @combiners;
+@composites = map { split(/[,:\s]/, $_) } @composites;
+
+my @ids = ();
+my %ids = (
+	IDT_IP4()		=> \@ip4,
+	IDT_IP6()		=> \@ip6,
+	IDT_DOMAIN()	=> \@domain,
+	IDT_URL()		=> \@url,
+	IDT_EMAIL()		=> \@email,
+);
+
+for my $type (keys %ids) {
+	for my $id (@{ $ids{$type} }) {
+	    if ($id =~ /^(.*)=([a-z,\.-]+)$/) {
+			my $tags = $2;
+			my @tags = split /,/, $tags;
+			push(@ids, [ $1, $type, @tags ]);
+		}
+		else {
+			push(@ids, [ $id, $type ]);
+		}
+	}
+}
+
+push(@ids, [ '127.0.0.2', IDT_IP4 ]) unless @ids;
+unless (@composites || @feeds) {
+	push(@composites, "karmasphere.email-sender");
+}
+
+my %args = ();
+$args{PeerHost} = $host if $host;
+$args{PeerPort} = $port if $port;
+$args{Proto} = 'tcp' if $tcp;
+$args{Debug} = 1 if $debug;
+$args{Principal} = $username if $username;
+$args{Credentials} = $password if $password;
+my $client = new Mail::Karmasphere::Client(%args);
+if ($single) {
+	for (@ids) {
+		my $query = new Mail::Karmasphere::Query(
+				Identities	=> [ $_ ],	# $_ is an ARRAY ref.
+				Feeds		=> \@feeds,
+				Composites	=> \@composites,
+				Combiners	=> \@combiners,
+				Flags		=> $flags,
+					);
+		my $response = $client->ask($query);
+		if ($response) {
+			print $response->as_string();
+		}
+		else {
+			print "Timeout or error\n";
+		}
+	}
+}
+else {
+	my $query = new Mail::Karmasphere::Query(
+			Identities	=> \@ids,
+			Feeds		=> \@feeds,
+			Composites	=> \@composites,
+			Combiners	=> \@combiners,
+			Flags		=> $flags,
+				);
+	my $response = $client->ask($query);
+	if ($response) {
+		print $response->as_string();
+
+		for ($response->combiner_names) {
+			if ($flags & FL_TRACE)      { print $response->{$_ . ".trace"},      "\n"; }
+			if ($flags & FL_MODELTRACE) { print $response->{$_ . ".modeltrace"}, "\n"; }
+		}
+	}
+	else {
+		print "Timeout or error\n";
+	}
+}
+
+__END__
+
+=head1 NAME
+
+karmaclient - Karmasphere commandline query client
+
+=head1 DESCRIPTION
+
+A commandline query client which allows access to most of the
+features of L<Mail::Karmasphere::Client>.
+
+=head1 USAGE
+
+karmaclient [--username=<login> --password=<pass>]
+	[--host=<hostname>][--port=port] [--tcp][--feed=<feedname>]
+	[--composite=<compositename>][--combiner=<combinername>]
+	[--ip4=<ip4>[=tag]] [--url=<url>[=tag]] [--domain=<domain>[=tag]]
+	[--help] [--version]
+
+=head1 EXAMPLES
+
+=head2 Querying an IP4 identity
+
+You can query an IP4 identity using the I<--ip4> argument to karmaclient.
+Here, we query the composite (or I<feedset>), I<karmasphere.email-sender-ip>
+for an opinion on the identity I<127.0.0.1>:
+
+ $ karmaclient --ip4=127.0.0.2 --composite=karmasphere.email-sender-ip
+ Response id 'mkc0': 1ms, 1 combinations, 5 attributes
+ Warning: Truncated
+ Combiner 'karmasphere.email-sender-ip': verdict -1000 (abuseat.cbl: if-bad(0) => return-bad(1.0))
+ Attribute 'trusted-forwarder.ips': identity '127.0.0.2' value 1000 (Listed in trusted-forwarder.org)
+ Attribute 'returnpath.senderscorecertified': identity '127.0.0.2' value 1000 (Listed in ReturnPath Sender Score Certified)
+ Attribute 'sorbs.safe': identity '127.0.0.2' value -1000 (Low false positive zone See: http://www.sorbs.net/lookup.shtml?$)
+ Attribute 'uribl.ip-black': identity '127.0.0.2' value -1000 (Blacklisted, see http://lookup.uribl.com/?domain=$)
+ Attribute 'tqmcube.dhcp': identity '127.0.0.2' value -1000 (TEST record. See http://tqmcube.com)>
+
+=head2 Querying a domain identity
+
+Similarly, we can query the composite I<karmasphere.email-sender> for
+opinions on the domain I<example.com> using the I<--domain> argument.
+We can also specify the query get sent to I<query.karmasphere.com> by
+using the I<--host> argument:
+
+ $ karmaclient --host=query.karmasphere.com --composite=karmasphere.email-sender --domain=example.com
+ Response id 'mkc0': 1ms, 1 combinations, 0 attributes
+ Combiner 'karmasphere.email-sender': verdict 0 ()
+
+=head2 Querying a url identity
+
+It follows, then, that we can use the I<--url> argument to ask questions
+about the URL I<http://www.example.com/>:
+
+ $ karmaclient --composite=karmasphere.email-body --url=http://www.example.com/
+ Response id 'mkc0': 24ms, 1 combinations, 0 attributes
+ Combiner 'karmasphere.email-body': verdict 0 ()
+
+=head2 Querying many identities at once
+
+We aren't limited to one identity per query.  karmaclient can send queries
+that contain many identities to a query server.  As we saw when querying
+an IP4 identity, the response can be truncated when sending UDP queries.
+This situation is much more likely to arise, and more problematic, when
+sending many identities in a single query, but the problem can be mitigated
+by specifying that TCP queries be sent, using the I<--tcp> flag to
+karmaclient:
+
+ $ karmaclient --composite=karmasphere.email-sender --ip4=127.0.0.2 --ip4=192.168.3.4 --ip4=10.11.12.13 --domain=example.com --tcp
+ Response id 'mkc0': 1ms, 1 combinations, 14 attributes
+ Combiner 'karmasphere.email-sender': verdict -1000 (abuseat.cbl: if-bad(0) => return-bad(1.0))
+ Attribute 'spamcop.bl': identity '127.0.0.2' value -1000 (Blocked - see http://www.spamcop.net/bl.shtml?$)
+ Attribute 'uribl.ip-grey': identity '127.0.0.2' value -1000 (Greylisted, see http://lookup.uribl.com/?domain=$)
+ Attribute 'dsbl.list': identity '127.0.0.2' value -1000 (http://dsbl.org/listing?$)
+ Attribute 'cymru.bogons': identity '192.168.3.4' value -1000 (Invalid source IP address (cymru))
+ Attribute 'sorbs.safe': identity '127.0.0.2' value -1000 (Low false positive zone See: http://www.sorbs.net/lookup.shtml?$)
+ Attribute 'cymru.bogons': identity '127.0.0.2' value -1000 (Invalid source IP address (cymru))
+ Attribute 'abuseat.cbl': identity '127.0.0.2' value -1000 (Blocked - see http://cbl.abuseat.org/lookup.cgi?ip=$)
+ Attribute 'virbl.blacklist': identity '127.0.0.2' value -1000 (VIRBL test entry)
+ Attribute 'njabl.dnsbl': identity '127.0.0.2' value 1000 (open relay -- 1008601823)
+ Attribute 'trusted-forwarder.ips': identity '127.0.0.2' value 1000 (Listed in trusted-forwarder.org)
+ Attribute 'cymru.bogons': identity '10.11.12.13' value -1000 (Invalid source IP address (cymru))
+ Attribute 'returnpath.senderscorecertified': identity '127.0.0.2' value 1000 (Listed in ReturnPath Sender Score Certified)
+ Attribute 'uribl.ip-black': identity '127.0.0.2' value -1000 (Blacklisted, see http://lookup.uribl.com/?domain=$)
+ Attribute 'tqmcube.dhcp': identity '127.0.0.2' value -1000 (TEST record. See http://tqmcube.com)
+
+
+=head1 BUGS
+
+The examples in this document do not sit well on the page.
+
+=head1 SEE ALSO
+
+L<Mail::Karmasphere::Client>
+L<Mail::Karmasphere::Query>
+L<Mail::Karmasphere::Response>
+L<karmad>
+http://www.karmasphere.com/
+
+=head1 COPYRIGHT
+
+Copyright (c) 2005 Shevek, Karmasphere. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

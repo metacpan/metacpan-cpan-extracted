@@ -1,0 +1,126 @@
+[% IF statustext %]
+<p align="center">
+    <div class="[% statuscolor %]">[% tr.tr(statustext) %]</div>
+</p>
+[% END %]
+<p align="center">
+    <form name="adduser" method="post" action="[% PostLink %]">
+        <table class="data" align="center" id="HelperTable1">
+            <tr class="tabheader">
+                <th colspan="2">
+                    <div class="infotext">[% tr.tr("New User") %]</div>
+                </th>
+            </tr>
+            <tr>
+                <td align="right">[% tr.tr("Username") %]</td>
+                <td align="left">
+                    <input type="text" name="adduser_username" value="[% adduser.username %]" maxLength=40 size=20>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">[% tr.tr("New Password") %]</td>
+                <td align="left">
+                    <input type="password" name="adduser_pwnew" value="[% adduser.pwnew %]">
+                </td>
+            </tr>
+            <tr>
+                <td align="right">[% tr.tr("Email") %]</td>
+                <td align="left">
+                    <input type="text" name="adduser_email" size="40" maxlength="60" value="[% adduser.email %]">
+                </td>
+            </tr>
+            <tr>
+                <td align="right">[% tr.tr("Rights") %]</td>
+                <td>
+                    <table class="data" align="center" id="SubHelperTable1">
+                        <tr>
+                            [% FOREACH UserLevel IN UserLevels %]
+                                <th>[% tr.tr(UserLevel.name) %]</th>
+                            [% END %]
+                        </tr>
+                        <tr>
+                            [% FOREACH right IN adduser.rights %]
+                                <td><input type="checkbox" name="adduser_[% right.id %]"
+                                    [% IF right.val %]
+                                    checked
+                                    [% END %]
+                                ></td>
+                            [% END %]
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">[% tr.tr("Card ID") %]</td>
+                <td align="left">
+                    <input type="text" name="adduser_chipcard_id" value="[% adduser.chipcard_id %]" maxLength=40 size=40>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <table border="0" cellpadding="4" cellspacing="5" align="right">
+                        <td align="center"><input type="submit" value="[% tr.tr("Save") %]"></td>
+                        <td align="center"><input type="reset" value="[% tr.tr("Reset") %]"></td>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <input type="hidden" name="mode" value="adduser">
+    </form>
+</p>
+&nbsp;<br>
+<p align="center">
+    <table class="data" align="center" id="MainDataTable">
+        <tr class="tabheader">
+            <th>[% tr.tr("Username") %]</th>
+            <th>[% tr.tr("Password") %]</th>
+            <th>[% tr.tr("Email") %]</th>
+            [% FOREACH UserLevel IN UserLevels %]
+                <th>[% tr.tr(UserLevel.name) %]</th>
+            [% END %]
+            <th>[% tr.tr("Card ID") %]</th>
+            <th></th>
+            <th></th>
+        </tr>
+        [% FOREACH user IN users %]
+            <form id="changeuser_[% user.username %]" method="post" action="[% PostLink %]">
+                <tr>
+                    <td>
+                        <input type="hidden" name="username" value="[% user.username %]">
+                        [% user.username %]
+                    </td>
+                    <td>
+                        <input type="password" name="password" value="">
+                    </td>
+                    <td>
+                        <input type="text" name="email_addr" size="40" maxlength="60"  value="[% user.email_addr %]">
+                    </td>
+                    
+                    [% FOREACH right IN user.rights %]
+                        <td>
+                            <input type="checkbox" name="[% right.id %]"
+                                [% IF right.val %]
+                                    checked
+                                [% END %]
+                            >
+                        </td>
+                    [% END %]
+                    <td>
+                        <input type="text" name="chipcard_id" value="[% user.chipcard_id %]">
+                    </td>
+                    <td>
+                        <input type="hidden" name="mode" value="changeuser">
+                        <input type="submit" value="[% tr.tr("Change") %]" onClick="return confirmChangeUser('changeuser_[% user.username %]');">
+                    </td>
+                </form>
+                <form id="deleteuser_[% user.username %]" method="post" action="[% PostLink %]">
+                    <td>
+                        <input type="hidden" name="username" value="[% user.username %]">
+                        <input type="hidden" name="mode" value="deleteuser">
+                        <input type="submit" value="[% tr.tr("Delete") %]" onClick="return confirmDeleteUser('deleteuser_[% user.username %]');">
+                    </td>
+                </tr>
+            </form>
+        [% END %]
+    </table>
+</p>

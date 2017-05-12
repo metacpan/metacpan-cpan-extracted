@@ -1,0 +1,46 @@
+Revision history for Messaging-Message:
+
+1.6	Wed Oct  5 2016
+	* Added a "ZERO" message queue type working like "/dev/zero".
+	* Rewrote the "NULL" message queue to stop using Directory::Queue::Null.
+
+1.5	Tue Nov 19 2013
+	* Added an example message generator program: eg/mqgen.pl.
+	* Improved message queue testing (RT#87341).
+
+1.4	Tue Nov 13 2012
+	* Now using No::Worries.
+	* Cleanup code to please Perl::Critic.
+
+1.3	Fri May 11 2012
+	* Portability fixes for the new compression algorithms.
+
+1.2	Mon Apr 30 2012
+	* Improved the message generator: it can now generate Unicode strings.
+
+1.1	Wed Apr 25 2012
+	* Added support for LZ4 and Snappy compression.
+	* Added support for forced compression in jsonify() and friends.
+
+1.0	Mon Mar  5 2012
+	* Promoted to 1.0 after successful testing.
+	* The API is now stable.
+
+0.9	Thu Feb 23 2012
+	* All message queues now inherit from Messaging::Message::Queue.
+
+0.8	Thu Jan 26 2012
+	* Ported to the new Directory::Queue 1.5.
+	* Added a "NULL" message queue type based on Directory::Queue::Null.
+
+0.7	Fri Dec  2 2011
+	* Take advantage of string access by refrence in Directory::Queue.
+	* Allow \t, \n and \r in non Base64 encoded bodies.
+
+0.6	Thu Nov 24 2011
+	* Code, documentation and packaging cleanup.
+	* Improved speed.
+	* Removed test files containing dubious Unicode character \x{FDDB}.
+
+0.5	Wed Nov 16 2011
+	* First version released in CPAN.

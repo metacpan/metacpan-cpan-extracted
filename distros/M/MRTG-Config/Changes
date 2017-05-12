@@ -1,0 +1,21 @@
+Revision history for Perl extension MRTG::Config.
+
+0.04 Mon Jul 02 22:19:00 2007
+    - Fixed CPAN upload error. Stupid me didn't increment version.
+
+0.03 Thu Jun 28 14:59:07 2007
+    - Added some new methods, I don't know which.
+    - Squashed some bugs
+    - Greatly improved documentation.
+    - Fixed missing Makefile dependency (Thanks to jagh at perlmonks.org!)
+
+0.02 Sat Jun 23 11:55:03 2007
+    - Added some new methods, I don't know which.
+    - Squashed some bugs
+    - Added the ability to track in which file a target was last defined
+    - All directive names are now stored as lowercase after parsing.
+
+0.01  Wed Jun 20 17:55:18 2007
+	- original version; created by h2xs 1.23 with options
+		-AXc --use-new-tests -n MRTG::Config
+

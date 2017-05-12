@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+			"http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+	<title>Dependency Viewer</title>
+<link rel="stylesheet" href="depend.css" type="text/css">
+</head>
+<body>
+<h1>Dependency Info</h1>
+<p>You'll need to edit this HTML before you can use it with the CGI
+program pmd_cgidepend.plx - view the source and look at the comments.</p>
+
+<!-- *** You should edit this to point to your installation of pmd_cgidepend.plx *** -->
+<!-- *** use either 'get' or 'post' as the action - it will work either way *** -->
+<form action="/cgi-bin/pmd_cgidepend.plx" method="get">
+
+Enter item to start tree with (separate multiple items with commas): <input type="text" name="seed" size="50" maxlength="100">
+<br />
+Or, check this box to start the tree with all the scripts in the database: <input type="checkbox" name="allscripts" value="1">
+
+<br /><br />
+
+Which dependencies to show: <select name="kind">
+<option value="both">Both directions</option>
+<option value="child">Child dependencies</option>
+<option value="parent">Parent dependencies</option>
+</select>
+
+<br /><br />
+
+Optional: show only items matching this regex: <input type="text" name="re" size="50" maxlength="100">
+<br />
+Optional: omit items matching this regex: <input type="text" name="xre" size="50" maxlength="100">
+
+<input type="hidden" name="go" value="1">
+
+<!-- *** You should probably change this default to PNG - check with your local install of GD *** -->
+<br />
+Optional: Choose the image format - NOTE that some formats may not work on your system!
+<select name="format">
+<option value="GIF">GIF</option>
+<option value="PNG">PNG</option>
+<option value="SVG">SVG</option>
+<option value="JPG">JPEG</option>
+</select>
+
+<!-- *** Point this to the datafile you wish to use, or none to use the default *** -->
+<input type="hidden" name="datafile" value="/home/piers/src/dependency/build/unified.dat">
+
+<br /><br />
+
+<input type="submit" value="Get Dependency Info">
+</form>
+
+</body>
+</html>

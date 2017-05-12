@@ -1,0 +1,1283 @@
+NAME
+    MMapDB - a simple database in shared memory
+
+SYNOPSIS
+      use MMapDB qw/:error/;
+
+      # create a database
+      my $db=MMapDB->new(filename=>$path, intfmt=>'J');
+      $db->start;       # check if the database exists and connect
+      $db->begin;       # begin a transaction
+
+      # insert something
+      ($id, $pos)=$db->insert([[qw/main_key subkey .../],
+                               $sort, $data]);
+      # or delete
+      $success=$db->delete_by_id($id);
+      $just_deleted=$db->delete_by_id($id, 1);
+
+      # or forget everything
+      $db->clear;
+
+      # make changes visible
+      $db->commit;
+
+      # or forget the transaction
+      $db->rollback;
+
+      # use a database
+      my $db=MMapDB->new(filename=>$path);
+      $db->start;
+
+      # tied interface
+      ($keys, $sort, $data, $id)=@{$db->main_index->{main_key}->{subkey}};
+      $subindex=$db->main_index->{main_key};
+      @subkeys=keys %$subindex;
+      @mainkeys=keys %{$db->main_index};
+
+      # or even
+      use Data::Dumper;
+      print Dumper($db->main_index); # dumps the whole database
+
+      tied(%{$db->main_index})->datamode=DATAMODE_SIMPLE;
+      print Dumper($db->main_index); # dumps only values
+
+      # access by ID
+      ($keys, $sort, $data, $id)=@{$db->id_index->{$id}};
+
+      # fast access
+      @positions=$db->index_lookup($db->mainidx, $key);
+      if( @positions==1 and $positions[0] >= $db->mainidx ) {
+        # found another index
+        @positions=$db->index_lookup($positions[0], ...);
+      } elsif(@positions) {
+        # found a data record
+        for (@positions) {
+          ($keys, $sort, $data, $id)=@{$db->data_record($_)};
+
+          or
+
+          $data=$db->data_value($_);
+
+          or
+
+          $sort=$db->data_sort($_);
+        }
+      } else {
+        # not found
+      }
+
+      # access by ID
+      $position=$db->id_index_lookup($id);
+      ($keys, $sort, $data, $id)=@{$db->data_record($position)};
+
+      # iterate over all valid data records
+      for( $it=$db->iterator; $pos=$it->(); ) {
+        ($keys, $sort, $data, $id)=@{$db->data_record($pos)};
+      }
+
+      # or all invalid data records
+      for( $it=$db->iterator(1); $pos=$it->(); ) {
+        ($keys, $sort, $data, $id)=@{$db->data_record($pos)};
+      }
+
+      # iterate over an index
+      for( $it=$db->index_iterator($db->mainidx);
+           ($partkey, @positions)=$it->(); ) {
+        ...
+      }
+
+      # and over the ID index
+      for( $it=$db->id_index_iterator;
+           ($id, $position)=$it->(); ) {
+        ...
+      }
+
+      # disconnect from a database
+      $db->stop;
+
+INSTALLATION
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+DEPENDENCIES
+    *   perl 5.8.8
+
+    *   File::Map 0.16
+
+DESCRIPTION
+    "MMapDB" implements a database similar to a hash of hashes of hashes,
+    ..., of arrays of data.
+
+    It's main design goals were:
+
+    *   very fast read access
+
+    *   lock-free read access for massive parallelism
+
+    *   minimal memory consumption per accessing process
+
+    *   transaction based write access
+
+    *   simple backup, compactness, one file
+
+    The cost of write access was unimportant and the expected database size
+    was a few thousands to a few hundreds of thousands data records.
+
+    Hence come 2 major decisions. Firstly, the database is completely mapped
+    into each process's address space. And secondly, a transaction writes
+    the complete database anew.
+
+    Still interested?
+
+CONCEPTS
+  The data record
+    A data record consists of 3-4 fields:
+
+     [[KEY1, KEY2, ..., KEYn], ORDER, DATA, ID]   # ID is optional
+
+    All of the "KEY1", ..., "KEYn", "SORT" and "DATA" are arbitrary length
+    octet strings. The key itself is an array of strings showing the way to
+    the data item. The word *key* in the rest of this text refers to such an
+    array of strings.
+
+    Multiple data records can be stored under the same key. So, there is
+    perhaps an less-greater relationship between the data records. That's
+    why there is the "ORDER" field. If the order field of 2 or more data
+    records are equal ("eq", not "=="), their order is defined by the
+    stability of perl's "sort" operation. New data records are always
+    appended to the set of records. So, if "sort" is stable they appear at
+    the end of a range of records with the same "ORDER".
+
+    The "DATA" field contains the data itself.
+
+    A data record in the database further owns an ID. The ID uniquely
+    identifies the data record. It is assigned when the record is inserted.
+
+    An ID is a fixed size number (32 or 64 bits) except 0. They are
+    allocated from 1 upwards. When the upper boundary is reached the next ID
+    becomes 1 if it is not currently used.
+
+  The index record
+    An index record consists of 2 or more fields:
+
+     (PARTKEY, POS1, POS2, ..., POSn)
+
+    "PARTKEY" is one of the "KEYi" that form the key of a data record. The
+    "POSi" are positions in the database file that point to other indices or
+    data records. Think of such a record as an array of data records or the
+    leafes in the hash of hashes tree.
+
+    If an index record contains more than 1 positions they must all point to
+    data records. This way an ordered array of data records is formed. The
+    position order is determined by the "ORDER" fields of the data records
+    involved.
+
+    If the index record contains only one position it can point to another
+    index or a data record. The distiction is made by the so called *main
+    index* position. If the position is lower it points to a data record
+    otherwise to an index.
+
+  The index
+    An index is a list of index records ordered by their "PARTKEY" field.
+    Think of an index as a hash or a twig in the hash of hashes tree. When a
+    key is looked up a binary search in the index is performed.
+
+    There are 2 special indices, the main index and the ID index. The
+    positions of both of them are part of the database header. This fact is
+    the only thing that makes the main index special. The ID index is
+    special also because it's keys are IDs rather than strings.
+
+  The hash of hashes
+    To summarize all of the above, the following data structure displays the
+    logical structure of the database:
+
+     $main_index={
+                   KEY1=>{
+                           KEY11=>[[DATAREC1],
+                                   [DATAREC2],
+                                   ...],
+                           KEY12=>[[DATAREC1],
+                                   [DATAREC2],
+                                   ...],
+                           KEY13=>{
+                                    KEY131=>[[DATAREC1],
+                                             [DATAREC2],
+                                             ...],
+                                    KEY132=>...
+                                  },
+                         },
+                   KEY1=>[[DATAREC1],
+                          [DATAREC2],
+                          ...]
+                 }
+
+    What cannot be expressed is an index record containing a pointer to a
+    data record and to another subindex, somthing like this:
+
+      KEY=>[[DATAREC],
+            {                     # INVALID
+              SUBKEY=>...
+            },
+            [DATAREC],
+            ...]
+
+    Note also, the root element is always a hash. The following is invalid:
+
+     $main_index=[[DATAREC1],
+                  [DATAREC2],
+                  ...]
+
+  Accessing a database
+    To use a database it must be connected. Once connected a database is
+    readonly. You will always read the same values regardless of other
+    transactions that may have written the database.
+
+    The database header contains a flag that says if it is still valid or
+    has been replaced by a transaction. There is a method that checks this
+    flag and reconnects to the new version if necessary. The points when to
+    call this method depend on your application logic.
+
+  Accessing data
+    To access data by a key first thing the main index position is read from
+    the database header. Then a binary search is performed to look up the
+    index record that matches the first partial key. If it could be found
+    and there is no more partial key the position list is returned. If there
+    is another partial key but the position list points to data records the
+    key is not found. If the position list contains another index position
+    and there is another partial key the lookup is repeated on this index
+    with the next partial key until either all partial keys have been found
+    or one of them could not be found.
+
+    A method is provided to read a single data record by its position.
+
+    The index lookup is written in C for speed. All other parts are perl.
+
+  Transaction
+    When a transaction is started a new private copy of the database is
+    created. Then new records can be inserted or existing ones deleted.
+    While a transaction is active it is not possible to reconnect to the
+    database. This ensures that the transaction derives only from the data
+    that was valid when the transaction has begun.
+
+    Newly written data cannot be read back within the transaction. It
+    becomes visible only when the transaction is committed. So, one will
+    always read the state from the beginning of the transaction.
+
+    When a transaction is committed the public version is replaced by the
+    private one. Thus, the old database is deleted. But other processes
+    including the one performing the commit still have the old version still
+    mapped in their address space. At this point in time new processes will
+    see the new version while existing see the old data. Therefore a flag in
+    the old memory mapped database is written signaling that is has become
+    invalid. The atomicity of this operation depends on the atomicity of
+    perls "rename" operation. On Linux it is atomic in a sense that there is
+    no point in time when a new process won't find the database file.
+
+    A lock file can be used to serialize transactions.
+
+  The integer format
+    All numbers and offsets within the database are written in a certain
+    format (byte order plus size). When a database is created the format is
+    written to the database header and cannot be changed afterwards.
+
+    Perl's "pack" command defines several ways of encoding integer numbers.
+    The database format is defined by one of these pack format letters:
+
+    *   L
+
+        32 bit in native byte order.
+
+    *   N
+
+        32 bit in big endian order. This format should be portable.
+
+    *   J
+
+        32 or 64 bit in native byte order.
+
+    *   Q
+
+        64 bit in native byte order. But is not always implemented.
+
+  Iterators
+    Some "MMapDB" methods return iterators. An iterator is a blessed
+    function reference (also called closure) that if called returns one item
+    at a time. When there are no more items an empty list or "undef" is
+    returned.
+
+    If you haven't heard of this concept yet perl itself has an iterator
+    attached to each hash. The "each" operation returns a key/value pair
+    until there is no more.
+
+    Iterators are mainly used this way:
+
+      $it=$db->...;       # create an iterator
+      while( @item=$it->() ) {
+        # use @item
+      }
+
+    As mentioned, iterators are also objects. They have methods to fetch the
+    number of elements they will traverse or to position the iterator to a
+    certain element.
+
+  Error Conditions
+    Some programmers believe exceptions are the right method of error
+    reporting. Other think it is the return value of a function or method.
+
+    This modules somehow divides errors in 2 categories. A key that could
+    not be found for example is a normal result not an error. However, a
+    disk full condition or insufficient permissions to create a file are
+    errors. This kind of errors are thrown as exceptions. Normal results are
+    returned through the return value.
+
+    If an exception is thrown in this module $@ will contain a scalar
+    reference. There are several errors defined that can be imported into
+    the using program:
+
+      use MMapDB qw/:error/;  # or :all
+
+    The presence of an error is checked this way (after "eval"):
+
+      $@ == E_TRANSACTION
+
+    Human readable error messages are provided by the scalar $@ points to:
+
+      warn ${$@}
+
+   List of error conditions
+    *   E_READONLY
+
+        database is read-only
+
+    *   E_TWICE
+
+        attempt to insert the same ID twice
+
+    *   E_TRANSACTION
+
+        attempt to begin a transaction while there is one active
+
+    *   E_FULL
+
+        no more IDs
+
+    *   E_DUPLICATE
+
+        data records cannot be mixed up with subindices
+
+    *   E_OPEN
+
+        can't open file
+
+    *   E_READ
+
+        can't read from file
+
+    *   E_WRITE
+
+        can't write to file
+
+    *   E_CLOSE
+
+        file could not be closed
+
+    *   E_RENAME
+
+        can't rename file
+
+    *   E_SEEK
+
+        can't move file pointer
+
+    *   E_TRUNCATE
+
+        can't truncate file
+
+    *   E_LOCK
+
+        can't lock or unlock
+
+    *   E_RANGE
+
+        attempt move an iterator position out of its range
+
+    *   E_NOT_IMPLEMENTED
+
+        function not implemented
+
+  UTF8
+    As of version 0.07 "MMapDB" supports UTF8 data. What does that mean?
+
+    For each string perl maintains a flag that says whether the string is
+    stored in UTF8 or not. "MMapDB" stores and retrieves this flag along
+    with the string itself.
+
+    For example take the string "\320\263\321\200\321\203\321\210\320\260".
+    With the UTF8 flag unset it is just a bunch of octets. But if the flag
+    is set the string suddenly becomes these characters
+    "\x{433}\x{440}\x{443}\x{448}\x{430}" or "груша" which means "pear" in
+    Russian.
+
+    Note, with the flag unset the length of our string is 10 which is the
+    number of octets. But if the flag is set it is 5 which is the number of
+    characters.
+
+    So, although the octet sequences representing both strings (with and
+    without the flag) equal the strings themselves differ.
+
+    With "MMapDB", if something is stored under an UTF8 key it can be
+    retrieved also only by the UTF8 key.
+
+    There is a subtle point here, what if the UTF8 flag is set for a string
+    consisting of ASCII-only characters? In Perl th following expression is
+    true:
+
+     'hello' eq Encode::decode_utf8('hello')
+
+    The first "hello" is a string the the UTF8 flag unset. It is compared
+    with the same sequence of octets with the UTF8 flag set.
+
+    "MMapDB" up to version 0.11 (including) considered those 2 strings
+    different. That bug has been fixed in version 0.12.
+
+  The database format
+    With version 0.07 UTF8 support was introduced into "MMapDB". This
+    required a slight change of the database on-disk format. Now the
+    database format is encoded in the magic number of the database file. By
+    now there are 2 formats defined:
+
+    *   Format 0 --> magic number: MMDB
+
+    *   Format 1 --> magic number: MMDC
+
+    "MMapDB" reads and writes both formats. By default new databases are
+    written in the most up-to-date format and the format of existing ones is
+    not changed.
+
+    If you want to write a certain format for a new database or convert an
+    existing database to an other format specify it as parameter to the
+    "begin()" method.
+
+    If you want to write the newest format use -1 as format specifier.
+
+METHODS
+  $dh=MMapDB->new( KEY=>VALUE, ... )
+  $new=$db->new( KEY=>VALUE, ... )
+  $dh=MMapDB->new( $filename )
+  $new=$db->new( $filename )
+    creates or clones a database handle. If there is an active transaction
+    it is rolled back for the clone.
+
+    If only one parameter is passed it is taken as the database filename.
+
+    Otherwise parameters are passed as (KEY,VALUE) pairs:
+
+    *   filename
+
+        specifies the database file
+
+    *   lockfile
+
+        specify a lockfile to serialize transactions. If given at start of a
+        transaction the file is locked using "flock" and unlocked at commit
+        or rollback time. The lockfile is empty but must not be deleted.
+        Best if it is created before first use.
+
+        If "lockfile" ommitted "MMapDB" continues to work but it is possible
+        to begin a new transaction while another one is active in another
+        process.
+
+    *   intfmt
+
+        specifies the integer format. Valid values are "N" (the default),
+        "L", "J" and "Q" (not always implemented). When opening an existing
+        database this value is overwritten by the database format.
+
+    *   readonly
+
+        if passed a true value the database file is mapped read-only. That
+        means the accessing process will receive a SEGV signal (on UNIX) if
+        some stray pointer wants to write to this area. At perl level the
+        variable is marked read-only. So any read access at perl level will
+        not generate a segmentation fault but instead a perl exception.
+
+  $success=$db->set_intfmt(LETTER)
+    sets the integer format of an existing database handle. Do not call this
+    while the handle is connected to a database.
+
+  $db->filename
+  $db->readonly
+  $db->intfmt
+    those are accessors for the attributes passed to the constructor. They
+    can also be assigned to ("$db->filename=$new_name") but only before a
+    database is connected to. "intfmt" must be set using "set_intfmt()".
+
+  $success=$db->start
+    (re)connects to the database. This method maps the database file and
+    checks if it is still valid. This method cannot be called while a
+    transaction is active.
+
+    If the current database is still valid or the database has been
+    successfully connected or reconnected the database object is returned.
+    "undef" otherwise.
+
+    There are several conditions that make "start" fail:
+
+    *   $db->filename could not be opened
+
+    *   the file could not be mapped into the address space
+
+    *   the file is empty
+
+    *   the magic number of the file does not match
+
+    *   the integer format indentifier is not valid
+
+  $success=$db->stop
+    disconnects from a database.
+
+  $success=$db->begin
+  $success=$db->begin($dbformat)
+    begins a transaction. Returns the database object.
+
+    If the $dbformat parameter is ommitted the database format is unchanged.
+
+    If 0 is given the database is written in "MMDB" format. If 1 is given
+    "MMDC" format is written.
+
+    If -1 is given always the newest format is written.
+
+  $db->index_prealloc
+  $db->stringmap_prealloc
+    When a transaction is begun 2 temporary files are created, one for the
+    index and data records the other for the string table. These files are
+    then mapped into the process' address space for faster access.
+
+    "index_prealloc" and "stringmap_prealloc" define the initial sizes of
+    these files. The files are created as sparse files. The actual space is
+    allocated on demand. By default both these values are set to
+    "10*1024*1024" which is ten megabytes.
+
+    When the space in one of the areas becomes insufficient it is extented
+    and remapped in chunks of "index_prealloc" and "stringmap_prealloc"
+    respectively.
+
+    You should change the default values only for really big databases:
+
+     $db->index_prealloc=100*1024*1024;
+     $db->stringmap_prealloc=100*1024*1024;
+
+  $success=$db->commit
+  $success=$db->commit(1)
+    commits a transaction and reconnects to the new version.
+
+    Returns the database object it the new version has been connected.
+
+    If a true value is passed to this message the old database version is
+    not invalidated. This makes it possible to safely create a copy for
+    backup this way:
+
+      my $db=MMapDB->new(filename=>FILENAME);
+      $db->start;
+      $db->filename=BACKUPNAME;
+      $db->begin;
+      $db->commit(1);
+
+    or
+
+      my $db=MMapDB->new(filename=>FILENAME);
+      $db->start;
+      my $backup=$db->new(filename=>BACKUP);
+      $backup->begin;
+      $backup->commit(1);
+
+  $success=$db->rollback
+    forgets about the current transaction
+
+  $db->is_valid
+    returns true if a database is connected an valid.
+
+  $db->invalidate
+    invalidates the current version of the database. This is normally called
+    internally by "commit" as the last step. Perhaps there are also other
+    uses.
+
+  $db->backup(BACKUPNAME)
+    creates a backup of the current database version called "BACKUPNAME". It
+    works almost exactly as shown in commit. Note, "backup" calls
+    "$db->start".
+
+    If the "filename" parameter is ommitted the result of appending the
+    ".BACKUP" extension to the object's "filename" property is used.
+
+  $db->restore(BACKUPNAME)
+    just the opposite of "backup". It renames "BACKUPNAME" to
+    "$db->filename" and invalidates the current version. So, the backup
+    becomes the current version. For other processes running in parallel
+    this looks just like another transaction being committed.
+
+  $db->dbformat_in
+  $db->dbformat_out
+    when a database is newly created it is written in the format passed to
+    the "begin()" method. When it is connected later via "start()"
+    "dbformat_in()" contains this format. So, a database user can check if a
+    database file meets his expectations.
+
+    Within a transaction "dbformat_out()" contains the format of the
+    database currently being written.
+
+  $db->flags
+    contains a number in the range between 0 and 255 that represents the
+    "flags" byte of the database.
+
+    It is written to the database file by the "begin()" method and read by
+    "start()".
+
+    Using this field is not recommended. It is considered experimental and
+    may disappear in the future.
+
+  @positions=$db->index_lookup(INDEXPOS, KEY1, KEY2, ...)
+    looks up the key "[KEY1, KEY2, ...]" in the index given by its position
+    "INDEXPOS". Returns a list of positions or an empty list if the complete
+    key is not found.
+
+    If "INDEXPOS" is 0 or "undef" "$db->mainidx" is used.
+
+    To check if the result is a data record array or another index use this
+    code:
+
+      if( @positions==1 and $positions[0] >= $db->mainidx ) {
+        # found another index
+        # the position can be passed to another index_lookup()
+      } elsif(@positions) {
+        # found a data record
+        # the positions can be passed to data_record()
+      } else {
+        # not found
+      }
+
+  ($idxpos, $nth)=$db->index_lookup_position(INDEXPOS, KEY1, ...)
+    This method behaves similar to index_lookup() in that it looks up a key.
+    It differs in
+
+    *   It returns the position of the index containing the last key element
+        and the position of the found element within that index. These 2
+        numbers can be used to create and position an iterator.
+
+    *   The last key element may not exist. In this case the value returned
+        as $nth points to the index element before which the key would
+        appear.
+
+    *   If an intermediate key element does not exist or is not an index an
+        empty list is returned.
+
+    Consider the following database:
+
+     {
+       key => {
+                aa => ['1'],
+                ab => ['2'],
+                ad => ['3'],
+              }
+     }
+
+    Now let's define an accessor function:
+
+     sub get {
+       my ($subkey)=@_;
+
+       $db->data_value
+         ((
+           $db->index_iterator
+             ($db->index_lookup_position($db->mainidx, "key", $subkey))->()
+          )[1])
+     }
+
+    Then
+
+     get "aa";    # returns '1'
+     get "ab";    # returns '2'
+     get "ac";    # returns '3' although key "ac" does not exist it would
+                  #             show up between "ab" and "ad". So, the iterator
+                  #             is positioned on "ad"
+     get "aba";   # returns '3' for the same reason
+     get "ad";    # returns '3'
+
+     (undef, $nth)=$db->index_lookup_position($db->mainidx, "key", "az");
+     # now $nth is 3 because "az" would be inserted after "ad" which is at
+     # position 2 within the index.
+
+    If "INDEXPOS" is 0 or "undef" "$db->mainidx" is used.
+
+  $position=$db->id_index_lookup(ID)
+    looks up a data record by its ID. Returns the data record's position.
+
+  $boolean=$db->is_datapos(POS)
+    returns true if $pos points to the data record space.
+
+    This method is simply a shortcut for
+
+      $pos < $db->mainidx
+
+    A true result does not mean it is safe to use $pos in "data_record()".
+
+  @recs=$db->data_record(POS, ...)
+    given a list of positions fetches the data records. Each @recs element
+    is an array reference with the following structure:
+
+      [[KEY1, KEY2, ...], SORT, DATA, ID]
+
+    All of the "KEYs", "SORT" and "DATA" are read-only strings.
+
+  @values=$db->data_value(POS, ...)
+    similar to data_record() but returns only the "DATA" fields of the
+    records. Faster than data_record().
+
+    See "The MMapDB::Data class" for an example.
+
+  @sorts=$db->data_sort(POS, ...)
+    similar to data_record() but returns only the "SORT" fields of the
+    records. Faster than data_record().
+
+  @records=$db->index_lookup_records(INDEXPOS, KEY1, KEY2, ...)
+    a more effective shortcut of
+
+     @records=$db->data_record($db->index_lookup((INDEXPOS, KEY1, KEY2, ...)))
+
+  @values=$db->index_lookup_values(INDEXPOS, KEY1, KEY2, ...)
+    a more effective shortcut of
+
+     @records=$db->data_value($db->index_lookup((INDEXPOS, KEY1, KEY2, ...)))
+
+  @sorts=$db->index_lookup_sorts(INDEXPOS, KEY1, KEY2, ...)
+    a more effective shortcut of
+
+     @records=$db->data_sort($db->index_lookup((INDEXPOS, KEY1, KEY2, ...)))
+
+  $it=$db->iterator
+  $it=$db->iterator(1)
+    perhaps you want to iterate over all data records in a database. The
+    iterator returns a data record position:
+
+      $position=$it->()
+
+    If a true value is passed as parameter only deleted records are found
+    otherwise only valid ones.
+
+    $it is an MMapDB::Iterator object. Invoking any method on this iterator
+    results in a "E_NOT_IMPLEMENTED" exception.
+
+  $it=$db->index_iterator(POS, NTH)
+  ($it, $nitems)=$db->index_iterator(POS, NTH)
+    iterate over an index given by its position. The iterator returns a
+    partial key and a position list:
+
+      ($partkey, @positions)=$it->()
+
+    If called in array context the iterator and the number of items it will
+    iterate is returned.
+
+    The optional "NTH" parameter initially positions the iterator within the
+    index as MMapDB::Iterator->nth does.
+
+    "index_iterator()" can be used in combination with
+    index_lookup_position() to create and position an iterator:
+
+     $it=$db->index_iterator($db->index_lookup_position($db->mainidx, qw/key .../));
+
+    $it is an MMapDB::Iterator object.
+
+  $it=$db->id_index_iterator
+  ($it, $nitems)=$db->id_index_iterator
+    iterate over the ID index. The iterator returns 2 elements, the ID and
+    the data record position:
+
+      ($id, $position)=$it->()
+
+    If called in array context the iterator and the number of items it will
+    iterate is returned.
+
+    $it is an MMapDB::Iterator object.
+
+  ($id, $pos)=$db->insert([[KEY1, KEY2, ....], SORT, DATA])
+  ($id, $pos)=$db->insert([[KEY1, KEY2, ....], SORT, DATA, ID])
+    insert a new data record into the database. The ID parameter is optional
+    and should be ommitted in most cases. If it is ommitted the next
+    available ID is allocated and bound to the record. The ID and the
+    position in the new database version are returned. Note, that the
+    position cannot be used as parameter to the "data_record" method until
+    the transaction is committed.
+
+  $success=$db->delete_by_id(ID)
+  ($keys, $sort, $data, $id)=@{$db->delete_by_id(ID, 1)}
+    delete an data record by its ID. If the last parameter is true the
+    deleted record is returned if there is one. Otherwise only a status is
+    returned whether a record has been deleted by the ID or not.
+
+  $db->clear
+    deletes all data records from the database.
+
+  $pos=$db->mainidx
+    returns the main index position. You probably need this as parameter to
+    "index_lookup()".
+
+  $hashref=$db->main_index
+    This is an alternative way to access the database via tied hashes.
+
+      $db->main_index->{KEY1}->{KEY2}->[0]
+
+    returns almost the same as
+
+      $db->data_record( ($db->index_lookup($db->mainidx, KEY1, KEY2))[0] )
+
+    provided "[KEY1, KEY2]" point to an array of data records.
+
+    While it is easier to access the database this way it is also much
+    slower.
+
+    See also "The MMapDB::Index and MMapDB::IDIndex classes"
+
+  $db->datamode=$mode or $mode=$db->datamode
+    Set/Get the datamode for "%{$db->main_index}".
+
+    See also "The MMapDB::Index and MMapDB::IDIndex classes"
+
+  $hashref=$db->id_index
+    The same works for indices:
+
+      $db->id_index->{42}
+
+    returns almost the same as
+
+      $db->data_record( $db->id_index_lookup(42) )
+
+    See also "The MMapDB::Index and MMapDB::IDIndex classes"
+
+  $db->id_datamode=$mode or $mode=$db->id_datamode
+    Set/Get the datamode for "%{$db->id_index}".
+
+    See also "The MMapDB::Index and MMapDB::IDIndex classes"
+
+The "MMapDB::Index" and "MMapDB::IDIndex" classes
+    "$db->main_index" and "$db->id_index" elements are initialized when
+    "$db->start" is called. They simply point to empty anonymous hashes.
+    These hashes are then tied to these classes.
+
+    Now if a hash value is accessed the "FETCH" function of the tied object
+    checks whether the element points to another index (that means another
+    hash) or to a list of data records. The "$db->id_index" hash elements
+    are always data records. So, there is nothing to decide here.
+
+    If an index is found the reference of another anonymous hash is
+    returned. This hash itself is again tied to a "MMapDB::Index" object. If
+    a list of data records is found the reference of an anonymous array is
+    returned. The array itself is tied to a "MMapDB::Data" object.
+
+    All 3 classes, "MMapDB::Index", "MMapDB::IDIndex" and "MMapDB::Data"
+    have a property called "datamode". When a "MMapDB::Index" object creates
+    a new "MMapDB::Index" or "MMapDB::Data" object it passes its datamode
+    on.
+
+    The datamode itself is either "DATAMODE_NORMAL" or "DATAMODE_SIMPLE". It
+    affects only the behavior of a "MMapDB::Data" object. But since it is
+    passed on setting it for say "tied(%{$db->main_index})" affects all
+    "MMapDB::Data" leaves created afterwards.
+
+The "MMapDB::Data" class
+    When a list of data records is found by a "MMapDB::Index" or
+    "MMapDB::IDIndex" object it is tied to an instance of "MMapDB::Data".
+
+    The individual data records can be read in 2 modes "DATAMODE_NORMAL" and
+    "DATAMODE_SIMPLE". In normal mode the record is read with
+    "$db->data_record", in simple mode with "$db->data_value".
+
+    The following example shows the difference:
+
+    Create a database with a few data items:
+
+     my $db=MMapDB->new("mmdb");
+     $db->start; $db->begin;
+     $db->insert([["k1", "k2"], "0", "data1"]);
+     $db->insert([["k1", "k2"], "1", "data2"]);
+     $db->insert([["k2"], "0", "data3"]);
+     $db->commit;
+
+    Now, in "DATAMODE_NORMAL" it looks like:
+
+     {
+       k1 => {
+               k2 => [
+                       [['k1', 'k2'], '0', 'data1', 1],
+                       [['k1', 'k2'], '1', 'data2', 2],
+                     ],
+             },
+       k2 => [
+               [['k2'], '0', 'data3', 3],
+             ],
+     }
+
+    Now, we set "$db->datamode=DATAMODE_SIMPLE" and it looks like:
+
+     {
+       k1 => {
+               k2 => ['data1', 'data2'],
+             },
+       k2 => ['data3'],
+     }
+
+The "MMapDB::Iterator" class
+    To this class belong all iterators documented here. An iterator is
+    mainly simply called as function reference to fetch the next element:
+
+     $it->();
+
+    But sometimes one wants to reposition an iterator or ask it a question.
+    Here this class comes into play.
+
+    Some iterators don't implement all of the methods. In this case an
+    "E_NOT_IMPLEMENTED" exception is thrown.
+
+    The index and id-index iterators implement all methods.
+
+  $it->nth($n)
+  @el=$it->nth($n)
+    If called in void context the iterator position is moved to the $n'th
+    element. The element read by the next "$it->()" call will be this one.
+
+    If called in other context the iterator position is moved to the $n'th
+    element which then is returned. The next "$it->()" call will return the
+    "($n+1)"'th element.
+
+    An attempt to move the position outside its boundaries causes an
+    "E_RANGE" exception.
+
+  $it->cur
+    returns the current iterator position as an integer starting at 0 and
+    counting upwards by 1 for each element.
+
+  $it->nelem
+    returns the number of elements that the iterator will traverse.
+
+INHERITING FROM THIS MODULE
+    An "MMapDB" object is internally an array. If another module want to
+    inherit from "MMapDB" and needs to add other member data it can add
+    elements to the array. @MMapDB::attributes contains all attribute names
+    that "MMapDB" uses.
+
+    To add to this list the following scheme is recommended:
+
+     package MMapDB::XX;
+     use MMapDB;
+     our @ISA=('MMapDB');
+     our @attributes;
+
+     # add attribute accessors
+     BEGIN {
+       @attributes=(@MMapDB::attributes, qw/attribute1 attribute2 .../);
+       for( my $i=@MMapDB::attributes; $i<@attributes; $i++ ) {
+         my $method_num=$i;
+         no strict 'refs';
+         *{__PACKAGE__.'::'.$attributes[$method_num]}=
+            sub : lvalue {$_[0]->[$method_num]};
+       }
+     }
+
+    Now an "MMapDB::XX" object can call "$obj->filename" to get the "MMapDB"
+    filename attribute or "$obj->attribute1" to get its own "attribute1".
+
+    If another module then wants to inherit from "MMapDB::XX" it uses
+
+       @attributes=(@MMapDB::XX::attributes, qw/attribute1 attribute2 .../);
+       for( my $i=@MMapDB::XX::attributes; $i<@attributes; $i++ ) {
+         ...
+       }
+
+    Multiple inheritance is really tricky this way.
+
+EXPORT
+    None by default.
+
+    Error constants are imported by the ":error" tag.
+
+    "DATAMODE_SIMPLE" is imported by the ":mode" tag.
+
+    All constants are imported by the ":all" tag.
+
+READ PERFORMANCE
+    The "t/002-benchmark.t" test as the name suggests is mainly about
+    benchmarking. It is run only if the "BENCHMARK" environment variable is
+    set. E.g. on a "bash" command line:
+
+     BENCHMARK=1 make test
+
+    It creates a database with 10000 data records in a 2-level hash of
+    hashes structure. Then it finds the 2nd level hash with the largest
+    number of elements and looks for one of the keys there.
+
+    This is done for each database format using both "index_lookup" and the
+    tied interface. For comparison 2 perl hash lookups are also measured:
+
+     sub {(sub {scalar @{$c->{$_[0]}->{$_[1]}}})->($k1, $k2)};
+     sub {scalar @{$c->{$k1}->{$k2}}};
+
+    As result you can expect something like this:
+
+                 Rate mmdb_L mmdb_N mmdb_Q mmdb_J hash1 idxl_N idxl_Q idxl_J idxl_L hash2
+     mmdb_L   41489/s     --    -0%    -1%    -1%  -89%   -92%   -93%   -93%   -93%  -99%
+     mmdb_N   41696/s     1%     --    -0%    -1%  -89%   -92%   -93%   -93%   -93%  -99%
+     mmdb_Q   41755/s     1%     0%     --    -1%  -89%   -92%   -93%   -93%   -93%  -99%
+     mmdb_J   42011/s     1%     1%     1%     --  -89%   -92%   -93%   -93%   -93%  -99%
+     hash1   380075/s   816%   812%   810%   805%    --   -31%   -32%   -33%   -33%  -87%
+     idxl_N  548741/s  1223%  1216%  1214%  1206%   44%     --    -2%    -3%    -4%  -81%
+     idxl_Q  560469/s  1251%  1244%  1242%  1234%   47%     2%     --    -1%    -2%  -81%
+     idxl_J  568030/s  1269%  1262%  1260%  1252%   49%     4%     1%     --    -0%  -81%
+     idxl_L  570717/s  1276%  1269%  1267%  1258%   50%     4%     2%     0%     --  -81%
+     hash2  2963100/s  7042%  7006%  6996%  6953%  680%   440%   429%   422%   419%    --
+
+    The "mmdb" tests use the tied interface. "idxl" means "index_lookup".
+    "hash1" is the first of the 2 perl hash lookups above, "hash2" the 2nd.
+
+    "hash2" is naturally by far the fastest. But add one anonymous function
+    level and "idxl" becomes similar. Further, the "N" format on this
+    machine requires byte rearrangement. So, it is expected to be slower.
+    But it differs only in a few percents from the other "idxl".
+
+BACKUP AND RESTORE
+    The database consists only of one file. So a backup is in principle a
+    simple copy operation. But there is a subtle pitfall.
+
+    If there are writers active while the copy is in progress it may become
+    invalid between the opening of the database file and the read of the
+    first block.
+
+    So, a better way is this:
+
+     perl -MMMapDB -e 'MMapDB->new(filename=>shift)->backup' DATABASENAME
+
+    To restore a database use this one:
+
+     perl -MMMapDB -e 'MMapDB->new(filename=>shift)->restore' DATABASENAME
+
+    See also backup() and restore()
+
+DISK LAYOUT
+    In this paragraph the letter *S* is used to designate a number of 4 or 8
+    bytes according to the "intfmt". The letter *F* is used as a variable
+    holding that format. So, when you see "F/a*" think "N/a*" or "Q/a*" etc.
+    according to "intfmt".
+
+    If an integer is used somewhere in the database it is aligned correctly.
+    So, 4-byte integer values are located at positions divisible by 4 and
+    8-byte integers are at positions divisible by 8. This also requires
+    strings to be padded up to the next divisible by 4 or 8 position.
+
+    Strings are always packed as "F/a*" and padded up to the next S byte
+    boundary. With "pack" this can be achieved with "F/a* x!S" where "F" is
+    one of "N", "L", "J" or "Q" and "S" either 4 or 8.
+
+    The database can be divided into a few major sections:
+
+    *   the database header
+
+    *   the data records
+
+    *   the indices
+
+    *   the string table
+
+  Differences between database format 0 and 1
+    Format 0 and 1 are in great parts equal. Only the database header and
+    the string table entry slightly differ.
+
+  The database header
+   Database Format 0
+    At start of each database comes a descriptor:
+
+     +----------------------------------+
+     | MAGIC NUMBER (4 bytes) == 'MMDB' |
+     +----------------------------------+
+     | FORMAT (1 byte) + 3 bytes resrvd |
+     +----------------------------------+
+     | MAIN INDEX POSITION (S bytes)    |
+     +----------------------------------+
+     | ID INDEX POSITION (S bytes)      |
+     +----------------------------------+
+     | NEXT AVAILABLE ID (S bytes)      |
+     +----------------------------------+
+     | STRING TABLE POSITION (S bytes)  |
+     +----------------------------------+
+
+    The magic number always contains the string "MMDB". The "FORMAT" byte
+    contains the "pack" format letter that describes the integer format of
+    the database. It corresponds to the "intfmt" property. When a database
+    becomes invalid a NULL byte is written at this location.
+
+    Main Index position is the file position just after all data records
+    where the main index resides.
+
+    ID Index is the last index written to the file. This field contains its
+    position.
+
+    The "NEXT AVAILABLE ID" field contains the next ID to be allocated.
+
+    The "STRING TABLE POSITION" keeps the offset of the string table at the
+    end of the file.
+
+   Database Format 1
+    At start of each database comes a descriptor:
+
+     +----------------------------------+
+     | MAGIC NUMBER (4 bytes) == 'MMDC' |
+     +----------------------------------+
+     | FORMAT (1 byte)                  |
+     +----------------------------------+
+     | FLAGS  (1 byte)                  |
+     +----------------------------------+
+     | 2 bytes reserved                 |
+     +----------------------------------+
+     | MAIN INDEX POSITION (S bytes)    |
+     +----------------------------------+
+     | ID INDEX POSITION (S bytes)      |
+     +----------------------------------+
+     | NEXT AVAILABLE ID (S bytes)      |
+     +----------------------------------+
+     | STRING TABLE POSITION (S bytes)  |
+     +----------------------------------+
+
+    In format 1 the database header sightly differs. The magic number is now
+    "MMDC" instead of "MMDB". One of the reserved bytes following the format
+    indicator is used as flags field.
+
+    All other fields remain the same.
+
+  Data Records
+    Just after the descriptor follows an arbitrary umber of data records. In
+    the following diagrams the "pack" format is shown after most of the
+    fields. Each record is laid out this way:
+
+     +----------------------------------+
+     | VALID FLAG (S bytes)             |
+     +----------------------------------+
+     | ID (S bytes)                     |
+     +----------------------------------+
+     | NKEYS (S bytes)                  |
+     +----------------------------------+
+     ¦                                  ¦
+     ¦ KEY POSITIONS (NKEYS * S bytes)  ¦
+     ¦                                  ¦
+     +----------------------------------+
+     | SORT POSITION                    |
+     +----------------------------------+
+     | DATA POSITION                    |
+     +----------------------------------+
+
+    A data record consists of a certain number of keys, an ID, a sorting
+    field and of course the data itself. The key, sort and data positions
+    are offsets from the start of the string table.
+
+    The "valid" flag is 1 if the data is active or 0 if it has been deleted.
+    In the latter case the next transaction will purge the database.
+
+  The Index
+    Just after the data section follows the main index. Its starting
+    position is part of the header. After the main index an arbitrary number
+    of subindices may follow. The last index in the database is the ID
+    index.
+
+    An index is mainly an ordered list of strings each of which points to a
+    list of positions. If an index element points to another index this list
+    contains 1 element, the position of the index. If it points to data
+    records the position list is ordered according to the sorting field of
+    the data items.
+
+    An index starts with a short header consisting of 2 numbers followed by
+    constant length index records:
+
+     +----------------------------------+
+     | NRECORDS (S bytes)               |
+     +----------------------------------+
+     | RECORDLEN (S bytes)              |  in units of integers
+     +----------------------------------+
+     ¦                                  ¦
+     ¦ constant length records          ¦
+     ¦                                  ¦
+     +----------------------------------+
+
+    The record length is a property of the index itself. It is the length of
+    the longest index record constituting the index. It is expressed in
+    units of "S" bytes.
+
+    Each record looks like this:
+
+     +----------------------------------+
+     | KEY POSITION (S bytes)           |
+     +----------------------------------+
+     | NPOS (S bytes)                   |
+     +----------------------------------+
+     ¦                                  ¦
+     ¦ POSITION LIST (NPOS * S bytes)   ¦
+     ¦                                  ¦
+     +----------------------------------+
+     ¦                                  ¦
+     ¦ padding up to RECORDLEN          ¦
+     ¦                                  ¦
+     +----------------------------------+
+
+    The "KEY POSITION" contains the offset of the record's partial key from
+    the start of the string table. "NPOS" is the number of elements of the
+    subsequent position list. Each position list element is the starting
+    point of a data record or another index relativ to the start of the
+    file.
+
+  The string table
+   Database Format 0
+    The string table is located at the end of the database file that so far
+    consists only of integers. There is no structure in the string table.
+    All strings are simply padded to the next integer boundary and
+    concatenated.
+
+    Each string is encoded with the "F/a* x!S" pack-format:
+
+     +----------------------------------+
+     | LENGTH (S bytes)                 |
+     +----------------------------------+
+     ¦                                  ¦
+     ¦ OCTETS (LENGTH bytes)            ¦
+     ¦                                  ¦
+     +----------------------------------+
+     ¦                                  ¦
+     ¦ padding                          ¦
+     ¦                                  ¦
+     +----------------------------------+
+
+   Database Format 1
+    In database format 1 a byte representing the utf8-ness is appended to
+    each string. The pack-format "F/a*C x!S" is used:
+
+     +----------------------------------+
+     | LENGTH (S bytes)                 |
+     +----------------------------------+
+     ¦                                  ¦
+     ¦ OCTETS (LENGTH bytes)            ¦
+     ¦                                  ¦
+     +----------------------------------+
+     ¦ UTF8 INDICATOR (1 byte)          ¦
+     +----------------------------------+
+     ¦                                  ¦
+     ¦ padding                          ¦
+     ¦                                  ¦
+     +----------------------------------+
+
+AUTHOR
+    Torsten Förtsch, <torsten.foertsch@gmx.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009-2010 by Torsten Förtsch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.0 or, at
+    your option, any later version of Perl 5 you may have available.
+

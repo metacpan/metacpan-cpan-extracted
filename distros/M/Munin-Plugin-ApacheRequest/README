@@ -1,0 +1,50 @@
+Munin-Plugin-ApacheRequest
+==========================
+
+The module provides the mechanism to trigger Apache request monitoring for a 
+specific VHOST, using Munin.
+
+This distribution is based on a script written by Nicolas Mendoza.
+
+NOTE: In order to use this module, you will need to add a field in your Apache 
+logs showing time executed. This is normally done using the %T (seconds) or 
+%D (microseconds). For instance: 
+
+    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\" %T %v"
+
+See http://httpd.apache.org/docs/2.2/mod/mod_log_config.html#formats for 
+more info.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules to run, however, it does use several
+modules during testing.
+
+For testing the module requires these modules:
+
+  IO::File
+  Test::Trap
+  Test::More
+
+For optional testing the module would like these modules:
+
+  Test::CPAN::Meta
+  Test::CPAN::Meta::JSON
+  Test::Pod
+  Test::Pod::Coverage
+
+COPYRIGHT AND LICENSE
+
+  Copyright (C) 2008-2014 Barbie for Miss Barbell Productions
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

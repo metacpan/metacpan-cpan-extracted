@@ -1,0 +1,62 @@
+---
+abstract: 'Utility for XS'
+author:
+  - 'Goro Fuji, is original author of Module::Install::XSUtil.'
+build_requires:
+  Test::Module::Build::Pluggable: '0'
+  Test::More: '0.98'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Build-Pluggable-XSUtil
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Devel::WantXS:
+    file: lib/Devel/WantXS.pm
+  Devel::XSHelper:
+    file: lib/Devel/XSHelper.pm
+    version: '1.03'
+  Module::Build::Pluggable::CheckLib:
+    file: lib/Module/Build/Pluggable/CheckLib.pm
+    version: '1.03'
+  Module::Build::Pluggable::XSUtil:
+    file: lib/Module/Build/Pluggable/XSUtil.pm
+    version: '1.03'
+requires:
+  Devel::CheckCompiler: '0.02'
+  Devel::CheckLib: '0.04'
+  Devel::PPPort: '3.19'
+  Exporter: '0'
+  ExtUtils::CBuilder: '0'
+  ExtUtils::ParseXS: '2.21'
+  Module::Build::Pluggable: '0.10'
+  Module::Build::Pluggable::Base: '0'
+  XSLoader: '0.02'
+  parent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/tokuhirom/Module-Build-Pluggable-XSUtil/issues
+  homepage: https://github.com/tokuhirom/Module-Build-Pluggable-XSUtil
+  repository: git://github.com/tokuhirom/Module-Build-Pluggable-XSUtil.git
+version: '1.03'
+x_authority: cpan:TOKUHIROM
+x_contributors:
+  - 'hideo55 <hide.o.j55@gmail.com>'
+  - 'jfoug <jfoug@cox.net>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

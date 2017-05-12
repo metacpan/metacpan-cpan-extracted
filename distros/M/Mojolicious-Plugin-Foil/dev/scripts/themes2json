@@ -1,0 +1,138 @@
+#! /usr/bin/env perl
+
+=head1 NAME
+
+themes2json - Generates a JSON file listing all the themes.
+
+=head1 SYNOPSIS
+
+themes2json --help | --manpage | --version
+
+themes2json --themedir I<directory>
+
+=head1 DESCRIPTION
+
+Generates a JSON file listing all the themes.
+
+=head1 OPTIONS
+
+=over
+
+=item --help
+
+Display short help and exit.
+
+=item --manpage
+
+Display full documentation and exit.
+
+=item --verbose
+
+Make the output verbose.
+
+=back
+
+=cut
+use common::sense;
+use Getopt::Long;
+use Getopt::ArgvFile qw(argvFile);
+use Pod::Usage;
+use File::Basename;
+
+use FindBin;
+use Cwd 'abs_path';
+use File::Slurper 'read_dir';
+use File::Serialize { pretty => 1 };
+
+#========================================================
+# Subroutines
+
+sub process_args () {
+    my $opts = {
+    };
+
+    # check the rc file
+    my $nameBuilder=sub
+    {
+        my $bn = basename($_[0], '');
+        [".${bn}rc", ".${bn}/config", ".config/${bn}/config"];
+    };
+    argvFile(
+        startupFilename=>$nameBuilder,
+        home=>1,
+        current=>1);
+
+    my $op = new Getopt::Long::Parser;
+    $op->configure(qw(auto_version auto_help));
+    $op->getoptions($opts,
+	       'verbose+',
+	       'manpage',
+	       'dry_run|n!',
+	       'themedir=s',
+	      ) or pod2usage(2);
+
+    if ($opts->{manpage})
+    {
+	pod2usage({ -message => "$0",
+		    -exitval => 0,
+		    -verbose => 2,
+	    });
+    }
+
+    if (!-d $opts->{themedir})
+    {
+        pod2usage({ -message => "$0\nthemedir '$opts->{themedir}' not found",
+                -exitval => 2,
+                -verbose => 0,
+            });
+    }
+
+    return $opts;
+} # process_args
+
+sub find_theme_names ($) {
+    my $opts = shift;
+    
+    my %themes = ();
+    my @files = read_dir($opts->{themedir});
+    for (my $i = 0; $i < @files; $i++)
+    {
+        if ($files[$i] =~ /^theme_(.*)\.scss$/)
+        {
+            my $theme = $1;
+            my $dark_on_light = 1;
+            # check if this theme is light_on_dark or dark_on_light
+            open( INPUTFILE, $opts->{themedir} . '/' . $files[$i] ) or die "$!";
+
+            while (<INPUTFILE>)
+            {
+                if ( $_ =~ m/dark_on_light/ )
+                {
+                    $dark_on_light = 1; 
+                    last;
+                }
+                if ( $_ =~ m/light_on_dark/ )
+                {
+                    $dark_on_light = 0; 
+                    last;
+                }
+            }
+            close(INPUTFILE);
+
+            $themes{$theme} = ($dark_on_light ? 'logo_dark' : 'logo_light');
+        }
+    }
+    return \%themes;
+} # find_theme_names
+
+#========================================================
+# Main
+
+MAIN: {
+    my $opts = process_args();
+
+    my $d = ();
+    $d->{themes} = find_theme_names($opts);
+    my $json_file = $opts->{themedir} . "/themes.json";
+    serialize_file $json_file => $d;
+}

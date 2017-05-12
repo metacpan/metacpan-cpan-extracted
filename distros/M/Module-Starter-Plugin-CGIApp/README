@@ -1,0 +1,123 @@
+Module-Starter-Plugin-CGIApp
+
+This is a plugin for Module::Starter that builds you a skeleton 
+CGI::Application module with all the extra files needed to package it for 
+CPAN. You can customize the output using HTML::Template.
+
+INSTALLATION
+
+If you have the Module::Signature module installed, you can verify the
+integrity of this distribution by typing:
+
+    cpansign -v
+
+Module::Signature requires GnuPG which you can get from: 
+http://www.gnupg.org/download/
+A binary version for Windows is available from that page.
+        
+Then to install this module, run the following commands:
+
+    perl Build.pl
+    ./Build
+    ./Build test
+    ./Build install
+    
+On Windows you don't need to type the preliminary ./
+
+Alternatively, you can do:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If you are using ActiveState perl on Windows and you don't have a make 
+utility, you can download nmake from:
+http://download.microsoft.com/download/vc15/patch/1.52/w95/en-us/nmake15.exe
+(Replace make with nmake in the instructions above if you are using it.)
+
+If you are using Strawberry perl on Windows, it comes with a make utility 
+called dmake.  (Replace make with dmake in the instructions above if you are
+using it.)
+
+NOTE: At the moment, some of the tests will fail on Windows if the path to the 
+directory you unpacked the distribution in has spaces in it.  Either skip the 
+tests or move to another directory.
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+perl 5.008
+File::ShareDir
+HTML::Template
+Module::Starter        1.70
+
+At build time you will need the above modules plus the following if you want
+to run the tests:
+
+File::Copy::Recursive
+File::DirCompare
+Test::More
+Test::MockTime
+Time::Piece            1.12
+
+The signature can be tested by installing the following module:
+
+Module::Signature
+
+and setting the environment variable TEST_SIGNATURE to 1.
+
+Further tests are enabled by setting the environment variable RELEASE_TESTING
+to 1 and installing the following modules:
+
+Perl::Critic           1.098
+Perl::MinimumVersion   1.20
+Pod::Coverage          0.18
+Pod::Simple            3.07
+Test::CPAN::Meta       0.12
+Test::DistManifest     1.003
+Test::HasVersion       0.012
+Test::Kwalitee
+Test::MinimumVersion   0.008
+Test::Perl::Critic     1.01
+Test::Pod              1.26
+Test::Pod::Coverage    1.08
+
+They are all available on CPAN (http://www.cpan.org)
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc 
+command.
+
+    perldoc Module::Starter::Plugin::CGIApp
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Module-Starter-Plugin-CGIApp
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Module-Starter-Plugin-CGIApp
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Module-Starter-Plugin-CGIApp
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Module-Starter-Plugin-CGIApp
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015, Consolidated Braincells Inc.  All Rights Reserved.
+
+This distribution is free software; you can redistribute it and/or modify it
+under the terms of either:
+
+a) the GNU General Public License as published by the Free Software
+Foundation; either version 1, or (at your option) any later version, or
+
+b) the Artistic License version 1.0 or a later version.
+
+The full text of the license can be found in the LICENSE file included
+with this distribution.

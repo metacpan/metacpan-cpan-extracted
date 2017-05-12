@@ -1,0 +1,11 @@
+This has been tested only under MPE/iX 6.0
+
+Try to get the latest GNU gcc build from jazz (http://jazz.external.hp.com)
+This was tested with the 20 December 2000 build.  Some earlier builds do
+not have a correct 'ld' command.
+
+The usual command sequence should work:
+   perl Makefile.PL
+   make
+   make test
+   make install

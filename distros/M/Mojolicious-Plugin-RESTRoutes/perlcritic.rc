@@ -1,0 +1,2 @@
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Modern::Perl

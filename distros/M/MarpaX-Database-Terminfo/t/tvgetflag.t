@@ -1,0 +1,28 @@
+#!perl -T
+use strict;
+use warnings FATAL => 'all';
+use Test::More tests => 3;
+use File::Spec;
+use Path::Tiny qw/path/;
+
+my $path;
+
+BEGIN { $path = path(File::Spec->curdir)->absolute->stringify;
+        $path =~ /(.*)/;
+        $path = $1;
+}
+
+use Test::File::ShareDir
+    -root  =>  $path,
+    -share =>  {
+        -module => { 'MarpaX::Database::Terminfo' => File::Spec->curdir },
+        -dist => { 'MarpaX-Database-Terminfo' => File::Spec->curdir },
+};
+#------------------------------------------------------
+BEGIN {
+    use_ok( 'MarpaX::Database::Terminfo::Interface', qw/:functions/ ) || print "Bail out!\n";
+}
+my $t = MarpaX::Database::Terminfo::Interface->new();
+$t->tgetent('dumb');
+is($t->tvgetflag('notexisting'), 0, "\$t->tvgetflag('notexisting') returns false");
+is($t->tvgetflag('auto_right_margin'), 1, "\$t->tvgetflag('auto_right_margin') returns true");

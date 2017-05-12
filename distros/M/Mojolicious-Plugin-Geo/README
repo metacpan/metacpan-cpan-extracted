@@ -1,0 +1,9 @@
+This uses a geo server that I am pretty sure is from a spyware company. What you do with this is at your own risk. I have no rights nor do I claim to with the geo server used...
+
+Usage:
+
+plugin 'geo'
+
+$self->geo('ip');
+
+Returns an object with some fields about the location

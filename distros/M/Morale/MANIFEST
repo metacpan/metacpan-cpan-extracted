@@ -1,0 +1,8 @@
+CHANGES
+COPYRIGHT
+lib/Morale.pm
+Makefile.PL
+MANIFEST
+README
+script/tkmorale
+t/basic.t

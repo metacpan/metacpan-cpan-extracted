@@ -1,0 +1,40 @@
+ChangeLog				Module history
+MANIFEST				This file
+MANIFEST.SKIP
+Makefile.PL				Makefile generator
+README					The programs installation and use
+lib/Bundle/Mail/IspMailGate.pm		A bundle for CPAN installation
+lib/Mail/IspMailGate/Install.pm		Interactive configuration module
+lib/Mail/IspMailGate/Parser.pm		Our MIME::Parser subclass
+lib/Mail/IspMailGate/Filter.pm		Base filter class
+lib/Mail/IspMailGate/Filter/Banner.pm	Filter adding a banner message.
+lib/Mail/IspMailGate/Filter/Packer.pm	Compression/Decompression filter
+lib/Mail/IspMailGate/Filter/Dummy.pm	Dummy filter
+lib/Mail/IspMailGate/Filter/VirScan.pm	Virus scanning filter
+lib/Mail/IspMailGate/Filter/PGP.pm	PGP encryption/decryption filter
+lib/Mail/IspMailGate/Test.pm		Test support functions
+lib/Mail/IspMailGate.pm			The programs main module
+lib/MIME/Decoder/PGP.pm			The MIME::Decoder::PGP module
+ispMailGate.c				Source of the wrapper program
+ispMailGateD.PL				The main program
+t/01base.t				Base test - loads modules and exits
+t/02system.t				Checks for system environment
+t/10dummy.t				Dummy filter test
+t/11packer.t				Packer filter test
+t/12virscan.t				Virus scanning filter test
+t/13pgp.t				PGP filter test
+t/14antivir.t				AntiVir virus scanner test
+t/15banner.t				Banner filter test
+t/20mail-dummy.t			Test IspMailGate -> Dummy filter
+t/21mail-packer.t			Test IspMailGate -> Packer filter
+t/22mail-virscan.t			Test IspMailGate -> Virus scanner
+t/23mail-pgp.t				Test IspMailGate -> PGP filter
+t/24mail-antivir.t			Test IspMailGate -> AntiVir scanner
+t/eicar.com				Pseudo "Virus" for AntiVir tests
+t/virscan				Dummy virus scanner
+examples/pubring.pgp			Dummy PGP files for testing the
+examples/randseed.bin			PGP filter
+examples/secring.pgp
+examples/sendmail.mc			Example sendmail configuration
+examples/sendmail.mc2			Example configutation for 2nd sendmail
+examples/ispmailgate.m4			Example mailer

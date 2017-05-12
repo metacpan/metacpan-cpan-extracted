@@ -1,0 +1,32 @@
+--- import_logs.py	2014-05-25 22:37:31.000000000 -0500
++++ import_logs.py	2016-04-02 12:37:30.202983529 -0500
+@@ -1278,6 +1278,7 @@
+             'idsite': site_id,
+             'dp': '0' if config.options.reverse_dns else '1',
+             'ua': hit.user_agent.encode('utf8'),
++            'cvar': '{}',  
+         }
+         if config.options.replay_tracking:
+             # prevent request to be force recorded when option replay-tracking
+@@ -1308,6 +1309,21 @@
+ 
+         if hit.generation_time_milli > 0:
+             args['gt_ms'] = hit.generation_time_milli
++
++        q = ''
++        p = re.compile('\?(.*)$')
++        m = p.search(url)
++        if m.group(1):
++                q = '&'+m.group(1)
++                args['_cvar'] = json.loads(args['_cvar'])
++                args['_cvar'][str(2)] = "foo"
++                c = len(args['_cvar'].keys())
++                p = re.compile(r'&(pk\_[^=]+)=(.*?)(?:&|$)')
++                for (k, v) in re.findall(p, q):
++                        ++c
++                        args['_cvar'][str(c)] = [k,v]
++                args['_cvar'] = json.dumps(args['_cvar'])
++
+         return args
+ 
+     def _record_hits(self, hits):

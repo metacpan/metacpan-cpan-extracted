@@ -1,0 +1,30 @@
+---
+abstract: 'Take a REST inside Moose'
+author:
+  - 'Shutterstock Webstack Team'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.06'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-Role-REST-Consumer
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker::CPANfile: '0'
+  Moose: '0'
+  MooseX::Role::Parameterized: '0'
+  REST::Consumer: '1.02'
+  Test::Easy: '1.09'
+  Test::Exception: '0'
+  Try::Tiny: '0'
+  WWW::Curl::UserAgent: '0'
+version: '0.003'

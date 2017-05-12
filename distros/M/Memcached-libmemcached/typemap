@@ -1,0 +1,180 @@
+###############################################################################
+##
+##    Typemap for Memcached::libmemcached objects
+##
+##    Copyright (c) 2007 Tim Bunce
+##    All rights reserved.
+##
+###############################################################################
+## vi:et:sw=4 ts=4
+
+TYPEMAP
+
+# --- some basic types not in the perl 5.6 typemap
+const char *           T_PV
+size_t                 T_UV
+
+
+# --- simple types ---
+memcached_behavior                      T_IV
+memcached_callback                      T_IV
+memcached_return                        T_RETURN
+
+# --- generic simple types ---
+# general uint16_t
+uint16_t                                T_UV
+# XXX need to at least document this as an issue
+# Could also check at build time if this perl has 64bit ints and use UV if so
+uint64_t                                T_NV
+
+# --- perl api private abstraction typedefs ---
+lmc_key                                 T_KEY
+lmc_value                               T_VALUE
+lmc_expiration                          T_EXPIRATION
+lmc_data_flags_t                        T_FLAGS
+
+# --- complex types (incl. objects, typedef name encodes class name) ---
+# XXX memory management may be reworked to store structure in scalars
+Memcached__libmemcached                 T_MEMCACHED
+
+
+INPUT
+T_HVREF
+    if (!SvROK($arg) || !SvTYPE(SvRV($arg))==SVt_PVHV)
+        Perl_croak(aTHX_ \"$var is not a hash reference\");
+    $var = (HV*)SvRV($arg);
+
+INPUT
+T_RETURN
+        /* T_RETURN */
+        $var = (SvOK($arg)) ? ($type)SvIV($arg) : 0;
+
+OUTPUT
+T_RETURN:init
+        /* T_RETURN:init */
+        LMC_RECORD_RETURN_ERR(\"${func_name}\", ptr, $var);
+T_RETURN
+        /* T_RETURN */
+        if (!SvREADONLY($arg)) {
+            if (LMC_RETURN_OK($var)) {
+                sv_setsv($arg, &PL_sv_yes);
+            }
+            else if ($var == MEMCACHED_NOTFOUND) {
+                sv_setsv($arg, &PL_sv_no);
+            }
+            else {
+                SvOK_off($arg);
+            }
+        }
+
+INPUT
+T_PV
+        /* treat undef as null pointer (output does the inverse) */
+        $var = (SvOK($arg)) ? ($type)SvPV_nolen($arg) : NULL;
+
+INPUT
+T_KEY
+        /* T_KEY */
+        $var = ($type)SvPV($arg, $length_var);
+
+OUTPUT
+T_KEY
+        /* T_KEY */
+        /* assumes the existance of a key_length variable holding the length */
+        if (!SvREADONLY($arg))
+            sv_setpvn((SV*)$arg, $var, key_length);
+
+INPUT
+T_VALUE
+        /* T_VALUE - main code in T_VALUE:pre_call below (so it can access/modify flags) */
+        /* mention $length_var here to keep ParseXS happy for now */
+T_VALUE:pre_call
+        /* T_VALUE:pre_call */
+        if (SvOK(LMC_STATE_FROM_PTR(ptr)->cb_context->set_cb)) {
+            /* XXX ignoring flags till we have a better mechanism */
+            SV *key_sv, *value_sv, *flags_sv;
+            /* these SVs may get cached inside lmc_cb_context_st and reused across calls */
+            /* which would save the create,mortalize,destroy costs for each invocation  */
+            key_sv   = sv_2mortal(newSVpv(key,   STRLEN_length_of_key));
+            value_sv = sv_mortalcopy($arg); /* original SV, as it may be a ref */
+            flags_sv = sv_2mortal(newSVuv(flags));
+            SvREADONLY_on(key_sv); /* just to be sure for now, may allow later */
+            _cb_fire_perl_set_cb(ptr, key_sv, value_sv, flags_sv);
+            /* recover possibly modified values (except key) */
+            $var = SvPV(value_sv, $length_var);
+            flags = SvUV(flags_sv);
+        }
+        else {
+            $var = ($type)SvPV($arg, $length_var);
+        }
+
+OUTPUT
+T_VALUE
+        /* T_VALUE */
+        /* assumes the existance of a value_length variable holding the length */
+        if (!SvREADONLY($arg))
+            sv_setpvn((SV*)$arg, $var, value_length);
+
+INPUT
+T_FLAGS
+        /* T_FLAGS */
+        $var = (SvOK($arg)) ? ($type)SvUV($arg) : 0;
+
+OUTPUT
+T_FLAGS
+        /* T_FLAGS */
+        if (!SvREADONLY($arg))
+            sv_setuv($arg, (UV)$var);
+
+INPUT
+T_EXPIRATION
+        /* T_EXPIRATION */
+        $var = (SvOK($arg)) ? ($type)SvUV($arg) : 0;
+
+OUTPUT
+T_MEMCACHED
+        /* T_MEMCACHED */
+        if (!$var)          /* if null */
+            SvOK_off($arg); /* then return as undef instead of reaf to undef */
+        else {
+            /* setup $arg as a ref to a blessed hash hv */
+            lmc_state_st *lmc_state;
+            HV *hv = newHV();
+            const char *classname = \"${(my $ntt=$ntype)=~s/__/::/g;\$ntt}\";
+            /* take (sub)class name to use from class_sv if appropriate */
+            if (class_sv && SvOK(class_sv) && sv_derived_from(class_sv, classname))
+                classname = (SvROK(class_sv)) ? sv_reftype(class_sv, 0) : SvPV_nolen(class_sv);
+            sv_setsv($arg, sv_2mortal(newRV_noinc((SV*)hv)));
+            (void)sv_bless($arg, gv_stashpv(classname, TRUE));
+
+            /* allocate an lmc_state struct and attach via MEMCACHED_CALLBACK_USER_DATA */
+            lmc_state = lmc_state_new($var, hv);
+            memcached_callback_set($var, MEMCACHED_CALLBACK_USER_DATA, lmc_state);
+
+            /* now attach $var to the HV */
+            /* done as two steps to avoid sv_magic SvREFCNT_inc and MGf_REFCOUNTED */
+            sv_magic((SV*)hv, NULL, '~', NULL, 0);
+            LMC_STATE_FROM_SV($arg) = (void*)lmc_state;
+        }
+        if (LMC_TRACE_LEVEL_FROM_PTR($var) >= 2)
+            warn(\"\t<= %s(%s %s = %p)\", \"${func_name}\", \"${ntype}\", \"${var}\", (void*)$var);
+
+INPUT
+T_MEMCACHED
+        /* T_MEMCACHED */
+        if (!SvOK($arg)) {  /* undef         */
+            $var = NULL;    /* treat as null */
+        }
+        else if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/__/::/g;\$ntt}\")) {
+            if (SvROK($arg)) {
+                $var = (memcached_st*)LMC_PTR_FROM_SV($arg);
+            }
+            else { /* memcached_st ptr already freed or is a class name */
+                $var = NULL;
+            }
+        }
+        else
+            croak(\"$var is not of type ${(my $ntt=$ntype)=~s/__/::/g;\$ntt}\");
+        if (LMC_TRACE_LEVEL_FROM_PTR($var) >= 2)
+            warn(\"\t=> %s(%s %s = 0x%p)\", \"${func_name}\", \"${ntype}\", \"${var}\", (void*)$var);
+

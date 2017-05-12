@@ -1,0 +1,8 @@
+Revision history for McBain-WithZeroMQ
+
+2.000000  2014-08-19 18:56:38+03:00 Asia/Jerusalem
+	- Updated docs on how to use this runner module as McBain
+	  no longer uses the MCBAIN_WITH environment variable.
+
+1.000000  2014-03-31 20:20:40+03:00 Asia/Jerusalem
+	- First public release

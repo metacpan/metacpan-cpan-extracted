@@ -1,0 +1,121 @@
+#!/usr/bin/env perl
+
+use 5.01;
+use strict;
+use warnings;
+use version; our $VERSION = qv( '0.6' );
+use lib                     qw( lib );
+
+use Date::Format            qw( time2str );
+use English                 qw( -no_match_vars );
+use File::Spec::Functions   qw( catfile updir );
+use Module::Metadata;
+use Perl::Version;
+
+sub __read_all_from ($) {
+   my $path = shift;
+
+   open my $fh, '<', $path or die "Path ${path} cannot open: ${OS_ERROR}";
+
+   local $RS = undef; my $content = <$fh>; close $fh; return $content;
+}
+
+sub __write_data_to ($$) {
+   my ($path, $data) = @_;
+
+   open my $fh, '>', $path or die "Path ${path} cannot open: ${OS_ERROR}";
+
+   print {$fh} $data; close $fh; return;
+}
+
+sub __get_module_from ($) {
+   return
+      (map    { s{ [-] }{::}gmx; $_ }
+       map    { m{ \A [q\'\"] }mx ? eval $_ : $_ }
+       map    { m{ \A \s* (?:module|name) \s+ [=]?[>]? \s* ([^,;]+) [,;]? }imx }
+       grep   { m{ \A \s*   (module|name) }imx }
+       split m{ [\n] }mx, $_[ 0 ])[ 0 ];
+}
+
+sub __get_ignore_rev_regex () {
+   my $ignore_rev_file = '.gitignore-rev'; -f $ignore_rev_file or return;
+
+   my $paths = __read_all_from $ignore_rev_file; chomp $paths;
+
+   return join '|', split m{ [\n] }mx, $paths;
+}
+
+sub __update_version ($$) {
+   my ($rev_ref, $path) = @_;
+
+   my $rev = ${ $rev_ref }; my $content = __read_all_from $path;
+
+   $content =~ m{ \$ (Rev (?:ision)?) (?:[:] \s+ (\d+) \s+)? \$ }mx or return 0;
+   $content =~ s{ \$ (Rev (?:ision)?) (?:[:] \s+ (\d+) \s+)? \$ }{\$$1\$}gmx;
+   $rev < ($2 || 0) + 1 and $rev = ${ $rev_ref } = ($2 || 0) + 1;
+   $content =~ s{ \$ (Rev (?:ision)?) \$ }{\$$1: $rev \$}gmx;
+   __write_data_to $path, $content;
+
+   my $cmd = "git add ${path}"; qx{ $cmd };
+
+   return 1;
+}
+
+my ($module, $rev, $rev_file);
+
+my $project_file = -f 'dist.ini'    ? 'dist.ini'    :
+                   -f 'Build.PL'    ? 'Build.PL'    :
+                   -f 'Makefile.PL' ? 'Makefile.PL' : undef;
+
+if (defined $project_file) {
+   $module = __get_module_from __read_all_from $project_file;
+
+   my $distname = lc $module; $distname =~ s{ :: }{-}gmx;
+
+   $rev_file = catfile( updir, ".${distname}.rev" );
+
+   if (-f $rev_file) { $rev = __read_all_from $rev_file; chomp $rev; $rev++ }
+}
+
+if (defined $rev and qx{ git branch 2>/dev/null } =~ m{ ^ [*] \s+ master }mx) {
+   my $main   = catfile( 'lib', split m{ :: }mx, "${module}.pm" );
+   my @stat   = split m{ \n }mx, qx{ git status --porcelain };
+   my $ignore = __get_ignore_rev_regex;
+   my $found  = 0;
+
+   for my $path (map { s{ \A .+ \s+ }{}mx; $_ } grep { m{ \A [AM] }mx } @stat) {
+      $ignore and $path =~ m{ (?: $ignore ) }mx and next; $found = 1;
+      $main   ne  $path and __update_version \$rev, $path;
+   }
+
+   $found and __update_version \$rev, $main
+          and __write_data_to $rev_file, "${rev}\n";
+}
+
+my $change_file = 'Changes';
+
+if (-f $change_file) {
+   my $changes    = __read_all_from $change_file;
+   my $change_ver = qv( (split q( ),
+                         (grep { m{ \A v? [0-9._]+ }mx } split m{ [\n] }mx,
+                          $changes)[ 0 ] || q())[ 0 ] || '0.1.1' );
+   my $meta       = defined $module
+                  ? Module::Metadata->new_from_module( $module ) : undef;
+   my $module_ver = $meta ? $meta->version : qv( '0.1.1' );
+
+   $meta or warn 'No meta object for module '.($module // '<undef>');
+
+   my $pmv = Perl::Version->new( $module_ver ); $pmv->components( 2 );
+   my $pcv = Perl::Version->new( $change_ver ); $pcv->components( 2 );
+
+   if ($pmv > $pcv) {
+      my $stamp  = time2str( '%Y-%m-%d %H:%M:%S', time );
+      my $header = sprintf "%-9.9s %s", $module_ver, $stamp;
+
+      $changes =~ s{ ^ $ }{\n$header}mx; __write_data_to $change_file, $changes;
+
+      my $gitcmd = "git add ${change_file}"; qx{ $gitcmd };
+   }
+}
+
+exit 0;

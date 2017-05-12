@@ -1,0 +1,43 @@
+.perltidyrc
+Changes
+cpanfile
+examples/blog/blog.conf
+examples/blog/lib/Blog.pm
+examples/blog/lib/Blog/Controller/Posts.pm
+examples/blog/lib/Blog/Model/Posts.pm
+examples/blog/migrations/blog.sql
+examples/blog/script/blog
+examples/blog/templates/layouts/blog.html.ep
+examples/blog/templates/posts/_form.html.ep
+examples/blog/templates/posts/create.html.ep
+examples/blog/templates/posts/edit.html.ep
+examples/blog/templates/posts/index.html.ep
+examples/blog/templates/posts/show.html.ep
+examples/chat.pl
+lib/Mojo/mysql.pm
+lib/Mojo/mysql/Database.pm
+lib/Mojo/mysql/Migrations.pm
+lib/Mojo/mysql/PubSub.pm
+lib/Mojo/mysql/Results.pm
+lib/Mojo/mysql/Transaction.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.pod
+t/00-basic.t
+t/connection.t
+t/crud.t
+t/database.t
+t/migrations.t
+t/migrations/test.sql
+t/mysql_auto_reconnect.t
+t/mysql_lite_app.t
+t/pubsub.t
+t/results.t
+t/results_methods.t
+t/strict-mode.t
+t/utf8.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

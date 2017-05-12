@@ -1,0 +1,19 @@
+Revision history for Math-Fractal-Julia.
+
+0.000003 2012-06-23
+    - Improved documentation
+    - Added minimum Perl version requirement
+
+0.000002 2012-06-20
+    - Removed Perl version requirement
+    - Added pod coverage tests
+    - Improved documentation
+    - Refactored XS
+    - Upgraded ppport.h
+    - Bumped copyright year
+    - Refactored tests
+    - Removed accidentally included perltidy.rc and dist.ini files
+
+0.000001 2012-04-06
+    - Initial release
+

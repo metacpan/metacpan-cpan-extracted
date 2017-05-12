@@ -1,0 +1,79 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 182cdb12433992bede52765c8652154b55179658 Build.PL
+SHA1 a5e24cc5abb276744de16544601957521f388396 Changes
+SHA1 c9287a0cfea1301a8e275e14df35a74d0b85e71c LICENSE
+SHA1 3bb77fda40f18b30a2b1d3aade920b61276eebf2 MANIFEST
+SHA1 0260f6a37f8d4b36c9f82c060c971eeaff45f4cd META.json
+SHA1 b37e1172575c902a66db666bb785309a5a890273 META.yml
+SHA1 b47ae4a84bab63f6d8236085c95b7ce53d32edb9 README
+SHA1 250b939e4d0efa110c69eab7648660b67076bf11 bin/module-provision
+SHA1 79232c99f0e07a9c6d84ecb7e1cd5d4e26719e27 lib/Module/Provision.pm
+SHA1 9eb3aaf3443c638ebfb28cd37e4e733461fd9cbd lib/Module/Provision/Base.pm
+SHA1 16a587aa27f67ef0a1cc919ebacbe364a89be139 lib/Module/Provision/Config.pm
+SHA1 d9be0cfee8a90549ec6b0dd8fe53efe9c3844f20 lib/Module/Provision/MetaData.pm
+SHA1 a6292ae30aa88ee0bb0619a9646acd6d39828fc7 lib/Module/Provision/TraitFor/AddingFiles.pm
+SHA1 6acdd69bddd0aa86a8ef22215036a827ce2afc8f lib/Module/Provision/TraitFor/Badges.pm
+SHA1 fcd913110828719647062c33cf024f79bfee60b3 lib/Module/Provision/TraitFor/CPANDistributions.pm
+SHA1 67c7a22fd2561ff694270c2cc5265cb00c9c1bdc lib/Module/Provision/TraitFor/CreatingDistributions.pm
+SHA1 cd4b8780db7e1e8d37c380f00876461fb6799daa lib/Module/Provision/TraitFor/EnvControl.pm
+SHA1 9485119a7a221b87042f588d6ad0f2af988bc142 lib/Module/Provision/TraitFor/PrereqDifferences.pm
+SHA1 870bf1a5daadb9b51764a06a6a836efc4f259c0a lib/Module/Provision/TraitFor/Rendering.pm
+SHA1 cf9cbf44e112186c31d2ea9606936e98fa016d3a lib/Module/Provision/TraitFor/UpdatingContent.pm
+SHA1 3a0fa4065621321541754f5fc82827c668219c70 lib/Module/Provision/TraitFor/VCS.pm
+SHA1 f6d57d8f933efb33cc057c265798688e69971860 share/02pod.t
+SHA1 378c0b8a1bf6d248e0025321be971f3d360c983b share/03podcoverage.t
+SHA1 ec69eb3d114489b222043cf3726cb4ef26b3bf51 share/05kwalitee.t
+SHA1 230ce4beccce2b8d03267940e81fcd403d2f6860 share/06yaml.t
+SHA1 7a3192ea1c6fe8560f14100603413c6a793b3b77 share/07podspelling.t
+SHA1 419792ae47f06792b5c994840e77827caee2d46a share/10test_script.t
+SHA1 5d08a0d31bfe731341ab7b617000a81f1d0bef64 share/Build.PL
+SHA1 9f2d2b4c005e8ddcb07e96c3c6cb258a67550a16 share/Changes
+SHA1 5cd3cfe304c5bb30abad3bc254bf1815450bcac4 share/DZ_Build.PL
+SHA1 8a1dd1b7893d5469cb18d2ad949ea2354f09c593 share/MANIFEST.SKIP
+SHA1 8673e228f1bb5117895fdbcab181f86925addd1d share/bad_toolchain_DZ_Build.PL
+SHA1 5ca3d33e602461489c4795ecea1c3adc200530c3 share/boilerplate.pm
+SHA1 9acec4a8fc3154fee2236b6548ce711da06113be share/boilerplate_whitelist.pm
+SHA1 54de88c5acbc2dfd9ba4b1a9327f4bb2f3b2b317 share/data_dumper.pm
+SHA1 9ca9e7e5ba882ff0a30aba7f26522659ce15d2c0 share/dist.ini
+SHA1 d025d5bf3af8405ba44d975dafe7aedd145e4394 share/gitcommit-msg
+SHA1 510cfbb9c53a7511e5597bb82b4fcc9a64938e41 share/gitignore
+SHA1 1e54994ade6c7aabdcc3459d78b8e80ea7fbdaa5 share/gitpre-commit
+SHA1 54aa9d22fa34d07f004a5e45b95ac891005ea033 share/perl_localenv
+SHA1 af25203151d0573feacd8a59817dd18fdc9d242b share/perl_module.pm
+SHA1 2c49dcc4b4fe7ae067c3c3230f97e7f2fd8fc7a1 share/perl_program.pl
+SHA1 c7070765f9e7cf54357f04eef163a9e5350a15ef share/travis.yml
+SHA1 e39a8bd998046974fcda9ab7316cba35c3f5f508 t/00report-metadata.dd
+SHA1 c7d9429f60087220bf7b11ad1f97c7af9a647fa7 t/00report-metadata.t
+SHA1 427b1a5820b3d6bc52044b99c999e458eba7d6dc t/02pod.t
+SHA1 113a5cc194200eeb5840ac7752a8cb8eec41a6c6 t/03podcoverage.t
+SHA1 c1c29d14c961c30f0ea1ff84dd3b6acb7f4d3e81 t/05kwalitee.t
+SHA1 8b1ef2c2000dda84911be6a6bf76d4de88a4d4dc t/06yaml.t
+SHA1 8bc9550ee12f1687e49f6cea3f3451d930ddb369 t/07podspelling.t
+SHA1 e70f576fc5264209d4402752b058b0fcf597fe9f t/10test_script.t
+SHA1 196585dd3abdd4c0cbae8bd2b60cb29f4bbbcaba t/boilerplate.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJZEMcpAAoJEK492j4Im1BppNgH/09xWBNZzepq/QtVuKVSKY4C
+737c009dKPJqH5fyQXTRr2PDST9dVDCwHLxp6uGY+oJGyaruE1owLJZIQmnkb3Cj
+dyK5UICjTSuUa14xpehG5v7V97PBU/g8svoEcve5oQ2gb8dDc7GcHU2g32vZecwJ
+RM3KCELX9Ust6K7A+DBsETD5xv3NHraHe1vccrr/SI+kAdHZY/R3kJnIidqIVYvO
+wLgjoH25vkMQ6gXROe66ErIAYhKJgNOpeMtcy5ix3Rf8JmnCZgIAVD5A8MLpqh8/
+y6sWhODZSvmmly6aazNP0IPlPi1Z5LIhxm/g8Pg/9UVXizY1H2Y5dBGmBUbjjak=
+=yCTm
+-----END PGP SIGNATURE-----

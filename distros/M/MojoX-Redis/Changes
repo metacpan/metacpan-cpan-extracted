@@ -1,0 +1,61 @@
+This file documents the revision history for Perl extension MojoX::Redis
+
+0.88 2015-03-24 00:00:00
+         - docs updated
+         - handle error on connection
+
+0.87 2015-03-23 00:00:00
+         - fixed to work with latest Mojolicious
+
+0.86 2014-06-12 00:00:00
+         - Readme fixed
+
+0.85 2012-12-11 00:00:00
+         - Obsoleted by Mojo::Redis
+
+0.84 2012-06-18 00:00:00
+         - Updated to work with latest IOLoop API (marcusramberg)
+
+0.83 2011-12-11 00:00:00
+         - Added info about Protocol::Redis::XS
+         - Fixed to work with latest Mojolicious
+
+0.82 2011-11-02 00:00:00
+         - Documentation improved
+
+0.81 2011-07-30 00:00:00
+         - fixed encoding issue on multi-bulk reply
+
+0.8  2011-02-01 00:00:00
+         - moved to Protocol::Redis parser
+         - changed response format for multi-bulk replies (LRANGE, ...) API
+           CHANGED!
+         - use new API of IOLoop
+
+0.7  2011-01-30 00:00:00
+         - on_error method added
+         - added not live tests
+         - added fast commands
+
+0.6  2010-12-15 00:00:00
+         - Better connection handling
+
+0.5  2010-11-25 00:00:00
+         - Fixed memory leaks
+
+0.4  2010-11-14 00:00:00
+         - Warning! Changed callback interface
+         - Documentation added
+         - Small improvements
+
+0.3  2010-11-09 00:00:00
+         - Fixed encoding support
+         - Processing nil values
+         - Processing lists with zero elements
+
+0.2  2010-11-06 00:00:00
+         - Nice pipline command parsing
+         - timeout added
+
+0.1  2010-11-04 00:00:00
+        - First release

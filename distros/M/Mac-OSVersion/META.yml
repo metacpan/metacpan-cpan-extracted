@@ -1,0 +1,24 @@
+---
+abstract: 'Get the Mac OS X system version'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mac-OSVersion
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008'
+resources:
+  repository: https://github.com/briandfoy/mac-osversion
+version: '1.002'

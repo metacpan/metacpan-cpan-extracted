@@ -1,0 +1,22 @@
+Build.PL
+Changes
+lib/Mojolicious/Command/am.pm
+lib/Mojolicious/Plugin/AdvancedMod.pm
+lib/Mojolicious/Plugin/AdvancedMod/ActionFilter.pm
+lib/Mojolicious/Plugin/AdvancedMod/Authoriz.pm
+lib/Mojolicious/Plugin/AdvancedMod/Configurator.pm
+lib/Mojolicious/Plugin/AdvancedMod/HashedParams.pm
+lib/Mojolicious/Plugin/AdvancedMod/TagHelpers.pm
+MANIFEST			This list of files
+README.pod
+t/action_filter.t
+t/am.t
+t/configurator.t
+t/etc/general.yml
+t/etc/pg.yml
+t/hashed_params.t
+t/lib/MyApp.pm
+t/lib/MyApp/Controllers/App.pm
+t/lib/MyApp/Helpers/App.pm
+t/lib/MyApp/Models/App.pm
+t/tag_helpers.t

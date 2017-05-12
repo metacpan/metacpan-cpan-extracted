@@ -1,0 +1,23 @@
+---
+name: Math-Geometry-Planar-Offset
+version: 1.05
+author:
+  - 'Eric Wilhelm @ <ewilhelm at cpan dot org>'
+abstract: Calculate offset polygons
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Geometry-Planar-Offset
+  homepage: http://scratchcomputing.com/
+  license: http://dev.perl.org/licenses/
+  repository: http://scratchcomputing.com/svn/Math-Geometry-Planar-Offset/trunk
+requires:
+  Test::More: 0
+  YAML: 0
+provides:
+  Math::Geometry::Planar::Offset:
+    file: lib/Math/Geometry/Planar/Offset.pm
+    version: 1.05
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

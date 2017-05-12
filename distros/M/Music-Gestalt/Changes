@@ -1,0 +1,25 @@
+Revision history for Music-Gestalt
+
+0.06    2005-July-13
+        Added Insert.
+        Added pitch mode 'row'. Now needs MIDI::Pitch.
+
+0.05    2005-July-4th
+        Added NoteLength.
+        Changed Perl version requirement to 5.6 (from 5.6.1).
+        Added Pitches and PitchesMode functions.
+
+0.04    2005-June-28
+        Added automation for velocity and pitch middle.
+
+0.03    2005-June-27
+        Duration is now changeable.
+        Added Density.
+        Added Mirror functions
+
+0.02    2005-June-26
+        Bugfixes in the conversion from/to scores and in the append function.
+        Pitch and velocity parameters are now changeable.
+
+0.01    2005-June-19
+        Initial version.

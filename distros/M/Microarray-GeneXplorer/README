@@ -1,0 +1,388 @@
+What is this?
+
+This distribution provides a set of modules, and a single client, gx,
+to implement GeneXplorer, which is a web interface for browsing
+hierarchically clustered data.
+
+The latest version of this module should always be available from:
+
+http://search.cpan.org/dist/Microarray-GeneXplorer/
+
+An example of this software in action is available at:
+
+http://microarray-pubs.stanford.edu/cgi-bin/gx?n=prostate1&rx=5
+
+PREREQUISITES
+
+GD.pm
+
+GeneXplorer relies on the GD module (http://search.cpan.org/dist/GD/)
+for image creation.  If the GD module support png image creation
+(version > 1.19), then it will create png images, otherwise gif images
+will be created.
+
+INSTALLATION
+
+Firstly, read all the installation instructions before you begin!
+
+To install this software, you will need some limited Unix experience,
+and some limited Perl experience.  If in doubt, consult your local
+Perl guru or systems administrator.  You also need access to a Unix
+machine, such as MacOSX, or a Windows machine running Cygwin, a Linux
+box, a Sun machine etc..
+
+To install the software do the following after downloading the
+distribution:
+
+First decompress the gzipped tarfile, e.g:
+
+   tar zxvf Microarray-GeneXplorer-0.1.tar.gz
+
+or:
+
+   gunzip Microarray-GeneXplorer-0.1.tar.gz
+   tar xvf Microarray-GeneXplorer-0.1.tar
+
+Then change into the created directory:
+
+   cd Microarray-GeneXplorer-0.1
+
+
+To install the actual Perl modules themselves, and the executable
+correlations and makeMicroarrayDataset.pl programs, type the following
+(note, the 'make install' step requires administrative privileges -
+see your sysadmin if you don't have them):
+
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+If you don't have administrative privileges, or want to install the
+modules and excutables (correlations and makeMicroarrayDataset.pl)
+into a location other than the default location on your machine, then
+use the following:
+
+    perl Makefile.PL INSTALLDIRS=site INSTALLSITELIB=/home/your/private/dir/lib INSTALLSCRIPT=/home/your/private/bin
+    make
+    make install
+
+Replace /home/your/private/dir/lib with the full path to the directory
+you want the libraries placed in, and /home/your/private/bin with the
+full path to the directory that you want the executables placed in.
+Note that if you install the libraries in a non-standard place, prior
+to doing the install step you should edit the
+bin/makeMicroarrayDataset.pl program to include that path (with a 'use
+lib' statement), so that the installed version can find the library.
+
+See the documentation for ExtUtils::MakeMaker for more details about
+how to modify the behaviour during the make process:
+
+http://search.cpan.org/dist/ExtUtils-MakeMaker/
+
+A Note About Directories
+
+Programs within the GeneXplorer distribution are picky about directory
+structures, in that they expect a certain directory structure to
+exist when a dataset is created (see below), and when the contents of
+a dataset are subsequently used by the gx application.  You will need
+to have a web accesible directories where images can be read from over
+http for general images used by GeneXplorer, images used for a
+particular dataset, and images that are created on a temporary basis.
+You will also need a cgi-bin directory where the gx application itself
+will exist, and a directory in which the dataset files can be stored
+and read by the cgi application.  Your set up needs to look something
+like this:
+
+/<rootpath>/
+		html/
+			tmp/		# for temporary images
+			explorer/	# under which images specific
+					  for a dataset are created
+				images/ # for general GeneXplorer images
+
+		cgi-bin/		# gx resides here
+		data/			
+			explorer/	# datafiles for a dataset reside here
+		lib/
+
+in the above example, when creating a dataset, a directory, based on
+the name of the dataset, would be created under each of :
+
+/<rootpath>/html/explorer/
+/<rootpath>/data/explorer/
+
+where files specific to that dataset will be stored.
+
+The gx application assumes that there exists a rootpath (server_root
+above), under which will be an html directory, and underneath that
+there will be a tmp and an explorer directory.  This is somewhat
+inflexible, and will be made more configurable in a future release.
+
+The bottom line is that you MUST create a directory structure that
+looks like the one above, where the html directory is the DOCUMENT_ROOT.
+
+What is a displayConfig file?
+
+It is a file that allows you to specify some of the look and feel of 
+gx, and to where certain things should link etc.  Some examples are 
+in the data/explorer directory.
+
+GeneXplorer allows you to specify some of the look and feel of gx and
+to configure linking out of gene annotations to external databases.
+The configuration file 'default.display_config' has to be placed in
+the /data/explorer directory to control where the various gene
+identifiers are linked.  Some examples for display config files can be
+found in the data/explorer directory in the distribution.
+
+GeneXplorer uses all gene annotations that are available in the cdt
+file and saves them in the '.feature_info' file at the time of dataset
+creation.  Because of the limitations of the cdt file format (see:
+http://genome-www5.stanford.edu/help/formats.shtml#cdt) it cannot be
+expected that the headers in the cdt file accurately describe the
+contents of the annotation columns. This has to be enforced manually
+by changing the headers in the .feature_info (or the cdt) file to
+match both the content of the columns and the corresponding entry in
+the display configuration file that specifies the external database to
+use.
+
+For example, the 'CLONEID' header in the '.feature_info' file
+indicates the column contains cloneids. The provided
+data/explorer/hs.diplay_config file links columns with headers
+'CLONEID' to the corresponding gene page in SOURCE
+(http://source.stanford.edu/cgi-bin/source/sourceSearch).  If the
+header for the column were not 'CLONEID' it'd need to be changed to
+ensure correct linking out.
+
+The display configuration file is extensible and new entries can be
+added to it; the format for new entries is described in the display
+configuration file itself.
+
+The '.feature_info' file can have unlimited number of annotation
+columns and all of them can be configured to a different external
+database, if so desired.  If they are present these columns will be
+displayed in the order of the corresponding entries in the config
+file.  Currently, due to the limitations of the .cdt file format, .cdt
+files can only have two annotation columns, so to have a .feature_info
+file with more than two columns of annotation, you must custom
+generate it - the makeMicroarrayDataset.pl program extracts the two
+annotation columns from the .cdt file, with their column headings.  In
+future, and extended version of the .cdt file format will be
+supported, which will allow an unlimited number of annotation columns
+in the .cdt file.
+
+Using GeneXplorer
+
+Once you have installed the Perl modules, and compiled the
+correlations binary and placed it in an appropriate location, you are
+almost ready to start using GeneXplorer.  There are two stages to
+using GeneXplorer:
+
+1.  Creating a dataset.
+
+To create a dataset, you will need a cdt file, whose format is
+described at:
+
+http://genome-www5.stanford.edu/MicroArray/help/formats.shtml#cdt
+
+A cdt file is created using a program to hierarchically cluster
+microarray expression data.  Many programs exist to do this
+hierarchical clustering, e.g.:
+
+Cluster:      http://rana.lbl.gov/EisenSoftware.html
+
+Cluster 3.0 : http://bonsai.ims.u-tokyo.ac.jp/~mdehoon/software/cluster/index.htm
+
+XCluster    : http://genetics.stanford.edu/~sherlock/cluster.html
+
+There are cdt sample files in the data/sample/ directory of this
+distribution.
+
+Once you have a cdtfile, you can now use the makeMicroarrayDataset.pl
+program to create a dataset from it.  Before you run it, you need to
+make sure of two things:
+
+i.  The correlations binary that you installed must be in your path.
+
+ii. The location where you just installed the perl modules must be in your
+    path, or edit makeMicroarrayDataset.pl to add a 'use lib'
+    statement such that it can find them.
+
+There are several command-line options for makeMicroarrayDataset.pl
+(execute it with no parameters, and it will print out its usage
+information):
+
+makeMicroarrayDataset.pl -file <file/name> -name <intended/dataset/name> \
+[-rootpath <your_root_directory> -contrast <float> -colorscheme <rg|yb> -corrcutoff <float> -verbose]
+
+        -file           = (required) input file (currently only '.cdt' files supported)
+
+        -name           : (required) dataset name to be created
+                          (may be delimited by slashes(/) to imply hierarchy)
+
+        -rootpath       : root directory, under which must exist html
+			  and data directories
+                          
+        -contrast       : (optional) contrast value for the generated images
+                          (defaults to 4, As the data are expected to
+                           be in log base 2, this corresponds to a
+                           16-fold change as the maximum color in any
+                           image)
+
+        -colorscheme    : (optional) color scheme used for generating the images
+                          (rg = red/green, yb = yellow/blue ; defaults to yellow/blue)
+
+        -corrcutoff     : optional value for correlation cutoff during dataset creation
+                          (defaults to 0.5 if not specified; allowed range: 0.2 - 1.0)
+
+        -verbose        : (optional) whether show feedback messages during run
+			  (no value required - simply provide the parameter)
+
+	-help		: (optional) whether to print usage information
+			  (no value required - just provide the parameter)
+
+eg:
+
+makeMicroarrayDataset.pl -file mydata.cdt -name mydata -rootpath /<rootpath>/ -verbose -contrast 2 -corrcutoff 0.2 -colorscheme rg
+
+The program will create 7 files in:
+
+        /<rootpath>/data/explorer/<name>/
+
+with the following suffixes:
+
+                .expt_info .feature_info, .data_matrix, .binCor, .meta
+
+(these files must be readable by a gx application running out of cgi-bin)
+
+and two files in:
+
+	/<rootpath>/html/explorer/<name>/
+
+with the following suffixes:
+
+		.data_matrix.gif, .expt_info.gif
+
+In addition, the dataset creation will expect a tmp directory to exist
+at:
+
+	/<rootpath>/html/tmp/
+
+Once your dataset has been created, it should be usable by the gx
+application.
+
+2. Move some files in the distribution into place
+
+a) The displayConfig files
+
+   cp data/explorer/* /<rootpath>/data/explorer/
+
+b) Some images
+
+   cp html/explorer/images/* /<rootpath>/html/explorer/images/
+
+3. Use the gx application
+
+You will need to place the gx application in your cgi-bin directory,
+and make it executable.  You will also need to make some modifications
+to the gx application so that it knows where certain things exist that
+are within your system:
+
+a) Libraries
+
+gx has to be able to find the Perl libraries that you installed with
+the 'make install' command above.  If you installed them in a typical
+system wide fashion, then it is likely that they are in the path of
+the cgi script.  If you installed them in a specific place, then you
+will need to add a :
+
+use lib '/home/your/private/dir/lib';
+
+in gx, before the:
+
+use Microarray::CdtDataset;
+use Microarray::Explorer;
+use Microarray::Config;
+
+lines.  If you installed them in a lib directory immediately below the
+server root, at the same level as your html directory, then simply
+uncomment the lines in gx that read:
+
+#use File::Basename;
+#use lib dirname($ENV{DOCUMENT_ROOT})."/lib";
+
+which should locate the libraries for you.
+
+b) Paths
+
+You need to put into the gx file the your rooturl and rootpath so it
+knows where to find the files and link to.
+
+You also need to place the images that are provided in the
+html/explorer/images directory of this distribution into the
+<rootpath>/html/explorer/images/ directory on your server.
+
+
+To then actually use gx, you should be able to type in your web
+browser a url such as:
+
+http://<rooturl>/cgi-bin/gx?n=<name>
+
+where <name> is the name that you gave your dataset when creating it
+with makeMicroarrayDataset.pl.
+
+For creation of subsequent datasets, as long as you are using the same
+rootpath directory, then you should be able to not worry about this
+step 2, and after creating your dataset should be able to simply
+change the n parameter passed to gx, and it will just work.
+
+Using the Correlations Program as a Standalone executable
+
+The correlations program, which is used by GeneXplorer during dataset
+creation, can also be used as a standalone piece of software to get a
+list of sorted correlations between each gene in a .pcl file.  For
+usage information, simply type:
+
+correlations -h
+
+which will give the following output:
+
+######################################################################
+
+The program "correlations" will take a preclustering file as an input,
+and produce a file containing the correlations for each gene in sorted
+order.  The output file will be named with the same stem as the input
+file, but with a .stdCor suffix
+
+Usage:
+
+The following command line arguments may be used:
+
+-f            Allows you to specify the preclustering filename.  Relative paths may be used
+
+-corr   1|2   Allows you to specify whether you want an uncentered (1) or a centered (2) metric.
+              1 is the default
+
+-cutoff       Allows you to specify a cutoff, correlations above which will be stored
+
+-num          Allows you to specify the number of correlations that you would like to store
+              20 is the default
+
+-l      0|1   Allows you to specify if you want to log transform the data (1)
+              0 is the default
+
+-u            Allows you to specify a unique id by which you output file will be named
+              eg.  correlations -f sample.pcl -u 888
+              will produce an output file named 888.stdCor
+
+-showCorr 0|1 specifies whether you want to see the correlations themselves.
+              1 is the default
+
+Questions or comments should be addressed to sherlock@genome.stanford.edu
+
+######################################################################
+
+Alternatively, if you have created a dataset using the
+makeMicroarrayDataset.pl script, you can write your own clients of the
+Microarray::CdtDataset class (see the documentation for that class),
+and retrive correlation through its interface.

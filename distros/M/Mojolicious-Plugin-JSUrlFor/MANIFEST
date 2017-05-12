@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README.pod
+lib/Mojolicious/Plugin/JSUrlFor.pm
+lib/Mojolicious/Command/generate/js_url_for.pm
+t/basic.t
+t/mount.t
+t/dynamic_js_file.t
+t/generate_command.t
+t/mounted_app.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

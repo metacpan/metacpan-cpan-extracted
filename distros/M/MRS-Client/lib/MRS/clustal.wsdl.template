@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://mrs.cmbi.ru.nl/mrsws/clustal" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns="http://mrs.cmbi.ru.nl/mrsws/clustal" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+ <wsdl:types>
+  <xsd:schema targetNamespace="http://mrs.cmbi.ru.nl/mrsws/clustal" xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+   <xsd:element name="ClustalW">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="input" type="ns:Sequence" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="gapOpen" type="xsd:unsignedInt" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="gapExtend" type="xsd:float" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="ClustalWResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="diagnosticsOut" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="diagnosticsErr" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="alignment" type="ns:Sequence" minOccurs="0" maxOccurs="unbounded"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:complexType name="Sequence">
+    <xsd:sequence>
+     <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="sequence" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+    </xsd:sequence>
+   </xsd:complexType>
+  </xsd:schema>
+ </wsdl:types>
+ <wsdl:message name="ClustalWRequestMessage">
+  <wsdl:part name="parameters" element="ns:ClustalW"/>
+ </wsdl:message>
+ <wsdl:message name="ClustalWResponseMessage">
+  <wsdl:part name="parameters" element="ns:ClustalWResponse"/>
+ </wsdl:message>
+ <wsdl:portType name="mrsws_clustalPortType">
+  <wsdl:operation name="ClustalW">
+   <wsdl:input message="ns:ClustalWRequestMessage"/>
+   <wsdl:output message="ns:ClustalWResponseMessage"/>
+  </wsdl:operation>
+ </wsdl:portType>
+ <wsdl:binding name="mrsws_clustal" type="ns:mrsws_clustalPortType">
+  <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+  <wsdl:operation name="ClustalW">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+ </wsdl:binding>
+ <wsdl:service name="${SERVICE}">
+  <wsdl:port name="mrsws_clustal" binding="ns:mrsws_clustal">
+   <soap:address location="${LOCATION}"/>
+  </wsdl:port>
+ </wsdl:service>
+</wsdl:definitions>

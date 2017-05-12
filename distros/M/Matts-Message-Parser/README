@@ -1,0 +1,8 @@
+Matts::Message::Parser
+======================
+
+Originally written for parsing NNTP messages, adapted for parsing email messages,
+and bastardised to support horrible TNEF stuff too.
+
+Don't use in your own projects, unless you are willing to figure out the API
+yourself.

@@ -1,0 +1,88 @@
+	Math::Polynomial::Solve, version 2.75, 22 May 2016.
+-------------------------------------------------------------------------------
+Coming changes:
+
+Most of the functions under the :utility tag have been
+moved to Math::Utils. See the DEPRECATED FUNCTIONS section of the
+documentation, as well as the documentation of Math-Utils (there will
+be some parameter changes as well).
+
+You will now receive warning messages if you are using any of the
+deprecated functions in your code (politely collected and sorted for
+you at the end of the run.)
+
+The functions (and their warning messages) will be removed by version 2.80.
+-------------------------------------------------------------------------------
+
+By release 3.00 (scheduled for approximately end of 2017), the default order
+of the the coefficients of the polynomials will be changed to an ascending
+order, to match that of Math::Polynomial. To help with the change, the
+function ascending_order() is available.
+
+Currently if your polynomial is the cubic x**3 + 3*x**2 + 11* x + 5,
+then all functions are called with the polynomials in descending order.
+For example,
+
+        my @cubic = (1, 3, 11, 5);
+        my @roots = cubic_roots(@cubic);
+
+To get a jump on the change (or to just have less-confusing code if
+you're also using Math::Polynomial), use ascending_order(). For example,
+
+        ascending_order(1);
+
+        my @cubic = (5, 11, 3, 1);
+        my @roots = cubic_roots(@cubic);
+
+After version 3.00 is released, you can still maintain the old order
+by calling ascending_order():
+
+        ascending_order(0);          # Keep it the old way.
+
+        my @cubic = (1, 3, 11, 5);
+        my @roots = cubic_roots(@cubic);
+
+------------------------------------------------------------------------
+
+This package provides a set of functions that find the roots of
+polynomials up to degree 4 using the classical methods; a function
+for solving polynomials of any degree by an implementation of the
+QR Hessenberg algorithm; and functions that implement Sturm's
+sequence for counting the number of real, unique roots in a range.
+
+These functions can be exported by name or by tag (:classical, :numeric,
+:sturm, and :utility). The utility tag exports the functions that
+are used internally and which previously were private to the module.
+See the documentation for more information.
+
+Using the classical methods, the cubic may be solved by the method
+described by R. W. D. Nickalls, "A New Approach to solving the cubic:
+Cardan's solution revealed," The Mathematical Gazette, 77, 354-359, 1993.
+Dr. Nickalls has made his paper available at
+<http://www.nickalls.org/dick/papers/maths/cubic1993.pdf>, one of his
+many publications at <http://www.nickalls.org/dick/papers/rwdnPapers.html>
+
+The solution for the quartic is based on Ferrari's method, as described
+in the web page Karl's Calculus Tutor,
+<http://www.karlscalculus.org/quartic.html>.
+
+INSTALLATION:
+
+The usual way.  Unpack the archive:
+	gzip -d Math-Polynomial-Solve-2.75.tar.gz
+	tar xvf Math-Polynomial-Solve-2.75.tar
+
+Go into the resulting directory, and type:
+	perl Build.PL
+	Build
+
+Run the tests:
+	Build test
+
+Install the module:
+	Build install
+
+
+Copyright (c) 2015 John M. Gamble. All rights reserved. This program is
+free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.

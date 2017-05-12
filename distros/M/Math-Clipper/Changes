@@ -1,0 +1,149 @@
+Revision history for Perl extension Math::Clipper.
+
+1.23  Thu May 22 20:30:00 2014
+
+  - Fix 5.20 compatibility: av_extend is now using
+    unsigned lengths.
+
+1.22  Sun May 19 17:14:00 2013
+
+  - Fixed some memory leaks.
+
+1.21  Fri May 10 14:43:00 2013
+
+  - New pt_execute() method exposing PolyTree.
+  - New int_offset2()
+  - Upgraded the Clipper library to the newest available version 5.1.5.
+
+1.20  Sun Apr 28 15:43:00 2013
+
+  - Fix compilation on Windows.
+
+1.19  Mon Apr 22 13:54:00 2013
+
+  - Upgraded the Clipper library to the newest available version 5.1.4.
+
+1.18  Sun Mar 31 12:46:00 2013
+
+  - new int_offset()
+  - new ex_int_offset()
+  - new ex_int_offset2()
+
+1.17  Tue Jan 15 14:07:00 2013
+
+  - Expose PFT_POSITIVE and PFT_NEGATIVE constants.
+  - Upgraded the Clipper library to the newest available version 5.0.3.
+
+1.16  Wed Dec 26 15:29:00 2012
+
+  - Upgraded the Clipper library to the newest available version 4.10.0.
+
+1.15  Sat Nov 09 17:16:00 2012
+
+  - Upgraded the Clipper library to the newest available version 4.9.6.
+
+1.14  Sat Nov 03 02:00:00 2012
+
+  - Upgraded the Clipper library to the newest available version 4.9.4.
+
+1.13  Wed Nov 01 01:19:00 2012
+
+  - Upgraded the Clipper library to the newest available version 4.9.3.
+
+1.12  Tue Oct 30 01:09:00 2012
+
+  - Fixed Int128 comparison operators in Clipper library, which could 
+    cause wrong orientations.
+
+1.11  Mon Oct 22 14:33:00 2012
+
+  - Reduced 32 bit and 64 bit max integer limits introduced in 4.8.6.
+
+1.10  Tue Oct 16 17:39:00 2012
+
+  - Upgraded the Clipper library to the newest available version 4.8.8.
+
+1.08  Mon May 28 19:16:00 2012
+
+  - Upgraded the Clipper library to the newest available version 4.8.3.
+
+1.07  Tue May 01 12:30:00 2012
+
+  - Upgraded the Clipper library to the newest available version 4.8.0.
+  - Upgraded the Clipper library to the newest available version 4.7.5.
+
+1.06  Mon Apr 02 18:36:00 2012
+
+  - new simplify_polygon() and simplify_polygons() functions
+
+  - Renamed is_counter_clockwise() to orientation() (the former is still
+    exported for backwards compatibility).
+
+1.05  Sun Mar 11 19:06:00 2012
+
+  - Releasing again, since the 1.04 release got out broken probably.
+
+1.04  Sun Mar 11 19:01:00 2012
+
+  - Upgraded the Clipper library to the newest available version 4.7.3.
+
+1.03  Sat Jan 28 16:39:43 2012
+
+  - Added a sub CLONE_SKIP { 1 } to make the module thread-safe in its
+    basic form
+
+1.02  Tue Oct 11 16:36:00 2011
+
+  - Upgraded the Clipper library to the newest available version 4.5.5.
+    use_full_coordinate_range is always enabled by default, so we now 
+    provide this method for legacy purposes but it's actually a no-op.
+  
+  - Removed warning from integerize_coordinate_sets().
+
+  - Added Test::Deep to prerequisites.
+
+1.01  Mon Oct 03 09:15:00 2011
+
+  - Upgraded the Clipper library to the newest available version 4.4.4.
+  
+  - New jointype and miterlimit arguments supported for OffsetPolygons
+
+1.00  Mon Sep 19 08:48:00 2011
+  * WARNING * This release contains incompatible changes!
+
+  - Upgraded the Clipper library to the newest available version 4.3.0.
+
+  - Clipper 4.3.0 has various interface changes, see the documentation
+    for details. Most importantly, the coordinates are now 64bit
+    integers instead of floating point numbers.
+
+  - Clipper 4.3.0 now works with large integers internally instead of
+    floats. Thus, this release adds support and tests for Clipper's
+    int/double conversions.
+
+  - Add ex_execute() for ExPolygons.
+
+  - Add use_full_coordinate_range() method.
+
+  - Remove broken is_clockwise() function and replace with
+    is_counter_clockwise(), which is what the C++ function
+    IsClockwise() has been doing all along.
+
+  - area() is now a function instead of a method.
+
+  - Exposes polygon_offset function.
+
+  - force_orientation related functions are gone.
+
+  - Compilation fixes for Windows perls and compilers.
+
+  - Internals:
+    => Use ExtUtils::Typemaps instead of the deprecated
+       ExtUtils::Typemap.
+    => Moved all XS++ types to the clipper:: C++ namespace to avoid
+       collisions on Win32.
+
+0.01  Thu Aug 19 19:00:00 2010
+  
+  - original version
+

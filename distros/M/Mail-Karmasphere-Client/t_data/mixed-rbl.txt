@@ -1,0 +1,27 @@
+# 
+# WHEREIN the rbl.mixed data format is specified
+# 
+#    20061109-21:55:22 mengwong@alexandre:~ksource% less grey.uribl.com
+#    jocks-n-jills.com
+#    velobit.com.br
+#    207.13.185.200
+#    szhot.com
+#    
+#    20061109-21:55:03 mengwong@alexandre:~ksource% dig +short 207.13.185.200.grey.uribl.com
+#    127.0.0.2
+#    20061109-21:55:22 mengwong@alexandre:~ksource%
+#    
+# from which we conclude that IP addresses in an rbl.mixed form are already reversed; they are in 4.3.2.1 format.
+# 
+163.186.230.203
+164.220.67.209
+167.225.246.66
+16dsurf.com
+16incher.com
+1728j.net
+177.43.3.210
+178.255.9.72
+1800refinowok.com
+1800sensuals.info
+1800studstuff.info
+123.45.6

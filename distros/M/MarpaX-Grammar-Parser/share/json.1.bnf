@@ -1,0 +1,73 @@
+lexeme default = latm => 1
+
+:start       ::= json
+
+json         ::= object
+               | array
+
+object       ::= '{' '}'               action => do_empty_object
+               | '{' members '}'       action => do_object
+
+members      ::= pair+                 separator => <comma> action => do_list
+
+pair         ::= string ':' value      action => do_pair
+
+value        ::= string
+               | object
+               | number
+               | array
+               | 'true'                action => do_true
+               | 'false'               action => do_true
+               | 'null'                action => do_null
+
+array        ::= '[' ']'               action => do_empty_array
+               | '[' elements ']'      action => do_array
+
+elements     ::= value+                separator => <comma> action => do_list
+
+number         ~ int
+               | int frac
+               | int exp
+               | int frac exp
+
+int            ~ digits
+               | '-' digits
+
+digits         ~ [\d]+
+
+frac           ~ '.' digits
+
+exp            ~ e digits
+
+e              ~ 'e'
+               | 'e+'
+               | 'e-'
+               | 'E'
+               | 'E+'
+               | 'E-'
+
+string       ::= lstring               action => do_string
+
+lstring        ~ quote in_string quote
+quote          ~ ["]
+
+in_string      ~ in_string_char*
+
+in_string_char  ~ [^"\\]
+                | '\' '"'
+                | '\' 'b'
+                | '\' 'f'
+                | '\' 't'
+                | '\' 'n'
+                | '\' 'r'
+                | '\' 'u' four_hex_digits
+                | '\' '/'
+                | '\\'
+
+four_hex_digits ~ hex_digit hex_digit hex_digit hex_digit
+hex_digit       ~ [0-9a-fA-F]
+
+comma          ~ ','
+
+:discard       ~ whitespace
+whitespace     ~ [\s]+

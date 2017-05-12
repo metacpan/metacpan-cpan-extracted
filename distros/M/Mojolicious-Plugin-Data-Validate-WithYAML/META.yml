@@ -1,0 +1,22 @@
+---
+abstract: 'validate form input with Data::Validate::WithYAML'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-Data-Validate-WithYAML
+requires:
+  Data::Validate::WithYAML: 0.11
+  Mojolicious: 4.0
+resources:
+  bugtracker: http://github.com/reneeb/Mojolicious-Plugin-Data-Validate-WithYAML/issues
+  homepage: http://github.com/reneeb/Mojolicious-Plugin-Data-Validate-WithYAML
+  repository: git://github.com/reneeb/Mojolicious-Plugin-Data-Validate-WithYAML.git
+version: 0.04

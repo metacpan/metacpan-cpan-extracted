@@ -1,0 +1,42 @@
+Mojolicious::Plugin::DBViewer
+
+  Mojolicious plugin to display database information on browser.
+
+Features
+
+  This module have the following features.
+    
+    - Support MySQL and SQLite
+    - Display all table names
+    - Display show create table
+    - Select * from TABLE
+    - Display primary keys, null allowed columnes,
+      database engines, and charsets in all tables.
+
+Example
+
+  # Mojolicious::Lite
+  plugin(
+    'DBViewer',
+    dsn => "dbi:mysql:database=bookshop",
+    user => 'ken',
+    password => '!LFKD%$&'
+  );
+
+  # Mojolicious
+  $app->plugin(
+    'DBViewer',
+    dsn => "dbi:mysql:database=bookshop",
+    user => 'ken',
+    password => '!LFKD%$&'
+  );
+  
+  # Access
+  http://localhost:3000/dbviewer
+  
+  # Prefix change (http://localhost:3000/dbviewer2)
+  plugin 'DBViewer', dsn => $dsn, prefix => 'dbviewer2';
+
+  # Route for bridge
+  my $bridge = $app->route->under(sub {...});
+  plugin 'DBViewer', dsn => $dsn, route => $bridge;

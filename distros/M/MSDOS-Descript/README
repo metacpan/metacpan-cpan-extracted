@@ -1,0 +1,58 @@
+MSDOS::Descript version 1.05, released September 20, 2014
+
+
+This module provides access to 4DOS style DESCRIPT.ION files.
+It can both read and write them.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+
+DEPENDENCIES
+
+  Package      Minimum Version
+  ------------ ---------------
+  perl          5.6.0
+  Carp          
+  Tie::CPHash   
+  vars
+
+    You must have the Tie::CPHash module (a case-insensitive hash).
+
+    Additionally, you should have the MSDOS::Attrib module if it's
+    supported on your system (it currently works on OS/2 and Win32
+    systems).  If you don't have MSDOS::Attrib, then any DESCRIPT.ION
+    files modified by MSDOS::Descript will no longer be hidden files.
+    This means that they will show up in directory listings.
+
+    Both these modules are available on CPAN:
+
+        http://search.cpan.org/dist/Tie-CPHash/
+        http://search.cpan.org/dist/MSDOS-Attrib/
+
+
+
+CHANGES
+    Here's what's new in version 1.05 of MSDOS::Descript:
+    (See the file "Changes" for the full revision history.)
+
+	- mention JP Software in documentation
+	- release tests moved to xt/
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

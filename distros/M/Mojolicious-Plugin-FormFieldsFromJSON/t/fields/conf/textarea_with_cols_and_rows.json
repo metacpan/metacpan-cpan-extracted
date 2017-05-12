@@ -1,0 +1,12 @@
+ [
+    {
+        "type" : "textarea",
+        "name" : "message",
+        "data" : "Current message",
+        "attributes" : {
+            "cols" : 80,
+            "rows" : 10
+        }
+    }
+ ]
+

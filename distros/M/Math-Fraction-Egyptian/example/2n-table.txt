@@ -1,0 +1,273 @@
+http://rmprectotable.blogspot.com/2008/07/rmp-2n-table.html
+
+BREAKING the RMP 2/n Table Code
+Author: Milo Gardner Bio
+
+INTRODUCTION
+
+Breaking the RMP 2/n table code is a central task for historians that wish to
+learn Egyptian mathematics. Egyptians wrote rational numbers in two ways. The
+first method acted like our modern rational numbers. The second method,
+written in a unique manner, converted rational numbers to equivalent unit
+fraction, sometimes optimized and sometimes not, to concise series.
+
+The first, and second methods, are recorded in the Kahun Papyrus and the Rhind
+Mathematical Papyrus. Both texts solved arithmetic progression problems by
+using rational number differences. Egyptian fraction series were used to write
+final answers. Arithmetic progressions, an algebra topic that followed
+interesting formulas, will not be discussed. The second method, an arithmetic
+topic, 2/n tables, listing optimized unit fraction series, will be discussed
+in terms of a likely ancient unifying theme.
+
+Overly analytical views of possible 2/n table methods, especially potential
+2/35, 2/91 and 2/95 conversion methods have been suggested by scholars for
+over 100 years. In 1995, an interesting internet paper suggested discussed the
+2/35, 2/91 and 2/95 cases, as well as 2/17 and 2/19 table solutions written in
+500 AD (Akhmim Papyrus). Overall, modern number theory's abstract analysis are
+important. These analysis show that ancient Egyptian fractions were likely
+well definedm and unified in several respects. But, what where the ancient
+ideas that unified the work of Ahmes and other ancient scribes? Can the
+ancient unifying idea(s) be identified?
+
+As a method to attempt to correct for over analytical and under analytical
+errors, and fairly parse ancient unifying ideas, Fibonacci's 1202 AD Liber
+Abaci was consulted. The first 126 pages of the Liber Abaci covers
+conversion and factoring examples. The examples are summarized by seven
+Egyptian fraction conversion methods. Four of the conversion methods date
+to the time of Ahmes. It will be shown that Ahmes used a three-step
+conversion method that applied four of Fibonacci's seven conversion
+methods. Ahmes first step, the selection of a multiple, was indirectly
+cited in Ahmes' shorthand notation by a' red auxiliary number. Hence the
+selection of particular multiples may have been intuitive.
+
+CODE BREAKING METHODOLOGY
+
+It will be shown that Egyptian fraction series were created from vulgar
+fractions by using optimal red auxiliary numbers for over 3,000 years. The
+Egyptian fraction body of knowledge was reverse and forward engineered.
+Historians parse aspects of the oldest rational number arithmetic by
+working backwards. Historians consider original and additional Egyptian
+fraction patterns by analytical methods. The test for historians is to find
+the simplest forward engineered method. The traditional scholarly method
+points out original methods by applying Occam's Razor. In the case of
+Ahmes' RMP 2/n table , Occam's Razor was applied to point out a general
+used of red auxiliary multiple. A 350 year older text, the EMLR details 26
+conversions of 1/p and 1/pq by selecting non-optimal multiples.
+
+Following a Middle Kingdom tradition, texts published in the Ancient Near
+East for 3,000 years published optimal and elegant Egyptian fraction texts.
+Ahmes' tradition optimized red auxiliary numbers. The multiple step will be
+denoted by a number m. For ease of reporting 2/n table data, m will be
+replaced by (m/m). First-steps, second-steps, and third-steps were
+personalized by scribes. That is, Ahmes' 2/n table rules report alternative
+multiples, when compared to other Egyptian fraction texts. For example
+alternative multiples are reported in the Kahun 2/n table. Alternative
+multiples are also reported in Greek, Ancient Near East, and medieval
+texts.
+
+Whatever set of conversion steps Ahmes may have used, Ahmes, and other
+scribes, first converted vulgar fractions by multiplying 2/n vulgar
+fractions by red auxiliary numbers (m/m). Two additional steps were used by
+Ahmes when 2/n table information was fully translated into modern
+arithmetic. Clearly Ahmes' arithmetic partitioned numerator 2m into
+additive integers, a fact pointed out in the 1920's. That is, 2/n
+conversions created a new numerator 2m, a new denominator mn, a set of
+additive 2m integers, and an optimized Egyptian fraction series. Ahmes
+method is symbolically written as Rule One, a fact decoded in 2005.
+
+Rule One:
+
+    2/n = 2/n*(m/m)
+        = 2m/mn
+        = (mn1 + ... + mni)/(mn)
+        = 1/a + 1/a1(n) + ...+ 1/ai(n)
+
+where:
+
+    1. 2m was additively partitioned into i integers: (mn1 + mn2 + ... +
+       mni) = 2m, based on mn being factored into mn1, mn2, ..., mni and
+       other primes and composites
+
+such that:
+
+    2. mn1, mn2, ..., mni each divide mn
+
+and,
+
+    3. m = a, in most cases, when for m > 8
+
+and,
+
+    4. As an observation a1, ..., ai were always divisors of the
+       denominator a of the first partition 1/a
+
+example:
+
+    2/7 = 2/7*(4/4) = 8/28 = (7 + 1)/28 = 1/4 + 1/28
+
+where:
+
+    2m = 8, with additive parts (7 + 1) = 8
+
+and,
+
+    a = 4, with 4 and n: being divisors of 28 (and all a1, a2, ... denominators).
+
+The second-step, 2m/mn (8/28) has been omitted. The omission provides a
+sense of Ahmes' red auxiliary shorthand, a major decoding barrier. The
+decoded data therefore leaves work for readers, as Ahmes did himself, to
+compute 2m and confirm the numerator's additive parts that adds to 2m.
+
+RMP 2/n TABLE: DECODED
+
+    2/3   = 1/3 + 1/3 = 2/3 followed an EMLR 1/3 = 1/6 + 1/6 'rule'.
+    2/5   = 2/5*(3/3) = (5 + 1)/15 = 1/3 + 1/15
+    2/7   = 2/7*(4/4) = (7 + 1)/28 = 1/4 + 1/28
+    2/9   = 2/9*(2/2) = (3 + 1)/18 = 1/6 + 1/18
+    2/11  = 2/11*(6/6) = (11 + 1)/66 = 1/6 + 1/66
+    2/13  = 2/13*(8/8) = (13 + 2 + 1)/104 = 1/8 + 1/52 + 1/104
+    2/15  = 2/15*(2/2) = (3 + 1)/30 = 1/10 + 1/30
+    2/17  = 2/17*(12/12) = (17 + 4 + 3)/204 = 1/12 + 1/51 + 1/68
+    2/19  = 2/19*(12/12) = (19 + 3 + 2)/228 = 1/12 + 1/76 + 1/114
+    2/21  = 2/21*(2/2) = (3 + 1)/42 = 1/14 + 1/42
+    2/23  = 2/23*(12/12) =(23 +1)/276 = 1/12 1/276
+    2/25  = 2/25*(3/3) = (5 + 1)/75 = 1/15 + 1/75
+    2/27  = 2/27*(2/2) = (3 + 1)/54 = 1/18 + 1/54
+    2/29  = 2/29*(24/24)= (29 + 12 + 4 + 3)/696 = 1/24 + 1/58 + 1/174 + 1/232
+    2/31  = 2/31*(20/20) = (31 + 5 + 4)/1620 = 1/20 + 1/124 + 1/155
+    2/33  = 2/33*(2/2) = (3 + 1)/66 = 1/22 + 1/66
+    2/35  = 2/35*(30/30) = (35 + 25)/1050 = 1/30 + 1/42
+    2/37  = 2/37*(24/24) = ( 37 + 8 + 3 )/888 = 1/24 + 1/111 + 1/296
+    2/39  = 2/39*(2/2)= (3 + 1)/78 = 1/26 + 1/78
+    2/41  = 2/41*(24/24)= (41 + 4 + 3 )/984 = 1/24 + 1/246 + 1/328
+    2/43  = 2/43*(42/42)=(43 + 21 + 14 + 6)/1806 = 1/42 + 1/86 + 1/129 + 1/301
+    2/45  = 2/45*(2/2)      = ( 3 + 1)/90 = 1/30 + 1/90
+    2/47  = 2/47*(30/30)    = (47 + 10 + 3)/1410 = 1/30 + 1/141 + 1/470
+    2/49  = 2/49*(4/4)      = (7 + 1)/196 = 1/28 + 1/196
+    2/51  = 2/51*(2/2)      = (3 + 1)/102 = 1/34 + 1/102
+    2/53  = 2/53*(30/30)    = (53 + 5 + 2 )/1590 = 1/30 + 1/318 + 1/795
+    2/55  = 2/55(6/6)       = (11 + 1)/330 = 1/30 + 1/330
+    2/57  = 2/57*(2/2)      = (3 + 1)/114 = 1/38 + 1/114
+    2/59  = 2/59*(36/36)    = (59 + 9 + 4) /2124 = 1/36 + 1/236 + 1/531
+    2/61  = 2/61*(40/40)    = (61 + 10 + 5 + 4)/2440 = 1/40 + 244 + 1/488 + 1/610
+    2/63  = 2/63*(2/2)      = (3 + 1)/126 = 1/42 + 1/126
+    2/65  = 2/65*(3/3)      = (5 + 1)/195 = 1/39 + 1/195
+    2/67  = 2/67*(40/40)    = (67 + 8 +5 )/2680 = 1/40 + 1/335 + 1/536
+    2/69  = 2/69*(2/2)      = (3 + 1)/138 = 1/46 +1/138
+    2/71  = 2/71*(40/40)    = (71+ 5 + 4)2840 = 1/40 + 1/568 + 1/710
+    2/73  = 2/73*(60/60)    = (73 + 20 + 15 + 12)/4380 = 1/60 + 1/219 + 1/292 + 1/365
+    2/75  = 2/75*(2/2)      = (3 +1)/150 = 1/50 + 1/75
+    2/77  = 2/77*(4/4)      = (7 + 1)/388 = 1/44 + 1/308
+    2/79  = 2/79*(60/60)    = (79 + 20 + 15 + 6 )/4740 = 1/60 + 237 + 1/316 + 1/790
+    2/81  = 2/81*(2/2)      = (3 + 1)/162 = 1/54 + 1/162
+    2/83  = 2/83*(60/60)    = (83+ 15 + 12 +10)/4980 = 1/60 + 1/332 + 1/415 + 1/498
+    2/85  = 2/85*(3/3)      = (5 + 1)/255 = 1/51 + 1/255
+    2/87  = 2/87*(2/2)      = (3 + 1)/174 = 1/58 + 1/74
+    2/89  = 2/89*(60/60)    = (89 + 15 +10 + 6)/5340 = 1/60 + 1/356 + 1/534 + 1/890
+    2/91  = 2/91*(70/70)    = (91 + 49)/6370 = 1/70 + 1/130
+    2/93  = 2/93*(2/2)      = (3 + 1)/186 = 1/62 + 1/186
+    2/95  = 2/95*(12/12)    = (19 + 3 + 2)/1140 = 1/60 + 1/380 + 1/570
+    2/97  = 2/97*(56/56)    = (97+ 8 + 7 )/5432 = 1/56 + 1/679 + 1/776
+    2/99  = 2/99*(2/2)      = (3 + 1)/198 = 1/66 + 1/198
+    2/101 = 2/101*(6/6)     = (6 + 3 + 2 + 1)/606 = 1/101 + 1/202 + 1/303 + 1/606
+
+OBSERVATIONS
+
+1. When n is a prime > 99
+
+a. The EMLR cited: m = 6 was used to convert 1/101, as Ahmes used m = 6 to convert 2/101 and likely all larger 2/p prime denominators.
+
+b. By implication (since Ahmes did not mention this class of detail) when n was composite, m was selected in terms of its largest prime number. Taking two examples, n = 19 and n = 95 (5*19), Ahmes used m = 12.
+
+2. When m > 8
+
+a. mn1 = n
+
+b. a = m
+
+3. The 2/n table method was extended to n/p and n/pq tables. A Coptic Akhmim Papyrus
+included over-analyzed n/17 and n/19 data, referenced in the INTRODUCTION. Applying Occam's Razor to simplify Coptic multiples several examples vulgar fractions may be of interest:
+
+a. 2/19 x 10/10 = (19 +1)/190 = 10' 190' (Greek notation 1/n = n'):
+b. m = 60 to convert 3/19, additive parts (76 + 57 + 20 + 15 + 12)/1140
+c. m = 6 to convert 4/19,
+d. m = 4 to convert 5/19.
+e. m = 6 to convert 6/19
+f. m= 6 to convert 7/19
+g. m = 30 to convert 8/19
+
+CONCLUSION
+
+Summing up Ahmes' stated, and observed, RMP 2/n table rules, a three-step
+method included the use of intuition. Ahmes also understood aspects of the
+fundamental theorem of arithmetic, that integers uniquely factor into prime
+numbers. It should be noted that Ahmes did not use algorithms, though
+fragments of a single false position algorithm have been reported for
+almost 100 years, and a cursive algorithm was known in the Old Kingdom.
+Middle Kingdom single false position was not used in RMP 31, and other like
+problems, since traditional red auxiliary multiples offers a simpler
+approach. In RMP 31 Ahmes converted 28/97 by solving two vuglar fractions:
+26/97 + 2/97. Ahmes solved 26/97 (with m = 4) and solved 2/97 (with m =
+56). Ahmes combined 28/97 unit fractions series into one answer.
+Robins-Shute' RMP 1987 book discusses the problem/answer, omitting the red
+auxiliary step, a common practice of historians. Historians need to
+included a red auxiliary step even in texts that scribes left no explicit
+clue of its use. The Egyptian fraction data provides sufficient proof of
+the scribal use of multiples, every time when 2/n, and vulgar fractions
+were optimally or elegantly created.
+
+Concerning a wider view of vulgar fractions and 2/n tables a narrative
+links Old Kingdom infinite series numeration to Middle Kingdom finite
+Egyptian fraction numeration. Ahmes' red auxiliary first-step, used in 2/n
+tables, was extended to convert n/p and n/pq vulgar fractions solved in 84
+RMP problems. Ahmes, RMP 81, discussed two additional classes of Egyptian
+fraction series. The additional classes defined Egyptian fraction weights
+and measures applications that partitioned a hekat unity (64/64), writing
+red auxiliary remainders, and m/n 'sub-units' of a hekat, that did not use
+red auxiliary remainders.
+
+BIBLIOGRAPHY
+
+1. Mahmoud Ezzamel, Accounting for Private Estates and the Household in the
+   20th Century BC Middle Kingdom, Abacus Vol 38 pp 235-263, 2002
+
+2. Milo Gardner, The Egyptian Mathematical Leather Roll Attested Short Term
+   and Long Term, History of Mathematical Sciences, Hindustan Book Company,
+   2002.
+
+3. Milo Gardner, An Ancient Egyptian Problem and its Innovative Solution,
+   Ganita Bharati, MD Publications Pvt Ltd, 2006.
+
+4. Richard Gillings, Mathematics in the Time of the Pharaohs, Dover Books,
+   1992.
+
+5. Heinz Lüneburg, Leonardi Pisani Liber Abbaci oder Lesevergnügen eines
+   Mathematikers, Mannheim: B. I. Wissenschaftsverlag , 1993.
+
+6. Oystein Ore, Number Theory and its History, McGraw-Hill, 1948.
+
+7. T.E. Peet, Arithmetic in the Middle Kingdom, Journal Egyptian
+   Archeology, 1923.
+
+8. Tanja Pommerening, "Altagyptische Holmasse Metrologish neu
+   Interpretiert" and relevant phramaceutical and medical knowledge, an
+   abstract, Phillips-Universtat, Marburg, 8-11-2004, taken from "Die
+   Altagyptschen Hohlmass, Buske-Verlag, 2005.
+
+9. L.E. Sigler, Fibonacci's Liber Abaci: Leonardo Pisano's Book of
+   Calculation, Springer, 2002.
+
+10. Hana Vymazalova, The Wooden Tablets from Cairo:The Use of the Grain
+    Unit HK3T in Ancient Egypt, Archiv Orientalai, Charles U Prague, 2002.
+
+LINKS:
+
+    1. RMP 2/n Table (Wikipedia)
+    2. EMLR (Wikipedia)
+    3. EMLR (Planetmath)
+    4. Hultsch-Bruins Method (Planetmath)
+    5. Egyptian fractions (Planetmath)
+    6. Kahun Papyrus
+    7. Liber Abaci (Planetmath)
+    8. Liber Abaci (Blog)
+

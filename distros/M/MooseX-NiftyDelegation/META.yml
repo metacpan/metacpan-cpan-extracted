@@ -1,0 +1,42 @@
+---
+abstract: 'extra sugar for method delegation'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.61'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Moose::Meta::Class::__ANON__::SERIAL::8 version , CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-NiftyDelegation
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  MooseX::NiftyDelegation:
+    file: lib/MooseX/NiftyDelegation.pm
+    version: '0.003'
+  MooseX::NiftyDelegation::Trait::Attribute:
+    file: lib/MooseX/NiftyDelegation.pm
+    version: '0.003'
+requires:
+  Moose: '2.00'
+  Sub::Exporter: '0'
+  thanks: '0.001'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/MooseX-NiftyDelegation/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=MooseX-NiftyDelegation
+  homepage: https://metacpan.org/release/MooseX-NiftyDelegation
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-moosex-niftydelegation.git
+version: '0.003'

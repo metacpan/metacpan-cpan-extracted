@@ -1,0 +1,5 @@
+2.4.8.1 -- initial release.
+2.4.8.2 -- fix accidental double mcrypt_end'ing which using strict.
+2.4.8.3 -- fix AUTOLOAD recursion problem when Mcrypt.so dependencies
+           aren't met at runtime.
+2.5.7.0 -- update tests to pass.. test against libmcrypt 2.5.7

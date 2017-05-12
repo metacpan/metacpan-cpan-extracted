@@ -1,0 +1,130 @@
+#!/usr/bin/perl
+#
+# rc.honeypot v0.02 9-11-06
+# Copyright 2006, Michael Robinton, michael@bizsystems.com
+# See GPL notice in Mail::SMTP::Honeypot
+#
+use strict;
+use Mail::SMTP::Honeypot;
+local $^W = 1;	# use warnings;
+
+#########################################################
+#     For most unix systems, this should work as is	#
+#########################################################
+
+my $config = {
+
+# specify the directory for the pid file for this daemon
+# [required]
+#
+	piddir		=> '/var/run',
+
+# deny at command state, one of:
+#	CONN EHLO HELO MAIL RCPT DATA
+# defaults to DATA if not specified
+# [optional]
+#	deny		=> 'DATA',
+
+
+# specify the local domain name, defaults to local hostname.
+# this is probably not what you want if you use virtual IP's
+# and have a real mail client on the same host. so...
+# specify the host 'answerback name' here.
+# [optional]
+#
+#	hostname	=> 'my.host.name.com',
+
+# specify the IP address to bind the listening port
+# defaults to ALL interfaces (INADDR_ANY)
+# [optional]
+#
+#	ip_address	=> '1.2.3.4',
+
+# listen port -- default 25
+# this is useful for debugging purposes
+# [optional]
+#
+#	port		=> 25,
+
+## NOTE: 	see Concurrent Daemon Operation in the
+##		documentation for setup where another
+##		mail daemon is running on the same host.
+
+# specify the response delay after connect or upon
+# receipt of an smtp command from the client
+#
+# NOTE:	if a response is not received
+#		from the client in this time
+#		period, the smptdeny daemon will
+#		issue a 421 response and disconnect
+# [optional] default 10 seconds
+#
+#	delay		=> 10,
+
+# syslog facility, one of:
+#	LOG_KERN LOG_USER LOG_MAIL LOG_DAEMON
+#	LOG_AUTH LOG_SYSLOG LOG_LPR LOG_NEWS
+#	LOG_UUCP LOG_CRON LOG_AUTHPRIV LOG_FTP
+#	LOG_LOCAL0 LOG_LOCAL1 LOG_LOCAL2 LOG_LOCAL3
+#	LOG_LOCAL4 LOG_LOCAL5 LOG_LOCAL6 LOG_LOCAL7
+#
+# You should not need to change this
+#
+#	log_facility	=> 'LOG_MAIL',
+
+# syslog log level or (none), one of:
+#	STDERR LOG_EMERG LOG_ALERT LOG_CRIT LOG_ERR
+#	LOG_WARNING LOG_NOTICE LOG_INFO LOG_DEBUG
+#
+# NOTE: 	the command line -d flag overrides
+#		this and sets the level to STDERR
+# [optional]
+#
+	syslog		=> 'LOG_WARNING',
+
+# log verbosity
+#	0 connect only
+#	1 + To: & From:
+#	2 + bad commands
+#	3 + trace execution
+#	4 + deep trace with sub names
+# [optional]
+#
+	verbose		=> 0,
+
+# DNS host, if you do not have a resolver
+# on your host or for debugging
+# default: as returned by your resolver for local dns
+# [optional]
+#	dnshost		=> 'use.default',
+
+# DNS port, useful for debugging
+# [optional] default 53
+#
+#	dnsport		=> 53,
+
+# timeout for DNS PTR queries
+# [optional] default: use 'delay' above
+#
+#	DNStimeout	=> 10,
+
+# maximum number of connected clients
+# [optional] default 100
+#
+#	maxthreads	=> 100,
+
+# maximum number of commands per client
+# [optional] default 100
+#
+#	maxcmds		=> 100,
+
+# disconnect the remote after this much time
+# [optional] default 300 seconds
+#
+#	disconnect	=> 300,
+
+};
+
+local $^W = 0; # no warnings;
+
+run_honeypot($config);

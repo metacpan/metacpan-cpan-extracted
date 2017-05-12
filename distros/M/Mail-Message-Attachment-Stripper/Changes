@@ -1,0 +1,11 @@
+Revision history for Mail::Message::Attachment::Stripper
+
+1.01  Mon Jan 16 2006
+  - Explicitly close mailbox in text to silence warning
+
+1.00  Oct 26 2003
+  - first CPAN release.
+
+0.01  Dec 15 2002
+	- original version, internal to Kasei
+

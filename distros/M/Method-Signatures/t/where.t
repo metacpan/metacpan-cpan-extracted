@@ -1,0 +1,167 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Test::More;
+use Test::Warn;
+use Test::Exception;
+use lib 't/lib';
+use GenErrorRegex qw< required_placeholder_error placeholder_badval_error placeholder_failed_constraint_error >;
+
+# Skip the test before Method::Signatures can try to compile it and blow up.
+BEGIN {
+    plan skip_all => "Perl 5.10.1 or higher required to test where constraints" if $] < 5.01001;
+}
+
+use Method::Signatures;
+
+
+my $where_func = q{ func silly_test ($x where { $_ == 3 }) {} };
+warning_is { eval $where_func } undef, 'no warnings for using smartmatch';
+
+
+subtest 'where { block() }' => sub {
+    plan tests => 3;
+
+    func small_int (Maybe[Int] $x where { $_ < 10 } is copy = 0 when undef) {
+        ok defined $x, "small_int($x) has defined value";
+        ok $x < 10, "small_int($x) has value in range";
+        return 1;
+    }
+
+    subtest "small_int()" => sub {
+        ok  eval{ small_int();  }, "small_int() called as expected"
+            or note $@;
+    };
+
+    subtest "small_int(9)" => sub {
+        ok  eval{ small_int(9); }, "small_int(9) called as expected"
+            or note $@;
+    };
+
+    subtest "small_int(10)" => sub {
+        ok !eval{ small_int(10);}, "small_int(10) not called (as expected)";
+        note $@;
+    };
+};
+
+
+subtest 'where [0..10]' => sub {
+    plan tests => 4;
+
+    func range_int (Maybe[Int] $x where [0..9] is copy = 0 when undef) {
+        ok defined $x, "range_int($x) has defined value";
+        ok 0 <= $x && $x <= 9, "range_int($x) has value in range";
+        return 1;
+    }
+
+    subtest "range_int()" => sub {
+        ok  eval{ range_int();  }, "range_int() called as expected"
+            or note $@;
+    };
+
+    subtest "range_int(9)" => sub {
+        ok  eval{ range_int(9); }, "range_int(9) called as expected"
+            or note $@;
+    };
+
+    subtest "range_int(10)" => sub {
+        ok !eval{ range_int(10);}, "range_int(10) not called (as expected)";
+        note $@;
+    };
+
+    subtest "range_int(-1)" => sub {
+        ok !eval{ range_int(-1);}, "range_int(10) not called (as expected)";
+        note $@;
+    };
+};
+
+
+subtest 'where { cat => 1, dog => 2}' => sub {
+    plan tests => 4;
+
+    func hash_member (Maybe[Str] $x where { cat => 1, dog => 2 } is copy = 'cat' when undef) {
+        ok defined $x, "hash_member($x) has defined value";
+        like $x, qr{^(cat|dog)$} , "hash_member($x) has value in range";
+        return 1;
+    }
+
+    subtest "hash_member()" => sub {
+        ok  eval{ hash_member();  }, "hash_member() called as expected"
+            or note $@;
+    };
+
+    subtest "hash_member('cat')" => sub {
+        ok  eval{ hash_member('cat'); }, "hash_member('cat') called as expected"
+            or note $@;
+    };
+
+    subtest "hash_member('dog')" => sub {
+        ok  eval{ hash_member('dog'); }, "hash_member('dog') called as expected"
+            or note $@;
+    };
+
+    subtest "hash_member('fish')" => sub {
+        ok !eval{ hash_member('fish');}, "hash_member('fish') not called (as expected)";
+        note $@;
+    };
+};
+
+
+subtest 'where where where' => sub {
+    no if $] >= 5.017011, warnings => 'experimental::smartmatch';
+    plan tests => 14;
+
+    func is_prime ($x) {
+        return $x ~~ [2,3,5,7,11];
+    }
+
+    func neg_and_odd_and_prime ($x where [0..10] where { $x % 2 } where \&is_prime ) {
+        ok $x ~~ [3,5,7], '$x had acceptable value';
+        return 1;
+    }
+
+    for my $n (-1..11) {
+        subtest "neg_and_odd_and_prime($n)" => sub {
+            local $@;
+            my $result = eval{ neg_and_odd_and_prime($n); };
+            my $error  = $@;
+
+            if (defined $result) {
+                pass "neg_and_odd_and_prime($n) as expected";
+            }
+            else {
+                like $error, qr{\$x value \("$n"\) does not satisfy constraint:}
+                    => "neg_and_odd_and_prime($n) as expected";
+                note $@;
+            }
+        };
+    }
+
+    # try an undef value
+    my $result = eval{ neg_and_odd_and_prime(undef); };
+    like $@, qr{\$x value \(undef\) does not satisfy constraint:}, "neg_and_odd_and_prime(undef) as expected";
+};
+
+subtest 'where with placeholders' => sub {
+    func constrained_placeholder(Int $ where { $_ < 10 }) {
+        pass 'placeholder passes constraints';
+    }
+
+    ok eval { constrained_placeholder(2) }, 'constrained_placeholder() called as expected'
+        or note $@;
+
+    # line 155
+    throws_ok { constrained_placeholder() }
+        required_placeholder_error('main', 0, 'constrained_placeholder', LINE => 156),
+        'missing requierd constrained placeholder';
+    throws_ok { constrained_placeholder('foo') }
+        placeholder_badval_error('main', 0, 'Int' => 'foo', 'constrained_placeholder', LINE => 159),
+        'placeholder value wrong type';
+    throws_ok { constrained_placeholder(99) }
+        placeholder_failed_constraint_error('main', 0, 99 => '{$_<10}', 'constrained_placeholder', LINE => 162),
+        'placeholder value wrong type';
+};
+
+done_testing;

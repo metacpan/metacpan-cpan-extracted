@@ -1,0 +1,141 @@
+Change history for Math::Counting
+
+0.1305 2015-10-19 21:47:24
+    - Added handy plugins to dist.ini.
+    - Corrected numeric tests with "cmp_ok ==."
+    - Improved documentation.
+
+0.1304 2014-08-30 09:23:52
+    - Fixed POD
+
+0.1303 2013-06-05 01:14:32
+    - Improve upper-bound factorial tests.
+
+0.1302 2013-06-04 11:something PM
+    - Fixed infinity tests on "differnently-abled" systems.
+    - Split up tests into conceptual files.
+    - Improved docs.
+
+0.1301 2013-06-03
+    - Removed the annoying " == $x" bits from test names.
+    - Try to isolate the 171! on windows test failure...
+    - Handle zero padded exponents in tests.
+
+0.1300 2013-06-01
+    - Enable derangement computation.
+
+0.1202 2013-05-31
+    - Fixed Math::BigInt version prereq.
+
+0.1201 2013-05-31
+    - Fixed usage of either GMP or Pari.
+
+0.1200 2013-05-30
+    - Contemplate the sub-factorial.
+    - Allow upper bound test to pass with inf or the actual e+309 value.
+
+0.1100 2013-05-29
+    - Add try => GMP to the use Math::BigInt line.
+    - Add upper bounds factorial tests.
+
+0.10 2013-05-27
+    - Add computation of combinations with repetition from Petar Kaleychev.
+    - Add tests for repetition computation.
+    - Improve documentation.
+
+0.0908 2013-02-20
+    - Only allow Math::BigInt v1.76 and up.
+
+0.0907 2013-02-18
+    - Added handy plugins to distro building.
+    - Fixed scientific notation matching.
+    - Removed eval overkill in the methods test.
+
+0.0906 Sat Feb 16, 2013
+    - Added Test::PodSpelling to dist.ini.
+    - Reduce the precision of the test values by two places.
+
+0.0905 Wed Apr 26, 2012
+    - Explicitly export nothing by default.
+    - Add a friendly CREDITS section to the POD.
+    - Repaired and reorganized POD.
+
+0.0904 Wed Apr 25, 2012
+    - Allow individual functions to be exported, also.
+
+0.0903 Wed Apr 25, 2012
+    - Added missing Export require statement.
+
+0.0902 Thu May 26, 2011
+    - Account for system dependent sprintf %e format return values
+      when testing. LeoNerd++
+
+0.0901 Sun May 22, 2011
+    - Properly import when testing.
+    - Decreased digits of precision in test.
+
+0.09 Wed Apr 20, 2011
+    - Let's specifiy the module prerequisite this time!
+    - Minimized distribution bulk and maintenance tasks with Dist::Zilla.
+
+0.0801 Thu Aug 8, 2008
+    - Fixed documentation.
+
+0.08 Thu Aug 8, 2008
+    - Fixed the broken/wtf? test.
+    - Added defined && /^\d+$/ tests to the student subroutines.
+
+0.0702 Mon Dec 3, 2007
+    - Whoops. Need require 5.6 in the makefile.
+
+0.0701 Mon Jun 18, 2007
+    - Removed the Math::BigInt "try =>" bit until I figure out how to
+      use it properly.
+    - Fixed incomplete POD.
+
+0.07 Mon Jun 18, 2007
+    - Use Math::Big for actual computation.
+
+0.06 Sat Jun 24, 2006
+    - Replaced the :all export tag with :long and :short.
+    - Reorganized and updated the POD.
+    - Updated the test to use :long and :short.
+
+0.05 Sun Dec 4, 2005
+    - Added f(), P() and C() convenience methods.
+    - Added the :all export tag.
+    - Added tests for exporting the shortnames and :all.
+    - Cleaned up the POD a bit, as usual.
+
+0.04 Tue Nov 15, 2005
+    - Cleaned up the unit test.
+    - Cleaned up the Makefile.PL a bit.
+    - Cleaned up the POD.
+    - Made the three exported functions share identical syntax.
+
+0.0302 Thu Oct 27, 2005
+    - Ack! The most horrid, ironically stupid typo ever.
+      (This was supposed to be a simple package... Someone
+      put me out of my own misery.)
+
+0.0301 Wed Oct 26, 2005
+    - oof. Forgot to fix-up the tests=>flag
+
+0.03 Wed Oct 26, 2005
+    - Researched the permutation function again and found that I was
+      still correct. 
+    - Cleaned up POD.
+    - Added a slew of goofy edge-case tests.
+
+0.02 Tue Sep 28, 2005
+    - Made the test actually test edge cases.
+
+0.01 Tue Sep 27 7PM, 2005
+    - Remembered to finish this module.
+
+0.00_02 Mon Sep 12, 2005
+    - Added MJD's algorithms.
+    - Replaced the stupid OO crap with exported functions.
+
+0.00_01 Sun Sep 11 18:51:29, 2005
+    - Created with Module::Husbandry.

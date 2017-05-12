@@ -1,0 +1,8 @@
+Music::Note
+ 
+ An OO encapsulation of a single musical note. 
+ Includes methods for transposition, enharmonic equivalence, 
+ and creation/output in a range of formats.
+
+ See the module documentation for futher details.
+

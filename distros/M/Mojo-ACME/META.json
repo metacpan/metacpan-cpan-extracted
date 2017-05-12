@@ -1,0 +1,94 @@
+{
+   "abstract" : "Mojo-based ACME-protocol client",
+   "author" : [
+      "Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.018",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-ACME",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.018"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::OpenSSL::Bignum" : "0",
+            "Crypt::OpenSSL::PKCS10" : "0",
+            "Crypt::OpenSSL::RSA" : "0",
+            "Digest::SHA" : "0",
+            "MIME::Base64" : "3.11",
+            "Mojolicious" : "7.15",
+            "Safe::Isa" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Mock::MonkeyPatch" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojo::ACME" : {
+         "file" : "lib/Mojo/ACME.pm",
+         "version" : "0.09"
+      },
+      "Mojo::ACME::CA" : {
+         "file" : "lib/Mojo/ACME/CA.pm"
+      },
+      "Mojo::ACME::ChallengeServer" : {
+         "file" : "lib/Mojo/ACME/ChallengeServer.pm"
+      },
+      "Mojo::ACME::Key" : {
+         "file" : "lib/Mojo/ACME/Key.pm"
+      },
+      "Mojolicious::Plugin::ACME" : {
+         "file" : "lib/Mojolicious/Plugin/ACME.pm"
+      },
+      "Mojolicious::Plugin::ACME::Command" : {
+         "file" : "lib/Mojolicious/Plugin/ACME/Command.pm"
+      },
+      "Mojolicious::Plugin::ACME::Command::acme" : {
+         "file" : "lib/Mojolicious/Plugin/ACME/Command/acme.pm"
+      },
+      "Mojolicious::Plugin::ACME::Command::acme::account" : {
+         "file" : "lib/Mojolicious/Plugin/ACME/Command/acme/account.pm"
+      },
+      "Mojolicious::Plugin::ACME::Command::acme::account::register" : {
+         "file" : "lib/Mojolicious/Plugin/ACME/Command/acme/account/register.pm"
+      },
+      "Mojolicious::Plugin::ACME::Command::acme::cert" : {
+         "file" : "lib/Mojolicious/Plugin/ACME/Command/acme/cert.pm"
+      },
+      "Mojolicious::Plugin::ACME::Command::acme::cert::generate" : {
+         "file" : "lib/Mojolicious/Plugin/ACME/Command/acme/cert/generate.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jberger/Mojo-ACME/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jberger/Mojo-ACME"
+      }
+   },
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

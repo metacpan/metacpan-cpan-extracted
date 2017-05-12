@@ -1,0 +1,28 @@
+---
+abstract: 'Use Moose with make_immutable called for you.'
+author:
+  - 'Chad Granum <exodist7@gmail.com>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-AutoImmute
+provides:
+  MooseX::AutoImmute:
+    file: lib/MooseX/AutoImmute.pm
+    version: 0.001
+requires:
+  Fennec: 0.029
+  Hook::AfterRuntime: 0.003
+  Moose: 0
+resources:
+  bugtracker: http://github.com/exodist/MooseX-AutoImmute/issues
+  homepage: http://open-exodus.net/projects/MooseX-AutoImmute
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/exodist/MooseX-AutoImmute
+version: 0.001

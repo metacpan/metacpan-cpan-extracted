@@ -1,0 +1,46 @@
+Revision history for Perl module Module::Release::Git
+
+1.011 2016-01-26T19:06:04Z
+	* Freshen the distro.
+
+0.20 - 2014-01-17
+	* Add vcs_exit to @EXPORT! Oops.
+
+0.19 - 2014-01-06
+	* Implement vcs_tag for post-release repo tasks
+
+0.18 - 2014-01-03
+	* Get rid of MYMETA
+
+0.17 - 2013-02-07
+	* Require 5.10, since I use some of those features
+
+0.16 - 2013-02-02
+	* A less restrictive git status match
+
+0.13 - 2009-08-21
+	* The same as 0.12_02, but as a full release
+
+0.12_02 - 2009-05-09
+	* Distro cleaning, no big whoop
+
+0.12_01 - 2008-08-09
+	* Clean up the module to work with the latest version of
+	Module::Release.
+	* The git command seems to exit with 1 when everything works.
+	I don't know what it exits with when it fails, so don't
+	bother to check for the exit value right now.
+
+0.10_06 - 2008-08-30
+	* okay, this should really fix cvs_tag
+
+0.10_05 - 2008-08-30
+	* Oh, and I need to fix up some internals to match the
+	Changes in Module::Release
+
+0.10_04 - 2008-08-30
+	* Fix the disappearing tag in cvs_tag
+
+0.10_03 - 2008-08-29
+	* Fixed a bug in cvs_tag where nothing was tagged
+

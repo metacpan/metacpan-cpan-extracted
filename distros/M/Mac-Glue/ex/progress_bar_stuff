@@ -1,0 +1,33 @@
+#!perl -wl
+use Mac::Glue ':all';
+use strict;
+my($p, $pbar, %params, $name, $val);
+
+$name = 'foo';
+%params = (
+  caption       => 'bar',
+  subcaption    => 'baz',
+  minimum_value => 0,
+  maximum_value => 100
+);
+
+$p = new Mac::Glue 'Progress Bar';
+$p->activate;
+
+$p->make(new => window => with_properties =>
+    {name => $name, position => [300, 100]}
+);
+
+$pbar = $p->obj(progress_bar => 1, window => 1);
+
+foreach (keys %params) {
+    $p->set($p->prop($_ => $pbar), to => $params{$_});
+}
+
+$val = $p->prop(current_value => $pbar);
+
+for (1..100) {
+    $p->set($val, to => $_);
+}
+
+$p->quit;

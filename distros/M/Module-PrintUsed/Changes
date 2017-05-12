@@ -1,0 +1,20 @@
+Revision history for Perl extension Module::PrintUsed.
+
+0.06, Mon Mar 9th, 2015
+	- RT#84119: Specified POD encoding as UTF-8
+	- RT#101812: Added code to avoid negative repeat count
+	- Updated Meta.yml
+
+0.04 and 0.05
+	- Changes lost in time
+
+0.03  Sat Jun 6th, 2005
+    - Added POD tests, updated POD
+
+0.02  Thu Jun 22nd, 2004
+    - Refactored formatting code into FormattedModulesList()
+
+0.01  Sat Jun 12th, 2004
+	- original version
+
+

@@ -1,0 +1,25 @@
+---
+abstract: "Make your distribution's POD link to where inherited methods come from, the easy way (if you use M::I)."
+author:
+  - ', James Mastros, AKA theorbtwo.  Released under the same'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Module::Install::Pod::Inherit
+name: Module-Install-Pod-Inherit
+no_index:
+  directory:
+    - inc
+requires:
+  Pod::Inherit: 0.03
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

@@ -1,0 +1,178 @@
+=pod
+
+=head1 NAME
+
+Module::Mapper - Find source for modules and optionally map to another directory
+
+=head1 SYNOPSIS
+
+	use Module::Mapper;
+	#
+	#	explicit mode
+	#
+	$options = (
+		All => 1,
+		IncludePOD => 1,
+		Verbose => sub { print STDERR $_[0], "\n"; },
+		UseINC => 1,
+		Libs => [ './lib', './otherlib' ],
+		Scripts => [ './bin/mapmodule' ],
+		Output => './classdoc',
+		Modules => [ 'DBD', 'Module::Mapper', 'Some::Other::Module' ]
+	);
+	my $modules = find_sources( %options );
+	#
+	#	project mode
+	#
+	$options = (
+		IncludePOD => 1,
+		Verbose => sub { print STDERR $_[0], "\n"; },
+		Output => './classdoc',
+		Project => './project'
+	);
+	my $modules = find_sources( %options );
+
+=head1 DESCRIPTION
+
+Searches specified directories and/or @INC (or both) for the specified
+module(s) and/or executable(s). Returns a hashref mapping the module to
+an arrayref containing the full path where the sources were found
+and (optionally) a mapping output path if the Output option was specified.
+
+If neither C<Scripts> or C<Modules> are specified, the search
+is performed in "project" mode, which assumes that all scripts
+and modules within a project directory tree (specified by C<Project>,
+or defaults to './') are to be scanned and remapped. Any files within
+the "$options{Project}/bin" directory are assumed to be scripts; all
+files ending in '.pm' and '.pod' in all directories beneath
+the "$options{Project}/lib" directory are assumed to be modules.
+
+=head1 METHODS
+
+Only a single method is exported:
+
+=head3 $modules = find_sources( %options )
+
+Uses the options in C<%options> to direct a search for modules and
+executable, and optionally generate a remapped paths for them.
+
+If an error occurs during the search (e.g., a nonexistant directory
+is specified in C<Libs>), C<undef> is returned with an error message in
+C<$@>.
+
+On success, the returned hashref maps the found module names and/or
+provided executable script paths to an arrayref consisting
+of
+
+=over
+
+=item *
+
+the full pathname of the source file for the module or script
+
+=item *
+
+the remapped pathname of the source file, with the root directory replaced
+with a directory specified via the C<Output> option described below.
+
+=item *
+
+the full pathname of any associated POD file for the module (if any)
+
+=item *
+
+the fully remapped pathname of the POD file (if any), with the root 
+directory replaced with a directory specified via the C<Output> option 
+described below.
+
+=back
+
+C<%options> may include the following:
+
+=over
+
+=item B<All> C<=E<gt> $boolean>
+
+Causes each module to be treated as a potential
+root namespace, and locates/maps all child modules within
+the same root directory. Does not effect script
+searches.
+
+=item B<IncludePOD> C<=E<gt> $boolean>
+
+Causes POD files (ending in '.pod') to be included in the search/map operation,
+and treats as an acceptable alternative to the source file
+(ending in '.pm').
+
+=item B<Verbose> C<=E<gt> \&coderef>
+
+Calls the provided coderef with diagnostic message as the search
+progresses.
+
+=item B<UseINC> C<=E<gt> $boolean>
+
+Causes the paths in C<@INC> to be included in the search. Default
+is to only search directories explicit specified via C<Libs>.
+
+=item B<Libs> C<=E<gt> \@locallibs>
+
+Contains a list of directories to be searched for any specified modules.
+The libraries are searched in the order they appear in @locallibs; if
+C<UseINC> is specified, directories in <@INC> are searched B<after>
+C<@locallibs>.
+
+=item B<Scripts> C<=E<gt> \@scripts>
+
+Contains a list of fully qualified script paths to be located and
+optionally remapped. Does B<not> apply the same directory search
+method as for modules.
+
+=item B<Output> C<=E<gt> $outpath>
+
+Specifies a root directory to be used to remap the modules and scripts.
+If specified, then the output paths are mapped as follows:
+
+	Source Type         Mapped Location
+	-----------         ---------------
+	executables         <$outpath>/bin
+	local modules       <$outpath>/blib
+	@INC modules        <$outpath>/lib
+
+B<NOTE> that the output maths are B<not> created;
+rather, a file specification is provided which can be
+used by the caller to create the path via (e.g.) 
+L<File::Path>::mkpath().
+
+=item B<Modules> C<=E<gt> \@modules>
+
+Contains a list of Perl module names or namespaces to search
+for in the specified C<@localibs> and/or C<@INC>. If the
+C<All> option is enabled, then elements may be top level
+namespaces within which to search for all child modules.
+
+=item B<Project> C<=E<gt> $projpath>
+
+Specifies a project root directory to be used for project
+mode searches. If not specified, defaults to './'.
+
+=back
+
+=head1 SEE ALSO
+
+L<Module::Find>
+
+L<Module::Finder>
+
+This module was developed primarily to support L<Pod::Classdoc> and
+L<PPI::HTML::CodeFolder>, but may be generally useful.
+
+=head1 TO DO
+
+=head1 AUTHOR, COPYRIGHT, & LICENSE
+
+Copyright(C) 2007, Dean Arnold, Presicient Corp., USA. All rights reserved.
+
+Permission is granted to use this software under the terms of the
+L<Perl Artistic License|perlartistic>.
+
+=cut

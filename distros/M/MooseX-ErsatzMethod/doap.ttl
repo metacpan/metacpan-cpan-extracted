@@ -1,0 +1,96 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "Moose 2.00"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-ErsatzMethod>;
+	doap:created         "2012-10-02"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/MooseX-ErsatzMethod>;
+	doap:homepage        <https://metacpan.org/release/MooseX-ErsatzMethod>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "MooseX-ErsatzMethod";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/v_0-004>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-moosex-ersatzmethod>;
+	];
+	doap:shortdesc       "provide a method implementation that isn't as good as the real thing".
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "MooseX-ErsatzMethod-0.001"^^xsd:string;
+	dc:issued            "2012-10-02"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-ErsatzMethod-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "MooseX-ErsatzMethod-0.002"^^xsd:string;
+	dc:issued            "2012-10-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Improved test suite.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "When classes consume roles which provide an ersatz method plus a real implementation, they should get the real implementation. Yes this does happen - e.g. when roles are composed.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-ErsatzMethod-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "MooseX-ErsatzMethod-0.003"^^xsd:string;
+	dc:issued            "2012-10-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Remove smartmatch usage from test suite, for Perl 5.8 compatibility.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-ErsatzMethod-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-ErsatzMethod/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "MooseX-ErsatzMethod-0.004"^^xsd:string;
+	dc:issued            "2014-09-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Drop the dependency on thanks.pm; use Module::Runtime (which Moose already requires) instead.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "use Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-ErsatzMethod-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

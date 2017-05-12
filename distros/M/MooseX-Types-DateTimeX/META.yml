@@ -1,0 +1,35 @@
+---
+abstract: 'Extensions to L<MooseX::Types::DateTime::ButMaintained>'
+author:
+  - 'John Napiorkowski <jjn1056 at yahoo.com>'
+  - 'Evan Carroll <me@evancarroll.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Exception: 0.27
+  Test::More: 0
+  Test::use::ok: 0.02
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Types-DateTimeX
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DateTimeX::Easy: 0.085
+  Moose: 0.41
+  MooseX::Types: 0.04
+  MooseX::Types::DateTime::ButMaintained: 0.04
+  Time::Duration::Parse: 0.06
+  namespace::clean: 0.08
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git@github.com:EvanCarroll/mx-t-datetimex.git
+version: 0.10

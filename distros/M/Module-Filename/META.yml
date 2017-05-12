@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Module-Filename
+version:             0.02
+abstract:            Returns the filename for a given module
+license:             ~
+author:              
+    - Michael R. Davis (domain=>michaelrdavis,tld=>com,account=>perl)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Path::Class:                   0
+    strict:                        0
+    Test::Simple:                  0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

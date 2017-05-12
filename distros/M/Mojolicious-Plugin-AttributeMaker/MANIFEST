@@ -1,0 +1,14 @@
+Changes
+lib/Mojolicious/Plugin/AttributeMaker.pm
+lib/Mojolicious/Plugin/AttributeMaker/Extension.pm
+lib/Mojolicious/Plugin/AttributeMaker/Extension/Routing.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-attribute-extension-routes.t
+t/02-custom-attribute.t
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Test.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

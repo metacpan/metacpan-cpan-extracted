@@ -1,0 +1,216 @@
+=head1 NAME
+
+Mozilla::DOM::Location
+
+=for object Mozilla::DOM::Location
+
+Mozilla::DOM::Location is a wrapper around an instance of Mozilla's
+nsIDOMLocation interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::Location->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $hash = $location->B<GetHash>()
+
+=over
+
+=back
+
+=head2 $location->B<SetHash>($hash)
+
+=over
+
+=over
+
+=item * $aHash (string)
+
+=back
+
+=back
+
+=head2 $host = $location->B<GetHost>()
+
+=over
+
+=back
+
+=head2 $location->B<SetHost>($host)
+
+=over
+
+=over
+
+=item * $aHost (string)
+
+=back
+
+=back
+
+=head2 $hostname = $location->B<GetHostname>()
+
+=over
+
+=back
+
+=head2 $location->B<SetHostname>($hostname)
+
+=over
+
+=over
+
+=item * $aHostname (string)
+
+=back
+
+=back
+
+=head2 $href = $location->B<GetHref>()
+
+=over
+
+=back
+
+=head2 $location->B<SetHref>($href)
+
+=over
+
+=over
+
+=item * $aHref (string)
+
+=back
+
+=back
+
+=head2 $pathname = $location->B<GetPathname>()
+
+=over
+
+=back
+
+=head2 $location->B<SetPathname>($pathname)
+
+=over
+
+=over
+
+=item * $aPathname (string)
+
+=back
+
+=back
+
+=head2 $port = $location->B<GetPort>()
+
+=over
+
+=back
+
+=head2 $location->B<SetPort>($port)
+
+=over
+
+=over
+
+=item * $aPort (string)
+
+=back
+
+=back
+
+=head2 $protocol = $location->B<GetProtocol>()
+
+=over
+
+=back
+
+=head2 $location->B<SetProtocol>($protocol)
+
+=over
+
+=over
+
+=item * $aProtocol (string)
+
+=back
+
+=back
+
+=head2 $search = $location->B<GetSearch>()
+
+=over
+
+=back
+
+=head2 $location->B<SetSearch>($search)
+
+=over
+
+=over
+
+=item * $aSearch (string)
+
+=back
+
+=back
+
+=head2 $location->B<Assign>($url)
+
+=over
+
+=over
+
+=item * $url (string)
+
+=back
+
+=back
+
+=head2 $location->B<Reload>($forceget)
+
+=over
+
+=over
+
+=item * $forceget (boolean)
+
+=back
+
+=back
+
+=head2 $location->B<Replace>($url)
+
+=over
+
+=over
+
+=item * $url (string)
+
+=back
+
+=back
+
+=head2 $retval = $location->B<ToString>()
+
+=over
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

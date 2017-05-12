@@ -1,0 +1,3 @@
+This file only exists in TestOO.
+Child classes should be able to find this file when they look for it.
+t-TestOO-testoo.txt

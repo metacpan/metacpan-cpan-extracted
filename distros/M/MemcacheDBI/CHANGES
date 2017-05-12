@@ -1,0 +1,182 @@
+==================================================
+Changes from 2014-02-02 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.08 at 2015-02-02 17:12:43 +0000
+-----------------------------------------
+
+  Change: 54b0a9ed97965ccc0818d1251959c04daf6cf181
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2015-02-02 10:02:52 +0000
+
+    Make sure we delete the correct hash keys, add unit test for commit
+    and rollback 
+
+  Change: 55bc7ad2e7541f6935d2ff4d11d82af4a49531ac
+  Author: Jason Terry <oaxlin@cpan.org>
+  Date : 2014-06-10 09:17:33 +0000
+
+    Simple version bump to add minimum perl version. 
+
+  Change: 0b9419316eb1d2a52891287d8822a12f4a652b40
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-30 14:27:38 +0000
+
+    Use clone so we don't mess up data if they change stuff in a pointer
+    after setting it.
+
+    Make get/set work exactly like the real thing when AutoCommit=1
+
+    Add support for delete/namespace 
+
+  Change: dbdbbf8d08fad62fe6fbb152468f9077db58312d
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-30 14:26:50 +0000
+
+    Add clone as a prereq 
+
+  Change: c0f9824c54d7297a61a1db655daee20572b74965
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-30 14:26:17 +0000
+
+    Test now works with both DBD:CSV and DBD:Pg 
+
+  Change: bd5a068c9261464cd91e96e36c510b5f3128468a
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-30 14:25:11 +0000
+
+    Run test only when using DBD::Pg. Since each driver apparently
+    returns commit a little bit differently. 
+
+  Change: a9f1e16832e86461c7760a1442829b5cc5b280d3
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-30 09:14:01 +0000
+
+    Minor version bump to fix make test requirement should be DBD::CSV 
+
+  Change: db6335914228c0324a105dc7ab6f06ddb2aab694
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-29 11:46:54 +0000
+
+    A few fixes so MemcacheDBI responds more like DBI when it is unable
+    to create a DB connection.
+
+    A few new unit tests. 
+
+  Change: fd7ae5c56b7d666e7fef61386f3bc7c3bb57098c
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-21 09:25:48 +0000
+
+    Add a comment to commit.t so I remember specifically why I made the
+    trivial test. 
+
+  Change: 6bad2b3fbb35c987f170a40f6538da3d5fb829cf
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-21 09:24:16 +0000
+
+    Add a commit test. 
+
+  Change: f49678afe20956eb3389c1e28a6cf476bd93c9d5
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-21 09:23:51 +0000
+
+    Bubble up the autocommit warning so it's easier to find. 
+
+  Change: 4b0e733a3a15ee5523cb3699c0bd483fac5d2b06
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-20 15:55:44 +0000
+
+    Fix commit when no memd exits 
+
+  Change: 51fdd2f76a8b84d2cede8368da29ebeada94e848
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-20 15:55:25 +0000
+
+    Fix typo in prereq 
+
+  Change: 5d1a4fbc2c21fdf6ecd739a61895c96061046f12
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-20 15:40:41 +0000
+
+    Cleanup some code and a revamp to the methods.
+
+    Now you can use this as a drop in for dbh and get memd drop in
+    replacement for memcache (for set/get only) 
+
+  Change: dbc209389756b0d60950f11ec6459cf75b1452eb
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-20 11:14:56 +0000
+
+    Make Data::Dumper work just like DBI would (except the ref is
+    MemcacheDBI).
+
+    If you want to peer Dumper the MemcacheDBI bit then Dumper
+    $memd->{'MemcacheDBI'} is what you really want to do. 
+
+  Change: 50e2679cd912ee9220ea99de8c2d3328c4194b51
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-19 10:56:01 +0000
+
+    Don't die on memd_commit unless there is something to commit This
+    helps maintain compatibility with normal DBI before initializing the
+    memd side. 
+
+  Change: 0c6583a3a9d62fe00df045f9cf74bd21ec61f596
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-19 09:15:33 +0000
+
+    fix minor typo in pod 
+
+  Change: ac933d9f4f608602d73f6f1087040407a070ca0e
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-19 09:14:11 +0000
+
+    Add test only prereqs 
+
+  Change: e6585a5e6e5cc2bc2183a9e1690fcb44dbbf9f65
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-16 16:48:21 +0000
+
+    basic readme 
+
+  Change: 2fdc9e58cf996c44cc15eb67e4b274e4b77500bf
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-16 16:47:01 +0000
+
+    oops, checked the wrong value 
+
+  Change: 47ba30e6f31f33e347cb558bad940c56c605b500
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-16 16:46:34 +0000
+
+    basic transaction tests 
+
+  Change: fc45db5e0aa20e3a37e2d7daeb995777cbcecc89
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-16 16:45:49 +0000
+
+    used for testing without a real db 
+
+  Change: 5c030f13eb24b02ffa1105b35a8cbb03ef35df7a
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-16 15:32:14 +0000
+
+    initial commit 
+
+  Change: 54624cb2f4f44072a652b8868bfcc053b22e758b
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-16 15:12:57 +0000
+
+    Cache::Memcached::Fast does not need a "use"... "require" is good
+    enough. 
+
+  Change: 71aae379d69aa20fe2c47fed8bf2573c732ea478
+  Author: Jason Terry <jterry@jterry-mac.local>
+  Date : 2014-05-16 15:09:22 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

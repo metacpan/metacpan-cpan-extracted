@@ -1,0 +1,203 @@
+NAME
+    Mojolicious::Plugin::PayPal - Make payments using PayPal
+
+VERSION
+    0.07
+
+DESCRIPTION
+    Mojolicious::Plugin::PayPal is a plugin for the Mojolicious web
+    framework which allow you to do payments using
+    <https://www.paypal.com|PayPal>.
+
+    This module is EXPERIMENTAL. The API can change at any time. Let me know
+    if you are using it.
+
+    See also
+    <https://developer.paypal.com/webapps/developer/docs/integration/web/acc
+    ept-paypal-payment/>.
+
+SYNOPSIS
+      use Mojolicious::Lite;
+
+      plugin PayPal => {
+        secret => '...',
+        client_id => '...',
+      };
+
+      # register a payment and send the visitor to PayPal payment terminal
+      post '/checkout' => sub {
+        my $c = shift;
+        my %payment = (
+          amount => $c->param('amount'),
+          description => 'Some description',
+        );
+
+        $c->delay(
+          sub {
+            my ($delay) = @_;
+            $c->paypal(register => \%payment, $delay->begin);
+          },
+          sub {
+            my ($delay, $res) = @_;
+            return $c->render(text => "Ooops!", status => $res->code) unless $res->code == 302;
+            # store $res->param('transaction_id');
+            $c->redirect_to($res->headers->location);
+          },
+        );
+      };
+
+      # after redirected back from PayPal payment terminal
+      get '/checkout' => sub {
+        my $c = shift;
+
+        $c->delay(
+          sub {
+            my ($delay) = @_;
+            $c->paypal(process => {}, $delay->begin);
+          },
+          sub {
+            my ($delay, $res) = @_;
+            return $c->render(text => $res->param("message"), status => $res->code) unless $res->code == 200;
+            return $c->render(text => "yay!");
+          },
+        );
+      };
+
+  Transaction ID mapper
+    You should provide a "transaction_id_mapper". Here is an example code on
+    how to do that:
+
+      $app->paypal->transaction_id_mapper(sub {
+        my ($self, $token, $transaction_id, $cb) = @_;
+
+        if($transaction_id) {
+          eval { My::DB->store_transaction_id($token => $transaction_id); };
+          $self->$cb($@, $transaction_id);
+        }
+        else {
+          my $transaction_id = eval { My::DB->get_transaction_id($token)); };
+          $self->$cb($@, $transaction_id);
+        }
+      });
+
+ATTRIBUTES
+  base_url
+      $str = $self->base_url;
+
+    This is the location to PayPal payment solution. Will be set to
+    <https://api.paypal.com> if the mojolicious application mode is
+    "production" or <https://api.sandbox.paypal.com>.
+
+  client_id
+      $str = $self->client_id;
+
+    The value used as username when fetching the the access token. This can
+    be found in "Applications tab" in the PayPal Developer site.
+
+  currency_code
+      $str = $self->currency_code;
+
+    The currency code. Default is "USD".
+
+  transaction_id_mapper
+      $code = $self->transaction_id_mapper;
+
+    Holds a code used to find the transaction ID, after user has been
+    redirected back from PayPal terminal page.
+
+    NOTE! The default callback provided by this module does not scale and
+    will not work in a multi-process environment, such as running under
+    "hypnotoad" or using a load balancer. You should therefor provide your
+    own backend solution. See "Transaction ID mapper" for example code.
+
+  secret
+      $str = $self->secret;
+
+    The value used as password when fetching the the access token. This can
+    be found in "Applications tab" in the PayPal Developer site.
+
+HELPERS
+  paypal
+      $self = $c->paypal;
+      $c = $c->paypal($method => @args);
+
+    Returns this instance unless any args have been given or calls one of
+    the available "METHODS" instead. $method need to be without "_payment"
+    at the end. Example:
+
+      $c->paypal(register => { ... }, sub {
+        my ($c, $res) = @_;
+        # ...
+      });
+
+METHODS
+  process_payment
+      $self = $self->process_payment(
+        $c,
+        {
+          token => $str, # default to $c->param("token")
+          payer_id => $str, # default to $c->param("PayerID")
+        },
+        sub {
+          my ($self, $res) = @_;
+        },
+      );
+
+    This is used to process the payment after a user has been redirected
+    back from the PayPal terminal.
+
+    See
+    <https://developer.paypal.com/webapps/developer/docs/api/#execute-an-app
+    roved-paypal-payment> for details.
+
+  register_payment
+      $self = $self->register_payment(
+        $c,
+        {
+          amount => $num, # 99.90, not 9990
+          redirect_url => $str, # default to current request URL
+          # ...
+        },
+        sub {
+          my ($self, $res) = @_;
+        },
+      );
+
+    The "register_payment" method is used to send the required payment
+    details to PayPal which will later be approved by the user after being
+    redirected to the PayPal terminal page.
+
+    Useful $res values:
+
+    *   $res->code
+
+        Set to 302 on success.
+
+    *   $res->param("transaction_id")
+
+        Only set on success. An ID identifying this transaction. Generated
+        by PayPal.
+
+    *   $res->headers->location
+
+        Only set on success. This holds a URL to the PayPal terminal page,
+        which you will redirect the user to after storing the transaction ID
+        and other customer related details.
+
+  register
+      $app->plugin(PayPal => \%config);
+
+    Called when registering this plugin in the main Mojolicious application.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014, Jan Henning Thorsen
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+AUTHOR
+    Jan Henning Thorsen - "jhthorsen@cpan.org"
+
+CONTRIBUTORS
+    Yu Pan - "yu.pan1005@gmail.com"
+

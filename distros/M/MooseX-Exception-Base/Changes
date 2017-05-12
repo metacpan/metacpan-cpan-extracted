@@ -1,0 +1,44 @@
+Revision history for MooseX-Exception-Base
+
+0.0.6   2015-08-04
+        Updating for release of version 0.0.6
+        Removed unneeded tag (Ivan Wills)
+        102839 - Added comment about using Throwable (Ivan Wills)
+
+0.0.5   2015-01-26
+        Add additional tests (Adam Herzog)
+        Move over to Dist::Zilla (Adam Herzog)
+        Upped version for next release (Ivan Wills)
+        Update spelling stopwords, adding my name. (Adam Herzog)
+        Merge branch 'master' into move-to-dzil (Adam Herzog)
+        Update Changes (Adam Herzog)
+        Fix spelling error. Cought -> Caught. (Adam Herzog)
+        Convert to Dist::Zilla, including relocating tests. (Adam Herzog)
+        Update Changes file, and add myself to pod. (Adam Herzog)
+        Merge branch 'master' into improve-test-coverage (Adam Herzog)
+        Remove extraneous, unreachable code. (Adam Herzog)
+        Add additional tests, improving overall coverage. (Adam Herzog)
+
+0.0.4   2015-01-24
+        Updating for release of version 0.0.4
+        Updated dependencies (Ivan Wills)
+        Updated readme (Ivan Wills)
+        Updated tests (Ivan Wills)
+        Updated manifest (Ivan Wills)
+        Updated License (Ivan Wills)
+        Fixed abstracts to match spec per http://neilb.org/2014/02/19/compliant-abstract.html (Ivan Wills)
+        Adding tag files (Ivan Wills)
+        Merge (Ivan Wills)
+        Added configure requires section (Ivan Wills)
+
+0.0.3   2013-05-21
+        Fixed so test works better in Windows
+
+0.0.2   2012-07-19
+        Removed accedentally added MyException from prereqs
+        Added example file using MooseX::Exception::Base
+        Fixed missing prereqs
+
+0.0.1   2012-07-12
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,46 @@
+{
+   "abstract" : "Ensure instance and class methods are called properly",
+   "author" : [
+      "Robin Smidsr\u00c3\u00b8d <robin@smidsrod.no>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.101610",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Method-Assert",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Scalar::Util" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : 0,
+            "Test::More" : 0,
+            "Test::NoWarnings" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robinsmidsrod/Method-Assert.git",
+         "web" : "http://github.com/robinsmidsrod/Method-Assert"
+      }
+   },
+   "version" : "0.0.1"
+}
+

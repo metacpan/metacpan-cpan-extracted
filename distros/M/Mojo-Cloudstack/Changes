@@ -1,0 +1,25 @@
+Revision history for Mojo-Cloudstack
+
+0.01    2015-04-16
+        Initial Release.
+
+0.02    2015-05-07
+        added dependencies to Build.pl
+        added api cache file
+        implements an api cache
+
+0.03    2015-05-26
+        improved api cache
+        implements all responsetypes
+
+0.04    2015-05-26
+        cleanups
+        removed boilerplate stuff
+
+0.05    2015-05-30
+        implements login/logout api calls
+        use import and attr from Mojo::Base'
+
+0.06    2015-09-28
+        use post request due to CLOUDSTACK-8505 and commit 1c81b241e7914b24b06c3b7b3ee98bc0d3b4f68b only POST methods
+        are allowed.

@@ -1,0 +1,33 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use lib 'lib';
+use MIME::Structure;
+
+my $parser = MIME::Structure->new;
+my $processed_stdin;
+
+@ARGV = ('-') unless @ARGV;
+
+foreach my $f (@ARGV) {
+    my $fh;
+    if ($f eq '-') {
+        if (defined $processed_stdin) {
+            print STDERR "Attempt to reprocess standard input\n";
+            exit 1;
+        }
+        $processed_stdin = 1;
+        $fh = \*STDIN;
+    }
+    else {
+        open $fh, '<', $f or die "Can't open file $f: $!";
+    }
+    my ($message) = $parser->parse($fh);
+    my $concise = $parser->concise_structure($message);
+    while ( $concise =~ m{\([\d.]+ ([^:]+)}g ) {
+        print $1, "\n";
+    }
+    close $fh unless $f eq '-';
+}
+

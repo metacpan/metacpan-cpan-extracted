@@ -1,0 +1,9 @@
+`Module-Install-RDF`
+	requires       p`Object::ID`;
+	requires       p`Module::Install 1.00`;
+	requires       p`Module::Runtime`;
+	requires       p`RDF::Trine 0.135`;
+	requires       p`RDF::TriN3 0.201`;
+	requires       p`URI::file 4.0`;
+	test_requires  p`Test::More 0.61`;
+	.

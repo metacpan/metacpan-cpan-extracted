@@ -1,0 +1,38 @@
+Build.PL
+Changes
+eg/extends_io_file.pl
+eg/my_io.pl
+Incompatibilities
+lib/MooseX/GlobRef.pm
+lib/MooseX/GlobRef/Object.pm
+lib/MooseX/GlobRef/Role/Meta/Instance.pm
+lib/MooseX/GlobRef/Role/Object.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/all_tests.t
+t/test.pl
+t/tlib/MooseX/GlobRef/ObjectImmutableTest.pm
+t/tlib/MooseX/GlobRef/ObjectTest.pm
+t/tlib/MooseX/GlobRefImmutableTest.pm
+t/tlib/MooseX/GlobRefTest.pm
+t/tlib/MooseX/GlobRefTestBase.pm
+xt/check_changes.t
+xt/consistent_version_numbers.t
+xt/copyright.t
+xt/cover.pl
+xt/distribution.t
+xt/kwalitee.t
+xt/minimumversion.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod_coverage.t
+xt/pod_spell.t
+xt/pod_spellrc
+xt/pod_syntax.t
+xt/signature.t
+SIGNATURE    Added here by Module::Build
+SIGNATURE    Added here by Module::Build

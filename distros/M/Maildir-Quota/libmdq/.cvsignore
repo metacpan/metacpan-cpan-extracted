@@ -1,0 +1,17 @@
+Makefile
+config.cache
+config.log
+config.status
+*.o
+config.h
+ktrace.out
+*.a
+*~
+configure.lineno
+mdq.x
+libmdq-*.tar.gz
+mdq.h
+*.da
+*.bb
+*.bbg
+*.gcov

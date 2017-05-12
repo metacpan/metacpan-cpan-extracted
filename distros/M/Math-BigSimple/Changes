@@ -1,0 +1,12 @@
+Module Math::BigSimple changes log.
+-----------------------------------
+12.06.2005 - version 1.1:
+- Exact number length guaranteed
+- More easy procedure interface
+- Number checking function provided
+- Improved module documentation
+Now module is completely ready for usage.
+
+11.11.2004 - version 1.0:
+basic functions are available, now there are only "soft"
+requirements of number length. But everything works. :-)

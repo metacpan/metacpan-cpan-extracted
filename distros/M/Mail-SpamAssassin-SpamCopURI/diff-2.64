@@ -1,0 +1,142 @@
+--- ../Mail-SpamAssassin-2.64/lib/Mail/SpamAssassin/Conf.pm	2004-08-04 18:48:34.000000000 -0700
++++ lib/Mail/SpamAssassin/Conf.pm	2004-08-04 16:21:26.000000000 -0700
+@@ -218,6 +218,13 @@
+   $self->{whitelist_from} = { };
+   $self->{blacklist_from} = { };
+ 
++  $self->{spamcop_uri_limit} = 20;
++
++  $self->{spamcop_uri_resolve_open_redirects} = 0;
++  $self->{open_redirect_list_spamcop_uri} = { };
++  $self->{whitelist_spamcop_uri} = { };
++  $self->{blacklist_spamcop_uri} = { };
++
+   $self->{blacklist_to} = { };
+   $self->{whitelist_to} = { };
+   $self->{more_spam_to} = { };
+@@ -596,6 +603,42 @@
+       $self->add_to_addrlist ('blacklist_to', split (' ', $1)); next;
+     }
+ 
++=item whitelist_spamcop_uri *.good.com
++
++Used to specify hosts of URIs that for some reason get mistakenly
++reported as spamming.  No SPAMCOP_URI tests will score hits if a 
++uri matches the whitelist.  
++
++=cut
++
++    if (/^whitelist_spamcop_uri\s+(.+)$/) {
++      $self->add_to_addrlist ('whitelist_spamcop_uri', split (' ', $1)); next;
++    }
++
++=item open_redirect_list_spamcop_uri *.tinyurl.com
++
++Used to specify hosts for open redirect services.  These
++URIs that match these hosts will get their Location header
++resolved against the origin host.
++
++=cut
++
++    if (/^open_redirect_list_spamcop_uri\s+(.+)$/) {
++      $self->add_to_addrlist ('open_redirect_list_spamcop_uri', split (' ', $1)); next;
++    }
++
++=item blacklist_spamcop_uri *.spammer.com
++
++Used to specify hosts of URIs that send spam frequently.  All SPAMCOP_URI
++tests will score hits for a host uri that matches occurs against the blacklist.
++Same format as C<whitelist_spamcop_uri>.
++
++=cut
++
++    if (/^blacklist_spamcop_uri\s+(.+)$/) {
++      $self->add_to_addrlist ('blacklist_spamcop_uri', split (' ', $1)); next;
++    }
++
+ =back
+ 
+ =head2 SCORING OPTIONS
+@@ -1281,6 +1324,31 @@
+       $self->{dcc_fuz2_max} = $1+0; next;
+     }
+ 
++=item spamcop_uri_resolve_open_redirects ( 0 | 1 )		(default: 0)
++
++Resolve open redirects such as tinyurl.com and snipurl.com 
++while checking urls.  Hosts will be compared against 
++the open_redirect_list_spamcop_uri address list to determine
++whether we are going to attempt to resolve the redirect.
++
++=cut
++
++    if (/^spamcop_uri_resolve_open_redirects\s+(\d+)$/) {
++      $self->{spamcop_uri_resolve_open_redirects} = $1; next;
++    }
++
++=item spamcop_uri_limit { integer }		(default: 20)
++
++Set the maximum number of URIs to check per RBL.
++If you set this to 10 and you run mail against three RBL lists,
++up to 30 checks could be run for a particular piece of mail.
++'0' indicates no limit.
++
++=cut
++
++    if (/^spamcop_uri_limit\s+(\d+)$/) {
++      $self->{spamcop_uri_limit} = $1; next;
++    }
+ 
+ =item use_pyzor ( 0 | 1 )		(default: 1)
+ 
+@@ -2060,10 +2128,12 @@
+ =cut
+ 
+ # we don't do URI evals yet - maybe later
+-#    if (/^uri\s+(\S+)\s+eval:(.*)$/) {
+-#      $self->add_test ($1, $2, TYPE_URI_EVALS);
+-#      next;
+-#    }
++
++    if (/^uri\s+(\S+)\s+eval:(.*)$/) {
++      $self->add_test ($1, $2, TYPE_URI_EVALS);
++      next;
++    }
++
+     if (/^uri\s+(\S+)\s+(.*)$/) {
+       $self->add_test ($1, $2, TYPE_URI_TESTS);
+       next;
+@@ -2610,9 +2680,9 @@
+ 	elsif ($type == TYPE_FULL_EVALS) {
+ 	  $self->{full_evals}->{$name} = \@args;
+ 	}
+-	#elsif ($type == TYPE_URI_EVALS) {
+-	#  $self->{uri_evals}->{$name} = \@args;
+-	#}
++	elsif ($type == TYPE_URI_EVALS) {
++	  $self->{uri_evals}->{$name} = \@args;
++	}
+ 	else {
+ 	  $self->{errors}++;
+ 	  sa_die(70, "unknown type $type for $name: $text");
+--- ../Mail-SpamAssassin-2.64/lib/Mail/SpamAssassin/PerMsgStatus.pm	2004-08-04 18:48:33.000000000 -0700
++++ plib/2.64/Mail/SpamAssassin/PerMsgStatus.pm	2004-08-05 11:57:34.000000000 -0700
+@@ -38,6 +38,7 @@
+ use Text::Wrap ();
+ 
+ use Mail::SpamAssassin::EvalTests;
++use Mail::SpamAssassin::SpamCopURI;
+ use Mail::SpamAssassin::AutoWhitelist;
+ use Mail::SpamAssassin::HTML;
+ use Mail::SpamAssassin::Conf;
+@@ -1851,6 +1852,10 @@
+     $self->{conf}->{user_rules_to_compile}->{Mail::SpamAssassin::Conf::TYPE_URI_TESTS};
+ 
+   $self->{test_log_msgs} = ();	# clear test state
++                                                             
++  $self->run_eval_tests($self->{conf}->{uri_evals}, '', \@uris);
++
++
+   if (defined &Mail::SpamAssassin::PerMsgStatus::_body_uri_tests && !$doing_user_rules) {
+     Mail::SpamAssassin::PerMsgStatus::_body_uri_tests($self, @uris);
+     return;

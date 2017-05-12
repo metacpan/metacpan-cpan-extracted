@@ -1,0 +1,120 @@
+#!/usr/bin/perl -W
+# _________________________________________________________________
+# 
+# $Id: BioMobyWSDL,v 1.2 2009/04/15 16:54:25 kawas Exp $
+# Developed by: Jose Manuel Rodriguez Carrasco -jmrodriguez@cnio.es-
+# Created: 13-April-2009
+# Updated: 14-April-2009
+# _________________________________________________________________
+
+# Must declare and initialize all variables
+use strict;
+
+# MOBY libraries
+use MOBY::Client::Central;
+use MOBY::Client::Service;
+
+
+# CGI and HTTP libraries
+use CGI;
+use HTTP::Status;
+use HTTP::Headers;
+use HTTP::Response;
+$|=1; # not use buffering
+
+###################
+# Global variable #
+###################
+my $URL = $ENV{MOBY_SERVER} || 'http://moby.ucalgary.ca/moby/MOBY-Central.pl';
+my $URI = $ENV{MOBY_URI} || 'http://moby.ucalgary.ca/MOBY/Central';
+
+#####################
+# Method prototypes #
+#####################
+sub print_http_response($;$);
+sub main();
+
+#################
+# Method bodies #
+#################
+sub print_http_response($;$)
+{
+	my ($http_error_num,$content) = @_;
+
+	my($http_response);
+	if (is_success($http_error_num))
+	{
+		my($http_header)=HTTP::Headers->new;
+		$http_header->header('Content-Type' => 'text/xml');
+		$http_response=HTTP::Response->new($http_error_num, status_message($http_error_num),$http_header,$content);
+
+		print "Content-Type: ".$http_response->header('Content-Type')."\n\n";
+		print $http_response->content;
+	}
+	else
+	{
+		my($http_header)=HTTP::Headers->new;
+		$http_header->header('Content-Type' => 'text/plain');
+		$http_response=HTTP::Response->new($http_error_num, status_message($http_error_num),$http_header);
+
+		print "Content-Type: ".$http_response->header('Content-Type')."\n\n";
+		print $http_response->status_line."\n";
+	}
+
+	$http_error_num==200? exit 0: exit $http_response;
+}
+sub main()
+{
+	# Get input parameters: "/authURI/serviceName/"
+	my($cgi)=new CGI;
+	my($url_path_info)=$cgi->path_info();
+	# append a / to the end if necessary
+	$url_path_info .= '/' unless $url_path_info =~ m/\/$/i; 
+	my(@input_parameters)=split('/',$url_path_info);
+
+	# Check input parameters:
+	print_http_response(400) if(scalar(@input_parameters)>3); # only 3 parameters (+1 empty value)
+	
+	my($authURI)=$input_parameters[1];
+	my($serviceName)=$input_parameters[2];
+	print_http_response(400) unless(defined $authURI and defined $serviceName);
+
+	# Get MOBY Central URI-URL
+	print_http_response(400) unless(defined $URL and defined $URI and $URL ne '');
+	
+	# Connect to MOBY Central
+	my($Central);
+	eval {
+		$Central=MOBY::Client::Central->new(
+		        Registries => {
+		        	mobycentral => {
+		        		URL => $URL,
+		        		URI => $URI
+		        	}
+		        }
+		);
+	};
+	print_http_response(400) if($@);
+	
+	# Get Service instance
+	my($ServiceInstances,$RegObject);
+	eval {
+		($ServiceInstances,$RegObject)=$Central->findService(
+		                serviceName=> $serviceName,
+		                authURI => $authURI
+		);
+	};
+	print_http_response(404) if($@);
+	
+	# Get WSDL
+	my($WSDL);
+	eval {
+		$WSDL=$Central->retrieveService($ServiceInstances->[0]);
+	};
+	print_http_response(404) if($@ or !defined $WSDL);
+
+	# Everything was OK
+	print_http_response(200,$WSDL);
+}
+main();
+

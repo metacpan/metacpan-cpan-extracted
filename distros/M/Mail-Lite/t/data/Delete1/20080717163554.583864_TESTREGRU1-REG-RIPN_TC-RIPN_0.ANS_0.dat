@@ -1,0 +1,29 @@
+---
+-
+  - rusu.response.delete
+  -
+    - domain: air.ru
+      req_id: 20080717163553.100030
+      rule_id: rusu.response.delete.ok
+    - domain: upanishadixxx.ru
+      error_code: "Object 'UPANISHADIXXX.RU' not found - FATAL ERROR !"
+      req_id: 20080717163553.100030
+      rule_id: rusu.response.delete.fail
+    - domain: sex.ru
+      error_code:
+        - 'Authentication failed. - FATAL ERROR !'
+        - Access to object is denied!
+      req_id: 20080717163553.100030
+      rule_id: rusu.response.delete.fail
+    - domain: trax007.ru
+      req_id: 20080717163553.100030
+      rule_id: rusu.response.delete.ok
+    - domain: don22200.ru
+      req_id: 20080717163553.100030
+      rule_id: rusu.response.delete.ok
+    - domain: xn--sex170004536_74323-.ru
+      error_code:
+        - 'Invalid domain name - FATAL ERROR !'
+        - "Domain name contains forbidden character. Must be just letters, digits or `-'. "
+      req_id: 20080717163553.100030
+      rule_id: rusu.response.delete.fail

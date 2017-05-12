@@ -1,0 +1,59 @@
+/* ================================================================== */
+/* THEME: Silver
+ */
+@import 'functions';
+@import 'fonts_silver';
+@import 'icon_dark_on_light';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: #eeeeee;
+$verge-fg: set-fg($verge-bg);
+$verge-border: black;
+$button-bg: #aaaaaa;
+$button-fg: set-fg($button-bg);
+$button-border: black;
+$main-bg: #eeeeee;
+$main-fg: set-fg($main-bg);
+$link-fg: set-link($main-bg);
+$link-visited: set-visited($main-bg);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+}
+
+header,
+footer {
+	@extend .verge;
+	background: $verge-bg url(silver1.jpg) repeat-x;
+}
+.side {
+	@extend .verge;
+	background: #cccccc url(silver4.jpg) repeat-x;
+}
+
+
+body {
+	color: $main-fg;
+	background: $main-bg;
+}
+
+@include some-links($link-fg, $link-visited);
+@include fancy($verge-fg, $verge-bg, "silver3.jpg");
+@include make-buttons;
+
+header nav li {
+	border-color: #666666;
+}
+header nav .selflink,
+header nav em,
+header nav .current a {
+	background-color: #eeeeee;
+	color: black;
+}
+

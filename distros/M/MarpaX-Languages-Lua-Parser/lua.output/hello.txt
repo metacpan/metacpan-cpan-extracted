@@ -1,0 +1,30 @@
+chunk
+stat list
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+"Hello world, from "
+exp
+var
+Name
+_VERSION
+exp
+String
+double quoted string
+"!\n"
+)

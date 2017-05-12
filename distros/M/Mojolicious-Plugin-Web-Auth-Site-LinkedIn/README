@@ -1,0 +1,51 @@
+NAME
+    Mojolicious::Plugin::Web::Auth::Site::LinkedIn - LinkedIn OAuth Plugin
+    for Mojolicious::Plugin::Web::Auth
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+        # Mojolicious
+        $self->plugin('Web::Auth',
+            module      => 'LinkedIn',
+            key         => 'LinkedIn consumer key',
+            secret      => 'LinkedIn consumer secret',
+            on_finished => sub {
+                my ( $c, $access_token, $user_info ) = @_;
+                ...
+            },
+            on_error => sub {
+                my ( $c, $error ) = @_;
+                ...
+            },
+        );
+
+        # Mojolicious::Lite
+        plugin 'Web::Auth',
+            module      => 'LinkedIn',
+            key         => 'LinkedIn consumer key',
+            secret      => 'LinkedIn consumer secret',
+            on_finished => sub {
+                my ( $c, $access_token, $user_info ) = @_;
+                ...
+            };
+
+
+        # default authentication endpoint: /auth/linkedin/authenticate
+        # default callback endpoint: /auth/linkedin/callback
+
+DESCRIPTION
+    This module adds LinkedIn
+    <https://developer.linkedin.com/docs/rest-api/> support to
+    Mojolicious::Plugin::Web::Auth.
+
+AUTHOR
+    Vikas N Kumar <vikas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2016 by Vikas N Kumar.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

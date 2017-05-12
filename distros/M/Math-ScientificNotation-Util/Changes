@@ -1,0 +1,18 @@
+Revision history for Math-ScientificNotation-Util
+
+0.003   2016-06-17 (PERLANCAR)
+
+	- [Bugfix] Missed another regex mistake which allowed 1.e2 and
+	  1.0e2 didn't allow 1e2.
+
+
+0.002   2016-06-17 (PERLANCAR)
+
+	- [Bugfix] Fix regex to recognize decimal number.
+
+	- Check undef argument, print argument in error message.
+
+
+0.001   2016-06-17 (PERLANCAR)
+
+        - First release.

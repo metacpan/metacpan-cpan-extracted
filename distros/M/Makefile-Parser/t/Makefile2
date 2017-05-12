@@ -1,0 +1,16 @@
+EXE_FILES = sum1.exe sum2.exe
+OBJ_FILES = sum1.obj sum2.obj ast++.sum.o
+
+all : $(EXE_FILES) ast++.sum.o
+
+%.exe : %.obj
+	link /BATCH /NOLOGO $<;
+
+%.obj : %.asm
+	masm /t $<;
+
+ast++.%.o: ast++.%.c
+	cl /L ast++.$*.lib $< > $@
+
+clean :
+	$(RM_F) $(EXE_FILES) $(OBJ_FILES)

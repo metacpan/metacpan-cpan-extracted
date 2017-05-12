@@ -1,0 +1,58 @@
+---
+abstract: 'Java-style interfaces for Moose'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.61'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Moose::Meta::Class::__ANON__::SERIAL::10 version , CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-Interface
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  MooseX::Interface:
+    file: lib/MooseX/Interface.pm
+    version: '0.008'
+  MooseX::Interface::Meta::Method::Constant:
+    file: lib/MooseX/Interface.pm
+    version: '0.008'
+  MooseX::Interface::Meta::Method::Required:
+    file: lib/MooseX/Interface.pm
+    version: '0.008'
+  MooseX::Interface::Meta::Method::Required::WithSignature:
+    file: lib/MooseX/Interface.pm
+    version: '0.008'
+  MooseX::Interface::Meta::TestCase:
+    file: lib/MooseX/Interface.pm
+    version: '0.008'
+  MooseX::Interface::Meta::TestReport:
+    file: lib/MooseX/Interface.pm
+    version: '0.008'
+  MooseX::Interface::Trait::Role:
+    file: lib/MooseX/Interface.pm
+    version: '0.008'
+requires:
+  Class::Load: '0'
+  Moose: '2.00'
+  namespace::clean: '0.19'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/MooseX-Interface/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Interface
+  homepage: https://metacpan.org/release/MooseX-Interface
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-moosex-interface.git
+version: '0.008'

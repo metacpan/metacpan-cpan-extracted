@@ -1,0 +1,17 @@
+History for Mojolicious::Plugin::TagHelpersI18N
+===============================================
+
+0.03  2014-12-11
+
+      [IMPROVEMENTS]
+      * new required Mojolicious version is 5.67 as we use "every_param"
+        to avoid "uninitialized" warnings
+
+0.02  2014-01-13
+
+      * Add support for sorting the options
+
+0.01  2014-01-11
+
+      * initial release
+

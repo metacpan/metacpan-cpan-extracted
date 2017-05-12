@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Math-Gauss.t
+lib/Math/Gauss.pm
+META.yml                                 Module meta-data (added by MakeMaker)

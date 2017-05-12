@@ -1,0 +1,12 @@
+.cvsignore
+\.svn
+\.git
+\.DS_Store$
+blib/
+\bCVS\b
+^Makefile$
+pm_to_blib
+_build
+^Build$
+~$
+^MYMETA.yml$

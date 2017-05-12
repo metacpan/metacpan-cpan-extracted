@@ -1,0 +1,64 @@
+---
+abstract: 'Metabase backend implemented using MongoDB'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Metabase::Test::Archive: 0
+  Metabase::Test::Index: 0
+  Test::Deep: 0
+  Test::More: 0.92
+  Test::Routine: 0
+  Test::Routine::Util: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120921'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Metabase-Backend-MongoDB
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Metabase::Archive::MongoDB:
+    file: lib/Metabase/Archive/MongoDB.pm
+    version: 1.000
+  Metabase::Backend::MongoDB:
+    file: lib/Metabase/Backend/MongoDB.pm
+    version: 1.000
+  Metabase::Index::MongoDB:
+    file: lib/Metabase/Index/MongoDB.pm
+    version: 1.000
+requires:
+  Carp: 0
+  Compress::Zlib: 2
+  Data::Stream::Bulk::Callback: 0
+  JSON: 2
+  Metabase::Archive: 0.017
+  Metabase::Fact: 0
+  Metabase::Index: 0.017
+  MongoDB: 0
+  Moose: 0
+  Moose::Role: 0
+  Regexp::SQL::LIKE: 0.001
+  Try::Tiny: 0
+  boolean: 0
+  namespace::autoclean: 0
+  perl: 5.010
+  re: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Metabase-Backend-MongoDB
+  homepage: https://github.com/dagolden/metabase-backend-mongodb
+  repository: https://github.com/dagolden/metabase-backend-mongodb.git
+version: 1.000

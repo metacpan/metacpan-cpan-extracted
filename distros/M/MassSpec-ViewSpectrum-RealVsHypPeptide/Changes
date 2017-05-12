@@ -1,0 +1,9 @@
+Revision history for Perl extension MassSpec::ViewSpectrum::RealVsHypPeptide.
+
+0.01  Tue Aug  9 09:44:52 2005
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n MassSpec::ViewSpectrum::RealVsHypPeptide
+0.02  Mon Aug 15 09:44:52 2005
+	- improve documentation, fix minor inconsistency with
+          MassSpec::ViewSpectrum and label matching
+

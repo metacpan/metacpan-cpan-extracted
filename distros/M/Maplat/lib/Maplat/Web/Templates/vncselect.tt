@@ -1,0 +1,61 @@
+<p align="center">
+    <form name="settheme" method="post" action="[% PostLink %]" id="MainFilterForm">
+        <table class="data" align="center" id="MainFilterTable">
+            <thead>
+                <tr class="tabheader">
+                    <th></th>
+                    <th>[% tr.tr("ProdLine") %]</th>
+                    <th>[% tr.tr("Hostname") %]</th>
+                    <th>[% tr.tr("Domain") %]</th>
+                    <th>[% tr.tr("User") %]</th>
+                    <th>[% tr.tr("Password") %]</th>
+                    <th>[% tr.tr("Description") %]</th>
+                </tr>
+            </thead>
+            <tbody>
+                [% FOREACH Computer IN AvailComputers %]
+                    <tr>
+                        <td>
+                            <input type="radio" name="computername" value="[% Computer.computer_name %]" onChange="return updateButton();">
+                        </td>
+                        <td>[% Computer.line_id %]</td>
+                        <td>[% Computer.computer_name %]</td>
+                        <td>[% tr.tr(Computer.account_domain) %]</td>
+                        <td>[% Computer.account_user %]</td>
+                        <td>[% Computer.account_password %]</td>
+                        <td>[% Computer.description %]</td>
+                    </tr>
+                [% END %]
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="7">
+                        [% tr.tr("Reason for connection") %]:
+                        <input type="text" size="40" maxLength="80" name="reason" id="reason" onkeyup="return updateButton();">
+                        *[% tr.tr("required") %]
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="7" align="center">
+                        <input type="hidden" name="mode" value="selectcomputer">
+                        <input type="submit" value="[% tr.tr("Select") %]" id="submitbutton" disabled="true">
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </form>
+</p>
+<script language="javascript">
+    function updateButton () {
+        var noText = true;
+        var reason_c = document.getElementById("reason");
+        var hostname = $('input[name=computername]:checked').val()
+        if(hostname.length > 0 && reason_c.value.length > 10) {
+            noText = false;
+        }
+        $( "#submitbutton" ).button( "option", "disabled", noText );
+        return true;
+    }
+</script>
+    
+    

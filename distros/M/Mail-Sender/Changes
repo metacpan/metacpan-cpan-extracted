@@ -1,0 +1,210 @@
+Revision history for Mail-Sender
+
+0.903     2016-11-17
+    - PLEASE CONSIDER USING EMAIL-SENDER INSTEAD
+    - Fixed an errant extra test requirement, GH #3.  Thanks, Paul.
+    - Marked the entire dist as DEPRECATED as it should no longer be used.
+
+0.902     2016-07-11
+    ** PLEASE CONSIDER USING EMAIL-SENDER INSTEAD **
+
+    - Fixed multiple $VERSION variables, GH #2.  Thanks, Pavel.
+    - Addressed some testing issues with bad SMTP host.
+    - Turned off uninitialized warnings until they can all be resolved.
+    - Let DZil version the CType:: classes
+    - Removed unused EXPORT_OK option
+
+0.901     2016-06-29
+    ** PLEASE CONSIDER USING EMAIL-SENDER INSTEAD **
+
+    - Fixed a bug introduced in 0.900 where the auth method call pointed to the
+    wrong scope.
+
+0.900003  2016-06-10
+    ** PLEASE CONSIDER USING EMAIL-SENDER INSTEAD **
+
+    - Fixed conditional dependencies
+    - Fixed locale specific testing
+    - Fixed the Changes file
+    - Added some git helper files for the repo
+    - Reorganized the PM files into the lib directory
+    - Auto-generate MANIFEST using MANIFEST.SKIP from here on
+    - Ensure all files EOL with \n rather than any combination of \n and \r\n
+    - Renamed many undocumented/private functions to names beginning with _
+    - Added many, many tests for coverage and to prevent regressions
+    - Updated Config.PL to modernize.
+    - Lazily load Win32API::Registry for ::CType::Win32
+
+0.8.23  2014-07-15
+    - fixed problems with long subjects containing accentuated characters
+    - fixed problems with IO::Socket::SSL
+    - trims addresses passed in an array (per request)
+    - changed licence per request from Fedora
+    - fix to allow very long passwords
+    - fix error in TestServer()
+
+0.8.22  2012-12-12
+    - minor fixes
+
+0.8.21  2012-05-27
+    - fixed the case in the header names (Content-type -> Content-Type)
+    - fixed the encoding of non-ascii stuff in headers (RFC 2047)
+    - fixed using the ctype even for body with MailFile
+
+0.8.16  2008-07-15
+    - fixed unwanted modification of the parameter hash
+
+0.8.13  2006-02-25
+    - fixed incorrect handling of singlequotes in mail addresses
+    - add SMTP commands now sent in uppercase
+    - removing the port number if the local name is taken from $ENV{HTTP_HOST}
+    - improved getting the current user name
+    - can accept authid and authpwd already encoded to base64
+    - better handling of errors when reading attachments from files and when opening the debug files
+    - fixed some problems in Content-type header generation
+
+0.8.10  2003-11-23
+    - use $ENV{HOSTNAME} || $ENV{HTTP_HOST}
+        in preference to
+        (gethostbyname 'localhost')[0]
+        as the local name if none is specified by the user
+    - fixed half-hour timezone handling
+    - fixed to => [list, of, addresses] handling
+    - fixed "incorrect server name" handling (previous versions did not
+        report the problem correctly in all cases
+    - untaining the IP address of the SMTP server in all cases
+    - fixed a problem that caused rare doubling of dots in quoted-printable encoded parts.
+    - various doc improvements
+
+0.8.08  2003-08-31
+    - fixed an error in SendEx() causing problems with qmail
+        (thanks to report&help from "Luciano Bueno " <lbueno@grupoaraucaria.com.ar>)
+    - added debugging levels
+    - added an option that tells Mail::Sender to ignore rejected recipients
+    - you can now overwrite the message-id generation function
+    - added two addins improving the content type guesswork
+    - added TestServer method/function
+    - improved handling of the last newline in quoted-printable encoded parts
+      (the Outlook problem with = appearing at the end of attached files)
+
+0.8.06  2003-03-24
+    - new Mail::Sender ({..., on_errors => 'die'});
+    - new Mail::Sender ({..., on_errors => 'undef'});
+    - new Mail::Sender ({..., on_errors => 'code'});
+    - A small fix for an issue with nested parts on the courier-imap server (whatever it is).
+
+0.8.05  2003-03-01
+    - new Mail::Sender ({..., die_on_errors => 1});
+
+0.8.04  2003-01-08
+    - fixed typo causing the "Unknown PerlIO layer 'raw:perlio' at .../Mail/Sender.pm line 21"
+    - fixed incorrect handling of halfhour timezones
+
+0.8.03  2002-12-29
+    - added NTLM authentication
+    - send_cmd (internal function for sending commands to the server) checks for
+       broken connections
+    - reverted the server response tests
+       (instead of /^[45]/ (server reported an error)
+       I use now !/^[123]/ (server reported success) )
+    - some documentation fixes and additions
+
+0.8.01  2002-08-05
+    - internal only, please do not use
+    - fixed problems with PerlIO and ascii-mode sockets under windows with Perl 5.8
+
+0.8.00  2002-08-04
+    - minor fixes
+
+0.7.14.1    2002-06-12
+    - minor fixes
+
+0.7.14  2002-06-06
+    - added ESMTP authentication (LOGIN, PLAIN, CRAM-MD5)
+    - docs tuneup
+    - various small fixes
+
+0.7.13.2  2002-03-18
+    - internal only, BETA versions. Please do not use.
+
+0.7.13.1    2002-03-17
+    - Small bug fix. Pleae don't use 0.7.12 or 0.7.13
+
+0.7.13  2002-03-13
+    - made compatible with Perl 5.004 again (sorry I don't have 5.004 at hand and noone reported the problems before releasing 0.7.12 to general public)
+    - Improved compatibility with some BSD versions (using sockaddr_in() instead of pack())
+
+0.7.12  2002-02-18
+    - added debuging output
+    - The problem with multiline responses from some SMTP servers (namely qmail) is solved.
+
+0.7.10  2001-07-10
+    - minor installation related fixes
+
+0.7.09  2001-06-28
+    - minor fixes
+
+0.7.08  2001-04-10
+    - doc fix
+
+0.7.07  2001-04-04
+    - fixed multipart messages (have you ever used one hash item for two different purposes?)
+
+0.7.06  2001-02-07
+    - Bug fixed.
+
+0.7.05  2000-01-25
+    - Added fake_from, fake_to and fake_cc options to new/Open/OpenMultipart/MailMsg/MailFile.
+        This allows you to send a message to a list of people, while including only the list name/address in the headers. The fake_... may be whatever text you like, doesn't need to look like an address.
+
+0.7.04  2000-01-14
+    - PPM installation fix. No code changes.
+
+0.7.03  2000-01-14
+    - bugfix - ate the last character on each line in SendEx() (Used in SendFile) under Unix. Thanks, Jan Starzynski <jan@planet.de>!
+
+0.7.02  2000-01-08
+    - bugfix - sending en email with a line consisting of only a single dot?
+
+0.7.01  1999-12-09
+    - bugfix (qmail would not accept attachments)
+
+0.7.00  1999-11-24
+    - Mail/Sender.config file may be used to set up default options for new Mail::Sender.
+    - You may install a function that gets called for every message.
+    - Open(), MailMsg and MailFile accept ctype, and encoding parameters.
+    - You have more options in Part() and Body(). It's possible to send HTML mails with inlined images easily now.
+    - Error -5 (Unspecified communication error) now includes the actual error returned by the mail server.
+    - Some more examples in the docs.
+    - Mail::Sender now tries to guess the content type for attached files.
+    - You may now create not only multipart/mixed but also multipart/related or other messages.
+
+0.6.7   1999-01-25
+    - minor fixes
+
+0.6.6   1999-01-04
+    - unsure of release date
+    - Added support for CC: and BCC:.
+
+0.6     1999-01-03
+    - unsure of release date
+    - fixed problems with Base64 encoding.
+    - Files are now read, encoded and sent in parts instead of whole at once.
+    - You may call SendEnc several times in one part now.
+
+0.5     1999-01-02
+    - unsure of release date
+    - Cancel : cancel an Opened message.
+    - $sender->{'error'} : last error for this object.
+    - @Errors : a list of error messages.
+    - Several minor fixes.
+
+0.4     1999-01-01
+    - Unsure of release date
+    - MailMsg : Send a string as a mail by single call
+    - MailFile : The same plus attached files
+    - SendFile : Insert a file as a part of a multipart message
+    - Send(Line)Enc : Automatic encoding (Base64,Quoted-Printable)
+
+0.01    1998-12-22
+    - original version; created by h2xs 1.18

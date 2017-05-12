@@ -1,0 +1,11 @@
+lib/Mojolicious/Plugin/Util/Endpoint.pm
+lib/Mojolicious/Plugin/Util/Endpoint/endpoints.pm
+t/Endpoint.t
+t/Endpoint-Mount.t
+t/endpoint-mounted.pl
+Changes
+MANIFEST
+LICENSE
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

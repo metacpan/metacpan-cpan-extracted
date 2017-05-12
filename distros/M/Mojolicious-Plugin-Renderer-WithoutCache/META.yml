@@ -1,0 +1,44 @@
+---
+abstract: 'Disable the template cache in your Mojo app'
+author:
+  - 'simbabque, C<< <simbabque at cpan.org> >>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Renderer-WithoutCache
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Mojolicious::Plugin::Renderer::WithoutCache:
+    file: lib/Mojolicious/Plugin/Renderer/WithoutCache.pm
+    version: '0.04'
+  Mojolicious::Plugin::Renderer::WithoutCache::Cache:
+    file: lib/Mojolicious/Plugin/Renderer/WithoutCache/Cache.pm
+    version: '0.04'
+requires:
+  Mojolicious: '5.29'
+  Test::Mojo: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/simbabque/Mojolicious-Plugin-Renderer-WithoutCache/issues
+  homepage: https://github.com/simbabque/Mojolicious-Plugin-Renderer-WithoutCache
+  repository: git://github.com/simbabque/Mojolicious-Plugin-Renderer-WithoutCache.git
+version: '0.04'
+x_authority: cpan:SIMBABQUE
+x_contributors:
+  - 'simbabque <simbabque@cpan.org>'

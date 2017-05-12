@@ -1,0 +1,114 @@
+Revision history for Moose-Autobox
+
+0.16  2016-05-03 01:33:43Z
+    - explicitly depend on List::MoreUtils (Nigel Gregoire, PR#2)
+
+0.15  2013-10-28 01:59:43Z
+    - hide internal packages from PAUSE
+    - point repo/bugtracker at GitHub
+
+0.14  2013-10-28 01:59:43Z
+    - typo fixes (dsteinbrunner)
+    - repackage to drop MYMETA files
+    - stop using 'use_ok' in tests
+
+0.13  2012-08-29 13:56:58Z
+    - switch from Perl6::Junction to Syntax::Keyword::Junction (rjbs)
+
+0.12  2012-03-20
+    - replace "use base" with "use parent"
+
+0.11  2010-03-23
+    - add each_n_values to Indexed (rafl and rjbs)
+    - add first and last to Scalar and Array (t0m)
+
+0.10  2009-10-12
+    - add each, each_key, each_value to Indexed (array and hash) (rjbs)
+    - add split, words, lines to String (Sartak)
+    - add 'to' to Number (Debolaz)
+
+0.09  2008-10-23
+    - update Perl6::Junction dependency and support new version
+
+0.08  2008-05-12
+    - add flatten method to Array and Hash
+    - upped the dependency on autobox from 1.22 to 2.23
+      at the suggestion of chocolateboy
+    - might as well up the Moose dependency too.
+
+0.07  2008-04-28
+    ~~ no more Module::Build, thanks mst ~~
+
+    * Moose::Autobox
+      - added documentation about how to extend the autoboxed
+        types (RT #34315)
+
+    * Moose::Autobox::Hash
+      Moose::Autobox::Indexed
+      - added support for slice and hslice (jrockway)
+        - added tests for this
+
+0.06  2008-01-22
+    ~~ updated copyright dates & some docs ~~
+
+    * Moose::Autobox
+      - fixed role application code to follow the new
+        Moose::Util based API
+
+    - upped the Moose version dependency
+    - upped the autobox version dependency
+
+0.05  2007-08-05
+    * Moose::Autobox
+      - fixed loading approach so that Moose::Object doesn't end
+        up in isa (thanks to mst)
+
+0.04  2007-05-31
+    * Moose::Autobox::Hash
+      - added method for shallow hash merging
+
+    * Moose::Autobox::String
+      - fixed rindex method
+
+    * Moose::Autobox::Item
+      - moved &dump from ::Ref to ::Item, so that it can be used
+        for the other types too
+
+      - added &perl method which is an alias for &dump for symmetry
+        with Perl6's .perl
+
+    * Moose::Autobox::Scalar/Array/Hash
+      - added &print/&say to SCALAR, ARRAY and HASH
+
+0.03  2006-08-17
+
+    * Moose::Autobox
+      - we now inherit from autobox, now we don't have to
+        do that ugly eval thing or manually load autobox
+        when we want to use this module.
+      - added &mixin_additional_role to allow mixing in of
+        additional functionality (see examples/unit/*)
+
+    * Moose::Autobox::Code
+      - added the Y and U combinators
+
+    + added new examples for units
+      - ported from the Pugs examples/units directory
+
+0.02  2006-06-24
+    - fixed Moose::Autobox so that PAUSE won't try to
+      index SCALAR, ARRAY, HASH and CODE.
+
+    - added examples/ directory
+      - ported tic-tac-toe from the Pugs examples
+
+    * Moose::Autobox::Ref
+      - added &dump method which will use Data::Dumper
+        to return a dumped representation of the ref
+
+    * Moose::Autobox::Array
+      - added Junctions support with Perl6::Junction
+
+0.01  2006-06-09
+    - Autoboxing, all the cool kids are doing it ;)
+

@@ -1,0 +1,2 @@
+[%~ moosexParamsValidatePerScope.$currentFullyQualifiedScopedName = 1 ~%]
+my (\$[%~ identifier ~%]) = pos_validated_list(\@_, {isa => [%~ posSpec ~%]}, MX_PARAMS_VALIDATE_ALLOW_EXTRA => 1, MX_PARAMS_VALIDATE_CACHE_KEY => '[%~ currentFullyQualifiedScopedName ~%]::[%~ identifier ~%]');

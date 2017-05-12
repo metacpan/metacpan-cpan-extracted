@@ -1,0 +1,158 @@
+=for html <a href="https://travis-ci.org/jddurand/c-genericHash"><img src="https://travis-ci.org/jddurand/c-genericHash.svg?branch=master" alt="Travis CI build status" height="18"></a> <a href="https://badge.fury.io/gh/jddurand%2Fc-genericHash"><img src="https://badge.fury.io/gh/jddurand%2Fc-genericHash.svg" alt="GitHub version" height="18"></a> <a href="http://opensource.org/licenses/MIT" rel="nofollow noreferrer"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License MIT" height="18"></a>
+
+=head1 NAME
+
+genericHash - generic hash interface
+
+=head1 DESCRIPTION
+
+genericHash is an ANSI set of macros exposing key hashing and comparison functions, as well as key/value copying and freeing functions. It is built on top of L<genericStack|https://github.com/jddurand/c-genericStack>.
+
+=head1 SYNOPSIS
+
+  #include <genericHash.h>
+
+  genericHash_t *myHashp;
+
+=head1 MACROS
+
+=head2 GENERICHASH_NEW(hashName, indFunctionp)
+
+Alias to GENERICHASH_NEW_ALL(hashName, keyIndFunctionp, keyCmpFunctionp, keyCopyFunctionp, keyFreeFunctionp, valCopyFunctionp, valFreeFunctionp, wantedSize, wantedSubSize), see below.
+
+=head2 GENERICHASH_NEW_ALL(hashName, keyIndFunctionp, keyCmpFunctionp, keyCopyFunctionp, keyFreeFunctionp, valCopyFunctionp, valFreeFunctionp, wantedSize, wantedSubSize)
+
+Create an empty hash on the heap, where function pointer prototypes are:
+
+  typedef size_t (*genericHashKeyIndFunction_t)(void *userDatavp, genericStackItemType_t itemType, void **pp);
+  typedef short  (*genericHashKeyCmpFunction_t)(void *userDatavp, void **pp1, void **pp2);
+  typedef void  *(*genericHashKeyCopyFunction_t)(void *userDatavp, void **pp);
+  typedef void   (*genericHashKeyFreeFunction_t)(void *userDatavp, void **pp);
+  typedef void  *(*genericHashValCopyFunction_t)(void *userDatavp, void **pp);
+  typedef void   (*genericHashValFreeFunction_t)(void *userDatavp, void **pp);
+
+All these functions are called with a context C<userDatavp> that is passed as-is through macros described below. The generic pointers are I<always> pointers to data, i.e. pointer to char, pointer to pointer, etc... Take care, nothing prevent the pointer content to be a C<NULL> pointer itself, depending on the context (see below).
+
+=over
+
+=item C<keyIndFunctionp>
+
+  typedef size_t (*genericHashKeyIndFunction_t)(void *userDatavp, genericStackItemType_t itemType, void **pp);
+
+Mandatory. This function returns the indice in the hash. C<itemType> is generated using genericStack constants, e.g. it can be C<GENERICSTACKITEMTYPE_CHAR>, C<GENERICSTACKITEMTYPE_PTR>, etc... C<*pp> is a I<pointer> to the data, regardless of its type, i.e. it can be a pointer to char, a pointer to a pointer, etc...
+
+=item C<keyCmpFunctionp>
+
+  typedef short  (*genericHashKeyCmpFunction_t)(void *userDatavp, void **pp1, void **pp2);
+
+Optional. When not C<NULL>, this function is called I<only> when the engine need to know if two opaque pointers refer to identical objects, and to handle collisions within the same hash row. This mean that the item type is implicitly C<GENERICSTACKITEMTYPE_PTR>, and the function is called with two pointers of pointer. If the function returns a true value, the two keys are considered equal. If this function pointer is C<NULL>, direct pointer comparison is done.
+
+=item C<keyCopyFunctionp>
+
+  typedef void  *(*genericHashKeyCopyFunction_t)(void *userDatavp, void **pp);
+
+Optional. When not C<NULL>, this function is called I<only> when the engine need to insert data that is an opaque pointer. This mean that the item type is implicitly C<GENERICSTACKITEMTYPE_PTR>. This function must return a non C<NULL> if the data pointed to by C<*p> is non C<NULL>. If this function pointer is C<NULL>, direct pointer copy is done.
+
+=item C<keyFreeFunctionp>
+
+  typedef void   (*genericHashKeyFreeFunction_t)(void *userDatavp, void **pp);
+
+Optional. When not C<NULL>, this is called I<only> when the engine need to free data that is an opaque pointer.
+
+=item C<valCopyFunctionp>
+
+  typedef void  *(*genericHashValCopyFunction_t)(void *userDatavp, void **pp);
+
+Optional. Same description as C<keyCopyFunctionp>, but for values.
+
+=item C<valFreeFunctionp>
+
+  typedef void   (*genericHashValFreeFunction_t)(void *userDatavp, void **pp);
+
+Optional. Same description as C<keyFreeFunctionp>, but for values.
+
+=item C<wantedSize>
+
+Optional. Initial number of hash rows.
+
+=item C<wantedSubSize>
+
+Optional. Initial number of columns within a hash row.
+
+=back
+
+=head2 GENERICHASH_INIT(hashName, indFunctionp)
+
+Alias to GENERICHASH_INIT_ALL(hashName, keyIndFunctionp, keyCmpFunctionp, keyCopyFunctionp, keyFreeFunctionp, valCopyFunctionp, valFreeFunctionp, wantedSize, wantedSubSize), see below.
+
+=head2 GENERICHASH_INIT_ALL(hashName, keyIndFunctionp, keyCmpFunctionp, keyCopyFunctionp, keyFreeFunctionp, valCopyFunctionp, valFreeFunctionp, wantedSize, wantedSubSize)
+
+Create an empty hash on the stack, where function pointer prototypes have the same meaning as in GENERICHASH_NEW_ALL.
+
+=head2 GENERICHASH_SET(hashName, userDatavp, keyType, keyVal, valType, valVal)
+
+Set an entry in hash C<hashName>, using the key C<keyVal> of type C<keyType>, and value C<valVal> of type C<valType>. C<keyType> and C<valType> must be I<shorthands> for genericStack constants, i.e. C<CHAR>, C<PTR>, etc...
+
+=head2 GENERICHASH_SET_BY_IND(hashName, userDatavp, keyType, keyVal, valType, valVal, subStackIndex)
+
+Same as GENERICHASH_SET, but bypasses the call to key indice function, by setting it explicitely in the C<subStackIndex> variable.
+
+=head2 GENERICHASH_FIND(hashName, userDatavp, keyType, keyVal, valType, valValp, findResult)
+
+Find an entry in hash C<hashName>, using the key C<keyVal> of type C<keyType>, and expecting a value of type C<valType>. C<valValp> must be a pointer, eventually C<NULL>. If successful, the content of C<valValp> is filled with the found value. C<findResult> must be a valid C identifier, in which a true or a false will be set. C<keyType> and C<valType> must be I<shorthands> for genericStack constants, i.e. C<CHAR>, C<PTR>, etc...
+
+=head2 GENERICHASH_FIND_BY_IND(hashName, userDatavp, keyType, keyVal, valType, valValp, findResult, index)
+
+Same as GENERICHASH_FIND, but bypasses the call to key indice function, by setting it explicitely in the C<subStackIndex> variable.
+
+=head2 GENERICHASH_REMOVE(hashName, userDatavp, keyType, keyVal, valType, valValp, findResult)
+
+Remove an entry in hash C<hashName>, using the key C<keyVal> of type C<keyType>, and expecting a value of type C<valType>. C<valValp> must be a pointer, eventually C<NULL>. If successful, the content of C<valValp> is filled with the found value. When C<valValp> is C<NULL>, key and data are explicitely removed, eventually calling the free callback functions. C<keyType> and C<valType> must be I<shorthands> for genericStack constants, i.e. C<CHAR>, C<PTR>, etc...
+
+=head2 GENERICHASH_REMOVE_BY_IND(hashName, userDatavp, keyType, keyVal, valType, valValp, findResult, index)
+
+Same as GENERICHASH_REMOVE, but bypasses the call to key indice function, by setting it explicitely in the C<subStackIndex> variable.
+
+=head2 GENERICHASH_FREE(hashName)
+
+Releases a hash allocated on the heap via GENERICHASH_NEW_ALL. This may call the free callback functions.
+
+=head2 GENERICHASH_RESET(hashName)
+
+Releases a hash initialized on the stack via GENERICHASH_INIT_ALL. This may call the free callback functions.
+
+=head2 GENERICHASH_RELAX(hashName)
+
+Sets back the hash to its initial state, without releasing all internal allocated memory. This is the most efficient way to <reuse> a hash.
+
+=head2 GENERICHASH_ERROR(hashName)
+
+Returns a true value if the hash an error, a false value otherwise.
+
+=head2 GENERICHASH_USED(hashName)
+
+Returns the number of elements in the hash. Take case, also it is legal from syntax point of view to use it an a lvalue, do not modify it.
+
+=head2 GENERICHASH_KEYCMPFUNCTION(hashName)
+
+Accessor to the key comparison function.
+
+=head2 GENERICHASH_KEYCOPYFUNCTION(hashName)
+
+Accessor to the key copy function.
+
+=head2 GENERICHASH_KEYFREEFUNCTION(hashName)
+
+Accessor to the key free function.
+
+=head2 GENERICHASH_VALCOPYFUNCTION(hashName)
+
+Accessor to the val copy function.
+
+=head2 GENERICHASH_VALFREEFUNCTION(hashName)
+
+Accessor to the val free function.
+
+=head1 SEE ALSO
+
+L<genericStack|https://github.com/jddurand/c-genericStack>

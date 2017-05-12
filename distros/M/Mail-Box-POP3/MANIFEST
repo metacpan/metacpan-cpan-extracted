@@ -1,0 +1,24 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/Mail/Box/POP3.pm
+lib/Mail/Box/POP3.pod
+lib/Mail/Box/POP3/Message.pm
+lib/Mail/Box/POP3/Message.pod
+lib/Mail/Box/POP3/Test.pm
+lib/Mail/Box/POP3s.pm
+lib/Mail/Box/POP3s.pod
+lib/Mail/Transport/POP3.pm
+lib/Mail/Transport/POP3.pod
+t/01basic.t
+t/02break.t
+t/03minimal.t
+t/04autodelete.t
+t/original/0001
+t/original/0002
+t/original/0003
+t/original/0004
+t/server
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

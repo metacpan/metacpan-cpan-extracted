@@ -1,0 +1,35 @@
+Revision history for Perl extension MARC::Descriptions
+
+0.9  January 16, 2004
+     - added tags < 010
+
+0.8  December 09, 2003
+     - Renamed MARC::tagdata to MARC::Descriptions::Data
+
+0.7  December 09, 2003
+     - An even better get() routine, again thanks to Brian Cassidy
+
+0.6  December 09, 2003
+     - Modified comments in the SYNOPSIS to fit in 80 characters
+       (thanks, Ed)
+
+0.5  December 09, 2003
+     - tweaked the code for returning description/flags/shortname to
+       avoid all those if/elsif statements - thanks to Brian Cassidy!
+
+0.4  December 08, 2003
+      - updated POD
+      - first "real" distribution!
+
+0.3  December 07, 2003
+      - added a whole whack of tests
+
+0.2  December 07, 2003
+      - built the tagdata structure as a separate package, for
+        easier maintenance.
+
+0.1  December 06, 2003
+      - original version, split out from work-(forever)-in-progress
+        Perl/Tk ILS.
+
+

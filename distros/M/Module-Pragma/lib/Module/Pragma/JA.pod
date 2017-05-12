@@ -1,0 +1,244 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Module::Pragma::JA - プラグマモジュールの実装のサポート
+
+=head1 SYNOPSIS
+
+	# Foo.pm
+	package Foo;
+	use base qw(Module::Pragma);
+
+	__PACKAGE__->register_tags(qw(-SHA1 -MD5));
+	__PACKAGE__->exclusive_tag( __PACKAGE__->tags );
+
+	sub something
+	{
+		# ...
+		if(__PACKAGE__->enabled(-SHA1)){
+			$mod = 'Digest::SHA1';
+		}
+		elsif(__PACKAGE__->enabled(-MD5)){
+			$mod = 'Digest::MD5';
+		}
+		else{
+			$mod = $Digest_Default;
+		}
+		# ...
+	}
+	# ...
+	1;
+	__END__
+
+	# foo.pl
+	use Foo;
+
+	Foo->something(); # Foo->enabled(-SHA1)は真
+	{
+		use Foo -MD5;
+		Foo->something(); # Foo->enabled(-MD5)が真
+	}
+	Foo->something(); # Foo->enabled(-SHA1)が真
+
+	# ...
+
+=head1 DESCRIPTION
+
+perl5.10よりユーザープラグマを作れるようになりました。これにより、モジュール実装者はモジュールの実行時のオプションをプラグマに頼ることができるようになります。そして、Module::Pragmaはプラグマモジュールの実装を助けます。
+
+Module::Pragmaがサポートするプラグマはビットマスクベースとなります。これにより、タグの数は最大でも32ないし64個（Perlの整数のサイズによります）に制限されています。
+
+=head2 How to set it up
+
+Module::Pragmaはオブジェクト指向モジュールであり、全てのメソッドは継承されたクラスメソッドとして使います。
+
+まず最初に、Module::Pragmaをロードし、スーパークラスとして設定します。
+
+	package mypragma;
+	use base qw(Module::Pragma);
+
+次に、サブプラグマ(このモジュールではB<タグ>と呼びます)を C<register_tags()> メソッドで登録します。
+
+	__PACKAGE__->register_tags(qw(foo bar baz));
+
+いくつかのタグを C<register_bundle()> メソッドでまとめることもできます。
+
+	__PACKAGE__->register_bundle('foobar' => ['foo', 'bar']);
+
+タグ同士をそれぞれ排他的に選択させるには、 C<register_exclusive()> メソッドを使います。
+
+	__PACKAGE__->register_bundle('foo', 'baz');
+
+これで基本的なセットアップは終了し、プラグマとして使うことができます。
+
+
+	use mypragma 'foo';
+	use mypragma 'baz';     # fooとbazは排他的
+	                        # ->fooは解除され、bazが設定される
+	use mypragma ':foobar'; # fooとbazは排他的
+	                        # ->bazは解除され、fooとbarが設定される
+
+
+規定の状態では、プラグマの呼び出しには引数が必要であり、また未知の引数は認められません。
+
+	use mypragma;        # die! 必ず引数が必要
+	use mypragma 'fooo'; # die! 未知のタグは禁止
+
+この動作はC<default_import()>メソッドとC<unknown_tag()>メソッドのオーバーライドにより変更可能です。
+
+=head1 METHODS
+
+
+=head2 Registering tags
+
+=over 4
+
+=item PRAGMA->register_tags(tagname [ => flag] [, more ...])
+
+C<register_tags()>はタグを登録します。
+それぞれのタグはビットフラグとして扱われ、値が自動的に割り当てられますが、任意で値を設定することもできます。
+
+例えば以下の通りです。
+
+	PRAGMA->register_tags(
+		'A' =>   0b00100,
+		'B',   # 0b01000
+		'C',   # 0b10000
+		'D' =>   0b00001,
+		'E',   # 0b00010
+	);
+
+C<register_tags()>は最後に設定したタグの値（上記の例では C<'E'> の値）を返します。
+
+=item PRAGMA->register_bundle(bundlename => tagname [, more ...])
+
+C<register_bundle()>はいくつかのタグをまとめて一つのタグセットを作ります。
+タグセットを参照するときは接頭辞としてコロンをつけます。
+
+=item PRAGMA->register_exclusive(tagname1, tagname2 [, more ...])
+
+C<register_exclusive()>は複数のタグが相互に排他的であることを宣言します。
+
+排他的なタグはC<import()>時に同時に指定できず、一方を指定すると一方は自動的に解除されます。
+
+=back
+
+=head2 Checking Effects
+
+=over 4
+
+=item PRAGMA->enabled(tags...)
+
+実行時にタグの効果を調べるメソッドです。
+引数を渡さなければ、そのプラグマについて全体の状態を返します。
+
+スカラコンテキストではビット値をそのまま返します。
+リストコンテキストではビット値をタグ名のリストに変換して返します。
+
+
+=back
+
+=head2 use/no Directives
+
+Module::Pragma自体のC<import()>とC<unimport()>はどちらも何もしません。サブクラスから使うときにのみ有効です。
+
+この二つのメソッドは引数をC<check_exclusive()>でチェックします。
+
+=over 4
+
+=item PRAGMA->import(tags...)
+
+C<import()>はI<tags>と排他関係にあるタグを無効にし、I<tags>を有効にします。
+
+I<tags>を省略するとC<default_import()>が呼び出され、(C<_die()>しなければ）その返り値を引数として使います。
+
+=item PRAGMA->uimport(tags...)
+
+C<unimport()>はI<tags>を無効にし、I<tags>と排他関係にあるタグを有効にします。
+
+I<tags>を省略すると、プラグマの効果を完全に無効化します。
+
+=back
+
+=head2 Handling Exception
+
+いくつかの例外処理はオーバーライドすることで規定の動作を変更できます。
+
+=over 4
+
+=item PRAGMA->default_import()
+
+C<import()>を引数を指定せずに呼び出すと、規定の動作ではC<_die()>します。
+
+この動作はC<default_import()>メソッドをオーバーライドすることで変更できます。
+
+C<default_import()>はC<import()>に引数が渡されなかったときにメソッドとして呼ばれ、返り値がC<import()>の引数として使用されます。
+
+=item PRAGMA->unknown_tag(tagname)
+
+未知のタグを発見したときに内部で呼ばれるメソッドです。規定の動作はC<_die()>です。
+C<register_tags()>を利用してその場でタグを生成するなどの動作を想定しています。
+
+返り値は(C<_die()>しなければ）タグに相当するビットマスクとして使われます。
+
+=back
+
+=head2 Utilities
+
+=over 4
+
+
+=item PRAGMA->hint(level)
+
+コンパイル時にセットされたプラグマの状態を表す値を返します。
+
+
+=item PRAGMA->_die(message)
+
+C<Carp.pm>モジュールをロードし、C<Carp::croak()>にI<PRAGMA>とI<message>を渡して呼び出します。
+
+=item PRAGMA->tag(tagname)
+
+I<tagname>に相当するビット値を返します。I<tagname>が未登録の場合はC<unknown_tag()>を呼び出します。
+
+=item PRAGMA->tags()
+
+登録済みのタグのリストを返します。
+
+=item PRAGMA->pack_tags(tags...)
+
+個々のI<tags>のビット値の論理和を返します。
+
+=item PRAGMA->unpack_tags(bits)
+
+I<bits>の値に相当するタグのリストを返します。
+
+=item PRAGMA->exclusive_tags(tags...)
+
+I<tags>と排他関係にあるタグのリストを返します。
+
+=item PRAGMA->check_exclusive(tags...)
+
+I<tags>が相互に排他的かどうかをチェックし、排他的であればC<_die()>します。
+
+=back
+
+=head1 SEE ALSO
+
+L<perlpragma>でプラグマの実装について解説しています。
+
+L<Module::Pragma>にはプラグマの実装例があります。
+
+=head1 AUTHOR
+
+Goro Fuji (藤 吾郎) C<< <gfuji(at)cpan.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2008 Goro Fuji.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

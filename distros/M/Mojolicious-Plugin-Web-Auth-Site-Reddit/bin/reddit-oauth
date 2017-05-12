@@ -1,0 +1,152 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+
+use FindBin;
+BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
+
+use Config::Pit;
+use MIME::Base64;
+use Mojolicious::Lite;
+use URI::FromHash qw( uri );
+
+print STDERR
+    "[NOTICE] should be used in domains other than 'localhost' (e.g. local.example.com)\n";
+
+my $site = 'reddit';
+helper site => sub { $site };
+
+my $pit = pit_get(
+    $site,
+    require => {
+        key    => ucfirst($site) . ' Client ID',
+        secret => ucfirst($site) . ' Client Secret',
+    }
+);
+
+my $access_token_url = uri(
+    scheme   => 'https',
+    username => $pit->{key},
+    password => $pit->{secret},
+    host     => 'www.reddit.com',
+    path     => '/api/v1/access_token',
+);
+
+my $scope
+    = 'identity,edit,flair,history,modconfig,modflair,modlog,modposts,modwiki,mysubreddits,privatemessages,read,report,save,submit,subscribe,vote,wikiedit,wikiread';
+
+plugin 'Mojolicious::Plugin::Web::Auth',
+    access_token_url => $access_token_url,
+    authorize_url =>
+    'https://www.reddit.com/api/v1/authorize?duration=permanent',
+    module      => ucfirst($site),
+    key         => $pit->{key},
+    scope       => $scope,
+    on_finished => sub {
+    my ( $c, $access_token, $account_info, $extra ) = @_;
+    $c->session( access_token => $access_token );
+    $c->session( account_info => $account_info );
+    $c->session( extra => $extra );
+    return $c->redirect_to('index');
+    };
+
+get '/' => sub {
+    my ($c) = @_;
+    unless ( $c->session('access_token') ) {
+        return $c->redirect_to('login');
+    }
+} => 'index';
+
+any [qw/get post/] => '/login' => sub {
+    my ($c) = @_;
+    if ( uc $c->req->method eq 'POST' ) {
+        return $c->redirect_to(
+            sprintf( "/auth/%s/authenticate", lc $site ) );
+    }
+} => 'login';
+
+post '/logout' => sub {
+    my ($c) = @_;
+    $c->session( expires => 1 );
+    $c->redirect_to('index');
+} => 'logout';
+
+app->start;
+
+# PODNAME: reddit-oauth
+# ABSTRACT: Tiny app to facilitate getting Reddit OAuth tokens
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+reddit-oauth - Tiny app to facilitate getting Reddit OAuth tokens
+
+=head1 VERSION
+
+version 0.000004
+
+=head1 SYNOPSIS
+
+If module is installed:
+
+    reddit-oauth daemon -m development -l http://*:3000
+
+If developing:
+
+    perl -Ilib bin/reddit-auth daemon -m development -l http://*:3000
+
+In your browser go to http://localhost:3000/
+
+=head2 ACKNOWLEDGEMENTS
+
+This code is mostly copied from the examples in
+L<Mojolicious::Plugin::Web::Auth>.
+
+=head1 AUTHOR
+
+Olaf Alders <olaf@wundercounter.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Olaf Alders.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+__DATA__
+
+@@ index.html.ep
+% layout 'default';
+<p><%= site %> access token: <%= session('access_token') %></p>
+<p><%= site %> refresh token: <%= session('extra')->{refresh_token} %></p>
+
+% use Data::Printer;
+% my $session = session();
+
+<pre>
+<%= site %> session: <%= np( $session ) %>
+</pre>
+<form method="post" action="/logout">
+<button type="submit">Log out</button>
+</form>
+
+@@ login.html.ep
+% layout 'default';
+<form method="post">
+<button type="submit">Log in with <%= ucfirst( site ) %></button>
+</form>
+
+@@ layouts/default.html.ep
+% title 'Auth' . ucfirst(lc site);
+<!DOCTYPE html>
+<html>
+  <head><title><%= title %></title></head>
+  <body><%= content %></body>
+</html>

@@ -1,0 +1,36 @@
+---
+abstract: 'Add encoding support to Poet/Mason apps'
+author:
+  - 'Dave Baird <dave@zerofive.co.uk>'
+build_requires:
+  Test::Class: '0'
+  Test::Class::Most: '0'
+  Test::More: '0'
+  perl: v5.12.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mason-Plugin-WithEncoding
+no_index:
+  directory:
+    - lib/Mason/Plugin/WithEncoding/Test
+    - lib/Mason/Plugin/WithEncoding/t
+requires:
+  Encode: '0'
+  Guard: '0.1'
+  Mason: '2.13'
+  Moose: '0.34'
+  Plack::Request::WithEncoding: '0'
+  Poet: '0.04'
+  Try::Tiny: '0.01'
+  URI::Escape: '3.29'
+  encoding::warnings: '0'
+  perl: v5.12.0
+resources:
+  bugtracker: https://github.com/davebaird/mason-plugin-withencoding/issues
+  homepage: https://github.com/davebaird/mason-plugin-withencoding
+  repository: https://github.com/davebaird/mason-plugin-withencoding.git
+version: '0.2'

@@ -1,0 +1,12 @@
+Revision history for Mojolicious-Plugin-Web-Auth-Site-LinkedIn
+
+0.03      2016-11-05 13:18:52-04:00 America/New_York
+
+    - Add an authorize_header value to make API calls work correctly
+
+0.02      2016-11-05 11:33:01-04:00 America/New_York
+
+    - Get the basic profile information on sign in itself
+
+0.01      2016-11-05 10:40:43-04:00 America/New_York
+    - Initial release.

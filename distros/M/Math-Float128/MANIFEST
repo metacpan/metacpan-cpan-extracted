@@ -1,0 +1,33 @@
+MANIFEST
+README
+Changes
+Float128.pm
+Float128.xs
+Makefile.PL
+math_float128_include.h
+quad.in
+typemap
+t/01load.t
+t/02abs.t
+t/03arith.t
+t/04bool.t
+t/05cmp.t
+t/06inc_dec.t
+t/infnan_overloading.t
+t/07int.t
+t/08log_exp.t
+t/09new.t
+t/nnum.t
+t/NOK_and_POK.t
+t/pod.t
+t/10pow.t
+t/prec.t
+t/11stringification.t
+t/12trig.t
+t/13constants.t
+t/14f128_bytes.t
+t/15special.t
+t/16overload.t
+t/17overload_cmp_reversal.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

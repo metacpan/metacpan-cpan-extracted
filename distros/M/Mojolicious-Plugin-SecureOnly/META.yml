@@ -1,0 +1,28 @@
+---
+abstract: 'Mojolicious Plugin to force all requests secure.'
+author:
+  - 'Stefan Adams <s1037989@gmail.com>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-SecureOnly
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '6.00'
+  perl: v5.14.0
+resources:
+  bugtracker: https://github.com/s1037989/Mojolicious-Plugin-SecureOnly/issues
+  homepage: https://github.com/s1037989/Mojolicious-Plugin-SecureOnly
+  repository: https://github.com/s1037989/Mojolicious-Plugin-SecureOnly.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

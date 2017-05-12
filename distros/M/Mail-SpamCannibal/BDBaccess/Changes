@@ -1,0 +1,94 @@
+Revision history for Perl extension Mail::SpamCannibal::BDBreader
+
+0.25  Mon Jan 27 11:59:58 PST 2014
+        modify Makefile.PL to bypass missing 'pod2text'
+
+0.24  Tue May 12 18:49:41 PDT 2009
+	edited CTest.xs, main.c, netio.c, misc_func.h, godaemon.c,
+	 and util_pid.c to kill warnings from newer gcc versions
+
+	in dsocket.t & rsocket.t change "kill 15" to "kill 9" in tests 
+	that won't die under newer version of perl and make utilities
+
+	fixed typo in test 5 of t/util_pid.t that failed with potential
+	false positive.
+
+0.23  Wed Apr 16 13:40:03 PDT 2008
+        add #include <stdlib.h> to main.c in DNSBLserver v0.51 and
+        BDBaccess v0.23 for compatability with newer Clib versions
+
+0.22  Wed Dec 12 12:26:31 PST 2007
+	remove $VERSION in CTest.pm, replace with $modVERSION
+
+0.21  Sun Sep 17 15:53:24 PDT 2006
+	add MANIFEST.SKIP
+
+0.20  Sat Sep  9 20:38:22 PDT 2006
+	updated test file 'mkdir' statement for compatibility with  Perl 5.0503
+
+0.19  Sat Nov 13 16:31:56 PST 2004
+	update docs
+
+0.18  Fri Aug 27 10:08:51 PDT 2004
+	update CTest.xs to eliminate use of "putchar" which conflicts
+	with buffered/unbuffered use of IO in testing
+
+0.17  Tue Jun  8 16:29:39 PDT 2004
+	updated rc.bdbaccess v0.06 to fix bug for perl v5.8.3 
+	where unshift does not work properly for default @_
+
+0.16  Sat May 22 10:45:37 PDT 2004
+	removed compiler dependent bug for C version extraction 
+	from BDBaccess.pm
+
+0.15  Sat May  1 16:02:23 PDT 2004
+	altered the comments at the beginning of BDBaccess.pm
+
+0.14  Mon Feb  9 15:56:51 PST 2004
+	rewrite 'restart' logic in rc.bdbaccess v0.5
+
+0.13  Wed Oct  8 11:36:59 PDT 2003
+	add Makefile entry to copy rc.bdbaccess to install script directory
+	update test suites to accomodate libdbtarpit change
+
+0.12  Fri Oct  3 16:49:27 PDT 2003
+	add code to generate pid file for each child and
+	for each task to delete its own pid file on exit
+	in support of the db watcher
+
+0.11  Thu Sep 25 10:55:48 PDT 2003
+	add Makefile constant MY_POD2TEXT
+
+0.10  Wed Sep 24 10:28:57 PDT 2003
+	adjusted pointer arithmetic for systems that don't tolerate
+	address pointers on odd boundries.
+	change print strings to eliminate null pointers that segfault
+	on some OS's
+
+0.09  Sat Aug 23 15:25:31 PDT 2003
+	add inetd logic
+
+0.08  Wed Jul 30 09:55:14 PDT 2003
+	change conflicting name Config.pm to SiteConfig.pm
+
+0.07  Sat Jul 26 13:22:09 PDT 2003
+	add network socket support and inetd mode
+
+0.06  Sat Jul 26 10:10:53 PDT 2003
+	add multiple record key only read capability
+
+0.05  Fri Jul 18 21:47:30 PDT 2003
+	convert to use libdbtarpit shared library
+
+0.04  Mon Jul 14 13:11:02 PDT 2003
+	fix minor bug in dsocket.t related to 
+	changes in version reporting
+
+0.03  Sat Jul 12 11:18:12 PDT 2003
+	update bdb functions to use common bdbtarpit library
+
+0.02  Tue Jul  9 14:17:25 PDT 2003
+	account for big/little endian storage
+
+0.01  Sat Jul  5 14:48:50 PDT 2003
+	alpha release

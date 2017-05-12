@@ -1,0 +1,86 @@
+* 2016-07-21 2.3
+  add --extra-opts
+* 2016-07-12 2.2.01
+  fix tests
+* 2016-07-12 2.2
+  add handling for --environment and --runas
+* 2016-07-07 2.1.3
+  add bulk_is_baeh for devices which don't like bulk requests
+* 2016-06-29 2.1.2.2
+  return metrics as string
+* 2016-06-29 2.1.2.1
+  bugfix in load_my_extension for old-style api
+* 2016-06-20 2.1.2
+  add mode encode to DB.pm
+* 2016-06-16 2.1.1
+  add DAMOCLES-MIB
+* 2016-05-30 2.1
+  warninx and criticalx can be regular expressions
+* 2016-05-19 2.0.18
+  add unitOnOff De. to Stulzmib
+* 2016-05-12 2.0.17
+  add mitigation-methods
+  update CISCO-FIREWALL-MIB
+* 2016-05-12 2.0.16
+  add BIANCA-BRICK-MIBRES-MIB
+  add BINTEC_FILESYS-MIB
+  add unhex_octet_string()
+* 2016-05-10 2.0.15
+  bugfix in discover_suitable_class
+* 2016-05-10 2.0.14
+  add mib_ids to JUNIPER-IVE and UCD-SNMP Mibs
+* 2016-04-19 2.0.13
+  allow own handlers for set_timeout_alarm
+* 2016-04-17 2.0.12
+  add VRRP-MIB (dhoffend pullrequest #3)
+* 2016-04-08 2.0.11
+  escape special characters for statefiles under windows
+* 2016-04-04 2.0.10
+  improve the timeout handler
+* 2016-04-04 2.0.9
+  DB: add fetchall_array_cached
+* 2016-03-29 2.0.8
+  SNMP: add CISCO-STACKWISE-MIB
+* 2016-03-11 2.0.7
+  SNMP: update CISCO-ENHANCED-MEMPOOL-MIB
+* 2016-03-08 2.0.6
+  DB: allow encoded exec
+* 2016-02-26 2.0.5
+  add Raritan-EMD-MIB and Stulz-WIB8000-MIB
+* 2016-02-22 2.0.3
+  add CISCO-STACK-MIB
+* 2016-02-17 2.0.2
+  update CHECKPOINT-MIB
+  replace pipe-symbol in output by !
+* 2016-02-15 2.0.1
+  bugfix in snmpwalk simulation
+  bugfix in valdiff @_
+* 2016-01-29 2.0
+  add MIBS, dynamical load of snmp modules
+* 2016-01-25 1.4.3
+  add get_entities
+* 2016-01-24 1.4.2.2
+  source DB/DBI.pm
+* 2016-01-24 1.4.2.1
+  add DB/DBI.pm
+* 2016-01-24 1.4.2
+  Bugfixes in the DB part
+* 2016-01-20 1.4.1
+  Bugfixes in the DB part
+* 2016-01-06 1.4
+  fix sql(runtime) in DB.pm, refactor
+* 2015-12-24
+  fix autoload of DB module
+* 2015-11-28 1.3
+  add merge_tables, merge_tables_with_code
+* 2015-11-29 1.2.2
+  add merge_tables
+  get_tables can get only specific rows
+  finish units
+* 2015-11-05 1.2
+  remove VERSION from submodules
+* 2015-11-05 1.1
+  Fix CPAN structure
+* 2015-07-08 1.0
+  First version, released on an unsuspecting world.
+  GLPlugin has long been used in check_*_health-plugins

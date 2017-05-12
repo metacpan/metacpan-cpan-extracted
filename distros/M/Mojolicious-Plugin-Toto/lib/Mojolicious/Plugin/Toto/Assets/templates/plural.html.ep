@@ -1,0 +1,22 @@
+% use Mojo::ByteStream qw/b/;
+<pre class="toto_code">
+get '/<%= $object %>/<%= $tab %>' => sub {
+% if ($self->app->routes->namespaces) {
+    # or define <%= $self->app->routes->namespaces->[0] %>::<%= b($object)->camelize %>::<%= $tab %>()
+% }
+    ...
+} => '<%= $object %>/<%= $tab %>';
+
+# templates/<%= $object %>/<%= $tab %>.html.ep
+<%= '%' %> for (1..10) {
+<%= '%' %>= link_to "$object/default", { key => $_ } => begin
+<%= $object %> &lt;%= $_ %&gt;&lt;br&gt;
+<%= '%' %>= end
+<%= '%' %> }
+</pre>
+% for (1..10) {
+%= link_to url_for("$object/default", { key => $_ }) => begin
+<%= $object %> <%= $_ %><br>
+%= end
+% }
+

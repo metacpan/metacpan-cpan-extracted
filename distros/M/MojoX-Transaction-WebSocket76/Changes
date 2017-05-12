@@ -1,0 +1,24 @@
+Revision history for MojoX::Transaction::WebSocket76
+
+0.05
+        - Fixed (skipped) tests for Mojolicious 6.40 and above.
+        - Updated documentation.
+        - Added license.
+
+0.04
+        - Updated author & copyright info.
+
+0.03
+        - Upgraded to work with new versions of Mojolicious (>= 2.52).
+        - Updated distribution.
+        - Added example of module usage.
+        - Hided utility package form PAUSE.
+        - Specified minimal version of Perl (>= 5.010001).
+
+0.02
+        - Fixed response processing related bug.
+        - Upgraded to work with new versions of Mojolicious (>= 2.47).
+        - Improved documentation.
+
+0.01
+        - Initial public release.

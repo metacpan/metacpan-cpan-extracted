@@ -1,0 +1,49 @@
+Revision history for Perl extension Wed Feb  1 21:47:48 PST 2006
+
+0.11  Mon Jan 27 12:47:58 PST 2014
+        correct typo in Makefile.pm
+
+0.10  Sat Nov 10 17:58:54 PST 2012
+	sub closelog was missing when syslog = STDERR
+
+0.09  Sat Jul 11 12:03:08 PDT 2009
+	This package requires Net::NBsocket-0.15 to accomodate "goto"
+	bug in perl version 5.8.0 thru 5.8.5
+
+0.08  Wed Oct 15 14:19:29 PDT 2008
+	require Net::DNS::ToolKit version 0.41 or higher
+
+0.07  Tue Sep 30 16:02:18 PDT 2008
+	parseSMTP.t fails in the sandbox because of global modification
+	to $$. Change to "local $$".
+
+0.06  Tue Sep 12 23:23:03 PDT 2006
+	oops! left 'use diagnostics in v0.05';
+
+0.05  Mon Sep 11 16:55:20 PDT 2006
+	remove references to 'mkdir' in test programs
+	for compability with perl 5.0503
+
+0.04  Tue Apr 18 15:48:17 PDT 2006
+	fix documentation error run_honeypot typo
+	add deep trace level 4 to show sub names in trace
+	add $SIG{PIPE} = 'IGNORE';
+
+0.03  Sat Feb  4 15:23:34 PST 2006
+	corrected bug in configuration check that alway set the
+	bind address to INADDR_ANY
+
+	added documentation about the use of IPTABLES to run
+	concurrent mail servers on the same host
+
+	added 'log_facility' parameter to config hash
+
+	include rc.honeypot shell script wrapper for
+	rc.honeypot.pl
+
+0.02  Wed Feb  1 22:22:02 PST 2006
+	oops! forgot to comment out #use diagnostics;
+
+0.01  Tue Jan 24 10:49:10 PST 2006
+	initial release
+

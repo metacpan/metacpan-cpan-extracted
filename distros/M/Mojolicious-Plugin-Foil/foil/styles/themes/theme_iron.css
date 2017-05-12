@@ -1,0 +1,124 @@
+/* ================================================================== */
+/* THEME: Iron
+ */
+/* ================================================================== */
+/* THEME: Iron - fonts
+ */
+/* ------------------------------------------------------------------ */
+/* Fonts */
+h1, h2, h3, h4 {
+  font-family: Verdana, Tahoma, Arial, Helvetica, sans-serif;
+}
+
+/* ================================================================== */
+/* ICONS - light on dark
+ * Nav arrows with transparent backgrounds
+ */
+.side nav li > ul {
+  list-style-image: url(nav_white.png);
+}
+
+/* ================================================================== */
+/* General */
+.verge, header,
+footer,
+.side, .fancy {
+  color: #111111;
+  background: #808080;
+  border-color: black;
+}
+
+header,
+footer,
+.side {
+  background-image: url(iron1.jpg);
+}
+
+body {
+  color: #333333;
+  background: #eeeeee;
+}
+
+a:link {
+  color: #6a8000;
+}
+
+a:visited {
+  color: #805500;
+}
+
+header a:link,
+footer a:link,
+.side a:link,
+.verge a:link,
+header a:link,
+footer a:link,
+.side a:link,
+.fancy a:link {
+  color: #dde6b3;
+}
+
+header a:visited,
+footer a:visited,
+.side a:visited,
+.verge a:visited,
+header a:visited,
+footer a:visited,
+.side a:visited,
+.fancy a:visited {
+  color: #e6d5b3;
+}
+
+.fancy {
+  color: #111111;
+  background-image: url("iron1.jpg");
+  border: 5px double #111111;
+  padding: 0;
+}
+.fancy li {
+  padding: 0.5em;
+  margin: 5px;
+  border: 5px solid #111111;
+  background-color: #9d9995;
+  background: linear-gradient(#9d9995, #77736e);
+}
+.fancy li a:link {
+  color: #660066;
+}
+.fancy li a:visited {
+  color: #000066;
+}
+
+.button, input[type=submit], header nav a,
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: #ebe4e0;
+  border-color: #111111;
+  background-color: #59524f;
+}
+
+.button a:link, input[type=submit] a:link, header nav a a:link,
+header nav .selflink a:link,
+header nav em a:link,
+header nav .current a a:link, a.button:link, header nav a:link {
+  color: #ebe4e0;
+}
+
+.button a:visited, input[type=submit] a:visited, header nav a a:visited,
+header nav .selflink a:visited,
+header nav em a:visited,
+header nav .current a a:visited, a.button:visited, header nav a:visited {
+  color: #b3f5a3;
+}
+
+header nav li {
+  border-color: #666666;
+}
+
+header nav .selflink,
+header nav em,
+header nav .current a {
+  background-color: #746b67;
+  color: white;
+}

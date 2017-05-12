@@ -1,0 +1,36 @@
+Makefile-Parallel
+
+The module Makefile::Parallel implements a way of describing process
+inter-dependency with a textual specification resembling the Makefile syntax,
+and provides a scheduler with many fancy options of running the
+specification on a number of sub-systems.
+
+Currently, a "local" and a "PBS" (ROCKS clusters) sub-systems are
+implemented and full operational. However, creating new sub-systems
+is as simple as implementing a well defined interface.
+
+This work is already being used at production, but a lot of more features
+are planned to be added. Sorry for the lack of documentation and tests
+for now, this is something that will be better in the future.
+
+For documentation, please read the pmake POD (you can found it on
+examples/ of this distribution).
+
+Please report any problem or suggestion to
+ruben (at) di (dot) uminho (dot) pt
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2015 Natura
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

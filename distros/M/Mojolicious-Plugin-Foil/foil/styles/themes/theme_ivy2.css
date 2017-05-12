@@ -1,0 +1,46 @@
+/* ================================================================== */
+/* THEME: Ivy 2
+ * light_on_dark
+ */
+@import url(theme_ivy.css);
+/* ================================================================== */
+/* THEME: Ivy
+ *
+ * This only defines fonts, colours and borders, not layout.
+ */
+/* ================================================================== */
+/* THEME: Ivy - fonts
+ *
+ * This only defines fonts, colours and borders, not layout.
+ */
+/* ------------------------------------------------------------------ */
+/* Fonts */
+h1, h2, h3, h4 {
+  font-family: "Lucida Calligraphy", Merlin, "Black", verdana, helvetica, arial, sans-serif;
+  color: white;
+}
+
+/* ================================================================== */
+/* General */
+.verge, header, footer,
+.side {
+  color: #eeeeee;
+  background: black;
+  border-color: white;
+}
+
+header {
+  background-image: url(ivy1.jpg);
+  background-attachment: fixed;
+}
+
+footer,
+.side {
+  background-image: url(ivy2.jpg);
+  background-attachment: fixed;
+}
+
+body {
+  color: #e0ebe0;
+  background: #003300;
+}

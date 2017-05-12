@@ -1,0 +1,314 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+# $Id: maps-gather,v 1.6 2004/09/12 01:35:02 lem Exp $
+
+use URI::URL;
+use Pod::Usage;
+use Getopt::Std;
+use NetAddr::IP;
+use Mail::Mailer;
+use LWP::RobotUA;
+use HTML::Entities;
+use HTML::LinkExtor;
+
+our $VERSION = do { my @r = (q$Revision: 1.6 $ =~ /\d+/g); sprintf " %d."."%03d" x $#r, @r };
+
+=pod
+
+=head1 NAME
+
+maps-gather - Gather evidence associated to a MAPS complaint
+
+=head1 SYNOPSIS
+
+    maps-gather [-h] [-v] [-r relay] -s report-email
+
+=head1 DESCRIPTION
+
+This script is used to request the evidence that MAPS keeps associated
+with a listing of an open relay, spam source, etc. The evidence is
+formatted so as to keep the original complaint and all the evidence in
+a single message and then it is forwarded to the designated contact
+address.
+
+Normally, C<abuso> would let the MAPS compalints in the directory
+where B<empty> reports are sent. You could then use C<maps-gather> to
+re-feed a more documented report to your C<abuso> engine.
+
+=head2 Do not abuse this script
+
+In general, it is not polite to send large numbers of queries to a
+host, as this might be interpreted as an attack. Use this scipt
+judiciously and avoid long and repeated queries.
+
+Note that mail-abuse.org / mail-abuse.com has a limit on the number of
+queries allowed per hour. If you need to scan an address block using
+this tool, you should probably use a delay of a few minutes between
+queries, using the B<-d> option.
+
+The following options are recognized:
+
+=over
+
+=item B<-h>
+
+Outputs this documentation.
+
+=item B<-v>
+
+Be verbose about progress.
+
+=item B<-r relay>
+
+The relay server to use in order to send the email message with the
+complaint and the evidence. Defaults to 'mail'.
+
+=item B<-s report-email>
+
+Specify the RFC-822 address that the email is going to be sent to.
+
+=cut
+
+    ;
+use vars qw/ $opt_r $opt_s $opt_h $opt_v /;
+
+getopts('hr:s:v');
+
+pod2usage(verbose => 1) unless $opt_s;
+pod2usage(verbose => 2) if $opt_h;
+
+$opt_r = 'mail' unless $opt_r;
+
+my $ua = LWP::RobotUA->new("maps-gather/$VERSION", 
+			   'maps-gather-user@this.domain');
+$ua->delay(0.1);
+
+sub _maps_query ($$$$)
+{
+    my $ua	= shift;
+    my $type	= shift;
+    my $ip	= shift;
+    my $r_cont	= shift;
+
+    print "# MAPS-$type lookup of ", $ip->addr, "\n" if $opt_v;
+
+    my $r	= undef;
+    $$r_cont	.= <<EOF;
+
+The following evidence has been provided by MAPS to back its complaint.
+
+EOF
+    ;
+
+    if ($type =~ /OPS/i)
+    {
+	$r = $ua->get('http://www3.mail-abuse.com/cgi-bin/nph-ops?' 
+		      . $ip->addr);
+	if ($r->is_success)
+	{
+	    my $cont = decode_entities($r->content);
+	    $cont =~ s/^\s*([\w\-]+:)/$1/gm;
+	    $cont =~ s/^\s+/ /gm;
+	    $$r_cont .= $cont;
+	}
+	else
+	{
+	    warn "# Failed MAPS-$type HTTP query for ", $ip->addr, 
+	    ": ", $r->code, "/", $r->message, "\n";
+	    return 5;
+	}
+    }
+    elsif ($type =~ /RSS/)
+    {
+	$r = $ua->get('http://work-rss.mail-abuse.com/cgi-bin/nph-rss?' 
+		      . $ip->addr);
+	if ($r->is_success)
+	{
+	    my $cont = decode_entities($r->content);
+	    $cont =~ s/^\s*([\w\-]+:)/$1/gm;
+	    $cont =~ s/^\s+/ /gm;
+	    $$r_cont .= $cont;
+	}
+	else
+	{
+	    warn "# Failed MAPS-$type HTTP query for ", $ip->addr, 
+	    ": ", $r->code, "/", $r->message, "\n";
+	    return 5;
+	}
+    }
+    elsif ($type =~ /RBL/)
+    {
+	$r = $ua->get('http://mail-abuse.com/cgi-bin/lookup?' 
+		      . $ip->addr);
+	if ($r->is_success)
+	{
+	    my @links;
+	    my $p = HTML::LinkExtor->new(undef, $r->base);
+	    my $res = $p->parse($r->content);
+	    for my $link ($p->links)
+	    {
+		my $uri		= $link->[2];
+		next unless $uri =~ /show_listing\.cgi\?(\d+)/;
+		my $case	= $1;
+
+		warn "# Fecthing case id $case\n" if $opt_v;
+
+		$$r_cont .= <<EOF;
+*** Begin evidence for case $case
+EOF
+    ;
+
+		my $r2 = $ua->get($uri);
+		if ($r2->is_success)
+		{
+		    my $c = decode_entities($r2->content);
+		    $c =~ s/^\s*([\w\-]+:)/$1/gm;
+		    $c =~ s/^\s+/ /gm;
+		    $$r_cont .= $c;
+		}
+		else
+		{
+		    $$r_cont .= 'Failed to fetch: ' . $r2->code 
+			. '/' . $r2->message . "\n";
+		    $$r_cont .= "See $uri for case $case details\n";
+		    warn "# Failed MAPS-$type (case) HTTP query for ", 
+		    $ip->addr, " / $case : ", $r->code, "/", $r->message, 
+		    "\n";
+		}
+
+		$$r_cont .= <<EOF;
+*** End evidence for case $case
+EOF
+    ;
+	    }
+	}
+	else
+	{
+	    warn "# Failed MAPS-$type HTTP query for ", $ip->addr, 
+	    ": ", $r->code, "/", $r->message, "\n";
+	    return 5;
+	}
+    }
+    else
+    {
+	warn "Unknown type of query '$type' for ", $ip->addr, "\n";
+	return 4;
+    }
+
+    return 0;
+}
+
+my $msg;
+
+do
+{
+    local $/ = undef;
+    $msg = <>;
+};
+				# We parse the Subject: header, as it
+				# contains all the info we need.
+
+my $cont = <<EOF;
+The following is an almost intact complaint from MAPS
+
+EOF
+    ;
+
+$cont .= $msg;
+
+unless ($msg =~ /^From: .*\@mail-abuse\.(org|com)/m
+	and $msg =~ /has been added to the MAPS/m)
+{
+    warn "# Report not recognized as coming from MAPS\n";
+    exit 3;
+}
+
+if ($msg =~ /^Subject: (\w+) [Ll]isting of (\d+\.\d+\.\d+\.\d+)/m)
+{
+    my ($type, $ip) = ($1, new NetAddr::IP $2);
+    unless (defined $ip and defined $type)
+    {
+	warn "# Failed to extract MAPS information from the report\n";
+	exit 1;
+    }
+
+    warn "# Found ($type, $ip) in report\n" if ($opt_v);
+
+    my $e_val = _maps_query $ua, $type, $ip, \$cont;
+    if ($e_val)
+    {
+	warn "# Exiting with $e_val\n" if $opt_v;
+	exit $e_val;
+    }
+    else
+    {
+	warn "# Sending mail report to $opt_s\n" if $opt_v;
+	my $m;
+	eval {
+	    $m = new Mail::Mailer 'smtp', Server => $opt_r;
+	    $m->open(
+		       {
+			   'X-Mailer'	=> "maps-gather/$VERSION",
+			   'To'		=> $opt_s,
+			   'From'	=> 'maps-gather',
+			   'Subject'	=> "MAPS Report for $ip + samples"
+			   });
+	};
+
+	if ($@)
+	{
+	    warn "# Failed to send mail report (check parameters): $@\n";
+	    exit 1;
+	}
+
+	print $m $cont, "\n";
+	$m->close;
+	warn "# Message sent to $opt_s\n" if $opt_v;
+    }
+}
+else
+{
+    warn "# Could not find MAPS information from the report\n";
+    exit 2;
+}
+
+__END__
+
+=pod
+
+=back
+
+The complaint should be fed through C<STDIN>, as the output of C<acat>
+would.
+
+=head1 HISTORY
+
+=over
+
+=item B<Jan, 2004>
+
+First version of this code.
+
+=back
+
+=head1 LICENSE AND WARRANTY
+
+This code and all accompanying software comes with NO WARRANTY. You
+use it at your own risk.
+
+This code and all accompanying software can be used freely under the
+same terms as Perl itself.
+
+=head1 AUTHOR
+
+Luis E. Muñoz <luismunoz@cpan.org>
+
+=head1 SEE ALSO
+
+perl(1), C<acat(1)>, C<LWP::RobotUA(3)>
+
+=cut
+

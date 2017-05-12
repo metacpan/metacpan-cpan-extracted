@@ -1,0 +1,153 @@
+#!perl
+
+use strict;
+use MMapDB;
+
+sub simple_printer {
+    my ($db, $first, @pos)=@_;
+    $first=$db->data_record($first);
+
+    (my $key, undef, $first)=@$first;
+    print('[[', join(', ', @$key), ']] ==> [[',
+	  join(', ', $first, $db->data_value(@pos)), "]]\n");
+}
+
+sub verbose_printer {
+    my ($db)=@_;
+    my @rec=$db->data_record(@_[1..$#_]);
+
+    print('[[', join(', ', @{$rec[0]->[0]}), ']] ==> [[',
+	  join(', ', map( {"[@{$_}[1,3,2]]"} @rec )), "]]\n");
+}
+
+sub config {
+    use Getopt::Long;
+    use Pod::Usage;
+    my ($opt_verbose, $help, $man);
+    my $printer=\&simple_printer;
+    Getopt::Long::Configure(qw/no_ignore_case/);
+    GetOptions('verbose'=>\$opt_verbose,
+	       'man'=>\$man,
+	       'help'=>\$help) or pod2usage(2);
+    pod2usage(1) if $help;
+    pod2usage(-verbose=>2) if $man;
+
+    if( $opt_verbose ) {
+	$printer=\&verbose_printer;
+    }
+
+    return $ARGV[0], $printer, @ARGV[1..$#ARGV];
+}
+
+sub dumpidx;
+sub dumpidx {
+    my ($db, $printer, $pos)=@_;
+    for( my $it=$db->index_iterator($pos); my (undef, @pos)=$it->(); ) {
+	if( $db->is_datapos($pos[0]) ) {
+	    $printer->($db, @pos);
+	} else {
+	    for my $p (@pos) {
+		dumpidx $db, $printer, $p;
+	    }
+	}
+    }
+}
+
+sub dumpit {
+    my ($dbname, $printer, @key)=@_;
+    my $db=MMapDB->new(filename=>$dbname, readonly=>1)->start;
+    die "Cannot open database $dbname: $!\n" unless $db;
+    if( @key ) {
+	if( my @pos=$db->index_lookup($db->mainidx, @key) ) {
+	    if( $db->is_datapos($pos[0]) ) {
+		$printer->($db, @pos);
+	    } else {
+		for my $p (@pos) {
+		    dumpidx $db, $printer, $p;
+		}
+	    }
+	}
+    } else {
+	dumpidx $db, $printer, $db->mainidx;
+    }
+}
+
+dumpit config;
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+MMDB-lookup - a command line lookup tool for MMapDB databases
+
+=head1 SYNOPSIS
+
+ MMDB-lookup [OPTIONS] database-file key ...
+
+=head1 OPTIONS
+
+Options can be abbreviated.
+
+=over 4
+
+=item B<--verbose>
+
+Normally only the data value is printed for each data record. If C<-v>
+is specified the sorting field and the record id are also printed.
+
+=item B<--help>
+
+Prints a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=back
+
+The first non-option is interpreted as database filename. All subsequent
+parameters form a key to be looked up. If the lookup results in an index
+the whole subtree starting with the index is printed. If the key is ommitted
+the whole database is dumped.
+
+=head1 DESCRIPTION
+
+C<MMDB-lookup> dumps L<MMapDB> databases either completely or partly.
+
+Example 1:
+
+ $ MMDB-lookup transconfig.mmdb actn opi /hangman
+ [[actn, opi, /hangman]] ==> [[File: '/Documents/hangman.svg', Done]]
+
+Here the database C<transconfig.mmdb> has been looked up for the key
+C<actn opi /hangman>. Two data records have been found. Their values
+are C<File: '/Documents/hangman.svg'> and C<Done>.
+
+Example 2:
+
+ $ MMDB-lookup x.mmdb Tschechien 6 1-2 F
+ [[Tschechien, 6, 1-2, F, di]] ==> [[6, 10, 27, 35, 48, 88, 90, 94]]
+ [[Tschechien, 6, 1-2, F, do]] ==> [[1, 6, 27, 88, 94]]
+ [[Tschechien, 6, 1-2, F, fr]] ==> [[1, 6, 10, 27, 48, 88, 90, 94]]
+ [[Tschechien, 6, 1-2, F, mi]] ==> [[1, 10, 27, 35, 88]]
+ [[Tschechien, 6, 1-2, F, mo]] ==> [[88, 90, 94]]
+ [[Tschechien, 6, 1-2, F, sa]] ==> [[10, 88]]
+ [[Tschechien, 6, 1-2, F, so]] ==> [[1, 6, 10, 27, 32, 48, 90, 94]]
+
+In this example the passed key resolves to an index. Hence, the whole
+subtree is dumped.
+
+Example 3:
+
+ $ MMDB-lookup -v x.mmdb Tschechien 6 1-2 F sa
+ [[Tschechien, 6, 1-2, F, sa]] ==> [[[SORTA 7076 10], [SORTB 58834 88]]]
+
+This example is to demonstrate the C<--verbose> option. Additionally
+to the data values C<10> and C<88> that can be found also in example 2
+their sorting field and record IDs are shown.
+
+=head1 SEE ALSO
+
+L<MMapDB>

@@ -1,0 +1,28 @@
+#-*-perl-*-
+#
+# $Id: RequestParameterOrder.in,v 33.5 2012/09/26 16:15:24 jettisu Exp $
+#
+# (c) 1999-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+package MQSeries::Command::PCF;
+
+#
+# Some of the PCF commands have order dependencies for the optional
+# parameters.  MQSeries::Command is smart enough to put required in
+# front of optional, but this configuration will guarantee the order
+# of the optional parameters, where necessary.
+#
+
+%RequestParameterOrder =
+  (
+   DeleteQueue			=> [ qw(QType Purge) ],
+
+   InquireQueueStatus		=> [ qw(StatusType OpenType QStatusAttrs) ],
+   InquireClusterQueueManager	=> [ qw(Channel ClusterName ClusterQMgrAtrrs) ],
+   InquireConnection		=> [ qw(ConnectionId GenericConnectionId) ],
+   InquireChannel               => [ qw(ChannelType) ],
+  );
+
+1;

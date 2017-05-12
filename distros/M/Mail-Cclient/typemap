@@ -1,0 +1,26 @@
+Mail::Cclient		T_XSCPTR
+
+INPUT
+T_XSCPTR
+	STMT_START {
+	    MAGIC *mg;
+	    SV *sv = ($arg);
+
+	    if (sv == &sv_undef)
+		$var = 0;
+	    else {
+		if (!sv_isobject(sv))
+		    croak(\"$var is not an object\");
+		sv = (SV*)SvRV(sv);
+		if (!SvRMAGICAL(sv) || !(mg = mg_find(sv, '~'))
+		    || mg->mg_private != ${type}_MAGIC_SIGNATURE)
+		{
+		    croak(\"$var is a forged ${ntype} object\");
+		}
+		$var = ($type) SvIVX(mg->mg_obj);
+	    }
+	} STMT_END
+
+OUTPUT
+T_XSCPTR
+	sv_setsv($arg, get_mailstream_sv($var, \"${ntype}\"));

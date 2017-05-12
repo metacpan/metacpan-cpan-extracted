@@ -1,0 +1,26 @@
+---
+abstract: 'Plugin for logging datastructures using sprintf'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  Test::More: '0.90'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Logf
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '6.47'
+resources:
+  bugtracker: https://github.com/jhthorsen/mojolicious-plugin-logf/issues
+  homepage: https://github.com/jhthorsen/mojolicious-plugin-logf
+  repository: https://github.com/jhthorsen/mojolicious-plugin-logf.git
+version: '0.10'

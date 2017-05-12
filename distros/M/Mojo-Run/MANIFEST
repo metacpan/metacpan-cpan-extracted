@@ -1,0 +1,7 @@
+MANIFEST
+README.md
+LICENSE
+Changes
+Makefile.PL
+lib/Mojo/Run.pm
+t/001_load.t

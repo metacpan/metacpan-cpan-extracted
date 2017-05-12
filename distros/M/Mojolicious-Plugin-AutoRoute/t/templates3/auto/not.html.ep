@@ -1,0 +1,9 @@
+<%
+  if ($Mojolicious::VERSION >= 5.73) {
+    $self->reply->not_found
+  }
+  else {
+    $self->render_not_found;
+  }
+  return;
+%>

@@ -1,0 +1,89 @@
+NAME
+    Math::Random::AcceptReject - Acceptance-Rejection PDF transformations
+
+SYNOPSIS
+      use Math::Random::AcceptReject;
+      my $pdf = Math::Random::AcceptReject->new(
+        xmin   => 0, # defaults to 0
+        xmax   => 2, # defaults to 1
+        ymax   => 2, # no default!
+        pdf    => 'x',    # a triangle from x=0 to x=2 with slope 1
+        random => 'rand', # use Perl's builtin (default)
+      );
+  
+      foreach (1..100) {
+          my $rnd = $pdf->rand();
+          # ...
+      }
+  
+      # Use Math::Random::MT instead of bultin rand()
+      # Same target PDF but as Perl code instead of a Math::Symbolic
+      # function!
+      use Math::Random::MT;
+      my $mt = Math::Random::Mt->new($seed);
+      $pdf = Math::Random::AcceptReject->new(
+        xmax   => 2,
+        ymax   => 2,
+        pdf    => sub { $_[0] },
+        random => sub { $mt->rand() };
+      );
+
+DESCRIPTION
+    This module implements acceptance-rejection transformations of uniformly
+    distributed random numbers to mostly arbitrary probability density
+    functions (*PDF*s).
+
+    Note that whereas J. von Neumann's algorithm can transform from
+    arbitrary source PDFs to arbitrary destination PDFs, this module is
+    currently limited to uniform "[0,1]" source PDFs!
+
+METHODS
+  new
+    Creates a new random number generator. Takes named arguments.
+
+    Mandatory parameters:
+
+      pdf:  The probability density function. This can either be a
+            subroutine reference which takes an argument ('x') and
+            returns f(x), a Math::Symbolic tree representing f(x) and
+            using the variable 'x', or a string which can be parsed
+            as such a Math::Symbolic tree.
+      ymax: Maximum value of the target PDF f(x) in the x range. This
+            max theoretically be safely set to a very large value which
+            is much higher than the real maximum of f(x) within
+            the range [xmin,xmax]. The efficiency of the algorithm goes
+            down with 
+
+    Optional parameters:
+
+      random: The random number generator. Defaults to using Perl's
+              rand() function. May be set to either 'rand' for the
+              default or a subroutine reference for custom random
+              number generators. Expected to return one or more(!)
+              random numbers per call.
+      xmin:   Minimum value for x. Defaults to 0.
+      xmax:   Maximum value for x. Defaults to 1.
+
+  rand
+    Returns the next random number of PDF f(x) as specified by the "pdf"
+    parameter to "new()".
+
+SEE ALSO
+    <http://en.wikipedia.org/wiki/Rejection_sampling>
+
+    Math::Random::MT, Math::Random, Math::Random::OO, Math::TrulyRandom
+
+    Math::Symbolic
+
+    The examples in the examples/ subdirectory of this distribution.
+
+AUTHOR
+    Steffen Mueller, <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2007 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.6 or, at your
+    option, any later version of Perl 5 you may have available.
+

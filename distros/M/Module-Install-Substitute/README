@@ -1,0 +1,45 @@
+NAME
+    Module::Install::Skip - Module::Install extension that allow skip files
+    with regexp.
+
+SYNOPSIS
+      Makefile.PL
+            use inc::Module::Install;
+            ...
+            # will skip *.in files from installation
+            skip('\.in$');
+            ...
+
+METHODS
+  skip
+    Takes one argument - regexp. Returns nothing. Files that match regexp
+    wouldn't be installed. Subsequent requests override previous so use
+    complex regular expression instead.
+
+NOTES
+  preamble
+    This extension doesn't cover drop-ins into Makefile that was done
+    directly, for example with ExtUtils::MakeMaker->preamble call.
+
+    For example: Module::Install::RTx use preamble call for all dirs except
+    libs, you can filter lib files but not bin/sbin.
+
+  libscan
+    M::I::Skip uses libscan overriding. I didn't test with other
+    Module::Install extensions which uses libscan too because I don't know
+    no such extensions on CPAN yet.
+
+AUTHOR
+            Ruslan U. Zakirov
+            cubic@wildgate.miee.ru
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with perl distribution.
+
+SEE ALSO
+    Module::Install.
+

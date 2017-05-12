@@ -1,0 +1,21 @@
+Revision history for MooseX-Role-Strict
+
+0.05    04-16-2011
+        - Drop Test::Most dependency (we didn't actually need it). Thanks to
+          Larry Gilbert (https://github.com/L2G) for this.
+
+0.04    01-09-2010
+        - Fix warnings with new Moose versions about "excludes" during role
+          application (Karen Etheridge)
+
+0.03    19-11-2009
+        - Ignore the 'meta' method.  This is now implicitly added to your
+          class.
+
+0.02    30-04-2009
+        - Make the Meta class a bit more future-proof (Sartak).
+
+0.01    30-04-2009
+        - Push to github and CPAN.
+        - Don't allow classes to silently override methods.
+

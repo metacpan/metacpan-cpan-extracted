@@ -1,0 +1,64 @@
+{
+   "abstract" : "In-memory database, mostly-compatible clone of MongoDB",
+   "author" : [
+      "Ido Perlmuter <ido@ido50.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MorboDB",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Clone" : "0",
+            "Data::UUID" : "0",
+            "MQUL" : "0.003",
+            "Moo" : "0",
+            "Scalar::Util" : "0",
+            "Tie::IxHash" : "0",
+            "boolean" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::FailWarnings" : "0",
+            "Test::More" : "0",
+            "Try::Tiny" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/ido50/MorboDB",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ido50/MorboDB.git",
+         "web" : "https://github.com/ido50/MorboDB"
+      }
+   },
+   "version" : "1.000000"
+}
+

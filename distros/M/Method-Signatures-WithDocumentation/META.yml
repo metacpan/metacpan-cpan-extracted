@@ -1,0 +1,35 @@
+---
+abstract: 'use Method::Signatures with Sub::Documentation together'
+author:
+  - 'David Zurborg <zurborg@cpan.org>'
+build_requires:
+  Class::Load: '0'
+  Test::Most: '0'
+  YAML::Any: '0'
+  base: '0'
+  lib: '0'
+  perl: '5.012'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Method-Signatures-WithDocumentation
+requires:
+  Attribute::Handlers: '0'
+  Data::Alias: '0'
+  Method::Signatures: '0'
+  Moose: '0'
+  Sub::Documentation: '0'
+  perl: '5.012'
+  strictures: '2'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/zurborg/libmethod-signatures-withdocumentation-perl/issues
+  homepage: https://github.com/zurborg/libmethod-signatures-withdocumentation-perl
+  repository: https://github.com/zurborg/libmethod-signatures-withdocumentation-perl.git
+version: '1.000'

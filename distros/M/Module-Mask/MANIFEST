@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Module/Mask.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/01..mask.t
+t/02..inverted.t
+t/03..import.t
+t/99..pod.t
+t/lib/Dummy.pm
+t/lib/Other.pm

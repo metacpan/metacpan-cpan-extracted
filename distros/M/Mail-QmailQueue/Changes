@@ -1,0 +1,12 @@
+2002-04-05  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* 0.03 
+	* data method append mail DATA. when it called twice or more.
+	* data method can handle either a scalar or a ref to an array of scalars.
+
+2001-10-10  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* 0.02 add documentation.
+	
+
+

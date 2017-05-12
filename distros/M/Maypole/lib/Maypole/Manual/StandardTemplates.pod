@@ -1,0 +1,374 @@
+
+=head1 NAME
+
+Maypole::Manual::StandardTemplates - Maypole's Standard Templates and Actions
+
+=head1 DESCRIPTION
+
+As we saw in our Create-Read-Update-Delete (CRUD) example,
+Maypole does all it can to make your life
+easier; this inclues providing a set of default actions and
+factory-supplied templates. These are written in such a generic way,
+making extensive use of class metadata, that they are more or less
+applicable to any table or application. However, in order to progress
+from automatically generated CRUD applications to real customized
+applications, we need to begin by understanding how these default
+actions do their stuff, and how the default templates are put together.
+Once we have an understanding of what Maypole does for us automatically,
+we can begin to customize and create our own templates and actions.
+
+Although the standard templates can be applied in many situations,
+they're really provided just as examples,
+as a starting point to create your own templates to suit your needs.
+The goal of templating is to keep templates simple so the presentation
+can be changed easily when you desire.
+We're not trying to build a single set of reusable templates that cover
+every possible situation.
+
+=head2 The standard actions
+
+Remember that actions are just subroutines in the model classes with an
+I<Exported> attribute.
+A simple, uncustomized Maypole model class, such as one of the classes
+in the beer database application, provides the following default actions
+- that is, provides access to the following URLs:
+
+=over 3
+
+=item C</[table]/view/[id]>
+
+This takes the ID of an object in a table, retrieves the object, and
+presents it to the F<view> template.
+
+=item C</[table]/edit/[id]>
+
+This is the same as C<view>, but uses the F<edit> template to provide a
+web form to edit the object; it submits to C<do_edit>.
+
+=item C</[table]/do_edit/[id]>
+
+When called with an ID, the C<do_edit> action provides row editing.
+
+=item C</[table]/do_edit/>
+
+When called without an ID, the C<do_edit> action provides row creation.
+
+=item C</[table]/delete/id>
+
+This deletes a row, returning to the C<list> page.
+
+=item C</[table]/list/>
+
+This provides a paged list of the table suitable for browsing.
+
+=item C</[table]/do_search/>
+
+This handles a search query and presents the search results back to the
+F<list> template. Previously this was called search, but obviously that 
+clashes with a lot of stuff, and that usage is now deprecated.
+
+=back
+
+We'll now look at how these actions are implemented, before moving on to
+take a detailed look at the templates they drive.
+
+=head3 C<view> and C<edit>
+
+These actions are very simple; their job is to take a row ID, turn it
+into an object, and hand it to the template to be displayed. However, as
+taking the first argument and turning it into an object is such a common
+action, it is handled directly by the model class's C<process> method.
+Similarly, the default template name provided by the C<process> method
+is the name of the action, and so will be C<view> or C<edit>
+accordingly. 
+
+So the code required to make these two actions work turns out to be:
+
+    sub view :Exported { }
+    sub edit :Exported { }
+
+That's right - no code at all. This shows the power of the templating
+side of the system. If you think about it for a moment, it is natural
+that these actions should not have any code - after all, we have
+separated out the concerns of "acting" and displaying. Both of these
+"actions" are purely concerned with displaying a record, and don't need
+to do any "acting". Remember that the "edit" method doesn't actually do
+any editing - this is provided by C<do_edit>; it is just another view of
+the data, albeit one which allows the data to be modified later. These
+two methods don't need to modify the row in any way, they don't need to
+do anything clever. They just are.
+
+So why do we need the subroutines at all? If the subroutines did not exist,
+we would be sent to the C<view> and C<edit> templates as would be
+expected, but these templates would not be provided with the right
+arguments; we need to go through the C<process> method in order to turn
+the URL argument into a row and thence into an object to be fed to the
+template. By exporting these methods, even though they contain no code
+themselves, we force Maypole to call C<process> and provide the class
+and object to the templates.
+
+The moral of this story is that if you need to have an action which is
+purely concerned with display, not acting, but needs to receive an ID
+and turn it into an object, then create an empty method. For instance,
+if we want to make an alternate view of a row which only showed the
+important columns, we might create a method
+
+    sub short_view :Exported {}
+
+This will cause the row to be turned into an object and fed to the
+C<short_view> template, and that template would be responsible for
+selecting the particular columns to be displayed.
+
+=head3 C<do_edit>
+
+This action, on the other hand, actually has to do something. If it's
+provided with an ID, this is turned into an object and we're in edit
+mode, acting upon that object. If not, we're in create mode. 
+
+    sub do_edit :Exported {
+        my ($self, $r) = @_;
+        my $h = CGI::Untaint->new(%{$r->params});
+        my ($obj) = @{$r->objects || []};
+        if ($obj) {
+            # We have something to edit
+            $obj->update_from_cgi($h);
+        } else {
+            $obj = $self->create_from_cgi($h);
+        }
+
+The C<CDBI> model uses the C<update_from_cgi> and C<create_from_cgi>
+methods of L<Class::DBI::FromCGI> to turn C<POST> parameters
+into database table data. This in turn uses L<CGI::Untaint> to ensure
+that the data coming in is suitable for the table. If you're using the
+default C<CDBI> model, then, you're going to need to set up your tables
+in a way that makes C<FromCGI> happy.
+
+The data is untainted, and any errors are collected into a hash which is
+passed to the template. We also pass back in the parameters, so that the
+template can re-fill the form fields with the original values. The user
+is then sent back to the C<edit> template.
+
+        if (my %errors = $obj->cgi_update_errors) {
+            # Set it up as it was:
+            $r->template_args->{cgi_params} = $r->params;
+            $r->template_args->{errors} = \%errors;
+            $r->template("edit");
+        }
+
+Otherwise, the user is taken back to viewing the new object:
+
+    } else {
+        $r->template("view");
+    }
+    $r->objects([ $obj ]);
+
+Notice that this does use hard-coded names for the templates to go to next.
+Feel free to override this in your subclasses:
+
+    sub do_edit :Exported {
+        my ($class, $r) = @_;
+        $class->SUPER::do_edit($r);
+        $r->template("my_edit");
+    }
+
+=head3 Digression on C<Class::DBI::FromCGI>
+
+C<CGI::Untaint> is a mechanism for testing that incoming form data
+conforms to various properties. For instance, given a C<CGI::Untaint>
+object that encapsulates some C<POST> parameters, we can extract an
+integer like so:
+
+    $h->extract(-as_integer => "score");
+
+This checks that the C<score> parameter is an integer, and returns it if
+it is; if not, C<< $h->error >> will be set to an appropriate error
+message. Other tests by which you can extract your data are C<as_hex>
+and C<as_printable>, which tests for a valid hex number and an ordinary
+printable string respectively; there are other handlers available on
+CPAN, and you can make your own, as documented in L<CGI::Untaint>.
+
+To tell the C<FromCGI> handler what handler to use for each of your
+columns, you need to use the C<untaint_columns> methods in the classes
+representing your tables. For instance:
+
+    BeerDB::Beer->untaint_columns(
+        integer => ["score", ... ],
+    );
+
+This must be done after the call to C<setup> in your handler, because
+otherwise the model classes won't have been set up to inherit from
+C<Class::DBI::FromCGI>.
+
+Remember that if you want to use drop-downs to set the value of related
+fields, such as the brewery for a beer, you need to untaint these as
+something acceptable for the primary key of that table:
+
+    BeerDB::Beer->untaint_columns(
+        integer => ["score", "brewery", "style" ],
+        ...
+    );
+
+This is usually integer, if you're using numeric IDs for your primary
+key. If not, you probably want C<printable>, but you probably know what
+you're doing anyway.
+
+=head3 do_delete
+
+The do_delete method takes a number of arguments and deletes those rows from the
+database; it then loads up all rows and heads to the F<list> template.
+You almost certainly want to override this to provide some kind of
+authentication.
+
+Previously this was called delete, but obviously that clashes with a lot of stuff,
+and that usage is now deprecated.
+
+
+=head3 list
+
+Listing, like viewing, is a matter of selecting objects for
+presentation. This time, instead of a single object specified in the
+URL, we want, by default, all the records in the table:
+
+    sub list :Exported {
+        my ($class, $r) = @_;
+        $r->objects([ $self->retrieve_all ])
+    }
+
+However, things are slightly complicated by paging and ordering by
+column; the default implementation also provides a C<Class::DBI::Pager>
+object to the templates and uses that to retrieve the appropriate bit of
+the data, as specified by the C<page> URL query parameter. See the
+L<"pager"> template below.
+
+=head3 search
+
+Searching also uses paging, and creates a query from the C<POST>
+parameters. It uses the F<list> template to display the objects once
+they've been selected from the database.
+
+=head2 The templates and macros
+
+Once these actions have done their work, they hand a set of objects to
+the templates; if you haven't specified your own custom template
+globally or for a given class, you'll be using the factory specified
+template. Let's take a look now at each of these and how they're put
+together.
+
+The beauty of the factory specified templates is that they make use of
+the classes' metadata as supplied by the view class. Although you're
+strongly encouraged to write your own templates, in which you don't need
+to necessarily be as generic, the factory templates will always do the
+right thing for any class without further modification, and as such are
+useful examples of how to build Maypole templates.
+
+=head3 Commonalities
+
+There are certain common elements to a template, and these are extracted
+out. For instance, all the templates call the F<header> template to
+output a HTML header, and nearly all include the F<macros> template to
+load up some common template functions. We'll look at these common
+macros as we come across them.
+
+=head3 F<view> 
+
+template view
+
+=head3 F<edit>
+
+The F<edit> template is pretty much the same as F<view>, but it uses 
+L<Maypole::Model::CDBI::AsForm>'s
+C<to_field> method on each column of an object to return a C<HTML::Element>
+object representing a form element to edit that property. These elements
+are then rendered to HTML with C<as_HTML> or to XHTML with C<as_XML>.
+It expects to see a list of
+editing errors, if any, in the C<errors> template variable:
+
+     FOR col = classmetadata.columns;
+        NEXT IF col == "id";
+        "<P>";
+        "<B>"; classmetadata.colnames.$col; "</B>";
+        ": ";
+            item.to_field(col).as_HTML;
+        "</P>";
+        IF errors.$col;
+            "<FONT COLOR=\"#ff0000\">"; errors.$col; "</FONT>";
+        END;
+    END;
+
+=head3 F<list>
+
+Browsing records and search results are both handled by the F<list> template.
+The C<search> template argument is used to distinguish between the two cases:
+
+    [% IF search %]
+    <h2> Search results </h2>
+    [% ELSE %]
+    <h2> Listing of all [% classmetadata.plural %]</h2>
+    [% END %]
+
+=head3 F<pager>
+
+The pager template controls the list of pages at the bottom (by default)
+of the list and search views. It expects a C<pager> template argument
+which responds to the L<Data::Page> interface.
+There's a description of how it works in
+L<the Template Toolkit section|Maypole::Manual::View/"The Template Toolkit">
+of the View chapter.
+
+=head3 F<macros>
+
+The F<macros> template is included at the start of most other templates
+and makes some generally-useful template macros available:
+
+=over
+
+=item C<link(table, command, additional, label)>
+
+This makes an HTML link pointing to C</base/table/command/additional>
+labelled by the text in I<label>. C<base> is the template variable that
+contains the base URL of this application.
+
+=item C<maybe_link_view(object)>
+
+C<maybe_link_view> takes something returned from the database - either
+some ordinary data, or an object in a related class expanded by a
+has-a relationship. If it is an object, it constructs a link to the view
+command for that object. Otherwise, it just displays the data.
+
+=item C<display_line(object)>
+
+C<display_line> is used in the list template to display a row from the
+database, by iterating over the columns and displaying the data for each
+column. It misses out the C<id> column by default, and magically
+URLifies columns called C<url>. This may be considered too much magic
+for some.
+
+=item C<button(object, action)>
+
+This is a simple button that is submitted to C</base/table/action/id>,
+where C<table> and C<id> are those belonging to the database row C<object>.
+The button is labelled with the name of the action.
+You can see buttons on many pages, including lists.
+
+=item C<view_related(object)>
+
+This takes an object, and looks up its C<related_accessors>; this gives
+a list of accessor methods that can be called to get a list of related
+objects. It then displays a title for that accessor, (e.g. "Beers" for a
+C<brewery.beers>) calls the accessor, and displays a list of the results.
+You can see it in use at the bottom of the standard view pages.
+
+=back
+
+=begin TODO
+
+=head2 Customizing Generic CRUD Applications
+
+=end TODO
+
+=head2 Links
+
+L<Contents|Maypole::Manual>,
+Next L<The Request Workflow|Maypole::Manual::Workflow>,
+Previous L<Maypole View Classes|Maypole::Manual::View>,
+

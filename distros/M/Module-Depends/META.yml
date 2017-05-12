@@ -1,0 +1,34 @@
+---
+abstract: 'identify the dependencies of a distribution'
+author: []
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Depends
+provides:
+  Module::Build:
+    file: lib/Module/Depends/Intrusive.pm
+    version: 666
+  Module::Depends:
+    file: lib/Module/Depends.pm
+    version: 0.16
+  Module::Depends::Intrusive:
+    file: lib/Module/Depends/Intrusive.pm
+  Module::Depends::Intrusive::Fake::Module::Build:
+    file: lib/Module/Depends/Intrusive.pm
+  inc::Module::Install:
+    file: lib/Module/Depends/Intrusive.pm
+    version: 666
+requires:
+  Class::Accessor::Chained: 0
+  File::Spec: 0
+  Parse::CPAN::Meta: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.16

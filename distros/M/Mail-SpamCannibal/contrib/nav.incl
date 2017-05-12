@@ -1,0 +1,42 @@
+<div class="nav">
+<form name=navbar action="" method=POST>
+<input type=hidden name=page value="">
+<!-- broken Netscape 4.xx requires use to make a border with an extra table -->
+<table cellspacing=0 cellpadding=0 border=1 width=100%><tr><td>
+<table cellspacing=0 cellpadding=2 border=0 width=100%>
+
+<tr align=center><td class=gry><a href="#top" onClick="return(nav(''));" 
+  onMouseOver="return(show('HOME'));" onMouseOut="return(off());">HOME</a></td></tr>
+
+<tr align=center><td class=wht><a href="#top" onClick="return(nav('lookup'));" 
+  onMouseOver="return(show('Lookup IP'));" onMouseOut="return(off());">Lookup IP</a></td></tr>
+
+<tr align=center><td class=gry><a href="#top" onClick="return(nav('whois'));" 
+  onMouseOver="return(show('Whois IP'));" onMouseOut="return(off());">Whois IP</a></td></tr>
+
+<tr align=center><td class=wht><a href="docs/" onClick="location = 'docs/';return false;"
+  onMouseOver="return(show('DOCUMENTATION'));" onMouseOut="return(off());">Documentation</a></td></tr>
+
+<tr align=center><td class=gry><a href="#top" onClick="return(nav('download'));" 
+  onMouseOver="return(show('DOWNLOAD'));" onMouseOut="return(off());">Download</a></td></tr>
+
+<tr align=center><td class=wht><a href="#top" onClick="return(nav('contact'));" 
+  onMouseOver="return(show('CONTACT'));" onMouseOut="return(off());">Contact</a></td></tr>
+
+<tr align=center><td class=gry><a href="zonefile.shtml"
+  onMouseOver="return(show('DOWNLOAD ZONEFILE'));" onMouseOut="return(off());">ZONE file</a></td></tr>
+
+<tr align=center><td class=wht><a href="dnsbl_stats.shtml"
+  onMouseOver="return(show('DNSBL STATS'));" onMouseOut="return(off());">DNSBL Stats</a></td></tr>
+
+<script language=javascript1.2>
+if(labrea != '') {
+  document.writeln('<tr align=center><td class=gry><a href="#top" onClick="self.location = labrea;return false;"');
+  document.writeln('onMouseOver="return(show(\'SITE STATS\'));" onMouseOut="return(off());">Site Stats</a></td></tr>');
+}
+</script>
+
+</table></td></tr>
+</table>
+</form>
+</div><br>

@@ -1,0 +1,27 @@
+CHANGES
+	Release Name: 0.4101 2010-08-16
+		*	Updated to use new method system
+
+		*	POD Changes
+
+	Release Name: 0.4001 2010-07-27
+		*	Started using git and github
+
+		*	Normalized version accross plugins.
+
+		*	POD Changes
+
+		*	Revised Testing
+
+    Release Name: 0.30
+        *   Changed license to allow option of GPL
+
+        *   Started using Pod::Readme
+
+    Release Name: 0.29
+        *   Kwalitee Changes
+
+        *   Added no_savecover and no_savelyrics
+
+    Release Name: 0.28 2008-02-11
+        * Split off from Music::Tag distribution

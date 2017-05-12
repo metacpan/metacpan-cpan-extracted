@@ -1,0 +1,153 @@
+From <adamrice@ntlworld.com> Thu Jan  2 16:43:01 2003
+Received: from onion.valueclick.com ([64.70.54.95] helo=onion.perl.org)
+	by deep-dark-truthful-mirror.pad with smtp (Exim 3.36 #1 (Debian))
+	id 18U8RX-0001Jq-00
+	for <fwp@simon-cozens.org>; Thu, 02 Jan 2003 16:43:40 +0000
+Received: (qmail 98153 invoked by uid 1005); 2 Jan 2003 16:43:37 -0000
+Mailing-List: contact fwp-help@perl.org; run by ezmlm
+Precedence: bulk
+List-Post: <mailto:fwp@perl.org>
+List-Help: <mailto:fwp-help@perl.org>
+List-Unsubscribe: <mailto:fwp-unsubscribe@perl.org>
+List-Subscribe: <mailto:fwp-subscribe@perl.org>
+Delivered-To: mailing list fwp@perl.org
+Received: (qmail 98135 invoked by uid 76); 2 Jan 2003 16:43:36 -0000
+Received: from pc1-blac2-3-cust247.mant.cable.ntl.com (HELO glympton.airtime.co.uk) (81.97.36.247) by onion.perl.org (qpsmtpd/0.20) with SMTP; 2003-01-02 16:43:36Z
+Received: from tenacity (ntlworld.com) [127.0.0.1] 	by glympton.airtime.co.uk with esmtp (Exim 3.36 #1 (Debian))	id 18U8O6-0001M5-00; Thu, 02 Jan 2003 16:40:06 +0000
+Message-ID: <3E146C15.8000302@ntlworld.com>
+Date: Thu, 02 Jan 2003 16:43:01 +0000
+From: Adam Rice <adamrice@ntlworld.com>
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.2.1) Gecko/20021130
+X-Accept-Language: en-gb, en, ja
+MIME-Version: 1.0
+To: fwp@perl.org
+Subject: Re: Zip/Postal codes.
+References: <20030102152943.D635@hermione.osp.nl> <20030102144211.GV7700@ox.compsoc.net>
+In-Reply-To: <20030102144211.GV7700@ox.compsoc.net>
+X-SMTPD: qpsmtpd/0.20, http://develooper.com/code/qpsmtpd/
+Content-Type: text/plain; charset="us-ascii"
+Content-Length: 478
+Lines: 10
+Content-Transfer-Encoding: 8bit
+Status: 
+
+David Sheldon wrote:
+> m/(^|\W)(([A-Za-z][0-9]|[A-Za-z][0-9]{2}|[A-Za-z][A-HJ-Ya-hj-y][0-9]|[A-Za-z][A-HJ-Ya-hj-y][0-9]{2}|[A-Za-z][0-9][A-Za-z]|[A-Za-z][A-HJ-Ya-hj-y][0-9][A-Za-z])\s+[0-9][ABD-HJLP-UW-Zabd-hjlp-uw-z]{2}|[Gg][iI][Rr]\W+0[aA]{2})(\W|$)/
+
+I think it's worth mentioning that, right or wrong, postcodes are often 
+written without the space in the middle. Abigail didn't mention whether 
+he wanted to just match the canonical form, or match any common form.
+
+Adam
+
+
+
+From <rick.delaney@rogers.com> Thu Jan  2 16:51:17 2003
+Received: from onion.valueclick.com ([64.70.54.95] helo=onion.perl.org)
+	by deep-dark-truthful-mirror.pad with smtp (Exim 3.36 #1 (Debian))
+	id 18U8ZS-0001Md-00
+	for <fwp@simon-cozens.org>; Thu, 02 Jan 2003 16:51:51 +0000
+Received: (qmail 8341 invoked by uid 1005); 2 Jan 2003 16:51:47 -0000
+Mailing-List: contact fwp-help@perl.org; run by ezmlm
+Precedence: bulk
+List-Post: <mailto:fwp@perl.org>
+List-Help: <mailto:fwp-help@perl.org>
+List-Unsubscribe: <mailto:fwp-unsubscribe@perl.org>
+List-Subscribe: <mailto:fwp-subscribe@perl.org>
+Delivered-To: mailing list fwp@perl.org
+Received: (qmail 8315 invoked by uid 76); 2 Jan 2003 16:51:47 -0000
+Received: from cpe3236303635383434.cpe.net.cable.rogers.com (HELO cs839290-a.mtth.phub.net.cable.rogers.com) (24.114.172.6) by onion.perl.org (qpsmtpd/0.20) with SMTP; 2003-01-02 16:51:47Z
+Received: by cs839290-a.mtth.phub.net.cable.rogers.com (Postfix, from userid 500)	id BD50416EE1; Thu,  2 Jan 2003 11:51:17 -0500 (EST)
+Date: Thu, 2 Jan 2003 11:51:17 -0500
+From: Rick Delaney <rick.delaney@rogers.com>
+To: Abigail <abigail@foad.org>
+Cc: fwp@perl.org
+Subject: Re: Zip/Postal codes.
+Message-ID: <20030102115117.A21351@cs839290-a.mtth.phub.net.cable.rogers.com>
+References: <20030102152943.D635@hermione.osp.nl>
+Mime-Version: 1.0
+User-Agent: Mutt/1.2.5.1i
+In-Reply-To: <20030102152943.D635@hermione.osp.nl>; from abigail@foad.org on Thu, Jan 02, 2003 at 03:29:43PM +0100
+X-SMTPD: qpsmtpd/0.20, http://develooper.com/code/qpsmtpd/
+Content-Type: text/plain; charset="us-ascii"
+Content-Length: 572
+Lines: 22
+Content-Transfer-Encoding: 8bit
+Status: 
+
+On Thu, Jan 02, 2003 at 03:29:43PM +0100, Abigail wrote:
+> 
+> For Canada, I have: /[A-Z]\d[A-Z] \d[A-Z]\d/, but does Canada
+> use all 26 letters? 
+
+No.  This covers it:
+
+    /[ABCEGHJKLMNPRSTVXY][0-9][A-Z] [0-9][A-Z][0-9]/;
+
+> Is there any checksum buildin?
+
+LOL!  More like a big collection of maps that changes every five years
+with the census.
+
+The space in the middle is required by Canada Post but if you're 
+accepting user input it's better to make it optional, as well as allow
+lower case, and just reformat before using.
+
+-- 
+Rick Delaney
+rick.delaney@rogers.com
+
+
+From <abigail@foad.org> Thu Jan  2 17:02:31 2003
+Received: from onion.valueclick.com ([64.70.54.95] helo=onion.perl.org)
+	by deep-dark-truthful-mirror.pad with smtp (Exim 3.36 #1 (Debian))
+	id 18U8hN-0001Pg-00
+	for <fwp@simon-cozens.org>; Thu, 02 Jan 2003 17:00:01 +0000
+Received: (qmail 23320 invoked by uid 1005); 2 Jan 2003 16:59:56 -0000
+Mailing-List: contact fwp-help@perl.org; run by ezmlm
+Precedence: bulk
+List-Post: <mailto:fwp@perl.org>
+List-Help: <mailto:fwp-help@perl.org>
+List-Unsubscribe: <mailto:fwp-unsubscribe@perl.org>
+List-Subscribe: <mailto:fwp-subscribe@perl.org>
+Delivered-To: mailing list fwp@perl.org
+Received: (qmail 23303 invoked by uid 76); 2 Jan 2003 16:59:56 -0000
+Received: from osp.demon.nl (HELO foad.org) (212.238.163.113) by onion.perl.org (qpsmtpd/0.20) with SMTP; 2003-01-02 16:59:56Z
+Received: (qmail 13635 invoked by uid 1000); 2 Jan 2003 17:02:31 -0000
+Date: Thu, 2 Jan 2003 18:02:31 +0100
+From: Abigail <abigail@foad.org>
+To: Adam Rice <adamrice@ntlworld.com>
+Cc: fwp@perl.org
+Subject: Re: Zip/Postal codes.
+Message-ID: <20030102180231.F635@hermione.osp.nl>
+References: <20030102152943.D635@hermione.osp.nl> <20030102144211.GV7700@ox.compsoc.net> <3E146C15.8000302@ntlworld.com>
+Mime-Version: 1.0
+User-Agent: Mutt/1.2.5i
+In-Reply-To: <3E146C15.8000302@ntlworld.com>; from adamrice@ntlworld.com on Thu, Jan 02, 2003 at 04:43:01PM +0000
+X-SMTPD: qpsmtpd/0.20, http://develooper.com/code/qpsmtpd/
+Content-Type: text/plain; charset="us-ascii"
+Content-Length: 835
+Lines: 19
+Content-Transfer-Encoding: 8bit
+Status: 
+
+On Thu, Jan 02, 2003 at 04:43:01PM +0000, Adam Rice wrote:
+> David Sheldon wrote:
+> > m/(^|\W)(([A-Za-z][0-9]|[A-Za-z][0-9]{2}|[A-Za-z][A-HJ-Ya-hj-y][0-9]|[A-Za-z][A-HJ-Ya-hj-y][0-9]{2}|[A-Za-z][0-9][A-Za-z]|[A-Za-z][A-HJ-Ya-hj-y][0-9][A-Za-z])\s+[0-9][ABD-HJLP-UW-Zabd-hjlp-uw-z]{2}|[Gg][iI][Rr]\W+0[aA]{2})(\W|$)/
+> 
+> I think it's worth mentioning that, right or wrong, postcodes are often 
+> written without the space in the middle. Abigail didn't mention whether 
+> he wanted to just match the canonical form, or match any common form.
+
+
+I'll probably make it so that people can do things like:
+
+    use Regexp::Common;
+    /$RE{zip}{British}/;                 # Uses ' ' as separator.
+    /$RE{zip}{British}{-sep => '\s*'}/;  # Uses \s* as separator.
+    /(?i)$RE{zip}{British}/;             # Case insensitive match.
+
+
+Abigail
+
+

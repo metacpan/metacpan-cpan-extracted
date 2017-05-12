@@ -1,0 +1,774 @@
+NAME
+    McBain - Framework for building portable, auto-validating and
+    self-documenting APIs
+
+SYNOPSIS
+            package MyAPI;
+
+            use McBain; # imports strict and warnings for you
+
+            get '/multiply' => (
+                    description => 'Multiplies two integers',
+                    params => {
+                            one => { required => 1, integer => 1 },
+                            two => { required => 1, integer => 1 }
+                    },
+                    cb => sub {
+                            my ($api, $params) = @_;
+
+                            return $params->{one} * $params->{two};
+                    }
+            );
+
+            post '/factorial' => (
+                    description => 'Calculates the factorial of an integer',
+                    params => {
+                            num => { required => 1, integer => 1, min_value => 0 }
+                    },
+                    cb => sub {
+                            my ($api, $params) = @_;
+
+                            # note how this route both uses another
+                            # route and calls itself recursively
+
+                            if ($params->{num} <= 1) {
+                                    return 1;
+                            } else {
+                                    return $api->forward('GET:/multiply', {
+                                            one => $params->{num},
+                                            two => $api->forward('POST:/factorial', { num => $params->{num} - 1 })
+                                    });
+                            }
+                    }
+            );
+
+            1;
+
+DESCRIPTION
+    "McBain" is a framework for building powerful APIs and applications.
+    Writing an API with "McBain" provides the following benefits:
+
+    *   Lightweight-ness
+
+        "McBain" is extremely lightweight, with minimal dependencies on
+        non-core modules; only two packages; and a succinct, minimal syntax
+        that is easy to remember. Your APIs and applications will require
+        less resources and perform better. Maybe.
+
+    *   Portability
+
+        "McBain" APIs can be run/used in a variety of ways with absolutely
+        no changes of code. For example, they can be used directly from Perl
+        code (see McBain::Directly), as fully fledged RESTful PSGI web
+        services (see McBain::WithPSGI), as Gearman workers (see
+        McBain::WithGearmanXS), or as ZeroMQ workers (see
+        McBain::WithZeroMQ). Seriously, no change of code required. More
+        McBain runners are yet to come (plus search CPAN to see if more are
+        available), and you can easily create your own, god knows I don't
+        have the time or motivation or talent. Why should I do it for you
+        anyway?
+
+    *   Auto-Validation
+
+        No more tedious input tests. "McBain" will handle input validation
+        for you. All you need to do is define the parameters you expect to
+        get with the simple and easy to remember syntax provided by
+        Brannigan. When your API is used, "McBain" will automatically
+        validate input. If validation fails, "McBain" will return
+        appropriate errors and tell the users of your API that they suck.
+
+    *   Self-Documentation
+
+        "McBain" also eases the burden of having to document your APIs, so
+        that other people can actually use it (and you, two weeks later when
+        you're drunk and can't remember why you wrote the thing in the first
+        place). Using simple descriptions you give to your API's methods,
+        and the parameter definitions, "McBain" can automatically create a
+        manual document describing your API (see the mcbain2pod command line
+        utility).
+
+    *   Modularity and Flexibility
+
+        APIs written with "McBain" are modular and flexible. You can make
+        them object oriented if you want, or not, "McBain" won't care, it's
+        unobtrusive like that. APIs are hierarchical, and every module in
+        the API can be used as a complete API all by itself, detached from
+        its siblings, so you can actually load only the parts of the API you
+        need. Why is this useful? I don't know, maybe it isn't, what do I
+        care? It happened by accident anyway.
+
+    *   No More World Hunger
+
+        It'll do that too, just give it a chance.
+
+FUNCTIONS
+    The following functions are exported:
+
+  provide( $method, $route, %opts )
+    Define a method and a route. $method is one of "GET", "POST", "PUT" or
+    "DELETE". $route is a string that starts with a forward slash, like a
+    path in a URI. %opts can hold the following keys (only "cb" is
+    required):
+
+    *   description
+
+        A short description of the method and what it does.
+
+    *   params
+
+        A hash-ref of parameters in the syntax of Brannigan (see
+        Brannigan::Validations for a complete references).
+
+    *   cb
+
+        An anonymous subroutine (or a subroutine reference) to run when the
+        route is called. The method will receive the root topic class (or
+        object, if the topics are written in object oriented style), and a
+        hash-ref of parameters.
+
+  get( $route, %opts )
+    Shortcut for "provide( 'GET', $route, %opts )"
+
+  post( $route, %opts )
+    Shortcut for "provide( 'POST', $route, %opts )"
+
+  put( $route, %opts )
+    Shortcut for "provide( 'PUT', $route, %opts )"
+
+  del( $route, %opts )
+    Shortcut for "provide( 'DELETE', $route, %opts )"
+
+  pre_route( $cb->( $self, $meth_and_route, \%params ) )
+  post_route( $cb->( $self, $meth_and_route, \$ret ) )
+    Define a post_route method to run before/after every request to a route
+    in the defining topic. See "PRE-ROUTES AND POST-ROUTES" for details.
+
+METHODS
+    The following methods will be available on importing classes/objects:
+
+  call( @args )
+    Calls the API, requesting the execution of a certain route. This is the
+    main way your API is used. The arguments it expects to receive and its
+    behavior are dependent on the McBain runner used. Refer to the docs of
+    the runner you wish to use for more information.
+
+  forward( $namespace, [ \%params ] )
+    For usage from within API methods; this simply calls a method of the the
+    API with the provided parameters (if any) and returns the result. With
+    "forward()", an API method can call other API methods or even itself
+    (for recursive operations).
+
+    $namespace is the method and route to execute, in the format
+    "<METHOD>:<ROUTE>", where "METHOD" is one of "GET", "POST", "PUT",
+    "DELETE", and "ROUTE" starts with a forward slash.
+
+  is_root( )
+    Returns a true value if the module is the root topic of the API. Mostly
+    used internally and in McBain runner modules.
+
+MANUAL
+  ANATOMY OF AN API
+    Writing an API with "McBain" is easy. The syntax is short and easy to
+    remember, and the feature list is just what it needs to be - short and
+    sweet.
+
+    The main idea of a "McBain" API is this: a client requests the execution
+    of a method provided by the API, sending a hash of parameters. The API
+    then executes the method with the client's parameters, and produces a
+    response. Every runner module will enforce a different response format
+    (and even request format). When the API is used directly, for example,
+    whatever the API produces is returned as is. The PSGI and Gearman::XS
+    runners, however, are both JSON-in JSON-out interfaces.
+
+    A "McBain" API is built of one or more topics, in a hierarchical
+    structure. A topic is a class that provides methods that are
+    categorically similar. For example, an API might have a topic called
+    "math" that provides math-related methods such as add, multiply, divide,
+    etc.
+
+    Since topics are hierarchical, every API will have a root topic, which
+    may have zero or more child topics. The root topic is where your API
+    begins, and it's your decision how to utilize it. If your API is short
+    and simple, with methods that cannot be categorized into different
+    topics, then the entire API can live within the root topic itself, with
+    no child topics at all. If, however, you're building a larger API, then
+    the root topic might be empty, or it can provide general-purpose methods
+    that do not particularly fit in a specific topic, for example maybe a
+    status method that returns the status of the service, or an
+    authentication method.
+
+    The name of a topic is calculated from the name of the package itself.
+    The root topic is always called "/" (forward slash), and its child
+    topics are named like their package names, in lowercase, relative to the
+    root topic, with "/" as a separator instead of Perl's "::", and starting
+    with a slash. For example, lets look at the following API packages:
+
+            +------------------------+-------------------+------------------+
+            | Package Name           | Topic Name        | Description      |
+            +========================+===================+==================+
+            | MyAPI                  | "/"               | the root topic   |
+            | MyAPI::Math            | "/math"           | a child topic    |
+            | MyAPI::Math::Constants | "/math/constants" | a child-of-child |
+            | MyAPI::Strings         | "/strings"        | a child topic    |
+            +------------------------+--------------------------------------+
+
+    You will notice that the naming of the topics is similar to paths in
+    HTTP URIs. This is by design, since I wrote "McBain" mostly for writing
+    web applications (with the PSGI runner), and the RESTful architecture
+    fits well with APIs whether they are HTTP-based or not.
+
+  CREATING TOPICS
+    To create a topic package, all you need to do is:
+
+            use McBain;
+
+    This will import "McBain" functions into the package, register the
+    package as a topic (possibly the root topic), and attempt to load all
+    child topics, if there are any. For convenience, "McBain" will also
+    import strict and warnings for you.
+
+    Notice that using "McBain" doesn't make your package an OO class. If you
+    want your API to be object oriented, you are free to form your classes
+    however you want, for example with Moo or Moose:
+
+            package MyAPI;
+
+            use McBain;
+            use Moo;
+
+            has 'some_attr' => ( is => 'ro' );
+
+            1;
+
+  CREATING ROUTES AND METHODS
+    The resemblance with HTTP continues as we delve further into methods
+    themselves. An API topic defines routes, and one or more methods that
+    can be executed on every route. Just like HTTP, these methods are "GET",
+    "POST", "PUT" and "DELETE".
+
+    Route names are like topic names. They begin with a slash, and every
+    topic *can* have a root route which is just called "/". Every method
+    defined on a route will have a complete name (or path, if you will), in
+    the format "<METHOD_NAME>:<TOPIC_NAME><ROUTE_NAME>". For example, let's
+    say we have a topic called "/math", and this topic has a route called
+    "/divide", with one "GET" method defined on this route. The complete
+    name (or path) of this method will be "GET:/math/divide".
+
+    By using this structure and semantics, it is easy to create CRUD
+    interfaces. Lets say your API has a topic called "/articles", that deals
+    with articles in your blog. Every article has an integer ID. The
+    "/articles" topic can have the following routes and methods:
+
+            +------------------------+--------------------------------------+
+            | Namespace              | Description                          |
+            +========================+======================================+
+            | POST:/articles/        | Create a new article (root route /)  |
+            | GET:/articles/(\d+)    | Read an article                      |
+            | PUT:/articles/(\d+)    | Update an article                    |
+            | DELETE:/articles/(\d+) | Delete an article                    |
+            +------------------------+--------------------------------------+
+
+    Methods are defined using the get(), post(), put() and del()
+    subroutines. The syntax is similar to Moose's antlers:
+
+            get '/multiply' => (
+                    description => 'Multiplies two integers',
+                    params => {
+                            a => { required => 1, integer => 1 },
+                            b => { required => 1, integer => 1 }
+                    },
+                    cb => sub {
+                            my ($api, $params) = @_;
+
+                            return $params->{a} * $params->{b};
+                    }
+            );
+
+    Of the three keys above ("description", "params" and "cb"), only "cb" is
+    required. It takes the actual subroutine to execute when the method is
+    called. The subroutine will get two arguments: first, the root topic
+    (either its package name, or its object, if you're creating an object
+    oriented API), and a hash-ref of parameters provided to the method (if
+    any).
+
+    You can provide "McBain" with a short "description" of the method, so
+    that "McBain" can use it when documenting the API with mcbain2pod.
+
+    You can also tell "McBain" which parameters your method takes. The
+    "params" key will take a hash-ref of parameters, in the format defined
+    by Brannigan (see Brannigan::Validations for a complete references).
+    These will be both enforced and documented.
+
+    As you may have noticed in the "/articles" example, routes can be
+    defined using regular expressions. This is useful for creating proper
+    RESTful URLs:
+
+            # in topic /articles
+
+            get '/(\d+)' => (
+                    description => 'Returns an article by its integer ID',
+                    cb => sub {
+                            my ($api, $params, $id) = @_;
+
+                            return $api->db->get_article($id);
+                    }
+            );
+
+    If the regular expression contains captures, and a call to the API
+    matches the regular expressions, the values captured will be passed to
+    the method, after the parameters hash-ref (even if the method does not
+    define parameters, in which case the parameters hash-ref will be empty -
+    this may change in the future).
+
+    It is worth understanding how "McBain" builds the regular expression. In
+    the above example, the topic is "/articles", and the route is "/(\d+)".
+    Internally, the generated regular expression will be
+    "^/articles/(\d+)$". Notice how the topic and route are concatenated,
+    and how the "^" and "$" metacharacters are added to the beginning and
+    end of the regex, respectively. This means it is impossible to create
+    partial regexes, which only pose problems in my experience.
+
+  OPTIONS REQUESTS
+    Every route defined by the API also automatically gets an "OPTIONS"
+    method, again just like HTTP. This method returns a list of HTTP-style
+    methods allowed on the route. The return format depends on the runner
+    module used. The direct runner will return a hash-ref with keys being
+    the HTTP methods, and values being hash-refs holding the "description"
+    and "params" definitions (if any).
+
+    For example, let's look at the following route:
+
+            get '/something' => (
+                    description => 'Gets something',
+                    cb => sub { }
+            );
+
+            put '/something' => (
+                    description => 'Updates something',
+                    params => { new_content => { required => 1 } },
+                    cb => sub { }
+            );
+
+    Calling "OPTIONS:/something" will return:
+
+            {
+                    GET => {
+                            description => "Gets something"
+                    },
+                    PUT => {
+                            description => "Updates something",
+                            params => {
+                                    new_content => { required => 1 }
+                            }
+                    }
+            }
+
+  CALLING METHODS FROM WITHIN METHODS
+    Methods are allowed to call other methods (whether in the same route or
+    not), and even call themselves recursively. This can be accomplished
+    easily with the forward() method. For example:
+
+            get '/factorial => (
+                    description => 'Calculates the factorial of a number',
+                    params => {
+                            num => { required => 1, integer => 1 }
+                    },
+                    cb => sub {
+                            my ($api, $params) = @_;
+
+                            if ($params->{num} <= 1) {
+                                    return 1;
+                            } else {
+                                    return $api->forward('GET:/multiply', {
+                                            one => $params->{num},
+                                            two => $api->forward('GET:/factorial', { num => $params->{num} - 1 })
+                                    });
+                            }
+                    }
+            );
+
+    In the above example, notice how the "GET:/factorial" method calls both
+    "GET:/multiply" and itself.
+
+  EXCEPTIONS
+    "McBain" APIs handle errors in a graceful way, returning proper error
+    responses to callers. As always, the way errors are returned depends on
+    the runner module used. When used directly from Perl code, McBain will
+    confess (i.e. die) with a hash-ref consisting of two keys:
+
+    *   "code" - An HTTP status code indicating the type of the error (for
+        example 404 if the route doesn't exist, 405 if the route exists but
+        the method is not allowed, 400 if parameters failed validation,
+        etc.).
+
+    *   "error" - The text/description of the error.
+
+    Depending on the type of the error, more keys might be added to the
+    exception. For example, the parameters failed validation error will also
+    include a "rejects" key holding Brannigan's standard rejects hash,
+    describing which parameters failed validation.
+
+    When writing APIs, you are encouraged to return exceptions in this
+    format to ensure proper handling by "McBain". If "McBain" encounters an
+    exception that does not conform to this format, it will generate an
+    exception with "code" 500 (indicating "Internal Server Error"), and the
+    "error" key will hold the exception as is.
+
+  PRE-ROUTES AND POST-ROUTES
+    *New in v1.3.0*
+
+    Every topic in your API can define pre and post routes. The pre route is
+    called right before a route is executed, while the post route is called
+    immediately after.
+
+    You should note that the pre and post routes are called on every route
+    execution (when applicable), even when forwarding from one route to
+    another.
+
+    Pre and post routes are hierarchical. When a route is executed, "McBain"
+    will analyze the entire chain of topics leading up to that route, and
+    execute all pre and post routes on the way (if any, of course). So, for
+    example, if the route "/math/factorial" is to be executed, "McBain" will
+    look for pre and post routes and the root topic ("/"), the "/math"
+    topic, and the "/math/factorial" topic (if it exists). Whichever ones it
+    finds will be executed, in order.
+
+    The "pre_route" subroutine gets as parameters the API package (or
+    object, if writing object-oriented APIs, or the context object, if
+    writing in contextual mode), the full route name (the method and the
+    path, e.g. "POST:/math/factorial"), and the parameters hash-ref, after
+    validation has occurred.
+
+            package MyApi::Math;
+
+            post '/factorial' => (
+                    ...
+            );
+
+            pre_route {
+                    my ($self, $meth_and_route, $params) = @_;
+
+                    # do something here
+            }
+
+    The "post_route" subroutine gets the same parameters, except the
+    parameters hash-ref, in which place a reference to the result returned
+    by the actual route is passed. So, for example, if the
+    "POST:/math/factorial" method returned 13, then "post_route" will get a
+    reference to a scalar variable whose value is 13.
+
+            post_route {
+                    my ($self, $meth_and_route, $ret) = @_;
+
+                    if ($$ret == 13) {
+                            # change the result to 14, because
+                            # 13 is an unlucky number
+                            $$ret = 14;
+                    }
+            }
+
+  CONTEXTUAL MODE
+    *Note: contextual mode is an experimental feature introduced in v1.2.0
+    and may change in the future.*
+
+    Contextual mode is an optional way of writing "McBain" APIs, reminiscent
+    of web application frameworks such as Catalyst and Leyland. The main
+    idea is that a context object is created for every request, and follows
+    it during its entire life.
+
+    In regular mode, the API methods receive the class of the root package
+    (or its object, if writing object oriented APIs), and a hash-ref of
+    parameters. This is okay for simple APIs, but many APIs need more, like
+    information about the user who sent the request.
+
+    In contextual mode, the context object can contain user information,
+    methods for checking authorization (think role-based and ability-based
+    authorization systems), database connections, and anything else your API
+    might need in order to fulfill the request.
+
+    Writing APIs in contextual mode is basically the same as in regular
+    mode, only you need to build a context class. Since "McBain" doesn't
+    intrude on your OO system of choice, constructing the class is your
+    responsibility, and you can use whatever you want (like Moo, Moose,
+    Class::Accessor). "McBain" only requires your context class to implement
+    a subroutine named "create_from_env( $runner, \%env, @args_to_call )".
+    This method will receive the name of the runner module used, the
+    standard environment hash-ref of "McBain" (which includes the keys
+    "METHOD", "ROUTE" and "PAYLOAD"), plus all of the arguments that were
+    sent to the "call( @args )" method. These are useful for certain runner
+    modules, such as the PSGI runner, which gets the PSGI hash-ref, from
+    which you can extract session data, user information, HTTP headers, etc.
+    Note that this means that if you plan to use your API with different
+    runner modules, your "create_from_env()" method should be able to parse
+    differently formatted arguments.
+
+    Note that currently, the context class has to be named
+    "__ROOT__::Context", where "__ROOT__" is the name of your API's root
+    package. So, for example, if your API's root package is named "MyAPI",
+    then "McBain" will expect "MyAPI::Context".
+
+    *Note: since v2.1.0, if "McBain" doesn't find a package named
+    "__ROOT__::Context", it will go up the package hierarchy until it finds
+    one. For example, if the root package of your API is "Some::API", then
+    McBain will try "Some::API::Context", then "Some::Context", then finally
+    "Context". This was added to allow the sharing of the same context class
+    in a project comprised of several APIs.*
+
+    When writing in contextual mode, your API methods will receive the
+    context object instead of the root package/object, and the parameters
+    hash-ref.
+
+    Let's look at a simple example for writing APIs in contextual mode. Say
+    our API is called "MyAPI". Let's begin with the context class,
+    "MyAPI::Context":
+
+            package MyAPI::Context;
+
+            use Moo;
+            use Plack::Request;
+
+            has 'user_agent' => (
+                    is => 'ro',
+                    default => sub { 'none' }
+            );
+
+            sub create_from_env {
+                    my ($class, $runner, $mcbain_env, @call_args) = @_;
+
+                    my $user_agent;
+
+                    if ($runner eq 'McBain::WithPSGI') {
+                            # extract user agent from the PSGI env,
+                            # which will be the first item in @call_args
+                            $user_agent = Plack::Request->new($call_args[0])->user_agent;
+                    }
+
+                    return $class->new(user_agent => $user_agent);
+            }
+
+            1;
+
+    Now let's look at the API itself:
+
+            package MyAPI;
+
+            use McBain -contextual;
+
+            get '/' => (
+                    cb => sub {
+                            my ($c, $params) = @_;
+
+                            if ($c->user_agent =~ m/Android/) {
+                                    # do it this way
+                            } else {
+                                    # do it that way
+                            }
+
+                            # you can still forward to other methods
+                            $c->forward('GET:/something_else', \%other_params);
+                    }
+            );
+
+            1;
+
+    So as you can see, the only real change for API packages is the need to
+    write "use McBain -contextual" instead of "use McBain". The only
+    "challenge" is writing the context class.
+
+MCBAIN RUNNERS
+    *NOTE: since v2.0.0 the way runner modules are used has changed. The
+    "MCBAIN_WITH" environment variable is no longer used. Read on for more
+    information.*
+
+    A runner module is in charge of loading "McBain" APIs in a specific way.
+    The default runner, McBain::Directly, is the simplest runner there is,
+    and is meant for using APIs directly from Perl code.
+
+    The runner module is in charge of whatever heavy lifting is required in
+    order to turn your API into a "service", or an "app", or whatever it is
+    you think your API needs to be.
+
+    The following runners are currently available:
+
+    *   McBain::Directly - Directly use an API from Perl code.
+
+    *   McBain::WithPSGI - Turn an API into a Plack based, JSON-to-JSON
+        RESTful web application.
+
+    *   McBain::WithGearmanXS - Turn an API into a JSON-to-JSON Gearman
+        worker.
+
+    *   McBain::WithWebSocket - Turn an API into a WebSocket server.
+
+    *   McBain::WithZeroMQ - Turn an API into a JSON-to-JSON ZeroMQ REP
+        worker.
+
+    The latter four completely change the way your API is used, and yet you
+    can see their code is very short.
+
+    To tell "McBain" which runner module to use, you must provide the name
+    of the runner when loading your API:
+
+            use MyAPI -withPSGI; # can also write -WithPSGI
+
+    In the above example, "McBain::WithPSGI" will be the runner module used.
+
+    The default runner module is "McBain::Directly". If you "use" an API
+    with no parameter, it will be the loaded runner module:
+
+            use MyAPI;
+
+            use MyAPI -directly; # the same as above
+
+    You can easily create your own runner modules, so that your APIs can be
+    used in different ways. A runner module needs to implement the following
+    interface:
+
+  init( $runner_class, $target_class )
+    This method is called when "McBain" is first imported into an API topic.
+    $target_class will hold the name of the class currently being imported
+    to.
+
+    You can do whatever initializations you need to do here, possibly
+    manipulating the target class directly. You will probably only want to
+    do this on the root topic, which is why "is_root( )" is available on
+    $target_class.
+
+    You can look at "WithPSGI" and "WithGearmanXS" to see how they're using
+    the "init()" method. For example, in "WithPSGI", Plack::Component is
+    added to the @ISA array of the root topic, so that it turns into a Plack
+    app. In "WithGearmanXS", the "init()" method is used to define a
+    "work()" method on the root topic, so that your API can run as any
+    standard Gearman worker.
+
+  generate_env( $runner_class, @call_args )
+    This method receives whatever arguments were passed to the "call( @args
+    )" method. It is in charge of returning a standard hash-ref that
+    "McBain" can use in order to determine which route the caller wants to
+    execute, and with what parameters. Remember that the way "call()" is
+    invoked depends on the runner used.
+
+    The hash-ref returned *must* have the following key-value pairs:
+
+    *   ROUTE - The route to execute (string).
+
+    *   METHOD - The method to call on the route (string).
+
+    *   PAYLOAD - A hash-ref of parameters to provide for the method. If no
+        parameters are provided, an empty hash-ref should be given.
+
+    The returned hash-ref is called $env, inspired by PSGI.
+
+  generate_res( $runner_class, \%env, $result )
+    This method formats the result from a route before returning it to the
+    caller. It receives the $env hash-ref (if needed), and the result from
+    the route. In the "WithPSGI" runner, for example, this method encodes
+    the result into JSON and returns a proper PSGI response array-ref.
+
+  handle_exception( $runner_class, $error, @args )
+    This method will be called whenever a route raises an exception, or
+    otherwise your code fails. The $error variable will always be a standard
+    exception hash-ref, with "code" and "error" keys, and possibly more.
+    Read the discussion above.
+
+    The method should format the error before returning it to the user,
+    similar to what "generate_res()" above performs, but it allows you to
+    handle exceptions gracefully.
+
+    Whatever arguments were provided to "call()" will be provided to this
+    method as-is, so that you can inspect or use them if need be.
+    "WithGearmanXS", for example, will get the Gearman::XS::Job object and
+    call the "send_fail()" method on it, to properly indicate the job
+    failed.
+
+CONFIGURATION AND ENVIRONMENT
+    No configuration files or environment variables required.
+
+DEPENDENCIES
+    "McBain" depends on the following CPAN modules:
+
+    *   Brannigan
+
+    *   Carp
+
+    *   File::Spec
+
+    *   Scalar::Util
+
+    *   Try::Tiny
+
+    The command line utility, mcbain2pod, depends on the following CPAN
+    modules:
+
+    *   IO::Handle
+
+    *   Getopt::Compact
+
+    *   Module::Load
+
+INCOMPATIBILITIES WITH OTHER MODULES
+    None reported.
+
+BUGS AND LIMITATIONS
+    Please report any bugs or feature requests to "bug-McBain@rt.cpan.org",
+    or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=McBain>.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+            perldoc McBain
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=McBain>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/McBain>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/McBain>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/McBain/>
+
+AUTHOR
+    Ido Perlmuter <ido@ido50.net>
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2013-2014, Ido Perlmuter "ido@ido50.net".
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either version 5.8.1 or any later
+    version. See perlartistic and perlgpl.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

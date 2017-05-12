@@ -1,0 +1,38 @@
+0.21 Sat Aug 16 11:39:23 PDT 2014
+ - Meta 0.0.2
+
+0.20 Fri Aug 15 21:22:16 PDT 2014
+ - Remove t/use_ok.t
+
+0.19 Fri Aug 15 16:05:53 PDT 2014
+ - Add t/000-compile-modules.t
+ - CPAN Day 2014 - 21 Release Salute!
+
+0.18 Wed Aug 13 22:42:44 PDT 2014
+ - Fix Meta
+
+0.17 Wed Aug 13 22:25:49 PDT 2014
+ - Switch to Zilla::Dist
+
+0.16 Sun Sep 25 04:08:21 CEST 2011
+ - minimum perl 5.8.1
+ - https://rt.cpan.org/Public/Bug/Display.html?id=71157
+
+0.15 Fri Jul 15 11:14:38 CDT 2011
+ - Accept more version formats
+
+0.14 Wed Jun  1 20:10:34 EST 2011
+ - Rerelease with Module::Package 0.19
+
+0.13 Mon May 30 20:38:26 EST 2011
+ - Rerelease with Module::Package 0.18
+
+0.12 Mon May 30 00:14:46 EST 2011
+ - Switch to Module::Package
+
+0.11 Mon Sep 20 09:47:04 PDT 2010
+ - modify message
+
+0.10 Fri Sep 17 16:14:27 PDT 2010
+ - initial release
+

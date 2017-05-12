@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Mail-Simple-DKIM-Signer.t
+lib/Mail/Simple/DKIM/Signer.pm

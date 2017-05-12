@@ -1,0 +1,18 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+MDQuery/Makefile.PL
+MDQuery/MDQuery.xs
+MDQuery/ppport.h
+MDQuery/typemap
+MDQuery/t/Mac-Spotlight-MDQuery.t
+MDQuery/lib/Mac/Spotlight/MDQuery.pm
+MDItem/Makefile.PL
+MDItem/MDItem.xs
+MDItem/ppport.h
+MDItem/typemap
+MDItem/callbacks.c
+MDItem/t/Mac-Spotlight-MDItem.t
+MDItem/lib/Mac/Spotlight/MDItem.pm
+META.yml                                 Module meta-data (added by MakeMaker)

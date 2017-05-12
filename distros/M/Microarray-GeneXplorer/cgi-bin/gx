@@ -1,0 +1,299 @@
+#!/usr/bin/perl
+
+# License information (the MIT license)
+
+# Copyright (c) 2003 Christian Rees, Janos Demeter, John Matese, Gavin
+# Sherlock; Stanford University
+
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation files
+# (the "Software"), to deal in the Software without restriction,
+# including without limitation the rights to use, copy, modify, merge,
+# publish, distribute, sublicense, and/or sell copies of the Software,
+# and to permit persons to whom the Software is furnished to do so,
+# subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT.  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+# BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+# ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+
+use strict;
+
+# uncomment the following two lines of you installed the GeneXplorer
+# libraries in a lib directory at the same level as your DOCUMENT_ROOT
+# (html) directory
+
+#use File::Basename;
+#use lib dirname($ENV{DOCUMENT_ROOT})."/lib";
+
+use Microarray::CdtDataset;
+use Microarray::Explorer;
+use Microarray::Config;
+
+use CGI qw/:html3 :standard :netscape/;
+use CGI::Carp qw/fatalsToBrowser/;
+
+
+{ #MAIN
+
+    my $action  = param('a');
+    my $name    = param('n')|| &WrapUp("You did not supply a value for the 'n' parameter!  Please, provide the name of your dataset!");
+
+    # you need to edit the construction of the Microarray::Config object
+    # such that your rootpath and rooturl are passed in
+
+    my $config = new Microarray::Config(rootpath => '<rootpath>',
+					rooturl  => '<rooturl>');
+
+    my $dataset = &CreateDataset('config'  => $config, 
+				 'name'    => $name);
+
+    defined $dataset || &WrapUp("The dataset $name could not be created");
+
+    my $explorer = &CreateExplorer('config'  => $config, 
+				   'name'    => $name, 
+				   'dataset' => $dataset);
+
+
+    # dispatch logic
+
+    # when no action requested print frameset to window
+    my $target = "_top"; 
+
+    # check for requested action and direct to appropriate frame
+    if($action){
+	$target = 'z'   if $action eq 'z' || $action eq 'c' || $action eq 's';
+	$target = 'r'   if $action eq 'r';
+	$target = 't'   if $action eq 't';
+    }
+
+    # print header for the targeted frame ...
+    print header (-target => $target);
+    if ( $target eq "_top" ) {
+	$explorer->print_frameset(); # or for the whole document
+	exit;
+
+    }
+    
+    # Do what was requested ...
+    $explorer->toolbar           if $action eq 't';
+    $explorer->radar             if $action eq 'r';
+    $explorer->zoom              if $action eq 'z';
+    $explorer->search_feature    if $action eq 's';
+    $explorer->neighbors         if $action eq 'c';
+
+    exit;
+}
+
+#####################################################################
+sub CreateDataset {
+#####################################################################
+# this particular gx client knows where the data and images should
+# reside (by design), and constructs the fully qualified paths based
+# one just the name (and optional project)
+
+    my (%args) = @_;
+
+    # construct the data path
+    my $dataPath = $args{'config'}->gxDataPath; # default for this client
+
+    # construct the image path
+    my $imagePath = $args{'config'}->gxHtmlPath; # default for this client
+
+    # create a new dataset object
+    my $dataset = Microarray::CdtDataset->new(name      => $args{'name'},
+					      datapath  => $dataPath,
+					      imagepath => $imagePath,
+					      config    => $args{'config'});
+
+
+    return $dataset;
+
+}
+
+#####################################################################
+sub CreateExplorer {
+#####################################################################
+# this particular gx client knows where the data and images should
+# reside (by design), and constructs the fully qualified paths based
+# on just the name
+
+    my (%args) = @_;
+
+    # create a new explorer object 
+    my $displayConfig = "default.display_config";  # How display configs are treated needs to be revisited
+    my $explorer = Microarray::Explorer->New({ dataset       => $args{'dataset'},
+					       config        => $args{'config'},
+					       displayConfig => $displayConfig});
+    return $explorer;
+
+}
+
+#####################################################################
+sub WrapUp {
+#####################################################################
+# This subroutine handles 
+
+    my $message = shift;
+
+    print header(-type => 'text/html');
+    print start_html(-title => "Missing Name for GeneXplorer");
+    $message = br.table({-cellpadding => 3,
+			 -width       => '95%'},
+			Tr(
+			   td({#-colspan => '2',
+			       -height  => '20',
+			       -bgcolor => 'beige'},
+			      font({-face => 'arial,sans-serif',
+				    -size => 3}, b($message)
+				   ), "\n"
+			      ), "\n"
+			   ), "\n"
+			)."\n";
+    
+    print $message, br;
+    print end_html();
+    exit;
+}
+=pod
+
+=head1 Abstract
+
+    The gx script is a client of the Microarray::Explorer class.
+    Microarray::Explorer functions as a web viewer for
+    Microarray::CdtDataset objects.  Following the Model/View/Controller
+    concept, the Microarray::Explorer class is the View, the
+    Microarray::CdtDataset class is the Model, and this script, gx, is the
+    controller, dealing with the dispatch logic.
+
+=head2 Intended Behaviour
+
+    Explorer will display the dataset object in a web browser in a frameset 
+    of 3 frames. 
+
+    The frames are:   - radar frame   - left side of the window
+                      - toolbar frame - top of right side of window  
+                      - zoom frame    - lower part of right side of window
+
+=head3 Radar frame
+
+    The radar frame displays the whole dataset as an image map. The genes 
+    (clones, ...) are shown are the rows of the image, while the experiments 
+    are shown as the columns. Clicking the image will have 2 effects: 
+
+                - the expression patterns for the next XXX genes starting at
+                  position of the click are displayed in the zoom frame
+
+                - the top of a small bracket on the right side of the radar
+                  frame is positioned at the height of the click and the bracket
+                  shows the XXX genes selected and magnified on the zoom frame.
+
+    The size of the image is maximized both horizontally and vertically.
+
+=head3 Toolbar frame
+
+    The toolbar allows actions on either the radar frame or the zoom frame.
+
+    For the radar frame it allows a simple customization: changing the width of
+    the radar image. Selecting any of the allowed percentages changes the current
+    width of the image proprotionately.
+
+    For the zoom frame, it provides a search tool. The various fields of annotations
+    or all of them for the genes can be searched for a string. The string can be 
+    entered in a text field. The string may contain more than one terms, spaces
+    are interpreted as term separators. The terms are conbined using logical 'AND'.
+    The hits resulting from the search are displayed in the zoom frame, as expression
+    patterns. 
+    The number of hits displayed in the zoom window is limited to 200 hits and the 
+    length of each term in te search string should be at least 2 characters long.
+
+    In addition, the toolbar frame contains an Info Box that displays various textual 
+    information dependent on the position of the mouse pointer over the zoom frame. 
+    It can display: 
+    
+                 - gene information in the NAME field when the mouse is positioned 
+                   over an image row
+
+                 - experiment info, if positioned above the experiment image map
+                  
+                 - correlation of a genes expression pattern to that of the top
+                   gene in to zoom window displaying correlations, when the pointer
+                    is above is above the correlation image.
+
+=head3 Zoom frame
+     
+    The zoom frame displays expression patterns and annotations for genes in the 
+    dataset. It can display genes selected from: 
+
+                 - radar frame; it displays a given number of genes starting from the 
+                   genes whose image was clicked on
+
+                 - the toolbar; the result of the search performed using the searchtool
+                   is displayed here
+
+                 - the zoom frame itself; when a row is clicked on in the radar frame,
+                   the genes with the highest correlation in their expression pattern 
+                   are displayed
+
+    Information about various elements in the zoom frame is displayed in the Info Box
+    in the toolbar, dependent on the position of the mouse:
+     
+                 - experiment info
+                 - gene info
+                 - correlation value
+
+=head2 Parameters
+
+    'n'    = name; name of dataset to use
+    'a'    = action; action to perform
+    'seed' = seed; 
+    'q'    = query (the string to use for the search)
+    'f'    = field (the field to search)
+    'rx'   = column width in pxl in radar frame
+    'ry'   = column height in pxl in radar frame
+    'zy'   = column height in pxl in zoom frame
+    'ry'   = column width in pxl in zoom frame
+
+
+   possible values for action:
+   ---------------------------
+
+   'c' = correlate
+
+           - print the most correlated gene expression vectors 
+             (neighbors) for gene provided in param('seed')
+
+   's' = search
+
+           - Do a search using the string provided in param('q')
+             to search the field(s) provided in param('f')
+
+   'z' = zoom
+
+           - print a zoom frame (currently arround the mouseclick 
+	     x/y coordinates
+
+   'r' = radar
+
+	   - print a radar frame
+
+   't' = toolbar
+
+	   - print a toolbar frame
+
+
+=head1 Authors
+Original work: Christian Rees
+
+Re-write: Janos Demeter
+jdemeter@genome.stanford.edu
+=cut

@@ -1,0 +1,137 @@
+=pod
+
+=head1 NAME
+
+Math::SigFigs - do math with correct handling of significant figures
+
+=head1 SYNOPSIS
+
+If you only need to use CountSigFigs and FormatSigFigs, use the first
+form.  If you are going to be doing arithmetic, use the second line.
+
+  use Math::SigFigs;
+  use Math::SigFigs qw(:all);
+
+The following routines do simple counting/formatting:
+
+  $n=CountSigFigs($num);
+  $num=FormatSigFigs($num,$n);
+
+Use the following routines to do arithmetic operations.
+
+  $num=addSF($n1,$n2);
+  $num=subSF($n1,$n2);
+  $num=multSF($n1,$n2);
+  $num=divSF($n1,$n2);
+
+=head1 DESCRIPTION
+
+In many scientific applications, it is useful (and in some cases required)
+to be able to format numbers with a given number of significant figures,
+or to do math in such a way as to maintain the correct number of
+significant figures.  The rules for significant figures are too
+complicated to be handled solely using the sprintf function.
+
+These routines allow you to correctly handle significant figures.  It can
+handle real number or exponentials correctly.
+
+It can count the number of significant figures, format a number to a
+given number of significant figures, and do basic arithmetic.
+
+=head1 ROUTINES
+
+All routines return nothing if something other than a valid number is
+passed in for any argument.
+
+=over 4
+
+=item B<CountSigFigs>
+
+  $n=CountSigFigs($N);
+
+This returns the number of significant figures in a number.  It returns
+C<()> if C<$N> is not a number.
+
+  $N      $n
+  -----   --
+  240     2
+  240.    3
+  241     3
+  0240    2
+  0.03    1
+  0.030   2
+  0       1
+  0.0     1
+  0.00    2
+  1.2e2   2
+  0.0e2   1
+
+=item B<FormatSigFigs>
+
+  $str=FormatSigFigs($N,$n)
+
+This returns a string containing C<$N> formatted to C<$n> significant figures.
+This will work for all cases except something like "2400" formatted to
+3 significant figures.
+
+  $N     $n   $str
+  ------ --   -------
+  2400    1   2000
+  2400    2   2400
+  2400    3   2400
+  2400    4   2400.
+  2400    5   2400.0
+
+  141     3   141
+  141     2   140
+
+  0.039   1   0.04
+  0.039   2   0.039
+  0.0300  2   0.030
+
+  9.9     1   10
+  9.9     2   9.9
+  9.9     3   9.90
+
+  0       2   0.00
+
+=item B<addSF, subSF, multSF, divSF>
+
+These routines add/subtract/multiply/divide two numbers while maintaining
+the proper number of significant figures.
+
+Working with zero is a special case.  If 0 has 1 signficiant figure (i.e.
+'0') it is treated as exact.  If it has more significant figures (i.e. 0.00),
+that number is used as appropriate.
+
+=back
+
+=head1 KNOWN PROBLEMS
+
+=over 4
+
+=item B<Without scientific notation, some numbers are ambiguous>
+
+These routines do not work with scientific notation (exponents).  As a
+result, it is impossible to unambiguously format some numbers.  For
+example,
+
+  $str = FormatSigFigs("2400",3);
+
+will by necessity return the string "2400" which does NOT have 3
+significant figures.  This is not a bug.  It is simply a fundamental
+problem with working with significant figures when not using scientific
+notation.
+
+=back
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)
+
+=cut

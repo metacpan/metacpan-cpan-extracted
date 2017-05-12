@@ -1,0 +1,29 @@
+Revision history for Perl module Module::Reload
+
+1.11 2017-04-17 NEILB
+    - Fix the tests to pass when '.' is no longer in @INC (Perl 5.26.0)
+
+1.10 2015-11-13 NEILB
+    - Supress warning if entries in %INC don't have a value.
+      Miko O'Sullivan pointed out how this can happen. Added test case for it.
+    - Added a link to "perldoc require" in SEE ALSO
+
+1.09 2015-10-27 NEILB
+    - Updated github repo URL after changing my github username
+    - Include a META.json in releases, and tag & push to github on release
+
+1.08 2014-06-08 NEILB
+    - Got rid of each on %INC, since we might delete from %INC, so each
+      is unsafe.
+    - Added Changes file
+    - Added standard doc sections for author, license, and repository
+    - Added some entries to SEE ALSO
+    - Switched to Dist::Zilla, moving Reload.pm into lib/Module/ in the process
+
+1.07 1998-08-20 JPRIT
+
+1.06 1998-07-30 JPRIT
+
+1.05 1998-07-28 JPRIT
+    - First release to CPAN
+

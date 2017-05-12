@@ -1,0 +1,22 @@
+Revision history for Math-Goedel
+
+0.01    2008-07-02
+        First version.
+
+0.02    2008-07-03
+        - implement 'offset' and 'reverse' options
+        - append validity check of input number.
+        - some changes on POD.
+        - fix version of requirement in Makefile.PL (require Exporter 5.57 for 'import' export)
+          http://www.nntp.perl.org/group/perl.cpan.testers/2008/07/msg1843497.html 
+
+0.03    2008-07-04
+        - fix test case t/10_bigint.t
+          http://www.nntp.perl.org/group/perl.cpan.testers/2008/07/msg1848936.html
+        - append test case t/80_performance.t (for myself)
+        - change my e-mail address (use cpan.org)
+
+0.04    2013-09-21
+        - fix rt#88842, simplify code (great thanks to DANAJ)
+        - add 'bigint' option
+

@@ -1,0 +1,95 @@
+{
+   "abstract" : "Number sequences.",
+   "author" : [
+      "Kevin Ryde <user42_kevin@yahoo.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-NumSeq",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "devel",
+         "xt"
+      ]
+   },
+   "optional_features" : {
+      "maximum_interoperation" : {
+         "description" : "Have maximum inter-operation with other modules (optional other stuff).",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Language::Expr" : "0.24",
+                  "Language::Expr::Compiler::perl" : "0.24",
+                  "Math::Expression::Evaluator" : "0",
+                  "Math::Symbolic" : "0"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::HomeDir" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "List::Util" : "0",
+            "Math::Factor::XS" : "0.40",
+            "Math::Libm" : "0",
+            "Math::Prime::XS" : "0.23",
+            "Module::Load" : "0",
+            "Module::Pluggable" : "0",
+            "Module::Util" : "0",
+            "constant" : "1.02",
+            "constant::defer" : "1",
+            "perl" : "5.004"
+         },
+         "suggests" : {
+            "Language::Expr" : "0.24",
+            "Language::Expr::Compiler::perl" : "0.24",
+            "Math::Expression::Evaluator" : "0",
+            "Math::Symbolic" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test" : "0"
+         },
+         "suggests" : {
+            "Data::Float" : "0",
+            "Language::Expr" : "0.24",
+            "Language::Expr::Compiler::perl" : "0.24",
+            "Math::Expression::Evaluator" : "0",
+            "Math::Symbolic" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://user42.tuxfamily.org/math-numseq/index.html",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl.html"
+      ]
+   },
+   "version" : "72",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

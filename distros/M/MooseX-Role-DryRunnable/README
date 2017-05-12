@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution MooseX-Role-DryRunnable,
+version 0.006:
+
+  role for add a dry_run (or dryrun) option into your Moose Class
+
+This software is copyright (c) 2013 by Tiago Peczenyj.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

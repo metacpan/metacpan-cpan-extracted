@@ -1,0 +1,10 @@
+2012-09-14 v0.04
+* Bug fix: remove whitespace from DOM IDs
+* Require Mojolicious >= 2.20
+
+2011-08-21 v0.03
+* If Lingua::EN::Inflect is installed package names are pluralized when contained in an ARRAY
+
+2011-08-20 v0.02
+* Changed version scheme from X.X to X.XX
+* Added dom_class() 

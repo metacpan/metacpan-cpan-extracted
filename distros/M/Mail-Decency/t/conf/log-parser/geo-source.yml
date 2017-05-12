@@ -1,0 +1,12 @@
+---
+
+disable: 0
+
+interval_formats:
+    - 'year-%Y'
+    - 'week-%Y-%U'
+    - 'month-%Y-%m'
+
+enable_per_recipient: 1
+enable_per_sender: 1
+

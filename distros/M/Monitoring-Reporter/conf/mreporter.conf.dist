@@ -1,0 +1,20 @@
+<Monitoring>
+	<Reporter>
+    <Backends>
+      <Zabbix>
+        type = ZabbixDBI
+        key = 
+        <DB>
+            Hostname = 127.0.0.1
+            Port     = 3306
+            Database = zabbix
+            Username = zabbix
+            Password = zabbix
+        </DB>
+      </Zabbix>
+      <Nagios>
+        type = NagiosLivestatus
+        peer = /var/lib/socket
+      </Nagios>
+	</Reporter>
+</Monitoring>

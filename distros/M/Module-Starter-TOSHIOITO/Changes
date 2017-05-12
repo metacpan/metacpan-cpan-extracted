@@ -1,0 +1,58 @@
+Revision history for Module-Starter-TOSHIOITO
+
+0.09    2014-10-12
+        - .travis.yml is updated to install Module::Build::Prereqs::FromCPANfile explicitly.
+          This is because Travis-CI doesn't have cpanfile-dump command anymore.
+
+0.08    2014-08-17
+        - Add "share" directory and "README.md" to no_index.
+
+0.07    2014-08-17
+        - Just update the documentation. I forgot it at the previous release..
+
+0.06    2014-08-17
+        - Now Build.PL uses Module::Build::Prereqs::FromCPANfile instead of
+          Module::Build::Pluggable::CPANfile. The former is a lot lighter
+          in terms of dependency.
+        - Add an author test to check generated files.
+        - .travis.yml is updated to install configure_requires in before_install phase.
+
+0.05    2014-07-28
+        - Add "before_script" command to .travis.yml.
+          This is because cpanm (as of version 1.7004) does not install configure-requires
+          in cpanfile. See also: https://github.com/miyagawa/cpanminus/issues/398
+          Current best practice is to generate and keep META files in the repository.
+          In that case, cpanm will install configure-requires. But I'm afraid I don't wanna
+          keep them around. They are so verbose :(
+
+0.04    2014-07-27
+        - Generates .travis.yml
+        - Generates more detailed "repository" meta fields, which is defined
+          in Meta Spec version 2.
+
+0.03    2014-02-24
+        - Stop generating xt/consistent_version.t.
+          It seems it's not the best practice to have consistent version
+          across all modules in a distribution. Well, I do think it's good,
+          but maintaining version numbers of all modules is an aweful task.
+          I've done several approaches (like letting a single module in the
+          dist keep the version number), but all of them broke something
+          in CPAN. So the only way to keep the consistency intact is to
+          let the packager software write version numbers (like
+          Dist::Zilla::Plugin::PkgVersion). However, not all CPAN authors
+          are happy with letting software rewrite your code (See
+          https://metacpan.org/pod/Dist::Milla#WHY ), and I don't like it
+          either. After all, many famous CPAN authors do not give
+          version numbers to all modules in a dist.
+
+
+0.02    2013-11-21
+        - Fix minor POD error.
+        - Modules used in xt/ tests are now mandatory. They are installed
+          as prerequisites of this module.
+        - Now it generates xt/consistent_version.t test using
+          Test::ConsistentVersion.
+
+0.01    2013-11-17
+        First version, released on an unsuspecting world.
+

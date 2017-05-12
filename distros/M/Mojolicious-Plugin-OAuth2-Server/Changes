@@ -1,0 +1,114 @@
+Revision history for Mojolicious-Plugin-OAuth2-Server
+
+0.36     2017-05-03
+        - Fix bug in test for version 0.34 due to requiring url_decode
+          of access token in implicit grant flow
+
+0.35     2017-03-06
+        - Fix bug in test for previous version
+
+0.34     2017-03-06
+        - Fix implicit grant should return query params in a fragment
+
+0.33     2017-03-03
+        - Fix tests for recent version of Net::OAuth2::AuthorizationServer
+
+0.32     2016-11-01
+        - Remove args_as_hash, this is now the default
+
+0.31     2016-10-01
+        - Deprecate args_as_hash, will become the standard as from the next version
+
+0.30     2016-09-16
+        - Add "Client Credentials Grant" flow (response_type = "client_credentials"
+          in call to access_token)
+        - Improve test coverage for Implicit Grant
+        - Fix setting of scopes for JWT in Implicit Grant revealed by improved test
+          coverage
+
+0.29     2016-08-31
+        - Fix Implicit Grant needs to be able to support login_resource_owner and
+          confirm_by_resource_owner callbacks
+
+0.28     2016-08-31
+        - Fix don't allow clients defined with a client_secret to use the Implicit
+          Grant Flow (handled in Net::OAuth2::AuthorizationServer, but add tests here)
+
+0.27     2016-08-31
+        - Add "Implicit Grant" flow (response_type = "token" in call to authorize)
+
+0.26     2016-05-12
+        - Transfer repo from G3S to Humanstate
+
+0.25     2016-04-17
+        - Add "Resource Owner Password Credentials Grant"
+
+0.24     2016-04-11
+        - split out bulk of code into Net::OAuth2::AuthorizationServer
+        - ditto for examples and bulk of the perldoc
+        - plugin is fully backwards compatible, although you may want to
+          move to using the args_as_hash option for cleaner callbacks
+          see docs for Net::OAuth2::AuthorizationServer::AuthorizationCodeGrant
+
+0.23     2015-10-21
+        - move github repo to Humanstate org
+
+0.22     2015-06-25
+        - auth codes, access tokens, and refresh tokens returned can now be
+          JWTs (implemented via Mojo::JWT). this allows validation without
+          database lookup *should you want to do that*
+
+        - this allows the "simple" usage of the plugin to be persistent and
+          multi process compat by supplying a jwt_secret - although you lose
+          the automatic token revoking capabilities of the module when doing
+          this. see the examples, tests, and perldoc for more information
+
+0.11     2015-03-19
+        - update examples/oauth2_client.pl to work with latest version of
+          Mojolicious::Plugin::OAuth2. point to examples/ in the perldoc
+        - tweaks to perldoc to highlight that this is an implementation of
+          the "Authorization Code Grant" flow
+
+0.10     2015-03-17
+        - change token_type to be Bearer rather than bearer as this maps better
+          for use in the Authorization header
+
+0.09     2015-03-16
+        - fix refresh_token check to prevent it being used as an access token.
+          this adds an extra argument ($is_refresh_token) to the method that
+          is called to _verify_access_token
+
+0.08     2015-02-12
+        - stipulate CryptX in the Makefile.PL rather than Crypt::PRNG, as the
+          latter doesn't have a VERSION number so causes dependency check to
+          fail (thanks to reneeb for the report/fix)
+        - some tweaks in examples
+
+0.07     2015-02-11
+        - call verify_client before redirecting to login / confirm scopes
+          as there's no point logging a user in, etc, if the client is bad
+        - make _verify_access_token return a list as _verify_auth_code so
+          we can report the failure reason in a meaningful way.
+        - Add example schema and code for using the module with a relational
+          database
+        - harden token generation function using Crypt::PRNG random_string
+
+0.06     2015-02-10
+        - test and documentation for flash + redirect in a full fat app
+
+0.05     2015-02-07
+        - use warnings and fix any raised by tests
+
+0.04     2015-02-06
+        - refatoring and consistency tweaks
+
+0.03     2015-02-06
+        - fix regexp in tests to be looser
+
+0.02     2015-02-06
+        - POD tweaks
+        - set minimum perl version (5.10.1)
+
+0.01     2015-02-06
+        - First release inspired by frustration, confusion, and hate when trying
+          to implement OAuth2 resource/auth server using existing CPAN modules

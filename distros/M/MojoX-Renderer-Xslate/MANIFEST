@@ -1,0 +1,19 @@
+Changes
+lib/Mojolicious/Plugin/XslateRenderer.pm
+lib/MojoX/Renderer/Xslate.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00_compile.t
+t/default.t
+t/lite_app.t
+t/templates/foo.html.tx
+xt/kwalitee.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod.t
+xt/pod_coverage.t
+xt/vars.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

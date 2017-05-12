@@ -1,0 +1,12 @@
+Revision history for Perl extension MIME::Type::FileName
+
+1.0	Fri May  4 12:09:04 MUT 2012
+	- I'm going for 1.0, damn it
+	- Moved $VERSION from Makefile to package
+
+0.2	Wed Apr 25 13:08:00 MUT 2012
+	- Added application/octet-stream as default instead of 'undef'
+	- Made the matching case insensitive
+
+0.1	Wed Apr 25 07:11:58 MUT 2012
+	- initial release

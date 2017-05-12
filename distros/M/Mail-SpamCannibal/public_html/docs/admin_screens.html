@@ -1,0 +1,135 @@
+<html><title>Administration Screen Shots</title>
+<body bgcolor="#ffffff">
+<!-- last updated 10-2-03 -->
+<table border=0 width=100%>
+<tr><td><img src=../images/login.jpg align=right
+width=255 height=199
+>
+<font size='+2'>Administration Screen Shots</font>
+<p>
+<font size='+1'>Login</font>
+<p>
+The administration process starts with the <b>login</b> process. Authentication and authorization use
+a clear text process which should be protected by using an SSL enhanced web
+server (https protocol). The session key is embeded in a cookie with an
+configurable timeout (default 15 minutes) with no activity.
+</td></tr>
+
+<tr><td>
+<hr>
+<p>
+<img src=../images/updpass.jpg align=right
+width=350 height=171
+>
+<font size='+1'>Password Administration</font>
+<p>
+SpamCannibal has a user friendly password adminstration front end. New
+administrative users can be added and removed by any other admin or
+optionally this feature can be disabled in the configuration file.
+Password updates are straightforward and use the familiar OLD, double NEW
+format.
+
+<tr><td>
+<hr>
+<p>
+<img src=../images/spamadd.jpg align=right
+width=350 height=219
+><a name="add spam"></a>
+<font size='+1'>Manually Adding a Spam Source</font>
+<p>
+Enter the IP address of the spam source and either paste in the spam record
+from and email (headers and salient portions of the message) or type in
+descriptive text that may be useful for the lookup client or to reference
+other records in the same netblock that are spam sources. A button is
+provided to add a single spam source or an entire CIDR/24 netblock.
+<p>
+Typical message content is shown below in the example for the
+administrative <a href="#email interface">E-mail interface</a>
+</td></tr>
+
+<tr><td>  
+<hr>
+<p> 
+<img src=../images/blkadd.jpg align=right
+width=394 height=250
+>
+<font size='+1'>Manually Add BlackList Item</font>
+<p>
+The administration tools also provide a means to add entries that appear to
+be from a remote DNSBL. While this may not be frequently used, it does allow
+entry of a new or modified record to be made if needed. There are numerous
+fields, all of which are self explanatory and which are described in detail in the
+configuration file, sc_BlackList.conf
+</td></tr>
+
+<tr><td>  
+<hr>
+<p> 
+<img src=../images/database.jpg align=right
+width=362 height=250
+>
+<font size='+1'>View a Database</font>
+<p>
+Each database used by SpamCannibal is viewable. The view screen displays 255
+records per screen and can be scrolled by screen or by record number. The
+primary display comes up showning the number of records in each database.
+Clicking the database name produces the first page of the database showing
+the IP address entries for each record. Clicking the IP address switches to
+the <a href="#lookup ip">Lookup IP</a> screen for that particular record.
+</td></tr>
+
+<tr><td>  
+<hr>
+<p> 
+<img src=../images/lookupy.jpg align=right
+width=370 height=264
+><a name="lookup ip"></a>
+<font size='+1'>Administrative Lookup</a></font> (data found)
+<p>
+The administrative IP LOOKUP display provides information similar to the
+public web LOOKUP display. There are two added features, the addition of
+single host and CIDR/24 delete buttons and a display of other records in
+the same CIDR/24 block so the record(s) can be easily removed from the
+databases.
+</td></tr>
+
+<tr><td>  
+<hr>
+<p> 
+<img src=../images/lookupno.jpg align=right
+width=370 height=148
+><font size='+1'>Administrative Lookup</a></font> (NO data found)
+<p>
+When a record is looked up in the SpamCannibal database but not found, the
+administrative Lookup IP display show an <b>add to tarpit</b> button which
+when clicked take you immediately to the <a href="#add spam">Add Spam</a>
+window.
+</td></tr>
+
+<tr><td>
+<hr>
+<p>
+<img src=../images/spamsg.jpg align=right
+width=280 height=283
+><a name="#email interface"></a>
+<font size='+1'>Add Spam via E-mail</font>
+<p>
+Spam can be added to the SpamCannibal database by email from your desktop.
+Optionally, to protect the interface from malicious data entry, it can (and
+should) be encrypted using PGP. Follow these simple steps:
+<ol>
+<li>Pop a new message window and address it to your SPAM mail client.
+Messages addressed to this client will be caught and processed by the
+sc_mailfilter.pl script.
+<li>Expand the mail message to show the headers
+<li>Copy and paste the headers and salient portions of the message into the
+new message window.
+<li>Encrypt the message
+<li>Click send. It's DONE!
+</ol>
+</td></tr>
+
+</table>
+<hr>
+</body>
+</html>

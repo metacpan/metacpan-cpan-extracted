@@ -1,0 +1,22 @@
+{
+   "abstract" : "Test distribution for Module::Mask::Deps not to be installed",
+   "name" : "Test-Dist2",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Foo" : "0"
+         }
+      }
+   }
+}
+

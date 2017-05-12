@@ -1,0 +1,106 @@
+== stencil ==
+
+An ordinary button, with applied shortcuts:
+
+--input--
+    %= button 'The example 5' => large, warning
+--end input--
+--output--
+    <button class="btn btn-lg btn-warning" type="button">The example 5</button>
+--end output--
+
+
+
+== stencil ==
+
+With a url the button turns into a link:
+
+--input--
+    %= button 'The example 1' => ['http://www.example.com/'], small
+--end input--
+--output--
+    <a class="btn btn-default btn-sm" href="http://www.example.com/">The example 1</a>
+--end output--
+
+
+
+== stencil ==
+
+A submit button for use in forms. It overrides the build-in submit_button helper:
+
+--input--
+    %= submit_button 'Save 2', primary
+--end input--
+--output--
+    <button class="btn btn-primary" type="submit">Save 2</button>
+--end output--
+
+
+
+== stencil { to_pod => 0 } ==
+--input--
+    %= submit_button 'Save 2', primary, disabled
+--end input--
+--output--
+    <button class="btn btn-primary" disabled="disabled" type="submit">Save 2</button>
+--end output--
+
+
+
+== stencil { to_pod => 0 } ==
+--input--
+    %= button 'The example 2' => [url_for]
+--end input--
+--output--
+    <a class="btn btn-default" href="/button_1_50">The example 2</a>
+--end output--
+
+== stencil { to_pod => 0 } ==
+--input--
+    %= button 'The example 3' => ['panel_1']
+--end input--
+--output--
+    <a class="btn btn-default" href="panel_1">The example 3</a>
+--end output--
+
+
+== stencil { to_pod => 0 } ==
+--input--
+    %= button 'The example 4'
+--end input--
+--output--
+    <button class="btn btn-default" type="button">The example 4</button>
+--end output--
+
+
+== stencil { to_pod => 0 } ==
+--input--
+    %= button [url_for], disabled, begin
+       The Example 6
+    %  end
+--end input--
+--output--
+    <a class="btn btn-default disabled" href="/button_1_76"> The Example 6 </a>
+--end output--
+
+
+== stencil { to_pod => 0 } ==
+--input--
+    %= submit_button 'Save 1'
+--end input--
+--output--
+    <button class="btn btn-default" type="submit">Save 1</button>
+--end output--
+
+
+
+
+
+== stencil { loop => [qw/active block/] } ==
+--input--
+    %= button 'Loop', [var]
+--end input--
+--output--
+    <button class="[var] btn btn-default" type="button">Loop</button>
+--end output--
+

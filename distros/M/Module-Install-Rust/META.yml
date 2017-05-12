@@ -1,0 +1,31 @@
+---
+abstract: 'Helpers to build Perl extensions written in Rust'
+author:
+  - 'Vickenty Fesunov <kent@setattr.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  Module::Install: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Install-Rust
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  TOML: '0.97'
+  perl: 5.14.0
+resources:
+  bugtracker: https://github.com/vickenty/mi-rust/issues
+  homepage: https://github.com/vickenty/mi-rust
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/vickenty/mi-rust
+version: '0.04'

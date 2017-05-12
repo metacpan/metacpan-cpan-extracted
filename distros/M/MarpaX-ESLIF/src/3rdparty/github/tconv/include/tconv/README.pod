@@ -1,0 +1,365 @@
+=head1 NAME
+
+tconv_ext - tconv extended API
+
+=head1 SYNOPSIS
+
+  #include <tconv.h>
+
+  tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_t *tconvOptionp);
+
+  void  tconv_trace_on(tconv_t tconvp);
+  void  tconv_trace_off(tconv_t tconvp);
+  void  tconv_trace(tconv_t tconvp, const char *fmts, ...);
+  char *tconv_error_set(tconv_t tconvp, const char *msgs);
+  char *tconv_error(tconv_t tconvp);
+  char *tconv_fromcode(tconv_t tconvp);
+  char *tconv_tocode(tconv_t tconvp);
+
+=head1 DESCRIPTION
+
+tconv extended API is providing more entry points to query or control how tconv behaves: tconv is a generic layer on top of iconv(), ICU, etc. Therefore additional semantic is needed.
+
+=head1 METHODS
+
+=head2 tconv_open_ext
+
+  tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_t *tconvOptionp);
+
+  typedef void (*tconvTraceCallback_t)(void *userDatavp, const char *msgs);
+  typedef struct tconv_option {
+    tconv_charset_t      *charsetp;
+    tconv_convert_t      *convertp;
+    tconvTraceCallback_t  traceCallbackp;
+    void                 *traceUserDatavp;
+  } tconv_option_t;
+
+tconv support two engine types: one for charset detection, one for character conversion. Each engine as its own option structure:
+
+=over
+
+=item charsetp
+
+Describe charset engine options.
+
+=item convertp
+
+Describe convertion engine options.
+
+=back
+
+Logging is provided through the I<genericLogger> package, and the developper may provide a function pointer with an associated context:
+
+=over
+
+=item traceCallbackp
+
+A function pointer.
+
+=item traceUserDatavp
+
+Function pointer opaque context.
+
+=back
+
+If C<tconvOptionp> is NULL, defaults will apply. Otherwise, if C<charsetp> is NULL charset defaults apply, if C<convertp> is NULL convertion defaults apply, and if C<traceCallbackp> is NULL, no logging is possible.
+
+=head3 charset engine
+
+A charset engine may support three entry points:
+
+  typedef void *(*tconv_charset_new_t) (tconv_t tconvp, void *optionp);
+  typedef char *(*tconv_charset_run_t) (tconv_t tconvp, void *contextp, char *bytep, size_t bytel);
+  typedef void  (*tconv_charset_free_t)(tconv_t tconvp, void *contextp);
+
+All entry points start with a C<tconvp> pointer (that they can use to trigger logging, error setting).
+
+The I<new> is optional, have a pointer to an opaque (from tconv point of view) data area, and return a charset specific opaque context.
+If I<new> is not NULL, then I<free> must not be NULL, and will be called with the charset specific context pointer returned by I<new>.
+When I<new> is NULL, the charset specific context will be NULL.
+
+The only required entry point is I<run>, with a pointer to bytes, and the number of bytes.
+
+C<charsetp> must point to a structure defined as:
+
+  typedef struct tconv_charset {
+    enum {
+      TCONV_CHARSET_EXTERNAL = 0,
+      TCONV_CHARSET_PLUGIN,
+      TCONV_CHARSET_ICU,
+      TCONV_CHARSET_CCHARDET,
+    } charseti;
+    union {
+      tconv_charset_external_t         external;
+      tconv_charset_plugin_t           plugin;
+      tconv_charset_ICU_option_t      *ICUOptionp;
+      tconv_charset_cchardet_option_t *cchardetOptionp;
+    } u;
+  } tconv_charset_t;
+
+i.e. a charset engine can be of four types:
+
+=over
+
+=item TCONV_CHARSET_EXTERNAL
+
+An I<external> charset engine type is a structure that give explicitly the three entry points described at the beginning of this section, and a pointer to an opaque charset specific option area. It is defined as:
+
+  typedef struct tconv_charset_external {
+    void                *optionp;
+    tconv_charset_new_t  tconv_charset_newp;
+    tconv_charset_run_t  tconv_charset_runp;
+    tconv_charset_free_t tconv_charset_freep;
+  } tconv_charset_external_t;
+
+=item TCONV_CHARSET_PLUGIN
+
+The charset engine is dynamically loaded. A I<plugin> definition is:
+
+  typedef struct tconv_charset_plugin {
+    void *optionp;
+    char *news;
+    char *runs;
+    char *frees;
+    char *filenames;
+  } tconv_charset_plugin_t;
+
+i.e. I<tconv> will use C<filenames> as the path of a shared library and will try to load it. C<optionp> is a pointer to a charset specific option area. I<tconv> will look to the three entry points named C<news>, C<runs> and C<frees>:
+
+=over
+
+=item news
+
+If C<news> is NULL, environment variable C<TCONV_ENV_CHARSET_NEW>, else C<tconv_charset_newp> will be looked at.
+
+=item runs
+
+If C<runs> is NULL, environment variable C<TCONV_ENV_CHARSET_RUN>, else C<tconv_charset_runp> will be looked at.
+
+=item frees
+
+If C<frees> is NULL, environment variable C<TCONV_ENV_CHARSET_FREE>, else C<tconv_charset_freep> will be looked at.
+
+=back
+
+Please note that dynamically load is not always thread-safe, and I<tconv> will not try to adapt to this situation. Therefore, it is up to the caller to make sure that tconv_open_ext() is called within a context that is not affected by an eventual non-thread-safe workflow (e.g. typically within a critical section, or at program startup).
+
+=item TCONV_CHARSET_ICU
+
+ICU built-in, available when I<tconv> has been compiled with ICU. If I<tconv> has not been compiled with such support, C<TCONV_CHARSET_ICU> remain available, but using it will fail.
+
+If C<ICUOptionp> is not NULL, it must be a pointer to a structure defined as:
+
+  typedef struct tconv_charset_ICU_option {
+    int confidencei;
+  } tconv_charset_ICU_option_t;
+
+where C<confidencei> is the minimum accepted confidence level. If NULL, a default of 10 is used, unless the environment variable C<TCONV_ENV_CHARSET_ICU_CONFIDENCE> is set.
+
+=item TCONV_CHARSET_CCHARDET
+
+cchardet built-in, always available.
+
+If C<cchardetOptionp> is not NULL, it must be a pointer to a structure defined as:
+
+  typedef struct tconv_charset_cchardet_option {
+    float confidencef;
+  } tconv_charset_cchardet_option_t;
+
+where C<confidencef> is the minimum accepted confidence level. If NULL, a default of 0.4f is used. This can also be set via the environment variable C<TCONV_ENV_CHARSET_CCHARDET_CONFIDENCE>.
+
+=back
+
+=head3 convert engine
+
+A convert engine may support three entry points:
+
+  typedef void   *(*tconv_convert_new_t) (tconv_t tconvp, const char *tocodes, const char *fromcodes, void *optionp);
+  typedef size_t  (*tconv_convert_run_t) (tconv_t tconvp, void *contextp, char **inbufsp, size_t *inbytesleftlp, char **outbufsp, size_t *outbytesleftlp);
+  typedef int     (*tconv_convert_free_t)(tconv_t tconvp, void *contextp);
+
+All entry points start with a C<tconvp> pointer.
+
+The I<new> is optional, have a pointer to an opaque (from tconv point of view) data area, and return a convert specific opaque context.
+If I<new> is not NULL, then I<free> must not be NULL, and will be called with the convert specific context pointer returned by I<new>.
+When I<new> is NULL, the convert specific context will be NULL.
+
+The only required entry point is I<run>, with additional parameters that are the iconv() semantics: pointers to
+
+=over
+
+=item a pointer to input bytes
+
+=item number of input bytes
+
+=item a pointer to output bytes
+
+=item number of output bytes
+
+=back 
+
+C<convertp> must point to a structure defined as:
+
+  typedef struct tconv_convert {
+    enum {
+      TCONV_CONVERT_EXTERNAL = 0,
+      TCONV_CONVERT_PLUGIN,
+      TCONV_CONVERT_ICU,
+      TCONV_CONVERT_ICONV
+    } converti;
+    union {
+      tconv_convert_external_t      external;
+      tconv_convert_plugin_t        plugin;
+      tconv_convert_ICU_option_t   *ICUOptionp;
+      tconv_convert_iconv_option_t *iconvOptionp;
+    } u;
+  } tconv_convert_t;
+
+i.e. a convert engine can be of four types:
+
+=over
+
+=item TCONV_CONVERT_EXTERNAL
+
+An I<external> convert engine type is a structure that give explicitly the three entry points described above, and a pointer to an opaque convert specific option area. It is defined as:
+
+  typedef struct tconv_convert_external {
+    void                 *optionp;
+    tconv_convert_new_t  tconv_convert_newp;
+    tconv_convert_run_t  tconv_convert_runp;
+    tconv_convert_free_t tconv_convert_freep;
+  } tconv_convert_external_t;
+
+=item TCONV_CONVERT_PLUGIN
+
+The convert engine is dynamically loaded. A I<plugin> definition is:
+
+  typedef struct tconv_convert_plugin {
+    void *optionp;
+    char *news;
+    char *runs;
+    char *frees;
+    char *filenames;
+  } tconv_convert_plugin_t;
+
+i.e. I<tconv> will use C<filenames> as the path of a shared library and will try to load it. C<optionp> is a pointer to a convert specific option area. I<tconv> will look to the three entry points named C<news>, C<runs> and C<frees>:
+
+=over
+
+=item news
+
+If C<news> is NULL, environment variable C<TCONV_ENV_CONVERT_NEW>, else C<tconv_convert_newp> will be looked at.
+
+=item runs
+
+If C<runs> is NULL, environment variable C<TCONV_ENV_CONVERT_RUN>, else C<tconv_convert_runp> will be looked at.
+
+=item frees
+
+If C<frees> is NULL, environment variable C<TCONV_ENV_CONVERT_FREE>, else C<tconv_convert_freep> will be looked at.
+
+=back
+
+Same remark about thread-safety as for the charset engine.
+
+=item TCONV_CONVERT_ICU
+
+ICU built-in, available when I<tconv> has been compiled with ICU. If I<tconv> has not been compiled with such support, C<TCONV_CONVERT_ICU> remain available, but using it will fail.
+
+If C<ICUOptionp> is not NULL, it must be a pointer to a structure defined as:
+
+  typedef struct tconv_convert_ICU_option {
+    size_t uCharCapacityl;
+    short  fallbackb;
+    int    signaturei;
+  } tconv_convert_ICU_option_t;
+
+containing:
+
+=over
+
+=item uCharCapacityl
+
+ICU convertion always go through an UTF-16 internal buffer by design. C<uCharCapacityl> is the number of bytes of this internal intermediary buffer. The default is 4096, unless environment variable C<TCONV_ENV_CONVERT_ICU_UCHARCAPACITY> is set.
+
+=item fallbackb
+
+ICU convertion has an optional fallback mechanism for unknown characters. Default value is a false value, unless C<TCONV_ENV_CONVERT_ICU_FALLBACK> is set.
+
+=item signaturei
+
+A signature may be added or removed on demand. If C<signaturei> is lower than zero, signature is removed. If C<signaturei> is higher than zero, signature is added. Else ICU default will apply. Default is 0, unless C<TCONV_ENV_CONVERT_ICU_SIGNATURE> is set.
+
+=back
+
+=item TCONV_CONVERT_ICONV
+
+iconv built-in, available when I<tconv> has been compiled with iconv. If I<tconv> has not been compiled with such support, C<TCONV_CONVERT_ICONV> remain available, but using it will fail.
+
+If C<iconvOptionp> is not NULL, it remains a noop, since the definition of corresponding type is:
+
+  typedef void tconv_convert_iconv_option_t;
+
+which mean that I<tconv> is then only a proxy to the iconv() with which it was compiled and linked.
+
+=back
+
+=head2 tconv_trace_on
+
+  void  tconv_trace_on(tconv_t tconvp);
+
+Set tracing. Then any call to tconv_trace() will trigger a call to C<traceCallbackp> given in tconv_open_ext()'s option structure.
+
+=head2 tconv_trace_off
+
+  void  tconv_trace_off(tconv_t tconvp);
+
+Unset tracing.
+
+=head2 tconv_trace
+
+  void  tconv_trace(tconv_t tconvp, const char *fmts, ...);
+
+Formats a message string and call C<traceCallbackp> if tracing is on.
+
+=head2 tconv_error_set
+
+  char *tconv_error_set(tconv_t tconvp, const char *msgs);
+
+Set a string that should a contain a more accurate description of the last error. Any engine should use that when a specific description exist. Default is use system's errno description.
+
+=head2 tconv_error
+
+  char *tconv_error(tconv_t tconvp);
+
+Get the latest value of specific error string.
+
+=head2 tconv_fromcode
+
+  char *tconv_fromcode(tconv_t tconvp);
+
+Get the source codeset.
+
+=head2 tconv_tocode
+
+  char *tconv_tocode(tconv_t tconvp);
+
+Get the destination codeset.
+
+=head1 NOTES
+
+=over
+
+=item tracing
+
+I<tconv> can trace itself, unless I<tconv> has been compiled with -DTCONV_NDEBUG, which is the default. When compiled without -DTCONV_NDEBUG, default tracing level is 0, unless environment variable C<TCONV_ENV_TRACE> is set and the value of the later is a true value.
+
+=item specific error string
+
+I<tconv> internally limit the length of such string to 1024 bytes (including NUL).
+
+=back
+
+=head1 SEE ALSO
+
+L<tconv(3)>, L<genericLogger(3)>

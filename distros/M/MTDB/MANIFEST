@@ -1,0 +1,8 @@
+MANIFEST
+Makefile.PL
+MTDB.pm
+README
+lib/MTDB.pm
+lib/MTDB/Serializer/Data/Dumper.pm
+lib/MTDB/Serializer/FreezeThaw.pm
+lib/MTDB/Serializer/Storable.pm

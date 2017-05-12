@@ -1,0 +1,10 @@
+Revision history for Perl extension Palm::Memo32.
+
+1.00  Wed May  7 15:23:24 2003
+	- original version;
+1.01  Fri May  9 13:29:00 2003
+	- fixed installer
+1.01a Mon May 19 22:04:00 2003
+	- fixed dependency
+1.01b Fri Jun 18 01:12:00 2004
+        - added a die if you do not have p5-Perl installed

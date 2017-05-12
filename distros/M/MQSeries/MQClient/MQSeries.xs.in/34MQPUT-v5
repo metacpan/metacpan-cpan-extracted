@@ -1,0 +1,329 @@
+# -*-c-*-
+#
+# $Id: 34MQPUT-v5,v 33.5 2012/09/26 16:10:04 jettisu Exp $
+#
+# (c) 1999-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+void
+MQPUT(Hconn,Hobj,MsgDesc,PutMsgOpts,Msg,CompCode,Reason)
+        MQHCONN Hconn
+        MQHOBJ  Hobj
+        MQMD    MsgDesc
+        MQPMO   PutMsgOpts
+        SV     *Msg
+        MQLONG  CompCode = NO_INIT
+        MQLONG  Reason = NO_INIT
+
+    PREINIT:
+        char     *Key, *pPutMsgRecPtr = NULL, *String;
+        STRLEN    KeyLength, StringLength;
+        int       index, subindex;
+        size_t    FieldSize;
+        int       PutMsgRecSize = 0;
+        PMQRR     pResponseRecPtr = NULL;
+        PMQCHAR   Buffer;
+
+        SV      **svp;
+        AV       *PutMsgRecs, *ValidPutMsgRecFieldsArray;
+        AV       *ResponseRecArray;
+        HV       *PutMsgRecFields = NULL, *PutMsgRecHash;
+        HV       *ValidPutMsgRecFieldsHash;
+        HV       *ValidPutMsgRecFieldsSubHash, *ResponseRecHash;
+
+    PPCODE:
+        CompCode = MQCC_FAILED;
+        Reason = MQRC_UNEXPECTED_ERROR;
+        sv_setiv(ST(5),(IV)CompCode);
+        sv_setiv(ST(6),(IV)Reason);
+
+        /*
+         * We set the MQMD version to 2, so users of segmentation or
+         * grouping won't have to do this manually.
+         */
+        if (MsgDesc.Version < MQMD_VERSION_2) {
+            MsgDesc.Version = MQMD_VERSION_2;
+        }
+
+        if ( hv_exists((HV*)SvRV(ST(3)),"PutMsgRecs",10) ) {
+          /*
+           * Using the put-msg records (distribution list features)
+           * requires MQPMO version 2.  We enable that automatically
+           * if distribution lists are used.
+           */
+          if (PutMsgOpts.Version < MQPMO_VERSION_2) {
+              PutMsgOpts.Version = MQPMO_VERSION_2;
+          }
+
+          /*
+            We will need this configuration hash, but only
+            when handling dist lists.
+          */
+          if ( (ValidPutMsgRecFieldsHash =
+                perl_get_hv("MQSeries::Constants::ValidPutMsgRecFields",FALSE)) == NULL ) {
+            warn("Unable to see %%MQSeries::Constants::ValidPutMsgRecFields\n");
+            XSRETURN_EMPTY;
+          }
+
+          if ( (ValidPutMsgRecFieldsArray =
+                perl_get_av("MQSeries::Constants::ValidPutMsgRecFields",FALSE)) == NULL ) {
+            warn("Unable to see @MQSeries::Constants::ValidPutMsgRecFields\n");
+            XSRETURN_EMPTY;
+          }
+
+          svp = hv_fetch((HV*)SvRV(ST(3)),"PutMsgRecs",10,FALSE);
+          if ( svp == NULL ) {
+            warn("Unable to fetch value for key PutMsgRecs\n");
+            XSRETURN_EMPTY;
+          }
+
+          if ( !SvROK(*svp) || ( SvROK(*svp) && SvTYPE(SvRV(*svp)) != SVt_PVAV ) ) {
+            warn("Invalid data for 'PutMsgRecs', not an ARRAY reference\n");
+            XSRETURN_EMPTY;
+          }
+
+          PutMsgRecs = (AV*)SvRV(*svp);
+
+          PutMsgOpts.RecsPresent = av_len(PutMsgRecs) + 1;
+
+          /*
+            OK, here we go...
+
+            First, look at the *first* PutMsgRecs hash, and from
+            that set the PutMsgOpts.PutMsgRecFields value, and
+            malloc() the necessary memory for the MQMPR and MQRR
+            structures.
+
+            NOTE: When we scan the entire list of PutMsgRecs hashes,
+            they will be required to have the *same* keys as the
+            first one.
+          */
+
+          for ( index = -1 ; index < PutMsgOpts.RecsPresent ; index++ ) {
+
+            svp = av_fetch(PutMsgRecs,(index == -1 ? 0 : index),FALSE);
+            if ( svp == NULL ) {
+              warn("Unable to retreive array element from PutMsgRecs!!\n");
+              XSRETURN_EMPTY;
+            }
+
+            if ( !SvROK(*svp) || ( SvROK(*svp) && SvTYPE(SvRV(*svp)) != SVt_PVHV ) ) {
+              warn("Invalid data for PutMsgRecs->[%d], not a HASH reference\n",
+                   (index == -1 ? 0 : index));
+              XSRETURN_EMPTY;
+            }
+
+            PutMsgRecHash = (HV*)SvRV(*svp);
+
+            if ( index == -1 ) {
+              PutMsgRecFields = (HV*)SvRV(*svp);
+            }
+
+            for ( subindex = 0 ; subindex < av_len(ValidPutMsgRecFieldsArray) + 1 ; subindex++ ) {
+
+              svp = av_fetch(ValidPutMsgRecFieldsArray,subindex,FALSE);
+              if ( svp == NULL ) {
+                warn("Unable to retreive array element from ValidPutMsgRecFieldsArray!!\n");
+                XSRETURN_EMPTY;
+              }
+              Key = SvPV(*svp,KeyLength);
+
+              if ( !hv_exists(PutMsgRecFields,Key,KeyLength) ) {
+                continue;
+              }
+
+              svp = hv_fetch(ValidPutMsgRecFieldsHash,Key,KeyLength,FALSE);
+              if ( svp == NULL ) {
+                warn("Unable to retreive hash value from ValidPutMsgRecFieldsHash!!\n");
+                XSRETURN_EMPTY;
+              }
+              if ( !SvROK(*svp) || ( SvROK(*svp) && SvTYPE(SvRV(*svp)) != SVt_PVHV ) ) {
+                warn("Invalid data for ValidPutMsgRecFields->{%s}, not a HASH reference\n",Key);
+                XSRETURN_EMPTY;
+              }
+              ValidPutMsgRecFieldsSubHash = (HV*)SvRV(*svp);
+
+              if ( index == -1 ) {
+
+                svp = hv_fetch(ValidPutMsgRecFieldsSubHash,"Flag",4,FALSE);
+                if ( svp == NULL ) {
+                  warn("Invalid data for ValidPutMsgRecFields->{%s} HASH, no 'Flag' key\n",Key);
+                  XSRETURN_EMPTY;
+                }
+
+                PutMsgOpts.PutMsgRecFields |= SvIV(*svp);
+
+              }
+
+              svp = hv_fetch(ValidPutMsgRecFieldsSubHash,"Size",4,FALSE);
+              if ( svp == NULL ) {
+                warn("Invalid data for ValidPutMsgRecFields->{%s} HASH, no 'Size' key\n",Key);
+                XSRETURN_EMPTY;
+              }
+
+              FieldSize = SvIV(*svp);
+
+              if ( index == -1 ) {
+                PutMsgRecSize += FieldSize ? FieldSize : sizeof(MQLONG);
+              }
+              else {
+
+                svp = hv_fetch(PutMsgRecHash,Key,KeyLength,FALSE);
+                if ( svp == NULL ) {
+                  warn("Unable to retrieve hash value from PutMsgRecs->[%d]\n",index);
+                  XSRETURN_EMPTY;
+                }
+
+                if ( FieldSize ) {
+		    String = SvPV(*svp,StringLength);
+		    strncpy(pPutMsgRecPtr,
+			    String,
+			    StringLength > FieldSize ? FieldSize : StringLength);
+		    pPutMsgRecPtr += FieldSize;
+                } else {
+		    *(PMQLONG)pPutMsgRecPtr = SvIV(*svp);
+		    pPutMsgRecPtr += sizeof(MQLONG);
+                }
+              }
+            }
+
+            if ( index == -1 ) {
+              if ( (pPutMsgRecPtr = malloc(PutMsgOpts.RecsPresent * PutMsgRecSize)) == NULL ) {
+                perror("Unable to allocate memory");
+                XSRETURN_EMPTY;
+              }
+
+              memset(pPutMsgRecPtr,'\0',PutMsgOpts.RecsPresent * PutMsgRecSize);
+
+              if ( (pResponseRecPtr = malloc(PutMsgOpts.RecsPresent * sizeof(MQRR))) == NULL ) {
+                perror("Unable to allocate memory");
+                XSRETURN_EMPTY;
+              }
+
+              memset(pResponseRecPtr,'\0',PutMsgOpts.RecsPresent * sizeof(MQRR));
+
+              PutMsgOpts.PutMsgRecPtr = pPutMsgRecPtr;
+              PutMsgOpts.ResponseRecPtr = pResponseRecPtr;
+
+            }
+
+          }
+
+        }
+
+        Buffer = SvPV(Msg,PL_na);
+        MQPUT(Hconn,Hobj,&MsgDesc,&PutMsgOpts,SvCUR(Msg),Buffer,&CompCode,&Reason);
+
+        /*
+          If there were multiple reason codes imbedded in the
+          "Response Records", then we have to decode these.
+         */
+        if ( Reason == MQRC_MULTIPLE_REASONS ) {
+
+          ResponseRecArray = newAV();
+
+          for ( index = 0 ; index < PutMsgOpts.RecsPresent ; index++ ) {
+            ResponseRecHash = newHV();
+            hv_store(ResponseRecHash,"CompCode",8,newSViv(pResponseRecPtr->CompCode),FALSE);
+            hv_store(ResponseRecHash,"Reason",6,newSViv(pResponseRecPtr->Reason),FALSE);
+            av_push(ResponseRecArray,newRV_noinc((SV*)ResponseRecHash));
+            pResponseRecPtr++;
+          }
+
+          hv_store((HV*)SvRV(ST(3)),"ResponseRecs",12,newRV_noinc((SV*)ResponseRecArray),FALSE);
+
+        }
+
+        hv_store((HV*)SvRV(ST(2)),"Version",7,
+                 (newSViv(MsgDesc.Version)),0);
+        hv_store((HV*)SvRV(ST(2)),"Report",6,
+                 (newSViv(MsgDesc.Report)),0);
+        hv_store((HV*)SvRV(ST(2)),"MsgType",7,
+                 (newSViv(MsgDesc.MsgType)),0);
+        hv_store((HV*)SvRV(ST(2)),"Expiry",6,
+                 (newSViv(MsgDesc.Expiry)),0);
+        hv_store((HV*)SvRV(ST(2)),"Feedback",8,
+                 (newSViv(MsgDesc.Feedback)),0);
+        hv_store((HV*)SvRV(ST(2)),"Encoding",8,
+                 (newSViv(MsgDesc.Encoding)),0);
+        hv_store((HV*)SvRV(ST(2)),"CodedCharSetId",14,
+                 (newSViv(MsgDesc.CodedCharSetId)),0);
+        hv_store((HV*)SvRV(ST(2)),"Format",6,
+                 (newSVpv(MsgDesc.Format, 8)),0);
+        hv_store((HV*)SvRV(ST(2)),"Priority",8,
+                 (newSViv(MsgDesc.Priority)),0);
+        hv_store((HV*)SvRV(ST(2)),"Persistence",11,
+                 (newSViv(MsgDesc.Persistence)),0);
+        hv_store((HV*)SvRV(ST(2)),"MsgId",5,
+                 (newSVpv((char *)MsgDesc.MsgId,24)),0);
+        hv_store((HV*)SvRV(ST(2)),"CorrelId",8,
+                 (newSVpv((char *)MsgDesc.CorrelId,24)),0);
+        hv_store((HV*)SvRV(ST(2)),"BackoutCount",12,
+                 (newSViv(MsgDesc.BackoutCount)),0);
+        hv_store((HV*)SvRV(ST(2)),"ReplyToQ",8,
+                 (newSVpv(MsgDesc.ReplyToQ, 48)),0);
+        hv_store((HV*)SvRV(ST(2)),"ReplyToQMgr",11,
+                 (newSVpv(MsgDesc.ReplyToQMgr, 48)),0);
+        hv_store((HV*)SvRV(ST(2)),"UserIdentifier",14,
+                 (newSVpv(MsgDesc.UserIdentifier, 12)),0);
+        hv_store((HV*)SvRV(ST(2)),"AccountingToken",15,
+                 (newSVpv((char *)MsgDesc.AccountingToken,32)),0);
+        hv_store((HV*)SvRV(ST(2)),"ApplIdentityData",16,
+                 (newSVpv(MsgDesc.ApplIdentityData, 32)),0);
+        hv_store((HV*)SvRV(ST(2)),"PutApplType",11,
+                 (newSViv(MsgDesc.PutApplType)),0);
+        hv_store((HV*)SvRV(ST(2)),"PutApplName",11,
+                 (newSVpv(MsgDesc.PutApplName, 28)),0);
+        hv_store((HV*)SvRV(ST(2)),"PutDate",7,
+                 (newSVpv(MsgDesc.PutDate, 8)),0);
+        hv_store((HV*)SvRV(ST(2)),"PutTime",7,
+                 (newSVpv(MsgDesc.PutTime, 8)),0);
+        hv_store((HV*)SvRV(ST(2)),"ApplOriginData",14,
+                 (newSVpv(MsgDesc.ApplOriginData, 4)),0);
+        hv_store((HV*)SvRV(ST(2)),"GroupId",7,
+                 (newSVpv((char *)MsgDesc.GroupId,24)),0);
+        hv_store((HV*)SvRV(ST(2)),"MsgSeqNumber",12,
+                 (newSViv(MsgDesc.MsgSeqNumber)),0);
+        hv_store((HV*)SvRV(ST(2)),"Offset",6,
+                 (newSViv(MsgDesc.Offset)),0);
+        hv_store((HV*)SvRV(ST(2)),"MsgFlags",8,
+                 (newSViv(MsgDesc.MsgFlags)),0);
+        hv_store((HV*)SvRV(ST(2)),"OriginalLength",14,
+                 (newSViv(MsgDesc.OriginalLength)),0);
+
+        SvSETMAGIC(ST(2));
+        /* output a MQPMO: */
+
+        hv_store((HV*)SvRV(ST(3)),"Version",7,
+                 (newSViv(PutMsgOpts.Version)),0);
+        hv_store((HV*)SvRV(ST(3)),"Options",7,
+                 (newSViv(PutMsgOpts.Options)),0);
+        hv_store((HV*)SvRV(ST(3)),"Timeout",7,
+                 (newSViv(PutMsgOpts.Timeout)),0);
+        hv_store((HV*)SvRV(ST(3)),"Context",7,
+                 (newSViv(PutMsgOpts.Context)),0);
+        hv_store((HV*)SvRV(ST(3)),"KnownDestCount",14,
+                 (newSViv(PutMsgOpts.KnownDestCount)),0);
+        hv_store((HV*)SvRV(ST(3)),"UnknownDestCount",16,
+                 (newSViv(PutMsgOpts.UnknownDestCount)),0);
+        hv_store((HV*)SvRV(ST(3)),"InvalidDestCount",16,
+                 (newSViv(PutMsgOpts.InvalidDestCount)),0);
+        hv_store((HV*)SvRV(ST(3)),"ResolvedQName",13,
+                 (newSVpv(PutMsgOpts.ResolvedQName, 48)),0);
+        hv_store((HV*)SvRV(ST(3)),"ResolvedQMgrName",16,
+                 (newSVpv(PutMsgOpts.ResolvedQMgrName, 48)),0);
+        hv_store((HV*)SvRV(ST(3)),"RecsPresent",11,
+                 (newSViv(PutMsgOpts.RecsPresent)),0);
+        hv_store((HV*)SvRV(ST(3)),"PutMsgRecFields",15,
+                 (newSViv(PutMsgOpts.PutMsgRecFields)),0);
+        hv_store((HV*)SvRV(ST(3)),"PutMsgRecOffset",15,
+                 (newSViv(PutMsgOpts.PutMsgRecOffset)),0);
+        hv_store((HV*)SvRV(ST(3)),"ResponseRecOffset",17,
+                 (newSViv(PutMsgOpts.ResponseRecOffset)),0);
+
+        SvSETMAGIC(ST(3));
+        sv_setiv(ST(5), (IV)CompCode);
+        SvSETMAGIC(ST(5));
+        sv_setiv(ST(6), (IV)Reason);
+        SvSETMAGIC(ST(6));

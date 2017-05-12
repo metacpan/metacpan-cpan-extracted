@@ -1,0 +1,113 @@
+######################################################################
+    Module::Rename 0.04
+######################################################################
+
+NAME
+    Module::Rename - Utility functions for renaming a module distribution
+
+SYNOPSIS
+        ########
+        # Shell:
+        ########
+        $ module-rename Old::Name New::Name Old-Name-Distro
+
+        #######
+        # Perl:
+        #######
+        use Module::Rename;
+
+        my $ren = Module::Rename->new(
+            name_old           => "Old::Name",
+            name_new           => "New::Name",
+        );
+
+        $ren->find_and_rename($start_dir);
+
+DESCRIPTION
+    Have you ever created a module distribution, only to realize later that
+    the module hierarchary needed to be changed? All of a sudden,
+    "Cool::Frobnicator" didn't sound cool anymore, but needed to be
+    "Util::Frobnicator" instead?
+
+    Going through a module's distribution, changing all package names,
+    variable names, and move the directories around can be a tedious task.
+    "Module::Rename" comes with a script "module-rename" which takes care of
+    all this:
+
+        $ ls
+        Cool-Frobnicator-0.01/
+
+        $ module-rename Cool::Frobnicator Util::Frobnicator Cool-Frobnicator-0.01
+        Cool-Frobnicator-0.01/lib/Cool is empty and can go away.
+
+    Done. The directory hierarchy has changed:
+
+        $ ls -R
+        Util-Frobnicator-0.01/
+        ...
+        Util-Frobnicator-0.01/lib/Util/Frobnicator.pm
+
+    ... and so has the content of all files:
+
+        $ grep "package" Util-Frobnicator-0.01/lib/Util/Frobnicator.pm
+        package Util::Frobnicator;
+
+  Things to Keep in Mind
+    *   "module-rename" will rename files and replace their content, so make
+        sure that you have a backup copy in case something goes horribly
+        wrong.
+
+    *   After changing the module hierarchy, some directories might be
+        empty, like the "lib/Cool" directory above. In this case, a warning
+        will be issued:
+
+            Cool-Frobnicator-0.01/lib/Cool is empty and can go away.
+
+        and the 'empty' directory gets deleted (even if a CVS subdirectory
+        is in there).
+
+API
+    "my $renamer = Module::Rename->new(...)"
+        The renamer's constructor takes the following parameters:
+
+        "name_old"
+            Old module name.
+
+        "name_new"
+            New module name.
+
+        "dir_exclude"
+            Reference to an array with directories to exclude from
+            traversing. Preset to
+
+                dir_exclude => ['blib']
+
+            but can be overridden.
+
+        "dir_ignore"
+            Reference to an array with entries to be ignored in 'empty'
+            directories. Even with these entries being present, a directory
+            will be considered empty and swept away.
+
+            Preset to
+
+                    dir_ignore => ['CVS'],
+
+            but can be overridden.
+
+        "wipe_empty_subdirs"
+            If set to a true value, 'empty' (see above) subdirectories will
+            be deleted after all renaming and restructuring is done.
+            Defaults to true.
+
+    "$renamer->find_and_rename($start_dir)"
+        Start searching and replacing in $start_dir and recurse into it.
+
+LEGALESE
+    Copyright 2005 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2005, Mike Schilli <cpan@perlmeister.com>
+

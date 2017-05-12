@@ -1,0 +1,94 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLParamElement
+
+=for object Mozilla::DOM::HTMLParamElement
+
+Mozilla::DOM::HTMLParamElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLParamElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLParamElement interface is the interface to a [X]HTML
+ * param element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLParamElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $name = $htmlparamelement->B<GetName>()
+
+=head2 $type = $htmlparamelement->B<GetType>()
+
+=head2 $value = $htmlparamelement->B<GetValue>()
+
+=head2 $valuetype = $htmlparamelement->B<GetValueType>()
+
+=head2 $htmlparamelement->B<SetName>($name)
+
+=over
+
+=over
+
+=item * $name (string)
+
+=back
+
+=back
+
+=head2 $htmlparamelement->B<SetType>($type)
+
+=over
+
+=over
+
+=item * $type (string)
+
+=back
+
+=back
+
+=head2 $htmlparamelement->B<SetValue>($value)
+
+=over
+
+=over
+
+=item * $value (string)
+
+=back
+
+=back
+
+=head2 $htmlparamelement->B<SetValueType>($valuetype)
+
+=over
+
+=over
+
+=item * $valuetype (string)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

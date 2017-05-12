@@ -1,0 +1,17 @@
+$Id: README,v 1.1 2003/04/12 16:05 $
+
+Mail::Ezmlm::Archive
+
+Object methods for accessing ezmlm-idx archives.
+
+This software is beta release. As such, please treat it with the appropriate 
+amount of caution. Let me know if you find any bugs, etc.
+
+Install by doing the following:
+# perl Makefile.PL
+# make install
+
+Documentation is in pod format. Please run perldoc Mail::Ezmlm::Archive after 
+you have installed it. Updates on <http://alex.primafila.net>.
+
+- Alessandro Ranellucci <alex@primafila.net>

@@ -1,0 +1,19 @@
+This is a simple "Hello World" example on how to
+use the maplat framework.
+
+This example doesn't do much usefull things, it basically
+just shows how to write a *very* simple webgui module and
+run some basic workers
+
+To run this example, you have to create a postgresql database,
+see the two included SQL files.
+
+Run the webgui:
+perl webgui_cmd.pl configs/webgui.xml
+
+Run a basic worker (cleans out directories):
+perl worker_cmd.pl configs/worker.xml
+
+Run a basic admin worker (works on database admin command
+send from the webgui):
+perl worker_cmd.pl configs/adminworker.xml

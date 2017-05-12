@@ -1,0 +1,5 @@
+(* $Id$ *)
+
+tell application "iTunes"
+	return name of current track & "|" & artist of current track
+end tell

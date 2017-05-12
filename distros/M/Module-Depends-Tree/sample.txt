@@ -1,0 +1,720 @@
+# This is a dependency tree for Socialtext Open
+# (http://sourceforge.com/projects/socialtext)
+
+Dependency tree created Sat Aug 19 23:53:53 2006
+Created with Module::Depends::Tree 0.01
+$ /usr/bin/deptree build/Deps.yaml
+
+Algorithm::Diff
+
+Alzabo
+    Class::Factory::Util
+    DBI
+    Exception::Class
+        Class::Data::Inheritable
+        Devel::StackTrace
+    Params::Validate
+    Tie::IxHash
+
+Apache::Constants
+
+Apache::Reload
+
+Apache::Request
+    Apache::Test
+
+Apache::Session::Store::Postgres
+    Test::Deep
+        Test::NoWarnings
+            Test::Tester
+        Test::Tester
+    Test::Exception
+        Sub::Uplevel
+        Test::Builder::Tester
+
+Apache::Session::Wrapper
+    Apache::Session
+        Test::Deep
+            Test::NoWarnings
+                Test::Tester
+            Test::Tester
+        Test::Exception
+            Sub::Uplevel
+            Test::Builder::Tester
+    Class::Container
+        Params::Validate
+    Exception::Class
+        Class::Data::Inheritable
+        Devel::StackTrace
+    Module::Build
+    Params::Validate
+
+Apache::SubProcess
+
+Apache::URI
+
+Archive::Tar
+    IO::Zlib
+        Compress::Zlib
+
+Archive::Zip
+    Compress::Zlib
+
+Cache::FileCache
+    Digest::SHA1
+    Error
+
+Class::AlzaboWrapper
+    Alzabo
+        Class::Factory::Util
+        DBI
+        Exception::Class
+            Class::Data::Inheritable
+            Devel::StackTrace
+        Params::Validate
+        Tie::IxHash
+    Exception::Class
+        Class::Data::Inheritable
+        Devel::StackTrace
+    Module::Build
+    Params::Validate
+
+Class::AlzaboWrapper::Cursor
+    Alzabo
+        Class::Factory::Util
+        DBI
+        Exception::Class
+            Class::Data::Inheritable
+            Devel::StackTrace
+        Params::Validate
+        Tie::IxHash
+    Exception::Class
+        Class::Data::Inheritable
+        Devel::StackTrace
+    Module::Build
+    Params::Validate
+
+Class::Field
+    Test::Base
+        Spiffy
+
+Class::Singleton
+
+Crypt::SSLeay
+
+DBD::Pg
+    DBI
+
+DBI
+
+DB_File::Lock
+
+Data::UUID
+
+Date::Format
+
+DateTime
+    DateTime::Locale
+        Params::Validate
+    DateTime::TimeZone
+        Class::Singleton
+        Module::Build
+        Params::Validate
+    Params::Validate
+
+DateTime::Format::Mail
+    DateTime
+        DateTime::Locale
+            Params::Validate
+        DateTime::TimeZone
+            Class::Singleton
+            Module::Build
+            Params::Validate
+        Params::Validate
+    Module::Build
+    Params::Validate
+
+DateTime::Format::Pg
+    DateTime
+        DateTime::Locale
+            Params::Validate
+        DateTime::TimeZone
+            Class::Singleton
+            Module::Build
+            Params::Validate
+        Params::Validate
+    DateTime::Format::Builder
+        Class::Factory::Util
+        DateTime
+            DateTime::Locale
+                Params::Validate
+            DateTime::TimeZone
+                Class::Singleton
+                Module::Build
+                Params::Validate
+            Params::Validate
+        DateTime::Format::Strptime
+            DateTime
+                DateTime::Locale
+                    Params::Validate
+                DateTime::TimeZone
+                    Class::Singleton
+                    Module::Build
+                    Params::Validate
+                Params::Validate
+            DateTime::Locale
+                Params::Validate
+            DateTime::TimeZone
+                Class::Singleton
+                Module::Build
+                Params::Validate
+            Params::Validate
+        Module::Build
+        Params::Validate
+    DateTime::TimeZone
+        Class::Singleton
+        Module::Build
+        Params::Validate
+
+DateTime::Format::Strptime
+    DateTime
+        DateTime::Locale
+            Params::Validate
+        DateTime::TimeZone
+            Class::Singleton
+            Module::Build
+            Params::Validate
+        Params::Validate
+    DateTime::Locale
+        Params::Validate
+    DateTime::TimeZone
+        Class::Singleton
+        Module::Build
+        Params::Validate
+    Params::Validate
+
+Digest::SHA1
+
+Email::Address
+
+Email::MIME
+    Email::MIME::ContentType
+    Email::MIME::Encodings
+    Email::Simple
+    MIME::Types
+
+Email::MIME::Creator
+    Email::MIME
+        Email::MIME::ContentType
+        Email::MIME::Encodings
+        Email::Simple
+        MIME::Types
+    Email::MIME::Modifier
+        Email::MIME
+            Email::MIME::ContentType
+            Email::MIME::Encodings
+            Email::Simple
+            MIME::Types
+        Email::MIME::ContentType
+        Email::MIME::Encodings
+        Email::MessageID
+            Email::Address
+        Email::Simple
+    Email::Simple
+    Email::Simple::Creator
+        Email::Date
+            Date::Parse
+            Email::Abstract
+                Email::Simple
+                Module::Pluggable
+                    Class::Inspector
+            Email::Simple
+            Time::Piece
+        Email::Simple
+
+Email::MessageID
+    Email::Address
+
+Email::Send
+    Class::Accessor::Fast
+    Email::Address
+    Email::Simple
+    Module::Pluggable
+        Class::Inspector
+    Return::Value
+
+Email::Send::Sendmail
+    Class::Accessor::Fast
+    Email::Address
+    Email::Simple
+    Module::Pluggable
+        Class::Inspector
+    Return::Value
+
+Email::Simple
+
+Email::Valid
+    Mail::Address
+
+Error
+
+Exception::Class
+    Class::Data::Inheritable
+    Devel::StackTrace
+
+File::Copy::Recursive
+
+File::CounterFile
+
+File::Slurp
+
+File::chdir
+
+Filesys::Df
+
+HTML::Entities
+    HTML::Tagset
+
+HTML::FillInForm
+    HTML::Parser
+        HTML::Tagset
+
+HTML::Mason
+    Apache::Request
+        Apache::Test
+    Cache::Cache
+        Digest::SHA1
+        Error
+    Class::Container
+        Params::Validate
+    Exception::Class
+        Class::Data::Inheritable
+        Devel::StackTrace
+    Params::Validate
+    mod_perl
+
+HTML::Mason::Interp
+    Apache::Request
+        Apache::Test
+    Cache::Cache
+        Digest::SHA1
+        Error
+    Class::Container
+        Params::Validate
+    Exception::Class
+        Class::Data::Inheritable
+        Devel::StackTrace
+    Params::Validate
+    mod_perl
+
+HTML::PrettyPrinter
+    HTML::Element
+        HTML::Parser
+            HTML::Tagset
+        HTML::Tagset
+    HTML::Tagset
+
+HTML::TreeBuilder
+    HTML::Parser
+        HTML::Tagset
+    HTML::Tagset
+
+HTTP::BrowserDetect
+
+IPC::Run
+
+LWP::UserAgent
+    Compress::Zlib
+    HTML::Parser
+        HTML::Tagset
+    URI
+
+List::MoreUtils
+
+Log::Dispatch
+    Module::Build
+    Params::Validate
+
+Log::Dispatch::Screen
+    Module::Build
+    Params::Validate
+
+Log::Dispatch::Syslog
+    Module::Build
+    Params::Validate
+
+MIME::Parser
+    IO::Stringy
+    Mail::Field
+    Mail::Header
+    Mail::Internet
+
+MIME::Types
+
+MLDBM
+
+Mail::Address
+
+MasonX::WebApp
+    Apache::Session::Wrapper
+        Apache::Session
+            Test::Deep
+                Test::NoWarnings
+                    Test::Tester
+                Test::Tester
+            Test::Exception
+                Sub::Uplevel
+                Test::Builder::Tester
+        Class::Container
+            Params::Validate
+        Exception::Class
+            Class::Data::Inheritable
+            Devel::StackTrace
+        Module::Build
+        Params::Validate
+    Class::Data::Inheritable
+    Class::Factory::Util
+    Exception::Class
+        Class::Data::Inheritable
+        Devel::StackTrace
+    HTML::Mason
+        Apache::Request
+            Apache::Test
+        Cache::Cache
+            Digest::SHA1
+            Error
+        Class::Container
+            Params::Validate
+        Exception::Class
+            Class::Data::Inheritable
+            Devel::StackTrace
+        Params::Validate
+        mod_perl
+    Test::Exception
+        Sub::Uplevel
+        Test::Builder::Tester
+    URI
+
+Params::Validate
+
+Plucene
+    Bit::Vector::Minimal
+    Class::Accessor
+    Class::Accessor::Fast
+    Class::Virtual
+        Carp::Assert
+        Class::Data::Inheritable
+    File::Slurp
+    IO::Scalar
+    Lingua::Stem::En
+        Lingua::GL::Stemmer
+        Lingua::PT::Stemmer
+        Lingua::Stem::Fr
+        Lingua::Stem::It
+        Lingua::Stem::Ru
+        Lingua::Stem::Snowball::Da
+        Lingua::Stem::Snowball::No
+        Lingua::Stem::Snowball::Se
+        Text::German
+    Tie::Array::Sorted
+    Time::Piece
+
+Readonly
+
+Readonly::XS
+    Readonly
+
+SOAP::Lite
+    Compress::Zlib
+    Crypt::SSLeay
+    FCGI
+    HTTP::Daemon
+        Compress::Zlib
+        HTML::Parser
+            HTML::Tagset
+        URI
+    MIME::Lite
+    MIME::Parser
+        IO::Stringy
+        Mail::Field
+        Mail::Header
+        Mail::Internet
+    URI
+    XML::Parser
+
+SOAP::Transport::HTTP
+
+Template
+    AppConfig
+        File::HomeDir
+
+Template::Iterator::AlzaboWrapperCursor
+    Class::AlzaboWrapper
+        Alzabo
+            Class::Factory::Util
+            DBI
+            Exception::Class
+                Class::Data::Inheritable
+                Devel::StackTrace
+            Params::Validate
+            Tie::IxHash
+        Exception::Class
+            Class::Data::Inheritable
+            Devel::StackTrace
+        Module::Build
+        Params::Validate
+    Template
+        AppConfig
+            File::HomeDir
+
+Text::Autoformat
+    Text::Reform
+
+Text::Flowed
+
+Tie::IxHash
+
+Time::Piece
+
+Time::Piece::Range
+    Date::Range
+        Date::Simple
+    Time::Piece
+
+URI::Escape
+
+URI::FromHash
+    URI
+
+URI::QueryParam
+
+XML::Atom
+    Class::Data::Inheritable
+    URI
+
+XML::Feed
+    Class::ErrorHandler
+    DateTime
+        DateTime::Locale
+            Params::Validate
+        DateTime::TimeZone
+            Class::Singleton
+            Module::Build
+            Params::Validate
+        Params::Validate
+    DateTime::Format::Mail
+        DateTime
+            DateTime::Locale
+                Params::Validate
+            DateTime::TimeZone
+                Class::Singleton
+                Module::Build
+                Params::Validate
+            Params::Validate
+        Module::Build
+        Params::Validate
+    DateTime::Format::W3CDTF
+        DateTime
+            DateTime::Locale
+                Params::Validate
+            DateTime::TimeZone
+                Class::Singleton
+                Module::Build
+                Params::Validate
+            Params::Validate
+    Feed::Find
+        Class::ErrorHandler
+        HTML::Parser
+            HTML::Tagset
+        LWP
+            Compress::Zlib
+            HTML::Parser
+                HTML::Tagset
+            URI
+        URI
+    HTML::TokeParser
+        HTML::Tagset
+    LWP
+        Compress::Zlib
+        HTML::Parser
+            HTML::Tagset
+        URI
+    URI::Fetch
+        Class::ErrorHandler
+        LWP
+            Compress::Zlib
+            HTML::Parser
+                HTML::Tagset
+            URI
+        URI
+    XML::Atom
+        Class::Data::Inheritable
+        URI
+    XML::RSS
+        Test::Manifest
+        XML::Parser
+
+XML::RSS
+    Test::Manifest
+    XML::Parser
+
+YAML
+
+
+Number of times each module is used
+ 58 Params::Validate
+ 23 Module::Build
+ 18 Class::Data::Inheritable
+ 14 Devel::StackTrace
+ 14 Exception::Class
+ 14 HTML::Tagset
+ 13 Class::Singleton
+ 12 DateTime::TimeZone
+ 12 URI
+ 11 DateTime::Locale
+ 11 Email::Simple
+  9 DateTime
+  9 HTML::Parser
+  8 Compress::Zlib
+  6 Class::Factory::Util
+  6 DBI
+  6 Test::Tester
+  5 Class::Container
+  5 Digest::SHA1
+  5 Email::Address
+  5 Error
+  5 Tie::IxHash
+  4 Alzabo
+  4 Apache::Request
+  4 Apache::Test
+  4 Email::MIME::ContentType
+  4 Email::MIME::Encodings
+  4 MIME::Types
+  4 Sub::Uplevel
+  4 Test::Builder::Tester
+  4 Test::Exception
+  4 Time::Piece
+  3 Cache::Cache
+  3 Class::Accessor::Fast
+  3 Class::ErrorHandler
+  3 Class::Inspector
+  3 Email::MIME
+  3 LWP
+  3 Module::Pluggable
+  3 Test::Deep
+  3 Test::NoWarnings
+  3 XML::Parser
+  3 mod_perl
+  2 Apache::Session
+  2 Apache::Session::Wrapper
+  2 AppConfig
+  2 Class::AlzaboWrapper
+  2 Crypt::SSLeay
+  2 DateTime::Format::Mail
+  2 DateTime::Format::Strptime
+  2 Email::MessageID
+  2 File::HomeDir
+  2 File::Slurp
+  2 HTML::Mason
+  2 IO::Stringy
+  2 MIME::Parser
+  2 Mail::Address
+  2 Mail::Field
+  2 Mail::Header
+  2 Mail::Internet
+  2 Readonly
+  2 Return::Value
+  2 Template
+  2 Test::Manifest
+  2 XML::Atom
+  2 XML::RSS
+  1 Algorithm::Diff
+  1 Apache::Constants
+  1 Apache::Reload
+  1 Apache::Session::Store::Postgres
+  1 Apache::SubProcess
+  1 Apache::URI
+  1 Archive::Tar
+  1 Archive::Zip
+  1 Bit::Vector::Minimal
+  1 Cache::FileCache
+  1 Carp::Assert
+  1 Class::Accessor
+  1 Class::AlzaboWrapper::Cursor
+  1 Class::Field
+  1 Class::Virtual
+  1 DBD::Pg
+  1 DB_File::Lock
+  1 Data::UUID
+  1 Date::Format
+  1 Date::Parse
+  1 Date::Range
+  1 Date::Simple
+  1 DateTime::Format::Builder
+  1 DateTime::Format::Pg
+  1 DateTime::Format::W3CDTF
+  1 Email::Abstract
+  1 Email::Date
+  1 Email::MIME::Creator
+  1 Email::MIME::Modifier
+  1 Email::Send
+  1 Email::Send::Sendmail
+  1 Email::Simple::Creator
+  1 Email::Valid
+  1 FCGI
+  1 Feed::Find
+  1 File::Copy::Recursive
+  1 File::CounterFile
+  1 File::chdir
+  1 Filesys::Df
+  1 HTML::Element
+  1 HTML::Entities
+  1 HTML::FillInForm
+  1 HTML::Mason::Interp
+  1 HTML::PrettyPrinter
+  1 HTML::TokeParser
+  1 HTML::TreeBuilder
+  1 HTTP::BrowserDetect
+  1 HTTP::Daemon
+  1 IO::Scalar
+  1 IO::Zlib
+  1 IPC::Run
+  1 LWP::UserAgent
+  1 Lingua::GL::Stemmer
+  1 Lingua::PT::Stemmer
+  1 Lingua::Stem::En
+  1 Lingua::Stem::Fr
+  1 Lingua::Stem::It
+  1 Lingua::Stem::Ru
+  1 Lingua::Stem::Snowball::Da
+  1 Lingua::Stem::Snowball::No
+  1 Lingua::Stem::Snowball::Se
+  1 List::MoreUtils
+  1 Log::Dispatch
+  1 Log::Dispatch::Screen
+  1 Log::Dispatch::Syslog
+  1 MIME::Lite
+  1 MLDBM
+  1 MasonX::WebApp
+  1 Plucene
+  1 Readonly::XS
+  1 SOAP::Lite
+  1 SOAP::Transport::HTTP
+  1 Spiffy
+  1 Template::Iterator::AlzaboWrapperCursor
+  1 Test::Base
+  1 Text::Autoformat
+  1 Text::Flowed
+  1 Text::German
+  1 Text::Reform
+  1 Tie::Array::Sorted
+  1 Time::Piece::Range
+  1 URI::Escape
+  1 URI::Fetch
+  1 URI::FromHash
+  1 URI::QueryParam
+  1 XML::Feed
+  1 YAML
+
+153 total modules
+

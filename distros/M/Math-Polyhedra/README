@@ -1,0 +1,39 @@
+Math/Polyhedra version 0.7
+==========================
+
+This module calculates and structures the coordinates of a library of
+commonly useful regular polyhedra.  These geometrical figures can be
+selected by name, or by the number of sides.
+
+The heart of the data is a set of 62 coordinates, from which each of
+these common polyhedra can be defined.  Each of the vertices can be
+defined as a set of points around the origin measured with various
+multiples and powers of I<phi>, also known as the S<Golden Ratio>, which
+is approximately 1.618.
+
+This package was inspired by the nice reference page provided by Robert
+W. Gray: http://www.rwgrayprojects.com/Lynn/Coordinates/coord01.html
+Other sites also explore the S<Golden Ratio> and these polyhedra.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules, but may interface with additional
+vector math modules, such as Math::VectorReal.  See the POD documentation
+for details and examples.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Ed Halley
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

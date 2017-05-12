@@ -1,0 +1,282 @@
+[% IF statustext %]
+<p align="center">
+    <div class="[% statuscolor %]">[% tr.tr(statustext) %]</div>
+</p>
+[% END %]
+
+
+<p align="center">
+    <table class="data" id="MainDataTable">
+        <tr class="tabheader">
+            <th>[% tr.tr("Key") %]</th>
+            <th>[% tr.tr("Value") %]</th>
+        </tr>
+
+        <form name="computeredit" method="post" action="[% webpath %]">
+            <tr>
+                <td>[% tr.tr("Hostname") %]</td>
+                <td>
+                    <input type="hidden" name="old_computer_name" value="[% computer.computer_name %]">
+                    <input type="text" name="computer_name" size="30" maxLength="60" value="[% computer.computer_name %]">
+                </td>
+            </tr>
+            <tr>
+                <td>[% tr.tr("Cost Unit") %]</td>
+                <td>
+                    <select name="costunit">
+                        <option value=""></option>
+                        [% FOREACH costunit IN costunits %]
+                        <option value="[% costunit.costunit %]"
+                            [% IF costunit.costunit == computer.costunit %]
+                                selected="selected"
+                            [% END %]
+                            >[% costunit.costunit %] : [% costunit.description %] 
+                        </option>
+                        [% END %]
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>[% tr.tr("Line") %]</td>
+                <td>
+                    <select name="line_id">
+                        <option value=""></option>
+                        [% FOREACH Prodline IN AvailProdLines %]
+                        <option value="[% Prodline.line_id %]"
+                            [% IF Prodline.line_id == computer.line_id %]
+                                selected="selected"
+                            [% END %]
+                            >[% Prodline.line_id %] : [% Prodline.description %]
+                        </option>
+                        [% END %]
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td>[% tr.tr("Description") %]</td>
+                <td><input type="text" name="description" size="30" maxLength="60" value="[% computer.description %]"></td>
+            </tr>
+            
+            <tr>
+                <td>[% tr.tr("Operating System") %]</td>
+                <td>
+                    <select name="operating_system" onChange="changeosdefaults(this.value);">
+                        <option value=""></option>
+                        [% FOREACH operating_system IN operating_systems %]
+                        <option value="[% operating_system.operating_system %]"
+                            [% IF operating_system.operating_system == computer.operating_system %]
+                                selected="selected"
+                            [% END %]
+                            >[% operating_system.operating_system %]
+                        </option>
+                        [% END %]
+                    </select>
+                </td>
+            </tr>
+            
+            <tr>
+                <td>[% tr.tr("Int. network type") %]</td>
+                <td>
+                    <select name="net_internal_type">
+                        <option value=""></option>
+                        [% FOREACH networktype IN networktypes %]
+                        <option value="[% networktype %]"
+                            [% IF networktype == computer.net_internal_type %]
+                                selected="selected"
+                            [% END %]
+                            >[% tr.tr(networktype) %]
+                        </option>
+                        [% END %]
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>[% tr.tr("Int. IP") %]</td>
+                <td><input type="text" name="net_internal_ip" size="30" maxLength="60" value="[% computer.net_internal_ip %]"></td>
+            </tr>
+            <tr>
+                <td>[% tr.tr("Int. MAC") %]</td>
+                <td><input type="text" name="net_internal_mac" size="30" maxLength="60" value="[% computer.net_internal_mac %]"></td>
+            </tr>
+            
+            <tr>
+                <td>[% tr.tr("Ext. network type") %]</td>
+                <td>
+                    <select name="net_prod_type">
+                        <option value=""></option>
+                        [% FOREACH networktype IN networktypes %]
+                        <option value="[% networktype %]"
+                            [% IF networktype == computer.net_prod_type %]
+                                selected="selected"
+                            [% END %]
+                            >[% tr.tr(networktype) %]
+                        </option>
+                        [% END %]
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>[% tr.tr("Ext. IP") %]</td>
+                <td><input type="text" name="net_prod_ip" size="30" maxLength="60" value="[% computer.net_prod_ip %]"></td>
+            </tr>
+            <tr>
+                <td>[% tr.tr("Ext. MAC") %]</td>
+                <td><input type="text" name="net_prod_mac" size="30" maxLength="60" value="[% computer.net_prod_mac %]"></td>
+            </tr>            
+            
+            <tr>
+                <td>[% tr.tr("User") %]</td>
+                <td><input type="text" name="account_user" size="30" maxLength="60" value="[% computer.account_user %]"></td>
+            </tr>
+            <tr>
+                <td>[% tr.tr("Password") %]</td>
+                <td><input type="text" name="account_password" size="30" maxLength="60" value="[% computer.account_password %]"></td>
+            </tr>
+            <tr>
+                <td>[% tr.tr("Account Domain") %]</td>
+                <td>
+                    <select name="account_domain" id="account_domain_c">
+                        <option value=""></option>
+                        [% FOREACH domain IN domains %]
+                        <option value="[% domain %]"
+                            [% IF domain == computer.account_domain %]
+                                selected="selected"
+                            [% END %]
+                            >[% tr.tr(domain) %]
+                        </option>
+                        [% END %]
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>[% tr.tr("Computer Domain") %]</td>
+                <td>
+                    <select name="computer_domain" id="computer_domain_c">
+                        <option value=""></option>
+                        [% FOREACH domain IN domains %]
+                        <option value="[% domain %]"
+                            [% IF domain == computer.computer_domain %]
+                                selected="selected"
+                            [% END %]
+                            >[% tr.tr(domain) %]
+                        </option>
+                        [% END %]
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td>[% tr.tr("Coordinates") %]</td>
+                <td>
+                    <div id="computercoords">[% computer.position_x %] : [% computer.position_y %]</div>
+                    <input type="hidden" name="position_x" id="position_x_c" value="[% computer.position_x %]" size="5">
+                    <input type="hidden" name="position_y" id="position_y_c" value="[% computer.position_y %]" size="5">
+                </td>
+            </tr>
+            
+            <tr>
+                <td>[% tr.tr("Servicepack") %]</td>
+                <td><input type="text" name="servicepack" id="servicepack_c" size="30" maxLength="60" value="[% computer.servicepack %]"></td>
+            </tr>
+            
+            <tr>
+                <td>[% tr.tr("64 Bit") %]</td>
+                <td>
+                    <input type="checkbox" name="is_64bit"
+                    [% IF computer.is_64bit == "1" %]
+                        checked="checked"
+                    [% END %]
+                    >
+                </td>
+            </tr>
+            
+            <tr>
+                <td>[% tr.tr("AntiVirus") %]</td>
+                <td>
+                    <input type="checkbox" name="has_antivirus"
+                    [% IF computer.has_antivirus == "1" %]
+                        checked="checked"
+                    [% END %]
+                    >
+                </td>
+            </tr>
+
+            <tr>
+                <td>[% tr.tr("Acronis Agent") %]</td>
+                <td>
+                    <input type="checkbox" name="has_acronisagent"
+                    [% IF computer.has_acronisagent == "1" %]
+                        checked="checked"
+                    [% END %]
+                    >
+                </td>
+            </tr>
+
+            <tr>
+                <td valign="top">[% tr.tr("VNC remote control") %]</td>
+                <td>
+                    <input type="checkbox" name="has_vnc"
+                    [% IF computer.has_vnc == "1" %]
+                        checked="checked"
+                    [% END %]
+                    >
+                    [% tr.tr("Password") %]: <input type="text" name="vnc_password" value="[% computer.vnc_password %]"><br>
+                    <hr width="90%">
+                    [% FOREACH vnccompany IN vnccompanies %]
+                        <input type="checkbox" name="vnccompany[]" value="[% vnccompany.name %]"
+                            [% IF vnccompany.is_active == "1" %]
+                               checked="checked"
+                            [% END %]
+                        > [% vnccompany.name %]<br>
+                    [% END %]
+                </td>
+            </tr>
+            
+            <tr>
+                <td colspan="2" align="center">
+                    <input type="hidden" name="mode" id="editmode" value="[% EditMode %]">
+                    [% IF EditMode == "create" %]
+                        <input type="submit" value="[% tr.tr("Create") %]">
+                    [% ELSE %]
+                        <input type="submit" value="[% tr.tr("Update") %]">
+                        <input type="submit" value="[% tr.tr("Delete") %]" onClick="return confirmDeleteComputer('computeredit', 'editmode');">
+                    [% END %]
+                    <input type="reset" value="[% tr.tr("Reset") %]">
+                </td>
+            </tr>
+        </form>
+    </table>
+</p>
+
+[% MAPMAKER %]
+
+<script language="javascript">
+        
+    function changeosdefaults(osname) {
+        var servicepack_c = document.getElementById("servicepack_c");
+        var computer_c = document.getElementById("computer_domain_c");
+        var account_c = document.getElementById("account_domain_c");
+        
+        var default_sp = "";
+        var default_domain = "";
+        
+        [% FOREACH operating_system IN operating_systems %]
+            if(osname == '[% operating_system.operating_system %]') {
+                default_sp = '[% operating_system.default_servicepack %]';
+                default_domain = '[% operating_system.default_domain %]';
+            }
+        [% END %]
+        
+        if(default_sp != '') {
+            servicepack_c.value = default_sp;
+        }
+        
+        if(default_domain != '') {
+            computer_c.value = default_domain;
+            account_c.value = default_domain;
+        }
+
+        return false;
+    }
+</script>

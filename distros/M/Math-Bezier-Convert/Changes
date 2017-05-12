@@ -1,0 +1,9 @@
+Revision history for Perl extension Math::Bezier::Convert.
+
+0.02  Wed Sep 29 17:00:27 2004
+	- Improved approximation of cubic_to_quadratic.
+	- Fixed to hang up when anchors and control points are in line.
+
+0.01  Sat May 16 23:00:00 2002
+	- original version.
+

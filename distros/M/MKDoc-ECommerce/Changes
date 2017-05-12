@@ -1,0 +1,5 @@
+Revision history for MKDoc::ECommerce.
+
+0.01  Tue Oct 12 14:26:00 2004
+      - bundle into basic perl module (removed from mkdoc-1.6 for mkdoc-1.8).
+      - Requires documentation and re-integration with MKDoc

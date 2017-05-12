@@ -1,0 +1,65 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 65dbe8b0c97c467ccf4a936990dc418fd45f1ffd Changes
+SHA1 c8419d7b2378a755d5b6c18c5cee7410e83a0659 MANIFEST
+SHA1 1de344e0c508f65f428824c97edadb95586384e3 META.json
+SHA1 c57956eb92c0155b630e7142a2714d77b4f798b0 META.yml
+SHA1 30d154a295ff225cc7900fe6784168f0d0742d1a Makefile.PL
+SHA1 99b4308c11b1d05df8c5436f22a6ba8dd9029ab9 README
+SHA1 d971933fd7b74051f653cefcc97dce646745b610 examples/horner.pl
+SHA1 798d909a4baeccd562cff2059fe768e491957923 examples/legendre.pl
+SHA1 a3664cd521de232905fb24a09b3e1f36e208a807 examples/migration.pl
+SHA1 34158a4d16aa16bac4e9c5867ea660c826599b54 examples/runge.pl
+SHA1 ab329ccf238b1f08d0e62009e44be6681184cef0 examples/runge_plot.png
+SHA1 d48075507094d84c457dc832bed391997f58ae0e examples/symbolic.pl
+SHA1 86298f46e47ec17a1f4b890119cd7182d141282a lib/Math/Polynomial.pm
+SHA1 14171341e745e00757e97268563452749ea2d5b3 lib/Math/Polynomial/Generic.pm
+SHA1 1c32c9e70acce2afb94287df8fee32ef2070bffc t/01_load.t
+SHA1 671c011b4a914e34a9bdb1e8437a051065b4002e t/02_basics.t
+SHA1 8e529ddd77b8474316e3e77d41bd3b1a5f3d1961 t/03_expressions.t
+SHA1 8399def50acf0ab4e0694e201d3daeef880008dd t/04_lagrange.t
+SHA1 ba11c68a24555cbc404ccdc04ce53ec02b05373b t/05_euclid.t
+SHA1 3280a66fa29d8a953a6686897dbc6ac757293243 t/06_calculus.t
+SHA1 bf6e8b4b00d94ed306d5210b220c1569f9774b77 t/07_strings.t
+SHA1 2f19d3c1a900d87a054889b568196a2f14cd1bf3 t/08_generic.t
+SHA1 634f585cd4e4ae107bd2d4dfde28d936173ded21 t/09_linear_terms.t
+SHA1 584136677453222e032ab76be7615534cd514677 t/10_math_complex.t
+SHA1 f26d78a197a5ca98b64928ed499d0c91770229ec t/11_math_bigrat.t
+SHA1 8838f5e888ba4c89c02d612b8ae6a4d33c233c4d t/12_gf3.t
+SHA1 112889310b3499aeadc8ba49d9e1264693d102b2 t/13_trees.t
+SHA1 9377a77c303366532e8f520d2703e656bc961e20 t/14_math_modint.t
+SHA1 c1ff091afaf11ad142280d6315629cd717b57d20 t/15_deprecation.t
+SHA1 12ee5eb7013598c45007b488ade9b94f146d5c7e t/90_pod.t
+SHA1 c28ebf0fa25e9cb7a8fbbbf5ae78dc39952f607a t/91_pod_cover_cp.t
+SHA1 76b25fc1b302e9056874a951821b8f8d7cdc7e02 t/92_consistency.t
+SHA1 690c222221fa956f136f5277ef82ce96eb4b682b t/93_examples.t
+SHA1 89727a981f36c21d0651e0cf8f2436524d8dfe80 t/94_diag_cover.t
+SHA1 1d5d8e199564f6d9baeadfef7ffef02a3b464f48 t/95_versions.t
+SHA1 1496e251e89201034ae1c6519408983a31f2ae5b t/99_signature.t
+SHA1 3e04edd8ced88d8bbc391e1aa9a9fcaf00e37411 t/data/KNOWN_VERSIONS
+SHA1 dca377e2382f6f63634e88223ef35434690ffcc6 t/lib/Test/MyUtils.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJXqMSZAAoJEKddzZlvHx0lCzgH/jmwq+X7YWwrpwQDEQm1YnPr
+SyM+jolAPKhs3rsGLP70XBsJvPjCwTHphtCm31M4IKkpp9sUI2k5M4R4CKQVtC4f
+0Y7zn3II2XvZUDB/DKqYXFpzx8ipc7XO2dpgr9Dvt5yPvt6SUZ3EYy8cvLWIBz7n
+LfqnAzYxM5QIJR5+1h+6RdnVcqb2ImxReWK7+yvoh+hDvtjqVJ6ewiSYthk8zHHU
+DTI1kAaUPIM0SxhyZZWVCqDZALiUF/OoyeT1BHxeQXvFM3xMx9XXrUbDyTzAdxD9
+BNRP0Bw6JPMMnjhsWrHhltV2ZvqUzTffGQWpKnr0lb166phPpo11OVhZfsNKl/g=
+=JFbO
+-----END PGP SIGNATURE-----

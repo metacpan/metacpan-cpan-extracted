@@ -1,0 +1,51 @@
+MooX::Lsub
+
+I often want to use a lot of lazy build subs to implement some plumbing,
+with scope to allow it to be overridden by people who know what they're
+doing with an injection library like Bread::Board.
+
+Usually, the syntax of "Class::Tiny" is what I use for such things.
+
+  use Class::Tiny {
+    'a' => sub { },
+    'b' => sub { },
+  };
+
+Etc.
+
+But switching things to Moo means I usually have to get much uglier, and
+repeat myself a *lot*.
+
+So this module exists as a compromise.
+
+Additionally, I always forgot to declare "use Moo 1.000008" which was
+the first version of "Moo" where "builder => sub" worked, and I would
+invariably get silly test failures in smokers as a consequence.
+
+This module avoids such problem entirely, and is tested to work with
+"Moo 0.009001".
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

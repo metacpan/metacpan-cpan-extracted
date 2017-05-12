@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+# Now playing script for mplayer playing streams supporting ICY data
+
+use strict;
+use Mplayer::NowPlaying;
+
+my $log = "$ENV{HOME}/.mplayerlog";
+my $c   = now_playing_stream($log);
+
+for my $tag(keys(%{$c})) {
+  printf("%6s: %s\n", ucfirst($tag), $c->{$tag}) if exists($c->{$tag});
+}

@@ -1,0 +1,296 @@
+To-do:
+    . store the origin of a callback so
+      we can tell the user where it originated if it leaks
+    . Make the callback-leak warning configurable
+    . Make MozRepl::RemoteObject::Instance::DESTROY just
+      queue the id, and have MozRepl::RemoteObject call
+      repl.breakLink() with just the ids, reducing traffic
+    . Automatically load the AnyEvent backend if needed.
+    . Implement ->can() for MozRepl objects
+
+0.39 20141026
+    ! Fix wrong coordinates sent in ->__click()
+
+0.38 20141020
+    . Pass through parameters for ->__event()
+      This allows ->__click() to pass in x,y coordinates
+
+0.37 20130825
+    . Fix MozRepl::RemoteObject raising an invalid
+      "Continuation prompt detected" error (RT #88100)
+      Diagnosis, test code and fix by Daniel Stadie
+      The test requires WWW::Mechanize::Firefox and lives
+      in that module.
+
+0.36 20130403
+    ! Revert 0.35 - it fails with WWW::Mechanize::Firefox,
+      which I should have tested before releasing.
+
+0.35 20130403
+    ! Changed the XPath evaluation from using
+      XPathResult.ORDERED_NODE_SNAPSHOT_TYPE to XPathResult.ANY_TYPE. This
+      may or may not influence the results you get from ->xpath() calls.
+      This widens the amount of valid XPath queries - you can now query
+      for string results in addition to nodes.
+      People tell me that Firefox still returns nodes in document (depth
+      first) order.
+
+0.34 20121012
+    ! Firefox 16 now seems to treat String concatenation with the "+"
+      operator in a bad way:
+          "\u30BD\u30FC\u30B7\u30E3\u30EB\u30FB\u30CD\u30C3"
+          + "\u30C8\u30EF\u30FC\u30AD\u30F3\u30B0 \u30B5\u30FC"
+      results in NaN , which means that something in there gets
+      interpreted as number. This is different from previous Firefox
+      versions.
+      The change is only in the tests - they now use Array.join("")
+      for string concatenation.
+
+
+0.33 20120901
+    . ->__click() directly calls target.click() if the target has
+      a .click field.
+    . Eliminated random guessing of the "window" object for mouse
+      events in favour of deriving the window from the defaultView
+      property of the document.
+
+0.32 20120410
+    ! Fix for using MozRepl::RemoteObject with WWW::Mechanize::Firefox 0.65
+    . Move the __dive method to MozRepl::RemoteObject::Methods
+
+0.31 20120331
+    ! Do not rely on obj.hasOwnProperty being available.
+      We now always use Object.hasOwnProperty, to avoid calling methods
+      on a Javascript object.
+
+0.30 20120316
+    ! Fix a destructor clobbering $@ indirectly
+      This led to $@ being empty even though an exception was thrown.
+    . Add a test for long function bodies
+
+0.29 20111222
+    . This version is mostly a cleanup version with clearer failure
+      diagnostics. If MozRepl::RemoteObject is currently working for you,
+      there is no need to upgrade.
+    + The module is now tested with
+        Firefox 3.0.9
+        Firefox 3.5.x
+        Firefox 4.0.1
+        Firefox 5
+        Firefox 6.0.1
+        Firefox 7.0.1
+        Firefox 8
+        Firefox 9
+    . Firefox 8 onwards need a very recent version of the mozrepl Add-on,
+      for example 1.1.0 available from
+        https://github.com/bard/mozrepl/tags
+      Older versions will not work due to "script caching" in Firefox
+      that prevents the repl from ever returning anything but the first result.
+      If you are upgrading Firefox to version 8 or later, you will see failure
+      symptoms like
+      
+        Transport still not UTF-8 safe: "8.0!"?!? 
+
+0.28 20110923
+    + Switch to "multiline" input mode.
+    
+      This should eliminate the "no result yet from mozrepl"
+      warnings and make input/response somewhat better.
+    . Fix a buglet in the memleak test
+    ! Function generation using ->expr() needs the following
+      idiom to work with Firefox 6+:
+          f=function() {
+            ...
+          }; f
+      Ideally, use ->declare() to declare functions.
+
+    + The module is now tested with
+        Firefox 3.0.9
+        Firefox 3.5.x
+        Firefox 4.0.1
+        Firefox 5
+        Firefox 6.0.1
+        Firefox 7 Beta 5
+
+0.27 20110726
+    + The module is now tested with
+        Firefox 3.0.9
+        Firefox 3.5.x
+        Firefox 4.0.1
+        Firefox 5
+        Firefox 6 Beta
+
+    + The Javascript code now catches eval() errors and
+      returns a structured exception to Perl. The
+      Perl interface does not change.
+      This brings ca. 10% speed increase
+
+    + More UTF-8 handling on the Perl side of the connection. All
+      received strings are now actively decoded to unicode strings
+      before being handed to JSON.pm
+      
+    + The JS API now uses the native JSON encoder of Firefox
+      instead of using a hand-rolled JSON encoder when possible. The
+      conditions are:
+        a) Native JSON must be available
+        b) The transport of Unicode characters must survive from
+           Javascript back to Perl. This only works natively with
+           a patched version mozrepl, see
+             https://github.com/bard/mozrepl/pull/17
+      This should be autodetected.
+
+0.26 20110502
+    ! Bugfix: Actually process the C<bufsize> parameter again
+
+0.25 20110426
+    . Add CLEAR method to tied objects so now list-assignment
+      to a hash works:
+      
+          %$foo = (Just => 'another', Javascript => 'Hacker');
+          $foo->{Just} # another
+          $foo->{Javascript} # Hacker
+          
+    . Add the C<bufsize> parameter to ->install_bridge
+      for setting the Net::Telnet buffer size
+    . Don't list MozRepl::RemoteObject::Methods in carp()
+    . More method implementation moved to ::Methods
+
+0.24 20110416
+    . Redo connect logic in ->setup, so that we handle cases
+      where MozRepl is unavailable gracefully.
+
+0.23 20110415
+    . Fix test failures
+    . Postpone deprecation period of methods added to JS objects
+      a bit. All methods will remain until after 0.25.
+
+0.22 20110411
+    . Added experimental AnyEvent-compatible backend MozRepl::AnyEvent
+      This backend does not yet support asynchronous execution. It
+      just plays well with other AnyEvent-enabled modules.
+      It is not automatically loaded.
+    ! Start of deprecation cycle for methods injected to the JS objects.
+      ->__xpath will be moved to MozRepl::RemoteObject::Util::xpath
+      Change
+          $obj->__xpath(...)
+      to
+          $obj->MozRepl::RemoteObject::Util::xpath( ... )
+      This makes the object cleaner and you shouldn't have many places
+      where you call C<< ->__xpath >> anyway, as it is not available on
+      most JS objects anyway.
+      
+      This method will go away in 0.23.
+
+0.21 20110109
+    . Remove a debugging help that crashed the module when it was called...
+
+0.20 20110106
+    . Improve event sending/handling
+    . Add max_queue_size to limit queue backlog
+    . Add stress-test for queue backlog
+    . Collect statistics about roundtrips,callbacks,fetch,store
+      in $repl->{stats}
+
+0.19 20101211
+    . Simplify Exporter usage
+    . Add ->constant() method to (lazily) fetch Javascript constants
+      and cache them on the Perl side of things.
+    . Add more tests to ensure that we have no memory cycles
+
+0.18 20101122
+    . Add test for pop(), actually make pop() work
+    . Add test for splice(), actually make splice() work
+    + Add as_list, an exportable function in MozRepl::RemoteObject,
+      that allows bulk-fetching of arrays.
+
+0.17 20101120
+    . Added test for circular reference fixed in 0.16
+    . Added more support for command queueing. Destructors can now
+      be queued until program exit, repl shutdown or
+      until the next command is executed, whichever comes first.
+    + Actually call the callback set up by ->__on_destroy
+    . Added a test that the __on_destroy callbacks get called
+
+0.16 20101119
+    . Enable use_queue parameter (but leave it undocumented)
+    + Fix memory leak when using ->declare. This should fix the messages
+      during global destruction.
+
+0.15 20101021
+    . Filter object for only immediate properties. This means that inherited
+      properties don't show up anymore in keys %$obj or using exists. You
+      can still get at their values though.
+      See L<http://yuiblog.com/blog/2006/09/26/for-in-intrigue/> for a
+      discussion of filtering and why it should happen.
+    . Implement C<delete> (and tests) for hashes
+
+0.14 20101017
+    . Fix ->__event() to create the event in the correct .document.
+      This fixes intermittent errors that were raised if (for example)
+      the Firefox Javascript Console was the topmost Firefox window.
+    . Add a test that checks that the Changes file has a well-formed date
+      for every version
+
+0.13 20100810
+    . Squelch some warnings when global destruction pulls out the rug
+      from under our feet.
+    . Don't fetch results from Firefox if we don't need them.
+      STORE() in tied elements should not return a value.
+
+0.12 20100625
+    . Fix bad unquoted passthrough of numbers with a leading zero. This
+      led to those numbers being interpreted as octal numbers.
+      Reported and diagnosed by Jess Robinson and James Mastros
+    . Document limitations of passthrough
+    + Die with an informative message if we can't connect
+
+0.11 20091130
+    . Don't carp() in ::TiedHash or ::TiedArray
+    . Added "launch" option to launch a mozrepl process
+    . This means we need IPC::Run as a prerequisite
+
+0.10 20091126
+    . Add way to deregister callbacks to release the memory
+      taken up on the Perl side for them.
+
+0.09 20091121
+    . Add tests for multiple bridge instances
+    . Multiple bridge instances work (except for some warnings
+      originating from MozRepl.pm)
+    . Some code cleanup
+
+0.08 20091111
+    . Localize $@ in the destructor so we don't eat
+      exceptions.
+    . Allow for passing of multiple parameters in callbacks
+
+0.07 20091109
+    . Always use our own JSON encoder on the Javascript side.
+      The native encoders don't output ASCII. This is sad,
+      but there seems to be a problem with the encodings along the way.
+
+0.06 20091102
+    . Added __event() to send arbitrary events
+
+0.05 20091031
+    . Implement callbacks/events
+
+0.04 20091030
+    . Added exists functionality for hashes
+    . added $bridge->appinfo as a convenience function
+
+0.03 20091029
+    ! Fixed ->__xpath
+    ! Fixed bad use of ->declare
+    * Use the stable but large encoding of 7-bit ASCII
+      for communication by switching to String.toSourceCode() on the
+      JS side.
+
+0.02 20091027
+    * ->__xpath returned numbers instead of objects
+    * The object was split into two classes, one for bridge functionality
+      and one for instance functionality
+    * $bridge->declare() for declaring cached anonymous functions
+
+0.01 20091018
+    . released on CPAN

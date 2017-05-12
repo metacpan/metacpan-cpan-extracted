@@ -1,0 +1,80 @@
+Return-Path: <dave@brondsema.net>
+Delivered-To: user0009-dave@brondsema.net
+Received: (qmail 10264 invoked by uid 0); 22 Mar 2005 00:32:31 -0000
+Received: from unknown (HELO ?192.168.1.101?) (user0009@68.22.152.170)
+  by 0 with SMTP; 22 Mar 2005 00:32:31 -0000
+Message-ID: <423F6771.2080805@brondsema.net>
+Date: Mon, 21 Mar 2005 19:31:45 -0500
+From: Dave Brondsema <dave@brondsema.net>
+User-Agent: Mozilla Thunderbird 1.0 (X11/20041206)
+X-Accept-Language: en-us, en
+MIME-Version: 1.0
+To: Dave Brondsema <dave@brondsema.net>
+Subject: binary att
+X-Enigmail-Version: 0.90.0.0
+X-Enigmail-Supports: pgp-inline, pgp-mime
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enig06E19ED53877FE0F7724B108"
+X-Spam-Checker-Version: SpamAssassin 3.0.2 (2004-11-16) on ferrari
+X-Spam-Level: 
+X-Spam-Status: No, score=0.0 required=4.0 tests=none autolearn=failed 
+	version=3.0.2
+
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enig06E19ED53877FE0F7724B108
+Content-Type: multipart/mixed;
+ boundary="------------030903040403080708030400"
+
+This is a multi-part message in MIME format.
+--------------030903040403080708030400
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+
+--
+Dave Brondsema : dave@brondsema.net
+http://www.splike.com : programming
+http://csx.calvin.edu : student org
+http://www.brondsema.net : personal
+
+--------------030903040403080708030400
+Content-Type: image/jpeg;
+ name="tiny.jpg"
+Content-Transfer-Encoding: base64
+Content-Disposition: inline;
+ filename="tiny.jpg"
+
+/9j/4AAQSkZJRgABAQIAAAAAAAD/2wBDAP//////////////////////////////////////
+////////////////////////////////////////////////2wBDAf//////////////////
+////////////////////////////////////////////////////////////////////wAAR
+CAAgACcDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAA
+AgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkK
+FhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWG
+h4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl
+5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREA
+AgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYk
+NOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOE
+hYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk
+5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwA6d/8APbPHf0+npSbj/Tvn3wacQfbt1z27
+d/zpMdR36/y6k9u/Ix75oumMN3+e35dvb+WDRknA/wA9Pf8A/V/Mpg/r6H/63fGB604DA+vv
+/ngfp+HIF0Jk+p/p+tFH0/z6fn+NFFx+6PNRdCf6dO2MdOPz4/OpabtOc5/z0zz3A7+wqV2J
+G5/z9f8APt+tL/k9uOP/ANXrSFT+fv39Pr3/AE+rlB7+36fr6enXpximKwnb+f0z6H3oo2nn
+9KKCuVdz/9k=
+--------------030903040403080708030400--
+
+--------------enig06E19ED53877FE0F7724B108
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.0 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://enigmail.mozdev.org
+
+iD8DBQFCP2d0VvBSb5uzznARAiToAKDXyOd7GVs6Lhx9rUL7aODq/hH8PgCgjMWX
+K3f7VjRNb4af+3HTdJANIYE=
+=tG59
+-----END PGP SIGNATURE-----
+
+--------------enig06E19ED53877FE0F7724B108--
+

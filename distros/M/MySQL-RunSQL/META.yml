@@ -1,0 +1,25 @@
+---
+abstract: 'Run SQL queries against a MySQL database and return the'
+author:
+  - 'Melissa A. VandenBrink <geeklady@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MySQL-RunSQL
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBI: 1.617
+  Excel::Writer::XLSX: 0.5
+  Modern::Perl: 1.20120521
+  Params::Validate: 1.06
+version: 1.2

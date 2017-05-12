@@ -1,0 +1,33 @@
+<%args>
+$item
+</%args>
+<%doc>
+=head2 display_line
+
+C<display_line> is used in the list template to display a row from the
+database, by iterating over the columns and displaying the data for each
+column. It misses out the C<id> column by default, and magically
+URLifies columns called C<url>. This may be considered too much magic
+for some.
+
+=cut
+
+</%doc>
+
+%foreach my $col (@{$classmetadata->{columns}}) {
+%  next if $col eq "id";
+        <td>
+%       if ($col eq "url" && $item->{url}) {
+            <a href="<% $item->{url}%>"><%$item->{url}%></a>
+%       }elsif ($col eq $item->stringify_column) {
+            <& maybe_link_view, %ARGS, item=>$item&>
+%       } else {
+            <& maybe_link_view, %ARGS, item=>$item->$col&>
+%       }
+        </td>
+%}
+<td>
+    <& button, %ARGS, item=>$item, action => "edit",base=>$base &>
+    <& button, %ARGS, item=>$item, action =>"delete",base=>$base &>
+</td>
+

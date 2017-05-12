@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name: Math-Fleximal
+version: 0.06
+license: perl
+distribution_type: module
+requires: {}
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Math::Fleximal:
+    file: lib/Math/Fleximal.pm
+    version: 0.06
+generated_by: Module::Build version 0.20

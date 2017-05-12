@@ -1,0 +1,7 @@
+decNumber*    T_PTROBJ
+decContext* 	T_PTROBJ
+uint8_t       T_U_CHAR
+int32_t       T_IV
+uint32_t			T_UV
+enum rounding	T_ENUM
+enum decClass T_ENUM

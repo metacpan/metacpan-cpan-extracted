@@ -1,0 +1,22 @@
+# Legend:
+# --- = A new release
+#   + = Added a feature (in a backwards compatible way)
+#   ! = Changed something significant, or removed a feature
+#   * = Fixed a bug, or made a minor improvement
+
+--- 1.001 (2007-05-30 20:30)
+
+  Miscellaneous:
+  ! Build-require Module::Build 0.2805 (was: 0.26), hopefully fixing a
+    version.pm/CPAN.pm compatibility issue (see rt.cpan.org #26784).
+    (Debian packaging is not affected because it does not rely on META.yml.)
+  * Require YAML.pm >= 0.50 (was unversioned), as the required OO
+    infrastructure was introduced only then.
+
+  Debian:
+  * Depends: libyaml-perl (>= 0.50) (was unversioned)
+
+--- 1.000 (initial release) (2006-12-23 20:00)
+
+# $Id: CHANGES 106 2007-05-30 20:42:50Z Julian Mehnle $
+# vim:syn=changelog tw=79 sts=2 sw=2

@@ -1,0 +1,11 @@
+Revision history for McBain-WithWebSocket
+
+2.000000  2014-08-19 18:55:48+03:00 Asia/Jerusalem
+	- Updated docs on how to use this runner module as
+	  McBain no longer uses the MCBAIN_WITH environment variable.
+
+1.000001  2014-06-04 00:33:56+03:00 Asia/Jerusalem
+	- Small documentation fixes and updates
+
+1.000000  2014-06-02 21:33:35+03:00 Asia/Jerusalem
+	- First public release

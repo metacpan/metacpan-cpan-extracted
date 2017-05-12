@@ -1,0 +1,15 @@
+0.052
+    * Update for new MongoDB
+    * More test
+
+0.051
+    * Fix typo
+
+0.05
+    * Fix tests
+    * Fix memory leak and lost connection issue
+
+0.004
+  - small fix
+0.002
+  - Update documents

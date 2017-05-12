@@ -1,0 +1,16 @@
+--------------------
+2015-06-22  v0.05
+--------------------
+* Fix tests broken by Mojolicious changes
+
+--------------------
+2014-06-19   v0.04
+--------------------
+* Add validation via Vaidate::Tiny
+* Require Mojolicious >= 2.52
+
+--------------------
+2013-11-28   v0.03
+--------------------
+* Require Mojolicious >= 4.5
+* Removed deprecated attrs calls to Mojo::DOM (Bug #2, thanks Leon Kyneur)

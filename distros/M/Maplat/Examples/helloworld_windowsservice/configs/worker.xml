@@ -1,0 +1,84 @@
+<worker>
+	<!-- displayed Application name -->
+	<appname>Maplat Worker</appname>
+	
+	<!--
+	     mincycletime should be equal or greater than whatever cycle time the SAP BC has, because
+	     we can't book signals faster anyway. Going faster would only be a useless use of CPU cycles
+		 and clog the network.
+	-->
+	
+	<mincycletime>30</mincycletime>
+	
+	<!-- Database module -->
+	<module>
+		<modname>maindb</modname>
+		<pm>PostgresDB</pm>
+		<options>
+			<dburl>dbi:Pg:dbname=MAPLAT_DB;host=10.176.199.199</dburl>
+			<dbuser>MAPLAT_Server</dbuser>
+			<dbpassword>MAPLAT</dbpassword>
+		</options>
+	</module>
+
+	<!-- Memcache module (just handles the memcache instance variable) -->
+	<module>
+		<modname>memcache</modname>
+		<pm>MemCache</pm>
+		<options>
+			<service>127.0.0.1:11211</service>
+			<namespace>RBSMem</namespace>
+		</options>
+	</module>
+	
+	<!-- Mail module -->
+	<module>
+		<modname>sendmail</modname>
+		<pm>SendMail</pm>
+		<options>
+			<mailserver>mail</mailserver>
+			<mailport>25</mailport>
+			<mailer_id>Maplat Notification System</mailer_id>
+			<sender>worker@example.com</sender>
+			<subject_prefix>[Worker]</subject_prefix>
+		</options>
+	</module>
+		
+	<!-- Standard Reporting module -->
+	<module>
+		<modname>reporting</modname>
+		<pm>Reporting</pm>
+		<options>
+			<db>maindb</db>
+			<mail>sendmail</mail>
+			<memcache>memcache</memcache>
+			<email>0</email>
+			<std_out>1</std_out>
+			<maxlines>60</maxlines>
+			<worker>RBSAdm Worker</worker>
+		</options>
+	</module>
+	
+	<!-- Clean old files from directories -->
+	<module>
+		<modname>dircleaner</modname>
+		<pm>DirCleaner</pm>
+		<options>
+			<reporting>reporting</reporting>
+			<memcache>memcache</memcache>
+			<limit>10000</limit>
+			<db>maindb</db>
+			<directory>
+				<path>/home/someuser/tmp</path>
+				<maxage>8</maxage>
+			</directory>
+			<directory>
+				<path>/home/someuser/log</path>
+				<maxage>7</maxage>
+			</directory>
+		</options>
+	</module>
+	
+</worker>	
+	
+

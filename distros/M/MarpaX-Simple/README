@@ -1,0 +1,49 @@
+SYNOPSIS
+
+     use MarpaX::Simple qw(gen_parser);
+    
+     my $parser = gen_parser(
+         grammar => <<'EOG',
+     :start     ::= expr
+     expr       ::= num
+                  | num '+' num    action => do_add
+     num        ~ [\d]+
+     :discard   ~ whitespace
+     whitespace ~ [\s]+
+     EOG
+         actions => {
+             do_add => sub { shift; $_[0] + $_[2] }
+         },
+     );
+    
+     print $parser->('3 + 4'); # -> 7
+     print $parser->('3 + ');  # dies with parse error
+
+    which is a shortcut for roughly this:
+
+     no strict 'refs';
+     use Marpa::R2;
+     my $slif = Marpa::R2::Scanless::G->new({source => \$args{grammar}});
+     my $pkg = "MarpaX::Simple::gen" . some_random_value();
+     my $actions = $args{actions};
+     for (keys %$actions) {
+         ${"$pkg\::$_"} = $actions->{$_};
+     }
+     my $parser = sub {
+         my $input = shift;
+         my $recce = Marpa::R2::Scanless::R->new({
+             grammar => $slif,
+             semantics_package => $pkg,
+         });
+     };
+
+DESCRIPTION
+
+    This module tries to simplify the incantation of producing a parser
+    using Marpa::R2 (the scanless interface) by reducing the process to a
+    single function call: gen_parser.
+
+SEE ALSO
+
+    Marpa::R2
+

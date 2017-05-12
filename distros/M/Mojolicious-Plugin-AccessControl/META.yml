@@ -1,0 +1,35 @@
+---
+abstract: 'Access control'
+author:
+  - 'hayajo <hayajo@cpan.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build::Tiny: 0.030
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.4, Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-AccessControl
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Mojolicious: 2.63
+  Net::CIDR::Lite: 0.21
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/hayajo/Mojolicious-Plugin-AccessControl/issues
+  homepage: https://github.com/hayajo/Mojolicious-Plugin-AccessControl
+  repository: https://github.com/hayajo/Mojolicious-Plugin-AccessControl.git
+version: 0.04
+x_contributors:
+  - 'Oliver Guenther <mail@oliverguenther.de>'
+  - 'hayato imai <hayato.imai@gmail.com>'

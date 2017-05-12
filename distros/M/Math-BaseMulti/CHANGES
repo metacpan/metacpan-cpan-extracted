@@ -1,0 +1,33 @@
+==================================================
+Changes from 2012-08-22 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.01 at 2013-08-22 10:44:45 +0000
+-----------------------------------------
+
+  Change: b47bd105d617d097a47f688a9fb0e09f04605970
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-08-22 12:42:55 +0000
+
+    -add abstract comment 
+
+-----------------------------------------
+version 1.00 at 2013-08-22 10:39:32 +0000
+-----------------------------------------
+
+  Change: 35bc2cd1c7d8c301ef737f850538e667b694617d
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-08-22 12:39:32 +0000
+
+    -added gitignore -added version comment to BaseMulti.pm 
+
+  Change: 7ae3f2fc2bc672387fcbd8636852146c4c3cb8ff
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-08-22 12:38:00 +0000
+
+    -initial checkin 
+
+================
+End of releases.
+================

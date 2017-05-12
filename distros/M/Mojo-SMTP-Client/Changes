@@ -1,0 +1,52 @@
+Revision history for Perl extension Mojo::SMTP::Client
+
+0.12  Sat Feb  4 00:32:46 KRAT 2017
+    - Fix tests, so they works with newer Mojolicious (#rt119946)
+
+0.11  Wed Jun 29 19:43:43 NOVT 2016
+    - Automatically normalize newlines in the message specified for `data'
+      and turn `.' at the start of the line to `..', which SMTP protocol
+      requires (#gh1)
+
+0.10  Wed Apr 22 13:06:04 NOVT 2015
+    - Clean ripped childs inside tests to prevent tests failing on BINGOS's
+      openBSDs
+
+0.09  Thu Apr 16 23:56:39 NOVT 2015
+    - Fix possible memory leak for `starttls' command
+    - Support for explicit `hello' command
+    - new `prepend_cmd' method
+
+0.08  Thu Mar 26 18:31:20 NOVT 2015
+    - Fix tests for cases when IO::Socket::SSL not available
+    - Fix bug when last chars of data could be LF without CR
+    - Add new `auth' command for `send'
+    - Add new recipe about sending emails via public SMTP servers with auth
+
+0.07  Wed Mar 25 16:28:18 NOVT 2015
+    - new `tls', `tls_ca', `tls_cert', `tls_key' attributes
+    - new `starttls' command for `send'
+
+0.06  Mon Mar 23 18:28:12 NOVT 2015
+    - $resp now is an object of Mojo::SMTP::Client::Response class
+
+0.05  Thu Mar 19 18:48:20 NOVT 2015
+    - Fix tests, so they will pass on OS X
+
+0.04  Wed Mar 18 23:02:32 NOVT 2015
+    - More correct stream errors handling
+    - Fix memory leak which occurred on error
+
+0.03  Wed Mar 11 22:55:12 NOVT 2015
+    - new `reset' command for `send'
+    - now order of commands for `send' is important
+    - you can send several non-unique commands with one `send' call
+
+0.02  Tue Mar 10 22:37:21 NOVT 2015
+    - `start' event added
+    - allow argument for `data' command to be a reference to a string
+    - new global %CMD variable
+    - cookbook with some useful examples added
+
+0.01  Mon Mar  9 13:48:44 NOVT 2015
+    - First release

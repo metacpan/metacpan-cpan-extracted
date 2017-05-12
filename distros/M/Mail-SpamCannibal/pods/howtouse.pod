@@ -1,0 +1,262 @@
+
+=head2 NAME
+
+How To Use - SpamCannibal
+
+=head2 PREFACE
+
+Today's email systems are called upon to examine and classify 
+incoming mail in ways it was never designed to do. DNSBL servers and 
+sophisticated filter help immensely in this task by quickly 
+identifying viruses, spam and spam sources, but there is no good way 
+to stop this traffic from consuming bandwidth. The tactic from 
+yesteryear of bouncing messages back to the envelope sender only 
+makes the matter worse as ALL spam and virus mail comes with bogus 
+headers. This practice triples or quadruples the bandwidth consumed 
+by the spam. First the inbound transit, second the bounce to the 
+innocent envelope domain owner, third the return bounce from the 
+mailer daemon for the unknown envelope user and a potential fourth refusal from 
+those site equipped with a double bounce filter. Every time a piece 
+of spam is received, even from a known source, this process is 
+repeated and there is no burden placed on the sender or incentive for 
+them to stop.
+
+Before discussing how SpamCannibal addresses this problem, let us 
+consider the path that a message takes as it enters a well designed 
+mail system.
+
+=over 4
+
+=item 1. connection
+
+A connection is made to the host TCP/IP port 25 and is handed off 
+to the Mail Transfer Agent or front-end-filter by the operating system.
+
+=item 2. access control
+
+The MTA examines the source of the message and checks against 
+remote DNSBL's and its access list to see if the source is in its 
+reject list. If rejected, the message is usually returned to the 
+envelope sender with and error code.
+
+=item 3. content filtering
+
+ The message is filtered for spam content and either marked for 
+special delivery disposition or bounced to the envelope sender as in 
+step 2.
+
+=back
+
+While these steps do a reasonable job of reducing the unwanted mail 
+delivered to the end user, it does nothing to reduce or eliminate the
+bandwidth consumed by the ever increasing load of spam and virus mail, nor
+does it impose any penalty on the feckles sender.
+
+=head2 SpamCannibal, the missing piece
+
+SpamCannibal provides the missing element in email system design. It 
+provides the piece needed to reduce and eliminate unwanted spam 
+traffic. SpamCannibal does this in a surprisingly simple way in a 
+multi step process -- since we will reference the three steps that 
+the MTA takes to receive mail, the SpamCannibal steps will be labeled 
+a), b), c), etc..... 
+
+With a SpamCannibal enhanced mail system, an incoming connection to 
+TCP/IP port 25 goes through these steps.
+
+=over 4
+
+=item a. access control
+
+The incoming host IP address is checked against a local database 
+of banned hosts. If the IP address is acceptable OR UNKNOWN, it is 
+logged into the archive database and the MTA is connected for step 1) 
+of its process.
+
+Let's assume for the sake of discussion that the UNKNOWN host 
+delivered a spam load for which the MTA will complete steps 2) and 3) 
+and provide some subsequent disposition.
+
+=item b. c. d. skipped for normal messages
+
+This connection is passed through to the MTA
+
+=item e. automated spam source identification
+
+Some few minutes later, a cron script checks all of the collected 
+archive IP addresses against the same DNSBL list used by the MTA. 
+Addresses for which "A" records are returned from the DNSBL's are 
+added to the database of banned hosts to be tarpitted. If you wish to 
+be polite and impose a minimum cost on the spam sender, SpamCannibal 
+can be configured to simply ignore the incoming connection request as 
+if  port 25 had no service.
+
+The spam source has now been identified. Let us repeat the steps for 
+SpamCannibal.
+
+item a. (again) access control / tarpit action
+
+The incoming host IP address is checked against a local database 
+of banned host. The IP address is found to match an entry in the 
+database. 
+
+=item b. tarpit response
+
+SpamCannibal ACKnowledges the connecting hosts SYN packet with a 
+small window size then drops the packet.
+
+=item c. tarpit acknowledgement
+
+The connecting host responds with its own ACK and may attempt to 
+send data using the reduced window size or simply ask for a larger 
+window. Either way it will take some time before the connection is 
+terminated.
+
+=item d. persistent tarpit complete
+
+The connecting host sends data. SpamCannibal ACKnowledges the data 
+receipt and further reduces the transmission window size. The remote 
+host now will hang on indefinitely trying to send the balance of its 
+payload.
+
+=item e. never reached
+
+The local host never sees the banned connection. What little traffic remains
+is handled entirely by the tarpit daemon.
+
+=back
+
+All of the steps that the SpamCannibal tarpit takes are stateless. 
+There is no forked child, suspended job, or memory storage. Each 
+incoming connection it treated anew based only on the information in 
+the inbound packet. What SpamCannibal accomplished is a threefold 
+reduction in the traffic cause by spam and virus payloads because 
+they NEVER LEAVE THE TRANSMITTING HOST. This multiplies itself in 
+reduction in resources consumed on the local mail host since it does 
+not have to process the payload through the MTA, interrogate DNSBL's, 
+run filters or waste human time emptying overfilled email boxes.
+
+The flip side of this is not so pleasant. The sending mail host has a loaded
+task waiting for a response from its TCP/IP stack. The TCP/IP stack has full
+buffers that have not been transmitted and the timeout mechanism is reset
+each time it attempts to send data. Every additional thread caught by
+SpamCannibal requires another task and additional resources on the TCP/IP
+stack. This could easily stall the sending process on a host that distributes 
+UBE, UCE or virus mail to a large number of sites where SpamCannibal has
+been deployed.
+
+=head2 USING SPAMCANNIBAL WITH YOUR MAIL SYSTEM
+
+SpamCannibal has four runtime elements.
+
+=over 4
+
+=item 1. Front end "dbtarpit" daemon.
+
+This daemon interfaces directly with Linux's "iptables" and receives every packet destined 
+for port 25 before it is passed to the MTA. As far as human operators 
+are concerned, this it the most passive looking of the operations 
+since there is no external interface.
+
+=item 2. The sc_BLcheck script
+
+This script runs periodically to check the accumulated 
+(logged) IP addresses that connected to port 25 against your 
+preferred list of DNSBL's. This should be the same set of DNSBL's that are
+used by your MTA. IP addresses with returned "A" records are 
+added to the "tarpit" database for subsequent denial of access.
+
+=item 3. Inbox robot
+
+Spam that escapes DNSBL detection can be emailed to 
+SpamCannibal's secure mail robot, B<sc_mailfilter>,  to process the 
+headers, extract the originating MTA IP address, and add that address 
+to the tarpit database.
+
+=item 4. Web administration tools
+
+SpamCannibal's secure web administration tools allows the system 
+administrator to manually add spam hosts through a simple cut and 
+paste operation or to manually add or delete hosts from the database.
+
+In addition to these tools, there's also a nifty statistics display 
+that is borrowed from the LaBrea::Tarpit perl module. It provides a 
+realtime snapshot of the current and recent spam host activity on the 
+mail host.
+
+=item 5. Optional multi_dnsbl daemon
+
+B<multi_dnsbl> is a DNS emulator daemon that increases the efficacy of DNSBL
+look-ups in a mail system. B<multi_dnsbl> may be used as a stand-alone DNSBL
+or as a plug-in for a standard BIND 9 installation. 
+B<multi_dnsbl> shares a common configuration file format with the
+Mail::SpamCannibal sc_BLcheck.pl script so that DNSBL's can be maintained in
+a common configuration file for an entire mail installation.
+
+It is recommended that SpamCannibal installations utilize B<multi_dnsbl> for
+there MTA's DNSBL lookups as this minimizes network traffic to the DNSBL's
+and optimizes the order in which they are interrogated.
+
+=back
+
+=head2 TYPICAL INSTALLATIONS
+
+The SpamCannibal site.
+
+=head3 System 1
+
+A standalone system incorporating an MTA, DNS daemon, web server, and 
+SpamCannibal installation. This system runs three of SpamCannibal 
+daemons.
+
+=over 4
+
+=item 1. dbtarpit
+
+Denies access to banned hosts and collects incoming 
+connection IP addresses.
+
+=item 2. dnsbls
+
+Provides blacklist DNS service on a internally accessible 
+port from the SpamCannibal databases. The primary DNS server (bind-9.xx) is 
+slaved to dnsbls to provide external DNSBL service.
+
+=item 3. bdbaccess
+
+Provides privileged access to the SpamCannibal web 
+pages running on the local web server.
+
+=back
+
+In addition, the sc_lbdaemon (LaBrea) data collection daemon runs on the 
+localhost and provides statistics for the local web server pages.
+
+=head3 System 2
+
+A standalone system incorporating an MTA and SpamCannibal 
+installation. This system runs two SpamCannibal daemons.
+
+=over 4
+
+=item 1. dbtarpit
+
+Denies access to banned hosts and collects incoming 
+connection IP addresses in the same manner as System 1.
+
+=item 2. bdbaccess
+
+Provides privileged remote access to the SpamCannibal 
+web pages running on a remote host (actually in another city with a 
+different network provider).
+
+=back
+
+System 2 uses System 1's DNSBL for to check its IP archive database. 
+System 2 is the secondary mail host for System 1, but bears roughly twice as 
+much spam traffic based on traffic analysis.
+
+In addition, System 2 runs the sc_lbdaemon and 
+provides remote statistics access for a web process running on 
+another host.
+

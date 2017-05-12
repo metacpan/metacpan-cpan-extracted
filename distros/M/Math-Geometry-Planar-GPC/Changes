@@ -1,0 +1,18 @@
+Revision history for Perl extension GPC.
+
+1.00  Fri Sep  6 14:36:09 2002
+	- First relesaseon
+
+1.01  Fri Sep 27 12:30:05 2002
+        - Change equal signs to hash signs in comments
+          (comment lines starting with '=' caused some
+           automated module tests to produce errors)
+
+1.02  Wed Oct  2 10:12:35 2002
+        - Added tests
+
+1.03  Sun Oct  6 13:10:17 2002
+        - Changed namespace to Math::Geometry::GPC
+
+1.04  Sun Jun 12 10:30:17 2003
+        - Changed namespace to Math::Geometry::Planar::GPC

@@ -1,0 +1,13 @@
+  [
+    {
+      "type" : "select",
+      "name" : "language",
+      "data" : [
+        "de",
+        "en"
+      ],
+      "attributes" : {
+          "class" : "W75px"
+      }
+    }
+  ]

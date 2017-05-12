@@ -1,0 +1,4 @@
+alias bill "Bill Smith"<george@nowhere.com>
+alias george "george"<george@nowhere.com>
+alias mygroup bob@nowhere.com,george,bill
+

@@ -1,0 +1,16 @@
+0.005     2017-03-21 01:17:50 EDT
+  - Include Sereal::Encoder and Sereal::Decoder versions in tests for debugging purposes
+
+0.004     2016-12-28 22:25:15 EST
+  - Remove experimental designation from module.
+
+0.003     2016-09-27 01:55:58 EDT
+  - Remove subclass interface in favor of exported $_subprocess method
+    (This module does say EXPERIMENTAL!)
+  - Export $_subprocess method by default
+
+0.002     2016-09-27 00:34:55 EDT
+  - Export $_subprocess method as drop-in for Mojo::IOLoop->subprocess()
+
+0.001     2016-09-19 21:44:22 EDT
+  - First release

@@ -1,0 +1,4 @@
+#!/usr/bin/perl
+# 45UBxJY - b64 (CoNVert decimal string parameter to base-64) as part of the Math::BaseConvert package
+use strict; use warnings; use Math::BaseConvert qw(b64);
+my $numb = shift; die("USAGE: `b64 <DecimalNumberStringToConvertToBase64>`\n") if(!defined($numb) || $numb =~ /^-+[h\?]/i); print(b64($numb));

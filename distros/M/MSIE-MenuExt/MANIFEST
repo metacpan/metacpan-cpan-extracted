@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/MSIE/MenuExt.pm
+t/00_compile.t
+t/01.reg
+t/01_menuext.t

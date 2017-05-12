@@ -1,0 +1,9 @@
+<div id="search">
+<form method="get" action="[% base %]/[% classmetadata.table %]/search/">
+<fieldset>
+<legend>Search</legend>
+    [% INCLUDE display_search_inputs; %] 
+    <input type="submit" name="search" value="search"/>
+</fieldset>
+</form>
+</div>

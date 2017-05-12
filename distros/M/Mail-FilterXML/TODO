@@ -1,0 +1,6 @@
+add subject filtering - done (ebs)
+add actions to filters - done (ebs)
+allow multiple actions per filter - done (ebs)
+better documentation
+safer action handling. Maybe a safe directory configuration directive
+

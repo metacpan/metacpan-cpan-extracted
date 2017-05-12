@@ -1,0 +1,54 @@
+{
+   "abstract" : "Interface with Disqus comments from your Mojolicious app",
+   "author" : [
+      "Ben van Staveren <madcat@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Disqus",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31",
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojo::Base" : 0,
+            "Net::Disqus" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/benvanstaveren/Mojolicious-Plugin-Disqus/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/Mojolicious-Plugin-Disqus/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/benvanstaveren/Mojolicious-Plugin-Disqus.git",
+         "web" : "https://github.com/benvanstaveren/Mojolicious-Plugin-Disqus"
+      }
+   },
+   "version" : "1.22"
+}
+

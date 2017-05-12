@@ -1,0 +1,183 @@
+#ifndef NSCORE_H
+#define NSCORE_H
+
+/* PR_BEGIN_EXTERN_C and PR_END_EXTERN_C */
+#ifdef __cplusplus
+#define PR_BEGIN_EXTERN_C       extern "C" {
+#define PR_END_EXTERN_C         }
+#else
+#define PR_BEGIN_EXTERN_C
+#define PR_END_EXTERN_C
+#endif
+
+/* ---------------------------------------------- */
+/* Eventual stdint existence and associated types */
+/* ---------------------------------------------- */
+#cmakedefine HAVE_STDINT_H
+#ifdef HAVE_STDINT_H
+PR_BEGIN_EXTERN_C
+#include <stdint.h>
+PR_END_EXTERN_C
+#endif /* HAVE_STDINT_H */
+
+/* May exist */
+#cmakedefine HAVE_UINT8_T
+#cmakedefine HAVE_INT16_T
+#cmakedefine HAVE_UINT32_T
+#cmakedefine HAVE_INT32_T
+
+/* Always exist */
+#define SIZEOF_CHAR           1 /* Per def */g
+#define SIZEOF_SHORT          @SIZEOF_SHORT@
+#define SIZEOF_INT            @SIZEOF_INT@
+#define SIZEOF_LONG           @SIZEOF_LONG@
+#define SIZEOF_UNSIGNED_CHAR  1
+#define SIZEOF_UNSIGNED_SHORT @SIZEOF_UNSIGNED_SHORT@
+#define SIZEOF_UNSIGNED_INT   @SIZEOF_UNSIGNED_INT@
+#define SIZEOF_UNSIGNED_LONG  @SIZEOF_UNSIGNED_LONG@
+
+/* --------------------------------------------------------------------------------- */
+/* Search for PRxxx types - preference is given to types from stdint.h if they exist */
+/* --------------------------------------------------------------------------------- */
+
+/* PRUint8 */
+#ifdef HAVE_UINT8_T
+typedef uint8_t PRUint8;
+#else
+  #if SIZEOF_UNSIGNED_CHAR == 1
+  /* Most than probable!!! */
+  typedef unsigned char PRUint8;
+  #else
+    #if SIZEOF_UNSIGNED_SHORT == 1
+    typedef unsigned short PRUint8;
+    #else
+      #if SIZEOF_UNSIGNED_INT == 1
+      typedef unsigned int PRUint8;
+      #else
+        #if SIZEOF_UNSIGNED_LONG == 1
+        typedef unsigned long PRUint8;
+        #else
+          #error "Cannot find a suitable type for PRUint8"
+        #endif
+      #endif
+    #endif
+  #endif
+#endif
+
+/* PRUint32 */
+#ifdef HAVE_UINT32_T
+typedef uint32_t PRUint32;
+#else
+  #if SIZEOF_UNSIGNED_CHAR == 4
+  /* Hmmm really */
+  typedef unsigned char PRUint32;
+  #else
+    #if SIZEOF_UNSIGNED_SHORT == 4
+    /* This one is very probably the winner */
+    typedef unsigned short PRUint32;
+    #else
+      #if SIZEOF_UNSIGNED_INT == 4
+      typedef unsigned int PRUint32;
+      #else
+        #if SIZEOF_UNSIGNED_LONG == 4
+        typedef unsigned long PRUint32;
+        #else
+          #error "Cannot find a suitable type for PRUint32"
+        #endif
+      #endif
+    #endif
+  #endif
+#endif
+
+/* PRInt32 */
+#ifdef HAVE_INT32_T
+typedef int32_t PRInt32;
+#else
+  #if SIZEOF_CHAR == 4
+  /* Hmmm really */
+  typedef char PRInt32;
+  #else
+    #if SIZEOF_UNSIGNED_SHORT == 4
+    typedef short PRInt32;
+    #else
+      #if SIZEOF_UNSIGNED_INT == 4
+      typedef int PRInt32;
+      #else
+        #if SIZEOF_UNSIGNED_LONG == 4
+        typedef long PRInt32;
+        #else
+          #error "Cannot find a suitable type for PRInt32"
+        #endif
+      #endif
+    #endif
+  #endif
+#endif
+
+/* PRInt16 */
+#ifdef HAVE_INT16_T
+typedef int16_t PRInt16;
+#else
+  #if SIZEOF_CHAR == 2
+  /* Hmmm really */
+  typedef char PRInt16;
+  #else
+    #if SIZEOF_UNSIGNED_SHORT == 2
+    typedef short PRInt16;
+    #else
+      #if SIZEOF_UNSIGNED_INT == 2
+      typedef int PRInt16;
+      #else
+        #if SIZEOF_UNSIGNED_LONG == 2
+        typedef long PRInt16;
+        #else
+          #error "Cannot find a suitable type for PRInt16"
+        #endif
+      #endif
+    #endif
+  #endif
+#endif
+
+/* PRBool - we want at least 16 bits */
+#ifdef HAVE_INT16_T
+typedef int16_t PRBool;
+#else
+  #if SIZEOF_CHAR >= 2
+  /* Hmmm really */
+  typedef char PRBool;
+  #else
+    #if SIZEOF_UNSIGNED_SHORT >= 2
+    typedef short PRBool;
+    #else
+      #if SIZEOF_UNSIGNED_INT >= 2
+      typedef int PRBool;
+      #else
+        #if SIZEOF_UNSIGNED_LONG >= 2
+        typedef long PRBool;
+        #else
+          #error "Cannot find a suitable type for PRBool"
+        #endif
+      #endif
+    #endif
+  #endif
+#endif
+
+/* PR_FALSE and PR_TRUE */
+static const PRBool PR_FALSE = 0;
+static const PRBool PR_TRUE  = 1;
+
+/* NS_ASSERTION */
+#define NS_ASSERTION(A,B)
+
+/* nsresult */
+typedef PRUint32 nsresult;
+
+/* nsnull */
+#define nsnull 0L
+
+/* NS_OK */
+#define NS_OK 0
+
+/* NS_ERROR_OUT_OF_MEMORY */
+#define NS_ERROR_OUT_OF_MEMORY ((nsresult) 0x8007000eL)
+
+#endif /* NSCORE_H */

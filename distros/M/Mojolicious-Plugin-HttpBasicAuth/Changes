@@ -1,0 +1,37 @@
+Revision history for Mojolicious-Plugin-HttpBasicAuth
+
+0.12    2015-03-25        
+        fixed warning for delayed rendering
+
+0.11    2014-01-21
+        POD fixed
+
+0.10    2014-01-21
+        Added realm to validation sub
+
+0.09    2014-01-16
+        fixed typo in POD
+
+0.08    2013-11-18
+        updated POD
+
+0.07    2013-11-18
+        moved to github
+
+0.06    2013-11-17
+        Test Requirements fixed
+
+0.05    2013-11-15
+        Some Fixes
+
+0.04    2013-11-15
+        dependencies where missing
+
+0.03    2013-11-15
+        improvements
+
+0.02    2013-11-15
+        version fixed
+
+0.01    2013-11-15
+        First version released

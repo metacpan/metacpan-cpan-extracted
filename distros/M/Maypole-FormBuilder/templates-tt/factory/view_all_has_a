@@ -1,0 +1,18 @@
+[% RETURN UNLESS  object.hasa_columns %]
+[% labels = config.table_labels %]
+
+<div class="fleft">
+[% PERL %]
+	$stash->set('colnames', map { $_->name } $stash->get('object')->hasa_columns);
+[% END %]
+
+[% FOREACH related_accessor IN colnames %]
+[% related = object.$related_accessor %] 
+[% table = related.table %]
+<div class="ViewTable">
+<h3>[% labels.$table %]</h3>
+[% request.quick_table( 'vertical', 1, 'object', related, 'labels',  'L' ) %]
+</div>
+[% END %]
+</div>
+

@@ -1,0 +1,6 @@
+name = "Mojolicious-Plugin-Materialize"
+# badges = ["travis"]
+authority="cpan:MUDLER"
+
+module_maker="ExtUtilsMakeMaker"
+

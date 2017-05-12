@@ -1,0 +1,34 @@
+---
+abstract: 'A Path::Class type library for Mouse'
+author:
+  - 'NAKAGAWA Masaki <masaki@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.94
+  Test::UseAllModules: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MouseX-Types-Path-Class
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  MouseX::Getopt: 0.2200
+requires:
+  Mouse: 0.39
+  MouseX::Types: 0.02
+  Path::Class: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/masaki/mousex-types-path-class.git
+version: 0.07

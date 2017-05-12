@@ -1,0 +1,49 @@
+Revision history for MooseX-Types-Path-Tiny
+
+0.012     2017-04-05 23:17:14Z
+    - repository migrated to the github moose organization
+    - switch from Test::Requires to Test::Needs in tests
+    - add MooseX::Getopt option type maps when MooseX::Getopt is installed
+      (thanks, Gregory Oschwald!)
+
+0.011     2014-08-30 03:17:07Z
+    - documentation amendments (thanks, Demian Riccardi!)
+    - add missing prereq declaration
+
+0.010     2014-02-16 22:02:29Z
+    - fixed if eval problem in "use if" in 0.009
+
+0.009     2014-02-16 21:57:00Z
+    - only clean namespaces when MooseX::Types is new enough that our declared
+      types are installed as methods
+
+0.008     2014-02-16 21:20:46Z
+    - new Paths, AbsPaths types, for coercable ArrayRefs
+
+0.007     2013-12-22 00:44:49Z
+    - add missing authority data to module and metadata
+
+0.006     2013-06-21 22:01:15Z
+    - re-release with my plugin bundle, fixing associated metadata.
+
+0.005     2013-06-21 20:11:26Z
+    - split apart MooseX::Types::Path::Tiny and Types::Path::Tiny into their
+      own distributions. This dist has reverted back to
+      MooseX-Types-Path-Tiny as of version 0.002, and to using MooseX::Types
+      -- the Type::Tiny version is available in the separate Types-Path-Tiny
+      distribution.
+    - Perl prereq remains at v5.8.1
+
+0.004     2013-06-21 17:05:55Z
+    - Bumped Type::Tiny prereq to avoid known bugs in it
+
+0.003     2013-06-20 20:01:13Z
+    - Converted to Type::Tiny; works with Moose or Moo now
+    - Dropped Perl prereq to v5.8.1
+
+0.002     2013-02-12 14:35:41Z
+    - Bump Moose version prereq to 2, just in case anyone out there still
+      has version 1 installed.
+
+0.001     2013-01-31 15:45:24Z
+    - First release

@@ -1,0 +1,53 @@
+/* ================================================================== */
+/* THEME: Green2
+ * dark_on_light
+ */
+@import 'functions';
+@import 'theme_green';
+@import 'fonts_green2';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: #229922;
+$verge-fg: set-fg($verge-bg);
+$verge-border: #005500;
+$button-bg: darken($verge-bg, 10);
+$button-fg: set-fg($button-bg);
+$button-border: #003300;
+$verge-link-fg: set-link($verge-bg);
+$verge-link-visited: set-visited($verge-bg);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+}
+
+header,
+footer {
+	@extend .verge;
+	background-image: url(green2_h.jpg);
+}
+
+.side {
+	@extend .verge;
+	background-image: url(green2_side.jpg);
+}
+
+@include many-links($link-fg,$link-visited,$verge-link-fg,$verge-link-visited);
+@include fancy($verge-fg, $verge-bg, "green2_h.jpg");
+@include make-buttons;
+
+header nav li {
+	border-color: #116611;
+}
+header nav .selflink,
+header nav em,
+header nav .current a {
+	background-color: #66cc66;
+	color: #003333;
+}
+

@@ -1,0 +1,27 @@
+Changes
+lib/Mojolicious/Plugin/SQLiteViewerLite.pm
+lib/Mojolicious/Plugin/SQLiteViewerLite/Base.pm
+lib/Mojolicious/Plugin/SQLiteViewerLite/Base/Command.pm
+lib/Mojolicious/Plugin/SQLiteViewerLite/Base/Sqliteviewerlite.pm
+lib/Mojolicious/Plugin/SQLiteViewerLite/Command.pm
+lib/Mojolicious/Plugin/SQLiteViewerLite/public/js/jquery-1.9.1.js
+lib/Mojolicious/Plugin/SQLiteViewerLite/Sqliteviewerlite.pm
+lib/Mojolicious/Plugin/SQLiteViewerLite/templates/layouts/sqliteviewerlite/common.html.ep
+lib/Mojolicious/Plugin/SQLiteViewerLite/templates/sqliteviewerlite/default.html.ep
+lib/Mojolicious/Plugin/SQLiteViewerLite/templates/sqliteviewerlite/pagenavi.html.ep
+lib/Mojolicious/Plugin/SQLiteViewerLite/templates/sqliteviewerlite/select.html.ep
+lib/Mojolicious/Plugin/SQLiteViewerLite/templates/sqliteviewerlite/showcreatetables.html.ep
+lib/Mojolicious/Plugin/SQLiteViewerLite/templates/sqliteviewerlite/shownullallowedcolumns.html.ep
+lib/Mojolicious/Plugin/SQLiteViewerLite/templates/sqliteviewerlite/showprimarykeys.html.ep
+lib/Mojolicious/Plugin/SQLiteViewerLite/templates/sqliteviewerlite/showselecttables.html.ep
+lib/Mojolicious/Plugin/SQLiteViewerLite/templates/sqliteviewerlite/table.html.ep
+lib/Mojolicious/Plugin/SQLiteViewerLite/templates/sqliteviewerlite/tables.html.ep
+Makefile.PL
+MANIFEST			This list of files
+README
+t/basic.t
+t/connector.t
+t/load.t
+t/test.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

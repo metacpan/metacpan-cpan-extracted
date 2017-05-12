@@ -1,0 +1,187 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+module_info - find information about modules
+
+=head1 SYNOPSIS
+
+  module_info [B<-a>] [B<-s>] [B<-p>] [B<-m>] MODULE|FILE...
+
+=head1 DESCRIPTION
+
+List information about the arguments (either module names in the form
+C<Module::Name> or paths in the form C<Foo/Bar.pm> or C<foo/bar.pl>).
+
+By default only shows module name, version, directory, absolute path
+and a flag indicating if it is a core module. Additional information
+can be requested through command line switches.
+
+=over 4
+
+=item B<-s>
+
+Show subroutines created by the module.
+
+=item B<-p>
+
+Show packages created by the module.
+
+=item B<-m>
+
+Show modules C<use()>d by the module.
+
+=item B<-a>
+
+Equivalent to C<-s -p -m>.
+
+=back
+
+=head1 AUTHOR
+
+Mattia Barbon <mbarbon@cpan.org>
+
+=head1 SEE ALSO
+
+L<Module::Info>
+
+=cut
+
+use strict;
+use Module::Info;
+use Getopt::Long;
+
+my( $show_subroutines, $show_modules, $show_packages, $show_all, $help );
+
+GetOptions( 's' => \$show_subroutines,
+            'p' => \$show_packages,
+            'm' => \$show_modules,
+            'a' => \$show_all,
+            'h' => \$help,
+          );
+
+if( $help || !@ARGV ) {
+    print <<EOT;
+Usage: module_info [-a] [-s] [-p] [-m] MODULE|FILE...
+
+    -a Equivalent to -s -p -m
+    -h Help message
+    -m Show modules use()d by the module
+    -p Show packages created by the module
+    -s Show subroutines created by the module
+EOT
+    exit 0;
+}
+
+$show_subroutines ||= $show_all;
+$show_modules ||= $show_all;
+$show_packages ||= $show_all;
+
+my $some_error = 0;
+
+foreach my $module (@ARGV) {
+    my $info;
+
+    if( -f $module ) {
+        $info = Module::Info->new_from_file($module);
+    }
+    else {
+        $info = Module::Info->new_from_module($module);
+    }
+
+    unless( $info ) {
+        warn "Can't create Module::Info object for module '$module'";
+        $some_error = 1;
+        next;
+    }
+
+    $info->die_on_compilation_error(1);
+
+    my $name = $info->name || $module;
+    my $version = $info->version || '(unknown)';
+    my $dir = $info->inc_dir;
+    my $file = $info->file;
+    my $is_core = $info->is_core ? "yes" : "no";
+
+    print <<EOT;
+
+Name:        $name
+Version:     $version
+Directory:   $dir
+File:        $file
+Core module: $is_core
+EOT
+
+    my %packages_created;
+    my @modules_used;
+    my %subroutines;
+
+    eval {
+        @modules_used = $info->modules_used if $show_modules;
+        %packages_created = $info->package_versions if $show_packages;
+        %subroutines = $info->subroutines if $show_subroutines;
+    };
+    if( $@ ) {
+        warn "Compilation failed for module '$module'";
+        $some_error = 1;
+        next;
+    }
+
+    ###########################################################################
+    # Modules used
+    ###########################################################################
+    if( $show_modules ) {
+        print "\nModules used:\n";
+        foreach my $m (sort @modules_used) {
+            print "    $m\n";
+        }
+        print "    (none)\n" unless @modules_used;
+    }
+
+    ###########################################################################
+    # Packages defined
+    ###########################################################################
+    if( $show_packages ) {
+        print "\nPackages created:\n";
+        foreach my $p (sort keys %packages_created) {
+            print "    $p\t";
+            print +( defined( $packages_created{$p} ) ?
+                                $packages_created{$p} :
+                                      '(no version)' );
+            print "\n";
+        }
+        print "    (none)\n" unless keys %packages_created;
+    }
+
+    ###########################################################################
+    # Subroutines
+    ###########################################################################
+    if( $show_subroutines ) {
+        print "\nSubroutines defined:\n";
+        {
+            my @subroutines =
+              sort  { ( $a->[0] cmp $b->[0] ) || ( $a->[1] cmp $b->[1] ) }
+              map   {
+                        my($package, $subname) = ($_ =~ m/^(.*)?::(\w+)$/);
+                        warn "Strange subroutine '$_'"
+                          unless $package || $subname;
+                        $package ||= '(unknown)';
+                        $subname ||= '(unknown)';
+                        [ $package, $subname ];
+                    } keys %subroutines;
+            my $prev_package = ':'; # impossible
+            foreach my $s (@subroutines) {
+                my($package, $subname) = @$s;
+                if($prev_package ne $package) {
+                    $prev_package = $package;
+                    print "    $package\n";
+                }
+
+                print "        $subname\n";
+            }
+        }
+        print "    (none)\n" unless %subroutines;
+    }
+}
+
+exit $some_error;

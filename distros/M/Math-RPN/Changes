@@ -1,0 +1,82 @@
+Revision history for Perl extension Math::RPN.
+
+1.11 2012.07.27
+    - cosmetic changes
+    - Move to Github
+
+1.10 2009.04.25
+
+    - Some documentation cleanup.
+    - The warning about XOR removed, tests added
+    - Warning about ^ being "power" and bitwise xor is added.
+    - Add more tests
+
+1.09 2009.04.22
+    - Maintainership received by Gabor Szabo
+    - Testing framework changed to Test::More
+
+1.08  Sun Jul 29 12:29:00 2001
+    - Should have tested the POD before checking it in.  (!)
+
+1.07  Sun Jul 29 12:12:00 2001
+    - Added ones-compliment functionality
+
+    - Synchronized ALL files SCCS versions
+
+1.06  Sun Jul 29 11:52:00 2001
+    - Integrated into SCCS (versions above don't necessarily match,
+      versions below will).
+
+    - Created build directory with SCCS files
+
+    - Created mkdist script to compute version and create file for
+      upload to CPAN.
+
+
+1.05  Fri Jul 27 15:49:00 2001
+    - Added additional mathematical functionality
+        ABS
+        INCR/++
+        DECR/--
+        AND/&
+        OR/|
+        NOT/!
+        TAN
+        INT
+        RAND
+        LRAND
+
+    - Added XOR as experimental.  Perl's XOR doesn't seem to behave
+      as expected.  As such, XOR isn't tested, but there's a commented
+      out test for it.  If you know what's wrong with PERL XOR, or what
+      I did wrong in the code, please email owen@delong.com.  Thanks!
+
+    - Enhanced diagnostics
+
+
+1.04  Thu Jul 26 08:17:00 2001
+    - Modified calling sequence to support standard PERL list passing
+      style so that you can pass any number of scalars in and they
+      will be treated as one big RPN expression.
+
+    - Improved compile efficiency by moving stack checks to subroutine
+
+    - Expanded documentation detail
+
+
+1.03  Wed Jul 25 17:46:00 2001
+    - Updated Changes file to include information on 1.01 and 1.02
+
+1.02  Tue Jul 24 21:26:00 2001
+    - Made modifications to test.pl to try and resolve problems
+      created by differences in rounding on different platforms.
+
+1.01  Mon Jul 23 16:25:00 2001
+    - Improved documentation and cleaned up some errors in the POD
+
+1.00  Mon Jul 16 23:33:00 2001
+    - Template filled in and module ready for testing as Math::RPN
+
+0.01  Mon Jul 16 23:08:27 2001
+    - original version; created by h2xs 1.19
+

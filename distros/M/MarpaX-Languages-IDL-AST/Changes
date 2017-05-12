@@ -1,0 +1,183 @@
+Changelog for MarpaX-Languages-IDL-AST
+
+0.007 2017-04-12T18:32:26
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Switch to File::ShareDir, closes #1
+ - dev+
+ - Role/Consumer.pm
+ - Impl/_Default.pm: MooX::DefaultVia removal
+ - Impl/Perl5,pm: fix _pushLine
+ - Impl/Perl5.pm: CPPSTYLEDIRECTIVE
+ - IDL/AST.pm: Support cpp commands at the end
+ - dev+: default is the concatenation
+ - Impl/Perl5.pm: trigger_level call misses @_
+ - Impl/_Default.pm: Make trigger_level aroundable
+ - Impl/_Default.pm: Externalize trigger_level
+ - Impl/_Default.pm: Logging
+ - IDL/AST.pm: temporary code to test the Data::Scan implementation
+ - Impl/Perl5,pm: definition of the global namespace
+ - Impl/Perl5.pm: perl5 transpiling dev+
+ - Perl5/_Perl5Types.pm: Perl5 architectural types
+ - Impl/_Default.pm: Try to make sure internal attributes would not clash
+   with eventual subclasses
+ - Perl5/_BaseTypes.pm: IDL_charType optimization
+ - Perl5/_BaseTypes.pm: Type::Tiny version of IDL base types
+ - Role/Consumer.pm: Removed
+ - Data::Scan implementation: dev+
+ - Role/Consumer.pm: output -> outputDir
+ - Impl/Perl5.pm: template
+ - Role/Consumer.pm: Data::Scan::Role::Consumer API compliance
+ - Role/Consumer.pm: use Data::Scan 0.003
+ - Role/Consumer.pm: Data::Scan consumer
+ - perl5.tt2: init of scopednamePerscope.
+ - Moose/namespace.tt2: do not systematically import
+ - dist.ini: more prereqs
+ - import: dev+
+ - dist.ini: Unparsable version for Win32::ShellQuote
+
+0.006 2016-02-05T05:29:24Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - dist.ini: more prereqs that AutoPrereqs cannot guess
+ - perl5.tt2: where => sub {} instead of where => {}
+ - _declaratorToIdentifier & _declaratorToType
+ - import.tt2
+ - Cosmetic typos
+ - Comment about the void keyword
+ - Tokens externalization
+ - Add MX_PARAMS_VALIDATE_CACHE_KEY to pos_validated_list() calls
+ - say an OO style is required
+ - posValidatedList bis
+ - useClassAttribute
+ - useSpecializedType
+ - useBaseTypes again
+ - initGlobalVariables and initNameSpace
+ - useBaseTypes.tt2
+ - moosex renamed to perl5
+ - follow INCLUDE_PATH
+ - op.tt2: more generic
+ - op.tt2 dev+
+ - bin/idl2moose: xF6 character in source -;
+ - Moose/op.tt2: return; instead of return undef;
+ - bin/idl2moose: encoding issues
+ - IDL/AST.pm: support string in input
+ - moosex.tt2: wideStringLiteral
+ - stringLiteral fix detected for "import" directive
+ - moosex.tt2: dev+ prefer sub {} for default
+ - moosex.tt2: dev+ fixed for arraysized declarator
+
+0.005 2015-01-11T01:19:05Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Always do $self->$orig(@_) in Moose implementation
+
+0.004 2015-01-11T00:52:12Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - When validating parameters, allow extra parameters in the Moose
+   implementation
+ - etc: oups, wrong repo...
+ - etc/m4.idl: IDL t+
+
+0.003 2015-01-09T19:15:25Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - share/dist/MarpaX-Languages-IDL-AST/moosex.tt2: removed unused block
+   enumTypeOrig
+ - share/dist/MarpaX-Languages-IDL-AST/moosex.tt2: structType fix
+ - share/dist/MarpaX-Languages-IDL-AST/moosex.tt2: Removed unused
+   namespaceArg2
+ - use File::ShareDir::ProjectDistDir + a fix in template for structType
+
+0.002 2014-08-09T15:30:56Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - AST.pm: fix for sharedir
+ - bin/idl2moose: fix for -o option
+ - bin/idl2moose: fix example
+
+0.001 2014-08-09T09:26:39Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Release of version 0.001
+ - For initial release
+ - bin/idl2moose: fix output on STDOUT
+ - bin/idl2moose
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - data/dom.idl: Dom Level 3 Core
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - dev+
+ - t/dom.t: remove Dumper()
+ - Add bessing and move parse() to a direct ast() method
+ - wide_string fix
+ - dev+
+ - dev+
+ - dev+

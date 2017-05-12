@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Mojolicious/Plugin/BootstrapPagination.pm
+t/00_compile.t
+t/01_bootstrap_pagination.t
+t/02_global_attributes.t
+t/03_i18n.t
+t/04_i18n.t
+t/lib/Dokechin/I18N/en.pm
+META.yml
+MANIFEST

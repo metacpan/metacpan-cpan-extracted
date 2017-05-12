@@ -1,0 +1,201 @@
+#!/usr/bin/perl -w
+# vi:et:sw=4 ts=4
+
+=head1 NAME
+
+marcdump - MARC record dump utility
+
+=head1 SYNOPSIS
+
+B<marcdump> [options] file(s)
+
+=cut
+
+use strict;
+use integer;
+
+use Encode;
+use MARC::File;
+use MARC::File::USMARC;
+use MARC::Record;
+use Getopt::Long;
+
+## flag STDOUT for UTF8
+
+my $opt_print = 1;
+my $opt_hex = 0;
+my $opt_quiet = 0;
+my $opt_stats = 1;
+my @opt_field = ();
+my $opt_help = 0;
+my $opt_lif = 0;
+
+my $rc =
+    GetOptions(
+        "version"   => sub { print "$0, using MARC::Record v$MARC::Record::VERSION\n"; exit 1; },
+        "print!"    => \$opt_print,
+        "hex!"      => \$opt_hex,
+        "lif!"      => \$opt_lif,
+        "quiet!"    => \$opt_quiet,
+        "stats!"    => \$opt_stats,
+        "field=s"   => \@opt_field,
+        "debug!"    => \$MARC::Record::DEBUG,
+        "help"      => \$opt_help,
+    );
+
+my @files = @ARGV;
+if ( $opt_help || !@files || !$rc ) {
+    print <DATA>;
+    exit 1;
+}
+
+my $wants_leader = grep { /LDR/ } @opt_field;
+
+my $class = $opt_lif ? "MARC::File::MicroLIF" : "MARC::File::USMARC";
+eval "require $class"; # Must be quoted to get path searching
+
+my %counts;
+my %errors;
+for my $filename ( @files ) {
+    $counts{$filename} = 0;
+    $errors{$filename} = 0;
+
+    warn "$filename\n" unless $opt_quiet;
+
+    my $file = $class->in( $filename ) or die $MARC::File::ERROR;
+
+    while ( my $marc = $file->next() ) {
+        ++$counts{$filename};
+        warn "$counts{$filename} records\n" if ( !$opt_quiet && ($counts{$filename} % 1000 == 0) );
+
+        if ( @opt_field ) {
+            $marc = $marc->clone( @opt_field );
+            $marc->leader('') unless $wants_leader;
+        }
+
+        if ( $opt_print ) {
+            if ( $opt_hex ) {
+                print_hex( $marc );
+            }
+            else {
+                # stifle warnings here in case there's utf8 data being printed
+                no warnings;
+                print $marc->as_formatted, "\n\n";
+            }
+        }
+
+        if ( $marc->warnings() ) {
+            ++$errors{$filename};
+            print join( "\n", $marc->warnings(), "" );
+        }
+    } # while
+    $file->close();
+} # for
+
+if ( $opt_stats ) {
+    print " Recs  Errs Filename\n";
+    print "----- ----- --------\n";
+    for my $key ( sort keys %counts ) {
+        printf( "%5d %5d %s\n", $counts{$key}, $errors{$key}, $key );
+    } # for
+} # if stats
+
+
+sub print_hex {
+    my $marc = shift;
+    my $raw = $marc->as_usmarc();
+
+    print "\n";
+
+    my $offset = 0;
+
+    # dump the leader
+    my $leader = bytes::substr( $raw, 0, MARC::Record::LEADER_LEN );
+    my $part1 = bytes::substr( $leader, 0, 12 );
+    my $part2 = bytes::substr( $leader, 12 );
+    _hex_line_output( $offset,    _to_hex($part1), _to_ascii($part1), 48 );
+    _hex_line_output( $offset+12, _to_hex($part2), _to_ascii($part2), 48 );
+    $offset += MARC::Record::LEADER_LEN;
+
+    # dump the directory.  If we can't find end-of-field character that
+    # follows the directory, everything following the leader (which we
+    # have already dumped) will be dumped as part of the data section.
+    my $dir_end = bytes::index( $raw, MARC::File::USMARC::END_OF_FIELD, MARC::Record::LEADER_LEN );
+    if ( $dir_end >= 0 ) {
+        for ( my $n = $offset; $n < $dir_end; $n += MARC::File::USMARC::DIRECTORY_ENTRY_LEN ) {
+
+            my $dir_entry = bytes::substr( $raw, $n, MARC::File::USMARC::DIRECTORY_ENTRY_LEN );
+
+            my $hex = _to_hex( $dir_entry );
+
+            my $ascii =
+                bytes::substr( $dir_entry, 0, 3 ) . ' ' .
+                bytes::substr( $dir_entry, 3, 4 ) . ' ' .
+                bytes::substr( $dir_entry, 7, 5 )
+            ;
+
+            _hex_line_output( $offset, $hex, $ascii, 48 );
+            $offset += MARC::File::USMARC::DIRECTORY_ENTRY_LEN;
+        }
+
+        # dump the end-of-field character that follows the directory
+        _hex_line_output( $offset, _to_hex(MARC::File::USMARC::END_OF_FIELD), '.', 48 );
+        ++$offset;
+    }
+
+    # dump the data
+    my $data_offset = 0;
+    while ( $offset < bytes::length($raw) ) {
+        my $chunk = bytes::substr( $raw, $offset, 16 );
+        _hex_line_output( $data_offset, _to_hex($chunk), _to_ascii($chunk), 48 );
+        $offset += 16;
+        $data_offset += 16;
+    }
+}
+
+sub _to_ascii {
+    my $raw = shift;
+    if ( defined $raw ) {
+        $raw =~ s/[\x00-\x1f\x7f-\xff]/./g;
+    }
+    return $raw;
+}
+
+sub _to_hex {
+    my $raw = shift;
+    my $result = '';
+
+    if ( defined $raw ) {
+        for ( my $n = 0; $n < bytes::length($raw); $n++ ) {
+            $result .= sprintf( '%02x ', ord(bytes::substr($raw, $n, 1)) );
+        }
+    }
+    $result =~ s/ $//;
+
+    return $result;
+}
+
+sub _hex_line_output {
+    my $offset = shift;
+    my $hex = shift;
+    my $ascii = shift;
+    my $width = shift;
+
+    printf( "%05d: %-$width.${width}s %s\n", $offset, $hex, $ascii );
+}
+
+
+__END__
+Usage: marcdump [options] file(s)
+
+Options:
+    --[no]print     Print a MicroLIF-style dump of each record
+    --[no]hex       If --print active, make the output hexadecimal
+    --lif           Input files are MicroLIF, not USMARC
+    --field=spec    Specify a field spec to include.  There may be many.
+                    Examples:
+                        --field=245 --field=1XX
+    --[no]quiet     Print status messages
+    --[no]stats     Print a statistical summary by file at the end
+    --version       Print version information
+    --help          Print this summary

@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 27f73198e217423061ddce2fc7c23db5724e3cd4 BUGS
+SHA1 c8fc81d8c912bf3b8b4fdf8a22c9105bffd32603 CHANGES
+SHA1 d7c83d8f89b92a3262a01eb2778d39402e77263a LICENSE
+SHA1 a2ed822b605636b0e9885b7ddc0c036086300c50 MANIFEST
+SHA1 2a97695db68802c5abd54d846f6fd7af88128a98 MANIFEST.SKIP
+SHA1 0e3143faa51a2b8012c65df452d300263a50e2cf META.json
+SHA1 bc74dcacc85627022834485d579190bd6fe13149 META.yml
+SHA1 64b8d8bb1873ca0b4bcec74aaeebcc4d510dc547 Makefile.PL
+SHA1 b6fa6ca5e4f70bd49f1e7d6a3cde3cd9e01936f5 README
+SHA1 2f2aa6a1b56f1b31bcffc30399813768ea310747 TODO
+SHA1 885a982347ad2f83c9b1068a19e5d1725e8ffdf1 lib/Math/BigRat.pm
+SHA1 269da3400f1967b91dc3b6dd97fecd46b3242aee t/00sig.t
+SHA1 bc4d299a2e45cc68c9eb737e5a8f31bcfbf192ee t/01load.t
+SHA1 237e24044b9cc602f739d4eff3f6f1bd3b51f16e t/02pod.t
+SHA1 b8c080d10916f6def84488665294efd351484730 t/03podcov.t
+SHA1 0729dd26a48eac5e596d19b39f21c5d582479fe4 t/Math/BigRat/Test.pm
+SHA1 b6ab5e829a13f0f817f5767b1e6a4f976b3c3a32 t/author-blog-mbr.t
+SHA1 6ea87e1558998780c460e157381459697ad9e66c t/author-relop-mbr.t
+SHA1 b03c383e8318d3540650ed790c5a2ab86adf6009 t/big_ap.t
+SHA1 215aa1e5ae87e05d16bb078ad89717d62a739bfc t/bigfltpm.inc
+SHA1 acc91c97ae813ab5f4e598d1535534a50a5f75da t/bigfltrt.t
+SHA1 33c04c0c45bc55605dbae8d0744c7157b87cd3ba t/biglog.t
+SHA1 df31dc401da573b271c32489cbce99b4e3c3d5e9 t/bigrat.t
+SHA1 9afc29c7de3868de5f90a45cda9cbd87672213b8 t/bigratpm.inc
+SHA1 3f9fd8cd7c3ae1aa148420d26496480f94cd636f t/bigratpm.t
+SHA1 9afd485984510e56eb403b7551f171cf0a78157d t/bigratup.t
+SHA1 0e79d4c8d4b5f94e66a6c464972e51857fdd4107 t/bigroot.t
+SHA1 3591b395ee9b3f581e6fdeacb6feef4ad8296670 t/bitwise.t
+SHA1 f6ab368cc8193522c93ce16a35d388148543b8f2 t/hang.t
+SHA1 3d2f66d534b29d1612427f280be8bb4fb20d18e4 t/requirer.t
+SHA1 bec1ee4ff69fa1927f542f488244fad188c6e06b t/trap.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYtr5nAAoJEGcmPl2fr166qNQIAIAiOD+poAo4eFTQhTifaLOP
+HLC+x8uogG6KmIzU60fYWMOurTmGQ2nFMUUGSNre9bmY66yQ/syhC5OoFKlqCIoq
+UOWc7YU6miqtYIFVBMeEhpP0l4vOhVN7+RC/ROb7zgeS2L4ih4YwnkFGJTrYRdSA
+mXpWfxo2OJY4jfVRNNiGy2rqgZeMBh21VV1as5QUw32Y8WWvnNyPNiR4aHcKV77t
+AvLVDuZXUQrqv43WEYAQ3HCgz2fI3stR7n2JNjRHeeoALPdfQpu8iGDzPahyHh8H
+YhRYlPMM+hYHFSxkk5Iu8Wvr6YQaQ1BTc51gfGd2I7Q+BePlGMgZorKHtdSTI18=
+=uvpc
+-----END PGP SIGNATURE-----

@@ -1,0 +1,87 @@
+---
+abstract: 'Resource Identifier Parameterized role'
+author:
+  - 'Jean-Damien Durand <jeandamiendurand@free.fr>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MarpaX-Role-Parameterized-ResourceIdentifier
+no_index:
+  directory:
+    - t
+    - xt
+provides:
+  MarpaX::Role::Parameterized::ResourceIdentifier:
+    file: lib/MarpaX/Role/Parameterized/ResourceIdentifier.pm
+    version: '0.003'
+  MarpaX::Role::Parameterized::ResourceIdentifier::BNF:
+    file: lib/MarpaX/Role/Parameterized/ResourceIdentifier/BNF.pm
+    version: '0.003'
+  MarpaX::Role::Parameterized::ResourceIdentifier::Impl::Segment:
+    file: lib/MarpaX/Role/Parameterized/ResourceIdentifier/Impl/Segment.pm
+    version: '0.003'
+  MarpaX::Role::Parameterized::ResourceIdentifier::MarpaTrace:
+    file: lib/MarpaX/Role/Parameterized/ResourceIdentifier/MarpaTrace.pm
+    version: '0.003'
+  MarpaX::Role::Parameterized::ResourceIdentifier::Setup:
+    file: lib/MarpaX/Role/Parameterized/ResourceIdentifier/Setup.pm
+    version: '0.003'
+  MarpaX::Role::Parameterized::ResourceIdentifier::Types:
+    file: lib/MarpaX/Role/Parameterized/ResourceIdentifier/Types.pm
+    version: '0.003'
+requires:
+  Carp: '0'
+  Class::Method::Modifiers: '0'
+  Data::Dumper: '0'
+  Data::Printer: '0.36'
+  Encode: '2.21'
+  Import::Into: '0'
+  Marpa::R2: '0'
+  MarpaX::RFC::RFC3629: '0'
+  Module::Find: '0'
+  Module::Runtime: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  MooX::HandlesVia: '0'
+  MooX::Role::Logger: '0'
+  MooX::Role::Parameterized: '0'
+  MooX::Singleton: '0'
+  MooX::Struct: '0'
+  Net::IDN::Encode: '0'
+  Role::Tiny: '0'
+  Scalar::Util: '0'
+  Term::ANSIColor: '0'
+  Try::Tiny: '0'
+  Type::Library: '0'
+  Type::Params: '0'
+  Type::Utils: '0'
+  Types::Encodings: '0'
+  Types::Standard: '0'
+  Types::TypeTiny: '0'
+  Unicode::Normalize: '0'
+  constant: '0'
+  overload: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MarpaX-Role-Parameterized-ResourceIdentifier
+  homepage: https://metacpan.org/release/MarpaX-Role-Parameterized-ResourceIdentifier
+  repository: git://github.com/jddurand/marpax-role-parameterized-resourceidentifier.git
+version: '0.003'
+x_authority: cpan:JDDPAUSE

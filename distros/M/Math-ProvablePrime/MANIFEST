@@ -1,0 +1,11 @@
+.gitignore
+Changes
+MANIFEST
+Makefile.PL
+README.pod
+lib/Math/ProvablePrime.pm
+lib/Math/ProvablePrime/Rand.pm
+t/Math-ProvablePrime-Rand.t
+t/Math-ProvablePrime.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

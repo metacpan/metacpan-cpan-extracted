@@ -1,0 +1,43 @@
+NAME
+    MooseX::AutoImmute - Use Moose with make_immutable called for you.
+
+DESCRIPTION
+    Moose classes are littered with __PACKAGE__->meta->make_immutable(); at
+    the end. This is much like all packages ending with a true value. true
+    removes the boilerplate for packages, this removes the boilerplate for
+    Moose.
+
+SYNOPSYS
+        package MyPackage;
+        use strict;
+        use warnings;
+        use MooseX::AutoImmute;
+
+        has ...;
+
+        ...;
+
+        #EOF
+        # immutable autamatically!
+
+ALTERNATIVE MOOSE
+        package MyPackage;
+        use strict;
+        use warnings;
+
+        # This will import Custom::Moose instead of Moose.
+        use MooseX::AutoImmute qw/Custom::Moose/;
+
+AUTHORS
+    Chad Granum exodist7@gmail.com
+
+COPYRIGHT
+    Copyright (C) 2010 Chad Granum
+
+    MooseX-AutoImmute is free software; Standard perl licence.
+
+    MooseX-AutoImmute is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the license for
+    more details.
+

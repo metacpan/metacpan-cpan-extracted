@@ -1,0 +1,119 @@
+# Input_Method_Muldis_D.cin: Shortcuts for Muldis D Symbols
+#
+# This file is part of the Muldis D language and implementations manual.
+# Muldis D Manual is Copyright © 2002-2010, Muldis Data Systems, Inc.
+# http://www.muldis.com/
+#
+# See http://www.yale.edu/chinesemac/pages/input_methods.html#cin for an
+# explanation of this file's format.  See http://openvanilla.googlecode.com
+# /svn/trunk/Modules/SharedData/ehq-symbols.cin for the original example
+# file whose format (and a bit of content) this current one is based on.
+#
+%gen_inp
+%ename Muldis D Symbols
+%cname Muldis D Symbols
+%tcname Muldis D Symbols
+%scname Muldis D Symbols
+%encoding UTF-8
+%selkey 1234567890
+%keyname begin
+a a
+b b
+c c
+d d
+e e
+f f
+g g
+h h
+i i
+j j
+k k
+l l
+m m
+n n
+o o
+p p
+q q
+r r
+s s
+t t
+u u
+v v
+w w
+x x
+y y
+z z
+! !
+< <
+= =
+> >
+%keyname end
+%chardef begin
+inf     ∞
+false   ⊥
+true    ⊤
+empty   ∅
+nothing ∅
+eq =
+=  =
+ne ≠
+!= ≠
+lt <
+<  <
+gt >
+>  >
+le ≤
+<= ≤
+ge ≥
+>= ≥
+<=> <=>
+not     ¬
+!       ¬
+and     ∧
+nand    ⊼
+nand    ↑
+or      ∨
+nor     ⊽
+nor     ↓
+xnor    ↔
+iff     ↔
+xor     ⊻
+xor     ↮
+imp     →
+implies →
+nimp    ↛
+if      ←
+nif     ↚
+in      ∈
+nin     ∉
+has     ∋
+nhas    ∌
+sub     ⊆
+nsub    ⊈
+super   ⊇
+nsuper  ⊉
+psub    ⊂
+npsub   ⊄
+psuper  ⊃
+npsuper ⊅
+intersect ∩
+union     ∪
+diff      ∖
+minus     ∖
+except    ∖
+exclude   ∆
+symdiff   ∆
+times     ×
+crossjoin ×
+prod      ×
+product   ×
+mul       ×
+div       ÷
+divide    ÷
+divideby  ÷
+join      ⋈
+semijoin  ⋉
+antijoin  ⊿
+semidiff  ⊿
+semiminus ⊿
+%chardef end

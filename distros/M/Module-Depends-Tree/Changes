@@ -1,0 +1,33 @@
+Revision history for Module-Depends-Tree
+
+1.00    Thu Nov 23 22:19:04 CST 2006
+
+[FIXES]
+
+Fixed my incorrect use of LWP::UserAgent.
+
+deptree now creates the temp directory before using it.
+
+The module list is now sorted strictly by module name, not the
+number of uses.
+
+Added a package list that shows all the modules used in that package.
+
+
+
+0.02    Sun Aug 20 09:54:14 CDT 2006
+
+[FIXES]
+Fixed the dependencies in Makefile.PL.  How embarrassing for a
+dependency tool to have bad dependencies!
+
+
+0.01    Sat Aug 19 23:48:49 CDT 2006
+
+This is a tool for digging into dependencies and showing a snazzy
+little tree.  I needed it to figure out all the dependencies in
+Socialtext Open (http://sourceforge.net/programs/socialtext/).
+
+It's very rough, and not very generalized.  Patches and input
+welcome.
+

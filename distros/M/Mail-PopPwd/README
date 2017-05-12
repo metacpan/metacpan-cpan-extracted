@@ -1,0 +1,31 @@
+This is the README file for the PERL module Mail::PopPwd for Version 0.03
+
+This is a poppassd client module for perl5. It provides an object-oriented
+interface to a poppassd daemon. It can be used to write perl-based clients
+to change users password (you can even use this for change passwords via 
+web clients). See the inline POD document for more details
+(perldoc Mail::PopPwd).
+
+
+Get and install the Poppassd daemon.
+http://echelon.pl/pubs/poppassd.html
+http://echelon.pl/pubs/poppassd-1.8.4.tar.gz
+
+Prerequisites
+
+In order to install and use this package you will need Crypt::Cracklib
+installed.
+
+To install Mail::PopPwd module type the following:
+
+% perl Makefile.PL
+% make
+% make test
+% make install
+
+Questions, bug reports, useful code bits, and suggestions for
+Mail::PopPwd hould just be sent to me at hdias@aesbuc.pt
+
+Copyright (c) 2003 Henrique Dias. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

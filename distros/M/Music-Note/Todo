@@ -1,0 +1,6 @@
+TODO list for Perl module Music::Note
+
+ more types - abc, solfa (do,re,mi,fa,so,la,ti), Indian (sa,re,ga,ma,pa,da,ni)
+ length manipulation
+
+

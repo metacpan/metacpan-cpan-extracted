@@ -1,0 +1,39 @@
+; vim: syntax=dosini
+name    = MooseX-Has-Sugar
+author  = Kent Fredric <kentnl@cpan.org>
+license = Perl_5
+copyright_holder = Kent Fredric <kentfredric@gmail.com>
+
+[@Author::KENTNL]
+:version = 2.016
+normal_form  = numify
+mantissa     = 6
+twitter_extra_hash_tags = #moose
+auto_prereqs_skip = MooseX::Types::Moose
+auto_prereqs_skip = Moose
+toolkit = eumm
+toolkit_hardness = soft
+bumpversions = 1
+srcreadme = mkdn
+Test::Compile::PerFile.test_template = 02-raw-require.t.tpl
+Test::Compile::PerFile.:version = 0.003902
+
+
+;version_major = 0
+;version_minor = 5
+;version_rel_year = 2009
+;version_rel_month = 5
+;version_rel_day = 15
+;version_rel_hour = 19
+;version_rel_time_zone = Pacific/Auckland
+
+[Prereqs / TestRecommends]
+MooseX::Types::Moose  = 0
+Moose                 = 0
+
+[Prereqs / DevelopRequires]
+MooseX::Types::Moose  = 0
+Moose                 = 0
+
+
+[Prereqs]

@@ -1,0 +1,20 @@
+Build.PL
+Changes
+devel/curversion
+devel/grepversion.sh
+devel/incrementversion.sh
+inc/Module/Build/Debian/Self.pm
+lib/Module/Build/Debian.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-Kwalitee.t
+t/00-YAML-META_valid.t
+t/00.load.t
+t/perlcritic.t
+t/perlcriticrc
+t/pod-coverage.t
+t/pod-spell.t
+t/pod.t
+t/stopwords-asksh.txt
+META.yml

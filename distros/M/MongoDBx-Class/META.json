@@ -1,0 +1,74 @@
+{
+   "abstract" : "Flexible ORM for MongoDB databases",
+   "author" : [
+      "Ido Perlmuter <ido@ido50.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MongoDBx-Class",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DateTime::Format::W3CDTF" : "0",
+            "Module::Load" : "0",
+            "Module::Pluggable" : "0",
+            "MongoDB" : "0.40",
+            "MongoDB::Collection" : "0",
+            "MongoDB::Connection" : "0",
+            "MongoDB::Cursor" : "0",
+            "MongoDB::Database" : "0",
+            "MongoDB::MongoClient" : "0",
+            "Moose" : "0",
+            "Moose::Exporter" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "Try::Tiny" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.006",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "DateTime" : "0",
+            "Test::More" : "0",
+            "Time::HiRes" : "0",
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/ido50/MongoDBx-Class",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ido50/MongoDBx-Class.git",
+         "web" : "https://github.com/ido50/MongoDBx-Class"
+      }
+   },
+   "version" : "1.030002"
+}
+

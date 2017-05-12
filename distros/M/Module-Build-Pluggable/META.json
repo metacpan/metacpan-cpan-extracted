@@ -1,0 +1,99 @@
+{
+   "abstract" : "Module::Build meets plugins",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.4.0",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Module-Build-Pluggable",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.2"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0",
+            "Class::Method::Modifiers" : "0",
+            "Data::OptList" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "File::Temp" : "0",
+            "Module::Build" : "0.38",
+            "Module::Load" : "0",
+            "Test::SharedFork" : "0",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Module::Build::Pluggable" : {
+         "file" : "lib/Module/Build/Pluggable.pm",
+         "version" : "0.10"
+      },
+      "Module::Build::Pluggable::Base" : {
+         "file" : "lib/Module/Build/Pluggable/Base.pm"
+      },
+      "Module::Build::Pluggable::GithubMeta" : {
+         "file" : "lib/Module/Build/Pluggable/GithubMeta.pm"
+      },
+      "Module::Build::Pluggable::Repository" : {
+         "file" : "lib/Module/Build/Pluggable/Repository.pm",
+         "version" : "0.10"
+      },
+      "Module::Build::Pluggable::Util" : {
+         "file" : "lib/Module/Build/Pluggable/Util.pm"
+      },
+      "Test::Module::Build::Pluggable" : {
+         "file" : "lib/Test/Module/Build/Pluggable.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Module-Build-Pluggable/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Module-Build-Pluggable",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Module-Build-Pluggable.git",
+         "web" : "https://github.com/tokuhirom/Module-Build-Pluggable"
+      }
+   },
+   "version" : "0.10",
+   "x_contributors" : [
+      "tokuhirom <tokuhirom@gmail.com>"
+   ]
+}

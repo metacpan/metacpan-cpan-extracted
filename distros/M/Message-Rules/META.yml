@@ -1,0 +1,28 @@
+---
+abstract: 'Apply a pile of rules to incoming messages'
+author:
+  - 'Dana M. Diederich <dana@realms.org>'
+build_requires:
+  Test::More: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Message-Rules
+requires:
+  File::Find: 0
+  JSON: 0
+  Message::Match: 0
+  Message::Transform: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/dana/perl-Message-Rules/issues
+  homepage: https://github.com/dana/perl-Message-Rules
+  repository: https://github.com/dana/perl-Message-Rules.git
+version: 1.150170

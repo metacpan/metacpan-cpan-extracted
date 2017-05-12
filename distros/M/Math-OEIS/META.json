@@ -1,0 +1,68 @@
+{
+   "abstract" : "Things for Online Encyclopedia of Integer Sequences.",
+   "author" : [
+      "Kevin Ryde <user42_kevin@yahoo.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-OEIS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "devel",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "File::Map" : "0",
+            "Scalar::Util" : "0"
+         },
+         "requires" : {
+            "Class::Singleton" : "0",
+            "File::HomeDir" : "0",
+            "File::Spec" : "0",
+            "Module::Load" : "0",
+            "Search::Dict" : "0",
+            "constant::defer" : "0",
+            "perl" : "5.006"
+         },
+         "suggests" : {
+            "Encode::Locale" : "0.02"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://user42.tuxfamily.org/math-oeis/index.html",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl.html"
+      ]
+   },
+   "version" : "9",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

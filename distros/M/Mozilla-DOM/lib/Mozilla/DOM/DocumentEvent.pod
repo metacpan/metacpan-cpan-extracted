@@ -1,0 +1,78 @@
+=head1 NAME
+
+Mozilla::DOM::DocumentEvent
+
+=head1 DESCRIPTION
+
+Mozilla::DOM::DocumentEvent is a wrapper around an instance of Mozilla's
+nsIDOMDocumentEvent interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+ * The nsIDOMDocumentEvent interface is the interface to the event
+ * factory method on a DOM document object.
+ *
+ * For more information on this interface please see
+ * L<http:E<sol>E<sol>www.w3.orgE<sol>TRE<sol>DOM-Level-2-EventsE<sol>>
+
+(In particular, sections 1.5 and 1.6. Very important to read that
+if you want to understand how to create an L<Event|Mozilla::DOM::Event>.)
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::DocumentEvent->B<GetIID>()
+
+Pass this to QueryInterface on a L<Document|Mozilla::DOM::Document>
+object to get back a DocumentEvent, like
+
+  $window = $browser->GetContentDOMWindow;
+  $doc = $window->GetDocument;
+  $iid = Mozilla::DOM::DocumentEvent->GetIID
+  $docevent = $doc->QueryInterface($iid);
+  $event = $docevent->CreateEvent('MouseEvents');
+  $event->InitEvent('click', 1, 1);
+  ...
+
+You can also print it out, and it will look like
+
+  {46b91d66-28e2-11d4-ab1e-0010830123b4}
+
+=head1 METHODS
+
+=head2 $domevent = $docevent->B<CreateEvent>($eventType)
+
+=over
+
+=over
+
+=item * $eventtype (string)
+
+=back
+
+$event_type is a string, apparently one of 'Events', 'UIEvents',
+'HTMLEvents', 'MutationEvents', 'KeyEvents', or 'MouseEvents'.
+See section 1.6 of the DOM Level 2 specs. Apparently 'KeyEvents'
+is not in DOM Level 2, but I was able to create them anyway.
+
+The return value is an L<Event|Mozilla::DOM::Event> object.
+You can then call L<InitEvent|Mozilla::DOM::Event/InitEvent>.
+Or you can get the C<GetIID> of L<UIEvent|Mozilla::DOM::UIEvent>,
+L<MouseEvent|Mozilla::DOM::MouseEvent>, or
+L<MouseEvent|Mozilla::DOM::MouseEvent>, pass it to
+$event->QueryInterface, call the corresponding Init(UI|Mouse|Key)Event
+method. After that, call
+L<DispatchEvent|Mozilla::DOM::EventTarget/DispatchEvent>
+on an EventTarget.
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut

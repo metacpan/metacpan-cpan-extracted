@@ -1,0 +1,11 @@
+Revision history for Perl extension Music::Image::Chord.
+
+0.04  Wed Oct  1 21:37:57 2003
+	- original version; created by h2xs 1.23 with options
+		-AXn Music::Image::Chord
+
+0.05 Fri Oct 3 22:01 2003
+	- Added dependencies
+0.06 Fri Oct 3 22:06 2003
+	- Fixed AUTHOR block, description of draw() and a few other minor doc
+          bugs.

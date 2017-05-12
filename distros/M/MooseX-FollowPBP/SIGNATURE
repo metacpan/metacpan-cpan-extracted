@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 abf5ca34a025f45c72a145830f9fef34677a0a9c Changes
+SHA1 27291faeba400eab6879fdc0b00e3e53e47233e7 INSTALL
+SHA1 c715d20265d2931c7564fc64abfdc4f8ff33e297 LICENSE
+SHA1 35d3f4ec9c322624a3bd6ee78a260ba6851a40e7 MANIFEST
+SHA1 3bb9eb6d3ea2285d2caf65fd9ffd79613c11f529 META.json
+SHA1 45c628d53551ee1091ae64d742aa2313dc94e747 META.yml
+SHA1 99c1e7f806ff1b92f42049e7bc9b16c438d7cdcd Makefile.PL
+SHA1 70b09749ec37ef7a7f4c852119f31e5e9e9d60c5 README
+SHA1 9e0946ba098a68edc9204cff12ed21a3331bec8e dist.ini
+SHA1 1ee2a9b16b8d6f22f59412f659fde708dfd404e2 lib/MooseX/FollowPBP.pm
+SHA1 823a4ff0b528ab8536d54b7f438ee092f2a4c9e7 lib/MooseX/FollowPBP/Role/Attribute.pm
+SHA1 33235c2593361ec8d256ff6dc65fdd7646189c40 t/basic.t
+SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 9433c240fe590bc404ab68ff63984df763e347ed t/release-pod-coverage.t
+SHA1 cb3e2ea10fc7e63d3c8c82561439919d5780bace t/release-pod-spell.t
+SHA1 9775e90d40f094f3e5a23c695d6e6e436a2232c3 t/release-pod-syntax.t
+SHA1 2a2ce8b635d1df973c5ca6656261faedbd84e90f t/role.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk1pTQIACgkQIgMCsV8qvRLsnACfbIS/o1VoWRjqhX+ePfltsahM
+LhIAnjwr0Bjaz9hWxZcvudv0l+QlzDyj
+=wdkv
+-----END PGP SIGNATURE-----

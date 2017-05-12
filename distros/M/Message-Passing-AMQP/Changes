@@ -1,0 +1,37 @@
+0.007  2015-10-28 09:57:00+01:00 Europe/Vienna
+  - Add support for headers exchanges
+  - Add a serialize callback to Output::AMQP for simpler header construction
+  - Add support for making exchanges auto-delete
+  - Remove queue_type attribute as there is no such thing in AMQP
+  - Auto-delete all exchanges and queues in author-only tests
+
+0.006  2015-06-26 17:54:00+01:00 Europe/London
+  - Fix license to be LGPL 2.1
+
+0.005  2015-04-01 17:26:00+01:00 Europe/Vienna
+  - Fix TLS support
+
+0.004  2015-04-01 16:53:00+01:00 Europe/Vienna
+  - Add support for making queues auto-delete.
+  - Add support for making queues exclusive.
+  - Add documentation to roles.
+  - Add TLS support
+  - Fix die on AMQP server restart (RT#87705)
+  - Fix docs regarding supported AMQP protocol versions (RT#94388)
+
+0.003
+  - Use core Message::Passing::Role::HasHostnameAndPort
+  - Use core Message::Passing::Role::HasUsernameAndPassword
+  - username, password, hostname attributes no longer default
+    to a values, and must be user supplied.
+
+0.002
+  - Fix SYNOPSIS in documentation.
+  - Add timeouts to tests to avoid hangs when they fail.
+  - Fix for latest version of Message::Passing.
+  - Emit warnings if output is a perl ref (i.e. hasn't
+    been correctly serialized/encoded)
+
+0.001
+  - Initial barely working version
+

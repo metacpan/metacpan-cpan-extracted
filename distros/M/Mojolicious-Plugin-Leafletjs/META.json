@@ -1,0 +1,70 @@
+{
+   "abstract" : "A Mojolicious Plugin",
+   "author" : [
+      "Adam Stokes <adamjs@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.4, Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Leafletjs",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.026"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::ShareDir" : "0",
+            "File::Spec::Functions" : "0",
+            "Mojo::Base" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Mojo" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/battlemidget/Mojolicious-Plugin-Leafletjs/issues"
+      },
+      "homepage" : "https://github.com/battlemidget/Mojolicious-Plugin-Leafletjs",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/battlemidget/Mojolicious-Plugin-Leafletjs.git",
+         "web" : "https://github.com/battlemidget/Mojolicious-Plugin-Leafletjs"
+      }
+   },
+   "version" : "0.004",
+   "x_contributors" : [
+      "Adam Stokes <adam.stokes@ubuntu.com>"
+   ]
+}
+

@@ -1,0 +1,232 @@
+<html>
+<head>
+<title>MHonArc Resources: OTHERINDEXES</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="notetext.html">NOTETEXT</a>]</td><td><nobr>[<a href="../resources.html#otherindexes">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="outdir.html">OUTDIR</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>OTHERINDEXES</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p>
+<code>M2H_OTHERINDEXES=</code><var>rcfile1</var><code>:</code><var
+>rcfile2</var><code>:</code><var>...</var><code>:</code><var
+>rcfileN</var>
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p>
+<code>&lt;OTHERINDEXES&gt;<br></code>
+<var>rcfile1</var><code>:</code><var>rcfile2</var><code>:</code><var
+>...</var><br>
+<var>rcfilei</var><code>:</code><var>...</var><code>:</code><var
+>rcfileN</var><br>
+<code>&lt;/OTHERINDEXES&gt;<br></code>
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p>
+<code>-otherindexes </code><var>rcfile1</var><code>:</code><var
+>rcfile2</var><code>:</code><var>...</var><code>:</code><var
+>rcfileN</var>
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>OTHERINDEXES defines a list of resource files that 
+define other index pages
+to generate when creating, or updating, an archive.  When setting
+the OTHERINDEXES resource, the filenames are separated by colons
+(or semicolons under MSDOS/Windows).  Line-breaks can be used
+to separate filenames if setting OTHERINDEXES via the
+<code>OTHERINDEXES</code> element.
+</p>
+
+<table border=0 cellpadding=4>
+<tr valign=top>
+<td><strong>CAUTION</strong></td>
+<td><P>It is very important that each resource file specified
+defines the
+<a href="main.html">MAIN</a> or
+<a href="thread.html">THREAD</a> resource to determine the
+type of index to create.  Also, the
+<A HREF="idxfname.html">IDXFNAME</A> or 
+<A HREF="tidxfname.html">TIDXFNAME</A> resource
+(and <A HREF="idxprefix.html">IDXPREFIX</a> or
+<A HREF="tidxprefix.html">TIDXPREFIX</a> resource if
+<A HREF="multipg.html">MULTIPG</a> is active)
+must be defined
+to prevent overwriting of the default index pages.
+</P>
+</td>
+</tr>
+</table>
+
+<table border=0 cellpadding=4>
+<tr valign=top>
+<td><strong><font color=red>WARNING</font></strong></td>
+<td><p>Make sure OTHERINDEXES does <strong>NOT</strong>
+list the file OTHERINDEXES
+is defined in.  This will cause an infinite loop.
+</td>
+</tr>
+</table>
+
+<table border=0 cellpadding=4>
+<tr valign=top>
+<td><strong><font color=red>WARNING</font></strong></td>
+<td><p>OTHERINDEXES resource file should <strong>NOT</strong>
+define the OTHERINDEXES resource.  Unpredictable results may
+occur, possibly infinite recursion.
+</td>
+</tr>
+</table>
+
+<P>MHonArc will only store the name of the resource files
+listed in the database.  Therefore, for any subsequent updates of the
+archive, the extra index resource files must exist inorder to generate
+the extra index pages.  </P>
+
+<p>All filenames are treated relative to the current working
+directory or the archive directory, except for absolute
+pathnames.  The following shows the search order MHonArc uses
+to find resource files listed in OTHERINDEXES:
+</p>
+<ol>
+<li>Current working directory.</li>
+<li>Same directory that the first resource file was read as
+specified by the RCFILE resource.</li>
+<li>User's home directory.</li>
+<li>Archive directory.</li>
+<li>Perl's <tt><!--
+-->&#64;<!--
+-->INC</tt> library search page.</li>
+</ol>
+
+<table border=0 cellpadding=4>
+<tr valign=top>
+<td><strong>NOTE</strong></td>
+<td><P>When creating resource files for extra indexes, make sure to
+explicitly set all resources desired since some resource settings may
+no longer be set to the defaults due to database settings or from
+a previously read resource file. Ie. MHonArc does not reset
+to the default settings before reading the other resource files.  </P>
+</td>
+</tr>
+</table>
+
+<table border=0 cellpadding=4>
+<tr valign=top>
+<td><strong>NOTE</strong></td>
+<td><P>Archive navigational resources, like
+<a href="listbegin.html">LISTBEGIN</a>,
+<a href="thead.html">THEAD</a>,
+<a href="toplinks.html">TOPLINKS</a>, and
+<a href="botlinks.html">BOTLINKS</a>,
+are <strong>NOT</strong> automatically modified to include
+navigational links related to the other indexes created (even
+if using the default settings).  Therefore, you will have
+to explicily define these resources if you want navigational
+links for the other indexes.
+</td>
+</tr>
+</table>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<p>Nil
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>Since MHonArc only creates two indexes by default
+(the main/date index and the thread index), you can use OTHERINDEXES
+to define other index formats for navigating your archive.  A
+possible setting for OTHERINDEXES may look like this:
+</p>
+
+<pre>
+<b>&lt;OtherIndexes&gt;</b>
+reversedateidx.mrc
+subjectidx.mrc
+<b>&lt;/OtherIndexes&gt;</b>
+</pre>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>1.2
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+<A HREF="idxfname.html">IDXFNAME</A>,
+<A HREF="idxprefix.html">IDXPREFIX</a>,
+<A HREF="multipg.html">MULTIPG</a>,
+<A HREF="tidxfname.html">TIDXFNAME</A>,
+<A HREF="tidxprefix.html">TIDXPREFIX</a>,
+<a href="main.html">MAIN</a>,
+<a href="thread.html">THREAD</a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="notetext.html">NOTETEXT</a>]</td><td><nobr>[<a href="../resources.html#otherindexes">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="outdir.html">OUTDIR</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2003/10/06 22:04:19 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"><strong>MHonArc</strong></a><br>
+Copyright &#169; 1997-2001, <a href="http://www.earlhood.com/">Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org">mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

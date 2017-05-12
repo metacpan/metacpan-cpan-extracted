@@ -1,0 +1,32 @@
+03/07/1998 Version 1.00
+First public realese
+
+03/14/1998 Version 1.01
+Added use of Carp routines to verify the number of rows and columns is equal
+
+03/21/1998 Version 1.10
+Added Panmagic Square test in check method
+
+03/28/1998 Version 1.20
+Added printhtml method
+
+04/11/1998 Version 1.30
+Added rotation method
+
+04/19/1998 Version 1.40
+Added reflection method
+
+01/10/2003 Version 2.00
+Added printimage("jpeg|png") to create magicsquare.jpg or magicsquare.png
+
+10/24/2003 Version 2.01
+GD is changed and printimage can save only png.
+
+10/24/2003 Version 2.02
+Added PREREQ_PM  => {'GD' => '0'} and AUTHOR in Makefile.PL
+
+10/24/2003 Version 2.03
+An error inside Makefile.PL
+
+12/13/2003 Version 2.04
+An error inside tests

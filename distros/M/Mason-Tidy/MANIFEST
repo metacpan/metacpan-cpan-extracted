@@ -1,0 +1,15 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+bin/masontidy
+lib/Mason/Tidy.pm
+lib/Mason/Tidy/App.pm
+lib/Mason/Tidy/t/Basic.pm
+lib/Mason/Tidy/t/CLI.pm
+t/01-use.t
+t/Basic.t
+t/CLI.t

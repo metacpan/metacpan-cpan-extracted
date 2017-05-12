@@ -1,0 +1,34 @@
+html, body { background: #fff; width: 100%; height: 100%; padding: 0; margin: 0; }
+body, select { font-family: sans-serif; font-size: 12px; }
+.credits { font-size: 0.9em; text-align: center; margin-top: 1em; }
+.credits, .credits a { color: #777; }
+.container { padding: 20px; }
+.device { background: no-repeat 0 0; margin: 0 auto; }
+.screen { overflow: hidden; }
+.screen iframe { background: #fefefe; border: 1px solid #d1d1d1; height: 100%; width: 100%; }
+.toolbar { text-align: right; position: absolute; top: 0; right: 0; }
+
+.iphone.portrait { background-image: url(./iphone-portrait.png); padding: 115px 0 117px 0; width: 367px; }
+.iphone.portrait .screen { width: 320px; height: 416px; padding: 20px 0 44px 23px;  }
+.iphone.landscape { background-image: url(./iphone-landscape.png); padding: 23px 0 24px 0; width: 710px; }
+.iphone.landscape .screen { width: 480px; height: 256px; padding: 20px 0 44px 116px; }
+
+.iphone-5.portrait { background-image: url(./iphone-5-portrait.png); padding: 103px 0 117px 0; width: 367px; }
+.iphone-5.portrait .screen { width: 320px; height: 504px; padding: 20px 0 44px 23px; }
+.iphone-5.landscape { background-image: url(./iphone-5-landscape.png); padding: 22px 0 24px 0; width: 776px; }
+.iphone-5.landscape .screen { width: 568px; height: 256px; padding: 20px 0 44px 104px; }
+
+.ipad.portrait { background-image: url(./ipad-portrait.png); padding: 111px 0 113px 0; width: 972px; }
+.ipad.portrait .screen { width: 768px; height: 929px; padding: 95px 0 0 102px; }
+.ipad.landscape { background-image: url(./ipad-landscape.png); padding: 101px 0 103px 0; width: 1248px; }
+.ipad.landscape .screen { width: 1024px; height: 675px; padding: 93px 0 0 112px; }
+
+.wildfire.portrait { background-image: url(./android-240x320-portrait.png); padding: 46px 0 80 0; width: 272px; }
+.wildfire.portrait .screen { width: 240px; height: 300px; padding: 20px 0 0 16px; }
+.wildfire.landscape { background-image: url(./android-320x240-landscape.png); padding: 14px 0 18px 0; width: 474px; }
+.wildfire.landscape .screen { width: 320px; height: 220px; padding: 20px 0 0 77px; }
+
+.nexus-4.portrait { background-image: url(./android-nexus-4-portrait.png); padding: 68px 0 146px 0; width: 426px; }
+.nexus-4.portrait .screen { width: 384px; height: 600px; padding: 20px 0 0 21px; }
+.nexus-4.landscape { background-image: url(./android-nexus-4-landscape.png); padding: 22px 0 28px 0; width: 888px; }
+.nexus-4.landscape .screen { width: 600px; height: 364px; padding: 20px 0 0 144px; }

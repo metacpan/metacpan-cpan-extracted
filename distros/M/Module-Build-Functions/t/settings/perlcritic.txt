@@ -1,0 +1,81 @@
+verbose = %f:%l:%c:\n %p: %m\n
+theme = (core || more)
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = t\settings\perltidy.txt
+
+[ControlStructures::ProhibitPostfixControls]
+allow = if unless
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 7
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print close closedir readdir
+
+[Modules::PerlMinimumVersion]
+version = 5.00503
+
+# Exclusions
+
+# Since Readonly is not an option here, I turn this off.
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+
+# I know people for whom 4 spaces is too little, but 8 is too much for me.
+[-CodeLayout::ProhibitHardTabs]
+
+# My opinion is that unless is fine.
+[-ControlStructures::ProhibitUnlessBlocks]
+
+# We use an RCS, and that's the point of this. No need for keywords.
+[-Miscellanea::RequireRcsKeywords]
+
+# Some routines just pass it on.
+[-Subroutines::RequireArgUnpacking]
+
+# Since this is to be included in distributions, I have a separate pod.
+[-Documentation::RequirePodAtEnd]
+[-Documentation::RequirePodSections]
+
+# I don't USE emacs!
+[-Editor::RequireEmacsFileVariables]
+
+# We can't use exceptions in this module because
+# prerequisites have to be minimized.
+[-ErrorHandling::RequireUseOfExceptions]
+
+# Can't require use warnings, since we're aiming pre-5.006.
+[-TestingAndDebugging::RequireUseWarnings]
+
+# This deliberately exports everything!
+[-Modules::ProhibitAutomaticExportation]
+
+# We have to have an AUTOLOAD in this one, bad or not.
+[-ClassHierarchies::ProhibitAutoloading]
+
+# For the simple stuff, there's no need for this.
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireLineBoundaryMatching]
+
+# Since AUTOLOAD uses string eval's, I turn this off.
+[-BuiltinFunctions::ProhibitStringyEval]
+[-ErrorHandling::RequireCheckingReturnValueOfEval]
+
+# Since AUTOLOAD uses string eval's, I turn this off.
+#[-References::ProhibitDoubleSigils]
+
+# check close on a READ???
+[-InputOutput::RequireCheckedClose]
+
+# Can't use English well before 5.8.1.
+[-Variables::ProhibitPunctuationVars]
+
+# Can't use IO::Interactive because of use of module.
+[-InputOutput::ProhibitInteractiveTest]
+
+# RequireBriefOpen doesn't work because I have to have the option of 2 or 3-arg open.
+[-InputOutput::RequireBriefOpen]
+
+#
+#[-Variables::ProhibitPackageVars]

@@ -1,0 +1,14 @@
+Changes
+lib/Mojolicious/Plugin/ErrorsAndWarnings.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/description.t
+t/errors_and_warnings.t
+t/pod.t
+t/pod_coverage.t
+t/synopsis.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

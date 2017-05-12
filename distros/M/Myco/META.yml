@@ -1,0 +1,28 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Myco
+version:      0.01
+version_from: lib/Myco.pm
+installdirs:  site
+requires:
+    Bit::Vector:                   0
+    Class::Data::Inheritable:      0
+    Class::Inner:                  0
+    Class::Tangram:                1.15
+    Date::Calc:                    0
+    Date::Manip:                   0
+    DBD::Pg:                       0
+    DBI:                           0
+    Devel::StackTrace:             0
+    Devel::Symdump:                0
+    Error:                         0
+    Exception::Class:              0
+    Locale::SubCountry:            0
+    Pod::Constants:                0
+    Set::Object:                   1.04
+    Tangram:                       0
+    Test::Unit:                    0
+    WeakRef:                       0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 1.34

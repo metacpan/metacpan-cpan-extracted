@@ -1,0 +1,78 @@
+#!/usr/bin/env perl
+use Applify;
+use Mojo::Base -strict;
+use Mojo::Cloudflare;
+use Mojo::UserAgent;
+
+version 'Mojo::Cloudflare';
+documentation __FILE__;
+
+option str => zone => 'Zone to modify';
+option str => email => 'Account email';
+option str => filter => 'Regex to filter domain names';
+option bool => dry_run => 'Test the script';
+
+sub old_ip {
+  open my $IP, '<', "/tmp/maintain-a-records.$<" or return '';
+  return readline($IP) =~ /(\S+)/ ? $1 : '';
+}
+
+sub cache_ip {
+  open my $IP, '>', "/tmp/maintain-a-records.$<" or die $!;
+  print $IP $_[1];
+}
+
+app {
+  my($self) = @_;
+  my $re = $self->filter;
+
+  my $ua = Mojo::UserAgent->new;
+  my $cf = Mojo::Cloudflare->new(
+             key => $ENV{CLOUDFLARE_KEY},
+             email => $self->email,
+             zone => $self->zone,
+           );
+
+  my $ip = $ua->get("http://canhazip.com")->res->body =~ /(\S+)/ ? $1 : '';
+  my $records;
+
+  if($ip eq $self->old_ip and !$self->dry_run) {
+    print "Skip update since $ip has not changed.\n";
+    return 0;
+  }
+
+  $ip =~ /\d\./ or die "Could not get IP from canhazip.com.\n";
+  $self->cache_ip($ip) unless $self->dry_run;
+  $records = $cf->records;
+  printf "%-40s %-15s\n", 'localhost', $ip;
+
+  for my $record ($records->all) {
+    next if $record->type ne 'A';
+    next if $re and $record->name !~ m!$re!;
+    printf "%-40s %-15s\n", $record->name, $record->content;
+    next if $record->content eq $ip;
+    $record->content($ip)->save unless $self->dry_run;
+  }
+
+  return 0;
+}
+
+=head1 NAME
+
+maintain-a-records - Change A records for a zone
+
+=head1 DESCRIPTION
+
+This script will update the A records for a given zone with the IP address
+reported by L<http://canhazip.com>.
+
+=head1 SYNOPSIS
+
+  $ CLOUDFLARE_KEY=xyz maintain-a-records --email example@example.com --zone example.com --dry-run
+  $ CLOUDFLARE_KEY=xyz maintain-a-records --email example@example.com --zone example.com
+
+=head1 AUTHOR
+
+Jan Henning Thorsen - C<jhthorsen@cpan.org>
+
+=cut

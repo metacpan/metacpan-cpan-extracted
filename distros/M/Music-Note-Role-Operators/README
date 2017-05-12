@@ -1,0 +1,89 @@
+NAME
+
+    Music::Note::Role::Operators
+
+ DESCRIPTION
+
+    Role::Tiny to be applied on top Music::Note with comparison methods
+    added and overloaded operators. Also adds a clone method and a way to
+    generate Music::Interval objects via a Music::Note.
+
+ SYNOPSIS
+
+    If you're working with a Music::Note subclass:
+
+        package Music::MyNote;
+        use parent 'Music::Note';
+        use Role::Tiny::With;
+        with 'Music::Note::Role::Operators';
+        # etc
+
+    Or if you're working in a script and just want the behaviour:
+
+        use Music::Note;
+        use Role::Tiny (); # Don't import R::T into current namespace for cleanliness
+        Role::Tiny->apply_roles_to_package('Music::Note', 'Music::Note::Role::Operators');
+
+ SUMMARY
+
+    Assuming you're working in a script:
+
+        my $note = Music::Note->new('C#');
+        my $other = Music::Note->new('E');
+    
+        my $true = $other->gt($note);
+        $true = $other > $note;
+    
+        $true = $note->lt($other);
+        $true = $note < $other;
+    
+        $true = $note->eq($note->clone);
+        $true = $note == $note->clone;
+    
+        $true = $note->gte($note->clone);
+        $true = $note >= $note->clone;
+    
+        $true = $note->lte($note->clone);
+        $true = $note <= $note->clone;
+    
+        my $interval = $note->interval($other);
+        my $conveneince_interval = $note->interval(%args_for_music_interval);
+
+ CAVEAT
+
+    Don't try to do something like $note == 90>. The overloading expects a
+    Music::Note on both sides. To perform comparisons versus note and not a
+    note you should be doing $note->format('midi') == 90.
+
+  AUTHOR
+
+    Kieren Diment zarquon@cpan.org
+
+  LICENSE
+
+    This code can be redistributed on the same terms as perl itself
+
+ get_interval
+
+    If called with a single Music::Note as argument is returns a
+    Music::Interval object
+
+        my $interval = $self->get_interval($other);
+
+    If called with an arguments hash
+
+        my $interval = $self->get_interval(%args_for_music_interval)
+
+    Note that this will default to 1 for the following constructor
+    attributes, so if you don't want these values you'll have to explicitly
+    set them to something else in the constructor.
+
+    Music::Intervals does some quite expensive calculations during the
+    process method. By default this method will run process before
+    returning the interval. You can avoid this by adding the argument
+    <no_process = 1>> to this method's arguments.
+
+    NOTE: It would be nice to have the subtract method return a
+    Music::Interval but it's a complex module, and only seems to deal with
+    intervals inside a single octave.
+

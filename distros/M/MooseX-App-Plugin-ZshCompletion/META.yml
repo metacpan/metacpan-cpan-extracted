@@ -1,0 +1,41 @@
+---
+abstract: 'zsh completion for your MooseX::App applications'
+author:
+  - 'Tina Müller <cpan2@tinita.de>'
+build_requires:
+  FindBin: '0'
+  MyApp: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-App-Plugin-ZshCompletion
+provides:
+  MooseX::App::Plugin::ZshCompletion:
+    file: lib/MooseX/App/Plugin/ZshCompletion.pm
+    version: '0.002'
+  MooseX::App::Plugin::ZshCompletion::Command:
+    file: lib/MooseX/App/Plugin/ZshCompletion/Command.pm
+    version: '0.002'
+  MooseX::App::Plugin::ZshCompletion::Meta::Class:
+    file: lib/MooseX/App/Plugin/ZshCompletion/Meta/Class.pm
+    version: '0.002'
+requires:
+  IO::Interactive: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  MooseX::App::Command: '0'
+  namespace::autoclean: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/perlpunk/MooseX-App-Plugin-ZshCompletion
+version: '0.002'

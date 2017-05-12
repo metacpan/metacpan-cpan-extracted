@@ -1,0 +1,34 @@
+---
+abstract: 'A Module::Starter plugin for adding new modules into an existing distribution'
+author:
+  - 'Ruey-Cheng Chen <rueycheng@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Module::Starter: '1.58'
+  Test::More: '0'
+  Test::TempDir::Tiny: '0'
+  parent: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142060'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Starter-Smart
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ExtUtils::Command: '0'
+  File::Spec: '0'
+  Module::Starter: '1.58'
+  Test::More: '0'
+  Test::TempDir::Tiny: '0'
+  parent: '0'
+resources:
+  repository: https://github.com/rueycheng/Module-Starter-Smart.git
+version: v0.0.6

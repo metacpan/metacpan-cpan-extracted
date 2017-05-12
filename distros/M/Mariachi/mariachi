@@ -1,0 +1,254 @@
+#!/usr/local/bin/perl -w
+use strict;
+use AppConfig qw(:argcount);
+use Mariachi;
+
+=head1 NAME
+
+mariachi - All dancing mail archive generator
+
+=head1 SYNOPSIS
+
+ mariachi [ OPTIONS ]
+
+=head1 DESCRIPTION
+
+Mariachi is a mail archive generator, much like mhonarc or pipermail.
+It differs in a few important ways:
+
+=over
+
+=item Its name is Juan
+
+=item It uses the Template Toolkit.
+
+=item This is a made up list
+
+=back
+
+=head1 USAGE
+
+You can write a config file to save yourself some trouble - mariachi
+first looks in I</usr/local/mariachi/mariachi.conf> and then
+I<~/.mariachi>.
+
+An example config file might look like
+
+    refresh
+    input  = ~/mail
+    output = ~/public_html/mymail/
+
+For more information about the configuration file format, consult
+L<AppConfig>
+
+You don't have to supply everything (as long as the required options
+are then passed on the command line).
+
+Options on the command line override options in the config files.
+
+=head1 OPTIONS
+
+=head2 -i, --input I<folder>
+
+The source mail folder
+
+=cut
+
+# define the command line options
+my $config = AppConfig->new({ PEDANTIC => 1,
+                              GLOBAL   => {
+                                  ARGCOUNT => ARGCOUNT_ONE,
+                              },
+                              ERROR    => sub {
+                                  my $format = shift;
+                                  $format = "mariachi: $format\n";
+                                  print STDERR sprintf $format, @_;
+                                  exit;
+                              },
+                             });
+
+$config->define("input", { ALIAS => 'i' });
+
+=head2 -o, --output I<directory>
+
+Name of the directory to write output to
+
+=cut
+
+$config->define("output", { ALIAS => 'o' });
+
+
+=head2 -n, --name I<title>
+
+What to use in the title of the mailing lists
+
+=cut
+
+$config->define("name", { ALIAS => 'n' });
+
+
+=head2 -t, --templates I<directory>
+
+Add additional directories to scan in looking for templates
+
+Defaults to I</usr/local/mariachi/templates>
+
+Any values supplied will be added to the head of that list.
+
+=cut
+
+$config->define("templates", {
+    ALIAS    => 't',
+    DEFAULT  => [ '/usr/local/mariachi/templates' ],
+    ARGCOUNT => ARGCOUNT_LIST
+   });
+
+=head2 -r --refresh
+
+Refreshes individual message pages and other indexes even if mariachi
+believes this is not necessary. This is usually only needed if you change
+the templates (typically to update the style of a page).
+
+=cut
+
+$config->define("refresh", {
+    ALIAS    => 'r',
+    DEFAULT  => 0,
+    ARGCOUNT => ARGCOUNT_NONE
+   });
+
+
+=head2 -v --reverse
+
+By default, mariachi renders the most recent messages on the first page of
+the archive, and later messages later on in the archive. This flag reverses
+this behaviour, placing the earliest messages on the first page of the
+archive. 
+
+=cut
+
+$config->define("reverse", {
+    ALIAS    => 'v',
+    DEFAULT  => 0,
+    ARGCOUNT => ARGCOUNT_NONE
+   });
+
+
+=head2 --nolurker
+
+Disable lurker output
+
+=cut
+
+$config->define("lurker", {
+    DEFAULT  => 1,
+    ARGCOUNT => ARGCOUNT_NONE
+});
+
+=head2 --thread-context I<context_style>
+
+Controls the amount of context to show with a message in thread view.
+
+Legal values for I<context_style> are C<first_line>,
+C<first_paragraph>, C<first_sentence>, and the empty string (the
+default).
+
+=head2 --lurker-context I<context_style>
+
+See C<thread-context>
+
+=cut
+
+my %context_styles = map {
+    $_ => 1
+} '', qw( first_line first_paragraph first_sentence );
+
+$config->define("thread-context", {
+    DEFAULT => '',
+    VALIDATE => sub { $context_styles{ $_[1] } }
+   });
+
+$config->define("lurker-context", {
+    DEFAULT => '',
+    VALIDATE => sub { $context_styles{ $_[1] } }
+   });
+
+=head2 --class I<class>
+
+Specifies using a class other than C<Mariachi> to do the rendering.
+
+=cut
+
+$config->define("class", {
+    DEFAULT => 'Mariachi',
+    VALIDATE => sub { eval "require $_[1]; 1" or die "$@" }
+   });
+
+
+# define the system and the user config files
+my $sys  = "/usr/local/mariachi/mariachi.conf";
+my $user = "$ENV{HOME}/.mariachi";
+
+# and read them in if they're readable
+$config->file($sys)  if -r $sys;
+$config->file($user) if -r $user;
+
+# then read in the command line options
+$config->getopt;
+
+die "mariachi: unrecognised arguments ".join(' ', map { qq{'$_'} } @ARGV )."\n"
+  if @ARGV;
+
+die <<USAGE unless (defined $config->input && defined $config->output);
+mariachi: mail archive generator
+   usage: mariachi -i input.mbox -o output_folder -n 'list name'
+          see 'perldoc mariachi' for further information and options
+USAGE
+
+die "need an input maildir"
+  unless defined $config->input;
+die "where do we put them?"
+  unless defined $config->output;
+
+unless (defined $config->name) {
+    warn "Should pass a list name\n";
+    $config->name("no list name");
+}
+
+$config->class->new( config  => $config,
+                     threads_per_page => 20,
+                    )
+  ->perform;
+
+
+__END__
+
+=head1 AUTHORS
+
+This code was written as part of the Siesta project and includes code
+from:
+
+Richard Clamp <richardc@unixbeard.net>
+
+Simon Wistow <simon@thegestalt.org>
+
+Tom Insam <tom@jerakeen.org>
+
+Mark Fowler <mark@twoshortplanks.com>
+
+More information about the Siesta project can be found online at
+http://siesta.unixbeard.net/
+
+=head1 COPYRIGHT
+
+Copyright 2003 The Siesta Project
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Mail::Thread>, L<Mariachi>
+
+=cut
+

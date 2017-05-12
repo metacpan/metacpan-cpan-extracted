@@ -1,0 +1,116 @@
+." -*- nroff -*-
+."   Copyright 2003 Laurent Wacrenier
+."
+."   This file is part of PLL mdq.
+."
+."   PLL mdq is free software; you can redistribute it and/or modify
+."   it under the terms of the GNU Lesser Public License as published by
+."   the Free Software Foundation; either version 2 of the License, or
+."   (at your option) any later version.
+."
+."   PLL mdq is distributed in the hope that it will be useful,
+."   but WITHOUT ANY WARRANTY; without even the implied warranty of
+."   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+."   GNU Lesser Public License for more details.
+."
+."   You should have received a copy of the GNU Lesser Public License
+."   along with PLL mdq; if not, write to the Free Software
+."   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+."
+." $Id: mdq.3,v 1.5 2005/01/31 17:38:06 lwa Exp $
+.TH MDQ 3 "Nov 24 2003"
+
+.SH NAME
+
+mdq_open, mdq_add, mdq_test, mdq_close
+
+.SH LIBRARY
+
+libmdq (-lmdq)
+
+.SH SYNOPSIS
+
+\fC#include <mdq.h>\fP
+.PP
+\fCMDQ *\fBmdq_open\fP(char *dir, char *quotastr);\fP
+.PP
+\fCvoid \fBmdq_add\fP(MDQ *q, long bytes, long files);\fP
+.PP
+\fCint \fBmdq_test\fP(MDQ *q, long bytes, long files);\fP
+.PP
+\fClong \fBmdq_get\fP(MDQ *q, int what)\fP
+.PP
+\fCvoid \fBmdq_close\fP(MDQ *q);\fP
+.PP
+\fCextern int \fBmdq_trash_quota\fP;\fP
+.PP
+\fCconst char *\fBmdq_version\fP;\fP
+.PP
+\fC#include <stdarg.h>\fP
+.PP
+\fCvoid (*\fBmdq_error\fP)(const char *format, va_list args);\fP
+
+.SH DESCRIPTION
+
+The \fBmdq_open\fP function open Maildir++ soft quota informations for
+the mail box or mail folder in the directory \fIdir\fP and with quota
+definition \fBquotastr\fP. If \fBquotastr\fP is NULL, the quota
+definition will be read from maildir.
+
+The quota definition is a list, separate by commas. Each member of the
+list consists of an integer followed by a letter, specifying the
+nature of the quota. Currently defined quota types are 'S' - total
+size of all messages, and 'C' - the maximum count of messages in the
+maildir. For example, 10000000S,1000C specifies a quota of 10,000,000
+bytes or 1,000 messages, whichever comes first.
+
+The \fBmdq_add\fP add (or remove with negative arguments) \fIbytes\fP
+bytes and \fIfiles\fP message to the current maildir quota status.
+
+The \fBmdq_test\fP checks if theyre is enough space to keep current
+ammount of space and files, added with \fIbytes\fP bytes of messages
+and \fIfiles\fP messages.
+
+The \fBmdq_get\fP may be used to retrieve the current values
+of the mailbox quota cache according the second argument
+.RS
+.IP MDQ_BYTES_CURRENT
+return the number of bytes used
+
+.IP MDQ_BYTES_MAX
+return the maximum number of bytes
+
+.IP MDQ_FILES_CURRENT
+return the number of files used
+
+.IP MDQ_FILES_MAX
+return the maximum number of files
+.RE
+On error or undefined value, a negative value is returned.
+
+The \fBmdq_close\fP function flush the modifications and free any
+resources associated with \fBq\fP.
+
+The NULL MDQ pointer is a special quota information who has no limit.
+\fBmdq_open\fP may returns NULL and \fBmdq_add\fP, \fBmdq_test\fP,
+\fBmdq_close\fP may take NULL as first argument.
+
+It the \fBmdq_trash_quota\fP int is set to 0 (default), the messages
+in Trash folder and trashed message in other folders are not counted
+in the quota. If set to 1, all messages are counted. It must be
+defined before call to \fBmdq_open\fP.
+
+.SH RETURN VALUES
+\fBmdq_open\fP returns a MDQ pointer or NULL if an error occurs or if
+all quotas are non positive. \fBmdq_test\fP returns 0 if theyre is
+enough space left or -1 if not.  Other functions returns no value.
+
+.SH DIAGNOSTIC MESSAGES
+
+If the \fBmdq_error\fP function pointer is set, all diagnostic
+messages will be send to the function to be displayed. All diagnostic
+messages begin by the string "\fI[mdq]\fP".
+
+.SH AUTHOR
+
+Laurent Wacrenier <lwa@teaser.fr>

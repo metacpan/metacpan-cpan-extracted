@@ -1,0 +1,35 @@
+---
+abstract: 'Store a Moose object in glob reference'
+author:
+  - 'Piotr Roszatycki <dexter@cpan.org>'
+build_requires:
+  Test::Assert: 0
+  Test::Unit::Lite: 0.12
+  parent: 0
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-GlobRef
+provides:
+  MooseX::GlobRef:
+    file: lib/MooseX/GlobRef.pm
+    version: 0.0701
+  MooseX::GlobRef::Object:
+    file: lib/MooseX/GlobRef/Object.pm
+    version: 0.0701
+  MooseX::GlobRef::Role::Meta::Instance:
+    file: lib/MooseX/GlobRef/Role/Meta/Instance.pm
+    version: 0.0701
+  MooseX::GlobRef::Role::Object:
+    file: lib/MooseX/GlobRef/Role/Object.pm
+    version: 0.0701
+requires:
+  Moose: 0.94
+  perl: 5.006
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooseX-GlobRef
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/dex4er/perl-MooseX-GlobRef
+version: 0.0701

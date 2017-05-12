@@ -1,0 +1,43 @@
+Revision history for Perl extension Module-Install-Template
+
+0.08  Mon 2009.12.07 20:21:49 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - Added dependency for Module::Install (thanks GUGU)
+
+0.07  Mon 2009.12.07 00:20:05 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+     - reduced dependencies using author tests
+     - better dist engineering (INSTALL, README, README.mkdn etc.)
+
+0.06  Thu, 29 May 2008 12:06:12 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.06
+     - updated t/perlcriticrc
+     - .shipit: fixed svk.tagpattern
+
+0.05  Sat, 17 Nov 2007 23:37:22 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.05
+     - also passes base_dir (getcwd) to the template
+
+0.04  Fri, 16 Nov 2007 07:41:52 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Don't run MY::postamble unless process_templates() was called
+     - added Twitter step to .shipit
+     - added Module::AutoInstall to Makefile.PL
+     - uses Data::Dumper instead of YAML in bin/tt_pm_to_blib and
+       Module::Install::Template because YAML requires YAML::Base and others,
+       which aren't copied to inc/
+     - removed the last remnants of YAML
+     - added support for 'other_authors'
+     - tags: BUGFIX, NEWFEATURE
+
+0.03  Sun, 11 Nov 2007 21:19:40 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - MY::postamble had spaces instead of tabs for Makefile; fixed that
+     - added pm_to_blib requirement to create_distdir target
+     - tags: BUGFIX
+
+0.02  Sun, 11 Nov 2007 21:13:10 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Makefile's disttest target had to be modified to make pm_to_blib before
+     - tags: BUGFIX
+
+0.01  Sun, 11 Nov 2007 20:23:19 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

@@ -1,0 +1,15 @@
+Changes
+lib/Mojolicious/Plugin/HTMLTemplateProRenderer.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/001_load.t
+t/002_use_home_template.t
+t/003_extension.t
+t/004_loop.t
+t/template_base_app.html.tmpl
+t/templates/template1.html.tmpl
+Todo
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

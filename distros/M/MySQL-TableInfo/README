@@ -1,0 +1,74 @@
+.::MySQL/TableInfo version 1.01::..
+============================
+
+.:DESCRIPTION:.
+
+MySQL::TableInfo is a handy class for getting easy access to MySQL tables' descriptions
+which is available via
+
+    DESCRIBE table_name, SHOW COLUMNS FROM table_name
+
+queries. It's also handy for constructing form based CGI applications to control HTML forms'
+attributes such as C<VALUE>, C<SIZE>, C<MAXLENGTH>, C<TYPE> and so forth. 
+For example, if you have a ENUM('Yes', 'No') column in your mysql table, then you normally
+would present it either as a group of radio buttons, or as a <SELECT> menu. If you modify
+the column, and add one more option, ENUM('Yes', 'No', 'N/A'), then you will have to 
+re-write your html code accordingly. By using MySQL::TableInfo, you can avoide this double 
+troubles. Consider the following code:
+
+        use CGI;
+        use DBI;
+        my MySQL::TableInfo;
+
+        my $CGI = new CGI:
+        my $dbh = DBI->connect(....);
+        my $table = new MySQL::TableInfo($dbh, "bio");
+
+        print $CGI->header, $CGI->start_html("MySQL::TableInfo");
+
+        print $CGI->start_form,
+                $CGI->div("Do you wear beard?"),
+                $CGI->popup_menu(-name=>'has_beard', 
+                                                 -values=>[$table->set('beard')],
+                                                 -default=>$table->default('beard')),
+        $CGI->end_form;
+
+        print $CGI->end_html;
+
+As you see, modifying 'beard' column, which is an enumeration column, whould
+reflect in your CGI too.        
+
+
+.:INSTALLATION:.
+
+After downloading the destribution, you need to uncompress and unpack it. 
+In windows you could use WinZip. In *.nix you can use gzip to uncompress
+the file and use 'tar' to unpack it. You can combine the two steps into 
+one command like:
+ 
+   % gzip -dc MySQL-TableInfo-0.03.tar.gz | tar -xof -
+
+Then cd into the folder:
+
+   % cd MySQL-TableInfo-0.08
+
+And perform the following commands:
+
+   perl Makefile.PL
+   make   
+   make install
+
+.:DEPENDENCIES:.
+
+Perl 5 or later is required to install this module.
+
+.:COPYRIGHT AND LICENCE:.
+
+This library is a free software. You can modify and destribute this 
+under the same condition as Perl itself. 
+
+
+.:AUTHOR:.
+
+Sherzod B. Ruzmetov, sherzodr@cpan.org
+

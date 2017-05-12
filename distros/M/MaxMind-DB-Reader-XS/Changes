@@ -1,0 +1,55 @@
+1.000004 2017-01-25
+
+- Command line arguments to Build.PL are now passed through, allowing building
+  with option install_base. PR by Mickey. GitHub #18.
+
+
+1.000003 2016-03-23
+
+- iterate_search_tree() now works with libmaxminddb 1.2.0+. GitHub #12.
+
+
+1.000002 2016-01-07
+
+- Fixed test failures with the latest version of libmaxminddb (1.1.3).
+
+
+1.000001 2015-12-21
+
+- Fixed test failures with the latest version of libmaxminddb (1.1.2).
+
+
+1.000000 2014-09-22
+
+- First production release.
+
+
+0.070000 2014-09-15
+
+- An exception is no longer thrown when a private IP address is passed to
+  record_for_address. Instead a lookup will be done in the database, and
+  undef will be returned if there is no record for the IP.
+
+
+0.060004 2014-04-21
+
+- Updated to latest tests from pure Perl reader. Fixes GH #3.
+
+
+0.060003 2014-03-10
+
+- Added basic docs for this distro.
+
+
+0.060002 2013-12-30
+
+- Error messages should now be the same for the pure Perl and XS readers.
+
+- Added some more tests and made a small internals change to faciliate said
+  tests.
+
+
+0.060001 2013-12-17
+
+- First public release. We've been using this at MaxMind, Inc. for a while and
+  it seems to be stable. Bug reports to the contrary are welcome.

@@ -1,0 +1,5 @@
+tell application "Finder"
+	set myFile to file "Otter:Users:brian:path.pl"
+	set myDisk to disk of myFile
+	return kind of myDisk
+end tell

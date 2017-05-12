@@ -1,0 +1,16 @@
+[% WRAPPER page/wrapper.tt title = c.expand_wikilink(proto_pages.last.name_orig) %]
+<div id="content">
+    <div id="nonexistent_pages">
+    <p>[% loc('The following pages in the requested path do not exist:') %]</p>
+    <p>
+    ...
+    [% FOREACH page IN proto_pages %]
+        / <a class="protoPage" href="[% c.uri_for( page.path )%].edit" rel="nofollow">[% page.name_orig %]</a>
+    [% END %]
+    </p>
+    <p>
+        [% loc('Click on a link above to create that page.') %]
+    </p>
+    </div>
+</div>
+[% END %]

@@ -1,0 +1,13 @@
+Revision history for Module-Modular
+
+0.003   08/01/2012
+        + Wanted a way to share data.. added the stash method in Plugins.
+        + When __init() is called, it now passes a blessed reference, then the name of the plugin
+
+0.002   08/01/2012
+        + Fixed bug in getting a single plugin
+        + Added new strict option
+
+0.001   07/01/2012
+        Initial release
+

@@ -1,0 +1,31 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use Math::Pari qw/isprime/;
+use Math::Prime::Util;
+use Math::Primality qw/is_prime/;
+use Math::Primality::AKS qw/is_aks_prime/;
+use Benchmark qw/:all/;
+my $count = shift || 10000;
+
+my $magnitude = 10;
+my @small_nums = map { "$_" } map { int(1+rand(9)) ** ($magnitude) } (1..50);
+
+print <<BENCH;
+Benchmarking:
+Math::Primality $Math::Primality::VERSION
+Math::Pari $Math::Pari::VERSION
+Math::Prime::Util $Math::Pari::VERSION
+BENCH
+
+print "Psuedorandom numbers of magnitude 10 ^ $magnitude\n";
+
+my $is_prime_implementations = {
+    'Math::Primality::is_prime'          => sub { is_prime($_) for @small_nums },
+    'Math::Pari::isprime'                => sub { isprime($_) for @small_nums },
+    'Math::Primality::AKS::is_aks_prime' => sub { is_aks_prime($_) for @small_nums },
+    'Math::Prime::Util::is_prime'        => sub { Math::Prime::Util::is_prime($_) for @small_nums },
+};
+
+cmpthese($count,$is_prime_implementations);

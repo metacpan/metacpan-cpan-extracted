@@ -1,0 +1,33 @@
+Revision history for Perl module Mojo-Phantom
+
+0.09 2016-03-15
+  - reinstate correct Build.PL (really, again)
+
+0.08 2016-03-15
+  - Fix use of deprecated Mojo::Util functions
+    - Bump Mojolicious dependency to 7.15
+
+0.07 2016-12-08
+  - reinstate correct Build.PL (yes again)
+
+0.06 2016-12-08
+  - Add ability to pass command line arguments to the phantom process (Eckankar)
+
+0.05 2016-06-07
+  - reinstate correct Build.PL
+
+0.04 2016-06-07
+  - added ability to use alternate executable via exe attribute (plicease)
+  - added no_exit option (plicease)
+  - added console output redirection to TAP stream as note scoped by note_console option (plicease)
+  - explicitly depend on Test2 for our tests, not yet using Test2 directly though
+
+0.03 2015-07-12
+  - Fix some failing tests on older perls by monkey-patching die into CORE:: if necessary
+
+0.02 2015-05-30
+  - Fix Build.PL where phantomjs is missing
+
+0.01 2015-05-30
+  - Initial release
+

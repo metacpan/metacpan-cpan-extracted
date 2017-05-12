@@ -1,0 +1,1772 @@
+# xhtml 1.0 strict
+# http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd
+#
+# <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+#
+# lovingly expanded and sorted from the dtd by paul arzul (patricka@mkdoc.com) 2003/09/24
+
+
+# a
+# anchor
+
+a accesskey
+a charset
+a class
+a coords
+a dir
+a href
+a hreflang
+a id
+a lang
+a name
+a onblur
+a onclick
+a ondblclick
+a onfocus
+a onkeydown
+a onkeypress
+a onkeyup
+a onmousedown
+a onmousemove
+a onmouseout
+a onmouseover
+a onmouseup
+a rel
+a rev
+a shape
+a style
+a tabindex
+a title
+a type
+a xml:lang
+
+
+# abbr
+# abbreviated form (e.g., WWW, HTTP, etc.)
+
+abbr class
+abbr dir
+abbr id
+abbr lang
+abbr onclick
+abbr ondblclick
+abbr onkeydown
+abbr onkeypress
+abbr onkeyup
+abbr onmousedown
+abbr onmousemove
+abbr onmouseout
+abbr onmouseover
+abbr onmouseup
+abbr style
+abbr title
+abbr xml:lang
+
+
+# acronym
+#
+
+acronym class
+acronym dir
+acronym id
+acronym lang
+acronym onclick
+acronym ondblclick
+acronym onkeydown
+acronym onkeypress
+acronym onkeyup
+acronym onmousedown
+acronym onmousemove
+acronym onmouseout
+acronym onmouseover
+acronym onmouseup
+acronym style
+acronym title
+acronym xml:lang
+
+
+# address
+# information on author
+
+address class
+address dir
+address id
+address lang
+address onclick
+address ondblclick
+address onkeydown
+address onkeypress
+address onkeyup
+address onmousedown
+address onmousemove
+address onmouseout
+address onmouseover
+address onmouseup
+address style
+address title
+address xml:lang
+
+
+# area
+# client-side image map area
+
+area accesskey
+area alt
+area class
+area coords
+area dir
+area href
+area id
+area lang
+area nohref
+area onblur
+area onclick
+area ondblclick
+area onfocus
+area onkeydown
+area onkeypress
+area onkeyup
+area onmousedown
+area onmousemove
+area onmouseout
+area onmouseover
+area onmouseup
+area shape
+area style
+area tabindex
+area title
+area xml:lang
+
+
+# b
+# bold text style
+
+b class
+b dir
+b id
+b lang
+b onclick
+b ondblclick
+b onkeydown
+b onkeypress
+b onkeyup
+b onmousedown
+b onmousemove
+b onmouseout
+b onmouseover
+b onmouseup
+b style
+b title
+b xml:lang
+
+
+# base
+# document base URI
+
+base href
+base id
+
+
+# bdo
+# I18N BiDi over-ride
+
+bdo class
+bdo dir
+bdo id
+bdo lang
+bdo onclick
+bdo ondblclick
+bdo onkeydown
+bdo onkeypress
+bdo onkeyup
+bdo onmousedown
+bdo onmousemove
+bdo onmouseout
+bdo onmouseover
+bdo onmouseup
+bdo style
+bdo title
+bdo xml:lang
+
+
+# big
+# large text style
+
+big class
+big dir
+big id
+big lang
+big onclick
+big ondblclick
+big onkeydown
+big onkeypress
+big onkeyup
+big onmousedown
+big onmousemove
+big onmouseout
+big onmouseover
+big onmouseup
+big style
+big title
+big xml:lang
+
+
+# blockquote
+# long quotation
+
+blockquote cite
+blockquote class
+blockquote dir
+blockquote id
+blockquote lang
+blockquote onclick
+blockquote ondblclick
+blockquote onkeydown
+blockquote onkeypress
+blockquote onkeyup
+blockquote onmousedown
+blockquote onmousemove
+blockquote onmouseout
+blockquote onmouseover
+blockquote onmouseup
+blockquote style
+blockquote title
+blockquote xml:lang
+
+
+# body
+# document body
+
+body class
+body dir
+body id
+body lang
+body onclick
+body ondblclick
+body onkeydown
+body onkeypress
+body onkeyup
+body onload
+body onmousedown
+body onmousemove
+body onmouseout
+body onmouseover
+body onmouseup
+body onunload
+body style
+body title
+body xml:lang
+
+
+# br
+# forced line break
+
+br class
+br id
+br style
+br title
+
+
+# button
+# push button
+
+button accesskey
+button class
+button dir
+button disabled
+button id
+button lang
+button name
+button onblur
+button onclick
+button ondblclick
+button onfocus
+button onkeydown
+button onkeypress
+button onkeyup
+button onmousedown
+button onmousemove
+button onmouseout
+button onmouseover
+button onmouseup
+button style
+button tabindex
+button title
+button type
+button value
+button xml:lang
+
+
+# caption
+# table caption
+
+caption class
+caption dir
+caption id
+caption lang
+caption onclick
+caption ondblclick
+caption onkeydown
+caption onkeypress
+caption onkeyup
+caption onmousedown
+caption onmousemove
+caption onmouseout
+caption onmouseover
+caption onmouseup
+caption style
+caption title
+caption xml:lang
+
+
+# cite
+# citation
+
+cite class
+cite dir
+cite id
+cite lang
+cite onclick
+cite ondblclick
+cite onkeydown
+cite onkeypress
+cite onkeyup
+cite onmousedown
+cite onmousemove
+cite onmouseout
+cite onmouseover
+cite onmouseup
+cite style
+cite title
+cite xml:lang
+
+
+# code
+# computer code fragment
+
+code class
+code dir
+code id
+code lang
+code onclick
+code ondblclick
+code onkeydown
+code onkeypress
+code onkeyup
+code onmousedown
+code onmousemove
+code onmouseout
+code onmouseover
+code onmouseup
+code style
+code title
+code xml:lang
+
+
+# col
+# table column
+
+col align
+col char
+col charoff
+col class
+col dir
+col id
+col lang
+col onclick
+col ondblclick
+col onkeydown
+col onkeypress
+col onkeyup
+col onmousedown
+col onmousemove
+col onmouseout
+col onmouseover
+col onmouseup
+col span
+col style
+col title
+col valign
+col width
+col xml:lang
+
+
+# colgroup
+# table column group
+
+colgroup align
+colgroup char
+colgroup charoff
+colgroup class
+colgroup dir
+colgroup id
+colgroup lang
+colgroup onclick
+colgroup ondblclick
+colgroup onkeydown
+colgroup onkeypress
+colgroup onkeyup
+colgroup onmousedown
+colgroup onmousemove
+colgroup onmouseout
+colgroup onmouseover
+colgroup onmouseup
+colgroup span
+colgroup style
+colgroup title
+colgroup valign
+colgroup width
+colgroup xml:lang
+
+
+# dd
+# definition description
+
+dd class
+dd dir
+dd id
+dd lang
+dd onclick
+dd ondblclick
+dd onkeydown
+dd onkeypress
+dd onkeyup
+dd onmousedown
+dd onmousemove
+dd onmouseout
+dd onmouseover
+dd onmouseup
+dd style
+dd title
+dd xml:lang
+
+
+# del
+# deleted text
+
+del cite
+del class
+del datetime
+del dir
+del id
+del lang
+del onclick
+del ondblclick
+del onkeydown
+del onkeypress
+del onkeyup
+del onmousedown
+del onmousemove
+del onmouseout
+del onmouseover
+del onmouseup
+del style
+del title
+del xml:lang
+
+
+# dfn
+# instance definition
+
+dfn class
+dfn dir
+dfn id
+dfn lang
+dfn onclick
+dfn ondblclick
+dfn onkeydown
+dfn onkeypress
+dfn onkeyup
+dfn onmousedown
+dfn onmousemove
+dfn onmouseout
+dfn onmouseover
+dfn onmouseup
+dfn style
+dfn title
+dfn xml:lang
+
+
+# div
+# generic language/style container
+
+div class
+div dir
+div id
+div lang
+div onclick
+div ondblclick
+div onkeydown
+div onkeypress
+div onkeyup
+div onmousedown
+div onmousemove
+div onmouseout
+div onmouseover
+div onmouseup
+div style
+div title
+div xml:lang
+
+
+# dl
+# definition list
+
+dl class
+dl dir
+dl id
+dl lang
+dl onclick
+dl ondblclick
+dl onkeydown
+dl onkeypress
+dl onkeyup
+dl onmousedown
+dl onmousemove
+dl onmouseout
+dl onmouseover
+dl onmouseup
+dl style
+dl title
+dl xml:lang
+
+
+# dt
+# definition term
+
+dt class
+dt dir
+dt id
+dt lang
+dt onclick
+dt ondblclick
+dt onkeydown
+dt onkeypress
+dt onkeyup
+dt onmousedown
+dt onmousemove
+dt onmouseout
+dt onmouseover
+dt onmouseup
+dt style
+dt title
+dt xml:lang
+
+
+# em
+# emphasis
+
+em class
+em dir
+em id
+em lang
+em onclick
+em ondblclick
+em onkeydown
+em onkeypress
+em onkeyup
+em onmousedown
+em onmousemove
+em onmouseout
+em onmouseover
+em onmouseup
+em style
+em title
+em xml:lang
+
+
+# fieldset
+# form control group
+
+fieldset class
+fieldset dir
+fieldset id
+fieldset lang
+fieldset onclick
+fieldset ondblclick
+fieldset onkeydown
+fieldset onkeypress
+fieldset onkeyup
+fieldset onmousedown
+fieldset onmousemove
+fieldset onmouseout
+fieldset onmouseover
+fieldset onmouseup
+fieldset style
+fieldset title
+fieldset xml:lang
+
+
+# form
+# interactive form
+
+form accept
+form accept-charset
+form action
+form class
+form dir
+form enctype
+form id
+form lang
+form method
+form onclick
+form ondblclick
+form onkeydown
+form onkeypress
+form onkeyup
+form onmousedown
+form onmousemove
+form onmouseout
+form onmouseover
+form onmouseup
+form onreset
+form onsubmit
+form style
+form title
+form xml:lang
+
+
+# h1
+# heading
+
+h1 class
+h1 dir
+h1 id
+h1 lang
+h1 onclick
+h1 ondblclick
+h1 onkeydown
+h1 onkeypress
+h1 onkeyup
+h1 onmousedown
+h1 onmousemove
+h1 onmouseout
+h1 onmouseover
+h1 onmouseup
+h1 style
+h1 title
+h1 xml:lang
+
+
+# h2
+# heading
+
+h2 class
+h2 dir
+h2 id
+h2 lang
+h2 onclick
+h2 ondblclick
+h2 onkeydown
+h2 onkeypress
+h2 onkeyup
+h2 onmousedown
+h2 onmousemove
+h2 onmouseout
+h2 onmouseover
+h2 onmouseup
+h2 style
+h2 title
+h2 xml:lang
+
+
+# h3
+# heading
+
+h3 class
+h3 dir
+h3 id
+h3 lang
+h3 onclick
+h3 ondblclick
+h3 onkeydown
+h3 onkeypress
+h3 onkeyup
+h3 onmousedown
+h3 onmousemove
+h3 onmouseout
+h3 onmouseover
+h3 onmouseup
+h3 style
+h3 title
+h3 xml:lang
+
+
+# h4
+# heading
+
+h4 class
+h4 dir
+h4 id
+h4 lang
+h4 onclick
+h4 ondblclick
+h4 onkeydown
+h4 onkeypress
+h4 onkeyup
+h4 onmousedown
+h4 onmousemove
+h4 onmouseout
+h4 onmouseover
+h4 onmouseup
+h4 style
+h4 title
+h4 xml:lang
+
+
+# h5
+# heading
+
+h5 class
+h5 dir
+h5 id
+h5 lang
+h5 onclick
+h5 ondblclick
+h5 onkeydown
+h5 onkeypress
+h5 onkeyup
+h5 onmousedown
+h5 onmousemove
+h5 onmouseout
+h5 onmouseover
+h5 onmouseup
+h5 style
+h5 title
+h5 xml:lang
+
+
+# h6
+# heading
+
+h6 class
+h6 dir
+h6 id
+h6 lang
+h6 onclick
+h6 ondblclick
+h6 onkeydown
+h6 onkeypress
+h6 onkeyup
+h6 onmousedown
+h6 onmousemove
+h6 onmouseout
+h6 onmouseover
+h6 onmouseup
+h6 style
+h6 title
+h6 xml:lang
+
+
+# head
+# document head
+
+head dir
+head id
+head lang
+head profile
+head xml:lang
+
+
+# hr
+# horizontal rule
+
+hr class
+hr dir
+hr id
+hr lang
+hr onclick
+hr ondblclick
+hr onkeydown
+hr onkeypress
+hr onkeyup
+hr onmousedown
+hr onmousemove
+hr onmouseout
+hr onmouseover
+hr onmouseup
+hr style
+hr title
+hr xml:lang
+
+
+# html
+# document root element
+
+html dir
+html id
+html lang
+html xml:lang
+html xmlns
+
+
+# i
+# italic text style
+
+i class
+i dir
+i id
+i lang
+i onclick
+i ondblclick
+i onkeydown
+i onkeypress
+i onkeyup
+i onmousedown
+i onmousemove
+i onmouseout
+i onmouseover
+i onmouseup
+i style
+i title
+i xml:lang
+
+
+# img
+# Embedded image
+
+img alt
+img class
+img dir
+img height
+img id
+img ismap
+img lang
+img longdesc
+img onclick
+img ondblclick
+img onkeydown
+img onkeypress
+img onkeyup
+img onmousedown
+img onmousemove
+img onmouseout
+img onmouseover
+img onmouseup
+img src
+img style
+img title
+img usemap
+img width
+img xml:lang
+
+
+# input
+# form control
+
+input accept
+input accesskey
+input alt
+input checked
+input class
+input dir
+input disabled
+input id
+input lang
+input maxlength
+input name
+input onblur
+input onchange
+input onclick
+input ondblclick
+input onfocus
+input onkeydown
+input onkeypress
+input onkeyup
+input onmousedown
+input onmousemove
+input onmouseout
+input onmouseover
+input onmouseup
+input onselect
+input readonly
+input size
+input src
+input style
+input tabindex
+input title
+input type
+input usemap
+input value
+input xml:lang
+
+
+# ins
+# inserted text
+
+ins cite
+ins class
+ins datetime
+ins dir
+ins id
+ins lang
+ins onclick
+ins ondblclick
+ins onkeydown
+ins onkeypress
+ins onkeyup
+ins onmousedown
+ins onmousemove
+ins onmouseout
+ins onmouseover
+ins onmouseup
+ins style
+ins title
+ins xml:lang
+
+
+# kbd
+# text to be entered by the user
+
+kbd class
+kbd dir
+kbd id
+kbd lang
+kbd onclick
+kbd ondblclick
+kbd onkeydown
+kbd onkeypress
+kbd onkeyup
+kbd onmousedown
+kbd onmousemove
+kbd onmouseout
+kbd onmouseover
+kbd onmouseup
+kbd style
+kbd title
+kbd xml:lang
+
+
+# label
+# form field label text
+
+label accesskey
+label class
+label dir
+label for
+label id
+label lang
+label onblur
+label onclick
+label ondblclick
+label onfocus
+label onkeydown
+label onkeypress
+label onkeyup
+label onmousedown
+label onmousemove
+label onmouseout
+label onmouseover
+label onmouseup
+label style
+label title
+label xml:lang
+
+
+# legend
+# fieldset legend
+
+legend accesskey
+legend class
+legend dir
+legend id
+legend lang
+legend onclick
+legend ondblclick
+legend onkeydown
+legend onkeypress
+legend onkeyup
+legend onmousedown
+legend onmousemove
+legend onmouseout
+legend onmouseover
+legend onmouseup
+legend style
+legend title
+legend xml:lang
+
+
+# li
+# list item
+
+li class
+li dir
+li id
+li lang
+li onclick
+li ondblclick
+li onkeydown
+li onkeypress
+li onkeyup
+li onmousedown
+li onmousemove
+li onmouseout
+li onmouseover
+li onmouseup
+li style
+li title
+li xml:lang
+
+
+# link
+# a media-independent link
+
+link charset
+link class
+link dir
+link href
+link hreflang
+link id
+link lang
+link media
+link onclick
+link ondblclick
+link onkeydown
+link onkeypress
+link onkeyup
+link onmousedown
+link onmousemove
+link onmouseout
+link onmouseover
+link onmouseup
+link rel
+link rev
+link style
+link title
+link type
+link xml:lang
+
+
+# map
+# client-side image map
+
+map class
+map dir
+map id
+map lang
+map name
+map onclick
+map ondblclick
+map onkeydown
+map onkeypress
+map onkeyup
+map onmousedown
+map onmousemove
+map onmouseout
+map onmouseover
+map onmouseup
+map style
+map title
+map xml:lang
+
+
+# meta
+# generic metainformation
+
+meta content
+meta dir
+meta http-equiv
+meta id
+meta lang
+meta name
+meta scheme
+meta xml:lang
+
+
+# noscript
+# alternate content container for non script-based rendering
+
+noscript class
+noscript dir
+noscript id
+noscript lang
+noscript onclick
+noscript ondblclick
+noscript onkeydown
+noscript onkeypress
+noscript onkeyup
+noscript onmousedown
+noscript onmousemove
+noscript onmouseout
+noscript onmouseover
+noscript onmouseup
+noscript style
+noscript title
+noscript xml:lang
+
+
+# object
+# generic embedded object
+
+object archive
+object class
+object classid
+object codebase
+object codetype
+object data
+object declare
+object dir
+object height
+object id
+object lang
+object name
+object onclick
+object ondblclick
+object onkeydown
+object onkeypress
+object onkeyup
+object onmousedown
+object onmousemove
+object onmouseout
+object onmouseover
+object onmouseup
+object standby
+object style
+object tabindex
+object title
+object type
+object usemap
+object width
+object xml:lang
+
+
+# ol
+# ordered list
+
+ol class
+ol dir
+ol id
+ol lang
+ol onclick
+ol ondblclick
+ol onkeydown
+ol onkeypress
+ol onkeyup
+ol onmousedown
+ol onmousemove
+ol onmouseout
+ol onmouseover
+ol onmouseup
+ol style
+ol title
+ol xml:lang
+
+
+# optgroup
+# option group
+
+optgroup class
+optgroup dir
+optgroup disabled
+optgroup id
+optgroup label
+optgroup lang
+optgroup onclick
+optgroup ondblclick
+optgroup onkeydown
+optgroup onkeypress
+optgroup onkeyup
+optgroup onmousedown
+optgroup onmousemove
+optgroup onmouseout
+optgroup onmouseover
+optgroup onmouseup
+optgroup style
+optgroup title
+optgroup xml:lang
+
+
+# option
+# selectable choice
+
+option class
+option dir
+option disabled
+option id
+option label
+option lang
+option onclick
+option ondblclick
+option onkeydown
+option onkeypress
+option onkeyup
+option onmousedown
+option onmousemove
+option onmouseout
+option onmouseover
+option onmouseup
+option selected
+option style
+option title
+option value
+option xml:lang
+
+
+# p
+# paragraph
+
+p class
+p dir
+p id
+p lang
+p onclick
+p ondblclick
+p onkeydown
+p onkeypress
+p onkeyup
+p onmousedown
+p onmousemove
+p onmouseout
+p onmouseover
+p onmouseup
+p style
+p title
+p xml:lang
+
+
+# param
+# named property value
+
+param id
+param name
+param type
+param value
+param valuetype
+
+
+# pre
+# preformatted text
+
+pre class
+pre dir
+pre id
+pre lang
+pre onclick
+pre ondblclick
+pre onkeydown
+pre onkeypress
+pre onkeyup
+pre onmousedown
+pre onmousemove
+pre onmouseout
+pre onmouseover
+pre onmouseup
+pre style
+pre title
+pre xml:lang
+pre xml:space
+
+
+# q
+# short inline quotation
+
+q cite
+q class
+q dir
+q id
+q lang
+q onclick
+q ondblclick
+q onkeydown
+q onkeypress
+q onkeyup
+q onmousedown
+q onmousemove
+q onmouseout
+q onmouseover
+q onmouseup
+q style
+q title
+q xml:lang
+
+
+# samp
+# sample program output, scripts, etc.
+
+samp class
+samp dir
+samp id
+samp lang
+samp onclick
+samp ondblclick
+samp onkeydown
+samp onkeypress
+samp onkeyup
+samp onmousedown
+samp onmousemove
+samp onmouseout
+samp onmouseover
+samp onmouseup
+samp style
+samp title
+samp xml:lang
+
+
+# script
+# script statements
+
+script charset
+script defer
+script id
+script src
+script type
+script xml:space
+
+
+# select
+# option selector
+
+select class
+select dir
+select disabled
+select id
+select lang
+select multiple
+select name
+select onblur
+select onchange
+select onclick
+select ondblclick
+select onfocus
+select onkeydown
+select onkeypress
+select onkeyup
+select onmousedown
+select onmousemove
+select onmouseout
+select onmouseover
+select onmouseup
+select size
+select style
+select tabindex
+select title
+select xml:lang
+
+
+# small
+# small text style
+
+small class
+small dir
+small id
+small lang
+small onclick
+small ondblclick
+small onkeydown
+small onkeypress
+small onkeyup
+small onmousedown
+small onmousemove
+small onmouseout
+small onmouseover
+small onmouseup
+small style
+small title
+small xml:lang
+
+
+# span
+# generic language/style container
+
+span class
+span dir
+span id
+span lang
+span onclick
+span ondblclick
+span onkeydown
+span onkeypress
+span onkeyup
+span onmousedown
+span onmousemove
+span onmouseout
+span onmouseover
+span onmouseup
+span style
+span title
+span xml:lang
+
+
+# strong
+# strong emphasis
+
+strong class
+strong dir
+strong id
+strong lang
+strong onclick
+strong ondblclick
+strong onkeydown
+strong onkeypress
+strong onkeyup
+strong onmousedown
+strong onmousemove
+strong onmouseout
+strong onmouseover
+strong onmouseup
+strong style
+strong title
+strong xml:lang
+
+
+# style
+# style info
+
+style dir
+style id
+style lang
+style media
+style title
+style type
+style xml:lang
+style xml:space
+
+
+# sub
+# subscript
+
+sub class
+sub dir
+sub id
+sub lang
+sub onclick
+sub ondblclick
+sub onkeydown
+sub onkeypress
+sub onkeyup
+sub onmousedown
+sub onmousemove
+sub onmouseout
+sub onmouseover
+sub onmouseup
+sub style
+sub title
+sub xml:lang
+
+
+# sup
+# superscript
+
+sup class
+sup dir
+sup id
+sup lang
+sup onclick
+sup ondblclick
+sup onkeydown
+sup onkeypress
+sup onkeyup
+sup onmousedown
+sup onmousemove
+sup onmouseout
+sup onmouseover
+sup onmouseup
+sup style
+sup title
+sup xml:lang
+
+
+# table
+#
+
+table border
+table cellpadding
+table cellspacing
+table class
+table dir
+table frame
+table id
+table lang
+table onclick
+table ondblclick
+table onkeydown
+table onkeypress
+table onkeyup
+table onmousedown
+table onmousemove
+table onmouseout
+table onmouseover
+table onmouseup
+table rules
+table style
+table summary
+table title
+table width
+table xml:lang
+
+
+# tbody
+# table body
+
+tbody align
+tbody char
+tbody charoff
+tbody class
+tbody dir
+tbody id
+tbody lang
+tbody onclick
+tbody ondblclick
+tbody onkeydown
+tbody onkeypress
+tbody onkeyup
+tbody onmousedown
+tbody onmousemove
+tbody onmouseout
+tbody onmouseover
+tbody onmouseup
+tbody style
+tbody title
+tbody valign
+tbody xml:lang
+
+
+# td
+# table data cell
+
+td abbr
+td align
+td axis
+td char
+td charoff
+td class
+td colspan
+td dir
+td headers
+td id
+td lang
+td onclick
+td ondblclick
+td onkeydown
+td onkeypress
+td onkeyup
+td onmousedown
+td onmousemove
+td onmouseout
+td onmouseover
+td onmouseup
+td rowspan
+td scope
+td style
+td title
+td valign
+td xml:lang
+
+
+# textarea
+# multi-line text field
+
+textarea accesskey
+textarea class
+textarea cols
+textarea dir
+textarea disabled
+textarea id
+textarea lang
+textarea name
+textarea onblur
+textarea onchange
+textarea onclick
+textarea ondblclick
+textarea onfocus
+textarea onkeydown
+textarea onkeypress
+textarea onkeyup
+textarea onmousedown
+textarea onmousemove
+textarea onmouseout
+textarea onmouseover
+textarea onmouseup
+textarea onselect
+textarea readonly
+textarea rows
+textarea style
+textarea tabindex
+textarea title
+textarea xml:lang
+
+
+# tfoot
+# table footer
+
+tfoot align
+tfoot char
+tfoot charoff
+tfoot class
+tfoot dir
+tfoot id
+tfoot lang
+tfoot onclick
+tfoot ondblclick
+tfoot onkeydown
+tfoot onkeypress
+tfoot onkeyup
+tfoot onmousedown
+tfoot onmousemove
+tfoot onmouseout
+tfoot onmouseover
+tfoot onmouseup
+tfoot style
+tfoot title
+tfoot valign
+tfoot xml:lang
+
+
+# th
+# table header cell
+
+th abbr
+th align
+th axis
+th char
+th charoff
+th class
+th colspan
+th dir
+th headers
+th id
+th lang
+th onclick
+th ondblclick
+th onkeydown
+th onkeypress
+th onkeyup
+th onmousedown
+th onmousemove
+th onmouseout
+th onmouseover
+th onmouseup
+th rowspan
+th scope
+th style
+th title
+th valign
+th xml:lang
+
+
+# thead
+# table header
+
+thead align
+thead char
+thead charoff
+thead class
+thead dir
+thead id
+thead lang
+thead onclick
+thead ondblclick
+thead onkeydown
+thead onkeypress
+thead onkeyup
+thead onmousedown
+thead onmousemove
+thead onmouseout
+thead onmouseover
+thead onmouseup
+thead style
+thead title
+thead valign
+thead xml:lang
+
+
+# title
+# document title
+
+title dir
+title id
+title lang
+title xml:lang
+
+
+# tr
+# table row
+
+tr align
+tr char
+tr charoff
+tr class
+tr dir
+tr id
+tr lang
+tr onclick
+tr ondblclick
+tr onkeydown
+tr onkeypress
+tr onkeyup
+tr onmousedown
+tr onmousemove
+tr onmouseout
+tr onmouseover
+tr onmouseup
+tr style
+tr title
+tr valign
+tr xml:lang
+
+
+# tt
+# teletype or monospaced text style
+
+tt class
+tt dir
+tt id
+tt lang
+tt onclick
+tt ondblclick
+tt onkeydown
+tt onkeypress
+tt onkeyup
+tt onmousedown
+tt onmousemove
+tt onmouseout
+tt onmouseover
+tt onmouseup
+tt style
+tt title
+tt xml:lang
+
+
+# ul
+# unordered list
+
+ul class
+ul dir
+ul id
+ul lang
+ul onclick
+ul ondblclick
+ul onkeydown
+ul onkeypress
+ul onkeyup
+ul onmousedown
+ul onmousemove
+ul onmouseout
+ul onmouseover
+ul onmouseup
+ul style
+ul title
+ul xml:lang
+
+
+# var
+# instance of a variable or program argument
+
+var class
+var dir
+var id
+var lang
+var onclick
+var ondblclick
+var onkeydown
+var onkeypress
+var onkeyup
+var onmousedown
+var onmousemove
+var onmouseout
+var onmouseover
+var onmouseup
+var style
+var title
+var xml:lang
+

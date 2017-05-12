@@ -1,0 +1,55 @@
+---
+abstract: 'Send LWP requests through a caching proxy server'
+author:
+  - 'Eric Johnson <cpan at iijo dot org>'
+build_requires:
+  LWP::UserAgent: '0'
+  MooseX::Test::Role: '0.02'
+  Test::CPAN::Meta: '0'
+  Test::HTTP::Server: '0'
+  Test::MinimumVersion::Fast: '0'
+  Test::Most: '0'
+  Test::PAUSE::Permissions: '0'
+  Test::Pod: '1.14'
+  Test::Spellunker: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-CachingProxy
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MooseX::CachingProxy:
+    file: lib/MooseX/CachingProxy.pm
+    version: '0.002'
+requires:
+  LWP::Protocol::PSGI: '0'
+  Moose::Role: '0'
+  MooseX::Types::Path::Class: '0'
+  Plack::App::Proxy: '0'
+  Plack::Builder: '0'
+  Plack::Middleware::Cache: '0'
+  perl: 5.008_001
+resources:
+  bugtracker: https://github.com/kablamo/MooseX-CachingProxy/issues
+  homepage: https://github.com/kablamo/MooseX-CachingProxy
+  repository: git://github.com/kablamo/MooseX-CachingProxy.git
+version: '0.002'
+x_authority: cpan:KABLAMO
+x_contributors:
+  - 'J.E. Turcotte <josh@numbersusa.com>'
+  - 'Eric Johnson <github@iijo.org>'
+  - 'Eric Johnson <eric.git@iijo.org>'

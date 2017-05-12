@@ -1,0 +1,27 @@
+=pod
+
+=head1 DESCRIPTION
+
+=for graph-common node { color: red; }
+
+=for graph [ Red ]
+
+=begin graph
+
+[ Red Too ] --> [ Also Red ]
+
+[ color me Red ]
+
+=end graph
+
+=for graph-common node { color: blue; }
+
+=begin graph
+
+[ Blue ] --> [ I am so Blue ]
+
+[ last of the Blue ]
+
+=end graph
+
+=cut

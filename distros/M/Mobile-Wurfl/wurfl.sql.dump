@@ -1,0 +1,1 @@
+mysqldump --no-data --add-drop-table --user="wurfl" --password="wurfl" wurfl > wurfl.sql

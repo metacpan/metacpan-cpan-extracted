@@ -1,0 +1,62 @@
+Changes for MooseX-MarkAsMethods
+
+0.15      2012-05-30 17:34:11 America/Los_Angeles
+	* Document that overload declarations must use the anon sub style for
+	  methods to resolve correctly.
+	* No code/functionality changes.
+
+0.14      2011-11-03 21:08:52 America/Los_Angeles
+	* honor the "into => 'X'" flag Sub::Exporter recognizes
+
+0.13      2011-09-17 10:08:31 America/Los_Angeles
+	* drop Perl6::Junction dependency; we don't use it (anymore?)
+
+0.12      2011-09-16 11:10:21 America/Los_Angeles
+	* restore Moose minimum version as 0.94
+
+0.11      2011-03-31 15:07:38 America/Los_Angeles
+    * Correct POD error
+    * Switch to Dist::Zilla
+
+0.10 - Mon Jun 14 2010
+	* Add author_requires for modules needed by xt/ bits.
+	* MooseX/MarkAsMethods.pm was being a touch misleading, when asking for
+	  0.90 of Moose.  This fell out of sync with the requirements in
+	  Makefile.PL, and as such has been removed.
+
+0.09 - Fri Jun 11 2010
+	* push Moose required version (rt#58309)
+
+0.08 - Tue May 25 2010
+	* Remove "inc" from MANIFEST.SKIP...  Not entirely sure how that snuck in
+	  there.
+
+0.07 - Sat May 22 2010
+	* Use wrap_method_body() rather than using our own method metaclass
+	  subclass, and drop said subclass
+	* Apply a trait to the class/role metaclass that provides a
+	  mark_as_method() method, and use that do do our method marking
+	* Initial test-cases for after-the-fact method marking
+	* Documentation updates w.r.t. the above
+
+0.06 - Tue May 11 2010
+	* Added a couple additional test cases
+	* Cleaned up our dependencies (*sigh*)
+
+0.05 - Mon Dec 14 20:15:32 2009 -0800
+  Chris Weyl <cweyl@alumni.drew.edu> (2):
+    make Perl6::Junction required for testing
+    Updating $VERSION to 0.05
+
+0.04 - Fri Dec 4 17:04:23 2009 -0800
+  Chris Weyl <cweyl@alumni.drew.edu> (4):
+    use namespace::clean->import()
+    abstract out o/l testing into check_overloads()
+    unmark author boilerplate tests as TODO
+    Updating $VERSION to 0.04
+
+0.03 - Wed Nov 25 22:15:47 2009 -0800
+  Chris Weyl <cweyl@alumni.drew.edu> (2):
+    .pm updates (autoclean)
+    Rework and enlarge test suite.
+

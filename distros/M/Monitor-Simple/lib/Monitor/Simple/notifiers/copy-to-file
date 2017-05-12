@@ -1,0 +1,76 @@
+#!/usr/bin/env perl
+#
+# A notifier script that writes notification to a given file. The file
+# can be on a remote machine if you have an ssh access (based on
+# public key) to it.
+#
+#   Usage: ./copy-to-file -service <name> -msg <file>
+#                         -file <output-file>
+#                         -login <user@hostname>
+#                         -logfile <logfile> -loglevel <level> -logformat <format>
+#      where:
+#         -service <name> idetifies a service on whom behave the notification is sent
+#         -msg <file> contains the message to be sent
+#         -file <output-file> tells where to store the notification (always, it appends)
+#         -login <user@hostname> is used if you wish to write/append to a remote file.
+#                        It is use for the ssh command. The user of this script has to
+#                        have its publis key already propagated to the provided ssh
+#                        server.
+#         and optional logging parameters that will be used to initialize logging system
+#
+#   Martin Senger <martin.senger@gmail.com>
+#   September 2011
+# -----------------------------------------------------------------
+
+use warnings;
+use strict;
+use Monitor::Simple;
+use Log::Log4perl qw(:easy);
+use Getopt::Long qw(GetOptionsFromArray);
+
+# read command-line arguments
+my ($service_id, $msgfile) =
+    Monitor::Simple::Utils->parse_notifier_args (\@ARGV);
+
+# read more command-line arguments specific for this notifier
+my ($output_file, $login_name);
+Getopt::Long::Configure ('no_ignore_case', 'pass_through');
+GetOptionsFromArray (\@ARGV,
+                     'login=s'   => \$login_name,
+                     'file=s'    => \$output_file,
+    );
+LOGDIE ("Missing parameter '-file'\n")
+    unless $output_file;
+
+# input file with the notification message
+open (my $msg, '<', $msgfile)
+    or LOGDIE ("Cannot open file '$msgfile' with the notification message: $!\n");
+
+# output
+if ($login_name) {
+    # file on a remote server (using ssh)
+    my @command = ('ssh', $login_name, 'cat', '>>', "'$output_file'");
+    DEBUG ("[$0] Command: " . join (' ', @command));
+    open (my $out, '|-', @command);
+    while (<$msg>) {
+        print $out $_;
+    }
+    close $out;
+
+} else {
+    # local file
+    open (my $out, '>>', $output_file)
+        or LOGDIE ("Cannot open file '$output_file' for writting: $!\n");
+    while (<$msg>) {
+        &Monitor::Simple::Output::lock_file ($out);
+        print $out $_;
+        &Monitor::Simple::Output::unlock_file ($out);
+    }
+    close $out;
+}
+close $msg;
+
+INFO ("[$0] Appended to '$output_file'" . ($login_name ? " [at $login_name]." : '.'));
+
+__END__
+

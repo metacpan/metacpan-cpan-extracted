@@ -1,0 +1,24 @@
+Build.PL
+Changes
+lib/Mock/Quick.pm
+lib/Mock/Quick/Class.pm
+lib/Mock/Quick/Method.pm
+lib/Mock/Quick/Object.pm
+lib/Mock/Quick/Object/Control.pm
+lib/Mock/Quick/Util.pm
+lib/Object/Quick.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/Class.t
+t/clear_warn.t
+t/intercept.t
+t/Method.t
+t/metrics.t
+t/Mock-Quick.t
+t/Object-Quick.t
+t/Object.t
+t/object_control.t
+t/Util.t

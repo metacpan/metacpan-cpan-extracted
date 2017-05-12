@@ -1,0 +1,42 @@
+#############################################################################
+#
+# muckFS.conf - muck File System Configuration File
+#
+# See http://www.muckos.org/doc/muckfs for more
+#
+#############################################################################
+
+#----------------------------------------------------------------------------
+# Debug Level
+#----------------------------------------------------------------------------
+# 1 = Muck::FS::VFS Callback Progress
+# 2 = Muck::FS::VFS Internals
+# 3 = Fuse debug
+debug = 0
+
+#----------------------------------------------------------------------------
+# Local inode Cache directory (trailing / is important!)
+#----------------------------------------------------------------------------
+cachedir = /mnt/muckFScache/
+
+#----------------------------------------------------------------------------
+# Amazon Access Keys
+#----------------------------------------------------------------------------
+# These will be used to login to S3
+aws_access_key_id = <replace with yours>
+aws_secret_access_key = <replace with yours>
+s3_bucket = <replace with yours>
+
+#----------------------------------------------------------------------------
+# DBI Credentials
+#----------------------------------------------------------------------------
+# Used to login to MySQL 
+dsn = DBI:mysql:muckfsdb:localhost
+dbuser = muckfs
+dbpass = password
+
+#----------------------------------------------------------------------------
+# Memcached Servers
+#----------------------------------------------------------------------------
+memcache_servers = localhost
+

@@ -1,0 +1,7 @@
+	Music::Tempo Readme
+ 
+ Music::Tempo provides routines for converting Beats Per Minute to and from 
+ both milliseconds and Italian tempo markings.
+
+ See the module documentation for futher details.
+

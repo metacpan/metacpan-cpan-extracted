@@ -1,0 +1,395 @@
+=head1 NAME
+
+Mozilla::DOM::URI
+
+=for object Mozilla::DOM::URI
+
+Mozilla::DOM::URI is a wrapper around an instance of Mozilla's
+nsIURI interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+ * nsIURI - interface for an uniform resource identifier w/ i18n support.
+ *
+ * AUTF8String attributes may contain unescaped UTF-8 characters.
+ * Consumers should be careful to escape the UTF-8 strings as necessary, but
+ * should always try to "display" the UTF-8 version as provided by this
+ * interface.
+ *
+ * AUTF8String attributes may also contain escaped characters.
+ *
+ * Unescaping URI segments is unadvised unless there is intimate
+ * knowledge of the underlying charset or there is no plan to display (or
+ * otherwise enforce a charset on) the resulting URI substring.
+ *
+ * @status FROZEN
+
+ * URIs are essentially structured names for things -- anything. This interface
+ * provides accessors to set and query the most basic components of an URI.
+ * Subclasses, including nsIURL, impose greater structure on the URI.
+ *
+ * This interface follows Tim Berners-Lee's URI spec (RFC2396) [1], where the
+ * basic URI components are defined as such:
+ *
+ *      ftp://username:password@hostname:portnumber/pathname
+ *      \ /   \               / \      / \        /\       /
+ *       -     ---------------   ------   --------  -------
+ *       |            |             |        |         |
+ *       |            |             |        |        Path
+ *       |            |             |       Port         
+ *       |            |            Host      /
+ *       |         UserPass                 /
+ *     Scheme                              /
+ *       \                                /
+ *        --------------------------------
+ *                       |
+ *                    PrePath
+ *
+ * The definition of the URI components has been extended to allow for
+ * internationalized domain names [2] and the more generic IRI structure [3].
+ *
+ * [1] http://www.ietf.org/rfc/rfc2396.txt
+ * [2] http://www.ietf.org/internet-drafts/draft-ietf-idn-idna-06.txt
+ * [3] http://www.ietf.org/internet-drafts/draft-masinter-url-i18n-08.txt
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::URI->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $retval = $uri->B<Clone>()
+
+=over
+
+     * Clones the current URI.  For some protocols, this is more than just an
+     * optimization.  For example, under MacOS, the spec of a file URL does not
+     * necessarily uniquely identify a file since two volumes could share the
+     * same name.
+
+=back
+
+=head2 $bool = $uri->B<Equals>($other)
+
+=over
+
+=over
+
+=item * $other (Mozilla::DOM::URI)
+
+=back
+
+     * URI equivalence test (not a strict string comparison).
+     *
+     * eg. http://foo.com:80/ == http://foo.com/
+
+=back
+
+=head2 $asciihost = $uri->B<GetAsciiHost>()
+
+=over
+
+     * The URI host with an ASCII compatible encoding.  Follows the IDNA
+     * draft spec for converting internationalized domain names (UTF-8) to
+     * ASCII for compatibility with existing internet infrasture.
+
+=back
+
+=head2 $asciispec = $uri->B<GetAsciiSpec>()
+
+=over
+
+     * The URI spec with an ASCII compatible encoding.  Host portion follows
+     * the IDNA draft spec.  Other parts are URL-escaped per the rules of
+     * RFC2396.  The result is strictly ASCII.
+
+=back
+
+=head2 $host = $uri->B<GetHost>()
+
+=over
+
+     * The host is the internet domain name to which this URI refers.  It could
+     * be an IPv4 (or IPv6) address literal.  If supported, it could be a
+     * non-ASCII internationalized domain name.
+     *
+     * Characters are NOT escaped.
+
+=back
+
+=head2 $hostport = $uri->B<GetHostPort>()
+
+=over
+
+     * The host:port (or simply the host, if port == -1).
+     *
+     * Characters are NOT escaped.
+
+=back
+
+=head2 $origincharset = $uri->B<GetOriginCharset>()
+
+=over
+
+     * The charset of the document from which this URI originated.  An empty
+     * value implies UTF-8.
+     *
+     * If this value is something other than UTF-8 then the URI components
+     * (e.g., spec, prePath, username, etc.) will all be fully URL-escaped.
+     * Otherwise, the URI components may contain unescaped multibyte UTF-8
+     * characters.
+
+=back
+
+=head2 $password = $uri->B<GetPassword>()
+
+=over
+
+See GetUserName.
+
+=back
+
+=head2 $path = $uri->B<GetPath>()
+
+=over
+
+     * The path, typically including at least a leading '/' (but may also be
+     * empty, depending on the protocol).
+     *
+     * Some characters may be escaped.
+
+=back
+
+=head2 $port = $uri->B<GetPort>()
+
+=over
+
+     * A port value of -1 corresponds to the protocol's default port (eg. -1
+     * implies port 80 for http URIs).
+
+=back
+
+=head2 $prepath = $uri->B<GetPrePath>()
+
+=over
+
+     * The prePath (eg. scheme://user:password@host:port) returns the string
+     * before the path.  This is useful for authentication or managing sessions.
+     *
+     * Some characters may be escaped.
+
+=back
+
+=head2 $scheme = $uri->B<GetScheme>()
+
+=over
+
+     * The Scheme is the protocol to which this URI refers.  The scheme is
+     * restricted to the US-ASCII charset per RFC2396.
+
+=back
+
+=head2 $spec = $uri->B<GetSpec>()
+
+=over
+
+     * Returns a string representation of the URI. Setting the spec causes
+     * the new spec to be parsed, initializing the URI.
+     *
+     * Some characters may be escaped.
+
+=back
+
+=head2 $userpass = $uri->B<GetUserPass>()
+
+=over
+
+     * The username:password (or username only if value doesn't contain a ':')
+     *
+     * Some characters may be escaped.
+
+=back
+
+=head2 $username = $uri->B<GetUsername>()
+
+=over
+
+     * The optional username and password, assuming the preHost consists of
+     * username:password.
+     *
+     * Some characters may be escaped.
+
+=back
+
+=head2 $retval = $uri->B<Resolve>($relativepath)
+
+=over
+
+=over
+
+=item * $relativePath (string)
+
+=back
+
+     * This method resolves a relative string into an absolute URI string,
+     * using this URI as the base.
+     *
+     * NOTE: some implementations may have no concept of a relative URI.
+
+=back
+
+=head2 $bool = $uri->B<SchemeIs>($scheme)
+
+=over
+
+=over
+
+=item * $scheme (string)
+
+=back
+
+     * An optimization to do scheme checks without requiring the users of nsIURI
+     * to GetScheme, thereby saving extra allocating and freeing. Returns true if
+     * the schemes match (case ignored).
+
+=back
+
+=head2 $uri->B<SetHost>($host)
+
+=over
+
+=over
+
+=item * $aHost (string)
+
+=back
+
+See GetHost.
+
+=back
+
+=head2 $uri->B<SetHostPort>($hostport)
+
+=over
+
+=over
+
+=item * $aHostPort (string)
+
+=back
+
+See GetHostPort.
+
+=back
+
+=head2 $uri->B<SetPassword>($password)
+
+=over
+
+=over
+
+=item * $aPassword (string)
+
+=back
+
+See GetUserName.
+
+=back
+
+=head2 $uri->B<SetPath>($path)
+
+=over
+
+=over
+
+=item * $aPath (string)
+
+=back
+
+See GetPath.
+
+=back
+
+=head2 $uri->B<SetPort>($port)
+
+=over
+
+=over
+
+=item * $aPort (integer (long))
+
+=back
+
+See GetPort.
+
+=back
+
+=head2 $uri->B<SetScheme>($scheme)
+
+=over
+
+=over
+
+=item * $aScheme (string)
+
+=back
+
+See GetScheme.
+
+=back
+
+=head2 $uri->B<SetSpec>($spec)
+
+=over
+
+=over
+
+=item * $aSpec (string)
+
+=back
+
+See GetSpec.
+
+=back
+
+=head2 $uri->B<SetUserPass>($userpass)
+
+=over
+
+=over
+
+=item * $aUserPass (string)
+
+=back
+
+See GetUserPass.
+
+=back
+
+=head2 $uri->B<SetUsername>($username)
+
+=over
+
+=over
+
+=item * $aUsername (string)
+
+=back
+
+See GetUserName.
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

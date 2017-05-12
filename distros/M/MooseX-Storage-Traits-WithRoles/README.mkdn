@@ -1,0 +1,63 @@
+# NAME
+
+MooseX::Storage::Traits::WithRoles - A custom trait to include roles in serialization
+
+# VERSION
+
+version 0.2.0
+
+# SYNOPSIS
+
+    package ThirdDimension;
+    use Moose::Role;
+
+    has 'z' => (is => 'rw', isa => 'Int');
+
+    package Point;
+    use Moose;
+    use MooseX::Storage;
+
+    with Storage( base => 'SerializedClass', traits => [ 'WithRoles' ] );
+
+    has 'x' => (is => 'rw', isa => 'Int');
+    has 'y' => (is => 'rw', isa => 'Int');
+
+    1;
+
+    use Moose::Util qw/ with_traits /;
+
+    my $p = with_traits( 'Point', 'ThirdDimension' )->new(x => 10, y => 10, z => 10);
+
+    my $packed = $p->pack(); 
+    # { __CLASS__ => 'Point', '__ROLES__' => [ 'ThirdDimension' ], x => 10, y => 10, z => 10 }
+
+    # unpack the hash into a class
+    my $p2 = Point->unpack($packed);
+
+    print $p2->z;
+
+# DESCRIPTION
+
+This trait is meant to be used when a base class will be consuming roles at runtime
+via (for example) `with_traits`.
+Without this trait, the '\_\_CLASS\_\_' attribute of the serialized object would be the name
+of the resulting anonymous class, which is useless to reconstruct the class after the fact.
+
+When this trait is used, the serialized `__CLASS__` value will be the base 
+class, and `__ROLES__` will contain the list of roles that it consumes. If used
+in conjecture with [MooseX::Storage::Base::SerializedClass](https://metacpan.org/pod/MooseX::Storage::Base::SerializedClass), `unpack()` will reinflate the data
+in the right class augmented by the given roles.
+
+Oh yeah, and the trait also works with [MooseX::Role::Parameterized](https://metacpan.org/pod/MooseX::Role::Parameterized) roles. You're
+welcome, Sartak. ;-)
+
+# AUTHOR
+
+Yanick Champoux <yanick@babyl.dyndns.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

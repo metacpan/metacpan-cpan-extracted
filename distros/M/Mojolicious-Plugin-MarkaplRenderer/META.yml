@@ -1,0 +1,23 @@
+---
+abstract: 'Markapl template plugin for Mojolicious'
+author:
+  - 'Gea-Suan Lin <gslin@gslin.org>'
+build_requires:
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-MarkaplRenderer
+requires:
+  Mojo::Base: 0
+resources:
+  homepage: https://github.com/gslin/mojolicious-plugin-markaplrenderer-perl
+  repository: https://github.com/gslin/mojolicious-plugin-markaplrenderer-perl.git
+version: 0.2.0

@@ -1,0 +1,48 @@
+{
+   "abstract" : "Pure Perl Mersenne Twister Random Number Generator",
+   "author" : [
+      "Dr James Freeman"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-Random-MT-Perl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Math::Random::MT" : "0",
+            "Test::Kwalitee" : "0",
+            "Test::More" : "0",
+            "Test::Number::Delta" : "0",
+            "Test::Pod" : "1.00",
+            "Test::Pod::Coverage" : "1.00",
+            "Test::Spelling" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : 1.15,
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

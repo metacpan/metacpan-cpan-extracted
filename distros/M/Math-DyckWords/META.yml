@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               Math-DyckWords
+version:            0.03
+abstract:           Perl module for generating Dyck words. Dyck words
+author:
+    - Mark Mertel <mmertel@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Math::BigInt:  ~
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

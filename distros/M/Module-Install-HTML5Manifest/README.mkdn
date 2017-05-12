@@ -1,0 +1,143 @@
+# NAME
+
+Module::Install::HTML5Manifest - HTML5 application cache manifest file generator for Module::Install
+
+# SYNOPSIS
+
+## simple usage
+
+in your Makefile.PL
+
+    use Module::Install::HTML5Manifest;
+    
+
+    use inc::Module::Install;
+    name 'Example';
+    all_from 'lib/Example.pm';
+    
+
+    html5_manifest
+        htdocs_from   => 'htdocs',
+        manifest_skip => 'html5manifest.skip',
+        generate_to   => 'example.manifest',
+        with_gzfile   => 1, # create .gz file
+        network_list  => [qw( /api /foo/bar.cgi )],
+        use_digest    => 1,
+        ;
+    
+
+    WriteAll;
+
+in your html5manifest.skip
+
+    \.txt$
+    tmp/
+
+run shell commands
+
+    $ perl Makefile.PL
+    $ make html5manifest
+    $ cat example.manifest
+    $ zcat example.manifest.gz
+
+## customize make file target
+in your Makefile.PL
+
+    use Module::Install::HTML5Manifest;
+    
+
+    use inc::Module::Install;
+    name 'Example';
+    all_from 'lib/Example.pm';
+    
+
+    html5_manifest
+        make_target   => 'html5manifest_target1',
+        htdocs_from   => 'htdocs',
+        manifest_skip => 'html5manifest_target1.skip',
+        generate_to   => 'target1.manifest',
+        ;
+    
+
+    html5_manifest
+        make_target   => 'html5manifest_target2',
+        htdocs_from   => 'htdocs',
+        manifest_skip => 'html5manifest_target2.skip',
+        generate_to   => 'target2.manifest',
+        ;
+    
+
+    WriteAll;
+
+in your html5manifest1.skip
+
+    \.txt$
+    tmp/
+
+run shell commands
+
+    $ perl Makefile.PL
+    $ make html5manifest_target1
+    $ make html5manifest_target2
+    $ cat target1.manifest
+    $ cat target2.manifest
+
+# DESCRIPTION
+
+Module::Install::HTML5Manifest is generate HTML5 application cache manifest file.
+
+# FUNCTION
+
+## html5_manifest(%args)
+
+The following options can be specified and suitable HTML5 manifest file for your site can be generated.
+
+_%args_ are:
+
+- `make_target => $make_target`
+
+you can change make command target of making manifest file.
+
+default value is 'html5manifest'.
+
+- `htdocs_from => $htdocs_path`
+
+root directory of a file included to manifest is specified.
+
+- `manifest_skip => $manifest_skip_file_path`
+
+The file path which saved the list of the file pattern excepted to manifest file is specified.
+
+The file pattern excepted from `$args{htdocs}` is described. It is the same work as `MANIFEST.SKIP`.
+
+- `network_list => \@network_list`
+
+NETWORK: URL specified as section is specified in manifest file.
+
+- `generate_to => $output_manifest_file_path`
+
+The file path of manifest file created by the make command is specified.
+
+- `with_gzfile => $boolean`
+
+true is passed when making .gz file together with the file created by `generate_to`.
+
+In many cases, the transfer cost when sending a manifest file to a browser decreases.
+
+- `use_digest => $boolean`
+
+md5 checksum is created from all the contents of the file included in cache, and it writes in manifest file.
+This is useful to updating detection of manifest file.
+
+# AUTHOR
+
+Kazuhiro Osawa <yappo {at} shibuya {dot} pl>
+
+# SEE ALSO
+
+[HTML5::Manifest](http://search.cpan.org/perldoc?HTML5::Manifest), [http://www.w3.org/TR/html5/offline.html](http://www.w3.org/TR/html5/offline.html)
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

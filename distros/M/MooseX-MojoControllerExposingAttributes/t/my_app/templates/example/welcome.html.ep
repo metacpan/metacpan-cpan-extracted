@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <div id='name'><%= ctrl->name %></div>
+  <div id='rose'><%= ctrl->rose %></div>
+  <div id='custom'><%= ctrl->custom %></div>
+</body>
+</html>

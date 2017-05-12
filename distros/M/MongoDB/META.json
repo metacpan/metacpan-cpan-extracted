@@ -1,0 +1,417 @@
+{
+   "abstract" : "Official MongoDB Driver for Perl",
+   "author" : [
+      "David Golden <david@mongodb.com>",
+      "Rassi <rassi@mongodb.com>",
+      "Mike Friedman <friedo@friedo.com>",
+      "Kristina Chodorow <k.chodorow@gmail.com>",
+      "Florian Ragwitz <rafl@debian.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MongoDB",
+   "no_index" : {
+      "directory" : [
+         "devel",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Config::AutoConf" : "0.22",
+            "ExtUtils::MakeMaker" : "0",
+            "Path::Tiny" : "0.052"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "English" : "0",
+            "Test::Memory::Cycle" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Version" : "1",
+            "lib" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "IO::Socket::IP" : "0.25",
+            "IO::Socket::SSL" : "1.42",
+            "Mozilla::CA" : "20130114",
+            "Net::SSLeay" : "1.49"
+         },
+         "requires" : {
+            "Authen::SCRAM::Client" : "0.003",
+            "BSON::Decimal128" : "0",
+            "BSON::Types" : "0",
+            "Carp" : "0",
+            "Class::XSAccessor" : "0",
+            "DateTime" : "0.78",
+            "Digest::MD5" : "0",
+            "Encode" : "0",
+            "Exporter" : "5.57",
+            "IO::File" : "0",
+            "IO::Socket" : "0",
+            "List::Util" : "0",
+            "MIME::Base64" : "0",
+            "Moo" : "2",
+            "Moo::Role" : "0",
+            "Safe::Isa" : "0",
+            "Scalar::Util" : "0",
+            "Socket" : "0",
+            "Sub::Quote" : "0",
+            "Tie::IxHash" : "0",
+            "Time::HiRes" : "0",
+            "Try::Tiny" : "0",
+            "Type::Library" : "0",
+            "Type::Tiny::XS" : "0",
+            "Type::Utils" : "0",
+            "Types::Standard" : "0",
+            "XSLoader" : "0",
+            "boolean" : "0.25",
+            "bytes" : "0",
+            "constant" : "0",
+            "if" : "0",
+            "namespace::clean" : "0",
+            "overload" : "0",
+            "perl" : "v5.8.0",
+            "re" : "0",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         },
+         "suggests" : {
+            "IO::Socket::SSL" : "1.56"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900",
+            "DateTime::Tiny" : "1",
+            "Test::Harness" : "3.31",
+            "Time::Moment" : "0.22"
+         },
+         "requires" : {
+            "Data::Dumper" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Compare" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "FileHandle" : "0",
+            "JSON::MaybeXS" : "0",
+            "Math::BigInt" : "0",
+            "Path::Tiny" : "0.054",
+            "Test::Deep" : "0.111",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.96",
+            "bigint" : "0",
+            "lib" : "0",
+            "threads::shared" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MongoDB" : {
+         "file" : "lib/MongoDB.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::AuthError" : {
+         "file" : "lib/MongoDB/Error.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::BSON" : {
+         "file" : "lib/MongoDB/BSON.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::BSON::Binary" : {
+         "file" : "lib/MongoDB/BSON/Binary.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::BSON::Regexp" : {
+         "file" : "lib/MongoDB/BSON/Regexp.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::BulkWrite" : {
+         "file" : "lib/MongoDB/BulkWrite.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::BulkWriteResult" : {
+         "file" : "lib/MongoDB/BulkWriteResult.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::BulkWriteView" : {
+         "file" : "lib/MongoDB/BulkWriteView.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::Code" : {
+         "file" : "lib/MongoDB/Code.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::Collection" : {
+         "file" : "lib/MongoDB/Collection.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::CommandResult" : {
+         "file" : "lib/MongoDB/CommandResult.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::ConnectionError" : {
+         "file" : "lib/MongoDB/Error.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::Cursor" : {
+         "file" : "lib/MongoDB/Cursor.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::CursorNotFoundError" : {
+         "file" : "lib/MongoDB/Error.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::DBRef" : {
+         "file" : "lib/MongoDB/DBRef.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::Database" : {
+         "file" : "lib/MongoDB/Database.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::DatabaseError" : {
+         "file" : "lib/MongoDB/Error.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::DecodingError" : {
+         "file" : "lib/MongoDB/Error.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::DeleteResult" : {
+         "file" : "lib/MongoDB/DeleteResult.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::DocumentError" : {
+         "file" : "lib/MongoDB/Error.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::DuplicateKeyError" : {
+         "file" : "lib/MongoDB/Error.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::Error" : {
+         "file" : "lib/MongoDB/Error.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::ExecutionTimeout" : {
+         "file" : "lib/MongoDB/Error.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::GridFS" : {
+         "file" : "lib/MongoDB/GridFS.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::GridFS::File" : {
+         "file" : "lib/MongoDB/GridFS/File.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::GridFSBucket" : {
+         "file" : "lib/MongoDB/GridFSBucket.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::GridFSBucket::DownloadStream" : {
+         "file" : "lib/MongoDB/GridFSBucket/DownloadStream.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::GridFSBucket::UploadStream" : {
+         "file" : "lib/MongoDB/GridFSBucket/UploadStream.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::GridFSError" : {
+         "file" : "lib/MongoDB/Error.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::HandshakeError" : {
+         "file" : "lib/MongoDB/Error.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::IndexView" : {
+         "file" : "lib/MongoDB/IndexView.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::InsertManyResult" : {
+         "file" : "lib/MongoDB/InsertManyResult.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::InsertOneResult" : {
+         "file" : "lib/MongoDB/InsertOneResult.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::InternalError" : {
+         "file" : "lib/MongoDB/Error.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::MongoClient" : {
+         "file" : "lib/MongoDB/MongoClient.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::NetworkError" : {
+         "file" : "lib/MongoDB/Error.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::NetworkTimeout" : {
+         "file" : "lib/MongoDB/Error.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::NotMasterError" : {
+         "file" : "lib/MongoDB/Error.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::OID" : {
+         "file" : "lib/MongoDB/OID.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::ProtocolError" : {
+         "file" : "lib/MongoDB/Error.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::QueryResult" : {
+         "file" : "lib/MongoDB/QueryResult.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::QueryResult::Filtered" : {
+         "file" : "lib/MongoDB/QueryResult/Filtered.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::ReadConcern" : {
+         "file" : "lib/MongoDB/ReadConcern.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::ReadPreference" : {
+         "file" : "lib/MongoDB/ReadPreference.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::SelectionError" : {
+         "file" : "lib/MongoDB/Error.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::TimeoutError" : {
+         "file" : "lib/MongoDB/Error.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::Timestamp" : {
+         "file" : "lib/MongoDB/Timestamp.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::UnacknowledgedResult" : {
+         "file" : "lib/MongoDB/UnacknowledgedResult.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::UpdateResult" : {
+         "file" : "lib/MongoDB/UpdateResult.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::UsageError" : {
+         "file" : "lib/MongoDB/Error.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::WriteConcern" : {
+         "file" : "lib/MongoDB/WriteConcern.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::WriteConcernError" : {
+         "file" : "lib/MongoDB/Error.pm",
+         "version" : "v1.8.0"
+      },
+      "MongoDB::WriteError" : {
+         "file" : "lib/MongoDB/Error.pm",
+         "version" : "v1.8.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://jira.mongodb.org/browse/PERL"
+      },
+      "homepage" : "https://github.com/mongodb/mongo-perl-driver",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mongodb/mongo-perl-driver.git",
+         "web" : "https://github.com/mongodb/mongo-perl-driver"
+      }
+   },
+   "version" : "v1.8.0",
+   "x_contributors" : [
+      "Andrew Page <andrew@infosiftr.com>",
+      "Andrey Khozov <avkhozov@gmail.com>",
+      "Ashley Willis <ashleyw@cpan.org>",
+      "Ask Bj\u00f8rn Hansen <ask@develooper.com>",
+      "Bernard Gorman <bernard.gorman@mongodb.com>",
+      "Brendan W. McAdams <brendan@mongodb.com>",
+      "Casey Rojas <casey.j.rojas@gmail.com>",
+      "Christian Hansen <chansen@cpan.org>",
+      "Christian Sturm <kind@gmx.at>",
+      "Christian Walde <walde.christian@googlemail.com>",
+      "Colin Cyr <ccyr@sailingyyc.com>",
+      "Danny Raetzsch <danny@paperskymedia.com>",
+      "David Morrison <dmorrison@venda.com>",
+      "David Nadle <david@nadle.com>",
+      "David Steinbrunner <dsteinbrunner@pobox.com>",
+      "David Storch <david.storch@mongodb.com>",
+      "diegok <diego@freekeylabs.com>",
+      "D. Ilmari Manns\u00e5ker <ilmari.mannsaker@net-a-porter.com>",
+      "Eric Daniels <eric.daniels@mongodb.com>",
+      "Gerard Goossen <gerard@ggoossen.net>",
+      "Glenn Fowler <cebjyre@cpan.org>",
+      "Graham Barr <gbarr@pobox.com>",
+      "Hao Wu <echowuhao@gmail.com>",
+      "Jason Carey <jason.carey@mongodb.com>",
+      "Jason Toffaletti <jason@topsy.com>",
+      "Johann Rolschewski <rolschewski@gmail.com>",
+      "Joseph Harnish <bigjoe1008@gmail.com>",
+      "Josh Matthews <joshua.matthews@mongodb.com>",
+      "Joshua Juran <jjuran@metamage.com>",
+      "J. Stewart <jstewart@langley.theshire>",
+      "Kamil Slowikowski <kslowikowski@gmail.com>",
+      "Ken Williams <kwilliams@cpan.org>",
+      "Matthew Shopsin <matt.shopsin@mongodb.com>",
+      "Michael Langner <langner@fch.de>",
+      "Michael Rotmanov <rotmanov@sipgate.de>",
+      "Mike Dirolf <mike@mongodb.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Nickola Trupcheff <n.trupcheff@gmail.com>",
+      "Nigel Gregoire <nigelg@airg.com>",
+      "Niko Tyni <ntyni@debian.org>",
+      "Nuno Carvalho <mestre.smash@gmail.com>",
+      "Orlando Vazquez <ovazquez@gmail.com>",
+      "Othello Maurer <omaurer@venda.com>",
+      "Pan Fan <nightsailer@gmail.com>",
+      "Pavel Denisov <pavel.a.denisov@gmail.com>",
+      "Rahul Dhodapkar <rahul@mongodb.com>",
+      "Robin Lee <cheeselee@fedoraproject.org>",
+      "Roman Yerin <kid@cpan.org>",
+      "Ronald J Kimball <rkimball@pangeamedia.com>",
+      "Ryan Chipman <ryan@ryanchipman.com>",
+      "Slaven Rezic <slaven.rezic@idealo.de>",
+      "Stephen Oberholtzer <stevie@qrpff.net>",
+      "Steve Sanbeg <stevesanbeg@buzzfeed.com>",
+      "Stuart Watt <stuart@morungos.com>",
+      "Uwe Voelker <uwe.voelker@xing.com>",
+      "Whitney Jackson <whjackson@gmail.com>",
+      "Xtreak <tirkarthi@users.noreply.github.com>",
+      "Zhihong Zhang <zzh_621@yahoo.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

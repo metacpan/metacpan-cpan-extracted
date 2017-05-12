@@ -1,0 +1,26 @@
+Revision history for Mojo-Log-JSON
+
+0.04  2015-09-08 15:16:16 BST
+
+ [Enhancements]
+ - Uses JSON::MaybeXS instead of JSON to load appropriate JSON package
+
+ [Bug Fixes]
+ - No longer loads JSON module(s) when using codec argument
+
+0.03  2015-01-23 14:55:17 GMT
+
+ [Features]
+ - Add include_level option to toggle level key in output
+ 
+ [Maintenance]
+ - Added CONTRIBUTORS to POD
+ - Added more tests (default_fields and include_level)
+ - Switched from Test::Trap to Capture::Tiny (Issue #2)
+
+0.02  2014-08-04 12:14:04 BST
+
+ - BUGFIX: Updated to work with Mojolicious 5.0+ only (big changes to Mojo::Log)
+
+0.01  2014-04-10 15:10:02 BST
+ - Initial release

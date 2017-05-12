@@ -1,0 +1,20 @@
+NAME
+
+    Module::Mask - Pretend certain modules are not installed
+
+INSTALLATION
+
+    perl Build.PL
+    ./Build test
+    ./Build install
+
+    - or -
+
+    perl Makefile.PL
+    make test
+    make install
+
+AUTHOR
+
+    Matt Lawrence <mattlaw@cpan.org>
+

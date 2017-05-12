@@ -1,0 +1,8 @@
+lib/Math/Cartesian/Product.pm
+CHANGES
+Build.PL
+MANIFEST
+META.yml
+README
+t/test.t
+META.json

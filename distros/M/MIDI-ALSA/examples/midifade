@@ -1,0 +1,542 @@
+#! /usr/bin/perl
+#########################################################################
+#        This Perl script is Copyright (c) 2006, Peter J Billam         #
+#     c/o P J B Computing, GPO Box 669, Hobart TAS 7001, Australia      #
+#                                                                       #
+#     This script is free software; you can redistribute it and/or      #
+#            modify it under the same terms as Perl itself.             #
+#########################################################################
+#
+# see 20111002    midislide ?
+# 20140306 seconded ! : for pitch-adjusting the midi
+#   when there are midi files and audio-files
+#   so that the synth can be tuned by hand to an arbitrary wav file
+# could simply offer pitchbend as a alternative to cc=?
+#   perhaps just the letter "p" instead of the cc number !
+# Or, should always apply to all channels ? This will be the common case...
+#
+# Also: an audiofile-mixer option, which starts up a suitable ecasound
+# and offers vol,pan,filter on each audiofile !
+#   midifade -audio v,p gtr.wav v,f,q str.wav v brass.wav backing.wav
+
+# and could record its fadermovements in a midi file
+#   which (or several of which) can be replayed behind subsequent passes
+#   should contain a comment on which vpfq and which audiofile,
+#     so the ecasound commands can be reconstructed.
+#   midifade -audio -replay mix0.mid,mix1.mid v,p,f,q vocal.wav final.wav
+#     those midifiles should automatically replay their audio-file.
+# However the whole mechanism only redoes what can be done by producing
+#   a mixed-down .wav, and then using that as subsequent audio input.
+# Therefore forget the -replay option and the custom midi-comments.
+
+
+# Curses interface from midiedit, midi stuff from midikbd.
+# On exit, could print the equivalent muscript, or Perl,Python,or Lua ?
+# 20130814: midifade could conceiveably take an a=auto for the value,
+#   asking somehow for min, max, period, perhaps sin/tri/sawup/sawdown, and
+#   then behave like panfarm on MIDI::ALSA. Probably need a child process...
+# 20130815: Also, then what would the Up/Down/PgUp/PgDown/Home/End keys do ?
+#   or, instead of n=new, perhaps w=wahwah and p=pan ?  74 wants also 71
+#   should this be in our hypothetical midihub? Only really applies to 11,74
+
+my $Version      = '2.0'; # a new fader with val=0 does not get given val=64
+my $VersionDate  = '09aug2015';
+my $OutputPort   = $ENV{'ALSA_OUTPUT_PORTS'};
+my $ColsPerFader = 6;
+my $AlsaName     = "midifade";
+
+eval 'require Curses'; if ($@) {
+	die "you'll need to install the Curses module from www.cpan.org\n";
+}
+import Curses;
+eval 'require MIDI::ALSA'; if ($@) {
+	die "you'll need to install the MIDI::ALSA module from www.cpan.org\n";
+}
+import MIDI::ALSA;
+
+# use Data::Dumper;
+
+while ($ARGV[$[] =~ /^-(\w)/) {
+	if ($1 eq 'd')      { $UseCurses = 0; shift;
+	} elsif ($1 eq 'o') { shift; $OutputPort = shift;
+	} elsif ($1 eq 'N') { shift; $AlsaName = shift;
+	} else {
+print <<EOT; exit 0;
+Usage:
+   midifade c13m71v120 c2m11v80 # 2 faders: cha2 cc11=80, cha13 cc71=120
+   midifade -o 128:0            # outputs to port 0 of client 128
+   midifade -N fad9             # sets AlsaClientName to 'fad9'
+   midifade -v                  # prints the Version number
+   perldoc midifade             # read the manual :-)
+Version $Version   $VersionDate   http://www.pjb.com.au/midi
+EOT
+	}
+}
+my @Faders = ();  # LoL {$c,$m,$v}
+my $IFader = undef;
+
+my @note2letter=split / /,'C C D E E F F G G A B B c c d e e f f g g a b b';
+my @note2acc = ('','#','','b','','','#','','#','','b','');
+
+if (! MIDI::ALSA::client( $AlsaName, 0, 1, 1 )) {
+	die "can't start up the ALSA client\n";
+}
+foreach my $cl_po (split /,/, $OutputPort) {  # 1.3
+	if ($cl_po ne '0') {
+		if (! MIDI::ALSA::connectto( 1, $cl_po )) {  # 1.4
+			die "can't connect to ALSA client $cl_po\n";
+		}
+	}
+}
+if (! MIDI::ALSA::start()) { die "can't start the ALSA client queue\n"; }
+my $ID = MIDI::ALSA::id();
+
+while ($ARGV[$[] =~ /^c(\d+)m(\d+)(v(\d+))?$/) {  # must start client first!
+	add_new_fader($1,$2,$4); shift;
+}
+
+# eval 'sub END {all_sounds_off();}';
+
+# ----- the Curses app...
+initscr(); cbreak(); noecho(); nonl(); clear();
+# start_color();  # can't seem to get it not to enforce white on black
+# init_pair(1, COLOR_WHITE(), COLOR_BLACK());
+# init_pair(2, COLOR_RED(), COLOR_RED());
+# attrset(COLOR_PAIR(1));
+# http://docstore.mik.ua/orelly/perl/cookbook/ch15_13.htm  BUT:
+keypad(stdscr(),1);
+$SIG{'INT'} = sub {exit 0;}; $SIG{'TERM'} = sub {exit 0;};
+eval 'sub END {endwin();}';  # mustn't create call to endwin in nonCurses mode
+display_clientstr();   # 1.6
+display_screen();
+
+while (1) {  # the loop
+	my $c = getch();
+	if ($c == ERR())   {
+		# see man ncurses ==> man inopts
+		timeout(-1);  # Shouldn't happen. Anyway, block next read
+		# but could use this for a Message which vanishes after 2 sec
+	} elsif ($c eq 'q')  { quit();
+	} elsif ($c eq 'Q')  { exit 0;
+	} elsif ($c eq 'D') { # or $c==KEY_DL() or $c==KEY_DC()) { too close to End
+		if (@Faders) {
+			splice @Faders, $IFader, 1;
+			if ($IFader > $#Faders) { $IFader = $#Faders; }
+		}
+		display_screen();
+	} elsif ($c eq 'n')    {
+		my ($c,$m,$v) = new_fader_dialogue();
+		if (defined $m) { add_new_fader($c,$m,$v); }
+		display_screen();
+	} elsif ($c == KEY_UP() or $c eq 'k')    {
+		my ($c,$m,$v) = @{$Faders[$IFader]};
+		$v += 1; if ($v > 127) { $v = 127; }
+		$Faders[$IFader] = [$c,$m,$v]; output_fader($IFader); display_screen();
+	} elsif ($c == KEY_DOWN() or $c eq 'j')  {
+		my ($c,$m,$v) = @{$Faders[$IFader]};
+		$v -= 1; if ($v < 0) { $v = 0; }
+		$Faders[$IFader] = [$c,$m,$v]; output_fader($IFader); display_screen();
+	} elsif ($c == KEY_LEFT() or $c eq 'h')  {
+		if ($IFader>$[) { $IFader -= 1; } display_screen();
+	} elsif ($c == KEY_RIGHT() or $c eq 'l') {
+		if ($IFader<$#Faders) { $IFader += 1; } display_screen();
+	} elsif ($c eq "\t") {
+		if ($IFader<$#Faders) { $IFader += 1; } else { $IFader = $[; }
+		display_screen();
+	} elsif ($c == KEY_PPAGE() or $c eq 'K') {
+		my ($c,$m,$v) = @{$Faders[$IFader]};
+		$v += 10; if ($v > 127) { $v = 127; }
+		$Faders[$IFader] = [$c,$m,$v];
+		output_fader($IFader); display_screen();
+	} elsif ($c == KEY_NPAGE() or $c eq 'J') {
+		my ($c,$m,$v) = @{$Faders[$IFader]};
+		$v -= 10; if ($v < 0) { $v = 0; }
+		$Faders[$IFader] = [$c,$m,$v];
+		output_fader($IFader); display_screen();
+	} elsif ($c == KEY_HOME())  {
+		my ($c,$m,$v) = @{$Faders[$IFader]};
+		$Faders[$IFader] = [$c,$m,127];
+		output_fader($IFader); display_screen();
+	} elsif ($c == KEY_END())   {  # all_sounds_off ? or v=0?
+		my ($c,$m,$v) = @{$Faders[$IFader]};
+		$Faders[$IFader] = [$c,$m,0];
+		output_fader($IFader); display_screen();
+	}
+}
+
+#-------------- Infrastructure for the Curses version -------------
+sub addl { my ($lin,$col,$str) = @_;
+	move($lin,$col); addstr($str); clrtoeol();
+}
+
+sub all_sounds_off {
+	foreach my $c (0..15) {
+		MIDI::ALSA::output(MIDI::ALSA::controllerevent($c,120,0));
+	}
+	MIDI::ALSA::stop();
+}
+
+sub cc2str { my $m = $_[$[];
+	if (! %c2s) { %c2s = (
+		0, 'Bank Select (MSB)',
+		32, 'Bank Select (LSB)',
+		64, 'Sustain Pedal',
+		96, 'Data Increment',
+		1, 'Modulation (MSB)',
+		33, 'Modulation (LSB)',
+		65, 'Portamento on/off',
+		97, 'Data Decrement',
+		2, 'Breath Control (MSB)',
+		34, 'Breath Control (LSB)',
+		66, 'Sostenuto Pedal',
+		98, 'non-reg param lsb',
+		67, 'Soft Pedal',
+		99, 'non-reg param msb',
+		4, 'Foot Control (MSB)',
+		36, 'Foot Control (LSB)',
+		68, 'Legato Pedal',
+		100, 'Reg Param (LSB)',
+		5, 'Portamento Time (MSB)',
+		37, 'Portamento Time (LSB)',
+		69, 'Hold 2',
+		101, 'Reg Param (MSB)',
+		6, 'Data Entry (MSB)',
+		38, 'Data Entry (LSB)',
+		70, 'Sound Variation',
+		7, 'Channel Volume (MSB)',
+		39, 'Channel Volume (LSB)',
+		71, 'Resonance, Q',
+		8, 'Balance (MSB)',
+		40, 'Balance (LSB)',
+		72, 'Release Time',
+		73, 'Attack Time',
+		10, 'Pan (MSB)',
+		42, 'Pan (LSB)',
+		74, 'Cut-off Frequency',
+		11, 'Expression (MSB)',
+		43, 'Expression (LSB)',
+		75, 'Decay Time',
+		12, 'Effects Controller 1',
+		76, 'Vibrato Rate',
+		13, 'Effects Controller 2',
+		77, 'Vibrato Depth',
+		78, 'Vibrato Delay',
+		84, 'Portamento Control',
+		120, 'All Sound Off',
+		121, 'Reset All Controllers',
+		122, 'Local Control',
+		91, 'Reverb Depth',
+		123, 'All Notes Off',
+		92, 'Tremolo Depth',
+		124, 'Omni Off',
+		93, 'Chorus Depth',
+		125, 'Omni On',
+		94, 'Celeste (De-tune)',
+		126, 'Mono On (Poly off)',
+		95, 'Phaser Depth',
+		127, 'Poly On (Mono off)',
+		);
+	}
+	return $c2s{$_[$[]} || '';
+}
+
+sub debug {
+	open (T, '>>', '/tmp/debug');
+	print T $_[$[],"\n";
+	close T;
+}
+
+sub add_new_fader { my ($c,$m,$v) = @_;
+	if (! defined $v) { $v = 64; }
+	$c = 0+$c; $m = 0+$m; $v = 0+$v;
+	my $i = $[; while ($i <= $#Faders) {
+		my ($this_c,$this_m,$this_v) = @{$Faders[$i]};
+		if ($this_c == $c and $this_m == $m) {  # a duplicate; update $v
+			$Faders[$i] = [$c,$m,$v];  $IFader = $i;
+			output_fader($IFader); return 1;
+		} elsif ($this_c > $c or ($this_c == $c and $this_m > $m)) {
+			splice @Faders, $i, 0, [$c,$m,$v];  $IFader = $i;
+			output_fader($IFader); return 1;
+		}
+		$i += 1;
+	}
+	push @Faders, [$c,$m,$v]; $IFader = $#Faders;
+	output_fader($IFader); return 1;
+}
+
+sub display_faders {
+	foreach my $irow (1..$LINES-4) { move($irow, 0); clrtoeol(); } # XXX
+	foreach my $i ($[ .. $#Faders) { display_fader($i); }
+	refresh();
+}
+
+sub output_fader { my $i = $_[$[];
+	if ($i < $[ or $i > $#Faders) { die "output_fader: i=$i\n"; }
+	my ($c,$m,$v) = @{$Faders[$i]};
+	my ($status,$time,$events ) = MIDI::ALSA::status();
+	MIDI::ALSA::output(MIDI::ALSA::controllerevent($c,$m,$v,$time));
+	MIDI::ALSA::syncoutput();
+}
+sub display_fader { my $i = $_[$[];
+	if ($i < $[ or $i > $#Faders) { die "display_fader: i=$i\n"; }
+	my $icol = 2 + $ColsPerFader * ($i-$[);
+	my ($c,$m,$v) = @{$Faders[$i]};
+	move($LINES-6,$icol); addstr(substr " c=$c   ",$[,6);
+	move($LINES-5,$icol); addstr(substr " m=$m   ",$[,6);
+	move($LINES-4,$icol); addstr(substr " v=$v   ",$[,6);
+	my $top_of_fader = 0 + round(($LINES-7) * (128-$v) / 128);
+	my $irow = 1; while ($irow < $top_of_fader) {
+		move($irow, $icol); attrset(A_NORMAL()); addstr(q{ } x $ColsPerFader);
+		$irow += 1;
+	}
+	while ($irow < ($LINES-6)) {
+		move($irow, $icol+2);
+		if ($i == $IFader) {
+			attrset(A_REVERSE()); addstr('  '); attrset(A_NORMAL());
+		} else {
+			# attrset(A_REVERSE()); attrset(COLOR_PAIR(2));
+			addstr('XX');
+			# addstr("\e[41m  \e[0m");   # addstr escapes the escapes :-(
+			# refresh(); print STDERR "\e[41m  \e[0m\e[D\e[D"; leaves bg wrong
+			# attrset(A_NORMAL()); attrset(COLOR_PAIR(1));
+		}
+		$irow += 1;
+	}
+	if ($i == $IFader) {
+		move(0,0); clrtoeol();
+		my $s1 = cc2str($m);
+		my $x = $icol + 4 - round(0.5 * length($s1));
+		if ($x < 0) { $x = 0; } elsif ($x > $COLS) { $x = $COLS - length $s1; }
+		display_clientstr();
+		move(0,$x); addstr("$s1 "); # cc-str overwrites client-str if conflict
+	}
+	if ($i == $#Faders) {
+		foreach my $irow (1..$LINES-4) { move($irow, $icol+6); clrtoeol(); }
+	}
+	move($LINES-4, ($IFader-$[) * $ColsPerFader + 4);
+}
+
+sub display_clientstr {   # 1.6
+	my $s2 = "client $ID, $AlsaName";
+	if (($icol+4) > 0.5*$COLS) { move(0,0);
+	} else { move(0, $COLS-length($s2)-1);
+	}
+	addstr($s2);
+	refresh();
+}
+
+sub display_keystrokes {
+	$TopKeystrokesLine = $LINES-4;
+	if ($Message) {
+		move($LINES-2,2); clrtoeol();
+		addl($LINES-2, round(0.4*($COLS - length $Message)) ,$Message);
+		# move($LINES-3,2); clrtoeol();
+		$Message = '';
+	} else {
+		addl($LINES-2,2,
+		'Left,Right,Tab=move between faders  n=new  D=Delete  q=quit');
+	}
+	addl($LINES-1,2,
+		  'k/Up/j/Down=+-1,  K/PageUp/J/PageDown=+-10,  Home=127,  End=0');
+	refresh();
+}
+
+sub display_screen {
+	move($LINES-3,1); hline($ACS_HLINE,$COLS-2);
+	display_keystrokes();
+	display_faders();
+	refresh();
+}
+
+sub display_message {
+	my ($y,$x); getyx($y,$x);
+	$Message = $_[$[]; display_keystrokes();
+	move($y,$x);
+	refresh();
+}
+
+sub new_fader_dialogue {
+	# Could introduce value=A meaning Auto like panfarm
+	# and then ask for min, max, period, perhaps sin/tri/sawup/sawdown
+	addl($LINES-3,2,'        Channel (0..15)  ?');
+	addl($LINES-2,2,'MIDI-Controller (0..127) ?');
+	addl($LINES-1,2,'          Value (0..127) ?');
+	refresh();
+	my @newfader = ();
+	my $iline = 3;
+	while ($iline > 0) {
+		move($LINES-$iline,29);
+		my $str; my $n;
+		echo();
+		if ($iline == 3) { $n = getnstr($str,2);   # 1.2
+		} else { $n = getnstr($str,3);
+		}
+		noecho();
+		if (length $str) { $newfader[$[+3-$iline] = 0 + $str; }  # 2.0 length
+		$iline -= 1;
+	}
+	return @newfader;
+}
+
+sub quit {
+	move($LINES-2,2); clrtobot();
+	addl($LINES-2,round(0.4*($COLS-24)),"OK to quit (y/n) ? ");
+	my $c = getch();
+	if ($c eq 'y') { exit 0; }
+	display_keystrokes();
+	move($LINES-4, ($IFader-$[) * $ColsPerFader + 4);
+	refresh();
+}
+
+# ----------------------- infrastructure --------------------
+sub round   { my $x = $_[$[];
+	if ($x > 0.0) { return int ($x + 0.5); }
+	if ($x < 0.0) { return int ($x - 0.5); }
+	return 0;
+}
+sub deepcopy {
+	use Storable;
+	if (1 == @_ and ref($_[$[])) { return Storable::dclone($_[$[]);
+	} else { my $b_ref = Storable::dclone(\@_); return @$b_ref;
+	}
+}
+
+=pod
+
+=head1 NAME
+
+midifade - Provides faders generating midi-controller events
+
+=head1 SYNOPSIS
+
+ midifade c13m71v120 c2m11v80 # 2 faders: cha2 cc11=80, cha13 cc71=120
+ midifade -o 128:0            # outputs to port 0 of client 128
+ midifade -o TiMidity         # outputs to TiMidity
+ midifade -N fad9             # sets AlsaClientName to 'fad9'
+ midifade -v                  # prints the Version number
+ perldoc midifade             # read the manual :-)
+
+=head1 DESCRIPTION
+
+B<Midifade> is a Curses and ALSA application which provides on-screen faders,
+to control various midi-controllers on various midi-channels.
+
+It uses a simple user-interface:
+The Left and Right arrow keys move from one fader to the next,
+the Up and Down arrow keys adjust the value of the current fader by 1,
+the PageUp and PageDown keys adjust the value by 10,
+and the Home and End keys set it to maximum (127) or minimum (0).
+
+The faders are always displayed sorted by channel-number
+then by midi-controller-number.
+
+The available keystrokes are displayed in the bottom three lines of the screen.
+
+It uses the B<Curses> CPAN module for the user-interface,
+and the B<MIDI::ALSA> CPAN module to set up an ALSA client
+which can communicate with your synth.
+
+=head1 OPTIONS
+
+=over 3
+
+=item I<-o 128:0>
+
+This example plays into the ALSA port 128:0.
+This option allows I<midifade> to use the same port-specification
+as the other alsa-utils, e.g. I<aplaymidi> and I<aconnect>. 
+For port 0 of a client, the ":0" part of the port specification
+can be omitted.
+The port specification is taken from the ALSA_OUTPUT_PORTS
+environment variable if none is given on the command line.
+Since Version 1.3, you may supply a comma-separated list of ports,
+e.g. B<-o 20,128:1>
+
+If the ALSA port is specified as B<0> then I<midifade> will start
+up without connecting to anything. This allows you, for example,
+to use I<midifade> (assumed here to be starting up as ALSA-client
+129 ; check with I<aconnect -ol>)
+to control I<ecasound>:
+
+ midifade -o 0 c0m9v102 c1m9v105 c2m9v96 c3m9v64
+
+ ecasound -c -r -Md:alsaseq,midifade:0 \
+  -a:1 -i drums.wav                -ea:200 -km:1,0,250,9,1 \
+  -a:2 -i synth-chords.wav -epp:30 -ea:120 -km:1,0,150,9,2 \
+  -a:3 -i bass-guitar_take-2.ewf   -ea:75  -km:1,0,100,9,3 \
+  -a:4 -i brass-lead.wav   -epp:70 -ea:50  -km:1,0,100,9,4 \
+  -a:1,2,3,4 -o loop,1 \
+  -a:5,6 -i loop,1 \
+  -a:5 -o alsa \
+  -a:6 -o current-mix.wav
+
+Here I chose midi-controller 9 because it isn't defined in General-MIDI,
+and therefore General-MIDI-labels, useless in this context,
+do not appear in the I<midifade> screen.
+See I<ecasound_manpage.html> and I<examples.html> in the
+I<ecasound> documentation for details of the B<-ea> and B<-km> options.
+
+=item I<-N my_fade>
+
+Sets the Alsa-Client name, to I<my_name> in this example.
+
+This is useful in scripts,
+to be able to connect from a specific I<midifade> by a known name.
+
+The default Alsa-Client name is "I<midifade>"
+
+=item I<-v>
+
+Prints version number.
+
+=back
+
+=head1 ARGUMENTS
+
+=over 3
+
+=item I<c14m74v123>
+
+This example starts I<midifade> up with a fader on channel 14 (0..15),
+midi-controller 74 (0..127), set initially to a value of 123 (0..127).
+( In I<muscript>, that would be expressed I<cha14 cc74=123> )
+Multiple arguments can be specified.
+The B<c> and B<m> and B<v> bits must be in that order,
+all in one word with no spaces.
+The B<v> bit is optional; its default value is 64.
+
+=back
+
+=head1 CHANGES
+
+ 2.0, 20150809, a new fader with val=0 does not get given val=64
+ 1.9, 20140907, -N my_name  sets the AlsaClientName
+ 1.8, 20130323, D can now delete the only fader
+ 1.7, 20120831, -o "string" works
+ 1.6, 20120820, display_clientstr called at start
+ 1.5, 20111216, if  -o 0  then midifade starts up but connects to nothing
+ 1.4, 20111103, use the new MIDI-ALSA 1.11 to handle portnames
+ 1.3, 20111028, OutputPort can be a comma-separated list
+ 1.2, 20111027, add-new-fader dialogue allows 3-digit controller-nums
+ 1.1, 20111023, much irrelevant code eliminated; q asks y/n first
+ 1.0, 20111022, first working version
+
+=head1 AUTHOR
+
+Peter J Billam  http://www.pjb.com.au/comp/contact.html
+
+=head1 CREDITS
+
+Based on the I<Curses> and I<MIDI::ALSA> CPAN modules.
+
+=head1 SEE ALSO
+
+ aconnect -oil
+ http://www.pjb.com.au/muscript/index.html#midi_in_a_stave
+ http://www.pjb.com.au/muscript/gm.html#cc
+ http://ecasound.sourceforge.net/ecasound/Documentation/examples.html
+ http://search.cpan.org/perldoc?Curses
+ http://search.cpan.org/perldoc?MIDI::ALSA
+ http://www.pjb.com.au/midi
+
+=cut

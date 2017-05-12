@@ -1,0 +1,173 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+subjmap-tmpl - generate a MARC::SubjectMap configuration template
+
+=head1 SYNOPSIS
+
+    subjmap-tmpl --in=marc.dat --out=config.xml --copy=600aq \
+        --translate=600xyzv --copy=610ab --translate=610xyzv 
+
+=head1 DESCRIPTION
+
+The MARC::SubjectMap framework allows you to generate transalted versions
+of subject headings in MARC records. The magic of translation is really 
+no magic at all, and is only the result of translations provided via an 
+XML configuration file. This XML configuration file maps field/subfield
+combinations from one language into another language: each mapping is known 
+as a rule.
+
+Obviously, there are lots of combintions so subjmap-tmpl allows you to 
+autogenerate a template of the XML configuration using a batch of 
+MARC records as source. For example if you wanted to create a configuration
+that would translate subfields x,y,z,v in the 600 and simply copy over
+the contents of subfileds a and q you could issue this command:
+
+    subjmap-tmpl --in=marc.dat --out=config.xml --copy=600aq \
+        --translate=600xyzv
+
+This would read in the MARC batch file marc.dat, analyze all the 600 fields
+and write out an XML configuration to config.xml. This configuration would
+be lacking the <translation> elements, which would have to be manually 
+filled in.
+
+See subjmap for the application which actually does the translation.
+
+=head1 AUTHORS
+
+=over 4
+
+=item * Ed Summers <ehs@pobox.com>
+
+=back
+
+=cut
+
+use strict;
+use warnings;
+use MARC::Batch;
+use MARC::SubjectMap;
+use MARC::SubjectMap::Field;
+use MARC::SubjectMap::Rules;
+use MARC::SubjectMap::Rule;
+use Getopt::Long;
+use Pod::Usage;
+
+my ( $in, $out, @translates, @copies, $help ); 
+
+GetOptions(
+    'in:s'          => \$in, 
+    'out:s'         => \$out,
+    'translate:s'   => \@translates,
+    'copy:s'        => \@copies,
+    'help!'         => \$help,
+);
+
+## output docs if necessary
+pod2usage( -verbose => 2 ) if $help;
+pod2usage( -verbose => 1 ) if !$out or ! -f $in;
+
+## add fields to mapper
+my $map = parseOptions( \@translates, \@copies );
+
+## read MARC records and add template rules to config
+addRules( $map, $in );
+
+## write XML config
+$map->writeConfig($out);
+
+## reads cmd line options and configures mapper object
+sub parseOptions {
+    my ($translates,$copies) = @_;
+
+    fatal( "no --translates or --copies options found!" )
+        if ( ! @$translates and ! @$copies );
+
+    ## storage for all the fields since a field
+    ## object bundles up both translate and copy data
+    my %fields = ();
+
+    ## go through translate options and build up 
+    ## MARC::SubjectMap::Field objects
+    foreach my $trans ( @$translates ) { 
+        my ($tag,@subfields) = parse($trans);
+        unless ( exists($fields{$tag}) ) {
+            $fields{$tag} = MARC::SubjectMap::Field->new({tag=>$tag})
+        }
+        map { $fields{$tag}->addTranslate($_) } @subfields;
+    }
+    
+    ## go through copy options and build up
+    ## MARC::SubjectMap::Field objects
+    foreach my $copy ( @$copies ) { 
+        my ($tag,@subfields) = parse($copy);
+        unless ( exists($fields{$tag}) ) {
+            $fields{$tag} = MARC::SubjectMap::Field->new({tag=>$tag})
+        }
+        map { $fields{$tag}->addCopy($_) } @subfields;
+    }
+
+    ## add MARC::SubjectMap::Field objects to 
+    ## a MARC::Subject map object 
+    my $map = MARC::SubjectMap->new();
+    foreach my $tag ( keys(%fields) ) {
+        my $field = $fields{$tag};
+        $map->addField( $field );
+    }
+    
+    return $map;
+}
+
+sub parse {
+    my $str = shift;
+    my ($field,$subfields) = $str =~ /^(\d\d\d)(.*)$/;
+    fatal( "unable to parse option $str" ) 
+        if ( ! $field or ! $subfields ); 
+    my @subfields = split //, $subfields;
+    fatal( "unable to find subfields in option $str" ) 
+        if ! @subfields;
+    return( $field, @subfields );
+}
+
+sub addRules {
+    my ($map,$file) = @_;
+    my $batch = MARC::Batch->new( 'USMARC', $file );
+    my $rules = MARC::SubjectMap::Rules->new();
+    $batch->warnings_off();
+    $batch->strict_off();
+
+    while ( my $record = $batch->next() ) {
+        ## go through fields that we are configured to examine
+        foreach my $mapField ( $map->fields() ) {
+            ## look for the fields in the record
+            foreach my $field ( $record->field( $mapField->tag() ) ) {
+                ## only look at LoC subjects
+                next if $field->indicator(2) ne '0';
+                ## look for subfields that need to be translated
+                foreach my $subfield ( $mapField->translate() ) {
+                    ## pull out all values for the subfield 
+                    foreach my $value ( $field->subfield( $subfield ) ) { 
+                        ## add a rule template
+                        $rules->addRule( 
+                            MARC::SubjectMap::Rule->new({ 
+                                field       => $mapField->tag(),
+                                subfield    => $subfield, 
+                                original    => $value,
+                            })
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    ## add the rules to the mapper
+    $map->rules( $rules );
+}
+
+sub fatal {
+    my $msg = shift;
+    print STDERR "FATAL: $msg\n";
+    exit( 1 );
+}

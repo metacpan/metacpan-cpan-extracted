@@ -1,0 +1,66 @@
+SYNOPSIS
+
+     use Module::Loadable qw(module_loadable module_source);
+    
+     # check if a module is available
+     if (module_loadable "Foo::Bar") {
+         # Foo::Bar is available
+     } elsif (module_loadable "Foo/Baz.pm") {
+         # Foo::Baz is available
+     }
+    
+     # get a module's source code, dies on failure
+     my $src = module_source("Foo/Baz.pm");
+
+DESCRIPTION
+
+    To check if a module is loadable (available), generally the simplest
+    way is to try to require() it:
+
+     if (eval { require Foo::Bar; 1 }) {
+         # Foo::Bar is available
+     }
+
+    However, this actually loads the module. If a large number of modules
+    need to be checked, this can potentially consume a lot of CPU time and
+    memory.
+
+    Module::Loadable provides a routine module_loadable() which works like
+    Perl's require but does not actually load the module.
+
+FUNCTIONS
+
+ module_loadable($name) => bool
+
+    Check that module named $name is loadable, without actually loading it.
+    $name will be converted from Foo::Bar format to Foo/Bar.pm.
+
+    It works by following the behavior of Perl's require, except the actual
+    loading/executing part. First, it checks if $name is already in %INC,
+    returning true immediately if that is the case. Then it will iterate
+    each entry in @INC. If the entry is a coderef or object or arrayref,
+    module_loadable() will treat it like a hook and call it like Perl's
+    require() does as described in perlfunc. Otherwise, the entry will be
+    treated like a directory name and the module's file will be searched on
+    the filesystem.
+
+ module_source($name) => str
+
+    Return module's source code, without actually loading it. Die on
+    failure.
+
+SEE ALSO
+
+    Module::Path and Module::Path::More. These modules can also be used to
+    check if a module on the filesystem is available. It iterates
+    directories in @INC to try to find the module's file, but will not work
+    with fatpacked (see App::FatPacker or Module::FatPack) or datapacked
+    (see Module::DataPack) scripts or generally when there is a hook in
+    @INC. Module::Loadable, on the other hand, handles require hook like
+    Perl's require().
+
+    Also, those two modules at the time of this writing currently does not
+    actually read the module file. In the case of, say, permission problem,
+    those two will still return the path but the module might not actually
+    readable.
+

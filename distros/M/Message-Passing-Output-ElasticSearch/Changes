@@ -1,0 +1,10 @@
+0.004
+  - Remove hard coded 2012
+
+  - Add deletion of archives
+
+  - Add no_refresh option to Elasticsearch constructor.
+
+0.003
+  - Initial working version
+

@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.21.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b696bfda3a0a81e6c512603ab3ad67135afaab5e Audit/Miner.pm
+SHA1 20803bce54ea2595e051ef15b9cde3b8dc26d05b Changes
+SHA1 b1e6c334e160e206f4e8d38e31813b5eb3d0d974 MANIFEST
+SHA1 fb7e37bbc7e3e6b916cecd5361d4767b76238129 Makefile.PL
+SHA1 8fdcf707b3eeaa105eb348e14e497d0f69f84b13 Miner.pm
+SHA1 5d1a88c4372468edf96cb097795feab7c9cc5881 Miner/Asset.pm
+SHA1 5a3cc74c915849b1985e9b9e8f35d7e19eb315c7 Miner/Assets.pm
+SHA1 fcac21d6f0218e2a5493b8b4a0046e7998b35be9 Miner/Attachment.pm
+SHA1 d9e1c8014bfd6f2d41059ffe16e81f1b0060cc12 Miner/Config.pm
+SHA1 dec6a87ce094ec26c905e9c5ce54e35073f6309d Miner/DBI.pm
+SHA1 b67241a021d73206025edecdb0d802170f1c4dca Miner/Mail.pm
+SHA1 30d56f4c90a53eae24361e25c88459b4508bddeb Miner/Recogniser/Address.pm
+SHA1 a3b8a8a72209e11029a2427575b297eeb2a77a2a Miner/Recogniser/Date.pm
+SHA1 ac5d121af08b899ab83f5f66dd6847c0e9a96900 Miner/Recogniser/Keywords.pm
+SHA1 c6f34b971d94a220e8c3f3b1d6837a88cc0c978a Miner/Recogniser/Phone.pm
+SHA1 713ca9fbcaf17e0bca64a89e164fa37a5b155019 README
+SHA1 528979050e852ea6b3071dde92cf19404588b145 miner.sql
+SHA1 1c10644b9d46e40f923a7090a95265faeea63ce5 mm
+SHA1 3c8a48ed8b7148d7881fd7c6963f5ea5d07cb510 mm_process
+SHA1 65b5ea3071178f9e8a6aa76426cace071a143163 t/assets.t
+SHA1 cad678d6de572ea0d4af98d7ca30ffd4dc0b6384 t/mail-box.t
+SHA1 23f0f7575354a00bdc7adb772fbdfab1bc2cec74 test-message
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.1 (GNU/Linux)
+
+iD8DBQE+GZkQ8tC+HArVOVIRAkd4AJkBqUHyVFW9voiwUMAIbSt9Z86Y7ACgrkTr
+taIu6hCPKlJLbKOvEsuTEKU=
+=QhEu
+-----END PGP SIGNATURE-----

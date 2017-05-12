@@ -1,0 +1,7 @@
+<p align="center">
+    <div class="Infotext">[% tr.tr("Just one moment") %]</div>
+</p>
+<p align="center">
+    If you are not automatically redidirected to the requested page<br>
+    <a href="[% NextLocation %]">please click here!</a>
+</p>

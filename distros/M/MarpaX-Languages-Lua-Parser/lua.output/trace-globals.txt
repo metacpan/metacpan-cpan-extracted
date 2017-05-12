@@ -1,0 +1,579 @@
+chunk
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat
+keyword do
+do
+block
+chunk
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat
+keyword local
+local
+namelist
+Name
+_tostring
+optional namelist initialization
+=
+explist
+exp
+var
+Name
+tostring
+stat
+keyword local
+local
+namelist
+Name
+tostring
+optional namelist initialization
+=
+explist
+exp
+function
+keyword function
+function
+funcbody
+(
+optional parlist
+namelist
+Name
+a
+)
+block
+chunk
+stat list
+stat
+keyword if
+if
+exp
+exp
+exp
+var
+Name
+type
+args
+(
+optional explist
+explist
+exp
+var
+Name
+a
+)
+==
+exp
+String
+double quoted string
+"string"
+keyword then
+then
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+string
+.
+Name
+format
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+"%q"
+exp
+var
+Name
+a
+)
+elseif sequence
+optional else block
+keyword else
+else
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+exp
+var
+Name
+_tostring
+args
+(
+optional explist
+explist
+exp
+var
+Name
+a
+)
+keyword end
+end
+keyword end
+end
+stat
+keyword local
+local
+namelist
+Name
+log
+optional namelist initialization
+=
+explist
+exp
+function
+keyword function
+function
+funcbody
+(
+optional parlist
+namelist
+Name
+name
+Name
+old
+Name
+new
+)
+block
+chunk
+stat list
+stat list
+stat list
+stat list
+stat list
+stat
+keyword local
+local
+namelist
+Name
+t
+optional namelist initialization
+=
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+debug
+.
+Name
+getinfo
+args
+(
+optional explist
+explist
+exp
+Number
+3
+exp
+String
+double quoted string
+"Sl"
+)
+stat
+keyword local
+local
+namelist
+Name
+line
+optional namelist initialization
+=
+explist
+exp
+var
+prefixexp
+var
+Name
+t
+.
+Name
+currentline
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+var
+prefixexp
+var
+Name
+t
+.
+Name
+short_src
+)
+stat
+keyword if
+if
+exp
+exp
+var
+Name
+line
+>=
+exp
+Number
+0
+keyword then
+then
+block
+chunk
+stat list
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+":"
+exp
+var
+Name
+line
+)
+elseif sequence
+optional else block
+keyword end
+end
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+": "
+exp
+var
+Name
+name
+exp
+String
+double quoted string
+" is now "
+exp
+exp
+var
+Name
+tostring
+args
+(
+optional explist
+explist
+exp
+var
+Name
+new
+)
+exp
+String
+double quoted string
+" (was "
+exp
+exp
+var
+Name
+tostring
+args
+(
+optional explist
+explist
+exp
+var
+Name
+old
+)
+exp
+String
+double quoted string
+")"
+exp
+String
+double quoted string
+"\n"
+)
+keyword end
+end
+stat
+keyword local
+local
+namelist
+Name
+g
+optional namelist initialization
+=
+explist
+exp
+tableconstructor
+{
+}
+stat
+keyword local
+local
+namelist
+Name
+set
+optional namelist initialization
+=
+explist
+exp
+function
+keyword function
+function
+funcbody
+(
+optional parlist
+namelist
+Name
+t
+Name
+name
+Name
+value
+)
+block
+chunk
+stat list
+stat list
+stat
+functioncall
+prefixexp
+var
+Name
+log
+args
+(
+optional explist
+explist
+exp
+var
+Name
+name
+exp
+var
+prefixexp
+var
+Name
+g
+[
+exp
+var
+Name
+name
+]
+exp
+var
+Name
+value
+)
+stat
+varlist
+var
+prefixexp
+var
+Name
+g
+[
+exp
+var
+Name
+name
+]
+=
+explist
+exp
+var
+Name
+value
+keyword end
+end
+stat
+functioncall
+prefixexp
+var
+Name
+setmetatable
+args
+(
+optional explist
+explist
+exp
+exp
+var
+Name
+getfenv
+args
+(
+optional explist
+)
+exp
+tableconstructor
+{
+fieldlist
+field
+Name
+__index
+=
+exp
+var
+Name
+g
+field
+Name
+__newindex
+=
+exp
+var
+Name
+set
+}
+)
+keyword end
+end
+stat
+varlist
+var
+Name
+a
+=
+explist
+exp
+Number
+1
+stat
+varlist
+var
+Name
+b
+=
+explist
+exp
+Number
+2
+stat
+varlist
+var
+Name
+a
+=
+explist
+exp
+Number
+10
+stat
+varlist
+var
+Name
+b
+=
+explist
+exp
+Number
+20
+stat
+varlist
+var
+Name
+b
+=
+explist
+exp
+keyword nil
+nil
+stat
+varlist
+var
+Name
+b
+=
+explist
+exp
+Number
+200
+stat
+functioncall
+prefixexp
+var
+Name
+print
+args
+(
+optional explist
+explist
+exp
+var
+Name
+a
+exp
+var
+Name
+b
+exp
+var
+Name
+c
+)

@@ -1,0 +1,13 @@
+Perl Beginner Digest
+
+00001:
+    first processed at          Sat May 14 22:55:41 2011
+    most recently processed at  Sat May 14 22:55:41 2011
+
+00002:
+    first processed at          Sat May 14 22:55:41 2011
+    most recently processed at  Sat May 14 22:55:41 2011
+
+00003:
+    first processed at          Sat May 14 22:55:41 2011
+    most recently processed at  Sat May 14 22:55:41 2011

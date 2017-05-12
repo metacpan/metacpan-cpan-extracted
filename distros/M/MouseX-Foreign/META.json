@@ -1,0 +1,106 @@
+{
+   "abstract" : "Extends non-Mouse classes as well as Mouse classes",
+   "author" : [
+      "Fuji, Goro (gfx) <gfuji(at)cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.14.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MouseX-Foreign",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Any::Moose" : "0.15",
+            "Test::Exception" : "0",
+            "Test::More" : "0.88",
+            "Test::Requires" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mouse" : "0.77",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "MouseX::Foreign" : {
+         "file" : "lib/MouseX/Foreign.pm",
+         "version" : "1.000"
+      },
+      "MouseX::Foreign::Meta::Role::Class" : {
+         "file" : "lib/MouseX/Foreign/Meta/Role/Class.pm"
+      },
+      "MouseX::Foreign::Meta::Role::Method::Constructor" : {
+         "file" : "lib/MouseX/Foreign/Meta/Role/Method/Constructor.pm"
+      },
+      "MouseX::Foreign::Meta::Role::Method::Destructor" : {
+         "file" : "lib/MouseX/Foreign/Meta/Role/Method/Destructor.pm"
+      },
+      "MouseX::NonMoose" : {
+         "file" : "lib/MouseX/NonMoose.pm",
+         "version" : "1.000"
+      },
+      "MouseX::NonMoose::Meta::Role::Class" : {
+         "file" : "lib/MouseX/NonMoose/Meta/Role/Class.pm"
+      },
+      "MouseX::NonMoose::Meta::Role::Method::Constructor" : {
+         "file" : "lib/MouseX/NonMoose/Meta/Role/Method/Constructor.pm"
+      },
+      "MouseX::NonMoose::Meta::Role::Method::Destructor" : {
+         "file" : "lib/MouseX/NonMoose/Meta/Role/Method/Destructor.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gfx/p5-MouseX-Foreign/issues"
+      },
+      "homepage" : "https://github.com/gfx/p5-MouseX-Foreign",
+      "repository" : {
+         "url" : "git://github.com/gfx/p5-MouseX-Foreign.git",
+         "web" : "https://github.com/gfx/p5-MouseX-Foreign"
+      }
+   },
+   "version" : "1.000",
+   "x_contributors" : [
+      "Richard Simões <rsimoes@cpan.org>",
+      "Fuji Goro <fuji.goro@dena.jp>",
+      "Michael G. Schwern <schwern@pobox.com>",
+      "Fuji, Goro (gfx) <gfuji@cpan.org>"
+   ]
+}

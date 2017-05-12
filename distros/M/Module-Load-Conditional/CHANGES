@@ -1,0 +1,174 @@
+0.68    Fri Jul 29 08:01:12 BST 2016
+
+* Fix unconditional @INC localisation
+
+0.66    Wed Jul 27 08:22:53 BST 2016
+
+* Add FORCE_SAFE_INC option to fix CVE-2016-1238
+
+0.64    Sat Jan 17 13:33:57 GMT 2015
+
+* Resolve an edge-case with DEPRECATED
+  [ https://rt.cpan.org/Public/Bug/Display.html?id=101555 ]
+
+0.62    Fri Jan 24 15:52:44 GMT 2014
+
+* Resolve test failures on v5.16.x
+
+0.60    Thu Jan 16 12:28:24 GMT 2014
+
+* Added autoload option to can_load()
+
+0.58    Sun Sep  1 11:21:59 BST 2013
+
+* RT#83728 make quoting work portably and remove
+  prototypes from one-liner in requires()
+
+0.56    Thu Aug 29 21:29:22 BST 2013
+
+* RT#83728 make requires() more robust
+
+0.54    Sun Aug 12 09:10:13 BST 2012
+
+* VMS test fixes from Craig Berry
+
+0.52    Sun Jul 29 10:06:44 BST 2012
+
+* Various enhancements, including now uses
+  Module::Metadata (vpit)
+
+0.50    Fri Apr 27 22:22:13 BST 2012
+
+* Speed enhancements with thanks to Vincent Pit
+
+0.48    Thu Mar 15 13:55:50 GMT 2012
+
+* Wrap $^X in "" to foil paths with spaces
+  Reported by Samuel Ferencik (via email)
+
+0.46    Wed Sep  7 23:57:03 BST 2011
+
+* Use || instead of "or" (perl#78708) (chorny)
+
+0.44    Wed Feb  9 21:48:42 GMT 2011
+
+* Apply podchecker patch from Michael Stevens RT #65601
+
+0.42    Wed Feb  9 15:27:14 GMT 2011
+
+* Apply patch from Phillip Moore RT #60916, which
+  fixes an edge-case with obj/ref @INC entries.
+
+0.40    Fri Jan  7 21:45:01 GMT 2011
+
+* Apply blead patch from Peter Acklam
+
+0.38    Fri Apr 23 15:52:38 BST 2010
+
+* New release of version raises exceptions on
+  parse errors. Use eval to guard ourselves
+  against this.
+
+0.36    Tue Feb  9 14:16:21 GMT 2010
+
+* Apply patch from Pavel Shaydo RT #53546 to improve
+  the performance of _parse_version()
+
+0.34    Thu Oct 29 09:22:48 GMT 2009
+
+* Remove DOS line endings from test files RT#50926
+  reported by Steve Hay
+
+0.32    Fri Oct 23 21:56:11 BST 2009
+
+* Version bump
+
+0.31_01 Fri Oct 23 09:47:12 BST 2009
+
+* Added DEPRECATED and support for determining if
+  a core module is loaded from perl lib path and
+  setting uptodate accordingly.
+
+0.30    Mon Jan 19 16:25:55 CET 2009
+
+* This is a test-suite fix release only. Users of
+  0.28 need not upgrade.
+* Address #42140: 01_Module_Load_Conditional.t support
+  VMS in UNIX compatible mode.
+* Address #42282: test fail on MSWin32
+
+0.28    Wed Dec 17 13:54:17 CET 2008
+
+* Add the directory the package was found in to the
+  return value of check_install()
+
+0.26    Fri Feb 29 16:01:15 CET 2008
+
+* Address #32817: $INC{'Module/Load/Conditional.pm'}
+  isn't canonicalized under Win32. This exposed an
+  issue in the test suite under ActivePerl for Win32,
+  but not the code itself.
+  Users of 0.24 do not need to upgrade.
+
+0.24    Wed Jan  2 16:53:19 CET 2008
+
+* Readdress #29348 to make sure version comparisons
+  handle alpha versions (XX_YY type) gracefully.
+* Address #31680 to make sure $FIND_VERSION works
+  nicely with taint mode enabled.
+
+0.22    Mon Oct 15 10:10:21 CEST 2007
+
+* Promote 0.21_01 to stable. Users who already have
+  0.20 installed do not need to upgrade. This is merely
+  a test suit portability fix for perl 5.005
+
+0.21_01 Fri Oct 12 10:48:06 CEST 2007
+
+* Patch to make test-suite work with 5.005 weirdness
+  as reported by Slaven Rezic.
+
+0.20    Wed Oct  3 16:24:46 CEST 2007
+
+* Update directory depth of test files to be less
+  than 8 under perl core for old VAX and VMS
+  compatibility. Users who have installed 0.18 do
+  not need to upgrade.
+
+0.18    Sat Sep 15 14:22:23 CEST 2007
+
+* Promoted 0.17_02 to stable.
+
+0.17_02 Fri Sep 14 11:55:52 CEST 2007
+
+* Some more VMS fixes as suggested by John Malmberg
+* Address #29348: Version compare logic doesn't
+  handle alphas? by always using qv() to compare
+  version strings.
+
+0.17_01 Sun Sep  9 11:55:54 CEST 2007
+
+* Most VMS specifics can now be removed from the
+  test suite, as we now depend on a newer version
+  of Module::Load, which will hide this all away.
+
+0.16    Thu Jan 25 22:24:36 CET 2007
+
+* Address #23995: Version parsing code has been
+  improved and now partly relies on version.pm.
+  Previously, versions declared with qv() or
+  ($VERSION) (note the braces) could fail to
+  parse under certain conditions.
+* Add 02_Parse_Version.t to specifically test for
+  this behaviour.
+
+0.14    Wed Jan  3 18:27:36 CET 2007
+
+* Skip $VERSION declarations that are part of the
+  POD as reported in #24062
+
+0.12    Sun Aug 13 14:55:54 CEST 2006
+
+* Make %INC look ups work correctly under win32,
+  where the directory seperator is not the same
+  as the %INC path seperator

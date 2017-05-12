@@ -1,0 +1,28 @@
+Changes
+lib/Map/Tube/Plugin/FuzzyFind.pm
+Makefile.PL
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+README
+SIGNATURE
+t/00-load.t
+t/01-plain.t
+t/02-start.t
+t/03-in.t
+t/04-re.t
+t/05-soundex.t
+t/06-metaphone.t
+t/07-levenshtein.t
+t/08-ngrams.t
+t/49-args.t
+t/50-manifest.t
+t/51-meta-json.t
+t/52-meta-yml.t
+t/53-version.t
+t/54-signature.t
+t/60-pod.t
+t/61-pod-coverage.t
+t/62-changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,58 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Box::FastScalar - fast alternative to IO::Scalar
+
+=head1 DESCRIPTION
+
+Contributed by "Todd Richmond" (richmond@proofpoint.com)  This package
+should be released as separate package, but till then is incorporated
+in the Mail::Box module.
+
+Extremely fast L<IO::Scalar> replacement - >20x improvement in
+getline(s)()
+
+=head2 Warnings
+
+You cannot modify the original reference between calls unless you
+C<$obj->seek(1, 0)> to reset the object - VERY rare usage case
+
+$/ must be undef or string - "" and \scalar unimplemented
+
+=head1 SEE ALSO
+
+This module is part of Mail-Message distribution version 3.000,
+built on February 02, 2017.
+
+Do not forget to read
+L</Mail::Box-Overview>,
+L</Mail::Box-Cookbook>, and
+L</Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L</Mail::Message>,
+L</Mail::Box>,
+L</Mail::Box::IMAP4>,
+L</Mail::Box::POP3>,
+L</Mail::Box::Parser::C>,
+L</Mail::Box::Dbx> (unpublished),
+L</Mail::Transport>,
+L</Object::Realize::Later>, and
+L</User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

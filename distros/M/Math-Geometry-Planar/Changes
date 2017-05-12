@@ -1,0 +1,85 @@
+Revision history for Perl extension MAth::Geometry::Planar.
+
+1.00  Fri Sep  6 14:36:09 2002
+	- First relesaseon
+
+1.01  Fri Sep 27 12:40:17 2002
+	- Changed Math::Geometry_2D to Math::Geometry::Planar
+
+1.02  Fri Sep 27 14:37:25 2002
+	- Include the triangulation code (which was a separate
+          .pl file) into the module code
+
+1.03  Tue Oct  1 09:30:15 2002
+	- Corrected some typos in POD
+        - Added some initialization statements to overcome
+          'Use of uninitialized value' warnings during tests
+
+1.04  Tue Oct  1 14:18:05 2002
+	- Corrected some typos in POD
+        - Different approach for running tests - trying
+          to get rid of 'dubious' thing for linux 2.4.16-6mdksmp i386-linux
+          (although there is not a 'real' problem afaik)
+
+1.05  Sun Oct  6 14:16:47 2002
+	- Adapted module to registered namespace for GPC
+          (Math::Geometry::GPC)
+
+1.06  Mon Oct  7 09:50:12 2002
+	- Small change in Makefile.PL for correct GPC version in PREREQ_PM
+
+1.07  Mon Oct  7 14:10:02 2002
+	- Small change in tests
+
+1.08  Mon Oct  7 14:12:02 2002
+	- another attempt to fix linux 2.4.16-6mdksmp i386-linux test
+          (nothing is - imho - wrong though ...)
+
+1.09  Mon Oct 14 11:05:34 2002
+	- polygons operations now return polygon (contour) objects
+          and leave the original object unaltered
+          Method triangulate returns a list of polygon (contour)
+          objects.
+        - fixed a few bugs
+            - point missing in result convexhull2 (except for some
+              special cases like the one in the tests ...)
+            - typo in move made it work only for polygon objects and
+              not for contour objects
+
+1.10  Fri May  9 09:30:00 2003
+	- Optimized PolygonArea for better performance
+          as suggested by C. David Tallman (thanks David)
+
+1.11  Mon Jun 15 10:17:00 2003
+	- Added Eric Wilhelm's polygon offset module
+        - Moved GPC module under Planar
+        - Added precision to parallel and intersection routines
+        - Added ray intersection and all combinations of
+          ray/line/segment intersection
+
+1.12  Fry Jun 15 11:07:00 2003
+	- Added tests for all intersections (ray/line/segment)
+
+1.13  Wed Jun 16 17:05:00 2004
+
+1.14  Fry Jun 18 12:14:00 2004
+        - Fixed bug in GPC2polygons function reported by C. Pettir
+          ticket 6250
+
+1.15  Wed Dec 14 17:31:00 2005
+        - Fixed bug in inside function reported by Sharaba Avshalom
+          inconsistent results for when point tested is colinear
+          with an edge of the polygon.
+
+1.16  Mon Dec 19 16:10:00 2005
+        - Finally got the inside function right
+          Points on the perimeter evaluate as being inside
+
+1.17  Thu Jul 16 12:05:00 2009
+        - Bug reported by T. Fawcet
+          convexhull2 method returns too many points in some
+	  cases
+
+1.18  Thu Mar 10 17:27:00 2011
+        - Bug reported by M. Henning
+          Intermittent segfaults

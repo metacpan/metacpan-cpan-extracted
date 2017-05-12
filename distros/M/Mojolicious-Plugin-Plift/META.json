@@ -1,0 +1,76 @@
+{
+   "abstract" : "Plift ♥ Mojolicious",
+   "author" : [
+      "Carlos Fernando Avila Gratz <cafe@kreato.com.br>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.3",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Plift",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Plift" : "0.09",
+            "XML::LibXML::jQuery" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Mojo" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::Plift" : {
+         "file" : "lib/Mojolicious/Plugin/Plift.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cafe01/Mojolicious-Plugin-Plift/issues"
+      },
+      "homepage" : "https://github.com/cafe01/Mojolicious-Plugin-Plift",
+      "repository" : {
+         "url" : "git://github.com/cafe01/Mojolicious-Plugin-Plift.git",
+         "web" : "https://github.com/cafe01/Mojolicious-Plugin-Plift"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:CAFEGRATZ"
+}

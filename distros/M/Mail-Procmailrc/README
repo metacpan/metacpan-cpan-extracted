@@ -1,0 +1,58 @@
+Mail::Procmailrc version 1.09
+=============================
+
+Mail::Procmailrc is a pure Perl module that can read and write
+procmail(1) compatible rc files. The intent behind its creation was
+to provide an abstracted interface for web clients wishing to edit
+procmailrc files, but it could be used in any number of useful ways
+(e.g., a procmail rc pretty printer--how useful is that!?).
+
+Mail::Procmailrc does not process mail in any form; it only reads and
+writes procmail(1) rc files.
+
+SAMPLE USAGE
+
+    use Mail::Procmailrc;
+
+    $pmrc = new Mail::Procmailrc("$HOME/.procmail/rc.spam");
+
+    ## find the recipe we're looking for
+    my $conditions;
+    for my $recipe ( @{$pmrc->recipes} ) {
+	next unless $recipe->info->[0] =~ /^\s*\#\# this recipe is for spam/io;
+	$conditions = $recipe->conditions;
+	last;
+    }
+
+    ## add another condition to this recipe
+    push @$conditions, '* 1^0 this is not SPAM';
+
+    ## write back out to disk
+    $pmrc->flush;
+
+EXAMPLES
+
+The POD for this module contains extensive examples. Also included
+with this distribution is a sample CGI script that makes use of
+Mail::Procmailrc to create/edit a procmail rc file. See the 'eg'
+directory in this distribution for example programs.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002 Scott Wiersdorf. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the Perl Artistic License.
+
+AUTHOR
+
+Scott Wiersdorf, <scott@perlcode.org>

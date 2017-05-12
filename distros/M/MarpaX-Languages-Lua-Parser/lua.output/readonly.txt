@@ -1,0 +1,193 @@
+chunk
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat
+keyword local
+local
+namelist
+Name
+f
+optional namelist initialization
+=
+explist
+exp
+function
+keyword function
+function
+funcbody
+(
+optional parlist
+namelist
+Name
+t
+Name
+i
+)
+block
+chunk
+stat list
+stat
+functioncall
+prefixexp
+var
+Name
+error
+args
+(
+optional explist
+explist
+exp
+exp
+String
+double quoted string
+"cannot redefine global variable `"
+..
+exp
+exp
+var
+Name
+i
+..
+exp
+String
+double quoted string
+"'"
+exp
+Number
+2
+)
+keyword end
+end
+stat
+keyword local
+local
+namelist
+Name
+g
+optional namelist initialization
+=
+explist
+exp
+tableconstructor
+{
+}
+stat
+keyword local
+local
+namelist
+Name
+G
+optional namelist initialization
+=
+explist
+exp
+exp
+var
+Name
+getfenv
+args
+(
+optional explist
+)
+stat
+functioncall
+prefixexp
+var
+Name
+setmetatable
+args
+(
+optional explist
+explist
+exp
+var
+Name
+g
+exp
+tableconstructor
+{
+fieldlist
+field
+Name
+__index
+=
+exp
+var
+Name
+G
+field
+Name
+__newindex
+=
+exp
+var
+Name
+f
+}
+)
+stat
+functioncall
+prefixexp
+var
+Name
+setfenv
+args
+(
+optional explist
+explist
+exp
+Number
+1
+exp
+var
+Name
+g
+)
+stat
+functioncall
+prefixexp
+var
+Name
+rawset
+args
+(
+optional explist
+explist
+exp
+var
+Name
+g
+exp
+String
+double quoted string
+"x"
+exp
+Number
+3
+)
+stat
+varlist
+var
+Name
+x
+=
+explist
+exp
+Number
+2
+stat
+varlist
+var
+Name
+y
+=
+explist
+exp
+Number
+1

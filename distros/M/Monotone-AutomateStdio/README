@@ -1,0 +1,75 @@
+Monotone::AutomateStdio Version 1.10
+====================================
+
+This is a Perl library module for accessing Monotone's automate stdio
+interface. Monotone is a distributed, change-set, based VCS system. It has a
+mode where commands can be sent to it via STDIN and output read from it via
+STDOUT. Monontone::AutomateStdio makes use of this facility to provide the Perl
+programmer with a programmatic interface to Monotone.
+
+For further details on Monotone see http://monotone.ca. For further details on
+Monotone::AutomateStdio see http://www.coosoft.plus.com/software.html.
+
+
+INSTALLATION
+------------
+
+Simply unpack the tar file and use Makefile.PL by doing:
+
+    tar xvpzf Monotone-AutomateStdio-<Version Number>.tar.gz
+    cd Monotone-AutomateStdio-<Version Number>
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+To install to a custom location use:
+
+    perl Makefile.PL PREFIX=<PATH>
+
+To configure the software to run in a custom location but have the installation
+location prepended by an additional path (useful for package maintainers) use:
+
+    perl Makefile.PL PREFIX=<PATH> DESTDIR=<PATH>
+
+Please note that automated testing of this library module is still `work in
+progress'. There is a test harness called mtn-tester that can be used to test
+most important features of this library. However, it does require not only the
+installation of Monotone, as you would expect, but also a test database with
+certain revisions and files in it. At the moment this is done by using a
+dedicated branch in the main Monotone database found at monotone.ca. The test
+branch is called net.venge.monotone.contrib.lib.automate-stdio.test.
+
+In time I hope to write a Monotone emulator that generates the required output
+to test the library, or perhaps just have a smaller database generated on the
+fly.
+
+
+DEPENDENCIES
+------------
+
+This module requires these other modules and libraries:
+
+    * Perl 5.8.5
+
+Older versions of Perl may work but these have not been tested at this point in
+time.
+
+
+COPYRIGHT AND LICENCE
+---------------------
+
+Copyright (c) 2007 Anthony Edward Cooper <aecooper@coosoft.plus.com>.
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 3 of the License, or (at your option) any
+later version.
+
+This library is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License along
+with this library; if not, write to the Free Software Foundation, Inc., 59
+Temple Place - Suite 330, Boston, MA 02111-1307 USA.

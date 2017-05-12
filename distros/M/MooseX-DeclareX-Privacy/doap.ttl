@@ -1,0 +1,90 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX-Privacy/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [
+		doap-deps:on "MooseX::DeclareX 0.008"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "MooseX::Privacy 0.05"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ], [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-DeclareX-Privacy>;
+	doap:created         "2012-08-22"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/MooseX-DeclareX-Privacy>;
+	doap:homepage        <https://metacpan.org/release/MooseX-DeclareX-Privacy>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "MooseX-DeclareX-Privacy";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX-Privacy/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX-Privacy/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX-Privacy/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX-Privacy/v_0-006>;
+	doap:shortdesc       "shiny syntax for MooseX::Privacy".
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX-Privacy/v_0-003>
+	a                    doap:Version;
+	rdfs:label           "Split out from MooseX-DeclareX; no functional changes";
+	dc:identifier        "MooseX-DeclareX-Privacy-0.003"^^xsd:string;
+	dc:issued            "2012-08-22"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-DeclareX-Privacy-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX-Privacy/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "MooseX-DeclareX-Privacy-0.004"^^xsd:string;
+	dc:issued            "2012-08-24"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Modules were being installed in an incorrectly named directory (wrong case).";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-DeclareX-Privacy-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX-Privacy/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "MooseX-DeclareX-Privacy-0.005"^^xsd:string;
+	dc:issued            "2013-07-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Get MooseX::DeclareX::Privacy actually working!";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-DeclareX-Privacy-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX-Privacy/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "MooseX-DeclareX-Privacy-0.006"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-DeclareX-Privacy-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

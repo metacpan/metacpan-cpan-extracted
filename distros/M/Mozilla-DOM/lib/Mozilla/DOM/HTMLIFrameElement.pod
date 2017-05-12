@@ -1,0 +1,180 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLIFrameElement
+
+=for object Mozilla::DOM::HTMLIFrameElement
+
+Mozilla::DOM::HTMLIFrameElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLIFrameElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLIFrameElement interface is the interface to a [X]HTML
+ * iframe element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLIFrameElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $align = $htmliframeelement->B<GetAlign>()
+
+=head2 $contentdocument = $htmliframeelement->B<GetContentDocument>()
+
+=head2 $frameborder = $htmliframeelement->B<GetFrameBorder>()
+
+=head2 $height = $htmliframeelement->B<GetHeight>()
+
+=head2 $longdesc = $htmliframeelement->B<GetLongDesc>()
+
+=head2 $marginheight = $htmliframeelement->B<GetMarginHeight>()
+
+=head2 $marginwidth = $htmliframeelement->B<GetMarginWidth>()
+
+=head2 $name = $htmliframeelement->B<GetName>()
+
+=head2 $scrolling = $htmliframeelement->B<GetScrolling>()
+
+=head2 $src = $htmliframeelement->B<GetSrc>()
+
+=head2 $width = $htmliframeelement->B<GetWidth>()
+
+=head2 $htmliframeelement->B<SetAlign>($align)
+
+=over
+
+=over
+
+=item * $align (string)
+
+=back
+
+=back
+
+=head2 $htmliframeelement->B<SetFrameBorder>($frameborder)
+
+=over
+
+=over
+
+=item * $frameborder (string)
+
+=back
+
+=back
+
+=head2 $htmliframeelement->B<SetHeight>($height)
+
+=over
+
+=over
+
+=item * $height (string)
+
+=back
+
+=back
+
+=head2 $htmliframeelement->B<SetLongDesc>($longdesc)
+
+=over
+
+=over
+
+=item * $longdesc (string)
+
+=back
+
+=back
+
+=head2 $htmliframeelement->B<SetMarginHeight>($marginheight)
+
+=over
+
+=over
+
+=item * $marginheight (string)
+
+=back
+
+=back
+
+=head2 $htmliframeelement->B<SetMarginWidth>($marginwidth)
+
+=over
+
+=over
+
+=item * $marginwidth (string)
+
+=back
+
+=back
+
+=head2 $htmliframeelement->B<SetName>($name)
+
+=over
+
+=over
+
+=item * $name (string)
+
+=back
+
+=back
+
+=head2 $htmliframeelement->B<SetScrolling>($scrolling)
+
+=over
+
+=over
+
+=item * $scrolling (string)
+
+=back
+
+=back
+
+=head2 $htmliframeelement->B<SetSrc>($src)
+
+=over
+
+=over
+
+=item * $src (string)
+
+=back
+
+=back
+
+=head2 $htmliframeelement->B<SetWidth>($width)
+
+=over
+
+=over
+
+=item * $width (string)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

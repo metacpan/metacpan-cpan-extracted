@@ -1,0 +1,43 @@
+--- #YAML:1.0
+name:               MyCPAN-Indexer
+version:            1.28
+abstract:           Index a Perl distribution
+author:
+    - brian d foy <bdfoy@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Archive::Extract:     0
+    Archive::Tar:         0
+    ConfigReader::Simple:  0
+    CPAN::Checksums:      0
+    CPAN::PackageDetails:  0.21
+    Data::UUID:           0
+    Digest::MD5:          0
+    Distribution::Guess::BuildSystem:  0.11
+    File::Find:           0
+    File::Find::Closures:  0
+    Log::Log4perl:        0
+    Module::Extract::Namespaces:  0.14
+    Module::Extract::Use:  0.13
+    Module::Extract::VERSION:  0.13
+    Parallel::ForkManager:  0
+    Probe::Perl:          0
+    Test::More:           0
+    Test::Output:         0.13
+    YAML:                 0
+resources:
+    homepage:    http://github.com/briandfoy/mycpan-indexer/tree/master
+    repository:  git://github.com/briandfoy/mycpan-indexer.git
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

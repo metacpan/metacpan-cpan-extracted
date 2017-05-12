@@ -1,0 +1,23 @@
+<HTML>
+    <HEAD>
+        <TITLE> Beer Database </TITLE>
+<META http-equiv=Content-Type content="text/html; charset=utf-8">
+
+<LINK title=myStyle href="/beerdb.css" type=text/css rel=stylesheet>
+
+<script language="javascript" type="text/javascript">
+<!--
+function go()
+{
+    box = document.forms[-1].navi;
+    destination = box.options[box.selectedIndex].value;
+    if (box.options[box.selectedIndex].class == 'redirect')
+        location.href = destination;
+}
+
+// -->
+</SCRIPT>
+</HEAD>
+<BODY>
+<DIV class="content">
+

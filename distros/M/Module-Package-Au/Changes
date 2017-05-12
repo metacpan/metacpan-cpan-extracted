@@ -1,0 +1,9 @@
+[Changes for 2 - Fri May 10 16:17:40 CST 2013]
+
+* Add Module::Install::AuthorTests and Module::Install::Repository.
+
+* Use "license 'unrestricted'" to indicate CC0.
+
+[Changes for 0.01 - 2011年 6月13日 周一 20時54分56秒 CST]
+
+* Initial 0.01 release to CPAN.

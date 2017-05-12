@@ -1,0 +1,159 @@
+{
+   "abstract" : "more sugar for MooseX::Declare",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::10 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-DeclareX",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "Data::OptList" : "0",
+            "Devel::Declare" : "0",
+            "Devel::Declare::Context::Simple" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util" : "0",
+            "MooseX::Declare" : "0",
+            "MooseX::Declare::Context::WithOptions::Patch::Extensible" : "0",
+            "MooseX::Method::Signatures" : "0",
+            "Sub::Install" : "0",
+            "Throwable::Error" : "0",
+            "TryCatch" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.61"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::DeclareX" : {
+         "file" : "lib/MooseX/DeclareX.pm",
+         "version" : "0.009"
+      },
+      "MooseX::DeclareX::Keyword::class" : {
+         "file" : "lib/MooseX/DeclareX/Keyword/class.pm",
+         "version" : "0.009"
+      },
+      "MooseX::DeclareX::Keyword::exception" : {
+         "file" : "lib/MooseX/DeclareX/Keyword/exception.pm",
+         "version" : "0.009"
+      },
+      "MooseX::DeclareX::Keyword::namespace" : {
+         "file" : "lib/MooseX/DeclareX/Keyword/namespace.pm",
+         "version" : "0.009"
+      },
+      "MooseX::DeclareX::Keyword::role" : {
+         "file" : "lib/MooseX/DeclareX/Keyword/role.pm",
+         "version" : "0.009"
+      },
+      "MooseX::DeclareX::MethodPrefix" : {
+         "file" : "lib/MooseX/DeclareX/MethodPrefix.pm",
+         "version" : "0.009"
+      },
+      "MooseX::DeclareX::Plugin" : {
+         "file" : "lib/MooseX/DeclareX/Plugin.pm",
+         "version" : "0.009"
+      },
+      "MooseX::DeclareX::Plugin::build" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/build.pm",
+         "version" : "0.009"
+      },
+      "MooseX::DeclareX::Plugin::build::MethodModifier" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/build.pm",
+         "version" : "0.009"
+      },
+      "MooseX::DeclareX::Plugin::guard" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/guard.pm",
+         "version" : "0.009"
+      },
+      "MooseX::DeclareX::Plugin::guard::MethodModifier" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/guard.pm",
+         "version" : "0.009"
+      },
+      "MooseX::DeclareX::Plugin::having" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/having.pm",
+         "version" : "0.009"
+      },
+      "MooseX::DeclareX::Plugin::having::Role" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/having.pm",
+         "version" : "0.009"
+      },
+      "MooseX::DeclareX::Plugin::imports" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/imports.pm",
+         "version" : "0.009"
+      },
+      "MooseX::DeclareX::Plugin::postprocess" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/postprocess.pm",
+         "version" : "0.009"
+      },
+      "MooseX::DeclareX::Plugin::postprocess::MethodModifier" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/postprocess.pm",
+         "version" : "0.009"
+      },
+      "MooseX::DeclareX::Plugin::preprocess" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/preprocess.pm",
+         "version" : "0.009"
+      },
+      "MooseX::DeclareX::Plugin::preprocess::MethodModifier" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/preprocess.pm",
+         "version" : "0.009"
+      },
+      "MooseX::DeclareX::Plugin::std_constants" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/std_constants.pm",
+         "version" : "0.009"
+      },
+      "MooseX::DeclareX::Plugin::types" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/types.pm",
+         "version" : "0.009"
+      },
+      "MooseX::DeclareX::Registry" : {
+         "file" : "lib/MooseX/DeclareX/Registry.pm",
+         "version" : "0.009"
+      },
+      "MooseX::DeclareX::RegistryUsing" : {
+         "file" : "lib/MooseX/DeclareX/RegistryUsing.pm",
+         "version" : "0.009"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=MooseX-DeclareX"
+      },
+      "homepage" : "https://metacpan.org/release/MooseX-DeclareX",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.009"
+}

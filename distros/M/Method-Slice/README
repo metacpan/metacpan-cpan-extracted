@@ -1,0 +1,60 @@
+Method-Slice
+============
+
+Perl has a very convenient feature called I<slice>, to extract
+several pieces of information at once from an array or from a hash
+(see L<perldata/"Slices"). It is even possible to assign a list,
+to a slice, i.e. to simultaneously update several items within
+an array or hash.
+
+Unfortunately, when it comes to objects with accessor methods,
+good practice forbids us to directly access the internal
+hash or array that stores the object state; so slices are no
+longer available, and every attribute of the object must be accessed
+in a separate call.
+
+The present module comes the rescue : it exports a single subroutine
+C<mslice> (for "method slice"), that takes an object and a collection
+of method names, and encapsulates a list of method calls, either to get
+a list of attributes, or to set them in a single list operation.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Method::Slice
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Method-Slice
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Method-Slice
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Method-Slice
+
+    Search MetaCPAN
+        https://metacpan.org/module/Method::Slice
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Laurent Dami
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+

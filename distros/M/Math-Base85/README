@@ -1,0 +1,27 @@
+========================
+Math::Base85 Version 0.2
+========================
+
+This module handles numbers in base 85, via strings and Math::BigInt.
+For more information, read the module or rfc1924.txt.
+
+The usual installation instructions apply:
+
+	/path/to/perl Makefile.PL
+	make
+	make test
+	make install
+
+Please report bugs to the author at <tmonroe plus perl at nog dot net>.
+
+---------------------
+Copyright and License
+---------------------
+
+This distribution (with the exception of any included RFC's) is
+copyright (c) 2001-2002 Tony Monroe.  All rights reserved.  This
+software is distributed under the same license terms as Perl itself.
+This software comes with NO WARRANTIES WHATSOEVER, express, implied,
+or otherwise.
+
+$Id: README,v 1.3 2002/08/06 21:31:52 tony Exp $

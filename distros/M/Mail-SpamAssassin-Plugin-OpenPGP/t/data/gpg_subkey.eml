@@ -1,0 +1,74 @@
+Return-Path: <dave@brondsema.net>
+X-Spam-Konfidi-Trust-Value: _KONFIDITRUSTVALUE_
+X-Spam-Checker-Version: SpamAssassin 3.2.0 (2007-05-01) on
+	postalmail-mx2.dreamhost.com
+X-Spam-Scores: BAYES_00=-2.599,DKIM_POLICY_SIGNSOME=0,OPENPGP_SIGNED=-1,
+	OPENPGP_SIGNED_GOOD=-2
+X-Spam-Level: 
+X-Spam-Status: No, score=-5.6 required=4.0 tests=BAYES_00,DKIM_POLICY_SIGNSOME,
+	OPENPGP_SIGNED,OPENPGP_SIGNED_GOOD autolearn=ham version=3.2.0
+X-Original-To: dave@brondsema.net
+Delivered-To: brondsem@postalmail-mx2.g.dreamhost.com
+Received: from QMTA10.westchester.pa.mail.comcast.net (qmta10.westchester.pa.mail.comcast.net [76.96.62.17])
+	by postalmail-mx2.g.dreamhost.com (Postfix) with ESMTP id 347EBCB2ED
+	for <dave@brondsema.net>; Sun, 20 Jan 2008 21:00:26 -0800 (PST)
+Received: from OMTA13.westchester.pa.mail.comcast.net ([76.96.62.52])
+	by QMTA10.westchester.pa.mail.comcast.net with comcast
+	id fdfe1Y00117dt5G5A09m00; Mon, 21 Jan 2008 05:00:21 +0000
+Received: from [192.168.1.107] ([71.205.211.130])
+	by OMTA13.westchester.pa.mail.comcast.net with comcast
+	id fh0P1Y0052pMfen3Z00000; Mon, 21 Jan 2008 05:00:24 +0000
+X-Authority-Analysis: v=1.0 c=1 a=sVrjfIfPAAAA:8 a=YzmW9EoVAAAA:8 a=6okNipqR3ukWS65GxHMA:9 a=oMM2x8x75ybnDgGUNMAQDiUdMjoA:4 a=s3N_0KhLiLgA:10 a=GDo4ns1aOqcA:10 a=xe8BsctaAAAA:8 a=cEK9d1pfYmk_IvX_gjAA:9 a=dKpAF6WGDaXOBO06Pl-Y65kAVcMA:4 a=rPt6xJ-oxjAA:10
+Message-ID: <47942645.2030409@brondsema.net>
+Date: Sun, 20 Jan 2008 23:57:41 -0500
+From: Dave Brondsema <dave@brondsema.net>
+User-Agent: Thunderbird 2.0.0.9 (X11/20071116)
+MIME-Version: 1.0
+To: Dave Brondsema <dave@brondsema.net>
+Subject: first konfidi plugin message?
+X-Enigmail-Version: 0.95.5
+Content-Type: multipart/signed; micalg=pgp-sha512;
+ protocol="application/pgp-signature";
+ boundary="------------enig4654A6DFEDE42B61029D1C8A"
+
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enig4654A6DFEDE42B61029D1C8A
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+
+oooh!
+
+--=20
+Dave Brondsema : dave@brondsema.net
+http://www.brondsema.net : personal
+http://www.splike.com : programming
+               <><
+
+
+--------------enig4654A6DFEDE42B61029D1C8A
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+
+iQIVAwUBR5QmRmc36lVi77tzAQqoUxAAtJ9FCDZnuLMsNt7evzXuVvTgsU7essI4
+20KyysjgGjOOdDj3bD0HrHJv+4mxRdBVSVF21e+ieH3iNi2TQ73gZ4hWiaDZXXq8
+zfHOTbPT9Rz/AoGppkbR2FM90ln4xI1Vz9lqzymaEq3kv02Tp1WiCpe1Cb08O9Eo
+EctKzFUfxBAuj8URcZmBRz7+TDxq8z10AMftWUYYP2rhAImRJ5sFGOrK1Kp68tAN
+UZQq4sVzZIDgSyW2mlX6OGeJgfZl1PWqVXTdoiadZvyGGz5drN1BH+WXv60o+dM0
+FuusM0ZbOGXxNRK6pWpoYAukQFNqaVAZ5XLgbsP0p/II/rNXj3gfJuy5OlRCY/ye
+ZVjUtjWgNGowUArk4WshXTX6FZnuHs6BLNDJI0TBeZt8MTqX4303YSrRUThlzJiF
+iMV3O//y1+6DKt5tK1Eeds/MGNzFUczLceeTpKiclzHLDwvwKqQm4fnp0OlhkUqE
+cZIfQLn6pdbk53/6Hlz4eMzojw84X6CWk37Ut9gv0QfyUJ8TrfQOK5rQjk7IIdGU
+n85z9kl0rNPQaxml9vpJ9QS1z7fSfOx9CkyFMgjimjsVOo/e2Dc+6Lj97r7yWZGb
+T/j/T5Sn59SX88lIVgmQxIE/ENuU2UUmB4YiL9xz3dIc81+nWK4yJnOBCrbEDnu2
+iXB7ggMGSr4=
+=5zIT
+-----END PGP SIGNATURE-----
+
+--------------enig4654A6DFEDE42B61029D1C8A--
+

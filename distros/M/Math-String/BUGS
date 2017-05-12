@@ -1,0 +1,17 @@
+
+Known bugs:
+
+* General:
+  + divide by zero throws no exception
+
+* Math::String
+  + :constant does not work (uses integers instead of strings)
+* Math::String::Charset::Nested
+  + bigram support does not yet fully work (str2num and num2str are missing)
+* Math::String::Charset::Grouped
+  + $x->length() does not always work (like in Dev::Bollocks)
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

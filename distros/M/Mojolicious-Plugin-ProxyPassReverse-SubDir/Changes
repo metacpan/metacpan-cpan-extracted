@@ -1,0 +1,7 @@
+Revision history for Perl extension Mojolicious::Plugin::ProxyPassReverse::SubDir
+
+0.02    Wed Oct  7 21:00:49 JST 2015
+        - bug fix
+
+0.01    Tue Oct  6 21:36:16 2015
+        - original version

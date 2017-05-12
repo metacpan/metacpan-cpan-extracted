@@ -1,0 +1,35 @@
+Changes
+ctest/100axis.c
+ctest/200histogram.c
+ctest/210histofill.c
+ctest/mytap.h
+Histogram.xs
+lib/Math/Histogram.pm
+lib/Math/Histogram/Axis.pm
+Makefile.PL
+MANIFEST			This list of files
+mh_axis.c
+mh_axis.h
+mh_bitfield.h
+mh_histogram.c
+mh_histogram.h
+perl.supp
+perl_type_tools.h
+ppport.h
+README
+t/001load.t
+t/100c_100axis.t
+t/100c_200histogram.t
+t/100c_210histofill.t
+t/200axis.t
+t/210axisdump.t
+t/300histogram.t
+t/310contract.t
+t/320cumulate.t
+t/330histodump.t
+t/lib/Math/Histogram/Test.pm
+typemap
+XS/Axis.xs
+XS/Histogram.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,38 @@
+NAME
+
+Math::Interpolator - interpolate between lazily-evaluated points
+
+DESCRIPTION
+
+This class supports interpolation of a curve between known points,
+known as "knots", with the knots being lazily evaluated.  An object of
+this type represents a set of knots on a one-dimensional curve, the knots
+possibly not being predetermined.  The methods implemented in this class
+extract knots, forcing evaluation as required.  Subclasses implement
+interpolation by various algorithms.
+
+This code is neutral as to numeric type.  The coordinate values used
+in interpolation may be native Perl numbers, "Math::BigRat" objects,
+or possibly other types.  Mixing types within a single interpolation is
+not recommended.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2006, 2007, 2009, 2010, 2012
+Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

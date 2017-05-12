@@ -1,0 +1,21 @@
+#!/usr/bin/perl -w
+
+use MIME::Lite;
+use strict;
+
+my $msg = MIME::Lite->new(From => "me",
+			  To => "you",
+			  Subject => "hello",
+			  Type    => "multipart/mixed");
+
+my $part = $msg->attach(Type => "text/plain",
+			Path => "/home/eryq/.cshrc",
+			Encoding => '7bit');
+
+
+$msg->scrub;
+$msg->print;
+
+
+
+

@@ -1,0 +1,7 @@
+Revision history for Mojolicious::Command::generate::qx_mojo_app
+
+0.2.1   2014-11-05
+  - split template files into individual files for easier maintenance
+ 
+0.0.0   2014-08-31
+  - initial

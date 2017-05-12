@@ -1,0 +1,9 @@
+Changes
+GPL
+Makefile.PL
+MANIFEST
+README
+README.WINDOWS
+TO-DO
+lib/Mail/Webmail/Gmail.pm
+t/use.t

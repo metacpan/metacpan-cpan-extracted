@@ -1,0 +1,30 @@
+---
+abstract: 'Create optional plugins for your module'
+author:
+  - 'Brad Haywood <brad@perlpowered.com>'
+  - 'Brad Haywood <brad@perlpowered.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+  Module::Install: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Modular
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Import::Into: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Module-Modular
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/bradhaywood/Module-Modular.git
+version: 0.003

@@ -1,0 +1,31 @@
+---
+abstract: 'Quick reference tool for the Reddit API'
+author:
+  - 'Curtis Brandt <curtis@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Command-snoodoc
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Mojolicious: '6.0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/aggrolite/Mojolicious-Command-snoodoc/issues
+  homepage: https://github.com/aggrolite/Mojolicious-Command-snoodoc
+  repository: https://github.com/aggrolite/Mojolicious-Command-snoodoc.git
+version: '0.05'

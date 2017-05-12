@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- https://ru.wikipedia.org/wiki/Петербургский_метрополитен -->
+<tube name="Петербургский метрополитен">
+  <lines>
+    <line id="M1" name="Кировско-Выборгская линия" color="red"/>
+    <line id="M2" name="Московско-Петроградская линия" color="blue"/>
+    <line id="M3" name="Невско-Василеостровская линия" color="green"/>
+    <line id="M4" name="Правобережная линия" color="orange"/>
+    <line id="M5" name="Фрунзенско-Приморская линия" color="magenta"/>
+  </lines>
+  <stations>
+
+    <!-- https://ru.wikipedia.org/wiki/Кировско-Выборгская_линия -->
+    <station id="M1-01" name="Девяткино" line="M1:1" link="M1-02"/>
+    <station id="M1-02" name="Гражданский проспект" line="M1:2" link="M1-01,M1-03"/>
+    <station id="M1-03" name="Aкадемическая" line="M1:3" link="M1-02,M1-04"/>
+    <station id="M1-04" name="Политехническая" line="M1:4" link="M1-03,M1-05"/>
+    <station id="M1-05" name="Площадь Мужества" line="M1:5" link="M1-04,M1-06"/>
+    <station id="M1-06" name="Лесная" line="M1:6" link="M1-05,M1-07"/>
+    <station id="M1-07" name="Выборгская" line="M1:7" link="M1-06,M1-08"/>
+    <station id="M1-08" name="Площадь Ленина" line="M1:8" link="M1-07,M1-09"/>
+    <station id="M1-09" name="Чернышевская" line="M1:9" link="M1-08,M1-10"/>
+    <station id="M1-10" name="Площадь Восстания" line="M1:10" link="M1-09,M1-11" other_link="Tunnel:M3-04"/>
+    <station id="M1-11" name="Владимирская" line="M1:11" link="M1-10,M1-12" other_link="Tunnel:M4-02"/>
+    <station id="M1-12" name="Пушкинская" line="M1:12" link="M1-11,M1-13" other_link="Tunnel:M5-08"/>
+    <station id="M1-13" name="Технологический институт" line="M1:13" link="M1-12,M1-14" other_link="Tunnel:M2-11"/>
+    <station id="M1-14" name="Балтийская" line="M1:14" link="M1-13,M1-15"/>
+    <station id="M1-15" name="Нарвская" line="M1:15" link="M1-14,M1-16"/>
+    <station id="M1-16" name="Кировский завод" line="M1:16" link="M1-15,M1-17"/>
+    <station id="M1-17" name="Автово" line="M1:17" link="M1-16,M1-18"/>
+    <station id="M1-18" name="Ленинский проспект" line="M1:18" link="M1-17,M1-19"/>
+    <station id="M1-19" name="Проспект Ветеранов" line="M1:19" link="M1-18"/>
+
+    <!-- https://ru.wikipedia.org/wiki/Московско-Петроградская_линия -->
+    <station id="M2-01" name="Парнас" line="M2:1" link="M2-02"/>
+    <station id="M2-02" name="Проспект Просвещения" line="M2:2" link="M2-01,M2-03"/>
+    <station id="M2-03" name="Озерки" line="M2:3" link="M2-02,M2-04"/>
+    <station id="M2-04" name="Удельная" line="M2:4" link="M2-03,M2-05"/>
+    <station id="M2-05" name="Пионерская" line="M2:5" link="M2-04,M2-06"/>
+    <station id="M2-06" name="Чёрная речка" line="M2:6" link="M2-05,M2-07"/>
+    <station id="M2-07" name="Петроградская" line="M2:7" link="M2-06,M2-08"/>
+    <station id="M2-08" name="Горьковская" line="M2:8" link="M2-07,M2-09"/>
+    <station id="M2-09" name="Невский проспект" line="M2:9" link="M2-08,M2-10" other_link="Tunnel:M3-03"/>
+    <station id="M2-10" name="Сенная площадь" line="M2:10" link="M2-09,M2-11" other_link="Tunnel:M4-01,Tunnel:M5-07"/>
+    <station id="M2-11" name="Технологический институт" line="M2:11" link="M2-10,M2-12" other_link="Tunnel:M1-13"/>
+    <station id="M2-12" name="Фрунзенская" line="M2:12" link="M2-11,M2-13"/>
+    <station id="M2-13" name="Московские ворота" line="M2:13" link="M2-12,M2-14"/>
+    <station id="M2-14" name="Электросила" line="M2:14" link="M2-13,M2-15"/>
+    <station id="M2-15" name="Парк Победы" line="M2:15" link="M2-14,M2-16"/>
+    <station id="M2-16" name="Московская" line="M2:16" link="M2-15,M2-17"/>
+    <station id="M2-17" name="Звёздная" line="M2:17" link="M2-16,M2-18"/>
+    <station id="M2-18" name="Купчино" line="M2:18" link="M2-17"/>
+
+    <!-- https://ru.wikipedia.org/wiki/Невско-Василеостровская_линия -->
+    <station id="M3-01" name="Приморская" line="M3:1" link="M3-02"/>
+    <station id="M3-02" name="Василеостровская" line="M3:2" link="M3-01,M3-03"/>
+    <station id="M3-03" name="Гостиный двор" line="M3:3" link="M3-02,M3-04" other_link="Tunnel:M2-09"/>
+    <station id="M3-04" name="Маяковская" line="M3:4" link="M3-03,M3-05" other_link="Tunnel:M1-10"/>
+    <station id="M3-05" name="Площадь Александра Невского-1" line="M3:5" link="M3-04,M3-06" other_link="Tunnel:M4-04"/>
+    <station id="M3-06" name="Елизаровская" line="M3:6" link="M3-05,M3-07"/>
+    <station id="M3-07" name="Ломоносовская" line="M3:7" link="M3-06,M3-08"/>
+    <station id="M3-08" name="Пролетарская" line="M3:8" link="M3-07,M3-09"/>
+    <station id="M3-09" name="Обухово" line="M3:9" link="M3-08,M3-10"/>
+    <station id="M3-10" name="Рыбацкое" line="M3:10" link="M3-09"/>
+
+    <!-- https://ru.wikipedia.org/wiki/Правобережная_линия -->
+    <station id="M4-01" name="Спасская" line="M4:1" link="M4-02" other_linke="Tunnel:M2-10,Tunnel:M5-07"/>
+    <station id="M4-02" name="Достоевская" line="M4:2" link="M4-01,M4-03" other_link="Tunnel:M1-11"/>
+    <station id="M4-03" name="Лиговский проспект" line="M4:3" link="M4-02,M4-04"/>
+    <station id="M4-04" name="Площадь Александра Невского-2" line="M4:4" link="M4-03,M4-05" other_link="Tunnel:M3-05"/>
+    <station id="M4-05" name="Новочеркасская" line="M4:5" link="M4-04,M4-06"/>
+    <station id="M4-06" name="Ладожская" line="M4:6" link="M4-05,M4-07"/>
+    <station id="M4-07" name="Проспект Большевиков" line="M4:7" link="M4-06,M4-08"/>
+    <station id="M4-08" name="Улица Дыбенко" line="M4:8" link="M4-07"/>
+
+    <!-- https://ru.wikipedia.org/wiki/Фрунзенско-Приморская_линия -->
+    <station id="M5-01" name="Комендантский проспект" line="M5:1" link="M5-02"/>
+    <station id="M5-02" name="Старая Деревня" line="M5:2" link="M5-01,M5-03"/>
+    <station id="M5-03" name="Крестовский остров" line="M5:3" link="M5-02,M5-04"/>
+    <station id="M5-04" name="Чкаловская" line="M5:4" link="M5-03,M5-05"/>
+    <station id="M5-05" name="Спортивная" line="M5:5" link="M5-04,M5-06"/>
+    <station id="M5-06" name="Адмиралтейская" line="M5:6" link="M5-05,M5-07"/>
+    <station id="M5-07" name="Садовая" line="M5:7" link="M5-06,M5-08" other_link="Tunnel:M2-10,Tunnel:M4-01"/>
+    <station id="M5-08" name="Звенигородская" line="M5:8" link="M5-07,M5-09" other_link="Tunnel:M1-12"/>
+    <station id="M5-09" name="Обводный канал" line="M5:9" link="M5-08,M5-10"/>
+    <station id="M5-10" name="Волковская" line="M5:10" link="M5-09,M5-11"/>
+    <station id="M5-11" name="Бухарестская" line="M5:11" link="M5-10,M5-12"/>
+    <station id="M5-12" name="Международная" line="M5:12" link="M5-11"/>
+  </stations>
+</tube>

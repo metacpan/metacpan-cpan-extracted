@@ -1,0 +1,114 @@
+NAME
+    MooseX::hasn't - syntactic sugar to complement "has"
+
+SYNOPSIS
+     {
+       package Person;
+       use Moose;
+       has name => (is => "ro", writer => "_rename", required => 1);
+     }
+ 
+     {
+       package AnonymousPerson;
+       use Moose;
+       use MooseX::hasn't;
+       extends "Person";
+       hasn't name => ();
+     }
+ 
+     my $dude  = AnonymousPerson->new;
+     say($dude->can('_rename') ? 'true' : 'false');  # false
+     say($dude->name);                               # croaks
+
+DESCRIPTION
+    `hasn't` is a counter-part for Moose's `has`.
+
+    It tries to stop a child class inheriting something (an attribute or a
+    method) from its parent class - though it's not always 100% successful.
+
+FAQ
+  Doesn't this break polymorphism?
+    The idea behind polymorphism is that if *Bar* inherits from *Foo*, then I
+    should be able to use an object of type *Bar* wherever I'd normally use
+    *Foo*.
+
+    In particular, if I can do:
+
+     Foo->new()->some_method();
+
+    then I should be able to do:
+
+     Bar->new()->some_method();
+
+    But if *Bar* can explicitly indicate that it hasn't got method
+    `some_method` then this breaks. So, yes, this module does break
+    polymorphism.
+
+    But observe that it's not especially difficult to break polymorphism
+    manually:
+
+     {
+       package Foo;
+       use Moose;
+       sub some_method {}
+     }
+ 
+     {
+       package Bar;
+       use Moose;
+       extends 'Foo';
+       sub some_method { die "some_method not found in package Bar" }
+     }
+
+    This module just makes it easier and more declarative.
+
+  How exactly is this achieved?
+    For `hasn't $method`, it simply adds an override method modifier to the
+    given method that croaks.
+
+    For `hasn't $attribute`, it finds the names of the accessor, reader,
+    writer, clearer, predicate and initializer methods for that attribute (if
+    any) and overrides them all.
+
+    In both cases, it overrides the class' `can` method too.
+
+  What about required attributes?
+    If the parent class has an attribute which is required and has a default,
+    then you can use `hasn't` in a child class safely.
+
+    If the parent class has an attribute which is required but has no default,
+    then you must explicitly specify a default in the child class:
+
+     hasn't name => (default => 'anon');
+
+    This latter technique is probably not foolproof. Defaults may be coderefs,
+    like in `has`.
+
+BUGS AND LIMITATIONS
+    *   `hasn't $attr (default => sub {})` will execute the coderef as a
+        function with no arguments, not as a method.
+
+    *   `$object->meta` can still see attributes and methods which have been
+        "hasn'ted". Some serious Class::MOP fu is needed to fix this.
+
+    Report anything else here:
+
+    <http://rt.cpan.org/Dist/Display.html?Queue=Moose-hasn-t>.
+
+SEE ALSO
+    Moose.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

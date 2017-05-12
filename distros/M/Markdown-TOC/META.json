@@ -1,0 +1,76 @@
+{
+   "abstract" : "Create a table of contents from markdown",
+   "author" : [
+      "@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Markdown-TOC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Markdown::TOC" : {
+         "file" : "lib/Markdown/TOC.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/imago-storm/Markdown-TOC/issues"
+      },
+      "homepage" : "https://github.com/imago-storm/Markdown-TOC",
+      "repository" : {
+         "url" : "git://github.com/imago-storm/Markdown-TOC.git",
+         "web" : "https://github.com/imago-storm/Markdown-TOC"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:IMAGO",
+   "x_contributors" : [
+      "Polina Shubina <925043@gmail.com>"
+   ]
+}

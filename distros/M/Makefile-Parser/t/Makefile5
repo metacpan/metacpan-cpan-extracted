@@ -1,0 +1,8 @@
+32A = 5
+52 := foo.obj
+CL =
+abc : $(52)
+	link ${32A} $(32A) $(MAKE) $(CC) $(CL) > $@
+
+${52}::
+	echo $@

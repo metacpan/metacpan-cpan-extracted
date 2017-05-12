@@ -1,0 +1,34 @@
+#!/usr/bin/perl -w
+use Math::GSL::Matrix;
+use strict;
+my $matrix = Math::GSL::Matrix->new(2,2)
+                              ->set_row(0, [0,-1] )
+                              ->set_row(1, [1, 0] );
+print <<STUFF;
+Finding eigenvalue/eigenvectors for
+[ 0  -1 ]
+[ 1   0 ]
+STUFF
+
+# this actually calculates the eigenvalues and eigenvectors and returns
+# an array reference of eigenvalues (scalars which may be Math::Complex objects)
+# and an array reference of Math::GSL::VectorComplex objects
+my ($eigenvalues, $eigenvectors) = $matrix->eigenpair;
+my ($eig1,$eig2) = @$eigenvalues;
+my ($u,$v)       = @$eigenvectors;
+my ($u1,$u2)     = $u->as_list;
+my ($v1,$v2)     = $v->as_list;
+
+print <<ANSWER;
+
+Eigenvectors:
+
+u = ($u1,$u2)
+v = ($v1,$v2)
+
+Eigenvalues:
+
+lambda_0 = $eig1
+lambda_1 = $eig2
+
+ANSWER

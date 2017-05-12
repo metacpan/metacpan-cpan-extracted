@@ -1,0 +1,1150 @@
+
+=pod
+
+=head1 NAME
+
+   Math::GMPz - perl interface to the GMP library's integer (mpz) functions.
+
+=head1 DEPENDENCIES
+
+   This module needs the GMP C library - available from:
+   http://gmplib.org
+
+=head1 DESCRIPTION
+
+   A bignum module utilising the Gnu MP (GMP) library.
+   Basically this module simply wraps nearly all of
+   the integer functions provided by that library.
+   The documentation below extensively plagiarises
+   the documentation at http://gmplib.org.
+   See the Math::GMPz test suite for examples of
+   usage.
+
+=head1 SYNOPSIS
+
+   use Math::GMPz qw(:mpz :primes :supp);
+
+   my $string = 'fa9eeeeeeeeeeeeea1234dcbaef1';
+   my $base = 16;
+
+   # Create the Math::GMPz object
+   my $bn1 = Rmpz_init_set_str($string, $base);
+
+   # Create another Math::GMPz object that holds
+   # an initial value of zero, but has enough
+   # memory allocated to store a 131-bit number.
+   # If 131 bits turns out to be insufficient, it
+   # doesn't matter - additional memory is allocated
+   # automatically to Math::GMPz objects as needed
+   # by the GMP library.
+   my $bn2 = Rmpz_init2(131);
+
+   # Create another Math::GMPz object initialised to 0.
+   my $bn3 = Rmpz_init();
+
+   # or use the new() function:
+   my $bn4 = Math::GMPz->new(12345);
+
+   # Perform some operations ... see 'FUNCTIONS' below.
+
+   .
+   .
+
+   # print out the value held by $bn1 (in octal):
+   print Rmpz_get_str($bn1, 8), "\n";
+
+   # print out the value held by $bn1 (in decimal):
+   print Rmpz_get_str($bn1, 10);
+
+   # print out the value held by $bn1 (in base 29)
+   # using the (alternative) Rmpz_out_str()
+   # function. (This function doesn't print a newline.)
+   Rmpz_out_str($bn1, 29);
+
+=head1 MEMORY MANAGEMENT
+
+   Objects created with the Rmpz_init* functions have
+   been blessed into package Math::GMPz. They will
+   therefore be automatically cleaned up by the DESTROY()
+   function whenever they go out of scope.
+
+   For each Rmpz_init* function there is a corresponding function
+   called Rmpz_init*_nobless which returns an
+   unblessed object. If you create Math::GMPz objects
+   using the '_nobless' versions, it will then be up to you
+   to clean up the memory associated with these objects by
+   calling Rmpz_clear($op) for each object. Alternatively
+   such objects will be cleaned up when the script ends.
+   I don't know why you would want to create unblessed
+   objects. The point is that you can if you want to.
+
+=head1 FUNCTIONS
+
+   See the GMP documentation at http://gmplib.org.
+
+   These next 3 functions are demonstrated above:
+   $rop   = Rmpz_init_set_str($str, $base); # 1 < $base < 37
+   $rop   = Rmpz_init2($bits); # $bits > 0
+   $str = Rmpz_get_str($r, $base); # 1 < $base < 37
+
+   The following functions are simply wrappers around a GMP
+   function of the same name. eg. Rmpz_swap() is a wrapper around
+   mpz_swap().
+
+   "$rop", "$op1", "$op2", etc. are Math::GMPz objects - the
+   return values of one of the Rmpz_init* functions.
+   They are in fact references to GMP structures.
+   The "$rop" argument(s) contain the result(s) of the calculation
+   being done, the "$op" argument(s) being the input(s) into that
+   calculation.
+   Generally, $rop, $op1, $op2, etc. can be the same perl variable,
+   though usually they will be distinct perl variables
+   referencing distinct GMP structures.
+   Eg something like Rmpz_add($r1, $r1, $r1),
+   where $r1 *is* the same reference to the same GMP structure,
+   would add $r1 to itself and store the result in $r1. Think of it
+   as $r1 += $r1. Otoh, Rmpz_add($r1, $r2, $r3), where each of the
+   arguments is a different reference to a different GMP structure
+   would add $r2 to $r3 and store the result in $r1. Think of it as
+   $r1 = $r2 + $r3.
+   Mostly, the first argument is the argument that
+   stores the result and subsequent arguments provide the input values.
+   Exceptions to this can be found in some of the functions that
+   actually return a value, and, eg., the div_qr functions (which
+   yield both quotient and remainder as their first *two* arguments).
+   Like I say, see the GMP manual for details. I hope it's
+   intuitively obvious or quickly becomes so. Also see the test
+   suite that comes with the distro for some examples of usage.
+
+   "$ui" means any integer that will fit into a C 'unsigned long int'.
+
+   "$si" means any integer that will fit into a C 'signed long int'.
+
+   "$double" means any number (not necessarily integer) that will fit
+   into a C 'double'.
+
+   "$bool" means a value (usually a 'signed long int') in which
+   the only interest is whether it evaluates as true or not.
+
+   "$str" simply means a string of symbols that represent a number,
+   eg "1234567890987654321234567" which might be a base 10 number,
+   or "zsa34760sdfgq123r5" which would have to represent at least
+   a base 36 number (because "z" is a valid digit only in bases 36
+   and higher). Valid bases for GMP numbers are 2..62 .
+
+   "$NULL" is $Math::GMPz::NULL (the NULL mpz type).
+
+   #####################
+
+   INITIALIZING INTEGERS
+
+   Normally, a variable should be initialized once only or at least be
+   cleared, using `Rmpz_clear', between initializations.
+   'DESTROY' (which calls 'Rmpz_clear') is automatically called on
+   blessed objects whenever they go out of scope.
+
+   First read the section 'MEMORY MANAGEMENT' (above).
+
+   $rop = Math::GMPz::new();
+   $rop = Math::GMPz->new();
+   $rop = new Math::GMPz();
+   $rop = Rmpz_init();
+   $rop = Rmpz_init_nobless();
+    Initialize $rop, and set its value to 0.
+
+   $rop = Rmpz_init2($bits);
+   $rop = Rmpz_init2_nobless($bits);
+    Initialize $rop, with space for $bits bits, and set its value
+    to 0. $bits is only the initial space, $rop will grow
+    automatically if necessary, for subsequent values stored.
+    `Rmpz_init2' makes it possible to avoid such reallocations if a
+    maximum size is known in advance.
+
+   Rmpz_realloc2($rop, $ui);
+    Change the space allocated for $rop to $ui bits.  The value in
+    $rop is preserved if it fits, or is set to 0 if not.
+
+   ##################
+
+   ASSIGNING INTEGERS
+
+
+   Rmpz_set($rop, $op);
+    Assign the value in $op to $rop.
+
+   Rmpz_set_si($rop, $si);
+    Assign the 'signed int', $si, to $rop.
+
+   Rmpz_set_ui($rop, $ui);
+    Assign the 'unsigned int', $ui, to $rop.
+
+   Rmpz_set_d($rop, $double);
+    Assign $double to $rop. (First truncate to an integer if $double
+    does not contain an integer value.)
+    Program dies with an appropriate error message if $double is
+    Inf or NaN.
+
+   Rmpz_set_q($rop, $q); # $q is a Math::GMPq or GMP::Mpq object
+    Assign $q to $rop. (Truncate to an integer if necessary.)
+
+   Rmpz_set_f($rop, $f); # $f is a Math::GMPf or GMP::Mpf object
+    Assign $f to $rop. (Truncate to an integer if necessary.)
+
+   Rmpz_set_str($rop, $str, $base);
+    Set $rop to the base $base value of $str. $base may vary from
+    2 to 62.  If $base is 0, the actual base is determined from the
+    leading characters: if the first two characters are "0x" or "0X",
+    hexadecimal is assumed, otherwise if the first character is "0",
+    octal is assumed, otherwise decimal is assumed.
+
+   Rmpz_set_IV($rop, $IV); # $IV is a perl integer value
+    Set $rop to the value of $IV. (If $IV is an unsigned integer
+    value then that unsigned value is assigned.)
+
+   Rmpz_set_NV($rop, $NV); # $NV is a perl floating point value
+    Set $rop to the value of $NV. (First truncate to an integer if
+    $NV does not contain an integer value.)
+    The program dies with an appropriate error message if $NV is
+    Inf or NaN.
+
+   Rmpz_swap($rop1, $rop2); # swap the values
+
+   ######################################
+
+   COMBINED INITIALIZATION AND ASSIGNMENT
+
+   Both initialise and set the value in one step.
+
+   NOTE: Do NOT use these functions if $rop has already
+   been initialised. Instead use the Rmpz_set* functions
+   in 'Assigning Integers' (above)
+
+   First read the section 'MEMORY MANAGEMENT' (above).
+
+   $rop = Math::GMPz->new($arg);
+   $rop = Math::GMPz::new($arg);
+   $rop = new Math::GMPz($arg);
+    Returns a Math::GMPz object with the value of $arg.
+    $arg can be either a Math::GMPz object, a Math::BigInt object, a
+    number (signed integer, unsigned integer, signed fraction or
+    unsigned fraction) or a string that represents a numeric value. If
+    $arg is a string, an optional additional argument that specifies
+    the base of the number can be supplied to new(). If base is 0 (or
+    not supplied) then the leading characters of the string are used:
+    0x or 0X for hex, 0b or 0B for binary, 0 for octal, or decimal
+    otherwise. Legal values for the base are 0 and 2..62 .
+
+   $rop = Rmpz_init_set($op);
+   $rop = Rmpz_init_set_nobless($op);
+   $rop = Rmpz_init_set_ui($ui);
+   $rop = Rmpz_init_set_ui_nobless($ui);
+   $rop = Rmpz_init_set_si($si);
+   $rop = Rmpz_init_set_si_nobless($si);
+   $rop = Rmpz_init_set_d($double);
+   $rop = Rmpz_init_set_d_nobless($double);
+   $rop = Rmpz_init_set_str($str, $base);
+   $rop = Rmpz_init_set_str_nobless($str, $base);
+
+   $rop = Rmpz_init_set_IV($IV); # $IV is a perl integer value
+   $rop - Rmpz_init_set_NV($NV); # $NV is a perl floating point value
+    Note that Rmpz_init_set_d and Rmpz_init_set_NV will truncate the
+    double/NV to an integer value prior to assigning if the double/NV
+    does not hold an integer value.
+    Assigning an Inf or NaN is a fatal error.
+
+   $rop = new_from_MBI($mbi); # $mbi is a Math::BigInt object.
+
+   ###################
+
+   CONVERTING INTEGERS
+
+
+   $ui = Rmpz_get_ui($op);
+    Return the value of $op as an `unsigned long'.
+    The sign of $op is ignored, only the absolute value is used.
+    If $op is either too big to fit into an `unsigned long int', or
+    is negative, the returned result is probably not very useful.
+    To find out if the value will fit, use the function
+    `Rmpz_fits_ulong_p'.
+
+   $si = Rmpz_get_si($op);
+    If $op fits into a `signed long int' return the value of $op.
+    Otherwise return the least significant part of $op, with the
+    same sign as $op. If $op is too big to fit in a `signed long
+    int', the returned result is probably not very useful.  To
+    find out if the value will fit, use the function
+    `Rmpz_fits_slong_p'.
+
+   $IV = Rmpz_get_IV($op);
+    If $op fits into either an IV or a UV return the value of $op.
+    Otherwise return the least significant part of $op, with the
+    same sign as $op. If $op does not fit into either an IV or a
+    UV, the returned result is probably not very useful. To find
+    find out if the value will fit, use the functions
+    'Rmpz_fits_IV_p' and 'Rmpz_fits_UV_p'.
+
+   $double = Rmpz_get_d($op);
+     Place the value of $op into a normal perl scalar.
+
+   ($double, $si) = Rmpz_get_d_2exp($op);
+    Find $double and $si such that $double times 2 raised to
+    $si, with 0.5<=abs($double)<1, is a good approximation to $op.
+
+   $ul = Rmpz_getlimbn($op, $ui);
+    Return limb number $ui from $op.  The sign of $op is ignored,
+    just the absolute value is used.  The least significant limb
+    is number 0. `Rmpz_size' can be used to find how many limbs
+    make up $op. `Rmpz_getlimbn' returns zero if $ui is outside the
+    range 0 to `Rmpz_size($op)-1'.
+
+   $str = Rmpz_get_str($op, $base);
+    Convert $op to a string of digits in base $base.
+    The base may vary from -36..-2, 2..62.
+
+   ##################
+
+   INTEGER ARITHMETIC
+
+   Rmpz_add($rop, $op1, $op2);
+   Rmpz_add_ui($rop, $op, $ui);
+    $rop = 2nd arg + 3rd arg.
+
+   Rmpz_sub($rop, $op1, $op2);
+   Rmpz_sub_ui($rop, $op, $ui);
+   Rmpz_ui_sub($rop, $ui, $op);
+    $rop = 2nd arg - 3rd arg.
+
+   Rmpz_mul($rop, $op1, $op2);
+   Rmpz_mul_si($rop, $op, $si);
+   Rmpz_mul_ui($rop, $op, $ui);
+    $rop = 2nd arg * 3rd arg.
+
+   Rmpz_addmul($rop, $op1, $op2);
+   Rmpz_addmul_ui($rop, $op, $ui);
+    $rop += 2nd arg * 3rd arg.
+
+   Rmpz_submul($rop, $op1, $op2);
+   Rmpz_submul_ui($rop, $op, $ui);
+    $rop -= 2nd arg * 3rd arg.
+
+   Rmpz_mul_2exp($rop, $op, $ui);
+    Set $rop to $op * (2 ** $ui).  This operation can
+    also be defined as a left shift by $ui bits.
+
+   Rmpz_div_2exp($rop, $op, $ui); # Same as Rmpz_fdiv_q_2exp
+    Set $rop to $op / (2 ** $ui).  This operation can
+    also be defined as a right shift by $ui bits.
+
+   Rmpz_neg($rop, $op);
+    $rop = -$op.
+
+   Rmpz_abs($rop, $op);
+    $rop = abs($op).
+
+   ################
+
+   INTEGER DIVISION
+
+   `cdiv' rounds quotient up towards +infinity, and remainder
+          will have the opposite sign to divisor.
+         The `c' stands for "ceil".
+
+   `fdiv' rounds quotient down towards -infinity, and remainder
+          will have the same sign as divisor.
+          The `f' stands for "floor".
+
+   `tdiv' rounds quotient towards zero, and remainder
+          will have the same sign as the number.
+          The `t' stands for "truncate".
+
+   Rmpz_div($rop, $op1, $op2); # Same as Rmpz_fdiv_q
+   Rmpz_cdiv_q($rop, $op1, $op2);
+   Rmpz_fdiv_q($rop, $op1, $op2);
+   Rmpz_tdiv_q($rop, $op1, $op2);
+    $rop = $op1 / $op2.
+
+   Rmpz_cdiv_r($rop, $op1, $op2);
+   Rmpz_fdiv_r($rop, $op1, $op2);
+   Rmpz_tdiv_r($rop, $op1, $op2);
+    $rop = $op1 % $op2.
+
+   Rmpz_divmod($rop1, $rop2m $op1, $op2); # Same as Rmpz_fdiv_qr
+   Rmpz_cdiv_qr($rop1, $rop2, $op1, $op2);
+   Rmpz_fdiv_qr($rop1, $rop2, $op1, $op2);
+   Rmpz_tdiv_qr($rop1, $rop1, $op1, $op2);
+    $rop1 = $op1 / $op2.
+    $rop2 = $op1 % $op2.
+
+   $ul = Rmpz_div_ui($rop, $op, $ui); # Same as Rmpz_fdiv_q_ui
+   $ul = Rmpz_cdiv_q_ui($rop, $op, $ui);
+   $ul = Rmpz_fdiv_q_ui($rop, $op, $ui);
+   $ul = Rmpz_tdiv_q_ui($rop, $op, $ui);
+    $rop = $op / $ui.
+    $ul = $op % $ui.
+
+   $ul = Rmpz_cdiv_r_ui($rop, $op, $ui);
+   $ul = Rmpz_fdiv_r_ui($rop $op, $ui);
+   $ul = Rmpz_tdiv_r_ui($rop, $op, $ui);
+    $rop = $op % $ui.
+    $ul = $op % $ui.
+
+   $ul = Rmpz_divmod_ui($rop1, $rop2, $op1, $ui); # Same as Rmpz_fdiv_qr_ui
+   $ul = Rmpz_cdiv_qr_ui($rop1, $rop2, $op, $ui);
+   $ul = Rmpz_fdiv_qr_ui($rop1, $rop2, $op, $ui);
+   $ul = Rmpz_tdiv_qr_ui($rop1, $rop2, $op, $ui);
+    $rop1 = $op / $ui.
+    $rop2 = $op % $ui.
+    $ul = $op % $ui.
+
+   $ul = Rmpz_cdiv_ui($op, $ui);
+   $ul = Rmpz_fdiv_ui($op, $ui);
+   $ul = Rmpz_tdiv_ui($op, $ui);
+    $ul = $op % $ui.
+
+   Rmpz_cdiv_q_2exp($rop, $op, $ui);
+   Rmpz_fdiv_q_2exp($rop, $op, $ui);
+   Rmpz_tdiv_q_2exp($rop, $op, $ui);
+    $rop = $op / (2 ** $ui). ie $rop is $op right-shifted
+    by $ui bits.
+
+   Rmpz_mod_2exp($rop, $op, $ui); # Same as Rmpz_fdiv_r_2exp
+   Rmpz_cdiv_r_2exp($rop, $op, $ui);
+   Rmpz_fdiv_r_2exp($rop, $op, $ui);
+   Rmpz_tdiv_r_2exp($rop, $op, $ui);
+    $rop = $op % (2 ** $ui).
+
+   Rmpz_mod($rop, $op1, $op2);
+    $rop = $op1 % $op2. The sign of the divisor is ignored.
+    The result is never negative.
+
+   $ul = Rmpz_mod_ui($rop, $op, $ui);
+    $rop = $op % $ui.
+    $ul = $op % $ui.
+    The sign of the divisor is ignored. The result is never negative.
+
+   Rmpz_divexact($rop, $op1, $op2);
+   Rmpz_divexact_ui($rop, $op, $ui);
+    $rop = 2nd arg / 3rd arg.
+    These 2 functions provide correct results only when it
+    is known that the 3rd arg divides the 2nd arg.
+
+   $bool = Rmpz_divisible_p($op1, $op2);
+   $bool = Rmpz_divisible_ui_p($op, $ui);
+   $bool = Rmpz_divisible_2exp_p($op, $ui);
+    Return non-zero if 1st arg is exactly divisible by 2nd arg,
+    or in the case of `Rmpz_divisible_2exp_p' by 2 ** 2nd arg.
+
+   $bool = Rmpz_congruent_p($op1, $op2, $op3);
+   $bool = Rmpz_congruent_ui_p($op, $ui, $ui);
+   $bool = Rmpz_congruent_2exp_p($op1, $op2, $ui);
+    Return non-zero if 1st arg is congruent to 2nd arg modulo
+    3rd arg, or in the case of `Rmpz_congruent_2exp_p' modulo
+    2 ** 3rd arg.
+
+   ######################
+
+   INTEGER EXPONENTIATION
+
+   Rmpz_powm($rop, $op1, $op2, $op3);
+   Rmpz_powm_sec($rop, $op1, $op2, $op3); # gmp-5.0 and later only
+    $rop = ($op1 ** $op2 ) % $op3
+    In the case of Rmpz_powm_sec, $op2 must be > 0, and $op3 must
+    be odd.
+
+   Rmpz_powm_ui($rop, $op1, $ui, $op2);
+    $rop = ($op1 ** $ui) % $op2
+
+   Rmpz_pow_ui($rop, $op, $ui);
+    $rop = $op ** $ui
+
+   Rmpz_ui_pow_ui($rop, $ui1, $ui2);
+    $rop = $ui1 ** $ui2
+
+   #############
+
+   INTEGER ROOTS
+
+   Rmpz_root($rop, $op, $ui);
+    $rop = $op ** (1 / $ui).
+
+   Rmpz_rootrem($rop1, $rop2, $op, $ui);
+    $rop1 = $op **(1 / $ui).
+    $op = $rop2 + ($rop1 ** $ui).
+
+   Rmpz_sqrt($rop, $op);
+    $rop = $op ** 0.5.
+
+   Rmpz_sqrtrem($rop1, $rop2, $op);
+    $rop1 = $op ** 0.5.
+    $op = $rop2 + ($rop1 ** 2).
+
+   $bool = Rmpz_perfect_power_p($op);
+    Return zero if $op is not a perfect power.
+    Else return non-zero.
+
+   $bool = Rmpz_perfect_square_p($op);
+    Return zero if $op is not a perfect square.
+    Else return non-zero.
+
+   ##########################
+
+   NUMBER THEORETIC FUNCTIONS
+
+   $si = Rmpz_probab_prime_p($rop, $ui);
+    Determine whether $rop is prime. Return 2 if $rop is
+    definitely prime, return 1 if $rop is probably prime
+    (without being certain), or return 0 if $rop is definitely
+    composite. This function does some trial divisions, then
+    some Miller-Rabin probabilistic primality tests.  $ui
+    controls how many such tests are done, 5 to 10 is a
+    reasonable number, more will reduce the chances of a
+    composite being returned as "probably prime".
+    Miller-Rabin and similar tests can be more properly called
+    compositeness tests.  Numbers which fail are known to be
+    composite but those which pass might be prime or might be
+    composite. Only a few composites pass, hence those which
+    pass are considered probably prime.
+
+   Rmpz_nextprime($rop, $op);
+    This function uses a probabilistic algorithm to identify
+    primes. For practical purposes it's adequate, the chance
+    of a composite passing will be extremely small.
+
+   Rmpz_gcd($rop, $op1, $op2);
+    Set $rop to the greatest common divisor of $op1 and $op2.
+    The result is always positive even if one or both input
+    operands are negative.
+
+   $ui2 = Rmpz_gcd_ui($rop, $op, $ui1);  # GCD in $ui2 & $rop
+   $ui2 = Rmpz_gcd_ui($NULL, $op, $ui1); # GCD in $ui2 only
+    Compute the greatest common divisor of $op and $ui1.
+    Store the result in $rop (iff $rop is not $Math::GMPz::NULL).
+    If the result is small enough to fit in an `unsigned long
+    int', it is returned.  If the result does not fit, 0 is
+    returned, and the result is equal to the argument $op.
+    Note that the result will always fit if $ui1 is non-zero.
+
+   Rmpz_gcdext($rop1, $rop2, $rop3, $op1, $op2);
+   Rmpz_gcdext($rop1, $rop2, $NULL, $op1, $op2);
+    Set $rop1 to the greatest common divisor of $op1 and $op2,
+    and in addition set $rop2 and $rop3 to coefficients
+    satisfying $op1*$rop2 + $op2*$rop3 = $rop1. $rop1 is
+    always positive, even if one or both of $op1 and $op2
+    are negative.
+    If $rop3 is $Math::GMPz::NULL then that value is not
+    computed.
+
+   Rmpz_lcm($rop, $op1, $op2);
+   Rmpz_lcm_ui($rop, $op, $ui);
+    Set $rop to the least common multiple of 2nd and 3rd args.
+    $rop is always positive, irrespective of the signs of the
+    2nd and 3rd args. $rop will be zero if either
+    2nd or 3rd arg is zero.
+
+   $bool = Rmpz_invert($rop, $op1, $op2);
+    Compute the inverse of $op1 modulo $op2 and put the result
+    in $rop. If the inverse exists, the return value is
+    non-zero and $rop will satisfy 0 <= $rop < $op2.
+    If an inverse doesn't exist the return value is zero and
+    $rop is undefined.
+
+   $si = Rmpz_jacobi($op1, $op2);
+    Calculate the Jacobi symbol ($op1/$op2). This is defined
+    only for $op2 odd.
+
+   $si = Rmpz_legendre($op1, $op2);
+    Calculate the Legendre symbol ($op1/$op2). This is defined
+    only for $op2 an odd positive prime, and for such $op2
+    it's identical to the Jacobi symbol.
+
+   $si = Rmpz_kronecker($op1, $op2);
+   $si = Rmpz_kronecker_si($op, $si);
+   $si = Rmpz_kronecker_ui($op, $ui);
+   $si = Rmpz_si_kronecker($si, $op);
+   $si = Rmpz_ui_kronecker($ui, $op);
+    Calculate the Jacobi symbol (1st arg/2nd arg) with the
+    Kronecker extension (a/2)=(2/a) when a odd, or (a/2)=0
+    when a even. When 2nd arg is odd the Jacobi symbol and
+    Kronecker symbol are identical, so `mpz_kronecker_ui'
+    etc can be used for mixed precision Jacobi symbols too.
+
+   $ui = Rmpz_remove($rop, $op1, $op2);
+    Remove all occurrences of the factor $op2 from $op1 and
+    store the result in $rop.  The return value is how many
+    such occurrences were removed.
+
+   Rmpz_fac_ui($rop, $ui);
+    Set $rop to the factorial of $ui.
+
+   Rmpz_2fac_ui($rop, $ui); # Available only with gmp-5.1.0
+                            # or later
+    Set $rop to the double-factorial (n!!) of $ui.
+
+   Rmpz_mfac_uiui($rop, $ui1, $u2); # Available only with
+                                    # gmp-5.1.0 or later
+    Set $rop to the $ui2-multi-factorial of $ui1, $ui2.
+
+   Rmpz_primorial_ui($rop, $ui); # Available only with gmp-5.1.0
+                                 # or later
+    Set $rop to the primorial of $ui, i.e. the product of all
+    positive prime numbers smaller than or equal to $ui.
+
+   Rmpz_bin_ui($rop, $op, $ui);
+   Rmpz_bin_uiui($rop, $ui, $ui);
+   Rmpz_bin_si($rop, $op, $si);
+    Compute the binomial coefficient 2nd arg over 3rd arg and
+    store the result in $rop.  Negative values of 2nd arg are
+    supported by `Rmpz_bin_ui' & `Rmpz_bin_si'.
+    (NOTE: The GMP library does not provide an `mpz_bin_si'
+    function.)
+
+   Rmpz_fib_ui($rop, $ui);
+   Rmpz_fib2_ui($rop1, $rop2, $ui);
+    `Rmpz_fib_ui' sets $rop to to F[$ui], the $ui'th
+    Fibonacci number. `Rmpz_fib2_ui' sets $rop1 to F[$ui],
+    and $rop2 to F[$ui-1]. These functions are designed for
+    calculating isolated Fibonacci numbers.  When a sequence
+    of values is wanted it's best to start with `Rmpz_fib2_ui'
+    and iterate the defining F[n+1]=F[n]+F[n-1] or similar.
+
+   Rmpz_lucnum_ui($rop, $ui);
+   Rmpz_lucnum2_ui($rop1, $rop2, $ui);
+    `Rmpz_lucnum_ui' sets $rop to to L[$ui], the $ui'th
+    Lucas number. `Rmpz_lucnum2_ui' sets $rop1 to L[$ui],
+    and $rop2 to L[$ui-1]. These functions are designed for
+    calculating isolated Lucas numbers.  When a sequence of
+    values is wanted it's best to start with `Rmpz_lucnum2_ui'
+    and iterate the defining L[n+1]=L[n]+L[n-1] or similar.
+
+   ###################
+
+   INTEGER COMPARISONS
+
+   $si = Rmpz_cmp($op1, $op2);
+   $si = Rmpz_cmp_d($op, $double);
+   $si = Rmpz_cmp_NV($op, $nv); # $nv is an NV
+   $si = Rmpz_cmp_si($op, $si);
+   $si = Rmpz_cmp_ui($op, $ui);
+    Compare 1st and 2nd args.  Return a positive value if
+    1st arg > 2nd arg, zero if 1st arg = 2nd arg, or a
+    negative value if 1st arg < 2nd arg.
+    Note that Rmpz_cmp_d and Rmpz_cmp_NV compare $op to the
+    actual value held in the double/NV - not to the truncated
+    integer value. Comparison to an Inf is allowed, but
+    comparison to a NaN is a fatal error.
+
+   $si = Rmpz_cmpabs($op1, $op2);
+   $si = Rmpz_cmpabs_d($op, $double);
+   $si = Rmpz_cmpabs_ui($op, $ui);
+    Compare the absolute values of 1st and 2nd args.  Return
+    a positive value if abs(1st arg) > abs(2nd arg), zero if
+    abs(1st arg) = abs(2nd arg), or a negative value if
+    abs(1st arg) < abs(2nd arg).
+
+   $si = Rmpz_sgn($op);
+    Return +1 if $op > 0, 0 if $opP = 0, and -1 if $op < 0.
+
+   ##############################
+
+   INTEGER LOGIC AND BIT FIDDLING
+
+   Rmpz_and($rop, $op1, $op2);
+    Set $rop to $op1 logical-and $op2.
+
+   Rmpz_ior($rop, $op1, $op2);
+    Set $rop to $op1 inclusive-or $op2.
+
+   Rmpz_xor($rop, $op1, $op2);
+    Set $rop to $op1 exclusive-or $op2.
+
+   Rmpz_com($rop, $op);
+    Set $rop to the one's complement of $op.
+
+   $ui = Rmpz_popcount($op);
+    (This function returns an unsigned long value. If the actual
+    popcount is greater than the maximum value that an unsigned
+    long can hold, then the return value will be incorrect.)
+    If $op>=0, return the population count of $op, which is the
+    number of 1 bits in the binary representation.  If $op<0, the
+    number of 1s is infinite, and the return value is MAX_ULONG,
+    the largest possible `unsigned long'.
+
+   $ui = Rmpz_hamdist($op1, $op2);
+    (This function returns an unsigned long value. If the actual
+    hamming distance is greater than the maximum value that an
+    unsigned long can hold, then the return value will be
+    incorrect.)
+    If $op1 and $op2 are both >=0 or both <0, return the hamming
+    distance between the two operands, which is the number of bit
+    positions where $op1 and $op2 have different bit values.  If
+    one operand is >=0 and the other <0 then the number of bits
+    different is infinite, and the return value is MAX_ULONG,
+    the largest possible `unsigned long'.
+
+   $ui = Rmpz_scan0($op, $ui);
+   $ui = Rmpz_scan1($op, $ui);
+    Scan $op, starting from bit index $ui, towards more
+    significant bits, until the first 0 or 1 bit (respectively)
+    is found.  Return the index of the found bit. If the bit at
+    index $ui is already what's sought, then $ui is returned.
+    If there's no bit found, then MAX_ULONG is returned.  This
+    will happen in `Rmpz_scan0' past the end of a positive
+    number, or `Rmpz_scan1' past the end of a negative.
+
+   Rmpz_setbit($rop, $ui);
+    Set bit index $ui in $rop.
+
+   Rmpz_clrbit($rop, $ui);
+    Clear bit index $ui in $rop.
+
+   $si = Rmpz_tstbit($op, $ui);
+    Test bit index $ui in $op and return 0 or 1 accordingly.
+
+   ###############
+
+   I/O of INTEGERS
+
+   $bytes_written = Rmpz_out_str([$prefix,] $op, $base [, $suffix]);
+    BEST TO USE TRmpz_out_str INSTEAD.
+    Output $op to STDOUT, as a string of digits in base $base.
+    The base may vary from -36..-2, 2..62. Return the number
+    of bytes written, or if an error occurred,return 0.
+    The optional arguments ($prefix and $suffix) are strings
+    that will be prepended/appended to the mpz_out_str output.
+    $bytes_written does not include the bytes contained in
+    $prefix and $suffix.
+
+   $bytes_written = TRmpz_out_str([$prefix,] $stream, $base, $op, [, $suffix]);
+    As for Rmpz_out_str, except that there's the capability to print
+    to somewhere other than STDOUT. Note that the order of the args
+    is different (to match the order of the mpz_out_str args).
+    To print to STDERR:
+       TRmpz_out_str(*stderr, $base, $digits, $op);
+    To print to an open filehandle (let's call it FH):
+       TRmpz_out_str(\*FH, $base, $digits, $op);
+
+   $bytes_written = Rmpz_out_raw(\*FH, $op);
+    Output $op to filehandle FH, in raw binary format. The integer is
+    written in a portable format, with 4 bytes of size information, and
+    that many bytes of limbs. Both the size and the limbs are written
+    in decreasing significance order (i.e., in big-endian). The output
+    can be read with mpz_inp_raw.
+
+   $bytes_read = Rmpz_inp_str($rop, $base);
+    BEST TO USE TRmpz_inp_str instead.
+    Input a string in base $base from STDIN, and put the read
+    integer in $rop. The base may vary from 2 to 62.  If $base
+    is 0, the actual base is determined from the leading
+    characters: if the first two characters are `0x' or `0X',
+    hexadecimal is assumed, otherwise if the first character is
+   `0', octal is assumed, otherwise decimal is assumed.
+    Return the number of bytes read, or if an error occurred, return 0.
+
+   $bytes_read = TRmpz_inp_str($rop, $stream, $base);
+    As for Rmpz_inp_str, except that there's the capability to read
+    from somewhere other than STDIN.
+    To read from STDIN:
+       TRmpz_inp_str($rop, *stdin, $base);
+    To read from an open filehandle (let's call it FH):
+       TRmpz_inp_str($rop, \*FH, $base);
+
+    $bytes_read = Rmpz_inp_raw($rop, \*FH);
+     Input from filehandle FH in the format written by Rmpz_out_raw,
+     and put the result in $rop. Return the number of bytes read, or
+     if an error occurred, return 0.
+
+
+   #######################
+
+   RANDOM NUMBER FUNCTIONS
+
+   In the random number functions, @r is an array of
+   Math::GMPz objects (one for each random number that is
+   required). $how_many is the number of random numbers you
+   want and must be equal to scalar(@r). $bits is simply the
+   number of random bits required. Before calling the random
+   number functions, $state must be initialised and seeded.
+
+   $state = rand_init($op); # $op is the seed.
+    Initialises and seeds $state, ready for use with the random
+    number functions. However, $state has not been blessed into
+    any package, and therefore does not get cleaned up when it
+    goes out of scope. To avoid memory leaks you therefore need
+    to call 'rand_clear($state);' once you have finished with it
+    and before it goes out of scope. Also, it uses the default
+    algorithm. Consider using the following initialisation and
+    seeding routines - they provide a choice of algorithm, and
+    there's no need to call rand_clear() when you've finished with
+    them.
+
+   $state = zgmp_randinit_default();
+    This is the Math::GMPz interface to the gmp library function
+   'gmp_randinit_default'.
+    $state is blessed into package Math::GMPz::Random and will be
+    automatically cleaned up when it goes out of scope.
+    Initialize $state with a default algorithm. This will be a
+    compromise between speed and randomness, and is recommended for
+    applications with no special requirements. Currently this is
+    the gmp_randinit_mt function (Mersenne Twister algorithm).
+
+   $state = zgmp_randinit_mt();
+    This is the Math::GMPz interface to the gmp library function
+   'gmp_randinit_mt'.
+    Currently identical to zgmp_randinit_default().
+
+   $state = zgmp_randinit_lc_2exp($mpz, $ui, $m2exp);
+    This is the Math::GMPz interface to the gmp library function
+   'gmp_randinit_lc_2exp'.
+    $state is blessed into package Math::GMPz::Random and will be
+    automatically cleaned up when it goes out of scope.
+    Initialize $state with a linear congruential algorithm
+    X = ($mpz*X + $ui) mod (2 ** $m2exp). The low bits of X in this
+    algorithm are not very random. The least significant bit will have a
+    period no more than 2, and the second bit no more than 4, etc. For
+    this reason only the high half of each X is actually used.
+    When a random number of more than m2exp/2 bits is to be generated,
+    multiple iterations of the recurrence are used and the results
+    concatenated.
+
+   $state = zgmp_randinit_lc_2exp_size($ui);
+    This is the Math::GMPz interface to the gmp library function
+   'gmp_randinit_lc_2exp_size'.
+    $state is blessed into package Math::GMPz::Random and will be
+    automatically cleaned up when it goes out of scope.
+    Initialize state for a linear congruential algorithm as per
+    gmp_randinit_lc_2exp. a, c and m2exp are selected from a table,
+    chosen so that $ui bits (or more) of each X will be used,
+    ie. m2exp/2 >= $ui.
+    If $ui is bigger than the table data provides then the function fails
+    and dies with an appropriate error message. The maximum value for $ui
+    currently supported is 128.
+
+   $state2 = zgmp_randinit_set($state1);
+    This is the Math::GMPz interface to the gmp library function
+   'gmp_randinit_set'.
+    $state2 is blessed into package Math::GMPz::Random and will be
+    automatically cleaned up when it goes out of scope.
+    Initialize $state2 with a copy of the algorithm and state from
+    $state1.
+
+   $state = zgmp_randinit_default_nobless();
+   $state = zgmp_randinit_mt_nobless();
+   $state = zgmp_randinit_lc_2exp_nobless($mpz, $ui, $m2exp);
+   $state2 = zgmp_randinit_set_nobless($state1);
+    As for the above comparable function, but $state is not blessed into
+    any package. (Generally not useful - but they're available if you
+    want them.)
+
+   zgmp_randseed($state, $mpz);
+   zgmp_randseed_ui($state, $ui);
+    These are the Math::GMPz interfaces to the gmp library functions
+   'gmp_randseed' and 'gmp_randseed_ui'.
+    Seed an initialised (but not yet seeded) $state with $mpz/$ui.
+
+   $ui = zgmp_urandomb_ui($state, $bits);
+    This is the Math::GMPz interface to the gmp library function
+    'gmp_urandomb_ui'.
+    Return a uniformly distributed random number of $bits bits, ie. in
+    the range 0 to 2 ** ($bits - 1) inclusive. $bits must be less than or
+    equal to the number of bits in an unsigned long.
+
+   $ui2 = zgmp_urandomm_ui($state, $ui1);
+    This is the Math::GMPz interface to the gmp library function
+    'gmp_urandomm_ui'.
+    Return a uniformly distributed random number in the range 0 to
+    $ui1 - 1, inclusive.
+
+   Rmpz_urandomm(@r, $state, $mpz, $how_many);
+    Generate $how_many uniform random integers in the range
+    0 to $op-1, inclusive.
+
+   Rmpz_urandomb(@r, $state, $bits, $how_many);
+    Generate $how_many uniformly distributed random integers
+    in the range 0 to 2**($bits-1), inclusive.
+
+   Rmpz_rrandomb(@r, $state, $bits, $how_many);
+    Generate $how_many random integers with long strings of
+    zeros and ones in the binary representation. Useful for
+    testing functions and algorithms, since this kind of random
+    numbers have proven to be more likely to trigger corner-case bugs.
+    The random number will be in the range 0 to 2**($bits-1), inclusive.
+
+   zgmp_randclear($state);
+   rand_clear($state);
+    Destroys $state, as also does Math::GMPz::Random::DESTROY - three
+    identical functions.
+    Use only if $state is an unblessed object - ie if it was initialised
+    using rand_init() or one of the zgmp_randinit*_nobless functions.
+
+   #########################
+
+   INTEGER IMPORT AND EXPORT
+
+   Rmpz_import($rop, $len, $order, $size, $endian, $nails, $bstr);
+
+    Take a binary string ("$bstr") and convert it to a GMP
+    bignum structure, treating the string as a base 256
+    number. "$rop" is a Math::GMPz object holding that number.
+    "$len" is the length of the string segment to be
+    converted to the GMP bignum. Normally, $len = length($bstr),
+    but you can opt not to take the entire string if you like.
+
+    Usually ($order, $size, $endian, $nails) = (1, 1, 0, 0);
+
+    See the GMP manual for a full explanation of what these
+    variables mean.
+
+   $bstr = Rmpz_export($order, $size, $endian, $nails, $op);
+
+    Rmpz_export() is simply the reverse of Rmpz_import().
+    It returns a base 256 string representation of the
+    number held by the Math::GMPz object, "$op".
+
+   ###############################
+
+   MISCELLANEOUS INTEGER FUNCTIONS
+
+   $bool = Rmpz_fits_ulong_p ($op);
+   $bool = Rmpz_fits_slong_p ($op);
+   $bool = Rmpz_fits_uint_p  ($op);
+   $bool = Rmpz_fits_sint_p  ($op);
+   $bool = Rmpz_fits_ushort_p($op);
+   $bool = Rmpz_fits_sshort_p($op);
+   $bool = Rmpz_fits_UV_p    ($op);
+   $bool = Rmpz_fits_IV_p    ($op);
+
+    Return non-zero iff the value of $op fits an 'unsigned long int',
+    'signed long int', 'unsigned int', 'signed int', 'unsigned short
+    int', or 'signed short int', 'UV', or 'IV' respectively.
+    Otherwise, return zero.
+
+   $bool = Rmpz_odd_p ($op);
+   $bool = Rmpz_even_p($op);
+    Determine whether $op is odd or even, respectively.
+    Return non-zero if yes, zero if no.
+
+   $ui = Rmpz_size($op);
+    Return the size of $op measured in number of limbs.
+    If $op is zero, the returned value will be zero.
+
+   $ui = Rmpz_sizeinbase($op, $base);
+    (This function returns a size_t value. If the actual sizeinbase
+    of $op is greater than the maximum value that a size_t can hold,
+    then the return value will be incorrect.)
+    Return the size of $op measured in number of digits in base
+    $base. The base may vary from 2 to 62.  The sign of $op is
+    ignored, just the absolute value is used.  The result will be
+    exact or 1 too big.  If $base is a power of 2, the result will
+    always be exact. If $op is zero the return value is always 1.
+
+   ####################
+
+   OPERATOR OVERLOADING
+
+    Overloading works with numbers, strings, Math::GMPz objects,
+    Math::BigInt objects and, to a limited extent, Math::GMPq objects
+    (iff the gmp library is version 6.1.0 or later) and Math::MPFR
+    objects (iff version 3.13 or later of Math::MPFR has been
+    installed).
+
+   The following operators are overloaded:
+    + - * / % **
+    += -= *= /= %= **=
+    << >> <<= >>=
+    & | ^ ~
+    &= |= ^=
+    < <= > >= == != <=>
+    ! abs
+
+    The "power" operators ('**' and '**=') overload accept only +ve
+    integers (ie +IV or UV). Values that are too large to fit into
+    a C 'unsigned long int' will be silently truncated.
+
+    Division uses 'tdiv' (see 'Integer Division', above).
+    Check that '~', '%', and '%=' are working as you expect
+    (especially in relation to negative values).
+
+    Attempting to use the overloaded operators with objects that
+    have been blessed into some package other than 'Math::BigInt',
+   'Math::GMPz', 'Math::GMPq' (comparison operators), or 'Math::MPFR'
+    (limited applications) will not work.
+    Math::MPFR objects can be used only with '+', '-', '*', '/'
+    and '**' operators, and will work only if Math::MPFR is at
+    version 3.13 or later - in which case the operation will
+    return a Math::MPFR object.
+    Math::GMPq objects can be used only with the comparison operators
+    ( == != < <= > >= <=> ), and only if Math::GMPq has been built
+    against gmp-6.1.0 or later.
+
+    In those situations where the overload subroutine operates on 2
+    perl variables, then obviously one of those perl variables is
+    a Math::GMPz object. To determine the value of the other variable
+    the subroutine works through the following steps (in order),
+    using the first value it finds, or croaking if it gets
+    to step 6:
+
+    1. If the variable is an unsigned long then that value is used.
+       The variable is considered to be an unsigned long if
+       (perl 5.8) the UOK flag is set or if (perl 5.6) SvIsUV()
+       returns true. (In the case of perls whose ivtype is long long,
+       the variable is treated as an unsigned long long int if the
+       UOK/SvISUV flag is set.)
+
+    2. If the variable is a signed long int, then that value is used.
+       The variable is considered to be a signed long int if the
+       IOK flag is set. (In the case of perls whose ivtype is long long,
+       the variable is treated as a signed long long int if the IOK flag
+       is set.)
+
+    3. If the variable is an NV, then that value is used. The variable
+       is considered to be an NV if the NOK flag is set && the POK flag
+       is unset.
+
+    4. If the variable is a string (ie the POK flag is set) then the
+       value of that string is used. Octal strings must begin with
+       '0', hex strings must begin with either '0x' or '0X' -
+       otherwise the string is assumed to be decimal. If the POK
+       flag is set, but the string is not a valid base 8, 10, or 16
+       number, the subroutine croaks with an appropriate error
+       message.
+
+    5. If the variable is a Math::GMPz object (or, for operators
+       specified above, a Math::MPFR/Math::GMPq object) then the value
+       of that object is used.
+
+    6. If none of the above is true, then the second variable is
+       deemed to be of an invalid type. The subroutine croaks with
+       an appropriate error message.
+
+    If the second operand is a 'double' (ie if the other
+    operand's NOK flag is set) then it is first truncated
+    to an integer value before the operation is performed.
+
+    For example:
+    my $x = Rmpz_init_set_ui(112);
+    $x *= 2.9;
+    print "$x"; # prints 224
+
+   #####
+
+   OTHER
+
+   $GMP_version = Math::GMPz::gmp_v;
+    Returns the version of the GMP library (eg 4.2.3) being used by
+    Math::GMPz. The function is not exportable.
+
+   $GMP_cc = Math::GMPz::__GMP_CC;
+   $GMP_cflags = Math::GMPz::__GMP_CFLAGS;
+    If Math::GMPz has been built against gmp-4.2.3 or later,
+    returns respectively the CC and CFLAGS settings that were used
+    to compile the gmp library against which Math::GMPz was built.
+    (Values are as specified in the gmp.h that was used to build
+    Math::GMPz.)
+    Returns undef if Math::GMPz has been built against an earlier
+    version of the gmp library.
+    (These functions are in @EXPORT_OK and are therefore exportable
+    by request. They are not listed under the ":mpz" tag.)
+
+
+   $major = Math::GMPz::__GNU_MP_VERSION;
+   $minor = Math::GMPz::__GNU_MP_VERSION_MINOR;
+   $patchlevel = Math::GMPz::__GNU_MP_VERSION_PATCHLEVEL;
+    Returns respectively the major, minor, and patchlevel numbers
+    for the GMP library version used to build Math::GMPz. Values are
+    as specified in the gmp.h that was used to build Math::GMPz.
+    (These functions are in @EXPORT_OK and are therefore exportable
+    by request. They are not listed under the ":mpz" tag.)
+
+   ################
+
+   FORMATTED OUTPUT
+
+   NOTE: The format specification can be found at:
+   http://gmplib.org/manual/Formatted-Output-Strings.html#Formatted-Output-Strings
+   However, the use of '*' to take an extra variable for width and
+   precision is not allowed in this implementation. Instead, it is
+   necessary to interpolate the variable into the format string - ie,
+   instead of:
+     Rmpz_printf("%*Zd\n", $width, $mpz);
+   we need:
+     Rmpz_printf("%${width}Zd\n", $mpz);
+
+   $si = Rmpz_printf($format_string, $var);
+
+    This function changed with the release of Math-GMPz-0.27.
+    Now (unlike the GMP counterpart), it is limited to taking 2
+    arguments - the format string, and the variable to be formatted.
+    That is, you can format only one variable at a time.
+    If there is no variable to be formatted, then the final arg
+    can be omitted - a suitable dummy arg will be passed to the XS
+    code for you. ie the following will work:
+     Rmpz_printf("hello world\n");
+    Returns the number of characters written, or -1 if an error
+    occurred.
+
+   $si = Rmpz_fprintf($fh, $format_string, $var);
+
+    This function (unlike the GMP counterpart) is limited to taking
+    3 arguments - the filehandle, the format string, and the variable
+    to be formatted. That is, you can format only one variable at a time.
+    If there is no variable to be formatted, then the final arg
+    can be omitted - a suitable dummy arg will be passed to the XS
+    code for you. ie the following will work:
+     Rmpz_fprintf($fh, "hello world\n");
+    Returns the number of characters written, or -1 if an error
+    occurred.
+
+   $si = Rmpz_sprintf($buffer, $format_string, [$var,] $buflen);
+
+    This function (unlike the GMP counterpart) is limited to taking
+    4 arguments - the buffer, the format string, the variable to be
+    formatted and the buffer length. If there is no variable to be
+    formatted, then the "$var" arg can be omitted - a suitable dummy
+    arg will be passed to the XS code for you. ie the following will
+    work:
+     Rmpz_sprintf($buffer, "hello world\n", 12);
+    $buflen must be large enough to accommodate the formatted string,
+    Sets $buffer to the formatted string and returns the number of
+    characters written, or -1 if an error occurred.
+
+   $si = Rmpz_snprintf($buffer, $bytes, $format_string, [$var,] $buflen);
+
+    Form a null-terminated string in $buffer. No more than $bytes
+    bytes will be written. To get the full output, $bytes must be
+    enough for the string and null-terminator. $buflen must be large
+    enough to accommodate the string and null-terminator..
+    The return value is the total number of characters which ought
+    to have been produced, excluding the terminating null.
+    If $si >= $bytes then the actual output has been truncated to
+    the first $bytes-1 characters, and a null appended.
+    This function (unlike the GMP counterpart) is limited to taking
+    5 arguments - the buffer, the maximum number of bytes to be
+    returned, the format string, the variable to be formatted, and
+    the length of the buffer to which the formatted string will be
+    written.
+    If there is no variable to be formatted, then the "$var" arg can
+    be omitted - a suitable dummy arg will be passed to the XS code
+    for you. ie the following will work:
+     Rmpz_snprintf($buffer, 6 "hello world", 12);
+
+   ###################
+   ###################
+
+=head1 BUGS
+
+    You can get segfaults if you pass the wrong type of
+    argument to the functions - so if you get a segfault, the
+    first thing to do is to check that the argument types
+    you have supplied are appropriate.
+
+=head1 LICENSE
+
+    This program is free software; you may redistribute it and/or
+    modify it under the same terms as Perl itself.
+    Copyright 2006-20011, 2013-17, Sisyphus
+
+=head1 AUTHOR
+
+    Sisyphus <sisyphus at(@) cpan dot (.) org>
+
+=cut

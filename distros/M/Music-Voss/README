@@ -1,0 +1,33 @@
+Music::Voss - functions for fractal noise generation functions
+
+To install this module, use CPAN, for example:
+
+  cpan Music::Voss
+
+Run perldoc(1) on Music::Voss for additional documentation.
+
+
+For the source code, see:
+
+https://github.com/thrig/Music-Voss
+
+This can be built and installed by running:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+REGARDING THE NAME
+
+It's easier for me to type than Weierstrass, and something with fractal
+in the name would have been far too obvious.
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2016 Jeremy Mates
+
+This module is free software; you can redistribute it and/or modify it
+under the Artistic License (2.0).

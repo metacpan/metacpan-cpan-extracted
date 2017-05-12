@@ -1,0 +1,99 @@
+Revision history for MojoX-Session
+
+0.33 2015-03-11T08:58:45Z
+
+        - Fix a build error @ Mojolicious 6.* (Jeen Lee)
+
+0.32 2015-02-15T18:12:59Z
+
+        - Fix test compatibility with v5.78
+
+0.31 2014-01-07T08:04:08Z
+
+        - Just meta files update
+
+0.30 2013-10-18T08:16:12Z
+
+        - Support httponly flag (Sergey Homenkow)
+
+0.29 2013-10-10T16:51:24Z
+
+        - Fix test compatibility with v4.45
+
+0.28    2013-06-06 00:00:00
+        - Fix Mojolicious update
+
+0.27    2013-05-06 00:00:00
+        - Correcting Dbi/Dbic capitalisation (Alex Hutton)
+
+0.26    2012-12-30 00:00:00
+        - Require Digest::SHA instead of Digest::SHA1
+        - Remove DBI/DBIC in favor of Dbi/Dbic (Alex Hutton)
+
+0.25    2012-02-11 00:00:00
+        - Fixes due to Mojolicious api change (and again)
+
+0.24    2011-07-19 00:00:00
+        - Fixes due to Mojolicious api change (again)
+
+0.20    2010-05-19 00:00:00
+        - CouchDB store fixes (tomiles)
+
+0.16    2010-01-22 00:00:00
+        - Fixed session initialization place in plugin to avoid cross-request
+          data sharing (mvuets, korshak)
+
+0.15    2009-12-15 00:00:00
+        - flush method returns store value (abh suggestion)
+        - Cookie transport by default
+        - Autoloading store and transport classes
+        - Added Mojolicious::Plugin::Session
+
+0.13    2009-08-18 00:00:00
+        - Fixes due to Mojo update (David Davis)
+
+0.12    2009-08-03 00:00:00
+        - Better DBIC store (William Ono)
+
+0.11    2009-07-22 00:00:00
+        - Minimal Mojo version where remote_addr() first appeared (0.9002)
+
+0.10    2009-04-12 00:00:00
+        - DBIC store, thanks to William Ono
+
+0.09    2009-04-08 00:00:00
+        - get rid of not initialized warnings
+        - do not set sid unless session is loaded
+        - test empty data handling
+        - do not return object, return stringified cookie
+        - fix hardcoded table column names
+        - warning fix
+        - weak tx
+
+0.08    2009-01-25 00:00:00
+        - tx is passed to session now
+        - correct ip_match behavior
+
+0.07    2009-01-25 00:00:00
+        - fix bug when there are many cookies
+
+0.06    2009-01-25 00:00:00
+        - path, domain, secure cookie flags
+
+0.05    2009-01-20 00:00:00
+        - wrong generated id length fix
+
+0.04    2008-12-07 00:00:00
+        - fix multiple data setting
+
+0.03    2008-11-26 00:00:00
+        - flash
+        - No flush on object desctruction, bad practice
+
+0.02    2008-11-18 00:00:00
+        - Digest::SHA1 in dependencies
+        - Made tx ref weak
+
+0.01    2008-11-16 00:00:00
+        First version
+

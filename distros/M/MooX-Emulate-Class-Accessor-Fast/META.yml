@@ -1,0 +1,27 @@
+---
+abstract: 'Emulate Class::Accessor::Fast behavior using Moo attributes.'
+author:
+  - 'Aran Deltac <bluefeet@gmail.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::Simple: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-Emulate-Class-Accessor-Fast
+requires:
+  Carp: '0'
+  Class::Method::Modifiers: '2.05'
+  Moo: '1.004005'
+  Package::Stash: '0.26'
+  strictures: '1.004004'
+resources:
+  bugtracker: https://github.com/bluefeet/MooX-Emulate-Class-Accessor-Fast/issues
+  homepage: https://github.com/bluefeet/MooX-Emulate-Class-Accessor-Fast
+  repository: https://github.com/bluefeet/MooX-Emulate-Class-Accessor-Fast.git
+version: '0.03'

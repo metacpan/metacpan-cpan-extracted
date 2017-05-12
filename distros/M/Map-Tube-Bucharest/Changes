@@ -1,0 +1,54 @@
+0.08 2015-10-23T10:20:03+02:00
+ - Implement station order.
+ - Improve comment in tests.
+ - Rewrite XML map to new version with line IDs.
+ - Rewrite XML map to new version without junctions.
+
+0.07 2015-10-15T13:55:29+02:00
+ - Add EXAMPLE4 to doc.
+ - Add get_line_by_id() and get_line_by_name() methods to doc.
+ - Add tests for get_line_by_id() and get_line_by_name() methods.
+ - Add test for get_lines() method.
+ - Add tests for get_stations() method.
+ - Improve description for get_lines() in doc.
+ - Update to Map::Tube 3.06.
+
+0.06 2015-10-02T13:17:33+02:00
+ - Add tests for get_node_by_id() and get_node_by_name() methods.
+ - Fix Test::Map::Tube and planning of tests.
+ - Move author tests to xt/ directory.
+ - Rewrite SEE ALSO section to new style.
+ - Update Module::Install to 1.16 version.
+
+0.05 2015-03-06T09:01:05+01:00
+ - Fix test dependencies.
+
+0.04 2015-03-05T16:37:24+01:00
+ - Add <?xml> header to XML document.
+ - Add 04-map.t test.
+ - Add Map::Tube::Singapore to SEE ALSO section in doc.
+ - Add lines to XML document.
+ - Move comment in xml file to top.
+
+0.03 2015-01-20T07:34:18+01:00
+ - Add Map::Tube::Budapest to SEE ALSO section in doc.
+ - Add Map::Tube::Graph to SEE ALSO section in doc.
+ - Add Map::Tube::Nanjing to SEE ALSO section in doc.
+ - Add Map::Tube::Plugin::Graph to SEE ALSO section in doc.
+ - Add Task::Map::Tube to SEE ALSO section in doc.
+ - Fix XML map (duplicite links).
+ - Update copyright years to 2015.
+
+0.02 2014-12-26T18:50:38+01:00
+ - Add EXAMPLE3 section to doc.
+ - Add Map::Tube::GraphViz, Map::Tube::Text::Table,
+   Map::Tube::Dnipropetrovsk, Map::Tube::Kazan, Map::Tube::Novosibirsk,
+   Map::Tube::Prague, Map::Tube::SaintPetersburg, Map::Tube::Tbilisi,
+   Map::Tube::Vienna and Map::Tube::Yekaterinburg> to SEE ALSO section in
+   doc.
+ - Add get_lines() method to doc.
+ - Add get_stations() method to doc.
+ - Remove executable bit from bucharest-map.xml file.
+
+0.01 2014-12-10T01:21:14+01:00
+ - First version

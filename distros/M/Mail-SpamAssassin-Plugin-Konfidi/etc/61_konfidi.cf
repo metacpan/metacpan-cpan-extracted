@@ -1,0 +1,16 @@
+ifplugin Mail::SpamAssassin::Plugin::OpenPGP
+
+rawbody   OPENPGP_SIGNED_GOOD     eval:check_openpgp_signed_good()
+describe OPENPGP_SIGNED_GOOD     OpenPGP: message body is signed with a valid signature
+tflags OPENPGP_SIGNED_GOOD nice
+ 
+endif   # Mail::SpamAssassin::Plugin::OpenPGP
+
+# changes to this should also be changed in Konfidi.pm's SYNOPSIS section
+
+ifplugin Mail::SpamAssassin::Plugin::Konfidi
+
+full    KONFIDI_TRUST_VALUE     eval:check_konfidi()
+describe KONFIDI_TRUST_VALUE     Konfidi-computed trust value for sender, if sender is authenticated
+
+endif   # Mail::SpamAssassin::Plugin::Konfidi

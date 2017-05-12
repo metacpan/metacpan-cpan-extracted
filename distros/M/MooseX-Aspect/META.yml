@@ -1,0 +1,41 @@
+---
+abstract: 'aspect-oriented programming toolkit for Moose'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.61
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: MooseX::Aspect
+name: MooseX-Aspect
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  Devel::Caller: 0
+  Moose: 2.00
+  MooseX::ClassAttribute: 0
+  MooseX::RoleQR: 0.002
+  MooseX::Singleton: 0
+  Scalar::Does: 0.002
+  namespace::sweep: 0
+  perl: 5.10.0
+  thanks: 0
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Aspect
+  homepage: https://metacpan.org/release/MooseX-Aspect
+  license: http://dev.perl.org/licenses/
+  repository: https://bitbucket.org/tobyink/p5-moosex-aspect
+version: 0.001

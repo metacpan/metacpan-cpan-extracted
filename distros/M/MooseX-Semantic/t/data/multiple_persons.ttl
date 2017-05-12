@@ -1,0 +1,33 @@
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:    <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf:   <http://xmlns.com/foaf/0.1/> .
+@prefix bio:    <http://purl.org/vocab/bio/0.1/> .
+@prefix schema: <http://schema.org/> .
+
+<alice>
+	a foaf:Person ;
+	foaf:name "Alice" ;
+	bio:olb "My name is Alice" .
+
+<bob>
+	a foaf:Person , schema:Person ;
+	foaf:name "Bob" ;
+	bio:olb "My name is Bob" .
+
+<carol>
+	a schema:Person ;
+	foaf:name "Carol" ;
+	bio:olb "My name is Carol" .
+
+<dave>
+	a schema:Person ;
+	schema:name "Dave" ;
+	bio:olb "My name is Carol" .
+
+<eve>
+	a foaf:Person ;
+	rdfs:comment "Eve" ;
+	bio:olb "My name is Eve" .
+

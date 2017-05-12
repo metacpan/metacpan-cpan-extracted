@@ -1,0 +1,35 @@
+---
+abstract: 'Mojolicious Plugin for Config::Any support'
+author:
+  - 'Huo Linhe <huolinhe@berrygenomics.com>'
+build_requires:
+  Config::Any: '0'
+  Modern::Perl: '0'
+  Module::Build: '0.28'
+  Mojolicious::Lite: '0'
+  Test::Mojo: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '1.00'
+  YAML: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-ConfigAny
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Config::Any: '0'
+  File::ConfigDir: '0'
+  IO::All: '0'
+  Mojo::Base: '0'
+version: 0.1.3

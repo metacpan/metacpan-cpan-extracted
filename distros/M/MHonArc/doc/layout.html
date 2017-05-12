@@ -1,0 +1,347 @@
+<HTML>
+<HEAD>
+<TITLE>MHonArc Reference -- Page Layout</TITLE>
+<link rel="stylesheet" type="text/css" href="docstyles.css">
+</HEAD>
+<BODY>
+
+<!--X-NavButtons-Start-->
+<table width="100%">
+<tr valign="top">
+<td align="left"><nobr><a href="commontasks.html"><img src="prev.png"border=0 alt="[Prev]"></a>&nbsp;&nbsp;&nbsp;</nobr></td><td align="center" width="99%"><a href="mhonarc.html"><img src="up.png" border=0 alt="[TOC]"></a><a href="faq/faq.html"><img src="faq.png" border=0 alt="[FAQ]"></a><a href="app-bugs.html"><img src="bug.png" border=0 alt="[Bugs]"></a><a href="http://www.mhonarc.org/"><img src="home.png" border=0 alt="[Home]"></a></td><td align="right"><nobr>&nbsp;&nbsp;&nbsp;<a href="resources.html"><img src="next.png" border=0 alt="[Next]"></a></nobr></td></tr></table>
+<!--X-NavButtons-End-->
+<HR>
+
+<!-- ******************************************************************** -->
+<H1><a name="pagelayout">Page Layout</a></H1>
+
+<p>The section describes the layout of the pages created by
+MHonArc.  Each page's layout is controled by
+<a href="resources.html">resources</a>.  Layout
+resources can be changed as you see fit to achieve the
+appearance you desire.
+
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#notaion">Notation</a>
+<li><a href="#mainidxpg">Main Index Page</a>
+<ul>
+<li><small><a href="#mainidxlayout">Main index page resource layout</a></small>
+</ul>
+<li><a href="#threadidxpg">Thread Index Page</a>
+<ul>
+<li><small><a href="#tidxlayout">Thread index page resource layout</a></small>
+</ul>
+<li><a href="#msgpg">Message Page</a>
+<ul>
+<li><small><a href="#msgpglayout">Message page resource layout</a></small>
+<li><small><a href="#msgheaderlayout">Converted message header</a></small>
+<li><small><a href="#msgbodylayout">Converted message body</a></small>
+<li><small><a href="#tslice">Thread slices</a></small>
+</ul>
+</ul>
+<!--X-TOC-End-->
+
+
+<!-- ******************************************************************** -->
+<hr>
+<h2><a name="notaion">Notation</a></h2>
+
+<p>To simplify the description of the various pages created
+by MHonArc, the following notation is used:
+</p>
+
+<dl>
+<dt><strong>(&#160;)</strong></dt>
+<dd>Parentheses denote a <em>group</em> of resources.
+</dd>
+<dt><strong>|</strong></dt>
+<dd>The vertical bar is use within a <em>group</em> to denote
+a boolean OR.  For example, "<tt>(X&nbsp;|&nbsp;Y&nbsp;|&nbsp;Z)</tt>"
+states that either X, Y, or Z may apply.
+</dd>
+<dt><strong>?</strong></dt>
+<dd>Denotes that preceding resource, or group, is
+optional.
+</dd>
+<dt><strong>*</strong></dt>
+<dd>Denotes that preceding resource, or group, can
+occur zero or more times.
+</dd>
+<dt><strong>+</strong></dt>
+<dd>Denotes that preceding resource, or group, can
+occur one or more times.
+</dd>
+</dl>
+
+<!-- ******************************************************************** -->
+<hr>
+<h2><a name="mainidxpg">Main Index Page</a></h2>
+
+<p>The main index is normally the default index of an
+archive.  The main index list messages by date,
+subject, author, or message number.
+Since date listing is the default, the
+main index is commonly referred to as the date index.
+</p>
+
+<h3><a name="mainidxlayout">Main index page resource layout</a></h3>
+
+<pre class="code">
+<a href="resources/idxpgssmarkup.html"><b>IDXPGSSMARKUP</b></a>
+<a href="resources/idxpgbegin.html"><b>IDXPGBEGIN</b></a>
+    <a href="resources/listbegin.html"><b>LISTBEGIN</b></a>
+	<b>(</b><a href="resources/authorbegin.html"><b>AUTHORBEGIN</b></a> <b>|</b>
+	 <a href="resources/daybegin.html"><b>DAYBEGIN</b></a> <b>|</b>
+	 <a href="resources/subjectbegin.html"><b>SUBJECTBEGIN</b></a><b>)?</b>
+	<a href="resources/litemplate.html"><b>LITEMPLATE</b></a><b>+</b>
+	<b>(</b><a href="resources/authorend.html"><b>AUTHOREND</b></a> <b>|</b>
+	 <a href="resources/dayend.html"><b>DAYEND</b></a> <b>|</b>
+	 <a href="resources/subjectend.html"><b>SUBJECTEND</b></a><b>)?</b>
+     <a href="resources/listend.html"><b>LISTEND</b></a>
+    <a href="resources/doc.html"><b>DOC</b></a><b>?</b>
+<a href="resources/idxpgend.html"><b>IDXPGEND</b></a>
+</pre>
+
+<!-- ******************************************************************** -->
+<hr>
+<h2><a name="threadidxpg">Thread Index Page</a></h2>
+
+<p>The thread index list messages by thread.  Threads
+are based upon <tt>In-Reply-To</tt> and <tt>References</tt> fields of
+messages and by same <tt>Subject</tt>s.
+</p>
+
+<p>The layout of a thread index page is more complicated
+than the main index layout since threading is more
+complex.
+Also, MHonArc tries to provide the greatest
+flexibility for customizing thread listing layout.
+</p>
+
+<h3><a name="tidxlayout">Thread index page resource layout</a></h3>
+
+<pre class="code">
+<a href="resources/tidxpgssmarkup.html"><b>TIDXPGSSMARKUP</b></a>
+<a href="resources/tidxpgbegin.html"><b>TIDXPGBEGIN</b></a>
+    <a href="resources/thead.html"><b>THEAD</b></a>
+	<b>((</b><a href="resources/ttopbegin.html"><b>TTOPBEGIN</b></a>
+	    <a href="resources/tsublistbeg.html"><b>TSUBLISTBEG</b></a>
+		<b>((</b><a href="resources/tlitxt.html"><b>TLITXT</b></a>
+		    <small>[possible subthread listing]</small>
+		  <a href="resources/tliend.html"><b>TLIEND</b></a><b>)|</b>
+		<b>(</b><a href="resources/tlinone.html"><b>TLINONE</b></a>
+		    <small>[possible subthread listing]</small>
+		 <a href="resources/tlinoneend.html"><b>TLINONEEND</b></a><b>))+</b>
+	    <b>(</b><a href="resources/tsubjectbeg.html"><b>TSUBJECTBEG</b></a>
+		<b>((</b><a href="resources/tlitxt.html"><b>TLITXT</b></a>
+		    <small>[possible subthread listing]</small>
+		  <a href="resources/tliend.html"><b>TLIEND</b></a><b>)|</b>
+		<b>(</b><a href="resources/tlinone.html"><b>TLINONE</b></a>
+		    <small>[possible subthread listing]</small>
+		 <a href="resources/tlinoneend.html"><b>TLINONEEND</b></a><b>))+</b>
+	     <a href="resources/tsubjectend.html"><b>TSUBJECTEND</b></a><b>)?</b>
+	    <a href="resources/tsublistend.html"><b>TSUBLISTEND</b></a><b></b>
+	  <a href="resources/ttopend.html"><b>TTOPEND</b></a><b>)</b>
+	 <b>|</b>
+	 <a href="resources/tsingletxt.html"><b>TSINGLETXT</b></a><b>)*</b> <small>[message w/o references or follow-ups]</small>
+    <a href="resources/tfoot.html"><b>TFOOT</b></a>
+    <a href="resources/doc.html"><b>DOC</b></a><b>?</b>
+<a href="resources/tidxpgend.html"><b>TIDXPGEND</b></a>
+</pre>
+
+<p>If the previous is not confusing enough, there are four other resources
+for controlling the thread index page layout:
+<a href="resources/tcontbegin.html">TCONTBEGIN</a>,
+<a href="resources/tcontend.html">TCONTEND</a>,
+<a href="resources/tindentbegin.html">TINDENTBEGIN</a>,
+<a href="resources/tindentend.html">TINDENTEND</a>.
+If the <a href="resources/multipg.html">multiple page resource</a> is
+set, it is possible that a thread can span more than one page.  These
+resources are used to restart a thread that has been clipped due to
+a page boundary.
+</p>
+
+<!-- ******************************************************************** -->
+<hr>
+<h2><a name="msgpg">Message Page</a></h2>
+
+<p>The message page contains a single message converted
+to HTML and archive navigational links.
+</p>
+
+<h3><a name="msgpglayout">Message page resource layout</a></h3>
+
+<pre class="code">
+<a href="resources/msgpgssmarkup.html"><b>MSGPGSSMARKUP</b></a>
+<a href="resources/msgpgbegin.html"><b>MSGPGBEGIN</b></a>
+    <a href="resources/msghead.html"><b>MSGHEAD</b></a>
+    <a href="resources/toplinks.html"><b>TOPLINKS</b></a>
+    <a href="resources/subjectheader.html"><b>SUBJECTHEADER</b></a>
+    <a href="#msgheaderlayout"><i>Converted message header</i></a>
+    <a href="resources/headbodysep.html"><b>HEADBODYSEP</b></a>
+    <a href="#msgbodylayout"><i>Converted message body</i></a>
+    <a href="resources/msgbodyend.html"><b>MSGBODYEND</b></a>
+    <b>(</b><a href="resources/folupbegin.html"><b>FOLUPBEGIN</b></a>
+	<a href="resources/foluplitxt.html"><b>FOLUPLITXT</b></a><b>+</b>
+     <a href="resources/folupend.html"><b>FOLUPEND</b></a><b>)?</b>
+    <b>(</b><a href="resources/refsbegin.html"><b>REFSBEGIN</b></a>
+	<a href="resources/refslitxt.html"><b>REFSLITXT</b></a><b>+</b>
+     <a href="resources/refsend.html"><b>REFSEND</b></a><b>)?</b>
+    <a href="resources/botlinks.html"><b>BOTLINKS</b></a>
+    <a href="resources/msgfoot.html"><b>MSGFOOT</b></a>
+<a href="resources/msgpgend.html"><b>MSGPGEND</b></a>
+</pre>
+
+<table class="note" width="100%">
+<tr valign=top>
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>If the <a href="resources/single.html">SINGLE</a> resource
+is set, <a href="resources/toplinks.html">TOPLINKS</a>
+and <a href="resources/botlinks.html">BOTLINKS</a>
+are are not applicable.  If the
+<a href="resources/folrefs.html">FOLREFS</a> is off,
+<a href="resources/folupbegin.html">FOLUPBEGIN</a>,
+<a href="resources/foluplitxt.html">FOLUPLITXT</a>,
+<a href="resources/folupend.html">FOLUPEND</a>,
+<a href="resources/refsbegin.html">REFSBEGIN</a>,
+<a href="resources/refslitxt.html">REFSLITXT</a>, and
+<a href="resources/refsend.html">REFSEND</a> resources
+are not applicable.
+</p>
+</td>
+</tr>
+</table>
+
+<p>Message pages also contain comment declarations.  Some of the
+comment declarations are vital markers to allow MHonArc
+to properly edit the message during updates.
+</p>
+
+<h3><a name="msgheaderlayout">Converted message header</a></h3>
+
+<p>The format of converted message headers is determined by the
+following resource layout:
+</p>
+<pre class="code">
+<a href="resources/fieldsbeg.html">FIELDSBEG</a>
+    (<a href="resources/labelbeg.html">LABELBEG</a>
+     <i>label text</i>
+     <a href="resources/labelend.html">LABELEND</a>
+     <a href="resources/fldbeg.html">FLDBEG</a>
+     <i>field text</i>
+     <a href="resources/fldend.html">FLDEND</a>)*
+<a href="resources/fieldsend.html">FIELDSEND</a>
+</pre>
+
+<table class="note" width="100%">
+<tr valign=top>
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>The line breaks above are used to show the sequence order of
+the resources and do not indicate any actual line breaks in the final
+markup generated.
+</p>
+</td>
+</tr>
+</table>
+<p> </p>
+<table class="note" width="100%">
+<tr valign="baseline">
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>After a message is initially converted, the message
+header data is static.  Changes to resources that affect message header
+layout will only affect new messages and not existing archived messages.
+</p>
+</td>
+</tr>
+</table>
+<h3><a name="msgbodylayout">Converted message body</a></h3>
+
+<p>The formatting of message body data is controled by filter routines.
+See the <a href="resources/mimefilters.html">MIMEFILTERS</a> resource
+page for more information.
+</p>
+
+<table class="note" width="100%">
+<tr valign="baseline">
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>After a message is initially converted, the message
+body data is static.  Changes to resources that affect message body
+appearance will only affect news messages and not existing archived
+messages.
+</p>
+</td>
+</tr>
+</table>
+
+<h3><a name="tslice">Thread slices</a></h3>
+
+<p>MHonArc supports the ability to include thread listings on messages
+pages via the
+<a href="rcvars.html#TSLICE"><tt>$TSLICE$</tt></a> resource variable.
+The formatting of the <tt>$TSLICE$</tt> resource variable is controled
+by the following resources:
+<a href="resources/tslicebeg.html">TSLICEBEG</a>,
+<a href="resources/tslicecontbeg.html">TSLICECONTBEG</a>,
+<a href="resources/tslicecontend.html">TSLICECONTEND</a>,
+<a href="resources/tsliceend.html">TSLICEEND</a>,
+<a href="resources/tsliceindentbeg.html">TSLICEINDENTBEG</a>,
+<a href="resources/tsliceindentend.html">TSLICEINDENTEND</a>,
+<a href="resources/tsliceliend.html">TSLICELIEND</a>,
+<a href="resources/tsliceliendcur.html">TSLICELIENDCUR</a>,
+<a href="resources/tslicelinone.html">TSLICELINONE</a>,
+<a href="resources/tslicelinoneend.html">TSLICELINONEEND</a>,
+<a href="resources/tslicelitxt.html">TSLICELITXT</a>,
+<a href="resources/tslicelitxtcur.html">TSLICELITXTCUR</a>,
+<a href="resources/tslicesingletxt.html">TSLICESINGLETXT</a>,
+<a href="resources/tslicesingletxtcur.html">TSLICESINGLETXTCUR</a>,
+<a href="resources/tslicesubjectbeg.html">TSLICESUBJECTBEG</a>,
+<a href="resources/tslicesubjectend.html">TSLICESUBJECTEND</a>,
+<a href="resources/tslicesublistbeg.html">TSLICESUBLISTBEG</a>,
+<a href="resources/tslicesublistend.html">TSLICESUBLISTEND</a>,
+<a href="resources/tslicetopbeg.html">TSLICETOPBEG</a>,
+<a href="resources/tslicetopbegcur.html">TSLICETOPBEGCUR</a>,
+<a href="resources/tslicetopend.html">TSLICETOPEND</a>, and
+<a href="resources/tslicetopendcur.html">TSLICETOPENDCUR</a>
+</p>
+
+<p>The structure of the resources parallels the thread resource
+layout structure described for the <a href="#threadidxpg">thread
+index page</a>, and the above thread slice resources will default to
+the corresponding non-tslice resources, allowing you to provide a
+consistent look to all thread listings without having to define two
+sets of resources.
+</p>
+
+<p>One key difference to the <tt>TSLICE</tt>* resources is the ability
+to customize the look for current message item in the
+the slice listing.  I.e.  You can actually highlight, grey-out, etc,
+the current message to give the reader a visual cue of where they are
+in the thread.  See
+<a href="resources/tslicetopbegcur.html">TSLICETOPBEGCUR</a> for
+an example.
+</p>
+
+<hr>
+<!--X-NavButtons-Start-->
+<table width="100%">
+<tr valign="top">
+<td align="left"><nobr><a href="commontasks.html"><img src="prev.png"border=0 alt="[Prev]"></a>&nbsp;&nbsp;&nbsp;</nobr></td><td align="center" width="99%"><a href="mhonarc.html"><img src="up.png" border=0 alt="[TOC]"></a><a href="faq/faq.html"><img src="faq.png" border=0 alt="[FAQ]"></a><a href="app-bugs.html"><img src="bug.png" border=0 alt="[Bugs]"></a><a href="http://www.mhonarc.org/"><img src="home.png" border=0 alt="[Home]"></a></td><td align="right"><nobr>&nbsp;&nbsp;&nbsp;<a href="resources.html"><img src="next.png" border=0 alt="[Next]"></a></nobr></td></tr></table>
+<!--X-NavButtons-End-->
+
+<!-- ******************************************************************** -->
+<HR>
+<address>
+$Date: 2005/05/13 00:00:35 $ <br>
+<img align="top" src="monicon.png" alt="">
+<a href="http://www.mhonarc.org"
+><strong>MHonArc</strong></a><br>
+Copyright &#169; 1997-1999,2005 <a href="http://www.mhonarc.org/~ehood/"
+>Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org"
+>mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</BODY>
+</HTML>

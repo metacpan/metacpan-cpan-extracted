@@ -1,0 +1,30 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.143240'
+keywords:
+  - units
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Units-PhysicalValue
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Math::Algebra::Symbols: '0'
+  Math::BigFloat: '0'
+  Math::Units: '0'
+  Number::Format: '0'
+  perl: '5.006001'
+resources:
+  repository: http://github.com/jettero/pv/
+version: '1.0009'

@@ -1,0 +1,104 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+2.000001
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - perl 5.006
+
+2.000000 2014-09-24T05:26:53Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker
+
+ [Added / runtime requires]
+ - namespace::clean
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec
+ - lib
+
+ [Changed / runtime requires]
+ - perl v5.10.0 → 5.006
+
+ [Changed / test requires]
+ - Test::More 0.98 → 0.92
+
+ [Removed / build requires]
+ - Module::Build 0.4004
+
+ [Removed / configure requires]
+ - Module::Build 0.4004
+
+ [Removed / runtime requires]
+ - namespace::autoclean 0.08
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+1.0.3 2013-04-06T05:09:44Z
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Changed / test requires]
+ - Test::More 0.92 → 0.98
+
+1.0.2 2011-10-30T19:28:41Z
+ [Added / runtime requires]
+ - perl v5.10.0
+ - strict
+ - warnings
+
+ [Removed / test requires]
+ - English
+
+1.0.1 2011-04-04T07:40:17Z
+
+1.0.0 2011-01-23T04:01:35Z
+ [Added / build requires]
+ - Module::Build 0.3601
+
+ [Added / configure requires]
+ - Module::Build 0.3601
+
+ [Added / runtime requires]
+ - Moose::Exporter
+ - Moose::Role
+ - Moose::Util::MetaRole
+
+ [Added / test requires]
+ - English
+ - File::Find
+ - File::Temp
+ - Test::Moose
+ - Test::More 0.92
+
+ [Changed / runtime requires]
+ - Moose 0.89 → 0.94
+ - Scalar::Util 1.21 → 0
+
+ [Removed / runtime requires]
+ - Data::Dump 1.15
+ - MooseX::Types 0.19
+ - Test::More 0.92
+
+0.01001007 2009-08-31T19:52:09Z
+ [Added / runtime requires]
+ - Scalar::Util 1.21
+
+0.01000613 2009-08-28T01:55:48Z
+ [Added / runtime requires]
+ - MooseX::Types 0.19
+
+ [Changed / runtime requires]
+ - Data::Dump 0 → 1.15
+ - MooseX::Types::Moose 0 → 0.19
+
+0.01000404 2009-08-25T16:18:59Z
+ [Added / runtime requires]
+ - Data::Dump

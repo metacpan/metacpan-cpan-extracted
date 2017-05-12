@@ -1,0 +1,56 @@
+=head1 THANKS
+
+=over 4
+
+=item Larry Wall
+
+for being wise and good
+
+=item Marc Lehmann <pcg@goof.com>
+
+for writing Audio::Play::MPG123
+
+=item Chris Nandor <pudge@pobox.com>
+
+for writing MP3::Info
+
+=item Graham Barr <gbarr@pobox.com>
+
+for IO::Socket and IO::Select
+
+=item Brad Appleton <bradapp@enteract.com>
+
+for Pod::Usage
+
+=item Rene K. Mueller <kiwi@the-labs.com>
+
+for suggestions on improving qx(mp3 ls), and for writing the first
+thank you letter I got for MP3::Daemon.
+
+=item Patrik Tschudin <ptschudin@datanetworks.ch>
+
+for telling me about his ROSS project, and giving me an idea about
+what direction MP3::Daemon may need to take to help him reach his goal.
+
+http://ross.sourceforge.net/
+
+=item Sean E. McSherry <mcsherry@mcsherry.org>
+
+for suggesting that I add randomization, and for hinting about some
+bad behaviour in the client.  I found the bugs and fixed them.
+
+He's using MP3::Daemon in conjunction with an X10 remote control unit
+in his very wired house.
+
+=item Daniel Pearson <dpears2@umbc.edu>
+
+for putting up w/ my freshmeat.net newbie-ness, and for writing
+Moosic which is a Python variation on MP3::Daemon.  It was interesting
+to compare and contrast the two implementaions.  A little competition
+is nice, too ;-)
+
+http://freshmeat.net/projects/moosic/
+
+=back
+
+=cut

@@ -1,0 +1,41 @@
+MW-ssNA
+
+Perl module to calculate molecular weight of ssDNA or ssRNA.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+MODULE INFORMATION:
+
+The input file may contain one or more sequences (should be in FASTA format).
+
+The formulas used to calculate molecular weight of ssDNA and ssRNA are;
+
+ssDNA : ssdna = (An * 313.2) + (Tn * 304.2) + (Gn * 329.2) + (Cn * 289.2);
+
+ssRNA : ssrna = (An * 329.2) + (Un * 306.2) + (Gn * 345.2) + (Cn * 305.2);
+
+where 'n' refers to the total number of occurrences. 
+
+The option values are;
+
+'d'	-	to find molecular weight of ssDNA
+
+'r' 	-	to find molecular weight of ssRNA
+
+'cd'	-	To get the total count of ATGC in DNA input sequence(s)
+
+'cr'	-	To get the total count of AUGC in RNA input sequence(s)
+
+LICENSE AND COPYRIGHT
+
+Copyright 2011 Shankar M.
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+

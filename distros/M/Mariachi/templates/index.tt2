@@ -1,0 +1,17 @@
+[% PROCESS header.tt2 title=mariachi.config.name %]
+[% USE Mariachi %]
+
+<h1>[% mariachi.config.name %]</h1>
+[% PROCESS paginate.tt2 %]
+[% PROCESS pagenav.tt2 %]
+
+[% FOREACH root = page.splice(content) %]
+
+<ul class="threads">
+    [% INCLUDE thread.tt2 thread=root depth=0 backlink=1 %]
+</ul>
+
+[% END %]
+
+[% PROCESS pagenav.tt2 %]
+[% PROCESS footer.tt2 %]

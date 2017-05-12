@@ -1,0 +1,29 @@
+---
+abstract: 'Moose type definitions for Unicode strings'
+author:
+  - '唐鳳 <cpan@audreyt.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: MooseX::Types::UniStr
+name: MooseX-Types-UniStr
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 0.50
+  MooseX::Types: 0
+  namespace::clean: 0.08
+  ok: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

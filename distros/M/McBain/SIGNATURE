@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 3f159bca9eef48bd063f963f4558cd268e1249be Changes
+SHA1 3dc0c952e2f662d920830fd561e6d0308a5346ef INSTALL
+SHA1 8582065cd14fffaec80bf3b157124ec6fbaef873 LICENSE
+SHA1 36eeeffe4b75858383bb7d1620613e24841f8bc1 MANIFEST
+SHA1 0aa434651f4d8185e4f5f80bc310bcd97c8dd374 MANIFEST.SKIP
+SHA1 0b0877fd2aa9e4d6a324e8e9d3a87f3221876873 META.json
+SHA1 ae6ac42b0278e64c1774bff0db69cf97513ff19e Makefile.PL
+SHA1 df76ba96885d00336a44a9fe71f904b95bfe84e1 README
+SHA1 885a5a1fa5ac6dbb92262e7f4ff1c847596ae914 bin/mcbain2pod
+SHA1 554fe4bb3062215bd1d54d8f68adc3496e7e198e dist.ini
+SHA1 8127050925f44a7ab3c17978dcc058811e29fe91 lib/McBain.pm
+SHA1 be0dda70bd2401d6e6579df6e3fd64b416e6d057 lib/McBain/Directly.pm
+SHA1 1c79716e082ccd6c437cedbe672594059ba815db t/00-load.t
+SHA1 7aa00217ddd5dda25a897a24580d55d855fcdb86 t/01-simple.t
+SHA1 52cee206717a66929a614e747f0ec77b390a2b48 t/02-contextual.t
+SHA1 ccd1b65d90f0380e3c1b761b6e2106ac6139046f t/03-context_lookup.t
+SHA1 ce6895f58098f376216a4c673568033d15cebaa1 t/lib/Luftwaffe/API/TheRootOfIt.pm
+SHA1 33b01a7a37cd3788eda36c7b3c9cf5363f0ebbae t/lib/Luftwaffe/Context.pm
+SHA1 858b579dfba9f716096c55eea239661c3c9d2c04 t/lib/Mendoza.pm
+SHA1 5d6079af27a9a8aefb7cd67d2c45c8910869db62 t/lib/Mendoza/Math.pm
+SHA1 d3f317af734cbe21130f8480c728d6e599b40112 t/lib/Mendoza/Math/Constants.pm
+SHA1 3cc8210ee0e38917d78997134fa5f2c4fb9cfcc9 t/lib/Wolfcastle.pm
+SHA1 673a225eeafe8c3a2da49ca11b890ed14f95db28 t/lib/Wolfcastle/Context.pm
+SHA1 3d5c11599e5c585c6845e99dd24a0eb94c55195b t/lib/Wolfcastle/Math.pm
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iF4EAREIAAYFAlSq1+8ACgkQa4OHQAFM10fZzwD+Lfziv9+qzWEAQgCI+hOb+K9J
+6ONvb/dRj0ykt3eliH8A/jxcdM31BrBWjK/mPN12AY34OGVWMHN64tMth1yIPkm5
+=n0BC
+-----END PGP SIGNATURE-----

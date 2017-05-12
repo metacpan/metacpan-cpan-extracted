@@ -1,0 +1,50 @@
+{
+   "abstract" : "write-once attributes for Moo",
+   "author" : [
+      "haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooX-SetOnce",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {},
+      "configure" : {},
+      "runtime" : {
+         "requires" : {
+            "Class::Method::Modifiers" : "1.05",
+            "Moo" : "1.002",
+            "perl" : "5.008001",
+            "strictures" : "1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/haarg/MooX-SetOnce.git",
+         "web" : "https://github.com/haarg/MooX-SetOnce",
+         "x_tyoe" : "git"
+      }
+   },
+   "version" : "0.001003"
+}

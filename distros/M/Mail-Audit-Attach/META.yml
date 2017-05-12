@@ -1,0 +1,32 @@
+--- #YAML:1.0
+name:               Mail-Audit-Attach
+version:            0.96
+abstract:           Mail::Audit plugin for attachment handling.
+author:
+    - Christian Renz <crenz@web42.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Mail::Audit:   2
+    Mail::Header:  1
+    MIME::Base64:  0
+    MIME::Entity:  5
+    MIME::Head:    5
+    Test::More:    0
+resources:
+    repository:  http://github.com/crenz/Mail-Audit-Attach
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+recommends:
+    Test::Pod:            1.14
+    Test::Pod::Coverage:  1.04

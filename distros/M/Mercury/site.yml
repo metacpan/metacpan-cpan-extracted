@@ -1,0 +1,77 @@
+theme:
+    class: Statocles::Theme
+    args:
+        store: site/theme
+
+deploy:
+    class: Statocles::Deploy::Git
+    args:
+        base_url: http://preaction.me/mercury
+        path: '.'
+        remote: www
+        branch: deploy
+
+site:
+    class: Statocles::Site
+    args:
+        title: Mercury
+        base_url: http://preaction.me/mercury/
+        nav:
+            main:
+                - title: Blog
+                  href: /blog
+                - title: Docs
+                  href: /pod
+                - title: Demo
+                  href: http://preaction.me:3000/
+                - title: Code
+                  href: 'http://github.com/preaction/Mercury'
+                - title: Bugs
+                  href: 'http://github.com/preaction/Mercury/issues'
+                - title: CPAN
+                  href: 'http://metacpan.org/pod/Mercury'
+                - title: IRC
+                  href: 'https://chat.mibbit.com/?channel=%23statocles&server=irc.perl.org'
+        deploy:
+            $ref: deploy
+        index: /
+        theme:
+            $ref: theme
+        apps:
+
+            page:
+                $class: Statocles::App::Basic
+                $args:
+                    url_root: /
+                    store: site/
+
+            pod:
+                $class: Statocles::App::Perldoc
+                $args:
+                    url_root: /pod
+                    inc:
+                        - lib/
+                        - bin/
+                    modules:
+                        - 'Mercury'
+                        - 'Mercury::'
+                        - 'mercury'
+                    index_module: 'mercury'
+                    weave: 1
+
+            blog:
+                $class: Statocles::App::Blog
+                $args:
+                    store: site/blog
+                    url_root: /blog
+
+        data:
+            google_analytics_id: 'UA-61295159-3'
+            disqus:
+                shortname: 'mercury'
+
+    on:
+        - build:
+            $class: Statocles::Plugin::LinkCheck
+            $sub: check_pages
+

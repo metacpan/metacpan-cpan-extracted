@@ -1,0 +1,50 @@
+Revision history for mojox-cpan-uploader
+
+0.034    Wed Jan 07 14:44:52 2015
+         Added x_deprecated metadata bit
+
+0.033    Tue Jan 06 17:49:12 2015
+         Adjusted for most recent Mojolicious changes
+         Module is DEPRECATED in favor of Mojolicious::Command::cpanify
+
+0.032    Tue Aug 16 10:46:27 2011
+         perlcritic fixes
+
+0.031    Sun Aug 14 20:57:50 2011
+         Follow Mojolicous 1.76 Mojo::Path->append removal
+         perlcritic fixes
+         
+0.03     Wed Aug 10 14:44:53 2011
+         Fixed parameters handling in mojo-cpanup
+         Avoid using experimental Mojo methods in tests
+         Use Module::Install
+         Require Mojolicous 1.51. Not all previous versions of Mojo::*
+         support userinfo
+         Cleanups
+
+0.02_1   Wed Jun 01 16:52:36 2011
+         Switched to Mojo::UserAgent (Mojoliicous 1.16)
+
+0.01_5   Sun Nov 14 20:37:25 2010
+         Test fixes
+
+0.01_4   The Aug 14 22:53:35 2010
+         mojo-cpanup can save user details
+         Deps fixes
+         Tests fixes
+         Documentation
+
+0.01_3   The Aug 11 00:01:05 2010
+         Verbose exceptions and errors
+
+0.01_2   The Aug 10 20:30:48 2010
+         Changed version numbering to match perlmodstyle
+         Test for mojo-cpanup
+
+0.0.2    The Aug 10 01:06:22 2010
+         vti forced me to do this
+         Deps fixes (vti)
+         Tests fixes (vti)
+
+0.0.1    Fri May 28 14:06:15 2010
+         Initial release.

@@ -1,0 +1,9 @@
+Revision history for Perl module Mojolicious-Plugin-Multiplex
+
+0.02 2016-08-23
+  - Client caches channel objects rather than overwriting them
+  - Rename error method to send_error
+
+0.01 2016-08-22
+  - Initial release
+

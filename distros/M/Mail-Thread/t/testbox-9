@@ -1,0 +1,415 @@
+From london.pm-admin@london.pm.org Tue Mar 11 10:03:04 2003
+Return-Path: <london.pm-admin@london.pm.org>
+Received: from pop3.demon.co.uk
+	by localhost with POP3 (fetchmail-6.2.1)
+	for richardc@localhost (single-drop); Tue, 11 Mar 2003 10:03:04 +0000 (GMT)
+Received: from punt-2.mail.demon.net by mailstore for richardc@mirth.demon.co.uk
+          id 1047372076:20:09615:18; Tue, 11 Mar 2003 08:41:16 GMT
+Received: from penderel.state51.co.uk ([193.82.57.128]) by punt-2.mail.demon.net
+           id aa2008852; 11 Mar 2003 8:40 GMT
+Received: from localhost ([127.0.0.1] helo=penderel.state51.co.uk)
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 18sfF0-00049Z-00; Tue, 11 Mar 2003 08:36:06 +0000
+Received: from cat.ourshack.com ([212.74.28.153])
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 18sfEk-000498-00
+	for <london.pm@london.pm.org>; Tue, 11 Mar 2003 08:35:50 +0000
+Received: from abw by cat.ourshack.com with local (Exim 4.05)
+	id 18sfIO-000FHw-00
+	for london.pm@london.pm.org; Tue, 11 Mar 2003 08:39:36 +0000
+From: Andy Wardley <abw@andywardley.com>
+To: london.pm@london.pm.org
+Subject: Perl 6 Apocalypse 6
+Message-ID: <20030311083936.GB26176@cat.ourshack.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.4i
+Sender: london.pm-admin@london.pm.org
+Errors-To: london.pm-admin@london.pm.org
+X-BeenThere: london.pm@london.pm.org
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+Reply-To: london.pm@london.pm.org
+List-Help: <mailto:london.pm-request@london.pm.org?subject=help>
+List-Post: <mailto:london.pm@london.pm.org>
+List-Subscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=subscribe>
+List-Id: London.pm Perl M[ou]ngers <london.pm.london.pm.org>
+List-Unsubscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=unsubscribe>
+List-Archive: <http://london.pm.org/pipermail/london.pm/>
+X-Original-Date: Tue, 11 Mar 2003 08:39:36 +0000
+Date: Tue, 11 Mar 2003 08:39:36 +0000
+Status: RO
+Content-Length: 119
+
+In case you haven't already seen it, Apocalypse 6 is out.
+
+  http://www.perl.com/pub/a/2003/03/07/apocalypse6.html
+
+A
+
+
+From london.pm-admin@london.pm.org Tue Mar 11 10:03:17 2003
+Return-Path: <london.pm-admin@london.pm.org>
+Received: from pop3.demon.co.uk
+	by localhost with POP3 (fetchmail-6.2.1)
+	for richardc@localhost (single-drop); Tue, 11 Mar 2003 10:03:17 +0000 (GMT)
+Received: from punt-1.mail.demon.net by mailstore for richardc@mirth.demon.co.uk
+          id 1047376968:10:08748:9; Tue, 11 Mar 2003 10:02:48 GMT
+Received: from penderel.state51.co.uk ([193.82.57.128]) by punt-1.mail.demon.net
+           id ab1119973; 11 Mar 2003 10:02 GMT
+Received: from localhost ([127.0.0.1] helo=penderel.state51.co.uk)
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 18sgF4-0004iq-00; Tue, 11 Mar 2003 09:40:14 +0000
+Received: from mx1.fotango.com ([195.157.53.90])
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 18sgEk-0004iD-00
+	for <london.pm@london.pm.org>; Tue, 11 Mar 2003 09:39:54 +0000
+Received: from cowgirl (localhost.localdomain [127.0.0.1])
+	by mx1.fotango.com (8.12.8/8.12.8) with ESMTP id h2B9hPS6003269
+	for <london.pm@london.pm.org>; Tue, 11 Mar 2003 09:43:25 GMT
+Received: from 192.168.1.26 (piezo [192.168.1.26])
+	by cowgirl (Postfix) with ESMTP id D0514329E3
+	for <london.pm@london.pm.org>; Tue, 11 Mar 2003 09:48:19 +0000 (GMT)
+Mime-Version: 1.0
+X-Sender: blech@husk.org
+Message-Id: <f05200f00ba93600e2e7a@10.0.0.250>
+In-Reply-To: <20030311083936.GB26176@cat.ourshack.com>
+References: <20030311083936.GB26176@cat.ourshack.com>
+To: london.pm@london.pm.org
+From: Paul Mison <paulm@husk.org>
+Subject: Re: Perl 6 Apocalypse 6
+Content-Type: text/plain; charset="us-ascii" ; format="flowed"
+Sender: london.pm-admin@london.pm.org
+Errors-To: london.pm-admin@london.pm.org
+X-BeenThere: london.pm@london.pm.org
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+Reply-To: london.pm@london.pm.org
+List-Help: <mailto:london.pm-request@london.pm.org?subject=help>
+List-Post: <mailto:london.pm@london.pm.org>
+List-Subscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=subscribe>
+List-Id: London.pm Perl M[ou]ngers <london.pm.london.pm.org>
+List-Unsubscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=unsubscribe>
+List-Archive: <http://london.pm.org/pipermail/london.pm/>
+X-Original-Date: Tue, 11 Mar 2003 09:43:42 +0000
+Date: Tue, 11 Mar 2003 09:43:42 +0000
+Status: RO
+Content-Length: 229
+
+On 11/03/2003 at 08:39 +0000, Andy Wardley wrote:
+>In case you haven't already seen it, Apocalypse 6 is out.
+>
+>   http://www.perl.com/pub/a/2003/03/07/apocalypse6.html
+
+And Apocalypse 7, too.
+
+-- 
+:: paul
+:: we're like crystal
+
+
+From london.pm-admin@london.pm.org Tue Mar 11 12:41:18 2003
+Return-Path: <london.pm-admin@london.pm.org>
+Received: from pop3.demon.co.uk
+	by localhost with POP3 (fetchmail-6.2.1)
+	for richardc@localhost (single-drop); Tue, 11 Mar 2003 12:41:18 +0000 (GMT)
+Received: from punt-1.mail.demon.net by mailstore for richardc@mirth.demon.co.uk
+          id 1047383462:10:24349:155; Tue, 11 Mar 2003 11:51:02 GMT
+Received: from penderel.state51.co.uk ([193.82.57.128]) by punt-1.mail.demon.net
+           id aa1025599; 11 Mar 2003 11:50 GMT
+Received: from localhost ([127.0.0.1] helo=penderel.state51.co.uk)
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 18shyN-0005YR-00; Tue, 11 Mar 2003 11:31:07 +0000
+Received: from post.tobit.co.uk ([212.240.163.99])
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 18shxp-0005Y1-00
+	for <london.pm@london.pm.org>; Tue, 11 Mar 2003 11:30:33 +0000
+Received: from [192.168.242.37] (helo=[192.168.242.37])
+	by post.tobit.co.uk with esmtp (Exim 4.12)
+	id 18si1S-0006l0-00
+	for london.pm@london.pm.org; Tue, 11 Mar 2003 11:34:18 +0000
+Subject: Re: Perl 6 Apocalypse 6
+From: Dirk Koopman <djk@tobit.co.uk>
+To: london.pm@london.pm.org
+In-Reply-To: <f05200f00ba93600e2e7a@10.0.0.250>
+References: <20030311083936.GB26176@cat.ourshack.com>
+	 <f05200f00ba93600e2e7a@10.0.0.250>
+Content-Type: text/plain
+Organization: Tobit Computer Co Ltd, http://www.tobit.co.uk
+Message-Id: <1047382472.1875.19.camel@dirk2.int.tobit.co.uk>
+Mime-Version: 1.0
+X-Mailer: Ximian Evolution 1.2.2 
+Content-Transfer-Encoding: 7bit
+X-Spam-Score: -27.5 (---------------------------)
+X-Scanner: exiscan for exim4 (http://duncanthrax.net/exiscan/) *18si1S-0006l0-00*icHIpDgt7y6*
+Sender: london.pm-admin@london.pm.org
+Errors-To: london.pm-admin@london.pm.org
+X-BeenThere: london.pm@london.pm.org
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+Reply-To: london.pm@london.pm.org
+List-Help: <mailto:london.pm-request@london.pm.org?subject=help>
+List-Post: <mailto:london.pm@london.pm.org>
+List-Subscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=subscribe>
+List-Id: London.pm Perl M[ou]ngers <london.pm.london.pm.org>
+List-Unsubscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=unsubscribe>
+List-Archive: <http://london.pm.org/pipermail/london.pm/>
+X-Original-Date: 11 Mar 2003 11:34:32 +0000
+Date: 11 Mar 2003 11:34:32 +0000
+Status: RO
+Content-Length: 693
+
+I realise that I am an old and useless programmer, a dinosaur even, but
+is all this going to add up to a language that is:-
+
+a) easier to learn
+b) faster both to parse and execute
+c) still something that could reasonably be called perl?
+
+Dirk
+
+On Tue, 2003-03-11 at 09:43, Paul Mison wrote:
+> On 11/03/2003 at 08:39 +0000, Andy Wardley wrote:
+> >In case you haven't already seen it, Apocalypse 6 is out.
+> >
+> >   http://www.perl.com/pub/a/2003/03/07/apocalypse6.html
+> 
+> And Apocalypse 7, too.
+-- 
+Please Note: Some Quantum Physics Theories Suggest That When the
+Consumer Is Not Directly Observing This Product, It May Cease to
+Exist or Will Exist Only in a Vague and Undetermined State.
+
+
+
+
+From london.pm-admin@london.pm.org Tue Mar 11 12:41:17 2003
+Return-Path: <london.pm-admin@london.pm.org>
+Received: from pop3.demon.co.uk
+	by localhost with POP3 (fetchmail-6.2.1)
+	for richardc@localhost (single-drop); Tue, 11 Mar 2003 12:41:17 +0000 (GMT)
+Received: from punt-2.mail.demon.net by mailstore for richardc@mirth.demon.co.uk
+          id 1047384983:20:01221:83; Tue, 11 Mar 2003 12:16:23 GMT
+Received: from penderel.state51.co.uk ([193.82.57.128]) by punt-2.mail.demon.net
+           id ab2125275; 11 Mar 2003 12:15 GMT
+Received: from localhost ([127.0.0.1] helo=penderel.state51.co.uk)
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 18si88-0005fk-00; Tue, 11 Mar 2003 11:41:12 +0000
+Received: from mta05-svc.ntlworld.com ([62.253.162.45])
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 18si7j-0005fJ-00
+	for <london.pm@london.pm.org>; Tue, 11 Mar 2003 11:40:47 +0000
+Received: from quietstars.com ([62.252.188.133]) by mta05-svc.ntlworld.com
+          (InterMail vM.4.01.03.27 201-229-121-127-20010626) with ESMTP
+          id <20030311114436.MFSZ3525.mta05-svc.ntlworld.com@quietstars.com>
+          for <london.pm@london.pm.org>; Tue, 11 Mar 2003 11:44:36 +0000
+Subject: Re: Perl 6 Apocalypse 6
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Mime-Version: 1.0 (Apple Message framework v551)
+From: Adrian Howard <adrianh@quietstars.com>
+To: london.pm@london.pm.org
+Content-Transfer-Encoding: 7bit
+In-Reply-To: <1047382472.1875.19.camel@dirk2.int.tobit.co.uk>
+Message-Id: <D4CA215C-53B6-11D7-8510-0030654E40D0@quietstars.com>
+X-Mailer: Apple Mail (2.551)
+Sender: london.pm-admin@london.pm.org
+Errors-To: london.pm-admin@london.pm.org
+X-BeenThere: london.pm@london.pm.org
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+Reply-To: london.pm@london.pm.org
+List-Help: <mailto:london.pm-request@london.pm.org?subject=help>
+List-Post: <mailto:london.pm@london.pm.org>
+List-Subscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=subscribe>
+List-Id: London.pm Perl M[ou]ngers <london.pm.london.pm.org>
+List-Unsubscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=unsubscribe>
+List-Archive: <http://london.pm.org/pipermail/london.pm/>
+X-Original-Date: Tue, 11 Mar 2003 11:44:34 +0000
+Date: Tue, 11 Mar 2003 11:44:34 +0000
+Status: RO
+Content-Length: 700
+
+On Tuesday, March 11, 2003, at 11:34  am, Dirk Koopman wrote:
+
+> I realise that I am an old and useless programmer, a dinosaur even, but
+> is all this going to add up to a language that is:-
+>
+> a) easier to learn
+
+Not any harder anyway. There's more to learn obviously because there is 
+more functionality.
+
+> b) faster both to parse and execute
+
+Yup. Lots more room for optimisation with declaration of args and the 
+more complex typing.
+
+> c) still something that could reasonably be called perl?
+
+I think so from what I've seen. Your milage may vary.
+
+You also forgot:
+
+	d) more useful
+
+Which, for me, is a resounding "Hell yeah!". I want macros, 
+multimethods and methodsubs *now* :-)
+
+Adrian
+
+
+
+From london.pm-admin@london.pm.org Tue Mar 11 14:50:17 2003
+Return-Path: <london.pm-admin@london.pm.org>
+Received: from pop3.demon.co.uk
+	by localhost with POP3 (fetchmail-6.2.1)
+	for richardc@localhost (single-drop); Tue, 11 Mar 2003 14:50:17 +0000 (GMT)
+Received: from punt-1.mail.demon.net by mailstore for richardc@mirth.demon.co.uk
+          id 1047392543:10:27211:26; Tue, 11 Mar 2003 14:22:23 GMT
+Received: from penderel.state51.co.uk ([193.82.57.128]) by punt-1.mail.demon.net
+           id aa1117029; 11 Mar 2003 14:21 GMT
+Received: from localhost ([127.0.0.1] helo=penderel.state51.co.uk)
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 18skW7-00072d-00; Tue, 11 Mar 2003 14:14:07 +0000
+Received: from mail.webbox.com ([207.231.76.69])
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 18skVU-0006vx-00
+	for <london.pm@london.pm.org>; Tue, 11 Mar 2003 14:13:28 +0000
+Received: from mdev [207.183.234.66] by mail.webbox.com
+  (SMTPD32-6.06) id A09253DB0154; Tue, 11 Mar 2003 06:20:02 -0800
+To: london.pm@london.pm.org
+CC: 
+From: "Dave Cross" <dave@dave.org.uk>
+Subject: Re: Perl 6 Apocalypse 6
+Message-Id: <11030370.22639@webbox.com>
+Mime-Version: 1.0
+Content-Type: text/plain
+Sender: london.pm-admin@london.pm.org
+Errors-To: london.pm-admin@london.pm.org
+X-BeenThere: london.pm@london.pm.org
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+Reply-To: london.pm@london.pm.org
+List-Help: <mailto:london.pm-request@london.pm.org?subject=help>
+List-Post: <mailto:london.pm@london.pm.org>
+List-Subscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=subscribe>
+List-Id: London.pm Perl M[ou]ngers <london.pm.london.pm.org>
+List-Unsubscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=unsubscribe>
+List-Archive: <http://london.pm.org/pipermail/london.pm/>
+X-Original-Date: Tue, 11 Mar 2003 06:20:04 -0800
+Date: Tue, 11 Mar 2003 06:20:04 -0800
+Status: RO
+Content-Length: 314
+
+
+From: merlyn@stonehenge.com (Randal L. Schwartz)
+Date: 3/11/03 1:30:51 PM
+
+> Will the llama and alpaca for perl6 be easier or harder to
+> read?
+
+alpaca?
+
+Am I missing something here?
+
+Dave...
+
+-- 
+<http://www.dave.org.uk>
+
+"Let me see you make decisions, without your television"
+   - Depeche Mode (Stripped)
+
+
+
+
+
+From london.pm-admin@london.pm.org Tue Mar 11 14:59:04 2003
+Return-Path: <london.pm-admin@london.pm.org>
+Received: from pop3.demon.co.uk
+	by localhost with POP3 (fetchmail-6.2.1)
+	for richardc@localhost (single-drop); Tue, 11 Mar 2003 14:59:04 +0000 (GMT)
+Received: from punt-1.mail.demon.net by mailstore for richardc@mirth.demon.co.uk
+          id 1047394517:10:25799:67; Tue, 11 Mar 2003 14:55:17 GMT
+Received: from penderel.state51.co.uk ([193.82.57.128]) by punt-1.mail.demon.net
+           id aa1125596; 11 Mar 2003 14:54 GMT
+Received: from localhost ([127.0.0.1] helo=penderel.state51.co.uk)
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 18skpT-0007Ju-00; Tue, 11 Mar 2003 14:34:07 +0000
+Received: from red.stonehenge.com ([65.208.40.162] ident=postfix)
+	by penderel.state51.co.uk with esmtp (Exim 3.35 #1 (Debian))
+	id 18skoq-0007J8-00
+	for <london.pm@london.pm.org>; Tue, 11 Mar 2003 14:33:29 +0000
+Received: by red.stonehenge.com (Postfix, from userid 1001)
+	id E44468250F; Tue, 11 Mar 2003 06:37:19 -0800 (PST)
+To: london.pm@london.pm.org
+Subject: Re: Perl 6 Apocalypse 6
+References: <11030370.22639@webbox.com>
+From: merlyn@stonehenge.com (Randal L. Schwartz)
+In-Reply-To: <11030370.22639@webbox.com>
+Message-ID: <86fzpu3r6o.fsf@red.stonehenge.com>
+User-Agent: Gnus/5.09 (Gnus v5.9.0) Emacs/21.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Sender: london.pm-admin@london.pm.org
+Errors-To: london.pm-admin@london.pm.org
+X-BeenThere: london.pm@london.pm.org
+X-Mailman-Version: 2.0.11
+Precedence: bulk
+Reply-To: london.pm@london.pm.org
+List-Help: <mailto:london.pm-request@london.pm.org?subject=help>
+List-Post: <mailto:london.pm@london.pm.org>
+List-Subscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=subscribe>
+List-Id: London.pm Perl M[ou]ngers <london.pm.london.pm.org>
+List-Unsubscribe: <http://london.pm.org/mailman/listinfo/london.pm>,
+	<mailto:london.pm-request@london.pm.org?subject=unsubscribe>
+List-Archive: <http://london.pm.org/pipermail/london.pm/>
+X-Original-Date: 11 Mar 2003 06:37:19 -0800
+Date: 11 Mar 2003 06:37:19 -0800
+Status: RO
+Content-Length: 963
+Lines: 29
+
+>>>>> "Dave" == Dave Cross <dave@dave.org.uk> writes:
+
+Dave> From: merlyn@stonehenge.com (Randal L. Schwartz)
+Dave> Date: 3/11/03 1:30:51 PM
+
+>> Will the llama and alpaca for perl6 be easier or harder to
+>> read?
+
+Dave> alpaca?
+
+Dave> Am I missing something here?
+
+
+Well, O'Reilly probably doesn't want me to scoop them in public, but
+I'm in the final edit phase of
+
+        Learning Perl Objects, References, and Modules
+
+which is the sequel in form and function to the Llama.  And yes, it'll
+have an alpaca on the cover.  It's the textbook for our 4-day class
+that follows the llama course.  Exercises with answers, and jokes.
+
+Expected debut at the OSCON this summer.
+
+-- 
+Randal L. Schwartz - Stonehenge Consulting Services, Inc. - +1 503 777 0095
+<merlyn@stonehenge.com> <URL:http://www.stonehenge.com/merlyn/>
+Perl/Unix/security consulting, Technical writing, Comedy, etc. etc.
+See PerlTraining.Stonehenge.com for onsite and open-enrollment Perl training!
+
+

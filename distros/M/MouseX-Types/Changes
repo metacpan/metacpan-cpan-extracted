@@ -1,0 +1,34 @@
+Revision history for Perl extension MouseX::Types
+
+0.06 2011-10-17 19:03:59
+    - Add Any::Moose compatibility (simoes)
+
+0.05 Sat Feb 13 16:08:44 2010
+    - No functional changes (gfx)
+    - Fix a typo in the tests (gfx)
+
+0.04 Sun Jan  3 10:23:47 2010
+    - Add copyright information (RT #53013)
+    - Support type predicates (gfx)
+        (e.g. "use MouseX::Types::Mouse qw(is_Int)")
+
+0.03 Sun Dec 20 15:13:39 2009
+    - Shipped as a stable version
+
+0.02_03 Thu Dec 17 14:16:53 2009
+    - Fix segmentation fault issue on older perls (gfx)
+
+0.02_02 Tue Dec 15 12:05:34 2009
+    - Fix parametarization issue (gfx)
+
+0.02_01 Sun Dec 13 16:39:09 2009
+    - Refactoring for new Mouse (gfx)
+    - Fix import to warn about undefined types (gfx)
+    - Support type parametarization (gfx)
+    - Support Mouse::Exporter (gfx)
+
+0.02
+    - Fix a test to avoid warnings
+
+0.01    2009-02-06T08:09:43+09:00
+    - split dist from Mouse 0.14

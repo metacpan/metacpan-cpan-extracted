@@ -1,0 +1,61 @@
+Module::Dependency Documentation
+------------------ -------------
+
+Examples
+--------
+
+You should find some examples of what the Grapher module can do in the
+root of this distribution. All examples were generated from the test
+files in the t/u/ directory using the pmd_grapher.plx program.
+
+Images
+------
+
+Five GIFs have been created to show you the different sorts of charts
+you can get. Have a look at example*.gif in this directory. Note that your
+local copy of GD may not create GIFs - it will probably create PNGs.
+Created using the Module::Dependency::Grapher::makeImage routine.
+
+The images are also inlined in example.html so you might find it easiest to
+just open that file.
+
+PostScript
+----------
+
+If you have the PostScript::Simple module then you can output in PostScript
+or EPS format. See example.ps and example.eps - I personally find EPS a more
+useful format.
+
+Plain Text
+----- ----
+
+The file example.txt contains text versions of the example images.
+Created using the Module::Dependency::Grapher::makeText routine.
+
+HTML
+----
+
+The file example.html contains HTML fragment versions of the example
+images. It being HTML, we have the images inline followed by their
+HTML equivalents. The visual styling is done with CSS so that there is
+no hard-coded BGCOLOR or similar attributes. See example.css for the
+classes used, or view the HTML source.
+
+SVG
+---
+
+If you have the SVG.pm module you can create images in SVG format too.
+Files example1.svg, example2.svg and example3.svg are SVG versions of the
+images example[123].gif mentioned above. You may render these images in
+a number of ways, although most people will find installing an SVG
+plug-in for their web browser easiest. I personally use the Adobe plug-in.
+
+CGI
+---
+
+An example installation of the CGI is at:
+http://www.selsyn.co.uk/depend.shtml
+But note that this machine is not hugely powerful so it may take a
+few seconds to build the image. Your hardware will probably be 
+quicker. For various reasons this may not be running the latest
+software.

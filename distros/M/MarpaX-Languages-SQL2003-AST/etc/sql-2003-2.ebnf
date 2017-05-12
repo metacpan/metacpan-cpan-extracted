@@ -1,0 +1,4643 @@
+/*
+############################################################################
+# Comments:                                                                #
+############################################################################
+# <host identifier> is approximated to the following sub-grammar:          #
+# <host identifier L0 internal> ~ [^\s,;:()]+                              #
+# <host identifier L0> ~ <host identifier L0 internal>                     #
+#                     | '(' <host identifier L0> ')'                       #
+# All host programs as assumed to start with EXEC SQL                      #
+# <regular identifier> is supposed to match <SQL language identifier>      #
+# <direct implementation-defined statement> is skipped.                    #
+# <UESCAPE> is fully supported.                                            #
+# <COBOL dbcs> is not implemented                                          #
+#                                                                          #
+# Take care that in SQL-2003 string are single quoted, Unicode strings are #
+# double quoted, and UESCAPE is single quoted.                             #
+#                                                                          #
+############################################################################
+# Marpa specific constraints:                                              #
+############################################################################
+# * <ref cast option> has been made non nullable                           #
+# * <cast option> has been made non nullable                               #
+# These two modifications upper had no impact IMHO on the grammar.         #
+#                                                                          #
+############################################################################
+# Fatal errors in the grammar found on the internet:                       #
+############################################################################
+# * Typo <multset value expression>                                        #
+#   => Replaced by <multiset value expression>                             #
+# * Typo <module collation>                                                #
+#   => Replaced by <module collations>                                     #
+# * Undefined <bit string literal>                                         #
+#   => Removed because not referenced                                      #
+# * Undefined <hex string literal>                                         #
+#   => Removed because not referenced                                      #
+# * Undefined <handler declaration>                                        #
+#   => Removed because not referenced                                      #
+# * Typo  <overlaps predicate part>                                        #
+#   =>  Replaced by <overlaps predicate>                                   #
+# * Undefined <slash>                                                      #
+#   => Replaced by <solidus>                                               #
+# * Undefined <numeric value expression dividend>                          #
+#   => Replaced by <numeric value expression>                              #
+# * Undefined <numeric value expression divisor>                           #
+#   => Replaced by <numeric value expression>                              #
+# * Undefined <white space>                                                #
+#   => Replaced by <space>                                                 #
+# * Undefined <unsigned integer>                                           #
+#   => Defined by <unsigned integer> ::= [\d]+                             #
+# * Undefined <unqualified schema name>                                    #
+#   => Defined by <unqualified schema name> ::= <identifier>               #
+#                                                                          #
+# Notes: my grammar is translating EBNF to Marpa's BNF with the following  #
+# extension: any expression enclosed in (...) is systematically converted  #
+# to an internal G1. Nevertheless there are cases where you want to enforce#
+# lexeme context. In such a case it is the responsability for the grammar  #
+# author to:                                                               #
+# * use explicitely ~ as rule separator instead of ::=                     #
+# * use ((...))) for any eventual enclosed expression on the rhs           #
+# * force every rhs that is a factor to be an uncopiable lexeme using      #
+#   LEX in front.                                                          #
+# * Lexemes can have priorities a in Marpa's BNF                           #
+#                                                                          #
+# Marpa's :discard is handling all spaces, simple and bracketed comments   #
+# This mean that <separator>, <comment> and its subrules are removed,      #
+# except when explicitely stated, e.g. in String rules.                    #
+############################################################################
+*/
+
+<:start> ::= <SQL start sequence>
+<SQL start sequence>  ::= <SQL start>+
+<SQL start>  ::= <preparable statement>
+               | <direct SQL statement>
+               | <embedded SQL declare section>
+/*             | <embedded SQL host program> */ /* Generates useless ambiguity */
+               | <embedded SQL statement>
+               | <SQL_client module definition>
+
+<SQL terminal character> ::= <SQL language character>
+
+<SQL language character L0> ~ <simple Latin letter L0> | <digit L0> | <SQL special character L0>  /* Reusable in L0 grammar */
+<SQL language character> ~ <SQL language character L0>
+
+<simple Latin letter L0> ~ <simple Latin upper case letter L0> | <simple Latin lower case letter L0>  /* Reusable in L0 grammar */
+<simple Latin upper case letter L0> ~ [A-Z] /* Reusable in L0 grammar */
+<simple Latin lower case letter L0> ~ [a-z] /* Reusable in L0 grammar */
+
+<digit L0> ~ /*LEX*/[0-9] /* Reusable in L0 grammar */
+<digit> ~ <digit L0>
+
+/* SQL special character L0 contains space that is ALSO part of the :discard: we subprioritize it */
+<SQL special character L0> ~
+		<space L0>
+	|	<double quote L0>
+	|	<percent L0>
+	|	<ampersand L0>
+	|	<quote L0>
+	|	<left paren L0>
+	|	<right paren L0>
+	|	<asterisk L0>
+	|	<plus sign L0>
+	|	<comma L0>
+	|	<minus sign L0>
+	|	<period L0>
+	|	<solidus L0>
+	|	<colon L0>
+	|	<semicolon L0>
+	|	<less than operator L0>
+	|	<equals operator L0>
+	|	<greater than operator L0>
+	|	<question mark L0>
+	|	<left bracket L0>
+	|	<right bracket L0>
+	|	<circumflex L0>
+	|	<underscore L0>
+	|	<vertical bar L0>
+	|	<left brace L0>
+	|	<right brace L0>
+
+<SQL special character> ~ <SQL special character L0>
+
+<space L0> ~ \s
+
+<double quote L0> ~ '"'
+
+<percent L0> ~ '%'
+<percent> ~ <percent L0>
+
+<ampersand L0> ~ '&'
+<ampersand> ~ <ampersand L0>
+
+<quote L0> ~ "'"
+<quote> ~<quote L0>
+
+<left paren L0> ~ '('
+<left paren> ~ <left paren L0>
+
+<right paren L0> ~ ')'
+<right paren> ~ <right paren L0>
+
+<asterisk L0> ~ '*'
+<asterisk> ~<asterisk L0>
+
+<plus sign L0> ~ '+'
+<plus sign> ~ <plus sign L0>
+
+<comma L0> ~ ','
+<comma> ~ <comma L0>
+
+<minus sign L0> ~ '-'
+<minus sign> ~ <minus sign L0>
+
+<period L0> ~ '.'
+<period> ~ <period L0>
+
+<solidus L0> ~ '/'
+<solidus> ~ <solidus L0>
+
+<colon L0> ~ ':'
+<colon> ~ <colon L0>
+
+<semicolon L0> ~ ';'
+<semicolon> ~ <semicolon L0>
+
+<less than operator L0> ~ '<'
+<less than operator> ~ <less than operator L0>
+
+<equals operator L0> ~ '='
+<equals operator> ~ <equals operator L0>
+
+<greater than operator L0> ~ '>'
+<greater than operator> ~ <greater than operator L0>
+
+<question mark L0> ~ '?'
+<question mark> ~ <question mark L0>
+
+<left bracket or trigraph> ::= <left bracket> | <left bracket trigraph>
+
+<right bracket or trigraph> ::= <right bracket> | <right bracket trigraph>
+
+<left bracket L0> ~ '['
+<left bracket> ~ <left bracket L0>
+
+<left bracket trigraph L0> ~ '??('
+<left bracket trigraph> ~ <left bracket trigraph L0>
+
+<right bracket L0> ~ ']'
+<right bracket> ~ <right bracket L0>
+
+<right bracket trigraph L0> ~ '??)'
+<right bracket trigraph> ~ <right bracket trigraph L0>
+
+<circumflex L0> ~ '^'
+<circumflex> ~ <circumflex L0>
+
+<underscore L0> ~ '_'
+<underscore> ~ <underscore L0>
+
+<vertical bar L0> ~ '|'
+<vertical bar> ~ <vertical bar L0>
+
+<left brace L0> ~ '{'
+<left brace> ~ <left brace L0>
+
+<right brace L0> ~ '}'
+<right brace> ~ <right brace L0>
+
+<token> ::= <nondelimiter token> | <delimiter token>
+
+<nondelimiter token> ::=
+		<regular identifier>
+	|	<key word>
+	|	<unsigned numeric literal>
+	|	<national character string literal>
+/* 	|	<bit string literal> UNDEFINED + UNUSED */
+/*	|	<hex string literal> UNDEFINED + UNUSED */
+	|	<large object length token>
+/*	|	<multiplier> */
+
+<regular identifier L0 internal> ~ <SQL language identifier L0 internal>
+<regular identifier L0> ~ <regular identifier L0 internal>
+<regular identifier> ~ <regular identifier L0>
+
+<large object length token> ~ /*LEX*/(<digit L0>)+ <multiplier L0>
+
+<multiplier L0> ~ /*LEX*/K | /*LEX*/M | /*LEX*/G
+<multiplier> ~ <multiplier L0>
+
+<delimited identifier L0> ~ /*LEX*/'"' <delimited identifier body L0> /*LEX*/'"'
+<delimited identifier> ~ <delimited identifier L0>
+
+<delimited identifier body L0> ~ /*LEX*/(<delimited identifier part L0>)+
+
+<delimited identifier part L0> ~ <nondoublequote character L0> | <doublequote symbol L0>
+
+<Unicode delimited identifier value> ~
+		/*LEX*/U /*LEX*/'&'
+                /*LEX*/(/*LEX*/(<separator L0>)* /*LEX*/'"' <Unicode delimiter body L0> /*LEX*/'"')+
+
+/* In the value phase we will revisit <Unicode delimited identifier> */
+
+<Unicode delimited identifier> ::=
+		<Unicode delimited identifier value>
+                semanticAction => _unicodeDelimitedIdentifier
+                |
+		<Unicode delimited identifier value>
+                /*LEX*/(<separator L0>)* 
+		<Unicode escape specifier>
+                semanticAction => _unicodeDelimitedIdentifierUescape
+
+<Unicode escape specifier> ::= ( UESCAPE priority => 1
+                                 /*LEX*/(/*LEX*/"'" <Unicode escape character L0> /*LEX*/"'")
+                               )?
+
+<Unicode delimiter body L0> ~ /*LEX*/(<Unicode identifier part L0>)+
+
+<Unicode identifier part L0> ~ <Unicode delimited identifier part L0> | <Unicode escape value internal L0>
+
+<Unicode delimited identifier part L0> ~ <nondoublequote character L0> | <doublequote symbol L0>
+
+<Unicode escape value internal L0> ~
+		<Unicode 4 digit escape value L0>
+	|	<Unicode 6 digit escape value L0>
+	|	<Unicode character escape value L0>
+
+<Unicode escape value L0> ~ <Unicode escape value internal L0>
+
+<Unicode hexit L0> ~ /*LEX*/[a-fA-f0-9]
+
+<Unicode 4 digit escape value L0> ~ <Unicode escape character L0> <Unicode hexit L0> <Unicode hexit L0> <Unicode hexit L0> <Unicode hexit L0>
+
+<Unicode 6 digit escape value L0> ~ <Unicode escape character L0> /*LEX*/'+' <Unicode hexit L0> <Unicode hexit L0> <Unicode hexit L0> <Unicode hexit L0> <Unicode hexit L0> <Unicode hexit L0>
+
+<Unicode character escape value L0> ~ <Unicode escape character L0 ><Unicode escape character L0>
+
+/* We VOLONTARILY take ANY character as unicode escape: confirmity will be done at value post-processing v.s. UESCAPE eventual value */
+<Unicode escape character L0> ~ /*LEX*/[\s\S]
+
+<nondoublequote character L0> ~ /*LEX*/[^"] | <Unicode escape character L0> /*LEX*/'"'
+
+<doublequote symbol L0> ~ /*LEX*/'""'
+
+<delimiter token> ::=
+		<character string literal>
+	|	<date string>
+	|	<time string>
+	|	<timestamp string>
+	|	<interval string>
+	|	<delimited identifier>
+	|	<Unicode delimited identifier>
+	|	<SQL special character>
+	|	<not equals operator>
+	|	<greater than or equals operator>
+	|	<less than or equals operator>
+	|	<concatenation operator>
+	|	<right arrow>
+	|	<left bracket trigraph>
+	|	<right bracket trigraph>
+	|	<double colon>
+	|	<double period>
+
+<not equals operator L0> ~ <less than operator L0> <greater than operator L0>
+<not equals operator> ~ <not equals operator L0>
+
+<greater than or equals operator L0> ~ <greater than operator L0> <equals operator L0>
+<greater than or equals operator> ~ <greater than or equals operator L0>
+
+<less than or equals operator L0> ~ <less than operator L0> <equals operator L0>
+<less than or equals operator> ~ <less than or equals operator L0>
+
+<concatenation operator L0> ~ <vertical bar L0> <vertical bar L0>
+<concatenation operator> ~ <concatenation operator L0>
+
+<right arrow L0> ~ <minus sign L0> <greater than operator L0>
+<right arrow> ~ <right arrow L0>
+
+<double colon L0> ~ <colon L0> <colon L0>
+<double colon> ~ <double colon L0>
+
+<double period L0> ~ <period L0> <period L0>
+<double period> ~ <double period L0>
+
+<separator L0> ~ <discard L0>
+
+/*
+<separator> ::= ( <comment> | <space> )+
+
+<comment> ::= <simple comment> | <bracketed comment>
+
+<simple comment> ::= <simple comment introducer> <comment character>* <newline>
+
+<simple comment introducer> ::= <minus sign><minus sign> <minus sign>*
+
+<bracketed comment> ::=
+		<bracketed comment introducer> <bracketed comment contents> <bracketed comment terminator>
+
+<bracketed comment introducer> ::= <solidus> <asterisk>
+
+<bracketed comment terminator> ::= <asterisk> <solidus>
+
+<bracketed comment contents> ::= ( <comment character> | <separator> )*
+
+<comment character> ::= <nonquote character> | <quote>
+
+<newline> ::= \n
+*/
+
+<key word> ::= <reserved word> | <non_reserved word>
+
+<non_reserved word> ::=
+		A
+	|	ABS
+	|	ABSOLUTE
+	|	ACTION
+	|	ADA
+	|	ADMIN
+	|	AFTER
+	|	ALWAYS
+	|	ASC
+	|	ASSERTION
+	|	ASSIGNMENT
+	|	ATTRIBUTE
+	|	ATTRIBUTES
+	|	AVG
+	|	BEFORE
+	|	BERNOULLI
+	|	BREADTH
+	|	C
+	|	CARDINALITY
+	|	CASCADE
+	|	CATALOG
+	|	CATALOG_NAME
+	|	CEIL
+	|	CEILING
+	|	CHAIN
+	|	CHARACTERISTICS
+	|	CHARACTERS
+	|	CHARACTER_LENGTH
+	|	CHARACTER_SET_CATALOG
+	|	CHARACTER_SET_NAME
+	|	CHARACTER_SET_SCHEMA
+	|	CHAR_LENGTH
+	|	CHECKED
+	|	CLASS_ORIGIN
+	|	COALESCE
+	|	COBOL
+	|	CODE_UNITS
+	|	COLLATION
+	|	COLLATION_CATALOG
+	|	COLLATION_NAME
+	|	COLLATION_SCHEMA
+	|	COLLECT
+	|	COLUMN_NAME
+	|	COMMAND_FUNCTION
+	|	COMMAND_FUNCTION_CODE
+	|	COMMITTED
+	|	CONDITION
+	|	CONDITION_NUMBER
+	|	CONNECTION_NAME
+	|	CONSTRAINTS
+	|	CONSTRAINT_CATALOG
+	|	CONSTRAINT_NAME
+	|	CONSTRAINT_SCHEMA
+	|	CONSTRUCTORS
+	|	CONTAINS
+	|	CONVERT
+	|	CORR
+	|	COUNT
+	|	COVAR_POP
+	|	COVAR_SAMP
+	|	CUME_DIST
+	|	CURRENT_COLLATION
+	|	CURSOR_NAME
+	|	DATA
+	|	DATETIME_INTERVAL_CODE
+	|	DATETIME_INTERVAL_PRECISION
+	|	DEFAULTS
+	|	DEFERRABLE
+	|	DEFERRED
+	|	DEFINED
+	|	DEFINER
+	|	DEGREE
+	|	DENSE_RANK
+	|	DEPTH
+	|	DERIVED
+	|	DESC
+	|	DESCRIPTOR
+	|	DIAGNOSTICS
+	|	DISPATCH
+	|	DOMAIN
+	|	DYNAMIC_FUNCTION
+	|	DYNAMIC_FUNCTION_CODE
+	|	EQUALS
+	|	EVERY
+	|	EXCEPTION
+	|	EXCLUDE
+	|	EXCLUDING
+	|	EXP
+	|	EXTRACT
+	|	FINAL
+	|	FIRST
+	|	FLOOR
+	|	FOLLOWING
+	|	FORTRAN
+	|	FOUND
+	|	FUSION
+	|	G
+	|	GENERAL
+	|	GO
+	|	GOTO
+	|	GRANTED
+	|	HIERARCHY
+	|	IMPLEMENTATION
+	|	INCLUDING
+	|	INCREMENT
+	|	INITIALLY
+	|	INSTANCE
+	|	INSTANTIABLE
+	|	INTERSECTION
+	|	INVOKER
+	|	ISOLATION
+	|	K
+	|	KEY
+	|	KEY_MEMBER
+	|	KEY_TYPE
+	|	LAST
+	|	LENGTH
+	|	LEVEL
+	|	LN
+	|	LOCATOR
+	|	LOWER
+	|	M
+	|	MAP
+	|	MATCHED
+	|	MAX
+	|	MAXVALUE
+	|	MESSAGE_LENGTH
+	|	MESSAGE_OCTET_LENGTH
+	|	MESSAGE_TEXT
+	|	MIN
+	|	MINVALUE
+	|	MOD
+	|	MORE
+	|	MUMPS
+	|	NAME
+	|	NAMES
+	|	NESTING
+	|	NEXT
+	|	NORMALIZE
+	|	NORMALIZED
+	|	NULLABLE
+	|	NULLIF
+	|	NULLS
+	|	NUMBER
+	|	OBJECT
+	|	OCTETS
+	|	OCTET_LENGTH
+	|	OPTION
+	|	OPTIONS
+	|	ORDERING
+	|	ORDINALITY
+	|	OTHERS
+	|	OVERLAY
+	|	OVERRIDING
+	|	PAD
+	|	PARAMETER_MODE
+	|	PARAMETER_NAME
+	|	PARAMETER_ORDINAL_POSITION
+	|	PARAMETER_SPECIFIC_CATALOG
+	|	PARAMETER_SPECIFIC_NAME
+	|	PARAMETER_SPECIFIC_SCHEMA
+	|	PARTIAL
+	|	PASCAL
+	|	PATH
+	|	PERCENTILE_CONT
+	|	PERCENTILE_DISC
+	|	PERCENT_RANK
+	|	PLACING
+	|	PLI
+	|	POSITION
+	|	POWER
+	|	PRECEDING
+	|	PRESERVE
+	|	PRIOR
+	|	PRIVILEGES
+	|	PUBLIC
+	|	RANK
+	|	READ
+	|	RELATIVE
+	|	REPEATABLE
+	|	RESTART
+	|	RETURNED_CARDINALITY
+	|	RETURNED_LENGTH
+	|	RETURNED_OCTET_LENGTH
+	|	RETURNED_SQLSTATE
+	|	ROLE
+	|	ROUTINE
+	|	ROUTINE_CATALOG
+	|	ROUTINE_NAME
+	|	ROUTINE_SCHEMA
+	|	ROW_COUNT
+	|	ROW_NUMBER
+	|	SCALE
+	|	SCHEMA
+	|	SCHEMA_NAME
+	|	SCOPE_CATALOG
+	|	SCOPE_NAME
+	|	SCOPE_SCHEMA
+	|	SECTION
+	|	SECURITY
+	|	SELF
+	|	SEQUENCE
+	|	SERIALIZABLE
+	|	SERVER_NAME
+	|	SESSION
+	|	SETS
+	|	SIMPLE
+	|	SIZE
+	|	SOURCE
+	|	SPACE
+	|	SPECIFIC_NAME
+	|	SQRT
+	|	STATE
+	|	STATEMENT
+	|	STDDEV_POP
+	|	STDDEV_SAMP
+	|	STRUCTURE
+	|	STYLE
+	|	SUBCLASS_ORIGIN
+	|	SUBSTRING
+	|	SUM
+	|	TABLESAMPLE
+	|	TABLE_NAME
+	|	TEMPORARY
+	|	TIES
+	|	TOP_LEVEL_COUNT
+	|	TRANSACTION
+	|	TRANSACTIONS_COMMITTED
+	|	TRANSACTIONS_ROLLED_BACK
+	|	TRANSACTION_ACTIVE
+	|	TRANSFORM
+	|	TRANSFORMS
+	|	TRANSLATE
+	|	TRIGGER_CATALOG
+	|	TRIGGER_NAME
+	|	TRIGGER_SCHEMA
+	|	TRIM
+	|	TYPE
+	|	UNBOUNDED
+	|	UNCOMMITTED
+	|	UNDER
+	|	UNNAMED
+	|	USAGE
+	|	USER_DEFINED_TYPE_CATALOG
+	|	USER_DEFINED_TYPE_CODE
+	|	USER_DEFINED_TYPE_NAME
+	|	USER_DEFINED_TYPE_SCHEMA
+	|	VIEW
+	|	WORK
+	|	WRITE
+	|	ZONE
+
+<reserved word> ::=
+		ADD                                priority => 1
+	|	ALL                                priority => 1
+	|	ALLOCATE                           priority => 1
+	|	ALTER                              priority => 1
+	|	AND                                priority => 1
+	|	ANY                                priority => 1
+	|	ARE                                priority => 1
+	|	ARRAY                              priority => 1
+	|	AS                                 priority => 1
+	|	ASENSITIVE                         priority => 1
+	|	ASYMMETRIC                         priority => 1
+	|	AT                                 priority => 1
+	|	ATOMIC                             priority => 1
+	|	AUTHORIZATION                      priority => 1
+	|	BEGIN                              priority => 1
+	|	BETWEEN                            priority => 1
+	|	BIGINT                             priority => 1
+	|	BINARY                             priority => 1
+	|	BLOB                               priority => 1
+	|	BOOLEAN                            priority => 1
+	|	BOTH                               priority => 1
+	|	BY                                 priority => 1
+	|	CALL                               priority => 1
+	|	CALLED                             priority => 1
+	|	CASCADED                           priority => 1
+	|	CASE                               priority => 1
+	|	CAST                               priority => 1
+	|	CHAR                               priority => 1
+	|	CHARACTER                          priority => 1
+	|	CHECK                              priority => 1
+	|	CLOB                               priority => 1
+	|	CLOSE                              priority => 1
+	|	COLLATE                            priority => 1
+	|	COLUMN                             priority => 1
+	|	COMMIT                             priority => 1
+	|	CONNECT                            priority => 1
+	|	CONSTRAINT                         priority => 1
+	|	CONTINUE                           priority => 1
+	|	CORRESPONDING                      priority => 1
+	|	CREATE                             priority => 1
+	|	CROSS                              priority => 1
+	|	CUBE                               priority => 1
+	|	CURRENT                            priority => 1
+	|	CURRENT_DATE                       priority => 1
+	|	CURRENT_DEFAULT_TRANSFORM_GROUP    priority => 1
+	|	CURRENT_PATH                       priority => 1
+	|	CURRENT_ROLE                       priority => 1
+	|	CURRENT_TIME                       priority => 1
+	|	CURRENT_TIMESTAMP                  priority => 1
+	|	CURRENT_TRANSFORM_GROUP_FOR_TYPE   priority => 1
+	|	CURRENT_USER                       priority => 1
+	|	CURSOR                             priority => 1
+	|	CYCLE                              priority => 1
+	|	DATE                               priority => 1
+	|	DAY                                priority => 1
+	|	DEALLOCATE                         priority => 1
+	|	DEC                                priority => 1
+	|	DECIMAL                            priority => 1
+	|	DECLARE                            priority => 1
+	|	DEFAULT                            priority => 1
+	|	DELETE                             priority => 1
+	|	DEREF                              priority => 1
+	|	DESCRIBE                           priority => 1
+	|	DETERMINISTIC                      priority => 1
+	|	DISCONNECT                         priority => 1
+	|	DISTINCT                           priority => 1
+	|	DOUBLE                             priority => 1
+	|	DROP                               priority => 1
+	|	DYNAMIC                            priority => 1
+	|	EACH                               priority => 1
+	|	ELEMENT                            priority => 1
+	|	ELSE                               priority => 1
+	|	END                                priority => 1
+	|	END-EXEC                           priority => 1
+	|	ESCAPE                             priority => 1
+	|	EXCEPT                             priority => 1
+	|	EXEC                               priority => 1
+	|	EXECUTE                            priority => 1
+	|	EXISTS                             priority => 1
+	|	EXTERNAL                           priority => 1
+	|	FALSE                              priority => 1
+	|	FETCH                              priority => 1
+	|	FILTER                             priority => 1
+	|	FLOAT                              priority => 1
+	|	FOR                                priority => 1
+	|	FOREIGN                            priority => 1
+	|	FREE                               priority => 1
+	|	FROM                               priority => 1
+	|	FULL                               priority => 1
+	|	FUNCTION                           priority => 1
+	|	GET                                priority => 1
+	|	GLOBAL                             priority => 1
+	|	GRANT                              priority => 1
+	|	GROUP                              priority => 1
+	|	GROUPING                           priority => 1
+	|	HAVING                             priority => 1
+	|	HOLD                               priority => 1
+	|	HOUR                               priority => 1
+	|	IDENTITY                           priority => 1
+	|	IMMEDIATE                          priority => 1
+	|	IN                                 priority => 1
+	|	INDICATOR                          priority => 1
+	|	INNER                              priority => 1
+	|	INOUT                              priority => 1
+	|	INPUT                              priority => 1
+	|	INSENSITIVE                        priority => 1
+	|	INSERT                             priority => 1
+	|	INT                                priority => 1
+	|	INTEGER                            priority => 1
+	|	INTERSECT                          priority => 1
+	|	INTERVAL                           priority => 1
+	|	INTO                               priority => 1
+	|	IS                                 priority => 1
+	|	ISOLATION                          priority => 1
+	|	JOIN                               priority => 1
+	|	LANGUAGE                           priority => 1
+	|	LARGE                              priority => 1
+	|	LATERAL                            priority => 1
+	|	LEADING                            priority => 1
+	|	LEFT                               priority => 1
+	|	LIKE                               priority => 1
+	|	LOCAL                              priority => 1
+	|	LOCALTIME                          priority => 1
+	|	LOCALTIMESTAMP                     priority => 1
+	|	MATCH                              priority => 1
+	|	MEMBER                             priority => 1
+	|	MERGE                              priority => 1
+	|	METHOD                             priority => 1
+	|	MINUTE                             priority => 1
+	|	MODIFIES                           priority => 1
+	|	MODULE                             priority => 1
+	|	MONTH                              priority => 1
+	|	MULTISET                           priority => 1
+	|	NATIONAL                           priority => 1
+	|	NATURAL                            priority => 1
+	|	NCHAR                              priority => 1
+	|	NCLOB                              priority => 1
+	|	NEW                                priority => 1
+	|	NO                                 priority => 1
+	|	NONE                               priority => 1
+	|	NOT                                priority => 1
+	|	NULL                               priority => 1
+	|	NUMERIC                            priority => 1
+	|	OF                                 priority => 1
+	|	OLD                                priority => 1
+	|	ON                                 priority => 1
+	|	ONLY                               priority => 1
+	|	OPEN                               priority => 1
+	|	OR                                 priority => 1
+	|	ORDER                              priority => 1
+	|	OUT                                priority => 1
+	|	OUTER                              priority => 1
+	|	OUTPUT                             priority => 1
+	|	OVER                               priority => 1
+	|	OVERLAPS                           priority => 1
+	|	PARAMETER                          priority => 1
+	|	PARTITION                          priority => 1
+	|	PRECISION                          priority => 1
+	|	PREPARE                            priority => 1
+	|	PRIMARY                            priority => 1
+	|	PROCEDURE                          priority => 1
+	|	RANGE                              priority => 1
+	|	READS                              priority => 1
+	|	REAL                               priority => 1
+	|	RECURSIVE                          priority => 1
+	|	REF                                priority => 1
+	|	REFERENCES                         priority => 1
+	|	REFERENCING                        priority => 1
+	|	REGR_AVGX                          priority => 1
+	|	REGR_AVGY                          priority => 1
+	|	REGR_COUNT                         priority => 1
+	|	REGR_INTERCEPT                     priority => 1
+	|	REGR_R2                            priority => 1
+	|	REGR_SLOPE                         priority => 1
+	|	REGR_SXX                           priority => 1
+	|	REGR_SXY                           priority => 1
+	|	REGR_SYY                           priority => 1
+	|	RELEASE                            priority => 1
+	|	RESULT                             priority => 1
+	|	RETURN                             priority => 1
+	|	RETURNS                            priority => 1
+	|	REVOKE                             priority => 1
+	|	RIGHT                              priority => 1
+	|	ROLLBACK                           priority => 1
+	|	ROLLUP                             priority => 1
+	|	ROW                                priority => 1
+	|	ROWS                               priority => 1
+	|	SAVEPOINT                          priority => 1
+	|	SCROLL                             priority => 1
+	|	SEARCH                             priority => 1
+	|	SECOND                             priority => 1
+	|	SELECT                             priority => 1
+	|	SENSITIVE                          priority => 1
+	|	SESSION_USER                       priority => 1
+	|	SET                                priority => 1
+	|	SIMILAR                            priority => 1
+	|	SMALLINT                           priority => 1
+	|	SOME                               priority => 1
+	|	SPECIFIC                           priority => 1
+	|	SPECIFICTYPE                       priority => 1
+	|	SQL                                priority => 1
+	|	SQLEXCEPTION                       priority => 1
+	|	SQLSTATE                           priority => 1
+	|	SQLWARNING                         priority => 1
+	|	START                              priority => 1
+	|	STATIC                             priority => 1
+	|	SUBMULTISET                        priority => 1
+	|	SYMMETRIC                          priority => 1
+	|	SYSTEM                             priority => 1
+	|	SYSTEM_USER                        priority => 1
+	|	TABLE                              priority => 1
+	|	THEN                               priority => 1
+	|	TIME                               priority => 1
+	|	TIMESTAMP                          priority => 1
+	|	TIMEZONE_HOUR                      priority => 1
+	|	TIMEZONE_MINUTE                    priority => 1
+	|	TO                                 priority => 1
+	|	TRAILING                           priority => 1
+	|	TRANSLATION                        priority => 1
+	|	TREAT                              priority => 1
+	|	TRIGGER                            priority => 1
+	|	TRUE                               priority => 1
+/*	|	UESCAPE                            priority => 1 Prioritized only in the context of Unicode */
+	|	UNION                              priority => 1
+	|	UNIQUE                             priority => 1
+	|	UNKNOWN                            priority => 1
+	|	UNNEST                             priority => 1
+	|	UPDATE                             priority => 1
+	|	UPPER                              priority => 1
+	|	USER                               priority => 1
+	|	USING                              priority => 1
+	|	VALUE                              priority => 1
+	|	VALUES                             priority => 1
+	|	VAR_POP                            priority => 1
+	|	VAR_SAMP                           priority => 1
+	|	VARCHAR                            priority => 1
+	|	VARYING                            priority => 1
+	|	WHEN                               priority => 1
+	|	WHENEVER                           priority => 1
+	|	WHERE                              priority => 1
+	|	WIDTH_BUCKET                       priority => 1
+	|	WINDOW                             priority => 1
+	|	WITH                               priority => 1
+	|	WITHIN                             priority => 1
+	|	WITHOUT                            priority => 1
+	|	YEAR                               priority => 1
+
+<literal> ::= <signed numeric literal> | <general literal>
+
+<unsigned literal> ::= <unsigned numeric literal> | <general literal>
+
+<general literal> ::=
+		<character string literal>
+	|	<national character string literal>
+	|	<Unicode character string literal>
+	|	<binary string literal>
+	|	<datetime literal>
+	|	<interval literal>
+	|	<boolean literal>
+
+/*
+<character string literal> ::=
+		( <introducer><character set specification> )?
+		<quote> <character representation>* <quote>
+		( <separator>* <quote> <character representation>* <quote> )*
+*/
+
+<character string literal> ::= <character string literal L0> semanticAction => _characterStringLiteral
+
+<character string literal L0> ~
+                /*LEX*/(<introducer L0> <character set specification L0 internal>)?
+		<character string literal unit L0> /*LEX*/( /*LEX*/(<separator L0>)* <character string literal unit L0> )*
+
+<character string literal unit L0> ~ <quote L0> /*LEX*/(<character representation L0>)* <quote L0>
+
+<introducer L0> ~ <underscore L0>
+
+<character representation L0> ~ <nonquote character L0> | <quote symbol L0>
+
+<character representation> ~ <character representation L0>
+
+<nonquote character L0> ~ /*LEX*/[^'] | /*LEX*/#x5c /*LEX*/[']
+
+<quote symbol L0> ~ /*LEX*/"'" /*LEX*/"'"
+
+<national character string literal> ::= <national character string literal L0> semanticAction => _nationalCharacterStringLiteral
+
+<national character string literal L0> ~
+                /*LEX*/'N' <quote L0> /*LEX*/(<character representation L0>)* <quote L0>
+                /*LEX*/( /*LEX*/(<separator L0>)* <quote L0> /*LEX*/(<character representation L0>)* <quote L0>)*
+
+/* Rewriten because explicit <separator> in the rule causes trouble */
+/*
+<Unicode character string literal> ::=
+		( <introducer><character set specification> )?
+		U<ampersand><quote> <Unicode representation>* <quote>
+		( <separator> <quote> <Unicode representation>* <quote> )*
+		( ESCAPE <escape character> )?
+*/
+<Unicode character string literal> ::= <Unicode character string literal value>
+   		                       ( ESCAPE <escape character> )?
+
+<Unicode character string literal value> ~
+		/*LEX*/( <introducer L0> <character set specification L0 internal> )?
+		/*LEX*/'U' <ampersand L0> <quote L0> /*LEX*/(<Unicode representation L0>)* <quote L0>
+		/*LEX*/( <separator L0> <quote L0> /*LEX*/(<Unicode representation L0>)* <quote L0> )*
+
+<Unicode representation L0> ~ <character representation L0> | <Unicode escape value L0>
+
+/* Rewriten because explicit <separator> in the rule causes trouble */
+/*
+<binary string literal> ::=
+		X <quote> ( <hexit><hexit> )* <quote>
+		( <separator> <quote> ( <hexit><hexit> )* <quote> )*
+		( ESCAPE <escape character> )?
+*/
+<binary string literal> ::=
+		X ( <quote> ( <hexit><hexit> )* <quote> )+
+		( ESCAPE <escape character> )?
+
+<hexit> ::= <digit> | A | B | C | D | E | F | a | b | c | d | e | f
+
+/* Revisited to truely match when there is a sign. In the other case the unsigned rule will take over */
+<signed numeric literal> ::= <sign>? <unsigned numeric literal>
+
+<unsigned numeric literal L0 internal> ~ <exact numeric literal L0> | <approximate numeric literal L0>
+<unsigned numeric literal L0> ~ <unsigned numeric literal L0 internal>
+<unsigned numeric literal> ::= <unsigned numeric literal L0> semanticAction => _unsignedNumericLiteral
+
+<unsigned integer L0> ~ \d+
+<unsigned integer> ~ <unsigned integer L0>
+
+<exact numeric literal L0> ~
+		<unsigned integer L0> /*LEX*/( <period L0> /*LEX*/(<unsigned integer L0>)? )?
+	|	<period L0> <unsigned integer L0>
+
+<sign L0> ~ <plus sign L0> | <minus sign L0>
+<sign> ~ <sign L0>
+
+<approximate numeric literal L0> ~ <mantissa L0> /*LEX*/E <exponent L0>
+
+<mantissa L0> ~ <exact numeric literal L0>
+
+<exponent L0> ~ <signed integer L0>
+
+<signed integer L0> ~ /*LEX*/(<sign L0>)? <unsigned integer L0>
+
+<datetime literal> ::= <date literal> | <time literal> | <timestamp literal>
+
+<date literal> ::= DATE <date string>
+
+<time literal> ::= TIME <time string>
+
+<timestamp literal> ::= TIMESTAMP <timestamp string>
+
+<date string L0> ~ <quote L0> <unquoted date string L0> <quote L0>
+<date string> ~ <date string L0>
+
+<time string L0> ~ <quote L0> <unquoted time string L0> <quote L0>
+<time string> ~ <time string L0>
+
+<timestamp string L0> ~ <quote L0> <unquoted timestamp string L0> <quote L0>
+<timestamp string> ~ <timestamp string L0>
+
+<time zone interval L0> ~ <sign L0> <hours value L0> <colon L0> <minutes value L0>
+
+<date value L0> ~ <years value L0> <minus sign L0> <months value L0> <minus sign L0> <days value L0>
+
+<time value L0> ~ <hours value L0> <colon L0> <minutes value L0> <colon L0> <seconds value L0>
+
+<interval literal> ::= INTERVAL <sign>? <interval string> <interval qualifier>
+
+<interval string L0> ~ <quote L0> <unquoted interval string L0> <quote L0>
+<interval string> ~ <interval string L0>
+
+<unquoted date string L0> ~ <date value L0>
+
+<unquoted time string L0> ~ <time value L0> /*LEX*/(<time zone interval L0>)?
+
+<unquoted timestamp string L0> ~ <unquoted date string L0> <space L0> <unquoted time string L0>
+
+<unquoted interval string L0> ~ /*LEX*/(<sign L0>)? /*LEX*/( <year_month literal L0> | <day_time literal L0> )
+
+<year_month literal L0> ~ <years value L0> | /*LEX*/( <years value L0> <minus sign L0> )? <months value L0>
+
+<day_time literal L0> ~ <day_time interval L0> | <time interval L0>
+
+<day_time interval L0> ~
+		<days value L0> /*LEX*/( <space L0> <hours value L0> /*LEX*/( <colon L0> <minutes value L0> /*LEX*/( <colon L0> <seconds value L0> )? )? )?
+
+<time interval L0> ~
+		<hours value L0> /*LEX*/( <colon L0> <minutes value L0> /*LEX*/( <colon L0> <seconds value L0> )? )?
+	|	<minutes value L0> /*LEX*/( <colon L0> <seconds value L0> )?
+	|	<seconds value L0>
+
+<years value L0> ~ <datetime value L0>
+
+<months value L0> ~ <datetime value L0>
+
+<days value L0> ~ <datetime value L0>
+
+<hours value L0> ~ <datetime value L0>
+
+<minutes value L0> ~ <datetime value L0>
+
+<seconds value L0> ~ <seconds integer value L0> /*LEX*/( <period L0> /*LEX*/(<seconds fraction L0>)? )?
+
+<seconds integer value L0> ~ <unsigned integer L0>
+
+<seconds fraction L0> ~ <unsigned integer L0>
+
+<datetime value L0> ~ <unsigned integer L0>
+
+<boolean literal> ::= TRUE | FALSE | UNKNOWN
+
+<host identifier L0 internal> ~ [^\s,;:()]+
+<host identifier L0> ~ <host identifier L0 internal>
+                     | /*LEX*/'(' <host identifier L0> /*LEX*/')'
+
+<identifier L0 internal> ~ <actual identifier L0>
+<identifier> ~ <identifier L0 internal>
+
+<actual identifier L0> ~ <regular identifier L0 internal> | <delimited identifier L0>
+
+<SQL language identifier L0 internal> ~ <SQL language identifier start L0> /*LEX*/( <underscore L0> | <SQL language identifier part L0> )*
+
+<SQL language identifier start L0> ~  <simple Latin letter L0>
+
+<SQL language identifier part L0> ~  <simple Latin letter L0> | <digit L0>
+
+<authorization identifier> ::= <role name> | <user identifier>
+
+<table name> ::= <local or schema qualified name>
+
+<domain name> ::= <schema qualified name>
+
+<unqualified schema name L0 internal> ~ <identifier L0 internal>
+<unqualified schema name L0> ~ <unqualified schema name L0 internal>
+<unqualified schema name> ::= <unqualified schema name L0>
+
+<schema name L0 internal> ~ /*LEX*/( <catalog name L0 internal> <period L0> )? <unqualified schema name L0 internal>
+<schema name L0> ~ <schema name L0 internal>
+<schema name> ::= <schema name L0>
+
+<catalog name L0 internal> ~ <identifier L0 internal>
+<catalog name L0> ~ <catalog name L0 internal>
+<catalog name> ::= <catalog name L0>
+
+<schema qualified name> ~ /*LEX*/( <schema name L0 internal> <period L0> )? <qualified identifier L0>
+
+<local or schema qualified name> ~ /*LEX*/( <local or schema qualifier L0> <period L0> )? <qualified identifier L0>
+
+<local or schema qualifier L0> ~ <schema name L0 internal> | /*LEX*/MODULE
+
+<qualified identifier L0> ~ <identifier L0 internal>
+
+<qualified identifier> ~ <qualified identifier L0>
+
+<column name L0> ~ <identifier L0 internal>
+<column name> ~ <column name L0>
+
+<correlation name> ::= <identifier>
+
+<query name> ::= <identifier>
+
+<SQL_client module name> ::= <identifier>
+
+<procedure name> ::= <identifier>
+
+<schema qualified routine name> ::= <schema qualified name>
+
+<method name> ::= <identifier>
+
+<specific name> ::= <schema qualified name>
+
+<cursor name> ::= <local qualified name>
+
+<local qualified name> ~ /*LEX*/( <local qualifier L0> <period L0> )? <qualified identifier L0>
+
+<local qualifier L0> ~ /*LEX*/MODULE
+
+<host parameter name> ::= <colon> <identifier>
+
+<SQL parameter name> ::= <identifier>
+
+<constraint name> ::= <schema qualified name>
+
+<external routine name> ::= <identifier> | <character string literal>
+
+<trigger name> ::= <schema qualified name>
+
+<collation name> ::= <schema qualified name>
+
+<character set name L0 internal> ~ /*LEX*/( <schema name L0 internal> <period L0> )? <SQL language identifier L0 internal>
+<character set name L0> ~ <character set name L0 internal>
+<character set name> ~ <character set name L0>
+
+<transliteration name> ::= <schema qualified name>
+
+<transcoding name> ::= <schema qualified name>
+
+<user_defined type name> ::= <schema qualified type name>
+
+<schema_resolved user_defined type name> ::= <user_defined type name>
+
+<schema qualified type name> ~ /*LEX*/( <schema name L0 internal> <period L0> )? <qualified identifier L0>
+
+<attribute name> ::= <identifier>
+
+<field name> ::= <identifier>
+
+<savepoint name> ::= <identifier>
+
+<sequence generator name> ::= <schema qualified name>
+
+<role name> ::= <identifier>
+
+<user identifier> ::= <identifier>
+
+<connection name> ::= <simple value specification>
+
+<sql_server name> ::= <simple value specification>
+
+<connection user name> ::= <simple value specification>
+
+<SQL statement name> ::= <statement name> | <extended statement name>
+
+<statement name> ::= <identifier>
+
+<extended statement name> ::= <scope option>? <simple value specification>
+
+<dynamic cursor name> ::= <cursor name> | <extended cursor name>
+
+<extended cursor name> ::= <scope option>? <simple value specification>
+
+<descriptor name> ::= <scope option>? <simple value specification>
+
+<scope option> ::= GLOBAL | LOCAL
+
+<window name> ::= <identifier>
+
+<data type> ::=
+		<predefined type>
+	|	<row type>
+	|	<path_resolved user_defined type name>
+	|	<reference type>
+	|	<collection type>
+
+<predefined type> ::=
+		<character string type> ( CHARACTER SET <character set specification> )? <collate clause>?
+	|	<national character string type> <collate clause>?
+	|	<binary large object string type>
+	|	<numeric type>
+	|	<boolean type>
+	|	<datetime type>
+	|	<interval type>
+
+<character string type> ::=
+		CHARACTER ( <left paren> <length> <right paren> )?
+	|	CHAR ( <left paren> <length> <right paren> )?
+	|	CHARACTER VARYING <left paren> <length> <right paren>
+	|	CHAR VARYING <left paren> <length> <right paren>
+	|	VARCHAR <left paren> <length> <right paren>
+	|	CHARACTER LARGE OBJECT ( <left paren> <large object length> <right paren> )?
+	|	CHAR LARGE OBJECT ( <left paren> <large object length> <right paren> )?
+	|	CLOB ( <left paren> <large object length> <right paren> )?
+
+<national character string type> ::=
+		NATIONAL CHARACTER ( <left paren> <length> <right paren> )?
+	|	NATIONAL CHAR ( <left paren> <length> <right paren> )?
+	|	NCHAR ( <left paren> <length> <right paren> )?
+	|	NATIONAL CHARACTER VARYING <left paren> <length> <right paren>
+	|	NATIONAL CHAR VARYING <left paren> <length> <right paren>
+	|	NCHAR VARYING <left paren> <length> <right paren>
+	|	NATIONAL CHARACTER LARGE OBJECT ( <left paren> <large object length> <right paren> )?
+	|	NCHAR LARGE OBJECT ( <left paren> <large object length> <right paren> )?
+	|	NCLOB ( <left paren> <large object length> <right paren> )?
+
+<binary large object string type> ::=
+		BINARY LARGE OBJECT ( <left paren> <large object length> <right paren> )?
+	|	BLOB ( <left paren> <large object length> <right paren> )?
+
+<numeric type> ::= <exact numeric type> | <approximate numeric type>
+
+<exact numeric type> ::=
+		NUMERIC ( <left paren> <precision> ( <comma> <scale> )? <right paren> )?
+	|	DECIMAL ( <left paren> <precision> ( <comma> <scale> )? <right paren> )?
+	|	DEC ( <left paren> <precision> ( <comma> <scale> )? <right paren> )?
+	|	SMALLINT
+	|	INTEGER
+	|	INT
+	|	BIGINT
+
+<approximate numeric type> ::=
+		FLOAT ( <left paren> <precision> <right paren> )?
+	|	REAL
+	|	DOUBLE PRECISION
+
+<length> ::= <unsigned integer>
+
+<large object length> ::=
+		<unsigned integer> <multiplier>? <char length units>?
+	|	<large object length token> <char length units>?
+
+<char length units> ::= CHARACTERS | CODE_UNITS | OCTETS
+
+<precision> ::= <unsigned integer>
+
+<scale> ::= <unsigned integer>
+
+<boolean type> ::= BOOLEAN
+
+<datetime type> ::=
+		DATE
+	|	TIME ( <left paren> <time precision> <right paren> )? ( <with or without time zone> )?
+	|	TIMESTAMP ( <left paren> <timestamp precision> <right paren> )? ( <with or without time zone> )?
+
+<with or without time zone> ::= WITH TIME ZONE | WITHOUT TIME ZONE
+
+<time precision> ::= <time fractional seconds precision>
+
+<timestamp precision> ::= <time fractional seconds precision>
+
+<time fractional seconds precision> ::= <unsigned integer>
+
+<interval type> ::= INTERVAL <interval qualifier>
+
+<row type> ::= ROW <row type body>
+
+<row type body> ::= <left paren> <field definition> ( <comma> <field definition> )* <right paren>
+
+<reference type> ::= REF <left paren> <referenced type> <right paren> <scope clause>?
+
+<scope clause> ::= SCOPE <table name>
+
+<referenced type> ::= <path_resolved user_defined type name>
+
+<path_resolved user_defined type name> ::= <user_defined type name>
+
+<collection type> ::= <array type> | <multiset type>
+
+<array type> ::= <data type> ARRAY ( <left bracket or trigraph> <unsigned integer> <right bracket or trigraph> )?
+
+<multiset type> ::= <data type> MULTISET
+
+<field definition> ::= <field name> <data type> <reference scope check>?
+
+<value expression primary> ::=
+		<parenthesized value expression>
+	|	<nonparenthesized value expression primary>
+
+<parenthesized value expression> ::= <left paren> <value expression> <right paren>
+
+<nonparenthesized value expression primary> ::=
+		<unsigned value specification>
+	|	<column reference>
+	|	<set function specification>
+	|	<window function>
+	|	<scalar subquery>
+	|	<case expression>
+	|	<cast specification>
+	|	<field reference>
+	|	<subtype treatment>
+	|	<method invocation>
+	|	<static method invocation>
+	|	<new specification>
+	|	<attribute or method reference>
+	|	<reference resolution>
+	|	<collection value constructor>
+	|	<array element reference>
+	|	<multiset element reference>
+	|	<routine invocation>
+	|	<next value expression>
+
+<value specification> ::= <literal> | <general value specification>
+
+<unsigned value specification> ::= <unsigned literal> | <general value specification>
+
+<general value specification> ::=
+		<host parameter specification>
+	|	<SQL parameter reference>
+	|	<dynamic parameter specification>
+	|	<embedded variable specification>
+	|	<current collation specification>
+	|	CURRENT_DEFAULT_TRANSFORM_GROUP
+	|	CURRENT_PATH
+	|	CURRENT_ROLE
+	|	CURRENT_TRANSFORM_GROUP_FOR_TYPE <path_resolved user_defined type name>
+	|	CURRENT_USER
+	|	SESSION_USER
+	|	SYSTEM_USER
+	|	USER
+	|	VALUE
+
+<simple value specification> ::=
+		<literal>
+	|	<host parameter name>
+	|	<SQL parameter reference>
+	|	<embedded variable name>
+
+<target specification> ::=
+		<host parameter specification>
+	|	<SQL parameter reference>
+	|	<column reference>
+	|	<target array element specification>
+	|	<dynamic parameter specification>
+	|	<embedded variable specification>
+
+<simple target specification> ::=
+		<host parameter specification>
+	|	<SQL parameter reference>
+	|	<column reference>
+	|	<embedded variable name>
+
+<host parameter specification> ::= <host parameter name> <indicator parameter>?
+
+<dynamic parameter specification> ::= <question mark>
+
+<embedded variable specification> ::= <embedded variable name> <indicator variable>?
+
+<indicator variable> ::= INDICATOR? <embedded variable name>
+
+<indicator parameter> ::= INDICATOR? <host parameter name>
+
+<target array element specification> ::=
+		<target array reference> <left bracket or trigraph> <simple value specification> <right bracket or trigraph> 
+
+<target array reference> ::= <SQL parameter reference> | <column reference>
+
+<current collation specification> ::= CURRENT_COLLATION <left paren> <string value expression> <right paren>
+
+<contextually typed value specification> ::=
+		<implicitly typed value specification> | <default specification>
+
+<implicitly typed value specification> ::= <null specification> | <empty specification>
+
+<null specification> ::= NULL
+
+<empty specification> ::=
+		ARRAY <left bracket or trigraph> <right bracket or trigraph>
+	|	MULTISET <left bracket or trigraph> <right bracket or trigraph>
+
+<default specification> ::= DEFAULT
+
+<identifier chain> ~ <identifier L0 internal> /*LEX*/( <period L0> <identifier L0 internal> )*
+
+<basic identifier chain> ::= <identifier chain>
+
+<column reference> ::=
+		<basic identifier chain>
+	|	/*LEX*/(/*LEX*/MODULE <period L0> <qualified identifier L0> <period L0> <column name L0>)
+
+<SQL parameter reference> ::= <basic identifier chain>
+
+<set function specification> ::= <aggregate function> | <grouping operation>
+
+<grouping operation> ::= GROUPING <left paren> <column reference> ( <comma> <column reference> )* <right paren>
+
+<window function> ::= <window function type> OVER <window name or specification>
+
+<window function type> ::=
+		<rank function type> <left paren> <right paren>
+	|	ROW_NUMBER <left paren> <right paren>
+	|	<aggregate function>
+
+<rank function type> ::= RANK | DENSE_RANK | PERCENT_RANK | CUME_DIST
+
+<window name or specification> ::= <window name> | <in_line window specification>
+
+<in_line window specification> ::= <window specification>
+
+<case expression> ::= <case abbreviation> | <case specification>
+
+<case abbreviation> ::=
+		NULLIF <left paren> <value expression> <comma> <value expression> <right paren>
+	|	COALESCE <left paren> <value expression> ( <comma> <value expression> )+ <right paren>
+
+<case specification> ::= <simple case> | <searched case>
+
+<simple case> ::= CASE <case operand> <simple when clause>+ <else clause>? END
+
+<searched case> ::= CASE <searched when clause>+ <else clause>? END
+
+<simple when clause> ::= WHEN <when operand> THEN <result>
+
+<searched when clause> ::= WHEN <search condition> THEN <result>
+
+<else clause> ::= ELSE <result>
+
+<case operand> ::= <row value predicand> | <overlaps predicate>
+
+<when operand> ::=
+		<row value predicand>
+	|	<comparison predicate part 2>
+	|	<between predicate part 2>
+	|	<in predicate part 2>
+	|	<character like predicate part 2>
+	|	<octet like predicate part 2>
+	|	<similar predicate part 2>
+	|	<null predicate part 2>
+	|	<quantified comparison predicate part 2>
+	|	<match predicate part 2>
+	|	<overlaps predicate part 2>
+	|	<distinct predicate part 2>
+	|	<member predicate part 2>
+	|	<submultiset predicate part 2>
+	|	<set predicate part 2>
+	|	<type predicate part 2>
+
+<result> ::= <result expression> | NULL
+
+<result expression> ::= <value expression>
+
+<cast specification> ::= CAST <left paren> <cast operand> AS <cast target> <right paren>
+
+<cast operand> ::= <value expression> | <implicitly typed value specification>
+
+<cast target> ::= <domain name> | <data type>
+
+<next value expression> ::= NEXT VALUE FOR <sequence generator name>
+
+<field reference> ::= <value expression primary> <period> <field name>
+
+<subtype treatment> ::=
+		TREAT <left paren> <subtype operand> AS <target subtype> <right paren>
+
+<subtype operand> ::= <value expression>
+
+<target subtype> ::=
+		<path_resolved user_defined type name>
+	|	<reference type>
+
+<method invocation> ::= <direct invocation> | <generalized invocation>
+
+<direct invocation> ::=
+		<value expression primary> <period> <method name> <SQL argument list>?
+
+<generalized invocation> ::=
+		<left paren> <value expression primary> AS <data type> <right paren> <period> <method name>
+		<SQL argument list>?
+
+<method selection> ::= <routine invocation>
+
+<constructor method selection> ::= <routine invocation>
+
+<static method invocation> ::=
+		<path_resolved user_defined type name> <double colon> <method name> <SQL argument list>?
+
+<static method selection> ::= <routine invocation>
+
+<new specification> ::= NEW <routine invocation>
+
+<new invocation> ::= <method invocation> | <routine invocation>
+
+<attribute or method reference> ::=
+		<value expression primary> <dereference operator> <qualified identifier>
+		<SQL argument list>?
+
+<dereference operator> ::= <right arrow>
+
+<dereference operation> ::= <reference value expression> <dereference operator> <attribute name>
+
+<method reference> ::=
+		<value expression primary> <dereference operator> <method name> <SQL argument list>
+
+<reference resolution> ::= DEREF <left paren> <reference value expression> <right paren>
+
+<array element reference> ::=
+		<array value expression> <left bracket or trigraph> <numeric value expression> <right bracket or trigraph> 
+
+<multiset element reference> ::=
+		ELEMENT <left paren> <multiset value expression> <right paren>
+
+<value expression> ::=
+		<common value expression>
+	|	<boolean value expression>
+	|	<row value expression>
+
+<common value expression> ::=
+		<numeric value expression>
+	|	<string value expression>
+	|	<datetime value expression>
+	|	<interval value expression>
+	|	<user_defined type value expression>
+	|	<reference value expression>
+	|	<collection value expression>
+
+<user_defined type value expression> ::= <value expression primary>
+
+<reference value expression> ::= <value expression primary>
+
+<collection value expression> ::= <array value expression> | <multiset value expression>
+
+<collection value constructor> ::= <array value constructor> | <multiset value constructor>
+
+<numeric value expression> ::=
+		<term>
+	|	<numeric value expression> <plus sign> <term>
+	|	<numeric value expression> <minus sign> <term>
+
+<term> ::=
+		<factor>
+	|	<term> <asterisk> <factor>
+	|	<term> <solidus> <factor>
+
+<factor> ::= <sign>? <numeric primary>
+
+<numeric primary> ::=
+		<value expression primary>
+	|	<numeric value function>
+
+<numeric value function> ::=
+		<position expression>
+	|	<extract expression>
+	|	<length expression>
+	|	<cardinality expression>
+	|	<absolute value expression>
+	|	<modulus expression>
+	|	<natural logarithm>
+	|	<exponential function>
+	|	<power function>
+	|	<square root>
+	|	<floor function>
+	|	<ceiling function>
+	|	<width bucket function>
+
+<position expression> ::=
+		<string position expression>
+	|	<blob position expression>
+
+<string position expression> ::=
+		POSITION <left paren> <string value expression> IN <string value expression> ( USING <char length units> )? <right paren>
+
+<blob position expression> ::=
+		POSITION <left paren> <blob value expression> IN <blob value expression> <right paren>
+
+<length expression> ::=
+		<char length expression>
+	|	<octet length expression>
+
+<char length expression> ::=
+		( CHAR_LENGTH | CHARACTER_LENGTH ) <left paren> <string value expression> ( USING <char length units> )? <right paren>
+
+<octet length expression> ::= OCTET_LENGTH <left paren> <string value expression> <right paren>
+
+<extract expression> ::= EXTRACT <left paren> <extract field> FROM <extract source> <right paren>
+
+<extract field> ::= <primary datetime field> | <time zone field>
+
+<time zone field> ::= TIMEZONE_HOUR | TIMEZONE_MINUTE
+
+<extract source> ::= <datetime value expression> | <interval value expression>
+
+<cardinality expression> ::= CARDINALITY <left paren> <collection value expression> <right paren>
+
+<absolute value expression> ::= ABS <left paren> <numeric value expression> <right paren>
+
+<modulus expression> ::= MOD <left paren> <numeric value expression> <comma> <numeric value expression> <right paren>
+
+<natural logarithm> ::= LN <left paren> <numeric value expression> <right paren>
+
+<exponential function> ::= EXP <left paren> <numeric value expression> <right paren>
+
+<power function> ::= POWER <left paren> <numeric value expression base> <comma> <numeric value expression exponent> <right paren>
+
+<numeric value expression base> ::= <numeric value expression>
+
+<numeric value expression exponent> ::= <numeric value expression>
+
+<square root> ::= SQRT <left paren> <numeric value expression> <right paren>
+
+<floor function> ::= FLOOR <left paren> <numeric value expression> <right paren>
+
+<ceiling function> ::= ( CEIL | CEILING ) <left paren> <numeric value expression> <right paren>
+
+<width bucket function> ::= WIDTH_BUCKET <left paren> <width bucket operand> <comma> <width bucket bound 1> <comma> <width bucket bound 2> <comma> <width bucket count> <right paren>
+
+<width bucket operand> ::= <numeric value expression>
+
+<width bucket bound 1> ::= <numeric value expression>
+
+<width bucket bound 2> ::= <numeric value expression>
+
+<width bucket count> ::= <numeric value expression>
+
+<string value expression> ::= <character value expression> | <blob value expression>
+
+<character value expression> ::= <concatenation> | <character factor>
+
+<concatenation> ::= <character value expression> <concatenation operator> <character factor>
+
+<character factor> ::= <character primary> <collate clause>?
+
+<character primary> ::= <value expression primary> | <string value function>
+
+<blob value expression> ::= <blob concatenation> | <blob factor>
+
+<blob factor> ::= <blob primary>
+
+<blob primary> ::= <value expression primary> | <string value function>
+
+<blob concatenation> ::= <blob value expression> <concatenation operator> <blob factor>
+
+<string value function> ::= <character value function> | <blob value function>
+
+<character value function> ::=
+		<character substring function>
+	|	<regular expression substring function>
+	|	<fold>
+	|	<transcoding>
+	|	<character transliteration>
+	|	<trim function>
+	|	<character overlay function>
+	|	<normalize function>
+	|	<specific type method>
+
+<character substring function> ::=
+		SUBSTRING <left paren> <character value expression> FROM <start position>
+		( FOR <string length> )? ( USING <char length units> )? <right paren>
+
+<regular expression substring function> ::=
+		SUBSTRING <left paren> <character value expression>
+		SIMILAR <character value expression> ESCAPE <escape character> <right paren>
+
+<fold> ::= ( UPPER | LOWER ) <left paren> <character value expression> <right paren>
+
+<transcoding> ::= CONVERT <left paren> <character value expression> USING <transcoding name> <right paren>
+
+<character transliteration> ::= TRANSLATE <left paren> <character value expression> USING <transliteration name> <right paren>
+
+<trim function> ::= TRIM <left paren> <trim operands> <right paren>
+
+<trim operands> ::= ( <trim specification>? <trim character>? FROM )? <trim source>
+
+<trim source> ::= <character value expression>
+
+<trim specification> ::= LEADING | TRAILING | BOTH
+
+<trim character> ::= <character value expression>
+
+<character overlay function> ::= 
+		OVERLAY <left paren> <character value expression> PLACING <character value expression>
+		FROM <start position> ( FOR <string length> )? ( USING <char length units> )? <right paren>
+
+<normalize function> ::= NORMALIZE <left paren> <character value expression> <right paren>
+
+<specific type method> ::= <user_defined type value expression> <period> SPECIFICTYPE
+
+<blob value function> ::=
+		<blob substring function>
+	|	<blob trim function>
+	|	<blob overlay function>
+
+<blob substring function> ::=
+		SUBSTRING <left paren> <blob value expression> FROM <start position> ( FOR <string length> )? <right paren>
+
+<blob trim function> ::= TRIM <left paren> <blob trim operands> <right paren>
+
+<blob trim operands> ::= ( <trim specification>? <trim octet>? FROM )? <blob trim source>
+
+<blob trim source> ::= <blob value expression>
+
+<trim octet> ::= <blob value expression>
+
+<blob overlay function> ::=
+		OVERLAY <left paren> <blob value expression> PLACING <blob value expression>
+		FROM <start position> ( FOR <string length> )? <right paren>
+
+<start position> ::= <numeric value expression>
+
+<string length> ::= <numeric value expression>
+
+<datetime value expression> ::=
+		<datetime term>
+	|	<interval value expression> <plus sign> <datetime term>
+	|	<datetime value expression> <plus sign> <interval term>
+	|	<datetime value expression> <minus sign> <interval term>
+
+<datetime term> ::= <datetime factor>
+
+<datetime factor> ::= <datetime primary> <time zone>?
+
+<datetime primary> ::= <value expression primary> | <datetime value function>
+
+<time zone> ::= AT <time zone specifier>
+
+<time zone specifier> ::= LOCAL | TIME ZONE <interval primary>
+
+<datetime value function> ::=
+		<current date value function>
+	|	<current time value function>
+	|	<current timestamp value function>
+	|	<current local time value function>
+	|	<current local timestamp value function>
+
+<current date value function> ::= CURRENT_DATE
+
+<current time value function> ::= CURRENT_TIME ( <left paren> <time precision> <right paren> )?
+
+<current local time value function> ::= LOCALTIME ( <left paren> <time precision> <right paren> )?
+
+<current timestamp value function> ::= CURRENT_TIMESTAMP ( <left paren> <timestamp precision> <right paren> )?
+
+<current local timestamp value function> ::= LOCALTIMESTAMP ( <left paren> <timestamp precision> <right paren> )?
+
+<interval value expression> ::=
+		<interval term>
+	|	<interval value expression 1> <plus sign> <interval term 1>
+	|	<interval value expression 1> <minus sign> <interval term 1>
+	|	<left paren> <datetime value expression> <minus sign> <datetime term> <right paren> <interval qualifier>
+
+<interval term> ::=
+		<interval factor>
+	|	<interval term 2> <asterisk> <factor>
+	|	<interval term 2> <solidus> <factor>
+	|	<term> <asterisk> <interval factor>
+
+<interval factor> ::= <sign>? <interval primary>
+
+<interval primary> ::=
+		<value expression primary> <interval qualifier>?
+	|	<interval value function>
+
+<interval value expression 1> ::= <interval value expression>
+
+<interval term 1> ::= <interval term>
+
+<interval term 2> ::= <interval term>
+
+<interval value function> ::= <interval absolute value function>
+
+<interval absolute value function> ::= ABS <left paren> <interval value expression> <right paren>
+
+<boolean value expression> ::=
+		<boolean term>
+	|	<boolean value expression> OR <boolean term>
+
+<boolean term> ::=
+		<boolean factor>
+	|	<boolean term> AND <boolean factor>
+
+<boolean factor> ::= NOT? <boolean test>
+
+<boolean test> ::= <boolean primary> ( IS NOT? <truth value> )?
+
+<truth value> ::= TRUE | FALSE | UNKNOWN
+
+<boolean primary> ::= <predicate> | <boolean predicand>
+
+<boolean predicand> ::=
+		<parenthesized boolean value expression>
+	|	<nonparenthesized value expression primary>
+
+<parenthesized boolean value expression> ::= <left paren> <boolean value expression> <right paren>
+
+<array value expression> ::= <array concatenation> | <array factor>
+
+<array concatenation> ::= <array value expression 1> <concatenation operator> <array factor>
+
+<array value expression 1> ::= <array value expression>
+
+<array factor> ::= <value expression primary>
+
+<array value constructor> ::=
+		<array value constructor by enumeration>
+	|	<array value constructor by query>
+
+<array value constructor by enumeration> ::=
+		ARRAY <left bracket or trigraph> <array element list> <right bracket or trigraph>
+
+<array element list> ::= <array element> ( <comma> <array element> )*
+
+<array element> ::= <value expression>
+
+<array value constructor by query> ::=
+		ARRAY <left paren> <query expression> <order by clause>? <right paren>
+
+<multiset value expression> ::=
+		<multiset term>
+	|	<multiset value expression> MULTISET UNION ( ALL | DISTINCT ) <multiset term>
+	|	<multiset value expression> MULTISET EXCEPT ( ALL | DISTINCT ) <multiset term>
+
+<multiset term> ::=
+		<multiset primary>
+	|	<multiset term> MULTISET INTERSECT ( ALL | DISTINCT ) <multiset primary>
+
+<multiset primary> ::= <multiset value function> | <value expression primary>
+
+<multiset value function> ::= <multiset set function>
+
+<multiset set function> ::= SET <left paren> <multiset value expression> <right paren>
+
+<multiset value constructor> ::=
+		<multiset value constructor by enumeration>
+	|	<multiset value constructor by query>
+	|	<table value constructor by query>
+
+<multiset value constructor by enumeration> ::= MULTISET <left bracket or trigraph> <multiset element list> <right bracket or trigraph>
+
+<multiset element list> ::= <multiset element> ( <comma> <multiset element> )*
+
+<multiset element> ::= <value expression>
+
+<multiset value constructor by query> ::= MULTISET <left paren> <query expression> <right paren>
+
+<table value constructor by query> ::= TABLE <left paren> <query expression> <right paren>
+
+<row value constructor> ::=
+		<common value expression>
+	|	<boolean value expression>
+	|	<explicit row value constructor>
+
+<explicit row value constructor> ::=
+		<left paren> <row value constructor element> <comma> <row value constructor element list> <right paren>
+	|	ROW <left paren> <row value constructor element list> <right paren>
+	|	<row subquery>
+
+<row value constructor element list> ::=
+		<row value constructor element> ( <comma> <row value constructor element> )*
+
+<row value constructor element> ::= <value expression>
+
+<contextually typed row value constructor> ::=
+		<common value expression>
+	|	<boolean value expression>
+	|	<contextually typed value specification>
+	|	<left paren> <contextually typed row value constructor element> <comma> <contextually typed row value constructor element list> <right paren>
+	|	ROW <left paren> <contextually typed row value constructor element list> <right paren>
+
+<contextually typed row value constructor element list> ::=
+		<contextually typed row value constructor element>
+		( <comma> <contextually typed row value constructor element> )*
+
+<contextually typed row value constructor element> ::=
+		<value expression>
+	|	<contextually typed value specification>
+
+<row value constructor predicand> ::=
+		<common value expression>
+	|	<boolean predicand>
+	|	<explicit row value constructor>
+
+<row value expression> ::=
+		<row value special case>
+	|	<explicit row value constructor>
+
+<table row value expression> ::=
+		<row value special case>
+	|	<row value constructor>
+
+<contextually typed row value expression> ::=
+		<row value special case>
+	|	<contextually typed row value constructor>
+
+<row value predicand> ::=
+		<row value special case>
+	|	<row value constructor predicand>
+
+<row value special case> ::= <nonparenthesized value expression primary>
+
+<table value constructor> ::= VALUES <row value expression list>
+
+<row value expression list> ::= <table row value expression> ( <comma> <table row value expression> )*
+
+<contextually typed table value constructor> ::= VALUES <contextually typed row value expression list>
+
+<contextually typed row value expression list> ::= <contextually typed row value expression> ( <comma> <contextually typed row value expression> )*
+
+<table expression> ::=
+		<from clause>
+		<where clause>?
+		<group by clause>?
+		<having clause>?
+		<window clause>?
+
+<from clause> ::= FROM <table reference list>
+
+<table reference list> ::= <table reference> ( <comma> <table reference> )*
+
+<table reference> ::= <table primary or joined table> <sample clause>?
+
+<table primary or joined table> ::= <table primary> | <joined table>
+
+<sample clause> ::=
+		TABLESAMPLE <sample method> <left paren> <sample percentage> <right paren> <repeatable clause>?
+
+<sample method> ::= BERNOULLI | SYSTEM
+
+<repeatable clause> ::= REPEATABLE <left paren> <repeat argument> <right paren>
+
+<sample percentage> ::= <numeric value expression>
+
+<repeat argument> ::= <numeric value expression>
+
+<table primary> ::=
+		<table or query name> ( AS? <correlation name> ( <left paren> <derived column list> <right paren> )? )?
+	|	<derived table> AS? <correlation name> ( <left paren> <derived column list> <right paren> )?
+	|	<lateral derived table> AS? <correlation name> ( <left paren> <derived column list> <right paren> )?
+	|	<collection derived table> AS? <correlation name> ( <left paren> <derived column list> <right paren> )?
+	|	<table function derived table> AS? <correlation name> ( <left paren> <derived column list> <right paren> )?
+	|	<only spec> ( AS? <correlation name> ( <left paren> <derived column list> <right paren> )? )?
+	|	<left paren> <joined table> <right paren>
+
+<only spec> ::= ONLY <left paren> <table or query name> <right paren>
+
+<lateral derived table> ::= LATERAL <table subquery>
+
+<collection derived table> ::= UNNEST <left paren> <collection value expression> <right paren> ( WITH ORDINALITY ) ?
+
+<table function derived table> ::= TABLE <left paren> <collection value expression> <right paren>
+
+<derived table> ::= <table subquery>
+
+<table or query name> ::= <table name> | <query name>
+
+<derived column list> ::= <column name list>
+
+<column name list> ::= <column name> ( <comma> <column name> )*
+
+<joined table> ::=
+		<cross join>
+	|	<qualified join>
+	|	<natural join>
+	|	<union join>
+
+<cross join> ::= <table reference> CROSS JOIN <table primary>
+
+<qualified join> ::= <table reference> <join type>? JOIN <table reference> <join specification>
+
+<natural join> ::= <table reference> NATURAL <join type>? JOIN <table primary>
+
+<union join> ::= <table reference> UNION JOIN <table primary>
+
+<join specification> ::= <join condition> | <named columns join>
+
+<join condition> ::= ON <search condition>
+
+<named columns join> ::= USING <left paren> <join column list> <right paren>
+
+<join type> ::= INNER | <outer join type> OUTER?
+
+<outer join type> ::= LEFT | RIGHT | FULL
+
+<join column list> ::= <column name list>
+
+<where clause> ::= WHERE <search condition>
+
+<group by clause> ::= GROUP BY <set quantifier>? <grouping element list>
+
+<grouping element list> ::= <grouping element> ( <comma> <grouping element> )*
+
+<grouping element> ::=
+		<ordinary grouping set>
+	|	<rollup list>
+	|	<cube list>
+	|	<grouping sets specification>
+	|	<empty grouping set>
+
+<ordinary grouping set> ::=
+		<grouping column reference>
+	|	<left paren> <grouping column reference list> <right paren>
+
+<grouping column reference> ::= <column reference> <collate clause>?
+
+<grouping column reference list> ::= <grouping column reference> ( <comma> <grouping column reference> )*
+
+<rollup list> ::= ROLLUP <left paren> <ordinary grouping set list> <right paren>
+
+<ordinary grouping set list> ::= <ordinary grouping set> ( <comma> <ordinary grouping set> )*
+
+<cube list> ::= CUBE <left paren> <ordinary grouping set list> <right paren>
+
+<grouping sets specification> ::= GROUPING SETS <left paren> <grouping set list> <right paren>
+
+<grouping set list> ::= <grouping set> ( <comma> <grouping set> )*
+
+<grouping set> ::=
+		<ordinary grouping set>
+	|	<rollup list>
+	|	<cube list>
+	|	<grouping sets specification>
+	|	<empty grouping set>
+
+<empty grouping set> ::= <left paren> <right paren>
+
+<having clause> ::= HAVING <search condition>
+
+<window clause> ::= WINDOW <window definition list>
+
+<window definition list> ::= <window definition> ( <comma> <window definition> )*
+
+<window definition> ::= <new window name> AS <window specification>
+
+<new window name> ::= <window name>
+
+<window specification> ::= <left paren> <window specification details> <right paren>
+
+<window specification details> ::=
+		<existing window name>? <window partition clause>? <window order clause>? <window frame clause>?
+
+<existing window name> ::= <window name>
+
+<window partition clause> ::= PARTITION BY <window partition column reference list>
+
+<window partition column reference list> ::= <window partition column reference> ( <comma> <window partition column reference> )*
+
+<window partition column reference> ::= <column reference> <collate clause>?
+
+<window order clause> ::= ORDER BY <sort specification list>
+
+<window frame clause> ::= <window frame units> <window frame extent> <window frame exclusion>?
+
+<window frame units> ::= ROWS | RANGE
+
+<window frame extent> ::= <window frame start> | <window frame between>
+
+<window frame start> ::= UNBOUNDED PRECEDING | <window frame preceding> | CURRENT ROW
+
+<window frame preceding> ::= <unsigned value specification> PRECEDING
+
+<window frame between> ::= BETWEEN <window frame bound 1> AND <window frame bound 2>
+
+<window frame bound 1> ::= <window frame bound>
+
+<window frame bound 2> ::= <window frame bound>
+
+<window frame bound> ::=
+		<window frame start>
+	|	UNBOUNDED FOLLOWING
+	|	<window frame following>
+
+<window frame following> ::= <unsigned value specification> FOLLOWING
+
+<window frame exclusion> ::=
+		EXCLUDE CURRENT ROW
+	|	EXCLUDE GROUP
+	|	EXCLUDE TIES
+	|	EXCLUDE NO OTHERS
+
+<query specification> ::= SELECT <set quantifier>? <select list> <table expression>
+
+<select list> ::= <asterisk> | <select sublist> ( <comma> <select sublist> )*
+
+<select sublist> ::= <derived column> | <qualified asterisk>
+
+<qualified asterisk> ::=
+		/*LEX*/(<asterisked identifier chain L0> <period L0> <asterisk L0>)
+	|	<all fields reference>
+
+<asterisked identifier chain L0> ~ <asterisked identifier L0> /*LEX*/( <period L0> <asterisked identifier L0> )*
+
+<asterisked identifier L0> ~ <identifier L0 internal>
+
+<derived column> ::= <value expression> <as clause>?
+
+<as clause> ::= AS? <column name>
+
+<all fields reference> ::= <value expression primary> <period> <asterisk> ( AS <left paren> <all fields column name list> <right paren> )?
+
+<all fields column name list> ::= <column name list>
+
+<query expression> ::= <with clause>? <query expression body>
+
+<with clause> ::= WITH RECURSIVE? <with list>
+
+<with list> ::= <with list element> ( <comma> <with list element> )*
+
+<with list element> ::=
+		<query name> ( <left paren> <with column list> <right paren> )?
+		AS <left paren> <query expression> <right paren> <search or cycle clause>?
+
+<with column list> ::= <column name list>
+
+<query expression body> ::= <non_join query expression> | <joined table>
+
+<non_join query expression> ::=
+		<non_join query term>
+	|	<query expression body> UNION ( ALL | DISTINCT )? <corresponding spec>? <query term>
+	|	<query expression body> EXCEPT ( ALL | DISTINCT )? <corresponding spec>? <query term>
+
+<query term> ::= <non_join query term> | <joined table>
+
+<non_join query term> ::=
+		<non_join query primary>
+	|	<query term> INTERSECT ( ALL | DISTINCT )? <corresponding spec>? <query primary>
+
+<query primary> ::= <non_join query primary> | <joined table>
+
+<non_join query primary> ::= <simple table> | <left paren> <non_join query expression> <right paren>
+
+<simple table> ::=
+		<query specification>
+	|	<table value constructor>
+	|	<explicit table>
+
+<explicit table> ::= TABLE <table or query name>
+
+<corresponding spec> ::= CORRESPONDING ( BY <left paren> <corresponding column list> <right paren> )?
+
+<corresponding column list> ::= <column name list>
+
+<search or cycle clause> ::=
+		<search clause>
+	|	<cycle clause>
+	|	<search clause> <cycle clause>
+
+<search clause> ::= SEARCH <recursive search order> SET <sequence column>
+
+<recursive search order> ::=
+		DEPTH FIRST BY <sort specification list>
+	|	BREADTH FIRST BY <sort specification list>
+
+<sequence column> ::= <column name>
+
+<cycle clause> ::=
+		CYCLE <cycle column list>
+		SET <cycle mark column> TO <cycle mark value>
+		DEFAULT <non_cycle mark value>
+		USING <path column>
+
+<cycle column list> ::= <cycle column> ( <comma> <cycle column> )*
+
+<cycle column> ::= <column name>
+
+<cycle mark column> ::= <column name>
+
+<path column> ::= <column name>
+
+<cycle mark value> ::= <value expression>
+
+<non_cycle mark value> ::= <value expression>
+
+<scalar subquery> ::= <subquery>
+
+<row subquery> ::= <subquery>
+
+<table subquery> ::= <subquery>
+
+<subquery> ::= <left paren> <query expression> <right paren>
+
+<predicate> ::=
+		<comparison predicate>
+	|	<between predicate>
+	|	<in predicate>
+	|	<like predicate>
+	|	<similar predicate>
+	|	<null predicate>
+	|	<quantified comparison predicate>
+	|	<exists predicate>
+	|	<unique predicate>
+	|	<normalized predicate>
+	|	<match predicate>
+	|	<overlaps predicate>
+	|	<distinct predicate>
+	|	<member predicate>
+	|	<submultiset predicate>
+	|	<set predicate>
+	|	<type predicate>
+
+<comparison predicate> ::= <row value predicand> <comparison predicate part 2>
+
+<comparison predicate part 2> ::= <comp op> <row value predicand>
+
+<comp op> ::=
+		<equals operator>
+	|	<not equals operator>
+	|	<less than operator>
+	|	<greater than operator>
+	|	<less than or equals operator>
+	|	<greater than or equals operator>
+
+<between predicate> ::= <row value predicand> <between predicate part 2>
+
+<between predicate part 2> ::= NOT? BETWEEN ( ASYMMETRIC | SYMMETRIC )? <row value predicand> AND <row value predicand>
+
+<in predicate> ::= <row value predicand> <in predicate part 2> 
+
+<in predicate part 2> ::= NOT? IN <in predicate value>
+
+<in predicate value> ::=
+		<table subquery>
+	|	<left paren> <in value list> <right paren>
+
+<in value list> ::= <row value expression> ( <comma> <row value expression> )*
+
+<like predicate> ::= <character like predicate> | <octet like predicate>
+
+<character like predicate> ::= <row value predicand> <character like predicate part 2>
+
+<character like predicate part 2> ::= NOT? LIKE <character pattern> ( ESCAPE <escape character> )?
+
+<character pattern> ::= <character value expression>
+
+<escape character> ::= <character value expression>
+
+<octet like predicate> ::= <row value predicand> <octet like predicate part 2>
+
+<octet like predicate part 2> ::= NOT? LIKE <octet pattern> ( ESCAPE <escape octet> )?
+
+<octet pattern> ::= <blob value expression>
+
+<escape octet> ::= <blob value expression>
+
+<similar predicate> ::= <row value predicand> <similar predicate part 2>
+
+<similar predicate part 2> ::= NOT? SIMILAR TO <similar pattern> ( ESCAPE <escape character> )?
+
+<similar pattern> ::= <character value expression>
+
+<regular expression> ::=
+		<regular term>
+	|	<regular expression> <vertical bar> <regular term>
+
+<regular term> ::=
+		<regular factor>
+	|	<regular term> <regular factor>
+
+<regular factor> ::=
+		<regular primary>
+	|	<regular primary> <asterisk>
+	|	<regular primary> <plus sign>
+	|	<regular primary> <question mark>
+	|	<regular primary> <repeat factor>
+
+<repeat factor> ::= <left brace> <low value> <upper limit>? <right brace>
+
+<upper limit> ::= <comma> <high value>?
+
+<low value> ::= <unsigned integer>
+
+<high value> ::= <unsigned integer>
+
+<regular primary> ::=
+		<character specifier>
+	|	<percent>
+	|	<regular character set>
+	|	<left paren> <regular expression> <right paren>
+
+<character specifier> ::= <non_escaped character> | <escaped character>
+
+/*
+##################################################################################################
+# Disgression to the grammar:even if the ESCAPE lexeme in the rhs is supported                   #
+# it is ignored, always defaulting to '\'. Why ESCAPE is specified after the affected other      #
+# rules? To support this feature, this would require going back in the stream and apply the      #
+# escaped character that is defined... after.                                                    #
+##################################################################################################
+*/
+
+/* <non_escaped character> ::= !! See the Syntax Rules. */
+<non_escaped character> ~ [^\[\]()|\^\-+*_%?{\\]
+
+/* <escaped character> ::= !! See the Syntax Rules. */
+<escaped character> ~ /*LEX*/#x5c /*LEX*/[\[\]()|\^\-+*_%?{\\]
+
+<regular character set> ::=
+		<underscore>
+	|	<left bracket> <character enumeration>+ <right bracket>
+	|	<left bracket> <circumflex> <character enumeration>+ <right bracket>
+	|	<left bracket> <character enumeration include>+  <circumflex> <character enumeration exclude>+ <right bracket>
+
+<character enumeration include> ::= <character enumeration>
+
+<character enumeration exclude> ::= <character enumeration>
+
+<character enumeration> ::=
+		<character specifier>
+	|	<character specifier> <minus sign> <character specifier>
+	|	<left bracket> <colon> <regular character set identifier> <colon> <right bracket>
+
+<regular character set identifier> ::= <identifier>
+
+<null predicate> ::= <row value predicand> <null predicate part 2>
+
+<null predicate part 2> ::= IS NOT? NULL 
+
+<quantified comparison predicate> ::= <row value predicand> <quantified comparison predicate part 2>
+
+<quantified comparison predicate part 2> ::= <comp op> <quantifier> <table subquery>
+
+<quantifier> ::= <all> | <some>
+
+<all> ::= ALL
+
+<some> ::= SOME | ANY
+
+<exists predicate> ::= EXISTS <table subquery>
+
+<unique predicate> ::= UNIQUE <table subquery>
+
+<normalized predicate> ::= <string value expression> IS NOT? NORMALIZED
+
+<match predicate> ::= <row value predicand> <match predicate part 2>
+
+<match predicate part 2> ::= MATCH UNIQUE? ( SIMPLE | PARTIAL | FULL )? <table subquery>
+
+<overlaps predicate> ::= <overlaps predicate part 1> <overlaps predicate part 2>
+
+<overlaps predicate part 1> ::= <row value predicand 1>
+
+<overlaps predicate part 2> ::= OVERLAPS <row value predicand 2>
+
+<row value predicand 1> ::= <row value predicand>
+
+<row value predicand 2> ::= <row value predicand>
+
+<distinct predicate> ::= <row value predicand 3> <distinct predicate part 2>
+
+<distinct predicate part 2> ::= IS DISTINCT FROM <row value predicand 4>
+
+<row value predicand 3> ::= <row value predicand>
+
+<row value predicand 4> ::= <row value predicand>
+
+<member predicate> ::= <row value predicand> <member predicate part 2>
+
+<member predicate part 2> ::= NOT? MEMBER OF? <multiset value expression>
+
+<submultiset predicate> ::= <row value predicand> <submultiset predicate part 2>
+
+<submultiset predicate part 2> ::= NOT? SUBMULTISET OF? <multiset value expression>
+
+<set predicate> ::= <row value predicand> <set predicate part 2>
+
+<set predicate part 2> ::= IS NOT? A SET
+
+<type predicate> ::= <row value predicand> <type predicate part 2>
+
+<type predicate part 2> ::= IS NOT? OF <left paren> <type list> <right paren>
+
+<type list> ::= <user_defined type specification> ( <comma> <user_defined type specification> )*
+
+<user_defined type specification> ::=
+		<inclusive user_defined type specification>
+	|	<exclusive user_defined type specification>
+
+<inclusive user_defined type specification> ::= <path_resolved user_defined type name>
+
+<exclusive user_defined type specification> ::= ONLY <path_resolved user_defined type name>
+
+<search condition> ::= <boolean value expression>
+
+<interval qualifier> ::=
+		<start field> TO <end field>
+	|	<single datetime field>
+
+<start field> ::= <non_second primary datetime field> ( <left paren> <interval leading field precision> <right paren> )?
+
+<end field> ::=
+		<non_second primary datetime field>
+	|	SECOND ( <left paren> <interval fractional seconds precision> <right paren> )?
+
+<single datetime field> ::=
+		<non_second primary datetime field> ( <left paren> <interval leading field precision> <right paren> )?
+	|	SECOND ( <left paren> <interval leading field precision> ( <comma> <interval fractional seconds precision> )? <right paren> )?
+
+<primary datetime field> ::=
+		<non_second primary datetime field>
+	|	SECOND
+
+<non_second primary datetime field> ::= YEAR | MONTH | DAY | HOUR | MINUTE
+
+<interval fractional seconds precision> ::= <unsigned integer>
+
+<interval leading field precision> ::= <unsigned integer>
+
+<language clause> ::= LANGUAGE <language name>
+
+<language name> ::= ADA | C | COBOL | FORTRAN | MUMPS | PASCAL | PLI | SQL
+
+<path specification> ::= PATH <schema name list>
+
+<schema name list> ::= <schema name> ( <comma> <schema name> )*
+
+<routine invocation> ::= <routine name> <SQL argument list>
+
+<routine name> ~ /*LEX*/( <schema name L0 internal> <period L0> )? <qualified identifier L0>
+
+<SQL argument list> ::= <left paren> ( <SQL argument> ( <comma> <SQL argument> )* )? <right paren>
+
+<SQL argument> ::=
+		<value expression>
+	|	<generalized expression>
+	|	<target specification>
+
+<generalized expression> ::= <value expression> AS <path_resolved user_defined type name>
+
+<character set specification L0 internal> ~
+		<standard character set name L0 internal>
+	|	<implementation_defined character set name L0 internal>
+	|	<user_defined character set name L0 internal>
+
+<character set specification> ~ <character set specification L0 internal>
+
+<standard character set name L0 internal> ~ <character set name L0 internal>
+<implementation_defined character set name L0 internal> ~ <character set name L0 internal>
+<user_defined character set name L0 internal> ~ <character set name L0 internal>
+
+<specific routine designator> ::=
+		SPECIFIC <routine type> <specific name>
+			|	<routine type> <member name>
+		( FOR <schema_resolved user_defined type name> )?
+
+<routine type> ::=
+		ROUTINE
+	|	FUNCTION
+	|	PROCEDURE
+	|	( INSTANCE | STATIC | CONSTRUCTOR )? METHOD
+
+<member name> ::= <member name alternatives> <data type list>?
+
+<member name alternatives> ::= <schema qualified routine name> | <method name>
+
+<data type list> ::= <left paren> ( <data type> ( <comma> <data type> )* )? <right paren>
+
+<collate clause> ::= COLLATE <collation name>
+
+<constraint name definition> ::= CONSTRAINT <constraint name>
+
+<constraint characteristics> ::=
+		<constraint check time> ( NOT? DEFERRABLE )?
+	|	NOT? DEFERRABLE <constraint check time>?
+
+<constraint check time> ::= INITIALLY DEFERRED | INITIALLY IMMEDIATE
+
+<aggregate function> ::=
+		COUNT <left paren> <asterisk> <right paren> <filter clause>?
+	|	<general set function> <filter clause>?
+	|	<binary set function> <filter clause>?
+	|	<ordered set function> <filter clause>?
+
+<general set function> ::= <set function type> <left paren> <set quantifier>? <value expression> <right paren>
+
+<set function type> ::= <computational operation>
+
+<computational operation> ::=
+		AVG | MAX | MIN | SUM
+	|	EVERY | ANY | SOME
+	|	COUNT
+	|	STDDEV_POP | STDDEV_SAMP | VAR_SAMP | VAR_POP
+	|	COLLECT | FUSION | INTERSECTION
+
+<set quantifier> ::= DISTINCT | ALL
+
+<filter clause> ::= FILTER <left paren> WHERE <search condition> <right paren>
+
+<binary set function> ::= <binary set function type> <left paren> <dependent variable expression> <comma> <independent variable expression> <right paren>
+
+<binary set function type> ::=
+		COVAR_POP | COVAR_SAMP | CORR | REGR_SLOPE
+	|	REGR_INTERCEPT | REGR_COUNT | REGR_R2 | REGR_AVGX | REGR_AVGY
+	|	REGR_SXX | REGR_SYY | REGR_SXY
+
+<dependent variable expression> ::= <numeric value expression>
+
+<independent variable expression> ::= <numeric value expression>
+
+<ordered set function> ::= <hypothetical set function> | <inverse distribution function>
+
+<hypothetical set function> ::= <rank function type> <left paren> <hypothetical set function value expression list> <right paren> <within group specification>
+
+<within group specification> ::= WITHIN GROUP <left paren> ORDER BY <sort specification list> <right paren>
+
+<hypothetical set function value expression list> ::= <value expression> ( <comma> <value expression> )*
+
+<inverse distribution function> ::= <inverse distribution function type> <left paren> <inverse distribution function argument> <right paren> <within group specification>
+
+<inverse distribution function argument> ::= <numeric value expression>
+
+<inverse distribution function type> ::= PERCENTILE_CONT | PERCENTILE_DISC
+
+<sort specification list> ::= <sort specification> ( <comma> <sort specification> )*
+
+<sort specification> ::= <sort key> <ordering specification>? <null ordering>?
+
+<sort key> ::= <value expression>
+
+<ordering specification> ::= ASC | DESC
+
+<null ordering> ::= NULLS FIRST | NULLS LAST
+
+<schema definition> ::= CREATE SCHEMA <schema name clause> <schema character set or path>? <schema element>*
+
+<schema character set or path> ::=
+		<schema character set specification>
+	|	<schema path specification>
+	|	<schema character set specification> <schema path specification>
+	|	<schema path specification> <schema character set specification>
+
+<schema name clause> ::=
+		<schema name>
+	|	AUTHORIZATION <schema authorization identifier>
+	|	<schema name> AUTHORIZATION <schema authorization identifier>
+
+<schema authorization identifier> ::= <authorization identifier>
+
+<schema character set specification> ::= DEFAULT CHARACTER SET <character set specification>
+
+<schema path specification> ::= <path specification>
+
+<schema element> ::=
+		<table definition>
+	|	<view definition>
+	|	<domain definition>
+	|	<character set definition>
+	|	<collation definition>
+	|	<transliteration definition>
+	|	<assertion definition>
+	|	<trigger definition>
+	|	<user_defined type definition>
+	|	<user_defined cast definition>
+	|	<user_defined ordering definition>
+	|	<transform definition>
+	|	<schema routine>
+	|	<sequence generator definition>
+	|	<grant statement>
+	|	<role definition>
+
+<drop schema statement> ::= DROP SCHEMA <schema name> <drop behavior>
+
+<drop behavior> ::= CASCADE | RESTRICT
+
+<table definition> ::=
+		CREATE <table scope>? TABLE <table name> <table contents source>
+		( ON COMMIT <table commit action> ROWS )?
+
+<table contents source> ::=
+		<table element list>
+	|	OF <path_resolved user_defined type name> <subtable clause>? <table element list>?
+	|	<as subquery clause>
+
+<table scope> ::= <global or local> TEMPORARY
+
+<global or local> ::= GLOBAL | LOCAL
+
+<table commit action> ::= PRESERVE | DELETE
+
+<table element list> ::= <left paren> <table element> ( <comma> <table element> )* <right paren>
+
+<table element> ::=
+		<column definition>
+	|	<table constraint definition>
+	|	<like clause>
+	|	<self_referencing column specification>
+	|	<column options>
+
+<self_referencing column specification> ::= REF IS <self_referencing column name> <reference generation>
+
+<reference generation> ::= SYSTEM GENERATED | USER GENERATED | DERIVED
+
+<self_referencing column name> ::= <column name>
+
+<column options> ::= <column name> WITH OPTIONS <column option list>
+
+<column option list> ::= <scope clause>? <default clause>? <column constraint definition>*
+
+<subtable clause> ::= UNDER <supertable clause>
+
+<supertable clause> ::= <supertable name>
+
+<supertable name> ::= <table name>
+
+<like clause> ::= LIKE <table name> <like options>?
+
+<like options> ::= <identity option> | <column default option>
+
+<identity option> ::= INCLUDING IDENTITY | EXCLUDING IDENTITY
+
+<column default option> ::= INCLUDING DEFAULTS | EXCLUDING DEFAULTS
+
+<as subquery clause> ::= ( <left paren> <column name list> <right paren> )? AS <subquery> <with or without data>
+
+<with or without data> ::= WITH NO DATA | WITH DATA
+
+<column definition> ::=
+		<column name> ( <data type> | <domain name> )? <reference scope check>?
+		( <default clause> | <identity column specification> | <generation clause> )?
+		<column constraint definition>* <collate clause>?
+
+<column constraint definition> ::= <constraint name definition>? <column constraint> <constraint characteristics>?
+
+<column constraint> ::=
+		NOT NULL
+	|	<unique specification>
+	|	<references specification>
+	|	<check constraint definition>
+
+<reference scope check> ::= REFERENCES ARE NOT? CHECKED ( ON DELETE <reference scope check action> )?
+
+<reference scope check action> ::= <referential action>
+
+<identity column specification> ::=
+		GENERATED ( ALWAYS | BY DEFAULT ) AS IDENTITY
+		( <left paren> <common sequence generator options> <right paren> )?
+
+<generation clause> ::= <generation rule> AS <generation expression>
+
+<generation rule> ::= GENERATED ALWAYS
+
+<generation expression> ::= <left paren> <value expression> <right paren>
+
+<default clause> ::= DEFAULT <default option>
+
+<default option> ::=
+		<literal>
+	|	<datetime value function>
+	|	USER
+	|	CURRENT_USER
+	|	CURRENT_ROLE
+	|	SESSION_USER
+	|	SYSTEM_USER
+	|	CURRENT_PATH
+	|	<implicitly typed value specification>
+
+<table constraint definition> ::= <constraint name definition>? <table constraint> <constraint characteristics>?
+
+<table constraint> ::=
+		<unique constraint definition>
+	|	<referential constraint definition>
+	|	<check constraint definition>
+
+<unique constraint definition> ::=
+		<unique specification> <left paren> <unique column list> <right paren>
+	|	UNIQUE ( VALUE )
+
+<unique specification> ::= UNIQUE | PRIMARY KEY
+
+<unique column list> ::= <column name list>
+
+<referential constraint definition> ::= FOREIGN KEY <left paren> <referencing columns> <right paren> <references specification>
+
+<references specification> ::= REFERENCES <referenced table and columns> ( MATCH <match type> )? <referential triggered action>?
+
+<match type> ::= FULL | PARTIAL | SIMPLE
+
+<referencing columns> ::= <reference column list>
+
+<referenced table and columns> ::= <table name> ( <left paren> <reference column list> <right paren> )?
+
+<reference column list> ::= <column name list>
+
+<referential triggered action> ::= <update rule> <delete rule>? | <delete rule> <update rule>?
+
+<update rule> ::= ON UPDATE <referential action>
+
+<delete rule> ::= ON DELETE <referential action>
+
+<referential action> ::= CASCADE | SET NULL | SET DEFAULT | RESTRICT | NO ACTION
+
+<check constraint definition> ::= CHECK <left paren> <search condition> <right paren>
+
+<alter table statement> ::= ALTER TABLE <table name> <alter table action>
+
+<alter table action> ::=
+		<add column definition>
+	|	<alter column definition>
+	|	<drop column definition>
+	|	<add table constraint definition>
+	|	<drop table constraint definition>
+
+<add column definition> ::= ADD COLUMN? <column definition>
+
+<alter column definition> ::= ALTER COLUMN? <column name> <alter column action>
+
+<alter column action> ::=
+		<set column default clause>
+	|	<drop column default clause>
+	|	<add column scope clause>
+	|	<drop column scope clause>
+	|	<alter identity column specification>
+
+<set column default clause> ::= SET <default clause>
+
+<drop column default clause> ::= DROP DEFAULT
+
+<add column scope clause> ::= ADD <scope clause>
+
+<drop column scope clause> ::= DROP SCOPE <drop behavior>
+
+<alter identity column specification> ::= <alter identity column option>+
+
+<alter identity column option> ::=
+		<alter sequence generator restart option>
+	|	SET <basic sequence generator option>
+
+<drop column definition> ::= DROP COLUMN? <column name> <drop behavior>
+
+<add table constraint definition> ::= ADD <table constraint definition>
+
+<drop table constraint definition> ::= DROP CONSTRAINT <constraint name> <drop behavior>
+
+<drop table statement> ::= DROP TABLE <table name> <drop behavior>
+
+<view definition> ::=
+		CREATE RECURSIVE? VIEW <table name> <view specification> AS <query expression>
+		( WITH <levels clause>? CHECK OPTION )?
+
+<view specification> ::= <regular view specification> | <referenceable view specification>
+
+<regular view specification> ::= ( <left paren> <view column list> <right paren> )?
+
+<referenceable view specification> ::= OF <path_resolved user_defined type name> <subview clause>? <view element list>?
+
+<subview clause> ::= UNDER <table name>
+
+<view element list> ::= <left paren> <view element> ( <comma> <view element> )* <right paren>
+
+<view element> ::= <self_referencing column specification> | <view column option>
+
+<view column option> ::= <column name> WITH OPTIONS <scope clause>
+
+<levels clause> ::= CASCADED | LOCAL
+
+<view column list> ::= <column name list>
+
+<drop view statement> ::= DROP VIEW <table name> <drop behavior>
+
+<domain definition> ::=
+		CREATE DOMAIN <domain name> AS? <data type>
+		<default clause>? <domain constraint>* <collate clause>?
+
+<domain constraint> ::= <constraint name definition>? <check constraint definition> <constraint characteristics>?
+
+<alter domain statement> ::= ALTER DOMAIN <domain name> <alter domain action>
+
+<alter domain action> ::=
+		<set domain default clause>
+	|	<drop domain default clause>
+	|	<add domain constraint definition>
+	|	<drop domain constraint definition>
+
+<set domain default clause> ::= SET <default clause>
+
+<drop domain default clause> ::= DROP DEFAULT
+
+<add domain constraint definition> ::= ADD <domain constraint>
+
+<drop domain constraint definition> ::= DROP CONSTRAINT <constraint name>
+
+<drop domain statement> ::= DROP DOMAIN <domain name> <drop behavior>
+
+<character set definition> ::=
+		CREATE CHARACTER SET <character set name> AS? <character set source> <collate clause>?
+
+<character set source> ::= GET <character set specification>
+
+<drop character set statement> ::= DROP CHARACTER SET <character set name>
+
+<collation definition> ::=
+		CREATE COLLATION <collation name> FOR <character set specification>
+		FROM <existing collation name> <pad characteristic>?
+
+<existing collation name> ::= <collation name>
+
+<pad characteristic> ::= NO PAD | PAD SPACE
+
+<drop collation statement> ::= DROP COLLATION <collation name> <drop behavior>
+
+<transliteration definition> ::=
+		CREATE TRANSLATION <transliteration name> FOR <source character set specification>
+		TO <target character set specification> FROM <transliteration source>
+
+<source character set specification> ::= <character set specification>
+
+<target character set specification> ::= <character set specification>
+
+<transliteration source> ::= <existing transliteration name> | <transliteration routine>
+
+<existing transliteration name> ::= <transliteration name>
+
+<transliteration routine> ::= <specific routine designator>
+
+<drop transliteration statement> ::= DROP TRANSLATION <transliteration name>
+
+<assertion definition> ::=
+		CREATE ASSERTION <constraint name> CHECK <left paren> <search condition> <right paren> <constraint characteristics>?
+
+<drop assertion statement> ::= DROP ASSERTION <constraint name>
+
+<trigger definition> ::=
+		CREATE TRIGGER <trigger name> <trigger action time> <trigger event>
+		ON <table name> ( REFERENCING <old or new values alias list> )?
+		<triggered action>
+
+<trigger action time> ::= BEFORE | AFTER
+
+<trigger event> ::= INSERT | DELETE | UPDATE ( OF <trigger column list> )?
+
+<trigger column list> ::= <column name list>
+
+<triggered action> ::=
+		( FOR EACH ( ROW | STATEMENT ) )?
+		( WHEN <left paren> <search condition> <right paren> )?
+		<triggered SQL statement>
+
+<triggered SQL statement> ::=
+		<SQL procedure statement>
+	|	BEGIN ATOMIC ( <SQL procedure statement> <semicolon> )+  END
+
+<old or new values alias list> ::= <old or new values alias>+
+
+<old or new values alias> ::=
+		OLD ROW? AS? <old values correlation name>
+	|	NEW ROW? AS? <new values correlation name>
+	|	OLD TABLE AS? <old values table alias>
+	|	NEW TABLE AS? <new values table alias>
+
+<old values table alias> ::= <identifier>
+
+<new values table alias> ::= <identifier>
+
+<old values correlation name> ::= <correlation name>
+
+<new values correlation name> ::= <correlation name>
+
+<drop trigger statement> ::= DROP TRIGGER <trigger name>
+
+<user_defined type definition> ::= CREATE TYPE <user_defined type body>
+
+<user_defined type body> ::=
+		<schema_resolved user_defined type name> <subtype clause>?
+		( AS <representation> )? <user_defined type option list>? <method specification list>?
+
+<user_defined type option list> ::= <user_defined type option> <user_defined type option>*
+
+<user_defined type option> ::=
+		<instantiable clause>
+	|	<finality>
+	|	<reference type specification>
+	|	<ref cast option>
+	|	<cast option>
+
+<subtype clause> ::=
+		UNDER <supertype name>
+
+<supertype name> ::=
+		<path_resolved user_defined type name>
+
+<representation> ::= <predefined type> | <member list>
+
+<member list> ::= <left paren> <member> ( <comma> <member> )* <right paren>
+
+<member> ::= <attribute definition>
+
+<instantiable clause> ::= INSTANTIABLE | NOT INSTANTIABLE
+
+<finality> ::= FINAL | NOT FINAL
+
+<reference type specification> ::=
+		<user_defined representation>
+	|	<derived representation>
+	|	<system_generated representation>
+
+<user_defined representation> ::= REF USING <predefined type>
+
+<derived representation> ::= REF FROM <list of attributes>
+
+<system_generated representation> ::= REF IS SYSTEM GENERATED
+
+<ref cast option> ::=  <cast to ref> <cast to type>?
+                    |  <cast to type>
+
+<cast to ref> ::= CAST <left paren> SOURCE AS REF <right paren> WITH <cast to ref identifier>
+
+<cast to ref identifier> ::= <identifier>
+
+<cast to type> ::= CAST <left paren> REF AS SOURCE <right paren> WITH <cast to type identifier>
+
+<cast to type identifier> ::= <identifier>
+
+<list of attributes> ::= <left paren> <attribute name> ( <comma> <attribute name> )* <right paren>
+
+<cast option> ::= <cast to distinct>? <cast to source>
+                | <cast to source>
+
+<cast to distinct> ::=
+		CAST <left paren> SOURCE AS DISTINCT <right paren>
+		WITH <cast to distinct identifier>
+
+<cast to distinct identifier> ::= <identifier>
+
+<cast to source> ::=
+		CAST <left paren> DISTINCT AS SOURCE <right paren>
+		WITH <cast to source identifier>
+
+<cast to source identifier> ::= <identifier>
+
+<method specification list> ::= <method specification> ( <comma> <method specification> )*
+
+<method specification> ::= <original method specification> | <overriding method specification>
+
+<original method specification> ::=
+		<partial method specification> ( SELF AS RESULT )? ( SELF AS LOCATOR )? <method characteristics>?
+
+<overriding method specification> ::= OVERRIDING <partial method specification>
+
+<partial method specification> ::=
+		( INSTANCE | STATIC | CONSTRUCTOR )? METHOD <method name> <SQL parameter declaration list>
+		<returns clause> ( SPECIFIC <specific method name> )?
+
+<specific method name> ~ /*LEX*/( <schema name L0 internal> <period L0> )? <qualified identifier L0>
+
+<method characteristics> ::= <method characteristic>+
+
+<method characteristic> ::=
+		<language clause>
+	|	<parameter style clause>
+	|	<deterministic characteristic>
+	|	<SQL_data access indication>
+	|	<null_call clause>
+
+<attribute definition> ::=
+		<attribute name> <data type> <reference scope check>? <attribute default>? <collate clause>?
+
+<attribute default> ::= <default clause>
+
+<alter type statement> ::=
+ALTER TYPE <schema_resolved user_defined type name> <alter type action>
+
+<alter type action> ::=
+		<add attribute definition>
+	|	<drop attribute definition>
+	|	<add original method specification>
+	|	<add overriding method specification>
+	|	<drop method specification>
+
+<add attribute definition> ::= ADD ATTRIBUTE <attribute definition>
+
+<drop attribute definition> ::= DROP ATTRIBUTE <attribute name> RESTRICT
+
+<add original method specification> ::= ADD <original method specification>
+
+<add overriding method specification> ::= ADD <overriding method specification>
+
+<drop method specification> ::= DROP <specific method specification designator> RESTRICT
+
+<specific method specification designator> ::= ( INSTANCE | STATIC | CONSTRUCTOR )? METHOD <method name> <data type list>
+
+<drop data type statement> ::= DROP TYPE <schema_resolved user_defined type name> <drop behavior>
+
+<SQL_invoked routine> ::= <schema routine>
+
+<schema routine> ::= <schema procedure> | <schema function>
+
+<schema procedure> ::= CREATE <SQL_invoked procedure>
+
+<schema function> ::= CREATE <SQL_invoked function>
+
+<SQL_invoked procedure> ::=
+		PROCEDURE <schema qualified routine name> <SQL parameter declaration list> <routine characteristics> <routine body>
+
+<SQL_invoked function> ::=
+		( <function specification> | <method specification designator> ) <routine body>
+
+<SQL parameter declaration list> ::=
+		<left paren> ( <SQL parameter declaration> ( <comma> <SQL parameter declaration> )* )? <right paren>
+
+<SQL parameter declaration> ::= <parameter mode>? <SQL parameter name>? <parameter type> RESULT?
+
+<parameter mode> ::= IN | OUT | INOUT
+
+<parameter type> ::= <data type> <locator indication>?
+
+<locator indication> ::= AS LOCATOR
+
+<function specification> ::=
+		FUNCTION <schema qualified routine name>
+		<SQL parameter declaration list> <returns clause> <routine characteristics> <dispatch clause>?
+
+<method specification designator> ::=
+		SPECIFIC METHOD <specific method name>
+	|	( INSTANCE | STATIC | CONSTRUCTOR )? METHOD <method name> <SQL parameter declaration list>
+		<returns clause>? FOR <schema_resolved user_defined type name>
+
+<routine characteristics> ::= <routine characteristic>*
+
+<routine characteristic> ::=
+		<language clause>
+	|	<parameter style clause>
+	|	SPECIFIC <specific name>
+	|	<deterministic characteristic>
+	|	<SQL_data access indication>
+	|	<null_call clause>
+	|	<dynamic result sets characteristic>
+	|	<savepoint level indication>
+
+<savepoint level indication> ::= NEW SAVEPOINT LEVEL | OLD SAVEPOINT LEVEL
+
+<dynamic result sets characteristic> ::= DYNAMIC RESULT SETS <maximum dynamic result sets>
+
+<parameter style clause> ::= PARAMETER STYLE <parameter style>
+
+<dispatch clause> ::= STATIC DISPATCH
+
+<returns clause> ::= RETURNS <returns type>
+
+<returns type> ::=
+		<returns data type> <result cast>?
+	|	<returns table type>
+
+<returns table type> ::= TABLE <table function column list>
+
+<table function column list> ::=
+		<left paren>
+		<table function column list element> ( <comma> <table function column list element> )*
+		<right paren>
+
+<table function column list element> ::= <column name> <data type>
+
+<result cast> ::= CAST FROM <result cast from type>
+
+<result cast from type> ::= <data type> <locator indication>?
+
+<returns data type> ::= <data type> <locator indication>?
+
+<routine body> ::=
+		<SQL routine spec>
+	|	<external body reference>
+
+<SQL routine spec> ::= <rights clause>? <SQL routine body>
+
+<rights clause> ::= SQL SECURITY INVOKER | SQL SECURITY DEFINER
+
+<SQL routine body> ::= <SQL procedure statement>
+
+<external body reference> ::=
+		EXTERNAL ( NAME <external routine name> )? <parameter style clause>?
+		<transform group specification>? <external security clause>?
+
+<external security clause> ::=
+		EXTERNAL SECURITY DEFINER
+	|	EXTERNAL SECURITY INVOKER
+	|	EXTERNAL SECURITY IMPLEMENTATION DEFINED
+
+<parameter style> ::= SQL | GENERAL
+
+<deterministic characteristic> ::= DETERMINISTIC | NOT DETERMINISTIC
+
+<SQL_data access indication> ::=
+		NO SQL
+	|	CONTAINS SQL
+	|	READS SQL DATA
+	|	MODIFIES SQL DATA
+
+<null_call clause> ::=
+		RETURNS NULL ON NULL INPUT
+	|	CALLED ON NULL INPUT
+
+<maximum dynamic result sets> ::= <unsigned integer>
+
+<transform group specification> ::= TRANSFORM GROUP ( <single group specification> | <multiple group specification> )
+
+<single group specification> ::= <group name>
+
+<multiple group specification> ::= <group specification> ( <comma> <group specification> )*
+
+<group specification> ::= <group name> FOR TYPE <path_resolved user_defined type name>
+
+<alter routine statement> ::= ALTER <specific routine designator> <alter routine characteristics> <alter routine behavior>
+
+<alter routine characteristics> ::= <alter routine characteristic>+
+
+<alter routine characteristic> ::=
+		<language clause>
+	|	<parameter style clause>
+	|	<SQL_data access indication>
+	|	<null_call clause>
+	|	<dynamic result sets characteristic>
+	|	NAME <external routine name>
+
+<alter routine behavior> ::= RESTRICT
+
+<drop routine statement> ::= DROP <specific routine designator> <drop behavior>
+
+<user_defined cast definition> ::=
+		CREATE CAST <left paren> <source data type> AS <target data type> <right paren>
+		WITH <cast function> ( AS ASSIGNMENT )?
+
+<cast function> ::= <specific routine designator>
+
+<source data type> ::= <data type>
+
+<target data type> ::= <data type>
+
+<drop user_defined cast statement> ::=
+		DROP CAST <left paren> <source data type> AS <target data type> <right paren> <drop behavior>
+
+<user_defined ordering definition> ::=
+		CREATE ORDERING FOR <schema_resolved user_defined type name> <ordering form>
+
+<ordering form> ::= <equals ordering form> | <full ordering form>
+
+<equals ordering form> ::= EQUALS ONLY BY <ordering category>
+
+<full ordering form> ::= ORDER FULL BY <ordering category>
+
+<ordering category> ::= <relative category> | <map category> | <state category>
+
+<relative category> ::= RELATIVE WITH <relative function specification>
+
+<map category> ::= MAP WITH <map function specification>
+
+<state category> ::= STATE <specific name>?
+
+<relative function specification> ::= <specific routine designator>
+
+<map function specification> ::= <specific routine designator>
+
+<drop user_defined ordering statement> ::=
+		DROP ORDERING FOR <schema_resolved user_defined type name> <drop behavior>
+
+<transform definition> ::= CREATE ( TRANSFORM | TRANSFORMS ) FOR <schema_resolved user_defined type name> <transform group>+
+
+<transform group> ::= <group name> <left paren> <transform element list> <right paren>
+
+<group name> ::= <identifier>
+
+<transform element list> ::= <transform element> ( <comma> <transform element> )?
+
+<transform element> ::= <to sql> | <from sql>
+
+<to sql> ::= TO SQL WITH <to sql function>
+
+<from sql> ::= FROM SQL WITH <from sql function>
+
+<to sql function> ::= <specific routine designator>
+
+<from sql function> ::= <specific routine designator>
+
+<alter transform statement> ::=
+		ALTER ( TRANSFORM | TRANSFORMS ) FOR <schema_resolved user_defined type name> <alter group>+
+
+<alter group> ::= <group name> <left paren> <alter transform action list> <right paren>
+
+<alter transform action list> ::= <alter transform action> ( <comma> <alter transform action> )*
+
+<alter transform action> ::= <add transform element list> | <drop transform element list>
+
+<add transform element list> ::= ADD <left paren> <transform element list> <right paren>
+
+<drop transform element list> ::= DROP <left paren> <transform kind> ( <comma> <transform kind> )? <drop behavior> <right paren>
+
+<transform kind> ::= TO SQL | FROM SQL
+
+<drop transform statement> ::=
+		DROP ( TRANSFORM | TRANSFORMS ) <transforms to be dropped> FOR <schema_resolved user_defined type name> <drop behavior>
+
+<transforms to be dropped> ::= ALL | <transform group element>
+
+<transform group element> ::= <group name>
+
+<sequence generator definition> ::= CREATE SEQUENCE <sequence generator name> <sequence generator options>?
+
+<sequence generator options> ::= <sequence generator option>+
+
+<sequence generator option> ::= <sequence generator data type option> | <common sequence generator options>
+
+<common sequence generator options> ::= <common sequence generator option>+
+
+<common sequence generator option> ::= <sequence generator start with option> | <basic sequence generator option>
+
+<basic sequence generator option> ::=
+		<sequence generator increment by option>
+	|	<sequence generator maxvalue option>
+	|	<sequence generator minvalue option>
+	|	<sequence generator cycle option>
+
+<sequence generator data type option> ::= AS <data type>
+
+<sequence generator start with option> ::= START WITH <sequence generator start value>
+
+<sequence generator start value> ::= <signed numeric literal>
+
+<sequence generator increment by option> ::= INCREMENT BY <sequence generator increment>
+
+<sequence generator increment> ::= <signed numeric literal>
+
+<sequence generator maxvalue option> ::=
+		MAXVALUE <sequence generator max value>
+	|	NO MAXVALUE
+
+<sequence generator max value> ::= <signed numeric literal>
+
+<sequence generator minvalue option> ::= MINVALUE <sequence generator min value> | NO MINVALUE
+
+<sequence generator min value> ::= <signed numeric literal>
+
+<sequence generator cycle option> ::= CYCLE | NO CYCLE
+
+<alter sequence generator statement> ::=
+		ALTER SEQUENCE <sequence generator name> <alter sequence generator options>
+
+<alter sequence generator options> ::= <alter sequence generator option>+
+
+<alter sequence generator option> ::=
+		<alter sequence generator restart option>
+	|	<basic sequence generator option>
+
+<alter sequence generator restart option> ::= RESTART WITH <sequence generator restart value>
+
+<sequence generator restart value> ::= <signed numeric literal>
+
+<drop sequence generator statement> ::= DROP SEQUENCE <sequence generator name> <drop behavior>
+
+<grant statement> ::= <grant privilege statement> | <grant role statement>
+
+<grant privilege statement> ::=
+		GRANT <privileges> TO <grantee> ( <comma> <grantee> )*
+		( WITH HIERARCHY OPTION )? ( WITH GRANT OPTION )? ( GRANTED BY <grantor> )?
+
+<privileges> ::= <object privileges> ON <object name>
+
+<object name> ::=
+		TABLE? <table name>
+	|	DOMAIN <domain name>
+	|	COLLATION <collation name>
+	|	CHARACTER SET <character set name>
+	|	TRANSLATION <transliteration name>
+	|	TYPE <schema_resolved user_defined type name>
+	|	SEQUENCE <sequence generator name>
+	|	<specific routine designator>
+
+<object privileges> ::=
+		ALL PRIVILEGES
+	|	<action> ( <comma> <action> )*
+
+<action> ::=
+		SELECT
+	|	SELECT <left paren> <privilege column list> <right paren>
+	|	SELECT <left paren> <privilege method list> <right paren>
+	|	DELETE
+	|	INSERT ( <left paren> <privilege column list> <right paren> )?
+	|	UPDATE ( <left paren> <privilege column list> <right paren> )?
+	|	REFERENCES ( <left paren> <privilege column list> <right paren> )?
+	|	USAGE
+	|	TRIGGER
+	|	UNDER
+	|	EXECUTE
+
+<privilege method list> ::= <specific routine designator> ( <comma> <specific routine designator> )*
+
+<privilege column list> ::= <column name list>
+
+<grantee> ::= PUBLIC | <authorization identifier>
+
+<grantor> ::= CURRENT_USER | CURRENT_ROLE
+
+<role definition> ::= CREATE ROLE <role name> ( WITH ADMIN <grantor> )?
+
+<grant role statement> ::=
+		GRANT <role granted> ( <comma> <role granted> )*
+		TO <grantee> ( <comma> <grantee> )* ( WITH ADMIN OPTION )? ( GRANTED BY <grantor> )?
+
+<role granted> ::= <role name>
+
+<drop role statement> ::= DROP ROLE <role name>
+
+<revoke statement> ::=
+		<revoke privilege statement>
+	|	<revoke role statement>
+
+<revoke privilege statement> ::=
+		REVOKE <revoke option extension>? <privileges> FROM <grantee> ( <comma> <grantee> )*
+		( GRANTED BY <grantor> )? <drop behavior>
+
+<revoke option extension> ::= GRANT OPTION FOR | HIERARCHY OPTION FOR
+
+<revoke role statement> ::=
+		REVOKE ( ADMIN OPTION FOR )? <role revoked> ( <comma> <role revoked> )*
+		FROM <grantee> ( <comma> <grantee> )* ( GRANTED BY <grantor> )? <drop behavior>
+
+<role revoked> ::= <role name>
+
+<SQL_client module definition> ::=
+		<module name clause> <language clause> <module authorization clause>
+		<module path specification>?
+		<module transform group specification>?
+		<module collations>?
+		<temporary table declaration>*
+		<module contents>+
+
+<module authorization clause> ::=
+		SCHEMA <schema name>
+	|	AUTHORIZATION <module authorization identifier> ( FOR STATIC ( ONLY | AND DYNAMIC ) )?
+	|	SCHEMA <schema name> AUTHORIZATION <module authorization identifier> ( FOR STATIC ( ONLY | AND DYNAMIC ) )?
+
+<module authorization identifier> ::= <authorization identifier>
+
+<module path specification> ::= <path specification>
+
+<module transform group specification> ::= <transform group specification>
+
+<module collations> ::= <module collation specification>+
+
+<module collation specification> ::= COLLATION <collation name> ( FOR <character set specification list> )?
+
+<character set specification list> ::= <character set specification> ( <comma> <character set specification> )*
+
+<module contents> ::=
+		<declare cursor>
+	|	<dynamic declare cursor>
+	|	<externally_invoked procedure>
+
+<module name clause> ::=
+		MODULE <SQL_client module name>? <module character set specification>?
+
+<module character set specification> ::= NAMES ARE <character set specification>
+
+<externally_invoked procedure> ::=
+		PROCEDURE <procedure name> <host parameter declaration list> <semicolon>
+		<SQL procedure statement> <semicolon>
+
+<host parameter declaration list> ::=
+		<left paren> <host parameter declaration> ( <comma> <host parameter declaration> )* <right paren>
+
+<host parameter declaration> ::=
+		<host parameter name> <host parameter data type>
+	|	<status parameter>
+
+<host parameter data type> ::= <data type> <locator indication>?
+
+<status parameter> ::= SQLSTATE
+
+<SQL procedure statement> ::= <SQL executable statement>
+
+<SQL executable statement> ::=
+		<SQL schema statement>
+	|	<SQL data statement>
+	|	<SQL control statement>
+	|	<SQL transaction statement>
+	|	<SQL connection statement>
+	|	<SQL session statement>
+	|	<SQL diagnostics statement>
+	|	<SQL dynamic statement>
+
+<SQL schema statement> ::=
+		<SQL schema definition statement>
+	|	<SQL schema manipulation statement>
+
+<SQL schema definition statement> ::=
+		<schema definition>
+	|	<table definition>
+	|	<view definition>
+	|	<SQL_invoked routine>
+	|	<grant statement>
+	|	<role definition>
+	|	<domain definition>
+	|	<character set definition>
+	|	<collation definition>
+	|	<transliteration definition>
+	|	<assertion definition>
+	|	<trigger definition>
+	|	<user_defined type definition>
+	|	<user_defined cast definition>
+	|	<user_defined ordering definition>
+	|	<transform definition>
+	|	<sequence generator definition>
+
+<SQL schema manipulation statement> ::=
+		<drop schema statement>
+	|	<alter table statement>
+	|	<drop table statement>
+	|	<drop view statement>
+	|	<alter routine statement>
+	|	<drop routine statement>
+	|	<drop user_defined cast statement>
+	|	<revoke statement>
+	|	<drop role statement>
+	|	<alter domain statement>
+	|	<drop domain statement>
+	|	<drop character set statement>
+	|	<drop collation statement>
+	|	<drop transliteration statement>
+	|	<drop assertion statement>
+	|	<drop trigger statement>
+	|	<alter type statement>
+	|	<drop data type statement>
+	|	<drop user_defined ordering statement>
+	|	<alter transform statement>
+	|	<drop transform statement> | <alter sequence generator statement>
+	|	<drop sequence generator statement>
+
+<SQL data statement> ::=
+		<open statement>
+	|	<fetch statement>
+	|	<close statement>
+	|	<select statement_ single row>
+	|	<free locator statement>
+	|	<hold locator statement>
+	|	<SQL data change statement>
+
+<SQL data change statement> ::=
+		<delete statement_ positioned>
+	|	<delete statement_ searched>
+	|	<insert statement>
+	|	<update statement_ positioned>
+	|	<update statement_ searched>
+	|	<merge statement>
+
+<SQL control statement> ::=
+		<call statement>
+	|	<return statement>
+
+<SQL transaction statement> ::=
+		<start transaction statement>
+	|	<set transaction statement>
+	|	<set constraints mode statement>
+	|	<savepoint statement>
+	|	<release savepoint statement>
+	|	<commit statement>
+	|	<rollback statement>
+
+<SQL connection statement> ::=
+		<connect statement>
+	|	<set connection statement>
+	|	<disconnect statement>
+
+<SQL session statement> ::=
+		<set session user identifier statement>
+	|	<set role statement>
+	|	<set local time zone statement>
+	|	<set session characteristics statement>
+	|	<set catalog statement>
+	|	<set schema statement>
+	|	<set names statement>
+	|	<set path statement>
+	|	<set transform group statement>
+	|	<set session collation statement>
+
+<SQL diagnostics statement> ::= <get diagnostics statement>
+
+<SQL dynamic statement> ::=
+		<system descriptor statement>
+	|	<prepare statement>
+	|	<deallocate prepared statement>
+	|	<describe statement>
+	|	<execute statement>
+	|	<execute immediate statement>
+	|	<SQL dynamic data statement>
+
+<SQL dynamic data statement> ::=
+		<allocate cursor statement>
+	|	<dynamic open statement>
+	|	<dynamic fetch statement>
+	|	<dynamic close statement>
+	|	<dynamic delete statement_ positioned>
+	|	<dynamic update statement_ positioned>
+
+<system descriptor statement> ::=
+		<allocate descriptor statement>
+	|	<deallocate descriptor statement>
+	|	<set descriptor statement>
+	|	<get descriptor statement>
+
+<declare cursor> ::=
+		DECLARE <cursor name> <cursor sensitivity>? <cursor scrollability>? CURSOR
+		<cursor holdability>? <cursor returnability>? FOR <cursor specification>
+
+<cursor sensitivity> ::= SENSITIVE | INSENSITIVE | ASENSITIVE
+
+<cursor scrollability> ::= SCROLL | NO SCROLL
+
+<cursor holdability> ::= WITH HOLD | WITHOUT HOLD
+
+<cursor returnability> ::= WITH RETURN | WITHOUT RETURN
+
+<cursor specification> ::= <query expression> <order by clause>? <updatability clause>?
+
+<updatability clause> ::= FOR ( READ ONLY | UPDATE ( OF <column name list> )? )
+
+<order by clause> ::= ORDER BY <sort specification list>
+
+<open statement> ::= OPEN <cursor name>
+
+<fetch statement> ::=
+		FETCH ( <fetch orientation>? FROM )? <cursor name> INTO <fetch target list>
+
+<fetch orientation> ::=
+		NEXT
+	|	PRIOR
+	|	FIRST
+	|	LAST
+	|	( ABSOLUTE | RELATIVE ) <simple value specification>
+
+<fetch target list> ::= <target specification> ( <comma> <target specification> )*
+
+<close statement> ::= CLOSE <cursor name>
+
+<select statement_ single row> ::=
+		SELECT <set quantifier>? <select list> INTO <select target list> <table expression>
+
+<select target list> ::= <target specification> ( <comma> <target specification> )*
+
+<delete statement_ positioned> ::= DELETE FROM <target table> WHERE CURRENT OF <cursor name>
+
+<target table> ::=
+		<table name>
+	|	ONLY <left paren> <table name> <right paren>
+
+<delete statement_ searched> ::= DELETE FROM <target table> ( WHERE <search condition> )?
+
+<insert statement> ::= INSERT INTO <insertion target> <insert columns and source>
+
+<insertion target> ::= <table name>
+
+<insert columns and source> ::=
+		<from subquery>
+	|	<from constructor>
+	|	<from default>
+
+<from subquery> ::= ( <left paren> <insert column list> <right paren> )? <override clause>? <query expression>
+
+<from constructor> ::=
+		( <left paren> <insert column list> <right paren> )? <override clause>? <contextually typed table value constructor>
+
+<override clause> ::= OVERRIDING USER VALUE | OVERRIDING SYSTEM VALUE
+
+<from default> ::= DEFAULT VALUES
+
+<insert column list> ::= <column name list>
+
+<merge statement> ::=
+		MERGE INTO <target table> ( AS? <merge correlation name> )?
+		USING <table reference> ON <search condition> <merge operation specification>
+
+<merge correlation name> ::= <correlation name>
+
+<merge operation specification> ::= <merge when clause>+
+
+<merge when clause> ::= <merge when matched clause> | <merge when not matched clause>
+
+<merge when matched clause> ::= WHEN MATCHED THEN <merge update specification>
+
+<merge when not matched clause> ::= WHEN NOT MATCHED THEN <merge insert specification>
+
+<merge update specification> ::= UPDATE SET <set clause list>
+
+<merge insert specification> ::=
+		INSERT ( <left paren> <insert column list> <right paren> )?
+		<override clause>? VALUES <merge insert value list>
+
+<merge insert value list> ::=
+		<left paren> <merge insert value element> ( <comma> <merge insert value element> )* <right paren>
+
+<merge insert value element> ::= <value expression> | <contextually typed value specification>
+
+<update statement_ positioned> ::= UPDATE <target table> SET <set clause list> WHERE CURRENT OF <cursor name>
+
+<update statement_ searched> ::= UPDATE <target table> SET <set clause list> ( WHERE <search condition> )?
+
+<set clause list> ::= <set clause> ( <comma> <set clause> )*
+
+<set clause> ::=
+		<multiple column assignment>
+	|	<set target> <equals operator> <update source>
+
+<set target> ::= <update target> | <mutated set clause>
+
+<multiple column assignment> ::= <set target list> <equals operator> <assigned row>
+
+<set target list> ::= <left paren> <set target> ( <comma> <set target> )* <right paren>
+
+<assigned row> ::= <contextually typed row value expression>
+
+<update target> ::=
+		<object column>
+	|	<object column> <left bracket or trigraph> <simple value specification> <right bracket or trigraph>
+
+<object column> ::= <column name>
+
+<mutated set clause> ::= <mutated target> <period> <method name>
+
+<mutated target> ::= <object column> | <mutated set clause>
+
+<update source> ::= <value expression> | <contextually typed value specification>
+
+<temporary table declaration> ::=
+		DECLARE LOCAL TEMPORARY TABLE <table name> <table element list>
+		( ON COMMIT <table commit action> ROWS )?
+
+<free locator statement> ::= FREE LOCATOR <locator reference> ( <comma> <locator reference> )*
+
+<locator reference> ::= <host parameter name> | <embedded variable name>
+
+<hold locator statement> ::= HOLD LOCATOR <locator reference> ( <comma> <locator reference> )*
+
+<call statement> ::= CALL <routine invocation>
+
+<return statement> ::= RETURN <return value>
+
+<return value> ::= <value expression> | NULL
+
+<start transaction statement> ::= START TRANSACTION ( <transaction mode> ( <comma> <transaction mode> )* )?
+
+<transaction mode> ::= <isolation level> | <transaction access mode> | <diagnostics size>
+
+<transaction access mode> ::= READ ONLY | READ WRITE
+
+<isolation level> ::= ISOLATION LEVEL <level of isolation>
+
+<level of isolation> ::= READ UNCOMMITTED | READ COMMITTED | REPEATABLE READ | SERIALIZABLE
+
+<diagnostics size> ::= DIAGNOSTICS SIZE <number of conditions>
+
+<number of conditions> ::= <simple value specification>
+
+<set transaction statement> ::= SET LOCAL? <transaction characteristics>
+
+<transaction characteristics> ::= TRANSACTION <transaction mode> ( <comma> <transaction mode> )*
+
+<set constraints mode statement> ::= SET CONSTRAINTS <constraint name list> ( DEFERRED | IMMEDIATE )
+
+<constraint name list> ::= ALL | <constraint name> ( <comma> <constraint name> )*
+
+<savepoint statement> ::= SAVEPOINT <savepoint specifier>
+
+<savepoint specifier> ::= <savepoint name>
+
+<release savepoint statement> ::= RELEASE SAVEPOINT <savepoint specifier>
+
+<commit statement> ::= COMMIT WORK? ( AND NO? CHAIN )?
+
+<rollback statement> ::= ROLLBACK WORK? ( AND NO? CHAIN )? <savepoint clause>?
+
+<savepoint clause> ::= TO SAVEPOINT <savepoint specifier>
+
+<connect statement> ::= CONNECT TO <connection target>
+
+<connection target> ::=
+		<sql_server name> ( AS <connection name> )? ( USER <connection user name> )?
+	|	DEFAULT
+
+<set connection statement> ::= SET CONNECTION <connection object>
+
+<connection object> ::= DEFAULT | <connection name> 
+
+<disconnect statement> ::= DISCONNECT <disconnect object>
+
+<disconnect object> ::= <connection object> | ALL |	CURRENT
+
+<set session characteristics statement> ::= SET SESSION CHARACTERISTICS AS <session characteristic list>
+
+<session characteristic list> ::= <session characteristic> ( <comma> <session characteristic> )*
+
+<session characteristic> ::= <transaction characteristics>
+
+<set session user identifier statement> ::= SET SESSION AUTHORIZATION <value specification>
+
+<set role statement> ::= SET ROLE <role specification>
+
+<role specification> ::= <value specification> | NONE
+
+<set local time zone statement> ::= SET TIME ZONE <set time zone value>
+
+<set time zone value> ::= <interval value expression> | LOCAL
+
+<set catalog statement> ::= SET <catalog name characteristic>
+
+<catalog name characteristic> ::= CATALOG <value specification>
+
+<set schema statement> ::= SET <schema name characteristic>
+
+<schema name characteristic> ::= SCHEMA <value specification>
+
+<set names statement> ::= SET <character set name characteristic>
+
+<character set name characteristic> ::= NAMES <value specification>
+
+<set path statement> ::= SET <SQL_path characteristic>
+
+<SQL_path characteristic> ::= PATH <value specification>
+
+<set transform group statement> ::= SET <transform group characteristic>
+
+<transform group characteristic> ::=
+		DEFAULT TRANSFORM GROUP <value specification>
+	|	TRANSFORM GROUP FOR TYPE <path_resolved user_defined type name> <value specification>
+
+<set session collation statement> ::=
+		SET COLLATION <collation specification> ( FOR <character set specification list> )?
+	|	SET NO COLLATION ( FOR <character set specification list> )?
+
+<character set specification list> ::= <character set specification> ( <comma> <character set specification> )*
+
+<collation specification> ::= <value specification>
+
+<allocate descriptor statement> ::= ALLOCATE SQL? DESCRIPTOR <descriptor name> ( WITH MAX <occurrences> )?
+
+<occurrences> ::= <simple value specification>
+
+<deallocate descriptor statement> ::= DEALLOCATE SQL? DESCRIPTOR <descriptor name>
+
+<get descriptor statement> ::= GET SQL? DESCRIPTOR <descriptor name> <get descriptor information>
+
+<get descriptor information> ::=
+		<get header information> ( <comma> <get header information> )*
+	|	VALUE <item number> <get item information> ( <comma> <get item information> )*
+
+<get header information> ::= <simple target specification 1> <equals operator> <header item name>
+
+<header item name> ::= COUNT | KEY_TYPE | DYNAMIC_FUNCTION | DYNAMIC_FUNCTION_CODE | TOP_LEVEL_COUNT
+
+<get item information> ::= <simple target specification 2> <equals operator> <descriptor item name>
+
+<item number> ::= <simple value specification>
+
+<simple target specification 1> ::= <simple target specification>
+
+<simple target specification 2> ::= <simple target specification>
+
+<descriptor item name> ::=
+		CARDINALITY
+	|	CHARACTER_SET_CATALOG
+	|	CHARACTER_SET_NAME
+	|	CHARACTER_SET_SCHEMA
+	|	COLLATION_CATALOG
+	|	COLLATION_NAME
+	|	COLLATION_SCHEMA
+	|	DATA
+	|	DATETIME_INTERVAL_CODE
+	|	DATETIME_INTERVAL_PRECISION
+	|	DEGREE
+	|	INDICATOR
+	|	KEY_MEMBER
+	|	LENGTH
+	|	LEVEL
+	|	NAME
+	|	NULLABLE
+	|	OCTET_LENGTH
+	|	PARAMETER_MODE
+	|	PARAMETER_ORDINAL_POSITION
+	|	PARAMETER_SPECIFIC_CATALOG
+	|	PARAMETER_SPECIFIC_NAME
+	|	PARAMETER_SPECIFIC_SCHEMA
+	|	PRECISION
+	|	RETURNED_CARDINALITY
+	|	RETURNED_LENGTH
+	|	RETURNED_OCTET_LENGTH
+	|	SCALE
+	|	SCOPE_CATALOG
+	|	SCOPE_NAME
+	|	SCOPE_SCHEMA
+	|	TYPE
+	|	UNNAMED
+	|	USER_DEFINED_TYPE_CATALOG
+	|	USER_DEFINED_TYPE_NAME
+	|	USER_DEFINED_TYPE_SCHEMA
+	|	USER_DEFINED_TYPE_CODE
+
+<set descriptor statement> ::= SET SQL? DESCRIPTOR <descriptor name> <set descriptor information>
+
+<set descriptor information> ::=
+		<set header information> ( <comma> <set header information> )*
+	|	VALUE <item number> <set item information> ( <comma> <set item information> )*
+
+<set header information> ::= <header item name> <equals operator> <simple value specification 1>
+
+<set item information> ::= <descriptor item name> <equals operator> <simple value specification 2>
+
+<simple value specification 1> ::= <simple value specification>
+
+<simple value specification 2> ::= <simple value specification>
+
+<prepare statement> ::=
+		PREPARE <SQL statement name> <attributes specification>? FROM <SQL statement variable>
+
+<attributes specification> ::= ATTRIBUTES <attributes variable>
+
+<attributes variable> ::= <simple value specification>
+
+<SQL statement variable> ::= <simple value specification>
+
+<preparable statement> ::=
+		<preparable SQL data statement>
+	|	<preparable SQL schema statement>
+	|	<preparable SQL transaction statement>
+	|	<preparable SQL control statement>
+	|	<preparable SQL session statement>
+/*
+################################################################################
+# SKIPPED
+################################################################################
+	|	<preparable implementation_defined statement>
+*/
+
+<preparable SQL data statement> ::=
+		<delete statement_ searched>
+	|	<dynamic single row select statement>
+	|	<insert statement>
+	|	<dynamic select statement>
+	|	<update statement_ searched>
+	|	<merge statement>
+	|	<preparable dynamic delete statement_ positioned>
+	|	<preparable dynamic update statement_ positioned>
+
+<preparable SQL schema statement> ::= <SQL schema statement>
+
+<preparable SQL transaction statement> ::= <SQL transaction statement>
+
+<preparable SQL control statement> ::= <SQL control statement>
+
+<preparable SQL session statement> ::= <SQL session statement>
+
+<dynamic select statement> ::= <cursor specification>
+
+/*
+################################################################################
+# SKIPPED
+################################################################################
+<preparable implementation_defined statement> ::= !! See the Syntax Rules.
+*/
+
+<cursor attributes> ::= <cursor attribute>+
+
+<cursor attribute> ::=
+		<cursor sensitivity>
+	|	<cursor scrollability>
+	|	<cursor holdability>
+	|	<cursor returnability>
+
+<deallocate prepared statement> ::= DEALLOCATE PREPARE <SQL statement name>
+
+<describe statement> ::= <describe input statement> | <describe output statement>
+
+<describe input statement> ::= DESCRIBE INPUT <SQL statement name> <using descriptor> <nesting option>?
+
+<describe output statement> ::= DESCRIBE OUTPUT? <described object> <using descriptor> <nesting option>?
+
+<nesting option> ::= WITH NESTING | WITHOUT NESTING
+
+<using descriptor> ::= USING SQL? DESCRIPTOR <descriptor name>
+
+<described object> ::=
+		<SQL statement name>
+	|	CURSOR <extended cursor name> STRUCTURE
+
+<input using clause> ::= <using arguments> | <using input descriptor>
+
+<using arguments> ::= USING <using argument> ( <comma> <using argument> )*
+
+<using argument> ::= <general value specification>
+
+<using input descriptor> ::= <using descriptor>
+
+<output using clause> ::= <into arguments> | <into descriptor>
+
+<into arguments> ::= INTO <into argument> ( <comma> <into argument> )*
+
+<into argument> ::= <target specification>
+
+<into descriptor> ::= INTO SQL? DESCRIPTOR <descriptor name>
+
+<execute statement> ::= EXECUTE <SQL statement name> <result using clause>? <parameter using clause>?
+
+<result using clause> ::= <output using clause>
+
+<parameter using clause> ::= <input using clause>
+
+<execute immediate statement> ::= EXECUTE IMMEDIATE <SQL statement variable>
+
+<dynamic declare cursor> ::=
+		DECLARE <cursor name> <cursor sensitivity>? <cursor scrollability>? CURSOR
+		<cursor holdability>? <cursor returnability>? FOR <statement name>
+
+<allocate cursor statement> ::= ALLOCATE <extended cursor name> <cursor intent>
+
+<cursor intent> ::= <statement cursor> | <result set cursor>
+
+<statement cursor> ::=
+		<cursor sensitivity>? <cursor scrollability>? CURSOR
+		<cursor holdability>? <cursor returnability>? FOR <extended statement name>
+
+<result set cursor> ::= FOR PROCEDURE <specific routine designator>
+
+<dynamic open statement> ::= OPEN <dynamic cursor name> <input using clause>?
+
+<dynamic fetch statement> ::= FETCH ( <fetch orientation>? FROM )? <dynamic cursor name> <output using clause>
+
+<dynamic single row select statement> ::= <query specification>
+
+<dynamic close statement> ::= CLOSE <dynamic cursor name>
+
+<dynamic delete statement_ positioned> ::= DELETE FROM <target table> WHERE CURRENT OF <dynamic cursor name>
+
+<dynamic update statement_ positioned> ::=
+		UPDATE <target table> SET <set clause list> WHERE CURRENT OF <dynamic cursor name>
+
+<preparable dynamic delete statement_ positioned> ::=
+		DELETE ( FROM <target table> )? WHERE CURRENT OF <scope option>? <cursor name>
+
+<preparable dynamic update statement_ positioned> ::=
+		UPDATE <target table>? SET <set clause list> WHERE CURRENT OF <scope option>? <cursor name>
+
+<embedded SQL host program> ::=
+		<embedded SQL Ada program>
+	|	<embedded SQL C program>
+	|	<embedded SQL COBOL program>
+	|	<embedded SQL Fortran program>
+	|	<embedded SQL MUMPS program>
+	|	<embedded SQL Pascal program>
+	|	<embedded SQL PL_I program>
+
+<embedded SQL statement> ::= <SQL prefix> <statement or declaration> <SQL terminator>?
+
+<statement or declaration> ::=
+		<declare cursor>
+	|	<dynamic declare cursor>
+	|	<temporary table declaration>
+	|	<embedded authorization declaration>
+	|	<embedded path specification>
+	|	<embedded transform group specification>
+	|	<embedded collation specification>
+	|	<embedded exception declaration>
+/* 	|	<handler declaration> UNDEFINED */
+	|	<SQL procedure statement>
+
+<SQL prefix> ::= EXEC SQL | <ampersand>SQL<left paren>
+
+<SQL terminator> ::= END-EXEC | <semicolon> | <right paren>
+
+<embedded authorization declaration> ::= DECLARE <embedded authorization clause>
+
+<embedded authorization clause> ::=
+		SCHEMA <schema name>
+	|	AUTHORIZATION <embedded authorization identifier> ( FOR STATIC ( ONLY | AND DYNAMIC ) )?
+	|	SCHEMA <schema name> AUTHORIZATION <embedded authorization identifier> ( FOR STATIC ( ONLY | AND DYNAMIC ) )?
+
+<embedded authorization identifier> ::= <module authorization identifier>
+
+<embedded path specification> ::= <path specification>
+
+<embedded transform group specification> ::= <transform group specification>
+
+<embedded collation specification> ::= <module collations>
+
+<embedded SQL declare section> ::=
+		<embedded SQL begin declare> <embedded character set declaration>? <host variable definition>* <embedded SQL end declare>
+	|	<embedded SQL MUMPS declare>
+
+<embedded character set declaration> ::= SQL NAMES ARE <character set specification>
+
+<embedded SQL begin declare> ::= <SQL prefix> BEGIN DECLARE SECTION <SQL terminator>?
+
+<embedded SQL end declare> ::= <SQL prefix> END DECLARE SECTION <SQL terminator>?
+
+<embedded SQL MUMPS declare> ::=
+		<SQL prefix> BEGIN DECLARE SECTION <embedded character set declaration>?
+		<host variable definition>* END DECLARE SECTION <SQL terminator>
+
+<host variable definition> ::=
+		<Ada variable definition>
+	|	<C variable definition>
+	|	<COBOL variable definition>
+	|	<Fortran variable definition>
+	|	<MUMPS variable definition>
+	|	<Pascal variable definition>
+	|	<PL_I variable definition>
+
+<embedded variable name> ::= <colon> <host identifier>
+
+<host identifier> ::=
+		<Ada host identifier>
+	|	<C host identifier>
+	|	<COBOL host identifier>
+	|	<Fortran host identifier>
+	|	<MUMPS host identifier>
+	|	<Pascal host identifier>
+	|	<PL_I host identifier>
+
+<embedded exception declaration> ::= WHENEVER <condition> <condition action>
+
+<condition> ::= <SQL condition>
+
+<SQL condition> ::=
+		<major category>
+	|	SQLSTATE ( <SQLSTATE class value> ( <comma> <SQLSTATE subclass value> )? )
+	|	CONSTRAINT <constraint name>
+
+<major category> ::= SQLEXCEPTION | SQLWARNING | NOT FOUND
+
+<SQLSTATE class value> ::= <SQLSTATE char><SQLSTATE char> /*  !! See the Syntax Rules. */
+
+<SQLSTATE subclass value> ::= <SQLSTATE char><SQLSTATE char><SQLSTATE char> /* !! See the Syntax Rules. */
+
+<SQLSTATE char L0> ~ <simple Latin upper case letter L0> | <digit L0>
+<SQLSTATE char> ~ <SQLSTATE char L0>
+
+<condition action> ::= CONTINUE | <go to>
+
+<go to> ::= ( GOTO | GO TO ) <goto target>
+
+/*
+<goto target> ::=
+		<host label identifier>
+	|	<unsigned integer>
+	|	<host PL_I label variable>
+
+<host label identifier> ::= !! See the Syntax Rules.
+
+<host PL_I label variable> ::= !! See the Syntax Rules.
+*/
+
+<goto target> ::=
+		<unsigned integer>
+
+<embedded SQL Ada program> ::= EXEC SQL /* !! See the Syntax Rules. */
+
+<Ada variable definition> ::=
+		<Ada host identifier> ( <comma> <Ada host identifier> )* <colon> <Ada type specification> <Ada initial value>?
+
+<Ada initial value> ::= <Ada assignment operator> <character representation>+
+
+<Ada assignment operator> ::= <colon><equals operator>
+
+<Ada host identifier> ~ <host identifier L0>
+
+/*
+<Ada host identifier> ::= <Ada host identifier letter> ( <underscore>? ( <Ada host identifier letter> | <digit> ) )*
+
+<Ada host identifier letter> ::= <simple Latin letter>
+*/
+
+<Ada type specification> ::=
+		<Ada qualified type specification>
+	|	<Ada unqualified type specification>
+	|	<Ada derived type specification>
+
+<Ada qualified type specification> ::=
+		'Interfaces.SQL' <period> CHAR ( CHARACTER SET IS? <character set specification> )?
+		<left paren> 1 <double period> <length> <right paren>
+	|	'Interfaces.SQL' <period> SMALLINT
+	|	'Interfaces.SQL' <period> INT
+	|	'Interfaces.SQL' <period> BIGINT
+	|	'Interfaces.SQL' <period> REAL
+	|	'Interfaces.SQL' <period> DOUBLE_PRECISION
+	|	'Interfaces.SQL' <period> BOOLEAN
+	|	'Interfaces.SQL' <period> SQLSTATE_TYPE
+	|	'Interfaces.SQL' <period> INDICATOR_TYPE
+
+<Ada unqualified type specification> ::=
+		CHAR <left paren> 1 <double period> <length> <right paren>
+	|	SMALLINT
+	|	INT
+	|	BIGINT
+	|	REAL
+	|	DOUBLE_PRECISION
+	|	BOOLEAN
+	|	SQLSTATE_TYPE
+	|	INDICATOR_TYPE
+
+<Ada derived type specification> ::=
+		<Ada CLOB variable>
+	|	<Ada CLOB locator variable>
+	|	<Ada BLOB variable>
+	|	<Ada BLOB locator variable>
+	|	<Ada user_defined type variable>
+	|	<Ada user_defined type locator variable>
+	|	<Ada REF variable>
+	|	<Ada array locator variable>
+	|	<Ada multiset locator variable>
+
+<Ada CLOB variable> ::=
+		SQL TYPE IS CLOB <left paren> <large object length> <right paren> ( CHARACTER SET IS? <character set specification> )?
+
+<Ada CLOB locator variable> ::= SQL TYPE IS CLOB AS LOCATOR
+
+<Ada BLOB variable> ::= SQL TYPE IS BLOB <left paren> <large object length> <right paren>
+
+<Ada BLOB locator variable> ::= SQL TYPE IS BLOB AS LOCATOR
+
+<Ada user_defined type variable> ::= SQL TYPE IS <path_resolved user_defined type name> AS <predefined type>
+
+<Ada user_defined type locator variable> ::= SQL TYPE IS <path_resolved user_defined type name> AS LOCATOR
+
+<Ada REF variable> ::= SQL TYPE IS <reference type>
+
+<Ada array locator variable> ::= SQL TYPE IS <array type> AS LOCATOR
+
+<Ada multiset locator variable> ::= SQL TYPE IS <multiset type> AS LOCATOR
+
+<embedded SQL C program> ::= EXEC SQL /* !! See the Syntax Rules. */
+
+<C variable definition> ::= <C storage class>? <C class modifier>? <C variable specification> <semicolon>
+
+<C variable specification> ::= <C numeric variable> | <C character variable> | <C derived variable>
+
+<C storage class> ::= auto | extern | static
+
+<C class modifier> ::= const | volatile
+
+<C numeric variable> ::=
+		( long long | long | short | float | double ) <C host identifier> <C initial value>?
+		( <comma> <C host identifier> <C initial value>? )*
+
+<C character variable> ::=
+		<C character type> ( CHARACTER SET IS? <character set specification> )?
+		<C host identifier> <C array specification> <C initial value>?
+		( <comma> <C host identifier> <C array specification> <C initial value>? )*
+
+<C character type> ::= char | unsigned char | unsigned short
+
+<C array specification> ::= <left bracket> <length> <right bracket>
+
+<C host identifier> ~ <host identifier L0>
+
+/*
+<C host identifier> ::= <regular identifier> */ /* !! See the Syntax Rules. */
+
+<C derived variable> ::=
+		<C VARCHAR variable>
+	|	<C NCHAR variable>
+	|	<C NCHAR VARYING variable>
+	|	<C CLOB variable>
+	|	<C NCLOB variable>
+	|	<C BLOB variable>
+	|	<C user_defined type variable>
+	|	<C CLOB locator variable>
+	|	<C BLOB locator variable>
+	|	<C array locator variable>
+	|	<C multiset locator variable>
+	|	<C user_defined type locator variable>
+	|	<C REF variable>
+
+<C VARCHAR variable> ::=
+		VARCHAR ( CHARACTER SET IS? <character set specification> )?
+		<C host identifier> <C array specification> <C initial value>?
+		( <comma> <C host identifier> <C array specification> <C initial value>? )*
+
+<C NCHAR variable> ::=
+		NCHAR ( CHARACTER SET IS? <character set specification> )?
+		<C host identifier> <C array specification> <C initial value>?
+		( <comma> <C host identifier> <C array specification> <C initial value>? )*
+
+<C NCHAR VARYING variable> ::=
+		NCHAR VARYING ( CHARACTER SET IS? <character set specification> )?
+		<C host identifier> <C array specification> <C initial value>?
+		( <comma> <C host identifier> <C array specification> <C initial value>? )*
+
+<C CLOB variable> ::=
+		SQL TYPE IS CLOB <left paren> <large object length> <right paren>
+		( CHARACTER SET IS? <character set specification> )?
+		<C host identifier> <C initial value>?
+		( <comma> <C host identifier> <C initial value>? )*
+
+<C NCLOB variable> ::=
+		SQL TYPE IS NCLOB <left paren> <large object length> <right paren>
+		( CHARACTER SET IS? <character set specification> )?
+		<C host identifier> <C initial value>?
+		( <comma> <C host identifier> <C initial value>? )*
+
+<C user_defined type variable> ::=
+		SQL TYPE IS <path_resolved user_defined type name> AS <predefined type>
+		<C host identifier> <C initial value>?
+		( <comma> <C host identifier> <C initial value>? )*
+
+<C BLOB variable> ::=
+		SQL TYPE IS BLOB <left paren> <large object length> <right paren>
+		<C host identifier> <C initial value>?
+		( <comma> <C host identifier> <C initial value>? )*
+
+<C CLOB locator variable> ::=
+		SQL TYPE IS CLOB AS LOCATOR
+		<C host identifier> <C initial value>?
+		( <comma> <C host identifier> <C initial value>? )*
+
+<C BLOB locator variable> ::=
+		SQL TYPE IS BLOB AS LOCATOR
+		<C host identifier> <C initial value>?
+		( <comma> <C host identifier> <C initial value>? )*
+
+<C array locator variable> ::=
+		SQL TYPE IS <array type> AS LOCATOR
+		<C host identifier> <C initial value>?
+		( <comma> <C host identifier> <C initial value>? )*
+
+<C multiset locator variable> ::=
+		SQL TYPE IS <multiset type> AS LOCATOR
+		<C host identifier> <C initial value>?
+		( <comma> <C host identifier> <C initial value>? )*
+
+<C user_defined type locator variable> ::=
+		SQL TYPE IS
+		<path_resolved user_defined type name> AS LOCATOR
+		<C host identifier> <C initial value>?
+		( <comma> <C host identifier> <C initial value>? )*
+
+<C REF variable> ::= SQL TYPE IS <reference type>
+
+<C initial value> ::= <equals operator> <character representation>+
+
+<embedded SQL COBOL program> ::= EXEC SQL /* !! See the Syntax Rules. */
+
+<COBOL host identifier> ~ <host identifier L0>
+
+<COBOL variable definition> ::=
+		( 01 | 77 ) <COBOL host identifier> <COBOL type specification>
+		<character representation>* <period>
+
+/* As per http://www.cs.vu.nl/grammarware/browsable/vs-cobol-ii/#gdef:identifier */
+/*
+<COBOL host identifier> ::= <COBOL qualified-data-name> ( "(" <COBOL subscript> ")" )* ( "(" <COBOL leftmost-character-position> ":" <COBOL length>? ")" )?
+
+<COBOL qualified-data-name> ::= <COBOL data-name> ( ( "IN" | "OF" ) <COBOL data-name> )* ( ( "IN" | "OF" ) <COBOL file-name> )?
+
+<COBOL data-name> ::= <COBOL alphabetic-user-defined-word>
+
+<COBOL alphabetic-user-defined-word> ::= (<digit>+ [\-]*)* <digit>* [A-Za-z] [A-Za-z0-9]* ([\-]+ [A-Za-z0-9]+)*
+
+<COBOL file-name> ::= <COBOL alphabetic-user-defined-word>
+
+<COBOL subscript> ::= (  <COBOL integer>
+                       | <COBOL qualified-data-name> ( ( "+" | "-" ) <COBOL integer> )?
+                       | <COBOL index-name> ( ( "+" | "-" ) <COBOL integer> )?
+                      )+
+
+<COBOL integer> ::= [0]* [1-9] <digit>*
+
+<COBOL index-name> ::= <COBOL alphabetic-user-defined-word>
+
+<COBOL host identifier> ::= "LINAGE-COUNTER" ( ( "IN" | "OF" ) <COBOL file-name> )?
+
+<COBOL leftmost-character-position> ::= <COBOL arithmetic-expression>
+
+<COBOL length> ::= <COBOL arithmetic-expression>
+
+<COBOL arithmetic-expression> ::= <COBOL times-div> ( ( "+" | "-" ) <COBOL times-div> )*
+
+<COBOL times-div> ::= <COBOL power> ( ( "*" | "/" ) <COBOL power> )*
+
+<COBOL power> ::= ( ( "+" | "-" ) )? <COBOL basis> ( "**" <COBOL basis> )*
+
+<COBOL basis> ::= <COBOL host identifier> | <COBOL literal> | "(" <COBOL arithmetic-expression> ")"
+
+<COBOL literal> ::= <COBOL nonnumeric>
+                  | <COBOL numeric>
+                  | <COBOL dbcs>
+                  | <COBOL figurative-constant>
+
+<COBOL nonnumeric> ::= '"' ([^"] | '"' '"')* '"'
+                     | "'" ([^'] | "'" "'")* "'"
+                     | "X" '"' <COBOL hexdigits> '"'
+                     | "X" "'" <COBOL hexdigits> "'"
+
+<COBOL hexdigits> ::= [0-9A-Fa-f]+
+
+<COBOL numeric> ::= ('+' | '-')? (<digit>* '.' <digit>+ | <digit>+)
+
+<COBOL dbcs> = NOT IMPLEMENTED
+
+<COBOL figurative-constant> ::= "ZERO"
+                              | "ZEROS"
+                              | "ZEROES"
+                              | "SPACE"
+                              | "SPACES"
+                              | "HIGH-VALUE"
+                              | "HIGH-VALUES"
+                              | "LOW-VALUE"
+                              | "LOW-VALUES"
+                              | "QUOTE"
+                              | "QUOTES"
+                              | "ALL" <COBOL literal>
+                              | "NULL"
+                              | "NULLS"
+
+*/
+
+<COBOL type specification> ::=
+		<COBOL character type>
+	|	<COBOL national character type>
+	|	<COBOL numeric type>
+	|	<COBOL integer type>
+	|	<COBOL derived type specification>
+
+<COBOL derived type specification> ::=
+		<COBOL CLOB variable>
+	|	<COBOL NCLOB variable>
+	|	<COBOL BLOB variable>
+	|	<COBOL user_defined type variable>
+	|	<COBOL CLOB locator variable>
+	|	<COBOL BLOB locator variable>
+	|	<COBOL array locator variable>
+	|	<COBOL multiset locator variable>
+	|	<COBOL user_defined type locator variable>
+	|	<COBOL REF variable>
+
+<COBOL character type> ::=
+		( CHARACTER SET IS? <character set specification> )?
+		( PIC | PICTURE ) IS? ( X ( <left paren> <length> <right paren> )? )+
+
+<COBOL national character type> ::=
+		( CHARACTER SET IS? <character set specification> )?
+		( PIC | PICTURE ) IS? ( N ( <left paren> <length> <right paren> )? )+
+
+<COBOL CLOB variable> ::=
+		( USAGE IS? )?
+		SQL TYPE IS CLOB <left paren> <large object length> <right paren>
+		( CHARACTER SET IS? <character set specification> )?
+
+<COBOL NCLOB variable> ::=
+		( USAGE IS? )?
+		SQL TYPE IS NCLOB <left paren> <large object length> <right paren>
+		( CHARACTER SET IS? <character set specification> )?
+
+<COBOL BLOB variable> ::=
+		( USAGE IS? )?
+		SQL TYPE IS BLOB <left paren> <large object length> <right paren>
+
+<COBOL user_defined type variable> ::=
+		( USAGE IS? )? SQL TYPE IS <path_resolved user_defined type name> AS <predefined type>
+
+<COBOL CLOB locator variable> ::=
+		( USAGE IS? )? SQL TYPE IS CLOB AS LOCATOR
+
+<COBOL BLOB locator variable> ::=
+		( USAGE IS? )? SQL TYPE IS BLOB AS LOCATOR
+
+<COBOL array locator variable> ::=
+	( USAGE IS? )? SQL TYPE IS <array type> AS LOCATOR
+
+<COBOL multiset locator variable> ::=
+	( USAGE IS? )? SQL TYPE IS <multiset type> AS LOCATOR
+
+<COBOL user_defined type locator variable> ::=
+	( USAGE IS? )? SQL TYPE IS <path_resolved user_defined type name> AS LOCATOR
+
+<COBOL REF variable> ::= ( USAGE IS? )? SQL TYPE IS <reference type>
+
+<COBOL numeric type> ::=
+		( PIC | PICTURE ) IS? S <COBOL nines specification> ( USAGE IS? )? DISPLAY SIGN LEADING SEPARATE
+
+<COBOL nines specification> ::=
+		<COBOL nines> ( V <COBOL nines>? )?
+	|	V <COBOL nines>
+
+<COBOL integer type> ::= <COBOL binary integer>
+
+<COBOL binary integer> ::= ( PIC | PICTURE ) IS? S<COBOL nines> ( USAGE IS? )? BINARY
+
+<COBOL nines> ::= ( 9 ( <left paren> <length> <right paren> )? )+
+
+<embedded SQL Fortran program> ::= EXEC SQL /* !! See the Syntax Rules. */
+
+<Fortran host identifier> ~ <host identifier L0>
+
+<Fortran variable definition> ::=
+		<Fortran type specification> <Fortran host identifier> ( <comma> <Fortran host identifier> )*
+
+/*
+<Fortran host identifier> ::= <simple Latin letter> (<simple Latin letter> | <digit> | <underscore> )*
+*/
+
+<Fortran type specification> ::=
+		CHARACTER ( <asterisk> <length> )? ( CHARACTER SET IS? <character set specification> )?
+	|	CHARACTER KIND <equals operator> [0-9] [0-9]* ( <asterisk> <length> )? ( CHARACTER SET IS? <character set specification> )?
+	|	INTEGER
+	|	REAL
+	|	DOUBLE PRECISION
+	|	LOGICAL
+	|	<Fortran derived type specification>
+
+<Fortran derived type specification> ::=
+		<Fortran CLOB variable>
+	|	<Fortran BLOB variable>
+	|	<Fortran user_defined type variable>
+	|	<Fortran CLOB locator variable>
+	|	<Fortran BLOB locator variable>
+	|	<Fortran user_defined type locator variable>
+	|	<Fortran array locator variable>
+	|	<Fortran multiset locator variable>
+	|	<Fortran REF variable>
+
+<Fortran CLOB variable> ::=
+		SQL TYPE IS CLOB <left paren> <large object length> <right paren>
+		( CHARACTER SET IS? <character set specification> )?
+
+<Fortran BLOB variable> ::=
+		SQL TYPE IS BLOB <left paren> <large object length> <right paren>
+
+<Fortran user_defined type variable> ::=
+		SQL TYPE IS <path_resolved user_defined type name> AS <predefined type>
+
+<Fortran CLOB locator variable> ::= SQL TYPE IS CLOB AS LOCATOR
+
+<Fortran BLOB locator variable> ::= SQL TYPE IS BLOB AS LOCATOR
+
+<Fortran user_defined type locator variable> ::= SQL TYPE IS <path_resolved user_defined type name> AS LOCATOR
+
+<Fortran array locator variable> ::= SQL TYPE IS <array type> AS LOCATOR
+
+<Fortran multiset locator variable> ::= SQL TYPE IS <multiset type> AS LOCATOR
+
+<Fortran REF variable> ::= SQL TYPE IS <reference type>
+
+<embedded SQL MUMPS program> ::= EXEC SQL /* !! See the Syntax Rules. */
+
+<MUMPS variable definition> ::=
+		<MUMPS numeric variable> <semicolon>
+	|	<MUMPS character variable> <semicolon>
+	|	<MUMPS derived type specification> <semicolon>
+
+<MUMPS host identifier> ~ <host identifier L0>
+
+<MUMPS character variable> ::=
+		VARCHAR <MUMPS host identifier> <MUMPS length specification>
+		( <comma> <MUMPS host identifier> <MUMPS length specification> )*
+
+/*
+<MUMPS host identifier> ::= ('%' | <simple Latin letter>) (<simple Latin letter> | <digit>)*
+*/
+
+<MUMPS length specification> ::= <left paren> <length> <right paren>
+
+<MUMPS numeric variable> ::= <MUMPS type specification> <MUMPS host identifier> ( <comma> <MUMPS host identifier> )*
+
+<MUMPS type specification> ::=
+		INT
+	|	DEC ( <left paren> <precision> ( <comma> <scale> )? <right paren> )?
+	|	REAL
+
+<MUMPS derived type specification> ::=
+		<MUMPS CLOB variable>
+	|	<MUMPS BLOB variable>
+	|	<MUMPS user_defined type variable>
+	|	<MUMPS CLOB locator variable>
+	|	<MUMPS BLOB locator variable>
+	|	<MUMPS user_defined type locator variable>
+	|	<MUMPS array locator variable>
+	|	<MUMPS multiset locator variable>
+	|	<MUMPS REF variable>
+
+<MUMPS CLOB variable> ::=
+		SQL TYPE IS CLOB <left paren> <large object length> <right paren>
+		( CHARACTER SET IS? <character set specification> )?
+
+<MUMPS BLOB variable> ::= SQL TYPE IS BLOB <left paren> <large object length> <right paren>
+
+<MUMPS user_defined type variable> ::= SQL TYPE IS <path_resolved user_defined type name> AS <predefined type>
+
+<MUMPS CLOB locator variable> ::= SQL TYPE IS CLOB AS LOCATOR
+
+<MUMPS BLOB locator variable> ::= SQL TYPE IS BLOB AS LOCATOR
+
+<MUMPS user_defined type locator variable> ::= SQL TYPE IS <path_resolved user_defined type name> AS LOCATOR
+
+<MUMPS array locator variable> ::= SQL TYPE IS <array type> AS LOCATOR
+
+<MUMPS multiset locator variable> ::= SQL TYPE IS <multiset type> AS LOCATOR
+
+<MUMPS REF variable> ::= SQL TYPE IS <reference type>
+
+<embedded SQL Pascal program> ::= EXEC SQL /* !! See the Syntax Rules. */
+
+<Pascal host identifier> ~ <host identifier L0>
+
+<Pascal variable definition> ::=
+		<Pascal host identifier> ( <comma> <Pascal host identifier> )* <colon> <Pascal type specification> <semicolon>
+
+/*
+<Pascal host identifier> ::= (<simple Latin letter> | <underscore> ) (<simple Latin letter> | <underscore> | <digit> )*
+*/
+
+<Pascal type specification> ::=
+		PACKED ARRAY <left bracket> 1 <double period> <length> <right bracket> OF CHAR
+		( CHARACTER SET IS? <character set specification> )?
+	|	INTEGER
+	|	REAL
+	|	CHAR ( CHARACTER SET IS? <character set specification> )?
+	|	BOOLEAN
+	|	<Pascal derived type specification>
+
+<Pascal derived type specification> ::=
+		<Pascal CLOB variable>
+	|	<Pascal BLOB variable>
+	|	<Pascal user_defined type variable>
+	|	<Pascal CLOB locator variable>
+	|	<Pascal BLOB locator variable>
+	|	<Pascal user_defined type locator variable>
+	|	<Pascal array locator variable>
+	|	<Pascal multiset locator variable>
+	|	<Pascal REF variable>
+
+<Pascal CLOB variable> ::=
+		SQL TYPE IS CLOB <left paren> <large object length> <right paren>
+		( CHARACTER SET IS? <character set specification> )?
+
+<Pascal BLOB variable> ::= SQL TYPE IS BLOB <left paren> <large object length> <right paren>
+
+<Pascal CLOB locator variable> ::= SQL TYPE IS CLOB AS LOCATOR
+
+<Pascal user_defined type variable> ::= SQL TYPE IS <path_resolved user_defined type name> AS <predefined type>
+
+<Pascal BLOB locator variable> ::= SQL TYPE IS BLOB AS LOCATOR
+
+<Pascal user_defined type locator variable> ::= SQL TYPE IS <path_resolved user_defined type name> AS LOCATOR
+
+<Pascal array locator variable> ::= SQL TYPE IS <array type> AS LOCATOR
+
+<Pascal multiset locator variable> ::= SQL TYPE IS <multiset type> AS LOCATOR
+
+<Pascal REF variable> ::= SQL TYPE IS <reference type>
+
+<embedded SQL PL_I program> ::= EXEC SQL /* !! See the Syntax Rules. */
+
+<PL_I host identifier> ~ <host identifier L0>
+
+<PL_I variable definition> ::=
+		( DCL | DECLARE ) <PL_I host identifier>
+		<left paren> <PL_I host identifier> ( <comma> <PL_I host identifier> )* <right paren>
+		<PL_I type specification> <character representation>* <semicolon>
+
+/*
+<PL_I host identifier> ::= <regular identifier> */ /* !! See the Syntax Rules. */
+
+<PL_I type specification> ::=
+		( CHAR | CHARACTER ) VARYING? <left paren><length><right paren> ( CHARACTER SET IS? <character set specification> )?
+	|	<PL_I type fixed decimal> <left paren> <precision> ( <comma> <scale> )? <right paren>
+	|	<PL_I type fixed binary> ( <left paren> <precision> <right paren> )?
+	|	<PL_I type float binary> <left paren> <precision> <right paren>
+	|	<PL_I derived type specification>
+
+<PL_I derived type specification> ::=
+		<PL_I CLOB variable>
+	|	<PL_I BLOB variable>
+	|	<PL_I user_defined type variable>
+	|	<PL_I CLOB locator variable>
+	|	<PL_I BLOB locator variable>
+	|	<PL_I user_defined type locator variable>
+	|	<PL_I array locator variable>
+	|	<PL_I multiset locator variable>
+	|	<PL_I REF variable>
+
+<PL_I CLOB variable> ::=
+		SQL TYPE IS CLOB <left paren> <large object length> <right paren>
+		( CHARACTER SET IS? <character set specification> )?
+
+<PL_I BLOB variable> ::= SQL TYPE IS BLOB <left paren> <large object length> <right paren>
+
+<PL_I user_defined type variable> ::= SQL TYPE IS <path_resolved user_defined type name> AS <predefined type>
+
+<PL_I CLOB locator variable> ::= SQL TYPE IS CLOB AS LOCATOR
+
+<PL_I BLOB locator variable> ::= SQL TYPE IS BLOB AS LOCATOR
+
+<PL_I user_defined type locator variable> ::= SQL TYPE IS <path_resolved user_defined type name> AS LOCATOR
+
+<PL_I array locator variable> ::= SQL TYPE IS <array type> AS LOCATOR
+
+<PL_I multiset locator variable> ::= SQL TYPE IS <multiset type> AS LOCATOR
+
+<PL_I REF variable> ::= SQL TYPE IS <reference type>
+
+<PL_I type fixed decimal> ::=
+		( DEC | DECIMAL ) FIXED
+	|	FIXED ( DEC | DECIMAL )
+
+<PL_I type fixed binary> ::=
+		( BIN | BINARY ) FIXED
+	|	FIXED ( BIN | BINARY )
+
+<PL_I type float binary> ::=
+		( BIN | BINARY ) FLOAT
+	|	FLOAT ( BIN | BINARY )
+
+<direct SQL statement> ::= <directly executable statement> <semicolon>
+
+<directly executable statement> ::=
+		<direct SQL data statement>
+	|	<SQL schema statement>
+	|	<SQL transaction statement>
+	|	<SQL connection statement>
+	|	<SQL session statement>
+/* 	|	<direct implementation_defined statement> */
+
+<direct SQL data statement> ::=
+		<delete statement_ searched>
+	|	<direct select statement_ multiple rows>
+	|	<insert statement>
+	|	<update statement_ searched>
+	|	<merge statement>
+	|	<temporary table declaration>
+
+/* <direct implementation_defined statement> ::= !! See the Syntax Rules. */
+
+<direct select statement_ multiple rows> ::= <cursor specification>
+
+<get diagnostics statement> ::= GET DIAGNOSTICS <SQL diagnostics information>
+
+<SQL diagnostics information> ::= <statement information> | <condition information>
+
+<statement information> ::= <statement information item> ( <comma> <statement information item> )*
+
+<statement information item> ::= <simple target specification> <equals operator> <statement information item name>
+
+<statement information item name> ::=
+		NUMBER
+	|	MORE
+	|	COMMAND_FUNCTION
+	|	COMMAND_FUNCTION_CODE
+	|	DYNAMIC_FUNCTION
+	|	DYNAMIC_FUNCTION_CODE
+	|	ROW_COUNT
+	|	TRANSACTIONS_COMMITTED
+	|	TRANSACTIONS_ROLLED_BACK
+	|	TRANSACTION_ACTIVE
+
+<condition information> ::=
+		( EXCEPTION | CONDITION ) <condition number> <condition information item> ( <comma> <condition information item> )*
+
+<condition information item> ::= <simple target specification> <equals operator> <condition information item name>
+
+<condition information item name> ::=
+		CATALOG_NAME
+	|	CLASS_ORIGIN
+	|	COLUMN_NAME
+	|	CONDITION_NUMBER
+	|	CONNECTION_NAME
+	|	CONSTRAINT_CATALOG
+	|	CONSTRAINT_NAME
+	|	CONSTRAINT_SCHEMA
+	|	CURSOR_NAME
+	|	MESSAGE_LENGTH
+	|	MESSAGE_OCTET_LENGTH
+	|	MESSAGE_TEXT
+	|	PARAMETER_MODE
+	|	PARAMETER_NAME
+	|	PARAMETER_ORDINAL_POSITION
+	|	RETURNED_SQLSTATE
+	|	ROUTINE_CATALOG
+	|	ROUTINE_NAME
+	|	ROUTINE_SCHEMA
+	|	SCHEMA_NAME
+	|	SERVER_NAME
+	|	SPECIFIC_NAME
+	|	SUBCLASS_ORIGIN
+	|	TABLE_NAME
+	|	TRIGGER_CATALOG
+	|	TRIGGER_NAME
+	|	TRIGGER_SCHEMA
+
+<condition number> ::= <simple value specification>

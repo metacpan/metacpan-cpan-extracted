@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Maildir/Lite.pm
+t/00-basic.t
+t/01-trash.t
+t/02-sort.t
+META.yml                                 Module meta-data (added by MakeMaker)

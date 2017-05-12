@@ -1,0 +1,26 @@
+---
+abstract: 'A pragma to declare and organise messaging.'
+author:
+  - 'Iain Campbell <cpanic@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  Data::Dumper::Concise: '0'
+  Test::Deep: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Message-String
+requires:
+  Clone: '0'
+  DateTime: '0'
+  IO::Stty: '0'
+  List::MoreUtils: '0'
+  Sub::Util: '0'
+  namespace::clean: '0'
+  perl: v5.8.8
+version: 0.1.9

@@ -1,0 +1,37 @@
+Revision history for Perl extension Math::Permute::Array.
+
+0.04 provides more checking on the provided parameters and more tests (close to be the last version)
+0.03 provides a new API which more efficient and some tests
+0.02 provides a new name which is better
+
+
+
+0.043   Thu Sep 18 21:14:28 2012
+  - add the coverage summarize inside the sources
+  every parts of the code are tested now
+  - the case that a undefined value is provided is took into account
+  - this version could be the called the stable version just wait the
+  feedback of some testers
+0.0421   Thu Sep 18 20:31:28 2012
+  - remove a wrong line inside Makefile.PL
+0.042   Thu Sep 18 20:31:28 2012
+  - remove UTF-8 caracters to be more portable
+  - improve the documentation
+0.041   Thu Sep 18 15:31:28 2012
+  - add test and examples
+  - correct all problems provided on
+  http://cpants.charsbar.org/dist/kwalitee/Math-Permute-Array
+0.04   Thu Sep 18 13:51:28 2012
+  - improve the tests and chack if some undef values are provided
+0.032  Thu Sep 13 14:41:28 2012
+  - update the documentation and improve the tests
+0.031  Thu Sep 13 11:41:28 2012
+  - update the documentation
+0.03  Thu Sep 13 10:41:28 2012
+  - add the function Apply_on_perms to reduce the call function cost
+0.02  Wed Sep 12 23:41:28 2012
+  - Change the name of the module and immprove the performances.
+0.01  Wed Sep 12 16:41:28 2012
+	- original version; created by h2xs 1.23 with options
+		-b 5.9.0 -XAn SimplePermutation
+

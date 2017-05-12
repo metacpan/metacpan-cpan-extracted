@@ -1,0 +1,36 @@
+0.11 2016-09-01
+        - Fixed dependency to Mojolicious to deal with issues
+          from cpantesters.
+
+0.10 2016-08-30
+        - Fixed link to license.
+
+0.09 2016-08-29
+        - Rename sign_url_for to close_redirect_to.
+        - Support rolling private secrets.
+        - Prepare CPAN release.
+
+0.08 2016-08-28
+        - Introduced closed_redirect check.
+        - Removed closed_redirect_to helper.
+        - sign_url_for is DEPRECATED.
+
+0.07 2016-08-20
+        - Introduced on_open_redirect_attack hook.
+        - Deprecated undocumented user notification.
+        - Remove token_length parameter.
+        - Remove secret prefixing.
+        - Remove dependencies for unnecessary plugins.
+
+0.06 2016-03-13
+        - Improve documentation slightly.
+        - Support for rolling secrets.
+
+0.05 2015-06-11
+        - Fix case where no return url was present.
+
+0.04 2015-06-11
+        - Added Localization and Notifications.
+
+0.03 2015-06-05
+        - Update to recent version of Mojolicious.

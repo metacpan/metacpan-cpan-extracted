@@ -1,0 +1,106 @@
+NAME
+    Metabase - A database framework and API for resource metadata
+
+VERSION
+    version 1.003
+
+DESCRIPTION
+    Metabase is a database framework and API for resource metadata. The
+    framework describes how arbitrary data ("facts") are associated with
+    particular resources or related to each other. The API describes how to
+    store, retrieve, and search this information.
+
+  History and Motivation
+    Metabase was originally designed as a means of storing reports from the
+    CPAN Testers project. When Metabase was initially developed, CPAN
+    Testers reports were sent by individual testers to a single email
+    server, which then forwarded them to a USENET group, which was
+    considered the authoritative store. This presented problems: some
+    testers couldn't send email, the system wasn't very searchable, was hard
+    to mirror, and the data inside the system was entirely unstructured.
+
+    Metabase aimed to avoid all of those problems by being
+    transport-neutral, searchable and easier to mirror by design, and geared
+    toward storing structured data. Simplicity is another design goal: while
+    it has several moving parts, they're all simple and designed to be
+    replaceable and extensible, rather than to be a perfect design up front.
+
+OVERVIEW
+    A Metabase has several parts:
+
+    *   Metabase::Librarian, a class which manages access to the Archive and
+        Index
+
+    *   Metabase::Gateway, a role for managing submission of facts to the
+        Librarian
+
+    *   Metabase::Archive, a role for storing and retrieving facts
+
+    *   Metabase::Index, a role for indexing and searching facts
+
+    *   Metabase::Query, a role for translating a common query data
+        structure into a backend-specific query
+
+    Roles require implementations. These could use flat files, relational
+    databases, object databases, cloud services, or anything else that can
+    satisfy the role API.
+
+    Metabase comes with some simple, stupid backends for testing:
+
+    *   Metabase::Archive::Filesystem
+
+    *   Metabase::Index::FlatFile
+
+    Facts stored with in a Metabase are defined as subclasses of
+    Metabase::Fact. Metabase::Report is a subclass that relates multiple
+    facts.
+
+    Metabase::Web provides the web API for storing, searching and retrieving
+    facts. Metabase::Client::Simple is the client library to submit facts to
+    a Metabase::Web server. A future Metabase::Client class will provide
+    submit and search capabilities.
+
+SEE ALSO
+    *   Metabase::Backend::AWS
+
+    *   Metabase::Backend::MongoDB
+
+    *   Metabase::Backend::SQL
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/rjbs/metabase/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/rjbs/metabase>
+
+      git clone https://github.com/rjbs/metabase.git
+
+AUTHORS
+    *   David Golden <dagolden@cpan.org>
+
+    *   Ricardo Signes <rjbs@cpan.org>
+
+    *   Leon Brocard <acme@cpan.org>
+
+CONTRIBUTORS
+    *   Florian Ragwitz <rafl@debian.org>
+
+    *   Graham Knop <haarg@haarg.org>
+
+    *   Leon Brocard <acme@astray.com>
+
+    *   Ricardo SIGNES <rjbs@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

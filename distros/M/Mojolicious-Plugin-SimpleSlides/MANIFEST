@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+cpanfile
+lib/Mojolicious/Plugin/SimpleSlides.pm
+metamerge.json
+share/public/mousetrap.min.js
+share/public/simple_slides.css
+t/00-basic.t
+t/multiple.t
+t/single.t

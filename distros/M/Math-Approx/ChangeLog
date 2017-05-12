@@ -1,0 +1,9 @@
+Tue Mar  3 15:01:12 1998  Ulrich Pfeifer  <upf@de.uu.net>
+
+	* integrated patch from Elias AKA Andreas König
+
+	  - strict clean
+	  - many "my"s
+	  - improved  manual page
+	  - simplified interface
+	  - $VERSION

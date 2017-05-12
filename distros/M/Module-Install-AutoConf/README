@@ -1,0 +1,5 @@
+
+This is a Module::Install plugin to help using Module::Install with
+Gnu's autoconf package. Look in the examples directory for a
+Makefile.in example.
+

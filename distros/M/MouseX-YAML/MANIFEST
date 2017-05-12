@@ -1,0 +1,25 @@
+Changes
+example/load.pl
+inc/Module/Install.pm
+inc/Module/Install/AuthorTests.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Repository.pm
+inc/Module/Install/WriteAll.pm
+lib/MouseX/YAML.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00_load.t
+t/01_basic.t
+t/02_yaml_xs.t
+t/03_yaml_syck.t
+t/04_yaml.t
+t/yaml/myclass.yml
+xt/01_podspell.t
+xt/02_pod.t
+xt/03_pod-coverage.t
+xt/04_synopsis.t

@@ -1,0 +1,24 @@
+NAME
+    allpod - All pod sections all ready there.
+
+SYNOPSIS
+     allpod.pl [OPTIONS] [ALIENS]
+
+OPTIONS
+    Some extra options text. Put above DESCRIPTION, should stay there.
+
+    --help -? --usage
+        Display the usage message and exit
+
+    --man
+        Display man page
+
+    --doom
+
+DESCRIPTION
+    This program will read the given input ALIENS and do something useful
+    with the contents thereof.
+
+AUTHOR
+    Invader Larb
+

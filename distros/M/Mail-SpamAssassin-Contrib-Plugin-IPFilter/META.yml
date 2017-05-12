@@ -1,0 +1,45 @@
+---
+abstract: 'Blocks bad MTA behavior using IPTables.'
+author:
+  - 'Tamer Rizk <foss@inficron.com>'
+build_requires:
+  DBI: '1.631'
+  Data::Dumper: '2.154'
+  Email::Simple: '2.0'
+  IPTables::ChainMgr: '1.5'
+  Redis: '1.5'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mail-SpamAssassin-Contrib-Plugin-IPFilter
+no_index:
+  directory:
+    - inc
+requires:
+  Config::Crontab: '1.40'
+  DBI: '1.631'
+  Date::Parse: '2.30'
+  Email::Simple: '2.0'
+  Fcntl: '1.11'
+  Hash::Util: '0.11'
+  IPTables::ChainMgr: '1.5'
+  JSON::XS: '3.01'
+  Lingua::StopWords: '0.09'
+  MIME::Base64: '3.0'
+  MIME::Lite: '3.0'
+  Mail::SpamAssassin: '3.0'
+  Math::Round: '0'
+  Net::DNS: '1.06'
+  POSIX: '1.24'
+  PathTools: '3.62'
+  Redis: '1.5'
+  Sys::SigAction: '0.21'
+  Text::Document: '1.07'
+  perl: '5.010'
+version: '1.2'

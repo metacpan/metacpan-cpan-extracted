@@ -1,0 +1,6 @@
+# view 
+# Begin object list
+[% FOR obj = objects %]
+- [% obj.name %]
+[% END %]
+# End object list

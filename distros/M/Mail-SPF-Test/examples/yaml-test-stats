@@ -1,0 +1,41 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use Mail::SPF::Test;
+
+print("SPF test suite statistics:\n");
+
+my $yaml = do { local $/; <> };
+
+my $test_suite = Mail::SPF::Test->new_from_yaml($yaml);
+
+print("\n");
+
+printf("%-2s  %-40s  %5s  %5s  %-19s\n", 'S#', 'Scenario', 'Tests', 'RRs', 'Spec References');
+print('-' x 79, "\n");
+
+my $scenario_id              = 0;
+my $total_test_cases_count   = 0;
+my $total_rrs_count          = 0;
+
+foreach my $scenario ($test_suite->scenarios) {
+    $scenario_id++;
+    my $test_cases_count     = scalar($scenario->test_cases);
+    $total_test_cases_count += $test_cases_count;
+    my $rrs_count            = scalar($scenario->records);
+    $total_rrs_count        += $rrs_count;
+    
+    printf(
+        "%2d  %-40.40s  %5d  %5d  %-19s\n",
+        $scenario_id,
+        $scenario->description || '',
+        $test_cases_count,
+        $rrs_count,
+        join(', ', $scenario->spec_refs('*.*'))
+    );
+}
+
+print('-' x 79, "\n");
+printf("%-44s  %5s  %5s\n", 'Total:', $total_test_cases_count, $total_rrs_count);

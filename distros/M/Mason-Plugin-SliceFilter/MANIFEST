@@ -1,0 +1,17 @@
+Changes
+lib/Mason/Plugin/SliceFilter.pm
+lib/Mason/Plugin/SliceFilter/Filters.pm
+lib/Mason/Plugin/SliceFilter/Filters/Slice.pm
+lib/Mason/Plugin/SliceFilter/t/Basic.pm
+lib/Mason/Plugin/SliceFilter/t/CaptureParam.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/Basic.t
+t/boilerplate.t
+t/CaptureParam.t
+t/manifest.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

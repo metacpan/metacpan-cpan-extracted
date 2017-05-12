@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name: Provides-Inner-Sorted
+abstract: test the Faker/sorted attribute in provides
+version: 0.001
+provides:
+  Provides::Inner::Sorted::Charlie:
+    file: lib/Provides/Inner/Sorted.pm
+    version: 0.008
+    X_Module_Faker:
+      order: 2
+  Provides::Inner::Sorted::Alfa:
+    file: lib/Provides/Inner/Sorted.pm
+    version: 0.001
+    X_Module_Faker:
+      order: 1
+  Provides::Inner::Sorted::Bravo:
+    file: lib/Provides/Inner/Sorted.pm
+    version: 0.002
+    X_Module_Faker:
+      order: 4
+  Provides::Inner::Sorted::Delta:
+    file: lib/Provides/Inner/Sorted.pm
+    version: 0.001
+    X_Module_Faker:
+      order: 3

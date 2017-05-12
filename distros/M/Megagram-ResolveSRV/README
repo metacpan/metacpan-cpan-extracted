@@ -1,0 +1,10 @@
+Megagram-ResolveSRV version 0.01
+================================
+
+use Megagram::ResolveSRV;
+
+my $rsrv = Megagram::ResolveSRV->new;
+my @hosts = $rsrv->resolve('_xmpp-server._tcp.google.com');
+
+use Data::Dumper;
+print Dumper(\@hosts);

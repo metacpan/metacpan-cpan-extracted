@@ -1,0 +1,25 @@
+NAME
+    mbcol - Upload your list of albums to MusicBrainz
+
+SYNOPSIS
+    mbcol [OPTIONS] DIRECTORY
+
+    This script recursively scans DIRECTORY for all audio files containing
+    MusicBrainz Album ID tags. The list of albums found is uploaded to your
+    MusicBrainz account and will appear under "My Collection".
+
+    Supported file formats (from Audio::Scan): MP3, MP4, FLAC, Ogg Vorbis,
+    WMA, WAV, AIFF, Musepack, Monkey's Audio
+
+    Options:
+
+        --user sampleuser       Your MusicBrainz username
+        --pass 12345            Your MusicBrainz password
+        -v                      Display verbose information
+
+    MusicBrainz account information may also be stored in the file
+    ~/.musicbrainz using the format:
+
+        user sampleuser
+        pass 12345
+

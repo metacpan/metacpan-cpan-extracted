@@ -1,0 +1,31 @@
+---
+abstract: 'Mixin methods for simple event/message dispatch framework'
+author:
+  - 'Tom Molesworth <cpan@perlsite.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::Fatal: '0.010'
+  Test::More: '0.98'
+  Test::Refcount: '0.07'
+  perl: '5.010001'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mixin-Event-Dispatch
+requires:
+  List::UtilsBy: '0'
+  Scalar::Util: '0'
+  parent: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Mixin-Event-Dispatch
+  homepage: http://search.cpan.org/dist/Mixin-Event-Dispatch/
+version: '2.000'

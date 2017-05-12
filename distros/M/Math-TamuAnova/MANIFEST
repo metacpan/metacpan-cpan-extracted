@@ -1,0 +1,13 @@
+inc/Devel/CheckLib.pm
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+TamuAnova.xs
+typemap
+t/TamuAnova.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Math/TamuAnova.pm
+META.yml                                 Module meta-data (added by MakeMaker)

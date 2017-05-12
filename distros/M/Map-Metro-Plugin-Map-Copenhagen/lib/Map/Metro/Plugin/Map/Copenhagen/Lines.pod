@@ -1,0 +1,99 @@
+
+# PODNAME: Map::Metro::Plugin::Map::Copenhagen::Lines
+# ABSTRACT: Lines and stations in the Copenhagen map
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Map::Metro::Plugin::Map::Copenhagen::Lines - Lines and stations in the Copenhagen map
+
+=head1 VERSION
+
+Version 0.2006, released 2016-01-21.
+
+=head1 LINES
+
+=head2 M1: Vanløse → Vestamager [M1]
+
+=for HTML <div style="background-color: #397c5d; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Vanløse         (M2)
+    Flintholm       (M2)
+    Lindevang       (M2)
+    Fasanvej        (M2)
+    Frederiksberg   (M2)
+    Forum           (M2)
+    Nørreport       (M2)
+    Kongens Nytorv  (M2)
+    Christianshavn  (M2)
+    Islands Brygge
+    DR Byen
+    Sundby
+    Bella Center
+    Ørestad
+    Vestamager
+
+=head2 M2: Lufthavnen → Vanløse [M2]
+
+=for HTML <div style="background-color: #e8c929; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    Lufthavnen
+    Kastrup
+    Femøren
+    Amager Strand
+    Øresund
+    Lergravsparken
+    Amagerbro
+    Christianshavn  (M1)
+    Kongens Nytorv  (M1)
+    Nørreport       (M1)
+    Forum           (M1)
+    Frederiksberg   (M1)
+    Fasanvej        (M1)
+    Lindevang       (M1)
+    Flintholm       (M1)
+    Vanløse         (M1)
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Map::Metro::Plugin::Map::Copenhagen>
+
+=item *
+
+L<Task::MapMetro::Maps>
+
+=item *
+
+L<Map::Metro>
+
+=back
+
+=head1 SOURCE
+
+L<https://github.com/Csson/p5-Map-Metro-Copenhagen>
+
+=head1 HOMEPAGE
+
+L<https://metacpan.org/release/Map-Metro-Plugin-Map-Copenhagen>
+
+=head1 AUTHOR
+
+Erik Carlsson <info@code301.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Erik Carlsson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

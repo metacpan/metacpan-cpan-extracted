@@ -1,0 +1,80 @@
+#--------------------------#
+# MegaDistro - README file #
+#--------------------------#
+
+INTRODUCTION: MegaDistro, is a system by which a list of perl modules can be built, 
+                into the form a binary package (rpm or deb).
+
+REQUIREMENTS: CPANPLUS-0.0562 or greater *must be configured*
+              Module-CoreList-2.02 or greater
+              ExtUtils-MakeMaker-6.17 or greater
+              Archive::Tar
+              File::Spec
+
+USAGE: The usage of the system is briefly described as follows.
+
+The perl MegaDistro system is used to create packages of perl modules, simply by reading a list.
+
+For example, all that is required, is that you simply write a list of modules, 
+  (See modules.list), or (t/test.list - in the src directory), for an example of this.
+
+Hence, the first thing that you must do, is create the module list.
+  - The default location of the module list is: ~/.megadistro/modules.list
+    (Note: you may create and use a list with another name, or, in another location,
+           however, you must specify this, upon execution of the program, see below).
+
+However, you must note the following things:
+
+       o) Module dependencies, by default, will not settled automatically.
+            Therefore, to ensure that all prerequesites for a given module, 
+            are installed into the package [to be created], you must specify
+            them in the list (currently, order is irrelevant).
+
+       o) Modules that have _external_ dependencies, that is,
+          modules which require some sort of external package or program to be installed,
+          or require something to be installed in a particular location,
+           - are not currently supported.
+            (e.g. DBD::mysql, GD, Net::SSLeay)
+            
+
+Other than the aforementioned items, the system should, ideally, be a breeze.
+  In that, turning your "wish-list" of modules into a binary package,
+  should be, no more difficult that simply running the 'megadistro' script, 
+  and specifying information, if/as necessary. ;)
+
+Once you've created your module list, you are ready to run it through the system.
+  (Note: If you are using a module list other than the default [module.list], 
+         you must specify this, by using the --modlist=LIST override,
+           where LIST is the /path/to/your/module.list file).
+  
+  The following are examples of how to run the system:
+  
+    You may run the system without any options (provided you do not want to override any of the defaults),
+    
+    To run by default:         megadistro
+    	* This method is fine, it will simply ask you which package type you would like to generate :)
+    	
+    Otherwise, to explicitly specify which type you would like, you may use any of the following:
+  
+        To generate a rpm:         megadistro -t rpm
+    
+        To generate a deb:         megadistro -t deb
+    
+        To generate a tarball:     megadistro --build-only
+    
+    If you didn't use the default list file [location]:
+    
+           megadistro --modlist=/new/location/to/my_modules.list
+
+*** For more information regarding command-line options,
+        either run: megadistro --help
+        or check the documentation: perldoc megadistro
+
+If everything went well, and a package was created, it will be located in: ~/.megadistro
+
+
+BUGS: If you notice any strange behavior, such as something noticably just doesn't work right,
+         or the system blatantly explodes, so to speak - please report them - thanks.
+         
+More information can be found in the MegaDistro documentation - and remember, this is only experimental, so far. :)
+     See: perldoc megadistro

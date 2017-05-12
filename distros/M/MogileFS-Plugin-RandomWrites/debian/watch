@@ -1,0 +1,2 @@
+version=3
+http://search.cpan.org/dist/MogileFS-Plugin-RandomWrites/   .*/MogileFS-Plugin-RandomWrites-v?(\d[\d.-]+)\.(?:tar(?:\.gz|\.bz2)?|tgz|zip)$

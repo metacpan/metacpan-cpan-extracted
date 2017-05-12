@@ -1,0 +1,28 @@
+---
+abstract: 'DEPRECATED Redis client'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-Redis
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: '0'
+  Mojolicious: '3.0'
+  Protocol::Redis: '1.0'
+resources:
+  bugtracker: https://github.com/marcusramberg/mojo-redis/issues
+  homepage: https://github.com/marcusramberg/mojo-redis
+  repository: https://github.com/marcusramberg/mojo-redis.git
+version: '1.02'

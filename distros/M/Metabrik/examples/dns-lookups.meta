@@ -1,0 +1,6 @@
+use client::dns
+
+set core::shell echo 1
+
+run client::dns a_lookup "[ qw(google.com yahoo.fr bing.com) ]"
+run client::dns ptr_lookup "[ map { @$_ } values %$RUN ]"

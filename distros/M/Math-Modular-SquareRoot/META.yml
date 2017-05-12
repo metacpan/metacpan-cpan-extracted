@@ -1,0 +1,17 @@
+---
+name: Math-Modular-SquareRoot
+version: 1.001
+author:
+  - 'PhilipRBrenan@handybackup.com'
+abstract: Modular square roots
+license: perl
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Math::Modular::SquareRoot:
+    file: lib/Math/Modular/SquareRoot.pm
+    version: 1.001
+resources:
+  license: http://dev.perl.org/licenses/

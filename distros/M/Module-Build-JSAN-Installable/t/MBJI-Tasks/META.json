@@ -1,0 +1,26 @@
+{
+   "resources" : {
+      "license" : "http://dev.perl.org/licenses/"
+   },
+   "meta-spec" : {
+      "version" : "1.4",
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "generated_by" : "Module::Build version 0.3607",
+   "version" : "0.01",
+   "name" : "Digest.MD5",
+   "author" : [
+      "SamuraiJack <root@symbie.org>"
+   ],
+   "license" : "perl",
+   "static_dir" : "static",
+   "build_requires" : {
+      "Building.JS.Lib" : "1.1",
+      "Another.Building.JS.Lib" : "1.2"
+   },
+   "requires" : {
+      "Cool.JS.Lib" : "1.1",
+      "Another.Cool.JS.Lib" : "1.2"
+   },
+   "abstract" : "Digest md5"
+}

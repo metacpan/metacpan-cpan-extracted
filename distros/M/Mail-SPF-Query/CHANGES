@@ -1,0 +1,232 @@
+# Legend:
+# --- = A new release
+#   + = Added a feature (in a backwards compatible way)
+#   ! = Changed something significant, or removed a feature
+#   * = Fixed a bug, or made a minor improvement
+
+--- 1.999.1 (2006-02-26 18:00)
+
+  Mail::SPF::Query:
+  * Do not use \p{} named properties in the "a" and "mx" mechanisms' argument
+    validation code, since Perl 5.6 requires (flaky) "use utf8" for them to
+    work, and [a-z]/[a-z0-9] should work just as well (closes rt.cpan.org bug
+    #17815).
+  * Some minor documentation formatting improvements.
+
+  Debian:
+  + Added watch file.
+
+--- 1.999 (2006-02-07 00:00)
+
+  Mail::SPF::Query:
+  ! No longer accept malformed SPF records such as "\"v=spf1 ...\"" (spurious
+    double quotes) or " v=spf1 ..." (leading whitespace).
+  * Combine multiple TXT strings into a single string _before_ fallbacks are
+    tried.  Thus, fallbacks now also get applied if there are only non-
+    "v=spf1" TXT records; this wasn't the case before.
+  * Guard against non-numeric cidr-lengths (closes rt.cpan.org bug #17061).
+  * Flattened the { 'domain' => { record => '...' } } override and fallback
+    argument format to just { 'domain' => '...' }.  The old format is still
+    supported for backwards compatibility.
+  * Added a "BUGS" section to the man-page documenting M:S:Q's known
+    deficiencies.
+  * Lots of minor code improvements.
+
+  spfquery:
+  * Correctly recognize the --mail-from (AKA --sender) option.  The version
+    in the M:S:Q 1.998 release was broken in this regard.
+  * Actually require the --helo option for the --mail-from (AKA --sender)
+    form.
+  * Cleaned up command-line argument validation code.
+  * Cleaned up the inconsistent short and long (--help) usage and man-page
+    texts.
+  * Clarified the file input syntax in the help and man-page texts.
+  + The "--override" and "--fallback" options are now actually working and
+    documented.
+
+  Tests:
+  * Overhauled 00_all.t test script:
+    * Don't skip tests when a non-last test in a test tuple fails (this made
+      test 223 "fail", for example, because Test::Harness thought that some
+      planned tests were not performed).
+    * Marked test 219 (SERVFAIL) as non-critical, because it isn't completely
+      reliable (sometimes, apparently behind some NATs and firewalls, the
+      query just times out instead of returning SERVFAIL) (closes rt.cpan.org
+      bug #17099).
+    * Generate and collect debug log output (internally) along with the normal
+      M:S:Q->result() calls right away, so that extra just-to-get-debug-output
+      M:S:Q->result() calls can be saved.  Also we can make debug log output
+      Test::Harness-compatible this way by printing it ourselves with '#'
+      chars at the beginnings of lines.
+    * Cleaned up code.
+  * Cleaned up comments in t/test.dat test data file.
+
+  Debian:
+  ! Build-Depend, not Build-Depend-Indep, on debhelper.  Also, depend on
+    debhelper >= 5.
+  * Build-Depend-Indep on netbase to allow testing to work when building in a
+    pbuilder chroot (closes Debian bug #351030).
+
+--- 1.998 (2005-12-31 23:00)
+
+  Mail::SPF::Query:
+  ! Require Perl 5.6 or better.
+  ! Require URI::Escape module, not URI module.
+  ! Removed obsolete Caller-ID support (closes Debian bugs #337319, #337500).
+  ! Always use Sys::Hostname::Long. And thus, require Sys::Hostname::Long to be
+    installed (closes Debian bugs #332952, #342629).
+  * Changed local machine hostname macro from "xr" to "r" (closes rt.cpan.org
+    bug #9744).
+  ! Restrict the number of SPF record lookups to a maximum of 10 (was: 20).
+    Thanks to Craig Whitmore!
+  * Fixes to mechanisms implementation:
+    * a, mx: Check if domain is a valid FQDN, i.e. ends in ".<toplabel>".
+    * ip4: Return "unknown" (PermError) if no argument was specified. Also,
+      don't auto-complete "1.2.3" CIDR specs to "1.2.3.0", as such an
+      abbreviated syntax is forbidden by the SPF spec anyway.
+    Thanks to Craig Whitmore!
+  * Lots of minor code and documentation fixes/improvements.
+
+  spfd:
+  + Added complete POD documentation/man-page.
+  * Both "--xxx" and "-xxx" forms of command-line options are now supported.
+  ! Renamed most of the command-line options:
+      --path       => --socket
+      --pathuser   => --socket-user
+      --pathgroup  => --socket-group
+      --pathmode   => --socket-perms
+      --setuser    => --set-user
+      --setgroup   => --set-group
+    The old option names are still supported for backwards compatibility.
+  * Do not print usage information when neither "--port" nor "--socket" are
+    specified (i.e. when the default TCP port would just be used).  Print a
+    more specific hint instead.
+  * Added "--help" option to print usage information.
+  * Some minor code fixes/improvements.
+
+  spfquery:
+  + Added complete POD documentation/man-page.
+  * Exit with code 0 and do not print usage hint on '-v' (was Debian bug
+    #237751, has been already resolved in Debian release 1.997-3).
+  * Both "--xxx" and "-xxx" forms of command-line options are now supported.
+    Also, a "-x" (short) form is now supported for the most important options.
+  ! Renamed the "--max-lookup" option to "--max-lookup-count" to match the
+    Mail::SPF::Query API.  "--max-lookup" is still supported for backwards
+    compatibility.
+  * Added "--mail-from" and "-m" synonyms for the "--sender" option for
+    consistency with the "--helo" option.
+  * Cleaned up the "--help" usage output.
+  * Lots of minor code improvements.
+
+  Tests:
+  * Some minor tests improvements.
+  * Turned test.pl into .t file in t/ directory, so testing output is parsed
+    (closes rt.cpan.org bug #7748).
+  * Plan the correct number of tests, not just the number of non-comment lines
+    in test data file.
+
+  Debian:
+  + Added Debian package control files. This is now also a native Debian
+    package!
+
+  Miscellaneous:
+  ! Updated URLs everywhere:
+      http://spf.pobox.com                            -> http://www.openspf.org
+      http://www.anarres.org/projects/srs/            -> http://www.libsrs2.org
+      http://asarian-host.net/srs/sendmailsrs.htm
+                                   -> http://srs-socketmap.info/sendmailsrs.htm
+  ! Point out everywhere the "non-standard"-ness of best guess processing,
+    trusted forwarder accreditation checking, and several other features.
+  * Cleaned up source package file and directory layout:
+      Query.pm     -> lib/Mail/SPF/Query.pm
+      Changes      -> CHANGES
+      test.*       -> t/
+      spf{d,query} -> bin/
+      sample/      -> examples/
+  + Added META.yml.
+  * postfix-policyd-spf:
+    * Generate "Received-SPF:" header unless rejecting (fail/Fail) or deferring
+      (error/TempError) the message.
+    * Verbose mode is disabled by default.
+    Thanks to Arjen de Korte!
+  ! spf.py: Removed, because it was really old, and this is a Perl package, not
+    a Python one.
+  * Did I mention lots of minor code and documentation fixes/improvements?
+
+--- 1.997 (2004-04-26 06:07)
+
+  * Svn revs 72..76
+
+--- 1.996 (2004-02-27 18:39)
+
+  * Svn revs 71
+
+--- 1.994 (2004-02-26 22:55)
+
+  * Svn revs 68..70
+  * Bugfix for Net::CIDR::Lite -- we now recognize 1.2.3/0 syntax, not just
+    1.2.3.4/0.
+
+--- 1.993 (2004-02-26 04:20)
+
+  * Svn revs 65..67
+  * Added support for Microsoft Caller-ID.
+
+--- 1.992 (2004-02-26 03:30)
+
+  * Svn revs 62..64
+  * Added fallback and override logic.
+  * Minor bugfixes.
+
+--- 1.991 (2004-01-29 06:29)
+
+  * Svn rev 61 (parts)
+
+--- 1.990 (2004-01-24 02:01)
+
+  * Svn rev 61 (parts)
+
+--- 1.980 (2004-01-14 03:40)
+
+  * Svn revs 58..60
+
+--- 1.970 (2004-01-10 00:20)
+
+  * Svn revs 53..57
+
+--- 1.960 (2003-12-19 03:21)
+
+  * Svn revs 51..52
+
+--- 1.010 (2003-12-18 19:33)
+
+--- 1.009.6 (2003-12-17 22:29)
+
+  * Svn revs 49..50
+
+--- 1.009.5 (2003-12-15 22:59)
+
+  * Svn revs 46..48
+
+--- 1.009.4 (2003-12-12 04:58)
+
+  * Svn revs 43..45
+
+--- 1.009.3 (2003-12-11 23:01)
+
+  * Svn revs 38..42
+
+--- 1.009.1 (2003-11-30 08:58)
+
+  * Svn rev 37
+
+--- 1.009 (2003-11-29 21:39)
+
+  * Svn revs 10..36
+
+--- 1.006 (2003-07-24 22:19)
+
+  * First public release.
+
+# $Id: CHANGES 144 2006-02-26 18:01:35Z julian $
+# vim:tw=79 syn=changelog

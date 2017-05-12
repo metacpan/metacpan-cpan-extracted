@@ -1,0 +1,10 @@
+Revision history for Perl module Method::Declarative
+
+0.01 Tue Jul 11 22:51:05 2006
+    - original version; created by ExtUtils::ModuleMaker 0.47, then modified.
+
+0.02 Wed Jul 12 21:15:10 2006
+    - Relaxed restriction on 'code' key in the --defaults section.
+
+0.03 Sun Jul 16 21:01:08 2006
+    - Added a test script

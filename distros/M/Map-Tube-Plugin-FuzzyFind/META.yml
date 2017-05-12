@@ -1,0 +1,37 @@
+---
+abstract: 'Map::Tube add-on for finding stations and lines by inexact name.'
+author:
+  - 'Gisbert W. Selke <gws@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Map::Tube: '2.92'
+  Map::Tube::London: '0.71'
+  Test::More: '0.82'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.0514, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Map-Tube-Plugin-FuzzyFind
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Map::Tube::Plugin::FuzzyFind:
+    file: lib/Map/Tube/Plugin/FuzzyFind.pm
+    version: '0.08'
+requires:
+  Map::Tube: '2.85'
+  Moo: '0'
+  Moo::Role: '0'
+  Try::Tiny: '0'
+  namespace::clean: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://rt.cpan.org/Dist/Display.html?Name=Map-Tube-Plugin-FuzzyFind
+version: '0.08'
+

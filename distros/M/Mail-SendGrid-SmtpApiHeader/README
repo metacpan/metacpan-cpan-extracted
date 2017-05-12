@@ -1,0 +1,34 @@
+MAil-SendGrid-SmtpApiHeader
+===========================
+
+This module provides a simple way to generate the custom SMTP extension header used by
+SendGrid.
+
+See the file "Changes" for all changes made to this software.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries at runtime:
+
+  JSON
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2010 by SendGrid
+Copyright (C) 2011 by Booking.com
+Copyright (C) 2012 by Emmanuel Rodriguez
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

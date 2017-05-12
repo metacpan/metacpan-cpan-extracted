@@ -1,0 +1,6 @@
+Revision history for Perl extension Math::Symbolic::Custom::ErrorPropagation.
+
+0.11  Wed Jun 05 07:59:37 2013
+	- POD encoding fix
+0.10  Mon Apr 12 17:20:37 2004
+	- original version as uploaded to CPAN

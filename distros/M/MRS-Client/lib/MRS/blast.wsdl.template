@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://mrs.cmbi.ru.nl/mrsws/blast" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns="http://mrs.cmbi.ru.nl/mrsws/blast" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+ <wsdl:types>
+  <xsd:schema targetNamespace="http://mrs.cmbi.ru.nl/mrsws/blast" xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+   <xsd:element name="Blast">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="query" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="program" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="db" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="mrsBooleanQuery" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="params" type="ns:Parameters" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="reportLimit" type="xsd:unsignedInt" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="BlastJobError">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="jobId" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="BlastJobErrorResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="error" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="BlastJobResult">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="jobId" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="BlastJobResultResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="dbCount" type="xsd:unsignedInt" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="dbLength" type="xsd:unsignedLong" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="effectiveSearchSpace" type="xsd:unsignedLong" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="kappa" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="lambda" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="entropy" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="hits" type="ns:Hit" minOccurs="0" maxOccurs="unbounded"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="BlastJobStatus">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="jobId" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="BlastJobStatusResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="status" type="ns:JobStatus" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="BlastResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="jobId" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:complexType name="Hit">
+    <xsd:sequence>
+     <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="sequenceId" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+     <xsd:element name="title" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="hsps" type="ns:Hsp" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+   </xsd:complexType>
+   <xsd:complexType name="Hsp">
+    <xsd:sequence>
+     <xsd:element name="score" type="xsd:unsignedInt" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="bitScore" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="expect" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="queryStart" type="xsd:unsignedInt" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="subjectStart" type="xsd:unsignedInt" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="identity" type="xsd:unsignedInt" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="positive" type="xsd:unsignedInt" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="gaps" type="xsd:unsignedInt" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="subjectLength" type="xsd:unsignedInt" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="queryAlignment" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="subjectAlignment" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="midline" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+    </xsd:sequence>
+   </xsd:complexType>
+   <xsd:simpleType name="JobStatus">
+    <xsd:restriction base="xsd:string">
+     <xsd:enumeration value="unknown"/>
+     <xsd:enumeration value="queued"/>
+     <xsd:enumeration value="running"/>
+     <xsd:enumeration value="error"/>
+     <xsd:enumeration value="finished"/>
+    </xsd:restriction>
+   </xsd:simpleType>
+   <xsd:complexType name="Parameters">
+    <xsd:sequence>
+     <xsd:element name="matrix" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="wordSize" type="xsd:unsignedInt" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="expect" type="xsd:double" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="lowComplexityFilter" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="gapped" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="gapOpen" type="xsd:unsignedInt" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="gapExtend" type="xsd:unsignedInt" minOccurs="1" maxOccurs="1"/>
+    </xsd:sequence>
+   </xsd:complexType>
+  </xsd:schema>
+ </wsdl:types>
+ <wsdl:message name="BlastJobErrorRequestMessage">
+  <wsdl:part name="parameters" element="ns:BlastJobError"/>
+ </wsdl:message>
+ <wsdl:message name="BlastJobErrorResponseMessage">
+  <wsdl:part name="parameters" element="ns:BlastJobErrorResponse"/>
+ </wsdl:message>
+ <wsdl:message name="BlastJobResultRequestMessage">
+  <wsdl:part name="parameters" element="ns:BlastJobResult"/>
+ </wsdl:message>
+ <wsdl:message name="BlastJobResultResponseMessage">
+  <wsdl:part name="parameters" element="ns:BlastJobResultResponse"/>
+ </wsdl:message>
+ <wsdl:message name="BlastJobStatusRequestMessage">
+  <wsdl:part name="parameters" element="ns:BlastJobStatus"/>
+ </wsdl:message>
+ <wsdl:message name="BlastJobStatusResponseMessage">
+  <wsdl:part name="parameters" element="ns:BlastJobStatusResponse"/>
+ </wsdl:message>
+ <wsdl:message name="BlastRequestMessage">
+  <wsdl:part name="parameters" element="ns:Blast"/>
+ </wsdl:message>
+ <wsdl:message name="BlastResponseMessage">
+  <wsdl:part name="parameters" element="ns:BlastResponse"/>
+ </wsdl:message>
+ <wsdl:portType name="mrsws_blastPortType">
+  <wsdl:operation name="Blast">
+   <wsdl:input message="ns:BlastRequestMessage"/>
+   <wsdl:output message="ns:BlastResponseMessage"/>
+  </wsdl:operation>
+  <wsdl:operation name="BlastJobStatus">
+   <wsdl:input message="ns:BlastJobStatusRequestMessage"/>
+   <wsdl:output message="ns:BlastJobStatusResponseMessage"/>
+  </wsdl:operation>
+  <wsdl:operation name="BlastJobResult">
+   <wsdl:input message="ns:BlastJobResultRequestMessage"/>
+   <wsdl:output message="ns:BlastJobResultResponseMessage"/>
+  </wsdl:operation>
+  <wsdl:operation name="BlastJobError">
+   <wsdl:input message="ns:BlastJobErrorRequestMessage"/>
+   <wsdl:output message="ns:BlastJobErrorResponseMessage"/>
+  </wsdl:operation>
+ </wsdl:portType>
+ <wsdl:binding name="mrsws_blast" type="ns:mrsws_blastPortType">
+  <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+  <wsdl:operation name="Blast">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="BlastJobStatus">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="BlastJobResult">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="BlastJobError">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+ </wsdl:binding>
+ <wsdl:service name="${SERVICE}">
+  <wsdl:port name="mrsws_blast" binding="ns:mrsws_blast">
+   <soap:address location="${LOCATION}"/>
+  </wsdl:port>
+ </wsdl:service>
+</wsdl:definitions>

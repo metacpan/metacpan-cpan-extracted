@@ -1,0 +1,34 @@
+#
+# This aliases file contains several types of aliases:
+#   * normal aliases
+#   * programs (| /some/path)
+#   * files (/dev/null)
+#   * groups (multiple aliases)
+#
+# I'll use the unresolvable.perl.org domain for examples
+
+Postmaster: /dev/null
+MAILER-DAEMON: postmaster
+nobody: /dev/null
+spam:   /dev/null
+
+### Individual aliases
+tjones: Tom_Jones@unresolvable.perl.org
+bjones: Barnaby_Jones@unresolvable.perl.org
+bjones2: Bridget_Jones@unresolvable.perl.org
+qjones: Quincy_Jones@unresolvable.perl.org
+### Lists
+jones: tjones,bjones,bjones2,qjones
+crap:
+        tjones,
+        bjones,
+        bjones2
+
+archive: /var/mail/archive, root
+redist: "| /path/to/redist"
+
+silly: silly, stuff
+
+backslashed: \jones
+
+nothing: nothing

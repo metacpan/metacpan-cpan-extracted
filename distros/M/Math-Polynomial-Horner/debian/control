@@ -1,0 +1,37 @@
+# Copyright 2010, 2011 Kevin Ryde
+
+# This file is part of Math-Polynomial-Horner.
+#
+# Math-Polynomial-Horner is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 3, or
+# (at your option) any later version.
+#
+# Math-Polynomial-Horner is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Math-Polynomial-Horner.  If not, see
+# <http://www.gnu.org/licenses/>.
+
+
+# Build-Depends could have the "maximum_tests" modules from META.yml
+# for more tests, but they're optional author tests really and would
+# just make the build tools drag in more stuff.
+
+Source: libmath-polynomial-horner-perl
+Section: perl
+Priority: optional
+Build-Depends: libtest-more-perl | perl (>= 5.6.2), cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42@zip.com.au>
+Standards-Version: 3.9.1
+Homepage: http://user42.tuxfamily.org/math-polynomial-horner/index.html
+Bugs: mailto:user42@zip.com.au
+
+Package: libmath-polynomial-horner-perl
+Architecture: all
+Depends: perl (>= 5.004), libmath-polynomial-perl (>= 1), ${perl:Depends}, ${misc:Depends}
+Description: Stringizing Math::Polyomial objects in Horner form
+ Eg. strings like ((((5*x + 4)*x + 3)*x + 2)*x + 1)

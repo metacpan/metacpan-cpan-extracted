@@ -1,0 +1,427 @@
+#! /usr/bin/perl
+#########################################################################
+#        This Perl script is Copyright (c) 2011, Peter J Billam         #
+#     c/o P J B Computing, GPO Box 669, Hobart TAS 7001, Australia      #
+#                                                                       #
+#     This script is free software; you can redistribute it and/or      #
+#            modify it under the same terms as Perl itself.             #
+#########################################################################
+# Simulates a metronome, on real-time MIDI, as an ALSA client
+
+use Term::ReadKey;
+use Time::HiRes;
+use bytes;
+
+my $Version      = '1.4'; # use the new MIDI-ALSA 1.11 to handle portnames
+my $VersionDate  = '03nov2011';
+my $Tempo        = 120;   # beats per minute
+my $BarLength    = 0;     # beats per bar
+my $Volume       = 100;   # MIDI velocity 0..127
+my $Debug        = 0;
+my $Quiet        = 0;     # no display; for use in background, and in scripts
+my $Paused       = 0;
+my $OutputPort   = q{};
+# vt100 globals
+my $CursorRow    = 5;
+my $Irow         = 1;
+my $Icol         = 1;
+my $MidCol       = 32;
+
+eval 'require MIDI::ALSA'; if ($@) {
+	die "you'll need to install the MIDI-ALSA module from www.cpan.org\n";
+}
+
+# check format of options args...
+while ($ARGV[$[] =~ /^-(\w)/) {
+	if ($1 eq 'V')      { shift;
+		my $n = $0; $n =~ s{^.*/([^/]+)$}{$1};
+		print "$n version $Version $VersionDate\n";
+		exit 0;
+	} elsif ($1 eq 't')      { shift;
+		my $a = shift; if ($a !~ /^\d[\d.]*$/) { die "bad -t arg: $a\n"; }
+		$Tempo     = 0 + $a;
+	} elsif ($1 eq 'b') { shift;
+		my $a = shift; if ($a !~ /^\d+$/) { die "bad -b arg: $a\n"; }
+		$BarLength = 0 + $a;
+	} elsif ($1 eq 'v') { shift;
+		my $a = shift; if ($a !~ /^\d+$/) { die "bad -v arg: $a\n"; }
+		$Volume    = 0 + $a;
+		if ($Volume < 1) { $Volume = 1;
+		} elsif ($Volume > 127) { $Volume = 127;
+		}
+	} elsif ($1 eq 'o') { shift; $OutputPort = shift;
+	} elsif ($1 eq 'p') { shift; $Paused     = 1;
+	} elsif ($1 eq 'Q') { shift; $Quiet      = 1;
+	} elsif ($1 eq 'D') { shift; $Debug      = 1;
+	} else {
+		my $n = $0; $n =~ s#^.*/([^/]+)$#$1#;
+		print "usage:\n";
+		my $synopsis = 0;
+		while (<DATA>) {
+			if (/^=head1 SYNOPSIS/) { push @Synopsis,$_; $synopsis=1; next; }
+			if ($synopsis && /^=head1/) { last; }
+			if ($synopsis)      { print $_; next; }
+		}
+		exit 1;
+	}
+}
+if ($Quiet) { $Paused = 0; }
+
+my $RealTimeMode = 1;  # an anacronism from midiecho; we're always RealTime.
+if ($RealTimeMode) {
+	eval 'require MIDI::ALSA'; if ($@) {
+		die "you need to install the MIDI::ALSA module from www.cpan.org\n";
+	}
+
+	#if ($OutputPort =~ /^$|^\d+(:\d)?(,\d+(:\d)?)*$/)  {
+	#} else { die "bad -o arg: $OutputPort\n";
+	#}
+	if (! MIDI::ALSA::client( "midiclick pid=$$", 0, 1, 1 )) {
+	   	die "can't create the  MIDI::ALSA::client\n";
+	}
+
+	if (!$OutputPort) { $OutputPort = $ENV{'ALSA_OUTPUT_PORTS'}; }
+	if (!$OutputPort) {
+		warn "OutputPort not specified and ALSA_OUTPUT_PORTS not set\n";
+	}
+	foreach my $cl_po (split /,/, $OutputPort) {  # 3.6
+		#$cl_po =~ /^(\d+):?(\d*)$/;
+		#my $cl = $1; my $po = $2 or 0;
+		#if ($cl == MIDI::ALSA::id()) {
+		#	die "can't connect to $cl_po, which is myself\n";
+		#}
+		if (! MIDI::ALSA::connectto( 1, $cl_po )) {  # 1.4
+			die "can't connect to ALSA client $cl_po\n";
+		}
+	}
+	if (! MIDI::ALSA::start()) {
+		die "can't start the queue of the ALSA client\n";
+	}
+	# system "aconnect -oil";
+	display_alsa(); display_keystrokes(); display_tempo();
+	display_paused(); display_volume();
+
+	# The child responds to keystrokes and the parent emits the alsaevents
+	if (! $Quiet) {  # 3.1
+		my $parent_pid = $$;
+		my $child_pid  = open(CHILD_STDOUT, "-|");
+		sub handle_child_output {
+			my $cmd = <CHILD_STDOUT>;
+			eval $cmd; if ($@) { warn "can't eval $cmd $@\n"; }
+		}
+		if (! $child_pid) {   # The child does all the UI
+			while (1) {
+				ReadMode(4, STDIN);
+				my $c = ReadKey(0, STDIN);
+				if ($c =~ /^\e$/) { # reduce an escape sequence to just 1 char
+					$c = ReadKey(0, STDIN);
+					if ($c eq '[') {
+						$c = ReadKey(0, STDIN);
+						if ($c =~ /^\d$/) {   # e.g. Delete; throw away the ~
+							my $tilde = ReadKey(0, STDIN);
+						}
+					}
+				}
+				if ($c =~ /^q$/i) {
+					gotoxy(1, $CursorRow); display_keystrokes('quit');
+					ReadMode(0, STDIN);
+					print STDOUT "wait; exit;\n"; kill 'HUP', $parent_pid;
+					exit;
+				}
+				if ($c eq 't') {
+					my $ch = get_int('tempo (beats per minute) ?');
+					if (defined $ch) {
+						$Tempo = $ch;
+						print STDOUT "\$Tempo  = $ch;\n";
+						kill 'HUP', $parent_pid;
+					}
+					display_tempo(); display_keystrokes();
+				} elsif ($c eq 'b') {
+					my $d = get_int('bar length (in beats) ?');
+					if (defined $d) {
+						$BarLength = $d;
+						print STDOUT "\$BarLength  = $d;\n";
+						kill 'HUP', $parent_pid;
+					}
+					display_tempo(); display_keystrokes();
+				} elsif ($c eq 'v') {
+					my $d = get_int('volume ?');
+					if (defined $d) {
+						$Volume = $d;
+						print STDOUT "\$Volume  = $d;\n";
+						kill 'HUP', $parent_pid;
+					}
+					display_volume(); display_keystrokes();
+				} elsif ($c eq ' ') {
+					if ($Paused) { $Paused=0; } else { $Paused = 1; }
+					print STDOUT "\$Paused  = $Paused;\n";
+					kill 'HUP', $parent_pid;
+					display_paused(); display_keystrokes();
+				}
+				# every second or so, the child should display_alsa()
+				# print STDOUT "$cmd\n"; kill 'HUP', $parent_pid;
+			}
+		}
+		$SIG{'HUP'} = \&handle_child_output;
+		close STDIN;  # end of child
+	}  # end of   if(!$Quiet)
+
+	my $beat = 0;   # 0 .. ($BarLength-1)
+	my $next_click = 0;
+	while (1) {  # the parent...
+		# on my system, sleep is interrupted by HUP...
+		if ($Paused) { $beat = 0; Time::HiRes::sleep(10.0); next; }
+		MIDI::ALSA::syncoutput();
+		my ($is_running,$now,$nevents) = MIDI::ALSA::status();
+		my $pitch = 33;
+		if ($beat == 0 and $BarLength > 0) { $pitch = 34; }
+		$next_click += 60/$Tempo;
+		my @alsaevent=MIDI::ALSA::noteevent(9,$pitch,$Volume,$next_click,0.3);
+		my $rc = MIDI::ALSA::output(@alsaevent);
+		# HUP aborts this sleep, therefore must syncoutput as well;
+		Time::HiRes::sleep(60/$Tempo);
+		# but on its own, syncoutput lurches on BarLength change, not sure why
+		$beat += 1;
+		if ($beat >= $BarLength) { $beat = 0; }
+	}
+	exit 0;   # end of RealTime mode
+}
+
+#--------- RealTime UI and infrastructure, recycled from midikbd ---------
+sub display_alsa {
+	return if $Quiet;
+	@ConnectedTo = ();
+	my $id = MIDI::ALSA::id();
+	foreach (MIDI::ALSA::listconnectedto()) {
+		my @cl = @$_;
+		push @ConnectedTo, "$cl[1]:$cl[2]"
+	}
+	@ConnectedFrom = ();
+	foreach (MIDI::ALSA::listconnectedfrom()) {
+		my @cl = @$_;
+		push @ConnectedFrom, "$cl[1]:$cl[2]"
+	}
+	gotoxy(1,1);       puts_30c("ALSA client $id");
+	gotoxy($MidCol,1); puts_clr("midiclick pid=$$");
+	gotoxy(1,2); puts_clr($s);
+	my $s = "Ouput port $id:0 is ";
+	if (@ConnectedTo) { $s .= "connected to ".join(',',@ConnectedTo);
+	} else {            $s .= "not connected to anything";
+	}
+	gotoxy(1,2); puts_clr($s);
+	gotoxy(1,$CursorRow);
+}
+
+sub display_tempo {
+	return if $Quiet;
+	gotoxy(1,3);       puts_30c("Tempo $Tempo beats/min");
+	gotoxy($MidCol,3); puts_clr("BarLength $BarLength beats");
+	gotoxy(1,$CursorRow);
+}
+
+sub display_paused {
+	return if $Quiet;
+	gotoxy(1,4);
+	if ($Paused) {
+		puts_30c("PAUSED");
+	} else {
+		puts_30c("Playing");
+	}
+	gotoxy(1,$CursorRow);
+}
+
+sub display_volume {
+	return if $Quiet;
+	gotoxy($MidCol,4); puts_clr("Volume $Volume");
+	gotoxy(1,$CursorRow);
+}
+
+sub display_keystrokes { my $arg = $_[$[];
+	if ($Quiet) { return; }
+	my $s = " t=Tempo  b=Barlength  <spacebar>=";
+	if ($Paused) { $s .= "Play"; } else { $s .= "Pause"; }
+	$s .= "  v=Volume  q=Quit" ;
+	if ($arg eq 'quit') { $s = ''; gotoxy(1,4); puts_30c("Quit"); }
+	gotoxy(1, $CursorRow+1); puts_clr($s); gotoxy(1,$CursorRow);
+}
+
+sub get_int { my $s = $_[$[];   # this runs in the child
+	my $min_int = 0;
+	my $max_int = 127;
+	if      ($s =~ /bar/i)    { $max_int = 50;
+	} elsif ($s =~ /tempo/i)  { $min_int = 30; $max_int = 300;
+	} elsif ($s =~ /output/i) { $min_int = 10; $max_int = 200;
+	}
+	ReadMode(0, STDIN);
+	my $int;
+	while (1) {
+		puts_clr("$s ($min_int..$max_int) ? ");
+		$int = <STDIN>;
+		print STDERR "\e[A"; $Icol = 1;
+		if ($int =~ /^-?[0-9]+$/ and $int >= $min_int and $int <= $max_int) {
+			ReadMode(4, STDIN);
+			puts_clr('');
+			return 0+$int;
+		}
+		if ($int =~ /^\s*$/) {
+			ReadMode(4, STDIN);
+			puts_clr('');
+			return undef;
+		}
+	}
+}
+
+# --------------- vt100 stuff, evolved from Term::Clui ---------------
+sub puts   { my $s = join q{}, @_;
+	$Irow += ($s =~ tr/\n/\n/);
+	if ($s =~ /\r\n?$/) { $Icol = 0;
+	} else { $Icol += length($s);   # BUG, wrong on multiline strings!
+	}
+	# print STDERR "$s\e[K";   # and clear-to-eol
+	# should be caller's responsibility ? or an option ? a different sub ?
+	print STDERR $s;
+}
+sub puts_30c {  my $s = $_[$[];   # assumes no newlines
+	my $rest = 30-length($s);
+	print STDERR $s, " "x$rest, "\e[D"x$rest;
+	$Icol += length($s);
+}
+sub puts_clr {  my $s = $_[$[];   # assumes no newlines
+	my $rest = 30-length($s);
+	print STDERR "$s\e[K";
+	$Icol += length($s);
+}
+sub clrtoeol {
+	print STDERR "\e[K";
+}
+sub up    {
+	# if ($_[$[] < 0) { down(0 - $_[$[]); return; }
+	print STDERR "\e[A" x $_[$[]; $Irow -= $_[$[];
+}
+sub down  {
+	# if ($_[$[] < 0) { up(0 - $_[$[]); return; }
+	print STDERR "\n" x $_[$[]; $Irow += $_[$[];
+}
+sub right {
+	# if ($_[$[] < 0) { left(0 - $_[$[]); return; }
+	print STDERR "\e[C" x $_[$[]; $Icol += $_[$[];
+}
+sub left  {
+	# if ($_[$[] < 0) { right(0 - $_[$[]); return; }
+	print STDERR "\e[D" x $_[$[]; $Icol -= $_[$[];
+}
+sub gotoxy { my $newcol = shift; my $newrow = shift;
+	if ($newcol == 0) { print STDERR "\r" ; $Icol = 0;
+	} elsif ($newcol > $Icol) { right($newcol-$Icol);
+	} elsif ($newcol < $Icol) { left($Icol-$newcol);
+	}
+	if ($newrow > $Irow)      { down($newrow-$Irow);
+	} elsif ($newrow < $Irow) { up($Irow-$newrow);
+	}
+}
+
+#sub usecs {
+#	my ($secs, $usecs) = Time::HiRes::gettimeofday();
+#	return 1000000*$secs + $usecs;
+#}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+midiclick - generates a metronome click-track on MIDI channel 9
+
+=head1 SYNOPSIS
+
+ midiclick -t 108           # tempo is (starts at) 108 beats/min
+ midiclick -t 108 -b 4      # Four beats in a bar
+ midiclick -Q -t 108 -b 4   # Quiet mode; no User-Interface
+ midiclick -o 14:1 -t 108   # Output to ALSA-port 14:1
+ midiclick -p               # starts up in Paused mode
+ xterm -geometry 80x7-1+1 -exec 'midiclick -t 165 -b 5' &
+
+ ~> midiclick -o TiMidity -t 144 -b 5 -p
+ ALSA client 129                midiclick pid=2157
+ Output port 129:1 is connected to 128:0
+ Tempo 144 beats/min            BarLength 5 beats
+ PAUSED                         Volume 100
+ _
+  t=Tempo  b=Barlength  <spacebar>=Play  v=Volume  q=Quit
+
+ http://www.pjb.com.au/midi/midiclick.html
+
+=head1 DESCRIPTION
+
+The MIDI::ALSA module is used to create an ALSA client.
+
+The keyboard interface,
+allows real-time adjustment of the delay parameters.
+If you don't want the interface (e.g. in a Makefile),
+the -Q option sets Quiet-mode.
+
+=head1 OPTIONS
+
+=over 3
+
+=item I<-t 72>
+
+The Tempo will be set; to 72 beats per minute in this example.
+The default is 120.
+
+=item I<-b 3>
+
+The Bar length will be set;
+the bell will sound every 3 beats in this example
+The default is 0, which means every beat clicks and there are no bells.
+
+=item I<-v 80>
+
+This option sets the Volume (or Velocity) of the midi output.
+The default is 100.
+
+=item I<-p>
+
+This option starts I<midiclick> in Paused state;
+you can then start it Playing with spacebar.
+This option is ignored in -Q Quiet mode.
+
+=item I<-o 128:0> or I<-o TiMidity>
+
+This option sets the ouput-port to which the midi output will be sent.
+You can check out the available ports with the command
+I<aplaymidi -l> or I<aconnect -ol>.
+The default ouput-port
+is the environment variable $ALSA_OUTPUT_PORTS
+
+=item I<-Q>
+
+This option runs I<midiclick> in Quiet mode;
+there is no user-interface, and the metronome just runs
+with its Tempo and BarLength as given on the command-line,
+until it is interrupted.  It can be useful in scripts.
+
+=item I<-V>
+
+This option displays the Version number.
+
+=back
+
+=head1 AUTHOR
+
+Peter J Billam  http://www.pjb.com.au/comp/contact.html
+
+=head1 CREDITS
+
+Based on the MIDI::Perl CPAN module in midi-file mode,
+and the MIDI::ALSA CPAN module in real-time mode.
+
+=head1 SEE ALSO
+
+ http://search.cpan.org/perldoc?MIDI
+ http://search.cpan.org/perldoc?MIDI::ALSA
+ http://www.pjb.com.au/muscript
+ http://www.pjb.com.au/midi
+
+=cut

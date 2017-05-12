@@ -1,0 +1,32 @@
+Math-GSL-Linalg-SVD version 0.0.2
+
+DESCRIPTION
+
+The singular value decomposition (SVD) is an important factorization of a rectangular real matrix - see http://en.wikipedia.org/wiki/Singular_value_decomposition. Eigendecomposition is the factorization of a matrix into a canonical form, whereby the matrix is represented in terms of its eigenvalues and eigenvectors - see http://en.wikipedia.org/wiki/Eigendecomposition_of_a_matrix. This module implements the SVD and Eigen decomposition routines of the The C GNU Scientific Library (GSL). It provides simple convinience methods in the upper-level Math::GSL::Linalg::SVD namespace to perform these operations. Alternatively, it also provides direct access to the C routines in the Math::GSL::Linalg::SVD::Matrix, Math::GSL::Linalg::SVD::Vector and Math::GSL::Linalg::SVD::Eigen namespaces.
+
+INSTALLATION
+
+To install this module type the following:
+
+    Install gsl package
+    Make sure the libraries gsl, gslcblas are in standard search paths.
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+Just gsl.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2009 by Dr Daniel S. T. Hughes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

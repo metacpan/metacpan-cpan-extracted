@@ -1,0 +1,135 @@
+Revision history for MooseX-Workers
+   Full history: https://github.com/jhannah/moosex-workers
+
+0.24 2015-02-07 14:01:39
+  - fix POD error (extra =back) (github #1)
+  - add blank line after package statement so that dzil plugin
+    PkgVersion doesn't complain (github #1)
+  - reenable 10.worker.enqueue.t on Win32 to see if there are still
+    problems with smokers
+
+0.23 2013-04-30 18:40:46
+  - check class mutability when adding around for Win32
+
+0.22 2013-04-30 14:03:39
+  - don't quote external prog/args on Win32 (broke in cmd)
+  - skip 10.worker.enqueue.t on Win32 (fails sometimes, cannot reproduce)
+
+0.21 2013-04-29 01:36:27
+  - much better compatibility with Win32
+  - wrap non-job workers in an anon job (which stringifies/numifies to wheel ID
+    for backcompat)
+
+0.20 2013-04-27 00:34:18
+  - fix another test on Win32
+
+0.19 2013-04-25 07:55:52
+  - tests pass on Win32, one fixed, one skipped
+
+0.18 2013-04-17 13:36:15
+  - tell PAUSE not to index doc/
+
+0.17 2013-04-17 13:21:35
+  - convert dist to Dist::Zilla
+  - add worker_finished with correct num_workers/has_workers state, deprecate
+    worker_done
+
+0.16 2011-02-22 
+  - CPAN testers looks happy so pushing as 0.16.
+
+0.15_01 2011-02-18 arcanez
+  - no indirect
+  - make POE::Filter::Reference print work
+  - fix some POE issues, RT#54805
+  - fix typos
+
+0.15 2011-02-01
+  - CPAN testers looks happy so pushing as 0.15.
+
+0.14_01 2011-02-01 David K. Storrs
+  - MXW now saves its ctor-time params so they can be passed on to Engine later 
+
+0.14 2010-11-16
+  - Oops. DateTime is a new dep from David's new test.
+
+0.13 2010-11-15
+  - 2010-11-12 David K. Storrs (github.com/dstorrs)
+    Added POE::Filter::Reference support.
+    Added more tests
+  - 2010-05-19 Neil Stott
+    $^O eq 'MSWin32' test patches to try to make Windows happy. 
+
+0.12  2010-03-05 jhannah
+   - 0.11_01 is testing well. Pushing as 0.12.
+
+0.11_01  2010-03-03 pmooney, dec, jhannah
+   - pmooney added get_worker_ids, the ability to trap SIG TERM, demo
+   - dec wrote a generic signal handler instead of TERM-only.
+   - jhannah wrote t/20.worker.SIG.TERM.t, showing sig_TERM() in action.
+   - jhannah tried to write tests for MooseX/Workers/Engine/PreforkPoe.pm (we had none),
+     but couldn't seem to get it to work. So apparently this was an experiment that never
+     got fully off the ground. Removed.
+   - dec Added an alias to MooseX::Workers::Engine to stop its POE::Session from being 
+     terminated early.
+
+0.11  2010-02-18 arcanez
+   - 0.10_01 is testing well. Pushing as 0.11.
+
+0.10_01  2010-02-18 arcanez
+   - Oops. We left MooseX::AttributeHelpers in t/02.wheel.t, making some testers fail.
+     Submitting this correction to the smoking section to see if we missed anything else.
+        (MX::Workers + MXAH 0.22+ worked fine (02.wheel.t), 
+         but Moose 0.90+ and MXAH < 0.22 do not.
+         And since MX::Workers 0.10 requires Moose 0.90 and doesn't
+         specify any MXAH.. issues occurred.)
+
+0.10  2010-02-17 arcanez
+   - get rid of MXAH in favor of Native::Trait, also remove auto_deref in favor 
+     of Native::Trait handles
+
+0.09  2009-07-22 jhannah
+   - confound and Sartak tell me that 'weaken' is wrong. Changed to 'weak_ref'.
+   - doy suggests abandoning testing how long things take. Instead, design less 
+     fragile tests for things happening or not. 
+   - Fixed and cleaned up sig_child, added a test. Got rid of all those annoying 
+     POE warnings about unhandled reap events. 
+   - Misc. POD cleanup.
+
+0.08  2009-07-14 jhannah
+   - MooseX::Workers::Job 'args' attribute can now actually be used.
+
+0.07  2009-06-16 jhannah
+   - No one screamed at the dev release, so pushing as a normal release.
+
+0.06_99  2009-06-10 jhannah
+   - Added enqueue()
+   - Added MooseX::Workers::Job
+   - Added timeout attribute, worker_timeout callback
+   - POD cleanup
+
+0.05  2009-04-27
+   - Fixed deprecation warnings with modern Moose. 
+   - Updated dependency version numbers
+   - Cleaned up extraneous use stricts
+   - Deprecate check_worker_threashold cause it's a typo
+
+0.04  Dec 31 2008
+   - Added put_worker to send input to a worker
+   - Added kill_worker to terminate a wheel
+   - Exposed more of the engine details
+
+0.03  Mon Oct 1 2007
+   - Moved worker_started into an event so add_worker returns
+     before it's called (dec)
+   - Can now pass arguments to spawn() which are passed as
+     ProgramArgs to the underlying POE::Wheel (dec)
+   - Fixed a bug where worker_start was actually calling worker_stop 
+     in the visitor (thanks to ash and perlmonkey2 for noticing)
+   - new spawn() interface that returns the Wheel ID and PID
+
+0.02  Wed Sep 19 16:00:00 2007
+   - Fix a bug where worker_started wasn't being very optional (discovered by Kake)
+   - Fix some packaging issues and tests
+
+0.01  Mon Jul 16 20:38:32 2007
+   Initial release.

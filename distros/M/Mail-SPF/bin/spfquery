@@ -1,0 +1,731 @@
+#!/usr/bin/perl
+
+# 
+# spfquery: Command-line tool for performing SPF queries
+#
+# (C) 2005-2012 Julian Mehnle <julian@mehnle.net>
+#     2004      Wayne Schlitt <wayne@schlitt.net>
+# $Id: spfquery 138 2006-01-22 18:00:34Z julian $
+#
+##############################################################################
+
+=head1 NAME
+
+spfquery - (Mail::SPF) - Checks if a given set of e-mail parameters matches a
+domain's SPF policy
+
+=head1 VERSION
+
+2.501
+
+=head1 SYNOPSIS
+
+=over
+
+=item B<Preferred usage:>
+
+B<spfquery> [B<--versions>|B<-v> B<1>|B<2>|B<1,2>] [B<--scope>|B<-s> B<helo>|B<mfrom>|B<pra>]
+B<--identity>|B<--id> I<identity> B<--ip-address>|B<--ip> I<ip-address>
+[B<--helo-identity>|B<--helo-id> I<helo-identity>] [I<OPTIONS>]
+
+B<spfquery> [B<--versions>|B<-v> B<1>|B<2>|B<1,2>] [B<--scope>|B<-s> B<helo>|B<mfrom>|B<pra>]
+B<--file>|B<-f> I<filename>|B<-> [I<OPTIONS>]
+
+=item B<Legacy usage:>
+
+B<spfquery> B<--helo> I<helo-identity> B<--ip-address>|B<--ip> I<ip-address> [I<OPTIONS>]
+
+B<spfquery> B<--mfrom> I<mfrom-identity> B<--ip-address>|B<--ip> I<ip-address>
+[B<--helo> I<helo-identity>] [I<OPTIONS>]
+
+B<spfquery> B<--pra> I<pra-identity> B<--ip-address>|B<--ip> I<ip-address> [I<OPTIONS>]
+
+=item B<Other usage:>
+
+B<spfquery> B<--version>|B<-V>
+
+B<spfquery> B<--help>
+
+=back
+
+=head1 DESCRIPTION
+
+B<spfquery> checks if a given set of e-mail parameters (e.g., the SMTP sender's
+IP address) matches the responsible domain's Sender Policy Framework (SPF)
+policy.  For more information on SPF see L<http://www.openspf.org>.
+
+=head2 Preferred Usage
+
+The following usage forms are preferred over the L<legacy forms|/Legacy usage>
+used by older B<spfquery> versions:
+
+The B<--identity> form checks if the given I<ip-address> is an authorized SMTP
+sender for the given C<helo> hostname, C<mfrom> envelope sender e-mail address,
+or C<pra> (so-called purported resonsible address) e-mail address, depending
+on the value of the B<--scope> option (which defaults to B<mfrom> if omitted).
+
+The B<--file> form reads "I<ip-address> I<identity> [I<helo-identity>]" tuples
+from the file with the specified I<filename>, or from standard input if
+I<filename> is B<->, and checks them against the specified scope (B<mfrom> by
+default).
+
+Both forms support an optional B<--versions> option, which specifies a
+comma-separated list of the SPF version numbers of SPF records that may be
+used.  B<1> means that C<v=spf1> records should be used.  B<2> means that
+C<spf2.0> records should be used.  Defaults to B<1,2>, i.e., uses any SPF
+records that are available.  Records of a higher version are preferred.
+
+=head2 Legacy Usage
+
+B<spfquery> versions before 2.500 featured the following usage forms, which are
+discouraged but still supported for L<backwards compatibility|/COMPATIBILITY>:
+
+The B<--helo> form checks if the given I<ip-address> is an authorized SMTP
+sender for the C<HELO> hostname given as the I<identity> (so-called C<HELO>
+check).
+
+The B<--mfrom> form checks if the given I<ip-address> is an authorized SMTP
+sender for the envelope sender email-address (or domain) given as the
+I<identity> (so-called C<MAIL FROM> check).  If a domain is given instead of an
+e-mail address, C<postmaster> will be substituted for the localpart.
+
+The B<--pra> form checks if the given I<ip-address> is an authorized SMTP
+sender for the PRA (Purported Responsible Address) e-mail address given as the
+identity.
+
+=head2 Other Usage
+
+The B<--version> form prints version information of spfquery.  The B<--help>
+form prints usage information for spfquery.
+
+=head1 OPTIONS
+
+=head2 Standard Options
+
+The preferred and legacy forms optionally take any of the following
+I<OPTIONS>:
+
+=over
+
+=item B<--default-explanation> I<string>
+
+=item B<--def-exp> I<string>
+
+Use the specified I<string> as the default explanation if the authority domain
+does not specify an explanation string of its own.
+
+=item B<--hostname> I<hostname>
+
+Use I<hostname> as the host name of the local system instead of auto-detecting
+it.
+
+=item B<--keep-comments>
+
+=item B<--no-keep-comments>
+
+Do (not) print any comments found when reading from a file or from standard
+input.
+
+=item B<--sanitize> (currently ignored)
+
+=item B<--no-sanitize> (currently ignored)
+
+Do (not) sanitize the output by condensing consecutive white-space into a
+single space and replacing non-printable characters with question marks.
+Enabled by default.
+
+=item B<--debug> (currently ignored)
+
+Print out debug information.
+
+=back
+
+=head2 Black Magic Options
+
+Several options that were supported by earlier versions of B<spfquery> are
+considered black magic (i.e. potentially dangerous for the innocent user) and
+are thus disabled by default.  If the L<B<Mail::SPF::BlackMagic>> Perl module
+is installed, they may be enabled by specifying B<--enable-black-magic>.
+
+=over
+
+=item B<--max-dns-interactive-terms> I<n>
+
+Evaluate a maximum of I<n> DNS-interactive mechanisms and modifiers per SPF
+check.  Defaults to B<10>.  Do I<not> override the default unless you know what
+you are doing!
+
+=item B<--max-name-lookups-per-term> I<n>
+
+Perform a maximum of I<n> DNS name look-ups per mechanism or modifier.
+Defaults to B<10>.  Do I<not> override the default unless you know what you are
+doing!
+
+=item B<--authorize-mxes-for> I<email-address>|I<domain>B<,>...
+
+Consider all the MXes of the comma-separated list of I<email-address>es and
+I<domain>s as inherently authorized.
+
+=item B<--tfwl>
+
+Perform C<trusted-forwarder.org> accreditation checking.
+
+=item B<--guess> I<spf-terms>
+
+Use I<spf-terms> as a default record if no SPF record is found.
+
+=item B<--local> I<spf-terms>
+
+Process I<spf-terms> as local policy before resorting to a default result
+(the implicit or explicit C<all> mechanism at the end of the domain's SPF
+record).  For example, this could be used for white-listing one's secondary
+MXes: C<mx:mydomain.example.org>.
+
+=item B<--override> I<domain>B<=>I<spf-record>
+
+=item B<--fallback> I<domain>B<=>I<spf-record>
+
+Set overrides and fallbacks.  Each option can be specified multiple times.  For
+example:
+
+    --override example.org='v=spf1 -all'
+    --override '*.example.net'='v=spf1 a mx -all'
+    --fallback example.com='v=spf1 -all'
+
+=back
+
+=head1 RESULT CODES
+
+=over 12
+
+=item B<pass>
+
+The specified IP address is an authorized SMTP sender for the identity.
+
+=item B<fail>
+
+The specified IP address is not an authorized SMTP sender for the identity.
+
+=item B<softfail>
+
+The specified IP address is not an authorized SMTP sender for the identity,
+however the authority domain is still testing out its SPF policy.
+
+=item B<neutral>
+
+The identity's authority domain makes no assertion about the status of the IP
+address.
+
+=item B<permerror>
+
+A permanent error occurred while evaluating the authority domain's policy
+(e.g., a syntax error in the SPF record).  Manual intervention is required
+from the authority domain.
+
+=item B<temperror>
+
+A temporary error occurred while evaluating the authority domain's policy
+(e.g., a DNS error).  Try again later.
+
+=item B<none>
+
+There is no applicable SPF policy for the identity domain.
+
+=back
+
+=head1 EXIT CODES
+
+  Result    | Exit code
+ -----------+-----------
+  pass      |     0
+  fail      |     1
+  softfail  |     2
+  neutral   |     3
+  permerror |     4
+  temperror |     5
+  none      |     6
+
+=head1 EXAMPLES
+
+    spfquery --scope mfrom --id user@example.com --ip 1.2.3.4
+    spfquery --file test_data
+    echo "127.0.0.1 user@example.com helohost.example.com" | spfquery -f -
+
+=head1 COMPATIBILITY
+
+B<spfquery> has undergone the following interface changes compared to earlier
+versions:
+
+=over
+
+=item B<2.500>
+
+=over
+
+=item *
+
+A new preferred usage style for performing individual SPF checks has been
+introduced.  The new style accepts a unified B<--identity> option and an
+optional B<--scope> option that specifies the type (scope) of the identity.  In
+contrast, the legacy usage style requires a separate usage form for every
+supported scope.  See L</Preferred usage> and L</Legacy usage> for details.
+
+=item *
+
+The former C<unknown> and C<error> result codes have been renamed to C<permerror>
+and C<temperror>, respectively, in order to comply with RFC 4408 terminology.
+
+=item *
+
+SPF checks with an empty identity are no longer supported.  In the case of an
+empty C<MAIL FROM> SMTP transaction parameter, perform a check with the C<helo>
+scope directly.
+
+=item *
+
+The B<--debug> and B<--(no-)sanitize> options are currently ignored by this
+version of B<spfquery>.  They will again be supported in the future.
+
+=item *
+
+Several features that were supported by earlier versions of B<spfquery> are
+considered black magic and thus are now disabled by default.  See L</Black
+Magic Options>.
+
+=item *
+
+Several option names have been deprecated.  This is a list of them and their
+preferred synonyms:
+
+  Deprecated options  | Preferred options
+ ---------------------+-----------------------------
+  --sender, -s        | --mfrom
+  --ipv4, -i          | --ip-address, --ip
+  --name              | --hostname
+  --max-lookup-count, | --max-dns-interactive-terms
+    --max-lookup      |
+  --rcpt-to, -r       | --authorize-mxes-for
+  --trusted           | --tfwl
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mail::SPF>, L<spfd(8)>
+
+L<http://tools.ietf.org/html/rfc4408>
+
+=head1 AUTHORS
+
+This version of B<spfquery> is a complete rewrite by Julian Mehnle
+<julian@mehnle.net>, based on an earlier version written by Meng Weng Wong
+<mengwong+spf@pobox.com> and Wayne Schlitt <wayne@schlitt.net>.
+
+=cut
+
+our $VERSION = '2.501';
+
+use warnings;
+use strict;
+
+use IO::File;
+use Getopt::Long qw(:config gnu_compat no_ignore_case);
+use Error ':try';
+use Mail::SPF;
+
+use constant TRUE   => (0 == 0);
+use constant FALSE  => not TRUE;
+
+use constant exit_codes_by_result_code => {
+    pass        => 0,
+    fail        => 1,
+    softfail    => 2,
+    neutral     => 3,
+    permerror   => 4,
+    temperror   => 5,
+    none        => 6
+};
+
+# Helper Functions
+##############################################################################
+
+sub usage {
+    STDERR->printf(<<'EOT');
+Preferred Usage:
+    spfquery [--versions|-v 1|2|1,2] [--scope|-s helo|mfrom|pra]
+        --identity|--id <identity> --ip-address|--ip <ip-address>
+        [--helo-identity|--helo-id <helo-identity>] [OPTIONS]
+    spfquery [--versions|-v 1|2|1,2] [--scope|-s helo|mfrom|pra]
+        --file|-f <filename>|- [OPTIONS]
+
+Legacy Usage:
+    spfquery --helo <helo-identity> --ip-address|--ip <ip-address> [OPTIONS]
+    spfquery --mfrom <mfrom-identity> --ip-address|--ip <ip-address>
+        [--helo <helo-identity>] [OPTIONS]
+    spfquery --pra <pra-identity> --ip-address|--ip <ip-address> [OPTIONS]
+
+Other Usage:
+    spfquery --version|-V
+
+See `spfquery --help` for more information.
+EOT
+    return;
+}
+
+sub help {
+    print(<<'EOT');
+Preferred Usage:
+    spfquery [--versions|-v 1|2|1,2] [--scope|-s helo|mfrom|pra]
+        --identity|--id <identity> --ip-address|--ip <ip-address>
+        [--helo-identity|--helo-id <helo-identity>] [OPTIONS]
+    spfquery [--versions|-v 1|2|1,2] [--scope|-s helo|mfrom|pra]
+        --file|-f <filename>|- [OPTIONS]
+
+Legacy Usage:
+    spfquery --helo <helo-identity> --ip-address|--ip <ip-address> [OPTIONS]
+    spfquery --mfrom <mfrom-identity> --ip-address|--ip <ip-address>
+        [--helo <helo-identity>] [OPTIONS]
+    spfquery --pra <pra-identity> --ip-address|--ip <ip-address> [OPTIONS]
+
+Other Usage:
+    spfquery --version|-V
+
+spfquery performs SPF checks based on the command-line arguments or data given
+in a file or on standard input.
+
+Only the preferred and other usage forms are explained here.  See the
+spfquery(1) man-page for an explanation of the legacy usage forms.
+
+The "--identity" form checks if the given <ip-address> is an authorized SMTP
+sender for the given "helo" hostname, "mfrom" envelope sender e-mail address,
+or "pra" (purported resonsible address) e-mail address, depending on the value
+of the "--scope" option (which defaults to "mfrom" if omitted).
+
+The "--file" form reads "<ip-address> <identity> [<helo-identity>]" tuples from
+the file with the specified <filename>, or from standard input if <filename> is
+"-", and checks them against the specified scope ("mfrom" by default).
+
+The "--version" form prints version information of spfquery.
+
+Valid OPTIONS (and their defaults) are:
+    --default-explanation <string>
+                        Default explanation string to use (sensible default).
+    --hostname <hostname>
+                        The name of the system doing the SPF checking (local
+                        system's configured hostname).
+    --keep-comments     Print comments found when reading from a file.
+    --no-sanitize       Do not clean up invalid characters in output.
+    --debug             Output debugging information.
+
+Black-magic OPTIONS are:
+    --max-dns-interactive-terms <n>
+                        Maximum number of DNS-interactive mechanisms and
+                        modifiers (10).
+    --max-name-lookups-per-term <n>
+                        Maximum number of DNS name look-ups per mechanism or
+                        modifier (10).
+    --authorize-mxes-for <email-address>|<domain>,...
+                        A comma-separated list of e-mail addresses and domains
+                        whose MXes will be considered inherently authorized.
+    --tfwl              Check trusted-forwarder.org white-list.
+    --guess <spf-terms> Default checks if no SPF record is found.
+    --local <spf-terms> Local policy to process before default result.
+    --override <domain>=<spf-record>
+    --fallback <domain>=<spf-record>
+                        Set override and fallback SPF records for domains.
+
+Examples:
+    spfquery --scope mfrom --id user@example.com --ip 1.2.3.4
+    spfquery --file test_data
+    echo "127.0.0.1 user@example.com helohost.example.com" | spfquery -f -
+EOT
+    return;
+}
+
+sub deprecated_option {
+    my ($old_option, $new_option, $options) = @_;
+    return FALSE if not exists($options->{$old_option});
+    STDERR->print(
+        "Warning: '$old_option' option is deprecated" .
+        ($new_option ? "; use '$new_option' instead" : '') .
+        ".\n"
+    );
+    $options->{$new_option} = delete($options->{$old_option});
+    return TRUE;
+}
+
+sub unsupported_option {
+    my ($option_name, $options) = @_;
+    return FALSE if not exists($options->{$option_name});
+    STDERR->print("Error: '$option_name' option is no longer supported.\n");
+    return TRUE;
+}
+
+sub black_magic_option {
+    my ($option_name, $options) = @_;
+    return FALSE if not exists($options->{$option_name});
+    STDERR->print("Error: '$option_name' option is black magic! Do not use it!\n");
+    return TRUE;
+}
+
+# Command-line Option Handling
+##############################################################################
+
+my $options = {};
+my $getopt_result = GetOptions(
+    $options,
+
+    'file|f=s',
+
+    'versions|v=s',
+    'scope=s',
+    's=s',  # Special handling for ambiguous 's' option (formerly a synonym
+            # for 'sender', now preferredly a synonym for 'scope').
+    'identity|id=s',
+    'ip-address|ip=s',
+    'helo-identity|helo-id=s',
+
+    # Legacy/shortcut options:
+    'mfrom|mail-from|m=s',
+    'helo|h=s',
+
+    'default-explanation|def-exp=s',
+    'hostname=s',
+
+    'keep-comments!',
+    'debug!',       # TODO Implement!
+    'sanitize!',    # TODO Implement!
+
+    # Black Magic options:
+    'enable-black-magic!',
+    'max-dns-interactive-terms=i',
+    'max-name-lookups-per-term=i',
+    'authorize-mxes-for=s',
+                    # TODO implement!
+    'tfwl!',        # TODO Implement!
+    'guess=s',      # TODO Implement!
+    'local=s',      # TODO Implement!
+    'override=s%',  # TODO Implement!
+    'fallback=s%',  # TODO Implement!
+
+    # Meta actions:
+    'version|V!',
+    'help!',
+
+    # Deprecated options:
+    'sender=s',     # Now 'scope'/'identity' or 'mfrom'
+    'ipv4=s',       # Now 'ip-address'
+    'i=s',          # Now 'ip-address'
+    'name=s',       # Now 'hostname'
+    'max-lookup-count=i',
+    'max-lookup=i', # Now 'max-dns-interactive-terms'
+    'rcpt-to=s',    # Now 'authorize-mxes-for'
+    'r=s',          # Now 'authorize-mxes-for'
+    'trusted!'      # Now 'tfwl'
+);
+
+if (not $getopt_result) {
+    usage();
+    exit(255);
+}
+
+if ($options->{help}) {
+    help();
+    exit(0);
+}
+
+if ($options->{version}) {
+    print("spfquery version $VERSION (using Mail::SPF)\n");
+    exit(0);
+}
+
+deprecated_option('sender',           'mfrom',                     $options);
+deprecated_option('ipv4',             'ip-address',                $options);
+deprecated_option('i',                'ip-address',                $options);
+deprecated_option('name',             'hostname',                  $options);
+deprecated_option('max-lookup-count', 'max-dns-interactive-terms', $options);
+deprecated_option('max-lookup',       'max-dns-interactive-terms', $options);
+deprecated_option('rcpt-to',          'authorize-mxes-for',        $options);
+deprecated_option('r',                'authorize-mxes-for',        $options);
+deprecated_option('trusted',          'tfwl',                      $options);
+
+if ($options->{'enable-black-magic'}) {
+    if (not defined(eval('require Mail::SPF::BlackMagic'))) {
+        STDERR->print("Error: Cannot enable black magic. Unable to load Mail::SPF::BlackMagic.\n");
+        exit(255);
+    }
+    # else: Black magic enabled!
+}
+elsif (
+    black_magic_option('max-dns-interactive-terms', $options) or
+    black_magic_option('max-name-lookups-per-term', $options) or
+    black_magic_option('rcpt-to',                   $options) or
+    black_magic_option('trusted',                   $options) or
+    black_magic_option('guess',                     $options) or
+    black_magic_option('local',                     $options) or
+    black_magic_option('override',                  $options) or
+    black_magic_option('fallback',                  $options)
+) {
+    exit(255);
+}
+
+my @versions            = split(',', $options->{versions} || '');
+my $scope               = $options->{scope};
+my $identity            = $options->{identity};
+my $ip_address          = $options->{'ip-address'};
+my $helo_identity       = $options->{'helo-identity'};
+
+# Heuristic for distinguishing between 's(cope)' and 's(ender)':
+if (defined(my $s = $options->{s})) {
+    if (
+        not defined($scope) and  # No explicit 'scope' option has been specified, and
+        $s !~ /[@.]/             # 's' option contains neither an '@' nor a dot,
+                                 # so it cannot be an e-mail address or a domain.
+    ) {
+        # Thus it must be meant as the 'scope' option:
+        $scope = $s;
+    }
+    else {
+        # Else, it must be meant as the deprecated 'sender' option:
+        $options->{mfrom} = $s;
+    }
+}
+
+# Heuristic for when explicit 'scope'/'s(cope)' option is absent:
+if (not defined($scope)) {
+    if (defined($identity) or defined($options->{file})) {
+        # Identity has been specified, or input will be read from file:
+        # apply the 'scope' option default:
+        $scope    = 'mfrom';
+    }
+    elsif (defined($options->{helo})) {
+        $scope    = 'helo';
+        $identity = $options->{helo};
+    }
+    elsif (defined($options->{mfrom})) {
+        $scope    = 'mfrom';
+        $identity = $options->{mfrom};
+        $helo_identity ||= $options->{helo};
+    }
+    elsif (defined($options->{pra})) {
+        $scope    = 'pra';
+        $identity = $options->{pra};
+    }
+}
+
+my $default_explanation = $options->{'default-explanation'};
+my $hostname            = $options->{hostname};
+
+if (
+    not defined($scope) or
+    not (defined($identity) xor defined($options->{file}))
+) {
+    usage();
+    exit(255);
+}
+
+if (defined($identity) and $identity eq '') {
+    STDERR->print("Error: Empty identities are not supported. See spfquery(1).\n");
+    exit(255);
+}
+
+# Process the SPF Request(s)
+##############################################################################
+
+try {
+    my $spf_server = Mail::SPF::Server->new(
+        default_authority_explanation
+                        => $default_explanation,
+        hostname        => $hostname,
+    #    debug           => $options->{debug},
+    #    sanitize        => $options->{sanitize},
+
+        # Black Magic:
+        (
+            exists($options->{'max-dns-interactive-terms'}) ?
+                (max_dns_interactive_terms  => $options->{'max-dns-interactive-terms'} || undef)
+            :   ()
+        ),
+        (
+            exists($options->{'max-name-lookups-per-term'}) ?
+                (max_name_lookups_per_term  => $options->{'max-name-lookups-per-term'} || undef)
+            :   ()
+        )
+    #    rcpt_to         => $options->{'rcpt-to'},
+    #    trusted         => $options->{trusted},
+    #    guess           => $options->{guess},
+    #    local           => $options->{local},
+    #    override        => $options->{override},
+    #    fallback        => $options->{fallback},
+    );
+
+    my $exit_code;
+
+    if (not defined($options->{file})) {
+        # Single request:
+        my $result_code = do_process(
+            $spf_server,
+            versions        => @versions ? [@versions] : undef,
+            scope           => $scope,
+            identity        => $identity,
+            ip_address      => $ip_address,
+            helo_identity   => $helo_identity
+        );
+        $exit_code = exit_codes_by_result_code->{$result_code};
+    }
+    else {
+        # File request:
+        my $file = $options->{file} eq '-' ? \*STDIN : IO::File->new($options->{file})
+            or die("Could not open: $options->{file}\n");
+        while (<$file>) {
+            chomp;
+            s/^\s*//;
+            next if /^$/;
+            if (/^#/) {
+                print("$_\n") if $options->{'keep-comments'};
+                next;
+            }
+            ($ip_address, $identity, $helo_identity) = split;
+            my $result_code = do_process(
+                $spf_server,
+                versions        => @versions ? [@versions] : undef,
+                scope           => $scope,
+                identity        => $identity,
+                ip_address      => $ip_address,
+                helo_identity   => $helo_identity
+            );
+            $exit_code ||= exit_codes_by_result_code->{$result_code};
+        }
+    }
+
+    exit($exit_code);
+}
+catch Mail::SPF::Exception with {
+    my ($e) = @_;
+    STDERR->printf("Error: %s.\n", $e->text);
+    exit(255);
+};
+
+
+# Helper Function
+##############################################################################
+
+sub do_process {
+    my ($spf_server, %request_options) = @_;
+    my $request = Mail::SPF::Request->new(%request_options);
+    my $result  = $spf_server->process($request);
+    printf(
+        "%s\n%s\n%s\n%s\n",
+        $result->code,
+        (
+            $result->can('authority_explanation') ?
+                $result->authority_explanation
+            :   $result->local_explanation
+        ),
+        $result->local_explanation,
+        $result->received_spf_header
+    );
+    return $result->code;
+}

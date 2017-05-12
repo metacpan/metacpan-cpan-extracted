@@ -1,0 +1,13 @@
+<div id="navcontainer">
+<ul id="navlist">
+% foreach my $table ( @{ $config->{display_tables} } ) {
+<li<% ($request->model_class and $request->model_class->table eq $table  ? ' id="active"' :'') %>>\
+<% $request->link( table      => $table,
+                   action     => 'list',
+                   additional => '',
+                   label      => $table,
+                   ) %>\
+</li>
+% }
+</ul>
+</div>

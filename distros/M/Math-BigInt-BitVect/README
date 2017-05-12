@@ -1,0 +1,49 @@
+Math-BigInt-BitVect
+
+Math::BigInt::BitVect is an alternative backend library for Math::BigInt::Calc.
+It can be used via:
+
+    use Math::BigInt lib => 'BitVect';
+
+If Bit::Vector is not installed, this will safely fall back to using the
+Math::BigInt::Calc backend library, the default library of Math::BigInt.
+
+INSTALLATION
+
+To install this module, unpack the distribution file, and run the following
+commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for these modules with the
+perldoc command.
+
+    perldoc Math::BigInt::BitVect
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-BigInt-BitVect
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Math-BigInt-BitVect
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Math-BigInt-BitVect
+
+    Search CPAN
+        http://search.cpan.org/dist/Math-BigInt-BitVect
+
+COPYRIGHT AND LICENCE
+
+Tels L<http://bloodgate.com>, 2001-2004.
+
+Peter John Acklam L<pjacklam@online.no>, 2016-.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

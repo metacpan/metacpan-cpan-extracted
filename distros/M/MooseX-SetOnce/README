@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution MooseX-SetOnce,
+version 0.200002:
+
+  write-once, read-many attributes for Moose
+
+This software is copyright (c) 2013 by Ricardo SIGNES.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

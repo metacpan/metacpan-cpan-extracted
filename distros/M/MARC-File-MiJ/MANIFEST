@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/MARC/File/MiJ.pm
+lib/MARC/Record/MiJ.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/boilerplate.t
+t/camel.usmarc
+t/test.mrc
+t/test.ndj
+Makefile.PL
+META.yml
+META.json

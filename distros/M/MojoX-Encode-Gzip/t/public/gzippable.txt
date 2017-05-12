@@ -1,0 +1,5 @@
+This file is used to test gzipping. It needs to be at least 500 bytes long so that the gzipping kicks in.
+This file is used to test gzipping. It needs to be at least 500 bytes long so that the gzipping kicks in.
+This file is used to test gzipping. It needs to be at least 500 bytes long so that the gzipping kicks in.
+This file is used to test gzipping. It needs to be at least 500 bytes long so that the gzipping kicks in.
+This file is used to test gzipping. It needs to be at least 500 bytes long so that the gzipping kicks in.

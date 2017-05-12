@@ -1,0 +1,21 @@
+NAME
+    poprelay_ipop3d - Agent for Ipop3d
+
+SYNOPSIS
+    ./poprelay_ipop3d config-file
+
+DESCRIPTION
+    This agent is suitable for working with the Ipop3d POP daemon.
+
+    Make sure to specify the correct config-file for your server configuration. Subtle
+    modifications may be necessary in the config-file depending on your server configuration.
+
+DIAGNOSTICS
+    croak(). Will write to syslog eventually.
+
+AUTHOR
+    Keith Hoerling <keith@hoerling.com>
+
+SEE ALSO
+    Mail::POPRelay::Daemon(3pm), Mail::POPRelay(3pm), poprelay_cleanup(1p).
+

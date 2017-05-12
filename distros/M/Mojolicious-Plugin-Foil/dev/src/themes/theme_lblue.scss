@@ -1,0 +1,55 @@
+/* ================================================================== */
+/* THEME: Lavender Blue
+ */
+@import 'functions';
+@import 'fonts_lblue';
+@import 'icon_dark_on_light';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: #b1b9f2;
+$verge-fg: set-fg($verge-bg);
+$verge-border: navy;
+$button-bg: adjust-hue(darken($verge-bg, 10),10);
+$button-fg: set-fg($button-bg);
+$button-border: navy;
+$main-bg: #ccccff;
+$main-fg: set-fg($main-bg);
+$link-fg: set-link($main-bg);
+$link-visited: set-visited($main-bg);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+}
+
+header,
+footer,
+.side {
+	@extend .verge;
+	background-image: url(blue2a.jpg);
+}
+
+body {
+	color: $main-fg;
+	background: $main-bg;
+}
+
+@include some-links($link-fg, $link-visited);
+@include fancy($verge-fg, $verge-bg, "blue2a.jpg");
+@include make-buttons;
+
+header nav li {
+	border-color: #555588;
+}
+header nav .selflink,
+header nav em,
+header nav .current a {
+	color: #9900CC;
+	background-color: #ccccff;
+}
+

@@ -1,0 +1,16 @@
+Revision history for MojoX::Log::Dispatch::Simple
+
+1.05      2015-07-08 06:41:19-07:00 America/Los_Angeles
+        - Fix for silly POD bug
+
+1.04      2015-07-08 06:37:29-07:00 America/Los_Angeles
+        - Tomohiro Hosaka fixed a bug that Prefork server does not end at SIGTERM
+
+1.03      2015-04-22 09:42:56-07:00 America/Los_Angeles
+        - Fix to make "warnings" use Log::Dispatch goodness
+
+1.02      2015-04-22 07:32:54-07:00 America/Los_Angeles
+        - Improved the POD a bit
+
+1.01      2015-04-21 20:09:01-07:00 America/Los_Angeles
+        - First version, released on an unsuspecting world

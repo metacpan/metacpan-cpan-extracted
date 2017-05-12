@@ -1,0 +1,12 @@
+/*
+	Mojolicious::Plugin::StaticCompressor
+	Example css(style-sheet) file
+*/
+
+body {
+	color: black;
+}
+
+header {
+	font-style: italic;
+}

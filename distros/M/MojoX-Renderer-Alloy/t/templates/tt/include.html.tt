@@ -1,0 +1,4 @@
+[%- INCLUDE 'include.inc' -%]
+Include!
+[% INCLUDE 'includes/include.inc' -%]
+

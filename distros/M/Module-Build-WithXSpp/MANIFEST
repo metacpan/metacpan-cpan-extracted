@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/Module/Build/WithXSpp.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/001_load.t

@@ -1,0 +1,42 @@
+=head1 NAME
+
+Mozilla::DOM::AbstractView
+
+=head1 DESCRIPTION
+
+Mozilla::DOM::UIEvent is a wrapper around an instance of Mozilla's
+nsIDOMAbstractView interface. This inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+Note: I think the only way to get an AbstractView is
+with L<UIEvent|Mozilla::DOM::UIEvent>'s GetView method.
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::AbstractView->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $docview = $view->B<GetDocument>
+
+=over
+
+Gets a Mozilla::DOM::DocumentView (not sure if this is necessary/useful).
+
+See the DOM Level 2 Views spec.
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut

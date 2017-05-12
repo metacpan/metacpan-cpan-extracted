@@ -1,0 +1,45 @@
+Math::Symbolic::Custom::LaTeXDumper
+===================================
+
+DESCRIPTION
+
+This class is an extension for the Math::Symbolic framework.
+It implements a new method for all Math::Symbolic trees: to_latex().
+The method returns a LaTeX representation of the formula.
+
+This functionality used to be experimental and included in
+the Math::Symbolic core distribution.
+
+Starting with Math::Symbolic 0.201, this is distributed separately.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module depends on Math::Symbolic 0.201 and all its dependencies.
+
+SEE ALSO
+
+Current versions of this module may be found via http://steffen-mueller.net or
+CPAN.
+
+Please send your suggestions, inquiries, and feedback to
+modules at steffen-mueller dot net.
+
+Any bugs should be reported via
+http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Math-Symbolic-Custom-LaTeXDumper
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006, 2008, 2011 by Steffen Mueller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

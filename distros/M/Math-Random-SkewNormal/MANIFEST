@@ -1,0 +1,13 @@
+Changes
+examples/sn.pl
+examples/sn_multi.pl
+examples/skewness2.data
+examples/skewness2.png
+lib/Math/Random/SkewNormal.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00pod.t
+t/00podcover.t
+t/01basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

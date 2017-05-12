@@ -1,0 +1,9 @@
+Revision history for Perl extension MP3::Icecast.
+
+0.01  Sun Nov 30 22:25:54 2003
+	- original version; created by h2xs 1.22 with options
+		-Xn MP3::Icecast
+
+0.02  Mon Feb  2 13:35:43 PST 2004
+	- removed File::MimeInfo dependency.  it is a non-trivial
+		install

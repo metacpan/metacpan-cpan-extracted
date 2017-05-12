@@ -1,0 +1,29 @@
+SYNOPSIS
+
+    Use directly:
+
+     use Media::Info::Ffmpeg qw(get_media_info);
+     my $res = get_media_info(media => '/home/steven/celine.avi');
+
+    or use via Media::Info.
+
+    Sample result:
+
+     [
+       200,
+       "OK",
+       {
+         audio_bitrate => 128000,
+         audio_format  => "aac",
+         audio_rate    => 44100,
+         duration      => 2081.25,
+       },
+       {
+         "func.raw_output" => "ffmpeg version 0.8.17-...",
+       },
+     ]
+
+SEE ALSO
+
+    Media::Info
+

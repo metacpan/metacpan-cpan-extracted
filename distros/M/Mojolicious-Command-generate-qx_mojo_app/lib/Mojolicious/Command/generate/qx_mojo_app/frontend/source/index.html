@@ -1,0 +1,38 @@
+% my $p = shift;
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+  <!-- #VERSION# / #DATE# -->
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="SHORTCUT ICON" href="resource/<%= $p->{name} %>/favicon.ico"/>
+  <title> <%= $p->{class} %> </title>
+</head>
+<body>
+<div style="text-align: center; font-size: 30pt; right-margin: auto; margin-top: 100px">loading <%= $p->{class} %> ...</div>
+<script type="text/javascript" src="script/<%= $p->{name} %>.js?v=#VERSION#"></script>
+</body>
+</html>
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+Mojolicious::Command::generate::qx_mojo_app - App generator command
+
+=head1 SYNOPSIS
+
+  Usage: APPLICATION generate qx_mojo_app [NAME]
+
+=head1 DESCRIPTION
+
+L<Mojolicious::Command::generate::qx_mojo_app> generates application directory
+structures for a fully functional Qooxdoo web application with a L<Mojolicious> backend.
+
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+
+=cut
+

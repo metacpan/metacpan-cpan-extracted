@@ -1,0 +1,46 @@
+Revision history for Mojolicious-Plugin-CSRFProtect
+
+0.01
+        First version, released on an unsuspecting world.
+
+0.02
+        Better debug messages
+
+0.03
+        "is_valid_csrftoken" now works with token from route placeholder
+
+0.04
+        Updated documentation and added tests
+
+0.05
+        Small fix in documentation
+
+0.06
+        Disabled protection for HEAD requests
+
+0.07
+        Disabled CSRF Protection for AJAX GET requests
+
+0.08
+        Fixed typo in documentation
+
+0.09
+        "on_error" callback support
+
+0.10
+        Fixed warning about redefined helper
+
+0.11
+        Increased minimum perl version to 5.10
+
+0.12
+        Changed $ to jQuery to avoid names conflicts
+
+0.13
+        Updated Mojolicious dependency to 3.85
+
+0.14
+        Fixed: "render_text" was removed in Mojolicious 4.0
+
+0.16
+        Fixed: Do not check OPTIONS requests for CSRF token

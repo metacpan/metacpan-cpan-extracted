@@ -1,0 +1,37 @@
+Revision history for MooseX-Types-Parameterized
+
+0.08  08 February 2012
+        - POD fixes (chocolateboy++)
+        - remove pointless dependency (chocolateboy++)
+
+0.07   02 August 2011
+        - Changed the way we set a message so that we can access both value and
+          parameterized type in the message.  This lets us make more useful error
+          messages (brianphillips)
+        - Test case for above
+
+0.06   25 July 2011
+        - Fixed problem when you create a type with no message (brianphillips)
+        - test case for above
+
+0.05    28 April 2011
+        - Changes for Moose to be
+
+0.04    28 June 2010
+        - More documentation fixes, no code changes
+
+0.03    25 June 2010
+        - more documentation fixes, better coecion docs
+        - more tests
+
+0.02    24 June 2010
+        - numerous documentation and code formatting fixes
+        - fixed coercions
+        - better custom error messages
+        - more tests
+        - fixed missing dependency
+
+0.01    23 June 2010
+        - Completed basic requirements, documentation and tests.
+        - sending this out from YAPC::NA, while in a talk on extending
+          Moose :)

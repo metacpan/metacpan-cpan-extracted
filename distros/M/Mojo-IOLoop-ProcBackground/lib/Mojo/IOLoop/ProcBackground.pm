@@ -1,0 +1,145 @@
+package Mojo::IOLoop::ProcBackground;
+
+use Mojo::Base 'Mojo::EventEmitter';
+
+use Proc::Background;
+
+# 
+# Thanks to Mojo::IOLoop::ReadWriteFork and Mojo::IOLoop::ForkCall 
+#
+
+use constant DEBUG => $ENV{MOJO_PROCBACKGROUND_DEBUG} || 0;
+
+our $VERSION = '0.06';
+
+=head1 NAME
+
+Mojo::IOLoop::ProcBackground - IOLoop interface to Proc::Background
+
+=head1 VERSION
+
+0.06
+
+=head1 DESCRIPTION
+
+This is an IOLoop interface to Proc::Background.
+
+From Proc::Background:
+
+    This is a generic interface for placing processes in the background on both Unix and
+    Win32 platforms.  This module lets you start, kill, wait on, retrieve exit values, and
+    see if background processes still exist.
+
+
+=head1 SYNOPSIS
+
+    use Mojolicious::Lite;
+
+    use Mojo::IOLoop::ProcBackground;
+
+    use File::Temp;
+    use File::Spec;
+    use Proc::Background;
+
+    any '/run' => sub {
+            my $self = shift;
+
+            # Setup our request to take a while
+            Mojo::IOLoop->stream($self->tx->connection)->timeout(30);
+            $self->render_later;
+
+            $self->on(finish => sub { 
+                $self->app->log->debug("Finished");
+            });
+
+            # We want the UserAgent to see something as soon as possible
+            $self->res->code(200);
+            $self->res->headers->content_type('text/html');
+            $self->write_chunk("<html><body>Starting...<br>\n");
+
+            # This is our utility script that will run in the background
+            my $tmp = File::Temp->new(UNLINK => 0, SUFFIX => '.pl');
+            my $statefile = $self->stash->{_statefile} = File::Spec->catfile(File::Spec->tmpdir, "done");
+            print($tmp 'sleep(10); $f="$ARGV[0].$$"; open($fh, ">", $f); sleep(3)');
+            my $script = $tmp->filename;
+            undef($tmp);
+
+            # Thanks CPAN.. :)  The magic happens in Proc::Background
+            my $proc = $self->stash->{_proc} = Mojo::IOLoop::ProcBackground->new;
+
+            # Every so often we get a heartbeat from the background process
+            $proc->on(alive => sub {
+                my ($proc) = @_;
+
+                my $pid = $proc->proc->pid;
+                my $statefile = $self->stash->{_statefile} . ".$pid";
+
+                if (-f $statefile) {
+                    $self->write_chunk("Done</body></html>");
+                    $proc->unsubscribe("alive");
+                }
+            });
+
+            # When the process terminates, we get this event
+            $proc->on(dead => sub {
+                my ($proc) = @_;
+
+                my $pid = $proc->proc->pid;
+                my $statefile = $self->stash->{_statefile} . ".$pid";
+
+                $self->app->log->debug("Done: $statefile");
+                $self->finish;
+            });
+
+            # Start our process
+            $proc->run([$^X, $script, $statefile]);
+    };
+
+    # Run the app
+    push(@ARGV, 'daemon', '-l', 'http://*:5555') unless @ARGV;
+    app->log->level("debug");
+    app->secrets(["I Knos# you!!"]);
+    app->start;
+
+=head2 SEE ALSO
+
+=over
+
+=item L<Mojo::IOLoop::ReadWriteFork>
+
+=item L<Mojo::IOLoop::ForkCall>
+
+=back
+
+=cut
+
+# Thanks jberger.. :)
+
+has 'command';
+
+has proc => sub {
+    my $command = shift->command;
+    Proc::Background->new(ref($command) ? @{ $command } : $command);
+};
+
+has recurring => sub {
+    my $self = shift;
+    Mojo::IOLoop->recurring(0.05 => sub {
+        if ($self->proc->alive) {
+            $self->emit("alive");
+        }
+        else {
+            Mojo::IOLoop->remove($self->recurring);
+            $self->emit("dead");
+        }
+    });
+};
+
+sub run {
+    my $self = shift;
+    $self->command(shift) if @_;
+    $self->proc; # build proc
+    $self->recurring; # start watching it
+}
+
+1;

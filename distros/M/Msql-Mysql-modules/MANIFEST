@@ -1,0 +1,67 @@
+ChangeLog			History file
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/DBD/mysql/Install.pm
+lib/DBD/mSQL/Install.pm
+lib/DBD/mSQL1/Install.pm
+lib/ExtUtils/PerlPP.pm
+mysql/lib/Bundle/DBD/mysql.pm	These are only distributed because PAUSE needs
+mysql/lib/Mysql.pm		the .pm files being present. Instead modify
+mysql/lib/Mysql/Statement.pm	the corresponding files in the dbd and nodbd
+mysql/lib/DBD/mysql.pm		directories. They are automatically
+mSQL/lib/Bundle/DBD/mSQL.pm	regenerated using ExtUtils::PerlPP.
+mSQL/lib/Msql.pm
+mSQL/lib/Msql/Statement.pm
+mSQL/lib/DBD/mSQL.pm
+dbd/Acknowledgements
+dbd/Changes
+dbd/Makefile.PL.in		Makefile generator for DBI drivers
+dbd/bindparam.h
+dbd/bundle.pm.in
+dbd/constants.h
+dbd/dbd.pm.in
+dbd/dbd.xs.in
+dbd/dbdimp.c
+dbd/dbdimp.h
+dbd/dbimon.in			The DBI monitor
+dbd/myMsql.h			Header file for common Msql/Mysql sources
+nodbd/nodbd.pm.in
+nodbd/pmsql.in
+nodbd/statement.pm.in
+nodbd/typemap
+tests/README		Tutorial for writing new tests
+tests/00base.t		base DBI driver test: Loads DBI and driver
+tests/10dsnlist.t	Low level DBI driver test: List data sources
+tests/20createdrop.t	Test for creating and dropping tables
+tests/30insertfetch.t	Test for insert, fetch and delete of rows
+tests/40bindparam.t	Test of bind_col and bind_param methods
+tests/40blobs.t		Test for working with blobs
+tests/40listfields.t	Test for field oriented methods, e.g. NAME
+tests/40nulls.t		Test for correct handling of NULL's
+tests/40numrows.t	Test for row attributes, e.g. $sth->{rows}
+tests/50chopblanks.t	Test for the 'ChopBlanks' attribute
+tests/50commit.t	Test for commit, rollback and AutoCommit
+tests/60leaks.t		Test script for various kinds of memory leaks
+tests/lib.pl		Common declarations of the test suite
+tests/ak-dbd.t		Miscellaneous DBI driver tests
+tests/akmisc.t		Msql/Mysql only, also a valuable tutorial
+tests/dbdadmin.t	Check $dbh->ping and 'admin' methods
+tests/msql1.t		Test script for Msql only
+tests/msql2.t		Test script for Msql with msql2 only
+tests/mysql.t		Test script for Mysql only
+tests/mysql2.t		Test script for Mysql only
+tests/mSQL.dbtest	Core of testing mSQL database access
+tests/mSQL.mtest	Core of testing mSQL module
+tests/mSQL1.dbtest	Core of testing mSQL1 database access
+tests/mSQL1.mtest	Core of testing mSQL1 module
+tests/mysql.dbtest	Core of testing mysql database access
+tests/mysql.mtest	Core of testing mysql module
+tests/pNET.dbtest	Core of testing pNET database access (dummy)
+tests/pNET.mtest	Core of testing pNET database access
+tests/skeleton.test	Skeleton file for writing new tests
+tests/Adabas.dbtest	These are here merely so that I can use CPAN
+tests/Adabas.mtest	as my personal backup server ... ;-)
+tests/CSV.dbtest
+tests/CSV.mtest

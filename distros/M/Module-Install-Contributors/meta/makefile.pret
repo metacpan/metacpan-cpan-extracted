@@ -1,0 +1,9 @@
+# This file provides instructions for packaging.
+
+`Module-Install-Contributors`
+	perl_version_from m`Module::Install::Contributors`;
+	version_from      m`Module::Install::Contributors`;
+	readme_from       m`Module::Install::Contributors`;
+	requires          p`Module::Install`;
+	.
+

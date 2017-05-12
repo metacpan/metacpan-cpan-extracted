@@ -1,0 +1,16 @@
+# This file provides instructions for packaging.
+
+`Module-Install-Copyright`
+	perl_version_from m`Module::Install::Copyright`;
+	version_from      m`Module::Install::Copyright`;
+	readme_from       m`Module::Install::Copyright`;
+	test_requires     p`Test::More 0.61`;
+	requires          p`MooX::Struct`;
+	requires          p`List::MoreUtils`;
+	requires          p`Module::Install::Admin::RDF`;
+	requires          p`Module::Install::Contributors`;
+	requires          p`Module::Manifest`;
+	requires          p`Path::Class`;
+	requires          p`Software::License`;
+	.
+

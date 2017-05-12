@@ -1,0 +1,32 @@
+Email/Verp version 0.06
+=======================
+
+This is the README file for Mail::Verp, which 
+creates Variable Envelope Return Paths (VERP) addresses
+as detailed by http://cr.yp.to/proto/verp.txt.
+The encoding follows the methods described by
+http://www.courier-mta.org/draft-varshavchik-verp-smtpext.txt.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires:
+
+    Carp.pm
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Gyepi Sam <gyepi@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

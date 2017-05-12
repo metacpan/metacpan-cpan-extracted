@@ -1,0 +1,29 @@
+To build this module you need the GMP library installed on your computer.
+See: http://gmplib.org/
+
+You will also need either Math::GMPz or Math::GMP
+
+Build in the usual way:
+
+ perl Makefile.PL
+ make
+ make test
+ make install
+
+If the GMP library is not in a location where your compiler finds it by default,
+then instead of running 'perl Makefile.PL', you'll need to run:
+
+perl Makefile.pl INC="-I/path/to/gmp_include" LIBS="-L/path/to/gmp_lib -lgmp"
+
+Any problems, I am contactable by email at sisyphus at(@) cpan dot (.) org.
+
+==========
+MS WINDOWS
+==========
+If building with an MSVC++ compiler against a MinGW-built gmp lib, you'll
+need to additionally link to MinGW's libgcc.a and libcoldname.a. First,
+create copies of the 3 '.a' files (named libgmp.lib, libgcc.lib, and
+libcoldname.lib) and then run:
+
+perl Makefile.pl INC="-IC:/path/to/gmp_include" LIBS="-LC:/path/to/gcc_lib -lgcc -LC:/path/to/coldname_lib -lcoldname -LC:/path/to/gmp_lib -lgmp"
+

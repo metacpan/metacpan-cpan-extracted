@@ -1,0 +1,90 @@
+# Basic setup
+severity = 3
+verbose = 8
+
+# Prohibit indirect syntax of "new", "create" and "destroy"
+# Should we add "connect" (DBI) as well?
+[Objects::ProhibitIndirectSyntax]
+severity = 4
+forbid = create destroy connect
+
+# Stop gap measure - FIXME
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 40
+
+# Maplat is a highly complex project. Splitting
+# everything into multiple subroutines just makes matters worse
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 67
+
+# This policy would force constructs that will prohibit simple
+# copy&paste (used in all the SQL strings where c&p between perl code and some SQL
+# window are the most efficient form of editing.
+# The alternative would be HEREDOC's. They will break the code flow and are more
+# akward to implement. I'll maybe do this later... for now, just use implicit newlines
+# because they get ignored by the SQL parsers anyway...
+#
+# So we don't forget, we set a severety level that's not yet checked
+[Perl::Critic::Policy::ValuesAndExpressions::ProhibitImplicitNewlines]
+severity = 2
+
+# When writing commercial applications, the default is somewhat conservative
+[Subroutines::ProhibitManyArgs]
+max_arguments = 8
+
+# There are a few cases where deep nests are the best alternative
+# from a basket of bad possibilities
+[ControlStructures::ProhibitDeepNests]
+max_nests = 9
+
+# Too brief open forces memory slurping. Not nice for files
+# where the size isn't known in advance
+[InputOutput::RequireBriefOpen]
+lines = 20
+
+# RCS Keywords are outdated. They mess up patch-files (see "Updating 
+# FreeBSD from Source" as a prime example why NOT to use them these days)
+# and they are also discouraged by the mercurial team.
+[-Perl::Critic::Policy::Miscellanea::RequireRcsKeywords]
+
+# POD documentation has a rather low priority in this project. Set severety to the
+# lowest level
+[Perl::Critic::Policy::Documentation::RequirePodSections]
+severity = 1
+
+# This is a web project. HTTP status codes aren't undocumented "magic numbers", they are *very*
+# well defined in RFC2612. It just doesn't make sense to use them as named variables by default. In fact,
+# it might be much worse
+[ValuesAndExpressions::ProhibitMagicNumbers]
+allowed_values = 0 1 2 100 101 200 201 202 203 204 205 206 300 301 302 303 304 305 306 307 400 401 402 403 404 405 406 407 408 409 410 411 412 413 414 415 416 417 500 501 502 503 504 505
+
+# I disagree with this policy. If you look into the examples given by
+# the manual of this very same policy, the regex are easy to read whereas
+# the alternatives are jumbled character soup.
+# Also performance is *not* an issue as long as you use /o
+#[-Perl::Critic::Policy::RegularExpressions::ProhibitFixedStringMatches]
+
+# I like perls matching behaviour just as it is, thank you very much
+[-Perl::Critic::Policy::RegularExpressions::RequireLineBoundaryMatching]
+[-RegularExpressions::RequireDotMatchAnything]
+
+# Whats that about Conway and his dislike of PostfixControls? Sure, you
+# have to be a bit carefull when and where to use them. But *i* like and use
+# them because there are instances they make the code more readable to *me*.
+# And since i seems to be the only one who actually does any work on this project,
+# i might as well use my own styleguide...
+#[-ControlStructures::ProhibitPostfixControls]
+
+# "unless" in its block form is *really* bad. Bump it up to a more
+# reasonable error level
+#[Perl::Critic::Policy::ControlStructures::ProhibitUnlessBlocks]
+#severity = 4
+
+# What the...? q{} is more readable than '' for empty strings??? No, not in my world.
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+# The same goes for "noisy" quotes
+[-ValuesAndExpressions::ProhibitNoisyQuotes]
+
+# Force "use English" to behave properly
+[Perl::Critic::Policy::Modules::RequireNoMatchVarsWithUseEnglish]
+severity = 4

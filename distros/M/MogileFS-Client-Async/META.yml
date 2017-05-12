@@ -1,0 +1,39 @@
+---
+abstract: ~
+author: ~
+build_requires:
+  Data::Dumper: 0
+  Digest::MD5: 0
+  Digest::SHA1: 0
+  ExtUtils::MakeMaker: 6.42
+  File::Temp: 0
+  Test::Exception: 0.31
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.92'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: MogileFS::Client::Async
+name: MogileFS-Client-Async
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  AnyEvent: 0
+  AnyEvent::HTTP: 0
+  File::Slurp: 0
+  IO::AIO: 3.25
+  IO::Socket::INET: 0
+  LWP::Simple: 0
+  Linux::PipeMagic: 0.03
+  MogileFS::Client: 0
+  Try::Tiny: 0
+  namespace::clean: 0
+resources:
+  repository: git://github.com/davel/MogileFS-Client-Async.git
+version: 0.030

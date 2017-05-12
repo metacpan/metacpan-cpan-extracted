@@ -1,0 +1,40 @@
+h=a:a:b:c:b:d
+A: 1
+A: 2
+B: 3
+C: 4
+B: 5
+D: 6
+
+
+
+h=a:a:b:c:b:d
+C: 4
+D: 6
+B: 3
+B: 5
+A: 0
+A: 1
+A: 2
+
+
+
+When RFC4870 signing with an h= tag,
+a signer MUST include all headers presented to the signing algorithm,
+in the order they were presented the signing algorithm.
+
+a signer, when encountering multiple-occuring headers, MAY list those
+header names more than once
+
+--
+
+I conclude from this that signers SHOULD reorder the headers so
+that multiple-occuring headers occur together.
+
+--
+
+a verifier, if a header is listed only once in h=, but there are
+multiple of those headers available, MUST play back those multiple
+headers together.
+
+

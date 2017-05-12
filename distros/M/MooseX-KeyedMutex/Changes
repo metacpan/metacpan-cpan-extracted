@@ -1,0 +1,13 @@
+Changes
+=======
+
+0.00003 - 01 Oct 2008
+  - Minor house cleaning, such as qualifing a subtype.
+  - s/auto_include/auto_include_deps/
+
+0.00002 - 08 Sep 2008
+  - Recent versions of Moose (properly) unimport confess(), which breaks
+    my code depending on it.
+
+0.00001 - 15 Jul 2008
+  - Initial release

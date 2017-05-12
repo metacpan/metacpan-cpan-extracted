@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Mail-Maps-Lookup.t
+lib/Mail/Maps/Lookup.pm
+META.yml

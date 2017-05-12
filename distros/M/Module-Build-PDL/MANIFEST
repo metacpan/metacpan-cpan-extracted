@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/Module/Build/PDL.pm
+MANIFEST			This list of files
+META.yml
+README
+t/00.load.t
+xt/perlcritic.t
+xt/pod-coverage.t
+xt/pod.t

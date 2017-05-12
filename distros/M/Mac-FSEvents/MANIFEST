@@ -1,0 +1,23 @@
+Changes
+FSEvents.xs
+hints/darwin.pl
+lib/Mac/FSEvents.pm
+lib/Mac/FSEvents/Event.pm
+MacVersion.pm
+Makefile.PL
+MANIFEST
+META.yml
+ppport.h
+README
+t/01use.t
+t/02constructor.t
+t/03event.t
+t/04flags.t
+t/05fork.t
+t/06receive-all-changes.t
+typemap
+xt/02pod.t
+xt/03podcoverage.t
+xt/04critic.rc
+xt/04critic.t
+META.json                                Module JSON meta-data (added by MakeMaker)

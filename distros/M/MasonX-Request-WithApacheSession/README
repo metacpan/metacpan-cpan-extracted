@@ -1,0 +1,42 @@
+HTML::Mason::Request::WithApacheSession
+=======================================
+
+This module takes advantage of the new flexibility in Mason 1.09_01
+and newer to integrate an Apache::Session session directly into
+Mason's Request object.
+
+This module is very alpha at this point, considering that it only
+works with a beta release of Mason!
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Then in your httpd.conf file add:
+
+   PerlSetVar  MasonRequestClass       HTML::Mason::Request::WithApacheSession
+   PerlSetVar  MasonSessionClass       Apache::Session::File
+   PerlSetVar  MasonSessionDataSource  dbi:mysql:somedb
+
+DEPENDENCIES
+
+You must have Mason 1.10 or newer installed for this module to work
+at all.
+
+BUGS
+
+Bug reports should be sent to the mason-users list.  See
+http://www.masonhq.com/resources/mailing_lists.html for more details.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002 David Rolsky
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,14 @@
+Revision history for MasonX-MiniMVC
+
+0.03    2007-07-04
+        Argh, forgot to update changes for 0.02.  Nothing else
+        changed in this release.
+
+0.02    2007-07-03
+        * Created minimvc-install installer
+        * Updated docs to reflect new installer -- much nicer
+        * Added MasonX::MiniMVC::Cookbook docs
+
+0.01    2007-06-27
+        First version, works for me.
+

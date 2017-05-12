@@ -1,0 +1,19 @@
+v0.0.6    2016-11-30
+--------------------
+* Fixes for Mojolicious 7 (Bug #3, thanks Joel Maslak)
+
+v0.0.5    2015-03-28
+--------------------
+* Bug fix: Specify Mojolicious 6.0 as the minimum requirement in Makefile.PL
+
+v0.0.4    2015-03-26
+--------------------
+* Fixes for Mojolicious 6.0
+
+v0.0.3    2014-12-24
+--------------------
+* trim_param now accepts regexps
+
+v0.0.2    2014-12-24
+--------------------
+* Add collection helper

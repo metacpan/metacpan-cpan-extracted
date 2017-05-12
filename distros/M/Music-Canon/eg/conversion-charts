@@ -1,0 +1,50 @@
+Reference charts used to confirm operation of modal_map (which is
+proving ever so tricky to get just right for ascending vs.
+descending and so forth). Gist of construction is to fill in the
+pitch numbers for the input scale, then the Diatonics and
+chromatics, then line up the corresponding Diatonics of the output
+scale with the Diatonics of the input scale, and then fill in what
+chromatics are possible in the output, 'x' otherwise, then fill in
+the output pitch numbers as possible.
+
+* Major to Major, link on MIDI pitch 72, parallel motion (transpose of
+  0; a real example would doubtless have a non-zero transpose as
+  otherwise this would be an expensive way to gain no new information).
+
+     2      2    1   2     2     2    1   2     2    1   2     2     2    1  
+  C, c#  D d#  E  F f#  G g#  A a#  B  C c#  D d#  E  F f#  G g#  A a#  B  C'
+  60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84
+                                  ... 72 73 ...
+  C, c#  D d#  E  F f#  G g#  A a#  B  C c#  D d#  E  F f#  G g#  A a#  B  C'
+     2      2    1   2     2     2    1   2     2    1   2     2     2    1  
+
+* Major to Major, link on MIDI pitch 72, contrary motion.
+
+     2      2    1   2     2     2    1   2     2    1   2     2     2    1  
+  C, c#  D d#  E  F f#  G g#  A a#  B  C c#  D d#  E  F f#  G g#  A a#  B  C'
+  60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84
+  84  x 83 82 81 79 78 77  x 76 75 74 72  x 71 70 69 67 66 65  x 64 63 62 60
+  C'  x  B a#  A  G f#  F  x  E d#  D  C  x  B a#  A  G f#  F  x  E d#  D  C,
+      1     2    2   2     1     2    2   1     2    2   2     1     2    2  
+
+  DSC or ASC should play out the same way, as DSC no different pattern.
+
+* Melodic Minor to Melodic Minor, link on pitch 72 - ASC to DSC (rising
+  phrases) for contrary motion. Needs to use DSC scale downwards, as
+  contrary motion, so anything going up will imply something going
+  down, which for melodic minor means using the descending version of
+  that scale.
+
+  C, c#  D Eb  e  F f#  G g#  A a#  B  C c#  D Eb  e  F f#  G g#  A a#  B  C'
+  60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84
+  84 83 82 80  x 79 78 77 76 75  x 74 72 71 70 68  x 67 66 65 64 63  x 62 60
+  C'  b Bb Ab  x  G f#  F  e Eb  x  D  C  b Bb Ab  x  G f#  F  e Eb  x  D  C,
+
+* Melodic Minor to Melodic Minor, link on 72 - DSC to ASC (falling
+  phrases) for contrary motion. Descending means the ascending version
+  of the scale must be used in corresponding contrary motion.
+
+  C, c#  D Eb  e  F f#  G Ab  a Bb  b  C c#  D Eb  e  F f#  G Ab  a Bb  b  C'
+  60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84
+  84  x 83 81 80 79 78 77 75  x 74 73 72  x 71 69 68 67 66 65 63  x 62 61 60
+  C'  x  B  A g#  G f#  F Eb  x  D c#  C  x  B  A g#  G f#  F Eb  x  D c#  C

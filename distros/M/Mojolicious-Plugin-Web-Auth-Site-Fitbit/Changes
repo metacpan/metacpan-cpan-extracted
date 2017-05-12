@@ -1,0 +1,7 @@
+Revision history for Mojolicious-Plugin-Web-Auth-Site-Fitbit
+
+0.000002  2017-02-19 23:04:45-05:00 America/Toronto
+    - Now gets user info after authentication.
+
+0.000001  2017-01-04 23:13:33-05:00 America/Toronto
+    - Initial release.

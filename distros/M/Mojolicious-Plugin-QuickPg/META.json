@@ -1,0 +1,53 @@
+{
+   "abstract" : "Mojolicious Plugin enables quick and simple access for Mojo::Pg",
+   "author" : [
+      "Pavel Kuptsov <pkuptsov@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4216",
+   "keywords" : [
+      "mojo",
+      "mojolicious",
+      "postgresql",
+      "mojo-pg",
+      "plugin"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-QuickPg",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojo::Pg" : "2",
+            "Mojolicious" : "6",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::QuickPg" : {
+         "file" : "lib/Mojolicious/Plugin/QuickPg.pm",
+         "version" : "1.6"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/pkuptsov/mojolicious-plugin-quickpg"
+      }
+   },
+   "version" : "1.6"
+}

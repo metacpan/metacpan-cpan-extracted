@@ -1,0 +1,87 @@
+=head1 NAME
+
+Mac::Pasteboard::Droplet - How to write a droplet.
+
+=head1 DETAILS
+
+The editor that came with MacOS Perl (for Mac OS 9 and below) was able
+to save your script as a droplet -- that is, an application that you
+could run by dropping files onto it. When your script got control, the
+paths to the dropped files were in @ARGV
+
+Under Mac OS X you can get this functionality by wrapping your Perl
+script in an Apple Script. The following example assumes you want to
+wrap a Perl script named droplet.PL in an application called
+PerlDroplet. It works because a Mac OS X application bundle is simply a
+directory whose contents are known to the system.
+
+=over
+
+=item 1. Run the Script Editor, which is found in /Applications/AppleScript/
+
+=item 2. Paste the text of the Apple Script as it appears below into the editor.
+
+=item 3. Save the script as an Application Bundle named PerlDroplet.
+
+=item 4. Copy your Perl script to directory PerlDroplet.app/Contents/Resources/.
+
+=back
+
+Yes, this will work if you move PerlDroplet somewhere else.
+
+The 'do shell script' directive used to get the Perl script to run will
+actually work on any command that /bin/sh can handle. This means you
+need a shebang line in your script, or you need to explicitly run Perl.
+The do shell script is the equivalent of Perl's back tick or qx{}
+operators; anything the command writes to standard out is returned to
+the Apple Script.
+
+The environment your script sees is fairly minimal. Specifically, you
+will not see anything you defined in your .profile or .bash_profile
+file. You will, however, see anything you define in
+~/.MacOSX/environment.plist -- that is, once you log out and log back in
+again. Restarting the finder is not sufficient.
+
+OK, at long last here is the actual Apple Script. Beware of the fact
+that the software which renders this documentation may wrap or truncate
+lines. You may want to start with F<eg/droplet> instead.
+
+ -- field the drop event
+ on open argv
+ 	
+ 	-- Make the file names into strings containing quoted POSIX file names, and concatenate them with spaces between.
+ 	set shell_argv to ""
+ 	repeat with arg in argv
+ 		set shell_argv to shell_argv & " " & quoted form of POSIX path of arg
+ 	end repeat
+ 	
+ 	-- Our Perl script is droplet.PL in the Resources directory of the application bundle.
+ 	set perl_script to quoted form of POSIX path of (path to resource "droplet.PL")
+ 	
+ 	-- Run the Perl script. The file names appear in @ARGV. Its output to STDOUT is captured in result.
+ 	set result to do shell script perl_script & shell_argv
+ 	
+ 	-- Display a dialog containing the result.
+ 	display dialog result as string
+ 	
+ end open
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011-2017 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

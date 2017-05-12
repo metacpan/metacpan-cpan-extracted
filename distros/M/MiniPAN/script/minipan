@@ -1,0 +1,74 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use MiniPAN;
+
+=head1 NAME
+
+minipan - a minimalistic CPAN module installer
+
+=head1 SYNOPSIS
+
+	$ minipan Some::Module # or 'Some/Module.pm' for easy copy'n'paste
+                               # from an missing module error message
+
+=head1 DESCRIPTION
+
+MiniPan is a try to write a minimalistic replacement for the 'cpan' command
+line tool mainly for the iPhone as limited resources make it impossible to use
+it on that platform (cpan tries to load the whole package list into the memory,
+even with CPAN::SQLite installed...
+
+Currently only installation of a single module and its dependencis is
+supported.
+No optional dependency modules will be installed at the moment though.
+
+=head1 FUNCTIONS
+
+=head2 usage
+
+prints the usage and exits
+
+=cut
+
+sub usage() {
+	print << "EOH";
+Usage: $0 <module>
+
+module    - cpan perl module (e.g. "Net::Server")
+EOH
+	exit;
+}
+
+usage() unless $ARGV[0];
+
+eval {
+	my $module = MiniPAN->new($ARGV[0]);
+	$module->fetch();
+	my @deps = $module->config();
+	system("$0 $_") == 0 or exit 1 foreach (@deps);
+	$module->install();
+};
+print "$@\n" and usage() if ($@);
+
+=head1 TODO
+
+* process multiple modules on command line
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-minipan at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MiniPAN>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SEE ALSO
+
+MiniPAN, CPAN
+
+=head1 AUTHOR
+
+Tobias Kirschstein, C<< <mail at lev.geek.nz> >>
+
+=cut

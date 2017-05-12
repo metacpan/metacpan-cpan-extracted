@@ -1,0 +1,78 @@
+0.19 2016-02-29
+        - Fixed for Mojolicious 6.48
+          (This removes support for named routes usable for url_for).
+
+0.18 2014-04-18
+        - Fixed dependency.
+
+0.17 2014-04-14
+        - Fixed compatibility with Mojolicious 6.0 (vti).
+	  This was a contribution motivated by the
+          CPAN Pull Request Challenge - Thank you very much!
+
+0.16 2014-02-10
+        - Documentation tweaks regarding the template URI RFC.
+
+0.15 2013-05-20
+        - Fixed compatibility with Mojolicious 4.0 (Reneeb).
+	- Removed experimental given/when operations (Reneeb, Akron).
+	- Fixed randomized hash bug in t/Endpoint-Command.t.
+
+0.14 2013-04-17
+        - Improve documentation.
+	- Fixed bug with named routes.
+
+0.13 2013-04-07
+        - Allow interpolation of arbitrary urls.
+        - Small improvement to documentation.
+	- Support undefining placeholders in path, domain and parameters.
+	- Small performance improvement for '?' => undef.
+	- Improved test suite.
+
+0.12 2013-03-22
+        - Made warning for undefined endpoints a
+          debug information.
+
+0.11 2013-03-18
+        - Fixed a newly introduced relative path bug.
+
+0.10 2013-03-18
+        - Partially reimplemented due to
+	  a bug with mounted apps.
+	- Update dependencies.
+
+0.09 2013-03-16
+        - Update year.
+	- Documentation tweaks.
+	- Change title of endpoints command.
+	- Small bugfix in port setting.
+
+0.08 2012-11-19
+        - Small bugfix regarding empty queries.
+
+0.07 2012-11-13
+        - Small bugfix regarding warnings.
+
+0.06 2012-11-03
+        - Small improvement regarding no-placeholder URIs.
+        - Small improvements of the documentation.
+
+0.05 2012-10-30
+        - Add setting function to endpoint helper.
+	- Small improvements of the test suite.
+
+0.04 2012-10-28
+        - Small improvements/corrections of the documentation.
+
+0.03 2012-10-28
+        - Corrections regarding meta data.
+	- Small improvements of the documentation.
+
+0.02 2012-10-28
+        - Small improvements/corrections of the documentation.
+	- Small code improvements.
+
+0.01 2012-10-28
+        - Separation from Sojolicious package.
+        - Initial submission to GitHub.
+        - Initial submission to CPAN.

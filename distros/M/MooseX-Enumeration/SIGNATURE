@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 03d760aff943b5576abb00a5688919a64eca3f25 COPYRIGHT
+SHA1 56ddcb9c6e2d886be1fef4a193c23f08d817c6d4 CREDITS
+SHA1 3b31795b4cadc069a786edf03c5d14488e5fbd91 Changes
+SHA1 81ad0f4f9631fad11a4feb2bdc18ae4d42d95b5e INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 7855ad5811ebb0647dd1aa59e8968bd259e487c5 MANIFEST
+SHA1 fc6de1d314f0381ed1d2500f32d09f774202a24b META.json
+SHA1 2c3e0969c87bfb82e1c59f6272fe7cdb7827a02e META.yml
+SHA1 d32fcc8d2df91682d6e302141cd0269716a229e2 Makefile.PL
+SHA1 5441589664d997fc457cdd4de2fa713139af6552 README
+SHA1 20f1b5567ca8bc55ef9e464e36554d41182baf1c dist.ini
+SHA1 d4930916977edd2425e8df5ca1b68bbbe8f5945b doap.ttl
+SHA1 7bcfd479c8e49477c11209e47dde0563e2ff1d7c lib/Moose/Meta/Attribute/Custom/Trait/Enum.pm
+SHA1 a74da50f90129aa9ad7f2f8828920fd14dde32d3 lib/Moose/Meta/Attribute/Custom/Trait/Enumeration.pm
+SHA1 4f694702e4cbec66f0ed27dccecd8bd9c11115f3 lib/MooseX/Enumeration.pm
+SHA1 d11d8f8d6c7e0845eb694cd65d7c745c0f3010dc lib/MooseX/Enumeration/Meta/Attribute/Native/Trait/Enumeration.pm
+SHA1 01a83a66bf30ce966ce8d251589c50d1a877d4a9 lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/assign.pm
+SHA1 dc38bc2a2477f88b43780e95a65cbfe09ef64ed2 lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/is.pm
+SHA1 6c7427f209d90b0bef56c08cd381d02832f9cf4d t/01basic.t
+SHA1 481bfd4f875e08e63607a649cbd02fbf7da6cf4b t/02moosey.t
+SHA1 c7624ccd78a990cf0fd1d155a80fb1990db1b30e t/03typetiny.t
+SHA1 df40c1d0ecbfb76516d23a4d0cf439f827f57174 t/04matchsimple.t
+SHA1 404f5ad5d131b4cdd0d17ff2c95cf04e63d3049d t/05assign.t
+SHA1 a981e30dcb3f8ab67fee38a90fe906ae8a2b2376 t/91exceptions.t
+SHA1 643027f72ce32a991e92bf5f0ceb9ea498d36b03 t/rt96312.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQS6o4ACgkQzr+BKGoqfTkZUQCggNg9E/x+Sni2S68rQnbx63vP
+8uIAoJRkYRjGhKfBQxhBcqhp0xb7tt8i
+=MFBU
+-----END PGP SIGNATURE-----

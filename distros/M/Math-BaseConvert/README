@@ -1,0 +1,309 @@
+VERSION
+    This documentation refers to version 1.8 of Math::BaseConvert, which
+    was released on April 14 2016.
+
+SYNOPSIS
+      use Math::BaseConvert;
+
+      # CoNVert     63 from base-10 (decimal) to base- 2 (binary )
+      $binary_63  = cnv(     63, 10,  2 );
+      # CoNVert 111111 from base- 2 (binary ) to base-16 (hex    )
+      $hex_63     = cnv( 111111,  2, 16 );
+      # CoNVert     3F from base-16 (hex    ) to base-10 (decimal)
+      $decimal_63 = cnv(   '3F', 16, 10 );
+      print "63 dec->bin $binary_63 bin->hex $hex_63 hex->dec $decimal_63\n";
+
+DESCRIPTION
+    BaseConvert provides a few simple functions for converting between arbitrary
+    number bases. It is as fast as I currently know how to make it (of
+    course relying only on the lovely Perl). If you would rather utilize an
+    object syntax for number-base conversion, please see Ken Williams's
+    <Ken@Forum.Swarthmore.Edu> fine Math::BaseCalc module.
+
+PURPOSE
+    The reason I created BaseConvert was that I needed a simple way to convert
+    quickly between the 3 number bases I use most (10, 16, && 64). It turned
+    out that it was trivial to handle any arbitrary number base that is
+    represented as characters. High-bit ASCII has proven somewhat
+    problemmatic but at least BaseConvert can simply && realiably convert
+    between any possible base between 2 && 64 (or 85). I'm happy with it &&
+    employ b64() in places I probably shouldn't now =).
+
+USAGE
+  cnv($numb[,$from[,$tobs]])
+    CoNVert the number contained in $numb from its current number base
+    ($from) into the result number base ($tobs).
+
+    When only $numb is provided as a parameter:
+
+    If $numb only contains valid decimal (base 10) digits, it will be
+    converted to hexadecimal (base 16).
+
+    If $numb only contains valid hexadecimal (base 16) digits or begins with
+    '0x', it will be it will be converted to decimal (base 10).
+
+    When only $numb && $from are provided as parameters:
+
+    cnv() assumes that $numb is already in decimal format && uses $from as
+    the $tobs.
+
+    When all three parameters are provided:
+
+    The normal (&& most clear) usage of cnv() is to provide all three
+    parameters where $numb is converted from $from base to $tobs.
+
+    cnv() is the only function that is exported from a normal 'use
+    Math::BaseConvert;' command. The other functions below can be imported to
+    local namespaces explicitly or with the following tags:
+
+      :all - every function described here
+      :hex - only dec() && hex()
+      :b64 - only b10() && b64() && b64sort() && cnv()
+      :dig - only dig() && diginit()
+      :sfc - only summ(), fact(), && choo()
+
+  b10($b64n)
+    A shortcut to convert the number given as a parameter ($b64n) from base
+    64 to decimal (base 10).
+
+  b64($b10n)
+    A shortcut to convert the number given as a parameter ($b10n) from
+    decimal (base 10) to base 64.
+
+  b64sort(@b64s)
+    A way to sort b64 strings as though they were decimal numbers.
+
+  dec($b16n)
+    A shortcut to convert the number given as a parameter ($b16n) from
+    hexadecimal (base 16) to decimal (base 10).
+
+  hex($b10n)
+    A shortcut to convert the number given as a parameter ($b10n) from
+    decimal (base 10) to hexadecimal (base 16).
+
+    Please read the "NOTES" regarding hex().
+
+  dig(\@newd)
+    Assign the new digit character list to be used in place of the default
+    one. dig() can also alternately accept a string name matching one of the
+    following predefined digit sets:
+
+      'bin' => ['0', '1']
+      'oct' => ['0'..'7']
+      'dec' => ['0'..'9']
+      'hex' => ['0'..'9', 'a'..'f']
+      'HEX' => ['0'..'9', 'A'..'F']
+      'b62' => ['0'..'9', 'a'..'z', 'A'..'Z']
+      'b64' => ['0'..'9', 'A'..'Z', 'a'..'z', '.', '_']
+      'm64' => ['A'..'Z', 'a'..'z', '0'..'9', '+', '/'] # MIME::Base64
+      'iru' => ['A'..'Z', 'a'..'z', '0'..'9', '[', ']'] # IRCu
+      'url' => ['A'..'Z', 'a'..'z', '0'..'9', '*', '-'] # URL
+      'rex' => ['A'..'Z', 'a'..'z', '0'..'9', '!', '-'] # RegEx
+      'id0' => ['A'..'Z', 'a'..'z', '0'..'9', '_', '-'] # ID 0
+      'id1' => ['A'..'Z', 'a'..'z', '0'..'9', '.', '_'] # ID 1
+      'xnt' => ['A'..'Z', 'a'..'z', '0'..'9', '.', '-'] # XML Nmtoken
+      'xid' => ['A'..'Z', 'a'..'z', '0'..'9', '_', ':'] # XML ID Name
+      'b85' => ['0'..'9', 'A'..'Z', 'a'..'z', '!', '#', # RFC 1924 for
+                '$', '%', '&', '(', ')', '*', '+', '-', #   IPv6 addrs
+                ';', '<', '=', '>', '?', '@', '^', '_', #   like in
+                '`', '{', '|', '}', '~'               ] # Math::Base85
+
+    If no \@newd list or digit set name is provided as a parameter, dig()
+    returns the current character list. It's fine to have many more
+    characters in your current digit set than will be used with your
+    conversions (e.g., using dig('b64') works fine for any cnv() call with
+    $from && $tobs params less than or equal to 64).
+
+    An example of a \@newd parameter for a specified alternate digit set for
+    base 9 conversions is:
+
+      dig( [ qw( n a c h o z   y u m ) ] );
+
+  diginit()
+    Resets the used digit list to the initial default order of the
+    predefined digit set: 'b64'. This is simply a shortcut for calling
+    dig('b64') for reinitialization purposes.
+
+  summ($numb)
+    A simple function to calculate a memoized summation of $numb down to 1.
+
+  fact($numb)
+    A simple function to calculate a memoized factorial of $numb.
+
+  choo($ennn, $emmm)
+    A simple function to calculate a memoized function of $ennn choose
+    $emmm.
+
+NOTES
+    The Perl builtin hex() function takes a hex string as a parameter &&
+    returns the decimal value (FromBase = 16, ToBase = 10) but this notation
+    seems counter-intuitive to me since a simple reading of the code
+    suggests that a hex() function will turn your parameter into hexadecimal
+    (i.e., It sounds like Perl's hex() will hexify your parameter but it
+    does not.) so I've decided (maybe foolishly) to invert the notation for
+    my similar functions since it makes more sense to me this way && will be
+    easier to remember (I've had to lookup hex() in the Camel book many
+    times already which was part of the impetus for this module... as well
+    as the gut reaction that sprintf() is not a proper natural inverse
+    function for hex()).
+
+    This means that my b64() function takes a decimal number as a parameter
+    && returns the base64 equivalent (FromBase = 10, ToBase = 64) && my
+    b10() function takes a base64 number (string) && returns the decimal
+    value (FromBase = 64, ToBase = 10). My hex() function overloads Perl's
+    builtin version with this opposite behavior so my dec() function behaves
+    like Perl's normal hex() function. I know it's confusing && maybe bad
+    form of me to do this but I like it so much better this way that I'd
+    rather go against the grain.
+
+    Please think of my dec() && hex() functions as meaning decify && hexify.
+    Also the pronunciation of dec() is 'dess' (!'deck' which would be the
+    inverse of 'ink' which -- && ++ already do so well). After reading the
+    informative Perl module etiquette guidelines, I now appreciate the need
+    to export as little as is necessary by default. So to be responsible, I
+    have limited BaseConvert exporting to only cnv() under normal circumstances.
+    Please specify the other functions you'd like to import into your
+    namespace or use the tags described above in the cnv() section like:
+
+      'use Math::BaseConvert qw(:all !:hex);'
+
+    Error checking is minimal.
+
+    This module does not handle fractional number inputs because I like
+    using the dot (.) character as a standard base64 digit since it makes
+    for clean filenames.
+
+    summ(), fact(), && choo() are general Math function utilities which are
+    unrelated to number-base conversion but I didn't feel like making
+    another separate module just for them so they snuck in here.
+
+    I hope you find Math::BaseConvert useful. Please feel free to e-mail me any
+    suggestions or coding tips or notes of appreciation
+    ("app-ree-see-ay-shun"). Thank you. TTFN.
+
+2DO
+    - better error checking
+    - handle fractional parts? umm but I like using '.' as a b64 char so ','
+    comma or some other separator?
+    - What else does BaseConvert need?
+
+CHANGES
+    Revision history for Perl extension Math::BaseConvert:
+
+    - 1.7 Tue Jun 15 16:17:20:14 2010
+      * bumped minor version number so they'll keep ascending (without PT
+      comprehension)
+
+    - 1.4.A6FAbEb Tue Jun 15 10:37:14:37 2010
+      * added Math::BigInt code for >64-bit number-base conversions
+
+      * added a bunch more DigitSets: IRCu, URL, RegEx, identifier variants,
+      XML Nmtoken, && XML ID Name
+
+    - 1.4.75O6Pbr Thu May 24 06:25:37:53 2007
+      * added Test::Pod(::Coverage)? tests && PREREQ entries
+
+      * added b85 for IPv6, gen'd META.yml (w/ newline before EOF), up'd
+      minor ver
+
+    - 1.2.68J9uJQ Sat Aug 19 09:56:19:26 2006
+      * added b64sort() && put pod at bottom
+
+    - 1.2.59M7mRX Thu Sep 22 07:48:27:33 2005
+      * testing Make as primary and BuildPL backup (needing rename for dot)
+
+    - 1.2.59IBlgw Sun Sep 18 11:47:42:58 2005
+      * testing just using Module::Build instead of MakeMaker
+
+      * fixed test 12 which was failing on AMD64
+
+      * added Build.PL to pkg
+
+    - 1.2.54HK3pB Sun Apr 17 20:03:51:11 2005
+      * removed 128 digit-set since some hi-bit chars cause probs on Win32
+
+      * made bin/cnv only executable to go in EXE_FILES
+
+      * made Math::BaseCalc a link in pod && updated License
+
+    - 1.2.45UC8fo Sun May 30 12:08:41:50 2004
+      * tidied POD && upped minor version number since CPAN can't read PTVR
+
+    - 1.0.44E9ljP Wed Apr 14 09:47:45:25 2004
+      * added test for div-by-zero error in choo()
+
+      * added summ()
+
+    - 1.0.446EIbS Tue Apr 6 14:18:37:28 2004
+      * snuck in fact() && choo()
+
+    - 1.0.42REDir Fri Feb 27 14:13:44:53 2004
+      * changed test.pl to hopefully pass MSWin32-x86-multi-thread
+
+    - 1.0.428LV46 Sun Feb 8 21:31:04:06 2004
+      * broke apart CHANGES to descend chronologically
+
+      * made dec() auto uppercase param since dec(a) was returning 36
+      instead of 10
+
+    - 1.0.41M4GMP Thu Jan 22 04:16:22:25 2004
+      * put cnv in bin/ as EXE_FILES
+
+    - 1.0.418BEPc Thu Jan 8 11:14:25:38 2004
+      * testing new e auto-gen MANIFEST(.SKIP)?
+
+    - 1.0.3CNH37s Tue Dec 23 17:03:07:54 2003
+      * updated POD
+
+    - 1.0.3CG3dIx Tue Dec 16 03:39:18:59 2003
+      * normalized base spelling
+
+    - 1.0.3CD1Vdd Sat Dec 13 01:31:39:39 2003
+      * added ABSTRACT section to WriteMakeFile()
+
+      * changed synopsis example
+
+      * updated all POD indenting
+
+    - 1.0.3CCA5Mi Fri Dec 12 10:05:22:44 2003
+      * removed indenting from POD NAME field
+
+    - 1.0.3CB7M43 Thu Dec 11 07:22:04:03 2003
+      * updated package to coincide with Time::Fields release
+
+    - 1.0.39B36Lv Thu Sep 11 03:06:21:57 2003
+      * synchronized POD with README documentation using new e utility
+
+      * templatized package compilation
+
+      * fixed boundary bugs
+
+    - 1.0.37SLNGN Mon Jul 28 21:23:16:23 2003
+      * first version (&& my first Perl module... yay!) put on CPAN
+
+    - 1.0.37JKj3w Sat Jul 19 20:45:03:58 2003
+      * reworked interface from shell utility to package
+
+    - 1.0.3159mLT Sun Jan 5 09:48:21:29 2003
+      * original version
+
+INSTALL
+    Please run:
+
+      `perl -MCPAN -e "install Math::BaseConvert"`
+
+    or uncompress the package && run:
+
+      `perl Makefile.PL;       make;       make test;       make install`
+        or if you don't have  `make` but Module::Build is installed
+      `perl    Build.PL; perl Build; perl Build test; perl Build install`
+
+LICENSE
+    Most source code should be Free! Code I have lawful authority over is &&
+    shall be! Copyright: (c) 2003-2007, Pip Stuart. Copyleft : This software
+    is licensed under the GNU General Public License (version 3). Please
+    consult the Free Software Foundation (HTTP://FSF.Org) for important
+    information about your freedom.
+
+AUTHOR
+    Pip Stuart <Pip@CPAN.Org>

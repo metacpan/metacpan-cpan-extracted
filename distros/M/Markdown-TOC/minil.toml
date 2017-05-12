@@ -1,0 +1,4 @@
+name = "Markdown-TOC"
+badges = ["travis"]
+module_maker="ExtUtilsMakeMaker"
+authority = "cpan:IMAGO"

@@ -1,0 +1,8 @@
+Revision history for MooseX-Error-Trap
+
+0.01    04 May 2009
+        First release, it works but you only have the option for a single dispatch call.
+0.011   05 May 2009
+        Minor fixes, updates to the docs and require Module::Build
+0.02    30 Nov 2010
+        Converted to dzil and changed the error-handler to also accept a code ref / text for attr

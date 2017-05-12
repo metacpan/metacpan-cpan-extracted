@@ -1,0 +1,55 @@
+Received: from ns.ATComputing.nl (ns.ATComputing.nl [195.108.229.25])
+	by atcmpg.ATComputing.nl (8.9.0/8.9.0) with ESMTP id TAA26427
+	for <markov@ATComputing.nl>; Wed, 4 Oct 2000 19:56:00 +0200 (MET DST)
+Received: from imagemagick.org (magick.imagemagick.org [38.220.172.2])
+	by ns.ATComputing.nl (Postfix) with ESMTP id 84B2DED32
+	for <markov@ATComputing.nl>; Wed,  4 Oct 2000 19:55:58 +0200 (CEST)
+Received: (from majordomo@localhost)
+	by imagemagick.org (8.11.0.Beta3/8.9.3) id e94IMj420302
+	for magick-developer-outgoing; Wed, 4 Oct 2000 14:22:45 -0400
+X-Authentication-Warning: magick.imagemagick.org: majordomo set sender to owner-magick@imagemagick.org using -f
+From: cristy@mystic.es.dupont.com
+Date: Wed, 4 Oct 2000 14:22:35 -0400 (EDT)
+Message-Id: <200010041822.e94IMZr19712@mystic.es.dupont.com>
+To: magick-developer@imagemagick.org
+Subject: Font metrics
+Sender: owner-magick@imagemagick.org
+Precedence: bulk
+Reply-To: cristy@mystic.es.dupont.com
+Content-Type: text
+Status: RO
+Content-Length: 1620
+Lines: 32
+
+The problem with general font metrics in ImageMagick is that there are
+four schemes for obtaining fonts FreeType 1, FreeType 2,
+Postscript/Ghostscript fonts, and X11 fonts.  Freetype returns plenty
+of information associated with font metrics.  I know of no way to get
+the font metrics from Ghostscript and X11 fonts returns metrics but
+they do not exactly match the information returned by Freetype.
+Layered on top of that is the fonts can be manipulated with an affine
+matrix with varying results for the different font schemes.  Currently
+I write fonts to an image that bounds the font and turn all pixels not
+covered by the font lettering to transparent then composite this on top
+of the image being annotated.
+
+The only metrics available now are the maximum font height and string
+width.  In Perl, for example, use
+
+  $font->Read('label:This is a test');
+  ($width,$height)=$font->Get('width','height');
+
+I can certainly include other metric information as well but how to do
+this consistently for all font schemes?  Perhaps I could retain the
+font metrics for Freetype fonts only?  Or can you think of a few
+specific font metrics that would be useful to you that we can get for
+FreeType, X11, and Postscript fonts?  What is a minimal set of font
+metrics you need to make annotating more useable?
+
+***********************************************************************
+To remove yourself from this mailing list, send mail to:
+	majordomo@imagemagick.org
+
+Include the following command in the body of your message:
+	unsubscribe magick-developer
+***********************************************************************

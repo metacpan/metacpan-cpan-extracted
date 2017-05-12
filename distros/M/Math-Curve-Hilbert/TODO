@@ -1,0 +1,8 @@
+TODO
+----
+
+Write a proper test suite, to check that it hasn't been broken if modified.
+
+Memoize range function as it can be expensive.
+
+Include some sort of polygon range, or combined ranges

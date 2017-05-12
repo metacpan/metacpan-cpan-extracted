@@ -1,0 +1,10 @@
+THIS MODULE IS DEPRECATED. USE Mojolicious::Plugin::Qooxdoo instead
+
+MojoX::Dispatcher::Qooxdoo::Jsonrpc.pm 
+is a dispatcher for qooxdoo json rpc calls
+
+install:
+
+perl Makefile.PL
+make
+make install

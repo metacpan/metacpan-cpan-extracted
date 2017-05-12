@@ -1,0 +1,92 @@
+#!/usr/bin/env perl
+use Mojolicious::Lite;
+
+plugin 'QuickMy' => {dsn => 'mysql://sri:123456@localhost/testdb'};
+
+get '/' => sub { shift->redirect_to('/sort/desc') };
+
+get '/sort/:order' => {order => 'desc'} => sub {
+  my $c = shift;
+  my $sort = $c->param('order') || 'desc';
+  my $order = ($sort eq 'desc') ? 'asc' : ($sort eq 'asc') ? 'desc' : 'desc';
+  # simple select: ($table) = $c->qselect('table_name');
+  my ($table) = $c->qselect('models',
+                          {},
+                          {
+                            order_by  => { $sort => 'id' },
+                          }
+                          );
+  $c->stash(
+            table => $table,
+            count => $c->qcount('models'),
+            order => $order,
+            );
+  $c->render(template => 'index');
+};
+
+get '/insert' => sub {
+  my $c = shift;
+  my $id = $c->qinsert('models', { name => 'Moscow', foto => 'https://www.flickr.com/search/?text=Moscow' } );
+  $c->app->log->info($id);
+  $c->redirect_to('/sort/desc');
+};
+
+get '/edit/:id' => [id => qr/\d+/] => sub {
+  my $c = shift;
+  my $id = $c->param('id');
+  $c->qupdate('models', {id => $id}, { name => 'New York',
+                                      foto => 'https://www.flickr.com/search/?text=New%20York'
+                                      } );
+  $c->redirect_to('/sort/desc');
+};
+
+get '/delete/:id' => [id => qr/\d+/] => sub {
+  my $c = shift;
+  my $id = $c->param('id');
+  $c->qdelete('models', {id => $id});
+  $c->redirect_to('/sort/desc');
+};
+
+app->start;
+__DATA__
+
+@@ index.html.ep
+% layout 'default';
+% title 'Welcome to QuickMy';
+<div class="container">
+<h3>QuickMy: example table operations</h3>
+<h4>Count of rows: <%= $count %></h4>
+<a href="/insert" title="Insert new row"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a>
+<table class="table table-striped">
+<thead>
+<tr>
+  <td><a href="/sort/<%= $order %>"><span class="glyphicon glyphicon-sort" aria-hidden="true"></span></a></td>
+  <td>Name</td>
+  <td>Foto</td>
+  <td>Edit</td>
+  <td>Delete</td>
+</tr>
+</thead>
+% for my $row(@$table) {
+<tr>
+    <td><%= $row->{id}%></td>
+    <td><%= $row->{name}%></td>
+    <td><%= $row->{foto}%></td>
+    <td><a href="/edit/<%= $row->{id}%>"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a></td>
+    <td><a href="/delete/<%= $row->{id}%>"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a></td>
+</tr>
+%}
+</table>
+</div>
+
+@@ layouts/default.html.ep
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= title %></title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+        integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  </head>
+  <body><%= content %></body>
+</html>
+

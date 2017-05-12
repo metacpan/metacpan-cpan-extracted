@@ -1,0 +1,8 @@
+# Add here the rules
+# [allow|deny] [address|subscribers|any] to [post|bounce|proceed] \
+# from [localnet|anywhere] with(out) stamp
+#
+
+deny .com to proceed from anywhere
+allow subscribers to post from anywhere without stamp
+deny any to proceed from anywhere

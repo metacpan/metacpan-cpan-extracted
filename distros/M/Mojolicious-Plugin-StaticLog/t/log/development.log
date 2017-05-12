@@ -1,0 +1,54 @@
+[Sat Apr 16 13:09:29 2016] [debug] GET "/"
+[Sat Apr 16 13:09:29 2016] [debug] Routing to a callback
+[Sat Apr 16 13:09:29 2016] [debug] 200 OK (0.000701s, 1426.534/s)
+[Sat Apr 16 13:09:29 2016] [debug] Static 200    151 /one-eyed.txt
+[Sat Apr 16 13:09:30 2016] [debug] Static 200    151 /one-eyed.txt
+[Sat Apr 16 13:09:30 2016] [debug] Static 200    151 /one-eyed.txt
+[Sat Apr 16 13:09:30 2016] [info] Static 200    151 /one-eyed.txt
+[Sat Apr 16 13:09:46 2016] [debug] GET "/"
+[Sat Apr 16 13:09:46 2016] [debug] Routing to a callback
+[Sat Apr 16 13:09:46 2016] [debug] 200 OK (0.000695s, 1438.849/s)
+[Sat Apr 16 13:09:46 2016] [debug] Static 200    151 /one-eyed.txt
+[Sat Apr 16 13:09:46 2016] [debug] Static 200    151 /one-eyed.txt
+[Sat Apr 16 13:09:46 2016] [debug] Static 200    151 /one-eyed.txt
+[Sat Apr 16 13:09:47 2016] [info] Static 200    151 /one-eyed.txt
+[Sat Apr 16 13:11:08 2016] [debug] Static 200    151 /one-eyed.txt
+[Sat Apr 16 13:11:09 2016] [info] Static 200    151 /one-eyed.txt
+[Tue May 24 12:25:45 2016] [debug] GET "/"
+[Tue May 24 12:25:45 2016] [debug] Routing to a callback
+[Tue May 24 12:25:45 2016] [debug] 200 OK (0.000716s, 1396.648/s)
+[Tue May 24 12:25:45 2016] [error] Can't locate object method "is_debug" via package "Mojo::Log" at /home/frankc/local/Mojolicious-Plugin-StaticLog/lib/Mojolicious/Plugin/StaticLog.pm line 16.
+
+[Tue May 24 12:25:45 2016] [debug] Template "exception.development.html.ep" not found
+[Tue May 24 12:25:45 2016] [debug] Template "exception.html.ep" not found
+[Tue May 24 12:25:45 2016] [debug] Rendering template "mojo/debug.html.ep"
+[Tue May 24 12:25:45 2016] [debug] Rendering template "mojo/menubar.html.ep"
+[Tue May 24 12:25:45 2016] [debug] Your secret passphrase needs to be changed
+[Tue May 24 12:25:46 2016] [error] Can't locate object method "is_debug" via package "Mojo::Log" at /home/frankc/local/Mojolicious-Plugin-StaticLog/lib/Mojolicious/Plugin/StaticLog.pm line 16.
+
+[Tue May 24 12:25:46 2016] [debug] Template "exception.development.html.ep" not found
+[Tue May 24 12:25:46 2016] [debug] Template "exception.html.ep" not found
+[Tue May 24 12:25:46 2016] [debug] Rendering template "mojo/debug.html.ep"
+[Tue May 24 12:25:46 2016] [debug] Rendering template "mojo/menubar.html.ep"
+[Tue May 24 12:25:46 2016] [debug] Your secret passphrase needs to be changed
+[Tue May 24 12:25:46 2016] [error] Can't locate object method "is_debug" via package "Mojo::Log" at /home/frankc/local/Mojolicious-Plugin-StaticLog/lib/Mojolicious/Plugin/StaticLog.pm line 16.
+
+[Tue May 24 12:25:46 2016] [error] Can't locate object method "is_debug" via package "Mojo::Log" at /home/frankc/local/Mojolicious-Plugin-StaticLog/lib/Mojolicious/Plugin/StaticLog.pm line 16.
+
+[Tue May 24 12:25:46 2016] [debug] Template "exception.development.html.ep" not found
+[Tue May 24 12:25:46 2016] [debug] Template "exception.html.ep" not found
+[Tue May 24 12:25:46 2016] [debug] Rendering cached template "mojo/debug.html.ep"
+[Tue May 24 12:25:46 2016] [debug] Rendering cached template "mojo/menubar.html.ep"
+[Tue May 24 12:25:46 2016] [error] Can't locate object method "is_info" via package "Mojo::Log" at /home/frankc/local/Mojolicious-Plugin-StaticLog/lib/Mojolicious/Plugin/StaticLog.pm line 16.
+
+[Tue May 24 12:30:33 2016] [debug] GET "/"
+[Tue May 24 12:30:33 2016] [debug] Routing to a callback
+[Tue May 24 12:30:33 2016] [debug] 200 OK (0.000642s, 1557.632/s)
+[Tue May 24 12:30:33 2016] [debug] Static 200    151 /one-eyed.txt
+[Tue May 24 12:30:33 2016] [debug] Static 200    151 /one-eyed.txt
+[Tue May 24 12:30:33 2016] [debug] Static 200    151 /one-eyed.txt
+[Tue May 24 12:30:33 2016] [info] Static 200    151 /one-eyed.txt
+[Tue May 24 12:32:09 2016] [debug] Static 200    151 /one-eyed.txt
+[Tue May 24 12:32:10 2016] [info] Static 200    151 /one-eyed.txt
+[Tue May 24 12:39:32 2016] [debug] Static 200    151 /one-eyed.txt
+[Tue May 24 12:39:32 2016] [info] Static 200    151 /one-eyed.txt

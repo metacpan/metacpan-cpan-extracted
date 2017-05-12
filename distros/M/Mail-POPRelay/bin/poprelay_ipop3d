@@ -1,0 +1,50 @@
+#!/usr/bin/perl
+
+use strict;
+use Mail::POPRelay::Daemon;
+
+
+# main
+# ---------
+my $popDaemon = new Mail::POPRelay::Daemon(
+	$ARGV[0],
+	{ mailLogRegExp => 'ipop3d\[\d+\]:.+user=(\w+) host=.*\[(\d+\.\d+\.\d+\.\d+)\] nmsgs=', }
+);
+
+
+=head1 NAME
+
+poprelay_ipop3d - Agent for Ipop3d
+
+
+=head1 SYNOPSIS
+
+./poprelay_ipop3d config-file
+
+
+=head1 DESCRIPTION
+
+This agent is suitable for working with the Ipop3d POP daemon.
+
+Make sure to specify the correct config-file for your server configuration.
+Subtle modifications may be necessary in the config-file depending on your
+server configuration.
+
+
+=head1 DIAGNOSTICS
+
+croak().  Will write to syslog eventually.
+
+
+=head1 AUTHOR
+
+Keith Hoerling <keith@hoerling.com>
+
+
+=head1 SEE ALSO
+
+Mail::POPRelay::Daemon(3pm), Mail::POPRelay(3pm), poprelay_cleanup(1p).
+
+=cut
+
+# $Id: poprelay_ipop3d,v 1.1.1.1 2002/05/28 07:32:59 keith Exp $

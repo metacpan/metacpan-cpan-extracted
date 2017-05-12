@@ -1,0 +1,35 @@
+Revision history for Map::Tube::Plugin::FuzzyFind
+
+0.08 2015-03-25
+  - Upgraded test 07 to work properly with Map::Tube 2.93
+
+0.07 2015-03-24
+  - Removed "internal use only" remark in POD left over from test version
+  - Adapted test 05 to changed diagnostics as of v0.06
+  - Upgraded test 07 to work properly with Map::Tube 2.92 and M::T::London 0.71
+    (Thanks to Slaven for pointing this one out!)
+
+0.06 2015-03-12
+  - Catch broken installations of Text::Soundex, as reported by some
+    CPAN testers. (Big thanks to Mohammad (MANWAR) for research into
+    the why and how of this bug.)
+
+0.05 2015-03-10
+  - fixed MANIFEST.SKIP and tests to cope with ExtUtils::MakeMaker 7.05+
+    (thanks to Slaven's tireless research)
+
+0.04  2015-02-25
+  - added pod coverage test.
+  - reworked Makefile.PL (based on hints from Slaven)
+
+0.03  2015-02-23
+  - rewrote tests to cope with missing optional modules. (Thanks Slaven!)
+  - added ngram fuzzy matching.
+
+0.02  2015-02-18
+  - tidied code as per perltidy and perlcritic.
+  - fixed file permissions in tar ball. (Thanks Slaven!)
+  - added Soundex and Metaphone fizzy matching.
+
+0.01  2015-02-14
+  - first public release.

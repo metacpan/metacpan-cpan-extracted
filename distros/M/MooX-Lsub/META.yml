@@ -1,0 +1,39 @@
+---
+abstract: 'Very shorthand syntax for bulk lazy builders'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  Test::Needs: '0'
+  perl: '5.008'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-Lsub
+provides:
+  MooX::Lsub:
+    file: lib/MooX/Lsub.pm
+    version: '0.002001'
+recommends:
+  Sub::Util: '0'
+requires:
+  Carp: '0'
+  Eval::Closure: '0'
+  constant: '0'
+  perl: '5.008'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/MooX-Lsub/issues
+  homepage: https://github.com/kentnl/MooX-Lsub
+  repository: https://github.com/kentnl/MooX-Lsub.git
+version: '0.002001'

@@ -1,0 +1,74 @@
+README file contents:
+
+  1. BBEdit_LM_Muldis_D.plist
+  2. Input_Method_Muldis_D.cin
+
+----------
+
+The plain-text file BBEdit_LM_Muldis_D.plist is a Codeless Language Module
+for the Mac OS X text editor BBEdit
+(http://barebones.com/products/bbedit/), at least for version 9.x and
+possibly earlier versions may be supported.
+
+To use it, simply copy that file into this directory (which you might have
+to create):
+
+    ~/Library/Application\ Support/BBEdit/Language\ Modules
+
+... and BBEdit will load it when it is next launched.
+
+The CLM empowers BBEdit to syntax color PTMD_STD dialect Muldis D code,
+and to scan it for major entity (eg, routine and type) declarations so you
+can easily jump around to those in your Muldis D code files.
+
+The CLM will automatically be applied to any text files with the filename
+extension ".md" (subject to change) but you can apply it to any file.
+
+Be aware that BBEdit_LM_Muldis_D.plist is only as completely defined as the
+PTMD_STD dialect itself and that is incomplete but should be done
+soon.  Also, the syntax coloring is more rudimentary than the actual
+grammar, and certainly can stand to be refactored for better accuracy
+whenever I figure out more on how to properly write CLM's.
+
+Over time I expect that Muldis D language modules for other text editors
+will be created, as well as syntax coloring utilities for web display of
+code, etc.  Meanwhile, what we have here is a reasonable start.
+
+----------
+
+The plain-text file Input_Method_Muldis_D.cin is an "input method rule
+file" written in the "CIN" format, commonly used by free and open source
+programs (such as OpenVanilla "http://openvanilla.org/" input method
+framework), that you can see explained at
+"http://www.yale.edu/chinesemac/pages/input_methods.html#cin", with
+"http://openvanilla.googlecode.com/svn/trunk/Modules/SharedData/" holding
+some example CIN files.
+
+The purpose of Input_Method_Muldis_D.cin is to make it easier for you to
+type the various trans-ASCII mathematical/etc symbols that various concrete
+Muldis D syntaxes let you use for various operators/etc, which don't have
+their own keys on normal keyboards.  It helps remove the practical barriers
+to writing code in a more visually pleasing or more readable way because
+doing so is more difficult to write.
+
+Of course, you may already have other input method tools at your
+disposal that are effective for various mathematical/etc symbols, in which
+case this option bundled with the Muldis D manual is redundant for you.
+But for other people such as the author which hasn't found such tools, this
+bundled plugin should make a big difference.
+
+To use Input_Method_Muldis_D.cin on Mac OS X 10.5+, simply copy that file
+into this directory (which you might have to create):
+
+    ~/Library/Input\ Methods
+
+... and the "International" pane of "System Preferences" should show
+"Muldis D Symbols" as an Input Menu option after you next Log Out + Log In;
+you can then use it in any application of your choice.
+
+See "http://docs.info.apple.com/article.html?path=Mac/10.5/en/8952.html"
+also which might be useful, though the Yale link is better in general.
+
+Using Input_Method_Muldis_D.cin on other operating systems should be
+easy enough, but I don't have the installation details for you.  Perhaps if
+anyone wants to supply me with such I could append them to this file.

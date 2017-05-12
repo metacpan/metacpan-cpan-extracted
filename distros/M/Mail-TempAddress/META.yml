@@ -1,0 +1,31 @@
+---
+name: Mail-TempAddress
+version: 0.62
+author:
+  - 'chromatic, C<chromatic@wgz.org>.'
+abstract: 'module for managing simple, temporary mailing addresses'
+license: perl
+resources:
+  license: ~
+requires:
+  Class::Roles: 0.30
+  Email::Address: ''
+  Mail::Action: 0.45
+  YAML: 0.35
+  perl: 5.8.6
+build_requires:
+  Test::Exception: ''
+  Test::MockObject: 0.11
+  Test::Simple: 0.47
+provides:
+  Mail::TempAddress:
+    file: lib/Mail/TempAddress.pm
+    version: 0.62
+  Mail::TempAddress::Address:
+    file: lib/Mail/TempAddress/Address.pm
+  Mail::TempAddress::Addresses:
+    file: lib/Mail/TempAddress/Addresses.pm
+generated_by: Module::Build version 0.31
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

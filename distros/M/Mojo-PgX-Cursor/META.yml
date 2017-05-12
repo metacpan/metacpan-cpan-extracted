@@ -1,0 +1,47 @@
+---
+abstract: 'Cursor Extension for Mojo::Pg'
+author:
+  - 'Nathaniel Nutter C<nnutter@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-PgX-Cursor
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Mojo::PgX::Cursor:
+    file: lib/Mojo/PgX/Cursor.pm
+    version: '0.502001'
+  Mojo::PgX::Cursor::Cursor:
+    file: lib/Mojo/PgX/Cursor/Cursor.pm
+  Mojo::PgX::Cursor::Database:
+    file: lib/Mojo/PgX/Cursor/Database.pm
+  Mojo::PgX::Cursor::Results:
+    file: lib/Mojo/PgX/Cursor/Results.pm
+requires:
+  Mojo::Pg: '2.0'
+  Mojolicious: '6.0'
+  Time::HiRes: '1.00'
+  UUID::Tiny: '1.01'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/nnutter/mojo-pgx-cursor/issues
+  homepage: https://github.com/nnutter/mojo-pgx-cursor
+  repository: git://github.com/nnutter/mojo-pgx-cursor.git
+version: '0.502001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

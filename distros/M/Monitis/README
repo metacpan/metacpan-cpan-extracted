@@ -1,0 +1,47 @@
+NAME
+
+    Monitis Perl - API Perl interface for Monitis, all-in-one IT monitoring platform (http://www.monitis.com)
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+EXAMPLES
+
+    See 'eg' directory of this distribution for examples.
+
+DEPENDENCIES
+
+    LWP::UserAgent
+    JSON
+    Digest::SHA
+    HTTP::Message
+    Test::Simple
+
+
+AUTHORS
+
+    Yaroslav Korshak <yko@cpan.org>
+    Alexandr Babenko  <foxcool@cpan.org>
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2006-2011, Monitis Inc.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+About Monitis 
+
+Monitis is an all-in-one hosted systems monitoring platform.
+It provides flexible API to extend its core functionality for monitoring anything,
+from anywhere and at anytime.
+
+More about Monitis API - http://monitis.com/api/api.html

@@ -1,0 +1,21 @@
+{
+  "name" : "JavaScript Archive Network",
+  "master" : "http://openjsan.org/",
+  "timestamp" : "2007-01-15T21:17:52Z",
+  "mirrors" : [
+    "http://jsan.caseywest.com/",
+    "http://back.openjsan.org/",
+    "http://jsan.jp/",
+    "http://jsan.nc.cyut.edu.tw/",
+    "http://jsan.stu.edu.tw/",
+    "http://www.jsan.de/",
+    "http://jsan.log.pt/",
+    "http://jsan.davecardwell.co.uk/",
+    "http://jsan.clueball.com/",
+    "http://jsan.woobling.org/",
+    "http://jsan.develooper.com/",
+    "http://pair.openjsan.org/",
+    "http://jsan.mirrors.playboy.com/",
+    "http://jsan.phunnel.org/"
+  ]
+}

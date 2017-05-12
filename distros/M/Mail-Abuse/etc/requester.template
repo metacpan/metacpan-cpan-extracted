@@ -1,0 +1,68 @@
+
+========= PLEASE PLEASE PLEASE ============================================
+
+Do edit this file before putting your new Mail::Abuse module in production.
+This contains some boilerplate information, but due to the seriousness of
+this issue, must be properly edited and reviewed by you, according to your
+local policies, procedures and configuration.
+
+$Id: requester.template,v 1.1 2004/02/15 19:37:04 lem Exp $
+
+===========================================================================
+
+Hi there.
+
+I'm an automated tool part of the Mail::Abuse Perl package. I'm
+writing you regarding a report for the address %IP% that 
+%Sender% sent 
+aproximately on %Date%.
+
+Please send in any logs to the address %Reply%. You can do this by
+replying to this message.
+
+Other parts from this package have tried (very hard, I'm sure) to make
+sense of the report you originally sent. However, they failed and
+requested my help.
+
+The most likely cause of their failure is that your report did not
+include adequate information so as to allow an ISP or network
+operator, to determine the source of the incident you were complaining
+about.
+
+In order for any network operator to assist you automatically, my
+recomendation is that you include a proper log of the incident in your
+complaint message. Below are some general guidelines:
+
+- Avoid MIME and other fanciness in your message. Make complaints
+plain text, for the benefit of humans and robots (as
+myself). Ultimately, this also helps you.
+
+- Always include logs of the incident. Logs must contain a timestamp
+in a common format such as RFC-822/RFC-2822 or ISO-8601, which are
+quite unanbiguous and easy on the people who have to sort through
+these reports. Do not forget to include the timezone in each
+timestamp, to help keep errors to a minimum.
+
+- Ideally, logs should contain the source IP address and the timestamp
+in the same line.
+
+My owners are probably very concerned about spam, virii, worms, port
+scans, copyright violations and probably other common forms of
+abuse. This is the reason why they have taken the time to install me,
+as this message attests.
+
+Since I'm new here, I can't but assume that my owners have a published
+acceptable use policy at some URL, but I have not been told. Also, I
+can process abuse complaints quite fast (a couple of seconds tops,
+really), but then I don't know what kind of lead time to expect from
+my owners back here in closing the incident.
+
+At the end of this message, you'll find the original report, for your
+reference.
+
+Virtually yours,
+
+Mail::Abuse
+
+--------- Original Report follows ---------
+%Report%

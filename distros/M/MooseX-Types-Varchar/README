@@ -1,0 +1,9 @@
+This archive contains the distribution MooseX-Types-Varchar, 
+version 0.03:
+
+  A Str type parameterised by length
+
+This software is copyright (c) 2009 by Chris Andrews.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as perl itself.

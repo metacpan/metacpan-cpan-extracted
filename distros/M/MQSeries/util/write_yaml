@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+#
+# $Id: write_yaml,v 33.6 2012/09/26 16:15:38 jettisu Exp $
+#
+# (c) 2009-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+# write_yaml - Write YAML file; we cannot get ExtUtils::MakeMaker
+#              to do this, as we don't use the "dist" target to
+#              build the tarball but out own mechanim to deal
+#              with the Morgan Stanley source environment.
+#
+# $Id: write_yaml,v 33.6 2012/09/26 16:15:38 jettisu Exp $
+#
+
+use strict;
+use Getopt::Long;
+
+our %args;
+GetOptions(\%args, qw(release=s)) || die "Invalid argument";
+
+open (META, '>', 'META.yml') ||
+  die "Cannot create output file: $!";
+print META <<"_END_META_";
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MQSeries
+abstract: "Interface to IBM's MQSeries Product"
+author:
+  - 'MQ Engineering Group <mqseries\@cpan.org>'
+version: $args{release}
+version_from: MQSeries.pm
+installdirs: site
+build_requires:
+  Params::Validate: 0.89
+configure_requires:
+  Params::Validate: 0.89
+requires:
+  Convert::EBCDIC: 0.06
+  Params::Validate: 0.89
+recommends:
+  Test::Pod: 1.20
+  Test::Simple: 0.62
+license: perl
+distribution_type: module
+generated_by: $0
+_END_META_
+;
+close(META);
+
+exit(0);

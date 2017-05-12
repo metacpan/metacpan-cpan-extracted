@@ -1,0 +1,22 @@
+COPYING
+dist/makerelease.xml
+docs/makerelease-example.xml
+docs/makerelease-problems.xml
+DOCUMENTATION.html
+DOCUMENTATION.org
+Makefile.PL
+makerelease
+Makerelease.pm
+Makerelease/Step.pm
+Makerelease/Step/Command.pm
+Makerelease/Step/Include.pm
+Makerelease/Step/Informational.pm
+Makerelease/Step/Modify.pm
+Makerelease/Step/Perl.pm
+Makerelease/Step/Prompt.pm
+Makerelease/Step/Section.pm
+Makerelease/Step/System.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+META.yml                                 Module meta-data (added by MakeMaker)

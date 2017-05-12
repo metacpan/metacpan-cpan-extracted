@@ -1,0 +1,77 @@
+<xml>
+
+	<name>example.com website</name>
+	<output_path>example/www</output_path>
+	<files_path>example/www/files</files_path>
+
+	<!-- URL CONSTRUCTION -->
+	<domain>www.example.com</domain>
+	<http_dir>/</http_dir>
+	<files_http_dir>/files/</files_http_dir>
+
+	<!-- MAKE SURE YOU CHANGE THIS! -->
+	<secret>Some secret line</secret>
+
+	<types>
+ 		<type>
+			<name>News</name>
+			<id>news</id>
+			<location></location>
+			<template>page.tmpl</template>
+		</type>
+		<type>
+			<name>Page</name>
+			<id>page</id>
+			<location></location>
+			<template>page.tmpl</template>
+		</type>
+	</types>
+
+	<authors>
+		<author>J. R. R. Tolkien</author>
+		<author>J. K. Rowling</author>
+	</authors>
+
+	<topics>
+		<topic>
+			<id>flowers</id>
+			<name>Flowers</name>
+		</topic>
+		<topic>
+			<id>animals</id>
+			<name>Fuzzy Animals</name>
+		</topic>
+		<topic>
+			<id>bananas</id>
+			<name>Bananas</name>
+		</topic>
+	</topics>
+
+	<lists>
+
+		<!-- THE NEWS PAGE -->
+		<list>
+			<id>news</id>
+			<name>News</name>
+			<template>news.tmpl</template>
+			<location>news.html</location>
+			<match>
+				<type>news</type>
+				<last>6</last>
+			</match>
+		</list>
+
+		<!-- THE ATOM FEED WITH RECENT NEWS -->
+		<list>
+			<id>feed</id>
+			<name>Sample Atom Feed</name>
+			<template>atom.tmpl</template>
+			<location>atom.xml</location>
+			<match>
+				<type>news</type>
+				<last>12</last>
+			</match>
+		</list>
+	</lists>
+
+</xml>

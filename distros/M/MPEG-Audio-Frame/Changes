@@ -1,0 +1,42 @@
+Revision history for Perl extension MPEG::Audio::Frame.
+
+0.01  Fri Apr 18 01:53:54 2003
+	- original version
+
+0.02  Fri Apr 18 13:30:31 2003
+	- Fixed error in docs
+	- pod2text Frame.pm > README
+
+0.03  Fri Apr 18 19:05:42 2003
+	- Fixed lost offset method, which appeared in doc example but not in the source
+
+0.04  Sat Aug  2 20:52:42 2003
+	- Fixed length calculation with CRC frames thanks to Johan Vromans
+
+0.05  Sun Aug  3 01:00:14 2003
+	- Added CRC checking for layers III and I
+	- Added overloaded "" with asbin
+
+0.06  Fri Oct 17 11:36:25 2003
+	- Fixed pod errors thanks to Suleyman Gulsuner 
+	- Added mention of binmode in docs, thanks to Nikolaus Schusser
+	- Finally found the little endian CRC problem - was looking in the wrong place (unpack("S",...) => unpack("n",...))
+
+0.07  Sun Oct 19 03:59:41 2003
+	- Made broken load on demand instead of always
+	- Cryptographically signed distribution
+
+0.08  Tue Oct 21 23:12:38 2003
+	- Fixed asbin which broke in 0.07 (from $self->header() to $self->{header} instead of $self->{binhead}) thanks to Johan Vromans
+
+0.09  Thu Jan 13 02:09:09 2005
+	- Yasuhiro Sasama submitted a patch to properly handle MPEG2.5 files.
+	- dropped mpeg2 multichannel support, since i don't know how to do it.
+	- Completely rehauled everything internal. Now nearly 50% faster. ***NOTE!
+	  This introduces an incompatible change! $frame->header will no longer
+	  return a hash of string values, but an array of integers***.
+	- Test suite redone and expanded.
+	- Repackaged with Module::Build, and various goodnesses.
+	- Trahed README
+	- Now compatible down to at least 5.005_04
+

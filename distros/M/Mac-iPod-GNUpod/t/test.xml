@@ -1,0 +1,41 @@
+<?xml version='1.0' standalone='yes'?>
+<gnuPod>
+ <files>
+  <file album="S2_INC" artist="Soundtrack" bitrate="192" cdnum="0" cds="0" filesize="7324948" genre="Soundtrack" id="1" path=":iPod_Control:Music:F01:Track_08___Kanon_D_dur__normal_.mp3" playcount="0" prerating="0" rating="0" songnum="0" songs="0" srate="44100" starttime="0" stoptime="0" time="305200" title="Kanon D-dur (normal)" volume="0" year="1997" />
+  <file album="S2_INC" artist="Soundtrack" bitrate="192" cdnum="0" cds="0" comment="W Quintett" filesize="7299871" genre="Soundtrack" id="2" path=":iPod_Control:Music:F07:Track_09___Kanon_D_dur__W_quinte.mp3" playcount="0" prerating="0" rating="0" songnum="0" songs="0" srate="44100" starttime="0" stoptime="0" time="304155" title="Kanon D-dur" volume="0" year="1997" />
+  <file album="S2_INC" artist="Soundtrack" bitrate="192" cdnum="0" cds="0" filesize="2810989" genre="Soundtrack" id="3" path=":iPod_Control:Music:F12:Track_41___A_15__Tenpo_chi_.mp3" playcount="0" prerating="0" rating="0" songnum="0" songs="0" srate="44100" starttime="0" stoptime="0" time="117119" title="A-15 &quot;Tenpo chi&quot;" volume="0" year="1997" />
+  <file album="S2_INC" artist="Soundtrack" bitrate="192" cdnum="0" cds="0" filesize="3145856" id="4" path=":iPod_Control:Music:F02:Track_42___A_15__Tenpo_chi_Rizum.mp3" playcount="0" prerating="0" rating="0" songnum="0" songs="0" srate="44100" starttime="0" stoptime="0" time="131072" title="Tenpo chi Rizumo" volume="0" year="0" />
+  <file album="Refrain" artist="Soundtrack" bitrate="128" cdnum="0" cds="0" comment="Evangelion Refrain" filesize="3886856" id="5" path=":iPod_Control:Music:F17:02___Zankoku_Na_Tenshi_No_These.mp3" playcount="0" prerating="0" rating="0" songnum="0" songs="0" srate="44100" starttime="0" stoptime="0" time="242920" title="Cruel Angel's Thesis - Ambiv" volume="0" year="1997" />
+  <file album="S2_INC" artist="Soundtrack" bitrate="192" cdnum="0" cds="0" filesize="482538" genre="Soundtrack" id="6" path=":iPod_Control:Music:F04:Track_04___Violin_Tuning.mp3" playcount="0" prerating="0" rating="0" songnum="0" songs="0" srate="44100" starttime="0" stoptime="0" time="20100" title="Violin Tuning" volume="0" year="1997" />
+  <file album="S2_INC" artist="Soundtrack" bitrate="192" cdnum="0" cds="0" comment="The Heady Feeling of Freedom" filesize="2572752" genre="Soundtrack" id="7" path=":iPod_Control:Music:F16:Track_05___OP_1_Strings__Tenpo_c.mp3" playcount="0" prerating="0" rating="0" songnum="0" songs="0" srate="44100" starttime="0" stoptime="0" time="107192" title="OP-1 Strings &quot;Tenpo chi&quot;" volume="0" year="1998" />
+  <file bitrate="123" cdnum="0" cds="0" filesize="0" id="8" path="foo" playcount="0" prerating="0" rating="0" songnum="0" songs="0" srate="44100" starttime="0" stoptime="0" time="345" volume="70" year="0" />
+  <file bitrate="123" cdnum="0" cds="0" filesize="0" id="20" path="bar" playcount="0" prerating="0" rating="0" songnum="0" songs="0" srate="44100" starttime="0" stoptime="0" time="345" volume="-90" year="0" />
+  <file bitrate="256" cdnum="0" cds="0" filesize="0" id="21" path="blubb" playcount="33" prerating="0" rating="4" songnum="0" songs="0" srate="44100" starttime="0" stoptime="0" time="2332" volume="0" year="0" />
+  <file bitrate="256" cdnum="0" cds="0" filesize="0" id="22" playcount="0" prerating="0" rating="0" songnum="0" songs="0" srate="44100" starttime="50" stoptime="4555" time="5000" volume="0" year="0" />
+ </files>
+
+ <playlist name="IDs" >
+   <add id="1" />
+   <add id="3" />
+ </playlist>
+
+ <playlist name="Extended" >
+    <add album="S2_INC" />
+    <add artist="Soundtrack" />
+ </playlist>
+
+ <playlist name="Regex sample 1" >
+    <regex title="[Tt]enpo" />
+    <iregex title="DUR" />
+ </playlist>
+
+ <playlist name="Mixed" >
+    <add id="3" />
+    <add artist="Soundtrack" />
+    <iregex title="DUR" />
+ </playlist>
+
+ <playlist name="劇場版" >
+ </playlist>
+
+</gnuPod>

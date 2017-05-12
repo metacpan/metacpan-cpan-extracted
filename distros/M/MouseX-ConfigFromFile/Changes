@@ -1,0 +1,23 @@
+Revision history for Perl extension MouseX::ConfigFromFile
+
+0.05
+        - no functional changes, no need to update
+        - fixed tests on win32 (http://www.cpantesters.org/cpan/report/6807947)
+
+0.04
+        - use Mouse 0.39
+        - use MouseX::Types::Path::Class 0.06
+        - added has_configfile
+        - removed Any::Moose test case
+        - required Test::More 0.94 for done_testing
+
+0.03
+        - use Mouse 0.19
+        - configfile attribute works with 'builder'
+        - added tests
+
+0.02
+        - use Mouse 0.15
+
+0.01
+        - original version

@@ -1,0 +1,5 @@
+Revision history for Perl extension Mojolicious::Plugin::Captcha.
+
+0.01  Tue Mar 26 16:24:07 2013
+	- original version; created by h2xs 1.23 with options
+		-b 5.8.8 -XAn Mojolicious::Plugin::Captcha

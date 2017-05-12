@@ -1,0 +1,47 @@
+Revision history for Mock::Populate
+
+0.0902 2016-03-07 20:44:19
+    - Corrected the time string selection index.
+
+0.0901    2014-08-30 09:30:36-04:00 America/New_York
+    - Improved subroutine names.
+    - Improved docs & comments.
+    - Added path string type.
+    - Fixed crucial "off by one" type error.
+
+0.08      2013-12-16 01:12:33 America/Los_Angeles
+    - Improved documentation.
+    - Made most function calls use named parameters.
+    - Added date_modifier() function for future offset modified columns.
+
+0.0701    2013-12-14 22:25:51 America/Los_Angeles
+    - Allowed single name email addresses.
+
+0.07      2013-12-14 22:12:57 America/Los_Angeles
+    - Added an emailify() function based on person names.
+    - Made all functions return array references rather than lists.
+
+0.06      2013-12-13 17:19:17 America/Los_Angeles
+    - Made the imager() function produce random byte sizes.
+
+0.05      2013-12-13
+    - Improved documentation.
+    - Added ultra-simple imager() function.
+    - Added hex char type to stringer()
+    - Added MetaResources to dist.
+
+0.04      2013-12-13
+    - Added the stringer() function.
+
+0.03      2013-12-13
+    - Improved documentation.
+    - Added the shuffler() function.
+
+0.02      2013-12-13
+    - Implemented the collate() function.
+
+0.01_01  2013-12-12
+    - Added functionality for all bin scripts.
+
+0.01     2013-12-11 Pacific TZ
+    - Copied boilerplate and reconstructed by hand.

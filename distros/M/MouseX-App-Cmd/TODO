@@ -1,0 +1,6 @@
+Full support for Getopt::Long::Descriptive's abilities is not yet written.
+
+This entails taking apart the attributes and getting at the descriptions.
+
+This might actually be added upstream to MooseX::Getopt, so until we decide
+here's a functional but not very helpful (to the user) version anyway.

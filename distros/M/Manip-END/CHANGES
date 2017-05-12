@@ -1,0 +1,9 @@
+0.08
+
+Recieved an anonymous patch via rt.cpan.org to make get_pkg take an int arg
+for index, index is used inside this function, it must have been picking up
+a definition from one of the headers or something.
+
+Also, now I require perl 5.000, no idea if it works for versions that old
+but 5.008 is too restrictive. Suck it and see.
+

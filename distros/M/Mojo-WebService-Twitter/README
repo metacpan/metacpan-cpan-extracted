@@ -1,0 +1,335 @@
+NAME
+
+    Mojo::WebService::Twitter - Simple Twitter API client
+
+SYNOPSIS
+
+     my $twitter = Mojo::WebService::Twitter->new(api_key => $api_key, api_secret => $api_secret);
+     
+     # Request and store access token
+     $twitter->authentication($twitter->request_oauth2);
+     
+     # Blocking API request
+     my $user = $twitter->get_user(screen_name => $name);
+     say $user->screen_name . ' was created on ' . $user->created_at->ymd;
+     
+     # Non-blocking API request
+     $twitter->get_tweet($tweet_id, sub {
+       my ($twitter, $err, $tweet) = @_;
+       say $err ? "Error: $err" : 'Tweet: ' . $tweet->text;
+     });
+     Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+     
+     # Some requests require authentication on behalf of a user
+     $twitter->authentication(oauth => $token, $secret);
+     my $authorizing_user = $twitter->verify_credentials;
+     
+     my $new_tweet = $twitter->post_tweet('Something new and exciting!');
+
+DESCRIPTION
+
+    Mojo::WebService::Twitter is a Mojo::UserAgent based Twitter
+    <https://twitter.com> API client that can perform requests
+    synchronously or asynchronously. An API key and secret for a Twitter
+    Application <https://apps.twitter.com> are required.
+
+    API requests are authenticated by the "authentication" coderef, which
+    can either use an OAuth 2.0 access token to authenticate requests on
+    behalf of the application itself, or OAuth 1.0 credentials (access
+    token and secret) to authenticate requests on behalf of a specific
+    user. The twitter_oauth_creds script can be used to obtain Twitter
+    OAuth credentials for a user from the command-line. A web application
+    may wish to implement its own OAuth authorization flow, passing a
+    callback URL back to the application in "request_oauth", then calling
+    "verify_oauth" with the passed verifier code to retrieve the
+    credentials. See the Twitter documentation
+    <https://dev.twitter.com/web/sign-in/implementing> for more details.
+
+    All methods which query the Twitter API can be called with an optional
+    trailing callback argument to run a non-blocking API query. On
+    transport, HTTP, or API error, blocking API queries will throw a
+    Mojo::WebService::Twitter::Error exception, while non-blocking API
+    queries will pass the exception object to the callback. Consider
+    organizing complex sequences of non-blocking queries with "delay" in
+    Mojo::IOLoop.
+
+    Note that this distribution implements only a subset of the Twitter
+    API. Additional features may be added as requested.
+
+ATTRIBUTES
+
+    Mojo::WebService::Twitter implements the following attributes.
+
+ api_key
+
+     my $api_key = $twitter->api_key;
+     $twitter    = $twitter->api_key($api_key);
+
+    API key for your Twitter Application <https://apps.twitter.com>.
+
+ api_secret
+
+     my $api_secret = $twitter->api_secret;
+     $twitter       = $twitter->api_secret($api_secret);
+
+    API secret for your Twitter Application <https://apps.twitter.com>.
+
+ ua
+
+     my $ua      = $webservice->ua;
+     $webservice = $webservice->ua(Mojo::UserAgent->new);
+
+    HTTP user agent object to use for synchronous and asynchronous
+    requests, defaults to a Mojo::UserAgent object.
+
+METHODS
+
+    Mojo::WebService::Twitter inherits all methods from Mojo::Base, and
+    implements the following new ones.
+
+ authentication
+
+     my $code = $twitter->authentication;
+     $twitter = $twitter->authentication($code);
+     $twitter = $twitter->authentication({oauth_token => $access_token, oauth_token_secret => $access_token_secret});
+     $twitter = $twitter->authentication(oauth => $access_token, $access_token_secret);
+     $twitter = $twitter->authentication({access_token => $access_token});
+     $twitter = $twitter->authentication(oauth2 => $access_token);
+
+    Get or set coderef used to authenticate API requests. Passing oauth
+    with optional token and secret, or a hashref containing oauth_token and
+    oauth_token_secret, will set a coderef which uses a WWW::OAuth to
+    authenticate requests. Passing oauth2 with required token or a hashref
+    containing access_token will set a coderef which authenticates using
+    the passed access token. The coderef will receive the
+    Mojo::Message::Request object as the first parameter, and an optional
+    hashref of oauth_ parameters.
+
+ request_oauth
+
+     my $res = $twitter->request_oauth;
+     my $res = $twitter->request_oauth($callback_url);
+     $twitter->request_oauth(sub {
+       my ($twitter, $error, $res) = @_;
+     });
+
+    Send an OAuth 1.0 authorization request and return a hashref containing
+    oauth_token and oauth_token_secret (request token and secret). An
+    optional OAuth callback URL may be passed; by default, oob is passed to
+    use PIN-based authorization. The user should be directed to the
+    authorization URL which can be retrieved by passing the request token
+    to "twitter_authorize_url" in Mojo::WebService::Twitter::Util. After
+    authorization, the user will either be redirected to the callback URL
+    with the query parameter oauth_verifier, or receive a PIN to return to
+    the application. Either the verifier string or PIN should be passed to
+    "verify_oauth" to retrieve an access token and secret.
+
+ verify_oauth
+
+     my $res = $twitter->verify_oauth($verifier, $request_token, $request_token_secret);
+     $twitter->verify_oauth($verifier, $request_token, $request_token_secret, sub {
+       my ($twitter, $error, $res) = @_;
+     });
+
+    Verify an OAuth 1.0 authorization request with the verifier string or
+    PIN from the authorizing user, and the previously obtained request
+    token and secret. The secret is cached by "request_oauth" and may be
+    omitted. Returns a hashref containing oauth_token and
+    oauth_token_secret (access token and secret) which may be passed
+    directly to "authentication" to authenticate requests on behalf of the
+    user.
+
+ request_oauth2
+
+     my $res = $twitter->request_oauth2;
+     $twitter->request_oauth2(sub {
+       my ($twitter, $error, $res) = @_;
+     });
+
+    Request OAuth 2 credentials and return a hashref containing an
+    access_token that can be passed directly to "authentication" to
+    authenticate requests on behalf of the application itself.
+
+ get_tweet
+
+     my $tweet = $twitter->get_tweet($tweet_id);
+     $twitter->get_tweet($tweet_id, sub {
+       my ($twitter, $err, $tweet) = @_;
+     });
+
+    Retrieve a Mojo::WebService::Twitter::Tweet by tweet ID.
+
+ get_user
+
+     my $user = $twitter->get_user(user_id => $user_id);
+     my $user = $twitter->get_user(screen_name => $screen_name);
+     $twitter->get_user(screen_name => $screen_name, sub {
+       my ($twitter, $err, $user) = @_;
+     });
+
+    Retrieve a Mojo::WebService::Twitter::User by user ID or screen name.
+
+ post_tweet
+
+     my $tweet = $twitter->post_tweet($text, %options);
+     $twitter->post_tweet($text, %options, sub {
+            my ($twitter, $err, $tweet) = @_;
+     });
+
+    Post a status update (tweet) and retrieve the resulting
+    Mojo::WebService::Twitter::Tweet. Requires OAuth 1.0 authentication.
+    Accepts the following options:
+
+    in_reply_to_status_id
+
+       in_reply_to_status_id => '12345'
+
+      Indicates the tweet is in reply to an existing tweet ID. IDs should
+      be specified as a string to avoid issues with large integers. This
+      parameter will be ignored by the Twitter API unless the author of the
+      referenced tweet is mentioned within the status text as @username.
+
+    lat
+
+       lat => '37.781157'
+
+      The latitude of the location to attach to the tweet. This parameter
+      will be ignored by the Twitter API unless it is within the range
+      -90.0 to 90.0, and a corresponding long is specified. It is
+      recommended to specify values as strings to avoid issues with
+      floating-point representations.
+
+    long
+
+       long => '-122.398720'
+
+      The longitude of the location to attach to the tweet. This parameter
+      will be ignored by the Twitter API unless it is within the range
+      -180.0 to 180.0, and a corresponding lat is specified. It is
+      recommended to specify values as strings to avoid issues with
+      floating-point representations.
+
+    place_id
+
+       place_id => 'df51dec6f4ee2b2c'
+
+      A Twitter place ID <https://dev.twitter.com/overview/api/places> to
+      attach to the tweet.
+
+    display_coordinates
+
+       display_coordinates => 1
+
+      If true, tweet will display the exact coordinates the tweet was sent
+      from.
+
+ retweet
+
+     my $tweet = $twitter->retweet($tweet_id);
+     $twitter->retweet($tweet_id, sub {
+       my ($twitter, $err, $tweet) = @_;
+     });
+
+    Retweet the tweet ID or Mojo::WebService::Twitter::Tweet object.
+    Returns a Mojo::WebService::Twitter::Tweet representing the original
+    tweet. Requires OAuth 1.0 authentication.
+
+ search_tweets
+
+     my $tweets = $twitter->search_tweets($query);
+     my $tweets = $twitter->search_tweets($query, %options);
+     $twitter->search_tweets($query, %options, sub {
+       my ($twitter, $err, $tweets) = @_;
+     });
+
+    Search Twitter and return a Mojo::Collection of
+    Mojo::WebService::Twitter::Tweet objects. Accepts the following
+    options:
+
+    geocode
+
+       geocode => '37.781157,-122.398720,1mi'
+       geocode => ['37.781157','-122.398720','1mi']
+       geocode => {latitude => '37.781157', longitude => '-122.398720', radius => '1mi'}
+
+      Restricts tweets to the given radius of the given latitude/longitude.
+      Radius must be specified as mi (miles) or km (kilometers). It is
+      recommended to specify values as strings to avoid issues with
+      floating-point representations.
+
+    lang
+
+       lang => 'eu'
+
+      Restricts tweets to the given ISO 639-1
+      <http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes> language code.
+
+    result_type
+
+       result_type => 'recent'
+
+      Specifies what type of search results to receive. Valid values are
+      recent, popular, and mixed (default).
+
+    count
+
+       count => 5
+
+      Limits the search results per page. Maximum 100, default 15.
+
+    until
+
+       until => '2015-07-19'
+
+      Restricts tweets to those created before the given date, in the
+      format YYYY-MM-DD.
+
+    since_id
+
+       since_id => '12345'
+
+      Restricts results to those more recent than the given tweet ID. IDs
+      should be specified as a string to avoid issues with large integers.
+      See here <https://dev.twitter.com/rest/public/timelines> for more
+      information on filtering results with since_id and max_id.
+
+    max_id
+
+       max_id => '54321'
+
+      Restricts results to those older than (or equal to) the given tweet
+      ID. IDs should be specified as a string to avoid issues with large
+      integers. See here <https://dev.twitter.com/rest/public/timelines>
+      for more information on filtering results with since_id and max_id.
+
+ verify_credentials
+
+     my $user = $twitter->verify_credentials;
+     $twitter->verify_credentials(sub {
+       my ($twitter, $error, $user) = @_;
+     });
+
+    Verify the authorizing user's credentials and return a representative
+    Mojo::WebService::Twitter::User object. Requires OAuth 1.0
+    authentication.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2015 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Net::Twitter, WWW::OAuth
+

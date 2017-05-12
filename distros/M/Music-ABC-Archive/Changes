@@ -1,0 +1,8 @@
+Revision history for Perl extension Music::ABC::Archive.
+0.02
+    Bugfix for get_song -- no_headers needs to only recognize [A-Z]: or [a-z]: as a header
+
+0.01  Wed Oct  8 21:45:21 2003
+	- original version; created by h2xs 1.22 with options
+		-A -X -n Music::ABC::Archive
+

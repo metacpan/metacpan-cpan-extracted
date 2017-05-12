@@ -1,0 +1,6 @@
+---
+-
+  - rusu.notify
+  -
+    - domain: TRAX007.RU
+      rule_id: rusu.notify.deleted

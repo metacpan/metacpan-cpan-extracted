@@ -1,0 +1,164 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLLinkElement
+
+=for object Mozilla::DOM::HTMLLinkElement
+
+Mozilla::DOM::HTMLLinkElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLLinkElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLLinkElement interface is the interface to a [X]HTML
+ * link element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLLinkElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $charset = $htmllinkelement->B<GetCharset>()
+
+=head2 $bool = $htmllinkelement->B<GetDisabled>()
+
+=head2 $href = $htmllinkelement->B<GetHref>()
+
+=head2 $hreflang = $htmllinkelement->B<GetHreflang>()
+
+=head2 $media = $htmllinkelement->B<GetMedia>()
+
+=head2 $rel = $htmllinkelement->B<GetRel>()
+
+=head2 $rev = $htmllinkelement->B<GetRev>()
+
+=head2 $target = $htmllinkelement->B<GetTarget>()
+
+=head2 $type = $htmllinkelement->B<GetType>()
+
+=head2 $htmllinkelement->B<SetCharset>($charset)
+
+=over
+
+=over
+
+=item * $charset (string)
+
+=back
+
+=back
+
+=head2 $htmllinkelement->B<SetDisabled>($disabled)
+
+=over
+
+=over
+
+=item * $disabled (boolean)
+
+=back
+
+=back
+
+=head2 $htmllinkelement->B<SetHref>($href)
+
+=over
+
+=over
+
+=item * $href (string)
+
+=back
+
+=back
+
+=head2 $htmllinkelement->B<SetHreflang>($hreflang)
+
+=over
+
+=over
+
+=item * $hreflang (string)
+
+=back
+
+=back
+
+=head2 $htmllinkelement->B<SetMedia>($media)
+
+=over
+
+=over
+
+=item * $media (string)
+
+=back
+
+=back
+
+=head2 $htmllinkelement->B<SetRel>($rel)
+
+=over
+
+=over
+
+=item * $rel (string)
+
+=back
+
+=back
+
+=head2 $htmllinkelement->B<SetRev>($rev)
+
+=over
+
+=over
+
+=item * $rev (string)
+
+=back
+
+=back
+
+=head2 $htmllinkelement->B<SetTarget>($target)
+
+=over
+
+=over
+
+=item * $target (string)
+
+=back
+
+=back
+
+=head2 $htmllinkelement->B<SetType>($type)
+
+=over
+
+=over
+
+=item * $type (string)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

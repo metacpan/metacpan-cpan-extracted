@@ -1,0 +1,198 @@
+NAME
+    Math::PSNR - Calculate PSNR (Peak Signal-to-Noise Ratio) and MSE (Mean
+    Square Error).
+
+VERSION
+    This document describes Math::PSNR version 0.02
+
+SYNOPSIS
+        use Math::PSNR;
+
+        my $psnr = Math::PSNR->new(
+            {
+                bpp => 8,
+                x   => [ 1.1, 2.2, 3.3, 4.4, 5.5 ],
+                y   => [ 9.9, 8.8, 7.7, 6.6, 5.5 ],
+            }
+        );
+
+        # Calculate MSE
+        $psnr->mse;
+
+        # Calculate PSNR
+        $psnr->psnr;
+
+        # Access to member variable of x
+        $psnr->x(
+            {
+                r => [ 1.1, 2.2, 3.3, 4.4, 5.5 ],
+                g => [ 1.1, 2.2, 3.3, 4.4, 5.5 ],
+                b => [ 1.1, 2.2, 3.3, 4.4, 5.5 ],
+            }
+        );
+
+        # Access to member variable of y
+        $psnr->y(
+            {
+                r => [ 9.9, 8.8, 7.7, 6.6, 5.5 ],
+                g => [ 9.9, 8.8, 7.7, 6.6, 5.5 ],
+                b => [ 9.9, 8.8, 7.7, 6.6, 5.5 ],
+            }
+        );
+
+        # Calculate MSE of three components signal (e.g. RGB image)
+        $psnr->msr_rgb;
+
+        # Calculate PSNR of three components signal (e.g. RGB image)
+        $psnr->psnr_rgb;
+
+DESCRIPTION
+    This module calculates PSNR (Peak Signal-to-Noise Ration) and MSE (Mean
+    Square Error).
+
+    PSNR and MSE are the index of measuring quality between different
+    signals. They are commonly used to evaluate quality of images.
+
+    This module can deal with single component signals (e.g. monochrome
+    image) and three components signals (e.g. color (RGB) image).
+
+    More examples are in my GitHub repository.
+    <https://github.com/moznion/p5-Math--PSNR>
+
+INTERFACES
+  "Math::PSNR->new( bpp => $bpp, x => $x, y => $y )"
+    Creates an instance. Attributes are as follows:
+
+   "bpp"
+    Specify the bpp (bit per pixel). It sets 2^(bpp) - 1 to maximum power
+    ("maximum power" means maximum allowable value of signal).
+
+    "is : rw"
+        This attribute is rewritable. Default accessor to this attribute is
+        provided.
+
+    "isa : Int"
+        Please specify value of this attribute as integer.
+
+    "default : 8"
+        This attribute has default value. If *bpp* is not specified, it will
+        be set 8 (bit).
+
+    "required : 0"
+        You do not have to set value of this attribute at constructor.
+
+   "x"
+    One side of signal for calculate PSNR and MSE.
+
+    "is : rw"
+        This attribute is rewritable. Default accessor to this attribute is
+        provided.
+
+    "isa : ArrayRef|HashRef"
+        Please specify value of this attribute as numerical array reference
+        or hash reference.
+
+    "required : 1"
+        You must set value of this attribute at constructor.
+
+   "y"
+    Another signal for calculate PSNR or MSE.
+
+    "is : rw"
+        This attribute is rewritable. Default accessor to this attribute is
+        provided.
+
+    "isa : ArrayRef|HashRef"
+        Please specify value of this attribute as numerical array reference
+        or hash reference.
+
+    "required : 1"
+        You must set value of this attribute at constructor.
+
+METHODS
+    "mse"
+        This function calculates and returns MSE of single component signal.
+        This function requires values of attribute *x* and *y* that is
+        numerical array reference. Signal (array) length of *x* and *y* must
+        be the same.
+
+        This function can use cache. If instance is immutable, this function
+        returns previous calculated result.
+
+    "psnr"
+        This function calculates and returns PSNR of single component
+        signal. This function requires values of attribute *x* and *y* that
+        is numerical array reference. Signal (array) length of *x* and *y*
+        must be the same.
+
+        This function can use cache. If instance is immutable, this function
+        returns previous calculated result. And this function uses cache of
+        MSE if it is available.
+
+    "mse_rgb"
+        This function calculates and returns MSE of three components (RGB)
+        signal. This function requires values of attribute *x* and *y* that
+        is hash reference. Those hash references must have three components
+        (keys of hash are 'r', 'g', and 'b'). Signal length of each
+        components (keys) of *x* and *y* must be the same.
+
+        This function can use cache like above-functions.
+
+    "psnr_rgb"
+        This function calculates and returns PSNR of three components
+        signal. This function requires values of attribute *x* and *y* that
+        is hash reference. Those hash references must have three components
+        (keys of hash are 'r', 'g', and 'b'). Signal length of each
+        components (keys) of *x* and *y* must be the same.
+
+        This function can use cache like above-functions.
+
+CONFIGURATION AND ENVIRONMENT
+    Math::PSNR requires no configuration files or environment variables.
+
+DEPENDENCIES
+    Mouse (version 1.02 or later)
+    Test::Exception (version 0.31 or later)
+    Test::Warn (version 0.24 or later)
+
+INCOMPATIBILITIES
+    None reported.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to
+    "bug-math-psnr@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
+
+AUTHOR
+    moznion "<moznion@gmail.com>"
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2012, moznion "<moznion@gmail.com>". All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

@@ -1,0 +1,24 @@
+# Changes for Mac::iPhoto::Shell
+
+0.14 - Thu Jan  1 19:21:43 EST 2015
+	* I'm cutting this module loose. It's now adoptable and
+	unmaintained.
+
+0.13 - Sat Jan 20 13:09:12 2007
+	* I've converted my iphoto-shell application to a modulino
+	called Mac::iPhoto::Shell
+
+0.16 - Fri Jan 18 04:14:26 2008
+	* Die gracefully in Makefile.PL if not on a Mac
+	* No need to upgrade if you already have this
+
+0.15 - Sun Mar 18 23:12:26 2007
+	* Require the latest Mac::Glue, which has the Intel fixes
+	* No need to upgrade if you already have this installed
+
+0.14 - Sat Jan 20 17:10:35 2007
+	* Makefile now checks for and installs iPhoto glue
+
+0.10 - Fri Feb 20 15:44:55 2004
+	+ initial distribution created with scriptdist
+

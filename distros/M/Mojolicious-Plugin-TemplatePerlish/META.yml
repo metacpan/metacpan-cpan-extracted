@@ -1,0 +1,33 @@
+---
+abstract: 'Template::Perlish renderer plugin for Mojolicious'
+author:
+  - 'Flavio Poletti <polettix@cpan.org>'
+build_requires:
+  Path::Tiny: '0.084'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-TemplatePerlish
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Mojolicious: '6.0'
+  Template::Perlish: '1.52'
+resources:
+  bugtracker: https://github.com/polettix/Mojolicious-Plugin-TemplatePerlish/issues
+  homepage: https://github.com/polettix/Mojolicious-Plugin-TemplatePerlish
+  repository: https://github.com/polettix/Mojolicious-Plugin-TemplatePerlish.git
+version: '0.002'
+x_contributors:
+  - 'Flavio Poletti <flavio@polettix.it>'

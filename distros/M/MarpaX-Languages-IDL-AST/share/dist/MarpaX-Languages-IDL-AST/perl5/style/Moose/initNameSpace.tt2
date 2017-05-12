@@ -1,0 +1,4 @@
+[%~ moosexTypesPerScope.$identifier = {} ~%]
+[%~ moosexTypesMoosePerScope.$identifier = {} ~%]
+[%~ moosexTypesStructuredPerScope.$identifier = {} ~%]
+[%~ moosexParamsValidatePerScope.$identifier = 0 ~%]

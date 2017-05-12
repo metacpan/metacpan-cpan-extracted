@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 0685ea4463d9071f31b62a0e6f481dab2841852e Changes
+SHA1 d73b2a9e77c6c86d6c700f0d68335c6a0aa235be MANIFEST
+SHA1 6c771cc4b0718f7bc9c9af01889700d7bce0a8e6 MANIFEST.SKIP
+SHA1 7ed1b565ef33bceec49fd001c3ad1af6b313e933 META.yml
+SHA1 73bb7078c8235527629ccf94e3e3b1efa596f93e Makefile.PL
+SHA1 494256b3eeb9e2df8438fd78224b55097d128af8 debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 b1200d7efa68a2f047991f0f56b7d98d31d16601 debian/control
+SHA1 da450e9ec39d96f7735f3fb9ad50e541e6a7bb3f debian/copyright
+SHA1 ec28c96dba85f644e8fa7e4f0346887b064567ba debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 dd15567f951c0872469bff3e11b85e7e8c41614d debian/watch
+SHA1 3a409b9accc2b81df567b019dfc1d449634db161 devel/misc.pl
+SHA1 cf647ee28a7aaad9896d0063f8a2529919ccfcd3 inc/MyMakeMakerExtras.pm
+SHA1 7a988b2aa7ed09f1cb9029a1ef3f0e2139dca0cf inc/my_pod2html
+SHA1 e7b061f394b0ecfcda581efb58a396073a19e29b lib/Math/Polynomial/Horner.pm
+SHA1 8c612ae5868b7bbb548e8a51fb2d1fb0c84bddce t/Horner.t
+SHA1 36b8eba56c87d62b1b41959187c717577dc16fa5 t/MyTestHelpers.pm
+SHA1 0279c9310ec528d10a2a14e602bf98f1c776cce1 xt/0-META-read.t
+SHA1 8a5e0f34131de34e584fbb1939c191a152566155 xt/0-Test-DistManifest.t
+SHA1 cc04a5fe5d8b8b38bfd56453d5d2686c8ea58783 xt/0-Test-Pod.t
+SHA1 8cc52e23427a82cfef5802bf512b13c65de2687a xt/0-Test-Synopsis.t
+SHA1 4c14845872d6eb4280e12f862d6ba2c343358c60 xt/0-Test-YAML-Meta.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iD8DBQFNUJB8LFMCIV9q3ToRAp/PAJ4pHEYs32Y1E8JoDGHukHMWyQExcwCfR2I/
+5TVfHaOZ1Zog2qoDW2127u0=
+=cW6w
+-----END PGP SIGNATURE-----

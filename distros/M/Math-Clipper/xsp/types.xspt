@@ -1,0 +1,39 @@
+%typemap{bool}{simple};
+
+%typemap{ClipperLib::Polygon};
+%typemap{const ClipperLib::Polygon};
+%typemap{ClipperLib::Polygons};
+%typemap{const ClipperLib::Polygons};
+%typemap{ClipperLib::ExPolygon};
+%typemap{const ClipperLib::ExPolygon};
+%typemap{ClipperLib::ExPolygons};
+%typemap{const ClipperLib::ExPolygons};
+
+%typemap{PolyType}{parsed}{
+  %cpp_type{PolyType};
+  %precall_code{%
+    $CVar = (PolyType)SvUV($PerlVar);
+  %};
+};
+
+%typemap{ClipType}{parsed}{
+  %cpp_type{ClipType};
+  %precall_code{%
+    $CVar = (ClipType)SvUV($PerlVar);
+  %};
+};
+
+
+%typemap{PolyFillType}{parsed}{
+  %cpp_type{PolyFillType};
+  %precall_code{%
+    $CVar = (PolyFillType)SvUV($PerlVar);
+  %};
+};
+
+%typemap{JoinType}{parsed}{
+  %cpp_type{JoinType};
+  %precall_code{%
+    $CVar = (JoinType)SvUV($PerlVar);
+  %};
+};

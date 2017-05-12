@@ -1,0 +1,25 @@
+---
+abstract: 'Test distribution for Module::Mask::Deps'
+author:
+  - 'Matt Lawrence <mattlaw@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.4
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120620'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Dist1
+provides:
+  Test::Dist1:
+    file: lib/Test/Dist1.pm
+    version: 1.00
+requires:
+  Foo: 0
+  perl: v5.3.7
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.00

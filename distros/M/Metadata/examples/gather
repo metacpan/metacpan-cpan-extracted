@@ -1,0 +1,147 @@
+#!/usr/local/bin/perl -w
+#
+# $Id: gather,v 1.4 2001/01/09 12:03:54 cmdjb Exp $
+#
+# Harvest gather command using Metadata classes
+#
+# Copyright (C) 1997-2001 Dave Beckett - http://purl.org/net/dajobe/
+#
+
+require 5.004;
+
+use strict;
+
+use File::Basename;
+use IO::File;
+use IO::Socket;
+
+# Local modules
+use Metadata::SOIF;
+
+$::VERSION=(split(/ /, q$Id: gather,v 1.4 2001/01/09 12:03:54 cmdjb Exp $))[2];
+
+$::progname=basename $0;
+
+&main(@ARGV);
+exit 0;
+
+
+sub main () {
+  my $usage=0;
+  my $host;
+  my $port='8500';
+  my $timestamp=0;
+
+  my $do_info=1;
+  my $do_compress=1;
+
+  while(@ARGV && $ARGV[0] =~ /^-(.*)$/) {
+    shift(@ARGV);
+    my $arg=$1;
+    if ($arg eq 'info') {
+      $do_info=1;
+    } elsif ($arg eq 'nocompress') {
+      $do_compress=0;
+    } elsif ($arg =~ /^v(?:ersion)?$/) {
+      die "$::VERSION\n";
+    } else {
+      $usage=1;
+      last;
+    }
+  }
+
+  if (@ARGV) {
+    $host=shift(@ARGV);
+    if(@ARGV) {
+      $port=shift(@ARGV);
+      if(@ARGV) {
+	$timestamp=shift(@ARGV);
+	$usage=1 if @ARGV;
+      }
+    }
+  } else {
+    $usage=1;
+  }
+
+  die "Usage: gather [-info | -nocompress] hostname [port] [timestamp]\n" 
+    if $usage;
+
+  my $sock=IO::Socket::INET->new(PeerAddr => "$host:$port", Proto => 'tcp');
+  die "Cannot create IO::Socket to $host:$port - $!\n" unless $sock;
+
+  autoflush $sock 1;
+
+  my $sockhost=$sock->sockhost; # Me
+  my $hostname=gethostbyaddr(inet_aton($sock->sockhost), AF_INET);
+
+  my $peerhost=$sock->peerhost;
+  my $peerhostname=gethostbyaddr(inet_aton($sock->peerhost), AF_INET);
+  warn "$::progname: I am $sockhost - $hostname, peer is $peerhost - $peerhostname\n";
+
+  while(<$sock>) {
+    chomp;
+    if (my($code,$msg)=(/^(\d+) - (.*)$/)) {;
+      warn "$::progname: Received $code - \"$msg\"\n";
+      if ($code eq '000') {
+	my($version,$remote)=$msg =~ /^HELLO (\S+) (\S+)/;
+	die "Cannot parse handshake '$msg'\n" unless $remote;
+
+	warn "$::progname: Received welcome message from $remote using protocol V$version\n";
+	if ($remote ne $peerhostname) {
+	  warn "$::progname: Remote hostname mismatch - $remote vs $peerhostname\n";
+	}
+	warn "$::progname: Sending HELLO\n";
+	print $sock "HELLO $hostname\n";
+      } elsif ($code eq '100') {
+	if ($do_info) {
+	  warn "$::progname: Asking for INFO\n";
+	  print $sock "INFO\n";
+
+	  my $infomd=new Metadata::SOIF;
+	  $infomd->read($sock);
+	  print $infomd->format;
+
+	  print $sock "QUIT\n";
+	} else {
+	  if ($do_compress) {
+	    warn "$::progname: Setting compression\n";
+	    print $sock "SET compression\n";
+	  } else {
+	    warn "$::progname: Issuing SEND-UPDATE $timestamp\n";
+	    print $sock "SEND-UPDATE $timestamp\n";
+	  }
+	}
+      } elsif ($code eq '400') {
+	warn "$::progname: Acknowledge of SEND-UPDATE, reading data\n";
+	my $outfd;
+	if ($do_compress) {
+	  $outfd=new IO::File "|gzip -d" or die "Cannot make filter to gzip - $!\n";
+	} else {
+	  $outfd=IO::Handle::new_from_fd('STDOUT', 'w');
+	}
+	while(<$sock>) {
+	  last if /^499 - /;
+	  print $outfd;
+	}
+	close($outfd) if $do_compress;
+	print $sock "QUIT\n";
+      } elsif ($code eq '500') {
+	warn "$::progname: Acknowledge of SET, issuing SEND-UPDATE $timestamp\n";
+	print $sock "SEND-UPDATE $timestamp\n";
+      } elsif ($code eq '600') {
+	warn "$::progname: End of INFO, sending QUIT\n";
+	print $sock "QUIT\n";
+      } elsif ($code eq '999') {
+	warn "$::progname: End of input, finishing\n";
+	last;
+      } else {
+	warn "$::progname: Unknown code $code\n";
+      }
+    } else {
+      # Ignore lines not understood
+      warn "$::progname: Ignoring '$_'\n";
+    }
+  }
+
+  $sock->close;
+}

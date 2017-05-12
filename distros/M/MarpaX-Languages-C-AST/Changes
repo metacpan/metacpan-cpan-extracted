@@ -1,0 +1,2328 @@
+preamble
+
+0.47 2017-04-12T18:08:16
+ [Ben Bullock <benkasminbullock@gmail.com>]
+ - indent the heredocument part of the code correctly
+
+ [Ivan Baidakou <basiliscos@openmailbox.com>]
+ - Fix issue with shared dir
+
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Switch to File::ShareDir, closes #13
+ - Profiling dev+
+ - Fix finding of parsed function declaration at the TOP LEVEL
+ - csl.xsl: do not take parameterDeclaration by default
+ - csl: recurse number
+ - csl: added missing specifierQualifierList
+ - csl: dev+
+ - hsl: dev+
+ - perl5.xsl: dev+
+ - xslt/perl5.xsl: dev+
+ - ISO_ANSI_C_2011/Scan.pm: export of xslt() and content() methods
+ - bin/cscan: POD fix
+ - ISO_ANSI_C_2011/Scan.pm: fix usage of temp filehandle
+ - ISO_ANSI_C_2011/Scan.pm: switch to the more portable IO::CaptureOutput
+   module
+ - Grammar/ISO_ANSI_C_2011.pm: Removed non-needed (seems to me)
+   MSVS___C_ASSERT, added more MSVS compatibility stuff
+ - perlcritic
+ - perlcritic.rc: allow_includes
+ - bin/c2ast: remove mention of cpretty
+ - xpath/declaration2declarator.xpath: unused
+ - t/scan.t: handle different cpp behaviours v.s. space
+ - bin/cscan: --lazy, --typedef and --enum options
+ - bin/c2ast: Removed unnecessary use File::ShareDir::ProjectDistDir
+ - bin/c2ast: Removed all experimental stuff with Template
+ - Impl/Logger.pm: github issue #9 with latest Log::Any
+ - bin/cdecl: move print of STDOUT/STDERR before the exit
+ - bin/cscan: enumType default is int
+ - bin/cscan: better handling of C::Scan returned object type
+ - replae method: dev+
+ - Scan/Actions.pm: fix very last action
+ - AST/Util.pm: fix POD error
+ - In nocpp init phase, fix read of buffer
+ - ISO_ANSI_C_2011/Scan.pm: nocpp option, pass other options as-is to
+   AST->new(), do not call all methods systematically
+ - Grammar/ISO_ANSI_C_2011.pm: Fixed an error in labeledStatement
+   introduced when adding gcc extension case A ... B
+ - bin/cscan: show that file argument is optional in the help
+ - bin/cdecl: wrapper around bin/cscan
+ - bin/cscan: automatic - for last argument if nothing left and no --in
+   option, mention cdecl in the help
+ - cdecl test suite
+ - ISO_ANSI_C_2011/Scan.pm: _readFunctionArgs() should always return $last
+   node
+ - cdecl: _readToId() need sometimes to distinguish stack up to the first
+   declarator and later
+ - bin/cscan: fix test of filename v.s. filesystem case tolerance
+ - bin/cscan: fix default --filter option value
+ - ISO_ANSI_C_2011/Scan.pm: fix eventual crash with fc()
+ - --filter default option value is basename of last argument
+ - xpath/enumerators.xpath: list of all enumerators
+ - cdecl: enum support
+ - bin/cscan: --enumType option
+ - cdecl: struct fixes
+ - ISO_ANSI_C_2011/Scan.pm: dev+ on embedded definitions - almost done -;
+ - cdecl: reduction
+ - xpath/missingIdentifier.xpath: xpath fix
+ - Grammar/ISO_ANSI_C_2011.pm: unhide single SEMICOLON lexeme in case of
+   empty declaration
+ - Scan/Actions.pm: getRuleDescription() method
+ - missingIdentifier: better solution using xpath, IMHO -;
+ - ISO_ANSI_C_2011/Scan.pm: fake identifiers dev+
+ - xpath/missingIdentifier.xpath: fake identifiers dev+
+ - ISO_ANSI_C_2011/Scan.pm: log improvement
+ - ISO_ANSI_C_2011/Scan.pm: ellipsis and comma fixes
+ - ISO_ANSI_C_2011/Scan.pm: restoring commas dev+
+ - xpath/missingComma.xpath: xpath to recover commas removed by Marpa's
+   separator keyword: cdecl relies on it
+ - ISO_ANSI_C_2011/Scan.pm: revert last thingy - solution is deeper
+ - ISO_ANSI_C_2011/Scan.pm: cdecl ellipsis fix
+ - ISO_ANSI_C_2011/Scan.pm: minor typos fixes
+ - ISO_ANSI_C_2011/Scan.pm: cdecl dev+
+ - bin/cscan: add log options and support of -
+ - Scan/Actions.pm: removed unused "use"
+ - bin/cdecl: dev+
+ - bin/cdecl: logging stuff
+ - bin/cdecl: --input argument
+ - bin/cdecl: POD fixes
+ - dev+
+ - xslt/perl5: dev+
+ - ISO_ANSI_C_2011/Scan.pm: _getNodeFile becomes back _pushNodeFile and can
+   automatically set the file attribute
+ - ISO_ANSI_C_2011/Scan.pm: renamed _pushNodeFile to _getNodeFile
+ - ISO_ANSI_C_2011/Scan.pm: _pushNodeFile fix
+ - bin/c2bind: log as info instead of trace sometimes
+ - bin/c2bind: fix POD
+ - bin/c2bind: revival
+ - dev+: back to TT
+ - bin/c2ast: dev+ on elements values
+ - bin/c2ast: dev+ on xslt dependencies
+ - bin/c2ast: work on paths for xslt
+ - xpath/topDeclarations.xpath: needed for C::Scan
+ - bin/c2ast: dev+ for bindings
+ - Grammar/ISO_ANSI_C_2011.pm: add name for lexeme default value - impact
+   on test suite
+ - Data/Find.pm: Add endOfElement callback
+ - Grammar/ISO_ANSI_C_2011.pm: add name for lexeme default value
+ - bin/c2ast: reorg of used modules + Template preparation
+ - ISO_ANSI_C_2011/Scan.pm: say which xpath is used + topDeclarations file
+   attribute
+ - bin/cscan: mention topDeclarations
+ - t/complex_declarations.t: more complex declaration
+ - Grammar/ISO_ANSI_C_2011.pm: rename gccArrayTypeModifierList to
+   typeQualifierlist
+ - t/complex_declarations.t: who knows
+ - bin/c2bind: fix @ARGV a-la cscan
+ - bin/c2bind: fix a comment
+ - bin/c2bind prototype
+ - bin/cscan: fix help
+ - cosmetics
+ - fdecls fixes
+ - s/scan.t: typedef_structs fixes
+ - ISO_ANSI_C_2011/Scan.pm: typedef addons
+ - ISO_ANSI_C_2011/Scan.pm: vdecl addons
+ - ISO_ANSI_C_2011/Scan.pm: start adding file information
+ - ISO_ANSI_C_2011/Scan.pm: macros revisit
+ - ISO_ANSI_C_2011/Scan.pm: fix modification of non-creatable array value
+   attempted, subscript -1
+ - Getting rid of XML::Simple, finally
+ - AST/Util.pm: fix line and column count
+ - cscan: prepare for supression of XML::Simple
+ - cscan: restore some xml behaviour
+ - Removed shared xsd/cscan.xsd
+ - use File::ShareDir::ProjectDistDir
+ - bin/cscan: Rephrasing a bit in the POD
+ - bin/cscan: Removed unused asHash option
+ - Method astToString and cscan
+ - ISO_ANSI_C_2011/Scan.pm: removed a print to STDERR
+ - Grammar/ISO_ANSI_C_2011.pm: careful use of separator v.s. proper
+ - typedef_texts a-la xpath
+ - typedef_hash a-la xpath
+ - share/xpath/xsd2fdecls.xpath: exclude path having structDeclarationList
+   from fdecls candidates
+ - share/xpath/xsd2fdecls.xpath: exclude TYPEDEF from fdecls candidates
+ - Move to a correct solution and process the tree using XML::LibXML (until
+   a Marpa XML parser -;)
+ - Grammar/ISO_ANSI_C_2011.pm: forget around structContext internal rule in
+   the value
+ - ISO_ANSI_C_2011/Scan.pm: prepare for use of Scan/Actions.pm
+ - Grammar/ISO_ANSI_C_2011.pm: use semantics_package instead of obsolete
+   action_object
+ - Scan/Actions.pm: specific Scan actions
+ - C/AST.pm: actionObject, nonTerminalSemantic and terminalSemantic
+   arguments to grammar
+ - Grammar/ISO_ANSI_C_2011.pm: added configurable action object, reworked
+   internal variable names
+ - Grammar/ISO_ANSI_C_2011.pm: added configurable non-terminal and terminal
+   semantic actions
+ - work on cscan.xsd
+ - work on _pushRcp
+ - share/xsd/cscan.xsd
+ - merge conflict
+ - ISO_ANSI_C_2011/Scan.pm: typedefs_structs fix in case of opaque struct
+   forward declaration
+ - Grammar/ISO_ANSI_C_2011/Scan.pm: fix typedef_structs
+ - Grammar/ISO_ANSI_C_2011.pm: allow empty externalDeclaration
+ - Grammar/ISO_ANSI_C_2011.pm: allow no translation unit
+ - ISO_ANSI_C_2011/Scan.pm: cleaned bloated _buildContext()
+ - xslt: dev+
+ - ISO_ANSI_C_2011/Scan.pm: fix undef args
+ - Grammar/ISO_ANSI_C_2011.pm: Support of GCC case ranges
+ - ISO_ANSI_C_2011: Support of GCC escape ESC character
+ - ISO_ANSI_C_2011/Scan.pm: list fixes
+ - t/struct.t: add a function declaration in struct
+ - Callback/Events.pm: force struct counter to have a persistence level to
+   "level", add these counters to parameterDeclarationCheck
+ - Callback/Events.pm: added missing counters in topic data, that caused
+   parse table to be processed even in struct context
+ - t/struct.t: renamed misleading identifier "free" to "this"
+ - t/struct.t: case that failed with 0.36-TRIAL
+ - t/obscure_typedef_*style.t : change comment
+ - bug fix with parameter not obscuring typedef
+ - bin/c2ast: missing --trace option
+ - rulesByDepth: sort by ruleId eventually
+ - ruleByDepth: use rule_name and put more info the result
+ - use Marpa::R2 2.081001
+ - rulesByDepth
+ - POD update
+ - bin/c2ast: Mention '-' for STDIN usage in the POD and fix log info about
+   it
+ - bin/c2ast: Support STDIN, loglevel aliases on the command-line, optional
+   start (dev+), add INFO level logging to bin/c2ast
+ - optional :start, dev+
+ - AST/Impl.pm: use Marpa::R2 2.080000
+ - ISO_ANSI_C_2011/Scan.pm: ft can be '0', so use // instead of ||
+ - Test suite and CPP different behaviour v.s. OS
+ - bin/c2ast: --lazy, --typedef, --enum and --nocpp options
+ - AST.pm: mod POD for lazy mode
+ - AST.pm: even in lazy mode we can use typedef/enum helpers
+ - AST.pm: type, enum and lazy options support. Preparation for start
+   option support
+ - AST/impl.pm: added lexeme_alternative() and lexeme_complete()
+ - bin/*: say that filename must be the last argument when using unknown
+   option(s)
+ - Optimization bis
+ - Global optimization
+ - Callback/Events.pm : optimization
+ - t\delayed_directDeclaratorIdentifier.t: more tests
+ - Grammar/ISO_ANSI_C_2011.pm: need for a special lexeme in
+   compoundStatementReenterScope
+ - Scope management: delay flag should be per scope, closing a scope should
+   recursively its parent if it is marked delayed
+ - Callback/Events.pm: delayed directDeclaratorIdentifier test
+ - Callback/Events.pm: fixed a vicious case where
+   directDeclaratorIdentifier is not yet propagated into
+   declarationCheckinitDeclaratorList
+ - Removed unwanted file from previous commit
+ - bin/c2ast: fix pod2usage call
+ - bin/cscan: pass through of arguments, fix POD output
+ - Grammar/ISO_ANSI_C_2011.pm: unmask gccExtension
+ - ASM.pm: added a NOTES section
+ - Removed work files
+ - t/*.t: alwys call value()
+ - Opaque ASM support for everything not GCC inline ASM
+ - AST/Util.pm: force non true space to a true space for error reporting
+ - AST/Util.pm: Fixed $log->fatalf() arguments
+ - MASM: dev+
+ - work/MSASM2.pl: dev+
+ - work/MSASM.bnf: fixed end of buffer detection + use forgiving
+ - work/MSASM.bnf: add end of buffer to endOfLine
+ - work/MSASM.bnf: dev+
+ - Revert "work/MSASM.bnf: dev+"
+ - work/MSASM.bnf: :discard rule dev+
+ - MSASM.bnf: dev+
+ - Impl.pm: Bump Marpa::R2 dependency to version 2.078000
+ - Grammar/ISO_ANSI_C_2011.pm: use insentitive lexemes for MASM
+ - AST.pm: Reduce the number of calls to value()
+ - dist.ini: Move [OSPrereqs / MSWin32] after [MakeMaker]
+ - Grammar/ISO_ANSI_C_2011.pm: ambiguity with msvsAsmType
+ - ISO_ANSI_C_2011/Scan.pm: Environment variables support for cpprun and
+   cppflags, Shell quoting when executing the preprocessor
+ - dist.ini: Win32::ShellQuote on MSWin32
+ - examples/h2xs.PL : Marpa aware version
+ - ISO_ANSI_C_2011/Scan.pm: more protections
+ - ISO_ANSI_C_2011/Scan.pm: parsed_fdecls is not interested by typedef'ed
+   functions declarations, prevent more undefined to be inserted
+ - bin/cscan: fixed mod example, "mytype" should read "double"
+ - ISO_ANSI_C_2011/Scan.pm: mod is setted via an appended, its separator is
+   empty
+ - Removed unused blog file and dir
+ - ISO_ANSI_C_2011/Scan.pm: no splice if not necessary, exhibits a test
+   failure under perl <= 5.14
+ - bin/cscan: --in option
+ - bin/cscan: --out and --err options, yet another --xpath example
+ - bin/cscan: fix $xml usage confusion in source
+ - bin/cscan: revisited example to find declared strings
+ - bin/cscan: example for find declared strings
+ - bin/cscan: say that get method are for C::Scan like methods
+ - bin/cscan: removed a debugging print STDERR
+ - bin/cscan: say in the abstract this is a C::Scan alternative
+ - bin/cscan: no critic on the eval (bis)
+ - bin/cscan: no critic on the eval
+ - bin/c2ast: perlcritic
+ - c2ast.pl -> c2ast
+ - say that c2ast.pl is now c2ast
+ - bin/cscan: more examples with --cppflags
+ - bin/cscan: another example taking about inner anonymous types
+ - bin/cscan : implementation of --xml and --xpath options
+ - ISO_ANSI_C_2011/Scan: fix calculation of line number
+ - t/scan.t: skip file/line information in tests dev+
+ - ISO_ANSI_C_2011/Scan.pm: line calculation dev+
+ - ISO_ANSI_C_2011.pm: <DATA> should be loaded once
+ - bin/scan: xpath preparation
+ - ISO_ANSI_C_2011/Scan: function type is not inherited
+ - bin/cscan: generic get argument
+ - ISO_ANSI_C_2011/Scan.pm: original filename processing fix
+ - bin/cscan : a very special replacement for POD not generated at run time
+ - ISO_ANSI_C_2011/Scan.pm: perlcritic on $_
+ - t/scan.t: fix following removal of use C::Scan
+ - ISO_ANSI_C_2011/Scan.pm: typo that exhibits under perl <= 5.12
+ - t/scan.t: remove use C::Scan
+ - use #!perl for shebang (same effect as #!/usr/bin/perl but I prefer the
+   former)
+ - bin/c2ast.pl: fix some POD formatting
+ - cscan cmdline prototype
+ - Commented C::Scan comparison in tests - too many failures
+ - Yet POD fixes
+ - Scan.pm: update SYNOPSIS
+ - release trial fixes
+ - C::Scan cmp MarpaX::Languages::C::Scan
+ - typedefs_structs test and change following before/after fix
+ - ISO_ANSI_C_2011/Scan.pm : missing enum in KEY2ID and fix before/after as
+   per C::SCan
+ - ISO_ANSI_C_2011/Scan.pm: POD fix
+ - ISO_ANSI_C_2011/Scan: POD fixes
+ - vdecl_hash test
+ - vdecls test
+ - typedef_texts and typedefs_maybe tests
+ - ISO_ANSI_C_2011/Scan: sort explicitely when output is a map on hash
+   result
+ - scan.t: typedef_hash test
+ - scan.t: t+
+ - parsed_fdecls test
+ - ISO_ANSI_C_2011/Scan.pm: Fix bug in _analyseDirectAbstractDeclarator,
+   missing checks in _prependRcp and _appendRcp
+ - ISO_ANSI_C_2011/Scan.pm: Fix POD and 'ty' in parsed_fdecls in case of a
+   function
+ - ISO_ANSI_C_2011/Scan.pm: Fixed PURGE_IDX value, removed unused _copyRcp
+ - C::Scan t+
+ - C::Scan integration: t+
+ - use Pod::Usage
+ - c2ast.pl: say that unknown options are sent to cpp
+ - import C::Scan-like module
+ - AST.pm: Initial line number should be 1 instead of 0
+ - c2ast.pl: move File::Spec->canonpath at a better place
+ - c2ast.pl: use File::Spec->canonpath before file comparison
+ - comment #7
+ - Grammar/ISO_ANSI_C_2011.pm: Added missing priority for
+   IDENTIFIER_UNAMBIGUOUS
+ - bin/c2ast.pl: typo in usage
+ - t/gcc_extension.t: tests
+ - ISO_ANSI_C_2011.pm: restored (gccExtension) rhs in specifiers
+   declarations
+ - ISO_ANSI_C_2011.pm: moved misplaced (gccExtension) rhs
+ - Fixed reference data
+ - Remove unused event
+ - Runtime optimization
+ - Remove usage of clone
+ - Fix show source when failure is on paused lexeme
+ - use Clone instead of Storable
+ - Removed unused import
+ - runtime optimization
+ - renamed cached ncb from _ncb to _cacheNcb
+ - Avoid one internal match
+ - Cases where IDENTIFIER is not ambiguous
+ - Modifications as per yafce
+ - runtime optimizations
+ - MSVS's .type could eat C lexemes DOT and 'type'
+ - Back to version with GCC extension in the grammar
+ - Fix errors let by previous commit
+ - Discard GCC __extension__
+ - Removed unused event
+ - More GCC asm tests
+ - New reference data
+ - Removed gccEmptyRule, Support of GCC asm goto
+ - Newline stuff (Marpa i.e. unicode v.s. only \n)
+ - Work on newline
+ - Work on typedef priority
+ - Removed ASM pause before preparation
+ - GCC_ASM token can also be "asm"
+ - New version of reference data
+ - Support of binary constants (GCC extension)
+ - __asm G1 preparation
+ - _doPauseAfterLexeme renamed to ->doPauseBefore
+ - <G0 anything but space> replaced by <G0 constant>
+ - GCC __extension__ ony once for expression
+ - GCC __extension__ cannot be in :discard
+ - :discard of __extension (GCC)
+ - :discard of GCC __attribute__
+ - renamed
+ - Move GCC __attribute__ to :discard
+ - Added missing MSVS __thiscall and __clrcall to function modifier
+ - Move MSVS's __inline and __forceinline into generic INLINE lexeme
+ - MSVS __declspec :discard test
+ - Move __declspec to :discard
+ - Try to make grammer more readable (2)
+ - Try to make grammer more readable
+ - Add missing MSVS declspec modifiers
+ - Renamed t/discard_pragma.t to t/discard_MSVS_pragma.t
+ - Remove logging
+ - __pragma vtordisp
+ - __pragma strict_gs_check
+ - __pragma setlocale
+ - __pragma section
+ - __pragma runtime_checks
+ - __pragma region/endregion
+ - __pragma pop_macro/push_macro
+ - __pragma pointers_to_members
+ - __pragma pack
+ - __pragma optimize
+ - __pragma once
+ - __pragma message
+ - __pragma managed/unmanaged
+ - __pragma make_public
+ - __pragma loop
+ - __pragma intrinsic
+ - __pragma inline_recursion
+ - __pragma inline_depth
+ - __pragma include_alias
+ - __pragma hdrstop
+ - __pragma function
+ - __pragma fp_contract
+ - __pragma float_control
+ - __pragma fenv_access
+ - __pragma detect_mismatch
+ - __pragma deprecated
+ - __pragma conform
+ - __pragma component
+ - __pragma comment
+ - bss_seg, code_seg, const_seg and data_seg share the same syntax
+ - __pragma bss_seg fixes, add __pragma check_stack
+ - test pragma bss_seg
+ - pragma bss_seg
+ - add comments
+ - pragma warning fix
+ - pragma test
+ - pragma fix
+ - Missing statement in pragma push
+ - __declspec(deprecated) fix and __pragma alloc_text, auto_inline, warning
+   discard
+ - Support of logInfo __ALL__ continued
+ - Fix reference data
+ - __ALL__ special lexeme survey support, MSVS fixes
+ - Document __ALL__ --lexeme value
+ - Associate user-data to typedef and enum
+ - new function startAndLength
+ - deref nothing, revisit few sequences
+ - Return true is something found
+ - Push dirty files correctly
+ - typedefPerScope and enumAnyScope  accessors
+ - scope object accessor
+ - Fix default callback value
+ - Better comment
+ - Fix pod
+ - v0.19
+ - Call log only when its level is ok
+ - Remove useless commented block
+ - Remove non-needed events
+ - Tiny optimization
+ - v0.18
+ - c2ast cc replacement example
+ - stack based version as per jeffreykegler
+ - Tiny optimisations
+ - Tiny optimisation
+ - --logstderr option
+ - Fix doc
+ - Remove non-needed use Config
+ - Promote STRING_LITERAL_UNIT as lexeme
+ - Remember logInfo parameter so that we do not log more than was it
+   requested
+ - Fix logInfo parameter
+ - Trying to fix Changes content, some dirty things will lay out forever it
+   seems
+ - v0.17
+ - c2ast.pl: typo in regexp
+ - v0.16
+ - Optimisations (ter)
+ - v0.15
+ - Lasy commit just to have git cached connection for dzil release
+ - v0.14
+ - Limit calls to last_completed
+ - Fix format pull request #2
+ - Ambiguity because of gcc
+ - Doc update
+ - Optimisations
+
+ [Jeffrey Kegler <JKEGL@cpan.org>]
+ - Revise --cppfile help
+
+ [jddurand <jeandamiendurand@free.fr>]
+ - ISO_ANSI_C_2011/Scan.pm: _classifyNode: do not rely on node adress when
+   eating nodes
+ - bin/cdecl: use IPC::Cmd for portability until I find another way
+
+0.46 2017-02-11T10:28:34Z
+ [Ben Bullock <benkasminbullock@gmail.com>]
+ - indent the heredocument part of the code correctly
+
+ [Ivan Baidakou <basiliscos@openmailbox.com>]
+ - Fix issue with shared dir
+
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - csl.xsl: do not take parameterDeclaration by default
+ - csl: recurse number
+ - csl: added missing specifierQualifierList
+ - csl: dev+
+ - hsl: dev+
+ - perl5.xsl: dev+
+ - xslt/perl5.xsl: dev+
+ - ISO_ANSI_C_2011/Scan.pm: export of xslt() and content() methods
+ - bin/cscan: POD fix
+ - ISO_ANSI_C_2011/Scan.pm: fix usage of temp filehandle
+ - ISO_ANSI_C_2011/Scan.pm: switch to the more portable IO::CaptureOutput
+   module
+ - Grammar/ISO_ANSI_C_2011.pm: Removed non-needed (seems to me)
+   MSVS___C_ASSERT, added more MSVS compatibility stuff
+ - perlcritic
+ - perlcritic.rc: allow_includes
+ - bin/c2ast: remove mention of cpretty
+ - xpath/declaration2declarator.xpath: unused
+ - t/scan.t: handle different cpp behaviours v.s. space
+ - bin/cscan: --lazy, --typedef and --enum options
+ - bin/c2ast: Removed unnecessary use File::ShareDir::ProjectDistDir
+ - bin/c2ast: Removed all experimental stuff with Template
+ - Impl/Logger.pm: github issue #9 with latest Log::Any
+ - bin/cdecl: move print of STDOUT/STDERR before the exit
+ - bin/cscan: enumType default is int
+ - bin/cscan: better handling of C::Scan returned object type
+ - replae method: dev+
+ - Scan/Actions.pm: fix very last action
+ - AST/Util.pm: fix POD error
+ - In nocpp init phase, fix read of buffer
+ - ISO_ANSI_C_2011/Scan.pm: nocpp option, pass other options as-is to
+   AST->new(), do not call all methods systematically
+ - Grammar/ISO_ANSI_C_2011.pm: Fixed an error in labeledStatement
+   introduced when adding gcc extension case A ... B
+ - bin/cscan: show that file argument is optional in the help
+ - bin/cdecl: wrapper around bin/cscan
+ - bin/cscan: automatic - for last argument if nothing left and no --in
+   option, mention cdecl in the help
+ - cdecl test suite
+ - ISO_ANSI_C_2011/Scan.pm: _readFunctionArgs() should always return $last
+   node
+ - cdecl: _readToId() need sometimes to distinguish stack up to the first
+   declarator and later
+ - bin/cscan: fix test of filename v.s. filesystem case tolerance
+ - bin/cscan: fix default --filter option value
+ - ISO_ANSI_C_2011/Scan.pm: fix eventual crash with fc()
+ - --filter default option value is basename of last argument
+ - xpath/enumerators.xpath: list of all enumerators
+ - cdecl: enum support
+ - bin/cscan: --enumType option
+ - cdecl: struct fixes
+ - ISO_ANSI_C_2011/Scan.pm: dev+ on embedded definitions - almost done -;
+ - cdecl: reduction
+ - xpath/missingIdentifier.xpath: xpath fix
+ - Grammar/ISO_ANSI_C_2011.pm: unhide single SEMICOLON lexeme in case of
+   empty declaration
+ - Scan/Actions.pm: getRuleDescription() method
+ - missingIdentifier: better solution using xpath, IMHO -;
+ - ISO_ANSI_C_2011/Scan.pm: fake identifiers dev+
+ - xpath/missingIdentifier.xpath: fake identifiers dev+
+ - ISO_ANSI_C_2011/Scan.pm: log improvement
+ - ISO_ANSI_C_2011/Scan.pm: ellipsis and comma fixes
+ - ISO_ANSI_C_2011/Scan.pm: restoring commas dev+
+ - xpath/missingComma.xpath: xpath to recover commas removed by Marpa's
+   separator keyword: cdecl relies on it
+ - ISO_ANSI_C_2011/Scan.pm: revert last thingy - solution is deeper
+ - ISO_ANSI_C_2011/Scan.pm: cdecl ellipsis fix
+ - ISO_ANSI_C_2011/Scan.pm: minor typos fixes
+ - ISO_ANSI_C_2011/Scan.pm: cdecl dev+
+ - bin/cscan: add log options and support of -
+ - Scan/Actions.pm: removed unused "use"
+ - bin/cdecl: dev+
+ - bin/cdecl: logging stuff
+ - bin/cdecl: --input argument
+ - bin/cdecl: POD fixes
+ - dev+
+ - xslt/perl5: dev+
+ - ISO_ANSI_C_2011/Scan.pm: _getNodeFile becomes back _pushNodeFile and can
+   automatically set the file attribute
+ - ISO_ANSI_C_2011/Scan.pm: renamed _pushNodeFile to _getNodeFile
+ - ISO_ANSI_C_2011/Scan.pm: _pushNodeFile fix
+ - bin/c2bind: log as info instead of trace sometimes
+ - bin/c2bind: fix POD
+ - bin/c2bind: revival
+ - dev+: back to TT
+ - bin/c2ast: dev+ on elements values
+ - bin/c2ast: dev+ on xslt dependencies
+ - bin/c2ast: work on paths for xslt
+ - xpath/topDeclarations.xpath: needed for C::Scan
+ - bin/c2ast: dev+ for bindings
+ - Grammar/ISO_ANSI_C_2011.pm: add name for lexeme default value - impact
+   on test suite
+ - Data/Find.pm: Add endOfElement callback
+ - Grammar/ISO_ANSI_C_2011.pm: add name for lexeme default value
+ - bin/c2ast: reorg of used modules + Template preparation
+ - ISO_ANSI_C_2011/Scan.pm: say which xpath is used + topDeclarations file
+   attribute
+ - bin/cscan: mention topDeclarations
+ - t/complex_declarations.t: more complex declaration
+ - Grammar/ISO_ANSI_C_2011.pm: rename gccArrayTypeModifierList to
+   typeQualifierlist
+ - t/complex_declarations.t: who knows
+ - bin/c2bind: fix @ARGV a-la cscan
+ - bin/c2bind: fix a comment
+ - bin/c2bind prototype
+ - bin/cscan: fix help
+ - cosmetics
+ - fdecls fixes
+ - s/scan.t: typedef_structs fixes
+ - ISO_ANSI_C_2011/Scan.pm: typedef addons
+ - ISO_ANSI_C_2011/Scan.pm: vdecl addons
+ - ISO_ANSI_C_2011/Scan.pm: start adding file information
+ - ISO_ANSI_C_2011/Scan.pm: macros revisit
+ - ISO_ANSI_C_2011/Scan.pm: fix modification of non-creatable array value
+   attempted, subscript -1
+ - Getting rid of XML::Simple, finally
+ - AST/Util.pm: fix line and column count
+ - cscan: prepare for supression of XML::Simple
+ - cscan: restore some xml behaviour
+ - Removed shared xsd/cscan.xsd
+ - use File::ShareDir::ProjectDistDir
+ - bin/cscan: Rephrasing a bit in the POD
+ - bin/cscan: Removed unused asHash option
+ - Method astToString and cscan
+ - ISO_ANSI_C_2011/Scan.pm: removed a print to STDERR
+ - Grammar/ISO_ANSI_C_2011.pm: careful use of separator v.s. proper
+ - typedef_texts a-la xpath
+ - typedef_hash a-la xpath
+ - share/xpath/xsd2fdecls.xpath: exclude path having structDeclarationList
+   from fdecls candidates
+ - share/xpath/xsd2fdecls.xpath: exclude TYPEDEF from fdecls candidates
+ - Move to a correct solution and process the tree using XML::LibXML (until
+   a Marpa XML parser -;)
+ - Grammar/ISO_ANSI_C_2011.pm: forget around structContext internal rule in
+   the value
+ - ISO_ANSI_C_2011/Scan.pm: prepare for use of Scan/Actions.pm
+ - Grammar/ISO_ANSI_C_2011.pm: use semantics_package instead of obsolete
+   action_object
+ - Scan/Actions.pm: specific Scan actions
+ - C/AST.pm: actionObject, nonTerminalSemantic and terminalSemantic
+   arguments to grammar
+ - Grammar/ISO_ANSI_C_2011.pm: added configurable action object, reworked
+   internal variable names
+ - Grammar/ISO_ANSI_C_2011.pm: added configurable non-terminal and terminal
+   semantic actions
+ - work on cscan.xsd
+ - work on _pushRcp
+ - share/xsd/cscan.xsd
+ - merge conflict
+ - ISO_ANSI_C_2011/Scan.pm: typedefs_structs fix in case of opaque struct
+   forward declaration
+ - Grammar/ISO_ANSI_C_2011/Scan.pm: fix typedef_structs
+ - Grammar/ISO_ANSI_C_2011.pm: allow empty externalDeclaration
+ - Grammar/ISO_ANSI_C_2011.pm: allow no translation unit
+ - ISO_ANSI_C_2011/Scan.pm: cleaned bloated _buildContext()
+ - xslt: dev+
+ - ISO_ANSI_C_2011/Scan.pm: fix undef args
+ - Grammar/ISO_ANSI_C_2011.pm: Support of GCC case ranges
+ - ISO_ANSI_C_2011: Support of GCC escape ESC character
+ - ISO_ANSI_C_2011/Scan.pm: list fixes
+ - t/struct.t: add a function declaration in struct
+ - Callback/Events.pm: force struct counter to have a persistence level to
+   "level", add these counters to parameterDeclarationCheck
+ - Callback/Events.pm: added missing counters in topic data, that caused
+   parse table to be processed even in struct context
+ - t/struct.t: renamed misleading identifier "free" to "this"
+ - t/struct.t: case that failed with 0.36-TRIAL
+ - t/obscure_typedef_*style.t : change comment
+ - bug fix with parameter not obscuring typedef
+ - bin/c2ast: missing --trace option
+ - rulesByDepth: sort by ruleId eventually
+ - ruleByDepth: use rule_name and put more info the result
+ - use Marpa::R2 2.081001
+ - rulesByDepth
+ - POD update
+ - bin/c2ast: Mention '-' for STDIN usage in the POD and fix log info about
+   it
+ - bin/c2ast: Support STDIN, loglevel aliases on the command-line, optional
+   start (dev+), add INFO level logging to bin/c2ast
+ - optional :start, dev+
+ - AST/Impl.pm: use Marpa::R2 2.080000
+ - ISO_ANSI_C_2011/Scan.pm: ft can be '0', so use // instead of ||
+ - Test suite and CPP different behaviour v.s. OS
+ - bin/c2ast: --lazy, --typedef, --enum and --nocpp options
+ - AST.pm: mod POD for lazy mode
+ - AST.pm: even in lazy mode we can use typedef/enum helpers
+ - AST.pm: type, enum and lazy options support. Preparation for start
+   option support
+ - AST/impl.pm: added lexeme_alternative() and lexeme_complete()
+ - bin/*: say that filename must be the last argument when using unknown
+   option(s)
+ - Optimization bis
+ - Global optimization
+ - Callback/Events.pm : optimization
+ - t\delayed_directDeclaratorIdentifier.t: more tests
+ - Grammar/ISO_ANSI_C_2011.pm: need for a special lexeme in
+   compoundStatementReenterScope
+ - Scope management: delay flag should be per scope, closing a scope should
+   recursively its parent if it is marked delayed
+ - Callback/Events.pm: delayed directDeclaratorIdentifier test
+ - Callback/Events.pm: fixed a vicious case where
+   directDeclaratorIdentifier is not yet propagated into
+   declarationCheckinitDeclaratorList
+ - Removed unwanted file from previous commit
+ - bin/c2ast: fix pod2usage call
+ - bin/cscan: pass through of arguments, fix POD output
+ - Grammar/ISO_ANSI_C_2011.pm: unmask gccExtension
+ - ASM.pm: added a NOTES section
+ - Removed work files
+ - t/*.t: alwys call value()
+ - Opaque ASM support for everything not GCC inline ASM
+ - AST/Util.pm: force non true space to a true space for error reporting
+ - AST/Util.pm: Fixed $log->fatalf() arguments
+ - MASM: dev+
+ - work/MSASM2.pl: dev+
+ - work/MSASM.bnf: fixed end of buffer detection + use forgiving
+ - work/MSASM.bnf: add end of buffer to endOfLine
+ - work/MSASM.bnf: dev+
+ - Revert "work/MSASM.bnf: dev+"
+ - work/MSASM.bnf: :discard rule dev+
+ - MSASM.bnf: dev+
+ - Impl.pm: Bump Marpa::R2 dependency to version 2.078000
+ - Grammar/ISO_ANSI_C_2011.pm: use insentitive lexemes for MASM
+ - AST.pm: Reduce the number of calls to value()
+ - dist.ini: Move [OSPrereqs / MSWin32] after [MakeMaker]
+ - Grammar/ISO_ANSI_C_2011.pm: ambiguity with msvsAsmType
+ - ISO_ANSI_C_2011/Scan.pm: Environment variables support for cpprun and
+   cppflags, Shell quoting when executing the preprocessor
+ - dist.ini: Win32::ShellQuote on MSWin32
+ - examples/h2xs.PL : Marpa aware version
+ - ISO_ANSI_C_2011/Scan.pm: more protections
+ - ISO_ANSI_C_2011/Scan.pm: parsed_fdecls is not interested by typedef'ed
+   functions declarations, prevent more undefined to be inserted
+ - bin/cscan: fixed mod example, "mytype" should read "double"
+ - ISO_ANSI_C_2011/Scan.pm: mod is setted via an appended, its separator is
+   empty
+ - Removed unused blog file and dir
+ - ISO_ANSI_C_2011/Scan.pm: no splice if not necessary, exhibits a test
+   failure under perl <= 5.14
+ - bin/cscan: --in option
+ - bin/cscan: --out and --err options, yet another --xpath example
+ - bin/cscan: fix $xml usage confusion in source
+ - bin/cscan: revisited example to find declared strings
+ - bin/cscan: example for find declared strings
+ - bin/cscan: say that get method are for C::Scan like methods
+ - bin/cscan: removed a debugging print STDERR
+ - bin/cscan: say in the abstract this is a C::Scan alternative
+ - bin/cscan: no critic on the eval (bis)
+ - bin/cscan: no critic on the eval
+ - bin/c2ast: perlcritic
+ - c2ast.pl -> c2ast
+ - say that c2ast.pl is now c2ast
+ - bin/cscan: more examples with --cppflags
+ - bin/cscan: another example taking about inner anonymous types
+ - bin/cscan : implementation of --xml and --xpath options
+ - ISO_ANSI_C_2011/Scan: fix calculation of line number
+ - t/scan.t: skip file/line information in tests dev+
+ - ISO_ANSI_C_2011/Scan.pm: line calculation dev+
+ - ISO_ANSI_C_2011.pm: <DATA> should be loaded once
+ - bin/scan: xpath preparation
+ - ISO_ANSI_C_2011/Scan: function type is not inherited
+ - bin/cscan: generic get argument
+ - ISO_ANSI_C_2011/Scan.pm: original filename processing fix
+ - bin/cscan : a very special replacement for POD not generated at run time
+ - ISO_ANSI_C_2011/Scan.pm: perlcritic on $_
+ - t/scan.t: fix following removal of use C::Scan
+ - ISO_ANSI_C_2011/Scan.pm: typo that exhibits under perl <= 5.12
+ - t/scan.t: remove use C::Scan
+ - use #!perl for shebang (same effect as #!/usr/bin/perl but I prefer the
+   former)
+ - bin/c2ast.pl: fix some POD formatting
+ - cscan cmdline prototype
+ - Commented C::Scan comparison in tests - too many failures
+ - Yet POD fixes
+ - Scan.pm: update SYNOPSIS
+ - release trial fixes
+ - C::Scan cmp MarpaX::Languages::C::Scan
+ - typedefs_structs test and change following before/after fix
+ - ISO_ANSI_C_2011/Scan.pm : missing enum in KEY2ID and fix before/after as
+   per C::SCan
+ - ISO_ANSI_C_2011/Scan.pm: POD fix
+ - ISO_ANSI_C_2011/Scan: POD fixes
+ - vdecl_hash test
+ - vdecls test
+ - typedef_texts and typedefs_maybe tests
+ - ISO_ANSI_C_2011/Scan: sort explicitely when output is a map on hash
+   result
+ - scan.t: typedef_hash test
+ - scan.t: t+
+ - parsed_fdecls test
+ - ISO_ANSI_C_2011/Scan.pm: Fix bug in _analyseDirectAbstractDeclarator,
+   missing checks in _prependRcp and _appendRcp
+ - ISO_ANSI_C_2011/Scan.pm: Fix POD and 'ty' in parsed_fdecls in case of a
+   function
+ - ISO_ANSI_C_2011/Scan.pm: Fixed PURGE_IDX value, removed unused _copyRcp
+ - C::Scan t+
+ - C::Scan integration: t+
+ - use Pod::Usage
+ - c2ast.pl: say that unknown options are sent to cpp
+ - import C::Scan-like module
+ - AST.pm: Initial line number should be 1 instead of 0
+ - c2ast.pl: move File::Spec->canonpath at a better place
+ - c2ast.pl: use File::Spec->canonpath before file comparison
+ - comment #7
+ - Grammar/ISO_ANSI_C_2011.pm: Added missing priority for
+   IDENTIFIER_UNAMBIGUOUS
+ - bin/c2ast.pl: typo in usage
+ - t/gcc_extension.t: tests
+ - ISO_ANSI_C_2011.pm: restored (gccExtension) rhs in specifiers
+   declarations
+ - ISO_ANSI_C_2011.pm: moved misplaced (gccExtension) rhs
+ - Fixed reference data
+ - Remove unused event
+ - Runtime optimization
+ - Remove usage of clone
+ - Fix show source when failure is on paused lexeme
+ - use Clone instead of Storable
+ - Removed unused import
+ - runtime optimization
+ - renamed cached ncb from _ncb to _cacheNcb
+ - Avoid one internal match
+ - Cases where IDENTIFIER is not ambiguous
+ - Modifications as per yafce
+ - runtime optimizations
+ - MSVS's .type could eat C lexemes DOT and 'type'
+ - Back to version with GCC extension in the grammar
+ - Fix errors let by previous commit
+ - Discard GCC __extension__
+ - Removed unused event
+ - More GCC asm tests
+ - New reference data
+ - Removed gccEmptyRule, Support of GCC asm goto
+ - Newline stuff (Marpa i.e. unicode v.s. only \n)
+ - Work on newline
+ - Work on typedef priority
+ - Removed ASM pause before preparation
+ - GCC_ASM token can also be "asm"
+ - New version of reference data
+ - Support of binary constants (GCC extension)
+ - __asm G1 preparation
+ - _doPauseAfterLexeme renamed to ->doPauseBefore
+ - <G0 anything but space> replaced by <G0 constant>
+ - GCC __extension__ ony once for expression
+ - GCC __extension__ cannot be in :discard
+ - :discard of __extension (GCC)
+ - :discard of GCC __attribute__
+ - renamed
+ - Move GCC __attribute__ to :discard
+ - Added missing MSVS __thiscall and __clrcall to function modifier
+ - Move MSVS's __inline and __forceinline into generic INLINE lexeme
+ - MSVS __declspec :discard test
+ - Move __declspec to :discard
+ - Try to make grammer more readable (2)
+ - Try to make grammer more readable
+ - Add missing MSVS declspec modifiers
+ - Renamed t/discard_pragma.t to t/discard_MSVS_pragma.t
+ - Remove logging
+ - __pragma vtordisp
+ - __pragma strict_gs_check
+ - __pragma setlocale
+ - __pragma section
+ - __pragma runtime_checks
+ - __pragma region/endregion
+ - __pragma pop_macro/push_macro
+ - __pragma pointers_to_members
+ - __pragma pack
+ - __pragma optimize
+ - __pragma once
+ - __pragma message
+ - __pragma managed/unmanaged
+ - __pragma make_public
+ - __pragma loop
+ - __pragma intrinsic
+ - __pragma inline_recursion
+ - __pragma inline_depth
+ - __pragma include_alias
+ - __pragma hdrstop
+ - __pragma function
+ - __pragma fp_contract
+ - __pragma float_control
+ - __pragma fenv_access
+ - __pragma detect_mismatch
+ - __pragma deprecated
+ - __pragma conform
+ - __pragma component
+ - __pragma comment
+ - bss_seg, code_seg, const_seg and data_seg share the same syntax
+ - __pragma bss_seg fixes, add __pragma check_stack
+ - test pragma bss_seg
+ - pragma bss_seg
+ - add comments
+ - pragma warning fix
+ - pragma test
+ - pragma fix
+ - Missing statement in pragma push
+ - __declspec(deprecated) fix and __pragma alloc_text, auto_inline, warning
+   discard
+ - Support of logInfo __ALL__ continued
+ - Fix reference data
+ - __ALL__ special lexeme survey support, MSVS fixes
+ - Document __ALL__ --lexeme value
+ - Associate user-data to typedef and enum
+ - new function startAndLength
+ - deref nothing, revisit few sequences
+ - Return true is something found
+ - Push dirty files correctly
+ - typedefPerScope and enumAnyScope  accessors
+ - scope object accessor
+ - Fix default callback value
+ - Better comment
+ - Fix pod
+ - v0.19
+ - Call log only when its level is ok
+ - Remove useless commented block
+ - Remove non-needed events
+ - Tiny optimization
+ - v0.18
+ - c2ast cc replacement example
+ - stack based version as per jeffreykegler
+ - Tiny optimisations
+ - Tiny optimisation
+ - --logstderr option
+ - Fix doc
+ - Remove non-needed use Config
+ - Promote STRING_LITERAL_UNIT as lexeme
+ - Remember logInfo parameter so that we do not log more than was it
+   requested
+ - Fix logInfo parameter
+ - Trying to fix Changes content, some dirty things will lay out forever it
+   seems
+ - v0.17
+ - c2ast.pl: typo in regexp
+ - v0.16
+ - Optimisations (ter)
+ - v0.15
+ - Lasy commit just to have git cached connection for dzil release
+ - v0.14
+ - Limit calls to last_completed
+ - Fix format pull request #2
+ - Ambiguity because of gcc
+ - Doc update
+ - Optimisations
+
+ [Jeffrey Kegler <JKEGL@cpan.org>]
+ - Revise --cppfile help
+
+ [jddurand <jeandamiendurand@free.fr>]
+ - ISO_ANSI_C_2011/Scan.pm: _classifyNode: do not rely on node adress when
+   eating nodes
+ - bin/cdecl: use IPC::Cmd for portability until I find another way
+
+0.45 2015-01-28T21:15:47Z
+ [Ben Bullock <benkasminbullock@gmail.com>]
+ - indent the heredocument part of the code correctly
+
+ [Ivan Baidakou <basiliscos@openmailbox.com>]
+ - Fix issue with shared dir
+
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - perlcritic
+ - perlcritic.rc: allow_includes
+ - bin/c2ast: remove mention of cpretty
+ - xpath/declaration2declarator.xpath: unused
+ - t/scan.t: handle different cpp behaviours v.s. space
+ - bin/cscan: --lazy, --typedef and --enum options
+ - bin/c2ast: Removed unnecessary use File::ShareDir::ProjectDistDir
+ - bin/c2ast: Removed all experimental stuff with Template
+ - Impl/Logger.pm: github issue #9 with latest Log::Any
+ - bin/cdecl: move print of STDOUT/STDERR before the exit
+ - bin/cscan: enumType default is int
+ - bin/cscan: better handling of C::Scan returned object type
+ - replae method: dev+
+ - Scan/Actions.pm: fix very last action
+ - AST/Util.pm: fix POD error
+ - In nocpp init phase, fix read of buffer
+ - ISO_ANSI_C_2011/Scan.pm: nocpp option, pass other options as-is to
+   AST->new(), do not call all methods systematically
+ - Grammar/ISO_ANSI_C_2011.pm: Fixed an error in labeledStatement
+   introduced when adding gcc extension case A ... B
+ - bin/cscan: show that file argument is optional in the help
+ - bin/cdecl: wrapper around bin/cscan
+ - bin/cscan: automatic - for last argument if nothing left and no --in
+   option, mention cdecl in the help
+ - cdecl test suite
+ - ISO_ANSI_C_2011/Scan.pm: _readFunctionArgs() should always return $last
+   node
+ - cdecl: _readToId() need sometimes to distinguish stack up to the first
+   declarator and later
+ - bin/cscan: fix test of filename v.s. filesystem case tolerance
+ - bin/cscan: fix default --filter option value
+ - ISO_ANSI_C_2011/Scan.pm: fix eventual crash with fc()
+ - --filter default option value is basename of last argument
+ - xpath/enumerators.xpath: list of all enumerators
+ - cdecl: enum support
+ - bin/cscan: --enumType option
+ - cdecl: struct fixes
+ - ISO_ANSI_C_2011/Scan.pm: dev+ on embedded definitions - almost done -;
+ - cdecl: reduction
+ - xpath/missingIdentifier.xpath: xpath fix
+ - Grammar/ISO_ANSI_C_2011.pm: unhide single SEMICOLON lexeme in case of
+   empty declaration
+ - Scan/Actions.pm: getRuleDescription() method
+ - missingIdentifier: better solution using xpath, IMHO -;
+ - ISO_ANSI_C_2011/Scan.pm: fake identifiers dev+
+ - xpath/missingIdentifier.xpath: fake identifiers dev+
+ - ISO_ANSI_C_2011/Scan.pm: log improvement
+ - ISO_ANSI_C_2011/Scan.pm: ellipsis and comma fixes
+ - ISO_ANSI_C_2011/Scan.pm: restoring commas dev+
+ - xpath/missingComma.xpath: xpath to recover commas removed by Marpa's
+   separator keyword: cdecl relies on it
+ - ISO_ANSI_C_2011/Scan.pm: revert last thingy - solution is deeper
+ - ISO_ANSI_C_2011/Scan.pm: cdecl ellipsis fix
+ - ISO_ANSI_C_2011/Scan.pm: minor typos fixes
+ - ISO_ANSI_C_2011/Scan.pm: cdecl dev+
+ - bin/cscan: add log options and support of -
+ - Scan/Actions.pm: removed unused "use"
+ - bin/cdecl: dev+
+ - bin/cdecl: logging stuff
+ - bin/cdecl: --input argument
+ - bin/cdecl: POD fixes
+ - dev+
+ - xslt/perl5: dev+
+ - ISO_ANSI_C_2011/Scan.pm: _getNodeFile becomes back _pushNodeFile and can
+   automatically set the file attribute
+ - ISO_ANSI_C_2011/Scan.pm: renamed _pushNodeFile to _getNodeFile
+ - ISO_ANSI_C_2011/Scan.pm: _pushNodeFile fix
+ - bin/c2bind: log as info instead of trace sometimes
+ - bin/c2bind: fix POD
+ - bin/c2bind: revival
+ - dev+: back to TT
+ - bin/c2ast: dev+ on elements values
+ - bin/c2ast: dev+ on xslt dependencies
+ - bin/c2ast: work on paths for xslt
+ - xpath/topDeclarations.xpath: needed for C::Scan
+ - bin/c2ast: dev+ for bindings
+ - Grammar/ISO_ANSI_C_2011.pm: add name for lexeme default value - impact
+   on test suite
+ - Data/Find.pm: Add endOfElement callback
+ - Grammar/ISO_ANSI_C_2011.pm: add name for lexeme default value
+ - bin/c2ast: reorg of used modules + Template preparation
+ - ISO_ANSI_C_2011/Scan.pm: say which xpath is used + topDeclarations file
+   attribute
+ - bin/cscan: mention topDeclarations
+ - t/complex_declarations.t: more complex declaration
+ - Grammar/ISO_ANSI_C_2011.pm: rename gccArrayTypeModifierList to
+   typeQualifierlist
+ - t/complex_declarations.t: who knows
+ - bin/c2bind: fix @ARGV a-la cscan
+ - bin/c2bind: fix a comment
+ - bin/c2bind prototype
+ - bin/cscan: fix help
+ - cosmetics
+ - fdecls fixes
+ - s/scan.t: typedef_structs fixes
+ - ISO_ANSI_C_2011/Scan.pm: typedef addons
+ - ISO_ANSI_C_2011/Scan.pm: vdecl addons
+ - ISO_ANSI_C_2011/Scan.pm: start adding file information
+ - ISO_ANSI_C_2011/Scan.pm: macros revisit
+ - ISO_ANSI_C_2011/Scan.pm: fix modification of non-creatable array value
+   attempted, subscript -1
+ - Getting rid of XML::Simple, finally
+ - AST/Util.pm: fix line and column count
+ - cscan: prepare for supression of XML::Simple
+ - cscan: restore some xml behaviour
+ - Removed shared xsd/cscan.xsd
+ - use File::ShareDir::ProjectDistDir
+ - bin/cscan: Rephrasing a bit in the POD
+ - bin/cscan: Removed unused asHash option
+ - Method astToString and cscan
+ - ISO_ANSI_C_2011/Scan.pm: removed a print to STDERR
+ - Grammar/ISO_ANSI_C_2011.pm: careful use of separator v.s. proper
+ - typedef_texts a-la xpath
+ - typedef_hash a-la xpath
+ - share/xpath/xsd2fdecls.xpath: exclude path having structDeclarationList
+   from fdecls candidates
+ - share/xpath/xsd2fdecls.xpath: exclude TYPEDEF from fdecls candidates
+ - Move to a correct solution and process the tree using XML::LibXML (until
+   a Marpa XML parser -;)
+ - Grammar/ISO_ANSI_C_2011.pm: forget around structContext internal rule in
+   the value
+ - ISO_ANSI_C_2011/Scan.pm: prepare for use of Scan/Actions.pm
+ - Grammar/ISO_ANSI_C_2011.pm: use semantics_package instead of obsolete
+   action_object
+ - Scan/Actions.pm: specific Scan actions
+ - C/AST.pm: actionObject, nonTerminalSemantic and terminalSemantic
+   arguments to grammar
+ - Grammar/ISO_ANSI_C_2011.pm: added configurable action object, reworked
+   internal variable names
+ - Grammar/ISO_ANSI_C_2011.pm: added configurable non-terminal and terminal
+   semantic actions
+ - work on cscan.xsd
+ - work on _pushRcp
+ - share/xsd/cscan.xsd
+ - merge conflict
+ - ISO_ANSI_C_2011/Scan.pm: typedefs_structs fix in case of opaque struct
+   forward declaration
+ - Grammar/ISO_ANSI_C_2011/Scan.pm: fix typedef_structs
+ - Grammar/ISO_ANSI_C_2011.pm: allow empty externalDeclaration
+ - Grammar/ISO_ANSI_C_2011.pm: allow no translation unit
+ - ISO_ANSI_C_2011/Scan.pm: cleaned bloated _buildContext()
+ - xslt: dev+
+ - ISO_ANSI_C_2011/Scan.pm: fix undef args
+ - Grammar/ISO_ANSI_C_2011.pm: Support of GCC case ranges
+ - ISO_ANSI_C_2011: Support of GCC escape ESC character
+ - ISO_ANSI_C_2011/Scan.pm: list fixes
+ - t/struct.t: add a function declaration in struct
+ - Callback/Events.pm: force struct counter to have a persistence level to
+   "level", add these counters to parameterDeclarationCheck
+ - Callback/Events.pm: added missing counters in topic data, that caused
+   parse table to be processed even in struct context
+ - t/struct.t: renamed misleading identifier "free" to "this"
+ - t/struct.t: case that failed with 0.36-TRIAL
+ - t/obscure_typedef_*style.t : change comment
+ - bug fix with parameter not obscuring typedef
+ - bin/c2ast: missing --trace option
+ - rulesByDepth: sort by ruleId eventually
+ - ruleByDepth: use rule_name and put more info the result
+ - use Marpa::R2 2.081001
+ - rulesByDepth
+ - POD update
+ - bin/c2ast: Mention '-' for STDIN usage in the POD and fix log info about
+   it
+ - bin/c2ast: Support STDIN, loglevel aliases on the command-line, optional
+   start (dev+), add INFO level logging to bin/c2ast
+ - optional :start, dev+
+ - AST/Impl.pm: use Marpa::R2 2.080000
+ - ISO_ANSI_C_2011/Scan.pm: ft can be '0', so use // instead of ||
+ - Test suite and CPP different behaviour v.s. OS
+ - bin/c2ast: --lazy, --typedef, --enum and --nocpp options
+ - AST.pm: mod POD for lazy mode
+ - AST.pm: even in lazy mode we can use typedef/enum helpers
+ - AST.pm: type, enum and lazy options support. Preparation for start
+   option support
+ - AST/impl.pm: added lexeme_alternative() and lexeme_complete()
+ - bin/*: say that filename must be the last argument when using unknown
+   option(s)
+ - Optimization bis
+ - Global optimization
+ - Callback/Events.pm : optimization
+ - t\delayed_directDeclaratorIdentifier.t: more tests
+ - Grammar/ISO_ANSI_C_2011.pm: need for a special lexeme in
+   compoundStatementReenterScope
+ - Scope management: delay flag should be per scope, closing a scope should
+   recursively its parent if it is marked delayed
+ - Callback/Events.pm: delayed directDeclaratorIdentifier test
+ - Callback/Events.pm: fixed a vicious case where
+   directDeclaratorIdentifier is not yet propagated into
+   declarationCheckinitDeclaratorList
+ - Removed unwanted file from previous commit
+ - bin/c2ast: fix pod2usage call
+ - bin/cscan: pass through of arguments, fix POD output
+ - Grammar/ISO_ANSI_C_2011.pm: unmask gccExtension
+ - ASM.pm: added a NOTES section
+ - Removed work files
+ - t/*.t: alwys call value()
+ - Opaque ASM support for everything not GCC inline ASM
+ - AST/Util.pm: force non true space to a true space for error reporting
+ - AST/Util.pm: Fixed $log->fatalf() arguments
+ - MASM: dev+
+ - work/MSASM2.pl: dev+
+ - work/MSASM.bnf: fixed end of buffer detection + use forgiving
+ - work/MSASM.bnf: add end of buffer to endOfLine
+ - work/MSASM.bnf: dev+
+ - Revert "work/MSASM.bnf: dev+"
+ - work/MSASM.bnf: :discard rule dev+
+ - MSASM.bnf: dev+
+ - Impl.pm: Bump Marpa::R2 dependency to version 2.078000
+ - Grammar/ISO_ANSI_C_2011.pm: use insentitive lexemes for MASM
+ - AST.pm: Reduce the number of calls to value()
+ - dist.ini: Move [OSPrereqs / MSWin32] after [MakeMaker]
+ - Grammar/ISO_ANSI_C_2011.pm: ambiguity with msvsAsmType
+ - ISO_ANSI_C_2011/Scan.pm: Environment variables support for cpprun and
+   cppflags, Shell quoting when executing the preprocessor
+ - dist.ini: Win32::ShellQuote on MSWin32
+ - examples/h2xs.PL : Marpa aware version
+ - ISO_ANSI_C_2011/Scan.pm: more protections
+ - ISO_ANSI_C_2011/Scan.pm: parsed_fdecls is not interested by typedef'ed
+   functions declarations, prevent more undefined to be inserted
+ - bin/cscan: fixed mod example, "mytype" should read "double"
+ - ISO_ANSI_C_2011/Scan.pm: mod is setted via an appended, its separator is
+   empty
+ - Removed unused blog file and dir
+ - ISO_ANSI_C_2011/Scan.pm: no splice if not necessary, exhibits a test
+   failure under perl <= 5.14
+ - bin/cscan: --in option
+ - bin/cscan: --out and --err options, yet another --xpath example
+ - bin/cscan: fix $xml usage confusion in source
+ - bin/cscan: revisited example to find declared strings
+ - bin/cscan: example for find declared strings
+ - bin/cscan: say that get method are for C::Scan like methods
+ - bin/cscan: removed a debugging print STDERR
+ - bin/cscan: say in the abstract this is a C::Scan alternative
+ - bin/cscan: no critic on the eval (bis)
+ - bin/cscan: no critic on the eval
+ - bin/c2ast: perlcritic
+ - c2ast.pl -> c2ast
+ - say that c2ast.pl is now c2ast
+ - bin/cscan: more examples with --cppflags
+ - bin/cscan: another example taking about inner anonymous types
+ - bin/cscan : implementation of --xml and --xpath options
+ - ISO_ANSI_C_2011/Scan: fix calculation of line number
+ - t/scan.t: skip file/line information in tests dev+
+ - ISO_ANSI_C_2011/Scan.pm: line calculation dev+
+ - ISO_ANSI_C_2011.pm: <DATA> should be loaded once
+ - bin/scan: xpath preparation
+ - ISO_ANSI_C_2011/Scan: function type is not inherited
+ - bin/cscan: generic get argument
+ - ISO_ANSI_C_2011/Scan.pm: original filename processing fix
+ - bin/cscan: POD fix
+ - bin/cscan : a very special replacement for POD not generated at run time
+ - ISO_ANSI_C_2011/Scan.pm: perlcritic on $_
+ - t/scan.t: fix following removal of use C::Scan
+ - ISO_ANSI_C_2011/Scan.pm: typo that exhibits under perl <= 5.12
+ - t/scan.t: remove use C::Scan
+ - use #!perl for shebang (same effect as #!/usr/bin/perl but I prefer the
+   former)
+ - bin/c2ast.pl: fix some POD formatting
+ - cscan cmdline prototype
+ - Commented C::Scan comparison in tests - too many failures
+ - Yet POD fixes
+ - Scan.pm: update SYNOPSIS
+ - release trial fixes
+ - C::Scan cmp MarpaX::Languages::C::Scan
+ - typedefs_structs test and change following before/after fix
+ - ISO_ANSI_C_2011/Scan.pm : missing enum in KEY2ID and fix before/after as
+   per C::SCan
+ - ISO_ANSI_C_2011/Scan.pm: POD fix
+ - ISO_ANSI_C_2011/Scan: POD fixes
+ - vdecl_hash test
+ - vdecls test
+ - typedef_texts and typedefs_maybe tests
+ - ISO_ANSI_C_2011/Scan: sort explicitely when output is a map on hash
+   result
+ - scan.t: typedef_hash test
+ - scan.t: t+
+ - parsed_fdecls test
+ - ISO_ANSI_C_2011/Scan.pm: Fix bug in _analyseDirectAbstractDeclarator,
+   missing checks in _prependRcp and _appendRcp
+ - ISO_ANSI_C_2011/Scan.pm: Fix POD and 'ty' in parsed_fdecls in case of a
+   function
+ - ISO_ANSI_C_2011/Scan.pm: Fixed PURGE_IDX value, removed unused _copyRcp
+ - C::Scan t+
+ - C::Scan integration: t+
+ - use Pod::Usage
+ - c2ast.pl: say that unknown options are sent to cpp
+ - import C::Scan-like module
+ - AST.pm: Initial line number should be 1 instead of 0
+ - c2ast.pl: move File::Spec->canonpath at a better place
+ - c2ast.pl: use File::Spec->canonpath before file comparison
+ - comment #7
+ - Grammar/ISO_ANSI_C_2011.pm: Added missing priority for
+   IDENTIFIER_UNAMBIGUOUS
+ - bin/c2ast.pl: typo in usage
+ - t/gcc_extension.t: tests
+ - ISO_ANSI_C_2011.pm: restored (gccExtension) rhs in specifiers
+   declarations
+ - ISO_ANSI_C_2011.pm: moved misplaced (gccExtension) rhs
+ - Fixed reference data
+ - Remove unused event
+ - Runtime optimization
+ - Remove usage of clone
+ - Fix show source when failure is on paused lexeme
+ - use Clone instead of Storable
+ - Removed unused import
+ - runtime optimization
+ - renamed cached ncb from _ncb to _cacheNcb
+ - Avoid one internal match
+ - Cases where IDENTIFIER is not ambiguous
+ - Modifications as per yafce
+ - runtime optimizations
+ - MSVS's .type could eat C lexemes DOT and 'type'
+ - Back to version with GCC extension in the grammar
+ - Fix errors let by previous commit
+ - Discard GCC __extension__
+ - Removed unused event
+ - More GCC asm tests
+ - New reference data
+ - Removed gccEmptyRule, Support of GCC asm goto
+ - Newline stuff (Marpa i.e. unicode v.s. only \n)
+ - Work on newline
+ - Work on typedef priority
+ - Removed ASM pause before preparation
+ - GCC_ASM token can also be "asm"
+ - New version of reference data
+ - Support of binary constants (GCC extension)
+ - __asm G1 preparation
+ - _doPauseAfterLexeme renamed to ->doPauseBefore
+ - <G0 anything but space> replaced by <G0 constant>
+ - GCC __extension__ ony once for expression
+ - GCC __extension__ cannot be in :discard
+ - :discard of __extension (GCC)
+ - :discard of GCC __attribute__
+ - renamed
+ - Move GCC __attribute__ to :discard
+ - Added missing MSVS __thiscall and __clrcall to function modifier
+ - Move MSVS's __inline and __forceinline into generic INLINE lexeme
+ - MSVS __declspec :discard test
+ - Move __declspec to :discard
+ - Try to make grammer more readable (2)
+ - Try to make grammer more readable
+ - Add missing MSVS declspec modifiers
+ - Renamed t/discard_pragma.t to t/discard_MSVS_pragma.t
+ - Remove logging
+ - __pragma vtordisp
+ - __pragma strict_gs_check
+ - __pragma setlocale
+ - __pragma section
+ - __pragma runtime_checks
+ - __pragma region/endregion
+ - __pragma pop_macro/push_macro
+ - __pragma pointers_to_members
+ - __pragma pack
+ - __pragma optimize
+ - __pragma once
+ - __pragma message
+ - __pragma managed/unmanaged
+ - __pragma make_public
+ - __pragma loop
+ - __pragma intrinsic
+ - __pragma inline_recursion
+ - __pragma inline_depth
+ - __pragma include_alias
+ - __pragma hdrstop
+ - __pragma function
+ - __pragma fp_contract
+ - __pragma float_control
+ - __pragma fenv_access
+ - __pragma detect_mismatch
+ - __pragma deprecated
+ - __pragma conform
+ - __pragma component
+ - __pragma comment
+ - bss_seg, code_seg, const_seg and data_seg share the same syntax
+ - __pragma bss_seg fixes, add __pragma check_stack
+ - test pragma bss_seg
+ - pragma bss_seg
+ - add comments
+ - pragma warning fix
+ - pragma test
+ - pragma fix
+ - Missing statement in pragma push
+ - __declspec(deprecated) fix and __pragma alloc_text, auto_inline, warning
+   discard
+ - Support of logInfo __ALL__ continued
+ - Fix reference data
+ - __ALL__ special lexeme survey support, MSVS fixes
+ - Document __ALL__ --lexeme value
+ - Associate user-data to typedef and enum
+ - new function startAndLength
+ - deref nothing, revisit few sequences
+ - Return true is something found
+ - Push dirty files correctly
+ - typedefPerScope and enumAnyScope  accessors
+ - scope object accessor
+ - Fix default callback value
+ - Better comment
+ - Fix pod
+ - v0.19
+ - Call log only when its level is ok
+ - Remove useless commented block
+ - Remove non-needed events
+ - Tiny optimization
+ - v0.18
+ - c2ast cc replacement example
+ - stack based version as per jeffreykegler
+ - Tiny optimisations
+ - Tiny optimisation
+ - --logstderr option
+ - Fix doc
+ - Remove non-needed use Config
+ - Promote STRING_LITERAL_UNIT as lexeme
+ - Remember logInfo parameter so that we do not log more than was it
+   requested
+ - Fix logInfo parameter
+ - Trying to fix Changes content, some dirty things will lay out forever it
+   seems
+ - v0.17
+ - c2ast.pl: typo in regexp
+ - v0.16
+ - Optimisations (ter)
+ - v0.15
+ - Lasy commit just to have git cached connection for dzil release
+ - v0.14
+ - Limit calls to last_completed
+ - Fix format pull request #2
+ - Ambiguity because of gcc
+ - Doc update
+ - Optimisations
+
+ [Jeffrey Kegler <JKEGL@cpan.org>]
+ - Revise --cppfile help
+
+ [jddurand <jeandamiendurand@free.fr>]
+ - ISO_ANSI_C_2011/Scan.pm: _classifyNode: do not rely on node adress when
+   eating nodes
+ - bin/cdecl: use IPC::Cmd for portability until I find another way
+
+0.44 2015-01-21T20:34:05Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - t/scan.t: handle different cpp behaviours v.s. space
+
+0.43 2015-01-19T19:48:56Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - bin/cscan: --lazy, --typedef and --enum options
+ - bin/c2ast: Removed unnecessary use File::ShareDir::ProjectDistDir
+
+0.42 2015-01-07T21:00:30Z
+ [Ivan Baidakou <basiliscos@openmailbox.com>]
+ - Fix issue with shared dir
+
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - bin/c2ast: Removed all experimental stuff with Template
+ - Impl/Logger.pm: github issue #9 with latest Log::Any
+ - bin/cdecl: move print of STDOUT/STDERR before the exit
+ - bin/cscan: enumType default is int
+ - bin/cscan: better handling of C::Scan returned object type
+ - replae method: dev+
+ - Scan/Actions.pm: fix very last action
+ - AST/Util.pm: fix POD error
+ - In nocpp init phase, fix read of buffer
+ - ISO_ANSI_C_2011/Scan.pm: nocpp option, pass other options as-is to
+   AST->new(), do not call all methods systematically
+ - Grammar/ISO_ANSI_C_2011.pm: Fixed an error in labeledStatement
+   introduced when adding gcc extension case A ... B
+
+ [jddurand <jeandamiendurand@free.fr>]
+ - ISO_ANSI_C_2011/Scan.pm: _classifyNode: do not rely on node adress when
+   eating nodes
+ - bin/cdecl: use IPC::Cmd for portability until I find another way
+
+0.41 2014-12-04T06:53:33Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - bin/cscan: show that file argument is optional in the help
+ - bin/cdecl: wrapper around bin/cscan
+ - bin/cscan: automatic - for last argument if nothing left and no --in
+   option, mention cdecl in the help
+ - cdecl test suite
+ - ISO_ANSI_C_2011/Scan.pm: _readFunctionArgs() should always return $last
+   node
+ - cdecl: _readToId() need sometimes to distinguish stack up to the first
+   declarator and later
+ - bin/cscan: fix test of filename v.s. filesystem case tolerance
+ - bin/cscan: fix default --filter option value
+ - ISO_ANSI_C_2011/Scan.pm: fix eventual crash with fc()
+ - --filter default option value is basename of last argument
+ - xpath/enumerators.xpath: list of all enumerators
+ - cdecl: enum support
+ - bin/cscan: --enumType option
+ - cdecl: struct fixes
+ - ISO_ANSI_C_2011/Scan.pm: dev+ on embedded definitions - almost done -;
+ - cdecl: reduction
+ - xpath/missingIdentifier.xpath: xpath fix
+ - Grammar/ISO_ANSI_C_2011.pm: unhide single SEMICOLON lexeme in case of
+   empty declaration
+ - Scan/Actions.pm: getRuleDescription() method
+ - missingIdentifier: better solution using xpath, IMHO -;
+ - ISO_ANSI_C_2011/Scan.pm: fake identifiers dev+
+ - xpath/missingIdentifier.xpath: fake identifiers dev+
+ - ISO_ANSI_C_2011/Scan.pm: log improvement
+ - ISO_ANSI_C_2011/Scan.pm: ellipsis and comma fixes
+ - ISO_ANSI_C_2011/Scan.pm: restoring commas dev+
+ - xpath/missingComma.xpath: xpath to recover commas removed by Marpa's
+   separator keyword: cdecl relies on it
+ - ISO_ANSI_C_2011/Scan.pm: revert last thingy - solution is deeper
+ - ISO_ANSI_C_2011/Scan.pm: cdecl ellipsis fix
+ - ISO_ANSI_C_2011/Scan.pm: minor typos fixes
+ - ISO_ANSI_C_2011/Scan.pm: cdecl dev+
+ - bin/cscan: add log options and support of -
+ - Scan/Actions.pm: removed unused "use"
+ - bin/cdecl: dev+
+ - bin/cdecl: logging stuff
+ - bin/cdecl: --input argument
+ - bin/cdecl: POD fixes
+ - dev+
+ - xslt/perl5: dev+
+ - ISO_ANSI_C_2011/Scan.pm: _getNodeFile becomes back _pushNodeFile and can
+   automatically set the file attribute
+ - ISO_ANSI_C_2011/Scan.pm: renamed _pushNodeFile to _getNodeFile
+ - ISO_ANSI_C_2011/Scan.pm: _pushNodeFile fix
+ - bin/c2bind: log as info instead of trace sometimes
+ - bin/c2bind: fix POD
+ - bin/c2bind: revival
+ - dev+: back to TT
+ - bin/c2ast: dev+ on elements values
+ - bin/c2ast: dev+ on xslt dependencies
+ - bin/c2ast: work on paths for xslt
+ - xpath/topDeclarations.xpath: needed for C::Scan
+ - bin/c2ast: dev+ for bindings
+ - Grammar/ISO_ANSI_C_2011.pm: add name for lexeme default value - impact
+   on test suite
+ - Data/Find.pm: Add endOfElement callback
+ - Grammar/ISO_ANSI_C_2011.pm: add name for lexeme default value
+ - bin/c2ast: reorg of used modules + Template preparation
+ - ISO_ANSI_C_2011/Scan.pm: say which xpath is used + topDeclarations file
+   attribute
+ - bin/cscan: mention topDeclarations
+ - t/complex_declarations.t: more complex declaration
+ - Grammar/ISO_ANSI_C_2011.pm: rename gccArrayTypeModifierList to
+   typeQualifierlist
+ - t/complex_declarations.t: who knows
+ - bin/c2bind: fix @ARGV a-la cscan
+ - bin/c2bind: fix a comment
+ - bin/c2bind prototype
+ - bin/cscan: fix help
+ - cosmetics
+ - fdecls fixes
+ - s/scan.t: typedef_structs fixes
+ - ISO_ANSI_C_2011/Scan.pm: typedef addons
+ - ISO_ANSI_C_2011/Scan.pm: vdecl addons
+ - ISO_ANSI_C_2011/Scan.pm: start adding file information
+ - ISO_ANSI_C_2011/Scan.pm: macros revisit
+ - ISO_ANSI_C_2011/Scan.pm: fix modification of non-creatable array value
+   attempted, subscript -1
+ - Getting rid of XML::Simple, finally
+ - AST/Util.pm: fix line and column count
+ - cscan: prepare for supression of XML::Simple
+ - cscan: restore some xml behaviour
+ - Removed shared xsd/cscan.xsd
+ - use File::ShareDir::ProjectDistDir
+ - bin/cscan: Rephrasing a bit in the POD
+ - bin/cscan: Removed unused asHash option
+
+0.40 2014-11-11T00:18:39Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Method astToString and cscan
+ - ISO_ANSI_C_2011/Scan.pm: removed a print to STDERR
+ - Grammar/ISO_ANSI_C_2011.pm: careful use of separator v.s. proper
+ - dev+
+ - typedef_texts a-la xpath
+ - typedef_hash a-la xpath
+ - share/xpath/xsd2fdecls.xpath: exclude path having structDeclarationList
+   from fdecls candidates
+ - share/xpath/xsd2fdecls.xpath: exclude TYPEDEF from fdecls candidates
+ - Move to a correct solution and process the tree using XML::LibXML (until
+   a Marpa XML parser -;)
+ - Grammar/ISO_ANSI_C_2011.pm: forget around structContext internal rule in
+   the value
+ - ISO_ANSI_C_2011/Scan.pm: prepare for use of Scan/Actions.pm
+ - Grammar/ISO_ANSI_C_2011.pm: use semantics_package instead of obsolete
+   action_object
+ - Scan/Actions.pm: specific Scan actions
+ - C/AST.pm: actionObject, nonTerminalSemantic and terminalSemantic
+   arguments to grammar
+ - Grammar/ISO_ANSI_C_2011.pm: added configurable action object, reworked
+   internal variable names
+ - Grammar/ISO_ANSI_C_2011.pm: added configurable non-terminal and terminal
+   semantic actions
+ - work on cscan.xsd
+ - work on _pushRcp
+ - share/xsd/cscan.xsd
+ - merge conflict
+ - ISO_ANSI_C_2011/Scan.pm: typedefs_structs fix in case of opaque struct
+   forward declaration
+
+0.39 2014-11-05T07:02:35Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Grammar/ISO_ANSI_C_2011/Scan.pm: fix typedef_structs
+ - Grammar/ISO_ANSI_C_2011.pm: allow empty externalDeclaration
+ - Grammar/ISO_ANSI_C_2011.pm: allow no translation unit
+ - ISO_ANSI_C_2011/Scan.pm: cleaned bloated _buildContext()
+ - xslt: dev+
+ - ISO_ANSI_C_2011/Scan.pm: fix undef args
+ - Grammar/ISO_ANSI_C_2011.pm: Support of GCC case ranges
+ - ISO_ANSI_C_2011: Support of GCC escape ESC character
+
+0.38 2014-11-03T18:48:27Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - ISO_ANSI_C_2011/Scan.pm: list fixes
+
+0.37 2014-03-08T08:36:27Z
+ [Ben Bullock <benkasminbullock@gmail.com>]
+ - indent the heredocument part of the code correctly
+
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - t/struct.t: add a function declaration in struct
+ - Callback/Events.pm: force struct counter to have a persistence level to
+   "level", add these counters to parameterDeclarationCheck
+ - Callback/Events.pm: added missing counters in topic data, that caused
+   parse table to be processed even in struct context
+ - t/struct.t: renamed misleading identifier "free" to "this"
+ - t/struct.t: case that failed with 0.36-TRIAL
+ - t/obscure_typedef_*style.t : change comment
+ - bug fix with parameter not obscuring typedef
+ - bin/c2ast: missing --trace option
+ - rulesByDepth: sort by ruleId eventually
+ - ruleByDepth: use rule_name and put more info the result
+ - use Marpa::R2 2.081001
+ - rulesByDepth
+ - dev+
+ - POD update
+
+0.36 2014-02-23T11:43:02Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - bin/c2ast: Mention '-' for STDIN usage in the POD and fix log info about
+   it
+ - bin/c2ast: Support STDIN, loglevel aliases on the command-line, optional
+   start (dev+), add INFO level logging to bin/c2ast
+ - optional :start, dev+
+ - AST/Impl.pm: use Marpa::R2 2.080000
+ - ISO_ANSI_C_2011/Scan.pm: ft can be '0', so use // instead of ||
+ - Test suite and CPP different behaviour v.s. OS
+ - bin/c2ast: --lazy, --typedef, --enum and --nocpp options
+ - AST.pm: mod POD for lazy mode
+ - AST.pm: even in lazy mode we can use typedef/enum helpers
+ - AST.pm: type, enum and lazy options support. Preparation for start
+   option support
+ - AST/impl.pm: added lexeme_alternative() and lexeme_complete()
+ - bin/*: say that filename must be the last argument when using unknown
+   option(s)
+
+0.35 2014-01-23T20:56:10Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Optimization bis
+ - Global optimization
+ - Callback/Events.pm : optimization
+
+0.34 2014-01-22T20:20:40Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - t\delayed_directDeclaratorIdentifier.t: more tests
+ - Grammar/ISO_ANSI_C_2011.pm: need for a special lexeme in
+   compoundStatementReenterScope
+ - Scope management: delay flag should be per scope, closing a scope should
+   recursively its parent if it is marked delayed
+ - Callback/Events.pm: delayed directDeclaratorIdentifier test
+ - Callback/Events.pm: fixed a vicious case where
+   directDeclaratorIdentifier is not yet propagated into
+   declarationCheckinitDeclaratorList
+ - Removed unwanted file from previous commit
+ - bin/c2ast: fix pod2usage call
+ - bin/cscan: pass through of arguments, fix POD output
+ - Grammar/ISO_ANSI_C_2011.pm: unmask gccExtension
+ - ASM.pm: added a NOTES section
+
+0.33 2014-01-20T19:52:51Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Removed work files
+ - t/*.t: alwys call value()
+ - Opaque ASM support for everything not GCC inline ASM
+ - AST/Util.pm: force non true space to a true space for error reporting
+ - AST/Util.pm: Fixed $log->fatalf() arguments
+ - MASM: dev+
+ - work/MSASM2.pl: dev+
+ - work/MSASM.bnf: fixed end of buffer detection + use forgiving
+ - work/MSASM.bnf: add end of buffer to endOfLine
+ - work/MSASM.bnf: dev+
+ - Revert "work/MSASM.bnf: dev+"
+ - work/MSASM.bnf: :discard rule dev+
+ - MSASM.bnf: dev+
+ - Impl.pm: Bump Marpa::R2 dependency to version 2.078000
+ - Grammar/ISO_ANSI_C_2011.pm: use insentitive lexemes for MASM
+ - AST.pm: Reduce the number of calls to value()
+ - dist.ini: Move [OSPrereqs / MSWin32] after [MakeMaker]
+ - Grammar/ISO_ANSI_C_2011.pm: ambiguity with msvsAsmType
+ - ISO_ANSI_C_2011/Scan.pm: Environment variables support for cpprun and
+   cppflags, Shell quoting when executing the preprocessor
+ - dist.ini: Win32::ShellQuote on MSWin32
+ - examples/h2xs.PL : Marpa aware version
+ - ISO_ANSI_C_2011/Scan.pm: more protections
+ - ISO_ANSI_C_2011/Scan.pm: parsed_fdecls is not interested by typedef'ed
+   functions declarations, prevent more undefined to be inserted
+
+0.32 2014-01-12T08:49:17Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - bin/cscan: fixed mod example, "mytype" should read "double"
+ - ISO_ANSI_C_2011/Scan.pm: mod is setted via an appended, its separator is
+   empty
+ - Removed unused blog file and dir
+
+0.31 2014-01-11T20:13:08Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - ISO_ANSI_C_2011/Scan.pm: no splice if not necessary, exhibits a test
+   failure under perl <= 5.14
+
+0.30 2014-01-11T17:25:42Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - bin/cscan: --in option
+ - bin/cscan: --out and --err options, yet another --xpath example
+ - bin/cscan: fix $xml usage confusion in source
+ - bin/cscan: revisited example to find declared strings
+ - bin/cscan: example for find declared strings
+ - bin/cscan: say that get method are for C::Scan like methods
+ - bin/cscan: removed a debugging print STDERR
+ - bin/cscan: say in the abstract this is a C::Scan alternative
+ - bin/cscan: no critic on the eval (bis)
+ - bin/cscan: no critic on the eval
+ - bin/c2ast: perlcritic
+ - c2ast.pl -> c2ast
+ - say that c2ast.pl is now c2ast
+ - bin/cscan: more examples with --cppflags
+ - bin/cscan: another example taking about inner anonymous types
+ - bin/cscan : implementation of --xml and --xpath options
+ - ISO_ANSI_C_2011/Scan: fix calculation of line number
+ - t/scan.t: skip file/line information in tests dev+
+ - ISO_ANSI_C_2011/Scan.pm: line calculation dev+
+ - ISO_ANSI_C_2011.pm: <DATA> should be loaded once
+ - bin/scan: xpath preparation
+ - ISO_ANSI_C_2011/Scan: function type is not inherited
+ - bin/cscan: generic get argument
+ - ISO_ANSI_C_2011/Scan.pm: original filename processing fix
+ - bin/cscan: POD fix
+ - bin/cscan : a very special replacement for POD not generated at run time
+ - ISO_ANSI_C_2011/Scan.pm: perlcritic on $_
+
+0.29 2014-01-07T06:59:24Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - t/scan.t: fix following removal of use C::Scan
+ - ISO_ANSI_C_2011/Scan.pm: typo that exhibits under perl <= 5.12
+ - t/scan.t: remove use C::Scan
+ - use #!perl for shebang (same effect as #!/usr/bin/perl but I prefer the
+   former)
+ - bin/c2ast.pl: fix some POD formatting
+ - cscan cmdline prototype
+
+0.28 2014-01-07T05:25:27Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Commented C::Scan comparison in tests - too many failures
+ - Yet POD fixes
+ - Scan.pm: update SYNOPSIS
+
+0.27 2014-01-06T19:35:31Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - release trial fixes
+ - C::Scan cmp MarpaX::Languages::C::Scan
+ - typedefs_structs test and change following before/after fix
+ - ISO_ANSI_C_2011/Scan.pm : missing enum in KEY2ID and fix before/after as
+   per C::SCan
+ - ISO_ANSI_C_2011/Scan.pm: POD fix
+ - ISO_ANSI_C_2011/Scan: POD fixes
+ - vdecl_hash test
+ - vdecls test
+ - typedef_texts and typedefs_maybe tests
+ - ISO_ANSI_C_2011/Scan: sort explicitely when output is a map on hash
+   result
+ - scan.t: typedef_hash test
+ - scan.t: t+
+ - parsed_fdecls test
+ - ISO_ANSI_C_2011/Scan.pm: Fix bug in _analyseDirectAbstractDeclarator,
+   missing checks in _prependRcp and _appendRcp
+ - ISO_ANSI_C_2011/Scan.pm: Fix POD and 'ty' in parsed_fdecls in case of a
+   function
+ - ISO_ANSI_C_2011/Scan.pm: Fixed PURGE_IDX value, removed unused _copyRcp
+ - C::Scan t+
+ - C::Scan integration: t+
+ - use Pod::Usage
+ - c2ast.pl: say that unknown options are sent to cpp
+ - import C::Scan-like module
+
+0.26 2013-12-27T19:39:06Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - AST.pm: Initial line number should be 1 instead of 0
+ - c2ast.pl: move File::Spec->canonpath at a better place
+ - c2ast.pl: use File::Spec->canonpath before file comparison
+ - comment #7
+
+0.25 2013-12-25T09:33:40Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Grammar/ISO_ANSI_C_2011.pm: Added missing priority for
+   IDENTIFIER_UNAMBIGUOUS
+
+0.24 2013-12-25T06:12:47Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - bin/c2ast.pl: typo in usage
+ - t/gcc_extension.t: tests
+ - ISO_ANSI_C_2011.pm: restored (gccExtension) rhs in specifiers
+   declarations
+ - ISO_ANSI_C_2011.pm: moved misplaced (gccExtension) rhs
+
+ [Jeffrey Kegler <JKEGL@cpan.org>]
+ - Revise --cppfile help
+
+0.23 2013-09-25T16:45:49Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Fixed reference data
+
+0.22 2013-09-24T19:49:26Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Remove unused event
+ - Runtime optimization
+ - Remove usage of clone
+ - Fix show source when failure is on paused lexeme
+ - use Clone instead of Storable
+ - Removed unused import
+ - runtime optimization
+ - renamed cached ncb from _ncb to _cacheNcb
+ - Avoid one internal match
+ - Cases where IDENTIFIER is not ambiguous
+ - Modifications as per yafce
+
+0.21 2013-09-21T08:56:11Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - runtime optimizations
+ - MSVS's .type could eat C lexemes DOT and 'type'
+
+0.20 2013-09-19T21:20:31Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Back to version with GCC extension in the grammar
+ - Fix errors let by previous commit
+ - Discard GCC __extension__
+ - Removed unused event
+ - More GCC asm tests
+ - New reference data
+ - Removed gccEmptyRule, Support of GCC asm goto
+ - Newline stuff (Marpa i.e. unicode v.s. only \n)
+ - Work on newline
+ - Work on typedef priority
+ - Removed ASM pause before preparation
+ - GCC_ASM token can also be "asm"
+ - New version of reference data
+ - Support of binary constants (GCC extension)
+ - __asm G1 preparation
+ - _doPauseAfterLexeme renamed to ->doPauseBefore
+ - <G0 anything but space> replaced by <G0 constant>
+ - GCC __extension__ ony once for expression
+ - GCC __extension__ cannot be in :discard
+ - :discard of __extension (GCC)
+ - :discard of GCC __attribute__
+ - renamed
+ - Move GCC __attribute__ to :discard
+ - Added missing MSVS __thiscall and __clrcall to function modifier
+ - Move MSVS's __inline and __forceinline into generic INLINE lexeme
+ - MSVS __declspec :discard test
+ - Move __declspec to :discard
+ - Try to make grammer more readable (2)
+ - Try to make grammer more readable
+ - Add missing MSVS declspec modifiers
+ - Renamed t/discard_pragma.t to t/discard_MSVS_pragma.t
+ - Remove logging
+ - __pragma vtordisp
+ - __pragma strict_gs_check
+ - __pragma setlocale
+ - __pragma section
+ - __pragma runtime_checks
+ - __pragma region/endregion
+ - __pragma pop_macro/push_macro
+ - __pragma pointers_to_members
+ - __pragma pack
+ - __pragma optimize
+ - __pragma once
+ - __pragma message
+ - __pragma managed/unmanaged
+ - __pragma make_public
+ - __pragma loop
+ - __pragma intrinsic
+ - __pragma inline_recursion
+ - __pragma inline_depth
+ - __pragma include_alias
+ - __pragma hdrstop
+ - __pragma function
+ - __pragma fp_contract
+ - __pragma float_control
+ - __pragma fenv_access
+ - __pragma detect_mismatch
+ - __pragma deprecated
+ - __pragma conform
+ - __pragma component
+ - __pragma comment
+ - bss_seg, code_seg, const_seg and data_seg share the same syntax
+ - __pragma bss_seg fixes, add __pragma check_stack
+ - test pragma bss_seg
+ - pragma bss_seg
+ - add comments
+ - pragma warning fix
+ - pragma test
+ - pragma fix
+ - Missing statement in pragma push
+ - __declspec(deprecated) fix and __pragma alloc_text, auto_inline, warning
+   discard
+ - Support of logInfo __ALL__ continued
+ - Fix reference data
+ - __ALL__ special lexeme survey support, MSVS fixes
+ - Document __ALL__ --lexeme value
+ - Associate user-data to typedef and enum
+ - new function startAndLength
+ - deref nothing, revisit few sequences
+ - Return true is something found
+ - Push dirty files correctly
+ - typedefPerScope and enumAnyScope  accessors
+ - scope object accessor
+ - Fix default callback value
+ - Better comment
+ - Fix pod
+
+0.19 2013-07-30T20:41:04Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - v0.19
+ - Call log only when its level is ok
+ - Remove useless commented block
+ - Remove non-needed events
+ - Tiny optimization
+
+0.18 2013-07-29T18:10:08Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - v0.18
+ - c2ast cc replacement example
+ - stack based version as per jeffreykegler
+ - Tiny optimisations
+ - Tiny optimisation
+ - --logstderr option
+ - Fix doc
+ - Remove non-needed use Config
+ - Promote STRING_LITERAL_UNIT as lexeme
+ - Remember logInfo parameter so that we do not log more than was it
+   requested
+ - Fix logInfo parameter
+ - Trying to fix Changes content, some dirty things will lay out forever it
+   seems
+
+0.17 2013-07-25T07:57:31Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - v0.17
+ - c2ast.pl: typo in regexp
+
+0.16 2013-07-24T20:51:24Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - v0.16
+ - Optimisations (ter)
+
+0.15 2013-07-24T19:07:52Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - v0.15
+ - Lasy commit just to have git cached connection for dzil release
+
+0.14 2013-07-24T19:00:43Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - v0.14
+ - Limit calls to last_completed
+ - Fix format pull request #2
+ - Ambiguity because of gcc
+ - Optimization bis
+ - Doc update
+ - Optimisations
+ - v0.13
+ - Revival of 'IDENTIFIER COLON initializer' old style coding, use rank to
+   bypass gccAttributeInnerParameter generating multiple parse values
+ - Another way to handle preprocessing
+ - Say how many parse trees were found
+ - Tiny protection
+ - show context on error only if >= debug
+ - G1 distinction between #line and #pragma directives
+ - v0.12
+ - Force scanning of IDENTIFIER if --check reservedNames and no --lexeme
+   IDENTIFIER
+ - v0.11
+ - gcc asm test
+ - gcc asm grammar fix
+ - More about tracing
+ - --dump and --loglevel options
+ - Better error reporting
+ - v0.10
+ - Disable [CheckExtraTests] until I fix them all
+ - Perl::Critic
+ - Perl::Critic::Policy::Modules::RequireFilenameMatchesPackage
+ - [CheckChangesHasContent] has a problem with my Changes format
+ - use Marpa::R2 2.064000 back (indexed CPAN version)
+ - RELEASE_TESTING=1
+ - use Marpa::R2 2.065000
+ - Leave directDeclaratorIdentifier as a possible value
+ - Minimalist C AST targetted Data::Find
+ - lexeme default = action => [start,length,value]
+ - A gentle optimization
+ - Remove log statements
+ - Import nothing by default
+ - Last Term::ProgressBar update if needed
+ - Enable Log4perl and logInfo option
+ - preprocessorDirective is introducing ambiguity
+ - New option --progress
+ - Support of comma ending argumentExpressionList
+ - Check GetOptions return value
+ - Fix file test for default behaviour
+ - Support of #line in original .c and list of lexemes of interest
+ - #line and #pragma as a whole big lexeme
+ - Revert "use script directory instead of bin"
+ - use script directory instead of bin
+ - logInfo option and SEE ALSO section
+ - POD update
+ - update
+ - dzil compliance
+ - updated POD
+ - Remove bin/ from ignore list
+ - c2ast tool
+ - MSVS annotation discard
+ - callback option and logInfo option
+ - Simplified
+ - Remove any preprocessor directive
+ - Probably the next developer release candidate!
+ - Fix for a feature that may disappear
+ - Correct implementation v.s. different type of pauses
+ - A lot of gcc attribute extensions
+ - Starting adding more gcc attribute extensions
+ - Grr, missing GNU attribute extensions
+ - Even closer
+ - almost completed -;
+ - Fix usage
+ - Revisited namings, removed ugly object dependencies
+ - Pod change
+ - return if (! @terminals_expected);
+ - Removed non needed methods
+ - Cleanup cont'd
+ - Moving methods to Util
+ - Marpa-R2-2.061_002 bug fix
+ - use Marpa::R2 2.061002
+ - parameterDeclaration check
+ - to be done in post grammar
+ - Fixes on updates and checks
+ - Work on functionDefinition, simplified some calls
+ - use Marpa::R2 2.061001 and its terminals_expected
+ - functionDefinition
+ - Work on events
+ - functionDefinition checks
+ - New attribute extra_description, mainly for better logging
+ - Use explicit ($start, $length) for readibility
+ - A little more information in the log
+ - Removed unused methods and did few renamings
+ - General fixes
+ - Revisited scope management
+ - Scope fix
+ - Fixed deref action and do not return flags data
+ - Protect against eventual emtpy topic data
+ - declaration rule is now OK with events
+ - Work on functionDefinition
+ - Imported changes
+ - Imported ctesk original SEC.bnf
+ - _doDelayedExitScope called too often
+ - Test suite fixes
+ - syntax error, despite compilers wrongly parses it
+ - parameter declaration and typedef
+ - Test cases based on wikipedia
+ - void func(x, typedef) {}
+ - void func(typedef) {}
+ - void func(x, typedef) {};
+ - void func(typedef) {};
+ - void typedef func() {};
+ - typedef void func() {};
+ - Scope events
+ - remove dist.init from dirty Git::Check
+ - use Marpa::R2 2.057006
+ - Events callback
+ - A simple callback framework
+ - use Marpa::R2 2.057005
+ - Changed how Scopes are detected - removing two calls to
+   findInProgressshort()!
+ - Fixed an <undef> in the logging
+ - Typos
+ - Quote of "What is the Marpa algorithm?"
+ - Test plan
+ - Restored TODO list
+ - v0.09
+ - Back to eval Log::Log4perl because of Win32 warn
+ - v0.08
+ - Ignore my MarpaX::Languages::C::AST::Expected in AutoPrereqs
+ - Enable UploadToCPAN
+ - Back to 95% of DAGOLDEN great dist.ini
+ - oups back
+ - Closer to DAGOLDEN
+ - Removed non needed dzil.sh, this also allow to have a clean tag, but
+   Dist::Zilla perturbed a bit the followup of tag v.s. official releases
+ - Uncommentedd UploadToCPAN
+ - Remove dist.ini from allow_dirty, Added back commented [FakeRelease]
+ - New CPAN release of MarpaX-Languages-C-AST - v0.04
+ - Added META.json and README.pod to .gitignore
+ - Add .build to .gitignore
+ - Dist:Zilla version
+ - Removed
+ - Removed README boilerplate
+ - Remove given/when: warnings on perl5.18
+ - Better readibility
+ - v0.03
+ - Synopsis made readable
+ - Move atomic stuff to example since the grammar does not have pb with it
+   (historically c2011 draft had an ambiguity between atomic as type
+   specifier and type qualifier)
+ - Updated test file to follow logging that now have a context free string
+ - Use given/when, log the context (lexeme, event)
+ - MIN_PERL_VERSION => '5.10.0'
+ - Fix under taint mode
+ - Preview of changes for 0.03
+ - My own version of changes.t
+ - Cosmetic reorder in _doLexeme()
+ - Revisited lexeme and events processing
+ - Again manifest.t
+ - Fixed MANIFEST
+ - Back to quasi-original manifest.t
+ - TODO list, currently contains only PERHAPS items
+ - Revisited log mechanism and inspectG1
+ - Better log
+ - examples/synopsis.pl
+ - Variable name convention fix
+ - Correct parameters to findInProgress()
+ - No (not-needed) $lhs nor [@rhs] in $matchesp
+ - findInProgressShort and g1Describe helper methods
+ - Return list of [$ruleId, $dotPosition, $origin, $lhs, [@rhs]] that
+   matched
+ - Force Marpa::R2 in addition to the test in Makefile.PL
+ - Fix rc=1 if anything was requested /and/ matched
+ - Typo in a comment
+ - Removed perl version dependency
+ - Removed duplicate BUILD_REQUIRES
+ - Do a PREREQ_PM
+ - Removed non-needed Module::Info requirement
+ - Removed use perl 5.006
+ - Added use warnings
+ - Updated methods docs
+ - Fixed typos in the doc
+ - Marpa::R2 2.056000 official release dependency
+ - Add ruleid and origin in findinprogress
+ - Forgot 0.02 Changes update
+ - Bumped to version 0.02
+ - Fixed synopsis
+ - Add repository to META_MERGE
+ - Say what this module is not
+ - Move to Storage (core module) instead of Clone
+ - Add package tarballs to .gitignore
+ - test blessed structure result
+ - Oups, removed a Data::Dumper call
+ - No more untaint and if-if-else ambiguity solving
+ - Fix t/Grammar/synposis.t on Win32
+ - Precisions in the POD for read method
+ - Untaint the grammar when reading it, use core IO::File instead of
+   File::Slurp
+ - Simplified new()
+ - Renamed if-then-else.t to if-if-else.t
+ - use Marpa::R2 2.055_003
+ - Fix output v.s. arrayOfValuesb
+ - Possiblity to return all values
+ - Fix some POD sections
+ - Hmm, I messed up last commit logs - let's restart from here
+ - if-then-else test Fixed some SEE ALSO sections
+ - Few fixes and global t/synopsis.t file for the whole package
+ - Log::Any wrapper on top of Marpa
+ - Added $grammar->list() method
+ - Grammar test files and implementation on top of Marpa
+ - Use $log Remove __DATA__
+ - MarpaX::Languages::C::AST::Grammar package Fixes for newest Test::More
+ - Scope synopsis test
+ - Scope module
+ - Initial commit
+
+ [Jeffrey Kegler <jkegl@cpan.org>]
+ - README changes
+
+0.13 2013-07-23T22:56:11Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Revival of 'IDENTIFIER COLON initializer' old style coding, use rank to
+   bypass gccAttributeInnerParameter generating multiple parse values
+ - Another way to handle preprocessing
+ - Say how many parse trees were found
+ - Tiny protection
+ - show context on error only if >= debug
+ - G1 distinction between #line and #pragma directives
+
+0.12 2013-07-21T09:41:16Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Force scanning of IDENTIFIER if --check reservedNames and no --lexeme
+   IDENTIFIER
+
+0.11 2013-07-21T09:08:18Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - gcc asm test
+ - gcc asm grammar fix
+ - More about tracing
+ - --dump and --loglevel options
+ - Better error reporting
+
+0.10 2013-07-20T22:24:47Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Disable [CheckExtraTests] until I fix them all
+ - Perl::Critic
+ - Perl::Critic::Policy::Modules::RequireFilenameMatchesPackage
+ - [CheckChangesHasContent] has a problem with my Changes format
+ - use Marpa::R2 2.064000 back (indexed CPAN version)
+ - RELEASE_TESTING=1
+ - use Marpa::R2 2.065000
+ - Leave directDeclaratorIdentifier as a possible value
+ - Minimalist C AST targetted Data::Find
+ - lexeme default = action => [start,length,value]
+ - A gentle optimization
+ - Remove log statements
+ - Import nothing by default
+ - Last Term::ProgressBar update if needed
+ - Enable Log4perl and logInfo option
+ - preprocessorDirective is introducing ambiguity
+ - New option --progress
+ - Support of comma ending argumentExpressionList
+ - Check GetOptions return value
+ - Fix file test for default behaviour
+ - Support of #line in original .c and list of lexemes of interest
+ - #line and #pragma as a whole big lexeme
+ - Revert "use script directory instead of bin"
+ - use script directory instead of bin
+ - logInfo option and SEE ALSO section
+ - POD update
+ - update
+ - dzil compliance
+ - updated POD
+ - Remove bin/ from ignore list
+ - c2ast tool
+ - MSVS annotation discard
+ - callback option and logInfo option
+ - Simplified
+ - Remove any preprocessor directive
+ - Probably the next developer release candidate!
+ - Fix for a feature that may disappear
+ - Correct implementation v.s. different type of pauses
+ - A lot of gcc attribute extensions
+ - Starting adding more gcc attribute extensions
+ - Grr, missing GNU attribute extensions
+ - Even closer
+ - almost completed -;
+ - Fix usage
+ - Revisited namings, removed ugly object dependencies
+ - Pod change
+ - return if (! @terminals_expected);
+ - Removed non needed methods
+ - Cleanup cont'd
+ - Moving methods to Util
+ - Marpa-R2-2.061_002 bug fix
+ - use Marpa::R2 2.061002
+ - parameterDeclaration check
+ - to be done in post grammar
+ - Fixes on updates and checks
+ - Work on functionDefinition, simplified some calls
+ - use Marpa::R2 2.061001 and its terminals_expected
+ - functionDefinition
+ - Work on events
+ - functionDefinition checks
+ - New attribute extra_description, mainly for better logging
+ - Use explicit ($start, $length) for readibility
+ - A little more information in the log
+ - Removed unused methods and did few renamings
+ - General fixes
+ - Revisited scope management
+ - Scope fix
+ - Fixed deref action and do not return flags data
+ - Protect against eventual emtpy topic data
+ - declaration rule is now OK with events
+ - Work on functionDefinition
+ - Imported changes
+ - Imported ctesk original SEC.bnf
+ - _doDelayedExitScope called too often
+ - Test suite fixes
+ - syntax error, despite compilers wrongly parses it
+ - parameter declaration and typedef
+ - Test cases based on wikipedia
+ - void func(x, typedef) {}
+ - void func(typedef) {}
+ - void func(x, typedef) {};
+ - void func(typedef) {};
+ - void typedef func() {};
+ - typedef void func() {};
+ - Scope events
+ - remove dist.init from dirty Git::Check
+ - use Marpa::R2 2.057006
+ - Events callback
+ - A simple callback framework
+ - use Marpa::R2 2.057005
+ - Changed how Scopes are detected - removing two calls to
+   findInProgressshort()!
+ - Fixed an <undef> in the logging
+ - Typos
+ - Quote of "What is the Marpa algorithm?"
+ - Test plan
+ - Restored TODO list
+
+ [Jeffrey Kegler <jkegl@cpan.org>]
+ - README changes
+
+0.09 2013-06-03T18:22:46Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Back to eval Log::Log4perl because of Win32 warn
+ - v0.08
+
+0.08 2013-06-02T21:18:03Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Ignore my MarpaX::Languages::C::AST::Expected in AutoPrereqs
+ - Enable UploadToCPAN
+ - Back to 95% of DAGOLDEN great dist.ini
+
+0.07 2013-06-02T17:36:58Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - oups back
+
+0.06 2013-06-02T17:33:00Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Closer to DAGOLDEN
+
+0.05 2013-06-02T17:12:10Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Removed non needed dzil.sh, this also allow to have a clean tag, but
+   Dist::Zilla perturbed a bit the followup of tag v.s. official releases
+
+0.04 2013-06-02T17:03:14Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Uncommentedd UploadToCPAN
+ - Remove dist.ini from allow_dirty, Added back commented [FakeRelease]
+ - New CPAN release of MarpaX-Languages-C-AST - v0.04
+ - Added META.json and README.pod to .gitignore
+ - Add .build to .gitignore
+ - Dist:Zilla version
+ - Removed
+ - Removed README boilerplate
+ - Remove given/when: warnings on perl5.18
+ - Better readibility
+
+0.03 2013-05-30T19:12:07Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Synopsis made readable
+ - Removed
+ - Move atomic stuff to example since the grammar does not have pb with it
+   (historically c2011 draft had an ambiguity between atomic as type
+   specifier and type qualifier)
+ - Updated test file to follow logging that now have a context free string
+ - Use given/when, log the context (lexeme, event)
+ - MIN_PERL_VERSION => '5.10.0'
+ - Fix under taint mode
+ - Preview of changes for 0.03
+ - My own version of changes.t
+ - Cosmetic reorder in _doLexeme()
+ - Revisited lexeme and events processing
+ - Again manifest.t
+ - Fixed MANIFEST
+ - Back to quasi-original manifest.t
+ - TODO list, currently contains only PERHAPS items
+ - Revisited log mechanism and inspectG1
+ - Better log
+ - examples/synopsis.pl
+ - Variable name convention fix
+ - Correct parameters to findInProgress()
+ - No (not-needed) $lhs nor [@rhs] in $matchesp
+ - findInProgressShort and g1Describe helper methods
+ - Return list of [$ruleId, $dotPosition, $origin, $lhs, [@rhs]] that
+   matched
+ - Force Marpa::R2 in addition to the test in Makefile.PL
+ - Fix rc=1 if anything was requested /and/ matched
+ - Typo in a comment
+ - Removed perl version dependency
+ - Removed duplicate BUILD_REQUIRES
+ - Do a PREREQ_PM
+ - Removed non-needed Module::Info requirement
+ - Removed use perl 5.006
+ - Added use warnings
+ - Updated methods docs
+ - Fixed typos in the doc
+ - Marpa::R2 2.056000 official release dependency
+ - Add ruleid and origin in findinprogress
+ - Forgot 0.02 Changes update
+
+0.02 2013-05-21T22:39:50Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Bumped to version 0.02
+ - Fixed synopsis
+ - Add repository to META_MERGE
+ - Say what this module is not
+ - Move to Storage (core module) instead of Clone
+
+0.01 2013-05-21T12:19:33Z
+ - No changes found

@@ -1,0 +1,53 @@
+^DATABASE = Geo
+!Database_name = Gene Expression Omnibus (GEO)
+!Database_institute = NCBI NLM NIH
+!Database_web_link = http://www.ncbi.nlm.nih.gov/geo
+!Database_email = geo@ncbi.nlm.nih.gov
+!Database_ref = Nucleic Acids Res. 2005 Jan 1;33 Database Issue:D562-6
+^DATASET = GDS3718
+!dataset_title = Zinc finger Zbtb20 deficiency effect on the developing hippocampus
+!dataset_description = Analysis of hippocampi of postnatal day 2 mutants lacking Zbtb20. Zbtb20 is a member of the BTB/POZ zinc finger family. Results provide insight into the role of Zbtb20 in hippocampal development.
+!dataset_type = Expression profiling by array
+!dataset_pubmed_id = 20308569
+!dataset_platform = GPL1261
+!dataset_platform_organism = Mus musculus
+!dataset_platform_technology_type = in situ oligonucleotide
+!dataset_feature_count = 10
+!dataset_sample_organism = Mus musculus
+!dataset_sample_type = RNA
+!dataset_channel_count = 1
+!dataset_sample_count = 4
+!dataset_value_type = count
+!dataset_reference_series = GSE19513
+!dataset_order = none
+!dataset_update_date = Jun 23 2010
+^SUBSET = GDS3718_1
+!subset_dataset_id = GDS3718
+!subset_description = wild type
+!subset_sample_id = GSM506899,GSM506900
+!subset_type = genotype/variation
+^SUBSET = GDS3718_2
+!subset_dataset_id = GDS3718
+!subset_description = Zbtb20 null
+!subset_sample_id = GSM506901,GSM506902
+!subset_type = genotype/variation
+^DATASET = GDS3718
+#ID_REF = Platform reference identifier
+#IDENTIFIER = identifier
+#GSM506899 = Value for GSM506899: wildtype P2 hippocampus rep1; src: P2 control hippocampus
+#GSM506900 = Value for GSM506900: wildtype P2 hippocampus rep2; src: P2 control hippocampus
+#GSM506901 = Value for GSM506901: ZBTB20-KO P2 hippocampus rep1; src: P2 knockout hippocampus
+#GSM506902 = Value for GSM506902: ZBTB20-KO P2 hippocampus rep2; src: P2 knockout hippocampus
+!dataset_table_begin
+ID_REF	IDENTIFIER	GSM506899	GSM506900	GSM506901	GSM506902
+1415670_at	Copg	1717.100	188.310	1686.000	206.620
+1415671_at	Atp6v0d1	6642.100	1156.160	7593.200	917.560
+1415672_at	Golga7	3877.100	1503.080	3677.800	1441.210
+1415673_at	Psph	1160.400	362.970	1034.900	371.510
+1415674_a_at	Trappc4	4705.000	697.510	4786.000	585.600
+1415675_at	Dpm2	1430.700	357.820	1395.100	286.230
+1415676_a_at	Psmb5	3819.700	1455.470	3717.700	1008.790
+1415677_at	Dhrs1	1729.300	477.210	1391.000	436.180
+1415678_at	Ppm1a	2835.000	524.310	3070.800	548.290
+1415679_at	Gm12396	4300.000	843.910	4428.800	633.020
+!dataset_table_end

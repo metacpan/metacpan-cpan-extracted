@@ -1,0 +1,10 @@
+t/test.html
+t/one_time_http.pl
+Makefile.PL
+MANIFEST
+ObserverService.xs
+ppport.h
+README
+t/Mozilla-ObserverService.t
+lib/Mozilla/ObserverService.pm
+META.yml                                 Module meta-data (added by MakeMaker)

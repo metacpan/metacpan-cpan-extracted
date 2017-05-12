@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Module-Pluggable-Ordered
+version:      1.5
+version_from: Ordered.pm
+installdirs:  site
+requires:
+    Module::Pluggable:             1.9
+    UNIVERSAL::require:            0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

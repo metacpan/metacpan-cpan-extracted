@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Examples</title>
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    </head>
+
+    <body>
+        <div class="container">
+            
+
+<p>By default, <code>tabindex</code> is set to <code>-1</code>:</p>
+<pre>&lt;div class=&quot;text-right&quot;&gt;
+    &lt;%= dropdown
+         [&#39;Dropdown 1&#39;, id =&gt; &#39;a_custom_id&#39;, right, items =&gt; [
+            [&#39;Item 1&#39;, [&#39;item1&#39;] ],
+            [&#39;Item 2&#39;, [&#39;item2&#39;] ],
+            [],
+            [&#39;Item 3&#39;, [&#39;item3&#39;] ]
+         ] ] %&gt;
+&lt;/div&gt;</pre>
+<pre>&lt;div class=&quot;text-right&quot;&gt;
+    &lt;div class=&quot;dropdown&quot;&gt;
+        &lt;button class=&quot;btn btn-default dropdown-toggle&quot; type=&quot;button&quot; id=&quot;a_custom_id&quot; data-toggle=&quot;dropdown&quot;&gt;Dropdown 1&lt;/button&gt;
+        &lt;ul class=&quot;dropdown-menu dropdown-menu-right&quot;&gt;
+            &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item1&quot; tabindex=&quot;-1&quot;&gt;Item 1&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item2&quot; tabindex=&quot;-1&quot;&gt;Item 2&lt;/a&gt;&lt;/li&gt;
+            &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item3&quot; tabindex=&quot;-1&quot;&gt;Item 3&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="text-right">        <div class="dropdown">            <button class="btn btn-default dropdown-toggle" type="button" id="a_custom_id" data-toggle="dropdown">Dropdown 1</button>            <ul class="dropdown-menu dropdown-menu-right">                <li><a class="menuitem" href="item1" tabindex="-1">Item 1</a></li>                <li><a class="menuitem" href="item2" tabindex="-1">Item 2</a></li>                <li class="divider"></li>                <li><a class="menuitem" href="item3" tabindex="-1">Item 3</a></li>            </ul>        </div>    </div></div>
+<hr />
+<p>...but it can be overridden:</p>
+<pre>&lt;%= dropdown
+     [&#39;Dropdown 2&#39;, caret, large, primary, items =&gt; [
+        [&#39;Item 1&#39;, [&#39;item1&#39;], data =&gt; { attr =&gt; 2 } ],
+        [&#39;Item 2&#39;, [&#39;item2&#39;], disabled, data =&gt; { attr =&gt; 4 } ],
+        [],
+        [&#39;Item 3&#39;, [&#39;item3&#39;], data =&gt; { attr =&gt; 7 } ],
+        [],
+        [&#39;Item 4&#39;, [&#39;item4&#39;], tabindex =&gt; 4 ],
+        &#39;This is a header&#39;,
+        [&#39;Item 5&#39;, [&#39;item5&#39;] ],
+     ] ] %&gt;</pre>
+<pre>&lt;div class=&quot;dropdown&quot;&gt;
+    &lt;button class=&quot;btn btn-lg btn-primary dropdown-toggle&quot; type=&quot;button&quot; data-toggle=&quot;dropdown&quot;&gt;Dropdown 2 &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;&lt;/button&gt;
+    &lt;ul class=&quot;dropdown-menu&quot;&gt;
+        &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item1&quot; tabindex=&quot;-1&quot; data-attr=&quot;2&quot;&gt;Item 1&lt;/a&gt;&lt;/li&gt;
+        &lt;li class=&quot;disabled&quot;&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item2&quot; tabindex=&quot;-1&quot; data-attr=&quot;4&quot;&gt;Item 2&lt;/a&gt;&lt;/li&gt;
+        &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item3&quot; tabindex=&quot;-1&quot; data-attr=&quot;7&quot;&gt;Item 3&lt;/a&gt;&lt;/li&gt;
+        &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item4&quot; tabindex=&quot;4&quot;&gt;Item 4&lt;/a&gt;&lt;/li&gt;
+        &lt;li class=&quot;dropdown-header&quot;&gt;This is a header&lt;/li&gt;
+        &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item5&quot; tabindex=&quot;-1&quot;&gt;Item 5&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="dropdown">        <button class="btn btn-lg btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Dropdown 2 <span class="caret"></span></button>        <ul class="dropdown-menu">            <li><a class="menuitem" href="item1" tabindex="-1" data-attr="2">Item 1</a></li>            <li class="disabled"><a class="menuitem" href="item2" tabindex="-1" data-attr="4">Item 2</a></li>            <li class="divider"></li>            <li><a class="menuitem" href="item3" tabindex="-1" data-attr="7">Item 3</a></li>            <li class="divider"></li>            <li><a class="menuitem" href="item4" tabindex="4">Item 4</a></li>            <li class="dropdown-header">This is a header</li>            <li><a class="menuitem" href="item5" tabindex="-1">Item 5</a></li>        </ul>    </div></div>
+        </div>
+        <pre style="background-color: #fff; border-width: 0px;">
+
+
+
+        </pre>
+    </body>
+</html>

@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 cb837e00ea11aafaab8db7b5a1d44154c24a5188 BUGS
+SHA1 a9685e053909f6a012fe9178d797ff6f0066d73c CHANGES
+SHA1 cffcb3c7afe0e3742a5bc2681f0c3f9371c47d87 CREDITS
+SHA1 d7c83d8f89b92a3262a01eb2778d39402e77263a LICENSE
+SHA1 42e56980e8831d30583a1d25a583b8809f63c8f8 MANIFEST
+SHA1 08451be6f8e25d14d433056a810fd60d2c946041 MANIFEST.SKIP
+SHA1 1117d30cb9ec4bea43c4e2d1137b1d6a86457434 META.json
+SHA1 4ca2f8956f773a1482f5eb51101991c0d57d8946 META.yml
+SHA1 6b2e24b18800cd5281c172f9dec78cde29be8e83 Makefile.PL
+SHA1 fa23172f6c9445f82d09680a2f7d42ea386b36e2 NEW
+SHA1 ea39ab882b94f38671bffd74ea3d3c7c62f421b8 README
+SHA1 fe8186e638f5977889d46c53d0b97bf1fae146e7 TODO
+SHA1 a8ffc7d3270e481c9d24603a74ba2c0f46cae0e3 examples/1000.txt
+SHA1 c314ec4c00817eaf40418a76a183ba745470e4ee examples/bigprimes.pl
+SHA1 9d5682361c3edd1cf7496011692feebdb94b64be examples/fib.pl
+SHA1 b57b118469a1a16e54d61206c5bd9077dbb2231a examples/hailstone.pl
+SHA1 989bfc0ad145d0f42b1eb65e83d9de018a7ee150 examples/prime.pl
+SHA1 1f134d71545e1fc7e0cfa6c4aaca7cede834375e lib/Math/Big.pm
+SHA1 49914372fa9634bc2896508aebe0689aeeab04ce lib/Math/Big/Factors.pm
+SHA1 d083d32a7b79543c5de0a4568e5049e9e77abd16 t/bigpm.t
+SHA1 d5c8a10e3b66cc29726221114020d6613b2cb81e t/factorspm.t
+SHA1 49654fef1d727ee13d6447cbec2d44b76140fe20 t/pod.t
+SHA1 983cb968b77db86521b9f886ef1247079b35dc8c t/pod_cov.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYQ9i+AAoJEGcmPl2fr166MjwH/jGDm/BOHeG57WhM/3BGW1yu
+iqZ7mEXiUDS4RgeRyqgdYQQ+VaTIDINKF+CXI6s8I/XhJ4alvgFZqGmpTruFV4Wr
+FkeZt9ygxcRP2pLDJ8inKsdvWr9rnRUbhliEpuyEeVNJcFytzMNmxk50HluV9Mel
+jPx5WDeWrVJym4KVibQhkIb2dSPGvbXsHkXpGRdiw0Iswr5X9MwV7ZBK0bKfXuDb
++S6gADl+VjMzZJZ7vkiZbfoPHf8cnrQPYEqxeUVg5k8AXoZ8DKzggLWpeZpkrsiH
+77fYzXHuVoFYqiZFM+F3Ko/owqcNdl+ylF7RlXpDp1Irkx6DVVgim4GSe8p9MLY=
+=2n9Y
+-----END PGP SIGNATURE-----

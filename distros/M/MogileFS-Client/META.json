@@ -1,0 +1,46 @@
+{
+   "abstract" : "MogileFS client library",
+   "author" : [
+      "Brad Fitzpatrick <brad@danga.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MogileFS-Client",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::WrapTie" : "2.102",
+            "LWP::Simple" : 0,
+            "List::Util" : 0,
+            "Test::More" : 0,
+            "Time::HiRes" : 0,
+            "fields" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.17"
+}

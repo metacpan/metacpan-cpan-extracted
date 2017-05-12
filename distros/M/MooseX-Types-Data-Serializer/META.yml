@@ -1,0 +1,22 @@
+---
+abstract: 'A Data::Serializer type library for Moose.'
+author:
+  - 'Aran Deltac <bluefeet@gmail.com>'
+build_requires:
+  Test::Simple: 0.94
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Types-Data-Serializer
+requires:
+  Data::Serializer: 0.54
+  Moose: 1.23
+resources:
+  bugtracker: https://github.com/bluefeet/MooseX-Types-Data-Serializer/issues
+  repository: git://github.com/bluefeet/MooseX-Types-Data-Serializer.git
+version: 0.02

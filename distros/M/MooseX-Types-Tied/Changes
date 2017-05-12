@@ -1,0 +1,10 @@
+Revision history for MooseX-Types-Tied
+
+0.003     2012-04-21 12:30:10 America/Los_Angeles
+	- Drop coercion to IxHash from HashRef.
+
+0.002     2011-04-19 20:41:44 America/Los_Angeles
+    - Update IxHash coercion and tests
+    - Preliminary native Hash trait tests
+
+0.001     2011-04-18 19:33:45 America/Los_Angeles

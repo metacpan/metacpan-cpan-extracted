@@ -1,0 +1,67 @@
+<%args>
+    $search => undef        # from search_form
+</%args>
+
+% if ( $search ) {
+    <div id="title">Search results</div>
+% } else {
+    <div id="title">Listing of all <% $classmetadata->{plural} %></div>
+% }
+
+<& navbar &>
+
+<div class="list">
+<table id="matrix" width="100%" >
+    <tr>
+% foreach my $col ( @{ $classmetadata->{columns} } ) {
+% next if $col eq "id";
+<th>
+<%perl>
+    my $additional = "?order=$col";
+
+    $additional .= "&page=" . $pager->current_page if $pager;
+
+    $additional .= '&o2=desc' if ( $col eq $request->query->{order} and $request->query->{o2} ne "desc" );
+
+    my $action = "list";
+
+    foreach my $name ( @{ $classmetadata->{columns} } )
+    {
+        if ( $request->query->{ $name } )
+        {
+            $additional .= "&$name=" . $request->query->{ $name };
+            $action = "search";
+        }
+    }
+</%perl>
+<& link, table      => $classmetadata->{table},
+         command    => $action,
+         additional => $additional,
+         label      => $classmetadata->{colnames}->{ $col } &>
+% if ( $col eq $request->query->{order} ) {
+<% ( $request->query->{o2} ne "desc" ? '&darr;' : '&uarr;' ) %>
+% }
+</th>
+% }
+
+<th id="actionth">Actions</th>
+
+</tr>
+
+% my $count = 0;
+% foreach my $item ( @$objects ) {
+% if ( $count++ % 2 ) {
+<tr class="alternate">
+% } else {
+<tr>
+% }
+<& display_line, item => $item &>
+</tr>
+% }
+</table>
+
+<& pager &>
+<& addnew &>
+<& search_form &>
+</div>
+

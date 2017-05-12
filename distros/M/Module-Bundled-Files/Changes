@@ -1,0 +1,37 @@
+Fri Sep  2 23:56:34 BST 2005  Paul Campbell <kemitix@gmail.com>
+  * Minor house keeping
+
+Fri Sep  2 22:03:41 BST 2005  Paul Campbell <kemitix@gmail.com>
+  tagged 0.02
+
+Fri Sep  2 21:58:01 BST 2005  Paul Campbell <kemitix@gmail.com>
+  * Fix Bug: RT#14424 - %INC uses '/', even on Windows
+  The %INC uses '/' as a directory delimiter on Windows, even though
+  the OS delimiter is '\'.  Thanks to Martin Thurn for the bug report.
+
+Wed Aug 31 13:01:35 BST 2005  Paul Campbell <kemitix@gmail.com>
+  tagged 0.01
+
+Wed Aug 31 13:00:14 BST 2005  Paul Campbell <kemitix@gmail.com>
+  * Update Changes and README
+
+Sat Aug 27 23:38:31 BST 2005  Paul Campbell <kemitix@gmail.com>
+  * Search for files in inherited Modules
+  If a file is not provided by the derived Module
+  that asks for it, then any ancestor Modules will
+  be examined to see if they provide the file.
+  This allows sub-classing and overridding of
+  supplied files.
+
+Sat Aug 27 18:45:30 BST 2005  Paul Campbell <kemitix@gmail.com>
+  * Revert Exporter syntax to pre-perl-5.8.3 compatible
+  Thanks to Slaven Rezic for bug report. (http://groups.google.com/group/comp.lang.perl.modules/msg/2d79a98cf605718c?hl=en&)
+
+Fri Aug 26 23:42:54 BST 2005  Paul Campbell <kemitix@gmail.com>
+  * POD Synopsis updated to correct module and function names
+
+Fri Aug 26 23:21:46 BST 2005  Paul Campbell <kemitix@gmail.com>
+  * Imported module-bundled-files
+  into Darcs repository
+  
+  

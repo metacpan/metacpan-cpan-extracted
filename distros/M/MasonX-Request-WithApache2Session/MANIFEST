@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+diff/WithApacheSession.diff
+diff/WithMultiSession.diff
+lib/MasonX/Request/WithApache2Session.pm
+lib/MasonX/Request/WithMulti2Session.pm
+t/MasonX-Request-WithApache2Session.t
+META.yml                                 Module meta-data (added by MakeMaker)

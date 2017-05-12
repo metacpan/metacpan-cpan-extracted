@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 fe29b634269f67d20589415ee363ce265340231e Changes
+SHA1 4749ad02d72b2d0a5ba974b2cef88186b6b5dfb0 MANIFEST
+SHA1 001b4b998af76bc2d956d1f44fcafb3c17bd4ba5 MANIFEST.SKIP
+SHA1 f265e7ac147d2621aa9784d74ed40338b313c2e6 META.yml
+SHA1 c0406e2690c12861f0c60e5309f7f9be3a35792e Makefile.PL
+SHA1 9e512d2b8b2e87983153664ede5ad9998d741a4c README
+SHA1 ad18442c2a918cd194d1f57b03d83be76f974f25 examples/mb.pl
+SHA1 e5fb92ac217988bfc7a6af739b0459627020a27e inc/Module/AutoInstall.pm
+SHA1 fd5f3c4f0418efee3b9b16cf8c3902e8374909df inc/Module/Install.pm
+SHA1 5c529e96420d964b192f011b121283a4916f7331 inc/Module/Install/AutoInstall.pm
+SHA1 7cd7c349afdf3f012e475507b1017bdfa796bfbd inc/Module/Install/Base.pm
+SHA1 ba186541bbf6439111f01fc70769cf24d22869bf inc/Module/Install/Can.pm
+SHA1 aaa50eca0d7751db7a4d953fac9bc72c6294e238 inc/Module/Install/Fetch.pm
+SHA1 219da5a95c290312a81477b226f005997d97dcfd inc/Module/Install/Include.pm
+SHA1 3e83972921d54198d1246f7278f08664006cd65d inc/Module/Install/Makefile.pm
+SHA1 12bf1867955480d47d5171a9e9c6a96fabe0b58f inc/Module/Install/Metadata.pm
+SHA1 f7ee667e878bd2faf22ee9358a7b5a2cc8e91ba4 inc/Module/Install/Win32.pm
+SHA1 8ed29d6cf217e0977469575d788599cbfb53a5ca inc/Module/Install/WriteAll.pm
+SHA1 64f05f705fc4b161960b0de4117d3427e12e9b0f lib/Mediawiki/Blame.pm
+SHA1 7b696d8c06e4361f1f32e7b710b613350cd4e17a lib/Mediawiki/Blame/Line.pm
+SHA1 1a10ade7941d33bae52c50859e2e1534747f2f7b lib/Mediawiki/Blame/Revision.pm
+SHA1 c62ad397e3ca52154b689193f2da9c98e86f88b8 t/00.load.t
+SHA1 d88cf0be6ea01061783cbca7de0eac94acce1752 t/perlcritic.t
+SHA1 8f41ce34ad89e183cc7e31d1e1b7e69bb4679d00 t/pod-coverage.t
+SHA1 7fe41e93962e06623109660b585da4e471c4a67e t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.12 (GNU/Linux)
+
+iEYEARECAAYFAksT1BoACgkQFtlTdOX00HoprACeK5TIGbd0EP4zYmpI1sRj9Qsp
+X4AAoIuHuH7oXhCV62lZ/I6vGZ8cWAM3
+=QLuC
+-----END PGP SIGNATURE-----

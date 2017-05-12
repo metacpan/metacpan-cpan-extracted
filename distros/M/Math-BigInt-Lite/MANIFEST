@@ -1,0 +1,24 @@
+BUGS
+CHANGES
+lib/Math/BigInt/Lite.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+NEW
+README
+t/alias.inc
+t/bigintpm.inc
+t/bigintpm.t
+t/from_bin-mbl.t
+t/from_hex-mbl.t
+t/from_oct-mbl.t
+t/lite.t
+t/mbi_ali.t
+t/pod.t
+t/pod_cov.t
+t/with.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -1,0 +1,22 @@
+Revision history for Math-TotalBuilder
+
+1.102     2013-10-02 08:47:30 America/New_York
+        - update bugtracker, repo data
+        - not actually any more useful
+
+1.101 2006-11-06
+        - improve packages, etc; perl-critic added
+        - fix hash/hashref mismatch in ::Common
+
+1.10  2004-08-23 10:50
+        - updated documentation
+        - 100% coverage
+        - added readme
+        - handle bad args to build
+
+1.005 2004-06-09 22:33:39
+        - added Math::TotalBuilder::Common
+        - accept alternate coderefs to build totals
+
+0.02  2004-02-28 11:51:39
+        - added better handling of imperfect totals

@@ -1,0 +1,66 @@
+---
+doctype: dist
+
+header:
+  name: Map-Metro
+
+add_prereqs_as_authordeps: 1
+
+prereqs:
+  runtime:
+    requires:
+     - perl: 5.010000
+     - Eponymous::Hash
+     - File::ShareDir
+     - Graph: 0.9704
+     - IO::Interactive
+     - List::Util
+     - List::Compare
+     - Module::Pluggable
+     - Moose
+     - MooseX::App: 1.29
+     - MooseX::AttributeShortcuts
+     - MooseX::AttributeDocumented
+     - namespace::autoclean
+     - Path::Tiny
+     - PerlX::Maybe
+     - Safe::Isa
+     - String::Trim
+     - Term::Size::Any
+     - Text::Undiacritic
+     - Throwable::SugarFactory
+     - Try::Tiny
+     - Types::Path::Tiny
+     - Types::Standard
+     - XML::Writer
+
+plugins:
+  - +config: Author::CSSON
+
+  - +remove_plugin: Test::Version
+
+  - +plugin: Test::CleanNamespaces
+    skip:
+     - ^Map::Metro$
+     - ^Map::Metro::Cmd$
+     - ^Map::Metro::Emitter$
+     - ^Map::Metro::Exceptions$
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+    splint: 1
+
+  - +extend_plugin: Splint
+    type_libraries: Map::Metro::Types=Station Types::Standard=Int,Str
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+config: Author::CSSON
+always:
+ - /Map-Metro-*

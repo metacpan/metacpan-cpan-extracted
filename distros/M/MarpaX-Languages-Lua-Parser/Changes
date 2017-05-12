@@ -1,0 +1,21 @@
+Revision history for Perl extension MarpaX::Languages::Lua::Parser.
+
+1.04  Sun Aug  2 11:33:00 2015
+	- Incorporate grammar changes discussed here:
+		https://github.com/ronsavage/MarpaX-Languages-Lua-Parser/issues/2 and
+		https://github.com/ronsavage/MarpaX-Languages-Lua-Parser/issues/3.
+	- Add lua.sources/constructs.lua from MarpaX::Languages::Lua::AST.
+	- Add lua.output/constructs.txt. It's output from MarpaX::Languages::Lua::Parser.
+	- Reformat grammar slightly, by replacing 4 leading spaces with a "\t".
+
+1.03  Sun Jul 12 17:07:00 2015
+	- Update pre-reqs to Data::RenderAsTree V 1.03.
+
+1.02  Sun Jul 12 14:52:00 2015
+	- Remove the line 'use open qw(:std :utf8);'. See RT#105798 (for Tree::DAG_Node actually).
+
+1.01  Mon Jul  6 12:57:00 2015
+	- Bump pre-req for Data::RenderAsTree to V 1.02.
+
+1.00  Mon Jun 15 09:46:00 2015
+	  - Original version

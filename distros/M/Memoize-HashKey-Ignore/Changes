@@ -1,0 +1,8 @@
+Revision history for Memoize-HashKey-Ignore
+
+0.01    10/08/2014
+        First version
+
+0.02    09/09/2014
+        Makefile fixes and testcase name consistency, remove unwanted module uses
+

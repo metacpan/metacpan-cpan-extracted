@@ -1,0 +1,33 @@
+---
+abstract: 'Parser for MARC XML records'
+author:
+  - 'Johann Rolschewski <jorol@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.16, Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MARC-Parser-XML
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Carp: '0'
+  XML::LibXML::Reader: '0'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/jorol/MARC-Parser-XML/issues
+  homepage: https://github.com/jorol/MARC-Parser-XML
+  repository: https://github.com/jorol/MARC-Parser-XML.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.69'

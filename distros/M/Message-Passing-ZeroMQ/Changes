@@ -1,0 +1,46 @@
+0.010
+    - Update deps
+0.009
+    - Fix previous release (HWM handling)
+0.008
+    - Fix first message (probably) not sent with libzmq3
+    - Added zmq_major_version accessor
+    - Remove SWAP, since libzmq3 removes it. Removes chdir
+
+0.007
+    - Support (and default for writeres) to swapping content out onto disk
+
+0.006
+    - Port to Moo
+
+    - Allow the client to supply a socket builder to take control of the
+      socket construction themselves.
+
+    - Change SO_LINGER option to be an integer as per the ZMQ spec.
+
+    - Allow SUB sockets to subscribe to a subset of possible messages.
+
+0.005
+    - Improve documentation.
+
+    - Fix incorrect docs to do with linger option
+
+    - Add ability to override default high water marks on sockets.
+
+    - Increase default high water mark for the output
+
+0.004
+    - Changes to match up with Message::Passing 0.006
+
+0.003
+    - Documentation fixes.
+
+0.002_01
+    - Rename dist
+
+0.002
+    - Avoid bug in earlier ZeroMQ versions by dependening on newer ones.
+
+0.001
+    - Initial version
+

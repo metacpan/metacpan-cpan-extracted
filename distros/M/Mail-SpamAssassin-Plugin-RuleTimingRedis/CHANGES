@@ -1,0 +1,190 @@
+==================================================
+Changes from 2015-03-16 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.005 at 2016-03-15 15:18:43 +0000
+------------------------------------------
+
+  Change: 8602cd594cec6abdba6506d1b74431c2ef0ecfe0
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-03-15 16:12:27 +0000
+
+    Add support for counting test hits
+
+    This add a new option timing_redis_hits_enabled.
+
+    If enabled for each test that matched an counter will be incremented
+    in the redis database.
+
+    127.0.0.1:6379> keys *.hits
+
+    1) "sa-timing.MISSING_SUBJECT.hits"
+
+    2) "sa-timing.MISSING_MID.hits"
+
+    3) "sa-timing.NO_RELAYS.hits"
+
+    127.0.0.1:6379> GET "sa-timing.MISSING_SUBJECT.hits"
+
+    "3"
+
+    Default is: 0 (disabled) 
+
+------------------------------------------
+version 1.004 at 2015-11-25 08:58:00 +0000
+------------------------------------------
+
+  Change: 34a34930a9183fea87dfe87d28d13cc80243f443
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-11-25 09:58:00 +0000
+
+    Merge branch 'master' of
+    https://github.com/benningm/Mail-SpamAssassin-Plugin-RuleTimingRedis 
+
+  Change: bc5a3777b538561fd522a350f28690144586acaf
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-11-25 09:53:38 +0000
+
+    Fix inaccuracy because of missing timer resets
+
+    Reset counter after each check to prevent counting the overhead of
+    the redis updates. When a bulk update happend the elapsed time was
+    added to the time of the check.
+
+    Also reset counter for skipped rules. This caused that the time of
+    the skipped rules was added to the next rule. 
+
+  Change: 6959f35acf8b17be0a8f37666a499a9069e92358
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 15:52:26 +0000
+
+    try with system perl and dpkg spamassassin 
+
+  Change: 1f21117ef015b8404c42160282b27929d7e8ba57
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 14:51:55 +0000
+
+    apt-get update and sudo in travis 
+
+  Change: 983dc7844bfe201b1142aef9f6421ed1d6a419f9
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 10:10:03 +0000
+
+    install spamassassin before build in travis 
+
+  Change: 14e0b4ece93ff81d82c86e761dfb01109d0878e3
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 09:17:06 +0000
+
+    update build env 
+
+------------------------------------------
+version 1.003 at 2015-07-21 06:55:10 +0000
+------------------------------------------
+
+  Change: 968f03283aecdce47f92a2f5f02d650da58fe9ee
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-07-21 08:55:10 +0000
+
+    fix taintness of timing_redis_server option
+
+    - untaint value of timing_redis_server
+
+    - add "is_admin => 1" flag to all config parameters 
+
+  Change: 8f69a2080950c98bcb7eb242b2084867d2915b5a
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-07-16 20:45:41 +0000
+
+    replace README.md with a README.pod link to module 
+
+------------------------------------------
+version 1.002 at 2015-07-16 18:31:00 +0000
+------------------------------------------
+
+  Change: 2452fdcf8a5d5113f3b3efdd93bbd2d3d7c8c175
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-07-16 20:31:00 +0000
+
+    added new features and performance improvements
+
+    The following new features have been added:
+
+    - New option: timing_redis_password allows to specifiy a redis
+    password
+
+    - New option: timing_redis_exclude_re excludes rules from timing
+
+    statistics. By default set to '^__' which will exclude all sub-rules
+
+    - New option: timing_redis_database allows to select a non-default
+
+    database in redis. (redis SWITCH call)
+
+    - New option: timing_redis_bulk_update will queue timing updates
+
+    before sending them to redis and execute them in a bulk via a
+
+    single call to a server-side script. By default this option is set
+
+    to 50 entries. Set to 0 do disable. Requires redis >= 2.6.0 and a
+
+    Redis perl >= 1.954 module. 
+
+------------------------------------------
+version 1.001 at 2015-05-12 10:32:22 +0000
+------------------------------------------
+
+  Change: bec006cb738896f124e818095fbce29be385cf02
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-05-12 12:32:22 +0000
+
+    Merge branch 'master' of
+    https://github.com/benningm/Mail-SpamAssassin-Plugin-RuleTimingRedis 
+
+  Change: b2e7dfc66470f3cf13acfd1c6923531a965f7019
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-05-12 12:30:34 +0000
+
+    only close redis handle if it has been created 
+
+  Change: af9de0a766da648fc0ca0d014aaf92bd1e573d4e
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2015-05-10 22:01:35 +0000
+
+    Update README.md
+
+    fix parameters formating 
+
+------------------------------------------
+version 1.000 at 2015-05-10 19:56:50 +0000
+------------------------------------------
+
+  Change: 217ee028dbe9996bbb14a2803cd097ca2c50388a
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-05-10 21:56:50 +0000
+
+    add .gitignore 
+
+  Change: 17cfd9684f8cf7b41857b117150477b18bbad141
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-05-10 21:55:47 +0000
+
+    remove LICENSE because dzil will add it 
+
+  Change: f04876f8546d820ae34103df1b0952d66ae9d28c
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-05-10 21:53:33 +0000
+
+    intial checkin 
+
+  Change: 1d9d06cdc3459660f6d847092f098f8cb4d5fa06
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2015-05-10 21:52:28 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

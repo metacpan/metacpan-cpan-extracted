@@ -1,0 +1,22 @@
+---
+abstract: 'Petal::Tiny renderer plugin'
+author:
+  - 'Lars Balker <lars@balker.dk>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-PetalTinyRenderer
+requires:
+  Mojolicious: '5.05'
+  Petal::Tiny: '1.07'
+  Try::Tiny: '0'
+resources:
+  homepage: https://github.com/DK-Hostmaster/mojolicious-plugin-petaltinyrenderer
+  repository: https://github.com/DK-Hostmaster/mojolicious-plugin-petaltinyrenderer.git
+version: '0.05'

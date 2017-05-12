@@ -1,0 +1,11 @@
+0.03 2010-12-16
+    - fixed: Makefile incompatibility with non-Linux makes
+    - minor documentation fixes
+
+0.02 2010-12-14
+    - virtual rewrite with alogorithm and code from Anders Johnson:
+      - fixes an over-allocation bug
+      - adds round_adjacent
+
+0.01 2009-06-30
+    - Initial version

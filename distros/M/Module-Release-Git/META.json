@@ -1,0 +1,66 @@
+{
+   "abstract" : "Use Git with Module::Release",
+   "author" : [
+      "brian d foy <bdfoy@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [
+      "workflow",
+      "module",
+      "distribution",
+      "pause",
+      "automation",
+      "testing",
+      "git"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Module-Release-Git",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Module::Release" : "2.06",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/module-release-git/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/module-release-git",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/module-release-git.git",
+         "web" : "https://github.com/briandfoy/module-release-git"
+      }
+   },
+   "version" : "1.011"
+}

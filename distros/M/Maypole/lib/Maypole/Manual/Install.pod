@@ -1,0 +1,52 @@
+
+=head1 NAME
+
+Maypole::Manual::Install - installing Maypole
+
+=head1 Installing Maypole
+
+The first thing you're going to need to do to get Maypole running is to
+install it. Maypole needs an absolute shedload of Perl modules from CPAN
+to do its job. I am unrepentant about this. Maypole does a lot of work,
+so that you don't have to. This is called code re-use, and if we're
+serious about code re-use, then Maypole should be re-using as much code
+as possible in terms of Perl modules. In another sense, this gives the
+impression that Maypole doesn't actually do all that much itself,
+because all it's doing is gluing together already-existing code. Well,
+welcome to code re-use.
+
+The downside of code re-use is, of course, that you then have to install
+a shedload of Perl modules from CPAN. If you're using OpenBSD or
+FreeBSD, the wonderful ports system will be your friend. There's a
+Maypole port in C<p5-Maypole>. Just type C<make install>.
+
+Debian users, hang in there. There's a package coming.
+
+For other Unices, the L<CPANPLUS> or C<CPAN> modules will help with
+this. If you don't have C<CPANPLUS> installed, my recommendation is to
+use C<perl -MCPAN -e install CPANPLUS> to install it and then throw
+C<CPAN.pm> away. In any case, one of these two should get all that
+Maypole needs:
+
+    % perl -MCPANPLUS -e 'install Maypole'
+    % perl -MCPAN -e 'install Maypole'
+
+    
+Information on installing under Windows is available from the wiki - 
+http://maypole.perl.org/?WindowsInstall
+
+More information of installing under various Linux flavours is available on the
+Wiki - http://maypole.perl.org/?LinuxInstall
+
+You're also going to need a database server and a web server. For
+databases, I recommend SQLite (if you install the C<DBD::SQLite> module,
+you get the SQLite library for free) for prototyping and mysql for
+production; heavier duty users should use Postgresql or Oracle - Maypole
+should be happy with them all. Maypole is happiest when running under
+Apache C<mod_perl>, with the C<Apache::Request> module installed, but as
+I said, it is a blank slate, and everything is customizable. There is a
+C<CGI::Maypole> frontend available to run as a standalone CGI script.
+
+As well as the documentation embedded in the Perl modules the distribution
+also includes the manual, of which this is a part. You can access it using the
+perldoc command, the man command, or by browsing CPAN.

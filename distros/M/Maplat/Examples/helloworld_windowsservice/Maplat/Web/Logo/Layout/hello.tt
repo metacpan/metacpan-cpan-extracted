@@ -1,0 +1,17 @@
+<tr>
+    <td bgcolor="#9fc5ff" align="left" valign="middle" width="*" height="60">
+        &nbsp;
+    </td>
+    <td align="center" valign="middle" width="*" bgcolor="#9fc5ff">
+        <img src="/logo/pics/ProdITLogo.bmp" border="0">
+    </td>
+    <td align="center" valign="middle" width="80" background="/logo/pics/Farbverlauf2.bmp">
+        &nbsp;
+    </td>
+    <td align="right" valign="middle" width="*" bgcolor="#ededc3">
+        <img src="/logo/pics/HelloWorld.bmp" border="0">
+    </td>
+    <td align="right" valign="middle" width="*" bgcolor="#ededc3">
+        <img src="/pics/hackman.gif" border="0">
+    </td>
+</tr>

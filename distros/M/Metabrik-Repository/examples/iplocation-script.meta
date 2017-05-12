@@ -1,0 +1,11 @@
+use lookup::iplocation
+if ($ERR) { exit }
+
+run lookup::iplocation update
+if ($ERR) { exit }
+
+run lookup::iplocation from_ip 106.219.10.202
+if ($ERR) { exit }
+
+use Data::Dumper
+print Dumper($RUN)

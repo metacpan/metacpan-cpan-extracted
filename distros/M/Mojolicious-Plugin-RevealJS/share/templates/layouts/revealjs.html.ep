@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+    <title><%= title %></title>
+
+    <meta name="description" content="<%= stash('description') || 'defies description' %>">
+    <meta name="author" content="<%= stash('author') || 'somebody pretty cool' %>">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="/revealjs/css/reveal.css">
+    <%
+      my $theme = stash('theme') || 'black';
+      $theme = "/revealjs/css/theme/$theme.css" unless $theme =~ /\.css$/;
+    %>
+    %= stylesheet $theme, id => 'theme'
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="/revealjs/lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? '/revealjs/css/print/pdf.css' : '/revealjs/css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="/revealjs/lib/js/html5shiv.js"></script>
+		<![endif]-->
+
+    %= include 'revealjs_head'
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+        <%= content %>
+			</div>
+
+		</div>
+
+		<script src="/revealjs/lib/js/head.min.js"></script>
+		<script src="/revealjs/js/reveal.js"></script>
+
+		<script>
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+      <%
+        require Mojo::JSON;
+        my %opts = (
+          %{ stash('revealjs.init') || {} },
+          %{ stash('init')          || {} },
+        );
+      %>
+      var init = <%== Mojo::JSON::to_json(\%opts) %>;
+			// Optional reveal.js plugins
+      init.dependencies = [
+        { src: '/revealjs/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+        { src: '/revealjs/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+        { src: '/revealjs/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+        { src: '/revealjs/plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+        { src: '/revealjs/plugin/zoom-js/zoom.js', async: true },
+        { src: '/revealjs/plugin/notes/notes.js', async: true }
+      ];
+
+      %= include 'revealjs_preinit', format => 'js'
+			Reveal.initialize(init);
+
+		</script>
+
+    %= include 'revealjs_body'
+	</body>
+</html>

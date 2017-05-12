@@ -1,0 +1,44 @@
+NAME
+    MojoX::AIO - Asynchronous File I/O for Mojolicious
+
+SYNOPSIS
+      use Mojo::IOLoop;
+      use MojoX::AIO;
+      use Fcntl qw( O_RDONLY );
+
+      # use normal IO::AIO methods
+      aio_open( '/etc/passwd', O_RDONLY, 0, sub {
+          my $fh = shift;
+          my $buffer = '';
+          aio_read( $fh, 0, 1024, $buffer, 0, sub {
+              my $bytes = shift;
+              warn "read bytes: $bytes data: $buffer\n";
+              Mojo::IOLoop->singleton->stop;
+          });
+      });
+
+      Mojo::IOLoop->singleton->start;
+
+DESCRIPTION
+     This component adds support for L<IO::AIO> use with L<Mojolicious>
+
+NOTES
+    This module automaticly bootstraps itself on use. To disable this, use:
+
+      use MojoX::AIO { no_auto_bootstrap => 1 };
+
+SEE ALSO
+    IO::AIO, Mojolicious (<http://mojolicio.us/>)
+
+AUTHOR
+    David Davis <xantus@cpan.org>, <http://xantus.org/>
+
+CONTRIBUTORS
+    Olivier Duclos
+
+LICENSE
+    Artistic License
+
+COPYRIGHT
+    Copyright (c) 2010-2012 David Davis, All rights reserved
+

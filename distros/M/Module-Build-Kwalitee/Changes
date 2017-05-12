@@ -1,0 +1,64 @@
+0.24
+  * fix M::B::K::Stub to hide the stubbed version from CPAN indexer
+
+0.22
+  * Make ourselves installable.
+    Thanks to Jos Boumans for pointing out the problem.
+  * Use M::B::K to install M::B::K.
+
+0.21
+  * Actually ship the Makefile.PL. I suck.
+
+0.20
+  * Revert change to not generate Makefile.PL - the version
+    of CPAN.pm released with Perl 5.8 fails to install us :(
+
+0.19
+  * Don't generate a Makefile.PL - we're only useable with 
+    Module::Build
+  * speed up the compile test of modules by forking more 
+    than one process at a time
+  * make compile test of scripts be more quiet
+  * compile testing of scripts now works correctly if there is no
+    'blib' or 'lib' directory
+  * do pod coverage tests in repeatable order
+  * do pod syntax tests even if we can't do pod coverage tests
+    and vice versa
+
+0.18
+  * make use of Module::Build magic to install .t files
+  * also test-compile perl scripts in bin/
+  * always report 'naked' subroutines
+  * skip 'total_coverage' test if there are no modules with pod
+
+0.17
+  * removed traces of utility module that turned out to be 
+    the wrong solution
+
+0.16
+  * merged 'use strict' and 'use warnings' tests
+  * make own test apply to ourselves better
+
+0.15
+  * symlink shipped tests to t/ so they are run for us too
+  * use 'traditional' style of generating Makefile.PL
+
+0.14
+  * Improve description a bit
+
+0.13
+  * The stub M::B::K that ships with distributions now merely
+    recommend some modules; if they are missing, some tests are
+    skipped.  they do not exist. For module authors, however,
+    these modules are all mandatory (so all tests will run).
+
+  * for .pod files, do syntax checking but skip coverage checks
+
+0.12 
+  * Added Changes file
+
+0.11
+  * Minor pod fixes
+
+0.10
+  * Initial release to CPAN

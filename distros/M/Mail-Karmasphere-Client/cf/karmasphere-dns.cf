@@ -1,0 +1,50 @@
+# ==============================================================================
+# Karmasphere DNS-Based Rules for SpamAssassin
+# http://www.karmasphere.com/devzone/client/spamassassin/#dns
+# 
+#  Karmasphere IP Whitelist
+# 
+#    karmasphere.email-sender-ip aggregates several IP
+#    blacklists and whitelists.  the RBL API exposed at
+#    *.karmasphere.email-sender-ip.dnswl.karmasphere.com is
+#    meant to be used as a DNSWL.
+#    
+#  Karmasphere Domain Whitelist
+# 
+#    karmasphere.manywl aggregregates several domain whitelists.
+#    the RHSWL API exposed at *.karmasphere.manywl.karmasphere.com
+#    is meant to be used as a RHSWL.
+#   
+#  Making a Contribution
+#   
+#    If you think you can improve on the feedsets above, you are
+#    welcome to build your own.  After registering an account,
+#    you can click on "clone" to produce a feedset you can tweak.
+#
+#    Then change the *.dnswl.karmasphere.com configuration below.
+# 
+# ==========================================================
+
+header   __KS_DNSWL_DNS    eval:check_rbl_envfrom('karmasphere.email-sender-ip','karmasphere.email-sender-ip.dnswl.karmasphere.com.')
+describe __KS_DNSWL_DNS    SRC IP whitelisted in Karmasphere Email Sender IP Feedset
+tflags   __KS_DNSWL_DNS    net nice
+
+ifplugin Mail::SpamAssassin::Plugin::SPF
+
+# 
+# karmasphere domain-based whitelist
+header   __KS_RHSWL_DNS    eval:check_rbl_envfrom('karmasphere.manywl','karmasphere.manywl.dnswl.karmasphere.com.')
+describe __KS_RHSWL_DNS    Envelope sender in Karmasphere Domain Whitelist Feedset
+tflags   __KS_RHSWL_DNS    net nice
+
+meta     __KS_AUTH_SPF   (SPF_PASS && __KS_RHSWL_DNS)
+describe __KS_AUTH_SPF   Envelope sender is both authenticated and reputable
+tflags   __KS_AUTH_SPF   userconf nice noautolearn
+score    __KS_AUTH_SPF   -0.01
+
+endif
+
+# support for DKIM and DomainKeys coming soon.
+
+meta     KS_WHITELIST       (__KS_AUTH_SPF || __KS_DNSWL_DNS)
+score    KS_WHITELIST       -123

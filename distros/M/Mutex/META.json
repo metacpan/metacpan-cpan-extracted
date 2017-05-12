@@ -1,0 +1,80 @@
+{
+   "abstract" : "Various locking implementations supporting processes and threads",
+   "author" : [
+      "Mario E. Roy <marioeroy AT gmail DOT com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.55_02, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mutex",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0.88",
+            "perl" : "5.008"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Fcntl" : "0",
+            "Socket" : "0",
+            "base" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mutex" : {
+         "file" : "lib/Mutex.pm",
+         "version" : "1.004"
+      },
+      "Mutex::Channel" : {
+         "file" : "lib/Mutex/Channel.pm",
+         "version" : "1.004"
+      },
+      "Mutex::Flock" : {
+         "file" : "lib/Mutex/Flock.pm",
+         "version" : "1.004"
+      },
+      "Mutex::Util" : {
+         "file" : "lib/Mutex/Util.pm",
+         "version" : "1.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/marioroy/mutex-perl/issues"
+      },
+      "homepage" : "https://github.com/marioroy/mutex-perl",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/marioroy/mutex-perl.git"
+      }
+   },
+   "version" : "1.004"
+}

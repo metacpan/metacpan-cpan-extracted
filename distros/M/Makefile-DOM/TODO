@@ -1,0 +1,4 @@
+* add tests to t/mdom/gmake/*.t
+* add POD to lib/*.pm
+* MDOM::Document::Gmake - rename $context to $inner_context and $saved_context to $outer_context
+

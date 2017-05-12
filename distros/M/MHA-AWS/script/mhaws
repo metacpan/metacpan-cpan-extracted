@@ -1,0 +1,91 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use String::CamelCase qw/ camelize /;
+use MHA::AWS;
+use Pod::Usage;
+use JSON;
+
+my (
+    $host, $vip, $port,
+    $orig_master_host, $orig_master_ip, $orig_master_port,
+    $new_master_host, $new_master_ip, $new_master_port, $new_master_password,
+    $command, $ssh_user, $interface_id,
+    $route_table_id,
+);
+GetOptions(
+    "host=s"                => \$host,
+    "port=s"                => \$port,
+    "vip=s"                 => \$vip,
+    "interface_id=s"        => \$interface_id,
+    "route_table_id=s"      => \$route_table_id,
+    "orig_master_host=s"    => \$orig_master_host,
+    "orig_master_ip=s"      => \$orig_master_ip,
+    "orig_master_port=s"    => \$orig_master_port,
+    "new_master_host=s"     => \$new_master_host,
+    "new_master_ip=s"       => \$new_master_ip,
+    "new_master_port=s"     => \$new_master_port,
+    "new_master_password=s" => \$new_master_password,
+    "ssh_user=s"            => \$ssh_user,
+    "command=s"             => \$command,
+);
+my $sub_command = $ARGV[0] or pod2usage();
+my $class = sprintf("MHA::AWS::%s", camelize($sub_command));
+eval "use $class;";
+if ($@) {
+    die "Can't load $class: $@";
+}
+my $failover_method;
+if (defined $interface_id) {
+    $failover_method = "eni";
+}
+elsif (defined $route_table_id) {
+    if (!defined $vip) {
+        die "--vip is required.";
+    }
+    $failover_method = "route_table";
+}
+else {
+    die "--interface_id or --route_table_id is required.";
+}
+
+my $app = $class->new(
+    host             => $host,
+    orig_master_host => $orig_master_host,
+    new_master_host  => $new_master_host,
+    interface_id     => $interface_id,
+    ssh_user         => $ssh_user,
+    vip              => $vip,
+    failover_method  => $failover_method,
+    route_table_id   => $route_table_id,
+);
+$app->init;
+print JSON->new->pretty->encode($app->info);
+$app->dispatch($command);
+
+exit 0;
+
+__END__
+
+=pod
+
+=head1 USAGE
+
+    $ mhaws [subcommand] --interface_id=ENI-id [... args passed by MHA]
+
+    required arguments:
+      1. failover method is ENI attach/detach
+        --interface_id=[ENI-id for master VIP]
+      
+      2. failover method is RouteTable change destination
+        --route_table_id=[RouteTable-id]
+        --vip=[master VIP]
+
+    subcommand:
+      master_ip_failover
+      master_ip_online_change
+      shutdown
+
+=cut

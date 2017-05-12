@@ -1,0 +1,52 @@
+This module wraps all of the 'mpf' (floating point) functions that
+the Gnu MP (GMP) library provides. It requires gmp-4.2.0 or later.
+
+You therefore need the GMP library installed on your computer. See:
+http://gmplib.org/
+
+To build this module you need perl 5.6.0 or later. I'm not sure of all
+the requirements to get it to build with earlier versions of perl, but
+it's definite that the XS code relating to operator overloading will
+not compile with perl versions prior to 5.6.
+
+No OO interface - just plain access to GMP's floating point functions.
+
+Build in the usual way:
+
+ perl Makefile.PL
+ make
+ make test
+ make install
+
+When building this module, the GMP library will need to be accessible.
+If it's in a location where your compiler does not find it by default,
+then instead of running 'perl Makefile.PL', you'll need to run:
+
+perl Makefile.PL INC="-I/path/to/gmp_include" LIBS="-L/path/to/gmp_lib -lgmp"
+
+===================================================
+64-bit integer, long double, and __float128 support
+===================================================
+
+If your perl's Config reports that 'ivsize' >= 8 && 'ivtype' is not
+'long' then Math::GMPf will, by default, be built to enable
+you to assign. pass, and retieve 64-bit long long int values.
+
+Similarly, if your perl's Config reports that 'nvtype' is long double,
+then Math::GMPf will, by default, be built to enable you to assign,
+pass, and retrieve long double values.
+Or, ifperl's Config reports that 'nvtype' is __float128, then
+Math::GMPf will, by default, be built to enable you to assign, pass
+and retrieve __float128 values.
+
+I am contactable by email at sisyphus at(@) cpan dot (.) org.
+
+==========
+MAC OS X
+==========
+
+If you have MacPorts installed, you may need to install gmp +universal
+for the bindings to work. After installing you'll need to run:
+
+perl Makefile.PL INC="-I/opt/local/include" LIBS="-L/opt/local/lib -lgmp"
+

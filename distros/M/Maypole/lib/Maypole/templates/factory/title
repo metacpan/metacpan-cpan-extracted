@@ -1,0 +1,1 @@
+    <a href="[% base %]/frontpage">[% config.application_name %]</a>

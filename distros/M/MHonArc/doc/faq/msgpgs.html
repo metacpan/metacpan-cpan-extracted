@@ -1,0 +1,305 @@
+<HTML>
+<HEAD>
+<TITLE>MHonArc FAQ: Message Pages</TITLE></HEAD>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+<BODY>
+
+<!--X-NavButtons-Start-->
+<table width="100%"><tr><td align="left"><nobr>[<a href="indexpgs.html">Prev</a>]</nobr></td><td align="center" width="100%">[<a href="faq.html">TOC</a>][<a href="../mhonarc.html">Manual</a>][<a href="http://www.mhonarc.org/">Home</a>]</td><td align="right"><nobr>[<a href="threads.html">Next</a>]</nobr></td></tr></table>
+</p>
+<!--X-NavButtons-End-->
+
+<!-- ===================================================================== -->
+<hr>
+<H2><a name="messagepages">Message Pages</a></H2>
+
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#msgorder">Can I change the order the message resources are printed?</a></li>
+<li><a href="#msghead">How can I change how message headers gets formatted?</a></li>
+<li><a href="#msgbody">How can I change how message body data gets formatted?</a></li>
+<li><a href="#headnbody">Can I have the message header come after the body?</a></li>
+<li><a href="#chngmesgfmt">Can I make changes to message formatting on existing archived messages?</a></li>
+<li><a href="#msgcomms">What are those "&lt;!--X-... -->"?</a></li>
+<li><a href="#commslegal">Are those "&lt;!--X-... -->" legal comments?</a></li>
+<li><a href="#removingmsgfooters">Can I have footers removed from messages when archived?</a></li>
+</ul>
+<!--X-TOC-End-->
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="msgorder">Can I change the order the message resources are printed?</a></b></h3>
+</td></tr></table>
+
+<p>No.  However, with the exceptions of the message header and body
+(but see next questions), those resource can be defined
+anyway you like.  For example, I can change the <a href="../resources/toplinks.html">TOPLINKS</a> resource
+to look like the <a href="../resources/botlinks.html">BOTLINKS</a> resource.  Or, I can change the
+default meaning of the resource so it really outputs something
+else entirely.  If you look at the documentation, the resources
+are just defined by HTML markup and resource variables.  Many
+of the resource variables can be used within any resource.
+</p>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="msghead">How can I change how message headers gets formatted?</a></b></h3>
+</td></tr></table>
+
+<p>There are several resources for controlling how message headers
+are converted into HTML.  You can exclude fields and style fields
+with your own HTML markup.  For example, here are resources that
+cause message headers to be formatted with a table:
+</p>
+<pre class="code">
+<b>&lt;<a href="../resources/fieldsbeg.html">FIELDSBEG</a>&gt;</b>
+&lt;table&gt;
+<b>&lt;/FIELDSBEG&gt;</b>
+<b>&lt;<a href="../resources/labelbeg.html">LABELBEG</a>></b>
+&lt;tr&gt;
+&lt;td align="right" valign="top"&gt;
+<b>&lt;/LABELBEG&gt;</b>
+<b>&lt;<a href="../resources/labelend.html">LABELEND</a>&gt;</b>
+&lt;/td&gt;
+<b>&lt;/LABELEND&gt;</b>
+<b>&lt;<a href="../resources/fldbeg.html">FLDBEG</a>&gt;</b>
+&lt;td align="left"&gt;
+<b>&lt;/FLDBEG&gt;</b>
+<b>&lt;<a href="../resources/fldend.html">FLDEND</a>&gt;</b>
+&lt;/td&gt;
+&lt;/tr&gt;
+<b>&lt;/FLDEND&gt;</b>
+<b>&lt;<a href="../resources/fieldsend.html">FIELDSEND</a>&gt;</b>
+&lt;/table&gt;
+<b>&lt;/FIELDSEND&gt;</b>
+</pre>
+
+<p>You can also control the order message fields are displayed:
+</p>
+<pre class="code">
+<b>&lt;<a href="../resources/fieldorder.html">FIELDORDER</a>&gt;</b>
+from
+subject
+date
+-extra-
+<b>&lt;/FIELDORDER&gt;</b>
+</pre>
+<p>The "-extra-" signifies all other message fields in alphabetic
+order.
+</p>
+
+<p>You can also exclude specific message fields:
+</p>
+<pre class="code">
+<b>&lt;<a href="../resources/excs.html">EXCS</a>&gt;</b>
+x-
+precendence
+<b>&lt;/EXCS&gt;</b>
+</pre>
+<p>Here, we are exluding all "X-..." fields and the Precendence
+field.
+</p>
+
+<p>Consult the MHonArc documentation for more information
+on how to use the resources shown here and other resources for
+controlling message header formatting.
+</p>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="msgbody">How can I change how message body data gets formatted?</a></b></h3>
+</td></tr></table>
+
+<p>Message body conversion are controlled by content-type filters.
+See the <a href="mime.html">MIME</a> section of this FAQ for
+more information.
+</p>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="headnbody">Can I have the message header come after the body?</a></b></h3>
+</td></tr></table>
+
+<p>In general, no.  A limitation of MHonArc is that you cannot change
+the relative order of the resources/message-data in the output (but see
+other questions in this section).  MHonArc expects
+a specific order so it can edit archived messages when needed w/o
+using a bunch of logic and performance degradation (special comment
+declarations are used to mark off the different sections of a message).
+Therefore, you cannot have the body come before the message header.
+The best you can do is suppress the header (via <a href="../resources/excs.html">EXCS</a>) and create a
+bogus header via the resource variables available.  For example:
+</p>
+<pre class="code">
+<b>&lt;<a href="../resources/excs.html">EXCS</a> override&gt;</b>
+.
+<b>&lt;/EXCS&gt;</b>
+<b>&lt;<a href="../resources/msgfoot.html">MSGFOOT</a>&gt;</b>
+&lt;ul&gt;
+&lt;li&gt;From: $FROM$
+&lt;li&gt;Subject: $SUBJECTNA$
+&lt;li&gt;Date: $DATE$
+&lt;ul&gt;
+<b>&lt;/MSGFOOT&gt;</b>
+</pre>
+
+<p>In v2.6, you can include additional header fields by using the
+<a href="../resources/fieldstore.html">FIELDSTORE</a> resource
+and the <tt>$MSGHFIELD$</tt> resource variable.  For example, say
+you want to include the <tt>To:</tt> field in the previous example.
+You can do the following:
+</p>
+<pre class="code">
+<b>&lt;<a href="../resources/excs.html">EXCS</a> override&gt;</b>
+.
+<b>&lt;/EXCS&gt;</b>
+<b>&lt;<a href="../resources/fieldstore.html">FIELDSTORE</a>&gt;</b>
+to
+<b>&lt;/FIELDSTORE&gt;</b>
+<b>&lt;<a href="../resources/msgfoot.html">MSGFOOT</a>&gt;</b>
+&lt;ul&gt;
+&lt;li&gt;To: $MSGHFIELD(CUR;to)$
+&lt;li&gt;From: $FROM$
+&lt;li&gt;Subject: $SUBJECTNA$
+&lt;li&gt;Date: $DATE$
+&lt;ul&gt;
+<b>&lt;/MSGFOOT&gt;</b>
+</pre>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="chngmesgfmt">Can I make changes to message formatting on existing archived messages?</a></b></h3>
+</td></tr></table>
+
+<p>Yes, mostly.  The only thing cannot be changed once converted
+is the message header and message body (but see
+<a href="#reconvert_note">note below</a>).  All other parts of the
+message page can be changed at any time.  To make any changes
+appear on existing archived messages, set the <a href="../resources/editidx.html">EDITIDX</a> resource.
+The <a href="../resources/editidx.html">EDITIDX</a> resource tells MHonArc to recreate all archive
+pages.
+</p>
+<table class="note" width="100%">
+<tr valign="baseline">
+<td><a name="reconvert_note"><strong>NOTE:</strong></a></td>
+<td width="100%"><p>v2.6 introduced the
+<a href="../resources/reconvert.html">RECONVERT</a> resource.  With
+RECONVERT, you can reconvert messages if the original raw messages
+are available.  See RECONVERT
+<a href="../resources/reconvert.html#examples">examples</a> for
+more information.
+</p>
+</td>
+</tr>
+</table>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="msgcomms">What are those "&lt;!--X-... -->"?</a></b></h3>
+</td></tr></table>
+
+<p>If you ever looked at the HTML source of converted messages,
+you will notice a bunch of comment declarations, "&lt;!--X-... -->".
+These comment declarations are used by MHonArc to
+properly edit messages when needed.  Therefore, <strong>DO NOT
+MESS WITH THEM</strong>.
+</p>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="commslegal">Are those "&lt;!--X-... -->" legal comments?</a></b></h3>
+</td></tr></table>
+
+<p>Yes.
+</p>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="removingmsgfooters">Can I have footers removed from messages when archived?</a></b></h3>
+</td></tr></table>
+
+<p>The following questions are in the same class as the following:
+</p>
+<p><b>Can I remove signatures in archived messages?</b><br>
+   <b>Can I remove list footers in archived messages?</b><br>
+   <b>Can I remove mail ads from archived messages?</b>
+</p>
+
+<p>Yes, but you will need to register a custom filter via the
+<a href="../resources/mimefilters.html">MIMEFILTERS</a> resource.
+</p>
+<p>The following custom filter will remove signatures from messages:
+</p>
+<pre class="code">
+package my_text_plain;
+
+sub filter {
+  my($fields, $data, $is_decoded, $filter_args) = @_;
+
+  # strip signature
+  $$data =~ s/\r\n/\n/g;
+  $$data =~ s/^-- \n[\s\S]*//m;
+
+  # call mhonarc's default filter to do everything else
+  require mhtxtplain.pl;
+  return m2h_text_plain::filter($fields, $data, $is_decoded, $filter_args);
+}
+</pre>
+<p>With this implementation, your customization will inherit any new
+capabilities (and bug fixes) of the default plain text filter without
+have to update your filter each time you upgrade mhonarc.
+</p>
+
+<p>Let's assume the filter above is contained in the file
+<tt>my_txtplain.pl</tt>.  To register the filter into MHonArc
+we use the <a href="../resources/mimefilters.html">MIMEFILTERS</a> resource:
+</p>
+<pre class="code">
+&lt;MIMEFilters&gt;
+application/x-patch;     my_text_plain::filter;       my_txtplain.pl
+message/delivery-status; my_text_plain::filter;       my_txtplain.pl
+message/partial;         my_text_plain::filter;       my_txtplain.pl
+text/*;                  my_text_plain::filter;       my_txtplain.pl
+text/plain;              my_text_plain::filter;       my_txtplain.pl
+x-sun-attachment;        my_text_plain::filter;       my_txtplain.pl
+&lt;/MIMEFilters&gt;
+</pre>
+
+<!-- ===================================================================== -->
+<hr>
+
+<!--X-NavButtons-Start-->
+<table width="100%"><tr><td align="left"><nobr>[<a href="indexpgs.html">Prev</a>]</nobr></td><td align="center" width="100%">[<a href="faq.html">TOC</a>][<a href="../mhonarc.html">Manual</a>][<a href="http://www.mhonarc.org/">Home</a>]</td><td align="right"><nobr>[<a href="threads.html">Next</a>]</nobr></td></tr></table>
+</p>
+<!--X-NavButtons-End-->
+
+<HR>
+<address>
+$Date: 2006/05/26 14:11:57 $ <br>
+<img align="top" src="monicon.png" alt="">
+<a href="http://www.mhonarc.org/"
+><strong>MHonArc</strong></a><br>
+Copyright &#169; 1997-2004, <a href="http://www.earlhood.com/"
+>Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org"
+>mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+</BODY>
+</HTML>

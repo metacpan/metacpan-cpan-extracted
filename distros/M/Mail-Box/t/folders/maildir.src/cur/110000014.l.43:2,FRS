@@ -1,0 +1,52 @@
+Received: from ns.ATComputing.nl (ns.ATComputing.nl [195.108.229.25])
+	by atcmpg.ATComputing.nl (8.9.0/8.9.0) with ESMTP id PAA15311
+	for <markov@ATComputing.nl>; Tue, 9 May 2000 15:11:14 +0200 (MET DST)
+Received: (from nobody@localhost)
+	by ns.ATComputing.nl (8.8.8/8.8.8) id PAA24539
+	for <markov@ATComputing.nl>; Tue, 9 May 2000 15:11:13 +0200
+Received: from mustang.oldcity.dca.net(216.158.38.3) by ns.ATComputing.nl via smap (V2.1)
+	id xma024537; Tue, 9 May 00 15:11:01 +0200
+Received: from unca-don.wizards.dupont.com ([204.183.81.133])
+	by mustang.oldcity.dca.net (8.9.3/8.9.3/DCANET) with ESMTP id JAA17934;
+	Tue, 9 May 2000 09:09:29 -0400
+Received: (from majordomo@localhost)
+	by unca-don.wizards.dupont.com (8.9.3/8.9.3) id IAA13522
+	for magick-outgoing; Tue, 9 May 2000 08:42:00 -0400 (EDT)
+X-Authentication-Warning: unca-don.wizards.dupont.com: majordomo set sender to owner-magick@wizards.dupont.com using -f
+Message-ID: <3917FC90.8B8B0CF@gmx.net>
+Date: Tue, 09 May 2000 13:54:56 +0200
+From: Pletschette Andre <andre.pletschette@gmx.net>
+X-Mailer: Mozilla 4.7 [en] (X11; I; Linux 2.2.13 i586)
+X-Accept-Language: fr, en, de
+MIME-Version: 1.0
+To: "magick@wizards.dupont.com" <magick@wizards.dupont.com>
+Subject: Undefined Symbol: SetWarningHandler
+Content-Transfer-Encoding: 7bit
+Sender: owner-magick@wizards.dupont.com
+Precedence: bulk
+Reply-To: Pletschette Andre <andre.pletschette@gmx.net>
+Content-Type: text/plain; charset=us-ascii
+Status: RO
+X-Status: A
+Content-Length: 747
+Lines: 19
+
+When I tried to write a perl script with the following line in it:
+  use Image::Magick;
+I get the following error-message:
+
+  perl: error in loading shared librairies:
+  /usr/lib/perl5/site_perl/5.005/i586-lin
+  ux/auto/Image/Magick/Magick.so: undefined symbol: SetWarningHandler
+
+Could anybody tell me what this means, and how I can get it run, I run 
+Suse Linux 6.3 and I've installed Image Magick with the C++ and the Perl
+Modules.
+
+***********************************************************************
+To remove yourself from this mailing list, send mail to:
+	majordomo@wizards.dupont.com
+
+Include the following command in the body of your message:
+	unsubscribe magick
+***********************************************************************

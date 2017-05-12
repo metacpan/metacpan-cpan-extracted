@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               Mail-ListDetector
+version:            1.04
+abstract:           Mailing list message detector
+author:
+    - Michael Stevens <michael@etla.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:             0
+    Email::Abstract:  3.001
+    Email::Valid:     0.182
+    Mail::Internet:   2.04
+    Test::More:       0.08
+    URI:              1.1
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

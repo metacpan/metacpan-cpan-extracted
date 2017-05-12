@@ -1,0 +1,51 @@
+{
+   "abstract" : "L<Perl::Version> type for Moose classes",
+   "author" : [
+      "Roman F. <romanf@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Types-PerlVersion",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MooseX::Types" : "0",
+            "MooseX::Types::Moose" : "0",
+            "Perl::Version" : "0",
+            "namespace::clean" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "Test::More" : "0",
+            "ok" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/moltar/MooseX-Types-PerlVersion.git",
+         "web" : "https://github.com/moltar/MooseX-Types-PerlVersion"
+      }
+   },
+   "version" : "0.002"
+}
+

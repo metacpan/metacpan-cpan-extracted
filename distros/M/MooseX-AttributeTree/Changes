@@ -1,0 +1,24 @@
+Revision history for MooseX::AttributeTree
+
+0.06   2015-06-27
+	- Give all modules the same version as the distribution
+
+0.05   2013-10-05
+	- Verify minimum Moose version at runtime
+	- Release tests are now located in xt/ so they don't run
+	  during normal testing
+
+0.04   2011-10-11
+	- Maintain internal class cache because Moose can't cache
+	  parameterized roles
+
+0.03   2010-11-14
+	- Generated accessor methods are faster
+	- parent_link is now a method name, not necessarily an attribute
+
+0.02   2010-06-19
+	- Added fetch_method & default attributes
+	- Now has tests
+
+0.01   2009-10-20
+	- Initial release

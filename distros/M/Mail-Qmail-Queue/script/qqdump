@@ -1,0 +1,74 @@
+#!/usr/bin/perl
+#
+# Copyright 2006 Scott Gifford
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+
+=head1 NAME
+
+qqdump - Receive a message with the qmail-queue protocol, and print its contents.
+
+=head1 SYNOPSIS
+
+env QMAILQUEUE=qqdump fixcrio /var/qmail/bin/qmail-smtpd
+
+=cut
+
+use warnings;
+use strict;
+
+use Mail::Qmail::Queue::Error qw(:errcodes :fail);
+use Mail::Qmail::Queue::Receive::Envelope;
+use Mail::Qmail::Queue::Receive::Body;
+
+=head1 DESCRIPTION
+
+This program simply receives a message using the qmail-queue protocol,
+then dumps its contents to STDERR (which will show up in your qmail
+logs if that's what you're testing).
+
+To use it, put it somewhere as a C<qmail-queue> replacement, possibly
+using Bruce Guenter's patch and the C<QMAILQUEUE> environment
+variable.
+
+For example, with that patch, you might run:
+
+  env QMAILQUEUE=qqdump fixcrio /var/qmail/bin/qmail-smtpd
+
+then conduct an SMTP conversation with the SMTP server, and see what
+C<qmail-queue> saw as a result.
+
+=cut
+
+!@ARGV
+    or usage();
+
+my $qq_body = Mail::Qmail::Queue::Receive::Body->new()
+    or tempfail QQ_EXIT_READERR, "Couldn't get message body: $!\n";
+my $fh = $qq_body->body_fh()
+    or tempfail QQ_EXIT_READERR, "Couldn't get message body filehandle: $!\n";
+while (<$fh>)
+{
+    warn "QQDUMP_BOD: ".$_;
+}
+$qq_body->close()
+    or tempfail QQ_EXIT_READERR, "Couldn't close message body filehandle: $!\n";
+
+my $qq_env = Mail::Qmail::Queue::Receive::Envelope->new()
+    or tempfail "Couldn't create qmail-queue reader: $!\n";
+warn "QQDUMP_ENV: From '",$qq_env->from,"'\n";
+while(my $to = $qq_env->to)
+{
+  warn "QQDUMP_ENV: To '$to'\n";
+}
+
+exit(0);
+
+
+sub usage
+{
+  system("awk  '/^#!/,/^=cut/ {print}' $0 |pod2text");
+  print "-- Type pod2text $0 for full documentation\n";
+  exit(1);
+}

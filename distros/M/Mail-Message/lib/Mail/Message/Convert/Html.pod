@@ -1,0 +1,263 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Message::Convert::Html - Format messages in HTML
+
+=head1 INHERITANCE
+
+ Mail::Message::Convert::Html
+   is a Mail::Message::Convert
+   is a Mail::Reporter
+
+=head1 SYNOPSIS
+
+ use Mail::Message::Convert::Html;
+ my $Html = Mail::Message::Convert::Html->new;
+
+ print $html->fieldToHtml($head);
+ print $html->headToHtmlHead($head);
+ print $html->headToHtmlTable($head);
+ print $html->textToHtml($text);
+
+=head1 DESCRIPTION
+
+The package contains various translators which handle HTML or XHTML
+without the help of external modules.  There are more HTML related modules,
+which do require extra packages to be installed.
+
+Extends L<"DESCRIPTION" in Mail::Message::Convert|Mail::Message::Convert/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Message::Convert|Mail::Message::Convert/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Mail::Message::Convert|Mail::Message::Convert/"Constructors">.
+ 
+=over 4
+
+=item Mail::Message::Convert::Html-E<gt>B<new>(%options)
+
+ -Option     --Defined in            --Default
+  fields       Mail::Message::Convert  <see description>
+  head_mailto                          <true>
+  log          Mail::Reporter          'WARNINGS'
+  produce                              HTML
+  trace        Mail::Reporter          'WARNINGS'
+
+=over 2
+
+=item fields => NAMES|ARRAY-OF-NAMES|REGEXS
+
+=item head_mailto => BOOLEAN
+
+Whether to replace e-mail addresses in some header lines with links.
+
+=item log => LEVEL
+
+=item produce => 'HTML'|'XHTML'
+
+Produce HTML or XHTML output.  The output is slightly different, even
+html browsers will usually accept the XHTML data.
+
+=item trace => LEVEL
+
+=back
+
+=back
+
+=head2 Converting
+
+Extends L<"Converting" in Mail::Message::Convert|Mail::Message::Convert/"Converting">.
+ 
+=over 4
+
+=item $obj-E<gt>B<fieldContentsToHtml>( $field, [$subject] )
+
+Format one field from the header to HTML.  When the header line usually
+contains e-mail addresses, the line is scanned and valid addresses
+are linked with an C<mailto:> anchor.  The $subject can be specified to
+be included in that link.
+
+=item $obj-E<gt>B<fieldToHtml>( $field, [$subject] )
+
+Reformat one header line field to HTML.  The $field's name
+is printed in bold, followed by the formatted field content,
+which is produced by L<fieldContentsToHtml()|Mail::Message::Convert::Html/"Converting">.
+
+=item $obj-E<gt>B<headToHtmlHead>($head, $meta)
+
+Translate the selected header lines (fields) to an html page header.  Each
+selected field will get its own meta line with the same name as the line.
+Furthermore, the C<Subject> field will become the C<title>,
+and C<From> is used for the C<Author>.
+
+Besides, you can specify your own meta fields, which will overrule header
+fields.  Empty fields will not be included.  When a C<title> is specified,
+this will become the html title, otherwise the C<Subject> field is
+taken.  In list context, the lines are separately, where in scalar context
+the whole text is returned as one.
+
+If you need to add lines to the head (for instance, http-equiv lines), then
+splice them before the last element in the returned list.
+
+example: 
+
+ my @head = $html->headToHtmlHead
+     ( $head
+     , description => 'This is a message'
+     , generator   => 'Mail::Box'
+     );
+ splice @head, -1, 0, '<meta http-equiv=...>';
+ print @head;
+
+=item $obj-E<gt>B<headToHtmlTable>( $head, [$table_params] )
+
+Produce a display of the L<selectedFields()|Mail::Message::Convert/"Converting"> of the header in a
+table shape.  The optional $table_params are added as parameters to the
+produced TABLE tag.  In list context, the separate lines are returned.
+In scalar context, everything is returned as one.
+
+example: 
+
+ print $html->headToHtmlTable($head, 'width="50%"');
+
+=item $obj-E<gt>B<selectedFields>($head)
+
+Inherited, see L<Mail::Message::Convert/"Converting">
+
+=item $obj-E<gt>B<textToHtml>($lines)
+
+Translate one or more $lines from text into HTML.  Each line is taken one
+after the other, and only simple things are translated.  C<textToHtml>
+is able to convert large plain texts in a descent fashion.  In scalar
+context, the resulting lines are returned as one.
+
+=back
+
+=head2 Error handling
+
+Extends L<"Error handling" in Mail::Message::Convert|Mail::Message::Convert/"Error handling">.
+ 
+=over 4
+
+=item $obj-E<gt>B<AUTOLOAD>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<addReport>($object)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+=item Mail::Message::Convert::Html-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<errors>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<log>( [$level, [$strings]] )
+
+=item Mail::Message::Convert::Html-E<gt>B<log>( [$level, [$strings]] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logPriority>($level)
+
+=item Mail::Message::Convert::Html-E<gt>B<logPriority>($level)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<notImplemented>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<report>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<reportAll>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<trace>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<warnings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=back
+
+=head2 Cleanup
+
+Extends L<"Cleanup" in Mail::Message::Convert|Mail::Message::Convert/"Cleanup">.
+ 
+=over 4
+
+=item $obj-E<gt>B<DESTROY>()
+
+Inherited, see L<Mail::Reporter/"Cleanup">
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Message distribution version 3.000,
+built on February 02, 2017.
+
+Do not forget to read
+L</Mail::Box-Overview>,
+L</Mail::Box-Cookbook>, and
+L</Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L</Mail::Message>,
+L</Mail::Box>,
+L</Mail::Box::IMAP4>,
+L</Mail::Box::POP3>,
+L</Mail::Box::Parser::C>,
+L</Mail::Box::Dbx> (unpublished),
+L</Mail::Transport>,
+L</Object::Realize::Later>, and
+L</User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

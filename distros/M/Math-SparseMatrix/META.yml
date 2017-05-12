@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Math-SparseMatrix
+version:             0.03
+abstract:            Provides basic sparse matrix operations such as creation, reading from file, reading transpose from file and writing to file. 
+license:             gpl
+author:              
+    - Ted Pedersen <tpederse at d.umn.edu>; Mahesh Joshi <maheshj@cmu.edu>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Math::SparseVector:            0.01
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

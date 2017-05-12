@@ -1,0 +1,137 @@
+Revision history for Module-DataPack
+
+0.20    2016-12-28 (PERLANCAR)
+
+	- No functional changes.
+
+        - [dist] Fix expressing follow-spec prereq relationship with x_spec.
+
+
+0.19    2016-12-27 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereq from DevelopRecommends to DevelopSuggests
+	  with _SPEC:: prefix.
+
+
+0.18    2016-12-11 (PERLANCAR)
+
+	- Tweak Rinci metadata for nicer CLI.
+
+	- Fix module regex (subpackages are allowed to begin with a digit).
+
+
+0.17    2016-02-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add example.
+
+	- [dist] Bump Data::Section::Seekable version to 0.08 (allow empty
+	  parts).
+
+
+0.16    2015-11-27 (PERLANCAR)
+
+	- [Experimental] Use '#' to prefix lines in included source code
+	  instead of ' ', to make things clearer and make the packed script
+	  easier to work with more naive source munger.
+
+
+0.15    2015-10-21 (PERLANCAR)
+
+	- [Bugfix] fix line numbering 2nd attempt, still off by 1, derp.
+
+
+0.14    2015-10-21 (PERLANCAR)
+
+	- [Bugfix] Fix line number reporting: didn't handle lines before
+	  DSS header (now allowed in Data::Section::Seekable 0.07).
+
+
+0.13    2015-10-21 (PERLANCAR)
+
+	- No functional changes.
+
+	- [build] Rebuild with Data::Section::Seekable::Reader 0.07 which allows
+          header line to not be the first line of data section.
+
+
+0.12    2015-10-11 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fill in datapack overhead numbers.
+
+
+0.11    2015-10-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Update mentioned module App::fatten (has been renamed to
+	  App::depak).
+
+
+0.10    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.09    2015-08-01 (PERLANCAR)
+
+	- No functional changes.
+
+	- Show error detail in error loading a datapacked module.
+
+
+0.08    2015-07-08 (PERLANCAR)
+
+	- [Bugfix] Fix off-by-one line numbering.
+
+
+0.07    2015-07-05 (PERLANCAR)
+
+	- [Bugfix] Use binary encoding to avoid mangling.
+
+
+0.06    2015-07-04 (PERLANCAR)
+
+	- Indent datapacked modules, like what App::FatPacker does, so packed
+	  script is easier to work with regex-based file mungers Dist::Zilla
+	  plugins like DZP:OurPkgVersion et al.
+
+
+0.05    2015-07-03 (PERLANCAR)
+
+	- Accept Foo/Bar.pm or Foo::Bar syntax in module_names &
+	  module_srcs.
+
+
+0.04    2015-06-18 (PERLANCAR)
+
+	- Adjust to Data::Section::Seekable::Writer 0.06.
+
+
+0.03    2015-06-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Use stripper args from PERLANCAR::AppUtil::PerlStripper to remove
+	  duplication.
+
+
+0.02     2015-06-17 (PERLANCAR)
+
+         - No functional changes.
+
+         - [doc] Mention Data::Section::Seekable & datapack-modules script.
+
+
+0.01     2015-06-12 (PERLANCAR)
+
+         - First release.

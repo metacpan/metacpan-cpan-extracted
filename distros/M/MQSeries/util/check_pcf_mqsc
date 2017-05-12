@@ -1,0 +1,321 @@
+#!/ms/dist/perl5/bin/perl5.6
+#
+# check_pcf_mqsc - Cross-check the PCF and MQSC command tables
+#
+# (c) 2005-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+# $Id: check_pcf_mqsc,v 33.4 2012/09/26 16:15:36 jettisu Exp $
+#
+
+use strict;
+use lib ".";
+require "MQSeries/Command/MQSC/RequestParameters.pl";
+require "MQSeries/Command/MQSC/Requests.pl";
+require "MQSeries/Command/MQSC/ResponseParameters.pl";
+require "MQSeries/Command/MQSC/Responses.pl";
+require "MQSeries/Command/PCF/RequestValues.pl";
+require "MQSeries/Command/PCF/RequestParameters.pl";
+require "MQSeries/Command/PCF/Requests.pl";
+require "MQSeries/Command/PCF/ResponseValues.pl";
+require "MQSeries/Command/PCF/ResponseParameters.pl";
+require "MQSeries/Command/PCF/Responses.pl";
+#use Data::Dumper; print Dumper(\%INC); exit(1);
+
+#
+# We'll cross-check the PCF and MQSC command parameters and values,
+# which is finally relevant as of MQ v6.  We'll make the following
+# checks:
+#
+# In check_commands:
+# - Each command defined in MQSC must also be defined for PCF.
+#   The reverse is not true, alas.
+# - Each request must have a response and vice versa
+#
+# In check_parameters_xplatform:
+# - Each response parameter returned by MQSC commands must also be
+#   defined for PCF, and vice versa (exceptions for some Unix-only
+#   PCF response parameters).
+# - Each request parameter specified for MQSC commands must also
+#   be defined for PCF, and vice versa (exceptions for some Unix-only
+#   PCF request parameters).
+#
+# In check_parameters_xtype:
+# - Each response parameter for InquireXXX commands must exist as a
+#   request parameters for the corresponding CreateXXX command
+#   (with exceptions for generated fields like creation dates,
+#   queue depths, etc.)
+# - Each response value for InquireXXX commands must exist as a
+#   request value for the corresponding CreateXXX command
+#   (the reverse it not true for things like "All", "Default", etc)
+#
+# Not yet implemented:
+# - Each response value for MQSC must also be defined for PCF, and
+#   vice versa (exceptions for some Unix-only PCF response values).
+# - Each request value for MQSC must also be defined for PCF, and
+#   vice versa (exceptions for some Unix-only PCF request values).
+#
+# We expect this script to find typos and missing values in our tables,
+# plus inconsistent definitions by IBM.
+#
+our $errors = 0;
+check_commands();
+
+#
+# This one leads to so many errors we skip it for now.
+#
+#check_parameters_xplatform();
+
+check_parameters_xtype();
+
+if ($errors) {
+    print "$errors errors found\n";
+} else {
+    print "All checks okay\n";
+}
+exit($errors);
+
+# ---------------------------------------------
+
+#
+# - Check that all MQSC requests and responses are also defined in PCF
+# - Check that each InquireXXX request has a response
+# - Check that each response has a request
+#
+sub check_commands {
+    #
+    # Make sure each MQSC command also exists as a PCF command (with
+    # long list of exceptions)
+    #
+    foreach my $set ( [ 'Requests',
+			\%MQSeries::Command::MQSC::Requests,
+			\%MQSeries::Command::PCF::Requests,
+		      ],
+		      [ 'Responses',
+			\%MQSeries::Command::MQSC::Responses,
+			\%MQSeries::Command::PCF::Responses,
+		      ],
+		    ) {
+	my ($name, $mqsc, $pcf) = @$set;
+	foreach my $mqsc_cmd (sort keys %$mqsc) {
+	    next if (defined $pcf->{$mqsc_cmd});
+	    next if ($mqsc_cmd =~ m!^(ArchiveLog|ChangeTrace|CreateBufferPool|CreatePageSetId|InquireThread|InquireTrace|RecoverBootStrapDataSet|ResetTpipe|ResolveInDoubt|StartTrace|StopTrace)$!); # Not supported for PCF
+	    print "MQSC $name command '$mqsc_cmd' not defined for PCF\n";
+	    $errors++;
+	}
+
+	#
+	# Make sure each PCF request and response has values (no
+	# invalid hash)
+	#
+	foreach my $pcf_cmd (sort keys %$pcf) {
+	    my $value = $pcf->{$pcf_cmd};
+	    unless (ref($value) eq 'ARRAY' && @$value == 2 &&
+		    defined $value->[1] && ref($value->[1]) eq 'HASH') {
+		print "PCF $name command '$pcf_cmd' not correct - no array or no parameters\n";
+		$errors++;
+	    }
+	}
+    }				# End foreach: set
+
+    #
+    # Make sure the requests and responses line up
+    # Only InquireXXX requests need a response
+    #
+    foreach my $set ( [ 'PCF',
+			\%MQSeries::Command::PCF::Requests,
+			\%MQSeries::Command::PCF::Responses,
+		      ],
+		      [ 'MQSC',
+			\%MQSeries::Command::MQSC::Requests,
+			\%MQSeries::Command::MQSC::Responses,
+		      ],
+		    ) {
+	my ($type, $req, $resp) = @$set;
+	#print "$type responses: ", join(', ', sort keys %$resp), "\n";
+	foreach my $cmd (sort keys %$req) {
+	    next if (defined $resp->{$cmd});
+	    next unless ($cmd =~ /^Inquire/);
+	    next if ($type eq 'MQSC' && $cmd =~ /^Inquire(Security|Thread)$/);
+	    print "$type request '$cmd' has no response\n";
+	    $errors++;
+	}
+	foreach my $cmd (sort keys %$resp) {
+	    next if (defined $req->{$cmd});
+	    next if ($cmd eq 'Error'); # No specific request, valid response for any request
+	    print "$type response '$cmd' has no request\n";
+	    $errors++;
+	}
+    }
+}
+
+
+#
+# Check that all request and response parameters for all supported
+# commands exist for both MQSC and PCF.
+#
+sub check_parameters_xplatform {
+    foreach my $set ( [ 'Requests',
+			\%MQSeries::Command::MQSC::Requests,
+			\%MQSeries::Command::PCF::Requests,
+		      ],
+		      [ 'Responses',
+			\%MQSeries::Command::MQSC::Responses,
+			\%MQSeries::Command::PCF::Responses,
+		      ],
+		    ) {
+	my ($type, $mqsc, $pcf) = @$set;
+	foreach my $cmd (sort keys %$mqsc) {
+	    next unless (defined $pcf->{$cmd});
+	    my $mqsc_params = $mqsc->{$cmd};
+	    if (ref $mqsc_params eq 'ARRAY') {
+		$mqsc_params = $mqsc_params->[1];
+	    } else { # Map MQCTEXT => [ Name, values ] to { Name => Values }
+		my $work = {};
+		foreach my $entry (values %$mqsc_params) {
+		    my ($name, $values) = @$entry;
+		    $work->{$name} = $values;
+		}
+		$mqsc_params = $work;
+	    }
+	    my $pcf_params = $pcf->{$cmd}->[1];
+	    #print "For $cmd $type, have MQSC params [" .
+	    #  join(',', sort keys %$mqsc_params) . "] and PCF params [" .
+	    #  join(',', sort keys %$pcf_params) . "]\n";
+	    #last;
+	    my $first = 1;
+	    foreach my $param (sort keys %$mqsc_params) {
+		next if (defined $pcf_params->{$param});
+		# FIXME: verify these lists against PCF manual
+		next if ($param =~ /^(AutoStart|EnvironmentParameters|KeepAliveInterval|LUName|Parameter|Port)$/); # Channel
+		next if ($param =~ /^(ClusInfo|CouplingStructure)$/); # Backwards compatibility for Queue
+		if ($first) {
+		    print "Difference between $cmd $type:\n";
+		    $first = 0;
+		}
+		print "- MQSC parameter '$param' not defined for PCF\n";
+		$errors++;
+	    }
+	    foreach my $param (sort keys %$pcf_params) {
+		next if (defined $mqsc_params->{$param});
+		next if ($param =~ /^(To|From).*Name$/);
+		if ($first) {
+		    print "Difference between $cmd $type:\n";
+		    $first = 0;
+		}
+		print "- PCF parameter '$param' not defined for MQSC\n";
+		$errors++;
+	    }
+	}			# End foreach: command
+    }				# End foreach: set (Requests / Responses)
+}
+
+
+#
+# Check parameters across type: for both MQSC and PCF, response
+# parameters must also be request parameters and vice versa.
+#
+sub check_parameters_xtype {
+    foreach my $set ( [ 'PCF',
+			\%MQSeries::Command::PCF::RequestParameters,
+			\%MQSeries::Command::PCF::ResponseParameters,
+		      ],
+
+		      #
+		      # We care less about MQSC request completeness...
+		      #
+#		      [ 'MQSC',
+#			\%MQSeries::Command::MQSC::RequestParameters,
+#			\%MQSeries::Command::MQSC::ResponseParameters,
+#		      ],
+		    ) {
+	my ($type, $req, $resp) = @$set;
+	#print "For $type requests, have object types [" .
+	#  join(',', sort keys %$req), "]\n";
+	foreach my $obj_type (qw(QueueManager Queue Channel AuthInfo 
+				 Namelist CFStruc CFStruct StorageClass)) {
+	    unless (defined $req->{$obj_type}) {
+		print "Object type '$obj_type' not defined in $type request params\n";
+		$errors++;
+		next;
+	    }
+	    unless (defined $resp->{$obj_type}) {
+		print "Object type '$obj_type' not defined in $type response params\n";
+		$errors++;
+		next;
+	    }
+	    my $in = $req->{$obj_type};
+	    my $out = $resp->{$obj_type};
+	    if ($type eq 'MQSC') { # Deal with reversed hash
+		my $work = {};
+		foreach my $entry (values %$out) {
+		    my ($name, $values) = @$entry;
+		    $work->{$name} = $values || {};
+		}
+		$out = $work;
+	    }
+	    foreach my $param (sort keys %$in) {
+		next if (defined $out->{$param});
+		next if ($param =~ /Attrs$/);
+		next if ($param =~ /^(To|From).*Name$/);
+		next if ($param =~ /^(CommandScope|Force|Purge|Quiesce|Replace)$/);
+		next if ($obj_type eq 'QueueManager' &&
+			 $param =~ /^(Force|QSGDisposition)$/);
+		print "$type $obj_type request parameter '$param' not defined in response\n";
+		$errors++;
+	    }
+	    foreach my $param (sort keys %$out) {
+		next if (defined $in->{$param});
+		next if ($param =~ /^(Alteration|Creation)(Date|Time)$/);
+		next if ($param eq $obj_type . 'Names');
+		next if ($param =~ /^Response(Id|QMgrName)$/);
+		next if ($obj_type eq 'QueueManager' &&
+			 $param =~ /^(CommandInputQName|CommandLevel|CPILevel|DistLists|MaxPriority|Platform|QMgrIdentifier|QMgrName|QSharingGroupName|SyncPoint)$/);
+		next if ($obj_type eq 'Queue' &&
+			 $param =~ /^(CurrentQDepth|HighQDepth|MsgDeqCount|MsgEnqCount|OpenInputCount|OpenOutputCount)$/);
+		next if ($obj_type eq 'Namelist' &&
+			 $param =~ /^(NameCount)$/);
+		print "$type $obj_type response parameter '$param' not defined in request\n";
+		$errors++;
+	    }
+	}			# End foreach: major object type
+    }				# End foreach: PCF / MQSC
+
+    #
+    # Check that each PCF request/response parameter value is an array
+    # with two or three values.  If size three, the third parameter
+    # must be defined, must be a hash-ref, and must have key/values.
+    #
+    foreach my $pair ( [ 'Request', 
+			\%MQSeries::Command::PCF::RequestParameters,
+		      ],
+		      [ 'Response',
+			\%MQSeries::Command::PCF::ResponseParameters,
+		      ]
+		    ) {
+	my ($type, $cmds) = @$pair;
+	foreach my $cmd (sort keys %$cmds) {
+	    my $params = $cmds->{$cmd};
+	    foreach my $par (sort keys %$params) {
+		my $value = $params->{$par};
+		unless (ref($value) eq 'ARRAY') {
+		    print "PCF $cmd $type parameter '$par' value is not an array ref\n";
+		    $errors++;
+		    next;
+		}
+		next if (@$value == 2);
+		unless (@$value == 3) {
+		    print "PCF $cmd $type parameter '$par' value has array size <> 2/3\n";
+		    $errors++;
+		    next;
+		}
+		my $vals = $value->[2];
+		next if (defined $vals && ref($vals) eq 'HASH' && keys %$vals);
+		print "PCF $cmd $type parameter '$par' value has invalid values enum\n";
+		use Data::Dumper;
+		print Dumper($vals); exit(0);
+		$errors++;
+	    }
+	}
+    }
+}

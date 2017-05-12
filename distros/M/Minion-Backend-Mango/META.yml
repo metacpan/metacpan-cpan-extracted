@@ -1,0 +1,41 @@
+---
+abstract: 'Mango backend for Minion'
+author:
+  - 'Andrey Khozov <avkhozov@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Minion-Backend-Mango
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Minion::Backend::Mango:
+    file: lib/Minion/Backend/Mango.pm
+    version: '1.01'
+requires:
+  Mango: '1.20'
+  Minion: '5.05'
+  Mojolicious: '6.0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/avkhozov/Minion-Backend-Mango/issues
+  homepage: https://github.com/avkhozov/Minion-Backend-Mango
+  repository: git://github.com/avkhozov/Minion-Backend-Mango.git
+version: '1.01'
+x_authority: cpan:AVKHOZOV
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

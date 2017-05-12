@@ -1,0 +1,34 @@
+---
+abstract: 'Some extra Mojo for Perl native datatypes'
+author:
+  - 'Joel Berger <joel.a.berger@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-Autobox
+provides:
+  Mojo::Autobox:
+    file: lib/Mojo/Autobox.pm
+    version: '0.03'
+  Mojo::Autobox::Array:
+    file: lib/Mojo/Autobox/Array.pm
+  Mojo::Autobox::Hash:
+    file: lib/Mojo/Autobox/Hash.pm
+  Mojo::Autobox::String:
+    file: lib/Mojo/Autobox/String.pm
+  ojoBox:
+    file: lib/ojoBox.pm
+requires:
+  Mojolicious: '5.00'
+  autobox: '0'
+resources:
+  bugtracker: https://github.com/jberger/Mojo-Autobox/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/jberger/Mojo-Autobox
+version: '0.03'

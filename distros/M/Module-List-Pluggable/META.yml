@@ -1,0 +1,19 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Module-List-Pluggable
+version:      0.08
+version_from: lib/Module/List/Pluggable.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    Class::Base:                   0.03
+    Data::Dumper:                  0
+    Exporter:                      0
+    File::Find:                    0
+    FindBin:                       0
+    lib:                           0
+    Module::List:                  0.001
+    Test::More:                    0.64
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

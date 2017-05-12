@@ -1,0 +1,130 @@
+{
+   "abstract" : "Moose-like OO, fast to load, with zero dependencies.",
+   "author" : [],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mite",
+   "no_index" : {
+      "package" : [
+         "MY"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0.22",
+            "Child" : "0.010",
+            "Devel::Hide" : "0.0009",
+            "Fennec" : "2.016",
+            "File::Copy::Recursive" : "0.38",
+            "Test::Compile" : "0.24",
+            "Test::Deep" : "0.110",
+            "Test::FailWarnings" : "0.008",
+            "Test::Most" : "0.31",
+            "Test::Output" : "1.02",
+            "Test::Sims" : "20130412"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Cmd" : "0.323",
+            "Method::Signatures" : "20140224",
+            "Mouse" : "1.08",
+            "MouseX::Foreign" : "1.000",
+            "Path::Tiny" : "0.052",
+            "YAML::XS" : "0.41",
+            "perl" : "v5.10.1",
+            "version" : "0.77"
+         }
+      }
+   },
+   "provides" : {
+      "MY" : {
+         "file" : "lib/Mite/MakeMaker.pm"
+      },
+      "Mite" : {
+         "file" : "lib/Mite.pm",
+         "version" : "v0.0.1"
+      },
+      "Mite::App" : {
+         "file" : "lib/Mite/App.pm"
+      },
+      "Mite::App::Command" : {
+         "file" : "lib/Mite/App/Command.pm"
+      },
+      "Mite::App::Command::clean" : {
+         "file" : "lib/Mite/App/Command/clean.pm"
+      },
+      "Mite::App::Command::compile" : {
+         "file" : "lib/Mite/App/Command/compile.pm"
+      },
+      "Mite::App::Command::init" : {
+         "file" : "lib/Mite/App/Command/init.pm"
+      },
+      "Mite::Attribute" : {
+         "file" : "lib/Mite/Attribute.pm"
+      },
+      "Mite::Class" : {
+         "file" : "lib/Mite/Class.pm"
+      },
+      "Mite::Compiled" : {
+         "file" : "lib/Mite/Compiled.pm"
+      },
+      "Mite::Config" : {
+         "file" : "lib/Mite/Config.pm"
+      },
+      "Mite::MakeMaker" : {
+         "file" : "lib/Mite/MakeMaker.pm"
+      },
+      "Mite::ModuleBuild" : {
+         "file" : "lib/Mite/ModuleBuild.pm"
+      },
+      "Mite::Project" : {
+         "file" : "lib/Mite/Project.pm"
+      },
+      "Mite::Role::HasConfig" : {
+         "file" : "lib/Mite/Role/HasConfig.pm"
+      },
+      "Mite::Role::HasDefault" : {
+         "file" : "lib/Mite/Role/HasDefault.pm"
+      },
+      "Mite::Role::HasYAML" : {
+         "file" : "lib/Mite/Role/HasYAML.pm"
+      },
+      "Mite::Shim" : {
+         "file" : "lib/Mite/Shim.pm",
+         "version" : "v0.0.1"
+      },
+      "Mite::Source" : {
+         "file" : "lib/Mite/Source.pm"
+      },
+      "Mite::Types" : {
+         "file" : "lib/Mite/Types.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/evalEmpire/Mite/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/evalEmpire/Mite"
+      }
+   },
+   "version" : "v0.0.1"
+}

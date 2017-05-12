@@ -1,0 +1,40 @@
+---
+abstract: 'creates module/distribution skeleton and more'
+author:
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.04'
+  Test::More: '0.96'
+  Test::UseAllModules: '0.09'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.06'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-New
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::HomeDir: '0.66'
+  Getopt::Long: '0'
+  Log::Dump: '0.03'
+  Module::Find: '0'
+  Parse::LocalDistribution: '0.13'
+  Path::Tiny: '0.044'
+  Pod::Text: '0'
+  Software::License: '0'
+  String::CamelCase: '0'
+  Sub::Install: '0'
+  Text::MicroTemplate: '0.06'
+  Time::Piece: '0'
+  Version::Next: '0'
+  YAML::Tiny: '1.51'
+  version: '0.77'
+resources:
+  repository: https://github.com/charsbar/module-new
+version: '0.15'

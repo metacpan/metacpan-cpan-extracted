@@ -1,0 +1,67 @@
+{
+    "name": "Mail-Outlook",
+    "version": "0.25",
+    "abstract": "An mail interface to Microsoft (R) Outlook (R)",
+    "author": ["Barbie <barbie@cpan.org>"],
+
+    "license": "artistic_2",
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "Hand 1.0",
+    "keywords" : [
+        "mail",
+        "outlook"
+    ],
+
+    "prereqs" : {
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "File::Basename": "0",
+                "Win32::OLE": "0",
+                "Win32::OLE::Const": "0"
+            }
+        },
+        "test" : {
+            "requires": {
+                "Cwd": "0",
+                "IO::File": "0",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::More": "0.70",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        }
+    },
+
+    "provides": {
+        "Mail::Outlook": {
+            "file": "lib/Mail/Outlook.pm",
+            "version": "0.25"
+        },
+        "Mail::Outlook::Folder": {
+            "file": "lib/Mail/Folder.pm",
+            "version": "0.25"
+        },
+        "Mail::Outlook::Message": {
+            "file": "lib/Mail/Outlook/Message.pm",
+            "version": "0.25"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples"]
+    },
+
+    "resources": {
+        "license": "http://www.perlfoundation.org/artistic_license_2_0",
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Mail-Outlook" }
+    }
+}

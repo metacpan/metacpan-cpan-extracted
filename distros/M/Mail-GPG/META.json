@@ -1,0 +1,48 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mail-GPG",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "2.12",
+            "Event" : "0",
+            "GnuPG::Interface" : "0",
+            "List::MoreUtils" : "0",
+            "MIME::Entity" : "5.419",
+            "MIME::Parser" : "5.419",
+            "MIME::QuotedPrint" : "2.2",
+            "Mail::Address" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.0.10"
+}

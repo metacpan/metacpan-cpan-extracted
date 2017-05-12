@@ -1,0 +1,88 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Muck::FS;
+use ConfigReader::Simple;
+
+=head1 NAME
+
+muckFS - mount muckFS filesystem
+
+=head1 SYNOPSIS
+
+muckFS muckFS.conf /mnt
+
+=head1 DESCRIPTION
+
+TBD
+
+=cut
+
+my ($config_file,$mount) = @ARGV;
+
+unless ($config_file && $mount) {
+   print STDERR <<_USAGE_;
+usage: $0 muckFS.conf /mnt
+
+For more information see perldoc muckFS
+_USAGE_
+   exit 1;
+}
+
+system "fusermount -u $mount" unless (-w $mount);
+
+unless (-w $mount) {
+   print STDERR "Current user doesn't have permission on mount point $mount: $!";
+   exit 1;
+}
+unless (-e $config_file ) {
+   print STDERR "Unable to read config file: $!";
+   exit 1;
+}
+
+my $cfg = ConfigReader::Simple->new($config_file);
+
+my $mnt = Muck::FS->mount({
+   aws_access_key_id     => $cfg->get('aws_access_key_id'),
+   aws_secret_access_key => $cfg->get('aws_secret_access_key'),
+   s3_bucket             => $cfg->get('s3_bucket'),
+   cachedir              => $cfg->get('cachedir'),
+   dsn                   => $cfg->get('dsn'),
+   user                  => $cfg->get('dbuser'),
+   password              => $cfg->get('dbpass'),
+   memcached             => $cfg->get('memcache_servers'),
+   mount                 => $mount,
+   fork                  => 0,
+   debug                 => $cfg->get('debug'),
+});
+
+if (! $mnt) {
+   print STDERR "can't mount filesystem!";
+   exit 1;
+}
+
+#print "Press enter to exit...";
+#my $foo = <STDIN>;
+#$mnt->umount;
+
+=head1 SEE ALSO
+
+C<Muck::FS> website
+L<http://www.muckOS.org/doc/muckfs>
+
+C<FUSE (Filesystem in USErspace)> website
+L<http://fuse.sourceforge.net/>
+
+=head1 AUTHOR
+
+Mike Schroeder, E<lt>mike-cpan@donorware.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2007 by DonorWare LLC
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

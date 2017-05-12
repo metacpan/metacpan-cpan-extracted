@@ -1,0 +1,56 @@
+Revision history for MooseX::Log::Log4perl
+    * RT#82888: Refactor to use Moo instead of Any::Moose (Alexander Hartmaier)
+
+0.46  Wed Jun 27 2012 (rl)
+    * RT#77451: Spelling mistake in Easy.pm (thanks gregoa@debian.org)
+    * RT#77783: Added tests (03inheritence) to showcase expected category in logging
+
+0.45  Mon May 7 2012 (rl)
+    * RT#72596: META file needs regenerating, should be fixed now
+    * Correct some dist stuff (copyright, license, bundled Module::Install)
+
+0.44  Wed May 1 2012 (rl)
+    * Fix CPAN tester build issue for Tie::Hash::NamedCapture (probably caused by "use English")
+    * Support special 'append' prefix for category (Andreas Marienborg)
+    * Fix wrong META.yml file
+
+0.43  Thu Aug 25 2011 (rl)
+    * Change to use Any::Moose to also support Mouse environment
+    * Documentation improvements for Any::Moose
+
+0.42  Thu Apr 29 2010 (again)
+    * Remove Log::Any from benchmark tests, we want to avoid failing tests
+
+0.41  Thu Apr 29 2010
+    * Added POD::Covergage test (t/podcoverage.t)
+    * Added Perl::Critic test (t/pelr-critic.t)
+    * RT#57021: Raised dependency to Log::Log4perl 1.13 which first introduced the TRACE level (thanks Sam Vilain)
+    * Raise dependency for Moose to 0.65, which has fixes for Win32 Builds
+    * Updated Module::Install to 0.94
+    * Raise required perl version to 5.8
+
+0.40  Sun May 17 2009
+    * #45554: Applied patch for easy method handling for %M pattern by Tim Bunce
+    * Added t/99bench.t for basic benchmark testing
+    * Added load test of ::Easy and diag printing of version numbers to t/00load.t
+    * Updated included Module::Install to 0.88
+    * Improved tests to include %M pattern
+    * Only do the benchmark test for TEST_MAINT is set, otherwise skip
+
+0.31  Mon Jul 21 2008
+    * Fixed bug reported by Maik Hentsche
+
+0.30  Tue Jul 15 2008
+    * Corrected MANIFEST (added MANIFEST.SKIP to generate it correctly now)
+    * Improved pod and fixed typo in MooseX::Log::Log4perl::Easy
+    * Cleanup of tests and pod
+    * Repackage as 0.30 to fix failing cpan tests (and fix perl module version numbering for CPAN)
+
+0.2    Mon Jul 14 2008
+    * Added MooseX::Log::Log4perl::Easy for simple log interface
+      this adds methods $self->log_error, $self->log_debug, ... for all log levels
+    * Cleanup of tests and pod
+
+0.1    Thu Jul 10 2008
+    * Initial release with support for log4perl logging. (Roland Lammel)
+    * Logger init  has to be done outside of this package for now.

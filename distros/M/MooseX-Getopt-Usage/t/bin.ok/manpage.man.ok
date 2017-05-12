@@ -1,0 +1,17 @@
+NAME
+    ManPage - Using MooseX::Getopt::Usage with minimal pod for man page.
+
+SYNOPSIS
+    manpage.pl [OPTIONS]
+
+DESCRIPTION
+    This program will read the given input file(s) and do something useful
+    with the contents thereof.
+
+OPTIONS
+    --help -? --usage
+        Display the usage message and exit
+
+    --man
+        Display man page
+

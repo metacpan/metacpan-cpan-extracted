@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="
+    http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.pastdev</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.0.0</version>
+    <relativePath>../parent-parent</relativePath>
+  </parent>
+
+  <groupId>com.pastdev</groupId>
+  <artifactId>my-project</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+  
+  <dependencies>
+    <dependency>
+      <groupId>com.pastdev</groupId>
+      <artifactId>dependency</artifactId>
+      <version>1.0.0</version>
+      <classifier>assembly</classifier>
+      <type>jar</type>
+      <scope>compile</scope>
+      <systemPath>${java.home}/lib</systemPath>
+      <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <groupId>com.pastdev</groupId>
+          <artifactId>exclude-me</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
+  
+  <modules>
+    <module>module-one</module>
+  </modules>
+  
+  <properties>
+    <key>value</key>
+  </properties>
+  
+  <build>
+    <defaultGoal>install</defaultGoal>
+    <directory>${basedir}/target</directory>
+    <finalName>${artifactId}-${version}</finalName>
+    <filters>
+      <filter>filters/filter1.properties</filter>
+    </filters>
+    <resources>
+      <resource>
+        <targetPath>META-INF/main</targetPath>
+        <filtering>false</filtering>
+        <directory>${basedir}/src/main/main</directory>
+        <includes>
+          <include>configuration.xml</include>
+        </includes>
+        <excludes>
+          <exclude>**/*.properties</exclude>
+        </excludes>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <targetPath>META-INF/test</targetPath>
+        <filtering>false</filtering>
+        <directory>${basedir}/src/test/test</directory>
+        <includes>
+          <include>test_configuration.xml</include>
+        </includes>
+        <excludes>
+          <exclude>**/*test.properties</exclude>
+        </excludes>
+      </testResource>
+    </testResources>
+    <plugins>
+      <plugin>
+        <groupId>com.pastdev.plugins</groupId>
+        <artifactId>build-plugin</artifactId>
+        <version>2.0</version>
+        <extensions>false</extensions>
+        <inherited>true</inherited>
+        <configuration>
+          <classifier>test</classifier>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>com.pastdev</groupId>
+            <artifactId>plugin-dep</artifactId>
+            <version>1.0.0</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>foo</id>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <phase>verify</phase>
+            <inherited>false</inherited>
+            <configuration>
+              <tasks>
+                <echo>Foo you</echo>
+              </tasks>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>com.pastdev.plugins</groupId>
+          <artifactId>build-plugin</artifactId>
+          <version>2.1</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+    <scriptSourceDirectory>${basedir}/src/main/scripts</scriptSourceDirectory>
+    <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
+    <outputDirectory>${basedir}/target/classes</outputDirectory>
+    <testOutputDirectory>${basedir}/target/test-classes</testOutputDirectory>
+    <extensions>
+      <extension>
+        <groupId>com.pastdev</groupId>
+        <artifactId>build-extension</artifactId>
+        <version>1.0.0</version>
+      </extension>
+    </extensions>
+  </build>
+  <reporting>
+    <outputDirectory>${basedir}/target/site</outputDirectory>
+    <plugins>
+      <plugin>
+        <artifactId>reporting-plugin</artifactId>
+        <version>2.0.0</version>
+        <reportSets>
+          <reportSet>
+            <id>reportSet1</id>
+            <reports>
+              <report>javadoc</report>
+            </reports>
+            <inherited>true</inherited>
+            <configuration>
+              <links>
+                <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
+              </links>
+            </configuration>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
+  
+  <name>project name</name>
+  <description>project description</description>
+  <url>project url</url>
+  <inceptionYear>2014</inceptionYear>
+  
+  <licenses>
+    <license>
+      <name>Artistic License 2.0</name>
+      <url>http://www.perlfoundation.org/artistic_license_2_0</url>
+      <distribution>repo</distribution>
+      <comments>Basic perl license</comments>
+    </license>
+  </licenses>
+  
+  <organization>
+    <name>Pastdev</name>
+    <url>http://pastdev.com</url>
+  </organization>
+  
+  <developers>
+    <developer>
+      <id>lucastheisen</id>
+      <name>Lucas</name>
+      <email>dontuse@lucastheisen.com</email>
+      <url>https://github.com/lucastheisen</url>
+      <organization>Pastdev</organization>
+      <organizationUrl>http://pastdev.com</organizationUrl>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>-6</timezone>
+      <properties>
+        <picUrl>http://www.gravatar.com/avatar/c292b959ecf29c86e4c0d093a6f24e19.png</picUrl>
+      </properties>
+    </developer>
+  </developers>
+
+  <contributors>
+    <contributor>
+      <name>Contributor</name>
+      <email>dontuse@contributor.com</email>
+      <url>http://contributor.com</url>
+      <organization>Contributor Organization</organization>
+      <organizationUrl>http://contributor.org</organizationUrl>
+      <roles>
+        <role>tester</role>
+      </roles>
+      <timezone>America/Vancouver</timezone>
+      <properties>
+        <gtalk>contributor@gmail.com</gtalk>
+      </properties>
+    </contributor>
+  </contributors>
+
+  <issueManagement>
+    <system>Github</system>
+    <url>https://github.com/dashboard/issues</url>
+  </issueManagement>
+
+  <ciManagement>
+    <system>jenkins</system>
+    <url>http://127.0.0.1:8080/jenkins</url>
+    <notifiers>
+      <notifier>
+        <type>mail</type>
+        <sendOnError>true</sendOnError>
+        <sendOnFailure>true</sendOnFailure>
+        <sendOnSuccess>false</sendOnSuccess>
+        <sendOnWarning>false</sendOnWarning>
+        <configuration><address>jenkins@127.0.0.1</address></configuration>
+      </notifier>
+    </notifiers>
+  </ciManagement>
+
+  <mailingLists>
+    <mailingList>
+      <name>User List</name>
+      <subscribe>user-subscribe@127.0.0.1</subscribe>
+      <unsubscribe>user-unsubscribe@127.0.0.1</unsubscribe>
+      <post>user@127.0.0.1</post>
+      <archive>http://127.0.0.1/user/</archive>
+      <otherArchives>
+        <otherArchive>http://base.google.com/base/1/127.0.0.1</otherArchive>
+      </otherArchives>
+    </mailingList>
+  </mailingLists>
+  
+  <scm>
+    <connection>scm:git:https://github.com/lucastheisen/perl-maven.git</connection>
+    <developerConnection>scm:git:git@github.com:lucastheisen/perl-maven.git</developerConnection>
+    <tag>HEAD</tag>
+    <url>http://127.0.0.1/websvn/my-project</url>
+  </scm>
+
+  <prerequisites>
+    <maven>2.0.6</maven>
+  </prerequisites>
+
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>false</enabled>
+        <updatePolicy>always</updatePolicy>
+        <checksumPolicy>warn</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+        <checksumPolicy>fail</checksumPolicy>
+      </snapshots>
+      <id>pastdev</id>
+      <name>Pastdev</name>
+      <url>http://pastdev.com/maven2</url>
+      <layout>default</layout>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <releases>
+        <enabled>false</enabled>
+        <updatePolicy>always</updatePolicy>
+        <checksumPolicy>warn</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+        <checksumPolicy>fail</checksumPolicy>
+      </snapshots>
+      <id>pastdev-plugins</id>
+      <name>Pastdev Plugins</name>
+      <url>http://pastdev.com/plugins/maven2</url>
+      <layout>default</layout>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <distributionManagement>
+    <repository>
+      <uniqueVersion>false</uniqueVersion>
+      <id>pastdev</id>
+      <name>Pastdev Repository</name>
+      <url>scp://repo/maven2</url>
+      <layout>default</layout>
+    </repository>
+    <snapshotRepository>
+      <uniqueVersion>true</uniqueVersion>
+      <id>pastdev</id>
+      <name>Pastdev Snapshots</name>
+      <url>sftp://pastdev.com/maven</url>
+      <layout>legacy</layout>
+    </snapshotRepository>
+    <site>
+      <id>website</id>
+      <name>Website</name>
+      <url>http://pastdev.com/public_html/</url>
+    </site>
+    <relocation>
+      <groupId>com.pastdev</groupId>
+      <artifactId>my-new-project</artifactId>
+      <version>1.0</version>
+      <message>We have moved the project</message>
+    </relocation>
+    <downloadUrl>http://pastdev.com/my-project</downloadUrl>
+    <status>deployed</status>
+  </distributionManagement>
+
+  <profiles>
+    <profile>
+      <id>test</id>
+      <activation>
+      </activation>
+      <build>
+      </build>
+      <modules></modules>
+      <repositories></repositories>
+      <pluginRepositories></pluginRepositories>
+      <dependencies></dependencies>
+      <reporting></reporting>
+      <dependencyManagement></dependencyManagement>
+      <distributionManagement></distributionManagement>
+    </profile>
+  </profiles>
+</project>

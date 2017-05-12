@@ -1,0 +1,90 @@
+NAME
+    Module::LocalLoad - create and use a local lib/ for globally installed
+    modules
+
+SYNOPSIS
+      my $module = 'Term::ANSIColor';
+      load($module) and printf("%s v%s loaded\n", $module $module->VERSION);
+
+DESCRIPTION
+    You're debugging your code, and it's still failing even though you're
+    doing everything right. You might have misinterpreted the documentation
+    for some module you're using, or perhaps it's not doing what it says it
+    should.
+
+    Time to take a peek at the inner guts of said module. Change a few
+    things, and see if your problem goes away.
+
+    Changing code in a globally installed module is not such a great idea.
+    Sometimes it's not even possible.
+
+    This module will help you set up a temporary local lib/ for the modules
+    that you are working on right now. See the "EXAMPLES" section.
+
+EXPORTS
+  load( $package )
+    When load() is called with a valid, globally installed package name
+    several things happen. First, we check if the environment variable
+    "PERL_HACK_LIB" is defined and points to a directory that'll be our new
+    lib/. If it isnt, we croak, announcing that it needs to be set.
+
+    If the directory already contains a copy of the module, we go ahead and
+    load it. We don't want our changes to be overwritten everytime we load
+    the module.
+
+    Otherwise, we copy the module, if existing in @INC, to "PERL_HACK_LIB",
+    modify @INC so that "PERL_HACK_LIB" comes first, and loads it.
+
+EXAMPLES
+    You want to muck around in the inner workings of the IO::File module.
+
+      # load.pl
+      use Module::LocalLoad;
+
+      my $m = 'Term::ANSIColor';
+      (my $f = $m) =~ s{::}{/}g;
+      $f .= '.pm';
+
+      load($m) and printf("%s v%s loaded - %s\n", $m, $m->VERSION, $INC{$f.});
+
+    This will produce something like:
+
+      Term::ANSIColor v3.00 loaded - /tmp/Term/ANSIColor.pm
+
+    Next up, go make some changes to /tmp/Term/ANSIColor.pm . Notice the
+    version number reported from ->VERSION:
+
+      vim /tmp/Term/ANSIColor.pm
+      perl load.pl
+
+      Term::ANSIColor v3.00_042 loaded - /tmp/Term/ANSIColor.pm
+
+ENVIRONMENT
+    PERL_HACK_LIB
+
+    Where the temporary lib should be set up.
+
+AUTHOR
+        \ \ | / /
+         \ \ - /
+          \ | /
+          (O O)
+          ( < )
+          (-=-)
+
+      Magnus Woldrich
+      CPAN ID: WOLDRICH
+      magnus@trapd00r.se
+      http://japh.se
+
+CONTRIBUTORS
+    None required yet.
+
+COPYRIGHT
+    Copyright 2011 the Module::LocalLoad "AUTHOR" and "CONTRIBUTORS" as
+    listed above.
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

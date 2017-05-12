@@ -1,0 +1,33 @@
+Revision history for Map-Metro-Plugin-Map-Gothenburg
+
+0.1004 2016-01-23T23:11:02Z UTC
+ [Line Changes]
+ - Stations 'Torp' and 'Kålltorp' have both changed name to 'Virginsgatan'.
+
+ [Other Changes]
+ - Rebuilt using current Dist::Iller::Config::Author::CSSON(::MapMetro).
+
+0.1003 2015-01-21T16:27:28Z CET
+ [Documentation]
+ - Improved synopsis.
+ - Linked to ::Lines documentation.
+
+0.1002 2015-01-21T14:31:41Z CET
+ [Bug Fixes]
+ - Added missing stations on line 13 (Korsvägen->Sahlgrenska)
+
+ [Meta]
+ - Changed Lines.pm to Lines.pod (fixes $VERSION problem).
+
+0.1001 2015-01-20T15:18:08Z CET
+ [Documentation]
+ - Rebuilt with podweaver.
+
+ [Meta]
+ - Added github info to meta and pod.
+ - Bumped Map::Metro requirement (to 0.2206).
+ - Now uses @Author::CSSON dist zilla plugin bundle, expanded.
+
+0.1000 2015-01-03T23:47:09Z CET
+ - Initial release
+

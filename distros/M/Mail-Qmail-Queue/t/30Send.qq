@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use Mail::Qmail::Queue::Receive::Envelope;
+use Mail::Qmail::Queue::Receive::Body;
+
+my $qq_body = Mail::Qmail::Queue::Receive::Body->new()
+  or die "Couldn't read QQ body: $!\n";
+my $qq_env = Mail::Qmail::Queue::Receive::Envelope->new()
+  or die "Couldn't read QQ envelope: $!\n";
+
+my($body_fn,$env_fn)=@ARGV;
+# Body
+open(BODY,"> $body_fn.new")
+   or die "Couldn't open $body_fn.new for write: $!\n";
+my $fh = $qq_body->body_fh()
+    or die "Couldn't get fh for body: $!\n";
+while (<$fh>)
+{
+  print BODY;
+}
+$qq_body->close()
+    or die "Couldn't close body: $!\n";
+close(BODY)
+  or die "Couldn't close $body_fn.new: $!\n";
+rename("$body_fn.new",$body_fn)
+  or die "Couldn't install $body_fn: $!";
+
+# Envelope
+open(ENV,"> $env_fn.new")
+   or die "Couldn't open $env_fn.new for write: $!\n";
+while (my $e = $qq_env->read_envelope_string)
+{
+  print ENV $e,"\0";
+}
+print ENV "\0";
+close(ENV)
+  or die "Couldn't close $env_fn.new: $!\n";
+rename("$env_fn.new",$env_fn)
+  or die "Couldn't install 30Send.body: $!";
+
+exit(0);

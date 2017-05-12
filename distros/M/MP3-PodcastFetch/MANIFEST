@@ -1,0 +1,23 @@
+bin/fetch_pods.PLS
+Build.PL
+Changes
+conf/fetchpods.conf
+conf/sample_conf.conf
+lib/MP3/PodcastFetch.pm
+lib/MP3/PodcastFetch/Feed.pm
+lib/MP3/PodcastFetch/Feed/Channel.pm
+lib/MP3/PodcastFetch/Feed/Item.pm
+lib/MP3/PodcastFetch/TagManager.pm
+lib/MP3/PodcastFetch/XML/SimpleParser.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+SIGNATURE			Added here by Module::Build
+t/01.basic.t
+'t/data/test 3.mp3'
+t/data/test.xml
+t/data/test1.mp3
+t/data/test2.mp3
+SIGNATURE    Added here by Module::Build

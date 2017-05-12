@@ -1,0 +1,74 @@
+
+abundant.pl
+
+  Prints the first N abundant (or deficient, or perfect) numbers.  E.g:
+
+  perl abundant.pl 100  abundant
+  perl abundant.pl 100  deficient
+  perl abundant.pl 15   perfect
+
+
+sophie_germain.pl
+
+  Prints the first N Sophie-Germain primes.  E.g.:
+
+  perl sophia_germain.pl 100000
+
+
+twin_primes.pl
+
+  Prints the first N twin-primes (first value of the pair).  E.g.:
+
+  perl twin_primes.pl 100000
+
+
+find_mr_bases.pl
+
+  An example using threads to do a parallel search for good deterministic
+  bases for a Miller-Rabin test.  This is definitely not the fastest way
+  to find these, but it's a decent example of quickly trying out an idea.
+  Be sure to set $nthreads to the right value for your machine.  It should
+  fully load your CPUs.
+
+
+parallel_fibprime.pl
+
+  Find Fibonacci primes, in parallel.  You will want Math::Prime::Util::GMP
+  installed, as these are many-thousand-digit numbers.
+
+
+porter.pl
+
+  Various ways of constructing a sequence suggested by Michael B. Porter:
+    a(n) = m s.t. sigma(m) + sigma(m+1) + ... + sigma(m+n-1) is prime.
+  Includes comparison to Pari/GP.
+
+inverse_totient.pl
+
+  Computes the image of phi(n) for a given m.  That is, given a number m,
+  the function computes all n where euler_phi(n) = m.  It returns just the
+  count in scalar context (which can be faster and lower memory for inputs
+  such as factorials that have huge images).
+
+project_euler_*.pl
+
+  Example solutions for some Project Euler problems.  If you participate
+  in PE, you really should solve the problems yourself first.  These
+  provide good examples how how to use some of the module functionality.
+
+
+verify-cert.pl
+
+  Takes an MPU or Primo primality certificate and verifies it.  This is
+  obsolete, as Math::Prime::Util::GMP now includes C code for this.
+
+verify-gmp-ecpp-cert.pl
+
+  Parses the verbose output of GMP-ECPP to construct a certificate, then
+  runs it through the verification process.
+
+verify-sage-ecpp-cert.pl
+
+  Verifies the output of SAGE's ECPP.  The SAGE module looks like it died
+  in development and never got into SAGE.  NZMath's ECPP doesn't seem to
+  output a certificate, which makes it much less useful.

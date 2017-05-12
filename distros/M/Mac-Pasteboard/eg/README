@@ -1,0 +1,35 @@
+This directory contains sample code. The largest sample, of course, is
+the pbtool script in the bin directory, which started out as an example,
+but outgrew its beginnings. The examples currently available are:
+
+README
+
+This is the file you are currently looking at.
+
+droplet
+
+    This is the source for an Apple Script droplet which passes the full
+    path names of any files dropped on it to a Perl script. To make this
+    into an Apple Script application bundle, open the Script Editor (in
+    /Applications/AppleScript until OS 10.10 Yosemite, where it became
+    /Applications/Utilities/Script Editor). Then run eg/droplet onto the
+    clipboard by (e.g.)
+
+     $ pbcopy <eg/droplet
+
+    Then paste the source into the Script Editor and save it as an
+    application bundle. The Mac::Pasteboard::Droplet documentation gives
+    the details on how to inject your Perl script into the application
+    bundle.
+
+save_image
+
+    This script saves an image on the system clipboard to a file. The
+    file name may be given on the command line; it defaults to
+    'clipboard'. If there is a file name extension associated with the
+    image's flavor, that extension is tacked onto the end of the file
+    name. For example, if the clipboard contains flavor 'com.apple.pict'
+    and this script is run, the output file will be 'clipboard.pict'
+    unless the user specifies otherwise. If there is more than one image
+    on the pasteboard, all will be dumped. If there is no image on the
+    pasteboard, the script dies with a semi-appropriate message.

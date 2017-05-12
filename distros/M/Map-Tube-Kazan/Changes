@@ -1,0 +1,30 @@
+0.04 2015-10-15T23:31:12+02:00
+ - Add tests for get_node_by_id() and get_node_by_name() methods.
+ - Update to Map::Tube 3.06.
+
+0.03 2015-09-27T18:59:14+02:00
+ - Add <?xml> header to XML document.
+ - Add example for print of metro lines to doc.
+ - Add get_line_by_id() and get_line_by_name() methods to doc.
+ - Add lines to XML document.
+ - Add test of map validity.
+ - Fix minimal Perl version.
+ - Move author tests to xt/ directory.
+ - Rewrite SEE ALSO section to new style.
+ - Update copyright years to 2015.
+ - Update Module::Install to 1.16 version.
+
+0.02 2014-12-25T18:26:55+01:00
+ - Add EXAMPLE3 section to doc.
+ - Add Map::Tube::GraphViz, Map::Tube::Text::Table, Map::Tube::Bucharest,
+   Map::Tube::Dnipropetrovsk, Map::Tube::Novosibirsk, Map::Tube::Prague,
+   Map::Tube::SaintPetersburg, Map::Tube::Tbilisi, Map::Tube::Vienna and
+   Map::Tube::Yekaterinburg to SEE ALSO section in doc.
+ - Add get_lines() method to doc.
+ - Add get_stations() method to doc.
+ - Update README.
+ - Remove executable bit from kazan-map.xml file.
+ - Remove obsolete code from EXAMPLE2 section in doc.
+
+0.01 2014-12-11T07:59:22+01:00
+ - First version

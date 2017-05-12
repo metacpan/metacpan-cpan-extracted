@@ -1,0 +1,47 @@
+[% IF statustext %]
+<p align="center">
+    <div class="[% statuscolor %]">[% tr.tr(statustext) %]</div>
+</p>
+[% END %]
+<p align="center">
+    <table class="data" align="center" id="MainDataTable">
+        <tr class="tabheader">
+            <th colspan="2">Spreadsheet</th>
+        </tr>
+        <tr>
+            <td>File:</td>
+            <td>[% FileName %]<input type="hidden" name="filename" value="[% FileName %]"</td>
+        </tr>
+        <tr>
+            <td colspan="2" width="800px">
+                <div id="jQuerySheet" style="height: 400px;"> 
+                <input type="hidden" name="mode" value="[% EditMode %]">
+                <input type="hidden" name="fileid" value="[% FileID %]">
+            </td>
+        </tr>
+    </table>
+</p>
+<script>
+    $(document).ready(function() {
+    $('#jQuerySheet').sheet({
+        [% IF AjaxGet %]
+            urlGet: '[% AjaxGet %]',
+        [% ELSE %]
+            buildSheet: '10x30',
+        [% END %]
+        title: '[% FileName %]',
+        urlSave: '[% AjaxPost %]',
+        ajaxSaveType: 'POST',
+        urlTheme: '/static/jquery.sheet-0.53/theme/jquery-ui-1.7.2.custom.css',
+        urlBaseCss: '/static/jquery.sheet-0.53/jquery.sheet.css',
+        urlMenu: "/static/jquery.sheet-0.53/menu.html",
+        urlMenuJs: "/static/jquery.sheet-0.53/plugins/mbMenu.min.js",
+        urlMenuCss: "/static/jquery.sheet-0.53/plugins/menu.css",
+        urlMetaData: "/static/jquery.sheet-0.53/plugins/jquery.metadata.js",
+        urlScrollTo: "/static/jquery.sheet-0.53/plugins/jquery.scrollto-min.js",
+        urlScrollsync: '/static/jquery.sheet-0.53/plugins/scrollsync.js',
+        urlJGCharts: '/static/jquery.sheet-0.53/plugins/jgcharts.pack.js'
+
+    });
+});
+</script> 

@@ -1,0 +1,88 @@
+{
+   "abstract" : "Interface to the NYC Subway Map.",
+   "author" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Map-Tube-NYC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.09"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Share" : "0.25",
+            "Map::Tube" : "3.28",
+            "Moo" : "2.000000",
+            "namespace::clean" : "0.24",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Map::Tube::NYC" : {
+         "file" : "lib/Map/Tube/NYC.pm",
+         "version" : "0.38"
+      },
+      "Map::Tube::NYC::Line::BMTCanarsie" : {
+         "file" : "lib/Map/Tube/NYC/Line/BMTCanarsie.pm",
+         "version" : "0.38"
+      },
+      "Map::Tube::NYC::Line::BMTNassauStreet" : {
+         "file" : "lib/Map/Tube/NYC/Line/BMTNassauStreet.pm",
+         "version" : "0.38"
+      },
+      "Map::Tube::NYC::Line::INDCrosstown" : {
+         "file" : "lib/Map/Tube/NYC/Line/INDCrosstown.pm",
+         "version" : "0.38"
+      },
+      "Map::Tube::NYC::Line::INDEighthAvenue" : {
+         "file" : "lib/Map/Tube/NYC/Line/INDEighthAvenue.pm",
+         "version" : "0.38"
+      },
+      "Map::Tube::NYC::Line::INDSixthAvenue" : {
+         "file" : "lib/Map/Tube/NYC/Line/INDSixthAvenue.pm",
+         "version" : "0.38"
+      },
+      "Map::Tube::NYC::Line::IRTFlushing" : {
+         "file" : "lib/Map/Tube/NYC/Line/IRTFlushing.pm",
+         "version" : "0.38"
+      },
+      "Map::Tube::NYC::Line::IRTLexingtonAvenue" : {
+         "file" : "lib/Map/Tube/NYC/Line/IRTLexingtonAvenue.pm",
+         "version" : "0.38"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/Map-Tube-NYC.git",
+         "web" : "https://github.com/manwar/Map-Tube-NYC"
+      }
+   },
+   "version" : "0.38",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

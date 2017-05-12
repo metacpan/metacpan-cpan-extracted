@@ -1,0 +1,3 @@
+# load the plugin from locally (TODO: test what happens when the module is already installed in @INC)
+# working dir is ./t/log/localrules.tmp/
+loadplugin Mail::SpamAssassin::Plugin::OpenPGP ../../../lib/Mail/SpamAssassin/Plugin/OpenPGP.pm

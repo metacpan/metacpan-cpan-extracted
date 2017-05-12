@@ -1,0 +1,8 @@
+1.22	Saturday, 7th June 2003
+	Fixed case for orphaned messages.
+	Fixed small glitch in horizontal stretching logic
+	Killed a 5.6ism that had crept in
+
+1.21	Friday, 6th June 2003
+	First release (pulled out from Mariachis svn repository as the
+	Mariachi code was starting to get very large)

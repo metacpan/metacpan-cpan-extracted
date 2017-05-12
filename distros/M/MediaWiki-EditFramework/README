@@ -1,0 +1,46 @@
+MediaWiki-EditFramework version 0.01
+====================================
+
+This is a higher level framework for editing MediaWiki pages.  
+
+This is the framework that I've been using for the past few years to run an
+archiving bot.  The main features that it has over lower-level frameworks
+are:
+
+* Pages are represented as objects.  This allows the page to store additional
+information, such as the last updated timestamp when they were retrieved.
+This time stamp is then passed back to the server when the page is edited,
+to allow it to properly detect edit conflicts.
+
+* The module supports specified a write_prefix, which is appended to pages
+titles when editing a page.  This makes it easier to create a test mode for
+a bot script.  By specifying the write prefix in your own user space, the
+bot will retrieve the normal pages, but the modifications will be written to
+user space so you can review them without impacting others.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  MediaWiki::API
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2012 by Steve Sanbeg
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,31 @@
+Revision history for MooseX-Types-URI
+
+0.08      2015-08-16 02:14:11Z
+  - fix duplicate TYPES section in pod
+
+0.07      2014-06-30 19:37:22Z
+  - add missing prereq declaration
+
+0.06      2014-06-28 17:00:56Z
+  - better fix for fully-qualified type names, made to MooseX::Types directly
+  - load URI::file, URI::data, URI::FromHash dynamically only when used
+    (Olivier Mengué).
+
+0.05      2013-12-17 23:20:10Z
+  - fully-qualified type names like MooseX::Types::URI::Uri work again
+    (removed in 0.04)
+
+0.04      2013-11-15 03:50:07Z
+  - convert to Dist::Zilla, fixing metadata
+  - fix coercion from HashRef (thanks, MORIYA Masaki!) (RT#69476)
+
+0.03  2011-11-17 15:40:20Z
+  - Adapt to the new type constraint inlining API in Moose 2.0100
+    (Shawn M Moore).
+
+0.02  2009-05-27 17:49:49Z
+  - Use MooseX::Types type declarators in the type coercions (Daniel Pittman).
+  - Coerce from additional MooseX::Types::Path::Class types (Daniel Pittman).
+
+0.01  2009-01-11 04:53:35Z
+  - Initial release.

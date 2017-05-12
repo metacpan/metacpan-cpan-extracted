@@ -1,0 +1,11 @@
+1.20160509 2016-05-08 22:41:55-07:00 America/Los_Angeles
+    - made compatible with Mojolicious 6.41 and later
+
+1.20150802 2015-08-01 19:23:11-07:00 America/Los_Angeles
+    - made compatible with Mojolicious 6.0 and later
+
+1.20140306 2014-03-06 10:23:35-08:00 America/Los_Angeles
+    - made compatible with Mojolicious 4.78 and later
+
+1.20131107 - 07 November 2013
+    - initial public release

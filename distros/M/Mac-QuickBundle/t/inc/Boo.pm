@@ -1,0 +1,3 @@
+package Boo;
+
+1;

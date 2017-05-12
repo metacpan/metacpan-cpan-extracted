@@ -1,0 +1,26 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/AutoManifest.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Repository.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Math/Round/Fair.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01-round_fair.t
+t/02-adjacent.t
+t/10-adjacent_total.t
+t/11-random.t
+t/12-random_big.t
+t/99-pod_coverage.t
+t/99-pod_spelling.t
+t/99-pod_syntax.t
+t/lib/Check_FairRound.pm
+t/regression.t

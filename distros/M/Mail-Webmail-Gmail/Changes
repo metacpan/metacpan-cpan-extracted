@@ -1,0 +1,126 @@
+Revision history for Perl extension Mail::Webmail::Gmail.
+
+1.09  Thu May 08 22:10:00 2006
+    - Fixed change in logon sequence (Thank you to Eric Wong).
+    - Fixed change in contacts layout (Thank you to Eric Wong).
+
+1.08  Mon May 08 10:00:00 2006
+    - Fixed change in logon sequence.
+
+1.07  Wed Apr 05 10:00:00 2006
+    - Fixed change in logon sequence.
+
+1.06  Mon Apr 03 09:30:00 2006
+    - Fixed login sequence to allow for difference in Gmail naming conventions.
+      It is not called "Gmail" in every country.
+    - Updated 'sender_email' for a slight change in the interface.
+
+1.05  Fri Mar 10 10:30:00 2006
+    - Fixed login for new Gmail login procedure.
+    - Added "timeout" argument.
+
+1.04  Wed Jun 22 17:30:00 2005
+    - Fixed an issue where Mail::Webmail::Gmail showing warnings under -w.
+    - Updated user agent string.
+    - Updated Gmail URLs + Login procedure.
+
+1.03.1 Sun Apr 17 18:30:00 2005
+    - Updated version number, missed it on 1.03.
+
+1.03  Sun Apr 17 10:30:00 2005
+    - Added the ability to act on multiple messages at one time.  Very useful
+      for deleting messages and adding labels.
+    - Added GPL License Information.
+    - Added sample code showing label retrieval and size usage.
+    - Fixed + updated Ad retrieval.
+    - Fixed a problem where Mail::Webmail::Gmail would crash out if
+      there was the exact amount of messages on a page ( it would try
+      to retrieve the next page, even though there were no more messages ).
+    - More fixes related to the last Gmail update.  Some variables
+      were incorrect, such as 'to' and 'sent'.
+
+1.02  Wed Apr 13 20:00:00 2005
+    - Google updated login procedure.  Updated Mail::Webmail::Gmail
+      to match.
+
+1.01  Sat Feb  7 01:29:00 2005
+    - Fixed proxy variable warnings ( Thank you Bas Couwenberg ).
+    - Fixed some mistakes in the documentation ( Thank you Barry D. Hassler ).
+    - Fixed error where results were limited by 'Maximum page size'
+      get_messages now returns all matched results. ( Thank you Jon Smith
+      and Christian Mendoza ).
+    - Updated documentation with new test scripts.
+    - Clarified how to delete from the spam folder.
+    - Added get_mime_email ( Thank you Marcelo E. Magallón ).
+    - Added get_contacts ( Thank you David Westbrook ).
+    - Added update_prefs.
+
+1.00  Sat Sep 12 13:32:00 2004
+    - Fixed some errors in the documentation.
+    - Fixed an error where large message bodies were
+      not returned properly.
+    - Updated documentation with new test scripts.
+    - Added the ability to delete messages.
+
+0.09  Thu Aug 12 22:14:00 2004
+    - Added a README.WINDOWS to help with the complexity of installing
+      Crypt::SSLeay under that platform.
+    - Added the ability to send attachments ( Thank you Daniel Stutz ).
+    - Added encrypt_session, which allows you to encrypt your entire
+      Gmail session, not just the logon process.
+    - Added the ability to pull ads.  Ads are automatically pulled when
+      you request a message thread.
+    - Removed reference to META.YML in the manifest.
+    - Fixed some spelling errors ( I think I do this everytime ).
+    - Fixed example scripts, changed reference of $Gmail::FOLDERS to
+      $Mail::Webmail::Gmail::FOLDERS ( thanks tristan! ).
+    - Fixed parsing error when there were unmatched square brackets
+      in a field ( Thanks again Daniel! ).
+    - Proxy support has stopped working for me, not sure if its an
+      issue with the proxy I've been using, or if its an issue with
+      the update I did to the logon process in 0.08.  ( After more testing
+      it appears that something changed with the proxy that Im using,
+      further investigation will be required to find out what I can do
+      to fix it.  Let me know if this breaks for anyone else ).
+    - I have met all of my goals for 1.0, so I guess this is the first
+      1.0 candidate, let me know what you think.
+
+0.08  Sat Aug  7 11:54:00 2004
+    - Updated the logon process after Google updated it.
+    - Some functions didnt return undef properly in list context, fixed.
+    - Updated error_msg, error_msg now resets the error string to ''.
+
+0.07  Thu Jul 15 12:35:00 2004
+    - Added the ability to star and unstar messages.
+    - Added the ability to achive and unachive messages.
+    - Added the ability to remove a label from a message.
+    - Cleaned up HTTP headers.
+    - Made further modifications to how proxy's are handled.
+
+0.06  Wed Jul 14 16:39:00 2004
+    - Reversed order of changes file to make veiwing new updates easier to view.
+    - Fixed the proxy code so that users that have a proxy, but not a login can
+      still use the module.
+
+0.05  Tue Jul 13 17:00:00 2004
+    - Cleaned up how cookies are handled.
+    - Added the ability to send email.
+    - Added the ability to label a message.
+
+0.04  (never released)
+    - cleaned up misc code.
+    - Added simple test for install.
+
+0.03  Fri Jul  9 23:36:24 2004
+    - Cosmetic fixes
+        - Replaced Tabs with 4 spaces in all code and documentation.
+        - Fixed some references incorrectly calling Gmail, "gmail".
+    - Updated error_msg.  error_msg now resets error to 0.
+    - Added edit_labels, now you can add, rename, and delete labels.
+
+0.02  Thu Jul  8 14:56:36 2004
+    - first public release.
+
+0.01  Wed Jul  7 12:16:45 2004
+    - original version; created by h2xs 1.23 with options:
+        -AX Mail::Webmail::Gmail.

@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/Mojolicious/Command/nopaste.pm
+lib/Mojolicious/Command/nopaste/Service.pm
+lib/Mojolicious/Command/nopaste/Service/debian.pm
+lib/Mojolicious/Command/nopaste/Service/fpaste.pm
+lib/Mojolicious/Command/nopaste/Service/gist.pm
+lib/Mojolicious/Command/nopaste/Service/mathbin.pm
+lib/Mojolicious/Command/nopaste/Service/pastie.pm
+lib/Mojolicious/Command/nopaste/Service/shadowcat.pm
+lib/Mojolicious/Command/nopaste/Service/sprunge.pm
+lib/Mojolicious/Command/nopaste/Service/ubuntu.pm
+MANIFEST			This list of files
+t/00-use.t
+META.yml
+META.json

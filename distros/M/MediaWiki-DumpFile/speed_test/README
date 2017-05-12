@@ -1,0 +1,324 @@
+ABOUT
+
+This is a benchmark system for XML parsers against various language editions of
+the Wikipedia. The benchmark is to print all the article titles and text of a 
+dump file specified on the command line to standard output. There are
+implementations for many perl parsing modules both high and low level. There
+are even implementations written in C that perform very fast. 
+
+The benchmark.pl program is used to run a series of benchmarks. It takes two 
+required arguments and one optional. The first required argument is a path to
+a directory full of tests to execute. The second required argument is a path
+to a directory full of dump files to execute the tests against. Both of these
+directories will be executed according to sort() on their file names. The third
+argument is a number of iterations to perform, the default being 1.
+
+Output goes to two files: results.log and results.data - they both are the
+output from YAML of an internal data structure that represents the
+test report. The results.log file is written to each time all the tests
+have been run against a specific file and lets you keep an eye on how long
+running jobs are performing. The results.data file is the cumulative data
+for all iterations and is written at the end of the entire run. 
+
+The benchmark.pl utility and all of the tests are only guaranteed to work
+if executed from the root directory of this software package. The C based
+parsers are in the bin/ directory and can be compiled by executing make in
+that directory. The Iksemel parser is not currently functional for unknown
+reasons. 
+
+THE CHALLENGE
+
+First and foremost the most important thing to keep in mind is that the English
+Wikipedia is currently 22 gigabytes of XML in a single file. You will not be 
+able to use any XML processing system that requires the entire document to 
+fit into RAM.  
+
+Each benchmark must gather up the title and text for each Wikipedia article
+for an arbitrary XML dump file. In the spirit of making this test approximate
+a real world scenario you must collect all character data together and make it
+available at one time. For instance in the perl benchmarks they actually invoke
+a common method that prints the article title and text for them. In the C based
+tests they simply collect all the data and print it out at once. 
+
+EXAMPLES
+
+Doing a test run:
+
+foodmotron:XML_Speed_Test tyler$ ./benchmark.pl test_cases data
+Iterations remaining: 1
+Benchmarking 20-simplewiki-20091021-pages-articles.xml
+Generating md5sum: 8fa1e9de18b8da7523ebfe2dac53482a
+running test_cases/MediaWiki-DumpFile-SimplePages.t data/20-simplewiki-20091021-pages-articles.xml: 12 seconds 
+running test_cases/Parse-MediaWikiDump.t data/20-simplewiki-20091021-pages-articles.xml: 66 seconds 
+running test_cases/XML-Bare.t data/20-simplewiki-20091021-pages-articles.xml: 7 seconds 
+running test_cases/XML-LibXML-Reader.t data/20-simplewiki-20091021-pages-articles.xml: 12 seconds 
+running test_cases/XML-LibXML-SAX.t data/20-simplewiki-20091021-pages-articles.xml: 68 seconds 
+running test_cases/XML-Parser-ExpatNB.t data/20-simplewiki-20091021-pages-articles.xml: 44 seconds 
+running test_cases/XML-Parser.t data/20-simplewiki-20091021-pages-articles.xml: 42 seconds 
+running test_cases/XML-SAX-Expat.t data/20-simplewiki-20091021-pages-articles.xml: 183 seconds 
+running test_cases/XML-SAX-ExpatXS.t data/20-simplewiki-20091021-pages-articles.xml: 33 seconds 
+running test_cases/XML-SAX-ExpatXS_nocharjoin.t data/20-simplewiki-20091021-pages-articles.xml: 62 seconds 
+running test_cases/XML-SAX-PurePerl.t data/20-simplewiki-20091021-pages-articles.xml: 585 seconds 
+running test_cases/XML-Twig.t data/20-simplewiki-20091021-pages-articles.xml: 204 seconds 
+running test_cases/expat.t data/20-simplewiki-20091021-pages-articles.xml: 7 seconds 
+running test_cases/libxml.t data/20-simplewiki-20091021-pages-articles.xml: 7 seconds 
+foodmotron:XML_Speed_Test tyler$ 
+
+The report:
+
+$VAR1 = [
+          {
+            'filename' => '20-simplewiki-20091021-pages-articles.xml',
+            'tests' => [
+                         {
+                           'runtimes' => {
+                                           'system' => '0.4',
+                                           'user' => '5.78',
+                                           'total' => '6.18'
+                                         },
+                           'name' => 'libxml.t',
+                           'percentage' => 100,
+                           'md5sum' => '8fa1e9de18b8da7523ebfe2dac53482a',
+                           'MiB/sec' => '35.1349971055213'
+                         },
+                         {
+                           'runtimes' => {
+                                           'system' => '0.37',
+                                           'user' => '6.32',
+                                           'total' => '6.69'
+                                         },
+                           'name' => 'XML-Bare.t',
+                           'percentage' => 108,
+                           'md5sum' => '8fa1e9de18b8da7523ebfe2dac53482a',
+                           'MiB/sec' => '32.4565444113784'
+                         },
+                         {
+                           'runtimes' => {
+                                           'system' => '0.4',
+                                           'user' => '6.55',
+                                           'total' => '6.95'
+                                         },
+                           'name' => 'expat.t',
+                           'percentage' => 112,
+                           'md5sum' => '8fa1e9de18b8da7523ebfe2dac53482a',
+                           'MiB/sec' => '31.2423427499455'
+                         },
+                         {
+                           'runtimes' => {
+                                           'system' => '0.83',
+                                           'user' => '10.62',
+                                           'total' => '11.45'
+                                         },
+                           'name' => 'XML-LibXML-Reader.t',
+                           'percentage' => 185,
+                           'md5sum' => '8fa1e9de18b8da7523ebfe2dac53482a',
+                           'MiB/sec' => '18.963692760884'
+                         },
+                         {
+                           'runtimes' => {
+                                           'system' => '0.42',
+                                           'user' => '11.33',
+                                           'total' => '11.75'
+                                         },
+                           'name' => 'MediaWiki-DumpFile-SimplePages.t',
+                           'percentage' => 190,
+                           'md5sum' => '8fa1e9de18b8da7523ebfe2dac53482a',
+                           'MiB/sec' => '18.4795133712444'
+                         },
+                         {
+                           'runtimes' => {
+                                           'system' => '0.55',
+                                           'user' => '32',
+                                           'total' => '32.55'
+                                         },
+                           'name' => 'XML-SAX-ExpatXS.t',
+                           'percentage' => 526,
+                           'md5sum' => '8fa1e9de18b8da7523ebfe2dac53482a',
+                           'MiB/sec' => '6.67079207717731'
+                         },
+                         {
+                           'runtimes' => {
+                                           'system' => '0.26',
+                                           'user' => '41.55',
+                                           'total' => '41.81'
+                                         },
+                           'name' => 'XML-Parser.t',
+                           'percentage' => 676,
+                           'md5sum' => '8fa1e9de18b8da7523ebfe2dac53482a',
+                           'MiB/sec' => '5.19335762047648'
+                         },
+                         {
+                           'runtimes' => {
+                                           'system' => '0.46',
+                                           'user' => '42.1',
+                                           'total' => '42.56'
+                                         },
+                           'name' => 'XML-Parser-ExpatNB.t',
+                           'percentage' => 688,
+                           'md5sum' => '8fa1e9de18b8da7523ebfe2dac53482a',
+                           'MiB/sec' => '5.1018393353412'
+                         },
+                         {
+                           'runtimes' => {
+                                           'system' => '0.53',
+                                           'user' => '60.13',
+                                           'total' => '60.66'
+                                         },
+                           'name' => 'XML-SAX-ExpatXS_nocharjoin.t',
+                           'percentage' => 981,
+                           'md5sum' => '8fa1e9de18b8da7523ebfe2dac53482a',
+                           'MiB/sec' => '3.5795298732628'
+                         },
+                         {
+                           'runtimes' => {
+                                           'system' => '0.49',
+                                           'user' => '65.33',
+                                           'total' => '65.82'
+                                         },
+                           'name' => 'Parse-MediaWikiDump.t',
+                           'percentage' => 1065,
+                           'md5sum' => '8fa1e9de18b8da7523ebfe2dac53482a',
+                           'MiB/sec' => '3.29891039368158'
+                         },
+                         {
+                           'runtimes' => {
+                                           'system' => '0.87',
+                                           'user' => '66.01',
+                                           'total' => '66.88'
+                                         },
+                           'name' => 'XML-LibXML-SAX.t',
+                           'percentage' => 1082,
+                           'md5sum' => '8fa1e9de18b8da7523ebfe2dac53482a',
+                           'MiB/sec' => '3.24662503158076'
+                         },
+                         {
+                           'runtimes' => {
+                                           'system' => '1.32',
+                                           'user' => '179.77',
+                                           'total' => '181.09'
+                                         },
+                           'name' => 'XML-SAX-Expat.t',
+                           'percentage' => 2930,
+                           'md5sum' => '8fa1e9de18b8da7523ebfe2dac53482a',
+                           'MiB/sec' => '1.19904070965885'
+                         },
+                         {
+                           'runtimes' => {
+                                           'system' => '1.95',
+                                           'user' => '201.49',
+                                           'total' => '203.44'
+                                         },
+                           'name' => 'XML-Twig.t',
+                           'percentage' => 3291,
+                           'md5sum' => '8fa1e9de18b8da7523ebfe2dac53482a',
+                           'MiB/sec' => '1.06731361635923'
+                         },
+                         {
+                           'runtimes' => {
+                                           'system' => '3.45',
+                                           'user' => '577.07',
+                                           'total' => '580.52'
+                                         },
+                           'name' => 'XML-SAX-PurePerl.t',
+                           'percentage' => 9393,
+                           'md5sum' => '8fa1e9de18b8da7523ebfe2dac53482a',
+                           'MiB/sec' => '0.374034110990356'
+                         }
+                       ],
+            'md5sum' => '8fa1e9de18b8da7523ebfe2dac53482a',
+            'size' => 227681797
+          }
+        ];
+
+One of the fastest benchmarks:
+
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Data::Dumper;
+
+use XML::LibXML;
+use XML::LibXML::Reader;
+
+binmode(STDOUT, ':utf8');
+binmode(STDERR, ':utf8');
+
+$| = 1;
+print '';
+
+use Bench;
+
+my $reader = XML::LibXML::Reader->new(location => shift(@ARGV));
+my $title;
+
+while(1) {
+	my $type = $reader->nodeType;
+	 
+	if ($type == XML_READER_TYPE_ELEMENT) {
+		if ($reader->name eq 'title') {
+			$title = get_text($reader);
+		} elsif ($reader->name eq 'text') {
+			my $text = get_text($reader);
+			Bench::Article($title, $text);
+		}
+				
+		$reader->nextElement;
+		next;
+	} 
+	
+	last unless $reader->read;
+}
+
+sub get_text {
+	my ($r) = @_;
+	my @buffer;
+	my $type;
+
+	while($r->nodeType != XML_READER_TYPE_TEXT && $r->nodeType != XML_READER_TYPE_END_ELEMENT) {
+		$r->read or die "could not read";
+	}
+
+	while($r->nodeType != XML_READER_TYPE_END_ELEMENT) {
+		if ($r->nodeType == XML_READER_TYPE_TEXT) {
+			push(@buffer, $r->value);
+		}
+		
+		$r->read or die "could not read";
+	}
+
+	return join('', @buffer);	
+}
+
+__END__
+
+
+TEST DATA
+You can find various MediaWiki dump files via http://download.wikimedia.org/
+I use the following various language Wikipedia dump files for my testing:
+
+http://download.wikimedia.org/cvwiki/20091208/cvwiki-20091208-pages-articles.xml.bz2
+http://download.wikimedia.org/simplewiki/20091203/simplewiki-20091203-pages-articles.xml.bz2
+http://download.wikimedia.org/enwiki/20091103/enwiki-20091103-pages-articles.xml.bz2
+
+TODO
+
+  * It would be nice if the C based parsers were glued to perl with XS so they invoke the
+    Bench::Article method just like the perl based parsers do. 
+ 
+  * One common string buffering library between all C based parsers would be nice
+    but I could not get this functional. There is a lot of other code duplication
+    as well. 
+    
+  * A C implementation of libxml's reader interface would be fun to compare
+    against the perl one. 
+    
+AUTHOR
+
+Test suite and initial tests created by Tyler Riddle <triddle@gmail.com>
+Please send any patches to me and feel free to add yourself to the 
+contributors list.
+
+CONTRIBUTORS
+
+  * "Sebastian Bober <sbober@servercare.de>" - Concept behind the XML::Bare implementation

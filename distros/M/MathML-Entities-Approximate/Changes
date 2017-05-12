@@ -1,0 +1,9 @@
+Revision history for Perl extension MathML::Entities::Approximate.
+
+0.01  Mon Dec 12 14:55:42 2005
+	- original version; created by h2xs 1.23 with options
+		-AX -b 5.6.0 --use-new-tests -n MathML::Entities::Approximate
+
+0.10  Tue Dec 13
+        - Correct some typo's in the documentation
+        - Add the getSet method

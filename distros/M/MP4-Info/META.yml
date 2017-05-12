@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                MP4-Info
+version:             1.13
+abstract:            Fetch info from MPEG-4 files (.mp4, .m4a, .m4p, .3gp)
+license:             ~
+author:              
+    - Jonathan Harris <jhar@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Encode:                        0
+    IO::String:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

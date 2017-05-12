@@ -1,0 +1,26 @@
+---
+abstract: 'Role To Add KeyedMutex'
+author:
+  - 'Daisuke Maki C<< <daisuke@endeworks.jp> >>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+  Test::UseAllModules: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-KeyedMutex
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  KeyedMutex: 0.05
+  Moose: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.00003

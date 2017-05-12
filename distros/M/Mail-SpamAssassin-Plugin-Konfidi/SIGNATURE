@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 169c8c5dd4befbef1d64e789c9ee6b1cf40d4aa2 Build.PL
+SHA1 14d871e783f212839da1a79551bf5640bdd0a897 Changes
+SHA1 2b8b815229aa8a61e483fb4ba0588b8b6c491890 LICENSE-Apache.txt
+SHA1 d213a0a50e3f89285bee522ad0d989df25b08d57 MANIFEST
+SHA1 65a2f85266ba1e00b85fdce8a9a4869b05599ffd MANIFEST.SKIP
+SHA1 9649a80692a4ac22f185e315d611ff9e844b2a77 META.yml
+SHA1 251d966d2e1f6a2b5532c292d4f43d21ed9d0f07 NOTICE.txt
+SHA1 f44518227e846d757fe19684047363719a0f5572 README
+SHA1 66cab991454122c337b33243c972dd9f160d8bae etc/61_konfidi.cf
+SHA1 d186da6cadc83858519373e4cc6698e21d243c7c etc/init_konfidi.pre
+SHA1 bf10d865251dfd738fd9f5197d787823d7ddf52d lib/Mail/SpamAssassin/Plugin/Konfidi.pm
+SHA1 8ea48df280439619c7618774150445c2d8d849b2 rules/10_misc.cf
+SHA1 f8870f13c6fd068c96dc362f40975c83b94ceca6 rules/test_load_plugin.pre
+SHA1 ee9aa2a0c155c661439643b1a60181cf0ba980e0 rules/user_prefs.template
+SHA1 de5aed9145016750c625c54438d9da7ba9d6ba4a t/00-load.t
+SHA1 20ca644ea438d62736b14927418b3f5a55d8f73a t/SATest.pm
+SHA1 692f2771df9bedf7242382ba4801d5eaa0019f8c t/acceptance-base.pl
+SHA1 95bb16becfa037ae15ac125aadbaa71d6a19d49b t/acceptance.t
+SHA1 789c51bee8e2d3ad5fca5fd84ec27a4fdb9b07d3 t/boilerplate.t
+SHA1 4529db8acd258e0c931248890af27035d86ae97b t/config
+SHA1 2a6200b4970e6761833432f119ab35ff04a6de42 t/config.dist
+SHA1 cea7ebdbf911f34e74a08232db9cd6affb87a95f t/data/gpg_thunderbird.eml
+SHA1 09a743a289b64bbfea5d49419d448541e13806fc t/data/plain.eml
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/test_dir
+SHA1 1a4c5edb1677f7bdadb52b0492a179b2ba5bb396 t/unit.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (GNU/Linux)
+
+iQIVAwUBR5Qllmc36lVi77tzAQrPWxAAse7R5WegM/dy4pk6XBqG2PMaZ5FqAaOs
+2cDdViDeMTLZVsTtVJMhfKs4teIid/w0KNwPBOyeOfCHNZLRXzou9d38Se6Ql48Y
+38UptwNDhEgrr0qo1qwTkvf5AnK8itvFB7jHe3t63WoUCC320dZb8QFxv6zAf6+/
+deX/DUzOVd/RUStX/NPM7xpz+/uKxT9whw6+J/5+3pTMoKzxEJ23sge+NrOOtay3
+PWkLWdPM0cDI9MJ6a9u+4DpJi9vPgfZ0oNOdjxh/OaBWn+zl1BTOsLPVX8jRh/bI
+LmTAihIWhbl3c/awJ2SQ8fV6jU2HJ9Sz1jXkkoBLrhS5l5e4t6JhYZv9eM9dRrBa
+fO58N54lN3G0t2tOF6tx5U/x4DIkUl8yOwufvXSUGNLVVUYXuALElj0X0Gx7v7Yu
+BitVJ3P+wR1yBwZOQ949s4fG90ye6qcOD/jbiJa+ahRzf+L55MAW+2hYj+vWa8dE
+Ra2x7FV4Gaz5HXqb3SCn8ibeoRRbNossk1b5Eopj+TF/2c65ZXs6YzHoePE8Jj0z
+AuYSbylADIG0I/+08BFf/tU2y9BRSercF1yl4QJpxg7noDFJp14/Ots3IRWiB0w/
+K8QcSkiO+QmYWZvIfs9Xe3WNiS/g/BtT+OSY3+f4Xiwe7hQm9cWTDxpj73AXDW9K
+shT2/cEIc/4=
+=qrAb
+-----END PGP SIGNATURE-----

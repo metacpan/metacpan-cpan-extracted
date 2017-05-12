@@ -1,0 +1,7 @@
+\B\.svn\b
+^_build
+^Build$
+^docs
+~$
+\.bak$
+templates/compile

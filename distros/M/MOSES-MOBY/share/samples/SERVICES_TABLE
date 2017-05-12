@@ -1,0 +1,4 @@
+$DISPATCH_TABLE = {
+                    'http://biomoby.org/#HelloBiomobyWorld' => 'Service::HelloBiomobyWorld',
+                    'http://biomoby.org/#Mabuhay' => 'Service::Mabuhay'
+                  };

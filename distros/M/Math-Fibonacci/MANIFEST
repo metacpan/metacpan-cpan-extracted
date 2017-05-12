@@ -1,0 +1,17 @@
+
+# Files in Math-Fibonacci bundle. 
+
+MANIFEST
+ARTISTIC
+TODO 
+Changes
+
+Makefile.PL
+
+lib/Math/Fibonacci.pm
+
+t/01-basic.t
+t/02-decompose.t
+
+# $Id: MANIFEST,v 1.2 2001/04/28 20:38:36 vipul Exp $ 
+

@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Module/Recursive/Require.pm
+t/00-compile.t
+t/01-require.t
+t/99-pod.t
+t/testlib/MyApp/Base.pm
+t/testlib/MyApp/Foo.pm
+t/testlib/MyApp/Mail.pm
+t/testlib/MyApp/Test.pm
+t/testlib/MyApp/Mail/LoveMail.pm
+META.yml                                 Module meta-data (added by MakeMaker)

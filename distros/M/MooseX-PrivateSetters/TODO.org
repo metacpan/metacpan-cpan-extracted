@@ -1,0 +1,11 @@
+* [[TODO]]
+*** Study MooseX::Accessors::ReadWritePrivate and perhaps implement (steal) his ideas
+*** test consistent use of versions
+*** test package name matches path to file
+* [[DONE]]
+*** Add repository
+*** Modernise as per SemiAffordanceAccessor etc
+*** Add SEE ALSO
+* [[WON'T DO/STALLED]]
+*** Add RATIONALE
+    - sick of writing reader=>'...', writer=>'...'

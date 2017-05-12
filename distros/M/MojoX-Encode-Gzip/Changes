@@ -1,0 +1,20 @@
+Revision history for MojoX-Encode-Gzip
+======================================
+
+1.11 2015-01-26
+
+  [MISC]
+  * Switched to Dist::Zilla
+  * Reformat Changes file
+
+  [TESTS]
+  * Fix t/encode-gzip.t
+
+1.10 2010-06-14 21:41:58
+
+    - Update API to match current Mojo version.
+
+1.00 2008-11-25 22:22:57
+
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,27 @@
+Revision history for Math-Round-Var
+
+v1.0.0 2008-03-09
+
+  * removed compatibility Makefile.PL
+
+0.03 2006-06-04
+
+  * fixed nit in compatibility Makefile.PL
+
+0.02 2006-01-06
+
+  * Added 'use' statements to secondary packages
+    (error found by Michael Graham.)
+
+  * Test cleanup.
+
+  * Added fake rounding class.
+
+0.01 2006-01-06
+
+  * first public release 
+
+See the source code repository for more detail.
+  http://scratchcomputing.com/svn/Math-Round-Var/trunk
+
+vim:ts=2:sw=2:et:sta

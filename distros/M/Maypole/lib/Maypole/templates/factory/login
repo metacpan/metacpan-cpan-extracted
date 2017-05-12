@@ -1,0 +1,27 @@
+[% PROCESS macros %]
+[% INCLUDE header %]
+[% INCLUDE title %]
+[% user_field = config.auth.user_field || "user" %]
+
+    <div id="title">You need to log in</div>
+
+    <div id="login">
+    [% IF login_error %]
+        <div class="error"> [% login_error | html %] </div>
+    [% END %]
+    <form method="post" action="[% base %]/[% request.path %]">
+    <fieldset>
+    <legend>Login</legend>
+        <label>
+            <span class="field">Username:</span>
+	    <input name="[% user_field %]" type="text" value="[% cgi_params.$user_field | html %]" />
+        </label>
+	<label>
+	    <span class="field">Password:</span>
+       	    <input name="password" type="password" value="[% cgi_params.passwrd | html %]"/>
+	</label>	
+        <input type="submit" name="login" value="Submit"/>
+    </fieldset>
+    </form>
+    </div>
+

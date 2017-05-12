@@ -1,0 +1,44 @@
+#! /usr/bin/env perl
+
+use warnings;
+use strict;
+
+use Getopt::Long;
+
+use Mail::SNCF::ICal;
+use Mail::SNCF::Text;
+use Mail::SNCF::Remind;
+
+my $ical;
+my $text;
+my $remind;
+my $file;
+
+GetOptions(
+    "c|ical"        => \$ical,
+    "t|text"        => \$text,
+    "r|remind"      => \$remind,
+    "o|outfile=s" => \$file,
+    );
+
+my $mailbox = shift;
+
+my $sncf;
+if ($ical) {
+    $sncf = Mail::SNCF::ICal->parse($mailbox);
+}
+else {
+    if ($remind) {
+        $sncf = Mail::SNCF::Remind->parse($mailbox);
+    }
+    else {
+        $sncf = Mail::SNCF::Text->parse($mailbox);
+    }
+}
+if (defined($file)) {
+    $sncf->file($file);
+}
+else {
+    $sncf->print;
+}
+

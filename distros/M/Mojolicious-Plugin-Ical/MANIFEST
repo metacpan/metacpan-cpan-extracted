@@ -1,0 +1,13 @@
+.perltidyrc
+.ship.conf
+Changes
+cpanfile
+lib/Mojolicious/Plugin/Ical.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-basic.t
+t/respond-to.t
+t/synopsis.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

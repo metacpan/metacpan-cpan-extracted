@@ -1,0 +1,35 @@
+const char *    T_PV
+
+
+// OSStatus is a SInt32 is a signed long;
+OSStatus    T_IV
+
+SInt32      T_IV
+
+// ItemCount is a UInt32 is an unsigned long
+ItemCount   T_UV
+
+Mac_CoreMIDI_Object   T_PTROBJ_SPECIAL
+Mac_CoreMIDI_Device   T_PTROBJ_SPECIAL
+Mac_CoreMIDI_Entity   T_PTROBJ_SPECIAL
+Mac_CoreMIDI_Endpoint T_PTROBJ_SPECIAL
+Mac_CoreMIDI_Client   T_PTROBJ_SPECIAL
+Mac_CoreMIDI_Port     T_PTROBJ_SPECIAL
+
+Mac_CoreMIDI_ThruConnection  T_PTROBJ_SPECIAL
+
+// from perlxstut
+
+INPUT
+T_PTROBJ_SPECIAL
+        if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")) {
+                IV tmp = SvIV((SV*)SvRV($arg));
+        $var = ($type) tmp;
+        }
+        else
+                croak(\"$var is not of type ${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")
+
+OUTPUT
+T_PTROBJ_SPECIAL
+        sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\",
+        (void*)$var);  

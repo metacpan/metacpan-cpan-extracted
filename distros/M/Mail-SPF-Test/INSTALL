@@ -1,0 +1,32 @@
+System Requirements
+-------------------
+
+The following Perl version and packages are required for...
+
+...building Mail::SPF::Test:
+
+  Perl 5.6
+  Module-Build 0.2805
+  version
+
+...running Mail::SPF::Test:
+
+  Perl 5.6
+  version
+  NetAddr-IP 4
+  Net-DNS 0.58
+  YAML 0.50
+
+Building and Installing
+-----------------------
+
+You can build and install Mail::SPF::Test automatically using the CPAN shell,
+or manually with the following commands:
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+# $Id: INSTALL 105 2007-05-30 20:41:57Z Julian Mehnle $
+# vim:tw=79

@@ -1,0 +1,141 @@
+<html>
+<head>
+<title>MHonArc Resources: GZIPFILES</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="gzipexe.html">GZIPEXE</a>]</td><td><nobr>[<a href="../resources.html#gzipfiles">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="gziplinks.html">GZIPLINKS</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>GZIPFILES</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p>
+<code>M2H_GZIPFILES=</code>[ <code>0</code> | <code>1</code> ]
+</p>
+</dd>
+
+<dt><strong>Element(s)</strong><dt>
+<dd><p>
+<code>&lt;GZIPFILES&gt;</code><br>
+<code>&lt;NOGZIPFILES&gt;</code><br>
+</p>
+</dd>
+
+<dt><strong>Command-line Option(s)</strong><dt>
+<dd><p>
+<code>-gzipfiles</code><br>
+<code>-nogzipfiles</code>
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>GZIPFILES tells MHonArc if it should gzip files it creates.
+This resource is useful if you have an archive with large messages,
+and/or you need to conserve disk space.
+</p>
+
+<table border=0 cellpadding=4>
+<tr valign=top>
+<td><strong>NOTE</strong></td>
+<td><p>There is a slow-down in execution speed when GZIPFILES is
+active.
+</p>
+</td>
+</tr>
+</table>
+
+<table border=0 cellpadding=4>
+<tr valign=top>
+<td><strong>NOTE</strong></td>
+<td><p>Before using GZIPFILES, you may want to make sure your
+HTTP server supports the automatic decompression of gzip files.
+The <a href="http://www.apache.org/">Apache</a> server
+supports automatic decompression of gzip files.
+</p>
+</td>
+</tr>
+</table>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<p>Off
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>None.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>2.1.0
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+<a href="gzipexe.html">GZIPEXE</a>,
+<a href="gziplinks.html">GZIPLINKS</a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="gzipexe.html">GZIPEXE</a>]</td><td><nobr>[<a href="../resources.html#gzipfiles">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="gziplinks.html">GZIPLINKS</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2003/10/06 22:04:17 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"
+><strong>MHonArc</strong></a><br>
+Copyright &#169; 1997-1998, <a href="http://www.earlhood.com/"
+>Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org"
+>mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

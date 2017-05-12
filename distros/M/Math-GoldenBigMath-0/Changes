@@ -1,0 +1,21 @@
+Revision history for Perl extension Math::GoldenBigMath.
+
+0.800  Sun Apr  7 15:42:22 2013
+	- original version; created by h2xs 1.23 with options
+		-X -n Math::GoldenBigMath
+
+0.801  Sun Jul 27 10:14:34 2014
+        - reduced test time by smaller loops in *.t
+
+0.802  Mon Aug 18 17:06:22 2014
+        - start test of exceptions only if module "Test::Exception" is available
+		- no change of Math::GoldenBigMath
+
+0.803  Tue Aug 19 08:42:38 2014
+        - correction in call of exception test file (path missing)
+		- no change of Math::GoldenBigMath
+
+0.804  Wed Aug 20 08:50:41 2014
+        - renamed Math-GoldenBigMath_Exceptions.t to Math-GoldenBigMath_Exceptions.pl
+		- no change of Math::GoldenBigMath
+				

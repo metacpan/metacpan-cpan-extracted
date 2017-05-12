@@ -1,0 +1,23 @@
+---
+abstract: 'Module::PortablePath - host-independent library paths'
+author:
+  - 'Roger M Pettett <rpettett@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-PortablePath
+provides:
+  Module::PortablePath:
+    file: lib/Module/PortablePath.pm
+    version: 0.17
+requires:
+  Config::IniFiles: 2.38
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.17

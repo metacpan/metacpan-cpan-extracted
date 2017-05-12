@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+Polygon.pm
+Polygon/functions.c
+Polygon/include/gpc.h
+Polygon/include/gpc.c
+README
+test.pl
+test_data/subjfile
+test_data/clipfile
+META.yml                                 Module meta-data (added by MakeMaker)

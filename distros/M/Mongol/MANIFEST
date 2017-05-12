@@ -1,0 +1,27 @@
+Build.PL
+lib/Mongol.pm
+lib/Mongol/Cookbook.pod
+lib/Mongol/Cursor.pm
+lib/Mongol/Model.pm
+lib/Mongol/Models/Page.pm
+lib/Mongol/Roles/Core.pm
+lib/Mongol/Roles/Pagination.pm
+lib/Mongol/Roles/Relations.pm
+lib/Mongol/Roles/UUID.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/basic.t
+t/cursor.t
+t/lib/Mongol/Models/Address.pm
+t/lib/Mongol/Models/Child.pm
+t/lib/Mongol/Models/Parent.pm
+t/lib/Mongol/Models/Person.pm
+t/lib/Mongol/Test.pm
+t/model.t
+t/pagination.t
+t/pod.t
+t/pod_coverage.t
+t/relations.t
+META.yml
+META.json

@@ -1,0 +1,423 @@
+Make Release
+
+* Project Details
+
+#+BEGIN_VERSE
+  Download:    [[http://sourceforge.net/svn/?group_id=206082currently][via SVN only]]
+  Website:     [[http://makerelease.sourceforge.net/][makerelease]]
+  SF Project:  [[http://sourceforge.net/projects/makerelease/][makerelease]]  
+#+END_VERSE
+
+* Introduction and History
+*** Release Pain
+
+    One of the issues with releasing software is that you need to do
+    mind-numbing tasks over and over and it is a barrier to "release
+    early, release often".  Not only that, releasing a particular
+    package becomes an art-form to do all the right steps in the right
+    order without forgetting anything.
+
+    The result of this problem is usually one of:
+
+    1. 1-2 knowledgeable people and if they perished someone else
+       would be bound to repeat the undocumented mistakes they made.
+    2. A hand-crafted shell script of some kind that automates at
+       least some of the tasks.  (somewhere in the middle there is
+       invariably a human step that needs to be done that requires "do
+       this and press enter".)
+    3. Documentation describing the release-steps that need to be performed.
+
+    For projects I've worked on in the past, there is often been all
+    three.  The scripts get you "so far" but there is still a lot of
+    operator knowledge.  Sometimes that knowledge is encoded into a
+    documentation file, but I've found that typically the
+    documentation lags behind the script, the expert operator or both.
+
+*** The solution: makerelease
+
+    It is, of course, impossible to take *all* the fun out of the
+    process and make everything totally automated.  The goal of
+    makerelease is a few fold:
+
+    + Ensure the documentation and the automated systems are combined
+      and thus always in sync
+    + Automattable instructions (commands to be run) can be included
+      directly and run automatically.
+    + The user can be prompted for values that need to be entered by a
+      human (like a version number for the release).
+    + It can be run interactively, prompting the administrator
+      at each step if each step should be done or not.
+    + Steps can be grouped together (e.g. "preparing", "packaging",
+      "uploading", ...)
+       
+* Usage
+*** Step by Step
+
+  makerelease divides up your release steps into pieces.  Each step
+  contains documentation and instructions (automatically done or not)
+  that need to be done.  There are a number of different types of steps.
+
+*** Structured in XML
+
+  All the steps are documented and defined using a simple xml syntax.
+  This provides easy editing using any common text editor, but still
+  allows for documentation to be easily embedded and displayable by
+  the makerlease tool.  The most basic step structure looks like:
+
+#+BEGIN_EXAMPLE
+ <makerelease>
+   <steps>
+     <step type="informational">
+       <text>
+ 	Advertise: NEWS upload to sf, publish on -announce, freshmeat,
+ 	and the GNU FSF directory
+ 	(http://directory.fsf.org/)...
+         (send mail to bug-directory@gnu.org)
+       </text>
+     </step>
+   </steps>
+ </makerelease>
+#+END_EXAMPLE
+
+  This example step (an /informational/ step) simply prints the text to the screen for the user to read.
+    
+*** makerelease -n: dry-run and produce documentation
+
+    You can test running makerelease on a defined xml file using the
+    -n switch.  This produces documentation about the steps to be
+    done.  For example, running makerelease -n on the previous example
+    would produce:
+
+*** makerelease:
+
+    By default, makerelease looks for a makerelease.xml file in the
+    current directory.  Use the /-c FILE/ flag to specify a particular
+    file to load.  It will then proceed to iterate through each step
+    and act accordingly.  See the [[Writing Steps]] section below
+    for details.
+
+#+BEGIN_EXAMPLE
+ # makerelease -c example.xml -n
+ STEP: 1:
+
+   Advertise: NEWS upload to sf, publish on -announce, freshmeat, and
+   the GNU FSF directory (http://directory.fsf.org/)... (send mail to
+   bug-directory@gnu.org)
+#+END_EXAMPLE
+
+    Note: by default it wraps all text nicely to fit into the screen
+    for you.
+
+* Writing Steps
+
+  There are a large number of step types, each with their own purpose.
+  Some flags for them work globally (on any step type) and some are
+  Step specific.
+
+*** Global Attributes and Data
+***** <text>foo</text>
+
+      The /<text>/ section is used to describe a particular step for
+      documentational purposes.  It is output both to the operator
+      doing an actual release as well as when using the /-n/ flag to
+      simply produce documentation.
+
+***** title="Title for the Step"
+
+      A step with the /title="something"/ attribute to the step will
+      "name" the step when displaying it to the user.
+
+#+BEGIN_EXAMPLE
+     <step type="informational" title="Call Bob">
+       <text>
+ 	Call Bob and have him commit all his outstanding changes.
+       </text>
+     </step>
+#+END_EXAMPLE
+
+     Produces:
+
+#+BEGIN_EXAMPLE
+ # makerelease -c example.xml
+ [...]
+ STEP: 2:  Call Bob
+
+   Call Bob and have him commit all his outstanding changes.
+
+#+END_EXAMPLE
+
+***** stepname="name"
+
+      The stepname will eventually be used to control auto-skipping of
+      things.  It is most useful when used with a structured naming
+      scheme like "build:configure".
+
+***** pause="true"
+      
+      Creating a step with /<step pause="true" ...>/ will tell
+      makerelease to stop after the text is displayed and wait for the
+      user to acknowledge the screen.
+
+#+BEGIN_EXAMPLE
+     <step type="informational" pause="true" title="Call Bob">
+       <text>
+ 	Call Bob and have him commit all his outstanding changes.
+       </text>
+     </step>
+#+END_EXAMPLE
+
+    Produces:
+
+#+BEGIN_EXAMPLE
+ # makerelease -c example.xml
+ [...]
+ STEP: 2:  Call Bob
+
+   Call Bob and have him commit all his outstanding changes.
+
+ ---- PRESS ENTER TO CONTINUE (q=quit) ----
+#+END_EXAMPLE
+
+*** Step Types
+***** Informational
+
+      Informational steps simply present information to the
+      administrator and do not perform any specific action.  They're
+      there just to document a step.  They can be used to tell an
+      administrator to do something that can't be automated by
+      including the /prompt/ flag to ensure the user sees it.
+
+#+BEGIN_EXAMPLE
+     <step type="informational" pause="true">
+       <text>
+ 	Call Bob and have him commit all his outstanding changes.
+       </text>
+     </step>
+#+END_EXAMPLE
+
+    Produces:
+
+#+BEGIN_EXAMPLE
+ # makerelease -c example.xml
+ [...]
+ STEP: 2:
+
+   Call Bob and have him commit all his outstanding changes.
+
+ ---- PRESS ENTER TO CONTINUE (q=quit) ----
+#+END_EXAMPLE
+
+
+***** Section
+
+      The /section/ type lets you group various sub-steps together.
+      It allows for entire sections to be skipped when using the /-i/
+ p     flag and documentation to be divided up into sections.
+
+
+#+BEGIN_EXAMPLE
+    <step type="section" title="Setup Steps" mandatory="1">
+     <text>These steps do preliminary work for making a release.</text>
+     <steps>
+       <step type="system">
+         <commands>
+           <command>echo "hello world"</command>
+         </commands>
+       </step>
+       <step type="informational">
+         <text>Also, Hello Universe</text>
+       </step>
+     </steps>
+    </step>
+#+END_EXAMPLE
+
+    Produces:
+
+#+BEGIN_EXAMPLE
+ # makerelease -c example.xml -n
+ STEP: 1: Setup Steps                                                          
+
+   These steps do preliminary work for making a release.
+
+   ===== Entering Step: 1 =====
+
+ STEP: 1.1:
+
+   Commands to execute:
+
+     echo "hello world"
+
+ STEP: 1.2:
+
+   Also, Hello Universe
+
+   (Leaving Step: 1)
+#+END_EXAMPLE
+
+***** Include
+
+      An /include/ directive is functionally the same as a /section/
+      directive, but the sections are specified in another
+      makerelease xml file (which must be a fully qualified xml file
+      with the top level /<makerelease>/ tag in place.
+
+#+BEGIN_EXAMPLE
+    <step type="include" title="Super extra steps">
+     <file>/path/to/foo.xml</file>
+    </step>
+#+END_EXAMPLE
+
+***** Command
+
+      Command steps are designed to run a particular set of commands
+      via system() calls.  All the commands must succeed or the user
+      will be prompted for what to do next (continue, retry or quit).
+
+#+BEGIN_EXAMPLE
+     <step type="command">
+       <commands>
+         <command>echo "hello world"</command>
+         <command>rm /</command>
+       </commands>
+     </step>
+#+END_EXAMPLE
+
+     Produces:
+
+#+BEGIN_EXAMPLE
+  STEP: 3:
+
+    running 'echo "hello world"'
+
+  hello world
+
+
+    running 'rm /'
+
+  rm: cannot remove `/': Is a directory
+  failed: status=256 what now (c,r,q)?
+#+END_EXAMPLE
+
+***** Prompt
+
+#+BEGIN_EXAMPLE
+     <step type="prompt" prompt="Enter the version number:"
+           title="Pick a Version Number for this release"
+           parameter="VERSION">
+     </step>
+#+END_EXAMPLE
+
+     Asks the user for a version number and assigns the result to the
+     VERSION parameter.  The VERSION parameter can be used in future
+     system commands, text, etc by wrapping the parameter name in {} brackets.
+
+#+BEGIN_EXAMPLE
+     <step type="system">
+       <text>We're going to produce {VERSION}
+       <commands>
+         <command>echo Hello World version {VERSION}</command>
+       </commands>
+     </step>
+#+END_EXAMPLE
+
+     You can also add a /values=/ attribute to specify the legal
+     values that can be chosen based on a regular expression.  For
+     example, the following enforces a strict NUM.NUM format:
+
+#+BEGIN_EXAMPLE
+     <step type="prompt" prompt="Enter the version number:"
+           title="Pick a Version Number for this release"
+           parameter="VERSION"
+           values="^\d+\.\d+$">
+     </step>
+#+END_EXAMPLE
+
+***** Modify
+
+    The modify step lets you make regexp based modifications to files
+    within the distribution.  Files are passed through glob() so can
+    include wildcards (*) characters.
+
+#+BEGIN_EXAMPLE
+	<step type="modify" title="Update the version number">
+	  <text>
+	    We will now modify files through the code to replace the
+	    version number with the newer one.
+	  </text>
+          <modifications>
+	    <modify
+	      find="VERSION = '(.*)'"
+	      replace="VERSION = \'{VERSION}\'">
+	      <files>
+	        <file>lib/MyModule.pm</file>
+	        <file>lib/SubDir/*.pm</file>
+	      </files>
+	    </modify>
+          </modifications>
+        </step>
+#+END_EXAMPLE
+
+    Note: You may specify multiple /<modify>/ sections within the
+    /<modifications>/ tag too.
+
+***** Perl
+
+    A wise man once said "when all else fails, resort to perl".  Ok, I
+    don't know that anyone said that actually.  But I bet someone did
+    because it seems wise to me.  Sometimes it's necessary to do extra
+    processing of user-entered data or files or the moon.  Embedding
+    perl code directly lets you accomplish these sorts of things.
+
+    The $self variable will be to the current Makerelease::Step::Perl
+    module, and within that is a reference to the parameters hash in
+    $self->{'parameters'}.
+
+    Here's an example that takes the VERSION parameter and creates a
+    new one called VERSIONDASHES with the dots replaced by dashes.
+
+#+BEGIN_EXAMPLE
+	<step type="perl" title="Defining a second internal version string"
+	  mandatory="1">
+	  <perl>
+	    <code>
+              # version number with dashes instead of dots
+	      $self->{'parameters'}{'VERSIONDASHES'} =
+    	          $self->{'parameters'}{'VERSION'};
+	      $self->{'parameters'}{'VERSIONDASHES'} =~ s/\./-/g;
+	    </code>
+	  </perl>
+	</step>
+#+END_EXAMPLE
+
+* Examples
+*** Projects that are making use of makerelease scripts
+
+    (scripts are located in the "dist" subdirectory if not otherwise
+    specified):
+
+    + [[http://www.net-snmp.org/][Net-SNMP]]
+    + [[http://www.dnssec-tools.org/][DNSSEC-Tools]]
+    + [[http://www.geoqo.org/][GeoQO]]
+    + [[http://search.cpan.org/search?query=qwizard&mode=all][QWizard]]
+
+*** Included example scripts
+
+    + dist/makerelease.xml:  the release script for this package!
+
+----------
+
+#+BEGIN_HTML
+<img src="http://sflogo.sourceforge.net/sflogo.php?group_id=121671&type=2" />
+#+END_HTML
+
+* COMMENT html style specifications
+
+# Local Variables:
+# org-export-html-style-extra:
+  "<style>
+   .outline-3 {margin-left: 1em;}
+   .example { margin-left: 2em;}
+   p { margin-left: 1em;}
+   </style>"
+# End:
+

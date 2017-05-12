@@ -1,0 +1,14 @@
+Revision history for Perl extension Module::Install::ShareFile
+
+0.04    Wed Jun 20 10:49:26 2012
+        - fixed test on Windows
+
+0.03    Tue Jun 19 10:36:12 2012
+        - fixed test on Windows
+        - added more tests
+
+0.02    Mon Jun 18 17:11:59 2012
+        - fixed test_requires
+
+0.01    Mon Jun 18 11:44:36 2012
+        - original version

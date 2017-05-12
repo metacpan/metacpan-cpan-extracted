@@ -1,0 +1,70 @@
+Revision history for Mojolicious-Plugin-Vparam
+
+2.07    25-04-2017
+    - New text type for address
+
+2.06    21-04-2017
+    - Fix depricated JSON functions
+    - Fix JSON and MD5 use blob
+
+2.05    24-03-2017
+    - Fix jpath arrays #24
+    - Fix leading dot in numeric #23
+    - Remove double regexp for numeric
+    - Fix url warnings #19
+    - New blessed attribute
+
+2.04    03-01-2017
+    - New config to fix phones
+
+2.03    19-12-2016
+    - Hash attribute
+
+2.02    13-12-2016
+    - Multiline attribute
+
+2.01    09-12-2016
+    - Drop new version function of for XML::LibXML
+
+2.00    09-12-2016
+    - Modular. Plugins are welcome!
+    - Add maestro card support
+    - Add creditcard aggregation type
+
+1.20    08-12-2016
+    - Add "load" attribute
+    - Add barcode
+    - Fix money with comma delimiter
+
+1.19.1  28-11-2016
+    - Fix workaround for old mojolicious version
+
+1.19    25-11-2016
+    - Add xpath
+    - Use Mojo::Loader for external modules
+    - Around deprecated methods.
+    - Remove Carp dependency.
+
+1.18    08-11-2016
+    - Shortcut for skipundef and optional
+    - Unversal shortcut parser
+
+1.17    08-11-2016
+    - Shortcut for optional and required
+
+1.16    03-11-2016
+    - Add ISIN
+
+1.15    03-11-2016
+    - Better POD readability
+    - POD test
+    - MANIFEST test
+
+1.14    03-11-2016
+    - Add skipundef
+
+1.13    02-11-2016
+    - Cache json and dom parsing
+
+1.12    02-11-2016
+    - Add jpath and cpath

@@ -1,0 +1,124 @@
+Revision history for Perl extension Monoceros
+
+0.27 2014-05-28T03:25:37Z
+
+  - stop using POSIX::Socket
+
+0.26 2013-10-23T01:33:36Z
+
+  - add --disable-keepalive opt
+  - change the default of --max-reqs-per-child, 100 to 1000
+  - support sendfile(2) (EXPERIMENTAL)
+
+0.25 2013-10-05T14:29:57Z
+
+  - supports accept4(2) using Linux::Socket::Accept4
+
+0.24 2013-09-02T06:39:06Z
+
+  - supports harakiri
+
+0.23 2013-08-29T04:45:27Z
+
+  - no trial version
+
+0.22 2013-08-29T02:50:57Z
+
+  - improved around readahead
+
+0.21 2013-08-28T05:21:59Z
+
+  - use AnyEvent::Util::portable_socketpair
+
+0.20 2013-08-28T02:40:00Z
+
+  - refactor: remove unused variables
+  - use sockpair instead of a internal unix-domain server
+  - change stats file format
+
+0.19 2013-06-11T17:18:23Z
+
+  - use file stat instead of symlink
+  - back fdopen in worker. error occurred in *bsd 
+
+0.18 2013-06-11T06:12:22Z
+
+  - support min-readahead-reqs option
+  - requires Test::TCP >= 2.00
+
+0.17 2013-06-07T01:50:12Z
+
+  - support max-readahead-reqs option
+  - change status content in MonocerosStatus
+  - require POSIX::getpeername
+
+0.16 2013-05-28T01:04:48Z
+
+  - remove sockfile at process exit
+
+0.15 2013-05-23T04:39:30Z
+
+  - fix pod
+
+0.14 2013-05-23T02:38:10Z
+
+  - add Plack::Middleware::MonocerosStatus to display manager status
+
+0.13 2013-05-22T06:16:38Z
+
+  - add max-keepalive-connection option
+
+0.12 2013-05-20T07:25:35Z
+
+  - refactoring worker->manager socket passing
+
+0.11 2013-05-17T05:37:59Z
+
+  - close timeouted sockets in preforked workers.
+    avoid nginx revc failed error message
+
+0.10 2013-05-16T05:35:01Z
+
+  - refactoring around read-forward. Improve performance in < 10 connections.
+
+0.09 2013-05-15T06:16:35Z
+
+  - support HTTP/1.1
+
+0.08 2013-05-13T16:49:17Z
+
+  - read-forward next reqs/socket before select
+  - drop max-keepalive-reqs
+  - bugfix around graceful-stop   
+
+0.07 2013-05-10T11:25:39Z
+
+  - refactoring around accepted sockets in worker.
+
+0.06 2013-05-10T06:03:49Z
+
+  - bugfix. recv() incorrect fd
+
+0.05 2013-05-10T02:28:02Z
+
+  - pre-sysread for tcp_defer_accept sockets.
+    if sysread returns EAGAIN. push a socket to connection manager process.
+    relate url: https://bugs.launchpad.net/ubuntu/+source/apache2/+bug/134274
+                https://forums.aws.amazon.com/thread.jspa?threadID=45564
+
+0.04 2013-05-09T04:28:31Z
+
+   - refactoring around timeout and disconnected sockets
+
+0.03 2013-05-09T01:46:46Z
+
+   - accept(2) in workers if enabled defer_accept.
+
+0.02 2013-05-07T07:35:30Z
+
+   - refactoring & performance tuning 
+
+0.01 2013-04-26T05:03:45Z
+
+    - original version
+

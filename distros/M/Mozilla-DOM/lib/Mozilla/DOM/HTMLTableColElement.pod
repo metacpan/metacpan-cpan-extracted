@@ -1,0 +1,122 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLTableColElement
+
+=for object Mozilla::DOM::HTMLTableColElement
+
+Mozilla::DOM::HTMLTableColElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLTableColElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLTableColElement interface is the interface to a
+ * [X]HTML col element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLTableColElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $align = $htmltablecolelement->B<GetAlign>()
+
+=head2 $ch = $htmltablecolelement->B<GetCh>()
+
+=head2 $choff = $htmltablecolelement->B<GetChOff>()
+
+=head2 $span = $htmltablecolelement->B<GetSpan>()
+
+=head2 $valign = $htmltablecolelement->B<GetVAlign>()
+
+=head2 $width = $htmltablecolelement->B<GetWidth>()
+
+=head2 $htmltablecolelement->B<SetAlign>($align)
+
+=over
+
+=over
+
+=item * $align (string)
+
+=back
+
+=back
+
+=head2 $htmltablecolelement->B<SetCh>($ch)
+
+=over
+
+=over
+
+=item * $ch (string)
+
+=back
+
+=back
+
+=head2 $htmltablecolelement->B<SetChOff>($choff)
+
+=over
+
+=over
+
+=item * $choff (string)
+
+=back
+
+=back
+
+=head2 $htmltablecolelement->B<SetSpan>($span)
+
+=over
+
+=over
+
+=item * $span (integer (long))
+
+=back
+
+=back
+
+=head2 $htmltablecolelement->B<SetVAlign>($valign)
+
+=over
+
+=over
+
+=item * $valign (string)
+
+=back
+
+=back
+
+=head2 $htmltablecolelement->B<SetWidth>($width)
+
+=over
+
+=over
+
+=item * $width (string)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

@@ -1,0 +1,23 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+examples/ramanujan.pl
+examples/tutte.pl
+lib/Math/Polynomial/Multivariate.pm
+t/01_basics.t
+t/02_operators.t
+t/03_bigrat.t
+t/04_squaring.t
+t/10_synopsis.t
+t/90_pod.t
+t/91_pod_cover_cp.t
+t/92_consistency.t
+t/93_examples.t
+t/95_versions.t
+t/99_signature.t
+t/data/KNOWN_VERSIONS
+t/lib/Test/MyUtils.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -1,0 +1,71 @@
+[%
+    IF page.path == '/';
+        SET title = loc('Recent pages in this wiki');
+    ELSE;
+        SET title = loc('Recent pages in x', page.path);
+    END;
+    IF activetag;
+        SET title = loc('Recent pages in x tagged with x', [page.path, activetag]);
+    END;
+    SET now = c.tz(objects.first.content.created).ymd;
+%]
+
+[% WRAPPER page/wrapper.tt title = title %]
+<div id="content">
+
+[% IF tags.count %]
+<div id="categories">
+    <strong>[% loc('Tags') %]</strong>:
+    [% WHILE (tag = tags.next) %]
+        [% IF tag.tag == activetag %]
+        <strong>[% tag.tag %]</strong>
+        [% ELSE %]
+        <a href="[% c.uri_for('recent' tag.tag) %]">[% tag.tag %]</a> ([% tag.refcount %])
+        [% END %]
+    [% END %]
+</div>
+[% END %]
+
+<h3>[% now %]</h3>
+
+[% first = 1 %]
+[% FOREACH page IN pages %]
+  [% IF c.check_permissions(page.path,c.user).view %]
+    [% IF now != c.tz(page.content.created).ymd; %]
+        [% IF first; first = 0; ELSE %]
+        </tbody></table>
+        [% END %]
+
+        [% SET now = c.tz(page.content.created).ymd %]
+        <h3>[% now %]</h3>
+        <table class="recent">
+            <thead>
+                <tr>
+                    <th class="page">[% loc('Page') %]</th>
+                    <th class="editedBy">[% loc('Edited by') %]</th>
+                    <th class="timeEdited">[% loc('Time edited') %]</th>
+                    <th class="actions">[% loc('Actions') %]</th>
+                </tr>
+            </thead>
+            <tbody>
+    [% END %]
+        <tr class="item">
+            <td>
+                <a href="[% c.uri_for( page.path ) %]">[% page.name_orig %]</a>
+                <div class="diff display-none"></div>
+            </td>
+            <td>
+            <a href="[% c.req.base; page.content.creator.link  _ '.profile'; %]">[% page.content.creator.name %]</a>
+             </td>
+            <td>
+                [% c.tz(page.content.created).hms(":") %]
+            </td>
+            <td><a rel="nofollow" href="[% c.uri_for('jsrpc/diff', page.id , 0, 0, 1) %]" class="diff_link">[% loc('View Diff') %]</a></td>
+        </tr>
+  [% END %]
+[% END %]
+</tbody>
+</table>
+
+</div>
+[% END # End WRAPPER %]

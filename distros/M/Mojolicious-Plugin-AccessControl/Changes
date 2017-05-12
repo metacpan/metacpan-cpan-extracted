@@ -1,0 +1,13 @@
+Revision history for Perl extension Mojolicious::Plugin::AccessControl
+
+0.04  2014-04-15 10:14:20 JST
+        - fixed a bug on cached routes. thanks oliverguenther@github.
+
+0.03  2013-06-05 08:34:23 JST
+        - Millaize
+
+0.02
+        - added 'on_deny' option
+
+0.01
+        - original version

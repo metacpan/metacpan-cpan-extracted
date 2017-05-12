@@ -1,0 +1,61 @@
+Module-Starter-Plugin-DebPackage
+
+This is a plugin for Module::Starter which creates a preconfigured
+set of debian configuration files (sufficient to be able to build the
+perl module into a debian package).
+
+The debian configuration files created are based on the following
+documentation:
+
+  Debian New Maintainers Guide (Chapter 4: Required stuff under debian/)
+  http://www.debian.org/doc/maint-guide/ch-dreq.en.html
+
+  Debian Perl Policy
+  http://www.debian.org/doc/packaging-manuals/perl-policy/
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Module::Starter::Plugin::DebPackage
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Module-Starter-Plugin-DebPackage
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Module-Starter-Plugin-DebPackage
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Module-Starter-Plugin-DebPackage
+
+    Search CPAN
+        http://search.cpan.org/dist/Module-Starter-Plugin-DebPackage/
+
+    Source Code Repository
+        http://github.com/bjdean/Module-Starter-Plugin-DebPackage
+
+    Ohloh News and Statistics
+        http://www.ohloh.net/projects/Module-Starter-Plugin-DebPackage
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2009 Bradley Dean
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

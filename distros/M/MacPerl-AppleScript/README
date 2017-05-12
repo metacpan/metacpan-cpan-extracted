@@ -1,0 +1,304 @@
+NAME
+    MacPerl::AppleScript - Perl extension for easily accessing scriptable
+    Apps
+
+SYNOPSIS
+      use MacPerl::AppleScript;
+
+      #
+      # create Application Object
+      #
+      my $app = MacPerl::AppleScript->new("Application Name");
+
+      my $doc1 = $application->new("document 1");
+      my $doc2 = $application->new("document 2 of $app");
+
+      #
+      # directly execute Script in Application
+      # (auto-creates a tell "Application Name" block for you
+      #
+      $app->execute("some applescript command");
+      $app->execute(["some applescript command", "..." ... ]);
+      $app->execute("some applescript command", "..." ... );
+
+      #
+      # alternative way using a hashref
+      #   script: script to get executed (string or array-ref)
+      #   object: optional, object to be named in the "tell" block
+      #   timeout: optional, timeout in seconds
+      #
+      $app->execute({
+                      script => [...],
+                      object => $doc1,
+                      timeout => 10,
+                    });
+
+      #
+      # calling functions
+      #
+      $app->open('POSIX path "/path/to/file" as alias');
+      $app->open($app->convert_path('/path/to/file','alias'));
+      $doc->close();
+      $app->close($doc1);
+
+      #
+      # string interpolation to Applescript Object Name
+      # gets 'application "Application Name"' for $application
+      # gets 'document 1 of application "Application Name"' for $doc1
+      #
+      my $ascript_appname = "$app";
+      my $ascript_docname = "$doc1";
+
+      $app->execute("close $doc1");  # cool :-)
+
+      #
+      # getting/setting properties
+      #
+      my $foo_property = $app->{foo};
+
+      my $foo_bar_prop = $doc1->{'foo bar'};
+      my $foo_bar_prop = $doc1->{foo_bar};
+
+      $app->{bar} = "any value";
+
+      $doc1->{'foo bar'} = [1,2,3,4];
+      $doc1->{foo_bar} = {a=>1, b=>2};
+
+      my %properties = %{$app};
+
+DESCRIPTION
+    This module is not written for being efficient. In fact it is really
+    inefficient but hopefully easy to use :-)
+
+    As AppleScript (and its way of communicating to Applications) usually
+    has some kind of latency. The creation of readable code is the most
+    important goal when writing this Module.
+
+    Another reason for some kind of inefficiency results in the technical
+    problem that AppleScript is a strongly typed language. Converting types
+    back to Perl is easy. But the other direction is not always clear, as
+    converting a scalar from Perl to AppleScript needs some guessing :-(
+
+    The parts of the code that deal with these problems do some tries with
+    different AppleScript commands wrapped in try-blocks. So usually one of
+    the expression works without errors. The same approach is made with hash
+    keys that can contain spaces or underscores inside the key name.
+
+    This module assumes that all strings are correctly encoded in perl
+    internal's coding sheme based on Unicode. During the conversion to
+    AppleScript all characters inside strings that are not ascii-clean are
+    converted to strange looking unicode-string constructing sequences. I
+    tested a lot of character schemes including west- and mid-european
+    languages as well as russian, greek and arabic with some applications
+    without getting problems.
+
+  USAGE
+      use MacPerl::AppleScript;
+
+    there are no special options for the usage of this module.
+
+  APPLESCRIPT OBJECTS
+    Internally a MacPerl::AppleScript Object simply is something that knows
+    the name of itself, its parent and the application it belongs to. There
+    is some caching inside. Constructing two objects for the same
+    AppleScript-Object results in the same Perl Object if the names are the
+    same. If the names differ (eg. 'foo id 13' and 'foo 1') but refer to the
+    same AppleScript Object, the MacPerl::AppleScript Objects will be
+    different, as this module only identifies things by their name.
+
+      my $app = MacPerl::AppleScript->new('application "MyApp"');
+      my $app = MacPerl::AppleScript->new('MyApp');
+
+      my $doc = MacPerl::AppleScript->new('document 1 of application "MyApp"');
+      my $doc = MacPerl::AppleScript->new("document 1 of $app");
+      my $doc = $app->new('document 1');
+
+      my $par = MacPerl::AppleScript->new('paragraph 1 of document 1 of application "MyApp"');
+      my $par = MacPerl::AppleScript->new("paragraph 1 of document 1 of $app");
+      my $par = MacPerl::AppleScript->new("paragraph 1 of $doc");
+      my $par = $app->new("paragraph 1 of $doc");
+      my $par = $doc->new('paragraph 1');
+
+    All grouped forms above are equivalent and give exactly the same result.
+    Note that in a string-context an object interpolates to its AppleScript
+    Name known from the moment of its construction.
+
+  SIMPLE METHODS
+      $obj->name()
+
+    delivers the name of an object in fully qualified form as used inside
+    AppleScript, e.g. 'application "MyApp"' or "'document 1 of application
+    "MyApp"'".
+
+      $obj->app()
+
+    gives back the Object of the application this Object belongs to. An
+    application object returns itself.
+
+      $obj->parent()
+
+    gives back the parent Object of this one. Application objects do not
+    have a parent object. In this case, "undef" is returned. (We do not
+    reflect the real AppleScript hierarchy hiere where everything is a
+    descendant of 'script "AppleScript"' that magically encloses every code
+    you write.)
+
+  SCRIPT EXECUTION
+      $obj->execute("one line script here");
+      $obj->execute("first line","second line", ...);
+      $obj->execute(["first line","second line",...]);
+
+    This simple execution format constructs an AppleScript "tell" Block for
+    the object on which the execute is called and puts the line(s) inside
+    the tell block. There is no guarantee that this execute ever returns or
+    that it will not die... Using the timeout feature (below) will prevent
+    the first, using an "eval{}" around will prevent the second.
+
+    If the AppleScript run returns something, it will be returned as a Perl
+    data structure reflecting the AppleScript data returned.
+
+      $obj->execute({script => string or array_ref,
+                     timeout => seconds,
+                     object => some_object });
+
+    Here, a timeout in full seconds may be given, or the object to be named
+    in the "tell" Block can get specified. The script may be a simple string
+    or an array-ref of script-lines.
+
+    Another way of getting AppleScript code to execute is by calling the
+    method directly. Internally the functions are resolved by Perl's
+    AUTOLOAD feature. Calling an undefined function of this class triggers
+    the AUTOLOAD function, that converts its caller and the parameters to an
+    AppleScript code sequence.
+
+      $obj->someFunction();
+
+    makes a "tell" block for $obj and "someFunction" as the AppleScript
+    function to get executed.
+
+      $obj->someFunction("argument1", "argument2", ...);
+
+    appends the space-separated arguments to the function call. If any
+    argument is an object, a hash or an array, the correct form for
+    AppleScript is used. Scalars are insert as they are. If you need args
+    quoted, you will have to add them on your own.
+
+  PROPERTIES AND INTERPOLATION
+    All AppleScript Objects have some magic features built in.
+
+      "$obj"
+
+    In String context, an object interpolates to its name inserting exactly
+    the same result as the "$obj-"name()> function call returns. This allows
+    you to use the object name inside an AppleScript you like to constuct,
+    giving you the meaning of this object in the right context.
+
+    An Object may get accessed like a Hash reference.
+
+      $obj->{'property name'}
+      $obj->{property_name}
+      %properties = %{$obj};
+
+    Access a property of the object by either using the AppleScript commands
+    "get ..." or "set ... to" to get the job done.
+
+    The key of the property may be written correct or in a simplified form
+    using underscores instead of spaces. Technically, both forms are tried
+    as AppleScript commands. The first successful set/get wins.
+
+    Retrieved values are converted to their Perl structures. Referred
+    Objects inside other objects are returned as MacPerl::AppleScript Object
+    (or subclasses hereof) references.
+
+    Setting values needs guessing of the right AppleScript datatype. 123 and
+    '123' will both result in an Integer Object inside AppleScript. In
+    doubtful cases, put the entire contents in "" quotes '"123"' in this
+    case.
+
+  CLASS METHODS
+    Working with paths and filenames in AppleScript is a bit nasty as it is
+    not always clear how to use Mac and Unix paths.
+
+      $self->convert_path('volume:folder:file')
+        returns 'file "volume:folder:file"'
+
+      $self->convert_path('volume:folder:file', 'string')
+        returns 'file "volume:folder:file" as string'
+
+      $self->convert_path('/path/to/file', 'alias')
+        returns 'POSIX file "/path/to/file" as alias'
+
+  SUBCLASSING
+    When building new classes based on MacPerl::AppleScript, there is one
+    feature that might help.
+
+    Every result that comes back from AppleScript is parsed as a text and
+    then converted to some Perl data structure. During this step all things
+    that look like AppleScript Objects are converted using a call like
+    MacPerl::AppleScript->new('some name');
+
+    Usually all objects created like that are objects of the base class.
+    However, if you like to get all 'foo of application "xx"' to be an
+    Object of 'MacPerl::XX::Foo' then you could force that behaviour.
+
+      $self->register_class('foo of application "xx"', 'MacPerl::XX::Foo');
+        or
+      $self->register_class('foo of xx', 'MacPerl::XX::Foo');
+        or
+      $self->register_class(['foo','application "xx"'], 'MacPerl::XX::Foo');
+        or
+      $self->register_class(['foo','xx'], 'MacPerl::XX::Foo');
+
+    as a step inside your class (maybe inside a BEGIN block) will do that
+    job. The left side is a collection of 'of' separated items or an array
+    reference that act as regular expressions to match the beginning of
+    object names.
+
+    If multiple registrations are made like this, they are evaluated in
+    unpredictable order of their definition stopping at the first match.
+    Doing a registration multiple times will not hurt, as internally the
+    registrations are stored in a HoH structure.
+
+      $self->get_registered_class(['foo','application "xx"'])
+        returns 'MacPerl::XX::Foo'
+
+    usually the latter function need never get called by a subclass, as the
+    magic of finding the class name occurs behind the scenes automatically.
+
+  EXPORT
+    None by default.
+
+    All defined subroutines are accessed as object-methods or indirectly by
+    overloaded functionality.
+
+SEE ALSO
+      MacPerl
+        this module uses the AppleScript sending routines of MacPerl.
+
+      Mac::Glue
+        this is an alternative to this module.
+
+      Mac::AppleEvents
+        for the brave people who want to compose AppleEvents on their own.
+
+      Mac::AppleScript
+        yet another alternative to executing AppleScript
+
+BUGS
+    probably many :-(
+
+    Please do not shame me too much, as this is my first CPAN module. There
+    are a couple of things that can be improved. Marying two completely
+    different worlds is not an easy task. If you do have any idea on how to
+    improve things, please drop me a short mail.
+
+AUTHOR
+    Wolfgang Kinkeldei, <wolfgang@kinkeldei.de>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005 by Wolfgang Kinkeldei
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.6 or, at
+    your option, any later version of Perl 5 you may have available.
+

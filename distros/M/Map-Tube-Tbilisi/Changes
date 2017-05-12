@@ -1,0 +1,28 @@
+0.04 2015-10-16T11:54:00+02:00
+ - Add lines to XML document.
+ - Improve description for get_lines() in doc.
+ - Update to Map::Tube 3.06.
+
+0.03 2015-10-09T01:02:59+02:00
+ - Add <?xml> header to XML document.
+ - Add 04-map.t test.
+ - Add EXAMPLE4 to doc.
+ - Add get_line_by_id() and get_line_by_name() methods to doc.
+ - Add tests for get_node_by_id() and get_node_by_name() methods.
+ - Move author tests to xt/ directory.
+ - Rewrite SEE ALSO section to new style.
+ - Update Module::Install to 1.16 version.
+
+0.02 2015-01-03T11:57:43+01:00
+ - Add EXAMPLE3 section to doc.
+ - Add Map::Tube::GraphViz, Map::Tube::Text::Table, Task::Map::Tube,
+   Map::Tube::Budapest, Map::Tube::Dnipropetrovsk, Map::Tube::Nanjing,
+   Map::Tube::Novosibirsk, Map::Tube::SaintPetersburg, Map::Tube::Vienna
+   and Map::Tube::Yekaterinburg to SEE ALSO section in doc.
+ - Add get_lines() method to doc.
+ - Add get_stations() method to doc.
+ - Remove executable bit from tbilisi-map.xml file.
+ - Update copyright years to 2015.
+
+0.01 2014-12-14T13:43:37+01:00
+ - First version

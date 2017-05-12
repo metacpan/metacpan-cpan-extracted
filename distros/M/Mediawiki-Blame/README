@@ -1,0 +1,92 @@
+=encoding UTF-8
+
+Mediawiki-Blame version 0.0.3 is Copyright © 2007-2009, Lars Dɪᴇᴄᴋᴏᴡ
+
+=head1 DESCRIPTION
+
+In Mediawiki, it is really easy to see who was responsible for a certain edit.
+But what if you want to know who is responsible for a piece of content? That
+would require you to go through all revisions manually.
+
+This module does the work for you by using a dump of the revision history and
+shows for each line of a Mediawiki page source who edited it last.
+
+
+=head1 INSTALLATION
+
+To install system-wide:
+
+  perl Makefile.PL
+  make
+  make test
+  sudo make install
+
+To install in a private directory:
+
+  perl Makefile.PL INSTALL_BASE=~/perl
+  make
+  make test
+  make install
+
+Do not forget to add F<$HOME/perl/lib/perl5> to your C<@INC>, see
+L<perlfaq8/"How do I add a directory to my include path (@INC) at runtime?">.
+
+
+=head1 TESTING
+
+Without special preparation, some tests are skipped.
+
+There are some checks provided through L<Test::Pod::Coverage> and
+L<Test::Pod> if they can be loaded.
+
+There is also a test through L<Test::Perl::Critic>,
+enabled by setting the C<TEST_AUTHOR> env variable.
+It is not useful for other people than me, the author.
+
+
+=head1 DEPENDENCIES
+
+=head2 For running:
+
+Perl 5.8,
+L<Algorithm::Annotate>,
+L<Carp>,
+L<Class::Spiffy>,
+L<DateTime>,
+L<DateTime::Format::ISO8601>,
+L<LWP::UserAgent>,
+L<Params::Validate>,
+L<Perl::Version>,
+L<Regexp::Common>,
+L<Readonly>,
+L<XML::Twig>
+
+=head2 optional:
+
+L<LWPx::ParanoidAgent>
+
+=head2 For testing, everything above and:
+
+L<Test::More>,
+L<Test::Exception>,
+L<Test::Without::Module>
+
+=head1 WHAT'S NEW
+
+For details, see the F<Changes> file.
+
+=head2 0.0.3  2009-11-30
+
+Maintainance release, no features changed.
+
+=head2 0.0.2  2007-08-01
+
+Made L<LWPx::ParanoidAgent> an optional feature.
+
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright © 2007-2009, Lars Dɪᴇᴄᴋᴏᴡ
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5.8.

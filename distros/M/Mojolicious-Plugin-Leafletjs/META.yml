@@ -1,0 +1,37 @@
+---
+abstract: 'A Mojolicious Plugin'
+author:
+  - 'Adam Stokes <adamjs@cpan.org>'
+build_requires:
+  Test::Mojo: 0
+  Test::More: 0.88
+configure_requires:
+  Module::Build::Tiny: 0.026
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.4, Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-Leafletjs
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  File::Basename: 0
+  File::ShareDir: 0
+  File::Spec::Functions: 0
+  Mojo::Base: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/battlemidget/Mojolicious-Plugin-Leafletjs/issues
+  homepage: https://github.com/battlemidget/Mojolicious-Plugin-Leafletjs
+  repository: https://github.com/battlemidget/Mojolicious-Plugin-Leafletjs.git
+version: 0.004
+x_contributors:
+  - 'Adam Stokes <adam.stokes@ubuntu.com>'

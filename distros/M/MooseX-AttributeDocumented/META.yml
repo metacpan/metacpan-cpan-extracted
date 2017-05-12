@@ -1,0 +1,46 @@
+---
+abstract: 'Add Documented trait to all to attributes'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  Test::More: '0.96'
+  Test::Warnings: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-AttributeDocumented
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+provides:
+  Moose::Meta::Attribute::Custom::Trait::Documented:
+    file: lib/Moose/Meta/Attribute/Custom/Trait/Documented.pm
+    version: '0.1003'
+  MooseX::AttributeDocumented:
+    file: lib/MooseX/AttributeDocumented.pm
+    version: '0.1003'
+  MooseX::AttributeDocumented::Meta::Attribute::Trait::Documented:
+    file: lib/MooseX/AttributeDocumented/Meta/Attribute/Trait/Documented.pm
+    version: '0.1003'
+requires:
+  Moose: '2.0000'
+  Moose::Exporter: '0'
+  Moose::Role: '0'
+  MooseX::Types::Moose: '0'
+  namespace::clean: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/Csson/p5-MooseX-AttributeDocumented/issues
+  homepage: https://metacpan.org/release/MooseX-AttributeDocumented
+  repository: https://github.com/Csson/p5-MooseX-AttributeDocumented.git
+version: '0.1003'

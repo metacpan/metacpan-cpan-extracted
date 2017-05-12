@@ -1,0 +1,161 @@
+
+=head1 NAME
+
+Module::ConfigureRequires - Backward-compatible configure_requires replacement
+
+=head1 VERSION
+
+0.03 (beta)
+
+=head1 SYNOPSIS
+
+In your F<Makefile.PL> or F<Build.PL>:
+
+  use ExtUtils::MakeMaker; # or Module::Build
+
+  use inc::Module::ConfigureRequires;
+  if( !eval{ require Some::Module } ) {
+    Module::ConfigureRequires::set_up(
+      error_message => "Please install Some::Module and re-run $0.\n",
+    )
+  }
+
+Then include your configuration prerequisities among the run-time or
+build prerequisites.
+
+=head1 DESCRIPTION
+
+A CPAN distribution's F<META.yml> can contain a C<configure_requires>
+entry, that lists modules needed for F<Makefile.PL> or F<Build.PL> to run.
+
+Tools such as L<CPAN.pm|CPAN> and L<CPANPLUS> automatically read this
+file, and everything just works, I<if> you have the latest version.
+
+The problem is that L<perl> 5.10.1 and earlier do not ship with a sufficiently recent version of CPAN.pm, and even the one that comes with
+5.12.x has problems.
+
+This module attempts to solve this problem by using a different approach:
+The F<Makefile> (or F<Build> script) can be made to re-run F<Makefile.PL>
+(or F<Build.PL>), if it was generated without the necessary modules, and
+then re-run the make command.
+
+The F<Makefile.PL> script will, of course, have to be able to generate at
+least a dummy F<Makefile> if the configuration prerequisites are not
+present, in order for this to work. It must also list the configuration
+prerequisites along with the build- or run-time prerequisites.
+
+So, this is how it would work under an old CPAN shell with this setup:
+
+ 1. User types ‘install Your::Module’ at the CPAN shell.
+ 2. CPAN.pm downloads and unpacks Your::Module.
+ 3. CPAN.pm runs Makefile.PL.
+ 4. CPAN.pm installs the modules that Makefile.PL claims it needs,
+    including Some::ConfigurePrereq.
+ 5. CPAN.pm runs make.
+ 6. The Makefile runs Makefile.PL, and then re-runs make.
+ 7. CPAN.pm proceeds with the tests and installation.
+
+To avoid looping, this module will die with an error message if, when the
+F<Makefile>
+runs F<Makefile.PL>, the prerequisites are still not installed.
+
+=head1 SETUP
+
+In your distribution's directory, type:
+
+  perl -MModule::ConfigureRequires=bundle-up
+
+to copy it to the F<inc> directory and add it to F<MANIFEST>.
+
+Then, in your F<Makefile.PL> or F<Build.PL>, before any code that
+manipulates command line arguments, load C<inc::Module::ConfigureRequires>.
+
+  use ExtUtils::MakeMaker; # or Module::Build
+  use inc::Module::ConfigureRequires;
+
+This has to come first, as it uses a command line argument as a cookie to
+prevent infinite loops.
+
+Then add code that checks whether the
+configuration requirements are present. Have it call
+C<Module::ConfigureRequires::set_up> if (and I<only> if) the required
+modules are not present. Include an C<error_message> argument. This will be
+used if someone tries to run make before installing the required modules.
+E.g.,
+
+  if(
+       !eval{ require ExtUtils::Depends }
+    || ExtUtils::Depends->VERSION < .2
+  ) {
+    Module::ConfigureRequires::set_up(
+     error_message =>
+       "ExtUtils::Depends .2 or higher is required to configure this\n"
+      ."module. Please install it and then re-run $0.\n"
+    )
+  }
+
+Then continue the rest of the F<Makefile.PL> or F<Build.PL>. Make sure to
+include the configure requirements among the build-time
+or run-time dependencies. (Otherwise CPAN.pm will not know to install
+them.)
+Parts of the F<Makefile.PL> (or F<Build.PL>) that require those modules
+will have to be skipped, or made to cope without them, at least for
+generating a dummy F<Makefile>.
+
+=head1 FUNCTIONS
+
+This module does not export any functions. You have to call them with the
+full package name.
+
+=over
+
+=item Module::ConfigureRequires::set_up
+
+This function chooses between one of the two functions below, based on
+C<$0> or the caller's file name, whichever ends with either Makefile.PL or
+Build.PL.
+
+=item Module::ConfigureRequires::set_up_for_mm
+
+=item Module::ConfigureRequires::set_up_for_mb
+
+These two functions do the actual work. If C<set_up> is unable to figure
+which one to use, you will have to call one of these directly.
+
+=head1 CAVEATS
+
+C<set_up_for_mm> defines a C<&MY::top_targets>. If your F<Makefile.PL> also
+defines one, there will be a conflict, and things just might not work. Make
+your F<Makefile.PL> define it conditionally, based on whether the configure
+prerequisites are present.
+
+C<set_up_for_mb> puts a wrapper around 
+C<&Module::Build::Base::create_build_script> that modifies the F<Build>
+script after it is generated. If you have code that modifies the F<Build>
+script directly, this will conflict as well.
+
+Don't list Module::ConfigureRequires under C<configure_requires>! That
+would defeat the entire purpose of this module's existence.
+
+It's somewhat ironic that we support Module::Build, even though it doesn't
+come with perl 5.8.x. In those cases, this module is absolutely useless
+unless you bundle Module::Build with your distribution.
+
+=head1 BUGS
+
+Probably.
+
+There are no automated tests yet.
+
+Please report them to bug-Module-ConfigureRequires@rt.cpan.org.
+
+=head1 AUTHOR & COPYLEFT
+
+Copyright 2010, Father Chrysostomos <sprout at a server named cpan.org>
+
+This is free software. You may use or re-distribute it under the same terms
+as perl.
+
+=head1 SEE ALSO
+
+L<ExtUtils::MakeMaker>, L<Module::Build>

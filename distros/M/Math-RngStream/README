@@ -1,0 +1,31 @@
+Math-RngStream
+==============
+
+This module wraps the RngStreams library, a package for generating
+multiple independent streams of pseudo-random numbers.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL                                             \
+             RNGSTREAMS_INCLUDE=/path/to/rngstreams/include     \
+             RNGSTREAMS_LIB=/path/to/rngstreams/lib
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires the C RngStreams library available on your
+system.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Salvador Fandino
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

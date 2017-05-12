@@ -1,0 +1,9 @@
+Revision history for Perl module Mojolicious::Plugin::Sentry
+
+0.11 2014-09-09
+    - fix make requires
+
+0.1 2014-09-08
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+

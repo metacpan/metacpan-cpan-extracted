@@ -1,0 +1,23 @@
+Revision history for Mojolicious-Plugin-ChromeLogger
+
+0.01
+        Date/time
+        First version, released on an unsuspecting world.
+
+0.02
+        Added caller info.
+        Added documentation.
+
+0.03
+        Groupped output
+        Dumps session, stash, config
+
+0.04
+        Now configurable
+        Better grouping
+
+0.05
+        HTTP Method in group name
+
+0.06
+        Fix usage with Mojolicious 5.73

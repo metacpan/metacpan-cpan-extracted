@@ -1,0 +1,109 @@
+=head1 NAME
+
+Mozilla::DOM::NSHTMLInputElement
+
+=for object Mozilla::DOM::NSHTMLInputElement
+
+Mozilla::DOM::NSHTMLInputElement is a wrapper around an instance of Mozilla's
+nsIDOMNSHTMLInputElement interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+Note: The `GetControllers' method is not wrapped; it has something to do
+with XUL.
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::NSHTMLInputElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=begin comment
+
+=head2 $controllers = $nshtmlinputelement->B<GetControllers>()
+
+Output:
+
+=over
+
+=item $controllers (nsIControllers)
+
+=back
+
+=end comment
+
+=head2 $selectionstart = $nshtmlinputelement->B<GetSelectionStart>()
+
+Output:
+
+=over
+
+=item $selectionstart (int)
+
+=back
+
+=head2 $nshtmlinputelement->B<SetSelectionStart>($selectionstart)
+
+Input:
+
+=over
+
+=item $aSelectionStart (int)
+
+=back
+
+=head2 $selectionend = $nshtmlinputelement->B<GetSelectionEnd>()
+
+Output:
+
+=over
+
+=item $selectionend (int)
+
+=back
+
+=head2 $nshtmlinputelement->B<SetSelectionEnd>($selectionend)
+
+Input:
+
+=over
+
+=item $aSelectionEnd (int)
+
+=back
+
+=head2 $nshtmlinputelement->B<SetSelectionRange>($selectionstart, $selectionend)
+
+Input:
+
+=over
+
+=item $selectionStart (int)
+
+=item $selectionEnd (int)
+
+=back
+
+=head2 $textlength = $nshtmlinputelement->B<GetTextLength>()
+
+Output:
+
+=over
+
+=item $textlength (int)
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

@@ -1,0 +1,50 @@
+{
+   "abstract" : "Mojolicious integration for humane.js",
+   "author" : [
+      "Joel A. Berger <joel.a.berger@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Humane",
+   "no_index" : {
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "1.00",
+            "Mojolicious" : "4.77"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::Humane" : {
+         "file" : "lib/Mojolicious/Plugin/Humane.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jberger/Mojolicious-Plugin-Humane/issues"
+      },
+      "repository" : {
+         "url" : "http://github.com/jberger/Mojolicious-Plugin-Humane"
+      }
+   },
+   "version" : "0.07"
+}

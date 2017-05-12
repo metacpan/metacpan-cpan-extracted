@@ -1,0 +1,382 @@
+
+Revision history for Perl module MCE::Shared.
+
+1.826 Wed May 03 03:00:00 EST 2017
+
+  * Reduced memory consumption.
+
+  * Clarified "limitations" section in MCE::Share::{ Condvar, Handle, Queue }.
+    Clarified "extra functionality" section in MCE::Shared.
+    Thank you, http://www.perlmonks.org/?node=zentara.
+
+  * Bumped MCE dependency to 1.829.
+
+1.825 Fri Apr 28 16:00:00 EST 2017
+
+  [BUG FIXES]
+
+  * Do not enable barrier mode for Queue on the Windows platform.
+  * Fixed MCE::Hobo on the Windows platform for older Perl < v5.16.
+
+  [ENHANCEMENTS]
+
+  * Added unbless option when exporting a shared object.
+    Thank you, Nick Tonkin: https://metacpan.org/author/TONKIN
+
+  * Added Curses and Prima to list for enabling the posix_exit option.
+  * Added module option for using a class explicitly when tie'ing a variable.
+  * Improved support for running MCE::Hobo on the NetBSD platform.
+  * Enhanced IPC and signal handling. Reduced memory consumption.
+
+  * Bumped MCE dependency to 1.828.
+
+1.824 Thu Apr 06 18:00:00 EST 2017
+
+  * Fixed bug introduced in 1.818, syswrite data to a shared file handle.
+
+1.823 Wed Apr 05 01:30:00 EST 2017
+
+  * Do not enable barrier mode for Queue if constructed inside a thread
+    or for the fast => 1 option.
+
+  * Fixed leaked handles during destruction; MCE::Shared::{ Condvar, Queue }.
+
+  * Updated MCE::Shared to not croak when running Perl in taint mode via
+    perl -T. Failing -T was MCE::Shared::{ Handle, Sequence, and Server }.
+
+  * Bumped MCE dependency to 1.827.
+
+1.822 Sun Apr 02 23:00:00 EST 2017
+
+  * Is now safe running MCE::Hobo with the Wx GUI toolkit (wxWidgets).
+  * Bumped MCE dependency to 1.826.
+
+1.821 Sun Apr 02 07:00:00 EST 2017
+
+  * Updated MCE::Shared::Queue. The following provides a comparison
+    for the enhancements made regarding IPC during 1.818 through 1.821,
+    in order to run on machines having "many" cores. I ran with 12, 96,
+    and 192 workers on an 8 core box.
+
+    Shared queue, dequeue 100k items.
+
+       my $Q = MCE::Shared->queue();
+
+       # Must start the manager manually when IO::FDPass is missing.
+       # This caveat applies to Condvar, Handle, and Queue.
+
+       MCE::Shared->start() unless $INC{'IO/FDPass.pm'};
+
+       $Q->enqueue( 1 .. 100000 );
+       $Q->end();
+
+       MCE->new(
+           max_workers => 12, 96, or 192,
+           user_func   => sub {
+               while ( defined ( my $item = $Q->dequeue ) ) {
+                   ;
+               }
+           }
+       )->run();
+
+    MCE::Shared 1.821:  12 ~ 1.325 secs  96 ~ 5.206 secs  192 ~ 8.158 secs
+    MCE::Shared 1.825:     ~ 0.913 secs     ~ 1.068 secs      ~ 1.560 secs
+
+  * Results were captured on a fast 8 core system running CentOS Linux 7.
+    The thing to take from this is that running many workers "no longer"
+    results in up to 6.2x penalty regarding IPC.
+
+  * When IO::FDPass is missing, croak with error if constructing a Condvar
+    or Queue and forgotten to start the shared-manager process manually.
+
+  * Bumped MCE dependency to 1.825.
+
+1.820 Sat Apr 01 01:00:00 EST 2017
+
+  * Completed validation for running MCE on a box having 100+ cores.
+  * Tuned the number of data-channels for IPC, similar to MCE.
+
+  * Bumped MCE dependency to 1.824.
+
+1.819 Fri Mar 31 19:30:00 EST 2017
+
+  * Calibrated the number of data-channels for IPC.
+
+  * Bumped MCE dependency to 1.823.
+
+1.818 Fri Mar 31 11:00:00 EST 2017
+
+  * Check for EINTR during sysread and syswrite.
+  * Improved non-shared handles constructed with MCE::Shared::Handle.
+  * Reap MCE::Hobo's from script exiting during development process.
+  * Completed validation for using MCE::Shared with 200+ cores.
+
+  * Bumped MCE dependency to 1.822.
+
+1.817 Sun Mar 19 04:00:00 EST 2017
+
+  * Fixed broken SIG{'PIPE'} handling: e.g. script.pl | head.
+  * Improved reliability when running MCE::Shared with threads.
+
+  * Added parallel Net::Pcap and Ping demonstrations on Github:
+    https://github.com/marioroy/mce-examples/tree/master/network
+
+  * Default to ':raw' for BINMODE in MCE::Shared::Handle.
+  * Optimized 'dequeue' method in MCE::Shared::Queue.
+
+  * Refactored MCE::Hobo to spawn children on the Windows platform.
+    This is necessary for Mojo::IOLoop::HoboProcess to run properly,
+    with Mojolicous 7.25 and later.
+
+  * Bumped MCE dependency to 1.821.
+
+1.816 Mon Mar 06 13:00:00 EST 2017
+
+  * Optimized SHIFT and UNSHIFT methods in MCE::Shared::Ordhash.
+
+1.815 Fri Mar 03 23:00:00 EST 2017
+
+  * Fixed issue with localizing AUTOFLUSH variable before autoflush handles.
+    Thank you, Charles Hendry for raising the issue.
+
+  * Bumped MCE dependency to 1.819.
+
+1.814 Wed Mar 01 22:00:00 EST 2017
+
+  * Fixed an issue in regards to deeply sharing an array or hash.
+
+  * Changed Sereal to Sereal::Decoder and Sereal::Encoder in recommends
+    section inside Makefile and META files.
+
+  * Revised limitations section in documentation, in regards to not having
+    IO::FDPass. E.g. Condvar, Handle, and Queue.
+
+  * Added 'end' method to MCE::Shared::Queue.
+    Updated documentation on dequeue and pending.
+
+  * Bumped MCE dependency to 1.818.
+
+1.813 Wed Feb 22 18:00:00 EST 2017
+
+  * Revised the main description in MCE::Shared::Cache.
+    Improved write performance by up to 8 percent.
+    Fixed spelling mistakes.
+
+  * Revised the description on posix_exit in MCE::Hobo.
+
+1.812 Mon Feb 20 05:30:00 EST 2017
+
+  * Improved performance for MCE::Shared::Cache.
+    This is now a hybrid LRU-plain cache implementation.
+    Added parallel demonstration at the end of the documentation.
+
+  * Bumped MCE dependency to 1.814 for the example to run.
+  * Tweaked MCE::Shared::Ordhash and MCE::Shared::Server.
+
+1.811 Wed Feb 15 17:00:00 EST 2017
+
+  * Bumped IO::FDPass dependency to 1.2 if not already installed (1.1+)
+    and have a CC compiler on hand. IO::FDPass is optional otherwise.
+
+  * Support csh redirection in Makefile.PL via bash for locating a C compiler.
+
+1.810 Tue Feb 14 17:00:00 EST 2017
+
+  * Bumped minimum requirement for Sereal to 3.015 when available.
+    Added check ensuring matching version for Encoder and Decoder.
+
+1.809 Mon Feb 13 23:30:00 EST 2017
+
+  * Fixed bug in MCE::Shared::Queue (dequeue_nb) when queue has zero items.
+  * Applied small optimization in MCE::Shared::Sequence.
+
+  * Added MCE::Shared::Cache, a fast and memory-efficient LRU-cache module.
+  * Added pipeline methods to MCE::Shared::Array, Hash, Minidb, and Ordhash.
+  * Added recommends section to Makefile and META files: IO::FDPass, Sereal.
+  * Added cross-platform template to MCE::Hobo for making an executable.
+
+  * Added hobo_timeout option to MCE::Hobo for timeout capability.
+    Also, imply posix_exit => 1 when Gearman::XS is present.
+
+  * Added MCE::Hobo + Gearman demonstrations (xs and non-xs) on Github:
+    https://github.com/marioroy/mce-examples/tree/master/gearman_xs
+    https://github.com/marioroy/mce-examples/tree/master/gearman
+
+  * Changed kilobytes and megabytes to kibiBytes (KiB) and mebiBytes (MiB)
+    respectively inside the documentation.
+
+  * Having IO::FDPass is beneficial for Condvar(s), Handle(s), and Queue(s).
+    Thus, append IO::FDPass to PREREQ_PM if we can and not already installed.
+    Run MCE_PREREQ_EXCLUDE_IO_FDPASS=1 perl Makefile.PL to bypass the check.
+
+  * Improved documentation for QUERY STRING in various helper classes.
+  * Updated SYNOPSIS in various helper classes.
+  * Updated LOCKING section in MCE::Shared.
+
+1.808 Fri Dec 09 23:30:00 EST 2016
+
+  * Optimized the barrier synchronization example in MCE::Shared::Condvar.
+
+1.807 Wed Nov 23 16:00:00 EST 2016
+
+  * Refactored MCE::Hobo. Thank you, Hermann Mueller for test case.
+  * Improved reliability on the Windows platform by using threads.
+  * Bug fixes for test scripts.
+
+1.806 Tue Nov 01 16:00:00 EST 2016
+
+  * Added a new section titled LOCKING to the MCE::Shared documentation.
+  * Tweaked shared-manager-loop delay -- applies to MSWin32 only.
+
+1.805 Fri Sep 23 01:00:00 EST 2016
+
+  * Fixed close method in shared-handle to work with Perl5i.
+    Support for Perl5i is on Unix only. Do not use threads.
+
+  * Bumped MCE dependency to 1.805.
+
+1.804 Thu Sep 01 16:00:00 EST 2016
+
+  * Fixed bug in MCE::Shared::Queue. Thank you, Mary Ehlers.
+
+  * Improved support for running MCE::Hobo with Tk. Added Tk demonstrations
+    to MCE::Examples (1.805). Thank you, Götz Meyer.
+
+1.803 Sun Jul 10 23:30:00 EST 2016
+
+  * Modified MCE::Shared::{ Base, Minidb } to pass testing with Sereal.
+  * Re-enabled Sereal 3.008+ for Perl < v5.12.0, if available.
+  * Optimized dequeue methods in MCE::Shared::Server.
+
+1.802 Mon Jul 04 03:30:00 EST 2016
+
+  * Default to Storable for serialization in Perl less than v5.12.0.
+    Sereal 3.008+, if available, is loaded automatically in Perl v5.12+.
+
+1.801 Sun Jul 03 00:30:00 EST 2016
+
+  [BUG FIXES]
+
+  * Fixed bug with MCE::Hobo for the Solaris platform.
+  * Fixed race condition in Condvar->broadcast, ->signal, ->wait.
+  * Fixed race condition in Queue->await.
+
+  [ENHANCEMENTS]
+
+  * MCE::Shared 1.801 is stable on all supported platforms.
+    Bumped version to match MCE version.
+
+  * Completed work supporting cyclical include of MCE Hobo.
+  * Updated MCE::Shared to support Perl included with Git Bash.
+
+1.102 Mon Jun 20 08:00:00 EST 2016
+
+  * Updated logic for obtaining caller in several MCE::Hobo methods.
+    This was missed in the 1.101 release.
+
+1.101 Mon Jun 20 01:00:00 EST 2016
+
+  [BUG FIXES]
+
+  * Reverted a small change in Shared/Server.pm introduced in 1.100.
+
+1.100 Sat Jun 18 16:30:00 EST 2016
+
+  [ENHANCEMENTS]
+
+  * Use Sereal 3.008+ automatically if available on the box.
+
+  [NEW FEATURES]
+
+  * Added support for cyclical include of MCE Hobo by scoping the
+    configuration to the local package.
+
+1.008 Wed May 25 22:00:00 EST 2016
+
+  * Applied correction in META.json.
+  * Bumped MCE dependency to 1.707.
+
+1.007 Wed May 25 16:00:00 EST 2016
+
+  [NEW FEATURES]
+
+  * Added chunk IO capability to READ in MCE::Shared::Handle. Both non-shared
+    and shared handles are supported. See documentation for demonstrations.
+
+  * Added assign to MCE::Shared::{ Array, Hash, and Ordhash }. Ditto, added
+    hassign and lassign to MCE::Shared::{ Minidb }. Assign is inspired by
+    Tie::Hash::Indexed v0.05_02. Thank you, Marcus Holland-Moritz.
+
+  * Added META.json to the distribution.
+
+  [ENHANCEMENTS]
+
+  * Close shared file-handles when stopping the shared-manager process.
+  * Improved exporting for shared MCE::Shared::{ Array, Hash, and Ordhash }.
+
+  * Now loads PDL::IO::Storable automatically when PDL is present. PDL must
+    come before MCE::Shared. Otherwise, load PDL::IO::Storable manually.
+
+  * Specifying Sereal for serialization falls back to Storable when PDL is
+    present. A warning is emitted indicating Sereal is not used.
+
+  [API CHANGES]
+
+  * Removed iterator and rewind functionality from MCE::Shared::Minidb.
+    This was done to streamline Minidb and MCE/Shared/Server.pm.
+
+1.006 Fri Apr 29 21:30:00 EST 2016
+
+  [BUG FIXES]
+
+  * Enabled deeply sharing by default when constructing a shared array
+    or hash. Thank you, Frank Wang.
+
+  [ENHANCEMENTS]
+
+  * Localized the output record separator in error and trap routines.
+  * Optimized READ in MCE::Shared::Server.
+
+1.005 Fri Apr 22 21:30:00 EST 2016
+
+  [ENHANCEMENTS]
+
+  * Time::HiRes sleep resolution is 15 milliseconds on Windows and Cygwin.
+    Adjusted timeout values accordingly. Thank you, Daniel Dragan.
+
+1.004 Fri Apr 15 00:30:00 EST 2016
+
+  * Bumped version for MCE to 1.705. Thank you, smoke testers.
+
+1.003 Thu Apr 14 10:00:00 EST 2016
+
+  * Bumped version for Test::More to 0.88. Thank you, Paul Howarth.
+
+1.002 Thu Apr 14 05:00:00 EST 2016
+
+  [BUG FIXES]
+
+  * Reached *stable* on all major platforms for MCE::Shared 1.0x.
+
+  [NEW FEATURES]
+
+  * MCE::Shared exports mce_open for more native feel to making a shared
+    file handle.
+
+  * Improved search functionality in MCE::Shared::{ Array, Hash, Ordhash }
+    and MCE::Shared::Minidb. Thank you, Demian Riccardi.
+
+  [ENHANCEMENTS]
+
+  * Enabled freeze callbacks for Sereal.
+  * Switched bug tracking to Github.
+  * Tweaked test scripts.
+
+1.001 Sat Mar 19 23:00:00 EST 2016
+
+  * Completed IPC optimizations for 1.0.
+
+1.000 Tue Mar 15 22:00:00 EST 2016
+
+  * First release.
+

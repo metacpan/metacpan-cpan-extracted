@@ -1,0 +1,49 @@
+#-*-perl-*-
+#
+# $Id: Event.in,v 37.2 2012/09/26 16:15:31 jettisu Exp $
+#
+# (c) 1999-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+package MQSeries::Message::Event;
+
+%ResponseParameters = 
+  (
+   &MQCACF_APPL_NAME                    => "ApplName",
+   &MQCACF_AUX_ERROR_DATA_STR_1         => "AuxErrorDataStr1",
+   &MQCACF_AUX_ERROR_DATA_STR_2         => "AuxErrorDataStr2",
+   &MQCACF_AUX_ERROR_DATA_STR_3         => "AuxErrorDataStr3",
+   &MQCACF_BRIDGE_NAME                  => "BridgeName",
+   &MQCACF_OBJECT_Q_MGR_NAME            => "ObjectQMgrName",
+   &MQCACF_USER_IDENTIFIER              => "UserIdentifier",
+   &MQCACH_CHANNEL_NAME                 => "ChannelName",
+   &MQCACH_CONNECTION_NAME              => "ConnectionName",
+   &MQCACH_FORMAT_NAME                  => "Format",
+   &MQCACH_SSL_HANDSHAKE_STAGE          => "SSLHandshakeStage",
+   &MQCACH_SSL_PEER_NAME                => "SSLPeerName",
+   &MQCACH_XMIT_Q_NAME                  => "XmitQName",
+   &MQCA_BASE_Q_NAME                    => "BaseQName",
+   &MQCA_PROCESS_NAME                   => "ProcessName",
+   &MQCA_Q_MGR_NAME                     => "QMgrName",
+   &MQCA_Q_NAME                         => "QName",
+   &MQCA_XMIT_Q_NAME                    => "XmitQName",
+   &MQIACF_AUX_ERROR_DATA_INT_1         => "AuxErrorDataInt1",
+   &MQIACF_AUX_ERROR_DATA_INT_2         => "AuxErrorDataInt2",
+   &MQIACF_BRIDGE_TYPE                  => "BridgeType",
+   &MQIACF_COMMAND                      => "Command",
+   &MQIACF_CONV_REASON_CODE             => "ConversionReasonCode",
+   &MQIACF_ERROR_IDENTIFIER             => "ErrorIdentifier",
+   &MQIACF_OPEN_OPTIONS                 => "Options",
+   &MQIACF_REASON_QUALIFIER             => "ReasonQualifier",
+   &MQIACH_CHANNEL_TYPE                 => "ChannelType",
+   &MQIACH_SSL_RETURN_CODE              => "SSLReturnCode",
+   &MQIA_APPL_TYPE                      => "ApplType",
+   &MQIA_HIGH_Q_DEPTH                   => "HighQDepth",
+   &MQIA_MSG_DEQ_COUNT                  => "MsgDeqCount",
+   &MQIA_MSG_ENQ_COUNT                  => "MsgEnqCount",
+   &MQIA_Q_TYPE                         => "QType",
+   &MQIA_TIME_SINCE_RESET               => "TimeSinceReset",
+  );
+
+1;

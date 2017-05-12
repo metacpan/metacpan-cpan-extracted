@@ -1,0 +1,9 @@
+
+#include <stdio.h>
+#include <quadmath.h>
+
+int main(void) {
+  printf("No problems\n"}
+  return 0;
+}
+

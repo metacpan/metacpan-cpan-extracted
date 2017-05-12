@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- http://twitter.github.com/bootstrap/examples/fluid.html -->
+<title><%= title %></title>
+%= javascript '/mojo/jquery/jquery.js';
+%= javascript '/bootstrap/js/bootstrap.min.js';
+%= javascript '/bootstrap/js/bootstrap-typeahead.js';
+%= javascript '/bootstrap/js/application.js';
+% if (my $head = stash 'head') {
+%= $head
+% }
+%= stylesheet '/bootstrap/css/bootstrap.min.css';
+<style>
+pre.toto_code {
+    float:right;
+    right:10%;
+    padding:5px;
+    border:1px grey dashed;
+    font-family:monospace;
+    position:absolute;
+    }
+    .sidebar-nav {
+        padding: 0px 0;
+    }
+</style>
+</head>
+<body style='padding-top:45px;'>
+        <div class="navbar navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container-fluid">
+                    <ul class="nav">
+                        % for my $c (@{ toto_config->{nav} }) {
+                        <li <%== $c eq ( ( stash 'nav_item' ) || '') ? q[class="active"] : "" %>>
+                            <%= link_to $c => begin =%><%= printable($c) =%><%= end =%>
+                        </li>
+                        % }
+                    </ul>
+                  % if (stash 'brand') {
+                        <%= stash 'brand' %>
+                  % }
+                </div>
+            </div>
+        </div>
+            <div class="row-fluid">
+                % if (stash 'nav_item') {
+                <div class="span2">
+                    <div class="well sidebar-nav">
+                        %= include 'toto/sidebar';
+                    </div>
+                </div>
+                <div class="span10">
+                % } else {
+                <div class="span12">
+                % }
+
+                    % if ( (stash 'key') || (stash 'show_tabs') ) {
+                    %= include 'toto/tabs';
+                    % }
+                       <%= content =%>
+                </div>
+            </div>
+    </body>
+</html>
+

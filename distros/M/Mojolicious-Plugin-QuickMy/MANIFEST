@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+lib/Mojolicious/Plugin/QuickMy.pm
+t/00-load.t
+examples/GrowApp/lib/MyApp.pm
+examples/GrowApp/lib/MyApp/Controller/Example.pm
+examples/GrowApp/script/my_app
+examples/GrowApp/templates/example/index.html.ep
+examples/GrowApp/templates/layouts/default.html.ep
+examples/LiteApp/MyApp
+Makefile.PL
+META.yml
+META.json

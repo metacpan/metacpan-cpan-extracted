@@ -1,0 +1,23 @@
+---
+name: Mail-Mailer-smtp_auth
+version: 0.02
+author:
+  - 'Fayland <fayland@gmail.com>'
+abstract: a Net::SMTP_auth wrapper for Mail::Mailer
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Mail::Mailer: 0
+  Net::SMTP_auth: 0
+  Test::More: 0
+provides:
+  Mail::Mailer::smtp_auth:
+    file: lib/Mail/Mailer/smtp_auth.pm
+    version: 0.02
+  Mail::Mailer::smtp_auth::pipe:
+    file: lib/Mail/Mailer/smtp_auth.pm
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

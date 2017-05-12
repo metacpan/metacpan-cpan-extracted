@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 294505f858f11dd062e9916e3f50d88210a9ef54 CONTRIBUTING
+SHA1 376593c764bac98f93e4f9185d5d80eabb52e4fe COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 4d5604d19f4f195f541ac472b0ce04351501c1f6 Changes
+SHA1 208ece136d27a5aa2158d6bd52b2a10b989efc8d INSTALL
+SHA1 47870123f373f5185d6893cb98bf06a8a05510aa LICENSE
+SHA1 2bdddffc899390c5bec856dd8570512e085b4245 MANIFEST
+SHA1 b5c976b328ce5562a64736efb6dbcbfcf660275e META.json
+SHA1 ac1919120745dc5939d26fe6ad9813097a646239 META.yml
+SHA1 575e36fb906b56d840ba2e6738d082d66ab3d45a Makefile.PL
+SHA1 8ad3c915f739bad3fb5a9b8789a09ad12ebd26eb README
+SHA1 d8f41846da37369e914d51a6aba704004f0e99fd dist.ini
+SHA1 9e3202580a57c273273c6e0f77e631fb155298c7 doap.ttl
+SHA1 f10dcd5581629c1954d07dae2e079371af49192b examples/funky-circle.pl
+SHA1 d921bba2e0d77c50bba748759f5a85a058d38162 examples/inside-out.pl
+SHA1 70b8a2d2a8f5af75bfe42ec8f0f1b54f124b1102 lib/MooseX/FunkyAttributes.pm
+SHA1 81d215aaad27cc8fbe4584f6b419223eb4ad6780 lib/MooseX/FunkyAttributes/Meta/Accessor.pm
+SHA1 3ee8161d2944579f66355528eace20f8959f07ea lib/MooseX/FunkyAttributes/Role/Attribute.pm
+SHA1 c41d1c1f7daa74ad3921a037cebb93d9d77b1efa lib/MooseX/FunkyAttributes/Role/Attribute/Delegated.pm
+SHA1 a3d083bbc107d57c07dbbb637ad4543a0927cb2c lib/MooseX/FunkyAttributes/Role/Attribute/InsideOut.pm
+SHA1 f84476b73442ca5c79312e724b0e502216cd7821 t/01basic.t
+SHA1 b4ad015dd5e7e8ad860c860271ce07192fc4afa3 t/02funky.t
+SHA1 eaad0638a9db93e0ecb2fcc0a4fcc8dcfe366352 t/03insideout.t
+SHA1 0ebc6fcbf258f26f1fd78f7be3a7a80526451d0a t/04delegated.t
+SHA1 85931a4faf10dc6822ff9b2390430c9a3b5a0593 t/05builder.t
+SHA1 0f0cfe3369fb5ed5104883e1e0df5e926edf56cf t/rt94201.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (GNU/Linux)
+
+iEYEARECAAYFAlMy8sAACgkQzr+BKGoqfTmDWACfSFcBgHhmuJWQQ9osLkx6sfgf
+wlYAn0QCQ3dIuJP4eYI3w9h+tmERY4+j
+=j+Hv
+-----END PGP SIGNATURE-----

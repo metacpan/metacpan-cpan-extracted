@@ -1,0 +1,21 @@
+For an updated list of bugs, see
+
+  https://rt.cpan.org/Public/Dist/Display.html?Name=Math-BigRat
+
+The following list is not up to date:
+
+* BigRat does not handle modify() yet or in a very incomplete manner
+* There are probably many... rats.
+
+Some things are not yet implemented, or only implemented half-way:
+
+* inf handling (partial)
+* NaN handling (partial)
+* rounding (not implemented except for bceil/bfloor)
+* $x ** $y where $y is not an integer
+* bmod(), blog(), bmodinv() and bmodpow() (partial)
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

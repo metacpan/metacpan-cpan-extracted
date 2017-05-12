@@ -1,0 +1,28 @@
+Revision history for MooseX-Attribute-Localize
+
+0.1.2 2016-01-09
+  [ BUG FIXES ]
+    - Set minimal version for Test::Deep (for 'obj_isa').
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 9 insertions(+), 2 deletions(-)
+
+0.1.1 2016-01-03
+  [ DOCUMENTATION ]
+    - Example didn't have sentinel (and thus was buggy). (ilmari)
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 9 insertions(+), 2 deletions(-)
+
+0.1.0 2016-01-01
+  [ ENHANCEMENTS ]
+    - Added hooks for when pushing, popping, and a way to access the stack.
+
+  [ STATISTICS ]
+    - code churn: 4 files changed, 196 insertions(+), 3 deletions(-)
+
+0.0.1 2015-12-31
+  - First version, unleashed on an unsuspecting world.
+
+  [ STATISTICS ]
+    - code churn: 4 files changed, 93 insertions(+), 82 deletions(-)

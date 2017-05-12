@@ -1,0 +1,6 @@
+0.04
+	- Fixed basic.t for Mojolicious 4.0
+0.03
+	- Applied patch from RT bug 80183
+0.01
+	- Initial release

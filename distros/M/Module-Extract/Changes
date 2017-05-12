@@ -1,0 +1,5 @@
+Version history for Perl distribution Module-Extract
+
+0.01 Mon  2 Oct 2006
+        - Initial Version
+	- Created by sucking code out of Module::Inspector

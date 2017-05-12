@@ -1,0 +1,41 @@
+MooseX-SingletonMethod
+
+This distribution includes the following modules:
+
+    MooseX::SingletonMethod       (0.02)
+    MooseX::SingletonMethod::Role (0.02)
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Moose
+	Moose::Role
+    	
+    	
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc MooseX::SingletonMethod
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Barry Walsh
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

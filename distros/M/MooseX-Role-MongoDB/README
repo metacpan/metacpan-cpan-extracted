@@ -1,0 +1,178 @@
+NAME
+    MooseX::Role::MongoDB - Provide MongoDB connections, databases and
+    collections
+
+VERSION
+    version 0.010
+
+SYNOPSIS
+    In your module:
+
+        package MyData;
+        use Moose;
+        with 'MooseX::Role::MongoDB';
+
+        has database => (
+            is       => 'ro',
+            isa      => 'Str',
+            required => 1,
+        );
+
+        has client_options => (
+            is       => 'ro',
+            isa      => 'HashRef',
+            default  => sub { {} },
+        );
+
+        sub _build__mongo_default_database { return $_[0]->database }
+        sub _build__mongo_client_options   { return $_[0]->client_options }
+
+        sub do_stuff {
+            my ($self) = @_;
+
+            # get "test" database
+            my $db = $self->_mongo_database("test");
+
+            # get "books" collection from default database
+            my $books = $self->_mongo_collection("books");
+
+            # get "books" collection from another database
+            my $other = $self->_mongo_collection("otherdb" => "books");
+
+            # ... do stuff with them
+        }
+
+    In your code:
+
+        my $obj = MyData->new(
+            database => 'MyDB',
+            client_options  => {
+                host => "mongodb://example.net:27017",
+                username => "willywonka",
+                password => "ilovechocolate",
+            },
+        );
+
+        $obj->do_stuff;
+
+DESCRIPTION
+    This role helps create and manage MongoDB objects. All MongoDB objects
+    will be generated lazily on demand and cached. The role manages a single
+    MongoDB::MongoClient connection, but many MongoDB::Database and
+    MongoDB::Collection objects.
+
+    The role also compensates for dropped connections and forks. If these
+    are detected, the object caches are cleared and new connections and
+    objects will be generated in the new process.
+
+    Note that a lost connection will not be detectable until *after* an
+    exception is thrown due to a failed operation.
+
+    When using this role, you should not hold onto MongoDB objects for long
+    if there is a chance of your code forking. Instead, request them again
+    each time you need them.
+
+REQUIREMENTS
+  _logger
+    You must provide a private method that returns a logging object. It must
+    implement at least the "info" and "debug" methods. MooseX::Role::Logger
+    version 0.002 or later is recommended, but other logging roles may be
+    sufficient.
+
+METHODS
+  _mongo_database
+        $obj->_mongo_database( $database_name );
+
+    Returns a MongoDB::Database. The argument is the database name. With no
+    argument, the default database name is used.
+
+  _mongo_collection
+        $obj->_mongo_collection( $database_name, $collection_name );
+        $obj->_mongo_collection( $collection_name );
+
+    Returns a MongoDB::Collection. With two arguments, the first argument is
+    the database name and the second is the collection name. With a single
+    argument, the argument is the collection name from the default database
+    name.
+
+  _mongo_clear_caches
+        $obj->_mongo_clear_caches;
+
+    Clears the MongoDB client, database and collection caches. The next
+    request for a database or collection will reconnect to the MongoDB.
+
+CONFIGURING
+    The role uses several private attributes to configure itself:
+
+    *   "_mongo_client_class" — name of the client class
+
+    *   "_mongo_client_options" — passed to client constructor
+
+    *   "_mongo_default_database" — default name used if not specified
+
+    Each of these have lazy builders that you can override in your class to
+    customize behavior of the role.
+
+    The builders are:
+
+    *   "_build__mongo_client_class" — default is "MongoDB::MongoClient"
+
+    *   "_build__mongo_client_options" — default is an empty hash reference
+
+    *   "_build__mongo_default_database" — default is the string 'test'
+
+    You will generally want to at least override
+    "_build__mongo_client_options" to allow connecting to different hosts.
+    You may want to set it explicitly or you may want to have your own
+    public attribute for users to set (as shown in the "SYNOPSIS"). The
+    choice is up to you.
+
+    If a MongoDB "host" string is provided in the client options hash, any
+    host names will be converted to IP addresses to avoid known bugs using
+    authentication over SSL.
+
+    Note that the "_mongo_default_database" is also used as the default
+    database for authentication, unless a "db_name" is provided to
+    "_mongo_client_options".
+
+LOGGING
+    Currently, only 'debug' level logs messages are generated for tracing
+    MongoDB interaction activity across forks. See the tests for an example
+    of how to enable it.
+
+SEE ALSO
+    *   Moose
+
+    *   MongoDB
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/MooseX-Role-MongoDB/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/MooseX-Role-MongoDB>
+
+      git clone https://github.com/dagolden/MooseX-Role-MongoDB.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTORS
+    *   Alexandr Ciornii <alexchorny@gmail.com>
+
+    *   David Golden <xdg@xdg.me>
+
+    *   Todd Bruner <tbruner@sandia.gov>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

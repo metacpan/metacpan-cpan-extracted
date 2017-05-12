@@ -1,0 +1,29 @@
+Revision history for Markup-Unified
+
+1.000000  2015-03-03 20:39:37+02:00 Asia/Jerusalem
+	- No longer using taint mode in the tests
+	- Bumped version to 1.0.0
+
+0.0401    2012-11-23 00:17:40 Asia/Jerusalem
+	- Documentation fixes
+
+0.04      2012-11-22 21:44:57 Asia/Jerusalem
+	- Removed Class::Accessor dependency
+	- Migrated distribution to Dist::Zilla
+
+0.03	2010-05-23, 10:30:00
+	- Added the on_space option to HTML::Truncate, so that words are
+	  are not cut-off when truncating
+	- Fixed some documentation typos and added some info
+
+0.02	2010-05-22, 20:15:00
+	- Switched from Moose to Class::Accessor for a smaller dependency chain
+	- Made all markup modules optional instead of required
+	- Added the ability to truncate the formatted text with HTML::Truncate
+	- Added a method for checking whether a markup language is supported
+	- Makefile.PL now uses Module::Install
+	- Created simple tests
+
+0.01    2009-09-29, 18:00:00
+        First version.
+

@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+lib/Mac/Glue/Apps/AddressBookExport.pm
+examples/templates/index.html
+examples/templates/by_name.html
+examples/export_example.pl
+t/address.vcf
+t/01_main.t
+META.yml                                Module meta-data (added by MakeMaker)

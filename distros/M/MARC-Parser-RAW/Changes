@@ -1,0 +1,25 @@
+Changelog for MARC-Parser-RAW
+
+0.05  2016-09-01 14:47:54 CEST
+ - fix merge
+
+0.04  2016-09-01 09:45:13 CEST
+ - support for scalar references with MARC data 
+ - tidy
+ - use Perl::Tidy and Perl::Critic
+
+0.03  2015-06-16 18:12:52 CEST
+ - edit cpanfile
+ - fix typo in POD
+
+0.02  2015-05-17 12:59:25 CEST
+ - requires perl 5.12.5
+ - edit cpanfile
+ - minor POD edit
+ - major refactoring
+ - switch to Dist-Milla
+ - edit .travis.yml
+
+0.01 2014-05-28
+ - initial commit 
+ 

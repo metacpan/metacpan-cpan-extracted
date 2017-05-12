@@ -1,0 +1,39 @@
+Mac-iTunes version 0.8
+==========================
+
+A representation of an iTunes library.
+
+This modules provides a data structure for representing a item (song, URL,
+video) within an iTunes library and a collection of items to make a library.  It
+provides methods for parsing an iTunes XML formatted library.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+SOURCE
+
+    http://mac-itunes.googlecode.com
+
+DEPENDENCIES
+
+    XML::Parser
+
+SVN INFO
+
+$Revision: 83 $
+$Date: 2010-01-20 10:12:06 -0800 (Wed, 20 Jan 2010) $
+$Author: drewgstephens $
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Drew Stephens <drew@dinomite.net>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,59 @@
+{
+   "abstract" : "Have Hash Make Code",
+   "author" : [
+      "John Scoles <byterock@hotmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Command-generate-routes_restsful_just_routes",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.38",
+            "Mojolicious::Lite" : "0",
+            "Test::Deep" : "0.113",
+            "Test::Exception" : "0.32",
+            "Test::Mojo" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Lingua::EN::Inflect" : "1",
+            "Mojo::Base" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/byterock/Mojolicious_Command_generate_routes_restsful_just_routes/issues"
+      },
+      "homepage" : "https://metacpan.org/module/Mojolicious::Command::generate::routes_restsful_just_routes",
+      "repository" : {
+         "url" : "https://github.com/byterock/Mojolicious_Command_generate_routes_restsful"
+      }
+   },
+   "version" : "0.01"
+}

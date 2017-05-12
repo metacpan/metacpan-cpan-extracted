@@ -1,0 +1,21 @@
+Changes file for Module::Husbandry
+
+0.002 Fri Feb 28 09:08:31 EST 2003
+    - Add bin/cppm and bin/rmpm to the manifest (should have used cppm for them
+      instead of cp ;)  Reported by Autrijus Tang <autrijus@autrijus.org>
+
+0.001 Wed Feb 26 08:51:20 EST 2003
+    - rmpm now updates the manifest
+    - Added cppm
+    - No longer inserts lots of blank lines in the MANIFEST
+    - Removed excess BFD call
+
+0.000_3 Mon Jan  6 14:40:07 EST 2003
+    - Added rmpm
+
+0.000_2 Tue Dec 31 09:59:41 EST 2002
+    - added bin/newpmbin
+    - MANIFEST is now properly sorted and uniqued when added to
+
+0.000_1 Tue Dec 17 09:59:30 2002
+    - Created

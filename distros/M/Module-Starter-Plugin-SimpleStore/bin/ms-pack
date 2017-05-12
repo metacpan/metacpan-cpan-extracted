@@ -1,0 +1,75 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use File::Basename;
+use Getopt::Long;
+
+GetOptions(
+	"o|output=s" => \(my $output_name),
+	"m|module=s" => \(my $module),
+);
+
+my @files = @ARGV or <*>;
+
+my $templates;
+
+for (@files) {
+	next unless -f $_ and -r $_;
+	open my $file, '<', $_;
+	$templates .= "___" . basename($_) . "___\n";
+	while (<$file>) { $templates .= $_ }
+	close $file;
+}
+
+open my $output_file, '>', $output_name;
+if ($module) { 
+	print $output_file "package $module;\n1;\n__DATA__\n";
+}
+print $output_file $templates;
+close $output_file;
+
+__END__
+
+=head1 NAME
+
+ms-pack - pack up a directory of templates
+
+=head1 SYNOPSIS
+
+ ms-pack -o Templates.pm -m Foo::Templates templates/*
+
+=head1 VERSION
+
+ $Id: ms-pack,v 1.2 2004/09/30 13:18:40 rjbs Exp $
+
+=head1 DESCRIPTION
+
+This program packs up a set of template files into a single inlined template.
+The name of the file to be written is given with the -o option.  The file is
+suitable for use as a template store with InlineStore.  If a module name is
+given with the -m option, the file will be made into a Perl module for use with
+ModuleStore.
+
+All other arguments are the names of files to pack.
+
+=head1 WARNINGS
+
+This code was hastily written and not tested.  It isn't really very good, but
+it makes my life easier.  I'll get around to making it nicer as time goes on.
+
+=head1 TODO
+
+Plenty.
+
+=head1 AUTHOR
+
+Ricardo SIGNES, <C<rjbs@cpan.org>>
+
+=head1 COPYRIGHT
+
+This code is Copyright 2004, Ricardo SIGNES.  It is licensed under the same
+terms as Perl itself.
+
+=cut

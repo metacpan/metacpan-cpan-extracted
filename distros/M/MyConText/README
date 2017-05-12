@@ -1,0 +1,141 @@
+
+			-------------------------
+				MyConText
+			-------------------------
+
+This is the README file for the MyConText module. Please read it fully,
+especially if you install or use the module for the first time and have
+some troubles with it. I probably won't be polite if you email me and I
+will realize that you did not read what I've written to help you to use
+the thing. That includes both the questions that are covered here and
+in the MyConText documentation, and the form of the email.
+
+MyConText is a Perl module that provides ways to index various text
+documents (Perl scalars, files, web pages, database fields) using the
+MySQL database in such a way, that queries like "what documents contain
+words penguin and yellow but not red" (written +penguin +yellow -red)
+can be processed. You can also index phrases, so that query
+"little penguin" returns list of documents where these two words appear
+in this sequence. A work on support of more complex queries, like
+"little penguin near swim% not penguin flies" is under way -- you are
+welcome to send patches for this feature.
+
+Perl interface is available that includes create method for creating
+new index, index_document to add (or update) info about document in
+the index and methods contains and econtains to fetch list of documents
+(document names, like filenames or URLs) that contain specified set of
+words or phrase.
+
+Main goals were:
+	use of MySQL, since database provides remote access and
+		access control and is generally nice; the mixture of
+		database indexes for speed with blobs for compact
+		storage seem very effective;
+	many flexible ways of storing the data -- you can have index
+		that is small but slow for upgrades, or bigger index
+		that is usefull for documents that change often, or
+		index for phrases; read the man page to understand the
+		concept of frontend and backend;
+	documents may be indexed (named) either by integers or by string
+		names -- conversion to internal numeric form (where
+		needed) is done by the module;
+	extendable design that provides easy ways of adding new storage
+		backends or application frontends; this makes this
+		modules suitable for tests and benchmarks of various
+		ideas;
+	perlish ways of specifying things -- you can provide your own
+		Perl code to specify how document is divided into words
+		and how words are treated; using stemming algorithms
+		and the like is easy -- just specify you Perl code
+		that will be called to do the job;
+	usefull for indexing mailinglist archives or small to medium web
+		page collections, or generally documents;
+	command line utility to maintain the indexes -- you do not need
+		to write Perl code to do tests or simple things.
+
+Main plans (ToDo):
+	extend the documentation to show how you can use your own
+		splitter and filter to strip down the HTML markup;
+	extend the backends so that one MyConText index can store more
+		views of the documents -- for example for indexing
+		mailinglist archives, it'd be nice to index from,
+		subject and body of the messages separately yet in one
+		index, so that you could base the selection critaria on
+		what part of the documents (headers or body in this
+		case) contains the pattern; for HTML document, indexing
+		titles and body in this way seems natural requirement.
+	make benchmarks showing the performance on various data sets and
+		various document types and lengths.
+
+Installation:
+	Download the tar.gz, unpack it, change to the MyConText-*
+	directory. Then do
+
+		perl Makefile.PL
+		make
+		make test
+		make install
+
+	You will be asked about way to connect to your MySQL server and
+	this information will be used to run the tests. If the MySQL
+	server is not available or you enter incorrect data, the tests
+	will be skipped.
+
+	You need perl at least 5.004, DBI at least 1.0, sufficiently
+	recent MySQL server (like 3.22+) and DBD::mysql sufficiently
+	recent. I myself use 5.004_04 and 5.005_03, 1.13, 3.22.25 and
+	2.0407. The module will probably run on older versions as
+	well, but if you experience problems and you are not sure,
+	upgrade first. Also, make sure you use the latest available
+	version of this (MyConText) module.
+
+	This is pure-Perl module -- you do not need to compile anything.
+	However I assume you know how modules and their installation
+	work with Perl. If not, please read the documentation that comes
+	with Perl and any platform specific notes -- I won't be very
+	helpfull unless we make a deal about support contract.
+
+Problems and bug reports:
+	If anything goes wrong during make test, make sure you have the
+	most recent versions of the software (this and other) first.
+	If that is the case please send me the output of
+
+		make
+		make test TEST_VERBOSE=1
+
+	together with any info that may be relevant. That includes
+	version of perl (perl -V), version of MySQL server and of this
+	any other modules. Please mention the words MyConText somewhere
+	in the Subject of your email so that I know what it's about.
+	Subjects containing stupid words like Help, all-uppercase and
+	use of exclamation points is considered rude, so avoid them.
+	Thank you.
+
+	Before you use the module, read the man page MyConText(3). If
+	reporting problems on your own data (after the installation went
+	fine), please describe the situation as clearly as possible.
+	More info is better than less.
+
+Success reports and ideas:
+	I'll appreciate and ideas and comments you might have about the
+	module. Ideas about better name (or analysis of legal side of
+	the name MyConText that is inspired by Oracle's ConText) are
+	also welcome.
+	
+	BTW, before you start flaming me that I've written this module
+	when others are available, please read my reasons in the
+	MyConText(3) man page.
+
+Available:
+	http://www.fi.muni.cz/~adelton/perl/
+	Once the name and the whole existence of the module is okayed by
+	the Perl community, also from each CPAN site in the
+	authors/id/JANPAZ/ directory.
+
+Copyright: (c) 1999 Jan Pazdziora, adelton@fi.muni.cz. All rights
+	reserved. This package is free software; you can redistribute
+	it and/or modify it under the same terms as Perl itself. It is
+	provided as is, without any warranty of it's purpose or
+	usefullness (you can't sue me if the module breaks your toaster
+	or annoys your fish either).
+

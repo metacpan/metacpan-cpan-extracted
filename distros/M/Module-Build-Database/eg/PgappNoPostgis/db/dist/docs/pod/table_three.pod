@@ -1,0 +1,30 @@
+
+=head1 NAME
+
+three
+
+=head1 DESCRIPTION
+
+this is the THREE table
+
+=head1 FIELDS
+
+ foo (integer) - 
+ bar (integer) - this is the three.bar field
+ baz (character varying) - this is the bas field
+
+
+=head1 SCHEMA
+
+                                 Table "doo.three"
+  Column |       Type        | Modifiers | Storage  |         Description         
+ --------+-------------------+-----------+----------+-----------------------------
+  foo    | integer           |           | plain    | 
+  bar    | integer           |           | plain    | this is the three.bar field
+  baz    | character varying |           | extended | this is the bas field
+ Has OIDs: no
+ 
+
+=cut
+
+

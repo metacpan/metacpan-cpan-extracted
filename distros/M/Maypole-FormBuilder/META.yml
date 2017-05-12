@@ -1,0 +1,38 @@
+---
+name: Maypole-FormBuilder
+version: 0.44
+author:
+  - David Baird <cpan@riverside-cms.co.uk>
+abstract: CGI::FormBuilder support in Maypole
+license: perl
+requires:
+  Class::DBI: 0
+  Class::DBI::AbstractSearch: 0
+  Class::DBI::FormBuilder: 0.46
+  Class::DBI::Loader: 0
+  Class::DBI::Pager: 0
+  Class::DBI::Plugin::RetrieveAll: 0
+  HTML::TreeBuilder: 0
+  List::Util: 0
+  Maypole: 2.1
+  Maypole::Plugin::LinkTools: 0.2
+  Maypole::Plugin::QuickTable: 0.421
+  Maypole::Plugin::Session: 0.2
+  NEXT: 0
+  Test::More: 0
+  UNIVERSAL::require: 0
+  URI: 0
+  URI::QueryParam: 0
+provides:
+  Maypole::FormBuilder:
+    file: lib/Maypole/FormBuilder.pm
+    version: 0.44
+  Maypole::FormBuilder::Model:
+    file: lib/Maypole/FormBuilder/Model.pm
+  Maypole::FormBuilder::Model::Plain:
+    file: lib/Maypole/FormBuilder/Model/Plain.pm
+  Maypole::FormBuilder::View:
+    file: lib/Maypole/FormBuilder/View.pm
+  Maypole::Plugin::FormBuilder:
+    file: lib/Maypole/Plugin/FormBuilder.pm
+generated_by: Module::Build version 0.2609

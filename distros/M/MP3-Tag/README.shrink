@@ -1,0 +1,21 @@
+Due to a bug (fixed in version 0.9701) when multiple edits were done on
+the same file, several K of zero bytes may have been inserted between
+the ID3v2 tag and the body of audio.  These bytes were not included in
+the count of bytes of the tag.
+
+To fix files with this unwanted padding, one can do the following:
+
+  a) include the byte count of the padding into the tag size (quick);
+
+  b) Remove the padding (will require rewriting of the file, so may take
+     some time).
+
+To do "a", enable the option 'id3v2_mergepadding' when you update tags.
+
+To do "b" enable the option 'id3v2_shrink' when you update tags.  (With
+method 'update_tag', you may want to specify the $force2 option; with mp3info2,
+use -2 option).
+
+Example:
+
+  mp3info2 -C "~id3v2_shrink=1~id3v2_mergepadding=1" -u2 -R .

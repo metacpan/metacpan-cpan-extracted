@@ -1,0 +1,6 @@
+0.101   2014-04-18
+  * Remove dependency on common::sense
+  * Improve documentation
+
+0.100   2014-04-15
+  * Initial CPAN release

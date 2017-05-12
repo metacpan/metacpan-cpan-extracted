@@ -1,0 +1,56 @@
+{
+   "abstract" : "Have a Hash make some Mojo routes",
+   "author" : [
+      "John Scoles <byterock@hotmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Routes-Restful",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Lingua::EN::Inflect" : "1",
+            "Module::Build" : "0.38",
+            "Test::Mojo" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojo::Base" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/byterock/mojolicious-plugin-routes-restful/issues"
+      },
+      "homepage" : "https://metacpan.org/module/Mojolicious::Plugin::Routes::Restful",
+      "repository" : {
+         "url" : "https://github.com/byterock/mojolicious-plugin-routes-restful"
+      }
+   },
+   "version" : "0.03"
+}

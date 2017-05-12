@@ -1,0 +1,11 @@
+Changes
+COPYRIGHT
+lib/Mail/Dir.pm
+lib/Mail/Dir/Message.pm
+t/lib-Mail-Dir.t
+LICENSE
+README.md
+Makefile.PL
+MANIFEST			This list of files
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

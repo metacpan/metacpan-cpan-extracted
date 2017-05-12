@@ -1,0 +1,226 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+#use lib qw(/home/agentz/gmake-db/lib /home/agentz/mdom-gmake/lib);
+
+#use Smart::Comments;
+#use Smart::Comments '####';
+use Getopt::Long;
+use Makefile::Parser::GmakeDB;
+use IPC::Run3;
+use File::Slurp;
+use Makefile::AST::Evaluator;
+use List::Util 'first';
+
+my $VERSION = $Makefile::Parser::GmakeDB::VERSION;
+
+my @DefaultMakefile = (
+    'GNUmakefile',
+    'makefile',
+    'Makefile'
+);
+
+my $user_makefile;
+my $print_version;
+my ($makefile, $njobs, @goals);
+Getopt::Long::Configure ("bundling");
+GetOptions(
+    'f|file|makefile=s' => \$user_makefile,
+    'v|version' => \$print_version,
+) or die "Usage: $0 [-f makefile] goals...\n";
+### $makefile
+### @ARGV
+
+$Makefile::AST::Evaluator::JustPrint = 0;
+$Makefile::AST::Evaluator::Quiet = 1;
+$Makefile::AST::Evaluator::IgnoreErrors = 1;
+$Makefile::AST::Evaluator::AlwaysMake = 1;
+$Makefile::AST::Evaluator::Question = 1;
+
+if ($print_version) {
+    print <<"_EOC_";
+makesimple $VERSION
+_EOC_
+    exit 0;
+}
+
+our $MAKE;
+my @var_defs;
+for my $arg (@ARGV) {
+    if ($arg =~ /(.*?)=(.*)/) {
+        my ($var, $value) = ($1, $2);
+        if ($var eq 'MAKE') {
+            $MAKE = $value;
+        }
+        push @var_defs, $arg;
+    } else {
+        push @goals, $arg;
+    }
+}
+if (!defined $MAKE) {
+    ($MAKE = $0) =~ s/.*[\\\/]//;
+}
+
+$makefile = $user_makefile;
+if (!defined $makefile) {
+    $makefile = first { -f $_ } @DefaultMakefile;
+} elsif ($makefile ne '-' and !-f $makefile) {
+    warn "$MAKE: $makefile: No such file or directory\n";
+    push @goals, $makefile; # This is required
+}
+
+### var defs via command line: @var_defs
+
+my $level = $ENV{MAKESIMPLE_LEVEL};
+if (!defined $level) { $level = 0; }
+else { $level++ }
+#### %ENV
+$ENV{MAKELEVEL} = $level;
+$ENV{MAKESIMPLE_LEVEL} = $level;
+
+my ($stdout, $stderr);
+run3 ['make', '-pqRrs', '-f', $makefile, @var_defs], undef, \$stdout, \$stderr;
+## $stderr
+my $exit_code = $? >> 8;
+if ($stderr and $exit_code == 2 and $stderr !~ /^make:/) {
+    $stderr =~ s/^make:/$MAKE:/msg;
+    warn $stderr;
+    exit $exit_code;
+}
+if ($stderr =~ /warning: (overriding|ignoring old) commands for target/) {
+    warn $stderr;
+}
+
+#die "GNU make stdout: $stdout\n";
+
+# XXX debug only
+#write_file('/home/agentz/mdom-gmake/make.db', $stdout);
+
+# patch the database output to work around gmake bugs
+patch_database(\$stdout);
+
+# XXX debug only
+#write_file('/home/agentz/mdom-gmake/make.db.patched', $stdout);
+
+#if ($stdout =~ m{^\s*\./Makefile_\S+\s*:\s*[^\n]*$}ms) {
+#    die $&;
+#}
+#print $stdout;
+#exit 0;
+
+$Makefile::AST::Runtime = 0;
+
+my $ast = Makefile::Parser::GmakeDB->parse(\$stdout);
+$ast->{makefile} = $makefile;
+## $ast
+## var a: $ast->get_var('a')
+## var b: $ast->get_var('b')
+#die;
+
+my $default_goal = $ast->default_goal;
+push @goals, $ast->default_goal
+    if !@goals && defined $default_goal;
+### @goals
+
+if (!@goals && !defined $makefile) {
+    warn "$MAKE: *** No targets specified and no makefile found.  Stop.\n";
+    exit(2);
+}
+
+# XXX uniq @goals?
+push @goals, keys %{ $ast->targets }, keys %{ $ast->prereqs };
+
+$ast->add_var(Makefile::AST::Variable->new({
+    name => 'MAKE',
+    flavor => 'simple',
+    value => ['$(MAKE)'],
+    origin => 'default',
+}));
+my $eval = Makefile::AST::Evaluator->new($ast);
+
+my @simple_rules;
+my @str_for_default;
+my @str_for_others;
+Makefile::AST::Evaluator->add_trigger(
+    firing_rule => sub {
+        my ($self, $rule, $ast_cmds) = @_;
+        ### $rule
+        ### $ast_cmds
+        my $str;
+        my $target = $rule->target;
+        my $colon = $rule->colon;
+        my @normal_prereqs = @{ $rule->normal_prereqs };
+        my $normal_prereqs =
+            @normal_prereqs ? " @normal_prereqs" : '';
+        my @order_prereqs = @{ $rule->order_prereqs };
+        my $order_prereqs =
+            @order_prereqs ? " | @order_prereqs" : '';
+        $str .= $target.$colon.$normal_prereqs.$order_prereqs."\n";
+        for my $cmd (@$ast_cmds) {
+            $str .= "\t" . $cmd->as_str . "\n";
+        }
+        if ($target eq $default_goal) {
+            push @str_for_default, $str;
+        } else {
+            push @str_for_others, $str;
+        }
+    }
+);
+$eval->set_required_target($user_makefile)
+    if defined $user_makefile;
+#warn "Default goal: $default_goal\n";
+for my $goal (@goals) {
+    ### goal: $goal
+    $eval->make($goal);
+}
+
+print join "\n", @str_for_default, @str_for_others;
+
+# XXX promote the fixes on the GNU make side
+sub patch_database {
+    my $ref = shift;
+    #$$ref =~ s/(\n\S+)#/$1\\#$2/gsm;
+    $$ref =~ s/^([^\n]*)(?<!\\)\\(\S[^\n]*\n#  Implicit rule search has)/$1\\\\$2/msg;
+    $$ref =~ s/^([^\n]*)(?<!\\)#(\S[^\n]*\n#  Implicit rule search has)/$1\\#$2/msg;
+    $$ref =~ s/^([^\n]*)(?<!\\):(\S[^\n]*:\n#  Implicit rule search has)/$1\\:$2/msg;
+}
+__END__
+
+=head1 NAME
+
+makesimple - De-sugar GNU makefiles to its simplest form using the GmakeDB parser
+
+=head1 SYNOPSIS
+
+    $ makesimple -f myGNUmakefile.mk > simplest.mk
+
+=head1 DESCRIPTION
+
+The makesimple script is a makefile simplifier. It
+converts a full-fledged GNU makefile to a highly de-sugared basic
+makefile which is almost a call-path tree dump.
+
+=head1 SVN REPOSITORY
+
+For the very latest version of this script, check out the source from
+
+L<http://github.com/agentzh/makefile-parser-pm>.
+
+There is anonymous access to all.
+
+=head1 AUTHOR
+
+Zhang "agentzh" Yichun, C<< <agentzh@gmail.com> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2005-2008 by Zhang "agentzh" Yichun (agentzh).
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Makefile::Parser::GmakeDB>, L<Makefile::AST>, L<Makefile::AST::Evaluator>.
+

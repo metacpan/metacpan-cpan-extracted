@@ -1,0 +1,91 @@
+This is to help you migrate from Mail::Bulkmail 2.x to Mail::Bulkmail 3.x
+
+change
+use Mail::Bulkmail 2.05
+to
+use Mail::Bulkmail 3.03 "/path/to/conf/file";
+
+change
+$bulk->allow_duplicates(1);
+to
+$bulk->Trusting('duplicates' => 1)
+(should be in the conf file as Trusting @= duplicates)
+
+change
+$bulk->safe_banned(1)
+to
+$bulk->Trusting('banned' => 0);
+(should just not be specified, since it defaults to 0. And yes, it's correct, they're inverse. Trusting('banned' => 0) == safe_banned(1))
+
+
+change
+$bulk->log_full_line(1);
+to
+$bulk->log_all_data(1);
+
+
+You no longer specify Smtp, Port, Tries in the constructor or as object calls, these
+should be specified in the conf file instead. See the sample config and sample server list
+files for examples as to how to set that up.
+
+It's important not to specify those items in the constructor, since they'll now turn into headers.
+
+$bulk->new(
+	'Smtp' => 'your.smtp.com'
+);
+
+Now sends a message with "Smtp : your.smtp.com" as a header.
+
+
+Headers from message (HFM) is no longer supported. This may return in the future.
+
+If you're creating a dynamic message, such as with a mail merge, dynamic message components,
+or dynamic headers, you now need to use Mail::Bulkmail::Dynamic. So change:
+
+$bulk = Mail::Bulkmail->new();
+to
+$bulk = Mail::Bulkmail::Dynamic->new();
+
+ONLY change it if you're using dynamic messages.
+
+To specify a merge, change this:
+
+$bulk->new(
+	'merge' => {
+		'date'		=> '01/28/2003',
+		'person'	=> 'bob',
+		'BULK_MAILMERGE' => 'BULK_EMAIL::name::age'
+	}
+);
+
+to:
+
+$bulk->new(
+	'global_merge' => {
+		'date' => '01/28/2003',
+		'person' => 'bob'
+	},
+	'merge_keys' => [qw(BULK_EMAIL name age)]
+);
+
+You should specify any delimiters you need in the conf file.
+
+There is no longer any support for local merges.
+
+$bulk->bulkmail({'local_key' => 'local_value'}); no longer works.
+Use global_merge instead.
+
+change
+
+$bulk->dynamic({...});
+to
+$bulk->dynamic_message_data({...});
+
+change
+
+$bulk->dynamic_headers({...});
+to
+$bulk->dynamic_header_data({...});
+
+change DYNAMIC_MESSAGE to BULK_DYNAMIC_MESSAGE
+change DYNAMIC_HEADERS to BULK_DYNAMIC_HEADERS

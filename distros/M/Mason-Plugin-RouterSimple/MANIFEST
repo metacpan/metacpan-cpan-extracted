@@ -1,0 +1,16 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+lib/Mason/Plugin/RouterSimple.pm
+lib/Mason/Plugin/RouterSimple/Component.pm
+lib/Mason/Plugin/RouterSimple/Component/Import.pm
+lib/Mason/Plugin/RouterSimple/Interp.pm
+lib/Mason/Plugin/RouterSimple/Request.pm
+lib/Mason/Plugin/RouterSimple/t/Basic.pm
+perlcriticrc
+t/01-use.t
+t/Basic.t

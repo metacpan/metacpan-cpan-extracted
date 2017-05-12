@@ -1,0 +1,704 @@
+=head1 NAME
+
+t/server/start - simple POP3 server for testing Mail::Transport::POP3
+
+=head1 SYNOPSIS
+
+ open( $pop3,"$^X t/server/start t/messages | " );
+
+ open( $pop3,"$^X t/server/start t/messages minimal | " );
+
+ open( $pop3,"$^X t/server/start t/messages apoponly | " );
+
+ open( $pop3,"$^X t/server/start t/messages autodelete | " );
+
+ open( $pop3,"$^X t/server/start t/messages noextra | " );
+
+ open( $pop3,"$^X t/server/start t/messages standardport | " );
+
+=head1 DESCRIPTION
+
+This POP3 server is created for testing the Mail::Transport::POP3 only.  It
+B<cannot be used> as real POP3 server (yet).
+
+The server takes on a randomly selected, free port to prevent interference
+with existing applications. Start the server by running this script from
+another script while capturing the output to STDOUT, e.g. like:
+
+  open( my $pop3,"$^X t/server/start t/messages |" )
+   or die "Could not start POP3 server: $!\n";
+  my $port = <$pop3>;
+
+The returned $pop3 file handle produces informational texts: it will tell
+you the port which is occupied by the server, and when the server shuts down.
+It will also report some statistics on the performance of the server.
+
+The server will be bound to localhost (127.0.0.1) at the port number of the
+first line that is printed to STDOUT by this script.
+
+The first parameter to the script indicates the directory in which the actual
+messages (each message as a seperate file) are located.  In the example, this
+is "t/messages".
+
+Any other parameters to the script are optional: they consist of keywords to
+indicate any settings or peculiarities of certain POP3 server implementations.
+The following keywords are recognised:
+
+=over 2
+
+=item minimal
+
+If the keyword "minimal" is specified, only the minimal set of POP3 commands
+will be allowed (i.e. USER, PASS, STAT, LIST, RETR, DELE, RSET, NOOP and QUIT).
+The optional POP3 commands (APOP, TOP and UIDL) are also supported if this
+keyword is B<not> specified.
+
+=item apoponly
+
+If the keyword "apoponly" is specified, then authorization will only be
+allowed with the APOP command (i.e. authorization with USER will yield a
+negative response).  Please note that you cannot use this together with the
+"minimal" keyword, as APOP is one of the optional POP3 commands (which is
+excluded if you use the "minimal" keyword).
+
+=item autodelete
+
+If the keyword "autodelete" is specified, any messages that are completely
+retrieved with RETR or TOP (without specification of number of lines in the
+body to return) will be automatically marked for deletion.  This will cause
+those messages to be deleted if the session is finished with a QUIT command.
+This coincides with system resource restrictions imposed by some providers.
+
+=item noextra
+
+If the keyword "noextra" is specified, then all messages will be served with
+a check for a CRLF pair at the end of the original messasge: if a CRLF is
+found, then only ".\r\n" will be added to indicate the end of a message that
+are retrieved with RETR or TOP.
+
+=item standardport
+
+If the keyword "standardport" is specified, then an attempt will be made to
+start the POP3 server on port 110, the standard POP3 port.  Please note that
+this will only be successful if the current user has sufficient privileges
+(usually only the root user will be allowed to listen on ports < 1024).
+
+=back
+
+User name is always "user" and the correct password is always "password".
+Any other combination will always fail.  APOP authorization can be used if
+the "minimal" keyword is B<not> specified.  The following script will help
+you in debugging APOP authorization:
+
+  use Digest::MD5 qw(md5_hex);
+  while (<>) {
+    s#\r?\n?$##s;
+    print md5_hex( $_.'password' )."\n";
+  }
+
+Copy the string that was sent by the initial greeting of the server (including
+the <> brackets), paste this into the running script, press ENTER.  The script
+will respond with a 32 character hexadecimal string.  Copy that and the enter
+the authorization thus:
+
+  APOP user 0123456789abcdef0123456789abcdef
+
+Note that the above hex string is only an example of course.
+
+The following commands do B<not> exist in the POP3 protocol, but are intended
+to simulate certain events.
+
+The BREAK command can be used to simulate the breaking of a connection.
+After a BREAK is received, the connection is broken by the server (without
+sending a response to the client).  No messages will be deleted even if any
+messages were marked for deletion.  This can also be used to simulate a
+timeout, of course.
+
+The EXIT command can be used for test-suites: when sent from the client, it
+will cause the server to shut down (as if an EXIT was sent) whenever the
+client does a QUIT command.  When the servers shuts down, its prints its
+statistics on STDOUT.  Statistics returned are:
+
+ - number of succesful logins
+ - each command + frequency in alphabetical order
+
+so a statistics list for one successful session could be:
+
+ 1
+ DELE 102
+ EXIT 1
+ LIST 1
+ PASS 1
+ QUIT 1
+ RETR 102
+ STAT 1
+ UIDL 1
+ USER 1
+
+=cut
+
+# Make sure we do everything by the book
+# Make sure we can do sockets
+# Make sure we can do digests
+
+use strict;
+use IO::Socket;
+use Digest::MD5 qw(md5_hex);
+
+# Obtain the directory to work on
+# Remove trailing slash if any
+# Die now if there is no directory
+# Die now if we can't work with it
+
+my $directory = shift;
+$directory =~ s#/$##;
+die qq(Must specify directory to work with\n) unless $directory;
+die qq(Trouble using directory "$directory": $!\n)
+ unless -d $directory and -w _;
+
+# Initialize the flag settings
+
+my $minimal = 0;
+my $apoponly = 0;
+my $autodelete = 0;
+my $noextra = 0;
+my $exitonquit = 0;
+my $exitnow = 0;
+my @port;
+
+# While there are keywords specified
+#  Set appropriate flags if so specified
+
+while (my $keyword = shift) {
+  $minimal = ($keyword eq 'minimal');
+  $apoponly = ($keyword eq 'apoponly');
+  $autodelete = ($keyword eq 'autodelete');
+  $noextra = ($keyword eq 'noextra');
+  @port = qw(LocalPort 110) if $keyword eq 'standardport';
+}
+
+# Make sure no buffering takes place
+# Create a server that can only take one connection at a time
+
+$| = 1;
+my $server = IO::Socket::INET->new(
+  Type      => SOCK_STREAM,
+  Listen    => 1,
+  @port,
+) or die "Couldn't start a POP3 server:\n $@\n";
+
+# Find out the port we're running on
+# Let the caller know which port we're running on
+
+my $port = $server->sockport;
+print "$port\n";
+
+# Initialize the connected flag
+# Initialize the list of available messages
+# Initialize the hash of message ordinal numbers to delete
+# Initialize the hash of message ordinal numbers to delete automatically
+
+my $connected = 0;
+my @message;
+my %delete;
+my %autodelete;
+
+# Initialize user
+# Initialize digest password field (used by APOP only)
+# Initialize the line ending on output
+
+my $user = '';
+my $digest;
+my $lf = "\x0D\x0A";  # always CRLF
+
+# Number of successful logins performed
+# Hash with frequency of each command
+
+my $logins = 0;
+my %command;
+
+# While the server is running and we got a new client
+#  Initialize the APOP initialization string
+#  If this is a minimal POP3 server
+#   Don't make it appear we can do POP3
+#  Else
+#   Create the APOP authentication string
+#   Let the client know we're there and we can do APOP
+
+SERVER: while (my $client = $server->accept()) {
+  my $apop = '';
+  if ($minimal) {
+    print $client qq(+OK Welcome to the test-suite POP3 server$lf);
+  } else {
+    $apop = "<$$.".time().'@localhost>';
+    print $client qq(+OK $apop$lf);
+  }
+
+#  Obtain list of files in message directory
+#  Reset the messages to be (automatically) deleted hashes
+
+  @message = <$directory/*>;
+  %autodelete = %delete = ();
+
+#  While the client is asking us stuff to do
+#   Lose the line ending (whatever it is)
+#   Split into a command and parameters
+#   Make sure the command is always uppercase (easier checks later)
+#   Make sure the parameters are defined (if empty)
+
+  while (<$client>) {
+    s#\r?\n$##s;
+    my ($command,$parameters) = split( /\s+/,$_,2 );
+    $command = uc($command);
+    $parameters = '' unless defined($parameters);
+
+#   Count this command for the statistics
+#   Outloop if quitting this client
+
+    $command{$command}++;
+    last if $command eq 'BREAK';
+
+#   If we're connected
+#    Allow for variable references
+#    If there is a subroutine for this command
+#     Execute it with the given parameters and return result
+#     Send result to client if there is something to connect
+#     Stop server is so requested
+#     Outloop if we're no longer connected
+#    Else
+#     Indicate it's not implemented
+
+    if ($connected) {
+      no strict 'refs';
+      if (exists( &$command )) {
+        my @return = &{$command}( split( /\s+/,$parameters ) );
+        print $client @return if @return;
+	last SERVER if $exitnow;
+        last unless $connected;
+      } else {
+        print $client "-ERR unimplemented$lf";
+      }
+
+#   Elseif we're quitting without a connection
+#    Show that we agree
+#    And outloop
+
+    } elsif ($command eq 'QUIT') {
+      print $client "+OK$lf";
+      last;
+
+#   Elseif we're trying APOP authentication
+#    If we have a minimal POP3 server
+#     Show that this isn't implemented
+#     And reloop
+
+    } elsif ($command eq 'APOP') {
+      if ($minimal) {
+        print $client "-ERR unimplemented$lf";
+        next;
+      }
+
+#    Obtain the user name and the digest
+#    Log the user in if client gives the right credentials
+#    Send the result to the client
+
+      ($user,$digest) = split( /\s+/,$parameters );
+      my @return = login(
+       $user eq 'user' and
+       $digest eq md5_hex( $apop.'password')
+      );
+      print $client @return;
+
+#   Elseif we have a user name (and we're not connected yet)
+#    Log the user in if client gives the right credentials now and before
+#    Send the result to the client
+
+    } elsif ($user) {
+      my @return = login(
+       $command eq 'PASS' and
+       $user eq 'user' and
+       $parameters eq 'password'
+      );
+      print $client @return;
+
+#   Elseif the user name is passed (and none given before)
+#    If we only allow APOP
+#     Let the client know it's not ok
+#    Else
+#     Save the user name (for later checking with PASS)
+#     Let the client know it's ok so far
+
+    } elsif ($command eq 'USER') {
+      if ($apoponly) {
+        print $client "-ERR APOP authorization allowed only$lf";
+      } else {
+        $user = $parameters;
+        print $client "+OK$lf";
+      }
+
+#   Elseif the password is given (but no user name before)
+#    Let the client know it's wrong
+#   Else (attempting to do anything else without authorization)
+#    Let the client know it's wrong
+
+    } elsif ($command eq 'PASS') {
+      print $client "-ERR user first$lf";
+    } else {
+      print $client "-ERR authorization first$lf";
+    }
+  }
+
+#  Reset user name
+#  Reset connected flag
+#  Shut down the client connection
+
+  $user = '';
+  $connected = 0;
+  close( $client );
+}
+
+# Show number of successful logins
+# For all the commands that were issued
+#  Return name and frequency of it
+# And shut down the server
+
+print "$logins\n";
+foreach (sort keys %command) {
+  print "$_ $command{$_}\n";
+}
+close($server);
+
+#------------------------------------------------------------------------
+# OUT: 1 whatever needs to be sent to client
+
+sub STAT {
+
+# Initialize number of messages
+# Initialize number of bytes they have
+# Initialize ordinal number
+
+  my $messages = 0;
+  my $octets = 0;
+  my $ordinal = 0;
+
+# For all of the messages
+#  Reloop if message marked as delete, incrementing ordina on the fly
+#  Increment number of messages
+#  Add number of bytes
+# Return the result
+
+  foreach (@message) {
+    next if exists( $delete{$ordinal++} );
+    $messages++;
+    $octets += -s;
+  }
+  return "+OK $messages $octets$lf";
+} #STAT
+
+#------------------------------------------------------------------------
+# OUT: 1 whatever needs to be sent to client
+
+sub UIDL {
+
+# Return now if running a minimal POP3 server
+
+  return "-ERR unimplemented$lf" if $minimal;
+
+# Initialize message number
+# If a number was specified
+#  Obtain ordinal number and possible error message
+#  Return error message if there is one
+#  Return the message number and the identifier of the message otherwise
+
+  my $number = shift;
+  if (defined($number)) {
+    my ($ordinal,$error) = ordinal( $number,1 );
+    return $error if $error;
+    return "+OK $number $message[$ordinal]$lf";
+  }
+
+# Initialize ordinal number
+# Initialize text to be returned
+# For all of the messages
+#  Reloop if message marked as deleted, incrementing ordinal on the fly
+#  Add the ordinal number and the identifier (just use filename for that)
+# Return the result with an extra . at the end to indicate end of list
+
+  my $ordinal = 0;
+  my $text = "+OK$lf";
+  foreach (@message) {
+    next if exists( $delete{$ordinal++} );
+    $text .= "$ordinal $_$lf"; # external numbers 1-based, internal 0-based
+  }
+  return "$text.$lf";
+} #UIDL
+
+#------------------------------------------------------------------------
+#  IN: 1 message to obtain (optionally)
+# OUT: 1 whatever needs to be sent to client
+
+sub LIST {
+
+# Initialize message number
+# If a number was specified
+#  Obtain ordinal number and possible error message
+#  Return error message if there is one
+#  Return the message number and size of message otherwise
+
+  my $number = shift;
+  if (defined($number)) {
+    my ($ordinal,$error) = ordinal( $number,1 );
+    return $error if $error;
+    return "+OK $number ".(-s $message[$ordinal]).$lf;
+  }
+
+# Initialize ordinal number
+# Initialize text to be returned
+# For all of the messages
+#  Reloop if message marked as deleted, incrementing ordinal on the fly
+#  Add the ordinal number and the identifier (just use filename for that)
+# Return the result with an extra . at the end to indicate end of list
+    
+  my $ordinal = 0;
+  my $text = "+OK$lf";
+  foreach (@message) {
+    next if exists( $delete{$ordinal++} );
+    $text .= "$ordinal ".(-s).$lf; # external numbers 1-based, internal 0-based
+  }
+  return "$text.$lf";
+} #LIST
+
+#------------------------------------------------------------------------
+#  IN: 1 ordinal number of message to retrieve
+# OUT: 1 whatever needs to be sent to client
+
+sub RETR {
+
+# Obtain ordinal number and possible error message
+# Return now if there was an error message
+
+  my ($ordinal,$error) = ordinal( shift,1 );
+  return $error if $error;
+
+# Open file for reading or return with empty message
+# Initialize text to be returned
+# While there are lines to be returned
+#  Make sure any period at the start of the line becomes a double period
+#  Add the line to the text to be returned
+
+  open( my $handle,'<',$message[$ordinal] ) or return "+OK$lf.$lf";
+  my $text = "+OK$lf";
+  while (<$handle>) {
+    s#^\.#..#;
+    $text .= $_;
+  }
+
+# Mark this message to be deleted automatically if flag set
+# Add the right marker to the text
+# Return the finished text
+
+  $autodelete{$ordinal} = undef if $autodelete;
+  addmarker( \$text );
+  $text;
+} #RETR
+
+#------------------------------------------------------------------------
+#  IN: 1 ordinal number of message to retrieve
+#      2 number of lines of the message to retrieve
+# OUT: 1 whatever needs to be sent to client
+
+sub TOP {
+
+# Return now if running a minimal POP3 server
+# Obtain ordinal number and possible error message
+# Return now if there was an error message
+
+  return "-ERR unimplemented$lf" if $minimal;
+  my ($ordinal,$error) = ordinal( shift,1 );
+  return $error if $error;
+
+# Open file for reading or return with empty message
+# Initialize text to be returned
+
+  open( my $handle,'<',$message[$ordinal] ) or return "+OK$lf.$lf";
+  my $text = "+OK$lf";
+
+# Obtain the number of lines
+# If a number of lines was specified
+#  While there are lines to be returned
+#   Make sure any period at the start of the line becomes a double period
+#   Add the line to the text to be returned
+#   Outloop if we're reached the end of the headers
+
+  my $lines = shift;
+  if (defined($lines)) {
+    while (<$handle>) {
+      s#^\.#..#;
+      $text .= $_;
+      last if m#^\s+$#s;
+    }
+
+#  While there are lines to be fetched
+#   Outloop if no line left to be fetched
+#   Make sure any period at the start of the line becomes a double period
+#   Add the line to the text to be returned
+
+    while ($lines--) {
+      last unless defined($_ = <$handle>);
+      s#^\.#..#;
+      $text .= $_;
+    }
+
+# Else (no limit)
+#  While there are lines to be returned
+#   Make sure any period at the start of the line becomes a double period
+#   Add the line to the text to be returned
+#  Mark this message to be deleted automatically if flag set
+
+  } else {
+    while (<$handle>) {
+      s#^\.#..#;
+      $text .= $_;
+    }
+    $autodelete{$ordinal} = undef if $autodelete;
+  }
+
+# Add the right marker to the text
+# Return the result with an extra . at the end to indicate end of list
+
+  addmarker( \$text );
+  $text;
+} #TOP
+
+#------------------------------------------------------------------------
+#  IN: 1 ordinal number of message to delete
+# OUT: 1 whatever needs to be sent to client
+
+sub DELE {
+
+# Obtain ordinal number and possible error message
+# Return now if there was an error message
+# Mark this message as deletable
+# Return the result with an extra . at the end to indicate end of list
+
+  my ($ordinal,$error) = ordinal( shift,1 );
+  return $error if $error;
+  $delete{$ordinal} = undef;
+  return "+OK$lf";
+} #DELE
+
+#------------------------------------------------------------------------
+#  IN: 1 ordinal number of message to undelete
+# OUT: 1 whatever needs to be sent to client
+
+sub RSET {
+
+# Obtain ordinal number and possible error message
+# Return now if there was an error message
+# Unmark this message as deletable
+# Return the result with an extra . at the end to indicate end of list
+
+  my ($ordinal,$error) = ordinal( shift );
+  return $error if $error;
+  delete( $delete{$ordinal} );
+  return "+OK$lf";
+} #RSET
+
+#------------------------------------------------------------------------
+# OUT: 1 whatever needs to be sent to client
+
+sub NOOP { "+OK$lf" } #NOOP
+
+#------------------------------------------------------------------------
+
+sub EXIT { $exitonquit = 1; return } #EXIT
+
+#------------------------------------------------------------------------
+# OUT: 1 whatever needs to be sent to client
+
+sub QUIT {
+
+# Remove all of the files that were supposed to be deleted
+# Remove all of the files that were supposed to be deleted automatically
+# Set exit now flag if QUIT is to operate as EXIT
+# Mark the connection as ended
+# Let the client now it was fun while it lasted
+
+  unlink( map {$message[$_]} keys %delete );
+  unlink( map {$message[$_]} keys %autodelete );
+  $exitnow = $exitonquit;
+  $connected = 0;
+  return "+OK$lf";
+} #QUIT
+
+#------------------------------------------------------------------------
+#  IN: 1 flag whether login successful
+# OUT: 1 what needs to be returned to the client
+
+sub login {
+
+# If successful
+#  Increment number of successful logins
+#  Set connected flag
+#  Let the client know it's ok
+
+  if (shift) {
+    $logins++;
+    $connected = 1;
+    return "+OK$lf";
+  }
+
+# Reset the user that was entered before
+# Let the client know authorization has failed
+
+  $user = '';
+  return "-ERR authorization failed$lf";
+} #login
+
+#------------------------------------------------------------------------
+#  IN: 1 ordinal number of message
+#      2 flag: check whether message deleted already
+# OUT: 1 normalize message number
+#      2 error message (if any)
+
+sub ordinal {
+
+# Obtain the message number
+# Initialize error message
+# Set error if too low
+# Set error if zero
+# Set error if too high
+
+  my $ordinal = shift;
+  my $error = '';
+  $error ||= "-ERR syntax error$lf" if $ordinal < 0;
+  $error ||= "-ERR messages are counted from 1$lf" if $ordinal == 0;
+  $error ||= "-ERR not that many messages$lf" if $ordinal > @message;
+
+# Normalize for arrays
+# Set error if checking for deletion and already deleted
+# Return the result
+
+  $ordinal--;
+  $error ||= "-ERR already deleted$lf" if shift and exists( $delete{$ordinal} );
+  return ($ordinal,$error);
+} #ordinal
+
+#------------------------------------------------------------------------
+#  IN: 1 reference to text (to add the right end-of-data marker to)
+
+sub addmarker {
+
+# Obtain the reference to the text
+# If we should check for extra newlines at the end
+#  Add the right stuff depending on the end of the text so far
+# Else
+#  Add it as most POP3 servers do
+
+  my $textref = shift;
+  if ($noextra) {
+    $$textref .= ($$textref =~ m#\r\n$#so ? ".$lf" : "$lf.$lf");
+  } else {
+    $$textref .= "$lf.$lf";
+  }
+}

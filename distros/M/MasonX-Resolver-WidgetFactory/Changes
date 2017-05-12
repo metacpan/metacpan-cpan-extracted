@@ -1,0 +1,31 @@
+Revision history for MasonX-Resolver-WidgetFactory
+
+0.009     2013-10-02 08:40:54 America/New_York
+          update bugtracker metadata
+
+0.007     Tue Sep 23 10:46:20 EDT 2008
+          the mason source wrapper introduces a newline; chomp it (RJBS)
+
+0.006
+          try harder (same as 0.005)
+
+0.005     Thu Jul 10 15:55:55 EDT 2008
+
+          try to avoid factory objects going away
+
+0.004     Thu May  8 17:03:46 EDT 2008
+
+          add -content handling for <&| syntax
+
+0.003     Thu May  8 16:24:21 EDT 2008
+
+          allow falling back to other resolvers for widgets we don't provide
+
+0.002     2008-05-07 16:50:33
+
+          include Multiplex in build_requires
+
+0.001     2008-05-07 16:49:20
+
+          First version, released on an unsuspecting world.
+

@@ -1,0 +1,137 @@
+From mauricio.campiglia@gmail.com Mon May 18 00:43:49 2009
+Return-Path: <mauricio.campiglia@gmail.com>
+X-Original-To: crhalpin@localhost
+Delivered-To: crhalpin@localhost.home.crhalpin.org
+Received: from spiff.home.crhalpin.org (localhost [127.0.0.1])
+	by spiff.home.crhalpin.org (Postfix) with ESMTP id A66261CC3C
+	for <crhalpin@localhost>; Mon, 18 May 2009 00:43:46 -0500 (CDT)
+Received: from crimson.cs.wisc.edu [128.105.6.43]
+	by spiff.home.crhalpin.org with IMAP (fetchmail-6.3.9)
+	for <crhalpin@localhost> (single-drop); Mon, 18 May 2009 00:43:46 -0500 (CDT)
+Received: from shale.cs.wisc.edu (shale.cs.wisc.edu [128.105.6.25])
+	by crimson.cs.wisc.edu (8.14.1/8.14.1) with ESMTP id n4I5fnVL000994
+	for <chalpin@crimson.cs.wisc.edu>; Mon, 18 May 2009 00:41:49 -0500
+Received: from sabe.cs.wisc.edu (sabe.cs.wisc.edu [128.105.6.20])
+	by shale.cs.wisc.edu (8.14.1/8.14.1) with ESMTP id n4I5fn3s007221
+	for <chalpin@cs.wisc.edu>; Mon, 18 May 2009 00:41:49 -0500
+Received: from spiff.home.crhalpin.org (eagleheights-105-18.resnet.wisc.edu [146.151.105.18])
+	(authenticated bits=0)
+	by sabe.cs.wisc.edu (8.14.1/8.14.1) with ESMTP id n4I5fnhh030486
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=NO)
+	for <chalpin@cs.wisc.edu>; Mon, 18 May 2009 00:41:49 -0500
+Received: by spiff.home.crhalpin.org (Postfix, from userid 1001)
+	id 7473A1CC3C; Mon, 18 May 2009 00:41:43 -0500 (CDT)
+X-Original-To: crhalpin@localhost
+Old-Delivered-To: crhalpin@localhost.home.crhalpin.org
+Received: from spiff.home.crhalpin.org (localhost [127.0.0.1])
+	by spiff.home.crhalpin.org (Postfix) with ESMTP id 47C2F1CC3B
+	for <crhalpin@localhost>; Sun, 17 May 2009 22:34:32 -0500 (CDT)
+Received: from crimson.cs.wisc.edu [128.105.6.43]
+	by spiff.home.crhalpin.org with IMAP (fetchmail-6.3.9)
+	for <crhalpin@localhost> (single-drop); Sun, 17 May 2009 22:34:32 -0500 (CDT)
+Received: from shale.cs.wisc.edu (shale.cs.wisc.edu [128.105.6.25])
+	by crimson.cs.wisc.edu (8.14.1/8.14.1) with ESMTP id n4I3YS9m007520
+	for <chalpin@crimson.cs.wisc.edu>; Sun, 17 May 2009 22:34:28 -0500
+Received: from silica.cs.wisc.edu (silica.cs.wisc.edu [128.105.6.34])
+	by shale.cs.wisc.edu (8.14.1/8.14.1) with ESMTP id n4I3YSPn003380
+	for <chalpin@cs.wisc.edu>; Sun, 17 May 2009 22:34:28 -0500
+Received: from yx-out-2324.google.com (yx-out-2324.google.com [74.125.44.29])
+	by silica.cs.wisc.edu (8.14.1/8.14.1) with ESMTP id n4I3YQqn025545
+	for <chalpin@cs.wisc.edu>; Sun, 17 May 2009 22:34:27 -0500
+Received: by yx-out-2324.google.com with SMTP id 8so1539394yxb.51
+        for <chalpin@cs.wisc.edu>; Sun, 17 May 2009 20:34:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=gamma;
+        h=domainkey-signature:received:received:sender:from:to:subject:date
+         :user-agent:mime-version:content-type:content-transfer-encoding
+         :message-id;
+        bh=mrCnj+peIRZyFKKUom45vtHHHalEHjngUu8ydLdXIQI=;
+        b=Nos28h4Ki/p8AmLuXUIXnY08sJVz5cZfP7iobo92FgBcAaISCSmb+j/226Ei+CM1cN
+         E/379QNgPRWBM0YC7x6zP5U4BfI7HBYnZEjm5LVOrQZuMYavm62xesV8Yq/wMeRSmNiO
+         wlhgPUBIWpJa25vLEGPFSAY+xeYhS45LTQj94=
+DomainKey-Signature: a=rsa-sha1; c=nofws;
+        d=gmail.com; s=gamma;
+        h=sender:from:to:subject:date:user-agent:mime-version:content-type
+         :content-transfer-encoding:message-id;
+        b=G74tCLyIQKXgrQXPzZF94Mu3MBiPsEAYsLOz8YvF6tSVpv1DmfnBPJHznKvXtXt+vR
+         vPizFC34icWwnEdzfLZ8q9qh3QWjpGRpfJnv7sa5bFOKMCnRH37Ev9zGWrphhgiOKvuv
+         igizNl84V7Lb5mNiQc8hgdqbMPLIyVYRdli20=
+Received: by 10.90.86.10 with SMTP id j10mr5493898agb.59.1242617665125;
+        Sun, 17 May 2009 20:34:25 -0700 (PDT)
+Received: from aldebaran.localnet (r190-64-27-81.dialup.adsl.anteldata.net.uy [190.64.27.81])
+        by mx.google.com with ESMTPS id 6sm12119406ywi.58.2009.05.17.20.34.23
+        (version=TLSv1/SSLv3 cipher=RC4-MD5);
+        Sun, 17 May 2009 20:34:24 -0700 (PDT)
+Sender: Mauricio Campiglia <mauricio.campiglia@gmail.com>
+From: Mauricio Campiglia <mauricio@campiglia.org>
+To: chalpin@cs.wisc.edu
+Subject: Incorrect packet traversal path on your Netfilter page?
+Date: Mon, 18 May 2009 00:34:03 -0300
+User-Agent: KMail/1.11.2 (Linux/2.6.26-2-686; KDE/4.2.2; i686; ; )
+MIME-Version: 1.0
+Content-Type: multipart/signed;
+  boundary="nextPart2389499.aip7uZ08Kp";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
+Content-Transfer-Encoding: 7bit
+Message-Id: <200905180034.15041.mauricio@campiglia.org> (sfid-20090517_22343_E096A717)
+X-Seen-By: mailfromd 4.1 silica.cs.wisc.edu
+X-Virus-Status: No
+X-Virus-Checker-Version: clamassassin 1.2.4 with clamdscan / ClamAV 0.95.1/9365/Sat May 16 07:41:29 2009
+X-CRM114-Version: 20090423-BlameSteveJobs ( TRE 0.7.5 (LGPL) ) MR-9B0B3C9E 
+X-CRM114-CacheID: sfid-20090517_22343_E096A717 
+X-CRM114-Status: UNSURE (   9.16  )
+X-CRM114-Notice: Please train this message. 
+X-TMDA-Confirm-Done: 1242617693.82104.1b4d37
+X-TMDA-Released: Mon, 18 May 2009 00:41:42 -0500
+X-RecFor-Recipient: chalpin@cs.wisc.edu
+
+--nextPart2389499.aip7uZ08Kp
+Content-Type: text/plain;
+  charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Corey,
+
+I have come across your Netfilter page [0]. Thanks for letting people=20
+understand Netfilter in a simple and straightforward way. I have,=20
+nevertheless, a couple of diferences on wich, afaik, are the correct=20
+traversal of packets.
+
+Where you write:
+forwarded
+     nat/PREROUTING -> filter/FORWARD -> nat/OUTPUT -> nat/POSTROUTING=20
+outgoing
+     filter/OUTPUT -> nat/PREROUTING -> nat/OUTPUT -> nat/POSTROUTING
+
+I think the correct flows are [1]:
+forwarded
+     nat/PREROUTING -> filter/FORWARD -> nat/POSTROUTING=20
+outgoing
+     nat/OUTPUT -> filter/OUTPUT -> nat/POSTROUTING
+
+[0]http://pages.cs.wisc.edu/~chalpin/project/netfilter.html
+[1]http://pub1.zcjh.tpc.edu.tw:9100/computer/Lists/Discussion/Attachments/1=
+/PacketFlow.png
+
+Regards,
+      Mauricio Campiglia
+=2D-=20
+=C2=ABHistory is a vast early warning system.=C2=BB
+         --Norman Cousins--
+
+--nextPart2389499.aip7uZ08Kp
+Content-Type: application/pgp-signature; name=signature.asc 
+Content-Description: This is a digitally signed message part.
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEABECAAYFAkoQ1ywACgkQ++X8pZRW0Wq8CgCgoi4ET6UwUuqNkiJX2SUVCNq5
+zs8AniaI78P46h9ZFiUc+pxfapI2s0mF
+=/yJS
+-----END PGP SIGNATURE-----
+
+--nextPart2389499.aip7uZ08Kp--
+

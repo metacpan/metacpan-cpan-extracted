@@ -1,0 +1,34 @@
+---
+abstract: 'A DateTime type library for Mouse'
+author:
+  - 'NAKAGAWA Masaki <masaki@cpan.org>'
+build_requires:
+  Test::More: 0
+  ok: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MouseX-Types-DateTime
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DateTime: 0
+  DateTime::Duration: 0
+  DateTime::Locale: 0
+  DateTime::TimeZone: 0
+  DateTimeX::Easy: 0
+  Filter::Util::Call: 0
+  Mouse: 0.15
+  MouseX::Types: 0.01
+  Scalar::Util: 0
+  Time::Duration::Parse: 0
+  namespace::clean: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

@@ -1,0 +1,17 @@
+Revision history for Perl module MooseX::Role::Timer
+
+0.05 2015-01-31
+    - now uses Moo as the use of Any::Moose is now deprecated
+
+0.04 2014-01-05
+    - convert distribution to use Dist::Zilla
+    - applied debian patches to be compatible with Any::Moose
+
+0.03   2010-08-18
+    - increase sleep times in tests
+
+0.02   2010-08-16
+    - fixed typos in META.yml and test
+
+0.01   2010-08-15
+    - Initial release

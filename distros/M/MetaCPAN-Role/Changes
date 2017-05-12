@@ -1,0 +1,20 @@
+Revision history for Perl module MetaCPAN::Role:
+
+0.06 Sat 19 Nov 2016 13:47:43 GMT
+	- purge_author_key accepts arrays
+
+0.05 Fri Nov 18 14:44:44 2016
+	- bug fix
+
+0.04 Fri Nov 18 13:53:43 2016
+	- run purge of DIST_UPDATES as well when they are
+
+0.03 Sat 10 Sep 2016 15:52:28 BST
+    - Some pre-reqs to help smokers ( Re: GH issue #1 )
+
+0.02 Thu  8 Sep 2016 20:22:48 BST
+    - add a 'return 1' to help other MC module tests
+    - Fix Changes file!
+
+0.01 Thu  8 Sep 2016 19:11:13 BST
+    - Initial release

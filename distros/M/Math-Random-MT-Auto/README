@@ -1,0 +1,121 @@
+Math-Random-MT-Auto version 6.22
+================================
+
+This module provides pseudorandom number generators (PRNGs) that are based
+on the Mersenne Twister algorithm.  There is a functional interface to a
+standalone PRNG, and an OO interface (based on the inside-out object model as
+implemented by the Object::InsideOut module) for generating multiple PRNG
+objects.
+
+The PRNGs are self-seeding, automatically acquiring a (19968-bit) random
+seed from user-selectable sources.  Seed sources include local random
+devices (/dev/random and /dev/urandom), Internet sources (random.org, HotBits
+and RandomNumber.info), and Win32 XP system random data.  Users may also
+provide their own seed sources.
+
+In addition to integer and floating-point uniformly-distributed random number
+deviates, this module implements the following non-uniform deviates as found
+in 'Numerical Recipes in C':
+    Gaussian (normal)
+    Exponential
+    Erlang (gamma of integer order)
+    Poisson
+    Binomial
+
+This module also provides a function/method for shuffling data based on the
+Fisher-Yates shuffling algorithm.
+
+This module is thread-safe and supports object sharing between threads.
+
+For Perl compiled to support 64-bit integers, this module will use a 64-bit
+version of the Mersenne Twister algorithm, thus providing 64-bit random
+integers (and 53-bit random doubles).  (32-bits otherwise.)
+
+The code for this module has been optimized for speed.  Under Cygwin, it's
+2.5 times faster than Math::Random::MT, and under Solaris, it's more than
+four times faster.  (Math::Random::MT fails to build under Windows.)
+
+INSTALLATION
+
+A 'C' compiler is required for building this module.
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Requires Perl 5.6.0 or later.
+
+This module uses the following 'standard' modules:
+
+  Carp
+  Fcntl
+  XSLoader
+  Scalar::Util (1.18 or later)
+  ExtUtils::MakeMaker          - For installation
+  File::Spec                   - For installation
+  Test::More                   - For installation
+  Data::Dumper                 - For installation
+
+This module uses the following modules available through CPAN:
+
+  Object::InsideOut (2.06 or later)
+  Exception::Class (1.22 or later)
+
+To utilize the option of acquiring seed data from Internet sources,
+the following module is needed:
+
+  LWP::UserAgent
+
+To utilize the option of acquiring seed data from the system's random data
+source under MSWin32 on Windows XP, the following module is needed:
+
+  Win32::API
+
+COPYRIGHT AND LICENCE
+
+A C-Program for MT19937 (32- and 64-bit versions), with initialization
+improved 2002/1/26.  Coded by Takuji Nishimura and Makoto Matsumoto,
+and including Shawn Cokus's optimizations.
+
+Copyright (C) 1997 - 2004, Makoto Matsumoto and Takuji Nishimura,
+All rights reserved.
+Copyright (C) 2005, Mutsuo Saito, All rights reserved.
+Copyright 2005 - 2009 Jerry D. Hedden <jdhedden AT cpan DOT org>
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+
+3. The names of its contributors may not be used to endorse or promote
+   products derived from this software without specific prior written
+   permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER
+OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Any feedback is very welcome.
+<m-mat AT math DOT sci DOT hiroshima-u DOT ac DOT jp>
+http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html
+
+# EOF

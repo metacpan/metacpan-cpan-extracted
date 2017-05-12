@@ -1,0 +1,84 @@
+MLA_Album					T_PTROBJ_LIBMTP
+MLA_AlbumList					T_PTROBJ_LIBMTP
+MLA_AllowedValues				T_PTROBJ_LIBMTP
+MLA_DeviceStorage				T_PTROBJ_LIBMTP
+MLA_Error					T_PTROBJ_LIBMTP
+MLA_File					T_PTROBJ_LIBMTP
+MLA_FileList					T_PTROBJ_LIBMTP
+MLA_FileSampleData				T_PTROBJ_LIBMTP
+MLA_Folder					T_PTROBJ_LIBMTP
+MLA_FolderList					T_PTROBJ_LIBMTP
+MLA_MTPDevice					T_PTROBJ_LIBMTP
+MLA_MTPDeviceList				T_PTROBJ_LIBMTP
+MLA_Playlist					T_PTROBJ_LIBMTP
+MLA_PlaylistList				T_PTROBJ_LIBMTP
+MLA_RawDevice					T_PTROBJ_LIBMTP
+MLA_RawDeviceList				T_PTROBJ_LIBMTP
+MLA_Track					T_PTROBJ_LIBMTP
+MLA_TrackList					T_PTROBJ_LIBMTP
+
+Utf8String					T_PV_UTF8
+Utf8StringConst					T_PV_UTF8
+Utf8String2Free					T_PV_UTF8_FREE
+
+LIBMTP_datatype_t				T_IV
+LIBMTP_error_number_t				T_IV
+LIBMTP_filetype_t				T_IV
+LIBMTP_property_t				T_IV
+int8_t						T_IV
+int16_t						T_IV
+int32_t						T_IV
+uint8_t						T_UV
+uint16_t					T_UV
+uint32_t					T_UV
+
+uint8_t *					T_ARRAY
+int8_t *					T_ARRAY
+uint16_t *					T_ARRAY
+int16_t *					T_ARRAY
+uint32_t *					T_ARRAY
+int32_t *					T_ARRAY
+uint64_t *					T_ARRAY
+int64_t *					T_ARRAY
+
+int64_t						T_NV
+uint64_t					T_NV
+
+#############################################################################
+INPUT
+T_PTROBJ_LIBMTP
+	if (SvROK($arg) && sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/^MLA_/Media::LibMTP::API::/g;\$ntt}\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR($type,tmp);
+	}
+	else
+	    Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+			\"$var\", \"${(my $ntt=$ntype)=~s/^MLA_/Media::LibMTP::API::/g;\$ntt}\")
+
+T_PV_UTF8
+	sv_utf8_upgrade((SV*)$arg);
+	$var = ($type)SvPV_nolen($arg)
+
+
+#############################################################################
+OUTPUT
+T_PTROBJ_LIBMTP
+	sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/^MLA_/Media::LibMTP::API::/g;\$ntt}\", (void*)$var);
+
+T_PV_UTF8_FREE
+	if ($var) {
+	  sv_setpv((SV*)$arg, $var);
+	  SvUTF8_on((SV*)$arg);
+	  Safefree($var);
+	} else {
+	  SvOK_off((SV*)$arg); /* Undef */
+	}
+
+T_PV_UTF8
+	if ($var) {
+	  sv_setpv((SV*)$arg, $var);
+	  SvUTF8_on((SV*)$arg);
+	} else {
+	  SvOK_off((SV*)$arg); /* Undef */
+	}

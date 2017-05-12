@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<config>
+
+<!-- the original language -->
+<sourceLanguage>spa</sourceLanguage>
+
+<!-- the fields and subfields to be processed -->
+<fields>
+
+<field tag="650" indicator2="0">
+<copy>c</copy>
+<copy>d</copy>
+<translate>a</translate>
+<translate>z</translate>
+<sourceSubfield>a</sourceSubfield>
+</field>
+
+<field tag="600">
+<copy>w</copy>
+<copy>o</copy>
+<translate>f</translate>
+<translate>g</translate>
+<sourceSubfield>a</sourceSubfield>
+</field>
+
+</fields>
+
+<!-- the rule mappings themselves -->
+<rules>
+
+<rule field="650" subfield="a">
+<original>goodbye</original>
+<translation>adios</translation>
+<source>bogus</source>
+</rule>
+
+<rule field="650" subfield="a">
+<original>hello</original>
+<translation>hola</translation>
+<source>bogus</source>
+</rule>
+
+</rules>
+
+</config>

@@ -1,0 +1,133 @@
+<html>
+<head>
+<title>MHonArc Resources: GZIPEXE</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="gmtdatefmt.html">GMTDATEFMT</a>]</td><td><nobr>[<a href="../resources.html#gzipexe">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="gzipfiles.html">GZIPFILES</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>GZIPEXE</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p>
+<code>M2H_GZIPEXE=</code><var>pathname</var>
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p>
+<code>&lt;GZIPEXE&gt;</code><br>
+<var>pathname</var><br>
+<code>&lt;/GZIPEXE&gt;</code><br>
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p>
+<code>-gzipexe </code><var>pathname</var>
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>GZIPEXE defines the pathname of the <em>gzip</em> executable.
+MHonArc automatically invokes gzip to decompress files with a
+"<strong><tt>.gz</tt></strong>" extension.  Gzip is also invoked
+for compressing files when the <a href="gzipfiles.html">GZIPFILES</a>
+resource is set.
+</p>
+
+<p>If the value of GZIPEXE is not an absolute pathname, then
+gzip should exist in your search path.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<p><tt>gzip</tt>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>This example is not specific to GZIPEXE, but the following
+sample invocation:
+</p>
+<pre>
+    % <b>mhonarc mailbox.gz</b>
+</pre>
+<p>can be done if MHonArc is able to invoke gzip.  Therefore,
+you do not have to manually ungzip the mailbox first or use a
+pipe to decompress the data before passing it to MHonArc.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>2.1.0
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+<a href="gzipfiles.html">GZIPFILES</a>,
+<a href="gziplinks.html">GZIPLINKS</a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="gmtdatefmt.html">GMTDATEFMT</a>]</td><td><nobr>[<a href="../resources.html#gzipexe">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="gzipfiles.html">GZIPFILES</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2003/10/06 22:04:17 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"
+><strong>MHonArc</strong></a><br>
+Copyright &#169; 1997-1998, <a href="http://www.earlhood.com/"
+>Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org"
+>mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

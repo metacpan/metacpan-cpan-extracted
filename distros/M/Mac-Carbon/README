@@ -1,0 +1,152 @@
+#!perl -w
+# run this document through perl to check its syntax
+use Pod::Checker;
+podchecker(\*DATA);
+__END__
+
+=head1 NAME
+
+README - Carbon API for perl on Mac OS X
+
+=head1 SYNOPSIS
+
+Mac::Carbon is a collection of perl modules for accessing the Carbon API
+under Mac OS X.  It is a port of the Toolbox modules written by Matthias
+Neeracher for MacPerl.
+
+See the documentation in L<Mac::Carbon> for more implementation details,
+bugs, etc.
+
+
+=head1 64-BIT NOTICE
+
+Mac::Carbon does not run under 64-bit perl. There are workarounds listed
+in L<Mac::Carbon/"64-BIT PERL">.  It does build with a "fat" 64-bit perl,
+for use with 32-bit mode.
+
+
+=head1 HELP ME
+
+There are probably a lot of bugs, especially in F<Carbon.h>.  Bugs are listed
+in L<Mac::Carbon/"Known Bugs">; please feel free to report more.  Patches
+are welcome, too, of course.  For large patches, such as stuff for test suites
+and building, please do coordinate with me before spending much time on it.
+
+	http://projects.pudge.net/
+
+
+=head1 REQUIREMENTS
+
+=head2 Mac OS
+
+These modules all build under Mac OS, but it is recommended you build them
+as a part of MacPerl itself, or at least under the MacPerl source
+(version 5.6.1 or greater).  See http://dev.macperl.org/ for more information.
+
+Under Mac OS, extra non-Carbon-compatible routines are available.
+
+=head2 Mac OS X
+
+To build these modules on Mac OS X, the Developer Tools are required.
+
+Building these modules has been tested on Mac OS X 10.3 through 10.5,
+with perl 5.8 and 5.10, with gcc 3.1, 3.3, 4.0, and 4.2.  Earlier versions have
+built under earlier versions of Mac OS X, perl, and gcc, but they have not been
+recently tested.  gcc 3.3 and 4 are the most well-tested.
+
+Mac OS X 10.6 has not yet been tested.  Both Intel and PPC have been tested.
+
+This tells you what version of gcc is in use, from the command line:
+
+   % gcc_select
+   Current default compiler:
+   gcc version 3.3 20030304 (Apple Computer, Inc. build 1495)
+
+To change it, try one of the following (as root, or with sudo; sudo is
+used in the examples).  "3" will give you 3.1, "3.3" will give you 3.3,
+"4.0" will give you 4.0.
+
+   % sudo gcc_select 3.3
+
+The Test::More module is required for running tests.
+
+The separate Mac::Errors module is not required, but is highly recommended, for
+providing more information from Mac system error codes.
+
+
+=head1 BUILDING
+
+Matthias added some extensions to XS for his Toolbox modules; they were
+never fully embraced by p5p, and as a result, we have a separate xsubpp
+for these additional XS macros.  The Makefile.PLs will choose and use
+the appropriate xsubpp version for your version of perl.
+
+You might want to run the test suite with C<make test TEST_VERBOSE=1>.
+It's cool.  For extra tests requiring the GUI, set C<MAC_CARBON_GUI=1>
+and C<MAC_CARBON_SOUND=1> in your environment.
+
+
+=head1 SUPPORTED MODULES
+
+Currently, only a subset of the modules are supported.  The ported
+modules are:
+
+	Mac::AppleEvents
+	Mac::Components
+	Mac::Files
+	Mac::Gestalt
+	Mac::InternetConfig
+	Mac::Memory
+	Mac::MoreFiles
+	Mac::Notification
+	Mac::OSA
+	Mac::Processes
+	Mac::Resources
+	Mac::Sound
+	Mac::Speech
+	Mac::Types
+	MacPerl
+
+Distributed separately on the CPAN and SourceForge.net:
+
+	Mac::Apps::Launch
+	Mac::AppleEvents::Simple
+	Mac::OSA::Simple
+	Mac::Glue
+
+And, coming someday, possibly:
+
+	Mac::SpeechRecognition
+
+There are currently no plans for the other (GUI) modules, including:
+
+	Mac::Controls
+	Mac::Dialogs
+	Mac::Events
+	Mac::Fonts
+	Mac::Lists
+	Mac::Menus
+	Mac::Movies
+	Mac::Navigation
+	Mac::QDOffScreen
+	Mac::QuickDraw
+	Mac::QuickTimeVR
+	Mac::TextEdit
+	Mac::Windows
+
+We could do these eventually, if there is enough interest.  They don't
+port as easily as some of the others, for many reasons, not the least of
+which is that we need a framework to handle events etc., which for
+MacPerl is mostly implemented in F<macish.c> / F<macish.h>.
+
+
+=head1 AUTHOR
+
+The Mac Toolbox modules were written by Matthias Neeracher
+E<lt>neeracher@mac.comE<gt>.  They are currently maintained by Chris
+Nandor E<lt>pudge@pobox.comE<gt>.
+
+
+=head1 VERSION
+
+$Id: README,v 1.15 2009/09/27 01:22:36 pudge Exp $

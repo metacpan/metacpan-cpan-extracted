@@ -1,0 +1,113 @@
+#!/usr/bin/perl
+#############################################################################
+## wpbl helper script
+## Copyright (C) 2004  Martin Ward  http://www.cse.dmu.ac.uk/~mward/
+## Email: martin@gkc.org.uk
+##
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation; either version 2 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#############################################################################
+#
+# Check the sender's IP address against the wpbl list
+# Add "X-WPBL: BLOCK (ip)" or "X-WPBL: OK (ip)" as appropriate
+#
+# Usage: wpbl_check < msg > output
+#
+
+use strict;
+use warnings;
+
+(my $myname = $0) =~ s|(.*/)*||;	# strip path component from name
+my $Usage = "Usage: $myname < msg > output\n";
+# Check for zeroarguments:
+die $Usage unless (@ARGV == 0);
+
+my $HOME = $ENV{'HOME'} || $ENV{'LOGDIR'} ||
+		(getpwuid($<))[7] || die "You're homeless!\n";
+
+my $base = "$HOME/.wpbl";
+my $exclude = "$base/data/exclude";
+my $blocks  = "$base/data/wpbl-blocks.cidr";
+my $source  = "rsync://rsync.wpbl.info/wpbl/wpbl-blocks.cidr";
+
+undef $/;
+
+# If $blocks is older than 0.042 days (just over one hour), then re-fetch it:
+if (-M $blocks > 0.042) {
+  system "rsync -q -z $source $blocks";
+  # In case the rsync failed, touch the file so that we won't try to fetch
+  # it again for another hour at least:
+  system "touch $blocks";
+}
+
+# Compute a regexp of IPs to exclude:
+my $excl_pat = "";
+open(EX, $exclude) or die "Can't read $exclude: $!\n";
+for (split(/\n/, <EX>)) {
+  s/#.*$//;
+  next unless /\S/;
+  s/\s+//g;
+  s/\./\\./g;
+  $excl_pat .= "$_|";
+}
+# Remove trailing |
+$excl_pat =~ s/\|$//;
+$excl_pat = "^($excl_pat)";
+
+
+open(IN, "$blocks") or die "Can't read $blocks: $!\n";
+my @block = grep { /^\d+\.\d+\.\d+\.\d+$/ } split(/\s+/, <IN>);
+close(IN);
+
+# Add spam entries from logfiles to blocks:
+opendir(DIR, $base) or die "Can't read directory $base: $!\n";
+foreach my $log (grep { /^log/ } readdir (DIR)) {
+  open(IN, "$base/$log") or die "Can't read $base/$log: $!\n";
+  my @spam = grep { /^spam\s+\d+\.\d+\.\d+\.\d+/ } split(/\n/, <IN>);
+  close(IN);
+  s/^spam (\d+\.\d+\.\d+\.\d+)\s*/$1/ for (@spam);
+  push(@block, @spam);
+}
+
+
+$_ = join("", <STDIN>);
+# Trim body if present:
+my $body = "";
+$body = $1 if s/\n(\n.*)/\n/s;
+
+# Join broken header lines:
+s/\n[ \t]+/ /g;
+
+# Get list of IPs in Received lines:
+my @ips = /\nReceived:.*?\[(\d+\.\d+\.\d+\.\d+)\]/g;
+
+# Delete exclusions:
+@ips = grep { !/$excl_pat/ } @ips;
+
+# Check that we found an IP (could be a local email):
+
+my $tags = "";
+if (@ips) {
+  if (grep { $ips[0] eq $_ } @block) {
+    # Sender IP is in block list
+    $tags .= "X-WPBL: BLOCK ($ips[0])\n";
+  } else {
+    $tags .= "X-WPBL: OK ($ips[0])\n";
+  }
+} else {
+  $tags .= "X-WPBL: OK (no ip)\n";
+}
+
+print $_, $tags, $body;
+

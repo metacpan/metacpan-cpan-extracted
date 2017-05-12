@@ -1,0 +1,14 @@
+Revision history for Perl module MooseFS
+
+0.04 2013-10-09
+ - fix Changes to comply w/CPAN::Changes::Spec
+   thanks to Сергей Романов.
+
+0.03 2013-10-08
+ - Exports/Mounts/Operations
+
+0.02 2013-09-12
+ - support 1.6.20
+
+0.01 2013-09-12
+ - First version, released on an unsuspecting world.

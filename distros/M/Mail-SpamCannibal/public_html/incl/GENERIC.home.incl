@@ -1,0 +1,22 @@
+
+This service does not block email access except for the IP addresses and
+generic netblocks that have sent 
+or relayed what we believe to be spam or other unsolicited email
+directly to our MX hosts. Spam originating IP addresses and netblocks are blocked only for
+access to our mail servers, however, the database we use for that purpose is
+freely availble for anyone to look at for use as they see fit. Use at your
+own risk.
+<p>
+If you have been referred to this site because you appear to be blocked by some 
+third party, speak to the adminstrators of the site you are trying to contact.
+<p>
+This service does not scan remote hosts or otherwise test remote sites. The
+ONLY way you can get into our database is by sending spam to our mail
+servers!
+<p>
+If you belive your IP address is in our database, click the <b>Lookup IP</b>
+link to find out why. To find out who owns a particular IP address, click
+the <b>Whois IP</b> link.
+<p>
+If you are interested in helping to stop spam, read the <b>FAQ</b>
+<p>

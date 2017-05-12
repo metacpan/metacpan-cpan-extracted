@@ -1,0 +1,77 @@
+SYNOPSIS
+
+     use Module::CoreList::More;
+    
+     # true, this module has always been in core since specified perl release
+     Module::CoreList::More->is_still_core("Benchmark", 5.010001);
+    
+     # false, since CGI is removed in perl 5.021000
+     Module::CoreList::More->is_still_core("CGI");
+    
+     # false, never been in core
+     Module::CoreList::More->is_still_core("Foo");
+    
+     my %modules = list_still_core_modules(5.010001);
+
+DESCRIPTION
+
+    This module is my experiment for providing more functionality to (or
+    related to) Module::CoreList. Some ideas include: faster functions,
+    more querying functions, more convenience functions. When I've got
+    something stable and useful to show for, I'll most probably suggest the
+    appropriate additions to Module::CoreList.
+
+    Below are random notes:
+
+FUNCTIONS
+
+    These functions are not exported. They can be called as function (e.g.
+    Module::CoreList::More::is_still_core($name) or as class method (e.g.
+    Module::CoreList::More->is_still_core($name).
+
+ first_release( MODULE )
+
+    Like Module::CoreList's version, but faster (see "BENCHMARK").
+
+ first_release_by_date( MODULE )
+
+    Like Module::CoreList's version, but faster (see "BENCHMARK").
+
+ removed_from( MODULE )
+
+    Like Module::CoreList's version, but faster (see "BENCHMARK").
+
+ removed_from_by_date( MODULE )
+
+    Like Module::CoreList's version, but faster (see "BENCHMARK").
+
+ is_core( MODULE, [ MODULE_VERSION, [ PERL_VERSION ] ] )
+
+    Like Module::CoreList's version, but faster (see "BENCHMARK").
+
+ is_still_core( MODULE, [ MODULE_VERSION, [ PERL_VERSION ] ] )
+
+    Like is_core, but will also check that from PERL_VERSION up to the
+    latest known version, MODULE has never been removed from core.
+
+    Note/idea: could also be implemented by adding a fourth argument
+    MAX_PERL_VERSION to is_core, defaulting to the latest known version.
+
+ list_core_modules([ PERL_VERSION ]) => %modules
+
+    List modules that are in core at specified perl release.
+
+ list_still_core_modules([ PERL_VERSION ]) => %modules
+
+    List modules that are (still) in core from specified perl release to
+    the latest. Keys are module names, while values are versions of said
+    modules in specified perl release.
+
+BENCHMARK
+
+    #COMMAND: devscripts/bench
+
+SEE ALSO
+
+    Module::CoreList
+

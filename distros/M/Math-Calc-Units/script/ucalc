@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+use Getopt::Long;
+use File::Basename qw(basename);
+use Math::Calc::Units qw(convert readable calc);
+
+use strict;
+use warnings;
+
+sub usage {
+    my ($msg, $bad) = @_;
+    my $out = $bad ? *STDERR : *STDOUT;
+
+    my $CMD = basename($0);
+    if ($msg) {
+	print $out "$CMD: $msg\n";
+    }
+
+    print $out <<"END";
+usage:
+
+Calculate the given expression, and guess human-readable units for the result:
+    $CMD [-v] [-a] <expr>
+
+Convert the given expression to the requested units:
+    $CMD -c <expr> <unit>
+    $CMD --convert <expr> <unit>
+
+Examples:
+How long does it take to download 10MB over a 384 kilobit/sec connection?
+    $CMD "10MB / 384Kbps"
+
+What is the expected I/O rate for 8KB reads on a disk that reads at 20MB/sec
+and has an average seek time of 15ms?
+    $CMD "8KB / (8KB/(20MB/sec) + 15ms)"
+
+Or if you prefer to calculate that by figuring out the number of seconds
+per byte and inverting:
+    $CMD "((1sec/20MB) + 15ms/8KB) ** -1"
+
+How many gigabytes can you transfer in a week at 2MB/sec?
+    $CMD -c "2MB/sec" "GB/week"
+
+How many angels fit on the heads of 17 pins (with some assumptions)?
+(This demonstrates that unknown units are allowed, with plurals.)
+    $CMD "42 angels/pinhead * 17 pinheads"
+END
+
+    exit($bad ? 1 : 0);
+}
+
+my $verbose = 0;
+my $abbreviate = 0;
+my $action = 'readable';
+
+GetOptions("verbose|v!" => \$verbose,
+           "abbreviate|abbrev|a" => \$abbreviate,
+           "convert|c!" => sub { $action = 'convert' },
+           "help|h!" => sub { usage("", 0) },
+          )
+  or usage("invalid arguments", 1);
+
+if ($action eq 'convert') {
+    usage("not enough args", 1) if (@ARGV < 2);
+    usage("too many args", 1) if (@ARGV > 2);
+    my ($expr, $units) = @ARGV;
+    if ($units =~ /^\s*\d+/) {
+      warn("WARNING: Destination units in conversion should probably not have a value\n");
+    }
+    print convert($expr, $units), "\n";
+} elsif ($action eq 'readable') {
+    usage("", 0) if @ARGV == 0;
+    usage("too many ARGV", 1) if (@ARGV > 1);
+    print "$_\n" foreach readable($ARGV[0], verbose => $verbose, abbreviate => $abbreviate);
+}
+
+1;

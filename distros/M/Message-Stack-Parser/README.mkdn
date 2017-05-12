@@ -1,0 +1,55 @@
+# NAME
+
+Message::Stack::Parser - A simple role for creating a Message::Stack from things
+
+# VERSION
+
+version 0.06
+
+# SYNOPSIS
+
+  use Message::Stack::Parser::DataVerifier;
+
+  my $dv = Data::Verifier->new;
+
+  my $dv_results = $dv->verify;
+
+  my $scope = 'login';
+  # Pass a Data::Verifier::Results object to parse.
+  my $ms = Message::Stack::Parser::DataVerifier->new->parse(
+    Message::Stack->new,
+    $scope,
+    $dv_results
+  );
+
+# DESCRIPTION
+
+Message::Stack::Parser is a [Moose](http://search.cpan.org/perldoc?Moose) role that is used to implement a parser
+for converting something into a [Message::Stack](http://search.cpan.org/perldoc?Message::Stack).  This role is nothing more
+than a single required method.  The actual point of this dist is to package
+some of the parsers separate from Message::Stack or the modules that may
+do the conversion.  Those are [Message::Stack::Parser::DataVerifier](http://search.cpan.org/perldoc?Message::Stack::Parser::DataVerifier) and
+[Message::Stack::Parser::FormValidator](http://search.cpan.org/perldoc?Message::Stack::Parser::FormValidator).
+
+# METHODS
+
+## parse ($stack, $scope, $results)
+
+Adds messages from the provided `$results` to the provided `$stack` under
+the `$scope` that is passed in.  This is the only method you need to implement.
+
+The `$stack` must be provided so multiple things may be parsed into a single
+stack.  The `$scope` is used to keep multiple parsings separated.  How this
+method works is completely up to the implementor, as the `$results` argument
+could be anything.
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Cold Hard Code, LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

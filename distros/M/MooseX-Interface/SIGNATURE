@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 8104299bd0372d4d792c647a51900d22e4e799a6 COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 02617ea0242e6ed3d9b662c546912581127e857f Changes
+SHA1 da5123b553c58adb17308aad842f15c258d2897b INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 bcabe94ac60f103fcc827b84a05799136e415ebc MANIFEST
+SHA1 281db551d9dd9ce48179c5bb90c62784015d9b20 META.json
+SHA1 20e855418b0570ee5c5fa05ff0d0090dc66ec7da META.yml
+SHA1 67c42a254d43389f8bbef15f8f1f83f0eb49f2fc Makefile.PL
+SHA1 869179818a3132408dff66639db9d4fbebdeda7f README
+SHA1 268f21992ca351bf0fbbc7f6c7a8f0f74e572bd5 dist.ini
+SHA1 6d23050dd1a79f14876703919579fb5c49123978 doap.ttl
+SHA1 f5a46326d93a46ca1963696f0db5aea2c0cafccf examples/eg1.pl
+SHA1 77585da62727f7842cb0a9b26d906cb401570640 lib/MooseX/Interface.pm
+SHA1 46c4656a554cec74cc565f8a5c1b3272986b5f50 lib/MooseX/Interface/Internals.pod
+SHA1 6dba2ddd964cd075916fcc6410e036f3ebe6879c lib/MooseX/Interface/Tutorial.pod
+SHA1 77f07adf296433767223ab53267f7abdaa98bf26 t/01integrity.t
+SHA1 934567c7aac09425c8cce94eb8358105f5ee89d1 t/02interfaces.t
+SHA1 f179f926bd5df68fb1ac421ea5d982636a270d57 t/03embeddedtc.t
+SHA1 4da010c7c1a7fddbcda7fbb06880492cf97b4fbd t/04meta.t
+SHA1 a2c4318c62478c65c6fec9f98f06bfa1cc39be64 t/05sigs.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQQ2HQACgkQzr+BKGoqfTnqgQCfR2QqEu5YISwO2FPMbFNs0yhw
+T1YAn1tCIRCMkLQSNJlmUUBFCePyQ4mN
+=ELs2
+-----END PGP SIGNATURE-----

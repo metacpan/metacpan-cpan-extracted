@@ -1,0 +1,39 @@
+{
+   "abstract" : "Collection of mojolicious plugins",
+   "author" : [
+      "Siddhartha Basu <biosidd@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Bundle",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bio::Chado::Schema" : "0.05703",
+            "Mojolicious" : "1.21",
+            "Regexp::Common" : "2010010201",
+            "YAML" : "0.71"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.004"
+}
+

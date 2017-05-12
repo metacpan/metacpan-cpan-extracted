@@ -1,0 +1,25 @@
+0.05 2015-10-16T12:04:29+02:00
+ - Improve description for get_lines() in doc.
+ - Update to Map::Tube 3.06.
+
+0.04 2015-09-28T12:36:54+02:00
+ - Add EXAMPLE3 section to doc with map.
+ - Add example for print of metro lines to doc.
+ - Add get_line_by_id() and get_line_by_name() methods to doc.
+ - Move author tests to xt/ directory.
+ - Remove duplicit api items in SYNOPSIS section in doc.
+ - Rewrite SEE ALSO section to new style.
+ - Update Module::Install to 1.16 version.
+
+0.03 2015-03-30T14:37:35+02:00
+ - Fix test for get_node_by_name() method to new Map::Tube::API (#103168).
+ - Remove TODO from EXAMPLE1 section in doc.
+ - Rewrite map and tests to conformity of Map::Tube 2.99.
+
+0.02 2015-03-29T11:51:23+02:00
+ - Add tests for get_node_by_id() method.
+ - Add tests for get_node_by_name() method.
+ - Fix map validity.
+
+0.01 2015-03-28T18:06:19+01:00
+ - First version

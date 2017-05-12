@@ -1,0 +1,15 @@
+all: foo
+all: bar
+	echo hallo
+
+any: foo hiya
+	echo larry
+	echo howdy
+any: blah blow
+
+foo:: blah boo
+	echo Hi
+foo:: howdy buz
+	echo Hey
+
+

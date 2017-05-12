@@ -1,0 +1,11 @@
+Revision history for Perl extension MooseX-Attribute-ENV.
+
+0.02    11 January 2011
+        - fixed a bug caused by the fact my generated default code was returning
+          an explicit undef, and not nothing.  This caused errors when the
+          attribute was optional but had a type constraint.
+        - Removed some unneeded whitespace from code
+
+0.01    07 June 2008
+        - Setup repository, created application skeleton
+        - Created tests, released.

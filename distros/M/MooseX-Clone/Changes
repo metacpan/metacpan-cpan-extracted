@@ -1,0 +1,26 @@
+Revision history for MooseX-Clone
+
+0.06    2015-05-23 22:37:41Z
+    - fix typo in package name (RT#55003)
+    - fix copying of attribute value provided to clone() when the original did
+      not have the value (Brendan Byrd, RT#104055)
+
+0.05    2010-01-13
+    - Fix cloning for attrs when init_arg is passed under Clone trait
+    - auto_deref related fixes (Evan Carroll)
+
+0.04    2009-04-20
+    - update code to call get_all_attributes instead of compute_all_applicable_attributes
+    - more tests
+    - add the StorableClone trait
+
+0.03    2008-06-18
+    - Add the Copy trait (simple 1 level cloning of hashes and array refs)
+    - namespace::clean all over
+
+0.02    2008-04-24
+    - Add deep cloning support using Data::Visitor
+    - Add the NoClone trait
+
+0.01    2008-04-24
+    - Initial release

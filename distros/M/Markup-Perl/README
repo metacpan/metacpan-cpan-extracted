@@ -1,0 +1,31 @@
+Markup-Perl version 0.01
+========================
+
+The first inspiration for this module was a total revulsion for seeing (writing, maintaining, debugging, etc etc) HTML inside print statements in CGI scripts. How far will I go to avoid such things? The answer is Markup::Perl.
+
+The second inspiration was Dag Ågren's PerlHP module, which made me realize I could have my Perl and template-like syntax too. But, you say, there are so many great perl-based templating systems already! Why not Mason, or Template Toolkit or [insert favorite here]?
+
+Well, I've tried those. They truly are great. Their popularity certainly proves that there is a desire for such things. My only problem was I already filled my entire brain with Perl. There simply wasn't room for any new invented mini-syntax, or complicated configuration information.
+
+Markup::Perl's raison d'être is simplicity. It purposely _doesn't_ do all the singing and dancing those other guys do. It's just perl, tagged with a <perl> tag, and then it works. One file, about 50 lines of code, and you're over a learning curve that was essentially flat. And, because it is "just perl", that's quite enough for nearly every purpose you can think up.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module is best used in a CGI environment, so it naturally includes the CGI.pm module. In addition it wouldn't work without the magic of Filter::Simple. Both of these are already included as standard in recent distributions.
+
+BUGS
+
+Achieving security is an unending job and I'm the first to admit there are always things that could be improved. That's the beauty of open-source, though and I'm anxious for your participation and feedback on how Markup::Perl could be better, stronger, faster. Possibly even bionic...
+
+COPYRIGHT AND LICENCE
+
+The author does not claim copyright on any part of this code; unless otherwise licensed, code in this work should be considered Public Domain.

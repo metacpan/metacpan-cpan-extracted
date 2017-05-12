@@ -1,0 +1,237 @@
+--stations
+
+# Line 1 west
+Frognerseteren
+Voksenkollen
+Lillevann
+Skogen
+Voksenlia
+Holmenkollen
+Besserud
+Midtstuen
+Skådalen
+Vettakollen
+Gulleråsen
+Gråkammen
+Slemdal
+Ris
+Gaustad
+Vinderen
+Steinerud
+Frøen
+
+# Line 5 west
+Østerås
+Lijordet
+Eiksmarka
+Ekraveien
+Røa
+Hovseter
+Holmen
+Makrellbekken
+Smestad
+Borgen
+
+# Line 2 west
+Avløs
+Haslum
+Gjønnes
+Bekkestua
+Ringstabekk
+Jar
+Bjørnsletta
+Åsjordet
+Ullemåsen
+Montebello
+
+# Line 6
+Sognsvann
+Kringsjå
+Holstein
+Østhorn
+Tåsen
+Berg
+Sinsen
+
+# Line 5 north
+Vestli
+Stovner
+Rommen
+Romsås
+Grorud
+Ammerud
+Kalbakken
+Rødtvet
+Veitvet
+Linderud
+Vollebekk
+Risløkka
+Økern
+Hasle
+Carl Berners plass
+
+# Line 3 east
+Mortensrud
+Skullerud
+Bogerud
+Bøler
+Ulsrud
+Oppsal
+Skøyenåsen
+Godlia
+
+# Line 4 east
+Bergkrystallen
+Munkelia
+Lambertseter
+Karlsrud
+Brattlikollen
+Ryen
+Manglerud
+Høyenhall
+
+# Line 2 east
+Ellingsrudåsen
+Furuset
+Lindeberg
+Trosterud
+Haugerud
+Tveita
+Hellerud
+
+# The rest
+Brynsereng
+Helsfyr
+Ensjø
+Tøyen
+Grønland
+Jernbanetorget
+Stortinget
+Nationaltheatret
+Majorstuen
+Blindern
+Forskningsparken
+Ullevål stadion
+Nydalen
+Storo
+
+--lines
+1|Line 1|Purple line|color:#7b88b3
+2|Line 2|Light blue line|color:#00add9
+3|Line 3|Yellow line|color:#ef9e45
+4|Line 4|Dark blue line|color:#004c8a
+5|Line 5|Orange line|color:#e55c35
+6|Line 6|Green line|color:#3cae55
+
+--segments
+1|Frognerseteren|Voksenkollen
+1|Voksenkollen|Lillevann
+1|Lillevann|Skogen
+1|Skogen|Voksenlia
+1|Voksenlia|Holmenkollen
+1|Holmenkollen|Besserud
+1|Besserud|Midtstuen
+1|Midtstuen|Skådalen
+1|Skådalen|Vettakollen
+1<-|Vettakollen|Gulleråsen
+1<-|Gulleråsen|Gråkammen
+1->|Vettakollen|Gråkammen
+1|Gråkammen|Slemdal
+1|Slemdal|Ris
+1|Ris|Gaustad
+1|Gaustad|Vinderen
+1|Vinderen|Steinerud
+1|Steinerud|Frøen
+1|Frøen|Majorstuen
+
+5|Østerås|Lijordet
+5|Lijordet|Eiksmarka
+5|Eiksmarka|Ekraveien
+5|Ekraveien|Røa
+5|Røa|Hovseter
+5|Hovseter|Holmen
+5|Holmen|Makrellbekken
+5|Makrellbekken|Smestad
+
+2|Avløs|Haslum
+2|Haslum|Gjønnes
+2|Gjønnes|Bekkestua
+2|Bekkestua|Ringstabekk
+2|Ringstabekk|Jar
+2|Jar|Bjørnsletta
+2|Bjørnsletta|Åsjordet
+2|Åsjordet|Ullemåsen
+2|Ullemåsen|Montebello
+2|Montebello|Smestad
+
+2,5|Smestad|Borgen
+2,5|Borgen|Majorstuen
+
+6|Sognsvann|Kringsjå
+6|Kringsjå|Holstein
+6|Holstein|Østhorn
+6|Østhorn|Tåsen
+6|Tåsen|Berg
+6|Berg|Ullevål stadion
+
+6|Storo|Sinsen
+6|Sinsen|Carl Berners plass
+
+5|Vestli|Stovner
+5|Stovner|Rommen
+5|Rommen|Romsås
+5|Romsås|Grorud
+5|Grorud|Ammerud
+5|Ammerud|Kalbakken
+5|Kalbakken|Rødtvet
+5|Rødtvet|Veitvet
+5|Veitvet|Linderud
+5|Linderud|Vollebekk
+5|Vollebekk|Risløkka
+5|Risløkka|Økern
+5|Økern|Hasle
+5|Hasle|Carl Berners plass
+
+3|Mortensrud|Skullerud
+3|Skullerud|Bogerud
+3|Bogerud|Bøler
+3|Bøler|Ulsrud
+3|Ulsrud|Oppsal
+3|Oppsal|Skøyenåsen
+3|Skøyenåsen|Godlia
+
+4|Bergkrystallen|Munkelia
+4|Munkelia|Lambertseter
+4|Lambertseter|Karlsrud
+4|Karlsrud|Brattlikollen
+4|Brattlikollen|Ryen
+4|Ryen|Manglerud
+4|Manglerud|Høyenhall
+
+2|Ellingsrudåsen|Furuset
+2|Furuset|Lindeberg
+2|Lindeberg|Trosterud
+2|Trosterud|Haugerud
+2|Haugerud|Tveita
+2|Tveita|Hellerud
+
+3|Godlia|Hellerud
+
+2,3|Hellerud|Brynsereng
+4|Høyenhall|Brynsereng
+2,3,4|Brynsereng|Helsfyr
+
+1,2,3,4|Helsfyr|Ensjø
+1,2,3,4|Ensjø|Tøyen
+5,6|Carl Berners plass|Tøyen
+
+1,2,3,4,5,6|Tøyen|Grønland
+1,2,3,4,5,6|Grønland|Jernbanetorget
+1,2,3,4,5,6|Jernbanetorget|Stortinget
+1,2,3,4,5,6|Stortinget|Nationaltheatret
+1,2,3,4,5,6|Nationaltheatret|Majorstuen
+3,4,6|Majorstuen|Blindern
+3,4,6|Blindern|Forskningsparken
+3,4,6|Forskningsparken|Ullevål stadion
+3,4|Ullevål stadion|Nydalen
+3,4|Nydalen|Storo

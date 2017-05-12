@@ -1,0 +1,52 @@
+---
+abstract: 'a client that submits to Metabase servers'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+  - 'Ricardo Signes <rjbs@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Metabase::User::Profile: '0'
+  Metabase::User::Secret: '0'
+  Test::More: '0.88'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Metabase-Client-Simple
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Metabase::Client::Simple:
+    file: lib/Metabase/Client/Simple.pm
+    version: '0.012'
+requires:
+  HTTP::Tiny: '0.056'
+  JSON::MaybeXS: '0'
+  URI: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/cpan-testers/Metabase-Client-Simple/issues
+  homepage: https://github.com/cpan-testers/Metabase-Client-Simple
+  repository: https://github.com/cpan-testers/Metabase-Client-Simple.git
+version: '0.012'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Alexandr Ciornii <alexchorny@gmail.com>'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'James McCoy <vega.james@gmail.com>'
+  - 'Karen Etheridge <ether@cpan.org>'

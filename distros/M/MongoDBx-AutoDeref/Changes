@@ -1,0 +1,15 @@
+Revision history for MongoDBx-AutoDeref: 1.110560
+
+1.110560  2011-02-25 15:32:05 America/Chicago
+        Enable partial document returns on DBRef->fetch()
+
+1.110530  2011-02-22 10:07:34 America/Chicago
+        Using Scalar::Defer was a bad idea and so that functionality is now
+            replaced using a proper object
+        Add some more tests to make sure storing something with live refs
+            works
+        Hook some more into MongoDB to properly deflate the new objects when
+            calling insert or update
+
+1.110520  2011-02-21 16:02:03 America/Chicago
+        Initial Release

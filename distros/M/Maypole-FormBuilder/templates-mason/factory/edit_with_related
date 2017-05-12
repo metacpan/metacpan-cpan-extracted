@@ -1,0 +1,15 @@
+<div id="search">
+<fieldset>
+Note: with related functionality is not yet implemented.
+<legend>Edit (with related) <% $item->get( $item->stringify_column ) %></legend>
+<% $request->as_form( reset        => 'reset', 
+                      submit       => 'submit',
+                      #show_related => [ qw( style pubs ) ],
+                      mode => 'editrelated'
+                      )->render %>
+</fieldset>
+</div>
+
+<%args>
+    $item
+</%args>

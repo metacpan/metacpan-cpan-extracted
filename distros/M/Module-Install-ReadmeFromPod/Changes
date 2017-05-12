@@ -1,0 +1,335 @@
+==============================
+2017-02-17 21:20:51 +0000 0.30
+==============================
+
+  commit 88faaf25e3b2463f3d9378e5d8c61cae6c25cb56
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Fri Feb 17 21:20:51 2017 +0000
+  
+    Fix clean pdf test after previous release 
+
+==============================
+2017-02-17 14:02:03 +0000 0.28
+==============================
+
+  commit 67e29aaf52f25af70bb83d776f7e8e115a3cf4a1
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Fri Feb 17 13:59:02 2017 +0000
+  
+    Handle perls without dot in @INC 
+
+==============================
+2016-04-26 13:54:51 +0100 0.26
+==============================
+
+  commit f916c088fcfc07256cdfab6a9412a589e0cd5756
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Tue Apr 26 13:54:51 2016 +0100
+  
+    Missed prereq IO::All 
+
+==============================
+2016-04-24 18:53:01 +0100 0.24
+==============================
+
+  commit 27492d5c7ed5dc0781ff91ad9218ab17d28bb541
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Sun Apr 24 18:31:17 2016 +0100
+  
+    Release engineering for 0.24
+
+  commit e5e932b54f292e20aaeb46c9c6934eef5613499e
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Sun Apr 24 18:28:52 2016 +0100
+  
+    Update README
+
+  commit 0d01dd098b1b36715c1c9ada480211c0769580b8
+  Merge: e4532dc 1d63936
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Sun Apr 24 18:13:19 2016 +0100
+  
+    Merge pull request #4 from djerius/markdown
+
+    add support for markdown output
+
+  commit e4532dcbb4255c878acdeafe11bb4d70793030f1
+  Merge: 327290b 53d1b55
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Sun Apr 24 18:12:34 2016 +0100
+  
+    Merge pull request #5 from djerius/namespace
+
+    only load IO::All and Capture::Tiny in admin mode
+
+  commit 58952626102ace3d4c4cc185e8b9600a642ef649
+  Author: Robert Rothenberg <rrwo@cpan.org>
+  Date:   Fri Oct 24 13:19:16 2014 +0100
+  
+    Fixes for Makefile.PL
+
+  commit 53d1b559b7731b04ccc91f1d11e9b1ec8780eee7
+  Author: Diab Jerius <djerius@cfa.harvard.edu>
+  Date:   Mon Sep 22 10:22:03 2014 -0400
+  
+    only load IO::All and Capture::Tiny in admin mode
+
+  commit 1d63936c277830285fd2d3ae7d319930ad2bf94a
+  Author: Diab Jerius <djerius@cfa.harvard.edu>
+  Date:   Sat Sep 20 17:07:05 2014 -0400
+  
+    add support for markdown output
+
+  commit 51dfe78d5e1bb209f5a6acd6f5e5a605c4281d9b
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date:   Sat Aug 9 23:28:18 2014 +0200
+  
+    ensure outputs are always written in binary mode 
+
+==============================
+2013-08-24 00:31:17 +0100 0.22
+==============================
+
+  commit a35f27ed5cece1de447dfdbdfba3afd1636acd84
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Sat Aug 24 00:31:17 2013 +0100
+  
+    No changes, version bump to fix META. 
+
+==============================
+2012-10-20 22:50:23 +0100 0.20
+==============================
+
+  commit b077ea51d9329409c9481946891945ce554df872
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Sat Oct 20 22:50:23 2012 +0100
+  
+    Update included Module::Install 
+
+==============================
+2012-02-25 10:20:43 +0000 0.18
+==============================
+
+  commit 571b8e8d634de60e871cf690a752006d83fbd147
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Sat Feb 25 10:20:43 2012 +0000
+  
+    Resolve test failures for v5.15.x perl releases 
+
+==============================
+2012-02-08 23:56:12 +0000 0.16
+==============================
+
+  commit 2d802f6a6e6ade42fd71fd921c7e35e6d745593b
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Wed Feb 8 23:56:12 2012 +0000
+  
+    Bump to version 0.16
+
+  commit 304c9299469efa5df6df935fbba10e5ff47b7e6c
+  Author: Florent Angly <florent.angly@gmail.com>
+  Date:   Tue Feb 7 16:50:28 2012 +1000
+  
+    Implemented mechanism to pass options to readme_from as a hashref 
+
+==============================
+2012-02-06 13:20:30 +0000 0.14
+==============================
+
+  commit 8ca70dcb914adf21c0bc7b6da156ad6cd13d8b3d
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon Feb 6 13:20:30 2012 +0000
+  
+    Add 'lib' using use lib in Makefile.PL
+
+  commit b8ccda189c5f33e08704e3d73eea160ff00a115b
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon Feb 6 13:07:29 2012 +0000
+  
+    Bump version to 0.14
+
+  commit 02741e0ddca9bd346c803ffee7cef3ad1cfedc8c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon Feb 6 13:06:08 2012 +0000
+  
+    Move the pdf tests to extra tests that are skipable if pod2pdf isn't
+    installed
+
+  commit fc297cbc24d31c51025d06af85c144608260a6cf
+  Author: Florent Angly <florent.angly@gmail.com>
+  Date:   Mon Feb 6 18:28:29 2012 +1000
+  
+    Provisions to pass options to the POD formatters
+
+  commit d25ff983d435defa04ac92e09dd68b050cb3c586
+  Author: Florent Angly <florent.angly@gmail.com>
+  Date:   Mon Feb 6 17:48:54 2012 +1000
+  
+    Allow specifying the name of the output file manually
+
+  commit f66344e7f486127f6a1e932c167c48e20a63995c
+  Author: Florent Angly <florent.angly@gmail.com>
+  Date:   Mon Feb 6 17:38:16 2012 +1000
+  
+    Allowing some alternate format spellings: text, html
+
+  commit 626ff75784cd54aa5b74b12ad07e35b76ddc509d
+  Author: Florent Angly <florent.angly@gmail.com>
+  Date:   Mon Feb 6 17:32:01 2012 +1000
+  
+    Support for README files in PDF format
+
+  commit e28a943d31eef780d56d6e942ee4dc27fdf7e103
+  Author: Florent Angly <florent.angly@gmail.com>
+  Date:   Mon Feb 6 16:23:41 2012 +1000
+  
+    Support for a README in manpage format
+
+  commit df73013741c77e8315b9cbd7f5322e90c8592073
+  Author: Florent Angly <florent.angly@gmail.com>
+  Date:   Mon Feb 6 15:30:40 2012 +1000
+  
+    Documented the HTML support
+
+  commit 471afe38836a45a9bd2351dc33585a881c3919ea
+  Author: Florent Angly <florent.angly@gmail.com>
+  Date:   Mon Feb 6 15:23:07 2012 +1000
+  
+    Support for HTML output
+
+  commit 7bd4d3dc913aceca456f68937153f821c6bb1548
+  Author: Florent Angly <florent.angly@gmail.com>
+  Date:   Sun Feb 5 15:44:20 2012 +1000
+  
+    clean_files can be out of the readme_txt sub
+
+  commit df98df367489c8f769d7cab8111a6fe1d318878f
+  Author: Florent Angly <florent.angly@gmail.com>
+  Date:   Sun Feb 5 15:39:14 2012 +1000
+  
+    Prepare support for other file formats
+
+  commit f78147f401f7b3d66813a692d8fe37e215b11dca
+  Author: Ingy dot Net <ingy@ingy.net>
+  Date:   Mon Sep 20 09:47:40 2010 -0700
+  
+    Updating all the plugins to print consistent output.
+
+    Prints:
+
+    readme_from lib/Module.pm
+
+  commit 4d455247ec1f6d62f1b36f4ae6543afd13c4af79
+  Author: Ingy dot Net <ingy@ingy.net>
+  Date:   Wed Sep 15 11:25:04 2010 -0700
+  
+    Found out that this doesn't work on older M::I.
+
+    This code looks at M::I internals. I should patch M::I to make the
+    all_from file a public variable. 
+
+==============================
+2010-09-12 19:49:54 +0100 0.12
+==============================
+
+  commit 5ca30f70f03174922dcdfc85e564e2ac5a58119e
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Sun Sep 12 19:49:54 2010 +0100
+  
+    Bump version to 0.12 as I odd version numbers for dev releases and
+    even version numbers for CPAN releases.
+
+  commit 439630939d5244c910d90d60050c7b8d936566fa
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Sun Sep 12 19:47:11 2010 +0100
+  
+    Add new test to the MANIFEST and add Ingy to the Changes file for the
+    last change. Thanks!
+
+  commit a747e5a5d16c549f76c3aa033f954491f5920c2c
+  Author: Ingy dot Net <ingy@ingy.net>
+  Date:   Fri Sep 10 18:59:02 2010 -0700
+  
+    Make the 'all_from' file be default.
+
+    Chris,
+
+    I changed a few things. Maybe I should have broken up the commits a
+    bit. I tried to stick with your coding style, but added a few things
+    I thought you might appreciate.
+
+    * The all_from default works.
+
+    * Readme_from '', 'clean'; # works
+
+    * Print a msg indicating that the README is generating.
+
+    * Added a test based on 01_dist.
+
+    * Updated Changes and bumped VERSION.
+
+    * I made the Makefile.PL rely more on all_from (including
+    readme_from).
+
+    * LICENSE file was showing up, so added it to clean_files.
+
+    * Updated doc showing the new default behavior
+
+    Lastly, I traded in the postamble clean targets, for simply adding
+    README to clean_files.
+
+    Not sure if it works exactly the same. Try it out and let me know.
+
+    Cheers, Ingy 
+
+==============================
+2010-07-18 12:20:50 +0100 0.10
+==============================
+
+  commit 8ab7b626cb33fddb8f7e2fe0d34f42c585e894a5
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Sun Jul 18 12:20:50 2010 +0100
+  
+    Update Changes
+
+  commit 400389ccec94c500d57dd9e9bb68e766eaa84333
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Sun Jul 18 12:16:16 2010 +0100
+  
+    Apply patch from Hakim Cassimally RT #59496 
+
+==============================
+2010-04-29 13:21:18 +0100 0.08
+==============================
+
+  commit 26d6177927bdaef2c50970fd2cad47125f79546f
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Thu Apr 29 13:21:18 2010 +0100
+  
+    tests runnable in parallel now. Reported by Florian Ragwitz RT #56980 
+
+==============================
+2009-05-06 12:51:13 +0100 0.06
+==============================
+
+  commit 2ebe6031ee7828194afe6a87d30f349f37907cfb
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Wed May 6 12:51:13 2009 +0100
+  
+    Explicitly require a modern version of Pod::Text. Update to use
+    auto_license and githubmeta 
+
+==============================
+2009-05-03 23:38:03 +0100 0.04
+==============================
+
+  commit 76aec2237585621e5d346f40b78c209d0d1de6c7
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Sun May 3 23:38:03 2009 +0100
+  
+    Forgot to put the clean into the clean test and forgot to add the
+    clean test to the MANIFEST 
+
+==============
+End of Excerpt
+==============

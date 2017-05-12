@@ -1,0 +1,1156 @@
+5.509	  2017-04-05  Dianne Skoll <dfs@roaringpenguin.com>
+
+	* VERSION 5.509 RELEASED
+
+	* Fix CPAN bug https://rt.cpan.org/Ticket/Display.html?id=120871
+	  Makefile.PL fails with no '.' in @INC
+
+	* Fix CPAN bug https://rt.cpan.org/Ticket/Display.html?id=118262
+	  Test t/Ref.t fails on Windows install
+
+	* Fix CPAN bug https://rt.cpan.org/Ticket/Display.html?id=119166
+	  MIME::Parser::parse_data() should check what it gets back...
+
+	* Fix CPAN bug https://rt.cpan.org/Ticket/Display.html?id=119568
+	  Allow \r\n to be used as line-end delimeter when outputting MIME
+	  message.
+
+5.508	  2016-08-29  Dianne Skoll <dfs@roaringpenguin.com>
+
+	* VERSION 5.508 RELEASED
+
+	* Fix test broken by Perl update
+	  https://rt.cpan.org/Ticket/Display.html?id=113887
+
+5.507	  2015-09-30  Dianne Skoll <dfs@roaringpenguin.com>
+
+	* VERSION 5.507 RELEASED
+
+	* Fix parsing bug
+	  https://rt.cpan.org/Public/Bug/Display.html?id=105455
+
+	* Fix typo that broke MIME::Body::incore->open() on Perl 5.20
+
+5.506	  2015-04-22  Dianne Skoll <dfs@roaringpenguin.com>
+
+	* VERSION 5.506 RELEASED
+
+	* Update maintainer's name to "Dianne Skoll"
+
+5.505	  2013-11-14  Dianne Skoll <dfs@roaringpenguin.com>
+
+	* VERSION 5.505 RELEASED
+
+	* Fix documentation typos.
+	  https://rt.cpan.org/Public/Bug/Display.html?id=80473
+
+	* Fix broken test.
+	  https://rt.cpan.org/Public/Bug/Display.html?id=84668
+
+	* Don't run Kwalitee tests unless author or release tests are enabled.
+	  https://rt.cpan.org/Public/Bug/Display.html?id=87094
+
+	* Fix many documentation typos.
+	  https://rt.cpan.org/Public/Bug/Display.html?id=87783
+
+	* Fix bug in header parsing that would fail to parse a header like:
+ 	      Content-Type: ; name="malware.zip"
+
+5.504	  2013-01-30  Dianne Skoll <dfs@roaringpenguin.com>
+
+	* VERSION 5.504 RELEASED
+
+	* Fix encoding of MIME parameters that contain a quoted
+	  string:  "like \"this"
+	  https://rt.cpan.org/Public/Bug/Display.html?id=80433
+
+	* Suppress useless warnings from tests
+	  https://rt.cpan.org/Public/Bug/Display.html?id=80679
+
+	* Fix long-standing bug in encode_mimewords that can
+	  break multibyte-encodings (eg, utf-8)
+	  https://rt.cpan.org/Public/Bug/Display.html?id=5462
+
+5.503	  2012-06-08  Dianne Skoll <dfs@roaringpenguin.com>
+
+	* VERSION 5.503 RELEASED
+
+	* Avoid inappropriately untainting data
+	  https://rt.cpan.org/Public/Bug/Display.html?id=67119
+
+	* Localise $\ to avoid parsing problems if it's set elsewhere
+	  https://rt.cpan.org/Public/Bug/Display.html?id=71041
+
+	* Improve exorcising of filenames
+	  https://rt.cpan.org/Public/Bug/Display.html?id=71677
+
+	* Fix potential race condition in t/Smtpsend.t
+	  https://rt.cpan.org/Public/Bug/Display.html?id=68879
+
+	* Allow native I/O on File::Handle objects
+	  https://rt.cpan.org/Public/Bug/Display.html?id=72538
+
+	* Add "recommends Convert::BinHex" clause to Makefile.PL
+	  https://rt.cpan.org/Public/Bug/Display.html?id=72223
+
+	* Add module_name to Makefile.PL
+	  https://rt.cpan.org/Public/Bug/Display.html?id=77138
+
+	* Fix "Uninitialized value" warning
+	  https://rt.cpan.org/Public/Bug/Display.html?id=77190
+
+	* Don't run t/Smtpsend.t on systems that lack fork()
+	  https://rt.cpan.org/Public/Bug/Display.html?id=77351
+
+	* Add "use strict" everywhere
+	  https://rt.cpan.org/Public/Bug/Display.html?id=77582
+
+5.502	  2011-03-08  Dianne Skoll <dfs@roaringpenguin.com>
+
+	* VERSION 5.502 RELEASED
+
+	* NOTE to packagers (Debian, Red Hat, FreeBSD, etc.): Do not ship
+	MIME::tools 5.500 or 5.501.  They both had serious bugs!
+
+	* Fix parsing bug: https://rt.cpan.org/Ticket/Display.html?id=66025
+
+	* Fix typo: https://rt.cpan.org/Ticket/Display.html?id=65387
+
+	* Fix unit tests on Perl 5.8.x: https://rt.cpan.org/Ticket/Display.html?id=66188
+
+	* Fix unit test failure on Win32:  (https://rt.cpan.org/Ticket/Display.html?id=66286)
+
+5.501	  2011-02-17  Dianne Skoll <dfs@roaringpenguin.com>
+
+	* VERSION 5.501 RELEASED
+
+	* Add build_requires 'Test::Deep'; to Makefile (rt.cpan.org #64659)
+
+	* Fix spelling errors (rt.cpan.org #64610)
+
+	* Fix double-decoding bug when decoding RFC-2231-encoded parameters
+	  (rt.cpan.org #65162)
+
+	* Fix inappropriate inclusion of CR characters in parsed headers
+	  (rt.cpan.org #65681)
+
+	* Document that MIME::WordDecoder is mostly deprecated.
+
+	* Document that MIME::Head->get(...) can include a trailing newline.
+
+	* Increase buffer size from 2kB to 8kB in MIME::Entity and MIME::Body
+	  (part of rt.cpan.org #65162)
+
+5.500	  2011-01-07  Dave O'Neill <dmo@roaringpenguin.com>
+
+	* VERSION 5.500 RELEASED
+
+	* (cleanup) IO-Stringy (specifically, IO::ScalarArray, IO::Lines, and
+	  IO::InnerFile) is no longer used
+
+	* (ticket 22684) Fix deadlock in filter() when invoking external
+	  programs such as gzip. (Alexey Tourbin <at -at- altlinux.ru>)
+
+	* Remove auto_install from Makefile.PL
+
+	* (ticket 60931) If preamble is empty, make sure it's still empty after roundtripping through MIME::Entity
+
+	* (ticket 63739) Properly decude RFC2231 encodings in attachment filenames
+
+5.428     2010-04-22  Dave O'Neill <dmo@roaringpenguin.com>
+
+	* VERSION 5.428 RELEASED
+
+	* (ticket 56764) Build release with a newer Module::Install
+
+	* (ticket 52924) ensure we add <> around Content-id data
+
+	* (ticket 48036) make mimesend example script a bit more useful
+	  (courtesy of Jerrad Pierce)
+
+	* (ticket 43439) fix for parsing of doubled ; in multipart headers
+
+	* (ticket 41632) If both RFC-2231 and non-RFC-2231 parameters are
+	  present, use only the RFC-2231 ones
+
+	* (ticket 40715) Reference Encode::MIME::Header in docs
+
+	* (ticket 39985) correct POD typos
+
+	* Only bind to localhost in smtpsend test, rather than to all available
+	  interfaces.  This might avoid some of the test failures seen on
+	  cpantesters.
+
+
+5.427     2008-06-30  Dave O'Neill <dmo@roaringpenguin.com>
+	* VERSION 5.427 RELEASED
+
+	* (bugfix) fix remove_sig() on invalid multipart message (RT #11901)
+
+	* (bugfix) make_singlepart() no longer creates bizzare Content-Type: headers
+	  (RT #37139)
+
+	* (bugfix) process_part() no longer sets incorrect charset on empty
+	  parts (RT #35369)
+
+	* (bugfix) fix runtime warnings caused by incorrect pack() string
+	  (RT #34451, bugs.debian.org #446342)
+
+	* (docs) add "SEE ALSO" sections to POD docs (RT #30391)
+
+	* (docs) fix documentation of MIME::Head::get() (RT #34552,
+	  bugs.debian.org #235189)
+
+	* (packaging) Depend on IO::File 1.1.3, for its binmode() support (RT #34178)
+
+
+5.426     2008-03-07  Dave O'Neill <dmo@roaringpenguin.com>
+	* VERSION 5.426 RELEASED
+
+	* (bugfix) require File::Temp 0.18 or newer, as we need seek()
+	  (RT#31032)
+
+	* (bugfix) Don't hang forever in t/Smtpsend.t (RT#31082)
+
+	* (bugfix) require Perl 5.8.0 or newer in Makefile.PL (RT#30927)
+
+	* (bugfix) encode_mimewords() no longer removes spaces between two
+	  encoded words (RT#5462)
+
+5.425     2007-11-17  Dave O'Neill <dmo@roaringpenguin.com>
+
+	* VERSION 5.425 RELEASED
+
+	* (bugfix) A stub for MIME::Parser's tmp_recycling() method has been
+	  re-added to preserve compatibility.  Since recycling of tempfiles
+	  never worked and has been removed, any code calling tmp_recycling()
+	  should stop attempting to use the feature.
+
+5.424     2007-11-07  Dianne Skoll <dfs@roaringpenguin.com>
+
+	* VERSION 5.424 RELEASED
+
+	* (bugfix) [rt.cpan.org #29864] - lines in $entity->body() should be
+	  newline-terminated.
+
+5.423     2007-09-27  Dave O'Neill <dmo@roaringpenguin.com>
+
+	* VERSION 5.423 RELEASED
+
+	* (bugfix) Fix API regression - MIME::Entity::body() should return an
+	  arrayref.  Fixes RT 29643.
+
+5.422     2007-09-25  Dave O'Neill <dmo@roaringpenguin.com>
+
+	* VERSION 5.422 RELEASED
+
+	* (bugfix) Require File::Temp 0.17 or newer for IO::Seekable support.
+	  This fixes test failures seen on Darwin.
+
+	* (bugfix) Clear filer's purgeable() before calling init_parse().  Fixes RT 7858.
+
+5.421     2007-09-21  Dave O'Neill <dmo@roaringpenguin.com>
+
+	* VERSION 5.421 RELEASED
+
+	* (enhancement) Use File::Temp for tempfile generation.  MIME::Parser
+	  now has a tmp_dir() method for changing the temporary directory on a
+	  per-parser basis.
+
+5.420_02  2007-08-29  Dave O'Neill <dmo@roaringpenguin.com>
+
+	* VERSION 5.420_02 (developer release)
+
+	* (bugfix) Correct 'use vars' and add a 'use strict' (fixes RT #22681)
+
+	* (bugfix) Don't allow all-whitespace filenames in
+	  recommended_filename() (fixes RT #6115)
+
+	* (bugfix) Require IO-stringy 2.110.  Fixes RT tickets 11312, 11452,
+	  12375, 12784, and 18791
+
+	* (docs) Updated RFC references to refer to MIME RFCs 2045-2049 (RT #14119)
+
+	* (cleanup) Warn if no decoder is found for a given encoding. (RT #22682)
+
+	* (cleanup) IO::Wrap no longer used, IO::ScalarArray use minimized
+
+
+5.420_01  2007-06-18  Dave O'Neill <dmo@roaringpenguin.com>
+
+	* VERSION 5.420_01 (developer release)
+
+	* (bugfix) Fix warning generated by a header of "Content-Type: /".
+	  Previous versions would warn about undefined variables.  We now
+	  set a blank type and subtype.
+
+	* (cleanup) Partial removal of dependencies on IO::Scalar and
+	  IO::ScalarArray.  We now use Perl's built-in I/O on scalars as much
+	  as possible.  NOTE THAT THIS REQUIRES PERL 5.8!
+
+	* (cleanup) FileHandle usage removed in favour of IO::File
+
+	* (cleanup) Remove broken utility methods -- shellquote() because it
+	  didn't really make anything safe, and catfile(), because File::Spec
+	  is better.
+
+	* (cleanup) Multiple test cleanups, including removal of
+	  ExtUtils/TBone.pm.  Tests now use Test::More.
+
+	* (cleanup) Remove support for recycling tempfiles ( tmp_recycling() and
+	  its usage in new_tmpfile() )
+
+	* (cleanup) Remove nasty "eval join('',<::DATA>) unless caller()"
+	  testing code from various modules
+
+	* (cleanup) Merge all changelog information from README and
+	  MIME/Tools.pm into ChangeLog
+
+5.420     2006-03-17  Dianne Skoll  <dfs@roaringpenguin.com>
+
+	* VERSION 5.420 RELEASED
+
+	* Fix regression introduced in 5.419 -- quoted-printable
+	encoding would sometimes fail on "textual" MIME parts.
+
+5.419     2005-12-22  Dianne Skoll  <dfs@roaringpenguin.com>
+
+	* VERSION 5.419 RELEASED
+
+	* Added MIME::Parser->decode_bodies method.  This lets you force
+	MIME::Tools to store body parts WITHOUT decoding them.  Useful
+	if you need the exact unmangled message source (for example,
+	for GPG-signing.)  Patch submitted by Jörn Reder.
+
+5.418     2005-09-29  Dianne Skoll  <dfs@roaringpenguin.com>
+
+	* VERSION 5.418 RELEASED
+
+	* MIME/Decoder/QuotedPrint.pm: Localize "$_" in a couple of places.
+
+	* MIME/WordDecoder.pm: Turn off useless debugging output to STDERR
+
+	* MIME/Entity.pm: Make the stringify method use IO::ScalarArray
+	instead of IO::Scalar.  For small messages, performance may be
+	worse; for large messages, it is definitely much better.
+
+	* MANIFEST: Remove some useless internal files from the manifest.
+	They were never meant to be part of the actual distribution.
+
+5.417     2005-01-20  Dianne Skoll  <dfs@roaringpenguin.com>
+
+	* VERSION 5.417 RELEASED
+
+	* Require MIME::QuotedPrint 3.03 to use the three-argument
+	"encode_qp" function.  If we have an earlier version of
+	MIME::QuotedPrint, fall back to the one-argument version.
+
+	* Field/ParamVal.pm: The patch to strip trailing whitespace on
+	parameters was buggy and caused decoding errors.  This has been
+	fixed.
+
+5.416     2005-01-03  Dianne Skoll  <dfs@roaringpenguin.com>
+
+	* VERSION 5.416 RELEASED
+
+	* Allow MIME::Tools to work with MIME::QuotedPrint 2.20 again.
+	The Makefile.PL will warn about potential problems, but will allow you
+	to proceed.
+
+	* Field/ParamVal.pm: Strip trailing whitespace when extracting
+	parameters.  Apparently, not doing so can cause Perl to core dump
+	on certain badly-formed messages.
+
+5.415     2004-10-27  Dianne Skoll  <dfs@roaringpenguin.com>
+
+	* VERSION 5.415 RELEASED
+
+	* Fixed parsing of parameter="" in headers, and fixed case where
+	multipart boundary is ""
+
+5.414     2004-10-06  Dianne Skoll  <dfs@roaringpenguin.com>
+
+	* VERSION 5.414 RELEASED
+
+	* Remove MIME::QuotedPrint 3.03 as a dependency and add
+	MIME::Base64 3.03 instead.
+
+	* Check return values of I/O operations like open(), close(), etc.
+	and die if they fail.  Problem reported by Mark Martinec.
+
+5.413     2004-09-15  Dianne Skoll  <dfs@roaringpenguin.com>
+
+	* VERSION 5.413 RELEASED
+
+	* Fix some $VERSION = xxx assignments that were broken; make sure
+	VERSION shows up as 5.413 everywhere.  Sorry about that!
+
+5.412     2004-09-09  Dianne Skoll  <dfs@roaringpenguin.com>
+
+	* VERSION 5.412 RELEASED
+
+	* Recognize "binhex40", "mac-binhex" and "mac-binhex40"
+	Content-Transfer-Encodings.
+
+	* Filer.pm: Be much more strict in evil_filename, allowing only
+	a set of known good characters.
+
+2004-09-08  Dianne Skoll  <dfs@roaringpenguin.com>
+
+	* Skip BinHex decoding if prerequisite modules not installed.
+
+	* Fix BinHex decoder so it encodes correctly; regression test for
+	BinHex encoding now passes.
+
+	* Require MIME::QuotedPrint 3.03 or newer.
+
+	* Rename variable "$jkfis" to "$how_encoded"
+
+	* Correct attribution of changes in changelog.
+
+	* Correct bad regexp test for "bad PDF" files.
+
+2004-09-07  Dianne Skoll  <dfs@roaringpenguin.com>
+
+	* lib/MIME/Parser/Filer.pm (evil_filename): Make evil_filename
+	more paranoid (Julian Field and Martin Blapp)
+
+	* lib/MIME/Parser/Filer.pm (exorcise_filename): Delete leading and
+	trailing whitespace (Julian Field)
+
+	* Remove all the Benchmark code (Martin Blapp)
+
+	* lib/MIME/Decoder.pm: Add support for BinHex encoded attachments
+	(Julian Field)
+
+	* lib/MIME/Decoder.pm: Require MIME::QuotedPrint 3.03 or newer
+	for correct decoding of binary attachments. (Alexey Kravchuk)
+
+	* lib/MIME/Decoder/QuotedPrint.pm: Attempt to deal sanely with
+	PDF files encoded using quoted-printable encoding by Outlook,
+	which does not follow the RFC guidelines.  (Martin Blapp)
+
+	* lib/MIME/Field/ParamVal.pm: Deal with RFC2231-encoded parameters.
+
+	* lib/MIME/Head.pm: Correct "7-bit", "7 bit" and "7_bit" to 7bit;
+	likewise for 8bit lookalikes.  (Martin Blapp)
+
+	* lib/MIME/Parser.pm: Add max_parts method to limit maximum number
+	of MIME parts we are willing to parse.
+
+	* DSKOLL took over maintainership of MIME::tools at version 5.411a.
+
+Version 5.411
+        Regenerated docs. Bug in HTML docs, now all fixed.
+
+Version 5.410   (2000/11/23)
+        Better detection of evil filenames. Now we check for filenames which
+        are suspiciously long, and a new MIME::Filer::exorcise_filename()
+        method is used to try and remove the evil. *Thanks to Jason Haar for
+        the suggestion.*
+
+Version 5.409   (2000/11/12)
+        Added functionality to MIME::WordDecoder, including support for
+        plain US-ASCII.
+
+        MIME::Tools::tmpopen() made more flexible. You can now override the
+        tmpfile-opening behavior.
+
+Version 5.408   (2000/11/10)
+        Added new Beta unmime() mechanism. See the MIME::WordDecoder manpage
+        for full details. Also see the section on "Understand how
+        international characters are represented".
+
+Version 5.405   (2000/11/05)
+        Added a purge() that does what people want it to. Now, when a parse
+        finishes and you want to delete everything that was created by it,
+        you can invoke `purge()' on the parser's filer. All
+        files/directories created during the last parse should vanish.
+        *Thanks to everyone who complained about MIME::Entity::purge.*
+
+Version 5.404   (2000/11/04)
+        Added new automatic MIME-decoding of attachment filenames with
+        encoded (non-ASCII) characters. Hopefully this will do more good
+        than harm. The use of MIME::Parser::decode_headers() and
+        MIME::Head::decode() has been deprecated in favor of the new
+        MIME::Words "unmime" mechanism. Please see the "unmime" entry in the
+        MIME::Words manpage.
+
+        Added tolerance for unquoted =?...?= in param values. This is in
+        violation of the RFCs, but then, so are some MUAs. *Thanks to desti
+        for bringing this to my attention.*
+
+        Fixed supposedly-bad B-encoding. *Thanks to Otto Frost for bringing
+        this to my attention.*
+
+Version 5.316   (2000/09/21)
+        Increased tolerance in MIME::Parser. Now will ignore bogus POP3
+        "+OK" line before header, as well as bogus mailbox "From " line
+        (both with warnings). *Thanks to Antony OSullivan (ajos1) for
+        suggesting this feature.*
+
+        Fixed small epilogue-related bug in MIME::Entity::print_body(). Now
+        it only outputs a final newline if the epilogue does not end in one
+        already. Support for checking the preamble/epilogue in regression
+        tests was also added. *Thanks to Lars Hecking for bringing this
+        issue up.*
+
+        Updated documentation. All module manual pages should now direct
+        readers to the main MIME-tools manual page.
+
+Version 5.314   (2000/09/06)
+        Fixed Makefile.PL to have less-restrictive requirement for
+        File::Spec (0.6).
+
+Version 5.313   (2000/09/05)
+        Fixed nasty bug with evil filenames. Certain evil filenames were
+        getting replaced by internally-generated filenames which were just
+        as evil... ouch! If your parser occasionally throws a fatal
+        exception with a "write-open" error message, then you have this bug.
+        *Thanks to Julian Field and Antony OSullivan (ajos1) for delivering
+        the evidence!*
+
+               Beware the doctor
+                  who cures seasonal head cold
+               by killing patient
+
+        Improved naming of extracted files. If a filename is regarded as
+        evil, we guess that it might just be because of part information,
+        and attempt to find and use the final path element.
+
+        Simplified message logging and made it more consistent. For details,
+        see the section on "Message-logging".
+
+Version 5.312   (2000/09/03)
+        Fixed a Perl 5.7 select() incompatibility which caused "make test"
+        to fail. *Thanks to Nick Ing-Simmons for the patch.*
+
+Version 5.311   (2000/08/16)
+        Blind fix for Win32 uudecoding bug. A missing binmode seems to be
+        the culprit here; let's see if this fixes it. *Thanks to ajos1 for
+        finding the culprit!*
+
+               The carriage return
+                  thumbs its nose at me, laughing:
+               DOS I/O *still* sucks
+
+Version 5.310   (2000/08/15)
+        Fixed a bug in the back-compat output_prefix() method of
+        MIME::Parser. Basically, output prefixes were not being set through
+        this mechanism. *Thanks to ajos1 for the alert.*
+
+                shift @_,                               ### "shift at-underscore"
+                   or @_ will have
+                bogus "self" object
+
+        Added some backcompat methods, like parse_FH(). *Thanks (and
+        apologies) to Alain Kotoujansky.*
+
+        Added filenames-with-spaces support to MIME::Decoder::UU. *Thanks to
+        Richard Pun for the suggestion.*
+
+Version 5.305   (2000/07/20)
+        Added MIME::Entity::parts_DFS as convenient way to "get all parts".
+        *Thanks to Xavier Armengou for suggesting this method.*
+
+        Removed the Alpha notice. Still a few features to tweak, but those
+        will be minor.
+
+Version 5.303   (2000/07/07)
+        Fixed output bugs in new Filers. Scads of them: bad handling of
+        filename collisions, bad implementation of output_under(), bad
+        linking to results, POD errors, you name it. If this had gone to
+        CPAN, I'd have issued a factory recall. `:-('
+
+               Errors, like beetles,
+                  Multiply ferociously
+               In the small hours
+
+Version 5.301   (2000/07/06)
+        READ ME BEFORE UPGRADING PAST THIS POINT! New MIME::Parser::Filer
+        class -- not fully backwards-compatible. In response to demand for
+        more-comprehensive file-output strategies, I have decided that the
+        best thing to do is to split all the file-output logic
+        (output_path(), evil_filename(), etc.) into its own separate class,
+        inheriting from the new MIME::Parser::Filer class. If you *override*
+        any of the following in a MIME::Parser subclass, you will need to
+        change your code accordingly:
+
+                evil_filename
+                output_dir
+                output_filename
+                output_path
+                output_prefix
+                output_under
+
+        My sincere apologies for any inconvenience this will cause, but it's
+        ultimately for the best, and is quite likely the last structural
+        change to 5.x. *Thanks to Tyson Ackland for all the ideas.*
+        Incidentally, the new code also fixes a bug where identically-named
+        files in the same message could clobber each other.
+
+               A message arrives:
+                   "Here are three files, all named 'Foo'"
+               Only one survives.  :-(
+
+        Fixed bug in MIME::Words header decoding. Underscores were not being
+        handled properly. *Thanks to Dominique Unruh and Doru Petrescu,* who
+        independently submitted the same fix within 2 hours of each other,
+        after this bug has lain dormant for months:
+
+               Two users, same bug,
+                  same patch -- mere hours apart:
+               Truly, life is odd.
+
+        Removed escaping of underscore in regexps. Escaping the underscore
+        (\_) in regexps was sloppy and wrong (escaped metacharacters may
+        include anything in \w), and the newest Perls warn about it. *Thanks
+        to David Dyck for bringing this to my attention.*
+
+               What, then, is a word?
+                  Some letters, digits, and, yes:
+               Underscores as well
+
+        Added Force option to MIME::Entity's make_multipart. *Thanks to Bob
+        Glickstein for suggesting this.*
+
+        Numerous fixlets to example code. *Thanks to Doru Petrescu for
+        these.*
+
+        Added REQUIREMENTS section in docs. Long-overdue. *Thanks to Ingo
+        Schmiegel for motivating this.*
+
+Version 5.211   (2000/06/24)
+        Fixed auto-uudecode bug. Parser was failing with "part did not end
+        with expected boundary" error when uuencoded entity was a
+        *singlepart* message (ironically, uuencoded parts of multiparts
+        worked fine). *Thanks to Michael Mohlere for testing uudecode and
+        finding this.*
+
+               The hurrying bee
+                  Flies far for nectar, missing
+               The nearest flowers
+
+               Say ten thousand times:
+                  Complex cases may succeed
+               Where simple ones fail
+
+        Parse errors now generate warnings. Parser errors now cause warn()s
+        to be generated if they are not turned into fatal exceptions. This
+        might be a little redundant, seeing as they are available in the
+        "results", but parser-warnings already cause warn()s. I can always
+        put in a "quiet" switch if people complain.
+
+        Miscellaneous cleanup. Documentation of MIME::Parser improved
+        slightly, and a redundant warning was removed.
+
+Version 5.210   (2000/06/20)
+        Change in "evil" filename. Made MIME::Parser's evil_filename
+        stricter by having it reject "path" characters: any of '/' '\' ':'
+        '[' ']'.
+
+               Just as with beauty
+                  The eye of the beholder
+               Is where "evil" lives.
+
+        Documentation fixes. Corrected a number of docs in MIME::Entity
+        which were obsoleted in the transition from 4.x to 5.x. *Thanks to
+        Michael Fischer for pointing these out.* For this one, a special 5-
+        5-5-5 Haiku of anagrams:
+
+               Documentation
+                  in mutant code, O!
+               Edit -- no, CUT! [moan]
+                  I meant to un-doc...
+
+        IO::Lines usage bug fixed. MIME::Entity was missing a "use
+        IO::Lines", which caused an exception when you tried to use the
+        body() method of MIME::Entity. *Thanks to Hideyo Imazu and Michael
+        Fischer for pointing this out.*
+
+               Bareword looks fine, but
+                  Perl cries: "Whoa there... IO::Lines?
+               Never heard of it."
+
+Version 5.209   (2000/06/10)
+        Autodetection of uuencode. You can now tell the parser to hunt for
+        uuencode inside what should be text parts. See extract_uuencode()
+        for full details. Beware: this is largely untested at the moment.
+        *Special thanks to Michael Mohlere at ADJE Webmail, who was the
+        first -- and most-insistent -- user to request this feature.*
+
+        Faster parsing. Sped up the MIME::Decoder::NBit decoder quite a bit
+        by using a variant of the chunking trick I used for
+        MIME::Decoder::Base64. I suspect that the same trick (reading a big
+        chunk plus the next line to get a big block of lines) would work
+        with MIME::Decoder::QuotedPrint, but I don't have the time or
+        resources to check that right now (tested contributions would be
+        welcome). NBit encoding is more-conveniently done line-by-line for
+        now, because individual line lengths must be checked.
+
+        Better use of core. MIME::Body::InCore is now used when you build()
+        an entity with the Data parameter, instead of MIME::Body::Scalar.
+
+        More documentation on toolkit configuration.
+
+Version 5.207   (2000/06/09)
+        Fixed whine() bug in MIME::Parser where the "warning" method whine()
+        was called as a static function instead of invoked as an instance
+        method. *Thanks to Todd A. Bradfute for reporting this.*
+
+               A simple warning
+                  Invokes method as function:
+               "Warning" makes us die
+
+Version 5.206   (2000/06/08)
+        Ahem. Cough cough:
+
+               Way too many bugs
+                  Thus, a self-imposed penance:
+               Write haiku for each
+
+        Fixed bug in MIME::Parser: the reader was not handling the odd (but
+        legal) case where a multipart boundary is followed by linear
+        whitespace. *Thanks to Jon Agnew for reporting this with the RFC
+        citation.*
+
+               Legal message fails
+                  And 'round the globe, thousands cry:
+               READ THE RFC
+
+        Empty preambles are now handled properly by MIME::Entity when
+        printing: there is now no space between the header-terminator and
+        the initial boundary. *Thanks to "sen_ml" for suggesting this.*
+
+               Nature hates vacuum
+                  But please refrain from tossing
+               Newlines in the void
+
+        Started using Benchmark for benchmarking.
+
+Version 5.205   (2000/06/06)
+        Added terminating newline to all parser messages, and fixed small
+        parser bug that was dropping parts when errors occurred in certain
+        places.
+
+Version 5.203   (2000/06/05)
+        Brand new parser based on new (private) MIME::Parser::Reader and
+        (public) MIME::Parser::Results. Fast and yet simple and very
+        tolerant of bad MIME when desired. Message reporting needs some
+        muzzling.
+
+        MIME::Parser now has ignore_errors() set true by default.
+
+Version 5.116   (2000/05/26)
+        Removed Tmpfile.t test, which was causing a bogus failure in "make
+        test". Now we require 5.004 for MIME::Parser anyway, so we don't
+        need it. *Thanks to Jonathan Cohn for reporting this.*
+
+Version 5.115   (2000/05/24)
+        Fixed Ref.t bug, and documented how to remove parts from a
+        MIME::Entity.
+
+Version 5.114   (2000/05/23)
+        Entity now uses MIME::Lite-style default suggested encoding.
+
+        More regression test have been added, and the "Size" tests in Ref.t
+        are skipped for text document (due to CRLF differences between
+        platforms).
+
+Version 5.113   (2000/05/21)
+        Major speed and structural improvements to the parser. *Major, MAJOR
+        thanks to Noel Burton-Krahn, Jeremy Gilbert, and Doru Petrescu for
+        all the patches, benchmarking, and Beta-testing!*
+
+        Convenient new one-directory-per-message parsing mechanism. Now
+        through `MIME::Parser' method `output_under()', you can tell the
+        parser that you want it to create a unique directory for each
+        message parsed, to hold the resulting parts.
+
+        Elimination of $', $` and $&. Wow... I still can't believe I missed
+        this. D'OH! *Thanks to Noel Burton-Krahn for all his patches.*
+
+        Parser is more tolerant of weird EOL termination. Some mailagents
+        are can terminate lines with "\r\r\n". We're okay with that now when
+        we extract the header. *Thanks to Joao Fonseca for pointing this
+        out.*
+
+        Parser is tolerant of "From " lines in headers. *Thanks to Joachim
+        Wieland, Anthony Hinsinger, Marius Stan, and numerous others.*
+
+        Parser catches syntax errors in headers. *Thanks to Russell P.
+        Sutherland for catching this.*
+
+        Parser no longer warns when subtype is undefined. *Thanks to Eric-
+        Olivier Le Bigot for his fix.*
+
+        Better integration with Mail::Internet. For example, smtpsend()
+        should work fine. *Thanks to Michael Fischer and others for the
+        patch.*
+
+        Miscellaneous cleanup. *Thanks to Marcus Brinkmann for additional
+        helpful input.* *Thanks to Klaus Seidenfaden for good feedback on
+        5.x Alpha!*
+
+Version 4.123   (1999/05/12)
+        Cleaned up some of the tests for non-Unix OS'es. Will require a few
+        iterations, no doubt.
+
+Version 4.122   (1999/02/09)
+        Resolved CORE::open warnings for 5.005. *Thanks to several folks for
+        this bug report.*
+
+Version 4.121   (1998/06/03)
+        Fixed MIME::Words infinite recursion. *Thanks to several folks for
+        this bug report.*
+
+Version 4.117   (1998/05/01)
+        Nicer MIME::Entity::build. No longer outputs warnings with undefined
+        Filename, and now accepts Charset as well. *Thanks to Jason Tibbits
+        III for the inspirational patch.*
+
+        Documentation fixes. Hopefully we've seen the last of the pod2man
+        warnings...
+
+        Better test logging. Now uses ExtUtils::TBone.
+
+Version 4.116   (1998/02/14)
+        Bug fix: MIME::Head and MIME::Entity were not downcasing the
+        content-type as they claimed. This has now been fixed. *Thanks to
+        Rodrigo de Almeida Siqueira for finding this.*
+
+Version 4.114   (1998/02/12)
+        Gzip64-encoding has been improved, and turned off as a default,
+        since it depends on having gzip installed. See MIME::Decoder::Gzip64
+        if you want to activate it in your app. You can now set up the
+        gzip/gunzip commands to use, as well. *Thanks to Paul J. Schinder
+        for finding this bug.*
+
+Version 4.113   (1998/01/20)
+        Bug fix: MIME::ParserBase was accidentally folding newlines in
+        header fields. *Thanks to Jason L. Tibbitts III for spotting this.*
+
+Version 4.112   (1998/01/17)
+        MIME::Entity::print_body now recurses when printing multipart
+        entities, and prints "everything following the header." This is more
+        likely what people expect to happen. PLEASE read the "two body
+        problem" section of MIME::Entity's docs.
+
+Version 4.111   (1998/01/14)
+        Clean build/test on Win95 using 5.004. Whew.
+
+Version 4.110   (1998/01/11)
+        Added make_multipart() and make_singlepart() in MIME::Entity.
+
+        Improved handling/saving of preamble/epilogue.
+
+Version 4.109   (1998/01/10)
+    Overall Major version shift to 4.x accompanies numerous structural changes,
+            and the deletion of some long-deprecated code. Many apologies to
+            those who are inconvenienced by the upgrade.
+
+            MIME::IO deprecated. You'll see IO::Scalar, IO::ScalarArray, and
+            IO::Wrap to make this toolkit work.
+
+            MIME::Entity deep code. You can now deep-copy MIME entities
+            (except for on-disk data files).
+
+    Encoding/decoding
+            MIME::Latin1 deprecated, and 8-to-7 mapping removed. Really,
+            MIME::Latin1 was one of my more dumber ideas. It's still there,
+            but if you want to map 8-bit characters to Latin1 ASCII
+            approximations when 7bit encoding, you'll have to request it
+            explicitly. *But use quoted-printable for your 8-bit documents;
+            that's what it's there for!*
+
+            7bit and 8bit "encoders" no longer encode. As per RFC-2045,
+            these just do a pass-through of the data, but they'll warn you
+            if you send bad data through.
+
+            MIME::Entity suggests encoding. Now you can ask MIME::Entity's
+            build() method to "suggest" a legal encoding based on the body
+            and the content-type. No more guesswork! See the "mimesend"
+            example.
+
+            New module structure for MIME::Decoder classes. It should be
+            easier for you to see what's happening.
+
+            New MIME decoders! Support added for decoding `x-uuencode', and
+            for decoding/encoding `x-gzip64'. You'll need "gzip" to make the
+            latter work.
+
+            Quoted-printable back on track... and then some. The 'quoted-
+            printable' decoder now uses the newest MIME::QuotedPrint, and
+            amends its output with guideline #8 from RFC2049 (From/.).
+            *Thanks to Denis N. Antonioli for suggesting this.*
+
+    Parsing Preamble and epilogue are now saved. These are saved in the parsed
+            entities as simple string-arrays, and are output by print() if
+            there. *Thanks to Jason L. Tibbitts for suggesting this.*
+
+            The "multipart/digest" semantics are now preserved. Parts of
+            digest messages have their mime_type() defaulted to
+            "message/rfc822" instead of "text/plain", as per the RFC.
+            *Thanks to Carsten Heyl for suggesting this.*
+
+    Output  Well-defined, more-complete print() output. When printing an entity,
+            the output is now well-defined if the entity came from a
+            MIME::Parser, even if using parse_nested_messages. See
+            MIME::Entity for details.
+
+            You can prevent recommended filenames from being output. This
+            possible security hole has been plugged; when building MIME
+            entities, you can specify a body path but suppress the filename
+            in the header. *Thanks to Jason L. Tibbitts for suggesting
+            this.*
+
+    Bug fixes
+            Win32 installations should work. The binmode() calls should work
+            fine on Win32 now. *Thanks to numerous folks for their patches.*
+
+            MIME::Head::add() now no longer downcases its argument. *Thanks
+            to Brandon Browning & Jason L. Tibbitts for finding this bug.*
+
+Version 3.204
+        Bug in MIME::Head::original_text fixed. Well, it took a while, but
+        another bug surfaced from my transition from 1.x to 2.x. This method
+        was, quite idiotically, sorting the header fields. *Thanks, as
+        usual, to Andreas Koenig for spotting this one.*
+
+        MIME::ParserBase no longer defaults to RFC-1522-decoding headers.
+        The documentation correctly stated that the default setting was to
+        *not* RFC-1522-decode the headers. The code, on the other hand, was
+        init'ing this parser option in the "on" position. This has been
+        fixed.
+
+        MIME::ParserBase::parse_nested_messages reexamined. If you use this
+        feature, please re-read the documentation. It explains a little more
+        precisely what the ramifications are.
+
+        MIME::Entity tries harder to ensure MIME compliance. It is now a
+        fatal error to use certain bad combinations of content type and
+        encoding when "building", or to attempt to "attach" to anything that
+        is not a multipart document. My apologies if this inconveniences
+        anyone, but it was just too darn easy before for folks to create bad
+        MIME, and gosh darn it, good libraries should at least *try* to
+        protect you from mistakes.
+
+        The "make" now halts if you don't have the right stuff, provided
+        your MakeMaker supports PREREQ_PM. See the section on "REQUIREMENTS"
+        for what you need to install this package. I still provide old
+        courtesy copies of the MIME:: decoding modules. *Thanks to Hugo van
+        der Sanden for suggesting this.*
+
+        The "make test" is far less chatty. Okay, okay, STDERR is evil. Now
+        a `"make test"' will just give you the important stuff: do a `"make
+        test TEST_VERBOSE=1"' if you want the gory details (advisable if
+        sending me a bug report). *Thanks to Andreas Koenig for suggesting
+        this.*
+
+Version 3.203
+        No, there haven't been any major changes between 2.x and 3.x. The
+        major-version increase was from a few more tweaks to get $VERSION to
+        be calculated better and more efficiently (I had been using RCS
+        version numbers in a way which created problems for users of
+        CPAN::). After a couple of false starts, all modules have been
+        upgraded to RCS 3.201 or higher.
+
+        You can now parse a MIME message from a scalar, an array-of-scalars,
+        or any MIME::IO-compliant object (including IO:: objects.) Take a
+        look at parse_data() in MIME::ParserBase. The parser code has been
+        modified to support the MIME::IO interface. *Thanks to fellow
+        Chicagoan Tim Pierce (and countless others) for asking.*
+
+        More sensible toolkit configuration. A new config() method in
+        MIME::ToolUtils makes a lot of toolkit-wide configuration cleaner.
+        Your old calls will still work, but with deprecation warnings.
+
+        You can now sign messages just like in Mail::Internet. See
+        MIME::Entity for the interface.
+
+        You can now remove signatures from messages just like in
+        Mail::Internet. See MIME::Entity for the interface.
+
+        You can now compute/strip content lengths and other non-standard
+        MIME fields. See sync_headers() in MIME::Entity. *Thanks to Tim
+        Pierce for bringing the basic problem to my attention.*
+
+        Many warnings are now silent unless $^W is true. That means unless
+        you run your Perl with `-w', you won't see deprecation warnings,
+        non-fatal-error messages, etc. But of course you run with `-w', so
+        this doesn't affect you. `:-)'
+
+        Completed the 7-bit encodings in MIME::Latin1. We hadn't had
+        complete coverage in the conversion from 8- to 7-bit; now we do.
+        *Thanks to Rolf Nelson for bringing this to my attention.*
+
+        Fixed broken parse_two() in MIME::ParserBase. BTW, if your code
+        worked with the "broken" code, it should *still* work. *Thanks again
+        to Tim Pierce for bringing this to my attention.*
+
+Version 2.14
+        Just a few bug fixes to improve compatibility with Mail-Tools 1.08,
+        and with the upcoming Perl 5.004 release. *Thanks to Jason L.
+        Tibbitts III for reporting the problems so quickly.*
+
+Version 2.13
+    New features
+            Added RFC-1522-style decoding of encoded header fields. Header
+            decoding can now be done automatically during parsing via the
+            new `decode()' method in MIME::Head... just tell your parser
+            object that you want to `decode_headers()'. *Thanks to Kent
+            Boortz for providing the idea, and the baseline RFC-1522-
+            decoding code!*
+
+            Building MIME messages is even easier. Now, when you use
+            MIME::Entity's `build()' or `attach()', you can also supply
+            individual mail headers to set (e.g., `-Subject', `-From', `-
+            To').
+
+            Added `Disposition' to MIME::Entity's `build()' method. *Thanks
+            to Kurt Freytag for suggesting this feature.*
+
+            An `X-Mailer' header is now output by default in all MIME-
+            Entity-prepared messages, so any bad MIME we generate can be
+            traced back to this toolkit.
+
+            Added `purge()' method to MIME::Entity for deleteing leftover
+            files. *Thanks to Jason L. Tibbitts III for suggesting this
+            feature.*
+
+            Added `seek()' and `tell()' methods to built-in MIME::IO
+            classes. Only guaranteed to work when reading! *Thanks to Jason
+            L. Tibbitts III for suggesting this feature.*
+
+            When parsing a multipart message with apparently no boundaries,
+            the error message you get has been improved. *Thanks to Andreas
+            Koenig for suggesting this.*
+
+    Bug fixes
+            Patched over a Perl 5.002 (and maybe earlier and later) bug
+            involving FileHandle::new_tmpfile. It seems that the underlying
+            filehandles were not being closed when the FileHandle objects
+            went out of scope! There is now an internal routine that creates
+            true FileHandle objects for anonymous temp files. *Thanks to
+            Dragomir R. Radev and Zyx for reporting the weird behavior that
+            led to the discovery of this bug.*
+
+            MIME::Entity's `build()' method now warns you if you give it an
+            illegal boundary string, and substitutes one of its own.
+
+            MIME::Entity's `build()' method now generates safer, fully-RFC-
+            1521-compliant boundary strings.
+
+            Bug in MIME::Decoder's `install()' method was fixed. *Thanks to
+            Rolf Nelson and Nickolay Saukh for finding this.*
+
+            Changed FileHandle::new_tmpfile to FileHandle->new_tmpfile, so
+            some Perl installations will be happier. *Thanks to Larry W.
+            Virden for finding this bug.*
+
+            Gave `=over' an arg of 4 in all PODs. *Thanks to Larry W. Virden
+            for pointing out the problems of bare =over's*
+
+Version 2.04
+        A bug in MIME::Entity's output method was corrected.
+        MIME::Entity::print now outputs everything to the desired filehandle
+        explicitly. *Thanks to Jake Morrison for pointing out the
+        incompatibility with Mail::Header.*
+
+Version 2.03
+        Fixed bug in autogenerated filenames resulting from transposed "if"
+        statement in MIME::Parser, removing spurious printing of header as
+        well. (Annoyingly, this bug is invisible if debugging is turned on!)
+        *Thanks to Andreas Koenig for bringing this to my attention.*
+
+        Fixed bug in MIME::Entity::body() where it was using the bodyhandle
+        completely incorrectly. *Thanks to Joel Noble for bringing this to
+        my attention.*
+
+        Fixed MIME::Head::VERSION so CPAN:: is happier. *Thanks to Larry
+        Virden for bringing this to my attention.*
+
+        Fixed undefined-variable warnings when dumping skeleton (happened
+        when there was no Subject: line) *Thanks to Joel Noble for bringing
+        this to my attention.*
+
+Version 2.02
+        Stupid, stupid bugs in both BASE64 encoding and decoding were fixed.
+        *Thanks to Phil Abercrombie for locating them.*
+
+Version 2.01
+        Modules now inherit from the new Mail:: modules! This means big
+        changes in behavior.
+
+        MIME::Parser can now store message data in-core. There were a *lot*
+        of requests for this feature.
+
+        MIME::Entity can now compose messages. There were a *lot* of
+        requests for this feature.
+
+        Added option to parse `"message/rfc822"' as a pseduo-multipart
+        document. *Thanks to Andreas Koenig for suggesting this.*
+
+Version 1.13
+        MIME::Head now no longer requires space after ":", although either a
+        space or a tab after the ":" will be swallowed if there. *Thanks to
+        Igor Starovoitov for pointing out this shortcoming.*
+
+Version 1.12
+        Fixed bugs in parser where CRLF-terminated lines were blowing out
+        the handling of preambles/epilogues. *Thanks to Russell Sutherland
+        for reporting this bug.*
+
+        Fixed idiotic is_multipart() bug. *Thanks to Andreas Koenig for
+        noticing it.*
+
+        Added untested binmode() calls to parser for DOS, etc. systems. No
+        idea if this will work...
+
+        Reorganized the output_path() methods to allow easy use of
+        inheritance, as per Achim Bohnet's suggestion.
+
+        Changed MIME::Head to report mime_type more accurately.
+
+        POSIX module no longer loaded by Parser if perl >= 5.002. Hey,
+        5.001'ers: let me know if this breaks stuff, okay?
+
+        Added unsupported ./examples directory.
+
+Version 1.11
+        Converted over to using Makefile.PL. *Thanks to Andreas Koenig for
+        the much-needed kick in the pants...*
+
+        Added t/*.t files for testing. Eeeeeeeeeeeh...it's a start.
+
+        Fixed bug in default parsing routine for generating output paths; it
+        was warning about evil filenames if there simply *were* no
+        recommended filenames. D'oh!
+
+        Fixed redefined parts() method in Entity.
+
+        Fixed bugs in Head where field name wasn't being case folded.
+
+Version 1.10
+        A typo was causing the epilogue of an inner multipart message to be
+        swallowed to the end of the OUTER multipart message; this has now
+        been fixed. *Thanks to Igor Starovoitov for reporting this bug.*
+
+        A bad regexp for parameter names was causing some parameters to be
+        parsed incorrectly; this has also been fixed. *Thanks again to Igor
+        Starovoitov for reporting this bug.*
+
+        It is now possible to get full control of the filenaming algorithm
+        before output files are generated, and the default algorithm is
+        safer. *Thanks to Laurent Amon for pointing out the problems, and
+        suggesting some solutions.*
+
+        Fixed illegal "simple" multipart test file. D'OH!
+
+Version 1.9
+        No changes: 1.8 failed CPAN registration
+
+Version 1.8
+        Fixed incompatibility with 5.001 and FileHandle::new_tmpfile Added
+        COPYING file, and improved README.
+

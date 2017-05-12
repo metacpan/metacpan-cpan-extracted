@@ -1,0 +1,159 @@
+% $svg =~ s{^.*<svg }{<svg }s;
+<%== $svg %>
+<div class="modal fade" id="help-modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+                <h3 class="modal-title" id="help-title">Help</h3>
+            </div>
+            <div class="modal-body">
+                <h4>tl;dr</h4>
+                <ol>
+                    <li>Click on a table name</li>
+                    <li>Press <code>[r]</code></li>
+                    <li>Press <code>[0]</code></li>
+                    <li>Press <code>[2]</code></li>
+                    <li>Press <code>[q]</code></li>
+                </ol>
+
+                <h4>Terminology</h4>
+
+                %=  table striped, hover, condensed, begin
+                    <tbody>
+                        <tr>
+                            <th>Wanted table</th>
+                            <td>It is possible to view parts of the schema by marking tables as <var>wanted</var>. This can make it easier
+                                to view larger schemas. See more under <code>[r]</code> below.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Skipped table</th>
+                            <td>In addition to <var>wanted</var>, tables can also be <var>skipped</var>. These tables will excluded. See more under <code>[r]</code> below.</td>
+                        </tr>
+                        <tr>
+                            <th>Degrees of separation</th>
+                            <td>When any table is wanted this determines how many relations will be traversed to find additional tables to show. See more under <code>[num]</code> below.</td>
+                        </tr>
+                    </tbody>
+                %   end
+
+                <h4>Relations</h4>
+
+                %=  table striped, hover, condensed, begin
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>Hover</th>
+                            <td>The relation will be highlighted. The columns and their relation types are shown.</td>
+                        </tr>
+                        <tr>
+                            <th>Click</th>
+                            <td>The relation will remain highlighted until clicked again, or the <code>[escape]</code> key is pressed.</td>
+                        </tr>
+                    </tbody>
+                %   end
+
+                <h4>Tables</h4>
+
+                %=  table striped, hover, condensed, begin
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>Hover column name</th>
+                            <td>The column name and all relations from the column will be highlighted</td>
+                        </tr>
+                        <tr>
+                            <th>Click column name</th>
+                            <td>The column name and its relations will remain highlighted until clicked again, or the <code>[escape]</code> key is pressed.</td>
+                        </tr>
+                        <tr>
+                            <th>Hover table name</th>
+                            <td>The table and all relations from the table will be highlighted.</td>
+                        </tr>
+                        <tr>
+                            <th>Click table name</th>
+                            <td>
+                                <p>The table and all relations from the table will remain highlighted until clicked again, or the <code>[escape]</code> key is pressed.</p>
+                                <p>Additionally, the table will be marked as <var>wanted</var>.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>[shift] + click table name</th>
+                            <td>This is exactly the same as doing <code>click table name</code> followed by <code>[r]</code></b>.</td>
+                        </tr>
+                        <tr>
+                            <th>[ctrl] + click table name</th>
+                            <td>The table is marked as <var>skipped</var>.</td>
+                        </tr>
+                        <tr>
+                            <th>[shift] + [ctrl] + click table name</th>
+                            <td>This is exactly the same as doing <code>[ctrl] + click table name</code> followed by <code>[r]</code>.</td>
+                        </tr>
+                    </tbody>
+                %   end
+
+                <h4>Keyboard shortcuts</h4>
+
+                %=  table striped, hover, condensed, begin
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>[escape]</th>
+                            <td>Remove all highlights, but don't reload. The tables that was marked <var>wanted</var> or <var>skipped</var> at the last reload will remain so.</td>
+                        </tr>
+                        <tr>
+                            <th>[k]</th>
+                            <td>Toggles between showing only primary and foreign keys, and showing all columns.</td>
+                        </tr>
+                        <tr>
+                            <th>[q]</th>
+                            <td>Show the whole schema and remove all highlights and the <var>wanted</var>, <var>skipped</var> and <var>degrees of separation</var> settings.</td>
+                        </tr>
+                        <tr>
+                            <th>[r]</th>
+                            <td>Reload the schema using the current <var>wanted</var>, <var>skipped</var> and <var>degrees of separation</var> settings.</td>
+                        </tr>
+                        <tr>
+                            <th>[num]</th>
+                            <td><p>Sets the <var>degrees of separation</var> setting to between 0 and 9. The numpad don't work.</p>
+                                <p>It is often better to mark tables as <var>skipped</var> rather than using a high <var>degrees of separation</var>.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>[shift] + [num]</th>
+                            <td>Sets the <var>degrees of separation</var> setting to between 10 and 19.</td>
+                        </tr>
+                        <tr>
+                            <th>[ctrl] + [num]</th>
+                            <td>Sets the <var>degrees of separation</var> setting to between 20 and 29.</td>
+                        </tr>
+                        <tr>
+                            <th>[ctrl] + [shift] + [num]</th>
+                            <td>Sets the <var>degrees of separation</var> setting to between 30 and 39.</td>
+                        </tr>
+                    </tbody>
+                %   end
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/dbic-schema-viewer/svg.js"></script>

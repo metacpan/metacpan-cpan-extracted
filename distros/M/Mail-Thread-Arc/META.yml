@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name: Mail-Thread-Arc
+version: 0.22
+author:
+  - Richard Clamp <richardc@unixbeard.net>
+abstract: Generates a Thread Arc reperesentation of a thread
+license: perl
+requires:
+  Class::Accessor::Chained: 0
+  Date::Parse: 0
+  Mail::Thread: 2.41
+  SVG: 0
+  Test::More: 0
+provides:
+  Mail::Thread::Arc:
+    file: lib/Mail/Thread/Arc.pm
+    version: 0.22
+generated_by: Module::Build version 0.25

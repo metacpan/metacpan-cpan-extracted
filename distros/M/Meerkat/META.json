@@ -1,0 +1,154 @@
+{
+   "abstract" : "Manage MongoDB documents as Moose objects",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Meerkat",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "examples",
+         "t",
+         "xt"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17",
+            "perl" : "v5.10.0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::RemovePrereqs" : "0",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.072",
+            "English" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::Apache_2_0" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1",
+            "blib" : "1.01"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DateTime" : "0",
+            "Module::Runtime" : "0",
+            "MongoDB" : "1",
+            "MongoDB::OID" : "0",
+            "Moose" : "2",
+            "Moose::Role" : "2",
+            "MooseX::AttributeShortcuts" : "0",
+            "MooseX::Role::Logger" : "0",
+            "MooseX::Role::MongoDB" : "0.01",
+            "MooseX::Storage" : "0",
+            "MooseX::Storage::Engine" : "0",
+            "MooseX::Types" : "0",
+            "Scalar::Util" : "0",
+            "Syntax::Keyword::Junction" : "0",
+            "Tie::IxHash" : "0",
+            "Try::Tiny" : "0",
+            "Try::Tiny::Retry" : "0.002",
+            "Type::Params" : "0",
+            "Types::Standard" : "0",
+            "aliased" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Data::Faker" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "MooX::Types::MooseLike::Base" : "0",
+            "Test::Deep" : "0",
+            "Test::FailWarnings" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "Test::Requires" : "0",
+            "Test::Roo" : "0",
+            "Test::Roo::Role" : "0",
+            "Time::HiRes" : "0",
+            "lib" : "0",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "provides" : {
+      "Meerkat" : {
+         "file" : "lib/Meerkat.pm",
+         "version" : "0.015"
+      },
+      "Meerkat::Collection" : {
+         "file" : "lib/Meerkat/Collection.pm",
+         "version" : "0.015"
+      },
+      "Meerkat::Cursor" : {
+         "file" : "lib/Meerkat/Cursor.pm",
+         "version" : "0.015"
+      },
+      "Meerkat::DateTime" : {
+         "file" : "lib/Meerkat/DateTime.pm",
+         "version" : "0.015"
+      },
+      "Meerkat::Role::Document" : {
+         "file" : "lib/Meerkat/Role/Document.pm",
+         "version" : "0.015"
+      },
+      "Meerkat::Types" : {
+         "file" : "lib/Meerkat/Types.pm",
+         "version" : "0.015"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dagolden/Meerkat/issues"
+      },
+      "homepage" : "https://github.com/dagolden/Meerkat",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/Meerkat.git",
+         "web" : "https://github.com/dagolden/Meerkat"
+      }
+   },
+   "version" : "0.015",
+   "x_authority" : "cpan:DAGOLDEN",
+   "x_contributors" : [
+      "Todd Bruner <todd.bruner@gmail.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

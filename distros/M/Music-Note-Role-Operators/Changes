@@ -1,0 +1,5 @@
+Release history for perl module Music-Note-Role-Operators
+
+0.03 Add subtract overloading, bolt in Music::Interval and changelog
+0.02 Doc fixes
+0.01 Initial version

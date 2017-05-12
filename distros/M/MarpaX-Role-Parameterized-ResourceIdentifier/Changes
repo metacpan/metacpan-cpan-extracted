@@ -1,0 +1,262 @@
+Changelog for MarpaX-Role-Parameterized-ResourceIdentifier
+
+0.003 2016-01-17T07:14:43
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - ResourceIdentifier/BNF.pm: eval and $_ modification in map {} for per
+   Perl::Critic
+ - ResourceIdentifier/BNF.pm: return undef fix as per Perl::Critic
+ - perlcritic.rc: allow_includes
+ - Parameterized/ResourceIdentifier.pm: main package
+
+0.002 2016-01-16T19:57:16Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Impl/_top.pm: few things for xtest
+ - dev+: removed "secure"
+ - dev+: simplication
+ - ResourceIdentifier/BNF.pm: commented a useful trace statement -;
+ - Role/ldap.pm: restore previous percent_decode() and
+   build_percent_encoding_normalizer() arounds
+ - ResourceIdentifier/BNF.pm: cosmetic typo
+ - uri_compat removal
+ - ldap: dev+
+ - Role/ldap.pm: dev+
+ - ResourceIdentifier/BNF.pm: fix warning on undef variable
+ - Accept ambiguous parse if no parse tree value, install any remaining
+   method in read-only by default
+ - LDAPString decoding
+ - ldaps
+ - Role/ldap.pm: default port
+ - ResourceIdentifier/BNF.pm: use ref() to detect if we push or not
+ - ldap
+ - Possibility to overwrite charset by locally setting
+   $MarpaX::Role::Parameterized::ResourceIdentifier::BNF::pct_encoded_default_charset
+ - https common role
+ - around on the builder instead of the method
+ - query_form and query_keywords
+ - overload fix, encoding charset dependency on spec
+ - centralized arg2arg handling uri compat mode
+ - Role/http.pm
+ - Fixed comment in percent_encode
+ - generic helpers
+ - issues seen when testing ftp scheme
+ - ftp: [0] issue
+ - add can_scheme
+ - ftp: dev+
+ - host(): fix for ipv6
+ - Role/ftp.pm: removed
+ - ResourceIdentifier/BNF.pm: server methods dev+
+ - prepare for server role
+ - ResourceIdentifier/BNF.pm: path_segments fix
+ - Impl/Segment.pm: full URI compliance
+ - path-segments: dev+
+ - escape/unescape
+ - perl op optimization
+ - percent_decode optimization when there is nothing excluded
+ - escape/unescape: dev+
+ - Removed  and add unescaped structure
+ - Fix inlined stubs in uri_compat mode
+ - ResourceIdentifier/BNF.pm: add notion of separator_location
+ - ResourceIdentifier/BNF.pm: return _escaped_struct members in uri_compat
+   mode
+ - Move percent_encode in parameterized role, create unescape method
+ - Move percent_decode in the parameterized role and add escape support
+ - Impl/_segment.pm add
+ - ResourceIdentifier/Setup.pm: use || instead of // in methods returning a
+   string
+ - ResourceIdentifier/Setup.pm: use || instead of // in
+   default_query_form_delimiter()
+ - ResourceIdentifier/Setup.pm: default_query_form_delimiter()
+ - dev+: Remove $__PACKAGE__ variable
+ - path_query: dev+
+ - secure(): dev+
+ - rel(): finally a version that looks ok
+ - rel: dev+
+ - ResourceIdentifier/BNF.pm; work on rel()
+ - dev+: rel()
+ - dev+: rel_normalized
+ - dev+: $setup->abs_normalized base(), not $self->abs_normalized_base()
+ - dev+: optionnaly use normalized base in abs()
+ - use InstanceOf($top) instead of does(__PACKAGE__)
+ - dev+: abs() and rel()
+ - clone revisited
+ - fix fields list in case of bnf extension
+ - Make plugins independant
+ - Role/ftp.pm: the ftp role inherits from the _generic role
+ - ResourceIdentifier/BNF.pm: support of extension, provide role parameter
+   clone
+ - Impl/_top.pm: protect against missing argument in new()
+ - dev+: Role/_generic is with Role/_common (in particular because of
+   build_character_normalizer
+ - dev+: removed after input modifier in BUILD, fix $is_common internal
+   variable
+ - dev+: common and generic types become _common and _generic, respectively
+ - dev+: let the implementation deal with case in can_scheme()
+ - Externalized starting rule
+ - dev+: Role/ftp.pm
+ - Role/ftp.pm: ftp role
+ - Impl/_top.pm: make sure scheme is normalized before trying the subclass,
+   fix subclass usage
+ - ResourceIdentifier/BNF.pm: convenience proxies normalized_scheme(),
+   normalized_opaque() and normalized_fragment
+ - ResourceIdentifier/BNF.pm: parse() method is public
+ - Move _parse in the parameterized role, follow RFC3987 revisited
+   architecture
+ - dev+: Externalize current_location and parent_location, and move
+   remove_dot_segments in the parameterized role
+ - ResourceIdentifier/BNF.pm; leading dots cont
+ - ResourceIdentifier/Setup.pm: abs_remote_leading_dots
+ - Impl/_top.pm: better eventual scheme argument processing
+ - dev+: suspend support of remote leading dots in abs(), not obligatory
+ - dev+: remove_dot_segments regexp simplification
+ - dev+: Tracking of remote leading dots in excess
+ - dev+: In abs(), do not croak if ref or abs are not of generic type
+ - dev+: remote_leading_dots preparation
+ - dev+: fix some writing style, _structs access, abs() optimization
+ - dev+: eq method installed in the top package
+ - dev+: as_string
+ - dev+: renamed internal variable *_with_accessors to *_call_lazy_builder
+   to make clear why this exist
+ - dev+: back to hashes for performance reason - this is a boost -;
+ - dev+: oups almost a revert of previous commit
+ - ResourceIdentifier/BNF.pm: removed an non-needed new()
+ - dev+: Cosmetic rearrange of use/with
+ - dev+: put instance methods in the parameterized code
+ - dev+: $URI::ABS_ALLOW_RELATIVE_SCHEME
+ - dev+: canonical(), access to some internals but not all
+ - t+: use is_absolute on base object in abs()
+ - t+: uri_compat at runtime and is_absolute support
+ - dev+: revisited engine
+ - dev+: Fix BUILDARGS
+ - dev+: when calling the builders do nothing else but that
+ - dev+: object construction optimization
+ - dev+: make sure the lazy builders are called after object construction
+ - dev+: add reg_name_is_domain_name in slurpy check, removed lazy on
+   _normalizer_wrapper and _converter_wrapper
+ - dev+: Perl op optimization
+ - dev+: Algorithmic optimization for normalizers
+ - dev+: clone of a MooX::Struct is faster than a new
+ - dev+: cache symbol_display_form
+ - dev+: profiling bis
+ - dev+: profiling
+ - dev+: fix bug in remove_dot_segments
+ - dev+: perl op optim
+ - dev+: abs() using an object instead of a string for absolute reference
+ - dev+: abs()
+ - dev+: Generic.path is never undef
+ - dev+: Removed a logging statement
+ - dev+: inlined version of percent_encoding_normalizer
+ - dev+: inlined sub
+ - dev+: pretty Data::Printer'ing
+ - dev+: MooX::Struct stringification
+ - dev+: store explicitely final value after all normalizations
+ - dev+: back to after instead of around for input
+ - dev+: Types simplification
+ - t+: BUILDARGS centralization
+ - dev+: remove some unused variables
+ - dev+: incorporate BUILDARGS in BNF
+ - dev+: has_recognized scheme is ro
+ - dev+: overload
+ - dev+: prefer around input instead of after input
+ - dev+: externalized unescape method, fo not use trigger but explicit
+   parsing at BUILD or after input is set
+ - dev+: build_path_segment_normalizer
+ - dev+: moved some specs from _common to _generic
+ - dev+: variables renaming
+ - dev+: build_percent_encoding_normalizer
+ - dev+
+ - dev+: normalizers fix
+ - dev+: default_port
+ - dev+: indeed, _indice_description label fix
+ - dev+: Make _indice_description an attribute
+ - dev+: cosmetic change in callback names array
+ - dev+: normalization and convertion ladders optimization, do it once also
+   before parsing
+ - dev+: normalization before parsing
+ - dev+: use Undef instead of defined
+ - dev+: removed unused files
+ - dev+: use centralzed BUILDARGS
+ - dev+: fixes
+ - t+
+ - dev+: factorization
+ - BNF role refactorization
+ - dev+: without Data::Dumper -;
+ - dev+: use Type::Params
+ - dev+: new_abs() and removal of all path derivations
+ - t+: new_abs
+ - dev+: removed unused use_utf8 constraint
+ - dev+: fix typo warnff
+ - dev+: is_absolute method
+ - Parameterized/ResourceIdentifier.pm: more generic, support of
+   URI_ENCODED and IRI_ENCODED callbacks
+ - ResourceIdentifier/BUILDARGS.pm: a little bit simplified
+ - ResourceIdentifier/_top.pm: uri_compat
+ - dev+: BUILD
+ - dev+: Removal of all __DATA__ section
+ - dev+: Install default (empty) normalizers in _common
+ - dev+: use _common and _generic instead of Common and Generic
+ - dev+: Fixed structure members accessors
+ - dev+: moved all Generic normalizers in the role
+ - dev+: Added escaped section
+ - dev+: path segment normalization
+ - dev+: add decoder
+ - dev+: get  once
+ - dev+: add external field name when calling normalization
+ - dev+: keep octets and al. information
+ - dev+: Fix BUILARGS and always do a copy of %args before jumping to
+   subclasses
+ - dev+: Fix _structs initialization
+ - dev+: deal with inheritance
+ - dev+: use Data::Dumper to see Character Normalization effect in trace
+   mode
+ - dev+: Removal of unused "normalize" method and require
+   "is_character_normalized", "character_normalization_strategy" in the
+   generic class
+ - dev+: The return of uri_compat
+ - dev+: More generic constructor
+ - dev+: put normalizer in the generic instance, not in the grammar and use
+   $self as argument to Marpa::R2s value()
+ - dev+: removed non-needed ";"s
+ - dev+: removed unused escape method
+ - dev+: descriptio of indices factorization
+ - dev+: fixed comments
+ - dev+: changed internal indices
+ - dev+: normalization
+ - dev+: normalization fix
+ - dev+: normalizer
+ - dev+: isdn, nfc
+ - dev+: eq and normalization
+ - dev+: revmoed fragments
+ - dev+: use setters
+ - dev+: explicits rw (for the moment)
+ - dev+: segments defaults to "" as per URI
+ - dev+: escape/unescape modes
+ - dev+: fix mode without logging
+ - dev+: engine fix
+ - More attributes in BNF
+ - use ${^MATCH} instead of $1 in percent_encode()
+ - Renamed Singleton to Grammars
+ - A lor of changes + wrapping Marpa log correctly (finally!)
+ - Use of  to have logging or not
+ - Factorization of different new methods
+ - TRUE and FALSE constants
+ - Revisited scheme parameter check
+ - removed some catch{} used for debugging
+ - use Type::Tiny for parameter type checking
+ - Removed a confusing file
+ - dev+: _uri_compat
+ - dev+: less hacks
+ - dev+: a bit better trace -;
+ - Structures generic accessors and Logging category fix
+ - Add URI, URI_reference, absolute_URI and relative_ref
+ - Make public method required
+ - soft revert Parameterized/ResourceIdentifier.pm: Note saying caller is
+   required to use MooX::ClassAttribute
+ - Parameterized/ResourceIdentifier.pm: Note saying caller is required to
+   use MooX::ClassAttribute
+
+0.001 2015-10-09T04:22:15Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - meta files for initial release
+ - xtest
+ - AUTHORITY
+ - Initial commit

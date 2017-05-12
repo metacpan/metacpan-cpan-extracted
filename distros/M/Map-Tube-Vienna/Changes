@@ -1,0 +1,47 @@
+0.07 2015-11-06T09:24:17+01:00
+ - Add EXAMPLE5 section to doc.
+ - Implement station order.
+ - Improve comment in xml file.
+ - Improve description for get_lines() in doc.
+ - Rewrite XML map to new version with line IDs.
+ - Rewrite XML map to new version without junctions.
+
+0.06 2015-10-16T10:37:07+02:00
+ - Add tests for get_line_by_id(), get_line_by_name(), get_lines(),
+   get_node_by_id(), get_node_by_name() and get_stations() methods.
+ - Update to Map::Tube 3.06.
+
+0.05 2015-09-28T12:03:27+02:00
+ - Add example for print of metro lines to doc.
+ - Add get_line_by_id() and get_line_by_name() methods to doc.
+ - Move author tests to xt/ directory.
+ - Rewrite SEE ALSO section to new style.
+ - Update Module::Install to 1.16 version.
+
+0.04 2015-03-16T07:35:27+01:00
+ - Fix test dependencies.
+
+0.03 2015-03-14T21:08:45+01:00
+ - Add Map::Tube::Plugin::FuzzyFind and Map::Tube::Text::Shortest to SEE
+   ALSO section in doc.
+ - Add Map::Tube::Glasgow, Map::Tube::KoelnBonn, Map::Tube::Lyon and
+   Map::Tube::Singapore to SEE ALSO section in doc.
+ - Add test of map validity.
+ - Update examples/ex3.pl example.
+
+0.02 2015-01-25T01:18:17+01:00
+ - Add <?xml> header to XML document.
+ - Add Map::Tube::Graph to SEE ALSO section in doc.
+ - Add Map::Tube::Plugin::Graph to SEE ALSO section in doc.
+ - Add Task::Map::Tube to SEE ALSO section in doc.
+ - Add get_lines() method to doc.
+ - Add get_stations() method to doc.
+ - Add lines to XML document.
+ - Fix minimal version of Perl.
+ - Improve EXAMPLE3 section in doc.
+ - Remove obsolete code from EXAMPLE3 section in doc (neato is default
+   driver).
+ - Update copyright years to 2015.
+
+0.01 2014-12-23T10:32:56+01:00
+ - First version

@@ -1,0 +1,22 @@
+MANIFEST
+Makefile.PL
+lib/Microarray/GEO/SOFT.pm
+lib/Microarray/GEO/SOFT/GDS.pm
+lib/Microarray/GEO/SOFT/GPL.pm
+lib/Microarray/GEO/SOFT/GSE.pm
+lib/Microarray/GEO/SOFT/GSM.pm
+t/00-1load.t
+t/00-1load-gds.t
+t/00-1load-gpl.t
+t/00-1load-gse.t
+t/00-1load-gsm.t
+t/00-pod.t
+t/00-pod-coverage.t
+t/01soft.t
+extdata/GDS3718.soft
+extdata/GPL1261.annot
+extdata/GSE10626_family.soft
+Changes
+README
+bin/getgeo
+META.yml                                 Module meta-data (added by MakeMaker)

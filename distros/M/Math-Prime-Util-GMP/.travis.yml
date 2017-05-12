@@ -1,0 +1,29 @@
+language: "perl"
+perl:
+  - "5.22"
+  - "5.16"
+  - "5.10"
+
+addons:
+  apt:
+    packages:
+      - libgmp-dev
+      - libmpfr-dev
+
+before_install:
+    - cpanm Test::Pod # optional dependency
+
+install:
+    - cpanm -v --installdeps --notest --mirror http://cpan.mirrors.travis-ci.org .
+
+script: "perl Makefile.PL; make test"
+# branches:
+#   only:
+#     - master
+notifications:
+  recipients:
+    - dana@acm.org
+  email:
+    on_success: change
+    on_failure: always
+#env:

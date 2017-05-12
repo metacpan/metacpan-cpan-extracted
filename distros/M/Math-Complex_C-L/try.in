@@ -1,0 +1,31 @@
+/*
+Check whether cpowl and catanhl can be linked.
+*/
+
+#ifdef  __MINGW32__
+#ifndef __USE_MINGW_ANSI_STDIO
+#define __USE_MINGW_ANSI_STDIO 1
+#endif
+#endif
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <complex.h>
+#include <math.h>
+
+int main(int argc, char *argv[]) {
+ long double _Complex rop, op;
+
+ __real__ op = strtold(argv[1], NULL);
+ __imag__ op = strtold(argv[2], NULL);
+
+ rop = cpowl(op, op);
+ printf("%Le %Le\n", __real__ rop, __imag__ rop);
+
+ rop = catanhl(op);
+ printf("%Le %Le\n", __real__ rop, __imag__ rop);
+
+ return 0;
+
+}
+

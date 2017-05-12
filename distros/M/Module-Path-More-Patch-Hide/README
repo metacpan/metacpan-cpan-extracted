@@ -1,0 +1,21 @@
+SYNOPSIS
+
+     % PERL5OPT=-MModule::Path::More::Patch::Hide=-module,'Foo::Bar;Baz' app.pl
+
+    In the above example app.pl will think that Foo::Bar and Baz are not
+    installed even though they might actually be installed.
+
+DESCRIPTION
+
+    This module can be used to simulate the absence of certain modules.
+    This only works if the application uses Module::Path::More's
+    module_path() to check the availability of modules.
+
+    This module works by patching module_path() to return empty result if
+    user asks the modules that happen to be hidden.
+
+append:SEE ALSO
+
+    If the application checks he availability of modules by actually trying
+    to require() them, you can try: lib::filter, lib::disallow.
+

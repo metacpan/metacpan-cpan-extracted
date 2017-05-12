@@ -1,0 +1,83 @@
+Revision history for Perl extension Marek::Pod::HTML.
+
+0.49 marek Thu Jan 16 21:49:21 CET 2003
+  - below reported by ADAMK:
+  - fixed: CPAN-RT#1905: Stylesheet link not currect HTML
+    (also reported by Mister Caveman mrcaveman101AThotmail.com)
+  - fixed: CPAN-RT#1906: Adding the generation time to the bottom of generated html
+  - fixed: CPAN-RT#1907: POD error in author section
+  - fixed: CPAN-RT#1908: "No POD in file" warning not suppressed by -warnings = 0
+  - fixed: CPAN-RT#1909: Files should be processed in alphabetical order
+  - fixed a few typos
+
+
+0.48 marek Thu Oct 31 11:45:38 MET 2002
+  - fixed bug in call to _write_html
+
+0.47 marek Fri Oct 25 08:43:04 MEST 2002
+  - next attempt to pacify CPANPLUS, only Makefile.PL modified
+
+0.46 marek Thu Oct 24 08:44:57 MET DST 2002
+  - changed Makefile.PL to enable automatic testing in CPAN
+  - fixed Pod error in mpod2html.PL (thanks to Mark Overmeer)
+
+0.45 marek Wed Oct 23 14:46:50 MEST 2002
+  - fixes/enhancements requested by Mark Overmeer <Mark  at  Overmeer.net>:
+  * option -stylesheet <link> to include a CSS
+  * fixed bug that turned a normal text paragraph into a verbatim one
+  * option -idxopt <options> to switch on/off index items
+  * Allow L<page/xxx> to X<xxx> in page.pod
+  - added some documentation and test
+  - fix spurious links to toc/idx if they are not generated
+  - -verbose switch now deserves its name (default is off)
+  - decent Pod documentation in mpod2html
+  - updated documentation wrt. the package name (Marek:: namespace)
+    as this probably will not make it into the core as the
+    replacement for Pod::HTML
+
+0.44 marek Fri Oct 12 12:30:35 MET DST 2001
+  - added paragraph for
+     =item * some text
+  - one more test added
+
+0.43 marek Thu Dec  7 17:50:11 MET 2000
+  - removed spurious <br> after <li>something
+  - fixed some HTML::Element->new()
+  - mpod2html in filter mode now omits navigation by default
+  - added a few TODO items
+  - DOCTYPE is now root element
+
+0.42 marek Mon Dec  4 10:10:05 MET 2000
+  - updated prerequisites to current versions on CPAN
+  - enabled parsing of HTML comments in =for/=begin html
+  - changed creation of <P> tags: now every text paragraph is in its own
+    <P> with proper start/end tags (<P>...</P>)
+  - =for/=begin do *not* introduce separate paragraphs in the output.
+    Give your own <P>...</P> if you like separate paragraphs
+  - thanks to Raphael Manfredi <Raphael_ManfrediATpobox.com> for these
+    valuable suggestions
+
+0.41 marek Wed Jul 26 10:01:06 MET DST 2000
+  - fixed bug that caused a crash in Pod::Checker
+  - made dependencies check more strict, i.e. the latest versions
+    of Pod::Checker, HTML::Element etc are required
+  - got rid of override package for HTML::Element
+  - updated TODO, README
+
+0.40 marek Sun Jun  4 19:57:55 MEST 2000
+  - first candidate for CPAN
+  - several cleanups
+  - command line should be compatible to old pod2html
+
+0.20 marek  Mon Mar 13 17:14:43 MET 2000
+  - included some changes from Perl Workshop
+  - changed namespace to avoid collisions with existing pod2html
+    (suggestion by Andreas Koenig)
+
+0.15 marek  Sun Dec 19 18:00:43 1999
+  - first working package with documentation, tests
+    and dependencies
+
+0.01 marek  Sun Dec 19 14:05:43 1999
+  - original version; created by h2xs 1.19
+

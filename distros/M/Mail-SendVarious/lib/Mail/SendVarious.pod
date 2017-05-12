@@ -1,0 +1,222 @@
+
+=head1 NAME
+
+ Mail::SendVarious - send mail via STMP and sendmail
+
+=head1 SYNOPSIS
+
+ use Mail::SendVarious;
+
+ sendmail(
+	from	=> 'user@host', 
+	From	=> 'First Last', 
+	to	=> 'user@host, user@host',
+	cc	=> 'user@host, user@host',
+	xheader	=> 'Some header stuff',
+	body	=> 'Some body stuff here'
+ );
+
+ sendmail(
+	envelope_to	=> 'user@host, user@host',
+	message		=> 'Complete header and body stuff',
+ );
+
+ sendmail(
+	envelope_to	=> 'user@host, user@host',
+	header		=> 'Complete header stuff',
+	body		=> 'Complete body stuff',
+ );
+
+ use Mail::SendVarious qw(make_message);
+ ($from, $message, @envelope_to) = make_message(%args);
+
+=head1 DESCRIPTION
+
+Mail::SendVarious will try to send mail multiple ways.  First it
+tries via SMTP.  If that doesn't work then it tries using 
+C</usr/sbin/sendmail>. 
+
+The C<sendmail()> function can put together a message header or you can
+hand it one.  Here are the options it can take:
+
+=over 15
+
+=item envelope_from
+
+Sets the sender email address.   If creating a header,
+also sets the email address in the C<From:> header
+if there is no C<from> option.
+
+=item from
+
+Sets the envelope sender email address if
+C<envelope_from> isn't set.   If creating a header,
+also sets the email address in the C<From:> header.
+
+=item From
+
+Set the name over the sender in the C<From:> header.
+
+=item envelope_to
+
+Sets who the message is sent to.
+
+=item to
+
+Sets the C<To:> header.  Also sets who the message is sent to if
+C<envelope_to> isn't set.
+
+=item cc
+
+Sets the C<Cc:> header.  Also adds who the message is sent to if
+C<envelope_to> isn't set.
+
+=item bcc
+
+Adds to who the message is sent to.
+
+=item subject
+
+Specifies the C<Subject:> header. 
+
+=item xheader
+
+Specifies extra header lines to be added if a header is generated.
+
+=item header
+
+Specifies the complete message header.  
+C<xheader> will be ignored.
+No C<To:>, C<From:>, C<Cc:> or C<Subject:> header will be generated.
+
+=item body
+
+Specifies the complete message body.
+
+=item message
+
+Specifies the complete message.  C<header> and C<body> arguments
+will be ignored. 
+No C<To:>, C<From:>, C<Cc:> or C<Subject:> header will be generated.
+
+=item build_header
+
+Specifies if a header should be generated with
+C<To:>, C<From:>, C<Cc:> and C<Subject:>.  
+This overrides what what otherwise might happen.
+
+=item debuglogger
+
+Specifies a function to call for debug output.  If not set,
+no debug output is generated.
+
+=item errorlogger
+
+Specifies a function to call for error output.  If not set,
+errors are reported on C<STDERR>.
+
+=item hostlist
+
+Specifies a list of hosts to try to send to via SMTP.  
+This should be an array refrence.  
+If not set, C<@Mail::SendVarious::mail_hostlist> is used.  
+The default for C<@Mail::SendVarious::mail_hostlist> is
+C<127.0.0.1>.
+
+=item mail_command
+
+Specifies a command to use if sending via SMTP fails.
+This should be an array refrence.
+If not set, C<@Mail::SendVarious::mail_command> is used.  
+The default for C<@Mail::SendVarious::mail_command> is
+C</usr/sbin/sendmail -oeml -i>.
+
+=item no_rejects
+
+Normally when sending via SMTP, Mail::SendVarious will skip
+over any recipients that are rejected.  Sent C<no_rejects>
+and the SMTP server will be skipped instead.  If C<no_rejects>
+is not set, then any rejected recipients will end up in
+C<@Mail::SendVarious::to_rejected>.
+
+=back
+
+The return value from C<sendmail()> is true if the message was
+sent and false otherwise.  If the message was not sent, then
+the variable C<Mail::SendVarious::mail_error> will be set to a
+description of the problem.
+
+
+=head1 EXPORT_OK
+
+In addition to the standard export item of the C<sendmail()> function, the
+following are available explicitly:
+
+=over 15
+
+=item $mail_error
+
+The last error.
+
+=item make_message()
+
+An additional function C<make_message()> is provided.  It takes
+the same arguemtns as C<sendmail()> but does not send mail.  It
+just generates the message.  
+
+The following two snippets do the same thing:
+
+ {
+	my ($from, $message, @envelope_to) = make_message(%args);
+	sendmail(
+		envelope_from	=> $from,
+		envelope_to	=> \@envelope_to,
+		message		=> $message,
+	);
+ }
+
+and
+
+ sendmail(%args);
+
+=item @to_rejected
+
+Any recipients that were rejected by the SMTP server.  (Only if C<no_rejects>
+isn't set).
+
+=item @mail_hostlist
+
+C<(qw(127.0.0.1))>
+
+=item @mail_command
+
+C<(qw(/usr/sbin/sendmail -oeml -i))>
+
+=back
+
+=head1 OTHER MODULES THAT DO SIMILAR THINGS
+
+Send mail via SMTP: 
+L<Mail::SMI>,
+L<Mail::Transport::SMTP>,
+L<Mail::SendEasy>,
+L<Mail::Sender>,
+L<Mail::Send>,
+L<Mail::Sendmail>.
+
+Send mail via /usr/sbin/sendmail: 
+L<Mail::Transport::Sendmail>.
+
+Send via various methods (but only one at a time): 
+L<Mail::Mailer>.
+
+Manage an outgoing mail spool: 
+L<Mail::Spool>.
+
+=head1 AUTHOR
+
+Copyright (C) 2002-2006, David Muir Sharnoff <muir@idiom.com>
+Copyright (C) 2011-2012, Google Inc.
+This module may be used and copied on the same terms as Perl
+itself.
+

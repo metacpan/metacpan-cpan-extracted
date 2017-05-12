@@ -1,0 +1,53 @@
+=encoding utf-8
+
+=head1 NAME
+
+MIME::Lite::TT::HTML::Japanese.ja - Template-Toolkit によるHTMLメール作成モジュール
+
+=head1 SYNOPSIS
+
+    use MIME::Lite::TT::HTML::Japanese;
+
+    my $msg = MIME::Lite::HTML::Japanese->new(
+        From        => 'from@example.com',
+        To          => 'to@example.com',
+        Subject     => 'Subject',
+        Template    => {
+            html => 'mail.html',
+            text => 'mail.txt',
+        },
+        TmplOptions => \%options,
+        TmplParams  => \%params,
+        Icode       => 'euc',    # input characterset (Jcode format)
+    );
+    
+    $msg->send;
+
+=head1 DESCRIPTION
+
+C<MIME::Lite> と C<Template> をつかって HTML メールを作成するモジュール。
+
+=head1 METHODS
+
+=over 4
+
+=item new( %options )
+
+%option を元に MIME::Lite でメールを作成し、その MIME::Lite オブジェクトを返す。
+
+%option のとれる値。
+
+=back
+
+=head1 AUTHOR
+
+Daisuke Murase E<lt>typester@cpan.orgE<gt>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<MIME::Lite>, L<Template>, L<MIME::Lite::TT::Japanese>

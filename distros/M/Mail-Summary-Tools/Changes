@@ -1,0 +1,34 @@
+0.05
+	- Formatting fixes for text output (link expansion, empty sections)
+	- Unsuccessful URI shortening is no longer cached
+
+0.04
+	- Fix the ToHTML command, which was accidentally broken in 0.03's App::Cmd
+	  refactoring
+	- use HTML::Element in Output::HTML, for more flexibility and correctness.
+	- add several options for HTML output to ToHTML: --body_only, --compact,
+	  --xml, --noxhtml
+	- when loading from flatfile with --extra_fields and the field isn't set
+	  clear it from the thread.
+
+0.03
+	- Fix UTF8 handling of edit --save/--load
+	- nntp article overviews are now saved in the correct place (and not my
+	  FIXME commented harcoded path ;-)
+	- fix the -e option to the edit command, which lists extra fields
+	- fix the dependency list
+	- temporarily work around a Geopt::Long::Descriptive's dealing with one_of
+	  and optional string
+
+0.02
+	- Documenation and stuff (kudra++)
+	- out_of_date gets set if a thread is hidden and gets new messages
+	- some error messages have been improved
+	- edit --hidden shows hidden threads in the flatfile
+	- hidden now allows arbitrary text
+	- Switch to App::Cmd
+	- NNTP dowloader
+	- Various other improvements
+
+0.01
+	- Initial release

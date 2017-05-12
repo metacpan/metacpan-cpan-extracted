@@ -1,0 +1,11 @@
+.*\.tar\.gz
+^blib.*
+^[\w\._-]+\.(html|txt|png|gif|dot|pl|svg|old|bak|org|vcg|gdl|ps)
+^Makefile\z
+^Makefile.(old|bak)\z
+^fun\z
+^[^\\\/]*\.pl
+^Math-String-[0-9]
+pm_to_blib
+tmon.out
+^todos[\\\/]

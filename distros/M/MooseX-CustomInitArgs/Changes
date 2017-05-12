@@ -1,0 +1,29 @@
+MooseX-CustomInitArgs
+=====================
+
+Created:      2013-01-08
+Home page:    <https://metacpan.org/release/MooseX-CustomInitArgs>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-CustomInitArgs>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.004	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.003	2013-03-01
+
+ - Added: Add before_typecheck and after_typecheck helper functions, and
+   introduce the feature where type constraints and coercions can be
+   optionally performed before coderefs are executed.
+ - Reduce possibility of divergence between mutable and immutable code
+   paths by making the mutable code path call the _run_init_code method
+   designed for the immutable path.
+
+0.002	2013-01-09
+
+ - Combine MooseX::CustomInitArgs::Trait::Application::ToClass and
+   MooseX::CustomInitArgs::Trait::Application::ToRole traits into a single
+   MooseX::CustomInitArgs::Trait::Application trait.
+
+0.001	2013-01-09	Initial release

@@ -1,0 +1,42 @@
+<%args>
+    $item
+</%args>
+
+% my $string = $item->stringify_column;
+<div id="title"><% $item->$string %></div>
+<& navbar &>
+<table class="view">
+    <tr>
+        <td class="field"><% $classmetadata->{colnames}->{ $string } %></td>
+        <td><% $item->$string %></td>
+    </tr>
+
+% foreach my $col ( @{ $classmetadata->{columns} } ) {
+% next if $col eq "id" or $col eq $string;
+% next unless $item->$col;
+
+<%doc>
+
+=for doc
+
+It gets the displayable form of a column's name from the hash returned
+from the C<column_names> method:
+
+</%doc>
+
+<tr>
+<td class="field"><% $classmetadata->{colnames}->{ $col } %></td>
+<td>
+
+% if ( $col eq "url" && $item->url ) {
+<a href="<% $item->url %>"><% $item->url %></a>
+% } else {
+<& maybe_link_view, object => $item->$col &>
+% }
+
+</td>
+</tr>
+% }
+</table>
+
+

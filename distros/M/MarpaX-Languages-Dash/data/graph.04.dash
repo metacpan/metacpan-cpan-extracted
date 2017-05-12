@@ -1,0 +1,15 @@
+# Juxtapositioned edges (-> -> twice). OK.
+->
+->
+
+[node]
+[node] ->
+-> {label: Start} -> {color: red} [node.1] {color: green} -> [node.2]
+[node.1] [node.2] [node.3]
+
+[]
+[node.1]
+[node 1]
+[\[node\]]
+["node"]
+[     From here     ] -> [     To there     ]

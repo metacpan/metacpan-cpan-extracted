@@ -1,0 +1,273 @@
+M_Send_Req_message: message_type_head_code m_send_req
+                transaction_id_head
+                MMS_version_head
+                header(s?)
+                content_type_head
+                multipart {
+   my %headers;
+   $headers{message_type_head} = 'm_send_req';
+   foreach my $header (@item[4,6], $item[3], @{$item[5]}) {
+      my ($name, $value) = @$header;
+      $headers{$name} = $value;
+   }
+   $return = {
+      headers => \%headers,
+      body    => $item{multipart},
+   };
+   1;
+}
+# MMS Notification Indication
+M_Notification_Ind_message: message_type_head_code m_notification_ind
+                            transaction_id_head
+                            MMS_version_head
+                            header(s?) {
+   my %retval;
+   $retval{message_type_head} = 'm_notification_ind';
+   foreach my $header (@item[3,4], @{$item[5]}) {
+      next unless ref($header) eq 'ARRAY';
+      my ($name, $value) = @$header;
+      $name =~ s/_head\z//;
+      $retval{$name} = $value;
+   }
+   $return = \%retval;
+   1;
+}
+#
+# MMS Retrieval Response
+M_Retrieve_Conf_message: message_type_head_code m_retrieve_conf
+                         transaction_id_head(?)
+                         MMS_version_head
+                         header(s)
+                         content_type_head
+                         multipart {
+   my %headers;
+   $headers{message_type_head} = 'm_retrieve_conf';
+   foreach my $header (@item[4,6], @{$item[3]}, @{$item[5]}) {
+      my ($name, $value) = @$header;
+      $headers{$name} = $value;
+   }
+   $return = {
+      headers => \%headers,
+      body    => $item{multipart},
+   };
+   1;
+}
+#
+# HEADERS isn't actually in the spec :)
+HEADERS: message_type_head
+         transaction_id_head(?)
+         MMS_version_head
+         header(s) 
+         content_type_head {
+   my %headers;
+   foreach my $header (@item[1,2,3,5], @{$item[4]}) {
+      my ($name, $value) = @$header;
+      $headers{$name} = $value;
+   }
+   $return = \%headers;
+   1;
+}
+MMS_MESSAGE: M_Retrieve_Conf_message {
+   $return = $item[1];
+   1;
+}
+#
+header: MMS_header | application_header
+application_header: token_text application_specific_value
+# "token_text: token end_of_string"   already in WSP
+application_specific_value: text_string
+MMS_header: bcc_head
+   | cc_head
+   | content_location_head
+   | date_head
+   | delivery_report_head
+   | delivery_time_head
+   | expiry_head
+   | from_head
+   | message_class_head
+   | message_id_head
+   | message_type_head
+   | message_size_head
+   | MMS_version_head
+   | priority_head
+   | read_reply_head
+   | report_allowed_head
+   | response_status_head
+   | response_text_head
+   | sender_visibility_head
+   | status_head
+   | subject_head
+   | to_head
+# Specifics
+bcc_head: "\x81" bcc_value
+   { $return = [ @item[0,2] ]; 1; }
+cc_head: "\x82" cc_value
+   { $return = [ @item[0,2] ]; 1; }
+content_location_head: "\x83" content_location_value
+   { $return = [ @item[0,2] ]; 1; }
+content_type_head: "\x84" content_type_value
+   { $return = [ @item[0,2] ]; 1; }
+date_head: "\x85" date_value
+   { $return = [ @item[0,2] ]; 1; }
+delivery_report_head: "\x86" delivery_report_value
+   { $return = [ @item[0,2] ]; 1; }
+delivery_time_head: "\x87" delivery_time_value
+   { $return = [ @item[0,2] ]; 1; }
+expiry_head: "\x88" expiry_value
+   { $return = [ @item[0,2] ]; 1; }
+from_head: "\x89" from_value
+   { $return = [ @item[0,2] ]; 1; }
+message_class_head: "\x8a" message_class_value
+   { $return = [ @item[0,2] ]; 1; }
+message_id_head: "\x8b" message_id_value
+   { $return = [ @item[0,2] ]; 1; }
+message_type_head_code: "\x8c" { $return = $item[1]; 1; }
+message_type_head: message_type_head_code message_type_value
+   { $return = [ @item[0,2] ]; 1; }
+MMS_version_head: "\x8d" MMS_version_value
+   { $return = [ @item[0,2] ]; 1; }
+message_size_head: "\x8e" message_size_value
+   { $return = [ @item[0,2] ]; 1; }
+priority_head: "\x8f" priority_value
+   { $return = [ @item[0,2] ]; 1; }
+read_reply_head: "\x90" read_reply_value
+   { $return = [ @item[0,2] ]; 1; }
+report_allowed_head: "\x91" report_allowed_value
+   { $return = [ @item[0,2] ]; 1; }
+response_status_head: "\x92" response_status_value
+   { $return = [ @item[0,2] ]; 1; }
+response_text_head: "\x93" response_text_value
+   { $return = [ @item[0,2] ]; 1; }
+sender_visibility_head: "\x94" sender_visibility_value
+   { $return = [ @item[0,2] ]; 1; }
+status_head: "\x95" status_value
+   { $return = [ @item[0,2] ]; 1; }
+subject_head: "\x96" subject_value
+   { $return = [ @item[0,2] ]; 1; }
+to_head: "\x97" to_value
+   { $return = [ @item[0,2] ]; 1; }
+transaction_id_head: "\x98" transaction_id_value
+   { $return = [ @item[0,2] ]; 1; }
+# Values
+_address_value: encoded_string_value {
+   # Will make more formal later
+   my %return = %{$item[1]};
+   my $v = $item[1]{text};
+   if ($v =~ m{\A (.+) /TYPE= (\w+) \z}mxs) {
+      $return{address} = $1;
+      $return{TYPE}    = $2;
+   }
+   else { # email
+      $return{address} = $v;
+   }
+   $return = \%return;
+   1;
+}
+bcc_value: _address_value
+cc_value:  _address_value
+content_location_value: uri_value
+uri_value: text_string
+# content_type_value is defined in WSP
+# date_value is defined in WSP
+delivery_report_value: YES | NO
+YES: "\x80" { $return = $item[0]; 1; }
+NO:  "\x81" { $return = $item[0]; 1; }
+# Value-length (Absolute-token Date-value | Relative-token Delta-seconds-value)
+_mixed_time_value: value_length _mtv_token long_integer { 
+   $return = { type => $item{_mtv_token}, value => $item{long_integer} };
+   1;
+}
+_mtv_token: absolute_token | relative_token
+absolute_token: "\x80" { $return = 'absolute'; 1; }
+relative_token: "\x81" { $return = 'relative'; 1; }
+delivery_time_value: _mixed_time_value
+# delta_seconds_value skipped, short-circuited
+encoded_string_value: _charset_part(?) text_string {
+   $return = { text => $item{text_string} };
+   if (scalar @{$item[1]} > 0) {
+      $return->{charset} = $item[1][0];
+   }
+   1;
+}
+_charset_part: value_length {
+   my $len = $item[1];
+   if ($len > 0 && $len <= length $text) {
+      $return = substr $text, 0, $len;
+      $text = substr $text, $len;
+   }
+   else { undef }
+}
+expiry_value: _mixed_time_value
+from_value: value_length ( ( address_present_token _address_value )
+                           | insert_address_token)
+{
+   $return = $item[2];
+   defined($return) || undef;
+}
+address_present_token: "\x80" { $return = 'address-present'; 1; }
+insert_address_token:  "\x81" { $return = 'insert-address'; 1; }
+#
+message_class_value: class_identifier | token_text
+class_identifier: PERSONAL | ADVERTISEMENT | INFORMATIONAL | AUTO
+PERSONAL: "\x80" { $return = $item[0]; 1; }
+ADVERTISEMENT: "\x81" { $return = $item[0]; 1; }
+INFORMATIONAL: "\x82" { $return = $item[0]; 1; }
+AUTO: "\x83" { $return = $item[0]; 1; }
+#
+message_id_value: text_string
+#
+message_type_value: m_send_req | m_send_conf | m_notification_ind
+                  | m_notifyresp_ind | m_retrieve_conf | m_acknowledge_ind
+                  | m_delivery_ind
+m_send_req: "\x80" { $return = $item[0]; }
+m_send_conf: "\x81" { $return = $item[0]; }
+m_notification_ind: "\x82" { $return = $item[0]; }
+m_notifyresp_ind: "\x83" { $return = $item[0]; }
+m_retrieve_conf: "\x84" { $return = $item[0]; }
+m_acknowledge_ind: "\x85" { $return = $item[0]; }
+m_delivery_ind: "\x86" { $return = $item[0]; }
+#
+message_size_value: long_integer
+#
+MMS_version_value: _short_integer_version
+priority_value: LOW | NORMAL | HIGH
+LOW: "\x80" { $return = $item[0]; 1; }
+NORMAL: "\x81" { $return = $item[0]; 1; }
+HIGH: "\x82" { $return = $item[0]; 1; }
+#
+read_reply_value: YES | NO
+report_allowed_value: YES | NO
+response_status_value: OK
+   | ERROR_UNSPECIFIED 
+   | ERROR_SERVICE_DENIED
+   | ERROR_MESSAGE_FORMAT_CORRUPT 
+   | ERROR_SENDING_ADDRESS_UNRESOLVED
+   | ERROR_MESSAGE_NOT_FOUND
+   | ERROR_NETWORK_PROBLEM
+   | ERROR_CONTENT_NOT_ACCEPTED
+   | ERROR_UNSUPPORTED_MESSAGE
+OK: "\x80" { $return = $item[0]; 1; }
+ERROR_UNSPECIFIED : "\x81" { $return = $item[0]; 1; }
+ERROR_SERVICE_DENIED: "\x82" { $return = $item[0]; 1; }
+ERROR_MESSAGE_FORMAT_CORRUPT : "\x83" { $return = $item[0]; 1; }
+ERROR_SENDING_ADDRESS_UNRESOLVED: "\x84" { $return = $item[0]; 1; }
+ERROR_MESSAGE_NOT_FOUND: "\x85" { $return = $item[0]; 1; }
+ERROR_NETWORK_PROBLEM: "\x86" { $return = $item[0]; 1; }
+ERROR_CONTENT_NOT_ACCEPTED: "\x87" { $return = $item[0]; 1; }
+ERROR_UNSUPPORTED_MESSAGE: "\x88" { $return = $item[0]; 1; }
+#
+response_text_value: encoded_string_value
+sender_visibility_value: HIDE | SHOW
+HIDE: "\x80" { $return = $item[0]; 1; }
+SHOW: "\x81" { $return = $item[0]; 1; }
+#
+status_value: EXPIRED | RETRIEVED | REJECTED | DEFERRED | UNRECOGNISED
+EXPIRED: "\x80" { $return = $item[0]; 1; }
+RETRIEVED: "\x81" { $return = $item[0]; 1; }
+REJECTED: "\x82" { $return = $item[0]; 1; }
+DEFERRED: "\x83" { $return = $item[0]; 1; }
+UNRECOGNISED: "\x84" { $return = $item[0]; 1; }
+#
+subject_value: encoded_string_value
+to_value: _address_value
+transaction_id_value: text_string

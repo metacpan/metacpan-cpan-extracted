@@ -1,0 +1,60 @@
+MPEG::LibMPEG3 version 0.01
+===========================
+
+MPEG::LibMPEG3 provides a Perl interface to the LibMPEG3 C library.  
+Using this module, you may extract information and YUV video frames 
+an MPEG stream.  Extracting audio is still under construction through
+patches are welcome.
+
+This module decodes:
+
+	MPEG-1 Layer II Audio
+	MPEG-1 Layer III Audio
+	MPEG-2 Layer III Audio
+	MPEG-1 program streams
+	MPEG-2 program streams
+	MPEG-2 transport streams
+	AC3 Audio
+	MPEG-2 Video
+	MPEG-1 Video
+	IFO files
+	VOB files
+
+Testing has only been performed under Linux 2.4.x and the i386
+architechture.  I have, however, tried to make the configuration 
+cross-platform by using Config.pm and would like to know if you 
+have success on another platform (particularly big-endian).  
+
+The Makefile.PL expects gcc to be in the current path.  For this
+reason, I don't expect this module to build correctly under Windows.  
+Maybe it will work if cygwin is installed?
+
+INSTALLATION
+
+Note that you will need to copy the libmpeg3.so and header files to
+your lib and include directories.  I do something like:
+
+  cd libmpeg3/
+  find -iname "*.h" -exec cp {} /usr/local/include
+  cp ARCH/libmpeg3.so /usr/local/lib
+  /sbin/ldconfig
+
+To then install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  libmpeg3 1.5 -- http://heroinewarrior.com/libmpeg3.php3
+
+COPYRIGHT AND LICENCE
+
+Free for non-commercial use.
+
+Copyright (C) 2002 Benjamin R. Ginter <bginter@asicommunications.com>
+

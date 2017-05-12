@@ -1,0 +1,19 @@
+---
+name: Maypole-Plugin-Trace
+version: 0.1
+author:
+  - David Baird <cpan@riverside-cms.co.uk>
+abstract: trace calls in Maypole
+license: perl
+requires:
+  Class::Data::Inheritable: 0
+  Class::ISA: 0
+  Class::Inspector: 0
+  Data::Dumper: 0
+  NEXT: 0
+  Test::More: 0
+provides:
+  Maypole::Plugin::Trace:
+    file: lib/Maypole/Plugin/Trace.pm
+    version: 0.1
+generated_by: Module::Build version 0.2609

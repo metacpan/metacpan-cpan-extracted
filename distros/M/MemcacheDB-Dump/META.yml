@@ -1,0 +1,40 @@
+---
+abstract: "It's new $module"
+author:
+  - 'ajiyoshi <yoichi@ajiyoshi.org>'
+build_requires:
+  Test::More: '0.98'
+  Test::Warn: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MemcacheDB-Dump
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MemcacheDB::Dump:
+    file: lib/MemcacheDB/Dump.pm
+    version: '0.04'
+requires:
+  BerkeleyDB: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/ajiyoshi-vg/MemcacheDB-Dump/issues
+  homepage: https://github.com/ajiyoshi-vg/MemcacheDB-Dump
+  repository: git://github.com/ajiyoshi-vg/MemcacheDB-Dump.git
+version: '0.04'
+x_contributors:
+  - 'ajiyoshi-vg <Yoichi_Sudo@voyagegroup.com>'

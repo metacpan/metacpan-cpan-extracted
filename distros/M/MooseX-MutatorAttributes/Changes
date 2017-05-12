@@ -1,0 +1,20 @@
+Revision history for MooseX-Setter
+
+0.11    02.11.08
+        Dropping the Pod test, apparently 'meta' is not podded anywhere thus the test fails. 
+
+0.11    18.10.08
+        new test failed due to using Test::Most and not including it in the reqs, fixed.
+
+0.10    18.09.08
+        Added new method set_only_rw_attr that will capture non-attr items and return them.
+
+0.03    06.08.08
+        thanks to mst's advice things now look a bit harder on what should really be done.
+
+0.02    02.08.08
+        Modified the docs to better reflect the user of croak and better explain that it's a role.
+
+0.01    02.08.08
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,8 @@
+0.03  2013-10-21 10:24:35 GMT
+    * Bug #346 : Implementation is not consistent with normal use of the word "protected" in OO programming (Celogeek San)
+
+0.02  2013-10-21 09:34:59 GMT
+    * Feature #344 : add "unless" keywords, to all using a sub that disable the warning (Celogeek San)
+
+0.01  2013-10-20 19:26:58 GMT
+    * Feature #343 : First Release (Celogeek San)

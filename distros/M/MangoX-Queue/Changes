@@ -1,0 +1,67 @@
+Revision history for Perl module MangoX::Queue
+
+0.16 2014-09-08
+ - Add delay_compat option (thanks @oliwer)
+
+0.15 2014-07-02
+ - Add no_binary_oid option to disable binary Object IDs
+
+0.14 2014-07-02
+ - Remove 'events' from job data written to MongoDB
+
+0.13 2014-06-25
+ - Remove circular dependency from MangoX::Queue::Job
+ - Add finished method to MangoX::Queue::Job
+ - Use events to communicate with the queue
+ - Use bson_time for created value
+
+0.12 2014-06-06
+ - A more efficient options hash - optimise out $or operators
+ - delay_until queue key is now required (Warning: be sure to add this to
+   existing queue items).
+ - Add failed_status, pending_status & processing_status attributes rather
+   than directly modifying the object hash. Pre-generate the status array,
+   rather than on the fly when get_options is called.
+
+0.11 2014-05-14
+ - Fix bug introduced by Mango/MongoDB 2.6 update
+
+0.10 2014-01-30
+ - Add concurrent_job_limit (thanks to https://github.com/bvinnerd)
+
+0.09 2014-01-22
+ - Add delay_until attribute to queue jobs
+
+0.08 2014-01-08
+ - Document error handling
+ - Add error to non-blocking callbacks
+
+0.07 2013-12-18
+ - Fix non-blocking update
+
+0.06 2013-04-11
+ - Fix dodgy file in distribution
+
+0.05 2013-10-14
+ - Switch to DateTime::Tiny for performance
+ - Replace attributes with hash keys for performance
+ - Fixed support for capped collections
+
+0.04 2013-10-12
+ - Add retries/attempts support
+ - Add attributes for pending, processing and failed status
+ - Improve error handling
+
+0.03 2013-10-09
+ - Add event support (consumed, enqueued, dequeued)
+ - Add plugin support
+ - Make all methods support non-blocking operations
+ - Add Statsd plugin
+ - Renamed 'watch' to 'consume'
+ - Renamed 'monitor' to 'watch'
+ - Add queue release to stop non-blocking consumers
+
+0.02 2013-10-06
+
+0.01 2013-10-06
+ - first release to CPAN

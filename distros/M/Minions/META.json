@@ -1,0 +1,89 @@
+{
+   "abstract" : "Simplifies the creation of loosely coupled object oriented code.",
+   "author" : [
+      "Arun Prasaad <arunbear@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Minions",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exception::Class" : "1.38",
+            "List::MoreUtils" : "0.33",
+            "Package::Stash" : "0.36",
+            "Params::Validate" : "1.10",
+            "Readonly" : "2.00",
+            "Sub::Name" : "0.09",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Lib" : "0.002",
+            "Test::Most" : "0.34",
+            "Test::Output" : "1.03"
+         }
+      }
+   },
+   "provides" : {
+      "Minions" : {
+         "file" : "lib/Minions.pm",
+         "version" : "1.000000"
+      },
+      "Minions::Implementation" : {
+         "file" : "lib/Minions/Implementation.pm"
+      },
+      "Minions::Role" : {
+         "file" : "lib/Minions/Role.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/arunbear/Minions/issues"
+      },
+      "homepage" : "https://github.com/arunbear/Minions",
+      "repository" : {
+         "url" : "git://github.com/arunbear/Minions.git",
+         "web" : "https://github.com/arunbear/Minions"
+      }
+   },
+   "version" : "1.000000",
+   "x_contributors" : [
+      "Arun Prasaad <arunbear@gmail.com>"
+   ]
+}

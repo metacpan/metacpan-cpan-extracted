@@ -1,0 +1,45 @@
+.perltidyrc
+.ship.conf
+.travis.yml
+Changes
+cpanfile
+doc/rfc2812.txt
+lib/Mojo/IRC.pm
+lib/Mojo/IRC/Events.pod
+lib/Mojo/IRC/UA.pm
+lib/Mojo/mojo-irc-client.crt
+lib/Mojo/mojo-irc-client.key
+lib/Test/Mojo/IRC.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-basic.t
+t/ctcp.t
+t/data/irc.perl.org
+t/data/join.mojo
+t/data/welcome
+t/default-handlers.t
+t/disconnect.t
+t/error.t
+t/Helper.pm
+t/join.t
+t/local-address.t
+t/nick.t
+t/parse-irc-message.t
+t/reconnect.t
+t/register.t
+t/test-mojo-irc-synopsis.t
+t/tls.t
+t/ua-channel-topic.t
+t/ua-channel-users-lc.t
+t/ua-channel-users.t
+t/ua-channels.t
+t/ua-join-channel.t
+t/ua-join-redirect.t
+t/ua-kick.t
+t/ua-mode.t
+t/ua-nick.t
+t/ua-part-channel.t
+t/ua-whois.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

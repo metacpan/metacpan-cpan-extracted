@@ -1,0 +1,17 @@
+Source: libmogilefs-plugin-randomwrites-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 7)
+Build-Depends-Indep: perl, libmogilefs-server-perl
+Maintainer: Dave Lambley <davel@state51.co.uk>
+Standards-Version: 3.8.3
+Homepage: http://search.cpan.org/dist/MogileFS-Plugin-RandomWrites/
+
+Package: libmogilefs-plugin-randomwrites-perl
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}, libmogilefs-server-perl
+Description: Perl extension for blah blah blah
+ This plugin cause MogileFS to distribute writes to a random device, rather
+ than concentrating on devices with the most space free.
+ .
+ This description was automagically extracted from the module by dh-make-perl.

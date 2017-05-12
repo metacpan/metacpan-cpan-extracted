@@ -1,0 +1,79 @@
+---
+abstract: 'A message broker for WebSockets'
+author:
+  - 'Doug Bell <preaction@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '1.001005'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mercury
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Mercury:
+    file: lib/Mercury.pm
+    version: '0.012'
+  Mercury::Command::mercury:
+    file: lib/Mercury/Command/mercury.pm
+    version: '0.012'
+  Mercury::Command::mercury::broker:
+    file: lib/Mercury/Command/mercury/broker.pm
+    version: '0.012'
+  Mercury::Controller::Bus:
+    file: lib/Mercury/Controller/Bus.pm
+    version: '0.012'
+  Mercury::Controller::PubSub:
+    file: lib/Mercury/Controller/PubSub.pm
+    version: '0.012'
+  Mercury::Controller::PubSub::Cascade:
+    file: lib/Mercury/Controller/PubSub/Cascade.pm
+    version: '0.012'
+  Mercury::Controller::PushPull:
+    file: lib/Mercury/Controller/PushPull.pm
+    version: '0.012'
+  Mercury::Pattern::Bus:
+    file: lib/Mercury/Pattern/Bus.pm
+    version: '0.012'
+  Mercury::Pattern::PubSub:
+    file: lib/Mercury/Pattern/PubSub.pm
+    version: '0.012'
+  Mercury::Pattern::PushPull:
+    file: lib/Mercury/Pattern/PushPull.pm
+    version: '0.012'
+  Mojolicious::Plugin::Mercury:
+    file: lib/Mojolicious/Plugin/Mercury.pm
+    version: '0.012'
+requires:
+  File::Basename: '0'
+  File::Spec::Functions: '0'
+  Mojolicious: '6.00'
+  Scalar::Util: '0'
+  perl: '5.010'
+resources:
+  IRC: irc://irc.perl.org/#statocles
+  bugtracker: https://github.com/preaction/Mercury/issues
+  homepage: https://github.com/preaction/Mercury
+  repository: https://github.com/preaction/Mercury.git
+version: '0.012'
+x_authority: cpan:PREACTION
+x_contributors:
+  - 'Joel Berger <joel.a.berger@gmail.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'William Lindley <wlindley@wlindley.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

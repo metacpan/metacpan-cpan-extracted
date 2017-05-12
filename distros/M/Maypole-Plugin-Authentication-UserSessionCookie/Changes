@@ -1,0 +1,45 @@
+Revision history for Perl extension Maypole::Authentication::UserSessionCookie.
+
+1.8   Mon Dec 05 23:50 2005
+    - use URI (rt #11709)
+    - don't try to load $user_class (rt #11915)
+    - default logout behaviour matches docs (rt #14491)
+    - fixed doc typo (rt #15665)
+
+1.7   Mon Jan 05 14:20:00 CET 2005
+    - logout could not create a cookie with undef as value
+      with CGI::Simple::Cookie
+
+1.6   Mon Jan 04 23:40:45 CET 2005
+    - Moved tests to t/ and added Pod tests.
+    - Changed to Module::Build
+
+1.5   Mon Jan 04 23:20:13 CET 2005
+    - session should be an accessor
+    - Added use statements to pass test.
+      
+1.4   Tue Dec 15 00:27:01 CET 2004
+    - Updated to work with Apache2 & Maypole2
+    - Changed Module name to work with Maypole's Plugin namespace.
+    - Applied misc fixes from Dave Howorth and Matt S. Trout
+
+1.3   Thu Sep 16 20:30:00 BST 2004
+    - Set sensible default for expires
+    - Fix Apache2 support
+    - Only spam errorlog when debug is set.
+    
+1.2   Thu Apr 29 15:52:39 BST 2004
+    - Several fixes
+    - Two new methods
+
+1.1   Wed Mar  3 16:42:57 GMT 2004
+    - Allow setting cookie expiry.
+    - And reissue the cookie every request.
+
+1.0   Thu Feb 26 15:30:13 GMT 2004
+    - Deal properly with the session going away.
+
+0.01  Fri Feb 20 12:54:02 2004
+	- original version; created by h2xs 1.21 with options
+		-AX -n Maypole::Authentication::UserSessionCookie
+

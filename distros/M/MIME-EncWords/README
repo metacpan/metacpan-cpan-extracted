@@ -1,0 +1,21 @@
+MIME-EncWords Package.
+
+Copyright (C) 2006-2013 by Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>.
+
+This package is free software; you can redistribute it and/or modify it 
+under the same terms as Perl itself.
+
+                                   ***
+
+Two modules and some supporting program files are contained. For more
+details read following POD documentations:
+
+    MIME::EncWords - deal with RFC 2047 encoded words (improved)
+    Encode::MIME::EncWords - MIME 'B' and 'Q' header encoding (alternative)
+
+For japonophones, POD in Japanese language is also included:
+
+    POD2::JA::MIME::EncWords - RFC 2047 encoded-word 関連 (改良版)
+    POD2::JA::Encode::MIME::EncWords - MIME の「B」・「Q」ヘッダエンコーディング (代替案)
+
+$$

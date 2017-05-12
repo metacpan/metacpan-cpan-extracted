@@ -1,0 +1,80 @@
+This is the README file for MLDBM, the Perl module that can 
+be used to store multidimensional hash structures in tied hashes
+(including DBM files).
+
+This is version 2.05. It requires Perl Version 5.5 or later.
+
+If you were able to install Data::Dumper with its XSUB extension, MLDBM
+will perform significantly faster.
+
+Optionally, you can also switch to other serializing packages such as
+FreezeThaw and Storable.  Storable provides much greater speeds, and the
+performance of FreezeThaw is comparable to Data::Dumper.  Support for
+this was added by Raphael Manfredi.  Many thanks!
+
+See the embedded documentation in the module for more details.
+
+As always, feedback is very welcome.
+
+ - Sarathy.
+   gsar@umich.edu
+
+----------------------------------------------------------------------
+INSTALLATION
+
+You must install the Data::Dumper package first.  Optionally, you
+may want to install one or more of Storable and FreezeThaw as well.
+(Storable-0.5@8 and FreezeThaw-0.3 have been tested, earlier versions
+may not work.)
+
+From the MLDBM source directory:
+
+   perl Makefile.PL
+   make test
+   make install
+
+is all that will be needed.
+
+----------------------------------------------------------------------
+CHANGES
+
+    2.05  (21 Feb 2013, by Alexandr Ciornii)
+            Require perl 5.5
+            Test for pod
+
+
+    2.04  (08 Mar 2010, by Alexandr Ciornii)
+            Compatibility with old EU::MM.
+
+    2.03  (27 Feb 2010, by Alexandr Ciornii) 
+            Test fixed.
+
+    2.02  (19 Feb 2010, by Alexandr Ciornii) 
+            New tests added.
+            Distribution upgraded
+
+    2.01  (07 July 2002)
+            Fixed t/*.t tests to work under perl 5.8.0 RC2
+            The core of MLDBM was working, the tests were fixed.
+            (courtesy of Josh Chamas)
+	
+    2.00  (10 May 1998)
+            Added support for multiple serializing interfaces.
+            (courtesy Raphael Manfredi
+            <Raphael_Manfredi@grenoble.hp.com>)
+
+            Split serializer wrappers into multiple files, and
+            regularized the interface some.  Underlying TIEHASH
+            object and serializer can now be set at runtime
+            (with care).
+
+            Miscellaneous pod tweaks.
+
+    1.25  (7 December 1997)
+
+            Add RemoveTaint flag.
+
+            require 5.004.
+
+            require Data::Dumper 2.08.
+

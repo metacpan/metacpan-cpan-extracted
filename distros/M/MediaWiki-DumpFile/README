@@ -1,0 +1,51 @@
+MediaWiki-DumpFile
+
+This module is used to parse various dump files from a MediaWiki instance. The most
+likely case is that you will want to be parsing content at http://download.wikimedia.org/backup-index.html 
+provided by WikiMedia which includes the English and all other language Wikipedias. 
+
+This module could also be considered Parse::MediaWikiDump version 2. It has been created
+as a seperate distribution to improve the API with out breaking existing code that is using
+Parse::MediaWikiDump. 
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc MediaWiki::DumpFile
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=MediaWiki-DumpFile
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/MediaWiki-DumpFile
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/MediaWiki-DumpFile
+
+    Search CPAN
+        http://search.cpan.org/dist/MediaWiki-DumpFile/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 "Tyler Riddle"
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

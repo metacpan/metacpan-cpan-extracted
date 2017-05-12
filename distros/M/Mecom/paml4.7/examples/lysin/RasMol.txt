@@ -1,0 +1,272 @@
+cartoon
+set background white
+select 1
+		color [2,2,120]
+select 2
+		color [186,60,200]
+select 3
+		color [133,57,240]
+select 4
+		color [250,5,5]
+select 5
+		color [133,57,240]
+select 6
+		color [250,5,5]
+select 7
+		color [250,5,5]
+select 8
+		color [133,57,240]
+select 9
+		color [250,5,5]
+select 10
+		color [250,5,5]
+select 11
+		color [250,5,5]
+select 12
+		color [250,5,5]
+select 13
+		color [133,57,240]
+select 14
+		color [250,5,5]
+select 15
+		color [133,57,240]
+select 16
+		color [2,2,120]
+select 17
+		color [133,57,240]
+select 18
+		color [2,2,120]
+select 19
+		color [2,2,120]
+select 20
+		color [2,2,120]
+select 21
+		color [133,57,240]
+select 22
+		color [133,57,240]
+select 23
+		color [2,2,120]
+select 24
+		color [133,57,240]
+select 25
+		color [133,57,240]
+select 26
+		color [2,2,120]
+select 27
+		color [133,57,240]
+select 28
+		color [2,2,120]
+select 29
+		color [133,57,240]
+select 30
+		color [133,57,240]
+select 31
+		color [2,2,120]
+select 32
+		color [250,5,5]
+select 33
+		color [250,5,5]
+select 34
+		color [2,2,120]
+select 35
+		color [2,2,120]
+select 36
+		color [250,5,5]
+select 37
+		color [186,60,200]
+select 38
+		color [2,2,120]
+select 39
+		color [2,2,120]
+select 40
+		color [186,60,200]
+select 41
+		color [250,5,5]
+select 42
+		color [133,57,240]
+select 43
+		color [133,57,240]
+select 44
+		color [250,5,5]
+select 45
+		color [133,57,240]
+select 46
+		color [2,2,120]
+select 47
+		color [133,57,240]
+select 48
+		color [2,2,120]
+select 49
+		color [133,57,240]
+select 50
+		color [2,2,120]
+select 51
+		color [133,57,240]
+select 52
+		color [2,2,120]
+select 53
+		color [2,2,120]
+select 54
+		color [2,2,120]
+select 55
+		color [2,2,120]
+select 56
+		color [2,2,120]
+select 57
+		color [2,2,120]
+select 58
+		color [2,2,120]
+select 59
+		color [2,2,120]
+select 60
+		color [2,2,120]
+select 61
+		color [2,2,120]
+select 62
+		color [2,2,120]
+select 63
+		color [186,60,200]
+select 64
+		color [250,5,5]
+select 65
+		color [2,2,120]
+select 66
+		color [2,2,120]
+select 67
+		color [250,5,5]
+select 68
+		color [200,60,160]
+select 69
+		color [133,57,240]
+select 70
+		color [250,5,5]
+select 71
+		color [133,57,240]
+select 72
+		color [133,57,240]
+select 73
+		color [133,57,240]
+select 74
+		color [250,5,5]
+select 75
+		color [250,5,5]
+select 76
+		color [2,2,120]
+select 77
+		color [2,2,120]
+select 78
+		color [2,2,120]
+select 79
+		color [200,60,160]
+select 80
+		color [200,60,160]
+select 81
+		color [133,57,240]
+select 82
+		color [133,57,240]
+select 83
+		color [250,5,5]
+select 84
+		color [2,2,120]
+select 85
+		color [2,2,120]
+select 86
+		color [250,5,5]
+select 87
+		color [250,5,5]
+select 88
+		color [133,57,240]
+select 89
+		color [2,2,120]
+select 90
+		color [2,2,120]
+select 91
+		color [2,2,120]
+select 92
+		color [2,2,120]
+select 93
+		color [2,2,120]
+select 94
+		color [2,2,120]
+select 95
+		color [2,2,120]
+select 96
+		color [133,57,240]
+select 97
+		color [2,2,120]
+select 98
+		color [133,57,240]
+select 99
+		color [133,57,240]
+select 100
+		color [250,5,5]
+select 101
+		color [133,57,240]
+select 102
+		color [2,2,120]
+select 103
+		color [133,57,240]
+select 104
+		color [2,2,120]
+select 105
+		color [133,57,240]
+select 106
+		color [200,60,160]
+select 107
+		color [186,60,200]
+select 108
+		color [133,57,240]
+select 109
+		color [133,57,240]
+select 110
+		color [133,57,240]
+select 111
+		color [2,2,120]
+select 112
+		color [2,2,120]
+select 113
+		color [250,5,5]
+select 114
+		color [133,57,240]
+select 115
+		color [250,5,5]
+select 116
+		color [250,5,5]
+select 117
+		color [2,2,120]
+select 118
+		color [2,2,120]
+select 119
+		color [250,5,5]
+select 120
+		color [250,5,5]
+select 121
+		color [133,57,240]
+select 122
+		color [133,57,240]
+select 123
+		color [200,60,160]
+select 124
+		color [133,57,240]
+select 125
+		color [133,57,240]
+select 126
+		color [250,5,5]
+select 127
+		color [250,5,5]
+select 128
+		color [2,2,120]
+select 129
+		color [133,57,240]
+select 130
+		color [133,57,240]
+select 131
+		color [133,57,240]
+select 132
+		color [250,5,5]
+select 133
+		color [133,57,240]
+select 133a
+		color [250,5,5]
+select 134
+		color [200,60,160]

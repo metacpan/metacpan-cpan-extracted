@@ -1,0 +1,27 @@
+---
+abstract: 'Apple Push Notification Service for Mojolicious'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-APNS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::Socket::SSL: '1.84'
+  Mojolicious: '5.30'
+resources:
+  bugtracker: https://github.com/jhthorsen/mojo-apns/issues
+  homepage: https://github.com/jhthorsen/mojo-apns
+  repository: https://github.com/jhthorsen/mojo-apns.git
+version: '1.00'

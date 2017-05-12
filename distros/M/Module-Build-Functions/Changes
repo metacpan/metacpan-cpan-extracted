@@ -1,0 +1,31 @@
+Revision history for Module-Build-Functions
+
+
+0.03    01/19/2010
+    - added 'auto_configure_requires' flag
+    - fixed several test failures which were relying on examination of
+    the Module::Build internals, which slightly changed after 0.35_01
+
+0.02    Fri Jan 15 2010
+    - added missed inc::Module::Build::Functions
+    
+
+0.01    Sun Jan 10 2010
+    First prod release
+    - Implemented self-bundling functionality 
+      (borrowed directly from Module::Install)
+    - Fixed several small bugs
+    - Improved test coverage
+    - Improved documentation
+
+
+0.001_010  Thu Jun 18 2009
+    1. Fixing and adding documentation (I never 
+       can get POD right on the first pass!)
+    2. Adding tests.
+	3. Adding a cygwin routine.
+	4. Making meta_merge work well.
+
+0.001_009  Tue Jun 16 2009
+       Initial release.
+

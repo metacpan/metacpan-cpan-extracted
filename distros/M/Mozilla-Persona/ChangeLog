@@ -1,0 +1,28 @@
+
+===== version history for Mozilla::Persona
+
+All modifications are made by Mark Overmeer, unless explicitly stated
+differently.
+
+version 0.12: Thu Nov 22 10:53:43 CET 2012
+
+	First release
+
+	Fixes:
+	- lookup default www* group
+	- JSON does not accept comments.
+	- repair loading of plugins
+	- error handling of Digest use
+	- no loop in index.pl
+
+	Improvements:
+	- look also for default group www-data on setup.
+	- default domain option for ::Table
+	- more help in bin/persona
+
+version 0.11: Wed Nov 21 14:12:15 CET 2012
+	- added ::Validate::Table
+	- improved dependencies
+
+version 0.10: Wed Nov 20
+	- initial implementation

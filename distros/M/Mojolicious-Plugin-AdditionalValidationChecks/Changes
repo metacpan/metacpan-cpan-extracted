@@ -1,0 +1,80 @@
+Release history for Mojolicious-Plugin-AdditionalValidationChecks
+=================================================================
+
+0.14 2016-06-17
+
+  [IMPROVEMENTS]
+  * fixed handling of phone number checks (thanks to Florian Heyer, #2)
+
+0.13 2014-01-02
+
+  [IMPROVEMENTS]
+  * add check for ISO dates (YYYY-MM-DD)
+
+0.12 2014-12-28
+
+  [IMPROVEMENTS]
+  * add "number" check (float || int)
+
+0.11 2014-12-27
+
+  [IMPROVEMENTS]
+  * add between check
+
+0.10 2014-12-26
+
+  [IMPROVEMENTS]
+  * add check for ipv6
+
+0.09 2014-12-25
+
+  [IMPROVEMENTS]
+  * add ip check
+
+0.08 2014-12-24
+
+  [IMPROVEMENTS]
+  * add hex check
+  * add float check
+
+  [DOCUMENTATION]
+  * Add Acknowledgements
+
+0.07 2014-12-22
+
+  [IMPROVEMENTS]
+  * add UUID check
+
+0.06 2014-12-11
+
+  [IMPROVEMENTS]
+  * add color check
+
+0.05 2014-12-11
+
+  [MISC]
+  * Added Net::Domain::TLD as prereq as TravisCI reported a problem under Perl 5.20
+  * Added TravisCI config
+
+0.04 2014-12-08
+
+  [IMPROVEMENTS]
+  * add "not" check 
+
+  [TESTS]
+  * remove local test as this wasn't stable
+
+0.03 2014-12-01
+
+  [IMPROVEMENTS]
+  * add length check and tests
+
+0.02 2014-11-30
+
+  [IMPROVEMENTS]
+  * add phone check and tests
+
+0.01 2014-11-29
+
+  * initial release
+

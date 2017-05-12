@@ -1,0 +1,30 @@
+---
+abstract: 'use DBIx::Simple::Class in your application.'
+author:
+  - "Ð\x9AÑ\x80Ð°Ñ\x81Ð¸Ð¼Ð¸Ñ\x80 Ð\x91ÐµÑ\x80Ð¾Ð² <berov@cpan.org>"
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-DSC
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  DBIx::Simple::Class: '1.009'
+  Mojolicious: '6.0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/kberov/Mojolicious--Plugin--DSC/issues
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/kberov/Mojolicious--Plugin--DSC
+version: '1.006'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

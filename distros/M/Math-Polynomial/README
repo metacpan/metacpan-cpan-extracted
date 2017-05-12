@@ -1,0 +1,70 @@
+Math-Polynomial version 1.011
+=============================
+
+Math::Polynomial is a Perl class representing polynomials in one
+variable.  It provides a set of operations defined for polynomials,
+like addition, multiplication, division with remainder, evaluation,
+nesting, etc., as well as attribute inspection and formatting
+capabilities.
+
+More documentation is in the module file, available through perldoc.
+Some additional usage examples can be found in the examples subdirectory.
+
+DLSIP STATUS
+
+   Development State:  R - Released
+   Language Used:      p - Perl-only
+   Support Level:      d - Developer
+   Interface Style:    O - Object oriented
+   Public License:     p - Standard-Perl
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+PROVIDED MODULES AND SCRIPTS
+
+The distribution provides these modules:
+
+  - Math::Polynomial          - main module
+  - Math::Polynomial::Generic - interface extension (deprecated)
+
+There are no scripts included as a part of the user interface.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries to run:
+
+  - perl version 5.6.0 or higher
+  - overload        (usually bundled with perl)
+  - Carp            (usually bundled with perl)
+
+Additional requirements to run the test suite:
+
+  - Test            (usually bundled with perl)
+
+Recommended modules for increased functionality:
+
+  - Math::Complex   (usually bundled with perl)
+  - Math::BigRat    (bundled with recent versions of perl, also on CPAN)
+  - Math::ModInt    (available on CPAN)
+
+AUTHOR
+
+Written and maintained by Martin Becker "becker-cpan-mp@cozap.com".
+
+Inspired by the module of the same name written by Mats Kindahl
+"mats@kindahl.net" 1997-2001, maintained by Martin Becker since 2007.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2007-2016 by Martin Becker.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.0 or,
+at your option, any later version of Perl 5 you may have available.

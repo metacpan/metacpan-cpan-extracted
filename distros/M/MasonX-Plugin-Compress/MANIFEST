@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/MasonX/Plugin/Compress.pm
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/01.gzip.t
+t/02.deflate.t
+t/03.bzip2.t
+t/04.flub.t
+t/05.not_text.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL

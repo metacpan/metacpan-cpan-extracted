@@ -1,0 +1,90 @@
+digraph install {
+	graph [rankdir=BT,
+		ratio=auto
+	];
+	node [fillcolor="#ffff99",
+		fontname=Arial,
+		fontsize=10,
+		label="\N",
+		shape=box,
+		style=filled
+	];
+	edge [color=red];
+	install	 [label=install];
+	pure_install	 [label=pure_install];
+	pure_install -> install;
+	pure_site_install	 [label=pure_site_install];
+	pure_site_install -> pure_install;
+	all	 [label=all];
+	all -> pure_site_install;
+	doc_site_install	 [label=doc_site_install];
+	all -> doc_site_install;
+	pure_all	 [label=pure_all];
+	pure_all -> all;
+	manifypods	 [label=manifypods];
+	pure_all -> manifypods;
+	config	 [label=config];
+	config -> pure_all;
+	Makefile	 [label=Makefile];
+	Makefile -> config;
+	pm_to_blib	 [label=pm_to_blib];
+	Makefile -> pm_to_blib;
+	dynamic	 [label=dynamic];
+	Makefile -> dynamic;
+	node14	 [label="...cript/gvmake"];
+	Makefile -> node14;
+	node1	 [label="Makefile.PL"];
+	node1 -> Makefile;
+	node4	 [label="...efile/.exists"];
+	node1 -> node4;
+	node5	 [label=".../arch/.exists"];
+	node1 -> node5;
+	node6	 [label="...phViz/.exists"];
+	node1 -> node6;
+	node7	 [label="...phViz/.exists"];
+	node1 -> node7;
+	node8	 [label="...b/bin/.exists"];
+	node1 -> node8;
+	node9	 [label="...cript/.exists"];
+	node1 -> node9;
+	node10	 [label=".../man1/.exists"];
+	node1 -> node10;
+	node11	 [label=".../man3/.exists"];
+	node1 -> node11;
+	node2	 [label="...multi/Config.pm"];
+	node2 -> Makefile;
+	node3	 [label=".../CORE/config.h"];
+	node3 -> Makefile;
+	blibdirs	 [label=blibdirs];
+	blibdirs -> config;
+	node4 -> blibdirs;
+	node5 -> blibdirs;
+	node6 -> blibdirs;
+	node7 -> blibdirs;
+	node8 -> blibdirs;
+	node8 -> node14;
+	node9 -> blibdirs;
+	node9 -> node14;
+	node10 -> blibdirs;
+	node11 -> blibdirs;
+	installdeps	 [label=installdeps];
+	installdeps -> config;
+	pm_to_blib -> pure_all;
+	node12	 [label="...efile/GraphViz.pm"];
+	node12 -> pm_to_blib;
+	node12 -> manifypods;
+	subdirs	 [label=subdirs];
+	subdirs -> pure_all;
+	node13	 [label="$(MYEXTLIB)"];
+	node13 -> subdirs;
+	linkext	 [label=linkext];
+	linkext -> pure_all;
+	dynamic -> linkext;
+	node14 -> pure_all;
+	node15	 [label="...cript/gvmake"];
+	node15 -> node14;
+	manifypods -> all;
+	doc_install	 [label=doc_install];
+	doc_install -> install;
+	doc_site_install -> doc_install;
+}

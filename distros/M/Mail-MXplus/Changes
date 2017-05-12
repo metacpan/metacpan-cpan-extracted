@@ -1,0 +1,10 @@
+Revision history for Perl extension Mail::MXplus.
+
+0.02  2005-09-28 
+	- Minor change to README file.
+
+0.01  Thu Aug 25 14:38:10 2005
+	- original version; created by h2xs 1.22 with options
+		-XA Mail::MXplus
+
+

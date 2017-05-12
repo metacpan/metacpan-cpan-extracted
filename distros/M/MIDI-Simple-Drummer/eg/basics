@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Data::Dumper;
+use MIDI::Simple::Drummer;
+my $d = MIDI::Simple::Drummer->new();
+
+# Beat metrics:
+printf("%d phrases of %d beats per measure where one %s-note (1/%d) gets the beat in %s time.\n",
+    $d->phrases, $d->beats, lc($d->div_name), $d->divisions, $d->signature
+);
+
+# MIDI note numbers:
+printf("Snare: %s. Kick: %s. Tick: %s\n", $d->snare, $d->kick, $d->tick);
+
+# Kit access examples:
+#printf("%s: %s\n",
+#    $d->name_of('kick'), # or: join(' ', @{$d->kit('kick')}), # or: ($d->kit('kick'))[0],
+#    $d->kick,
+#);
+printf("Backbeat: '%s' - '%s' [%s - %s]\n",
+    $d->name_of('backbeat'),
+    $d->_p2n->{($d->name_of('backbeat'))[0]},
+    $d->_p2n->{($d->name_of('backbeat'))[1]},
+);
+# The whole kit:
+#warn Data::Dumper->new([ $d->kit ])->Indent(1)->Terse(1)->Sortkeys(1)->Dump;
+
+# Patch name to number:
+#print Data::Dumper->new([ $d->_p2n ])->Indent(1)->Terse(1)->Sortkeys(1)->Dump;
+
+# The known patterns:
+#print 'Known patterns: ', Data::Dumper->new([ $d->patterns ])->Indent(1)->Terse(1)->Sortkeys(1)->Dump;
+
+# The MIDI::Simple score object:
+#print 'Object: '. $d->score;
+#print Data::Dumper->new([ $d->score ])->Indent(1)->Terse(1)->Sortkeys(1)->Dump;
+

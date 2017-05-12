@@ -1,0 +1,23 @@
+CHANGES
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/GithubMeta.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Mac/Safari/JavaScript.pm
+lib/Mac/Safari/JavaScript/Exception.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+t/000load.t
+t/001pod.t
+t/002podcoverage.t
+t/003perlcritic.t
+t/02trytiny.t
+t/anyperlperlcriticrc
+t/basic.t

@@ -1,0 +1,32 @@
+MultiProcFactory version 0.04
+=============================
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  IPC::Shareable 
+
+THANKS
+
+Ed Summers for helping me bundle this up and serve it up to you. 
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 Aaron Dancygier <adancygier@bigfootinteractive.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

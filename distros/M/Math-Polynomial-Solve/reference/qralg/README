@@ -1,0 +1,74 @@
+                                            Sun Apr  4, 1999
+                                            Version 1.0
+
+This is a demo of the root finding program for the real 
+coefficient monic polynomial. 
+
+  Program is based on the companion method.
+The companion matrix corresponding to the real coeff 
+monic polynomial is created,
+and then balanced is solved by the double-QR iteration
+to find the all eigenvalues of the balanced matrix.
+The eigenvalues are the roots of the original monic polynomial.
+
+(For the case of complex valued coefficients, the use of the 
+Francis QR-iteration for the complex Hessenberg matrix and 
+the appropriate modification of the arithmetics including 
+the companion and the balancing will do. But this sample 
+does not include the complex coefficient version. )
+
+The source code which is mostly within the fortran77 language,
+however the do-enddo loop structure and names longer than 6 
+letters including the underscore for character are introduced.
+
+This directory contains:
+        README   : This file.
+        Makefile : Makefile for the most UNIX-like systems.
+        qralg.f  : The subroutines for the companion method.
+        test.f   : Program to test the companion method.
+
+In this directory,
+
+% make 
+
+will produce a.out as the executable.
+
+% a.out
+
+will ask user the value of degree of the monic-polynomial,
+then the coefficients of from the constant term to
+the higher ones except the principal term successively.
+The compuation of the roots will be made then 
+and printed with some information related to the accuracies.
+
+
+NOTE:
+  In the subroutine balance_companion in file "qralg.f",
+depending on the base of floating point number system,
+the value of parameter b is chosen to 2(for example IEEE float) 
+or 16( for example IBM 360/370 float).
+  In calling the qr_algeq_solver, the value macheps have to be
+chosen appropriately depending on the machine epsilon of the 
+floating point number used in computation.
+  The balancing the companion is very crucial to the accuracies
+of the compuated roots and not to be ommitted.
+  The companion method can solve quite high degree problem
+stable in the meaning of the backward error analysis. Even the
+500 or 1000 degree problems may be solved.
+
+
+References:
+ 
+1.     "The QR Algorithm for Real Hessenberg Matrices"
+        by R.S.Martin, G.Peters and J.H.Wilkinson,
+        Numer. Math. 14, 219-231(1970).
+
+2.      "Balancing a Matrixfor Calculation of Eigenvalues 
+        and Eigenvectors" by B.N.Parlett and C.Reinsch, 
+        Numer. Math. 13, 293-304(1969).
+
+3.      "Polynomial Roots from Companion Matrix Eigenvalues",
+        by Alan Edelman and H. Murakami,
+        Math. Comp., v64,#210, pp.763-776(1995).
+
+END OF THIS FILE.

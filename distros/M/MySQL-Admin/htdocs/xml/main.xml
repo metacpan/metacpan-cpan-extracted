@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+	<action position="top" output="requestURI">
+		<title>News</title>
+		<xml>cgi-bin/mysql.pl?action=news</xml>
+		<out>content</out>
+		<id>news</id>
+		<text>news</text>
+	</action>
+	<action position="top" output="requestURI">
+		<title>gbook</title>
+		<xml>cgi-bin/mysql.pl?action=gbook</xml>
+		<out>content</out>
+		<id>gbook</id>
+		<text>gbook</text>
+	</action>
+	<action  position="top" output="requestURI">
+		<xml>cgi-bin/mysql.pl?action=links</xml>
+		<out>content</out>
+		<id>links</id>
+		<text>links</text>
+		<title>links</title>
+	</action>
+	<action output="requestURI">
+		<xml>cgi-bin/mysql.pl?action=showLogin</xml>
+		<out>content</out>
+		<id>showLogin</id>
+		<text>login</text>
+		<title>login</title>
+	</action>
+	<action position="top" output="requestURI">
+		<xml>cgi-bin/mysql.pl?action=fulltext</xml>
+		<out>content</out>
+		<id>fulltext</id>
+		<text>fulltext</text>
+		<title>fulltext</title>
+	</action>
+</actions>

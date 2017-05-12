@@ -1,0 +1,23 @@
+---
+abstract: 'Perl 5 module to talk to a POP3 (RFC1939) server'
+author:
+  - 'Sean Dowd <pop3client@dowds.net>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.78, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mail-POP3Client
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: 5.006001
+resources:
+  repository: https://github.com/ssdowd/mail-pop3client
+version: 2.19

@@ -1,0 +1,73 @@
+NAME
+    Mac::EyeTV - Interface to the Elgato EyeTV Digital Video Recorder
+
+SYNOPSIS
+      use Mac::EyeTV;
+      my $eyetv = Mac::EyeTV->new();
+
+      # See Mac::EyeTV::Channel
+      foreach my $channel ($eyetv->channels) {
+        my $name   = $channel->name;
+        my $number = $channel->number;
+        print "$number $name\n";
+      }
+
+      # See Mac::EyeTV::Programme
+      foreach my $programme ($eyetv->programmes) {
+        my $start = $programme->start;
+        my $stop  = $programme->stop;
+        my $title = $programme->title;
+        print "$title $start - $stop\n";
+      }
+
+DESCRIPTION
+    This module allows you to interface to the Elgato EyeTV Digital Video
+    Recorder. EyeTV is a piece of software and hardware for Mac OS X which
+    can record and play back television much like a Tivo. This module allows
+    you to interface to the EyeTV software, view the channel list and the
+    recorded programmes and schedule recordings.
+
+    See Mac::EyeTV::Programme for information on scheduling a recording.
+
+    You should create Mac::Glue bindings to EyeTV before using this (along
+    the lines of 'sudo gluemac EyeTV').
+
+    The EyeTV software itself is available from Elgato Systems at
+    http://www.elgato.com/index.php?file=support_updates_eyetv
+
+METHODS
+  new
+    This is the constructor, which takes no arguments:
+
+      my $eyetv = Mac::EyeTV->new();
+
+  channels
+    This returns the channels known by EyeTV:
+
+      # See Mac::EyeTV::Channel
+      foreach my $channel ($eyetv->channels) {
+        my $name   = $channel->name;
+        my $number = $channel->number;
+        print "$number $name\n";
+      }
+
+  programmes
+    This returns the programmes known by EyeTV:
+
+      # See Mac::EyeTV::Programme
+      foreach my $program ($eyetv->programmes) {
+        my $start = $programme->start;
+        my $stop  = $programme->stop;
+        my $title = $programme->title;
+        print "$title $start - $stop\n";
+      }
+
+AUTHOR
+    Leon Brocard <acme@astray.com>.
+
+COPYRIGHT
+    Copyright (C) 2004-5, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

@@ -1,0 +1,54 @@
+{
+   "abstract" : "L<IO> related constraints and coercions for Moose",
+   "author" : [
+      "Fayland Lam <fayland@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4203",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Types-IO",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO" : "0",
+            "IO::All" : "0",
+            "IO::String" : "0",
+            "MooseX::Types" : "0",
+            "Test::Exception" : "0.27",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::Types::IO" : {
+         "file" : "lib/MooseX/Types/IO.pm",
+         "version" : "0.04"
+      },
+      "MooseX::Types::IO::All" : {
+         "file" : "lib/MooseX/Types/IO/All.pm",
+         "version" : "0.04"
+      },
+      "MooseX::Types::IO_Global" : {
+         "file" : "lib/MooseX/Types/IO_Global.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.04"
+}

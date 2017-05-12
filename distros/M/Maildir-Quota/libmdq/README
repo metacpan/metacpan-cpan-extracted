@@ -1,0 +1,89 @@
+* $Id: README,v 1.1 2003/11/24 15:34:38 lwa Exp $
+
+* What is it ?
+
+ libmdq is a library is a quota managment library for Maildir++ soft
+quota system. On the system, a cache file with the current amount of
+space used is keeped in the maildir. Time to time the cache file is
+recomputed.
+
+* API Tutorial
+
+Include mdq.h file in your programs :
+
+  #include <mdq.h>
+
+If you want to count trashed message, set 
+
+  mdq_trash_quota = 1;
+
+note that you shall do this in all of your programs.  If you want
+display diagnotics message, define mdq_error, for example, to get
+diagnotics to standart standart error, define a function like this :
+
+  #include <stdio.h>
+  #include <stdarg.h>
+  my_mdq_error(const char *format, va_list args) {
+     vprintf(stderr, format, args);
+  }
+
+then set it to mdq_error
+
+  mdq_error = my_mdq_error;
+
+If you plan to add message in the maildir, get user quota information,
+for example :
+  quotastr = "10000S";
+which mean that mailbox is limited to 10 Kb of total messages. If
+you plan to only remove message, you can use a NULL quota description
+string.
+
+Then open the quota description structure.
+
+  MDQ *q = mdq_open(".", quotastr);
+
+No need to check return value. On error mdq_open() will return NULL
+and NULL is a quota description pointer with no limits.
+
+To check if Maildir is not over quota :
+
+  if (mdq_test(q, 0, 0) == 0) {
+    ...
+  }
+
+to check if Maildir can recieve a message of 1000 bytes :
+
+  if (mdq_test(q, 1000, 1) == 0) {
+    ...
+  }
+
+mdq_test() would return -1 is theyre is no space left.
+
+After you have removed a message of 1000 bytes, tell it to the 
+quota system:
+
+  mdq_add(q, -1000, -1);
+
+After you have added a message of 1000 bytes, do it so:
+
+  mdq_add(q, 1000, 1);
+
+You may also add or remove messages by packets with a single
+mdq_add() call:
+
+  mdq_add(q, -3000, -3); /* 3 messages of 3000 bytes total removed */
+
+When you finished the Maildir message edition, 
+
+  mdq_close(q);
+
+This will flush data on disk if needed and close any opened
+ressources.
+
+The soft quota system is designed to use no lock. This mean
+informations may be wrong sometime, specialy when theyre is two or
+more maildir writers. To limit this effect when maildir is overquota,
+the quota total will be recomputed within 15 minuts. To avoid false
+information within long time, you shall not use persistent
+MDQ*. mdq_close() openned resources as soon as possible.
+

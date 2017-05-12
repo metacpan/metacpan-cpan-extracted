@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                MFor
+version:             0.052
+abstract:            A module for multi-dimension looping.
+license:             ~
+author:              
+    - Lin Yo-An <cornelius.howl@gmail.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

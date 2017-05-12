@@ -1,0 +1,36 @@
+Method::Declarative version 0.03
+================================
+
+Method::Declarative - create methods with declarative syntax
+
+This module is the result of yet another "wouldn't it be nice if...".
+In this case, it's the writing of `leven-teen hundred different dozen
+line long methods that differ by maybe four lines.
+
+INSTALLATION
+
+You can either use the standard:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+or you can use the new, improved:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+DEPENDENCIES
+
+This module requires Module::Build
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2006 by Jim Schneider, <perl@jrcsdevelopment.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.0 or,
+at your option, any later version of Perl 5 you may have available.

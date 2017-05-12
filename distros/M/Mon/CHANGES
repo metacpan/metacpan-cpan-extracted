@@ -1,0 +1,93 @@
+$Id: CHANGES 1.2 Sun, 29 Oct 2000 12:52:41 -0800 trockij $
+$Name:  $
+
+CHANGELOG
+
+Differences between Mon-0.10 and 0.11:
+Sun Oct 29 12:16:43 PST 2000
+--------------------------------------
+
+ -incorporated Andrew Ryan's "test config" patch
+
+
+Differences between Mon-0.8 and 0.9:
+Mon Feb 28 04:59:39 PST 2000
+------------------------------------
+
+  -removed prot_cmp functions and no more support
+   for talking with 0.37 servers. prot_cmp was making
+   monshow fail with "unknown protocol" error.
+
+
+Differences between Mon-0.7 and 0.8:
+Tue Feb 22 08:51:42 PST 2000
+------------------------------------
+  -fixed the operation of the "test" command
+
+  -list_opstatus now accepts ([group, service], ...)
+
+  -version is now set properly
+
+  -added list_watch
+
+  -added protid, and optionally verify protocol ID upon
+   connect (can be disabled, read the man page).
+
+
+Differences between Mon-0.6 and 0.7:
+Sun Feb  6 13:07:57 PST 2000
+------------------------------------
+    -Fixed a problem with the "test" function. It now requires
+     the type of test as the first argument. Bug reported by
+     andrewr@myCFO.com and rjentsch@electronicpartner.de.
+
+    -reload accepts arguments such as "reload auth"
+
+    -fix "list pids" output parsing to match what mon-0.38.16 does.
+
+    -list_dtlog submitted by Martha H Greenberg <marthag@mit.edu>
+
+
+Differences between Mon-0.5 and 0.6:
+Tue Nov 16 10:51:26 PST 1999
+------------------------------------
+    -Added Mon::Protocol.
+
+    -Some code cleanups
+
+    -Added new quoting rules for mon-0.38.15
+
+    -implemented get and set
+
+    -supports escaped values
+
+
+Differences between Mon-0.4 and 0.5:
+------------------------------------
+    -Fixed bug in old (before 0.38) opstatus parsing for Client.pm
+
+
+Differences between Mon-0.3 and 0.4:
+------------------------------------
+    -Changed argument format for "prot", and added "prot_cmp", and
+     made appropriate documentation updates.
+
+    -$self->{"VERSION"} now defaults to undef (like it should),
+     since it is not the _requested_ protocol version, it is the
+     version obtained by asking the server. The _requested_ protocol
+     version is specified via $self->prot().
+
+    -_list_opstatus now uses $self->prot() to figure out how to behave
+     when talking to the server.
+
+    -Export %OPSTAT for use by clients
+
+
+Differences between Mon-0.1 and 0.3:
+------------------------------------
+
+    -Added send_trap, submitted by Lars Marowsky-Bree <lmb@teuto.net>.
+
+    -new now lets you initialize variables.
+
+    -Updated docs.

@@ -1,0 +1,118 @@
+0.61
+   Fri Jan 30 21:24:00 UTC 2009 ($Rev: 64 $, $Author: chromatic $)
+   - updated for Mail::Action 0.45
+   - added Perl dependency on 5.8.6
+   - removed some backwards compatibility distribution code
+   - fixed tests per Email::Simple changes
+
+   Fri Nov 26 20:35:06 UTC 2004 (Rev: 55, Author: chromatic)
+   - update Build.PL requirement on Mail::Action 0.42
+
+   Fri Nov 26 20:26:12 UTC 2004 (Rev: 53, Author: chromatic)
+   - look for request recipient first, over To header
+   - don't double-parse recipient
+   - added expansion_pattern() for overriding if necessary
+
+0.61
+   Wed Sep 29 04:49:04 UTC 2004 (Rev: 49, Author: chromatic)
+   - migrate Mail::TempAddress to work with Mail::Action::Request
+   - simplify the tests at the same time
+
+   Sat Sep 25 19:19:11 UTC 2004 (Rev: 45, Author: chromatic)
+   - work with new header-checking scheme in Mail::TempAddress
+   - remove Cc field when responding (may not be perfectly correct, yet)
+
+0.60
+   Sun Jul 11 03:36:11 UTC 2004 (Rev: 41, Author: chromatic)
+   - ported to Mail::Action 0.40 (Email::Simple, Email::MIME)
+   - improved build requrements listing in Build.PL
+
+0.57
+   Sun Apr 11 05:51:54 UTC 2004 (Rev: 38, Author: chromatic)
+   - don't add newlines to multi-part messages in Mail::TempAddress::respond()
+
+0.56
+   Tue Mar 16 05:23:32 UTC 2004 (Rev: 35, Author: chromatic)
+   - added ChangeLog to MANIFEST
+
+   Tue Mar 16 05:18:44 UTC 2004 (Rev: 34, Author: chromatic)
+   - test for multipart message handling (t/customer.t)
+   - don't add spurious newlines (Mail::TempAddress)
+   
+   Mon Mar 15 06:10:52 UTC 2004 (Rev: 32, Author: chromatic)
+   - mark dependency on Mail::Action 0.30 in Build.PL
+
+   Mon Mar 15 02:57:14 UTC 2004 (Rev: 32, Author: chromatic)
+   - cleaned up t/tempaddress.t
+   - bumped version number
+
+   Thu Mar 11 01:46:26 UTC 2004 (Rev: 32, Author: chromatic)
+   - ported to new Mail::Action (using Mail::Message, not Mail::Internet)
+   - set author keyword expansion on ChangeLog
+   - removed copy_headers() from Mail::TempAddress (it's inherited)
+
+0.55
+   Sun Dec 14 00:59:51 UTC 2003 (Rev: 26)
+   - update dependency on Mail::Action
+
+   Sat Dec 13 22:41:32 UTC 2003 (Rev: 25)
+   - use Mail::Action::Address roles in Mail::TempAddress::Address
+   - add dependency on Class::Roles
+
+   Thu Dec 11 05:41:25 UTC 2003 (Rev: 24)
+   - factored out Mail::Action::Address
+   - updated files for 0.55 release
+
+0.54
+   Sun Nov  2 04:32:09 UTC 2003 (Rev: 23)
+   - factored out Mail::Action::Storage
+   - made Mail::TempAddress::Addresses extend Mail::Action::Storage
+
+   Sun Nov  2 03:28:19 UTC 2003 (Rev: 22)
+   - factored out Mail::Action
+   - made Mail::TempAddress extend Mail::Action
+
+0.53
+   Tue Oct 28 06:08:36 UTC 2003 (Rev: 21)
+   - added address_extension() to Mail::TempAddress::Addresses
+   - allow passing in Addresses and Message objects in M::TA constructor
+
+0.52
+   Sun Oct 26 03:23:54 UTC 2003 (Rev: 20)
+   - added POD
+   - added README with installation instructions
+   - first public release (to CPAN)
+
+   Sat Oct 25 21:18:27 UTC 2003
+   - added Description directive support
+
+0.51
+   Thu Oct 23 03:27:00 UTC 2003 (Rev: 18)
+   - added expiration dates to aliases (optional directive)
+   - added META.yml to MANIFEST
+   - minor cleanup in Mail::TempAddress
+
+0.10
+   Wed Oct  1 23:28:24 UTC 2003
+   - copy headers when replying or re-replying
+   - update ChangeLog for recent changes
+
+   Wed Oct  1 19:10:13 UTC 2003
+   - read incoming mail from filehandle or STDIN
+   - run all tests in tempaddress.t (oops)
+   - implement reject() in Mail::TempAddress
+
+   Mon Sep 29 17:56:01 UTC 2003
+   - replying to replies implemented
+   - key/sender storage improved
+   - documentation added
+   - build infrastructure added
+
+   Sun Sep 28 2003
+   - replying implemented
+   - storing from addresses implemented
+
+   Sat Sep 27 2003
+   - initial code written
+   - basic message receiving
+   - basic address creating, loading, and saving

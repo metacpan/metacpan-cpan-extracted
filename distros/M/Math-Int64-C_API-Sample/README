@@ -1,0 +1,25 @@
+Math-Int64-C_API-Sample
+=======================
+
+Sample usage of Math::Int64 C API
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Math::Int64
+
+COPYRIGHT AND LICENCE
+
+This module is in the public domain.
+
+

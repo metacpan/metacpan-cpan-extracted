@@ -1,0 +1,7 @@
+[
+  {
+    "label": "Price",
+    "name" : "price",
+    "type" : "select"
+  }
+]

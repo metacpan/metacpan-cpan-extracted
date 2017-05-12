@@ -1,0 +1,409 @@
+=head1 NAME
+
+MBclient - Add modbus TCP or RTU functions for your program.
+
+=head1 SYNOPSIS
+
+  use strict;
+  use MBclient;
+
+  my $m = MBclient->new();
+  # define server target
+  $m->host("localhost");
+  $m->unit_id(1);
+
+  # read 16 bits register from ad 0 to 9
+  my $words = $m->read_holding_registers(0, 10);
+
+  # print words
+  foreach my $word (@$words) {
+    print $word."\n";
+  }
+
+  # clean exit
+  $m->close();
+  exit 0;
+
+=head1 DESCRIPTION
+
+Modbus is a standard serial communication protocol used to interconnect industrial
+PLC (and a lot of other things). This module gives you access to TCP and RTU
+version of this protocol, through the MBclient object.
+
+You can have a look at http://en.wikipedia.org/wiki/Modbus for details.
+
+=head1 INSTALL
+
+You can install this module from:
+
+CPAN, the easy way:
+
+    sudo perl -MCPAN -e'install MBclient'
+
+GitHub:
+
+    git clone https://github.com/sourceperl/MBclient.git
+    cd MBclient
+    perl Makefile.PL
+    make
+    make test
+    sudo make install
+
+=head1 DEPENDENCIES
+
+This module requires no other module or librarie.
+
+It's pure Perl code without any extension.
+
+=head1 USAGE
+
+=head2 How you might use this
+
+Here is how you I<might> use the MBclient module.
+
+First you have to create the object, and to set main params : host, port and unit_id.
+
+Then call open() function, or directly a "modbus function". In any case, you have to call the close() method, in order
+to cleanly close the TCP link.
+
+=head2 Functions
+
+The following functions are defined in the MBclient module. Most of
+them are I<public>, meaning that you're supposed to use
+them. Some are I<private>, meaning that you're not supposed to use
+them. Assume that functions are I<public>
+unless otherwise documented.
+
+=over
+
+=item new()
+
+new() create an MBclient object.
+
+Example: C<my $m = MBclient-E<gt>new();>
+
+=item open()
+
+open() funtion open the TCP link. If the TCP link is up when the function is
+called a close/open cycle is initiated.
+
+This function return undef in case of error.
+
+Example: C<$m-E<gt>open();>
+
+=item is_open()
+
+is_open() return True if TCP link is open, False when TCP is closed
+
+Example: C<$m-E<gt>is_open();>
+
+=item close()
+
+close() function close the TCP link.
+
+Return True if success, undef if error.
+
+Example: C<$m-E<gt>close();>
+
+=item mode(MODBUS_MODE)
+
+Use to set modbus mode : TCP (default value) or RTU (add crc16 on every frame).
+
+2 constants are import with this module MODBUS_TCP and MODBUS_RTU. Use it to
+define modbus mode.
+
+Example: C<$m-E<gt>mode(MODBUS_RTU);>
+
+=item host(hostname)
+
+Use to set server IPv4 like "192.168.0.1" or URL name like "plc1.domain.net".
+
+Return "hostname" if success, undef in other case.
+
+Example: C<$m-E<gt>host("192.168.0.1");>
+
+You can read hostname property if you call host() without arg.
+
+=item port(port)
+
+Use to set server port (default is 502).
+
+Return "port" if success, undef in other case.
+
+Example: C<$m-E<gt>port(888);>
+
+You can read port property if you call port() without arg.
+
+=item unit_id(uid)
+
+Use to set server modbus unit id (default is 1).
+
+Return "uid" if success, undef in other case.
+
+Example: C<$m-E<gt>unit_id(1);>
+
+You can read port property if you call unit_id() without arg.
+
+=item last_error()
+
+last_error() return last error on MBclient object.
+
+See source code for "module error code" list.
+
+Each error is a constant import in your program, so you can do thing like:
+
+  if ($m->last_error() == MB_RESOLVE_ERR) {
+    print "unable to resolve name\n";
+    exit 2;
+  }
+
+=item last_except()
+
+last_except() return last modbus exception code.
+
+See source code for "modbus except code" list.
+
+Each except is a constant import in your program, so you can do thing like:
+
+  if ($m->last_except() == EXP_GATEWAY_PATH_UNAVAILABLE) {
+    print "check your modbus gateway please\n";
+    exit 3;
+  }
+
+=item version()
+
+version() return current version.
+
+Example: C<print $m-E<gt>version();>
+
+=item read_coils(bit_addr, bit_nb)
+
+read_coils() is standard modbus function 1.
+
+This funtion read "bit_nb" number of bits at "bit_addr" bit address.
+
+Return a ref to a bits array or undef if error.
+
+Example read 10 bits at address 55:
+
+  my $bits = $m->read_coils(55, 10);
+  foreach my $bit (@$bits) {
+    print $bit."\n";
+  }
+
+=item read_discrete_inputs(bit_addr, bit_nb)
+
+read_discrete_inputs() is standard modbus function 2.
+
+This funtion read "bit_nb" number of bits at "bit_addr" bit address.
+
+Return a ref to a bits array or undef if error.
+
+Example read 1 bit at hex address 45:
+
+  my $bits = $m->read_discrete_inputs(0x45, 1);
+  if ($bits) {
+    print $$bits[0]."\n";
+  } else {
+    print "error code: ".$m->last_error()."\n";
+  }
+
+=item read_holding_registers(reg_addr, reg_nb)
+
+read_holding_registers() is standard modbus function 3.
+
+This funtion read "reg_nb" number of registers at "reg_addr" register address.
+
+Return a ref to a registers array or undef if error.
+
+Example read 2 registers at hex address 66:
+
+  my $regs = $m->read_holding_registers(0x66, 2);
+  foreach my $reg (@$regs) {
+    print $reg."\n";
+  }
+
+=item read_input_registers(reg_addr, reg_nb)
+
+read_input_registers() is standard modbus function 4.
+
+This funtion read "reg_nb" number of registers at "reg_addr" register address.
+
+Return a ref to a registers array or undef if error.
+
+Example read 4 registers at hex address 100:
+
+  my $regs = $m->read_input_registers(0x100, 4);
+  foreach my $reg (@$regs) {
+    print $reg."\n";
+  }
+
+=item write_single_coil(bit_addr, bit_value)
+
+write_single_coil() is standard modbus function 5.
+
+This funtion write "bit_value" (0 or 1) to "bit_addr" bit address.
+
+Return True if write success, undef if error.
+
+Example write 1 on bit at address 45:
+
+  if ($m->write_single_coil(45, 1)) {
+    print "write success\n";
+  } else {
+    print "write error\n";
+  }
+
+
+=item write_single_register(reg_addr, reg_value)
+
+write_single_register() is standard modbus function 6.
+
+This funtion write "reg_value" register value to "reg_addr" register address.
+
+Return True if write success, undef if error.
+
+Example write 578 on register at address 55:
+
+  if ($m->write_single_register(55, 578)) {
+    print "write success\n";
+  } else {
+    print "write error\n";
+  }
+
+
+=item write_multiple_registers(reg_addr, ref_array_reg)
+
+write_multiple_registers() is standard modbus function 16.
+
+This funtion write an array of register with reference to this array in
+"ref_array_reg" at "reg_addr" register address.
+
+Return True if write success, undef if error.
+
+Example write 3 registers at address 780:
+
+  my @to_write = (45, 22, 33);
+  if ($m->write_multiple_registers(780, \@to_write)) {
+    print "write success\n";
+  } else {
+    print "write error\n";
+  }
+
+=item _mbus_frame(fc, body)
+
+B<PRIVATE>
+
+Build the modbus frame. Called with "fc" as function code and "body" as modbus
+body frame.
+
+Return the modbus frame or undef if error.
+
+=item _send_mbus(frame)
+
+B<PRIVATE>
+
+Send "frame" over the current socket with debug pretty print option.
+
+Return the number of byte send or undef if error.
+
+=item _recv_mbus()
+
+B<PRIVATE>
+
+Receive modbus frame.
+
+Return body of the modbus frame.
+
+=item _send(data)
+
+B<PRIVATE>
+
+Send "data" over the current socket.
+
+Return the number of byte send or undef if error.
+
+=item _recv(max_size)
+
+B<PRIVATE>
+
+Receive "max_size" bytes of data from the current socket.
+
+Return receive buffer or undef if error.
+
+=item _can_read()
+
+B<PRIVATE>
+
+This function wait for data available on socket, block for a max of timeout
+second.
+
+=item _crc(frame)
+
+B<PRIVATE>
+
+This function compute crc16 for arg "frame".
+
+Return crc16.
+
+=item _add_crc(frame)
+
+B<PRIVATE>
+
+Return modbus arg "frame" with crc16 at the end.
+
+=item _crc_is_ok(frame)
+
+B<PRIVATE>
+
+Check the crc16 of modbus arg frame.
+
+Return True if crc16 is ok, False in other case.
+
+=item _pretty_dump(label, data)
+
+B<PRIVATE>
+
+Print modbus/TCP frame in pretty format.
+
+=back
+
+=head1 NOTES
+
+- The file "examples/read_10_reg.pl " is provided as a basic script. You can use
+it as a skeleton to start writing a modbus script.
+
+- Advance users can enable debug messages with C<$m-E<gt>{debug}=1;>
+
+=head1 BUGS
+
+Thanks to report issues at https://github.com/sourceperl/MBclient/
+
+=head1 AUTHOR
+
+Loic Lefebvre, E<lt>lle@cpan.orgE<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2014 Loic Lefebvre
+
+The MIT License (MIT)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+

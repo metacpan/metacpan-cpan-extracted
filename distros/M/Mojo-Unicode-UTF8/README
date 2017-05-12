@@ -1,0 +1,46 @@
+NAME
+
+    Mojo::Unicode::UTF8 - use Unicode::UTF8 as the UTF-8 encoder for
+    Mojolicious
+
+SYNOPSIS
+
+     use Mojo::Unicode::UTF8;
+     use Mojo::Util 'decode', 'encode';
+     
+     # Preload for scripts using Mojo::Util
+     $ perl -MMojo::Unicode::UTF8 $(which morbo) myapp.pl
+     
+     # Must be set in environment for hypnotoad
+     $ PERL5OPT=-MMojo::Unicode::UTF8 hypnotoad myapp.pl
+
+DESCRIPTION
+
+    Mojo::Unicode::UTF8 is a monkey-patch module for using Unicode::UTF8 as
+    the UTF-8 encoder for a Mojolicious application, or anything else using
+    Mojo::Util. It must be loaded before Mojo::Util so the new functions
+    will be properly exported. Calling "decode" in Mojo::Util or "encode"
+    in Mojo::Util with any encoding other than UTF-8 will fall back to
+    Encode as normal. For details on the benefits, see "COMPARISON" in
+    Unicode::UTF8.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2015 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Mojo::Util, Unicode::UTF8, Encode
+

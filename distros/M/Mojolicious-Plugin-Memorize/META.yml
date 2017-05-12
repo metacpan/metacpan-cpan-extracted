@@ -1,0 +1,32 @@
+---
+abstract: 'Memorize part of your Mojolicious template'
+author:
+  - 'Joel Berger'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Memorize
+no_index:
+  directory:
+    - ex
+    - t
+  file:
+    - README.pod
+provides:
+  Mojolicious::Plugin::Memorize:
+    file: lib/Mojolicious/Plugin/Memorize.pm
+    version: '0.02'
+requires:
+  Mojolicious: '3.92'
+  perl: v5.10.1
+resources:
+  bugtracker: http://github.com/jberger/Mojolicious-Plugin-Memorize/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jberger/Mojolicious-Plugin-Memorize
+version: '0.02'

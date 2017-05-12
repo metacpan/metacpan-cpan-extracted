@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Math/Project3D/Plot.pm
+examples/example1.png
+t/00pod.t
+t/00podcover.t
+t/01tests.t
+META.yml                                 Module meta-data (added by MakeMaker)

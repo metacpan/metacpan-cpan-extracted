@@ -1,0 +1,69 @@
+NAME
+    MooseX::AbstractMethod - Declare methods requirements that must be
+    satisfied
+
+VERSION
+    This document describes version 0.004 of MooseX::AbstractMethod -
+    released August 31, 2012 as part of MooseX-AbstractMethod.
+
+SYNOPSIS
+        use Moose;
+        use MooseX::Abstract;
+
+        requires 'bar';
+
+        # synonm to 'requires'
+        abstract 'foo';
+
+DESCRIPTION
+    This extensions allows classes to flag certain methods as being required
+    to be implemented by a subclass, much as a Moose::Role does with
+    'requires'.
+
+USAGE
+    As in the synopsis, simply mark certain methods as being required by
+    subclasses by passing their names to "abstract" or "requires". This will
+    cause a method of the same name to be installed in the class that will
+    die horribly if it's ever called. Additionally, when a class is made
+    immutable, all of its methods are checked to see if they're marked as
+    abstract; if any abstract methods exists that were not created in the
+    current class, we die horribly.
+
+    Checking for method satisfaction on make_immutable isn't perfect, but
+    AFAICT it's the most reasonable approach possible at the moment.
+    (Corrections welcome.)
+
+NEW SUGAR
+  abstract
+    abstract() allows one to declare a method dependency that must be
+    satisfied by a subclass before it is invoked, and before the subclass is
+    made immutable.
+
+        abstract 'method_name_that_must_be_satisfied';
+
+  requires
+    requires() is a synonym for abstract() and works in the way you'd
+    expect.
+
+SOURCE
+    The development version is on github at
+    <http://github.com/RsrchBoy/moosex-abstractmethod> and may be cloned
+    from <git://github.com/RsrchBoy/moosex-abstractmethod.git>
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/moosex-abstractmethod/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2011 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

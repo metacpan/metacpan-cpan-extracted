@@ -1,0 +1,398 @@
+chunk
+stat list
+stat list
+stat list
+stat list
+stat list
+stat
+varlist
+var
+Name
+Y
+=
+explist
+exp
+function
+keyword function
+function
+funcbody
+(
+optional parlist
+namelist
+Name
+g
+)
+block
+chunk
+stat list
+stat
+keyword local
+local
+namelist
+Name
+a
+optional namelist initialization
+=
+explist
+exp
+function
+keyword function
+function
+funcbody
+(
+optional parlist
+namelist
+Name
+f
+)
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+var
+Name
+f
+)
+keyword end
+end
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+exp
+var
+Name
+a
+args
+(
+optional explist
+explist
+exp
+function
+keyword function
+function
+funcbody
+(
+optional parlist
+namelist
+Name
+f
+)
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+exp
+var
+Name
+g
+args
+(
+optional explist
+explist
+exp
+function
+keyword function
+function
+funcbody
+(
+optional parlist
+namelist
+Name
+x
+)
+block
+chunk
+stat list
+stat
+keyword local
+local
+namelist
+Name
+c
+optional namelist initialization
+=
+explist
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+var
+Name
+f
+)
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+exp
+var
+Name
+c
+args
+(
+optional explist
+explist
+exp
+var
+Name
+x
+)
+keyword end
+end
+)
+keyword end
+end
+)
+keyword end
+end
+stat
+varlist
+var
+Name
+F
+=
+explist
+exp
+function
+keyword function
+function
+funcbody
+(
+optional parlist
+namelist
+Name
+f
+)
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+function
+keyword function
+function
+funcbody
+(
+optional parlist
+namelist
+Name
+n
+)
+block
+chunk
+stat list
+stat
+keyword if
+if
+exp
+exp
+var
+Name
+n
+==
+exp
+Number
+0
+keyword then
+then
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+Number
+1
+elseif sequence
+optional else block
+keyword else
+else
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+exp
+var
+Name
+n
+*
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+exp
+var
+Name
+n
+-
+exp
+Number
+1
+)
+keyword end
+end
+keyword end
+end
+keyword end
+end
+stat
+varlist
+var
+Name
+factorial
+=
+explist
+exp
+exp
+var
+Name
+Y
+args
+(
+optional explist
+explist
+exp
+var
+Name
+F
+)
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+test
+optional colon name element
+funcbody
+(
+optional parlist
+namelist
+Name
+x
+)
+block
+chunk
+stat list
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+var
+Name
+x
+exp
+String
+double quoted string
+"! = "
+exp
+exp
+var
+Name
+factorial
+args
+(
+optional explist
+explist
+exp
+var
+Name
+x
+)
+exp
+String
+double quoted string
+"\n"
+)
+keyword end
+end
+stat
+keyword for
+for
+Name
+n
+=
+exp
+Number
+0
+,
+exp
+Number
+16
+keyword do
+do
+block
+chunk
+stat list
+stat
+functioncall
+prefixexp
+var
+Name
+test
+args
+(
+optional explist
+explist
+exp
+var
+Name
+n
+)
+keyword end
+end

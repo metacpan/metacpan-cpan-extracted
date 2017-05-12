@@ -1,0 +1,36 @@
+---
+abstract: 'Auto handling of Devel::NYTProf in your Mojolicious app'
+author:
+  - 'Lee Johnson <leejo@cpan.org>'
+build_requires:
+  Algorithm::Combinatorics: '0.27'
+  Test::Exception: '0.32'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-NYTProf
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Devel::NYTProf: '5.07'
+  File::Spec::Functions: '3.30'
+  File::Temp: '0.22'
+  File::Which: '1.09'
+  Mojolicious: '6.00'
+  Time::HiRes: '1.9719'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/Humanstate/mojolicious-plugin-nytprof/issues
+  homepage: https://metacpan.org/module/Mojolicious::Plugin::NYTProf
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/Humanstate/mojolicious-plugin-nytprof
+version: '0.20'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,40 @@
+=encoding UTF-8
+
+=head1 Revision history for Mediawiki-Blame
+
+=head2 0.0.3  2009-11-30
+
+Maintainance release, no features changed.
+
+=over
+
+=item Clarify licence according to L<http://www.perlfoundation.org/cpan_licensing_guidelines>.
+
+=item Disable Internet based live tests for now – the software I<does> work, just have to implement the tests in a more reliable way.
+
+=item Remove L<Perl::Version>, use plain strings instead.
+
+=item Update L<Module::Install>; alas this removes support for F<Build.PL>, change build instruction accordingly.
+
+=item Podify some plain text files; Pod fixes.
+
+=item Add some more stuff L<Mediawiki::Blame/"TO DO">.
+
+=item Add link to Levitation project.
+
+=back
+
+
+=head2 0.0.2  2007-08-01
+
+=over
+
+=item Made L<LWPx::ParanoidAgent> an optional feature.
+
+=item Amended diagnostics in the docs.
+
+=back
+
+=head2 0.0.1  2007-07-29
+
+Initial release.

@@ -1,0 +1,31 @@
+
+############################################################
+# This config-file is generic in the sense that it should  #
+# work correctly with most Redhat installations.  However, #
+# it may require modification to work perfectly.  Please   #
+# consult the README file for further instructions.        #
+############################################################
+
+# General
+mailRelayPeriod = 86400
+
+
+# Sendmail with relay database file support
+mailRelayIsDatabase = 1
+mailRelayFile       = /etc/mail/access
+mailRelayFileFormat = %i RELAY
+
+
+# Exim without database file support
+#	Make sure to set Exims host_accept_relay configuration 
+#	key to your mailRelayFile value below
+# mailProgramName     = exim
+# mailRelayFile       = /etc/mail/ip_allow
+# mailRelayFileFormat = %i
+
+
+# Sendmail without relay database file support
+# mailProgramRestart  = 1
+# mailRelayFile       = /etc/mail/ip_allow
+# mailRelayFileFormat = %i
+

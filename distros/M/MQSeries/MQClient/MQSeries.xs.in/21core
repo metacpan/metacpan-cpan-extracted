@@ -1,0 +1,93 @@
+/* -*-c-*-
+ $Id: 21core,v 32.4 2012/09/26 16:10:02 jettisu Exp $
+
+ (c) 1999-2012 Morgan Stanley & Co. Incorporated
+ See ..../src/LICENSE for terms of distribution.
+ */
+
+MODULE = __APITYPE__::MQSeries		PACKAGE = __APITYPE__::MQSeries		
+
+PROTOTYPES: DISABLE
+
+void
+constant_hex(name)
+	char *		name
+
+	PPCODE:
+	{
+	SV		*Return;
+	MQULONG		 Result;
+
+	Result = constant_hex(name);
+
+	if ( errno ) 
+	  XSRETURN_UNDEF;
+	else {
+	  Return = sv_newmortal();
+	  sv_setuv(Return, (UV)Result);	
+	  XPUSHs(Return);
+	}
+
+	}
+
+void
+constant_numeric(name)
+	char *		name
+
+	PPCODE:
+	{
+	SV		*Return;
+	MQLONG		Result;
+
+	Result = constant_numeric(name);
+
+	if ( errno ) 
+	  XSRETURN_UNDEF;
+	else {
+	  Return = sv_newmortal();
+	  sv_setiv(Return, (IV)Result);	
+	  XPUSHs(Return);
+	}
+
+	}
+
+void
+constant_string(name)
+	char *		name
+
+	PPCODE:
+	{
+	char	tmp[256];
+	int	status;
+	SV	*Return;
+
+	if ( (status = constant_string(name,tmp)) != 0 ) {
+	  Return = sv_newmortal();
+	  sv_setpv(Return, tmp);	
+	  XPUSHs(Return);
+	} else {
+	  XSRETURN_UNDEF;
+	}
+
+	}
+
+void
+constant_char(name)
+	char *		name
+
+	PPCODE:
+	{
+	char	tmp[1];
+	int	status;
+	SV	*Return;
+
+	if ( (status = constant_char(name,tmp)) != 0 ) {
+	  Return = sv_newmortal();
+	  sv_setpvn(Return, tmp, 1);	
+	  XPUSHs(Return);
+	} else {
+	  XSRETURN_UNDEF;
+	}
+
+	}
+

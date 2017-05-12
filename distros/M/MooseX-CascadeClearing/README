@@ -1,0 +1,98 @@
+NAME
+    MooseX::CascadeClearing - Cascade clearer actions across attributes
+
+VERSION
+    This document describes version 0.05 of MooseX::CascadeClearing -
+    released September 15, 2012 as part of MooseX-CascadeClearing.
+
+SYNOPSIS
+        use Moose;
+        use MooseX::CascadeClearing;
+
+        has master => (
+            is              => 'rw',
+            isa             => 'Str',
+            lazy_build      => 1,
+            is_clear_master => 1,
+        );
+
+        my @opts => (
+            is           => 'ro',
+            isa          => 'Str',
+            clear_master => 'master',
+            lazy_build   => 1,
+        );
+
+        has sub1 => @opts;
+        has sub2 => @opts;
+        has sub3 => @opts;
+
+        sub _build_sub1 { shift->master . "1" }
+        sub _build_sub2 { shift->master . "2" }
+        sub _build_sub3 { shift->master . "3" }
+
+        sub some_sub {
+            # ...
+
+            # clear master, sub[123] in one fell swoop
+            $self->clear_master;
+
+        }
+
+DESCRIPTION
+    MooseX::CascadeClearing does the necessary metaclass fiddling to allow
+    an clearing one attribute to be cascaded through to other attributes as
+    well, calling their clear accessors.
+
+    The intended purpose of this is to assist in situations where the value
+    of one attribute is derived from the value of another attribute -- say a
+    situation where the secondary value is expensive to derive and is thus
+    lazily built. A change to the primary attribute's value would invalidate
+    the secondary value and as such the secondary should be cleared. While
+    it could be argued that this is trivial to do manually for a few
+    attributes, once we consider subclassing and adding in roles the ability
+    to "auto-clear", as it were, is a valuable trait. (Sorry, couldn't
+    resist.)
+
+CAVEAT
+    We don't yet trigger a cascade clear on a master attribute's value being
+    set through a setter/accessor accessor. This will likely be available as
+    an option in the not-too-distant-future.
+
+ATTRIBUTE OPTIONS
+    We install an attribute metaclass trait that provides two additional
+    attribute options, as well as wraps the generated clearer method for a
+    designated "master" attribute. By default, using this module causes this
+    trait to be installed for all attributes in the package.
+
+    is_clear_master => (0|1)
+        If set to 1, we wrap this attribute's clearer with a sub that looks
+        for other attributes to clear.
+
+    clear_master => < attribute_name >
+        Marks this attribute as one that should be cleared when the named
+        attribute's clearer is called. Note that no checking is done to
+        ensure that the named master is actually an attribute in the class.
+
+SOURCE
+    The development version is on github at
+    <http://github.com/RsrchBoy/moosex-cascadeclearing> and may be cloned
+    from <git://github.com/RsrchBoy/moosex-cascadeclearing.git>
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/moosex-cascadeclearing/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

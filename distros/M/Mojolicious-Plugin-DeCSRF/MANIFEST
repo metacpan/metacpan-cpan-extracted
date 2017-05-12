@@ -1,0 +1,8 @@
+Changes
+lib/Mojolicious/Plugin/DeCSRF.pm
+Makefile.PL
+MANIFEST			This list of files
+t/basic.t
+t/config.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,56 @@
+Revision history for Perl module Mac::Path::Util
+
+1.001 2016-02-03T01:48:28Z
+	* Freshen distro and note GitHub address
+
+0.26 - 2008-08-15
+	* Distro cleanup - no need to reinstall this if you already
+	have it
+
+0.25 - 2008-01-16
+	* Cleanups for the move from CVS to SVN. No need to upgrade.
+
+0.24 - 2007-01-09
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+0.23 - 2006-06-08
+	* distro cleanup. no need to upgrade.
+
+0.22 - 2006-06-08
+	* distro clean up, no need to upgrade
+
+0.22 - 2006-04-06
+	* Added the Changes file to MANIFEST so you actaully get to
+	see this file
+	* No need to upgrade
+
+0.21 - 2005-03-11
+	* fixed _get_startup to actually work under Mac::Carbon
+	* added POD coverage tests
+	* everyone should upgrade
+
+0.11 - 2004-09-08
+	* updated distro
+	* no need to update
+
+0.1 - 2004-09-02
+	* distribution clean-up: no need to upgrade if you already have this
+	module
+
+0.09 - 2002-05-11
+	* Now uses Mac::Carbon (MacPerl::Volumes()) to get the
+	  startup volume, which is more efficient and reliable than
+	  calling an AppleScript to do it. (Thanks, Pudge)
+	* Removed dependencies on Test::Manifest, Test::Prereq and
+	  File::Find::Rule.
+
+0.08 - 2002-12-01
+	* fixed minor doc formatting bug
+
+0.07 - 2002-11-26
+	* AppleScript is turned on if we're on a Mac
+
+0.06 - 2002-11-26
+	* Mac::AppleScript is optional
+	* use default startup volume name if not AppleScript

@@ -1,0 +1,9 @@
+0.003     Tue Mar 6 2012 01:25:40 PM CST
+- Make newer Moose versions happy by adding "is" argument
+
+0.002     Mon Mar 28 2011 01:28:51 PM CDT
+- Fixed tests with Mason >= 2.05
+- Added warning about using this plugin for new projects
+
+0.001     Wed Feb 23 2011 3:39:00 PM CST
+- Initial release

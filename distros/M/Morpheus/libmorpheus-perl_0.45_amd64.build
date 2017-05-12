@@ -1,0 +1,92 @@
+ dpkg-buildpackage -rfakeroot -D -us -uc
+dpkg-buildpackage: set CPPFLAGS to default value: 
+dpkg-buildpackage: set CFLAGS to default value: -g -O2
+dpkg-buildpackage: set CXXFLAGS to default value: -g -O2
+dpkg-buildpackage: set FFLAGS to default value: -g -O2
+dpkg-buildpackage: set LDFLAGS to default value: -Wl,-Bsymbolic-functions
+dpkg-buildpackage: source package libmorpheus-perl
+dpkg-buildpackage: source version 0.45
+dpkg-buildpackage: source changed by Andrei Mishchenko <druxa@yandex-team.ru>
+dpkg-buildpackage: host architecture amd64
+ fakeroot debian/rules clean
+dh_testdir
+dh_testroot
+dh_clean debian/build-stamp debian/install-stamp
+[ ! -f Makefile ] || /usr/bin/make realclean
+ dpkg-source -b Morpheus-0.45
+dpkg-source: warning: missing information for output field Standards-Version
+dpkg-source: warning: source directory './Morpheus-0.45' is not <sourcepackage>-<upstreamversion> 'libmorpheus-perl-0.45'
+dpkg-source: building libmorpheus-perl in libmorpheus-perl_0.45.tar.gz
+dpkg-source: building libmorpheus-perl in libmorpheus-perl_0.45.dsc
+ debian/rules build
+dh_testdir
+/usr/bin/perl Makefile.PL INSTALLDIRS=vendor \
+		INSTALLVENDORARCH=/usr/share/perl5/ \
+		VENDORARCHEXP=/usr/share/perl5/
+Checking if your kit is complete...
+Looks good
+Writing Makefile for Morpheus
+Writing MYMETA.yml and MYMETA.json
+/usr/bin/make
+make[1]: Entering directory `/home/druxa/mr/morpheus/Morpheus-0.45'
+cp lib/Morpheus/Plugin/File.pm blib/lib/Morpheus/Plugin/File.pm
+cp lib/Morpheus/Plugin/Simple.pm blib/lib/Morpheus/Plugin/Simple.pm
+cp lib/Morpheus/Plugin/DB.pm blib/lib/Morpheus/Plugin/DB.pm
+cp lib/Morpheus/Bootstrap.pm blib/lib/Morpheus/Bootstrap.pm
+cp lib/Morpheus/Plugin/Env.pm blib/lib/Morpheus/Plugin/Env.pm
+cp lib/Morpheus.pm blib/lib/Morpheus.pm
+cp lib/Morpheus/Overrides.pm blib/lib/Morpheus/Overrides.pm
+cp lib/Morpheus/Defaults.pm blib/lib/Morpheus/Defaults.pm
+cp lib/Morpheus/Bootstrap/Vital.pm blib/lib/Morpheus/Bootstrap/Vital.pm
+cp lib/Morpheus/Utils.pm blib/lib/Morpheus/Utils.pm
+cp lib/Morpheus/Plugin/Content.pm blib/lib/Morpheus/Plugin/Content.pm
+cp lib/Morpheus/Bootstrap/Extra.pm blib/lib/Morpheus/Bootstrap/Extra.pm
+cp lib/Morpheus/Key.pm blib/lib/Morpheus/Key.pm
+cp bin/morph blib/script/morph
+/usr/bin/perl -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/morph
+Manifying blib/man1/morph.1p
+Manifying blib/man3/Morpheus::Plugin::File.3pm
+Manifying blib/man3/Morpheus::Plugin::DB.3pm
+Manifying blib/man3/Morpheus::Plugin::Simple.3pm
+Manifying blib/man3/Morpheus::Bootstrap.3pm
+Manifying blib/man3/Morpheus::Plugin::Env.3pm
+Manifying blib/man3/Morpheus.3pm
+Manifying blib/man3/Morpheus::Overrides.3pm
+Manifying blib/man3/Morpheus::Defaults.3pm
+Manifying blib/man3/Morpheus::Plugin::Content.3pm
+Manifying blib/man3/Morpheus::Utils.3pm
+Manifying blib/man3/Morpheus::Bootstrap::Vital.3pm
+Manifying blib/man3/Morpheus::Key.3pm
+Manifying blib/man3/Morpheus::Bootstrap::Extra.3pm
+make[1]: Leaving directory `/home/druxa/mr/morpheus/Morpheus-0.45'
+/usr/bin/make test
+make[1]: Entering directory `/home/druxa/mr/morpheus/Morpheus-0.45'
+PERL_DL_NONLAZY=1 /usr/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/bootstrap.t ........... ok
+t/cross.t ............... ok
+t/env.t ................. ok
+# Looks like you planned 23 tests but ran 27.
+t/file.t ................ 
+Dubious, test returned 255 (wstat 65280, 0xff00)
+All 23 subtests passed 
+t/import-glob.t ......... ok
+t/import.t .............. ok
+t/key.t ................. ok
+t/merge.t ............... ok
+t/normalize.t ........... ok
+t/release-pod-syntax.t .. skipped: these tests are for release candidate testing
+t/script.t .............. ok
+
+Test Summary Report
+-------------------
+t/file.t              (Wstat: 65280 Tests: 27 Failed: 4)
+  Failed tests:  24-27
+  Non-zero exit status: 255
+  Parse errors: Bad plan.  You planned 23 tests but ran 27.
+Files=11, Tests=86,  3 wallclock secs ( 0.05 usr  0.01 sys +  2.36 cusr  0.28 csys =  2.70 CPU)
+Result: FAIL
+Failed 1/11 test programs. 4/86 subtests failed.
+make[1]: *** [test_dynamic] Error 255
+make[1]: Leaving directory `/home/druxa/mr/morpheus/Morpheus-0.45'
+make: *** [debian/build-stamp] Error 2
+dpkg-buildpackage: failure: debian/rules build gave error exit status 2

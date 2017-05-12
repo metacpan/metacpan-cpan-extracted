@@ -1,0 +1,125 @@
+.105
+  - corrected horizontal banding problem in gel noise types
+
+.104
+  - square and sgel types now consume -persist arg (like multires)
+  - added xscale/yscale args for stretching noise along either axis
+  - shadow/emboss not upsampled anymore, due to looking bad
+  - "lumber" type output was broken; fixed
+  - "simplex2" type was using forced tiling, this was wrong; fixed
+
+.103
+  - will now use upsampled lower res noise by default. this is
+    "about as good" in most cases, but renders much faster.
+  - to disable upsampling (aka to render at natural image resolution),
+    use -quality N+, eg "-quality 2+". current max is 3+. see docs
+    regarding "quality" arg.
+  - several effects like shadow and linear blur are now upsampled from
+    lower resolution for performance
+  - using -sphere will now create output as a 2:1 rectangular image
+  - will now create output as a single-channel file, unless -clut
+    was specified
+  - removed noisemaker internal functions from perldoc
+  - pruned optional exports to a single function, make()
+  - changed -workdir to -outdir, which makes more sense
+
+.102
+  - noisemaker now consumes *way* less memory (thx Tie::CArray!)
+  - added worley, wgel, gradient noise types (see docs/help)
+  - removed voronoi type, is about the same as using "-type worley -nth 0"
+  - added "-quality" arg to control smooth, interp, and grow
+  - default "-interp" changed from cosine to linear. use "-quality"
+  - misnomered "perlin" type renamed to "multires"
+  - improved gel noise
+  - tiling for non-seamless noise works better now
+  - simplified help screens
+
+.101
+  - Increased default octave count, tweaked other defaults
+  - Turned delta, chiral, stereo into post-processing options
+  - Added -interp noise arg for specifying interpolation function
+  - Added -grow noise arg for specifying upsampling function
+  - Replaced "complex" with refined "terra" type
+  - Added simplex and simplex2 types
+  - Changed default slice type/basis func back to white noise
+  - Changed false spheremap recipe, more convincing than ever
+
+.100
+  - Removed Math::Random::Brownian types for now, since the dependency
+    was limiting the number of supported platforms
+
+.099_001
+  - Added canvas type
+  - Updated dependency versions in Makefile.PL
+
+.015
+  - Added multi-res types: lumber, wormhole, flux
+  - Added smoothing step for square noise (sparkle looks nicer too)
+  - Misc cleanup and fixes
+  - Changed licensing to Perl's
+
+.014
+  - Doc updates with links to example images
+  - Added julia, newton types
+  - Added brownian/gaussian noise types via Math::Random::Brownian
+
+.013
+  - Added File::Tempdir as a dep in Makefile.PL
+
+.012
+  - Rename flame to fflame, tweaked function
+  - Tidied code+docs, update SYNOPSIS
+  - Add stereo map (thx jhewitt)
+  - mandel + dmandel output is now supersampled
+  - Tweaked dmandel interestingness criteria
+  - Rename to Math::Fractal::Noisemaker
+  - Tweak DLA seeding
+  - Re-wrote ex/make-samples as t/Noisemaker.t; accepts args
+
+.011
+  - Fixes for ridged, shadow, displace
+
+.010
+  - Added fur, dmandel, diffusion, flame, infile, intile,
+    spiral, voronoi, moire, textile, delta, chiral types
+  - Removed rgel, it was too close to pgel
+  - Even more futzing with spheremaps, poles conform better now
+  - Smoothed input for gel noise
+  - Code cleanup
+
+.009
+  - Added wavelet, mandel, buddha, fern functions
+
+.008
+  - Add missing POD header
+
+.007
+  - Added traditional smoothed noise source for Perlin
+  - Many new options for combining noise sources
+  - New noise types: ridged multifractal and "gel" types
+  - Added some simple color mapping options
+  - More futzing with spheremap scaling
+  - Added gappiness option (ie for starfields)
+  - Tweaked defaults for about 500 reasonable complex noise presets
+  - Rewrote POD
+
+.006
+  - Added a script to generate lots of example noise
+  - Tweaked scale at polar regions to more closely match look of equator
+  - Refractive spheremaps should look better
+
+.005
+  - Added spheremap option! They're fake but good.
+  - Added refractive palette option, looks like fractals
+  - Fixed bug with size of output images, was off by one in smooth function
+  - Added $QUIET option
+  - Allow negative feather vals for cool effects
+  - Complex noise now skips an un-needed smoothing step
+  - Tweaked default args
+
+.004
+  - Added example images to ex/ dir and inline with pod
+
+Sep 2009: .001
+  - Initial release
+

@@ -1,0 +1,26 @@
+---
+abstract: 'Mojo::Role - Tiny and simple role system for Mojo'
+author:
+  - 'Daniel Vinciguerra <daniel.vinciguerra@bivee.com.br>'
+build_requires:
+  FindBin: 0
+  Test::More: 0
+  lib: 0
+  perl: v5.10.0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojo-Role
+requires:
+  Mojo::Base: 0
+  Mojo::Util: 0
+  Role::Tiny: 0
+  Role::Tiny::With: 0
+version: 0.022

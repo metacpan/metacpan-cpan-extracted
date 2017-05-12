@@ -1,0 +1,45 @@
+---
+
+disable: 0
+
+# interval in seconds until a sender is allowed to re-send
+#   and pass
+min_interval: 600
+
+# per default, the greylist does not work as a whitelist, but
+#   a blacklist. it will reject (temporary) any mail not on the
+#   list, but does not explicit allow mails which are on the list
+#   to be passed (DUNNO).. you can enable passing by setting this
+#   to OK, thus any mail is on the list will pass.
+#   check with your restriction-classes to determine the better
+#   behavior for your mailserver
+pass_code: DUNNO
+
+# scoring awre. will put mails only on the permant whitelist
+#   (host or domain) if it has been scored zero or above
+#   this should keep suspicious mails from the whitelist
+scoring_aware: 0
+
+# policy for permanently whitelisting a whole sender server
+hosts_policy:
+    
+    # threshold of different sender mails
+    unique_sender: 5
+    
+    # threshold of mails received from ONE address finally
+    #   putting the host on the whitelist
+    one_address: 10
+
+# policy for permanently whitelisting a whole sender domain
+#   use this with care and SPF (beforehand!)
+domains_policy:
+    
+    # threshold of different sender mails
+    unique_sender: 5
+    
+    # threshold of mails received from ONE address finally
+    #   putting the host on the whitelist
+    one_address: 10
+
+
+

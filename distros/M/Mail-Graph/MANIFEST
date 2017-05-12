@@ -1,0 +1,26 @@
+BUGS
+MANIFEST
+README
+NEW
+LICENSE
+CHANGES
+CREDITS
+TODO
+SIGNATURE
+Makefile.PL
+lib/Mail/Graph.pm
+t/mailgraph.t
+t/target.t
+t/testmail.1
+t/testmail.2
+t/testmail.3
+t/testmail.4
+samples/convert.pl
+samples/index/dummy.txt
+samples/sample.pl
+samples/index.tpl
+samples/output/w3c.png
+samples/output/spam.css
+samples/archive/sample.txt.gz
+samples/archive/sample2.txt.gz
+META.yml                                 Module meta-data (added by MakeMaker)

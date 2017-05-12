@@ -1,0 +1,10 @@
+Math::Group::Thompson change log
+--------------------------------
+Author: Roberto Alamos Moreno <ralamosm@cpan.org>
+
+0.95 to 0.96 (November 30, 2004)
+------------
+- Corrected pod documentation
+- Method reduce renamed to divide
+- Math::Group::Thompson can now store the generated elements in a file
+- Added a DESTROY subroutine

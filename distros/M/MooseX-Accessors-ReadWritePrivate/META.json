@@ -1,0 +1,63 @@
+{
+   "abstract" : "Name your accessors get_foo() and set_foo() or _set_foo().",
+   "author" : [
+      "Elliot Shank <perl@galumph.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Accessors-ReadWritePrivate",
+   "no_index" : {
+      "directory" : [
+         "xt"
+      ],
+      "file" : []
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.72"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.2808"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "2",
+            "Moose::Exporter" : "2",
+            "Moose::Role" : "2",
+            "Moose::Util::MetaRole" : "2",
+            "strict" : 0,
+            "utf8" : 0,
+            "version" : 0,
+            "warnings" : 0
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::Accessors::ReadWritePrivate" : {
+         "file" : "lib/MooseX/Accessors/ReadWritePrivate.pm",
+         "version" : "v1.4.0"
+      },
+      "MooseX::Accessors::ReadWritePrivate::Role::Attribute" : {
+         "file" : "lib/MooseX/Accessors/ReadWritePrivate/Role/Attribute.pm",
+         "version" : "v1.4.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v1.4.0"
+}

@@ -1,0 +1,77 @@
+{
+   "abstract" : "write Excel spreadsheets from Mojolicious",
+   "author" : [
+      "Zak B. Elep <zakame@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-WriteExcel",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "5.73",
+            "Spreadsheet::WriteExcel::Simple" : "1.04"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::WriteExcel" : {
+         "file" : "lib/Mojolicious/Plugin/WriteExcel.pm",
+         "version" : "2.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/zakame/mojox-renderer-writeexcel/issues"
+      },
+      "homepage" : "https://github.com/zakame/mojox-renderer-writeexcel",
+      "repository" : {
+         "url" : "git://github.com/zakame/mojox-renderer-writeexcel.git",
+         "web" : "https://github.com/zakame/mojox-renderer-writeexcel"
+      }
+   },
+   "version" : "2.05",
+   "x_contributors" : [
+      "Bryan Paxton <starbelly@pobox.com>",
+      "Zak B. Elep <zakame@zakame.net>"
+   ]
+}

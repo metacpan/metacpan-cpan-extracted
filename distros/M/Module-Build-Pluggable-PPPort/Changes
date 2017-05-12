@@ -1,0 +1,12 @@
+Revision history for Perl extension Module::Build::Pluggable::PPPort
+
+0.04
+
+    - fixed deps
+
+0.03
+
+    - split from core dist
+
+0.01    Mon Nov  5 11:01:33 2012
+    - original version

@@ -1,0 +1,30 @@
+Changes for Module::Build::Pluggable::Fortran
+
+0.26 - Tue Jan 26 13:49:57 EST 2016
+    Fixes bug when adding linker flags; thanks to Luis Mochan for the patch
+    Fixes erroneous documentation; thanks to Luis Mochan for the bug report
+    Switches to the github issues tracker
+    Updates the distribution meta files and preps for release
+    Adds minimum perl version to the prereqs
+
+0.25 - Sat Aug  9 10:09:56 EDT 2014
+    Adds minimum perl version to the prereqs
+    Updates the distribution meta files and preps for release
+
+0.24 - Fri Mar 28 08:32:57 EDT 2014
+    Skips tests if no fortran compiler is installed
+
+0.23 - Thu May 30 08:38:51 EDT 2013
+    Fixes a typo in the Module::Build required version
+    - This is a mirror of RT#85721 found by ANDK++. Thanks.
+
+0.22 - Mon May 20 09:40:16 EDT 2013
+    Fixes build/test issues on some platforms
+    - Skips tests if no fortran compiler installed
+    - Adds missing prereqs for testing
+
+0.21 - Thu May 16 15:40:22 EDT 2013
+    Skips compile if .o files are up to date
+
+0.20 - Thu May 16 12:19:47 EDT 2013
+    Initial release

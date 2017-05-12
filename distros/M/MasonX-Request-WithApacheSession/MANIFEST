@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/MasonX/Request/WithApacheSession.pm
+lib/MasonX/Request/WithMultiSession.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/01-basic.t
+t/03-multi.t
+t/99-pod.t
+SIGNATURE    Added here by Module::Build

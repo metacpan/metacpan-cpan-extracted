@@ -1,0 +1,176 @@
+WHAT IS THIS ?
+
+This is MIME::Lite::HTML, a module which provide routine 
+to transform a HTML page in a MIME::Lite mail
+
+HOW DO I INSTALL IT ?
+
+To install this module, cd to the directory that contains
+this README file and type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you can't do that, you can put HTML.pm file in
+directory $root/MIME/Lite/HTML.pm and then put use lib
+$root in your program (make same thing if you haven't MIME-Lite
+module).
+So it give:
+$root/MIME/Lite/HTML.pm
+$root/MIME/Lite.pm
+
+and in your script:
+
+#!/usr/bin/perl
+use lib '/home/alian/mylibperl';
+use MIME::Lite;
+use MIME::Lite::HTML;
+
+REQUIREMENT ?
+
+libnet, MIME::Lite
+
+DOCUMENTATION ?
+
+You'll find documentation in the file HTML.pm in POD format
+See too the eg directory
+
+When you install MIME::Lite::HTML, the MakeMaker program
+will automatically install the manual pages for you
+(on Unix systems, type "man MIME::Lite::HTML").
+
+Here an extract of POD documentation:
+
+NAME
+    MIME::Lite::HTML - Provide routine to transform a HTML page in a
+    MIME-Lite mail
+
+SYNOPSIS
+      use MIME::Lite::HTML;
+
+      my $mailHTML = new MIME::Lite::HTML
+         From     => 'MIME-Lite@alianwebserver.com',
+         To       => 'alian@saturne',
+         Subject => 'Mail in HTML with images';
+
+      $MIMEmail = $mailHTML->parse('http://www.alianwebserver.com');
+      $MIMEmail->send; # or for win user : $mail->send_by_smtp('smtp.fai.com');
+
+DESCRIPTION
+    This module is a Perl mail client interface for sending message that
+    support HTML format and build them for you.. This module provide routine
+    to transform a HTML page in MIME::Lite mail. So you need this module to
+    use MIME-Lite-HTML possibilities
+
+  What's happen ?
+
+    The job done is:
+
+    *   Get the file (LWP) if needed
+
+    *   Parse page to find include images
+
+    *   Attach them to mail with adequat header if asked (default)
+
+    *   Include external CSS,Javascript file
+
+    *   Replace relative url with absolute one
+
+    *   Build the final MIME-Lite object with each part found
+
+  Usage
+
+    Did you alread see link like "Send this page to a friend" ?. With this
+    module, you can do script that to this in 3 lines.
+
+    It can be used too in a HTML newsletter. You make a classic HTML page,
+    and give just url to MIME::Lite::HTML.
+
+  Construction
+
+    MIME-Lite-HTML use a MIME-Lite object, and RFC2257 construction:
+
+    If images and text are present, construction use is:
+
+      --> multipart/alternative
+      ------> text/plain
+      ------> multipart/related
+      -------------> text/html
+      -------------> each images
+
+    If no images but text is present, this is that:
+
+      ---> multipart/alternative
+      -------> text/plain if present
+      -------> text/html
+
+    If images but no text, this is:
+
+      ---> multipart/related
+      -------> text/html
+      -------> each images
+
+    If no images and no text, this is:
+
+      ---> text/html
+
+  Documentation
+
+    Additionnal documentation can be found here:
+
+    *   MIME-lite module
+
+    *   RFC 822, RFC 1521, RFC 1522 and specially RFC 2257 (MIME
+        Encapsulation of Aggregate Documents, such as HTML)
+
+  Clients tested
+
+    HTML in mail is not full supported so this module can't work with all
+    email clients. If some client recognize HTML, they didn't support images
+    include in HTML. So in fact, they recognize multipart/relative but not
+    multipart/related.
+
+    Netscape Messager (Linux-Windows)
+        100% ok
+
+    Outlook Express (Windows)
+        100% ok
+
+    Eudora (Windows)
+        If this module just send HTML and text, (without images), 100% ok.
+
+        With images, Eudora didn't recognize multipart/related part as
+        describe in RFC 2257 even if he can read his own HTML mail. So if
+        images are present in HTML part, text and HTML part will be
+        displayed both, text part in first. Two additional headers will be
+        displayed in HTML part too in this case. Version 1.0 of this module
+        correct major problem of headers displayed with image include in
+        HTML part.
+
+    KMail (Linux)
+        If this module just send HTML and text, (without images), 100% ok.
+
+        In other case, Kmail didn't support image include in HTML. So if you
+        set in KMail "Prefer HTML to text", it display HTML with images
+        broken. Otherwise, it display text part.
+
+    Pegasus (Windows)
+        If this module just send HTML and text, (without images), 100% ok.
+
+        Pegasus didn't support images in HTML. When it find a
+        multipart/related message, it ignore it, and display text part.
+
+    If you find others mail client who support (or not support)
+    MIME-Lite-HTML module, give me some feedback ! If you want be sure that
+    your mail can be read by maximum of people, (so not only OE and
+    Netscape), don't include images in your mail, and use a text buffer too.
+    If multipart/related mail is not recognize, multipart/alternative can be
+    read by the most of mail client.
+
+
+Have fun, and let me know how it turns out!
+
+Alain BARBET
+alian@alianwebserver.com

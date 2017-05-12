@@ -1,0 +1,44 @@
+---
+abstract: 'Serve static files from document root with directory index'
+author:
+  - 'hayajo <hayajo@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Directory
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Mojolicious::Plugin::Directory:
+    file: lib/Mojolicious/Plugin/Directory.pm
+    version: '0.14'
+requires:
+  Mojolicious: '7.15'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/hayajo/Mojolicious-Plugin-Directory/issues
+  homepage: https://github.com/hayajo/Mojolicious-Plugin-Directory
+  repository: git://github.com/hayajo/Mojolicious-Plugin-Directory.git
+version: '0.14'
+x_contributors:
+  - 'ChinaXing(陈云星) <chen.yack@gmail.com>'
+  - 'Renee <reb@perl-services.de>'
+  - '今井隼人 <imai.h@imaihayato-no-MacBook-Pro.local>'
+  - 'hayajo <hayato.imai@gmail.com>'
+  - 'hayato imai <hayato@MBP2014MID.local>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,39 @@
+This module requires a C compiler to build. To install,
+execute the sequence
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Win32 users should use the 'make' program on their system.
+A ppm package, suitable for Win32 ActivePerl, is available via
+
+ ppm install http://theoryx5.uwinnipeg.ca/ppmpackages/Math-FFT.ppd
+
+for ActivePerl 6xx, or at
+
+ ppm install http://theoryx5.uwinnipeg.ca/ppms/Math-FFT.ppd
+
+for ActivePerl 8xx.
+
+If you do not have permission to install modules in the
+Perl site tree on your system, you can install this in
+your own library by
+
+   perl Makefile.PL PREFIX=/home/me/perl \
+     INSTALLMAN1DIR=/home/me/man/man1 \
+     INSTALLMAN3DIR=/home/me/man/man3
+   make
+   make test
+   make install
+
+To use modules in this location, either set the PERL5LIB
+environment variable to include your private module
+directory, or else put
+
+   use lib '/home/me/perl/path/to/lib';
+
+at the top of your script.
+
+Randy Kobes <r.kobes@uwinnipeg.ca>

@@ -1,0 +1,112 @@
+NAME
+    MouseX::AttributeHelpers - Extend your attribute interfaces
+
+SYNOPSIS
+        package MyClass;
+
+        use Mouse;
+        use MouseX::AttributeHelpers;
+
+        has 'mapping' => (
+            metaclass => 'Collection::Hash',
+            is        => 'rw',
+            isa       => 'HashRef',
+            default   => sub { +{} },
+            provides  => {
+                exists => 'exists_in_mapping',
+                keys   => 'ids_in_mapping',
+                get    => 'get_mapping',
+                set    => 'set_mapping',
+            },
+        );
+
+        package main;
+
+        my $obj = MyClass->new;
+        $obj->set_quantity(10);      # quantity => 10
+        $obj->set_mapping(4, 'foo'); # 4 => 'foo'
+        $obj->set_mapping(5, 'bar'); # 5 => 'bar'
+        $obj->set_mapping(6, 'baz'); # 6 => 'baz'
+
+        # prints 'bar'
+        print $obj->get_mapping(5) if $obj->exists_in_mapping(5);
+
+        # prints '4, 5, 6'
+        print join ', ', $obj->ids_in_mapping;
+
+DESCRIPTION
+    MouseX::AttributeHelpers provides commonly used attribute helper methods
+    for more specific types of data.
+
+    As seen in the "SYNOPSIS", you specify the extension via the "metaclass"
+    parameter.
+
+PARAMETERS
+  provides
+    This points to a hashref that uses "provider" for the keys and "method"
+    for the values. The method will be added to the object itself and do
+    what you want.
+
+  curries
+    This points to a hashref that uses "provider" for the keys and has two
+    choices for the value:
+
+    You can supply "{ method => \@args }" for the values. The method will be
+    added to the object itself (always using @args as the beginning
+    arguments).
+
+    Another approach to curry a method provider is to supply a coderef
+    instead of an arrayref. The code ref takes $self, $body, and any
+    additional arguments passed to the final method.
+
+METHOD PROVIDERS
+  Counter
+    Methods for incrementing and decrementing a counter attribute.
+
+  Number
+    Common numerical operations.
+
+  String
+    Common methods for string values.
+
+  Bool
+    Common methods for boolean values.
+
+  Collection::List
+    Common list methods for array references.
+
+  Collection::Array
+    Common methods for array references.
+
+  Collection::ImmutableHash
+    Common methods for hash references.
+
+  Collection::Hash
+    Common additional methods for hash references.
+
+  Collection::Bag
+    Methods for incrementing and decrementing a value of collection.
+
+AUTHOR
+    NAKAGAWA Masaki <masaki@cpan.org>
+
+THANKS TO
+    "AUTHOR" in MooseX::AttributeHelpers
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Mouse
+
+    MouseX::AttributeHelpers::Counter, MouseX::AttributeHelpers::Number,
+    MouseX::AttributeHelpers::String, MouseX::AttributeHelpers::Bool,
+    MouseX::AttributeHelpers::Collection::List,
+    MouseX::AttributeHelpers::Collection::Array,
+    MouseX::AttributeHelpers::Collection::ImmutableHash,
+    MouseX::AttributeHelpers::Collection::Hash,
+    MouseX::AttributeHelpers::Collection::Bag
+
+    MooseX::AttributeHelpers
+

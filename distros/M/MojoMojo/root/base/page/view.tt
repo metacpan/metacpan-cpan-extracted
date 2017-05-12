@@ -1,0 +1,45 @@
+[% WRAPPER page/wrapper.tt index_page=(c.req.params.rev ? 0 : 1) +%]
+<div id="content">
+
+[%- IF c.sessionid && c.flash.redirect %]
+    [% loc('Redirected from') %]
+    [% IF (c.pref('anonymous_user') OR user.can_edit(page.path)) %]
+<a href="[% c.req.base %]/[% c.flash.redirect %].edit" rel="nofollow">[% c.flash.redirect %]</a>
+    [% ELSE %]
+        [% c.flash.redirect %]
+    [% END %]
+[% END %]
+
+  [%- IF c.req.params.rev %]
+    <div id="revision_info">
+      [% loc('Revision') %] [% c.req.params.rev %] - [% c.tz(content.created).ymd %] [% loc('at') %] [% c.tz(content.created).hms %]
+      [% IF c.req.params.rev > page.content_version %]
+        <em>[% loc('Rolled Back (Current: x)', page.content_version) %]</em>
+      [% END %]
+    </div>
+  [% END +%]
+    <div id="current">
+      [%- IF render == 'highlight' +%]
+        [%+ content.highlight(c) %]
+      [% ELSE +%]
+        [%+ content.precompiled || content.formatted(c) %]
+      [% END %]
+    </div>
+
+    <div id="changes" class="display-none">
+        <p id="message">
+            <small>
+                [% loc('Showing changes from previous revision.') %]
+                <del class="diffdel">[% loc('Removed') %]</del> | <ins class="diffins">[% loc('Added') %]</ins>
+            </small>
+        </p>
+        <div id="diff"></div>
+    </div>
+
+    <div class="byline">
+        <acronym title="[% loc('Revised on x at x by x', [c.tz(content.created).ymd, c.tz(content.created).hms, content.creator.name]) %]">[% loc('Revision') %]</acronym>
+        [% loc('by') %] [% c.wikiword(content.creator.link, base, content.creator.name, 'profile') %], [% c.tz(content.created).ymd %]
+    </div>
+
+</div>
+[% END # WRAPPER %]

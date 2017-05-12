@@ -1,0 +1,9 @@
+<%
+  if ($Mojolicious::VERSION >= 5.73) {
+    $self->reply->exception('Internal Error');
+  }
+  else {
+    $self->render_exception('Internal Error');
+  }
+  return;
+%>

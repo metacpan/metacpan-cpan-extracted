@@ -1,0 +1,63 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9791803dfb1f6b233f4615ace5e45e419501dbb1 Changes
+SHA1 882221895a73bad18eb9f16a0ce523a968a932c1 LICENSE.artistic_2
+SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE.bsd
+SHA1 98af5862049cfc519b5d20b94f728bf22fc09fc7 MANIFEST
+SHA1 05129090fb8acda306333656f6114ffb83f45ba6 META.yml
+SHA1 bf0bb07e95db6aa635651f8d14e0ffa3ee3d8019 Makefile.PL
+SHA1 a567e0dc58c7334a94cb2084e9c92b724971bd00 Malaga.pm
+SHA1 1fa88a3667348295afbcae34f947826e193b9e2e README
+SHA1 9cbfdeadf23ed8655ab1c133fec5d8cb7901ca66 examples/ex1.pl
+SHA1 6d4e8be741a482b58533ebb4fdb375252cda8433 examples/ex2.pl
+SHA1 9310950457e31fca5c4ecf9644f6b978a87c9122 examples/ex3.pl
+SHA1 f47ead84d9505469b1a4ff99f5292e5e19d41938 examples/ex4.pl
+SHA1 810566049452a133eedc3a57b10f64d64345ccd6 images/ex3.png
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 42de62df31eaf796d8bfd49a11fdc9cff1b50b74 inc/Module/Install/Share.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 7a82ae90b66d00d929a4c60c8e7a505a7549125d share/malaga-map.xml
+SHA1 61e8d07c2c981dc95839724a9940c5cfa9d09230 t/Map-Tube-Malaga/01-use.t
+SHA1 4ff2a73eca9e636481df3057fb1edaccd8cc27de t/Map-Tube-Malaga/02-version.t
+SHA1 90e99167f750dea112833b422315bf01ce017b38 t/Map-Tube-Malaga/03-map.t
+SHA1 f8f797b5a08ff2dd08b9dea9b2c73d7d511de1bb t/Map-Tube-Malaga/04-get_node_by_id.t
+SHA1 3da1aecaa789aca4a8ad8eceac8e49bb2ca52cc5 t/Map-Tube-Malaga/05-get_node_by_name.t
+SHA1 a127ccde730798e11c34e966169b4a8557960c87 t/Map-Tube-Malaga/06-get_shortest_route.t
+SHA1 59adb3d3416e02f08273c15494c76122d3372e6e t/Map-Tube-Malaga/07-name.t
+SHA1 b23b73125fea7739220b77f8d46708baca24b177 t/Map-Tube-Malaga/08-xml.t
+SHA1 23f2d6a16d9acccb7f1bca098e4830a62e25ef25 xt/Map-Tube-Malaga/01-pod_coverage.t
+SHA1 07faf267ad193748e860b9270dddacd5b3d369c9 xt/Map-Tube-Malaga/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWIMwIAAoJEJe+XXKaIuTlLCkH/R+0p0VigF0+7i2EOSaW8EY6
+oede5PgUUI9btxfi9T8We9Bcy411lvG5X7iuprpQffG8/voKUcRY/lSUhs4iSRHX
+SCCqMf6gNCvt2ccSgCIHKnp3LKGrTHTmwbd7j+ADCtWKf0Ty4/SLhk7snU4eRm2P
+9uEpRgP7WVv/fSSFmtuD2F8ZrudvLRZj92ZaWCQnjjFPEsyPk0H9cEL/16XyyL94
+UGwwqRb2rgC8x5fbSwmhREyILRgd7OGyHqSDhqM81XUDQOEQPt6hp/8T44NsCL3A
+WHtitbaFlEEDjExgBipIOv/RfaHRNN/ZcPsZirnKPStUrNoYkCiKAaTfx2sgDmk=
+=DUaI
+-----END PGP SIGNATURE-----

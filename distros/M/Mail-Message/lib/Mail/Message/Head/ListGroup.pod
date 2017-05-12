@@ -1,0 +1,422 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Message::Head::ListGroup - mailinglist related header fields
+
+=head1 INHERITANCE
+
+ Mail::Message::Head::ListGroup
+   is a Mail::Message::Head::FieldGroup
+   is a Mail::Reporter
+
+=head1 SYNOPSIS
+
+ my $lg = Mail::Message::Head::ListGroup->new(head => $head, ...);
+ $head->addListGroup($lg);
+
+ my $lg = $head->addListGroup(...);
+
+ $lg->delete;
+
+=head1 DESCRIPTION
+
+A I<list group> is a set of header fields which are added by mailing-list
+managing software.  This class knowns various details about that software.
+
+The knowledge and test messages which are used to initially implement
+this module is taken from Mail::ListDetector, written by
+Michael Stevens <mailto:michael@etla.org>.  The logic is redesigned to
+add flexibility and use the powerful MailBox features.
+
+Extends L<"DESCRIPTION" in Mail::Message::Head::FieldGroup|Mail::Message::Head::FieldGroup/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Message::Head::FieldGroup|Mail::Message::Head::FieldGroup/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Mail::Message::Head::FieldGroup|Mail::Message::Head::FieldGroup/"Constructors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<address>()
+
+Returns a L<Mail::Message::Field::Address|Mail::Message::Field::Address> object (or C<undef>) which
+defines the posting address of the mailing list.
+
+=item $obj-E<gt>B<clone>()
+
+Inherited, see L<Mail::Message::Head::FieldGroup/"Constructors">
+
+=item $obj-E<gt>B<from>($head|$message)
+
+Create a C<Mail::Message::Head::ListGroup> based in the specified $message
+or message $head.
+
+=item $obj-E<gt>B<implementedTypes>()
+
+=item Mail::Message::Head::ListGroup-E<gt>B<implementedTypes>()
+
+Inherited, see L<Mail::Message::Head::FieldGroup/"Constructors">
+
+=item $obj-E<gt>B<listname>()
+
+Returns the name of the mailing list, which is usually a part of the
+e-mail address which is used to post the messages to.
+
+=item Mail::Message::Head::ListGroup-E<gt>B<new>($fields, %options)
+
+Construct an object which maintains one set of mailing list headers
+
+ -Option  --Defined in                     --Default
+  address                                    undef
+  head      Mail::Message::Head::FieldGroup  undef
+  listname                                   <derived from address>
+  log       Mail::Reporter                   'WARNINGS'
+  rfc                                        undef
+  software  Mail::Message::Head::FieldGroup  undef
+  trace     Mail::Reporter                   'WARNINGS'
+  type      Mail::Message::Head::FieldGroup  undef
+  version   Mail::Message::Head::FieldGroup  undef
+
+=over 2
+
+=item address => STRING|OBJECT
+
+Address of the mailing list, which may be specified as STRING
+or e-mail containing object (a L<Mail::Address|Mail::Address> or L<Mail::Identity|Mail::Identity>.
+In any case, the data is converted into a L<Mail::Identity|Mail::Identity>.
+
+=item head => HEAD
+
+=item listname => STRING
+
+A short textual representation of the mailing-list.
+
+=item log => LEVEL
+
+=item rfc => 'rfc2919'|'rfc2369'
+
+Defines the mailing list software follows an rfc.
+
+=item software => STRING
+
+=item trace => LEVEL
+
+=item type => STRING
+
+=item version => STRING
+
+=back
+
+=item $obj-E<gt>B<rfc>()
+
+When the mailing list software follows the guidelines of one of the dedicated
+RFCs, then this will be returned otherwise C<undef>.  The return values can
+be C<rfc2919>, C<rfc2369>, or C<undef>.
+
+=back
+
+=head2 The header
+
+Extends L<"The header" in Mail::Message::Head::FieldGroup|Mail::Message::Head::FieldGroup/"The header">.
+ 
+=over 4
+
+=item $obj-E<gt>B<add>( <$field, $value> | $object )
+
+Inherited, see L<Mail::Message::Head::FieldGroup/"The header">
+
+=item $obj-E<gt>B<addFields>( [$fieldnames] )
+
+Inherited, see L<Mail::Message::Head::FieldGroup/"The header">
+
+=item $obj-E<gt>B<attach>($head)
+
+Inherited, see L<Mail::Message::Head::FieldGroup/"The header">
+
+=item $obj-E<gt>B<delete>()
+
+Inherited, see L<Mail::Message::Head::FieldGroup/"The header">
+
+=item $obj-E<gt>B<fieldNames>()
+
+Inherited, see L<Mail::Message::Head::FieldGroup/"The header">
+
+=item $obj-E<gt>B<fields>()
+
+Inherited, see L<Mail::Message::Head::FieldGroup/"The header">
+
+=item $obj-E<gt>B<head>()
+
+Inherited, see L<Mail::Message::Head::FieldGroup/"The header">
+
+=back
+
+=head2 Access to the header
+
+Extends L<"Access to the header" in Mail::Message::Head::FieldGroup|Mail::Message::Head::FieldGroup/"Access to the header">.
+ 
+=over 4
+
+=item $obj-E<gt>B<isListGroupFieldName>($name)
+
+=item Mail::Message::Head::ListGroup-E<gt>B<isListGroupFieldName>($name)
+
+=item $obj-E<gt>B<software>()
+
+Inherited, see L<Mail::Message::Head::FieldGroup/"Access to the header">
+
+=item $obj-E<gt>B<type>()
+
+Inherited, see L<Mail::Message::Head::FieldGroup/"Access to the header">
+
+=item $obj-E<gt>B<version>()
+
+Inherited, see L<Mail::Message::Head::FieldGroup/"Access to the header">
+
+=back
+
+=head2 Internals
+
+Extends L<"Internals" in Mail::Message::Head::FieldGroup|Mail::Message::Head::FieldGroup/"Internals">.
+ 
+=over 4
+
+=item $obj-E<gt>B<collectFields>()
+
+Scan the header for fields which are usually contained in mailing list
+software.  This method is automatically called when a list group is
+constructed L<from()|Mail::Message::Head::ListGroup/"Constructors"> an existing header or message.
+
+Returned are the names of the list header fields found, in scalar
+context the amount.  An empty list/zero indicates that this is not
+a mailing list message.
+
+Please warn the author of MailBox if you see that to few
+or too many fields are included.
+
+=item $obj-E<gt>B<detected>($type, $software, $version)
+
+Inherited, see L<Mail::Message::Head::FieldGroup/"Internals">
+
+=back
+
+=head2 Error handling
+
+Extends L<"Error handling" in Mail::Message::Head::FieldGroup|Mail::Message::Head::FieldGroup/"Error handling">.
+ 
+=over 4
+
+=item $obj-E<gt>B<AUTOLOAD>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<addReport>($object)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+=item Mail::Message::Head::ListGroup-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<details>()
+
+Produce information about the detected/create list group, which may be
+helpful during debugging, by default to the selected file handle.
+
+=item $obj-E<gt>B<errors>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<log>( [$level, [$strings]] )
+
+=item Mail::Message::Head::ListGroup-E<gt>B<log>( [$level, [$strings]] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logPriority>($level)
+
+=item Mail::Message::Head::ListGroup-E<gt>B<logPriority>($level)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<notImplemented>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<print>( [$fh] )
+
+Inherited, see L<Mail::Message::Head::FieldGroup/"Error handling">
+
+=item $obj-E<gt>B<report>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<reportAll>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<trace>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<warnings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=back
+
+=head2 Cleanup
+
+Extends L<"Cleanup" in Mail::Message::Head::FieldGroup|Mail::Message::Head::FieldGroup/"Cleanup">.
+ 
+=over 4
+
+=item $obj-E<gt>B<DESTROY>()
+
+Inherited, see L<Mail::Reporter/"Cleanup">
+
+=back
+
+=head1 DETAILS
+
+=head2 Mailing list fields
+
+=head3 Detected lists
+
+The L<Mail::Message::Head::ListGroup|Mail::Message::Head::ListGroup> class can detect many different
+mailing lists, some of which are very popular and some of which are
+rare.
+
+Numerous fields in a header are addded when the message is passed
+through a mailing list server.  Each list software has defined its own
+fields, sometimes woth conflicting definitions.  There are also two
+RFCs about mailing list: C<rfc2919> and C<rfc2369>.
+
+The following lists are currently detected.  Between parenthesis is
+the string returned by L<type()|Mail::Message::Head::FieldGroup/"Access to the header"> when that differs from the software
+name.
+
+=over 4
+
+=item * CommuniGate
+
+Legacy commercial MacOS implementation by Stalker Software Inc.
+L<http://www.stalker.com/mac/default.html>
+
+=item * CommuniGate Pro (CommuniGatePro)
+
+Commercial rfc2919 compliant implementation by Stalker Software Inc.
+L<http://www.stalker.com>
+
+=item * Ecartis
+
+Commercial mailing list manager, formerly known as Listar. Produced
+by NodeRunner Computing.  See L<http://www.ecartis.com>.
+
+=item * Ezmlm
+
+Open Source mailing list manager, available from L<http://www.ezmlm.org>.
+
+=item * FML
+
+Open Source mailing list manager, see L<http://www.fml.org>.
+
+=item * Listar
+
+Old name for Ecartis.
+
+=item * Listbox
+
+Mailing lists defined at L<http://listbox.com>.
+
+=item * Mailman
+
+GNU's mailing list manager, available from L<http://www.list.org>.
+
+=item * Majordomo
+
+Free (licenced) mailing list manager by Great Circle Associates,
+available from L<http://www.greatcircle.com/majordomo/>
+
+=item * Smartlist
+
+Related to procmail, as expressed by their shared main page at
+L<http://www.procmail.org/>.
+
+=item * Yahoo! Groups (YahooGroups)
+
+Mailing lists defined at L<http://groups.yahoo.com>.
+
+=item * Listserv
+
+Commercial mailing list manager, produced by L-Soft. See
+L<http://www.lsoft.com/>.
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: Cannot convert "$string" into an address object
+
+The L<new(address)|Mail::Message::Head::ListGroup/"Constructors"> is coerced into a L<Mail::Message::Field::Address|Mail::Message::Field::Address>,
+which fails.  Have a look at L<Mail::Message::Field::Address::coerce()|Mail::Message::Field::Address/"Constructors">
+to see what valid arguments are.
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Message distribution version 3.000,
+built on February 02, 2017.
+
+Do not forget to read
+L</Mail::Box-Overview>,
+L</Mail::Box-Cookbook>, and
+L</Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L</Mail::Message>,
+L</Mail::Box>,
+L</Mail::Box::IMAP4>,
+L</Mail::Box::POP3>,
+L</Mail::Box::Parser::C>,
+L</Mail::Box::Dbx> (unpublished),
+L</Mail::Transport>,
+L</Object::Realize::Later>, and
+L</User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

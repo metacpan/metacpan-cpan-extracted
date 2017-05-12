@@ -1,0 +1,59 @@
+---
+abstract: 'perl bindings for Apache Mesos'
+author:
+  - 'Mark Flickinger <maf@cpan.org>'
+build_requires:
+  AnyEvent::Future: '0'
+  Devel::PPPort: '3.19'
+  ExtUtils::MakeMaker: '6.59'
+  Test::Class::Moose: '0.55'
+  Test::LeakTrace: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Strict: '0'
+  Try::Tiny: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  Devel::PPPort: '3.19'
+  ExtUtils::CppGuess: '0'
+  ExtUtils::MakeMaker: '6.59'
+  ExtUtils::ParseXS: '3.18'
+  ExtUtils::Typemaps::ObjectMap: '0'
+  ExtUtils::Typemaps::STL: '0'
+  File::Temp: '0'
+  List::Util: '0'
+dynamic_config: '0'
+generated_by: 'Module::Install version 1.16, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mesos
+no_index:
+  directory:
+    - bin
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  AnyEvent: '0'
+  Carp: '0'
+  Digest::SHA: '0'
+  Google::ProtocolBuffers: '0'
+  Module::Runtime: '0'
+  Moo: '0'
+  Scalar::Util: '0'
+  Scope::Guard: '0'
+  Type::Tiny: '0'
+  XSLoader: '0.02'
+  namespace::autoclean: '0.16'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/mark-5/perl-mesos/issues
+  homepage: https://github.com/mark-5/perl-mesos
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/mark-5/perl-mesos.git
+version: 1.07.1
+x_module_name: Mesos
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

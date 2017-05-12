@@ -1,0 +1,18 @@
+Build.PL
+Changes
+lib/MooseX/Error/Exception/Class.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/000_load.t
+t/001_test.t
+t/800_perlcritic.t
+t/801_pod.t
+t/802_minimumversion.t
+t/803_manifest.t
+t/804_meta.t
+t/settings/perlcritic.txt
+t/settings/perltidy.txt

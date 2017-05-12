@@ -1,0 +1,12 @@
+--- #YAML:1.0
+name: Math-SymbolicX-BigNum
+version: 0.02
+abstract: Big number support for the Math::Symbolic parser
+license: perl
+distribution_type: module
+requires:
+  Test::More: 0.44
+  Math::SymbolicX::ParserExtensionFactory: 0.01
+  Math::Symbolic: 0.129
+  Parse::RecDescent: 0
+dynamic_config: 0

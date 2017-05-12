@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: MARC-Crosswalk-DublinCore
+version: 0.02
+author:
+  - Brian Cassidy <bricas@cpan.org>
+abstract: Convert data between MARC and Dublin Core
+license: perl
+requires:
+  DublinCore::Record: 0
+  MARC::Record: 0
+  Test::More: 0
+provides:
+  MARC::Crosswalk::DublinCore:
+    file: lib/MARC/Crosswalk/DublinCore.pm
+    version: 0.02
+generated_by: Module::Build version 0.2609

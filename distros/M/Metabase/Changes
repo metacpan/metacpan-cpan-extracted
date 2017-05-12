@@ -1,0 +1,121 @@
+Revision history for Metabase
+
+1.003     2013-11-28 07:46:50 America/New_York
+    - Switch from Class::MOP::load_class to Class::Load::load_class
+
+1.002     2013-07-16 10:36:43 America/New_York
+    - Fix a test that had been broken by 5.18's hash ordering changes
+
+1.001     2012-05-18 15:34:47 America/New_York
+
+    [FIXED]
+
+    - Fixed bug where default CHI wasn't initialized properly
+
+1.000     2012-05-16 13:23:04 America/New_York
+
+    - The 1.000 release reflects a major reorganization of the Metabase
+      distribution and is not backwards compatible.
+
+    - The Archive and Index roles have an expanded API with additional
+      required methods
+
+    - A Query role has been added to abstract query requirements from the
+      indexer to allow for backend-specific query implementations
+
+    - Tests have been converted to Test::Routine style roles, which are
+      released with the distribution for use in backend tests in other
+      distributions.
+
+    - AWS and SQLite backends have been removed and will be released as
+      separate distributions.
+
+    - Solr backend has been removed.
+
+0.016     2010-12-07 15:27:49 EST5EDT
+
+    - No changes.  Released as stable
+
+0.015     2010-09-28 09:41:27 EST5EDT
+
+    - Add explicit dependency on SQL::Translator 0.11006 for DBIx::Class
+      deploy() used in Metabase::Archive::SQLite
+
+0.014     2010-09-20 22:22:45 EST5EDT
+
+    - Now uses SimpleDB::Client instead of SimpleDB::Class
+
+    - Updated dist.ini to @DAGOLDEN style
+
+    - Prerequisites now auto-detected
+
+0.013     2010-09-01 18:29:24 EST5EDT
+
+    - Improve diagnostics on failure
+
+    - Fix occasional failures in t/librarian/report.t due to time
+      comparison between original and saved reports
+
+    - Add iterator generators to librarian (only supported on S3 so far)
+
+    - Load fact classes on demand
+
+    - Require latest Metabase::Fact (0.018)
+
+0.012     2010-04-24 15:18:33 EST5EDT
+
+    - Fix authentication cache bug (first check was always failing)
+
+0.011     2010-04-23 23:38:58 EST5EDT
+
+    - Fix cache attribute type constraint
+
+    - Cache authentication strings, not objects
+
+0.010     2010-04-23 17:40:39 EST5EDT
+
+    - Add authentication caching.  Adds CHI as a prereq
+
+    - Properly document Metabase::Gateway as a Moose::Role
+
+0.009     2010-04-22 07:26:46 EST5EDT
+
+    - Don't add undefined values to the index
+
+0.008     2010-04-20 09:54:07 EST5EDT
+
+    - Fact content metadata keys no longer have to be lowercase
+
+0.007     2010-04-11 12:00:49 EST5EDT
+
+    - Fix a bug in Metabase::Archive::S3 -- NOTE: THIS WILL BREAK
+      ACCESS TO OLD S3 FACTS
+
+0.006     2010-03-29 14:29:25 EST5EDT
+
+    - JSON will now always encode/decode to/from ASCII
+
+    - Converted to Dist::Zilla for easier release management
+
+0.005
+
+    - Remove dependency on JSON::XS and rely on JSON to use it
+      if installed (see Task::Metabase)
+
+    - Ensure JSON encoding includes utf8 encoding to avoid
+      errors compressing wide characters in Metabase::Archive::S3
+
+0.004 Mon Mar 15 22:30:34 EDT 2010
+    - Fixed -limit operator for SimpleDB search
+    - Reduced numerous prerequisites to lower verisons
+
+0.003 Mon Mar  8 23:42:52 EST 2010
+    - heavily revised for CPAN Testers 2.0 effort
+    - Metabase::Gateway is now a Moose::Role
+    - Added Amazon Web Service backends
+
+0.002 (never released)
+    - private development version, never released to CPAN
+
+0.001 24 Jun 2009
+    - original skeleton created at Oslo QA hackathon 2008

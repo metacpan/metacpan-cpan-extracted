@@ -1,0 +1,9 @@
+Build.PL
+lib/Meta/Builder.pm
+lib/Meta/Builder/Base.pm
+lib/Meta/Builder/Util.pm
+MANIFEST			This list of files
+META.yml
+README
+t/Builder.t
+t/Merge.t

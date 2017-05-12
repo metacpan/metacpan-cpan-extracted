@@ -1,0 +1,30 @@
+Changes
+example/bulgarian.xml
+example/convert.pl
+example/greek.xml
+example/russian.xml
+example/ukranian.xml
+example/urdu.xml
+lib/MARC/Detrans.pm
+lib/MARC/Detrans/Config.pm
+lib/MARC/Detrans/Name.pm
+lib/MARC/Detrans/Names.pm
+lib/MARC/Detrans/Rule.pm
+lib/MARC/Detrans/Rules.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/config.t
+t/detrans.t
+t/marc.dat
+t/names.t
+t/parallel.t
+t/position.t
+t/repeated.t
+t/rules.t
+t/scriptpresent.t
+t/testconfig.xml
+t/translation.t
+t/unicode.t
+t/unicodeconfig.xml
+META.yml                                 Module meta-data (added by MakeMaker)

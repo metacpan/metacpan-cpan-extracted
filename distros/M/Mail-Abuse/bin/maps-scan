@@ -1,0 +1,251 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+# $Id: maps-scan,v 1.3 2003/11/02 03:13:44 lem Exp $
+
+use Pod::Usage;
+use Getopt::Std;
+use NetAddr::IP;
+use LWP::RobotUA;
+
+our $VERSION = do { my @r = (q$Revision: 1.3 $ =~ /\d+/g); sprintf " %d."."%03d" x $#r, @r };
+
+=pod
+
+=head1 NAME
+
+maps-scan - Checks listing status on mail-abuse.org's RBLs
+
+=head1 SYNOPSIS
+
+    maps-scan [-h] [-d delay] [-v] [-m regexp] [-M regexp] IPs
+
+=head1 DESCRIPTION
+
+This script automates the task of verifying that your address space is
+in one of the mail-abuse.org's RBL. You can supply a single host, a
+subnet or a list of hosts or subnets in the command line. Every host
+is listed against said RBLs.
+
+Queries are done through HTTP, as these lists are in the process of
+becoming private.
+
+=head2 Do not abuse this script
+
+In general, it is not polite to send large numbers of queries to a
+host, as this might be interpreted as an attack. Use this scipt
+judiciously and avoid long and repeated queries.
+
+Note that mail-abuse.org has a limit on the number of queries allowed
+per hour. If you need to scan an address block using this tool, you
+should probably use a delay of a few minutes between queries, using
+the B<-d> option.
+
+The following options are recognized:
+
+=over
+
+=item B<-h>
+
+Outputs this documentation.
+
+=item B<-d delay>
+
+Delay in seconds between a set of queries to the RBLs. Defaults to 60
+seconds, which is ok for ocassional scans of a few addresses. If you
+need to scan larger blocks, B<increase> the delay so that the abuse
+prevention mechanisms don not block you.
+
+=item B<-m regexp>
+
+Only query RBLs whose tags match the given regular expression.
+
+=item B<-M regexp>
+
+Similar to B<-m>, but the regexp B<must not match> to use the given RBL.
+
+This is very useful as there are some RBLs that match a significant
+proportion of the address space or that are not helpful in your
+particular scenario.
+
+Another potential use of B<-M> and B<-m>, is to taylor the list of
+RBLs to search in order to speed up the lookups. This is specially
+true if you are interested in a scan of a large piece of address
+space.
+
+=item B<-v>
+
+Be verbose about progress.
+
+=cut
+
+    ;
+use vars qw/ $opt_d $opt_h $opt_M $opt_m $opt_v /;
+
+getopts('d:hM:m:v');
+
+$opt_d = 60 unless $opt_d;
+pod2usage(verbose => 2) if $opt_h;
+
+$opt_m = qr/$opt_m/ if $opt_m;
+$opt_M = qr/$opt_M/ if $opt_M;
+
+my $ua = LWP::RobotUA->new("maps-scan/$VERSION", 
+			   'maps-scan-user@this.domain');
+$ua->delay($opt_d / 60);
+
+sub _maps_rbl ($$)
+{
+    my $ua	= shift;
+    my $ip	= shift;
+
+    print "# MAPS-RBL lookup of ", $ip->addr, "\n" if $opt_v;
+
+    my $r = $ua->get('http://www.mail-abuse.org/cgi-bin/lookup?' . $ip->addr);
+
+    if ($r->is_success)
+    {
+	if ($r->content =~ /get your IP address removed/)
+	{
+	    return $ip;
+	}
+	elsif ($r->content !~ /does not appear on the MAPS RBL/)
+	{
+	    print "# Inconclussive result (MAPS-RBL) for ", $ip->addr, "\n";
+	}
+    }
+    else
+    {
+	print "# Failed MAPS-RBL HTTP query for ", $ip->addr, 
+	": ", $r->code, "/", $r->message, "\n";
+    }
+
+    return;
+}
+
+sub _maps_rss ($$)
+{
+    my $ua	= shift;
+    my $ip	= shift;
+
+    print "# MAPS-RSS lookup of ", $ip->addr, "\n" if $opt_v;
+
+    my $r = $ua->get('http://work-rss.mail-abuse.org/cgi-bin/nph-rss?query=' 
+		     . $ip->addr);
+
+    if ($r->is_success)
+    {
+	if ($r->content =~ /is currently on the/)
+	{
+	    return $ip;
+	}
+	elsif ($r->content !~ /is NOT currently on the/)
+	{
+	    print "# Inconclussive result (MAPS-RSS) for ", $ip->addr, "\n";
+	}
+    }
+    else
+    {
+	print "# Failed MAPS-RSS HTTP query for ", $ip->addr, 
+	": ", $r->code, "/", $r->message, "\n";
+    }
+
+    return;
+}
+
+sub _maps_ops ($$)
+{
+    my $ua	= shift;
+    my $ip	= shift;
+
+    print "# MAPS-OPS lookup of ", $ip->addr, "\n" if $opt_v;
+
+    my $r = $ua->get('http://www3.mail-abuse.org/cgi-bin/nph-ops?query=' 
+		     . $ip->addr);
+
+    if ($r->is_success)
+    {
+	if ($r->content =~ /is currently on the/)
+	{
+	    return $ip;
+	}
+	elsif ($r->content !~ /is NOT currently on the/)
+	{
+	    print "# Inconclussive result (MAPS-OPS) for ", $ip->addr, "\n";
+	}
+    }
+    else
+    {
+	print "# Failed MAPS-OPS HTTP query for ", $ip->addr, 
+	": ", $r->code, "/", $r->message, "\n";
+    }
+
+    return;
+}
+
+my %rbl = (
+	   'maps-rbl'	=> \&_maps_rbl,
+	   'maps-dul'	=> \&_maps_rbl,	# Looks the same to me...
+	   'maps-rss'	=> \&_maps_rss,
+	   'maps-ops'	=> \&_maps_ops,
+	   );
+
+print "Scanning arguments against ", scalar keys %rbl, " RBLs\n"
+    if $opt_v;
+
+for my $ip (map { NetAddr::IP->new($_)->hostenum } @ARGV)
+{
+    local $| = 1;
+    for my $rbl (sort keys %rbl)
+    {
+	next unless !$opt_m or $rbl =~ m/${opt_m}/;
+	next unless !$opt_M or $rbl !~ m/${opt_M}/;
+
+	if ($rbl{$rbl}->($ua, $ip))
+	{
+	    print $ip->addr, " is listed in $rbl\n"; 
+	}
+	elsif ($opt_v)
+	{
+	    print $ip->addr, " is NOT listed in $rbl\n"; 
+	}
+
+    }
+}
+
+__END__
+
+=pod
+
+=back
+
+=head1 HISTORY
+
+=over
+
+=item B<Oct, 2003>
+
+First version of this code.
+
+=back
+
+=head1 LICENSE AND WARRANTY
+
+This code and all accompanying software comes with NO WARRANTY. You
+use it at your own risk.
+
+This code and all accompanying software can be used freely under the
+same terms as Perl itself.
+
+=head1 AUTHOR
+
+Luis E. Muñoz <luismunoz@cpan.org>
+
+=head1 SEE ALSO
+
+perl(1), C<LWP::RobotUA(3)>
+
+=cut
+

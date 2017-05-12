@@ -1,0 +1,107 @@
+Revision history for Map::Tube::Tokyo
+
+0.27  Wed Mar 22 23:15:00 2017
+      - Tidied up test scripts and removed "-T" switch.
+
+0.26  Sat Mar 18 14:45:00 2017
+      - Upgraded to use Test::Map::Tube v0.25.
+
+0.25  Sun Mar 12 08:45:00 2017
+      - Upgraded to use Map::Tube v3.28.
+
+0.24  Fri Aug 19 11:25:00 2016
+      - Upgraded to use Map::Tube v3.18.
+
+0.23  Fri Jul 01 19:00:00 2016
+      - Upgraded to use Map::Tube v3.15.
+      - Consolidated routes testing functions using method ok_map_routes().
+      - Updated copyright year information.
+
+0.22  Sat Nov 07 10:40:00 2015
+      - Fixed the error reported by CPANT Testers.
+      - Upgraded to use Map::Tube v3.12.
+
+0.21  Wed Sep 23 10:20:00 2015
+      - Upgraded to use Map::Tube v3.01.
+
+0.20  Tue Jul 28 12:00:00 2015
+      - Upgraded to use Map::Tube v3.00.
+
+0.19  Mon Jul 27 12:00:00 2015
+      - Corrected Asakusa and Chiyoda lines data in the map file.
+
+0.18  Sun Mar 01 09:50:00 2015
+      - Updated Copyright year information in the README file.
+
+0.17  Sun Mar 01 09:25:00 2015
+      - Added File::ShareDir::Install as configure requires in the Makefile.PL file.
+
+0.16  Mon Feb 23 20:00:00 2015
+      - Tidied up pod document.
+
+0.15  Mon Feb 23 18:30:00 2015
+      - Upgraded to use Map::Tube v2.87.
+      - Added unit test map.t script.
+      - Added Tokyo subway map image.
+      - Tidied up pod document.
+
+0.14  Sun Feb 08 02:15:00 2015
+      - Upgraded to use Map::Tube v2.78.
+      - Added map image for Asakusa and Chiyoda Tokyo Subway lines.
+      - Added section "MAP" to all pod documents of Map::Tube::Tokyo::Line::* family.
+      - Documented method as_image() in the pod of Map::Tube::Tokyo.
+      - Added lines information to the map data xml.
+      - Assigned name to the map in the xml data.
+
+0.13  Tue Jan 13 15:23:10 2015
+      - Upgraded to use Map::Tube v2.62.
+      - Tidied up unit test scripts.
+
+0.12  Thu Jan 08 16:00:00 2015
+      - Added line 'use strict; use warnings;' to all the packages Map::Tube::Tokyo::Line::*.pm file.
+
+0.11  Thu Jan 08 15:30:20 2015
+      - Upgraded to use Map::Tube v2.61 as it brings in new fix and feature.
+      - Updated Makefile.PL to generate the key 'provides' for META file correctly.
+      - Added unit test to test META files.
+      - Added LICENSE file.
+      - Updated Copyright year information.
+
+0.10  Fri Dec 26 19:20:10 2014
+      - Added package to list subway stations for Chiyoda Line.
+      - Updated pod document for Map::Tube::Tokyo about the above changes.
+
+0.09  Wed Dec 24 19:18:10 2014
+      - Upgraded to use Map::Tube v2.46.
+      - Added package to list subway stations for Asakusa Line.
+      - Updated pod document for Map::Tube::Tokyo about the above changes.
+
+0.08  Fri Dec 05 20:56:10 2014
+      - Upgraded to use Map::Tube v2.33 as it brings in new fix and feature.
+      - Updated unit test to reflect the changes in Map::Tube v2.33.
+
+0.07  Fri Dec 05 11:05:10 2014
+      - Updated the description of method get_shortest_route().
+
+0.06  Thu Dec 04 20:00:10 2014
+      - Updated unit test to make use of new class provided by Map::Tube role.
+      - Updated description of method get_shortest_route() in the pod documemt.
+
+0.05  Thu Dec 04 13:45:10 2014
+      - Upgraded to use Map::Tube v2.31 as it brings in new fix and feature.
+      - Added test case for case insensitive station name.
+      - Adding missing stations to the map data.
+      - Removed SIGNATURE file.
+
+0.04  Mon Dec 01 23:05:00 2014
+      - Upgraded to use Map::Tube v2.27 as it brings in new fix and feature.
+      - Updated test case to comply with the updated package Map::Tube.
+
+0.03  Wed Nov 12 20:04:05 2014
+      - Restructed the map and organised junction station correctly.
+
+0.02  Tue Nov 11 22:54:10 2014
+      - Added test script test-case-00.t.
+
+0.01  Sat Nov 08 01:30:01 2014
+      - First version, released.

@@ -1,0 +1,28 @@
+Fix EventListener.
+
+Split DOM.xs into separate files. I'd like to have ones
+for Event, Node, HTMLElement.. (would break interface, though)
+
+Figure out DOMException.
+I'm not sure if DOMException is even relevant from C++,
+as I think integers are always returned on failure.
+(need to verify)
+There isn't any error checking at the moment..
+
+nsIDOMSVG*, CSS*, XPath*, and XUL*?
+How would I even get a pointer to those?
+[Check out content/base/src/ns*.cpp and dom/src/base/ns*.cpp.
+What is EventReceiver? WebProgressListener?]
+
+Find a reference for different interfaces of each class
+(DocumentEvent for Document, etc.), what interfaces are
+valid to switch to with QueryInterface. It looks like I have
+to scour Mozilla's .cpp files. I did
+find . -name '*.cpp' -exec fgrep -H _MAP_ {} \;
+which seems to kind of list QI-able interfaces.
+See dom/src/base/nsDOMClassInfo.cpp.
+
+Fill out missing documentation.
+Document how to add this to a module using ExtUtils::Depends.
+
+Tests and more examples....

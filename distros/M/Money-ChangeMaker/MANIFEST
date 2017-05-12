@@ -1,0 +1,27 @@
+Changes
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Money/ChangeMaker.pm
+lib/Money/ChangeMaker/Denomination.pm
+lib/Money/ChangeMaker/Presets.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/australia.t
+t/canada.t
+t/euro.t
+t/india.t
+t/pod.t
+t/pod_cover.t
+t/uk.t
+t/us.t

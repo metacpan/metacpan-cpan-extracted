@@ -1,0 +1,38 @@
+---
+abstract: 'message-passing out put to MongoDB'
+author:
+  - ', COPYRIGHT AND LICENSE'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Try::Tiny: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Message-Passing-Output-MongoDB
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  AnyEvent: 0
+  Message::Passing: 0.009
+  MongoDB: 0
+  Moose: 0
+  MooseX::Types: 0
+  MooseX::Types::ISO8601: 0
+  Tie::IxHash: 0
+  aliased: 0
+  bareword::filehandles: 0
+  indirect: 0
+  multidimensional: 0
+  namespace::autoclean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/bins/Message-Passing-Output-MongoDB.git
+version: 0.052

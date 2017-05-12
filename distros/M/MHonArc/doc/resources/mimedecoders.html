@@ -1,0 +1,178 @@
+<html>
+<head>
+<title>MHonArc Resources: MIMEDECODERS</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="mimeargs.html">MIMEARGS</a>]</td><td><nobr>[<a href="../resources.html#mimedecoders">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="mimeexcs.html">MIMEEXCS</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>MIMEDECODERS</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p>
+<code>&lt;MIMEDECODERS&gt;</code><br>
+<var>decoder-specification</var><br>
+<var>...</var><br>
+<code>&lt;/MIMEDECODERS&gt;</code><br>
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>The MIMEDECODERS resource specifies Perl routines to call
+for decoding MIME encoded data.  For message bodies, the encoding
+is specified by the <tt>Content-Transfer-Encoding</tt> header
+field.  Data encoding can also occur for non-ASCII data in
+message headers.
+</p>
+
+<p>The MIMEDECODERS resource can only be defined via the
+resource file.  Each line of the element specifies a encoding,
+the Perl decoding routine, and the Perl source
+file containing the routine.
+</p>
+
+<p>Example:</p>
+<pre class="code">
+<b>&lt;MIMEDecoders&gt;</b>
+base64;           base64::b64decode;            base64.pl
+<b>&lt;/MIMEDecoders&gt;</b>
+</pre>
+
+<p>The first field is the encoding method.  The second field
+is the routine name (which should contain a package qualifier).
+The third field is the source file the routine is defined.  The
+source file is optional if the routine is known to be defined in
+an already listed source file.
+</p>
+
+<p>There are some special decoder routines
+values.  They are as follows:
+</p>
+ 
+<dl>
+ 
+<dt><em>as-is</em></dt>
+<dd><p>Leave the data "as-is".
+</p>
+</dd>
+
+</dl>
+
+<p>Each decoder function is invoked as follows:
+</p>
+
+<pre>
+    $decoded_data = &amp;function($data);
+</pre>
+ 
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<pre class="code">
+<b>&lt;MIMEDecoders&gt;</b>
+7bit;             as-is;
+8bit;             as-is;
+binary;           as-is;
+base64;           base64::b64decode;            base64.pl
+quoted-printable; quoted_printable::qprdecode;  qprint.pl
+x-uuencode;       base64::uudecode;             base64.pl
+xuue;             base64::uudecode;             base64.pl
+uuencode;         base64::uudecode;             base64.pl
+<b>&lt;/MIMEDecoders&gt;</b>
+</pre>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>The following example changes the base64 decoder to use the
+MIME::Base64 module (available from CPAN):
+</p>
+
+<pre class="code">
+<b>&lt;MIMEDecoders&gt;</b>
+base64; MIME::Base64::decode_base64; MIME/Base64.pm
+<b>&lt;/MIMEDecoders&gt;</b>
+</pre>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>2.4.4
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+<a href="charsetconverters.html">CHARSETCONVERTERS</a>,
+<a href="mimefilters.html">MIMEFILTERS</a>,
+<a href="perlinc.html">PERLINC</a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="mimeargs.html">MIMEARGS</a>]</td><td><nobr>[<a href="../resources.html#mimedecoders">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="mimeexcs.html">MIMEEXCS</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2005/05/13 18:50:38 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"
+><strong>MHonArc</strong></a><br>
+Copyright &#169; 1999, <a href="http://www.earlhood.com/"
+>Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org"
+>mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

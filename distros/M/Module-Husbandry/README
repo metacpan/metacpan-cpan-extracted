@@ -1,0 +1,157 @@
+README for Module::Husbandry
+
+    ALPHA CODE ALERT: This code is alpha; the API and behaviors are
+    likely to change.  This release is for evaluation and feedback;
+    see the TODO file for some ideas of where this might go.
+
+A module and a set of wrapper scripts that let me manage perl
+distributions a bit more easily.  There are more to come; the current
+crop is:
+
+    newpmdist      Creates a new distribution tree and populates it
+    newpm          Creates a new module in a distribution
+    mvpm           Renames a module and all occurences of its module name
+                   and path:
+
+                       s{Foo::Bar}{Foo::Bat}g;
+                       s{lib/Foo/Bar.pm}{lib/Foo/Bat.pm}g;
+                       s{t/Foo-Bar.t}{t/Foo-Bat.t}g;
+
+To use the new* scripts, you need a ~/.newpm/ directory with appropriate
+templates (see below).  mvpm just makes some rash assumptions (also see
+below) about your directory structure and test script naming convention.
+
+Here are the usages:
+
+    newpmdist Foo-Bar    ## Create Foo-Bar/ and populate it
+    newpmdist Foo::Bar   ## as above
+
+
+    newpm Foo::Bar           ## Create lib/Foo/Bar.pm and t/Foo-Bar.t
+    newpm lib/Foo/Bar.pm     ## Create lib/Foo/Bar.pm and t/Foo-Bar.t
+    newpm lib/Foo/Bar.pod    ## Create lib/Foo/Bar.pod only
+    
+    newpm Foo::Bar Foo::Bar  ## as above, but for multiple modules
+
+
+    mvpm From::Module       To::Module        # Use module names
+    mvpm lib/From/Module.pm lib/To/Module.pm  # or paths from main project dir
+    mvpm lib/From/Module.pm To::Module        # or mix and match
+
+    mvpm -r From            To                # move dir tree (TODO)
+    mvpm -r lib/From        lib/To            # move dir tree (TODO)
+
+As you can see, each can take a module name, if that's the way you
+work, or a file or directory name.  Using file or directory names lets
+you take advantage of your shell's autocompletion and history features.
+For instance:
+
+    $ newpm lib/Fundingulus/Maximus.pm
+    $ edit !$
+
+can be typed in a lot fewer keystrokes than
+
+    $ newpm Fundingulus::Maximus
+    $ edit lib/Fundingulus/Maximus.pm
+
+newpmdist and newpm use a set of templates to instantiate new files.
+These are stored (for now) in ~/.newpm:
+
+    $ cd ~/.newpm && find .
+    .
+    ./Template.t
+    ./Template.pm
+    ./skel
+    ./skel/MANIFEST.SKIP
+    ./skel/Makefile.PL
+    ./skel/t
+    ./skel/CHANGES
+
+This means that you control what files are populated how.  Some
+example files (those) are in newpm_example_dir/ in the source tarball.
+
+ASSumptions
+===========
+
+These tools make the assumption that you use a working directory
+structure like:
+
+    Foo-Bar/
+        lib/
+            Foo/
+                Bar.pm
+                Bah.pm
+                Bat.pm
+            Zed.pm
+        t/...
+
+and not the Foo-Bar/Bar.pm style promulgates by h2xs.  This layout
+(storing all .pm and .pod files under lib/) is more consistent and
+flexible than storing the .pm and .pod files in the main directory,
+but may not be to your liking.  Patches welcome :).
+
+One side effect of this is that XS modules are may not be
+well supported.
+
+newpm and mvpm also create and check for test suites named after the
+module like so:
+
+    Foo       t/Foo.t
+    Foo::Bar  t/Foo-Bar.t
+
+.  This is also arbitrary, and even I don't really like it that
+much, but it's the easiest way I could think of to be able to make
+and rename test files automatically.
+
+
+Example
+=======
+
+Here's an example newpmdist invocation.  Towards the end, newpmdist
+also does a newpm, so you can get a feel for what that's like (all lines
+but the first are emitted by newpmdist):
+
+    $ newpmdist Foo-Bar
+    newpmdist$ mkdir -p Foo-Bar
+    newpmdist$ chdir Foo-Bar
+    newpmdist$ install Makefile.PL
+    newpmdist$ install MANIFEST.SKIP
+    newpmdist$ install CHANGES
+    newpmdist$ install lib/Foo/Bar.pm
+    newpmdist$ mkdir -p lib/Foo
+    newpmdist$ install t/Foo-Bar.t
+    newpmdist$ mkdir -p t
+    newpmdist/usr/local/bin/perl Makefile
+    Checking if your kit is complete...
+    Looks good
+    Writing Makefile for Foo::Bar
+    newpmdist$ chdir ..
+
+Here's what things look like after all that:
+
+    $ cd Foo-Bar
+    $ find .
+    .
+    ./Makefile.PL
+    ./MANIFEST
+    ./MANIFEST.SKIP
+    ./CHANGES
+    ./lib
+    ./lib/Foo
+    ./lib/Foo/Bar.pm
+    ./t
+    ./t/Foo-Bar.t
+    ./Makefile
+    $ perl Makefile.PL
+    Writing Makefile for Foo::Bar
+    $ make distcheck
+    /usr/local/bin/perl "-MExtUtils::Manifest=fullcheck" -e fullcheck
+    $ make test
+    cp lib/Foo/Bar.pm blib/lib/Foo/Bar.pm
+    PERL_DL_NONLAZY=1 /usr/local/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+    t/Foo-Bar....ok                                                              
+    All tests successful.
+    Files=1, Tests=1,  0 wallclock secs ( 0.06 cusr +  0.00 csys =  0.06 CPU)
+
+The module Module::Husbandry uses lazy loading of required modules to
+minimize running time.

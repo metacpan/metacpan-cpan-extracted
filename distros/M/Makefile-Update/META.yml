@@ -1,0 +1,25 @@
+---
+abstract: 'Update make files.'
+author:
+  - 'Vadim Zeitlin <vz-cpan@zeitlins.org>'
+build_requires:
+  Test::LongString: '0'
+  Test::More: '0'
+  Test::Output: '0'
+  Test::Warn: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Makefile-Update
+recommends:
+  Text::Diff: '0'
+resources:
+  bugtracker: https://github.com/vadz/upmake/issues
+  homepage: https://github.com/vadz/upmake
+  repository: https://github.com/vadz/upmake.git
+version: '0.3'

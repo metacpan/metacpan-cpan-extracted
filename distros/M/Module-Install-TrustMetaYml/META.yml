@@ -1,0 +1,32 @@
+---
+abstract: 'trusts META.yml list of dependencies'
+author:
+  - 'Toby Inkster'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Module::Install::TrustMetaYml
+name: Module-Install-TrustMetaYml
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  YAML::Tiny: 0
+  perl: 5.005
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Module-Install-TrustMetaYml
+  homepage: https://metacpan.org/release/Module-Install-TrustMetaYml
+  license: http://dev.perl.org/licenses/
+  repository: https://bitbucket.org/tobyink/p5-module-install-trustmetayml
+version: 0.003

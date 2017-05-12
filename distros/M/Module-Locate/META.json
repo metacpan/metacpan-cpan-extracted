@@ -1,0 +1,54 @@
+{
+   "abstract" : "locate modules in the same fashion as C<require> and C<use>",
+   "author" : [
+      "Dan Brook <cpan@broquaint.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Module-Locate",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Spec::Functions" : "0",
+            "IO::File" : "0",
+            "overload" : "0",
+            "perl" : "v5.8.8",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "Test::More" : "0.88",
+            "base" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/Module-Locate",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/Module-Locate.git",
+         "web" : "https://github.com/neilb/Module-Locate"
+      }
+   },
+   "version" : "1.80"
+}
+

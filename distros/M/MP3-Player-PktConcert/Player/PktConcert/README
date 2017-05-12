@@ -1,0 +1,70 @@
+MP3/Player/PktConcert version 0.01
+==================================
+
+MP3::Player::PktConcert is a Perl wrapper to the excellent C API to the 
+Intel PocketConcert written by John Seagull. This module provides a Perl 
+object-oriented API that enables detecting, track management, and memory 
+management. John's C API is called libipc. The actual files that the 
+library builds are libipkc.a and libipkc.h.
+
+This package was developed on a Linux 2.4.8 kernel, and subsequently that 
+is the only known distribution that this package will reliably work on. 
+Your mileage may vary, and I would appreciate hearing if you can get this 
+package working on your system. It should work on most any modern Linux 
+distribution, but I make no guarantees.
+
+Installing this package also assumes that you've installed libipkc and 
+its dependency, libusb. Some modifications to libipkc.h may be required 
+to get this package working. See the installation notes for more details.
+
+As always, for usage questions, read the perldoc for the module. Thanks, 
+and have fun playing with your Intel PocketConcert with Perl!
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+MP3::Player::PktConcert requires the following C libraries, libusb and 
+libipc, both available from SourceForge. There is another SourceForge
+project with the name 'libipc', which aims to build an Open-Source 
+graphical user interface to the Intel Pocket Concert as well as a CLI
+specification for custom development. This is not the droid you're
+looking for. The libraries are available from the following links:
+
+libipc:
+http://www.sourceforge.org/projects/pocketconcert
+
+libusb:
+http://www.sourceforge.org/projects/libusb
+
+This package assumes that you have root priveleges to install these
+C libraries under /usr/local. Otherwise you may have to modify the
+Makefile.PL and *.xs files included with this package to point to
+your installation appropriately. 
+
+Modifying your libipkc.h to work in a general case:
+
+The header file libipkc.h, for some reason, has a dependency on a
+configuration header, config.h, found with the configure script
+(in version 0.4, that would be libipc/config.h). I found that,
+after make install, I created /usr/local/include/libipkc and copied
+config.h to that path. I then modified libipkc.h's #include directive
+to point to that copy of config.h.
+
+After doing that, I could compile my C programs requiring libipkc.h
+by telling gcc -I/usr/local/include -L/usr/local/lib without error.
+
+COPYRIGHT AND LICENCE
+
+  © 2002 Mike Wong. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

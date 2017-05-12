@@ -1,0 +1,44 @@
+Mac-Spotlight-MDQuery version 0.01
+==================================
+
+Mac-Spotlight provides a Perl API to the Spotlight service on OS X,
+specifically via Core Foundation's MDQuery and MDItem APIs.
+
+This is very much a beta version. It is not totally feature complete
+(see TODO) and probably has bugs. Please email bug reports to the
+below email address.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Mac-Spotlight does not have any dependencies on other Perl modules. It
+does require Mac OS 10.4 or higher and Perl 5.8.x or higher. If you
+have Mac OS 10.4 the default Perl is at least 5.8.6.
+
+TODO
+
+We don't support all the options that can be set in an MDQuery. Although
+most of those options have to do with asychronous queries which we don't 
+do.
+
+There should be a way to get more than one attribute at a time via
+MDItem::get(), and there should be something like MDItem::get_all()
+which returns a complete set of relevant attributes in a hash.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Adrian Hosey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

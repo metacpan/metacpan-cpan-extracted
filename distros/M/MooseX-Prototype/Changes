@@ -1,0 +1,35 @@
+MooseX-Prototype
+================
+
+Created:      2012-04-20
+Home page:    <https://metacpan.org/release/MooseX-Prototype>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Prototype>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.004	2014-09-16
+
+ [ Packaging ]
+ - Add IRC link.
+ - Add repo link.
+
+ [ Other ]
+ - No longer require thanks.pm.
+
+0.003	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.002	2012-10-25	Reboot
+
+ [ Documentation ]
+ - Improved documentation with better explanation about what
+   prototype-based programming is.
+
+ [ Other ]
+ - 'MooseX::Prototype::Role::UseAsPrototype' replaced with more functional
+   'MooseX::Prototype::Trait::Object'.
+ - 'use_as_prototype' function replaced with 'create_class_from_prototype'.
+ - Added: 'object' function for ex-nihilo object creation.
+
+0.001	2012-04-20	Initial release

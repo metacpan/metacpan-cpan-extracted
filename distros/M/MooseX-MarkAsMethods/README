@@ -1,0 +1,173 @@
+NAME
+    MooseX::MarkAsMethods - Mark overload code symbols as methods
+
+VERSION
+    This document describes version 0.15 of MooseX::MarkAsMethods - released
+    May 30, 2012 as part of MooseX-MarkAsMethods.
+
+SYNOPSIS
+        package Foo;
+        use Moose;
+
+        # mark overloads as methods and wipe other non-methods
+        use MooseX::MarkAsMethods autoclean => 1;
+
+        # define overloads, etc as normal
+        use overload '""' => sub { shift->stringify };
+
+        package Baz;
+        use Moose::Role;
+        use MooseX::MarkAsMethods autoclean => 1;
+
+        # overloads defined in a role will "just work" when the role is
+        # composed into a class; they MUST use the anon-sub style invocation
+        use overload '""' => sub { shift->stringify };
+
+        # additional methods generated outside Class::MOP/Moose can be marked, too
+        use constant foo => 'bar';
+        __PACKAGE__->meta->mark_as_method('foo');
+
+        package Bar;
+        use Moose;
+
+        # order is important!
+        use namespace::autoclean;
+        use MooseX::MarkAsMethods;
+
+        # ...
+
+DESCRIPTION
+    MooseX::MarkAsMethods allows one to easily mark certain functions as
+    Moose methods. This will allow other packages such as
+    namespace::autoclean to operate without blowing away your overloads.
+    After using MooseX::MarkAsMethods your overloads will be recognized by
+    Class::MOP as being methods, and class extension as well as composition
+    from roles with overloads will "just work".
+
+    By default we check for overloads, and mark those functions as methods.
+
+    If "autoclean =&gt; 1" is passed to import on using this module, we will
+    invoke namespace::autoclean to clear out non-methods.
+
+TRAITS APPLIED
+    Using this package causes a trait to be applied to your metaclass (for
+    both roles and classes), that provides a mark_as_method() method. You
+    can use this to mark newly generated methods at runtime (e.g. during
+    class composition) that some other package has created for you.
+
+    mark_as_method() is invoked with one or more names to mark as a method.
+    We die on any error (e.g. name not in symbol table, already a method,
+    etc). e.g.
+
+        __PACKAGE__->meta->mark_as_method('newly_generated');
+
+    e.g. say you have some sugar from another package that creates accessors
+    of some sort; you could mark them as methods via a method modifier:
+
+        # called as __PACKAGE__->foo_generator('name', ...)
+        after 'foo_generator' => sub {
+
+            shift->meta->mark_as_method(shift);
+        };
+
+IMPLICATIONS FOR ROLES
+    Using MooseX::MarkAsMethods in a role will cause Moose to track and
+    treat your overloads like any other method defined in the role, and
+    things will "just work". That's it.
+
+    Except... note that due to the way overloads, roles, and Moose work,
+    you'll need to use the coderef or anonymous subroutine approach to
+    overload declaration, or things will not work as you expect. Remember,
+    we're talking about _methods_ here, so we need to make it easy for
+    overload to find the right method. The easiest (and supported) way to do
+    this is to create an anonymous sub to wrap the overload method.
+
+    That is, this will work:
+
+        # note method resolution, things will "just work"
+        use overload '""' => sub { shift->stringify };
+
+    ...and this will not:
+
+        use overload '""' => 'stringify';
+
+    ...and will result in an error message like:
+
+        # wah-wah
+        Can't resolve method "???" overloading """" in package "overload"
+
+CAVEATS
+  Roles
+    See the "IMPLICATIONS FOR ROLES" section, above.
+
+  meta->mark_as_method()
+    You almost certainly don't need or want to do this. CMOP/Moose are
+    fairly good about determining what is and what isn't a method, but not
+    perfect. Before using this method, you should pause and think about why
+    you need to.
+
+  namespace::autoclean
+    As currently implemented, we run our "method maker" at the end of the
+    calling package's compile scope (B::Hooks::EndOfScope). As
+    namespace::autoclean does the same thing, it's important that if
+    namespace::autoclean is used that it be used BEFORE
+    MooseX::MarkAsMethods, so that its end_of_scope block is run after ours.
+
+    e.g.
+
+        # yes!
+        use namespace::autoclean;
+        use MooseX::MarkAsMethods;
+
+        # no -- overloads will be removed
+        use MooseX::MarkAsMethods;
+        use namespace::autoclean;
+
+    The easiest way to invoke this module and clean out non-methods without
+    having to worry about ordering is:
+
+        use MooseX::MarkAsMethods autoclean => 1;
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   overload, B::Hooks::EndOfScope, namespace::autoclean, Class::MOP,
+
+    *   Moose.
+
+    *   MooseX::Role::WithOverloading does allow for overload application
+        from
+
+    *   roles, but it does this by copying the overload symbols from the
+        (not
+
+    *   namespace::autoclean'ed role) the symbols handing overloads during
+        class
+
+    *   composition; we work by marking the overloads as methods and letting
+
+    *   CMOP/Moose handle them.
+
+SOURCE
+    The development version is on github at
+    <http://github.com/RsrchBoy/moosex-markasmethods> and may be cloned from
+    <git://github.com/RsrchBoy/moosex-markasmethods.git>
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/moosex-markasmethods/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2011 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

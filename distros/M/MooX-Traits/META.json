@@ -1,0 +1,91 @@
+{
+   "abstract" : "automatically apply roles at object creation time",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.021, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooX-Traits",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt::Profile::TOBYINK" : "0.001"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Moo::Role" : "0"
+         },
+         "requires" : {
+            "Exporter::Shiny" : "0",
+            "Module::Runtime" : "0",
+            "Role::Tiny" : "1.000000",
+            "Scalar::Util" : "0",
+            "perl" : "5.006000"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Moo" : "0",
+            "MooseX::Role::Parameterized" : "0",
+            "Package::Variant" : "0",
+            "Test::Fatal" : "0"
+         },
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MooX::Traits" : {
+         "file" : "lib/MooX/Traits.pm",
+         "version" : "0.005"
+      },
+      "MooX::Traits::Util" : {
+         "file" : "lib/MooX/Traits/Util.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=MooX-Traits"
+      },
+      "homepage" : "https://metacpan.org/release/MooX-Traits",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-moox-traits.git",
+         "web" : "https://github.com/tobyink/p5-moox-traits"
+      },
+      "x_IRC" : "irc://irc.perl.org/#moose",
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/MooX-Traits/project"
+   },
+   "version" : "0.005"
+}

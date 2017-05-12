@@ -1,0 +1,13 @@
+Revision history for Mojolicious::Plugin::JavaScript::Console
+=============================================================
+
+0.02    2015-03-01
+
+  [MISC]
+  * update dist.ini:
+    - add metadata for resources
+    - use @Basic and @Git bundles
+
+0.01    2012-12-09
+        First version, released on an unsuspecting world.
+

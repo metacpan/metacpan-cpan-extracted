@@ -1,0 +1,308 @@
+
+=head1 NAME
+
+Maypole::Manual::Inheritance - structure of a Maypole application
+
+=head1 DESCRIPTION
+
+Discusses the inheritance structure of a basic and a more advanced Maypole
+application.
+
+=head1 CONVENTIONS
+          
+=over 4
+
+=item inheritance
+
+        +
+        |
+     +-   -+
+	|
+	+
+	
+=item notes
+
+    target *-------- note about the target
+
+=item association
+
+    source ------> target
+
+=back
+
+=head1 Structure of a standard Maypole application
+
+A minimal Maypole application (such as the Beer database example from the
+L<Maypole> synopsis) consists of a custom driver (or controller) class (BeerDB.pm),
+a set of auto-generated model classes, and a view class:
+
+
+           THE DRIVER
+                                          +------- init() is a factory method,
+                   1      Maypole         |           it sets up the view
+   Maypole::Config <----- config();       |              classes
+   model();               init(); *-------+                           THE VIEW
+    |                     view_object(); -------+
+    |    +--------------* setup();              |      Maypole::View::Base
+    |    |                   +                  |              +
+    |    |                   |                  |     1        |
+    |    |    PLUGINS    Apache::MVC *-----+    +-----> Maypole::View::TT
+    |    |       +           +             |             (or another view class)
+    |    |       |           |             |
+    |    |       +-----+-----+             |
+    |    |             |                   |
+    |    |           BeerDB                +----- or CGI::Maypole
+    |    |                                         or MasonX:::Maypole
+    |    |
+    |   setup() is a factory method,
+    |     it sets up the model
+    |         classes
+    |
+    |                                             THE MODEL
+    |
+    |  Maypole::Model::Base    Class::DBI
+    |             +             +      +
+    |             |             |      |
+    +-------> Maypole::Model::CDBI   Class::DBI::<db_driver>
+                      +                     +
+                      |                     |
+           +------------+--------+-------+---------+
+           |            |        |       |         |
+       BeerDB::Pub      |   BeerDB::Beer | BeerDB::Brewery
+       beers();         |   pubs();      | beers();
+                        |   brewery();   |
+                        |   style();     |
+          BeerDB::Handpump               |
+          pub();                      BeerDB::Style
+          beer();                     beers();
+
+=head2 Ouch, that's a lot of inheritence!
+
+Yes, that's a lot of inheritence, at some point in the future - probably Maypole 3.x we
+will move to Class::C3
+
+=head2 What about Maypole::Application - loading plugins
+
+The main job of L<Maypole::Application> is to insert the plugins into the
+hierarchy. It is also the responsibility of L<Maypole::Application> to decide
+which frontend to use. It builds the list of plugins, then pushes them onto the
+driver's C<@ISA>, then pushes the frontend onto the end of the driver's C<@ISA>.
+So method lookup first searches all the plugins, before searching the frontend
+and finally L<Maypole> itself.
+
+From Maypole 2.11, L<Maypole::Application> makes no appearance in the
+inheritance structure of a Maypole application. (In prior versions,
+L<Maypole::Application> would make itself inherit the plugins, and then insert
+itself in the hierarchy, but this was unnecessary).
+
+=head2 Who builds the model?
+
+First, remember we are talking about the standard, unmodified Maypole here. It
+is possible, and common, to override some or all of this stage and build a
+customised model. See below - An advanced Maypole application - for one
+approach. Also, see L<Maypole's|Maypole> C<setup_model()> method. 
+
+The standard model is built in 3 stages. 
+
+First, C<Maypole::setup_model> calls C<setup_database> on the Maypole model
+class, in this case L<Maypole::Model::CDBI>. C<setup_database> then uses
+L<Class::DBI::Loader> to autogenerate individual L<Class::DBI> classes for each
+of the tables in the database (C<BeerDB::Beer>, C<BeerDB::Pub> etc).
+L<Class::DBI::Loader> identifies the appropriate L<Class::DBI> subclass and
+inserts it into each of these table classes' C<@ISA> ( C<<
+Class::DBI::<db_driver> >> in the diagrams)..
+
+Next, C<Maypole::setup> B<pushes> L<Maypole::Model::CDBI> onto the C<@ISA> 
+array of each of these classes. 
+
+Finally, the relationships among these tables are set up. Either do this
+manually, using the standard L<Class::DBI> syntax for configuring table
+relationships, or try L<Class::DBI::Relationship> (which you can use via
+L<Maypole::Plugin::Relationship>). If you use the plugin, you need to set up the
+relationships configuration before calling C<setup()>. Be aware that some people
+like the convenience of L<Class::DBI::Relationship>, others dislike the
+abstraction. YMMV. 
+
+=head1 An advanced Maypole application
+
+We'll call it C<BeerDB2>.
+
+Maypole is a framework, and you can replace different bits as you wish. So what 
+follows is one example of good practice, other people may do things differently. 
+
+We assume this application is being built from the ground up, but it will often
+be straightforward to adapt an existing L<Class::DBI> application to this
+general model.
+
+The main idea is that the autogenerated Maypole model is used as a layer on top
+of a separate L<Class::DBI> model. I am going to refer to this model as the
+'Offline' model, and the Maypole classes as the 'Maypole' model. The idea is
+that the Offline model can (potentially or in actuality) be used as part of
+another application, perhaps a command line program or a cron script, whatever.
+The Offline model does not know about the Maypole model, whereas the Maypole
+model does know about the Offline model.
+
+Let's call the offline model C<OfflineBeer>. As a traditional L<Class::DBI>
+application, individual table classes in this model will inherit from a common
+base (C<OfflineBeer>), which inherits from L<Class::DBI>).
+
+One advantage of this approach is that you can still use Maypole's autogenerated
+model. Another is that you do not mix online and offline code in the same
+packages.
+
+=head2 Building it
+
+Build a driver in a similar way as for the basic app, calling C<setup()> after
+setting up all the configuration. 
+
+It is a good habit to use a custom Maypole model class for each application, as
+it's a likely first target for customisation. Start it like this:
+
+    package BeerDB2::Maypole::Model;
+    use strict;
+    use warnings;
+    use base 'Maypole::Model::CDBI';
+    1;
+    
+You can add methods which should be shared by all table classes to this package 
+as and when required.
+    
+Configure it like this, before the C<setup()> call in the driver class:
+
+    # in package BeerDB2
+    __PACKAGE__->config->model('BeerDB2::Maypole::Model');
+    __PACKAGE__->setup;
+
+The C<setup()> call will ensure your custom model is loaded via C<require>.
+
+B<Note>: by default, this will create Maypole/CDBI classes for all the tables in
+the database. You can control this by passing options for L<Class::DBI::Loader>
+in the call to C<setup()>.
+
+For each class in the model, you need to create a separate file. So for
+C<BeerDB2::Beer>, you would write:
+
+    package BeerDB2::Beer;
+    use strict;
+    use warnings;
+    use base 'OfflineBeer::Beer';
+    1;
+    
+From Maypole 2.11, this package will be loaded automatically during C<setup()>,
+and C<BeerDB2::Maypole::Model> is B<pushed> onto it's C<@ISA>.
+
+Configure relationships either in the individual C<OfflineBeer::*> classes, or
+else all together in C<OfflineBeer> itself i.e. not in the Maypole model. This 
+way, you only define the relationships in one place.
+
+The resulting model looks like this:
+
+                                       Class::DBI
+    MAYPOLE 'MODEL'                       |
+                                          |
+   Maypole::Model::Base                   |
+           +                              |
+           |       +-----------------+----+-----------------+
+           |       |                 |                      |
+           |       |                 |                      |
+     Maypole::Model::CDBI            |                      |     OFFLINE
+             +                       |                      |        MODEL
+             |                       |                      |
+     BeerDB2::Maypole::Model  Class::DBI::<db_driver>  OfflineBeer
+       +                             +                      +
+       |                             |                      |
+       +-----------------------------+                      |
+       |                                                    |
+       +--- BeerDB2::Pub --------+ OfflineBeer::Pub --------+
+       |                           beers();                 |
+       |                                                    |
+       |                           OfflineBeer::Handpump ---+
+       |                           beer();                  |
+       |                           pub();                   |
+       |                                                    |
+       +--- BeerDB2::Beer -------+ OfflineBeer::Beer -------+
+       |                           pubs();                  |
+       |                           brewery();               |
+       |                           style();                 |
+       |                                                    |
+       +--- BeerDB2::Style ------+ OfflineBeer::Style ------+
+       |                           beers();                 |
+       |                                                    |
+       +--- BeerDB2::Brewery ----+ OfflineBeer::Brewery ----+
+                                   beers();
+
+
+
+=head3 Features
+
+1. Non-Maypole applications using the Offline model are completely isolated from
+the Maypole application, and need not know it exists at all.
+
+2. Methods defined in the Maypole table classes, override methods defined in the
+Offline table classes, because C<BeerDB2::Maypole::Model> was pushed onto the
+end of each Maypole table class's C<@ISA>. Perl's depth first,
+left-to-right method lookup from e.g. C<BeerDB2::Beer> starts in
+C<BeerDB2::Beer>, then C<BeerDB2::Maypole::Model>, C<Maypole::Model::CDBI>,
+C<Maypole::Model::Base>, and C<Class::DBI>, before moving on to
+C<OfflineBeer::Beer> and finally C<OfflineBeer>.
+
+B<CAVEAT> - if your Offline model overrides L<Class::DBI> methods, these methods
+will B<not> be overridden when called from the Maypole application, because the
+Maypole model provides an alternative path to L<Class::DBI> which is searched
+first. The solution is to place such methods in a separate package, e.g.
+C<OfflineBeer::CDBI>. Place this B<first> in the C<@ISA> of both
+C<BeerDB2::Maypole::Model> and C<OfflineBeer>. Note that C<OfflineBeer::CDBI>
+does not itself need to inherit from L<Class::DBI>.
+
+3. Methods defined in the Maypole model base class (C<BeerDB2::Maypole::Model>),
+override methods in the individual Offline table classes, and in the Offline
+model base class (C<Offline>). 
+
+4. Relationships defined in the Offline classes are inherited by the Maypole
+model.
+
+5. The Maypole model has full access to the underlying Offline model. 
+
+=head3 Theory 
+
+This layout illustrates more clearly why the Maypole model may be thought of as
+part of the controller, rather than part of the model of MVC. Its function is to 
+mediate web requests, translating them into method calls on the Offline model, 
+munging the results, and returning them via the Maypole request object. 
+
+Another way of thinking about it is that Maypole implements a two-layer
+controller. The first layer translates a raw request into a single method call
+on the Maypole model layer, which then translates that call into one or more
+calls on the underlying model.
+
+Whatever label you prefer to use, this approach provides for clear separation of
+concerns between the underlying model and the web/user interface, and that's
+what it's all about.
+
+=head1 Advanced applications - building the model by hand ** TODO
+
+- using Maypole::Model::CDBI::Plain or Maypole::FormBuilder::Model::Plain
+- setup_model() and load_model_subclass()
+- cutting out all those separate paths to CDBI - they're confusing 
+
+
+=head1 Method inheritance ** TODO
+
+More description of Perl's left-to-right, depth-first method lookup, and where
+it's particularly important in Maypole.
+
+
+          
+=head1 AUTHOR
+
+David Baird, C<< <cpan@riverside-cms.co.uk> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2005 David Baird, All Rights Reserved.
+
+This text is free documentation; you can redistribute it and/or modify it
+under the same terms as the Perl documentation itself.
+
+=cut
+

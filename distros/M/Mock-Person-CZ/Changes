@@ -1,0 +1,23 @@
+0.04 2015-09-22T13:14:45+02:00
+ - Fix comment (thanks Mohammad S Anwar).
+ - Move author tests to xt/ directory.
+ - Improve SEE ALSO section in doc.
+ - Rewrite B<> to C<> on methods.
+ - Update LICENSE AND COPYRIGHT section to my standard.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.03 2014-08-29T01:47:35+02:00
+ - Add 'readme_from' directive to Makefile.PL.
+ - Add minimum version of Perl.
+ - Fix LICENSE file.
+ - Update Module::Install to 1.10 version.
+
+0.02 2013-09-21
+ - Add link to Mock::Person::SK in doc.
+ - Fix LICENSE year.
+ - Fix doc spelling.
+ - Rewrite Changes file to CPAN::Changes::SPEC format.
+
+0.01 2013-07-26
+ - First version.

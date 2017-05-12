@@ -1,0 +1,235 @@
+Revision history for MooseX-ShortCut-BuildInstance
+
+Uses the change tracking convention
++ New feature.
+- Removed/depricated feature.
+! Bug fix.
+* Place holder
+
+v1.44.2   2016-08-16 19:11:16-07:00 America/Los_Angeles
+	
+	! Removed the direct call to Log::Shiras::Switchboard since I couldn't solve the recursive inheritance fails
+		use Log::Shiras::TapWarn to feed internal stuff to logs
+
+v1.42.0   2016-08-12 13:12:42-07:00 America/Los_Angeles
+
+	+ Updated the module ::BuildInstance to have new targeted Log::Shiras debug lines
+	+ Removed the UnhideDebug module in favor of the '~::Unhide' in Log::Shiras (soon to be released)
+
+v1.40.2   2016-05-01 09:41:57-07:00 America/Los_Angeles
+	
+	+ Added the global variable $should_clone_args and a method to set it
+	+ Added some additional debugging through Log::Shiras
+
+v1.38.4   2016-04-12 22:41:13-07:00 America/Los_Angeles
+	
+	! re-added MooseX::ShortCut::BuildInstance::UnhideDebug I still use it for debugging
+		The source filter is still not run till $ENV{log_shiras_filter_on} is set
+
+v1.38.2   2016-04-12 17:14:35-07:00 America/Los_Angeles
+
+	! Cleaned up a left-in debug print statement
+
+v1.36.8   2016-04-12 16:36:52-07:00 America/Los_Angeles
+	
+	! Fixed implementation of the re_use_classes to include all classes
+
+v1.36.6   2016-04-12 14:53:22-07:00 America/Los_Angeles
+	
+	! Fixed the badges
+	+ Update the .travis.yml file
+
+v1.36.4   2016-04-12 14:39:22-07:00 America/Los_Angeles
+
+	! Really removed MooseX::ShortCut::BuildInstance::UnhideDebug
+		after it got repopulated with a sync from Github
+
+v1.36.2   2016-04-12 14:31:59-07:00 America/Los_Angeles
+
+	- Removed the class MooseX::ShortCut::BuildInstance::UnhideDebug (Not actually used recently)
+	+ Added the ability to overwrite pre-built classes loaded with use
+		It does warn before doing so.
+
+v1.34.8   2015-10-27 13:09:54-07:00 America/Los_Angeles
+
+	+ A minor change to the logging comments for build fails
+	+ changed #! perl to #!/usr/bin/env perl in the SYNOPSIS
+
+v1.34.6   2015-09-25 06:01:53-07:00 America/Los_Angeles
+
+	! Added the configuration requirement for Moose 2.1213 before test since I got a weird fail for older moose when it was listed as installed
+	+ Added clone to the args so that passed references would stay safe for re-use
+	+ Additional badge changes
+
+v1.34.4   2015-03-31 05:30:37-07:00 America/Los_Angeles
+
+	+ Added a .travis.yml file for TravisCI coverage and Coveralls coverage
+	! Improved the manifest skip file
+	+ Added badges for the README
+	+ Added a Type::Tiny 1.000 requirement from 0.46
+	+ Reordered the Changes file to newest to oldest
+
+v1.34.2   2014-12-24 20:51:33-08:00 America/Los_Angeles
+
+	+ Improved error messaging for error instance creation
+
+v1.32.2   2014-12-22 09:24:36-08:00 America/Los_Angeles
+
+	+ Added better error messages when build_instance fails
+	+ Closed #1 in github by converting from Smart::Comments to Log::Shiras debug reporting!
+
+v1.28.6   2014-11-26 09:19:45-08:00 America/Los_Angeles
+
+	! Explicitly added all pre-reqs to the test phase to pass a clean build
+
+v1.28.4   2014-11-24 11:44:50-08:00 America/Los_Angeles
+
+	! Fixed the version to number based for systems that hate 'v'
+
+v1.28.2   2014-10-03 08:15:15-07:00 America/Los_Angeles
+
+	! Fixed heading level on POD
+	! Added minimum Moose dependancy to eliminate CPAN testers fails
+
+v1.26.2   2014-07-28 17:51:16-07:00 America/Los_Angeles
+
+	! Removed the no Type::Tiny::XS since it wasn't in a differnt package that 
+		passed while this one failed
+
+v1.24.2   2014-07-28 09:06:27-07:00 America/Los_Angeles
+
+	! Yet another attempt to fix the non zero wait status 139 segfault errors
+		(On a non XS module no less)
+
+v1.22.6   2014-07-27 07:25:31-07:00 America/Los_Angeles
+
+	! Figured out how to turn off Type::Tiny::XS altogether in testing so that 
+		Failures are constrained to issues with this package only (I hope)
+
+v1.22.4   2014-07-26 11:13:53-07:00 America/Los_Angeles
+
+	! Fixed missing test plans
+
+v1.22.2   2014-07-25 23:45:41-07:00 America/Los_Angeles
+
+	! Required Type::Tiny Version 0.046 to settle on error messages
+	! Required Type::Tiny::XS version 0.010 in testing but not installation
+
+v1.20.2   2014-07-24 19:43:22-07:00 America/Los_Angeles
+
+	! Fix fails associated with Type::Tiny::XS
+		Really just caused the module to fail if Type::Tiny::XS 
+		is loaded with a version earlier than 0.010
+
+v1.18.2   2014-07-21 08:17:42-07:00 America/Los_Angeles
+
+	! Reqired Type::Tiny 0.046 since 0.0.45_3 is broken
+	! Made a few POD changes for clarification
+	! Fixed the load test to clarify the requirements
+
+v1.16.2   2014-07-10 16:27:41-07:00 America/Los_Angeles
+
+	! another, another try at fixing the META files
+
+v1.14.2   2014-07-10 16:05:44-07:00 America/Los_Angeles
+
+	! another try at fixing the repository link in the META files
+
+v1.12.2   2014-07-10 07:25:52-07:00 America/Los_Angeles
+
+	! fixed the repository link in the META files
+
+v1.10.2   2014-06-09 08:35:00-07:00 America/Los_Angeles
+
+	! checked for mutability when building/adding roles and attributes
+		and force mutability if not available
+
+v1.8.2    2014-06-03 04:35:45-07:00 America/Los_Angeles
+
+	+ updated the README to include a suggested tar unzip string
+	+ switched the load order of add_roles_in_sequence and add_attributes and add_methods
+		The goal is to let the roles also 'require' 'ad_hoc' stand alone methods and methods from attributes
+
+v1.6.2    2014-05-30 18:46:44-07:00 America/Los_Angeles
+
+	! fixed the build_class documentation
+		changed the second 'add_roles_in_sequence' to 'add_methods'
+	- changed $instance_count to $anonymous_class_count
+	! changed our $anonymous_class_count to start at 0 since there isn't one at startup
+	+ added a test for $anonymous_class_count
+
+v1.4.2    2014-05-28 17:12:29-07:00 America/Los_Angeles
+
+	! changed use version 0.94 to use version to fix CPAN testers fails
+	! changed types test to accept a broader range of error messages for NameSpace fails
+
+v1.2.2    2014-05-27 13:26:13-07:00 America/Los_Angeles
+
+	+ Changing revisions to follow the convention
+		+ New feature.
+		- Removed/deprecated feature.
+		! Bug fix.
+		* Place holder
+	+ Added an add_methods call to build_class
+	+ Added an add_attributes call to build_class
+
+v0.014.002 2013-11-09 19:23:46 America/Los_Angeles
+
+	* Forced Boolean context on the 
+		$MooseX::ShortCut::BuildInstance::re_use_classes setter
+
+v0.012.004 2013-11-09 19:11:16 America/Los_Angeles
+
+	* Some POD updates to fix typos
+	* Then turned off the POD test for the distribution
+
+0.012.002 2013-11-09 17:55:56 America/Los_Angeles
+
+	* added the key 'add_roles_in_sequence' as a
+		'build_class' argument to allow for one role to
+		'require' a method from another role
+		see POD for more explanation
+	* added a method to manage behaviour of resetting or 
+		re-use of Moose Classes built with a duplicate 
+		'package' name.  The default is to overwrite 
+		with a warning.
+	* Improved POD definitions of the global variables used
+
+0.008.007 2013-08-21 14:44:56 America/Los_Angeles
+
+	* Still more POD improvements
+
+0.008.005 2013-08-21 14:33:25 America/Los_Angeles
+
+	* Improved POD for the README and the main module 
+		documentation
+
+0.008.001 2013-08-21 07:56:46 America/Los_Angeles
+
+	* Updated from a development release to a production release 
+	* and fixed some of the problems making it not index on CPAN.
+
+v0.007_003 2013-07-30 15:09:14 America/Los_Angeles
+
+	* Added the DCI programming concept as an improved explanation 
+		and removed the use Modern::Perl requirement
+
+v0.005_003 2012-12-31 13:29:19 America/Los_Angeles
+
+	* Another minor documentation update
+
+v0.003_003 2012-10-18 10:37:24 America/Los_Angeles
+
+	* Updated the documentation
+
+v0.003_001 2012-10-08 16:44:58 America/Los_Angeles
+
+	* Changed the name from MooseX-Util-ClassBuilder to 
+		MooseX-ShortCut-BuildInstance
+
+	* Changed the package name key from class_name to package
+
+v0.001_001 2012-10-04 10:34:09 America/Los_Angeles
+
+	* Initial version with exported build_class and build_instance methods
+	

@@ -1,0 +1,6 @@
+Revision history for Perl extension MediaWiki::EditFramework.
+
+0.01  Wed Sep 26 21:59:36 2012
+	- original version; created by h2xs 1.23 with options
+		-n MediaWiki::EditFramework -X
+

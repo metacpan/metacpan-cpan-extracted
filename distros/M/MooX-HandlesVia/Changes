@@ -1,0 +1,30 @@
+0.001008  2015-03-30 21:33:17-04:00 America/New_York
+  - fix a bug inheriting from nonmoo classes
+  - remove strictures dependency for laxer strict/warnings
+
+0.001007  2015-02-16 09:12:08-05:00 America/New_York
+  - fix some badly cp'd pod (RT 91955)
+  - add missing test time dependency on Test::Fatal (RT 101971)
+
+0.001006  2015-01-10 13:43:39EST-0500 America/Toronto
+  - fix ref check on moosify inflator (@shadowcat-mst)
+
+0.001005  2013-12-20 12:24:09 America/Toronto
+  - bugfix to support proper unimporting with 'no Moo' (@lukas-t)
+  - typofix (@djgoku)
+
+0.001004  2013-07-16 10:12:02 EST5EDT
+  - bump Moo minver to 1.00300, as it contains crucial Role composition fixes when
+    interacting with Moose. thanks @haarg
+
+0.001003  2013-05-15 10:19:06 EST5EDT
+  - handles_via can now accept arrayref as an arg, to more closely mirror Moose
+
+0.001002  2013-05-15 10:02:56 EST5EDT
+  - fix buggy flattening mechanism in MooseLike array/hashes
+
+0.001001  2013-05-14 17:05:24 EST5EDT
+  - adds support for moosify attribute spec, for proper Moo inflation.
+
+0.001000  2013-03-16 20:00:00 America/Toronto
+  - Initial drop to cpan.

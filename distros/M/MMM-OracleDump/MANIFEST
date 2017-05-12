@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+OracleDump.pm
+test.pl
+OracleDump/Table.pm
+scripts/oracle_dump.pl

@@ -1,0 +1,94 @@
+Module-Which version 0.0206
+===========================
+
+'Module::Which' is the basis of the script 'which_pm' intented
+to show which version of a Perl module is installed (if it is there at all).
+
+Modules are searched by name (like 'YAML') or by subcategories
+('DBD::' means all modules under the DBD subdirectories of
+your Perl installation, matching both 'DBD::Oracle' and 'DBD::ODBC::Changes').
+
+This module is very simple and most won't need it.
+But it has been instructive for the author to see how many broken modules
+one can find under your Perl installation (some which don't accept
+even a 'require' statement), modules with no version number and
+documentation files (named '.pm') which do not return a true value.
+
+To find out modules under subcategories, L<Module::Find> by Christian
+Renz was used.
+
+Well, all that said, this module is no more than automating:
+
+  perl -MInteresting::Module -e 'print $Interesting::Module::VERSION'
+
+or better the one-liner
+
+  perl -e '$pm = shift; eval "require $pm"; print ${"${pm}::VERSION"}' DBI
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  GetOpt::Long
+  Pod::Usage
+  Test::More
+  File::Spec::Unix
+  File::Glob
+  File::Find
+  ExtUtils::MakeMaker
+
+and recommends
+
+  Test::Pod
+
+TO DO
+
+* needs a more comprehensive test suite.
+
+* implement more options on which() behavior
+
+  return => 'ARRAY' | 'HASH' | 'HASH(FIRST)' | 'HASH(MULT)' | 'HASH(LIST)'
+  verbose => 0 | 1
+
+  include => @INC
+  method => 'REQUIRE' | 'EXTRACT'
+  info   => @fields
+
+
+* finish documentation of Data::Hash::Transform
+* stuff Data::Hash::Transform into its own distribution
+
+* fix bug in --help option
+* introduce more options to control C<which_pm> behavior: C<--include>, 
+  C<--method>, etc.
+
+* always update "META.yml" before releasing (this is not
+  being done automatically because MakeMaker overwrite
+  keys like 'license' and 'recommends')
+
+* which_pm should produce nice output for narrow terminal window sizes.
+* which_pm should be able to report the version of perl (and other Perl scripts)
+* a more complete implementation of --version for which_pm 
+  (copyright and license included)
+
+* support the pattern '' as a shortcut to show all installed modules
+  in include directories
+* finish documentation of Module::Which::List
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2007 by Adriano R. Ferreira
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

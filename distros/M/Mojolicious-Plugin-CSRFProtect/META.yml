@@ -1,0 +1,25 @@
+---
+abstract: 'Fully protects you from CSRF attacks'
+author:
+  - 'Viktor Turskyi <koorchik@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-CSRFProtect
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: 3.85
+  perl: 5.01
+resources:
+  repository: https://github.com/koorchik/Mojolicious-Plugin-CSRFProtect
+version: 0.16

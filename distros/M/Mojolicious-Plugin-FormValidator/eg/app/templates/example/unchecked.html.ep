@@ -1,0 +1,7 @@
+<!DOCTYPE html> 
+<html> 
+<body>
+    Username: <%= $username %> <br />
+    Email: <%= $email %> <br />
+</body>
+</html>

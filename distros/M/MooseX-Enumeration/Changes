@@ -1,0 +1,41 @@
+MooseX-Enumeration
+==================
+
+Created:      2014-05-16
+Home page:    <https://metacpan.org/release/MooseX-Enumeration>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Enumeration>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.005	2014-09-12
+
+ [ Bug Fixes ]
+ - Support lazy attributes.
+   Fixes RT#96312.
+   Jason McIntosh++
+   <https://rt.cpan.org/Ticket/Display.html?id=96312>
+
+0.004	2014-05-19
+
+ [ Bug Fixes ]
+ - Avoid role conflict on Moose older than 2.0800.
+
+0.003	2014-05-18
+
+ [ Packaging ]
+ - Declare dependency on Module::Runtime.
+
+ [ Other ]
+ - Improved efficiency of delegated methods; they now run at twice the
+   speed!
+ - No longer require Type::Tiny::Enum; fall back to
+   Moose::Meta::TypeConstraint::Enum.
+
+0.002	2014-05-16
+
+ [ Test Suite ]
+ - Add a test case for non-Type::Tiny type constraint.
+
+ [ Packaging ]
+ - Declare test dependency on Types::Standard.
+
+0.001	2014-05-16	Initial release

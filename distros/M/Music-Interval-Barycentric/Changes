@@ -1,0 +1,23 @@
+Revision history for Music-Interval-Barycentric
+
+0.0105 2015-10-19
+    - Fixed SYNOPSIS syntax.
+    - Added an eg/synopsis script.
+
+0.0104 2015-10-19
+    - Improved documentation again!
+    - Use Readonly instead of constant.
+
+0.0103 2015-03-17
+    - Improved documentation. 
+
+0.0102 2014-08-30
+    - Improved POD.
+
+0.01  2014-06-23
+    - Added actual tests!
+    - Cleaned out CLI cruft and cleaned up POD (a bit).
+
+0.01_01 2014-06-08
+    - Imported functionality from github:Music/barycentric.
+    - Minted by Dist::Zilla

@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+
+use CAD::Drawing;
+my $drw = CAD::Drawing->new(isbig => 1);
+
+my @pgons = @ARGV;
+
+my $color = 1;
+foreach my $pgon (@pgons) {
+	# check the format
+	$pgon =~ m/^[\[\]0-9,. -]+$/ or die;
+	my @data = map({ref($_) eq 'ARRAY' or die; $_} eval($pgon));
+	$drw->addpolygon(\@data, {color => $color});
+	$color++;
+}
+
+$CAD::Drawing::IO::Tk::arrow = 1;
+$drw->show(hang => 1);
+

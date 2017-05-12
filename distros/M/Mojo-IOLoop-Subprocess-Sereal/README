@@ -1,0 +1,70 @@
+NAME
+
+    Mojo::IOLoop::Subprocess::Sereal - Subprocesses with Sereal
+
+SYNOPSIS
+
+      use Mojo::IOLoop::Subprocess::Sereal;
+    
+      # Operation that would block the event loop for 5 seconds
+      my $subprocess = Mojo::IOLoop->$_subprocess(
+        sub {
+          my $subprocess = shift;
+          sleep 5;
+          return '♥', 'Mojolicious';
+        },
+        sub {
+          my ($subprocess, $err, @results) = @_;
+          say "I $results[0] $results[1]!";
+        }
+      );
+    
+      # Start event loop if necessary
+      Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
+DESCRIPTION
+
+    Mojo::IOLoop::Subprocess::Sereal provides a "$_subprocess" method which
+    works as a drop-in replacement for "subprocess" in Mojo::IOLoop while
+    using Sereal for data serialization. Sereal is faster than Storable and
+    supports serialization of more reference types such as Regexp. The
+    "FREEZE/THAW CALLBACK MECHANISM" in Sereal::Encoder is supported to
+    control serialization of blessed objects.
+
+EXPORTS
+
+    Mojo::IOLoop::Subprocess::Sereal exports the following variable by
+    default.
+
+ $_subprocess
+
+      my $subprocess = Mojo::IOLoop->$_subprocess(sub {...}, sub {...});
+      my $subprocess = $loop->$_subprocess(sub {...}, sub {...});
+
+    Build Mojo::IOLoop::Subprocess object to perform computationally
+    expensive operations in subprocesses, without blocking the event loop.
+    Sets "deserialize" in Mojo::IOLoop::Subprocess and "serialize" in
+    Mojo::IOLoop::Subprocess to callbacks that use Sereal for data
+    serialization. Arguments will be passed along to "run" in
+    Mojo::IOLoop::Subprocess.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2016 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Mojo::IOLoop, Sereal
+

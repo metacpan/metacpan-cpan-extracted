@@ -1,0 +1,9 @@
+---
+-
+  - rusu.notify
+  -
+    - '* person':
+        - Iliya I Liss
+        - Iliya1 I Liss
+      domain: SEX170004536743.RU
+      rule_id: rusu.notify.updated

@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Math-JSpline.t
+example/draw-some-jsplines.pl
+example/draw-some-jsplines.gif
+example/basic.pl
+lib/Math/JSpline.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

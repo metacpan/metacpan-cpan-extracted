@@ -1,0 +1,50 @@
+Revision history for MooseX-Types-DateTime
+
+0.13      2015-10-04 23:38:13Z
+        - make all tests pass with both the current DateTime::Locale and the
+          upcoming new version (currently still in trial releases).
+
+0.12      2015-09-27 05:01:39Z
+        - fix new test that may fail with older Moose
+
+0.11      2015-08-16 01:05:36Z
+        - update some distribution tooling
+
+0.10      2014-02-03 17:17:57Z
+        - temporarily revert change that cleaned namespaces (0.09), until the
+          logic is cleaned up in MooseX::Types itself
+
+0.09      2014-02-03 02:16:30Z
+        - Require perl 5.8.3, as Moose does
+        - canonical repository moved to github moose organization
+
+0.07    2011-12-12 12:58:19Z
+        - Provide optimize_as for pre-2.0100 Moose versions
+        - Bump MooseX::Types version requirement (RT#73188)
+        - Add missing dependencies
+        - Enforce version dependencies at runtime (RT#73189)
+
+0.06    2011-11-22
+        - Use inline_as instead of the deprecated optimize_as
+
+0.05    2009-08-24
+        - Merged the two 0.04 releases
+
+0.04    2009-08-24 (NUFFIN)
+        - Remove DateTimeX::Easy support, this is in its own distribution now
+
+0.04    2008-08-18 (FLORA)
+        - Depend on DateTime::TimeZone 0.95 to avoid test failures due to
+          broken, older versions.
+
+0.03    2008-07-11
+        - more explicit versions for dependencies
+        - removed a test that doesn't seem to cleanly pass in all timezones
+
+0.02    2008-06-16
+        - Use namespace::clean in some places
+        - Try to skip out of the test suite gracefully when bad crap happens
+          (too much DWIM--)
+
+0.01   2008-06-14
+        - Initial version

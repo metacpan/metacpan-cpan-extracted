@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Munin-Node-Client
+version:             0.01
+abstract:            Client module for munin nodes.
+license:             ~
+author:              
+    - Master Control Program <mcp@>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

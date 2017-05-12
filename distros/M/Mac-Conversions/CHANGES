@@ -1,0 +1,28 @@
+10/9/99 Version 1.04
+A serious error in demacbinary and macb2hex pointed out and patched by Mark
+Thompson <mark@moose.tgsoft.com> could cause resource fork corruption.  If
+the length of the data fork was an exact multiple of 128, an extra block
+would be read from the MacBinary file.  Although it wouldn't be written to
+the data fork, it meant that the processing of the resource fork would
+start 128 bytes beyond the actual beginning of the resource fork in the
+MacBinary file.  He also pointed out that if the filename ended with
+whitespace, the space padding used to extract the name from the MacBinary
+header would mean that the original filename couldn't be reconstructed.
+
+8/3/99 Version 1.03
+Added is_macbinary().  Changed test.pl to a plain text file to make it 
+easier to maintain under Unix.
+
+7/15/99  Version 1.02
+Fixed stupid 1.01 packaging error.  Put line in Makefile.PL to warn against 
+using this anywhere but MacPerl.  Fixed the comparison routine in test.pl so
+that it will actually work on 68k machines, by skipping the reserved first
+128 bytes of the resource fork.
+
+5/18/99 Version 1.01
+
+Changed macbinary decoding routines to croak when files smaller than 128
+bytes are fed to them.  Since the header must be 128 bytes in length, the
+file must be corrupt if it doesn't have at least this many bytes.  Added
+two tests to test for this by trying to decode an empty file.
+

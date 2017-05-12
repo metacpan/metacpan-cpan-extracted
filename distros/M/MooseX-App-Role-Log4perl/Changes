@@ -1,0 +1,9 @@
+Revision history for Perl extension MooseX-App-Role-Log4perl
+
+0.03 2014-06-02T16:38:42Z
+
+    - Removed the Modern::Perl requirement
+
+0.02 2014-05-30T17:28:56Z
+
+    - original version

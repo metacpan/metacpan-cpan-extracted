@@ -1,0 +1,69 @@
+MoneyWorks.pm, version 0.10 (beta)
+
+Perl interface to MoneyWorks accounting software
+
+
+RECENT CHANGES
+
+0.11
+----
+Fixed tests to work with MoneyWorks versions like 7.3.8r1.
+
+0.10
+----
+Fixed to work with perl 5.24.0.
+
+0.09
+----
+• Work around a bug in MoneyWorks, which sometimes begins output with
+ ‘Address already in use’ when the client is running as root.
+• Fix tests to work with MoneyWorks 6. 
+
+0.08
+----
+Suppress a warning about tie being ambiguous in perl 5.13.x.
+
+
+INSTALLATION
+
+The easiest way to install this module is to use the CPAN  module  or
+the cpan script:
+
+    [sudo] perl -MCPAN -e "install MoneyWorks"
+
+    [sudo] cpan MoneyWorks
+
+Or you can use the following:
+
+    perl Makefile.PL
+    make
+    make test
+    [sudo] make install
+
+
+DEPENDENCIES
+
+This module requires
+ • MoneyWorks Gold (or Datacentre Client)  (see http://cognito.co.nz),
+ • perl 5.6 or higher and
+ • the constant::lexical module, which can be found on the CPAN.
+
+
+DOCUMENTATION
+
+After installing,  you can find documentation for  this  module  with
+the perldoc command.
+
+    perldoc MoneyWorks
+
+Or try using man (it’s faster, in my experience):
+
+    man MoneyWorks
+
+
+COPYRIGHT AND LICENCE
+
+Copyright © 2009-16 Father Chrysostomos
+
+This program is free software; you may redistribute it, modify it, or
+both, under the same terms as perl.

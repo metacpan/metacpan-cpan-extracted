@@ -1,0 +1,78 @@
+{
+   "abstract" : "Get function list from package.",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.4.3",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Module-Functions",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.2"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Sub::Identify" : "0.04",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Module::Functions" : {
+         "file" : "lib/Module/Functions.pm",
+         "version" : "v2.1.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Module-Functions/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Module-Functions",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Module-Functions.git",
+         "web" : "https://github.com/tokuhirom/Module-Functions"
+      }
+   },
+   "version" : "2.1.3",
+   "x_contributors" : [
+      "bayashi <bayashi@cpan.org>",
+      "Kazuhiro Osawa <yappo@shibuya.pl>",
+      "tokuhirom <tokuhirom@gmail.com>"
+   ]
+}

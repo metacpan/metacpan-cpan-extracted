@@ -1,0 +1,148 @@
+$MODULE = "MLDBM::Sync"; $VERSION = '.30'; $DATE = '2002/07/03';
+
++ Added MLDBM to the list of PREREQ_PM modules for better CPAN installation
+
+$MODULE = "MLDBM::Sync"; $VERSION = .27; $DATE = '2002/06/23';
+
++ Added note to error for Lock upgrade during ReadLock
+  for case of doing unintentional write with construct like:
+  
+    tied(%dbm)->ReadLock;
+    my $v = $dbm{'key'}{'key2'}; # will error with write !!
+                 ^^^^^^^^^
+  Thanks to Steve Keith for noting this bizarre perl behavior.
+
++ bench/bench_sync.pl now creates a test dbm in the local directory
+  being run instead of /tmp ... benchmark results were being skewed
+  since /tmp could be a fast RAM cache file system like tmpfs on Linux
+
++ Added MANIFEST.SKIP for building
+
++ t/taint.t perl taint check test added.
+
++ escape inbound file parameter for safe taint checking
+
+$MODULE = "MLDBM::Sync"; $VERSION = .25; $DATE = '2001/11/11';
+
++ Honors the $MLDBM::RemoveTaint setting when MLDBM::Sync object is created,
+  storing for later creation of the MLDBM tied object
+
+$MODULE = "MLDBM::Sync"; $VERSION = .23; $DATE = '2001/11/08';
+
++ Updated AUTHORS section with perl license reference.
+
++ ./bench/bench_sync.pl has -n argument to specify # of reads/writes
+  where default is 100
+
++ ./bench/bench_sync.pl has --bundle argument to allows for reads/writes
+  in locked sections of that #, which improves performance.
+
++ $dbm->Size() for Tie::TextDir now adds size of directory as
+  reported by OS.  This still does not seem to take into account
+  the extra file inode overhead on a file system like ext2 linux
+  but its better now at least.
+
+$MODULE = "MLDBM::Sync"; $VERSION = .21; $DATE = '2001/10/31';
+
++ Added support in CLEAR() & SyncSize() for a tie directory
+  based data structure like Tie::TextDir
+
+$MODULE = "MLDBM::Sync"; $VERSION = .19; $DATE = '2001/10/15';
+
+- Fixed keys(%hash), where one of the keys was boolean FALSE
+  like '', or 0.  Bug found by Elliot Glaysher.
+
+$MODULE = "MLDBM::Sync"; $VERSION = .17; $DATE = '2001/10/11';
+
+- Make EXISTS safe after explicity tied hash ReadLock()
+
+- For loops in MLDBM::Sync::SDBM_File that are friendlier 
+  to perl5.004_04
+
+- Better Lock() return value, whether or not a lock has
+  previously been acquired
+
+$MODULE = "MLDBM::Sync"; $VERSION = .15; $DATE = '2001/09/21';
+
+- API fixes for easier integration with Apache::ASP
+
+- Made $sync_dbm->UnLock() repeatable, with the next
+  $sync_dbm->Lock() still working.
+
+$MODULE = "MLDBM::Sync"; $VERSION = .11; $DATE = '2001/09/12';
+
+++ Taking module out of BETA.  Been using it in production 
+   for 3 months, and in development for 6.
+
+- Bug fix for undefined warning in MLDBM::Sync::SDBM_File
+
+- MLDBM::Sync::SDBM_File STORE() now deletes prior key parts
+  before storing the value, which will result in more correct
+  behavior, there was a possible bug here.  Added a test
+  in t/sdbm_rec_big.t testing for this possible error.
+
++ Deletion of lock file when calling CLEAR(), or %dbm = ()
+  Do this after unlock, which _might_ have a race condition
+  but haven't seen in in heavy load testing... MLDBM::Sync
+  recreates the lock file every time if necessary, so this
+  may not be an issue anyway.  Might be good to unlink before
+  unlocking, but this might only work on *nix platformns,
+  now Win32.
+
+$MODULE = "MLDBM::Sync"; $VERSION = .09; $DATE = '2001/07/31';
+
+- Bug fix for undefined warning in MLDBM::Sync::SDBM_File
+
+$MODULE = "MLDBM::Sync"; $VERSION = .07; $DATE = '2001/03/18';
+
++ $dbm->SyncCacheSize() API activates 2nd layer RAM cache
+  via Tie::Cache with MaxBytes set.
+
++ CACHE documentation, cache.t test, sample benchmarks
+  with ./bench/bench_sync.pl -c
+
+$MODULE = "MLDBM::Sync"; $VERSION = .05; $DATE = '2001/03/13';
+
++ Simpler use of locking.
+
+- Read locking works on Solaris, had to open lock file in 
+  read/write mode.  Linux/NT didn't care.
+
+$MODULE = "MLDBM::Sync"; $VERSION = .03; $DATE = 'TBA';
+
++ $dbm_obj->SyncKeysChecksum(1) API documented.
+  New internal format that does not store the original key
+  with keys() & each() throwing errors now if used on this
+  kind of database.
+
++ ReadLock() API added, that does a LOCK_SH internally.
+  Also uses ReadLock() for FETCH and *KEY operations.
+  ** WARNING: one may not ReadLock() and then write to the 
+  dbm, or that will die in an error.  Must UnLock() first.
+  Writes may only occur in a Lock() section, which does a 
+  LOCK_EX internally.
+
++ Better backward compatibility with old SDBM_Files
+  for MLDBM::Sync::SDBM_File, also new format not compatible
+  with .01 format.
+
++ Better test for MLDBM::Sync::SDBM_File, using keys with
+  odd characters.
+
+$MODULE = "MLDBM::Sync"; $VERSION = .01; $DATE = '2001/02/07';
+
++ Initial release with flock concurrent access control to 
+  MLDBM databases.  
+
++ Also MLDBM::Sync::SDBM_File wrapper for getting around the 
+  1024 byte / record limitation for sDBM_File.  Writes data
+  in segments of 128 bytes.  This was created because SDBM_File
+  access is an order of magnitude faster than DB_File on Linux
+  with tie/untie per write in the MLDBM::Sync model, which is 
+  for i/o flushing do dbms don't get corrupt.  
+
+  But, then one has to worry about exceeding the 1024 byte limit, 
+  which can happen for serializing larger objects.  Well worry
+  no more!
+
+

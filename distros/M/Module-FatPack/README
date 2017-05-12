@@ -1,0 +1,8 @@
+SEE ALSO
+
+    App::FatPack, the original implementation.
+
+    App::depak for more options e.g. use various tracing methods, etc.
+
+    fatpack-modules, CLI for fatpack_modules
+

@@ -1,0 +1,18 @@
+#!perl
+
+use strict;
+use MMapDB;
+
+my ($backupname, $dbname)=@ARGV;
+
+eval {
+  MMapDB->new(filename=>$dbname)->restore($backupname);
+};
+
+if( $@ ) {
+  if( ref $@ ) {
+    die ${$@}."\n";
+  } else {
+    die $@;
+  }
+}

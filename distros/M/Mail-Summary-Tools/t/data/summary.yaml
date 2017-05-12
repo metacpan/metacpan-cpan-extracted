@@ -1,0 +1,24 @@
+---
+title: Mailing list summary
+extra:
+  see_also:
+    - name: Foo
+      uri:  http://www.example.com/
+    - name: The Perl Foundation
+      uri:  http://www.example.com/
+lists:
+  - name: oink
+    threads:
+      - message_id: 69d3ac770606131947r55708fc0g139242e5a989ae4e@mail.gmail.com
+        posters:
+          - email: user@example.com
+            name: User One
+          - email: user2@example.com
+            name: User Two
+          - email: user3@example.com
+            name: User Three
+        subject: 'The Message Subject'
+        summary: >-
+            Somebody asked whether or not monkeys like to eat cheese, at which
+            points the monkey subscribed to the list said that they did not
+            like cheese at all where he lives, but that he eats it anyway.

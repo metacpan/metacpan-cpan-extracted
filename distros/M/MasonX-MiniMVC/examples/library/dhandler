@@ -1,0 +1,6 @@
+<%init>
+use Library::Dispatcher;
+my $dispatcher = Library::Dispatcher->new();
+$dispatcher->dispatch($m);
+</%init>
+

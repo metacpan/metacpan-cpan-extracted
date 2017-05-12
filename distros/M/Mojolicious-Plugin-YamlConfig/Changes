@@ -1,0 +1,53 @@
+0.2.1 - 2015-10-29
+    - RT #108072 - update MANIFEST.SKIP to exclude MYMETA*
+
+0.2.0 - 2014-10-31
+    - Fix encoding issues introduced with Mojolicious 5.54 (mojo 27a351852)
+    - Mojolicious 5.54 is required now
+
+0.1.8 - 2014-06-03
+    - Fix test with Mojo >= 5 (ruzhnikov) (RT 96127)
+
+0.1.7 - 2014-02-17
+    - make YAML::Tiny work again
+
+0.1.6 - 2013-11-18
+    - documentation fix
+
+0.1.5 - 2012-05-15
+    - Fix RT #76551 (jploski)
+
+0.1.4 - 2012-03-20
+    - Fix RT #75848 (chorny)
+
+0.1.2 - 2011-09-04
+    - tiny documentation fix
+
+0.1.2 - 2011-09-02
+    -  just to bother me, sri renamed M::P::JsonConfig to M::P::JSONConfig :-P
+
+0.1.1 - 2011-03-16
+    - remove perl 5.010 dependency
+
+0.1.0 - 2011-02-26
+    - adjusted to new shiny mojolicious api
+    - support YAML::Old and YAML
+    - depends on perl > 5.010 now
+
+0.0.4 - 2010-08-25
+
+    - YAML::Tiny is the default backend now.
+      One can use YAML::XS per config option
+
+0.0.3 - 2010-08-17
+
+    - Switch from YAML::Any to YAML::XS
+      http://www.cpantesters.org/cpan/report/07665049-b19f-3f77-b713-d32bba55d77f
+
+0.0.2 - 2010-08-15
+
+    - Documentation fixes
+
+0.0.1 - 2010-08-15
+
+    - first release

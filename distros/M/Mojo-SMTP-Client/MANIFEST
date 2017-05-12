@@ -1,0 +1,15 @@
+Changes
+lib/Mojo/SMTP/Client.pm
+lib/Mojo/SMTP/Client/Exception.pm
+lib/Mojo/SMTP/Client/Response.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01_load.t
+t/02_smtp.t
+t/03_smtp_nb.t
+t/cert/server-cert.pem
+t/cert/server-key.pem
+t/lib/Utils.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

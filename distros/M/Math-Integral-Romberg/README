@@ -1,0 +1,18 @@
+Perl Module Math::Integral::Romberg
+
+     Copyright (c) 1998 Eric Boesch. All rights reserved.
+     This program is free software; you can redistribute it and/or
+     modify it under the same terms as Perl itself.
+
+To install, unzip and untar the archive. In the directory created type
+
+perl Build.PL
+
+Romberg integration is used for estimating the integral of a scalar
+function over a finite closed interval.  It is a better alternative to
+Simpson's method and the trapezoid method.
+
+Additional documentation is in the module file and will be added onto
+perllocal.pod as usual.
+
+I can be contacted at <Email: ericboesch@gmail.com>

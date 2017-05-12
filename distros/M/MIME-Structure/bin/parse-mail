@@ -1,0 +1,43 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use MIME::Structure;
+use Email::AddressParser;
+
+my $parser = MIME::Structure->new(
+    'keep_header' => 0,
+    'keep_fields' => 1,
+);
+
+foreach my $f (@ARGV) {
+    open my $fh, '<', $f or die;
+    binmode $fh;
+    my @entities = $parser->parse($fh);
+    close $fh;
+    
+    my ($message) = @entities;
+    my $fields = $message->{'fields'};
+    print ":file $f\n";
+    print ":size $message->{length}\n";
+    foreach my $field (qw{from to cc}) {
+        next unless defined $fields->{$field};
+        my ($value) = @{ $fields->{$field} };
+        my @addresses = Email::AddressParser->parse($value);
+        foreach my $a (@addresses) {
+            my $addr = $a->address;
+            print ":$field ", $a->address, "\n" if defined $addr;
+        }
+    }
+    my ($msg_id)  = @{ $fields->{'message-id'} || [] };
+    my ($subject) = @{ $fields->{'subject'}    || [] };
+    print ":message-id $msg_id\n" if defined $msg_id;
+    print ":subject $subject\n"   if defined $subject;
+    foreach my $e (@entities) {
+        my @fields = ($e->{number}, $e->{offset}, "$e->{type}/$e->{subtype}");
+        my $parent = $e->{'parent'};
+        push @fields, $parent->{'offset'} if $parent;
+        print ":entity @fields\n";
+    }
+    print ':structure ', $parser->concise_structure($message), "\n\n";
+}

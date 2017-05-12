@@ -1,0 +1,81 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Metaweb;
+use Getopt::Long;
+
+=head1 NAME
+
+metaweb -- command line interface to Metaweb
+
+=head1 SYNOPSIS
+
+    metaweb my_query.mql
+
+    metaweb --username foo --password bar --server http://example.com my_query.mql
+
+=head1 DESCRIPTION
+
+The C<metaweb> script provides a basic command line interface to Metaweb
+databases, including Freebase (L<http://freebase.com>).
+
+This module assumes JSON-formatted queries.  Support for Perl-formatted
+queries will be added later.
+
+=head1 OPTIONS
+
+=head2 write
+
+If C<--write> is specified, this is a write query.  (Default is "read").
+
+=head2 username
+
+Username to login as (no longer required for read access).
+
+=head2 password
+
+Password for login (no longer required for read access).
+
+=head2 server
+
+Server to login to.  Defaults to http://freebase.com
+
+=head2 login_path
+
+Login path relative to the server.  Defaults to what Freebase uses.
+
+=head2 read_path
+
+Metaweb read path relative to the server.  Defaults to what Freebase uses.
+
+=cut
+
+my ($write, $username, $password, $server, $login_path, $read_path);
+
+GetOptions(
+    'write'        => \$write,
+    'username=s'   => \$username,
+    'password=s'   => \$password,
+    'server=s'     => \$server,
+    'login_path=s' => \$login_path,
+    'read_path=s'  => \$read_path,
+);
+
+my %args;
+
+$args{username}   = $username if $username;
+$args{password}   = $password if $password;
+$args{server}     = $server if $server;
+$args{login_path} = $login_path if $login_path;
+$args{read_path}  = $read_path if $read_path;
+
+my $type = ($write ? "write" : "read");
+
+$/ = undef; # slurp!
+my $query = <STDIN>;
+
+my $mw = Metaweb->new(\%args);
+$mw->login() if $username;
+print $mw->json_query({query => $query, type => $type});

@@ -1,0 +1,26 @@
+log4perl.logger.services = INFO, Screen, Log
+#log4perl.logger.services = DEBUG, Screen, Log
+    
+log4perl.appender.Screen = Log::Log4perl::Appender::Screen
+log4perl.appender.Screen.stderr = 1
+log4perl.appender.Screen.Threshold = FATAL
+log4perl.appender.Screen.layout = Log::Log4perl::Layout::PatternLayout
+log4perl.appender.Screen.layout.ConversionPattern = %d (%r) %p> [%x] %F{1}:%L - %m%n
+
+log4perl.appender.Log = Log::Log4perl::Appender::File
+log4perl.appender.Log.filename = @LOGFILE@
+log4perl.appender.Log.mode = append
+log4perl.appender.Log.layout = Log::Log4perl::Layout::PatternLayout
+log4perl.appender.Log.layout.ConversionPattern = %d (%r) %p> [%x] %F{1}:%L - %m%n
+
+# for parser debugging
+log4perl.logger.parser = INFO, ParserLog
+#log4perl.logger.parser = DEBUG, ParserLog
+    
+log4perl.appender.ParserLog = Log::Log4perl::Appender::File
+log4perl.appender.ParserLog.filename = @LOGFILE2@
+log4perl.appender.ParserLog.mode = append
+log4perl.appender.ParserLog.layout = Log::Log4perl::Layout::PatternLayout
+log4perl.appender.ParserLog.layout.ConversionPattern = %d (%r) %p> [%x] %F{1}:%L - %m%n
+
+

@@ -1,0 +1,863 @@
+{
+   "lines" : {
+      "line" : [
+         {
+            "id" : "Red",
+            "name" : "Red",
+            "color" : "#8B0000"
+         },
+         {
+            "id" : "Green",
+            "name" : "Green",
+            "color" : "#006400"
+         },
+         {
+            "color" : "#ffff00",
+            "id" : "Yellow",
+            "name" : "Yellow"
+         },
+         {
+            "id" : "Blue",
+            "name" : "Blue",
+            "color" : "#000080"
+         },
+         {
+            "name" : "Orange",
+            "id" : "Orange",
+            "color" : "#ff4f00"
+         },
+         {
+            "color" : "#9400D3",
+            "id" : "Violet",
+            "name" : "Violet"
+         }
+      ]
+   },
+   "name" : "Delhi Metro",
+   "stations" : {
+      "station" : [
+         {
+            "name" : "Inderlok",
+            "id" : "INDERLOK",
+            "line" : "Red:9,Green:16",
+            "link" : "R08,R10,ASHOK-PARK-MAIN"
+         },
+         {
+            "line" : "Red:14,Yellow:9",
+            "link" : "R13,R15,Y08,Y10",
+            "name" : "Kashmere Gate",
+            "id" : "KASHMERE-GATE"
+         },
+         {
+            "id" : "ASHOK-PARK-MAIN",
+            "name" : "Ashok Park Main",
+            "link" : "G14,G12,INDERLOK",
+            "line" : "Green:13"
+         },
+         {
+            "name" : "Rajiv Chowk",
+            "id" : "RAJIV-CHOWK",
+            "line" : "Yellow:13,Blue:29",
+            "link" : "NEW-DELHI,Y14,B28,B30"
+         },
+         {
+            "link" : "Y16,Y14,V15",
+            "line" : "Yellow:15,Violet:16",
+            "id" : "CENTRAL-SECRETARIATE",
+            "name" : "Central Secretariate"
+         },
+         {
+            "link" : "RAJIV-CHOWK,Y11,O05",
+            "line" : "Yellow:12,Orange:6",
+            "id" : "NEW-DELHI",
+            "name" : "New Delhi"
+         },
+         {
+            "name" : "Dwarka Sector 21",
+            "id" : "DWARKA-SECTOR-21",
+            "line" : "Orange:1,Blue:1",
+            "link" : "B02,O02"
+         },
+         {
+            "id" : "YAMUNA-BANK",
+            "name" : "Yamuna Bank",
+            "link" : "B33,LAXMI-NAGAR,AKSHARDHAM",
+            "line" : "Blue:34"
+         },
+         {
+            "id" : "LAXMI-NAGAR",
+            "name" : "Laxmi Nagar",
+            "link" : "B36,YAMUNA-BANK",
+            "line" : "Blue:35"
+         },
+         {
+            "link" : "B43,YAMUNA-BANK",
+            "line" : "Blue:42",
+            "id" : "AKSHARDHAM",
+            "name" : "Akshardham"
+         },
+         {
+            "link" : "B23,B21,G14",
+            "line" : "Blue:22,Green:15",
+            "id" : "KIRTI-NAGAR",
+            "name" : "Kirti Nagar"
+         },
+         {
+            "line" : "Blue:2",
+            "link" : "B03,DWARKA-SECTOR-21",
+            "name" : "Dwarka Sector 8",
+            "id" : "B02"
+         },
+         {
+            "name" : "Dwarka Sector 9",
+            "id" : "B03",
+            "line" : "Blue:3",
+            "link" : "B04,B02"
+         },
+         {
+            "name" : "Dwarka Sector 10",
+            "id" : "B04",
+            "line" : "Blue:4",
+            "link" : "B05,B03"
+         },
+         {
+            "link" : "B06,B04",
+            "line" : "Blue:5",
+            "id" : "B05",
+            "name" : "Dwarka Sector 11"
+         },
+         {
+            "id" : "B06",
+            "name" : "Dwarka Sector 12",
+            "link" : "B07,B05",
+            "line" : "Blue:6"
+         },
+         {
+            "line" : "Blue:7",
+            "link" : "B08,B06",
+            "name" : "Dwarka Sector 13",
+            "id" : "B07"
+         },
+         {
+            "id" : "B08",
+            "name" : "Dwarka Sector 14",
+            "link" : "B09,B07",
+            "line" : "Blue:8"
+         },
+         {
+            "link" : "B10,B08",
+            "line" : "Blue:9",
+            "id" : "B09",
+            "name" : "Dwarka"
+         },
+         {
+            "name" : "Dwarka Mor",
+            "id" : "B10",
+            "line" : "Blue:10",
+            "link" : "B11,B09"
+         },
+         {
+            "line" : "Blue:11",
+            "link" : "B12,B10",
+            "name" : "Nawada",
+            "id" : "B11"
+         },
+         {
+            "id" : "B12",
+            "name" : "Uttam Nagar West",
+            "link" : "B13,B11",
+            "line" : "Blue:12"
+         },
+         {
+            "name" : "Uttam Nagar East",
+            "id" : "B13",
+            "line" : "Blue:13",
+            "link" : "B14,B12"
+         },
+         {
+            "line" : "Blue:14",
+            "link" : "B15,B13",
+            "name" : "Janakpuri West",
+            "id" : "B14"
+         },
+         {
+            "line" : "Blue:15",
+            "link" : "B16,B14",
+            "name" : "Janakpuri East",
+            "id" : "B15"
+         },
+         {
+            "name" : "Tilak Nagar",
+            "id" : "B16",
+            "line" : "Blue:16",
+            "link" : "B17,B15"
+         },
+         {
+            "link" : "B18,B16",
+            "line" : "Blue:17",
+            "id" : "B17",
+            "name" : "Subhash Nagar"
+         },
+         {
+            "name" : "Tagore Garden",
+            "id" : "B18",
+            "line" : "Blue:18",
+            "link" : "B19,B17"
+         },
+         {
+            "id" : "B19",
+            "name" : "Rajouri Garden",
+            "link" : "B20,B18",
+            "line" : "Blue:19"
+         },
+         {
+            "name" : "Ramesh Nagar",
+            "id" : "B20",
+            "line" : "Blue:20",
+            "link" : "B21,B19"
+         },
+         {
+            "id" : "B21",
+            "name" : "Moti Nagar",
+            "link" : "KIRTI-NAGAR,B20",
+            "line" : "Blue:21"
+         },
+         {
+            "link" : "B24,KIRTI-NAGAR",
+            "line" : "Blue:23",
+            "id" : "B23",
+            "name" : "Shadipur"
+         },
+         {
+            "id" : "B24",
+            "name" : "Patel Nagar",
+            "link" : "B25,B23",
+            "line" : "Blue:24"
+         },
+         {
+            "line" : "Blue:25",
+            "link" : "B26,B24",
+            "name" : "Rajendra Place",
+            "id" : "B25"
+         },
+         {
+            "link" : "B27,B25",
+            "line" : "Blue:26",
+            "id" : "B26",
+            "name" : "Karol Bagh"
+         },
+         {
+            "name" : "Jhandewalan",
+            "id" : "B27",
+            "line" : "Blue:27",
+            "link" : "B28,B26"
+         },
+         {
+            "name" : "Ramkrishna Ashram Marg",
+            "id" : "B28",
+            "line" : "Blue:28",
+            "link" : "RAJIV-CHOWK,B27"
+         },
+         {
+            "id" : "B30",
+            "name" : "Barakhamba Road",
+            "link" : "B31,RAJIV-CHOWK",
+            "line" : "Blue:30"
+         },
+         {
+            "line" : "Blue:31",
+            "link" : "B32,B30",
+            "name" : "Mandi House",
+            "id" : "B31"
+         },
+         {
+            "name" : "Pragati Maidan",
+            "id" : "B32",
+            "line" : "Blue:32",
+            "link" : "B33,B31"
+         },
+         {
+            "name" : "Indraprastha",
+            "id" : "B33",
+            "line" : "Blue:33",
+            "link" : "YAMUNA-BANK,B32"
+         },
+         {
+            "id" : "B36",
+            "name" : "Nirman Vihar",
+            "link" : "B37,LAXMI-NAGAR",
+            "line" : "Blue:36"
+         },
+         {
+            "line" : "Blue:37",
+            "link" : "B38,B36",
+            "name" : "Preet Vihar",
+            "id" : "B37"
+         },
+         {
+            "line" : "Blue:38",
+            "link" : "B39,B37",
+            "name" : "Karkarduma",
+            "id" : "B38"
+         },
+         {
+            "line" : "Blue:39",
+            "link" : "B40,B38",
+            "name" : "Anand Vihar ISBT",
+            "id" : "B39"
+         },
+         {
+            "name" : "Kaushambi",
+            "id" : "B40",
+            "line" : "Blue:40",
+            "link" : "B41,B39"
+         },
+         {
+            "name" : "Vaishali",
+            "id" : "B41",
+            "line" : "Blue:42",
+            "link" : "B40"
+         },
+         {
+            "link" : "B44,AKSHARDHAM",
+            "line" : "Blue:43",
+            "id" : "B43",
+            "name" : "Mayur Vihar I"
+         },
+         {
+            "name" : "Mayur Vihar Extn.",
+            "id" : "B44",
+            "line" : "Blue:44",
+            "link" : "B45,B43"
+         },
+         {
+            "name" : "New Ashok Nagar",
+            "id" : "B45",
+            "line" : "Blue:45",
+            "link" : "B46,B44"
+         },
+         {
+            "link" : "B47,B45",
+            "line" : "Blue:46",
+            "id" : "B46",
+            "name" : "Noida Sector 15"
+         },
+         {
+            "id" : "B47",
+            "name" : "Noida Sector 16",
+            "link" : "B48,B46",
+            "line" : "Blue:47"
+         },
+         {
+            "line" : "Blue:48",
+            "link" : "B49,B47",
+            "name" : "Noida Sector 18",
+            "id" : "B48"
+         },
+         {
+            "line" : "Blue:49",
+            "link" : "B50,B48",
+            "name" : "Botanical Garden",
+            "id" : "B49"
+         },
+         {
+            "link" : "B51,B49",
+            "line" : "Blue:50",
+            "id" : "B50",
+            "name" : "Golf Course"
+         },
+         {
+            "name" : "Noida City Centre",
+            "id" : "B51",
+            "line" : "Blue:51",
+            "link" : "B50"
+         },
+         {
+            "name" : "I. G. I. Airport",
+            "id" : "O02",
+            "line" : "Orange:2",
+            "link" : "DWARKA-SECTOR-21,O03"
+         },
+         {
+            "link" : "O02,O04",
+            "line" : "Orange:3",
+            "id" : "O03",
+            "name" : "Delhi Aero City"
+         },
+         {
+            "link" : "O03,O05",
+            "line" : "Orange:4",
+            "id" : "O04",
+            "name" : "Dhaula Kuan"
+         },
+         {
+            "link" : "O04,NEW-DELHI",
+            "line" : "Orange:5",
+            "id" : "O05",
+            "name" : "Shivaji Stadium"
+         },
+         {
+            "line" : "Violet:1",
+            "link" : "V02",
+            "name" : "Badarpur",
+            "id" : "V01"
+         },
+         {
+            "line" : "Violet:2",
+            "link" : "V03,V01",
+            "name" : "Tughlakabad",
+            "id" : "V02"
+         },
+         {
+            "name" : "Mohan Estate",
+            "id" : "V03",
+            "line" : "Violet:3",
+            "link" : "V04,V02"
+         },
+         {
+            "name" : "Sarita Vihar",
+            "id" : "V04",
+            "line" : "Violet:4",
+            "link" : "V05,V03"
+         },
+         {
+            "id" : "V05",
+            "name" : "Jasola - Apollo",
+            "link" : "V06,V04",
+            "line" : "Violet:5"
+         },
+         {
+            "id" : "V06",
+            "name" : "Okhla",
+            "link" : "V07,V05",
+            "line" : "Violet:6"
+         },
+         {
+            "id" : "V07",
+            "name" : "Govind Puri",
+            "link" : "V08,V06",
+            "line" : "Violet:7"
+         },
+         {
+            "id" : "V08",
+            "name" : "Kalkaji Mandir",
+            "link" : "V09,V07",
+            "line" : "Violet:8"
+         },
+         {
+            "id" : "V09",
+            "name" : "Nehru Place",
+            "link" : "V10,V08",
+            "line" : "Violet:9"
+         },
+         {
+            "link" : "V11,V09",
+            "line" : "Violet:10",
+            "id" : "V10",
+            "name" : "Kailash Colony"
+         },
+         {
+            "name" : "Moolchand",
+            "id" : "V11",
+            "line" : "Violet:11",
+            "link" : "V12,V10"
+         },
+         {
+            "line" : "Violet:12",
+            "link" : "V13,V11",
+            "name" : "Lajpat Nagar",
+            "id" : "V12"
+         },
+         {
+            "id" : "V13",
+            "name" : "Jangpura",
+            "link" : "V14,V12",
+            "line" : "Violet:13"
+         },
+         {
+            "name" : "JLN Stadium",
+            "id" : "V14",
+            "line" : "Violet:14",
+            "link" : "V15,V13"
+         },
+         {
+            "line" : "Violet:15",
+            "link" : "V14,CENTRAL-SECRETARIATE",
+            "name" : "Khan Market",
+            "id" : "V15"
+         },
+         {
+            "link" : "R02",
+            "line" : "Red:1",
+            "id" : "R01",
+            "name" : "Rithala"
+         },
+         {
+            "line" : "Red:2",
+            "link" : "R01,R03",
+            "name" : "Rohini West",
+            "id" : "R02"
+         },
+         {
+            "name" : "Rohini East",
+            "id" : "R03",
+            "line" : "Red:3",
+            "link" : "R02,R04"
+         },
+         {
+            "id" : "R04",
+            "name" : "Pitampura",
+            "link" : "R03,R05",
+            "line" : "Red:4"
+         },
+         {
+            "name" : "Kohat Enclave",
+            "id" : "R05",
+            "line" : "Red:5",
+            "link" : "R04,R06"
+         },
+         {
+            "id" : "R06",
+            "name" : "Netaji Subhash Place",
+            "link" : "R05,R07",
+            "line" : "Red:6"
+         },
+         {
+            "name" : "Keshav Puram",
+            "id" : "R07",
+            "line" : "Red:7",
+            "link" : "R06,R08"
+         },
+         {
+            "id" : "R08",
+            "name" : "Kanhaiya Nagar",
+            "link" : "R07,INDERLOK",
+            "line" : "Red:8"
+         },
+         {
+            "id" : "R10",
+            "name" : "Shastri Nagar",
+            "link" : "INDERLOK,R11",
+            "line" : "Red:10"
+         },
+         {
+            "name" : "Pratap Nagar",
+            "id" : "R11",
+            "line" : "Red:11",
+            "link" : "R10,R12"
+         },
+         {
+            "line" : "Red:12",
+            "link" : "R11,R13",
+            "name" : "Pulbangash",
+            "id" : "R12"
+         },
+         {
+            "link" : "R12,KASHMERE-GATE",
+            "line" : "Red:13",
+            "id" : "R13",
+            "name" : "Tis Hazari"
+         },
+         {
+            "line" : "Red:15",
+            "link" : "KASHMERE-GATE,R16",
+            "name" : "Shastri Park",
+            "id" : "R15"
+         },
+         {
+            "line" : "Red:16",
+            "link" : "R15,R17",
+            "name" : "Seelampur",
+            "id" : "R16"
+         },
+         {
+            "name" : "Welcome",
+            "id" : "R17",
+            "line" : "Red:17",
+            "link" : "R16,R18"
+         },
+         {
+            "link" : "R17,R19",
+            "line" : "Red:18",
+            "id" : "R18",
+            "name" : "Shahdara"
+         },
+         {
+            "name" : "Mansarovar Park",
+            "id" : "R19",
+            "line" : "Red:19",
+            "link" : "R18,R20"
+         },
+         {
+            "line" : "Red:20",
+            "link" : "R19,R21",
+            "name" : "Jhilmil",
+            "id" : "R20"
+         },
+         {
+            "name" : "Dilshad Garden",
+            "id" : "R21",
+            "line" : "Red:21",
+            "link" : "R20"
+         },
+         {
+            "id" : "G01",
+            "name" : "Mundka",
+            "link" : "G02",
+            "line" : "Green:1"
+         },
+         {
+            "name" : "Rajdhani Park",
+            "id" : "G02",
+            "line" : "Green:2",
+            "link" : "G03,G01"
+         },
+         {
+            "id" : "G03",
+            "name" : "Nangloi Railway Station",
+            "link" : "G04,G02",
+            "line" : "Green:3"
+         },
+         {
+            "name" : "Nangloi",
+            "id" : "G04",
+            "line" : "Green:4",
+            "link" : "G05,G03"
+         },
+         {
+            "name" : "Surajmal Stadium",
+            "id" : "G05",
+            "line" : "Green:5",
+            "link" : "G06,G04"
+         },
+         {
+            "link" : "G07,G05",
+            "line" : "Green:6",
+            "id" : "G06",
+            "name" : "Udyog Nagar"
+         },
+         {
+            "line" : "Green:7",
+            "link" : "G08,G06",
+            "name" : "Peeragarhi",
+            "id" : "G07"
+         },
+         {
+            "line" : "Green:8",
+            "link" : "G09,G07",
+            "name" : "Paschim Vihar West",
+            "id" : "G08"
+         },
+         {
+            "link" : "G10,G08",
+            "line" : "Green:9",
+            "id" : "G09",
+            "name" : "Paschim Vihar East"
+         },
+         {
+            "name" : "Madipur",
+            "id" : "G10",
+            "line" : "Green:10",
+            "link" : "G11,G09"
+         },
+         {
+            "link" : "G12,G10",
+            "line" : "Green:11",
+            "id" : "G11",
+            "name" : "Shivaji Park"
+         },
+         {
+            "link" : "ASHOK-PARK-MAIN,G11",
+            "line" : "Green:12",
+            "id" : "G12",
+            "name" : "Punjabi Bagh"
+         },
+         {
+            "name" : "Satguru Ram Singh Marg",
+            "id" : "G14",
+            "line" : "Green:14",
+            "link" : "ASHOK-PARK-MAIN,KIRTI-NAGAR"
+         },
+         {
+            "id" : "Y01",
+            "name" : "Jenhangir Puri",
+            "link" : "Y02",
+            "line" : "Yellow:1"
+         },
+         {
+            "name" : "Adarsh Nagar",
+            "id" : "Y02",
+            "line" : "Yellow:2",
+            "link" : "Y03,Y01"
+         },
+         {
+            "name" : "Azadpur",
+            "id" : "Y03",
+            "line" : "Yellow:3",
+            "link" : "Y04,Y02"
+         },
+         {
+            "line" : "Yellow:4",
+            "link" : "Y05,Y03",
+            "name" : "Model Town",
+            "id" : "Y04"
+         },
+         {
+            "line" : "Yellow:5",
+            "link" : "Y06,Y04",
+            "name" : "G. T. B. Nagar",
+            "id" : "Y05"
+         },
+         {
+            "name" : "Vishwavidyalya",
+            "id" : "Y06",
+            "line" : "Yellow:6",
+            "link" : "Y07,Y05"
+         },
+         {
+            "link" : "Y08,Y06",
+            "line" : "Yellow:7",
+            "id" : "Y07",
+            "name" : "Vidhan Sabha"
+         },
+         {
+            "id" : "Y08",
+            "name" : "Civil Lines",
+            "link" : "KASHMERE-GATE,Y07",
+            "line" : "Yellow:8"
+         },
+         {
+            "id" : "Y10",
+            "name" : "Chandni Chowk",
+            "link" : "Y11,KASHMERE-GATE",
+            "line" : "Yellow:10"
+         },
+         {
+            "line" : "Yellow:11",
+            "link" : "NEW-DELHI,Y10",
+            "name" : "Chawri Bazar",
+            "id" : "Y11"
+         },
+         {
+            "link" : "CENTRAL-SECRETARIATE,RAJIV-CHOWK",
+            "line" : "Yellow:14",
+            "id" : "Y14",
+            "name" : "Patel Chowk"
+         },
+         {
+            "id" : "Y16",
+            "name" : "Udyog Bhavan",
+            "link" : "Y17,CENTRAL-SECRETARIATE",
+            "line" : "Yellow:16"
+         },
+         {
+            "id" : "Y17",
+            "name" : "Race Course",
+            "link" : "Y18,Y16",
+            "line" : "Yellow:17"
+         },
+         {
+            "link" : "Y19,Y17",
+            "line" : "Yellow:18",
+            "id" : "Y18",
+            "name" : "Jor Bagh"
+         },
+         {
+            "name" : "INA",
+            "id" : "Y19",
+            "line" : "Yellow:19",
+            "link" : "Y20,Y18"
+         },
+         {
+            "line" : "Yellow:20",
+            "link" : "Y21,Y19",
+            "name" : "AIIMS",
+            "id" : "Y20"
+         },
+         {
+            "line" : "Yellow:21",
+            "link" : "Y22,Y20",
+            "name" : "Green Park",
+            "id" : "Y21"
+         },
+         {
+            "link" : "Y23,Y21",
+            "line" : "Yellow:22",
+            "id" : "Y22",
+            "name" : "Hauz Khas"
+         },
+         {
+            "link" : "Y24,Y22",
+            "line" : "Yellow:23",
+            "id" : "Y23",
+            "name" : "Malviya Nagar"
+         },
+         {
+            "line" : "Yellow:24",
+            "link" : "Y25,Y23",
+            "name" : "Saket",
+            "id" : "Y24"
+         },
+         {
+            "line" : "Yellow:25",
+            "link" : "Y26,Y24",
+            "name" : "Qutab Minar",
+            "id" : "Y25"
+         },
+         {
+            "name" : "Chhattarpur",
+            "id" : "Y26",
+            "line" : "Yellow:26",
+            "link" : "Y27,Y25"
+         },
+         {
+            "name" : "Sultanpur",
+            "id" : "Y27",
+            "line" : "Yellow:27",
+            "link" : "Y28,Y26"
+         },
+         {
+            "name" : "Ghitorni",
+            "id" : "Y28",
+            "line" : "Yellow:28",
+            "link" : "Y29,Y27"
+         },
+         {
+            "line" : "Yellow:29",
+            "link" : "Y30,Y28",
+            "name" : "Arjangarh",
+            "id" : "Y29"
+         },
+         {
+            "name" : "Guru Dronacharya",
+            "id" : "Y30",
+            "line" : "Yellow:30",
+            "link" : "Y31,Y29"
+         },
+         {
+            "name" : "Sikanderpur",
+            "id" : "Y31",
+            "line" : "Yellow:31",
+            "link" : "Y32,Y30"
+         },
+         {
+            "name" : "M G Road",
+            "id" : "Y32",
+            "line" : "Yellow:32",
+            "link" : "Y33,Y31"
+         },
+         {
+            "link" : "Y34,Y32",
+            "line" : "Yellow:33",
+            "id" : "Y33",
+            "name" : "IFFCO Chowk"
+         },
+         {
+            "name" : "HUDA City Centre",
+            "id" : "Y34",
+            "line" : "Yellow:34",
+            "link" : "Y33"
+         }
+      ]
+   }
+}

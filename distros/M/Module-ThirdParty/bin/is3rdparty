@@ -1,0 +1,134 @@
+#!/usr/bin/perl
+use strict;
+use Getopt::Long;
+use Module::ThirdParty;
+
+{ no strict;
+  $VERSION = '0.04';
+}
+
+_usage() unless @ARGV;
+
+my %options = (
+    help => 0, 
+    info => 0,
+    list => 0,
+);
+GetOptions(\%options, qw(help|h info|i list|l));
+
+_usage() if $options{help};
+_list()  if $options{list};
+
+my $module = shift;
+
+if(is_3rd_party($module)) {
+    print "$module is a known third-party module.\n";
+    
+    if($options{info}) {
+        my $info = module_information($module);
+        print "  in software: $info->{name}\n", 
+              "  available at <$info->{url}>\n", 
+              "  made by $info->{author} <$info->{author_url}>\n"
+    }
+
+} else {
+    print "$module is not a known third-party module";
+    eval { require Module::CoreList};
+    unless($@) {
+        print " but appears to be a CORE module" 
+          if Module::CoreList->first_release($module)
+    }
+    print ".\n";
+}
+
+
+sub _usage {
+    print STDERR "usage: is3rdparty [-i] Module::Name\n", 
+                 "       is3rdparty -l\n";
+    exit
+}
+
+sub _list {
+    print "Known third-party software:\n";
+    my @softs = Module::ThirdParty::provides;
+    for my $soft (sort {lc($a->{author}) cmp lc($b->{author}) or lc($a->{name}) cmp lc($b->{name})} @softs) {
+        my($author,$name) = ($$soft{author},$$soft{name});
+        $name =~ s/$author ?//;
+        print " - $author $name\n"
+    }
+    exit
+}
+
+
+__END__
+
+=head1 NAME
+
+is3rdparty - provides information for 3rd party modules
+
+=head1 SYNOPSIS
+
+    is3rdparty [-i] Module::Name
+    is3rdparty -l
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h>
+
+Prints terse usage help.
+
+=item B<-i>
+
+Prints detailed information about a module.
+
+=item B<-l>
+
+Prints the list of known third-party software for which this 
+command has information.
+
+=back
+
+
+=head1 DESCRIPTION
+
+This is a command line frontend to C<Module::ThirdParty>, much like 
+what C<corelist(1)> is to C<Module::CoreList>.
+
+See L<Module::ThirdParty> for more information.
+
+
+=head1 EXAMPLES
+
+    $ is3rdparty Text::ChaSen
+    Text::ChaSen is a known third-party module.
+
+    $ is3rdparty -i Text::ChaSen
+    Text::ChaSen is a known third-party module.
+      in software: ChaSen
+      available at <http://chasen.naist.jp/hiki/ChaSen/>
+      made by Nara Institute of Science and Technology <http://www.naist.jp/>
+
+
+=head1 AUTHOR
+
+SE<eacute>bastien Aperghis-Tramoni, E<lt>sebastien@aperghis.netE<gt>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-module-thirdparty@rt.cpan.org>, or through the web interface at
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Module-ThirdParty>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2005 SE<eacute>bastien Aperghis-Tramoni, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+

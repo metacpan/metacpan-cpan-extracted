@@ -1,0 +1,48 @@
+---
+abstract: 'automatically apply roles at object creation time'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+  Test::Requires: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 1
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.021, CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-Traits
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  MooX::Traits:
+    file: lib/MooX/Traits.pm
+    version: '0.005'
+  MooX::Traits::Util:
+    file: lib/MooX/Traits/Util.pm
+    version: '0.005'
+recommends:
+  Moo::Role: '0'
+requires:
+  Exporter::Shiny: '0'
+  Module::Runtime: '0'
+  Role::Tiny: '1.000000'
+  Scalar::Util: '0'
+  perl: '5.006000'
+resources:
+  IRC: irc://irc.perl.org/#moose
+  Identifier: http://purl.org/NET/cpan-uri/dist/MooX-Traits/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=MooX-Traits
+  homepage: https://metacpan.org/release/MooX-Traits
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-moox-traits.git
+version: '0.005'

@@ -1,0 +1,40 @@
+---
+abstract: 'Notify listeners when a Minion task has completed'
+author:
+  - 'Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>'
+build_requires:
+  Mercury: '0.003'
+  Minion::Backend::SQLite: '0'
+  Mojo::SQLite: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.018, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Minion-Notifier
+provides:
+  Minion::Notifier:
+    file: lib/Minion/Notifier.pm
+    version: '0.06'
+  Minion::Notifier::Transport:
+    file: lib/Minion/Notifier/Transport.pm
+  Minion::Notifier::Transport::Pg:
+    file: lib/Minion/Notifier/Transport/Pg.pm
+  Minion::Notifier::Transport::Redis:
+    file: lib/Minion/Notifier/Transport/Redis.pm
+  Minion::Notifier::Transport::WebSocket:
+    file: lib/Minion/Notifier/Transport/WebSocket.pm
+  Mojolicious::Plugin::Minion::Notifier:
+    file: lib/Mojolicious/Plugin/Minion/Notifier.pm
+requires:
+  Minion: '5.03'
+  Mojolicious: '6.0'
+resources:
+  bugtracker: http://github.com/jberger/Minion-Notifier/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jberger/Minion-Notifier
+version: '0.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

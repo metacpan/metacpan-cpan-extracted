@@ -1,0 +1,20 @@
+Revision history for Mojolicious-Plugin-JSONRPC2
+
+v2.0.0  2016-02-19 08:38:33 EET
+	- Switch to Dist::Milla.
+
+1.1.2   2014-12-24 11:57:32 EET
+	- Fix dependencies.
+
+1.1.1   2014-11-18 01:20:02 EET
+	- Set timeout only when possible, without any errors.
+
+1.1.0   2014-07-16 20:40:32 EEST
+	- Set default timeout to 5 minutes.
+	- Support stash 'jsonrpc2.timeout'.
+
+1.0.1   2014-06-26 10:03:24 EEST
+	- Require Mojolicious-5.0 for secrets().
+
+1.0.0	2014-06-20 11:02:36 EEST
+	- Initial release.

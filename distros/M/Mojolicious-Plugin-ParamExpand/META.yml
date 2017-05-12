@@ -1,0 +1,27 @@
+---
+abstract: 'Use objects and data structures in your forms'
+author:
+  - 'Skye Shaw <skye.shaw AT gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-ParamExpand
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI::Expand: '0'
+  Mojolicious: '2.52'
+resources:
+  bugtracker: http://github.com/sshaw/Mojolicious-Plugin-ParamExpand/issues
+  homepage: http://github.com/sshaw/Mojolicious-Plugin-ParamExpand
+  repository: http://github.com/sshaw/Mojolicious-Plugin-ParamExpand
+version: '0.03'

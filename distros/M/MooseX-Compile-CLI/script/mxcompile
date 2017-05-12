@@ -1,0 +1,6 @@
+#!/usr/bin/perl
+
+use MooseX::Compile::CLI;
+
+MooseX::Compile::CLI->run;
+

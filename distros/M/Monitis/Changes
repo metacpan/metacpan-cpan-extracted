@@ -1,0 +1,14 @@
+Revision history for Monitis
+
+0.9     Mon Jun 20 15:17:29 2011
+
+0.8_3   Sun Jun 19 13:22:17 2011
+        new agents->download method
+        monitis-agent-install installator
+
+0.8_1   Thu Jun 02 00:40:47 2011
+        First CPAN developer release
+
+0.7     Wed Jun 01 18:50:10 2011
+
+        First public release

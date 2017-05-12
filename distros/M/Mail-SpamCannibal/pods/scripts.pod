@@ -1,0 +1,311 @@
+
+=head1 NAME
+
+SpamCannibal - scripts
+
+=head2 sc_BLcheck.pl
+
+This script checks each IP address found in the B<archive> database against
+the list of DNSBL black list servers in its configuration file. IP addresses
+that have a matching DNSBL response are added to the B<tarpit> database and
+a corresponding record is made in the B<blcontrib> database to indicate the
+reason for addition and the black list server responsible. The entry may
+come in part from the TXT record returned by the DNSBL and/or from the
+default values in the config file.
+
+  Syntax: ./sc_BLcheck.pl path/to/config.file
+    or
+        ./sc_BLcheck.pl -d path/to/config.file
+        ./sc_BLcheck.pl -v path/to/config.file
+
+  The -d switch allows you to see what the 
+  script will do without any db updates 
+  taking place. The -v switch will print
+  the scripts actions to the screen. 
+  -v -v does it more verbosely.
+  The -d switch implies a single -v.
+
+=head2 sc_BLpreen.pl
+
+This script checks each IP address found in the B<blcontrib> file for
+continued blacklisting by the original DNSBL server. If the DNSBL no longer
+blacklists an address or if the DNSBL is unreachable for a predetermined,
+configurable timeout set in the config file for each DNSBL, then the IP
+address is removed from SpamCannibal's database.
+
+  Syntax: ./sc_BLpreen.pl path/to/config.file
+    or
+        ./sc_BLpreen.pl -d path/to/config.file
+        ./sc_BLpreen.pl -v path/to/config.file
+
+  The -d switch allows you to see what the 
+  script will do without any db updates 
+  taking place. The -v switch will print
+  the scripts actions to the screen. 
+  -v -v does it more verbosely.
+  The -d switch implies a single -v.
+
+=head2 sc_admin.pl
+
+This script provides low level access to the SpamCannibal databases for
+B<fixing> things or modifying things that can't be done using the admin
+interfaces. Belt and suspenders!
+
+  Syntax: sc_admin.pl db_name (action) [dot.quad.ip.addr] [stuff]
+        (or) [stuff]
+             [.]
+
+  sc_admin.pl  db_name  get     dot.quad.ip.addr
+  sc_admin.pl  db_name insert   dot.quad.ip.addr stuff...
+  sc_admin.pl  db_name delete   dot.quad.ip.addr
+  sc_admin.pl  db_name zap      key (unconstrained delete)
+  sc_admin.pl  db_name view
+  sc_admin.pl  db_name clear
+    and
+                where db_name is one of
+        tarpit, archive, blcontrib, or evidence
+
+  for "tarpit" and "archive" there are no arguments 
+        for "insert" except dot.quad.ip.addr,
+
+  for "blcontrib" the arguments are (in order):
+        addr => resp, err, remrsp, time, zone
+
+        dot.quad.ip.addr
+        127.0.0.3       # response code from our DNSBL
+        "error string... from remote DNSBL or our default"
+        127.0.0.x       # remote response accepted from remote DNSBL
+        1059422395      # time record expires (since epoch) or "0"
+        remote.dnsbl.zone
+
+  for "evidence" the arguments are
+        dot.quad.ip.addr followed by STDIN of
+        mail headers +
+        message terminated on the last line by a
+        .
+
+=head2 sc_initdb.pl
+
+This script initializes the SpamCannibal environment and database files; and
+sets the permissions on the directories and files.
+
+There's no usage syntax, it is run once after installation. And needs to be
+run again after a database recovery. Running it repeatedly
+won't hurt anything.
+
+=head2 sc_mailfilter.pl
+
+This script parses a received message that contains a set of spam headers
+and message body.
+
+  i.e.
+
+	-----------------
+	|  real headers	|
+	-----------------
+	   blank line
+	-----------------
+	|  spam headers	|
+	-----------------
+	   blank line
+	-----------------
+	|  spam body	|
+	-----------------
+
+The spam headers, blank line, body can optionally (recommend) be encrypted
+with PGP armor to prevent unauthorized access to the spam client input.
+
+  Syntax: ./sc_mailfilter.pl path/to/config.file
+    or
+        ./sc_mailfilter.pl -d path/to config.file
+        ./sc_mailfilter.pl -v path/to/config.file
+
+  The -v switch sends debug error messages to 
+  the REPORT target email address (if present)
+
+  The -d switch returns the information that would
+  be added to the tarpit and evidence databases.
+  Nothing is added to the database files.
+
+Typically this is invoked by placing a .forward file in the spamcannibal
+user directory containing the following:
+
+  "|/usr/local/spamcannibal/scripts/sc_mailfilter.pl \
+   -v /usr/local/spamcannibal/config/sc_mailfilter.conf"
+
+NOTE: if a username that ends in the character "X" is aliased to the
+spamcannibal user, messages sent to this "To:" address will not have the
+message truncated by the configuration entry "MAXMSG". This is useful when
+one wishes to have a large spam sample record for some egregious type of
+behavior such as RFC2476 violations.
+
+=head2 sc_abuse.pl
+
+This script parses a spam message in the format delivered to the spam
+moderator by sc_mailfilter.pl to determine the target domain to which 
+to which it will then send an abuse report.
+
+  Syntax: ./sc_abuse.pl path/to/config.file
+    or
+        ./sc_abuse.pl -d path/to/config.file
+        ./sc_abuse.pl -v path/to/config.file
+
+  The -d switch causes the normal output to
+  be sent to the REPORT target email address
+  rather than to the target abuse address
+
+  The -v switch sends debug error messages to 
+  the REPORT target email address (if present)
+
+  This script sends it's "message" to abuse@domain.name of
+  the first remote MTA found in the headers of the "message".
+  The script decodes the last character in the To: field of 
+  it's own received headers to determine the length of the 
+  domain to append to "abuse@" to determine the target address.
+
+  i.e. for some.spam.domain.com
+
+  To: localabuse  2 domain fields 'abuse@domain.com'
+  To: localabuse1 2 domain fields 'abuse@domain.com'
+  To: localabuse2 2 domain fields 'abuse@domain.com'
+  To: localabuse3 3 domain fields 'abuse@spam.domain.com'
+  To: localabuse4 4 domain fields 'abuse@some.spam.domain.com'
+
+Typically this is invoked by placing a .forward file in the sc_abuse
+user directory containing the following:
+
+  "|/usr/local/spamcannibal/scripts/sc_mailfilter.pl \
+   -v /usr/local/spamcannibal/config/sc_mailfilter.conf"
+
+The sc_abuse user should be created in GROUP "spam"
+
+=head2 sc_cleanup.pl
+
+This script cleans spurious records from the database.
+
+For example: A spam message arrives and the sc_BLcheck.pl script is fired
+off by cron. sc_BLcheck.pl finds the address on a remote DNSBL and adds a
+record to the tarpit. A few minutes later you read your mail, find the spam
+and send it off to sc_mailfilter. These two action result in a record in the
+tarpit as well as both the contrib and evidence databases. Only one tracking
+record is necessary in contrib or evidence so there is an extra record.
+Similarly if you "play" around with the sc_admin.pl tools and leave extra
+records here and there, sc_cleanup.pl will remove them.
+
+  Syntax: ./sc_cleanup.pl -q
+    or
+        ./sc_cleanup.pl -d
+        ./sc_cleanup.pl -v
+
+  The -q switch is for normal, quiet operation.
+  The -d switch allows you to see what the 
+  script will do without any db updates 
+  taking place. The -v switch will print
+  the scripts actions to the screen. 
+  The -d switch implies a -v.
+
+=head2 sc_recoverdb.pl
+
+This scripts verifies and/or recovers and writes a new DB file. You must
+move/copy the new DB file over the old one.
+
+  Syntax: ./sc_recoverdb.pl [-v] [-p path] [-t] db_file
+
+        -d      debug, print trace info
+        -p      optional non-standard path
+                (default /var/run/dbtarpit)
+        -t      db_file has text mode data
+                (needed only for non-standard
+                file names not in siteconfig)
+        -v      optional verify only switch
+                (do not write db_file.new)
+
+  All DB jobs must be stopped to run recovery
+  on a DB file. NOT applicable to 'verify mode'.
+
+  Verify example
+
+	./sc_recoverdb.pl -v evidence
+	verifying       157229 records...
+	bad record 5907  Successful return: 0
+	bad record 5908  Successful return: 0
+	verified        157229 records
+
+  New DB file example
+
+	./sc_recoverdb.pl evidence
+	checking        157229 records...
+	bad record 5907  Successful return: 0
+	bad record 5908  Successful return: 0
+	evidence 157229 -> evidence.new 157227
+
+=head2 sc_remote.pl
+
+This script is the alias for a suid wrapper (user spam) and provides secure access to a remote
+host spamcannibal databases
+for the web admin interface via ssh or other suitable transport for administrative
+activities. The command line interface is the same as B<sc_session.pl>.
+
+=head2 sc_session.pl
+
+This script is the alias for a suid wrapper (user spam) and provides secure access to the local host
+spamcannibal databases for the web admin interface.
+
+  Syntax: sc_session.pl command [arg1] [arg2] ...
+
+  sc_session.pl admin   on | off (command line only)
+  sc_session.pl newsess user password 
+  sc_session.pl updpass session_id expire user newpass oldpass
+  sc_session.pl chksess session_id expire (relative)
+  sc_session.pl rmvsess session_id
+  sc_session.pl insBL   session_id expire dot.quad.ip.addr stuff...
+  sc_session.pl insEVD  session_id expire dot.quad.ip.addr stuff...
+  sc_session.pl delete  session_id expire dot.quad.ip.addr
+
+  admin         returns "OK status"
+        allow admin addition/deletion of users
+  newsess       returns "OK session_id"
+  updpass       returns OK or (error text)
+        blank passwords deletes user (not self)
+  chksess       returns OK or (error text)
+  rmvsess       returns OK or (error text)
+  insBL         returns OK or (error text)
+                insert blacklist contrib
+                the arguments are (in order):
+        addr => resp, err, remrsp, time, zone
+
+        dot.quad.ip.addr =>
+        127.0.0.3       # response code from our DNSBL
+        "error string... from remote DNSBL or our default"
+        127.0.0.x       # remote response accepted from remote DNSBL
+        1059422395      # time record expires (since epoch) or "0"
+        remote.dnsbl.zone
+ 
+  insEVD        returns OK or (error text)
+                insert evidence, the arguments are:
+        dot.quad.ip.addr followed by STDIN of
+        mail headers +
+        message terminated on the last line by a single
+        .
+
+  delete        returns OK or (error text)
+                deletes dot.quad.ip.addr in all databases
+
+=head2 sc_country_origin.pl
+
+This script prints a sorted list (by count) of countries of origin (by
+country code) and the number of IP addresses that appear in the 'tarpit'
+database.
+
+  US 12345
+  CN 7543
+  KR 1234
+  ... and so on...
+
+=head2 sc_dns2rbld.pl
+
+This script converts the DNS zonefile in bind format created by B<dnsbls> 
+kill -USR2 into the format used by the popular rbldns daemon.
+
+  Syntax: ./sc_dns2rbld.pl infile outfile
+

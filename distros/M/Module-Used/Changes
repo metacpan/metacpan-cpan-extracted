@@ -1,0 +1,24 @@
+Revision history for Module::Used.
+
+1.3.0  2012-09-27
+
+    New modules_used_by_modules(), thanks to Neil Bowers.
+
+1.2.0  2008-12-08
+
+    Case-insensitive sort.
+
+    Now looks for "extends" and "with" when Moose or Moose::Role are used.
+
+1.1.0  2008-07-06
+
+    Now recursivly finds Perl code.
+
+1.0.1  2008-06-16
+
+    Require perl 5.8.3.  Due to site/core @INC issues, requiring Exporter 5.57
+    isn't good enough.
+
+1.0.0  2008-06-15
+
+    Initial release.

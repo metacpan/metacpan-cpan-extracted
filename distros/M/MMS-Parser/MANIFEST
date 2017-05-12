@@ -1,0 +1,31 @@
+Build.PL
+Makefile.PL
+Changes
+README
+MANIFEST
+META.yml # Will be created by "make dist"
+lib/MMS/Parser.pm
+lib/MMS/Parser/gr-WSP.prd
+lib/MMS/Parser/WorkHorse.pm.PL
+lib/MMS/Parser/g-startup.pl
+lib/MMS/Parser/WorkHorse.pod
+lib/MMS/Parser/gr-MMS.prd
+t/lib/Test/MMS/Parser.pm
+t/00.load.t
+t/01.char-ranges.t
+t/01.other-convenience.t
+t/02.primitives.t
+t/03.PDU-common-fields.t
+t/04.basic-rules.t
+t/05.length.t
+t/06.parameter-values.t
+t/07.parameter.t
+t/08.content-type.t
+t/09.multipart.t
+t/20.immediates.t
+t/21.straight.t
+t/pod-coverage.t
+t/pod.t
+eg/message-structure.pl
+eg/m-send-req.mms
+META.json                                Module JSON meta-data (added by MakeMaker)

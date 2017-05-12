@@ -1,0 +1,94 @@
+NAME
+
+    Mojolicious::Plugin::Args - gives you back the request parameters as a
+    simple %args hash, even if it's posted in json.
+
+VERSION
+
+    version 0.05
+
+SYNOPSIS
+
+    Route something like this:
+
+        package App;
+        use Mojo::Base 'Mojolicious';
+    
+        sub startup {
+            my $self = shift;
+    
+            $self->plugin( 'Mojolicious::Plugin::Args' );
+    
+            my $r = $self->routes;
+    
+            $r->any( '/example/test' )->to( 'example#test' );
+        }
+
+    Here's the controller:
+
+        package App::Example;
+        use Mojo::Base 'Mojolicious::Controller';
+    
+        sub test {
+            my $self = shift;
+            my %args = $self->args;
+    
+            $self->log->debug( 'args', $self->dumper( \%args ) );
+            $self->render( json => \%args );
+        }
+
+    Now send a POST to it (jQuery example):
+
+        $.ajax( {
+            type: 'POST'
+            ,url: '/example/test'
+            ,contentType: 'application/json'
+            ,dataType: 'json'
+            ,data: JSON.stringify( { foo: 'bar' } )
+        } );
+
+    Inspect the response. Keen. Try a GET on the endpoint with ".json"
+    typed (/example/test.json) and a json query string variable
+    (?json=...). Same result.
+
+        $.ajax( {
+            type: 'GET'
+            ,url: '/example/test.json?json='+ JSON.stringify( { foo: 'bar' } )
+        } );
+
+    Also, try regular query string vars (e.g. ?foo=bar&baz=foo) and
+    form-url-encoded POST stuff. Works the same. All-in-one: no more
+    dealing with the stupid param helper.
+
+SUPPORT
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests through the issue tracker at
+    https://github.com/sharabash/mojolicious-plugin-args/issues. You will
+    be notified automatically of any progress on your issue.
+
+ Source Code
+
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    https://github.com/sharabash/mojolicious-plugin-args
+
+      git clone git://github.com/sharabash/mojolicious-plugin-args.git
+
+AUTHOR
+
+    Nour Sharabash <amirite@cpan.org>
+
+CONTRIBUTOR
+
+    Nour Sharabash <nour.sharabash@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Nour Sharabash.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

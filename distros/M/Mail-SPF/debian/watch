@@ -1,0 +1,2 @@
+version=3
+http://search.cpan.org/dist/Mail-SPF/	.*/Mail-SPF-v?([\d.]+)\.tar\.gz

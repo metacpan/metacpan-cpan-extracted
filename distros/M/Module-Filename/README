@@ -1,0 +1,13 @@
+To install the module...
+
+  cpan2rpm filename.tgz
+  sudo rpm -Uhv filename.rpm
+
+OR
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

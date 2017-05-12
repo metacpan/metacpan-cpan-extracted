@@ -1,0 +1,120 @@
+# This grammar is for a path's 'd' attribute.
+
+:default			::= action => [values]
+
+# G1 stuff.
+
+:start 				::= d
+
+d					::= move_to draw_to_commands
+
+move_to				::=
+move_to				::= Mm moveto_arguments				action => command
+
+moveto_arguments	::= coordinate_pair
+
+draw_to_commands	::= draw_to_command*
+
+draw_to_command		::= close_path
+						| line_to
+						| horizontal_line_to
+						| vertical_line_to
+						| curve_to
+						| smooth_curve_to
+						| quadratic_bezier_curve_to
+						| smooth_quadratic_bezier_curve_to
+						| elliptical_arc
+
+close_path			::= Zz								action => command
+
+line_to				::= Ll line_to_arguments			action => command
+
+line_to_arguments	::= coordinate_pair
+						| coordinate_pair line_to_arguments
+
+horizontal_line_to	::= Hh coordinate_list				action => command
+
+vertical_line_to	::= Vv coordinate_list				action => command
+
+curve_to			::= Cc curve_to_arguments			action => command
+
+curve_to_arguments	::= coordinate_triple
+						| coordinate_triple curve_to_arguments
+
+smooth_curve_to		::= Ss line_to_arguments			action => command
+
+quadratic_bezier_curve_to			::= Qq line_to_arguments	action => command
+
+smooth_quadratic_bezier_curve_to	::= Tt line_to_arguments	action => command
+
+elliptical_arc		::= Aa coordinate_pair coordinate flag flag coordinate_pair	action => command
+
+coordinate_triple	::= coordinate coordinate coordinate
+
+coordinate_pair		::= coordinate coordinate
+
+coordinate_list		::= coordinate+
+
+coordinate			::= float							action => float
+						| integer						action => integer
+
+flag				::= boolean							action => boolean
+
+# G0 stuff.
+
+Aa					~ [Aa]
+
+boolean				~ 'zero'
+boolean				~ 'one'
+
+Cc					~ [Cc]
+
+digit				~ [0-9]
+digit_any			~ digit*
+digit_many			~ digit+
+
+E					~ [Ee] sign_maybe digit_many
+E_maybe				~ E
+E_maybe				~
+
+:lexeme				~ integer
+integer				~ sign_maybe non_zero digit_any
+						| zero
+
+:lexeme				~ float
+float				~ sign_maybe digit_many E
+						| sign_maybe digit_any '.' digit_many E_maybe
+						| sign_maybe digit_many '.' E_maybe
+						| sign_maybe non_zero digit_any
+
+Hh					~ [Hh]
+
+Ll					~ [Ll]
+
+Mm					~ [Mm]
+
+non_zero			~ [1-9]
+
+Qq					~ [Qq]
+
+sign_maybe			~ [+-]
+sign_maybe			~
+
+Ss					~ [Ss]
+
+Tt					~ [Tt]
+
+Vv					~ [Vv]
+
+zero				~ '0'
+
+Zz					~ [Zz]
+
+# Boilerplate.
+# \x{09} => \t. \x{0A} => \n. \x{0D} => \r. \x{20} => \s.
+
+:discard			~ comma
+comma				~ ','
+
+:discard			~ whitespace
+whitespace			~ [\s]+

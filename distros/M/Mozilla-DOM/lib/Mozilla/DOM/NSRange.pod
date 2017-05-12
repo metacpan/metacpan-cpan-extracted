@@ -1,0 +1,142 @@
+=head1 NAME
+
+Mozilla::DOM::NSRange
+
+=for object Mozilla::DOM::NSRange
+
+Mozilla::DOM::NSRange is a wrapper around an instance of Mozilla's
+nsIDOMNSRange interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+The following constants are available, exportable with
+
+  use Mozilla::DOM::NSRange qw(compare);
+
+=over 4
+
+=item NODE_BEFORE => 0
+
+=item NODE_AFTER => 1
+
+=item NODE_BEFORE_AND_AFTER => 2
+
+=item NODE_INSIDE => 3
+
+=back
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::NSRange->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $retval = $nsrange->B<CreateContextualFragment>($fragment)
+
+Input:
+
+=over
+
+=item $fragment (string)
+
+=back
+
+Output:
+
+=over
+
+=item $retval (Mozilla::DOM::DocumentFragment)
+
+=back
+
+=head2 $bool = $nsrange->B<IsPointInRange>($parent, $offset)
+
+Input:
+
+=over
+
+=item $parent (Mozilla::DOM::Node)
+
+=item $offset (int)
+
+=back
+
+Output:
+
+=over
+
+=item $bool (bool)
+
+=back
+
+=head2 $retval = $nsrange->B<ComparePoint>($parent, $offset)
+
+Input:
+
+=over
+
+=item $parent (Mozilla::DOM::Node)
+
+=item $offset (int)
+
+=back
+
+Output:
+
+=over
+
+=item $retval (int)
+
+=back
+
+=head2 $bool = $nsrange->B<IntersectsNode>($n)
+
+Input:
+
+=over
+
+=item $n (Mozilla::DOM::Node)
+
+=back
+
+Output:
+
+=over
+
+=item $bool (bool)
+
+=back
+
+=head2 $retval = $nsrange->B<CompareNode>($n)
+
+Input:
+
+=over
+
+=item $n (Mozilla::DOM::Node)
+
+=back
+
+Output:
+
+=over
+
+=item $retval (int)
+
+=back
+
+=head2 $nsrange->B<NSDetach>()
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

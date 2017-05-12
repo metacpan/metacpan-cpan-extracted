@@ -1,0 +1,95 @@
+NAME
+    MSWord::ToHTML
+
+    Take old or new format Word files and spit out extremely clean HTML.
+
+NOTICE
+    Because of the PITA involved in processing Word files, I have punted
+    most of the work to Libreoffice <http://www.libreoffice.org/> and tidy
+    <http://tidy.sourceforge.net/>.
+
+    Which means that you must have the binary programs tidy and libreoffice
+    installed.
+
+SYNOPSIS
+        {
+            package My::Word::Converter;
+
+            use strict;
+            use warnings;
+            use MSWord::ToHTML;
+
+            my $converter = MSWord::ToHTML->new;
+            my $doc = $converter->validate_file("/home/myself/my_excellent_writing.doc");
+              # This returns an instance of MSWord::ToHTML::Doc
+            my $docx = $converter->validate_file("/home/myself/my_excellent_notes.docx");
+              # This returns an instance of MSWord::ToHTML::DocX
+
+            my $writing_html = $doc->get_html;
+              # This returns an instance of MSWord::ToHTML::HTML
+            my $notes_html = $docx->get_html;
+              # This returns an instance of MSWord::ToHTML::HTML
+
+            my $text = $notes_html->content;
+              # The text content of the file.
+            my $text = $writing_html->content;
+              # The text content of the file.
+
+        }
+
+METHODS
+  new
+    MSWord::ToHTML is a Moose class, so new is Moose's constructor.
+
+  validate_file
+    This gets you the only thing you need, which is an object ready to give
+    you its HTML.
+
+  get_html
+    This is the other important method, that gives you an
+    MSWord::ToHTML::HTML object that contains:
+
+    file
+        An IO::All::File object from the html file written to your temp
+        directory. I haven't tested this on Windows, but the module attempts
+        to be agnostic with regards to temporary directories.
+
+        Because of the type conversions involved, that file object stores
+        its content in a scalarref, which is an IO::All::String object. To
+        use it directly, use
+
+          my $long_html_string = ${$notes_html->file};
+
+    content
+        This module does that dereferencing for you in this convenience
+        method on MSWord::ToHTML::HTML.
+
+          my $long_html_string = $notes_html->content;
+
+    images
+        A Path::Class::Dir containing all the images or static files
+        associated with your html document, so that you can iterate over
+        them and copy them to a destination of your choosing.
+
+        I used Path::Class::Dir instead of IO::All's directory methods
+        because it's friendlier:
+
+          my @image_files = $writing_html->images->children;
+
+AUTHOR
+    Amiri Barksdale, <amiribarksdale@gmail.com>
+
+COPYRIGHT
+    Copyright (c) 2013 the MSWord::ToHTML "AUTHOR" listed above.
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    IO::All
+
+    IO::All::File
+
+    IO::All::String
+

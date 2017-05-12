@@ -1,0 +1,26 @@
+#!/bin/sh -e
+#
+# This directory contains the source code for libmemcached that we will build and link to.
+# 
+# In future it may also contain source to memcached so we can be sure to have one available for running tests.
+#
+# TO UPGRADE TO A NEW libmemcached RELEASE:
+#
+#   ./README 0.45
+#
+v=${1?Specify the version to use as an argument, e.g., 0.45}
+rm -f libmemcached-$v.tar.gz
+wget --no-check-certificate https://launchpad.net/libmemcached/1.0/$v/+download/libmemcached-$v.tar.gz
+rm -rf libmemcached
+tar xfz libmemcached-$v.tar.gz
+mv libmemcached-$v libmemcached
+#
+# Note that libmemcached.patch is targeted to libmemcached version 1.0.18.
+# The patches to memflush.cc and byteorder.cc fixed compilation failures
+# on MacOSX, and may not apply to future releases of libmemcached.
+#
+patch -p2 < libmemcached.patch
+#
+git add -u libmemcached # notice deleted files
+git add libmemcached    # notice added files
+(cd .. && perl -MExtUtils::Manifest=mkmanifest -e mkmanifest)

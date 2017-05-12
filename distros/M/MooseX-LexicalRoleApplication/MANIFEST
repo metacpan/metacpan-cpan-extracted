@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/MooseX/LexicalRoleApplication.pm
+t/basic.t
+t/lib/SomeClass.pm
+t/lib/SomeRole.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t

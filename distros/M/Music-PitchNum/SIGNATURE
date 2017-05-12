@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 6d7b9a175d0dcca18684cdc196fe0d58101289bf Changes
+SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
+SHA1 171c84136b611199c54fa12299d38d826e375646 MANIFEST
+SHA1 1c7503d5b58892922fb7096a9295dd3a9c589250 MANIFEST.SKIP
+SHA1 1dd571d3d6100e4a12dd6907986fed5076411d2f META.json
+SHA1 611308acb7c5e89d921a5f583bf45f853be08328 META.yml
+SHA1 81a907472d3dd85533dc49a98ca1191834219893 Makefile.PL
+SHA1 47d851c79b980a80a8c1d3e9f4716c001c6fe350 README
+SHA1 48bf85b8c2c7ed20e001e80f14533f02d4b99c9b eg/word2notes
+SHA1 3b17764663d3851518f616d5c30f21ea496bb62c lib/Music/PitchNum.pm
+SHA1 05484e6774c7e6e6f518c0f60044cb7a938162ed lib/Music/PitchNum/ABC.pm
+SHA1 cb7f790ba73aae5b26f3522dfe5485bed1a04456 lib/Music/PitchNum/ASPN.pm
+SHA1 ed6769059f66a65095cce6d1047abe9cfbf4e907 lib/Music/PitchNum/Dutch.pm
+SHA1 89059dcba7acc1ed59c344536ba6d3faf6da234c lib/Music/PitchNum/German.pm
+SHA1 e9c95fab9941f61cb92402c61de248eda93b9b40 t/00-load.t
+SHA1 86a1704a4e794f485dd01a5cee7e8e7c4347c70d t/Music-PitchNum-ABC.t
+SHA1 c0547b335198dfce34441b7f5b5193956d7524d9 t/Music-PitchNum-ASPN.t
+SHA1 9e5d75e2f12a20f95054f8a4d841c820589ac4ea t/Music-PitchNum-Dutch.t
+SHA1 20413da3d71354ef235bc1209974435fdb1107ec t/Music-PitchNum-German.t
+SHA1 1bf638328701169992e98b403a9c1030a7eaefb9 t/Music-PitchNum.t
+SHA1 66e3e4ed5020659052fe7de5506b13f016185046 t/manifest.t
+SHA1 754b1649c578b42b74aa4c0238950a0d473c6155 t/pod-coverage.t
+SHA1 0062f84bfb49b275b13bd1136a746a32f96c0df7 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJXACffAAoJEKSYBH5dablg4YoIAI5r1gO1DzittIHzGNAlVCDz
+l7QsEmRwEl4JlcV6vpCyH3UH4sK0A7h9GSMNArDklnCES57IKc9h6IC3aULJNYlK
+o9o47YTdq2C1loOIOBeP4PdXO/xLis3IAyvCh2Ob5mV/0lKXAEyomYdvWBt62yFE
+Eo8yuTPJNnFFV5KNqWqqbH0X2UX6eELjhFHndfThNAvEnxd03yIS6C+WaqFQ8I6/
+O50WZgRF5Bq4M3IERxTOCjn7yYLNccCw4MxTvk/66kxSZLp6hqXXNyUJJyztk6fv
+RkGIDt+ZHGSgBDsH5JU7i3tQ7NChfUp4ZpQQJoDI2VGk/8wshmsuLBiMD3i/IFU=
+=U4Xc
+-----END PGP SIGNATURE-----

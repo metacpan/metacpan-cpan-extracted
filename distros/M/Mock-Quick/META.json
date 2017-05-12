@@ -1,0 +1,74 @@
+{
+   "abstract" : "Quickly mock objects and classes, even temporarily replace them,",
+   "author" : [
+      "Chad Granum <exodist7@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mock-Quick",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Fennec::Lite" : "0.004",
+            "Test::Exception" : "0.29",
+            "Test::Simple" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter::Declare" : "0.103",
+            "Scalar::Util" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mock::Quick" : {
+         "file" : "lib/Mock/Quick.pm",
+         "version" : "1.111"
+      },
+      "Mock::Quick::Class" : {
+         "file" : "lib/Mock/Quick/Class.pm"
+      },
+      "Mock::Quick::Method" : {
+         "file" : "lib/Mock/Quick/Method.pm"
+      },
+      "Mock::Quick::Object" : {
+         "file" : "lib/Mock/Quick/Object.pm"
+      },
+      "Mock::Quick::Object::Control" : {
+         "file" : "lib/Mock/Quick/Object/Control.pm"
+      },
+      "Mock::Quick::Util" : {
+         "file" : "lib/Mock/Quick/Util.pm"
+      },
+      "Object::Quick" : {
+         "file" : "lib/Object/Quick.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/exodist/Mock-Quick/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/exodist/Mock-Quick"
+      }
+   },
+   "version" : "1.111"
+}

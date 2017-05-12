@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:                MooseX-Compile-CLI
+version:             0.01
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    MooseX::App::Cmd:              0.02
+    MooseX::AttributeHelpers:      0
+    MooseX::Compile:               0
+    MooseX::Types::Path::Class:    0
+    Path::Class:                   0
+    Prompt::ReadKey:               0.02
+    Test::use::ok:                 0
+    Tie::RefHash:                  0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,127 @@
+NAME
+    Message::Passing::Output::WebHooks - call 'WebHooks' with messages.
+
+SYNOPSIS
+        message-pass_webhooks --input STDIN
+
+        You type:
+        {"url": "http://localhost:5000/test","@type":"WebHooks","data":{"foo":"bar"}}
+
+        Causes:
+
+        POST /test HTTP/1.1
+        Host: localhost:5000
+        Content-Length: 13
+        Content-Type: application/json
+
+        {"foo":"bar"}
+
+        # Consume messages from ZeroMQ, and publish results to
+        # ZeroMQ:
+        message-pass_webhooks --input ZeroMQ --input_options \
+            '{"socket_bind":"tcp://*:5558"}' --log ZeroMQ \
+            --log_options '{"connect":"tcp://192.168.0.1:5559"}'
+
+WHAT IS A WEBHOOK
+    A web-hook is an a notification method used by APIs.
+
+    The idea is that you (as a client) define a URI on your website which is
+    called when a certain action happens at your API provider. Some data
+    relevant to the event is serialized out to you, allowing you to take
+    action.
+
+    The canonical example is PayPal's IPN system, in which PayPal make a
+    call to your online payment system to verify that a payment has been
+    made.
+
+DESCRIPTION
+    This class expects to have it's consume method called with a has of
+    parameters, including:
+
+    url The URL to make the request to.
+
+    data
+        The data to serialize out to the HTTP post request
+
+USAGE
+    As a Message::Passing component, input is easy - if you're writing
+    asynchronous perl code already, you can use the
+    Message::Passing::Output::WebHooks class directly in your perl code, or
+    you can use Log::Dispatch::Message::Passing to divert your application
+    logs into it via the Log::Dispatch framework.
+
+    If you're not already an AnyEvent perl app (most people!), then you can
+    use Message::Passing::Input::STDIN, Message::Passing::Input::ZeroMQ or
+    any other input class, and the command line message-pass utility
+    supplied to run a worker process, then send messages to it.
+
+    To send messages, you can either use Java or Ruby logstash
+    <http://logstash.net/>, or if you're in perl, then it's entirely
+    possible to use the ZeroMQ output component,
+    Message::Passing::Output::ZeroMQ from within a normal perl application
+    (via Log::Dispatch::Message::Passing or directly).
+
+LOGGING
+    This output publishes one message for each message received, logging the
+    status of the HTTP call after it completes.
+
+    The log output can be setup on command line as documented in the
+    SYNOPSIS, or if you're building classes manually, you can supply the
+    "log_chain" attribute yourself.
+
+    Events that can be logged are:
+
+  Message::Passing::WebHooks::Event::Bad.
+    The message received was missing either a " url " or a " data " field,
+    meaning it could not be used for a HTTP request.
+
+  Message::Passing::WebHooks::Event::Call::Success.
+    The call succeeded, and a 2XX status was received from the remote server
+
+  Message::Passing::WebHooks::Event::Call::Failure.
+    The call failed, due to a bad server or the server returning an error
+    status.
+
+  Message::Passing::WebHooks::Event::Call::Timeout.
+    The remote server failed to respond within the timeout configured so the
+    request was aborted.
+
+ATTRIBUTES
+  log_chain
+    Holds a chain of Message::Passing filters and outputs.
+
+    Defaults to Message::Passing::Output::Null, causing all status reports
+    to be discarded.
+
+  timeout
+    Integer number of seconds, after which HTTP connections are timed out.
+
+METHODS
+  consume
+    Generates and sends the post request from the message passed.
+
+SEE ALSO
+    Message::Passing
+    <http://logstash.net>
+    <http://wiki.shopify.com/WebHook>
+
+AUTHOR
+    Tomas (t0m) Doran <bobtfish@bobtfish.net>
+
+SPONSORSHIP
+    This module exists due to the wonderful people at Suretec Systems Ltd.
+    <http://www.suretecsystems.com/> who sponsored its development for its
+    VoIP division called SureVoIP <http://www.surevoip.co.uk/> for use with
+    the SureVoIP API -
+    <http://www.surevoip.co.uk/support/wiki/api_documentation>
+
+COPYRIGHT
+    Copyright Suretec Systems 2012.
+
+LICENSE
+    GNU Affero General Public License, Version 3
+
+    If you feel this is too restrictive to be able to use this software,
+    please talk to us as we'd be willing to consider re-licensing under less
+    restrictive terms.
+

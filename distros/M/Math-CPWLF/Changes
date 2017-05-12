@@ -1,0 +1,30 @@
+Revision history for Math-CPWLF
+
+0.15    Sat Jan 16 16:44:29 2010
+        - make Build.PL non-executable
+        - minor internal clean up of binary search function
+
+0.14    Mon Dec 14 22:19:14 2009
+        - moderate speed improvement by changing _binary_search from recursive
+          to iterative
+        - added 'repository' to Build.PL
+        - many internal code changes for consistent style, commenting and naming
+
+0.13    Wed Dec  9 23:53:25 2009
+        - add example of setting non-default oob behavior
+        - refactored various pieces of code for clarity and speed
+        - added some internal commenting
+        - added tests covering identity function from -100 .. 100 with lookups
+          at 0.5 intervals
+        - increased Devel::Cover coverage
+
+0.12    Sun Dec  6 11:19:12 2009
+        - give doc example on setting oob behavior
+        - optimize direct hits of x values to avoid the binary search
+
+0.11    Thu Dec  3 00:23:31 2009
+        - fixed a bug in how the array search in _find_neighbors set the lower max
+
+0.10    Wed Dec  2 22:15:14 2009
+        First version, released on an unsuspecting world.
+

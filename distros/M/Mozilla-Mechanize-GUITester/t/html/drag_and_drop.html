@@ -1,0 +1,75 @@
+<html>
+<title>Drag and Drop</title>
+<style type="text/css">
+div#mover {
+	position: absolute;
+	background-color: yellow;
+	display:inline;
+	top: 123px;
+	left: 54px;
+}
+</style>
+	
+<script language="javascript" type="text/javascript">		
+	var _mo = null;
+
+	function start_move(e, element) {
+		element._offsetX = e.clientX + window.pageXOffset;
+		element._offsetY = e.clientY + window.pageYOffset;
+		_mo = element;
+	}
+
+	function end_move() {
+		_mo = null;
+	}
+
+	function move_object(e) {
+		if (null == _mo)
+			return;
+
+		_mo.style.top = e.clientY + window.pageYOffset;
+		_mo.style.left = e.clientX + window.pageXOffset;
+	}
+</script>
+</head>
+<body onmousemove="move_object(event);" onmouseup="end_move();"
+	onselect="return false;"
+	onselectstart="return false;">
+
+<div id="mover" onmouseover="this.style.cursor='move';"
+	onmouseout="this.style.cursor='default';"
+	onmousedown="start_move(event,this);" onmouseup="end_move();">
+
+<table cellpadding="0" cellspacing="0">
+<tbody>
+	<tr>
+		<th>Column1</th>
+		<th>Column2</th>
+		<th>Column3</th>
+	</tr>
+	<tr>
+		<td>text
+		</td><td>text
+		</td><td>text
+	</td></tr>
+	<tr>
+		<td>text
+		</td><td>text
+		</td><td>text
+	</td></tr>
+	<tr>
+		<td>text
+		</td><td>text
+		</td><td>text
+	</td></tr>
+	<tr>
+		<td>text
+		</td><td>text
+		</td><td>text
+	</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</body>
+</html>

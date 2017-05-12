@@ -1,0 +1,7 @@
+Revision history for Perl extension MarpaX::Languages::Dash.
+
+1.00  2016-12-25T12:00:00
+	- Renamed from MarpaX::Languages::Dash V 2.03, because the old name does not convey the real
+		purpose of this module.
+	- Remove use of 'use utf8' and 'use open ...', since they are global.
+	- Switch from File::Slurp to File::Slurper.

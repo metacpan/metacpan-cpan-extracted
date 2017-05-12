@@ -1,0 +1,15 @@
+Revision history for Mail-Milter-Authentication-Extra
+
+1.1.1   2017-04-17
+        - RSpamD Handler
+        - Metrics gathering for prometheus
+        - Allow hard reject of failures
+
+1.0.1   2015-09-11
+        - Packaging fixes
+
+1.0.0   2015-08-22
+        - Released to CPAN
+
+0.1.0   2015-08-04
+        - Split into additional module

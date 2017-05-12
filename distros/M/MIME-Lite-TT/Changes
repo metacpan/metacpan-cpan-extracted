@@ -1,0 +1,6 @@
+Revision history for Perl extension MIME::Lite::TT
+0.02  Fri Mar 17 13:54:12 2006
+    - Add option 'TmplUpgrade'.
+
+0.01  Sat Jul 24 01:58:50 2004
+	- original version

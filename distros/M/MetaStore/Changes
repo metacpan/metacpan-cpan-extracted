@@ -1,0 +1,66 @@
+Revision history for Perl extension MetaStore.
+
+0.62  09 March 2015
+    * fix code
+
+0.61  07 March 2015
+    * fix versions
+
+0.60  07 March 2015
+    * make tests ok
+
+0.59  22 Feb 2015
+    * make tests ok
+
+0.58  30 Dec 2014
+    * remove depreacted code
+0.57 30 May 2012
+    - fix qw()
+0.57 15.02.2012
+    - use request methods
+0.56
+    - fix key field (MetaStore::Cmetatags)
+0.55
+    - fix key field (MetaStore::Cmetalinks)
+0.54
+    - fix events 
+0.53
+    - adopt to latest api of  WebDAO
+0.52
+    - fix undefs
+0.51
+    - add raw response
+    - clean debug
+0.50
+    - fix autho method
+    - move to Collection
+    - delete MetaStore::Mem
+    - delete scripts dir
+    - switch to WebDAO 1.00 package
+    - clean tests
+
+0.29
+     - add INCLUDE to conf file; add += and ?= 
+    	    operations to config variables
+0.28 2008/06/21
+      - set guest user id = -1
+      - set deps : JSON=>2.07
+      - use to_json intead objToJson
+      - set to  off INTERPOLATE for TT (parse_template)
+0.27 2008/01/20
+	- remove auth depend in kernel
+0.26 2007/11/19
+        - add MetaStore::Response, for format results
+0.25 2007/06/17
+       -  add Metastore::Links, fix Cmetalinks;
+       -  add support additional configs passed to constructor -  new Template:: ;
+       -  add StoreDir tests;
+0.24 2007/06/08
+     - add links object
+0.23  2007/04/05 
+       - move parse method to root object;
+       - cache parser object;
+0.01  Mon Jan 23 13:18:45 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc --skip-exporter MetaStore
+

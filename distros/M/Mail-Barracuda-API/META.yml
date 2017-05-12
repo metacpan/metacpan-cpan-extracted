@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Mail-Barracuda-API
+version:             0.01
+abstract:            Manage Barracuda Antispam Appliance
+license:             ~
+author:              
+    - Jonathan Auer <jda@tapodi.net>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    LWP::UserAgent:                0
+    XML::Simple:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,152 @@
+{
+   "abstract" : "Translate an IDL source to an AST",
+   "author" : [
+      "Jean-Damien Durand <jeandamiendurand@free.fr>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MarpaX-Languages-IDL-AST",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06",
+            "perl" : "5.010"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "English" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Synopsis" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Data::Scan" : "0",
+            "Data::Scan::Role::Consumer" : "0",
+            "Encode" : "0",
+            "File::BOM" : "0",
+            "File::Basename" : "0",
+            "File::ShareDir" : "0",
+            "File::Spec::Functions" : "0",
+            "Getopt::Long" : "0",
+            "IO::String" : "0",
+            "MRO::Compat" : "0",
+            "Marpa::R2" : "0",
+            "Math::BigFloat" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "MooX::Role::Logger" : "0",
+            "Moose" : "0",
+            "MooseX::ClassAttribute" : "0",
+            "MooseX::Params::Validate" : "0",
+            "MooseX::Types" : "0",
+            "MooseX::Types::Moose" : "0",
+            "MooseX::Types::Structured" : "0",
+            "POSIX" : "0",
+            "Pod::Usage" : "0",
+            "Scalar::Util" : "0",
+            "Template" : "0",
+            "Template::Constants" : "0",
+            "Template::Plugin::PerlTidy" : "0",
+            "Template::Plugin::ScalarUtil" : "0",
+            "Type::Library" : "0",
+            "Type::Utils" : "0",
+            "Types::Common::Numeric" : "0",
+            "Types::Standard" : "0",
+            "constant" : "0",
+            "diagnostics" : "0",
+            "namespace::sweep" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "MarpaX::Languages::IDL::AST" : {
+         "file" : "lib/MarpaX/Languages/IDL/AST.pm",
+         "version" : "0.007"
+      },
+      "MarpaX::Languages::IDL::AST::Data::Scan::Impl::Perl5" : {
+         "file" : "lib/MarpaX/Languages/IDL/AST/Data/Scan/Impl/Perl5.pm",
+         "version" : "0.007"
+      },
+      "MarpaX::Languages::IDL::AST::Data::Scan::Role::Consumer" : {
+         "file" : "lib/MarpaX/Languages/IDL/AST/Data/Scan/Role/Consumer.pm",
+         "version" : "0.007"
+      },
+      "MarpaX::Languages::IDL::AST::Util" : {
+         "file" : "lib/MarpaX/Languages/IDL/AST/Util.pm",
+         "version" : "0.007"
+      },
+      "MarpaX::Languages::IDL::AST::Value" : {
+         "file" : "lib/MarpaX/Languages/IDL/AST/Value.pm",
+         "version" : "0.007"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-MarpaX-Languages-IDL-AST@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=MarpaX-Languages-IDL-AST"
+      },
+      "homepage" : "https://metacpan.org/release/MarpaX-Languages-IDL-AST",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jddurand/marpax-languages-idl-ast.git",
+         "web" : "https://github.com/jddurand/marpax-languages-idl-ast"
+      }
+   },
+   "version" : "0.007",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

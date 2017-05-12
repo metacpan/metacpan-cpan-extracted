@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Memoize/Memcached/Attribute.pm
+t/all.t
+t/lib/Memoize/Memcached/Attribute/Test.pm
+t/lib/Mock/Cache/Memcached.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t

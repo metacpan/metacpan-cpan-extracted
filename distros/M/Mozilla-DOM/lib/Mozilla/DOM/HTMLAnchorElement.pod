@@ -1,0 +1,212 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLAnchorElement
+
+=for object Mozilla::DOM::HTMLAnchorElement
+
+Mozilla::DOM::HTMLAnchorElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLAnchorElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLAnchorElement interface is the interface to a [X]HTML
+ * a element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLAnchorElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $htmlanchorelement->B<Blur>()
+
+=head2 $htmlanchorelement->B<Focus>()
+
+=head2 $accesskey = $htmlanchorelement->B<GetAccessKey>()
+
+=head2 $charset = $htmlanchorelement->B<GetCharset>()
+
+=head2 $coords = $htmlanchorelement->B<GetCoords>()
+
+$coords is a string, but I'm not sure what it is.
+
+=head2 $href = $htmlanchorelement->B<GetHref>()
+
+=head2 $hreflang = $htmlanchorelement->B<GetHreflang>()
+
+=head2 $name = $htmlanchorelement->B<GetName>()
+
+=head2 $rel = $htmlanchorelement->B<GetRel>()
+
+=head2 $rev = $htmlanchorelement->B<GetRev>()
+
+=head2 $shape = $htmlanchorelement->B<GetShape>()
+
+=head2 $tabindex = $htmlanchorelement->B<GetTabIndex>()
+
+=head2 $target = $htmlanchorelement->B<GetTarget>()
+
+=head2 $type = $htmlanchorelement->B<GetType>()
+
+=head2 $htmlanchorelement->B<SetAccessKey>($accesskey)
+
+=over
+
+=over
+
+=item * $accesskey (string)
+
+=back
+
+=back
+
+=head2 $htmlanchorelement->B<SetCharset>($charset)
+
+=over
+
+=over
+
+=item * $charset (string)
+
+=back
+
+=back
+
+=head2 $htmlanchorelement->B<SetCoords>($coords)
+
+=over
+
+=over
+
+=item * $coords (string)
+
+=back
+
+=back
+
+=head2 $htmlanchorelement->B<SetHref>($href)
+
+=over
+
+=over
+
+=item * $href (string)
+
+=back
+
+=back
+
+=head2 $htmlanchorelement->B<SetHreflang>($hreflang)
+
+=over
+
+=over
+
+=item * $hreflang (string)
+
+=back
+
+=back
+
+=head2 $htmlanchorelement->B<SetName>($name)
+
+=over
+
+=over
+
+=item * $name (string)
+
+=back
+
+=back
+
+=head2 $htmlanchorelement->B<SetRel>($rel)
+
+=over
+
+=over
+
+=item * $rel (string)
+
+=back
+
+=back
+
+=head2 $htmlanchorelement->B<SetRev>($rev)
+
+=over
+
+=over
+
+=item * $rev (string)
+
+=back
+
+=back
+
+=head2 $htmlanchorelement->B<SetShape>($shape)
+
+=over
+
+=over
+
+=item * $shape (string)
+
+=back
+
+=back
+
+=head2 $htmlanchorelement->B<SetTabIndex>($tabindex)
+
+=over
+
+=over
+
+=item * $tabindex (integer (long))
+
+=back
+
+=back
+
+=head2 $htmlanchorelement->B<SetTarget>($target)
+
+=over
+
+=over
+
+=item * $target (string)
+
+=back
+
+=back
+
+=head2 $htmlanchorelement->B<SetType>($type)
+
+=over
+
+=over
+
+=item * $type (string)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

@@ -1,0 +1,65 @@
+chunk
+stat list
+stat
+keyword for
+for
+Name
+i
+=
+exp
+Number
+0
+,
+exp
+exp
+var
+prefixexp
+var
+Name
+table
+.
+Name
+getn
+args
+(
+optional explist
+explist
+exp
+var
+Name
+arg
+)
+keyword do
+do
+block
+chunk
+stat list
+stat
+functioncall
+prefixexp
+var
+Name
+print
+args
+(
+optional explist
+explist
+exp
+var
+Name
+i
+exp
+var
+prefixexp
+var
+Name
+arg
+[
+exp
+var
+Name
+i
+]
+)
+keyword end
+end

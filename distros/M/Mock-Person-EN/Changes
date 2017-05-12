@@ -1,0 +1,20 @@
+0.04 2015-10-06T09:29:19+02:00
+ - Fix comment (thanks Mohammad S Anwar).
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Rewrite B<> to C<> on subroutines and variables.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.03 2014-11-09T03:24:25+01:00
+ - Fix JOHN to John.
+ - Fix NATASHA to Natasha.
+ - Fix tests for 3/4 word names.
+ - Update Module::Install to 1.14 version.
+
+0.02 2014-07-24T08:14:53+02:00
+ - Fix list of last names.
+
+0.01 2014-07-21T14:53:00+02:00
+ - First version.

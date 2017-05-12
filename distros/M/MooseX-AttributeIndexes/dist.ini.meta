@@ -1,0 +1,29 @@
+; vim: syntax=dosini
+name    = MooseX-AttributeIndexes
+author  = Kent Fredric <kentnl@cpan.org>
+author  = Jesse Luehrs <doy@cpan.org>
+license = Perl_5
+copyright_holder = Kent Fredric <kentfredric@gmail.com>
+
+[@Author::KENTNL]
+:version = 2.020
+auto_prereqs_skip = ^(Bar|Empty|Foo)::Role$
+bumpversions = 1
+normal_form  = numify
+mantissa     = 6
+srcreadme    = mkdn
+toolkit      = eumm
+toolkit_hardness = soft
+copyfiles        = LICENSE
+twitter_extra_hash_tags = #moose
+
+;version_major  = 0
+;version_minor  = 1
+;version_rel_year = 2009
+;version_rel_month = 8
+;version_rel_day = 22
+;version_rel_hour = 04
+;version_rel_time_zone = Pacific/Auckland
+
+[Prereqs]
+

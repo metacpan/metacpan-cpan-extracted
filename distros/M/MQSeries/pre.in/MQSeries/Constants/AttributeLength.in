@@ -1,0 +1,51 @@
+#-*-perl-*-
+#
+# $Id: AttributeLength.in,v 33.4 2012/09/26 16:15:28 jettisu Exp $
+#
+# (c) 1999-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+package MQSeries::Constants;
+
+%AttributeLength =
+  (
+   &MQCA_ALTERATION_DATE                => &MQ_DATE_LENGTH,
+   &MQCA_ALTERATION_TIME                => &MQ_TIME_LENGTH,
+   &MQCA_APPL_ID                        => &MQ_PROCESS_APPL_ID_LENGTH,
+   &MQCA_BACKOUT_REQ_Q_NAME             => &MQ_Q_NAME_LENGTH,
+   &MQCA_BASE_Q_NAME                    => &MQ_Q_NAME_LENGTH,
+   &MQCA_CF_STRUC_DESC                  => &MQ_CF_STRUC_DESC_LENGTH,
+   &MQCA_CF_STRUC_NAME                  => &MQ_CF_STRUC_NAME_LENGTH,
+   &MQCA_CHANNEL_AUTO_DEF_EXIT          => &MQ_EXIT_NAME_LENGTH,
+   &MQCA_CLUSTER_NAME                   => &MQ_CLUSTER_NAME_LENGTH,
+   &MQCA_CLUSTER_NAMELIST               => &MQ_NAMELIST_NAME_LENGTH,
+   &MQCA_CLUSTER_WORKLOAD_DATA          => &MQ_EXIT_DATA_LENGTH,
+   &MQCA_CLUSTER_WORKLOAD_EXIT          => &MQ_EXIT_NAME_LENGTH,
+   &MQCA_COMMAND_INPUT_Q_NAME           => &MQ_Q_NAME_LENGTH,
+   &MQCA_CREATION_DATE                  => &MQ_CREATION_DATE_LENGTH,
+   &MQCA_CREATION_TIME                  => &MQ_CREATION_TIME_LENGTH,
+   &MQCA_DEAD_LETTER_Q_NAME             => &MQ_Q_NAME_LENGTH,
+   &MQCA_DEF_XMIT_Q_NAME                => &MQ_Q_NAME_LENGTH,
+   &MQCA_ENV_DATA                       => &MQ_PROCESS_ENV_DATA_LENGTH,
+   &MQCA_INITIATION_Q_NAME              => &MQ_Q_NAME_LENGTH,
+   &MQCA_NAMELIST_DESC                  => &MQ_NAMELIST_DESC_LENGTH,
+   &MQCA_NAMELIST_NAME                  => &MQ_NAMELIST_NAME_LENGTH,
+   &MQCA_PROCESS_DESC                   => &MQ_PROCESS_DESC_LENGTH,
+   &MQCA_PROCESS_NAME                   => &MQ_PROCESS_NAME_LENGTH,
+   &MQCA_Q_DESC                         => &MQ_Q_DESC_LENGTH,
+   &MQCA_Q_MGR_DESC                     => &MQ_Q_MGR_DESC_LENGTH,
+   &MQCA_Q_MGR_IDENTIFIER               => &MQ_Q_MGR_IDENTIFIER_LENGTH,
+   &MQCA_Q_MGR_NAME                     => &MQ_Q_MGR_NAME_LENGTH,
+   &MQCA_Q_NAME                         => &MQ_Q_NAME_LENGTH,
+   &MQCA_REMOTE_Q_MGR_NAME              => &MQ_Q_MGR_NAME_LENGTH,
+   &MQCA_REMOTE_Q_NAME                  => &MQ_Q_NAME_LENGTH,
+   &MQCA_REPOSITORY_NAME                => &MQ_Q_MGR_NAME_LENGTH,
+   &MQCA_REPOSITORY_NAMELIST            => &MQ_NAMELIST_NAME_LENGTH,
+   &MQCA_STORAGE_CLASS                  => &MQ_STORAGE_CLASS_LENGTH,
+   &MQCA_TRIGGER_DATA                   => &MQ_TRIGGER_DATA_LENGTH,
+   &MQCA_USER_DATA                      => &MQ_PROCESS_USER_DATA_LENGTH,
+   &MQCA_XMIT_Q_NAME                    => &MQ_Q_NAME_LENGTH,
+  );
+
+1;

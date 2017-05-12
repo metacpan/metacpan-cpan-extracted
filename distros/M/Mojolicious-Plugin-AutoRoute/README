@@ -1,0 +1,31 @@
+Mojolicious::Plugin::AutoRoute
+
+  Mojolicious Plugin to create routes automatically
+
+CAUTION
+
+  This is beta release. Implementation will be changed without warnings
+
+SYNOPSIS
+
+  # Mojolicious
+  $self->plugin('AutoRoute');
+
+  # Mojolicious::Lite
+  plugin 'AutoRoute';
+
+DESCRIPTION
+
+  L<Mojolicious::Plugin::AutoRoute> is a L<Mojolicious> plugin
+  to create routes automatically.
+
+  Routes corresponding to URL is created .
+
+    TEMPLATES                           ROUTES
+    templates/auto/index.html.ep        # /
+                  /foo.html.ep          # /foo
+                  /foo/bar.html.ep      # /foo/bar
+                  /foo/bar/baz.html.ep  # /foo/bar/baz
+
+  If you like C<PHP>, this plugin is very good.
+  You only put file into C<auto> directory.

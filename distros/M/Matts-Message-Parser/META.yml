@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Matts-Message-Parser
+version:      1.0
+version_from: lib/Matts/Message/Parser.pm
+installdirs:  site
+requires:
+    Danga::Socket:                 0.52
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+ 
+<feed xmlns="http://www.w3.org/2005/Atom">
+ 
+	<title><TMPL_VAR NAME="list.title"></title>
+	<link href='<TMPL_VAR NAME="list.url.abs">' rel="self" />
+	<id><TMPL_VAR NAME="list.url.tag"></id>
+	<updated><TMPL_VAR NAME="list.timestamp.iso"></updated>
+	<author>
+		<name>Your Name</name>
+	</author>
+ 	
+	<TMPL_LOOP NAME="list.posts">
+	<entry>
+		<title><TMPL_VAR NAME="this.title"></title>
+		<link href='<TMPL_VAR NAME="this.url.abs">' />
+		<id><TMPL_VAR NAME="this.url.tag"></id>
+		<updated><TMPL_VAR NAME="this.published.iso"></updated>
+		<summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><TMPL_VAR NAME="this.teaser"></div></summary>
+		<content type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><TMPL_VAR NAME="this.body"></div></content>
+	</entry>
+ 	</TMPL_LOOP>
+
+</feed>
+
+

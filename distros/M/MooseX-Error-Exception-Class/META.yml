@@ -1,0 +1,25 @@
+---
+name: MooseX-Error-Exception-Class
+version: 0.099
+author:
+  - 'Curtis Jewell <csjewell@cpan.org>'
+abstract: Use Exception::Class exceptions for Moose errors
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0.61
+requires:
+  Exception::Class: 1.29
+  Moose: 0.88
+  perl: 5.008001
+configure_requires:
+  Module::Build: 0.33
+provides:
+  MooseX::Error::Exception::Class:
+    file: lib/MooseX/Error/Exception/Class.pm
+    version: 0.099
+generated_by: Module::Build version 0.34
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

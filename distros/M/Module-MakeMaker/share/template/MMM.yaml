@@ -1,0 +1,8 @@
+name: [% dist_name %]
+abstract: Abstract Goes Here
+version: '[% version %]'
+# install_script: bin/my-script
+# install_share: share
+# requires:
+# - YAML::XS
+# - File::Find::Rule: '0.30'

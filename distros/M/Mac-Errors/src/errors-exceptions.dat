@@ -1,0 +1,17 @@
+CATEGORY carbon_help_reference      	Carbon Help Result Codes
+CATEGORY collectionmgr  	    	Collection Manager Result Codes
+CATEGORY color_picker               	Color Picker Result Codes
+CATEGORY control_manager            	Control Manager Result Codes
+CATEGORY core_video_ref            	Core Video Result Codes
+CATEGORY dictionary_manager         	Dictionary Manager Result Codes
+CATEGORY drag_manager               	Drag Manager Result Codes
+CATEGORY font_manager               	Font Manager Result Codes
+CATEGORY internet_config_ref        	Internet Configuration Result Codes
+CATEGORY lam_reference              	Language Analysis Manager Result Codes
+CATEGORY memory_manager             	Memory Manager Result Codes
+CATEGORY mixed_mode_mgr_ref         	Mixed Mode Manager Result Codes
+CATEGORY open_script_arch           	Open Script Architecture Result Codes
+CATEGORY process_manager            	Process Manager Result Codes
+CATEGORY scrap_manager             	Scrap Manager Result Codes
+CATEGORY text_services_manager          Text Services Manager Result Codes
+CODE     kATSUInvalidFontFallbacksErr   8900  # Changed from 8810 by Apple

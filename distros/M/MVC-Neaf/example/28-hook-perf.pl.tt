@@ -1,0 +1,5 @@
+<html><head><title>Hook demo</title></head>
+<body>
+<h1>Hook demo</h1>
+<h2>Request processed in [% time %] seconds</h2>
+</body></html>

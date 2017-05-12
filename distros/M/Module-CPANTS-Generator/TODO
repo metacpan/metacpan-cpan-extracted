@@ -1,0 +1,25 @@
+ http://search.cpan.org/src/SBURKE/Pod-Simple-0.97/ChangeLog
+ * Rewrote Pod::Simple::Pullparser's get_title, and added
+   get_version, get_author, and get_description.  Documented them.
+
+Archive::Any's is_impolite/is_naughty
+Signature checker
+Version checker.
+valid META.yaml
+
+POD errors
+count of blank lines (so it doesn't count as code)
+did it unpack into its own directory
+If contains XS
+hassle factor (the more things depend on it, the less hassle)
+... and then you can figure out how much total hassle it would be to install a particular module
+(also installed modules, core versions)
+
+debian / gentoo packaged:
+http://www.gentoo.org/dyn/pkgs/dev-perl/index.xml
+http://www.freebsd.org/ports/perl5.html
+http://ppm.activestate.com/PPMPackages/zips/8xx-builds-only/Linux/
+http://www.openbsd.org/3.2_packages/i386.html
+http://packages.debian.org/stable/interpreters/
+http://packages.debian.org/testing/interpreters/
+http://packages.debian.org/unstable/interpreters/

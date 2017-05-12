@@ -1,0 +1,5 @@
+\bCVS\b
+^MANIFEST\.bak$
+\..*\.swp$
+~$
+\b\.xvpics\b

@@ -1,0 +1,35 @@
+name
+
+[% classmetadata.name %]
+
+table
+
+[% classmetadata.table %]
+
+columns
+
+[% classmetadata.columns.join(' ')%]
+
+list_columns
+
+[% classmetadata.list_columns.join(' ') %]
+
+colnames
+
+[% classmetadata.colnames.abv %]
+
+related_accessors
+
+[% classmetadata.related_accessors.join(' ') %]
+
+moniker
+
+[% classmetadata.moniker %]
+
+plural
+
+[% classmetadata.plural %]
+
+cgi
+
+[% classmetadata.cgi.abv%]

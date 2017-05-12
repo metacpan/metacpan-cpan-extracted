@@ -1,0 +1,50 @@
+MooseX-AttributeTree version 0.06, released June 27, 2015
+
+This module provides inheritance of attribute values based on object
+relationhips (instead of class relationhips), similar to how CSS
+styles work in HTML.
+
+MooseX::AttributeTree allows you to apply the TreeInherit trait to any
+attribute in your class.  This changes the way the attribute's
+accessor method works.  When reading the attribute's value, if no
+value has been set for the attribute in this object, the accessor will
+return the value from the parent object (which might itself be
+inherited).
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+
+DEPENDENCIES
+
+  Package                      Minimum Version
+  ---------------------------- ---------------
+  perl                          5.8.0
+  Moose                         2.0205
+  MooseX::Role::Parameterized
+
+
+
+CHANGES
+    Here's what's new in version 0.06 of MooseX-AttributeTree:
+    (See the file "Changes" for the full revision history.)
+
+	- Give all modules the same version as the distribution
+
+
+
+COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2015 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

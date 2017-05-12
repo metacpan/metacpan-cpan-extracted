@@ -1,0 +1,23 @@
+# This grammar is for 'preserveAspectRatio' attribute of various tags.
+
+:default	::= action => [values]
+
+# G1 stuff.
+
+:start		::= strings
+
+strings		::= string
+				| string string
+				| string string string
+
+string		::= letter			action => string
+
+# G0 stuff.
+
+letter		~ [A-Za-z]+
+
+# Boilerplate.
+# \x{09} => \t. \x{0A} => \n. \x{0D} => \r. \x{20} => \s.
+
+:discard	~ whitespace
+whitespace	~ [\s]+

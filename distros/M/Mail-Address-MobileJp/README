@@ -1,0 +1,58 @@
+NAME
+    Mail::Address::MobileJp - mobile email address in Japan
+
+SYNOPSIS
+      use Mail::Address::MobileJp;
+
+      my $email = '123456789@docomo.ne.jp';
+      if (is_mobile_jp($email)) {
+          print "$email is mobile email in Japan";
+      }
+
+      # extract mobile email address from an array of addresses
+      my @mobile = grep { is_mobile_jp($_) } @addr;
+
+DESCRIPTION
+    Mail::Address::MobileJp is an utility to detect an email address is
+    mobile (cellurar) email address or not.
+
+    This module should be updated heavily :)
+
+FUNCTION
+    This module exports following function(s).
+
+    is_mobile_jp
+          $bool = is_mobile_jp($email);
+
+        can be an email string or Mail::Address object.
+
+    is_imode
+          $bool = is_imode($email);
+
+        returns whether $email is a i-mode email address or
+        not. $email can be an email string or Mail::Address
+        object.
+
+    is_vodafone
+          $bool = is_vodafone($email);
+
+        returns whether $email is a vodafone(j-sky) email
+        address or not. $email can be an email string or
+        Mail::Address object.
+
+    is_ezweb
+          $bool = is_ezweb($email);
+
+        returns whether $email is a ezweb email address or
+        not. $email can be an email string or Mail::Address
+        object.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Mail::Address manpage, http://www.mag2.com/faq/mobile.htm
+

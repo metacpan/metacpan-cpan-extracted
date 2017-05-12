@@ -1,0 +1,13 @@
+
+===== ChangeLog of Mail::Box::POP3 version 3.*
+
+version 3.001: Thu  2 Feb 16:04:56 CET 2017
+
+	Fixes:
+	- bump version number caused by wrong IMAP4 packaging.
+
+version 3.000: Thu  2 Feb 15:45:18 CET 2017
+
+	Changes:
+	- split-off from Mail::Box
+	- supports perl from 5.10 (was 5.8.5)

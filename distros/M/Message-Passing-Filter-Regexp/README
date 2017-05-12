@@ -1,0 +1,89 @@
+NAME
+    Message::Passing::Filter::Regexp - Regexp Capture Filter For
+    Message::Passing
+
+SYNOPSIS
+        # regexfile
+        *** FORMAT ***
+        :default = "%date %status %remotehost %domain %request %originhost %responsetime %upstreamtime %bytes %referer %ua %xff"
+        :nginxaccesslog = "%date %status %remotehost %bytes %responsetime"
+        *** REGEXP ***
+        %date = '(?#=date)\[(?#=ts)\d{2}\/\w{3}\/\d{4}(?::\d{2}){3}(?#!ts) [-+]\d{4}\](?#!date)'
+        %status = '(?#=status)\d+(?#!status)'
+        %remotehost = '(?#=remotehost)\S+(?#!remotehost)'
+        %domain = '(?#=domain).*?(?#!domain)'
+        %request = '(?#=request)-|(?#=method)\w+(?#!method) (?#=url).*?(?#!url) (?#=version)HTTP/\d\.\d(?#!version)(?#!request)'
+        %originhost = '(?#=originhost)-|(?#=oh).*?(?#!oh):\d+(?#!originhost)'
+        %responsetime = '(?#=responsetime)-|.*?(?#!responsetime)'
+        %upstreamtime = '(?#=upstreamtime).*?(?#!upstreamtime)'
+        %bytes = '(?#=bytes)\d+(?#!bytes)'
+        %referer = '(?#=referer)\"(?#=ref).*?(?#!ref)\"(?#!referer)'
+        %useragent = '(?#=useragent)\"(?#=ua).*?(?#!ua)\"(?#!useragent)'
+        %xforwarderfor = '(?#=xforwarderfor)\"(?#=xff).*?(?#!xff)\"(?#!xforwarderfor)'
+
+        # message-passing-cli
+        use Message::Passing::DSL;
+        run_message_server message_chain {
+            input file => (
+                class => 'FileTail',
+                output_to => 'decoder',
+            );
+            decoder decoder => (
+                class => 'JSON',
+                output_to => 'logstash',
+            );
+            filter logstash => (
+                class => 'ToLogstash',
+                output_to => 'regexp',
+            );
+            filter regexp => (
+                class => 'Regexp',
+                format => ':nginxaccesslog',
+                capture => [qw( ts status remotehost url oh responsetime upstreamtime bytes )]
+                output_to => 'encoder',
+            );
+            encoder("encoder",
+                class => 'JSON',
+                output_to => 'stdout',
+                output_to => 'es',
+            );
+            output stdout => (
+                class => 'STDOUT',
+            );
+            output elasticsearch => (
+                class => 'ElasticSearch',
+                elasticsearch_servers => ['127.0.0.1:9200'],
+            );
+        };
+
+DESCRIPTION
+    This filter passes all incoming messages through with regexp captures.
+    Note it must be running after Message::Passing::Filter::ToLogstash
+    because it don't process with json format but directly capture
+    "$message->{'@message'}" data lines into "%{ $message->{'@fields'} }"
+
+ATTRIBUTES
+  regexfile
+    Path of your regexfile. Default is /etc/message-passing/regexfile.
+
+  format
+    Name of a defined format in your regexfile.
+
+  capture
+    ArrayRef of regex names which you want to capture and has been defined
+    in your regexfile. note delete the prefix "%".
+
+SEE ALSO
+    Capture Idea steal from <http://logstash.net> Grok filter Config Format
+    steal from <http://oss.oetiker.ch/smokeping> use Config::Grammar
+
+AUTHOR
+    chenryn, <rao.chenlin@gmail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2012 by chenryn
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.14.2 or, at
+    your option, any later version of Perl 5 you may have available.
+

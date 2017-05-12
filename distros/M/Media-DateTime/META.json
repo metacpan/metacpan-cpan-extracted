@@ -1,0 +1,65 @@
+{
+   "abstract" : "A simple module to extract the timestamp from media files in an flexible manner.",
+   "author" : [
+      "Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Media-DateTime",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DateTime::TimeZone" : "0",
+            "File::Which" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DateTime" : "0",
+            "Hash::Util" : "0.05",
+            "Image::ExifTool" : "0",
+            "Module::Pluggable" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Media::DateTime" : {
+         "file" : "lib/Media/DateTime.pm",
+         "version" : "0.49"
+      },
+      "Media::DateTime::JPEG" : {
+         "file" : "lib/Media/DateTime/JPEG.pm",
+         "version" : "0.49"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/mvgrimes/media-datetime/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/mvgrimes/media-datetime"
+      }
+   },
+   "version" : "0.49",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

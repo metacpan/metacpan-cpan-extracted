@@ -1,0 +1,39 @@
+=encoding utf-8
+
+=head1 NAME
+
+Math::ProvablePrime - Generate a provable prime number, in pure Perl
+
+=head1 SYNOPSIS
+
+    #The returned prime will be 512 bits long
+    #(i.e., the first and last bits will be 1)
+    #and will be an instance of Math::BigInt.
+    #
+    my $prime = Math::ProvablePrime::find(512);
+
+=head1 DISCUSSION
+
+There’s not much more to say: this module returns a prime number of a
+specified bit length.
+
+The specific algorithm is Maurer’s algorithm. The logic in this module
+is ported from a Python implementation first posted at
+L<http://s13.zetaboards.com/Crypto/topic/7234475/1/>.
+
+Note that cryptographic-strength randomness is not a necessity here
+because we’re making B<provable> primes.
+
+=head1 TODO
+
+Make it faster. :)
+
+Seriously, if there’s a faster algorithm for doing this, please let me know.
+The only limitation is that this module must be installable without a
+compiler. It will attempt to use the GMP or Pari backends for
+C<Math::BigInt> if they are available.
+
+=head1 LICENSE
+
+This module is released under the same license as Perl.
+

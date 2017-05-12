@@ -1,0 +1,19 @@
+0.03  Mon Oct 29 10:58:35 MET 2001
+	
+	- Added some more tests. No changes to the code
+
+0.02  Wed Jul 18 14:23:10 METDST 2001
+
+	- Keeps the internal lprec structure after solving
+          (which makes debugging a lot easier)
+
+        - Added more tests
+
+	- Shortened the short explanations so search.cpan.org does
+	  not cut them
+
+	- Declared the package variables (for types etc.) as constants
+
+0.01  Wed Nov 15 18:50:42 MET 2000
+
+	- Initial release

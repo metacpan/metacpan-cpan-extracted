@@ -1,0 +1,134 @@
+Revision history for Perl extension MojoX-Dispatcher-Qooxdoo-Jsonrpc:
+
+0.96    fix Mojolicious 5.73 compatibility and DEPRECATE the module in favor
+        of Mojolicious::Plugin::Qooxdoo.
+
+0.95    track mojo changes ... mojo does not split GET query strings on ;
+        anymore. fixed tests.
+
+0.94    provide more meaningful errors on botched jsonrpc input
+
+0.93    replace render_text(xxx)  with render(text=> ...)
+
+0.92    fixed tests to work with mojo 4.0
+
+0.91    fix MANIFEST
+
+0.90    fix tests and example to track changes in mojolicious
+
+0.89    fix test; perl 5.17.6 randomizes hashes
+ 
+0.88    add make source mode work even when prefix in /  
+ 
+0.87    make sure we do not ship from 'public' in QX_SRC_MODE
+
+0.86    use warn instead of warnings -> fix for rt#75866
+
+0.85    up required Mojolicious version to 2.49 and adapt route invocation
+        accordingly
+
+0.84    make compatible with Mojolicious::Static API changes
+
+0.83    removed excess loggin left in from development
+
+0.82    make the code more mojoy
+        rewritten QX_SRC_MODE to be more versatile in serving 'the source'
+
+0.81    If the service has a 'controller' property, it will get the current
+        controller context assigned. This supersedes the 'mojo_*'
+        properties, they are now deprecated.
+
+0.80	*** INCOMPATIBLE CHANGES ***
+        The QooxdooJsonrpc plugin does not install a /source
+        path automatically anymore ... there were too many problem
+        with other parts of the application which would need special
+        attention to work with relative requests coming from a different
+        'path' ... starting with this version, there are now two
+        environment variables that govern source mode:
+
+        QX_SRC_MODE=1 will enable serving your application from
+        ../frontend/source ... 
+
+        QX_SRC_PATH=/where/ever/source allows to specify some other 
+        directory to serve your application from.
+
+0.76    - require mojo 0.34 to make sure we don't run into
+          trouble with old versions.
+
+        - ship index.html without redirecting to it ... 
+          this makes for nicer urls
+
+        - simplify plugin code a little by using get method when
+          setting up routes
+
+0.75    - make plugin in development mode creative in finding
+          the qooxdoo source code and contrib downloads
+
+0.74    Mon Arp 04 2011
+        - added better __WARN__ handler as suggested by Sebastian Riedel
+        - fixed package name in example
+        - added pointer to Mojolicious::Plugin::QooxdooJsonrpc in
+          MojoX::Dispatcher::Qooxdoo::Jsonrpc documentation
+        
+0.72    Sat Mar 26 2011
+        - send requests and results to log at debug level
+        - new module Mojolicious::Plugin::QooxdooJsonrpc makes writing
+          applications even simpler. Included support for serving
+          both the production and the source version of the application
+
+0.71    Tue Mar 22 2011
+        - add utf8 to content_type
+        - re-decode json prior to rendering so that mojo can do the final encoding
+        - update tests accordingly
+
+0.70	Thu Mar 1 2011
+        - fix namespace issues
+        - update error codes according to
+          http://manual.qooxdoo.org/1.3.x/pages/communication/rpc_server_writer_guide.html#code
+
+0.69	Mon Feb 28 2011
+        - better documentation
+        - improved exception example
+
+0.68	Sun Feb 27 2011
+	- fix tests
+
+0.67	Sun Feb 27 2011
+        - bring Makefile.PL in line with latest trends
+        - add testing
+        - some catch more errors in jsonrpc
+        - set application/json header on response
+        - report rpc errors to the mojo log
+        - do not localize __WARN__ in eval as this makes no sense here
+        - simplified code a bit more
+
+0.66    Thu Feb 22 2011 
+	*** INCOMPATIBLE CHANGES ***
+
+        - the service module has to explicitly tell which
+          of its methods are to be called remotely via the
+          rpc_access_allow.
+
+        - drop the whole _ prefix thing ... and call the
+          check_access, mojo_session and mojo_stash by their actual names
+
+        - enhance pod to cover new things    
+        
+        - follow new mojo class style in examples
+
+0.55	Mon Feb 21 2011
+	
+0.54	Sat Feb 29 2011
+	- CGI::Session, rename main method into dispatch
+
+0.53    Thu Sep 21 2010
+   	- POD, fixes
+
+0.52	Mon Sep 20 2010
+	- POD improvements, error codes, fixes
+
+0.51	Mon Sep 13 2010
+	- improving POD
+
+0.50	Mon Sep 13 2010 
+	- initial release

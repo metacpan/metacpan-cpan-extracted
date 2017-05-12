@@ -1,0 +1,48 @@
+Revision history for MooseX-SimpleConfig
+
+0.11      2014-11-16 22:03:33Z
+  - remove optional test prereq by testing .pl config files, rather than .conf
+
+0.10      2013-11-13 01:13:05Z
+  - repository migrated from shadowcat to the github moose organization
+  - eliminate race conditions between tests by using separate tempdirs for
+    config files
+  - resolve failing test report by removing unnecessary and undeclared prereq
+
+0.09      2010-08-15
+  - Fix issue with MANIFEST
+
+0.08      2010-08-13
+  - Fix passing multiple config files to SimpleConfig.
+    - Tests for this (zby)
+
+0.07      2010-05-22
+  - Reverse order of testing config files so that latter options on the
+    command line (when multiple are specified) take precedence. (RT#57027)
+  - Reduce exception thrown by being unable to find a config file to a
+    warning (RT#57027)
+  - Fixed configfile attribute examples
+  - Added metadata to Makefile.PL
+
+0.06      2010-04-12
+  - Depend on at least version 0.13 of Config::Any for flatten_to_hash
+    support.
+
+0.05      2010-10-22
+   - Allow multiple config files to be loaded and merged.
+     Patch in RT#48552 from Sawyer X
+
+0.04      2009-11-04
+    - Allow options to be passed through to Config::Any more easily.
+
+0.03      2008-01-23
+    - Mostly just added pod and tests for configfile
+      defaulting
+
+0.02      2007-12-19
+    - Skip the tests if neither of YAML or YAML::Syck is
+      installed (but don't make it a test requirement,
+      some people won't be using this with YAML at all).
+
+0.01      2007-12-18
+    - Initial release

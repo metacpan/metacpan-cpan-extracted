@@ -1,0 +1,16 @@
+TYPEMAP
+TT800		T_TT800
+
+INPUT
+T_TT800
+	if (sv_isa($arg, \"Math::Random::TT800\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = ($type) tmp;
+	}
+	else
+	    croak(\"$var is not of type Math::Random::TT800\")
+
+OUTPUT
+T_TT800
+	sv_setref_pv($arg, \"Math::Random::TT800\", (void*)$var);
+

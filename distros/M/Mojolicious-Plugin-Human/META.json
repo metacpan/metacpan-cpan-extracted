@@ -1,0 +1,56 @@
+{
+   "abstract" : "Helpers to print values as human readable form.",
+   "author" : [
+      "Dmitry E. Oboukhov <unera@debian.org>,",
+      "Roman V. Nikolaev <rshadow@rambler.ru>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Human",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "DateTime::Format::DateParse" : "0",
+            "Mojo::Base" : "0",
+            "Test::Compile" : "0",
+            "perl" : "5.010000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dr-co/libmojolicious-plugin-human-perl/issues"
+      },
+      "homepage" : "https://github.com/dr-co/libmojolicious-plugin-human-perl",
+      "repository" : {
+         "url" : "https://github.com/dr-co/libmojolicious-plugin-human-perl"
+      }
+   },
+   "version" : "0.7"
+}

@@ -1,0 +1,390 @@
+Revision history for Perl module Module::Release
+
+2.123 2016-12-05T18:39:56Z
+	* Catch up with latest Test::More and perl behavior
+
+2.122_01 2016-11-16T01:15:00Z
+	* Try harder to find out what's going on with Dan Collins's 
+	testers setup.
+
+2.122 2016-03-04T23:38:14Z
+	* RT #112252 - fix for changes in version.pm
+	* RT #44492  - add ignore_prereqs config option
+	* RT #44529  - fix some tests on Windows
+	* RT #78442  - add explicit pod encoding
+	* RT #72845  - parse three part version
+
+2.121_02 2016-02-26T13:33:24Z
+	* Don't support underscores in v-strings. version  0.991201
+	changed this behavior according to the Lyon Compromise:
+	https://gist.github.com/dagolden/9559280
+	RT # 112252
+
+2.12 2016-01-26T19:00:52Z
+	* Freshen distro and fix a few things under the hood.
+
+2.11_01 2015-04-06T14:06:35Z
+	* Add the CA cert with the right Mojo::UserAgent method
+
+2.11 - 2014-09-18
+	* Update the data to 20140910.
+
+2.11 - 2014-09-14
+	* Add RELEASE_OPTS
+	* various small fixups
+
+2.09 - 2014-08-26
+	* Release the Andriod fix
+
+2.08 - 2014-01-06
+	* Add a vcs_exit() at the end so a repository can do
+	post-release tasks (such as a `git push`)
+
+2.07_01 - 2014-01-04
+	* Update Mojo::UserAgent for transactor changes in 4.50
+
+2.07 - 2013-12-17
+	* Bump to a release version
+
+2.06_06 - 2013-12-14
+	* Update for Mojo 4 (not that big of a change :)
+
+2.06_05 - 2013-12-12
+	* Don't try so hard to check perl on Windows
+
+2.06_04 - 2013-02-10
+	* PAUSE turned off FTP, so I switch to using a Mojo web uploader
+
+2.06_02 - 2012-07-18
+	* Add =encoding to Pod sections to avoid new Pod::Simple warnings
+
+2.06_01 - 2011-12-19
+	* Quash some warnings while loading mixins
+
+2.06 - 2011-12-19
+	* Bumping to a stable release
+
+2.05_07 - 2011-11-30
+	* Handle point versions RT  #72845 (WULEE)
+
+2.05_06 - 2011-07-24
+	* Handle the latest in LWP, using LWP::Protocol::https and
+	the new CACertOrg::CA to supply the cert for PAUSE.
+	* Add a -C command-line option to skip updating the Changes
+	file, it the case of a failed upload.
+
+2.05_05 - 2011-07-16
+	* Handle Module::Build
+	* Some Windows stuff is still broken
+
+2.05_04 - 2011-04-18
+	* Add LWP::UserAgent prereq: now not in the same distro
+	as HTTP::*!
+
+2.05_02 - 2011-04-16
+	* Two features from H.Merijn Brand: if a test fails under
+	debugging, try harder with prove
+	* Add the allow_glob_in_perls to specify a pattern for paths
+	for the perls option.
+
+2.05_01 - 2009-09-22
+	* Let's start checking MANIFEST to ensure we didn't forget
+	anything. This might be annoying the first time since
+	make manifest might re-order your file and you have to
+	recommit it.
+
+2.05 - 2009-06-15
+	* Fixes to SVN status pattern matching
+	* Set build file names in config, if you like
+
+2.04_03 - 2009-06-10
+	* RT 46696: Fix parsing of SVN output, handle makefile config
+	directives as documented.
+
+2.04_01 - 2009-03-24
+	* Add experimental ignore_prereqs option to pass on to Test::Prereqs
+
+2.04 - 2009-03-24
+	* Use a platform-specific version of devnull
+
+2.03 - 2009-03-22
+	* Treat Test::Prereq and Module::CPANTS::Analysse as
+	optional dependencies. They were before, but now you get
+	a nicer error message.
+
+2.02 - 2009-02-07
+	* Fix the command runner for the SVN.pm. SVN.pm is otherwise
+	neglected since I've stopped using SVN but I will accept
+	patches.
+	* The run.t patch undefs PATH before it looks for commands
+
+2.01 - 2008-11-25
+	A bump to a release version
+
+2.00_07 - 2008-11-06
+	* Changes the methods with "cvs" in the name to be "vcs" instead.
+	The old names came from the time I used CVS, but no one does
+	that anymore. "vcs" is for Version Control System.
+
+2.00_06 - 2008-11-05
+	* Fix up a test to work even if the system error message isn't
+	english.
+
+2.00_05 - 2008-11-04
+	* Added the -a switch to turn on $ENV{AUTOMATED_TESTING}
+	* Added the -p switch to turn off prereq tests
+	* Added automated_testing to possible config directives
+	* The kwalitee directive is now skip_kwalitee
+	* There's a skip_prereqs directive
+
+2.00_03 - 2008-08-15
+	* Distro cleanup, no big whoop
+
+2.00_02 - 2008-08-09
+	* The beginning of the new Module::Release. Lots of stuff
+	moved into separate modules to act as mixins. There is a
+	lot more testing.
+	* This is still a developer release, so don't get too
+	attached to anything just yet.
+
+1.22 - 2008-04-06
+	* BUG FIX: Move kwalitee testing after normal testing, and have
+	the kwalitee tests make their own dist to ensure that they
+	have it.
+
+1.21 - 2008-04-05
+	* NEW FEATURE: Now test with multiple perls!
+
+1.20 - 2007-11-20
+	* fix dist_version to handle dev versions. Previously it was
+	ignoring the _\d+, so the version that showed up in changes
+	didn't have the _\d+.
+
+1.19 - 2007-11-11
+	* Sagar Shah noticed I tried to call _die() before I used bless().
+	Oops. Fixed.
+	* If you have older versions before I started using _die(), you don't
+	need to rush to get this version. If you got the latest to use
+	Module::Release::Git, you need to upgrade.
+
+1.18 - 2007-10-27
+	* distro cleanups after moving from CVS to SVN
+	* Changes from Torsten Schoenfeld to make get_readme and get_changes
+	subclassable (that is, call them as methods like everything else)
+	* Require Perl 5.006. I haven't done anything intentional to not
+	use Perl 5.005, but I don't want to support that. With CPAN Testers
+	going back farther in time now, I have to draw the line somewhere
+	just to manage my time well. :)
+
+1.17_01 - 2007-10-03
+	* The output and debugging filehandles come from methods now.
+	This makes it easier to move the output around, or even turn
+	it off. I wanted this for Module::Release::Git. The interface
+	has some new features, but should be compatible with the older
+	stuff.
+	* Added some git support to release(1). This should refactor
+	itself out in various ways, but I just need the support right
+	now without going through all the work to make it nice nice.
+
+1.17 - 2007-08-13
+	* distro cleanups - no need to upgrade
+
+1.16 - 2007-05-03
+	* Fix for test suite problem
+
+1.14 - 2007-03-16
+	* use a temp file for cookies
+	* don't test script if M::R::Subversion isn't installed
+
+1.13 - 2007-02-22
+	* Updated the distro for PAUSE indexing problems (my fault)
+	* release(1) now detects SVN and loads Module::Release::Subversion
+	to handle it (that's a separate distro, though).
+	* release(1) now uses Module::CPANTS::Analyze's cpants_lint.pl
+	to check kwalitee. That's also a separate distro.
+
+1.12 - 2006-09-25
+
+	* Changes from Ken Williams
+
+	* New 'makefile_PL' and 'makefile' parameters to the new()
+	method allow Module::Build-based distributions to work more
+	smoothly - set them to 'Build.PL' and 'Build', respectively.
+
+	* The 'release_subclass' parameter to new() is un-deprecated
+	again.
+
+	* Subclasses previously could not override the new() method
+	when invoked via the 'release_subclass' mechanism, now they can.
+
+	* When running under a passive FTP mode, we were telling the
+	server to go into passive mode twice, which causes some
+	servers to bomb out.  This is fixed.
+
+	* The error message when an FTP PUT operation failed has been
+	improved.
+
+	* System calls made during the release process will now read
+	their underlying STDOUT and STDERR using read(), which helps
+	you see what's going on when there are interactive steps.
+
+	* The getpass() method will now check for CPAN_PASS and
+	SF_PASS values previously set as member variables.  This
+	helps users who might want to, for example, look their
+	values up in the OS X keychain using a custom subclass.
+
+	* Fixed a couple of minor POD formatting errors.
+
+1.10 - 2006-06-08
+	* Distro cleanup (removed sf_login.t test), fixed doc bug about
+	PAUSE, cleansed POD. No need to upgrade.
+
+1.08 - 2006-05-20
+	* Added MANIFEST checking feature. If `make manifest` has to change
+	MANIFEST, check_manifest() dies. You'll have to check in MANIFEST
+	before you can go on anyway, so you might as well stop and take a
+	look at it (and maybe update MANIFEST.SKIP too). I needed this
+	because although I had a lot of pod_coverage tests lying about,
+	they never made it into the dists because I never added them to
+	MANIFEST. Stoopid me.
+	* This updates the release(1) script too. Make sure you want this
+	feature before you overwrite your old release(1).
+
+1.07 - 2006-05-17
+	* Minor updates to the distro - no code changes. No need to upgrade
+
+0.25 - 2004-12-17
+	* No changes to functionality.
+	* Released only because I (Andy) deleted the latest version,
+	  because I thought brian had newer ones, when he didn't.
+	  This meant that the indexer got all confused.  I hope this
+	  stops people from now wondering "Where did Module::Release go?"
+	* Modernized t/pod.t
+	* Made tests in t/load.t more inclusive
+	* Updated the Makefile.PL
+
+0.24 - 2003-11-29
+	* fixed a problem in Module::Release's check_cvs routine where
+	it was not checking each line of output
+
+0.23 - 2003-06-22
+	* All output now goes to the screen if --debug is on.  Thanks to
+	Ken Williams.  "High school students."
+
+0.23 - 1899-12-31
+	* release will show the user all STDOUT of the subprocesses
+	  whenever debug is on.  This will prevent the machine from waiting
+	  for a response from you because you don't know it's there.
+
+0.22 - 2003-04-09
+	* release will not run if there are any switch errors
+
+	* Added many error checks in ftp_upload.
+
+	* Added some docs on how to find sf_group_id and sf_release_id.
+
+	* Removed a "last CVS" in cvs() method.  It would have
+  	  blown up if someone didn't have a CVS directory.
+
+	* Renamed perl() method to build_makefile()
+
+	* Renamed cvs() to check_cvs()
+
+	* Added basic POD docs for the functions
+
+0.21 - 2003-03-29
+	Many more patches, thanks to Ken Williams.  I fear it won't be
+	long until Module::Release is sending & receiving mail.
+
+	* release only checks for passwords if they're necessary.
+	  This means you don't have to have a password if you're running
+	  "release -t" to test.
+
+	* A more complete dependency list in Makefile.PL
+
+	* A new 'release_subclass' config file entry lets you subclass
+	  Module::Release.  There's an example in the docs.
+
+	* After FTP upload, we check to see whether the two versions of
+	  the file have the same size.	This should catch my FTP-ing bug.
+
+	* The cvs_tag() method now calls make_cvs_tag() to make the
+	  tag string.  This lets me override make_cvs_tag() in a subclass.
+
+0.20 - 2003-03-26
+	* Moved all the real work into Module::Release.  Thanks to
+	Ken Williams for doing all the dirty work on this.
+
+	* Fixed the Test::Pod dependency
+
+0.16 - 2003-03-19
+	* No new features
+	* Removed the dependency on Test::Pod
+
+0.15 - 2003-03-14
+	* Support for the PERL environment variable.
+	* Cleaned up tabs 'n' spaces in the source.  Shouldn't
+	  affect anything in how you use the program.
+
+0.14 - 2003-03-12
+	* 0.13 is an incorrect distro.  This is what you want.
+
+0.13 - 2003-03-12
+	Most of these changes are from Max Maischein.  Cross-platform
+	compatibility should be a lot better.  Thanks, Max!
+
+	* Prompts for passwords that are not set in the environment.
+
+	* Fixed a bug in checking for required fields
+
+	* Uses "$Config{make}" instead of "make".
+
+	* Moved all backticks into a subroutine "run", that also echoes
+	  the command if "-d" is set.
+
+	* Added a check whether the file-to-distribute actually exists,
+	  before making the ftp connection.
+
+	* The regex to guess the distname from the tardist output
+	  needed some whitespace added to work with Win32.
+
+	* Added support for passive FTP.
+
+0.12 - 2003-03-06
+	Most of the changes in this revision are from Chris Nandor:
+
+	* Add basic help page
+
+	* Add more debugging information (dump `` output)
+
+	* Add command-line switches for help, debug, and test (exits after
+	  testing phase)
+
+	* Allow not using either the CPAN or SourceForge.net (but not both)
+
+	* Check cvs exit status
+
+	* Do not update CVS automatically; release will exit if it sees a U
+	  anyway, so might as well just let the developer handle it
+
+	* Allow modification of "release name" via regex in .releaserc
+
+	* Update docs
+
+	* General cleanup
+
+0.11 - 2003-03-03
+	* Patches to make this less brian-specific.  Thanks to Chris
+	  Nandor for taking it upon himself to do so.
+
+	* Removed a lot of dependencies on external modules.
+
+0.10 - 2002-12-11
+	* prompt for comments to put in Changes, commit Changes, and
+	use comments in SourceForge change log notes
+
+	* guess the release file name from 'make dist' so the first
+	argument is now optional
+
+	* put the right date in the SourceForge release date
+

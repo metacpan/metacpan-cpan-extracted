@@ -1,0 +1,57 @@
+=head1 NAME
+
+Module::Dependency - Collection of modules for examining dependencies between parents and children, like Perl files
+
+=head1 SYNOPSIS
+
+(See the README file that came with the distribution for a thorough overview
+and introduction of what this software does)
+
+A set of pure-perl modules and helper programs that let you build a database
+of the dependency links between a collection of Perl files, and then query that 
+database, even producing text, HTML, PostScript or graphical reports.
+
+=head1 DESCRIPTION
+
+The database in question is actually a simple Storable image of a Perl data structure,
+and you can create as many of these as you want. You can use the command-line tools, or
+write your own Perl to query and manipulate the data however you want.
+
+The README and README.* files are the place to start if you've not used this software
+before.
+
+=head1 WHAT THE MODULES DO
+
+=over 4
+
+=item Module::Dependency::Indexer
+
+This module is used to create a database file for a collection of Perl source files.
+It doesn't eval or execute any code, but uses regexps to find dependencies.
+
+=item Module::Dependency::Info
+
+A module used to query the database.
+
+=item Module::Dependency::Grapher
+
+This module is used to create textual and graphical reports of dependencies.
+
+=back
+
+=head1 PREREQUISITES
+
+You'll need: Storable, File::Find, File::Spec - all of which are standard with Perl 5.6.
+
+Optionally, if you have certain other modules you can do more: 
+If you want image output you'll need GD.
+If you want PostScript output you'll need PostScript::Simple.
+If you want SVG output you'll need the SVG module.
+If you want to be able to index modules that use the 'base' pragma, as in
+'use base qw(Foo);' you'll need Safe (standard with Perl 5.6).
+
+=head1 VERSION
+
+$Rev: 6562 $
+
+=cut

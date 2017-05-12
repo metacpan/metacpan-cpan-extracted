@@ -1,0 +1,25 @@
+Revision history for Perl extension MultiTail.
+
+0.01  Tue Dec 16 11:45:01 1997
+	- original version; created by h2xs 1.16
+
+0.02 Wed January 30 14:47:45 EST 1998
+
+	- Bug fixes in DEBUG
+	- Change pattern match to use closures and string eval to
+		increase speed
+	- Port to Windows NT 
+		Tested on perl5.004_04
+
+0.03 Monday February 2 08:16:34 EST 1998
+
+	- Fix mistake in AUTOLOAD function 
+	- Fixed up code for better reading
+
+0.04 Friday February 27 09:36:06 EST 1998
+
+	- Added the tt option in OutputPrefix tt = complete timestamp
+	- Fixed Bug in MaxAge and File State
+
+0.05 Tuesday June 01 09:36:06 EST 1999
+	- Fixed Bug in two ref calls (Thanks to  Scot Wilcoxon)

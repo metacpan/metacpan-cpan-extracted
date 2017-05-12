@@ -1,0 +1,21 @@
+.shipit
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/MouseX/Types/Common.pm
+lib/MouseX/Types/Common/Numeric.pm
+lib/MouseX/Types/Common/String.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/01-string.t
+t/02-numeric.t

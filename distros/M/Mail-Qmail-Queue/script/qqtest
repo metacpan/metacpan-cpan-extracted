@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+#
+# Copyright 2006 Scott Gifford
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+
+=head1 NAME
+
+qqtest - Send a message to a qmail-queue program
+
+=head1 SYNOPSIS
+
+qqtest from to1 [to2 ...] <body
+
+=cut
+
+use warnings;
+use strict;
+
+use Mail::Qmail::Queue::Error qw(:errcodes :fail);
+use Mail::Qmail::Queue::Send;
+
+use FileHandle;
+use Getopt::Std;
+
+=head1 DESCRIPTION
+
+Sends a test message, using the C<from> and C<to> parameters given on
+the command-line and using the body provided on the standard input.
+
+=cut
+
+@ARGV >= 2
+    or usage();
+
+my $qq_send = Mail::Qmail::Queue::Send->new(LeaveMsgHandle => 1)
+    or tempfail "Couldn't start qmail-queue: $!\n";
+$qq_send->sender(shift)
+    or tempfail QQ_EXIT_WRITEERR, "Couldn't set sender\n";
+$qq_send->recipient(@ARGV)
+    or tempfail QQ_EXIT_WRITEERR, "Couldn't set recipients\n";
+$qq_send->envelope_done()
+    or tempfail QQ_EXIT_WRITEERR, "Couldn't finish envelope: $!\n";
+my $st = $qq_send->wait();
+warn "qmail-queue exited $st\n";
+
+sub usage
+{
+  system("awk  '/^#!/,/^=cut/ {print}' $0 |pod2text");
+  print "-- Type pod2text $0 for full documentation\n";
+  exit(1);
+}

@@ -1,0 +1,19 @@
+Changes
+lib/Mojolicious/Plugin/AccessLog.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/01-default.t
+t/02-abspath.t
+t/04-filehandle.t
+t/05-iofile.t
+t/06-object-print.t
+t/07-object-info.t
+t/08-callback.t
+t/09-logio.t
+t/21-uploadio.t
+t/lib/MPA_Test.pm
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

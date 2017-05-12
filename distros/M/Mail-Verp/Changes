@@ -1,0 +1,27 @@
+Revision history for Perl extension Mail::Verp.
+0.06 Fri Jun 19, 2007
+  - Make class methods use default separator as advertised.
+    Thanks to Peter Leonard <pete -at- peteleonard.com>
+  - Allow correct decoding of addresses with embedded equals sign (=).
+    Thanks to Joe Edmonds <joe -at- thisnext.com>
+  - Added more and better tests!
+    
+0.05 Wed Aug 17, 2005
+ - Add accessor and parameter setting for separator.
+   Thanks to Daniel Senie <dts -at- senie.com> 
+
+0.04 Tue Nov 11 2003
+  - Simpler solution for case insensitivity decoding.
+
+0.03 Tue Nov 11 2003
+  - Decode case insensitively: some MTAs lowercase the bounce address.
+    Thanks to Adam Augustine <adama -at- augustinefam.org>
+  - Changed author email address.
+
+0.02 Fri Aug  8 22:56:52 2003
+  - Fixed possible bug to allow for multiple hyphens in local address
+  - Expanded and clarified documentation
+
+0.01 Wed Apr 16 16:02:50 2003
+	- original version; created by h2xs 1.22 with options
+	-X -b 5.0.0 -O -nMail::Verp

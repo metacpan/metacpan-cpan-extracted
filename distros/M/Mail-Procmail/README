@@ -1,0 +1,106 @@
+Introduction
+------------
+procmail is one of the most powerful tools in use on Unix systems to
+filter incoming email. It is, however, rather complicated and
+configuring it can be a pain.
+
+Mail::Procmail.pm is a Perl module that provides procmail-like
+tools that you can use to write your own mail filtering program.
+
+For example, a simple filter that copies incoming mail regarding a
+specific subject to a separate mailbox, while also sending it to a
+friend:
+
+    #!/usr/bin/perl -w
+    use strict;
+    use Mail::Procmail;
+    pm_init(logfile=>'stderr', loglevel=>3);
+    if ( pm_gethdr("subject") =~ /interesting topic/i ) {
+      pm_resend("my_friend@somewhere.com", continue => 1);
+      pm_deliver($ENV{HOME}."/Mail/interesting");
+    }
+    # Default delivery.
+    pm_deliver("/var/spool/mail/".getpwuid($>));
+
+As can be deduced from the pm_init call, logging will be done to
+standard error. If a suitable message comes along, the following
+information will be logged:
+
+    2000/08/08 21:23:55 Mail from John Doe <jdoe@spam.net>
+    2000/08/08 21:23:55 To: jvromans@squirrel.nl
+    2000/08/08 21:23:55 Subject: This is an interesting topic
+    2000/08/08 21:23:55 resend[6]: my_friend@somewhere.com
+    2000/08/08 21:23:55 deliver[7]: /home/jv/Mail/interesting
+
+The number between [ ] shows the line number in your program that
+caused the delivery. This makes it easy to find out what rule
+triggered the delivery.
+
+If the message did not have the interesting subject, the log would
+show:
+
+    2000/08/08 21:26:14 Mail from John Doe <jdoe@spam.net>
+    2000/08/08 21:26:14 To: jvromans@squirrel.nl
+    2000/08/08 21:26:14 Subject: This is a boring topic
+    2000/08/08 21:26:14 deliver[19]: /var/spool/mail/jv
+
+All headers, and the body, of the message are at your disposal, so you
+can use all the powers of perl pattern matching for your email
+filtering.
+
+Delivery routines
+-----------------
+Most delivery routines will exit the program with status DELIVERED
+unless the attribute "continue=>1" is passed.
+
+* pm_deliver(filename[,attributes])
+  Deliver to the file. The file is locked during delivery to prevent
+  data corruption.
+
+* pm_resend(address[,attributes])
+  Remail to the specifield address.
+
+* pm_pipe_to(command[,attributes])
+  Pipe the message to the command. A lockfile attribute can be used to
+  prevent multiple deliveries using the same command at the same time.
+  Pipe write errors are silently ignored.
+
+* pm_command(command[,attributes])
+  Execute a system command for its side-effects.
+
+* pm_ignore(reason)
+  Treat as delivered but do noting but logging the reason.
+
+* pm_reject(reason)
+  The program will exit with status REJECTED to signal the
+  mail delivery system that the message was rejected.
+
+* pm_log(level,message)
+  Add a message to the log. A timestamp will be prepended.
+
+Reporting
+---------
+
+A facility is included to produce reports from log files written by
+Mail::Procmail applications.
+
+Requirements
+------------
+* Mail::Internet  1.33 (part of the MailTools package, version 1.15)
+* LockFile::Simple  0.2.5
+
+License
+-------
+GPL or Artistic, whatever you prefer.
+
+Credits
+-------
+Mail::Procmail is inspired by Simon Cozen's Mail::Audit, that was
+inspired by Tom Christiansen's audit_mail and deliverlib programs.
+
+------------------------------------------------------------------------------
+Johan Vromans                                             jvromans@squirrel.nl
+Squirrel Consultancy                                  Haarlem, the Netherlands
+http://www.squirrel.nl                  http://www.squirrel.nl/people/jvromans
+PGP Key 2048/4783B14D       http://www.squirrel.nl/people/jvromans/pgpkey.html
+------------------------ "Arms are made for hugging" -------------------------

@@ -1,0 +1,107 @@
+NAME
+    Mason::Plugin::Cache - Provide component cache object and filter
+
+VERSION
+    version 0.05
+
+SYNOPSIS
+        my $result = $.cache->get('key');
+        if (!defined($result)) {
+            ... compute $result ...
+            $.cache->set('key', $result, '5 minutes');
+        }
+
+        ...
+
+        % $.Cache('key2', '1 hour') {{
+          <!-- this will be cached for an hour -->
+        % }}
+
+DESCRIPTION
+    Adds a `cache' method and `Cache' filter to access a cache (CHI) object
+    with a namespace unique to the component.
+
+INTERP PARAMETERS
+    cache_defaults
+        Hash of parameters passed to cache constructor. Defaults to
+
+            driver=>'File', root_dir => 'DATA_DIR/cache'
+
+        which will create a basic file cache under Mason's data directory.
+
+    cache_root_class
+        Class used to create a cache. Defaults to CHI.
+
+COMPONENT CLASS METHODS
+    cache
+        Returns a new cache object with the namespace set to the component's
+        path. Parameters to this method, if any, are combined with
+        cache_defaults and passed to the cache_root_class constructor. The
+        cache object is memoized when no parameters are passed.
+
+            my $result = $.cache->get('key');
+
+REQUEST METHODS
+    cache
+        Same as calling `cache' on the current component class. This usage
+        will be familiar to Mason 1 users.
+
+            my $result = $m->cache->get('key');
+
+FILTERS
+    Cache ($key, $options, [%cache_params])
+        Caches the content using `$self->cache' and the supplied cache
+        *$key*.
+
+        *$options* is a scalar or hash reference. If a scalar, it is treated
+        as the `expires_in' duration and passed as the third argument to
+        `set'. If it is a hash reference, it may contain name/value pairs
+        for both `get' and `set'.
+
+        *%cache_params*, if any, are passed to `$self->cache'.
+
+            % $.Cache($my_key, '1 hour') {{
+              <!-- this will be cached for an hour -->
+            % }}
+
+            % $.Cache($my_key, { expire_if => sub { $.refresh } }, driver => 'RawMemory') {{
+              <!-- this will be cached until $.refresh is true -->
+            % }}
+
+        If neither *$key* nor *$options* are passed, the key is set to
+        'Default' and the cache never expires.
+
+            % $.Cache() {{
+              <!-- cache this forever, or until explicitly removed -->
+            % }}
+
+SUPPORT
+    The mailing list for Mason and Mason plugins is
+    mason-users@lists.sourceforge.net. You must be subscribed to send a
+    message. To subscribe, visit
+    https://lists.sourceforge.net/lists/listinfo/mason-users.
+
+    You can also visit us at `#mason' on irc:.
+
+    Bugs and feature requests will be tracked at RT:
+
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mason-Plugin-Cache
+        bug-mason-plugin-cache@rt.cpan.org
+
+    The latest source code can be browsed and fetched at:
+
+        http://github.com/jonswar/perl-mason-plugin-cache
+        git clone git://github.com/jonswar/perl-mason-plugin-cache.git
+
+SEE ALSO
+    Mason
+
+AUTHOR
+    Jonathan Swartz <swartz@pobox.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Jonathan Swartz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

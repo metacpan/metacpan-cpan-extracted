@@ -1,0 +1,19 @@
+MIME-Charset Package.
+
+Copyright (C) 2006-2017 by Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>.
+
+This package is free software; you can redistribute it and/or modify it 
+under the same terms as Perl itself.
+
+                                   ***
+
+One main module and some supporting program files are contained. For
+more details read following POD documentation:
+
+    MIME::Charset - Charset Information for MIME
+
+For japonophones, POD in Japanese language is also included:
+
+    POD2::JA::MIME::Charset - MIME のためのキャラクタセット情報
+
+$$

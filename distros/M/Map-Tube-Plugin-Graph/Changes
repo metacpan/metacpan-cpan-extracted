@@ -1,0 +1,86 @@
+Revision history for Map::Tube::Plugin::Graph
+
+0.24  2016-10-12T10:30:00+01:00
+      - Upgraded dependency on Map::Tube::Exception v3.08.
+      - Updated copyright year information in the README file.
+
+0.23  2016-09-24T23:10:00+01:00
+      - Add test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.22  2016-09-19T11:10:00+01:00
+      - Added key 'provides' to the Makefile.PL script.
+
+0.21  2016-09-13T09:20:00+01:00
+      - Upgraded dependency on Map::Tube::Exception v3.06.
+
+0.20  2016-04-04T14:10:00+01:00
+      - Fixed method Map::Tube::Plugin::Graph::Utils::graph_map_image() to handle line with no stations.
+      - Added $AUTHORITY to the distribution.
+      - Updated unit test scripts (t/00-load.t, t/pod.t and t/manifest.t).
+      - Updated copyright year information.
+
+0.19  2015-09-20T09:45:00+01:00
+      - Replaced die() with exception Map::Tube::Exception::*.
+
+0.18  2015-03-10T13:30:00+01:00
+      - Fixed typo in the package name Map::Tube::Plugin::Graph::Utils.
+      - Renamed method _graph_line_image() to graph_line_image().
+      - Renamed method _graph_map_image() to graph_map_image().
+      - Updated package Map::Tube::Plugin::Graph to respect the above changes.
+
+0.17  2015-03-10T10:40:00+01:00
+      - Renamed package Map::Tube::Utils::Graph to Map::Tube::Plugin::Graph::Utils.
+      - Updated test script t/00-load.t accordingly.
+
+0.16  2015-02-12T00:30:00+01:00
+      - Tidied up pod document of Map::Tube::Utils::Graph.
+
+0.15  2015-02-12T00:05:00+01:00
+      - Refactored the plugin code and moved private methods to separate package.
+
+0.14  2015-02-10T12:00:00+01:00
+      - Updated method _graph_map_label() to the generate the label for map correctly.
+
+0.13  2015-02-10T11:35:00+01:00
+      - Updated method as_image() to generate entire map, if no line name is passed.
+      - Fixed the code in the section SYNOPSIS to run smooth on Windows (thanks to Gisbert W. Selke).
+      - Added new code to the section SYNOPSIS to reflect the changes to the method as_image().
+
+0.12  2015-02-09T23:00:00+01:00
+      - Restructured the plugin as Moo Role, as conceived by Gisbert W. Selke.
+
+0.11  2015-02-01T19:19:00+01:00
+      - Made edge outside of the current line connected by dashed line.
+
+0.10  2015-01-29T15:15:00+01:00
+      - Added node text color, boundary color and image background color.
+
+0.09  2015-01-24T17:15:00+01:00
+      - Bundled pull request from TUPINEK.
+
+0.08  2015-01-23T10:15:00+01:00
+      - Patched RT: 101691, although it was raised against Map::Tube.
+
+0.07  2015-01-22T16:25:00+01:00
+      - Fixed method _label() throwing error "string ran past end of line".
+
+0.06  2015-01-21T21:15:00+01:00
+      - Updated map label as auto generated.
+
+0.05  2015-01-20T10:05:00+01:00
+      - Further more pod document tidied up.
+
+0.04  2015-01-20T00:35:00+01:00
+      - Minor pod document changes.
+
+0.03  2015-01-19T12:40:00+01:00
+      - Fixed the code in the pod document about method as_image().
+
+0.02  2015-01-19T12:00:00+01:00
+      - Renamed the test script as-image.t to as_image.t.
+      - Updated MANIFEST file to reflect the above changes.
+      - Added section "CONSTRUCTOR" and "INSTALLATION" to the pod document.
+      - Minor tidied up pod document.
+
+0.01  2015-01-18T14:30:11+01:00
+      - Module Created.

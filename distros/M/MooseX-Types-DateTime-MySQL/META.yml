@@ -1,0 +1,30 @@
+---
+abstract: 'Joins MooseX::Types::DateTime and DateTime::Format::MySQL'
+author:
+  - 'Tomas Doran (t0m) C<<bobtfish@bobtfish.net>>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.99'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Types-DateTime-MySQL
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DateTime::Format::Duration: 0
+  DateTime::Format::MySQL: 0
+  MooseX::Types: 0
+  MooseX::Types::DateTime: 0.05
+  namespace::clean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/bobtfish/moosex-types-datetime-mysql.git
+version: 0.003

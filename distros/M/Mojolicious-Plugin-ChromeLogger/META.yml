@@ -1,0 +1,23 @@
+---
+abstract: 'Pushes Mojolicious logs, stash, session, config to Google Chrome console'
+author:
+  - 'Viktor Turskyi <koorchik@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-ChromeLogger
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '4.0'
+  perl: '5.01'
+version: 0.06

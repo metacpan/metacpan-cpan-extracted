@@ -1,0 +1,51 @@
+{
+   "abstract" : "Perl class for polynomials in one variable",
+   "author" : [
+      "Martin Becker <becker-cpan-mp@cozap.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-Polynomial",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Math::BigInt" : "0",
+            "Math::BigRat" : "0.260804",
+            "Math::Complex" : "0",
+            "Math::ModInt" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "overload" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.011",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

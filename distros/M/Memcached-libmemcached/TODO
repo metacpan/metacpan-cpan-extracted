@@ -1,0 +1,43 @@
+*** General:
+
+    Stabilize stats api
+    Document all typedef actions on input and output
+
+    Resolve mapping of error codes to booleans
+    (see parse_*_reply in http://search.cpan.org/src/KROKI/Cache-Memcached-Fast-0.07/src/client.c)
+
+** Structure:
+
+    Add PrintError & RaiseError flags
+
+*** CAS
+
+    Add cas support - if sizeof(uint64_t) <= sizeof(UV) then use UV else use a newSV(sizeof(uint64_t))
+    and store the uint64_t as a binary string.
+
+*** 64bit issues
+
+    Resolve other uint64_t issues, esp increment/decrement
+
+*** More flexible callbacks, something like:
+
+    [
+        [ $bit_mask, \&callback, $callback_style ],
+        [ $bit_mask, \&callback, $callback_style ],
+        ...
+    ]
+
+    the code would iterate along the list and call each callback where any
+    bits in $bit_mask are set in $flag. If $bit_mask is undef then the callback
+    would be called unconditionally. $callback_style indicates how the
+    key, value, flags etc. should be passed in and returned from the
+    callback.  Several different callback styles would be supported that
+    correspond to the APIs used by Storable and IO::Zip, for example, so
+    those could be plumbed in and called directly without needing any perl code
+    (for the get, for the set the callbacks need extra logic to decide if the
+    serialization and compression should be applied to the particular value).
+
+*** Random thoughts...
+
+    For *_by_key functions, if $master_key is undef then use some per-$memc mechanism,
+    such as a pre-stored scalar, or a callback, to get the value.

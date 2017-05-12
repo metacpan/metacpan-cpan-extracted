@@ -1,0 +1,63 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 007d9eadef38d89600c372861a631e950cadab7e .travis.yml
+SHA1 7b454112aa7e571cc74bf7086051aa44b23a5161 Changes
+SHA1 bf2d713ceca5b8ad3d680ed15baba1b89df7e149 LICENSE
+SHA1 e8d07bd9008a57442bace8fc298ac2e7c3e08ee4 MANIFEST
+SHA1 66069329e37f4f02b4e6c186b0f65302ba9803c6 META.json
+SHA1 221d95770c8ab5ee6d999894c49cda18ed3aa5c2 META.yml
+SHA1 d207e331e8209aeb28d075bd3ed4abd7603edb1c Makefile.PL
+SHA1 f9aae909b6e486c67c0fd1d6adc283921ce90469 README
+SHA1 8fb0e39389ad0d4d74bdfc0178cb84197ed03d55 cpanfile
+SHA1 bfaccc82e7866ef298b051eaa3989547eb322823 dist.ini
+SHA1 ad2df26edaefa392c16d89e7e2c9349efd48a40c lib/MooseX/RelatedClasses.pm
+SHA1 4bdb7637c377a4563e26e887313ef118c1d1a22d t/00-check-deps.t
+SHA1 472b9efe8802a2de4ccdbac012cc7f847c0fbe9f t/00-compile.t
+SHA1 4330b17723f7c00560159080b1f7d90c7a0df680 t/00-report-prereqs.dd
+SHA1 b51f692a5745d119b1b22f72f819220715b919d4 t/00-report-prereqs.t
+SHA1 2547e8b514fa5afa01b2627aa92c7c80d3c825bc t/all_in_namespace.t
+SHA1 ea26c6491f2d2ab9bb416e978c987ca034a99fa1 t/basic.t
+SHA1 1507cf87525357c4626b3e8210ff8bb1cbd14d07 t/blank_namespace.t
+SHA1 f792061318a88c2c9dff4b13e05b3ac166b63e3f t/custom-decamelization.t
+SHA1 6a21995767ace00df6e3f6f937529fa4d3903b7c t/desnaking-with-doublecolon.t
+SHA1 79b726e41948bef1031804a5548022fa170f8d38 t/funcs.pm
+SHA1 42b4acc20b21397436b51701876d37739371431d t/lib/Test/Class/__WONKY__.pm
+SHA1 e91923100a02492a4d68a537203491203b7532b2 t/lib/Test/Class/__WONKY__/One.pm
+SHA1 5b9d8a5daa536e028df22c77b551452de88c00ba t/lib/Test/Class/__WONKY__/Sub/One.pm
+SHA1 1f8b4552feccf71011fa4207e0e9c56917d820ef t/multiple.t
+SHA1 1d286ae8ae2330424ce68d032b2291c1c640a1ae t/sugar.t
+SHA1 07811791d0076be500d4a3ca9041da62b5da3852 xt/author/eol.t
+SHA1 2d34ff6b1a1b62027add79057e9d6cd81ac59202 xt/author/no-tabs.t
+SHA1 184aadd09e300c87d2ebe7a2e2ba22dba0339a35 xt/author/pod-coverage.t
+SHA1 2e65cf323759188996cfe2916e3d51c9a58ae569 xt/author/pod-spell.t
+SHA1 8d7d589b1244b7e68e9a0e63c04c925b53d5f0af xt/author/pod-syntax.t
+SHA1 a7948d34cfaad400286ea5d5fa6206c4c7e2552c xt/release/consistent-version.t
+SHA1 ed951395b425827b105c0d265d059f8030f818f5 xt/release/has-version.t
+SHA1 45c5650c155fd2dc063487eddc21fdf1e58db399 xt/release/minimum-version.t
+SHA1 44e5dae45796132e11cedeb0611a3501c59eee4d xt/release/no-smart-comments.t
+SHA1 bd6361539c978171abd8de5763690a7ea1d9c7b1 xt/release/pod-linkcheck.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJY4vlHAAoJEJP6zjPp4XX4t9QIAKGmgQLjbdJo48fy86ffttWW
+LEpAvEnuLo2jgfyTzZjk2eC6xrK3Hr1KtUEMuilz7o347H7dZ4ictml3EgKFPqCy
+U3POU0q5atFw0uun825R/RCPJKwPs2g71ppzO1JY3JC5BtiDBMk8WG/+/dFepqb4
+mne/Y+DJ+wUjiI/zBB8Md3AtKA+LXeKUkDrqG5eyFkRf2PphcMkxEYtgg4pHC/z5
+H7zofYHMYGcR0RXep6VcpMAj7C1possgWJVewwSAE87DbuhUSQ0clAiLntNh9bFZ
+obBUq2fRbXsKmOgcLWjym2x3usmF23zMYrog1azUuqT3oZwjYROhIdYP3BFfxrY=
+=zmge
+-----END PGP SIGNATURE-----

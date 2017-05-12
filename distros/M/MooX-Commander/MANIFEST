@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+cpanfile.snapshot
+lib/MooX/Commander.pm
+lib/MooX/Commander/HasOptions.pm
+lib/MooX/Commander/HasSubcommands.pm
+lib/MooX/Commander/IsaHelpCommand.pm
+minil.toml
+t/00_compile.t
+META.yml
+MANIFEST

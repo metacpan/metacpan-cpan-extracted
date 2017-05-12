@@ -1,0 +1,15 @@
+Build.PL
+Changes
+ex/example.pl
+lib/MooseX/Types/NumUnit.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README.pod
+t/50-coerce.t
+t/additional_units.t
+t/caching.t
+t/num_of_si_unit_like.t
+t/num_of_unit.t
+t/NumSI.t
+t/NumUnit.t

@@ -1,0 +1,53 @@
+{
+   "abstract" : "Mojolicious::Lite syntax in a full Mojolicious app.",
+   "author" : [
+      "Stefan Adams <stefan@borgia.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Mojolyst",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.90"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.00",
+            "Mojolicious" : "7.11",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/s1037989/Mojolicious-Plugin-Mojolyst/issues"
+      },
+      "homepage" : "https://github.com/s1037989/Mojolicious-Plugin-Mojolyst",
+      "repository" : {
+         "url" : "https://github.com/stefan/mojolicious-plugin-mojolyst"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

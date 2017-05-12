@@ -1,0 +1,22 @@
+Mail::AddressSort is a module that sorts email addresses, and can create an 
+array of batches to hopefully speed up delivery of messages.
+
+INSTALLATION
+
+	perl Makefile.PL
+	make
+	make install
+
+MINIDOMO
+
+Minidomo is an example program that comes with the distribution.  It can be used 
+as a command line interface to the Mail::AddressSort module.  Read the 
+online documentation for help on using the tool.
+
+
+COPYRIGHT
+
+Copyright 2001, Chris Josephes, All rights reserved.
+
+This library is free software; you can redistribute it or modify it under the 
+same terms as Perl itself.

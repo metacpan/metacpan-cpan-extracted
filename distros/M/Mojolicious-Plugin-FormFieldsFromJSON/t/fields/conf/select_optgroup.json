@@ -1,0 +1,12 @@
+  [
+    {
+      "type" : "select",
+      "name" : "language",
+      "data" : {
+        "EU" : {
+          "de" : "German",
+          "en" : "English"
+        }
+      }
+    }
+  ]

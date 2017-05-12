@@ -1,0 +1,463 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use MIDI::Simple::Drummer;
+
+# Define our basic kit so we can do binary math with it.
+my $kit = {
+    rest  => 0x00,
+    tick  => 0x01,
+    kick  => 0x02,
+    snare => 0x04,
+    crash => 0x08,
+    ride  => 0x10,
+};
+
+# Collect user input and set defaults.
+my $repeat   = @ARGV ? shift : 1;   # Play the phrase once by default.
+my @patterns = @ARGV ? @ARGV : (1); # Play the first known pattern by default.
+
+# Enter: The Drummer.
+my $d = MIDI::Simple::Drummer->new(
+    -patterns => repertoire(@patterns),
+);
+
+# Get the set of interesting patterns.
+my $set = pattern(@patterns);
+
+# How many more times? o/`
+play($set) for 1 .. $repeat;
+
+# Output the MIDI file.
+$d->write("$0.mid");
+
+sub play {
+    my $set = shift;
+    # Play the set patterns.
+    for my $p (keys %$set) {
+        # Show status.
+        printf  '%3s (%2d): ', $p, scalar(@{ $set->{$p} });
+        # Loop over each beat of the pattern.
+        for my $beat (@{ $set->{$p} }) {
+            # Show the beat number.
+            printf '%x ', $beat;
+            # Accumulate the pads that simultaneously play.
+            my @note_list = ();
+            for my $pad (keys %$kit) {
+                # Add the pad value if present in the beat.
+                push @note_list, $d->$pad() if $beat & $kit->{$pad};
+            }
+            # Add the notes to the MIDI score.
+            # TODO Fix hardcoding of duration.
+            $d->note($d->EIGHTH, @note_list);
+        }
+        # "Close" status with a newline.
+        print "\n";
+    }
+}
+
+sub repertoire {
+    my @keys = @_;
+    my %pattern = (
+    1 => [  $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick}
+    ],
+    2 => [  $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare} | $kit->{kick},
+            $kit->{tick}
+    ],
+    3 => [  $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{kick}
+    ],
+    4 => [  $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+    ],
+    5 => [  $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick}
+    ],
+    9 => [  $kit->{tick} | $kit->{kick},
+            $kit->{rest},
+            $kit->{tick} | $kit->{snare},
+            $kit->{rest},
+            $kit->{tick} | $kit->{kick},
+            $kit->{rest},
+            $kit->{tick} | $kit->{snare},
+            $kit->{rest}
+    ],
+    10 => [ $kit->{tick} | $kit->{kick},
+            $kit->{rest},
+            $kit->{tick} | $kit->{snare} | $kit->{kick},
+            $kit->{rest},
+            $kit->{tick} | $kit->{kick},
+            $kit->{rest},
+            $kit->{tick} | $kit->{snare} | $kit->{kick},
+            $kit->{rest}
+    ],
+    11 => [ $kit->{tick} | $kit->{kick},
+            $kit->{rest},
+            $kit->{tick} | $kit->{snare},
+                           $kit->{kick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{rest},
+            $kit->{tick} | $kit->{snare},
+                           $kit->{kick}
+    ],
+    12 => [ $kit->{tick} | $kit->{kick},
+            $kit->{rest},
+            $kit->{tick} | $kit->{snare},
+                           $kit->{kick},
+            $kit->{tick},
+                           $kit->{kick},
+            $kit->{tick} | $kit->{snare},
+                           $kit->{kick},
+    ],
+    17 => [                $kit->{kick},
+            $kit->{tick},
+                           $kit->{snare},
+            $kit->{tick},
+                           $kit->{kick},
+            $kit->{tick},
+                           $kit->{snare},
+            $kit->{tick}
+    ],
+    18 => [                $kit->{kick},
+            $kit->{tick},
+            $kit->{snare} | $kit->{kick},
+            $kit->{tick},
+                           $kit->{kick},
+            $kit->{tick},
+            $kit->{snare} | $kit->{kick},
+            $kit->{tick}
+    ],
+    19 => [                $kit->{kick},
+            $kit->{tick},
+                           $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+                           $kit->{kick},
+            $kit->{tick},
+                           $kit->{snare},
+            $kit->{tick} | $kit->{kick}
+    ],
+    20 => [                $kit->{kick},
+            $kit->{tick},
+                           $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+            $kit->{rest},
+            $kit->{tick} | $kit->{kick},
+                           $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+    ],
+    33 => [ $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{snare}
+    ],
+    34 => [ $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare} | $kit->{kick},
+            $kit->{tick} | $kit->{snare}
+    ],
+    35 => [ $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{snare} | $kit->{kick}
+    ],
+    36 => [ $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{snare} | $kit->{kick}
+    ],
+    49 => [                $kit->{kick},
+            $kit->{tick},
+                           $kit->{snare},
+            $kit->{tick},
+            $kit->{kick},
+            $kit->{tick},
+                           $kit->{snare},
+            $kit->{tick} | $kit->{snare}
+    ],
+    50 => [                $kit->{kick},
+            $kit->{tick},
+            $kit->{snare} | $kit->{kick},
+            $kit->{tick},
+                           $kit->{kick},
+            $kit->{tick},
+            $kit->{snare} | $kit->{kick},
+            $kit->{tick} | $kit->{snare}
+    ],
+    51 => [                $kit->{kick},
+            $kit->{tick},
+                           $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+                           $kit->{kick},
+            $kit->{tick},
+                           $kit->{snare},
+            $kit->{tick} | $kit->{snare} | $kit->{kick}
+    ],
+    52 => [ $kit->{kick},
+            $kit->{tick},
+            $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+            $kit->{rest},
+            $kit->{tick} | $kit->{kick},
+            $kit->{snare},
+            $kit->{tick} | $kit->{snare} | $kit->{kick}
+    ],
+    65 => [ $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick}
+    ],
+    66 => [ $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{snare} | $kit->{kick},
+            $kit->{tick}
+    ],
+    67 => [ $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{kick}
+    ],
+    68 => [ $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare} | $kit->{kick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{kick}
+    ],
+    81 => [                $kit->{kick},
+            $kit->{tick},
+                           $kit->{snare},
+            $kit->{tick},
+                           $kit->{kick},
+            $kit->{tick} | $kit->{snare},
+                           $kit->{snare},
+            $kit->{tick}
+    ],
+    82 => [                $kit->{kick},
+            $kit->{tick},
+            $kit->{snare} | $kit->{kick},
+            $kit->{tick},
+                           $kit->{kick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{snare} | $kit->{kick},
+            $kit->{tick}
+    ],
+    83 => [                $kit->{kick},
+            $kit->{tick},
+                           $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+                           $kit->{kick},
+            $kit->{tick} | $kit->{snare},
+                           $kit->{snare},
+            $kit->{tick} | $kit->{kick}
+    ],
+    84 => [                $kit->{kick},
+            $kit->{tick},
+                           $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+            $kit->{rest},
+            $kit->{tick} | $kit->{snare} | $kit->{kick},
+                           $kit->{snare},
+            $kit->{tick} | $kit->{kick}
+    ],
+    97 => [ $kit->{tick} | $kit->{snare} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick},
+            $kit->{tick}
+    ],
+    98 => [ $kit->{tick} | $kit->{snare} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+    ],
+    99 => [ $kit->{tick} | $kit->{snare} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare} | $kit->{kick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick},
+            $kit->{tick} | $kit->{kick}
+    ],
+    100 => [$kit->{tick} | $kit->{snare} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{snare} | $kit->{kick},
+            $kit->{tick},
+            $kit->{tick} | $kit->{kick}
+    ],
+    113 => [$kit->{snare} | $kit->{kick},
+            $kit->{tick},
+            $kit->{rest},
+            $kit->{tick} | $kit->{snare},
+                           $kit->{kick},
+            $kit->{tick},
+                           $kit->{snare},
+            $kit->{tick},
+                           $kit->{kick},
+            $kit->{tick},
+                           $kit->{snare},
+            $kit->{tick},
+                           $kit->{kick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{rest},
+            $kit->{tick}
+    ],
+    114 => [$kit->{snare} | $kit->{kick},
+            $kit->{tick},
+                           $kit->{kick},
+            $kit->{tick} | $kit->{snare},
+                           $kit->{kick},
+            $kit->{tick},
+            $kit->{snare} | $kit->{kick},
+            $kit->{tick},
+                           $kit->{kick},
+            $kit->{tick},
+            $kit->{snare} | $kit->{kick},
+            $kit->{tick},
+                           $kit->{kick},
+            $kit->{tick} | $kit->{snare},
+                           $kit->{kick},
+            $kit->{tick},
+    ],
+    115 => [$kit->{snare} | $kit->{kick},
+            $kit->{tick},
+            $kit->{rest},
+            $kit->{tick} | $kit->{snare} | $kit->{kick},
+                           $kit->{kick},
+            $kit->{tick},
+                           $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+                           $kit->{kick},
+            $kit->{tick},
+                           $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+                           $kit->{kick},
+            $kit->{tick} | $kit->{snare},
+            $kit->{rest},
+            $kit->{tick} | $kit->{kick}
+    ],
+    116 => [$kit->{snare} | $kit->{kick},
+            $kit->{tick},
+            $kit->{rest},
+            $kit->{tick} | $kit->{snare} | $kit->{kick},
+            $kit->{rest},
+            $kit->{tick} | $kit->{kick},
+                           $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+                           $kit->{kick},
+            $kit->{tick},
+                           $kit->{snare},
+            $kit->{tick} | $kit->{kick},
+            $kit->{rest},
+            $kit->{tick} | $kit->{snare} | $kit->{kick},
+            $kit->{rest},
+            $kit->{tick} | $kit->{kick}
+    ],
+    );
+    # Return a hash of just the interesting keys.
+    return { map { $_ => $pattern{$_} } @keys };
+}

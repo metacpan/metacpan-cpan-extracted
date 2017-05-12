@@ -1,0 +1,183 @@
+NAME
+    Mason::Plugin::PSGIHandler - PSGI handler for Mason
+
+SYNOPSIS
+        # Quick start:
+        mason_psgi_setup myapp
+
+        # app.psgi
+        use Mason;
+        use Plack::Builder;
+        my $interp = Mason->new(
+             plugins => ['PSGIHandler', ...],
+             comp_root => '/path/to/comp_root/',
+             data_dir => '/path/to/data_dir/',
+        );
+        my $app = sub {
+            my $env = shift;
+            $interp->handle_psgi($env);
+        };
+        builder {
+            # Include PSGI middleware here
+            $app;
+        };
+
+DESCRIPTION
+    Provides a PSGI handler for Mason. It allows Mason to handle requests
+    directly from any web servers that support PSGI.
+
+  Run path
+    The top-level run path is taken from the method Plack::Request. So in a
+    simple Plack configuration like the one above, a URL like
+
+        /foo/bar
+
+    would result in
+
+        $interp->run("/foo/bar");
+
+    However, if you mounted your Mason app under "/mason",
+
+        builder {
+            mount "/mason" => builder {
+                $app;
+            };
+            mount "/other" => $other_app;
+            ...
+        };
+
+    then the "/mason" portion of the URL would get stripped off in the
+    top-level run path.
+
+  Run parameters
+    The top-level run parameters are taken from the method Plack::Request,
+    which combines GET and POST parameters. So
+
+        /foo/bar?a=5&b=6
+
+    would generally result in
+
+        $interp->run("/foo/bar", a=>5, b=>6);
+
+    If there are multiple values for a parameter, generally only the last
+    value will be kept, as per Hash::MultiValue. However, if the
+    corresponding attribute in the page component is declared an `ArrayRef',
+    then all values will be kept and passed in as an arrayref. For example,
+    if the page component `/foo/bar.mc' has these declarations:
+
+        <%args>
+        $.a
+        $.b => (isa => "Int")
+        $.c => (isa => "ArrayRef");
+        $.d => (isa => "ArrayRef[Int]");
+        </%args>
+
+    then this URL
+
+        /foo/bar?a=1&a=2&b=3&b=4&c=5&c=6&d=7&d=8
+
+    would result in
+
+        $interp->run("/foo/bar", a=>2, b=>4, c=>[5,6], d => [7,8]);
+
+    You can always get the original Hash::MultiValue object from
+    `$m->request_args'. e.g.
+
+        my $hmv = $m->request_args;
+        # get all values for 'e'
+        $hmv->get_all('e');
+
+  Plack request object
+    A Mason::Plack::Request is constructed from the plack environment and
+    made available in `$m->req'. This is a thin subclass of Plack::Request
+    and provides information such as the URL and incoming HTTP headers. e.g.
+
+        my $headers = $m->req->headers;
+        my $cookie = $m->req->cookies->{'foo'};
+
+  Plack response object
+    An empty Mason::Plack::Response is constructed and made available in
+    `$m->res'. Your Mason components are responsible for setting the status
+    and headers, by calling `$m->res->status' and `$m->res->headers' or
+    utility methods that do so. e.g.
+
+        $m->res->content_type('text/plain');
+        $m->res->cookies->{foo} = { value => 123 };
+
+        $m->redirect('http://www.google.com/', 301)  # sets header/status and aborts
+        $m->clear_and_abort(404);   # sets status and aborts
+
+    If the Mason request finishes successfully, the Mason output becomes the
+    plack response body; any value explicitly set in `$m->res->body' is
+    ignored and overwritten. `$m->res->status' is set to 200 if it hasn't
+    already been set.
+
+    If the top-level component path cannot be found, `$m->res->status' is
+    set to 404. All other runtime errors fall through to be handled by
+    Plack, i.e. with Plack::Middleware::StackTrace in development mode or a
+    500 error response in deployment mode.
+
+INTERP METHODS
+    handle_psgi ($env)
+        Takes a PSGI environment hash, calls an appropriate Mason request as
+        detailed above, and returns a standard PSGI response array.
+
+REQUEST METHODS
+    req ()
+        A reference to the Mason::Plack::Request.
+
+    res ()
+        A reference to the Mason::Plack::Response.
+
+    redirect (url[, status])
+        Sets headers and status for redirect, then clears the Mason buffer
+        and aborts the request. e.g.
+
+            $m->redirect("http://somesite.com", 302);
+
+        is equivalent to
+
+            $m->res->redirect("http://somesite.com", 302);
+            $m->clear_and_abort();
+
+    not_found ()
+        Sets the status to 404, then clears the Mason buffer and aborts the
+        request. Equivalent to
+
+            $m->res->status(404);
+            $m->clear_and_abort();
+
+    abort (status)
+    clear_and_abort (status)
+        These methods are overriden to set the response status before
+        aborting, if *status* is provided. e.g. to send back a NOT FOUND
+        result:
+
+            $m->clear_and_abort(404);
+
+        This is equivalent to
+
+            $m->res->status(404);
+            $m->clear_and_abort();
+
+SUPPORT
+    The mailing list for Mason and Mason plugins is
+    mason-users@lists.sourceforge.net. You must be subscribed to send a
+    message. To subscribe, visit
+    https://lists.sourceforge.net/lists/listinfo/mason-users.
+
+    You can also visit us at `#mason' on irc:.
+
+    Bugs and feature requests will be tracked at RT:
+
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mason-Plugin-PSGIHandler
+        bug-mason-plugin-psgihandler@rt.cpan.org
+
+    The latest source code can be browsed and fetched at:
+
+        http://github.com/jonswar/perl-mason-plugin-psgihandler
+        git clone git://github.com/jonswar/perl-mason-plugin-psgihandler.git
+
+SEE ALSO
+    Mason, http://plackperl.org/
+

@@ -1,0 +1,49 @@
+--stations
+Ruoholahti
+Kamppi
+Rautatientori
+Kaisaniemi
+Hakaniemi
+Sörnälnen
+Kalasatama
+Kulosaari
+Herttoniemi
+Siilitie
+Itäkeskus
+
+# north branch
+Myllypuro
+Kontula
+Mellunmäki
+
+# south branch
+Puotila
+Rastila
+Vuosaari
+
+
+--transfers
+
+--lines
+NB|North|North branch|color: #cc7220
+SB|South|South branch|color: #f4a350
+
+--segments
+NB,SB|Ruoholahti|Kamppi
+NB,SB|Kamppi|Rautatientori
+NB,SB|Rautatientori|Kaisaniemi
+NB,SB|Kaisaniemi|Hakaniemi
+NB,SB|Hakaniemi|Sörnälnen
+NB,SB|Sörnälnen|Kalasatama
+NB,SB|Kalasatama|Kulosaari
+NB,SB|Kulosaari|Herttoniemi
+NB,SB|Herttoniemi|Siilitie
+NB,SB|Siilitie|Itäkeskus
+
+NB|Itäkeskus|Myllypuro
+NB|Myllypuro|Kontula
+NB|Kontula|Mellunmäki
+
+SB|Itäkeskus|Puotila
+SB|Puotila|Rastila
+SB|Rastila|Vuosaari

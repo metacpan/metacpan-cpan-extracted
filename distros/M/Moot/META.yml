@@ -1,0 +1,24 @@
+---
+abstract: 'Perl interface to the libmoot HMM tagger library'
+author:
+  - 'Bryan Jurish <moocow@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  Alien::Moot: '0.001'
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Moot
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Moot: '0.001'
+  ExtUtils::MakeMaker: '6.52'
+version: v2.0.13

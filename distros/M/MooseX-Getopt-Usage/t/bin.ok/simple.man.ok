@@ -1,0 +1,19 @@
+NAME
+    Simple - Super simple usage message.
+
+SYNOPSIS
+     Should this get overridden by format above?
+
+DESCRIPTION
+    Make sure format overrides reading pod and hide everything else.
+
+OPTIONS
+    --help -? --usage
+        Display the usage message and exit
+
+    --man
+        Display man page
+
+AUTHOR
+    Invader Flobee
+

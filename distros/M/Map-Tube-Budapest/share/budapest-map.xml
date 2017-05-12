@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tube name="Budapesti metró">
+  <!-- https://hu.wikipedia.org/wiki/Budapesti_metró -->
+  <lines>
+    <line id="M1" name="Linia M1" color="yellow"/>
+    <line id="M2" name="Linia M2" color="red"/>
+    <line id="M3" name="Linia M3" color="blue"/>
+    <line id="M4" name="Linia M4" color="green"/>
+  </lines>
+  <stations>
+    <!-- https://hu.wikipedia.org/wiki/M1-es_metróvonal -->
+    <station id="M1-01" name="Vörösmarty tér" line="Linia M1" link="M1-02"/>
+    <station id="M1-02" name="Deák Ferenc tér" line="Linia M1" link="M1-01,M1-03,M2-05,M3-10"/>
+    <station id="M1-03" name="Bajcsy-Zsilinszky út" line="Linia M1" link="M1-02,M1-04"/>
+    <station id="M1-04" name="Opera" line="Linia M1" link="M1-03,M1-05"/>
+    <station id="M1-05" name="Oktogon" line="Linia M1" link="M1-04,M1-06"/>
+    <station id="M1-06" name="Vörösmarty utca" line="Linia M1" link="M1-05,M1-07"/>
+    <station id="M1-07" name="Kodály körönd" line="Linia M1" link="M1-06,M1-08"/>
+    <station id="M1-08" name="Bajza utca" line="Linia M1" link="M1-07,M1-09"/>
+    <station id="M1-09" name="Hősök tere" line="Linia M1" link="M1-08,M1-10"/>
+    <station id="M1-10" name="Széchenyi fürdő" line="Linia M1" link="M1-09,M1-11"/>
+    <station id="M1-11" name="Mexikói út vá." line="Linia M1" link="M1-10"/>
+
+    <!-- https://hu.wikipedia.org/wiki/M2-es_metróvonal -->
+    <station id="M2-01" name="Déli pályaudvar" line="Linia M2" link="M2-02"/>
+    <station id="M2-02" name="Széll Kálmán tér" line="Linia M2" link="M2-01,M2-03"/>
+    <station id="M2-03" name="Batthyány tér" line="Linia M2" link="M2-02,M2-04"/>
+    <station id="M2-04" name="Kossuth Lajos tér" line="Linia M2" link="M2-03,M2-05"/>
+    <station id="M2-05" name="Deák Ferenc tér" line="Linia M2" link="M1-02,M2-04,M2-06,M3-10"/>
+    <station id="M2-06" name="Astoria" line="Linia M2" link="M2-05,M2-07"/>
+    <station id="M2-07" name="Blaha Lujza tér" line="Linia M2" link="M2-06,M2-08"/>
+    <station id="M2-08" name="Keleti pályaudvar" line="Linia M2" link="M2-07,M2-09,M4-10"/>
+    <station id="M2-09" name="Puskás Ferenc Stadion" line="Linia M2" link="M2-08,M2-10"/>
+    <station id="M2-10" name="Pillangó utca" line="Linia M2" link="M2-09,M2-11"/>
+    <station id="M2-11" name="Örs vezér tere" line="Linia M2" link="M2-10"/>
+
+    <!-- https://hu.wikipedia.org/wiki/M3-as_metróvonal -->
+    <station id="M3-01" name="Újpest-Központ" line="Linia M3" link="M3-02"/>
+    <station id="M3-02" name="Újpest-Városkapu" line="Linia M3" link="M3-01,M3-03"/>
+    <station id="M3-03" name="Gyöngyösi utca" line="Linia M3" link="M3-02,M3-04"/>
+    <station id="M3-04" name="Forgách utca" line="Linia M3" link="M3-03,M3-05"/>
+    <station id="M3-05" name="Árpád híd" line="Linia M3" link="M3-04,M3-06"/>
+    <station id="M3-06" name="Dózsa György út" line="Linia M3" link="M3-05,M3-07"/>
+    <station id="M3-07" name="Lehel tér" line="Linia M3" link="M3-06,M3-08"/>
+    <station id="M3-08" name="Nyugati pályaudvar" line="Linia M3" link="M3-07,M3-09"/>
+    <station id="M3-09" name="Arany János utca" line="Linia M3" link="M3-08,M3-10"/>
+    <station id="M3-10" name="Deák Ferenc tér" line="Linia M3" link="M1-02,M2-05,M3-09,M3-11"/>
+    <station id="M3-11" name="Ferenciek tere" line="Linia M3" link="M3-10,M3-12"/>
+    <station id="M3-12" name="Kálvin tér" line="Linia M3" link="M3-11,M3-13,M4-07"/>
+    <station id="M3-13" name="Corvin-negyed" line="Linia M3" link="M3-12,M3-14"/>
+    <station id="M3-14" name="Klinikák" line="Linia M3" link="M3-13,M3-15"/>
+    <station id="M3-15" name="Nagyvárad tér" line="Linia M3" link="M3-14,M3-16"/>
+    <station id="M3-16" name="Népliget" line="Linia M3" link="M3-15,M3-17"/>
+    <station id="M3-17" name="Ecseri út" line="Linia M3" link="M3-16,M3-18"/>
+    <station id="M3-18" name="Pöttyös utca" line="Linia M3" link="M3-17,M3-19"/>
+    <station id="M3-19" name="Határ út" line="Linia M3" link="M3-18,M3-20"/>
+    <station id="M3-20" name="Kőbánya-Kispest" line="Linia M3" link="M3-19"/>
+
+    <!-- https://hu.wikipedia.org/wiki/M4-es_metróvonal -->
+    <station id="M4-01" name="Kelenföld vasútállomás" line="Linia M4" link="M4-02"/>
+    <station id="M4-02" name="Bikás park" line="Linia M4" link="M4-01,M4-03"/>
+    <station id="M4-03" name="Újbuda-központ" line="Linia M4" link="M4-02,M4-04"/>
+    <station id="M4-04" name="Móricz Zsigmond körtér" line="Linia M4" link="M4-03,M4-05"/>
+    <station id="M4-05" name="Szent Gellért tér" line="Linia M4" link="M4-04,M4-06"/>
+    <station id="M4-06" name="Fővám tér" line="Linia M4" link="M4-05,M4-07"/>
+    <station id="M4-07" name="Kálvin tér" line="Linia M4" link="M3-12,M4-06,M4-08"/>
+    <station id="M4-08" name="Rákóczi tér" line="Linia M4" link="M4-07,M4-09"/>
+    <station id="M4-09" name="II. János Pál pápa tér" line="Linia M4" link="M4-08,M4-10"/>
+    <station id="M4-10" name="Keleti pályaudvar" line="Linia M4" link="M2-08,M4-09"/>
+  </stations>
+</tube>

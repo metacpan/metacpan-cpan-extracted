@@ -1,0 +1,54 @@
+0.09     2014-08-24
+
+- Backed out the Sub::Name change in 0.08. It was pointed out to me by Graham
+  Knop that adding an XS dependency for a module that's often used to pick
+  between XS and non-XS implementations doesn't work so well.
+
+
+0.08     2014-08-24
+
+- Subroutines copied from an implementation package into the loading package
+  are now renamed using Sub::Name. This causes them to be considered part of
+  the loading package, which is important for things like
+  namespace::autoclean. Reported by Karen Etheridge. RT #98097.
+
+
+0.07     2013-07-14
+
+- Require Test::Fatal 0.006+ to avoid test failures. Reported by Salve
+  Nilsen. RT #76809.
+
+
+0.06     2012-02-12
+
+- Require Module::Runtime 0.012, which has a number of useful bug fixes.
+
+
+0.05     2012-02-09
+
+- Make Test::Taint an optional dependency. This module requires XS, and
+  requiring a compiler for Module::Implementation defeats its
+  purpose. Reported by Peter Rabbitson. RT #74817.
+
+
+0.04     2012-02-08
+
+- This module no longer installs an _implementation() subroutine in
+  callers. Instead, you can call
+  Module::Implementation::implementation_for($package) to get the
+  implementation used for a given package.
+
+
+0.03     2012-02-06
+
+- The generated loader sub now returns the name of the package it loaded.
+
+
+0.02     2012-02-06
+
+- Removed Test::Spelling from this module's prereqs.
+
+
+0.01     2012-02-06
+
+- First release upon an unsuspecting world.

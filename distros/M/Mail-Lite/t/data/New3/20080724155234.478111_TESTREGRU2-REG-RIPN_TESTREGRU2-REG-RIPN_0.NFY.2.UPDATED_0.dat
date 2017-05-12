@@ -1,0 +1,17 @@
+---
+-
+  - rusu.notify
+  -
+    - birth-date: 05.03.1978
+      domain: ORETEST14.RU
+      e-mail: oreola@mail.ru
+      p-addr: '109208, Москва, ул. Ленинска⌠ слояода д.4, кв.3, Лисс Иль⌠ Александпович'
+      passport: '4502096324, выдан ОВД "Даниловский" г. Москвы 01.04.2002'
+      person: Iliya I Liss
+      person-r: Лисс Иль⌠ Александпович
+      phone: +7 9153038519
+      reg-till: 24.07.2009
+      registrar: TESTREGRU2-REG-RIPN
+      rule_id: rusu.notify.new_object
+      state: NOT DELEGATED
+      type: CORPORATE

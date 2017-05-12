@@ -1,0 +1,39 @@
+cgi-bin/mdw.conf
+cgi-bin/mdw.search.html
+cgi-bin/mdw.search_results.html
+cgi-bin/mdw.db
+
+cgi-bin/mdplaymates.search.html
+cgi-bin/mdplaymates.search_results.html
+cgi-bin/mdplaymates.db
+cgi-bin/mdplaymates.conf
+
+cgi-bin/mdw.cgi
+
+t/99_cleanup.t
+t/04_regenerate_mdw_form.t
+t/test.db
+t/test.conf
+t/30_InterfaceHTML.t
+t/00_basic.t
+t/mdw_search.html
+t/88_wui.t
+
+# install
+Makefile.PL
+# NOTES.devel
+
+lib/Metadata/DB/CLI.pm
+bin/mdse - search cli
+bin/mdfi - indexer
+bin/mdri - regenerate interface
+
+lib/Metadata/DB/Search/InterfaceHTML.pm
+lib/Metadata/DB/WUI.pm
+lib/CGI/Application/Plugin/MetadataDB.pm
+
+README
+MANIFEST
+
+
+META.yml                                 Module meta-data (added by MakeMaker)

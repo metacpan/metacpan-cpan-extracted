@@ -1,0 +1,15 @@
+0.002000 - 2010-03-15 17:00:00 UTC (groditi)
+ - Fix a bug where entry matching was broken due to a side-effect of
+   MooseX::Types::TypeDecorator by eliminating the decorator at BUILDARGS time
+ - Because TypeMaps and Types are immutable, cache matching entries
+ - Eliminate reader methods in favor of 'elements' methods that return lists
+   instead of references. This breaks API compatibility with 0.001000. Effects
+   should be minimal, as there was no known legitimate use case for using any
+   of the readers from a library or application using Moosex::TypeMap
+ - The 'entries' attribute was renamed 'type_entries'. Using the 'entries' key
+   in the constructor has been deprecated although support for it will remain
+   for at least 6 months.
+ - A new method 'clone_with_additional_entries' has been introduced to
+   facilitate the cloning of a type map.
+0.001000 - 2010-01-07 17:45:00 UTC (groditi)
+ - Initial CPAN release

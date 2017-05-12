@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Mail/Address/Tagged.pm
+t/tagged.t

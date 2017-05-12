@@ -1,0 +1,50 @@
+
+TODO:
+
+This program was originally written in December 2000.  Then a total
+redesign was made, which was released in December 2001.
+
+The file TODO.v2 lists holes in the current implementation. In this file,
+more long-term plans are listed.
+
+Plans for the (near?) future:
+* Thread lint
+  Currently, threads are only detected based on some fields in the
+  message header which are dedicated for this (the In-Reply-To and
+  the References field), however, there are many more ways to
+  try to correct things if these are not present.
+
+  If a message does not contain the two mentioned fields, then look
+  for a message which is at most a few days younger, whose sender is
+  in the recipient-list of the current message, and where parts of
+  the message are quoted (preceded by some symbols).
+
+* Persistent external files
+  Extracting large message-parts into persistent external files.
+  Mime::Entity puts attachments in external files during parsing.  When
+  the message is put in a folder again, the content is glued back into
+  the folder.  It should be nice to keep them external, such that the
+  folder-file is much smaller, and parsing done quickly.
+
+* Many more folder-types
+  I have a long wishlist of older-types.  However, my knowledge on how
+  they work is limited.  Furthermore, I do not have test-data on them.
+
+  - Emaul     (? for compatibly with Mail::Folder)
+  - News      NNTP
+  - Outlook   writting... (reading is already available in ::Dbx)
+  - Exchange
+  - Netscape
+  - Zip       Compressed folders
+  - Encrypt
+  - DBI       Database
+
+  Any more?
+  One of the main reasons that these are not implemented, is that my
+  knowledge on how they work is insufficient.
+
+* Maildir quota
+
+* Cooperation with OpenPGP
+
+* MD5 checksums and more

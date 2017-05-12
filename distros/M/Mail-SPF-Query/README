@@ -1,0 +1,53 @@
+Mail::SPF::Query 1.999.1
+========================
+
+The SPF protocol relies on sender domains to publish a DNS whitelist of their
+designated outbound mailers.  Given an envelope sender, Mail::SPF::Query
+determines the legitimacy of an SMTP client IP.
+
+About SPF:         http://www.openspf.org
+Mail::SPF::Query:  http://search.cpan.org/dist/Mail-SPF-Query
+
+USAGE
+
+  perl -MMail::SPF::Query -le \
+    'print for Mail::SPF::Query->new( helo=>shift, ipv4=>shift, sender=>shift )->result' \
+    helohost.example.com 1.2.3.4 user@example.com
+      
+  pass     (client 1.2.3.4 is an authorized mailer for sender domain example.com)
+  fail     (client 1.2.3.4 is not an authorized mailer for sender domain example.com)
+  softfail (client 1.2.3.4 is not an authorized mailer for transitioning sender domain example.com)
+  neutral  (client 1.2.3.4 is neither authorized nor denied by sender domain example.com)
+  none     (sender domain example.com does not designate sender policy)
+  error    (temporary failure while resolving sender policy for sender domain example.com)
+  unknown  (sender domain example.com has an invalid sender policy)
+
+NON-STANDARD FEATURES
+
+  * trusted-forwarder.org support
+  * best_guess support
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+  Sys::Hostname::Long
+  Net::DNS 0.46+
+  Net::CIDR::Lite 0.15+
+  URI::Escape
+
+COPYRIGHT AND LICENCE
+
+Released under the same terms as Perl, i.e. the GPL-2 and Artistic License.
+
+Copyright (C) 2003-2005 Meng Weng Wong <mengwong+spf@pobox.com>
+Contributions by various members of the SPF project <http://www.openspf.org>

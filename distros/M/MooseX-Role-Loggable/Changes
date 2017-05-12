@@ -1,0 +1,72 @@
+0.114   12.02.17
+        * GH #3: Improved docs. (Shlomi Fish)
+        * GH #2: Switch back to the more-maintained namespace::autoclean.
+          (Karen Etheridge)
+        * GH #5: Do not ship with Build.PL.
+
+0.113   14.10.16
+        * Provide a META.json file.
+        * Removed some duplication in resources in metadata.
+
+0.112   30.12.12
+        * Use namespace::sweep instead of namespace::autoclean. The latter
+          brings up Class::MOP, which is clearly unnecessary here.
+        * Fix some override in tests to help out perl 5.8.8.
+
+0.111   29.12.12
+        * 100% testing coverage.
+
+0.110   05.12.12
+        * Now it's possible to send a logger *and* to override a value.
+          The value will be overridden in the logger.
+
+0.101   05.12.12
+        * Log deprecation warning as well.
+
+0.100   04.12.12
+        * Setting logger_ident to object name instead of role name.
+        * Deprecating log_fields (just pass "logger" attribute instead).
+          It will be removed in the next version. Probably.
+        * Documentation improvements.
+
+0.010   04.11.12
+        * No functional changes.
+        * Document a hard-to-debug situation.
+          (not a bug of MooseX::Role::Loggable)
+
+0.009   24.08.12
+        * GH #1: Allow Log::Dispatchouli::Proxy as well.
+          (thanks, Peter Shangov)
+
+0.008   22.07.12
+        * Move to Moo instead of Any::Moose.
+        * Require Sys::Syslog 0.25.
+
+0.007   03.01.12
+        * Finally remove prereq of Moose!
+
+0.006   03.01.12
+        * Adding Sys::Syslog 0.16 as a prereq.
+
+0.005   29.12.11
+        * Add log_fields method to allow to easily propagate preferences
+          to other objects.
+        * Change tests to use Any::Moose.
+
+0.004   27.07.11
+        * Use Any::Moose instead of Moose directly.
+        (this makes it possible to use with Moose or Mouse)
+
+0.003   25.04.11
+        * Adding log_file, log_path, log_pid, log_fail_fatal, log_muted
+          and log_quiet_fatal.
+        * Added set_debug and clear_debug.
+        * Added clear_prefix, set_muted, clear_muted.
+        * The method debug() no longer carries a trigger and the boolean
+          is instead propagated to the Log::Dispatchouli object.
+
+0.002   22.03.11
+        * Add a synopsis.
+
+0.001   21.03.11
+        * It's out!

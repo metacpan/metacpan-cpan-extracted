@@ -1,0 +1,6 @@
+0.02  Tue, 14 Jul 2009 14:48:42 +0200
+ * Load Module::Install::Base explicitly so that Module::Install correctly
+   finds us if we're the first extension loaded.
+
+0.01  Fri, 03 Jul 2009 03:51:28 +0200
+  * Initial release.

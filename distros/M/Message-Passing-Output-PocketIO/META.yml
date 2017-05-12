@@ -1,0 +1,27 @@
+---
+abstract: 'Output passing message as PocketIO Server'
+author:
+  - 'chenryn <chenryn@>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Message-Passing-Output-PocketIO
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyMQ: 0
+  Data::Section::Simple: 0
+  JSON: 0
+  Message::Passing: 0
+  PocketIO: 0
+  PocketIO::Client::IO: 0
+version: 0.01

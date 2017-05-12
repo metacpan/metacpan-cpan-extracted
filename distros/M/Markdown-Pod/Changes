@@ -1,0 +1,39 @@
+Release history for Markdown-Pod
+
+0.006     2015-02-22 17:41:28+09:00 Asia/Seoul
+    - [GitHub #6] Use a stack to handle styles inside other styles (ZMUGHAL)
+    - [GitHub #5] Smarter use of code formatting (ZMUGHAL)
+    - [GitHub #4] Formatting fixes (ASPEER)
+        - Adding --dialect option to script command line
+        - Adding missing methods (e.g. auto_link, horizontal rule)
+          to Handler.pm
+        - Adding simple table formatting to Handler.pm
+        - Changing block-quote formatting so it produces output
+          compatible with Pod::Simple::HTML
+
+0.005     2013-12-15 17:50:43 Asia/Seoul
+    - remove File::Slurp module dependency
+    - [GitHub #3] insisting on Markdent v0.23 or later,
+      in order to properly support lazy list numbering. (JMAC)
+
+0.004     2013-12-12 16:35:19 Asia/Seoul
+    - [GitHub #2] add handler support for HTML entities (JMAC)
+
+0.003     2012-07-26 21:04:23 Asia/Seoul
+    - handle Markdent 0.22's line_break event
+      - separate paragraph if line_break is occurred
+    - [RT #77887] parse embed html
+      - display html using POD's =begin and =end tag pair
+    - [RT #77889] display list's bullet
+      - Markdent 0.21 supports bullet attribute for list
+
+0.002     2012-06-18 18:06:55 Asia/Seoul
+    - add real world markdown converting test
+      - take markdown from http://advent.perl.kr/2011
+    - do not check attr param for end_html_tag
+    - [RT #75458] apply abigail's patch
+      - emphasis tag will be match with POD's 'I<>'
+      - strong tag will be match with POD's 'B<>'
+
+0.001     2011-12-10 04:15:49 Asia/Seoul
+    First version, released on unsuspecting world.

@@ -1,0 +1,33 @@
+<smon>
+  <general>
+    <email-group id="others">
+      <email>guest@localhost</email>
+    </email-group>
+    <email-group id="secrets">
+      <email>guest@localhost</email>
+      <email>guest2@localhost</email>
+    </email-group>
+    <notifier command="send-email" on="all" email="guest6@localhost,guest6@localhost" />
+  </general>
+
+  <services>
+    <service id="date1">
+      <plugin command="get-date.pl"/>
+      <notifier command="send-email" on="all" email-group="others,secrets" email="guest@localhost,guest3@localhost" />
+    </service>
+    <service id="date2">
+      <plugin command="get-date.pl"/>
+      <ignore-general-notifiers />
+      <notifier command="send-email" on="all" email-group="others,secrets" email="guest4@localhost,guest5@localhost" />
+    </service>
+    <service id="date3">
+      <plugin command="get-date.pl"/>
+      <ignore-general-notifiers />
+      <notifier command="copy-to-file" on="w" format="tsv">
+        <args>
+          <arg>-file</arg>  <arg>testing simple monitor</arg>
+        </args>
+      </notifier>
+    </service>
+  </services>
+</smon>

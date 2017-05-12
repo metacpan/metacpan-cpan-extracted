@@ -1,0 +1,23 @@
+split: (5:00)
+	nat-split foo bar
+	i <- cat nat.conf|grep nr-chunks|awk...
+
+encode$i: split (20:00)
+	nat-pre foo$i bar$i zbr ugh
+
+initmat$i: encode$i (1:00:00)
+	nat-initmat zbr$i ugh foo
+
+ipfp$i: initmat$i (4:00:00)
+	nat-ipfp ...
+
+nat2dic$i: ipfp$i (30:00)
+	nat-mat2dic ...
+
+postbin$i: nat2dic$i (15:00)
+	nat-postbin ...
+
+nat-adddict: postbin$i (20:00)
+	nat-adddict...
+
+

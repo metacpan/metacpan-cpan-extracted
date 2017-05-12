@@ -1,0 +1,96 @@
+Date: Wed, 14 Jun 2000 18:17:41 +0200
+From: Mark Overmeer <markov@ATComputing.nl>
+To: Cristy <cristy@mystic.es.dupont.com>
+Subject: Re: your mail
+Message-ID: <20000614181741.J22766@atcmpg.ATComputing.nl>
+References: <200006141634.e5EGYfI19547@mystic.es.dupont.com>
+Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="5vNYLRcllDrimb99"
+X-Mailer: Mutt 1.0pre4i
+In-Reply-To: <200006141634.e5EGYfI19547@mystic.es.dupont.com>; from cristy@mystic.es.dupont.com on Wed, Jun 14, 2000 at 12:34:41PM -0400
+Status: RO
+Content-Length: 4505
+Lines: 82
+
+--5vNYLRcllDrimb99
+Content-Type: text/plain; charset=us-ascii
+
+* Cristy (cristy@mystic.es.dupont.com) [000614 18:05]:
+> > It what you propose a feature or a designed thing?  You specify the
+> > coordinate of the right-top (NorthEast) wrt to the right-bottom
+> > (SouthEast).  I expect that x=0,y=0,SouthWest will work wrt to
+> > NorthWest.  It is not logical for me to treat North/South differently
+> > from East/West (designed before the fall of the Iron curtain?)
+> 
+> I'll send you a script that illustrates how gravity works.  The x,y
+> offset basically creates a bounding box within the image and the text
+> is placed relative to the virtual bounding box.
+
+As you can see in your own demo script, it is not consequent: W and E
+are inside the square, while N and S are outside... in my run.  Image
+attached.
+
+I changed the line-color you yellow (stroke) which worked, but it still
+does not work for the text.
+
+> Are you using ImageMagick 5.2.0?  When I used the script I sent the
+> text color was indeed yellow.
+
+The latest 5.2.0 (less than 48 hours ago directly from imagemagick.org).
+
+Sorry, no more time to investigate for me today: have to go...
+-- 
+               MarkOv       %-]
+
+------------------------------------------------------------------------
+drs Mark A.C.J. Overmeer                           markov@ATComputing.nl
+AT Computing, UNIX Training and Consultancy    http://www.ATComputing.nl
+http://www.dhp.nl/~markov/                         http://satfoto.dhp.nl
+
+--5vNYLRcllDrimb99
+Content-Type: image/gif
+Content-Disposition: attachment; filename="test.gif"
+Content-Transfer-Encoding: base64
+
+R0lGODlhkAGQAfECAP///wAAAP//AAAAACH5BAAAAAAALAAAAACQAZABAAL+hI+py+0Po5y0
+2ouz3rz7D4biSJbmiabqyrbuC8fyTNf2jef6zvf+DwwKh8Si8YhMKpfMpvMJjUqn1Kr1is1q
+t9yu9wsOi8fksvmMTqvX7Lb7DY/L5/S6/Y7P6/f8vv8PGCg4SFhoeIiYqLjI2Oj4CBkpOUlZ
+aXmJmam5ydnp+QkaKjpKWmp6ipqqusra6voKGys7S1tre4ubq7vL2+v7CxwsPExcbHyMnKy8
+zNzs/AwdLT1NXW19jZ2tvc3d7f0NHi4+Tl5ufo6err7O3u7+Dh8vP09fb3+Pn6+/z9/v/w8w
+oMCBBAsaPIgwocIgARo2VOAwokQAEh8eiLhiYoL+ijI0IqgIkmM6jx8DXHRY0iRElRkxrqxB
+8mTKl+pcbmRJ0eJJnAZ4qrBZ0gZQmUEhrouZ8+ZNnz5TINU54ylPqBePmkRZdKfSrCweYiVK
+wyvVsU3ZWfyadOZOnGVRnIVKNcZbtlOZmmUJlylduDB05hWKl+5WsCMDB16JN63iFn4bA9ba
+sy7Iu2rjYhWrsq3bvZEfQyY7WFtIm2SvNkWZ+Szi0RBGfy2t2HVcCbIPzwS9MSXrbZZNL/A4
+lLHexR2H4/5IefVvtMG7nkZbfPlxeLOb55QcXTnM59ORF2YAHTLhF7Ove0Yc2ju22uzbu38P
+P778+fTrt1+meW35tqf+5WoUkFtUSPUUWW204XcGgGbkBwyDWyhYhoO+SJgFhGRQyAuGV1g4
+hoa6eFgFh2KAiAuJU4gYhom2qBgFimCwSAuMT7j4hYyy2NgEjV7gCAuPS+jYhY+uCJkEkFwQ
+yQqSRxi5hZKqOFkEk1pAiQqVQ0iZhZWmaBkEllhwSQqYP3h5hZiimNkDmVagCQqbO6hZhZue
+yJkDnFTQyQmeN9g5hZ6a+FkDn1IAigmhMwgahaGWKBoDolAwSgmkLzj6hKSSWNoCpU5gCgmn
+K2jahKeOiJoCqEyQygiqJ5i6hKqKuFoCq0rAigitI8iahK2G6BoCrkjwSgiwH/h6hLCCGNv+
+AbFGIAsIsxsoW4SzfkibAbREUMsHthdYO4S2enhbAbdCgIsHuROIyxCCZqALhLl2uBsBuz/A
+Swe9D8jrg71y6NsAvj3wCwfAC/jLg8BuGJwAwTsgzAbDByisg8NqSAwAxDlQjAbFFuOA8Rka
+e6xuGRvf0PGCCYKszMcmp3zyysmoHGHIZIwslMxj0AyTzWLgHJbOYfAclc9gAN2R0F8QLZfR
+XiDdl9JdME2e01xA7ULJMa+L8sstX6011i4jA/OFUj+YNdhbi82y11ybrTbaXYtc9jFhdzi2
+FlQzVneFcRsz94h5Y3F3V39vuHcxfac4uBWBZ5R4iIUTc/iLjVP+sfhPk5/4+DCR13i5FJU7
+1XmLmQuz+Y6hQ/G5W6fPOHowpQe5uhOpn2C12zO33mAEHE22FkOTucregWm3xlx1nGKkoHXt
+9ib828RjF2C+OllYnu+/Nc82bdCr9y9OHNpaHfZyUwBddxFD9X2uKtZO9wTF8zUvT7M7YJn7
++AmAf/76749/Q/pH9D/+CXCABCygAQnovwMqcIEMbGABE5g/CB6QfX4jn19iczz5VSok9hue
+9lJjHopYDwHza4D5TIgfAy1FhCGUzG5AoEKquEiFTpENVwhUINckDjjhKRj6NmgU8fHNAkBR
+3sV+uKn1Na581TsfS0oInrI4iIKII+L+Cbv3xOgtS4q6m9xwroUSCDVxeehpjRevt8UBjSt4
+ZvTgzXD3i9cdKXY5guOEztY+573xa+NrWx6zdzs+DtGPFdTjzuzYCzk2iY5MgOIIqCg5QlbR
+kD9DZIbwWEhA7nFtfYSbIA2HyUlq8pCfhFwoI0nJoVlyF4qcEiN/tMoPnZJzbiQlJwfpyVuC
+UpKoHGUlS6m5WZqulr/UpSl5SctUHi2WuWhlll6pBEeKAJLJDKQxg4nMYSpzacwskTBhR0xV
+ApN035xjOJc5TteVc5Hn5GY6c5dNcG7zad28hTO/BM0i1XNF63RlO+n5zjj285n/nNo+a3HP
+MuUTCdIMATX+tWlN23Uyon+c6CYlikuKZtKitsToLnPp0WOCtKIZvShJP6pRUXK0mCHF5kg3
+WtKOnlSkKe3lSsV5TXLG05zzNGhA77hTdvaUbD9N5EDxWVCi5lSdQfXnUO120BgdVaFJhWpR
+L9lUgj5Vb1dl5VTXtNAlRXUWCQVrVbm6VHi+VKUxZelMXVrTat4UnWkVaFaRulXAjfVGX41T
+WI3QUBim0D6ELaxhD4vYxMJnIYwNEu92J5IchoV3C3ssDdHxmsbk5TmTNYwPPSue8ZhjOky0
+y2TTQ7K6oJaF39EiccKjp/pVNoiiZS1mSdudMf7kigJSbW3v0sT3sQUwut1OcE3+a5Xj6oZ7
+vfWU8nhbDjW+BoMcMyJxjUdZ4GK3M5dxYnGb+8XfVuOyy0VPajKzGg5WgLy9y6F6OcBeyd7Q
+tvHlDWxJ08PUfre5831oH7ijHfnmrIwck858zRJFA6tlwDQp8HIObNvocpbAnUntg4944QrT
+9hybReFqs1MgHy5Yw6EdbXY3XJXqRta7+K1vY18M4xjLeMY0rrGNb4zjHOt4xzzusY9/DOQg
+C3nIRC6ykY+M5CQreclMbrKTnwzlKEt5ylSuspWvjOUsa3nLXO6yl78M5jCLecxkLrOZz4zm
+NKt5zWxus5vfDOc4y3nOdK6zne+M5zzrec987rOf/wwg6EALetCELrShD43oRCt60YxutKMf
+DelIS3rSlF50AQAAOw==
+
+--5vNYLRcllDrimb99--

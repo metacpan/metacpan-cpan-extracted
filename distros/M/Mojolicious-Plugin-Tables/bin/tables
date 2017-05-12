@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+
+die qq[usage: tables [dbi-connect-params]
+    e.g. tables 'dbi:Pg:dbname="mydb"' myusr mypwd
+] unless @ARGV;
+
+package Tables;
+use Mojo::Base 'Mojolicious';
+use Mojolicious::Commands;
+
+sub startup { shift->plugin(Tables => {connect_info=>\@ARGV}) }
+
+Mojolicious::Commands->start_app(Tables=>'daemon');
+

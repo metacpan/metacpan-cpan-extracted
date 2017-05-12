@@ -1,0 +1,12 @@
+Revision history for Maypole-Plugin-ColumnGroups
+
+0.3     Fri  12 Aug,  2005 23:30
+        - added field_groups config accessor
+
+0.2     Thur 21 July, 2005 22:50
+        - re-designed the data structure, from ColGroup => { table => [ @cols ] }, to 
+            table => { ColGroup => $col_or_cols }
+
+0.1     Thur 21 July, 2005 11:15
+        - First version, released on an unsuspecting world.
+

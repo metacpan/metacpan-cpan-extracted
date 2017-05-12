@@ -1,0 +1,9 @@
+<h1>Search Books</h1>
+
+<form>
+Search terms: <input type="text" name="query" value="<% $query %>">
+</form>
+
+<%args>
+$query => undef;
+</%args>

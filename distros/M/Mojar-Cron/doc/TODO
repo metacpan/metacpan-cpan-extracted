@@ -1,0 +1,5 @@
+* overload "" for Mojar::Cron::Datetime so can say "$day" instead of
+  $day->to_string
+* be able to parse existing crontab file.
+* be able to dump a crontab ordered according to next invocation time relative
+  to a given datetime.

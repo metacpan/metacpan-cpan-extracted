@@ -1,0 +1,17 @@
+---
+development:
+    dsn: dbi:Pg:dbname=nourdb_dev
+    username: nour
+    password: sharabash
+production:
+    dsn: dbi:Pg:dbname=nourdb_prod
+default:
+    database: production
+    username: nour
+    password: nour
+    option:
+        AutoCommit: 1
+        RaiseError: 1
+        PrintError: 1
+        pg_bool_tf: 0
+        pg_enable_utf8: 1

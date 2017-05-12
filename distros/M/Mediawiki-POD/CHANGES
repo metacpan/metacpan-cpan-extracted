@@ -1,0 +1,47 @@
+
+2007-05-05 v0.06 Tels 29 tests
+  * require Graph::Easy 0.55
+  * remove tabs and form-feeds from output
+  * fixlinks in the form of L</foo> to not contain spurious quotes
+  * prevent an endless loop in the crude HTML parsing to remove newlines
+  * add support for "graph-common" sections
+  * add second parameter (space replacement char) to keyword_search_url()
+  * "graph" sections at the very end were silently dropped
+  * Fix the failing basic tests. They were failing since the test used another
+    Perl than the one that the tested script had, thus not finding Graph::Easy
+    from the temp. test setup - thanx David Cantrell for figuring this out!
+
+2007-03-18 v0.05 Tels 17 tests
+  * require Graph::Easy 0.54
+  * some fixes for "=begin graph .. =end graph" sections
+  * keywords are now linked to a search engine
+  * add keyword_search_url() to set the URL for the keyword links
+
+2007-03-11 v0.04 Tels 17 tests
+  * require Graph::Easy
+  * convert "=begin graph .. =end graph" to HTML-graphs
+  * add some options to Mediawiki::POD
+    + remove_newlines(): default to true
+    + body_only(): default to true
+  * headlines with spaces in them are now correctly linked from the TOC
+  * the TOC nesting is now correct
+  * we handle X<keywords> and generate them with their own div and span
+
+2007-03-09 v0.03 Tels 11 tests
+  * rewrite the plugin code to use pipes instead of the commandline,
+    this makes it work with inputs of any size. Unfortunately, it
+    generates a hard dependency on PHP 4 (or PHP 5, depending). Ugh.
+  * we need to replace newlines inside <pre> sections with <br>
+  * hopefully fix the failing tests due to Pod::Simple::HTML missing
+  * create a subclass of Pod::Simple::HTML, this makes it possible
+    to create a table of contents (collapsable with JS)
+  * clean up some of the generated HTML of unwanted junk
+
+2007-03-03 v0.02 Tels 1 tests
+  * replace newlines by spaces, otherwise sentences are stuck together
+  * remove unwanted HTML (like the <head> section, <body>, comments etc.)
+  * fix the warning about undefined variable
+
+2007-03-02 v0.01 Tels 1 tests
+  * first version
+

@@ -1,0 +1,54 @@
+---
+abstract: 'Build command line apps with subcommands and option parsing'
+author:
+  - 'Eric Johnson <eric.git@iijo.org>'
+build_requires:
+  Test::Compile: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-Commander
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MooX::Commander:
+    file: lib/MooX/Commander.pm
+    version: '0.03'
+  MooX::Commander::HasOptions:
+    file: lib/MooX/Commander/HasOptions.pm
+  MooX::Commander::HasSubcommands:
+    file: lib/MooX/Commander/HasSubcommands.pm
+  MooX::Commander::IsaHelpCommand:
+    file: lib/MooX/Commander/IsaHelpCommand.pm
+requires:
+  Class::Load: '0'
+  Getopt::Long: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Path::Tiny: '0'
+  String::CamelSnakeKebab: '0'
+  Syntax::Keyword::Junction: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/kablamo/MooX-Commander/issues
+  homepage: https://github.com/kablamo/MooX-Commander
+  repository: git://github.com/kablamo/MooX-Commander.git
+version: '0.03'
+x_authority: cpan:KABLAMO
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Eric Johnson <github@iijo.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

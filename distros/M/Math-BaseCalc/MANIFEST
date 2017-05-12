@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+SIGNATURE
+dist.ini
+lib/Math/BaseCalc.pm
+t/01_basic_tests.t
+t/02_digit_dash.t
+t/03_large_int.t
+t/04-bigint.t
+t/05-trans.t
+t/99_podcoverage.t
+t/author-critic.t

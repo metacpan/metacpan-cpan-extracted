@@ -1,0 +1,18 @@
+# This file acts as the project's changelog.
+
+`Module-Install-TrustMetaYml 0.001 cpan:TOBYINK`
+	issued       2011-10-06;
+	label        "Initial release".
+
+`Module-Install-TrustMetaYml 0.002 cpan:TOBYINK`
+	issued       2012-07-05;
+	changeset [
+		item "Reduce list of dependencies."^^Change;
+		item "Support Perls prior to 5.8."^^Change;
+	].
+
+`Module-Install-TrustMetaYml 0.003 cpan:TOBYINK`
+	issued       2013-03-20;
+	changeset [
+		item "No need to bundle Scalar::Util in 'inc' directory."^^Change;
+	].

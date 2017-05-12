@@ -1,0 +1,99 @@
+NAME
+    MouseX::Types::URI - A URI type library for Mouse
+
+SYNOPSIS
+  CLASS TYPES
+      package MyApp;
+      use Mouse;
+      use MouseX::Types::URI;
+
+      has 'uri' => (
+          is     => 'rw',
+          isa    => 'URI',
+          coerce => 1,
+      );
+
+      has 'data' => (
+          is     => 'rw',
+          isa    => 'URI::data',
+          coerce => 1,
+      );
+
+      has 'file' => (
+          is     => 'rw',
+          isa    => 'URI::file',
+          coerce => 1,
+      );
+
+  CUSTOM TYPES
+      package MyApp;
+      use Mouse;
+      use MouseX::Types::URI qw(Uri DataUri FileUri);
+
+      has 'uri' => (
+          is     => 'rw',
+          isa    => Uri,
+          coerce => 1,
+      );
+
+      has 'data' => (
+          is     => 'rw',
+          isa    => DataUri,
+          coerce => 1,
+      );
+
+      has 'file' => (
+          is     => 'rw',
+          isa    => FileUri,
+          coerce => 1,
+      );
+
+DESCRIPTION
+    MouseX::Types::URI creates common Mouse types, coercions and option
+    specifications useful for dealing with URIs as Mouse attributes.
+
+    Coercions (see Mouse::Util::TypeConstraints) are made from "Str",
+    "ScalarRef", "HashRef", Path::Class::Dir and Path::Class::File to URI,
+    URI::data and URI::file objects.
+
+TYPES
+  Uri
+        Either URI or URI::WithBase.
+
+        Coerces from "Str" via "new" in URI.
+
+        Coerces from Path::Class::File and Path::Class::Dir via "new" in
+        URI::file.
+
+        Coerces from "ScalarRef" via "new" in URI::data.
+
+        Coerces from "HashRef" using URI::FromHash.
+
+  DataUri
+        A URI whose scheme is "data".
+
+        Coerces from "Str" and "ScalarRef" via "new" in URI::data.
+
+  FileUri
+        A URI::file class type.
+
+        Coerces from "Str", Path::Class::File and Path::Class::Dir via "new"
+        in URI::file
+
+AUTHOR
+    NAKAGAWA Masaki <masaki@cpan.org>
+
+THANKS TO
+    Yuval Kogman, "AUTHOR" in MooseX::Types::URI
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Mouse, MouseX::Types,
+
+    URI, URI::data, URI::file, URI::WithBase, URI::FromHash,
+
+    MooseX::Types::URI
+

@@ -1,0 +1,64 @@
+#!/usr/bin/ucblogo
+
+;; Copyright 2012, 2014 Kevin Ryde
+;;
+;; This file is part of Math-PlanePath.
+;;
+;; Math-PlanePath is free software; you can redistribute it and/or modify it
+;; under the terms of the GNU General Public License as published by the Free
+;; Software Foundation; either version 3, or (at your option) any later
+;; version.
+;;
+;; Math-PlanePath is distributed in the hope that it will be useful, but
+;; WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+;; or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+;; for more details.
+;;
+;; You should have received a copy of the GNU General Public License along
+;; with Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
+
+
+;; hexagons overlapping much but slowly expanding
+
+
+to fibbinary.next :n
+  localmake "filled  bitor :n (lshift :n -1)
+  localmake "mask    lshift (bitxor :filled (:filled + 1)) -1
+  output (bitor :n :mask) + 1
+end
+
+
+; to print.binary :n
+;   do.while [
+;      type  bitand :n 1
+;      make "n  lshift :n -1
+;   ] [:n <> 0] 
+;   print "
+; end
+
+; make "n 0
+; for [i 0 21 1] [
+;    print "n
+;    print :n
+;    print.binary :n
+;    make "n  fibbinary.next :n
+; ]
+
+to fib.hex :steps
+  ; right 90
+  ; left 45
+  ; penup
+  ; back 300
+  ; right 90
+  ; pendown
+
+  localmake "step.len 10
+  localmake "n 0
+  for [i 0 :steps 1] [
+     forward :step.len
+     if (bitand :n 1)=0 [left 60] [right 60]
+     make "n  fibbinary.next :n
+  ]
+end
+
+fib.hex 210000

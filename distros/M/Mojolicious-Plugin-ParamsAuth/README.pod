@@ -1,0 +1,62 @@
+=head1 NAME
+
+Mojolicious::Plugin::ParamsAuth - URL Parameters Auth Helper
+
+=head1 DESCRIPTION
+
+L<Mojolicous::Plugin::ParamsAuth> is a helper for authenticating using url parameters
+
+=head1 USAGE
+
+    # Request:
+    GET /?userinput=username&passinput=password
+
+
+    use Mojolicious::Lite;
+
+    plugin 'params_auth';
+
+    get '/' => sub {
+        my $self = shift;
+
+        return $self->render_text('ok')
+          if $self->params_auth(userinput => passinput =>
+              sub { return 1 if "@_" eq 'username password' });
+    };
+
+    app->start;
+
+Any number of parameters can be specified:
+
+    $self->params_auth( one => two => three => four => sub { } )
+
+The subroutine callback receives form values as the parameter list.
+
+=head1 METHODS
+
+L<Mojolicious::Plugin::ParamsAuth> inherits all methods from
+L<Mojolicious::Plugin> and implements the following new ones.
+
+=head2 C<register>
+
+    $plugin->register;
+
+Register condition in L<Mojolicious> application.
+
+=head1 SEE ALSO
+
+L<Mojolicious>
+
+=head1 DEVELOPMENT
+
+L<http://github.com/tempire/mojolicious-plugin-paramsauth>
+
+=head1 VERSION
+
+0.01
+
+=head1 AUTHOR
+
+Glen Hinkle tempire@cpan.org
+
+=cut

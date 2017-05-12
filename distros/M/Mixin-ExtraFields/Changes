@@ -1,0 +1,42 @@
+Changelog for Mixin-ExtraFields
+
+0.140002  2013-10-03 19:20:01 America/New_York
+          fix documentation embarrassments (thanks, fschlich@github!)
+
+0.140001  2013-09-28 21:58:59 America/New_York
+          woah! replace *ancient* Dist::Zilla configuration
+
+0.132720  2013-09-28 21:55:52 America/New_York
+          update bugtracker, repo links
+
+0.100971  2010-04-07 08:00:05 America/New_York
+          make all package version numbers match
+
+0.100970  2010-04-06 21:49:43 America/New_York
+          repackage with Dist::Zilla to fix some packaging issues in 0.008
+
+0.008     2010-01-18
+        - allow the user to specify a different driver base class
+        - allow the user to provide a driver instance to ->import
+
+0.007     2007-11-14
+          prereqs incorrect: missing Sub::Exporter and ::Install
+
+0.006     2007-11-13
+          manifest was missing key file
+
+0.005     2007-11-07
+          explicit undef for 'id' uses object reference address
+
+0.004     2006-12-11
+        - greatly improve test coverage, fixing major Drver.pm bugs
+        - correct behavior of common ids under HashGuts
+
+0.003     2006-12-11
+          improve uniqueness of default HashGuts key
+
+0.002     2006-12-10
+          some documentation improvements
+
+0.001     2006-12-09
+          first release

@@ -1,0 +1,10 @@
+Revision history for Perl extension Mac::QuickBundle.
+
+0.03  Sat Jun  4 18:49:39 CEST 2011
+    - Don't try to skip bundling of files that are not there.
+
+0.02  Mon May 30 23:24:45 CEST 2011
+    - Various build/test fixes.
+
+0.01  Sun May 29 10:06:04 CEST 2011
+    - First public release.

@@ -1,0 +1,27 @@
+sudo: false
+language: perl
+perl:
+  - "5.21"
+  - "5.20"
+  - "5.18"
+  - "5.16"
+  - "5.14"
+install:
+  - "cpanm -n Mojolicious DBI DBD::mysql"
+  - "cpanm --installdeps --notest ."
+services:
+  - mysql
+env:
+  - "TEST_ONLINE=1"
+before_script:
+  - mysql -e 'create database test;'
+after_script:
+  - mysql -e 'drop database test;'
+notifications:
+  email:
+    on_success:change
+    on_failure:always
+branches:
+  only:
+    - master
+    - devel

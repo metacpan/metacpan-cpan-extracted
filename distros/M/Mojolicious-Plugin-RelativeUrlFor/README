@@ -1,0 +1,35 @@
+Mojolicious::Plugin::RelativeUrlFor - relative links in Mojolicious, really.
+
+This plugin adds two useful helpers to Mojolicious, that help you using URLs
+relative to the request URL: relative_url_for and rel_url_for. It's also
+possible to replace the url_for helper which influences link_to and form_for.
+
+Installation:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Basic usage:
+
+    # Mojolicious
+    $self->plugin('RelativeUrlFor');
+
+    # Mojolicious::Lite
+    plugin 'RelativeUrlFor';
+
+    # In your actions:
+    $rel_url = $self->rel_url_for('foo', bar => 'baz');
+
+    # In your templates:
+    <%= rel_url_for 'foo', bar => 'baz' %>
+
+For more informations, see the inlined POD documentation in
+lib/Mojolicious/Plugin/RelativeUrlFor.pm or view it in the terminal with
+    
+    perldoc Mojolicious::Plugin::RelativeUrlFor
+
+Copyright Mirko Westermeier <mirko@westermeier.de>
+
+This software is released under the MIT license. See MIT-LICENSE for details.

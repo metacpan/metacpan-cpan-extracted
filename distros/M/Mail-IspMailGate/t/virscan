@@ -1,0 +1,8 @@
+#!/bin/sh
+while test $# -ne 0; do
+    pattern=`grep asd $1`
+    if test "x$pattern" != "x"; then
+	echo "File $1: Virus detected!"
+    fi
+    shift
+done

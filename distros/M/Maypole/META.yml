@@ -1,0 +1,31 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Maypole
+version:      2.13
+version_from: lib/Maypole.pm
+installdirs:  site
+requires:
+    CGI::Simple:                   0
+    CGI::Untaint:                  1.26
+    CGI::Untaint::date:            0
+    CGI::Untaint::email:           0
+    Class::DBI:                    0.96
+    Class::DBI::AbstractSearch:    0
+    Class::DBI::Loader:            0.02
+    Class::DBI::Loader::Relationship: 0
+    Class::DBI::Pager:             0
+    Class::DBI::Plugin::RetrieveAll: 0
+    Class::DBI::Plugin::Type:      0
+    Digest::MD5:                   0
+    File::MMagic::XS:              0.08
+    HTML::Tree:                    0
+    HTTP::Body:                    0.5
+    Template:                      0
+    Template::Plugin::Class:       0
+    Test::MockModule:              0
+    UNIVERSAL::moniker:            0
+    UNIVERSAL::require:            0
+    URI:                           0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

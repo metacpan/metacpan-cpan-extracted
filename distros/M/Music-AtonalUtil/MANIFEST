@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+SIGNATURE
+eg/fortefy
+lib/Music/AtonalUtil.pm
+t/00-load.t
+t/Music-AtonalUtil.t
+t/forte2pcs2forte.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

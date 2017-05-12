@@ -1,0 +1,32 @@
+BUGS
+CHANGES
+lib/Math/BigRat.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00sig.t
+t/01load.t
+t/02pod.t
+t/03podcov.t
+t/author-blog-mbr.t
+t/author-relop-mbr.t
+t/big_ap.t
+t/bigfltpm.inc
+t/bigfltrt.t
+t/biglog.t
+t/bigrat.t
+t/bigratpm.inc
+t/bigratpm.t
+t/bigratup.t
+t/bigroot.t
+t/bitwise.t
+t/hang.t
+t/Math/BigRat/Test.pm
+t/requirer.t
+t/trap.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

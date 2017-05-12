@@ -1,0 +1,70 @@
+[% IF statustext %]
+<p align="center">
+    <div class="[% statuscolor %]">[% tr.tr(statustext) %]</div>
+</p>
+[% END %]
+<p align="center">
+    <table class="data" id="MainDataTable">
+        <tr class="tabheader">
+                <th>[% tr.tr("OS") %]</th>
+                <th>[% tr.tr("def. Servicepack") %]</th>
+                <th>[% tr.tr("def. Domain") %]</th>
+                <th></th>
+                <th></th>
+        </tr>
+        [% FOREACH os IN oss %]
+        <form name="os_[% os.operating_system %]" method="post" action="[% webpath %]">
+        <tr>
+                <td>
+                    <input type="hidden" name="operating_system" value="[% os.operating_system %]">
+                    <input type="text" name="newoperating_system" value="[% os.operating_system %]">
+                </td>
+                <td><input type="text" name="default_servicepack" size="5" maxLength="60" value="[% os.default_servicepack %]"></td>
+                <td>
+                    <select name="default_domain">
+                        [% FOREACH domain IN domains %]
+                            <option value="[% domain %]"
+                                [% IF os.default_domain == domain %]
+                                    selected="selected"
+                                [% END %]
+                            >
+                            [% domain %]
+                            </option>
+                        [% END %]
+                    </select>
+                </td>
+                <td>
+                        <input type="hidden" name="mode" value="change" id="mode_[% os.operating_system %]">
+                        <input type="submit" value="[% tr.tr("Change") %]">
+                </td>
+                <td>
+                    <input type="submit" value="[% tr.tr("Delete") %]" onClick="return confirmDeleteOS('os_[% os.operating_system %]', 'mode_[% os.operating_system %]');">
+                </td>
+        </tr>
+        </form>
+        [% END %]
+        <form name="os_new" method="post" action="[% webpath %]">
+        <tr>
+                <td><input type="text" name="operating_system" size="30" maxLength="60" value=""></td>
+                <td><input type="text" name="default_servicepack" size="5" maxLength="60" value="0"></td>
+                <td>
+                    <select name="default_domain">
+                        <option value="" selected="selected"></option>
+                        [% FOREACH domain IN domains %]
+                            <option value="[% domain %]">
+                            [% domain %]
+                            </option>
+                        [% END %]
+                    </select>
+                </td>
+                <td>
+                        <input type="hidden" name="mode" value="create">
+                        <input type="submit" value="Create">
+                </td>
+                <td></td>
+        </tr>
+        </form>
+    </table>
+    
+    
+</p>

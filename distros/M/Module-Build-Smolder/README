@@ -1,0 +1,99 @@
+NAME
+    Module::Build::Smolder - Extra build targets for sending smoke tests to
+    a Smolder server
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+    Easily add support for extra build targets to send TAP Archives to a
+    Smolder server
+
+    In your Build.PL
+
+        use Module::Builder::Smolder;
+        my $builder = Module::Builder::Smolder->new(
+            ...
+        );
+
+    Now you get these build targets
+
+        ]$ perl Build.PL
+        ]$ ./Build smolder ...
+
+NEW TARGETS
+    The following build targets are provided:
+
+  smolder
+    Create a TAP archive and then send it to Smolder.
+
+   Required Flags
+     This target needs to know where to send the archive, so it needs the following options:
+
+    --server
+    --project_id
+
+        ]$ ./Build smolder --server mysmolder.com --username foo --password s3cr3t --project_id 5
+
+   Optional Flags
+    --username
+        The Smolder user uploading the report. If not specified it will be
+        uploaded anonymously
+
+    --password
+    --archive_file
+        Specify the file to store the archive
+
+    --architecture
+        Name of the architecture for the report
+
+    --platform
+        Name of the CPU platform
+
+    --tags
+        Comma separated list of tags for this report
+
+    --comments
+        Free form text to associate with the smoke report
+
+    --use_existing_archive
+        If you've already run the tests and created a TAP Archive and you
+        just want to submit that one to Smolder again, use this flag so that
+        it doesn't run the tests again. Really useful when troubleshooting.
+
+AUTHOR
+    Michael Peters, "<mpeters at plusthree.com>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-module-build-taparchive at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Module-Build-Smolder>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Module::Build::Smolder
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Module-Build-Smolder>
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/Module-Build-Smolder>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/Module-Build-Smolder>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/Module-Build-Smolder/>
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Michael Peters, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

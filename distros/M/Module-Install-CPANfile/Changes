@@ -1,0 +1,27 @@
+Revision history for Perl extension Module::Install::CPANfile
+
+0.12  Wed Jun  5 12:27:07 JST 2013
+        - Up Module::CPANfile dependency
+        - Include Module::CPANfile's all packages in there
+
+0.11  Thu Jan 31 15:06:30 PST 2013
+        - Experimental: Enable dynamic_config 0 by default
+        - Increase the dependency for and include the latest Module::CPANfile
+
+0.10  Wed Jan 30 19:48:04 PST 2013
+        - Major update to cpanfile command: now it actually updates MYMETA
+          files upon installation, bypassing M::I and EUMM conversion
+        - Checks all requirements in author mode using CPAN::Meta::Check
+
+0.04  Fri Apr 13 18:13:45 CST 2012
+        - Fixed dependencies
+        - Added xt tests (xaicron)
+
+0.03  Thu Apr 12 20:51:21 JST 2012
+        - Fix version range to a minimum version requirement so that Module::Install can understand (xaicron)
+
+0.02  Thu Apr 12 20:25:44 JST 2012
+        - Fix runtime requires
+
+0.01  Thu Apr 12 19:46:19 2012
+        - original version

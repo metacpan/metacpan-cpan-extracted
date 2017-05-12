@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 dc45d2b0dd97b2c63573dd47735c2d3260184eee AUTHOR_PLEDGE
+SHA1 c9517f5a5e446503731f2e407b3b5e2efbbe4b4f CONTRIBUTORS
+SHA1 fddd998da83d2670430f958b4b7d5f40cbf2d51b Changes
+SHA1 f86e36f00de333514756d1846a40bb9398084a0c INSTALL
+SHA1 96d23fd0d5fce92a90b5c6cce7a1d10dc7f7afe8 LICENSE
+SHA1 2cfd880008620b81f1c7c0110b16927ae196819e MANIFEST
+SHA1 3dc8d6b9f9ecacf1ac3e79e455085cf02746b254 META.json
+SHA1 5a935fb4c1d279a4c9c1f7cd46e9649c4d0885e4 META.yml
+SHA1 740527b3e0d24b4293c588b3750ab1b6876c4e9f Makefile.PL
+SHA1 941ebc41183882beb1e739ca77da56fe6d3dda37 README
+SHA1 5c20ef0df30e830fbdc9a29b2cfea94637709601 cpanfile
+SHA1 6514cdc1b4281b67649117df9403ab4d7b6f39b7 doap.xml
+SHA1 8369b56e5b30e90e030d9bf3c2e99fdadb9760fe lib/MoobX.pm
+SHA1 b2e5ee65e717e44be0306d56f346d791bf06abaf lib/MoobX/Array.pm
+SHA1 9631fd37bf5bd04a86282cfe034fe0f526128a87 lib/MoobX/Array/Observable.pm
+SHA1 266c44ec2ff9e138bc1b173560d6de3a26073223 lib/MoobX/Attributes.pm
+SHA1 9aa58a7a5915740c82f5852e12ee476aa4ff9636 lib/MoobX/Hash.pm
+SHA1 4ff7c5fa75883f650108bcbd1857400813928ae7 lib/MoobX/Hash/Observable.pm
+SHA1 77a9c080c7ab810853cda90a78da0618e743cd7e lib/MoobX/Observer.pm
+SHA1 ca419de4e4ce5e77c884a7e32724ba0264b2a5f4 lib/MoobX/Scalar.pm
+SHA1 61d2be82c9fd8062c559c393e7bad80e23aceb8d lib/MoobX/Scalar/Observable.pm
+SHA1 0e2658323fd3ce4df7efb72f100027c969371e7c lib/MoobX/Trait/Observable.pm
+SHA1 cd6d76ab67898facec73e50efcfe4b9ac28d5410 lib/MoobX/Trait/Observer.pm
+SHA1 85f1d411afbd9d2f4e7f0e7f22b53eecbcacaafa t/00-compile.t
+SHA1 3eb0cf3a3fd3f6aa4eaeb1197938dd7abfddfe6c t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 eb75046d868905b88242c6a888aa11f80345fea5 t/array.t
+SHA1 6dba76a3683327ed8b6bc75546b4f05f298dfed9 t/attributes.t
+SHA1 4d3ba056374e2797ac33dc00e11ae7fc4cc6a3c5 t/autorun.t
+SHA1 deda7aa1ac563c2e6d7af6a586cefa925e6a6442 t/hash.t
+SHA1 fe204a39d46016dddc882758a84e644bb445bd4e t/mixed.t
+SHA1 15b14dd1b6f4da91147b234dc4d2f07e2fb541b2 t/moose.t
+SHA1 ae01172afbdcc1cb9a720d8ec0f79ae85d79b9a8 t/no-deps.t
+SHA1 e5176c4e346cd7eda370116d9f20517479561235 t/scalar.t
+SHA1 80ab1faf5d8174920b60461bf8c11e2225861f42 xt/release/pause-permissions.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAlh6qtMACgkQ34Hwf+GwC4yyKACfV21urNbT2zozzocA+KP1WbwO
+dq8AoJwcfEd7cHzX20rK7XeNEyHYS+Sy
+=XKok
+-----END PGP SIGNATURE-----

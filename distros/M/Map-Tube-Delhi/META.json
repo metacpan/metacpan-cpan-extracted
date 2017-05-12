@@ -1,0 +1,91 @@
+{
+   "abstract" : "Interface to the Delhi Metro Map.",
+   "author" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Map-Tube-Delhi",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Map::Tube" : "0.25",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "utf8" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "File::Share" : "0.25",
+            "Map::Tube" : "3.28",
+            "Moo" : "2.000000",
+            "namespace::clean" : "0.24",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Map::Tube::Delhi" : {
+         "file" : "lib/Map/Tube/Delhi.pm",
+         "version" : "0.54"
+      },
+      "Map::Tube::Delhi::Line::Blue" : {
+         "file" : "lib/Map/Tube/Delhi/Line/Blue.pm",
+         "version" : "0.54"
+      },
+      "Map::Tube::Delhi::Line::Green" : {
+         "file" : "lib/Map/Tube/Delhi/Line/Green.pm",
+         "version" : "0.54"
+      },
+      "Map::Tube::Delhi::Line::Orange" : {
+         "file" : "lib/Map/Tube/Delhi/Line/Orange.pm",
+         "version" : "0.54"
+      },
+      "Map::Tube::Delhi::Line::Red" : {
+         "file" : "lib/Map/Tube/Delhi/Line/Red.pm",
+         "version" : "0.54"
+      },
+      "Map::Tube::Delhi::Line::Violet" : {
+         "file" : "lib/Map/Tube/Delhi/Line/Violet.pm",
+         "version" : "0.54"
+      },
+      "Map::Tube::Delhi::Line::Yellow" : {
+         "file" : "lib/Map/Tube/Delhi/Line/Yellow.pm",
+         "version" : "0.54"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/manwar/Map-Tube-Delhi",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/Map-Tube-Delhi.git",
+         "web" : "https://github.com/manwar/Map-Tube-Delhi"
+      }
+   },
+   "version" : "0.54",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+}
+

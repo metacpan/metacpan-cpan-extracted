@@ -1,0 +1,197 @@
+#!/usr/bin/env perl
+# This is a WebFinger server and discoverer
+# for Mojolicious::Plugin::WebFinger
+#
+# You can run the app by starting the server with
+#
+#  $ webfingerapp-async daemon
+#
+# or by using either morbo or hypnotoad.
+#
+# -------------------------------------
+# Copyright (C) 2011-2013, Nils Diewald
+# http://nils-diewald.de/
+# -------------------------------------
+#
+# Todo: Add -secure and -rel features
+#
+
+use Mojolicious::Lite;
+
+use lib 'lib', '../lib';
+
+plugin 'WebFinger';
+
+# Default varianles
+app->defaults(
+  title => 'WebFinger Demo'
+);
+
+
+# Check for existence
+app->callback(prepare_webfinger => sub {
+  my ($c, $res) = @_;
+  if ($res =~ /^(?:acct\:)?(akron|nils)\@/i) {
+    $c->stash(user => $1);
+    return 1;
+  };
+  return;
+});
+
+
+# Add a link to a served webfinger
+hook before_serving_webfinger => sub {
+  my ($c, $res, $xrd) = @_;
+  my $path = '/' . $c->stash('user') . '/me';
+  $xrd->link(profile => $path . '.html');
+  $xrd->link(describedby => $path . '.rdf')
+      ->add(Title => ucfirst $c->stash('user'));
+};
+
+
+# Index page
+get '/' => sub {
+  my $c = shift;
+  my $acct = $c->param('acct');
+  if ($acct)  {
+
+    # Asynchronous rendering
+    $c->render_later;
+
+    return $c->webfinger(
+      $acct => sub {
+	my $xrd = shift;
+
+	$c->stash(xrd => $xrd ? $xrd->to_pretty_xml : '[WebFinger not found]');
+	return $c->render(template => 'index');
+      });
+  }
+  else {
+    return $c->render(template => 'index');
+  };
+} => 'index';
+
+
+# Discover WebFinger
+post '/' => sub {
+  my $c = shift;
+  my $acct = $c->param('acct');
+
+  # Discovery
+  if ($acct) {
+
+    # Add finger information for further retrieval
+    $c->flash(acct => $acct);
+
+    # Asynchronous rendering
+    $c->render_later;
+
+    $c->webfinger(
+      $acct => sub {
+	my $xrd = shift;
+
+	if ($xrd) {
+	  # Check formatting
+	  my $rv =
+	    ($c->param('submit') && $c->param('submit') eq 'json') ?
+	      $xrd->to_json : $xrd->to_pretty_xml;
+
+	  # Set flash
+	  $c->flash(xrd => $rv );
+	}
+	else {
+
+	  # Set flash
+	  $c->flash(xrd => '[WebFinger not found]');
+	};
+	# Return to index
+	return $c->redirect_to('index');
+      });
+  }
+
+  # WebFinger was not found
+  else {
+
+    # Return to index
+    return $c->redirect_to('index');
+  };
+};
+
+
+# Start application
+app->start;
+
+
+__DATA__
+
+@@ index.html.ep
+<!DOCTYPE html>
+<html>
+  <head>
+%= stylesheet "https://fonts.googleapis.com/css?family=Chivo:900"
+%= stylesheet "https://fonts.googleapis.com/css?family=Inconsolata:400"
+%= stylesheet "http://sojolicio.us/stylesheets/styles.css", media => "screen"
+%= stylesheet "http://sojolicio.us/stylesheets/prettify-mojo.css", media => "screen"
+    <link rel="icon" href="http://sojolicio.us/images/favicon.ico" type="image/x-icon" />
+
+%= stylesheet begin
+
+form {
+  padding: .5em;
+  background-color: transparent;
+}
+
+input, textarea {
+  border: 2px solid #00A3BA;
+  background-color: #e7e7e7;
+  color: #444;
+  padding: .1em;
+  margin: .2em;
+}
+
+textarea {
+  width: 100%;
+  height: 30em;
+}
+
+%end
+
+    <title><%= $title %></title>
+  </head>
+  <body>
+    <div id="container">
+      <div id="logo"></div>
+      <a id="github-ribbon" href="https://github.com/Akron/Mojolicious-Plugin-WebFinger">
+        <img src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub">
+      </a>
+      <div class="inner">
+      <header>
+        <h1><%= $title %></h1>
+      </header>
+      <section>
+
+%= form_for 'index', method => 'POST', begin
+%= text_field 'acct', value => flash('acct')
+<button value='xml' name='submit' type='submit'>XML</button>
+<button value='json' name='submit' type='submit'>JSON</button>
+% end
+
+%= text_area 'xrd_field' => ( readonly => 'readonly' ) => begin
+%= flash('xrd') || stash('xrd')
+% end
+
+% my $host = $self->req->url->base->host;
+
+  <ul>
+  % foreach (qw/akron nils unknown/) {
+    <li><a href="<%= url_for('index')->query([acct => 'acct:' . $_ . '@' . $host]) %>">[/.well-known/webfinger?resource=acct:<%= $_  %>@<%= $host %>]</a></li>
+% };
+% foreach (qw/acct:akron@identi.ca acct:a@gmail.com acct:akron@pod.geraspora.de/) {
+    <li><a href="<%= url_for('index')->query(['acct' => $_]) %>"><%= $_ %></a></li>
+% };
+  </ul>
+
+      </section>
+    </div>
+  </body>
+</html>

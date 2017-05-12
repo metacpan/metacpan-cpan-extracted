@@ -1,0 +1,24 @@
+20161104 1.22 ???
+20161104 1.21 test.pl works with different queue ids
+20140416 1.20 outputports marked WRITE to get UNSUBSCRIBED messages from System
+20140404 1.19 CONSTS exported as advertised
+20130514 1.18 parse_address matches startofstring to cover alsa-lib 1.0.24 bug
+20130211      noteonevent and noteoffevent accept a $start parameter
+20121208 1.17 test.pl handles alsa_1.0.16 quirk
+20121129 1.16 test.pl prints better diagnostics if it fails
+20120930 1.15 output() timestamp and duration in floating-point seconds
+20120925      (dis)?connect(from|to) return undef if parse_address fails
+20111112 1.14 but output() does broadcast if destination is self
+20111108 1.13 fix version number
+20111108 1.12 output() does not broadcast if destination is set
+20111101 1.11 add parse_address(), and call automatically from connectto() etc
+20111024 1.10 crash-proof all xs_ subs if called before client exists
+20110624 1.09 $maximum_nports increased from 4 to 64
+20110605 1.08 examples include midikbd, midiecho and midiclick
+20110430 1.07 reposition call to free() in xs_status
+20110428 1.06 fix bug in status() in the time return-value
+20110425 1.05 add the missing xs_status routine, and test status()
+20110303 1.04 output, input, *2alsa and alsa2* now handle sysex events
+20110228 1.03 add listclients, listconnectedto and listconnectedfrom
+20110213 1.02 add disconnectto and disconnectfrom
+20110211 1.01 translated from midialsa.lua, first released version

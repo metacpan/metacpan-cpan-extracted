@@ -1,0 +1,46 @@
+Revision history for Perl extension Math::Base36.
+
+0.14 2015-04-02
+ - Avoid negative repeat count warnings generated from new perls (RT #103266) 
+
+0.13 2015-01-17
+ - handle large base-10 numbers when encoding (GH #2)
+
+0.12 2013-03-29
+ - make errors more descriptive (Chisel Wright)
+
+0.11 2013-03-14
+ - repackaged
+
+0.10 2012-08-16
+ - Fix SYNOPSIS (RT #78790)
+
+0.09 2010-12-06
+ - explicit use of of Math::BigInt to avoid confusing Devel::Cover
+
+0.08 2010-12-06
+ - don't short-circuit encoding '0' so it gets proper padding.
+
+0.07 2009-11-18
+ - repackaged with a new version of Module::Install
+
+0.06 2009-03-18
+ - fix regex for input validation in decode_base36() (RT #44414)
+
+0.05 2007-12-05
+ - set Math::BigInt prereq version so a more recent version is used w/ 5.6.x
+
+0.04 2007-11-30
+ - add perl version requirement of 5.6.0
+
+0.03 2007-11-30
+ - fix tests by using Math::BigInt (RT #15712)
+ - fix return from decode_base36() (RT #18347, RT #15712)
+ - switch to Module::Install
+ - dist cleanup
+
+0.02 2002-02-17
+ - Fixed a dependency error.
+
+0.01 2002-02-04
+ - base36_encode and base36_decode work, and can be exported.

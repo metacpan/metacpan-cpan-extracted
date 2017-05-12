@@ -1,0 +1,17 @@
+0.05    Thanks to a patch from Jos Boumans, now picks up versions 
+        in the form $Foo::Bar::VERSION
+
+0.04    One-line change to modversion so it doesn't barf if the 
+        module isn't installed
+
+0.03    Now uses File::Spec for platform independence
+        (patch provided by Ville Skyttä <ville.skytta@iki.fi>)
+
+        Included a script, "modversion", to easily find a module's
+        version.
+
+        Now sets $m->{dir} even if it can't find a version.
+
+0.02    Removed an unnecessary debugging "print"
+
+0.01    Original version

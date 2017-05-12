@@ -1,0 +1,24 @@
+---
+abstract: 'HTTP Client + Evo::Promise'
+author:
+  - 'alexbyk <alexbyk.com>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-Pua
+requires:
+  Evo: '0.0252'
+  Mojolicious: '7.0'
+  perl: v5.20.0
+resources:
+  bugtracker: http://github.com/alexbyk/Mojo-Pua/issues
+  repository: http://github.com/alexbyk/Mojo-Pua
+version: '0.010'
+x_serialization_backend: 'YAML::Tiny version 1.69'

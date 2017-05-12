@@ -1,0 +1,20 @@
+Module-Install-TrustMetaYml
+===========================
+
+Created:      2011-10-04
+Home page:    <https://metacpan.org/release/Module-Install-TrustMetaYml>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Module-Install-TrustMetaYml>
+Maintainer:   Toby Inkster
+
+0.003  2013-03-20
+
+ - No need to bundle Scalar::Util in 'inc' directory.
+
+0.002  2012-07-05
+
+ - Reduce list of dependencies.
+ - Support Perls prior to 5.8.
+
+0.001  2011-10-06  # Initial release
+
+

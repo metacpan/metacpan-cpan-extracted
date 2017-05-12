@@ -1,0 +1,31 @@
+=head1 NAME
+
+Mozilla::DOM::Window2
+
+=head1 DESCRIPTION
+
+Mozilla::DOM::Window2 is a wrapper around an instance of Mozilla's
+nsIDOMWindow2 interface. This class inherits from
+L<Window|Mozilla::DOM::Window>.
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::Window2->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $windowroot = $window2->B<GetWindowRoot>()
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut

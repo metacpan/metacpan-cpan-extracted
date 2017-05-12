@@ -1,0 +1,13 @@
+CHANGES
+lib/Music/Tag/M4A.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/1-m4a.t
+t/2-pod.t
+t/3-pod-coverage.t
+t/elise.m4a
+t/options.conf
+Copying
+Artistic

@@ -1,0 +1,96 @@
+<HTML>
+<HEAD>
+<TITLE>Ideal - A simple of an algebraic Ideal.</TITLE>
+<LINK REV="made" HREF="mailto:bguarrac@hotmail.com">
+</HEAD>
+
+<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#NAME">NAME</A>
+	<LI><A HREF="#DESCRIPTION">DESCRIPTION</A>
+	<LI><A HREF="#AUTHOR">AUTHOR</A>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="NAME">NAME</A></H1>
+<P>
+Ideal - A simple (subset) of an algebraic Ideal.
+
+<P>
+<HR>
+<H1><A NAME="DESCRIPTION">DESCRIPTION</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new</A></STRONG><DD>
+<P>
+creates a new Ideal instance with no polynomials. 
+
+<p>
+
+<DT><STRONG><A NAME="item_copy">copy OBJREF</A></STRONG><DD>
+<P>
+performs a deep copy of object reference passed in.
+
+<p>
+
+<DT><STRONG><A NAME="item_polynomials">polynomials</A></STRONG><DD>
+<DT><STRONG>polynomials LIST</STRONG><DD>
+<P>
+access/modify polynomial list in object. If there is any input, it is taken
+as the new value of polynomials. The value of polynomials is returned to
+the caller.
+
+<p>
+
+<DT><STRONG><A NAME="item_appendPolynomial">appendPolynomial OBJREF</A></STRONG><DD>
+<P>
+takes as input a reference to polynomial to append to list; a copy of it is
+made and then appended.
+
+<p>
+
+<DT><STRONG><A NAME="item_toString">toString</A></STRONG><DD>
+<P>
+generates a string representing the list of polynomials and returns this
+string to the caller.
+
+<p>
+
+<DT><STRONG><A NAME="item_set">set LIST</A></STRONG><DD>
+<P>
+list of polynomials to set the ideal to. destroys current polynomial list
+and copies the new list.
+
+<p>
+
+<DT><STRONG><A NAME="item_getSize">getSize</A></STRONG><DD>
+<P>
+returns the number of polynomials in the ideal generator.
+
+<p>
+
+<DT><STRONG><A NAME="item_getPolynomial">getPolynomial</A></STRONG><DD>
+<P>
+returns the ith polynomial from the list. 
+
+<p>
+
+<DT><STRONG><A NAME="item_getGBasis">getGBasis</A></STRONG><DD>
+<P>
+generates a groebner basis using Buchberger's simplest algorithm. 
+
+</DL>
+<P>
+<HR>
+<H1><A NAME="AUTHOR">AUTHOR</A></H1>
+<P>
+Brian Guarraci &lt;<A
+HREF="mailto:bguarrac@hotmail.com">bguarrac@hotmail.com</A>&gt;
+</BODY>
+
+</HTML>

@@ -1,0 +1,37 @@
+---
+abstract: 'Mojo wrapper for the Reddit API'
+author:
+  - 'Curtis Brandt'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-Snoo
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Mojolicious: '6'
+  Moo: '2.000001'
+resources:
+  bugtracker: https://github.com/aggrolite/Mojo-Snoo/issues
+  homepage: https://github.com/aggrolite/Mojo-Snoo
+  repository: https://github.com/aggrolite/Mojo-Snoo.git
+version: '0.15'
+x_contributors:
+  - 'Curtis Brandt <curtis@cpan.org>'
+  - 'Hunter McMillen <mcmillhj@gmail.com>'
+  - 'Stefan Adams <stefan@borgia.com>'

@@ -1,0 +1,3 @@
+<%= link_to current_object()."/".current_tab, { key => "" } => class => "btn btn-mini" => style => 'float:right;' => begin =%>
+change <%= printable(current_object) %>
+<%= end %>

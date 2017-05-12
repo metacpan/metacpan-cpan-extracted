@@ -1,0 +1,32 @@
+This is a prototype of a REST abstraction of MogileFS.
+
+Rationale: mogilefs client implementation is a bit complicated (requires
+handling of propriatary mogile network protocol, correct management of
+data to be transfered etc.).
+
+Installation instructions:
+--------------------------
+
+$ git clone git@github.com/yannk/MogileFS-REST.git
+$ cpanm MogileFS-REST
+
+Configuration Instructions:
+---------------------------
+
+You can either use the provided app.psgi using ENV variable to configure it,
+or write your own app.psgi.
+
+ENV variables are:
+- MOGILEFS_REST_SERVERS         comma separated list of trackers
+- MOGILEFS_REST_DEFAULT_CLASS   default mogile class to use if none specified in the req.
+- MOGILEFS_REST_LARGEFILE:      use largefile support of mogile client. default to true.
+
+Usage Instructions:
+-------------------
+
+$ MOGILEFS_REST_SERVERS=localhost:7001 plackup -Ilib -a app.psgi
+# replace README with anyfile
+$ curl -i -X PUT --data-binary @README http://localhost:5000/testing/key
+$ curl -i -X GET http://localhost:5000/testing/key
+$ curl -i -X GET http://localhost:5000/testing/key?paths=1
+$ curl -i -X DELETE http://localhost:5000/testing/key

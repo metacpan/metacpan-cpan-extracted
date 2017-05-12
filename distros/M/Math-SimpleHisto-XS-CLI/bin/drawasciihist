@@ -1,0 +1,140 @@
+#!perl
+use strict;
+use warnings;
+
+package drawasciihist;
+our $VERSION = '1.05';
+use Getopt::Long qw(GetOptions);
+use Term::Size ();
+use Pod::Usage qw(pod2usage);
+use Math::SimpleHisto::XS;
+use Math::SimpleHisto::XS::CLI qw(:all);
+
+GetOptions(
+  my $opt = {},
+  'sort',
+  'min=s',
+  'max=s',
+  'width|w=i',
+  'delimiter|d=s',
+  'numeric-format|nf=s',
+  'style=s',
+  'timestamp|ts',
+  'log',
+  'man',
+  'help|h',
+);
+
+pod2usage({-verbose => 2}) if $opt->{man};
+pod2usage({-verbose => 0}) if $opt->{help};
+
+=pod
+
+=head1 NAME
+
+drawasciihist - draw simple text histograms
+
+=head1 SYNOPSIS
+
+  generator | drawasciihist [--sort] [--width=<ncols>] [--style=<ident>]
+                            [--numeric-format|nf=<printf format>]
+                            [--delimiter|d=<regexp>] [--timestamp|ts]
+                            [--min=X] [--max=X]
+
+Together with the C<histify> tool, this can easily produce simple
+visualizations for quickly analyzing simple data in a console. Run the
+script with the C<--man> option to see an example.
+
+The tool expects to read histogram data from STDIN, one bin per line.
+If a given input line has two or more columns (see the C<--delimiter>
+option), the first column will be used as the bin name, the second as
+the numeric bin content. If an input line has only one column, the
+bin description will be the bin number.
+
+By default, the output histogram will have a range from 0 to the maximum
+value in any bin. You can change the histogram range with the C<--min=X>
+and C<--max=X> options, providing numeric values for minimum and maximum.
+The C<--max> option also allows special values of C<auto> and C<total>.
+C<auto> is the default behaviour of --max and corresponds to the maximum
+bin content. C<--max=total> will use the sum of all histogram contents
+instead. The C<--min> option only understands C<auto> which forces it to
+use the smallest bin content as the lower display boundary.
+
+The output histogram width is determined automatically from your
+terminal size, if any. Otherwise assumes 80 columns. You can set the
+width explicitly using C<--width=ncols>. The C<--sort> option sorts
+the bins by content instead of input order.
+
+If the C<--numeric-format> option is present, then the actual numeric
+value is included in the histogram using the given C<printf> format.
+For positive integers, you would use C<--nf='%u'>, for signed integers,
+use C<--nf='%i'> and for fixed precision floats, you can use something
+like C<--nf='%.2f'>.
+
+The delimiter for splitting an input line into columns defaults to
+any whitespace. You can change that by supplying a Perl regular
+expression to the C<--delimiter=...> option.
+
+You can choose the character to be used for drawing histograms with the
+C<--style=[character]> option. The characters '-', '=', '~' are special
+cased to use an arrow-like appearance.
+
+The C<--timestamp> option will case bin descriptions to be passed
+through C<localtime()> to convert from Unix timestamps to
+human-readable time strings.
+
+The C<--log> option draws the histogram on a logarithmic scale. It is
+advised to use the C<--min> option to specify an explicit minimum in
+this case, as the logarithm of C<0> is not drawable. If no C<--min>
+option is present, the C<--log> option will change the default minimum
+from C<0> to C<--min=auto>.
+
+=head1 EXAMPLE OUTPUT
+
+  $ perl -e 'print $_*(rand()), "\n" for 1..100000' \
+          | histify | drawasciihist -nf='%u' -w=70
+
+   1:   33155|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~>|
+   2:   19010|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~>                         |
+   3:   13972|~~~~~~~~~~~~~~~~~~~~~~~>                                  |
+   4:   10476|~~~~~~~~~~~~~~~~~>                                        |
+   5:    7919|~~~~~~~~~~~~>                                             |
+   6:    5959|~~~~~~~~~>                                                |
+   7:    4446|~~~~~~>                                                   |
+   8:    2913|~~~~>                                                     |
+   9:    1611|~>                                                        |
+  10:     538|                                                          |
+
+=cut
+
+
+# Get CLI options
+my $input_col_delimiter = "\\s+";
+$input_col_delimiter = qr/$opt->{delimiter}/ if defined($opt->{delimiter});
+$opt->{"show-numeric"} = defined($opt->{"numeric-format"});
+$opt->{"numeric-format"} = $opt->{"show-numeric"} ? $opt->{"numeric-format"} : "%.2f";
+
+my $styledef = intuit_ascii_style($opt->{style});
+$opt->{style} = $styledef;
+
+# read all input
+my @rows;
+my $rowcount = 0;
+while (<STDIN>) {
+  ++$rowcount;
+  chomp;
+  s/^\s+//;
+  my @columns = split /$input_col_delimiter/o, $_;
+  next if @columns == 0;
+  if (@columns == 1) {
+    push @rows, [$rowcount, $columns[0]];
+  } else {
+    push @rows, [@columns[0,1]];
+  }
+}
+
+draw_ascii_histogram(
+  \*STDOUT,
+  \@rows,
+  $opt
+);

@@ -1,0 +1,19 @@
+Revision history for Perl module Mojo::JWT
+
+0.05 2017-01-12
+  - Port to Module::Build::Tiny, (via App::ModuleBuildTiny)
+  - Changed JWT link from draft to RFC
+
+0.04 2015-04-27
+  - Fix link to sponsor
+
+0.03 2015-04-25
+  - Added set_iat attribute and related functonality
+  - Set required MIME::Base64 version to 3.11 as it should have been
+
+0.02 2015-04-21
+  - Fix failing test when Crypt::OpenSSL::RSA is not installed
+
+0.01 2015-04-21
+  - Initial release
+

@@ -1,0 +1,166 @@
+NAME
+    Map::Tube::Text::Table - Table output for Map::Tube.
+
+SYNOPSIS
+     use Map::Tube::Text::Table;
+     my $obj = Map::Tube::Text::Table->new(%params);
+     my $text = $obj->junctions;
+     my $text = $obj->line($line);
+     my $text = $obj->lines;
+     my $text = $obj->print;
+
+METHODS
+    "new(%params)"
+             Constructor.
+
+            *       "print_id"
+
+                     Flag, that means printing of ID.
+                     Affected methods:
+                     - line()
+                     - print() (by line()).
+                     Default value is 0.
+
+            *       "tube"
+
+                     Map::Tube object.
+                     It is required.
+                     Default value is undef.
+
+    "junctions()"
+             Print junctions.
+             Returns string with unicode text table.
+
+    "line($line)"
+             Print line.
+             Returns string with unicode text table.
+
+    "lines()"
+             Print sorted lines.
+             Returns string with unicode text table.
+
+    "print()"
+             Print all (junctions + all lines).
+             Returns string with unicode text table.
+
+ERRORS
+     new():
+             Parameter 'tube' is required.
+             Parameter 'tube' must be 'Map::Tube' object.
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+EXAMPLE
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Encode qw(encode_utf8);
+     use English;
+     use Error::Pure qw(err);
+     use Map::Tube::Text::Table;
+
+     # Error::Pure environment.
+     $ENV{'ERROR_PURE'} = 'AllError';
+
+     # Arguments.
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 metro\n";
+             exit 1;
+     }
+     my $metro = $ARGV[0];
+ 
+     # Object.
+     my $class = 'Map::Tube::'.$metro;
+     eval "require $class;";
+     if ($EVAL_ERROR) {
+             err "Cannot load '$class' class.",
+                     'Error', $EVAL_ERROR;
+     }
+ 
+     # Metro object.
+     my $tube = eval "$class->new";
+     if ($EVAL_ERROR) {
+             err "Cannot create object for '$class' class.",
+                     'Error', $EVAL_ERROR;
+     }
+ 
+     # GraphViz object.
+     my $table = Map::Tube::Text::Table->new(
+             'tube' => $tube,
+     );
+ 
+     # Print out.
+     print encode_utf8($table->print);
+
+     # Output without arguments like:
+     # Usage: /tmp/SZXfa2g154 metro
+
+     # Output with 'Tbilisi' argument like:
+     # ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+     # │ Junctions                                                                                        │
+     # ├──────────────────┬──────────────────────────────────────────┬────────────────────────────────────┤
+     # │ Station          │ Line                                     │ Connected to                       │
+     # ├──────────────────┼──────────────────────────────────────────┼────────────────────────────────────┤
+     # │ სადგურის მოედანი │ ახმეტელი-ვარკეთილის ხაზი,საბურთალოს ხაზი │ მარჯანიშვილი, ნაძალადევი, წერეთელი │
+     # └──────────────────┴──────────────────────────────────────────┴────────────────────────────────────┘
+     # ┌───────────────────────────────────────────────────────────┐
+     # │ Line 'ახმეტელი-ვარკეთილის ხაზი'                           │
+     # ├──────────────────────┬────────────────────────────────────┤
+     # │ Station              │ Connected to                       │
+     # ├──────────────────────┼────────────────────────────────────┤
+     # │ ახმეტელის თეატრი     │ სარაჯიშვილი                        │
+     # │ სარაჯიშვილი          │ ახმეტელის თეატრი, გურამიშვილი      │
+     # │ გურამიშვილი          │ სარაჯიშვილი, ღრმაღელე              │
+     # │ ღრმაღელე             │ გურამიშვილი, დიდუბე                │
+     # │ დიდუბე               │ გოცირიძე, ღრმაღელე                 │
+     # │ გოცირიძე             │ დიდუბე, ნაძალადევი                 │
+     # │ ნაძალადევი           │ გოცირიძე, სადგურის მოედანი         │
+     # │ მარჯანიშვილი         │ რუსთაველი, სადგურის მოედანი        │
+     # │ რუსთაველი            │ თავისუფლების მოედანი, მარჯანიშვილი │
+     # │ თავისუფლების მოედანი │ ავლაბარი, რუსთაველი                │
+     # │ ავლაბარი             │ 300 არაგველი, თავისუფლების მოედანი │
+     # │ 300 არაგველი         │ ავლაბარი, ისანი                    │
+     # │ ისანი                │ 300 არაგველი, სამგორი              │
+     # │ სამგორი              │ ვარკეთილი, ისანი                   │
+     # │ ვარკეთილი            │ სამგორი                            │
+     # │ სადგურის მოედანი     │ მარჯანიშვილი, ნაძალადევი, წერეთელი │
+     # └──────────────────────┴────────────────────────────────────┘
+     # ┌────────────────────────────────────────────────────────────────────┐
+     # │ Line 'საბურთალოს ხაზი'                                             │
+     # ├─────────────────────────┬──────────────────────────────────────────┤
+     # │ Station                 │ Connected to                             │
+     # ├─────────────────────────┼──────────────────────────────────────────┤
+     # │ წერეთელი                │ სადგურის მოედანი, ტექნიკური უნივერსიტეტი │
+     # │ ტექნიკური უნივერსიტეტი  │ სამედიცინო უნივერსიტეტი, წერეთელი        │
+     # │ სამედიცინო უნივერსიტეტი │ დელისი, ტექნიკური უნივერსიტეტი           │
+     # │ დელისი                  │ ვაჟა-ფშაველა, სამედიცინო უნივერსიტეტი    │
+     # │ ვაჟა-ფშაველა            │ დელისი                                   │
+     # │ სადგურის მოედანი        │ მარჯანიშვილი, ნაძალადევი, წერეთელი       │
+     # └─────────────────────────┴──────────────────────────────────────────┘
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, Map::Tube::Text::Table::Utils,
+    List::MoreUtils, Readonly, Scalar::Util.
+
+SEE ALSO
+    Map::Tube, Map::Tube::Graph, Map::Tube::GraphViz,
+    Map::Tube::Plugin::Graph, Task::Map::Tube.
+
+REPOSITORY
+    <https://github.com/tupinek/Map-Tube-Text-Table>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2014-2015 Michal Špaček
+     Artistic License
+     BSD 2-Clause License
+
+VERSION
+    0.04
+

@@ -1,0 +1,47 @@
+Revision history for Marketplace-Ebay
+
+0.191 Thu Aug 18 10:24:00 2016 CEST
+
+    * Ebay is using XSD version 981 for the Trading API on the server,
+      but doesn't release the XSD before next week. As this version
+      introduces a new field <GuaranteedShipping>, we needed to add
+      a work around to the module
+      (Marco Pessotto, Stefan Hornburg/Racke).
+
+0.19 Tue Feb  9 12:20:15 2016 CET
+
+    [API CHANGES]
+
+    * Change behaviour of $order->first_name and $order->last_name
+      accessors (Marco Pessotto).
+
+    [ENHANCEMENTS]
+
+    * Add silent wrapper for API calls (Marco Pessotto).
+
+0.18 Wed Oct  7 09:22:15 2015 CEST
+
+    [BUG FIXES]
+
+    * Pass quantity 0 for variations instead asking for a deletion
+      (Marco Pessotto).
+
+0.17 Mon Jul 20 16:54:59 2015 CEST
+
+    [DOCUMENTATION]
+
+    * Add missing documentation for complete POD coverage (Marco Pessotto).
+
+0.16 Thu Jul 16 15:24:38 2015 CEST
+
+    [ENHANCEMENTS]
+
+    * Add payment status attribute to Order class (Marco Pessotto).
+
+    [BUG FIXES]
+
+    * Fix ambiguous use of localtime (Marco Pessotto, GH #1).
+
+0.15 Wed Jul  8 18:06:55 2015 CEST
+
+    * Initial CPAN release.

@@ -1,0 +1,18 @@
+Changes
+INSTALL
+Index
+MANIFEST
+Makefile.PL
+README
+Random.pm
+Random.xs
+com.c
+example.pl
+helper.c
+helper.h
+linpack.c
+randlib.c
+randlib.h
+test1.pl
+test2.pl
+META.yml                                 Module meta-data (added by MakeMaker)

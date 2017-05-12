@@ -1,0 +1,28 @@
+---
+abstract: 'asynchronous Redis client for L<Mojolicious>.'
+author:
+  - 'Sergey Zasenko <undef@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MojoX-Redis
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: '0'
+  Mojolicious: '2.80'
+  Protocol::Redis: '1.0'
+resources:
+  bugtracker: https://github.com/und3f/mojox-redis/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/und3f/mojox-redis
+version: 0.88

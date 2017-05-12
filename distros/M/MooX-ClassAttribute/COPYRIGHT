@@ -1,0 +1,65 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: MooX-ClassAttribute
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/MooX-ClassAttribute
+
+Files: examples/binomial_name.pl
+ examples/hooks/track-consumers.pl
+ lib/Method/Generate/ClassAccessor.pm
+ lib/MooX/CaptainHook.pm
+ lib/MooX/ClassAttribute.pm
+ lib/MooX/ClassAttribute/HandleMoose.pm
+ t/01basic.t
+ t/02class.t
+ t/03role.t
+ t/10class_moose.t
+ t/11role_moose.t
+ t/20hook_appl.t
+ t/21hook_appl_moose.t
+ t/22hook_infl.t
+ t/23hook_infl_noop.t
+ t/24hook_infl_backwards.t
+ t/30mgca.t
+Copyright: This software is copyright (c) 2013 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Changes
+ Makefile.PL
+ README
+Copyright: Copyright 1970 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: META.json
+ META.yml
+ doap.ttl
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
+
+Files: dist.ini
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

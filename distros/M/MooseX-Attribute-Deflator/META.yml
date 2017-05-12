@@ -1,0 +1,231 @@
+---
+abstract: 'Deflate and inflate Moose attribute values'
+author:
+  - 'Moritz Onken'
+build_requires:
+  Module::Build: 0.3601
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120921'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Attribute-Deflator
+provides:
+  MooseX::Attribute::Deflator:
+    file: lib/MooseX/Attribute/Deflator.pm
+    version: v2.2.2
+  MooseX::Attribute::Deflator::Meta::Role::Attribute:
+    file: lib/MooseX/Attribute/Deflator/Meta/Role/Attribute.pm
+    version: v2.2.2
+  MooseX::Attribute::Deflator::Moose:
+    file: lib/MooseX/Attribute/Deflator/Moose.pm
+    version: v2.2.2
+  MooseX::Attribute::Deflator::Registry:
+    file: lib/MooseX/Attribute/Deflator/Registry.pm
+    version: v2.2.2
+  MooseX::Attribute::Deflator::Structured:
+    file: lib/MooseX/Attribute/Deflator/Structured.pm
+    version: v2.2.2
+  MooseX::Attribute::LazyInflator:
+    file: lib/MooseX/Attribute/LazyInflator.pm
+    version: v2.2.2
+  MooseX::Attribute::LazyInflator::Meta::Role::ApplicationToClass:
+    file: lib/MooseX/Attribute/LazyInflator/Meta/Role/ApplicationToClass.pm
+    version: v2.2.2
+  MooseX::Attribute::LazyInflator::Meta::Role::ApplicationToRole:
+    file: lib/MooseX/Attribute/LazyInflator/Meta/Role/ApplicationToRole.pm
+    version: v2.2.2
+  MooseX::Attribute::LazyInflator::Meta::Role::Attribute:
+    file: lib/MooseX/Attribute/LazyInflator/Meta/Role/Attribute.pm
+    version: v2.2.2
+  MooseX::Attribute::LazyInflator::Meta::Role::Composite:
+    file: lib/MooseX/Attribute/LazyInflator/Meta/Role/Composite.pm
+    version: v2.2.2
+  MooseX::Attribute::LazyInflator::Meta::Role::Method::Accessor:
+    file: lib/MooseX/Attribute/LazyInflator/Meta/Role/Method/Accessor.pm
+    version: v2.2.2
+  MooseX::Attribute::LazyInflator::Meta::Role::Method::Constructor:
+    file: lib/MooseX/Attribute/LazyInflator/Meta/Role/Method/Constructor.pm
+    version: v2.2.2
+  MooseX::Attribute::LazyInflator::Meta::Role::Role:
+    file: lib/MooseX/Attribute/LazyInflator/Meta/Role/Role.pm
+    version: v2.2.2
+  MooseX::Attribute::LazyInflator::Role::Class:
+    file: lib/MooseX/Attribute/LazyInflator/Role/Class.pm
+    version: v2.2.2
+requires:
+  DateTime: 0
+  Devel::PartialDump: 0
+  File::Find: 0
+  File::Temp: 0
+  JSON: 0
+  Module::Build: 0.3601
+  Moose: 1.25
+  Moose::Util::TypeConstraints: 0
+  MooseX::Types: 0.30
+  MooseX::Types::Moose: 0
+  MooseX::Types::Structured: 0
+  Test::More: 0.88
+  Try::Tiny: 0
+resources:
+  bugtracker: https://github.com/monken/p5-moosex-attribute-deflator/issues
+  repository: git://github.com/monken/p5-moosex-attribute-deflator.git
+version: 2.2.2
+x_Dist_Zilla:
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: GatherDir
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      name: Test::Compile
+      version: 1.112820
+    -
+      class: Dist::Zilla::Plugin::HasVersionTests
+      name: HasVersionTests
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::KwaliteeTests
+      name: KwaliteeTests
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::Test::MinimumVersion
+      name: Test::MinimumVersion
+      version: 2.0.1
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: PodCoverageTests
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: PodSyntaxTests
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::ReportVersions::Tiny
+      name: ReportVersions::Tiny
+      version: 1.03
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: PruneCruft
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: PruneFiles
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: ManifestSkip
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: ExtraTests
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: NextRelease
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: PkgVersion
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: PodWeaver
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::Prepender
+      name: Prepender
+      version: 1.112280
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: ExecDir
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: ShareDir
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::Bugtracker
+      name: Bugtracker
+      version: 1.111080
+    -
+      class: Dist::Zilla::Plugin::Repository
+      name: Repository
+      version: 0.18
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      name: MetaProvides::Package
+      version: 1.14000001
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: MetaConfig
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::License
+      name: License
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::ModuleBuild
+      name: ModuleBuild
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: MetaYAML
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: MetaJSON
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: Readme
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: Manifest
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::CheckChangeLog
+      name: CheckChangeLog
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.300016
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 4.300016
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.300016

@@ -1,0 +1,254 @@
+Changelog for MarpaX-Java-ClassFile
+
+0.008 2016-03-31T05:15:12
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Role/Parser.pm: Fix number of calls to logger is_trace, is _debug etc...
+   when setting localized variables
+ - Move from MooX::Role::Logger to MooX::Log::Any because the logger can be
+   propagated with the later
+
+0.007 2016-03-30T17:20:17Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - BNF/OpCodeArray.pm: jsr bnf fix
+ - bin/javapp: log error eventually, and protect against failure with
+   illegal interchange characters when printing out
+ - Parser/Actions.pm: make sure utf8 returns undef on the stack instead of
+   nothing
+ - dist.ini: 2016
+
+0.006 2016-03-29T18:24:25Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - dist.ini: MetaProvides::Package and not MetaProvides::Class...
+
+0.005 2016-03-29T18:10:21Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Shortcut immediately to interpreted value, when it is the case, in
+   strinfigication
+ - _bytesToVector optmization and utf8() fix again
+ - Parser/Actions.pm: less ops
+ - dist.ini: hopefully fix package indexing
+
+0.004 2016-03-28T21:54:19Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Parser/Actions.pm: Revised and fixed utf8 action
+
+0.003 2016-03-28T16:27:51Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Struct/MethodInfo.pm: Added stringification of access flags
+ - Util/AccessFlagsStringification.pm: Added "Class"
+
+0.002 2016-03-28T10:16:10Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - dzil xtest
+ - bin/javapp: recommend implicitely a redirection in the help
+ - One-line description mode
+ - BNF/OpCodeArray.pm: add constant_pool
+ - bin/javapp: say output can contain UTF-8 characters
+ - BNF/OpCodeArray.pm: relativeOffset
+ - Struct/OpCode.pm: relativeOffset
+ - Struct/ConstantUtf8Info.pm: removed duplicate
+ - BNF/OpCodeArray.pm: use natively position returned by lexeme value
+   instead of playing with Marpa::R2::Context::location in the action
+ - Struct/_Base.pm: switch to Class::XSAccessor::Array
+ - Util/BNF.pm: possibility to overwrite top or bottom bnf
+ - Role/Parser.pm: fix logging
+ - Struct/_Base.pm: fix generation of accessors in tiny mode
+ - Object::Tiny::XS
+ - Role/Parser.pm: micro optimization
+ - bin/javapp: NOTES
+ - bin/javapp: POD
+ - Java/ClassFile.pm: POD
+ - Parser/Actions.pm: utf8 micro optimization
+ - Parser/Actions.pm: utf8 micro optimizations and protections
+ - Role/Parser.pm: A little perl op optimization
+ - Role/Parser.pm: Make sure that bypassing inner grammar is using a
+   defined value
+ - Role/Parser.pm: bypass inner grammar creation when the result is
+   predictable
+ - bin/classdump: removal
+ - bin/javapp: fix calls to print
+ - Java/ClassFile.pm: fixed calls to logger
+ - bin/javapp: fix usage of archive
+ - .jar support
+ - cosmetic dev+
+ - Fixes after testing
+ - stringification dev+
+ - Struct/_Base.pm: left align x => y
+ - Util/AccessFlagsStringification.pm: Access flags stringification
+ - bin/javapp: back to print
+ - BNF/ClassFile.pm: take care of unnecessay references counts
+ - Role/Parser.pm: make constant_pool with a default instead of being lazy
+ - Util/ArrayRefWeakenisation.pm: ArrayRef content weakenisator
+ - bin/javapp: use File::Find
+ - tracing levels
+ - event 'attribute_length$' was missing
+ - cosmetic fix
+ - Role/Parser.pm: Added offset in debug statements
+ - Added usuefull debug statements
+ - bin/javapp: log info of current file
+ - Added missing grammars
+ - BNF/ExceptionsAttribute.pm: cosmetic (removed a comma)
+ - Added missing grammar
+ - Struct/AnnotationDefaultAttribute.pm: stringification
+ - Struct/Annotation.pm: stringification
+ - BNF/RuntimeVisibleAnnotationsAttribute.pm: comment fix
+ - Struct/ClassFile.pm: Removed unused _stringify method
+ - Array stringification helper
+ - bin/javapp: add options
+ - Fix ConstantPoolArray constructor when no under AUTHOR_TESTING
+ - overload dev+
+ - use a real constant pool array object
+ - use overload
+ - toString dev+
+ - Fix BNF for tag, that must be an u1
+ - dzil compliance
+ - javapp is now classdump
+ - Javapp dev+
+ - Move check out - this will be in a dedicated module OOTD
+ - Checker dev+
+ - Leave validation to a later stage
+ - javapp dev+
+ - OpCode: make originPos an explicit attribute at object creation,
+   avoiding a sub BUILD
+ - Parse/InnerGrammar.pm: micro but justified optimization, nbDone is
+   really a temporary thingy
+ - javap dev+
+ - Struct runtime optimization in production mode
+ - Role/Parser.pm: use prod_isa() + micro optimizations
+ - Parser/InnerGrammar.pm: use prod_isa()
+ - Parser/Actions.pm: micro optimizations
+ - BNF/OpCodeArray.pm: bug fix when there is no padding, and remove padding
+   from action value
+ - Util/ProductionMode.pm: prod_isa()
+ - BNF/{AnnotationArray,ElementValueArray}.pm: these two grammars are pure
+   arrays, the simplest possible grammars and also the most dangerous: use
+   inner_silent() to prevent loop on evevents calling events and so on
+ - Role/Parser.pm: New routine inner_silent() to read an inner grammar and
+   ignore eventual events after it is pushed as a MANAGED lexeme
+ - BNF/ConstantDoubleInfo.pm: _value is indeed a double, not a long
+ - Parse/Actions.pm: but fix when calculating size of Bit::Vector
+ - Role/Parser.pm: Removed a debug print to STDERR -;
+ - Load time optimization
+ - Role/Parser.pm: My usual recognizers hooks when semantics never change
+   (and this is the case here)
+ - BNF/OpCodeArray.pm: padding fix and internal lexeme add for prevent
+   over-calculation of entries
+ - Struct/OpCode.pm: remember only offset (length calculation is garbbled
+   because of an "ok" internal lexeme anyway)
+ - Role/Parser.pm: lexeme_read_u4 fix
+ - BNF/ConstantIntegerInfo.pm: integer() was renamed to signedU4()
+ - Role/Parser.pm: localization of G, R, support of literal() and pause()
+   for all signed/unsigned U1, U2, U4
+ - Parser/InnerGrammar.pm: Support of inner grammar of unknown number of
+   elements
+ - Parser/Actions: Bit::Vector globalization, renamed integer() to
+   signedU4()
+ - Support of opcodes
+ - Struct/_Base.pm: my minimalist OO thingy - not used yet
+ - OpCode dev+
+ - Bug fixes when testing
+ - BNF/AppendFrame.pm: bug fix
+ - Fixes
+ - Fields working
+ - Fixed naming
+ - Attributes dev+
+ - StackMap dev+
+ - CodeAttribute dev+
+ - Leave validation out for the moment
+ - Add required
+ - ConstantValueAttribute dev+
+ - Make sure all Constant*Info.pm referenced by ConstantValueAttribute have
+   a _value attribute
+ - BNF/ConstantValueAttribute.pm: Added
+ - Add requires to all Constant members
+ - BNF/SignatureAttribute.pm: signature themselves
+ - getAndCheckCpInfo() centralization
+ - BNF/ClassFile.pm: use explicit literals and rules
+ - Role/Parser.pm: make literal arguments explicit
+ - Util/BNF.pm: make u1, u2, u4 and managed internal
+ - InterfacesArray
+ - BNF/ClassFile.pm: Removed debug statement since now it looks ok
+ - ConstantPool revisited dev+
+ - New architecture dev+
+ - New architecture: dev+
+ - dev+
+ - Common/InnerGrammar.pm: Add first() method
+ - Add a weak ref to classFile in all sub-objects
+ - Java/ClassFile.pm: Set counter and array immediately when calling inner
+   grammars
+ - ClassFile/Common.pm: executeInnerGrammar() returns inner grammar value
+ - Java/ClassFile.pm: Added missing close() in the constructor + more in
+   POD
+ - All grammar values are objects
+ - return objets directly in the AST dev+
+ - Java/ClassFile.pm: Removed unused variable %_ACCESSFLAGS
+ - Java/ClassFile.pm: Return a self-describing array as ast
+ - ClassFile/ConstantPoolArray.pm: Renamed _checkItem to
+   _checkConstantPoolItem
+ - ClassFile/Validator.pm: dev+
+ - Methodtype validation
+ - Methodhandle validation dev+
+ - ClassFile/ConstantPoolArray.pm: CONSTANT_MethodHandle_info validation
+   dev+
+ - ClassFile/FieldDescriptor.pm: Removed
+ - ClassFile/ConstantPoolArray.pm: parse tree value dev+
+ - Java/ClassFile.pm: Keep original bitmask in access_flags parse tree
+   value
+ - ClassFile/ConstantPoolArray.pm: validation dev+
+ - constant pool validation
+ - ClassFile/Common.pm: Do basic logging without lex information when in
+   the value() mode
+ - Revert "Java/ClassFile.pm: remember constantPool ast"
+ - Java/ClassFile.pm: remember constantPool ast
+ - ClassFile/Common.pm: make executeInnerGrammar return its ast
+ - Common/Actions.pm: Removed unnecessary temporary variables - bis
+ - Common/Actions.pm: Removed unnecessary temporary variables
+ - Java/ClassFile.pm: Improve POD about computed_value
+ - Java/ClassFile.pm: Removed analysis of access_flags - will be done
+   somewhere else
+ - Java/ClassFile.pm: precisions in POD
+ - ClassFile/*Array.pm: Fix parse tree value
+ - Fix undef entry in ConstantPoolArray directly ConstantPoolArray module
+   -;
+ - ConstantPoolArray and wanted undef entries dev+
+ - ClassFile/Common.pm: has_r() and not _has_r()
+ - ClassFile/Common.pm: Fixed logging in literalXxx() methods
+ - ClassFile/Common.pm: Add literalManaged
+ - ClassFile/FieldDescriptor.pm: dev+
+ - with qw/MarpaX::Java::ClassFile::Common::InnerGrammar/
+ - Common/InnerGrammar.pm: Centralized common code for inner grammars into
+   this role
+ - ClassFile/Common.pm: use directly stack for performance
+ - lib: Hide recognizer that is always implicit in user-space
+ - ClassFile/Common.pm more log wrapper
+
+0.001 2016-02-28T09:51:32Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Changes,META.json,README.pod: for first release
+ - Java/ClassFile.pm: SYNPOSIS -> SYNOPSIS
+ - Java/ClassFile.pm: put a NOTES section in POD
+ - lib: General POD fixes
+ - ClassFile/AttributesArray.pm: utf8 and POD fix
+ - dist.ini: Say files undef lib/MarpaX/Java/ClassFile should not be
+   indexed
+ - bin/javapp: Removed hexdump
+ - lib/: eof xtest compliance
+ - lib/: Add missing ABSTRACT, VERSION and AUTHORITY
+ - lib/: Add ABSTRACT, VERSION and AUTHORITY
+ - Working version -; !
+ - More readable code
+ - ClassFile/Common.pm: Generic executeInnerGrammar() method
+ - Make grammars looks like a class variable
+ - Java/ClassFile.pm: use explicitely lexeme in sub-rules and log how many
+   items we ask for when lauching an inner grammar
+ - ClassFile/ConstantPoolArray.pm: use explicitely lexeme in sub-rules
+ - use ConstantPoolArray instead of ConstantPool
+ - ClassFile/Common.pm: Removed BUILD and BUILDARGS they should never be in
+   a role, add possiblity to set next position on lexeme_read, add support
+   for eventual exhaustion user-space handling
+ - bin/javapp: Call ast() instead of non-existing output() -;
+ - Java/ClassFile.pm: Removed call to Data::Scan::Printer
+ - ClassFile/Common.pm: make ast be lazy and have a builder
+ - dev+: Constant pool working version -;
+ - dev+
+ - Init

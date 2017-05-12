@@ -1,0 +1,2 @@
+# A sample of preserveAspectRatio (with defer).
+defer xMidYMid slice

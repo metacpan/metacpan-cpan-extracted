@@ -1,0 +1,48 @@
+0.22 (2016-3-29)
+  - remove CAUTION because Mojolicious::Plugin::AutoRoute don't depend
+    on Mojolicious internal structure any more.
+0.21 (2016-3-28)
+  - implementation become simple.
+0.20 (2016-3-28)
+  - fix bug that exception return instead of not found
+0.19 (2016-3-25)
+  - remove "DB::single = 1" in source
+0.18
+  - improve registration of routes and performance.
+0.17
+  - fix Inactivity timeout bug
+0.16
+  - catch up Mojolicious 5.73(deprecated render_not_found, render_exception)
+0.15
+  - removed deprecated finish_rendering helper
+  - catch up Mojolicious 5.73(deprecated render_not_found, render_exception)
+0.14
+  - improve pod and test
+0.13
+  - first major release.
+0.12 (beta release)
+  - finish_rendering is DEPRECATED. no more needed.
+0.11 (beta release)
+  - fixed bug that if last slash exists, page is not found.
+0.10 (beta release)
+  - add Mojolicious::Plugin::AutoRoute::template function
+0.09 (beta release)
+  - catch up with Mojolicious 4.0.
+  - added finish_rendering helper.
+0.08 (beta release)
+  - fixed bug that multiple auto route don't work
+0.07 (beta release)
+  - route create by AutoRoute plugin don't overwrite user defined route.
+0.06 (beta release)
+  - fixed top_dir option bug
+0.05 (beta release)
+  - added Not found logic
+  - added top_dir option
+0.04 (beta release)
+  - much simplify logic.
+0.03 (beta release)
+  - detect not found page.
+0.02 (beta release)
+  - simplified route logic, not backword compatible.
+0.01 (beta release)
+  - first beta release.

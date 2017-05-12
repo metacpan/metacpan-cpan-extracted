@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+
+use strict ;
+use warnings ;
+
+=head1 NAME 
+
+ create_module - a simple, template based, module creation script.
+
+=head1 USAGE
+
+ create_module --MODULE My::Module --TEMPLATE module_template_directory 
+
+=head1 OPTIONS
+
+Running the script without any argument will display all the options the script accepts.
+
+=head1 EXIT STATUS
+
+An error message is displayed and  a non zero status is returned if the module can't be created. 
+
+=head1 AUTHOR
+
+	Khemir Nadim ibn Hamouda
+	CPAN ID: NKH
+	mailto:nadim@khemir.net
+
+=cut
+
+#--------------------------------------------------------------------------------------
+
+our $VERSION = '0.02' ;
+
+use Module::Text::Template::Build ;
+
+Module::Text::Template::Build::create_module(@ARGV) ;
+exit(0) ;
+

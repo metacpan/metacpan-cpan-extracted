@@ -1,0 +1,60 @@
+# -*-c-*-
+#
+# $Id: 36MQGET,v 33.4 2012/09/26 16:10:04 jettisu Exp $
+#
+# (c) 1999-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+SV *
+MQGET(Hconn,Hobj,MsgDesc,GetMsgOpts,Length,CompCode,Reason)
+        MQHCONN Hconn
+        MQHOBJ  Hobj
+        MQMD    MsgDesc
+        MQGMO   GetMsgOpts
+        MQLONG  Length
+        MQLONG  CompCode = NO_INIT
+        MQLONG  Reason = NO_INIT
+
+    PREINIT:
+        PMQCHAR pBuffer = NULL; /* guess at the beginning size */
+        MQLONG  bufLen  = Length;
+        MQLONG  dataLen = 0;
+    CODE:
+        CompCode = MQCC_FAILED;
+        Reason = MQRC_UNEXPECTED_ERROR;
+        sv_setiv(ST(5),(IV)CompCode);
+        sv_setiv(ST(6),(IV)Reason);
+
+        if ( (pBuffer = (PMQCHAR)malloc(bufLen)) == NULL ) {
+            warn("Unable to allocate memory in MQGET!\n");
+            XSRETURN_EMPTY;
+        }
+
+        /*
+         * We set the MQMD and MQGMO version to 2, so users of
+         * segmentation or grouping won't have to do this manually.
+         */
+        if (MsgDesc.Version < MQMD_VERSION_2) {
+            MsgDesc.Version = MQMD_VERSION_2;
+        }
+        if (GetMsgOpts.Version < MQGMO_VERSION_2) {
+            GetMsgOpts.Version = MQGMO_VERSION_2;
+        }
+
+        MQGET(Hconn,Hobj,&MsgDesc,&GetMsgOpts,bufLen,pBuffer,&dataLen,&CompCode,&Reason);
+        Length = dataLen;
+        if (CompCode != MQCC_FAILED) {
+            RETVAL = newSVpvn(pBuffer,(dataLen < bufLen ? dataLen : bufLen));
+        } else
+            RETVAL = newSV(0);
+
+        free(pBuffer);
+    OUTPUT:
+        RETVAL
+        MsgDesc
+        GetMsgOpts
+        Length
+        CompCode
+        Reason
+

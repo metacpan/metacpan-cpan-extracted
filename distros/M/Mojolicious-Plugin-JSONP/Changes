@@ -1,0 +1,6 @@
+0.04 2015-01-11
+  - Moved from partial => 1 to render_to_string in Mojolicious 5.0 - reneeb
+  - Require Mojolicious 5.0
+
+0.03 2013-09-13
+  - Moved away from render_json to render(json) - phillipadsmith

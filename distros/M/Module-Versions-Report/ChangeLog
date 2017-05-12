@@ -1,0 +1,31 @@
+Revision history for Perl module Module::Versions::Report
+
+2008-10-21 Jesse Vincent <jesse@bestpractical.com>
+	* Fix META.yml
+	* Bump the package limit from 1k to 10k
+
+2008-06-13  Jesse Vincent <jesse@bestpractical.com>
+	
+	* Release 1.05
+	* Fix a problem with perl 5.8 introduced in 1.03
+
+
+2008-06-05  Ruslan U. Zakirov <ruz@bestpractical.com>
+
+	* Release 1.03
+	* fix compatibility with perl 5.10
+
+2007-05-21  Ruslan U. Zakirov <ruz@bestpractical.com>
+
+	* Release 1.03
+	* count modules instead of records in tables
+	* update docs
+
+2003-06-21  Sean M. Burke <sburke@cpan.org>
+
+	* Release 1.02:  First public release
+	
+	(Before this it just sat around on my hard drive for a year,
+	as I fiddled with its docs, and vacillated on which name to
+	release it as.)
+

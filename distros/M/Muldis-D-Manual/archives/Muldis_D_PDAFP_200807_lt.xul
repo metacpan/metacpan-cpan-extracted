@@ -1,0 +1,593 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="takahashi.css" type="text/css"?>
+
+<page xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+    id="presentation" xmlns:html="http:/www.w3.org/1999/xhtml"
+    orient="vertical" onkeypress="Presentation.onKeyPress(event);">
+
+<html:textarea id="builtinCode" style="visibility: collapse">
+
+<![CDATA[
+Note: You may need to
+"zoom out" in your browser
+or set it to display text
+smaller than normal (such as
+with Cmd/Ctrl-minus), so
+you can see the longer
+lines of code
+----
+Muldis D -
+Portable Databases
+At Full Power
+(2008 July Edition)
+(Live Talk Version)
+----
+Darren Duncan
+Muldis Data Systems
+****
+Victoria, BC, Canada
+****
+Database Software
+Products and Services
+(Perl by Default)
+----
+Miss something?
+See http://muldis.com
+----
+Language: "Muldis D"
+----
+Reference implementation:
+"Muldis Rosetta"
+----
+Muldis D:
+* In the context of SQL
+* Intermediate of translation
+* Semantics preserved
+----
+Features:
+* Homoiconic
+* Declarative
+----
+Grammar:
+* Abstract at core
+* Concretes are many
+* Today is pseudo-code
+----
+Scalar literals in PTMD_Tiny dialect:
+  Bool:true
+  Int:9:42
+  Blob:F:A705E
+  Text:'サンプル'
+  Rat:radix:9:3.14159
+  Rat:ratio:9:1/43
+----
+Same scalar literals in HDMD_Perl_Tiny dialect:
+  [ 'Bool', 'perl_bool', Bool::True ] # Perl 6 only
+  [ 'Bool', 'perl_bool', (1 == 1) ]  # alternative
+  [ 'Int', 'perl_int', 42 ]
+  [ 'Blob', 'md_blob', 'F', 'A705E' ]
+  [ 'Text', 'サンプル' ]
+  [ 'Rat', 'perl_rat', 3.14159 ]
+  [ 'Rat', 'perl_int_ratio', [ 1, 43 ] ]
+----
+Database wrapper toolkit
+----
+Talk format
+----
+Not DWIM but explicit
+----
+A "D" language
+----
+Basic relational terms:
+attribute : field/column
+tuple : row
+relation : rowset
+relvar : table
+dbvar : database
+----
+OO vs relational terms
+----
+Data type:
+* Value set
+* Specialization by constraint
+* Circle example
+* Main categories
+----
+Tuple and relation types
+----
+Tuples in PTMD_Tiny dialect:
+  Tuple:{}
+  Tuple:{
+    'login_name' => Text:'hartmark',
+    'login_pass' => Text:'letmein',
+    'is_special' => Bool:true,
+  }
+  Tuple:{
+    'name' => Text:'Michelle',
+    'age'  => Int:9:17,
+  }
+----
+Same in PTMD_Perl_Tiny dialect:
+  [ 'Tuple', {} ]
+  [ 'Tuple', {
+    'login_name' => [ 'Text', 'hartmark' ],
+    'login_pass' => [ 'Text', 'letmein' ],
+    'is_special' => [ 'Bool', 'md_enum', 'true' ],
+  } ]
+  [ 'Tuple', {
+    'name' => [ 'Text', 'Michelle' ],
+    'age'  => [ 'Int', 'perl_int', 17 ],
+  } ]
+----
+Relations in PTMD_Tiny dialect:
+  Relation:{}
+  Relation:{ {}, }
+  Relation:{ 'x', 'y', 'z', }
+  Relation:{
+    {
+      'login_name' => Text:'hartmark',
+      'login_pass' => Text:'letmein',
+      'is_special' => Bool:true,
+    },
+  }
+  Relation:[ 'name', 'age', ]:{
+    [ Text:'Michelle', Int:9:17, ],
+  }
+----
+Same in PTMD_Perl_Tiny dialect:
+  [ 'Relation', [] ]
+  [ 'Relation', [ {}, ] ]
+  [ 'Relation', [ 'x', 'y', 'z', ] ]
+  [ 'Relation', [
+    {
+      'login_name' => [ 'Text', 'hartmark' ],
+      'login_pass' => [ 'Text', 'letmein' ],
+      'is_special' => [ 'Bool', 'md_enum', 'true' ],
+    },
+  ] ]
+  [ 'Relation', [ 'name', 'age', ], [
+    [ [ 'Text', 'Michelle' ], [ 'Int', 'perl_int', 17 ], ],
+  ] ]
+----
+Set, Array, Bag
+----
+Scalar types and possreps
+----
+PTMD_Tiny dialect:
+  Scalar:'fed.lib.the_db.WeekDay':'name':{
+    '' => Text:'monday',
+  }
+  Scalar:'fed.lib.the_db.WeekDay':'number':{
+    '' => Int:9:5,
+  }
+HDMD_Perl_Tiny dialect:
+  [ 'Scalar', 'fed.lib.the_db.WeekDay', 'name', {
+    '' => [ 'Text', 'monday' ],
+  } ]
+  [ 'Scalar', 'fed.lib.the_db.WeekDay', 'number', {
+    '' => [ 'Int', 'perl_int', 5 ],
+  } ]
+----
+Special scalar types
+----
+Boolean types
+----
+Muldis D:
+  Bool
+SQL:
+  BOOLEAN, TINYINT(1),
+  INTEGER, NUMBER(1), ...
+----
+Numeric types
+----
+Muldis D:
+  Int, Rat
+SQL:
+  TINYINT, SMALLINT,
+  MEDIUMINT, INTEGER,
+  BIGINT, NUMERIC, NUMBER,
+  DECIMAL, REAL, FLOAT,
+  DOUBLE, BIT, PLS_INTEGER,
+  BINARY_INTEGER, ...
+----
+Binary string types
+----
+Muldis D:
+  Blob
+SQL:
+  BIT, BINARY, VARBINARY,
+  TINYBLOB, BLOB,
+  MEDIUMBLOB, LONGBLOB,
+  BYTEA, RAW, LONG RAW, ...
+----
+Character string types
+----
+Muldis D:
+  Text
+SQL:
+  CHAR, VARCHAR, TINYTEXT,
+  TEXT, MEDIUMTEXT,
+  LONGTEXT, CLOB,
+  NATIONAL variants,
+  VARCHAR2, LONG, ...
+----
+Unicode
+----
+Temporals and spatials
+----
+Routine kinds
+----
+Functions
+----
+  create in fed.myapp
+  function cube {
+    result sys.std.Core.Type.Int
+    params { topic(sys.std.Core.Type.Int) }
+    exprs {
+      exp(sca_lit Int:9:3),
+      ''(func_invo sys.std.Integer.power
+        args { radix(lex.topic), exponent(lex.exp) }
+      ),
+    }
+  }
+----
+Updaters
+----
+  create in fed.myapp
+  updater chop_sign {
+    upd_params { topic(sys.std.Core.Type.Int) }
+    exprs {
+      abs_val(func_invo sys.std.Integer.abs
+        args { topic(lex.topic) }
+      ),
+    }
+    stmt {
+      sys.std.Core.Universal.assign
+        upd_args { target(lex.topic) }
+        ro_args { v(lex.abs_val) },
+    }
+  }
+----
+Common to functions
+and updaters
+----
+Procedures
+----
+  create in fed.myapp
+  procedure fetch_all_people {
+    upd_params { people(type.var.fed.mydb.people) }
+    stmts [
+      proc_invo sys.std.Core.Universal.assign
+        upd_args { target(lex.people) }
+        ro_args { v(fed.mydb.people) },
+    ]
+  }
+----
+Inner routines
+----
+Parameters and arguments
+----
+N-ary operators
+and aggregates
+----
+Nonscalar attributes
+----
+  Relation:[ 'order_id', 'cust_id', 'order_item' ]:{
+    [ Int:9:5073, Int:9:209, Relation:{
+      { 'prod_id' => Text:'paint',  'qty' => Int:9:3 },
+    } ],
+    [ Int:9:5074, Int:9:332, Relation:{
+      { 'prod_id' => Text:'axle',  'qty' => Int:9:20 },
+      { 'prod_id' => Text:'lever', 'qty' => Int:9:50 },
+      { 'prod_id' => Text:'paint', 'qty' => Int:9:8 },
+    } ],
+    [ Int:9:5075, Int:9:17, Relation:{
+      { 'prod_id' => Text:'banana', 'qty' => Int:9:100 },
+      { 'prod_id' => Text:'orange', 'qty' => Int:9:160 },
+    } ],
+  }
+----
+Values in logic
+----
+A way to replace NULL
+----
+Identity matters,
+comparisons, type safety
+----
+Virtual reality
+----
+System Catalog
+----
+Depots
+----
+Entity Names
+  sys - system-defined entities
+    sys.std - official Muldis D features
+    sys.imp - extra implementation-specifics
+  mnt - depot mount controls
+  fed - user-def entities in all depots
+  dep - in just current depot
+  sdp - current subdepot/schema
+  pkg - current Oracle-concept package
+  inn - local inner types/routines
+  lex - lexical param args, vars, expr nodes
+----
+Code comparisons
+----
+Muldis D:
+  'x'
+SQL (as a scalar query):
+  (SELECT 'x')
+or:
+  (SELECT 'x' FROM dual)
+----
+Muldis D:
+  tab1
+SQL:
+  SELECT * FROM tab1
+----
+Muldis D:
+  sys.std.Core.Relation.cardinality(
+    topic(tab1)
+  )
+SQL (as a scalar query):
+  (SELECT COUNT(*) FROM tab1)
+----
+Muldis D:
+  sys.std.Core.Relation.projection(
+    topic(tab1),
+    attrs(Set:{ 'col1', 'col2' }),
+  )
+SQL:
+  SELECT DISTINCT col1, col2
+  FROM tab1
+----
+Muldis D:
+  sys.std.Core.Relation.semijoin(
+    source(tab1),
+    filter(Relation:{
+      { col1(Text:'hello'), col2(Int:9:5) },
+      { col1(Text:'world'), col2(Int:9:7) },
+    }),
+  )
+----
+SQL:
+  SELECT *
+  FROM tab1
+  WHERE (col1, col2) IN (
+    SELECT 'hello' AS col1, 5 AS col2
+    UNION
+    SELECT 'world' AS col1, 7 AS col2
+  )
+or:
+  SELECT *
+  FROM tab1
+  WHERE col1 = 'hello' AND col2 = 5
+     OR col1 = 'world' AND col2 = 7
+----
+The next example is a
+natural join of 2 relations
+whose attrs are as follows:
+  tab1(col1,col2,col3)
+  tab2(col2,col3,col4)
+such that the result is:
+  tab(col1,col2,col3,col4)
+----
+Muldis D:
+  sys.std.Core.Relation.join(
+    topic(QuasiSet:{ tab1, tab2 }),
+  )
+SQL:
+  SELECT DISTINCT tab1.*, tab2.col4
+  FROM tab1 NATURAL INNER JOIN tab2
+or:
+  SELECT DISTINCT tab1.*, tab2.col4
+  FROM tab1 INNER JOIN tab2 USING (col2, col3)
+or:
+  SELECT DISTINCT tab1.*, tab2.col4
+  FROM tab1 INNER JOIN tab2
+    ON tab2.col2 = tab1.col2 AND tab2.col3 = tab1.col3
+----
+Muldis D:
+  sys.std.Core.Relation.rename(
+    topic(tab1),
+    map(Relation:['before','after']:{
+      ['col1', 'foo'],
+      ['col3', 'bar'],
+    }),
+  )
+SQL:
+  SELECT col1 AS foo, col2, col3 AS bar
+  FROM tab1
+----
+Muldis D:
+  with { function myext {
+      result sys.std.Core.Type.Tuple
+      params { topic(sys.std.Core.Type.Tuple) }
+      body { Tuple:{
+        a => Text:'x',
+        b => sys.std.Integer.difference(
+          minuend(lex.topic.m),
+          subtrahend(lex.topic.n)
+        ), } }
+  }, }
+  sys.std.Core.Relation.extension(
+    topic(tab1), func(inn.myext), )
+SQL:
+  SELECT tab1.*, 'x' AS a, (tab1.m - tab1.n) AS b FROM tab1
+----
+Database constraints
+----
+Transactions and
+exception handling
+----
+Muldis Rosetta
+----
+Nature of DBMS,
+relation to app
+----
+Implemented in Perl
+----
+Structure, features, uses
+----
+Thank you!
+----
+Copyright © 2008,
+Darren Duncan
+****
+http://muldis.com
+for email, see above
+----
+This slideshow text is
+free documentation for software;
+you can redistribute it and/or
+modify it under the terms of the
+GNU General Public License (GPL) as
+published by the Free Software Foundation
+(http://www.fsf.org/); either
+version 3 of the License,
+or (at your option) any later version.
+]]>
+</html:textarea>
+
+<deck flex="1" id="deck">
+
+<vbox flex="1" onmousemove="Presentation.onMouseMoveOnCanvas(event);">
+  <toolbox id="canvasToolbar">
+    <toolbar>
+      <toolbarbutton oncommand="Presentation.home()" label="|&lt;&lt;"
+        observes="canBack"/>
+      <toolbarbutton oncommand="Presentation.back()" label="&lt;"
+        observes="canBack"/>
+      <toolbarbutton oncommand="Presentation.forward()" label="&gt;"
+        observes="canForward"/>
+      <toolbarbutton oncommand="Presentation.end()" label="&gt;&gt;|"
+        observes="canForward"/>
+      <toolbarseparator/>
+      <hbox align="center">
+        <textbox id="current_page" size="4"
+          oninput="if (this.value) Presentation.showPage(parseInt(this.value)-1);"/>
+        <description value="/"/>
+        <description id="max_page"/>
+      </hbox>
+      <toolbarseparator/>
+      <vbox flex="2">
+        <spacer flex="1"/>
+        <scrollbar id="scroller"
+          align="center" orient="horizontal"
+          oncommand="Presentation.showPage(parseInt(event.target.getAttribute('curpos')));"
+          onclick="Presentation.showPage(parseInt(event.target.getAttribute('curpos')));"
+          onmousedown="Presentation.onScrollerDragStart();"
+          onmousemove="Presentation.onScrollerDragMove();"
+          onmouseup="Presentation.onScrollerDragDrop();"/>
+        <spacer flex="1"/>
+      </vbox>
+      <toolbarseparator/>
+      <spacer flex="1"/>
+      <toolbarseparator/>
+      <toolbarbutton id="toggleEva" label="Eva"
+        type="checkbox"
+        autoCheck="false"
+        oncommand="Presentation.toggleEvaMode();"/>
+      <toolbarseparator/>
+      <toolbarbutton label="Edit"
+        oncommand="Presentation.toggleEditMode();"/>
+      <toolbarbutton oncommand="Presentation.reload();" label="Reload"/>
+    </toolbar>
+  </toolbox>
+  <vbox flex="1" id="canvas"
+    onclick="Presentation.onPresentationClick(event);">
+    <spacer flex="1"/>
+    <hbox flex="1">
+      <spacer flex="1"/>
+      <vbox id="content"/>
+      <spacer flex="1"/>
+    </hbox>
+    <spacer flex="1"/>
+  </vbox>
+</vbox>
+
+<vbox flex="1" id="edit">
+  <toolbox>
+    <toolbar>
+      <toolbarbutton label="New Page"
+        oncommand="Presentation.addPage()"/>
+      <spacer flex="1"/>
+      <toolbarseparator/>
+      <toolbarbutton label="View"
+        oncommand="Presentation.toggleEditMode();"/>
+      <toolbarbutton oncommand="Presentation.reload();" label="Reload"/>
+    </toolbar>
+  </toolbox>
+  <textbox id="textField" flex="1" multiline="true"
+    oninput="Presentation.onEdit()"/>
+  <hbox collapsed="true">
+    <iframe id="dataLoader" onload="if (window.Presentation) Presentation.onDataLoad();"/>
+  </hbox>
+</vbox>
+
+</deck>
+
+<broadcasterset>
+  <broadcaster id="canBack"/>
+  <broadcaster id="canForward"/>
+</broadcasterset>
+
+<commandset>
+  <command id="cmd_forward"
+    oncommand="if (Presentation.isPresentationMode) Presentation.forward();"/>
+  <command id="cmd_back"
+    oncommand="if (Presentation.isPresentationMode) Presentation.back();"/>
+  <command id="cmd_home"
+    oncommand="if (Presentation.isPresentationMode) Presentation.home();"/>
+  <command id="cmd_end"
+    oncommand="if (Presentation.isPresentationMode) Presentation.end();"/>
+</commandset>
+
+<keyset>
+  <key keycode="VK_ENTER"    command="cmd_forward"/>
+  <key keycode="VK_RETURN"   command="cmd_forward"/>
+  <key keycode="VK_PAGE_DOWN"  command="cmd_forward"/>
+  <key keycode="VK_RIGHT"    command="cmd_forward"/>
+  <key keycode="VK_DOWN"     command="cmd_forward"/>
+  <!-- key keycode="VK_BACK_SPACE" command="cmd_back"/-->
+  <key keycode="VK_PAGE_UP"  command="cmd_back"/>
+    <!-- <key keycode="VK_BACK_UP"  command="cmd_back"/>-->
+    <!-- <key keycode="VK_BACK_LEFT"  command="cmd_back"/>-->
+  <key keycode="VK_HOME"     command="cmd_home"/>
+  <key keycode="VK_END"    command="cmd_end"/>
+  <key key="n" modifiers="accel" oncommand="Presentation.addPage();"/>
+  <key key="r" modifiers="accel" oncommand="window.location.reload();"/>
+  <key key="e" modifiers="accel" oncommand="Presentation.toggleEditMode();"/>
+  <key key="a" modifiers="accel" oncommand="Presentation.toggleEvaMode();"/>
+</keyset>
+
+<script src="takahashi.js" type="application/x-javascript" />
+
+</page>
+
+<!-- ***** BEGIN LICENSE BLOCK *****
+   - Version: MPL 1.1
+   -
+   - The contents of this file [except for the slideshow text in the CDATA
+   - block, which is independent user data to display by the rest of the file]
+   - are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is the Takahashi-Method-based Presentation Tool in XUL.
+   -
+   - The Initial Developer of the Original Code is SHIMODA Hiroshi.
+   - Portions created by the Initial Developer are Copyright (C) 2005
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s): SHIMODA Hiroshi <piro@p.club.ne.jp>
+   -
+   - ***** END LICENSE BLOCK ***** -->

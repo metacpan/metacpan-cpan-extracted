@@ -1,0 +1,62 @@
+{
+   "abstract" : "Load a McBain API as a RESTful PSGI web service",
+   "author" : [
+      "Ido Perlmuter <ido@ido50.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "McBain-WithPSGI",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "JSON::XS" : "3.0113"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "JSON::MaybeXS" : "0",
+            "Plack::Component" : "0",
+            "Plack::Request" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request" : "0",
+            "JSON" : "0",
+            "McBain" : "0",
+            "Plack" : "1.0029",
+            "Plack::Test" : "0",
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ido50/McBain-WithPSGI/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/McBain::WithPSGI",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ido50/McBain-WithPSGI.git",
+         "web" : "https://github.com/ido50/McBain-WithPSGI"
+      }
+   },
+   "version" : "2.001001"
+}
+

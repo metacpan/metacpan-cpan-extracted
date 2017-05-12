@@ -1,0 +1,135 @@
+#!/usr/bin/perl -w
+use lib './lib';
+use Metadata::ByInode;
+use strict;
+#use Getopt::Std;
+use Getopt::Long;
+use Cwd;
+use Carp;
+use CGI::Ex::Conf 'conf_read';
+#use Smart::Comments '###';
+
+# basic filename lookup
+my %_key = ();
+my $_dbfile = '';
+my $_debug =0;
+GetOptions(
+	"key=s" => \%_key,
+	"dbfile=s" => \$_dbfile,
+	"debug=i" => \$_debug,	
+	);
+
+#my $o = {};
+#getopts('l:f:d:',$o);
+
+#$o->{l} ||= cwd;
+#$o->{f} or croak('no -f arg');
+#$o->{d} ||= abs_dbfile_from_conf();
+
+
+
+
+$_dbfile ||= abs_dbfile_from_conf();
+$_key{ abs_loc } ||= cwd(); # set location if not defined
+### %_key
+my $m = new Metadata::ByInode({abs_dbfile => $_dbfile});
+
+$m->search( \%_key );
+
+my $results = $m->search_results;
+my $count = $m->results_count;
+
+print "
+mbi-find results: $count
+dbfile: $_dbfile\n";
+for (keys %_key){
+	print "$_: $_key{$_}\n";
+}
+print "\n";
+
+
+for ( @{$results} ){
+	my $hit = $_;
+	### $hit
+	my $output = "$$hit{abs_path}";
+	
+	delete $hit->{abs_loc};
+	delete $hit->{filename};
+	delete $hit->{ondisk};
+	delete $hit->{abs_path};
+	delete $hit->{inode};
+
+	if (keys %{$hit}){ # if any other meta found...
+	# if anything else..
+		$output.=" --key";
+		for ( keys %{$hit}){
+			$output.=" $_=$$hit{$_}";
+		}
+	}	
+
+	print $output."\n";
+}
+
+
+
+
+
+
+
+exit;
+
+
+
+sub abs_dbfile_from_conf {	
+	
+	-f '/etc/mbi.conf' or _USAGE();		
+	
+	my $conf = conf_read('/etc/mbi.conf');
+	$conf->{abs_dbfile} or croak('no abs dbfile specified in conf');
+	return $conf->{abs_dbfile};
+}
+
+
+sub _USAGE {
+
+print <<_USAGE_;
+mbi-find - find files that were indexed 
+
+
+	mbi-find --dbfile /usr/share/mbi.db --location /home/myself --tag filename=mp3
+
+
+command line args
+=================
+
+--dbfile
+
+use some other sqlite db file, full path.
+Or will read conf /etc/mbi.conf
+If you do not provide --dbfile arg and there is no /etc/mbi.conf, you get
+this message.
+	
+
+--location
+
+location, if not provided, will use pwd
+
+--tag
+
+what to look for
+
+	mbi-find --tag filename=rumba mime=audio author=joe 
+
+
+
+/etc/mbi.conf
+=============
+
+	---
+	abs_dbfile: /usr/share/mbi.db
+
+_USAGE_
+
+exit;
+}
+

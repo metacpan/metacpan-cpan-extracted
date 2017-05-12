@@ -1,0 +1,39 @@
+[% related_class = add_to.related_class( request, field ) %]
+<div class="addto">
+[% PERL %] 
+  $stash->set('r_plural_moniker', $stash->get('related_class')->plural_moniker); 
+  $stash->set('r_moniker', $stash->get('related_class')->moniker); 
+  $stash->set('a_moniker', $stash->get('add_to')->moniker);
+[% END %]
+<h2>[% r_plural_moniker | ucfirst %]</h2>
+[% many = request.maybe_many_link_views( add_to.$field ) %]
+[% IF many %] 
+<ol>
+[% FOREACH link IN many %]
+<li>[% link %]</li>
+[% END %]
+</ol>
+[% END %]
+<hr>
+<h2>Add a [% r_moniker %] to [% a_moniker %]: [% add_to %]</h2>
+
+[%# need to supply the entity argument because setup_form_mode is called *on* the entity,  
+  # it can't currently be used to *set* the entity, which is annoying and might change one day %]
+
+[% request.as_form( 'addto', 
+	entity = related_class,
+	mode_args =  { addto = add_to,
+			field = field } 
+).render 
+%]
+
+<br />
+
+[% request.as_form( 'addhowmany', 
+	entity =  related_class, 
+	mode_args = { addto =  add_to,
+		      how_many =  20
+} ).render %]
+
+</div>
+

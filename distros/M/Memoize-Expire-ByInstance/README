@@ -1,0 +1,76 @@
+Memoize-Expire-ByInstance
+
+Memoize::Expire::ByInstance is intended for object oriented perl coders who
+have on occasion a need to both Memoize a method so that when invoked on any
+instance the benefit of memoization can be had, while simultaniously wanting
+to provide expiration of the memoization with per-instance lifetimes/num-uses
+granularity. 
+
+Say for instance you were working on utility classes that utilized a
+semi-generic web-interface client class, and wanted to reduce the load on the
+HTTP servers by caching identical queries.
+
+For many types of queries, you could stand to use data that is somewhat old;
+however for some types of queries, you always needed "fresh" data.
+
+You have a generic 'query' class, that you use for all the low-level
+gruntwork of performing the RPC itself. 
+
+Because the Utility classes could be used in any permutation in a resulting 
+utilities (or other classes), you have know way of assigning a reasonable
+'default' timeout for the client class, instead you hope that whomever writes
+the utility classes will set an appropriate expiration policy, and provide
+accessors to adjust their defaults on a case-by-case basis.
+
+Memoize::Expire::ByInstance allows you to implement for that use-case just as
+easily as you would for any other Memoization. Simply tie the hash you
+use for the Memoization Cache to Memoize::Expire::ByInstance, and now every
+instance can decide for themselves how old is "too" old.
+
+This ensure that you never break assumptions globally about the 'freshness' of
+the memoized methods, while still reaping all the benefits of memoization when
+caching is appropriate. 
+
+This module requires Perl 5.6.2 or later.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Memoize::Expire::ByInstance
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Memoize-Expire-ByInstance
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Memoize-Expire-ByInstance
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Memoize-Expire-ByInstance
+
+    Search CPAN
+        http://search.cpan.org/dist/Memoize-Expire-ByInstance/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Jamie Beverly
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,63 @@
+#!perl -w
+# need UnderMethods module, see below
+
+# we need to change the view arrangement because of a "feature"
+# of Mac OS 9!
+
+use UnderMethods;
+use Mac::Glue ':all';
+use strict;
+
+for (my $f = new Mac::Glue 'Finder') {
+    my($vol, $label, @orig, @prop);
+
+    $vol      = prop('startup disk');
+    $label    = prop('label_index', $vol);
+    @prop = (
+        prop('position', $vol),
+        prop(spatial_view_arrangement => of => 'desktop'),
+        prop(button_view_arrangement => of => 'desktop'),
+    );
+    @orig = (get($prop[0]), get($prop[1]), get($prop[2]));
+
+    activate();
+    set($prop[2], to => enum('not arranged'));
+    set($prop[1], to => enum('not arranged'));
+    set($prop[0], to => [10, 40]);
+
+    for my $i (0 .. 2**5) {
+        set($label, to => $i);
+    }
+
+    set($prop[0], to => $orig[0]);
+    set($prop[1], to => param_type($orig[1], typeEnumerated));
+    set($prop[2], to => param_type($orig[2], typeEnumerated));
+
+    beep(3);
+}
+
+__END__
+
+package UnderMethods;
+
+use strict;
+use overload;
+use Carp;
+use vars '$AUTOLOAD';
+
+sub import {
+    no strict 'refs';
+    *{ caller() . "::AUTOLOAD" } = \&AUTOLOAD;
+}
+
+sub AUTOLOAD {
+    my($ref) = (overload::StrVal($_) =~ /^(?:(.*)\=)?(?:[^=]*)\((?:[^\(]*)\)$/);
+    croak "Undefined subroutine &$AUTOLOAD called" unless $ref;
+    (my $name = $AUTOLOAD) =~ s/.*:://;
+    my $func = $_->can($name);
+    confess "Can't call method `$name' in $ref" unless $func;
+    unshift @_, $_;
+    goto &$func;
+}
+
+1;

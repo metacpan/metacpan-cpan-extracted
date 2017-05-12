@@ -1,0 +1,9 @@
+Revision history for Perl extension Megaport
+
+1.00 2017-03-08T22:03:02Z
+
+    - initial release
+    - supports auth via user/pass or token
+    - read-only access to locations, partner ports and own services
+    - framework for read-only objects
+

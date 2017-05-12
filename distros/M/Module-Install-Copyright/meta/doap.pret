@@ -1,0 +1,19 @@
+# This file contains general metadata about the project.
+
+@prefix : <http://usefulinc.com/ns/doap#>.
+
+`Module-Install-Copyright`
+	:programming-language "Perl" ;
+	:shortdesc            "package a COPYRIGHT file with a distribution";
+	:homepage             <https://metacpan.org/release/Module-Install-Copyright>;
+	:download-page        <https://metacpan.org/release/Module-Install-Copyright>;
+	:bug-database         <http://rt.cpan.org/Dist/Display.html?Queue=Module-Install-Copyright>;
+	:created              2012-12-04;
+	:license              <http://dev.perl.org/licenses/>;
+	:maintainer           cpan:TOBYINK;
+	:developer            cpan:TOBYINK;
+	:helper               cpan:JONASS.
+
+<http://dev.perl.org/licenses/>
+	dc:title  "the same terms as the perl 5 programming language system itself".
+

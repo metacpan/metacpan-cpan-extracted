@@ -1,0 +1,54 @@
+---
+name: Module-CPANTS-ProcessCPAN
+version: 0.77
+author:
+  - 'Thomas Klausner, <domm@cpan.org>, http://domm.zsi.at'
+abstract: Generate Kwalitee ratings for the whole CPAN
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Accessor: 0.19
+  DBD::Pg: 1.49
+  DBIx::Class: 0.06002
+  File::HomeDir: 0.66
+  GD::Graph: 1.00
+  Module::CPANTS::Analyse: 0.77
+  Module::CoreList: 1.98
+  Parse::CPAN::Authors: 2.24
+  Parse::CPAN::Packages: 2.25
+  version: 0.73
+build_requires:
+  File::HomeDir: 0.66
+provides:
+  Module::CPANTS::MyBuild:
+    file: lib/Module/CPANTS/MyBuild.pm
+  Module::CPANTS::ProcessCPAN:
+    file: lib/Module/CPANTS/ProcessCPAN.pm
+    version: 0.77
+  Module::CPANTS::Schema:
+    file: lib/Module/CPANTS/Schema.pm
+  Module::CPANTS::Schema::Author:
+    file: lib/Module/CPANTS/Schema/Author.pm
+  Module::CPANTS::Schema::Dist:
+    file: lib/Module/CPANTS/Schema/Dist.pm
+  Module::CPANTS::Schema::Error:
+    file: lib/Module/CPANTS/Schema/Error.pm
+  Module::CPANTS::Schema::HistoryAuthor:
+    file: lib/Module/CPANTS/Schema/HistoryAuthor.pm
+  Module::CPANTS::Schema::HistoryDist:
+    file: lib/Module/CPANTS/Schema/HistoryDist.pm
+  Module::CPANTS::Schema::Kwalitee:
+    file: lib/Module/CPANTS/Schema/Kwalitee.pm
+  Module::CPANTS::Schema::Modules:
+    file: lib/Module/CPANTS/Schema/Modules.pm
+  Module::CPANTS::Schema::Prereq:
+    file: lib/Module/CPANTS/Schema/Prereq.pm
+  Module::CPANTS::Schema::Run:
+    file: lib/Module/CPANTS/Schema/Run.pm
+  Module::CPANTS::Schema::Uses:
+    file: lib/Module/CPANTS/Schema/Uses.pm
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

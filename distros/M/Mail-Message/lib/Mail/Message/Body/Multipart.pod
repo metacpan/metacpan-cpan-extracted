@@ -1,0 +1,652 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Message::Body::Multipart - body of a message with attachments
+
+=head1 INHERITANCE
+
+ Mail::Message::Body::Multipart
+   is a Mail::Message::Body
+   is a Mail::Reporter
+
+=head1 SYNOPSIS
+
+ See Mail::Message::Body
+
+ if($body->isMultipart) {
+    my @attachments = $body->parts;
+    my $attachment3 = $body->part(2);
+    my $before      = $body->preamble;
+    my $after       = $body->epilogue;
+    $body->part(1)->delete;
+ }
+
+=head1 DESCRIPTION
+
+The body (content) of a message can be stored in various ways.  In this
+manual-page you find the description of extra functionality you have
+when a message contains attachments (parts).
+
+Extends L<"DESCRIPTION" in Mail::Message::Body|Mail::Message::Body/"DESCRIPTION">.
+ 
+=head1 OVERLOADED
+
+Extends L<"OVERLOADED" in Mail::Message::Body|Mail::Message::Body/"OVERLOADED">.
+ 
+=over 4
+
+=item overload: B<"">
+
+Inherited, see L<Mail::Message::Body/"OVERLOADED">
+
+=item overload: B<'==' and '!='>
+
+Inherited, see L<Mail::Message::Body/"OVERLOADED">
+
+=item overload: B<@{}>
+
+Inherited, see L<Mail::Message::Body/"OVERLOADED">
+
+=item overload: B<bool>
+
+Inherited, see L<Mail::Message::Body/"OVERLOADED">
+
+=back
+
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Message::Body|Mail::Message::Body/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Mail::Message::Body|Mail::Message::Body/"Constructors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<clone>()
+
+Inherited, see L<Mail::Message::Body/"Constructors">
+
+=item Mail::Message::Body::Multipart-E<gt>B<new>(%options)
+
+ -Option           --Defined in         --Default
+  based_on           Mail::Message::Body  undef
+  boundary                                undef
+  charset            Mail::Message::Body  'PERL' or <undef>
+  checked            Mail::Message::Body  <false>
+  content_id         Mail::Message::Body  undef
+  data               Mail::Message::Body  undef
+  description        Mail::Message::Body  undef
+  disposition        Mail::Message::Body  undef
+  eol                Mail::Message::Body  'NATIVE'
+  epilogue                                ''
+  file               Mail::Message::Body  undef
+  log                Mail::Reporter       'WARNINGS'
+  message            Mail::Message::Body  undef
+  mime_type          Mail::Message::Body  'multipart/mixed'
+  modified           Mail::Message::Body  <false>
+  parts                                   undef
+  preamble                                undef
+  trace              Mail::Reporter       'WARNINGS'
+  transfer_encoding  Mail::Message::Body  'none'
+
+=over 2
+
+=item based_on => BODY
+
+=item boundary => STRING
+
+Separator to be used between parts of the message.  This separator must
+be unique in case the message contains nested multiparts (which are not
+unusual).  If C<undef>, a nice unique boundary will be generated.
+
+=item charset => CHARSET|'PERL'
+
+=item checked => BOOLEAN
+
+=item content_id => STRING
+
+=item data => ARRAY-OF-LINES | STRING
+
+=item description => STRING|FIELD
+
+=item disposition => STRING|FIELD
+
+=item eol => 'CR'|'LF'|'CRLF'|'NATIVE'
+
+=item epilogue => BODY|STRING
+
+The text which is included in the main body after the final boundary.  This
+is usually empty, and has no meaning.
+
+Provide a BODY object or a STRING which will automatically translated
+into a C<text/plain> body.
+
+=item file => FILENAME|FILEHANDLE|IOHANDLE
+
+=item log => LEVEL
+
+=item message => MESSAGE
+
+=item mime_type => STRING|FIELD|MIME
+
+=item modified => BOOLEAN
+
+=item parts => ARRAY-OF-(MESSAGES|BODIES)
+
+Specifies an initial list of parts in this body.  These may be full
+MESSAGES, or BODIES which transformed into messages before use.  Each
+message is coerced into a L<Mail::Message::Part|Mail::Message::Part> object.
+
+MIME::Entity and L<Mail::Internet|Mail::Internet> objects are acceptable in the
+list, because they are coercible into L<Mail::Message::Part|Mail::Message::Part>'s.  Values
+of C<undef> will be skipped silently.
+
+=item preamble => BODY|STRING
+
+The text which is included in the body before the first part.  It is
+common use to include a text to warn the user that the message is a
+multipart.  However, this was useful in earlier days: most mail
+agents are very capable in warning the user themselves.
+
+Provide a BODY object or a STRING which will automatically translated
+into a text/plain body.
+
+=item trace => LEVEL
+
+=item transfer_encoding => STRING|FIELD
+
+=back
+
+example: 
+
+ my $intro = Mail::Message::Body->new(data => ['part one']);
+ my $pgp   = Mail::Message::Body->new(data => ['part three']);
+
+ my $body  = Mail::Message::Body::Multipart->new
+   ( boundary => time . '--it-s-mine'
+   , preamble => "This is a multi-part message in MIME format.\n\n"
+   , parts    => [ $intro, $folder->message(3)->decoded, $pgp ]
+   );
+
+=back
+
+=head2 Constructing a body
+
+Extends L<"Constructing a body" in Mail::Message::Body|Mail::Message::Body/"Constructing a body">.
+ 
+=over 4
+
+=item $obj-E<gt>B<attach>($messages|$bodies)
+
+Attach a list of $messages to this multipart.  A new body is returned.
+When you specify $bodies, they will first be translated into
+real messages.  MIME::Entity and L<Mail::Internet|Mail::Internet> objects may be
+specified too.  In any case, the parts will be coerced into
+L<Mail::Message::Part|Mail::Message::Part>'s.
+
+=item $obj-E<gt>B<check>()
+
+Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
+
+=item $obj-E<gt>B<concatenate>($components)
+
+Inherited, see L<Mail::Message::Body::Construct/"Constructing a body">
+
+=item $obj-E<gt>B<decoded>(%options)
+
+Inherited, see L<Mail::Message::Body/"Constructing a body">
+
+=item $obj-E<gt>B<encode>(%options)
+
+Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
+
+=item $obj-E<gt>B<encoded>()
+
+Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
+
+=item $obj-E<gt>B<eol>( ['CR'|'LF'|'CRLF'|'NATIVE'] )
+
+Inherited, see L<Mail::Message::Body/"Constructing a body">
+
+=item $obj-E<gt>B<foreachComponent>(CODE)
+
+Execute the CODE for each component of the message: the preamble, the
+epilogue, and each of the parts.
+
+Each component is a body and is passed as second argument to the CODE.
+The first argument is a reference to this multi-parted body.  The CODE
+returns a body object.  When any of the returned bodies differs from
+the body which was passed, then a new multi-part body will be returned.
+Reference to the not-changed bodies and the changed bodies will be
+included in that new multi-part.
+
+example: 
+
+ my $checked = $multi->foreachComponent(sub {$_[1]->check});
+
+=item $obj-E<gt>B<foreachLine>((CODE))
+
+It is NOT possible to call some code for each line of a multipart,
+because that would not only inflict damage to the body of each
+message part, but also to the headers and the part separators.
+
+=item $obj-E<gt>B<stripSignature>(%options)
+
+Removes all parts which contains data usually defined as being signature.
+The L<MIME::Type|MIME::Type> module provides this knowledge.  A new multipart is
+returned, containing the remaining parts.  No %options are defined yet,
+although some may be specified, because this method overrules the
+C<stripSignature> method for normal bodies.
+
+ -Option     --Defined in                    --Default
+  max_lines    Mail::Message::Body::Construct  10
+  pattern      Mail::Message::Body::Construct  qr/^--\s?$/
+  result_type  Mail::Message::Body::Construct  <same as current>
+
+=over 2
+
+=item max_lines => INTEGER|undef
+
+=item pattern => REGEX|STRING|CODE
+
+=item result_type => CLASS
+
+=back
+
+=item $obj-E<gt>B<unify>($body)
+
+Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
+
+=back
+
+=head2 The body
+
+Extends L<"The body" in Mail::Message::Body|Mail::Message::Body/"The body">.
+ 
+=over 4
+
+=item $obj-E<gt>B<isDelayed>()
+
+Inherited, see L<Mail::Message::Body/"The body">
+
+=item $obj-E<gt>B<isMultipart>()
+
+Inherited, see L<Mail::Message::Body/"The body">
+
+=item $obj-E<gt>B<isNested>()
+
+Inherited, see L<Mail::Message::Body/"The body">
+
+=item $obj-E<gt>B<message>( [$message] )
+
+Inherited, see L<Mail::Message::Body/"The body">
+
+=item $obj-E<gt>B<partNumberOf>($part)
+
+Inherited, see L<Mail::Message::Body/"The body">
+
+=back
+
+=head2 About the payload
+
+Extends L<"About the payload" in Mail::Message::Body|Mail::Message::Body/"About the payload">.
+ 
+=over 4
+
+=item $obj-E<gt>B<charset>()
+
+Inherited, see L<Mail::Message::Body/"About the payload">
+
+=item $obj-E<gt>B<checked>( [BOOLEAN] )
+
+Inherited, see L<Mail::Message::Body/"About the payload">
+
+=item $obj-E<gt>B<contentId>( [STRING|$field] )
+
+Inherited, see L<Mail::Message::Body/"About the payload">
+
+=item $obj-E<gt>B<description>( [STRING|$field] )
+
+Inherited, see L<Mail::Message::Body/"About the payload">
+
+=item $obj-E<gt>B<disposition>( [STRING|$field] )
+
+Inherited, see L<Mail::Message::Body/"About the payload">
+
+=item $obj-E<gt>B<dispositionFilename>( [$directory] )
+
+Inherited, see L<Mail::Message::Body::Encode/"About the payload">
+
+=item $obj-E<gt>B<isBinary>()
+
+Inherited, see L<Mail::Message::Body::Encode/"About the payload">
+
+=item $obj-E<gt>B<isText>()
+
+Inherited, see L<Mail::Message::Body::Encode/"About the payload">
+
+=item $obj-E<gt>B<mimeType>()
+
+Inherited, see L<Mail::Message::Body/"About the payload">
+
+=item $obj-E<gt>B<nrLines>()
+
+Inherited, see L<Mail::Message::Body/"About the payload">
+
+=item $obj-E<gt>B<size>()
+
+Inherited, see L<Mail::Message::Body/"About the payload">
+
+=item $obj-E<gt>B<transferEncoding>( [STRING|$field] )
+
+Inherited, see L<Mail::Message::Body/"About the payload">
+
+=item $obj-E<gt>B<type>( [STRING|$field] )
+
+Inherited, see L<Mail::Message::Body/"About the payload">
+
+=back
+
+=head2 Access to the payload
+
+Extends L<"Access to the payload" in Mail::Message::Body|Mail::Message::Body/"Access to the payload">.
+ 
+=over 4
+
+=item $obj-E<gt>B<boundary>( [STRING] )
+
+Returns the boundary which is used to separate the parts in this
+body.  If none was read from file, then one will be assigned.  With
+STRING you explicitly set the boundary to be used.
+
+=item $obj-E<gt>B<endsOnNewline>()
+
+Inherited, see L<Mail::Message::Body/"Access to the payload">
+
+=item $obj-E<gt>B<epilogue>()
+
+Returns the epilogue; the text after the last message part (after the
+last real attachment).
+The epilogue is stored in a BODY object, and its encoding is taken
+from the general multipart header.
+
+=item $obj-E<gt>B<file>()
+
+Inherited, see L<Mail::Message::Body/"Access to the payload">
+
+=item $obj-E<gt>B<lines>()
+
+Inherited, see L<Mail::Message::Body/"Access to the payload">
+
+=item $obj-E<gt>B<part>($index)
+
+Returns only the part with the specified $index.  You may use a negative
+value here, which counts from the back in the list.  Parts which are
+flagged to be deleted are included in the count.
+
+example: 
+
+ $message->body->part(2)->print;
+ $body->part(1)->delete;
+
+=item $obj-E<gt>B<parts>( [<'ALL'|'ACTIVE'|'DELETED'|'RECURSE'|$filter>] )
+
+Return all parts by default, or when ALL is specified.  C<ACTIVE> returns
+the parts which are not flagged for deletion, as opposite to C<DELETED>.
+C<RECURSE> descents into all nested multiparts to collect all parts.
+
+You may also specify a code reference which is called for each nested
+part.  The first argument will be the message part.  When the code
+returns true, the part is incorporated in the return list.
+
+example: 
+
+ print "Number of attachments: ",
+     scalar $message->body->parts('ACTIVE');
+
+ foreach my $part ($message->body->parts) {
+     print "Type: ", $part->get('Content-Type');
+ }
+
+=item $obj-E<gt>B<preamble>()
+
+Returns the preamble; the text before the first message part (before the
+first real attachment).
+The preamble is stored in a BODY object, and its encoding is taken
+from the multipart header.
+
+=item $obj-E<gt>B<print>( [$fh] )
+
+Inherited, see L<Mail::Message::Body/"Access to the payload">
+
+=item $obj-E<gt>B<printEscapedFrom>($fh)
+
+Inherited, see L<Mail::Message::Body/"Access to the payload">
+
+=item $obj-E<gt>B<string>()
+
+Inherited, see L<Mail::Message::Body/"Access to the payload">
+
+=item $obj-E<gt>B<stripTrailingNewline>()
+
+Inherited, see L<Mail::Message::Body/"Access to the payload">
+
+=item $obj-E<gt>B<write>(%options)
+
+Inherited, see L<Mail::Message::Body/"Access to the payload">
+
+=back
+
+=head2 Internals
+
+Extends L<"Internals" in Mail::Message::Body|Mail::Message::Body/"Internals">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addTransferEncHandler>( $name, <$class|$object> )
+
+=item Mail::Message::Body::Multipart-E<gt>B<addTransferEncHandler>( $name, <$class|$object> )
+
+Inherited, see L<Mail::Message::Body::Encode/"Internals">
+
+=item $obj-E<gt>B<contentInfoFrom>($head)
+
+Inherited, see L<Mail::Message::Body/"Internals">
+
+=item $obj-E<gt>B<contentInfoTo>($head)
+
+Inherited, see L<Mail::Message::Body/"Internals">
+
+=item $obj-E<gt>B<fileLocation>( [$begin, $end] )
+
+Inherited, see L<Mail::Message::Body/"Internals">
+
+=item $obj-E<gt>B<getTransferEncHandler>($type)
+
+Inherited, see L<Mail::Message::Body::Encode/"Internals">
+
+=item $obj-E<gt>B<isModified>()
+
+Inherited, see L<Mail::Message::Body/"Internals">
+
+=item $obj-E<gt>B<load>()
+
+Inherited, see L<Mail::Message::Body/"Internals">
+
+=item $obj-E<gt>B<modified>( [BOOLEAN] )
+
+Inherited, see L<Mail::Message::Body/"Internals">
+
+=item $obj-E<gt>B<moveLocation>( [$distance] )
+
+Inherited, see L<Mail::Message::Body/"Internals">
+
+=item $obj-E<gt>B<read>( $parser, $head, $bodytype, [$chars, [$lines]] )
+
+Inherited, see L<Mail::Message::Body/"Internals">
+
+=back
+
+=head2 Error handling
+
+Extends L<"Error handling" in Mail::Message::Body|Mail::Message::Body/"Error handling">.
+ 
+=over 4
+
+=item $obj-E<gt>B<AUTOLOAD>()
+
+Inherited, see L<Mail::Message::Body/"Error handling">
+
+=item $obj-E<gt>B<addReport>($object)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+=item Mail::Message::Body::Multipart-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<errors>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<log>( [$level, [$strings]] )
+
+=item Mail::Message::Body::Multipart-E<gt>B<log>( [$level, [$strings]] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logPriority>($level)
+
+=item Mail::Message::Body::Multipart-E<gt>B<logPriority>($level)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<notImplemented>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<report>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<reportAll>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<trace>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<warnings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=back
+
+=head2 Cleanup
+
+Extends L<"Cleanup" in Mail::Message::Body|Mail::Message::Body/"Cleanup">.
+ 
+=over 4
+
+=item $obj-E<gt>B<DESTROY>()
+
+Inherited, see L<Mail::Reporter/"Cleanup">
+
+=back
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in Mail::Message::Body|Mail::Message::Body/"DETAILS">.
+ 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Warning: Charset $name is not known
+
+The encoding or decoding of a message body encounters a character set which
+is not understood by Perl's Encode module.
+
+=item Error: Data not convertible to a message (type is $type)
+
+An object which is not coercable into a L<Mail::Message::Part|Mail::Message::Part> object was
+passed to the initiation.  The data is ignored.
+
+=item Warning: No decoder defined for transfer encoding $name.
+
+The data (message body) is encoded in a way which is not currently understood,
+therefore no decoding (or recoding) can take place.
+
+=item Warning: No encoder defined for transfer encoding $name.
+
+The data (message body) has been decoded, but the required encoding is
+unknown.  The decoded data is returned.
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=item Error: Unknown criterium $what to select parts.
+
+Valid choices fdr part selections are C<ALL>, C<ACTIVE>, C<DELETED>,
+C<RECURSE> or a code reference.  However, some other argument was passed.
+
+=item Warning: Unknown line terminator $eol ignored
+
+=item Error: You cannot use foreachLine on a multipart
+
+L<foreachLine()|Mail::Message::Body::Multipart/"METHODS"> should be used on decoded message bodies only, because
+it would attempt to modify part-headers and separators as well, which is
+clearly not acceptible.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Message distribution version 3.000,
+built on February 02, 2017.
+
+Do not forget to read
+L</Mail::Box-Overview>,
+L</Mail::Box-Cookbook>, and
+L</Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L</Mail::Message>,
+L</Mail::Box>,
+L</Mail::Box::IMAP4>,
+L</Mail::Box::POP3>,
+L</Mail::Box::Parser::C>,
+L</Mail::Box::Dbx> (unpublished),
+L</Mail::Transport>,
+L</Object::Realize::Later>, and
+L</User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

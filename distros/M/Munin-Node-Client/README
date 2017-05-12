@@ -1,0 +1,30 @@
+Munin-Node-Client version 0.01
+==============================
+
+Munin::Node::Client is a OO module to talk to munin nodes. It currently supports version 1.2.6 and lower, 1.3 protocol will be implemented as soon as the protocol is stable.
+See the manpage for more information on usage and planning.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  IO::Socket::INET
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Sebastian Stellingwerff
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

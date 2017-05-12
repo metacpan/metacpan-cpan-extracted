@@ -1,0 +1,6 @@
+name = "MooX-Role-CloneSet"
+# badges = ["travis"]
+authority="cpan:ROAM"
+
+module_maker="ModuleBuildTiny"
+

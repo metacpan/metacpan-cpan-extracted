@@ -1,0 +1,31 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Jingxuan Wang <wjx@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-CustomLog",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/JingxuanWang/Mojolicious-Plugin-CustomLog.git",
+         "web" : "https://github.com/JingxuanWang/Mojolicious-Plugin-CustomLog"
+      }
+   },
+   "version" : "0.06"
+}

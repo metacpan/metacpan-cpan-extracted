@@ -1,0 +1,54 @@
+DESCRIPTION
+
+The release version 1.98 of Mojolicious has dropped FastCGI support because the
+code and test quality of the FastCGI code was not conforming to the standards of
+the rest of Mojolicious codebase.
+
+This code will now be maintained as a separate distribution, using the same
+namespace as before, so installing it alongside Mojolicious should give You the
+same functionality as before.
+
+
+REASONING
+
+Other Mojolicious users and I believe that FastCGI support is still relevant
+today so the goal is to have this distribution synced with core Mojolicious and
+have the code and the tests improved so that eventually it will be merged back
+in core Mojolicious.
+
+
+AUTHORS
+
+The original author of this code is Sebastian Riedel <sri@cpan.org> and the
+full list of contributors is available in the Mojolicious distribution. Please
+don't bother the authors of Mojolicious with bug reports or feature requests;
+this should be directed to the maintainer of this code.
+
+
+MAINTAINER
+
+The maintainer of this distribution is Árpád Szász <arpad.szasz@plenum.ro>.
+You can file bug reports or feature requests on Github:
+
+https://github.com/arpadszasz/mojo-server-fastcgi/issues
+
+
+CONTRIBUTE
+
+The code for this distribution is maintained on Github and any code
+contribution is welcome:
+
+https://github.com/arpadszasz/mojo-server-fastcgi
+
+Code has been contributed by the following:
+
+pboyd (Paul Boyd)
+sri (Sebastian Riedel)
+oetiker (Tobias Oetiker)
+stigtsp (Stig Palmquist)
+
+
+BUGS
+
+- Autodetection of the FastCGI environment doesn't work.
+- Weak test suite.

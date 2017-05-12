@@ -1,0 +1,6 @@
+Revision history for Perl extension Module::CAPIMaker.
+
+0.01  Fri Jul  6 11:09:40 2012
+	- original version; created by h2xs 1.23 with options
+		-AXn Module::CAPIMaker
+

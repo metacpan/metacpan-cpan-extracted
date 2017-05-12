@@ -1,0 +1,43 @@
+---
+abstract: 'Minimalistic Log4perl adapter for Mojolicious'
+author:
+  - 'yowcow <yowcow@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  Test::Deep: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MojoX-Log-Log4perl-Tiny
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MojoX::Log::Log4perl::Tiny:
+    file: lib/MojoX/Log/Log4perl/Tiny.pm
+    version: '0.01'
+requires:
+  Log::Log4perl: '0'
+  Mojolicious: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/yowcow/p5-MojoX-Log-Log4perl-Tiny/issues
+  homepage: https://github.com/yowcow/p5-MojoX-Log-Log4perl-Tiny
+  repository: git://github.com/yowcow/p5-MojoX-Log-Log4perl-Tiny.git
+version: '0.01'
+x_authority: cpan:YOWCOW
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

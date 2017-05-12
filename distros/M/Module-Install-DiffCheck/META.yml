@@ -1,0 +1,26 @@
+---
+abstract: 'Run diff commands looking for deployment problems'
+author:
+  - 'Jay Hannah <jay@jays.net>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.112621'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Install-DiffCheck
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: 0
+  Text::Diff::Parser: 0.1000
+  inc::Module::Install: 0
+resources:
+  repository: https://github.com/jhannah/module-install-diffcheck
+version: 0.02

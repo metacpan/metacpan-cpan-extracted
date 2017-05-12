@@ -1,0 +1,57 @@
+{
+   "abstract" : "Module Install Support for Test::Base",
+   "author" : [
+      "Ingy döt Net <ingy@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Module-Install-TestBase",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt",
+         "example"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Module::Install" : "1.10",
+            "Test::Base" : "0.86",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ingydotnet/module-install-testbase-pm/issues"
+      },
+      "homepage" : "https://github.com/ingydotnet/module-install-testbase-pm",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ingydotnet/module-install-testbase-pm.git",
+         "web" : "https://github.com/ingydotnet/module-install-testbase-pm"
+      }
+   },
+   "version" : "0.86"
+}
+

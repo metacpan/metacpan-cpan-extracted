@@ -1,0 +1,11 @@
+Changes
+ignore.txt
+lib/Mojolicious/Plugin/SessionCompress.pm
+Makefile.PL
+MANIFEST
+README.md
+t/default_settings.t
+t/custom_settings.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

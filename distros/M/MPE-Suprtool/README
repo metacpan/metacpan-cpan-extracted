@@ -1,0 +1,25 @@
+MPE::Suprtool - Perl extension for calling Robelle Suprtool
+
+Notes:
+  (1) Currently, your current working directory must be an MPE
+      group for this module to work.  A later version of Suprtool
+      should fix this.
+
+  (2) "make test" will purge and create the following files, so
+      *don't run it* if you have real files of these names that
+      you need!!
+         SUCHECK1.PUB
+         SUCHECK2.PUB
+         SUCHECK3.PUB
+
+      Note that these are in PUB group.
+
+  (3) If your Suprtool2 XL is not ST2XL.PUB.ROBELLE, you can specify
+      an alternate XL when you install the module.  For example, if
+      the XL is "ST2XL.REL43.ROBELLE", you type:
+         perl Makefile.PL DEFINE="-DST2LOC=ST2XL.REL43.ROBELLE"
+      before you
+         make install
+
+Many thanks to Robelle, which generously supported the completion of this
+module.

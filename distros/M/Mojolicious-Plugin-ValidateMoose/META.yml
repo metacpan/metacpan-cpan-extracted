@@ -1,0 +1,29 @@
+---
+abstract: 'Can validate using Moose objects'
+author:
+  - 'Jan Henning Thorsen - jhthorsen at cpan.org'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-ValidateMoose
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Mojolicious: 2.8
+  Moose: 2
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mojolicious-Plugin-ValidateMoose
+  homepage: https://metacpan.org/release/Mojolicious-Plugin-ValidateMoose
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/mojolicious-plugin-validatemoose
+version: 0.02

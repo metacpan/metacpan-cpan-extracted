@@ -1,0 +1,10 @@
+Revision history for Mojolicious-Plugin-FormChecker
+
+1.001003 2015-09-20
+    - Fixed POD errors
+
+1.001002 2015-08-30
+    - Modify errors to be use Bootstrap classes
+
+1.001001 2015-03-14
+    - First version released on an unsuspecting world

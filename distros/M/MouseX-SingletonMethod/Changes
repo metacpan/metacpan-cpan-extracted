@@ -1,0 +1,17 @@
+Revision history for Perl extension MouseX::SingletonMethod
+
+0.05 2014-09-11T17:55:40Z
+    - Fixed violation of CPAN Meta Spec
+
+0.04 2013-06-26T12:33:18Z
+    - Switch to Minilla
+    - Fixed typo in document
+
+0.03    Mon Oct 22 01:25:00 2012
+        - Switch to Module::Build
+
+0.02    Tue Oct 16 02:25:00 2012
+        - fixed deps
+
+0.01    Fri Oct  7 23:23:01 2011
+        - original version

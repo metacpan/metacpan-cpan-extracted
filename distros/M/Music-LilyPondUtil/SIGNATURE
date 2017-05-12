@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d82ced48bf6b70ec7715fd4daa4b502bfa8ff0a6 Changes
+SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
+SHA1 f61ed40c17cc7c418c009275a3c6445624c1a86b MANIFEST
+SHA1 d6949a46794473dc221c91dd4ea061200dfcd65b META.json
+SHA1 0e36ccae78dc130c456edbf509c99ff996da6346 META.yml
+SHA1 3dbe421754f7a41dd7aef018f221059a8acaaf21 Makefile.PL
+SHA1 c2d2dbfd690fb17448acc048069a6ce976ea254c README
+SHA1 3de4b6471a72c53b9b2afa6fe7ed4ef0a9a54928 lib/Music/LilyPondUtil.pm
+SHA1 210e193df6719f1b91a45b400f6842d74f4cf3be t/00-load.t
+SHA1 fbd2967c5b57c70794098fa67db3f616dff75f68 t/Music-LilyPondUtil.t
+SHA1 3ef65383d82f059f56f43236663119c01974decb t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWQWrIAAoJEDTEVWqwTuCURg0H/2fj0iiNpDZoNDskTITo2eSf
+kPVhCtEek/XbTZN/YR3TF+7xxfLg7teTgVojTq59/Ql69RAVjANUAoMHy+OVH4rC
+lX8RTZH74gn/0ZCETz2DScXb6m3U3rcAmssHeu5Mk+mdLvt0R0wVFI1EVmJOvxRe
+BF/c7oQI2pDSiLQMrJ61Ubp7XeQnN46mwcNXA3fCfqtqQLebJ7SkJsE+BKx4du0O
+D8MfPD7VLmpDOOvVcXcWAVscXwEfxmG8gq9mIuSIuogYGSkugmXqCCqwbwGYjfDP
+BHkuKy8GT4lb+OdIPxL4hapcExceE9Woq9di741aN5laCVatqdfTqxvfGdskDOg=
+=xPwV
+-----END PGP SIGNATURE-----

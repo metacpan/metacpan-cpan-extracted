@@ -1,0 +1,90 @@
+#!/usr/bin/perl -w
+use 5.010;
+use strict;
+use warnings;
+use autodie;
+
+# ABSTRACT: Turn markdown into phpBB code
+# PODNAME: md2phpbb
+our $VERSION = '0.02'; # VERSION
+
+
+use Markdown::phpBB;
+
+my $md2phpbb = Markdown::phpBB->new;
+
+my $text = join('', <>);
+
+print $md2phpbb->convert($text);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+md2phpbb - Turn markdown into phpBB code
+
+=head1 VERSION
+
+version 0.02
+
+=head1 DESCRIPTION
+
+Converts markdown into phpBB / BBcode format. Will read from
+STDIN, or files on the command-line. All output is sent to
+STDOUT.
+
+Internally, this is a thin wrapper around the L<Markdown::phpBB> module.
+
+=head2 USING WITH VIM / VIMPERATOR
+
+Of most use is C<:%!md2phpbb> in vim, which will replace your current
+buffer (written in markdown) with the phpBB equivalent code. You can even
+bind it to a key (place in your `~/.vimrc` file):
+
+    :nmap <F5> :%!md2phpbb<CR>
+
+If you've installed md2phpbb into a user (rather than system) directory,
+then running vim from vimperator may not have all your perl-specific
+environment variables in place. In that case you may need to use full
+paths:
+
+    :nmap <F5> :%!perl -I/home/pjf/perl5/lib/perl5 /home/pjf/perl5/bin/md2phpbb<CR>
+
+If you're using vimperator, phpBB will get in the way of using CTRL-I to
+invoke vim. You can allow CTRL-E (or another key of your choice) to also
+invoke the editor by adding the following to your `~/.vimperatorrc` file:
+
+    :inoremap <C-e> <C-i>
+
+You can now edit a message using vim/vimperator, and hit F5 to
+convert it from markdown into phpBB. Because the converter doesn't
+change existing phpBB code, you can make further edits in markdown
+and hit F5 as many times you need to refresh into phpBB.
+
+=head1 SYNPOSIS
+
+    phpbb2md < somefile.md > somefile.phpbb
+
+=head1 SEE ALSO
+
+L<Markdown::phpBB>, L<Markdown::phpBB::Handler>, L<phpbb2md>, L<Markdent>
+
+=head1 BUGS
+
+Plenty. Report them or fix them at
+L<http://github.com/pjf/Markdown-phpBB/issues>.
+
+=head1 AUTHOR
+
+Paul Fenwick <pjf@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Paul Fenwick.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

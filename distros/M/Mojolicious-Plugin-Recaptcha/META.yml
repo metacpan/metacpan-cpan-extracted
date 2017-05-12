@@ -1,0 +1,29 @@
+---
+abstract: 'ReCaptcha plugin for Mojolicious framework'
+author:
+  - 'Dmitry Konstantinov <konstantinov.dmitry@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150001'
+keywords:
+  - mojolicious
+  - recaptcha
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Recaptcha
+provides:
+  Mojolicious::Plugin::Recaptcha:
+    file: lib/Mojolicious/Plugin/Recaptcha.pm
+    version: '0.64'
+requires:
+  Mojolicious: '4.82'
+  perl: '5.006'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/konstantinov/Mojolicious-Plugin-Recaptcha.git
+version: '0.64'

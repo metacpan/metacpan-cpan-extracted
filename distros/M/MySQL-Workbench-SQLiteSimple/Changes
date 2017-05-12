@@ -1,0 +1,11 @@
+Change history for MySQL::Workbench::SQLiteSimple
+=================================================
+
+0.02 2014-12-13
+
+    [BUGFIX]
+    * AUTOINCREMENT columns have to be primary key
+
+0.01 2014-12-12
+
+    initial release

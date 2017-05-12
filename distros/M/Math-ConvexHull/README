@@ -1,0 +1,82 @@
+NAME
+    Math::ConvexHull - Calculate convex hulls using Graham's scan (n*log(n))
+
+SYNOPSIS
+      use Math::ConvexHull qw/convex_hull/;
+      $hull_array_ref = convex_hull(\@points);
+
+DESCRIPTION
+    "Math::ConvexHull" is a simple module that calculates convex hulls from
+    a set of points in 2D space. It is a straightforward implementation of
+    the algorithm known as Graham's scan which, with complexity of
+    O(n*log(n)), is the fastest known method of finding the convex hull of
+    an arbitrary set of points. There are some methods of eliminating points
+    that cannot be part of the convex hull. These may or may not be
+    implemented in a future version.
+
+    The implementation cannot deal with duplicate points. Therefore, points
+    which are very, very close (think floating point close) to the previous
+    point are dropped since version 1.02 of the module. However, if you pass
+    in randomly ordered data which contains duplicate points, this safety
+    measure might not help you. In that case, you will have to remove
+    duplicates yourself.
+
+  EXPORT
+    None by default, but you may choose to have the "convex_hull()"
+    subroutine exported to your namespace using standard Exporter semantics.
+
+  convex_hull() subroutine
+    "Math::ConvexHull" implements exactly one public subroutine which,
+    surprisingly, is called "convex_hull()". "convex_hull()" expects an
+    array reference to an array of points and returns an array reference to
+    an array of points in the convex hull.
+
+    In this context, a point is considered to be a reference to an array
+    containing an x and a y coordinate. So an example use of "convex_hull()"
+    would be:
+
+      use Data::Dumper;
+      use Math::ConvexHull qw/convex_hull/;
+  
+      print Dumper convex_hull(
+      [
+        [0,0],     [1,0],
+        [0.2,0.9], [0.2,0.5],
+        [0,1],     [1,1],
+      ]
+      );
+  
+      # Prints out the points [0,0], [1,0], [0,1], [1,1].
+
+    Please note that "convex_hull()" does not return *copies* of the points
+    but instead returns the same array references that were passed in.
+
+SEE ALSO
+    New versions of this module can be found on http://steffen-mueller.net
+    or CPAN.
+
+    After implementing the algorithm from my CS notes, I found the exact
+    same implementation in the German translation of Orwant et al,
+    "Mastering Algorithms with Perl". Their code reads better than mine, so
+    if you looked at the module sources and don't understand what's going
+    on, I suggest you have a look at the book.
+
+    In early 2011, much of the module was rewritten to use the formulation
+    of the algorithm that was shown on the Wikipedia article on Graham's
+    scan at the time. This takes care of issues with including collinear
+    points in the hull.
+
+    <http://en.wikipedia.org/wiki/Graham_scan>
+
+    One of these days, somebody should implement Chan's algorithm instead...
+
+AUTHOR
+    Steffen Mueller, <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2003-2011 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.6 or, at your
+    option, any later version of Perl 5 you may have available.
+

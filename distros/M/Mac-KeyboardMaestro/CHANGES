@@ -1,0 +1,6 @@
+1.01    Better (and more accurate) documentation.
+        Tests to ensure non-existent variables return the empty string
+        Better error messages when you use an invalid variable name
+        Better error messages during installation when no Keyboard Maestro Engine
+
+1.00    Initial release

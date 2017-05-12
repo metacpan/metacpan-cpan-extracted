@@ -1,0 +1,30 @@
+NAME
+
+    Map::Metro::Plugin::Map::Lyon - Map::Metro map for Lyon
+
+SYNOPSIS
+
+        use Map::Metro;
+        my $graph = Map::Metro->new('Lyon')->parse;
+
+    Or
+
+        $ map-metro.pl route Lyon 1 4
+
+DESCRIPTION
+
+    See Map::Metro for usage information.
+
+    This map includes:
+    - The four metro lines (https://en.wikipedia.org/wiki/Lyon_Metro)
+
+AUTHOR
+
+    Philippe Bruhat (BooK) <book@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2015 by Philippe Bruhat (BooK) <book@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.

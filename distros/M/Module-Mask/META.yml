@@ -1,0 +1,29 @@
+---
+abstract: 'Pretend certain modules are not installed'
+author:
+  - 'Matt Lawrence <mattlaw@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Mask
+provides:
+  Module::Mask:
+    file: lib/Module/Mask.pm
+    version: 0.06
+recommends:
+  Test::Pod: 1.14
+  Test::Pod::Coverage: 1.04
+requires:
+  Module::Util: 1.00
+  Scalar::Util: 1.01
+  perl: v5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.06

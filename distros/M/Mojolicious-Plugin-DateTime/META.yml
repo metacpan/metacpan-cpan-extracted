@@ -1,0 +1,23 @@
+---
+abstract: 'Mojolicious plugin to DateTime module integration'
+author:
+  - 'Daniel Vinciguerra <daniel.vinciguerra@bivee.com.br>'
+build_requires:
+  FindBin: 0
+  Mojolicious::Lite: 0
+  Test::Mojo: 0
+  Test::More: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-DateTime
+requires:
+  DateTime: 0
+  Mojo::Base: 0
+version: 0.02

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0">
+  <dict>
+    <key>Application Version</key>
+    <string>9.1.1</string>
+    <key>Archive Path</key>
+    <string>/Users/Shared/iPhoto</string>
+    <key>ArchiveId</key>
+    <string>1</string>
+    <key>List of Faces</key>
+    <dict>
+      <key>100</key>
+      <dict>
+        <key>key</key>
+        <string>100</string>
+        <key>name</key>
+        <string>Andreas Ackerl</string>
+        <key>key image</key>
+        <string>14499</string>
+        <key>key image face index</key>
+        <integer>5</integer>
+        <key>PhotoCount</key>
+        <integer>32</integer>
+        <key>Order</key>
+        <integer>0</integer>
+      </dict>
+      <key>101</key>
+      <dict>
+        <key>key</key>
+        <string>101</string>
+        <key>name</key>
+        <string>Bertram Bummérl</string>
+        <key>key image</key>
+        <string>14499</string>
+        <key>key image face index</key>
+        <integer>5</integer>
+        <key>PhotoCount</key>
+        <integer>32</integer>
+        <key>Order</key>
+        <integer>0</integer>
+      </dict>
+    </dict>
+    <key>List of Keywords</key>
+    <dict>
+      <key>200</key>
+      <string>Tag1</string>
+      <key>201</key>
+      <string>Tag2</string>
+    </dict>
+    <key>Master Image List</key>
+    <dict>
+      <key>1</key>
+      <dict>
+        <key>MediaType</key>
+        <string>Image</string>
+        <key>Caption</key>
+        <string>IMG_01</string>
+        <key>Comment</key>
+        <string>Comment 01</string>
+        <key>GUID</key>
+        <string>AE226D38-32C1-4F36-8EF8-0B5E8E880604</string>
+        <key>Aspect Ratio</key>
+        <real>1.333333</real>
+        <key>Rating</key>
+        <integer>0</integer>
+        <key>Roll</key>
+        <integer>3</integer>
+        <key>DateAsTimerInterval</key>
+        <real>192028593.000000</real>
+        <key>ModDateAsTimerInterval</key>
+        <real>192032192.000000</real>
+        <key>MetaModDateAsTimerInterval</key>
+        <real>314028353.390942</real>
+        <key>ImagePath</key>
+        <string>t/IMG_01.JPG</string>
+        <key>ThumbPath</key>
+        <string>t/Thumbnails/IMG_01.JPG</string>
+        <key>ImageType</key>
+        <string>JPEG</string>
+        <key>latitude</key>
+        <real>1.35619998</real>
+        <key>longitude</key>
+        <real>103.8281021</real>
+        <key>Faces</key>
+        <array>
+          <dict>
+            <key>face key</key>
+            <string>100</string>
+            <key>rectangle</key>
+            <string>{{0.534668, 0.336589}, {0.100586, 0.134115}}</string>
+            <key>face index</key>
+            <integer>1</integer>
+          </dict>
+          <dict>
+            <key>face key</key>
+            <string>101</string>
+            <key>rectangle</key>
+            <string>{{0.310059, 0.351562}, {0.128906, 0.171875}}</string>
+            <key>face index</key>
+            <integer>0</integer>
+          </dict>
+        </array>
+        <key>Keywords</key>
+        <array>
+          <string>200</string>
+          <string>201</string>
+        </array>
+      </dict>
+      <key>2</key>
+      <dict>
+        <key>MediaType</key>
+        <string>Image</string>
+        <key>Caption</key>
+        <string>IMG_02</string>
+        <key>Comment</key>
+        <string></string>
+        <key>GUID</key>
+        <string>AE226D38-32C1-4F36-8EF8-0B5E8E880604</string>
+        <key>Aspect Ratio</key>
+        <real>1.333333</real>
+        <key>Rating</key>
+        <integer>3</integer>
+        <key>Roll</key>
+        <integer>3</integer>
+        <key>DateAsTimerInterval</key>
+        <real>192028593.000000</real>
+        <key>ModDateAsTimerInterval</key>
+        <real>192032192.000000</real>
+        <key>MetaModDateAsTimerInterval</key>
+        <real>314028353.390942</real>
+        <key>ImagePath</key>
+        <string>t/IMG_02.JPG</string>
+        <key>ThumbPath</key>
+        <string>t/Thumbnails/IMG_02.JPG</string>
+        <key>ImageType</key>
+        <string>JPEG</string>
+        <key>latitude</key>
+        <real>1.356445445</real>
+        <key>longitude</key>
+        <real>103.23423433</real>
+        <key>Faces</key>
+        <array>
+          <dict>
+            <key>face key</key>
+            <string>100</string>
+            <key>rectangle</key>
+            <string>{{0.534668, 0.336589}, {0.100586, 0.134115}}</string>
+            <key>face index</key>
+            <integer>1</integer>
+          </dict>
+        </array>
+        <key>Keywords</key>
+        <array>           
+          <string>201</string>
+        </array>
+      </dict>
+    </dict>
+  </dict>
+</plist>

@@ -1,0 +1,137 @@
+2010-06-18  Marcel Gruenauer  <marcel@cpan.org>
+
+	* Received.pm: 0.26
+	* Makefile.PL: added dependencies
+
+2010-06-16  Marcel Gruenauer  <marcel@cpan.org>
+
+	* Received.pm: 0.25
+	* t/all.t:
+	- fixed so tests work with recent MailTools
+	- added TODO test case
+
+2003-03-17  Adam Spiers  <perl@adamspiers.org>
+
+	* Received.pm:
+	- case-insensitive days and months (thanks to Jernej Porenta for
+	  pointing out that some MTAs write these in lower case)
+	- 0.24
+
+2003-02-27  Adam Spiers  <perl@adamspiers.org>
+
+	* README: update URL
+
+2002-01-01  Adam Spiers  <perl@adamspiers.org>
+
+	* Received.pm: fix SYNOPSIS
+
+2001-10-21  Adam Spiers  <perl@adamspiers.org>
+
+	* Received.pm: fix warning
+
+2001-10-09  Adam Spiers  <perl@adamspiers.org>
+
+	* Received.pm: pod tweaks
+
+	* Received.pm: recognise (helo=1.2.3.4)
+
+2001-10-09  Adam Spiers  <perl@adamspiers.org>
+
+	* Received.pm: pod tweaks
+
+	* Received.pm: recognise (helo=1.2.3.4)
+
+2000-04-28  Adam Spiers  <perl@adamspiers.org>
+
+	* Received.pm: cosmetics
+
+	* Received.pm: small tidy-ups
+
+2000-04-27  Adam Spiers  <perl@adamspiers.org>
+
+	* Received.pm: 0.23
+
+	* Received.pm: oops, forgot brackets around domain_lit
+
+	* Received.pm: 0.22
+
+2000-04-26  Adam Spiers  <perl@adamspiers.org>
+
+	* t/all.t, Received.pm:
+	loads of tidying up and bugfixes (and new bugs probably)
+
+2000-04-12  Adam Spiers  <perl@adamspiers.org>
+
+	* README: RFC822 mutterings
+
+2000-04-10  Adam Spiers  <perl@adamspiers.org>
+
+	* Received.pm: doh, forgot =over 4 and =back
+
+	* t/all.t: more tests (this should be enough now)
+
+	* Received.pm:
+	- better docs
+	- hms was missing from date_time3 parse
+
+	* README: Added to `Uses' section
+
+2000-04-09  Adam Spiers  <perl@adamspiers.org>
+
+	* INSTALL, MANIFEST, Makefile.PL, README, t/all.t: first versions
+
+	* Received.pm:
+	- now inherits from Mail::Field::Generic too
+	- added pod about this
+
+2000-04-05  Adam Spiers  <perl@adamspiers.org>
+
+	* Received.pm: missed a )
+
+	* Received.pm: allow from <foo@bar.com>
+
+	* Received.pm: `from' after `by' ...
+
+	* Received.pm: `from' sometimes after `id'?! *sigh*
+
+2000-04-04  Adam Spiers  <perl@adamspiers.org>
+
+	* Received.pm:
+	- Moved from Mail::Header::Received to Mail::Field::Received
+	- several other improvements
+
+2000-03-20  Adam Spiers  <perl@adamspiers.org>
+
+	* Received.pm: date parsing tweaks
+
+2000-03-19  Adam Spiers  <perl@adamspiers.org>
+
+	* Received.pm:
+	- zone tweak
+	- ,... allowed after addr_spec4
+
+	* Received.pm:
+	- Numerous improvements to the parser.  It now catches virtually all
+	  exceptions to the RFC.
+	- Replaced the $state variable with %expecting.
+
+	* Received.pm: allow `, ...' at end of addr_spec
+
+	* Received.pm: allow for -0500(EST) i.e. no space
+
+2000-02-14  Adam Spiers  <perl@adamspiers.org>
+
+	* Received.pm: export %RC
+
+2000-02-12  Adam Spiers  <perl@adamspiers.org>
+
+	* Received.pm:
+	- (c) 2000
+	- version not from RCS
+
+2000-02-11  Adam Spiers  <perl@adamspiers.org>
+
+	* Received.pm: pod fixes
+
+	* Received.pm: Initial import.
+

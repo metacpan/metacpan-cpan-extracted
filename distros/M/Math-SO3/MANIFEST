@@ -1,0 +1,7 @@
+README
+Changes
+MANIFEST
+Makefile.PL
+SO3.pm
+SO3.xs
+test.pl

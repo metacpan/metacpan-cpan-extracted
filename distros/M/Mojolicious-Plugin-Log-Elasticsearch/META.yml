@@ -1,0 +1,21 @@
+---
+abstract: 'Mojolicious Plugin to log requests to an Elasticsearch instance'
+author:
+  - 'Justin Hawkins <justin@eatmorecode.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Log-Elasticsearch
+requires:
+  Mojolicious: '4.63'
+resources:
+  homepage: https://github.com/EatMoreCode/Mojolicious-Plugin-Log-Elasticsearch
+  repository: https://github.com/EatMoreCode/Mojolicious-Plugin-Log-Elasticsearch.git
+version: '1.162530'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,12 @@
+ChangeLog
+MANIFEST			This list of files
+META.yml
+Makefile.PL
+NEWS
+README
+lib/Math/BLAS.pm
+lib/Math/BLAS/ChangeLog
+lib/Math/BLAS/Enum.pm
+lib/Math/BLAS/Legacy.pm
+lib/Math/BLAS/PP.pm
+lib/Math/ChangeLog

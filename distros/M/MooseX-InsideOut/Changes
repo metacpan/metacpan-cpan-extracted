@@ -1,0 +1,39 @@
+Revision history for MooseX-InsideOut
+
+0.106   Sat, 05 Mar 2011 21:50:10 -0600
+  * stop shipping two copies of the pod tests
+
+0.105   Mon, 27 Sep 2010 15:06:30 -0400
+  * avoid warnings with latest Moose
+
+0.104   Thu, 10 Sep 2009 22:12:11 -0400
+
+  * avoid warnings with latest Moose
+
+0.103   Mon, 27 Apr 2009 11:22:28 -0400
+
+  * avoid warnings with latest Moose
+
+0.102   Sat, 04 Apr 2009 16:43:59 -0400
+
+  * add prereq for namespace::clean
+
+0.101   Sat, 04 Apr 2009 12:32:03 -0400
+
+  * fix and test inlining
+
+0.100   Sat, 04 Apr 2009 01:42:14 -0400
+
+  * major incompatible update for modern Moose; see POD for new usage
+
+0.003   Mon May 19 09:59:06 EDT 2008
+
+  * mark failing inheriting-from-Moose test TODO
+
+0.002   Wed, 30 Jan 2008 17:40:32 -0500
+
+  * get rid of the 'extends' interface, emulate MooseX::StrictConstructor
+
+0.001   Thu, 24 Jan 2008 13:17:54 -0500
+
+  * first release; thanks to stevan and mst for help

@@ -1,0 +1,23 @@
+Revision history for Perl extension Math::Symbolic::Custom::CCompiler.
+
+1.04  Wed Jun 05 07:48 2013
+  - POD encoding fix
+
+1.03  Tue May 14 19:00 2013
+  - Move POD tests to xt/
+
+1.02  Sat Jan  5 11:53 2008
+  - Added support for Math::Symbolic 0.509's B_ARCTANGENT_TWO op.
+
+1.01  Wed Sep 14 10:47 2006
+  - Added optional POD tests.
+
+1.00  Sat Jul 30 21:43 2005
+  - Changed call to _find_vars in the ::Compiler package to a method call
+    to explicit_signature() which does basically the same thing. Reason
+    is, that I've done this to ::Compiler a while ago an removed
+    _find_vars. So no I've learned why you don't just call private
+    routines of another package!
+
+0.01  Wed Jan 14 14:09 2004
+  - original version as uploaded to CPAN

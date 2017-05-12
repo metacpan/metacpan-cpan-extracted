@@ -1,0 +1,24 @@
+NAME
+
+MIME::Lite::Generator - generate email created with MIME::Lite chunk by chunk, in memory-efficient way
+
+DESCRIPTION
+
+MIME::Lite is a good tool to generate emails. It efficiently works
+with attachments without reading whole file into memory. But the
+only way to get generated email in memory-efficient way is to call
+print method. print is good enough to write content to the files or
+other blocking handles. But what if we want to write content to
+non-blocking socket? print will fail when socket will become
+non-writable. Or we may want to write inside some event loop.
+MIME::Lite::Generator fixes this problem. Now we can generate email
+chunk by chunk in small portions (< 4 kb each) and get result as a string.
+
+DEPENDENCIES
+
+MIME::Lite 3.020+
+
+INSTALLATION
+
+perl Makefile.PL
+make && make test && make install

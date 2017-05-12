@@ -1,0 +1,40 @@
+Module-AutoINC version 0.01
+===========================
+
+This module downloads and installs publicly available modules the first time 
+they are used in a script if they are not already installed.  
+
+When Module::AutoINC is loaded, it will add itself to @INC and catch any 
+requests for missing resources.  If a Perl module is requested that has not been 
+installed, then this will attempt to load it.  Under Active State Perl (or any 
+Perl where PPM is available), PPM will attempt to install it.  Otherwise CPAN 
+will be queried and, assuming that the module exists on CPAN, CPAN::Shell will 
+be invoked to install it. Execution of the script continues after the requisite 
+module has been installed.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+On windows systems you may need to use a different make program, such as nmake.
+
+DEPENDENCIES
+
+The only dependencies are to the standard modules CPAN, File::Basename, 
+File::Spec, and Config.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Language Weaver, Inc.
+Copyright (C) 2004 by Don Schwarz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

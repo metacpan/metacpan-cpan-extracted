@@ -1,0 +1,244 @@
+Revision history for Perl MySQL::Admin 1.12
+1.12
+   a few small fixes.
+   Default date (0000-00-00) in MySQL will not work longer.
+   unescaped brakets in regexp are deprecated.
+1.05
+    IE explorer fix. 
+
+1.03
+   Test::Pod::Coverage failed for DBI::Library::Database at some systems.
+  
+1.01
+   I Think the main System works now.Looking for tester and Translators.
+   There a only a few changes since 0.94 forget to update the change log in the past.
+   Currently I use MYsql::Admin also as CMS (take a look at http://lindnerei.de).
+   So there a few new files in extra/.
+   rpc.pl ( need 'Frontier::RPC2' => '>=0.06')  
+   xml-rpc file for the Blog (scribe fire).
+   Use Movable type if you choose the blog type.
+   plaintext.pl ( need 'XML::XSLT' => '>=0.48')
+   The CMS use a pure JavaScript system.
+   This file can be parsed by Google without js.
+   Move this files to /cgi-bin/ if necessary.
+   Search::Tools::UTF8
+   Will be used to detect the encoding of none Unicode tables.
+   Could be possible that the following line will be need at several places within the source code.
+   eval{
+    use Search::Tools::UTF8;
+    utf8::encode(
+    $value
+    ) unless is_valid_utf8( $value );#works always instead of utf8::is_utf8
+   };
+   eval is used because the system works also without XS.
+
+0.94
+      Grow out Syntax::Highlight::Perl because got trouble with Unicode.
+
+0.93
+     Updated Version include also the CMS Files.
+
+0.9   New Design and all old features a available.
+
+0.86
+      Nach dem ich blob files einführt hatte habe ich erstmal ein paar bugs verbaut.
+      Speichern funktioniert wieder.
+      Bei Export werden binary files ausgespart.
+      
+0.85
+      Bugs: change primary key (broken since datatype blob avaible.)
+
+0.84
+     fixed installer, ./Build tarball 
+
+0.83
+      A few bugs...
+
+0.79
+      Try to install the apache virtual host config for you.
+      Should works fine with ubuntu.
+      Support for Blob (binary file uploads).
+
+0.78  Bug fixes
+
+0.77  Experimental support for Foreign Keys.
+      Bug fixes.
+
+0.76  mod_perl support fixed
+      take a look @examples/apache2-example-config.conf
+
+0.74  Work around
+      higlight Sql (linked to Dokumentation on click)
+
+0.73  Bug fixes
+
+0.72 Workaround
+
+0.71 chmod fixed
+
+0.7  Cleaned up Version with many Bug fixes.
+
+0.69
+      Autocomplete Sql Editor.
+0.68
+      use Authen::Captcha
+      New login Screen
+0.67
+      IE Explorer js fix
+0.66
+      This Version is not Backward Compatible !
+      This Version comes with a new html5 xsl Ajax Frontend.
+      In the future MySQL Admin will be only a MySQL Administation tool
+      like phpMyAdmin but in Perl ...
+      Testers, Developers and Translators feel free to join this Project
+      at http://sourceforge.net/projects/lindnerei/.
+
+0.62
+      final html4 cgi version.
+      
+0.61
+     fixed,
+     ChangeCharset
+     AutoincrementValue
+     AddBookmark
+0.6
+    cleanup
+0.59
+    .htaccess fixed
+0.58
+     install.sql, permalink and blog tag bbcode fixed
+0.57
+     multiple delete EditTree
+     rights for Bookmarks
+     Create newTable form fixed
+     SaveNewTable  PrimaryKey fixed
+     Show Processlist
+     Show Variables
+     Change Charset
+     translate fixed
+     news per/page settings
+     ./Build install_docs
+     searchDatabase
+     empty directory bug Explorer
+     rename files
+0.56
+     trash fixed
+0.55
+     trash,translate, some fixes
+0.53
+     editCats fixed.
+     BBCODe fixed
+0.52
+     Crystal Style
+     delete some old translations and settings.
+     maxlength news fixed
+     Settings
+     Espanol translation (Thanks to  moises marquez )
+     maxlength fixed
+     reserved_words primary key
+0.51
+     a few fixes.
+     %ALIAS% htaccess
+     saveedit news.pl
+     exec sql form.
+     referer verif.pl
+     $ACCEPT_LANGUAGE editTree.pl
+     search.js droped
+0.49
+     clean html (pages.html fixed)
+0.48
+     ".htaccess" fixed
+     pages.html fixed
+     multiple cats fixed.
+     showThread fixed
+0.47
+     This Version is not Backward Compatible !
+     charset changed to utf8
+     news:
+     multiple cats selectable in profile
+     xml-rpc support (beta testet with scribefire)
+     Share on Facebook,Myspace link(settings)
+     Search:
+     regexp search
+     Bookmarks:
+     Add to bookmarks link.
+     Import Firefox bookmarks
+     Database:
+     Als neuer Ordner einfuegen(anhaengen)
+0.45 
+      attachment wird gelöscht(aus der Datenbank) beim bearbeiten.
+      links_pro_page für suche einbauen.
+0.44
+      Database Overeview (ShowDatabases),Delete and Create Databases (DropDatabase CreateDatabase)
+      some fixes, default password
+0.43
+      language Buttons
+      Sort Exlorer Tables
+      Html::Menu::TreeView 1.05 is required
+      Admin Password will be set during Build.PL
+0.42
+       Benutzt jetzt Parse::BBCode
+       Smilies sind rausgeflogen
+       Multiples leeren truncate fixed
+       Delete User geht jetzt.
+       Für perl Code wird wieder Syntax::Highlight::Perl benutzt ansonsten Syntax::Highlight::Engine::Kate
+       Style angepasst html gesäubert
+0.41
+       This Version is not Backward Compatible !
+       Renamed to Msql::Admin.
+0.37
+       This Version is not Backward Compatible !
+       Enlarged Database Editor.
+       New default style.
+       Import / Export Opera Bookmarks Drag&drop TreeView Items
+       Ajax support(cgi::cms required no ajax, but if youe want use it take a look in lze.pl)
+       Antiflood.
+       links_pro_page
+       layout editor
+       Current Action Menu (edit file menu action).
+
+0.36   Some changes for the new Style
+
+0.35
+       thread anzeigen bei bearbeiten news.pl
+       Doku.
+0.34
+       A few Security fixes !!!!
+       extended editor
+       align profiles
+       Help Action
+       antiflood settings
+       news-right
+       upload right
+       Bilder im Fileeditor anzeigen.
+       menü length durch ... ersetzen
+
+0.31
+        fix en de tags, db installer first post antiflood.
+
+0.30
+        use Syntax::Highlight::Engine::Kate
+        system style
+        new bbcode tags en de [code=lang]
+        save old .htaccess, bookmarks and navigation.
+        a few fixes and much more.
+0.29
+        ./Build install_examples, testdb , gbook,.a few fixes
+
+0.28
+        alle module in eine distrubtion zusammengefasst
+        zoom buttons, neues file erstellen,chmod files  uvm,
+
+0.27 some fixes
+
+0.26
+    Overwrought Docs and clean up code, fix build System
+
+0.25
+     -a few fixes
+0.24
+     -refactoring.
+
+0.01  Sun Jan 22 01:37:35 2006
+        - original version; created by h2xs 1.23 with options
+                -XAn  MySQL::Admin

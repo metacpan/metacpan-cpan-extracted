@@ -1,0 +1,62 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 43bd56b2e6c5124e9ed88ddc82c637ac218cb313 Changes
+SHA1 df55372ea220325a7b86ef0609c55a304d2b6c91 GraphViz.pm
+SHA1 947ef2005f21025ba186456222922d8398cfec27 GraphViz/Utils.pm
+SHA1 882221895a73bad18eb9f16a0ce523a968a932c1 LICENSE.artistic_2
+SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE.bsd
+SHA1 5ee05aed80c62462649d4b4726341e7cbb6b96e8 MANIFEST
+SHA1 a53499972fb44ddd2c7603ef7b99c2b69a950b6f META.yml
+SHA1 358f414381e01b8b558ee43bd8885860ab9df51d Makefile.PL
+SHA1 b7334b7b5e1ca02d5d753effae37ab849a9d3648 README
+SHA1 ba7b59a0d46cb5ff56d4695793362c46ea3a1fc0 examples/ex1.pl
+SHA1 8c383c9f6d42c2a783afb8bbceb70cb5f2bd2de6 examples/ex2.pl
+SHA1 eaebfe7c286e494965a87f61712e43a91821bed1 examples/ex3.pl
+SHA1 3fb5786f450a2f2f09504610e37b5b836f09f3a6 examples/ex4.pl
+SHA1 fb35caf900c5eadaddb9f53364a50714af7ff941 images/ex1.png
+SHA1 7c9bd0efe4e0ad84b4fd179373277a8fb50caee1 images/ex2.png
+SHA1 6e60c3b45ebc7422e348b26e5b846fd97364565e images/ex3.png
+SHA1 364da21c00b863ef6715a37a362344a16bcbaca4 images/ex4.png
+SHA1 d2664c57b65686abbfbbe1e71229761625be4922 inc/Module/Install.pm
+SHA1 da41a8d9904f7b409b49a5f6c338d3eb305a2b4b inc/Module/Install/Base.pm
+SHA1 0db0afe19cd298abba248fa089e5525bd5ab3ab6 inc/Module/Install/Can.pm
+SHA1 e7152bfd5ca67d0e33f96d09c59d600bca5c1f15 inc/Module/Install/Fetch.pm
+SHA1 29ee1cb0dc262b00983e3a2f5cf00b538dff5069 inc/Module/Install/Makefile.pm
+SHA1 e963f80cfe255f16e55067d1feb6841cff3ed2fe inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 65a1f09af1f4f9e47a98b6b45667c328b1b2f9c0 inc/Module/Install/Win32.pm
+SHA1 f191c49475b3f51775180cd4f7e41e3bdab7f85a inc/Module/Install/WriteAll.pm
+SHA1 028b85d29fc289353b0947f1d57205ae091ddae4 t/Map-Tube-GraphViz-Utils/00-use.t
+SHA1 d7b7b9eca6be80165e2316e4afdbcdbe3dea985f t/Map-Tube-GraphViz-Utils/01-version.t
+SHA1 89f5c1479dbea85919645bfc73072ffcda985532 t/Map-Tube-GraphViz-Utils/02-pod_coverage.t
+SHA1 8d3ae5c02ac4f7d397d2a05c9c77adc4ee1842c5 t/Map-Tube-GraphViz-Utils/03-pod.t
+SHA1 52dce8b6682173de235d83bb867dcad0409f31a1 t/Map-Tube-GraphViz/00-use.t
+SHA1 b83316cdc2598577a98c16a1e997b6e4f2c52a65 t/Map-Tube-GraphViz/01-version.t
+SHA1 fe8c4819bf8fb6e4bd641d4749a2690d78149fd9 t/Map-Tube-GraphViz/02-pod_coverage.t
+SHA1 c8c6141e640547c87fe7bfd3d2572b1299f3c3a1 t/Map-Tube-GraphViz/03-pod.t
+SHA1 3270dbd46382deb784809811dd62336a84278ae8 t/Map-Tube-GraphViz/04-new.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJU7COWAAoJEJe+XXKaIuTlCHkIALEGpsrGpnd6vPgRE1LfyqTc
+9aToLYdyU0s07lXY5pDr8MfXAJljBFItHOaH27qh0HLwE2GjvKZRzFaUhZciVWHz
+4uCBfxKOgA0SXDz+r+T4lUHOlO3TEucyzOefCshChejkJDzn46PeMBva4ydBaS2m
+eZ8Do6+eXfvy27+sMJ0beMnCYHFdCCUWBo7l77nrwoQGiLM3ujzL6A0sNm5BGZnw
+d5K79ueUJMPzSoMIfI3+Fs8zTgjkCuUIZ7yKGm2snL1ZneYBdjEN7LHmDDZKwyjp
+mtqN3FlkN2OyeLqFIhqgVm5Gu9hVoOI/u6ozuYcSyBiNbmwthKydpdtl9cCxuv8=
+=5gsA
+-----END PGP SIGNATURE-----

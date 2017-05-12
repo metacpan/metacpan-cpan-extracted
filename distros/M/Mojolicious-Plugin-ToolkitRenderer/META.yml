@@ -1,0 +1,36 @@
+---
+abstract: 'Template Toolkit Renderer Mojolicious Plugin'
+author:
+  - 'Gryphon Shafer <gryphon@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Mojolicious::Lite: '0'
+  Test::Mojo: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  blib: '1.01'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-ToolkitRenderer
+requires:
+  Mojo::Base: '0'
+  Mojo::Exception: '0'
+  Template: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/gryphonshafer/Mojo-Plugin-Toolkit/issues
+  homepage: https://github.com/gryphonshafer/Mojo-Plugin-Toolkit
+  repository: https://github.com/gryphonshafer/Mojo-Plugin-Toolkit.git
+version: '1.07'

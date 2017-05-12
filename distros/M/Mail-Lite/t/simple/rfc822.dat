@@ -1,0 +1,8 @@
+---
+-
+  - rfc822
+  -
+    - how_are_you: fine
+      who_are_you: man
+    - sam: medved
+      some: net

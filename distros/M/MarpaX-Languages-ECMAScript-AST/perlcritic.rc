@@ -1,0 +1,4 @@
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitStringyEval]
+allow_includes = 1
+[Perl::Critic::Policy::TestingAndDebugging::ProhibitNoStrict]
+allow = vars subs refs

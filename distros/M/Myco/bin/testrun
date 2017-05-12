@@ -1,0 +1,74 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use warnings;
+use FindBin;
+use Getopt::Std;
+use DBI;
+use Test::Unit::TestRunner;
+use Carp;
+
+$SIG{__WARN__} = sub {
+    print STDERR "##################################################################\n";
+    &Carp::cluck;
+    print "\n";
+};
+
+# Figure out where to find the test classes.
+use lib "$FindBin::Bin/../lib", "$FindBin::Bin/../test";
+
+# Turn on buffer autoflush.
+$| = 1;
+
+# Get the arguments and set up the relevant environment variables.
+our ($opt_h, $opt_T, $opt_m, $opt_b, $opt_D, $opt_d);
+getopts('hTmbd:D:');
+usage() if $opt_h;
+$ENV{TANGRAM_TRACE} = $opt_T ? 1 : 0;
+$ENV{MYCO_TESTMEM} = $opt_m ? 1 : 0;
+$ENV{MYCO_TESTCONFESS} = $opt_b ? 1 : 0;
+$ENV{MYCO_TEST_DEBUG} = $opt_d || 0;
+DBI->trace($opt_D || 0);
+
+# Tell the test suite where to look for the test classes.
+unless( @ARGV ) {
+    no warnings;
+    eval qq<
+        require Myco::Test::Suite;
+    >;
+    $Myco::Test::Suite::TESTROOT = "$FindBin::Bin/../test";
+}
+
+# Run the tests.
+my $testrunner = Test::Unit::TestRunner->new();
+$testrunner->start(@ARGV ? @ARGV : 'Myco::Test::Suite');
+
+# Cleanup dangling LDAP and IMAP data
+#my $cleanup_file = $ENV{MYCO_ROOT}.'test/ldap_imap_cleanup.txt';
+#open(F, "< $cleanup_file");
+
+
+print "\n\n";
+
+sub usage {
+    my $prog = substr($0, rindex($0, '/')+1);
+
+    print qq{
+Usage: $prog [options]
+
+Supported Options:
+  -b Generate a stack backtrace if an exception occurs.
+  -T Enable Tangram trace. Off by default.
+  -m Enable Tangram memory trace. Off by default.
+  -D Enable DBI trace. Supply a value between 0 and 9 depending on how much
+     trace information you want. See the DBI man page for more information.
+     Disabled (0) by default.
+  -d Display test debug messages (generated in tests via the call
+     "\$test->db_out(\$message)").  For numbered tests supply
+     the test number to see the debug messages for that test, or -1 to
+     see messages from all tests.
+  -h Display this usage message and exit.
+
+};
+    exit;
+}

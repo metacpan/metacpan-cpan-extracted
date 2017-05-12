@@ -1,0 +1,23 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+
+use Mac::Pasteboard;
+
+my $file = shift @ARGV || 'clipboard';
+
+my $pb = Mac::Pasteboard->new ();
+
+my @img = $pb->paste_all ('public.image')
+    or die "No data conforming to 'public.image' found.\n";
+
+foreach my $item (@img) {
+    my $tags = $pb->flavor_tags ($item->{flavor});
+    my $fn = $tags->{extension} ? "$file.$tags->{extension}" : $file;
+    warn "Creating $fn\n";
+    open (my $fh, '>', $fn) or die "Failed to open $fn: $!\n";
+    binmode $fh;
+    print $fh $item->{data};
+    close $fh;
+}

@@ -1,0 +1,56 @@
+
+make test BENCHMARK=3     t.benchmarkcalc.t
+
+
+	# short to	0.906 ms
+	# short from	0.510 ms
+	# long to	5.416 ms
+	# long from	4.892 ms
+
+make test BENCHMARK=3    t.useFROMbaseShortcuts.t
+
+
+	# short b2->b8_directTObase32	0.893 ms
+	# short b2->b8_multiplyTo_b32	1.101 ms
+
+	# long  b2->b8_directTObase32	2.105 ms
+	# long  b2->b8_multiplyTo_b32	8.422 ms
+
+	# benchmark 183deadbeef2feed1baddad123468
+	# b16->256_directTObase32	2.961 ms
+	# benchmark 183deadbeef2feed1baddad123468
+	# b16->256_multiplyTo_b32	7.581 ms
+
+	# benchmark 123468
+	# b16->256_directTObase32	1.299 ms
+	# benchmark 123468
+	# b16->256_multiplyTo_b32	1.452 ms
+
+	# benchmark f2feed1baddad123468
+	# b16->256_directTObase32	2.283 ms
+	# benchmark f2feed1baddad123468
+	# b16->256_multiplyTo_b32	4.570 ms
+
+make test BENCHMARK=3    t/useTObaseShortcuts.t
+
+
+	# short b2->b8-wide32->base	0.688 ms
+	# short b2->b8_divideTObase	1.528 ms
+
+	# long  b2->b8-wide32->base	1.381 ms
+	# long  b2->b8_divideTObase	12.886 ms
+
+	# benchmark 183deadbeef2feed1baddad123468
+	# b16->256-wide32->base	1.582 ms
+	# benchmark 183deadbeef2feed1baddad123468
+	# b16->256_divideTObase	11.564 ms
+
+	# benchmark 123468
+	# b16->256-wide32->base	1.125 ms
+	# benchmark 123468
+	# b16->256_divideTObase	1.851 ms
+
+	# benchmark f2feed1baddad123468
+	# b16->256-wide32->base	1.410 ms
+	# benchmark f2feed1baddad123468
+	# b16->256_divideTObase	6.742 ms

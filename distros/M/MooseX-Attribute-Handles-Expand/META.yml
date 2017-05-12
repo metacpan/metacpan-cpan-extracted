@@ -1,0 +1,43 @@
+---
+abstract: "Expands '*' in handle functions with the attribute name"
+author:
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Moose: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-Attribute-Handles-Expand
+provides:
+  Moose::Meta::Attribute::Custom::Trait::Handles::Expand:
+    file: lib/MooseX/Attribute/Handles/Expand.pm
+    version: v0.0.3
+  MooseX::Attribute::Handles::Expand:
+    file: lib/MooseX/Attribute/Handles/Expand.pm
+    version: v0.0.3
+requires:
+  List::Util: '1.29'
+  Moose::Role: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/MooseX-Attribute-Handles-Expand/issues
+  homepage: https://github.com/yanick/MooseX-Attribute-Handles-Expand
+  repository: https://github.com/yanick/MooseX-Attribute-Handles-Expand.git
+version: 0.0.3
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Yanick Champoux <yanick@cpan.org>'

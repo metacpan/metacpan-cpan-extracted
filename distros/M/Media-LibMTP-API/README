@@ -1,0 +1,61 @@
+Media-LibMTP-API version 0.04, released May 31, 2014
+
+
+You probably want to use Media-LibMTP instead of using this module
+directly.
+
+This module provides a low-level interface to libmtp, which is an
+Initiator implementation of the Media Transfer Protocol (MTP) in the
+form of a library suitable primarily for POSIX compliant operating
+systems.
+
+libmtp is not included; you must install it separately.
+
+See http://libmtp.sourceforge.net for details.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+You may see a warning about "Use of uninitialized value
+$ExtUtils::ParseXS::num in subtraction".  This appears to be harmless.
+See https://rt.perl.org/rt3/Ticket/Display.html?id=112776 for details.
+
+
+
+DEPENDENCIES
+
+libmtp 1.1.0 or later
+
+  Package   Minimum Version
+  --------- ---------------
+  perl       5.10.0
+  Carp       
+  Exporter   5.57
+  XSLoader
+
+
+
+CHANGES
+    Here's what's new in version 0.04 of Media-LibMTP-API:
+    (See the file "Changes" for the full revision history.)
+
+	- Document the memory managment change made in 0.03
+	- Media type audio/mp4 now maps to LIBMTP_FILETYPE_M4A
+	  instead of LIBMTP_FILETYPE_MP4
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

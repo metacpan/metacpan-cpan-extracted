@@ -1,0 +1,106 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+
+
+Mail::RBL - Perform queries to blacklists
+- - -----------------------------------------
+
+This module is meant to help querying blackhole lists, typically for
+use in anti-spam solutions.
+
+This code could be used as follows:
+
+  use Mail::RBL;
+
+  my $rbl = new Mail::RBL 'list.dsbl.org';
+  print "yeah!\n" unless $rbl->check('10.10.10.10');
+
+This module is entirely written in  Perl, so you do not need access to
+a compiler to use it.  It  has been extensively tested in a variety of
+platforms.  An extensive  test suite  is provided  with the  module to
+verify correct results.
+
+The lastest version of this module should be preferred. You can obtain
+it  on http://www.cpan.org/authors/id/L/LU/LUISMUNOZ/  or  one of  the
+many CPAN  mirrors. Please find a  mirror near you to  help spread the
+load.
+
+This module depends on you having the following co-requisite modules
+(which you can obtain from CPAN):
+
+- - - Test::More
+- - - NetAddr::IP
+
+To install, follow the standard CPAN recipe of:
+
+$ perl Makefile.PL
+$ make
+$ make test
+
+If all tests pass, then do
+
+$ make install
+
+To access the module's documentation, please see
+
+$ perldoc Mail::RBL
+
+Bug  reports  are  welcome. Please  do  not  forget  to tell  me  what
+version/platform are you running this code on. Providing a small piece
+of  code that  shows the  bug helps  me a  lot in  sorting it  out and
+possibly in writting more tests for the distribution.
+
+Also, this code is intended to be strict and -w safe, so please report
+cases where warnings are generated so that I can fix them.
+
+Report your bugs to me (luismunoz@cpan.org).
+
+DO YOU WANT TO SAY THANKS?
+
+I've been asked this question enough times so as to setup a page where
+you can express your gratitude, at either of those URLs
+
+	http://mipagina.cantv.net/lem/thanks-en.html (English)
+	http://mipagina.cantv.net/lem/thanks-es.html (Spanish)
+
+This is in no way a  requirement for using my code, getting support or
+requesting features.
+
+SECURITY CONSIDERATIONS
+
+I have no control on the machanisms involved in the storage or
+transport of this distribution.  This means that I cannot guarantee
+that the distribution you have in your hands is indeed, the same
+distribution I packed and uploaded.
+
+Along the distribution file, you should have a file with the extension
+".asc".  This contains a GPG "detached signature" that makes it
+impossible for anybody to alter this distribution.  If security is of
+any concern to you, by all means verify the signature of this file and
+contact the author if any discrepancy is detected.
+
+You can find more information about this at the following URL
+
+             http://mipagina.cantv.net/lem/gpg/
+
+This information includes the correct keys, fingerprints, etc.Note
+that this README file should also be signed.
+
+LICENSE AND WARRANTY
+
+This software is (c) Luis E. Muñoz.  It can be used under the terms
+of the perl artistic license provided that proper credit for the work
+of the author is preserved in the form of this copyright notice and
+license for this module.
+
+No warranty of any kind is expressed or implied. This code might make
+your computer go up in a puff of black smoke.
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.1 (Darwin)
+
+iD8DBQFDnfA/QyDWGRI/hhARAk7zAKChr+Nc8sDu93nuHtC3xJJbep+KAwCeKljW
+lxZwaf03rntkPWrHZCi/byM=
+=0UWN
+-----END PGP SIGNATURE-----

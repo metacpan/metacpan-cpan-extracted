@@ -1,0 +1,7 @@
+A module that works with Mason to do processing before Mason is
+invoked.
+
+perl Build.PL
+./Build
+./Build test
+./Build install

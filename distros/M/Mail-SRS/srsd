@@ -1,0 +1,147 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use vars qw($PATH);
+use IO::Socket;
+use IO::Select;
+use Getopt::Long;
+use Mail::SRS qw(:all);
+use Mail::SRS::Daemon qw(:all);
+
+$PATH = '/tmp/srsd';
+
+my ($secretfile, $help);
+my $separator = $SRSSEP;
+my $hashlength = $SRSHASHLENGTH;
+my @secrets;
+my $result = GetOptions (
+				"separator=s"	=> \$separator,
+				"secret=s"		=> \@secrets,
+				"secretfile=s"	=> \$secretfile,
+				"hashlength=i"	=> \$hashlength,
+				"help"			=> \$help,
+					);
+if (!$result || $help) {
+	print << "EOH";
+Usage: srs [flags] [address ...]
+   --separator=s      Specify the initial separator to be - + or =
+   --secret=s         Specify an SRS cryptographic secret
+   --secretfile=s     Specify a file from which to read the secret
+   --hashlength=i     Specify number of characters to use in the hash
+   --help             Display this help
+       =s denotes a string argument. =i denotes an integer argument
+Multiple addresses are permitted. Multiple secrets are permitted.
+EOH
+	exit(1);
+}
+
+my $daemon = new Mail::SRS::Daemon(
+		Secret		=> \@secrets,
+		SecretFile	=> $secretfile,
+		HashLength	=> $hashlength,
+		Separator	=> $separator,
+			);
+$daemon->run();
+
+__END__
+
+=head1 NAME
+
+srsd - daemon interface to Mail::SRS
+
+=head1 SYNOPSIS
+
+srsd --secretfile=/etc/srs_secret
+
+=head1 DESCRIPTION
+
+The srsd daemon listens on a socket for SRS address transformation
+requests. It transforms the addresses and returns the new addresses
+on the socket.
+
+It may be used from exim using ${readsocket ...}, from sendmail via
+a TCP socket in a rule, and probably from other MTAs as well. See
+http://www.anarres.org/projects/srs/ for examples.
+
+Arguments take the form --name or --name=value.
+
+=head1 ARGUMENTS
+
+=head2 --separator
+
+String, specified at most once. Defaults to $SRSSEP (C<=>).
+
+Specify the initial separator for the SRS address. See L<Mail::SRS> for
+details.
+
+=head2 --secret
+
+String, may be specified multiple times, at least one of --secret or
+--secretfile must be specified.
+
+Specify an SRS secret. The first specified secret is used for
+encoding. All secrets are used for decoding.
+
+=head2 --secretfile
+
+String, specified at most once, at least one of --secret or
+--secretfile must be specified.
+
+A file to read for secrets. Secrets are specified once per line. The
+first specified secret is used for encoding. Secrets are written
+one per line. Blank lines and lines starting with a # are ignored.
+If --secret is not given, then the secret file must be nonempty.
+
+--secret will specify a primary secret and override --secretfile
+if both are specified. However, secrets read from --secretfile will
+still be used for decoding if both are specified.
+
+=head2 --hashlength
+
+Integer, may be specified at most once, defaults to 4.
+
+Specify the number of base64 characters to use for the cryptographic
+authentication code.
+
+=head2 --help
+
+Print some basic help.
+
+=head1 PROTOCOL
+
+A forward request:
+
+	FORWARD sender@source.com alias@forwarder.com
+
+A reverse request:
+
+	REVERSE srs0+HHH=TT=domain=local-part@forwarder.com
+
+A client called srsc has been included in this distribution for
+testing purposes.
+
+=head1 TODO
+
+Add more daemon-related options. Path to socket. Document protocol.
+
+=head1 SEE ALSO
+
+L<Mail::SRS>, L<Mail::SRS::Daemon>, L<srsc>,
+http://www.anarres.org/projects/srs/
+
+=head1 AUTHOR
+
+    Shevek
+    CPAN ID: SHEVEK
+    cpan@anarres.org
+    http://www.anarres.org/projects/
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004 Shevek. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

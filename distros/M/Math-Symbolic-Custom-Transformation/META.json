@@ -1,0 +1,51 @@
+{
+   "abstract" : "Transform Math::Symbolic trees",
+   "author" : [
+      "Steffen Mueller <symbolic-module at steffen-mueller dot net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-Symbolic-Custom-Transformation",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Math::Symbolic" : "0.507",
+            "Math::Symbolic::Custom::Pattern" : "1.20"
+         }
+      }
+   },
+   "provides" : {
+      "Math::Symbolic::Custom::Transformation" : {
+         "file" : "lib/Math/Symbolic/Custom/Transformation.pm",
+         "version" : "2.02"
+      },
+      "Math::Symbolic::Custom::Transformation::Group" : {
+         "file" : "lib/Math/Symbolic/Custom/Transformation/Group.pm",
+         "version" : "2.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "2.02"
+}

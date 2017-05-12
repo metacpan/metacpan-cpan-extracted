@@ -1,0 +1,249 @@
+#!/usr/bin/perl -w
+
+use 5.006;
+use strict;
+use warnings;
+
+use Module::Which;
+use Getopt::Long;
+use Pod::Usage;
+
+sub print_version {
+    use File::Basename qw(basename);
+    print "This is ", basename($0), ", $Module::Which::VERSION\n";
+    exit(0);
+}
+
+# If STDOUT is not a tty, returns 0.
+# Retrieves the terminal width with Term::Size::Any if possible
+# Otherwise, returns 80.
+sub term_width {
+    return 0 unless -t STDOUT;
+    my $t_width;
+    eval { require Term::Size::Any; Term::Size::Any->import() };
+    $t_width = Term::Size::Any::chars() unless $@; 
+    return $t_width || 80
+} 
+
+#sub get_term_width {
+#    return 200 unless -t STDOUT; 
+#    eval { require Term::ReadKey };
+#    return 80 if ($@); 
+#    my @size = Term::ReadKey::GetTerminalSize(*STDOUT);
+#    print "size: @size\n";
+#    return shift @size;
+#}
+
+our $VERBOSE = 0 || $ENV{WHICH_PM_VERBOSE};
+our $WIDTH = term_width()-1;
+
+my %which_options;
+%which_options = (
+    return => 'ARRAY',
+    verbose => $VERBOSE,
+    quiet => sub { $which_options{verbose} = 0 },    
+    p5p => 0,
+    plain => sub { $which_options{p5p} = 0 },
+    width => \$WIDTH, 
+
+);
+
+GetOptions(
+    \%which_options,
+    "verbose",
+    "quiet",
+    "include=s@",
+    "help",
+    "man",
+    "version",
+    "p5p!",
+    "plain",
+    "width=i"
+) or pod2usage(2);
+
+#pod2usage(1) if $which_options{help};
+pod2usage(-exitstatus => 1, -verbose => 1) if $which_options{help};
+pod2usage(-exitstatus => 0, -verbose => 2) if $which_options{man};
+print_version if $which_options{version};
+
+sub out_info {
+    my $info = shift;
+    my $pm_len = 0;
+    for (@$info) {
+        $pm_len = length($_->{pm}) if $pm_len < length($_->{pm});
+    }
+    return { pm_len => $pm_len }
+}
+
+sub _elide {
+    require String::Truncate;
+    my $str = shift;
+    my $len = shift;
+    if ($len>0) {
+        return String::Truncate::elide($str, $len, { truncate => 'right' });
+    } else {
+        return $str;
+    }
+    #substr($str, 0, $len)
+}
+
+sub print_pm_0 {
+    my $pm_info = shift;
+    my $out_info = shift;
+    $pm_info->{version} = "(not found)" unless defined $pm_info->{version};
+    my $pm_len = $out_info->{pm_len};
+    $pm_len = 20 if $pm_len < 20;
+    $pm_info->{path} = '' unless $pm_info->{path}; # for (not found) entries
+    my $w = $WIDTH - $pm_len -10 -2;
+
+    printf "%-${pm_len}s %-10s %s\n", 
+        $pm_info->{pm}, $pm_info->{version}, _elide($pm_info->{path}, $w);
+}
+
+my @used_ivars;
+
+sub print_pm {
+    my $pm_info = shift;
+    my $out_info = shift;
+    $pm_info->{version} = "(not found)" unless defined $pm_info->{version};
+    my $pm_len = $out_info->{pm_len};
+    $pm_len = 20 if $pm_len < 20;
+
+    use Module::Which::P5Path qw(path_to_p5);
+    my ($p5path, $p5base) = path_to_p5($pm_info->{path});
+
+    if ($p5path && $p5path =~ /^\$\{(\w+)\}/ ) {
+        push @used_ivars, $1 unless grep { $_ eq $1 } @used_ivars
+    }
+
+    #$pm_info->{p5base} = '' unless $pm_info->{p5base}; # for (not found) entries
+    if ($p5base) {
+        my $w = $WIDTH - $pm_len -10 -5;
+        printf "%-${pm_len}s %-10s at %s\n", 
+            $pm_info->{pm}, $pm_info->{version}, _elide($p5base, $w);
+    } else { # for (not found) entries
+        printf "%-${pm_len}s %-10s\n", # FIXME: should be %s when $WIDTH = 0
+            $pm_info->{pm}, $pm_info->{version};
+    }
+}
+
+my $info = which(@ARGV, \%which_options);
+
+my $out_info = out_info($info);
+for (@$info) {
+    if ($which_options{p5p}) {
+        print_pm($_, $out_info) ;
+    } else {
+        print_pm_0($_, $out_info);
+    }
+#    my $pm_info = $_;
+#    $pm_info->{version} = "(not found)" unless defined $pm_info->{version};
+#    printf "%-20s $pm_info->{version}\n", $pm_info->{pm};
+}
+
+#if ($which_options{sym}) {
+if (@used_ivars) {
+    print "\nfrom Config:\n";
+    use Config;
+    for (@used_ivars) {
+        print "\t$_: $Config{$_}\n";
+    }
+}
+
+__END__
+
+=head1 NAME
+
+which_pm - Perl script to find out which versions of certain Perl modules are installed
+
+=head1 SYNOPSIS
+
+  which_pm [--verbose] [--quiet] [--p5p] DBI DBD::
+  which_pm --help
+  which_pm --man
+  which_pm --version
+
+  which_pm Module::Find Module::Which File::
+
+  Options:
+    -verbose       shows error messages (due to "require $module")
+    -quiet         hides error messages (due to "require $module")
+    -help          brief help message
+    -man           full documentation
+    -version       prints the version number of this script
+    -include       restricts library paths (defaults to @INC) (also --inc, -I)
+
+    -plain         print plain paths (default)
+    -p5p           prints p5-paths
+    -width         determines the terminal width (default: 78)
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-verbose>
+
+Version is determined by doing a C<require> on runtime.
+In case, the statement fails, error messages are shown.
+
+=item B<-quiet>
+
+Version is determined by doing a C<require> on runtime.
+In case, the statement fails, error messages are silently hidden.
+I<This is the default.> A failure during C<require> will
+result 'unknown' as version.
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=item B<-version>
+
+Prints the version number and exits.
+
+=item B<-p5p>, B<-plain>
+
+Toogles on and off printing paths as p5-paths or plain paths.
+For example, in a machine where the Config variable C<installarchlib>
+holds C<"C:\tools\Perl5\lib"> and C<File::Spec> is found at
+C<"c:/tools/Perl5/lib/File/Spec.pm">, the p5-path is
+C<"${installarchlib}/">.
+
+=item B<-include>
+
+When this switch is explicit, the library path is restricted.
+Otherwise, the library path defaults to C<@INC>. This can be
+spelt also as B<--inc> or B<-I>.
+
+=item B<-width>
+
+Determines the terminal width and defaults to 78. To avoid
+truncation, use B<-w 0>. # OUTDATED
+
+=back
+
+=head1 DESCRIPTION
+
+See the the documentation of L<Module::Which>.
+
+=head1 SEE ALSO
+
+Please report bugs via CPAN RT L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Module-Which>.
+
+=head1 AUTHOR
+
+Adriano R. Ferreira, E<lt>ferreira@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 by Adriano R. Ferreira
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=cut

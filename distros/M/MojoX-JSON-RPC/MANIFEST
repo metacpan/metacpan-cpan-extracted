@@ -1,0 +1,21 @@
+Changes
+lib/Mojolicious/Plugin/JsonRpcDispatcher.pm
+lib/MojoX/JSON/RPC.pm
+lib/MojoX/JSON/RPC/Client.pm
+lib/MojoX/JSON/RPC/Dispatcher.pm
+lib/MojoX/JSON/RPC/Dispatcher/Method.pm
+lib/MojoX/JSON/RPC/Service.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.bak
+MANIFEST.SKIP
+MYMETA.json
+MYMETA.yml
+README.pod
+t/basic.t
+t/exception.t
+t/lib/TestUts.pm
+t/lite_app.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

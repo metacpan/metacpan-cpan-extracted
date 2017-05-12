@@ -1,0 +1,33 @@
+use strict;
+
+open (POD, "pod2text MP3Play.pm |") or die "can't fork";
+
+my $skip = 0;
+while (<POD>) {
+	if ( not $skip ) {
+		if ( /^CONSTRUCTOR/ ) {
+			$skip = 1;
+			next;
+		}
+		print;
+	} else {
+		if ( /^TODO/ ) {
+			$skip = 0;
+			print "    You will find detailed information about the interface of\n";
+			print "    this module in its POD documentation.\n\n";
+			print;
+			next;
+		}
+	}
+}
+
+close POD or die "can't run pod2text";
+
+print "CHANGES\n";
+
+open (CHANGES, "Changes") or die "can't read Changes";
+while (<CHANGES>) {
+	print "    " if ! m/^\s/;
+	print;
+}
+close CHANGES;

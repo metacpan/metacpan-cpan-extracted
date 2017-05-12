@@ -1,0 +1,98 @@
+{
+   "abstract" : "Provide logging via Log::Any",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooX-Role-Logger",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.060",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Log::Any" : "0",
+            "Moo::Role" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Log::Any::Test" : "0",
+            "Moo" : "0",
+            "Test::FailWarnings" : "0",
+            "Test::More" : "0.96",
+            "lib" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MooX::Role::Logger" : {
+         "file" : "lib/MooX/Role/Logger.pm",
+         "version" : "0.005"
+      },
+      "MooseX::Role::Logger" : {
+         "file" : "lib/MooseX/Role/Logger.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dagolden/MooX-Role-Logger/issues"
+      },
+      "homepage" : "https://github.com/dagolden/MooX-Role-Logger",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/MooX-Role-Logger.git",
+         "web" : "https://github.com/dagolden/MooX-Role-Logger"
+      }
+   },
+   "version" : "0.005",
+   "x_authority" : "cpan:DAGOLDEN"
+}
+

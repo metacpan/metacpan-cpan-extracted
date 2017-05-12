@@ -1,0 +1,29 @@
+---
+abstract: 'Do Something Whenever a Worker Starts'
+author:
+  - 'Bernhard Graf <graf(a)cpan.org>'
+  - 'Bernhard Graf <graf@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::Mojo: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.17'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-OnFork
+no_index:
+  directory:
+    - inc
+requires:
+  Carp: 0
+  Mojolicious: '3.09'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/augensalat/mojolicious-plugin-onfork.git
+version: '0.006'

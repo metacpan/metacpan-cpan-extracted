@@ -1,0 +1,328 @@
+* v0.82, 4 October 2009
+
+  More Makefile.PL fixes.  Try to catch 64-bit-only perls.  Fix bug introduced
+  in 0.81 for older gcc 4's.
+
+
+* v0.81, 26 September 2009
+
+  Fixes for building on 64-bit perls and Mac OS X 10.6.  Build should now work
+  on any perl, whether self-built or system perl (unless your perl is 64-bit
+  only), and tests should run under 32-bit mode.
+
+  Other miscellaneous test fixes.
+
+
+* v0.80, 16 September 2009
+
+  Add notes for 64-bit perl
+
+  Bump all the version numbers
+
+  Fix a bunch of tests (nothing major, just make them work better)
+
+  Fix sound-env-var checking code for tests (no more sound tests
+  unless you ask for them with MAC_CARBON_SOUND, which was in the
+  last version, but the logic was broken)
+
+  Make CFStringRef typemap better
+
+  Remove high-bit characters from source files
+
+  Add new system version gestalt constants
+
+  Fix leak in Mac::Processes and Mac::Speech
+
+  
+
+* v0.77, 6 July 2006
+
+   Add typeAbsoluteOrdinal to ConvertFourCharCode() types for Intel Macs
+
+   Add SpeechToFile() to Mac::Speech, to allow outputting speech to an AIFF file
+
+   Remove unnecessary dependency in Alias.t
+
+* v0.76, 21 June 2006
+
+   Add Intel-specific docs to Mac::Carbon manpage (no Intel-specific code
+   changes in this release)
+
+   Fix some AppleEvents tests due to incompatible Test::More versions, and
+   Mac OS X 10.3 differences in AEBuild/AEPrint
+
+   Fix AppleEvents event sending test for cases where current user does not
+   have permissions (by default, they will not run: set MAC_CARBON_GUI=1 in
+   environment to run all tests)
+
+   Fix Speech test for Cepstral voices
+
+   Fix docs for Mac::Components::GetComponentInfo()
+
+   Fix MacPerl::Ask() for case where returned string is empty, fix test too
+
+   Other Mac::Carbon manpage cleanup
+
+
+* v0.75, 19 June 2006
+
+   Endian fixes for Intel Macs:
+       * ReadHex() for parsing GUSI FSSpec
+       * Lots of OSType fixes: global (in typemap), MacPerl, AppleEvents,
+         Components, InternetConfig
+       * Some test files that made bad assumptions
+
+   Clean up a bunch of tests, better document what is incomplete
+
+   Other AppleEvent fixes:
+       * Clean up some docs
+       * Clean up AEDesc->get, make AEKeyDesc->get an alias to same
+       * Add AEKeyDesc->desc (get underlying AEDesc)
+       * Add AEDesc->dispose and AEKeyDesc->dispose
+       * Add thousands of new tests
+
+   Remove a GetAliasInfo() test that no longer works, on UFS or on Intel
+
+   Document MacPerl::Choose as unimplemented in Carbon
+
+   Add some more Mac::Memory tests   
+
+   Make Mac::Processes::LSFindApplicationForInfo() properly return
+   undef on failure
+
+   Add typeProperty to Mac::Types
+
+   Add $BASEDIR for building modules outside the base directory, but using the
+   same headers etc.
+
+* v0.74, 14 May 2005
+
+   Add OSAGetAppTerminology to Mac::OSA, which is what we should have been
+   doing all along for getting terminology instead of trying to handle it
+   ourselves in Mac::Glue.
+
+* v0.73, 3 May 2005
+
+   Change cast of errno in Carbon.h to make it build under gcc 4.  (Sherm Pendley)
+
+   Re-fix Makefile for older ExtUtils::MakeMaker versions.
+
+* v0.72, 9 March 2005
+
+   Fix Makefile to work with latest ExtUtils::MakeMaker beta. (Michael Schwern)
+
+   Add OSAGetProperty/OSASetProperty to Mac::OSA.
+
+* v0.71, 19 February 2005
+
+   Fix some more memory leaks, in the ported GUSI routines.  Well, technically,
+   the memory leaks are still there: the return values of GUSIFSp2FullPath,
+   GUSIFS2FullPath, and GUSIFSp2Encoding need to be freed, and some frontend
+   functions were added to return SVs instead, freeing the values as
+   necessary.
+
+
+* v0.70, 10 May 2004
+
+   Fix some major memory leaks in Mac::AppleEvents.  Due to a necessary change
+   for Mac OS X, caller of AEDesc->data method is now responsible for disposing of
+   the returned Handle object with Handle->dispose.
+
+   Improve Mac::Notification tests.
+
+   Clean up docs; add notes about gcc versions.
+
+
+* v0.66, 23 March 2004
+
+   Fix _Unix2Mac to be more robust, by making it more limited: it must point
+   to a file (existing or not) in an existing directory.  This limitation is
+   not unusual, and it is extremely rare that you would want to pass a path
+   to a file in a directory that did not already exist.
+
+* v0.65, 9 March 2004
+
+   DirectoryCopy.c and FileCopy.c in MoreFiles have issues with G5 optimization
+   flags; ignore those flags for compiling MoreFiles. (John Siracusa)
+
+   Clean up tests, including turning GUI tests off by default (add
+   MAC_CARBON_GUI=1 to `make test` to turn on) and ability to turn
+   off sound (add MAC_CARBON_SOUND=0 to turn off).  Affected tests
+   include MacPerl, Notification, Sound, and Speech.
+
+
+* v0.64, 18 February 2004
+
+   *Export* typeApplicationBundleID target type constant.
+
+   Remove Mac::Path::Util dependence and add _Unix2Mac to Mac::Files instead.
+
+* v0.63, 19 November 2003
+
+   Add typeApplicationBundleID target type constant.
+
+
+* v0.62, 31 October 2003
+
+   Fix incorrect constant for typeApplicationURL.
+
+
+* v0.61, 28 October 2003
+
+   Adjust Mac::Speech test to work with fresh install of Panther, where
+   (on my machine) the Good News voice won't load, so CountVoices()
+   returns less than the test thinks it should.  Only this one test has
+   been changed, no need to upgrade from 0.60.
+
+
+* v0.60, 27 October 2003
+
+   Updated a bunch of docs for Carbon compatibility
+
+   Cleaned up docs a bit
+
+   Reverted AESend to use AESend without an idle proc,
+   instead of AESendMessage with a mach port
+
+   Undef I_POLL for Panther compatibility (Matthew Drayton)
+
+
+* v0.54, 13 August 2003
+
+   Skip some tests that fail on UFS (Randal Schwartz)
+
+   undef DEBUG for the sake of gcc 3.3 (perl's DEBUG conflicts with Mac's)
+
+   Add notes about Mac OS X 10.3
+
+
+* v0.53, 24 June 2003
+
+   OSADoEvent fixed
+
+   Fix some Files tests
+
+   Add Mac::Path::Util 0.09 to prereqs for Mac OS X
+
+
+* v0.52, 22 May 2003
+
+   Make Mac::AppleEvents return actual value, not pretty-printed value,
+   as last resort (if you want a pretty-printed value, get it yourself
+   with AEPrint, but we'll assume you want to do something useful with
+   the data)
+
+   Fix some memory leaks, sizes, and return values in Mac::Resources
+   stuff from 0.50
+
+   Overload NewAliasMinimalFromFullPath for Mac OS X, first converting
+   the path to an HFS path (that is all that NewAliasMinimalFromFullPath
+   knows)
+
+   Add app creator type/signature to Processes/eg/Processes.plx output
+
+
+* v0.51, 7 April 2003
+
+   Fix some new tests that didn't work well under root
+
+
+* v0.50, 6 April 2003
+
+   Mac::InternetConfig added
+
+   GUSI fixes
+     - Fix bug with GUSIFSp* routines not accepting paths where files
+       do not exist
+     - Make GUSIFSpDown work
+     - Add new "GUSIFS2FullPath" and "GUSIPath2FS" (for lack of better
+       names) for dealing with FSRefs
+     - Add FSRef to typemap
+
+   Launching apps
+     - Add LSFindApplicationForInfo to Mac::Processes for finding
+       applications on Mac OS X (by creator, bundle ID, or name)
+     - Make %Mac::MoreFiles::Application find paths to apps using
+       LSFindApplicationForInfo for Mac OS X
+
+   Open resource files from data forks
+     - Add FSCreateResourceFile and FSOpenResourceFile to
+       Mac::Resources for creating/opening resource files from data
+       fork instead of resource fork
+     - Remove resource/data fork workaround from Sound.t
+
+   More constants
+     - Add AERegistry.h type* constants to Mac::AppleEvents
+     - Add file access permissions constants to Mac::Files
+     - Add Finder flag constants to Mac::Files
+
+   Add -fpascal-strings to ccflags, for compatibility with some of the
+   GUSI API (tested with gcc2 and gcc3 under Mac OS X 10.2).
+
+   Fix segfault for NULL descriptor in new AEDesc
+
+   Add lots of tests for Mac::Files
+
+   Fix the two-arg form of FSpGetCatInfo(FILE, INDEX)
+
+   Add option for MacPerl::{Ask,Answer,Pick} to be text-based on Mac OS X
+
+
+* v0.05, 6 March 2003
+
+   Bad values for kCreateFolder and kDontCreateFolder (Ken Williams)
+
+
+* v0.04, 6 March 2003
+
+   Make AppleEvents with LD=c++ (required for Dec 2002 Dev Tools)
+
+   Add a bunch of Carbon-specific constants for Mac::Files
+
+   Modify Mac::Speech (Peter N Lewis)
+     - GetVoiceDesciption and NewSpeechChannel use default voice
+       if no parameter given
+     - %Voice hash returns default voice if key is false (undef, '', 0)
+     - Added accessor methods for VoiceDescription and VoiceSpec structures
+
+   Add Str63 type to typemap
+
+   Clean up distribution a little
+
+
+* v0.03, 17 December 2002
+
+   Fix AEDesc->data bug, remove debugging code (oops)
+
+   Refactor Makefile.PLs
+     - use common.pl for Makefile.PLs to share
+     - now use distributed xsubpp (brian d foy) instead of system xsubpp
+     - $module.c files no longer included
+     - auto-generate $module.pod (and manpages) from POD in $module.pm
+       and $module.xs
+
+   Fix POD in many places
+
+   Require 5.006 in the base Makefile.PL (just in case)
+
+   Make build work with gcc2 on Mac OS X 10.1 and 10.2
+
+   Make build work with UFS
+
+
+* v0.02, 9 December 2002
+
+   Addition of Mac::AppleEvents and Mac::OSA
+   (Mac::AppleEvents::Simple and Mac::OSA::Simple not yet fully
+   supported; needs some porting)
+
+   Add back Pick/Answer/Ask to MacPerl (code from Gero Herrmann)
+
+   Add GetProcessPID and GetProcessForPID to Mac::Processes
+
+   Clean up some of the tests
+
+
+* v0.01, 13 November 2002
+
+   Initial release

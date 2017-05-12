@@ -1,0 +1,130 @@
+
+- prime_count - needs the pc(#) option as well as pc(#,#)
+
+- Do a GMP version of LMO prime_count.  Possible versions:
+    - 32-bit main, 16-bit support
+    - 64-bit main, 32-bit support   (using __uint64_t if necessary)
+    - 128-bit main, 64-bit support  (gcc only)
+    - GMP main, 32-bit support      (portable)
+    - GMP main, 64-bit support      (mostly portable)
+
+- nth_prime
+
+- GMP SQUFOF could use a better implementation, though low priority since it
+  just isn't going to be the right algorithm for numbers > 2^64.  Mainly what
+  it needs is to pay attention to the rounds argument.  Perhaps race.
+
+- Tune and improve SIMPQS for our uses.  Check FLINT 2.3 for improvements.
+
+- Write our own QS.
+
+- The statics in ecm and QS won't play well with threading.
+
+- ECPP: Perhaps more HCPs/WCPs could be loaded if needed?
+
+- ECPP: Another idea is related to Atkin/Morain's EAS.  When we have a large
+  number, we can process more Ds, delaying the downrun.  We then use the
+  smallest q we found.  Combine with lightened stage 1 factoring as above.
+  This drops our q sizes faster, at the expense of more up-front time.
+  I have this running, but for small numbers it doesn't matter much, and for
+  large numbers it just highlights how much nicer FAS would be.
+
+- ECPP: All discriminants with D % 8 != 3 have been converted to Weber.  We're
+  still left with lots of those D values.  Figure out a different invariant
+  that will make smaller polynomials, along with a root conversion.
+
+- ECPP: Add a fast BLS5 to downrun?
+
+- Add BLS17 proof.  Merge into BLS5 code since the end is the same.
+
+- Add tests for proofs, similar to MPU t/23.
+
+- Handle objects of type:
+     Math::GMP
+     Math::GMP::Fast
+     Math::GMPz
+  We should parse their mpz_t directly, do our processing, and output the
+  result as one of these types.
+
+- Recognize Math::BigInt / Math::Pari objects.  Shortcut validation.
+  Create results as new objects of their type.
+
+- These functions should be added:
+     legendre_phi
+     znlog
+
+- Any fast primality pretest would be nice.  I've tested:
+    - Colin Plumb's Euler Criterion test
+    - Fermat base 210, which is done in GMP's internal millerrabin.c.
+    - Fermat base 2 also no faster than SPRP-2, though some claim it is.
+      mpz_t e, r;  int composite;
+      mpz_init(e);
+      mpz_init_set_ui(r, 2);  mpz_sub_ui(e, n, 1);  mpz_powm(r, r, e, n);
+      composite = mpz_cmp_ui(r, 1) != 0;
+      mpz_clear(r); mpz_clear(e);
+      if (composite) return 0;
+  None of these are faster on average than just doing BPSW.
+
+- merge the two frobenius tests.  cp is faster, needs the deterministic
+  version, we should switch to the two input version (allow GMP), etc.
+
+- New version of Pi code using Chudnovsky.  See Pari.
+
+- tests for sieve_primes.
+
+- speed up range sieving.
+
+- fast prime printing routine.  The following could be trivially 2x faster:
+    $n = 10**20; say for Math::Prime::Util::GMP::sieve_primes($n,$n+8e9,0);
+  About 3 minutes vs. 7-8 just by using gmp_printf.
+  Using sieve_range doesn't help, as the issue is the massive return array.
+
+- More efficient version of ramanujan_tau?  MPU has an hclassno implementation
+  now.
+
+- Consider ranged ramanujan_tau.  See:
+  https://cs.uwaterloo.ca/journals/JIS/VOL13/Lygeros/lygeros5.pdf
+  Where we could compute a number of hclassno values, then generate the
+  tau values.  This might be more efficient.
+
+- We could do LLR and Proth in prob_prime and return 1 instead of 2, leaving
+  certs possible.
+
+- consider probabilistic is_primitive_root for large inputs
+
+- Verify speed and memory use of GMP's two binomials for various versions
+  and compare.  Looks like Luschny sent his changes after 5.0.0.
+  https://gmplib.org/list-archives/gmp-discuss/2010-February/004036.html
+
+- faster znprimroot
+
+- Identify places where 32-bit GMP on 64-bit Perl will trip us up.
+
+- BLS75 methods: check if we can return 0 instead of 1 in many cases.
+
+- Make a trial factor routine that returns all factors.  This can be done
+  with a single treesieve.  ECPP could make use of this (since it is doing
+  many calls, keeping the product tree around would be useful).
+  All current calls are testing primality, so don't need multiple returns.
+  Changing the XS call to return multiple values might be useful.
+
+- mpu 'use bigint; $n=14299; say is_prime($n); say Math::Prime::Util::GMP::is_nplus1_prime($n)'
+  n=14299  F2=52 R2=275.  s=3,r=-37.  This passes theorem 17.
+  qi=2  p=66,q=2,d=4348
+  qi=13 p=45,q=1,d=2021
+  5543 also
+  all examples of this seem to be n+1 = 2 * [many small factors]
+
+  n = 5543 = 23*241, n+1=5544
+  n+1 = F2 * R2 = 88 * 63.  R2>1.  gcd(F2,R2)=1.
+  q_1 = 2    p=19,q=5,d=341
+  q_2 = 11   p=18,q=50,d=124
+  By Corollary 8, N is prime.
+  By Theorem 17, N is prime.
+  r2 = 63    p=11,q=29,d=5
+  By Corollary 10, N is prime
+  By Theorem 19, N is prime
+
+- zeta below -3
+
+- utility.c:is_primitive_root should not modify its arguments

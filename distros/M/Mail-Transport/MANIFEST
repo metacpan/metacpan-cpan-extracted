@@ -1,0 +1,23 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/Mail/Transport.pm
+lib/Mail/Transport.pod
+lib/Mail/Transport/Exim.pm
+lib/Mail/Transport/Exim.pod
+lib/Mail/Transport/Mailx.pm
+lib/Mail/Transport/Mailx.pod
+lib/Mail/Transport/Qmail.pm
+lib/Mail/Transport/Qmail.pod
+lib/Mail/Transport/Receive.pm
+lib/Mail/Transport/Receive.pod
+lib/Mail/Transport/SMTP.pm
+lib/Mail/Transport/SMTP.pod
+lib/Mail/Transport/Send.pm
+lib/Mail/Transport/Send.pod
+lib/Mail/Transport/Sendmail.pm
+lib/Mail/Transport/Sendmail.pod
+t/001use.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

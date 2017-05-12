@@ -1,0 +1,552 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd" xmlns="http://www.loc.gov/MARC21/slim">
+  <record>
+    <leader>00755cam  22002414a 4500</leader>
+    <controlfield tag="001">fol05731351 </controlfield>
+    <controlfield tag="003">IMchF</controlfield>
+    <controlfield tag="005">20000613133448.0</controlfield>
+    <controlfield tag="008">000107s2000    nyua          001 0 eng  </controlfield>
+    <datafield tag="010" ind1=" " ind2=" ">
+      <subfield code="a">   00020737 </subfield>
+    </datafield>
+    <datafield tag="020" ind1=" " ind2=" ">
+      <subfield code="a">0471383147 (paper/cd-rom : alk. paper)</subfield>
+    </datafield>
+    <datafield tag="040" ind1=" " ind2=" ">
+      <subfield code="a">DLC</subfield>
+      <subfield code="c">DLC</subfield>
+      <subfield code="d">DLC</subfield>
+    </datafield>
+    <datafield tag="042" ind1=" " ind2=" ">
+      <subfield code="a">pcc</subfield>
+    </datafield>
+    <datafield tag="050" ind1="0" ind2="0">
+      <subfield code="a">QA76.73.P22</subfield>
+      <subfield code="b">M33 2000</subfield>
+    </datafield>
+    <datafield tag="082" ind1="0" ind2="0">
+      <subfield code="a">005.13/3</subfield>
+      <subfield code="2">21</subfield>
+    </datafield>
+    <datafield tag="100" ind1="1" ind2=" ">
+      <subfield code="a">Martinsson, Tobias,</subfield>
+      <subfield code="d">1976-</subfield>
+    </datafield>
+    <datafield tag="245" ind1="1" ind2="0">
+      <subfield code="a">ActivePerl with ASP and ADO /</subfield>
+      <subfield code="c">Tobias Martinsson.</subfield>
+    </datafield>
+    <datafield tag="260" ind1=" " ind2=" ">
+      <subfield code="a">New York :</subfield>
+      <subfield code="b">John Wiley &amp; Sons,</subfield>
+      <subfield code="c">2000.</subfield>
+    </datafield>
+    <datafield tag="300" ind1=" " ind2=" ">
+      <subfield code="a">xxi, 289 p. :</subfield>
+      <subfield code="b">ill. ;</subfield>
+      <subfield code="c">23 cm. +</subfield>
+      <subfield code="e">1 computer  laser disc (4 3/4 in.)</subfield>
+    </datafield>
+    <datafield tag="500" ind1=" " ind2=" ">
+      <subfield code="a">"Wiley Computer Publishing."</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="0">
+      <subfield code="a">Perl (Computer program language)</subfield>
+    </datafield>
+    <datafield tag="630" ind1="0" ind2="0">
+      <subfield code="a">Active server pages.</subfield>
+    </datafield>
+    <datafield tag="630" ind1="0" ind2="0">
+      <subfield code="a">ActiveX.</subfield>
+    </datafield>
+  </record>
+  <record>
+    <leader>00647pam  2200241 a 4500</leader>
+    <controlfield tag="001">fol05754809 </controlfield>
+    <controlfield tag="003">IMchF</controlfield>
+    <controlfield tag="005">20000601115601.0</controlfield>
+    <controlfield tag="008">000203s2000    mau           001 0 eng  </controlfield>
+    <datafield tag="010" ind1=" " ind2=" ">
+      <subfield code="a">   00022023 </subfield>
+    </datafield>
+    <datafield tag="020" ind1=" " ind2=" ">
+      <subfield code="a">1565926994</subfield>
+    </datafield>
+    <datafield tag="040" ind1=" " ind2=" ">
+      <subfield code="a">DLC</subfield>
+      <subfield code="c">DLC</subfield>
+      <subfield code="d">DLC</subfield>
+    </datafield>
+    <datafield tag="042" ind1=" " ind2=" ">
+      <subfield code="a">pcc</subfield>
+    </datafield>
+    <datafield tag="050" ind1="0" ind2="0">
+      <subfield code="a">QA76.73.P22</subfield>
+      <subfield code="b">D47 2000</subfield>
+    </datafield>
+    <datafield tag="082" ind1="0" ind2="0">
+      <subfield code="a">005.74</subfield>
+      <subfield code="2">21</subfield>
+    </datafield>
+    <datafield tag="100" ind1="1" ind2=" ">
+      <subfield code="a">Descartes, Alligator.</subfield>
+    </datafield>
+    <datafield tag="245" ind1="1" ind2="0">
+      <subfield code="a">Programming the Perl DBI /</subfield>
+      <subfield code="c">Alligator Descartes and Tim Bunce.</subfield>
+    </datafield>
+    <datafield tag="260" ind1=" " ind2=" ">
+      <subfield code="a">Cmabridge, MA :</subfield>
+      <subfield code="b">O'Reilly,</subfield>
+      <subfield code="c">2000.</subfield>
+    </datafield>
+    <datafield tag="263" ind1=" " ind2=" ">
+      <subfield code="a">1111</subfield>
+    </datafield>
+    <datafield tag="300" ind1=" " ind2=" ">
+      <subfield code="a">p. cm.</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="0">
+      <subfield code="a">Perl (Computer program language)</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="0">
+      <subfield code="a">Database management.</subfield>
+    </datafield>
+    <datafield tag="700" ind1="1" ind2=" ">
+      <subfield code="a">Bunce, Tim.</subfield>
+    </datafield>
+  </record>
+  <record>
+    <leader>00605cam  22002054a 4500</leader>
+    <controlfield tag="001">fol05843555 </controlfield>
+    <controlfield tag="003">IMchF</controlfield>
+    <controlfield tag="005">20000525142739.0</controlfield>
+    <controlfield tag="008">000318s1999    cau      b    001 0 eng  </controlfield>
+    <datafield tag="010" ind1=" " ind2=" ">
+      <subfield code="a">   00501349 </subfield>
+    </datafield>
+    <datafield tag="040" ind1=" " ind2=" ">
+      <subfield code="a">DLC</subfield>
+      <subfield code="c">DLC</subfield>
+      <subfield code="d">DLC</subfield>
+    </datafield>
+    <datafield tag="042" ind1=" " ind2=" ">
+      <subfield code="a">pcc</subfield>
+    </datafield>
+    <datafield tag="050" ind1="0" ind2="0">
+      <subfield code="a">QA76.73.P22</subfield>
+      <subfield code="b">B763 1999</subfield>
+    </datafield>
+    <datafield tag="082" ind1="0" ind2="0">
+      <subfield code="a">005.13/3</subfield>
+      <subfield code="2">21</subfield>
+    </datafield>
+    <datafield tag="100" ind1="1" ind2=" ">
+      <subfield code="a">Brown, Martin C.</subfield>
+    </datafield>
+    <datafield tag="245" ind1="1" ind2="0">
+      <subfield code="a">Perl :</subfield>
+      <subfield code="b">programmer's reference /</subfield>
+      <subfield code="c">Martin C. Brown.</subfield>
+    </datafield>
+    <datafield tag="260" ind1=" " ind2=" ">
+      <subfield code="a">Berkeley :</subfield>
+      <subfield code="b">Osborne/McGraw-Hill,</subfield>
+      <subfield code="c">c1999.</subfield>
+    </datafield>
+    <datafield tag="300" ind1=" " ind2=" ">
+      <subfield code="a">xix, 380 p. ;</subfield>
+      <subfield code="c">22 cm.</subfield>
+    </datafield>
+    <datafield tag="504" ind1=" " ind2=" ">
+      <subfield code="a">Includes bibliographical references and index.</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="0">
+      <subfield code="a">Perl (Computer program language)</subfield>
+    </datafield>
+  </record>
+  <record>
+    <leader>00579cam  22002054a 4500</leader>
+    <controlfield tag="001">fol05843579 </controlfield>
+    <controlfield tag="003">IMchF</controlfield>
+    <controlfield tag="005">20000525142716.0</controlfield>
+    <controlfield tag="008">000318s1999    caua          001 0 eng  </controlfield>
+    <datafield tag="010" ind1=" " ind2=" ">
+      <subfield code="a">   00502116 </subfield>
+    </datafield>
+    <datafield tag="020" ind1=" " ind2=" ">
+      <subfield code="a">0072120002</subfield>
+    </datafield>
+    <datafield tag="040" ind1=" " ind2=" ">
+      <subfield code="a">DLC</subfield>
+      <subfield code="c">DLC</subfield>
+      <subfield code="d">DLC</subfield>
+    </datafield>
+    <datafield tag="042" ind1=" " ind2=" ">
+      <subfield code="a">pcc</subfield>
+    </datafield>
+    <datafield tag="050" ind1="0" ind2="0">
+      <subfield code="a">QA76.73.P22</subfield>
+      <subfield code="b">B762 1999</subfield>
+    </datafield>
+    <datafield tag="082" ind1="0" ind2="0">
+      <subfield code="a">005.13/3</subfield>
+      <subfield code="2">21</subfield>
+    </datafield>
+    <datafield tag="100" ind1="1" ind2=" ">
+      <subfield code="a">Brown, Martin C.</subfield>
+    </datafield>
+    <datafield tag="245" ind1="1" ind2="0">
+      <subfield code="a">Perl :</subfield>
+      <subfield code="b">the complete reference /</subfield>
+      <subfield code="c">Martin C. Brown.</subfield>
+    </datafield>
+    <datafield tag="260" ind1=" " ind2=" ">
+      <subfield code="a">Berkeley :</subfield>
+      <subfield code="b">Osborne/McGraw-Hill,</subfield>
+      <subfield code="c">c1999.</subfield>
+    </datafield>
+    <datafield tag="300" ind1=" " ind2=" ">
+      <subfield code="a">xxxv, 1179 p. :</subfield>
+      <subfield code="b">ill. ;</subfield>
+      <subfield code="c">24 cm.</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="0">
+      <subfield code="a">Perl (Computer program language)</subfield>
+    </datafield>
+  </record>
+  <record>
+    <leader>00801nam  22002778a 4500</leader>
+    <controlfield tag="001">fol05848297 </controlfield>
+    <controlfield tag="003">IMchF</controlfield>
+    <controlfield tag="005">20000524125727.0</controlfield>
+    <controlfield tag="008">000518s2000    mau           001 0 eng  </controlfield>
+    <datafield tag="010" ind1=" " ind2=" ">
+      <subfield code="a">   00041664 </subfield>
+    </datafield>
+    <datafield tag="020" ind1=" " ind2=" ">
+      <subfield code="a">1565924193</subfield>
+    </datafield>
+    <datafield tag="040" ind1=" " ind2=" ">
+      <subfield code="a">DLC</subfield>
+      <subfield code="c">DLC</subfield>
+    </datafield>
+    <datafield tag="042" ind1=" " ind2=" ">
+      <subfield code="a">pcc</subfield>
+    </datafield>
+    <datafield tag="050" ind1="0" ind2="0">
+      <subfield code="a">QA76.73.P22</subfield>
+      <subfield code="b">G84 2000</subfield>
+    </datafield>
+    <datafield tag="082" ind1="0" ind2="0">
+      <subfield code="a">005.2/762</subfield>
+      <subfield code="2">21</subfield>
+    </datafield>
+    <datafield tag="100" ind1="1" ind2=" ">
+      <subfield code="a">Guelich, Scott.</subfield>
+    </datafield>
+    <datafield tag="245" ind1="1" ind2="0">
+      <subfield code="a">CGI programming with Perl /</subfield>
+      <subfield code="c">Scott Guelich, Shishir Gundavaram &amp; Gunther Birznieks.</subfield>
+    </datafield>
+    <datafield tag="250" ind1=" " ind2=" ">
+      <subfield code="a">2nd ed., expanded &amp; updated</subfield>
+    </datafield>
+    <datafield tag="260" ind1=" " ind2=" ">
+      <subfield code="a">Cambridge, Mass. :</subfield>
+      <subfield code="b">O'Reilly,</subfield>
+      <subfield code="c">2000.</subfield>
+    </datafield>
+    <datafield tag="263" ind1=" " ind2=" ">
+      <subfield code="a">0006</subfield>
+    </datafield>
+    <datafield tag="300" ind1=" " ind2=" ">
+      <subfield code="a">p. cm.</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="0">
+      <subfield code="a">Perl (Computer program language)</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="0">
+      <subfield code="a">CGI (Computer network protocol)</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="0">
+      <subfield code="a">Internet programming.</subfield>
+    </datafield>
+    <datafield tag="700" ind1="1" ind2=" ">
+      <subfield code="a">Gundavaram, Shishir.</subfield>
+    </datafield>
+    <datafield tag="700" ind1="1" ind2=" ">
+      <subfield code="a">Birznieks, Gunther.</subfield>
+    </datafield>
+  </record>
+  <record>
+    <leader>00665nam  22002298a 4500</leader>
+    <controlfield tag="001">fol05865950 </controlfield>
+    <controlfield tag="003">IMchF</controlfield>
+    <controlfield tag="005">20000615103017.0</controlfield>
+    <controlfield tag="008">000612s2000    mau           100 0 eng  </controlfield>
+    <datafield tag="010" ind1=" " ind2=" ">
+      <subfield code="a">   00055759 </subfield>
+    </datafield>
+    <datafield tag="020" ind1=" " ind2=" ">
+      <subfield code="a">0596000138</subfield>
+    </datafield>
+    <datafield tag="040" ind1=" " ind2=" ">
+      <subfield code="a">DLC</subfield>
+      <subfield code="c">DLC</subfield>
+    </datafield>
+    <datafield tag="042" ind1=" " ind2=" ">
+      <subfield code="a">pcc</subfield>
+    </datafield>
+    <datafield tag="050" ind1="0" ind2="0">
+      <subfield code="a">QA76.73.P22</subfield>
+      <subfield code="b">P475 2000</subfield>
+    </datafield>
+    <datafield tag="082" ind1="0" ind2="0">
+      <subfield code="a">005.13/3</subfield>
+      <subfield code="2">21</subfield>
+    </datafield>
+    <datafield tag="111" ind1="2" ind2=" ">
+      <subfield code="a">Perl Conference 4.0</subfield>
+      <subfield code="d">(2000 :</subfield>
+      <subfield code="c">Monterey, Calif.)</subfield>
+    </datafield>
+    <datafield tag="245" ind1="1" ind2="0">
+      <subfield code="a">Proceedings of the Perl Conference 4.0 :</subfield>
+      <subfield code="b">July 17-20, 2000, Monterey, California.</subfield>
+    </datafield>
+    <datafield tag="250" ind1=" " ind2=" ">
+      <subfield code="a">1st ed.</subfield>
+    </datafield>
+    <datafield tag="260" ind1=" " ind2=" ">
+      <subfield code="a">Cambridge, Mass. :</subfield>
+      <subfield code="b">O'Reilly,</subfield>
+      <subfield code="c">2000.</subfield>
+    </datafield>
+    <datafield tag="263" ind1=" " ind2=" ">
+      <subfield code="a">0006</subfield>
+    </datafield>
+    <datafield tag="300" ind1=" " ind2=" ">
+      <subfield code="a">p. cm.</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="0">
+      <subfield code="a">Perl (Computer program language)</subfield>
+      <subfield code="v">Congresses.</subfield>
+    </datafield>
+  </record>
+  <record>
+    <leader>00579nam  22002178a 4500</leader>
+    <controlfield tag="001">fol05865956 </controlfield>
+    <controlfield tag="003">IMchF</controlfield>
+    <controlfield tag="005">20000615102948.0</controlfield>
+    <controlfield tag="008">000612s2000    mau           000 0 eng  </controlfield>
+    <datafield tag="010" ind1=" " ind2=" ">
+      <subfield code="a">   00055770 </subfield>
+    </datafield>
+    <datafield tag="020" ind1=" " ind2=" ">
+      <subfield code="a">1565926099</subfield>
+    </datafield>
+    <datafield tag="040" ind1=" " ind2=" ">
+      <subfield code="a">DLC</subfield>
+      <subfield code="c">DLC</subfield>
+    </datafield>
+    <datafield tag="042" ind1=" " ind2=" ">
+      <subfield code="a">pcc</subfield>
+    </datafield>
+    <datafield tag="050" ind1="0" ind2="0">
+      <subfield code="a">QA76.73.P22</subfield>
+      <subfield code="b">B43 2000</subfield>
+    </datafield>
+    <datafield tag="082" ind1="0" ind2="0">
+      <subfield code="a">005.13/3</subfield>
+      <subfield code="2">21</subfield>
+    </datafield>
+    <datafield tag="100" ind1="1" ind2=" ">
+      <subfield code="a">Blank-Edelman, David N.</subfield>
+    </datafield>
+    <datafield tag="245" ind1="1" ind2="0">
+      <subfield code="a">Perl for system administration /</subfield>
+      <subfield code="c">David N. Blank-Edelman.</subfield>
+    </datafield>
+    <datafield tag="260" ind1=" " ind2=" ">
+      <subfield code="a">Cambridge, Mass. :</subfield>
+      <subfield code="b">O'Reilly,</subfield>
+      <subfield code="c">2000.</subfield>
+    </datafield>
+    <datafield tag="263" ind1=" " ind2=" ">
+      <subfield code="a">0006</subfield>
+    </datafield>
+    <datafield tag="300" ind1=" " ind2=" ">
+      <subfield code="a">p. cm.</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="0">
+      <subfield code="a">Perl (Computer program language)</subfield>
+    </datafield>
+  </record>
+  <record>
+    <leader>00661nam  22002538a 4500</leader>
+    <controlfield tag="001">fol05865967 </controlfield>
+    <controlfield tag="003">IMchF</controlfield>
+    <controlfield tag="005">20000615102611.0</controlfield>
+    <controlfield tag="008">000614s2000    mau           000 0 eng  </controlfield>
+    <datafield tag="010" ind1=" " ind2=" ">
+      <subfield code="a">   00055799 </subfield>
+    </datafield>
+    <datafield tag="020" ind1=" " ind2=" ">
+      <subfield code="a">0596000278</subfield>
+    </datafield>
+    <datafield tag="040" ind1=" " ind2=" ">
+      <subfield code="a">DLC</subfield>
+      <subfield code="c">DLC</subfield>
+    </datafield>
+    <datafield tag="042" ind1=" " ind2=" ">
+      <subfield code="a">pcc</subfield>
+    </datafield>
+    <datafield tag="050" ind1="0" ind2="0">
+      <subfield code="a">QA76.73.P22</subfield>
+      <subfield code="b">W35 2000</subfield>
+    </datafield>
+    <datafield tag="082" ind1="0" ind2="0">
+      <subfield code="a">005.13/3</subfield>
+      <subfield code="2">21</subfield>
+    </datafield>
+    <datafield tag="100" ind1="1" ind2=" ">
+      <subfield code="a">Wall, Larry.</subfield>
+    </datafield>
+    <datafield tag="245" ind1="1" ind2="0">
+      <subfield code="a">Programming Perl /</subfield>
+      <subfield code="c">Larry Wall, Tom Christiansen &amp; Jon Orwant.</subfield>
+    </datafield>
+    <datafield tag="250" ind1=" " ind2=" ">
+      <subfield code="a">3rd ed.</subfield>
+    </datafield>
+    <datafield tag="260" ind1=" " ind2=" ">
+      <subfield code="a">Cambridge, Mass. :</subfield>
+      <subfield code="b">O'Reilly,</subfield>
+      <subfield code="c">2000.</subfield>
+    </datafield>
+    <datafield tag="263" ind1=" " ind2=" ">
+      <subfield code="a">0007</subfield>
+    </datafield>
+    <datafield tag="300" ind1=" " ind2=" ">
+      <subfield code="a">p. cm.</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="0">
+      <subfield code="a">Perl (Computer program language)</subfield>
+    </datafield>
+    <datafield tag="700" ind1="1" ind2=" ">
+      <subfield code="a">Christiansen, Tom.</subfield>
+    </datafield>
+    <datafield tag="700" ind1="1" ind2=" ">
+      <subfield code="a">Orwant, Jon.</subfield>
+    </datafield>
+  </record>
+  <record>
+    <leader>00603cam  22002054a 4500</leader>
+    <controlfield tag="001">fol05872355 </controlfield>
+    <controlfield tag="003">IMchF</controlfield>
+    <controlfield tag="005">20000706095105.0</controlfield>
+    <controlfield tag="008">000315s1999    njua          001 0 eng  </controlfield>
+    <datafield tag="010" ind1=" " ind2=" ">
+      <subfield code="a">   00500678 </subfield>
+    </datafield>
+    <datafield tag="020" ind1=" " ind2=" ">
+      <subfield code="a">013020868X</subfield>
+    </datafield>
+    <datafield tag="040" ind1=" " ind2=" ">
+      <subfield code="a">DLC</subfield>
+      <subfield code="c">DLC</subfield>
+      <subfield code="d">DLC</subfield>
+    </datafield>
+    <datafield tag="042" ind1=" " ind2=" ">
+      <subfield code="a">pcc</subfield>
+    </datafield>
+    <datafield tag="050" ind1="0" ind2="0">
+      <subfield code="a">QA76.73.P22</subfield>
+      <subfield code="b">L69 1999</subfield>
+    </datafield>
+    <datafield tag="082" ind1="0" ind2="0">
+      <subfield code="a">005.13/3</subfield>
+      <subfield code="2">21</subfield>
+    </datafield>
+    <datafield tag="100" ind1="1" ind2=" ">
+      <subfield code="a">Lowe, Vincent</subfield>
+      <subfield code="q">(Vincent D.)</subfield>
+    </datafield>
+    <datafield tag="245" ind1="1" ind2="0">
+      <subfield code="a">Perl programmer's interactive workbook /</subfield>
+      <subfield code="c">Vincent Lowe.</subfield>
+    </datafield>
+    <datafield tag="260" ind1=" " ind2=" ">
+      <subfield code="a">Upper Saddle River, NJ :</subfield>
+      <subfield code="b">Prentice Hall PTP,</subfield>
+      <subfield code="c">c1999.</subfield>
+    </datafield>
+    <datafield tag="300" ind1=" " ind2=" ">
+      <subfield code="a">xx, 633 p. :</subfield>
+      <subfield code="b">ill. ;</subfield>
+      <subfield code="c">23 cm.</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="0">
+      <subfield code="a">Perl (Computer program language)</subfield>
+    </datafield>
+  </record>
+  <record>
+    <leader>00696nam  22002538a 4500</leader>
+    <controlfield tag="001">fol05882032 </controlfield>
+    <controlfield tag="003">IMchF</controlfield>
+    <controlfield tag="005">20000707091904.0</controlfield>
+    <controlfield tag="008">000630s2000    cau           001 0 eng  </controlfield>
+    <datafield tag="010" ind1=" " ind2=" ">
+      <subfield code="a">   00058174 </subfield>
+    </datafield>
+    <datafield tag="020" ind1=" " ind2=" ">
+      <subfield code="a">0764547291 (alk. paper)</subfield>
+    </datafield>
+    <datafield tag="040" ind1=" " ind2=" ">
+      <subfield code="a">DLC</subfield>
+      <subfield code="c">DLC</subfield>
+    </datafield>
+    <datafield tag="042" ind1=" " ind2=" ">
+      <subfield code="a">pcc</subfield>
+    </datafield>
+    <datafield tag="050" ind1="0" ind2="0">
+      <subfield code="a">QA76.73.P22</subfield>
+      <subfield code="b">F64 2000</subfield>
+    </datafield>
+    <datafield tag="082" ind1="0" ind2="0">
+      <subfield code="a">005.13/3</subfield>
+      <subfield code="2">21</subfield>
+    </datafield>
+    <datafield tag="100" ind1="2" ind2=" ">
+      <subfield code="a">Foster-Johnson, Eric.</subfield>
+    </datafield>
+    <datafield tag="245" ind1="1" ind2="0">
+      <subfield code="a">Cross-platform Perl /</subfield>
+      <subfield code="c">Eric F. Johnson.</subfield>
+    </datafield>
+    <datafield tag="260" ind1=" " ind2=" ">
+      <subfield code="a">Foster City, CA :</subfield>
+      <subfield code="b">IDG Books Worldwide,</subfield>
+      <subfield code="c">2000.</subfield>
+    </datafield>
+    <datafield tag="263" ind1=" " ind2=" ">
+      <subfield code="a">0009</subfield>
+    </datafield>
+    <datafield tag="300" ind1=" " ind2=" ">
+      <subfield code="a">p. cm.</subfield>
+    </datafield>
+    <datafield tag="500" ind1=" " ind2=" ">
+      <subfield code="a">Includes index.</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="0">
+      <subfield code="a">Perl (Computer program language)</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="0">
+      <subfield code="a">Web servers.</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="0">
+      <subfield code="a">Cross-platform software development.</subfield>
+    </datafield>
+  </record>
+</collection>

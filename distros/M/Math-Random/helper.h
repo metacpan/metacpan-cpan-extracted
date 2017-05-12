@@ -1,0 +1,10 @@
+extern long gvpriw(long index);
+extern int rspriw(long size);
+extern double gvprfw(long index);
+extern void svprfw(long index, double value);
+extern int rsprfw(long size);
+extern void pgnprm(long n);
+extern void pgnmul (long n, long ncat);
+extern int psetmn(long p);
+extern int pgenmn(void);
+extern void salfph(char* phrase);

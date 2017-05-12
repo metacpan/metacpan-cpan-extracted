@@ -1,0 +1,172 @@
+<html>
+<head>
+<title>MHonArc Resources: MIMEEXCS</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="mimedecoders.html">MIMEDECODERS</a>]</td><td><nobr>[<a href="../resources.html#mimeexcs">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="mimefilters.html">MIMEFILTERS</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>MIMEEXCS</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p>
+<code>&lt;MIMEEXCS&gt;</code><br>
+<var>content-type</var><br>
+<var>content-type</var><br>
+...<br>
+<code>&lt;/MIMEEXCS&gt;</code><br>
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>MIMEEXCS defines the list of content-types to exclude from processing.
+The exclusion occurs before the data is processed to any filters
+registered via the <a href="mimefilters.html">MIMEFILTERS</a> resource.
+</p>
+<p>For example, if MIMEEXCS is set to the following:
+</p>
+<pre class="code">
+<b>&lt;MIMEExcs&gt;</b>
+image/jpg
+image/gif
+<b>&lt;/MIMEExcs&gt;</b>
+</pre>
+<p>Then JPEG and GIF images will be excluded.
+</p>
+
+<p>Base types can be listed in order exclude all
+content-types
+with a give base.  For example,
+</p>
+<pre class="code">
+<b>&lt;MIMEExcs&gt;</b>
+image
+<b>&lt;/MIMEExcs&gt;</b>
+</pre>
+<p>will exclude all images.
+</p>
+
+<p>If all you want to do is include a specified set of media-types, then
+use the 
+<a href="mimeincs.html">MIMEINCS</a> resource instead.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<p>Nil.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>The following example excludes all binaries, images, and postscript
+data:
+</p>
+<pre class="code">
+<b>&lt;MIMEExcs&gt;</b>
+application/octet-stream
+application/postscript
+image
+<b>&lt;/MIMEExcs&gt;</b>
+</pre>
+
+<p>The following is a very restrictive setting to minimize security
+risks and large data files:
+</p>
+<pre class="code">
+<b>&lt;MIMEExcs&gt;</b>
+application
+image
+audio
+video
+text/html
+<b>&lt;/MIMEExcs&gt;</b>
+</pre>
+
+<p>For tighter control of allowable media-types, see the
+<a href="mimeincs.html">MIMEINCS</a> resource.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>2.4.9
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+<a href="mimealtprefs.html">MIMEALTPREFS</a>,
+<a href="mimefilters.html">MIMEFILTERS</a>,
+<a href="mimeincs.html">MIMEINCS</a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="mimedecoders.html">MIMEDECODERS</a>]</td><td><nobr>[<a href="../resources.html#mimeexcs">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="mimefilters.html">MIMEFILTERS</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2005/06/07 19:15:44 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"
+><strong>MHonArc</strong></a><br>
+Copyright &#169; 2001, <a href="http://www.mhonarc.org/~ehood"
+>Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org"
+>mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

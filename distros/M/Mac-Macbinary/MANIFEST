@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Macbinary.pm
+Makefile.PL
+README
+t/00_load.t
+t/01_fh.t
+t/02_io.t
+t/03_path.t
+t/04_filename.t
+t/05_validate.t
+t/test.mb
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,74 @@
+/-----------------\
+| Minecraft::RCON |
+\-----------------/
+
+This library is intended to provide a nice way to interface with the Minecraft
+remote console, commonly referred to as RCON.
+
+It supports logging in and the sending of command as well as recieving the
+result of those commands back.  As far as I know, this is the complete
+feature-set of RCON, making this a complete implementation.
+
+INSTALLATION
+
+To install this module, type the following:
+
+    perl Build.PL
+    ./Build install
+
+There are no tests to be performed yet.  Future versons might have them, but for
+now I'm at a loss as to how I would test without requiring an actual minecraft
+server to test against.  Suggestions are very welcome.
+
+MAKING USE OF IT
+
+The POD should be close enough to good documentation to make use of this module.
+I've also included a script, mcrcon.pl, that should demonstrate the module's
+intended use and possibilities.
+If you have questions or suggestions about the usability of the module, feel
+free to contact fredrik@webkonsept.com
+
+DEPENDENCIES
+
+Requires IO::Socket, specifically IO::Socket::INET, version 1.18 or later.
+1.18 introduced automatic flushing of all sockets, which is super-handy.
+
+Requires Term::ANSIColor 3.02 or later, used in the color translation from
+Minecraft color codes to terminal color codes.
+
+I've tested this with perl as far down as 5.8.8, where it worked fine.  While I
+do recomend you get yourself a more recent perl than that, it should not be
+required to use this module.
+
+AFFILIATION WITH MOJANG AB
+
+Mojang AB, the owners of the Minecraft trademark and employer of the authors of
+Minecraft, have probably never heard of me.  I am not affiliated or endorsed by
+them in any way.  The fact that I tweeted about this module, and got a short
+response from a Mojang employee does not mean they are aware of this module any
+more.
+As such, I will get no more advance notice than anyone else when/if the RCON
+protocol changes, so if they break it on their end I'll have to fix it on my end
+without their help.
+
+Endorsement the other way does exist, however.  I whole-heartedly endorse Mojang
+AB, their current business practices and their product Minecraft.  I enjoy a
+splash of Minecrafting almost every day, and I enjoy being a server
+administraor.
+
+COPYRIGHT AND LICENSE
+
+The trademark "Minecraft" is owned by Mojang AB, and all rights to it are
+reserved by them.
+I've used "Minecraft" in my namespace in a way I believe follows their
+guidelines put forth in http://www.minecraft.net/brand-guidelines
+I invite anyone to point it out if I've made a mistake.
+
+The perl code was written by Fredrik Vold, but no copyright is claimed.
+You are hereby licensed to do as you please with this code, and while it would
+be nice of you to mention me when using the code, it is not required.
+
+Note, however, that this means you are not entitled to any support unless I feel
+like it, and that there are no warranties what so ever attached to this code.
+
+I'd love to hear from you if you use my code:  fredrik@webkonsept.com

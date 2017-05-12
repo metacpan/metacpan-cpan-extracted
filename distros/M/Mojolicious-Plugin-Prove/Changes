@@ -1,0 +1,55 @@
+Release history of Mojolicious-Plugin-Prove
+===========================================
+
+0.08 2015-01-26
+
+    [TESTS]
+    * Actually Mojolicious started to generate valid HTML5 stuff as of version 5.73
+
+0.07 2015-01-26
+
+    [IMPROVEMENTS]
+    * switch off proverc
+    * sort files when doing prove
+
+0.06 2015-01-25
+
+    [IMPROVEMENTS]
+    * Add route to run all tests of a group
+    * Switch off HARNESS_TIMER for tests run by this plugin
+
+    [TEST]
+    * Add test for running all tests of a group
+
+0.05 2015-01-25
+
+    [MISC]
+    * a release only to get "Changes" in sync
+
+0.04 2015-01-25
+
+    [TEST]
+    * When HARNESS_TIMER is set, there is additional output
+
+0.03 2015-01-24
+
+    [TESTS]
+    * Be more generic in Tests
+    * Mojolicious 5.73 generates valid HTML5 tags now (no self-closing stylesheet tag)
+
+0.02 2015-01-20
+
+    [BUGFIX]
+    * use render( text => ... ) instead of render_text( ... )
+
+    [TESTS]
+    * Add basic tests
+
+    [MISC]
+    * Add Changes file
+    * Add metaresources to dist.ini
+    * Add TODO
+
+0.01 2013-03-19
+
+    * Initial release

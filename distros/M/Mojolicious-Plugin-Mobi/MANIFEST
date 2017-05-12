@@ -1,0 +1,7 @@
+Changes
+lib/Mojolicious/Plugin/Mobi.pm
+Makefile.PL
+MANIFEST
+README
+t/basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

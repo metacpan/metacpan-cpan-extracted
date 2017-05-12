@@ -1,0 +1,128 @@
+#!/usr/bin/perl
+###########################################
+# module-rename -- 2005, Mike Schilli <cpan@perlmeister.com>
+###########################################
+# PURPOSE
+###########################################
+use strict;
+use warnings;
+use Pod::Usage;
+use Module::Rename;
+use Log::Log4perl qw(:easy);
+use Getopt::Std;
+use File::Basename;
+
+getopts("vgh", \my %o);
+
+Log::Log4perl->easy_init({
+  level  => $WARN,
+  layout => "%m%n",
+});
+
+my  $VERSION = "0.01";
+
+pod2usage({-message => basename($0) . " v$VERSION",
+           -verbose => 2
+          }) if $o{h};
+
+my($old, $new, $dir) = @ARGV;
+
+pod2usage "Missing arguments" unless defined $new;
+
+my $ren = Module::Rename->new(
+    name_old           => $old,
+    name_new           => $new,
+    wipe_empty_subdirs => 1,
+    use_git            => $o{g},
+);
+
+$ren->find_and_rename($dir || ".");
+
+__END__
+
+=head1 NAME
+
+    module-rename - Rename Perl module distributions
+
+=head1 SYNOPSIS
+
+    $ module-rename Old::Name New::Name Old-Name-Distro-Dir
+
+=head1 DESCRIPTION
+
+Have you ever created a module distribution, only to realize later that
+the module hierarchary needed to be changed? All of a sudden, 
+C<Cool::Frobnicator> didn't sound cool anymore, but needed to be
+C<Util::Frobnicator> instead?
+
+Going through a module's distribution, changing all package names,
+variable names, and move the directories around can be a tedious task. 
+C<Module::Rename> comes with a script C<module-rename> which takes care of 
+all this:
+
+    $ ls
+    Cool-Frobnicator-0.01/
+
+    $ module-rename Cool::Frobnicator Util::Frobnicator Cool-Frobnicator-0.01
+    Cool-Frobnicator-0.01/lib/Cool is empty and can go away.
+
+Done. The directory hierarchy has changed:
+
+    $ ls -R
+    Util-Frobnicator-0.01/
+    ...
+    Util-Frobnicator-0.01/lib/Util/Frobnicator.pm
+
+... and so has the content of all files:
+
+    $ grep "package" Util-Frobnicator-0.01/lib/Util/Frobnicator.pm
+    package Util::Frobnicator;
+
+=head2 Things to Keep in Mind
+
+=over 4
+
+=item *
+
+C<module-rename> will rename files and replace their content, so make
+sure that you have a backup copy in case something goes horribly wrong.
+
+=item *
+
+After changing the module hierarchy, some directories might be empty,
+like the C<lib/Cool> directory above. In this case, a warning will be issued:
+
+    Cool-Frobnicator-0.01/lib/Cool is empty and can go away.
+
+and the 'empty' directory gets deleted (even if a CVS subdirectory is in 
+there).
+
+=back
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-v>
+
+Verbose mode.
+
+=item B<-h>
+
+Show the script's version and manual page.
+
+=item B<-g>
+
+Move files using "git mv" instead of "mv".
+
+=back
+
+=head1 LEGALESE
+
+Copyright 2005 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2005, Mike Schilli <cpan@perlmeister.com>

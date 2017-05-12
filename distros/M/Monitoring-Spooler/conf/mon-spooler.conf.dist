@@ -1,0 +1,41 @@
+<Monitoring>
+    <Spooler>
+        NegatingTrigger = 1
+        DBFile = /var/lib/mon-spooler/db.sqlite3
+        <Frontend>
+            TemplatePath = /var/lib/mon-spooler/tpl
+            StaticPath   = /var/lib/mon-spooler/res
+        </Frontend>
+        <Transport>
+            <Sipgate>
+                Username = Test
+                Password = Test
+                Priority = 1
+            </Sipgate>
+            <Smstrade>
+                Apikey = xyz
+                Route = basic
+                Priority = 99
+            </Smstrade>
+            <FreeSwitch>
+                hostname = localhost
+                port = 8021
+                password = pass
+                priority = 1
+                url = sofia/gateway/provider.tld
+                # url = freetdm/1/
+                defaultaudio = /var/lib/mon-spooler/audio/default_alarm_multi.wav
+            </FreeSwitch>
+            <Pjsua>
+                sipid = sip:user@sipgate.de
+                registrar = sip:sipgate.de
+                realm = *
+                username = user
+                password = pass
+                outbound = sip:sipgate.de
+                stunsrv = stun.sipgate.net:10000
+                Priority = 99
+            </Pjsua>
+        </Transport>
+    </Spooler>
+</Monitoring>

@@ -1,0 +1,172 @@
+Revision history for MooseX-MethodAttributes
+
+0.31      2015-09-27 05:28:49Z
+ - increase Moose prereq on perl 5.8.x to fix boolean overload handling
+
+0.30      2015-08-16 04:02:53Z
+ - update some distribution tooling
+
+0.29      2013-11-15 02:31:46Z
+ - change docs to recommending using a role to grant Inheritable behaviour
+   rather than a superclass, and changed tests to match
+ - converted all uses of namespace::clean to namespace::autoclean
+ - converted all uses of Test::Exception to Test::Fatal
+ - repository migrated to the github moose organization
+
+0.28   2012-09-04 03:28:26Z
+ - RT#79385: Import Carp::croak into the right package (spotted by Bill
+   Moseley)
+
+0.27   2012-02-13 18:28:00Z
+ - Fix issue with new Moose and new Module::Runtime where Moose
+   functions were not getting correctly exported to the users of
+   this module.
+
+0.26   2012-01-13 12:06:00Z
+ - Fix packages relying on ->meta->make_immutable to return true.
+   This should work, but doesn't in some occasional circumstances.
+
+0.25   2011-06-20 10:53:00Z
+ - Updated to avoid test issues from Moose 2.0007 (spotted by ilmari)
+
+0.24   2010-07-19 03:23:57Z
+ - Updated to avoid warnings from Moose 1.09 (Dave Rolsky).
+
+0.23   2010-06-15 19:22:00Z
+ - Fix dependency on MooseX::Types::Moose (RT#58406)
+
+0.22   2010-05-31 19:49:00Z
+ - Fix issues causing composing multiple (normal) roles onto a subclass of a
+   MooseX::MethodAttributes class to fail by removing a forced metaclass
+   reinitialization which wasn't needed.
+
+0.21   2010-05-07 02:48:54Z
+  - Add more metadata, including a repository url.
+
+0.20   2010-02-10 00:46:11Z
+  - Remove horrible code and epic comment working around Moose bugs
+    with reinitializing anon classes now that the bug is fixed upstream
+    in Moose (commit cf600c83).
+
+0.19   2010-01-09 17:29:00Z
+  - Adapt to changes in in composition_class roles
+    in new Moose releases (>= 0.93_01)
+
+0.18   2009-09-25 09:51:24Z
+  - Bump Test::More dependency to 0.88 for done_testing
+  - Require namespace::autoclean for t/late_reinitialize.t
+
+0.17   2009-09-23 14:35:50Z
+  - Bump MooseX::Types version to 0.20 to avoid warnings with newer
+    Moose releases
+
+0.16_02   2009-09-20 16:58:38Z
+  - Also export the Moose::Role sugar from MooseX::MethodAttributes::Role
+
+0.16_01   2009-09-18 01:29:38Z
+  - Combining roles now works as expected when writing roles, or when applying
+    multiple roles to a class
+  - Bump other dependencies in line with required Moose version
+
+0.16   2009-09-15 05:58:14Z
+  - Fix so that MooseX::Role::Parameterized can be used in combination with roles
+    containing method attributes + testcase from phaylon (RT#48758)
+  - Fixes to avoid a deprecation warning from the latest Class::MOP (Dave
+    Rolsky)
+
+0.15  2009-07-26
+  - Fix test which was failing in some cases and additional test cases.
+
+  - No other changes on the dev release.
+
+0.14_01  2009-07-16
+  - Add TODO tests for role combination with method attributes, proving that this doesn't work.
+
+  - Add nasty hack to allow the application of roles with method attributes to anon classes to
+    work if the user does a special handwave. This is less than optimum, see big block comment
+    in the code. :/
+
+0.14  2009-06-07
+  - Fix bugs with composing roles with method attributes into other
+    roles with method attributes + tests
+
+0.13   2009-05-28 00:19:00Z
+  - Add Test::More and Test::Exception to requirements for RT#46395
+    and RT#46396
+
+0.12   2009-05-25 18:33:30Z
+  - Add additional tests for role composition behavior.
+  - Add an error message if someone tries to exclude or alias methods
+    from a role with attributes, which currently doesn't work.
+  - Add tests for this error, and tests for behavior if aliasing did work.
+
+0.11_03   2009-05-24 23:06:50Z
+  - Fix overenthusiastic meta trait application which caused
+    classes which already had methods with attributes to have their
+    attributes wiped out.
+
+0.11_02   2009-05-21 00:46:47Z
+  - Add support for use Moose::Role -traits => 'MethodAttributes'
+    if we've already been loaded.
+  - Add support for composing a role containg methods with attributes into
+    another role.
+
+0.11_01   2009-05-17 22:50:44Z
+  - Do not apply metaclass roles unless needed.
+  - Add MooseX::MethodAttributes::Role::Meta::Role, for roles which
+    contain methods with attributes.
+  - Split attribute container functionality out into
+    MooseX::MethodAttributes::Role::Meta::Map.
+
+0.11   2009-05-15 16:02:27Z
+  - Depend on Moose 079 to prevent metaclass incompatibility failure.
+
+0.10   2009-05-13 23:08:30Z
+  - Stop non Moose classes which inherit MooseX::MethodAttributes::Inheritable
+    and which define a sub meta from throwing an exception.
+
+0.09   2009-04-28 08:47:28Z
+  - Use modifiers in the metaclass role to catch modifiers being applied
+    to subs, and apply our wrapped method role to the generated method
+    instance. This is horrible, but appears to be a sane way to avoid
+    that fact that method metaclasses applied to one class aren't inherited.
+
+0.08   2009-04-25 15:30:00Z
+  - Fix get_nearest_methods_with_attributes to deal with wrapped methods.
+    - Add tests for this, and how Catalyst uses the module
+  - Add TODO tests showing that method metaclass inheritance (or lacktherof)
+    into subclasses causes us to fail to do the right thing.
+
+0.07   2009-04-25 12:47:05Z
+  - Add the get_nearest_methods_with_attributes method.
+
+0.06   2009-04-19 22:03:06Z
+  - Fix bug when using base, as Moose doesn't automatically inherit the
+    method metaclass from your parent class unless you use the 'extends'
+    syntax.
+  - Package on a different machine, due to reported unarchiving issues
+    on win32.
+
+0.05   2009-04-01 20:40:05Z
+  - Ensure that we have an initialised metaclass to apply roles to in
+    AttrContainer::Inheritable, fixing bugs with non-moose base classes
+    which have not has a metaclass initialised for them.
+
+0.04   2009-02-26 21:47:18Z
+  - Depend on an MX::Types version with support for parameterisation.
+  - Add tests for behaviour of get_all_methods_with_attributes and method
+    modifiers.
+
+0.03   2009-02-19 07:13:18Z
+  - Implement metaclass methods for getting all meta methods with attributes.
+
+0.02   2009-02-14 21:17:56Z
+  - Depend on Moose 0.70 for wrapped_method_metaclass_roles support.
+  - Apply a role to wrapped method metaclasses to support getting
+    attributes of wrapped methods.
+  - Add MooseX::MethodAttributes::Inherited as a way of capturing method
+    attributes without explicitly using MooseX::MethodAttributes in every
+    class.
+
+0.01   2009-02-13 21:21:11Z
+  - Initial release.

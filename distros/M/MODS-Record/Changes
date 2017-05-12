@@ -1,0 +1,41 @@
+Revision history for perl module MODS::Record
+
+0.12  2016-12-09 09:55:02 CET
+    - Fixing taint bug in tests
+    
+0.11  2015-09-23 09:23:57 CEST
+    - Fixing UTF8 bug in JSON export
+
+0.10  2015-09-22 15:46:42 CEST
+    - Adding missing Affiliation tag
+
+0.09  2015-04-01 13:18:23 CEST
+    - Downgrading cpanfile
+
+0.08 2015-03-02
+    - Changed shelfLocation to shelfLocator
+    - Migrating to Dist::Milla
+    - Bumping version +
+
+0.07 2013-08-08
+    - Changed 'defined-or' operators to 'or' operators to suport perl 5.8.X
+
+0.06 2013-08-06
+    - Fixing UTF-8 handling of JSON
+
+0.05 2013-08-05
+    - Adding Changes file
+    - Adding support for callback function in from_xml, from_json
+
+0.04 2013-08-04
+    - Fixing test scripts based on CPAN feedback
+
+0.03 2013-08-03
+    - Switching to Build.PL Scripts
+    - Fixing documentation
+
+0.02 2013-08-03
+    - Adding a LICENSE
+
+0.01 2013-08-02
+    - First release to CPAN

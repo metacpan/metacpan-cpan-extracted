@@ -1,0 +1,6 @@
+Revision history for Perl extension Math::Geometry::Planar::GPC::PolygonXS.
+
+0.01  Mon May 13 15:33:29 2013
+	- original version; created by h2xs 1.23 with options
+		-n Math::Geometry::Planar::GPC::PolygonXS -A -O -x functions.h
+

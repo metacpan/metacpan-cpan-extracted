@@ -1,0 +1,606 @@
+#!/usr/bin/perl
+
+#
+# spfd: Simple forking SPF query service daemon
+#
+# (C) 2005-2012 Julian Mehnle <julian@mehnle.net>
+#     2003-2004 Meng Weng Wong <mengwong+spf@pobox.com>
+# $Id: spfd 148 2006-06-17 21:50:57Z Julian Mehnle $
+#
+##############################################################################
+
+=head1 NAME
+
+spfd - (Mail::SPF) - Simple forking daemon to provide SPF query services
+
+=head1 VERSION
+
+2.000
+
+=head1 SYNOPSIS
+
+B<spfd> B<--port>|B<-p> I<port> [B<--set-user>|B<-u> I<uid>|I<username>]
+[B<--set-group>|B<-g> I<gid>|I<groupname>] [I<OPTIONS>]
+
+B<spfd> B<--socket>|B<-s> I<filename> [B<--socket-user> I<uid>|I<username>]
+[B<--socket-group> I<gid>|I<groupname>] [B<--socket-perms> I<octal-perms>]
+[B<--set-user>|B<-u> I<uid>|I<username>] [B<--set-group>|B<-g> I<gid>|I<groupname>]
+[I<OPTIONS>]
+
+B<spfd> B<--version|-V>
+
+B<spfd> B<--help>
+
+=head1 DESCRIPTION
+
+B<spfd> is a simple forking Sender Policy Framework (SPF) query server.  spfd
+receives and answers SPF requests on a TCP/IP or UNIX domain socket.  For more
+information on SPF see L<http://www.openspf.org>.
+
+The B<--port> form listens on a TCP/IP socket on the specified I<port>.  The
+default port is B<5970>.
+
+The B<--socket> form listens on a UNIX domain socket that is created with the
+specified I<filename>.  The socket can be assigned specific user and group
+ownership with the B<--socket-user> and B<--socket-group> options, and specific
+filesystem permissions with the B<--socket-perms> option.
+
+Generally, spfd can be instructed with the B<--set-user> and B<--set-group>
+options to drop root privileges and change to another user and group before it
+starts listening for requests.
+
+The B<--version> form prints version information of spfd.  The B<--help> form
+prints usage information for spfd.
+
+=head1 OPTIONS
+
+spfd takes any of the following I<OPTIONS>:
+
+=over
+
+=item B<--default-explanation> I<string>
+
+=item B<--def-exp> I<string>
+
+Use the specified I<string> as the default explanation if the authority domain
+does not specify an explanation string of its own.
+
+=item B<--hostname> I<hostname>
+
+Use I<hostname> as the host name of the local system instead of auto-detecting
+it.
+
+=item B<--debug>
+
+Print out debug information about spfd's operation, incoming requests, and the
+responses sent.
+
+=back
+
+=head1 REQUEST
+
+A request consists of a series of lines delimited by \x0A (LF) characters (or
+whatever your system considers a newline).  Each line must be of the form
+I<option>B<=>I<value>, where the following options are supported:
+
+=over
+
+=item B<versions>
+
+A comma-separated list of SPF version numbers of SPF records that may be used.
+B<1> means that C<v=spf1> records should be used.  B<2> means that C<spf2.0>
+records should be used.  Defaults to B<1,2>, i.e., uses any SPF records that
+are available.  Records of a higher version are preferred.
+
+=item B<scope>
+
+The authorization scope of the identity that should be checked.  Defaults to
+B<'mfrom'>.  The following scope values are supported: B<'helo'>, B<'mfrom'>,
+B<'pra'>.  See L<Mail::SPF::Request/new> for more information.
+
+=item B<identity>
+
+I<Required>.  The sender identity whose authorization should be checked.  This
+is a domain name for the C<helo> scope, and an e-mail address for the C<mfrom>
+and C<pra> scopes.
+
+=item B<ip_address>
+
+I<Required> for checks with the C<helo>, C<mfrom>, and C<pra> scopes.  The IP
+address of the host claiming the identity that is being checked.  Can be either
+an IPv4 or an IPv6 address.  An IPv4-mapped IPv6 address (e.g.
+'::ffff:192.168.0.1') is treated as an IPv4 address.
+
+=item B<helo_identity>
+
+The C<HELO> SMTP transaction parameter in the case that the main identity is of
+a scope other than C<helo>.  This identity is then used merely for the
+expansion of C<%{h}> macros during the policy evaluation of the main identity.
+If unspecified with a scope other than C<helo>, defaults to B<"unknown">.
+If the main identity is of the C<helo> scope, this option is unused.
+
+=back
+
+=head1 RESPONSE
+
+spfd responds to SPF requests with similar series of lines of the form
+I<key>B<=>I<value>.  The most important response keys are:
+
+=over
+
+=item B<result>
+
+The result code of the SPF check:
+
+=over 12
+
+=item B<pass>
+
+The specified IP address is an authorized SMTP sender for the identity.
+
+=item B<fail>
+
+The specified IP address is not an authorized SMTP sender for the identity.
+
+=item B<softfail>
+
+The specified IP address is not an authorized SMTP sender for the identity,
+however the authority domain is still testing out its SPF policy.
+
+=item B<neutral>
+
+The identity's authority domain makes no assertion about the status of the IP
+address.
+
+=item B<permerror>
+
+A permanent error occurred while evaluating the authority domain's policy
+(e.g., a syntax error in the SPF record).  Manual intervention is required
+from the authority domain.
+
+=item B<temperror>
+
+A temporary error occurred while evaluating the authority domain's policy
+(e.g., a DNS error).  Try again later.
+
+=item B<none>
+
+There is no applicable SPF policy for the identity domain.
+
+=back
+
+=item B<local_explanation>
+
+A locally generated explanation of the SPF result.
+
+=item B<authority_explanation>
+
+The authority domain's explanation for the SPF result.  Be aware that the
+authority domain may be a malicious party and thus the authority explanation
+should not be trusted blindly.  See RFC 4408, 10.5, for a detailed discussion
+of this issue.
+
+=item B<received_spf_header>
+
+An appropriate C<Received-SPF> header field for the SPF result.
+
+=item B<spf_record>
+
+The authority domain's SPF record that was used for the policy evaluation.
+
+=back
+
+=head1 EXAMPLE
+
+A running spfd could be tested using the C<netcat> utility like this (line
+breaks added for clarity):
+
+    $ echo -e "identity=user@example.com\nip_address=1.2.3.4\n" \
+        | nc localhost 5970
+    result=fail
+    local_explanation=example.com: Sender is not authorized by default to use
+        'user@example.com' in 'mfrom' identity (mechanism '-all' matched)
+    authority_explanation=Please see http://www.openspf.org/why.html?
+        sender=user%40example.com&ip=1.2.3.4&receiver=localhost
+    received_spf_header=Received-SPF: fail (example.com: Sender is not
+        authorized by default to use 'user@example.com' in 'mfrom' identity
+        (mechanism '-all' matched)) receiver=localhost; identity=mfrom;
+        envelope-from="user@example.com"; client-ip=1.2.3.4
+    spf_record=v=spf1 mx -all
+
+=head1 COMPATIBILITY
+
+B<spfd> has undergone the following interface changes compared to earlier
+versions:
+
+=over
+
+=item B<2.000>
+
+=over
+
+=item *
+
+A new preferred I<request> style has been introduced.  Instead of the old
+C<sender> request option, which is specific to the C<MAIL FROM> SMTP identity,
+a generic C<identity> option should now be specified.  In addition, a C<scope>
+option may be given to specify the identity's scope, otherwise a scope of
+C<mfrom> is assumed.  The old C<ip> and C<helo> options have been replaced by
+the C<ip_address> and C<helo_identity> options, respectively.
+
+This is how legacy requests with the C<mfrom> scope would translate to the new
+preferred request style:
+
+  Legacy request style       | New request style
+ ----------------------------+---------------------------------------
+                             | scope=mfrom
+  sender=<mfrom-identity>    | identity=<mfrom-identity>
+  ip=<ip-address>            | ip_address=<ip-address>
+  helo=<helo-identity>       | helo_identity=<helo-identity>
+
+A new I<response> style featuring new response values has also been introduced:
+
+  Legacy response style      | New response style
+ ----------------------------+---------------------------------------
+  result=<result-code>       | result=<result-code>
+  header_comment=<local-exp> | local_explanation=<local-exp>
+  smtp_comment=<local-exp    | authority_explanation=<authority-exp>
+    or authority-exp>        | 
+  spf_record=<spf-record>    | spf_record=<spf-record>
+                             | received_spf_header=<header>
+
+The legacy request style is deprecated but still supported for backwards
+compatibility.  The legacy response values are still returned for backwards
+compatibility in addition to the new response values, but may be removed in the
+future.  Adjust your code to use the new request and response styles.
+
+=item *
+
+The former C<unknown> and C<error> result codes have been renamed to C<permerror>
+and C<temperror>, respectively, in order to comply with RFC 4408 terminology.
+
+=item *
+
+SPF checks with an empty identity are no longer supported.  In the case of an
+empty C<MAIL FROM> SMTP transaction parameter, perform a check with the C<helo>
+scope directly.
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mail::SPF>, L<spfquery(1)>
+
+L<http://tools.ietf.org/html/rfc4408>
+
+=head1 AUTHORS
+
+This version of B<spfd> is a complete rewrite by Julian Mehnle <julian@mehnle.net>,
+based on an earlier version written by Meng Weng Wong <mengwong+spf@pobox.com>.
+
+=cut
+
+our $VERSION = '2.000';
+
+use warnings;
+use strict;
+
+use Error ':try';
+use IO::Handle;
+use Getopt::Long qw(:config gnu_compat);
+use Socket;
+use Mail::SPF;
+
+use constant TRUE   => (0 == 0);
+use constant FALSE  => not TRUE;
+
+use constant default_port   => 5970;
+
+use constant deprecated_request_keys => {
+    sender      => 'identity',
+    ip          => 'ip_address',
+    helo        => 'helo_identity'
+};
+
+# Helper Functions
+##############################################################################
+
+sub usage {
+    STDERR->print(<<'EOT');
+Usage:
+    spfd --port|-p <port>
+        [--set-user|-u <uid>|<username>] [--set-group|-g <gid>|<groupname>]
+    spfd --socket|-s <filename> [--socket-user <uid>|<username>]
+        [--socket-group <gid>|<groupname>] [--socket-perms <octal-perms>]
+        [--set-user|-u <uid>|<username>] [--set-group|-g <gid>|<groupname>]
+EOT
+    return;
+}
+
+sub deprecated_option {
+    my ($old_option, $new_option, $options) = @_;
+    return FALSE if not exists($options->{$old_option});
+    STDERR->print(
+        "Warning: '$old_option' option is deprecated" .
+        ($new_option ? "; use '$new_option' instead" : '') .
+        ".\n"
+    );
+    $options->{$new_option} = delete($options->{$old_option});
+    return TRUE;
+}
+
+# Command-line Option Handling
+##############################################################################
+
+my $options = {};
+my $getopt_result = GetOptions(
+    $options,
+
+    'port|p=i',
+    'socket|s=s',
+    'socket-user=s',
+    'socket-group=s',
+    'socket-perms=s',
+    'set-user|u=s',
+    'set-group=s',
+
+    'default-explanation|def-exp=s',
+    'hostname=s',
+
+    'debug!',
+
+    # Black Magic options:
+    'enable-black-magic!',
+
+    # Meta actions:
+    'version|V!',
+    'help!',
+
+    # Deprecated options:
+    'path=s',       # Now 'socket'
+    'pathuser=s',   # Now 'socket-user'
+    'pathgroup=s',  # Now 'socket-group'
+    'pathmode=s',   # Now 'socket-perms'
+    'setuser=s',    # Now 'set-user'
+    'setgroup=s'    # Now 'set-group'
+);
+
+if (not $getopt_result) {
+    usage();
+    exit(255);
+}
+
+if ($options->{help}) {
+    usage();
+    exit(0);
+}
+
+if ($options->{version}) {
+    print("spfd version $VERSION (using Mail::SPF)\n");
+    exit(0);
+}
+
+my $enable_black_magic = $options->{'enable-black-magic'};
+
+if (
+    $enable_black_magic and
+    not defined(eval('require Mail::SPF::BlackMagic'))
+) {
+    STDERR->print("Error: Cannot enable black magic. Unable to load Mail::SPF::BlackMagic.\n");
+    exit(255);
+}
+elsif ($enable_black_magic) {
+    STDERR->print("Black magic enabled.\n");
+}
+
+deprecated_option('path',       'socket',       $options);
+deprecated_option('pathuser',   'socket-user',  $options);
+deprecated_option('pathgroup',  'socket-group', $options);
+deprecated_option('pathmode',   'socket-perms', $options);
+deprecated_option('setuser',    'set-user',     $options);
+deprecated_option('setgroup',   'set-group',    $options);
+
+my $port                = $options->{port};
+my $socket_path         = $options->{socket};
+my $socket_user         = $options->{'socket-user'};
+my $socket_group        = $options->{'socket-group'};
+my $socket_perms        = $options->{'socket-perms'};
+my $set_user            = $options->{'set-user'};
+my $set_group           = $options->{'set-group'};
+
+my $default_explanation = $options->{'default-explanation'};
+my $hostname            = $options->{hostname};
+
+my $debug               = defined($options->{debug}) ? $options->{debug} : $ENV{DEBUG};
+
+if (defined($port) and defined($socket_path)) {
+    usage();
+    exit(255);
+}
+
+if (not defined($port) and not defined($socket_path)) {
+    $port = default_port;
+    STDERR->print("Using default TCP/IP port ($port).  Run `spfd --help` for supported options.\n");
+}
+
+# Main Program
+##############################################################################
+
+STDOUT->autoflush(TRUE);
+
+my $listen_socket;
+
+if (defined($port)) {
+    require IO::Socket::INET;
+    $listen_socket = IO::Socket::INET->new(
+        Listen      => TRUE,
+        LocalAddr   => '127.0.0.1',
+        LocalPort   => $port,
+        ReuseAddr   => TRUE
+    );
+    print("spfd (PID $$): Listening on TCP/IP port $port.\n");
+    #$0 = "spfd listening on TCP port $port";
+}
+elsif (defined($socket_path)) {
+    require IO::Socket::UNIX;
+    unlink $socket_path
+        if -S $socket_path;
+    $listen_socket = IO::Socket::UNIX->new(
+        Listen      => TRUE,
+        Local       => $socket_path
+    );
+    print("spfd (PID $$): Listening on UNIX socket '$socket_path'.\n");
+    #$0 = "spfd listening on UNIX socket $socket_path";
+
+    $socket_user  = normalize_uid($socket_user);
+    $socket_group = normalize_gid($socket_group);
+    chown($socket_user, $socket_group, $socket_path)
+        or die("Unable to chown($socket_user, $socket_group) socket '$socket_path'")
+        if $socket_user != -1 or $socket_path != -1;
+
+    chmod(oct($socket_perms), $socket_path)
+        or die("Unable to chmod($socket_perms) socket '$socket_path': $!")
+        if defined($socket_perms);
+}
+
+if (defined($set_group)) {
+    $set_group = normalize_gid($set_group);
+    $( = $) = $set_group;
+    $( == $set_group and $) == $set_group
+        or die("Unable to setgid($set_group): $!");
+}
+
+if (defined($set_user)) {
+    $set_user = normalize_uid($set_user);
+    $< = $> = $set_user;
+    $< == $set_user and $> == $set_user
+        or die("Unable to setuid($set_user): $!");
+}
+
+my $spf_server = Mail::SPF::Server->new(
+    default_authority_explanation
+                    => $default_explanation,
+    hostname        => $hostname,
+
+    # Black Magic:
+    # TODO
+    # max-dns-interactive-terms
+    # max-name-lookups-per-term
+    # more?
+);
+
+# Handle Client Connections
+##############################################################################
+
+while (my $socket = $listen_socket->accept()) {
+    if (fork) {
+        # Parent process.
+        close($socket);
+        wait;  # Reap our immediate child (the grand-child will run on its own).
+        next;
+    }
+    elsif (fork) {
+        # Child process, parent of grand-child process.
+        # The child exits immediately in order to avoid zombies:
+        exit;
+    }
+
+    # Grand-child process.
+
+    my $time = gmtime;
+    if ($debug) {
+        my $peerinfo =
+            $listen_socket->isa('IO::Socket::INET') ?
+                sprintf(" from %s [%s]", scalar(gethostbyaddr($socket->peeraddr, AF_INET)), $socket->peerhost)
+            :   '';
+        print("\n");
+        print("[$time] Incoming connection" . $peerinfo . "\n");
+    }
+
+    try {
+        $socket->autoflush(TRUE);
+
+        my $request_values = {};
+        while (<$socket>) {
+            s/\s+$//;
+            last if /^$/;
+            my ($key, $value) = split(/=/, $_, 2);
+            $key = lc($key);
+            $key = deprecated_request_keys->{$key}
+                if defined(deprecated_request_keys->{$key});
+            $request_values->{$key} = $value;
+
+            print("[$time] R: $key=$value\n")
+                if $debug;
+        }
+
+        my @versions = split(',', $request_values->{versions} || '');
+
+        my $request = Mail::SPF::Request->new(
+            versions        => @versions ? [@versions] : undef,
+            scope           => $request_values->{scope},
+            identity        => $request_values->{identity},
+            ip_address      => $request_values->{ip_address},
+            helo_identity   => $request_values->{helo_identity}
+        );
+
+        my $result = $spf_server->process($request);
+
+        my $response_values = {};
+        $response_values->{result}                  = $result->code;
+        $response_values->{local_explanation}       = $result->local_explanation;
+        $response_values->{authority_explanation}   = $result->authority_explanation
+            if $result->can('authority_explanation');
+        $response_values->{received_spf_header}     = $result->received_spf_header;
+        $response_values->{spf_record}              = $result->request->root_request->record
+            if defined($result->request->root_request->record);
+
+        # Legacy response values:
+        $response_values->{smtp_comment}            =
+            defined($response_values->{authority_explanation}) ?
+                $response_values->{authority_explanation}
+            :   $response_values->{local_explanation};
+        $response_values->{header_comment}          = $response_values->{local_explanation};
+
+        foreach my $key (qw(
+            result local_explanation authority_explanation received_spf_header spf_record
+            smtp_comment header_comment
+        )) {
+            defined($response_values->{$key}) or next;
+            $socket->print("$key=$response_values->{$key}\n");
+            print("[$time] W: $key=$response_values->{$key}\n")
+                if $debug;
+        }
+    }
+    catch Mail::SPF::Exception with {
+        my ($e) = @_;
+        printf("[$time] An error occurred: %s\n", $e->text);
+    };
+
+    $socket->close();
+
+    exit;
+}
+
+# Helper Functions
+##############################################################################
+
+sub normalize_uid {
+    my ($uid) = @_;
+    return -1 if not defined($uid);
+    return getpwnam($uid)
+        or die("Unknown user '$uid'")
+        if $uid =~ /\D/;
+    return $uid;
+}
+
+sub normalize_gid {
+    my ($gid) = @_;
+    return -1 if not defined($gid);
+    return getgrnam($gid)
+        or die("Unknown group '$gid'")
+        if $gid =~ /\D/;
+    return $gid;
+}

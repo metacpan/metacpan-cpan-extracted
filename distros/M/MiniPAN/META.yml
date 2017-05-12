@@ -1,0 +1,30 @@
+---
+abstract: 'A minimalistic installer of CPAN modules for the iPhone'
+author:
+  - 'Tobias Kirschstein <lev@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MiniPAN
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Archive::Tar: 0
+  File::Path: 0
+  IO::Uncompress::Gunzip: 0
+  LWP::UserAgent: 0
+  Spiffy: 0
+  perl: 5.005
+resources:
+  license: http://opensource.org/licenses/bsd-license.php
+version: 0.04

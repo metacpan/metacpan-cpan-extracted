@@ -1,0 +1,238 @@
+#!/usr/bin/perl
+#
+# sc_zoneload v0.02, 11-16-08
+#
+# load a BIND or 'dig' compatible zonefile into the database.
+# only loads A and TXT records, the zone name is not examined
+#
+
+use strict;
+use IPTables::IPv4::DBTarpit::Inst qw(hard_fail);
+use IPTables::IPv4::DBTarpit::Tools qw(inet_aton);
+use File::SafeDO qw(doINCLUDE);
+use Mail::SpamCannibal::PidUtil 0.02 qw(
+	if_run_exit
+	zap_pidfile
+);
+
+sub usage {
+  my $msg = $_[0] || '';
+  print $msg, qq|
+
+  This script loads a bind compatible zone file 
+  or 'dig' listing into the database
+
+syntax: $0 path/to/zonefile;
+
+  use -d switch to print results to STDOUT
+  use -e switch to load the zonefile unchanged with
+	127.0.0.2 response going to the evidence db
+	(where they came from). Otherwise, a normal
+	zoneload operation will convert all 127.0.0.2
+	responses to 127.0.0.3 and place them in the
+	'contrib' database.
+
+|;
+  exit 0;
+}
+
+usage () unless @ARGV;
+
+my $file;
+my $DEBUG;
+my $EVD;
+
+while ($_ = shift @ARGV) {
+  if ($_ eq '-d') {
+    $DEBUG = 1;
+  }
+  elsif ($_ eq '-e') {
+    $EVD = 1;
+  }
+  else {
+    $file = $_;
+  }
+}
+usage('no such zone file '.$file)
+	unless $file && -e $file && -r $file;
+
+my $CONFIG;
+# you can override the installation configuration variables by
+# editing the configuration file 'config/dnsbls.conf' in the
+# SpamCannibal home directory
+#
+# Set the SpamCannibal home directory if it is not
+# what is found in Mail::SpamCannibal::SiteConfig
+#
+# $CONFIG->{SPAMCANNIBAL_HOME} = '/usr/local/spamcannibal';
+
+###########################################################################
+############## NO MORE CONFIGURABLE ITEMS BEYOND THIS POINT ###############
+###########################################################################
+
+if ($CONFIG && exists $CONFIG->{SPAMCANNIBAL_HOME}) {
+    $CONFIG->{SPMCNBL_DAEMON_DIR} = $CONFIG->{SPAMCANNIBAL_HOME} .'/bin';
+} else {
+    require Mail::SpamCannibal::SiteConfig;
+    $CONFIG = new Mail::SpamCannibal::SiteConfig;
+}
+
+my $DNSBLS = $CONFIG->{SPAMCANNIBAL_HOME}. '/config/dnsbls.conf';
+
+hard_fail('could not find dnsbls configuration file')
+	unless -e $DNSBLS;
+
+exit 1 if eval q|system($perl, '-w', $DNSBLS)|;
+
+$DNSBLS = doINCLUDE($DNSBLS);
+
+my @required = qw(
+	127.0.0.2
+);
+
+my $thereis = sub {
+  my $var = shift;
+  exists $DNSBLS->{"$var"} && defined $DNSBLS->{"$var"};
+};
+
+foreach(@required) {
+  hard_fail("could not find required parameter '$_' in the configuration file")
+	unless &$thereis($_);
+}
+
+# process parameters in desired order, environment variables first
+#
+
+$CONFIG->{SPMCNBL_ENVIRONMENT} = $DNSBLS->{environment}
+	if &$thereis('environment');
+
+hard_fail("zoneload  blocked by DB watcher process")
+	if -e $CONFIG->{SPMCNBL_ENVIRONMENT} .'/'. 'blockedBYwatcher';
+
+$CONFIG->{SPMCNBL_DB_TARPIT} = $DNSBLS->{tarpit}
+	if &$thereis('tarpit');
+
+$CONFIG->{SPMCNBL_DB_CONTRIB} = $DNSBLS->{contrib}
+	if &$thereis('contrib');
+
+$CONFIG->{SPMCNBL_DB_EVIDENCE} = $DNSBLS->{evidence}
+	if &$thereis('evidence');
+
+# only open the db's we will need
+my ($environment,$tarpit,$contrib,$evidence) = (
+	$CONFIG->{SPMCNBL_ENVIRONMENT},
+	$CONFIG->{SPMCNBL_DB_TARPIT},
+	$CONFIG->{SPMCNBL_DB_CONTRIB},
+	$CONFIG->{SPMCNBL_DB_EVIDENCE},
+);
+my %default = (
+	dbhome  => $environment,
+	dbfile  => [$tarpit],
+	txtfile => [$contrib],
+);
+if ($EVD) {
+  push @{$default{txtfile}}, $evidence;
+}
+my $tool;
+if ($DEBUG) {
+  print "DEBUG mode, database is not altered\n"
+} else {
+  if_run_exit($environment,'already running');
+  $tool = new IPTables::IPv4::DBTarpit::Tools(%default);
+}
+
+open(Z,$file) or die "could not open $file\n";
+
+my $ORIGIN = '';
+#while(<Z>) {
+#  next unless $_ =~ /^\$ORIGIN\s+([\d\.]{2,})/;
+#  $ORIGIN = $1;
+#  chop $ORIGIN;
+#  last;
+#}
+#unless ($ORIGIN) {
+#  close Z;
+#  die "could not locate \$ORIGIN in $file\n";
+#}
+
+my $ZONE = '';
+my $A = '';
+my $R = '';
+my $C = '';
+my $T = '';
+
+sub arct {
+  my($a,$r,$c,$t,$d) = @_;
+  return unless $a;
+  $a =~ /^(\d+)\.(\d+)\.(\d+)\.(\d+)\./;
+  unless ($ZONE) {
+    $ZONE = $' if $';
+  }
+  $a = $4 .'.'. $3 .'.'. $2 .'.'. $1;
+  my $ip = inet_aton($a);
+  $t = $DNSBLS->{'127.0.0.2'}
+	unless $t;
+  if ($d) {					# if DEBUG mode
+    print "$a -> $r\n"
+	if $a;
+    print "\t$t\n"
+	if $t;
+  } else {
+    $tool->touch($tarpit,$ip);
+    if ($r eq '127.0.0.2') {			# EVD must be true, below
+      $tool->put($evidence,$ip,"zonefile $ZONE\n$t\n");
+    } else {
+      my $rsp = inet_aton($r);
+      my $ctb = inet_aton($c);
+      my $now = time;
+      my $zon = (&$thereis('zonename')) ? $DNSBLS->{zonename} : 'localhost';
+      my $record = pack("a4 x A* x a4 x N x A* x A*",$rsp,$t,$ctb,$now,$zon);
+      $tool->put($contrib,$ip,$record);
+    }
+  }
+  $A = $R = $C = $T = '';
+}
+
+my $run =1;
+
+$_ = sub {$run = 0};
+
+local $SIG{TERM} = $_;
+local $SIG{INT}  = $_;
+local $SIG{QUIT} = $_;
+
+while($run && ($_ = <Z>)) {
+  if ($_ =~ /^\$ORIGIN\s+(\d+\S+)/) {
+    $ORIGIN = $1;
+    arct($A,$R,$C,$T,$DEBUG);
+  }
+  elsif ($_ =~ /^(\S+).+A\s+(\d+\.\d+\.\d+\.\d+)/) {	# if A record
+    arct($A,$R,$C,$T,$DEBUG);
+    $A = $1;
+    $C = $2;
+    $R = (!$EVD && $C eq '127.0.0.2')
+	? '127.0.0.3'
+	: $C;
+    $T = '';
+    if ($A =~ /\.$/) {
+      $ORIGIN = '';
+      chop $A;
+    } else {
+      $A .= '.'. $ORIGIN;
+    }
+  }
+  elsif ($_ =~ /TXT\s+/) {			# TXT records must follow A records
+    $T = $';
+    chop $T;					# remove trailing '\n'
+    $T =~ s/"//g;				# remove quotes
+  }
+}
+arct($A,$R,$C,$T,$DEBUG)
+	if $run;
+
+close Z;
+
+unless ($DEBUG) {
+  $tool->closedb();
+  zap_pidfile($environment);
+}

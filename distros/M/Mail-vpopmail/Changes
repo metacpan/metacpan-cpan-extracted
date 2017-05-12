@@ -1,0 +1,30 @@
+Revision history for Perl extension Mail::vpopmail.
+
+0.60 Mon Apr 16 00:32:24 EDT 2007
+   - added sql support (thanks to Werner Garcia for hints)
+   - removed legacy "get" function left over from v0.52
+   - changed alldomains behavior
+     * ->map returns a hash reference of domain name -> domain directory
+     * ->dir returns an array refrence of all domain directories
+
+0.54 Wed Dec  6 15:14:22 EST 2006
+   - added dir field to domaininfo
+
+0.53 Tue Oct 17 20:45:21 EDT 2006
+   - updated forgotten Constructor documentation 
+     (such as userinfo, domaininfo and alldomains)
+
+0.52 Fri Sep 29 15:23:41 EDT 2006
+   - added feature to get all mailboxes in a domain
+   - added feature to get all properties of a domain
+	- added feature to get all domains
+	- added feature to get all domains and their directories
+
+0.51 Thu Sep 15 20:35:06 EDT 2005
+   - enabled compatiblity for vpopmail installations compiled
+     with --disable-clear-passwd
+
+0.50  Mon Dec 13 21:44:37 2004
+	- original version; created by h2xs 1.21 with options
+		-AX Mail::vpopmail
+

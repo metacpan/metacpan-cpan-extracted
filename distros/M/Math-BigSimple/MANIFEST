@@ -1,0 +1,9 @@
+Changes
+INSTALL
+lib/Math/BigSimple.pm
+Makefile.PL
+MANIFEST
+README
+t/test01_oop.t
+t/test02_proc.t
+t/test03_chk.t

@@ -1,0 +1,29 @@
+---
+abstract: "provides detection in META.yml for 'class' keyword"
+author:
+  - 'Copyright (C) Ash Berlin C<< <ash@cpan.org> >>, 2009-2010.'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Moose: 0
+  Test::Differences: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.93'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Module::Install::ProvidesClass
+name: Module-Install-ProvidesClass
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Discover: 1.000001
+  inc::Module::Install: 0.79
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.000000

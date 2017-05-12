@@ -1,0 +1,45 @@
+NAME
+    Module::Install::Contributors - add an "x_contributors" section to your
+    META.yml
+
+SYNOPSIS
+    In your Makefile.PL:
+
+     contributors "Alan Smithee", "Nicolas Bourbaki <nic@math.example.fr>";
+     contributors "Spartacus <spartacus@example.it>";
+
+DESCRIPTION
+    This is a plugin for Module::Install. It adds a "x_contributors" section
+    to your META.yml file. This is an array of strings, which should
+    normally be in "Name <email>" format.
+
+    It provides one function to Module::Install-based Makefile.PLs:
+
+    "contributors(@names)"
+
+    Repeated calls are cumulative. The example in the SYNOPSIS has three
+    contributors, not just Spartacus.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Module-Install-Contributors>
+    .
+
+SEE ALSO
+    Pod::Weaver::Section::Contributors,
+    Dist::Zilla::Plugin::ContributorsFromGit.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

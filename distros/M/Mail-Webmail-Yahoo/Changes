@@ -1,0 +1,114 @@
+Revision history for Perl extension Mail::Webmail::Yahoo.
+
+0.601 Sat Oct 18 23:53:47 EDT 2003
+  - Added installation of yahootils.pl to Makefile.PL. Bah.
+
+
+0.600
+	- Fixed sending buglet - generation of spurious warnings.
+	- Added support for signature attachment, and send-message-as-html.
+  - Added 'yahootils.pl' script with 'empty' action, to empty specified
+    folders. Supporting code added in Yahoo.pm to follow 'Empty' links.
+  - yahootils supercedes sendhoo and snagmail. 
+  - Yahoo::send() now accepts array-refs for To, Cc, and Bcc (scalars ok too)
+  - yahootils will read a message from STDIN, stopping at EOT (or ^.\s*$,
+    like SMTP), if --message is not provided.
+  - Changed README, updated documentation.
+  - Fixed bug where only  the current page of messages would be harvested if
+    the user settings cause the last page to be displayed by default.
+
+
+0.5a Tue Aug 19 02:43:49 GMT 2003 (pre-release for off-site testing)
+	- Fixed broken attachment code.
+	- Removed some deprecated methods from Yahoo.pm
+	-	Added filtering function to remove matching tag-sections in
+	  MessageParser.pm
+	-	Renamed MP:parse_body(_as_xxx) methods to body($1), and broke parsing down 
+	  into multiple steps.
+	- Fixed bug with surplus unshifting of mime-type and content boundary into
+	  message body.
+	- MessageParser can now render messages in HTML. It will also attempt to
+	  guess the correct type based on the presence/ absence of an HTML tag in
+	  the message, or a Content-Type in the message header.
+	- Added '_process_message', '_extract_header', and '_extract_body' methods,
+	  mostly to break up some longer pieces of code, but also to allow parsing
+	  of a page from a disk file or other local storage.
+	- Added CREDITS file.
+
+
+0.402 (Not tagged or released))
+  - Added version to test message.
+  - Hide password when running tests (requires 'stty')
+
+0.401 
+  - Fixed bug with sending - 'money' field expected but not set.
+  - Added minimum version of HTML::Tree
+
+0.4 Sun Jan 19 19:43:57 EST 2003
+  - Added 'DELETE_ON_READ' flag and functionality.
+  - Added 'MOVE_ON_READ' flag and functionality.
+  - Added both above options to snagmail.pl
+
+
+0.311 Tue Oct 29 17:08:58 EST 2002
+  - Removed some debug statements.
+  - Added disclaimer to README file.
+
+0.31 Sat Oct 26 10:44:03 EDT 2002
+  - Added some tracing output
+  - Check return value of login() in send(), and die if necessary.
+  - Also in get_mail_messages().
+  - Added documentation to MessageParser.pm
+
+
+0.301 Fri Oct 25 22:30:55 EDT 2002
+  - Removed debugging file output from Yahoo.pm
+
+
+0.30i  Sun Oct 20 12:26:08 EDT 2002
+  - Fixed a typo in Synopsis (WebMail should be Webmail)
+  - Set default trace level to 1 in snagmail.pl and sendhoo.pl.
+  - Converted many constant strings to pre-compiled regexps.
+  - Major changes to work with new HTML in Yahoo rendered pages:
+    o  Added 'Textractor' mini-class to remove HTML tags from mail headers.
+    o  Changed MESSAGE_START_STRING and friends
+    o  Changed LOOKS_LIKE_A_HEADER and mail_header_names - regexps instead of
+       simple strings. 
+
+Note: 0.30i is an interim release, intended to provide a minimal level of
+usablity. There is still some work to be done with message conversion and
+other items.
+
+
+
+0.22  Sat Oct 12 14:36:06 EDT 2002
+  - Fixed problem with not loading pages correctly.
+
+0.21  Fri Aug  9 21:03:23 EDT 2002
+  - Changed some parameters to match latest Yahoo interface.
+
+
+0.20  Sat Jul 27 10:38:11 EDT 2002
+  - Added preliminary support for sending a message. Attachments not supported
+    yet.
+  - Added tests for functionality, requiring the user enter a username/
+    password when those tests are run.
+  - Tidied up what gets output for various 'trace' levels - made tracing more
+    consistent.
+
+
+0.13  Sun Jun 30 10:07:33 2002
+  - Removed dump-to-file bits. This should have been in 0.12
+
+0.12  Sun Jun 30 10:07:33 2002
+  - Fixed bug in login page download.
+
+0.11  Mon Jun 17 11:42:26 2002
+	- Added Class::MethodMaker dependency to Makefile.PL
+
+0.1   Sat Jun 15 16:30:22 2002
+	- Main functionality complete.
+	- First version released.
+
+0.01  Wed Apr 24 18:48:45 2002
+	- original version; created by h2xs 1.21 with options -X -n Mail::Webmail

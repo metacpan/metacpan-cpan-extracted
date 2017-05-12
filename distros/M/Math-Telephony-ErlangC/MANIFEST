@@ -1,0 +1,13 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Math/Telephony/ErlangC.pm
+t/00.load.t
+t/pod-coverage.t
+t/pod.t
+t/Math-Telephony-ErlangC.t
+eg/average_time.pl
+META.json                                Module JSON meta-data (added by MakeMaker)

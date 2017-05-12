@@ -1,0 +1,26 @@
+---
+abstract: 'a MetaCPAN client that provides some high-level helper functions'
+author:
+  - 'Neil Bowers <neil@bowers.com>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MetaCPAN-Helper
+requires:
+  Carp: '0'
+  MetaCPAN::Client: '0'
+  Moo: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/CPAN-API/metacpan-helper
+  repository: https://github.com/CPAN-API/metacpan-helper.git
+version: '0.04'

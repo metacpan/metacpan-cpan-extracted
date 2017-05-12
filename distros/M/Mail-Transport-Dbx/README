@@ -1,0 +1,60 @@
+Mail/Transport/Dbx version 0.07
+===============================
+
+Mail::Transport::Dbx is a wrapper around libdbx to read Outlook Express
+mailboxes (more commonly known as .dbx files). It relies on a patched 
+version of libdbx to make it work on big-endian machines (like Solaris).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+In case of problems, read on.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    None but you need a working C compiler or 
+
+PROBLEMS:
+
+Compilation:
+------------
+As of v0.02, Mail::Transport::Dbx also supports suncc and MS VisualC.
+
+Solaris:
+--------
+For suncc you might need to 
+
+  perl Makefile.PL CCFLAGS=-Xa
+  make
+  make test
+  make install
+
+instead of the ordinary 'perl Makefile.PL'. This will put suncc into ANSI 
+mode.
+      
+Windows:
+--------
+Tested both on ActiveState's 5.6.1 and 5.8.0beta release. Should compile out 
+of the box. You'll receive a warning during compilation which you can safely
+ignore.
+
+Other platforms:
+----------------
+Please let me know if you are using a platform not mentioned here and 
+encounter problems (or even if not).
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2005 Tassilo von Parseval <tassilo.von.parseval@rwth-aachen.de>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

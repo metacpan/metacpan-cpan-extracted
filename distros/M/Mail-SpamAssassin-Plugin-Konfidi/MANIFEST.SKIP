@@ -1,0 +1,10 @@
+^t/log
+^Mail-SpamAssassin-Plugin-Konfidi-
+^_build
+^Build$
+^blib
+~$
+\.bak$
+CVS
+\.svn
+^t/data/01_test_rules.cf

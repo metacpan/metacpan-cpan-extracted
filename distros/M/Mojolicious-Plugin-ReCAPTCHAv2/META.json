@@ -1,0 +1,39 @@
+{
+   "abstract" : "use Googles \"No CAPTCHA reCAPCTHA\" (reCAPTCHA v2) service in Mojolicious apps",
+   "author" : [
+      "Heiko Jansen <hjansen@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-ReCAPTCHAv2",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Socket::SSL" : "1.75",
+            "Mojolicious" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/heikojansen/mojolicious-plugin-recaptchav2.git",
+         "web" : "https://github.com/heikojansen/mojolicious-plugin-recaptchav2"
+      }
+   },
+   "version" : "0.4"
+}
+

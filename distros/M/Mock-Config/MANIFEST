@@ -1,0 +1,13 @@
+.gitignore
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Mock/Config.pm
+t/0-basic.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

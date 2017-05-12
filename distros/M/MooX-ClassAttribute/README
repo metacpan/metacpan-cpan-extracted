@@ -1,0 +1,81 @@
+NAME
+    MooX::ClassAttribute - declare class attributes Moose-style... but without
+    Moose
+
+SYNOPSIS
+       {
+          package Foo;
+          use Moo;
+          use MooX::ClassAttribute;
+          class_has ua => (
+             is      => 'rw',
+             default => sub { LWP::UserAgent->new },
+          );
+       }
+   
+       my $r = Foo->ua->get("http://www.example.com/");
+
+DESCRIPTION
+    This module adds support for class attributes to Moo. Class attributes are
+    attributes whose values are not associated with any particular instance of
+    the class.
+
+    For example, the `Person` class might have a class attribute
+    "binomial_name"; its value "Homo sapiens" is not associated with any
+    particular individual, but the class as a whole.
+
+       say Person->binomial_name;   # "Homo sapiens"
+       my $bob = Person->new;
+       say $bob->binomial_name;     # "Homo sapiens"
+   
+       my $alice = Person->new;
+       $alice->binomial_name("H. sapiens");
+       say $bob->binomial_name;     # "H. sapiens"
+
+    Class attributes may be defined in roles, however they cannot be called as
+    methods using the role package name. Instead the role must be composed
+    with a class; the class attributes will be installed into that class.
+
+    This module mostly tries to behave like MooseX::ClassAttribute.
+
+CAVEATS
+    *   Overriding class attributes and their accessors in subclasses is not
+        yet supported. The implementation, and expected behaviour hasn't been
+        figured out yet.
+
+    *   When Moo classes are inflated to Moose classes, this module will
+        *attempt* to load MooseX::ClassAttribute, and use that to provide
+        class attribute meta objects.
+
+        If MooseX::ClassAttribute cannot be loaded, a loud warning will be
+        printed, and the inflation will fall back to representing class
+        attribute accessors as plain old class methods.
+
+    *   This module uses some pretty experimental techniques, especially to
+        handle inflation. There are probably all sorts of bugs lurking. Don't
+        let that scare you though; I'm usually pretty quick to fix bugs once
+        they're reported. ;-)
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooX-ClassAttribute>.
+
+    See also: "CAVEATS" in Method::Generate::ClassAccessor.
+
+SEE ALSO
+    Moo, MooseX::ClassAttribute.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

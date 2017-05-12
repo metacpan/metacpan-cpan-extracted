@@ -1,0 +1,243 @@
+#!/usr/bin/perl -w
+
+use strict;
+use lib '.';
+use Mail::Box::Manager;
+
+my $VERSION = '2.019';
+
+Mail::Box->VERSION($VERSION);
+
+=head1 NAME
+
+lsmail - list a mailbox
+
+=head1 SYNOPSIS
+
+lsmail [--entities][--header][--nheader][--size]
+       [--threads][--verbose][--help] mailboxes
+
+=cut
+
+sub usage($)
+{   my $rc = shift;
+
+    warn <<USAGE;
+Usage: $0 [options] mailbox
+options:
+    --entities      number of entities                
+    --header        print only mails containting 
+                    a key=value pair in header
+    --nheader       same as --header, but negated
+    --size          print size
+    --threads       list in threads
+    --verbose       print what is done including warnings etc.
+    --help  -?      show this help
+USAGE
+
+    exit $rc;
+}
+
+my %option =
+  ( entitities => 0
+  , size       => 0
+  , threads    => 0
+  , help       => 0 
+  , verbose    => 0
+  );
+
+sub get_options()
+{   use Getopt::Long;
+
+    GetOptions(\%option, 
+        'entities',
+        'size',
+        'threads', 
+        'help|?!', 
+        'verbose',
+        'header=s%',
+        'nheader=s%'
+         );
+}
+
+sub trace(@) { warn @_,"\n" if $option{verbose} }
+
+sub format_item ($) {
+    my $message = shift;
+    chomp(my $ret = $message->head->get('subject') || '<no subject>');
+    eval {
+        $ret .= " - ".scalar $message->parts if $option{entities};
+    };
+    return $ret;
+}
+
+#####
+##### MAIN
+#####
+
+usage 22 unless get_options;
+usage 0  if $option{help};
+
+open STDERR, ">/dev/null" if not $option{verbose};
+
+my @mailboxes = @ARGV;
+my $mgr = Mail::Box::Manager->new;
+
+#
+# Open the folders.
+#
+
+my @folders;
+my @open_options =
+  ( access   => 'r'
+  , extract  => 'LAZY'
+  );
+
+if(@mailboxes)
+{   foreach my $mailbox (@mailboxes)
+    {   trace "Opening folder $mailbox.";
+
+        my $folder = $mgr->open(folder => $mailbox, @open_options);
+
+        die "Mailbox $mailbox cannot be opened.\n"
+            unless $folder;
+
+        push @folders, $folder;
+    }
+}
+else
+{   trace "Opening default folder";
+
+    my $folder = $mgr->open(@open_options);
+
+    die "Default mailbox cannot be read.\n"
+        unless $folder;
+
+    push @folders, $folder;
+}
+
+#
+# List the folders
+#
+
+if($option{threads})
+{   trace "Collecting threads for all folders.";
+    my $threads = $mgr->threads(folders => \@folders);
+
+    trace "Dumping threads.";
+    foreach my $thread ($threads->sortedAll){   
+        print $thread->threadToString(\&format_item) unless not $thread;
+    }
+}
+else
+{   trace "List subjects.";
+    foreach my $folder (@folders) {   
+        open STDERR, ">/dev/null";
+        
+        MESSAGE:
+        foreach my $message ($folder->messages) {   
+                
+            if($option{header}) {
+                for my $h (keys %{$option{header}}) {
+                    my $pat = $option{header}{$h};
+                    next MESSAGE unless $message->head->get($h) =~ /$pat/;
+                }
+            }
+
+            if($option{nheader}) {
+                for my $h (keys %{$option{nheader}}) {
+                    my $pat = $option{nheader}{$h};
+                    next MESSAGE if $message->head->get($h) =~ /$pat/;
+                }
+            }
+            
+            eval { 
+                my $subject = $message->head->get('subject') 
+                    || '<no subject>';
+                print "subject: ", $subject, "\n";
+            };
+
+            # check further options
+            printf "size: %.1fK\n", $message->size / 1024 if $option{size};
+            printf "entities: %d\n", scalar $message->parts
+                if $option{entities}; 
+                
+            print "-" x 40, "\n";
+        }
+    }
+}
+
+#
+# Close folders
+#
+
+$mgr->closeAllFolders;
+
+exit 0;
+#-------------------------------------------
+
+__END__
+
+=head1 DESCRIPTION
+
+List the contents of one or more mailboxes.  Specifying more than one
+name is only useful when you read in threads, in which case the messages
+of both folders are merged.
+
+Options:
+
+=over 4
+
+=item --entities =E<gt> BOOLEAN
+
+(or C<-e>) show the number of MIME-entities in messages. When --threads is
+also given, the number is appended to the subject.  Slows down lsmail
+significantly since a mail message must be fully parsed to get the entities
+information.
+
+=item --size =E<gt> BOOLEAN
+
+(or C<-s>) also show size of message in non-threaded output.
+
+=item --header HEADER-FIELD=PATTERN
+
+only display mails whose HEADER-FIELD (for instance 'subject' or 'from')
+contains PATTERN.
+
+=item --nheader HEADER-FIELD=PATTERN
+
+do not display mails whose HEADER-FIELD contains PATTERN.
+
+=item --threads =E<gt> BOOLEAN
+
+(or C<-t> or C<-nothreads> or C<-not>) list the messages in threads.  The
+threads are sorted by time: the thread with the oldest starting message comes
+first.
+
+=item --help =E<gt> BOOLEAN
+
+(or C<--help> or C<-?>) Print a brief help
+
+=item --verbose =E<gt> BOOLEAN
+
+(or C<--verbose> or C<--noverbose>) Be verbose about the progress of the
+program.  This is especially useful for debugging purposes.
+
+=back
+
+=head1 AUTHOR
+
+Mark Overmeer (F<Mark@Overmeer.net>).
+All rights reserved.  This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+Additions by Tassilo v. Parseval (F<tassilo.parseval@post.rwth-aachen.de>)
+
+=head1 VERSION
+
+This code is beta, version 2.019
+
+=cut
+
+1;
+

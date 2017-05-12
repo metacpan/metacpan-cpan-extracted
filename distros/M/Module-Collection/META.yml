@@ -1,0 +1,23 @@
+
+no_index: 
+  directory: 
+    - inc
+    - t
+generated_by: Module::Install version 0.64
+distribution_type: module
+version: 0.02
+name: Module-Collection
+author: Adam Kennedy <adamk@cpan.org>
+license: perl
+build_requires: 
+  Test::More: 0.42
+  Test::Script: 0.01
+requires: 
+  Module::Inspector: 0.03
+  File::Find::Rule: 0
+  Getopt::Long: 0
+  perl: 5.005
+  Params::Util: 0.20
+  Module::Math::Depends: 0.01
+  Carp: 0
+abstract: Examine a group of Perl distributions

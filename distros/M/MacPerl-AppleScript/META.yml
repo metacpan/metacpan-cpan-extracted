@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: MacPerl-AppleScript
+version: 0.02
+author:
+  - Wolfgang Kinkeldei, E<lt>wolfgang@kinkeldei.deE<gt>
+abstract: Perl extension for easily accessing scriptable Apps
+license: perl
+generated_by: Module::Build version 0.2611, without YAML.pm

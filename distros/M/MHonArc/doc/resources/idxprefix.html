@@ -1,0 +1,131 @@
+<html>
+<head>
+<title>MHonArc Resources: IDXPREFIX</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="idxpgssmarkup.html">IDXPGSSMARKUP</a>]</td><td><nobr>[<a href="../resources.html#idxprefix">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="idxsize.html">IDXSIZE</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>IDXPREFIX</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p>
+<code>M2H_IDXPREFIX=</code><var>prefix</var>
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p>
+<code>&lt;IDXPREFIX&gt;<br></code>
+<var>prefix</var><br>
+<code>&lt;/IDXPREFIX&gt;<br></code>
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p>
+<code>-idxprefix </code><var>prefix</var>
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>IDXPREFIX defines the prefix for the filenames of a multi-page
+main index.  The filename of the first page of the main index is always equal
+to the value of the
+<a href="idxfname.html">IDXFNAME</a> resource.  All other pages have
+a filename starting with the IDXPREFIX value with the page number and
+"<tt>.html</tt>" following.  For example, the filenames for a 4 page
+main index would be the following:
+</p>
+<pre>
+    maillist.html
+    mail2.html
+    mail3.html
+    mail4.html
+</pre>
+<p>assuming the default values for the IDXFNAME and IDXPREFIX
+resources.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<pre>
+mail
+</pre>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>None.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>2.0
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+<a href="idxfname.html">IDXFNAME</a>,
+<a href="multipg.html">MULTIPG</a>,
+<a href="tidxprefix.html">TIDXPREFIX</a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="idxpgssmarkup.html">IDXPGSSMARKUP</a>]</td><td><nobr>[<a href="../resources.html#idxprefix">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="idxsize.html">IDXSIZE</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2003/10/06 22:04:17 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"><strong>MHonArc</strong></a><br>
+Copyright &#169; 1997-1998, <a href="http://www.earlhood.com/">Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org">mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

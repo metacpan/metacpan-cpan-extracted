@@ -1,0 +1,17 @@
+Module Math::BigSimple 1.1 Installation Guide.
+----------------------------------------------
+1.Requrements.
+ This module requires Math::BigInt module.
+ It should work on pure-perl systems.
+2.How to install
+ Type the following into your command line:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+ ...and the module is instaled.
+ If there are any problems, simply copy the
+ lib/Math/BigSimple.pm file to the Math
+ subdirectory of your perl modules folder.

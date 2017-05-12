@@ -1,0 +1,20 @@
+Revision history for MorboDB
+
+1.000000  2013-12-24 22:33:30 Asia/Jerusalem
+	- Fix warning in MorboDB::Cursor when calling sort() with a hashref (Vincent Launchbury)
+	- MorboDB automatically creates a MongoDB::OID if no _id was provided
+	  to the save() method (Vincent Launchbury)
+	- Autoloaded methods for getting a database object and a collection
+	  object have been deprecated. Use get_database() and get_collection()
+	  instead. This is currently being deprecated in MongoDB as well. A get_collection() method
+	  was also added to MorboDB::Collection.
+
+0.001002  2012-12-09 20:52:24 Asia/Jerusalem
+	- Fix warning on perl-5.16 for accidentally using length() on an
+	  array (Vladimir Timofeev)
+
+0.001001  2011-08-16 01:39:53 Asia/Jerusalem
+	- Many documentation fixes and some additions
+
+0.001     2011-08-15 00:58:04 Asia/Jerusalem
+	- Initial commit

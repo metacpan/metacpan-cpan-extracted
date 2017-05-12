@@ -1,0 +1,114 @@
+Revision history for MongoDBx::Class
+
+1.030002  2014-02-04 21:43:35 Asia/Jerusalem
+	- Bugfix: wrong number of tests to skip in 01-simple.t
+
+1.030001  2014-02-03 23:13:49 Asia/Jerusalem
+	- Documentation fixes: joins_many relationship example was
+	  wrong (Keith Broughton); Insert in synopsis was wrong.
+	- Moved to 3 digit versioning.
+
+1.03      2014-01-15 21:25:15 Asia/Jerusalem
+	- Bugfix new versions of MongoDB
+
+1.02      2013-01-01 00:38:58 Asia/Jerusalem
+	- Fixed previous failed attempt at adapting MongoDBx::Class
+	  to the new MongoDB version
+
+1.01      2012-12-11 22:02:29 Asia/Jerusalem
+	- Updated to extend the correct MongoDB connection class
+	  depending on the installed version of the MongoDB driver
+	  (starting at MongoDB v0.503.1 MongoDB::Connection has been
+	  deprecated in favor of MongoDB::MongoClient)
+
+1.00      2012-09-06 21:20:00 Asia/Jerusalem
+	- Added a new Transient attribute trait, for document attributes that
+	  do not get saved in the database (thanks Thomas Müller)
+	- Expanded documentation on the joins_many relationship
+	- Small documentation fixes (thanks Dan Dascalescu)
+	- Module no longer considered beta
+
+0.91      2011-07-16 20:21:43 Asia/Jerusalem
+	- Small documentation fixes
+
+0.9       2011-07-16 17:10:26 Asia/Jerusalem
+	[ New features ]
+	- Created a very-simple (and experimental) connection pool under the new
+	  MongoDBx::Class::ConnectionPool role class, with two implementations
+	  called Backup Pool and Rotated Pool. See the documentation of
+	  the MongoDBx::Class::pool() method for more information.
+	- Changed MongoDBx::Class::Cursor->next() such that it takes an
+	  option to return the document as is (i.e. as a hash-ref) without
+	  expanding it (will be used internally by MongoDBx::Class at a
+	  later version).
+
+	[ Bug fixes ]
+	- MongoDBx::Class::Document::update(), when called with an update
+	  hash-ref, will return the output of MongoDB::Collection->update()
+	  as expected (did not do that before causing a false value to be
+	  returned even if update succeeded).
+
+0.8       2011-05-09 19:54:24 Asia/Jerusalem
+	- Added the option to tell MongoDBx::Class where to search for
+	  document classes (see the document_dirs attribute)
+	- Added a new question/answer to the FAQ section of the tutorial
+	  explaining when and why MongoDBx::Class might fail to expand
+	  documents to their respective classes
+	- Fixed bug causing MongoDBx::Class to fail when a document class
+	  has attributes that hold blessed values of classes that do not
+	  use Moose.
+	- 01-simple.t now drops the test database before and after running
+	  the test.
+	- renamed the test schema to prevent clashing with other namespaces
+
+0.7       2011-03-17 00:48:50 Asia/Jerusalem
+	- Changed the way database connection is made to be more like
+	  in the original MongoDB driver (there was no reason to do it differently,
+	  this change breaks backwords compatibility though)
+	- Added the defines_many relationship type that helps embedding
+	  documents within a hash reference.
+	- Added the as_hashref() method to embedded documents.
+	- Removed the -T option from the shebang line in 01-simple.t as
+	  it seems like it causes the whole module finding problems (though
+	  I could be wrong)
+	- Status updated from alpha to beta
+
+0.6       2011-02-01 23:28:29 Asia/Jerusalem
+	- MongoDBx::Class's connect() method now takes all the parameters
+	  that MongoDB::Collection's new() method takes, so we can use
+	  authentication and other MongoDB options. We can also define a
+	  safe connection with the 'safe' option.
+
+0.5       2011-02-01 21:10:25 Asia/Jerusalem
+	- DateTime inflation/deflation in MongoDBx::Class::ParsedAttribute::DateTime
+	  is now evaled to prevent dies
+	- The argumented version of the update() method in MongoDBx::Class::Moose
+	  now also updates the document object with the new changes
+	- Updated test to reflect above change
+	- Fixed bug causing 'null' values being saved in the database when
+	  using the $doc->update() method.
+
+0.4       2011-01-11 22:25:54 Asia/Jerusalem
+	- Added the _attributes method to document objects (standalone/embedded)
+	- Added the ParsedAttribute role and the ParsedAttribute::DateTime class for
+	      document attributes that are automatically expanded and collapsed by MongoDBx::Class
+	- Added the Parsed attribute trait to allow setting document attributes
+	      that are parsed by ParsedAttribute classes
+	- Fixed some POD mistakes in the docs
+	- Improved the documentation a bit
+	- insert and batch_insert shouldn't enforce only inserting hash-refs
+	- Fixed bug in MongoDBx::Class::Collection->update where the wrong function argument was collapsed
+	- Fixed bug in MongoDBx::Class::Collection->find_one where searching by string OID didn't work
+	- Updated test suite with new features
+
+0.3       2010-12-26 12:15:03 Asia/Jerusalem
+	- Fixed typos, errors and mistakes in the distribution's documentation
+	- Added another item to the CAVEATS AND THINGS TO CONSIDER section of MongoDBx/Class.pm
+	- Temporarily added a bypass for the test problem until I can figure
+	  out what's the problem.
+
+0.2       2010-12-25 23:13:25 Asia/Jerusalem
+	- Fixed bug preventing tests from loading the test schema
+
+0.1       2010-12-25 20:40:15 Asia/Jerusalem
+	- Initial release

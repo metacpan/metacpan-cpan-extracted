@@ -1,0 +1,13 @@
+---
+
+harsh: 0
+blacklist:
+    -
+        host: ix.dnsbl.manitu.net
+        weight: -100
+    -
+        host: bl.spamcop.net
+        weight: -100
+
+
+

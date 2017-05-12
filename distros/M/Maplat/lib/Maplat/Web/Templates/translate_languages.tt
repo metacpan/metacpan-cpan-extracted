@@ -1,0 +1,46 @@
+<p align="center">    
+    <table class="data" align="center" id="MainDataTable">
+        <tr class="tabheader">
+            <th>[% tr.tr("Name") %]</th>
+            <th>[% tr.tr("Description") %]</th>
+            <th></th>
+            <th></th>
+        </tr>
+        [% FOREACH Language IN AvailLanguages %]
+            <tr>
+                <form name="lang_[% Language.lang %]" method="post" action="[% PostLink %]">
+                    <td>
+                        <input type="hidden" name="language" value="[% Language.lang %]">
+                        <input type="text" name="newlanguage" value="[% Language.lang %]" size="3" maxLength="3">
+                    </td>
+                    <td>
+                        <input type="text" name="description" value="[% Language.description %]" size="30" maxLength="50">
+                    </td>
+                    <td>
+                        <input type="hidden" name="mode" id="mode_[% Language.lang %]" value="change">
+                        <input type="submit" value="[% tr.tr("Change") %]">
+                    </td>
+                    <td>
+                        <input type="submit" value="[% tr.tr("Delete") %]" onClick="return confirmDeleteLanguage('lang_[% Language.lang %]', 'mode_[% Language.lang %]');">
+                    </td>
+                </form>
+            </tr>
+        [% END %]
+        <tr>
+            <form name="lang_new" method="post" action="[% PostLink %]">
+                <td>
+                    <input type="text" name="newlanguage" value="" size="3" maxLength="3">
+                </td>
+                <td>
+                    <input type="text" name="description" value="" size="30" maxLength="50">
+                </td>
+                <td>
+                    <input type="hidden" name="mode" id="mode_new" value="create">
+                    <input type="submit" value="[% tr.tr("Create") %]">
+                </td>
+                <td>
+                </td>
+            </form>
+        </tr>                
+    </table>
+</p>

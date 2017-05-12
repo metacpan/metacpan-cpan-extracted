@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                MacOSX-Alias
+version:             0.11
+abstract:            Read or create aliases on Mac OS X
+license:             perl
+author:              
+    - brian d foy <bdfoy@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Mac::Errors:                   0
+    Mac::Files:                    0
+    Mac::Resources:                0
+    MacPerl:                       0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

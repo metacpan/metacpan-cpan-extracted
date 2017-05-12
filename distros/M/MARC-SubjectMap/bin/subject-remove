@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+subject-remove - remove subject headings
+
+=head1 SYNOPSIS
+
+    subject-remove --in=in.dat --out=out.dat --source=bidex
+
+=head1 DESCRIPTION
+
+subject-remove allows you to remove subject headings from a batch of 
+MARC records which are from a particular source. The example from 
+the synopsis shows you how to use it to remove any subject headings
+that are from the 'bidex' source.
+
+Records that lack the appropriate subject headings will be written
+out unchanged to the output file.
+
+=cut
+
+use strict;
+use warnings;
+use MARC::Batch;
+use Getopt::Long;
+use Pod::Usage;
+use IO::File;
+
+my ($in,$out,$source) = ('','','');
+GetOptions(
+    'in:s'      => \$in,
+    'out:s'     => \$out,
+    'source:s'  => \$source,
+);
+
+## verify options
+pod2usage( verbose => 2 ) if ! -f $in or ! $source or ! $out;
+
+## open output file
+my $outHandle = IO::File->new( ">$out" );
+pod2usage( verbose => 2 ) if ! $outHandle;
+
+## open input records
+my $batch = MARC::Batch->new( 'USMARC', $in );
+my $recordCount = 0;
+my $fieldCount = 0;
+
+## process each record and write possibly modified records to output file
+while ( my $r = $batch->next() ) {
+    foreach my $f ( $r->field( '6..' ) ) { 
+        my $subfield2 = $f->subfield(2) || '';
+        if ( $f->indicator(2) eq '7' and $subfield2 eq $source ) {
+            $r->delete_field($f);
+            $fieldCount++;
+        }
+    }
+    $recordCount++;
+    $outHandle->print( $r->as_usmarc() );
+}
+
+print "\nremoved $fieldCount subject headings in $recordCount records.\n\n";

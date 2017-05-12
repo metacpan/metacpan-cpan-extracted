@@ -1,0 +1,35 @@
+
+Mobile POP Relay Control - How To
+
+SYNOPSIS
+	o How to create my own agents
+		Read over the README file for further documentation.
+		Please send any newly created agents to the author.
+
+	o How to reload an agent's config-file without restarting
+		Send a HUP signal to the running agent.
+
+	o How to contribute to this project
+		a.   Define What to Contribute
+			Read over the Changes log for any outstanding work 
+			you feel capable of finishing.  If you're creative, 
+			try to envision a new feature this software lacks.
+
+		b.  Email Describing the Contribution
+			If unsure about the addition then email the author
+			to make sure your not starting an already work in progress.
+
+		c. Email the Contribution
+			Please email the contribution to the author.
+			If this is a code modification, provide a patch against 
+			the latest development release.  Thank you again for helping out!
+
+	Any contributions are warmly welcome and everyone is encouraged
+	to participate.  Suggestions are also welcome. 
+
+
+AUTHOR
+	Keith Hoerling <keith@hoerling.com>
+
+
+$Id: HOWTO,v 1.1.1.1 2002/05/28 07:32:59 keith Exp $

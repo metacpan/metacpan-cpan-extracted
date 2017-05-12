@@ -1,0 +1,28 @@
+severity = brutal
+verbose = 8
+exclude = CodeLayout::RequireUseUTF8 Compatibility::PodMinimumVersion Documentation::RequirePODUseEncodingUTF8 Editor::RequireEmacsFileVariables Miscellanea::RequireRcsKeywords Modules::RequireExplicitPackage CodeLayout::ProhibitHashBarewords Tics::ProhibitLongLines Documentation::RequirePodAtEnd Modules::RequireVersionVar
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = perltidy.rc
+
+[Lax::RequireExplicitPackage::ExceptForPragmata]
+allowed_pragmata = diagnostics feature perlversion strict warnings utf8
+
+[Documentation::PodSpelling]
+stop_words = bugtracker Perldoc perldoc
+
+[Documentation::RequirePodSections]
+lib_sections    = DESCRIPTION | SYNOPSIS
+script_sections = USAGE | OPTIONS | EXIT STATUS
+
+[Subroutines::ProhibitCallsToUndeclaredSubs]
+exempt_subs = Moose::blessed Moose::extends Moose::has Moose::override Moose::with
+
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+private_name_regex = _(?!build_)\w+
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Moose
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Moose

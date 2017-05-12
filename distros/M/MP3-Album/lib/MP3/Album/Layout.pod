@@ -1,0 +1,73 @@
+=pod
+
+=head1 NAME
+
+MP3::Album::Layout - Perl extension to manage/represent a layout for a m3 album.
+
+=head1 SYNOPSIS
+
+	use MP3::Album::Layout;
+
+	#create a new layout
+	my $layout = new MP3::Album::Layout;
+
+	#change the disc title
+	$layout->title("Perl conference");
+
+	#add a track
+	$layout->add_track(artist=>'someone', title=>'regex how to');
+
+	#edit track
+	$layout->edit_track(position=>1, artist=>'still dont know the name');
+
+=head1 DESCRIPTION
+
+MP3::Album::Layout represents a mp3 album layout, which contains the (artistic) information of a album.
+
+=head1 PUBLIC METHODS
+
+All methods return undef in error case. The error description will be in $@.
+
+=over
+
+=item new()
+
+Creates a new object.
+
+=item edit_track(position=>$position, artist=>$art, title=>$title)
+
+Edits the track info in $position.
+If you dont pass artist or title info, the ones you dont pass will be set as empty strings.
+
+=item add_track( artist=>$artist, title=>$title, lenght=>$lengh);
+
+Adds a track to this the end of this layout tracklist.
+
+=item artist([$artist])
+
+Sets/retrieves the layout artist name.
+
+=item genre([$genre])
+
+Sets/retrieves this layout genre.
+
+=item comment([$comment])
+
+Sets/retrieves this layout comment.
+
+=item title([$title])
+
+Sets/retrieves this layout title.
+
+=back
+
+=head1 BUGS
+
+There are no known bugs, if you catch one please let me know.
+
+=head1 CONTACT AND COPYRIGHT
+
+Copyright 2003 Bruno Tavares <bmavt@cpan.org>. All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,39 @@
+---
+name: Math-StochasticProcess
+version: 0.04
+author:
+  - 'Nicholas Bamber <nicholas@periapt.co.uk>'
+abstract: Stochastic Process
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/periapt/math-stochasticprocess.git
+build_requires:
+  File::Spec: 0
+  Test::More: 0
+requires:
+  Exporter: 5.57
+  Params::Validate: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Math::StochasticProcess:
+    file: lib/Math/StochasticProcess.pm
+    version: 0.04
+  Math::StochasticProcess::Event:
+    file: lib/Math/StochasticProcess/Event.pm
+    version: 0.04
+  Math::StochasticProcess::Event::Tuple:
+    file: lib/Math/StochasticProcess/Event/Tuple.pm
+    version: 0.04
+  Math::StochasticProcess::RandomVariable:
+    file: lib/Math/StochasticProcess/RandomVariable.pm
+    version: 0.04
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+keywords:
+  - math
+  - probability
+  - stochastic process

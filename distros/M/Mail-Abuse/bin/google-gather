@@ -1,0 +1,184 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+# $Id: google-gather,v 1.5 2004/04/05 04:41:26 lem Exp $
+
+use Pod::Usage;
+use Getopt::Std;
+use WWW::Mechanize;
+
+our $VERSION = do { my @r = (q$Revision: 1.5 $ =~ /\d+/g); sprintf " %d."."%03d" x $#r, @r };
+
+=pod
+
+=head1 NAME
+
+google-gather - Leverage the power of Google(tm) to catch abuse complaints
+
+=head1 SYNOPSIS
+
+    google-gather [-h] [-v] [-d delimiter] [-c count] [-m max] -s search
+
+=head1 DESCRIPTION
+
+One very important source of abuse complaints is the news group
+News.Admin.Net-Abuse.Sightings or NANAS. At NANAS, many activists
+place samples of abuse that are captured at remote sites and that,
+ideally, serve as an indication that corrections are needed.
+
+C<google-gather> fetches complaints from NANAS and produces an output
+suitable as input to C<abuso> through the
+C<Mail::Abuse::Reader::Stdin> module.
+
+=head2 Do not abuse this script
+
+In general, it is not polite to send large numbers of queries to a
+host, as this might be interpreted as an attack. This is true, even if
+said host is Google. Use this scipt judiciously and avoid long and
+repeated queries.
+
+The following options are recognized:
+
+=over
+
+=item B<-h>
+
+Outputs this documentation.
+
+=item B<-v>
+
+Be verbose about progress.
+
+=item B<-s search>
+
+What to search for. Typically, this should be your domain name.
+
+=item B<-d delimiter>
+
+Text string used to separate reports. See
+C<Mail::Abuse::Reader::Stdin> for an application of this
+delimiter. Defaults to B<___END_OF_REPORT___>.
+
+=item B<-c count>
+
+How many reports to extract from NANAS. No more than this number of
+reports will be processed. Defaults to 20.
+
+=item B<-m max count>
+
+The maximum number of articles that will be spidered by this
+script. Defaults to 1000.
+
+=cut
+
+    ;
+use vars qw/ $opt_c $opt_d $opt_h $opt_m $opt_v $opt_s /;
+
+getopts('c:d:hvs:m:');
+
+pod2usage(verbose => 1) unless $opt_s;
+pod2usage(verbose => 2) if $opt_h;
+
+$opt_d = '___END_OF_REPORT___' unless $opt_d;
+$opt_c = 20 unless defined $opt_c and $opt_c > 0;
+$opt_m = 1000 unless defined $opt_m and $opt_m > 0;
+
+my $ua = WWW::Mechanize->new(agent => "google-gather/$VERSION");
+
+				# Submit the search as we want it
+
+warn "Issuing GET request\n" if $opt_v;
+
+my $counter = 0;
+my $reports = 0;
+
+while ($ua->get('http://groups.google.com/groups?q=' . $opt_s . 
+		'&group=news.admin.net-abuse.sightings' .
+		'&sa=G&scoring=d&start=' . $counter)
+       && $ua->success)
+{
+    my @links = ();
+    warn "GET succeeded\n" if $opt_v;
+    unless (@links = grep { $_->url =~ m/\&selm=/ } ($ua->links))
+    {
+	warn "No more interesting links\n" if $opt_v;
+	last;
+    }
+    warn scalar @links, " links recovered\n" if $opt_v;
+    for my $l (@links)
+    {
+	if ($reports >= $opt_c)
+	{
+	    die "Reached maximum report count ($opt_c)\n";
+	}
+
+	if ($reports ++ >= $opt_m)
+	{
+	    die "Absolute maximum number of reports processed ($opt_m)\n";
+	}
+
+	my $res = $ua->get($l->url . '&output=gplain');
+	if ($res->is_success)
+	{
+	    my $date = scalar localtime;
+	    my $url = $l->url;
+	    my $title = $l->text;
+
+	    print <<EOF;
+# This report was obtained with google-gather
+# Source title: $title
+
+EOF
+    ;
+	    print $res->content, "\n$opt_d\n";
+	}
+	else
+	{
+	    warn "Failed to obtain ", $l->text, ": ", $res->status_line, "\n";
+	}
+    }
+
+    $counter += 10;
+}
+
+die "Failed GET request: ", $ua->response, "\n" unless $ua->success;
+
+__END__
+
+=pod
+
+=back
+
+The complaint should be fed through C<STDIN>, as the output of C<acat>
+would.
+
+=head1 HISTORY
+
+=over
+
+=item B<Jan, 2004>
+
+First version of this code.
+
+=back
+
+=head1 LICENSE AND WARRANTY
+
+This code and all accompanying software comes with NO WARRANTY. You
+use it at your own risk.
+
+This code and all accompanying software can be used freely under the
+same terms as Perl itself.
+
+=head1 AUTHOR
+
+Luis E. Muñoz <luismunoz@cpan.org>
+
+=head1 SEE ALSO
+
+perl(1), C<acat(1)>, C<WWW::Mechanize(3)>
+
+=cut
+

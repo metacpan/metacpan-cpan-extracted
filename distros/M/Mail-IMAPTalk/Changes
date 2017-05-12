@@ -1,0 +1,100 @@
+Revision history for Perl extension Mail::IMAPTalk.
+
+4.04      2016-10-22 13:16:42+11:00 Australia/Melbourne
+- Fix authentication to non-SASL-IR servers
+- Use AUTHENTICATE for login when necessary
+- Improve handling of headers with high-bit-set octet
+- Use correct UTF-8 decoder
+- Allow SELECT by SPECIAL-USE flag (Cyrus feature)
+
+4.03  Wed Mar 23 11:50 2016
+  - Bump version and update copyright
+  - add AuthzUser to allow admin override login
+  - add UseCompress to use COMPRESS=DEFLATE support if available
+
+4.01  Mon Jul 20 12:15 2015
+  - Bump version and update copyright
+  - Remove long command timer
+  - Misc parser and fixes
+  - Avoid / in generated message-id
+  - More improvements to find_message function
+  - Add cyrus IMAP extension commands
+  - Support extended-list options to list command
+  - Avoid undef warning on missing foldermode response
+  - Handle unexpected capability response
+  - Add ability to enable tracing when you "use" the module
+  - Replace multigetannotation with multigetmetadata
+  - Add IMAP myrights command
+  - Add IMAP id command
+  - Use release_socket to close connection
+  - Update root folder and Inbox vs INBOX handling
+  - Choose socket library to use, add SSL socket support
+  - Better formatting of email strings from envelope structure
+
+3.01  Tue Jul 10 11:00 2012
+  - Bumping major version again because of fetch response
+     format changes (Content-Disposition and annotation changes)
+  - Documentation updates.
+     Update to SORT RFC, update to latest ACL RFC
+  - Update get_response_code docs
+  - Alert reponse is remainder of line, put that in the response code
+     Hack around fact alert response is the remainder of the
+     line after the ], it's not an argument inside the [...],
+     but make it look that way because makes API easier
+     to just call get_response_code
+  - Deal with annoying ANSI_X3.4-1968 encoded headers
+  - Handle servers which don't return any untagged sort/search results, but OK response
+  - Add a Pedantic mode to the parser
+     Will die if a line with an unexpected tag appears
+     when parsing responses. Useful for test suite
+     writers.
+  - Fix parsing of server welcome banner
+  - Always increase CmdId, and rethrow error in pedantic mode
+  - Handle buggy multiple spaces in XIMAPPROXY response
+  - Doc updates and misc fixes
+  - Make Mail::IMAPTalk work on perl 5.8
+  - Add per-command parse mode, and parsing for annotations
+  - Document unicode folders and remove old warnings
+  - Improve find_message
+  - Typo fixes, remove need for Carp
+  - use RFC2047 not RFC1522
+  - Atoms can have } in them
+  - Allow reporting errors for multigetannotation
+  - Add IDLE command support
+  - Break Content-Disposition into separate parts like Content-Type
+    (NOTE: This changes the result of fetches and is backwards
+     incompatible)
+  - Improve find_message
+  - Handle literals that fail better (eg no + go ahead response)
+  - Strip newlines if server returns them (it should have unfolded)
+  - Allow release_socket() to take an error flag
+  - Show correct system error on system errors
+
+2.01  Fri Jul 15 17:00 2011
+  - Pushing to CPAN. Updating major version
+     number because of dozens of small
+     incompatible changes
+
+1.04  Mon Feb  8 13:55 2011
+  - hundreds of changes and improvements while
+     being used internally by Fastmail
+  - now making a project on github
+
+1.03  Thu Sep 29 17:58 2005
+	- improved find_message()
+  - added check/subscribe/unsubscribe (thanks Shriman Gurung)
+  - documentation cleanup (thanks Shriman Gurung)
+  - extra option to clear tracing variable before each command
+  - fix weird perl memory/performance issue when parsing
+     long ID lists
+
+1.02  Tue Sep  2 10:48 2004
+	- fix literal continuation response check
+
+1.01  Tue Aug 26 11:48 2004
+	- add utf-8 decoding support
+  - add annotatemore support
+
+1.00  Tue Feb  3 17:48 2004
+	- initial release
+

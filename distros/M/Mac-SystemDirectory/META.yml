@@ -1,0 +1,29 @@
+---
+abstract: 'Locate Mac OS X Standard System Directories'
+author:
+  - 'Christian Hansen, <chansen@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.86
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Mac::SystemDirectory
+name: Mac-SystemDirectory
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  perl: 5.6.0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Mac-SystemDirectory
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/Mac-SystemDirectory/
+version: 0.06

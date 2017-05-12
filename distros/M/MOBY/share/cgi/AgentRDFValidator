@@ -1,0 +1,288 @@
+#!/usr/bin/perl -w
+#-----------------------------------------------------------------
+# ValidateService
+# Author: Edward Kawas <edward.kawas@gmail.com>
+# Copyright (c) 2007 Edward Kawas. All Rights Reserved.
+#
+# This module is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+#
+# This software is provided "as is" without warranty of any kind.
+#
+# $Id: AgentRDFValidator,v 1.1 2008/02/21 00:21:27 kawas Exp $
+# 
+# This script is a web based form for testing the RDF agent
+# on a specified user URL. When the script is called without
+# parameters, a FORM is generated.
+# 
+# Parameters understood by this script:
+# 	url - the remote url of the RDF doc that the agent will fetch
+# NOTES:
+# 	1. This script assumes that a BioMOBY registry is properly 
+#	   installed
+#	2. JAVA_HOME is set in the environment or 'java' called
+#      at a command prompt actually calls a java runtime.
+#   3. This script attempts to ensure that the arguement passed
+#      in is a 'real' url by first calling head on the URL. 
+#      I am not sure if this will cause problems later on.
+#-----------------------------------------------------------------
+use strict;
+use CGI qw/:standard/;
+use LWP::UserAgent;
+use HTTP::Request::Common;
+use LWP::Simple qw(!head);
+use MOBY::Config;
+
+
+my $form = new CGI;
+use Data::Dumper;
+my $url = param('url') || undef;
+if ($url) {
+	print $form->header('text/plain');
+	# confirm valid url
+	 if (!LWP::Simple::head($url)) {
+		my $ua = LWP::UserAgent->new;
+		my $response = $ua->request(GET, $url);
+		print $response->content;
+	 	print "Invalid URL please try again.";
+		exit(0);
+	 }
+	# call the agent
+	my $JAVA_HOME = $ENV{JAVA_HOME} || "";
+	if ($JAVA_HOME) {
+		$JAVA_HOME .="/bin/java";
+	} else {
+		$JAVA_HOME ="java";
+	}
+	my $CONF  = MOBY::Config->new;
+	my $agent = $CONF->{mobycentral}->{rdfagent} or do{print "There was a problem calling the agent.\nPlease notify the administrator for this registry."; exit(0);};
+	my $text = `$JAVA_HOME -DRDFagent.home=$agent -jar $agent/RDFagent.jar -test $url`;
+	print $text;
+} else {
+print $form->header('text/html');
+print generate_page();
+}
+
+sub generate_page {
+
+return <<EOF;
+<TD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<style type="text/css">
+body { background: #ffffcd;
+       color: #000000;
+       font-family: Arial, Helvetica, sans-serif;
+       font-size: 12pt;
+       font-weight: normal;
+       margin-top: 10px;
+       margin-right: 1em;
+       margin-bottom: 1em;
+       margin-left: 1em;
+       background-position: left top;
+       background-repeat: no-repeat;
+     }
+
+h1 { border: solid; 
+     text-align:center;
+     background-color:yellow;
+     color: navy;
+   }
+h2 { border: ridge;
+     padding: 5px;
+     background-color:yellow;
+     color: navy;
+   }
+h3 { border: none;
+     padding: 5px;
+     background-color:yellow;
+     color: navy;
+   }
+iframe {
+	width:95%;
+	frameborder:0;
+	height:70%;
+	scrolling:auto;
+	}
+</style>
+<title>RDF Agent Test Page</title>
+</head>
+<body>
+<script>
+<!--
+if( !window.XMLHttpRequest ) XMLHttpRequest = function(){
+        try{ return new ActiveXObject("MSXML3.XMLHTTP") }catch(e){}
+        try{ return new ActiveXObject("MSXML2.XMLHTTP.3.0") }catch(e){}
+        try{ return new ActiveXObject("Msxml2.XMLHTTP") }catch(e){}
+        try{ return new ActiveXObject("Microsoft.XMLHTTP") }catch(e){}
+        throw new Error("Could not find an XMLHttpRequest alternative.")
+};
+
+function modular_waiting(vis, msg, options) {
+// Pass true to show the dialogue screen, false to hide
+var options   = options || {};
+var zindex   = options.zindex || 1000;
+var height   = options.height || 25;
+var width   = options.width || 35;
+var opacity   = options.opacity || 90;
+var opaque   = (opacity / 100);
+var bgcolor   = options.bgcolor || '#FFDC75';
+var fColor   = options.fontcolor || '#0000FF';
+var fWeight  = options.fontweight || 600;
+var bcolor   = options.bordercolor || 'black';
+var bstyle  = options.borderstyle || 'solid'
+var bwidth  = options.borderweight || '3px'
+var align   = options.align || 'center';
+var __div_id__ = options.name ||  '__modular__popup__';
+
+var dark= null;
+if (document.getElementById(__div_id__ )) {
+dark = document.getElementById(__div_id__ )
+}
+
+if (!dark) {
+var tbody = document.getElementsByTagName("body")[0];
+var tnode = document.createElement('div');       // Create the layer.
+tnode.style.position='fixed';                 	 // Position absolutely
+tnode.style.overflow='auto';
+tnode.style.display='none';                      // Start out Hidden
+tnode.id=__div_id__ ;                    	 // Name it so we can find it later
+tbody.appendChild(tnode);                        // Add it to the web page
+dark=document.getElementById(__div_id__ );       // Get the object.
+}
+
+if (vis) {
+var txt = document.createElement('font')
+txt.setAttribute('color',fColor);
+txt.style.fontWeight = fWeight;
+txt.innerHTML = msg
+
+dark.style.border = bwidth + " " + bstyle + " " + bcolor;
+dark.setAttribute('align',align);
+dark.style.opacity=opaque;    
+dark.style.MozOpacity=opaque; 
+dark.style.filter='alpha(opacity='+opacity+')';
+dark.style.zIndex=zindex;
+dark.style.backgroundColor=bgcolor;
+dark.style.width= width+'%';
+dark.style.height= height+ '%';
+dark.style.display='block';
+dark.style.cursor = 'wait';
+dark.appendChild(txt);
+dark.style.left =  '40%'
+dark.style.top  =  '50%'
+} else {
+// TODO - should i remove the element?
+dark.style.display='none';
+dark.innerHTML = "";
+}
+}
+
+function testAgent(value)
+{
+if (value && value.replace(/ /g, "") != "") {
+	document.getElementById('output_div').style.visibility = 'visible';
+	// call agent via ajax and insert text here
+	call_agent(location.href + "?url=" + value, value)
+}else{
+	alert('please enter a valid url!')
+}
+return false;
+}
+var request = null;
+function call_agent(url, signatureURL){
+		if (!request) {
+			request = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("MSXML2.XMLHTTP.3.0");
+		} else {
+			request.abort();
+			request = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("MSXML2.XMLHTTP.3.0");
+		}
+		if (document.getElementById("__submit__")) {
+			document.getElementById("__submit__").disabled = true;
+		}
+		modular_waiting(true,"Please wait while the agent processes your url ...<br/>" + signatureURL);
+        request.open("GET", url, true);
+        request.setRequestHeader("Content-Type", "text/plain"); 
+ 
+        request.onreadystatechange = function(){
+                if (request.readyState == 4 && request.status == 200) {
+                        if (request.responseText){
+                        	// update the div 'output'
+                        	if (document.getElementById("output").innerHTML) {
+                        		// clear the old information
+                        		document.getElementById("output").innerHTML = "";
+                        		if (document.getElementById("description_span")) {
+                                	document.getElementById("description_span").innerHTML = 'Results for: ' + signatureURL + ''
+                                }
+                                var node = document.createElement( "pre" );
+								node.innerText = request.responseText;
+                                document.getElementById('output').appendChild( node );
+                            } else if (document.getElementById("output").textContent != null) {
+                            	// opera, firefox
+                            	if (document.getElementById("description_span")) {
+                            		document.getElementById('description_span').textContent = 'Results for: ' + signatureURL
+                            	}
+                                document.getElementById('output').textContent = request.responseText
+                            } else {
+                            	// ie7
+                            	if (document.getElementById("description_span")) {
+                            		document.getElementById('description_span').outerText = 'Results for: ' + signatureURL
+                            	}
+                                var node = document.createElement( "pre" );
+                                node.innerText = request.responseText;
+                                document.getElementById('output').appendChild( node );
+                            }
+						}
+						if (document.getElementById("__submit__")) {
+                        	document.getElementById("__submit__").disabled = false;
+                        }
+						modular_waiting(false)
+                } else if (request.readyState == 4 && request.status != 200) {
+                	 modular_waiting(false)
+                	 if (document.getElementById("__submit__")) {
+                     	document.getElementById("__submit__").disabled = false;
+                     }
+                }
+        };
+        request.send(null);
+}
+
+function doNothing() { return false; }
+//-->
+</script>
+<h1>RDF Agent Test Page</h1>
+<p>
+<pre> Please enter the url to your RDF document that describes
+one or more moby services. The agent will then attempt to
+resolve and parse that url.
+
+Once the agent is complete, you should see what services were
+considered valid and what errors occurred below.
+</pre> 
+</p>
+<form name="url" onsubmit="return testAgent(document.url.url.value);" method="get" action="" >
+  Enter your URL to an RDF here:
+  <input name="url" tabindex="1" size="70" type="text" />
+  <br />
+  <input tabindex="2" name=".submit" id="__submit__" onclick="testAgent(document.url.url.value)" type="button" value="Call the agent" />
+  <div></div>
+</form>
+
+<div style='visibility:hidden;' id='output_div'>
+	<span id='description_span'></span><p></p>
+	<pre id='output'></pre>
+</div>
+<div align="center" style="border: 3px solid black; overflow: auto; position: fixed; display: none; opacity: 0.9; z-index: 10000; background-color: rgb(255, 220, 117); width: 35%; height: 25%; cursor: wait; left: 40%; top: 50%;" 
+id="__modular__popup__"/>
+</body>
+</html>
+</div>
+</form>
+</body>
+</html>
+EOF
+
+}
+

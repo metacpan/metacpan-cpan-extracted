@@ -1,0 +1,19 @@
+Revision history for MMS-Mail-Provider-UKOrange
+
+0.06    06-Jul-2006 / 19:56
+	Added improved video recognition
+0.05    13-Jan-2005 / 17:50
+        Updated dependancies to include version numbers for MMS classes
+0.04	09-Jan-2006 / 16:07
+	Improved pod
+	Updated README
+	Updated to use new MMS::Mail::Message::Parsed interface
+0.03	28-Sep-2005 / 11:30
+	Improved pod by adding formatting codes
+0.02    26-Sep-2005 / 12:30
+	Added a $skiptext variable to not include mime parts of type text/plain that include $skiptext
+	Modified retrieve_phone_number to use header_from property instead of from to relect removal of this property from MMS::Message::Parsed class
+        Modfied body_text setting to only populate the property if the string is not empty
+0.01    17-Sep-2005 / 16:50
+        First version, released on an unsuspecting world.
+

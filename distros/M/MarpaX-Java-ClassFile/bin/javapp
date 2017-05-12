@@ -1,0 +1,177 @@
+#!perl
+use strict;
+use warnings FATAL => 'all';
+
+# PODNAME: javapp
+
+# ABSTRACT: javap writen in perl
+
+our $VERSION = '0.008'; # VERSION
+
+our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
+
+use Archive::Zip qw/:ERROR_CODES :CONSTANTS/;
+use Class::Load qw/load_class/;
+use File::Basename qw/fileparse basename/;
+use File::chdir;
+use File::Find qw/find/;
+use File::Spec qw/case_tolerant canonpath/;
+use File::Temp qw/tempdir/;
+use Getopt::Long qw/GetOptions/;
+use Log::Log4perl qw/:easy/;
+use Log::Any::Adapter;
+use Log::Any qw/$log/;
+use open (':encoding(UTF-8)', ':std');        # Output might contain UTF-8 characters
+use POSIX qw/EXIT_SUCCESS EXIT_FAILURE/;
+use Pod::Usage qw/pod2usage/;
+
+#
+# Options
+# -------
+my $loglevel = 'WARN';
+my $help     = 0;
+GetOptions(
+    'loglevel|l=s' => \$loglevel,
+    'help|h!'      => sub { pod2usage( { -verbose => 3, -exitval => EXIT_SUCCESS }) }
+    ) || pod2usage({ -verbose => 3, -exitval => EXIT_FAILURE });
+#
+# Init log
+# --------
+our $defaultLog4perlConf = "
+log4perl.rootLogger              = $loglevel, Screen
+log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
+log4perl.appender.Screen.stderr  = 1
+log4perl.appender.Screen.layout  = PatternLayout
+log4perl.appender.Screen.layout.ConversionPattern = %d %-5p %6P %m{chomp}%n
+";
+Log::Log4perl::init(\$defaultLog4perlConf);
+Log::Any::Adapter->set('Log4perl');
+#
+# Process
+#
+load_class('MarpaX::Java::ClassFile');
+my $case_tolerant = File::Spec->case_tolerant;
+find({wanted => \&_wanted, no_chdir => 1}, @ARGV);
+
+sub _wanted {
+  #
+  # Should look like a file
+  #
+  return if (! -f $_);
+  #
+  # ./.. that end with ".class", or ".jar"
+  #
+  my ($filename_without_suffix, $dirs, $suffix) = fileparse($_, qr/\.[^.]*/);
+  $suffix = lc($suffix) if (! $case_tolerant);
+  #
+  # Try/catch that
+  #
+  my $canonpath = File::Spec->canonpath($_);
+  if ($suffix eq '.class') {
+    #
+    # ".class"
+    #
+    eval {
+        no warnings 'utf8';    # Unicode non-character blablabla is illegal for interchange
+        printf "%s\n",
+        MarpaX::Java::ClassFile->new(filename => $canonpath, log => $log)->ast
+    } || $log->errorf('%s', $@)
+  } elsif ($suffix eq '.jar') {
+    #
+    # ".jar"
+    #
+    local $CWD = tempdir(CLEANUP => 1);
+    $log->debugf('Using temporary directory %s', $CWD);
+
+    $log->debugf('Looking into %s', $canonpath);
+    my $zip = Archive::Zip->new();
+    if ($zip->read($canonpath) != AZ_OK) {
+      $log->errorf('Cannot read %s, %s', $canonpath, $!)
+    } else {
+      foreach ($zip->memberNames()) {
+        my ($filename_without_suffix, $dirs, $suffix) = fileparse($_, qr/\.[^.]*/);
+        $suffix = lc($suffix) if (! $case_tolerant);
+        if ($suffix eq '.class') {
+          #
+          # Note that this is naturally filtering directory members: in a zip
+          # file directory members always end with a forward slash
+          #
+          # ".jar" -> ".class"
+          #
+          $log->debugf('Extracting %s', $_);
+          if ($zip->extractMemberWithoutPaths($_) == AZ_OK) {
+            eval {
+                no warnings 'utf8';    # Unicode non-character blablabla is illegal for interchange
+                printf "%s\n",
+                MarpaX::Java::ClassFile->new(filename => basename($_), log => $log)->ast
+            } || $log->errorf('%s', $@)
+          } else {
+            $log->warnf('Failed to extract %s from %s, %s', $_, $canonpath, $!)
+          }
+        }
+      }
+    }
+    $log->debugf('Leaving %s', $CWD);
+  }
+}
+
+exit(EXIT_SUCCESS);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+javapp - javap writen in perl
+
+=head1 VERSION
+
+version 0.008
+
+=head1 SYNOPSIS
+
+$ javapp [--loglevel %s] [--help] <file or directory list>
+
+Searches all .class and .jar files from the argument list, and dump to stdout any .class file (.jar files are automatically handled as a zip archive)
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--loglevel> or B<-l>
+
+Set logging level. Log4perl values are supported, i.e. WARN, TRACE, DEBUG, etc... Default is WARN. Logging always goes to STDERR.
+
+=item B<--help> or B<-h>
+
+This help.
+
+=back
+
+=head1 EXAMPLE
+
+$ javapp -l DEBUG myJavaFile.class > /tmp/myJavaFile.txt
+
+=head1 NOTES
+
+javapp means "javap in perl". Nevertheless there is no filtering option to the dump: .class files are shown entirely, and output format is not designed to be compatible with javap.
+
+=head1 SEE ALSO
+
+perldoc MarpaX::Java::ClassFile
+
+=head1 AUTHOR
+
+Jean-Damien Durand <jeandamiendurand@free.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Jean-Damien Durand.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

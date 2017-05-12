@@ -1,0 +1,21 @@
+requires "Clone" => "0";
+requires "DateTime" => "0";
+requires "IO::Stty" => "0";
+requires "List::MoreUtils" => "0";
+requires "Sub::Util" => "0";
+requires "namespace::clean" => "0";
+requires "perl" => "v5.8.8";
+
+on 'test' => sub {
+  requires "Capture::Tiny" => "0";
+  requires "Data::Dumper::Concise" => "0";
+  requires "Test::Deep" => "0";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};
+
+on 'develop' => sub {
+  requires "Test::Pod" => "1.41";
+};

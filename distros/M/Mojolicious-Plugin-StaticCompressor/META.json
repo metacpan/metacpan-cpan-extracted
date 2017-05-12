@@ -1,0 +1,62 @@
+{
+   "abstract" : "Automatic JS/CSS minifier & compressor for Mojolicious",
+   "author" : [
+      "Masanori Ohgita (http://ohgita.info)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-StaticCompressor",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CSS::Minifier" : "0",
+            "Encode" : "0",
+            "File::Find" : "0",
+            "File::Slurp" : "0",
+            "FindBin" : "0",
+            "JavaScript::Minifier" : "0",
+            "Module::Build" : "0",
+            "Mojo::Util" : "0",
+            "Mojolicious" : "3.88",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "1.08",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::StaticCompressor" : {
+         "file" : "lib/Mojolicious/Plugin/StaticCompressor.pm",
+         "version" : "v1.0.0"
+      },
+      "Mojolicious::Plugin::StaticCompressor::Container" : {
+         "file" : "lib/Mojolicious/Plugin/StaticCompressor/Container.pm",
+         "version" : 0
+      },
+      "Mojolicious::Plugin::StaticCompressor::File" : {
+         "file" : "lib/Mojolicious/Plugin/StaticCompressor/File.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v1.0.0"
+}

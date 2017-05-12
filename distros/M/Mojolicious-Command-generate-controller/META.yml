@@ -1,0 +1,22 @@
+---
+abstract: 'Mojolicious command generator for controllers'
+author:
+  - 'Daniel Vinciguerra (DVINCI) <daniel.vinciguerra@bivee.com.br>'
+build_requires:
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Command-generate-controller
+requires:
+  Mojo::Base: '0'
+  Mojo::Util: '0'
+  Mojolicious: '0'
+version: '0.02'

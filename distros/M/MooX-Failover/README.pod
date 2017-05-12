@@ -1,0 +1,135 @@
+=head1 NAME
+
+MooX::Failover - Instantiate Moo classes with failover
+
+=head1 VERSION
+
+v0.3.3
+
+=head1 SYNOPSIS
+
+  # In your class:
+
+  package MyClass;
+
+  use Moo;
+  use MooX::Failover;
+
+  has 'attr' => ( ... );
+
+  # after attributes are defined:
+
+  failover_to 'OtherClass';
+
+  ...
+
+  # When using the class
+
+  my $obj = MyClass->new( %args );
+
+  # If %args contains missing or invalid values or new otherwise
+  # fails, then $obj will be of type "OtherClass".
+
+=head1 INSTALLATION
+
+See
+L<How to install CPAN modules|http://www.cpan.org/modules/INSTALL.html>.
+
+=head2 Required Modules
+
+This distribution requires Perl v5.10.0.
+
+This distribution requires the following modules:
+
+=over 4
+
+=item * L<Class::Load> (version 0.20)
+
+=item * L<Moo>
+
+=item * L<Sub::Defer>
+
+=item * L<Sub::Quote>
+
+=item * L<Test::Most>
+
+=item * L<Types::Standard>
+
+=back
+
+This distribution recommends the following modules:
+
+=over 4
+
+=item * L<Class::Load::XS>
+
+=back
+
+=head1 RECENT CHANGES
+
+=head2 Other Changes
+
+=over 4
+
+=item * 
+
+Minor tweaks to Changes file.
+
+=item * 
+
+Moved test prerequisties into test phase.
+
+=back
+
+See the F<Changes> file for a longer revision history.
+
+=head1 DESCRIPTION
+
+This module provides constructor failover for L<Moo> classes.
+
+For example, if a class cannot be instantiated because of invalid arguments
+(perhaps from an untrusted source), then instead it returns the
+failover class (passing the same arguments to that class).
+
+It is roughly equivalent to using
+
+  my $obj = eval { MyClass->new(%args) //
+     OtherClass->new( %args, error => $@ );
+
+This allows for cleaner design, by not forcing you to duplicate type
+checking for constructor parameters.
+
+See the module documentation for L<MooX::Failover> for more information.
+
+=head1 SEE ALSO
+
+This was originally a L<Moo> port of L<MooseX::Failover>.  The
+interface was redesigned significantly, to be more efficient.
+
+=head1 AUTHOR
+
+Robert Rothenberg C<<rrwo@thermeon.com>>
+
+=head2 Acknowledgements
+
+=over
+
+=item Thermeon.
+
+=item Piers Cawley.
+
+=item Gareth Kirwan.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright 2014 Thermeon Worldwide, PLC.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+

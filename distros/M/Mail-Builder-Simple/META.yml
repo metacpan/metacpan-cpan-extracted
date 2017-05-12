@@ -1,0 +1,35 @@
+---
+abstract: "Send UTF-8 HTML and text email with attachments and inline images, eventually using templates\r"
+author:
+  - 'Octavian Rasnita <orasnita@gmail.com>'
+build_requires:
+  FindBin: 0
+  Test::More: 0
+  Test::Pod: 0
+  utf8: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mail-Builder-Simple
+requires:
+  Carp: 0
+  Config::Any: 0
+  Cwd: 0
+  Email::Sender::Simple: 0
+  Email::Valid: 0
+  Encode: 0
+  Exception::Died: 0
+  HTML::Template: 0
+  Mail::Builder: 0
+  Module::Load: 0
+  Template: 0
+  base: 0
+  perl: 5.008_008
+  strict: 0
+  warnings: 0
+version: 0.16

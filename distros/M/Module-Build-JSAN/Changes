@@ -1,0 +1,23 @@
+Revision history for Perl extension Module::Build::JSAN.
+
+0.05  2009-04-06T18:06:46
+      - Fixed an issue with a meta character in the POD directory name not
+        getting properly escaped in a Regular Expression. Reported by Burak
+        Gürsoy (RT #24276).
+      - Added a link to the GitHub repository.
+
+0.04  2008-04-03T20:17:19
+      - No changes, just uploading to CPAN again now that DWHEELER is listed
+        as co-maintainer, so that CPAN.pm will be able to install it.
+
+0.03  2008-03-31T23:58:13
+      - Updated for JSON 2.0, which is now required for generating META.json.
+
+0.02  2006-09-05T18:24:47
+      - Added all authors to META.yml.
+      - Expanded the documentation a bit.
+      - Fixed permissions issues with newer versions of Module::Build.
+      - No longer adding META.yml or *.gz to cleanup during the dist action.
+
+0.01  2005-09-08T05:09:22
+      - Initial public release.

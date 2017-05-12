@@ -1,0 +1,5 @@
+0.15	0h0:0.05 # The first piece of length 0.05sec starting at 0.15sec
+0.3s	=1	 # The 2nd piece starts at 0.3sec, ends at 1sec
+>2	=1m	 # The 3rd piece starts 2 seconds after the 2nd, ends at 60sec
+>0	INF	 # The 4th piece starts where 3rd ends, ends where 5th starts
+1:15		 # Last piece starts at 1m15s and goes to the end

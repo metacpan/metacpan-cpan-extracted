@@ -1,0 +1,648 @@
+Revision history for Perl extension Minilla
+
+v3.0.10 2017-02-20T16:30:43Z
+    - Set '.' to @INC when using custom builder for newer Perl(#216)
+
+v3.0.9 2017-01-12T04:30:41Z
+    - Skip some tests if GIT_CONFIG environment variable is set(#213)
+
+v3.0.8 2017-01-05T11:23:47Z
+    - Allow 'Metadata' section in minil.toml (#209)
+    - Use shebang '#!perl' so that toolchains rewrite it (#210)
+
+v3.0.7 2016-12-13T13:07:43Z
+    - Remove @INC optimization. It doesn't work on ubuntu( #205 ).
+      (reported by kazuho++)
+    - Show better error message when there's no .pause file.
+      (reported by kazuho++)
+    - Added documents about release flow
+      (suggested by kazuho++)
+
+v3.0.6 2016-11-23T04:08:12Z
+    - Fix metacpan badge generating wrong URL issue
+
+v3.0.5 2016-11-10T17:19:04Z
+    - Support Travis private repository badge(#201)
+    - Support metacpan badge(#202, #203)
+
+v3.0.4 2016-08-01T13:31:03Z
+    - Support CircleCI badge
+
+v3.0.3 2016-07-27T22:49:54Z
+
+    - Update documentation
+    - Sort keys in Build.PL(#196)
+    - Fix environment variable issue of test(#195)
+
+v3.0.2 2016-06-03T23:07:05Z
+
+    commit 01fc3652ea8a892dc81ced2fe4534024b8d73777
+    Author: Jörg Forstreuter <forstreuter@belwue.de>
+    Date:   Thu Apr 21 15:26:11 2016 +0200
+
+        added requirements from cpan_meta information
+        
+        so that the generate Build.PL file has the correct information for Module::Build
+
+    commit 8924842129238ba3fbc29e68cbecb49807cea1bd
+    Author: sago35 <sago35@gmail.com>
+    Date:   Tue Mar 22 20:33:19 2016 +0900
+
+        Delete system() function call
+        
+        Delete system() function call.
+        Some operating system don't have 'cat' cmd.
+
+    commit da96e230055248870864e8215edd87094bae6433
+    Author: Syohei YOSHIDA <syohex@gmail.com>
+    Date:   Tue Mar 22 12:17:43 2016 +0900
+
+        Always use 'git.config'
+        
+        Both 'git.config' and environment variables are set, then
+        environment variables are used, this causes test failure.
+
+    commit cf64b33421971b62e96f7a3cb03b94c7405beb35
+    Author: Syohei YOSHIDA <syohex@gmail.com>
+    Date:   Tue Feb 16 10:51:55 2016 +0900
+
+        Lookup license package with case insensitive
+
+    commit 3188e8be17a1bd8c426689a7506b1fe8c8eb27f9
+    Author: Syohei YOSHIDA <syohex@gmail.com>
+    Date:   Tue Feb 16 10:50:48 2016 +0900
+
+        Add license case issue test(#184)
+
+    commit 06ab1d8027c251c329c74e813d222dfc263a0894
+    Author: Pine Mizune <pinemz@gmail.com>
+    Date:   Sun Dec 13 11:48:30 2015 +0000
+
+        Add Perl 5.22
+
+v3.0.1 2015-12-09T20:49:36Z
+
+    commit 480959a65a4c4df5109dce11e44919316eacf389
+    Author: Pine Mizune <pinemz@gmail.com>
+    Date:   Fri Dec 4 02:55:50 2015 +0900
+
+        Support to generate appveyor's badge.
+
+v3.0.0 2015-10-30T06:57:20Z
+
+    - bump version
+
+v2.4.4 2015-10-27T08:04:27Z
+
+    - enable 'sudo: false' by default in .travis.yml
+
+v2.4.3 2015-07-22T00:38:38Z
+
+    commit 91919267d95b3ca04bb839842cfe9430a93f04a6
+    Author: Tokuhiro Matsuno <tokuhirom@gmail.com>
+    Date:   Tue Jul 21 20:53:44 2015 +0900
+
+        Support 5.6 with EUMM.
+
+    commit 4fd3815b3c1259d90f56020c476b2845896dabb1
+    Author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+    Date:   Mon Jul 20 18:16:56 2015 -0700
+
+        require Module::Build 0.4005.
+
+    commit c0f6026ab38813da9b4ddd6a13dd9380e705eb06
+    Author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+    Date:   Mon Jul 20 18:13:39 2015 -0700
+
+        require EUMM 6.64 and remove fallback
+
+        6.64+ supports TEST_REQUIRES, and of course generates and merges MYMETA correctly.
+
+
+    commit e1b0ebca3d2b079176b12c87e74d0a5fac6c79b1
+    Author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+    Date:   Mon Jul 20 11:56:56 2015 -0700
+
+        Add perl 5.8.1 requirement in the assumption.
+
+        This makes Minilla more opinionated, and it is better to state so, rather than implicitly requiring 5.8.1 due to the build tool requirement (i.e. CPAN::Meta)
+
+v2.4.2 2015-07-13T02:55:57Z
+
+    - Make sure to always use Module::Build::Tiny by default, even when there's no
+      module_maker preference in minil.toml configuration file (or the configuration
+      file does not exist at all). Previously, `minil new` generates MBT by default,
+      but old distributions without the preference was still using Module::Build by
+      default. This version will switch to ModuleBuildTiny, unless you have a MB
+      specific options such as `[build]` or `[XSUtil]`. (miyagawa)
+    - Switch to Module::Build::Tiny in Minilla itself.
+
+v2.4.1 2015-05-02T02:30:20Z
+
+    - Depends on latest Module::Metadata.
+
+v2.4.0 2015-04-28T02:15:38Z
+
+    commit 28e4c4784f447ebccac651d4c1119ceb25a0f2b2
+    Author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+    Date:   Mon Apr 27 09:26:01 2015 -0700
+
+        Relax MakeMaker requirement, and also trust MM's MYMETA generation.
+
+        Slighly tweaked the way falling back _REQUIRES to PREREQ_PM, so that
+        it will only revert to PREREQ_PM if MakeMaker is old.
+
+        Do not request higher MakeMaker in configure_requires since older MakeMaker
+        will just install the distribution fine.
+
+        Do not set NO_MYMETA since MakeMaker (CPAN::Meta) will preserve what's in
+        META files when creating MYMETA. Only copy to MYMETA when the feature
+        is not in MakeMaker.
+
+        Only requires what's in 'requires' type, since the default includes
+        'recommends' and MakeMaker dumps them into _REQUIRES.
+
+v2.3.0 2014-12-07T11:28:37Z
+
+    - Fixed repository url was broken, when url contains port number.
+      (karupanerura++)
+    - Fixed testing deps
+      (reported by dotandimet++)
+
+v2.2.1 2014-11-17T02:31:30Z
+
+    - On Windows, (stat($file))[2] * ALWAYS * results in octal 0100666 (which means it is
+      world writeable). World writeable files are always rejected by PAUSE. The solution is to
+      change a file mode octal 0100666 to octal 000664, such that it is * NOT * world
+      writeable. This works on Windows, as well as on other systems (Linux, Mac, etc...), because
+      the filemode 0100666 only occurs on Windows. (If it occurred on Linux, it would be wrong anyway)
+      (klaus03)
+
+
+v2.2.0 2014-10-20T01:45:49Z
+
+    - Work better with github urls(lestrrat)
+
+v2.1.3 2014-10-10T02:33:19Z
+
+    - Minilla throws exception if you are using PL_files option with ModuleMaker::MBTiny.
+      It's not compatible with MBTiny.
+
+v2.1.2 2014-10-10T02:13:02Z
+
+    - Depended on latest TOML.pm
+
+    commit 343eba6a5a0b6980d4341f08a3aa18e80ce968f8
+    Author: iwata-motonori <motonori.iwata@dena.com>
+    Date:   Tue Aug 26 19:22:29 2014 +0900
+
+        now correspond to a badge of Gitter
+
+v2.1.1 2014-06-27T00:41:51Z
+
+    - Fixed deps.
+      (reported by nnutter++)
+      https://github.com/tokuhirom/Minilla/issues/137
+
+v2.1.0 2014-06-24T01:11:14Z
+
+    - Added EXPERIMENTAL EUMM support.
+
+v2.0.0 2014-06-23T10:08:59Z
+
+    - Do not use CPAN::Meta in Build.PL...
+      Previous version uses CPAN::Meta in Build.PL.
+      It breaks really old environment that doesn't supports
+      configure_requires.
+      (tokuhirom)
+
+v1.1.0 2014-06-01T02:50:15Z
+
+    commit ee9b9f7498c2fc260453cd5701a9009fbb275191
+    Author: Nathaniel Nutter <iam@nnutter.com>
+    Date:   Fri May 30 17:24:09 2014 -0500
+
+        allow a line to be annotated with '# No BumpVersion' to skip
+
+    commit 3330d6984747b1c9d02b579a56ce2353bbc43548
+    Author: moznion <moznion@gmail.com>
+    Date:   Sat May 17 14:09:26 2014 +0900
+
+        Fixed the problem where the default is not set to MBT
+
+v1.0.0 2014-05-12T04:47:31Z
+
+    - Default module builder is now Module::Builder::Tiny.
+      (tokuhirom)
+
+v0.15.2 2014-05-02T01:28:42Z
+
+    - Updaated prereqs
+
+v0.15.1 2014-05-01T07:38:30Z
+
+    - Run the xt/*.t with Module::Build::Tiny.
+      (moznion)
+
+v0.15.0 2014-05-01T03:51:37Z
+
+    - Added experimental Module::Build::Tiny support.
+      (tokuhirom)
+
+v0.14.1 2014-04-08T03:12:02Z
+
+    - Fix case that there is no '.pause'.
+      (syohex, gcs)
+
+v0.14.0 2014-04-07T21:15:35Z
+
+    - Generate 'authority' section in minil.toml by default.
+      (tokuhirom)
+    - Support Test::PAUSE::Permissions.
+      (tokuhirom)
+    - Update requirement 'Software::License'
+      (syohex)
+
+v0.13.0 2014-03-26T03:06:36Z
+
+    - Switch to Perl::MinimumVersion::Fast
+
+v0.12.0 2014-03-16T03:25:25Z
+
+    commit 0e929d2a63cee1ab9778f676744602978baab524
+    Author: moznion <moznion@gmail.com>
+    Date:   Sun Mar 16 00:55:13 2014 +0900
+
+        Add release hook feature
+
+    commit dc3da3cc010a7453ecdc0afafd245db6cd8df306
+    Author: Graham Knop <haarg@haarg.org>
+    Date:   Sat Mar 8 16:37:48 2014 -0500
+
+        decode contributor names
+
+    commit 5516ab9c07441dedde25fc5ce81cee01edcc2c89
+    Author: Kenichi Ishigaki <ishigaki@cpan.org>
+    Date:   Thu Feb 27 16:54:10 2014 +0900
+
+        chmod has a portability issue under Win32 (see perlport)
+
+v0.11.1 2014-02-27T03:20:09Z
+
+    - Add Debian standard inc
+      (syohex, helmut)
+    - allow_pureperl requires Module::Build 0.4005. http://blog.64p.org/entry/2013/04/27/091019
+      (kazeburo)
+    - Save file mode when creating a dist tarball
+      (Jiro Nishiguchi)
+    - Update bash/zsh completions
+      (syohex)
+
+v0.11.0 2013-11-27T00:17:41Z
+
+    - Support `-y` option for clean command
+      (moznion)
+    - Release::UploadToCPAN: Do not abort if user doesn't provide input char.
+      (Suggested by gfx++)
+
+v0.10.0 2013-11-25T13:26:03Z
+
+    - ReleaseTest.MinimumVersion for skipping Test::MinimumVersion test.
+      (Suggested by gfx)
+
+v0.9.1 2013-11-25T07:55:49Z
+
+    - Fixed logic in `minil test`.
+      (tokuhirom)
+    - Inject the badges line in minil.toml skelton.
+      (tokuhirom)
+    - Update bash/zsh completion
+      (Syohei YOSHIDA)
+    - Display upload url when prompting for upload if `upload_uri` is specified in `pause_config`
+      (Songmu)
+
+v0.9.0 2013-11-13T11:07:20Z
+
+    - Added release.do_not_upload_to_cpan
+      (tokuhirom)
+
+v0.8.4 2013-11-11T06:59:28Z
+
+    - Add 5.18 to default .travis.yml
+      (tagomoris)
+
+v0.8.3 2013-11-05T02:59:38Z
+
+    [BUG FIX]
+    -  Fixed `minil release --no-test`.
+      The flag does not affected on older version.
+      (hirobanex)
+
+    [DOCUMENTATION]
+    - Delete note that upload uri is unofficiall.
+      Added notes about OrePAN2::Server.
+      (hirobanex)
+
+v0.8.2 2013-11-03T10:30:11Z
+
+    - Added exmperimental support for tap_harness_args.
+      (tokuhirom)
+
+v0.8.1 2013-10-28T04:45:46Z
+
+    - git init before migrating if necessary
+      (charsbar)
+    - do not test twice on installation by default.
+      (charsbar)
+    - ignore /Build.bat (generated when you run "perl Build.PL" on Win32)
+      (charsbar)
+
+v0.8.0 2013-10-15T04:48:11Z
+
+    - Supports git-submodule
+      (ysasaki)
+    - Regenerate Build.PL after
+      (Shoichi Kaji)
+
+v0.7.5 2013-10-09T04:05:16Z
+
+    - Do not bump up version in share/ directory.
+      (tokuhirom)
+
+v0.7.4 2013-10-07T00:41:07Z
+
+    - Added 'builder' directory as default no_index.
+      (tokuhirom)
+
+v0.7.3 2013-10-05T00:32:34Z
+
+    - Fixed a problem when you specify a path string in XSUtil section
+      (hideo55)
+    - Pod tweaks
+      (dayflower)
+
+v0.7.2 2013-09-30T07:38:09Z
+
+    - release again.
+
+v0.7.1 2013-09-30T07:30:08Z
+
+    - Added tag_format option.
+      (Suggested by tagomoris++)
+
+v0.7.0 2013-09-26T05:07:27Z
+
+    - Support Module::Build::XSUtil
+      (hideo55)
+    - Support 'badges' attribute for showing travis badges!
+      (moznion)
+
+v0.6.8 2013-09-22T10:28:05Z
+
+    - Better license support in minil.toml.
+      (tokuhirom)
+
+v0.6.7 2013-09-19T04:16:29Z
+
+    - license field in prulal field.
+      (pointed by leont)
+
+v0.6.6 2013-09-17T02:47:55Z
+
+    - Fixed dependencies
+      (keita.iseki)
+    - Documented about .mailmap
+      (tokuhirom)
+    - skip -x test that has a portability issue on win32 (see perlport; chmod has an issue as well)
+      (Kenichi Ishigaki)
+
+v0.6.5 2013-09-01T23:35:54Z
+
+    - Fixed deps
+
+v0.6.4 2013-08-21T08:06:10Z
+
+    - Addex x_authority support
+      (tokuhirom)
+
+v0.6.3 2013-08-20T04:27:22Z
+
+    - version::is_strict is too strict for me. Use version::is_lax instead.
+
+v0.6.2 2013-08-16T00:48:07Z
+
+    - Generate stop words list by Dumper.
+      (reported by gfx++)
+
+v0.6.1 2013-08-15T06:14:53Z
+
+    - Support PL_files
+      (tokuhirom)
+
+v0.6.0 2013-08-14T05:49:51Z
+
+    - Added version number validation while release process.
+      (tokuhirom)
+    - Add a minil run command
+      (lestrrat)
+    - Added check git exist on exec some cli commands.
+      (gashev)
+
+v0.5.6 2013-07-07T02:36:17Z
+
+    - Show error message when Minilla can't get version number.
+      (tokuhirom)
+
+v0.5.5 2013-07-03T07:28:22Z
+
+    - Fix the problem about not including the author name in stop words.
+      (moznion)
+    - Added new `c_source` configuration option.
+      (tokuhirom)
+
+v0.5.3 2013-06-12T02:42:17Z
+
+    - Set 'release_status' key in META.json as 'unstable' if the version number contains '_' character.
+      https://github.com/tokuhirom/Minilla/issues/61#issuecomment-19238382
+      (Reported by mlawren++)
+
+v0.5.2 2013-06-11T08:52:49Z
+
+    - Set RELEASE_TESTING, AUTHOR_TESTING, AUTOMATED_TESTING after verified prereqs.
+      (Reported by aloelight++)
+
+v0.5.1 2013-06-11T08:05:45Z
+
+    - Note about FAKE_RELEASE in CLI::Release's document.
+      (tokuhirom)
+
+v0.5.0 2013-06-09T09:26:56Z
+
+    - Add 'pause_config' to release to an alternate PAUSE server.
+      (GeJ)
+
+v0.4.9 2013-06-08T04:58:01Z
+
+    - s/allow_pure_perl/allow_pureperl/!
+      allow_pure_perl is just a typo... orz.
+      This option is introduced in v0.4.0.
+      (tokuhirom)
+
+v0.4.8 2013-06-08T01:25:45Z
+
+    - Win32 Portability fix for testing code.
+      (tokuhirom)
+
+v0.4.7 2013-06-04T21:44:45Z
+
+    - Set PERL_CPANM_HOME for cpanm-reporter in test case.
+      Ref https://github.com/garu/App-cpanminus-reporter/issues/3
+      (tokuhirom)
+
+v0.4.6 2013-06-01T05:35:12Z
+
+    - Remove xt/spelling.t while migrating
+
+v0.4.5 2013-05-29T20:14:47Z
+
+    - fixed a bug that empty file couldn't be included to dist archive.
+      (ryochin)
+    - Fixed testing failure
+      (tokuhirom)
+
+v0.4.4 2013-05-24T04:38:41Z
+
+    - Depended on latest Pod::Readme
+      (reported by mlawren++)
+    - Force name delimiter to be single hyphen.
+      (moznion++)
+
+v0.4.3 2013-05-17T07:06:16Z
+
+    - Depended on Getopt::Long 2.36 for GetOptionsFromArray
+      (tokuhirom)
+    - Fixed "Use of uninitialized value $name in substitution (s///) at lib/Minilla/Metadata.pm line 55." error.
+      (lestrrat++)
+    - Ignore directories start with a dot if include_dotfiles is false
+      For compatible with Dist::Milla.
+      (songmu++)
+    - docs for FileGatherer
+      (songmu++)
+
+v0.4.2 2013-05-07T10:41:39Z
+
+    - Removed dependency on Path::Tiny
+
+v0.4.1 2013-05-07T09:06:46Z
+
+    - Module::Build keeps -Ixxx arguments in running `./Build`.
+      Do not make rel2abs '.'. In executing `perl Build.PL`
+      (tokuhirom)
+    - Cleanup code around `minil build`. Clean and saner code.
+      Older implementation creates work dir in '.build/XXXXX/' and copy it.
+      New implementation creates work dir in 'Module-Name-X.XX/' directly.
+      (tokuhirom)
+
+v0.4.0 2013-05-07T05:09:19Z
+
+    - documented build.build_class
+      (Fuji, Goro)
+    - Use `cpanm --notest` when using `minil --no-test install`
+      (reported by xaicron++)
+    - Support script_files in minil.toml
+      (xaicron)
+    - Added allow_pure_perl option.
+      (tokuhirom)
+
+v0.3.2 2013-05-03T01:09:37Z
+
+    - Do not run test case when cpanm command is not available
+      (tokuhirom)
+    - Add newline same as other error messages
+      (Syohei YOSHIDA)
+
+v0.3.1 2013-05-02T07:38:53Z
+
+    - Regenerate Build.PL/README.md before release, automatically
+      (tokuhirom)
+    - Deny Foo::Bar style name in minil.toml.
+      (tokuhirom)
+
+v0.3.0 2013-05-02T00:42:00Z
+
+    - Support MANIFEST.SKIP
+      (Suggested by Tatsuhiko Miyagawa)
+
+v0.2.0 2013-04-30T02:21:41Z
+
+    - add [no_index] feature for minil.toml
+      (Masayuki Matsuki)
+
+v0.1.0 2013-04-27T14:51:23Z
+
+    - Added authors_from, abstract_from
+
+v0.0.56 2013-04-24T05:23:14Z
+
+    - Use cpanm instead of CPAN::Meta::Check. Closed #12
+      (Suggested by miyagawa++)
+    - Fixed Double-encoded author name in META.json Closed #44
+      https://github.com/tokuhirom/Minilla/issues/44
+      (Reported by ilmali++)
+
+
+v0.0.55 2013-04-24T03:09:28Z
+
+    - Save mode when copying files to working directory.
+      (tokuhirom)
+
+v0.0.54 2013-04-22T23:27:19Z
+
+    [INCOMPATIBLE CHANGES]
+    - Enable xt/spelling.t by ~/spellunker.en, instead of ~/.aspell.en.pws
+
+    [FEATURE ENHANCEMENTS]
+    - Better zsh completion
+      (Syohei YOSHIDA, Yuji Shimada)
+    - Better spelling checking with Spellunker.
+      (tokuhirom)
+    - Better version number incrementation with Version::Next
+      (tokuhirom)
+    - Disabled ACTION_distmeta and ACTION_installdeps in Build.PL
+      (tokuhirom)
+    - Added new configuration parameter: readme_from
+      (tokuhirom)
+    - Support 'share/' directiory(Distribution share directiory only)
+      (tokuhirom)
+    - Remove dupilicate entry in manifest file
+      (Masayuki Matsuki)
+    - force add LICENSE in migration
+      (xaicron)
+    - add MYMETA.* and <% $dist %>-* to default .gitignore
+      (gfx)
+
+v0.0.53 2013-04-09T05:57:07Z
+
+    - Exclude extlib/ directory from tar ball.
+      (Reported by kazeburo++)
+
+v0.0.52 2013-04-08T03:11:44Z
+
+    - Tiny tweaks for CPAN testers.
+      (tokuhirom)
+
+v0.0.51 2013-04-07T04:09:37Z
+
+    - Remove M::I related files while migration.
+      (tokuhirom)
+    - Added '=encoding utf-8' in skelton
+      (tokuhirom)
+    - Do not run test cases without git command.
+      (tokuhirom)
+
+v0.0.50 2013-04-04T06:03:31Z
+
+    - first release on CPAN!
+
+0.0.1 2013-03-18T19:11:49
+    - original version

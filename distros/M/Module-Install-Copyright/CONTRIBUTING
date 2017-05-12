@@ -1,0 +1,74 @@
+NAME
+    CONTRIBUTING
+
+DESCRIPTION
+    If you're reading this document, that means you might be thinking about
+    helping me out with this project. Thanks!
+
+    Here's some ways you could help out:
+
+    *   Bug reports
+
+        Found a bug? Great! (Well, not so great I suppose.)
+
+        The place to report them is <https://rt.cpan.org/>. Don't e-mail me
+        about it, as your e-mail is more than likely to get lost amongst the
+        spam.
+
+        An example script clearly demonstrating the bug (preferably written
+        using Test::More) would be greatly appreciated.
+
+    *   Patches
+
+        If you've found a bug and written a fix for it, even better!
+
+        Generally speaking you should check out the latest copy of the code
+        from the source repository rather than using the CPAN distribution.
+        The file META.yml should contain a link to the source repository. If
+        not, then try <https://bitbucket.org/tobyink> or submit a bug
+        report. (As far as I'm concerned the lack of a link is a bug.) Many
+        of my distributions are also mirrored at
+        <http://github.com/tobyink>.
+
+        To submit the patch, do a pull request on Bitbucket or Github, or
+        attach a diff file to a bug report. Unless otherwise stated, I'll
+        assume that your contributions are licensed under the same terms as
+        the rest of the project.
+
+    *   Documentation
+
+        If there's anything unclear in the documentation, please submit this
+        as a bug report or patch as above.
+
+        Non-toy example scripts that I can bundle would also be appreciated.
+
+    *   Translation
+
+        Translations of documentation would be welcome.
+
+        For translations of error messages and other strings embedded in the
+        code, check with me first. Sometimes the English strings may not in
+        a stable state, so it would be a waste of time translating them.
+
+  Coding Style
+    I tend to write using something approximating the Allman style, using
+    tabs for indentation and Unix-style line breaks.
+
+    *   <http://en.wikipedia.org/wiki/Indent_style#Allman_style>
+
+    *   <http://www.derkarl.org/why_to_tabs.html>
+
+    I nominally encode all source files as UTF-8, though in practice most of
+    them use a 7-bit-safe ASCII-compatible subset of UTF-8.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    Copyright (c) 2012-2013 by Toby Inkster.
+
+    CONTRIBUTING.pod is licensed under the Creative Commons
+    Attribution-ShareAlike 2.0 UK: England & Wales License. To view a copy
+    of this license, visit
+    <http://creativecommons.org/licenses/by-sa/2.0/uk/>.
+

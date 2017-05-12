@@ -1,0 +1,32 @@
+Revision history for Perl extension Math::BigInt::Parts.
+
+2016-12-08 v0.03
+
+* Notify the world that this distribution is redundant.
+
+* Add required versions of Test::More and Math::BigInt to Makefile.PL.
+
+2010-09-16 v0.02
+
+* Parts.pm: Changed namespace from Math::BigInt to
+  Math::BigInt::Parts. The documentation says how to use the
+  Math::BigInt::Parts functions as Math::BigInt methods.
+
+* Parts.pm: Added URLs to documentation
+
+* Parts.pm: Miscellaneous code reformatting.
+
+* Parts.pm: Switched to UTF-8 encoding.
+
+* Parts.pm: Modernization: 'use vars ...' replaced by 'our ...'.
+
+* Add testfiles for POD.
+
+* Included signature. For testing signature, the TEST_SIGNATURE
+  environment variable must be set.
+
+* Parts.pm: Increased version number.
+
+2006-09-24 v0.01
+
+* First version, released on an unsuspecting world.

@@ -1,0 +1,51 @@
+Changelog for Mixin-Linewise
+
+0.108     2015-04-08 14:56:06-04:00 America/New_York
+        - first argument can be options only if there are two options
+
+0.107     2015-04-07 20:14:41-04:00 America/New_York
+        - add leading hashref arg for passing binmode to read_string,
+          write_string
+        - do not modify references of args passed to read_file, write_file
+
+0.106     2014-03-10 08:08:39-04:00 America/New_York
+        - avoid dumb v-string warning in dumb perl versions (thanks, Graham
+          Knop, you're not dumb!)
+
+0.105     2014-02-20 21:53:06-05:00 America/New_York
+        - update Readers to, by default, use PerlIO::utf8_strict to avoid
+          problems with CRLF layer on Win32
+
+0.104     2013-12-21 15:19:00-0500 America/New_York
+        - clean up the docs for changes made in 0.103
+
+0.103     2013-12-19 19:34:04-0500 America/New_York
+        [THIS MIGHT BREAK YOUR CODE]
+        - the string methods once again open references to scalars, rather
+          than using IO::Scalar
+
+0.102     2013-11-02 11:36:22 America/New_York
+        - revert the IO::String changes found in 0.101
+
+0.101     2013-11-02 08:00:43 America/New_York
+        [THIS MIGHT BREAK YOUR CODE]
+        - tweak how read_string handles non-ASCII strings; needs further
+          automated testing, so be sure to run your test suites
+
+0.100     2013-10-18 15:55:59 America/New_York (TRIAL RELEASE)
+        [THIS MIGHT BREAK YOUR CODE]
+        - add binmode option to set binmode on opened filehandles; this
+          defaults to encoding(UTF-8); thanks, David Golden!
+        - typo fix by the inimitable David Steinbrunner
+
+0.004     2013-06-18 17:30:31 America/New_York
+          repackage
+
+0.003     2010-02-14
+          add Test::More prereq
+
+0.002     2008-06-05
+          update prereqs
+
+0.001     2008-06-05
+          refactored out of Config-INI

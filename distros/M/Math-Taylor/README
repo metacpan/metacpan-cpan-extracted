@@ -1,0 +1,37 @@
+Math-Taylor version 1.00
+========================
+
+Math::Taylor offers facilites to calculate Taylor Polynomials of any degree symbolically.
+For its inner workings, it makes use of Math::Symbolic and specifically
+Math::Symbolic::MiscCalculus.
+
+Math::Taylor can also calculate two types of remainders for the Taylor Series.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Math::Symbolic (version 0.128 and up)
+  Test::More (tested with 0.44)
+  Test::Pod::Coverage (tested with 1.06)
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005 by Steffen Mueller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

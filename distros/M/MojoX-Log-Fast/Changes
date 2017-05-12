@@ -1,0 +1,20 @@
+Revision history for MojoX-Log-Fast
+
+v1.0.0  2016-02-17 23:41:22 EET
+	- Switch to Dist::Milla.
+
+0.1.4   2015-04-14 11:02:33 EEST
+	- Fix log level sync.
+
+0.1.3   2014-07-12 04:35:33 EEST
+	- Fix compatibility with 5.18.
+
+0.1.2   2013-05-20 19:28:43 EEST
+	- Improve compatibility with CPAN Testers.
+
+0.1.1	2013-04-21 15:53:40 EEST
+	- Remove "v" from version in .tar.gz.
+	- Fix compatibility with 5.10.1.
+
+0.1.0	2013-04-11 15:26:57 EEST
+	- Initial release.

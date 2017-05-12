@@ -1,0 +1,36 @@
+---
+abstract: 'a simple starter kit for any module'
+author:
+  - 'Andy Lester <andy@petdance.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Starter
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ExtUtils::Command: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  Pod::Usage: '1.21'
+  Test::Harness: '0.21'
+  Test::More: '0'
+  parent: '0'
+  perl: '5.006001'
+  version: '0'
+resources:
+  IRC: irc://irc.perl.org/#toolchain
+  bugtracker: https://github.com/xsawyerx/module-starter/issues
+  homepage: https://github.com/xsawyerx/module-starter
+  repository: https://github.com/xsawyerx/module-starter.git
+version: '1.72'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

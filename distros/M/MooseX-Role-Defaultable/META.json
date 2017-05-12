@@ -1,0 +1,55 @@
+{
+   "abstract" : "\"factory reset\" for a Moose class",
+   "author" : [
+      "Aaron Cohen <aarondcohen@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Role-Defaultable",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.05"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::MakeMaker::CPANfile" : "0",
+            "Moose" : "0",
+            "Sub::IsEqual" : "0",
+            "Test::Most" : "0",
+            "namespace::autoclean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/aarondcohen/perl-moosex-role-defaultable/issues"
+      },
+      "homepage" : "http://github.com/aarondcohen/perl-moosex-role-defaultable",
+      "repository" : {
+         "url" : "git://github.com/aarondcohen/perl-moosex-role-defaultable.git"
+      }
+   },
+   "version" : "1.01"
+}

@@ -1,0 +1,16 @@
+Changes
+lib/Mojolicious/Plugin/INIConfig.pm
+Makefile.PL
+MANIFEST			This list of files
+MYMETA.json
+MYMETA.yml
+README
+t/ini_config_lite_app.ini
+t/ini_config_lite_app.t
+t/ini_config_lite_app_abs.development.ini
+t/ini_config_lite_app_abs.ini
+t/ini_config_mode_lite_app.ini
+t/ini_config_mode_lite_app.t
+t/ini_config_mode_lite_app.testing.ini
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,47 @@
+Math::SymbolicX::Error version 1.00
+===================================
+
+Adds support for numbers with errors to the Math::Symbolic parser
+using the Number::WithError module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Math::Symbolic
+  Number::WithError
+  Test::More
+  Math::SymbolicX::ParserExtensionFactory
+  Parse::RecDescent
+
+SEE ALSO
+
+Current versions of this module may be found on http://steffen-mueller.net or
+CPAN.
+
+Please send your suggestions, inquiries, and feedback to
+math-symbolic-support at lists dot sourceforge dot net. Feel free to
+subscribe to the developers mailing list:
+math-symbolic-develop at lists dot sourceforge dot net
+
+Number::WithError for details on how errors are treated.
+
+Math::SymbolicX::ParserExtensionFactory for the implementation details.
+
+Math::Symbolic and Math::Symbolic::Parser for the full scoop if info.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2008 Steffen Mueller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

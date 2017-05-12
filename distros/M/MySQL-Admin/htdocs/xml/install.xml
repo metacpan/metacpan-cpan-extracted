@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+	<action position="top" output="link">
+		<title>ShowDatabases</title>
+		<href>index.html</href>
+		<id>Try</id>
+		<text>Try</text>
+	</action>
+<!--	<action position="top" output="requestURI">
+		<title>ShowTables</title>
+		<xml>cgi-bin/mysql.pl?action=ShowTables</xml>
+		<out>content</out>
+		<id>ShowTables</id>
+		<text>ShowTables</text>
+	</action>
+	<action position="top" output="requestURI">
+		<xml>cgi-bin/mysql.pl?action=ShowUsers</xml>
+		<out>content</out>
+		<id>ShowUsers</id>
+		<text>ShowUsers</text>
+		<title>ShowUsers</title>
+	</action>
+	<action position="left" output="requestURI">
+		<title>ShowProcesslist</title>
+		<xml>cgi-bin/mysql.pl?action=ShowProcesslist</xml>
+		<out>content</out>
+		<id>ShowProcesslist</id>
+		<text>ShowProcesslist</text>
+	</action>
+	<action position="left" output="requestURI">
+		<title>ShowVariables</title>
+		<xml>cgi-bin/mysql.pl?action=ShowVariables</xml>
+		<out>content</out>
+		<id>ShowVariables</id>
+		<text>ShowVariables</text>
+	</action>
+	<action output="requestURI">
+		<title>ShowDumpDatabase</title>
+		<xml>cgi-bin/mysql.pl?action=ShowDumpDatabase</xml>
+		<xsl>xsl/content.xsl</xsl>
+		<out>content</out>
+		<id>ShowDumpDatabase</id>
+		<text>ShowDumpDatabase</text>
+	</action>
+	<action position="left" output="javascript">
+		<javascript>showPopup('SqlSearch')</javascript>
+		<id>e7</id>
+		<text>SqlSearch</text>
+	</action>
+	<action position="left" output="javascript">
+		<javascript>showPopup('ChangeCurrentDb')</javascript>
+		<id>e8</id>
+		<text>ChangeCurrentDb</text>
+	</action>
+	<action position="left" output="javascript">
+		<javascript>showSQLEditor()</javascript>
+		<id>e8</id>
+		<text>SqlEditor</text>
+	</action>
+	<action output="requestURI">
+		<xml>cgi-bin/mysql.pl?action=showProfile</xml>
+		<out>content</out>
+		<id>showProfile</id>
+		<text>showProfile</text>
+		<title>showProfile</title>
+	</action>-->
+</actions>

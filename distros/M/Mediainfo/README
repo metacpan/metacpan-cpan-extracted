@@ -1,0 +1,29 @@
+Mediainfo version 0.12
+======================
+
+This module is a Perl interface to Mediainfo.
+
+This module is a thin layer above "Mediainfo" which supplies 
+technical and tag information about a video or audio file.
+L<http://mediainfo.sourceforge.net/>.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules and libraries.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2011 ChenGang.
+This library is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+

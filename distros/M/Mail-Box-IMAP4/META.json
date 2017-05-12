@@ -1,0 +1,60 @@
+{
+   "abstract" : "Mail::Box connector via IMAP4",
+   "author" : [
+      "Mark Overmeer"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mail-Box-IMAP4",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Date::Parse" : "0",
+            "Digest::HMAC_MD5" : "0",
+            "Digest::MD5" : "0",
+            "File::Compare" : "0",
+            "File::Copy" : "0",
+            "File::Spec" : "0",
+            "List::Util" : "0",
+            "Mail::Box::Manage::User" : "3",
+            "Mail::Box::Net" : "3",
+            "Mail::Box::Search" : "3",
+            "Mail::Box::Test" : "3",
+            "Mail::IMAPClient" : "0",
+            "Mail::Message" : "3",
+            "Mail::Message::Body::Lines" : "3",
+            "Mail::Message::Head::Complete" : "3",
+            "Mail::Message::Head::Delayed" : "3",
+            "Mail::Server" : "3",
+            "Mail::Transport::Receive" : "3",
+            "Scalar::Util" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "3.001"
+}

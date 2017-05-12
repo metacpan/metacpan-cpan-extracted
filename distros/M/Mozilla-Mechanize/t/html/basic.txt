@@ -1,0 +1,5 @@
+This is a basic textfile. It hasn't got any usefill content, but we
+need a plain text file for testing...
+
+
+bye from Mozilla::Mechanize

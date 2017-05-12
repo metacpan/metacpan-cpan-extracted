@@ -1,0 +1,44 @@
+CHANGES
+	Release Name: 0.4101 2010-08-16
+		*	Updated to use new method system
+
+		*	POD Changes
+
+	Release Name: 0.4002 2010-08-14
+        *   Bug in POD
+        
+		*	Changed requirement for Music::Tag to .40_01
+
+	Release Name: 0.4001 2010-07-27
+		*	Started using git and github
+
+		*	Normalized version accross plugins
+
+		*	POD Changes
+
+		*	Revised Testing 
+
+		*	Capability Methods
+
+		*	Started using hash tables for tags, simplifying code and testing.
+
+    Release Name: 0.32 2008-05-14
+        *   Changed to TXXX:ALBUMARTISTSORT from TXXX:MusicBrainz Album
+            Artist Sortname (will still read both). This is to partially
+            address 54571.
+
+    Release Name: 0.31
+        *   Added support for EAN/UPC TXXX tag, and for reading and writing
+            Music Magic fingerprints and data (puid).
+
+    Release Name: 0.30 
+        *   Documentation Changes
+
+    Release Name: 0.29 2008-02-20
+        *   Kwalitee fixes
+
+        *   Added Music::Info patch and explanation about gapless data
+
+    Release Name: 0.28 2008-02-11
+        *   Split from Music::Tag
+

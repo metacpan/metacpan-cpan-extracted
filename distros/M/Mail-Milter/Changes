@@ -1,0 +1,65 @@
+$Id: Changes,v 1.34 2006/03/22 15:43:15 tvierling Exp $
+
+Revision history for Perl extension Mail::Milter.
+
+0.07  Wed Mar 22 15:45:00 2006 UTC
+	- added Mail::Milter::Module::AccessDB
+	- Mail::Milter::Module::MailDomainDotMX needed a "use Net::DNS"
+	- improved Mail::Milter::Wrapper::DecodeSRS parsing to understand
+		Mail::SRS::Guarded munging where the original localpart
+		already contained an equals (=) character
+	- added Mail::Milter::Module::SPF
+	- added Mail::Milter::Module::MailFakeNull
+	- added Mail::Milter::Module::HeaderValidateMIME
+	- added method check_superdomains() to
+	  Mail::Milter::Module::MailDomainDNSBL, allowing use of e.g.
+	  surbl.org blacklist with MAIL FROM:<> addresses
+
+0.06  Thu Nov 25 20:30:00 2004 UTC
+	- fixed Mail::Milter::Chain where second and subsequent RCPTs
+		were not being rejected properly
+	- fixed Mail::Milter::Wrapper::DeferToRCPT where a reject at envfrom
+		was propagated as-is to further envfroms on the same session
+		(should be per-envfrom only)
+	- added Mail::Milter::Module::ConnectASNBL
+	- added Mail::Milter::Wrapper::DecodeSRS
+	- fixed parsing of AS_SETs in the AS list returned from the DNSBL
+	- added Mail::Milter::Module::MailDomainDotMX
+
+0.05  Thu Apr 15 19:15:00 2004 UTC
+	- fixed Mail::Milter::Module::*DNSBL to return a descriptive 451
+		error on a temporary DNSBL failure
+	- fixed Mail::Milter::Module::MailDomainDNSBL not to break on <>
+		sender (would cause a query beginning with a dot)
+
+0.04  [withdrawn due to <> bug fixed in 0.05, above]
+	- added modules
+		Mail::Milter::Module::ConnectDNSBL
+		Mail::Milter::Module::HeloRegex
+		Mail::Milter::Module::MailDomainDNSBL
+		Mail::Milter::Module::VirusBounceSpew
+	- changed Mail::Milter::Wrapper::DeferToRCPT to intercept normally
+		554 SMTP response codes (not valid for RCPT per RFC2822),
+		and replace them with 550 (which is valid, ibid.).
+
+0.03  Mon Mar 29 17:30:00 2004 UTC
+	- added module Mail::Milter::Module::ConnectMatchesHostname
+
+0.02  Wed Feb 25 16:45:00 2004 UTC
+	- added several Modules and Wrappers
+		Mail::Milter::Module::ConnectRegex
+		Mail::Milter::Module::HeaderRegex
+		Mail::Milter::Module::HeloRawLiteral
+		Mail::Milter::Wrapper::DeferToRCPT
+		Mail::Milter::Wrapper::RejectMsgEditor
+
+	- API CHANGE: changed Mail::Milter::Wrapper to pass reference to
+		wrapper as first arg to wrapper subroutine
+
+0.01  Tue Feb 24 02:20:00 2004 UTC
+	- first version, including:
+		Mail::Milter::Chain - chains multiple milters
+		Mail::Milter::Object - reworks milter into an object model
+		Mail::Milter::Wrapper - intercepts milter calls with a hook
+		Mail::Milter::Module::HeaderFromMissing
+		Mail::Milter::Module::HeloUnqualified

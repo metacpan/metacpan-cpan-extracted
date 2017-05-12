@@ -1,0 +1,513 @@
+<mediawiki xmlns="http://www.mediawiki.org/xml/export-0.5/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mediawiki.org/xml/export-0.5/ http://www.mediawiki.org/xml/export-0.5.xsd" version="0.5" xml:lang="en">
+  <siteinfo>
+    <sitename>Meta</sitename>
+    <base>http://meta.wikimedia.org/wiki/Main_Page</base>
+    <generator>MediaWiki 1.17wmf1</generator>
+    <case>first-letter</case>
+    <namespaces>
+      <namespace key="-2" case="first-letter">Media</namespace>
+      <namespace key="-1" case="first-letter">Special</namespace>
+      <namespace key="0" case="first-letter" />
+      <namespace key="1" case="first-letter">Talk</namespace>
+      <namespace key="2" case="first-letter">User</namespace>
+      <namespace key="3" case="first-letter">User talk</namespace>
+      <namespace key="4" case="first-letter">Meta</namespace>
+      <namespace key="5" case="first-letter">Meta talk</namespace>
+      <namespace key="6" case="first-letter">File</namespace>
+      <namespace key="7" case="first-letter">File talk</namespace>
+      <namespace key="8" case="first-letter">MediaWiki</namespace>
+      <namespace key="9" case="first-letter">MediaWiki talk</namespace>
+      <namespace key="10" case="first-letter">Template</namespace>
+      <namespace key="11" case="first-letter">Template talk</namespace>
+      <namespace key="12" case="first-letter">Help</namespace>
+      <namespace key="13" case="first-letter">Help talk</namespace>
+      <namespace key="14" case="first-letter">Category</namespace>
+      <namespace key="15" case="first-letter">Category talk</namespace>
+      <namespace key="100" case="first-letter">Hilfe</namespace>
+      <namespace key="101" case="first-letter">Hilfe Diskussion</namespace>
+      <namespace key="102" case="first-letter">Aide</namespace>
+      <namespace key="103" case="first-letter">Discussion Aide</namespace>
+      <namespace key="104" case="first-letter">Hjælp</namespace>
+      <namespace key="105" case="first-letter">Hjælp diskussion</namespace>
+      <namespace key="106" case="first-letter">Helpo</namespace>
+      <namespace key="107" case="first-letter">Helpa diskuto</namespace>
+      <namespace key="108" case="first-letter">Hjälp</namespace>
+      <namespace key="109" case="first-letter">Hjälp diskussion</namespace>
+      <namespace key="110" case="first-letter">Ayuda</namespace>
+      <namespace key="111" case="first-letter">Ayuda Discusión</namespace>
+      <namespace key="112" case="first-letter">Aiuto</namespace>
+      <namespace key="113" case="first-letter">Discussioni aiuto</namespace>
+      <namespace key="114" case="first-letter">ヘルプ</namespace>
+      <namespace key="115" case="first-letter">ヘルプ‐ノート</namespace>
+      <namespace key="116" case="first-letter">NL Help</namespace>
+      <namespace key="117" case="first-letter">Overleg help</namespace>
+      <namespace key="118" case="first-letter">Pomoc</namespace>
+      <namespace key="119" case="first-letter">Dyskusja pomocy</namespace>
+      <namespace key="120" case="first-letter">Ajuda</namespace>
+      <namespace key="121" case="first-letter">Ajuda Discussão</namespace>
+      <namespace key="122" case="first-letter">CA Ajuda</namespace>
+      <namespace key="123" case="first-letter">CA Ajuda Discussió</namespace>
+      <namespace key="124" case="first-letter">Hjelp</namespace>
+      <namespace key="125" case="first-letter">Hjelp diskusjon</namespace>
+      <namespace key="126" case="first-letter">帮助</namespace>
+      <namespace key="127" case="first-letter">帮助 对话</namespace>
+      <namespace key="128" case="first-letter">Помощь</namespace>
+      <namespace key="129" case="first-letter">Помощь Дискуссия</namespace>
+      <namespace key="130" case="first-letter">Pomoč</namespace>
+      <namespace key="131" case="first-letter">Pogovor o pomoči</namespace>
+      <namespace key="132" case="first-letter">مساعدة</namespace>
+      <namespace key="133" case="first-letter">نقاش المساعدة</namespace>
+      <namespace key="200" case="first-letter">Grants</namespace>
+      <namespace key="201" case="first-letter">Grants talk</namespace>
+      <namespace key="202" case="first-letter">Research</namespace>
+      <namespace key="203" case="first-letter">Research talk</namespace>
+    </namespaces>
+  </siteinfo>
+  <page>
+    <title>User:Mike.lifeguard/Wish list</title>
+    <id>112974</id>
+    <revision>
+      <id>845595</id>
+      <timestamp>2008-01-22T02:45:08Z</timestamp>
+      <contributor>
+        <username>Mike.lifeguard</username>
+        <id>49164</id>
+      </contributor>
+      <minor/>
+      <comment>first draft, mostly copied from http://en.wikibooks.org/w/index.php?title=Wikibooks:Reading_room/Archives/2007/November&amp;oldid=1072591#Technical &quot;Wish List&quot;</comment>
+      <text xml:space="preserve" bytes="2294">Wikibooks uses the [[MediaWiki]] software, which was developed for [[w:|Wikipedia]]. As such, it's not strictly intended for use in writing textbooks. Here is a technical wish list for Wikibooks to help with some of these shortcomings:
+
+#&quot;Search this book&quot; feature being a special page, not a link to a google search
+#Per-book stylesheets (although we could just as easily do that in javascript, it might be nice to have the javascript added to the core MW distribution)
+#Book organizational meta-pages. A page where you could specify the layout for a book, and it would then generate an automatic TOC, and automatic forward/backward links, etc. Darklama can probably explain this idea better then I can
+#List of books. Like the special page [[Special:Allpages]], but would only list the main page of a book, not all pages.
+#A read-only Wikijunior domain (already registered) - a read only storage location for all stable book versions, which could be updated from Wikibooks when necessary
+#The GNU Lilypond extension, for music and other types of displays (we've asked many times, and never got them because of technical reasons
+#PDF generator (currently hosted on the toolserver, but needs much work)
+#An automatic TOC-generator tool. Several people have asked how to create new pages; this would help with that by providing a TOC of redlinks for them to work on, and would also foster greater organization of new books right from the get-go.
+#Search by book is a must-have!
+#A list of all top-level pages in the mainspace would be great, especially if it can be done dynamically (as opposed to periodically sorting through the database or something).
+#Watching pages in bundles (ie per-book watchlists)
+
+----
+By priority:
+:::So that was basically an endorsement of almost all the proposals you mentioned. If prioritizing is required:
+:::#Search by book (should be easy to do)
+:::#List of top-level pages in the mainspace (ie books) (should be easy to do)
+:::#per-book styles (most important thing to do requiring some work)
+:::#''Good'' PDF (and/or print version) generation (requires lots of work, and is probably difficult to do properly)
+:::#TOC generator-thing (should be easy to do, but we can function just fine without it)
+:::#Read-only (needs lots of discussion before anything else)</text>
+    </revision>
+    <revision>
+      <id>845596</id>
+      <timestamp>2008-01-22T02:45:30Z</timestamp>
+      <contributor>
+        <username>Mike.lifeguard</username>
+        <id>49164</id>
+      </contributor>
+      <minor/>
+      <text xml:space="preserve" bytes="2164">Wikibooks uses the [[MediaWiki]] software, which was developed for [[w:|Wikipedia]]. As such, it's not strictly intended for use in writing textbooks. Here is a technical wish list for Wikibooks to help with some of these shortcomings:
+
+#&quot;Search this book&quot; feature being a special page, not a link to a google search
+#Per-book stylesheets (although we could just as easily do that in javascript, it might be nice to have the javascript added to the core MW distribution)
+#Book organizational meta-pages. A page where you could specify the layout for a book, and it would then generate an automatic TOC, and automatic forward/backward links, etc. Darklama can probably explain this idea better then I can
+#List of books. Like the special page [[Special:Allpages]], but would only list the main page of a book, not all pages.
+#A read-only Wikijunior domain (already registered) - a read only storage location for all stable book versions, which could be updated from Wikibooks when necessary
+#The GNU Lilypond extension, for music and other types of displays (we've asked many times, and never got them because of technical reasons
+#PDF generator (currently hosted on the toolserver, but needs much work)
+#An automatic TOC-generator tool. Several people have asked how to create new pages; this would help with that by providing a TOC of redlinks for them to work on, and would also foster greater organization of new books right from the get-go.
+#Search by book is a must-have!
+#A list of all top-level pages in the mainspace would be great, especially if it can be done dynamically (as opposed to periodically sorting through the database or something).
+#Watching pages in bundles (ie per-book watchlists)
+
+----
+By priority:
+#Search by book (should be easy to do)
+#List of top-level pages in the mainspace (ie books) (should be easy to do)
+#per-book styles (most important thing to do requiring some work)
+#''Good'' PDF (and/or print version) generation (requires lots of work, and is probably difficult to do properly)
+#TOC generator-thing (should be easy to do, but we can function just fine without it)
+#Read-only (needs lots of discussion before anything else)</text>
+    </revision>
+    <revision>
+      <id>845602</id>
+      <timestamp>2008-01-22T02:52:30Z</timestamp>
+      <contributor>
+        <username>Mike.lifeguard</username>
+        <id>49164</id>
+      </contributor>
+      <minor/>
+      <comment>+bug</comment>
+      <text xml:space="preserve" bytes="2183">Wikibooks uses the [[MediaWiki]] software, which was developed for [[w:|Wikipedia]]. As such, it's not strictly intended for use in writing textbooks. Here is a technical wish list for Wikibooks to help with some of these shortcomings:
+
+#&quot;Search this book&quot; feature being a special page, not a link to a google search
+#Per-book stylesheets (although we could just as easily do that in javascript, it might be nice to have the javascript added to the core MW distribution)
+#Book organizational meta-pages. A page where you could specify the layout for a book, and it would then generate an automatic TOC, and automatic forward/backward links, etc. Darklama can probably explain this idea better then I can
+#List of books. Like the special page [[Special:Allpages]], but would only list the main page of a book, not all pages.
+#A read-only Wikijunior domain (already registered) - a read only storage location for all stable book versions, which could be updated from Wikibooks when necessary
+#The GNU Lilypond extension, for music and other types of displays (we've asked many times, and never got them because of technical reasons
+#PDF generator (currently hosted on the toolserver, but needs much work)
+#An automatic TOC-generator tool. Several people have asked how to create new pages; this would help with that by providing a TOC of redlinks for them to work on, and would also foster greater organization of new books right from the get-go.
+#Search by book is a must-have!
+#A list of all top-level pages in the mainspace would be great, especially if it can be done dynamically (as opposed to periodically sorting through the database or something).
+#Watching pages in bundles (ie per-book watchlists) [[bugzilla:12308]]
+
+----
+By priority:
+#Search by book (should be easy to do)
+#List of top-level pages in the mainspace (ie books) (should be easy to do)
+#per-book styles (most important thing to do requiring some work)
+#''Good'' PDF (and/or print version) generation (requires lots of work, and is probably difficult to do properly)
+#TOC generator-thing (should be easy to do, but we can function just fine without it)
+#Read-only (needs lots of discussion before anything else)</text>
+    </revision>
+    <revision>
+      <id>845605</id>
+      <timestamp>2008-01-22T02:55:18Z</timestamp>
+      <contributor>
+        <username>Mike.lifeguard</username>
+        <id>49164</id>
+      </contributor>
+      <minor/>
+      <comment>+related links</comment>
+      <text xml:space="preserve" bytes="2410">Wikibooks uses the [[MediaWiki]] software, which was developed for [[w:|Wikipedia]]. As such, it's not strictly intended for use in writing textbooks. Here is a technical wish list for Wikibooks to help with some of these shortcomings:
+
+#&quot;Search this book&quot; feature being a special page, not a link to a google search
+#Per-book stylesheets (although we could just as easily do that in javascript, it might be nice to have the javascript added to the core MW distribution)
+#Book organizational meta-pages. A page where you could specify the layout for a book, and it would then generate an automatic TOC, and automatic forward/backward links, etc. Darklama can probably explain this idea better then I can
+#List of books. Like the special page [[Special:Allpages]], but would only list the main page of a book, not all pages.
+#A read-only Wikijunior domain (already registered) - a read only storage location for all stable book versions, which could be updated from Wikibooks when necessary
+#The GNU Lilypond extension, for music and other types of displays (we've asked many times, and never got them because of technical reasons
+#PDF generator (currently hosted on the toolserver, but needs much work) [http://lists.wikimedia.org/pipermail/textbook-l/2007-December/001217.html][http://lists.wikimedia.org/pipermail/textbook-l/2007-November/001178.html][http://lists.wikimedia.org/pipermail/textbook-l/2007-September/001144.html]
+#An automatic TOC-generator tool. Several people have asked how to create new pages; this would help with that by providing a TOC of redlinks for them to work on, and would also foster greater organization of new books right from the get-go.
+#Search by book is a must-have!
+#A list of all top-level pages in the mainspace would be great, especially if it can be done dynamically (as opposed to periodically sorting through the database or something).
+#Watching pages in bundles (ie per-book watchlists) [[bugzilla:12308]]
+
+----
+By priority:
+#Search by book (should be easy to do)
+#List of top-level pages in the mainspace (ie books) (should be easy to do)
+#per-book styles (most important thing to do requiring some work)
+#''Good'' PDF (and/or print version) generation (requires lots of work, and is probably difficult to do properly)
+#TOC generator-thing (should be easy to do, but we can function just fine without it)
+#Read-only (needs lots of discussion before anything else)</text>
+    </revision>
+    <revision>
+      <id>845608</id>
+      <timestamp>2008-01-22T02:56:35Z</timestamp>
+      <contributor>
+        <username>Mike.lifeguard</username>
+        <id>49164</id>
+      </contributor>
+      <minor/>
+      <comment>clarify who's talking here</comment>
+      <text xml:space="preserve" bytes="2453">Wikibooks uses the [[MediaWiki]] software, which was developed for [[w:|Wikipedia]]. As such, it's not strictly intended for use in writing textbooks. Here is a technical wish list for Wikibooks to help with some of these shortcomings:
+
+#&quot;Search this book&quot; feature being a special page, not a link to a google search
+#Per-book stylesheets (although we could just as easily do that in javascript, it might be nice to have the javascript added to the core MW distribution)
+#Book organizational meta-pages. A page where you could specify the layout for a book, and it would then generate an automatic TOC, and automatic forward/backward links, etc. [[b:User:Darklama|darklama]] can probably explain this idea better then [[b:User:Whiteknight|I]] can
+#List of books. Like the special page [[Special:Allpages]], but would only list the main page of a book, not all pages.
+#A read-only Wikijunior domain (already registered) - a read only storage location for all stable book versions, which could be updated from Wikibooks when necessary
+#The GNU Lilypond extension, for music and other types of displays (we've asked many times, and never got them because of technical reasons
+#PDF generator (currently hosted on the toolserver, but needs much work) [http://lists.wikimedia.org/pipermail/textbook-l/2007-December/001217.html][http://lists.wikimedia.org/pipermail/textbook-l/2007-November/001178.html][http://lists.wikimedia.org/pipermail/textbook-l/2007-September/001144.html]
+#An automatic TOC-generator tool. Several people have asked how to create new pages; this would help with that by providing a TOC of redlinks for them to work on, and would also foster greater organization of new books right from the get-go.
+#Search by book is a must-have!
+#A list of all top-level pages in the mainspace would be great, especially if it can be done dynamically (as opposed to periodically sorting through the database or something).
+#Watching pages in bundles (ie per-book watchlists) [[bugzilla:12308]]
+
+----
+By priority:
+#Search by book (should be easy to do)
+#List of top-level pages in the mainspace (ie books) (should be easy to do)
+#per-book styles (most important thing to do requiring some work)
+#''Good'' PDF (and/or print version) generation (requires lots of work, and is probably difficult to do properly)
+#TOC generator-thing (should be easy to do, but we can function just fine without it)
+#Read-only (needs lots of discussion before anything else)</text>
+    </revision>
+    <revision>
+      <id>845609</id>
+      <timestamp>2008-01-22T02:57:03Z</timestamp>
+      <contributor>
+        <username>Mike.lifeguard</username>
+        <id>49164</id>
+      </contributor>
+      <minor/>
+      <comment>rm dupe</comment>
+      <text xml:space="preserve" bytes="2421">Wikibooks uses the [[MediaWiki]] software, which was developed for [[w:|Wikipedia]]. As such, it's not strictly intended for use in writing textbooks. Here is a technical wish list for Wikibooks to help with some of these shortcomings:
+
+#&quot;Search this book&quot; feature being a special page, not a link to a google search
+#Per-book stylesheets (although we could just as easily do that in javascript, it might be nice to have the javascript added to the core MW distribution)
+#Book organizational meta-pages. A page where you could specify the layout for a book, and it would then generate an automatic TOC, and automatic forward/backward links, etc. [[b:User:Darklama|darklama]] can probably explain this idea better then [[b:User:Whiteknight|I]] can
+#List of books. Like the special page [[Special:Allpages]], but would only list the main page of a book, not all pages.
+#A read-only Wikijunior domain (already registered) - a read only storage location for all stable book versions, which could be updated from Wikibooks when necessary
+#The GNU Lilypond extension, for music and other types of displays (we've asked many times, and never got them because of technical reasons
+#PDF generator (currently hosted on the toolserver, but needs much work) [http://lists.wikimedia.org/pipermail/textbook-l/2007-December/001217.html][http://lists.wikimedia.org/pipermail/textbook-l/2007-November/001178.html][http://lists.wikimedia.org/pipermail/textbook-l/2007-September/001144.html]
+#An automatic TOC-generator tool. Several people have asked how to create new pages; this would help with that by providing a TOC of redlinks for them to work on, and would also foster greater organization of new books right from the get-go.
+#A list of all top-level pages in the mainspace would be great, especially if it can be done dynamically (as opposed to periodically sorting through the database or something).
+#Watching pages in bundles (ie per-book watchlists) [[bugzilla:12308]]
+
+----
+By priority:
+#Search by book (should be easy to do)
+#List of top-level pages in the mainspace (ie books) (should be easy to do)
+#per-book styles (most important thing to do requiring some work)
+#''Good'' PDF (and/or print version) generation (requires lots of work, and is probably difficult to do properly)
+#TOC generator-thing (should be easy to do, but we can function just fine without it)
+#Read-only (needs lots of discussion before anything else)</text>
+    </revision>
+    <revision>
+      <id>845610</id>
+      <timestamp>2008-01-22T02:58:19Z</timestamp>
+      <contributor>
+        <username>Mike.lifeguard</username>
+        <id>49164</id>
+      </contributor>
+      <minor/>
+      <comment>re-order by priority</comment>
+      <text xml:space="preserve" bytes="2446">Wikibooks uses the [[MediaWiki]] software, which was developed for [[w:|Wikipedia]]. As such, it's not strictly intended for use in writing textbooks. Here is a technical wish list for Wikibooks to help with some of these shortcomings:
+
+#&quot;Search this book&quot; feature being a special page, not a link to a google search
+#Per-book stylesheets (although we could just as easily do that in javascript, it might be nice to have the javascript added to the core MW distribution)
+#Book organizational meta-pages. A page where you could specify the layout for a book, and it would then generate an automatic TOC, and automatic forward/backward links, etc. [[b:User:Darklama|darklama]] can probably explain this idea better then [[b:User:Whiteknight|I]] can
+#List of books. Like the special page [[Special:Allpages]], but would only list the main page of a book, not all pages.
+#A read-only Wikijunior domain (already registered) - a read only storage location for all stable book versions, which could be updated from Wikibooks when necessary
+#The GNU Lilypond extension, for music and other types of displays (we've asked many times, and never got them because of technical reasons
+#PDF generator (currently hosted on the toolserver, but needs much work) [http://lists.wikimedia.org/pipermail/textbook-l/2007-December/001217.html][http://lists.wikimedia.org/pipermail/textbook-l/2007-November/001178.html][http://lists.wikimedia.org/pipermail/textbook-l/2007-September/001144.html]
+#An automatic TOC-generator tool. Several people have asked how to create new pages; this would help with that by providing a TOC of redlinks for them to work on, and would also foster greater organization of new books right from the get-go.
+#A list of all top-level pages in the mainspace would be great, especially if it can be done dynamically (as opposed to periodically sorting through the database or something).
+#Watching pages in bundles (ie per-book watchlists) [[bugzilla:12308]]
+
+----
+By priority:
+#Search by book (should be easy to do)
+#''Good'' PDF (and/or print version) generation (requires lots of work, and is probably difficult to do properly)
+#List of top-level pages in the mainspace (ie books) (should be easy to do)
+#TOC generator-thing (should be easy to do, but we can function just fine without it)
+#per-book styles (most important thing to do requiring some work)
+#Read-only or other quality control (needs lots of discussion before anything else)</text>
+    </revision>
+    <revision>
+      <id>852444</id>
+      <timestamp>2008-01-26T23:34:24Z</timestamp>
+      <contributor>
+        <username>Mike.lifeguard</username>
+        <id>49164</id>
+      </contributor>
+      <minor/>
+      <comment>wf</comment>
+      <text xml:space="preserve" bytes="2462">[[b:Wikibooks|Wikibooks]] uses the [[MediaWiki]] software, which was developed for [[w:|Wikipedia]]. As such, it's not strictly intended for use in writing textbooks. Here is a technical wish list for Wikibooks to help with some of these shortcomings:
+
+#&quot;Search this book&quot; feature being a special page, not a link to a google search
+#Per-book stylesheets (although we could just as easily do that in javascript, it might be nice to have the javascript added to the core MW distribution)
+#Book organizational meta-pages. A page where you could specify the layout for a book, and it would then generate an automatic TOC, and automatic forward/backward links, etc. [[b:User:Darklama|darklama]] can probably explain this idea better then [[b:User:Whiteknight|I]] can
+#List of books. Like the special page [[Special:Allpages]], but would only list the main page of a book, not all pages.
+#A read-only Wikijunior domain (already registered) - a read only storage location for all stable book versions, which could be updated from Wikibooks when necessary
+#The GNU Lilypond extension, for music and other types of displays (we've asked many times, and never got them because of technical reasons
+#PDF generator (currently hosted on the toolserver, but needs much work) [http://lists.wikimedia.org/pipermail/textbook-l/2007-December/001217.html][http://lists.wikimedia.org/pipermail/textbook-l/2007-November/001178.html][http://lists.wikimedia.org/pipermail/textbook-l/2007-September/001144.html]
+#An automatic TOC-generator tool. Several people have asked how to create new pages; this would help with that by providing a TOC of redlinks for them to work on, and would also foster greater organization of new books right from the get-go.
+#A list of all top-level pages in the mainspace would be great, especially if it can be done dynamically (as opposed to periodically sorting through the database or something).
+#Watching pages in bundles (ie per-book watchlists) [[bugzilla:12308]]
+
+----
+By priority:
+#Search by book (should be easy to do)
+#''Good'' PDF (and/or print version) generation (requires lots of work, and is probably difficult to do properly)
+#List of top-level pages in the mainspace (ie books) (should be easy to do)
+#TOC generator-thing (should be easy to do, but we can function just fine without it)
+#per-book styles (most important thing to do requiring some work)
+#Read-only or other quality control (needs lots of discussion before anything else)</text>
+    </revision>
+    <revision>
+      <id>852445</id>
+      <timestamp>2008-01-26T23:36:26Z</timestamp>
+      <contributor>
+        <username>Mike.lifeguard</username>
+        <id>49164</id>
+      </contributor>
+      <minor/>
+      <comment>rm dupe</comment>
+      <text xml:space="preserve" bytes="2285">[[b:Wikibooks|Wikibooks]] uses the [[MediaWiki]] software, which was developed for [[w:|Wikipedia]]. As such, it's not strictly intended for use in writing textbooks. Here is a technical wish list for Wikibooks to help with some of these shortcomings:
+
+#&quot;Search this book&quot; feature being a special page, not a link to a google search
+#Per-book stylesheets (although we could just as easily do that in javascript, it might be nice to have the javascript added to the core MW distribution)
+#Book organizational meta-pages. A page where you could specify the layout for a book, and it would then generate an automatic TOC, and automatic forward/backward links, etc. [[b:User:Darklama|darklama]] can probably explain this idea better then [[b:User:Whiteknight|I]] can
+#List of books. Like the special page [[Special:Allpages]], but would only list the main page of a book, not all pages.
+#A read-only Wikijunior domain (already registered) - a read only storage location for all stable book versions, which could be updated from Wikibooks when necessary
+#The GNU Lilypond extension, for music and other types of displays (we've asked many times, and never got them because of technical reasons
+#PDF generator (currently hosted on the toolserver, but needs much work) [http://lists.wikimedia.org/pipermail/textbook-l/2007-December/001217.html][http://lists.wikimedia.org/pipermail/textbook-l/2007-November/001178.html][http://lists.wikimedia.org/pipermail/textbook-l/2007-September/001144.html]
+#An automatic TOC-generator tool. Several people have asked how to create new pages; this would help with that by providing a TOC of redlinks for them to work on, and would also foster greater organization of new books right from the get-go.
+#Watching pages in bundles (ie per-book watchlists) [[bugzilla:12308]]
+
+----
+By priority:
+#Search by book (should be easy to do)
+#''Good'' PDF (and/or print version) generation (requires lots of work, and is probably difficult to do properly)
+#List of top-level pages in the mainspace (ie books) (should be easy to do)
+#TOC generator-thing (should be easy to do, but we can function just fine without it)
+#per-book styles (most important thing to do requiring some work)
+#Read-only or other quality control (needs lots of discussion before anything else)</text>
+    </revision>
+    <revision>
+      <id>904566</id>
+      <timestamp>2008-03-06T00:49:33Z</timestamp>
+      <contributor>
+        <username>Mike.lifeguard</username>
+        <id>49164</id>
+      </contributor>
+      <minor/>
+      <comment>+3 extensions</comment>
+      <text xml:space="preserve" bytes="2390">[[b:Wikibooks|Wikibooks]] uses the [[MediaWiki]] software, which was developed for [[w:|Wikipedia]]. As such, it's not strictly intended for use in writing textbooks. Here is a technical wish list for Wikibooks to help with some of these shortcomings:
+
+#&quot;Search this book&quot; feature being a special page, not a link to a google search
+#Per-book stylesheets (although we could just as easily do that in javascript, it might be nice to have the javascript added to the core MW distribution)
+#Book organizational meta-pages. A page where you could specify the layout for a book, and it would then generate an automatic TOC, and automatic forward/backward links, etc. [[b:User:Darklama|darklama]] can probably explain this idea better then [[b:User:Whiteknight|I]] can
+#List of books. Like the special page [[Special:Allpages]], but would only list the main page of a book, not all pages.
+#A read-only Wikijunior domain (already registered) - a read only storage location for all stable book versions, which could be updated from Wikibooks when necessary
+#The GNU Lilypond extension, for music and other types of displays (we've asked many times, and never got them because of technical reasons
+#PDF generator (currently hosted on the toolserver, but needs much work) [http://lists.wikimedia.org/pipermail/textbook-l/2007-December/001217.html][http://lists.wikimedia.org/pipermail/textbook-l/2007-November/001178.html][http://lists.wikimedia.org/pipermail/textbook-l/2007-September/001144.html]
+#:See also [[mw:Extension:Pdf Book]], [[mw:Extension:Pdf Export]] and [[mw:Extension:Pdf Export Dompdf]]
+#An automatic TOC-generator tool. Several people have asked how to create new pages; this would help with that by providing a TOC of redlinks for them to work on, and would also foster greater organization of new books right from the get-go.
+#Watching pages in bundles (ie per-book watchlists) [[bugzilla:12308]]
+
+----
+By priority:
+#Search by book (should be easy to do)
+#''Good'' PDF (and/or print version) generation (requires lots of work, and is probably difficult to do properly)
+#List of top-level pages in the mainspace (ie books) (should be easy to do)
+#TOC generator-thing (should be easy to do, but we can function just fine without it)
+#per-book styles (most important thing to do requiring some work)
+#Read-only or other quality control (needs lots of discussion before anything else)</text>
+    </revision>
+    <revision>
+      <id>904567</id>
+      <timestamp>2008-03-06T00:49:48Z</timestamp>
+      <contributor>
+        <username>Mike.lifeguard</username>
+        <id>49164</id>
+      </contributor>
+      <minor/>
+      <comment>)</comment>
+      <text xml:space="preserve" bytes="2391">[[b:Wikibooks|Wikibooks]] uses the [[MediaWiki]] software, which was developed for [[w:|Wikipedia]]. As such, it's not strictly intended for use in writing textbooks. Here is a technical wish list for Wikibooks to help with some of these shortcomings:
+
+#&quot;Search this book&quot; feature being a special page, not a link to a google search
+#Per-book stylesheets (although we could just as easily do that in javascript, it might be nice to have the javascript added to the core MW distribution)
+#Book organizational meta-pages. A page where you could specify the layout for a book, and it would then generate an automatic TOC, and automatic forward/backward links, etc. [[b:User:Darklama|darklama]] can probably explain this idea better then [[b:User:Whiteknight|I]] can
+#List of books. Like the special page [[Special:Allpages]], but would only list the main page of a book, not all pages.
+#A read-only Wikijunior domain (already registered) - a read only storage location for all stable book versions, which could be updated from Wikibooks when necessary
+#The GNU Lilypond extension, for music and other types of displays (we've asked many times, and never got them because of technical reasons)
+#PDF generator (currently hosted on the toolserver, but needs much work) [http://lists.wikimedia.org/pipermail/textbook-l/2007-December/001217.html][http://lists.wikimedia.org/pipermail/textbook-l/2007-November/001178.html][http://lists.wikimedia.org/pipermail/textbook-l/2007-September/001144.html]
+#:See also [[mw:Extension:Pdf Book]], [[mw:Extension:Pdf Export]] and [[mw:Extension:Pdf Export Dompdf]]
+#An automatic TOC-generator tool. Several people have asked how to create new pages; this would help with that by providing a TOC of redlinks for them to work on, and would also foster greater organization of new books right from the get-go.
+#Watching pages in bundles (ie per-book watchlists) [[bugzilla:12308]]
+
+----
+By priority:
+#Search by book (should be easy to do)
+#''Good'' PDF (and/or print version) generation (requires lots of work, and is probably difficult to do properly)
+#List of top-level pages in the mainspace (ie books) (should be easy to do)
+#TOC generator-thing (should be easy to do, but we can function just fine without it)
+#per-book styles (most important thing to do requiring some work)
+#Read-only or other quality control (needs lots of discussion before anything else)</text>
+    </revision>
+    <revision>
+      <id>904570</id>
+      <timestamp>2008-03-06T00:51:12Z</timestamp>
+      <contributor>
+        <username>Mike.lifeguard</username>
+        <id>49164</id>
+      </contributor>
+      <minor/>
+      <text xml:space="preserve" bytes="2432">[[b:Wikibooks|Wikibooks]] uses the [[MediaWiki]] software, which was developed for [[w:|Wikipedia]]. As such, it's not strictly intended for use in writing textbooks. Here is a technical wish list for Wikibooks to help with some of these shortcomings:
+
+#&quot;Search this book&quot; feature being a special page, not a link to a google search
+#Per-book stylesheets (although we could just as easily do that in javascript, it might be nice to have the javascript added to the core MW distribution)
+#Book organizational meta-pages. A page where you could specify the layout for a book, and it would then generate an automatic TOC, and automatic forward/backward links, etc. [[b:User:Darklama|darklama]] can probably explain this idea better then [[b:User:Whiteknight|I]] can
+#List of books. Like the special page [[Special:Allpages]], but would only list the main page of a book, not all pages.
+#A read-only Wikijunior domain (already registered) - a read only storage location for all stable book versions, which could be updated from Wikibooks when necessary
+#The GNU Lilypond extension, for music and other types of displays (we've asked many times, and never got them because of technical reasons)
+#PDF generator (currently hosted on the toolserver, but needs much work) [http://lists.wikimedia.org/pipermail/textbook-l/2007-December/001217.html][http://lists.wikimedia.org/pipermail/textbook-l/2007-November/001178.html][http://lists.wikimedia.org/pipermail/textbook-l/2007-September/001144.html]
+#:See also [[mw:Extension:Pdf Book]], [[mw:Extension:Pdf Export]] and [[mw:Extension:Pdf Export Dompdf]]
+#An automatic TOC-generator tool. Several people have asked how to create new pages; this would help with that by providing a TOC of redlinks for them to work on, and would also foster greater organization of new books right from the get-go.
+#Watching pages in bundles (ie per-book watchlists) [[bugzilla:12308]], [[bugzilla:2308]] and [[bugzilla:1710]]
+
+----
+By priority:
+#Search by book (should be easy to do)
+#''Good'' PDF (and/or print version) generation (requires lots of work, and is probably difficult to do properly)
+#List of top-level pages in the mainspace (ie books) (should be easy to do)
+#TOC generator-thing (should be easy to do, but we can function just fine without it)
+#per-book styles (most important thing to do requiring some work)
+#Read-only or other quality control (needs lots of discussion before anything else)</text>
+    </revision>
+    <revision>
+      <id>1124393</id>
+      <timestamp>2008-08-08T17:13:52Z</timestamp>
+      <contributor>
+        <username>Mike.lifeguard</username>
+        <id>49164</id>
+      </contributor>
+      <minor/>
+      <comment>+PDF is live on en.labs</comment>
+      <text xml:space="preserve" bytes="2530">[[b:Wikibooks|Wikibooks]] uses the [[MediaWiki]] software, which was developed for [[w:|Wikipedia]]. As such, it's not strictly intended for use in writing textbooks. Here is a technical wish list for Wikibooks to help with some of these shortcomings:
+
+#&quot;Search this book&quot; feature being a special page, not a link to a google search
+#Per-book stylesheets (although we could just as easily do that in javascript, it might be nice to have the javascript added to the core MW distribution)
+#Book organizational meta-pages. A page where you could specify the layout for a book, and it would then generate an automatic TOC, and automatic forward/backward links, etc. [[b:User:Darklama|darklama]] can probably explain this idea better then [[b:User:Whiteknight|I]] can
+#List of books. Like the special page [[Special:Allpages]], but would only list the main page of a book, not all pages.
+#A read-only Wikijunior domain (already registered) - a read only storage location for all stable book versions, which could be updated from Wikibooks when necessary
+#The GNU Lilypond extension, for music and other types of displays (we've asked many times, and never got them because of technical reasons)
+#PDF generator (currently hosted on the toolserver, but needs much work) [http://lists.wikimedia.org/pipermail/textbook-l/2007-December/001217.html]
+[http://lists.wikimedia.org/pipermail/textbook-l/2007-November/001178.html Nov 07]
+[http://lists.wikimedia.org/pipermail/textbook-l/2007-September/001144.html Sept 07]
+[http://lists.wikimedia.org/pipermail/textbook-l/2008-August/001299.html Aug 08]
+#:See also [[mw:Extension:Pdf Book]], [[mw:Extension:Pdf Export]] and [[mw:Extension:Pdf Export Dompdf]]
+#An automatic TOC-generator tool. Several people have asked how to create new pages; this would help with that by providing a TOC of redlinks for them to work on, and would also foster greater organization of new books right from the get-go.
+#Watching pages in bundles (ie per-book watchlists) [[bugzilla:12308]], [[bugzilla:2308]] and [[bugzilla:1710]]
+
+----
+By priority:
+#Search by book (should be easy to do)
+#''Good'' PDF (and/or print version) generation (requires lots of work, and is probably difficult to do properly)
+#List of top-level pages in the mainspace (ie books) (should be easy to do)
+#TOC generator-thing (should be easy to do, but we can function just fine without it)
+#per-book styles (most important thing to do requiring some work)
+#Read-only or other quality control (needs lots of discussion before anything else)</text>
+    </revision>
+    <revision>
+      <id>1124394</id>
+      <timestamp>2008-08-08T17:14:19Z</timestamp>
+      <contributor>
+        <username>Mike.lifeguard</username>
+        <id>49164</id>
+      </contributor>
+      <minor/>
+      <text xml:space="preserve" bytes="2537">[[b:Wikibooks|Wikibooks]] uses the [[MediaWiki]] software, which was developed for [[w:|Wikipedia]]. As such, it's not strictly intended for use in writing textbooks. Here is a technical wish list for Wikibooks to help with some of these shortcomings:
+
+#&quot;Search this book&quot; feature being a special page, not a link to a google search
+#Per-book stylesheets (although we could just as easily do that in javascript, it might be nice to have the javascript added to the core MW distribution)
+#Book organizational meta-pages. A page where you could specify the layout for a book, and it would then generate an automatic TOC, and automatic forward/backward links, etc. [[b:User:Darklama|darklama]] can probably explain this idea better then [[b:User:Whiteknight|I]] can
+#List of books. Like the special page [[Special:Allpages]], but would only list the main page of a book, not all pages.
+#A read-only Wikijunior domain (already registered) - a read only storage location for all stable book versions, which could be updated from Wikibooks when necessary
+#The GNU Lilypond extension, for music and other types of displays (we've asked many times, and never got them because of technical reasons)
+#PDF generator (currently hosted on the toolserver, but needs much work)
+[http://lists.wikimedia.org/pipermail/textbook-l/2008-August/001299.html Aug 08]
+[http://lists.wikimedia.org/pipermail/textbook-l/2007-December/001217.html Dec 07]
+[http://lists.wikimedia.org/pipermail/textbook-l/2007-November/001178.html Nov 07]
+[http://lists.wikimedia.org/pipermail/textbook-l/2007-September/001144.html Sept 07]
+#:See also [[mw:Extension:Pdf Book]], [[mw:Extension:Pdf Export]] and [[mw:Extension:Pdf Export Dompdf]]
+#An automatic TOC-generator tool. Several people have asked how to create new pages; this would help with that by providing a TOC of redlinks for them to work on, and would also foster greater organization of new books right from the get-go.
+#Watching pages in bundles (ie per-book watchlists) [[bugzilla:12308]], [[bugzilla:2308]] and [[bugzilla:1710]]
+
+----
+By priority:
+#Search by book (should be easy to do)
+#''Good'' PDF (and/or print version) generation (requires lots of work, and is probably difficult to do properly)
+#List of top-level pages in the mainspace (ie books) (should be easy to do)
+#TOC generator-thing (should be easy to do, but we can function just fine without it)
+#per-book styles (most important thing to do requiring some work)
+#Read-only or other quality control (needs lots of discussion before anything else)</text>
+    </revision>
+  </page>
+</mediawiki>

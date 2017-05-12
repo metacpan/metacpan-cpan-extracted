@@ -1,0 +1,130 @@
+
+# PODNAME: Map::Metro::Plugin::Map::Lille::Lines
+# ABSTRACT: Lines and stations in the Lille map
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Map::Metro::Plugin::Map::Lille::Lines - Lines and stations in the Lille map
+
+=head1 VERSION
+
+Version 0.1002, released 2015-05-09.
+
+=head1 LINES
+
+=head2 Line 1: CHR B-Calmette → Quatre Cantons - Stade Pierre-Mauroy [M1]
+
+=for HTML <div style="background-color: #ffcd09; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    CHR B-Calmette
+    CHR Oscar-Lambret
+    Porte des Postes                          (M2)
+    Wazemmes
+    Gambetta
+    République - Beaux-Arts
+    Rihour
+    Gare Lille-Flandres                       (M2)
+    Caulier
+    Fives
+    Marbrerie
+    Hellemmes
+    Lezennes
+    Pont de Bois
+    Villeneuve-d'Ascq - Hôtel de Ville
+    Triolo
+    Cité scientifique - Professeur Gabillard
+    Quatre Cantons - Stade Pierre-Mauroy
+
+=head2 Line 2: CH Dron → Saint-Philibert [M2]
+
+=for HTML <div style="background-color: #e43417; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
+
+    CH Dron
+    Bourgogne
+    Pont de Neuville
+    Phalempins
+    Colbert
+    Tourcoing - Centre
+    Tourcoing - Sébastopol
+    Carliers
+    Mercure
+    Alsace
+    Gare - Jean-Lebas
+    Roubaix - Grand-Place
+    Eurotéléport
+    Roubaix - Charles-de-Gaulle
+    Épeule - Montesquieu
+    Croix - Mairie
+    Croix - Centre
+    Wasquehal - Hôtel de ville
+    Wasquehal - Pavé de Lille
+    Jean-Jaurès
+    Les Prés
+    Fort de Mons
+    Mairie de Mons
+    Mons Sarts
+    Saint-Maurice Pellevoisin
+    Gare Lille-Europe
+    Gare Lille-Flandres          (M1)
+    Mairie de Lille
+    Lille Grand Palais
+    Porte de Valenciennes
+    Porte de Douai
+    Porte d'Arras
+    Porte des Postes             (M1)
+    Montebello
+    Cormontaigne
+    Port de Lille
+    Bois Blancs
+    Canteleu
+    Lomme - Lambersart
+    Pont Supérieur
+    Mitterie
+    Maison des Enfants
+    Bourg
+    Saint-Philibert
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Map::Metro::Plugin::Map::Lille>
+
+=item *
+
+L<Task::MapMetro::Maps>
+
+=item *
+
+L<Map::Metro>
+
+=back
+
+=head1 SOURCE
+
+L<https://github.com/Csson/p5-Map-Metro-Lille>
+
+=head1 HOMEPAGE
+
+L<https://metacpan.org/release/Map-Metro-Plugin-Map-Lille>
+
+=head1 AUTHOR
+
+Erik Carlsson <info@code301.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Erik Carlsson <info@code301.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

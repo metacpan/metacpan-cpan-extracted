@@ -1,0 +1,58 @@
+
+[PBML]_Digest_Number_1.txt
+     1. How to    $printHeader = \&$fext::printHeader;
+          From: "Allan Davis" <allan_davis@some.web.address.com>
+     2. One way to:   $printHeader = \&$fext::printHeader;
+          From: "Allan Davis" <allan_davis@some.web.address.com>
+     3. Re: One way to:   $printHeader = \&$fext::printHeader;
+          From: Jeff Piatigorski <japhy@some.web.address.com>
+     4. Re: One way to:   $printHeader = \&$fext::printHeader;
+          From: "Allan Davis" <allan_davis@some.web.address.com>
+     5. Returning 2 file handles?
+          From: "membruce" <membruce@some.web.address.com>
+     6. Re: One way to:   $printHeader = \&$fext::printHeader;
+          From: Jeff Piatigorski <japhy@some.web.address.com>
+     7. Re: Returning 2 file handles?
+          From: Jeff Piatigorski <japhy@some.web.address.com>
+     8. Re: Returning 2 file handles?
+          From: "chcst53" <charley@some.web.address.com>
+     9. grep over multiple lines
+          From: "Tom George Samson" <tomgeorgesamson@some.web.address.com>
+    10. Re: grep over multiple lines
+          From: "chcst53" <charley@some.web.address.com>
+    11. Re: grep over multiple lines
+          From: "Tom George Samson" <tomgeorgesamson@some.web.address.com>
+
+[PBML]_Digest_Number_2.txt
+     1. newbie -> pattern matching
+          From: "David" <tech_david@some.web.address.com>
+     2. AW: newbie -> pattern matching
+          From: "Lance Gunther, CH" <Gunther.Lance@some.web.address.com>
+     3. Re: newbie -> pattern matching
+          From: "adagio1977" <adagio1977@some.web.address.com>
+     4. Re: Returning 2 file handles?
+          From: "bruce" <bruce@some.web.address.com>
+     5. HOW TO DO This...
+          From: "fd809" <fd809@some.web.address.com>
+     6. Re: HOW TO DO This...
+          From: Thomas Sweden <Thomas.Sweden@some.web.address.com>
+     7. how to get the current working directory
+          From: "fd809" <fd809@some.web.address.com>
+     8. Re: HOW TO DO This...
+          From: "Derwood Davis" <dustin@some.web.address.com>
+
+[PBML]_Digest_Number_3.txt
+      1. Re: how to get the current working directory
+           From: dallysome@some.web.address.com
+      2. Re: Returning 2 file handles?
+           From: dallysome@some.web.address.com
+      3. Young and inexperienced
+           From: "cravn_thebig_d_now" <cravn_thebig_d_now@some.web.address.com>
+      4. Re: HOW TO DO This...
+           From: merlyn@some.web.address.com
+      5. Re: Young and inexperienced
+           From: Mike Simpson <gb1198@some.web.address.com>
+      6. Re: Young and inexperienced
+           From: "Alan" <nitedmn@some.web.address.com>
+      7. Re: Returning 2 file handles?
+           From: "bruce" <bruce@earthlink.net>

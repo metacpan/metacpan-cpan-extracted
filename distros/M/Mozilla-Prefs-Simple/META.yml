@@ -1,0 +1,26 @@
+---
+name: Mozilla-Prefs-Simple
+version: 0.01
+author:
+  - 'Robert Rothenberg <rrwo at cpan.org>'
+abstract: Manipulate Mozilla preferences
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  File::Copy: 0
+  IO::File: 0
+  Regexp::Common: 0
+  Tie::Hash::Sorted: 0.1
+  perl: 5.006
+build_requires:
+  Test::More: 0
+provides:
+  Mozilla::Prefs::Simple:
+    file: lib/Mozilla/Prefs/Simple.pm
+    version: 0.01
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

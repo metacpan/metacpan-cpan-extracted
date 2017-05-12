@@ -1,0 +1,145 @@
+--- SubCountry.pm.orig	Thu Jul 25 21:11:09 2002
++++ SubCountry.pm	Thu Jul 25 22:33:41 2002
+@@ -10,7 +10,8 @@
+    print($UK_counties->full_name('DUMGAL'));  # Dumfries & Galloway
+ 
+    $country = 'AUSTRALIA';
+-   @all_countries = &all_country_names;
++   @all_countries = &all_country_names;                # list context
++
+    if ( grep(/$country/, @all_countries) )
+    {
+       $australia = new Locale::SubCountry($country);
+@@ -20,6 +21,12 @@
+       die "No data for $country";
+    }
+ 
++   $hash_keyed_by_country_names = &all_country_names;  # scalar context
++   if ( exists $hash_keyed_by_country_names->{$country} )
++   {
++      $australia = new Locale::SubCountry($country);
++   }
++
+    print($australia->code('New South Wales ')); # NSW
+    print($australia->full_name('S.A.'));        # South Australia
+ 
+@@ -29,7 +36,8 @@
+    print $australia->country_code;     # AU
+    print $australia->sub_country_type; # State
+ 
+-   @all_country_codes = &all_country_codes;
++   @all_country_codes = &all_country_codes;            # list context
++   $hash_keyed_by_country_codes = &all_country_codes;  # scalar context
+ 
+    %all_australian_states = $australia->full_name_code_hash;
+    foreach $abbrev ( sort keys %australian_states )
+@@ -43,6 +51,7 @@
+    @all_australian_codes = $australia->all_codes;
+ 
+ 
++
+ =head1 REQUIRES
+ 
+ Perl 5.005 or above
+@@ -283,14 +292,19 @@
+ 
+ =head2 full_name_code_hash
+ 
+-Returns a hash of name/code pairs for the currently assigned country,
++If called in list context returns a hash of name/code pairs for the currently assigned country,
+ keyed by sub country name.
+ 
++If called in scalar context returns a reference a anonymous hash of
++the same description.  Do not modify the contents of this hash!
++
+ =head2 code_full_name_hash
+ 
+-Returns a hash of code/name pairs for the currently assigned country,
+-keyed by sub country code.
++If called in list context returns a hash of code/name pairs for the
++currently assigned country, keyed by sub country code.
+ 
++If called in scalar context returns a reference a anonymous hash of
++the same description.  Do not modify the contents of this hash!
+ 
+ =head2 all_full_names
+ 
+@@ -304,18 +318,25 @@
+ 
+ =head2 all_country_names
+ 
+-Returns an array of all country names that this module can do lookups for,
+-sorted alphabetically. This is implemented as a conventional subroutine rather
+-than a method. This allows us to check if lookups can be done for a given country
+-before actually creating the lookup object.
++If called in list context returns an array of all country names that this
++module can do lookups for, sorted alphabetically. This is implemented as a
++conventional subroutine rather than a method. This allows us to check if
++lookups can be done for a given country before actually creating the lookup
++object.
++
++If called in scalar context returns a reference to a hash of country
++name/code key/value pairs.  Do not modify the contents of this hash!
+ 
+ =head2 all_country_codes
+ 
+-Returns an array of all country 2 letter codes that this module can do lookups for,
+-sorted alphabetically. This is implemented as a conventional subroutine rather
+-than a method. This allows us to check if lookups can be done for a given country
+-code before actually creating the lookup object.
++If called in list context returns an array of all country 2 letter codes
++that this module can do lookups for, sorted alphabetically. This is
++implemented as a conventional subroutine rather than a method. This allows
++us to check if lookups can be done for a given country code before actually
++creating the lookup object.
+ 
++If called in scalar context returns a reference to a hash of country
++code/name key/value pairs.  Do not modify the contents of this hash!
+ 
+ =head1 SEE ALSO
+ 
+@@ -623,13 +644,19 @@
+ sub code_full_name_hash
+ {
+     my $sub_country = shift;
+-    return( %{ $::subcountry_lookup{$sub_country->{country}}{code_keyed} } );
++    return( wantarray
++	    ? %{ $::subcountry_lookup{$sub_country->{country}}{code_keyed} }
++	    : $::subcountry_lookup{$sub_country->{country}}{code_keyed}
++	  );
+ }
+ #-------------------------------------------------------------------------------
+ sub full_name_code_hash
+ {
+     my $sub_country = shift;
+-    return( %{ $::subcountry_lookup{$sub_country->{country}}{full_name_keyed} } );
++    return( wantarray
++	    ? %{$::subcountry_lookup{$sub_country->{country}}{full_name_keyed}}
++	    : $::subcountry_lookup{$sub_country->{country}}{full_name_keyed}
++	  );
+ }
+ #-------------------------------------------------------------------------------
+ # Returns sorted array of all sub country full names for the current country
+@@ -654,14 +681,20 @@
+ 
+ sub all_country_names
+ {
+-    return ( sort keys %{ $::country_lookup{full_name_keyed} });
++    return ( wantarray
++	     ? sort keys %{ $::country_lookup{full_name_keyed} }
++	     : $::country_lookup{full_name_keyed}
++	   );
+ }
+ #-------------------------------------------------------------------------------
+ # Returns sorted array of all two letter country codes that we can do lookups for
+ 
+ sub all_country_codes
+ {
+-    return ( sort keys %{ $::country_lookup{code_keyed} });
++    return ( wantarray
++	     ? sort keys %{ $::country_lookup{code_keyed} }
++	     : $::country_lookup{code_keyed}
++	   );
+ }
+ 
+ #-------------------------------------------------------------------------------

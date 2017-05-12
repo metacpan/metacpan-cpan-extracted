@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:                Metadata-DB
+version:             1.15
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Cwd:                           0
+    DBD::mysql:                    0
+    DBD::SQLite:                   0
+    File::Copy:                    2
+    HTML::Entities:                0
+    HTML::Template::Default:       1.04
+    LEOCHARRE::Class2:             1.03
+    LEOCHARRE::Database:           1
+    LEOCHARRE::DEBUG:              0
+    Metadata::Base:                0
+    Smart::Comments:               0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

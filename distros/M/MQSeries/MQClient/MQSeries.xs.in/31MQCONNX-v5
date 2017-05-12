@@ -1,0 +1,353 @@
+# -*-c-*-
+#
+# $Id: 31MQCONNX-v5,v 36.3 2012/09/26 16:10:02 jettisu Exp $
+#
+# (c) 1999-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+#ifdef MQCNO_NONE
+
+MQHCONN
+MQCONNX(Name,ConnectOpts,CompCode,Reason)
+        MQCHAR48 Name
+        MQCNO    ConnectOpts
+        MQLONG   CompCode = NO_INIT
+        MQLONG   Reason = NO_INIT
+
+    PREINIT:
+#ifdef MQCNO_VERSION_2
+        MQCD ClientConnOpts  = { MQCD_CLIENT_CONN_DEFAULT };
+#endif
+#ifdef MQCNO_VERSION_4
+        MQSCO SSLConfigOpts  = { MQSCO_DEFAULT };
+#endif
+#ifdef MQCNO_VERSION_5
+        MQCSP SecurityParms = { MQCSP_DEFAULT };
+#endif
+    CODE:
+#ifdef MQCNO_VERSION_2
+        /*
+           If the ClientConn hash entry is present in the ConnectOpts,
+           we need to build an MQCD data structure manually
+           and refer to it from the MQCON data structure.
+        */
+        if (hv_exists((HV*)SvRV(ST(1)),"ClientConn",10)) {
+            SV     **cvp, **elem;
+            HV      *options;
+            size_t   FieldSize;
+            STRLEN   StringLength;
+            char    *String;
+
+          /* warn("Using ClientConn options to set MQCD"); */
+          ConnectOpts.ClientConnOffset = 0;
+          ConnectOpts.ClientConnPtr = &ClientConnOpts;
+          if (ConnectOpts.Version < MQCNO_VERSION_2)
+              ConnectOpts.Version = MQCNO_VERSION_2; /* But see below */
+          cvp = hv_fetch((HV*)SvRV(ST(1)),"ClientConn",10, FALSE);
+          if ( !SvROK(*cvp) || ( SvROK(*cvp) &&
+                                 SvTYPE(SvRV(*cvp)) != SVt_PVHV ) ) {
+              warn("Invalid data for ClientConn, not a HASH reference\n");
+              XSRETURN_EMPTY;
+          }
+          options = (HV*)SvRV(*cvp);
+
+          /* ChannelName */
+          elem = hv_fetch(options, "ChannelName", 11, FALSE);
+          if (elem) {
+              FieldSize = sizeof(ClientConnOpts.ChannelName);
+              String = SvPV(*elem, StringLength);
+              strncpy(ClientConnOpts.ChannelName,
+                      String,
+                      StringLength > FieldSize ? FieldSize : StringLength);
+          }
+
+          /* Version */
+          elem = hv_fetch(options, "Version", 7, FALSE);
+          if (elem) {
+              ClientConnOpts.Version = SvIV(*elem);
+          }
+
+          /* TransportType */
+          /* We support the string "TCP", or any numerical constant */
+          elem = hv_fetch(options, "TransportType", 13, FALSE);
+          if (elem) {
+              String = SvPV(*elem, StringLength);
+              if (StringLength && ! strcmp(String, "TCP")) {
+                  ClientConnOpts.TransportType = MQXPT_TCP;
+              } else {            /* Fall back on numerical code */
+                  ClientConnOpts.TransportType = SvIV(*elem);
+              }
+          }
+
+          /* ModeName */
+          elem = hv_fetch(options, "ModeName", 8, FALSE);
+          if (elem) {
+              FieldSize = sizeof(ClientConnOpts.ModeName);
+              String = SvPV(*elem, StringLength);
+              strncpy(ClientConnOpts.ModeName,
+                      String,
+                      StringLength > FieldSize ? FieldSize : StringLength);
+          }
+
+          /* TpName */
+          elem = hv_fetch(options, "TpName", 6, FALSE);
+          if (elem) {
+              FieldSize = sizeof(ClientConnOpts.TpName);
+              String = SvPV(*elem, StringLength);
+              strncpy(ClientConnOpts.TpName,
+                      String,
+                      StringLength > FieldSize ? FieldSize : StringLength);
+          }
+
+          /* SecurityExit */
+          elem = hv_fetch(options, "SecurityExit", 12, FALSE);
+          if (elem) {
+              FieldSize = sizeof(ClientConnOpts.SecurityExit);
+              String = SvPV(*elem, StringLength);
+              strncpy(ClientConnOpts.SecurityExit,
+                      String,
+                      StringLength > FieldSize ? FieldSize : StringLength);
+          }
+
+          /* SendExit */
+          elem = hv_fetch(options, "SendExit", 8, FALSE);
+          if (elem) {
+              FieldSize = sizeof(ClientConnOpts.SendExit);
+              String = SvPV(*elem, StringLength);
+              strncpy(ClientConnOpts.SendExit,
+                      String,
+                      StringLength > FieldSize ? FieldSize : StringLength);
+          }
+
+          /* ReceiveExit */
+          elem = hv_fetch(options, "ReceiveExit", 11, FALSE);
+          if (elem) {
+              FieldSize = sizeof(ClientConnOpts.ReceiveExit);
+              String = SvPV(*elem, StringLength);
+              strncpy(ClientConnOpts.ReceiveExit,
+                      String,
+                      StringLength > FieldSize ? FieldSize : StringLength);
+          }
+
+          /* MaxMsgLength */
+          elem = hv_fetch(options, "MaxMsgLength", 12, FALSE);
+          if (elem) {
+              ClientConnOpts.MaxMsgLength = SvIV(*elem);
+          }
+
+          /* SecurityUserData */
+          elem = hv_fetch(options, "SecurityUserData", 16, FALSE);
+          if (elem) {
+              FieldSize = sizeof(ClientConnOpts.SecurityUserData);
+              String = SvPV(*elem, StringLength);
+              strncpy(ClientConnOpts.SecurityUserData,
+                      String,
+                      StringLength > FieldSize ? FieldSize : StringLength);
+          }
+
+          /* SendUserData */
+          elem = hv_fetch(options, "SendUserData", 12, FALSE);
+          if (elem) {
+              FieldSize = sizeof(ClientConnOpts.SendUserData);
+              String = SvPV(*elem, StringLength);
+              strncpy(ClientConnOpts.SendUserData,
+                      String,
+                      StringLength > FieldSize ? FieldSize : StringLength);
+          }
+
+          /* ReceiveUserData */
+          elem = hv_fetch(options, "ReceiveUserData", 15, FALSE);
+          if (elem) {
+              FieldSize = sizeof(ClientConnOpts.ReceiveUserData);
+              String = SvPV(*elem, StringLength);
+              strncpy(ClientConnOpts.ReceiveUserData,
+                      String,
+                      StringLength > FieldSize ? FieldSize : StringLength);
+          }
+
+          /* UserIdentifier */
+          elem = hv_fetch(options, "UserIdentifier", 14, FALSE);
+          if (elem) {
+              FieldSize = sizeof(ClientConnOpts.UserIdentifier);
+              String = SvPV(*elem, StringLength);
+              strncpy(ClientConnOpts.UserIdentifier,
+                      String,
+                      StringLength > FieldSize ? FieldSize : StringLength);
+          }
+
+          /* Password */
+          elem = hv_fetch(options, "Password", 8, FALSE);
+          if (elem) {
+              FieldSize = sizeof(ClientConnOpts.Password);
+              String = SvPV(*elem, StringLength);
+              strncpy(ClientConnOpts.Password,
+                      String,
+                      StringLength > FieldSize ? FieldSize : StringLength);
+          }
+
+          /* ConnectionName */
+          elem = hv_fetch(options, "ConnectionName", 14, FALSE);
+          if (elem) {
+              FieldSize = sizeof(ClientConnOpts.ConnectionName);
+              String = SvPV(*elem, StringLength);
+              strncpy(ClientConnOpts.ConnectionName,
+                      String,
+                      StringLength > FieldSize ? FieldSize : StringLength);
+          }
+
+          /* HeartbeatInterval */
+          elem = hv_fetch(options, "HeartbeatInterval", 17, FALSE);
+          if (elem) {
+              ClientConnOpts.HeartbeatInterval = SvIV(*elem);
+          }
+#endif /* MQCNO_VERSION_2 */
+#ifdef MQCNO_VERSION_4 /* Includes MQCNO_VERSION_2 */
+          /* Version 4 (WMQ 5.3) options: SSLCipherSpec and
+           * KeepAliveInterval. (Contributed by Brian Bumpass)
+           */
+          /* SSLCipherSpec */
+          elem = hv_fetch(options, "SSLCipherSpec", 13, FALSE);
+          if (elem) {
+              if (ConnectOpts.Version < MQCNO_VERSION_4)
+                  ConnectOpts.Version = MQCNO_VERSION_4;
+              REQUIREATLEAST(ClientConnOpts.Version, MQCD_VERSION_7);
+              FieldSize = sizeof(ClientConnOpts.SSLCipherSpec);
+              String = SvPV(*elem, StringLength);
+              strncpy(ClientConnOpts.SSLCipherSpec,
+                      String,
+                      StringLength > FieldSize ? FieldSize : StringLength);
+          }
+
+          /* SSLPeerName */
+          elem = hv_fetch(options, "SSLPeerName", 11, FALSE);
+          if (elem) {
+              STRLEN PeerLength;
+              char *peername = SvPV(*elem, PeerLength);
+              ClientConnOpts.SSLPeerNamePtr = peername;
+              ClientConnOpts.SSLPeerNameLength = strlen(peername);
+          }
+
+          /* KeepAliveInterval */
+          elem = hv_fetch(options, "KeepAliveInterval", 17, FALSE);
+          if (elem) {
+              ConnectOpts.Version = MQCNO_VERSION_4;
+              ClientConnOpts.KeepAliveInterval = SvIV(*elem);
+          }
+#endif /* MQCNO_VERSION_4 */
+#ifdef MQCNO_VERSION_2
+        } else {
+            /* warn("ClientConn options not present"); */
+        }
+#endif /* MQCNO_VERSION_2 */
+#ifdef MQCNO_VERSION_4
+        /*
+           SSLConfig represents the hash entry for ConnectOpts
+           (Contributed by Brian Bumpass)
+        */
+        if (hv_exists((HV*)SvRV(ST(1)),"SSLConfig",9)) {
+            SV     **cvp, **elem;
+            HV      *options;
+            size_t   FieldSize;
+            STRLEN   StringLength;
+            char    *String;
+
+            /* warn("Using SSLConfig options to set MQSCO"); */
+            ConnectOpts.SSLConfigOffset = 0;
+            ConnectOpts.SSLConfigPtr = &SSLConfigOpts;
+            if (ConnectOpts.Version < MQCNO_VERSION_4)
+                ConnectOpts.Version = MQCNO_VERSION_4;
+            cvp = hv_fetch((HV*)SvRV(ST(1)),"SSLConfig",9, FALSE);
+            if ( !SvROK(*cvp) || ( SvROK(*cvp) &&
+                                   SvTYPE(SvRV(*cvp)) != SVt_PVHV ) ) {
+                warn("Invalid data for SSLConfig, not a HASH reference\n");
+                XSRETURN_EMPTY;
+            }
+            options = (HV*)SvRV(*cvp);
+
+            /* Version */
+            elem = hv_fetch(options, "Version", 7, FALSE);
+            if (elem) {
+                SSLConfigOpts.Version = SvIV(*elem);
+            }
+
+            /* KeyRepository */
+            elem = hv_fetch(options, "KeyRepository", 13, FALSE);
+            if (elem) {
+                FieldSize = sizeof(SSLConfigOpts.KeyRepository);
+                String = SvPV(*elem, StringLength);
+                strncpy(SSLConfigOpts.KeyRepository,
+                        String,
+                        StringLength > FieldSize ? FieldSize : StringLength);
+            }
+        } else {
+            /* warn("SSLConfig options not present"); */
+        }
+#endif /* MQCNO_VERSION_4 */
+#ifdef MQCNO_VERSION_5
+        /*
+         * SecurityParms represents the hash entry for ConnectOpts
+         * (Contributed by Duke Nguyen)
+        */
+        if (hv_exists((HV*)SvRV(ST(1)), "SecurityParms", 13)) {
+            SV     **cvp, **elem;
+            HV      *options;
+            STRLEN   UserLength;
+            STRLEN   PassLength;
+            char    *user;
+            char    *pass;
+
+            /* warn("Using SecurityParms options to set MQCSP"); */
+            ConnectOpts.SecurityParmsOffset = 0;
+            ConnectOpts.SecurityParmsPtr = &SecurityParms;
+            if (ConnectOpts.Version < MQCNO_VERSION_5)
+                ConnectOpts.Version = MQCNO_VERSION_5;
+            cvp = hv_fetch((HV*)SvRV(ST(1)),"SecurityParms", 13, FALSE);
+            if ( !SvROK(*cvp) || ( SvROK(*cvp) &&
+                                   SvTYPE(SvRV(*cvp)) != SVt_PVHV ) ) {
+                warn("Invalid data for SecurityParms, not a HASH reference\n");
+                XSRETURN_EMPTY;
+            }
+            options = (HV*)SvRV(*cvp);
+
+            /* Version */
+            elem = hv_fetch(options, "Version", 7, FALSE);
+            if (elem) {
+                SecurityParms.Version = SvIV(*elem);
+            }
+
+            /* AuthenticationType */
+            elem = hv_fetch(options, "AuthenticationType", 18, FALSE);
+            if (elem) {
+                SecurityParms.AuthenticationType = SvIV(*elem);
+            }
+
+            /* CSPUserId */
+            elem = hv_fetch(options, "CSPUserId", 9, FALSE);
+            if (elem) {
+                user = SvPV(*elem, UserLength);
+                SecurityParms.CSPUserIdPtr = user;
+                SecurityParms.CSPUserIdOffset = 0;
+                SecurityParms.CSPUserIdLength = strlen(user);
+            }
+            /* CSPPassword */
+            elem = hv_fetch(options, "CSPPassword", 11, FALSE);
+            if (elem) {
+                pass = SvPV(*elem, PassLength);
+                SecurityParms.CSPPasswordPtr = pass;
+                SecurityParms.CSPPasswordOffset = 0;
+                SecurityParms.CSPPasswordLength = strlen(pass);
+            }
+        } else {
+            /* warn("SecurityParms options not present"); */
+        }
+#endif /* MQCNO_VERSION_5 */
+        MQCONNX(Name,&ConnectOpts,&RETVAL,&CompCode,&Reason);
+    OUTPUT:
+        ConnectOpts
+        RETVAL
+        CompCode
+        Reason
+
+#endif /* MQCNO_NONE */
+

@@ -1,0 +1,100 @@
+#!/usr/bin/perl
+#
+# This file is part of Module-Packaged-Generator
+#
+# This software is copyright (c) 2010 by Jerome Quelin.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+
+use 5.010;
+use strict;
+use warnings;
+
+package pkgcpan;
+BEGIN {
+  $pkgcpan::VERSION = '1.111930';
+}
+# ABSTRACT: create db of available Perl modules
+
+# terse error messages
+$ENV{MOOSE_ERROR_STYLE} = "croak";
+
+use File::Spec::Functions qw{ catdir updir };
+use Getopt::Long::Descriptive;
+use Moose;
+
+# for dev purposes
+use FindBin qw{ $Bin };
+use lib catdir( $Bin, updir, 'lib' );
+
+use Module::Packaged::Generator;
+
+with 'Module::Packaged::Generator::Role::Logging';
+
+
+# -- main program
+
+# parse command-line options
+my ($opt, $usage) = describe_options(
+    '%c %o',
+    [ 'file|f=s'   => "path to the database file"       ],
+    [ 'driver|d=s' => "force driver to use"             ],
+    [],
+    [ 'quiet|q'    => "don't print anything but errors" ],
+    [ 'verbose|v'  => "print debug messages"            ],
+    [ 'help|h'     => "print usage message and exit"    ],
+);
+print($usage->text), exit if $opt->help;
+
+# update logger behaviour
+my $self = pkgcpan->new;
+$self->set_debug( $opt->verbose );
+$self->set_muted( $opt->quiet );
+
+# run the whole show
+my %param;
+$param{ file }       = $opt->file   if $opt->file;
+$param{ drivername } = $opt->driver if $opt->driver;
+Module::Packaged::Generator->new(\%param)->run;
+
+exit;
+
+
+=pod
+
+=head1 NAME
+
+pkgcpan - create db of available Perl modules
+
+=head1 VERSION
+
+version 1.111930
+
+=head1 SYNOPSIS
+
+    $ pkgcpan [options]
+    $ pkgcpan --help
+
+=head1 DESCRIPTION
+
+This script will create and populate a sqlite database with the
+available Perl modules for your distribution.
+
+=head1 AUTHOR
+
+Jerome Quelin
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Jerome Quelin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+
+__END__
+

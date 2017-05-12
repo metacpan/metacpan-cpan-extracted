@@ -1,0 +1,12 @@
+on pppConnect (address = nil, userName = nil, password = nil, guestAccess = nil, terminalWindow = nil, connectScript = nil, quietMode = nil) { ÇInitiates a PPP connection
+	return (appleEvent (@PPP Commands.code.AEVTnetwRAco, 'netw', 'RAco', 'RAad', string (address), 'RAun', string (userName), 'RApw', string (password), 'RAgu', boolean (guestAccess), 'RAcw', boolean (terminalWindow), 'RAcs', alias (connectScript), 'RAci', boolean (quietMode)))}
+	
+on pppDisconnect () { ÇCloses a PPP connection
+	return (appleEvent (@PPP Commands.code.AEVTnetwRAdc, 'netw', 'RAdc'))}
+
+on pppSaveLog (pppSaveLogTo, clearingEntries = nil, appending = nil) { ÇSaves the PPP log to a disk file
+	return (appleEvent (@PPP Commands.code.AEVTnetwRAsl, 'netw', 'RAsl', 'RAlf', filespec (pppSaveLogTo), 'RAlc', boolean (clearingEntries), 'RAla', boolean (appending)))}
+
+on pppStatus () { ÇRetrieves the status of a PPP connection
+	return (appleEvent (@PPP Commands.code.AEVTnetwRAst, 'netw', 'RAst'))}
+	

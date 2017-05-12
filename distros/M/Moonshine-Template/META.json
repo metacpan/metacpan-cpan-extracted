@@ -1,0 +1,59 @@
+{
+   "abstract" : "Template some more html.",
+   "author" : [
+      "Robert Acock <thisusedtobeanemail@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Moonshine-Template",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Hash::Merge" : "0.200",
+            "Moonshine::Element" : "0.11",
+            "Ref::Util" : "0.101",
+            "UNIVERSAL::Object" : "0.04",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Moonshine::Template" : {
+         "file" : "lib/Moonshine/Template.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/Moonshine-Template.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/Moonshine-Template"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

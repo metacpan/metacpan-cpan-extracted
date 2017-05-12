@@ -1,0 +1,15 @@
+This module is depreciated.  Please use Digest::MD5 instead.
+
+This module (MD5.pm) is just a thin wrapper around the Digest::MD5
+module.  It is provided so that legacy code that rely on the old
+interface continue to work with the speed benefit of the new module.
+
+You will need perl version 5.004 or better to install this module.
+The Digest::MD5 module must be installed.
+
+Copyright 1998-2001 Gisle Aas.
+Copyright 1995-1996 Neil Winton.
+Copyright 1990-1992 RSA Data Security, Inc.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

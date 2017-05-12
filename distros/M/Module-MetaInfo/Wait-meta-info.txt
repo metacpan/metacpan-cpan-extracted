@@ -1,0 +1,47 @@
+Wait gets its meta information from each individual module.  It also
+uses the information which goes to build the modules list.  It
+directly reads from the POD documentation.  When we try to map this
+onto module distribution files, we can mostly read from the "Main"
+module of the distribution.  That is to say the one which has a name
+matching the distribution file's name.
+
+This would give the following
+
+'synopsis' - summary 
+
+'name' - ignored - the package name is needed
+
+'bugs', - hmm
+
+'author', - this can help map to the author but it tends to be verbose
+	  where the author field in most package formats is a single 
+	  URL (normally mailto)
+
+'example', - not relevant
+
+'description' - description
+
+'environment' - not relevant.  
+
+IMHO it seems that the most valuable is the description.  The best
+source for other information is the modules list, however, this is
+(deliberately) incomplete becuase it doesn't include the
+non-registered modules.  
+
+From the modules list we can map
+
+id - author
+
+description - summary
+
+deveopment stage - i..M not implemented but interesting
+		 S - probably should not be packaged separately from perl
+
+support level - not implemented but interesting - though maybe any
+	binary package comes with a fixed level of support from the 
+	packager??? 
+
+
+
+
+

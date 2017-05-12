@@ -1,0 +1,83 @@
+{
+   "abstract" : "Mouse type constraints for Data::Monad",
+   "author" : [
+      "aereal <aereal@aereal.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MouseX-Types-Data-Monad",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Monad" : "0",
+            "Mouse" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Devel::Cover" : "0",
+            "Devel::Cover::Report::Coveralls" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "MouseX::Types::Data::Monad" : {
+         "file" : "lib/MouseX/Types/Data/Monad.pm",
+         "version" : "0.01"
+      },
+      "MouseX::Types::Data::Monad::Either" : {
+         "file" : "lib/MouseX/Types/Data/Monad/Either.pm"
+      },
+      "MouseX::Types::Data::Monad::Maybe" : {
+         "file" : "lib/MouseX/Types/Data/Monad/Maybe.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aereal/MouseX-Types-Data-Monad/issues"
+      },
+      "homepage" : "https://github.com/aereal/MouseX-Types-Data-Monad",
+      "repository" : {
+         "url" : "git://github.com/aereal/MouseX-Types-Data-Monad.git",
+         "web" : "https://github.com/aereal/MouseX-Types-Data-Monad"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:AEREAL"
+}

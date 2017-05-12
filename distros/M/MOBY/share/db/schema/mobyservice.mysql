@@ -1,0 +1,33 @@
+-- MySQL dump 8.23
+--
+-- Host: localhost    Database: mobyservice
+---------------------------------------------------------
+-- Server version	4.1.12-standard
+
+--
+-- Table structure for table `service`
+--
+
+CREATE TABLE service (
+  service_id int(10) unsigned NOT NULL auto_increment,
+  service_lsid varchar(255) NOT NULL default '',
+  service_type varchar(255) NOT NULL default '',
+  description text NOT NULL,
+  authority varchar(255) NOT NULL default '',
+  contact_email varchar(255) NOT NULL default '',
+  PRIMARY KEY  (service_id),
+  UNIQUE KEY service_type (service_type)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `service_term2term`
+--
+
+CREATE TABLE service_term2term (
+  assertion_id int(10) unsigned NOT NULL auto_increment,
+  relationship_type varchar(255) NOT NULL default '',
+  service1_id int(11) NOT NULL default '0',
+  service2_id int(11) NOT NULL default '0',
+  PRIMARY KEY  (assertion_id)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+

@@ -1,0 +1,35 @@
+Mobile::UserAgent
+=================
+
+Description
+-----------
+Parses a mobile user agent string into it's basic constituent parts, the
+most important being vendor and model.
+
+One reason for doing this would be to use this information to lookup
+vendor-model specific device characteristics in a database. You can use also
+use user agent profiles to do this (for which I've developed other classes),
+but not all mobile phones have these, especially the older types.
+Another reason would be to detect if the visiting client is a mobile handset.
+
+Only real mobile user-agent strings can be parsed succesfully by this class.
+Most WAP emulators are not supported because they usually don't use the same
+user-agent strings as the devices they emulate.
+
+Copyright
+---------
+Copyright (C) 2005 Craig Manley. All rights reserved.
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. There is NO warranty; not even for
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Installation
+------------
+perl Makefile.PL
+make
+make install
+perldoc Mobile::UserAgent
+
+Author
+------
+Craig Manley

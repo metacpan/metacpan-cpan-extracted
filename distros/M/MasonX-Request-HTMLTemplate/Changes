@@ -1,0 +1,56 @@
+Revision history for Perl extension MasonX::Request::HTMLTemplate
+
+00.06  (2006-07-02)
+===================
+- Removed some calling to internal Mason methods in favour to public Mason 
+  methods
+
+00.05  (2003-09-07)
+===================
+- Add method template_arg to HTMLTemplate.pm to read a template arg
+  previously added with add_template_args method.
+00.04  (2003-08-04)
+===================
+- Fix a bug in WithApacheSession that cause problems when using session.
+- Add LICENSE to distribution.
+
+00.03  (2003-08-02)
+===================
+- Added many examples in documentation. Moreover it has been fixed in some 
+  points.
+
+- MasonX::Request::WithApacheSession is not required anymore to use this module.
+  Removed from required modules.
+
+- Fixed a bug in items method that it tried to use session also if there was no
+  session module available.
+
+- Test file was wrong. Created now tests for HTMLTemplate and 
+  WithApacheSession
+
+- Created manual for WithApacheSession
+
+- Completed separation of code between HTMLTemplate and WithApacheSession. Now
+  all code, necessary in order to use session variables, is placed in 
+  WithApacheSession.
+
+- Use of module "base" instead of directly use of @ISA.
+  
+
+00.02  (2003-07-30)
+===================
+- Added more examples and synopsis to pod files.
+
+- MasonX::Request::HTMLTemplate now inherits only HTML::Mason::ApacheHandler,
+  HTML::Mason::Request, HTML::Mason::CGIHandler. To use sessions and 
+  have an object that inherits from MasonX::Request::WithApacheSession
+  use the new module MasonX::Request::HTMLTemplate::WithApacheSession.
+
+- template_base_path and default_language initialize parameters
+  are now optional. The default value for the first is 'undef' that is
+  template_base_path it coincides with Mason component root directory.
+  The default value for the other is 'en'.
+
+00.01  (2003-07-29)
+===================
+- original version

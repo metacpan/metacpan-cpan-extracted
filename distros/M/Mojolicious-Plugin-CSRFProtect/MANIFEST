@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README.pod
+lib/Mojolicious/Plugin/CSRFProtect.pm
+t/basic.t
+t/on_error_cb.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

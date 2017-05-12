@@ -1,0 +1,595 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix nfo:   <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>
+	a                    foaf:Organization;
+	foaf:name            "Infinity Interactive, Inc".
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008"^^doap-deps:CpanId ], [
+		doap-deps:on "Class::XSAccessor 1.09"^^doap-deps:CpanId;
+	], [ doap-deps:on "Moose 2.0600"^^doap-deps:CpanId ];
+	doap-deps:runtime-suggestion [
+		doap-deps:on "MooseX::Attribute::Chained"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "MooseX::LvalueAttribute"^^doap-deps:CpanId;
+	];
+	doap-deps:test-recommendation [
+		doap-deps:on "MooseX::Attribute::Chained"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "MooseX::LvalueAttribute"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [
+		doap-deps:on "Import::Into 1.001000"^^doap-deps:CpanId;
+	], [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ], [ doap-deps:on "Test::Moose"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-XSAccessor>;
+	doap:created         "2013-06-13"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/MooseX-XSAccessor>;
+	doap:homepage        <https://metacpan.org/release/MooseX-XSAccessor>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "MooseX-XSAccessor";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-008>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-moosex-xsaccessor>;
+	];
+	doap:shortdesc       "use Class::XSAccessor to speed up Moose accessors".
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-000_01>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Developer release";
+	dc:identifier        "MooseX-XSAccessor-0.000_01"^^xsd:string;
+	dc:issued            "2013-06-14"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-XSAccessor-0.000_01.tar.gz>;
+	doap:revision        "0.000_01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-000_02>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "MooseX-XSAccessor-0.000_02"^^xsd:string;
+	dc:issued            "2013-06-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "MooseX::XSAccessor::is_xs function.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Better test cases.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Better documentation.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Work around some edge cases.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-XSAccessor-0.000_02.tar.gz>;
+	doap:revision        "0.000_02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Stable release";
+	dc:identifier        "MooseX-XSAccessor-0.001"^^xsd:string;
+	dc:issued            "2013-06-14"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-XSAccessor-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string;
+	rdfs:comment         "No functional changes since 0.000_02.".
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "MooseX-XSAccessor-0.002"^^xsd:string;
+	dc:issued            "2013-06-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Refactor overridden install_accessors into an 'after' method modifier, with the hope that this makes MooseX::XSAccessor play nicer with other MooseX modules.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Support slightly older versions of Class::XSAccessor (back to 1.09).";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Don't use Class::XSAccessor 1.16 and below to generate predicate methods, because their behaviour differs observably from Moose. If you want XS predicates, you'll need Class::XSAccessor 1.17 (which is not on CPAN yet).";
+			rdfs:seeAlso <http://purl.org/NET/cpan-uri/rt/ticket/86127>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-XSAccessor-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "MooseX-XSAccessor-0.003"^^xsd:string;
+	dc:issued            "2013-06-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Document the circumstances under which predicates and clearers can be acceleated (respectively: if Class::XSAccessor is new enough, and never).";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Since 0.002 we shouldn't need to skip test `t/moose_default_undef.t` anymore.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-XSAccessor-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "MooseX-XSAccessor-0.004"^^xsd:string;
+	dc:issued            "2013-06-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Integration with MooseX::Attribute::Chained.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/ilmari>;
+			rdfs:comment "This was ILMARI's idea.";
+		], [
+			rdfs:label "Improved `is_xs` implementation.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/flora>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-XSAccessor-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "MooseX-XSAccessor-0.005"^^xsd:string;
+	dc:issued            "2013-08-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Integration with MooseX::LvalueAttribute.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-XSAccessor-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "MooseX-XSAccessor-0.006"^^xsd:string;
+	dc:issued            "2013-10-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Avoid triggering silly deprecation warnings from MooseX::Attribute::Chained.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Pull latest attribute tests from Moose; the old versions of these test cases broke with Moose 2.11xx.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-XSAccessor-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "MooseX-XSAccessor-0.007"^^xsd:string;
+	dc:issued            "2013-10-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Skip the new version of moose_bad_coerce.t if Moose version is too old.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-XSAccessor-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "MooseX-XSAccessor-0.008"^^xsd:string;
+	dc:issued            "2017-05-01"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Update tests for more recent Moose versions.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-XSAccessor-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/flora>
+	a                    foaf:Person;
+	foaf:name            "Florian Ragwitz";
+	foaf:nick            "FLORA";
+	foaf:page            <https://metacpan.org/author/FLORA>.
+
+<http://purl.org/NET/cpan-uri/person/ilmari>
+	a                    foaf:Person;
+	foaf:name            "Dagfinn Ilmari Mannsåker";
+	foaf:nick            "ILMARI";
+	foaf:page            <https://metacpan.org/author/ILMARI>.
+
+<http://purl.org/NET/cpan-uri/person/ingy>
+	a                    foaf:Person;
+	foaf:name            "Ingy döt Net";
+	foaf:nick            "INGY";
+	foaf:page            <https://metacpan.org/author/INGY>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/86127>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "86127"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=86127>.
+
+[]
+	a                    nfo:FileDataObject;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "CONTRIBUTING".
+
+[]
+	a                    nfo:FileDataObject;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "CREDITS".
+
+[]
+	a                    nfo:FileDataObject;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "meta/makefile.pret".
+
+[]
+	a                    nfo:FileDataObject;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "meta/people.pret".
+
+[]
+	a                    nfo:FileDataObject;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "meta/rights.pret".
+
+[]
+	a                    nfo:FileDataObject;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/ingy>;
+	nfo:fileName         "MANIFEST.SKIP".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "t/lib/MyMoose.pm";
+	nfo:programmingLanguage "Perl";
+	rdfs:comment         "Shim for loading Moose and MooseX::XSAccessor simultaneously.".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "t/lib/MyMoose/Role.pm";
+	nfo:programmingLanguage "Perl";
+	rdfs:comment         "Shim for loading Moose::Role and MooseX::XSAccessor simultaneously.".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_accessor_context.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_accessor_inlining.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_accessor_override_method.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_accessor_overwrite_warning.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:TextDocument;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "Changes".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_attr_dereference_test.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_attribute_accessor_generation.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_attribute_custom_metaclass.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_attribute_delegation.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_attribute_does.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_attribute_inherited_slot_specs.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_attribute_lazy_initializer.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_attribute_names.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_attribute_reader_generation.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_attribute_required.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:TextDocument;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "LICENSE".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_attribute_traits_n_meta.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_attribute_traits_parameterized.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_attribute_traits_registered.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_attribute_traits.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_attribute_triggers.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_attribute_type_unions.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_attribute_without_any_methods.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_attribute_writer_generation.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_bad_coerce.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_chained_coercion.t".
+
+[]
+	a                    nfo:FileDataObject;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "doap.ttl".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_clone_weak.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_default_class_role_types.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_default_undef.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_delegation_and_modifiers.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_delegation_arg_aliasing.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_delegation_target_not_loaded.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_illegal_options_for_inheritance.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_inherit_lazy_build.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_lazy_no_default.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_method_generation_rules.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "Makefile.PL";
+	nfo:programmingLanguage "Perl".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_misc_attribute_coerce_lazy.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_misc_attribute_tests.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_more_attr_delegation.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_no_init_arg.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_non_alpha_attr_names.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_no_slot_access.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_numeric_defaults.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <file:///home/tai/src/p5/p5-moosex-xsaccessor/meta/rights.pret#infinity>;
+	nfo:fileName         "t/moose_trigger_and_coerce.t".
+
+[]
+	a                    nfo:FileDataObject, nfo:TextDocument;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "README".
+
+[]
+	a                    nfo:FileDataObject, nfo:SourceCode;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "examples/bench.pl";
+	nfo:programmingLanguage "Perl".
+
+[]
+	a                    nfo:FileDataObject;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "meta/changes.pret".
+
+[]
+	a                    nfo:FileDataObject;
+	dc:license           <http://dev.perl.org/licenses/>;
+	dc:rightsHolder      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	nfo:fileName         "meta/doap.pret".
+

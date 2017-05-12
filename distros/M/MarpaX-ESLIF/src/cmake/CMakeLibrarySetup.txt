@@ -1,0 +1,264 @@
+OPTION(ALL_IN_ONE "Compile non-system wide dependencies locally" OFF)
+
+IF (ALL_IN_ONE)
+  INCLUDE (BuildDependency)
+ENDIF ()
+
+#############################
+# Dependencies
+#############################
+EXECUTE_PROCESS(COMMAND "${CMAKE_COMMAND}" -E make_directory "${3RDPARTY_OUTPUT_PATH}")
+
+# -----------------------------------
+# genericLogger: required
+# -----------------------------------
+IF (ALL_IN_ONE)
+  IF (NOT GENERICLOGGER_ROOT_DIR)
+    SET (GENERICLOGGER_ROOT_DIR "${3RDPARTY_OUTPUT_PATH}/genericLogger-remote/install")
+    #
+    # All-in-one mode means static linking
+    #
+    BuildDependency(
+      "genericLogger-remote"
+      "${PROJECT_SOURCE_DIR}/3rdparty/github/genericLogger-remote"
+      "${3RDPARTY_OUTPUT_PATH}/genericLogger-remote"
+      "install"
+      FALSE
+      )
+  ENDIF ()
+  SET(ENV{GENERICLOGGER_ROOT_DIR} "${GENERICLOGGER_ROOT_DIR}")
+ENDIF ()
+FIND_PACKAGE (genericLogger)
+IF (NOT GENERICLOGGER_FOUND)
+  MESSAGE (FATAL_ERROR "genericLogger must be detected")
+ENDIF ()
+
+# -----------------------------------
+# genericStack: required
+# -----------------------------------
+IF (ALL_IN_ONE)
+  IF (NOT GENERICSTACK_ROOT_DIR)
+    SET (GENERICSTACK_ROOT_DIR "${3RDPARTY_OUTPUT_PATH}/genericStack-remote/install")
+    #
+    # All-in-one mode means static linking
+    #
+    BuildDependency(
+      "genericStack-remote"
+      "${PROJECT_SOURCE_DIR}/3rdparty/github/genericStack-remote"
+      "${3RDPARTY_OUTPUT_PATH}/genericStack-remote"
+      "install"
+      FALSE
+      )
+  ENDIF ()
+  SET(ENV{GENERICSTACK_ROOT_DIR} "${GENERICSTACK_ROOT_DIR}")
+ENDIF ()
+FIND_PACKAGE (genericStack)
+IF (NOT GENERICSTACK_FOUND)
+    MESSAGE (STATUS "genericStack must be detected")
+ENDIF ()
+
+# -----------------------------------
+# marpaWrapper: required
+# -----------------------------------
+IF (ALL_IN_ONE)
+  IF (NOT MARPAWRAPPER_ROOT_DIR)
+    SET (MARPAWRAPPER_ROOT_DIR "${3RDPARTY_OUTPUT_PATH}/marpaWrapper-remote/install")
+    #
+    # All-in-one mode means static linking
+    #
+    BuildDependency(
+      "marpaWrapper-remote"
+      "${PROJECT_SOURCE_DIR}/3rdparty/github/marpaWrapper-remote"
+      "${3RDPARTY_OUTPUT_PATH}/marpaWrapper-remote"
+      "install"
+      TRUE
+      )
+  ENDIF ()
+  SET(ENV{MARPAWRAPPER_ROOT_DIR} "${MARPAWRAPPER_ROOT_DIR}")
+ENDIF ()
+FIND_PACKAGE (marpaWrapper)
+IF (NOT MARPAWRAPPER_FOUND)
+    MESSAGE (STATUS "marpaWrapper must be detected")
+ENDIF ()
+
+# -----------------------------------
+# tconv: required
+# -----------------------------------
+IF (ALL_IN_ONE)
+  IF (NOT TCONV_ROOT_DIR)
+    SET (TCONV_ROOT_DIR "${3RDPARTY_OUTPUT_PATH}/tconv-remote/install")
+    #
+    # All-in-one mode means static linking
+    #
+    BuildDependency(
+      "tconv-remote"
+      "${PROJECT_SOURCE_DIR}/3rdparty/github/tconv-remote"
+      "${3RDPARTY_OUTPUT_PATH}/tconv-remote"
+      "install"
+      TRUE
+      )
+  ENDIF ()
+  SET(ENV{TCONV_ROOT_DIR} "${TCONV_ROOT_DIR}")
+ENDIF ()
+FIND_PACKAGE (tconv)
+IF (NOT TCONV_FOUND)
+    MESSAGE (STATUS "tconv must be detected")
+ENDIF ()
+
+# -----------------------------------
+# iconv: for static linking
+# -----------------------------------
+FIND_PACKAGE (Iconv)
+
+# -----------------------------------
+# ICU: for static linking
+# -----------------------------------
+FIND_PACKAGE (ICU)
+
+# -----------------------------------
+# PCRE2: found or built-in
+# -----------------------------------
+FIND_PACKAGE (PCRE2)
+IF (NOT PCRE2_FOUND)
+    EXECUTE_PROCESS(
+      COMMAND "${CMAKE_COMMAND}" -E tar xzf "${PROJECT_SOURCE_DIR}/3rdparty/tar/pcre2-10.22.tar.gz"
+      WORKING_DIRECTORY "${3RDPARTY_OUTPUT_PATH}"
+      )
+    INCLUDE(cmake/BuildPCRE2.cmake)
+ENDIF (NOT PCRE2_FOUND)
+
+MESSAGE (STATUS "")
+MESSAGE (STATUS "Configuration Setup:")
+MESSAGE (STATUS "--------------------")
+
+# --------------------------------------
+# config.h (we will share it with marpa)
+# --------------------------------------
+INCLUDE (FindInline)
+
+# ----------------------------------------------------
+# Host compiler - based on https://github.com/legatoproject/legato-af/blob/master/3rdParty/jansson-2.6/CMakeLists.txt
+# ----------------------------------------------------
+INCLUDE(CheckIncludeFile)
+# Make sure we have HAVE for the headers used by CheckTypeSize as per documentation
+CHECK_INCLUDE_FILE("sys/types.h"  HAVE_SYS_TYPES_H)
+CHECK_INCLUDE_FILE("stdint.h"     HAVE_STDINT_H)
+CHECK_INCLUDE_FILE("stddef.h"     HAVE_STDDEF_H)
+ 
+INCLUDE (CheckTypeSize)
+CHECK_TYPE_SIZE (uint32_t UINT32_T)
+CHECK_TYPE_SIZE (__uint32 __UINT32)
+CHECK_TYPE_SIZE ("unsigned long" UNSIGNED_LONG_INT)
+CHECK_TYPE_SIZE ("unsigned int" UNSIGNED_INT)
+IF (HAVE_UINT32_T)
+   MESSAGE (STATUS "  Unsigned 32-bit integer type is uint32_t")
+   SET (MARPSESLIF_UINT32_T uint32_t)
+ELSEIF (HAVE___UINT32)
+   MESSAGE (STATUS "  Unsigned 32-bit integer type is __uint32")
+   SET (MARPSESLIF_UINT32 __uint32)
+ELSEIF (HAVE_UNSIGNED_LONG_INT AND (${UNSIGNED_LONG_INT} EQUAL 4))
+   MESSAGE (STATUS "  Unsigned 32-bit integer type is unsigned long")
+   SET (MARPSESLIF_UINT32 "unsigned long")
+ELSEIF (HAVE_UNSIGNED_INT AND (${UNSIGNED_INT} EQUAL 4))
+   MESSAGE (STATUS "  Unsigned 32-bit integer type is unsigned int")
+   SET (MARPSESLIF_UINT32 "unsigned int")
+ELSE ()
+   MESSAGE (FATAL_ERROR "Could not detect a valid unsigned 32-bit integer type")
+ENDIF ()
+
+# ----------------------------------------------------
+# Configuration
+# ----------------------------------------------------
+SET (CONFIG_H ${CMAKE_CURRENT_SOURCE_DIR}/include/marpaESLIF/internal/config.h)
+SET (CONFIG_H_IN ${CMAKE_CURRENT_SOURCE_DIR}/include/config.h.in)
+CONFIGURE_FILE(${CONFIG_H_IN} ${CONFIG_H})
+ADD_CUSTOM_TARGET(marpaESLIFConfig SOURCES "${CONFIG_H}")
+MESSAGE (STATUS "  Configuration file: ${CONFIG_H}")
+MESSAGE (STATUS "")
+
+INCLUDE_DIRECTORIES (
+  "${INCLUDE_OUTPUT_PATH}"                             # Include path for generated files
+  "${PROJECT_SOURCE_DIR}/include"                      # Include path for the other headers
+  "${GENERICLOGGER_INCLUDE_DIRS}"                      # Include path for genericLogger (external - required)
+  "${GENERICSTACK_INCLUDE_DIRS}"                       # Include path for genericStack (external - required)
+  "${MARPAWRAPPER_INCLUDE_DIRS}"                       # Include path for marpaWrapper (external - required)
+  "${TCONV_INCLUDE_DIRS}"                              # Include path for tconv (external - required)
+  "${PCRE2_INCLUDE_DIRS}"                              # Include path for PCRE2 (external - required or built-in)
+  )
+
+# ------------------
+# marpaESLIF library
+# -----------------
+FILE (GLOB lib_src src/marpaESLIF.c)
+ADD_LIBRARY (marpaESLIF        SHARED ${lib_src})
+ADD_LIBRARY (marpaESLIF_static STATIC ${lib_src})
+SET (MARPAESLIF_TARGET_LINK_LIBRARIES ${GENERICLOGGER_LIBRARIES} ${MARPAWRAPPER_LIBRARIES} ${TCONV_LIBRARIES} ${PCRE2_LIBRARIES})
+#
+# Because of ICU and/or iconv, MARPAESLIF_STATIC_TARGET_LINK_LIBRARIES may be different than MARPAESLIF_TARGET_LINK_LIBRARIES
+#
+SET (MARPAESLIF_STATIC_TARGET_LINK_LIBRARIES ${MARPAESLIF_TARGET_LINK_LIBRARIES})
+IF (ICU_LIBRARIES)
+  LIST (APPEND MARPAESLIF_STATIC_TARGET_LINK_LIBRARIES ${ICU_LIBRARIES})
+ENDIF ()
+IF (ICONV_LIBRARIES)
+  LIST (APPEND MARPAESLIF_STATIC_TARGET_LINK_LIBRARIES ${ICONV_LIBRARIES})
+ENDIF ()
+TARGET_LINK_LIBRARIES (marpaESLIF        ${MARPAESLIF_TARGET_LINK_LIBRARIES})
+TARGET_LINK_LIBRARIES (marpaESLIF_static ${MARPAESLIF_STATIC_TARGET_LINK_LIBRARIES})
+SET_TARGET_PROPERTIES (marpaESLIF
+  PROPERTIES
+  COMPILE_FLAGS "-DmarpaESLIF_EXPORTS"
+  VERSION "${MARPAESLIF_VERSION}"
+  SOVERSION "${MARPAESLIF_VERSION_MAJOR}")
+SET_TARGET_PROPERTIES (marpaESLIF_static
+  PROPERTIES
+  COMPILE_FLAGS "-DmarpaESLIF_STATIC"
+  VERSION "${MARPAESLIF_VERSION}"
+  SOVERSION "${MARPAESLIF_VERSION_MAJOR}")
+#IF (WIN32)
+#  SET (MARPAESLIF_LIBRARY "${LIBRARY_OUTPUT_PATH}/${CMAKE_SHARED_LIBRARY_PREFIX}marpaESLIF${CMAKE_LINK_LIBRARY_SUFFIX}")
+#ELSE (WIN32)
+#  SET (MARPAESLIF_LIBRARY "${LIBRARY_OUTPUT_PATH}/${CMAKE_SHARED_LIBRARY_PREFIX}marpaESLIF${CMAKE_SHARED_LIBRARY_SUFFIX}")
+#ENDIF (WIN32)
+
+# ------------
+# Export flags
+# ------------
+INCLUDE (GenerateExportHeader)
+EXECUTE_PROCESS(COMMAND "${CMAKE_COMMAND}" -E make_directory "${INCLUDE_OUTPUT_PATH}/marpaESLIF")
+GENERATE_EXPORT_HEADER(marpaESLIF
+    BASE_NAME marpaESLIF
+    EXPORT_MACRO_NAME marpaESLIF_EXPORT
+    EXPORT_FILE_NAME "${INCLUDE_OUTPUT_PATH}/marpaESLIF/export.h"
+    STATIC_DEFINE marpaESLIF_STATIC)
+ADD_CUSTOM_TARGET(marpaESLIFExport SOURCES "${INCLUDE_OUTPUT_PATH}/marpaESLIF/export.h")
+
+# -------------
+# Include files
+# -------------
+SET (IN_MARPAESLIF_H include/marpaESLIF.h)
+SET (OUT_MARPAESLIF_H ${INCLUDE_OUTPUT_PATH}/marpaESLIF.h)
+ADD_CUSTOM_TARGET(marpaESLIFInclude DEPENDS ${IN_MARPAESLIF_H})
+ADD_CUSTOM_COMMAND(
+    OUTPUT ${OUT_MARPAESLIF_H}
+    COMMAND ${CMAKE_COMMAND} -E copy ${IN_MARPAESLIF_H} ${OUT_MARPAESLIF_H}
+    DEPENDS ${IN_MARPAESLIF_H})
+# ----------------------------------------
+# Explicit dependencies on generated files
+# ----------------------------------------
+IF (NOT PCRE2_FOUND)
+  ADD_DEPENDENCIES(marpaESLIF        marpaESLIFConfig marpaESLIFInclude marpaESLIFExport pcre2)
+  ADD_DEPENDENCIES(marpaESLIF_static marpaESLIFConfig marpaESLIFInclude marpaESLIFExport pcre2)
+ELSE (NOT PCRE2_FOUND)
+  ADD_DEPENDENCIES(marpaESLIF        marpaESLIFConfig marpaESLIFInclude marpaESLIFExport)
+  ADD_DEPENDENCIES(marpaESLIF_static marpaESLIFConfig marpaESLIFInclude marpaESLIFExport)
+ENDIF (NOT PCRE2_FOUND)
+
+# -------
+# Install
+# -------
+INCLUDE(InstallRequiredSystemLibraries)
+INSTALL (TARGETS marpaESLIF        ARCHIVE DESTINATION lib LIBRARY DESTINATION lib RUNTIME DESTINATION bin COMPONENT libraries)
+INSTALL (TARGETS marpaESLIF_static ARCHIVE DESTINATION lib LIBRARY DESTINATION lib RUNTIME DESTINATION bin COMPONENT libraries)
+INSTALL (FILES ${INCLUDE_OUTPUT_PATH}/marpaESLIF/export.h DESTINATION include/marpaESLIF)
+INSTALL (FILES include/marpaESLIF.h DESTINATION include)

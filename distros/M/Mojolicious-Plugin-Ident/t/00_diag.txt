@@ -1,0 +1,8 @@
+AnyEvent
+AnyEvent::Ident
+EV
+ExtUtils::MakeMaker
+Mojolicious
+Mojolicious::Lite
+Test::Mojo
+Test::More

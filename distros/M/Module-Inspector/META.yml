@@ -1,0 +1,34 @@
+---
+abstract: 'An integrated API for inspecting Perl distributions'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  Test::More: 0.47
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Inspector
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  File::Find::Rule: 0
+  File::Find::Rule::Perl: 0
+  File::Find::Rule::VCS: 1.02
+  File::Spec: 0.80
+  Module::Extract: 0.01
+  Module::Manifest: 0.01
+  Module::Math::Depends: 0.02
+  PPI: 1.118
+  Params::Util: 0.17
+  YAML::Tiny: 1.00
+  perl: 5.005
+  version: 0.74
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.05

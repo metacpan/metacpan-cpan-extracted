@@ -1,0 +1,63 @@
+/* ================================================================== */
+/* THEME: Burgundy
+ *
+ * This only defines fonts, colours and borders, not layout.
+ */
+@import 'functions';
+@import 'fonts_burgundy';
+@import 'icon_light_on_dark';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: hsl(330, 100%, 15%);
+$verge-fg: set-fg($verge-bg);
+$verge-border: #330000;
+$button-bg: #660033;
+$button-fg: set-fg($button-bg);
+$button-border: #330000;
+$main-bg: #cccccc;
+$main-fg: set-fg($main-bg);
+$link-fg: set-link($main-bg);
+$link-visited: set-visited($main-bg);
+$verge-link-fg: set-link($verge-bg);
+$verge-link-visited: set-visited($verge-bg);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+}
+
+header,
+footer {
+	@extend .verge;
+	background-image: url(burgundy_h.jpg);
+}
+
+.side {
+	@extend .verge;
+	background-image: url(burgundy_side.jpg);
+}
+
+body {
+	color: $main-fg;
+	background: $main-bg;
+}
+
+@include many-links($link-fg, $link-visited, $verge-link-fg, $verge-link-visited);
+@include fancy($verge-fg, $verge-bg, "burgundy_side.jpg");
+@include make-buttons;
+
+header nav li {
+	border-color: #226622;
+}
+header nav .selflink,
+header nav em,
+header nav .current a {
+	color: #bb0055;
+	background-color: #669933;
+}
+

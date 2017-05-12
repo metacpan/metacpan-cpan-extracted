@@ -1,0 +1,4 @@
+                 Rate      want_code simple_promise    bare_mojoua
+want_code      1057/s             --            -5%            -8%
+simple_promise 1109/s             5%             --            -3%
+bare_mojoua    1148/s             9%             4%             --

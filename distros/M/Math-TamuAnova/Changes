@@ -1,0 +1,27 @@
+Revision history for Perl extension TamuAnova.
+
+Version 0.2.1
+=============
+    Sun Mar  5 16:46:13 2006
+	- original version; created by h2xs 1.23 with options
+		-v 0.2.1 -x -n TamuAnova tamu_anova/tamu_anova.h
+
+Version 1.0.0
+=============
+Vincent Danjean (4):
+      fix typo
+      downgrade required perl version to 5.8.6
+      Change namespace TamuAnova into Math::TamuAnova
+      Bump version to 1.0.0
+
+Version 1.0.1
+=============
+Vincent Danjean (2):
+      Add dependency check for libtamuanova
+      Dump version for new release
+
+Version 1.0.2
+=============
+Vincent Danjean (1):
+      workaround gsl linking problems
+

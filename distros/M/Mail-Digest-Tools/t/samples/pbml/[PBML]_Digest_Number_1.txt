@@ -1,0 +1,434 @@
+------------------------ Yahoo! Groups Sponsor ---------------------~-->
+Buy Ink Cartridges or Refill Kits for your HP, Epson, Canon or Lexmark
+Printer at MyInks.com. Free s/h on orders $50 or more to the US & Canada.
+http://www.c1tracking.com/l.asp?cid=5511
+http://us.click.yahoo.com/mOAaAA/3exGAA/qnsNAA/ndFolB/TM
+---------------------------------------------------------------------~->
+
+There are 11 messages in this issue.
+
+Topics in this digest:
+
+     1. How to    $printHeader = \&$fext::printHeader;
+          From: "Allan Davis" <allan_davis@some.web.address.com>
+     2. One way to:   $printHeader = \&$fext::printHeader;
+          From: "Allan Davis" <allan_davis@some.web.address.com>
+     3. Re: One way to:   $printHeader = \&$fext::printHeader;
+          From: Jeff Piatigorski <japhy@some.web.address.com>
+     4. Re: One way to:   $printHeader = \&$fext::printHeader;
+          From: "Allan Davis" <allan_davis@some.web.address.com>
+     5. Returning 2 file handles?
+          From: "membruce" <membruce@some.web.address.com>
+     6. Re: One way to:   $printHeader = \&$fext::printHeader;
+          From: Jeff Piatigorski <japhy@some.web.address.com>
+     7. Re: Returning 2 file handles?
+          From: Jeff Piatigorski <japhy@some.web.address.com>
+     8. Re: Returning 2 file handles?
+          From: "chcst53" <charley@some.web.address.com>
+     9. grep over multiple lines
+          From: "Tom George Samson" <tomgeorgesamson@some.web.address.com>
+    10. Re: grep over multiple lines
+          From: "chcst53" <charley@some.web.address.com>
+    11. Re: grep over multiple lines
+          From: "Tom George Samson" <tomgeorgesamson@some.web.address.com>
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 1
+  Date: Mon, 09 Feb 2004 16:09:43 -0000
+  From: "Allan Davis" <allan_davis@some.web.address.com>
+Subject: How to    $printHeader = \&$fext::printHeader;
+
+Hiyo,
+
+I have several perl modules exporting the same function signatures,
+eg printHeader (et al).
+
+Depending on a file extension ($fext), i want to "interpolate" this 
+(= the module package ID) into a sub reference, as the actual scope, -
+- in principle something like :
+
+  my ($fnam, $fext) = split /\./, $GF;
+  $printHeader = \&$fext::printHeader;
+
+Now this of course does not compute, but how to DO IT i perl?
+I've tried some variations using eval, without luck.
+
+any suggestions?
+best regards / allan
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 2
+  Date: Mon, 09 Feb 2004 16:32:51 -0000
+  From: "Allan Davis" <allan_davis@some.web.address.com>
+Subject: One way to:   $printHeader = \&$fext::printHeader;
+
+
+Well, a little more hacking, and --
+this seems to work :
+
+# 	MAP generic API to concrete: [GML|DOT|...]
+#========================================================
+my ($fnam, $fext) = split /\./, $GF;
+$fext =~tr/a-z/A-Z/;
+if ( $fext!~/[GML|DOT|LSG]/ ) { $fext="GML"  };	# default
+$printHeader 	= eval "\\&${fext}::printHeader";
+$printNode	= eval "\\&${fext}::printNode";
+$printEdge	= eval "\\&${fext}::printEdge";
+$printTrailer	= eval "\\&${fext}::printTrailer";
+
+I donno if there's a more elegant way of mapping from a generic API 
+to concrete function implementations in separate modules ?
+
+best regards /
+allan
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 3
+  Date: Mon, 9 Feb 2004 12:14:37 -0500 (EST)
+  From: Jeff Piatigorski <japhy@some.web.address.com>
+Subject: Re: One way to:   $printHeader = \&$fext::printHeader;
+
+On Feb 9, Allan Davis said:
+
+>my ($fnam, $fext) = split /\./, $GF;
+>$fext =~tr/a-z/A-Z/;
+
+I'd use uc().
+
+ $fext = uc $fext;
+
+>if ( $fext!~/[GML|DOT|LSG]/ ) { $fext="GML"  };	# default
+
+I think you mean
+
+ if ($ftext !~ /GML|DOT|LSG/) { $ftext = "GML" };
+
+You're using a character class where it's not appropriate.
+
+>$printHeader 	= eval "\\&${fext}::printHeader";
+>$printNode	= eval "\\&${fext}::printNode";
+>$printEdge	= eval "\\&${fext}::printEdge";
+>$printTrailer	= eval "\\&${fext}::printTrailer";
+
+ $printHeader = \&{"${fext}::printHeader"};
+ # etc.
+
+Or perhaps:
+
+ $func{$_} = \&{"${fext}::print$_"} for qw( Header Node Edge Trailer );
+
+This gives you $func{Header}, $func{Node}, etc.
+
+-- 
+Jeff Piatigorski      japhy@some.web.address.com
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 4
+  Date: Mon, 09 Feb 2004 19:18:02 -0000
+  From: "Allan Davis" <allan_davis@some.web.address.com>
+Subject: Re: One way to:   $printHeader = \&$fext::printHeader;
+
+This proposal is most interesting, bordering on... beautiful!!
+Alas it doesn't seem to work in my context... I tried:
+  my ( $printHeader, $printNode, $printEdge, $printTrailer);
+  $print{$_} = \&{"${fext}::print$_"} for qw(Header Node Edge 
+Trailer);
+
+but i get:
+  Name "main::print" used only once: possible typo at ... etc
+
+hmmmm...
+
+thanks for the guidance Jeff, much appreciated!
+/ allan
+
+
+
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 5
+  Date: Mon, 09 Feb 2004 19:29:49 -0000
+  From: "membruce" <membruce@some.web.address.com>
+Subject: Returning 2 file handles?
+
+I have hit a snag while working on my first Purl program. I need to
+return 2 file handles from a subroutine. Since the file handles aren't
+declared, I can't just return them as a list.
+
+Thanks,
+Bruce
+
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 6
+  Date: Mon, 9 Feb 2004 15:57:03 -0500 (EST)
+  From: Jeff Piatigorski <japhy@some.web.address.com>
+Subject: Re: One way to:   $printHeader = \&$fext::printHeader;
+
+On Feb 9, Allan Davis said:
+
+>> Or perhaps:
+>>$func{$_} = \&{"${fext}::print$_"} for qw( Header Node Edge Trailer );
+>> This gives you $func{Header}, $func{Node}, etc.
+>
+>This proposal is most interesting, bordering on... beautiful!!
+>Alas it doesn't seem to work in my context... I tried:
+>   my ( $printHeader, $printNode, $printEdge, $printTrailer);
+>   $print{$_} = \&{"${fext}::print$_"} for qw(Header Node Edge Trailer);
+
+You don't need the $printHeader, $printNode, etc. variables, just %print.
+
+ my %print;
+ $print{$_} = \&{"${fext}::print$_"} for qw( Header Node Edge Trailer );
+
+Then you use $print{Header}->() to call the function (and put any args you
+want to pass to it in the parens) like so:
+
+ $print{Header}->('this', 'that');
+
+-- 
+Jeff Piatigorski      japhy@some.web.address.com
+[  I'm looking for programming work.  If you like my work, let me know.  ]
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 7
+  Date: Mon, 9 Feb 2004 16:03:39 -0500 (EST)
+  From: Jeff Piatigorski <japhy@some.web.address.com>
+Subject: Re: Returning 2 file handles?
+
+On Feb 9, membruce said:
+
+>I have hit a snag while working on my first Purl program. I need to
+>return 2 file handles from a subroutine. Since the file handles aren't
+>declared, I can't just return them as a list.
+
+Well, chances are you don't need to return them, since you've probably
+made filehandles that are globally visible to your entire program.  Here's
+an example:
+
+ #!/usr/bin/perl
+
+ my_open(".cshrc");
+ print <FILE>;
+
+ sub my_open {
+   my $file = shift;
+   open FILE, "< $file" or die "can't read $file: $!";
+ }
+
+That program works fine.  If, however, you declare the glob of FILE
+locally, then it WON'T be visible after your function returns:
+
+ sub my_open {
+   my $file = shift;
+   local *FILE;  # this means the filehandle FILE is localized
+   open FILE, "< $file" or die "can't read $file: $!";
+ }
+
+If you do that, you won't be able to access 'FILE' outside the function.
+
+What are you doing, that you need to return filehandles?
+
+-- 
+Jeff Piatigorski      japhy@some.web.address.com
+[  I'm looking for programming work.  If you like my work, let me know.  ]
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 8
+  Date: Mon, 09 Feb 2004 21:30:30 -0000
+  From: "chcst53" <charley@some.web.address.com>
+Subject: Re: Returning 2 file handles?
+
+--- In perl-beginner@yahoogroups.com, "membruce" <membruce@e...> 
+wrote:
+> I have hit a snag while working on my first Purl program. I need to
+> return 2 file handles from a subroutine. Since the file handles 
+aren't
+> declared, I can't just return them as a list.
+> 
+> Thanks,
+> Bruce
+
+From Programming Perl, 3d Ed
+
+for $file (@names) {
+my $fh;
+open $fh, $file or next;
+$handle{$file} = $fh;
+}
+
+Chris
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 9
+  Date: Tue, 10 Feb 2004 01:45:25 -0000
+  From: "Tom George Samson" <tomgeorgesamson@some.web.address.com>
+Subject: grep over multiple lines
+
+Hi Folks,
+
+How do you do a grep over multiple lines in perl?
+I have a file that is already read into an array and the array looks 
+like this.
+
+sldjflsdfjlskd          (line0)
+START_PATTERN lsdjflsd  (line1)
+lskdfljsld lkjsldflskd  (line2)
+sldjflsjdfsldfjlsjdflj  (line3)
+ljsdfsdf END_PATTERN    (line4)
+
+I want to grab the stuff between START_PATTERN and END_PATTERN 
+and dump it into a different array.
+It can be done in a couple of lines, I'm sure, but How do you do 
+with a one liner or some other short way?
+
+I tried to use Text::Balanced qw(extract_tagged) as a different 
+way to do this .. but somehow it does not work for me :-(.
+Could somebody also point me to some sites where they show examples 
+of text manipulating perl modules at work ?
+
+Thank you very much.
+Thomas.
+
+
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 10
+  Date: Tue, 10 Feb 2004 02:36:29 -0000
+  From: "chcst53" <charley@some.web.address.com>
+Subject: Re: grep over multiple lines
+
+--- In perl-beginner@yahoogroups.com, "Tom George Samson" 
+<tomgeorgesamson@y...> wrote:
+> Hi Folks,
+> 
+> How do you do a grep over multiple lines in perl?
+> I have a file that is already read into an array and the array     
+looks like this.
+> 
+> sldjflsdfjlskd          (line0)
+> START_PATTERN lsdjflsd  (line1)
+> lskdfljsld lkjsldflskd  (line2)
+> sldjflsjdfsldfjlsjdflj  (line3)
+> ljsdfsdf END_PATTERN    (line4)
+> 
+> I want to grab the stuff between START_PATTERN and END_PATTERN 
+> and dump it into a different array.
+> Thank you very much.
+> Thomas.
+
+This will do it, if I understand the problem correctly.
+
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @a;
+
+while(<DATA>) {
+next unless /START_PATTERN/../END_PATTERN/;
+push @a, /([a-z]+(?:\s+[a-z]+)*)/;
+}
+print "$_\n" for @a;
+
+__DATA__
+sldjflsdfjlskd
+START_PATTERN lsdjflsd
+lskdfljsld lkjsldflskd
+sldjflsjdfsldfjlsjdflj
+ljsdfsdf END_PATTERN
+
+
+The regular expression captures lowercased text _and_ optional space 
+followed by lowercase text, just like in thw sample data you have 
+here.
+
+Chris
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 11
+  Date: Tue, 10 Feb 2004 05:13:35 -0000
+  From: "Tom George Samson" <tomgeorgesamson@some.web.address.com>
+Subject: Re: grep over multiple lines
+
+Hi Chris,
+Thank you for the reply.
+Please bear with me if I appear to be a little naive, but this is my 
+problem. 
+I've already opened a file and have the data in an array.
+I want to perform this operation on that array. How do I do that ?
+open (FILE,$file);
+@my_array = <FILE> ;
+now my_array contains the day limited by START_PATTERN and 
+END_PATTERN.
+How do I filter it out from there ?
+
+Thomas.
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+
+Unsubscribing info is here: http://help.yahoo.com/help/us/groups/groups-32.=
+html
+------------------------------------------------------------------------
+Yahoo! Groups Links
+
+<*> To visit your group on the web, go to:
+    http://groups.yahoo.com/group/perl-beginner/
+
+<*> To unsubscribe from this group, send an email to:
+    perl-beginner-unsubscribe@yahoogroups.com
+
+<*> Your use of Yahoo! Groups is subject to:
+    http://docs.yahoo.com/info/terms/
+=20
+------------------------------------------------------------------------
+
+
+

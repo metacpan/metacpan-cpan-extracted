@@ -1,0 +1,214 @@
+NAME
+
+    Mail::Sendmail::Enhanced v.0.03 - Pure Perl email sender with multibyte characters encoding and easy attachments managment
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Mail::Sendmail::Enhanced
+
+and also please read (v. 0.79_16)
+
+    perldoc Mail::Sendmail
+
+
+SYNOPSIS
+
+  #!/usr/bin/perl -w
+
+  use strict;
+  use warnings;
+
+  use Mail::Sendmail::Enhanced;
+
+  # This part simulate the general setup of application mailer.
+  # It sets smtp server and size limit of attachments (1MB)
+  # This configuration is set by admin.
+  my $mail = Mail::Sendmail::Enhanced-> new(
+    charset     => 'cp1250',
+    smtp        => 'Your SMTP server',
+    from        => 'Your mail',
+    user        => 'user',
+    pass        => 'password',
+    method      => 'LOGIN',
+    required    => 1,
+    attachments => {
+      'name for email of the file1' => 'OS file1 location',
+      'name for email of the file2' => 'OS file2 location',
+    },
+    attachments_size_max => '1MB',
+    commit      => 0,
+  );
+
+  # This part simulates how clients can use the mailer.
+  # Configuration here is set by clients themself.
+  my @client = qw(John Henry Newman);
+  for (@client) {
+
+    my $lowercase = chr(185).chr(230).chr(234).chr(179).chr(241).chr(243).chr(156).chr(159).chr(191);
+    my $uppercase = chr(165).chr(198).chr(202).chr(163).chr(209).chr(211).chr(140).chr(143).chr(175);
+
+    print $mail-> send( {
+      to    => 'author of the module: <wb@webswing.co.uk>',
+      subject  => "Subject longer than 80 characters with Polish letters: lowercase: $lowercase and uppercase: $uppercase.",
+      message  => "This is the message from $_ in the character encoding ".$mail->{charset}.".
+
+      This is an example of mailing Polish letters in a header field named \"Subject\".
+      Additionally this field is longer than 80 characters.
+
+      Additional text:
+      Polish lowercase letters: $lowercase
+      Polish uppercase letters: $uppercase
+      ",
+    });
+  }
+
+  __END__
+
+
+DESCRIPTION
+
+Mail::Sendmail::Enhanced  is  an  enhanced   version  of  the module
+Mail::Sendmail.   It  is still pure Perl solution. In the module the
+problem  of  encoding  multibyte characters  in  Mail::Sendmail  was
+solved. Some  procedure of sending very easily a list of attachments
+was prepared.
+
+After preparing  multibyte  characters encoding and building message
+with attachments the  module  calls  "sendmail"  function  from  the
+Mail::Sendmail  module which does all the job.  So please read there
+in  Mail::Sendmail about  how to set up connections to email servers.
+This module behaves identically.
+
+As already mentioned this adds two things:
+
+1. Multibyte characters encoding - which uses refurbish and imported
+function encode_qp from the module MIME::QuotedPrint::Perl.
+
+The  problem  with  encoding  multibyte  characters  was that simple
+implemented encoding -  especially  in the "Subject:" field of email
+header - results that  some characters were divided between two rows
+when long  lines are folded.  Some email clients are not able to put
+together these  separated bytes into  one character  and letters are
+displeyed inproperly. The new encoding function keeps  bytes of  one
+character in one folded row.
+
+2. Simple attachments managment. List of attachments is a hash:
+
+  attachments => {
+    'name for email of the file1' => 'OS file1 location',
+    'name for email of the file2' => 'OS file2 location',
+  },
+
+where  the keys are  the  attachments email names and the values are
+OS locations.
+
+It is possible to add some control to sending attachment. It is done
+by the parameter B<attachments_size_max>. Possible values are:
+
+
+  attachments_size_max => -1,         # Negative value means that sending attachments is forbidden.
+                                      # Every try of sending them with this value negative is fatal one.
+
+  attachments_size_max =>  0,         # No size limit of attachments
+
+  attachments_size_max => '50 000 B', # Positive value is a maximum size of attachment.
+                                      # When size is bigger then fatal error is return.
+                                      # Spaces and the letter B (byte) are ignored.
+
+                                      # shorthand for sizes: k, K, m, M:
+  attachments_size_max => '100k',     # k = 1000,         so maximum =   100 000
+  attachments_size_max => '100 K',    # K = 1024,         so maximum =   102 400
+  attachments_size_max => '2 m',      # m = 1000x1000,    so maximum = 1 000 000
+  attachments_size_max => '2M',       # M = 1024x1024,    so maximum = 1 048 576
+
+
+INTERFACE
+
+Interface Mail::Sendmail::Enhanced, gets two methods:
+
+new()
+
+The method "new" creates mail object.
+
+send()
+
+The method "send" sends mail.
+
+Arguments  of both  methods  are  the  same  and  discussed  earlier.
+Dispersing  data  between  I<new>  and  I<send>  is  fully  optional.
+Assuming that we have three hashes %n, %s and %d which fullfiled the
+abstract equality:
+
+    "%n + %s = %d"
+
+all the three ways of sending email have the same effect:
+
+    my $mail = Mail::Sendmail::Enhanced->new(); $mail->send(%d);
+
+    my $mail = Mail::Sendmail::Enhanced->new(%d); $mail->send();
+
+    my $mail = Mail::Sendmail::Enhanced->new(%n); $mail->send(%s);
+
+
+BUGS
+
+Please report any bugs or feature requests to "bug-mail-sendmail-enhanced at rt.cpan.org", or through
+the web interface at  "http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Mail-Sendmail-Enhanced". I will
+be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2015 Waldemar Biernacki, <wb at webswing.co.uk>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the the Artistic License (2.0). You may obtain
+a copy of the full license at:
+
+<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard  or Modified
+Versions is governed by this Artistic License. By  using,  modifying
+or distributing  the Package, you  accept  this license.  Do not use,
+modify, or distribute the Package, if you do not accept this license.
+
+If  your  Modified  Version has been derived from a Modified Version
+made  by someone  other  than  you, you are nevertheless required to
+ensure that your Modified Version complies with the  requirements of
+this license.
+
+This  license  does  not  grant  you  the right to use any trademark,
+service mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive,  worldwide,  free-of-charge
+patent  license to make, have made, use, offer to sell, sell, import
+and otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by
+the  Package.  If  you  institute  patent  litigation  (including  a
+cross-claim  or counterclaim)  against  any  party alleging that the
+Package constitutes direct or contributory patent infringement, then
+this Artistic License to you shall terminate  on the date  that such
+litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS  PROVIDED  BY  THE  COPYRIGHT
+HOLDER AND CONTRIBUTORS "AS IS' AND WITHOUT  ANY EXPRESS  OR IMPLIED
+WARRANTIES. THE  IMPLIED WARRANTIES OF  MERCHANTABILITY, FITNESS FOR
+A  PARTICULAR PURPOSE, OR  NON-INFRINGEMENT  ARE  DISCLAIMED  TO THE
+EXTENT  PERMITTED  BY  YOUR  LOCAL  LAW. UNLESS  REQUIRED BY LAW, NO
+COPYRIGHT  HOLDER  OR  CONTRIBUTOR  WILL  BE  LIABLE  FOR ANY DIRECT,
+INDIRECT, INCIDENTAL, OR  CONSEQUENTIAL  DAMAGES  ARISING IN ANY WAY
+OUT OF THE USE OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGE.

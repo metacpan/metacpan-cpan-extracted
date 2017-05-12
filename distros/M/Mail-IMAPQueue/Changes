@@ -1,0 +1,14 @@
+Revision history for Mail-IMAPQueue
+
+0.04    Jul 20 2014
+        Cleanup code/docs
+
+0.03    Mar 22 2013
+        Specify prerequisite module versions in Makefile.PL
+
+0.02    Mar 17 2013
+        Fixed testing issue with Win32 getting stuck [rt.cpan.org #82058]
+
+0.01    Mar 5 2012
+        First version, released on an unsuspecting world.
+

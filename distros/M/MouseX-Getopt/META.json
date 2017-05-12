@@ -1,0 +1,142 @@
+{
+   "abstract" : "A Mouse role for processing command line options",
+   "author" : [
+      "=over 4"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.2",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MouseX-Getopt",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Long" : "2.37",
+            "Getopt::Long::Descriptive" : "0.091",
+            "Mouse" : "0.64",
+            "Mouse::Meta::Attribute" : "0",
+            "Mouse::Role" : "0",
+            "Mouse::Util::TypeConstraints" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Mouse::Meta::Class" : "0",
+            "MouseX::ConfigFromFile" : "0",
+            "MouseX::SimpleConfig" : "0",
+            "Scalar::Util" : "0",
+            "Test::Exception" : "0.21",
+            "Test::More" : "0.88",
+            "Test::Mouse" : "0",
+            "Test::Warn" : "0.21"
+         }
+      }
+   },
+   "provides" : {
+      "MouseX::Getopt" : {
+         "file" : "lib/MouseX/Getopt.pm",
+         "version" : "0.37"
+      },
+      "MouseX::Getopt::Basic" : {
+         "file" : "lib/MouseX/Getopt/Basic.pm"
+      },
+      "MouseX::Getopt::Dashes" : {
+         "file" : "lib/MouseX/Getopt/Dashes.pm"
+      },
+      "MouseX::Getopt::GLD" : {
+         "file" : "lib/MouseX/Getopt/GLD.pm"
+      },
+      "MouseX::Getopt::Meta::Attribute" : {
+         "file" : "lib/MouseX/Getopt/Meta/Attribute.pm"
+      },
+      "MouseX::Getopt::Meta::Attribute::NoGetopt" : {
+         "file" : "lib/MouseX/Getopt/Meta/Attribute/NoGetopt.pm"
+      },
+      "MouseX::Getopt::Meta::Attribute::Trait" : {
+         "file" : "lib/MouseX/Getopt/Meta/Attribute/Trait.pm"
+      },
+      "MouseX::Getopt::Meta::Attribute::Trait::NoGetopt" : {
+         "file" : "lib/MouseX/Getopt/Meta/Attribute/Trait/NoGetopt.pm"
+      },
+      "MouseX::Getopt::OptionTypeMap" : {
+         "file" : "lib/MouseX/Getopt/OptionTypeMap.pm"
+      },
+      "MouseX::Getopt::Strict" : {
+         "file" : "lib/MouseX/Getopt/Strict.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gfx/mousex-getopt/issues"
+      },
+      "homepage" : "https://github.com/gfx/mousex-getopt",
+      "repository" : {
+         "url" : "git://github.com/gfx/mousex-getopt.git",
+         "web" : "https://github.com/gfx/mousex-getopt"
+      }
+   },
+   "version" : "0.37",
+   "x_authority" : "cpan:GFUJI",
+   "x_contributors" : [
+      "Brandon L Black <blblack@gmail.com>",
+      "Ryan D Johnson <ryan@innerfence.com>",
+      "Todd Hepler <thepler@employees.org>",
+      "John Goulah <jgoulah@cpan.org>",
+      "Chris Prather <chris@prather.org>",
+      "Stevan Little <stevan.little@iinteractive.com>",
+      "Yuval Kogman <nothingmuch@woobling.org>",
+      "Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>",
+      "Hans Dieter Pearcey <hdp@weftsoar.net>",
+      "Nelo Onyiah <nelo.onyiah@gmail.com>",
+      "Ricardo SIGNES <rjbs@cpan.org>",
+      "Devin Austin <devin@devin-laptop.(none)>",
+      "Gordon Irving <goraxe@goraxe.me.uk>",
+      "Shlomi Fish <shlomif@iglu.org.il>",
+      "Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>",
+      "Tomas Doran (t0m) <t0m@state51.co.uk>",
+      "Ævar Arnfjörð Bjarmason <avarab@gmail.com>",
+      "Jesse Luehrs <doy@tozt.net>",
+      "Florian Ragwitz <rafl@debian.org>",
+      "Karen Etheridge <karen@etheridge.ca>",
+      "Justin Hunter <justin.d.hunter@gmail.com>",
+      "Tomas Doran <bobtfish@bobtfish.net>",
+      "Mark Gardner <gardnerm@gsicommerce.com>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>",
+      "FUJI Goro (gfx) <gfuji@cpan.org>",
+      "Paul Howarth <paul@city-fan.org>",
+      "FUJI Goro <gfx@users.noreply.github.com>",
+      "FUJI Goro <goro.fuji@ebookjapan.co.jp>"
+   ]
+}

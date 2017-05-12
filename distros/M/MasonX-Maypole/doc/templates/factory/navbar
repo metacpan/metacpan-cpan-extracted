@@ -1,0 +1,22 @@
+<%doc>
+
+=head1 navbar
+
+This is a navigation bar to go across the page. (Or down the side, or
+whatever you want to do with it.) It displays all the tables which are
+accessible, with a link to the list page for each one.
+
+</%doc>
+
+<div id="navcontainer">
+<ul id="navlist">
+% foreach my $table ( @{ $config->{display_tables} } ) {
+<li<% ($table eq $classmetadata->{table} ? ' id="active"' :'') %>>
+<& link, table      => $table,
+         command    => "list",
+         additional => "",
+         label      => $table &>
+</li>
+% }
+</ul>
+</div>

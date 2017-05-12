@@ -1,0 +1,36 @@
+Math::Financial 0.76
+
+Eric Fixler <fix@fixler.com> 1999
+
+Contains common calculations for loans and anniuities. You
+can use it to calculate compund interest, loan payments and terms,
+and the like.
+  
+Supports an object-oriented or procedural interface.
+
+INSTALLATION
+------------
+>perl Makefile.PL
+>make
+>make install
+
+There's just the one file, Financial.pm, so you can also
+just drag it to the Math/ folder of your local library
+tree.
+
+There are currently no tests defined.
+
+Complete documentation is podded in the module.
+Comments and questions welcome.
+
+
+CHANGES
+-------
+0.75   9 Sep 1999 - First Public Release
+0.76  15 Sep 1999 - Fixed an error in the loan_term method
+                  - Module now works with Perl 5.004 (and
+                    should work with 5.003 as well.
+                  - Changed the name of the IMPORT group
+                    for non object-oriented users to
+                    :standard
+

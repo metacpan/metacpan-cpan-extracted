@@ -1,0 +1,13 @@
+Revision history for Module-Install-TemplateInstallPath
+
+0.03 Mon Apr 11 11:01:09 EDT 2011
+
+	* fix error in test suite which caused failure on Windows.
+
+0.02 Thu Apr  7 13:51:41 EDT 2011
+
+	* fix tests on platforms with no prior installation of Module::Install
+
+0.01
+        Initial release.
+

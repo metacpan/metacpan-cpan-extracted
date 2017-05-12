@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Mojolicious/Plugin/Dotcloud.pm
+t/00-load.t
+t/release-cpan-changes.t
+weaver.ini

@@ -1,0 +1,81 @@
+
+body.ui-widget { font-size: 12px }
+
+.left    { float: left }
+.right   { float: right }
+.center  { text-align: center }
+.centered{ margin-left: auto; margin-right: auto }
+.w100    { width: 100px }
+.w150    { width: 150px }
+.w300    { width: 300px }
+.w400    { width: 400px }
+.w480    { width: 480px }
+.no-tb-margin { margin-top: 0; margin-bottom: 0 };
+
+#header h1        { font-style: italic; margin: 6px 0 6px 6px}
+#header a#logo  { height: 72px; width: 70px; background: url(/img/tables.png); background-size: 100% }
+#header .identity { float: right; font-weight: normal; margin: 4px 0 0 20px; text-align: left }
+#header .identity .identity-line { margin-top: 2px }
+#header .identity #identity-imglnk img { border: 0; border-radius: 50px; height: 32px; width: 32px }
+
+#header input#search { padding: 1px 8px }
+
+#header  a.button span.ui-button-text,
+#footer  a.button span.ui-button-text { padding:0 .5em }
+div.stats .button span.ui-button-text { font-size: .9em }
+
+.unknown          { display: none }
+
+div.menubar { padding: 8px; line-height: 2.5em }
+div.tables-notice          { padding: 0.2em 0.8em }
+div.tables-notice .ui-icon { margin-right: 0.3em }
+div.tables-notice p        { margin: .3em 0 }
+
+.mini-select        { line-height: normal }
+.mini-select label  { display: block }
+.mini-select select { width: 200px }
+.refresh-button     { padding: 1px }
+
+#footer a { float: right; display: inline-block; margin-left: 4px; margin-right: 4px }
+
+.pad2      { padding: 2px }
+.pad8      { padding: 8px }
+.pad10     { padding: 10px }
+.pad12     { padding: 12px }
+.content   { padding: 10px }
+
+@media (max-width: 600px) {
+    .home #homepic { display: none }
+    #header #banner-title { display: none }
+}
+
+.home table#buts { max-width: 540px; padding: 12px 0 0px 24px; border-collapse: collapse }
+.home table#buts tr#blurb th { text-align: left; padding: 12px }
+.home table#buts td { padding: 10px 4px }
+.home table#buts a.button { width: 116px }
+
+.about           { background: url(/img/lse.jpg) }
+.footnotes       { margin-top: 28px; border-top: black solid 1px; padding-top: 4px; font-size: 0.9em }
+.feedback textarea { width: 520px; height: 4em; display: block; margin-bottom: 8px }
+.ui-selectmenu-button { vertical-align: middle }
+
+table.dataTable td a       { text-decoration: none }
+table.dataTable td a:hover { text-decoration: underline }
+
+div#tablesbuts { padding: 8px }
+table#sources-table     { border-collapse: collapse; margin: 8px 0 }
+table#sources-table td,
+table#sources-table th  { border:  1px solid #CCC; padding: 4px }
+
+div#tablesbody .ui-accordion-header { margin-top: 0; padding-top: 2px; padding-bottom: 2px }
+div#tablesbody .ui-accordion-header.data-hdr h3 { margin: 2px 0 0 0 }
+div#tablesbody .ui-accordion-content { padding: .5em 1em } /* overrides; half of stock */
+div#tablesbody fieldset      { margin: 12px 0 }
+div#tablesbody legend        { border: 1px groove threedface; padding: .5em; font-weight: bold }
+div#tablesbody .attrib       { margin: .4em 0 }
+div#tablesbody .attrib label { float: left; min-width: 160px; font-weight: bold;
+                              text-align: right; margin: 0 16px 0 0 }
+div#tablesbody form .attrib label { margin-top: 3px }
+div#tablesbody .attrib span.data  { float: left; min-width: 40px; margin-right: 8px }
+div#tablesbody fieldset.group     { float: left; margin: 12px 12px 12px 0 }
+

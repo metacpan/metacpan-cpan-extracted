@@ -1,0 +1,12 @@
+MANIFEST
+README
+t/001-Config-Tiny.t
+t/003-Message-Passing-Filter-Regexp.t
+t/regexfile
+t/002-Regexp-Log.t
+Changes
+Makefile.PL
+lib/Message/Passing/Filter/Regexp/Log.pm
+lib/Message/Passing/Filter/Regexp.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

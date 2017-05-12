@@ -1,0 +1,30 @@
+NAME
+    MooseX::Role::HTML::Grabber - proved the needed bits to be a
+    HTML-Grabber
+
+VERSION
+    version 0.002
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Role-HTML-Grab
+    ber>. You will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/trcjr/moosex-role-html-grabber>
+
+      git clone git://github.com/trcjr/moosex-role-html-grabber.git
+
+AUTHOR
+    Theodore Robert Campbell Jr <trcjr@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Theodore Robert Campbell Jr.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

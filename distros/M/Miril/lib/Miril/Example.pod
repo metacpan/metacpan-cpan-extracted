@@ -1,0 +1,32 @@
+=head1 NAME
+
+Miril::Example - How to install and run the sample website provided with Miril.	
+
+=head1 ABOUT
+
+Miril comes bundled with a sample website so that you can quickly test what it can do for you. It also provides a nice starting point for you to cusomize instead of starting from scratch. The website is located in the C<"example"> folder in the Miril distribution.
+
+=head1 INSTALLATION
+
+=head2 Create the output directory
+
+First you need to decide where Miril will put the files it creates. Let us put create a directory called C<"miril_example"> in the document root of your webserver, so that your website will be accessible at C<"http://localhost/miril_example">. Copy all the files from the C<"examples/www"> directory into the newly-created C<"miril_example"> directory.
+
+=head2 Adjust the settings
+
+Next, you need to decide where Miril's configuration settings and other files that Miril uses internally will be stored. Create another directory, called "miril_settings" in a location that is not under the document root of your webserver, so that they are not accessible to prying eyes. Copy all the files and folders from C<"examples/settings"> into this new directory.
+
+Now open the file C<"miril_settings/cfg/config.xml"> and make sure all paths correspond to your setup. Consult C<Miril::Manual> if necessary. Also, make sure to the change the C<"secret"> setting to something other than the default.
+
+=head2 Install the cgi script
+
+Copy the file C<"examples/cgi-bin/miril.pl"> into the C<cgi-bin> directory of your webserver. Change the shebang line to match the path to C<perl> on your system, and change the C<"cfg_file"> parameter to match the path to your C<"config.xml"> file.
+
+=head2 Run
+
+You are now ready to run Miril. Open your browser and point to L<http://localhost/cgi-bin/miril.pl>. You should see a welcome screen with a login prompt. The default username is "admin" and the password is "123456". Needless to say, you need to change this password as soon as possible if you are going to use Miril in a production environment.
+
+=head1 SEE ALSO
+
+L<Miril::Manual>
+

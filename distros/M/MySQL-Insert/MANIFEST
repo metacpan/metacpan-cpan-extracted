@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/MySQL/Insert.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+META.json

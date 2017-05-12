@@ -1,0 +1,35 @@
+---
+abstract: 'a pseudo-random number generator compatible with Visual C.'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::Differences: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-RNG-Microsoft
+provides:
+  Math::RNG::Microsoft:
+    file: lib/Math/RNG/Microsoft.pm
+    version: v0.0.3
+requires:
+  Class::XSAccessor: '0'
+  integer: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-RNG-Microsoft
+  repository: ssh://hg@bitbucket.org/shlomif/abc-path
+version: 0.0.3

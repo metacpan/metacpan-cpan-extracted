@@ -1,0 +1,786 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+               "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+lang="en" xml:lang="en">
+<head>
+<title>Make Release</title>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="generated" content="2008-11-03 08:57:26 PST"/>
+<meta name="author" content="Wes Hardaker"/>
+<style type="text/css">
+  html { font-family: Times, serif; font-size: 12pt; }
+  .title  { text-align: center; }
+  .todo   { color: red; }
+  .done   { color: green; }
+  .tag    { background-color:lightblue; font-weight:normal }
+  .target { }
+  .timestamp { color: grey }
+  .timestamp-kwd { color: CadetBlue }
+  p.verse { margin-left: 3% }
+  pre {
+	border: 1pt solid #AEBDCC;
+	background-color: #F3F5F7;
+	padding: 5pt;
+	font-family: courier, monospace;
+        font-size: 90%;
+        overflow:auto;
+  }
+  table { border-collapse: collapse; }
+  td, th { vertical-align: top; }
+  dt { font-weight: bold; }
+
+  .org-info-js_info-navigation { border-style:none; }
+  #org-info-js_console-label { font-size:10px; font-weight:bold;
+                               white-space:nowrap; }
+  .org-info-js_search-highlight {background-color:#ffff00; color:#000000;
+                                 font-weight:bold; }
+
+</style><style>
+   .outline-3 {margin-left: 1em;}
+   .example { margin-left: 2em;}
+   p { margin-left: 1em;}
+   </style>
+</head><body>
+<h1 class="title">Make Release</h1>
+
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1 Project Details</a></li>
+<li><a href="#sec-2">2 Introduction and History</a>
+<ul>
+<li><a href="#sec-2.1">2.1 Release Pain</a></li>
+<li><a href="#sec-2.2">2.2 The solution: makerelease</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3 Usage</a>
+<ul>
+<li><a href="#sec-3.1">3.1 Step by Step</a></li>
+<li><a href="#sec-3.2">3.2 Structured in XML</a></li>
+<li><a href="#sec-3.3">3.3 makerelease -n: dry-run and produce documentation</a></li>
+<li><a href="#sec-3.4">3.4 makerelease:</a></li>
+</ul>
+</li>
+<li><a href="#sec-4">4 Writing Steps</a>
+<ul>
+<li><a href="#sec-4.1">4.1 Global Attributes and Data</a>
+<ul>
+<li><a href="#sec-4.1.1">4.1.1 &lt;text&gt;foo&lt;/text&gt;</a></li>
+<li><a href="#sec-4.1.2">4.1.2 title="Title for the Step"</a></li>
+<li><a href="#sec-4.1.3">4.1.3 stepname="name"</a></li>
+<li><a href="#sec-4.1.4">4.1.4 pause="true"</a></li>
+</ul>
+</li>
+<li><a href="#sec-4.2">4.2 Step Types</a>
+<ul>
+<li><a href="#sec-4.2.1">4.2.1 Informational</a></li>
+<li><a href="#sec-4.2.2">4.2.2 Section</a></li>
+<li><a href="#sec-4.2.3">4.2.3 Include</a></li>
+<li><a href="#sec-4.2.4">4.2.4 Command</a></li>
+<li><a href="#sec-4.2.5">4.2.5 Prompt</a></li>
+<li><a href="#sec-4.2.6">4.2.6 Modify</a></li>
+<li><a href="#sec-4.2.7">4.2.7 Perl</a></li>
+</ul></li>
+</ul>
+</li>
+<li><a href="#sec-5">5 Examples</a>
+<ul>
+<li><a href="#sec-5.1">5.1 Projects that are making use of makerelease scripts</a></li>
+<li><a href="#sec-5.2">5.2 Included example scripts</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1" class="outline-2">
+<h2 id="sec-1">1 Project Details</h2>
+<div id="text-1">
+
+
+<p>
+
+<p class="verse">
+&nbsp;&nbsp;&nbsp;&nbsp; Download:    <a href="http://sourceforge.net/svn/?group_id=206082currently">via SVN only</a> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp; Website:     <a href="http://makerelease.sourceforge.net/">makerelease</a> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp; SF Project:  <a href="http://sourceforge.net/projects/makerelease/">makerelease</a> <br/>
+</p>
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-2" class="outline-2">
+<h2 id="sec-2">2 Introduction and History</h2>
+<div id="text-2">
+
+
+</div>
+
+<div id="outline-container-2.1" class="outline-3">
+<h3 id="sec-2.1">2.1 Release Pain</h3>
+<div id="text-2.1">
+
+
+<p>
+One of the issues with releasing software is that you need to do
+mind-numbing tasks over and over and it is a barrier to "release
+early, release often".  Not only that, releasing a particular
+package becomes an art-form to do all the right steps in the right
+order without forgetting anything.
+</p>
+<p>
+The result of this problem is usually one of:
+</p>
+<ol>
+<li>
+1-2 knowledgeable people and if they perished someone else
+would be bound to repeat the undocumented mistakes they made.
+</li>
+<li>
+A hand-crafted shell script of some kind that automates at
+least some of the tasks.  (somewhere in the middle there is
+invariably a human step that needs to be done that requires "do
+this and press enter".)
+</li>
+<li>
+Documentation describing the release-steps that need to be performed.
+</li>
+</ol>
+
+
+<p>
+For projects I've worked on in the past, there is often been all
+three.  The scripts get you "so far" but there is still a lot of
+operator knowledge.  Sometimes that knowledge is encoded into a
+documentation file, but I've found that typically the
+documentation lags behind the script, the expert operator or both.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-2.2" class="outline-3">
+<h3 id="sec-2.2">2.2 The solution: makerelease</h3>
+<div id="text-2.2">
+
+
+<p>
+It is, of course, impossible to take <b>all</b> the fun out of the
+process and make everything totally automated.  The goal of
+makerelease is a few fold:
+</p>
+<ul>
+<li>
+Ensure the documentation and the automated systems are combined
+and thus always in sync
+</li>
+<li>
+Automattable instructions (commands to be run) can be included
+directly and run automatically.
+</li>
+<li>
+The user can be prompted for values that need to be entered by a
+human (like a version number for the release).
+</li>
+<li>
+It can be run interactively, prompting the administrator
+at each step if each step should be done or not.
+</li>
+<li>
+Steps can be grouped together (e.g. "preparing", "packaging",
+"uploading", &hellip;)
+</li>
+</ul>
+
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-3" class="outline-2">
+<h2 id="sec-3">3 Usage</h2>
+<div id="text-3">
+
+
+</div>
+
+<div id="outline-container-3.1" class="outline-3">
+<h3 id="sec-3.1">3.1 Step by Step</h3>
+<div id="text-3.1">
+
+
+<p>
+makerelease divides up your release steps into pieces.  Each step
+contains documentation and instructions (automatically done or not)
+that need to be done.  There are a number of different types of steps.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-3.2" class="outline-3">
+<h3 id="sec-3.2">3.2 Structured in XML</h3>
+<div id="text-3.2">
+
+
+<p>
+All the steps are documented and defined using a simple xml syntax.
+This provides easy editing using any common text editor, but still
+allows for documentation to be easily embedded and displayable by
+the makerlease tool.  The most basic step structure looks like:
+</p>
+<p>
+<pre class="example">
+ &lt;makerelease&gt;
+   &lt;steps&gt;
+     &lt;step type="informational"&gt;
+       &lt;text&gt;
+        Advertise: NEWS upload to sf, publish on -announce, freshmeat,
+        and the GNU FSF directory
+        (http://directory.fsf.org/)...
+         (send mail to bug-directory@gnu.org)
+       &lt;/text&gt;
+     &lt;/step&gt;
+   &lt;/steps&gt;
+ &lt;/makerelease&gt;
+</pre>
+</p>
+<p>
+This example step (an <i>informational</i> step) simply prints the text to the screen for the user to read.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-3.3" class="outline-3">
+<h3 id="sec-3.3">3.3 makerelease -n: dry-run and produce documentation</h3>
+<div id="text-3.3">
+
+
+<p>
+You can test running makerelease on a defined xml file using the
+-n switch.  This produces documentation about the steps to be
+done.  For example, running makerelease -n on the previous example
+would produce:
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-3.4" class="outline-3">
+<h3 id="sec-3.4">3.4 makerelease:</h3>
+<div id="text-3.4">
+
+
+<p>
+By default, makerelease looks for a makerelease.xml file in the
+current directory.  Use the <i>-c FILE</i> flag to specify a particular
+file to load.  It will then proceed to iterate through each step
+and act accordingly.  See the <a href="#sec-4">Writing Steps</a> section below
+for details.
+</p>
+<p>
+<pre class="example">
+ # makerelease -c example.xml -n
+ STEP: 1:
+
+   Advertise: NEWS upload to sf, publish on -announce, freshmeat, and
+   the GNU FSF directory (http://directory.fsf.org/)... (send mail to
+   bug-directory@gnu.org)
+</pre>
+</p>
+<p>
+Note: by default it wraps all text nicely to fit into the screen
+for you.
+</p>
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-4" class="outline-2">
+<h2 id="sec-4">4 Writing Steps</h2>
+<div id="text-4">
+
+
+<p>
+There are a large number of step types, each with their own purpose.
+Some flags for them work globally (on any step type) and some are
+Step specific.
+</p>
+
+</div>
+
+<div id="outline-container-4.1" class="outline-3">
+<h3 id="sec-4.1">4.1 Global Attributes and Data</h3>
+<div id="text-4.1">
+
+
+</div>
+
+<div id="outline-container-4.1.1" class="outline-4">
+<h4 id="sec-4.1.1">4.1.1 &lt;text&gt;foo&lt;/text&gt;</h4>
+<div id="text-4.1.1">
+
+
+<p>
+The <i>&lt;text&gt;</i> section is used to describe a particular step for
+documentational purposes.  It is output both to the operator
+doing an actual release as well as when using the <i>-n</i> flag to
+simply produce documentation.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-4.1.2" class="outline-4">
+<h4 id="sec-4.1.2">4.1.2 title="Title for the Step"</h4>
+<div id="text-4.1.2">
+
+
+<p>
+A step with the /title="something"/ attribute to the step will
+"name" the step when displaying it to the user.
+</p>
+<p>
+<pre class="example">
+     &lt;step type="informational" title="Call Bob"&gt;
+       &lt;text&gt;
+        Call Bob and have him commit all his outstanding changes.
+       &lt;/text&gt;
+     &lt;/step&gt;
+</pre>
+</p>
+<p>
+Produces:
+</p>
+<p>
+<pre class="example">
+ # makerelease -c example.xml
+ [...]
+ STEP: 2:  Call Bob
+
+   Call Bob and have him commit all his outstanding changes.
+
+</pre>
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-4.1.3" class="outline-4">
+<h4 id="sec-4.1.3">4.1.3 stepname="name"</h4>
+<div id="text-4.1.3">
+
+
+<p>
+The stepname will eventually be used to control auto-skipping of
+things.  It is most useful when used with a structured naming
+scheme like "build:configure".
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-4.1.4" class="outline-4">
+<h4 id="sec-4.1.4">4.1.4 pause="true"</h4>
+<div id="text-4.1.4">
+
+
+<p>
+Creating a step with <i>&lt;step pause="true" &hellip;&gt;</i> will tell
+makerelease to stop after the text is displayed and wait for the
+user to acknowledge the screen.
+</p>
+<p>
+<pre class="example">
+     &lt;step type="informational" pause="true" title="Call Bob"&gt;
+       &lt;text&gt;
+        Call Bob and have him commit all his outstanding changes.
+       &lt;/text&gt;
+     &lt;/step&gt;
+</pre>
+</p>
+<p>
+Produces:
+</p>
+<p>
+<pre class="example">
+ # makerelease -c example.xml
+ [...]
+ STEP: 2:  Call Bob
+
+   Call Bob and have him commit all his outstanding changes.
+
+ ---- PRESS ENTER TO CONTINUE (q=quit) ----
+</pre>
+</p>
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-4.2" class="outline-3">
+<h3 id="sec-4.2">4.2 Step Types</h3>
+<div id="text-4.2">
+
+
+</div>
+
+<div id="outline-container-4.2.1" class="outline-4">
+<h4 id="sec-4.2.1">4.2.1 Informational</h4>
+<div id="text-4.2.1">
+
+
+<p>
+Informational steps simply present information to the
+administrator and do not perform any specific action.  They're
+there just to document a step.  They can be used to tell an
+administrator to do something that can't be automated by
+including the <i>prompt</i> flag to ensure the user sees it.
+</p>
+<p>
+<pre class="example">
+     &lt;step type="informational" pause="true"&gt;
+       &lt;text&gt;
+        Call Bob and have him commit all his outstanding changes.
+       &lt;/text&gt;
+     &lt;/step&gt;
+</pre>
+</p>
+<p>
+Produces:
+</p>
+<p>
+<pre class="example">
+ # makerelease -c example.xml
+ [...]
+ STEP: 2:
+
+   Call Bob and have him commit all his outstanding changes.
+
+ ---- PRESS ENTER TO CONTINUE (q=quit) ----
+</pre>
+</p>
+
+</div>
+
+</div>
+
+<div id="outline-container-4.2.2" class="outline-4">
+<h4 id="sec-4.2.2">4.2.2 Section</h4>
+<div id="text-4.2.2">
+
+
+<p>
+The <i>section</i> type lets you group various sub-steps together.
+It allows for entire sections to be skipped when using the <i>-i</i>
+p     flag and documentation to be divided up into sections.
+</p>
+
+<p>
+<pre class="example">
+    &lt;step type="section" title="Setup Steps" mandatory="1"&gt;
+     &lt;text&gt;These steps do preliminary work for making a release.&lt;/text&gt;
+     &lt;steps&gt;
+       &lt;step type="system"&gt;
+         &lt;commands&gt;
+           &lt;command&gt;echo "hello world"&lt;/command&gt;
+         &lt;/commands&gt;
+       &lt;/step&gt;
+       &lt;step type="informational"&gt;
+         &lt;text&gt;Also, Hello Universe&lt;/text&gt;
+       &lt;/step&gt;
+     &lt;/steps&gt;
+    &lt;/step&gt;
+</pre>
+</p>
+<p>
+Produces:
+</p>
+<p>
+<pre class="example">
+ # makerelease -c example.xml -n
+ STEP: 1: Setup Steps                                                          
+
+   These steps do preliminary work for making a release.
+
+   ===== Entering Step: 1 =====
+
+ STEP: 1.1:
+
+   Commands to execute:
+
+     echo "hello world"
+
+ STEP: 1.2:
+
+   Also, Hello Universe
+
+   (Leaving Step: 1)
+</pre>
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-4.2.3" class="outline-4">
+<h4 id="sec-4.2.3">4.2.3 Include</h4>
+<div id="text-4.2.3">
+
+
+<p>
+An <i>include</i> directive is functionally the same as a <i>section</i>
+directive, but the sections are specified in another
+makerelease xml file (which must be a fully qualified xml file
+with the top level <i>&lt;makerelease&gt;</i> tag in place.
+</p>
+<p>
+<pre class="example">
+    &lt;step type="include" title="Super extra steps"&gt;
+     &lt;file&gt;/path/to/foo.xml&lt;/file&gt;
+    &lt;/step&gt;
+</pre>
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-4.2.4" class="outline-4">
+<h4 id="sec-4.2.4">4.2.4 Command</h4>
+<div id="text-4.2.4">
+
+
+<p>
+Command steps are designed to run a particular set of commands
+via system() calls.  All the commands must succeed or the user
+will be prompted for what to do next (continue, retry or quit).
+</p>
+<p>
+<pre class="example">
+     &lt;step type="command"&gt;
+       &lt;commands&gt;
+         &lt;command&gt;echo "hello world"&lt;/command&gt;
+         &lt;command&gt;rm /&lt;/command&gt;
+       &lt;/commands&gt;
+     &lt;/step&gt;
+</pre>
+</p>
+<p>
+Produces:
+</p>
+<p>
+<pre class="example">
+  STEP: 3:
+
+    running 'echo "hello world"'
+
+  hello world
+
+
+    running 'rm /'
+
+  rm: cannot remove `/': Is a directory
+  failed: status=256 what now (c,r,q)?
+</pre>
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-4.2.5" class="outline-4">
+<h4 id="sec-4.2.5">4.2.5 Prompt</h4>
+<div id="text-4.2.5">
+
+
+<p>
+<pre class="example">
+     &lt;step type="prompt" prompt="Enter the version number:"
+           title="Pick a Version Number for this release"
+           parameter="VERSION"&gt;
+     &lt;/step&gt;
+</pre>
+</p>
+<p>
+Asks the user for a version number and assigns the result to the
+VERSION parameter.  The VERSION parameter can be used in future
+system commands, text, etc by wrapping the parameter name in {} brackets.
+</p>
+<p>
+<pre class="example">
+     &lt;step type="system"&gt;
+       &lt;text&gt;We're going to produce {VERSION}
+       &lt;commands&gt;
+         &lt;command&gt;echo Hello World version {VERSION}&lt;/command&gt;
+       &lt;/commands&gt;
+     &lt;/step&gt;
+</pre>
+</p>
+<p>
+You can also add a <i>values=</i> attribute to specify the legal
+values that can be chosen based on a regular expression.  For
+example, the following enforces a strict NUM.NUM format:
+</p>
+<p>
+<pre class="example">
+     &lt;step type="prompt" prompt="Enter the version number:"
+           title="Pick a Version Number for this release"
+           parameter="VERSION"
+           values="^\d+\.\d+$"&gt;
+     &lt;/step&gt;
+</pre>
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-4.2.6" class="outline-4">
+<h4 id="sec-4.2.6">4.2.6 Modify</h4>
+<div id="text-4.2.6">
+
+
+<p>
+The modify step lets you make regexp based modifications to files
+within the distribution.  Files are passed through glob() so can
+include wildcards (*) characters.
+</p>
+<p>
+<pre class="example">
+        &lt;step type="modify" title="Update the version number"&gt;
+          &lt;text&gt;
+            We will now modify files through the code to replace the
+            version number with the newer one.
+          &lt;/text&gt;
+          &lt;modifications&gt;
+            &lt;modify
+              find="VERSION = '(.*)'"
+              replace="VERSION = \'{VERSION}\'"&gt;
+              &lt;files&gt;
+                &lt;file&gt;lib/MyModule.pm&lt;/file&gt;
+                &lt;file&gt;lib/SubDir/*.pm&lt;/file&gt;
+              &lt;/files&gt;
+            &lt;/modify&gt;
+          &lt;/modifications&gt;
+        &lt;/step&gt;
+</pre>
+</p>
+<p>
+Note: You may specify multiple <i>&lt;modify&gt;</i> sections within the
+<i>&lt;modifications&gt;</i> tag too.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-4.2.7" class="outline-4">
+<h4 id="sec-4.2.7">4.2.7 Perl</h4>
+<div id="text-4.2.7">
+
+
+<p>
+A wise man once said "when all else fails, resort to perl".  Ok, I
+don't know that anyone said that actually.  But I bet someone did
+because it seems wise to me.  Sometimes it's necessary to do extra
+processing of user-entered data or files or the moon.  Embedding
+perl code directly lets you accomplish these sorts of things.
+</p>
+<p>
+The $self variable will be to the current Makerelease::Step::Perl
+module, and within that is a reference to the parameters hash in
+$self-&gt;{'parameters'}.
+</p>
+<p>
+Here's an example that takes the VERSION parameter and creates a
+new one called VERSIONDASHES with the dots replaced by dashes.
+</p>
+<p>
+<pre class="example">
+        &lt;step type="perl" title="Defining a second internal version string"
+          mandatory="1"&gt;
+          &lt;perl&gt;
+            &lt;code&gt;
+              # version number with dashes instead of dots
+              $self-&gt;{'parameters'}{'VERSIONDASHES'} =
+                  $self-&gt;{'parameters'}{'VERSION'};
+              $self-&gt;{'parameters'}{'VERSIONDASHES'} =~ s/\./-/g;
+            &lt;/code&gt;
+          &lt;/perl&gt;
+        &lt;/step&gt;
+</pre>
+</p>
+</div>
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-5" class="outline-2">
+<h2 id="sec-5">5 Examples</h2>
+<div id="text-5">
+
+
+</div>
+
+<div id="outline-container-5.1" class="outline-3">
+<h3 id="sec-5.1">5.1 Projects that are making use of makerelease scripts</h3>
+<div id="text-5.1">
+
+
+<p>
+(scripts are located in the "dist" subdirectory if not otherwise
+specified):
+</p>
+<ul>
+<li>
+<a href="http://www.net-snmp.org/">Net-SNMP</a>
+</li>
+<li>
+<a href="http://www.dnssec-tools.org/">DNSSEC-Tools</a>
+</li>
+<li>
+<a href="http://www.geoqo.org/">GeoQO</a>
+</li>
+<li>
+<a href="http://search.cpan.org/search?query=qwizard&mode=all">QWizard</a>
+</li>
+</ul>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-5.2" class="outline-3">
+<h3 id="sec-5.2">5.2 Included example scripts</h3>
+<div id="text-5.2">
+
+
+<ul>
+<li>
+dist/makerelease.xml:  the release script for this package!
+</li>
+</ul>
+
+
+<p>
+
+<hr/>
+</p>
+
+
+<img src="http://sflogo.sourceforge.net/sflogo.php?group_id=121671&type=2" />
+
+
+
+</div>
+</div>
+</div>
+<div id="postamble"><p class="date"> Date: 2008-11-03 08:57:26 PST</p>
+<p>HTML generated by org-mode 6.10c in emacs 21</p>
+</div></body>
+</html>

@@ -1,0 +1,4 @@
+- Filters
+- Time-zone is hard set to Eastern ( 240 ).
+- Verify that proxy support still works for most people.
+- Better exit if no username and password supplied.

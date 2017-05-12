@@ -1,0 +1,19 @@
+CHANGELOG
+INSTALL
+lib/MetaMap/DataStructures.pm
+lib/MetaMap/DataStructures/Citation.pm
+lib/MetaMap/DataStructures/Concept.pm
+lib/MetaMap/DataStructures/Mapping.pm
+lib/MetaMap/DataStructures/Phrase.pm
+lib/MetaMap/DataStructures/Token.pm
+lib/MetaMap/DataStructures/Utterance.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/input/sample.txt
+t/output/dummy
+t/key/sample.key
+t/mmds.t
+utils/MetaMapDataStructures.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

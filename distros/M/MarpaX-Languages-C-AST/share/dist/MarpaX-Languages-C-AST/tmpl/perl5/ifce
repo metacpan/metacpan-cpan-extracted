@@ -1,0 +1,8 @@
+[%#
+       This file is a top-level template that is supposed to handle the generic layout of every generated interface
+
+       The input to this file is a DOM tree, and every sub tree will received its corresponding DOM node in the "vars" variable
+%]
+[%~ INCLUDE top ~%]
+[%~ INCLUDE content ~%]
+[%~ INCLUDE bottom ~%]

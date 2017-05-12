@@ -1,0 +1,49 @@
+NAME
+
+    MooseX::ErrorHandling - Monkey Patch Moose's Errors
+
+VERSION
+
+    version 0.2
+
+SYNOPSIS
+
+        whenMooseThrows CanOnlyConsumeRole => insteadDo {
+            My::Exception->new(
+                error => $_->message
+            );
+        };
+
+DESCRIPTION
+
+    This module is an attempt to monkey patch the way Moose handles errors.
+    Currently Moose throws a number of different exception objects for
+    different errors. If you're trying to replace an existing object system
+    with Moose, suddenly your errors could be very different.
+
+An Important Disclamer
+
+    This module is almost certainly a bad idea, and I'm fairly sure I'm
+    going to regret putting it on cpan.
+
+TODO
+
+      * Figure out a sane way to do this.
+
+AUTHORS
+
+        Chris Reinhardt
+        crein@cpan.org
+
+COPYRIGHT
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+
+    Moose, perl(1)
+

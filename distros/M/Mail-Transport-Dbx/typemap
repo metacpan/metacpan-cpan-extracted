@@ -1,0 +1,63 @@
+TYPEMAP
+#------
+
+DBX_BOX *    O_OBJECT
+DBX_EMAIL *  EM_OBJECT
+DBX_FOLDER * FO_OBJECT
+void *       GEN_OBJECT
+
+OUTPUT
+#-----
+
+O_OBJECT
+    sv_setref_pv( $arg, CLASS, (void*)$var );
+EM_OBJECT
+    sv_setref_pv( $arg, "Mail::Transport::Dbx::Email", (void*)$var );
+GEN_OBJECT
+    if (((DBX_BOX*)SvIV((SV*)SvRV(self)))->dbx->type == DBX_TYPE_EMAIL) {
+        DBX_EMAIL *ret;
+	New(0, ret, 1, DBX_EMAIL);
+        ret->dbx = self;
+        ret->email = (DBXEMAIL*) ret_type;
+        ret->header = NULL;
+        ret->body = NULL;
+        RETVAL = (void*)ret;
+        sv_setref_pv( $arg, "Mail::Transport::Dbx::Email", (void*)$var );
+    }
+    else if (dbx->dbx->type == DBX_TYPE_FOLDER) {
+        DBX_FOLDER *ret;
+	New(0, ret, 1, DBX_FOLDER);
+	if (!dbx->subfolders)
+	    New(0, dbx->subfolders, dbx->dbx->indexCount, SV*);
+        ret->dbx = self;
+        ret->folder = (DBXFOLDER*) ret_type;
+	ret->fullpath = Nullsv;
+        RETVAL = (void*)ret;
+	dbx->subfolders[index] = sv_setref_pv( $arg, "Mail::Transport::Dbx::Folder", (void*)$var );
+    }
+    
+INPUT
+#----
+
+O_OBJECT
+	if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	else{
+		warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+		XSRETURN_UNDEF;
+	}
+EM_OBJECT
+	if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	else{
+		warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+		XSRETURN_UNDEF;
+	}
+FO_OBJECT
+	if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	else{
+		warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+		XSRETURN_UNDEF;
+	}
+

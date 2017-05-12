@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Mojolicious-Plugin-ServerSession.t
+lib/Mojolicious/Plugin/ServerSession.pm

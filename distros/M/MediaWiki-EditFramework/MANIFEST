@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+LICENSE
+lib/MediaWiki/EditFramework.pm
+lib/MediaWiki/EditFramework/Page.pm
+t/MediaWiki-EditFramework.t
+t/data/Test-w-index.php
+t/data/Main_Page
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

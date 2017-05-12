@@ -1,0 +1,39 @@
+Mcache version 0.031
+===================
+
+    Mcache - program cache (DB) for storing in the memory pages 
+    with editable set of fields. Issuance result holds in the JSON 
+
+    id - unique page number
+
+    key - unique field number
+
+    new();
+    get(id); # return full data page (all fields) in JSON
+    get(id,key); # return a single field with a key
+    add(field,id); # add fields on data page id and return unique key
+    add(field,id,key); # add fields on data page id with key
+    del(id,key); # delete fields
+    update(field,id,key); # update fields
+    count(id); # count fields on data page id
+    id(id); # current id for update
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2011 by Maxim Motylkov
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+

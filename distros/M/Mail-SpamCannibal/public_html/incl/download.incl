@@ -1,0 +1,82 @@
+<!-- last updated 4-28-06 -->
+<font size=+1>SpamCannibal Required Modules and Dependencies</font>
+<p>
+<a href="http://search.cpan.org/search?query=IPTables::IPv4::DBTarpit">IPTables::IPv4::DBTarpit</a>
+    available on <a href="http://CPAN.org/">CPAN.org</a>
+<blockquote>
+  LIBNET 1.0 <a href="http://www.packetfactory.net/libnet/">www.packetfactory.net/libnet</a></br>
+  <blockquote>
+    <font size="-1">Usually in your kernel distribution<br>
+    [Berkeley DB 2.6.4 or better <a href="http://www.sleepycat.com/">www.sleepycat.com</a>]</br>
+    [Linux 2.4x or better kernel with iptables (libipq) <a href="http://www.kernel.org/">www.kernel.org</a>]</br>
+    </font>
+  </blockquote>
+</blockquote>
+
+<a href="http://search.cpan.org/search?query=Mail::SpamCannibal">Mail::SpamCannibal</a>
+    available on <a href="http://CPAN.org/">CPAN.org</a>
+<blockquote>
+  <a href="http://search.cpan.org/search?query=Test::Harness">Test::Harness</a>
+    available on <a href="http://CPAN.org/">CPAN.org</a><br>
+  <a href="http://search.cpan.org/search?query=Test::Simple">Test::Simple</a>
+    available on <a href="http://CPAN.org/">CPAN.org</a><br>
+  <a href="http://search.cpan.org/search?query=MIME::Base64">MIME::Base64</a>
+    available on <a href="http://CPAN.org/">CPAN.org</a><br>
+  <a href="http://search.cpan.org/search?query=Digest::MD5">Digest::MD5</a>
+    available on <a href="http://CPAN.org/">CPAN.org</a><br>
+  <a href="http://search.cpan.org/search?query=Unix::Syslog">Unix::Syslog</a>
+    available on <a href="http://CPAN.org/">CPAN.org</a><br>
+  <a href="http://search.cpan.org/search?query=Geo::IP::PurePerl">Geo::IP::PurePerl</a>
+    available on <a href="http://CPAN.org/">CPAN.org</a><br>
+  <a href="http://search.cpan.org/search?query=NetAddr::IP::Lite">NetAddr::IP::Lite</a> version 0.02 or better
+    available on <a href="http://CPAN.org/">CPAN.org</a><br>
+  <a href="http://search.cpan.org/search?query=Net::Whois::IP">Net::Whois::IP</a> version 0.35 or better
+    available on <a href="http://CPAN.org/">CPAN.org</a><br>
+  <a href="http://search.cpan.org/search?query=Net::DNS::Codes">Net::DNS::Codes</a>
+    available on <a href="http://CPAN.org/">CPAN.org</a><br>
+  <a href="http://search.cpan.org/search?query=Net::DNS::ToolKit">Net::DNS::ToolKit</a>
+    available on <a href="http://CPAN.org/">CPAN.org</a><br>
+  <a href="http://search.cpan.org/search?query=Net::DNSBL::MultiDaemon">Net::DNSBL::MultiDaemon</a>
+    available on <a href="http://CPAN.org/">CPAN.org</a><br>
+  <a href="http://search.cpan.org/search?query=Sys::Hostname::FQDN">Sys::Hostname::FQDN</a>
+    available on <a href="http://CPAN.org/">CPAN.org</a><br>
+  <br>
+   For optional PGP support, one of the following:
+<ul>
+<li><a href=" http://www.gnupg.org/">GnuPG</a> http://www.gnupg.org<br>
+If you plan to user PGP 2.6x or 6.x compatibility modes and you are in a
+country where there are not patent restrictions, then you will also need to
+download:
+<p>
+<a href="ftp://ftp.gnupg.dk/pub/contrib-dk/iodea.c.gz">ftp://ftp.gnupg.dk/pub/contrib-dk/iodea.c.gz</a>
+<p>
+<li>or PGP from one of these sites.
+<p>
+in the US: 2.6.2g, the "rebel" version<br> 
+<a href="ftp://sunsite.smc.univie.ac.at/pub/crypto/cypherpunks/pgp/pgp262/pgp262g.zip">ftp://sunsite.smc.univie.ac.at/pub/crypto/cypherpunks/pgp/pgp262/pgp262g.zip</a>
+<p>
+outside US:   PGP 2.6.3i or PGP 6.5.8<br>
+<a href="http://www.pgpi.org/">www.pgpi.org</a> pgpsrc658unix-gnu.tar.gz,  PGPcmdln_6.5.8.Lnx_FW.tar.gz, or  PGPcmdln_6.5.8.Lnx_FW.rpm.tar
+</ul>
+
+For optional web dbtarpit statistics support:
+<ul>
+<li><a href="http://search.cpan.org/search?query=LaBrea::Tarpit">LaBrea::Tarpit</a>
+    available on <a href="http://CPAN.org/">CPAN.org</a><br>
+</ul>
+
+For Optional optimized DNSBL polling for your MTA<br>
+using common SpamCannibal configuration files:
+<ul>
+<li><a href="http://search.cpan.org/search?query=Net::DNSBL::MultiDaemon">Net::DNSBL::MultiDaemon</a>
+    available on <a href="http://CPAN.org/">CPAN.org</a><br>
+</ul>
+
+For Optional country code and flag display on WHOIS and LOOKUP pages:
+<ul>
+<li><a
+href="http://search.cpan.org/search?query=Geo::CountryFlags">Geo::CountryFlagsl</a>
+   available on <a href="http://CPAN.org/">CPAN.org</a><br>
+</ul>
+
+</blockquote>

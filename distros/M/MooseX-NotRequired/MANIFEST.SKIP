@@ -1,0 +1,16 @@
+tags
+.git
+blib
+Makefile$
+Makefile.old
+Build$
+Build.bat
+_build.*
+pm_to_blib.*
+MYMETA.*
+.tar.gz$
+.lwpcookies$
+\.bak$
+cover_db
+pod2htm.*.tmp
+MooseX-NotRequired-.*

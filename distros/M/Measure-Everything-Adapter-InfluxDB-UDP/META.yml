@@ -1,0 +1,33 @@
+---
+abstract: 'A Measure::Everything adapter to feed InfluxDB through UDP.'
+author:
+  - 'Javier Arturo Rodriguez <javier@rodriguez.org.mx>'
+build_requires:
+  IO::Select: '0'
+  Measure::Everything: '1.001'
+  Measure::Everything::Adapter: '0'
+  Sys::Hostname: '0'
+  Test::Exception: '0.29'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Measure-Everything-Adapter-InfluxDB-UDP
+requires:
+  IO::Socket::INET: '1.18'
+  InfluxDB::LineProtocol: '1.007'
+  Measure::Everything: '1.001'
+  Measure::Everything::Adapter::Base: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/codehead/Measure-Everything-Adapter-InfluxDB-UDP/issues
+  homepage: https://github.com/codehead/Measure-Everything-Adapter-InfluxDB-UDP
+  repository: https://github.com/codehead/Measure-Everything-Adapter-InfluxDB-UDP.git
+version: '0.01'

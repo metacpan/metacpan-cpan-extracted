@@ -1,0 +1,171 @@
+#!/usr/bin/perl
+#Copyright (c) 2010, Zane C. Bowers
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use MP3::Tag::Utils;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+        print "mp3tag 0.0.0\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+        print "\n".
+		      "-a <album>\n".
+			  "-A <artist>\n".
+			  "-c <comment>\n".
+			  "-g <genre>\n".
+			  "-s <song>\n".
+			  "-S    Use this flag if changing the song on more than one file.\n".
+			  "-t <title>\n".
+			  "-T <track>\n".
+			  "-y <year>\n";
+}
+
+#gets the options
+my %opts;
+getopts('a:A:c:g:t:T:y:', \%opts);
+
+#if more than one was specified, make sure the safety is off
+if (
+	defined( $ARGV[1] ) &&
+	(!defined( $opts{S} )) &&
+	(defined($opts{t}))
+	) {
+	warn('More than one file specified and "-t" is being used, but "-S" is not supplied');
+	exit 254;
+}
+
+#init the utility
+my $mp3util=MP3::Tag::Utils->new;
+
+#change each one
+my $int=0;
+while ($ARGV[$int]) {
+	$mp3util->change({
+					  file=>$ARGV[$int],
+					  album=>$opts{a},
+					  artist=>$opts{A},
+					  comment=>$opts{c},
+					  genre=>$opts{g},
+					  title=>$opts{t},
+					  track=>$opts{T},
+					  year=>$opts{y},
+					  });
+
+	$int++;
+}
+
+exit 0;
+
+=head1 NAME
+
+mp3tag - Manipulate the tags for one or more MP3 files.
+
+=head1 SYNOPSIS
+
+mp3tag  [B<-S>] [B<-a> <album>] [B<-A> <artist>] [B<-c> <comment>] [B<-g> <genre>] [B<-t> <title>] [B<-T> <track>] [B<-y> <year>] <mp3 files 0> [<mp3 file 1>...]
+mp3tag  [B<-a> <album>] [B<-A> <artist>] [B<-c> <comment>] [B<-g> <genre>] [B<-t> <title>] [B<-T> <track>] [B<-y> <year>] [ <mp3 files 0>
+
+=head1 SWTICHES
+
+=head2 -S
+
+If more than one file is specified and "-t" being used.
+
+This is done as this is done as generally setting all MP3s to have the
+same title is not desired.
+
+=head2 -a <album>
+
+Set the album name.
+
+=head2 -A <artist>
+
+Set the artist name.
+
+=head2 -c <comment>
+
+Set the comment.
+
+=head2 -g <genre>
+
+Set the genre.
+
+=head2 -t <title>
+
+Set the title.
+
+=head2 -T <track>
+
+Set the track.
+
+=head2 -y <year>
+
+Sets the year.
+
+=head1 AUTHOR
+
+Copyright (c) 2010, Zame C. Bowers <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 SCRIPT CATEGORIES
+
+Desktop
+
+=head1 OSNAMES
+
+any
+
+=head1 README
+
+mp3tag - Manipulate the tags for one or more MP3 files.
+
+=cut

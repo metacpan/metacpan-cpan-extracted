@@ -1,0 +1,66 @@
+NAME
+    Message::Passing::Input::Freeswitch - input messages from Freeswitch.
+
+SYNOPSIS
+        message-pass --input Freeswitch --input_options \
+            '{"hostname":"127.0.0.1","secret":"s3kriTk3y"}' \
+            --output STDOUT
+
+DESCRIPTION
+    Produces a message stream from a Freeswitch <http://www.freeswitch.org/>
+    instance.
+
+    Uses the Freeswitch to connect to a local or remote Freeswitch instance
+    and stream event messages.
+
+ATTRIBUTES
+  hostname
+    The Freeswitch host to connect to.
+
+  secret
+    The secret configured in Freeswitch for connecting to the event listener
+    socket.
+
+  connection_retry_timeout
+    The number of seconds to wait after a disconnect before reconnecting.
+    Default 3.
+
+  port
+    The port that Freeswitch's ESL socket is listening on. Defaults to 8021.
+
+  events
+    An arrayref of types of events to listen for. These types are documented
+    on the Freeswitch wiki <http://wiki.freeswitch.org/wiki/Event_List>.
+
+    By default, the special type, "all" is used - which means all event
+    types are subscribed to.
+
+SEE ALSO
+    Message::Passing
+    <http://www.freeswitch.org/>
+    <http://wiki.freeswitch.org/wiki/Event_Socket_Library>
+    <http://wiki.freeswitch.org/wiki/Event_List>
+
+AUTHOR
+    Tomas (t0m) Doran <bobtfish@bobtfish.net>
+
+SPONSORSHIP
+    This module exists due to the wonderful people at Suretec Systems Ltd.
+    <http://www.suretecsystems.com/> who sponsored it's development for its
+    VoIP division called SureVoIP <http://www.surevoip.co.uk/> for use with
+    the SureVoIP API -
+    <http://www.surevoip.co.uk/support/wiki/api_documentation>
+
+COPYRIGHT
+    Copyright Suretec Systems Ltd. 2012.
+
+    Logstash (upon which many ideas for this project is based, but which we
+    do not reuse any code from) is copyright 2010 Jorden Sissel.
+
+LICENSE
+    GNU Affero General Public License, Version 3
+
+    If you feel this is too restrictive to be able to use this software,
+    please talk to us as we'd be willing to consider re-licensing under less
+    restrictive terms.
+

@@ -1,0 +1,1327 @@
+chunk
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+qsort
+optional colon name element
+funcbody
+(
+optional parlist
+namelist
+Name
+x
+Name
+l
+Name
+u
+Name
+f
+)
+block
+chunk
+stat list
+stat
+keyword if
+if
+exp
+exp
+var
+Name
+l
+<
+exp
+var
+Name
+u
+keyword then
+then
+block
+chunk
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat
+keyword local
+local
+namelist
+Name
+m
+optional namelist initialization
+=
+explist
+exp
+exp
+exp
+exp
+var
+prefixexp
+var
+Name
+math
+.
+Name
+random
+args
+(
+optional explist
+explist
+exp
+exp
+var
+Name
+u
+-
+exp
+(
+exp
+exp
+var
+Name
+l
+-
+exp
+Number
+1
+)
+)
++
+exp
+var
+Name
+l
+-
+exp
+Number
+1
+stat
+varlist
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+l
+]
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+m
+]
+=
+explist
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+m
+]
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+l
+]
+stat
+keyword local
+local
+namelist
+Name
+t
+optional namelist initialization
+=
+explist
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+l
+]
+stat
+varlist
+var
+Name
+m
+=
+explist
+exp
+var
+Name
+l
+stat
+keyword local
+local
+namelist
+Name
+i
+optional namelist initialization
+=
+explist
+exp
+exp
+var
+Name
+l
++
+exp
+Number
+1
+stat
+keyword while
+while
+exp
+exp
+var
+Name
+i
+<=
+exp
+var
+Name
+u
+keyword do
+do
+block
+chunk
+stat list
+stat list
+stat
+keyword if
+if
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+i
+]
+exp
+var
+Name
+t
+)
+keyword then
+then
+block
+chunk
+stat list
+stat list
+stat
+varlist
+var
+Name
+m
+=
+explist
+exp
+exp
+var
+Name
+m
++
+exp
+Number
+1
+stat
+varlist
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+m
+]
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+i
+]
+=
+explist
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+i
+]
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+m
+]
+elseif sequence
+optional else block
+keyword end
+end
+stat
+varlist
+var
+Name
+i
+=
+explist
+exp
+exp
+var
+Name
+i
++
+exp
+Number
+1
+keyword end
+end
+stat
+varlist
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+l
+]
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+m
+]
+=
+explist
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+m
+]
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+l
+]
+stat
+functioncall
+prefixexp
+var
+Name
+qsort
+args
+(
+optional explist
+explist
+exp
+var
+Name
+x
+exp
+var
+Name
+l
+exp
+exp
+var
+Name
+m
+-
+exp
+Number
+1
+exp
+var
+Name
+f
+)
+stat
+functioncall
+prefixexp
+var
+Name
+qsort
+args
+(
+optional explist
+explist
+exp
+var
+Name
+x
+exp
+exp
+var
+Name
+m
++
+exp
+Number
+1
+exp
+var
+Name
+u
+exp
+var
+Name
+f
+)
+elseif sequence
+optional else block
+keyword end
+end
+keyword end
+end
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+selectionsort
+optional colon name element
+funcbody
+(
+optional parlist
+namelist
+Name
+x
+Name
+n
+Name
+f
+)
+block
+chunk
+stat list
+stat list
+stat
+keyword local
+local
+namelist
+Name
+i
+optional namelist initialization
+=
+explist
+exp
+Number
+1
+stat
+keyword while
+while
+exp
+exp
+var
+Name
+i
+<=
+exp
+var
+Name
+n
+keyword do
+do
+block
+chunk
+stat list
+stat list
+stat list
+stat list
+stat
+keyword local
+local
+namelist
+Name
+m
+Name
+j
+optional namelist initialization
+=
+explist
+exp
+var
+Name
+i
+exp
+exp
+var
+Name
+i
++
+exp
+Number
+1
+stat
+keyword while
+while
+exp
+exp
+var
+Name
+j
+<=
+exp
+var
+Name
+n
+keyword do
+do
+block
+chunk
+stat list
+stat list
+stat
+keyword if
+if
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+j
+]
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+m
+]
+)
+keyword then
+then
+block
+chunk
+stat list
+stat
+varlist
+var
+Name
+m
+=
+explist
+exp
+var
+Name
+j
+elseif sequence
+optional else block
+keyword end
+end
+stat
+varlist
+var
+Name
+j
+=
+explist
+exp
+exp
+var
+Name
+j
++
+exp
+Number
+1
+keyword end
+end
+stat
+varlist
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+i
+]
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+m
+]
+=
+explist
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+m
+]
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+i
+]
+stat
+varlist
+var
+Name
+i
+=
+explist
+exp
+exp
+var
+Name
+i
++
+exp
+Number
+1
+keyword end
+end
+keyword end
+end
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+show
+optional colon name element
+funcbody
+(
+optional parlist
+namelist
+Name
+m
+Name
+x
+)
+block
+chunk
+stat list
+stat list
+stat list
+stat list
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+var
+Name
+m
+exp
+String
+double quoted string
+"\n\t"
+)
+stat
+keyword local
+local
+namelist
+Name
+i
+optional namelist initialization
+=
+explist
+exp
+Number
+1
+stat
+keyword while
+while
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+i
+]
+keyword do
+do
+block
+chunk
+stat list
+stat list
+stat list
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+i
+]
+)
+stat
+varlist
+var
+Name
+i
+=
+explist
+exp
+exp
+var
+Name
+i
++
+exp
+Number
+1
+stat
+keyword if
+if
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+i
+]
+keyword then
+then
+block
+chunk
+stat list
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+","
+)
+elseif sequence
+optional else block
+keyword end
+end
+keyword end
+end
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+"\n"
+)
+keyword end
+end
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+testsorts
+optional colon name element
+funcbody
+(
+optional parlist
+namelist
+Name
+x
+)
+block
+chunk
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat
+keyword local
+local
+namelist
+Name
+n
+optional namelist initialization
+=
+explist
+exp
+Number
+1
+stat
+keyword while
+while
+exp
+var
+prefixexp
+var
+Name
+x
+[
+exp
+var
+Name
+n
+]
+keyword do
+do
+block
+chunk
+stat list
+stat
+varlist
+var
+Name
+n
+=
+explist
+exp
+exp
+var
+Name
+n
++
+exp
+Number
+1
+keyword end
+end
+;
+stat
+varlist
+var
+Name
+n
+=
+explist
+exp
+exp
+var
+Name
+n
+-
+exp
+Number
+1
+stat
+functioncall
+prefixexp
+var
+Name
+show
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+"original"
+exp
+var
+Name
+x
+)
+stat
+functioncall
+prefixexp
+var
+Name
+qsort
+args
+(
+optional explist
+explist
+exp
+var
+Name
+x
+exp
+Number
+1
+exp
+var
+Name
+n
+exp
+function
+keyword function
+function
+funcbody
+(
+optional parlist
+namelist
+Name
+x
+Name
+y
+)
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+exp
+var
+Name
+x
+<
+exp
+var
+Name
+y
+keyword end
+end
+)
+stat
+functioncall
+prefixexp
+var
+Name
+show
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+"after quicksort"
+exp
+var
+Name
+x
+)
+stat
+functioncall
+prefixexp
+var
+Name
+selectionsort
+args
+(
+optional explist
+explist
+exp
+var
+Name
+x
+exp
+var
+Name
+n
+exp
+function
+keyword function
+function
+funcbody
+(
+optional parlist
+namelist
+Name
+x
+Name
+y
+)
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+exp
+var
+Name
+x
+>
+exp
+var
+Name
+y
+keyword end
+end
+)
+stat
+functioncall
+prefixexp
+var
+Name
+show
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+"after reverse selection sort"
+exp
+var
+Name
+x
+)
+stat
+functioncall
+prefixexp
+var
+Name
+qsort
+args
+(
+optional explist
+explist
+exp
+var
+Name
+x
+exp
+Number
+1
+exp
+var
+Name
+n
+exp
+function
+keyword function
+function
+funcbody
+(
+optional parlist
+namelist
+Name
+x
+Name
+y
+)
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+exp
+var
+Name
+x
+<
+exp
+var
+Name
+y
+keyword end
+end
+)
+stat
+functioncall
+prefixexp
+var
+Name
+show
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+"after quicksort again"
+exp
+var
+Name
+x
+)
+keyword end
+end
+stat
+varlist
+var
+Name
+x
+=
+explist
+exp
+tableconstructor
+{
+fieldlist
+field
+exp
+String
+double quoted string
+"Jan"
+field
+exp
+String
+double quoted string
+"Feb"
+field
+exp
+String
+double quoted string
+"Mar"
+field
+exp
+String
+double quoted string
+"Apr"
+field
+exp
+String
+double quoted string
+"May"
+field
+exp
+String
+double quoted string
+"Jun"
+field
+exp
+String
+double quoted string
+"Jul"
+field
+exp
+String
+double quoted string
+"Aug"
+field
+exp
+String
+double quoted string
+"Sep"
+field
+exp
+String
+double quoted string
+"Oct"
+field
+exp
+String
+double quoted string
+"Nov"
+field
+exp
+String
+double quoted string
+"Dec"
+}
+stat
+functioncall
+prefixexp
+var
+Name
+testsorts
+args
+(
+optional explist
+explist
+exp
+var
+Name
+x
+)

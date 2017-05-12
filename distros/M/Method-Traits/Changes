@@ -1,0 +1,28 @@
+Revision history for Perl extension Method-Traits
+
+0.04 2017-05-08
+    [BACKWARDS INCOMPATIBLE CHANGE]
+    - traits now get the MOP::Method instance instead
+      of only the name, this means all trait code will
+      need to be re-written to handle this, no attempt
+      at back compat will be made.
+        - I did tell you in 0.03 that things were still
+          in flux
+        - So you really only have yourself to blame
+        - updated tests and docs accordingly
+
+0.03 2017-02-23
+    - added a warning to the docs about things
+      still being in a state of flux
+    - handle the string 'undef' in trait, convert
+      it into proper undef value
+        - added tests for this
+
+0.02 2017-02-14
+    - Improved parsing of multi-line attributes
+    - switch test to use JSON::PP, which is core
+    - specify the need for Perl 5.14.5 as minimum version
+        - explain this in the docs
+
+0.01 2017-02-07
+    - Initial release to an unsuspecting world

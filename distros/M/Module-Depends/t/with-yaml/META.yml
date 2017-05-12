@@ -1,0 +1,24 @@
+---
+name: Module-Depends
+version: 0.06
+author: ~
+abstract: identify the dependencies of a distribution
+license: perl
+requires:
+  Class::Accessor::Chained: 0
+  File::Spec: 0
+  File::chdir: 0
+  YAML: 0
+build_requires:
+  Test::More: 0
+provides:
+  Module::Depends:
+    file: lib/Module/Depends.pm
+    version: 0.06
+  Module::Depends::Intrusive:
+    file: lib/Module/Depends/Intrusive.pm
+  Module::Depends::Intrusive::Fake::Module::Build:
+    file: lib/Module/Depends/Intrusive.pm
+  main:
+    file: lib/Module/Depends/Intrusive.pm
+generated_by: Module::Build version 0.2608

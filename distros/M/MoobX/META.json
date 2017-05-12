@@ -1,0 +1,131 @@
+{
+   "abstract" : "Reactive programming framework heavily inspired by JavaScript's MobX",
+   "author" : [
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MoobX",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::PAUSE::Permissions" : "0",
+            "strict" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Attribute::Handlers" : "0",
+            "Carp" : "0",
+            "Exporter::Tiny" : "0",
+            "Graph::Directed" : "0",
+            "Module::Runtime" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util" : "0",
+            "MooseX::MungeHas" : "0",
+            "Scalar::Util" : "0",
+            "experimental" : "0",
+            "overload" : "0",
+            "parent" : "0",
+            "perl" : "v5.20.0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "List::AllUtils" : "0",
+            "Test::More" : "0",
+            "Test::Warn" : "0",
+            "strict" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MoobX" : {
+         "file" : "lib/MoobX.pm",
+         "version" : "v0.1.0"
+      },
+      "MoobX::Array" : {
+         "file" : "lib/MoobX/Array.pm",
+         "version" : "v0.1.0"
+      },
+      "MoobX::Array::Observable" : {
+         "file" : "lib/MoobX/Array/Observable.pm",
+         "version" : "v0.1.0"
+      },
+      "MoobX::Attributes" : {
+         "file" : "lib/MoobX/Attributes.pm",
+         "version" : "v0.1.0"
+      },
+      "MoobX::Hash" : {
+         "file" : "lib/MoobX/Hash.pm",
+         "version" : "v0.1.0"
+      },
+      "MoobX::Hash::Observable" : {
+         "file" : "lib/MoobX/Hash/Observable.pm",
+         "version" : "v0.1.0"
+      },
+      "MoobX::Observer" : {
+         "file" : "lib/MoobX/Observer.pm",
+         "version" : "v0.1.0"
+      },
+      "MoobX::Scalar" : {
+         "file" : "lib/MoobX/Scalar.pm",
+         "version" : "v0.1.0"
+      },
+      "MoobX::Scalar::Observable" : {
+         "file" : "lib/MoobX/Scalar/Observable.pm",
+         "version" : "v0.1.0"
+      },
+      "MoobX::Trait::Observable" : {
+         "file" : "lib/MoobX/Trait/Observable.pm",
+         "version" : "v0.1.0"
+      },
+      "MoobX::Trait::Observer" : {
+         "file" : "lib/MoobX/Trait/Observer.pm",
+         "version" : "v0.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yanick/MoobX/issues"
+      },
+      "homepage" : "https://github.com/yanick/MoobX",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/MoobX.git",
+         "web" : "https://github.com/yanick/MoobX"
+      }
+   },
+   "version" : "0.1.0",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ]
+}
+

@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name: Mail-Action-Role-Purge
+version: 0.11
+author:
+  - James FitzGibbon E<lt>jfitz@CPAN.ORGE<gt>
+abstract: |-
+  purge expired objects from Mail::Action::Storage
+  collections.
+license: perl
+requires:
+  Class::Roles: 0.30
+  Mail::Action: 0.20
+  Mail::SimpleList: 0.85
+  Mail::TempAddress: 0.55
+build_requires:
+  Test::Role: 0.012
+provides:
+  Mail::Action::Role::Purge:
+    file: lib/Mail/Action/Role/Purge.pm
+    version: 0.11
+generated_by: Module::Build version 0.2607

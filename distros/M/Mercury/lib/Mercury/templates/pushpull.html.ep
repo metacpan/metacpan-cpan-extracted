@@ -1,0 +1,102 @@
+
+<div class="container-fluid">
+    <div class="row">
+
+        <div class="col-md-6">
+
+            <p>Push/pull allows multiple publishers to send messages that will
+            be handled by exactly one subscriber in a rotation. Requesting a
+            WebSocket from the URL <code>/pull/bender</code> creates a
+            subscription to the topic "bender". Requesting a WebSocket from the
+            URL <code>/push/bender</code> allows sending messages to the
+            "bender" topic, which are then sent to a single subscriber.</p>
+
+        </div>
+
+    </div>
+    <div class="row">
+
+        <div class="col-md-4">
+            <h2>Pull 1</h2>
+            <p>Type in a topic and press Enter to subscribe to that topic.</p>
+
+            <form id="pull-1-form">
+                <div id="pull-1-topic-field" class="form-group">
+                    <label for="pull-1-topic">Topic: </label>
+                    <div class="input-group">
+                        <span class="input-group-addon">/pull/</span>
+                        <input type="text" id="pull-1-topic" class="form-control" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary">Subscribe</button>
+                        </span>
+                    </div>
+                </div>
+            </form>
+            <div id="pull-1-log" class="log"></div>
+        </div>
+
+        <div class="col-md-4">
+            <h2>Pull 2</h2>
+            <p>Type in a topic and press Enter to subscribe to that topic.</p>
+
+            <form id="pull-2-form">
+                <div id="pull-2-topic-field" class="form-group">
+                    <label for="pull-2-topic">Topic: </label>
+                    <div class="input-group">
+                        <span class="input-group-addon">/pull/</span>
+                        <input type="text" id="pull-2-topic" class="form-control" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary">Subscribe</button>
+                        </span>
+                    </div>
+                </div>
+            </form>
+            <div id="pull-2-log" class="log"></div>
+        </div>
+
+        <div class="col-md-4">
+            <h2>Push</h2>
+
+            <p>Once you're subscribed, type in a topic and a message to send a message
+            on that topic.</p>
+
+            <form id="push-form">
+                <div id="push-topic-field" class="form-group has-feedback">
+                    <label for="push-topic">Topic: </label>
+                    <div class="input-group">
+                        <span class="input-group-addon">/push/</span>
+                        <input type="text" id="push-topic" class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message: </label>
+                    <div class="input-group">
+                        <input type="text" id="push-message" class="form-control" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary">Publish</button>
+                        </span>
+                    </div>
+                </div>
+            </form>
+            <div id="push-log" class="log"></div>
+        </div>
+
+    </div>
+</div>
+
+%= javascript begin
+
+    $(function(){
+        $( '#pull-1-form' ).on( 'submit', function ( e ) {
+            connect_recv( e, 'pull-1', '<%= url_for( 'pull' )->path %>' );
+        } );
+        $( '#pull-2-form' ).on( 'submit', function ( e ) {
+            connect_recv( e, 'pull-2', '<%= url_for( 'pull' )->path %>' );
+        } );
+        $( '#push-form' ).on( 'submit', function ( e ) {
+            connect_send( e, 'push', '<%= url_for( 'push' )->path %>' );
+        } );
+    });
+
+% end
+

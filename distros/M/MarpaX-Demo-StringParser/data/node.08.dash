@@ -1,0 +1,7 @@
+# Complete graph. OK.
+[node.1]
+-> {arrowhead: odot; arrowtail: ediamond; color: green; dir: both; label: A 1; penwidth: 1}
+-> {color: blue; label: B 2; penwidth: 3}
+-> {arrowhead: box; arrowtail: invdot; color: maroon; dir: both; label: C 3; penwidth: 5}
+[] {label: 'Some node'}
+-> [node.2]

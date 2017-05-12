@@ -1,0 +1,12 @@
+lib/Mojolicious/Plugin/Piwik.pm
+t/piwik_api.t
+t/piwik_api-track.t
+t/piwik_api_url.t
+t/piwik_tag.t
+t/piwik_tag-opt-out.t
+Changes
+MANIFEST
+LICENSE
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

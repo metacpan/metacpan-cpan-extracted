@@ -1,0 +1,15 @@
+This template is for testing Maypole::Plugin::Authorization's
+authorized classes method.
+
+# This should be a (short!) list of clases
+ZZ [% request.get_authorized_classes %] YY
+
+This should be a list of classes
+XX [% request.get_authorized_classes(1).sort.join(',') %] WW classes
+
+This should be an empty list
+VV [% request.get_authorized_classes(2).sort.join(',') %] UU classes
+
+This should be an empty list - called on Style class
+JJ [% request.get_authorized_classes.sort.join(',') %] II classes
+

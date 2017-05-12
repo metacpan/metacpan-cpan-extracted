@@ -1,0 +1,101 @@
+Mail::Webmail::Yahoo 
+====================
+
+******************************************************************************
+*                                                                            *
+*                       Mail Storage Quota Warning                           *
+* Hello Yahoo Mail User!                                                     *
+* You are approaching your quota of 6.0 Megabytes (MB) of storage. You are   *
+* currently using 5.2 MB of storage.  (Details)                              *
+*                                                                            *
+*                         Expand your mailbox!                               *
+*                                                                            *
+* Get up to 100 MB of storage for your mailbox. Starting at just $9.99/year! *
+* Please order more storage or delete older and/or larger messages so that   *
+* you can be assured of sending and receiving mail.                          *
+* We recommend that you keep at least 1 MB of space free for incoming mail.  *
+* Please be sure to "empty" your trash after you have deleted your messages -*
+* the space in your mailbox will not be freed until the trash folder is      *
+* emptied.                                                                   *
+*                                                                            *
+******************************************************************************
+
+
+If you've ever seen the above, this package might be for you. Frustrated by
+the lack of bulk processing tools in Yahoo mail, I was prompted to write this
+package. It allows you to download to your local machine all of the messages
+in your Yahoo account, attachments included. Future versions will allow bulk
+deletion, forwarding, and other useful mail functions.
+
+This is version 0.6 of the Mail::Webmail::Yahoo package; it may be slightly
+brittle. While I have been testing it and using it on my own yahoo
+accounts for several weeks, I would appreciate any feedback, positive or
+negative.
+
+Older versions of this package used 'snagmail.pl' and 'sendhoo.pl' to perform
+message retrieval and send duties. These have now been rolled into a much
+enhanced 'yahootils.pl' application. They remain in the distribution but will
+be removed at some future date.
+
+yahootils.pl comes with full instructions included. To see all available
+options, call
+
+  yahootils.pl --help
+
+
+INSTALLATION
+
+Note: This module requires a secure sockets layer library (such as openssl,
+available from www.openssl.org) and a perl wrapper for such. I recommend
+Crypt::SSLeay
+
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test          # (optional, but recommended)
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	LWP::UserAgent
+	Crypt::SSLeay or other SSL wrapper/ library
+	HTTP::Request
+	HTTP::Headers
+	HTTP::Cookies
+	HTML::LinkExtor
+	HTML::Entities
+	Mail::Internet
+	MIME::Base64
+	HTML::FormParser
+	HTML::TableExtractor
+	HTML::TableContentParser
+	HTML::Element
+	HTML::TreeBuilder
+	CGI
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002,2003  Simon Drabble  <sdrabble@cpan.org>
+
+
+This module is released under the same terms as perl itself. Please see
+http://www.perl.com for full details.
+
+
+DISCLAIMER
+
+This module is not published or authorised by Yahoo Inc. in any way. Please DO
+NOT contact Yahoo Inc. regarding use of this software. 
+
+CAVEATS
+
+There may be some issues with messages converted from HTML to plaintext. This
+is due to the way HTML::Element renders as_text(), although I expect to tidy
+it up in future. Generally if the message has the correct content type, things
+should for the most part work as expected.
+
+

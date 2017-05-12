@@ -1,0 +1,8 @@
+Scripts to interact with the *.scl files present in the archive:
+
+http://www.huygens-fokker.org/docs/scales.zip
+
+Other ideas: look for files with negative cents (what do those mean?),
+those with repeated elements, those that descend (subharmonics?), those
+that have multiple scales inside them (e.g. they have the octave twice
+with elements between).

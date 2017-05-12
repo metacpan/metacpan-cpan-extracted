@@ -1,0 +1,8 @@
+0.002   2008-09-24
+
+  * fix required/optional handling
+  * add B::Hooks::EndOfScope for _build_$attribute support
+
+0.001   2008-09-24
+
+  * first release

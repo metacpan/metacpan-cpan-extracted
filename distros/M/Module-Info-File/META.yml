@@ -1,0 +1,34 @@
+---
+abstract: 'retrieve module information from a file'
+author:
+  - 'Jonas B. Nielsen <jonasbn@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.30'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Info-File
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  File::Basename: '0'
+  Module::Info: '0.20'
+  Module::Metadata: '0'
+  Try::Tiny: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/jonasbn/Module-Info-File/issues
+  homepage: http://search.cpan.org/dist/Module-Info-File/
+  repository: git://github.com/jonasbn/Module-Info-File.git
+version: '1.00'
+x_serialization_backend: 'YAML::Tiny version 1.69'

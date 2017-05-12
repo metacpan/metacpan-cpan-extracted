@@ -1,0 +1,11 @@
+Revision history for Perl extension Math::decNumber.
+
+0.02  2014/5/15
+  - Removed the tests with precision 999999999 that causes a "Out of memory"
+    message (CPAN Testers).
+  - Added license file.
+  - completed Makefile.PL and Meta*
+
+0.01  2014/5/12
+  - First release.
+

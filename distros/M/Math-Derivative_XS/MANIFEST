@@ -1,0 +1,12 @@
+Changes
+Derivative_XS.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/01_Math-Derivative_XS.t
+t/02_regression.t
+t/02_regression.yml
+lib/Math/Derivative_XS.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,67 @@
+=head1 NAME
+
+Math::PartialOrder::CEnum -
+class for compiled type hierarchies using 'Enum' strings.
+
+=head1 SYNOPSIS
+
+  use Math::PartialOrder::CEnum;
+
+  ...
+
+=head1 REQUIRES
+
+Carp,
+Exporter,
+Math::PartialOrder::Base,
+Math::PartialOrder::CMasked,
+Bit::Vector.
+
+=head1 DESCRIPTION
+
+Math::PartialOrder::CEnum is a Math::PartialOrder::Base implementation for
+compiled datatype hierarchies using
+the Bit::Vector module for hierarchy operations and an internal
+representation of hierarchy information as 'Enum' strings.  It inherits
+from Math::PartialOrder::CMasked.
+
+This package implements the methods required by Math::PartialOrder::Base
+for datatype hierarchies.  See L<Math::PartialOrder::Base> for details.
+
+=pod
+
+=head1 METHODS
+
+No new methods are introduced by Math::PartialOrder::CEnum, but all additional
+methods described in L<Math::PartialOrder::CMasked> are supporterd.
+
+
+
+=head1 ACKNOWLEDGEMENTS
+
+perl by Larry Wall.
+
+Bit::Vector by Steffen Beyer.
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>jurish@ling.uni-potsdam.deE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001, Bryan Jurish.  All rights reserved.
+
+This package is free software.  You may redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+perl(1).
+Math::PartialOrder(3pm).
+Math::PartialOrder::Base(3pm).
+Math::PartialOrder::CMasked(3pm).
+Math::PartialOrder::Std(3pm).
+Math::PartialOrder::Caching(3pm).
+Math::PartialOrder::LRUCaching(3pm).
+Math::PartialOrder::Loader(3pm).
+Bit::Vector(3pm).

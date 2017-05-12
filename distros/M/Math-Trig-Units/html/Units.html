@@ -1,0 +1,245 @@
+<HTML>
+<HEAD>
+<TITLE>Units.pm</TITLE>
+<LINK REL="stylesheet" HREF="../html/docs.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Units.pm</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+    <LI><A HREF="#name">NAME</A></LI>
+    <LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+    <LI><A HREF="#description">DESCRIPTION</A></LI>
+    <UL>
+
+        <UL>
+
+            <LI><A HREF="#units( [units] )">units( [UNITS] )</A></LI>
+            <LI><A HREF="#dsin">dsin</A></LI>
+            <LI><A HREF="#dcos">dcos</A></LI>
+            <LI><A HREF="#tan">tan</A></LI>
+            <LI><A HREF="#sec">sec</A></LI>
+            <LI><A HREF="#csc">csc</A></LI>
+            <LI><A HREF="#cot">cot</A></LI>
+            <LI><A HREF="#asin">asin</A></LI>
+            <LI><A HREF="#acos">acos</A></LI>
+            <LI><A HREF="#atan">atan</A></LI>
+            <LI><A HREF="#asec">asec</A></LI>
+            <LI><A HREF="#acsc">acsc</A></LI>
+            <LI><A HREF="#acot">acot</A></LI>
+            <LI><A HREF="#sinh">sinh</A></LI>
+            <LI><A HREF="#cosh">cosh</A></LI>
+            <LI><A HREF="#tanh">tanh</A></LI>
+            <LI><A HREF="#sech">sech</A></LI>
+            <LI><A HREF="#csch">csch</A></LI>
+            <LI><A HREF="#coth">coth</A></LI>
+            <LI><A HREF="#asinh">asinh</A></LI>
+            <LI><A HREF="#acosh">acosh</A></LI>
+            <LI><A HREF="#atanh">atanh</A></LI>
+            <LI><A HREF="#asech">asech</A></LI>
+            <LI><A HREF="#acsch">acsch</A></LI>
+            <LI><A HREF="#acoth">acoth</A></LI>
+        </UL>
+
+    </UL>
+
+    <LI><A HREF="#history">HISTORY</A></LI>
+    <LI><A HREF="#bugs">BUGS</A></LI>
+    <LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<PRE>
+    Math::Trig::Units - Inverse and hyperbolic trigonemetric Functions
+                         in degrees, radians or gradians.</PRE>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Math::Trig::Units qw(dsin  dcos  tan   sec   csc   cot
+                             asin  acos  atan  asec  acsc  acot
+                             sinh  cosh  tanh  sech  csch  coth
+                             asinh acosh atanh asech acsch acoth
+                             deg_to_rad  rad_to_deg
+                             grad_to_rad rad_to_grad
+                             deg_to_grad grad_to_deg
+                             units );
+    $v = dsin($x);
+    $v = dcos($x);
+    $v = tan($x);
+    $v = sec($x);
+    $v = csc($x);
+    $v = cot($x);
+    $v = asin($x);
+    $v = acos($x);
+    $v = atan($x);
+    $v = asec($x);
+    $v = acsc($x);
+    $v = acot($x);
+    $v = sinh($x);
+    $v = cosh($x);
+    $v = tanh($x);
+    $v = sech($x);
+    $v = csch($x);
+    $v = coth($x);
+    $v = asinh($x);
+    $v = acosh($x);
+    $v = atanh($x);
+    $v = asech($x);
+    $v = acsch($x);
+    $v = acoth($x);
+    $degrees  = rad_to_deg($radians);
+    $radians  = deg_to_rad($degrees);
+    $degrees  = grad_to_deg($gradians);
+    $gradians = deg_to_grad($degrees);
+    $radians  = grad_to_rad($gradians);
+    $gradians = rad_to_grad($radians);</PRE>
+<PRE>
+    # set radians instead of degrees (default)
+    Math::Trig::Units::units('radians');
+    # set gradians as units
+    Math::Trig::Units::units('gradians');
+    # set degrees as units
+    Math::Trig::Units::units('degrees');
+    # return current unit setting
+    $units = Math::Trig::Units::units();</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module exports the missing inverse and hyperbolic trigonometric
+functions of real numbers.  The inverse functions return values
+cooresponding to the principal values.  Specifying an argument outside
+of the domain of the function where an illegal divion by zero would occur
+will cause infinity to be returned. Infinity is Perl's version of this.</P>
+<P>This module implements the functions in radians by default. You set the
+units via the units sub:</P>
+<PRE>
+    # set radians as units (default)
+    Math::Trig::Units::units('radians');
+    # set gradians as units
+    Math::Trig::Units::units('gradians');
+    # set degrees as units
+    Math::Trig::Units::units('degrees');
+    # return current unit setting
+    $units = Math::Trig::Units::units();</PRE>
+<P>To avoid redefining the internal <CODE>sin()</CODE> and <CODE>cos()</CODE> functions this module
+calls the functions <CODE>dsin()</CODE> and dcos().</P>
+<P>
+<H3><A NAME="units( [units] )">units( [UNITS] )</A></H3>
+<P>Set or get the units. Options are 'radians', 'degrees', 'gradians' and are
+case insensitive. When called without an argument this function returns the
+current units setting. Alternatively you can call the subclasses:</P>
+<PRE>
+    Math::Trig::Degree
+    Math::Trig::Radian
+    Math::Trig::Gradian</PRE>
+<P>
+<H3><A NAME="dsin">dsin</A></H3>
+<P>returns sin of real argument.</P>
+<P>
+<H3><A NAME="dcos">dcos</A></H3>
+<P>returns cos of real argument.</P>
+<P>
+<H3><A NAME="tan">tan</A></H3>
+<P>returns tangent of real argument.</P>
+<P>
+<H3><A NAME="sec">sec</A></H3>
+<P>returns secant of real argument.</P>
+<P>
+<H3><A NAME="csc">csc</A></H3>
+<P>returns cosecant of real argument.</P>
+<P>
+<H3><A NAME="cot">cot</A></H3>
+<P>returns cotangent of real argument.</P>
+<P>
+<H3><A NAME="asin">asin</A></H3>
+<P>returns inverse sine of real argument.</P>
+<P>
+<H3><A NAME="acos">acos</A></H3>
+<P>returns inverse cosine of real argument.</P>
+<P>
+<H3><A NAME="atan">atan</A></H3>
+<P>returns inverse tangent of real argument.</P>
+<P>
+<H3><A NAME="asec">asec</A></H3>
+<P>returns inverse secant of real argument.</P>
+<P>
+<H3><A NAME="acsc">acsc</A></H3>
+<P>returns inverse cosecant of real argument.</P>
+<P>
+<H3><A NAME="acot">acot</A></H3>
+<P>returns inverse cotangent of real argument.</P>
+<P>
+<H3><A NAME="sinh">sinh</A></H3>
+<P>returns hyperbolic sine of real argument.</P>
+<P>
+<H3><A NAME="cosh">cosh</A></H3>
+<P>returns hyperbolic cosine of real argument.</P>
+<P>
+<H3><A NAME="tanh">tanh</A></H3>
+<P>returns hyperbolic tangent of real argument.</P>
+<P>
+<H3><A NAME="sech">sech</A></H3>
+<P>returns hyperbolic secant of real argument.</P>
+<P>
+<H3><A NAME="csch">csch</A></H3>
+<P>returns hyperbolic cosecant of real argument.</P>
+<P>
+<H3><A NAME="coth">coth</A></H3>
+<P>returns hyperbolic cotangent of real argument.</P>
+<P>
+<H3><A NAME="asinh">asinh</A></H3>
+<P>returns inverse hyperbolic sine of real argument.</P>
+<P>
+<H3><A NAME="acosh">acosh</A></H3>
+<P>returns inverse hyperbolic cosine of real argument.</P>
+<P>(positive value only)</P>
+<P>
+<H3><A NAME="atanh">atanh</A></H3>
+<P>returns inverse hyperbolic tangent of real argument.</P>
+<P>
+<H3><A NAME="asech">asech</A></H3>
+<P>returns inverse hyperbolic secant of real argument.</P>
+<P>(positive value only)</P>
+<P>
+<H3><A NAME="acsch">acsch</A></H3>
+<P>returns inverse hyperbolic cosecant of real argument.</P>
+<P>
+<H3><A NAME="acoth">acoth</A></H3>
+<P>returns inverse hyperbolic cotangent of real argument.</P>
+<P>
+<HR>
+<H1><A NAME="history">HISTORY</A></H1>
+<P>Modification of Math::Trig by request from stefan_k.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>All known ones have been fixed (see changes). Let me know if you find one.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Initial Version John A.R. Williams &lt;<A HREF="mailto:J.A.R.Williams@aston.ac.uk">J.A.R.Williams@aston.ac.uk</A>&gt;
+Bug fixes and many additonal functions Jason Smith &lt;<A HREF="mailto:smithj4@rpi.edu">smithj4@rpi.edu</A>&gt;
+This version James Freeman &lt;<A HREF="mailto:james.freeman@id3.org.uk">james.freeman@id3.org.uk</A>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Units.pm</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

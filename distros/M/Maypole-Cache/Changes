@@ -1,0 +1,14 @@
+Revision history for Perl extension Maypole::Cache.
+
+1.2   Mon Jul 19 11:17:00 BST 2004
+    - Denature model class on template-only requests
+    - We need Digest::SHA1 to make the caching work (upstream dependency
+      problem, not my fault...)
+
+1.1   Sun Jul 11 22:55:47 BST 2004
+    - Properly cache GET args
+
+0.01  Tue Jul  6 15:29:35 2004
+	- original version; created by h2xs 1.22 with options
+		-AX -b 5.0.5 -n Maypole::Cache
+

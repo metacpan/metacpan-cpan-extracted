@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 a7aad0d7e542265c82a0fe4a839b6bb7a4b35bfe Changes
+SHA1 bcfa41dd104e3e7c5404cc8bfe10836e59152e2b INSTALL
+SHA1 8582065cd14fffaec80bf3b157124ec6fbaef873 LICENSE
+SHA1 76af548cf786093521daa9c9a1ea10adcdf36bb3 MANIFEST
+SHA1 757b2e701ab402b4f586addc98cca6a06a0b5080 MANIFEST.SKIP
+SHA1 3f87dcb0e3fc36215dd0b9e05c0da98929e0e3c5 META.json
+SHA1 b093de510c5aa28ad508cd1b46eff48a73aae8e6 Makefile.PL
+SHA1 df98dbb65accc787cd26377b523b4c24271d6471 README
+SHA1 52d245bca0b61255a9497d658ff840bb521e7169 dist.ini
+SHA1 8e8bf1230be8b9b22d548e1335b3e09779cf5513 examples/client.js
+SHA1 3a107f08391490018e0feba5bc0fc88b6bde3adc lib/McBain/WithWebSocket.pm
+SHA1 c0c60cfbc5a50c57cb3471e73ca2c0b5bb99fe34 t/00-load.t
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iF4EAREIAAYFAlPzc4YACgkQa4OHQAFM10fSBQEAnzrShj+2K9yuXml8j3fW3hXA
+Oe7E1yHcra8WUN475csA/AleFJ/A2t/eChgOGtKIm3isqfnd3GWAEw4NKT0SwXiY
+=wvFR
+-----END PGP SIGNATURE-----

@@ -1,0 +1,150 @@
+#!/usr/bin/perl
+#                                                    -*-perl-*-
+# (c) 2000-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+# $Id: saveauth,v 33.4 2012/09/26 16:15:23 jettisu Exp $
+#
+
+use strict;
+use Carp;
+
+use MQSeries::Command;
+use MQSeries::Config::Authority;
+use MQSeries::Config::Machine;
+
+#
+# We require exactly one parameter: the queue-manager name
+#
+unless (@ARGV == 1) {
+    die "Usage: $0 <qmgr-name>";
+}
+my $qmgr_name = shift @ARGV;
+
+#
+# Verify the queue-manager is defined locally, then create a
+# command object.
+#
+my $machine ||= MQSeries::Config::Machine->new();
+my $local_qmgrs = $machine->localqmgrs();
+die "Unknown queue-manager '$qmgr_name'"
+  unless (defined $local_qmgrs->{$qmgr_name});
+
+my $command = new MQSeries::Command('QueueManager' => $qmgr_name,
+                                    'Type'         => 'PCF') ||
+  confess "Cannot create command";
+
+#
+# Dump the queue-manager
+#
+{
+    my $authobj = 
+      MQSeries::Config::Authority->new('QMgrName'   => $qmgr_name,
+                                       'ObjectType' => 'qmgr');
+    foreach my $group ($authobj->entities()) {
+        print "setmqaut -m $qmgr_name -t qmgr -g $group " .
+          $authobj->authority_command($group), "\n";
+    }
+    print "\n";
+}
+
+
+#
+# Dump all process-names
+#
+my @proc_names = $command->InquireProcessNames();
+if (@proc_names) {
+    foreach my $proc (@proc_names) {
+        my $authobj = 
+          MQSeries::Config::Authority->new('QMgrName'   => $qmgr_name,
+                                           'ObjectType' => 'process',
+                                           'ObjectName' => $proc);
+        next unless (defined $authobj); # Survive concurrent delete
+        foreach my $group ($authobj->entities()) {
+            print "setmqaut -m $qmgr_name -t process -n $proc -g $group " .
+              $authobj->authority_command($group), "\n";
+        }
+    }
+    print "\n";
+}
+
+#
+# Dump all name-lists
+#
+my @namelists = $command->InquireNamelistNames();
+if (@namelists) {
+    foreach my $name (@namelists) {
+        my $authobj = 
+          MQSeries::Config::Authority->new('QMgrName'   => $qmgr_name,
+                                           'ObjectType' => 'namelist',
+                                           'ObjectName' => $name);
+        next unless (defined $authobj); # Survive concurrent delete
+        foreach my $group ($authobj->entities()) {
+            print "setmqaut -m $qmgr_name -t namelist -n $name -g $group " .
+              $authobj->authority_command($group), "\n";
+        }
+    }
+    print "\n";
+}
+ 
+#
+# Dump all queues, but skip temporary queues
+#
+my @queues = $command->InquireQueue('QName'  => '*',
+                                    'QAttrs' => [ qw(QName DefinitionType) ]);
+if (@queues) {
+    foreach my $queue (@queues) {
+        #
+        # Skip all temporary (actually, non-predefined) queues
+        #
+        next if ($queue->{'DefinitionType'} eq 'Temporary' ||
+                 $queue->{'DefinitionType'} eq 'Permanent');
+
+        my $qname = $queue->{'QName'};
+        
+        my $authobj = 
+          MQSeries::Config::Authority->new('QMgrName'   => $qmgr_name,
+                                           'ObjectType' => 'queue',
+                                           'ObjectName' => $qname);
+        next unless (defined $authobj); # Survive concurrent delete
+        foreach my $group ($authobj->entities()) {
+            print "setmqaut -m $qmgr_name -t queue -n $qname -g $group " .
+              $authobj->authority_command($group), "\n";
+        }
+    }
+    print "\n";
+}
+
+__END__
+
+
+=head1 NAME
+
+saveauth -- Save all authority settings for a queue manager
+
+=head1 SYNOPSIS
+
+saveauth QMgrName
+
+=head1 DESCRIPTION
+
+This script will read all authority settings for all queue manager
+objects, then write out 'setmqaut' commands that can be used to
+restore these settings.  This can be useful as part of a backup
+strategy.
+
+The script supports the queue manager, process names, namelists and
+queues. Temporary queues will be skipped.
+
+The script needs to be run by a userid that has both inquire authority
+for the queue manager and filesystem read permission for the authority
+files.  Typically, the userid used will be 'mqm'.
+
+=head1 EXAMPLE
+
+In order to create 'setmqaut' commands for all objects on queue manager
+'TEST' and write the commands to the file 'saved.txt', run:
+  
+  saveauth TEST > saved.txt
+
+=cut

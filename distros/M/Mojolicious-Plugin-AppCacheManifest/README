@@ -1,0 +1,64 @@
+NAME
+    Mojolicious::Plugin::AppCacheManifest - Offline web application manifest
+    support for Mojolicious
+
+SYNOPSIS
+      # Mojolicious
+      $self->plugin( "AppCacheManifest" );
+      $self->plugin( "AppCacheManifest" => { extension => "manifest" } );
+      $self->plugin( "AppCacheManifest" => { extension => [qw[ appcache manifest mf ]] } );
+      $self->plugin( "AppCacheManifest" => { timeout => 60 * 5 } );
+  
+      # Mojolicious::Lite
+      plugin "AppCacheManifest";
+      plugin "AppCacheManifest" => { extension => "manifest" };
+      plugin "AppCacheManifest" => { extension => [qw[ appcache manifest mf ]] };
+      plugin "AppCacheManifest" => { timeout => 60 * 5 };
+
+DESCRIPTION
+    This plugin manages manifest delivery for Offline Web applications
+    <http://www.whatwg.org/specs/web-apps/current-work/multipage/offline.html>.
+    It read manifests, checks modification of contained files that exist
+    in static directories, and returns a clean manifest with only one
+    comment containing a timestamp to allow for cache invalidation on
+    changes.
+
+OPTIONS
+  extension
+      # Mojolicious::Lite
+      plugin "AppCacheManifest" => { extension => "manifest" };
+      plugin "AppCacheManifest" => { extension => [qw[ appcache manifest mf ]] };
+
+    Manifest file extension, allows array references to pass multiple
+    extensions and defaults to "appcache".
+
+  timeout
+      # Mojolicious::Lite
+      plugin "AppCacheManifest" => { timeout => 60 * 5 };
+
+    Cache timeout after which all files in the cache section of manifests
+    get checked again, defaults to 0 seconds (disabled).
+
+    Note: Manifests are always tested and trigger a full check when they
+    change.
+
+METHODS
+  timeout
+    Accessor for "timeout", see above.
+
+SEE ALSO
+    *       Specification for Offline Web applications
+            <http://www.whatwg.org/specs/web-apps/current-work/multipage/offline.html>.
+
+    *       HTML5::Manifest has a different approach by generating the
+            manifest programmatically.
+
+AUTHOR
+    Simon Bertrang, <janus@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014 by Simon Bertrang
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

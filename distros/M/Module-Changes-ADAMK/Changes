@@ -1,0 +1,39 @@
+Changes for Perl extension Module-Changes-ADAMK
+
+0.11 Sun 19 Apr 2009
+	- Ignore empty paragraphs (ADAMK)
+
+0.10 Tue 14 Apr 2009
+	- Updating to Module::Install::DSL 0.83 (ADAMK)
+
+0.09 Mon 13 Apr 2009
+	- Handle failed DateTime parsing better (ADAMK)
+
+0.08 Mon 13 Apr 2009
+	- Localise newlines before the constructor (ADAMK)
+
+0.07 Mon 13 Apr 2009
+	- Added a ->roundtrips method (ADAMK)
+	- Added support for blank lines in the middle of
+	  a set of changes (ADAMK)
+
+0.06 Mon 13 Apr 2009
+	- Adding a regression test script (ADAMK)
+	- More descriptive version-parse failure message (ADAMK)
+
+0.05 Sun 12 Apr 2009
+	- Changed ->current_release to ->current (ADAMK)
+
+0.04 Sun 12 Apr 2009
+	- Implemented ->save (ADAMK)
+
+0.03 Sun 12 Apr 2009
+	- Adding support for changing a release date (ADAMK)
+	- Implemented stringification (ADAMK)
+
+0.02 Wed  9 Apr 2009
+	- Updated to Module::Install::DSL 0.82 (ADAMK)
+
+0.01 Wed  2 Apr 2009
+	- Created the initial version (ADAMK)
+	- Adding DateTime parsing (ADAMK)

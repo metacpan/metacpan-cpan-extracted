@@ -1,0 +1,23 @@
+#!/usr/bin/perl -w
+
+#
+# displays current system processes (according to the Finder)
+#
+
+use strict;
+use warnings;
+
+use Mac::AppleScript::Glue;
+
+##$Mac::AppleScript::Glue::Debug{SCRIPT} = 1;
+##$Mac::AppleScript::Glue::Debug{RESULT} = 1;
+
+my $finder = new Mac::AppleScript::Glue::Application('Finder');
+
+my $folder = $finder->objref(folder => 'Applications');
+
+my $apps = $folder->items(whose_name_contains => 'TextEdit');
+
+for my $app (@{$apps}) {
+    $app->open;
+}

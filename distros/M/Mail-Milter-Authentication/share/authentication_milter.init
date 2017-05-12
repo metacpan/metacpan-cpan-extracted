@@ -1,0 +1,73 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:       authentication_milter
+# Required-Start: $remote_fs
+# Required-Stop:  $remote_fs
+# Should-Start:   $network $syslog
+# Default-Start:  2 3 4 5
+# Default-Stop:   0 1 6
+### END INIT INFO
+
+DAEMON=/usr/local/bin/authentication_milter
+NAME=authentication_milter
+SNAME=authentication_milter
+DESC="Authentication Mail Filter Daemon"
+PIDFILE="/run/$NAME.pid"
+
+export TMPDIR=/tmp
+cd $TMPDIR
+
+. /lib/lsb/init-functions
+
+test -f /etc/default/authentication_milter && . /etc/default/authentication_milter
+
+DOPTIONS="--pidfile=$PIDFILE"
+
+if [ "$ENABLED" = "0" ]; then
+    echo "$DESC: disabled, see /etc/default/authentication_milter"
+    exit 0
+fi
+
+test -f $DAEMON || exit 0
+
+case "$1" in
+
+  start)
+        echo -n "Starting $DESC: "
+        $DAEMON $DOPTIONS --control=start
+        echo "$NAME."
+        ;;
+
+  stop)
+        echo -n "Stopping $DESC: "
+        $DAEMON $DOPTIONS --control=stop
+        /bin/rm $PIDFILE
+        echo "$NAME."
+        ;;
+
+  reload|force-reload)
+        echo -n "Reloading $DESC: "
+        $DAEMON $DOPTIONS --control=restart
+        echo "$NAME."
+        ;;
+
+  restart)
+        echo -n "Restarting $DESC: "
+        $DAEMON $DOPTIONS --control=restart
+        echo "$NAME."
+        ;;
+
+  status)
+        $DAEMON $DOPTIONS --control=status
+        ;;
+
+  *)
+        N=/etc/init.d/$SNAME
+        echo "Usage: $N {start|stop|restart|reload|force-reload|status}" >&2
+        exit 1
+        ;;
+
+esac
+
+exit 0

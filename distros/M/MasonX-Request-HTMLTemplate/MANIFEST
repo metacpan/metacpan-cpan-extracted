@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+LICENSE
+HTMLTemplate.pm
+HTMLTemplate.pod
+HTMLTemplate/WithApacheSession.pm
+HTMLTemplate/WithApacheSession.pod
+t/01_HTMLTemplate.t
+t/02_WithApacheSession.t
+META.yml                                 Module meta-data (added by MakeMaker)

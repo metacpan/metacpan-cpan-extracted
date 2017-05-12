@@ -1,0 +1,59 @@
+Revision history for Perl extension Mojolicious::Plugin::Crypto.
+
+0.01  Sun Mar 23 21:31:30 2014
+      First release - Added support for AES and Blowfish
+
+0.02  Fri Mar 28 16:56:00 2014
+      - Second release - Code optimization
+      - Added support for 
+      DES 
+      DES_EDE (aka Triple-DES, 3DES)
+      IDEA
+      TWOFISH
+      XTEA
+      ANUBIS
+      CAMELLIA
+      KASUMI
+      KHAZAD
+      NOEKEON
+      MULTI2
+      RC2
+      RC5
+      RC6
+      - Changed return values of decrypt() and crypt() functions in order to make a nested calls
+     
+0.03 Wed Apr 1 00:36:14 2014
+      - Some fix on doc
+
+0.04 Sat Apr 12 19:25:00 2014
+      - Add Hash/Digest functions support
+
+0.05 First Clean and Stable release
+
+0.06 Sun Apr 13 17:41:00 2014
+      - Cpan testers bug fixes, test script and use of smart match
+
+0.07 Sun Apr 13 20:00:00 2014
+      - Add HMAC functions
+
+0.08 Wed Apr 30 19:31:00 2014
+      - ...dirty code
+
+0.09 Sat May 10 23:40:00 2014
+      - input arguments added
+       - using Mojo::Loader to avoid using unuseful modules
+
+0.10 Mon May 12 01:01:00 2014
+      - Fix - cpan testers
+
+0.11 Wed May 14 08:48:00 2014
+      - Fix - remove support for IDEA
+
+0.12 Tue Nov 18 18:02:31 2014
+      - Fix
+
+0.13 Wed Nov 19 08:27:53 2014
+      - CPAN testers Fixes
+
+0.14 Mon Feb 23 16:39:01 2015
+     - Fix deprecrated use of Mojo::Loader in OO mode

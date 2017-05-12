@@ -1,0 +1,21 @@
+Changes
+edgelist.c
+geometry.c
+heap.c
+leak-test.pl
+lib/Math/Geometry/Voronoi.pm
+Makefile.PL
+MANIFEST
+memory.c
+output.c
+ppport.h
+README
+t/00basic.t
+vdefs.h
+voronoi_core.c
+Voronoi.xs
+voronoi_main.c
+t/02real.t
+t/real_data.txt
+examples/voronoi.cgi
+META.yml                                 Module meta-data (added by MakeMaker)

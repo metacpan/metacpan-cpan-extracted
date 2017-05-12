@@ -1,0 +1,148 @@
+Revision history for Perl extension Mail::Procmailrc.
+
+Release 1.09
+----------------------------
+revision 1.23
+date: 2005/06/09 17:03:43;  author: scottw;  state: Exp;  lines: +1 -1
+- version bump
+----------------------------
+revision 1.22
+date: 2005/06/09 17:02:33;  author: scottw;  state: Exp;  lines: +3 -0
+- cure for infinite looping on certain broken recipes
+
+Release 1.08
+----------------------------
+revision 1.21
+date: 2005/02/03 23:00:16;  author: scottw;  state: Exp;  lines: +3 -3
+- allow for empty variable assignment when groking variables
+
+Release 1.07
+----------------------------
+revision 1.20
+date: 2004/01/21 16:27:50;  author: scottw;  state: Exp;  lines: +18 -9
+- change confess to carp: don't die ever
+----------------------------
+revision 1.19
+date: 2003/08/08 17:38:23;  author: scottw;  state: Exp;  lines: +1 -1
+branches:  1.19.2;
+- fix a test to test cleanly under warnings
+----------------------------
+revision 1.18
+date: 2003/08/08 17:16:34;  author: scottw;  state: Exp;  lines: +28 -17
+- allow multiline quoted variable assignment
+----------------------------
+revision 1.17
+date: 2003/03/17 21:53:02;  author: scottw;  state: Exp;  lines: +43 -31
+- remove keyword 'our' and replace with 'use vars' for 5.00503
+  compatibility
+- fix typo in synopsis example
+----------------------------
+revision 1.16
+date: 2002/11/20 21:24:58;  author: scottw;  state: Exp;  lines: +18 -10
+- fix discrepancy between parsing from file and parsing from a string
+  via split (had to re-add a chomp to make everything consistent). Do
+  not use the previous version (1.02); it contains a nasty bug in the
+
+Release 1.06
+----------------------------
+revision 1.19
+date: 2003/08/08 17:38:23;  author: scottw;  state: Exp;  lines: +1 -1
+- fix a test to test cleanly under warnings
+
+Release 1.05
+----------------------------
+revision 1.18
+date: 2003/08/08 17:16:34;  author: scottw;  state: Exp;  lines: +28 -17
+- allow multiline quoted variable assignment
+
+Release 1.04
+----------------------------
+revision 1.17
+date: 2003/03/17 21:53:02;  author: scottw;  state: Exp;  lines: +43 -31
+- remove keyword 'our' and replace with 'use vars' for 5.00503
+  compatibility
+- fix typo in synopsis example
+
+Release 1.03
+----------------------------
+revision 1.16
+date: 2002/11/20 21:24:58;  author: scottw;  state: Exp;  lines: +18 -10
+- fix discrepancy between parsing from file and parsing from a string
+  via split (had to re-add a chomp to make everything consistent). Do
+  not use the previous version (1.02); it contains a nasty bug in the
+  variable parsing routine which can clobber multi-line variables when
+  flushed to file (the parsing works ok initally, so 1.02 is ok for
+  read-only stuff).
+- added tests for this bug
+----------------------------
+revision 1.15
+date: 2002/11/20 18:55:50;  author: scottw;  state: Exp;  lines: +4 -3
+- fix nested recipe bug (action object was not stopping after final curly brace)
+- fix comment being parsed as var bug (tightened regex)
+----------------------------
+revision 1.14
+date: 2002/11/16 00:08:07;  author: scottw;  state: Exp;  lines: +19 -4
+- fix bug for variable assignments for continuation lines (ending with backslash)
+- make note in TODO/BUGS section about not being able to parse old-style procmailrc files
+----------------------------
+revision 1.13
+date: 2002/08/27 18:27:29;  author: scottw;  state: Exp;  lines: +21 -11
+- minor code fixes, doc fixes, updated tests
+- comment changes in procmail.cgi
+----------------------------
+revision 1.12
+date: 2002/07/30 17:59:19;  author: scottw;  state: Exp;  lines: +2 -2
+- license fix to match README
+----------------------------
+revision 1.11
+date: 2002/07/30 17:56:30;  author: scottw;  state: Exp;  lines: +20 -21
+- update version
+- fix whitespace problem in POD
+----------------------------
+revision 1.10
+date: 2002/07/29 18:33:25;  author: scottw;  state: Exp;  lines: +47 -53
+- allow scalar var for *::Recipe constructor
+- more docs
+----------------------------
+revision 1.9
+date: 2002/07/26 20:29:21;  author: scottw;  state: Exp;  lines: +14 -1
+- document new 'delete' method
+----------------------------
+revision 1.8
+date: 2002/07/26 20:26:09;  author: scottw;  state: Exp;  lines: +155 -6
+- added 'delete' method to Mail::Procmailrc object class; deletes an
+  object by reference
+- added tests for delete method
+----------------------------
+revision 1.7
+date: 2002/07/22 20:30:35;  author: scottw;  state: Exp;  lines: +70 -10
+- fix push to take an array for argument
+- documentation addition
+----------------------------
+revision 1.6
+date: 2002/07/09 22:12:34;  author: scottw;  state: Exp;  lines: +57 -21
+- documentation fixes
+----------------------------
+revision 1.5
+date: 2002/02/20 23:37:19;  author: scottw;  state: Exp;  lines: +2 -2
+- update version string
+----------------------------
+revision 1.4
+date: 2002/02/14 23:58:10;  author: scottw;  state: Exp;  lines: +61 -64
+- some code cleanup
+- add an undef check before regex
+- fix how init handles certain named parameters
+----------------------------
+revision 1.3
+date: 2002/02/11 22:40:52;  author: scottw;  state: Exp;  lines: +1 -3
+- clean up some old comments
+----------------------------
+revision 1.2
+date: 2002/02/11 17:25:35;  author: scottw;  state: Exp;  lines: +50 -2
+- added 'literals', 'variables', and 'recipes' methods
+----------------------------
+revision 1.1
+date: 2002/02/07 19:26:19;  author: scottw;  state: Exp;
+initial import of Mail::Procmailrc: a Perl class to parse and
+pretty-print procmail rc files.
+=============================================================================

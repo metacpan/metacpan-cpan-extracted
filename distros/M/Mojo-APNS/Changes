@@ -1,0 +1,46 @@
+Revision history for perl distribution Mojo-APNS
+
+1.00 2016-02-25T14:15:02+0100
+ - Bumping to 1.0, since it seems pretty stable at this point
+ - Improved documentation and SYNOPSIS example
+ - Made t/feedback.t and t/send.t run again
+
+0.07 2015-01-03T23:14:39Z
+ - IO::Socket::SSL 1.84 required #5
+
+0.06 2015-01-02T12:51:25Z
+ - Avoid length of undefined values #6
+ - Use encode_json instead of OO Mojo::JSON #4
+
+0.05 2014-09-11T23:55:17Z
+ - Add support for "content-available"
+ - Fix generate_port()
+
+0.0404 2014-03-19T14:13:14Z
+ - Add not about segfault
+
+0.0403 2013-11-20T11:54:56Z
+ - Fix RT#89150: MYMETA.{yml,json} must not be bundled
+
+0.0402 2013-09-06T23:38:16Z
+ - Fix Makefile.PL
+
+0.0401 2013-08-26T23:16:28Z
+ - IO::Socket::SSL 1.75 required for TLS support
+
+0.04 2013-08-16T23:23:59Z
+ - Change default value for "sandbox" attribute
+ - Fix NAME in Makefile.PL
+
+0.03 2013-06-14T08:46:02Z
+ - Add support for listening to feedback from APNS
+
+0.0201 2014-09-11T23:48:44Z
+ - Fix Use of uninitialized value in concatenation
+ - Fix clearing client_id stream on timeout
+
+0.02 2013-06-11T08:10:19Z
+ - Fix errors from send() can be received in callback
+
+0.01 2013-06-10T22:25:44Z
+ - Can send() messages to APNS

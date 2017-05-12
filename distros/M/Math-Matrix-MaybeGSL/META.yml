@@ -1,0 +1,29 @@
+---
+abstract: 'Uniform use of Math::MatrixReal and Math::GSL::Matrix.'
+author:
+  - 'Alberto Simões <ambs@cpan.org>'
+build_requires:
+  Test::More: '0'
+  Test::Without::Module: '0.17'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Matrix-MaybeGSL
+recommends:
+  Math::GSL: '0.32'
+requires:
+  Exporter: '0'
+  Math::GSL: '0'
+  Math::MatrixReal: '2.12'
+  overload: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/ambs/Math-Matrix-MaybeGSL.git
+version: '0.007'

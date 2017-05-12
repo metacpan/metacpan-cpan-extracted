@@ -1,0 +1,90 @@
+#!/usr/bin/perl -w
+#
+#   mqdb-rm - part of the Mail::Queue::Database suite
+#
+#   Copyright (C) 2004  S. Zachariah Sprackett <zacs@cpan.org>
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+=head1 NAME
+
+mqdb-rm - part of the Mail::Queue::DB suite
+
+=head1 SYNOPSIS
+
+mqdb-rm <message id> [<message id> ... ]
+
+=head1 DESCRIPTION
+
+mqdb-rm purges messages from the database.  It can accept multiple message
+IDs on the command line.
+
+=head2 MQDB_DB
+
+mqdb-rm honours the MQDB_DB environment variable which specifies the 
+location of the mail database.  The default location, if not specified,
+is $HOME/.mqdb_email.db
+
+=cut
+
+use strict;
+use Mail::Queue::DB;
+
+my $file;
+if (exists $ENV{MQDB_DB}) {
+  $file = $ENV{MQDB_DB};
+} else {
+  $file = $ENV{HOME} . "/.mqdb_email.db";
+}
+
+my $z = new Mail::Queue::DB(db_file => $file);
+
+if (! scalar @ARGV) {
+	HELP_MESSAGE();
+	exit 1;
+}
+
+my $has_error = 0;
+foreach(@ARGV) {
+	if ($z->dequeue_mail($_)) {
+		print STDERR "Failed to dequeue message id $_\n";
+		$has_error++;
+	}
+}
+exit(0 - $has_error);
+
+sub HELP_MESSAGE
+{
+	print "Usage $0: <list of message ids to delete>\n";
+}
+
+__END__
+
+=head1 AUTHOR
+
+S. Zachariah Sprackett <zacs@cpan.org>
+
+=head1 COPYRIGHT
+
+(C) Copyright 2004, S. Zachariah Sprackett <zacs@cpan.org>
+
+Distributed under the terms of the GPL version 2 or later.
+
+=head1 SEE ALSO
+
+L<Mail::Queue::DB> L<mqdb-sendmail>, L<mqdb-list>, L<mqdb-flush>
+
+=cut

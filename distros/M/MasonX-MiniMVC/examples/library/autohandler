@@ -1,0 +1,23 @@
+<html>
+<head>
+<title><% $m->notes("title") || "MiniMVC Demo" %></title>
+</head>
+<body>
+
+<% $content %>
+
+</body>
+</html>
+
+<%init>
+# Before we generate our autohandler HTML, we locate the next component
+# (in our case the MiniMVC dhandler) and call it, capturing its output.
+# This means that notes() can be set before the autohandler generates a
+# title and other component-dependent output.
+my $next = $m->fetch_next;
+my $content = $m->scomp($next);
+</%init>
+
+<%flags>
+inherit => undef
+</%flags>

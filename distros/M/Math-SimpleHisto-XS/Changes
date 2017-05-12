@@ -1,0 +1,123 @@
+Revision history for Perl extension Math::SimpleHisto::XS.
+
+1.30  Fri May 23 07:40:00 2014
+  - Histogram subtraction, multiplication, division
+  - Optimizations for histogram filling
+  - Standard deviation
+
+1.29  Thu Nov 21 19:48:00 2013
+  - Mac OS X fix (C99)
+
+1.28  Thu Jun 12 14:00:00 2012
+  - Rebinning of histograms
+  - Embed blob length in native pack format.
+
+1.27  Thu Apr  5 14:00:00 2012
+  - add_histogram floating point comparison workaround.
+
+1.26  Wed Mar 14 21:00:00 2012
+  - Fix Math::SimpleHisto::XS::Named documentation to refer to the right
+    namespace.
+
+1.25  Fri Nov 18 13:34:00 2011
+  - Do not check 'nfills == 0' in various aggregate functions
+    since it might have been dropped somewhere and the histogram might
+    still be valid.
+
+1.24  Wed Nov 16 18:22:00 2011
+  - add_histogram($to_add) method that adds the contents of another
+    histogram to the invocant if the histogram have the same binning.
+
+1.23  Wed Oct 19 13:10:00 2011
+  - No functional changes
+
+1.22  Wed Sep 28 21:55:00 2011
+  - Fix t/80named.t if there's no JSON implementation.
+
+1.21  Wed Sep 28 21:55:00 2011
+  - to_soot() method will create a SOOT TH1D object from the
+    Math::SimpleHisto::XS histogram IF the optional SOOT library
+    is available.
+
+1.20  Tue Sep 27 17:43:00 2011
+  - Include Math::SimpleHisto::XS::Named implementing histograms with
+    named bins.
+  - Implements a "fill_by_bin" method that fills into a given bin
+    number instead of locating the target bin by coordinates.
+  - Lots of internals refactoring.
+
+1.13  Wed Sep 21 15:47:00 2011
+  - Fix dependency on ExtUtils::ParseXS.
+
+1.12  Fri Jun 10 21:29:00 2011
+  - Fix segfaulting bug in median/mad calculation.
+  - Fix t/50mean.t
+
+1.11  Fri Jun 10 20:17:00 2011
+  - Minor test bug fix release, no functional changes.
+
+1.10  Thu Jun  9 13:07:00 2011
+  * This release contains incompatible changes to previous releases *
+  - INCOMPATBLE CHANGE: The rand() method now works on the
+    histogram itself instead of its cumulation. This works by
+    lazily constructing and caching a cumulative histogram
+    internally and greatly reduces the chance for user errors:
+    Before:
+      my $ch = $hist->cumulative(1);
+      push @rand_like_hist, $ch->rand for 1..100000;
+    After:
+      push @rand, $hist->rand for 1..100000;
+  - Implemented the median() and median_absolute_deviation()
+    methods to calculate estimates of those two quantities.
+  - highest_bin() returns the index of the highest bin in the
+    histogram.
+
+1.03  Wed Jun  1 21:45:00 2011
+  - The rand() method, when called on a cumulative distribution,
+    returns random numbers sampled from the source distribution.
+  - Includes a Mersenne-twister random number generator as
+    Math::SimpleHisto::XS::RNG.
+  - multiply_constant($k) will scale the histogram contents with $k.
+  - The cumulative() method now takes an optional argument that
+    is used to normalize the cumulative distribution's last bin.
+  - The methods new_from_bin_range($i, $j)
+    and new_alike_from_bin_range($i, $j)
+    return clones of the histogram that include only the bins $i
+    to $j.
+  - Several new examples in examples/ and xt/ including an
+    example of fitting and plotting histograms.
+
+1.02  Wed May 25 09:00:00 2011
+  - Test fixes: On some platforms, is($foo, $bar) is not accurate
+    enough. Need an "is_approx" for floats.
+  - Using done_testing where test number calculation exceeds the
+    tests in complexity.
+
+1.01  Sun May 22 21:48:00 2011
+  - Version checks when deserializing
+    Note: Future versions of this module will try to be able to
+    deserialize the histograms from earlier versions. The other
+    way around is not going to work. The indicator for forwards=
+    incompatible changes is a major version bump (here: 0 => 1)
+  - Variable bin-size histograms.
+    (Requiring a total makeover and heavy refactoring)
+  - $hist->cumulative to get the cumulation of the histogram
+
+0.05  Thu May 18 18:30:00 2011
+  - More documentation on dumping/serializing
+  - Accepts any of JSON::XS, JSON::PP, JSON
+    as JSON implementations.
+  - Fast 'native_pack' serialization format
+  - Includes benchmark script for serialization
+
+0.04  Wed May 18  2:00:00 2011
+  - Test fix (proper use of eval, DOH)
+
+0.03  Tue May 16 19:00:00 2011
+  - Test fix (proper use of SKIP)
+
+0.02  Mon May 16 12:00:00 2011
+  - Minor POD/doc fix
+
+0.01  Sun May 15 23:00:00 2011
+  - original version

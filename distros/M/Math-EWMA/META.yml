@@ -1,0 +1,28 @@
+---
+abstract: 'EWMA in object form'
+author:
+  - 'Samuel Smith'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-EWMA
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Moo: '1.001000'
+  Scalar::Util: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  namespace::autoclean: '0'
+resources:
+  repository: https://github.com/smith153/Math-EWMA
+version: '0.03'

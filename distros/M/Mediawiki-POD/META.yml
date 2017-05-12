@@ -1,0 +1,23 @@
+--- 
+abstract: Convert POD to HTML inside Mediawiki
+author: Tels <nospam-abuse@bloodgate.com>
+build_requires: 
+  Test::More: 0.62
+distribution_type: module
+generated_by: Module::Install version 0.65
+license: gpl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Mediawiki-POD
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Graph::Easy: 0.55
+  Pod::Simple: 3.04
+  Pod::Simple::HTML: 3.03
+  Scalar::Util: 1.13
+  perl: 5.8.1
+version: 0.06

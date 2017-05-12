@@ -1,0 +1,44 @@
+NAME
+    pimp - Pip's Intergallactive Moosex Plaqueluster
+
+SYNOPSIS
+    pimp [OPTION]...
+
+      Pip's Intergallactive Moosex Plaqueluster (Pip'sIMP [pimp]) Help:            
+       -h[elp]          this Help text, -(x|q|exit)         eXit pimp              
+       -v[(p|r)][+|-]<volume#>       set Volume (Pcm|Relative/song) to rel/abs vol#
+       -(n|l)(<song#>|/titlematch/)[c] set Next/Last song as # or titlematch [copy]
+       -t(f|l|t|n|pl|p|sp|sl|st|s|vp|v) sTatus Frmz,Left,Totl,songNum,PlaqueLust,  
+                  Percentplayed,SecsPlayed,SecsLeft,SecsTotl,Songname,VolPcm,Volume
+       -pl(s|l|a|i<index#>:)[(o|f|r)][!][(a|n|/match/)]<PLfilename.plf> PlaqueLust 
+         Save,Load,Append,Ins<#>: Order,Filter,Rndmize [Not]AlphaNumeric/match/ PLF
+               *NOTE*  only -pl(s|l|a|i#:)<PLfilename.plf> werk so far!            
+       -p(<song#>|/titlematch/)    Play/Pause PLsong# or first matching title      
+       -s                          Stop                                            
+       -(f|r)(f|p)[+|-]<amount#>[%][/<fastPlaydivisor#>]        Fastfwd/Rewind in 
+             Frames(seconds are Dfalt) by +/- amount or fastPlay +/- amount/divisor
+       -j(n|l|b|m|e|f|r|h|t|song#|/titlematch/)        Jump to Next,Last,Beginning,
+            Middle,End,Ffwd,Rwnd,Head,Tail,Song# or ffwd/rwnd secs,next title match
+       -a(n|l|b|m|e|position#)[r:](<filename.mp3>|<mp3Directory>)   Add file(s) to 
+          current PL @ Nxt,Lst,Bgn,Mdl,End,Pos# Recurse mp3Dir or just add file.mp3
+       -o(l|d|r|u<threshold#>)    Options (toggles) Loop?,Delete song from PL after
+           playing,start Random rotation     set Unique thresh# for random rotation
+  
+       To Get Started Try           `echo /path/to/MyFavorite.mp3 > MyFirstPL.plf`;
+                                    `pimp -pllMyFirstPL.plf`;
+        You can also directly load playlists created with mms.
+
+DESCRIPTION
+    pimp will be an mpg123 front-end that uses the MP3::Daemon framework...
+    some day. For now, behold the original version in all its undaemonized
+    glory.
+
+    It's defining feature is the Pseudorandom Plaqueluster. It's vintage
+    pip.
+
+COPYRIGHT
+    I am Free!
+
+AUTHOR
+    pip <pip@binq.org>
+

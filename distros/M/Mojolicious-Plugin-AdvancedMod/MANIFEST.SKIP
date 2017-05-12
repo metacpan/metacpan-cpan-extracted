@@ -1,0 +1,11 @@
+.*\.old$
+^MYMETA\.
+^blib
+^pm_to_blib
+^_build
+^Build$
+^blib
+~$
+\.bak$
+^MANIFEST\.SKIP$
+\.git

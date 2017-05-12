@@ -1,0 +1,242 @@
+NAME
+    MT::Import::Mbox - import one or more mbox messages in to a Movable Type
+    weblog
+
+SYNOPSIS
+     use strict;
+     use MT::Import::Mbox;
+
+     my $cfg = Config::Simple->new("/path/to/mbox.cfg");
+     my $mt = MT::Import::Mbox->new($cfg);
+     $mt->verbose(1);
+
+     $mt->import_mbox("/path/to/mbox");
+     $mt->rebuild();
+
+DESCRIPTION
+    Import one or more mbox messages in to a Movable Type weblog.
+
+MOTIVATION
+    I keep my email in a dated (YYYY/MM/DD) space. In a world where every
+    other way of organizing email messages kind of sucks, this one doesn't
+    necessarily suck any less but at least it's consistent.
+
+    The downside to doing things this way is that there aren't any email
+    clients that are capable of doing multi-folder searches. When I need to
+    find something I am reduced to using tools like grep which, despite
+    having a certain charm, is pretty painful.
+
+    Movable Type, with its built-in search and trackback widget seemed like
+    an interesting way to create a threaded read-only archive of my mail. I
+    could have built something from scratch (and I have) but MT was most of
+    the puzzle already completed.
+
+    The idea of using tags and comments for annotating an email was also
+    intriguing. Using custom X-headers to tag an email from Ted as "asshole"
+    is great until you need to reply to that message and forget to purge
+    your personal notes.
+
+    Also I was curious to see if, and how, it could be done and I hadn't
+    played with the MT source in a couple years.
+
+EMAIL TO MT MAPPINGS
+    * Threads
+        Message threads are handled using Movable Type's trackback features.
+
+    * Authors
+        Normalized email addresses are treated as Movable Type authors and
+        added to the database, as need.
+
+    * Categories
+        Normalized email addresses are treated as the primary category for a
+        message/post. The message's 'directional' headers for are treated as
+        the secondary category. For example :
+
+         + foo@example.com
+
+           - From
+           - Cc
+
+    * Attachments
+        Multi-part MIME attachments are parsed using the Email::MIME
+        package. In the event that no attachments are found it returns the
+        body of the orginal message as a 'part', or attachment.
+
+        If only one attachment exists it is used to generate the body of the
+        entry.
+
+        If the first attachment content-type is determined to be either
+        plain-text or HTML it is used to generate the body of the entry.
+
+        All other attachments are written to disk. Attachments are written
+        to disk as :
+
+         /your/static/weblog/attachments/$YYYY/$MM/$DD/$MSG_ID/$FNAME
+
+        $YYYY is the four digit year for the message as determined by its
+        'Date' header. $MM and $DD the two digit month and day respectively.
+
+        $MSG_ID is an MD5 digest of a normalized form of the message's
+        Message-ID header.
+
+        $FNAME is an MD5 digest of the attachment's body. If it is possible
+        to determine the attachment's content-type then a suitable extension
+        is appended to $FNAME.
+
+        A messsage's headers are stored as a separate attachment in :
+
+         /your/static/weblog/attachments/$YYYY/$MM/$DD/$MSG_ID/headers.txt
+
+SETUP
+  Versioning
+    This package is designed to be used with Movable Type 3.2
+
+  Templates
+    * Master Archive Index template.
+        You will need to copy and paste, or link to, the custom version of
+        this file located in :
+
+         /path/to/MT-Import-Mbox-1.01/templates/archives.html
+
+    * Daily Archive template
+        Ensure that it is enabled.
+
+        You will need to copy and paste, or link to, the custom version of
+        this file located in :
+
+         /path/to/MT-Import-Mbox-1.01/templates/date-based-archive.html
+
+    * Monthly Archive template
+        Ensure that it is enabled.
+
+        You will need to copy and paste, or link to, the custom version of
+        this file located in :
+
+         /path/to/MT-Import-Mbox-1.01/templates/date-based-archive-monthly.html
+
+    * Category Archive template
+        Ensure that it is enabled.
+
+    * Individual Entry Archive template
+        You will need to copy and paste, or link to, the custom version of
+        this file located in :
+
+         /path/to/MT-Import-Mbox-1.01/templates/individual-entry-archive.html
+
+    *Future releases may try to automate this process.*
+
+  Plugins
+    In order to rebuild your templates with bi-directional trackback
+    threading, you will need to install the MTPingUrls plugin.
+
+     cp /path/to/MT-Import-Mbox-1.01/plugins/pinged-by-entry \
+        /path/to/your/cgi-bin/mt/plugins/
+
+    *Future releases may try to automate this process.*
+
+  Permissions
+    Ensure that your MT installation is configured to allow both the default
+    CGI scripts and the scripts using this library sufficient permissions to
+    create an modify files in your (MT) static archive.
+
+PACKAGE METHODS
+  __PACKAGE__->new()
+CONFIG OPTIONS
+  mt
+    * root
+        String. *required*
+
+        The path to your Movable Type installation.
+
+    * blog_id
+        Int. *required*
+
+        The numberic ID of the Movable Type weblog you are posting to.
+
+    * blog_ownerid
+        Int. *required*
+
+        The numberic ID of a Movable Type author with permissions to add new
+        authors to the Movable Type weblog you are posting to.
+
+    * author_password
+        String.
+
+        The password to assign to any new authors you add to the Movable
+        Type weblog you are posting to.
+
+        Default is "*none*".
+
+    * author_permissions
+        Int.
+
+        The permissions set to grant any new authors you add to the Movable
+        Type weblog you are posting to.
+
+        Default is *514*, or the ability to add new categories.
+
+  importer
+    * force
+        Boolean.
+
+        Force a message to be reindexed, including any trackback pings and
+        attachments. If an entry matching the message id already exists in
+        the database it should only ever update or overwrite *existing*
+        data.
+
+        Default is *false*
+
+    * verbose
+        Boolean.
+
+        Enabled verbose logging.
+
+        Default is *false*
+
+  email
+    * personal
+        A comma-separated list of email addresses that when present in the
+        From header will cause a message/post's primary category to be set
+        as *Sent* rather than *Received*
+
+OBJECT METHODS (you should care about)
+  $obj->import_mbox($path_to_mbox,%args)
+    Where *%args* are whatever valid parameters you can pass to the
+    *Email::Folder::Mbox* object constructor.
+
+  $obj->import_msg(Email::Simple)
+    Returns an *MT::Entry* object.
+
+VERSION
+    1.01
+
+DATE
+    $Date: 2005/12/03 19:10:27 $
+
+AUTHOR
+    Aaron Straup Cope <ascope@cpan.org>
+
+SEE ALSO
+    MT::Import::Base
+
+    http://pep.perl.org
+
+    http://www.movabletype.org
+
+TO DO
+    Write message body to disk and store as an attachment Render the static
+    version using MTInclude. This should allow for better searching and
+    indexing by third-party tools.
+
+BUGS
+    Probably, or at least a handful of special-cases. Patches are welcome.
+    Please report all bugs via :
+
+    <http://rt.cpan.org>
+
+LICENSE
+    Copyright (c) 2005 Aaron Straup Cope. All Rights Reserved.
+
+    This is free software, you may use it and distribute it under the same
+    terms as Perl itself.
+

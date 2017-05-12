@@ -1,0 +1,59 @@
+---
+name: Mail-Action
+version: 0.46
+author:
+  - 'chromatic <chromatic@wgz.org>'
+abstract: base for building modules that act on incoming mail
+license: perl
+resources:
+  license: ~
+requires:
+  Class::Roles: 0.30
+  Email::Address: 1.889
+  Email::MIME: ''
+  Email::MIME::Modifier: ''
+  Email::Simple: ''
+  Mail::Mailer: ''
+  Pod::Simple: ''
+  YAML: 0.35
+  perl: 5.8.6
+build_requires:
+  IO::File: ''
+  Test::Class: ''
+  Test::Exception: ''
+  Test::MockObject: 1.09
+  Test::Simple: 0.47
+provides:
+  Mail::Action:
+    file: lib/Mail/Action.pm
+    version: 0.46
+  Mail::Action::Address:
+    file: lib/Mail/Action/Address.pm
+    version: 0.46
+  Mail::Action::Address::Base:
+    file: lib/Mail/Action/AddressTest.pm
+  Mail::Action::AddressTest:
+    file: lib/Mail/Action/AddressTest.pm
+  Mail::Action::PodToHelp:
+    file: lib/Mail/Action/PodToHelp.pm
+    version: 0.46
+  Mail::Action::RealAddress:
+    file: lib/Mail/Action/StorageTest.pm
+  Mail::Action::Request:
+    file: lib/Mail/Action/Request.pm
+    version: 0.46
+  Mail::Action::RequestTest:
+    file: lib/Mail/Action/RequestTest.pm
+  Mail::Action::Storage:
+    file: lib/Mail/Action/Storage.pm
+    version: 0.46
+  Mail::Action::StorageSub:
+    file: lib/Mail/Action/StorageTest.pm
+  Mail::Action::StorageTest:
+    file: lib/Mail/Action/StorageTest.pm
+  Mail::Action::Test:
+    file: lib/Mail/Action/Test.pm
+generated_by: Module::Build version 0.31
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

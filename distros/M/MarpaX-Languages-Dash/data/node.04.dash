@@ -1,0 +1,3 @@
+# Juxtaposed nodes (without comma) with attributes. OK.
+[node.1]{label: A and B}
+[node.2]{label : A or B}

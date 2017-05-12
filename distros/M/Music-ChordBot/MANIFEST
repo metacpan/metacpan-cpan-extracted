@@ -1,0 +1,23 @@
+Changes
+lib/Music/ChordBot.pm
+lib/Music/ChordBot/Opus.pm
+lib/Music/ChordBot/Opus/Base.pm
+lib/Music/ChordBot/Opus/Section.pm
+lib/Music/ChordBot/Opus/Section/Chord.pm
+lib/Music/ChordBot/Opus/Section/Style.pm
+lib/Music/ChordBot/Opus/Section/Style/Track.pm
+lib/Music/ChordBot/Song.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+Makefile.PL
+README
+t/10_test.t
+t/11_test.t
+t/20_chord.t
+t/22_track.t
+t/24_style.t
+t/30_song.t
+t/31_song.t
+t/32_song.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,18 @@
+MANIFEST
+MANIFEST.SKIP
+Changes
+Makefile.PL
+lib/MogileFS/Utils.pm
+mogtool
+mogadm
+mogstats
+mogupload
+mogdelete
+mogfetch
+mogfileinfo
+moglistfids
+moglistkeys
+mogfiledebug
+mogrename
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

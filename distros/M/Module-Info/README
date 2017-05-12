@@ -1,0 +1,19 @@
+
+    README for Perl module Module::Info
+
+Module::Info can be used to get information other Perl modules,
+without loading them into your process.
+
+You can read a nicely formatted version of the documentation for
+this module online:
+
+    https://metacpan.org/pod/Module::Info
+
+You should be able to install this using your usual method for installing
+modules from CPAN. If you don't have one, have a look at:
+
+    http://www.cpan.org/modules/INSTALL.html
+
+This module was originally written by Michael G Schwern <schwern@pobox.com>.
+It was maintained from 2002 to 2013 by Mattia Barbon <mbarbon@cpan.org>.
+It is currently being maintained by Neil Bowers <neilb@cpan.org>.

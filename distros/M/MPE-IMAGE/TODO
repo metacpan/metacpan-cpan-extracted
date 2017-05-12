@@ -1,0 +1,7 @@
+1) It would be nice if README were automatically built just prior to creating
+   the distribution.
+
+2) All calls which accept item and set numbers should accept either negative or
+   positive values.
+
+3) DbPut and DbUpdate should handle being given a schema

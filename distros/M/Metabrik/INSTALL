@@ -1,0 +1,63 @@
+INSTALLATION INSTRUCTIONS
+
+An up-to-date installation guide can be found at: http://www.metabrik.org/metabrik/install/ .
+
+
+1. Ubuntu
+
+# apt-get install liblexical-persistence-perl liblocal-lib-perl \
+     libterm-readline-gnu-perl libnet-ssh2-perl libnet-pcap-perl \
+     libnet-libdnet-perl libnet-libdnet6-perl libppi-perl
+
+
+2. Mac OS X
+
+2.1. Install Xcode/MacPorts
+
+Follow https://www.macports.org/install.php .
+
+2.2. Install required packages with MacPorts
+
+# port install readline p5-net-pcap p5-app-cpanminus libdnet mercurial
+
+2.3. Install required Perl modules
+
+# cpanm local::lib Data::Dump PPI Exporter::Tiny Class::Gomor \
+     Term::ReadLine::Gnu File::HomeDir File::Path IO::All Term::Shell \
+     File::Find Term::ANSIColor Net::Libdnet Lexical::Persistence \
+     Module::Reload
+
+2.4. Set environnement variables
+
+2.4.1. For bash shell
+
+Replace 5.16.3 with your Perl version.
+
+$ export PERL5LIB=$PERL5LIB:/opt/local/lib/perl5/vendor_perl/5.16.3/darwin-thread-multi-2level
+
+
+3. FreeBSD (Tested on 10.1-RELEASE)
+
+XXX: to complete
+
+
+4. Metabrik
+
+4.1. Clone Mercurial repositories
+
+Replace 1_xx by latest version from: http://trac.metabrik.org/browser/core/.hgtags
+
+$ mkdir ~/metabrik
+$ hg clone -r METABRIK_1_xx http://trac.metabrik.org/hg/core ~/metabrik/core
+$ hg clone -r METABRIK_REPOSITORY_1_xx http://trac.metabrik.org/hg/repository ~/metabrik/repository
+
+4.2. Place environnement variables
+
+4.2.1. For bash shell
+
+$ export PATH=$PATH:~/metabrik/core/bin
+$ export PERL_RL=Gnu
+
+4.3. Run and enjoy
+
+$ metabrik

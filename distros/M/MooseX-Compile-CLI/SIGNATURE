@@ -1,0 +1,34 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 92dacc44000d3fd57602a171426486ca638aad4d MANIFEST
+SHA1 ddb918d4e02cc06f4b9fe77adeca65403f8fdd56 MANIFEST.SKIP
+SHA1 84ce81eec6bf3c854bf11d1fe3b49a480f1bb8db META.yml
+SHA1 e271156e38ccb191388afa63fc7880bfef5b7004 Makefile.PL
+SHA1 2c8c8c3dd55b8f51501815c4d446a512cdbf2bc0 lib/MooseX/Compile/CLI.pm
+SHA1 a1523c105ef4dced1b2ec9382a7d257e3b3d8749 lib/MooseX/Compile/CLI/Base.pm
+SHA1 24fca253edf301a2373a5cd81a81e91d5c9da7c1 lib/MooseX/Compile/CLI/Command/clean.pm
+SHA1 bcd01cb1a2b2b608fafbd6d0ccbea8047d64dc9a lib/MooseX/Compile/CLI/Command/compile.pm
+SHA1 618ec6c9ef39445025c53b6094538ce292fa5ed2 script/mxcompile
+SHA1 8f379aa510a8c84a146420e50d9e2b5ebc88b526 t/001_load.t
+SHA1 251005caae3ad0ff699c0c0ae7e573744f9d54f8 t/002_base.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFHlkfoVCwRwOvSdBgRAtIvAJ91sTmQDokguuL725ImzBmnxPx7CwCfXp3Z
+vFaz7D6iyBATHppR36PWKbw=
+=DMA+
+-----END PGP SIGNATURE-----

@@ -1,0 +1,11 @@
+TYPEMAP
+mvr        T_MVR
+
+
+INPUT
+T_MVR
+        $var = mvr_from_sv(aTHX_ $arg);
+
+OUTPUT
+T_MVR
+        sv_set_mvr(aTHX_ $arg, $var);

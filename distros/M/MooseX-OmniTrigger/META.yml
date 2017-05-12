@@ -1,0 +1,54 @@
+---
+abstract: 'Recursion-proof attribute triggers that fire on any initialize, set, or clear operation.'
+author:
+  - 'Todd Lorenz <trlorenz@hotmail.com>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-OmniTrigger
+provides:
+  MooseX::OmniTrigger:
+    file: lib/MooseX/OmniTrigger.pm
+    version: 0.06
+  MooseX::OmniTrigger::MetaRole::AppToClass:
+    file: lib/MooseX/OmniTrigger.pm
+    version: 0
+  MooseX::OmniTrigger::MetaRole::AppToRole:
+    file: lib/MooseX/OmniTrigger.pm
+    version: 0
+  MooseX::OmniTrigger::MetaRole::Attribute:
+    file: lib/MooseX/OmniTrigger.pm
+    version: 0
+  MooseX::OmniTrigger::MetaRole::Class:
+    file: lib/MooseX/OmniTrigger.pm
+    version: 0
+  MooseX::OmniTrigger::MetaRole::Composite:
+    file: lib/MooseX/OmniTrigger.pm
+    version: 0
+  MooseX::OmniTrigger::MetaRole::Instance:
+    file: lib/MooseX/OmniTrigger.pm
+    version: 0
+  MooseX::OmniTrigger::MetaRole::Method::Accessor::Native::Writer:
+    file: lib/MooseX/OmniTrigger.pm
+    version: 0
+  MooseX::OmniTrigger::MetaRole::Role:
+    file: lib/MooseX/OmniTrigger.pm
+    version: 0
+  MooseX::OmniTrigger::State:
+    file: lib/MooseX/OmniTrigger.pm
+    version: 0
+requires:
+  Hash::Util::FieldHash: 0
+  Moose: 2.02
+  namespace::autoclean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.06

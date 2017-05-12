@@ -1,0 +1,334 @@
+#! /usr/bin/perl
+
+use strict;
+use warnings;
+use vars qw($PORT_DEFAULT);
+use Getopt::Long;
+use Mail::Karmasphere::Client qw(:all);
+use Unix::Syslog qw(:macros :subs);
+
+$PORT_DEFAULT = 8555;
+
+sub usage {
+	print STDERR <<EOUSAGE;
+usage: master.cf should contain
+
+karmad-postfix
+             [--username=foo --password=bar]
+             [--server=query.karmasphere.com]
+             [--feedset=karmasphere.email-sender]
+             [--action=PREPEND|reject]
+             [--syslog]
+EOUSAGE
+}
+
+my $help;
+my ($server, $user, $group, $port, $path, $login, $pass);
+my ($action, $verbose_header, $cutoff_fail, $cutoff_pass, $syslog);
+my $composite = "karmasphere.email-sender";
+
+my $result = GetOptions(
+	"help"			=> \$help,
+	"server=s"		=> \$server,
+	"feedset=s"		=> \$composite,
+	"user=s"		=> \$user,
+	"group=s"		=> \$group,
+	"username=s"	=> \$login,
+	"password=s"	=> \$pass,
+	"action=s"		=> \$action,
+	"verbose-header" => \$verbose_header,
+	"verbose-headers" => \$verbose_header,
+	"cutoff-fail=i"   => \$cutoff_fail,
+	"cutoff-pass=i"   => \$cutoff_pass,
+	"syslog"		=> \$syslog,
+);
+
+$cutoff_pass = +300 if not defined $cutoff_pass;
+$cutoff_fail = -300 if not defined $cutoff_fail;
+
+if ($syslog) { $syslog = LOG_MAIL }
+
+openlog "karmad", LOG_PID, $syslog if $syslog;
+syslog (LOG_DEBUG, "starting. server=%s feedset=%s action=%s", $server, $composite, $action) if $syslog;
+syslog (LOG_DEBUG, "starting. cutoff-fail=%s, cutoff-pass=%s, verbose-header=%s", $cutoff_fail, $cutoff_pass, $verbose_header) if $syslog;
+syslog (LOG_DEBUG, "starting. username=%s password=%s", $login, map { "x" x length($_) } $pass) if $syslog;
+
+if (!$result or $help) {
+	usage();
+	exit 0;
+}
+
+my @args;
+
+my %in;
+
+$|++;
+
+# Read the request.
+while (<STDIN>) {
+	chomp;
+	chomp;
+	if (/^$/) { proceed(); next; }
+	my ($lhs, $rhs) = split(/\s*=\s*/, $_, 2);
+	$in{lc $lhs} = $rhs;
+}
+
+sub proceed {
+	for my $key (sort keys %in) {
+		print STDERR "$key = $in{$key}\n" if -t STDERR;
+		syslog LOG_DEBUG, "$key = $in{$key}" if $syslog;
+	}
+
+	my $query_id = join('-', 'karmad', time(), ($in{queue_id} || ()));
+
+	my $query = new Mail::Karmasphere::Query(
+											 Composite	=> $composite,
+											 Id => $query_id,
+											 );
+	
+	$query->identity($in{ip}, 					IDT_IP4_ADDRESS, "smtp.client-ip")				if exists $in{ip}; # backward compatibility
+	$query->identity($in{helo}, 				IDT_DOMAIN_NAME, "smtp.env.helo")				if exists $in{helo}; # backward compatibility
+	$query->identity($in{client_address}, 		IDT_IP4_ADDRESS, "smtp.client-ip")				if exists $in{client_address};
+	$query->identity($in{helo_name}, 			IDT_DOMAIN_NAME, "smtp.env.helo")				if exists $in{helo_name};
+	$query->identity($in{sender}, 				IDT_EMAIL_ADDRESS, "smtp.env.mail-from")		if exists $in{sender};
+# Postfix only. Hope these are useful.
+	$query->identity($in{client_name}, 			IDT_DOMAIN_NAME, "a")							if exists $in{client_name};
+	
+	my ($shost, $sport) = split(/:/, $server) if $server;
+	my %mkcargs = (
+				   PeerHost	=> $shost,
+				   PeerPort	=> $sport,
+				   Principal	=> $login,
+				   Credentials	=> $pass,
+				   );
+	my $client = new Mail::Karmasphere::Client(%mkcargs);
+	
+	print STDERR "sending query \"@{[$query->as_string]}\"\n" if -t STDERR;
+	syslog LOG_DEBUG, "sending query %s", $query->as_string if $syslog;
+	my $response = $client->ask($query);
+
+	respond(response  => $response,
+			composite => $composite,
+			query     => $query,
+			);
+
+	%in = ();
+}
+
+exit;
+
+### 
+### --------------------------------------------------------- respond dispatcher
+### 
+
+sub respond {
+	respond_postfix(@_);
+	respond_syslog(@_)  if ($syslog);
+}
+
+### 
+### --------------------------------------------------------- syslog
+### 
+
+sub respond_syslog {
+	my %param     = @_;
+	my ($response, $composite, $query) = @param{qw(response composite query)};
+
+	if (not $response) {
+		syslog LOG_DEBUG, "response: no response";
+	}
+	else {
+		my $value = $response->value($composite);
+		$value = 0 unless defined $value;
+		my $verdict = ($value > $cutoff_pass ? "pass" :
+					   $value < $cutoff_fail ? "fail" :
+					   "neutral");
+
+		my $data = $response->data($composite);
+		$data = '(null data)' unless defined $data;
+
+		syslog (LOG_INFO,
+				"response: verdict=%s score=%s query_id=%s identities=%s comment=%s",
+				$verdict, $value, $query->id, $query->identities_as_humanreadable_string, $data);
+	}
+}
+
+### 
+### --------------------------------------------------------- MTA = postfix
+### 
+
+sub respond_postfix {
+	my %param     = @_;
+	my ($response, $composite, $query) = @param{qw(response composite query)};
+
+	if (not $response) {
+		# In case of trouble the policy server must not send
+		# a reply. Instead the server must log a warning and
+		# disconnect. Postfix will retry the request at some
+		# later time.
+		# -- http://www.postfix.org/SMTPD_POLICY_README.html
+
+		print STDERR "timeout\n" if -t STDERR;
+		print "action=dunno\n\n";
+		return;
+	}
+
+	print STDERR $response->as_string if -t STDERR;
+
+	if ($response->error) {
+		print "action=dunno\n\n";
+		return;
+	}
+
+	my $data = $response->data($composite) || '(no comment)';
+
+	my $action = $action || "prepend";
+
+	my $value = $response->value($composite);
+	$value = 0 unless defined $value;
+	my $verdict = ($value > $cutoff_pass ? "pass" :
+				   $value < $cutoff_fail ? "fail" :
+				                           "neutral");
+
+	my @prepend_string = ("prepend",
+						  "X-Karma:",
+						  "verdict=$verdict",
+						  "score=$value",
+						  "comment=$data");
+
+	if ($verbose_header) {
+		splice(@prepend_string, -1, 0,
+			   "identities=" . $query->identities_as_humanreadable_string,
+			   "query_id=" . $query->id,
+			   );
+	}
+
+	my $prepend_string = join (" ", @prepend_string);
+
+	if ($action eq "prepend")   {
+		print "action=$prepend_string\n";
+	}
+	elsif ($action eq "reject") {
+		if ($verdict eq "pass") { print "action=permit\n"; }
+		if ($verdict eq "fail") { print "action=reject karma scored too low: $value ($data)\n"; }
+		else                    { print "action=$prepend_string\n"; }
+	}
+	print "\n";
+}
+
+__END__
+
+=head1 NAME
+
+karmad - Karmasphere policy daemon for Postfix
+
+=head1 DESCRIPTION
+
+This is a small postfix policy server.  It is spawned by spawn(8).
+It offers an interface between Postfix and L<Mail::Karmasphere::Client>.
+
+=head1 USAGE
+
+Add the following to /etc/postfix/master.cf:
+
+ karma unix - n n - 0 spawn
+   user=nobody argv=/usr/local/bin/karmad-postfix --action=prepend --verbose-header --syslog
+
+Add the following to /etc/postfix/main.cf:
+
+ karma_time_limit = 3600
+
+Append the following to smtpd_recipient_restrictions, somewhere AFTER reject_unauth_destination:
+
+  check_policy_service unix:private/karma
+
+Watch your mail.debug syslog go by; you should see queries and responses.
+
+=head1 COMMAND LINE PARAMETERS
+
+=over 12
+
+=item --cutoff-pass
+
+=item --cutoff-fail
+
+Recommended.
+
+Scores below C<cutoff-fail> will turn into a "fail/reject".
+Scores above C<cutoff-pass> will turn into a "pass".  You
+should set these thresholds yourself: Karmasphere provides
+the score, but you decide policy.  If you do not, they will
+default to +300 and -300.
+
+=item --action
+
+Optional.
+
+If you're running postfix, you can set --action to one of
+C<prepend> (default) or C<reject>.  Prepend will prepend an
+X-Karma header.  Reject will cause any mail with a karma
+score below C<cutoff-fail> to be rejected.  Use this only if
+you are happy with the results you've observed.
+
+If not specified, defaults to C<prepend>.
+
+=item --verbose-header
+
+Optional.
+
+If you've set C<action> to C<prepend>, this flag will add
+two fields to the X-Karma header: C<identities> shows what
+was queried, and C<query_id> includes the timestamp and (if
+available) the MTA's queue ID.)  This is useful for
+debugging purposes: it allows one to replay the query.
+
+=item --username
+
+=item --password
+
+Optional.
+
+Query credentials for authenticated queries.  You only need
+to set this if you're querying a restricted feedset.  For
+more information, see
+L<http://www.karmasphere.com/devzone/client/configuration#credentials>
+
+=item --server
+
+Hostname of the Karmasphere Query Server to connect to.
+Defaults to query.karmasphere.com.  You probably don't need
+to set this, unless you have set up a local query server, in
+which case you should be following the directions provided
+with that server.
+
+=item --feedset
+
+The name of the feedset you want to query.  Defaults to
+karmasphere.email-sender.  You probably don't need to set
+this.  
+
+=item --syslog
+
+Syslog verbosely to mail.info and mail.debug.
+
+=back
+
+=head1 BUGS
+
+=head1 SEE ALSO
+
+L<Mail::Karmasphere::Client>
+L<Mail::Karmasphere::Query>
+L<Mail::Karmasphere::Response>
+L<karmaclient>
+http://www.karmasphere.com/
+http://www.postfix.org/SMTPD_POLICY_README.html
+
+=head1 COPYRIGHT
+
+Copyright (c) 2005 Shevek, Karmasphere. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

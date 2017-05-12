@@ -1,0 +1,31 @@
+
+Revision history for Perl module Mojo::IOLoop::HoboProcess.
+
+0.005 Fri Apr 28 18:00:00 EST 2017
+
+  * Disabled timeout testing on the Windows platform.
+
+0.004 Fri Mar 17 06:30:00 EST 2017
+
+  * Bumped MCE::Shared dependency to 1.817 for improved reliability
+    with Mojolicious 7.25 and later releases.
+
+0.003 Thu Feb 16 04:00:00 EST 2017
+
+  * Improved reliability with recent Mojolicious releases
+    (same bug fixed by jberger in Mojo::IOLoop::Subprocess).
+
+  * Added inherited test from Mojolicious-7.26/t/mojo/subprocess.t.
+
+  * Bumped MCE::Shared dependency to 1.808.
+  * Bumped Mojolicious dependency to 7.07.
+
+0.002 Wed Nov 23 16:00:00 EST 2016
+
+  * Bumped MCE::Shared dependency to 1.807.
+  * Improved reliability.
+
+0.001 Thu Nov 03 04:00:00 EST 2016
+
+  * First release.
+

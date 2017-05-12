@@ -1,0 +1,6 @@
+hdlist.cz	Mandrake/RPMS	Installation CD
+hdlist.src.cz   ../SRPMS	Installation sources
+hdlist2.cz	Mandrake/RPMS2	Contrib CD
+hdlist2.src.cz   ../contrib/SRPMS	Contrib sources
+hdlist3.cz	Mandrake/RPMS3	Jpackage.org
+hdlist3.src.cz   ../contrib/jpackage/SRPMS	Jpackage.org sources

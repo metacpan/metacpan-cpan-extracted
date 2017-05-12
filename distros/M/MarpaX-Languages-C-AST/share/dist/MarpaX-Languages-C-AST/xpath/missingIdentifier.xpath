@@ -1,0 +1,15 @@
+.//structOrUnion[following-sibling::*[1]/self::LCURLY]
+|
+.//ENUM[following-sibling::*[1]/self::LCURLY]
+|
+.//parameterDeclaration/declarationSpecifiers[not(following-sibling::*)]
+|
+.//abstractDeclarator/msvsAttributeAny[not(following-sibling::*)]
+|
+.//structDeclaration/specifierQualifierList[following-sibling::*[1]/self::SEMICOLON]
+|
+.//structDeclaration/SEMICOLON[not(preceding-sibling::*)]
+|
+.//structDeclarator/COLON[not(preceding-sibling::*)]
+|
+./declarationSpecifiers[following-sibling::*[1]/self::SEMICOLON]

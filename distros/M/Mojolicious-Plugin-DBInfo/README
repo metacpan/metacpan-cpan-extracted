@@ -1,0 +1,33 @@
+NAME
+    Mojolicious::Plugin::DBInfo - display DataBase Information
+
+SYNOPSIS
+     $app->plugin('Mojolicious::Plugin::DBInfo');
+
+DESCRIPTION
+    Mojolicious::Plugin::DBInfo is a Mojolicious-Plugin.
+
+    It creates a route
+
+      /dbinfo
+
+    where detailed info is displayed in formatted HTML.
+
+  METHODS
+    register
+
+SEE ALSO
+    *   Mojolicious
+
+SOURCE REPOSITORY
+    <http://github.com/wollmers/Mojolicious-Plugin-DBInfo>
+
+AUTHOR
+    Helmut Wollmersdorfer, <helmut.wollmersdorfer@gmail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2013-2015 by Helmut Wollmersdorfer
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

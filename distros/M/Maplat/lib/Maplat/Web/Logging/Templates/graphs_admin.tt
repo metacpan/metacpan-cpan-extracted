@@ -1,0 +1,95 @@
+<p align="center">
+    <form name="powerdevices" method="post" action="[% webpath %]">
+    <table class="data" id="MainDataTable">
+        <tr class="tabheader">
+                <th>[% tr.tr("Name") %]</th>
+                <th>[% tr.tr("Device") %]</th>
+                <th>[% tr.tr("Title") %]</th>
+                <th>[% tr.tr("Y-Label") %]</th>
+                <th>[% tr.tr("Type") %]</th>
+                <th>[% tr.tr("Cummulate") %]</th>
+                <th>[% tr.tr("Column names") %]</th>
+                <th>[% tr.tr("Column labels") %]</th>
+                <th>[% tr.tr("Delete") %]</th>
+        </tr>
+        [% FOREACH graph IN graphs %]
+        <tr>
+                <td>
+                    <input type="hidden" name="graph_id" value="[% graph.id %]">
+                    <input type="hidden" name="graph_name_[% graph.id %]" value="[% graph.graph_name %]">
+                    <input type="text" name="new_graph_name_[% graph.id %]" size="15" maxlength="60" value="[% graph.graph_name %]">
+                </td>
+                <td>
+                        <input type="hidden" name="devicetype_[% graph.id %]" value="[% graph.device_type %]">
+                        [% graph.device_type %]
+                </td>
+                <td><input type="text" size="20" maxlength="60" name="title_[% graph.id %]" value="[% graph.title %]"></td>
+                <td><input type="text" size="10" maxlength="60" name="ylabel_[% graph.id %]" value="[% graph.ylabel %]"></td>
+                <td>
+                        <select name="type_[% graph.id %]">
+                            [% FOREACH graphtype IN graphtypes %]
+                                <option value="[% graphtype.type %]"
+                                    [% IF graph.graph_type == graphtype.type %]
+                                        selected="selected"
+                                    [% END %]
+                                    >[% graphtype.label %]
+                                </option>
+                            [% END %]
+                        </select>
+                </td>
+                <td><input type="checkbox" name="cummulate_[% graph.id %]"
+                        [% IF graph.cummulate %]
+                        checked
+                        [% END %]
+                ></td>
+                <td><input type="text" size="30" maxlength="80" name="colnames_[% graph.id %]" value="[% graph.colnames %]"></td>
+                <td><input type="text" size="30" maxlength="80" name="collabels_[% graph.id %]" value="[% graph.collabels %]"></td>
+                <td><input type="checkbox" name="delete_[% graph.id %]"></td>
+        </tr>
+        [% END %]
+        
+        <!-- "New" -->
+        <tr>
+                <td>
+                    <input type="hidden" name="graph_id" value="__NEW__">
+                    <input type="hidden" name="graph_name" value="__NEW__">
+                    <input type="text" name="new_graph_name___NEW__" size="15" maxlength="60">
+                </td>
+                <td>
+                        <select name="devicetype___NEW__">
+                            <option value="PAC3200">PAC3200</option>
+                            <option value="USV">USV</option>
+                            <option value="RBS">RBS</option>
+                            <option value="EMCTIME">EMC Time</option>
+                        </select>
+                </td>
+                <td><input type="text" size="20" maxlength="60" name="title___NEW__" value=""></td>
+                <td><input type="text" size="10" maxlength="60" name="ylabel___NEW__" value=""></td>
+                <td>
+                        <select name="type___NEW__">
+                            [% FOREACH graphtype IN graphtypes %]
+                                <option value="[% graphtype.type %]">
+                                    [% graphtype.label %]
+                                </option>
+                            [% END %]
+                        </select>
+                </td>
+                <td><input type="checkbox" name="cummulate___NEW__"
+                        [% IF graph.cummulate %]
+                        checked
+                        [% END %]
+                ></td>
+                <td><input type="text" size="30" maxlength="80" name="colnames___NEW__" value=""></td>
+                <td><input type="text" size="30" maxlength="80" name="collabels___NEW__" value=""></td>
+                <td><input type="hidden" name="delete___NEW__" value="0"></td>
+        </tr>
+        <tr>
+            <td colspan="8" align="center">
+                <input type="submit" value="[% tr.tr("Save") %]">
+                <input type="reset" value="[% tr.tr("Reset") %]">
+            </td>
+        </tr>
+    </table>
+    <input type="hidden" name="submitform" value="1">
+    </form>
+</p>

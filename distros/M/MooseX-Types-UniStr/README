@@ -1,0 +1,40 @@
+NAME
+    MooseX::Types::UniStr - Moose type definitions for Unicode strings
+
+SYNOPSIS
+      use Moose;
+      use MooseX::Types::UniStr;
+
+      has 'name' => ( is => 'rw', isa => 'UniStr', coerce => 1 );
+
+DESCRIPTION
+    This module lets you specify attributes as Unicode strings.
+
+TYPES / COERCIONS
+  UniStr
+    Coercions provided:
+
+    from Str
+        Turns on the Unicode bit using "Encode::decode_utf8($_)".
+
+        If the Unicode bit is already on, the coercion is a no-op.
+
+    to Str
+        No-op; the Unicode bit is left on.
+
+AUTHORS
+    唐鳳 <cpan@audreyt.org>
+
+    Jeremy Stashewsky <jstash+cpan at gmail.com>
+
+CC0 1.0 Universal
+    To the extent possible under law, 唐鳳 has waived all copyright and
+    related or neighboring rights to MooseX-Types-UniStr.
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Jeremy Stashewsky Copyright 2009 Socialtext Inc., all
+    rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

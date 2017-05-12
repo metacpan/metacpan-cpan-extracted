@@ -1,0 +1,63 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 13d9990f1956e12ec63cc54608b2ab51e59d8d5b Changes
+SHA1 34565a23493508c6ec6e38fc9e6b7f0e6cbab333 INSTALL
+SHA1 8a4fdad1020dbfd5154c3f042385ce86e2eefea2 LICENSE
+SHA1 78bdafe2a64b5a46890d35a1a4440bf1509c3454 MANIFEST
+SHA1 0113bdd5ac629815e724168abf955d0809dee2b6 META.json
+SHA1 1d99a72358a9fe93305323ad028bc3b0a2abbff1 META.yml
+SHA1 040428d38d0eb95f49da5bd59f5f621acd787473 Makefile.PL
+SHA1 a57c8d47a28bdca9ac6b7e601515b40be4630d7e README
+SHA1 0d50c319d82b846ffabf47b1a5fb665efa6e62ed cpanfile
+SHA1 4722ccd661f71e8095d3eec5257ade83cb60d4d6 dist.ini
+SHA1 854b857dcef02b5559b3e5b567ce50e84411b7c1 examples/benchmark.pl
+SHA1 2d18bfadd6b6608bca4f01ca36fb3f1c29415669 examples/subscribe-invoke.pl
+SHA1 4f420bf9e5d957d84c4bb2774ad7f9e48b76499c lib/Mixin/Event/Dispatch.pm
+SHA1 5e2475ba57fa7d7b5a816e4b64cbdc21b133813b lib/Mixin/Event/Dispatch/Bus.pm
+SHA1 dbef057a26b999143637ddb4ba253e9c557c422b lib/Mixin/Event/Dispatch/Bus.pod
+SHA1 f8e6aa6fe180dff00e8e3e698af508fffeed7712 lib/Mixin/Event/Dispatch/Event.pm
+SHA1 bf197ff20e04cab0ef3d3b32c084f6246ecf7989 lib/Mixin/Event/Dispatch/Methods.pm
+SHA1 abdcc6f61cfcd41eb131a69989dbbf8babe6982f lib/Mixin/Event/Dispatch/Methods.pod
+SHA1 947ca86c2bef5344eb858480d48451963933ae9d t/00-check-deps.t
+SHA1 34d1a71672cd62d33d417be717272bfa093e825a t/00-compile.t
+SHA1 f4ce350a5ed7a76dce14348416f328d7a77c1ca6 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 1e13e1d3f2013e19039b693098d341bb766e1197 t/cycle.t
+SHA1 d69b0b698fe7e26a955af024bc2ebf7df1105b81 t/event.t
+SHA1 879250f293c5abf612e503e6254dda2df8a9793f t/import.t
+SHA1 ad5322df59379b5dbe39a68d91a1210a63290975 t/moo-role.t
+SHA1 f1379f06fa862a7d8572b2ff2e2af4f675511f6a t/moose-role.t
+SHA1 216dc70e9071c5dc6eddb7143646fe44487af73f t/refcount.t
+SHA1 7d66d4a5bc6fc3679174c203930420a47951f80e t/role-tiny.t
+SHA1 d6439cb7f195ebadb010cdf0200f7d816fd330b8 t/size.t
+SHA1 6d3d0c301c10bc355f25b7255e67812b1a5751e8 t/subscribe.t
+SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
+SHA1 5598b706d9b813eafb74508a7575b391ccd30423 xt/author/test-version.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/release/synopsis.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEbBAEBAgAGBQJV9iGsAAoJEFKElMNpjtyD9OQH91622nCybFjCGFclaqqO8t2f
+53F0oRV9j+6QAcAc8OdTDVCELBpN+yGiYGV8qsnjChcl8ENfuSoO1w5uXJgwVQep
+UtvfT7Kk3+JsH6ut2eL27yRT/euCwakd18oOxmQ7biM6G2/crTF2ZlW28/if+FJU
+g4uHmcnB+k9br/N+HjQWisSKEcEvcJw7e2KxzbaQxTi92C/ko+rcXayCvTVXzw9I
+55jG2hVRQsTbwIMj1Z01CVE/SM9QOz5vjc3QnxuFFfqcIyWVyI0YnI4tkURFkVgO
+an47XlFG6iCSEDkv2IVBAApepgYwf2sKsssLkUAwTFyGNXOcssvCX5P+k7M/BA==
+=oABO
+-----END PGP SIGNATURE-----

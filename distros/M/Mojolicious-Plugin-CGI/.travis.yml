@@ -1,0 +1,12 @@
+language: perl
+perl:
+  - "5.20"
+  - "5.14"
+  - "5.10"
+env:
+  - "HARNESS_OPTIONS=j1 TEST_POD=1 TEST_MORBO=1"
+install:
+  - "cpanm -n Test::Pod Test::Pod::Coverage Parallel::ForkManager Proc::ProcessTable"
+  - "cpanm -n --installdeps ."
+notifications:
+  email: false

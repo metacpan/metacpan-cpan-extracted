@@ -1,0 +1,43 @@
+{
+   "abstract" : "Set default of an attribute to a value from %ENV",
+   "author" : [
+      "John Napiorkowski, C<< <jjnapiork at cpan.org> >>, John Napiorkowski <jjnapiork@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Attribute-ENV",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.62",
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0.48",
+            "perl" : "5.008006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02"
+}

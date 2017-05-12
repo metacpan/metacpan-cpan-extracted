@@ -1,0 +1,79 @@
+#! /usr/bin/perl
+#########################################################################
+#        This Perl script is Copyright (c) 2003, Peter J Billam         #
+#               c/o P J B Computing, www.pjb.com.au                     #
+#                                                                       #
+#     This script is free software; you can redistribute it and/or      #
+#            modify it under the same terms as Perl itself.             #
+#########################################################################
+use Term::Clui;
+use Math::RungeKutta qw(:ALL arr2txt);
+
+sub dydt { my ($t, @y) = @_;
+	my @dydt;
+	$dydt[$[] = 0.5*$y[$[];
+	$dydt[$[+1] = $y[$[+1];
+	return @dydt;
+}
+print "Simulates exponential growths: dydt[0]=.5*y[0], dydt[1]=y[1]\n";
+print "   ( use arrow keys and <Return>, or q to quit )\n";
+while (1) {
+	$algorithm = &choose("Algorithm ?",
+	 'rk2','rk4','rk4_classical','rk4_ralston','rk4_auto');
+	last unless $algorithm;
+	$dt = &choose('Timestep ?','.1','.2','.5','1','2');
+	$n = 20;
+	@y = (1,1); $t=0; $epsilon = 0.01;
+	$e = 2.718281828;
+
+	print "i= 0 t=0.0 y0=1.00000 y1=1.00000\n";
+	if ($algorithm eq 'rk4_auto') {
+		foreach (1..$n) {
+			($t, @y) = &{$algorithm}( \@y, \&dydt, $t, $dt, $epsilon );
+			printf "i=%2d t=%g y0=%g y1=%g\n",$_,$t,$y[$[],$y[$[+1];
+		}
+	} else {
+		foreach (1..$n) {
+			($t, @y) = &{$algorithm}( \@y, \&dydt, $t, $dt );
+			printf "i=%2d t=%g y0=%g y1=%g\n",$_,$t,$y[$[],$y[$[+1];
+		}
+	}
+	printf "error per timestep = %g\n",
+	 (abs ($y[$[+1] - exp $t)) / ($y[$[+1] * $n);
+}
+exit 0;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+exponentials - Perl script to test Math::RungeKutta
+
+=head1 SYNOPSIS
+
+ perl examples/exponentials
+
+=head1 DESCRIPTION
+
+This script uses I<Math::RungeKutta> to integrate the exponential
+equations I<dy/dt=y/2> and I<dy/dt=y> from I<t=0, y=1> to I<t=2>
+
+It uses I<Term::Clui> to give you a choice of the various methods that
+I<Math::RungeKutta> offers, and of a selection of timestep values
+or error criteria.
+
+=head1 AUTHOR
+
+Peter J Billam  www.pjb.com.au/comp/contact.html
+
+=head1 SEE ALSO
+
+examples/sine-cosine
+examples/three-body
+Math::RungeKutta,
+Term::Clui
+
+=cut
+

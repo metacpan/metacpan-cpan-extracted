@@ -1,0 +1,5 @@
+COPYING
+MANIFEST
+Makefile.PL
+lib/HTTP/Monkeywrench.pm
+test.pl

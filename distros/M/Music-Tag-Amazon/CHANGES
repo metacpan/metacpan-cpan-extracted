@@ -1,0 +1,51 @@
+CHANGES
+	Release Name: 0.4101 2008-08-16
+		*	Updated to use new method system
+
+		*	POD Changes
+
+	Release Name: 0.4001 2010-07-27
+		*	Started using git and github
+
+		*	Normalized version accross plugins.
+
+		*	POD Changes
+
+    Release Name: 0.34 2010-07-25
+        *   Added canned responses from Net::Amazon.
+
+    Release Name: 0.33 2009-08-28
+        *   Added secret_key option required by Amazon now.
+
+    Release Name: 0.32  
+        *   Changed license to allow option of GPL
+
+    Release Name: 0.31 2008-02-28
+        *   Requires higher verbosity to print all info so it is much
+            quieter when quiet is not set
+
+        *   Requires Music::Tag 0.33
+
+        *   Pod improvements
+
+        *   Now using Pod::Readme and Test::Spelling
+
+    Release Name: 0.30 2008-02-23
+        *   Added amazon_info option and several new set values
+
+        *   Set upc and ean and will search by these
+
+        *   Example code
+
+    Release Name: 0.29 2008-02-21
+        *   Added option to set several internal objects, such as the cache
+            objects.
+
+        *   Fixed bug in lwp method which would cause it to create a new
+            object every call!
+
+        *   Kwalitee improvments
+
+    Release Name: 0.28 2008-02-11
+        *   Split off from Music::Tag distribution
+

@@ -1,0 +1,33 @@
+MasonX/Resolver/PAR version 0.1
+================================
+
+This is a custom Mason Resolver that gets components from PAR Archive.
+Refer to the PAR module for more information about them. It can be used
+in conjunction with Apache::PAR to distribute mason applications as 
+single files which can be plugged into a PAR enabled Apache web server.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  HTML::Mason
+  Apache::PAR
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2003 Marcus Ramberg
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

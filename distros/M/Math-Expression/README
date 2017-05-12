@@ -1,0 +1,234 @@
+Math::Expression version 1.47
+=============================
+
+Evaluating an expression from an untrusted source can result in security or denial of service attacks.
+Sometimes this needs to be done to do what the user wants, ie you have to allow a user
+to enter an expression that is evaluated.
+
+This module solves the problem of evaluating expressions read from sources such as config/...
+files and user web forms without the use of C<eval>.
+String and arithmetic operators are supported (as in C/Perl),
+as are: variables, loops, conditions, arrays and be functions (inbuilt & user defined).
+
+For instance, shipping cost depends on item price by some arbitrary formula. The VAT amount can also
+vary depending on political edict. Rather than nail these formula into the application code the
+formula are obtained at run time from some configuration source. These formula are probably
+entered by a non technical manager and are thus not to be trusted.
+
+	use Math::Expression;
+	my $ae = new Math::Expression;
+
+# Obtain from a configuration source:
+	my $ShippingFormula = 'Price >= 100 ? Price * 0.1 : (Price >= 50 ? Price * 0.15 : Price * 0.2)';
+	my $VatFormula = 'VatTax := Price * 0.2';
+
+# Price of what you are selling, set the price variable:
+	my $price = 100;
+	$ae->VarSetScalar('Price', $price);
+
+# Obtain VAT & Shipping using the configured formula:
+	my $VatTax = $ae->ParseToScalar($VatFormula);
+	my $Shipping  = $ae->ParseToScalar($ShippingFormula);
+
+	say "Price=$price VatTax=$VatTax Shipping=$Shipping";
+
+# If these will be run many times, parse the formula once:
+
+	my $VatExpr = $ae->Parse($VatFormula);
+	my $ShipExpr = $ae->Parse($ShippingFormula);
+
+# Evaluate it with the current price many times:
+
+	$ae->VarSetScalar('Price', $price);
+	$VatTax = $ae->EvalToScalar($VatExpr);
+	$Shipping = $ae->EvalToScalar($ShipExpr);
+
+
+If there is a typeo in the formula, the program will continue to run since it is not in
+the program source code. Math::Expression returns an error that can be logged.
+
+If the formula code was malicious then no harm will be done to the computing system,
+the code is parsed and interpretted by this modle, what it can do is limited. Ie the code
+is not run using perl's eval.
+
+String and arithmetic operators are supported, as are: variables, loops, conditions, arrays
+and functions.
+
+The program may set initial values for variables and obtain their values once the expression
+has been evaluated.
+
+The name-space is managed (forsecurity), user provided functions may be specified to set/get variable values.
+Error messages may be via a user provided function.
+This is not designed for high computation use.
+
+Another example:
+
+	use strict;
+	use Math::Expression;
+
+	my $ArithEnv = new Math::Expression;
+
+	# Some/all of these read from a config file:
+	my $tree1 = $ArithEnv->Parse('ConfVar := 42');
+
+	my $tree2 = $ArithEnv->Parse('ConfVar * 3');
+
+	...
+
+	$ArithEnv->Eval($tree1);
+	my $ConfValue = $ArithEnv->EvalToScalar($tree2);
+	my $three = $ArithEnv->ParseToScalar('1 + 2');
+
+Operators:
+
+	++ --	Pre increment/decrement only
+	+ - ~ !	(Monadic)
+	* / %
+	+ -
+	.	String concatenation
+	> < >= <= == != <>
+	lt gt le ge eq ne
+	&&
+	||
+	? :
+	,
+	:=
+
+Variables may contain numbers or strings.
+Variables may be single values or can be arrays. Index into an array with [].
+In addition the verbs: 'if' and 'while' have their conventional meanings.
+Double quoted string constants can contain the escapes: \n \r \t \\ \xXX \u{XXX} (Unicode).
+
+
+Example expressions.
+
+These could be evaluated in several ways, ParseToScalar() is probably the easiest,
+in which case if there is more than one expression, the value of the last one is what
+is returned.
+
+	a := 1; b := 2; a != b
+	"abc" lt "def"
+	"abc" lt "def" ? (1 + 2) : (30 * 40)
+
+
+	a := b := 3; if(1) a:= b := 4; b
+
+	(v1, v2, v3) := (42, 44, 48)
+	a1 := (1, 2, 3, 4)
+	a2 := (9, 8, 7, 6)
+	a1 , a2
+
+	a := (20,21,22); a[1] + a[2]
+	a := (20,21,22); a[1] := 9
+	i := -1; j := 2; a := (20,21,22); a[i + j] := 3
+
+	if(i < 3) { i := i + j; j := 0}
+	if(i < 3) i := 10;
+	i := a := 0; if(i < 4) {i := i + 1; a := 9 }; a+i
+	i := 0; b := 1; while(++i < 4) b := b * 2;  b
+	i := 0; while(i < 4) {i := i + 1;}; i
+
+
+
+For examples of use see the test program in the t/ directory
+and some more in Examples/.
+POD documentation is in the module.
+
+You install the module by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+
+Please report any bugs/suggestions to Alain Williams <addw@phcomp.co.uk>
+
+
+It is understood that any contribution that is sent in for distribution
+with this module shall have copyright assigned to addw who will release
+it under the same licence as the rest of the module. Contributions will
+be acknowledged.
+
+
+
+You may get a bit more debugging/information from the test scripts by
+the use of environment options, so:
+
+Trace:
+	TRACE=1 perl -Iblib/lib t/test.t
+The TRACE value can be 1 or 2.
+
+Print out the parse tree on error:
+	ERR_TREE=1 perl -Iblib/lib t/test.t
+
+
+
+
+
+COPYRIGHT
+
+      /\
+     /  \		(C) Copyright 2003 Parliament Hill Computers Ltd.
+     \  /		All rights reserved.
+      \/
+       .		Author: Alain Williams, January 2003 - 2016
+       .		addw@phcomp.co.uk
+        .
+          .
+
+	SCCS: @(#)README.in	1.10 07/21/16 01:02:10
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. You must preserve this entire copyright
+notice in any use or distribution.
+The author makes no warranty what so ever that this code works or is fit
+for purpose: you are free to use this code on the understanding that any problems
+are your responsibility.
+
+Permission to use, copy, modify, and distribute this software and its documentation for any purpose and without fee is
+hereby granted, provided that the above copyright notice appear in all copies and that both that copyright notice and
+this permission notice appear in supporting documentation.
+
+
+Note that the version number of this README may be different from the version of the module.
+The version number at the top of this file should correspond to the version number of the
+module at the time that it was bundled into a tar file.
+
+
+
+Keeping up to date
+******************
+
+You may find newer versions of this software at:
+
+	http://www.phcomp.co.uk/downloads.php
+
+Where you will also find references to email lists that relate to this software.
+
+
+
+
+Contributing
+************
+
+This module is free software (see the license). Free software grows and becomes more
+powerful and useful as those who gain by using it contribute their changes back
+to the original author.
+
+Contributions to this software are welcome. Please email the author the following:
+
+* your name & email address
+* your affiliation (company/institute/...) if any
+* the code
+* documentation
+* a statement that you are legally able to release the code and documentation
+* a statement transfering copyright of the code to the Author below giving permission that it
+  may be redistributed as part of this module under an appropriate license
+
+Contributions will be acknowledged in the Contributors file that accompanies this
+software. If you do not want to be acknowledged please make that clear.
+
+The author will be pleased to receive your comments, good or bad.
+

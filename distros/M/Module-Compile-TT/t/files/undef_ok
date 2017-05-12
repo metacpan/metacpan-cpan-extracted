@@ -1,0 +1,5 @@
+use tt ( DEBUG => 0 );
+[% this_var_does_not_exist %]
+no tt;
+
+1;

@@ -1,0 +1,5 @@
+--ignore-dir=Module-Install-1.14
+--ignore-dir=Module-Install-1.15
+--ignore-dir=Module-Install-1.16
+--ignore-dir=Module-Install-1.17
+--ignore-dir=Module-Install-1.18

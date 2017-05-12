@@ -1,0 +1,29 @@
+------------------------------------------------------------------------
+0.04 -> 0.05
+
+* Attributes are stored in hash slot of glob reference.  Previously they were
+  stored in hash reference pointed by scalar slot of glob reference.
+
+  Was:
+
+  my $obj = MooseX::GlobRef::Object->new;
+  ${*$obj}->{attr} = 42;
+
+  or:
+
+  my $obj = MooseX::GlobRef::Object->new;
+  my $hashref = ${*$obj};
+  ${*$obj}->{attr} = 42;
+
+  Should be:
+
+  my $obj = MooseX::GlobRef::Object->new;
+  *$obj->{attr} = 42;
+
+  or:
+
+  my $obj = MooseX::GlobRef::Object->new;
+  my $hashref = \%{*$obj};
+  $hashref->{attr} = 42;
+
+------------------------------------------------------------------------

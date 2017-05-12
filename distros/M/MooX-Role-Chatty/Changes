@@ -1,0 +1,6 @@
+1.01      2015-04-16
+  * Add guards against missing Log::Any - formally optional,
+    as user may choose to use an alternate logging package
+1.00      2015-04-15
+  * First CPAN publication
+

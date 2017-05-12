@@ -1,0 +1,291 @@
+---
+documentation:
+- ''
+- $a
+- required
+glob_type: CODE
+name: ffoo
+package: t::lib::foo
+type: param_signature
+---
+documentation:
+- ''
+- $b
+- aliased
+- required
+glob_type: CODE
+name: ffoo
+package: t::lib::foo
+type: param_signature
+---
+documentation:
+- ''
+- $c
+- optional
+glob_type: CODE
+name: ffoo
+package: t::lib::foo
+type: param_signature
+---
+documentation:
+- ''
+- $d
+- optional
+- defaults to C<<<  1 >>>
+glob_type: CODE
+name: ffoo
+package: t::lib::foo
+type: param_signature
+---
+documentation: func
+glob_type: CODE
+name: ffoo
+package: t::lib::foo
+type: type
+---
+documentation: ' $a,  \$b, [  $c ], [  $d ]'
+glob_type: CODE
+name: ffoo
+package: t::lib::foo
+type: signature
+---
+documentation: "\n        ffoo_purpose\n    "
+glob_type: CODE
+name: ffoo
+package: t::lib::foo
+type: purpose
+---
+documentation: "\n        ffoo_example\n    "
+glob_type: CODE
+name: ffoo
+package: t::lib::foo
+type: example
+---
+documentation: "\n        $a: ffoo_a\n    "
+glob_type: CODE
+name: ffoo
+package: t::lib::foo
+type: param
+---
+documentation: "\n        $b: ffoo_b\n    "
+glob_type: CODE
+name: ffoo
+package: t::lib::foo
+type: param
+---
+documentation: "\n        $c: ffoo_c\n    "
+glob_type: CODE
+name: ffoo
+package: t::lib::foo
+type: param
+---
+documentation: "\n        ffoo_pod1\n    "
+glob_type: CODE
+name: ffoo
+package: t::lib::foo
+type: pod
+---
+documentation: "\n        ffoo_pod2\n    "
+glob_type: CODE
+name: ffoo
+package: t::lib::foo
+type: pod
+---
+documentation: "\n        ffoo_author1\n    "
+glob_type: CODE
+name: ffoo
+package: t::lib::foo
+type: author
+---
+documentation: "\n        ffoo_author2\n    "
+glob_type: CODE
+name: ffoo
+package: t::lib::foo
+type: author
+---
+documentation: "\n        ffoo_deprecated\n    "
+glob_type: CODE
+name: ffoo
+package: t::lib::foo
+type: deprecated
+---
+documentation: "\n        ffoo_returns\n    "
+glob_type: CODE
+name: ffoo
+package: t::lib::foo
+type: returns
+---
+documentation: "\n        ffoo_throws1\n    "
+glob_type: CODE
+name: ffoo
+package: t::lib::foo
+type: throws
+---
+documentation: "\n        ffoo_throws2\n    "
+glob_type: CODE
+name: ffoo
+package: t::lib::foo
+type: throws
+---
+documentation: "\n        ffoo_since\n    "
+glob_type: CODE
+name: ffoo
+package: t::lib::foo
+type: since
+---
+documentation:
+- Int
+- $a
+- named
+- optional
+glob_type: CODE
+name: mfoo
+package: t::lib::foo
+type: param_signature
+---
+documentation:
+- Str
+- $b
+- named
+- aliased
+- optional
+glob_type: CODE
+name: mfoo
+package: t::lib::foo
+type: param_signature
+---
+documentation:
+- Int|Str
+- $c
+- named
+- required
+glob_type: CODE
+name: mfoo
+package: t::lib::foo
+type: param_signature
+---
+documentation:
+- ''
+- $d
+- named
+- optional
+- defaults to C<<<  2  >>>
+- but only when C<<<  { 1 == 0 } >>>
+glob_type: CODE
+name: mfoo
+package: t::lib::foo
+type: param_signature
+---
+documentation: method
+glob_type: CODE
+name: mfoo
+package: t::lib::foo
+type: type
+---
+documentation: '[ a => Int $a ], [ b => Str \$b ], c => Int|Str $c, [ d =>  $d ]'
+glob_type: CODE
+name: mfoo
+package: t::lib::foo
+type: signature
+---
+documentation: "\n        mfoo_purpose\n    "
+glob_type: CODE
+name: mfoo
+package: t::lib::foo
+type: purpose
+---
+documentation: "\n        mfoo_example\n    "
+glob_type: CODE
+name: mfoo
+package: t::lib::foo
+type: example
+---
+documentation: "\n        $a: mfoo_a\n    "
+glob_type: CODE
+name: mfoo
+package: t::lib::foo
+type: param
+---
+documentation: "\n        $b: mfoo_b\n    "
+glob_type: CODE
+name: mfoo
+package: t::lib::foo
+type: param
+---
+documentation: "\n        $c: mfoo_c\n    "
+glob_type: CODE
+name: mfoo
+package: t::lib::foo
+type: param
+---
+documentation: "\n        mfoo_pod1\n    "
+glob_type: CODE
+name: mfoo
+package: t::lib::foo
+type: pod
+---
+documentation: "\n        mfoo_pod2\n    "
+glob_type: CODE
+name: mfoo
+package: t::lib::foo
+type: pod
+---
+documentation: "\n        mfoo_author1\n    "
+glob_type: CODE
+name: mfoo
+package: t::lib::foo
+type: author
+---
+documentation: "\n        mfoo_author2\n    "
+glob_type: CODE
+name: mfoo
+package: t::lib::foo
+type: author
+---
+documentation: "\n        mfoo_deprecated\n    "
+glob_type: CODE
+name: mfoo
+package: t::lib::foo
+type: deprecated
+---
+documentation: "\n        mfoo_returns\n    "
+glob_type: CODE
+name: mfoo
+package: t::lib::foo
+type: returns
+---
+documentation: "\n        mfoo_throws1\n    "
+glob_type: CODE
+name: mfoo
+package: t::lib::foo
+type: throws
+---
+documentation: "\n        mfoo_throws2\n    "
+glob_type: CODE
+name: mfoo
+package: t::lib::foo
+type: throws
+---
+documentation: "\n        mfoo_since\n    "
+glob_type: CODE
+name: mfoo
+package: t::lib::foo
+type: since
+---
+documentation: method
+glob_type: CODE
+name: mbar
+package: t::lib::bar
+type: type
+---
+documentation: ''
+glob_type: CODE
+name: mbar
+package: t::lib::bar
+type: signature
+---
+documentation: "\n        mfoo_purpose\n    "
+glob_type: CODE
+name: mbar
+package: t::lib::bar
+type: purpose

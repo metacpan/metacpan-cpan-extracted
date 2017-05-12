@@ -1,0 +1,50 @@
+=head1 NAME
+
+Mozilla::DOM::Screen
+
+=for object Mozilla::DOM::Screen
+
+Mozilla::DOM::Screen is a wrapper around an instance of Mozilla's
+nsIDOMScreen interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::Screen->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $availheight = $screen->B<GetAvailHeight>()
+
+=head2 $availleft = $screen->B<GetAvailLeft>()
+
+=head2 $availtop = $screen->B<GetAvailTop>()
+
+=head2 $availwidth = $screen->B<GetAvailWidth>()
+
+=head2 $colordepth = $screen->B<GetColorDepth>()
+
+=head2 $height = $screen->B<GetHeight>()
+
+=head2 $left = $screen->B<GetLeft>()
+
+=head2 $pixeldepth = $screen->B<GetPixelDepth>()
+
+=head2 $top = $screen->B<GetTop>()
+
+=head2 $width = $screen->B<GetWidth>()
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

@@ -1,0 +1,281 @@
+== stencil ==
+
+A basic table:
+
+--input--
+    <%= table begin %>
+        <thead>
+            <tr>
+                <th>th 1</th>
+                <th>th 2</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Cell 1</td>
+                <td>Cell 2</td>
+            </tr>
+            <tr>
+                <td>Cell 1</td>
+                <td>Cell 2</td>
+            </tr>
+        </tbody>
+    <% end %>
+--end input--
+--output--
+    <table class="table">
+        <thead>
+            <tr>
+                <th>th 1</th>
+                <th>th 2</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Cell 1</td>
+                <td>Cell 2</td>
+            </tr>
+            <tr>
+                <td>Cell 1</td>
+                <td>Cell 2</td>
+            </tr>
+        </tbody>
+    </table>
+--end output--
+
+
+== stencil ==
+
+Several classes applied to the table:
+
+--input--
+    %= table hover, striped, condensed, begin
+        <thead>
+            <tr>
+                <th>th 1</th>
+                <th>th 2</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Cell 1</td>
+                <td>Cell 2</td>
+            </tr>
+            <tr>
+                <td>Cell 1</td>
+                <td>Cell 2</td>
+            </tr>
+        </tbody>
+    %  end
+--end input--
+--output--
+    <table class="table table-condensed table-hover table-striped">
+        <thead>
+            <tr>
+                <th>th 1</th>
+                <th>th 2</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Cell 1</td>
+                <td>Cell 2</td>
+            </tr>
+            <tr>
+                <td>Cell 1</td>
+                <td>Cell 2</td>
+            </tr>
+        </tbody>
+    </table>
+--end output--
+
+
+== stencil ==
+
+A <code>condensed</code> table with an <code>id</code> wrapped in a <code>success</code> panel:
+
+--input--
+    %= table 'Heading Table 4', panel => { success }, condensed, id => 'the-table', begin
+            <thead>
+                <tr>
+                    <th>th 1</th>
+                    <th>th 2</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Cell 1</td>
+                    <td>Cell 2</td>
+                </tr>
+                <tr>
+                    <td>Cell 1</td>
+                    <td>Cell 2</td>
+                </tr>
+            </tbody>
+    %  end
+--end input--
+--output--
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            <h3 class="panel-title">Heading Table 4</h3>
+        </div>
+        <table class="table table-condensed" id="the-table">
+            <thead>
+                <tr>
+                    <th>th 1</th>
+                    <th>th 2</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Cell 1</td>
+                    <td>Cell 2</td>
+                </tr>
+                <tr>
+                    <td>Cell 1</td>
+                    <td>Cell 2</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+--end output--
+
+
+
+
+== stencil { to_pod => 0 } ==
+--input--
+    <%= table begin %>
+        <thead>
+            <tr>
+                <th>th 1</th>
+                <th>th 2</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Cell 1</td>
+                <td>Cell 2</td>
+            </tr>
+            <tr>
+                <td>Cell 1</td>
+                <td>Cell 2</td>
+            </tr>
+        </tbody>
+    <% end %>
+--end input--
+--output--
+    <table class="table">
+        <thead>
+            <tr>
+                <th>th 1</th>
+                <th>th 2</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Cell 1</td>
+                <td>Cell 2</td>
+            </tr>
+            <tr>
+                <td>Cell 1</td>
+                <td>Cell 2</td>
+            </tr>
+        </tbody>
+    </table>
+--end output--
+    
+
+== stencil { to_pod => 0 } ==
+--input--
+    %= table hover, striped, condensed, begin
+        <thead>
+            <tr>
+                <th>th 1</th>
+                <th>th 2</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Cell 1</td>
+                <td>Cell 2</td>
+            </tr>
+            <tr>
+                <td>Cell 1</td>
+                <td>Cell 2</td>
+            </tr>
+        </tbody>
+    %  end
+--end input--
+--output--
+    <table class="table table-condensed table-hover table-striped">
+        <thead>
+            <tr>
+                <th>th 1</th>
+                <th>th 2</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Cell 1</td>
+                <td>Cell 2</td>
+            </tr>
+            <tr>
+                <td>Cell 1</td>
+                <td>Cell 2</td>
+            </tr>
+        </tbody>
+    </table>
+--end output--
+
+== stencil { to_pod => 0 } ==
+--input--
+    %= table 'Heading Table 3', hover, striped, condensed, begin
+        <thead>
+            <tr>
+                <th>th 1</th>
+                <th>th 2</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Cell 1</td>
+                <td>Cell 2</td>
+            </tr>
+            <tr>
+                <td>Cell 1</td>
+                <td>Cell 2</td>
+            </tr>
+        </tbody>
+    %  end
+--end input--
+--output--
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Heading Table 3</h3>
+        </div>
+        <table class="table table-condensed table-hover table-striped">
+            <thead>
+                <tr>
+                    <th>th 1</th>
+                    <th>th 2</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Cell 1</td>
+                    <td>Cell 2</td>
+                </tr>
+                <tr>
+                    <td>Cell 1</td>
+                    <td>Cell 2</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+--end output--
+
+
+== stencil ==
+--input--
+
+--end input--
+--output--
+
+--end output--
+
+== stencil ==
+--input--
+
+--end input--
+--output--
+
+--end output--

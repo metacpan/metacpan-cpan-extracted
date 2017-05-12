@@ -1,0 +1,10 @@
+=head1 NAME
+
+bbbbbbb
+
+=head1 DESCRIPTION
+
+This text contains a node X<bbb>bbb and a link to
+a node L<a/aaa>.
+
+

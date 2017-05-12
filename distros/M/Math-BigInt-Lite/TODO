@@ -1,0 +1,5 @@
+The following list is not up to date:
+
+* better (dynamic BASE calc) overflow detection
+* streamlining
+* the overload shortcuts (+= etc) could be optimized

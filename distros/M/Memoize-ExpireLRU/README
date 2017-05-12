@@ -1,0 +1,24 @@
+This is the README file for Memoize::ExpireLRU
+
+Memoize::ExpireLRU is a module that implements LRU expiration for
+Memoize.
+
+
+You can read a nicely formatted version of the documentation for
+this module online:
+
+    https://metacpan.org/pod/Module::Info
+
+
+You should be able to install this using your usual method for installing
+modules from CPAN. If you don't have one, have a look at:
+
+    http://www.cpan.org/modules/INSTALL.html
+
+Memoize::ExpireLRU requires Memoize version 0.52 or greater.
+
+Copyright (c) 1999 Brent B. Powers. All rights reserved.
+
+This program is free software,
+you may redistribute it and/or modify it under the same terms as Perl itself.
+

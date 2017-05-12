@@ -1,0 +1,44 @@
+1.11 (September 1, 2000)
+
+- fixed REFERENCES, broken urls etc.
+- adjusted Copyright
+- removed MPEG::ID3v1Tag wrapper
+
+1.10 (June 27, 2000)
+
+- Fixed print_genre_chart() spot by Olaf Maetzner
+- Adjusted Author e-mail address
+
+1.09 (Mar 14, 2000)
+----
+- Removed the __END__ 
+- Added MPEG::ID3v1Tag wrapper for 
+  backwards compatibility.
+
+1.08 (Mar 14, 2000)
+----
+- Changed to MP3:: name space
+- Automatic build of MANIFEST
+- Shortened Short Description
+- Added basic tests on the use clause.
+- Added this Changes file.
+
+1.06 (Jan 27, 2000)
+----
+- Made the ID3 Genres accessible from outside the package
+  for use by third party wrappers. (Olaf Maetzner)
+- Strip all text after a null. Some players (such as winamp)
+  space pad the fields, while others simply just terminate
+  the string with a null. The spec on http://www.id3.org/id3v1.html
+  states to null pad the string. (Sander van Zoest, Jason Bodnar)
+- Fixed the got_tag() method, it called find_tag_id3v1 as a routine,
+  rather then a method. (Sander van Zoest, Peter Johansson)
+- Now gracefully return undef rather then calling die when unable
+  to open the file. (Peter Johansson)
+- Made some cosmetic changes.
+
+1.04 (Dec 29, 1999)
+----
+- First Public Release
+
+$Id: Changes,v 1.12 2000/09/01 20:27:18 sander Exp $

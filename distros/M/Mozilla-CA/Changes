@@ -1,0 +1,48 @@
+20150826
+  - Update from Mozilla repository
+  - Update license to match license of data source (MPL 2)
+
+20141217
+  - Update from Mozilla repository
+
+20130114
+  - New certificate: "T-TeleSec GlobalRoot Class 3"
+
+20120823
+  - Fix test (RT#79129, reported by Sinan Unur)
+
+20120822
+  - Add mk-ca-bundle.pl from git repository to distribution.
+  - Add new/additional certificates from the following CAs: Verisign,
+    UTN-USER, UTN USERFirst, Sonera, NetLock Qualified, SwissSign
+    Platinum, S-TRUST, ComSign, Actalis, Trustis, StartCom, Buypass.
+
+20120309
+  - Download the certdata from mozilla over SSL (John Joseph Bachir)
+  - CA updates:
+    Removes:
+    - Hellenic Academic and Research Institutions RootCA 2011
+
+20120118
+  - CA updates:
+    Add:
+    - Security Communication RootCA2
+    - EC-ACC
+    - Hellenic Academic and Research Institutions RootCA 2011
+    Remove:
+    - Verisign Class 4 Public Primary Certification Authority - G2
+    - TC TrustCenter, Germany, Class 2 CA
+    - TC TrustCenter, Germany, Class 3 CA
+
+20111025
+  - Do not add CA's only trusted for email and/or code signing (RT#70967)
+    (if you need that, please let us know and we can see about putting it
+     in as an option)
+
+20110914
+  - Remove "untrusted" certificates (RT#70967, Tomas Hoger)
+
+20110904
+  - Remove and distrust DigiNotar
+  - Add Certinomis, Root CA Generalitat Valenciana, A-Trust-nQual-03 and TWCA 
+

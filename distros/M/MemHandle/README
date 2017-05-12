@@ -1,0 +1,98 @@
+NAME
+    MemHandle - supply memory-based FILEHANDLE methods
+
+SYNOPSIS
+        use MemHandle;
+        use IO::Seekable;
+
+        my $mh = new MemHandle;
+        print $mh "foo\n";
+        $mh->print( "bar\n" );
+        printf $mh "This is a number: %d\n", 10;
+        $mh->printf( "a string: \"%s\"\n", "all strings come to those who wait" );
+
+        my $len = $mh->tell();  # Use $mh->tell();
+                                # tell( $mh ) will NOT work!
+        $mh->seek(0, SEEK_SET); # Use $mh->seek($where, $whence)
+                                # seek($mh, $where, $whence)
+                                # will NOT work!
+
+        my $memory = $mh->mem();
+
+        Here's the real meat:
+
+        my $mh = new MemHandle;
+        my $old = select( $mh );
+        .
+        .
+        .
+        print "foo bar\n";
+        print "baz\n";
+        &MyPrintSub();
+        select( $old );
+
+        print "here it all is: ", $mh->mem(), "\n";
+
+DESCRIPTION
+    Generates inherits from `IO::Handle' and `IO::Seekable'. It provides an interface to
+    the file routines which uses memory instead. See perldoc IO::Handle, and perldoc
+    IO::Seekable as well as the perlfunc manpage for more detailed descriptions of the
+    provided built-in functions:
+
+        print
+        printf
+        readline
+        sysread
+        syswrite
+        getc
+        gets
+
+    The following functions are provided, but tie doesn't allow them to be tied to the
+    built in functions. They should be used by calling the appropriate method on the
+    MemHandle object.
+
+        seek
+        tell
+
+    call them like this:
+
+        my $mh = new MemHandle();
+        .
+        .
+        .
+        my $pos = $mh->tell();
+        $mh->seek( 0, SEEK_SET );
+
+CONSTRUCTOR
+    new( [mem] )
+        Creates a `MemHandle', which is a reference to a newly created symbol (see the
+        `Symbol' package). It then ties the FILEHANDLE to `MemHandle::Tie' (see the
+        section on "Tying FileHandles" in the perltie manpage). Tied methods in
+        `MemHandle::Tie' translate file operations into reads/writes into a string, which
+        can be accessed by calling `MemHandle::mem'.
+
+METHODS
+    seek( POS, WHENCE )
+        Sets the read/write position to WHENCE + POS. WHENCE is one of the constants
+        which are available from IO::Seekable or POSIX:
+
+            SEEK_SET # absolute position from the beginning.
+            SEEK_CUR # offset from the current location.
+            SEEK_END # from the end (POS can be negative).
+
+    tell()
+        Returns the current position of the mem-file, similiar to the way tell would.
+        (See the perlfunc manpage).
+
+    mem( [mem] )
+        gets or sets the memory. If called with a parameter, it copies it to the memory
+        and sets the position to be immediately after (so if you write more to it, you
+        append the string). Returns the current value of memory.
+
+AUTHOR
+    "Sheridan C. Rawlins" <scr14@cornell.edu>
+
+SEE ALSO
+    the perl manpage. the perlfunc manpage. the section on "Tying FileHandles" in the
+    perltie manpage. perldoc IO::Handle. perldoc IO::Seekable. perldoc Symbol.
+

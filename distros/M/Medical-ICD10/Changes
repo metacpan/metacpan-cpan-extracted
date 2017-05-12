@@ -1,0 +1,10 @@
+Revision history for Medical-ICD10
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02    Added Test::Deep, File::Temp to Makefile PREQ's
+0.03    Added link to github, updated copyright date.
+0.04    Some changes to tests, fixed bug where terms were not 
+        correctly parsed.
+0.5     Incrementing version by one to repush to CPAN.

@@ -1,0 +1,54 @@
+Math::Symbolic::Custom::Pattern version 1.11
+============================================
+
+This module is an extension to the Math::Symbolic module. A basic
+familiarity with that module is required.
+
+The Math::Symbolic::Custom::Pattern module implements pattern matching routines
+on Math::Symbolic trees. The patterns itself are constructed from
+Math::Symbolic trees with just a few variables which have a special meaning.
+
+Example pattern "VAR_foo + CONST*VAR_foo + VAR_bar + TREE"
+matches "a + 4*a + b + sin(a*b+c-d)", but not "a + 4*c + b + sin(a*b+c-d)"
+since the beginning "a +" sets VAR_foo to be "a" and "4*c" contradicts that.
+Refer to the documentation for details.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+On platforms that don't support the "./" notation, that would be:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+If you wish, you may use the old MakeMaker style instead:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+For list of dependencies that includes versions, please refer to the
+META.yml file in this distribution.
+
+  Math::Symbolic
+  Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Steffen Müller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.1,
+at your option, any later version of Perl 5 you may have available.
+

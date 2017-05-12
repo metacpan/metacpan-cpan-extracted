@@ -1,0 +1,14 @@
+The following list is not up to date:
+
+* rounding needs a new definiton: rounding to nearest fraction (see Knuth
+  and fixed-slash fractions)
+* bmod(), bmodpow(), bmodinv() not fully/properly implemented yet
+* bsqrt() is also not quite optimal yet
+* BigRat does not handle modify() yet or in a very incomplete manner
+
+Quite some stuff needs still to be done.
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

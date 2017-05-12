@@ -1,0 +1,81 @@
+---
+doctype: dist
+
+header:
+  name: Mojolicious-Plugin-BootstrapHelpers
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.020000
+      - Mojolicious: 5.0
+      - Scalar::Util: 1.29
+      - String::Trim: 0.004
+      - String::Random
+      - experimental: 0.008
+      - List::Util: 1.44
+
+  test:
+    requires:
+      - Test::Mojo::Trim: 0.03
+  
+  develop:
+    requires:
+      - Stenciller: 0.1400
+
+plugins:
+ - +config: Author::CSSON
+   travis_perl_min: 20
+
+ - +extend_plugin: Git::GatherDir
+   exclude_match:
+     - examples/.*\.html
+
+ - +plugin: Run::AfterBuild
+   run: cp %d/examples/*.html examples
+
+ - +plugin: Stenciller::HtmlExamples
+   +version: 0.0201
+   source_directory: examples/source
+   output_directory: examples
+   template_file: examples/source/template.html
+   output_also_as_html: 1
+   separator: '<hr />'
+
+ - +plugin: Stenciller::MojoliciousTests
+   +version: 0.0200
+   source_directory: examples/source
+   output_directory: t
+   template_file: examples/source/template.test
+
+---
+doctype: weaver
+
+plugins:
+ - +config: Author::CSSON
+
+ - +plugin: Stenciller
+   +base: -Transformer
+   +in: Elemental
+   transformer: Stenciller
+   directory: examples/source
+   text_as_html_pod: 1
+
+ - +remove_plugin: Splint
+
+ - +replace_plugin: Legal
+   +with: Legal::Supplemented
+   header: LICENSE
+   text_after:
+    - Bootstrap itself is (c) Twitter. See L<their license information|http://getbootstrap.com/getting-started/#license-faqs>.
+    - ~
+    - L<Mojolicious::Plugin::BootstrapHelpers> is third party software, and is not endorsed by Twitter.
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+config: Author::CSSON
+always:
+ - Mojolicious-Plugin-BootstrapHelpers-*

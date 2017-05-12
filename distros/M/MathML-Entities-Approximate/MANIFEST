@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/MathML-Entities-Approximate.t
+lib/MathML/Entities/Approximate.pm
+META.yml                                 Module meta-data (added by MakeMaker)

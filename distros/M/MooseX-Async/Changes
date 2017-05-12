@@ -1,0 +1,31 @@
+Revision history for MooseX-Async
+
+0.07 2008-11-13
+	- Remove Build.PL it was causing failures
+	+ Remove bad option link to MX::POE it caused issues with people
+
+0.06  2008-06-05
+   (Identical to 0.05)
+    - Fix Release Tarball
+
+0.05  2008-06-05
+    - Fix Makefile.PL to depend on 0.09 of MX::AttributeHelpers or above (tokuhirom)
+    - Finaly fix the cyclical deps on MX::POE
+
+0.04  2008-02-21
+    + NEW Role Metaclass (nothingmuch)
+    - Updated Class Metaclass to support Roles (nothingmuch)
+
+0.03  2008-01-17
+	(Features Identical to 0.01)
+	- Fix documentation
+	- Remove erroneous MooseX::POE Class
+	- Fix dependencies to list MooseX::AttributeHelpers
+	
+0.02  2008-01-16
+	(Features identical to 0.01)
+	- Fix circular dependency with MX::POE
+
+0.01  2008-01-15
+	+Initial release.
+

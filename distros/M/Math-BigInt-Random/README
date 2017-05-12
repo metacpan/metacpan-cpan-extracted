@@ -1,0 +1,18 @@
+NAME
+
+Math::BigInt::Random -- arbitrarily large random integers
+
+DESCRIPTION
+
+Exports the function random_bigint, which creates very large random integers 
+(as BigInt objects).
+
+
+To install the module...
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

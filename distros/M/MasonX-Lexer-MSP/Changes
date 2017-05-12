@@ -1,0 +1,19 @@
+Revision history for MasonX::Lexer::MSP.
+
+0.11  16 Apr 2004
+	Play nice with multiple user-defined escapes
+
+
+0.10  11 Feb 2004
+	Update tests to be compatible with Mason 1.3
+	We have a user!  Thanks, Aran Deltac!
+
+
+0.02  30 Jun 2003
+	Change name to MasonX::Lexer::MSP
+	use h2xs to make it CPAN compatible
+
+
+0.01  29 Aug 2002
+	original HTML::Mason::Lexer::MSP as posted to masonhq.com
+

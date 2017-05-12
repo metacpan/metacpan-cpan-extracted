@@ -1,0 +1,24 @@
+Mail-Send-Loop version 0.1
+==========================
+
+Standard Pure Perl SMTP Module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  IO::Socket
+  MIME::Lite
+
+Copyright (C) 2010 by Jing Kang
+
+This library is free software.

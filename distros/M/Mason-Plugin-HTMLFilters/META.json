@@ -1,0 +1,53 @@
+{
+   "abstract" : "Filters related to HTML generation",
+   "author" : [
+      "Jonathan Swartz <swartz@pobox.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200008, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mason-Plugin-HTMLFilters",
+   "no_index" : {
+      "directory" : [
+         "lib/Mason/Plugin/HTMLFilters"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::FillInForm" : "2.00",
+            "Mason" : "2.00"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Class::Most" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-mason-plugin-htmlfilters@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mason-Plugin-HTMLFilters"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jonswar/perl-mason-plugin-htmlfilters.git",
+         "web" : "https://github.com/jonswar/perl-mason-plugin-htmlfilters"
+      }
+   },
+   "version" : "0.03"
+}
+

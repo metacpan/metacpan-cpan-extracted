@@ -1,0 +1,16 @@
+BUGS			Known bugs
+Changes			Changes by version
+MANIFEST		This file
+Makefile.PL		The Makefile generator (via MakeMaker)
+README			Please read this
+examples/gather		Harvest gather program written using Metadata::SOIF
+examples/htdig-dump	Dump an ht://dig database as Harvest-style SOIF
+examples/scan-log	Example HTTP log scanning using Metadata::HTTP class
+lib/Metadata/Base.pm	Metadata::Base class
+lib/Metadata/HTTP.pm	Metadata::HTTP class
+lib/Metadata/IAFA.pm	Metadata::IAFA class
+lib/Metadata/SOIF.pm	Metadata::SOIF class
+t/base.t		Test Metadata::Base metadata class functionality
+t/iafa.t		Test Metadata::IAFA functionality
+t/soif.t		Test Metadata::SOIF functionality
+t/time.t		Test Metadata::IAFA time functionality

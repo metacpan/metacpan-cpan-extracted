@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+use FindBin '$Bin';
+
+use Benchmark::Command;
+
+Benchmark::Command::run(0, {
+    'perl'      => [$^X, "-I$Bin/..lib", "-e1"],
+    'load_mc'   => [$^X, "-I$Bin/..lib", "-MModule::CoreList", "-e", 1],
+    'load_mcm'  => [$^X, "-I$Bin/..lib", "-MModule::CoreList::More", "-e", 1],
+});

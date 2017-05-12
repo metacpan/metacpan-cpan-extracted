@@ -1,0 +1,13 @@
+Changes
+example/bin/server.pl
+example/lib/QxExample.pm
+example/lib/QxExample/JsonRpcService.pm
+lib/Mojolicious/Plugin/QooxdooJsonrpc.pm
+lib/MojoX/Dispatcher/Qooxdoo/Jsonrpc.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/simple.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

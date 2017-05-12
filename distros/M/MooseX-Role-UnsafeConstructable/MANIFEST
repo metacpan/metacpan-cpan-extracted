@@ -1,0 +1,16 @@
+benchmark/new.pl
+cpanfile
+lib/MooseX/Role/UnsafeConstructable.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+t/creation.t
+t/declaration.t
+t/inheritance.t
+t/initialization.t
+t/lib/Parent.pm
+t/lib/Parent/Child.pm
+t/lib/Uncle.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

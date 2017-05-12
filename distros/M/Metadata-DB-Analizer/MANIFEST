@@ -1,0 +1,8 @@
+lib/Metadata/DB/Analizer.pm
+t/03_Analizer.t
+t/04_Analizer.t
+t/premade_data.db
+t/testlib.pl
+Makefile.PL
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)

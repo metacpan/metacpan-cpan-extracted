@@ -1,0 +1,137 @@
+<html>
+<head>
+<title>MHonArc Resources: VARREGEX</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="usinglastpg.html">USINGLASTPG</a>]</td><td><nobr>[<a href="../resources.html#varregex">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="weekdays.html">WEEKDAYS</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>VARREGEX</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p><code>M2H_VARREGEX=</code><var>Perl-regex</var>
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p><code>&lt;VARREGEX&gt;</code><br>
+<var>Perl-regex</var><br>
+<code>&lt;/VARREGEX&gt;</code><br>
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p><code>-varregex </code><var>Perl-regex</var>
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>VARREGEX defines the Perl regular expression matching
+<a href="../rcvars.html">resource variables</a>.  The regex should
+define a back reference that contains the name of the resource
+variable and its arguments surround by parentheses.
+</p>
+
+<table class="caution" width="100%">
+<tr valign="baseline">
+<td><strong style="color: red;">WARNING:</strong></td>
+<td width="100%"><p>
+<b>DO NOT MESS WITH THIS RESOURCE UNLESS YOU KNOW WHAT YOU ARE
+DOING</b>.  If not set properly, page output can become munged.
+One symptom of a bad VARREGEX setting is the occurrence of numerous
+'<tt>$</tt>' characters in generated pages.  Make sure to test
+your VARREGEX setting before using it with production archives.
+</p>
+</td>
+</tr>
+</table>
+
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<pre class="code">
+\$([^\$]*)\$
+</pre>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>The following does a more stricter match:
+</p>
+<pre class="code">
+\$([^(\$]+(?:\([^)]+\))?)\$
+</pre>
+<p>Although slower than the default, it minimizes potential conflicts
+in resource files encoded in multi-byte character sets like SJIS.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>2.4.5
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="usinglastpg.html">USINGLASTPG</a>]</td><td><nobr>[<a href="../resources.html#varregex">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="weekdays.html">WEEKDAYS</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2003/10/06 22:04:23 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"
+><strong>MHonArc</strong></a><br>
+Copyright &#169; 2000, <a href="http://www.earlhood.com/"
+>Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org"
+>mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

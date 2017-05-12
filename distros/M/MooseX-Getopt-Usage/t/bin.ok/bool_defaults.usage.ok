@@ -1,0 +1,10 @@
+Usage:
+    bool_defaults.pl [OPTIONS]
+
+Options:
+     --help -? --usage - Bool. Display the usage message and exit
+     --man             - Bool. Display man page
+     --verbose         - Bool. Default=0. Say lots about what we do
+     --warnings        - Bool. Default=1. Show warnings
+     --other           - Bool. Say other things
+

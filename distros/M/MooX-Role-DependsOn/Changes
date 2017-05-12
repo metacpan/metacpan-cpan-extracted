@@ -1,0 +1,38 @@
+Revision history for Perl module MooX-Role-DependsOn
+
+1.001001 2016-06-27
+
+  - Minor packaging changes (ReadmeAnyFromPod)
+
+0.002004 2015-11-13
+
+  - POD
+
+  - Drop unnecessary VERSION check in Lowu 'require'
+    (breaks my reverse-dep-check workflow ...)
+
+0.002003 2015-05-08
+
+  - Minor documentation improvements
+
+  - Minor cleanups; method delegation for clear/has_dependencies,
+    kill stale import
+
+0.002002 2015-03-14
+
+  - Kill silly custom type that should've been a ConsumerOf
+
+  - use Moo-2 and drop MooX::late
+
+  - 'use strictures 2;' for saner fatal warnings behavior
+
+0.002001 2014-02-21
+
+  - Add circular dependency callbacks
+
+  - Deprecate 'callback' in favor of resolution_callback, which is passed
+    references to the actual in-use state for scary munging purposes
+
+0.001001 2013-12-05
+
+  - Initial release.

@@ -1,0 +1,67 @@
+% stash include_dt=>1;
+% stash exclude_menu=>1;
+
+% my $tablist = shipped('tablist');
+% my $bytable = shipped('bytable');
+
+% title "Tables";
+
+<div id="tablesbuts" class="ui-widget-content ui-corner-all">
+    % for my $table (@$tablist) {
+        % my $tinfo = $bytable->{$table};
+        %= t button => (class=>"button", table=>$table) => $tinfo->{label}
+    % }
+</div>
+
+<div id="tablesbody" class="accordion">
+
+    <div class="data-hdr ui-helper-clearfix">
+        <h3 class="left">Data</h3>
+        <div class="right">
+            <%= t button => (class=>"button add", 'data-icon1'=>'ui-icon-plusthick') => "Add" %>
+        </div>
+    </div>
+
+    <div>
+        <table id="data-table" class="display" width="100%"></table>
+    </div>
+
+    <h3>Schema</h3>
+    <div>
+    <table id="sources-table">
+        <thead>
+            <tr>
+                <th>M-to-1s</th>
+                <th>Tables</th>
+                <th>1-to-Ms</th>
+                <th>Columns</th>
+            </tr>
+        </thead>
+        <tbody>
+        % for my $sn (sort $schema->sources) {
+            % my $s = $schema->source($sn);
+            % my %rels;
+            % for my $r ($s->relationships) {
+                % my $info = $s->relationship_info($r);
+                % my $card = $info->{attrs}{accessor};
+                % my $label = $card eq 'multi' ? 'hasm':
+                %             $card eq 'single'? 'hasa':
+                %             $card eq 'filter'? 'hasa':
+                %             die "card $card?" . Dumper($info);
+                % push @{$rels{$label}}, $r;
+            % }
+            % my $par_str = join(', ', sort @{$rels{hasa}||[]});
+            % my $chd_str = join(', ', sort @{$rels{hasm}||[]});
+            % my $col_str = join(', ', $s->columns);
+            %= t tr => begin
+                %= t td => $par_str
+                %= t td => $s->name
+                %= t td => $chd_str
+                %= t td => $col_str
+            % end
+        % }
+        </tbody>
+    </table>
+    </div>
+
+</div>

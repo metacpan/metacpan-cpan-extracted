@@ -1,0 +1,32 @@
+---
+abstract: 'A Mouse role for setting attributes from a simple configfile'
+author:
+  - 'Brandon L. Black <blblack@gmail.com>'
+  - 'Mark Gardner <mjgardner@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Mouse: 0
+  Path::Class::File: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MouseX-SimpleConfig
+requires:
+  Carp: 0
+  Config::Any: 0.13
+  English: 0
+  Mouse: 0.35
+  Mouse::Role: 0
+  MouseX::ConfigFromFile: 0.02
+  perl: 5.006
+resources:
+  bugtracker: http://github.com/mjg/MouseX-SimpleConfig/issues
+  repository: git://github.com/mjg/mousex-simpleconfig.git
+version: 0.11

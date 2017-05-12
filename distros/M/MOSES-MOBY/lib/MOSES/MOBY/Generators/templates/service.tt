@@ -1,0 +1,635 @@
+[%# A template for a service implementation code
+      (an empty implementation of a service)
+    ============================================
+
+    Expected/recognized parameters:
+
+      base         ... a service base definition
+                       (type MOSES::MOBY::Def::Service)
+      impl         ... a service implementation details
+                       (type HASH)
+      static_impl  ... if true, the static option will be enabled
+      get_children ... a CODE returning all children datatypes of a given one:
+                       [MOSES::MOBY::Def::Relationship] <= get_childern (datatype_name)
+      ref          ... a CODE returning ref() of the given argument
+      input_paths  ... an array of structures, each of them for one input,
+                       defining all children of an input, considering differently
+                       HAS and HASA children. For example, for one input (part of
+                       a real data type 'BasicGFFSequenceFeature'):
+      $paths = {
+	score = [ 'gff', 'score', 'value' ],
+	reference = [ 'gff', 'reference', 'value' ],
+	column9_tag_value = [ 'gff', 'column9_tag_value' ,
+			       { key = [ 'column9_tag_value_element', 'key', 'value' ],
+				 value = [ 'column9_tag_value_element', 'value',
+					    { value = [ 'value_element', 'value' ], } ], }, ],
+        }
+-%]      
+    [%- MACRO is_simple (entry) BLOCK %]
+	[%- ref (entry) == 'MOSES::MOBY::Def::PrimaryDataSimple' %]
+    [%- END -%]
+    
+    [%- MACRO is_async (entry) BLOCK %]
+    [%- entry == 'cgi-async' || entry == 'moby-async' %]
+    [%- END -%]
+
+    [%- MACRO set_child (child, leftpad, value) BLOCK %]
+       [% FILTER indent (leftpad) -%]
+       [%- child.memberName %] => [% set_value (child, leftpad, value) %]
+       [%- END %]
+    [%- END -%]
+
+    [%- MACRO set_value (child, leftpad, value) BLOCK %]
+       [%- IF child.datatype    == 'String'   %]"this is a '[% child.memberName %] [% value %]'",   # TO BE EDITED
+       [%- ELSIF child.datatype == 'Integer'  %]42,   # TO BE EDITED
+       [%- ELSIF child.datatype == 'Float'    %]0.42, # TO BE EDITED
+       [%- ELSIF child.datatype == 'Boolean'  %]1,    # TO BE EDITED
+       [%- ELSIF child.datatype == 'DateTime' %]'1982-12-31T16:20:00Z+0000',   # TO BE EDITED
+       [%- ELSE %]new [% child.module_datatype %]
+       (
+       [%- FOREACH child IN get_children (child.datatype) %]
+       [%- new_leftpad = leftpad + 4 %]
+       [%- set_child (child, new_leftpad, value) %]
+       [%- END %]
+       ),
+       [%- END %]
+    [%- END -%]
+    
+    [%- MACRO get_use_statements (inputs, outputs) BLOCK %]
+    	[%- SET use_statements = [] -%]
+    	[%- FOREACH input IN inputs -%]
+			[%- IF NOT is_simple (input) -%]
+			    [%- found = 0 -%]
+			    [%- FOREACH e IN use_statements -%]
+			    	[%- SET found = 1 IF e == input.elements.0.datatype.name -%]
+			    [%- END -%]
+				[%- IF NOT found %]
+					[%- use_statements.push (input.elements.0.datatype.name) -%]
+					[%- get_use_statement(input.elements.0.datatype.name) -%]
+				[%- END -%]
+			[%- ELSE -%]
+				[%- found = 0 -%]
+			    [%- FOREACH e IN use_statements -%]
+			    	[%- SET found = 1 IF e == input.datatype.name -%]
+			    [%- END -%]
+				[%- IF NOT found %]
+					[%- use_statements.push (input.datatype.name) -%]
+					[%- get_use_statement(input.datatype.name) -%]
+				[%- END -%]
+			[%- END -%]
+		[%- END -%]
+		[%- FOREACH output IN outputs -%]
+			[%- IF NOT is_simple (output) -%]
+			    [%- found = 0 -%]
+			    [%- FOREACH e IN use_statements -%]
+			    	[%- SET found = 1 IF e == output.elements.0.datatype.name -%]
+			    [%- END -%]
+				[%- IF NOT found %]
+					[%- use_statements.push (output.elements.0.datatype.name) -%]
+					[%- get_use_statement(output.elements.0.datatype.name) -%]
+				[%- END -%]
+			[%- ELSE -%]
+				[%- found = 0 -%]
+			    [%- FOREACH e IN use_statements -%]
+			    	[%- SET found = 1 IF e == output.datatype.name -%]
+			    [%- END -%]
+				[%- IF NOT found %]
+					[%- use_statements.push (output.datatype.name) -%]
+					[%- get_use_statement(output.datatype.name) -%]
+				[%- END -%]
+			[%- END -%]
+		[%- END -%]
+    [%- END -%]
+    
+    [%- MACRO get_use_statement(datatype) BLOCK %]
+    	[%- IF datatype    == 'String'   %]use MOSES::MOBY::Data::String;
+
+		[%- ELSIF datatype == 'Integer'  %]use MOSES::MOBY::Data::Integer;
+
+		[%- ELSIF datatype == 'Float'    %]use MOSES::MOBY::Data::Float;
+
+		[%- ELSIF datatype == 'Boolean'  %]use MOSES::MOBY::Data::Boolean;
+
+		[%- ELSIF datatype == 'DateTime' %]use MOSES::MOBY::Data::DateTime;
+
+		[%- END -%]
+	[%- END -%]
+    
+    
+    [%- MACRO no_children (datatype, value) BLOCK %]
+       [%- IF datatype    == 'String'   %]value => "this is a value [% value %]",   # TO BE EDITED
+       [%- ELSIF datatype == 'Integer'  %]value => 42,   # TO BE EDITED
+       [%- ELSIF datatype == 'Float'    %]value => 0.42, # TO BE EDITED
+       [%- ELSIF datatype == 'Boolean'  %]value => 1,    # TO BE EDITED
+       [%- ELSIF datatype == 'DateTime' %]value => '1982-12-31T16:20:00Z+0000',   # TO BE EDITED
+       [%- ELSE %]id => '12345'
+       [%- END %]
+    [%- END -%]
+
+    [%- global.id = 1 -%]
+    [%- MACRO unique (name) BLOCK %]
+       [%- unique_name = name %]
+       [%- FOREACH input IN base.inputs %]
+          [%- IF input.name == name %]
+             [%- global.id = global.id + 1 %]
+             [%- unique_name = "${name}_${global.id}" %]
+             [%- LAST %]
+          [%- END %]
+       [%- END %]
+       [%- unique_name %]
+    [%- END -%]
+
+    [%- MACRO get_members (paths, leftpad, in_loop) BLOCK -%]
+      [%- FILTER indent (leftpad) %]
+        [%- FOREACH member IN paths.keys %]
+my $[% member %] = eval { $
+          [%- FOREACH part IN paths.$member %]
+            [%- IF ref (part) == 'HASH' %] };
+if (defined $[% member %]) {
+              [%- new_leftpad = leftpad + 4 %]
+    foreach my $[% member %]_element (@{ $[% member %] }) {
+                [%- get_members (part, new_leftpad, 1) %]
+    }
+}
+              [%- NEXT %]
+            [%- ELSE %]
+              [%- IF NOT loop.first %]->[% END %][% part %]
+              [%- IF loop.last %] };
+                 [%- IF in_loop == 1 %]
+# do something with $[% member %] (if defined)
+# ...
+                 [%- END %]
+              [%- END %]
+            [%- END %]
+          [%- END %]
+        [%- END %]
+      [%- END %]
+    [%- END -%]
+
+#-----------------------------------------------------------------
+# Service name: [% base.name %]
+# Authority:    [% base.authority %]
+# Created:      [% USE Date (format = '%d-%b-%Y %H:%M:%S %Z') %][% Date.format %]
+# Contact:      [% base.email %]
+# Description:  [% USE description = String (base.description) %]
+                [%- description.replace("\n", "\n#\t") %]
+#-----------------------------------------------------------------
+
+package [% impl.package %];
+
+use FindBin qw( $Bin );
+use lib $Bin;
+
+#-----------------------------------------------------------------
+# This is a mandatory section - but you can still choose one of
+# the two options (keep one and commented out the other):
+#-----------------------------------------------------------------
+use MOSES::MOBY::Base;
+[%- IF static_impl == 1 %][% opt1 = '#'; opt2 = '' %][% ELSE %][% opt1 = ''; opt2 = '#' %][% END %]
+# --- (1) this option loads dynamically everything
+[% opt1 %]BEGIN {
+[% opt1 %]    use MOSES::MOBY::Generators::GenServices;
+[% opt1 %]    new MOSES::MOBY::Generators::GenServices->load
+[% opt1 %]	(authority     => '[% base.authority %]',
+[% opt1 %]	 service_names => ['[% base.name %]']);
+[% opt1 %]}
+
+# --- (2) this option uses pre-generated module
+#  You can generate the module by calling a script:
+#    moses-generate-services -b [% base.authority %] [% base.name %]
+#  then comment out the whole option above, and uncomment
+#  the following line (and make sure that Perl can find it):
+[% opt2 %]use [% base.module_name %];
+
+# (this to stay here with any of the options above)
+use vars qw( @ISA );
+@ISA = qw( [% base.module_name %] );
+use MOSES::MOBY::Package;
+use MOSES::MOBY::ServiceException;
+[% IF is_async(base.category) -%]
+use MOBY::Async::LSAE;
+[%- END %]
+use strict;
+
+[%# here we output use statements for our primitives %]
+[%- get_use_statements(base.inputs, base.outputs) -%]
+
+my %valid_namespaces = ( [% FOREACH ns IN input_ns %] '[%ns%]'=>1,  [% END %]);
+#-----------------------------------------------------------------
+# process_it
+#    This method is called for every job in the client request.
+#    Input data are in $request, this method creates a response
+#    into $response. The $context tells about all other jobs
+#    from the same request, and it can be used to fill there
+#    exceptions and service notes.
+#-----------------------------------------------------------------
+sub process_it {
+    my ($self, $request, $response, $context) = @_;
+
+    # read input data (eval to protect against missing data)
+    
+    # NOTE: the following variables are for your information only
+    # please make sure to rename any of the variables that you use
+    # to ensure that variable shadowing doesnt become an issue!
+	
+	[%- FOREACH input IN base.inputs %]
+    [%- IF input.name.match ('^MISSING_ARTICLE_NAME') %]
+    my $[% input.name %][% IF NOT is_simple (input) %]_collection [% END %] = eval { $request->getData->data };
+    [%- ELSE %]
+    my $[% input.name %][% IF NOT is_simple (input) %]_collection [% END %] = eval { $request->[% input.name %] };
+    [%- END %]
+	
+    [%- IF is_simple (input) %]
+[% get_members (input_paths.${input.name}, 4) %]
+    # perform namespace checking for inputs to this service
+#   do {
+#       $response->record_error ( { code => INPUT_INCORRECT_NAMESPACE,
+#                                   msg  => 'This service requires inputs under the namespaces: {"' . join(',', keys %valid_namespaces) . '"}' } );
+#       return;
+#   } unless defined($namespace) && $valid_namespaces{$namespace};
+    [%- ELSE %]
+    if (defined $[% input.name %]_collection) {
+        foreach my $[% input.name %]_element (@{ $[% input.name %]_collection }) {
+            my $[% input.name %] = $[% input.name %]_element->data;
+[% get_members (input_paths.${input.name}, 12) %]
+            # perform namespace checking for inputs to this service
+        #   do {
+        #       $response->record_error ( { code => INPUT_INCORRECT_NAMESPACE,
+        #                                   msg  => 'This service requires inputs under the namespaces: { "' . join(',', keys %valid_namespaces) . '"}' } );
+        #       return;
+        #   } unless defined($namespace) && $valid_namespaces{$namespace};
+        }
+    }
+    [%- END %]
+    [%- END %]
+
+    [%- IF base.secondarys.size > 0 %]
+    # read parameters (eval to protect against missing ones)
+    [%- FOREACH param IN base.secondarys %]
+    my $[% param.name %] = eval { $request->getParameter ('[% param.name %]') };
+    [%- END %]
+    [%- END %]
+
+    # CONSIDER TO REMOVE THIS LATER - it's filling the logfile
+    # this will log input data:
+    [%- FOREACH input IN base.inputs %]
+    [%- IF is_simple(input) %]
+    $LOG->info ("Input data ([% input.name %]):\n" . $[% input.name %])
+        if defined $[% input.name %];
+    [%- ELSE %]
+    $LOG->info ("Input data ([% input.name %], a collection):\n" . join ("\n", @{ $[% input.name %]_collection }) )
+        if defined $[% input.name %]_collection;
+    [%- END %]
+    [%- END %]
+
+    # do something... (sorry, can't you help with that)
+    
+    [%- IF is_async(base.category) %]
+    #simulate a long running service while providing updates
+    
+    #update the state of our service
+    $self->update_state_event($request, 'running','about to sleep for 20 seconds!');
+    
+    # sleep for 20 seconds
+    sleep(20);
+    
+    # update state again
+    $self->update_state_event($request, 'running','Woke up and going back to sleep for 20 more seconds!');
+    
+    # sleep for 20 more seconds
+    sleep(20);
+    [%- END %]
+    # EDIT: PUT REAL VALUES INTO THE RESPONSE
+    # fill the response
+    [%- FOREACH output IN base.outputs %]
+    [%- IF is_simple(output) %]
+    [%- unique_output_name = unique (output.name) %]
+    my $[% unique_output_name %] = new [% output.datatype.module_name %]
+        (
+         [%- children = get_children (output.datatype.name) %]
+         [%- IF children.size == 0 %]
+         [% no_children (output.datatype.name) %]
+	 [%- ELSE %]
+         [%- FOREACH child IN children %]
+             [%- set_child (child, 2) %]
+         [%- END %]
+         [%- END %]
+         );
+    $response->[% output.name %] ($[% unique_output_name %]);
+    [%- ELSE %]
+    foreach my $elem (0..2) {
+        my $[% output.name %] = new [% output.elements.0.datatype.module_name %]
+            (
+	     [%- children = get_children (output.elements.0.datatype.name) %]
+	     [%- IF children.size == 0 %]
+	     [% no_children (output.elements.0.datatype.name) %]
+	     [%- ELSE %]
+	     [%- FOREACH child IN children %]
+                 [%- set_child (child, 6 '$elem') %]
+             [%- END %]
+             [%- END %]
+             );
+        $response->add_[% output.name %] ($[% output.name %]);
+    }
+    [%- END %]
+    [%- END %]
+
+    # fill service notes (if you wish)
+    $context->serviceNotes
+       ('Response created at ' . gmtime() . ' (GMT), by the service \'[% base.name %]\'.');
+
+    # this is how to fill (record) exceptions
+#    $response->record_info ('This is an info');
+#    $response->record_warning ('This is a warning');
+#    $response->record_error ('This is an error');
+#    $response->record_error ( { code => INPUTS_INVALID,
+# 				 msg  => 'This is an error with a code' } );
+
+}
+
+[%- IF is_async(base.category) -%]
+#-----------------------------------------------------------------
+# update_state_event
+#    This method is used to update the state of your 
+#    LSAE_STATE_CHANGED_EVENT event.
+#
+#  Parameters:  
+#    $request - $request from process_it()
+#    $state - one of (created, running, completed, terminated_by_request, terminated_by_error) 
+#    $msg   - a message to provide regarding the state of our event 
+#-----------------------------------------------------------------
+sub update_state_event {
+    my ( $self, $request, $state, $msg ) = @_;
+
+    my %valid_states = ('created'=>1,'running'=>1,'completed'=>1,'termintated_by_request'=>1,'terminated_by_error'=>1,);
+    
+    $msg = '' unless defined $msg;
+    $state = 'running' unless defined $state;
+    
+    # validate the state of the event ...
+    $state = 'running' unless $valid_states{$state};
+    
+    unless ( defined $ENV{ID} ) {
+        # hmm, local testing of service?
+        $ENV{ID} = WSRF::GSutil::CalGSH_ID();
+        WSRF::File::toFile($ENV{ID});
+    }
+
+    # our service invocation id
+    my $ID = $ENV{ID};
+
+    # our job id
+    my $jid = $request->jid;
+
+    # some variables we need to access/store our event information
+    my $property_pid    = "pid_$jid";
+    my $property_input  = "input_$jid";
+    my $property_status = "status_$jid";
+    my $property_result = "result_$jid";
+
+    # construct an LSAE object based on the old event block
+    my $old_status = LSAE::AnalysisEventBlock->new(
+                                    $WSRF::WSRP::ResourceProperties{$property_status}
+    );
+    # construct a new state changed event
+    my $status = LSAE::AnalysisEventBlock->new();
+    $status->type(LSAE_STATE_CHANGED_EVENT);
+
+    # set the previous state
+    $status->previous_state( $old_status->new_state() ) if defined ($old_status->type) and $old_status->type == LSAE_STATE_CHANGED_EVENT;
+    $status->previous_state( 'created') unless $status->previous_state;
+
+    # set the new state
+    $status->new_state($state);
+    $status->message($msg);
+
+    # set our job id for this event
+    $status->id($jid);
+
+    # create a file based resource that we will store our event information
+    my $lock = WSRF::MobyFile->new( undef, $ID );
+    $WSRF::WSRP::ResourceProperties{$property_status} = $status->XML();
+
+    # here we leave the result empty since the service is still running
+    $WSRF::WSRP::ResourceProperties{$property_result} = '';
+
+    # save the event so that our clients can access the information
+    $lock->toFile();
+    return;
+}
+#-----------------------------------------------------------------
+# update_percentage_event
+#    This method is used to update the state of your 
+#    LSAE_PERCENT_PROGRESS_EVENT event.
+#
+#  Parameters:  
+#    $request     - $request from process_it()
+#    $percentrage - an integer between 0-100 
+#    $msg         - a message to provide regarding the state of our event 
+#-----------------------------------------------------------------
+sub update_percentage_event {
+    my ( $self, $request, $percentage, $msg ) = @_;
+    
+    $msg = '' unless defined $msg;
+    $percentage = 1 unless defined $percentage;
+    
+    # validate the state of the event ...
+    $percentage = 1 unless $percentage >= 0 and $percentage <=100;
+    
+    unless ( defined $ENV{ID} ) {
+        # hmm, local testing of service?
+        $ENV{ID} = WSRF::GSutil::CalGSH_ID();
+        WSRF::File::toFile($ENV{ID});
+    }
+
+    # our service invocation id
+    my $ID = $ENV{ID};
+
+    # our job id
+    my $jid = $request->jid;
+
+    # some variables we need to access/store our event information
+    my $property_pid    = "pid_$jid";
+    my $property_input  = "input_$jid";
+    my $property_status = "status_$jid";
+    my $property_result = "result_$jid";
+
+    # construct an LSAE object based on the old event block
+    my $old_status = LSAE::AnalysisEventBlock->new(
+                                    $WSRF::WSRP::ResourceProperties{$property_status}
+    );
+    # construct a new state changed event
+    my $status = LSAE::AnalysisEventBlock->new();
+    $status->type(LSAE_PERCENT_PROGRESS_EVENT);
+
+    # set the new state
+    $status->percentage($percentage);
+    $status->message($msg);
+
+    # set our job id for this event
+    $status->id($jid);
+
+    # create a file based resource that we will store our event information
+    my $lock = WSRF::MobyFile->new( undef, $ID );
+    $WSRF::WSRP::ResourceProperties{$property_status} = $status->XML();
+
+    # here we leave the result empty since the service is still running
+    $WSRF::WSRP::ResourceProperties{$property_result} = '';
+
+    # save the event so that our clients can access the information
+    $lock->toFile();
+    return;
+}
+
+#-----------------------------------------------------------------
+# update_step_event
+#    This method is used to update the state of your 
+#    LSAE_STEP_PROGRESS_EVENT event.
+#
+#  Parameters:  
+#    $request         - $request from process_it()
+#    $total_steps     - integer representing total steps until completion
+#    $steps_completed - integer representing steps completed 
+#    $msg             - a message to provide regarding the state of our event 
+#-----------------------------------------------------------------
+sub update_step_event {
+    my ( $self, $request, $total_steps, $steps_completed, $msg ) = @_;
+   
+    $msg = '' unless defined $msg;
+    $total_steps = 1 unless defined $total_steps;
+    $steps_completed = 0 unless defined $steps_completed;
+    
+    # validate the state of the event ...
+    $steps_completed = $total_steps if $steps_completed > $total_steps;
+    
+    unless ( defined $ENV{ID} ) {
+        # hmm, local testing of service?
+        $ENV{ID} = WSRF::GSutil::CalGSH_ID();
+        WSRF::File::toFile($ENV{ID});
+    }
+
+    # our service invocation id
+    my $ID = $ENV{ID};
+
+    # our job id
+    my $jid = $request->jid;
+
+    # some variables we need to access/store our event information
+    my $property_pid    = "pid_$jid";
+    my $property_input  = "input_$jid";
+    my $property_status = "status_$jid";
+    my $property_result = "result_$jid";
+
+    # construct an LSAE object based on the old event block
+    my $old_status = LSAE::AnalysisEventBlock->new(
+                                    $WSRF::WSRP::ResourceProperties{$property_status}
+    );
+    # construct a new state changed event
+    my $status = LSAE::AnalysisEventBlock->new();
+    $status->type(LSAE_STEP_PROGRESS_EVENT);
+
+    # set the new state
+    $status->steps_completed($steps_completed);
+    $status->total_steps($total_steps);
+    $status->message($msg);
+
+    # set our job id for this event
+    $status->id($jid);
+
+    # create a file based resource that we will store our event information
+    my $lock = WSRF::MobyFile->new( undef, $ID );
+    $WSRF::WSRP::ResourceProperties{$property_status} = $status->XML();
+
+    # here we leave the result empty since the service is still running
+    $WSRF::WSRP::ResourceProperties{$property_result} = '';
+
+    # save the event so that our clients can access the information
+    $lock->toFile();
+    return;
+}
+
+#-----------------------------------------------------------------
+# update_time_event
+#    This method is used to update the state of your 
+#    LSAE_TIME_PROGRESS_EVENT event.
+#
+#  Parameters:  
+#    $request   - $request from process_it()
+#    $remaining - integer representing seconds until completion 
+#    $msg       - a message to provide regarding the state of our event 
+#-----------------------------------------------------------------
+sub update_time_event {
+    my ( $self, $request, $remaining, $msg ) = @_;
+    
+    $msg = '' unless defined $msg;
+    $remaining = 0 unless defined $remaining;
+    
+    # validate the state of the event ...
+    $remaining = 0 unless $remaining >= 0 ;
+    
+    unless ( defined $ENV{ID} ) {
+        # hmm, local testing of service?
+        $ENV{ID} = WSRF::GSutil::CalGSH_ID();
+        WSRF::File::toFile($ENV{ID});
+    }
+
+    # our service invocation id
+    my $ID = $ENV{ID};
+
+    # our job id
+    my $jid = $request->jid;
+
+    # some variables we need to access/store our event information
+    my $property_pid    = "pid_$jid";
+    my $property_input  = "input_$jid";
+    my $property_status = "status_$jid";
+    my $property_result = "result_$jid";
+
+    # construct an LSAE object based on the old event block
+    my $old_status = LSAE::AnalysisEventBlock->new(
+                                    $WSRF::WSRP::ResourceProperties{$property_status}
+    );
+    # construct a new state changed event
+    my $status = LSAE::AnalysisEventBlock->new();
+    $status->type(LSAE_TIME_PROGRESS_EVENT);
+
+    # set the new state
+    $status->remaining($remaining);
+    $status->message($msg);
+
+    # set our job id for this event
+    $status->id($jid);
+
+    # create a file based resource that we will store our event information
+    my $lock = WSRF::MobyFile->new( undef, $ID );
+    $WSRF::WSRP::ResourceProperties{$property_status} = $status->XML();
+
+    # here we leave the result empty since the service is still running
+    $WSRF::WSRP::ResourceProperties{$property_result} = '';
+
+    # save the event so that our clients can access the information
+    $lock->toFile();
+    return;
+}
+[%- END -%]
+
+1;
+__END__
+
+=head1 NAME
+
+[% impl.package %] - a BioMoby service
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+[% base.description %]
+
+=head1 CONTACT
+
+B<Authority>: [% base.authority %]
+
+B<Email>: [% base.email %]
+
+=cut

@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               MojoX-Renderer-HTP
+version:            0.032
+abstract:           HTML::Template::Pro renderer for Mojo
+author:
+    - Sergey Lobin <ifitwasi@gmail.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Mojo:        0.991251
+    HTML::Template::Pro:    0.81
+    Test::More:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,77 @@
+Revision history for Perl extension Math::Vector::Real.
+
+0.17  Apr 14, 2015
+        - add methods chebyshev_norm and chebyshev_dist
+
+0.16  Mar 11, 2015
+        - method min_dist2_between_boxes renamed to dist2_between_boxes
+
+0.15  Mar 10, 2015
+        - add min_dist2_between_boxes method
+
+0.14  Jun 1, 2014
+        - add Math::Vector::Real::Test module
+
+0.13  May 31, 2014
+        - check version of XS backend and abort when it is an old
+          buggy one
+	- don't load XS backend when testing
+
+0.12  May 30, 2014
+        - more tests added
+        - add max_dist2_to_box method
+        - add dist2_to_box method
+        - add sum method
+
+0.11  Apr 25, 2014
+        - add first_orthant_reflection method
+        - add max_dist2_between_boxes method
+        - add nearest_in_box method
+        - on tests, when comparing floats allow for a small error
+
+0.10  Jul 17, 2012
+        - correct broken max_component_index method
+        - add select_in_ball method
+        - solve issue in *= operator,
+        - use Math::Vector::Real::XS when available
+        - add manhattan norm and dist methods,
+        - doc correction (reported by Laszlo Kajan)
+
+0.09  Jun 13, 2012
+        - add rotation_base_3d and rotate_3d operations
+
+0.08  Nov 8, 2011
+        - add complementary_base and rewrite normal_base to use it
+        - canonical_base was broken
+        - don't use method syntax to call vector subroutines inside
+          module
+        - doc improvements
+
+0.07  Nov 7, 2011
+        - normal_base was broken
+        - several doc improvements
+        - minor code cleanups
+
+0.06  Jun 16, 2011
+        - import POSIX module
+        - add new_ref constructor
+
+0.04  Jun 14, 2011
+	- add cube constructor and min, max, dist, dist2 and abs2 methods
+        - add canonical_base, normal_base, decompose
+	- wrap method modified
+
+0.03  Jun 9, 2011
+        - add methods axis_versor, versor, zero, is_zero and wrap
+	- some doc corrections and improvements
+
+0.02  Dec 31, 2009
+        - clean up Makefile.PL
+	- remove 5.10 requirement
+	- doc minor improvements
+	- add example
+
+0.01  Wed Dec 30 19:47:00 2009
+	- original version; created by h2xs 1.23 with options
+		-AXn Math::Vector::Real
+

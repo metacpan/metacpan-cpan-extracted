@@ -1,0 +1,106 @@
+=head1 NAME
+
+Message::Passing::Manual::Cookbook - Common recipies
+
+=head1 Aggregating logs
+
+=head2 Logging from an application.
+
+You can use L<Log::Dispatch>, or any log system which will output into L<Log::Dispatch>.
+
+    use Log::Dispatch;
+    use Log::Dispatch::Message::Passing;
+    use Message::Passing::Filter::Encoder::JSON;
+    use Message::Passing::Output::ZeroMQ;
+
+    my $log = Log::Dispatch->new;
+
+    $log->add(Log::Dispatch::Message::Passing->new(
+        name      => 'myapp_aggregate_log',
+        min_level => 'debug',
+        output    => Message::Passing::Filter::Encoder::JSON->new(
+            output_to => Message::Passing::Output::ZeroMQ->new(
+                connect => 'tcp://192.168.0.1:5558',
+            ),
+        ),
+    ));
+
+    $log->warn($_) for qw/ foo bar baz /;
+
+=head2 Aggregating this log
+
+As simple as using the command line interface:
+
+    message-pass --input ZeroMQ --input_options '{"socket_bind":"tcp://192.168.0.1:5558"}' \
+        --output File --output_options '{"filename":"/tmp/mylog"}'
+
+And you've now got a multi-host log aggregation system for your application!
+
+=head2 Doing it manually
+
+You don't have to do any of the above, if you don't want to - you can easily reuse the ZeroMQ
+output yourself:
+
+    my $log = Message::Passing::Output::ZeroMQ->new(
+        connect => 'tcp://192.168.0.1:5558',
+        linger  => 1,  # make sure message is sent (flushed) before thread dies
+    );
+    $log->consume("A log message");
+
+=head2 A note about outputs
+
+ZeroMQ is the recommended B<output> for sending messages from within your application.
+This is because ZeroMQ uses a different (POSIX) thread to send
+messages - meaning that it transports messages independently to whatever
+your perl code is doing.
+
+This is B<not> the case for other message outputs, and therefore they are unlikely to work
+well, or at all, unless your application is already asynchronous and using an L<AnyEvent> supported event
+library.
+
+=head2 A note about ZeroMQ
+
+By default L<Message::Passing::ZeroMQ> will use PUB/SUB sockets for logging, with a finite 'high water mark'.
+
+This means that if your application logs significantly more data than you can fit down the network, you
+B<will drop logs>.
+
+If your application needs to do this, you can either increase this high water mark, or disable it
+(so ZeroMQ will buffer an infinite number of messages at the sending client - potentially using infinite RAM).
+
+The default setting is for the output to buffer up to 10000 messages on the output side, which should be
+enough to manage short term peaks, but is low enough to be reasonably safe in terms of memory consumption
+for buffering
+
+=head1 Aggregating syslog
+
+Assuming that you've got a regular syslogd setup and working, then you probably want to keep that.
+Having B<some of> the log files on individual hosts can be very useful. Also, we'd like to avoid
+the script being a privileged user (which would be needed to get the standard port).
+
+Therefore, we'll run a syslog listener on a high port (5140), and get the regular syslogd to ship
+messages to it. The listener will then forward from each host to a central aggregate logger
+(which is setup as above).
+
+=head2 On host collector
+
+    message-pass --input Syslog --output ZeroMQ --output_options '{"connect":"tcp://192.168.0.1:5558"}'
+
+=head2 Configuring your syslogd
+
+This should be easy, here's an example of what to add to rsyslogd.conf to get the syslog resent.
+
+    *.* =192.168.0.1:5140
+
+=head1 Aggregating everything
+
+If you have hosts with both applications and syslog that you want to aggregate, then you can easily
+do both at once. This also means that your apps ship logs to a local buffer process rather than
+directly across the network - which is more resilient to short network outages.
+
+=head1 AUTHOR, COPYRIGHT & LICENSE
+
+See L<Message::Passing>.
+
+=cut
+

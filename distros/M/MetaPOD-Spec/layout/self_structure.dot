@@ -1,0 +1,27 @@
+strict digraph Perl {
+	graph [overlap=false,
+		rankdir=LR,
+		ranksep=5,
+		splines=spline
+	];
+	node [label="\N",
+		shape=record,
+		style=dotted
+	];
+	edge [minlen=1];
+	subgraph cluster_1 {
+		graph [label="MetaPOD::",
+			overlap=false,
+			rank=min,
+			rankdir=LR,
+			ranksep=5,
+			splines=spline
+		];
+		node [shape=record,
+			style=dotted
+		];
+		edge [minlen=1];
+		"MetaPOD::JSON"		 [label="MetaPOD::JSON"];
+		"MetaPOD::Spec"		 [label="MetaPOD::Spec"];
+	}
+}

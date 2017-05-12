@@ -1,0 +1,13 @@
+INSTALL
+LICENSE
+Makefile.PL
+MANIFEST
+README
+CHANGES
+lib/MediaWiki/Bot/Plugin/SE.pm
+gpl.txt
+t/00_initialize.t
+t/97_pod.t
+t/98_pod_coverage.t
+t/99_pod_kwalitee.t
+META.yml                                 Module meta-data (added by MakeMaker)

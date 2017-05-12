@@ -1,0 +1,10 @@
+#--- A list of networks/subnets/hosts that are trusted enough that
+#--- you do not need to do a reverse lookup on the name to allow access.
+#
+#--- One host/subnet address per line:
+#--- 100.0.0. 100.0.0.* and 100.0.0.1 are all valid
+#--- 10.0.0.
+#--- 192.128.0.4
+#--- my.domain.co.uk
+
+#127.0.0.

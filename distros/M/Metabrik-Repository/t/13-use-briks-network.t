@@ -1,0 +1,35 @@
+use Test;
+BEGIN { plan(tests => 32) }
+
+ok(sub { eval("use Metabrik::Network::Address"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Arp"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Device"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Dns"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Frame"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Ftp"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Grep"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Http"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Icmp"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Linux::Iptables"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Modbus"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Netbios"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Nikto"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Nmap"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Ping"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Freebsd::Ping"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Linux::Ping"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Portscan"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Read"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::S7comm"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Sinfp3"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Sinfp3::Arpdiscover"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Smtp"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Sqlmap"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Ssdp"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Stream"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Traceroute"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Whois"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Wlan"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Wps"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Write"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use Metabrik::Network::Zmap"); $@ ? 0 : 1 }, 1, $@);

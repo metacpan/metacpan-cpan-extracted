@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                MIDI-XML
+version:             0.03
+abstract:            Module for representing MIDI-XML objects.
+license:             ~
+author:              
+    - Brian M. Ames <bmames@apk.net>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Carp:                          1.0
+    Class::ISA:                    0.30
+    Tk:                            800.0
+    Tk::Tree:                      4.0
+    XML::DOM:                      1.40
+    XML::Parser:                   2.0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,28 @@
+---
+abstract: 'Moo[se] extension that allows for setting handle accessors with the constructor'
+author:
+  - 'Zakariyya Mughal <zmughal@cpan.org>'
+build_requires:
+  Module::Load: 0
+  Test::Most: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-HandlesConstructor
+requires:
+  Class::Method::Modifiers: 0
+  Import::Into: 0
+  MooseX::MungeHas: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/zmughal/p5-MooseX-HandlesConstructor
+  repository: https://github.com/zmughal/p5-MooseX-HandlesConstructor.git
+version: 0.001

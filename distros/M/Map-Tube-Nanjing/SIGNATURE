@@ -1,0 +1,63 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3643cbaf125317628e48f354634e5ccc6c7a47b5 Changes
+SHA1 882221895a73bad18eb9f16a0ce523a968a932c1 LICENSE.artistic_2
+SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE.bsd
+SHA1 8f4b94b0b5ef7565c1f3ee8c9b8eb0f2dda21ec1 MANIFEST
+SHA1 e0a7af625fbbf9b7ef09a165505c53957d79b0cd META.yml
+SHA1 044330d1a8c3f44bdbb45a46d161ab07ac00ebe9 Makefile.PL
+SHA1 e5ea397d52720a0f600c58289afd32033e17e852 Nanjing.pm
+SHA1 87c7f635aeb5881f0e04fb5976cb9fe87069a11e README
+SHA1 8e44c7eab99179f6b3b9c6907d8a4a52383734f5 examples/ex1.pl
+SHA1 e1401d6b001570f52bcb54332020f094bffc8280 examples/ex2.pl
+SHA1 c6afd908ca3cbfe467d424f8507edc55445aaecf examples/ex3.pl
+SHA1 991959d5cac7b35024eb7cdb51cecbf86cb6faf8 examples/ex4.pl
+SHA1 b17bf7761864d79381446d4fdf3df65163c54a55 images/ex3.png
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 42de62df31eaf796d8bfd49a11fdc9cff1b50b74 inc/Module/Install/Share.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 86940ec0ccd069fb95deaa98b12ac1cf6d93ffa9 share/nanjing-map.xml
+SHA1 ee2f13eabf10142d160c96cea277e93fad84f7aa t/Map-Tube-Nanjing/01-use.t
+SHA1 e22e9ac6a1bd0ca0a329a7f75c67b5000373ec9e t/Map-Tube-Nanjing/02-version.t
+SHA1 e05d3413a198733125d08958cc8b59b59a620b30 t/Map-Tube-Nanjing/03-map.t
+SHA1 0892f8ee3d598c4ea7b644a52e42fa2aa24e945f t/Map-Tube-Nanjing/04-get_node_by_id.t
+SHA1 0205fe851316051e6e26e3bda2f5e7efd487ed3c t/Map-Tube-Nanjing/05-get_node_by_name.t
+SHA1 95b22dbb25119583d35128be198b6cf43df37461 t/Map-Tube-Nanjing/06-get_shortest_route.t
+SHA1 c756f6ec4067b088c54f891ed207544819b7e1fd t/Map-Tube-Nanjing/07-name.t
+SHA1 dfba495dd3b211a12875def13407fe885b8ab9b7 t/Map-Tube-Nanjing/08-xml.t
+SHA1 21a558273bc155425944b60799f7a9bc24c2df27 xt/Map-Tube-Nanjing/01-pod_coverage.t
+SHA1 f12636a952cfec2e1d47dc022640a9397e3cdcb8 xt/Map-Tube-Nanjing/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWIMQpAAoJEJe+XXKaIuTliNEIAJmgmmvwqC53lv341XVX4GYp
+fsTj+WS16s/EOyaJpFy22ThRWOyzd1Zpq9PMosSVhprvVjmcdHsp6F7pkRk8j296
+xJXiFqPMCau98Or1p7NMiTwv4DJmT0pazmQC1vlC0ZuMHUE+o9JwCjGGbvnDUq+a
+xhdV5quJ7SgsIlSg3sBqxiVDQyiF3/yBTUc93Ifj23CNLtGTnL27ui/ElL8tNmcR
+6cBFFIS//9qmHbp6Vxufn0uhGynluSEzJjDXsholOwb7/Yk6kA6Vgq4kgz84Rfak
+KCdR15AELgdR3sSvrNE0oGoAwiJT2mFq+TkuyVQV1KcjYWOUKQbfQ6dOR0MVqow=
+=kSAn
+-----END PGP SIGNATURE-----

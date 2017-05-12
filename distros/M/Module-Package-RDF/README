@@ -1,0 +1,68 @@
+NAME
+    Module::Package::RDF - drive your distribution with RDF
+
+SYNOPSIS
+    In your Makefile.PL:
+
+      use inc::Module::Package 'RDF';
+
+    That's all folks!
+
+DESCRIPTION
+    Really simple Makefile.PL.
+
+FLAVOURS
+    Currently this module only defines the ":standard" flavour.
+
+  :standard
+    This is the default, so the following are equivalent:
+
+      use inc::Module::Package 'RDF';
+      use inc::Module::Package 'RDF:standard';
+
+    In addition to the inherited behavior, this flavour uses the following
+    plugins:
+
+    *   AutoLicense
+
+    *   AutoManifest
+
+    *   Copyright
+
+    *   Credits
+
+    *   DOAP
+
+    *   DOAPChangeSets
+
+    *   RDF
+
+    *   ReadmeFromPod
+
+    *   TrustMetaYml
+
+    And sets "static_config" and "sign".
+
+BUGS
+    Please report any bugs to <http://rt.cpan.org/>.
+
+SEE ALSO
+    Module::Package, Module::Install::RDF, Module::Install::DOAP,
+    Module::Install::DOAPChangeSets .
+
+    <http://www.perlrdf.org/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2011-2013 by Toby Inkster
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

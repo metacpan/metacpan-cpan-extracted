@@ -1,0 +1,61 @@
+NAME
+    Mojolicious::Plugin::Module - Mojolicious Plugin.
+
+OVERVIEW
+    Mojolicious::Plugin::Module is a Mojolicious plugin. This module helps
+    to write more modular applications with Mojo.
+
+    After
+
+      $app->plugin('Module');
+
+    Mojolicious looks for "conf/app.conf" where you can define (in JSON
+    format) modules which should be used.
+
+    For example "app.conf" contains
+
+      {
+        "modules": ["Bugov::User", "Bugov::CommonModule"]
+      }
+
+    Two modules will used. They should be located in "mod/bugov/user" and
+    "mod/bugov/common_module" directories.
+
+  Structure of module
+      assets                                  # Module's public files.
+      conf                                    # Some configs.
+        module.conf                           # Main config of this module.
+      lib
+        Vendor
+          ModuleName
+            ... controllers, helpers, etc ... # The same what you can do in Mojolicious App.
+          ModuleName.pm                       # Should extends Mojolicious::Plugin::Module::Abstract.
+      templates
+        vendor
+          module_name
+            ... templates ...                 # Templates used in this module.
+
+METHODS
+    add($name, $module)
+        $name - required parameter. Defines package of module. For example
+        "Vendor::ModuleName".
+
+        $module - optional parameter. Module object which be finded as $name
+        in module manager. If <$module> does not defined $name will be
+        loaded.
+
+    get($name)
+        Get module by $name.
+
+SEE ALSO
+    Mojolicious::Plugin::Module::Abstract,
+    Mojolicious::Plugin::Module::Manager,
+    Mojolicious::Plugin::Module::Assets, Mojolicious::Guides,
+    <http://mojolicio.us>.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014, Georgy Bazhukov.
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+

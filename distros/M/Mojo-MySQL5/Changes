@@ -1,0 +1,48 @@
+Revision history for Mojo::MySQL5
+
+0.09     Sat May  2 17:52:05 2015
+       * Added module Mojo::MySQL5::PubSub.
+       * Added pubsub attribute to Mojo::MySQL5.
+       * Fixed Mojo::MySQL5::Connection to handle disconnect while running query
+       * URL is cloned on connection creation to support per connection options
+
+0.08     Sat Apr 18 06:27:45 2015
+       * Support for Unix domain socket connection.
+
+0.07     Wed Apr  8 14:51:52 2015
+       * Public attribute Mojo::MySQL5::Connection state
+       * Fixed bug in Mojo::MySQL5::Connection where connection cannot be reused
+         after error received not immediately after query
+
+0.06     Tue Apr  7 14:35:48 2015
+       * Fixed bug in Mojo::MySQL5::Connection to encode and decode big integers
+         on 32-bit platforms
+
+0.05     Mon Apr  6 03:29:29 2015
+       * Fixed bug in Mojo::MySQL5::Migrations where migrations would sometimes be
+         executed in the wrong order.
+
+0.04     Sun Apr  5 23:34:33 2015
+       * Fixed bug in Mojo::MySQL5::Migrations where the latest version could not always
+         be determined correctly. (Hernan Lopes)
+       * Updated blog example application from Mojo::Pg
+       * Packet encoding-decoding tests
+
+0.03     Sun Mar 29 18:26:17 2015
+       * Corrected POD
+       * Fixed error handling on connect failure
+       * Fixed Mojo::MySQL5::Migrations to allow delimiter in comments and quoted strings
+       * delimiter support in Mojo::MySQL5::Migrations,
+         allows creation of stored procedures and triggers in migration scripts
+       * Removed Mojo::MySQL5::Util
+       * 'quote' and 'quote_id' methods in Mojo::MySQL5::Database
+
+0.02     Tue Mar 24 13:12:49 2015
+       * blog example from Mojo::Pg
+       * Improved Mojo::mysql::Migrations to make no changes to the database when
+         checking the currently active version.
+       * Fixed Mojo::mysql::Migrations to handle UTF-8 encoded files correctly
+
+0.01     Mon Mar 23 16:53:07 2015
+       * Initial release, split from Mojo::mysql
+

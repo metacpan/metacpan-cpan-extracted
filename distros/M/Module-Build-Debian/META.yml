@@ -1,0 +1,23 @@
+---
+name: Module-Build-Debian
+version: 1.0.0
+author:
+  - 'Ask Solem <ASKSH@cpan.org>'
+abstract: Module::Build extension to build .deb packages using C<dh-make-perl>.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  version: 0
+build_requires:
+  Test::Simple: 0.42
+dynamic_config: 0
+provides:
+  Module::Build::Debian:
+    file: lib/Module/Build/Debian.pm
+    version: 1.0.0
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+distribution_type: Module

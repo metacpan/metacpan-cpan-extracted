@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<tube name="Beijing">
+  <lines>
+    <line color="#9B91B1" name_alt="Airport Express" name="æºåºå¿«è½¨" id="AirportExpress" />
+    <line color="#a12830" name_alt="Batong Line" name="å «éçº¿" id="BatongLine" />
+    <line color="#d47daa" name_alt="Changping Line" name="æå¹³çº¿" id="ChangpingLine" />
+    <line color="#008193" name_alt="Daxing Line" name="å¤§å ´çº¿" id="DaxingLine" />
+    <line color="#d85f26" name_alt="Fangshan Line" name="æ¿å±±çº¿" id="FangshanLine" />
+    <line color="#a12830" name_alt="Line 1" name="ä¸å·çº¿" id="Line1" />
+    <line color="#0092c7" name_alt="Line 10" name="åå·çº¿" id="Line10" />
+    <line color="#f5d312" name_alt="Line 13" name="åä¸å·çº¿" id="Line13" />
+    <line color="#d4a7a1" name_alt="Line 14" name="ååå·çº¿" id="Line14" />
+    <line color="#6a1d44" name_alt="Line 15" name="åäºå·çº¿" id="Line15" />
+    <line color="#00529B" name_alt="Line 2" name="äºå·çº¿" id="Line2" />
+    <line color="#008193" name_alt="Line 4" name="åå·çº¿" id="Line4" />
+    <line color="#ae005f" name_alt="Line 5" name="äºå·çº¿" id="Line5" />
+    <line color="#BB8900" name_alt="Line 6" name="å ­å·çº¿" id="Line6" />
+    <line color="#ffc66e" name_alt="Line 7" name="ä¸å·çº¿" id="Line7" />
+    <line color="#00997a" name_alt="Line 8" name="å «å·çº¿" id="Line8" />
+    <line color="#87d300" name_alt="Line 9" name="ä¹å·çº¿" id="Line9" />
+    <line color="#d61572" name_alt="Yizhuang Line" name="äº¦åºçº¿" id="YizhuangLine" />
+  </lines>
+  <stations>
+    <station link="S3" line_alt="Airport Express" name_alt="Terminal 2" name="2å·èªç«æ¥¼" id="S4" line="æºåºå¿«è½¨" />
+    <station link="S2,S4" line_alt="Airport Express" name_alt="Terminal 3" name="3å·èªç«æ¥¼" id="S3" line="æºåºå¿«è½¨" />
+    <station link="S130,S131,S160,S403" line_alt="Line 14,Line 9" name_alt="Qilizhuang" name="ä¸éåº" id="S161" line="ä¹å·çº¿,ååå·çº¿" />
+    <station link="S76,S78" line_alt="Line 1" name_alt="Wanshoulu" name="ä¸å¯¿è·¯" id="S77" line="ä¸å·çº¿" />
+    <station link="S413,S415" line_alt="Yizhuang Line" name_alt="Wanyuanjie" name="ä¸æºè¡" id="S414" line="äº¦åºçº¿" />
+    <station link="S1,S106,S108,S3" line_alt="Airport Express,Line 10" name_alt="Sanyuanqiao" name="ä¸å æ¡¥" id="S2" line="åå·çº¿,æºåºå¿«è½¨" />
+    <station link="S1304,S18" line_alt="Line 13" name_alt="Shangdi" name="ä¸å°" id="S1305" line="åä¸å·çº¿" />
+    <station link="S258,S318,S86,S88" line_alt="Line 1,Line 5" name_alt="Dongdan" name="ä¸å" id="S87" line="ä¸å·çº¿,äºå·çº¿" />
+    <station link="S261,S316,S318,S335" line_alt="Line 5,Line 6" name_alt="Dongsi" name="ä¸å" id="S317" line="äºå·çº¿,å ­å·çº¿" />
+    <station link="S1,S261" line_alt="Line 2" name_alt="Dongsi Shitiao" name="ä¸ååæ¡" id="S262" line="äºå·çº¿" />
+    <station link="S352,S354" line_alt="Line 6" name_alt="Dongxiayuan" name="ä¸å¤å­" id="S353" line="å ­å·çº¿" />
+    <station link="S111,S261" line_alt="Line 6" name_alt="Dongdaqiao" name="ä¸å¤§æ¡¥" id="S338" line="å ­å·çº¿" />
+    <station link="S189,S191" line_alt="Line 14" name_alt="Donghuqu" name="ä¸æ¹æ¸" id="S190" line="ååå·çº¿" />
+    <station link="S1315,S2,S262,S264" line_alt="Airport Express,Line 13,Line 2" name_alt="Dongzhimen" name="ä¸ç´é¨" id="S1" line="äºå·çº¿,åä¸å·çº¿,æºåºå¿«è½¨" />
+    <station link="S130,S164" line_alt="Line 14" name_alt="Dongguantou" name="ä¸ç®¡å¤´" id="S163" line="ååå·çº¿" />
+    <station link="S183,S185" line_alt="Line 14" name_alt="Dongfeng Beiqiao" name="ä¸é£åæ¡¥" id="S184" line="ååå·çº¿" />
+    <station link="S29,S31" line_alt="Daxing Line,Line 4" name_alt="Zhongguancun" name="ä¸­å ³æ" id="S30" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S335" line_alt="Line 8" name_alt="National Art Museum" name="ä¸­å½ç¾æ¯é¦" id="S394" line="å «å·çº¿" />
+    <station link="S161,S404" line_alt="Line 9" name_alt="Fengtai Dongdajie" name="ä¸°å°ä¸å¤§è¡" id="S403" line="ä¹å·çº¿" />
+    <station link="S403,S405" line_alt="Line 9" name_alt="Fengtainanlu" name="ä¸°å°åè·¯" id="S404" line="ä¹å·çº¿" />
+    <station link="S405,S60" line_alt="Line 9" name_alt="Fengtai Science Park" name="ä¸°å°ç§æå­" id="S406" line="ä¹å·çº¿" />
+    <station link="S127,S129" line_alt="Line 10" name_alt="Fengtai Railway Station" name="ä¸°å°ç«" id="S128" line="åå·çº¿" />
+    <station link="BT11,BT13" line_alt="Batong Line" name_alt="Linheli" name="ä¸´æ²³é" id="BT12" line="å «éçº¿" />
+    <station link="S163,S165" line_alt="Line 14" name_alt="Lize Business District" name="ä¸½æ³½åå¡åº" id="S164" line="ååå·çº¿" />
+    <station link="S56,S58" line_alt="Daxing Line,Line 4" name_alt="Yihezhuang" name="ä¹ååº" id="S57" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="BT09,BT11" line_alt="Batong Line" name_alt="Jiukeshu" name="ä¹æ£µæ " id="BT10" line="å «éçº¿" />
+    <station link="S114,S177,S368,S91" line_alt="Line 14,Line 7" name_alt="Jiulongshan" name="ä¹é¾å±±" id="S178" line="ä¸å·çº¿,ååå·çº¿" />
+    <station link="S329,S331" line_alt="Line 6" name_alt="Erligou" name="äºéæ²" id="S330" line="å ­å·çº¿" />
+    <station link="S75,S77" line_alt="Line 1" name_alt="Wukesong" name="äºæ£µæ¾" id="S76" line="ä¸å·çº¿" />
+    <station link="S1305,S98" line_alt="Line 13" name_alt="Wudaokou" name="äºéå£" id="S1304" line="åä¸å·çº¿" />
+    <station link="S412,S414" line_alt="Yizhuang Line" name_alt="Yizhuang Culture Park" name="äº¦åºæåå­" id="S413" line="äº¦åºçº¿" />
+    <station link="S411,S413" line_alt="Yizhuang Line" name_alt="Yizhuangqiao" name="äº¦åºæ¡¥" id="S412" line="äº¦åºçº¿" />
+    <station link="S109,S2" line_alt="Line 10" name_alt="Liangmaqiao" name="äº®é©¬æ¡¥" id="S108" line="åå·çº¿" />
+    <station link="S31,S33" line_alt="Daxing Line,Line 4" name_alt="Renmin University" name="äººæ°å¤§å­¦" id="S32" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S266,S335" line_alt="Line 8" name_alt="Shichahai" name="ä»å¹æµ·" id="S392" line="å «å·çº¿" />
+    <station link="BT03,BT05" line_alt="Batong Line" name_alt="Communication University of China CUC (Beijing Broadcasting Institute)" name="ä¼ åªå¤§å­¦" id="BT04" line="å «éçº¿" />
+    <station link="S248" line_alt="Line 15" name_alt="Fengbo" name="ä¿¸ä¼¯" id="S249" line="åäºå·çº¿" />
+    <station link="S105,S1315" line_alt="Line 13" name_alt="Guangximen" name="å çé¨" id="S1314" line="åä¸å·çº¿" />
+    <station link="S73,S75" line_alt="Line 1" name_alt="Babaoshan" name="å «å®å±±" id="S74" line="ä¸å·çº¿" />
+    <station link="S72,S74" line_alt="Line 1" name_alt="Bajiao Amusement Park" name="å «è§æ¸¸ä¹å­" id="S73" line="ä¸å·çº¿" />
+    <station link="BT06,BT08" line_alt="Batong Line" name_alt="Baliqiao Eight Mile Bridge" name="å «éæ¡¥" id="BT07" line="å «éçº¿" />
+    <station link="S132,S134,S77,S79" line_alt="Line 1,Line 10" name_alt="Gongzhufen" name="å ¬ä¸»å" id="S78" line="ä¸å·çº¿,åå·çº¿" />
+    <station link="S47,S49" line_alt="Daxing Line,Line 4" name_alt="Gongyixiqiao" name="å ¬çè¥¿æ¡¥" id="S48" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S230,S232" line_alt="Line 15" name_alt="Liudaokou" name="å ­éå£" id="S231" line="åäºå·çº¿" />
+    <station link="S130,S132,S161,S400" line_alt="Line 10,Line 9" name_alt="Liuliqiao" name="å ­éæ¡¥" id="S131" line="ä¹å·çº¿,åå·çº¿" />
+    <station link="S131,S355" line_alt="Line 9" name_alt="Liuliqiao East" name="å ­éæ¡¥ä¸" id="S400" line="ä¹å·çº¿" />
+    <station link="S1312,S235" line_alt="Line 15" name_alt="Guanzhuang (Line 15)" name="å ³åº" id="S236" line="åäºå·çº¿" />
+    <station link="S100,S102" line_alt="Line 10" name_alt="Jiandemen" name="å¥å¾·é¨" id="S101" line="åå·çº¿" />
+    <station link="S355,S397,S78,S80" line_alt="Line 1,Line 9" name_alt="Military Museum" name="åäºåç©é¦" id="S79" line="ä¸å·çº¿,ä¹å·çº¿" />
+    <station link="S108,S110" line_alt="Line 10" name_alt="Agricultural Exhibition Center" name="åä¸å±è§é¦" id="S109" line="åå·çº¿" />
+    <station link="S117,S119" line_alt="Line 10" name_alt="Fenzhongsi" name="åéå¯º" id="S118" line="åå·çº¿" />
+    <station link="S120,S172" line_alt="Line 5" name_alt="Liujiayao" name="åå®¶çª" id="S324" line="äºå·çº¿" />
+    <station link="S256,S258" line_alt="Line 2" name_alt="Qianmen" name="åé¨" id="S257" line="äºå·çº¿" />
+    <station link="S34,S36" line_alt="Daxing Line,Line 4" name_alt="Beijing Zoo" name="å¨ç©å­" id="S35" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S114,S116" line_alt="Line 10" name_alt="Jinsong" name="å²æ¾" id="S115" line="åå·çº¿" />
+    <station link="S369,S371" line_alt="Line 7" name_alt="Huagong" name="åå·¥" id="S370" line="ä¸å·çº¿" />
+    <station link="S167,S169,S44,S46" line_alt="Daxing Line,Line 14,Line 4" name_alt="Beijing South Railway Station" name="åäº¬åç«" id="S45" line="ååå·çº¿,åå·çº¿,å¤§å ´çº¿" />
+    <station link="S28,S30" line_alt="Daxing Line,Line 4" name_alt="East Gate of Peking University" name="åäº¬å¤§å­¦ä¸é¨" id="S29" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S258,S88" line_alt="Line 2" name_alt="Beijing Railway Station" name="åäº¬ç«" id="S259" line="äºå·çº¿" />
+    <station link="S356,S400,S79" line_alt="Line 7,Line 9" name_alt="Beijing West Railway Station" name="åäº¬è¥¿ç«" id="S355" line="ä¸å·çº¿,ä¹å·çº¿" />
+    <station link="S101,S103,S387,S389" line_alt="Line 10,Line 8" name_alt="Beitucheng" name="ååå" id="S102" line="å «å·çº¿,åå·çº¿" />
+    <station link="S25,S27" line_alt="Daxing Line,Line 4" name_alt="Beigongmen" name="åå®«é¨" id="S26" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S264,S316" line_alt="Line 5" name_alt="Beixinqiao" name="åæ°æ¡¥" id="S315" line="äºå·çº¿" />
+    <station link="S231,S233" line_alt="Line 15" name_alt="Beishatan" name="åæ²æ»©" id="S232" line="åäºå·çº¿" />
+    <station link="S335,S38" line_alt="Line 6" name_alt="Beihai North" name="åæµ·å" id="S334" line="å ­å·çº¿" />
+    <station link="S1312,S306" line_alt="Line 13" name_alt="Beiyuan" name="åè" id="S1311" line="åä¸å·çº¿" />
+    <station link="S235,S307" line_alt="Line 5" name_alt="Beiyuanlu North" name="åèè·¯å" id="S308" line="äºå·çº¿" />
+    <station link="S350,S352" line_alt="Line 6" name_alt="Beiyunhe East" name="åè¿æ²³ä¸" id="S351" line="å ­å·çº¿" />
+    <station link="S349,S351" line_alt="Line 6" name_alt="Beiyunhe West" name="åè¿æ²³è¥¿" id="S350" line="å ­å·çº¿" />
+    <station link="S181,S342" line_alt="Line 6" name_alt="Shilipu" name="åéå ¡" id="S341" line="å ­å·çº¿" />
+    <station link="S116,S118,S173,S175" line_alt="Line 10,Line 14" name_alt="Shilihe" name="åéæ²³" id="S117" line="åå·çº¿,ååå·çº¿" />
+    <station link="S117,S176" line_alt="Line 14" name_alt="Nanbalizhuang" name="åå «éåº" id="S175" line="ååå·çº¿" />
+    <station link="S370,S372" line_alt="Line 7" name_alt="Nanlouzizhuang" name="åæ¥¼æ¢åº" id="S371" line="ä¸å·çº¿" />
+    <station link="S245,S247" line_alt="Line 15" name_alt="Nanfaxin" name="åæ³ä¿¡" id="S246" line="åäºå·çº¿" />
+    <station link="S80,S82" line_alt="Line 1" name_alt="Nanlishilu" name="åç¤¼å£«è·¯ lÃ¹" id="S81" line="ä¸å·çº¿" />
+    <station link="S23" line_alt="Changping Line" name_alt="Nanshao" name="åéµ" id="S24" line="æå¹³çº¿" />
+    <station link="S317,S334,S392,S394" line_alt="Line 6,Line 8" name_alt="Nanluoguxiang" name="åé£é¼å··" id="S335" line="å «å·çº¿,å ­å·çº¿" />
+    <station link="S115,S178,S365,S90" line_alt="Line 10,Line 7" name_alt="Shuangjing" name="åäº" id="S114" line="ä¸å·çº¿,åå·çº¿" />
+    <station link="S373,S375" line_alt="Line 7" name_alt="Shuanghe" name="åå" id="S374" line="ä¸å·çº¿" />
+    <station link="BT04,BT06" line_alt="Batong Line" name_alt="Shuangqiao" name="åæ¡¥" id="BT05" line="å «éçº¿" />
+    <station link="S71,S73" line_alt="Line 1" name_alt="Gucheng" name="å¤å" id="S72" line="ä¸å·çº¿" />
+    <station link="S166,S45" line_alt="Line 14" name_alt="Youanmenwai" name="å³å®é¨å¤" id="S167" line="ååå·çº¿" />
+    <station link="S416,S418" line_alt="Yizhuang Line" name_alt="Tongjinanlu" name="åæµåè·¯" id="S417" line="äº¦åºçº¿" />
+    <station link="S244,S246" line_alt="Line 15" name_alt="Houshayu" name="åæ²å³ª" id="S245" line="åäºå·çº¿" />
+    <station link="S110,S112,S181,S338" line_alt="Line 10,Line 6" name_alt="Hujialou" name="å¼å®¶æ¥¼" id="S111" line="å ­å·çº¿,åå·çº¿" />
+    <station link="S104,S313" line_alt="Line 5" name_alt="Hepingxiqiao" name="åå¹³è¥¿æ¡¥" id="S312" line="äºå·çº¿" />
+    <station link="S264,S312" line_alt="Line 5" name_alt="Hepingli Beijie" name="åå¹³éåè¡" id="S313" line="äºå·çº¿" />
+    <station link="S257,S42" line_alt="Line 2" name_alt="Hepingmen" name="åå¹³é¨" id="S256" line="äºå·çº¿" />
+    <station link="S191" line_alt="Line 14" name_alt="Shan'gezhuang" name="åååº" id="S192" line="ååå·çº¿" />
+    <station link="BT02,S91" line_alt="Batong Line,Line 1" name_alt="Sihui" name="åæ" id="BT01" line="ä¸å·çº¿,å «éçº¿" />
+    <station link="BT01,BT03" line_alt="Batong Line,Line 1" name_alt="Sihui East" name="åæ ä¸" id="BT02" line="ä¸å·çº¿,å «éçº¿" />
+    <station link="S1307,S1309" line_alt="Line 13" name_alt="Huilongguan" name="åé¾è§" id="S1308" line="åä¸å·çº¿" />
+    <station link="S1309,S378" line_alt="Line 8" name_alt="Huilongguan Dongdajie" name="åé¾è§ä¸å¤§è¡" id="S379" line="å «å·çº¿" />
+    <station link="S109,S111" line_alt="Line 10" name_alt="Tuanjiehu" name="å¢ç»æ¹" id="S110" line="åå·çº¿" />
+    <station link="S156,S158" line_alt="Line 14" name_alt="Garden Expo" name="å­åå­" id="S157" line="ååå·çº¿" />
+    <station link="S329,S33,S35" line_alt="Daxing Line,Line 4,Line 9" name_alt="National Library" name="å½å®¶å¾ä¹¦é¦" id="S34" line="ä¹å·çº¿,åå·çº¿,å¤§å ´çº¿" />
+    <station link="S242,S244" line_alt="Line 15" name_alt="China International Exhibition Center" name="å½å±" id="S243" line="åäºå·çº¿" />
+    <station link="S112,S114,S89,S91" line_alt="Line 1,Line 10" name_alt="Guomao" name="å½è´¸" id="S90" line="ä¸å·çº¿,åå·çº¿" />
+    <station link="S27,S29" line_alt="Daxing Line,Line 4" name_alt="Yuanmingyuan Park" name="åæå­" id="S28" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="BT12" line_alt="Batong Line" name_alt="Tuqiao" name="åæ¡¥" id="BT13" line="å «éçº¿" />
+    <station link="S372,S374" line_alt="Line 7" name_alt="Fatou" name="å¡å¤´" id="S373" line="ä¸å·çº¿" />
+    <station link="S252,S254,S41,S81" line_alt="Line 1,Line 2" name_alt="Fuxingmen" name="å¤å ´é¨" id="S82" line="ä¸å·çº¿,äºå·çº¿" />
+    <station link="S159,S161" line_alt="Line 14" name_alt="Dajing" name="å¤§äº" id="S160" line="ååå·çº¿" />
+    <station link="S234,S236,S308,S310" line_alt="Line 15,Line 5" name_alt="Datunlu East" name="å¤§å±¯è·¯ä¸" id="S235" line="äºå·çº¿,åäºå·çº¿" />
+    <station link="BT01,S178,S180,S90" line_alt="Line 1,Line 14" name_alt="Dawanglu" name="å¤§æè·¯" id="S91" line="ä¸å·çº¿,ååå·çº¿" />
+    <station link="S157,S159" line_alt="Line 14" name_alt="Dawayao" name="å¤§ç¦çª" id="S158" line="ååå·çº¿" />
+    <station link="S121,S123" line_alt="Line 10" name_alt="Dahongmen" name="å¤§çº¢é¨" id="S122" line="åå·çº¿" />
+    <station link="S60,S62" line_alt="Fangshan Line" name_alt="Dabaotai" name="å¤§èå°" id="S61" line="æ¿å±±çº¿" />
+    <station link="S178,S369" line_alt="Line 7" name_alt="Dajiaoting" name="å¤§éäº­" id="S368" line="ä¸å·çº¿" />
+    <station link="S36,S98" line_alt="Line 13" name_alt="Dazhongsi Big Bell Temple" name="å¤§éå¯º" id="S1302" line="åä¸å·çº¿" />
+    <station link="S172,S321" line_alt="Line 5" name_alt="Tiantandongmen" name="å¤©åä¸é¨" id="S322" line="äºå·çº¿" />
+    <station link="S84,S86" line_alt="Line 1" name_alt="Tian'anmen East" name="å¤©å®é¨ä¸" id="S85" line="ä¸å·çº¿" />
+    <station link="S41,S85" line_alt="Line 1" name_alt="Tian'anmen West" name="å¤©å®é¨è¥¿" id="S84" line="ä¸å·çº¿" />
+    <station link="S58" line_alt="Daxing Line,Line 4" name_alt="Tiangongyuan" name="å¤©å®«é¢" id="S59" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S303,S305" line_alt="Line 5" name_alt="Tiantongyuan" name="å¤©éè" id="S304" line="äºå·çº¿" />
+    <station link="S304" line_alt="Line 5" name_alt="Tiantongyuan North" name="å¤©éèå" id="S303" line="äºå·çº¿" />
+    <station link="S304,S306" line_alt="Line 5" name_alt="Tiantongyuan South" name="å¤©éèå" id="S305" line="äºå·çº¿" />
+    <station link="S105,S2" line_alt="Line 10" name_alt="Taiyanggong" name="å¤ªé³å®«" id="S106" line="åå·çº¿" />
+    <station link="S102,S233" line_alt="Line 8" name_alt="Olympic Sports Center" name="å¥¥ä½ä¸­å¿" id="S387" line="å «å·çº¿" />
+    <station link="S232,S234,S385,S387" line_alt="Line 15,Line 8" name_alt="Olympic Green" name="å¥¥æå¹å å ¬å­" id="S233" line="å «å·çº¿,åäºå·çº¿" />
+    <station link="S241,S243" line_alt="Line 15" name_alt="Sunhe" name="å­æ²³" id="S242" line="åäºå·çº¿" />
+    <station link="S170,S172" line_alt="Line 14" name_alt="Anlelin" name="å®ä¹æ" id="S171" line="ååå·çº¿" />
+    <station link="S102,S390" line_alt="Line 8" name_alt="Anhuaqiao" name="å®åæ¡¥" id="S389" line="å «å·çº¿" />
+    <station link="S264,S266" line_alt="Line 2" name_alt="Andingmen" name="å®å®é¨" id="S265" line="äºå·çº¿" />
+    <station link="S266,S389" line_alt="Line 8" name_alt="Andelibeijie" name="å®å¾·éåè¡" id="S390" line="å «å·çº¿" />
+    <station link="S26" line_alt="Daxing Line,Line 4" name_alt="Anheqiao North" name="å®æ²³æ¡¥å" id="S25" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S233,S235" line_alt="Line 15" name_alt="Anlilu" name="å®ç«è·¯" id="S234" line="åäºå·çº¿" />
+    <station link="S102,S104" line_alt="Line 10" name_alt="Anzhenmen" name="å®è´é¨" id="S103" line="åå·çº¿" />
+    <station link="S119,S121,S324,S409" line_alt="Line 10,Line 5,Yizhuang Line" name_alt="Songjiazhuang" name="å®å®¶åº" id="S120" line="äºå·çº¿,äº¦åºçº¿,åå·çº¿" />
+    <station link="S254,S256,S41,S43" line_alt="Daxing Line,Line 2,Line 4" name_alt="Xuanwumen" name="å®£æ­¦é¨" id="S42" line="äºå·çº¿,åå·çº¿,å¤§å ´çº¿" />
+    <station link="S184,S186" line_alt="Line 14" name_alt="Jiangtai" name="å°å°" id="S185" line="ååå·çº¿" />
+    <station link="S409,S411" line_alt="Yizhuang Line" name_alt="Xiaohongmen" name="å°çº¢é¨" id="S410" line="äº¦åºçº¿" />
+    <station link="S257,S259,S321,S87" line_alt="Line 2,Line 5" name_alt="Chongwenmen" name="å´æé¨" id="S258" line="äºå·çº¿,äºå·çº¿" />
+    <station link="S239,S241" line_alt="Line 15" name_alt="Cuigezhuang" name="å´ååº" id="S240" line="åäºå·çº¿" />
+    <station link="S20,S22" line_alt="Changping Line" name_alt="Gonghuacheng" name="å·©åå" id="S21" line="æå¹³çº¿" />
+    <station link="S138,S95" line_alt="Line 10" name_alt="Bagou" name="å·´æ²" id="S94" line="åå·çº¿" />
+    <station link="S344,S346" line_alt="Line 6" name_alt="Changying" name="å¸¸è¥" id="S345" line="å ­å·çº¿" />
+    <station link="S176,S178" line_alt="Line 14" name_alt="Pingleyuan" name="å¹³ä¹å­" id="S177" line="ååå·çº¿" />
+    <station link="S251,S334,S37,S39" line_alt="Daxing Line,Line 4,Line 6" name_alt="Ping'anli" name="å¹³å®é" id="S38" line="å ­å·çº¿,åå·çº¿,å¤§å ´çº¿" />
+    <station link="S377,S379" line_alt="Line 8" name_alt="Pingxifu" name="å¹³è¥¿åº" id="S378" line="å «å·çº¿" />
+    <station link="S357,S43" line_alt="Line 7" name_alt="Guang'anmennei" name="å¹¿å®é¨å" id="S358" line="ä¸å·çº¿" />
+    <station link="S321,S365" line_alt="Line 7" name_alt="Guangqumennei" name="å¹¿æ¸ é¨å" id="S364" line="ä¸å·çº¿" />
+    <station link="S114,S364" line_alt="Line 7" name_alt="Guangqumenwai" name="å¹¿æ¸ é¨å¤" id="S365" line="ä¸å·çº¿" />
+    <station link="S64,S66" line_alt="Fangshan Line" name_alt="Guangyangcheng" name="å¹¿é³å" id="S65" line="æ¿å±±çº¿" />
+    <station link="S259,S261,S87,S89" line_alt="Line 1,Line 2" name_alt="Jianguomen" name="å»ºå½é¨" id="S88" line="ä¸å·çº¿,äºå·çº¿" />
+    <station link="S315,S317" line_alt="Line 5" name_alt="Zhangzizhonglu" name="å¼ èªå¿ è·¯" id="S316" line="äºå·çº¿" />
+    <station link="S157" line_alt="Line 14" name_alt="Zhangguozhuang" name="å¼ é­åº" id="S156" line="ååå·çº¿" />
+    <station link="S134,S136,S326,S328" line_alt="Line 10,Line 6" name_alt="Cishousi" name="æ å¯¿å¯º" id="S135" line="å ­å·çº¿,åå·çº¿" />
+    <station link="S104,S235" line_alt="Line 5" name_alt="Huixinxijie Beikou" name="æ æ°è¥¿è¡åå£" id="S310" line="äºå·çº¿" />
+    <station link="S103,S105,S310,S312" line_alt="Line 10,Line 5" name_alt="Huixinxijie Nankou" name="æ æ°è¥¿è¡åå£" id="S104" line="äºå·çº¿,åå·çº¿" />
+    <station link="S118,S120" line_alt="Line 10" name_alt="Chengshousi" name="æå¯¿å¯º" id="S119" line="åå·çº¿" />
+    <station link="S48,S50" line_alt="Daxing Line,Line 4" name_alt="Xingong" name="æ°å®«" id="S49" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S36,S38" line_alt="Daxing Line,Line 4" name_alt="Xinjiekou" name="æ°è¡å£" id="S37" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S117,S172" line_alt="Line 14" name_alt="Fangzhuang" name="æ¹åº" id="S173" line="ååå·çº¿" />
+    <station link="S410,S412" line_alt="Yizhuang Line" name_alt="Jiugong" name="æ§å®«" id="S411" line="äº¦åºçº¿" />
+    <station link="S1312,S188,S190,S239" line_alt="Line 14,Line 15" name_alt="Wangjing" name="æäº¬" id="S189" line="åäºå·çº¿,ååå·çº¿" />
+    <station link="S189,S240" line_alt="Line 15" name_alt="Wangjing East" name="æäº¬ä¸" id="S239" line="åäºå·çº¿" />
+    <station link="S186,S188" line_alt="Line 14" name_alt="Wangjing South" name="æäº¬å" id="S187" line="ååå·çº¿" />
+    <station link="S105,S1311,S189,S236" line_alt="Line 13,Line 15" name_alt="Wangjing West" name="æäº¬è¥¿" id="S1312" line="åä¸å·çº¿,åäºå·çº¿" />
+    <station link="S181,S183" line_alt="Line 14" name_alt="Chaoyang Park" name="æé³å ¬å­" id="S182" line="ååå·çº¿" />
+    <station link="S262,S317,S338,S88" line_alt="Line 2,Line 6" name_alt="Chaoyangmen" name="æé³é¨" id="S261" line="äºå·çº¿,å ­å·çº¿" />
+    <station link="S79,S81" line_alt="Line 1" name_alt="Muxidi" name="æ¨æ¨¨å°" id="S80" line="ä¸å·çº¿" />
+    <station link="S19,S21,S377" line_alt="Changping Line,Line 8" name_alt="Zhuxinzhuang" name="æ±è¾åº" id="S20" line="å «å·çº¿,æå¹³çº¿" />
+    <station link="S190,S192" line_alt="Line 14" name_alt="Laiguangying" name="æ¥å¹¿è¥" id="S191" line="ååå·çº¿" />
+    <station link="S175,S177" line_alt="Line 14" name_alt="Songyu" name="æ¾æ¦" id="S176" line="ååå·çº¿" />
+    <station link="S383,S385" line_alt="Line 8" name_alt="Lincuiqiao" name="æèæ¡¥" id="S384" line="å «å·çº¿" />
+    <station link="BT08,BT10" line_alt="Batong Line" name_alt="Guoyuan" name="æå­" id="BT09" line="å «éçº¿" />
+    <station link="S52,S54" line_alt="Daxing Line,Line 4" name_alt="Zaoyuan" name="æ£å­" id="S53" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S182,S184" line_alt="Line 14" name_alt="Zaoying" name="æ£è¥" id="S183" line="ååå·çº¿" />
+    <station link="S1,S1314" line_alt="Line 13" name_alt="Liufang" name="æ³è³" id="S1315" line="åä¸å·çº¿" />
+    <station link="S321,S361" line_alt="Line 7" name_alt="Qiaowan" name="æ¡¥æ¹¾" id="S362" line="ä¸å·çº¿" />
+    <station link="BT10,BT12" line_alt="Batong Line" name_alt="Liyuan" name="æ¢¨å­" id="BT11" line="å «éçº¿" />
+    <station link="S233,S384" line_alt="Line 8" name_alt="South Gate of Forest Park" name="æ£®æå ¬å­åé¨" id="S385" line="å «å·çº¿" />
+    <station link="S419" line_alt="Yizhuang Line" name_alt="Ciqu" name="æ¬¡æ¸" id="S420" line="äº¦åºçº¿" />
+    <station link="S418,S420" line_alt="Yizhuang Line" name_alt="Ciqu South" name="æ¬¡æ¸ å" id="S419" line="äº¦åºçº¿" />
+    <station link="S371,S373" line_alt="Line 7" name_alt="Happy Valley Scenic Area" name="æ¬¢ä¹è°·æ¯åº" id="S372" line="ä¸å·çº¿" />
+    <station link="S88,S90" line_alt="Line 1" name_alt="Yong'anli" name="æ°¸å®é" id="S89" line="ä¸å·çº¿" />
+    <station link="S169,S171" line_alt="Line 14" name_alt="Yongdingmenwai" name="æ°¸å®é¨å¤" id="S170" line="ååå·çº¿" />
+    <station link="S382,S384" line_alt="Line 8" name_alt="Yongtaizhuang" name="æ°¸æ³°åº" id="S383" line="å «å·çº¿" />
+    <station link="S21,S23" line_alt="Changping Line" name_alt="Shahe" name="æ²æ²³" id="S22" line="æå¹³çº¿" />
+    <station link="S22,S24" line_alt="Changping Line" name_alt="Shahe University Park" name="æ²æ²³é«æå­" id="S23" line="æå¹³çº¿" />
+    <station link="S128,S130" line_alt="Line 10" name_alt="Niwa" name="æ³¥æ´¼" id="S129" line="åå·çº¿" />
+    <station link="S231" line_alt="Line 15" name_alt="Qinghuadongluxikou" name="æ¸ åä¸è·¯è¥¿å£" id="S230" line="åäºå·çº¿" />
+    <station link="S53,S55" line_alt="Daxing Line,Line 4" name_alt="Qingyuanlu" name="æ¸ æºè·¯" id="S54" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S355,S357" line_alt="Line 7" name_alt="Wanzi" name="æ¹¾å­" id="S356" line="ä¸å·çº¿" />
+    <station link="S115,S117" line_alt="Line 10" name_alt="Panjiayuan" name="æ½å®¶å­" id="S116" line="åå·çº¿" />
+    <station link="S353" line_alt="Line 6" name_alt="Lucheng" name="æ½å" id="S354" line="å ­å·çº¿" />
+    <station link="S135" line_alt="Line 6" name_alt="Haidian Wuluju" name="æµ·æ·äºè·¯å±" id="S326" line="å ­å·çº¿" />
+    <station link="S30,S32,S95,S97" line_alt="Daxing Line,Line 10,Line 4" name_alt="Haidianhuangzhuang" name="æµ·æ·é»åº" id="S31" line="åå·çº¿,åå·çº¿,å¤§å ´çº¿" />
+    <station link="S137,S94" line_alt="Line 10" name_alt="Huoqiying" name="ç«å¨è¥" id="S138" line="åå·çº¿" />
+    <station link="S317,S87" line_alt="Line 5" name_alt="Dengshikou" name="ç¯å¸å£" id="S318" line="äºå·çº¿" />
+    <station link="S39,S41" line_alt="Daxing Line,Line 4" name_alt="Lingjing Hutong" name="çµå¢è¡å" id="S40" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S374" line_alt="Line 7" name_alt="Jiaohuachang" name="ç¦åå" id="S375" line="ä¸å·çº¿" />
+    <station link="S101,S99" line_alt="Line 10" name_alt="Mudanyuan" name="ç¡ä¸¹å­" id="S100" line="åå·çº¿" />
+    <station link="S346,S348" line_alt="Line 6" name_alt="Wuzixueyuanlu" name="ç©èµå­¦é¢è·¯" id="S347" line="å ­å·çº¿" />
+    <station link="S74,S76" line_alt="Line 1" name_alt="Yuquanlu" name="çæ³è·¯" id="S75" line="ä¸å·çº¿" />
+    <station link="S85,S87" line_alt="Line 1" name_alt="Wangfujing" name="çåºäº" id="S86" line="ä¸å·çº¿" />
+    <station link="S360,S362" line_alt="Line 7" name_alt="Zhushikou" name="ç å¸å£" id="S361" line="ä¸å·çº¿" />
+    <station link="S18,S20" line_alt="Changping Line" name_alt="Life Science Park" name="çå½ç§å­¦å­" id="S19" line="æå¹³çº¿" />
+    <station link="S57,S59" line_alt="Daxing Line,Line 4" name_alt="Biomedical Base" name="çç©å»è¯åºå°" id="S58" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S329,S79" line_alt="Line 9" name_alt="Baiduizi" name="ç½å å­" id="S397" line="ä¹å·çº¿" />
+    <station link="S328,S330,S34,S397" line_alt="Line 6,Line 9" name_alt="Baishiqiao South" name="ç½ç³æ¡¥å" id="S329" line="ä¹å·çº¿,å ­å·çº¿" />
+    <station link="S368,S370" line_alt="Line 7" name_alt="Baiziwan" name="ç¾å­æ¹¾" id="S369" line="ä¸å·çº¿" />
+    <station link="S1302,S1304,S97,S99" line_alt="Line 10,Line 13" name_alt="Zhichunlu" name="ç¥æ¥è·¯" id="S98" line="åä¸å·çº¿,åå·çº¿" />
+    <station link="S31,S98" line_alt="Line 10" name_alt="Zhichunli" name="ç¥æ¥é" id="S97" line="åå·çº¿" />
+    <station link="S120,S122" line_alt="Line 10" name_alt="Shiliuzhuang" name="ç³æ¦´åº" id="S121" line="åå·çº¿" />
+    <station link="S246,S248" line_alt="Line 15" name_alt="Shimen" name="ç³é¨" id="S247" line="åäºå·çº¿" />
+    <station link="S258,S322,S362,S364" line_alt="Line 5,Line 7" name_alt="Ciqikou" name="ç£å¨å£" id="S321" line="ä¸å·çº¿,äºå·çº¿" />
+    <station link="S404,S406" line_alt="Line 9" name_alt="Keyilu" name="ç§æ¡è·¯" id="S405" line="ä¹å·çº¿" />
+    <station link="S266,S36" line_alt="Line 2" name_alt="Jishuitan" name="ç§¯æ°´æ½­" id="S267" line="äºå·çº¿" />
+    <station link="S61,S63" line_alt="Fangshan Line" name_alt="Daotian" name="ç¨»ç°" id="S62" line="æ¿å±±çº¿" />
+    <station link="S1309,S1311,S305,S307" line_alt="Line 13,Line 5" name_alt="Lishuiqiao" name="ç«æ°´æ¡¥" id="S306" line="äºå·çº¿,åä¸å·çº¿" />
+    <station link="S306,S308" line_alt="Line 5" name_alt="Lishuiqiao South" name="ç«æ°´æ¡¥å" id="S307" line="äºå·çº¿" />
+    <station link="BT05,BT07" line_alt="Batong Line" name_alt="Guanzhuang (Batong line)" name="ç®¡åº" id="BT06" line="å «éçº¿" />
+    <station link="S63,S65" line_alt="Fangshan Line" name_alt="Libafang" name="ç¯±ç¬æ¿" id="S64" line="æ¿å±±çº¿" />
+    <station link="S181,S91" line_alt="Line 14" name_alt="Hongmiao" name="çº¢åº" id="S180" line="ååå·çº¿" />
+    <station link="S125,S127" line_alt="Line 10" name_alt="Jijiamiao" name="çºªå®¶åº" id="S126" line="åå·çº¿" />
+    <station link="S417,S419" line_alt="Yizhuang Line" name_alt="Jinghailu" name="ç»æµ·è·¯" id="S418" line="äº¦åºçº¿" />
+    <station link="S120,S410" line_alt="Yizhuang Line" name_alt="Xiaocun" name="èæ" id="S409" line="äº¦åºçº¿" />
+    <station link="S1309,S382" line_alt="Line 8" name_alt="Yuxin" name="è²æ°" id="S381" line="å «å·çº¿" />
+    <station link="S20,S378" line_alt="Line 8" name_alt="Yuzhilu" name="è²ç¥è·¯" id="S377" line="å «å·çº¿" />
+    <station link="S68,S70" line_alt="Fangshan Line" name_alt="Liangxiangnanguan" name="è¯ä¹¡åå ³" id="S69" line="æ¿å±±çº¿" />
+    <station link="S66,S68" line_alt="Fangshan Line" name_alt="Liangxiang University Town" name="è¯ä¹¡å¤§å­¦å" id="S67" line="æ¿å±±çº¿" />
+    <station link="S65,S67" line_alt="Fangshan Line" name_alt="Liangxiang University Town North" name="è¯ä¹¡å¤§å­¦åå" id="S66" line="æ¿å±±çº¿" />
+    <station link="S67,S69" line_alt="Fangshan Line" name_alt="Liangxiang University Town West" name="è¯ä¹¡å¤§å­¦åè¥¿" id="S68" line="æ¿å±±çº¿" />
+    <station link="S104,S106,S1312,S1314" line_alt="Line 10,Line 13" name_alt="Shaoyaoju" name="èè¯å±" id="S105" line="åä¸å·çº¿,åå·çº¿" />
+    <station link="S135,S329" line_alt="Line 6" name_alt="Huayuanqiao" name="è±å­æ¡¥" id="S328" line="å ­å·çº¿" />
+    <station link="S243,S245" line_alt="Line 15" name_alt="Hualikan" name="è±æ¢¨å" id="S244" line="åäºå·çº¿" />
+    <station link="S31,S94" line_alt="Line 10" name_alt="Suzhoujie" name="èå·è¡" id="S95" line="åå·çº¿" />
+    <station link="S69" line_alt="Fangshan Line" name_alt="Suzhuang" name="èåº" id="S70" line="æ¿å±±çº¿" />
+    <station link="S72" line_alt="Line 1" name_alt="Pingguoyuan" name="è¹æå­" id="S71" line="ä¸å·çº¿" />
+    <station link="S345,S347" line_alt="Line 6" name_alt="Caofang" name="èæ¿" id="S346" line="å ­å·çº¿" />
+    <station link="S126,S47" line_alt="Line 10" name_alt="Caoqiao" name="èæ¡¥" id="S125" line="åå·çº¿" />
+    <station link="S414,S416" line_alt="Yizhuang Line" name_alt="Rongjingdongjie" name="è£äº¬ä¸è¡" id="S415" line="äº¦åºçº¿" />
+    <station link="S415,S417" line_alt="Yizhuang Line" name_alt="Rongchangdongjie" name="è£æä¸è¡" id="S416" line="äº¦åºçº¿" />
+    <station link="S131,S78" line_alt="Line 10" name_alt="Lianhuaqiao" name="è²è±æ¡¥" id="S132" line="åå·çº¿" />
+    <station link="S358,S360,S42,S44" line_alt="Daxing Line,Line 4,Line 7" name_alt="Caishikou" name="èå¸å£" id="S43" line="ä¸å·çº¿,åå·çº¿,å¤§å ´çº¿" />
+    <station link="S164,S166" line_alt="Line 14" name_alt="Caihuying" name="èæ·è¥" id="S165" line="ååå·çº¿" />
+    <station link="S171,S173,S322,S324" line_alt="Line 14,Line 5" name_alt="Puhuangyu" name="è²é»æ¦" id="S172" line="äºå·çº¿,ååå·çº¿" />
+    <station link="S361,S43" line_alt="Line 7" name_alt="Hufangqiao" name="èåæ¡¥" id="S360" line="ä¸å·çº¿" />
+    <station link="S342,S344" line_alt="Line 6" name_alt="Dalianpo" name="è¤¡è£¢å¡" id="S343" line="å ­å·çº¿" />
+    <station link="S1305,S1307,S19" line_alt="Changping Line,Line 13" name_alt="Xi'erqi" name="è¥¿äºæ" id="S18" line="åä¸å·çº¿,æå¹³çº¿" />
+    <station link="S40,S42,S82,S84" line_alt="Daxing Line,Line 1,Line 4" name_alt="Xidan" name="è¥¿å" id="S41" line="ä¸å·çº¿,åå·çº¿,å¤§å ´çº¿" />
+    <station link="S38,S40" line_alt="Daxing Line,Line 4" name_alt="Xisi" name="è¥¿å" id="S39" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S100,S98" line_alt="Line 10" name_alt="Xitucheng" name="è¥¿åå" id="S99" line="åå·çº¿" />
+    <station link="S381,S383" line_alt="Line 8" name_alt="Xixiaokou" name="è¥¿å°å£" id="S382" line="å «å·çº¿" />
+    <station link="S129,S131,S161,S163" line_alt="Line 10,Line 14" name_alt="Xiju" name="è¥¿å±" id="S130" line="åå·çº¿,ååå·çº¿" />
+    <station link="S1302,S251,S267,S35,S37" line_alt="Daxing Line,Line 13,Line 2,Line 4" name_alt="Xizhimen" name="è¥¿ç´é¨" id="S36" line="äºå·çº¿,åä¸å·çº¿,åå·çº¿,å¤§å ´çº¿" />
+    <station link="S49,S51" line_alt="Daxing Line,Line 4" name_alt="Xihongmen" name="è¥¿çº¢é¨" id="S50" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S26,S28" line_alt="Daxing Line,Line 4" name_alt="Xiyuan" name="è¥¿è" id="S27" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S135,S78" line_alt="Line 10" name_alt="Xidiaoyutai" name="è¥¿éé±¼å°" id="S134" line="åå·çº¿" />
+    <station link="S165,S167" line_alt="Line 14" name_alt="Xitieying" name="è¥¿éè¥" id="S166" line="ååå·çº¿" />
+    <station link="S122,S47" line_alt="Line 10" name_alt="Jiaomen East" name="è§é¨ä¸" id="S123" line="åå·çº¿" />
+    <station link="S123,S125,S46,S48" line_alt="Daxing Line,Line 10,Line 4" name_alt="Jiaomen West" name="è§é¨è¥¿" id="S47" line="åå·çº¿,åå·çº¿,å¤§å ´çº¿" />
+    <station link="S252,S331,S36,S38" line_alt="Line 2,Line 6" name_alt="Chegongzhuang" name="è½¦å ¬åº" id="S251" line="äºå·çº¿,å ­å·çº¿" />
+    <station link="S251,S330" line_alt="Line 6" name_alt="Chegongzhuang West" name="è½¦å ¬åºè¥¿" id="S331" line="å ­å·çº¿" />
+    <station link="S135,S137" line_alt="Line 10" name_alt="Chedaogou" name="è½¦éæ²" id="S136" line="åå·çº¿" />
+    <station link="S356,S358" line_alt="Line 7" name_alt="Daguanying" name="è¾¾å®è¥" id="S357" line="ä¸å·çº¿" />
+    <station link="S347,S349" line_alt="Line 6" name_alt="Tongzhou Beiguan" name="éå·åå ³" id="S348" line="å ­å·çº¿" />
+    <station link="BT07,BT09" line_alt="Batong Line" name_alt="Tongzhou Beiyuan" name="éå·åè" id="BT08" line="å «éçº¿" />
+    <station link="S348,S350" line_alt="Line 6" name_alt="Tongyunmen" name="éè¿é¨" id="S349" line="å ­å·çº¿" />
+    <station link="S351,S353" line_alt="Line 6" name_alt="Haojiafu" name="éå®¶åº" id="S352" line="å ­å·çº¿" />
+    <station link="S406,S61" line_alt="Fangshan Line,Line 9" name_alt="Guogongzhuang" name="é­å ¬åº" id="S60" line="ä¹å·çº¿,æ¿å±±çº¿" />
+    <station link="S158,S160" line_alt="Line 14" name_alt="Guozhuangzi" name="é­åºå­" id="S159" line="ååå·çº¿" />
+    <station link="S111,S90" line_alt="Line 10" name_alt="Jintaixizhao" name="éå°å¤ç §" id="S112" line="åå·çº¿" />
+    <station link="S111,S180,S182,S341" line_alt="Line 14,Line 6" name_alt="Jintailu" name="éå°è·¯" id="S181" line="å ­å·çº¿,ååå·çº¿" />
+    <station link="S136,S138" line_alt="Line 10" name_alt="Changchunqiao" name="é¿æ¥æ¡¥" id="S137" line="åå·çº¿" />
+    <station link="S42,S82" line_alt="Line 2" name_alt="Changchunjie" name="é¿æ¤¿è¡" id="S254" line="äºå·çº¿" />
+    <station link="S62,S64" line_alt="Fangshan Line" name_alt="Changyang" name="é¿é³" id="S63" line="æ¿å±±çº¿" />
+    <station link="S251,S82" line_alt="Line 2" name_alt="Fuchengmen" name="éæé¨" id="S252" line="äºå·çº¿" />
+    <station link="S187,S189" line_alt="Line 14" name_alt="Futong" name="éé" id="S188" line="ååå·çº¿" />
+    <station link="S43,S45" line_alt="Daxing Line,Line 4" name_alt="Taoranting" name="é¶ç¶äº­" id="S44" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S170,S45" line_alt="Line 14" name_alt="Taoranqiao" name="é¶ç¶æ¡¥" id="S169" line="ååå·çº¿" />
+    <station link="S1,S265,S313,S315" line_alt="Line 2,Line 5" name_alt="Yonghegong Lama Temple" name="éåå®«" id="S264" line="äºå·çº¿,äºå·çº¿" />
+    <station link="S1308,S306,S379,S381" line_alt="Line 13,Line 8" name_alt="Huoying" name="éè¥" id="S1309" line="å «å·çº¿,åä¸å·çº¿" />
+    <station link="S341,S343" line_alt="Line 6" name_alt="Qingnianlu" name="éå¹´è·¯" id="S342" line="å ­å·çº¿" />
+    <station link="S247,S249" line_alt="Line 15" name_alt="Shunyi" name="é¡ºä¹" id="S248" line="åäºå·çº¿" />
+    <station link="S126,S128" line_alt="Line 10" name_alt="Shoujingmao" name="é¦ç»è´¸" id="S127" line="åå·çº¿" />
+    <station link="S45,S47" line_alt="Daxing Line,Line 4" name_alt="Majiapu" name="é©¬å®¶å ¡" id="S46" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S240,S242" line_alt="Line 15" name_alt="Maquanying" name="é©¬æ³è¥" id="S241" line="åäºå·çº¿" />
+    <station link="S185,S187" line_alt="Line 14" name_alt="Gaojiayuan" name="é«å®¶å­" id="S186" line="ååå·çº¿" />
+    <station link="BT02,BT04" line_alt="Batong Line" name_alt="Gaobeidian" name="é«ç¢åº" id="BT03" line="å «éçº¿" />
+    <station link="S50,S52" line_alt="Daxing Line,Line 4" name_alt="Gaomidian North" name="é«ç±³åºå" id="S51" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S51,S53" line_alt="Daxing Line,Line 4" name_alt="Gaomidian South" name="é«ç±³åºå" id="S52" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S32,S34" line_alt="Daxing Line,Line 4" name_alt="Weigongcun" name="é­å ¬æ" id="S33" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S55,S57" line_alt="Daxing Line,Line 4" name_alt="Huangcun Railway Station" name="é»æç«è½¦ç«" id="S56" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S54,S56" line_alt="Daxing Line,Line 4" name_alt="Huangcunxidajie" name="é»æè¥¿å¤§è¡" id="S55" line="åå·çº¿,å¤§å ´çº¿" />
+    <station link="S343,S345" line_alt="Line 6" name_alt="Huangqu" name="é»æ¸" id="S344" line="å ­å·çº¿" />
+    <station link="S265,S267,S390,S392" line_alt="Line 2,Line 8" name_alt="Guloudajie" name="é¼æ¥¼å¤§è¡" id="S266" line="äºå·çº¿,å «å·çº¿" />
+    <station link="S1308,S18" line_alt="Line 13" name_alt="Longze" name="é¾æ³½" id="S1307" line="åä¸å·çº¿" />
+  </stations>
+</tube>

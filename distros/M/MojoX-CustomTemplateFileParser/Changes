@@ -1,0 +1,56 @@
+Revision history for MojoX-CustomTemplateFileParser
+
+0.1002 2015-11-26T16:48:07Z UTC
+ - No changes.
+
+0.1001 2015-11-26T16:44:23Z UTC
+ - Deprecated.
+
+0.1000 2014-09-10T21:42:50Z CEST
+ - Bugfix: Lines meant to be parsed between test and expected could end up
+   in expected
+ - Bugfix: Malformed POD output near =begin/end html
+
+0.09 2014-09-10T16:50:23Z CEST
+ - Created a plugin architecture which allows for easy customization of
+   output
+ - Moved flatten() into ::Plugin::To::Test
+ - Moved exemplify() into ::Plugin::To::Pod
+ - Moved htmlify() into ::Plugin::To::Html
+ - Removed parse(). Now parsing takes place at object creation
+ - Changed to Moose, thanks to MooseX::Object::Pluggable
+
+0.08 2014-09-09T23:28:44Z CEST
+ - Add support for choosing to exemplify a test only if it is marked as an
+   example in the source file
+ - Fixed unitialized warning
+ - Added htmlify() which turns the source file into html
+
+0.07 2014-09-08T22:10:33Z CEST
+ - Ensure adequate line breaks between templates and  expected (and other
+   line types) in exemplify() output
+
+0.06 2014-09-08T20:38:25Z CEST
+ - Added test_index attribute for looking up tests by number
+ - Added test_count() for looking up number of tests
+ - Added exemplify() which translates a test number into a pod-able string
+
+0.05 2014-09-08T12:45:36Z CEST
+ - Fixed a bug where the last variable in a looped test sometimes were
+   checked agains all expected results
+ - Build fails on Travis for Perls < 5.14
+
+0.04 2014-09-07T21:16:41Z CEST
+ - Fixed a bug where the last test in a file sometimes were generated twice
+
+0.03 2014-09-07T20:57:54Z CEST
+ - Added support for ==test loop(var var2)== syntax to easily create
+   similar tests where only one value is different
+
+0.02 2014-09-07T16:42:25Z CEST
+ - The test is skipped if the template part of a test is empty
+ - Skip test by using ==no test==
+
+0.01 2014-09-07T14:22:39Z CEST
+ - Initial release
+

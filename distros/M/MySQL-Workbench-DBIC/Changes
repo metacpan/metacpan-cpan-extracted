@@ -1,0 +1,40 @@
+Change history for MySQL::Workbench::DBIC
+=========================================
+
+0.08 2014-12-23
+
+  [IMPROVEMENTS]
+  * add sqlt_deploy_hook when indexes are defined
+
+0.07 2014-11-20
+
+    * add output path to @INC
+    * add more tests
+
+0.06 2014-11-20
+
+    * fix CamelCase handling in relationships
+
+0.05 2014-11-20
+
+    * create classes with CamelCase names (when uppercase => 1 is set)
+
+0.04 2013-10-29
+
+    * if no version is defined, but a version_add is given, the first version is the value of version_add
+
+0.03 2013-10-25
+
+    add column_info:
+    * is_numeric
+    * is_foreign_key
+    * retrieve_on_insert (only for primary key)
+
+0.02 2013-10-19
+
+    better error message
+    fix handling of "schema_name"
+
+0.01 2013-09-27
+
+    initial release

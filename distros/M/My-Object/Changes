@@ -1,0 +1,9 @@
+Revision history for Perl module My::Object
+
+0.02 2014-08-27
+
+  - Fix failures on older versions of Perl
+
+0.01 2014-08-25
+
+  - Initial release

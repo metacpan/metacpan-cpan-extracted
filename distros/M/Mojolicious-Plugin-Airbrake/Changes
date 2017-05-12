@@ -1,0 +1,6 @@
+Revision history for Perl extension Mojolicious-Plugin-Airbrake.
+
+0.01  Fri Mar  7 15:49:41 2014
+	- original version; created by h2xs 1.23 with options
+		-AX Mojolicious-Plugin-Airbrake -b 5.10.1
+

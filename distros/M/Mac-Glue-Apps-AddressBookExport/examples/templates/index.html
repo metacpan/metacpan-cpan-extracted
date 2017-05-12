@@ -1,0 +1,44 @@
+<html>
+<head>
+	<title>List</title>
+	<style><!--
+		body,td,a,p,.h{font-family:arial,sans-serif;}
+		h1{color: #ff7f00; font-size: 20px;}
+		.p{font-size: 14px;}
+		.t{font-size: 10px;}
+		a    { color: #646464; font-style: normal; font-weight: 400; text-decoration: none }
+		a:hover  { color: #ff7f00; font-style: normal; font-weight: 400; text-decoration: none }
+		//-->
+	</style>
+</head>
+<body>
+	<h1>Phone List</h1>
+	[% USE table(people.sort('fullname'), rows=5) %]
+	<table cellpadding="2" cellspacing="0" border="0" width="100%">
+	[% FOREACH col = table.cols %]
+<tr>
+	[% FOREACH person = col %]
+	<td valign="top">[% f = first_letter(person) %]
+		[% IF f %]
+		<span class="p">
+			<a href="people/[% f %].html">[% person.fullname %]</a><br />
+		</span>	
+		[% tels = person.get('tel') %]
+	<span class="t">
+		[% FOREACH tel = tels %]
+		[% FOREACH t = tel.types %]
+		[% IF t != 'pref' %][% t %][% END %]
+		[% tel.value %]<br />
+		[% END %]
+	[% END %]
+	</span>
+	[% ELSE %]
+	&nbsp;
+	[% END %]
+</td>
+	[% END %]
+</tr>
+[% END %]
+</table>
+</body>
+</html>

@@ -1,0 +1,6 @@
+Revision history for Perl extension Mac::MotionSensor.
+
+0.01  Thu Jun 17 13:46:33 2010
+	- original version; created by h2xs 1.23 with options
+		-c -n Mac::MotionSensor motionsimple
+

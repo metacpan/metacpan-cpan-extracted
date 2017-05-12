@@ -1,0 +1,51 @@
+Monitoring::Icinga
+==================
+
+This module provides an API to Icinga using the Icinga Web REST API.
+
+For now, the functionality of this module is similar to
+Nagios::Status::HostStatus and Nagios::Status::ServiceStatus, except that it
+doesn't work like them.
+
+For now it is only possible to get objects from Icinga. Later it will also be
+possible to change things (i.e. reschedule checks) on the server.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+You will need the following modules and their dependencies from CPAN:
+
+    Carp
+    HTTP::Request::Common
+    LWP::UserAgent
+    JSON::XS
+
+If you use an SSL connection to the Icinga API, you will also need
+
+    LWP::Protocol::https
+
+
+EXAMPLES
+
+After installation, you can find examples in the pod documentation of the
+module. Call it with:
+
+    perldoc Monitoring::Icinga
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by Robin Schroeder
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

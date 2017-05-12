@@ -1,0 +1,28 @@
+0.06
+ - Replace SvIV/SvUV/SvNV with SvIVX/SvUVX/SvNVX where appropriate.
+ - Following typedef, replace "__complex128" with "complex128".
+ - Fix alignment issue with nvtype=double -DDEBUGGING perls
+
+0.05
+ - Add additional test to t/overload_string.t
+ - Fix typedef alignment for __float128 and __complex128 (mingw only)
+ - Change default output to 36 decimal digits.
+
+0.04
+ - Modify try.in and Q.xs to allow for runtime v4 bugfixes (mingw64 compiler)
+ - Modify t/conj_proj.t to allow for mingw64 gcc-4.9.2 bug that casts a long double
+   inf to a __float128 nan.
+ - Have the Makefile.PL perform a test that works around the brokenness of
+   Bingos' NetBSD smoker(s).
+ - Add nnumflag(), set_nnum() and clear_nnum() functions. Also start using the perl
+   API function looks_like_number() to detect non-numeric strings.
+
+0.03
+ - Fix test bugs in t/abs_arg.t and t/new_F128.t
+
+0.02
+ - Try to detect the presence of the gcc bug in ctanq() and ctanhq(), and implement
+   the workaround if required.
+
+0.01
+ - First release to CPAN

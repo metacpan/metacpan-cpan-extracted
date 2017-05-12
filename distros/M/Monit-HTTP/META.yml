@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:                Monit-HTTP
+version:             0.01
+abstract:            an OOP interface to Monit.
+license:             ~
+author:              
+    - Angelo "pallotron" Failla <pallotron@freaknet.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Error:                         0
+    HTTP::Request:                 0
+    LWP::UserAgent:                0
+    Test::MockModule:              0
+    Test::More:                    0
+    Test::Pod::Coverage:           1.08
+    XML::Bare:                     0
+    YAML:                          0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,28 @@
+v0.04 2006.05.06
+- Move the list of distributions from a simple array into a YAML structure
+  kept inline for now.
+- Add the universe repositories of Ubuntu.
+- Add report on modules available in Debian but missing from Ubuntu
+- Add report on modules available in FreeBSD but missing from Debian
+
+v0.03 2007.05.06
+- Split Debian into Unstable, Testing and Stable
+- Add Ubuntu version
+- Add ActivePerl 8xx on various platforms
+- Reduce hard coding in the templates to one place and have a list of
+  distributions in an array in the code
+- Forget to add the changes before releasing the module.
+
+v0.02 2007.05.04
+
+- Add report on total number of modules in each distro
+- Replace the name Mandrake by Mandriva
+- Add list of all the modules for each distribution
+- Add dependency on Parse::CPAN::Packages and App::Cache.
+  - Could I just write  use Leon; instead?
+  - Oh, yes it is spelled use Acme;
+- Add report based on CPANid
+
+v0.01 2007.04.28
+- First version released
+

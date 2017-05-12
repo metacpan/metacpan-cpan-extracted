@@ -1,0 +1,264 @@
+=head1 NAME
+
+Maypole::Manual::Beer - The Beer Database, Twice
+
+=head1 DESCRIPTION
+
+We briefly introduced the "beer database" example in the
+L<Introduction to Maypole|Maypole::Manual::About> chapter, where we
+presented its driver class, C<BeerDB.pm>, as a fait accompli. Where
+did all that code come from, and what does it actually mean?
+
+=head2 The big beer problem
+
+I have a seriously bad habit. This is not the beer problem; this is a
+programming problem. The bad habit is that when I approach a problem I
+want to solve, I get sidetracked deeper and deeper trying to solve more
+and more generic problems, and then, satisfied with solving the generic
+problem, I never get around to solving the specific problem. I always
+write libraries for people writing libraries, and never write
+applications.
+
+The thing with really good beer is that it commands you to drink more of
+it, and then by the morning you can't remember whether it was any good
+or not. After buying several bottles of some random central African
+lager on a dim recollection that it was really good and having it turn
+out to be abysmal, this really became a problem. If only I could have a
+database that I updated every time I buy a new beer, I'd be able to tell
+whether or not I should buy that Lithuanian porter again or whether it
+would be quicker just to flush my money down the toilet and cut out the
+middle-man.
+
+The only problem with databases on Unix is that there isn't really a
+nice way to get data into them. There isn't really a Microsoft Access
+equivalent which can put a simple forms-based front-end onto an
+arbitrary database, and if there is, I either didn't like it or couldn't
+find it, and after a few brews, you really don't want to be trying to type
+in your tasting notes in raw SQL.
+
+So you see a generic problem arising out of a specific problem here. I
+didn't want to solve the specific problem of the beer database, because
+I'd already had another idea for a database that needed a front-end. So
+for two years, I sat on this great idea of having a database of tasting
+notes for beer. I even bought that damned African beer again. Enough was
+enough. I wrote Maypole.
+
+=head2 The easy way
+
+The first Maypole application was the beer database. We've already met
+it; it looks like this.
+
+    package BeerDB;
+    use Maypole::Application;
+    BeerDB->setup("dbi:SQLite:t/beerdb.db");
+    BeerDB->config->uri_base("http://localhost/beerdb");
+    BeerDB->config->template_root("/path/to/templates");
+    BeerDB->config->rows_per_page(10);
+    BeerDB->config->display_tables([qw[beer brewery pub style]]);
+    BeerDB::Brewery->untaint_columns( printable => [qw/name notes url/] );
+    BeerDB::Style->untaint_columns( printable => [qw/name notes/] );
+    BeerDB::Beer->untaint_columns(
+        printable => [qw/abv name price notes/],
+        integer => [qw/style brewery score/],
+        date => [ qw/date/],
+    );
+
+    use Class::DBI::Loader::Relationship;
+    BeerDB->config->{loader}->relationship($_) for (
+        "a brewery produces beers",
+        "a style defines beers",
+        "a pub has beers on handpumps");
+    1;
+
+Now, we can split this into four sections. Let's look at them one
+at a time. 
+
+=head3 Driver setup
+
+Here's the first section:
+
+    package BeerDB;
+    use Maypole::Application;
+    BeerDB->setup("dbi:SQLite:t/beerdb.db");
+
+This is actually all you need for a functional database front-end. Everything
+else is configuration details. This says three things: we're an application
+called C<BeerDB>. This package is called the B<driver class>, because
+it's a relatively small class which defines how the whole application is
+going to run. 
+
+The second line says that our front-end is going to be
+L<Maypole::Application>, it automatically detects if you're using
+mod_perl or CGI and loads everything necessary for you.
+
+Thirdly we're going to need to set up our database with the given DBI
+connection string. Now the core of Maypole itself doesn't know about
+DBI; as we explained in the L<Model|Maypole::Manual::Model> chapter,
+this argument is passed to our
+model class wholesale. As we haven't said anything about a model
+class, we get the default one, L<Maypole::Model::CDBI>, which takes a
+DBI connect string. So this one line declares that we're using a C<CDBI>
+model class and it sets up the database for us. In the same way, we
+don't say that we want a particular view class, so we get the default
+L<Maypole::View::TT>.
+
+At this point, everything is in place; we have our driver class, it uses
+a front-end, we have a model class and a view class, and we have a data
+source.
+
+=head3 Application configuration
+
+The next of our four sections is the configuration for the application itself.
+
+    BeerDB->config->uri_base("http://localhost/beerdb");
+    BeerDB->config->template_root("/path/to/templates");
+    BeerDB->config->rows_per_page(10);
+    BeerDB->config->display_tables([qw[beer brewery pub style]]);
+
+Maypole provides a method called C<config> which returns an object that
+holds the application's whole configuration. We can use this to set some
+parameters; the C<uri_base> is used as the canonical URL of the base
+of this application, and Maypole uses it to construct links.
+
+We also tell Maypole where we keep our template files, using
+C<template_root>.
+
+By defining C<rows_per_page>, we say that any listings we do with the
+C<list> and C<search> templates should be arranged in sets of pages, with
+a maximum of 10 items on each page. If we didn't declare that, C<list>
+would try to put all the objects on one page, which could well be bad.
+
+Finally, we declare which tables we want our Maypole front-end to
+reference. If you remember from the schema, there's a table called
+C<handpump> which acts as a linking table in a many-to-many relationship
+between the C<pub> and C<beer> tables. As it's only a linking table, we
+don't want people poking with it directly, so we exclude it from the
+list of C<display_tables>.
+
+=head3 Editability
+
+The next section is the following set of lines:
+
+    BeerDB::Brewery->untaint_columns( printable => [qw/name notes url/] );
+    BeerDB::Style->untaint_columns( printable => [qw/name notes/] );
+    BeerDB::Beer->untaint_columns(
+        printable => [qw/abv name price notes/],
+        integer => [qw/style brewery score/],
+        date => [ qw/date/],
+    );
+
+As explained in the
+L<Standard Templates|Maypole::Manual::StandardTemplates> chapter,
+this is an set of instructions to
+L<Class::DBI::FromCGI> regarding how the given columns should be edited.
+If we didn't have this section, we'd be able to view and delete records,
+but adding and editing them wouldn't work. It took me ages to work that
+one out.
+
+=head3 Relationships
+
+Finally, we want to explain to Maypole how the various tables relate to
+each other. This is done so that, for instance, when displaying a beer,
+the brewery does not appear as an integer like "2" but as the name of
+the brewery from the C<brewery> table with an ID of 2.
+
+The usual L<Class::DBI> way to do this involves the C<has_a> and
+C<has_many> methods, but I can never remember how to use them, so I came
+up with the L<Class::DBI::Loader::Relationship> module; this was another
+yak that needed shaving on the way to the beer database:
+
+    use Class::DBI::Loader::Relationship;
+    BeerDB->config->{loader}->relationship($_) for (
+        "a brewery produces beers",
+        "a style defines beers",
+        "a pub has beers on handpumps");
+    1;
+
+C<CDBIL::Relationship> acts on a L<Class::DBI::Loader> object and
+defines relationships between tables in a fairly free-form style.
+The equivalent in ordinary C<Class::DBI> would be:
+
+       BeerDB::Brewery->has_many(beers => "BeerDB::Beer");
+       BeerDB::Beer->has_a(brewery => "BeerDB::Brewery");
+       BeerDB::Style->has_many(beers => "BeerDB::Beer");
+       BeerDB::Beer->has_a(style => "BeerDB::Style");
+
+       BeerDB::Handpump->has_a(beer => "BeerDB::Beer");
+       BeerDB::Handpump->has_a(pub => "BeerDB::Pub");
+       BeerDB::Pub->has_many(beers => [ 'BeerDB::Handpump' => 'beer' ]);
+       BeerDB::Beer->has_many(pubs => [ 'BeerDB::Handpump' => 'pub' ]);
+
+Maypole's default templates will use this information to display, for
+instance, a list of a brewery's beers on the brewery view page.
+
+Note the quoting in 'BeerDB::Handpump' => 'beer', if you forget to quote the
+left side when using strict you will get compilation errors.
+
+This is the complete beer database application; Maypole's default templates
+and the actions in the view class do the rest. But what if we want to do a
+little more. How would we begin to extend this application?
+
+=head2 The hard way
+
+Maypole was written because I don't like writing more Perl code than is
+necessary. I also don't like writing HTML. In fact, I don't really get
+on this whole computer thing, to be honest. But we'll start by ways that
+we can customize the beer application simply by adding methods or
+changing properties of the Perl driver code.
+
+The first thing we ought to look into is the names of the columns; most
+of them are fine, but that "Abv" column stands out. I'd rather that was
+"A.B.V.". Maypole uses the C<column_names> method to map between the
+names of the columns in the database to the names it displays in the
+default templates. This is provided by L<Maypole::Model::Base>, and
+normally, it does a pretty good job; it turns C<model_number> into
+"Model Number", for instance, but there was no way it could guess that
+C<abv> was an abbreviation. Since it returns a hash, the easiest way
+to correct it is to construct a hash consisting of the bits it got
+right, and then override the bits it got wrong:
+
+    package BeerDB::Beer;
+    sub column_names { 
+        (shift->SUPER::column_names(), abv => "A.B.V.")
+    }
+
+There's something to be aware of here: where are you going to type that
+code? You can just put it in F<BeerDB.pm>. Perl will be happy with that,
+though you might want to put an extra pair of braces around it to limit
+the scope of that package declaration. Alternatively, you might think
+it's neater to put it in a file called F<BeerDB/Beer.pm>, which is the
+natural home for the package. This would certainly be a good idea if you
+have a lot of other code to add to the C<BeerDB::Beer> package. But if
+you do that, you will have to tell Perl to load the F<BeerDB/Beer.pm>
+file by adding a line to F<BeerDB.pm>:
+
+    BeerDB::Beer->require;
+
+For another example of customization, the order of columns is a bit
+wonky. We can fix this by
+overriding the C<display_columns> method; this is also a good way to
+hide away any columns we don't want to have displayed, in the same way
+as declaring the C<display_tables> configuration parameter let us hide
+away tables we weren't using:
+
+    sub display_columns { 
+        ("name", "brewery", "style", "price", "score", "abv", "notes")
+    }
+
+Hey, have you noticed that we haven't done anything with the
+beers/handpumps/pubs thing yet? Good, I was hoping that you hadn't.
+Anyway, this is because Maypole can't tell easily that a C<BeerDB::Beer>
+object can call C<pubs> to get a list of pubs. Not yet, at least; we're
+working on it. In the interim, we can explicitly tell Maypole which
+accessors are related to the C<BeerDB::Beer> class like so:
+
+    sub related { "pubs" }
+
+Now when we view a beer, we'll have a list of the pubs that it's on at.
+
+=head2 Links
+
+L<Contents|Maypole::Manual>,
+Next L<The Request Cookbook|Maypole::Manual::Request>,
+Previous L<Maypole's Request Workflow|Maypole::Manual::Workflow>
+

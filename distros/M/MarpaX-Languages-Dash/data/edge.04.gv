@@ -1,0 +1,21 @@
+digraph Perl
+{
+graph [ rankdir="TB" ]
+node [ shape="oval" ]
+edge [ color="grey" ]
+"node.1" [ label="Node  1" ]
+"node.2" [ color="blue" ]
+"node.3" [ label="Node  3" ]
+"node.4" [ color="blue" ]
+"node.5" [ label="Node  5" ]
+"node.6" [ color="blue" ]
+"node.7" [ label=<Node  7> ]
+"node.8" [ color="blue" ]
+"node.9" [ label="Node  9" ]
+"node.10" [ color="blue" ]
+"node.1" -> "node.2" [ arrowhead="box" dir="forward" label="A box" ]
+"node.3" -> "node.4" [ arrowhead="crow" dir="forward" label="A crow" ]
+"node.5" -> "node.6" [ arrowhead="diamond" dir="forward" label="A diamond" ]
+"node.7" -> "node.8" [ arrowhead="veevee" dir="forward" label="A veevee" ]
+"node.9" -> "node.10" [ arrowhead="teetee" dir="forward" label="A teetee" ]
+}

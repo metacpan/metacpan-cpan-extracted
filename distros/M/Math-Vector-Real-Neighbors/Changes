@@ -1,0 +1,9 @@
+Revision history for Perl extension Math::Vector::Real::Neighbors.
+
+0.02  Sep 11, 2014
+        - point to Math::Vector::Real::kdTree
+
+0.01  Mon Jun 13 10:09:38 2011
+	- original version; created by h2xs 1.23 with options
+		-AXn Math::Vector::Real::Neighbors
+

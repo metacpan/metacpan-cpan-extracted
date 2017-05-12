@@ -1,0 +1,98 @@
+* v1.09, Wednesday, June 1, 2005
+
+   Fixed old bug where true-but-false values are not returned. (Peter N Lewis)
+
+
+* v1.08, Sunday, November 9, 2003
+
+   Oops, forgot Mac::AppleEvents::Simple in PREREQ.
+
+
+* v1.07, Sunday, November 9, 2003
+
+   Fix for changed file format in Panther's Script Editor.
+
+
+* v1.06, Wednesday, June 25, 2003
+
+   Fix PREREQ.
+
+
+* v1.05, Tuesday, June 24, 2003
+
+   Added call().
+
+
+* v1.04, Monday, April 21, 2003
+
+   Add support for saving/loading compiled AppleScripts as data in data fork
+   instead of resource in resource fork on Mac OS X, for compatability with
+   the Mac OS X Script Editor.
+
+* v1.03, Thursday, March 12, 2003
+
+   Tests broken mildly on most systems; corrected.
+
+
+* v1.02, Thursday, March 12, 2003
+
+   Added Mac OS X support (see Mac::Carbon).
+
+   Fixed bug with scripts not being saved in specified resource ID.
+
+   Don't save component if request for nonexistent one fails.
+
+   Some cleanup.
+
+   Changed load_osa_script() arguments.  Second argument no longer is in
+   use. Whether it is a file is determined by virtue of it not being a
+   Handle object.  Second argument is now resource ID, unless it is 1, in
+   which case we assume you are calling with the old parameters.  If you
+   really want to save with resource ID of 1, then add a third parameter of
+   "1".  Sorry.
+
+
+* v1.01, Wednesday, December 4, 2002
+
+   Save scripts as script contexts.  (Bart Lateur)
+
+
+* v1.00, Tuesday, January 22, 2002
+
+   Changed TEXT to SOURCE in internal hash storing text source of script.
+
+   Added C<source> method (finish adding docs).
+
+   Made calls for generic scripting component to %ScriptComponents
+   make new call to OpenComponent each time.
+
+   Bump version info.
+
+
+* v0.51, Saturday, March 20, 1999
+
+   Fixed silly bug in return from execute, where multiline
+   return values would not return (added /s so . would match \n)
+   (John Moreno <phenix@interpath.com>).
+
+
+* v0.50, Friday, March 12, 1999
+
+   Changed around the argument order for osa_script() and
+   compile_osa_script().
+
+   Added load_osa_script() function.
+
+   Added save() method.
+
+   Added lots of tests.
+
+
+* v0.10, Tuesday, March 9, 1999
+
+   Added lots of stuff to get compiled script data.
+
+
+* v0.02, May 19, 1998
+
+   Here goes ...

@@ -1,0 +1,10 @@
+Revision history for Mail-ThreadKiller
+
+1.0.1 Mon, 21 Sep 2015 10:53:13 -0400 (Dianne Skoll)
+
+  * Set proper TEST_REQUIRES prerequisites.
+
+1.0   Thu, 17 Sep 2015 13:53:03 -0400 (Dianne Skoll)
+
+  * Initial release.
+

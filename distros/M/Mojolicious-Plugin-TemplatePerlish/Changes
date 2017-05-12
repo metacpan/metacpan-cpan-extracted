@@ -1,0 +1,9 @@
+0.002  2016-05-19 22:51:49 CEST
+   - release after 113 PASSes on CPAN Testers (thanks!).
+     Too bad no Windows though.
+
+0.001001  2016-05-18 07:53:03 CEST
+   - Path::Tiny is a dependency for testing
+
+0.001  2016-05-17 09:29:03 CEST
+   - initial release

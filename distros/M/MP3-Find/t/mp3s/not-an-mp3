@@ -1,0 +1,1 @@
+# included to make sure MP3::Find is only looking at *.mp3 files

@@ -1,0 +1,391 @@
+v0.55 ( Thu Dec  8 11:12:15 CET 2005)
+
+    + new prefix option for store_attachment()
+      (patch by Christian Winter <thepoet AT a-za-z0-9 DOT de>)
+    + fixed a problem with skipping tests
+      (spotted by Sunit M. Das <sdas AT eeinternet DOT com>
+
+v0.54 (Tue Jul 12 09:40:20 CEST 2005)
+
+    + wrong assumptions about quoted-printable encoded
+      header-fields were made which lead to attachment 
+      filenames often not decoded properly
+      (Alper Sari <alper AT sabanciuniv DOT edu>)
+
+v0.53 (Thu Mar 31 09:27:59 CEST 2005)
+
+    + Adds tests for pod-correctness and -coverage
+
+v0.52 (Thu Feb 10 08:21:54 CET 2005)
+
+    + now decodes both base64 and quoted-printable data in the body
+
+v0.51 (Tue Jan  4 17:36:26 CET 2005)
+
+    + Mail::MboxParser::new() didn't check the return value
+      of Mail::Mbox::MessageParser's constructor which could lead
+      to fatal errors at runtime. When a M::M::MessageParser object
+      could not be created, it now silently falls back to the old
+      parser.
+      (Nigel Horne <njh AT bandsman DOT co DOT uk and
+       David Coppit <david AT coppit DOT org>)
+
+v0.50 (Sun Dec 12 09:38:47 CET 2004)
+
+    + At some point in the past this module must have
+      stopped working on 5.5.x perls, fixed now
+
+v0.49 (Wed Aug 11 09:43:22 CEST 2004)
+
+    + Dealing with uuencoded MIME parts added + 
+      a slight internal clean-up
+      (patch by Ed Huott <ed AT supergeek DOT com>)
+
+v0.48 (Wed May 19 07:36:34 CEST 2004)
+
+    + The previous patch was only a partial solution. If an
+      attachment wasn't saved, most of the time it meant that
+      it wasn't even recognized as such. store_attachment() and
+      store_all_attachments() should now find more attachments
+      (not more than there are, hopefully;-)
+    + Mark Mykkanen <shamu112 AT yahoo DOT com> made me aware that
+      the module wouldn't deal correctly with non-seekable filehandles.
+      Fixed now
+    + Localized *_ properly
+    + Replaced 0 with SEEK_SET where it wasn't already used
+
+v0.47 (Mon May  3 08:38:45 CEST 2004)
+
+    + store_attachment/store_all_attachment have new
+      parameter 'encoding' to allow filename encoding
+      on platforms that require this step (Mac OS X apparently)
+
+v0.46 (Fri Apr  2 09:51:34 CEST 2004)
+
+    + When using the Mail::Mbox::MessageParser,
+      the script would die on a file with zero length
+      (patch by Lance Cleveland <lance AT proactivewm DOT com>)
+
+v0.45 (Thu Feb  5 10:18:30 CET 2004)
+
+    + Mail::MboxParser::Mail::get_field() wasn't properly
+      dealing with multiple occurances of a field when it
+      was interleaved with another field
+      (patch by Martin Zuziak <zuziak AT fys DOT ku DOT dk>
+    + Mail::MboxParser::get_message() and ::next_message() 
+      ignored mails with no body
+
+v0.44 (Sat Jan  3 09:40:02 CET 2004)
+
+    + Mail::MboxParser had problems with older versions
+      of FileHandle::Unget. Makefile.PL now checks
+      that a useable version is installed
+
+v0.43 (Sat Oct 18 16:23:29 CEST 2003)
+
+    + Return values of File::Temp::tempfile() were 
+      mistakenly swapped 
+      (patch by Lyon Lemmens <lyon DOT lemmens AT oracle DOT com>)
+
+v0.42 (Tue Oct 14 10:46:11 CEST 2003)
+
+    + fixed "Call SETUP_CACHE() before calling new()..." warning
+      injected by Mail::Mbox::MessageParser
+    + hopefully removed function-redefinition warnings
+
+v0.41 (Thu Sep  4 09:52:04 CEST 2003)
+
+    + forgot to import tempfile() from File::Temp:
+      this resulted in an
+      "Undefined subroutine &Mail::MboxParser::tempfile
+      called at..."
+    + wrong SYNOPSIS: store_all_attachments() receives key/value 
+      pairs as arguments
+
+v0.40 (Tue Aug 19 09:14:08 CEST 2003)
+
+    + next_message() and get_message() dropped last
+      line of body if it did not end with a newline
+      (spotted by <marco AT aktex DOT net>)
+
+v0.39 (Tue Aug  5 08:06:50 CEST 2003)
+
+    + now uses David Coppit's new Mail::Mbox::MessageParser module 
+      which provides much faster and more robust parsing 
+      (the old parser can still be used (see docs))
+      !! therefore 0.39 should probably be marked as beta !!
+    + removed the silly benchmark results from the PODs
+      (they are no longer up-to-date)
+
+v0.38 (Wed Jan 15 14:34:49 CET 2003)
+
+    + fixed wrong splittal: in to(), cc(), from()
+      '"name, first" <email@host.com>' would be split even though
+      the comma is within double quotes
+      (patched by Robert McArthur <mcarthur AT dstc DOT edu DOT au>)
+    + in same methods:
+      'name' is set to "First Name" if it was previously empty and
+      the email address looks like "first.name@email.com"
+      (suggested and patched by Robert McArthur)
+    + fixed a mysterious "Uninitialized value in list assignment" 
+      warning in Body.pm
+    + localized a filehandle inside Mail.pm
+    + fixed typo in Makefile.PL
+
+v0.37 (Tue Nov 26 10:10:18 CET 2002)
+
+    + fixed some inconsistencies when constructing a 
+      Mail::MboxParser::Mail object manually
+      (thanks to Premjit Nair <premjit AT dpa DOT co DOT ae> for tracking 
+       that down)
+    + some of the PODs in Mail::MboxParser::Mail were really horrible,
+      a lot of minor errors along with bad formatting fixed
+
+v0.36 (Sun Nov 24 13:24:59 CET 2002)
+
+    + Mail::MboxParser::Mail::Body did not overload stringification
+      (patched by Steven W McDougall <swmcd AT TheWorld DOT com>)
+
+v0.35 (Thu Aug 22 08:54:01 CEST 2002)
+
+    + 0.34 forgot to bump the version number
+
+v0.34 (Sun Aug 11 16:25:53 CEST 2002)
+
+    + new option to strip signature on output
+      (implicitely suggested by David Bryson)
+    + on unfolding of continuation header-lines,
+      whitespaces disappeared
+      (fix by Nathan Uno (<Nathan AT unos DOT net>)
+    + added MIME::QuotedPrint to prerequisites
+    
+v0.33 (Thu Jun 20 07:26:25 CEST 2002)
+
+    This is a bug-fix only release:
+    + multiple occurances of a header-field were
+      incorrectly handled: only the last occurance
+      was returned, now you get an array_ref
+    + localizing of file-handles
+    + fixed $msg->as_string (broken in 0.32)
+    + store_attachment() and store_all_attachments()
+      fixed to work without the 'store_only' argument
+    + list/scalar context issue fixed in get_entities(),
+      that could break $msg->body under circumstances
+    + fixed a wrong prototype in Body.pm to make 
+      Perl 5.8.0 happy
+
+v0.32 (Fri Mar  1 10:34:46 CET 2002)
+
+    + fixed Mail::MboxParser::Mail::get_field() which was broken
+      in between, behaviour of it also changed a little to make it
+      more useful (see docs)
+    + added fix for header-fields that only contained the name, eg.
+      'Subject:'
+    + minimal corrections in some docs
+    + added two tests for get_field()
+
+v0.31 (Thu Feb 21 09:54:11 CET 2002)
+
+    + new option 'newline' for MboxParser-constructor,
+      defaults to 'AUTO' which can distinguish between
+      UNIXish and Win32-alike endings
+    + fixed a problem with saving non-text attachments under Win
+      (Aaron Johnson, Marco Trudel)
+    + added store_only switch to store_(all_)attachment(s) to only
+      save files matching a custom regex-pattern (Aaron Johnson)
+
+v0.30 (Thu Jan 31 10:28:42 CET 2002)
+
+    + new methods for accessing the "From "-line and "Received: "-lines
+    + I did not receive any complains about the new features introduced
+      in the previous beta-release and so I assume they work pretty well
+
+v0.30_4 (Thu Dec 13 14:27:35 CET 2001)
+
+    -----------------------
+    THIS IS A BETA RELEASE!
+    -----------------------
+
+    + There had been problems with mboxes under Win having
+      UNIXish line-ending, should be fixed now (should!)
+    + a speed-gain of 6% on overage when parsing a mailbox and 
+      accessing header-elements
+
+v0.30_3 (Sun Dec  9 10:41:26 CET 2001)
+
+    -----------------------
+    THIS IS A BETA RELEASE!
+    -----------------------
+    
+    + bugifx in MboxParser.pm:
+      under Win each second mail was skipped (Marco Trudel)
+    + removed silly debug-print in Mail.pm
+    + minor fixes of the PODs in Mail.pm
+      (duplicate =back directive)
+    
+v0.30_1 (Mon Dec  3 12:04:00 CET 2001)
+
+      -----------------------
+      THIS IS A BETA RELEASE! 
+      -----------------------
+      I added a lot of new stuff and I can't thoroughly 
+      test them all. I really need feedback from the users
+      now whether there are stealth-bugs in it....hmmh, bugs
+      are always sort of stealth, aren't they?
+    
+      Beware that store_attachement() and store_all_attachements()
+      have been renamed to their corrected spellings. The (incorrect) old
+      names are still there for backward-compatibility, though.
+      
+      -----------
+      New things:
+      -----------
+    
+    + new next_message mechanism (very memory-friendly)
+      plus needed helper-functions $mb->rewind, ->set_pos,
+      ->current_pos
+    + new get_message(n) method along with more messages 
+      dealing with file-handle positioning and reporting
+      (suggested by Marco Trudel <mtrudel@viviance.com>)
+    + get_attachment method that maps attachments to idx-nums
+      (suggested by Marco Trudel)
+
+    + some fixes:
+        - long-header lines contained wrong number of whitespaces
+          when decoded, fixed
+        - fix of nmsgs when mailbox has already been traversed
+          (filehandle had to be rewinded)
+        - 'attachement'-typos throughout the whole module,
+          both in method-names as well as docs
+          (long outstanding bug reported by Kenn Frankel 
+          <kfrankel AT maxstr DOT com>),
+          'get_entitities'-typo in Mail.pm docs fixed
+        - Removed $^W++ even though it nicely revealed warnings
+          raised in other modules (hehe...)
+        
+
+v0.24 (Wed Nov 28 14:48:05 CET 2001)
+    + mailboxes with DOSish line-endings (\015\012)
+      can now also be parsed (Bill Moseley)
+
+v0.23 (Mon Nov 26 12:07:41 CET 2001)
+    + bugfix in MboxParser.pm, last line of message sometimes 
+      ommited (Christian Wendt)
+    + decoding of qp-encoded filenames for
+      store_(all_)attachement(s)
+
+v0.22 (Tue Sep 20 13:23:38 CEST 2001)
+    + new get_field method that returns a raw headerfield,
+      so that even the "Received"-line is no longer lost
+      (Kenn Frankel)
+
+v0.21 (Sun Sep 9 10:37:46 CEST 2001)
+    + decoding is now pretty complete 
+      (whole header, body, quotes, signature)
+    + split up the documentation to the respective modules
+    + $obj->error and $obj->log is now correctly reseted on
+      each method invokation
+
+v0.20 (Sat Sep 8 10:03:23 CEST 2001)
+    + Mail::MboxParser::new() can now read from virtually 
+      anything (filename, filehandle, scalar/array-ref)
+    + introduction of named parameters coming as key/value pairs
+    + new class: Mail::MboxParser::Mail::Convertable
+    + decoding of header-fields and body
+
+v0.17 (Sat Sep  1 08:36:59 CEST 2001)
+	+ new Mail::MboxParser::Mail::Body::quotes() method
+	+ some corrections in the PODs
+
+v0.16 (Tue Aug 28 11:56:17 CEST 2001)
+	+ 'make test' will no longer fail if URI::Find is not installed
+
+v0.15 (Mon Aug 27 08:30:18 CEST 2001)
+    + an important change in indexing of MIME-parts:
+      the message itself is now the entity with the index 0, 
+      as it should be.
+      CHECK your scripts if you did a lot of MIME-stuff so that
+      they reflect the changes
+    + new class Mail::MboxParser::Mail::Body with methods for 
+      retrieving the signature and URLs from text
+	
+v0.14 (Fri Aug 24 12:23:36 CEST 2001):
+    + added an AUTOLOADer for Mail::MboxParser::Mail which will 
+      usually care that any methods inherited from MIME::Entity
+      work (mostly) in the expected way
+      nice side-effect: saves memory
+    + overloading of " " for Mail::MboxParser::Mail
+    + fixed some factually wrong documentation
+    + finally a MANIFEST in the package
+
+v0.13 (Sat Aug 18 11:04:54 CEST 2001):
+    + new to()-equivalent cc()
+    + id() now also resets $mail->error as it should do
+    + extended documentation for Mail::MboxParser::Mail
+    + made Mail::MboxParser-docs more eye-friendly
+
+v0.12 (Fri Aug 17 08:35:15 CEST 2001):
+    + new base-class Mail::MboxParser::Base
+    + new methods $obj->error, $obj->log
+    + Mail::MboxParser::Mail now extends MIME::Entity so
+      $mail->effective_type and stuff should work
+    + eventually using carp/croak instead of warn/die
+    + removed a very unpleasant memory-leak which did not allow
+      for a proper destruction of Mail::MboxParser objects,
+      happened when doing something like:
+      @mbs = map { Mail::MboxParser->new($_) } @mboxes;
+      undef $mbs[0]; # etc...
+
+v0.11 (Mon Aug 13 17:52:22 CEST 2001):
+    + new arguments for store_attachement and store_all_attachements
+      so that filenames for saving can be dynamically assigned
+      (suggestion by Angeline Koh <abuu AT home DOT com>)
+    + Mail::Box::SpamDetector class included but not yet properly working,
+      hence not documented either
+
+v0.10 (Sun Aug  5 12:24:56 CEST 2001):
+    + new method Mail::MboxParser::Mail->to
+    + additional tests for the above
+
+v0.09 (Sat Aug  4 13:58:47 CEST 2001):
+    + multi-line header-fields are now correctly reckognized
+      (Kenn Frankel <kfrankel AT maxstr DOT com>)
+
+v0.08 (Wed Aug  1 09:58:18 CEST 2001):
+    + $self->{ENTITY} now destroys itself once called,
+      reduces mem-usage when MIME is processed
+    + new test-suits
+    + updated PODs
+
+v0.07 (Sun Jul 29 11:37:43 CEST 2001):
+    + as the MIME stuff, headers are now only parsed
+      on demand (40% less memory, 25% quicker under normal conditions)
+
+v0.06 (Sat Jul 28 09:46:35 CEST 2001):
+    + on-demand parsing of entities by using closures
+      -> performance-gain of at least 900%
+    + rewinding of mailbox-filehandle, 
+      so a second call to get_messages will work
+
+v0.05 (Fri Jul 27 20:28:04 CEST 2001):
+    + rework of the pattern-matching,
+      should now be minimally quicker
+    + nmsgs now compliant to RFC 822
+    + added little script isspam (undocumented)
+    + this time the correct $VERSION !!
+
+v0.04 (Mon Jul 23 17:52:29 CEST 2001):
+    + fixed wrong parsing of header lines if line contains a colon
+    + increased reliability of get_entity_body
+
+v0.03 (Thu Jul 19 15:09:18 CEST 2001):
+    + $mail->{HEADER} returning a string broke everything, fixed
+    + added tests on install
+
+v0.02 (Fri Jul  6 08:04:34 CEST 2001):
+    + $mail->{HEADER} now returns a string
+    + eg-directory included in the package
+    + now works on Perl >= 5.004
+
+v0.01 (Thu Jul  5 08:19:40 CEST 2001):
+    + upload to CPAN

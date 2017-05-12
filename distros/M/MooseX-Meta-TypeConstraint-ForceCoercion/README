@@ -1,0 +1,12 @@
+
+
+This archive contains the distribution MooseX-Meta-TypeConstraint-ForceCoercion, version
+0.01:
+
+  Force coercion when validating type constraints
+
+This software is copyright (c) 2009 by Florian Ragwitz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as perl itself.
+

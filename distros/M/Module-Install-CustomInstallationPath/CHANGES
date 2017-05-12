@@ -1,0 +1,45 @@
+Version 0.1044:
+- Prevent CPAN from indexing private-lib
+- Add Module::Install requirement
+  http://www.cpantesters.org/cpan/report/cf8da780-e798-11e4-b042-71cc062ccc87
+
+Version 0.1043: Mon Apr 20 2015
+- Clarify licensing terms
+- Move verbose testing to a private module, and implement it in a way that
+  doesn't require editing the Makefile after it is generated.
+
+Version 0.1042: Sun Apr 12 2015
+- Enable verbose testing for CPAN-testers
+- Consolidate issue tracking at rt.cpan.org
+
+Version 0.1041: Sun Mar 22 2015
+- Moved code to github
+- Added POD test
+
+Version 0.1040: Mon Jul 14 2008
+- Updated to the latest version of Module::Install
+- Removed auto-install for better compatibility with CPAN and others
+- Renamed Check_Custom_Installation to check_custom_installation to match
+	Module::Install style
+
+Version 0.1030: Tue Dec 21 2004
+- Fixed version numbers, which were incompatible with some modules. (Thanks to
+  Tassilo von Parseval <tassilo.von.parseval@rwth-aachen.de> for the bug
+  report)
+- Improved the language in the prompt so that it isn't as confusing (Thanks to
+  Randal L. Schwartz <merlyn@stonehenge.com> for the suggestion.)
+- Added a warning in the docs about whether one should use this module or not,
+  given that there are other known methods for setting custom installation
+  options.
+
+Version 0.10.2: Thu Sep 16 2004
+- Fixed broken dependency specification in Makefile.PL
+- Fixed auto-import of dependencies for this extension
+- Added missing prompt instructions (e.g. for "none" option)
+
+Version 0.10.1: Wed Sep 15 2004
+- Added missing Module::Install dependency
+
+Version 0.1
+
+- Initial version, ported from grepmail's old Makefile.PL

@@ -1,0 +1,29 @@
+---
+abstract: 'Map::Metro map for Berlin'
+author:
+  - 'Slaven Rezic <srezic@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.142690'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Map-Metro-Plugin-Map-Berlin
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::ShareDir: '0'
+  Map::Metro: '0.22'
+  Moose::Role: '0'
+  Path::Tiny: '0'
+  Types::Path::Tiny: '0'
+resources:
+  repository: https://github.com/eserte/Map-Metro-Plugin-Map-Berlin.git
+version: '0.03'

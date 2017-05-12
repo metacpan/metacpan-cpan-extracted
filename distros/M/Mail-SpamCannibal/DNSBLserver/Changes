@@ -1,0 +1,297 @@
+Revision history for Perl extension Mail::SpamCannibal::DNSBLserver.
+
+0.55  Mon Jan 27 12:47:58 PST 2014
+	modify Makefile.PL to bypass missing 'pod2text'
+
+0.54  Tue May 12 19:20:35 PDT 2009
+	edit CText.xs, godaemon.c, hostinfo.c, hostinfo_func.h, main.c,
+	misc.c, misc_func.h, mung_macros.c, metio.c, ns.c, ns_func.h,
+	zonedump.c, and zonefile.c to eliminate warnings from new gcc
+	versions.
+
+	correct typo error in t/util_pid.t that caused false positve failure
+
+	enforce LANG = en_US in Makefile.PL
+
+0.53  Sun Nov 16 17:27:03 PST 2008
+	update rc.dnsbls to support INCLUDE keys
+
+0.52  Wed Oct 15 14:19:29 PDT 2008
+	require Net::DNS::ToolKit version 0.40 or higher
+
+	convert configuration to autoconf
+
+0.51  ??
+
+0.50  Wed Apr 16 13:40:03 PDT 2008
+	create 256k buffer for zonedump fd write
+
+0.49  Thu Dec 13 18:08:23 PST 2007
+	increase the allowable number of name servers to 15
+
+0.48  Wed Dec 12 12:26:31 PST 2007
+	replace $VERSION with $modVERSION in CTest.pm
+
+0.47  Thu Mar 29 11:38:48 PDT 2007
+	add reporting of "qflag" to -T output
+
+0.46  Fri Sep 22 12:24:33 PDT 2006
+	add missing -L argument to dnsbls optarg list
+
+0.45  Thu Sep 21 14:12:12 PDT 2006
+	fixed bug that did not increment localip[i] when reporting 
+	multiple ip addresses for the local zone
+
+0.44  Sun Sep 17 15:53:24 PDT 2006
+	added soa minimum ttl switch for negative caching
+	-s switch to DNSBLserver package
+	config/dnsbls.conf.sample, rc.dnsbls, main.c, data.c
+
+NOTE: the first two of these must be installed MANUALLY
+
+
+0.43  Sat Sep  9 20:38:22 PDT 2006
+	updated test file 'mkdir' statements for compatibility with Perl 5.0503
+
+0.42  Sat May  7 22:13:11 PDT 2005
+	corrected type in rbldnsDEF zonefile line
+
+0.41  Sat May  7 07:02:32 PDT 2005
+	corrected an error in zonefile.c and ns.c that incorrectly reported
+	the ip address during zone transfer and zone file creation in the 
+	TXT record of the form:
+
+	4.3.2.1.bl.spamcannibal.org	A	127.0.0.2
+					TXT	"some string  1.2.3.4"
+						 ^this was corrupted^
+
+	add an rbldns default record to the comment header of the zonefile
+	of the form:
+
+		; rbldnsDEF:a:txt
+
+0.40  Sun Apr 17 02:13:38 PDT 2005
+	add -C continuity flag, default '0', this is a BEHAVIOR CHANGE
+	For very large zones and multiple daemons constantly adding
+	and removing records, it is very difficult to get a contiguous
+	zone dump where the starting and ending serial number is constant.
+	Instead, re-sync the cursor to ignore BerkeleyDB's behavior of
+	renumbering the records after an insert or delete. This allows
+	a zone dump to proceed when record values that have already
+	been read are deleted or inserts are made to the area the cursor
+	has already transversed. More specifically, records ahead of the 
+	cursor will appear in the zone file as they are transversed, records
+	altered behind the cursor are not seen so effectively the zone is
+	frozen for dump purposes at the instant the cursor transverse it.
+	With "Continuity" set true, a single unperterbed snapshot of the
+	database is dumped to the zone file. However, this method will fail
+	if records are added or removed during the dump. The dump will
+	automatically retry 3 times. The practical aspect of this change
+	is that it is as if the zone was read a minute or two earlier in
+	the case of similtaneous database updates.
+
+	The old -C behavior is not desirable for large zones because it is not
+	practical for the database to remain static long enough for a 
+	complete zone dump. The behavior is deprecated, the -C flag is
+	provided to retain the old behavior if for some strange reason
+	you find it desirable.
+	
+	Removed redundant tests for 127.0.0.0 and 127.0.0.1
+	in ns.c and zonefile.c
+
+	corrected and old bug in zonefile.c that dumped 127.0.0.1
+	records to the zonefile
+
+0.39  Fri Apr 15 15:57:36 PDT 2005
+	left pointer indicator '&' out of statement and 
+	inadvertently commented out -L switch code in 0.38 release
+	duh!!!
+
+0.38  Thu Apr 14 13:02:58 PDT 2005
+	add -L switch to limit the zonefile build transfer rate
+	during a dnsbls zone dump. default 200,000 chars/sec
+
+0.37  Tue Mar  1 10:40:10 PST 2005
+	modify ns.c to always hide 127.0.0.0 AND 127.0.0.1 responses
+
+0.36  Tue Jan 11 15:45:02 PST 2005
+	change query response for record not found 
+		from:	NOERROR + SOA
+		to:	NXDOMAIN + SOA
+	to conform to standard response of most other d
+  Thanks to csg@habeas.com for spotting the error.
+
+0.35  Sat Dec  4 14:06:58 PST 2004
+	adjust priority of zonefile child to use minimum cpu cycles,
+	this needs site dependent "setpriority", tested with siteconf
+
+0.34  Sun Nov 14 21:39:48 PST 2004
+	add the number of records dumped by zonfile.c comment 
+	text in the zonefile. the form of the zonfile header is:
+
+	; Version: dnsbls 0.34, 11-14-04
+	; 375624 A records
+	; zone dump on Sun Nov 14 22:05:52 2004
+
+
+0.33  Sat Nov 13 16:31:56 PST 2004
+	update docs
+
+0.32  Wed Oct  6 11:08:38 PDT 2004
+	update docs
+
+0.31  Sat Oct  2 13:46:36 PDT 2004
+	correct BUG in zonefile.c that did not propagate IP address to
+	the TXT record while dumping a zone file
+
+	data.c, minor document update
+
+0.30  Fri Aug 27 10:08:51 PDT 2004
+	update CTest.xs to eliminate use of "putchar" which conflicts
+	with buffered/unbuffered use of IO in testing
+
+0.29  Sun Jun 27 09:04:56 PDT 2004
+	Added 'stop' variable for testing in main.c to intercept
+	processing of the -T flag and stop STDOUT
+	# Something in perl 5.8 does not allow the redirection of
+	# STDOUT in an eval to a C program. The workaround is
+	# simply to abort the call to 'main' just prior to issuing
+	# the print statements since this is all tested elsewhere
+	#
+
+0.28  Sat Jun 26 16:22:40 PDT 2004
+	added time tag to zone file dump in dnsbls::zonefile.c
+
+	changed test for zone dump so that it just checks for the
+	presence of a "zone_request" instead of no other activity + zone_request
+
+	fixed comment type in util_pid.c
+
+0.27  Fri Jun 25 11:25:29 PDT 2004
+	changed zonefile.c 'version' reporting string for zone file dump
+
+0.26  Wed Jun 23 12:55:01 PDT 2004
+	fixed bug in ns.c that prevented 127.xx.xx.xx response TXT strings
+	inserted by rc.dnsbls from being reported
+
+	added zonefile.c and zonedump.c so that dnsbls can
+	dump a zonefile to the dbhome directory on receipt
+	of a SIG_USR2
+
+	add script 'sc_zoneload' to load a BIND or 'dig' zone file
+	into the database.
+
+0.25  Tue Jun  8 16:29:39 PDT 2004
+	updated rc.dnsbls v0.10 to fix bug for perl v5.8.3 
+	where unshift does not work properly for default @_
+
+0.24  Mon May 10 18:39:31 PDT 2004
+	modified rc.dnsbls so that tarpit records forceably added from the
+	config file (such at 127.0.0.2, 127.0.0.3, etc...) are tested first
+	for existence and NOT added if they already exist. This preserves
+	the data (time tag) on these records so that they can be used by
+	other routines -- noteably, 127.0.0.2 which should always be present
+	is used by sc_BLpreen.pl to determine it's own cron interval
+
+0.23  Sat May  1 16:02:23 PDT 2004
+	altered the comments at the beginning of DNSBLserver.pm
+
+0.22  Mon Feb  9 15:56:51 PST 2004
+	rewrite 'restart' logic in rc.dnsbls v0.8
+
+0.21  Thu Oct 16 13:22:15 PDT 2003
+	correct logic in ns.c to report 127.x.x.x codes in zone transfers
+
+	add logic to main.c and ns.c to append the text of the IP address
+	to standard TXT responses if the error message is default and 
+	contains the character ? as in http://xxx.com?abc=
+
+0.20  Sat Oct 11 08:28:02 PDT 2003
+	modify util_pid.c and misc.c to include unlinkOK as in BDBaccess.
+	update options.t to test correctly when default /var/run/dbtarpit 
+	directory is not present
+
+0.19  Wed Oct  8 11:36:59 PDT 2003
+	add makefile entry to copy rc.dnsbls to install script file directory
+	update test suites to accomodate libdbtarpit changes
+
+0.18  Fri Oct  3 15:54:00 PDT 2003
+	add code to generate child pid files and 
+	for each task to remove it's own pid file on exit
+
+0.17  Thu Sep 25 11:02:02 PDT 2003
+	add Makefile constant MY_POD2TEXT
+
+0.16  Wed Sep 24 14:08:42 PDT 2003
+	modify source to be 32/64 bit independent
+	modify ns.t to ignore poor implementations of dn_comp
+	add os independent library calls/macros
+
+0.15  Sat Sep 20 11:44:11 PDT 2003
+	Add child wait status to tcp service so that the connection remains
+	open until closed by the client or an alarm event.
+	Add minimal IXFR service.
+
+0.14  Thu Sep 18 15:13:15 PDT 2003
+	place - holder
+
+0.13  Thu Sep 18 15:13:15 PDT 2003
+	incremental changes - place holder
+
+0.12  Sun Sep 14 09:40:23 PDT 2003
+	ns.c, rework the order of database interrogation for lookups
+	of black list addresses. The old way produced three database hits 
+	as the norm, this has been reduced to two.
+
+0.11  Tue Sep  9 18:00:28 PDT 2003
+	main.c -- modified the child network socket loop to fix a timing 
+	problem when interrogating the dnsbls from the local host via bind.
+
+	modify rc.dnsbls so that record 127.0.0.2 is 
+	forceably added without user intervention.
+
+0.10  Tue Sep  2 21:04:13 PDT 2003
+	Revert -M option -- this turns out to be unneeded
+	Add -N option for naming the localhost DNS object
+	Correct error in mungemacros.c where buffer size constraint
+	was MSGsize instead of IP_MAXPACKET
+	Add lookup in the evidence file to ns.c. Evidence must be
+	consulted before blcontrib to prevent non-reporting of 
+	127.0.0.2 'A' records if they appear in both blcontrib and evidence.
+
+0.09  Mon Sep  1 15:32:36 PDT 2003
+	Add -M masquerade option to main.c, host_info.c
+	When dnsbl is run on a virtual address, it must use the
+	zone name and designated IP address from the command line
+
+0.08  Tue Aug 12 15:53:46 PDT 2003
+	Modify ns.c to disallow response codes outside
+	the range of 127.0.0.3 => 127.255.255.255 for
+	the blcontrib database. This will prevent
+	feedback loops from developing among cooperating
+	promiscious DNSBL servers
+
+0.07  Sat Aug  2 22:25:05 PDT 2003
+	set -P option for promiscious reporting
+
+0.06  Wed Jul 30 09:59:09 PDT 2003
+	change conflicting name Config.pm to SiteConfig.pm
+
+0.05  Sat Jul 23 13:53:44 PDT 2003
+	update to use libdbtarpit
+
+0.04  Sat Jul 12 12:29:48 PDT 2003
+	update to use bdbtarpit.c library
+
+0.03  Thu Jul 10 07:37:26 PDT 2003
+	add promiscious mode flag to
+	enable reporting of tarpit
+	additions by secondary DNSBL's
+
+0.02  Sun Jul  6 17:00:06 PDT 2003
+	correct malformed TXT records,
+	add statistics for verbose logging,
+	fix SIGCHLD bug in set_signals
+
+0.01  Sat Jul  5 14:48:50 PDT 2003
+	alpha release

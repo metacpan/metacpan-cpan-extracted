@@ -1,0 +1,62 @@
+Revision history for MooseX-Object-Pluggable
+
+0.0014    2015-01-18 20:38:41Z
+          - add a test that runs `moose-outdated`, to make it more obvious
+            when there are installation conflicts
+
+0.0013    2014-02-02 08:53:34Z
+          - line numbers in shipped code are now almost the same (within 3) as
+            the repository source, for easier debugging
+          - add error diagnostic if the plugin is not a Moose role (RT#49507)
+          - avoid continuing on after failing to load a plugin (RT#63013)
+          - keep track of all plugins successfully loaded so far in case we
+            fail in the middle (RT#88562)
+
+0.0012    2013-11-11 03:59:19Z
+          - removed use of deprecated Class::MOP::load_class
+          - repository migrated from shadowcat to the github moose organization
+
+0.0011    2009-04-27
+          - Version number FAIL on last release
+
+0.0010    2009-04-27
+          - Change how _original_class_name works so it sucks less.
+
+0.0009    2008-11-25
+          - Avoid throwing an error when load_plugins is called on already-loaded
+            plugins
+
+0.0008    2008-07-18
+          - Cleanup Attribute declarations
+          - Eliminate extension mechanisms and the tests
+
+0.0007    2008-01-22
+          - Fix for Moose 0.34
+
+0.0006    2008-01-11
+          - Deprecate the Extension mechanism
+          - Added load_plugins
+          - Test while classes are immutable for good measure.
+          - Remove use strict and use warnings. Moose does it for us.
+
+0.0005    2007-04-13
+          - Goodbye Class::Inspector, hello Module::Object::Pluggable
+          - More Tests
+          - App namespaces functionality.
+          - Test for app namespaces functionality
+
+0.0004    2007-01-23
+          - PODFixes
+
+0.0003    2007-01-19
+          - Forget anon classes, go back to applying to $self
+          - goodbye __anon_subclass and _anon_subclass,
+            hello _original_class_name
+          - Props to mst for pointing out the error of my ways
+          - A couple more minor tests
+
+0.0002    2007-01-16
+          - Forgot Class::Inspector dep on Makefile
+
+0.0001    2007-01-16
+          - Initial Release!

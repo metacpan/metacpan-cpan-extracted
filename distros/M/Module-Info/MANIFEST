@@ -1,0 +1,26 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+bin/module_info
+bin/pfunc
+lib/B/Module/Info.pm
+lib/Module/Info.pm
+t/Module-Info.t
+t/lib/Bar.pm
+t/lib/Baz.pm
+t/lib/Boo.pm
+t/lib/Foo.pm
+t/lib/Moo.pm
+t/lib/Roo.pm
+t/lib/Test/Builder.pm
+t/lib/Test/More.pm
+t/lib/Test/Simple.pm
+t/n0_die_on_error.t
+t/n1_modules_required.t
+t/n2_safe.t
+t/n3_version.t
+t/zy_pod_coverage.t
+t/zz_pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

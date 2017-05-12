@@ -1,0 +1,40 @@
+{
+   "abstract" : "Export processed assets to directory",
+   "author" : [
+      "Heiko Jansen <hjansen@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-AssetPack-Pipe-ExportToDirectory",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious::Plugin::AssetPack" : "1.41",
+            "PerlIO::gzip" : "0.19"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/heikojansen/mojolicious-plugin-assetpack-pipe-exporttodirectory.git",
+         "web" : "https://github.com/heikojansen/mojolicious-plugin-assetpack-pipe-exporttodirectory"
+      }
+   },
+   "version" : "0.001003",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

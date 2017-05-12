@@ -1,0 +1,10 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         MD5-Reverse
+version:      0.01
+version_from: Reverse.pm
+installdirs:  site
+requires:
+    Digest::MD5:                   0.1
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

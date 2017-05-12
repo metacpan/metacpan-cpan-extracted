@@ -1,0 +1,336 @@
+
+<form name="md_search_form" 
+   action="?rm=mdw_search_results"
+   method="post">
+
+<!--  THIS VALUE MUST MATCH THE FIELDS -->
+<input type="hidden" name="search_interface_field_prepend" value='md'>
+ 
+
+
+<!--  // start attribute // -->
+<div>
+ <p><b>abs_path</b> 
+ 
+   <input type="text" name="md_abs_path">
+
+   <select name="md_abs_path_match_type">
+      <option value="like" selected>like</option>
+      <option value="exact">exact</option>
+      
+   </select>
+   <small>14253</small>   
+ 
+
+ <input type="hidden" name="md_attribute" value="abs_path">
+ </p>
+</div>
+
+
+
+<!--  // start attribute // -->
+<div>
+ <p><b>branch_directory</b> 
+  
+  <select name="md_branch_directory">
+  
+   <option value="">----</option>
+  
+   <option value="9501 Georgia Avenue LLC">9501 Georgia Avenue LLC</option>
+  
+   <option value="Abigail Tanner">Abigail Tanner</option>
+  
+   <option value="Alexander Kragie">Alexander Kragie</option>
+  
+   <option value="Andrew and Karla Whitman">Andrew and Karla Whitman</option>
+  
+   <option value="FICTION">FICTION</option>
+  
+   <option value="James and Joan Nalls">James and Joan Nalls</option>
+  
+   <option value="Jerome Mullin">Jerome Mullin</option>
+  
+   <option value="Joe Exampleman">Joe Exampleman</option>
+  
+   <option value="mdfi.log">mdfi.log</option>
+  
+   <option value="music">music</option>
+  
+   <option value="Protiveris Inc">Protiveris Inc</option>
+  
+   <option value="Provident Title - Burke">Provident Title - Burke</option>
+  
+   <option value="RAD Title LLC">RAD Title LLC</option>
+  
+   <option value="RGS Commercial - Bethesda">RGS Commercial - Bethesda</option>
+  
+   <option value="RGS Fountainhead - Annapolis">RGS Fountainhead - Annapolis</option>
+  
+   <option value="RGS Fountainhead - Catonsville">RGS Fountainhead - Catonsville</option>
+  
+   <option value="RGS Fountainhead - VA">RGS Fountainhead - VA</option>
+  
+   <option value="Richard and Ronni Cristol">Richard and Ronni Cristol</option>
+  
+   <option value="Robby Gonzalez">Robby Gonzalez</option>
+  
+   <option value="Robert and Lynne Angerer">Robert and Lynne Angerer</option>
+  
+   <option value="Robert and Nancy Conley">Robert and Nancy Conley</option>
+  
+   <option value="Thomas and Carolyn Wilson">Thomas and Carolyn Wilson</option>
+  
+   <option value="Universal Title - Ellicott City">Universal Title - Ellicott City</option>
+  
+   <option value="Universal Title - Hagerstown">Universal Title - Hagerstown</option>
+  
+   <option value="Universal Title LLC">Universal Title LLC</option>
+  
+   <option value="Walter Williams and Lizabeth ONeil">Walter Williams and Lizabeth ONeil</option>
+  
+   <option value="Whalen Construction Company Inc">Whalen Construction Company Inc</option>
+  
+   <option value="William and Lisa Slater">William and Lisa Slater</option>
+  
+   <option value="William Mohan">William Mohan</option>
+  
+  </select>
+  
+    
+      <input type="hidden" name="md_branch_directory_match_type" value="exact">
+    
+ 
+
+ <input type="hidden" name="md_attribute" value="branch_directory">
+ </p>
+</div>
+
+
+
+<!--  // start attribute // -->
+<div>
+ <p><b>file_is_directory</b> 
+  
+  <select name="md_file_is_directory">
+  
+   <option value="">----</option>
+  
+   <option value="0">0</option>
+  
+   <option value="1">1</option>
+  
+  </select>
+  
+    
+      <select name="md_file_is_directory_match_type">
+         <option value="exact" selected>exact</option>
+         <option value="morethan">more than</option>
+         <option value="lessthan">less than</option>
+      </select>
+    
+ 
+
+ <input type="hidden" name="md_attribute" value="file_is_directory">
+ </p>
+</div>
+
+
+
+<!--  // start attribute // -->
+<div>
+ <p><b>file_is_file</b> 
+  
+  <select name="md_file_is_file">
+  
+   <option value="">----</option>
+  
+   <option value="0">0</option>
+  
+   <option value="1">1</option>
+  
+  </select>
+  
+    
+      <select name="md_file_is_file_match_type">
+         <option value="exact" selected>exact</option>
+         <option value="morethan">more than</option>
+         <option value="lessthan">less than</option>
+      </select>
+    
+ 
+
+ <input type="hidden" name="md_attribute" value="file_is_file">
+ </p>
+</div>
+
+
+
+<!--  // start attribute // -->
+<div>
+ <p><b>file_is_text</b> 
+  
+  <select name="md_file_is_text">
+  
+   <option value="">----</option>
+  
+   <option value="0">0</option>
+  
+   <option value="1">1</option>
+  
+  </select>
+  
+    
+      <select name="md_file_is_text_match_type">
+         <option value="exact" selected>exact</option>
+         <option value="morethan">more than</option>
+         <option value="lessthan">less than</option>
+      </select>
+    
+ 
+
+ <input type="hidden" name="md_attribute" value="file_is_text">
+ </p>
+</div>
+
+
+
+<!--  // start attribute // -->
+<div>
+ <p><b>filename</b> 
+ 
+   <input type="text" name="md_filename">
+
+   <select name="md_filename_match_type">
+      <option value="like" selected>like</option>
+      <option value="exact">exact</option>
+      
+   </select>
+   <small>13001</small>   
+ 
+
+ <input type="hidden" name="md_attribute" value="filename">
+ </p>
+</div>
+
+
+
+<!--  // start attribute // -->
+<div>
+ <p><b>filename_extension</b> 
+  
+  <select name="md_filename_extension">
+  
+   <option value="">----</option>
+  
+   <option value="cpy">cpy</option>
+  
+   <option value="log">log</option>
+  
+   <option value="mp3">mp3</option>
+  
+   <option value="pdf">pdf</option>
+  
+   <option value="PDF">PDF</option>
+  
+   <option value="TXT">TXT</option>
+  
+   <option value="txt">txt</option>
+  
+   <option value="xls">xls</option>
+  
+  </select>
+  
+    
+      <input type="hidden" name="md_filename_extension_match_type" value="exact">
+    
+ 
+
+ <input type="hidden" name="md_attribute" value="filename_extension">
+ </p>
+</div>
+
+
+
+<!--  // start attribute // -->
+<div>
+ <p><b>filesize_bytes</b> 
+ 
+   <input type="text" name="md_filesize_bytes">
+
+   <select name="md_filesize_bytes_match_type">
+      <option value="like" selected>like</option>
+      <option value="exact">exact</option>
+            
+      <option value="morethan">more than</option>
+      <option value="lessthan">less than</option>
+      
+   </select>
+   <small>11221</small>   
+ 
+
+ <input type="hidden" name="md_attribute" value="filesize_bytes">
+ </p>
+</div>
+
+
+
+<!--  // start attribute // -->
+<div>
+ <p><b>mime_type</b> 
+  
+  <select name="md_mime_type">
+  
+   <option value="">----</option>
+  
+   <option value="application/pdf">application/pdf</option>
+  
+   <option value="application/vnd.ms-excel">application/vnd.ms-excel</option>
+  
+   <option value="audio/mpeg">audio/mpeg</option>
+  
+   <option value="inode/directory">inode/directory</option>
+  
+   <option value="text/plain">text/plain</option>
+  
+   <option value="text/x-log">text/x-log</option>
+  
+   <option value="text/x-readme">text/x-readme</option>
+  
+  </select>
+  
+    
+      <input type="hidden" name="md_mime_type_match_type" value="exact">
+    
+ 
+
+ <input type="hidden" name="md_attribute" value="mime_type">
+ </p>
+</div>
+
+
+
+<!--  // start attribute // -->
+<div>
+ <p><b>rel_path</b> 
+ 
+   <input type="text" name="md_rel_path">
+
+   <select name="md_rel_path_match_type">
+      <option value="like" selected>like</option>
+      <option value="exact">exact</option>
+      
+   </select>
+   <small>14252</small>   
+ 
+
+ <input type="hidden" name="md_attribute" value="rel_path">
+ </p>
+</div>
+
+
+
+
+<p><input type="submit" value="search"></p>
+<input type="hidden" name="rm" value="mdw_search_results">
+<p>Updated 08/03/06 21:05</p>
+</form>

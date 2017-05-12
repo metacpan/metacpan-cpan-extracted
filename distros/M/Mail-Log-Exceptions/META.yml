@@ -1,0 +1,23 @@
+---
+name: Mail-Log-Exceptions
+version: 1.0200
+author:
+  - 'Daniel Staal - <DStaal@usa.net>'
+abstract: Exceptions for the Mail::Log::* modules.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Exception::Class: 0
+build_requires:
+  Module::Build: 0
+  Test::Warn: 0
+dynamic_config: 0
+provides:
+  Mail::Log::Exceptions:
+    file: lib/Mail/Log/Exceptions.pm
+    version: 1.0200
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

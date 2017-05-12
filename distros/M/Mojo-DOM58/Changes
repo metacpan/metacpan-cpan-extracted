@@ -1,0 +1,25 @@
+1.002     2017-04-01 16:11:40 EDT
+  - Added html_attr_unescape function to Mojo::DOM58::Entities. (from
+    Mojolicious 7.29)
+  - Fixed unescaping of HTML5 attribute values. (from Mojolicious 7.29)
+
+1.001     2016-11-23 16:17:25 EST
+  - Fix bug in Mojo::DOM58::Entities where the DATA handle would be mentioned
+    in error messages. (from Mojolicious 7.03)
+
+1.000     2016-08-10 21:57:48 EDT
+  - (INCOMPATIBLE CHANGE) Removed support for smart whitespace trimming from
+    all_text and text methods, and fix whitespace bugs (from Mojolicious 7.0)
+  - Fixed CSS selector for value-less attributes (from Mojolicious 7.0)
+
+0.999     2016-08-01 04:24:01 EDT (TRIAL RELEASE)
+  - (INCOMPATIBLE CHANGE) Removed support for smart whitespace trimming from
+    all_text and text methods, and fix whitespace bugs (from Mojolicious 7.0)
+  - Fixed CSS selector for value-less attributes (from Mojolicious 7.0)
+
+0.002     2016-06-14 01:28:10 EDT
+  - Added recognition of <slot> element (from Mojolicious 6.59)
+  - Recognize legacy HTML entities without semicolons again (from Mojolicious 6.64)
+
+0.001     2016-03-27 16:12:42 EDT
+  - First release

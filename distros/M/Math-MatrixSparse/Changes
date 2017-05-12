@@ -1,0 +1,6 @@
+Revision history for Perl extension Math::MatrixSparse.
+
+0.01  Fri Jul  5 23:17:49 2002
+	- original version; created by h2xs 1.21 with options
+		-A -X -n Math::MatrixSparse
+

@@ -1,0 +1,11 @@
+%typemap{std::string};
+%typemap{const std::string};
+%typemap{int64_t};
+%typemap{uint64_t};
+%typemap{int32_t};
+%typemap{uint32_t};
+%typemap{size_t};
+%typemap{AV *};
+%typemap{const double};
+%typemap{std::vector<double>};
+

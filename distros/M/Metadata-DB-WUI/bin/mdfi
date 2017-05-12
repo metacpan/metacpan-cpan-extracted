@@ -1,0 +1,286 @@
+#!/usr/bin/perl
+use Carp;
+use strict;
+use lib './lib';
+use Metadata::DB::CLI ':all';
+use base 'LEOCHARRE::CLI';
+use vars qw($FILES $DBH $FILES_COUNT $FILES_INDEXED_COUNT $FILE_NAMING_CONVENTION);
+use Metadata::DB::Indexer;
+use LEOCHARRE::DBI;
+use File::PathInfo;
+use File::Filename::Convention;
+use YAML;
+use File::Find::Rule;
+
+*Metadata::DB::Indexer::record_identifier_to_metadata = \&get_metadata;
+
+
+my $o = gopts('f:D:U:P:H:a:CAR:n:c:');
+
+cli_consolidate_params($o);
+
+sub usage {
+   return qq{
+$0 - Metadata Database File Indexer
+
+DESCRIPTION
+
+Generic file indexer
+   
+PARAMETERS
+
+ cli  | conf          -  meaning
+
+   -D | DBNAME        - database name
+   -U | DBBUSER       - database user
+   -P | DBPASSWORD    - database password
+   -H | DBHOST        - database host
+   -a | DBABSPATH     - abs path to sqlite db instead of using U D P and H
+   -n | ABSCONVENTION - abs path to file holding file naming conventions (like autosort's)
+   -R | DOCUMENT_ROOT - set document root, default is ENV HOME
+   -f | ABSSEARCHFORM - abs path to search form to output
+   -c abs path to conf file
+
+USAGE EXAMPLES
+
+Load params from conf file:
+
+   $0 -c /var/www/cgi-bin/mdw.conf 
+
+   $0 -U user -P pass -D name -H host -R /home/myself/docs
+
+Example conf file
+
+   ---
+   DBNAME: pazdb
+   DBUSER: pazuser
+   DBPASSWORD: superpazz
+   DBHOST: 192.168.0.23
+   DOCUMENT_ROOT: /var/www/dms/doc
+   ABSCONVENTION: /etc/dmsautosort.conf
+   # DBABSPATH : /var/www/dms/doc/meta.db
+   HTML_TEMPLATE_ROOT: /var/www/cgi-bin
+   mdw_search_tmpl_name: mdw.search.html
+   mdw_search_results_tmpl_name: mdw_search_results.html
+
+AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+SEE ALSO
+
+Metadata::DB::WUI
+
+mdri
+
+   };
+}
+
+cli_log('started');
+
+$DBH = cli_get_dbh($o);
+
+$FILE_NAMING_CONVENTION = _get_file_filename_convention();
+
+$ENV{DOCUMENT_ROOT} = $o->{R};
+$ENV{DOCUMENT_ROOT}=~s/\/+$//;
+debug("doc root is $ENV{DOCUMENT_ROOT}, getting files list.. ");
+
+
+$FILES = cli_find_all_files($ENV{DOCUMENT_ROOT},$o->{l});
+$FILES_COUNT = scalar @$FILES;
+debug( cli_log("will index $FILES_COUNT records") );
+
+
+if ( DEBUG ){
+   for my $x ( 0 .. 5 ){ ### indexing test ...
+      
+      my $abs_path = $FILES->[$x];
+      print STDERR " abs path[$abs_path]\n";
+      $abs_path or return;
+      my $meta = get_metadata($abs_path);
+
+      printf STDERR "DEBUG $x\n$abs_path = %s\n\n", join( ', ',  keys  %$meta );
+
+      ### $meta
+      
+   }
+}
+# ok do it for real
+
+my $indexer = Metadata::DB::Indexer->new({ DBH => $DBH });
+debug('got dbh and instanced indexer');
+
+$indexer->records_to_index($FILES);
+$FILES_COUNT = $indexer->records_to_index_count;
+$indexer->run;
+$FILES_INDEXED_COUNT = $indexer->records_indexed_count;
+debug('creating index in table..');
+$indexer->create_index_id;
+my $tablename = $indexer->table_metadata_name;
+
+debug( cli_log("Done. Indexed $FILES_INDEXED_COUNT/$FILES_COUNT to '$tablename'") );
+
+
+# may or may not have
+sub get_metadata {
+   my $abs_path = shift;
+
+
+   my %meta = ();
+   
+   # first get file path info data
+   if( my $meta = _get_filesystem_metadata($abs_path)){
+      %meta = ( %meta, %$meta);
+   }
+   else {
+      return;
+   }
+
+   # then file filename convention.. ?
+   if ( my $meta = _get_filename_metadata($abs_path) ){
+       %meta = ( %meta, %$meta);
+   }
+
+   #if ($meta{is_dir}){
+   #   return \%meta;
+   #}
+
+
+   # then media type..
+   if( my $meta = _get_filetype_metadata($abs_path)){   
+       %meta = ( %meta, %$meta);
+   }
+
+   # exif..
+
+
+
+   # etc
+
+
+
+   return \%meta;
+}
+
+
+
+#  SECONDARY CODE ............
+
+
+sub _get_filetype_metadata {
+   my $abs_path = shift;
+   my $mime = shift;
+
+   my $hash;
+
+   unless ( defined $mime ){
+      require File::MimeInfo;
+      $mime = File::MimeInfo::mimetype($abs_path) or return;
+   }
+
+   #debug(" mime : $mime");
+   
+   $hash->{mime_type} = $mime;
+   
+
+   return $hash;
+}
+
+
+
+
+
+# as by possibly defined file naming conventions..
+# see File::Filename::Convention
+sub _get_filename_metadata {
+   my $filename = shift;
+   $FILE_NAMING_CONVENTION or return;
+   
+   require File::Filename::Convention;   
+   return File::Filename::Convention::get_filename_hash( $filename, $FILE_NAMING_CONVENTION );
+} 
+
+sub _get_file_filename_convention {   
+   for my $abs ( $o->{c}, $o->{n} ){
+      defined $abs and -f $abs or next;
+     
+      my $c = config($abs) or next;
+      exists $c->{type_fields}
+         #or logg("$abs does not have type_fields")
+         or next;
+      
+      return $c->{type_fields};
+   }
+   return;
+}
+
+
+
+
+
+
+
+# basic startoff point, can be used for other files, media
+sub _get_filesystem_metadata {
+   my $abs = shift;
+   defined $abs or confess("missing arg");
+
+   require File::PathInfo;
+   my $f = File::PathInfo->new($abs) or return;
+
+   my $is_dir = $f->is_dir;
+   my $is_file = $is_dir ? 0 : 1;
+ 
+   my $hash = {
+      filename_extension     => $f->ext,
+      filename               => $f->filename,
+
+      abs_path               => $f->abs_path,
+
+      file_is_directory      => $is_dir,
+      file_is_file           => $is_file,
+      file_is_text           => $f->is_text,
+      #file_is_binary         => $f->is_binary,
+
+      #date_modified          => $f->mtime_pretty,
+      #date_last_accessed     => $f->atime_pretty,
+      #date_created           => $f->ctime_pretty,
+   };
+
+   
+
+   if ($ENV{DOCUMENT_ROOT}){      
+  
+      $f->DOCUMENT_ROOT_set($ENV{DOCUMENT_ROOT});
+
+      if( my $rel = $f->rel_path ){
+         # store first part as 'client' like thing
+         $hash->{rel_path} = $rel;
+
+         if( $rel=~/^\/*([^\/]+)/ ){
+            #my $branch = $1;
+            $hash->{branch_directory} = $1; #$branch;
+            #debug("branch $branch");
+         }
+
+
+      }
+      else {
+         debug( "[$abs], cant get rel path, how come, docroot is $ENV{DOCUMENT_ROOT}?");
+      }
+     
+   }
+
+   if( $is_file ){
+      $hash->{filesize_bytes} = $f->filesize;
+   }     
+
+   return $hash;   
+}
+
+
+
+
+
+

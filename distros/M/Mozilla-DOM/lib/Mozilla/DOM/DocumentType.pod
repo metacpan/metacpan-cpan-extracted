@@ -1,0 +1,63 @@
+=head1 NAME
+
+Mozilla::DOM::DocumentType
+
+=for object Mozilla::DOM::DocumentType
+
+Mozilla::DOM::DocumentType is a wrapper around an instance of Mozilla's
+nsIDOMDocumentType interface. This inherits from
+L<Mozilla::DOM::Node|Mozilla::DOM::Node>.
+
+ * Each Document has a doctype attribute whose value is either null
+ * or a DocumentType object.
+ * The nsIDOMDocumentType interface in the DOM Core provides an
+ * interface to the list of entities that are defined for the document.
+ *
+ * For more information on this interface please see
+ * L<http:E<sol>E<sol>www.w3.orgE<sol>TRE<sol>DOM-Level-2-CoreE<sol>>
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::DocumentType->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $namednodemap = $documenttype->B<GetEntities>()
+
+A L<Mozilla::DOM::NamedNodeMap|Mozilla::DOM::NamedNodeMap> containing
+the general entities, both external and internal, declared in the DTD.
+Parameter entities are not contained. Duplicates are discarded.
+
+In list context, returns a list of L<Mozilla::DOM::Entity|Mozilla::DOM::Entity>,
+instead.
+
+=head2 $str = $documenttype->B<GetInternalSubset>()
+
+=head2 $name = $documenttype->B<GetName>()
+
+=head2 $namednodemap = $documenttype->B<GetNotations>()
+
+A L<Mozilla::DOM::NamedNodeMap|Mozilla::DOM::NamedNodeMap> containing
+the notations declared in the DTD. Duplicates are discarded.
+
+In list context, returns a list of L<Mozilla::DOM::Notation|Mozilla::DOM::Notation>,
+instead.
+
+=head2 $id = $documenttype->B<GetPublicId>()
+
+=head2 $id = $documenttype->B<GetSystemId>()
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

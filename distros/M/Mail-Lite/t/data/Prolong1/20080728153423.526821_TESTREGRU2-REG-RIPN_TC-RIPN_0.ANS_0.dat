@@ -1,0 +1,60 @@
+---
+-
+  - rusu.response.renew
+  -
+    - domain: air.ru
+      error_code: ' Prolong service does not exists'
+      req_id: 20080728153420.938576
+      rule_id: rusu.response.renew.fail
+    - domain: oretest201.ru
+      error_code: "Object 'ORETEST201.RU' not found - FATAL ERROR !"
+      req_id: 20080728153420.938576
+      rule_id: rusu.response.renew.fail
+    - domain: oretest2.ru
+      reg_till:
+        - 24.07.2008
+        - 24.07.2009
+      req_id: 20080728153420.938576
+      rule_id: rusu.response.renew.ok
+    - domain: oretest202.ru
+      error_code: "Object 'ORETEST202.RU' not found - FATAL ERROR !"
+      req_id: 20080728153420.938576
+      rule_id: rusu.response.renew.fail
+    - domain: oretest1.ru
+      reg_till:
+        - 24.07.2008
+        - 24.07.2009
+      req_id: 20080728153420.938576
+      rule_id: rusu.response.renew.ok
+    - domain: trax007.ru
+      error_code: ' Prolong service does not exists'
+      req_id: 20080728153420.938576
+      rule_id: rusu.response.renew.fail
+    - domain: oretest102.ru
+      error_code: ' Prolong service does not exists'
+      req_id: 20080728153420.938576
+      rule_id: rusu.response.renew.fail
+    - domain: oretest103.ru
+      error_code: "Object 'ORETEST103.RU' not found - FATAL ERROR !"
+      req_id: 20080728153420.938576
+      rule_id: rusu.response.renew.fail
+    - domain: oretest101.ru
+      error_code: ' Prolong service does not exists'
+      req_id: 20080728153420.938576
+      rule_id: rusu.response.renew.fail
+    - domain: oretest3.ru
+      reg_till:
+        - 24.07.2008
+        - 24.07.2009
+      req_id: 20080728153420.938576
+      rule_id: rusu.response.renew.ok
+    - domain: xn--trax_007-.ru
+      error_code:
+        - 'Invalid domain name - FATAL ERROR !'
+        - "Domain name contains forbidden character. Must be just letters, digits or `-'. "
+      req_id: 20080728153420.938576
+      rule_id: rusu.response.renew.fail
+    - domain: oretest203.ru
+      error_code: "Object 'ORETEST203.RU' not found - FATAL ERROR !"
+      req_id: 20080728153420.938576
+      rule_id: rusu.response.renew.fail

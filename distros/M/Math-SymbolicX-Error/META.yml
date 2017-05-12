@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Math-SymbolicX-Error
+version:             1.01
+abstract:            Parser extension for dealing with numeric errors
+license:             perl
+author:              
+    - Steffen Mueller <symbolic-module at steffen-mueller dot net>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Math::Symbolic:                0.506
+    Math::SymbolicX::ParserExtensionFactory: 2.01
+    Number::WithError:             0.03
+    Parse::RecDescent:             0
+    Test::More:                    0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

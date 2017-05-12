@@ -1,0 +1,25 @@
+Revision history for Perl extension Local::Wine.
+
+1.05  Fri Jan 25 10:08:00 2008
+	  - Implement new schema. Tables are: grapes, vineyards, wine_makers, wines
+
+1.06  Fri Mar 28 11:28:00 2008
+	  - Rename from Local::DB::Wines::SQLEngine to Local::Wine
+	  - Rename from Changes.txt to CHANGES
+	  - Switch from SQLEngine to Rose
+	  - Use scripts/plant.pl to generate Rose code
+
+1.04  Fri Jan 18 11:22:00 2008
+	  - Update Build.PL and Makefile.PL to require modules used by populate.wines.pl
+
+1.03  Fri Jan 18 11:20:00 2008
+	  - Update wines.csv
+
+1.02  Fri Nov 30 14:10:00 2007
+	  - Explicitly create database 'wines'
+
+1.01  Thu Nov 15 10:26:00 2007
+	  - Use Local::Config for database parameters
+
+1.00  Fri Jul 27 18:30:45 2007
+	  - Original version

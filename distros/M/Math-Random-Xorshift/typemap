@@ -1,0 +1,18 @@
+TYPEMAP
+xorshift_t * T_Xorshift_PRNG
+
+INPUT
+T_Xorshift_PRNG
+    if (sv_derived_from($arg, \"Math::Random::Xorshift::_ptr\")) {
+        IV tmp = SvIV((SV*)SvRV($arg));
+        $var = INT2PTR($type,tmp);
+    }
+    else {
+        Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+                   ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+                   \"$var\", \"Math::Random::Xorshift\");
+    }
+
+OUTPUT
+T_Xorshift_PRNG
+    sv_setref_pv($arg, \"Math::Random::Xorshift::_ptr\", (void*)$var);

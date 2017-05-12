@@ -1,0 +1,13 @@
+Revision history for Mojolicious-Command-donuts
+
+0.04  2015-11-24 23:12:52 PST
+        - Use WWW::KrispyKreme::HotLight 1.0 for scraping
+
+0.03  2015-06-14 12:18:25 PDT
+        - Require Mojolicious (this is important)
+
+0.02  2015-06-14 12:09:25 PDT
+        - Fix tagline
+
+0.01  2015-06-14 12:06:25 PDT
+        - Initial release

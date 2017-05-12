@@ -1,0 +1,8 @@
+Revision history for Mojolicious-Plugin-ValidateMoose
+
+0.02     Tue Apr 24 09:50:47 2012
+       * Made unittest more sloppy
+
+0.01     Mon Apr 23 21:50:21 2012
+       * Add validate_moose() helper
+       * Started project

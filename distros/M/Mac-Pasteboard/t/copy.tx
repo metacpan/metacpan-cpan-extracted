@@ -1,0 +1,96 @@
+package main;
+
+use strict;
+use warnings;
+
+use Mac::Pasteboard qw{:all};
+use Test::More 0.88;
+
+use lib qw{ inc };
+
+use My::Module::Test;
+
+check_testable 'pbpaste';
+
+my $do_utf = do_utf();
+
+my %pasteboard_info = (
+    default	=> {
+	putter	=> 'pbcopy',
+    },
+    general	=> {
+	name	=> kPasteboardClipboard,
+	pbopt	=> '-pboard general',
+	putter	=> 'pbcopy',
+    },
+    find	=> {
+	name	=> kPasteboardFind,
+	pbopt	=> '-pboard find',
+	putter	=> 'pbcopy_find',
+    },
+);
+
+foreach my $args (
+    [ 'default' ],
+    [ 'general' ],
+    [ 'general',
+	default_flavor	=> 'public.utf16-plain-text',
+	encode		=> 1,
+    ],
+    [ 'find' ],
+) {
+    my ( $selector, @args ) = @{ $args };
+    my $name = pb_name $selector;
+    my $putter = pb_putter $selector;
+    my $pbopt = pb_opt $selector;
+    my $putsub = __PACKAGE__->can( $putter );
+
+    my $where = $name || 'the default pasteboard';
+
+    my $pb = defined $name ?
+	Mac::Pasteboard->new( $name ) :
+	Mac::Pasteboard->new();
+    @args
+	and $pb->set( @args );
+    my $flavor = $pb->get( 'default_flavor' );
+
+    $do_utf
+	or not $pb->get( 'encode' )
+	or next;
+
+    $pb->clear;
+    test_vs_pbpaste $pbopt, '', "Initial clear should leave $where clear.";
+
+    my $data = 'There was a young lady named Bright';
+    $pb->copy ($data);
+    test_vs_pbpaste $pbopt, $data, "Place text data on $where.";
+
+    $data = {map {$_->{flavor} => $_} $pb->flavors()};
+    ok $data->{$flavor},
+	"Flavor $flavor should be present on $where";
+
+    $pb->clear;
+    test_vs_pbpaste $pbopt, '', "Clear $where again.";
+
+    $data = 'Who could travel much faster than light.';
+    $putsub->($data);
+    test_vs_pbpaste $pbopt, $data, "Use $putter to put data on $where.";
+
+    $pb->clear;
+    test_vs_pbpaste $pbopt, '', "Clear data placed on $where by pbcopy.";
+
+##	The following test is bypassed because pbpaste actually finds
+##	the data. I am not sure how this can be, since PasteboardPeeker
+##	does not, but it leaves me with no way to test.
+##
+##    $pb->copy ("Able was I, ere I saw Elba", undef,
+##	kPasteboardFlavorSenderOnly);
+##    test_vs_pbpaste $pbopt, '', "Should fail to find sender-only data on $where.";
+
+}
+
+done_testing;
+
+1;
+
+# ex: set textwidth=72 :

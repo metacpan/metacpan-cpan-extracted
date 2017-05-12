@@ -1,0 +1,184 @@
+NAME
+    Medical::Growth::NHANES_2000 - NHANES 2000 Growth Charts
+
+SYNOPSIS
+      use Medical::Growth::NHANES_2000;
+      my $handle = Medical::Growth::NHANES_2000->new;
+      my $dset = $handle->measure_class_for(measure => 'WtAge',
+                                            age_group => 'Infant',
+                                            sex => 'Male')
+      foreach my $pt (get_infant_data() ) {
+        ...
+        my $wfa_pct = $dset->pct_for_value($pt->age_mon, $pt->wt_kg);
+      }
+
+DESCRIPTION
+    Medical::Growth::NHANES_2000 is a measurement system implemented using
+    the Medical::Growth framework, that allows you to compare growth
+    measurements for children to the National Health and Nutrition
+    Examination Survey's (NHANES) 2000 infant and child growth charts
+    <http://www.cdc.gov/growthcharts>. Measurement classes are provided for
+    each of the datasets published by the CDC. These are typically used to
+    compute the percentile for a particular child's measurements relative to
+    the NHANES sample.
+
+    In order to compare a particular child's growth measurements to the
+    NHANES 2000 norms (the moral equivalent of plotting the measurement on
+    the appropriate growth chart), you will need to pick the measure class
+    for the growth measurement of interest (the moral equivalent of using
+    the right growth chart). While you can use a particular measurement
+    class directly by name, Medical::Growth::NHANES_2000 also provides ways
+    for you to look up the appopriate measurement class using more flexible
+    syntax, as described below.
+
+    Once you have retrieved the measure class, you may use the methods
+    available to manipulate specific values documented in the common
+    Medical::Growth::NHANES_2000::Base class; these may be called as class
+    or instance methods on any of the measurement classes.
+
+  METHODS
+    measure_classes
+        Returns a list of the names of measurement classes in the
+        Medical::Growth::NHANES_2000 system.
+
+    measure_class_name_for(*%criteria*)
+        Returns the name of the measurement class matching *%criteria*. No
+        check is made that the measurement class is actually available
+        (though this will be the case unless something went awry with
+        installation of Medical::Growth::NHANES_2000).
+
+        The following elements of *%criteria* are used to identify the
+        measurement class. Case is not significant for any of the values.
+
+        measure
+            Growth measurement to be examined and basis for comparison. This
+            can be a string of the form *measure*" for "*norm*, where
+            *measure* is the measurement (one of "Weight", "Height",
+            "Length", "Stature", "Head Circumference", or "BMI") and *norm*
+            is the norm (one of "Age", "Height", or "Length"). Spaces may be
+            replaced with underscores, and "for" may be replaced with "by",
+            or the entire preposition just replaced by spaces.
+
+            For convenience, some shorter forms are accepted as well, in the
+            form *MeasNorm*. In this case, *Meas* can have the values above,
+            but also "Wgt", "Wt", "Hgt", "Ht", "Stat", "Len", "Head", "HC",
+            or "OFC", and *Norm* can have the additional values "Hgt", "Ht",
+            or "Len".
+
+            Finally, any of "Height", "Length", or "Stature" are mapped to
+            "Length" if an infant *age_group* is specified (see below), or
+            to "Height" if a child age group is specified.
+
+        age_group
+            Age range for the norms to be used. In the NHANES 2000 data,
+            this is either infants (ages 0-24 months) or children (ages 2-20
+            years). Values of "Infant", "Toddler", "Recumbent", "Neonatal",
+            and "Neonate" are taken as "Infant", and values of "Child",
+            "School-age", and "Adolescent" are taken as "Child".
+
+            If the value looks like a number rather than a label, it is
+            interpreted as an age in months; values of 0-24 map to "Infant"
+            and larger values map to "Child".
+
+            The key "age" may be used instead of "age_group"; if both are
+            present, "age_group" is preferred.
+
+        sex Sex of the children from whose measurements the desired norms
+            were constructed. Values of "Male", "M", "Boy", "B", and 1 map
+            to "Male". Values of "Female", "F", "Girl", "G", and 2 map to
+            "Female".
+
+        If any of these values are missing or can't be interpreted, an
+        exception is thrown.
+
+    have_measure_class_for(*%criteria*)
+        Finds the measurement class name for *%criteria* as described above,
+        and tries to load the measurement class.
+
+        Returns the name of the measure class if successful, and "undef" if
+        the class cannot be loaded.
+
+    measure_class_for(*%criteria*)
+        Finds the measurement class name for *%criteria* as described above,
+        and loads the measurement class. An exception is thrown if the class
+        cannot be loaded.
+
+        Returns a handle for the measurement class, through which its
+        methods may be called.
+
+        This method can be called directly, or may be called by delegation
+        from "measure_class_for" in Medical::Growth, if the "system" element
+        of *%criteria* specifies "NHANES_2000".
+
+  USING NHANES_2000 MEASUREMENT CLASSES
+    Once you have a measurement class in hand, you will typically want to do
+    one of two things with it:
+
+    Compare a particular child's growth measurements with the NHANES norms.
+        You can convert growth measurements to percentiles or Z scores by
+        calling pct_for_value or z_for_value, respectively.
+
+    Reconstruct a growth curve
+        You can find out what specific growth measurements correspond to a
+        given percentile or Z score by calling value_for_pct or value_for_z,
+        respectively.
+
+  EXPORT
+    None.
+
+SEE ALSO
+    Medical::Growth
+
+    <http://www.cdc.gov/growthcharts>
+
+    Moo::Lax (for developers) Medical::Growth::NHANES_2000 is implemented
+    using Moo::Lax and friends to avoid the need for compiled dependencies;
+    if your code is already using Moose, it should play nicely.
+
+DIAGNOSTICS
+    Any message produced by an included package, as well as
+
+    Need to specify measure, age_group, and sex (F)
+        One of the required criteria for identifying a measurement class is
+        missing.
+
+    Don't understand measure spec (F)
+        The value of the "measure" element in *%criteria* wasn't in a known
+        format.
+
+    Don't understand measure name (F)
+        The growth measurement part of the "measure" element in *%criteria*
+        wasn't a known growth measurement.
+
+    Don't understand norm name (F)
+        The norm (basis for comparison) part of the "measure" element in
+        *%criteria* wasn't a known norm.
+
+    Don't understand age group (F)
+        The value of the "age_group" element in *%criteria* wasn't a known
+        growth measurement.
+
+    Don't understand sex (F)
+        The value of the "age_group" element in *%criteria* wasn't a known
+        growth measurement.
+
+BUGS AND CAVEATS
+    Are there, for certain, but have yet to be cataloged.
+
+VERSION
+    version 1.00
+
+AUTHOR
+    Charles Bailey <cbail@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2012-2014 Charles Bailey.
+
+    This software may be used under the terms of the Artistic License or the
+    GNU General Public License, as the user prefers.
+
+ACKNOWLEDGMENT
+    The code incorporated into this package was originally written with
+    United States federal funding as part of research work done by the
+    author at the Children's Hospital of Philadelphia.
+

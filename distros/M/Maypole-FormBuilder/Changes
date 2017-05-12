@@ -1,0 +1,313 @@
+Revision history for Maypole-FormBuilder
+
+0.44    Mon  26 Sept, 2005 10:50
+        
+        - Maypole::FormBuilder::Model
+            - new param() method, just like CGI's - e.g. used in the new cacheable templates
+            - do_edit() sets the 'form_failed_validation' template_arg - used in the 
+                cacheable templates
+            - added 'view' button to edit form
+
+        - Maypole::FormBuilder::View
+            - ensures the 'form_failed_validation' template_arg is always exported  
+            
+        - Maypole::Plugin::FormBuilder
+            - documented how setup() clobbers every subclass's form_builder_defaults() if 
+                they were set up during compilation (i.e. if specified inside the package 
+                of the subclass, instead of after the setup() call in the driver).
+                
+        - Mason templates
+            - much-improved cacheing algorithms - now checks if the template or the object 
+                has been updated, and if the form has validation errors, before looking in 
+                the cache
+            - a couple of small cosmetic changes
+
+0.431   Fri  23 Sept, 2005 23:10
+        - no code changes, require M-P-QT 0.421 in Build.PL
+
+0.43    Fri  23 Sept, 2005 22:40
+
+        Class::DBI::FormBuilder 0.46 - has-many and many-many support has improved
+
+        - Maypole::FormBuilder::Model
+            - display_columns now includes has_many fields by default
+            - all the *_fields() methods are empty by default, except edit_fields()
+            
+        - Maypole::Plugin::FormBuilder
+            - _form_args() sets 'required' to the stringify_column(), unless it is 
+                already configured. This stops the default from being 'require all 
+                columns', which was a pain
+                
+        - Mason templates
+            - added caching versions of the main editing templates. In an app with a large
+                number of related tables, this speeds up the generation of the edit page 
+                by at least 4X. These templates are not used by default - see the edit_with_cache 
+                template for details.
+            
+
+0.42    Mon  19 Sept, 2005 11:40
+        - updated the TT templates (supplied by Ron McClain)
+
+0.413   Sun  18 Sept, 2005 20:45
+        - fix a failure in pod test script 
+
+0.412   Tues 23 August, 2005 17:15
+        - added custom fields to process_extras in ADDTO and EDIT_ALL_HAS_A 
+            entries in the setup_from_mode dispatch table, so that 
+            they actually get included in the forms
+
+0.411   Tues 23 August, 2005 12:00
+        - fixed search_form to set $r as the param object - reported by Dave Howorth
+        - support TT's way of passing args that look like a hash, as a hashref - patch 
+            from Dave Howorth
+
+0.41    Fri 19 August, 2005 15:50
+        - do_pager (and Mp::FB) now works even without sessions (Dave Howorth)
+        - slight tweak to setup_form_mode() to ignore process_fields setting in the 
+            button modes
+
+0.4     Sat 13 August, 2005
+        - new dependencies: Maypole::Plugin::LinkTools, Maypole::Plugin::Session,
+            URI and URI::QueryParam, List::Util
+
+        - Maypole::FormBuilder::Model
+            - new methods:
+                - several new *_columns() and *_fields() methods
+                - hasa_columns() returns a list of columns that are in has_a relationships
+                - field_names() - provides names (i.e. labels) for has_many accessors, just 
+                    like Maypole::Model::Base::column_names() does for columns
+                - edit_all_has_a() - Exported method
+                
+            - display_columns() returns the columns in the order they are specified in 
+                the database
+            
+            - various additions and modifications to setup_form_mode(), to support 
+                new templates, and to move code out of the templates and into the model,
+                and to use the new *_columns and *_fields methods
+                
+            - do_pager() records the current page in the session
+            - copied new version of order() from Maypole::Model::CDBI in version 2.10
+            
+        - Maypole::Plugin::FormBuilder
+            - added table_labels slot to config object, and populate it in setup()
+            - ensure each class has its own private form_builder_defaults hashref
+                (in setup())
+            - factored out _get_form_args()
+            - removed no_textareas option from as_forms - it's hard-wired in render_form_as_row() 
+                now
+            - forms now pass a unique ID in their action, to be used to prevent multiple
+                submissions (_add_unique_id)
+            - _form_args now allows MP::FB::Model::setup_form_mode() to change the CDBI/Maypole 
+                object the form is built from 
+            
+        - templates
+            - new templates
+                - custom_css         - loads a class-specific css file, if one exists
+                - /beer/css/beer.css - example class-specific css file
+                - addmany
+                - edit_all_has_a
+                - view_all_has_a
+            
+            - modifications to edit, header, addto, maypole.css, addnew, addmany, 
+                generally moving perl code out of the template and into setup_form_mode()
+            - moved maypole.css back into the css subdirectory
+            - if /css/maypole_local.css exists, it will be loaded
+            - if /css/$table.css exists for the current model_class, it will be loaded 
+                e.g. /beer/css/beer.css in the factory templates
+
+0.32    Tues 9 Aug  2005, 1:20
+        - pass the Maypole request object to CGI::FB, instead of the CGI or Apache request object,
+            since Maypole has a suitable params() method - suggested by Dave Howarth
+            
+        - de-activated default PrettyPrint mode - you can get it now using CDBI::FB's post-processor 
+            architecture 
+            
+        - Maypole::FormBuilder::Model
+            - setup_form_mode() accepts a new mode_args argument, which is a hashref. The addto and
+                addmany templates use this 
+            - refactored setup_form_mode() to use a dispatch table of coderefs
+            
+        - templates
+            - edit  - simplified generation and layout of has_many forms
+            - addto - simplified, moved code into setup_form_mode()
+            - addmany - supports adding multiple items in a has_many relationship
+            - maypole.css - slight tweaks
+            - list - slight tweaks
+
+0.312   Wed  3 Aug  2005, 23:50
+        - swap the order of looking for ar or cgi in _form_args() (reported by Dave Howorth)
+        - activated CDBI::FB's new pretty-print mode, for the next few releases. Then I'll switch 
+            it off again. This makes HTML::TreeBuilder a new dependency. I'll try and figure out how 
+            to make this optional from Maypole.
+
+0.311   Tues  2 Aug  2005, 23:48
+        - included the new templates
+
+0.31    Tues  2 Aug  2005, 23:40
+        - removed dependency on CDBI::Plugin::Type - CDBI::FB doesn't need it any more
+        
+        - Maypole::FormBuilder::Model
+            - added search_columns(), search_fields(), edit_columns() and edit_fields() methods
+            
+        - templates
+            - search - moved all configuration of the search form into setup_form_mode(),
+                        using the new SET_$foo() processor in CDBI::FB 0.41
+            - edit - uses edit_fields() instead of related()
+
+0.302   Sun 31 July 2005, 18:55
+        - optionally pass $mode as a positional arg to as_form()
+
+0.301   Sun 31 July 2005, 17:30
+        new TT view template from Ron McLain
+
+0.3     Fri 22 July 2005, 23:00    
+        - templates 
+            - split the autohandler into header, navbar, title and footer templates
+            - added greying-out for ReadOnly and Disabled input classes
+            - added edit_with_related template - override this with an empty edit_with_related to 
+                remove the edit_with_related form in the edit template
+            - edit template 
+                - related fields are no longer rendered in the default edit form. 
+                    Instead, they are displayed in a table following the form, 
+                    with the new addto template
+            - addto - a new template, used in the edit template, to add a has_many item 
+                
+                
+        - Maypole::FormBuilder::Model
+            - removed related() from the default fields list in edit mode in setup_form_mode
+                - see edit template above
+            - added addto mode to setup_form_mode, with a corresponding addto Exported method
+            - addto doesn't work with many_many relationships yet
+
+0.28    Fri  22 July 2005, 00:50
+        - Maypole::FormBuilder::Model
+            - added list_fields() method, which defaults to related(). Used in setup_form_mode() in the 
+                editlist mode to supply the fields list (list_columns + list_fields), so that both the 
+                form built for the client, and the form built by the server to handle a submission, use 
+                the same default field list
+            - note: MP::QuickTable 0.31 tabulate() defaults to display_columns + related, but the list 
+                template sets fields to list_columns + list_fields, so that editlistview and listview 
+                show the same fields. 
+            - added some documentation to explain how server and client forms are 
+                co-ordinated by setup_form_mode.
+                
+        - templates
+            - list - explicitly set the fields argument to tabulate() in .listview (list_columns + list_fields)
+        
+0.27    Thur 21 July 2005, 19:45
+        - templates
+            - list - build a dummy form if no forms are available in editlistview
+            - moved Mason templates to templates-mason/
+            - added TT templates (in templates-tt/) from Ron McClain
+
+0.26   Wed 20 July 2005, 12:00
+        - templates
+            - pager: re-organised layout of code, and added code from Ron McClain to correctly 
+                page search results
+            - list: moved the pager to above the table of results, and now show page number
+                even for a single page of results
+        
+        - Maypole::FormBuilder::Model        
+            - uncommented code in list() to return sorted results, now that the framework is in 
+                place to provide the required parameters        
+
+0.25   Wed 20 July 2005, 00:45
+        - Maypole::Plugin::FormBuilder
+            - removed some dead code incl. as_form_with_related
+        
+        - Maypole::FormBuilder::Model
+            - load Class::DBI::Plugin::Type, rather than expecting the caller to do so
+            
+        - templates
+            - removed view_related - MP::P::QuickTable is smart enough to figure out 
+                has_many items in the view template
+            - adjusted column naming in list template to include has_many fields - 
+                see MP::P::QuickTable for other changes to make listview and editlistview 
+                show the same data - see http://rt.cpan.org/Ticket/Display.html?id=13779
+            - added some notes in source of pager template, sent by Ron McClain, to get the 
+                pager to work for search results. There's still a couple of things broken at the 
+                moment though - see also http://rt.cpan.org/Ticket/Display.html?id=13781    
+                
+        - added Maypole::Plugin::QuickTable as a prereq
+
+0.2433 Mon 18 July 2005, 21:00
+        - fixed maypole.css link in autohandler template 
+
+0.2432 Mon 18 July 2005, 12:55
+        - removed empty beer templates directory
+        - moved maypole.css to factory/ subdir, and removed css/ subdir
+        - upgraded CDBI::FB requirement to 0.3501 in Build.PL
+
+0.2431 Sun 17 July 2005, 12:10
+        - require CDBI::FB 0.3452 (not 0.35, which doesn't exist) in Build.PL
+
+0.243  Sat 16 July 2005, 22:45
+        - load use Class::DBI::Plugin::Type in MP::FB::Model
+
+0.242  Mon 11  Jul 2005, 21:55
+        - fixed bug in MP::FB::Model::setup_database() - 
+
+0.241  Mon  11 Jul 2005, 21:45
+        - a couple of minor updates to docs
+
+0.24   Fri   1 Jul 2005, 16:30
+        - got rid of MP::FB::Model::Base
+
+0.23   Thur 30 Jun 2005, 11:00
+        - added Maypole::FormBuilder::Model::Plain
+
+0.22   Tues 28 Jun 2005, 14:00
+        - added as_form_with_related() method to MP::P::FB to support the same method 
+            in CDBI::FB
+
+0.212  Tues 28 Jun 2005, 12:30
+        - more POD fixes
+
+0.211  Fri  24 June 2005, 14:30
+        - very minor POD fixes
+
+0.21   Tues 14 Jun 2005, 11:50
+        - fixed searching by not setting the form mode to do_search in MP::Plugin::FB::do_search()
+            (I don't get why that would break it though)
+        - fixed bugs in list template when a search returns no objects (use 
+            $request->model_class instead of $object->[0]) 
+        - removed template var 'search' from list template - check $request->action eq 
+            'do_search' instead
+        - refactored search template to take advantage of new search_opt_cmp and search_opt_order_by 
+            options in CDBI::FB::search_form()
+        - removed has_a fields from required lists in MP::Plugin::FB synopsis - CDBI::FB now adds them 
+            automatically        
+
+0.2    Sun  12 Jun 2005, 17:20
+        - fixed the editlist mode, so all the buttons now work (unsetting sticky 
+            forms was the key - otherwise, all the forms adopted the values in 
+            the submitted request)
+        
+        - added sessions to the demo app, to keep track of the list view mode
+            - various modifications to methods in MP::FB::Model
+            - added switchlistmode() exported method
+            
+        - MP::Plugin::FB:
+            - removed HTML rendering mode from MP::Plugin::FB::as_forms()
+            - added MP::Plugin::FB::render_form_as_row()
+            - added MP::Plugin::FB::listviewmode() to return the list view mode from the 
+                session (or 'list' if no session is available)
+        
+        - templates:
+            - removed the editlist template - it's all in the list template now
+            - removed hacks from pager and addnew templates to support different list view modes
+
+0.12   Sat  11 Jun 2005, 21:45
+        - Fixed a bug in Maypole::Plugin::FormBuilder::setup(). The vars() method 
+            in the view class was removing classmetadata from _all_ apps in the 
+            current interpreter that used the same view as the FB app. Bad for 
+            mod_perl.
+
+0.11   Fri  10 Jun 2005, 11:55
+        - morning after the night before POD fixes
+        - all modules load MP::FB and use its VERSION 
+        - moved do_delete() from MP::FB::Model::Base to MP::FB::Model
+
+0.1    Thur  9 Jun 2005, 22:45
+        First version, released on an unsuspecting world.
+

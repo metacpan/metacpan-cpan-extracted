@@ -1,0 +1,17 @@
+From sample@forged.com  Tue Oct 27 18:38:52 1998
+Received: from barfel by foo.example.com (8.9.1/8.6.12) with SMTP id 12345678 for <sample@example.com>; Tue, 27 Oct 1998 18:38:51 -0500 (EST)
+From: forged@example.com
+Date: Tue, 27 Oct 1998 09:52:14 +0100 (CET)
+Message-Id: <199810270852.12345567@example.com>
+To: <wrongsample@example.com>
+Subject: Sorry...
+X-Envelope-To: <sample@example.com>
+X-Loop-Detect: 1
+X-Spamblock: caught by rule dummy@
+
+BODY
+
+This message contains Received, so X-Envelope-To is ignored.
+
+SHOULD-BE: 'sample@example.com', 'example.com'
+

@@ -1,0 +1,26 @@
+CHANGES
+    Release Name: 0.05
+        *   Added new option: proxy_server to set proxy_server. Also now
+            reads proxy server from enviroment.
+
+    Release Name: 0.04
+        *   I noticed that Music::Tag was called with a use function.
+            Removed this line to remove Music::Tag requirement.
+
+        *   Added some more level 4 debuging messages.
+
+    Release Name: 0.03
+        *   Added musictag_overwrite option. This is false by default. It is
+            a workaround for problems with Music::Tag and unicode. Setting
+            this to true allows Music::Tag info to overwrite info from MPD.
+            Do not set this to true until Music::Tag returns proper unicode
+            consistantly.
+
+    Release Name: 0.02
+        *   Will print error and die if lastfm_password is not set.
+
+        *   Will print error and die if BADAUTH is received.
+
+    Release Name: 0.01
+        *   Initial Release
+

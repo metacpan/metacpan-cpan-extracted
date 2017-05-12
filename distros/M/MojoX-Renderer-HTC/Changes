@@ -1,0 +1,21 @@
+Revision history for MojoX::Renderer::HTC
+=========================================
+
+0.03    2015-03-02
+
+  [IMPROVEMENTS]
+  * Rewrite of this plugin (thanks to Tina Müller - tinita)
+  * Added more documentation
+
+  [TESTS]
+  * add renderer tests
+  * exclude htc_args from Pod::Coverage test as this is a generated attribute
+
+0.02    2015-02-09
+
+  [MISC]
+  * Added metaresources to dist.ini
+
+0.01    2012-12-09
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,25 @@
+
+                         MIDI::SoundFont
+
+This module makes easier the manipulation and creation of
+.sf2 SoundFont files and Gravis .pat files and .zip archives.
+
+It offers functions: file2sf sf2file new_sf2 file2gravis
+gravis2file timidity_cfg
+
+Nothing is exported by default, but all the documented functions
+can be exported.
+
+It requires a number of other modules: File::Format::RIFF MIDI
+File::Tmp Archive::Zip File::Basename LWP::Simple String::Approx
+and the installation also requires: Test::Simple and Data::Dumper
+
+The examples/ directory includes: sf_list and sf_edit  which are
+simple but already useful applications.
+
+To install:
+	perl Makefile.PL; make; make install
+
+For up-to-date source, see http://search.cpan.org/~pjb/
+
+Peter J Billam    www.pjb.com.au/comp/contact.html    www.pjb.com.au

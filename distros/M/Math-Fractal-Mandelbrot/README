@@ -1,0 +1,14 @@
+Module to calculate Mandelbrot fractal points efficiently
+
+(C) ..--- ----- ----- ...-- by - . .-.. ... .-.-.-  All rights reserved.
+
+See INSTALL on how to install this module. Please check the signature before
+doing anything with the package.
+
+Look for SDL-App-FPS on search.cpan.org for a demo application using this
+module.
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

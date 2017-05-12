@@ -1,0 +1,23 @@
+Thread:       grep_over_multiple_lines_thank_you
+Message:      00001_0011
+From:         "Tom George Samson" <tomgeorgesamson@some.web.address.com>
+Text:
+
+Hi Chris,
+Thank you for the reply.
+Please bear with me if I appear to be a little naive, but this is my 
+problem. 
+I've already opened a file and have the data in an array.
+I want to perform this operation on that array. How do I do that ?
+open (FILE,$file);
+@my_array = <FILE> ;
+now my_array contains the day limited by START_PATTERN and 
+END_PATTERN.
+How do I filter it out from there ?
+
+Thomas.
+
+_X_X_X_X_X_X_X_X_X_X_
+_X_X_X_X_X_X_X_X_X_X_
+
+

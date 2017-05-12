@@ -1,0 +1,80 @@
+NAME
+    MooseX::RoleQR - allow "before qr{...} => sub {...};" in roles
+
+SYNOPSIS
+       {
+          package Local::Role;
+          use MooseX::RoleQR;
+          after qr{^gr} => sub {
+             print " World\n";
+          };
+       }
+   
+       {
+          package Local::Class;
+          use Moose;
+          with qw( Local::Role );
+          sub greet {
+             print "Hello";
+          }
+       }
+   
+       Local::Class->new->greet; # prints "Hello World\n"
+
+DESCRIPTION
+    Method modifiers in Moose classes can be specified using regular
+    expressions a la:
+
+       before qr{...} => sub {...};
+
+    However, this is not allowed in Moose roles because Moose doesn't know
+    which class the role will be composed with, and thus doesn't know which
+    method names match the regular expression. Let's change that.
+
+    This module implements regular expression matched method modifiers for
+    Moose roles. It does so by deferring the calculation of which methods to
+    modify until role application time.
+
+    The current implementation handles only `before`, `after` and `around`
+    modifiers (not `override`), and thus it overrides the following standard
+    Moose::Role keywords:
+
+    `before Str|ArrayRef|RegexpRef => CodeRef`
+    `after Str|ArrayRef|RegexpRef => CodeRef`
+    `around Str|ArrayRef|RegexpRef => CodeRef`
+
+  Caveat Regarding the Order of Method Modifiers
+    Moose executes method modifiers in a well-defined order (see
+    Moose::Manual::MethodModifiers for details). This module has the potential
+    to disrupt that order, as regular expression matched modifiers are always
+    applied after the role's other modifiers have been applied.
+
+  Caveat: no `use Moose::Role`
+    You should `use MooseX::RoleQR` *instead of* Moose::Role; not *as well
+    as*.
+
+  General Caveat
+    There's some pretty nasty stuff under the hood. Let's pretend it's not
+    there.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-RoleQR>.
+
+SEE ALSO
+    Moose::Role.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

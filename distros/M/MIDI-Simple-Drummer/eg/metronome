@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use MIDI::Simple::Drummer;
+my $d = MIDI::Simple::Drummer->new(
+    -signature => shift || '4/4',
+    -bpm     => shift || 100,
+    -volume  => shift || 100,
+    -phrases => shift || 4,
+);
+print 'S: ', $d->signature,"\n";
+$d->kick('Bass Drum 1');
+$d->count_in;
+for my $i (1 .. $d->phrases * $d->beats) {
+    $d->note($d->EIGHTH, $d->backbeat_rhythm(-beat => $i));
+    $d->note($d->EIGHTH, $d->tick);
+}
+$d->write("$0.mid");

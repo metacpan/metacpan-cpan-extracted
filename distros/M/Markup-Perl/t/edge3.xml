@@ -1,0 +1,5 @@
+use blib;
+use utf8;
+use Markup::Perl;
+<h1>Some text.</h1>
+<perl> src("t/edge4.xml") </perl>

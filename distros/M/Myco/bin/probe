@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Data::Dumper;
+
+my $pkg = shift;
+chomp $pkg;
+eval "require $pkg;";
+
+my $md = eval { $pkg->introspect };
+
+if ($@) {
+	die "Error retreiving metadata for class $pkg:  $@\n";
+}
+
+print "*** Metadata for class $pkg:\n";
+
+print Dumper( $md )."\n";
+
+print "\n*** Schema for class $pkg:\n";
+
+no strict 'refs';
+print Dumper( ${ $pkg."::schema" } )."\n";
+
+1;

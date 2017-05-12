@@ -1,0 +1,47 @@
+MooseX-Struct
+
+This module is a reimplementation of the core Class::Struct package
+for the Moose Object System.
+
+Requires Moose and its dependencies.
+
+Includes MooseX::Struct VERSION 0.05
+ 
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc MooseX::Struct
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooseX-Struct
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/MooseX-Struct
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/MooseX-Struct
+
+    Search CPAN
+        http://search.cpan.org/dist/MooseX-Struct
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Jarrod Overson
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

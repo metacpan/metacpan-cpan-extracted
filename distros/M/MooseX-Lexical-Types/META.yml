@@ -1,0 +1,18 @@
+---
+abstract: automatically validate lexicals against Moose type constraints
+author:
+- Florian Ragwitz <rafl@debian.org>
+generated_by: Dist::Zilla::Plugin::MetaYaml version 1.007
+license: perl
+name: MooseX-Lexical-Types
+requires:
+  Carp: '0'
+  Class::MOP: '0'
+  Lexical::Types: '0'
+  Moose: '0'
+  MooseX::Types: '0.09'
+  Test::Exception: '0'
+  Test::More: '0'
+  Variable::Magic: '0'
+  namespace::autoclean: '0'
+version: '0.01'

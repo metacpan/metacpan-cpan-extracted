@@ -1,0 +1,36 @@
+requires "Carp" => "0";
+requires "Data::OptList" => "0.109";
+requires "Function::Parameters" => "1.0703";
+requires "Import::Into" => "1.002004";
+requires "Syntax::Feature::Try" => "1.003";
+requires "Type::Registry" => "0";
+requires "Type::Tiny" => "1.000006";
+requires "Type::Utils" => "0";
+requires "constant" => "0";
+requires "perl" => "5.014";
+requires "strictures" => "2";
+requires "syntax" => "0";
+
+on 'build' => sub {
+  requires "Module::Build" => "0.28";
+};
+
+on 'test' => sub {
+  requires "Test::More" => "0";
+  requires "Test::Most" => "0";
+  requires "Type::Library" => "0";
+  requires "Types::Standard" => "0";
+  requires "perl" => "5.014";
+};
+
+on 'configure' => sub {
+  requires "Module::Build" => "0.28";
+  requires "perl" => "5.010";
+};
+
+on 'develop' => sub {
+  requires "Pod::Coverage::TrustPod" => "0";
+  requires "Test::CPAN::Changes" => "0.19";
+  requires "Test::Pod" => "1.41";
+  requires "Test::Pod::Coverage" => "1.08";
+};

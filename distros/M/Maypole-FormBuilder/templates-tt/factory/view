@@ -1,0 +1,23 @@
+[% INCLUDE header %]
+[% FOREACH item IN objects %]
+<h2>[% item.moniker | ucfirst %]: [% item %]</h2>
+<div class="fleft">
+<div class="ViewTable">
+[% request.quick_table( 'labels', 'L', 
+                        'vertical', 1,
+                        'object', item,
+) %]
+</div>
+<p>[% request.link( table =  item.table,
+                    action = 'list',
+                    label = 'Back to listing',
+) %]</p>
+[% request.as_form( mode = 'edit_button',  entity = item ).render %]
+[% request.as_form( mode = 'delete_button', entity = item ).render %]
+
+</div>
+[% INCLUDE view_all_has_a
+	 object = item
+%]
+[% END %]
+[% INCLUDE footer %]

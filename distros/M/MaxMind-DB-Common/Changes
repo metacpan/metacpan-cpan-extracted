@@ -1,0 +1,33 @@
+0.040001 2016-02-02
+
+- Validation on the Int type used in the Metadata class has been loosened,
+  which should fix MaxMind::DB::Reader test failures on some platforms.
+
+
+0.040000 2015-04-29
+
+- Use Math::BigInt rather than Math::Int128 as part of working towards making
+  MaxMind::DB::Reader pure Perl.
+
+
+0.031003 2014-03-10
+
+- Added docs for MaxMind::DB::Metadata.
+
+- Added two more exported constants, DATA_SECTION_SEPARATOR and
+  METADATA_MARKER.
+
+
+0.031002 2013-07-18
+
+- Changes to make code work with Perl 5.8.x.
+
+
+0.031001 2013-07-16
+
+- Fixed a test failure with Perl 5.10.
+
+
+0.031000 2013-07-16
+
+- First release upon an unsuspecting world.

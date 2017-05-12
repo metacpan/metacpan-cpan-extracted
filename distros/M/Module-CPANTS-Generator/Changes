@@ -1,0 +1,37 @@
+Revision history for Perl module Module::CPANTS::Generator.
+
+0.006 Sat Sep  6 10:13:31 BST 2003
+	- get better match for the main module in a distribution for
+	  the description getting, spotted by Pierre Denis
+	- new metrics: uses info
+	- bug fixes for win32 POD
+	- more caching
+	- report POD errors
+	- use Pod::Simple::TextContent to properly parse POD and
+	  get an accurate count of the lines
+        - download the testers database from testers.cpan.org instead
+          of doing it ourselves. unfortunately this means that we lose
+          the number of tests as promised
+	- the module is now being maintained by Thomas Klausner
+
+0.005 Sun Apr 27 10:25:28 BST 2003
+	- incorporated patch by Casey West to get the number of lines
+	  of comments in a distribution
+	- moved view.pl from YAML to Data::Dumper
+	- remoeved DBD::SQLite from prereqs as we're not using it yet
+
+0.004 Mon Apr 21 19:25:18 BST 2003
+	- incorporated patches by Richard Clamp to refactor the code
+	  and a new metric: lines of pod vs. lines of code
+
+0.003 Sun Apr 13 15:59:42 BST 2003
+	- include CPAN testers data
+
+0.002 Wed Apr  2 22:02:59 BST 2003
+	- now kept in a subversion repository
+	- now get description from the POD of the main module in the
+	  distribution if it's not in the modules list
+
+0.001 Sat Mar 29 16:23:33 GMT 2003
+	- released initial version, now seperated from Module::CPANTS
+

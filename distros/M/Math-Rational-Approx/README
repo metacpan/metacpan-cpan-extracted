@@ -1,0 +1,159 @@
+NAME
+    Math::Rational::Approx - approximate a number with a rational number
+
+SYNOPSIS
+      use Math::Rational::Approx ':all';
+
+      #
+      # find rational approximation with maximum denominator
+      ($n, $d, $bounds ) = maxD( $x, 10 );
+
+      # refine; note reuse of $bounds from previous call
+      ( $n, $d ) = maxD( $x, 20, $bounds );
+
+
+      #
+      # find rational approximation to arbitrary precision using
+      # continued fractions
+
+      # one shot, 10 iterations
+      ( $numerator, $denominator ) =
+                       contfrac_nd( contfrac( 1.234871035, 10 ) );
+
+      # multiple calls on same number; useful for convergence tests
+      # keep array containing terms; get fraction and perhaps test it
+      ( $terms, $residual ) = contfrac( 1.234871035, 3 );
+      ( $n, $d ) = contfrac_nd( $terms  );
+
+      # continue for an additional number of steps; note reuse of $terms;
+      # new terms are appended to it
+      ( $terms, $residual ) = contfrac( $residual, 3, $terms );
+
+      # new results
+      ( $n, $d ) = contfrac_nd( $terms );
+
+DESCRIPTION
+    This module and its object oriented companion modules provide various
+    means for finding rational number approximations to real numbers. The
+    object oriented versions are suitable when repeated refinements are
+    required. See Math::Rational::Approx::MaxD and
+    Math::Rational::Approx::ContFrac.
+
+INTERFACE
+  Maximum denominator
+    maxD finds the best rational approximation (n/d) to a fraction with a
+    denominator less than a given value. It uses Farey's sequence and is
+    based upon the algorithm given at
+    <http://www.johndcook.com/blog/2010/10/20/best-rational-approximation/>.
+
+    This is an iterative procedure, searching a given range for the best
+    approximation. To enable further refinement, the limiting denominator
+    may by adjusted; the approximation will be continued from the last
+    calculation.
+
+    maxD
+          ( $n, $d, $bounds ) = maxD( $x, $maxD, );
+          ( $n, $d, $bounds ) = maxD( $x, $maxD, $bounds );
+
+        Calculate the rational number approximation to $x with denominator
+        no greater than $maxD.
+
+        The optional argument, $bounds, is a reference to a four element
+        array containing the initial bounds on the region to search. It
+        takes the form
+
+          bounds => [ a, b, c, d ]
+
+        where the elements are all non-negative integers and the bounds are
+        given by
+
+          a/b < x < c/d
+          b < maxD && d < maxD
+
+        The behavior is undefined if the latter condition is not yet, unless
+        the bounds are the result of a previous run of maxD.
+
+        By default it searches from float(x) to "float(x)+1".
+
+        maxD returns the determined numerator and denominator as well as an
+        arrayref containing the bounds. If the $bounds argument was
+        specified this is returned.
+
+  Continued Fractions
+    To approximate using continued fractions, one first generates the terms
+    in the fraction using contfrac and then calculates the numerator and
+    denominator using contfrac_nd.
+
+    contfrac
+          ( $terms, $residual ) = contfrac( $x, $n );
+          ( $terms, $residual ) = contfrac( $x, $n, $terms );
+
+        Generate $n terms of the continous fraction representing $x.
+        Additional terms may be added in subsequent calls to contfrac by
+        passing $residual as the number to approximate and supplying the
+        previous $terms arrayref:
+
+          ( $terms, $residual ) = contfrac( $x, 10 );
+          ( $terms, $residual ) = contfrac( $residual, 3, $terms );
+
+        The arguments are as follows:
+
+        $x  The number to approximate. It must be positive.
+
+        $n  The number of terms to generate.
+
+        $terms
+            *Optional*. An arrayref in which to store the terms. The array
+            is appended to.
+
+        Returns:
+
+        $terms
+            An arrayref which holds the terms. If one was provided in the
+            argument list it is passed through.
+
+        $residual
+            The residual of the input number as a Math::BigFloat object.
+            This is *not* the difference between the input number and the
+            rational approximation. It is suitable for reuse in subsequent
+            calls to contfrac.
+
+    contfrac_nd
+          ( $nominator, $denominator ) = contfrac_nd( $terms );
+
+        Generate the nominator and denominator from the terms created by
+        contfrac. They are returned as Math::BigInt objects.
+
+DEPENDENCIES
+    Math::BigFloat, POSIX, Params::Validate
+
+INCOMPATIBILITIES
+    None reported.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to
+    "bug-math-rational-approx@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Math-Rational-Approx>.
+
+SEE ALSO
+AUTHOR
+    Diab Jerius <djerius@cpan.org>
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2012 The Smithsonian Astrophysical Observatory
+
+    Math::Rational::Approx is free software: you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or (at
+    your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program. If not, see <http://www.gnu.org/licenses/>.
+

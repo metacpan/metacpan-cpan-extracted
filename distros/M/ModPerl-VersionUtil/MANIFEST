@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00_compile.t
+t/01_mp1.t
+t/02_mp19.t
+t/03_mp2.t
+t/04_nonmp.t
+lib/ModPerl/VersionUtil.pm
+META.yml                                 Module meta-data (added by MakeMaker)

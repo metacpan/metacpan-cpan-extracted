@@ -1,0 +1,292 @@
+.html_body {
+    background-color: #ddd;
+/* mojito green #87a865; */
+    margin-left: 0.25em;
+    margin-bottom: 0.25em;
+}
+.vanilla_body {
+    background-color: sienna;
+}
+
+#wiki_language {
+    font-size: 66.7%;
+}
+#publish-page {
+    font-size: 0.88em;
+}
+
+
+h1 {
+    margin-top: 0em;
+    padding-top: 0em;
+}
+
+#body_wrapper {
+    float: left; 
+    width: 98%;
+    margin: auto;
+    padding-left: 0.10em;
+    background-color: white;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+}
+
+#body_wrapper_vanilla {
+    width: 99%;
+    margin: auto;
+    padding: 0.10em;
+    background-color: white;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    border: 0px solid #f3f3f3;
+}
+
+#edit_area {
+    float: left;
+    width: 46%;
+}
+
+.view_area_edit_mode {
+    float: left;
+    margin-left: 2em;
+    padding-left: 1em;
+    width: 46%;
+}
+
+.view_area_view_mode {
+    float: left;
+    margin-left: 2em;
+    width: 64%;
+    background-color: white;
+}
+
+#toggle_view {
+	font-size: 66.7%;
+}
+
+#recent_area {
+    float: right;
+    border-left: 1px dotted #888;
+    padding-left: 0.5em;
+    width: 100%;
+    /*    background-color: #cafc97;
+    -moz-border-radius: 10px;
+    border-radius: 10px; */
+}
+
+#collections_area {
+    float: right;
+    border-left: 1px dotted #888;
+    padding-left: 0.5em;
+    width: 100%;
+    /*    background-color: #cafc97;
+    -moz-border-radius: 10px;
+    border-radius: 10px; */
+}
+
+#calendar_area {
+    float: right;
+    border-bottom: 1px dotted #888;
+    border-left: 1px dotted #888;
+    border-top: 1px dotted #888;
+    padding-left: 0.5em;
+    width: 100%;
+}
+
+#selectable_page_list .ui-selecting {
+    background: #FECA40;
+}
+
+#selectable_page_list .ui-selected {
+    background: #F39814;
+    color: white;
+}
+
+#selectable_page_list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+#selectable_page_list li {
+    margin: 2px;
+    padding: 2px;
+    font-size: 1.08em;
+}
+
+#search_area {
+    float: right;
+    width: 100%;
+    padding-bottom: 0.5em;
+}
+
+#search_area input {
+    width: 100%;
+}
+
+#side {
+    float: right;
+    margin-top: 1em;
+    margin-left: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
+    width: 20%;
+    /*   border-left: 1px dotted #888;
+    -moz-border-radius: 10px;
+    border-radius: 10px;  */
+    font-size: 0.82em;
+}
+
+#edit_link {
+    font-size: 0.88em;
+    float: left;
+}
+
+#new_link {
+    font-size: 0.88em;
+    float: right;
+}
+
+nav {
+    display: inline;
+}
+
+.list_of_links {
+    padding-bottom: 0.33em;
+}
+
+/* Wrap text in pre's */
+pre.prettyprint {
+    display: inline-block;
+    overflow: auto;
+    overflow-x: auto;
+    /* Use horizontal scroller if needed; for Firefox 2, not */
+    white-space: pre-wrap; /* css-3 */
+    white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
+    word-wrap: break-word; /* Internet Explorer 5.5+ */
+    white-space: normal; /* crucial for IE 6, maybe 7? */
+}
+
+#message_area {
+    color: sienna;
+    font-size: .92em;
+    font-style: italic;
+}
+
+.toc {
+    background-color: #F6F6F6;
+    border: 1px dotted #AAAAAA;
+    padding: 2px;
+    font-size: 0.92em;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.toc ul {
+    margin-bottom: 0.1em;
+    margin-top: 0.1em;
+    margin-left: 0.1em;
+}
+
+.toc>ul { /*    margin-left: 0.0em; */
+    
+}
+
+.toc li {
+    margin: 0;
+    padding: 0;
+    margin-left: -1.5em;
+    font-size: 1em !important;
+    /* some rule makes the font smaller as the indentation increases */
+}
+
+#sortable {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 60%;
+}
+
+#sortable li {
+    margin: 0 3px 3px 3px;
+    padding: 0.2em;
+    padding-left: 1.0em;
+    font-size: 1.2em;
+    background-color: #F6F6F6;
+    border: 1px dotted #AAAAAA;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+}
+/* #sortable li span { position: absolute; margin-left: -1.3em; } */
+div.note {
+    display: inline-block;
+    background-color: #ffff9c;
+    margin-left: -1em;
+    padding: 5px;
+    border: 1px solid #cccccc;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    font-size: 1.08em;
+}
+
+table.monthly_calendar {
+  border: 0px solid #cccccc;
+  width: 100%;
+  margin: auto;
+  border-collapse:collapse;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  margin-bottom: 1em;
+}    
+th.previous {
+     text-align:left;
+     font-size: 92%;
+}
+th.next {
+     text-align:right;
+     font-size: 92%;
+}
+th.calendar_month {
+    font-size: 108%;
+}
+th.weekdays {
+    width: 80px;
+    text-align: center;
+    border: 1px solid #dddddd;
+    background-color: #FEC0A3; /* wheat */
+}
+table.monthly_calendar td {
+   height:80px;
+   vertical-align:top;
+   border: 1px solid #dddddd;
+}
+
+table.header {
+    width: 100%;
+    border-collapse:collapse;
+}
+
+section.released {
+    margin: 0.5em;
+}
+
+section.developer {
+    margin: 0.5em;
+}
+
+.module_abstract {
+    font-style: italic;
+    font-size: 108%;
+    font-family: sans-serif;
+    padding: 0px;
+}
+
+.Module {
+    padding: 0px;
+    margin-bottom: 0em;
+}
+
+#footer_area {
+    clear:left;
+}

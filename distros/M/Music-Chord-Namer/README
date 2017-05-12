@@ -1,0 +1,36 @@
+Music-Chord-Namer version 0.01
+==============================
+
+Give it notes, it names the chord.
+
+Music::Chord::Namer optionally exports one sub, chordname, which accepts some notes as either a string
+or a list and returns the best chord name it can think of.
+
+chordname() accepts either a string of notes such as "C Eb G A#" or a list of notes such as
+qw/Ab Bb F Bb D/.  In a scalar context it returns the best name it could think of to describe the 
+chord made from the notes you gave it.  In an array context it returns all of the names it thought
+of, sorted from best to worst (shortest to longest!)
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module is purely perl and only uses strict and Exporter. This module requires no other modules.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Jimi-Carlo Bukowski-Wills
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

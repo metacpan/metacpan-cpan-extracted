@@ -1,0 +1,226 @@
+Revision history for Perl extension Math::Int64.
+
+0.54     2016-01-04
+        - don't use the reserved preprocessor macro __INT64 which was
+          causing a conflict in Cygwin (bug report by Graham Ollis)
+
+0.53     2015-05-14
+        - warn when both native_if_available and die_on_overflow are
+          enabled (bug report by David Wheeler).
+
+0.52     2015-03-12        
+        - include stdint.h when compiling with recent MS compilers
+          (bug report by A. Sinan Unur)
+        - fix C API generation on Windows (bug report by A. Sinan
+          Unur)
+
+0.51     2015-03-09
+        - when building the wrapper object, sv_bless may copy the NV
+          slot as a float and mess its bits (bug report and analysis
+          by Aleksey Mashanov, #RT100861)
+
+0.50     2015-03-09
+        - fix test failing in s390 (bug report by David Dick)
+        - NO_INIT optimizations reapplied
+        - remove gcc-isms breaking compilation with Solaris Studio
+        - Solaris make doesn't like unicode
+        - Fix Dist::Zilla issues (Dave Rolsky)
+
+0.49_01  2014-12-12
+        - Bad release
+
+0.34_01  2014-12-29
+        - Removed compiler detection in favor of compiler feature checking
+           with Config::AutoConf (Dave Rolsky)
+        - Add more tests
+        - Fixed some compiler warnings
+
+0.34     2014-10-30
+        - native_to_uint64 was broken when using native integers (bug
+          report by Aleksey Mashanov)
+        - add sv_seti64 and sv_setu64 macros (feature request by
+          Graham Ollis)
+
+0.33     2014-10-28
+        - fix test failures caused by operator ** sometimes not being
+          precise enough (reported by John David Anglin, Gregor
+          Herrmann and Sisyphus)
+
+0.32     2014-09-09
+        - BER_length was broken (bug report and solution by Mark Donovan)
+        - add native U64 to NV conversion support for some versions of MS
+          Visual C (patch by bulk88)
+
+0.31     2013-07-17
+        - fix spelling errors (bug report by dsteinbrunner@pobox.com)
+        - add automatic spelling test
+        - more and better tests (patch contributed by Dave Rolsky)
+
+0.30     2013-06-03
+        - fix compilation error/warning when compiling with GCC
+          format-security feature enabled (bug report by Jerome Quelin)
+        - use Travis CI for testing
+
+0.29     2013-01-07
+        - support perl 5.6 (patch by bulk88)
+
+0.28     2012-12-10
+        - rerelease as stable
+
+0.27_07  2012-09-19
+        - add support for OpenWatcom compiler (patch contributed by
+          NormW)
+
+0.27_06  2012-09-14
+        - make internal SV read only so can not be changed from the
+          Perl side.
+        - bug on internal C functions SvSU64 and SvSI64 corrected
+        - remove C++ style comments from XS
+
+0.27_05  2012-09-14
+        - add support for Storable freeze/thaw (feature request by
+          Don Armstrong)
+        - solve nasty bug on int64 <=> string conversions not setting
+          the '\0' byte at the end of the string
+        - on the string to int64 conversions, force byte encoding first
+        - add support for BER encoding/decoding (see perlfunc/pack)
+        - more tests added
+
+0.27_04  2012-07-20
+        - version declaration mismatch in c_api.decl corrected
+
+0.27_03  2012-07-19
+       - require version 2 of the C API on the client support files
+
+0.27_02  2012-07-18
+       - add support for exponentiation operators (** **=)
+       - correct several errors on the C API support files
+
+0.27_01  2012-07-17
+       - generate C API using Module::CAPIMaker
+       - make isaac64 methods thread friendly
+       - do not overflow on shift operations
+
+0.26     2012-06-07
+       - solve another uint64->double conversion not supported by MS
+         compiler issue
+
+0.25     2012-06-05
+       - typo in preprocessor conditional solved.
+
+0.24     2012-06-05
+       - workaround bug on old MS compilers not implementing
+         NV->uint64_t conversions and silently using NV->int64_t
+         instead
+
+0.23     2012-06-04
+       - multiplication of uint64 values was broken for very large
+         operands
+       - place local variables inside PREINIT blocks in XS code
+
+0.22     2012-06-04
+       - more fixes for MS compiler
+       - test for uint64 to NV conversions added
+
+0.21     2012-06-04
+       - make other and rev arguments optional for overloading methods
+         when possible so that they can be called directly
+
+0.20     2012-06-03
+        - several fixes for MS compiler (bug reports and testing by
+          bulk88 at PerlMonks)
+        - native_to_uint64 was broken
+
+0.19     2012-06-01
+        - do not overflow on shifts
+        - add limits constants
+
+0.18_04  2011-12-25
+        - optimize SV to int64/uint64 conversions
+        - switch perl stack before calling as_int64/as_uint64 methods
+
+0.18_03  2011-12-23
+        - uint64 multiplication and shift operations were broken,
+          corrected
+        - add support for as_int64 and as_uint64 callbacks
+        - make native_if_available a lexical pragma, there is some
+          risk of breaking old code using this pragma selectively on
+          5.8.x perls
+        - doc improvements
+
+0.18_02  2011-12-20
+        - make it run in perls 5.8, 5.10 and 5.12
+        - several doc corrections
+        - document die_on_overflow.pm
+
+0.18_01  2011-12-19
+        - released to CPAN just for CPAN Testers feedback
+        - add support for die_on_overflow feature
+
+0.17     2011-06-08
+        - add support for MinGW32 compiler on Windows to C API
+
+0.16     2011-06-02
+        - include ppport.h in perl_math_int64.c
+
+0.15     2011-05-27
+        - update ppport.h from Devel::PPPort 3.19 as some perlapi
+          functions not available on perls older than 5.10 are now
+          used.
+
+0.14     2011-05-27
+        - add support for 64bit random number generation
+        - selectively import subs from Math::Int64 or from ...::Native
+
+0.13     2011-05-26
+        - there were a couple of bugs on the str to int64 conversion
+          code
+
+0.12     2011-05-26
+        - add support for several string to int64 conversion functions
+        - replace usage of strtoll and friends for custom strtoint64
+
+0.11     2011-05-25
+        - introduce C API
+        - require perl 5.8.x
+
+0.10     2011-02-08
+        - solved bug in uint64_to_number
+        - replace sprintf by hand crafted int64 to string conversor
+
+0.09     2009-10-23
+        - native backend was failing due to different semantics under
+          perls compiled with long double support
+
+0.08     2009-10-17
+        - Fallback to native 64bit support if available feature added
+
+0.07     2009-10-17
+        - IV backend for computers with native 64bit IVs
+
+0.06     2009-10-17
+        - syntax error was broken compilation with MS compiler (bug
+          report by Taro Nishino)
+
+0.05     2009-10-16
+        - some bit operations were broken (bug report by Adam Woodworth)
+
+0.04     2009-09-10
+        - make it work under Strawberry Perl and probably other perl
+          Windows ports! (bug report and patch by Sisyphus)
+
+0.03     2007-04-05
+        - use SvIOK_UV instead of SvUOK (that's not supported in older
+          perls)
+        - int64_to_net and uint64_to_net were only accepting
+          Math::U?Int64 objects
+        - some more tests added
+
+0.02     2007-04-04
+        - support for uint64 added
+        - autodetect strtoll, atoll, etc. support
+
+0.01     2007-03-30
+	- original version; created by h2xs 1.23 with options
+		-An Math::Int64
+

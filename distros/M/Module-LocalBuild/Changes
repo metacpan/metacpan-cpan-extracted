@@ -1,0 +1,54 @@
+Revision history for Perl extension Module::LocalBuild.
+
+The contributors that suggested a given feature are shown in [].  [by ...]
+indicates the contributor was also the author of the fix; Thanks!
+
+* Module::LocalBuild 1.013 2010/08/04
+
+****	Fix Pod::Usage dependency, rt51024.  [Andreas Koenig]
+
+****	Give obvious error message when MS-Windows unsupported.
+
+* Module::LocalBuild 1.012 2010/01/12
+
+***	Ignore .git directories when detecting changes.
+
+* Module::LocalBuild 1.011 2009/05/19
+
+**	This package is now licensed under LGPL v3 and/or Artistic v2.0.
+
+***	Ignore Make::Cache temporary files when detecting changes.
+
+* Module::LocalBuild 1.010 2008/08/15
+
+***	Add mlbuilder --makeflag option.
+
+***	Add mlbuilder --version option.
+
+* Module::LocalBuild 1.001 2007/05/07
+
+****	Fix localboot test.  [cpan-testers]
+
+* Module::LocalBuild 1.000 2007/05/03
+
+**	First packaged release to CPAN.
+
+* Module::LocalBuild 0.000 2001
+
+**	First version created for internal use.
+
+----------------------------------------------------------------------
+DESCRIPTION: Documentation on change history for this package
+----------------------------------------------------------------------
+
+This uses outline mode in Emacs.  See C-h m [M-x describe-mode].
+
+Copyright 2001-2010 by Wilson Snyder.  This program is free software; you
+can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License Version 3 or the Perl Artistic License
+Version 2.0.
+
+Local variables:
+mode: outline
+paragraph-separate: "[ 	\f\n]*$"
+end:

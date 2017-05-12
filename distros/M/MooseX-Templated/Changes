@@ -1,0 +1,48 @@
+Revision history for MooseX-Templated
+
+0.09  2016-10-17
+
+ - allow render("xml") (with deprecation notice) (GH#2)
+
+0.08  2016-10-13
+
+ - fixed broken cross-platform test (GH#1)
+
+0.07  2016-10-12
+
+ - updated build data to allow CI tests/builds
+
+0.06  2016-10-11
+
+ - updated cpan meta data
+
+0.05  2016-10-11
+
+ - doc changes (minor)
+
+0.04  2016-10-11
+
+ - Complete rewrite: similar concepts, but NOT backwards compatible
+   - tidied up the interface and docs
+   - removed unnecessary deps (e.g. File::Where)
+
+0.03  2014-02-24
+
+ - Brought this up to date with Moose 2.0.
+
+0.02  2008-11-24
+
+ - Moved VERSION info to MX::T
+ - Moved perigrin to ACKNOWLEDGEMENTS rather than AUTHOR
+   - perigrin very much helped to lay out the project, but he shouldn't
+     get blamed for any of my mistakes in the implementation :)
+ - Tests:
+   - Fixed cross platform issues (thanks Taro Nishino RT#41168)
+        lib/MooseX/Templated/View.pm
+   - Fixed handling of single param in render()
+        lib/MooseX/Templated/View/TT.pm
+   - Added more info to the croak message when TT->process fails
+
+0.01  2008-11-13
+
+ - Initial release.

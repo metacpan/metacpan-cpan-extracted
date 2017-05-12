@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+lib/Math/Quaternion.pm
+README
+t/001_basic.t
+t/002_overloading.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

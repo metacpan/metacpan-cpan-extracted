@@ -1,0 +1,151 @@
+=encoding utf8
+
+=head1 NAME
+
+Module::Package::Plugin - Base class for Module::Package author-side plugins
+
+=head1 SYNOPSIS
+
+    package Module::Package::Name;
+
+    package Module::Package::Name::flavor;
+    use Moo;
+    extends 'Module::Package::Plugin';
+
+    sub main {
+        my ($self) = @_;
+        $self->mi->some_module_install_author_plugin;
+        $self->mi->other_author_plugin;
+    }
+
+    1;
+
+=head1 DESCRIPTION
+
+This module is the base class for Module::Package plugins. 
+
+=head1 EXAMPLE
+
+Take a look at the L<Module::Package::Ingy> module, for a decent starting
+point example. That plugin module is actually used to package Module::Package
+itself.
+
+=head1 API
+
+To create a Module::Package plugin you need to subclass
+Module::Package::Plugin and override the C<main> method, and possibly other
+things. This section describes how that works.
+
+Makefile.PL processing happens in the following order:
+
+    - 'use inc::Module::Package...' is invoked
+    - $plugin->initial is called
+    - BEGIN blocks in Makefile.PL are run
+    - $plugin->main is called
+    - The body of Makefile.PL is run
+    - $plugin->final is called
+
+=head2 initial
+
+This method is call during the processing of 'use inc::Module::Package'. You
+probably don't need to subclass it. If you do you probably want to call the
+SUPER method.
+
+It runs the deps_list, if any and guesses the primary modules file path.
+
+=head2 main
+
+This is the method you must override. Do all the things you want. You can call
+C<all_from>, if you need to get sequencing right, otherwise it gets called by
+final(). Don't call C<WriteAll>, it get's called automatically in final().
+
+=head2 final
+
+This does all the things after the entire Makefile.PL body has run. You
+probably don't need to override it.
+
+=head1 OPTIONS
+
+The following options are available for use from the Makefile.PL:
+
+    use Module::Package 'Foo:bar',
+        deps_list => 0|1,
+        install_bin => 0|1,
+        install_share => 0|1,
+        manifest_skip => 0|1,
+        requires_from => 0|1;
+
+These options can be used by any subclass of this module.
+
+=head2 deps_list
+
+Default is 1.
+
+This option tells Module::Package to generate a C<author_requires> deps list,
+when you run the Makefile.PL. This list will go in the file
+C<pkg/deps_list.pl> if that exists, or after a '__END__' statement in your
+Makefile.PL. If neither is available, a reminder will be warned (only when the
+author runs it).
+
+This list is important if you want people to be able to collaborate on your
+modules easily.
+
+=head2 install_bin
+
+Default is 1.
+
+All files in a C<bin/> directory will be installed. It will call the
+C<install_script> plugin for you. Set this option to 0 to disable it.
+
+=head2 install_share
+
+Default is 1.
+
+All files in a C<share/> directory will be installed. It will call the
+C<install_share> plugin for you. Set this option to 0 to disable it.
+
+=head2 manifest_skip
+
+Default is 1.
+
+This option will generate a sane MANIFEST.SKIP for you and delete it again
+when you run C<make clean>. You can add your own skips in the file called
+C<pkg/manifest.skip>. You almost certainly want this option on. Set to 0 if
+you are weird.
+
+=head2 requires_from
+
+Default is 1.
+
+This option will attempt to find all the requirements from the primary module.
+If you make any of your own requires or requires_from calls, this option will
+do nothing.
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Module::Package>
+
+=item *
+
+L<Module::Package::Tutorial>
+
+=back
+
+=head1 AUTHOR
+
+Ingy döt Net <ingy@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2011. Ingy döt Net.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html
+
+=cut

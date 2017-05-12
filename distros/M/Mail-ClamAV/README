@@ -1,0 +1,280 @@
+NAME
+    Mail::ClamAV - Perl extension for the clamav virus scanner
+
+SYNOPSIS
+        use Mail::ClamAV qw/:all/;
+
+        # $Mail::ClamAV::Error in numeric context return clamav's
+        # error status code which corresponds to the constants which
+        # can be exported
+        my $c = new Mail::ClamAV("/path/to/directory/or/file")
+            or die "Failed to load db: $Mail::ClamAV::Error (", 0+$Mail::;
+
+        # You can get retdbdir() to get the database dir in
+        # clamav's conf
+        my $c = new Mail::ClamAV(retdbdir())
+            or die "Failed to load db: $Mail::ClamAV::Error";
+
+        # When database is loaded, you must create the proper trie with:
+        $c->build or die "Failed to build engine: $Mail::ClamAV::Error";
+
+        # check to see if we need to reload
+        if ($c->statchkdir) {
+            $c = new Mail::ClamAV(retdbdir());
+            $c->build or die "Failed to build engine: $Mail::ClamAV::Error";
+        }
+
+        # Set some limits (only applies to scan())
+        $c->maxreclevel(4);
+        $c->maxfiles(20);
+        $c->maxfilesize(1024 * 1024 * 20); # 20 megs
+
+        # Scan a filehandle (scandesc in clamav)
+        # scan(FileHandle or path, Bitfield of options)
+        my $status = $c->scan(FH, CL_SCAN_ARCHIVE|CL_SCAN_MAIL);
+
+        # Scan a file (scanfile in clamav)
+        my $status = $c->scan("/path/to/file.eml", CL_SCAN_MAIL);
+
+        # $status is an overloaded object
+        die "Failed to scan: $status" unless $status;
+        if ($status->virus) {
+            print "Message is a virus: $status\n";
+        }
+        else {
+            print "No virus found!\n";
+        }
+
+DESCRIPTION
+    Clam AntiVirus is an anti-virus toolkit for UNIX
+    <http://www.clamav.com/>. This module provide a simple interface to its
+    C API.
+
+  EXPORT
+    None by default.
+
+  Exportable constants
+    Options for scanning.
+
+    CL_SCAN_STDOPT
+     This is an alias for a recommended set of scan options. You should use
+     it to make your software ready for new features in the future versions
+     of libclamav.
+
+    CL_SCAN_RAW
+     Use it alone if you want to disable support for special files.
+
+    CL_SCAN_ARCHIVE
+     This flag enables transparent scanning of various archive formats.
+
+    CL_SCAN_BLOCKENCRYPTED
+     With this flag the library will mark encrypted archives as viruses
+     (Encrypted.Zip, Encrypted.RAR).
+
+    CL_SCAN_BLOCKMAX
+     Mark archives as viruses if maxfiles, maxfilesize, or maxreclevel limit
+     is reached.
+
+    CL_SCAN_MAIL
+     Enable support for mail files.
+
+    CL_SCAN_MAILURL
+     The mail scanner will download and scan URLs listed in a mail body.
+     This flag should not be used on loaded servers. Due to potential
+     problems please do not enable it by default but make it optional.
+
+    CL_SCAN_OLE2
+     Enables support for OLE2 containers (used by MS Office and .msi files).
+
+    CL_SCAN_PE
+     This flag enables deep scanning of Portable Executable files and allows
+     libclamav to unpack executables compressed with run-time unpackers.
+
+    CL_SCAN_ELF
+     Enable support for ELF files.
+
+    CL_SCAN_BLOCKBROKEN
+     libclamav will try to detect broken executables and mark them as
+     Broken.Executable.
+
+    CL_SCAN_HTML
+     This flag enables HTML normalisation (including ScrEnc decryption).
+
+    CL_SCAN_ALGORITHMIC
+     Enable algorithmic detection of viruses.
+
+    CL_SCAN_PHISHING_DOMAINLIST
+     With a minor version bump clamav development team removed this and
+     broke backwards compatibility, so it is no longer supported in this
+     module as of 0.22.
+
+    CL_SCAN_PHISHING_BLOCKSSL
+     Phishing module: always block SSL mismatches in URLs.
+
+    CL_SCAN_PHISHING_BLOCKCLOAK
+     Phishing module: always block cloaked URLs.
+
+    Status returns. You can get the status code by putting the status object
+    returned into into numeric context.
+
+        my $status = $c->scan("foo.txt");
+        print "Status: ", ($status + 0), "\n";
+
+    The following are returned statuses if no error occured.
+
+    CL_CLEAN
+     no viruses found
+
+    CL_VIRUS
+     virus found, put the status in scalar context to see the type
+
+    Error statuses
+
+    CL_EMAXREC
+     recursion limit exceeded
+
+    CL_EMAXSIZE
+     size limit exceeded
+
+    CL_EMAXFILES
+     files limit exceeded
+
+    CL_EACCES
+     access denied
+
+    CL_ENULLARG
+     null argument
+
+    CL_ETMPFILE
+     tmpfile() failed
+
+    CL_EMEM
+     memory allocation error
+
+    CL_EOPEN
+     file open error
+
+    CL_EMALFDB
+     malformed database
+
+    CL_ETMPDIR
+     mkdir() failed
+
+    CL_ECVD
+     not a CVD file (or broken)
+
+    CL_EFORMAT
+     bad format or broken file
+
+    CL_ENCINIT
+     NodalCore initialization failed
+
+    CL_ENCLOAD
+     error loading NodalCore database
+
+    CL_ENCIO
+     general NodalCore I/O error
+
+  Exportable functions
+    These function can be exported either individually or using the :all
+    export flags
+
+    retdbdir
+     This function returns the path to the database directory specified when
+     clamav was compiled.
+
+METHODS
+  Settings
+    NOTE These settings only apply to "scan()" and archives
+    (CL_SCAN_ARCHIVE).
+
+    maxreclevel
+     Sets the maximum recursion level into archives [default 5].
+
+    maxmailrec
+     With a minor version bump clamav development team removed this and
+     broke backwards compatibility, so it is no longer supported in this
+     module as of 0.22.
+
+    maxfiles
+     Maximum number of files that will be scanned [default 1000]. A value of
+     zero disables the check.
+
+    maxfilesize
+     Maximum file size that will be scanned in bytes [default 10M]. A value
+     of zero disables the check.
+
+    maxratio
+     With a minor version bump clamav development team removed this and
+     broke backwards compatibility, so it is no longer supported in this
+     module as of 0.22.
+
+  Scanning
+    All of these methods return a status object. This object is overloaded
+    to make things cleaner. In boolean context this will return false if
+    there was an error. For example: my $status = $c->scan("foo.txt"); die
+    "Error scanning: $status" unless $status;
+
+    As you probably just noticed, $status in scalar context returns the
+    error message. In addition to the overloading you just saw, $status has
+    the following methods:
+
+    errno
+     The numeric value (if any) clamav returned.
+
+    clean
+     This will be true if the message was not a virus and an error did not
+     occur.
+
+    virus
+     Returns true if the message is a virus.
+
+    error
+     Return the error message (if any). This is the same thing as quoting
+     $status.
+
+    count
+     Returns the number of messages scanned. Only works with archives.
+
+    scan(FileHandle or Path, Bitfield of options)
+     "scan()" takes a FileHanle or path and passed the file descriptor for
+     that off to clamav. The second argument is a bitfield of options,
+     CL_SCAN_MAIL, CL_SCAN_ARCHIVE or CL_SCAN_RAW "Exportable constants".
+
+     This function returns the status object discussed earlier.
+
+     Note that if you are running in taint mode (-T) and a tainted path is
+     passed to "scan()", it will "croak()".
+
+    scanbuff($buff)
+     This function was taken out of ClamAV in 0.90 and was thus taken out of
+     Mail::ClamAV.
+
+  Data Directory stats
+    If the path passed into "new()" is a directory Mail::ClamAV will set
+    things up to check for updated database files. Calling the
+    "statchkdir()" will check the database directory to the stats we have in
+    memory. If anything has changed true is returned, otherwise false.
+
+    NOTE: trying to use "statchkdir()" when you passed in a database file
+    instead of directory will produce a fatal error.
+
+    "statchkdir()" is useful for long running daemons that need to check to
+    see if it is time to reload the database. Reloading is simply getting a
+    new Mail::ClamAV object and initializing it.
+
+SEE ALSO
+    The ClamAV API documentation
+    <http://www.clamav.net/doc/html-0.65/node44.html>
+
+AUTHOR
+    David P.C. Wollmann <converter42@gmail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2003 by Gossamer Threads Inc.
+    <http://www.gossamer-threads.com>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.1 or, at
+    your option, any later version of Perl 5 you may have available.
+

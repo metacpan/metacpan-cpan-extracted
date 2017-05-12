@@ -1,0 +1,58 @@
+# $Id: README,v 1.0 2005/09/22 19:38 $
+
+--------
+Abstract
+--------
+
+Module::Crypt encrypts your pure-Perl modules and then compiles them
+into a XS module. This lets you distribute binary versions without
+disclosing code.
+
+------------
+Requirements
+------------
+
+Module::Crypt requires Module::Build as a backend.
+
+------------------
+Basic Installation
+------------------
+
+Module::Crypt may be installed through the CPAN shell in
+the usual manner.  Typically:
+
+  $ perl -MCPAN -e 'intstall Module::Crypt'
+
+You can also read this README from the CPAN shell:
+
+  $ perl -MCPAN -e shell
+  cpan> readme Module::Crypt
+
+And you can install the component from the CPAN prompt as well:
+
+  cpan> install Module::Crypt
+
+-------------------
+Manual Installation
+-------------------
+
+This module may also be installed manually.  Its distribution is
+available from the author's CPAN directory,
+<ftp://ftp.cpan.org/pub/CPAN/authors/id/A/AA/AAR/>, or a similarly
+named directory at your favorite CPAN mirror.
+
+Downloading and unpacking the distribution are left as exercises for
+the reader.  To build and test it:
+
+  perl Makefile.PL
+  make test
+
+When you're ready to install the component:
+
+  make install
+
+It should now be ready to use.
+
+Thanks for reading!
+
+-- Alessandro Ranellucci / aar@cpan.org / http://alex.primafila.net

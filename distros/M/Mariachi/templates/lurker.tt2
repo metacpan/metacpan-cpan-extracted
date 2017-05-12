@@ -1,0 +1,69 @@
+[%# lurker-style thread indexes %]
+[% PROCESS header.tt2 title=mariachi.config.name _ ' - Cronological View' %]
+[% PROCESS paginate.tt2 %]
+
+<h1>[% mariachi.config.name %]</h1>
+
+[% PROCESS pagenav.tt2 %]
+
+[%     mapping = { ' ' => 'blank',
+                   '|' => 'vertical',
+                   '-' => 'horizontal',
+                   'L' => 'corner',
+                   'T' => 'tee',
+                   '{' => 'cross',
+                  }
+%]
+
+[% FOREACH root = page.splice(content) %]
+<h2>[% root.0.0.topmost.message.subject | html | mariachi %]</h2>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">[% y = 0 %]
+    [% FOREACH row = root %]
+        [% y = loop.count %] 
+        <tr height="24" class="[% loop.count % 2 == 0 ? "row1" : "row2" %]">
+        [% FOREACH cell = row %]
+            [% tmp = loop.count ; x = loop.count - 1 %]
+	    [% IF cell.message %]
+                [% message = cell.message %]
+                [% IF root.$y && root.$y.$x && root.$y.$x != ' ' && root.$y.$x != '-' %][%# something beneath us %]
+                    [% IF row.$tmp && row.$tmp != ' ' && row.$tmp != '|' %]
+                       [% img = 'message-top-bottom-right' %]
+                    [% ELSE %]
+                       [% img = 'message-top-bottom' %]
+                    [% END %] 
+                [% ELSE %] 
+                    [% img = 'message-terminal' %]
+                [% END %]
+            	<td width="24"><a name="[% cell.message.filename %]" href="[% cell.message.filename %]"><img src="images/[% img %].png" height="24" width="24" alt="*" border="0"></a></td>
+            [% ELSE %]
+                [% IF cell == '+' || cell == 'L' %][%# may really be a tee, or a corner %]
+                    [% cell = row.$tmp.match('[+{-]') ? 'T' : 'L' %]
+		[% END %]
+		<td width="24"><img src="images/[% mapping.$cell %].png" height="24" width="24" alt="[% cell %]"></td>
+	    [% END %]
+        [% END %]
+        [% message.linked.lurker = file %]
+        <td width="48"><img src="images/blank.png" width="48" height="24"></td>
+	<td rowspan="2"><small>[% context = mariachi.config.get('lurker-context') ; IF context %]
+		[% message.$context | html | mariachi %]<br />[% END %]
+			<a href="[% message.filename %]">[% message.from | html %]</a> [% date.format( message.epoch_date ) %]</small></td>
+        </tr>
+        <tr class="[% loop.count % 2 == 0 ? "row1" : "row2" %]">
+        [% FOREACH cell = row %]
+	    [% x = loop.count - 1 %]
+	    [% IF cell != ' ' && root.$y && root.$y.$x && !root.$y.$x.match('[ +-]') %][%# something beneath %]
+               <td width="24" background="images/vertical.png">&nbsp;</td>
+	    [% ELSE %]
+	       <td width="24"></td>
+            [% END %]
+        [% END %]
+            <td></td>
+            <td></td>
+	</td>
+    [% END %]
+</table>
+
+[% END %]
+
+[% PROCESS pagenav.tt2 %]
+[% PROCESS footer.tt2 %]

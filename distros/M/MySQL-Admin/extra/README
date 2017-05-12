@@ -1,0 +1,48 @@
+NAME
+    MySQL::Admin 
+
+SYNOPSIS
+    MySQL administration Web-App and Content Management System
+
+    Copy the whole tar-ball to your Document Root.
+
+    Open http://host/myAdmin/install.html in your Browser.
+    
+    Open index.html in your Browser.
+
+    Delete cgi-bin/install.pl
+
+    Delete install.html
+
+    You can also install this Programm via Cpan.
+
+    cpan MySQL::Admin
+
+
+DEPENDENCIES
+
+This module requires these other modules and libaries:
+    Test::More >= 0.7,
+    Module::Build >= 0.2808,
+    DBI >= 1.50,
+    CGI >= 3.29,
+    MD5 >= 2.03,
+    URI >= 1.40
+recommends
+    Authen::Captcha >= 1.024
+    Syntax::Highlight::Engine::Kate >= 0.10,
+    Frontier::RPC2 >= 0.06,
+    XML::XSLT >= 0.48
+
+COPYRIGHT
+    Copyright (C) 2006-2015 by Hr. Dirk Lindner
+
+    perl -e'sub lze_Rocks{print/(...)/ for shift;}sub{&{"@_"}}->("lze_Rocks")'
+
+    This program is free software; you can redistribute it and/or modify it 
+    under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation; This program is distributed in the hope 
+    that it will be useful, but WITHOUT ANY WARRANTY; without even
+    the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details
+

@@ -1,0 +1,22 @@
+0.07
+    - Add resources to distribution metadata.
+
+0.06
+    - Avoid using a full table lock, stick to application locks instead.
+
+0.05
+    - Make locks low priority, but we still block on them.
+
+0.04
+    - Get made_new_ref return value correct.
+    - Munge arguments to work with Mogile::Client without poking around in
+      it's internals.
+
+0.03
+    - Fix up domain argument.
+
+0.02
+    - Fix argument passing.
+
+0.01
+    - Initial release.

@@ -1,0 +1,48 @@
+=head1 NAME
+
+Mozilla::DOM::Text
+
+=for object Mozilla::DOM::Text
+
+Mozilla::DOM::Text is a wrapper around an instance of Mozilla's
+nsIDOMText interface. This inherits from
+L<Mozilla::DOM::CharacterData|Mozilla::DOM::CharacterData>.
+
+ * The nsIDOMText interface inherits from nsIDOMCharacterData and represents
+ * the textual content (termed character data in XML) of an Element or Attr.
+ *
+ * For more information on this interface please see
+ * L<http:E<sol>E<sol>www.w3.orgE<sol>TRE<sol>DOM-Level-2-CoreE<sol>>
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::Text->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $str = $text->B<SplitText>($offset)
+
+=over
+
+=over
+
+=item * $offset (integer (long))
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

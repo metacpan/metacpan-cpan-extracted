@@ -1,0 +1,90 @@
+NAME
+    Mail::Thread - Perl implementation of JWZ's mail threading algorithm
+
+SYNOPSIS
+        use Mail::Thread;
+        my $threader = new Mail::Thread (@messages);
+
+        $threader->thread;
+
+        dump_em($_,0) for $threader->rootset;
+
+        sub dump_em {
+            my ($self, $level) = @_;
+            print (' \\-> ' x $level);
+            if ($self->message) {
+                print $self->message->head->get("Subject") , "\n";
+            } else {
+                print "[ Message $self not available ]\n";
+            }
+            dump_em($self->next, $level) if $self->next;
+            dump_em($self->child, $level+1) if $self->child;
+        }
+
+DESCRIPTION
+    This module implements something relatively close to Jamie Zawinski's
+    mail threading algorithm, as described by
+    http://www.jwz.org/doc/threading.html. Any deviations from the algorithm
+    are accidental.
+
+    It doesn't do threading by subject yet, because I don't need it yet.
+
+    It's happy to be handed "Mail::Internet" and "Mail::Box::Message"
+    objects, since they're more or less the same, but nothing other than
+    that.
+
+METHODS
+  new(@messages)
+    Creates a new threader; requires a bunch of messages to thread.
+
+  thread
+    Goes away and threads the messages together.
+
+  rootset
+    Returns a list of "Mail::Thread::Container"s which are not the parents
+    of any other message.
+
+"Mail::Thread::Container" methods
+    "Mail::Thread::Container"s are the nodes of the thread tree. You can't
+    just have the ordinary messages, because we might not have the message
+    in question. For instance, a mailbox could contain two replies to a
+    question that we haven't received yet. So all "logical" messages are
+    stuffed in containers, whether we happen to have that container or not.
+
+    To do anything useful with the thread tree, you're going to have to
+    recurse around the list of "Mail::Thread::Containers". You do this with
+    the following methods:
+
+  parent
+  child
+  next
+    Returns the container which is the parent, child or immediate sibling of
+    this one, if one exists.
+
+  message
+    Returns the message held in this container, if we have one.
+
+  id
+    Returns the message ID for this container. This will be around whether
+    we have the message or not, since some other message will have referred
+    to it by message ID.
+
+  find_child($child)
+    Returns true if this container has the given container as a child
+    somewhere beneath it.
+
+  children
+    Returns a list of the immediate children of this container.
+
+  recurse_down($callback)
+    Calls the given callback on this node and all of its children.
+
+AUTHOR
+    Simon Cozens, <simon@kasei.com>
+
+COPYRIGHT AND LICENSE
+    Copyright 2003 by Kasei
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

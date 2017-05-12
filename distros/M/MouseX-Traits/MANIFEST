@@ -1,0 +1,16 @@
+.shipit
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/WriteAll.pm
+lib/MouseX/Traits.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+t/00-load.t
+t/basic.t
+t/parameterized.t
+t/subclass.t

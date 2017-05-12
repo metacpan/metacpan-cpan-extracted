@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modsCollection xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.loc.gov/mods/v3" xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-3.xsd">
+ <mods version="3.3">
+    <titleInfo>
+        <title>Telescope Peak from Zabriskie Point</title>
+    </titleInfo>
+    <titleInfo type="alternative" >
+        <title>Telescope PK from Zabriskie Pt.</title>
+    </titleInfo>
+    <name type="personal">
+        <namePart type="family">Cushman</namePart>
+        <namePart type="given">Charles Weever</namePart>
+        <namePart type="date">1896-1972</namePart>
+        <role>
+            <roleTerm type="code" authority="marcrelator">pht</roleTerm>
+            <roleTerm type="text" authority="marcrelator">Photographer</roleTerm>
+        </role>
+        <affiliation>ug_TW14</affiliation>
+    </name>
+    <typeOfResource>still image</typeOfResource>
+    <genre authority="gmgpc">Landscape photographs</genre>
+    <originInfo>
+        <dateCreated encoding="w3cdtf" keyDate="yes">1955-03-22</dateCreated>
+        <copyrightDate encoding="w3cdtf">2003</copyrightDate>
+    </originInfo>
+    <physicalDescription>
+        <internetMediaType>image/jpeg</internetMediaType>
+        <digitalOrigin>reformatted digital</digitalOrigin>
+        <note> Original 35mm slide was digitized in 2003 as a TIFF image. Display versions in JPEG format in three sizes are available.</note>
+        <note>100 f 6.3 tl</note>
+    </physicalDescription>
+    <subject authority="lctgm">
+        <topic>Mountains</topic>
+    </subject>
+    <subject authority="lctgm">
+        <topic>Snow</topic>
+    </subject>
+    <subject>
+        <topic>Telescope Peak (Inyo County, Calif.)</topic>
+    </subject>
+    <subject>
+        <topic>Zabriskie Point (Calif.)</topic>
+    </subject>
+    <subject>
+        <hierarchicalGeographic>
+            <country>United States</country>
+            <state>California</state>
+            <county>Inyo</county>
+        </hierarchicalGeographic>
+    </subject>
+    <relatedItem type="original">
+        <originInfo>
+            <dateCreated encoding="w3cdtf" keyDate="yes">1955-03-22</dateCreated>
+        </originInfo>
+        <physicalDescription>
+            <form authority="gmd">graphic</form>
+            <extent>1 slide : col. ; 35mm</extent>
+            <note>Original 35mm slide was digitized in 2003 as a TIFF image. Display versions in JPEG format in three sizes are available.</note>
+        </physicalDescription>
+        <location>
+            <physicalLocation displayLabel="Original slide"> Indiana University, Bloomington. University Archives P07803 </physicalLocation>
+            <shelfLocator>381 J8223</shelfLocator>
+        </location>
+    </relatedItem>
+    <relatedItem type="host">
+        <titleInfo type="uniform" authority="dlfaqcoll">
+            <title> Indiana University Digital Library Program: Charles W. Cushman Photograph Collection</title>
+        </titleInfo>
+    </relatedItem>
+    <identifier displayLabel="Cushman number" type="local">955.11</identifier>
+    <identifier displayLabel="IU Archives number" type="local">P07803</identifier>
+    <location>
+        <url>http://purl.dlib.indiana.edu/iudl/archives/cushman/P07803</url>
+        <url access="preview">http://quod.lib.umich.edu/m/mods/thumbs/Indiana/oai.dlib.indiana.edu/ archives/cushman/oai_3Aoai.dlib.indiana.edu_3Aarchives_5Ccushman_5CP07803.png</url>
+    </location>
+    <accessCondition> Copyright and reproduction rights for all Charles W. Cushman photographs are held by Indiana University and administered by the University Archives, Indiana University, Bloomington, IN 47405</accessCondition>
+    <recordInfo>
+    <recordContentSource>Indiana University Digital Library Program</recordContentSource>
+    <recordCreationDate encoding="w3cdtf">2004-09-09</recordCreationDate>
+    <recordIdentifier>archives/cushman/P07803</recordIdentifier>
+    </recordInfo>
+
+</mods>
+
+</modsCollection>

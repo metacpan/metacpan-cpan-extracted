@@ -1,0 +1,269 @@
+==================================================
+Changes from 2015-11-16 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.04 at 2016-11-15 18:47:50 +0000
+-----------------------------------------
+
+  Change: be037896a16581ea3fa43c12685989420e59ce5e
+  Author: Josh Lavin <digory@cpan.org>
+  Date : 2016-11-15 10:45:22 +0000
+
+    add tests back 
+
+  Change: 5d32691a44d90a19ca3271363296a2646865ed13
+  Author: Josh Lavin <digory@cpan.org>
+  Date : 2016-11-15 10:44:59 +0000
+
+    add contributors 
+
+  Change: 17af2fca307be44db0cd7c09c786d52575c22fff
+  Author: Josh Lavin <digory@cpan.org>
+  Date : 2016-11-15 10:23:43 +0000
+
+    Remove fake release 
+
+  Change: f65019d28a511cb1d905b24aed52ce479c11f40a
+  Author: Josh Lavin <digory@cpan.org>
+  Date : 2016-11-15 10:23:07 +0000
+
+    Revert "v0.04"
+
+    (did not intend to push...)
+
+    This reverts commit 6748b30230acd104d130b66c6835cd2cedb58a31. 
+
+  Change: 6748b30230acd104d130b66c6835cd2cedb58a31
+  Author: Josh Lavin <digory@cpan.org>
+  Date : 2016-11-15 10:12:14 +0000
+
+    v0.04 
+
+  Change: ac99c47e6b66e1f750bd0d949b1b21f304f4648f
+  Author: Josh Lavin <digory@cpan.org>
+  Date : 2016-11-15 09:48:54 +0000
+
+    Update tests 
+
+  Change: 51d20b12156247f225d18fcbc9c787bdcd045c2a
+  Author: Josh Lavin <digory@cpan.org>
+  Date : 2016-11-15 09:37:53 +0000
+
+    Add fake release configs 
+
+  Change: c8c7221fb4d0e47d8bf3237ad63ad06cbd04df4c
+  Author: Josh Lavin <digory@cpan.org>
+  Date : 2016-11-15 09:37:06 +0000
+
+    v0.03 
+
+-----------------------------------------
+version 0.03 at 2016-11-15 17:35:12 +0000
+-----------------------------------------
+
+  Change: e0ab21abb93496f318cb2f062c5c38e21e0b820f
+  Author: Josh Lavin <digory@cpan.org>
+  Date : 2016-11-15 09:35:12 +0000
+
+    Add batch_list to POD 
+
+  Change: 833df06908bb820a6ee41027bd674c68c39c57ee
+  Author: Josh Lavin <digory@cpan.org>
+  Date : 2016-11-15 08:50:02 +0000
+
+    Set minimum version for namespace::autoclean 
+
+  Change: 8edd5803476b2b843935866e7e4af97da1128a08
+  Author: Josh Lavin <jdigory@users.noreply.github.com>
+  Date : 2016-11-15 08:48:32 +0000
+
+    Merge pull request #2 from karpet/master
+
+    add batch_list endpoint 
+
+  Change: 13ef7cee879b4234d25744d5597e742a7ed836a6
+  Author: Peter Karman <pkarman@mpr.org>
+  Date : 2016-11-11 16:09:02 +0000
+
+    add batch_list endpoint 
+
+  Change: 1431bd9d1432c5f1e80d5afbc0f116b9b762fe52
+  Author: Josh Lavin <digory@cpan.com>
+  Date : 2016-08-11 10:36:47 +0000
+
+    v0.02 
+
+-----------------------------------------
+version 0.02 at 2016-08-10 22:05:46 +0000
+-----------------------------------------
+
+  Change: abea6e64f12c7edf9a6fe8b0c36f5399701f322d
+  Author: Josh Lavin <digory@cpan.com>
+  Date : 2016-08-10 15:05:46 +0000
+
+    Don't quote attributes if we don't need to 
+
+  Change: aec1c7f898334de7fb90b4e433565f070be5d60f
+  Author: Josh Lavin <digory@cpan.com>
+  Date : 2016-08-09 10:29:36 +0000
+
+    Add minimum Perl version 
+
+  Change: dac17ab7d250a78459615dd94bfa905a5a9e74ec
+  Author: Josh Lavin <digory@cpan.com>
+  Date : 2016-08-09 10:05:39 +0000
+
+    add META JSON 
+
+  Change: 7cc6324e95e81083915730610aa1f1772b87dbb0
+  Author: Josh Lavin <digory@cpan.com>
+  Date : 2016-08-09 09:25:53 +0000
+
+    Merge branch 'own-decoder' 
+
+  Change: 7ce7fec3effd5bffa15116a8f569cc15f5058b77
+  Author: Josh Lavin <digory@cpan.com>
+  Date : 2016-08-09 09:25:13 +0000
+
+    Use our own decoder
+
+    - Need to be able to handle HTTP response of 204 No Content 
+
+  Change: 25a7b1fcdf02bc754710e4daf67a0073b75986a1
+  Author: Josh Lavin <digory@cpan.com>
+  Date : 2016-08-04 16:46:32 +0000
+
+    Fix double-slashes in URI 
+
+  Change: 9bdc6ee4e833f9b1b5852400529f707dd5e8289c
+  Author: Josh Lavin <digory@cpan.com>
+  Date : 2016-08-04 16:46:20 +0000
+
+    dzil update 
+
+  Change: eae7010063308aca9ea63eb0df29e905a318aa5c
+  Author: Josh Lavin <jlavin@endpoint.com>
+  Date : 2016-07-27 16:16:56 +0000
+
+    v0.01 
+
+-----------------------------------------
+version 0.01 at 2016-07-27 23:15:37 +0000
+-----------------------------------------
+
+  Change: 457ab31931b3d3398c8ad1650a91fb806a79a76b
+  Author: Josh Lavin <jlavin@endpoint.com>
+  Date : 2016-07-27 16:15:37 +0000
+
+    fully implement all API endpoints 
+
+  Change: c4ba8a1f728be311db5f8bfb301a81b2f80874de
+  Author: Josh Lavin <jlavin@endpoint.com>
+  Date : 2016-07-27 16:15:30 +0000
+
+    fallback for version 
+
+  Change: 27010ca7e180cbd032ebb1e60d1e9660ab11cbd7
+  Author: Josh Lavin <jlavin@endpoint.com>
+  Date : 2016-07-27 14:49:08 +0000
+
+    Use markdown readme, upload to cpan 
+
+  Change: 49e3c8853753d12fe24086cc209d08ed46b71793
+  Author: Josh Lavin <jlavin@endpoint.com>
+  Date : 2016-07-27 14:48:30 +0000
+
+    made README use markdown, not pod 
+
+  Change: 0f1c9039c4b715178d332c40a4dc132b41bf65fb
+  Author: Josh Lavin <jlavin@endpoint.com>
+  Date : 2016-07-27 14:47:04 +0000
+
+    pod fixes 
+
+  Change: da3fd1f818e9e455a520b56df423510bfacc6ac5
+  Author: Josh Lavin <jlavin@endpoint.com>
+  Date : 2016-07-27 14:22:27 +0000
+
+    add dist.ini
+
+    - excluding t/* tests for now, until I can figure out the
+
+    LWP::Protocol::https problem 
+
+  Change: 8f0def149796a8f08575a015e91b702c5771fc2e
+  Author: Josh Lavin <jlavin@endpoint.com>
+  Date : 2016-07-27 14:17:55 +0000
+
+    readme changes 
+
+  Change: 7270d5ae467b7eb602e253d2024eeca8c633a43d
+  Author: Josh Lavin <jlavin@endpoint.com>
+  Date : 2016-07-27 14:17:36 +0000
+
+    Fix pod, use OurPkgVersion 
+
+  Change: ca0e69a9a397fabb12403536efe3607c5e18df2a
+  Author: Josh Lavin <jlavin@endpoint.com>
+  Date : 2016-07-27 10:02:20 +0000
+
+    use Moo 
+
+  Change: 242ac437df27cdb02eaad612c7af4f6d5dae62cc
+  Author: Josh Lavin <jlavin@endpoint.com>
+  Date : 2016-07-27 09:14:54 +0000
+
+    Namespace change 
+
+  Change: 57f6231c8a7ca792546fce392015b54e98bac204
+  Author: Josh Lavin <jlavin@endpoint.com>
+  Date : 2016-07-22 14:12:11 +0000
+
+    perltidy it up 
+
+  Change: 3440af8e729cbf048dc19f659c0b3162ad599c6b
+  Author: Josh Lavin <jlavin@endpoint.com>
+  Date : 2016-07-22 13:57:58 +0000
+
+    flesh out docs 
+
+  Change: 5e741d8fdf0c71f1ecf6692afb62701a818c5610
+  Author: Josh Lavin <jlavin@endpoint.com>
+  Date : 2016-07-18 15:37:20 +0000
+
+    fix typo 
+
+  Change: 3737293a29062163acc95bb630beb2eae12a0c46
+  Author: Josh Lavin <jlavin@endpoint.com>
+  Date : 2016-07-18 15:36:57 +0000
+
+    sort methods in readme 
+
+  Change: 163a5cbefc63ededc8b7150f2804ced8dbd44aee
+  Author: Josh Lavin <jlavin@endpoint.com>
+  Date : 2016-07-18 15:36:07 +0000
+
+    add name to readme 
+
+  Change: 8d2ebcfa84b9a14ebf6d4a71cb5dae634ebc4fe1
+  Author: Josh Lavin <jlavin@endpoint.com>
+  Date : 2016-07-18 15:34:09 +0000
+
+    sort methods in pod 
+
+  Change: 01148c1565d7a2ed1ebb1eb0a58ab70a03496499
+  Author: Josh Lavin <jlavin@endpoint.com>
+  Date : 2016-07-18 15:28:32 +0000
+
+    add README 
+
+  Change: 6e255b9a6792df6e194cad840e10a5750c73ca9b
+  Author: Josh Lavin <jlavin@endpoint.com>
+  Date : 2016-07-18 15:22:02 +0000
+
+    Initial add 
+
+================
+End of releases.
+================

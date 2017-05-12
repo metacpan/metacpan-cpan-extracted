@@ -1,0 +1,373 @@
+#
+# $Id: typemap,v 33.4 2012/09/26 16:10:11 jettisu Exp $
+#
+# (c) 1999-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+PMQCHAR		T_PV
+MQLONG          T_IV
+
+MQDLH		T_MQDLH
+MQMD		T_MQMD
+
+INPUT
+
+T_MQDLH
+    {
+	/* input a MQDLH */
+        STRLEN len = 0;
+	MQDLH default_MQDLH = { MQDLH_DEFAULT };
+
+	if (!SvROK($arg))
+	    croak(\"Reference expected for parameter $var\");
+	/* copy in the default value of structure... */
+	memcpy((char *)&$var, &default_MQDLH, sizeof(MQDLH));
+
+	if (hv_exists((HV*)SvRV($arg),\"Version\",7))
+	  $var.Version = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"Version\",7,0)));
+	if (hv_exists((HV*)SvRV($arg),\"Reason\",6))
+	  $var.Reason = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"Reason\",6,0)));
+        if (hv_exists((HV*)SvRV($arg), \"DestQName\", 9)) {
+	    SV **scalar;
+
+	    scalar = hv_fetch((HV *)SvRV($arg), \"DestQName\", 9, 0);
+	    strncpy($var.DestQName,
+		    (char *)SvPV(*scalar, len),
+		    48);
+	}
+
+			  
+        if (hv_exists((HV*)SvRV($arg), \"DestQMgrName\", 12)) {
+	    SV **scalar;
+
+	    scalar = hv_fetch((HV *)SvRV($arg), \"DestQMgrName\", 12, 0);
+	    strncpy($var.DestQMgrName,
+		    (char *)SvPV(*scalar, len),
+		    48);
+	}
+
+			  
+	if (hv_exists((HV*)SvRV($arg),\"Encoding\",8))
+	  $var.Encoding = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"Encoding\",8,0)));
+	if (hv_exists((HV*)SvRV($arg),\"CodedCharSetId\",14))
+	  $var.CodedCharSetId = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"CodedCharSetId\",14,0)));
+        if (hv_exists((HV*)SvRV($arg), \"Format\", 6)) {
+	    SV **scalar;
+
+	    scalar = hv_fetch((HV *)SvRV($arg), \"Format\", 6, 0);
+	    strncpy($var.Format,
+		    (char *)SvPV(*scalar, len),
+		    8);
+	}
+
+			  
+	if (hv_exists((HV*)SvRV($arg),\"PutApplType\",11))
+	  $var.PutApplType = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"PutApplType\",11,0)));
+        if (hv_exists((HV*)SvRV($arg), \"PutApplName\", 11)) {
+	    SV **scalar;
+
+	    scalar = hv_fetch((HV *)SvRV($arg), \"PutApplName\", 11, 0);
+	    strncpy($var.PutApplName,
+		    (char *)SvPV(*scalar, len),
+		    28);
+	}
+
+			  
+        if (hv_exists((HV*)SvRV($arg), \"PutDate\", 7)) {
+	    SV **scalar;
+
+	    scalar = hv_fetch((HV *)SvRV($arg), \"PutDate\", 7, 0);
+	    strncpy($var.PutDate,
+		    (char *)SvPV(*scalar, len),
+		    8);
+	}
+
+			  
+        if (hv_exists((HV*)SvRV($arg), \"PutTime\", 7)) {
+	    SV **scalar;
+
+	    scalar = hv_fetch((HV *)SvRV($arg), \"PutTime\", 7, 0);
+	    strncpy($var.PutTime,
+		    (char *)SvPV(*scalar, len),
+		    8);
+	}
+
+			  
+    }
+
+T_MQMD
+    {
+	/* input a MQMD */
+        STRLEN len = 0;
+	MQMD default_MQMD = { MQMD_DEFAULT };
+
+	if (!SvROK($arg))
+	    croak(\"Reference expected for parameter $var\");
+	/* copy in the default value of structure... */
+	memcpy((char *)&$var, &default_MQMD, sizeof(MQMD));
+
+	if (hv_exists((HV*)SvRV($arg),\"Version\",7))
+	  $var.Version = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"Version\",7,0)));
+	if (hv_exists((HV*)SvRV($arg),\"Report\",6))
+	  $var.Report = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"Report\",6,0)));
+	if (hv_exists((HV*)SvRV($arg),\"MsgType\",7))
+	  $var.MsgType = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"MsgType\",7,0)));
+	if (hv_exists((HV*)SvRV($arg),\"Expiry\",6))
+	  $var.Expiry = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"Expiry\",6,0)));
+	if (hv_exists((HV*)SvRV($arg),\"Feedback\",8))
+	  $var.Feedback = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"Feedback\",8,0)));
+	if (hv_exists((HV*)SvRV($arg),\"Encoding\",8))
+	  $var.Encoding = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"Encoding\",8,0)));
+	if (hv_exists((HV*)SvRV($arg),\"CodedCharSetId\",14))
+	  $var.CodedCharSetId = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"CodedCharSetId\",14,0)));
+        if (hv_exists((HV*)SvRV($arg), \"Format\", 6)) {
+	    SV **scalar;
+
+	    scalar = hv_fetch((HV *)SvRV($arg), \"Format\", 6, 0);
+	    strncpy($var.Format,
+		    (char *)SvPV(*scalar, len),
+		    8);
+	}
+
+			  
+	if (hv_exists((HV*)SvRV($arg),\"Priority\",8))
+	  $var.Priority = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"Priority\",8,0)));
+	if (hv_exists((HV*)SvRV($arg),\"Persistence\",11))
+	  $var.Persistence = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"Persistence\",11,0)));
+        if (hv_exists((HV*)SvRV($arg), \"MsgId\", 5)) {
+	    SV **scalar;
+
+	    scalar = hv_fetch((HV *)SvRV($arg), \"MsgId\", 5, 0);
+	    memcpy($var.MsgId,
+		    (char *)SvPV(*scalar, len),
+		    24);
+	}
+        if (hv_exists((HV*)SvRV($arg), \"CorrelId\", 8)) {
+	    SV **scalar;
+
+	    scalar = hv_fetch((HV *)SvRV($arg), \"CorrelId\", 8, 0);
+	    memcpy($var.CorrelId,
+		    (char *)SvPV(*scalar, len),
+		    24);
+	}
+	if (hv_exists((HV*)SvRV($arg),\"BackoutCount\",12))
+	  $var.BackoutCount = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"BackoutCount\",12,0)));
+        if (hv_exists((HV*)SvRV($arg), \"ReplyToQ\", 8)) {
+	    SV **scalar;
+
+	    scalar = hv_fetch((HV *)SvRV($arg), \"ReplyToQ\", 8, 0);
+	    strncpy($var.ReplyToQ,
+		    (char *)SvPV(*scalar, len),
+		    48);
+	}
+
+			  
+        if (hv_exists((HV*)SvRV($arg), \"ReplyToQMgr\", 11)) {
+	    SV **scalar;
+
+	    scalar = hv_fetch((HV *)SvRV($arg), \"ReplyToQMgr\", 11, 0);
+	    strncpy($var.ReplyToQMgr,
+		    (char *)SvPV(*scalar, len),
+		    48);
+	}
+
+			  
+        if (hv_exists((HV*)SvRV($arg), \"UserIdentifier\", 14)) {
+	    SV **scalar;
+
+	    scalar = hv_fetch((HV *)SvRV($arg), \"UserIdentifier\", 14, 0);
+	    strncpy($var.UserIdentifier,
+		    (char *)SvPV(*scalar, len),
+		    12);
+	}
+
+			  
+        if (hv_exists((HV*)SvRV($arg), \"AccountingToken\", 15)) {
+	    SV **scalar;
+
+	    scalar = hv_fetch((HV *)SvRV($arg), \"AccountingToken\", 15, 0);
+	    memcpy($var.AccountingToken,
+		    (char *)SvPV(*scalar, len),
+		    32);
+	}
+        if (hv_exists((HV*)SvRV($arg), \"ApplIdentityData\", 16)) {
+	    SV **scalar;
+
+	    scalar = hv_fetch((HV *)SvRV($arg), \"ApplIdentityData\", 16, 0);
+	    strncpy($var.ApplIdentityData,
+		    (char *)SvPV(*scalar, len),
+		    32);
+	}
+
+			  
+	if (hv_exists((HV*)SvRV($arg),\"PutApplType\",11))
+	  $var.PutApplType = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"PutApplType\",11,0)));
+        if (hv_exists((HV*)SvRV($arg), \"PutApplName\", 11)) {
+	    SV **scalar;
+
+	    scalar = hv_fetch((HV *)SvRV($arg), \"PutApplName\", 11, 0);
+	    strncpy($var.PutApplName,
+		    (char *)SvPV(*scalar, len),
+		    28);
+	}
+
+			  
+        if (hv_exists((HV*)SvRV($arg), \"PutDate\", 7)) {
+	    SV **scalar;
+
+	    scalar = hv_fetch((HV *)SvRV($arg), \"PutDate\", 7, 0);
+	    strncpy($var.PutDate,
+		    (char *)SvPV(*scalar, len),
+		    8);
+	}
+
+			  
+        if (hv_exists((HV*)SvRV($arg), \"PutTime\", 7)) {
+	    SV **scalar;
+
+	    scalar = hv_fetch((HV *)SvRV($arg), \"PutTime\", 7, 0);
+	    strncpy($var.PutTime,
+		    (char *)SvPV(*scalar, len),
+		    8);
+	}
+
+			  
+        if (hv_exists((HV*)SvRV($arg), \"ApplOriginData\", 14)) {
+	    SV **scalar;
+
+	    scalar = hv_fetch((HV *)SvRV($arg), \"ApplOriginData\", 14, 0);
+	    strncpy($var.ApplOriginData,
+		    (char *)SvPV(*scalar, len),
+		    4);
+	}
+
+			  
+        if (hv_exists((HV*)SvRV($arg), \"GroupId\", 7)) {
+	    SV **scalar;
+
+	    scalar = hv_fetch((HV *)SvRV($arg), \"GroupId\", 7, 0);
+	    memcpy($var.GroupId,
+		    (char *)SvPV(*scalar, len),
+		    24);
+	}
+	if (hv_exists((HV*)SvRV($arg),\"MsgSeqNumber\",12))
+	  $var.MsgSeqNumber = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"MsgSeqNumber\",12,0)));
+	if (hv_exists((HV*)SvRV($arg),\"Offset\",6))
+	  $var.Offset = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"Offset\",6,0)));
+	if (hv_exists((HV*)SvRV($arg),\"MsgFlags\",8))
+	  $var.MsgFlags = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"MsgFlags\",8,0)));
+	if (hv_exists((HV*)SvRV($arg),\"OriginalLength\",14))
+	  $var.OriginalLength = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"OriginalLength\",14,0)));
+    }
+
+OUTPUT
+ 
+T_MQDLH
+    /* output a MQDLH: */
+
+
+        hv_store((HV*)SvRV($arg),\"Version\",7,
+		 (newSViv($var.Version)),0);
+        hv_store((HV*)SvRV($arg),\"Reason\",6,
+		 (newSViv($var.Reason)),0);
+	hv_store((HV*)SvRV($arg),\"DestQName\",9,
+		 (newSVpv($var.DestQName, 48)),0);
+	hv_store((HV*)SvRV($arg),\"DestQMgrName\",12,
+		 (newSVpv($var.DestQMgrName, 48)),0);
+        hv_store((HV*)SvRV($arg),\"Encoding\",8,
+		 (newSViv($var.Encoding)),0);
+        hv_store((HV*)SvRV($arg),\"CodedCharSetId\",14,
+		 (newSViv($var.CodedCharSetId)),0);
+	hv_store((HV*)SvRV($arg),\"Format\",6,
+		 (newSVpv($var.Format, 8)),0);
+        hv_store((HV*)SvRV($arg),\"PutApplType\",11,
+		 (newSViv($var.PutApplType)),0);
+	hv_store((HV*)SvRV($arg),\"PutApplName\",11,
+		 (newSVpv($var.PutApplName, 28)),0);
+	hv_store((HV*)SvRV($arg),\"PutDate\",7,
+		 (newSVpv($var.PutDate, 8)),0);
+	hv_store((HV*)SvRV($arg),\"PutTime\",7,
+		 (newSVpv($var.PutTime, 8)),0);
+
+T_MQMD
+    /* output a MQMD: */
+
+
+        hv_store((HV*)SvRV($arg),\"Version\",7,
+		 (newSViv($var.Version)),0);
+        hv_store((HV*)SvRV($arg),\"Report\",6,
+		 (newSViv($var.Report)),0);
+        hv_store((HV*)SvRV($arg),\"MsgType\",7,
+		 (newSViv($var.MsgType)),0);
+        hv_store((HV*)SvRV($arg),\"Expiry\",6,
+		 (newSViv($var.Expiry)),0);
+        hv_store((HV*)SvRV($arg),\"Feedback\",8,
+		 (newSViv($var.Feedback)),0);
+        hv_store((HV*)SvRV($arg),\"Encoding\",8,
+		 (newSViv($var.Encoding)),0);
+        hv_store((HV*)SvRV($arg),\"CodedCharSetId\",14,
+		 (newSViv($var.CodedCharSetId)),0);
+	hv_store((HV*)SvRV($arg),\"Format\",6,
+		 (newSVpv($var.Format, 8)),0);
+        hv_store((HV*)SvRV($arg),\"Priority\",8,
+		 (newSViv($var.Priority)),0);
+        hv_store((HV*)SvRV($arg),\"Persistence\",11,
+		 (newSViv($var.Persistence)),0);
+        hv_store((HV*)SvRV($arg),\"MsgId\",5,
+		 (newSVpv((char *)$var.MsgId,24)),0);
+        hv_store((HV*)SvRV($arg),\"CorrelId\",8,
+		 (newSVpv((char *)$var.CorrelId,24)),0);
+        hv_store((HV*)SvRV($arg),\"BackoutCount\",12,
+		 (newSViv($var.BackoutCount)),0);
+	hv_store((HV*)SvRV($arg),\"ReplyToQ\",8,
+		 (newSVpv($var.ReplyToQ, 48)),0);
+	hv_store((HV*)SvRV($arg),\"ReplyToQMgr\",11,
+		 (newSVpv($var.ReplyToQMgr, 48)),0);
+	hv_store((HV*)SvRV($arg),\"UserIdentifier\",14,
+		 (newSVpv($var.UserIdentifier, 12)),0);
+        hv_store((HV*)SvRV($arg),\"AccountingToken\",15,
+		 (newSVpv((char *)$var.AccountingToken,32)),0);
+	hv_store((HV*)SvRV($arg),\"ApplIdentityData\",16,
+		 (newSVpv($var.ApplIdentityData, 32)),0);
+        hv_store((HV*)SvRV($arg),\"PutApplType\",11,
+		 (newSViv($var.PutApplType)),0);
+	hv_store((HV*)SvRV($arg),\"PutApplName\",11,
+		 (newSVpv($var.PutApplName, 28)),0);
+	hv_store((HV*)SvRV($arg),\"PutDate\",7,
+		 (newSVpv($var.PutDate, 8)),0);
+	hv_store((HV*)SvRV($arg),\"PutTime\",7,
+		 (newSVpv($var.PutTime, 8)),0);
+	hv_store((HV*)SvRV($arg),\"ApplOriginData\",14,
+		 (newSVpv($var.ApplOriginData, 4)),0);
+        hv_store((HV*)SvRV($arg),\"GroupId\",7,
+		 (newSVpv((char *)$var.GroupId,24)),0);
+        hv_store((HV*)SvRV($arg),\"MsgSeqNumber\",12,
+		 (newSViv($var.MsgSeqNumber)),0);
+        hv_store((HV*)SvRV($arg),\"Offset\",6,
+		 (newSViv($var.Offset)),0);
+        hv_store((HV*)SvRV($arg),\"MsgFlags\",8,
+		 (newSViv($var.MsgFlags)),0);
+        hv_store((HV*)SvRV($arg),\"OriginalLength\",14,
+		 (newSViv($var.OriginalLength)),0);
+

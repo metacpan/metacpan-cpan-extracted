@@ -1,0 +1,40 @@
+INSTALLATION NOTES FOR FreeBSD USERS
+
+    Bryan Collins <bryan@casper.spirit.net.au> suggests the following
+    procedure to get MPEG::MP3Play running with FreeBSD. This is an
+    excerpt from a email he sent me regarding this:
+    
+    --snip--
+    
+    I'm running FreeBSD 3.3-19990908-RC, but all of this applies
+    to FreeBSD 3.2 and above.
+
+    Now because the SDK for FreeBSD is an oldstyle 'ar' archive,
+    you can't link it in with the MPEG:MP3Play module because the
+    system installation of perl5 is elf.
+
+    To get around this, you need to compile perl5 as aout, along
+    with any modules you use.
+
+    Download http://www.plab.ku.dk/tobez/FreeBSD-perl-aout/Makefile.SH
+    and replace original Makefile.SH in the distribution.
+
+    Download http://www.plab.ku.dk/tobez/FreeBSD-perl-aout/hints/freebsd.sh
+    and replace original hints/freebsd.sh in the distribution.
+
+    $ OBJFORMAT=aout sh Configure -DAOUT -des
+
+    Not sure about this one, but my 3.3-RC came with no static aout libs,
+    so I grabbed some from a 2.2.8-RELEASE /usr/lib/*.[oa] and copied to
+    /usr/lib/compat/aout
+
+    Now, this would be way way way much easier if the Xaudio dudes would 
+    release an elf based library for linking your module against.
+    So perhaps it may be worth mentioning a small bit of the above, and you
+    can give my email for further questions.  That way if the Xaudio guys
+    do an elf library, then the NOTES for FreeBSD would zero :-)
+    
+    --snip--
+
+$Id: README.FreeBSD,v 1.1 1999/09/25 13:07:25 joern Exp $
+

@@ -1,0 +1,290 @@
+This file summarizes what's changed between releases of Mail-DKIM.
+See the ChangeLog file for the details.
+
+Version 0.41
+
+  * Fix to better comply with DKIM specification:
+    * DKIM signatures with multiple methods specified in q= tag are now
+      accepted. Such signatures are not known to appear in real life.
+      (rt.cpan.org issue #83176)
+
+  * Allow greater control over which headers are signed by Signer
+    * Added the extended_headers() method to allow headers
+      to be oversigned, or skipped.
+
+  * bugfixes:
+    * PrivateKey file is now closed correctly after being read.
+    * Use lexical rather than named file handle
+
+Version 0.40 - released 2013-02-07
+
+  * New/changed functionality:
+    * a single DNS resolver is created for the lifetime of the program,
+      rather than reinitializing the resolver for each new query.
+
+  * bugfixes:
+    * fix the error message given when an invalid algorithm is
+      specified in the construction of Mail::DKIM::Signer.
+    * avoid Perl warning about use of an undefined value in several
+      places (rt.cpan.org issue #82913).
+    * speed- improved performance of parsing the message into lines
+      (rt.cpan.org issue #77902). Patch by Mark Martinec.
+    * fix DNS queries to use the correct method (txtdata) of Net::DNS
+      (rt.cpan.org issue #83170). Patch by Mark Martinec.
+
+  * API changes:
+    * global subroutines resolver() or enable_EDNS0() in module
+      Mail::DKIM::DNS can be called to specify non-default options
+      to Net::DNS::Resolver (see also rt.cpan.org issue #80425).
+
+
+Version 0.39 - released 2010-11-14
+
+  * bugfixes:
+    * fix issue with getting wrong error codes when q= tag is empty
+      (issue #3011005)
+    * anti-abuse- prevent a message with thousands of signatures from
+      thrashing the whole computer (issue #3010997)
+    * memory usage- significantly reduced memory footprint for
+      processing a message with a large header and many signatures
+    * fix error message given when no KeyFile has been specified
+      (issue #1889690)
+
+  * API changes:
+    * the Canonicalization::finish_header() method now expects a
+      argument to be passed to it. In the unusual case that you are
+      using this method from your own code, please update your code.
+
+
+Version 0.38 - released 2010-03-31
+
+  * New/changed functionality:
+    * DNS lookups can now be started asynchronously; the queries are
+      created as the header is parsed; the results are not actually
+      needed until the entire message has been read. (The Mail::DKIM
+      module does not yet do the queries asynchrously; this is just
+      the infrastructure so that the queries can be asynchronous in
+      the future.)
+
+  * bugfixes:
+    * DNS lookup overrides alarm() signal (issue #2854325)
+
+  * documentation updates:
+    * document use of custom PrivateKey object, for external signing
+    * describe how to get "pretty signatures" in Signer.pm
+
+
+Version 0.37 - released 2009-09-08
+
+  * New/changed functionality:
+    * ADSP records now check whether the domain itself exists, in
+      accordance to the ADSP specification
+
+  * bugfixes:
+    * fixed regexp used to detect header field names (issue #2803465)
+    * various fixes to ADSP checking
+
+
+Version 0.36 - released 2009-06-02
+
+  * API changes:
+    * restore the as_string() method which was accidentally removed
+      in version 0.34
+
+
+Version 0.35 - released 2009-05-22
+
+  * bugfixes:
+    * fixed a runaway regular expression in the canonicalization
+      routines (patch provided by Mark Martinec)
+
+
+Version 0.34 - released 2009-05-20
+
+  * New/changed functionality:
+    * support for ADSP (author-domain-signing-practices) records
+    * removed support for pre-standardized DKIM signatures (i.e. these
+      are DKIM signatures without a v= or bh= tag).
+    * DNS resolver errors are detected and reported as such
+
+  * API changes:
+    * renamed Mail::DKIM::Policy to Mail::DKIM::DkPolicy. Programs using
+      the former name to create policy objects directly (though it would
+      be more expected to fetch the objects through
+      Mail::DKIM::Verifier) should update their code
+    * new policies() method in Mail::DKIM::Verifier for fetching all
+      applicable sender/author signing policies
+
+  * bugfixes:
+    * Signer object would die if first line of input wasn't a header
+      (rt.cpan.org issue #46179)
+
+
+Version 0.33 - released 2009-03-10
+
+  * bugfixes:
+    * signature wrapping would sometimes cause improper preparation of
+      DKIM signatures, with "simple" canonicalization (issue #2257046)
+  * test scripts:
+    * the included corpus is now verified using a fake-DNS resolver,
+      which means the test corpus can validate even when your DNS
+      servers are really slow
+
+
+Version 0.32 - released 2008-06-03
+
+  * removed requirement for Digest::SHA1 (issue #1832549).
+    We now use the more capable Digest::SHA module for SHA-1 and SHA-256.
+  * bugfixes:
+    * granularity checking should be case-sensitive (issue #1938112).
+    * identity tag now uses quoted-printable encoding (issue #1839015).
+  * API improvement:
+    * implemented identity_source() for DkSignature objects 
+
+
+Version 0.31 - released 2008-04-14
+
+  * some error detail messages were changed (see ChangeLog, 2008-01-10 entry)
+  * by default, and when possible, DKIM signatures now omit c= and q= tags
+    (they are optional tags) (issue #1878518)
+  * DKIM and DomainKey signatures are now wrapped so that line breaks
+    occur before colon (':') separators instead of after; this avoids
+	confusing some broken MUAs (issue #1868648)
+  * bugfixes:
+    * "undef value" error when DKIM signature appears at end of header
+      (issue #1878954)
+    * use proper regexp for splitting email address (issue #1878994)
+  * API improvements:
+    * can specify a domain for fetch_author_policy() (issue #1879197)
+    * can access a signature's public-key object (issue #1879215)
+    * can specify an OpenSSL-private-key object for PrivateKey->new()
+      (issue #1879209)
+
+
+Version 0.30.1 - released 2008-01-24
+
+ * bugfix:
+   * email from cisco.com was failing to verify (issue #1878523)
+
+
+Version 0.30 - released 2008-01-10
+
+ * includes speed-up optimizations by Mark Martinec
+ * DomainKeys, implement proper identity matching...
+   a DomainKey-Signature's domain should match the From/Sender address
+ * several more test cases
+ * API improvements:
+   * accept additional arguments when creating Signer/Signature
+ * bugfixes:
+   * DomainKey-Signature headers were not "prettified"
+   * granularity ending with '*' was not checked correctly
+   * DomainKey-Signature granularity was checked against the wrong value
+
+
+Version 0.29 - released 2007-11-08
+
+ * verifiers can now access all parsed signatures and their results,
+   not just signatures that were fully tested
+ * signer policies can now specify what private key file to use
+ * some other minor API improvements
+ * bugfixes:
+   * for DomainKeys signatures, fixed a compatibility issue handling
+     the h= tag
+   * for DKIM, signature expirations had been ignored
+   * for DKIM, signature identities did not have to match the domain
+   * for DKIM, public key granularity field had been ignored
+
+
+Version 0.28 - released 2007-07-31
+
+ * fixed a bug with line-wrapping a signature at the wrong place
+
+
+Version 0.27 - released 2007-07-25
+
+ * Sender signing policies are now better implemented
+ * Both Yahoo! DomainKeys signing policies and the under-development
+   IETF DKIM signing policies are supported
+    * Yahoo! DomainKeys policies can protect the Sender: header
+    * DKIM signing policies can protect the From: header
+   Look at Mail::DKIM::Verifier's fetch_author_policy() and
+   fetch_sender_policy() methods for hints.
+
+   
+Version 0.26 - released 2007-05-24
+
+ * recognize and generate v=1 signatures (DKIM is now RFC 4871)
+
+
+Version 0.25 - released 2007-05-10
+
+ * we now only sign headers that IETF recommends for signing
+ * it's now possible to "prettify" outgoing signatures, but this feature
+   is not enabled by default. To enable, do a "use Mail::DKIM::TextWrap"
+   in your program that signs messages. (This may change in a future
+   release.)
+
+
+Version 0.24 - released 2007-03-13
+
+ * fixes two bugs, see ChangeLog for details
+ * fixed a bug with public keys (in DNS) containing linebreak characters
+ * fixed a bug with DKIM signatures not including the optional q= tag
+
+
+Version 0.23 - released 2007-02-22
+
+ * fixes some issues with verifying DomainKeys signatures
+ * generate newer-style DKIM signatures (with v=0.5 tag)
+ * fixed some bugs related to handling messages with no body
+ * improved diagnostic messages for certain cases
+
+
+Version 0.22 - released 2007-01-19
+
+ * fixes a couple very minor bugs
+ * some cosmetic changes to error messages
+
+
+Version 0.21 - released 2006-11-29
+
+ * fixes two bugs, see ChangeLog for details
+
+
+Version 0.20 - released 2006-10-24
+
+ * now supports verifying multiple signatures (the result returned is based
+   on the "best" available signature)
+ * now supports adding multiple signatures in one pass (to use this, you
+   need to create a "signer policy"; see scripts/dkimsign.pl for an example)
+ * now supports signing/verifying signatures for the older DomainKeys standard
+ * now implements Internet Draft draft-ietf-dkim-base-05, including:
+   * support for the version (v=) tag
+ * eliminated "control character detected in message" error message
+
+
+Version 0.19 - released 2006-06-15
+
+ * now supports earlier versions of Perl (5.6.1 and up).
+
+
+Version 0.18 - released 2006-06-09
+
+ * no longer depends on Crypt::RSA or Crypt::OpenSSL::Bignum.
+
+
+Version 0.17 - released 2006-05-26
+
+ * now implements Internet Draft draft-ietf-dkim-base-01, including:
+   * support for the body hash (bh=) tag
+   * support for SHA256 digests (uses the Digest::SHA module from CPAN)
+ * if a message fails to verify, it now distinguishes between:
+   * headers having been altered
+   * body having been altered
+   * RSA key failure (i.e. the signing key does not match the public key)
+ * added several sample messages to test against when doing `make test'.
+
+
+Version 0.16 - released 2006-03-03
+
+ * first version for CPAN; implements draft-allman-dkim-base-01.

@@ -1,0 +1,97 @@
+/* ================================================================== */
+/* THEME: Yellow
+ */
+/* ================================================================== */
+/* THEME: Yellow - fonts
+ */
+/* ================================================================== */
+/* ICONS - dark on light
+ * Nav arrows with transparent backgrounds
+ */
+.side nav li > ul {
+  list-style-image: url(nav_black.png);
+}
+
+/* ================================================================== */
+/* General */
+.verge, header,
+footer, .side, .fancy {
+  color: #333300;
+  background: #ffff99;
+  border-color: #333300;
+}
+
+header,
+footer {
+  background: linear-gradient(#ffff99, #ffd24d);
+}
+
+.side {
+  background: linear-gradient(to right, #ffd24d, #ffff99);
+}
+
+body {
+  color: #333300;
+  background: #ffffbb;
+}
+
+a:link {
+  color: #1a3300;
+}
+
+a:visited {
+  color: #663300;
+}
+
+.fancy {
+  color: #333300;
+  background-image: url("yellow_tile.jpg");
+  border: 5px double #ffff33;
+  padding: 0;
+}
+.fancy li {
+  padding: 0.5em;
+  margin: 5px;
+  border: 5px solid #ffff33;
+  background-color: #ffff99;
+  background: linear-gradient(#ffff99, #ffd24d);
+}
+.fancy li a:link {
+  color: #1a3300;
+}
+.fancy li a:visited {
+  color: #663300;
+}
+
+.button, input[type=submit], header nav a,
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: #332600;
+  border-color: #333300;
+  background-color: #ffd24d;
+}
+
+.button a:link, input[type=submit] a:link, header nav a a:link,
+header nav .selflink a:link,
+header nav em a:link,
+header nav .current a a:link, a.button:link, header nav a:link {
+  color: #332600;
+}
+
+.button a:visited, input[type=submit] a:visited, header nav a a:visited,
+header nav .selflink a:visited,
+header nav em a:visited,
+header nav .current a a:visited, a.button:visited, header nav a:visited {
+  color: #661a00;
+}
+
+header nav li {
+  border-color: #996633;
+}
+
+header nav .selflink,
+header nav em,
+header nav .current a {
+  background-color: #ffffcc;
+}

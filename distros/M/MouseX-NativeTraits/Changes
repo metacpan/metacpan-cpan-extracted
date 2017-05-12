@@ -1,0 +1,47 @@
+Revision history for Perl extension MouseX::NativeTraits
+
+1.09 2012-11-26 17:56:42
+    - Remove "set" handler from pod
+
+1.08 2012-10-20 20:51:22
+    - No feature changes. Just upgraded Module::Install.
+
+1.07 2011-12-04 16:11:32
+    - Resolve RT #69039 - Hash trait: Tied hashes become "untied"
+      when using setter
+
+1.06 2011-12-04 15:23:07
+    - Apply a patch in RT #72900 - Spelling gritch (gregor herrmann)
+
+1.05 2011-11-28 13:09:51
+    - Resolve RT #72549 - Counter is slower than doing it by hand
+
+1.04 2010-11-08 14:06:41
+    - Workaround test problms, again
+
+1.03 2010-11-07 17:07:09
+    - Workaround test problems
+
+1.02 2010-11-06 19:36:15
+    - Fix testing issue on Windows/nmake
+
+1.01 2010-11-05 20:27:52
+    - This is a major update
+    - Requires Mouse 0.82 for type constraint robusity
+    - Follow Moose 1.19 except for smart coercions
+
+1.00 Mon Sep 27 15:01:21 2010
+    - No functional changes
+    - Follow Mouse 0.74, which is more compatible with Moose
+
+0.002 Mon Mar 15 15:56:36 2010
+    - First non-dev release
+
+0.001_02 Mon Feb 22 17:42:50 2010
+    - Improve docs
+
+0.001_01 Sat Feb 20 15:49:59 2010
+    - first dev release
+
+0.001 Fri Feb 19 10:45:19 2010
+    - original version; created by Module::Setup

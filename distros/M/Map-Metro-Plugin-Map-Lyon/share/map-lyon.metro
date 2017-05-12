@@ -1,0 +1,105 @@
+--stations
+# Line A
+Perrache
+Ampère - Victor Hugo % :Ampère
+Bellecour
+Cordeliers
+Hôtel de Ville - Louis Pradel % :Hôtel de Ville
+Foch
+Masséna
+Charpennes - Charles Hernu % :Charpennes
+République - Villeurbanne
+Gratte-Ciel
+Flachet
+Cusset
+Laurent Bonnevay - Astroballe  % :Laurent Bonnevay :Astroballe
+Vaulx-en-Velin - La Soie % :Vaulx-en-Velin :La Soie
+
+# Line B
+Charpennes - Charles Hernu % :Charpennes
+Brotteaux
+Part-Dieu
+Place Guichard - Bourse du Travail
+Saxe - Gambetta
+Jean Macé
+Place Jean Jaurès
+Debourg
+Stade de Gerland
+Gare d'Oullins
+
+# Line C
+Hôtel de Ville - Louis Pradel % :Hôtel de Ville
+Croix-Paquet
+Croix-Rousse
+Hénon
+Cuire
+
+# Line D
+Gare de Vaise
+Valmy
+Gorge de Loup
+Vieux Lyon - Cathédrale Saint-Jean
+Bellecour
+Guillotière - Gabriel Péri
+Saxe - Gambetta
+Garibaldi
+Sans Souci
+Monplaisir - Lumière
+Grange Blanche
+Laënnec
+Mermoz - Pinel % :Mermoz
+Parilly
+Gare de Vénissieux
+
+--lines
+MA|A|Line A|color:#ee3898,width:7
+MB|B|Line B|color:#007dc5,width:7
+MC|C|Line C|color:#f99d1d,width:7
+MD|D|Line D|color:#00ac4d,width:7
+
+--transfers
+
+--segments
+MA|Perrache|Ampère - Victor Hugo
+MA|Ampère - Victor Hugo|Bellecour
+MA|Bellecour|Cordeliers
+MA|Cordeliers|Hôtel de Ville - Louis Pradel
+MA|Hôtel de Ville - Louis Pradel|Foch
+MA|Foch|Masséna
+MA|Masséna|Charpennes - Charles Hernu
+MA|Charpennes - Charles Hernu|République - Villeurbanne
+MA|République - Villeurbanne|Gratte-Ciel
+MA|Gratte-Ciel|Flachet
+MA|Flachet|Cusset
+MA|Cusset|Laurent Bonnevay - Astroballe
+MA|Laurent Bonnevay - Astroballe|Vaulx-en-Velin - La Soie
+
+MB|Charpennes - Charles Hernu|Brotteaux
+MB|Brotteaux|Part-Dieu
+MB|Part-Dieu|Place Guichard - Bourse du Travail
+MB|Place Guichard - Bourse du Travail|Saxe - Gambetta
+MB|Saxe - Gambetta|Jean Macé
+MB|Jean Macé|Place Jean Jaurès
+MB|Place Jean Jaurès|Debourg
+MB|Debourg|Stade de Gerland
+MB|Stade de Gerland|Gare d'Oullins
+
+MC|Hôtel de Ville - Louis Pradel|Croix-Paquet
+MC|Croix-Paquet|Croix-Rousse
+MC|Croix-Rousse|Hénon
+MC|Hénon|Cuire
+
+MD|Gare de Vaise|Valmy
+MD|Valmy|Gorge de Loup
+MD|Gorge de Loup|Vieux Lyon - Cathédrale Saint-Jean
+MD|Vieux Lyon - Cathédrale Saint-Jean|Bellecour
+MD|Bellecour|Guillotière - Gabriel Péri
+MD|Guillotière - Gabriel Péri|Saxe - Gambetta
+MD|Saxe - Gambetta|Garibaldi
+MD|Garibaldi|Sans Souci
+MD|Sans Souci|Monplaisir - Lumière
+MD|Monplaisir - Lumière|Grange Blanche
+MD|Grange Blanche|Laënnec
+MD|Laënnec|Mermoz - Pinel
+MD|Mermoz - Pinel|Parilly
+MD|Parilly|Gare de Vénissieux

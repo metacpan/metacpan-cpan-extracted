@@ -1,0 +1,7 @@
+  [
+    {
+      "label" : "Name",
+      "type" : "testfield",
+      "name" : "name"
+    }
+  ]

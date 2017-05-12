@@ -1,0 +1,15 @@
+Changes
+lib/MMS/Mail/Parser.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/01-new.t
+t/02-regular_methods.t
+t/03-parse_open-Default.t
+t/04-parse_open-UKVodafone.t
+t/msgs/Default
+t/msgs/UKVodafone
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,151 @@
+<html>
+<head>
+<title>MHonArc Resources: FIELDSBEG</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="fieldorder.html">FIELDORDER</a>]</td><td><nobr>[<a href="../resources.html#fieldsbeg">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="fieldsend.html">FIELDSEND</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>FIELDSBEG</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p>
+<code>&lt;FIELDSBEG&gt;<br></code>
+<var>markup ... </var><br>
+<code>&lt;/FIELDSBEG&gt;<br></code>
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>FIELDSBEG represents the beginning markup of a message
+header.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<pre class="code">
+&lt;ul&gt;
+</pre>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>The following example shows how FIELDSBEG, with other
+message layout resources, be used to have message headers formatted
+using table markup:
+</p>
+
+<pre class="code">
+<b>&lt;FieldsBeg&gt;</b>
+&lt;table border=0&gt;
+<b>&lt;/FieldsBeg&gt;</b>
+ 
+<b>&lt;<a href="labelbeg.html">LabelBeg</a>&gt;</b>
+&lt;tr&gt;
+&lt;td align="right" valign="top"&gt;
+<b>&lt;/LabelBeg&gt;</b>
+ 
+<b>&lt;<a href="labelend.html">LabelEnd</a>></b>
+&lt;/td&gt;
+<b>&lt;/LabelEnd&gt;</b>
+ 
+<b>&lt;<a href="fldbeg.html">FldBeg</a>&gt;</b>
+&lt;td align="left"&gt;
+<b>&lt;/FldBeg&gt;</b>
+ 
+<b>&lt;<a href="fldend.html">FldEnd</a>&gt;</b>
+&lt;/td&gt;
+&lt;/tr&gt;
+<b>&lt;/FldEnd&gt;</b>
+ 
+<b>&lt;<a href="fieldsend.html">FieldsEnd</a>&gt;</b>
+&lt;/table&gt;
+<b>&lt;/FieldsEnd&gt;</b>
+</pre>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>2.0
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+<a href="excs.html">EXCS</a>,
+<a href="fieldorder.html">FIELDORDER</a>,
+<a href="fieldsend.html">FIELDSEND</a>,
+<a href="fieldstyles.html">FIELDSTYLES</a>,
+<a href="fldbeg.html">FLDBEG</a>,
+<a href="fldend.html">FLDEND</a>,
+<a href="labelbeg.html">LABELBEG</a>,
+<a href="labelend.html">LABELEND</a>,
+<a href="labelstyles.html">LABELSTYLES</a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="fieldorder.html">FIELDORDER</a>]</td><td><nobr>[<a href="../resources.html#fieldsbeg">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="fieldsend.html">FIELDSEND</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2003/10/06 22:04:16 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"><strong>MHonArc</strong></a><br>
+Copyright &#169; 1997-1998, <a href="http://www.earlhood.com/">Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org">mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

@@ -1,0 +1,387 @@
+Revision history for Module-CPANTS-Analyse
+
+0.96 2014-11-24
+  - Added an import option to load extra Kwalitee plugins.
+  - Fixed RT#100512 - has_readme now accepts README.pod as well
+  - Improved no_abstract_stub_in_pod to detect "The great new"
+    as a boilerplate
+  - Switched to File::Find::Object
+
+0.95 2014-09-26
+  - Switched to Test::FailWarnings to make CPAN testers happier
+
+0.94 2014-09-26
+  - Fixed RT#99141 - use_strict metric does not recognize
+    `use v5.14` syntax (ishigaki)
+
+0.93_04 2014-09-05
+  - Accept COPYING as a license file
+  - Take included module (under inc/) into consideration while
+    analyzing prereq_matches_use
+  - Changed most of the META.yml metrics to pass if META.yml doesn't
+    exist
+
+0.93_03 2014-08-13
+  - Added meta_json_is_parsable and meta_json_conforms_to_known_spec
+  - Added meta_yml_has_repository_resource
+  - Renamed metayml_ metrics to meta_yml_
+  - Fixed abstract encoding issues
+  - Refactored tests
+  - Fixed not to ignore directory symlinks
+  - Fixed RT#97858 - wrong no_symlinks test in files not in MANIFEST
+    (for a local distribution; CPANTS site doesn't ignore symlinks
+    not listed in MANIFEST)
+  - Fixed RT#97601 - Test::Kwalitee incorrectly reports non-use of
+    strict in Inline::CPP
+
+0.93_02 2014-06-30
+  - Removed cpants_lint.pl in favor of App::CPANTS::Lint
+  - Fixed RT#94468 - "use_strict" metric doesn't like .pod files
+    that contain no perl (ishigaki)
+  - Fixed RT#96492 - 0.93_01 test failures on OSX (ether)
+
+0.93_01 2014-05-27
+  - Added the following metrics:
+    - has_known_license_in_source_file
+    - has_abstract_in_pod
+    - no_abstract_stub_in_pod
+  - Removed metayml_conforms_spec_current metric.
+  - Supported x_cpants custom META field to tell analyzer to ignore
+    some of the metrics (only) when calculating a kwalitee score.
+  - Refactored several Kwalitee files, and internal stash layout has
+    changed rather significantly. You might need to modify your
+    tools if they happen to depend on the stash directly.
+
+0.92 2013-09-22
+  - Fixed a case when more than one license sections come in row
+    (spotted by ysasaki++) (ishigaki)
+  - stopped checking auto_features (ishigaki)
+
+0.91 2013-09-05
+  - Fixed RT#69233 - doesn't detect use >= 5.012 as use strict
+    (ishigaki)
+  - Fixed RT#83336 - Fails to detect strict via `use MooseX::Types`
+    (ether)
+  - Fixed RT#83851 - 'use v5.16' and greater not deemed "strict"
+    (ishigaki)
+  - Fixed RT#86504 - fix sort order of Kwalitee generators (ether)
+  - Fixed RT#87155 - more Module::Install tests needed (1.04 is
+    broken) (ishigaki)
+  - Fixed RT#87597 - proper_libs is a dubious test (ishigaki)
+  - Fixed RT#87598 - Can't use an undefined value as an ARRAY
+    reference at .../FindModules.pm line 115. (ishigaki)
+  - Fixed RT#87988 - Fix use of $Test::Kwalitee::VERSION (ether)
+  - Fixed RT#88216 - extracts_nicely metric fails for -TRIAL
+    releases (ishigaki)
+  - Fixed RT#88365 - YAML/JSON tests are not failing when improperly
+    encoded characters are seen (ishigaki)
+  - Moose::Exporter also provides strict and warnings (doy)
+
+0.90_02 2013-08-03
+  - Fixed rt#87535 - incorrect version specification in 0.90_01
+    (ether)
+  - Fixed rt#87534 - Test failure in 0.90_01 (ether)
+  - Fixed rt#87561 - t/11_hash_random.t fails due to undeclared test
+    dependency (wyant)
+
+0.90_01 2013-08-01
+  - Applied all the changes in 0.88 again, and removed a few
+    non-portable metrics for Test::Kwalitee.
+
+0.89 2013-08-01
+  - Tentatively reverted all the changes in 0.88
+
+0.88 2013-08-01
+  - add metric "no_dot_underscore_files" (daxim, charsbar)
+  - remove metrics "distributed_by_debian",
+    "latest_version_distributed_by_debian",
+    "has_no_bugs_reported_in_debian", "has_no_patches_in_debian",
+    "no_cpants_errors", "uses_test_nowarnings", "has_test_pod",
+    "has_test_pod_coverage", "has_examples" (charsbar)
+  - add metric "portable_filenames" (charsbar)
+  - numerous fixes for a smoother operation of www-cpants (charsbar)
+
+0.87 2013-02-12
+  - fix rt#80225 - Test failures due to
+    Test::CPAN::Meta::YAML::Version interface change (wyant)
+  - fix rt#82939 - Hash-Randomization causes 10_analyse.t to fail
+    (kentnl, chorny)
+  - fix rt#44796 - Module::CPANTS::Kwalitee::Manifest broken for
+    MANIFESTs containing files with spaces (rivy)
+
+0.86 2012-04-11
+  - add several strict and warnings equivalents & make it easy to
+    add more
+  - fix when Moose is used and strict is not used
+  - add info about "MIN_PERL_VERSION"
+  - better remedy for metayml_declares_perl_version
+  - metayml_declares_perl_version moved from experimental to extra
+    some pod improvements (jquelin)
+  - fix rt#65903 - no more "Test::YAML::Meta::Version" on CPAN
+    (jquelin)
+  - replace YAML::Syck with YAML::Any (jquelin)
+  - no_symlinks checks only files in MANIFEST, use "maniread" in
+    ExtUtils::Manifest (rurban)
+  - add more equivalents for use_strict and use_warnings tests
+    (doherty)
+  - implement valid_signature metric (daxim)
+
+0.85 2009-07-12, Alexandr Ciornii
+  - fix fails on non-Win32
+
+0.84 2009-07-08, Alexandr Ciornii
+  - require Test::Warn 0.11
+  - add Test::More to deps
+  - add LWP::Simple to deps
+  - fix calc_test_yaml_meta.t
+  - better META.yml
+  - list of changes for 0.83 (domm)
+
+0.83 2009-06-10
+  - ignore "no_index" when searching for examples (xdaveg)
+  - skip the debian metrics and downloading the debian file when in
+    LINT (szabgab)
+  - has_test_pod and has_test_pod_coverage are now optional metrics
+    (domm)
+
+0.82 2008-07-08 10:23:30
+  - update META.yml spec to 1.4
+    <http://module-build.sourceforge.net/META-spec-v1.4.html>
+  - fixed experimental metrics
+  - use Moose now counts for using strict
+  - lots of commits from Gábor
+  - honor META.yml key "no_index".
+  - Fixes RT#32777 and an IRC complaint by BinGOs
+
+0.81 Sun Apr 13 16:45:29 CEST 2008
+  - fixed doc bug in SYNOPSIS (reported by ADAMOWSKI as RT#34773)
+  - made Module::CPANTS::Kwalitee::FindModules smarter (domm):
+    If available, use META.yml "provides". If not, look for
+    "package" statements in files. It now also finds stuff like
+    Tk::Widget and App::Ack upgrade to Software::License 0.003
+    (Gábor)
+
+0.80 Sat Apr 12 10:53:40 CEST 2008
+  domm:
+  - add metayml_has_provides metric
+
+  Gábor Szabó:
+  - simplify the way the VERSION number is looked up, keep the full
+    version line
+  - increase the no_large_files limit to 200_000
+  - some unit test fixes thanks to Tux
+  - some of {error} fields are now ARRAY refs instead of strings
+  - more detailed unit tests
+  - add "LICENCE" to the list of special files (not only LICENSE)
+  - collect the license information of each file using
+    Software::LicenseUtils
+  - add has_separate_license_file metric
+  - add has_license_in_source_file metric
+
+0.79 Tue Apr  8 01:25:12 CEST 2008
+  - released at the Oslo QA Hackathon 2008
+
+  Gábor Szabó:
+  - replace File::Find by File::Find::Rule
+  - add no_large_files metrics
+  - add fits_fedora_license metric that was inside the
+  - easily_repackageable_by_fedora metric
+  - add "is_experimental" flag to some of the metrics
+  - add aggregating key to metric to list the other metrics being
+    aggregated
+  - unhide some errors during testing
+  - renamed some error fields
+  - add metayml_declares_perl_version metric
+
+0.78 2008-04-06
+  - released at the Oslo QA Hackathon 2008
+  - very hacky workaround for problems with Meta.YML, version
+    objects, etc
+  - moved "has_version_in_each_file" into
+  - Module::CPANTS::Kwalitee::Version & fixed a bug in it
+
+  Gábor Szabó:
+  - add fits_fedora_license metric that was inside the
+  - easily_repackageable_by_fedora metric
+  - add "is_experimental" and "is_aggregate" flags to some of the
+    metrics
+  - unhide some errors during testing
+  - add no_generated_files metric
+  - add easily_repackageable_by_fedora,
+  - easily_repackagable_by_debian and easily_repackageable metric
+  - add has_version_in_each_file metric
+  - add has_tests_in_t_dir metric
+  - add no_stdin_for_prompting metric checking for STDIN in
+    Makefile.PL and Build.PL
+
+0.77 2008-01-29
+  - made prereq_matches_use and build_prereq_matches_use optional
+    metrics
+  - changed data structure: all errors are now in a hashref called
+    "error"
+
+0.76 2007-11-14
+  - added new metrics prereq_matches_use and
+    build_prereq_matches_use
+  - added "needs_db" to metrics and removed hardcoded workaround for
+    is_prereq
+  - removed workaround in Module::CPANTS::Kwalitee::MetaYML (Barbie
+    fixed it the problem in Test::YAML::Meta)
+  - reworded metayml_is_parsable remedy
+
+0.75 2007-10-29
+  - added optional metric use_warnings
+  - added directory xt as a potential location for test files
+  - finally applied patch provided by Adriano Ferreira
+    to fix some issues in Module::CPANTS::Kwalitee::Manifest.
+    See RT #28982
+
+0.74 2007-10-24
+  - removed metric "metayml_conforms_spec_1_0"
+  - fixed bug in "check_spec_conformance" in
+    Module::CPANTS::Kwalitee::MetaYML, which caused wrong results in
+    metayml_conforms_spec*
+  - switched to YAML::Syck
+  - work around Pod::Simple::Checker returning strange data
+
+0.73 2007-09-12
+  - added version of dist to dump file name
+  - fixed bug in Module::CPANTS::Kwalitee::NeedsCompiler (RT #28134
+    plus all reported merged into that one)
+
+0.72 2007-06-30
+  - added docs to cpants_lint.pl
+  - cpants_lint.pl can now dump metadata to a file
+  - added YAML output to cpants_lint.pl
+
+  Gábor Szabó:
+  - added Module::CPANTS::Kwalitee::NeedsCompiler
+        MCK::NeedsCompiler does not contain any
+        "kwalitee_indicator", but adds much needed metadata.
+
+  Barbie:
+  - Module::CPANTS::Analyse assumes Unix paths after munging with
+    File::Spec, thus breaking portability at every turn in a
+    non-Unix-like environment… bad Thomas no biscuit!
+    Refined META.yml metrics using Test::YAML::Meta and brought
+    *current spec* up to date with version 1.3
+    <http://module-build.sourceforge.net/META-spec-v1.3.html> :)
+
+0.71 2007-04-23
+  - moved svn repo to <http://code.google.com/p/cpants/>
+  - has_license now also checks for LICENCE (as suggested by David
+    Cantrell)
+  - fixed RT #26535 reported by MTHURN
+  - has_example now also checks for "p(m|od)" files (as suggested by
+    JUERD)
+  - fixed RT #24228 reported by THALJEF - t/99_critic.t
+    now only runs if $ENV{AUTHOR_TEST} is set
+  - resolved RT #25198 reported by bdfoy using his patch
+    Module::CPANTS::Kwalitee::FindModules: do not check META.yml for
+    "provides" because META.yml might list semi-garbage (eg
+    according to META.yml, Siesta provides Apache::Constants, which
+    it does not.)
+  - skip very large test-files and only check *.t files (not
+    everything in t/) as suggested by CASIANO
+  - cpants_lint.pl:
+    - switched from Getopt::Std to Getopt::Long
+    - added "--no_capture" option for easier debugging
+    - added "--verbose" options
+
+  - hopefully fixed RT #25207 (test failures on Win32) reported
+    (and patched…) by HEMINGWAY. This should also solve
+    RT #26535 reported by Martin Thurn
+  - applied doc patch submitted by MSTEVENS as RT #26379
+
+0.69 2006-11-04
+  - split up "metayml_conforms_spec" to metayml_conforms_spec_1_0
+    and "metayml_conforms_spec_1_2" (which is optional)
+  - added "metayml_error" and docu pointers to it.
+
+0.68 2006-10-28
+  - fixed bug in Module::CPANTS::Kwalitee::FindModules reported by
+    JDHEDDEN in RT #22081 (the module name of modules living in the
+    top-level namespace (eg 'threads.pm') was not guessed correctly
+    use META.yml "provides" (if it exists) instead of guessing
+    module names in Module::CPANTS::Kwalitee::FindModules
+    modifed changelog-regex in Module::CPANTS::Kwalitee::Files as
+    suggested by CDOLAN in RT #21999
+  - added Module::CPANTS::Kwalitee::License
+  - moved license checking to Module::CPANTS::Kwalitee::License
+  - added checks for LICENSE file and "LICENSE" POD section
+  - moved "meta_yml" parsing to Module::CPANTS::Kwalitee::MetaYML
+  - changed "has_license|Module::CPANTS::Kwalitee::License" error
+    text after Schwern (and Andreas Koenig) suggested
+    that ExtUtils::MakeMaker now supports a "license" field
+
+0.67 2006-09-13
+  - cpants_lint.pl now handles reporting of optional metrics better.
+  - added t/99_critic.t (Gábor Szabó)
+  - some code cleanups as reported by Test::Perl::Critic (Gábor
+    Szabó)
+  - new metric: "has_license|Module::CPANTS::Kwalitee::License";
+  - Module::CPANTS::Kwalitee::MetaYML (Gábor Szabó)
+  - Module::CPANTS::Kwalitee::Pod now reports the error messages
+    returned by Pod::Simple::Checker (suggested by Gábor Szabó)
+
+0.66 2006-09-06
+  - added "optional_indicator_names utility" in
+    Module::CPANTS::Kwalitee method
+
+0.65 2006-09-05 (YAPC::Europe hackathon release)
+  - updated test suite
+  - added "has_example" to Module::CPANTS::Kwalitee::Files
+  - added "buildtool_not_executable" to
+    Module::CPANTS::Kwalitee::Files
+  - added Module::CPANTS::Kwalitee::Manifest
+    ("manifest_matches_dist")
+
+0.64 2006-08-29
+  - updated Module::CPANTS::Kwalitee::BrokenInstaller
+    submitted by Steffen Müller
+
+0.63 2006-07-31
+  - we now also find README.txt
+  - resolves RT #20633 reported by MBARBON (thanks for the patch!)
+
+0.62 2006-07-20
+  - added Module::CPANTS::Kwalitee::BrokenInstaller
+    submitted by Steffen Müller
+
+0.61 2006-07-17
+  - Kwalitee metrics can now be marked as "is_extra"
+    Such metrics do not count for available kwalitee
+
+  - marked is_prereq as "is_extra"
+  - cpants_lint now reports percentages additional to absolute
+    values
+  - cpants_lint won't list failed "is_extra" metrics
+  - added some method caching to Module::CPANTS::Kwalitee
+  - added Ctotal_kwalitee> to Module::CPANTS::Kwalitee.
+
+0.60 2006-05-18
+  - activated is_prereq metric
+  - added helper method ("available_kwalitee")
+  - Module::CPANTS::Kwalitee::FindModules: skip stuff in inc
+    (Module::Install)
+
+0.52 2006-03-12
+  - added some dependencies to Build.PL/META.yml (thanks to Achim
+    Grolms and BLBLACK (RT #17977))
+  - enhanced output of cpants_lint.pl (list failed tests)
+  - Module::CPANTS::Kwalitee::FindModules: die if we cannot find a
+    namespace
+  - Module::CPANTS::Kwalitee::FindModules: remove stuff that doesn't
+    seem to be namespace (eg lowercase) from module names
+  - changed the name of some fields to work with the (upcoming) DB
+    added some tests
+
+0.51 2006-02-16
+  - adapted Module::CPANTS::Kwalitee::Prereq to work with newer
+    versions of YAML (reported by Andreas Koenig as RT #17670)
+
+0.50 2006-01-26
+  - first release to CPAN
+
+0.01
+  - started rewrite

@@ -1,0 +1,16 @@
+<TMPL_INCLUDE NAME="header.tmpl">
+
+<h2>News</h2>
+
+<TMPL_LOOP NAME="list.posts">
+
+<h3><a href='<TMPL_VAR NAME="this.url.rel">'><TMPL_VAR NAME="this.title"></a></h3>
+<TMPL_VAR NAME="this.teaser">
+<div><i><a href='<TMPL_VAR NAME="this.url.rel">'>Read Full Article ...</a></i></div>
+
+</TMPL_LOOP>
+
+<h4><a href="archive.html">News Archive</a></h4>
+
+<TMPL_INCLUDE NAME="footer.tmpl">
+

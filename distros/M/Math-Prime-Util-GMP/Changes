@@ -1,0 +1,797 @@
+Revision history for Perl module Math::Prime::Util::GMP
+
+0.46 2017-04-17
+
+    [FIXES]
+
+    - Allow single argument to miller_rabin_random (implies one test).
+
+    - AKS on small inputs wasn't correctly calculating primitive roots.
+
+
+0.45 2017-04-16
+
+    [FIXES]
+
+    - Remove use of exp2 which is C99 only.
+
+    - Trap negative bases sent to miller_rabin_random
+
+
+0.44 2017-04-13
+
+    [ADDED]
+
+    - irand()                Returns uniform random 32-bit integer
+    - irand64()              Returns uniform random 64-bit integer
+    - drand([fmax])          Returns uniform random NV (floating point)
+    - urandomm(n)            Returns uniform random integer in [0, hi-1]
+    - random_bytes(nbytes)   Return a string of CSPRNG bytes
+
+    [FIXES]
+
+    - miller_rabin_random wasn't initializing a variable.  Fixed and test
+      added.  Thanks to Alexandr Ciornii for timely reporting.
+
+    - Fixed is_primitive_root behavior with negative values.
+
+    [PERFORMANCE]
+
+    - sieve_prime_cluster up to 2x faster.
+
+    [OTHER]
+
+    - prime_count(), random_prime(), urandomr() can be used with one arg.
+
+
+0.43 2017-03-12
+
+    [ADDED]
+
+    - random_strong_prime(nbits)       random strong prob prime of nbits bits
+    - random_maurer_prime(nbits)       random nbits-bits proven prime
+    - random_shawe_taylor_prime(nbits) random nbits-bits proven prime
+    - random_maurer_prime_with_cert(nbits)
+    - random_shawe_taylor_prime_with_cert(nbits)
+    - urandomb(n)                      random number between 0 and 2^n-1
+    - urandomr(lo,hi)                  random number in [lo,hi], inclusive.
+
+    [PERFORMANCE]
+
+    - sieve_primes with small widths should perform much better.
+
+
+0.42 2017-02-27
+
+    [ADDED]
+
+    - lambertw(x[,digits])         Lambert W function
+    - random_prime(a,b)            random prob prime in range [a,b]
+    - random_nbit_prime(nbits)     random prob prime of exactly nbits bits
+    - random_ndigit_prime(ndigs)   random prob prime of exactly ndigs digits
+    - seed_csprng(bytes,data)      supply a seed to the internal CSPRNG
+    - is_csprng_well_seeded()      returns 1 if the CSPRNG has a proper seed
+    - is_semiprime(n)              does n have exactly two prime factors
+
+    [FIXES]
+
+    - is_power behaviour for 1 and -1.
+
+    - is_nminus1_prime could assert on some inputs.  Fix.
+
+    - chinese([3,0],[2,3]) made GMP go belly up.  Found by Trizen.
+
+    - divisors(1) in list context would segfault.  Found by Trizen.
+
+    [PERFORMANCE]
+
+    - Adjust zeta algorithm crossover for large precision.  Makes a huge
+      difference for bern{frac/real} with values > 53000.
+      Thanks to Trizen for pointing this out.
+
+    - zeta works for all real values, returns undef for 1.  It has issues
+      below -10 or so that need to be dealt with in a later release.
+
+    - is_primitive_root a bit faster with large inputs.
+
+    - stirling about 40% faster.  Thanks to Karim Belabas.
+
+    [OTHER]
+
+    - The ISAAC CSPRNG has been added internally and all functions call it.
+      While it is quite fast it is slower than GMP's Mersenne Twister.
+
+    - On startup, we attempt to seed ISAAC with 256 bytes from /dev/urandom.
+      Callers can call is_csprng_well_seeded() to check if this succeeded,
+      and call as needed seed_csprng() to seed or reseed.
+
+
+0.41 2016-10-09
+
+    [API CHANGES]
+
+    - bernreal and harmreal will use the second argument to mean the digits
+      of precision to use, rather than the number of digits past the decimal
+      place.
+
+    - is_pseudoprime and is_strong_pseudoprime act like Math::Prime::Util.
+
+    [ADDED]
+
+    - todigits(n[,base[,len]])     Convert number to digit array
+    - zeta(s[,digits])             Riemann Zeta of integer or FP s
+    - riemannr(s[,digits])         Riemann R function of integer or FP s
+    - divisors(n)                  Returns list of divisors
+    - is_euler_pseudoprime(n,@a)   Euler-Jacobi primality test
+
+    [OTHER]
+
+    - With verbose >= 3, prints factors found in partial sieve.
+
+    - factor(1) returns empty list, just like non-GMP code.
+
+    - factor() went through a Perl layer for obsolete reasons.  Removed.
+
+    - bernreal and bernfrac will use the Zeta/Pi method for large values,
+      making it orders of magnitude faster for large sizes.
+
+    - Added internal FP log, exp, pow functions, which are not in GMP.
+
+    - is_prime will do one extra M-R test for probable primes, down from 1-5.
+      Also, if is_provable_prime adds two Frobenius tests if returning a 1.
+
+    - Removed Perl layer from is_strong_pseudoprime.
+
+    - is_pseudoprime and is_strong_pseudoprime take a list of bases, and
+      there is no default base.
+
+    - sieve_primes with small n and large range (e.g. 10^20 to 10^20+8e9) is
+      much faster.  This tunes the full vs. partial sieve crossover.
+
+
+0.40 2016-08-01
+
+    [ADDED]
+
+    - sqrtint(n)                Integer square root of n
+    - rootint(n,k)              Integer k-th root of n
+    - is_prime_power(n)         Returns k if n=p^k for p a prime.
+
+    [OTHER]
+
+    - is_perrin_pseudoprime 2x faster.  Takes optional
+      second argument for additional restrictions.
+
+
+0.39 2016-07-24
+
+    [ADDED]
+
+    - bernreal                     returns float value of Bernoulli number
+    - is_euler_plumb_pseudoprime   Colin Plumb's Euler Criterion test
+    - surround_primes              returns offsets of prev and next primes
+
+    [PERFORMANCE]
+
+    - prev/next/surround prime sieve is slightly deeper
+
+    - Add very simple composite filter for is_perrin_pseudoprime.
+
+    - Internal refactor of Miller-Rabin code to remove one mpz variable.
+
+    [OTHER]
+
+    - Add option for restricted Perrin pseudoprimes.
+
+
+0.38 2016-06-18
+
+    [FIXES]
+
+    - Minor updates for Kwalitee.
+
+    - Rewrite of BLS75 internals, rewrite BLS75 hybrid.
+
+    - Remove two small memory leaks.
+
+    [PERFORMANCE]
+
+    - Less effort to prove primality in is_prime().
+
+
+0.37 2016-06-06
+
+    [ADDED]
+
+    - is_nplus1_prime(n)         BLS75 N+1 deterministic primality test
+    - is_bls75_prime(n)          BLS75 N-1, N+1, combined primality tests
+
+    [FIXES]
+
+    - Fixed primorial on systems with not-new GMP, 8-byte UV, and 4-byte long.
+
+    - sieve_range should work with >32-bit depths on 64-bit Perl + 32-bit GMP.
+
+
+0.36 2016-05-21
+
+    [ADDED]
+
+    - addmod                      (a + b) % n
+    - mulmod                      (a * b) % n
+    - divmod                      (a / b) % n
+    - powmod                      (a ^ b) % n
+    - invmod                      (1 / b) % n
+    - sqrtmod                     square root modulo a prime
+    - is_primitive_root(a,n)      return 1 if 'a' is a primitive root mod n
+    - sieve_range(n,width,depth)  sieve from n, returning candidate offsets
+
+    [FIXES]
+
+    - Allow a leading '+' in inputs.
+
+    [PERFORMANCE]
+
+    - znprimroot is much faster with large inputs.
+
+    - Speedup partial sieve with large input.
+
+    - next_prime and prev_prime sieve deeper.  ~5% faster with large inputs.
+
+    - AKS using Bernstein (2003) theorem 4.1.  10-20x faster.
+
+    - Speedup for large pn_primorial and primorial.  Much faster for very
+      large values, though it will all get swamped by the overhead in
+      returning the large value.  This is a great reason to return mpz objects.
+
+    [OTHER]
+
+    - Split out factor, primality, and AKS code into separate source files.
+
+
+0.35 2015-12-13
+
+    [FIXES]
+
+    - gcdext done manually for old GMP.
+
+    - fix memory leak in chinese
+
+0.34 2015-10-14
+
+    [ADDED]
+
+    - sieve_prime_cluster(low,high,...)   sieve clusters/constellations
+
+    [PERFORMANCE]
+
+    - Speedup partial sieve with large range.
+
+    [OTHER]
+
+    - Remove _GMP_trial_primes(), which was never exported.
+    - Internal restructuring of sieve_primes and sieve_twin_primes.
+    - is_frobenius_pseudoprime with arguments doesn't check for perfect
+      square, and works for small primes plus large params.
+
+0.33 2015-09-04
+
+    [ADDED]
+
+    - sieve_twin_primes(low,high)         sieve for twin primes
+    - is_miller_prime(n[,assumeGRH])      deterministic Miller test
+
+    [PERFORMANCE]
+
+    - New results from Sorenson and Webster let us give faster deterministic
+      results for 65-82 bits.  is_prime always returns {0,2} for this range.
+
+0.32 2015-08-16
+
+    [ADDED]
+
+    - chinese                   chinese remainder theorem
+    - sigma                     divisor sums
+    - ramanujan_tau             Ramanujan's Tau function
+
+0.31 2015-06-21
+
+    [PERFORMANCE]
+
+    - Minor speedup to partial sieve.
+
+    [OTHER]
+
+    - Allow working on old GMP versions.
+
+0.30 2015-06-15
+
+    [ADDED]
+
+    - harmfrac                           returns (num,den) of Harmonic number
+    - harmreal                           returns float value of Harmonic number
+    - is_proth_prime(p)                  For k*2^n+1, returns -1, 0, or 2
+    - is_frobenius_khashin_pseudoprime   returns 1 if Frob-Khashin prob prime
+
+    [FIXES]
+
+    - lucas sequence with even n fixed.
+
+    [PERFORMANCE]
+
+    - A Proth test was added to quickly prove numbers of the form k*2^n+1.
+
+    - LLR testing was improved using a method by Rödseth.  This allows proofs
+      of k*2^n-1.  The old method is still used, but was unable to quickly
+      test cases where k was divisible by 3.  The new method handles these.
+
+    - BLS75-5 proof: use an expanding stack, allowing it to work on inputs
+      like:  'k * n# + 1'.
+
+    - BLS75-5 proof: remove some redundant computations.
+
+0.29 2014-11-26
+
+    [ADDED]
+
+    - is_llr_prime(p)           For k*2^n-1, returns -1, 0, or 2
+    - lucasu(P, Q, k)           U_k for Lucas(P,Q)
+    - lucasv(P, Q, k)           V_k for Lucas(P,Q)
+
+    [PERFORMANCE]
+
+    - is_prime will prove many Proth-form (h*2^n+1) numbers.
+
+    - is_provable_prime tries less hard to make a BLS75-T5 proof.  Certs may
+      be longer, but performance is better.
+
+    - is_power is more efficient (recursion removed, only prime powers checked).
+
+0.28 2014-11-17
+
+    [ADDED]
+
+    - is_mersenne_prime(p)      returns 1 iff 2^p-1 is prime
+
+    [PERFORMANCE]
+
+    - is_prime will do a LLR test, as will is_provable_prime if not returning
+      a certificate.  This means many primes of the form k*2^n-1 will run
+      faster and return 2 rather than 1.
+
+    - Update UV SQUFOF factoring code, faster factoring once reduced in size.
+
+    - Slightly better P-1 stage 2 performance.
+
+    - Slightly deeper trial division in general factoring.
+
+    - Big reduction in average depth of unfactored stack.  We work on smaller
+      composite factors first, and add repeated factors all at once.  This
+      fixes some pathological inputs such as:
+          vecprod( map { $_*($_+2)**17 } @{twin_primes(100000,115000)} )
+      which has 2574 factors and would overflow the 256-element stack.  With
+      the new code it has a maximum stack depth of 3.
+
+    [OTHER]
+
+    - is_power works with negative powers, although doesn't return root.
+
+0.27 2014-10-07
+
+    [PERFORMANCE]
+
+    - Minor changes to factor recipe, should give a little speedup.
+
+    - Cache ~32k worth of small primes to give a little speedup in many places.
+
+    - Switch to my original AGM code, slightly faster for large values.
+
+    - Add Goetgheluck binomial code, and switch to mpz_bin_uiui for builtin.
+      For large inputs this can be thousands of times faster than mpz_bin_ui.
+
+    [OTHER]
+
+    - Don't use mp_bitcnt_t -- old GMPs don't have this type.
+
+
+0.26 2014-09-26
+
+    [ADDED]
+
+    - stirling(n,m,[type])      Stirling numbers of first,second,third kind
+    - vecprod(list)             product of a list of integers
+
+    [OTHER]
+
+    - Cleanup invmod, etc. XS parser.  Smaller code.
+
+    - Fixed some leaked mpz_t / mpz_f objects.
+
+
+0.25 2014-09-23
+
+    - Fixed compiler warning (error for some compilers).
+
+    - prev_prime uses a sieve for 200+ bits.  20% speedup for large inputs.
+
+
+0.24 2014-09-22
+
+    [ADDED]
+
+    - sieve_primes(low,high[,k])          sieve for primes, partial or BPSW
+    - is_frobenius_pseudoprime(n,[a,b])   Frobenius quadratic primality test
+    - is_perrin_pseudoprime(n)            Perrin primality test
+    - factorial(n)                        n!
+    - bernfrac                            returns (num,den) of Bernoulli number
+    - Pi([digits])                        Pi with requested number of digits
+
+    [OTHER]
+
+    - next_prime will use a partial sieve for 120+ bit inputs.  For large
+      inputs this is a 15-30% speedup.  For 2469*2617#/93030-12182 I get:
+
+         = 392.2s  OpenPFGW 3.7.7
+         = 220.6s  Pari/GP 2.6.2
+         = 128.4s  GMP 5.0.2 mpz_nextprime
+         =  57.6s  old MPU
+         =  45.5s  new MPU
+
+    - New version of Frobenius-Underwood test to match the 2014 draft paper.
+      This is just a code refresh and has no other effect.
+
+    - BLS75 with effort 1 toned down.  This makes is_prime with 65- to 200-bit
+      inputs faster, though a bit less likely to return with the value 2
+      rather than 1.  It's a couple percent fewer, but 10-60% faster.
+
+
+0.23 2014-08-16
+
+    - Fat comma isn't fat for numbers, garbled test hashes on 32-bit.
+
+
+0.22 2014-08-16
+
+    [ADDED]
+
+    - moebius(n[,nhi])                    Moebius function (single or ranged)
+    - liouville(n)                        Liouville function
+    - totient(n)                          Euler's Totient function (single)
+    - jordan_totient(k, n)                Jordan totient
+    - carmichael_lambda(n)                Carmichael Lambda (reduced totient)
+    - znorder(a, n)                       multiplicative order of a mod n
+    - znprimroot(n)                       least primitive root of n
+
+    [OTHER]
+
+    - Moved factoring loop out of XS file.
+
+    - factor does much better power splitting, similar to MPU 0.38's code:
+      time mpu 'use bigint; my $n = next_prime(10**20)**200; say join(" ", map {"[@$_]"} factor_exp($n));'
+      time mpu 'use bigint; my $n = next_prime(10**21)**200 * next_prime(10**20)**200; say join(" ", map {"[@$_]"} factor_exp($n));'
+
+    - Fix spelling of Paul Zimmermann's name (thanks to Mathew @ mersenneforum)
+
+    - Standalone ECPP now does expression parsing using the GMP 6.0.0a demo
+      code.  Version bumped to 1.04.
+
+
+0.21 2014-06-19
+
+    - Used a bare 64-bit in a test.  Wrap in quotes.
+
+
+0.20 2014-06-18
+
+    [ADDED]
+
+    - valuation(a,b)                      how many times does b divide a?
+    - invmod(a,n)                         inverse of a modulo n
+    - is_pseudoprime(n,base)              Simple Fermat test
+    - binomial(n,k)                       binomial coefficient
+    - gcdext(a,b)                         extended Euclidian algorithm
+    - vecsum(...)                         sum list of integers
+
+    [OTHER]
+
+    - 10%-ish speedup for next/prev prime with 38-950 digit inputs.
+
+
+0.19 2014-04-21
+
+    [ADDED]
+
+    - is_power
+    - exp_mangoldt
+
+    [FIXES]
+
+    - Fixed string shortcut for simple divisibility.  is_prime and related
+      functions are a bit faster when given inputs divisible by 2 or 5.
+
+    [OTHER]
+
+    - Add improved AKS parameter selection.  About 200x faster, though still
+      thousands of times slower than APR-CL or ECPP.  Updated times for the
+      example in the v0.10 entry: Timing for 10**100+267:
+          AKS:         ~5 days.
+          BLS75 n-1:   ~3 minutes.
+          APR-CL:      0.09 seconds
+          ECPP:        0.05 seconds.
+
+    - ECPP performance adjustments, version 1.03 of standalone ECPP.
+
+    - Updated ECPP class polynomial data.  Default "tiny" table had very minor
+      changes.  The "big" table (in the github xt/ directory, default for
+      standalone ECPP) removed some large coefficient 17-24 degree polys to
+      make room for many more higher-degree polys.  For some ranges this may
+      mean more backtracking, but should expand the input size that is able to
+      find good discriminants without high factoring effort.  "prob" below is
+      summing the estimate 1/2H:   9x more polys and 66x larger size gives on
+      average about 3x more candidates.
+
+      Default "tiny" table:
+        OLD:    30373 bytes   604 polys    24 maxdeg   42.0 prob   1450 prob/MB
+        NEW:    30422 bytes   611 polys    25 maxdeg   42.8 prob   1475 prob/MB
+
+      "big"  table at www.probableprime.org/ecpp/cpd/big/class_poly_data.h.gz
+        OLD:  2032376 bytes  3197 polys   117 maxdeg  104.5 prob     54 prob/MB
+        NEW:  2005072 bytes  5271 polys    85 maxdeg  125.2 prob     65 prob/MB
+
+      "huge" table at www.probableprime.org/ecpp/cpd/huge/class_poly_data.h.gz
+             15724395 bytes 14571 polys   128 maxdeg  207.9 prob     14 prob/MB
+
+0.18 2014-01-27
+
+    [FIXES]
+
+    - Fix for 5.6.2 (undefined symbol).
+
+    - Fix for unsigned long != UV, reported by CHORNY.
+
+
+0.17 2014-01-24
+
+    [ADDED]
+
+    - is_bpsw_prime     specific BPSW-only test
+    - gcd               20-50x faster than Math::BigInt
+    - lcm               3-800x faster than Math::BigInt
+    - kronecker
+
+    [FIXES]
+
+    - Factoring with a number or intermediate near the word boundary would
+      hang or run very slow.  Thanks to Hugo van der Sanden for the report.
+
+    - Next version of vcert.c, which handles some new Primo changes.
+
+
+0.16 2013-10-28
+
+    [ADDED]
+
+    - partitions    partition function p(n), OEIS A000041
+
+    [FIXES]
+
+    - Fixed memory leak in Lucas sequence (is_prime, next_prime, etc.).
+
+    - is_aks_prime wasn't properly checking divisibility for composites.
+
+    [Scripts and Programs Added]
+
+    - verify_primegap.pl    parallel prime gap verification
+
+0.15 2013-09-30
+
+    [Functions Added]
+      - miller_rabin_random
+
+    - A tree sieve is done in trial factor for large (900+ digits) inputs.
+      This improves performance greatly for very large inputs.
+
+    - is_prob_prime uses more trial division for large inputs.  For very
+      large inputs (e.g. 50,000+ digits) this can greatly speed up probable
+      prime testing, for instance in next_prime or similar sieving.
+      Time for next_prime(99992 * 10**10101 - 100):
+         1m  4s  MPUGMP 0.15
+         3m 34s  Pari/GP (needs 450MB of stack!)
+         4m  1s  mpz_nextprime
+         9m 33s  Math::Primality
+
+    - Use shallow product tree for primorials.  Large primorials are 2 to 12
+      times faster.  Break consecutive_integer_lcm into four sub-products so
+      it runs 2-4x faster for large inputs.
+
+    - Trim ECPP and adjust its heuristics.
+
+    - Standalone ECPP now has consistent return codes, making it easier to
+      use in applications without having to parse return text.  The return
+      codes are consistent with the certificate verifier.
+
+    - factor() in scalar context is now consistent.
+
+0.14 2013-08-07
+
+    - Fix small certificates leaving out the "N " for small numbers.
+
+0.13 2013-08-06
+
+    [API Changes]
+      - Primality proofs now use a text certificate.  This is nicer for
+        external interaction, but is a change from previous behavior.  You
+        will need to use Math::Prime::Util 0.30 or newer.
+
+    [Functions Added]
+      - lucas_sequence
+      - is_almost_extra_strong_lucas_pseudoprime
+      - is_frobenius_underwood_pseudoprime
+      - pplus1_factor
+
+    [Enhancements]
+    - is_prob_prime now uses the extra-strong Lucas test instead of the
+      strong Lucas test.  This gives better performance.  is_prime and
+      is_provable_prime also incorporate the change.
+
+    - Added more trial division to is_prob_prime for big (100+ digit)
+      numbers.  This is a significant speedup for next_prime in many cases.
+      Pari/gp 2.6.0  nextprime(10^4000)    19 minutes
+      MPU:GMP 0.12   next_prime(10**4000)  15 minutes
+      MPU:GMP 0.13   next_prime(10**4000)   8 minutes
+
+    - ECPP now tries partial n-1 and n+1 proofs (BLS theorem 3 / 15) at each
+      step, and adds a couple additional quick factoring tests.  This mainly
+      helps lower the time variability with large inputs.
+
+    - Updated ECPP polynomials.  Should give better performance with larger
+      inputs.
+
+    [Scripts and Programs Added]
+      - convert-primo-cert.pl    convert a Primo certificate to MPU format.
+      - verify-cert.pl           Verify a Primo or MPU certificate.
+      - vcert.c                  Verify a Primo or MPU certificate.
+
+0.12 2013-06-12
+
+    - add standard and extra strong Lucas probable prime tests.
+
+    - Rearrange C code to allow standalone build of ECPP.
+
+    - Speedups for ECPP.
+
+0.11 2013-05-20
+
+    - is_prob_prime is faster at finding composites.
+
+    - rewrote Lucas inner loop for ~20% speedup.
+
+    - The previous two changes make is_prob_prime a bit faster, which means
+      a small speedup to almost all functions.
+
+    - Lower is_prime proving effort.  Proves ~30% of 128-bit primes instead
+      of 50%, but runs about 4x faster.
+
+    - Change ECPP to factor all strategy with backtracking.  Not much
+      difference below 200 digits, but a big help after that.  Certificates
+      are identical.
+
+0.10 2013-05-07
+
+    - ECPP -- a much faster primality prover.  BLS75 n-1 works well to about
+      40 digits, then slows down rapidly.  This ECPP implementation is good
+      to 300-500 digits.  Timing for 10**100+267:
+          AKS: ~1 year.    BLS75 n-1: 1.5-5 minutes.    ECPP: 0.1 seconds.
+
+    - is_prime does an additional 4 random-base M-R tests.
+
+    - is_provable_prime will try a quick n-1 then do ECPP.
+
+    - is_nminus1_prime added to give access to that specific method, in
+      case someone has reason to insist on that proof type.
+
+    - Change polynomial multiplication to use binary segmentation.  Huge
+      speed improvement for AKS primality proving (20-100x faster).  AKS
+      is now faster in GMP than MPU's C code.  It's still not nearly as fast
+      as other methods: proving 100000000003 takes 65 seconds, while this
+      would take a couple milliseconds at most for an n-1 proof.  The one year
+      estimate in the first paragraph is with the _new_ code.
+
+    - Compile-time support to BLS75 theorem 7, which reduces the amount of
+      n-1 we need to factor.  Not enabling because it just doesn't help
+      enough, and ECPP is a better place to spend development effort.
+
+    - Lots of new internal functions to support ECPP, which could be used
+      for future projects.
+
+0.09 2013-04-21
+
+    - Add primality certificate generation.
+
+0.08 2013-04-05
+
+    - Switch to a projective ECM with a stage 2.  Much better results, but
+      note that it doesn't build up to B1 like the old version.  This has
+      a big impact on factoring and primality proving.
+
+    - Add a QS based on William Hart's SIMPQS (a simple QS that is a
+      predecessor to what went into FLINT).  Not the fastest by a long shot
+      (yafu and msieve take that prize), but it's quite small and works pretty
+      well.  Eventually this will get replaced with a home-built QS.  Meanwhile
+      some improvements from version 2.0 that remain are (1) no partial
+      relations, (2) uses too much memory, and (3) uses GE instead of
+      jasonp's block Lanczos.
+
+    - The new ECM and QS make factoring much faster, especially for 30+
+      digit inputs.  Factoring should give reasonable times out to 70+
+      digits now.  Time is competitive with Math::Pari now, and often faster
+      (noting that Math::Pari uses a fairly old version of Pari).
+
+    - Factoring mix redone given the big changes in ECM and QS.
+
+    - Primality proofs adjusted to better use p-1 and ECM.  The quick proof
+      in is_prime has a higher success rate for all input sizes and is a
+      little faster for small numbers.  is_provable_prime is 10-50x faster.
+
+0.07 2013-03-19
+
+    - Tiny speedup when passing in bigints.
+
+    - Some speedups in pbrent, pbrent usage, and small prime iterator.
+      Factoring small (< ~30 digit) numbers is faster.
+
+    - Handle large and small M-R bases just like MPU does -- mod with n,
+      then return 1 if base <= 1 or base >= n-1.
+
+0.06 2012-12-17
+
+    - Fix 1-byte memory overrun (thanks to CPAN Testers, Solaris, Valgrind).
+
+    - Add factoring of small numbers.  Helps a little when the input gets
+      reduced enough to fit into a UV.
+
+0.05 2012-12-15
+
+    - Add AKS primality test.  Super slow, but nice to have around.
+
+    - ECM is faster.
+
+    - Add a small prime iterator, which means _much_ less memory and faster
+      operation for big smoothness factors in pminus1 and ecm factoring.
+
+0.04 2012-11-11
+
+    - Add simple prime_count function.  It uses next_prime so is terribly slow
+      for big ranges.  However it's a lot faster than the PP code when given
+      a large base and small range e.g. (10**96, 10**96 + 2**18).
+
+    - Add primorial, pn_primorial, and consecutive_integer_lcm functions.
+
+    - Factoring:
+         Add a perfect power test.
+         Add a simple ECM factoring method.
+         Speed up SQUFOF a bit.
+         Complete p-1 rewrite.  Much faster and finds more factors.
+         Adjust general factor() mix.
+
+    - Add Pocklington-Lehmer and BLS primality tests.  is_prime() uses the
+      BLS test with a quick factoring attempt for numbers less than 2^200,
+      though the chances of success drop off as the size increases.
+      The point is not to cull mismarked probable primes (we use BPSW so this
+      is highly unlikely for these small sizes), but to quickly mark more
+      numbers as definitely prime.  Remember to use is_prob_prime if you do
+      not care about this distinction and want the result slightly faster.
+
+    - add is_provable_prime function that calls BLS with much more aggressive
+      factoring.
+
+0.03 2012-07-16
+    - XS callable: _lcm_of_consecutive_integers(B)
+      which is a better alternative for B! for many factoring algorithms.
+    - Fix some minor compile issues.
+
+0.02 2012-07-15
+    - Factoring tests assumed 64-bit.  Rewrite.
+
+0.01 2012-07-15
+    - Initial release

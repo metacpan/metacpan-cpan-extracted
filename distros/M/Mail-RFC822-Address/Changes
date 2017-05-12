@@ -1,0 +1,15 @@
+Revision history for Perl extension Mail::RFC822::Address.
+
+0.3   Fri Apr 12 2002
+    - Changed behaviour of validlist when called in list context
+        Nick Cabatoff <ncabatoff@exodus.net>      
+
+0.2   Sat Apr 14 2001
+    - now allows null items in list as per RFC822
+        Sam Roberts <sroberts@uniserve.com>
+    - other slight tweaks to the regexp
+    - added INSTALL file
+
+0.01  Sat Jan 20 2001
+    - original version
+

@@ -1,0 +1,91 @@
+MooX-ClassAttribute
+===================
+
+Created:      2012-12-27
+Home page:    <https://metacpan.org/release/MooX-ClassAttribute>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-ClassAttribute>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.011	2014-11-01
+
+ [ Packaging ]
+ - Don't make Moose/MooseX::ClassAttribute runtime recommendations or
+   development requirements.
+   Jim Bacon++
+   cPanel, Inc.++
+
+ [ Other ]
+ - Use Exporter::Shiny instead of Sub::Exporter::Progressive.
+
+0.010	2013-09-06
+
+ [ Bug Fixes ]
+ - Skip test case that requires Moo 1.002000 on older versions of Moo.
+   Fixes RT#88459.
+   Andreas J. König++
+   <https://rt.cpan.org/Ticket/Display.html?id=88459>
+
+ [ Documentation ]
+ - Correct link to Method::Generate::ClassAccessor in documentation.
+
+ [ Packaging ]
+ - Conflict detection for Moo == 1.001000 in Makefile.PL.
+
+0.009	2013-08-27
+
+ [ Bug Fixes ]
+ - Fix MooX::CaptainHook's `on_application` hook to work with recent
+   versions of Moo::Role/Role::Tiny which do not always call
+   `apply_single_role_to_package`.
+   Graham Knop++
+
+0.008	2013-07-10
+
+ [ Bug Fixes ]
+ - Support non-coderef defaults.
+   Fixes RT#87638.
+   Rob Bloodgood++
+   <https://rt.cpan.org/Ticket/Display.html?id=87638>
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.007	2013-07-10
+
+ [ Bug Fixes ]
+ - Fixed error: Can't call method "isa" on an undefined value at
+   MooX/CaptainHook.pm line 27.
+   Fixes RT#86828.
+   Dinis Rebolo++
+   <https://rt.cpan.org/Ticket/Display.html?id=86828>
+
+ [ Documentation ]
+ - Note incompatibility with Moo 1.001000.
+
+0.006	2013-01-11
+
+ [ Bug Fixes ]
+ - Avoid triggering an 'in cleanup' error on some older versions of Perl.
+
+0.005	2013-01-05
+
+ [ Bug Fixes ]
+ - Avoid triggering Sub::Exporter::Progressive's dependency on
+   Sub::Exporter.
+
+0.004	2013-01-03
+
+ [ Bug Fixes ]
+ - Fix MooX::CaptainHook on_inflation fragility when Moose is loaded early.
+
+0.003	2013-01-03
+
+ [ Bug Fixes ]
+ - Prevent MooX::CaptainHook from inadvertantly loading Moose.
+
+0.002	2013-01-01
+
+ [ Packaging ]
+ - List dependencies.
+
+0.001	2013-01-01	Initial release

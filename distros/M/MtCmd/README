@@ -1,0 +1,19 @@
+##########################################################################
+#                                                                        #
+# © Copyright IBM Corporation 2002, 2007. All rights reserved.           #
+#                                                                        #
+# This program and the accompanying materials are made available under   #
+# the terms of the Common Public License v1.0 which accompanies this     #
+# distribution, and is also available at http://www.opensource.org       #
+# Contributors:                                                          #
+#                                                                        #
+# William Spurlin - wspurlin@us.ibm.com Initial version                  #
+#                                                                        #
+##########################################################################
+
+ 
+ClearCase::MtCmd version 0.1 is an interface to Rational ClearCase MultiSite.
+
+It has been tested in an elementary way on Solaris 5.8/CC 7.0/Perl 5.8.8.
+
+Contributions and suggestions are welcome.

@@ -1,0 +1,27 @@
+1.20  10-01-2012
+      + Added helper 'any_data'
+      + Added method 'load_data' (use via helper 'any_data')
+      + Added method 'func' (use via helper 'any_data')
+      + Added comments to the code
+      
+      * Fixed bug, when loading two tables with the same names led to error (only in plugin features)
+      * Improved documentation
+      * Improved tests
+
+1.14  28-12-2011
+      * Fixed typos
+      * Fixed translation
+
+1.12  26-12-2011
+      * Improved documentation (thanx to dfateyev)
+
+1.11: 25-12-2011
+      * Improved documentation  
+
+1.10: 18-12-2011
+      + Added possibility to load data by filename in method load_data.
+      * Improved documentation.
+      * Changed default name of helper to 'db'
+
+1.0:  16-12-2011
+      First release on github.

@@ -1,0 +1,55 @@
+TODO List for MHonArc
+=====================
+
+Items are in no particular order:
+
+===========================================================================
+
+=> Fix all open bugs. :-)
+
+=> Add resource to disable use of MD5 if no message-id.
+
+=> Generalize message page layout so converted header and body can
+   be placed in any order.  XXX: Old versions did not delimit
+   converted head and body, so what should be done for this case
+   or should any kind of compatibility be dropped?
+
+=> Log-style output when showing progress.  I.e. Prefix text with
+   date/time stamp.
+
+=> "Global" filter options.  For example, have something like
+   "subdir" be applied to all filters that write files.
+
+=> Define $MhaStdout and $MhaStdin.  Should help in embedded usage.
+
+=> Support for text/uri-list.
+
+=> XHTML defaults for resources (XXX: Browser impact?)
+
+=> "00" year => 1900 (need test case that verifies this).
+
+=> Add resource to set initial message number.  XXX: Use of this?
+
+=> Redo MHonArc using modules/class structure.  Basically a redesign
+   and implementation (MHonArc 3.x?).
+
+=> Provide attachment listing at top of each messages page
+   (suggested by Lars Aronsson).  This can be tricky since filters
+   have ultimate control of how parts are treated, including overriding
+   attachment disposition.  Would also require changes to how base
+   parsing cooperates with content filters.
+
+=> Subject-based threading enhancements:
+      . Messages with no "Re:" are in different threads.  Related to
+	this is grouping follow-ups under proper message based upon
+	date.
+
+=> Support filter chains: pre- and port-filters to MIMEFILTERS.
+
+=> Hashify all resources (part of code redesign).
+
+=> Use message-IDs as filenames: Internal impacts, OS support problems.
+   Should be configurable?
+
+===========================================================================
+$Id: TODO,v 1.25 2003/08/02 06:15:36 ehood Exp $

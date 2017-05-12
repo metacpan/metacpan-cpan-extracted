@@ -1,0 +1,15 @@
+Revision history for Perl module Mojolicious::Plugin::InstallablePaths.
+
+0.04 2015-01-25
+  - Fixes for deprecated render_static method (reneeb++)
+
+0.03  2013-01-28
+	- Bugfix
+
+0.02  2102-12-23
+	- Changed name to ::InstallablePaths (from ::ModuleBuild)
+	- Added comment on EUMM support
+	- Add Module::Build::CleanInstall support
+
+0.01  2012-12-19
+	- Initial release

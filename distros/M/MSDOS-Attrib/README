@@ -1,0 +1,56 @@
+MSDOS-Attrib version 1.06, released September 6, 2014
+
+
+MSDOS::Attrib allows you to get or set file attributes under
+OS/2 or Windows 95/NT.  These are the standard file attributes
+(read-only, hidden, system, archive, and directory).  If you
+want to access OS/2 extended attributes, use the OS2::ExtAttr
+module.  If you want to access Windows NT security attributes,
+try the Win32::FileSecurity module.
+
+MSDOS::Attrib was previously known as OS2::Attrib.  I renamed
+it because it now works on Win32 systems as well as OS/2.  To
+upgrade, simply replace "OS2::Attrib" with "MSDOS::Attrib" in
+any programs that use it.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+You must be able to compile extensions.
+
+
+
+DEPENDENCIES
+
+  Package   Minimum Version
+  --------- ---------------
+  perl       5.005
+  Carp       
+  Exporter   
+  XSLoader
+
+
+
+CHANGES
+    Here's what's new in version 1.06 of MSDOS::Attrib:
+    (See the file "Changes" for the full revision history.)
+
+	- no functional changes
+	- release tests moved to xt/
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

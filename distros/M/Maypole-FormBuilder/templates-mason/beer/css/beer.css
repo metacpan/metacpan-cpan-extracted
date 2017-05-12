@@ -1,0 +1,16 @@
+input#abv, input#price {
+    width: 30px;
+}
+
+select#score {
+    width: 70px;
+}
+
+
+% $r->content_type( 'text/css' );
+<%flags>
+inherit => undef
+</%flags>
+
+
+

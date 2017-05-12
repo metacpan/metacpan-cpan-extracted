@@ -1,0 +1,20 @@
+/*
+Check whether signbitl can be linked.
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+int main(int argc, char *argv[]) {
+ long double op = strtold(argv[1], NULL);
+ int ret;
+
+ ret = signbitl(op);
+
+ if(!ret) printf("ret set as expected\n");
+ else printf("signbitl is broken\n");
+
+ return 0;
+}
+

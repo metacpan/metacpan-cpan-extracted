@@ -1,0 +1,43 @@
+Revision history for MooX-Ipc-Cmd
+
+1.2.1 2016-11-18T10:25:48-08:00 America/Los_Angeles
+ [BUG FIXES]
+ - Cleanup namespace in the Exception package
+
+1.2.0 2016-11-11T07:55:10-08:00 America/Los_Angeles
+ [ENHANCEMENTS]
+ - -Cleanup namespace after itself
+
+1.1.2 2015-11-05T08:43:23-08:00 America/Los_Angeles
+ [DOCUMENTATION]
+ - -Removed reference to debug mode, better documentation
+
+1.1.1 2015-10-30T07:11:05-07:00 America/Los_Angeles
+ [BUG FIXES]
+ - Fix failures in non linux builds
+
+1.1.0 2015-07-17T08:26:07-07:00 America/Los_Angeles
+ [BUG FIXES]
+ - Fixed bug where stderr wasn't being captured 
+ - Fixed valid_exit option for capture
+
+ [ENHANCEMENTS]
+ - Added test case to checker stderr capture in exception
+
+1.0.3 2015-04-09T15:31:03-04:00 America/New_York
+ [BUG FIXES]
+ - Exception did not print out full error message
+ - Did not throw array with $!
+
+1.0.2 2015-04-06T13:33:21-04:00 America/New_York
+ [DOCUMENTATION]
+ - Better documentation
+
+1.0.1 2015-04-04T13:52:47-04:00 America/New_York
+ [BUG FIXES]
+ - Added authorpreq Pod::Elemental::Transformer::List
+ - Fixed issue #1, internationalization of error
+
+1.0.0 2015-04-01T07:58:18-07:00 America/Los_Angeles
+ [MAJOR]
+ - [MAJOR] - initial release

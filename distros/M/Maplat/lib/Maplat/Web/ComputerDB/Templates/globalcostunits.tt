@@ -1,0 +1,44 @@
+[% IF statustext %]
+<p align="center">
+    <div class="[% statuscolor %]">[% tr.tr(statustext) %]</div>
+</p>
+[% END %]
+<p align="center">
+    <table class="data" id="MainDataTable">
+        <tr class="tabheader">
+                <th>[% tr.tr("Cost Unit") %]</th>
+                <th>[% tr.tr("Description") %]</th>
+                <th></th>
+                <th></th>
+        </tr>
+        [% FOREACH costunit IN costunits %]
+        <form name="costunit_[% costunit.costunit %]" method="post" action="[% webpath %]">
+        <tr>
+                <td>
+                    <input type="hidden" name="costunit" value="[% costunit.costunit %]">
+                    <input type="text" name="newcostunit" value="[% costunit.costunit %]">
+                </td>
+                <td><input type="text" name="description" size="30" maxLength="60" value="[% costunit.description %]"></td>
+                <td>
+                        <input type="hidden" name="mode" value="change" id="mode_[% costunit.costunit %]">
+                        <input type="submit" value="[% tr.tr("Change") %]">
+                </td>
+                <td>
+                    <input type="submit" value="[% tr.tr("Delete") %]" onClick="return confirmDeleteCostunit('costunit_[% costunit.costunit %]', 'mode_[% costunit.costunit %]');">
+                </td>
+        </tr>
+        </form>
+        [% END %]
+        <form name="costunit_new" method="post" action="[% webpath %]">
+        <tr>
+                <td><input type="text" name="costunit" size="8" maxLength="20">
+                <td><input type="text" name="description" size="30" maxLength="60" value=""></td>
+                <td>
+                        <input type="hidden" name="mode" value="create">
+                        <input type="submit" value="[% tr.tr("Create") %]">
+                </td>
+                <td></td>
+        </tr>
+        </form>
+    </table>
+</p>

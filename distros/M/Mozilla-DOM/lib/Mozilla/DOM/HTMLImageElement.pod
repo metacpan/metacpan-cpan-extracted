@@ -1,0 +1,206 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLImageElement
+
+=for object Mozilla::DOM::HTMLImageElement
+
+Mozilla::DOM::HTMLImageElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLImageElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLImageElement interface is the interface to a [X]HTML
+ * img element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLImageElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $align = $htmlimageelement->B<GetAlign>()
+
+=head2 $alt = $htmlimageelement->B<GetAlt>()
+
+=head2 $border = $htmlimageelement->B<GetBorder>()
+
+=head2 $height = $htmlimageelement->B<GetHeight>()
+
+=head2 $hspace = $htmlimageelement->B<GetHspace>()
+
+=head2 $bool = $htmlimageelement->B<GetIsMap>()
+
+=head2 $longdesc = $htmlimageelement->B<GetLongDesc>()
+
+=head2 $name = $htmlimageelement->B<GetName>()
+
+=head2 $src = $htmlimageelement->B<GetSrc>()
+
+=head2 $usemap = $htmlimageelement->B<GetUseMap>()
+
+=head2 $vspace = $htmlimageelement->B<GetVspace>()
+
+=head2 $width = $htmlimageelement->B<GetWidth>()
+
+=head2 $htmlimageelement->B<SetAlign>($align)
+
+=over
+
+=over
+
+=item * $align (string)
+
+=back
+
+=back
+
+=head2 $htmlimageelement->B<SetAlt>($alt)
+
+=over
+
+=over
+
+=item * $alt (string)
+
+=back
+
+=back
+
+=head2 $htmlimageelement->B<SetBorder>($border)
+
+=over
+
+=over
+
+=item * $border (string)
+
+=back
+
+=back
+
+=head2 $htmlimageelement->B<SetHeight>($height)
+
+=over
+
+=over
+
+=item * $height (integer (long))
+
+=back
+
+=back
+
+=head2 $htmlimageelement->B<SetHspace>($hspace)
+
+=over
+
+=over
+
+=item * $hspace (integer (long))
+
+=back
+
+=back
+
+=head2 $htmlimageelement->B<SetIsMap>($ismap)
+
+=over
+
+=over
+
+=item * $ismap (boolean)
+
+=back
+
+=back
+
+=head2 $htmlimageelement->B<SetLongDesc>($longdesc)
+
+=over
+
+=over
+
+=item * $longdesc (string)
+
+=back
+
+=back
+
+=head2 $htmlimageelement->B<SetName>($name)
+
+=over
+
+=over
+
+=item * $name (string)
+
+=back
+
+=back
+
+=head2 $htmlimageelement->B<SetSrc>($src)
+
+=over
+
+=over
+
+=item * $src (string)
+
+=back
+
+=back
+
+=head2 $htmlimageelement->B<SetUseMap>($usemap)
+
+=over
+
+=over
+
+=item * $usemap (string)
+
+=back
+
+=back
+
+=head2 $htmlimageelement->B<SetVspace>($vspace)
+
+=over
+
+=over
+
+=item * $vspace (integer (long))
+
+=back
+
+=back
+
+=head2 $htmlimageelement->B<SetWidth>($width)
+
+=over
+
+=over
+
+=item * $width (integer (long))
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

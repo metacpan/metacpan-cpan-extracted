@@ -1,0 +1,132 @@
+#!/usr/bin/perl -w
+
+# $Id: mgpg-test,v 1.7 2006/04/14 10:53:11 joern Exp $
+
+use strict;
+use lib 'lib';
+use lib '/home/joern/projects/MIME-tools-5.411/lib';
+use Mail::GPG;
+use MIME::Parser;
+use Getopt::Std;
+
+$| = 1;
+
+my %passwords;
+
+main: {
+	# get options
+	my %opt;
+	my $opt_ok = getopts ('vd', \%opt);
+
+	if ( !@ARGV or not $opt_ok ) {
+		print STDERR "Usage: mgpg-test [-v] [-d] file ...\n";
+		exit 1;
+	}
+
+	my $verbose = $opt{v};
+	my $dump    = $opt{d};
+
+	foreach my $file ( @ARGV ) {
+		open(FILE,$file) or die "can't read $file";
+		print STDERR "* $file\n";
+		test_file(\*FILE, $verbose, $dump);
+	}
+}
+
+sub test_file {
+	my ($fh, $verbose, $dump) = @_;
+
+	my $entity = Mail::GPG->parse (
+		mail_fh => $fh
+	);
+
+	#-- extract subject and sender (just for output)
+	my $subject = substr($entity->head->get("subject")||"", 0, 35);
+	my $from    = substr($entity->head->get("from")||"", 0, 35);
+
+	chomp $subject;
+	chomp $from;
+
+	#-- print subject and sender
+	print STDERR sprintf("  => %-35s -- %-35s\n  => ", $subject, $from);
+
+	#-- create Mail::GPG instance, with debugging output
+	#-- to default temporary directory on this system
+	my $mg = Mail::GPG->new ( debug => 1 );
+
+	my $result;
+	my $dump_entity;
+	if ( $mg->is_signed ( entity => $entity ) ) {
+                print STDERR "Mail is signed\n  => ";
+
+		#-- mail is signed, so let's verify
+		$result = eval { $mg->verify ( entity => $entity ) } || "";
+		if ( $@ ) {
+			print STDERR "Error: $result\n$@";
+		} else {
+			print STDERR $result->as_short_string;
+		}
+
+		$dump_entity = $entity if $dump;
+
+	} elsif ( $mg->is_encrypted ( entity => $entity ) ) {
+                print STDERR "Mail is encrypted\n  => ";
+
+		#-- mail is encrypted, ask Mail::GPG for the
+		#-- key to decrypt this mail
+		my ($key_id, $key_mail) = $mg->get_decrypt_key (
+			entity => $entity
+		);
+
+                if ( ! defined $key_id ) {
+                    print STDERR "Could not determine decrypt key for encrytped entity\n";
+                    return;
+                }
+
+		#-- ask for password, if not already done
+		if ( ! exists $passwords{$key_id} ) {
+			print STDERR "Password for $key_mail ($key_id): ";
+			eval "use Term::ReadKey; ReadMode(2)";
+			chomp ( $passwords{$key_id} = <STDIN> );
+			eval "ReadMode(0)";
+			print STDERR "\n  => ";
+		}
+
+		#-- decode the mail
+		my $decrypted;
+		($decrypted, $result) = eval {
+			$mg->decrypt (
+				entity     => $entity,
+				passphrase => $passwords{$key_id},
+			)
+		};
+		if ( $@ ) {
+			print STDERR "Error:\n$@\n";
+			$dump_entity = $entity if $dump;
+		} else {
+			print STDERR $result->as_short_string;
+			$dump_entity = $decrypted if $dump;
+		}
+	
+		
+	} else {
+		#-- mail isn't encrypted or signed at all
+		print STDERR "NOENC - NOSIGN";
+	}
+	
+	print STDERR "\n";
+
+	#-- remove temp. files created by MIME::Entity
+	$entity->purge;
+
+	if ( $verbose && $result ) {
+		my $long = $result->as_string ( no_stdout => 1 );
+		$long =~ s/\n/\n     /g;
+		$long =~ s/\s+$//;
+		print STDERR "     ", $long,"\n";
+	}
+
+	$dump_entity->print(\*STDOUT) if $dump_entity;
+	
+	1;
+}

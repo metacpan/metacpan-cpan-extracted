@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+# WARNING: this file is generated, do not edit
+# 01: /usr/lib/perl5/Apache/TestConfig.pm:923
+# 02: /usr/lib/perl5/Apache/TestConfig.pm:1013
+# 03: /usr/lib/perl5/Apache/TestMM.pm:134
+# 04: Makefile.PL:11
+
+BEGIN { eval { require blib && blib->import; } }
+#!perl
+  
+use strict;
+use warnings FATAL => 'all';
+  
+use lib qw(lib);
+use base q(Apache::TestRunPerl);
+use Apache::TestConfig ();
+
+main::->new->run(@ARGV);
+
+sub pre_configure {
+      my $self = shift;
+      # mod_bt doesn't like to be loaded if it isn't configured.
+      Apache::TestConfig::autoconfig_skip_module_add('mod_bt.c')
+}

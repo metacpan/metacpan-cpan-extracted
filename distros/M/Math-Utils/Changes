@@ -1,0 +1,86 @@
+Revision history for Math-Utils
+
+1.09
+	11 May 2016
+	- New function fsum(), using Kahan's summation algorithm.
+	- Added tests in 17-derivative-eval.t to check for the
+	  linear polynomial and the constant-only polynomial.
+	  (They passed, but until now those cases hadn't been tested.)
+	- Extend the documentation for pl_div(), emphasizing the
+	  need to remove leading zeros.
+1.08
+	24 Feb 2016
+	- Inlined the comparison functions of generate_relational().
+	- Default tolerance was just under square root of (an) epsilon,
+	  changed to to just over.
+	- Updated 01-compare.t to test edge cases.
+	- Added a log2() function, because why not.
+1.07
+	23 Nov 2015
+	- Search using grep.cpan.me indicated that floor() and ceil()
+	  functions weren't defined in general-purpose modules (and
+	  the modules they were in were pretty heavy-weight). Decided
+	  to add them to the module.
+	- Repeated modulus of a number was worth making into
+	  utility function moduli().
+1.06
+	7 Oct 2015
+	- The if statements were laid out in generate_fltcmp in
+	  a way that could return a -1 (less than) when the two
+	  values were actually equal within tolerance. Changed this.
+	- Renamed some test files so that the compare test comes
+	  first.
+1.05
+	25 Sep 2015
+	- Bug in pl_derivative() for linear equation case.
+	- Added test cases to cover it.
+1.04
+	20 Sep 2015
+	- I had bumped the version number everywhere but in the module
+	  itself. This will probably complicate something, so
+	  fix this everywhere with a version 1.04.
+	- Add a flipsign() function to the :utility list.
+	- More documention clean-up. Mention Math::VecStat
+	  in the SEE ALSO.
+1.03
+	18 Sep 2015
+	- Put :fortran tagged functions copysign() and log10()
+	  in the :utility tagging. The :fortran tag sticks around
+	  though.
+	- New function pl_dxevaluate() for returning the y, dy,
+	  d2y values of the polynomial at x.
+	- New test files for pl_evaluate() and pl_dxevaluate().
+1.02
+	15 Sep 2015
+	- Documentation error in pl_div() (mis-named variables
+	  in the example).
+	- Extended the SEE ALSO paragraph.
+	- Very minor code clean-up in pl_antiderivative().
+1.01
+	5 Sep 2015
+	- I had left test file 15-objcoeff.t off the MANIFEST list. Oops.
+	- Embarrassing number of grammatical and spelling errors fixed.
+	- Clarified a couple of examples, and extended the
+	  pl_antiderivative() documentation with respect to the
+	  constant term.
+	- Version bump; up to CPAN.
+1.00
+	3 Sep 2015
+	- Added the coefficient list functions for addition, subtraction,
+	  division, multiplication, derivative, antiderivative,
+	  and evaluation (via Horner's method) of polynomials without
+	  actually creating a polynomial object.
+	- Added the tests for the above operations.
+0.02
+	30 Aug 2015
+	- CPAN testers caught a 5.10ism in the module, which is
+	  listed as okay for version 5.8. Decided to bump the
+	  minimum version requirement to 5.10.1.
+	- Documentation was sketchy, so added more descriptive
+	  text and examples.
+	- Version bump; up to CPAN.
+0.01
+	18 Aug 2015
+	- Collection of utility functions for Math modules, starting
+	  with the functions of Math-Fortran as a base.
+

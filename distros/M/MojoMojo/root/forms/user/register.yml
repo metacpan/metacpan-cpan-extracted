@@ -1,0 +1,61 @@
+---
+load_config_file: __path_to(root/forms/defaults.yml)__
+id: register
+
+elements:
+  - type: Text
+    name: login
+    label_loc: Login
+    filters:
+      - HTMLEscape
+      - LowerCase
+      - TrimEdges
+    constraints:
+      - Required
+      - Word
+  - type: Password
+    name: pass
+    label_loc: Password
+    constraints:
+      - Required
+      - type: Equal
+        others: confirm_password
+        message_loc: Password did not match
+      - type: Length
+        min: 4
+        max: 14
+        message_loc: Password must be between 4 and 14 chars
+  - type: Password
+    name: confirm_password
+    label_loc: Repeat password
+  - type: Text
+    name: email
+    label_loc: Email
+    filters:
+      - HTMLEscape
+      - TrimEdges
+    constraints:
+      - Email
+      - Required
+  - type: Text
+    name: name
+    label_loc: Name
+    filters:
+      - HTMLEscape
+      - TrimEdges
+    constraints:
+      - Required
+  - type: Text
+    name: antispam
+    label_loc: What is this wiki powered by (look at the bottom; 8 letters, all lowercase)?
+    filters:
+      - HTMLEscape
+      - TrimEdges
+    constraints:
+      - Required
+      - type: Regex
+        regex: mojomojo|catalyst
+        message_loc: Go away spammer!
+  - type: Submit
+    name: submit
+    value_loc: Register

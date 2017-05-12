@@ -1,0 +1,61 @@
+Module/Build/DB version 0.10
+============================
+
+This module subclasses Module::Build to provide added functionality for
+configuring, building, and testing database-backed applications. It uses a
+simple Rails-style numbered migration scheme, although migration scripts are
+written in pure SQL, not Perl.
+
+Frankly, this isn't a great module. Some reasons:
+
+* The numbered method of tracking migration dependencies has very little
+  flexibility.
+
+* Subclassing Module::Build is a really bad way to extend the build system,
+  because you can't really mix in other build features.
+
+Someday, I hope to fix the first issue by looking more closely at [database
+change
+management](http://www.justatheory.com/computers/databases/change-management.html),
+and perhaps by adopting a [completely different
+approach](http://www.depesz.com/index.php/2010/08/22/versioning/). The latter
+problem I would likely solve by completely separating the migration code from
+the build system, and then integrating as appropriate (hopefully Module::Build
+will get proper plugins someday).
+
+But in the meantime, I have working code that depends on this simple
+implementation (which does support [PostgreSQL](http://www.postgresql.org/),
+[SQLite](http://www.sqlite.org/) and [MySQL](ttp://www.mysql.com/)), and I
+want it to be easy for people to get at this dependency. So here we are.
+
+Installation
+------------
+
+To install this module, type the following:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Or, if you don't have Module::Build installed, type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Dependencies
+------------
+
+Module::Build::DB requires the following modules:
+
+* Module::Build 0.36
+
+Copyright and Licence
+---------------------
+
+Copyright (c) 2008-2010 David E. Wheeler. Some Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

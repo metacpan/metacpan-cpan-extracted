@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+
+(__FILE__ eq $0) and (exit(refresh::main()));
+
+package refresh;
+
+sub main {
+	my $dat = 'data/';
+	my $cache = 't/pgon_cache';
+	my $dfile = 't/pgons.yml';
+	(-d $dat) or die "cannot see '$dat' directory\n";
+	(-d $cache) or die "cannot see '$cache' directory\n";
+	# look for files in $dat and compare to md5sum info in $cache
+	# tests will only call me if I exist
+	# MANIFEST only contains $dfile
+	foreach my $dxf (glob("$dat/*.dxf")) {
+		# XXX what was the plan here?
+	}
+	1;
+}
+
+1;
+

@@ -1,0 +1,67 @@
+Revision history for Perl extension Math::FFT.
+
+1.34  2017-04-07
+    - Don't pack .*~ temporary files.
+        - Add MANIFEST.SKIP .
+
+1.33  2017-04-07
+    - Hopefully fix the tests with "." gone from @INC :
+        - http://www.cpantesters.org/cpan/report/873193f8-15df-11e7-a7e6-820fe85ef7bd
+        - Thanks to DCOLLINS for the report.
+
+1.32  2015-04-28
+    - Specify minimum version of perl as 5.8.x
+        - CPANTS / Kwalitee
+
+1.31  2015-03-25
+    - Convert n2 in _spctrm to "double" so it won't overflow as an int
+        - Fix https://rt.cpan.org/Ticket/Display.html?id=22068
+        - Thanks to thomas.poleschner@gmx.de for the report.
+
+1.30  2015-03-25
+    - Convert the test files to Test::More and do some other cleanups.
+
+1.29  2015-03-05
+    - Convert to Dist-Zilla.
+    - Reformatted the code.
+    - Get rid of trailing space.
+    - Got to 100% POD coverage.
+    - Other cleanups.
+    - As the original maintainer (Randy Kobes) passed away, the distribution
+    was adopted by Shlomi Fish (SHLOMIF).
+
+1.28  2005-09-03
+     - bump version so PAUSE ignores deleted 1.27 package
+
+0.28  2005-08-28
+     - fix version mistake in META.yml
+
+0.27  2005-08-28
+     - add method to calculate root mean square of data (suggested
+       by Robert Hiller)
+     - in calculating the power spectrum, use same logic for
+       segments = 1 as is currently done for segments > 1 when
+       "number" is specified (suggested by Robert Hiller)
+     - in calculating the power spectrum, check if data size
+       is an integral power of 2 if segments is not specified
+       or if segments = 1 and "number" is not specified
+     - in the spectrum method, change the name of the "hamm" window
+       function to "hann" (suggested by Robert Hiller). For
+       backwards compatibility, "hamm" is still supported.
+     - in the pod for the spctrm method, clarify how options
+       are to be passed in (suggested by Robert Hiller)
+
+0.26  2004-12-04
+     - include "arrays.h" in FFT.xs (required for some platforms)
+       (thanks to Doug Shubert)
+
+0.25  2000-12-28
+     - implement the routines of arrays.c of PGPLOT to pass
+       arrays to and from C
+     - added methods to calculate correlation, convolution
+       and deconvolution, and power spectrum
+     - added some simple statistical methods
+
+0.15  2000-12-05
+      - original version; created by h2xs 1.20 with options
+                -n Math::FFT

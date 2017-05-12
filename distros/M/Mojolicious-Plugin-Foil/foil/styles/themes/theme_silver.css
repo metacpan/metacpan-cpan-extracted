@@ -1,0 +1,105 @@
+/* ================================================================== */
+/* THEME: Silver
+ */
+/* ================================================================== */
+/* THEME: Silver - fonts
+ */
+/* ------------------------------------------------------------------ */
+/* Fonts */
+h1, h2, h3, h4 {
+  font-family: hancock, black, "lucida calligraphy", Merced, sans-serif;
+  color: black;
+}
+
+/* ================================================================== */
+/* ICONS - dark on light
+ * Nav arrows with transparent backgrounds
+ */
+.side nav li > ul {
+  list-style-image: url(nav_black.png);
+}
+
+/* ================================================================== */
+/* General */
+.verge, header,
+footer, .side, .fancy {
+  color: #111111;
+  background: #eeeeee;
+  border-color: black;
+}
+
+header,
+footer {
+  background: #eeeeee url(silver1.jpg) repeat-x;
+}
+
+.side {
+  background: #cccccc url(silver4.jpg) repeat-x;
+}
+
+body {
+  color: #111111;
+  background: #eeeeee;
+}
+
+a:link {
+  color: #660066;
+}
+
+a:visited {
+  color: #000066;
+}
+
+.fancy {
+  color: #111111;
+  background-image: url("silver3.jpg");
+  border: 5px double #111111;
+  padding: 0;
+}
+.fancy li {
+  padding: 0.5em;
+  margin: 5px;
+  border: 5px solid #111111;
+  background-color: #eeeeee;
+  background: linear-gradient(#eeeeee, #c8c8c8);
+}
+.fancy li a:link {
+  color: #660066;
+}
+.fancy li a:visited {
+  color: #000066;
+}
+
+.button, input[type=submit], header nav a,
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: #111111;
+  border-color: black;
+  background-color: #aaaaaa;
+}
+
+.button a:link, input[type=submit] a:link, header nav a a:link,
+header nav .selflink a:link,
+header nav em a:link,
+header nav .current a a:link, a.button:link, header nav a:link {
+  color: #111111;
+}
+
+.button a:visited, input[type=submit] a:visited, header nav a a:visited,
+header nav .selflink a:visited,
+header nav em a:visited,
+header nav .current a a:visited, a.button:visited, header nav a:visited {
+  color: #000066;
+}
+
+header nav li {
+  border-color: #666666;
+}
+
+header nav .selflink,
+header nav em,
+header nav .current a {
+  background-color: #eeeeee;
+  color: black;
+}

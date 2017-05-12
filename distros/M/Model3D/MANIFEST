@@ -1,0 +1,5 @@
+Makefile.PL
+MANIFEST
+README
+t/Model3D-WavefrontObject.t
+lib/Model3D/WavefrontObject.pm

@@ -1,0 +1,29 @@
+#
+# $Id: README 1.1 Mon, 21 Aug 2000 08:30:45 -0700 trockij $
+# $Name:  $
+#
+
+This is the Perl5 module for interfacing with the Mon system monitoring
+package. Currently only the client interface is implemented, but more
+things like special logging routines and persistent monitors are being
+considered.
+
+"mon" is a tool for monitoring the availability of services.
+More information can be found at http://www.kernel.org/software/mon/.
+
+To install:
+
+perl Makefile.PL
+make
+make test
+
+and if that goes well,
+
+make install
+
+
+Jim Trocki
+Computer System and Network Engineer
+Transmeta Corporation
+Santa Clara, CA
+trockij@transmeta.com

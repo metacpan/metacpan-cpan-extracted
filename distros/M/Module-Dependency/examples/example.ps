@@ -1,0 +1,286 @@
+%!PS-Adobe-3.0
+%%Title: (example.ps)
+%%LanguageLevel: 1
+%%Creator: PostScript::Simple perl module version 0.04
+%%CreationDate: Thu Sep 26 00:07:06 2002
+%%For: piers
+%%Orientation: Landscape
+%%Pages: 0
+%%EndComments
+%%BeginProlog
+%%BeginResource: PostScript::Simple
+/u {} def
+/landscape {
+  670 0 translate
+  90 rotate
+} bind def
+/pageclip {newpath 0 0 moveto
+0 670 lineto
+244 670 lineto
+244 0 lineto
+0 0 lineto
+closepath clip} bind def
+/STARTDIFFENC { mark } bind def
+/ENDDIFFENC { 
+
+% /NewEnc BaseEnc STARTDIFFENC number or glyphname ... ENDDIFFENC -
+	counttomark 2 add -1 roll 256 array copy
+	/TempEncode exch def
+	
+	% pointer for sequential encodings
+	/EncodePointer 0 def
+	{
+		% Get the bottom object
+		counttomark -1 roll
+		% Is it a mark?
+		dup type dup /marktype eq {
+			% End of encoding
+			pop pop exit
+		} {
+			/nametype eq {
+			% Insert the name at EncodePointer 
+
+			% and increment the pointer.
+			TempEncode EncodePointer 3 -1 roll put
+			/EncodePointer EncodePointer 1 add def
+			} {
+			% Set the EncodePointer to the number
+			/EncodePointer exch def
+			} ifelse
+		} ifelse
+	} loop	
+
+	TempEncode def
+} bind def
+
+% Define ISO Latin1 encoding if it doesnt exist
+/ISOLatin1Encoding where {
+%	(ISOLatin1 exists!) =
+	pop
+} {
+	(ISOLatin1 does not exist, creating...) =
+	/ISOLatin1Encoding StandardEncoding STARTDIFFENC
+		144 /dotlessi /grave /acute /circumflex /tilde 
+		/macron /breve /dotaccent /dieresis /.notdef /ring 
+		/cedilla /.notdef /hungarumlaut /ogonek /caron /space 
+		/exclamdown /cent /sterling /currency /yen /brokenbar 
+		/section /dieresis /copyright /ordfeminine 
+		/guillemotleft /logicalnot /hyphen /registered 
+		/macron /degree /plusminus /twosuperior 
+		/threesuperior /acute /mu /paragraph /periodcentered 
+		/cedilla /onesuperior /ordmasculine /guillemotright 
+		/onequarter /onehalf /threequarters /questiondown 
+		/Agrave /Aacute /Acircumflex /Atilde /Adieresis 
+		/Aring /AE /Ccedilla /Egrave /Eacute /Ecircumflex 
+		/Edieresis /Igrave /Iacute /Icircumflex /Idieresis 
+		/Eth /Ntilde /Ograve /Oacute /Ocircumflex /Otilde 
+		/Odieresis /multiply /Oslash /Ugrave /Uacute 
+		/Ucircumflex /Udieresis /Yacute /Thorn /germandbls 
+		/agrave /aacute /acircumflex /atilde /adieresis 
+		/aring /ae /ccedilla /egrave /eacute /ecircumflex 
+		/edieresis /igrave /iacute /icircumflex /idieresis 
+		/eth /ntilde /ograve /oacute /ocircumflex /otilde 
+		/odieresis /divide /oslash /ugrave /uacute 
+		/ucircumflex /udieresis /yacute /thorn /ydieresis
+	ENDDIFFENC
+} ifelse
+
+% Name: Re-encode Font
+% Description: Creates a new font using the named encoding. 
+
+/REENCODEFONT { % /Newfont NewEncoding /Oldfont
+	findfont dup length 4 add dict
+	begin
+		{ % forall
+			1 index /FID ne 
+			2 index /UniqueID ne and
+			2 index /XUID ne and
+			{ def } { pop pop } ifelse
+		} forall
+		/Encoding exch def
+		% defs for DPS
+		/BitmapWidths false def
+		/ExactSize 0 def
+		/InBetweenSize 0 def
+		/TransformedChar 0 def
+		currentdict
+	end
+	definefont pop
+} bind def
+
+% Reencode the std fonts: 
+/Courier-iso ISOLatin1Encoding /Courier REENCODEFONT
+/Courier-Bold-iso ISOLatin1Encoding /Courier-Bold REENCODEFONT
+/Courier-BoldOblique-iso ISOLatin1Encoding /Courier-BoldOblique REENCODEFONT
+/Courier-Oblique-iso ISOLatin1Encoding /Courier-Oblique REENCODEFONT
+/Helvetica-iso ISOLatin1Encoding /Helvetica REENCODEFONT
+/Helvetica-Bold-iso ISOLatin1Encoding /Helvetica-Bold REENCODEFONT
+/Helvetica-BoldOblique-iso ISOLatin1Encoding /Helvetica-BoldOblique REENCODEFONT
+/Helvetica-Oblique-iso ISOLatin1Encoding /Helvetica-Oblique REENCODEFONT
+/Times-Roman-iso ISOLatin1Encoding /Times-Roman REENCODEFONT
+/Times-Bold-iso ISOLatin1Encoding /Times-Bold REENCODEFONT
+/Times-BoldItalic-iso ISOLatin1Encoding /Times-BoldItalic REENCODEFONT
+/Times-Italic-iso ISOLatin1Encoding /Times-Italic REENCODEFONT
+/Symbol-iso ISOLatin1Encoding /Symbol REENCODEFONT
+/circle {newpath 0 360 arc closepath} bind def
+/box {
+  newpath 3 copy pop exch 4 copy pop pop
+  8 copy pop pop pop pop exch pop exch
+  3 copy pop pop exch moveto lineto
+  lineto lineto pop pop pop pop closepath
+} bind def
+%%EndResource
+%%EndProlog
+0.5 u setlinewidth
+/Helvetica findfont 9 scalefont setfont
+0.22 u setlinewidth
+1 1 1 setrgbcolor
+187 u 135 u 1 u circle fill
+0 0 0 setrgbcolor
+63 u 135 u 1 u circle fill
+187 u 135 u 1 u circle stroke
+0.22 u setlinewidth
+1 1 1 setrgbcolor
+187 u 171 u 1 u circle fill
+0 0 0 setrgbcolor
+63 u 135 u 1 u circle fill
+187 u 171 u 1 u circle stroke
+0.22 u setlinewidth
+1 1 1 setrgbcolor
+187 u 99 u 1 u circle fill
+0 0 0 setrgbcolor
+63 u 99 u 1 u circle fill
+187 u 99 u 1 u circle stroke
+0.22 u setlinewidth
+1 1 1 setrgbcolor
+187 u 135 u 1 u circle fill
+0 0 0 setrgbcolor
+63 u 99 u 1 u circle fill
+187 u 135 u 1 u circle stroke
+0.22 u setlinewidth
+1 1 1 setrgbcolor
+187 u 171 u 1 u circle fill
+0 0 0 setrgbcolor
+63 u 99 u 1 u circle fill
+187 u 171 u 1 u circle stroke
+0.22 u setlinewidth
+1 1 1 setrgbcolor
+337 u 111 u 1 u circle fill
+0 0 0 setrgbcolor
+196.5 u 135 u 1 u circle fill
+337 u 111 u 1 u circle stroke
+0.22 u setlinewidth
+1 1 1 setrgbcolor
+337 u 159 u 1 u circle fill
+0 0 0 setrgbcolor
+196.5 u 135 u 1 u circle fill
+337 u 159 u 1 u circle stroke
+0.22 u setlinewidth
+1 1 1 setrgbcolor
+337 u 111 u 1 u circle fill
+0 0 0 setrgbcolor
+196.5 u 171 u 1 u circle fill
+337 u 111 u 1 u circle stroke
+0.22 u setlinewidth
+1 1 1 setrgbcolor
+337 u 111 u 1 u circle fill
+0 0 0 setrgbcolor
+196.5 u 99 u 1 u circle fill
+337 u 111 u 1 u circle stroke
+0.22 u setlinewidth
+1 1 1 setrgbcolor
+337 u 159 u 1 u circle fill
+0 0 0 setrgbcolor
+196.5 u 99 u 1 u circle fill
+337 u 159 u 1 u circle stroke
+0.22 u setlinewidth
+1 1 1 setrgbcolor
+487 u 99 u 1 u circle fill
+0 0 0 setrgbcolor
+346.5 u 111 u 1 u circle fill
+487 u 99 u 1 u circle stroke
+0.22 u setlinewidth
+1 1 1 setrgbcolor
+487 u 135 u 1 u circle fill
+0 0 0 setrgbcolor
+346.5 u 111 u 1 u circle fill
+487 u 135 u 1 u circle stroke
+0.22 u setlinewidth
+1 1 1 setrgbcolor
+487 u 171 u 1 u circle fill
+0 0 0 setrgbcolor
+346.5 u 111 u 1 u circle fill
+487 u 171 u 1 u circle stroke
+0.22 u setlinewidth
+1 1 1 setrgbcolor
+487 u 135 u 1 u circle fill
+0 0 0 setrgbcolor
+346.5 u 159 u 1 u circle fill
+487 u 135 u 1 u circle stroke
+0 0 0 setrgbcolor
+newpath
+40 u 132 u moveto
+(y.pl) show stroke
+newpath
+40 u 96 u moveto
+(x.pl) show stroke
+newpath
+40 u 168 u moveto
+(z.cgi) show stroke
+newpath
+190 u 132 u moveto
+(b) show stroke
+newpath
+190 u 168 u moveto
+(c) show stroke
+newpath
+190 u 96 u moveto
+(a) show stroke
+newpath
+340 u 108 u moveto
+(d) show stroke
+newpath
+340 u 156 u moveto
+(e) show stroke
+newpath
+490 u 96 u moveto
+(f) show stroke
+newpath
+490 u 132 u moveto
+(g) show stroke
+newpath
+490 u 168 u moveto
+(h) show stroke
+newpath
+482 u 42 u moveto
+(Legend) show stroke
+0.4 u setlinewidth
+newpath
+482 u 30 u moveto
+(Foo.pl) show stroke
+newpath
+582 u 30 u moveto
+(Bar) show stroke
+newpath
+482 u 18 u moveto
+(Foo.pl depends upon Bar.pm) show stroke
+0.22 u setlinewidth
+1 1 1 setrgbcolor
+579 u 33 u 1 u circle fill
+0 0 0 setrgbcolor
+509 u 33 u 1 u circle fill
+579 u 33 u 1 u circle stroke
+0.25 u setlinewidth
+0 0 0 setrgbcolor
+480 u 15 u 600 u 50 u box stroke
+/Helvetica findfont 16 scalefont setfont
+0.250980392156863 0 0 setrgbcolor
+newpath
+15 u 18 u moveto
+(Dependencies for all scripts) show stroke
+/Helvetica findfont 12 scalefont setfont
+0.250980392156863 0 0 setrgbcolor
+newpath
+15 u 35 u moveto
+(Grapher.pm 1.22 - Thu Sep 26 00:07:06 2002) show stroke
+%%EOF

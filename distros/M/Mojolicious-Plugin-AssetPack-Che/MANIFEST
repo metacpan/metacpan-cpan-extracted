@@ -1,0 +1,24 @@
+Changes
+lib/Mojolicious/Plugin/AssetPack/Che.pm
+lib/Mojolicious/Plugin/AssetPack/Pipe/CombineFile.pm
+lib/Mojolicious/Plugin/AssetPack/Pipe/HTML.pm
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/01-combine-file-dev.t
+t/02-combine-file-prod.t
+t/app.pl
+t/assets
+t/assets/templates
+t/assets/templates/2.html
+t/assets/templates/1.html
+t/assets/css
+t/assets/css/foo.css
+t/assets/css/bar.css
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

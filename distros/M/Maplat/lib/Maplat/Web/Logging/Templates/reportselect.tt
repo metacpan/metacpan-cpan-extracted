@@ -1,0 +1,48 @@
+<p align="center">
+    <table class="data" id="MainDataTable">
+        <tr class="tabheader">
+            <th>[% tr.tr("Device") %]</th>
+            <th>[% tr.tr("Name") %]</th>
+            <th>[% tr.tr("Title") %]</th>
+            <th>[% tr.tr("Description") %]</th>
+            <th></th>
+        </tr>
+
+        [% FOREACH Report IN Reports %]
+            <form name="selectreport_[% Report.report_name %]__[% Report.device_type %]" method="post" action="[% webpath %]">
+                <tr>
+                    <td>[% Report.device_type %]</td>
+                    <td>[% Report.report_name %]</td>
+                    <td>[% Report.report_title %]</td>
+                    <td>[% Report.description %]</td>
+                    <td>
+                        <input type="hidden" name="reportid" value="[% Report.report_name %]_#_[% Report.device_type %]">
+                        <input type="hidden" name="mode" value="selectreport">
+                        <input type="submit" value="[% tr.tr("Select") %]">
+                    </td>
+                </tr>
+            </form>
+        [% END %]
+        <form name="selectreport_NEW" method="post" action="[% webpath %]">
+            <tr>
+                <td>
+                    <select name="device_type">
+                        <option value="USV">USV</option>
+                        <option value="PAC3200">PAC3200</option>
+                        <option value="RBS">RBS</option>
+                        <option value="EMCTIME">EMC Time</option>
+                    </select>
+                </td>
+                <td><input type="text" name="report_name" value="" size="15" maxlength="60"></td>
+                <td><input type="text" name="report_title" value="" size="30" maxlength="60"></td>
+                <td><input type="text" name="report_description" value="" size="30" maxlength="60"></td>
+                <td>
+                    <input type="hidden" name="mode" value="createreport">
+                    <input type="submit" value="[% tr.tr("Create") %]">
+                </td>
+            </tr>
+        </form>
+    </table>
+    
+    
+</p>

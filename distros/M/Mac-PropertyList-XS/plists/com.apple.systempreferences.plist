@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist SYSTEM "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="0.9">
+<dict>
+	<key>NSColorPanelMode</key>
+	<string>5</string>
+	<key>NSDefaultOpenDirectory</key>
+	<string>/Applications/Mozilla</string>
+	<key>NSToolbar Configuration com.apple.PrefsToolbar</key>
+	<dict>
+		<key>TB Display Mode</key>
+		<integer>1</integer>
+		<key>TB Is Shown</key>
+		<integer>1</integer>
+		<key>TB Item Identifiers</key>
+		<array>
+			<string>com.apple.prefpane.showall</string>
+			<string>NSToolbarSeparatorItem</string>
+			<string>com.apple.preference.displays</string>
+			<string>com.apple.preference.sound</string>
+			<string>com.apple.preference.network</string>
+			<string>com.apple.preference.startupdisk</string>
+		</array>
+		<key>TB Size Mode</key>
+		<integer>1</integer>
+	</dict>
+	<key>NSWindow Frame NSColorPanel</key>
+	<string>3 379 205 367 0 0 1024 746 </string>
+	<key>NSWindow Frame Speech Help</key>
+	<string>233 717 444 389 0 0 1024 746 </string>
+</dict>
+</plist>

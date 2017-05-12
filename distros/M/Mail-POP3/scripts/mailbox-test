@@ -1,0 +1,21 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+
+use Mail::POP3;
+
+my $USAGE = "Usage: $0 <conf-file> <user> <password>\n";
+my $FQDN = 'localhost'; # mailbox_args arg
+
+my $conf = shift @ARGV;
+die $USAGE unless $conf and -f $conf;
+my $config = do $conf or die "Read $conf failed: $@\n";
+my $user = shift @ARGV or die $USAGE;
+my $pass = shift @ARGV or die $USAGE;
+
+my @args = $config->{mailbox_args}->($config, $user, $FQDN);
+my $class = $config->{mailbox_class};
+Mail::POP3::Server::load_class($class);
+
+my $o = $class->new($user, $pass, @args);
+$o->uidl_list(\*STDOUT);

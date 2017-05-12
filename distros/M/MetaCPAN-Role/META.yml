@@ -1,0 +1,25 @@
+---
+abstract: 'Collection of roles useful to MetaCPAN project'
+author:
+  - 'Leo Lapworth'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MetaCPAN-Role
+requires:
+  Carp: '0'
+  CatalystX::Fastly::Role::Response: '0.04'
+  Moose::Role: '0'
+  MooseX::Fastly::Role: '0.01'
+  Net::Fastly: '1.05'
+resources:
+  bugtracker: https://github.com/metacpan/p5-metacpan-role/issues
+  repository: https://github.com/metacpan/p5-metacpan-role
+version: '0.06'

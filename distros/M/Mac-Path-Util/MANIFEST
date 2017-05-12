@@ -1,0 +1,20 @@
+Changes
+examples/README
+INSTALL.SKIP
+lib/Mac/Path/Util.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+t/darwin2mac.t
+t/get_startup.t
+t/identity.t
+t/is_startup.t
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/test_manifest
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

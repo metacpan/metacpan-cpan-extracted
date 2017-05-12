@@ -1,0 +1,59 @@
+=head1 ROADMAP
+
+=head2 References
+
+* Description of PARI primality algorithms: http://www.math.u-bordeaux.fr/~belabas/pari/doc/faq.html
+
+=head2 To be Done
+
+* More user documentation, explain the general idea of the algorithm used
+
+=head2 Hairy Details
+
+* Math::GMPz implements all the hairy details of GMP
+
+=head2 Other Possibilities
+
+=head2 Already Done
+
+* Port iBPSW from spec/bpsw/bpsw1.c
+
+        is_prime($N) <==> iBPSW(N,1)
+
+ This is basically trial division, followed by a is_strong_pseudoprime(),
+ followed by a is_strong_lucas_pseudoprime()
+
+ There are many optimizations to made for small arguments
+
+ Main function: is_prime(), to replace Math::PARI::is_prime()
+
+ It may take optional arguments for power-users, but we want to have a really
+ simple function for people to call like this:
+
+    is_prime($x) ? foo() : bar();
+
+ which "does what I mean."
+
+** next_prime()
+
+ This function is merely a wrapper around is_prime(), which takes a starting
+number and increments it until is_prime() returns true and then returns that
+number.
+
+This should only require a small number of tests, most of the work is in making
+the necessary components of is_prime().
+
+* Port iMillerRabin from spec/bpsw/trn.c , this will be is_strong_pseudoprime()
+
+* implement base b pseudoprime test, a.k.a n is in psp(b)
+  this is is_pseudoprime()
+
+* Port iStrongLucasSelfridge(mpz_t) from spec/bpsw/trn.c , this will be is_strong_lucas_pseudoprime()
+
+
+=cut
+
+
+=head2 References 
+
+* Description of PARI primality algorithms: http://www.math.u-bordeaux.fr/~belabas/pari/doc/faq.html

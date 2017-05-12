@@ -1,0 +1,68 @@
+0.29 2017-03-31
+  - Support DBIx::Custom 0.40, Validator::Custom 1.0201
+0.28
+  - Catch up Mojolicious 6
+0.27
+  - fix test
+0.26
+  - add favicon
+0.25
+  - catch up with Mojolicious::Plugin::AutoRoute version up.
+0.24
+  - fix column in select field not sorted bug
+0.23
+  - fix column not shown bug.
+0.22
+  - fix column not shown bug.
+0.21
+  - fix join mode column order bug.
+0.20
+  - fix join mode display bug.
+0.19
+  - add join option and join mode.
+0.18
+  - columns in select field is ordered in select page.
+  - add in condtion in select page.
+  - add order section in select page.
+  - add condition in select page.
+0.17
+  - catch up with Mojolicious 4.0
+0.16
+  - renamed default_charset to charset.
+  - Released!
+0.15 (beta release)
+  - upgrade Mojolicious::Plugin::AutoRoute 0.08
+    which has bug that two different auto route don't work.
+0.14 (beta release)
+  - internal change only(upgrade Mojolicious::Plugin::AutoRoute 0.07)
+0.13 (alpha release)
+  - cleanup internal
+0.12 (alpha release)
+  - improved design
+  - added footer_text and footer_link option
+0.11 (alpha release)
+  - added default_charset option to support character set
+0.10 (alpha release)
+  - fixed home link
+0.09 (alpha release)
+  - added site_title option
+0.08 (alpha release)
+  - fixed home link
+0.07 (alpha release)
+  - fixed database/table navi not display bug
+0.06 (alpha release)
+  - improved design
+  - support empty prefix
+0.05 (alpha release)
+  - fixed test
+0.04 (alpha release)
+  - added caution
+0.03 (alpha release)
+  - added many operator to select page
+  - added column hiden to select page
+0.02 (alpha release)
+  - Improved design
+0.01 (alpha release)
+  - First release
+  - Mojolicious::Plugin::MySQLViewerLite and
+    Mojolicious::Plugin::SQLiteViewerLite is merged into this module.

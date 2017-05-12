@@ -1,0 +1,56 @@
+MusicRoom
+
+Managing digital music files can be a complicated business, 
+converting between audio formats, ensuring tags are 
+consistent and locating extra data like cover art and lyrics.
+This package provides a framework for performing these 
+tasks.
+
+The package has been designed to simplify the creation of 
+a collection of scripts to carry out the essential tasks 
+required to manage digital music.  A complete set of sample 
+scripts has been distributed with the package.  These can 
+be used directly or can be customised to meet your own 
+needs.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc MusicRoom
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=MusicRoom
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/MusicRoom
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/MusicRoom
+
+    Search CPAN
+        http://search.cpan.org/dist/MusicRoom/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2009 Steve Hawtin
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

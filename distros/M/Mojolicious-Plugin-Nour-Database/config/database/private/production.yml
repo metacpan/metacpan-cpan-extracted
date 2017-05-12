@@ -1,0 +1,4 @@
+---
+dsn: dbi:Pg:dbname=nourdb_prod;host=secret.com
+username: override
+password: secret

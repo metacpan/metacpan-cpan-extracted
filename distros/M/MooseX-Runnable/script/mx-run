@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use MooseX::Runnable::Util::ArgParser;
+use MooseX::Runnable::Invocation::MxRun;
+
+exit run();
+
+sub run {
+    my $args = MooseX::Runnable::Util::ArgParser->new(
+        argv => \@ARGV,
+    );
+
+    help() if $args->is_help;
+
+    # set @INC from -I...
+    unshift @INC, $_->stringify for $args->include_paths;
+
+    # load -M... modules
+    do { eval "require $_"; die $@ if $@ }
+      for $args->modules;
+
+    my $app = $args->class_name;
+    local $0 = "mx-run ... $app";
+
+    return MooseX::Runnable::Invocation::MxRun->new(
+        class       => $app,
+        plugins     => $args->plugins,
+        parsed_args => $args,
+    )->run($args->app_args);
+}
+
+sub help {
+    print <<'END';
+
+This is mx-run, a utility for running MooseX::Runnable classes.
+
+usage: mx-run <mx-run options> -- Class::Name <options for Class::Name>
+
+mx-run options:
+
+    --help -? -h     Print this message
+    -I<path>         Add <path> to @INC before loading modules
+    -M<module>       use <module> immediately
+    +PluginName      Load PluginName (see MooseX::Runnable::Invocation)
+
+Note that as soon as +PluginName is seen, all following -[IM] options
+are ignored by mx-run, and are instead processed by PluginName.  So
+put them at the very beginning.
+
+In the simplest cases, where you use only -I or -M (no plugins), you
+may omit the -- before the class name.
+
+To get help for Class::Name, run:
+
+    mx-run Class::Name --help
+
+Syntax examples:
+
+    mx-run -Ilib Class::Name                          # Local Class::Name
+    mx-run -Ilib -MCarp::Always +Debug -- Class::Name # Debugging
+
+END
+
+    exit 1;
+}
+
+__END__
+
+=head1 NAME
+
+mx-run - script to run MooseX::Runnable classes
+
+=head1 SEE ALSO
+
+L<MooseX::Runnable>

@@ -1,0 +1,23 @@
+---
+abstract: 'A Node style event Role for Moose'
+author:
+  - 'Rebecca Turner <becca@referencethis.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Event
+requires:
+  Any::Moose: 0
+  strict: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/iarna/On-Event
+  repository: https://github.com/iarna/On-Event.git
+version: v0.2.0

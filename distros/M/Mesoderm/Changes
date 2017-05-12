@@ -1,0 +1,26 @@
+0.140780 -- Wed Mar 19 16:55:31 CDT 2014
+  * Use Class::Load
+
+0.131260 -- Mon May 06 10:06:23 CDT 2013
+  * Add resultset_components
+
+0.122290 -- Thu Aug 16 17:55:30 CDT 2012
+  * Include all roles in a single call to with
+
+0.122120 -- Mon Jul 30 15:37:43 CDT 2012
+  * Avoid "Package 'Mesoderm' already declared with version" from Module::Metadata
+  * PK::Auto is included by the Core component
+  * Avoid Data::Dumper attempting to preserve common references
+  * Fixup column names from an index that uses a prefix length of the column
+
+0.121140 -- Mon Apr 23 18:53:28 CDT 2012
+  * Add tests
+  * Fix might_have/belongs_to relationship selection
+  * Add method to all result sets and rows to obtain mesoderm schema object
+  * Rename as Mesoderm
+
+0.102881 -- Fri Oct 15 17:33:29 CDT 2010
+  * Fix column_accessor override (Ask Bjørn Hansen)
+
+0.102880 -- Fri Oct 15 17:23:21 CDT 2010
+  * Initial Release

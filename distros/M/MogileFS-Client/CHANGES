@@ -1,0 +1,121 @@
+1.17 - 2013-08-07
+
+   * Makefile.PL: declare explicit Time::HiRes dependency (Eric Wong <normalperson@yhbt.net>)
+
+   * add force_disconnect function (Dave Lambley <davel@state51.co.uk>)
+
+   * avoid retrying bad trackers (Dave Lambley <davel@state51.co.uk>)
+
+1.16 - 2012-03-30
+
+   * Allow fetching hashtype in get_domains (eric wong)
+
+1.15 - 2012-01-27
+
+   * Fix error in NewHTTPFile (Daniel.Bergmann)
+
+   * Fixed build if the directory is named perl-MogileFS-Client. (Andrei Pascha <apa@dev1.nbg1.kwick.de>)
+
+1.14 - 2011-01-08
+
+   * support the file_debug command (dormando <dormando@rydia.net>)
+
+   * file_info command for fetching file metadata (dormando <dormando@rydia.net>)
+
+   * update some variables (dormando <dormando@rydia.net>)
+
+   * Update specfile version (Jonathan Steinert <hachi@sixapart.com>)
+
+   * Ignore INSTALL_BASE during rpm building. (Jonathan Steinert <hachi@sixapart.com>)
+
+1.13 - 2010-09-28
+
+        * rebalance admin commands
+
+1.12 - 2010-08-13
+
+        * update_class command (requires 2.37 of mogilefs-server) (t0m)
+
+        * Improve error message on hostname lookup failure (t0m)
+
+1.11 - 2010-04-02
+
+        * Support replpolicy as an argument to class add/modify (dormando)
+
+        * Don't reuse dead socket on more error conditions (t0m)
+
+        * Add chunk_size option for store_file to speed up large uploads
+          (dormando)
+
+        * Add extra info to write failure errors (t0m)
+
+1.10 - 2009-12-05
+
+        * Support sending a timeout for admin commands (robbat2)
+
+1.09 - 2009-10-16
+
+        * Change really misleading timeout error message.
+
+        * Add optional startpos argument to fsck_reset.
+
+        * Add experimental 'edit_file' command, making use of ClientHTTPFile.
+
+        * Add 'read_file' command, which returns a seekable filehandle
+        to a mogile key, making use of ClientHTTPFile.
+
+        * Add new ClientHTTPFile backend as an alternate to NewHTTPFile.
+        This is used if the 'largefile' option is passed to new_file.
+
+1.08 - 2007-08-06
+
+        * Include update_device command for consistency.
+
+        * Include 'clear_cache' command.
+
+        * updated docs
+
+1.07 - 2006-05-03
+
+        * 'settings list' and 'settings set <key> <value>' commands.
+          use for enabling rebalancing, slaves, memcaches, etc.
+
+1.06 - 2006-04-20
+
+        * add fsck mgmt/status/querying commands to MogileFS::Admin
+
+1.05 - 2007-04-16
+
+        * POD docs!
+
+        * Add create_open_args and create_close_args which can be passed to
+          new_file (plus store_file and store_content). This can be used to
+          pass extra information to plugins running in the tracker.
+
+1.04 - Mar 26, 2007
+
+        * add observed_state and I/O utiliz% columns to mogadm check.
+
+        * removed support for non-http:// storage node URLs.  that is,
+          "NFS mode" is now gone.  yay.  it always sucked.
+
+1.03 - Sep 25, 2006
+
+        * rename from MogileFS to MogileFS::Client, add POD, prep for
+          future work.
+
+        * more verbose error messages
+
+        * AUTOLOAD-proxy unknown methods to server for server-based
+          plugins (Mark Smith)
+
+        * Andreas J. Koenig <andreas.koenig.gmwojprw@franz.ak.mind.de>:
+          The following bugfix guards against externally influenced $/. In
+          our case, somebody (not @danga :) had set $/ to undef and so the
+          application was hanging forever.
+
+1.01 - Jan 10, 2005
+
+        * fix CPU spinning bug in _getline where we didn't handle
+          sysread() returning 0.  (Brad)
+

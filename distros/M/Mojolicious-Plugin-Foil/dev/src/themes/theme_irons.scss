@@ -1,0 +1,61 @@
+/* ================================================================== */
+/* THEME: Irons
+ */
+@import 'functions';
+@import 'fonts_irons';
+@import 'icon_light_on_dark';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: #473d32;
+$verge-fg: set-fg($verge-bg);
+$verge-border: black;
+$button-bg: darken($verge-bg, 10);
+$button-fg: set-fg($button-bg);
+$button-border: #111;
+$main-bg: hsl(30, 10%, 95%);
+$main-fg: set-fg($main-bg);
+$link-fg: set-link($main-bg);
+$link-visited: set-visited($main-bg);
+$verge-link-fg: set-link($verge-bg);
+$verge-link-visited: set-visited($verge-bg);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+}
+
+header,
+footer {
+	@extend .verge;
+}
+
+.side {
+	@extend .verge;
+	color: #eee;
+}
+
+
+body {
+	color: $main-fg;
+	background: $main-bg;
+}
+
+@include many-links($link-fg, $link-visited, $verge-link-fg, $verge-link-visited);
+@include fancy($verge-fg, $verge-bg, "iron1.jpg");
+@include make-buttons;
+
+header nav li {
+	border-color: #666666;
+}
+header nav .selflink,
+header nav em,
+header nav .current a {
+	background-color: #746b67;
+	color: $button-fg;
+}
+

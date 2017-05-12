@@ -1,0 +1,12 @@
+---
+
+disable: 0
+
+default_user: global_shared
+
+# cmd_check: '/usr/bin/dspam --user %user% --classify'
+# cmd_learn_spam: '/usr/bin/dspam --user %user% --mode=teft --class=spam --deliver=spam --stdout'
+# cmd_unlearn_spam: '/usr/bin/dspam --user %user% --mode=toe --class=innocent --deliver=innocent --stdout'
+# cmd_learn_ham: '/usr/bin/dspam --user %user% --mode=teft --class=innocent --deliver=innocent --stdout'
+# cmd_unlearn_ham: '/usr/bin/dspam --user %user% --mode=toe --class=spam --deliver=spam --stdout'
+

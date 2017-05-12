@@ -1,0 +1,36 @@
+---
+abstract: 'Simple JSON logger'
+author:
+  - 'Michael Jemmeson <mjemmeson@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-Log-JSON
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  JSON::MaybeXS: '0'
+  Mojolicious: '5.0'
+  Time::HiRes: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/mjemmeson/Mojo-Log-JSON/issues
+  homepage: https://github.com/mjemmeson/Mojo-Log-JSON
+  repository: https://github.com/mjemmeson/Mojo-Log-JSON.git
+version: '0.04'
+x_contributors:
+  - 'Tom Hukins <tom@eborcom.com>'

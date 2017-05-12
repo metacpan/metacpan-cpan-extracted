@@ -1,0 +1,803 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Box::IMAP4 - handle IMAP4 folders as client
+
+=head1 INHERITANCE
+
+ Mail::Box::IMAP4
+   is a Mail::Box::Net
+   is a Mail::Box
+   is a Mail::Reporter
+
+=head1 SYNOPSIS
+
+ use Mail::Box::IMAP4;
+ my $folder = Mail::Box::IMAP4->new(folder => $ENV{MAIL}, ...);
+
+=head1 DESCRIPTION
+
+Maintain a folder which has its messages stored on a remote server.  The
+communication between the client application and the server is implemented
+using the IMAP4 protocol.  See also L<Mail::Server::IMAP4|Mail::Server::IMAP4>.
+
+This class uses L<Mail::Transport::IMAP4|Mail::Transport::IMAP4> to hide the transport of
+information, and focusses solely on the correct handling of messages
+within a IMAP4 folder.  More than one IMAP4 folder can be handled by
+one single IMAP4 connection.
+
+Extends L<"DESCRIPTION" in Mail::Box::Net|Mail::Box::Net/"DESCRIPTION">.
+ 
+=head1 OVERLOADED
+
+Extends L<"OVERLOADED" in Mail::Box::Net|Mail::Box::Net/"OVERLOADED">.
+ 
+=over 4
+
+=item overload: B<"">
+
+Inherited, see L<Mail::Box/"OVERLOADED">
+
+=item overload: B<@{}>
+
+Inherited, see L<Mail::Box/"OVERLOADED">
+
+=item overload: B<cmp>
+
+Inherited, see L<Mail::Box/"OVERLOADED">
+
+=back
+
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Box::Net|Mail::Box::Net/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Mail::Box::Net|Mail::Box::Net/"Constructors">.
+ 
+=over 4
+
+=item Mail::Box::IMAP4-E<gt>B<new>(%options)
+
+The C<new> can have many %options.  Not only the ones listed here below,
+but also all the %options for L<Mail::Transport::IMAP4::new()|Mail::Transport::IMAP4/"METHODS"> can be
+passed.
+
+The default depends on the value of L<new(cache_head)|Mail::Box::IMAP4/"METHODS">.
+
+Without folder name, no folder is selected.  Only few methods are
+available now, for instance L<listSubFolders()|Mail::Box/"Sub-folders"> to get the top-level
+folder names.  Usually, the folder named C<INBOX> will be present.
+
+ -Option           --Defined in     --Default
+  access             Mail::Box        'r'
+  body_delayed_type  Mail::Box        Mail::Message::Body::Delayed
+  body_type          Mail::Box        Mail::Message::Body::Lines
+  cache_body                          NO
+  cache_head                          NO or DELAY
+  cache_labels                        NO or DELAY
+  coerce_options     Mail::Box        []
+  create             Mail::Box        <false>
+  extract            Mail::Box        10240
+  field_type         Mail::Box        undef
+  fix_headers        Mail::Box        <false>
+  folder             Mail::Box        /
+  folderdir          Mail::Box        <network location>
+  head_delayed_type  Mail::Box        Mail::Message::Head::Delayed
+  head_type          Mail::Box        Mail::Box::IMAP4::Head or Mail::Message::Head::Complete
+  join_connection                     true
+  keep_dups          Mail::Box        <false>
+  lock_file          Mail::Box        undef
+  lock_timeout       Mail::Box        1 hour
+  lock_type          Mail::Box        'NONE'
+  lock_wait          Mail::Box        10 seconds
+  locker             Mail::Box        undef
+  log                Mail::Reporter   'WARNINGS'
+  manager            Mail::Box        undef
+  message_type       Mail::Box        Mail::Box::IMAP4::Message
+  multipart_type     Mail::Box        Mail::Message::Body::Multipart
+  password           Mail::Box::Net   undef
+  remove_when_empty  Mail::Box        <false>
+  save_on_exit       Mail::Box        <true>
+  server_name        Mail::Box::Net   undef
+  server_port        Mail::Box::Net   143
+  trace              Mail::Reporter   'WARNINGS'
+  transporter                         Mail::Transport::IMAP4
+  trusted            Mail::Box        <false>
+  username           Mail::Box::Net   undef
+
+=over 2
+
+=item access => MODE
+
+=item body_delayed_type => CLASS
+
+=item body_type => CLASS|CODE
+
+=item cache_body => 'NO'|'YES'|'DELAY'
+
+Body objects are immutable, but may still cached or not.  In common
+case, the body of a message is requested via L<Mail::Message::body()|Mail::Message/"The body">
+or L<Mail::Message::decoded()|Mail::Message/"The body">.  This returns a handle to a body object.
+You may decide wether that body object can be reused or not.  C<NO>
+means: retrieve the data each time again, C<YES> will cache the body data,
+C<DELAY> will send the whole message when the folder is closed.
+
+        [local cache]  [write]
+ NO         no           no
+ YES        yes          no
+ DELAY      yes          yes
+
+=item cache_head => 'NO'|'PARTIAL'|'DELAY'
+
+For a read-only folder, C<DELAY> is the default, otherwise C<NO> is
+chosen.  The four configuration parameter have subtile consequences.
+To start with a table:
+
+        [local cache]  [write]  [default head_type]
+ NO         no           no     Mail::Box::IMAP4::Head
+ PARTIAL    yes          no     Mail::Box::IMAP4::Head
+ DELAY      yes          yes    Mail::Message::Head::Complete
+
+The default C<head_type> is L<Mail::Box::IMAP4::Head|Mail::Box::IMAP4::Head>, the
+default C<cached_head_type> is L<Mail::Message::Head::Complete|Mail::Message::Head::Complete>.
+
+Having a local cache means that a lookup for a field is first done
+in a local data-structure (which extends L<Mail::Message::Head::Partial|Mail::Message::Head::Partial>),
+and only on the remote server if it was not found.  This is dangerous,
+because your locally cached data can be out-of-sync with the server.
+However, it may give you a nice performance benefit.
+
+C<DELAY> will always collect the whole
+header for you.  This is required when you want to look for Resent Groups
+(See L<Mail::Message::Head::ResentGroup|Mail::Message::Head::ResentGroup>) or other field order dependent
+header access.  A L<Mail::Message::Head::Delayed|Mail::Message::Head::Delayed> will be created first.
+
+=item cache_labels => 'NO'|'WRITE'|'DELAY'
+
+When labels from a message are received, these values can be kept. However,
+this imposes dangers where the server's internal label storage may get out
+of sync with your data.
+
+With C<NO>, no caching will take place (but the performance will be
+worse). With C<WRITE>, all label access will be cached, but written to
+the server as well.  Both C<NO> and C<WRITE> will update the labels on
+the served, even when the folder was opened read-only.  C<DELAY> will
+not write the changed information to the server, but delay that till
+the moment that the folder is closed.  It only works when the folder is
+opened read/write or write is enforced.
+
+The default is C<DELAY> for folders which where opened read-only.  This
+means that you still can force an update with L<close(write)|Mail::Box/"The folder">.  For folders
+which are opened read-write, the default is the safeset setting, which is
+C<NO>.
+
+=item coerce_options => ARRAY
+
+=item create => BOOLEAN
+
+=item extract => INTEGER | CODE | METHOD | 'LAZY'|'ALWAYS'
+
+=item field_type => CLASS
+
+=item fix_headers => BOOLEAN
+
+=item folder => FOLDERNAME
+
+=item folderdir => DIRECTORY
+
+=item head_delayed_type => CLASS
+
+=item head_type => CLASS
+
+=item join_connection => BOOLEAN
+
+Within this Mail::Box::IMAP4 class is registered which transporters are
+already in use, i.e. which connections to the IMAP server are already
+in established.  When this option is set, multiple folder openings on the
+same server will try to reuse one connection.
+
+=item keep_dups => BOOLEAN
+
+=item lock_file => FILENAME
+
+=item lock_timeout => SECONDS
+
+=item lock_type => CLASS|STRING|ARRAY
+
+=item lock_wait => SECONDS
+
+=item locker => OBJECT
+
+=item log => LEVEL
+
+=item manager => MANAGER
+
+=item message_type => CLASS
+
+=item multipart_type => CLASS
+
+=item password => STRING
+
+=item remove_when_empty => BOOLEAN
+
+=item save_on_exit => BOOLEAN
+
+=item server_name => HOSTNAME
+
+=item server_port => INTEGER
+
+=item trace => LEVEL
+
+=item transporter => OBJECT|CLASS
+
+The name of the CLASS which will interface with the connection.  When you
+implement your own extension to L<Mail::Transport::IMAP4|Mail::Transport::IMAP4>, you can either
+specify a fully instantiated transporter OBJECT, or the name of your own
+CLASS.  When an OBJECT is given, most other options will be ignored.
+
+=item trusted => BOOLEAN
+
+=item username => STRING
+
+=back
+
+example: 
+
+ my $imap   = Mail::Box::IMAP4->new(username => 'myname',
+    password => 'mypassword', server_name => 'imap.xs4all.nl');
+
+ my $url    = 'imap4://user:password@imap.xs4all.nl');
+ my $imap   = $mgr->open($url);
+
+ my $client = Mail::IMAPClient->new(...);
+ my $imap   = Mail::Box::IMAP4->new(imap_client => $client);
+
+=back
+
+=head2 The folder
+
+Extends L<"The folder" in Mail::Box::Net|Mail::Box::Net/"The folder">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addMessage>($message, %options)
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item $obj-E<gt>B<addMessages>(@messages)
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item Mail::Box::IMAP4-E<gt>B<appendMessages>(%options)
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item $obj-E<gt>B<close>(%options)
+
+Close the folder.  In the case of IMAP, more than one folder can use
+the same connection, therefore, closing a folder does not always close
+the connection to the server.  Only when no folder is using the
+connection anymore, a logout will be invoked by
+L<Mail::Transport::IMAP4::DESTROY()|Mail::Transport::IMAP4/"Cleanup">
+
+ -Option      --Defined in     --Default
+  force         Mail::Box        <false>
+  save_deleted  Mail::Box        false
+  write         Mail::Box        MODIFIED
+
+=over 2
+
+=item force => BOOLEAN
+
+=item save_deleted => BOOLEAN
+
+=item write => 'ALWAYS'|'NEVER'|'MODIFIED'
+
+=back
+
+=item $obj-E<gt>B<copyTo>($folder, %options)
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item $obj-E<gt>B<delete>(%options)
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item $obj-E<gt>B<folderdir>( [$directory] )
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item $obj-E<gt>B<name>()
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item $obj-E<gt>B<organization>()
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item $obj-E<gt>B<size>()
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item $obj-E<gt>B<type>()
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item $obj-E<gt>B<update>(%options)
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item $obj-E<gt>B<url>()
+
+Inherited, see L<Mail::Box/"The folder">
+
+=back
+
+=head2 Folder flags
+
+Extends L<"Folder flags" in Mail::Box::Net|Mail::Box::Net/"Folder flags">.
+ 
+=over 4
+
+=item $obj-E<gt>B<access>()
+
+Inherited, see L<Mail::Box/"Folder flags">
+
+=item $obj-E<gt>B<isModified>()
+
+Inherited, see L<Mail::Box/"Folder flags">
+
+=item $obj-E<gt>B<modified>( [BOOLEAN] )
+
+Inherited, see L<Mail::Box/"Folder flags">
+
+=item $obj-E<gt>B<writable>()
+
+Inherited, see L<Mail::Box/"Folder flags">
+
+=back
+
+=head2 The messages
+
+Extends L<"The messages" in Mail::Box::Net|Mail::Box::Net/"The messages">.
+ 
+=over 4
+
+=item $obj-E<gt>B<current>( [$number|$message|$message_id] )
+
+Inherited, see L<Mail::Box/"The messages">
+
+=item $obj-E<gt>B<find>($message_id)
+
+Inherited, see L<Mail::Box/"The messages">
+
+=item $obj-E<gt>B<findFirstLabeled>( $label, [BOOLEAN, [$msgs]] )
+
+Inherited, see L<Mail::Box/"The messages">
+
+=item $obj-E<gt>B<message>( $index, [$message] )
+
+Inherited, see L<Mail::Box/"The messages">
+
+=item $obj-E<gt>B<messageId>( $message_id, [$message] )
+
+Inherited, see L<Mail::Box/"The messages">
+
+=item $obj-E<gt>B<messageIds>()
+
+Inherited, see L<Mail::Box/"The messages">
+
+=item $obj-E<gt>B<messages>( <'ALL'|$range|'ACTIVE'|'DELETED'|$label| !$label|$filter> )
+
+Inherited, see L<Mail::Box/"The messages">
+
+=item $obj-E<gt>B<nrMessages>(%options)
+
+Inherited, see L<Mail::Box/"The messages">
+
+=item $obj-E<gt>B<scanForMessages>($message, $message_ids, $timespan, $window)
+
+Inherited, see L<Mail::Box/"The messages">
+
+=back
+
+=head2 Sub-folders
+
+Extends L<"Sub-folders" in Mail::Box::Net|Mail::Box::Net/"Sub-folders">.
+ 
+=over 4
+
+=item $obj-E<gt>B<listSubFolders>(%options)
+
+=item Mail::Box::IMAP4-E<gt>B<listSubFolders>(%options)
+
+Inherited, see L<Mail::Box/"Sub-folders">
+
+=item $obj-E<gt>B<nameOfSubFolder>( $subname, [$parentname] )
+
+=item Mail::Box::IMAP4-E<gt>B<nameOfSubFolder>( $subname, [$parentname] )
+
+Inherited, see L<Mail::Box/"Sub-folders">
+
+=item $obj-E<gt>B<openRelatedFolder>(%options)
+
+Inherited, see L<Mail::Box/"Sub-folders">
+
+=item $obj-E<gt>B<openSubFolder>($subname, %options)
+
+Inherited, see L<Mail::Box/"Sub-folders">
+
+=item $obj-E<gt>B<topFolderWithMessages>()
+
+=item Mail::Box::IMAP4-E<gt>B<topFolderWithMessages>()
+
+Inherited, see L<Mail::Box/"Sub-folders">
+
+=back
+
+=head2 Internals
+
+Extends L<"Internals" in Mail::Box::Net|Mail::Box::Net/"Internals">.
+ 
+=over 4
+
+=item $obj-E<gt>B<body>( [$body] )
+
+=item $obj-E<gt>B<coerce>($message, %options)
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<create>($folder, %options)
+
+=item Mail::Box::IMAP4-E<gt>B<create>($folder, %options)
+
+Inherited, see L<Mail::Box::Net/"METHODS">
+
+=item $obj-E<gt>B<createTransporter>($class, %options)
+
+Create a transporter object (an instance of L<Mail::Transport::IMAP4|Mail::Transport::IMAP4>), where
+$class defines the exact object type.  As %options, everything which is
+acceptable to a transporter initiation can be used (see
+L<Mail::Transport::IMAP4::new()|Mail::Transport::IMAP4/"METHODS">.
+
+ -Option         --Default
+  join_connection  true
+
+=over 2
+
+=item join_connection => BOOLEAN
+
+See L<new(join_connection)|Mail::Box::IMAP4/"METHODS">.  When false, the connection will never be shared
+with other IMAP mail boxes.
+
+=back
+
+=item $obj-E<gt>B<determineBodyType>($message, $head)
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<fetch>( <$messages|$selection>, $info )
+
+Low-level data retreival about one or more messages via IMAP4 from
+the remote server. Some of this data may differ from the information
+which is stored in the message objects which are created by MailBox,
+so you should avoid the use of this method for your own purposes.
+The IMAP implementation provides some wrappers around this, providing
+the correct behavior.
+
+An ARRAY of $messages may be specified or some message $selection,
+acceptable to L<Mail::Box::messages()|Mail::Box/"The messages">.  Examples of the latter are
+C<'ALL'>, C<'DELETED'>, or C<spam> (messages labelled to contain spam).
+
+The $info contains one or more attributes as defined by the IMAP protocol.
+You have to read the full specs of the related RFCs to see these.
+
+=item Mail::Box::IMAP4-E<gt>B<foundIn>( [$foldername], %options )
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<getHead>($message)
+
+Read the header for the specified message from the remote server.
+C<undef> is returned in case the message disappeared.
+
+=item $obj-E<gt>B<getHeadAndBody>($message)
+
+Read all data for the specified message from the remote server.
+Return head and body of the mesasge as list, or an empty list
+if the $message disappeared from the server.
+
+=item $obj-E<gt>B<lineSeparator>( [<STRING|'CR'|'LF'|'CRLF'>] )
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<locker>()
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<read>(%options)
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<readMessages>(%options)
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<storeMessage>($message)
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<toBeThreaded>($messages)
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<toBeUnthreaded>($messages)
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<transporter>( [$object] )
+
+Returns the object which is the interface to the IMAP4 protocol handler.
+The IMAP4 handler has the current folder selected.
+When an $object is specified, it is set to be the transporter from
+that moment on.  The $object must extend L<Mail::Transport::IMAP4|Mail::Transport::IMAP4>.
+
+=item $obj-E<gt>B<updateMessages>(%options)
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<write>(%options)
+
+The IMAP protocol usually writes the data immediately to the remote server,
+because that's what the protocol wants.  However, some options to L<new()|Mail::Box::IMAP4/"METHODS">
+may delay that to boost performance.  This method will, when the folder is
+being closed, write that info after all.
+
+ -Option      --Defined in     --Default
+  force         Mail::Box        <false>
+  save_deleted                   <false>
+
+=over 2
+
+=item force => BOOLEAN
+
+=item save_deleted => BOOLEAN
+
+You may be able to save the messages which are flagged for deletion now,
+but they will be removed anyway when the folder is closed.
+
+=back
+
+=item $obj-E<gt>B<writeMessages>(%options)
+
+ -Option     --Defined in     --Default
+  messages     Mail::Box        <required>
+  transporter                   <required>
+
+=over 2
+
+=item messages => ARRAY
+
+=item transporter => OBJECT
+
+=back
+
+=back
+
+=head2 Other methods
+
+Extends L<"Other methods" in Mail::Box::Net|Mail::Box::Net/"Other methods">.
+ 
+=over 4
+
+=item $obj-E<gt>B<timespan2seconds>($time)
+
+=item Mail::Box::IMAP4-E<gt>B<timespan2seconds>($time)
+
+Inherited, see L<Mail::Box/"Other methods">
+
+=back
+
+=head2 Error handling
+
+Extends L<"Error handling" in Mail::Box::Net|Mail::Box::Net/"Error handling">.
+ 
+=over 4
+
+=item $obj-E<gt>B<AUTOLOAD>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<addReport>($object)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+=item Mail::Box::IMAP4-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<errors>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<log>( [$level, [$strings]] )
+
+=item Mail::Box::IMAP4-E<gt>B<log>( [$level, [$strings]] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logPriority>($level)
+
+=item Mail::Box::IMAP4-E<gt>B<logPriority>($level)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<notImplemented>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<report>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<reportAll>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<trace>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<warnings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=back
+
+=head2 Cleanup
+
+Extends L<"Cleanup" in Mail::Box::Net|Mail::Box::Net/"Cleanup">.
+ 
+=over 4
+
+=item $obj-E<gt>B<DESTROY>()
+
+Inherited, see L<Mail::Box/"Cleanup">
+
+=back
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in Mail::Box::Net|Mail::Box::Net/"DETAILS">.
+ 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Warning: Cannot find head back for $uidl in $folder.
+
+The header was read before, but now seems empty: the IMAP4 server does
+not produce the header lines anymore.
+
+=item Warning: Cannot read body for $uidl in $folder.
+
+The header of the message was retrieved from the IMAP4 server, but the
+body is not read, for an unknown reason.
+
+=item Error: Copying failed for one message.
+
+For some reason, for instance disc full, removed by external process, or
+read-protection, it is impossible to copy one of the messages.  Copying will
+proceed for the other messages.
+
+=item Error: Couldn't select IMAP4 folder $name
+
+=item Error: Destination folder $name is not writable.
+
+The folder where the messages are copied to is not opened with write
+access (see L<new(access)|Mail::Box/"Constructors">).  This has no relation with write permission
+to the folder which is controled by your operating system.
+
+=item Warning: Different messages with id $msgid
+
+The message id is discovered more than once within the same folder, but the
+content of the message seems to be different.  This should not be possible:
+each message must be unique.
+
+=item Error: Folder $name not deleted: not writable.
+
+The folder must be opened with write access via L<new(access)|Mail::Box/"Constructors">, otherwise
+removing it will be refused.  So, you may have write-access according to
+the operating system, but that will not automatically mean that this
+C<delete> method permits you to.  The reverse remark is valid as well.
+
+=item Notice: Impossible to keep deleted messages in IMAP
+
+Some folder type have a 'deleted' flag which can be stored in the folder to
+be performed later.  The folder keeps that knowledge even when the folder
+is rewritten.  Well, IMAP4 cannot play that trick.
+
+=item Error: Invalid timespan '$timespan' specified.
+
+The string does not follow the strict rules of the time span syntax which
+is permitted as parameter.
+
+=item Warning: Message $uidl disappeared from $folder.
+
+Trying to get the specific message from the server, but it appears to be
+gone.
+
+=item Warning: Message $uidl disappeared from $folder.
+
+Trying to get the specific message from the server, but it appears to be
+gone.
+
+=item Warning: Message-id '$msgid' does not contain a domain.
+
+According to the RFCs, message-ids need to contain a unique random part,
+then an C<@>, and then a domain name.  This is made to avoid the creation
+of two messages with the same id.  The warning emerges when the C<@> is
+missing from the string.
+
+=item Error: No IMAP4 transporter configured
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=item Error: Unable to create subfolder $name of $folder.
+
+The copy includes the subfolders, but for some reason it was not possible
+to copy one of these.  Copying will proceed for all other sub-folders.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Box-IMAP4 distribution version 3.001,
+built on February 02, 2017.
+
+Do not forget to read
+L</Mail::Box-Overview>,
+L</Mail::Box-Cookbook>, and
+L</Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L</Mail::Message>,
+L</Mail::Box>,
+L</Mail::Box::IMAP4>,
+L</Mail::Box::POP3>,
+L</Mail::Box::Parser::C>,
+L</Mail::Box::Dbx> (unpublished),
+L</Mail::Transport>,
+L</Object::Realize::Later>, and
+L</User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,47 @@
+Command helpers
+=========
+
+- Admin command list:
+  * admin_diag_logging
+  * admin_get_replication_info
+  * admin_clone_database
+  * admin_copy_database
+  * admin_add_clone_source
+  * admin_get_shard_version
+  * admin_rename_collection
+  * admin_set_shard_version
+  * admin_top
+
+- Common command list:
+  * db_availablequeryoptions
+  * db_set_profiling_level
+  * db_kill_op
+  * db_captrunc
+  * db_clone_collection
+  * db_convert_to_capped
+  * db_coll_stats
+  * db_conn_pool_stats
+  * db_emptycapped
+  * db_geo_near
+  * db_geo_search
+  * db_geo_walk
+  * db_isinitialsynccomplete
+  * db_mapreduce_shardedfinish
+  * db_set_profiling_level
+  
+- Replica Set related commands:
+  * rs_freeze
+  * rs_get_status
+  * rs_initiate
+  * rs_reconfig
+  * rs_step_down
+
+GridFS stuff
+=========
+- Dump/import file to gridfs
+
+Scripts stuff (standalone module?)
+=========
+- mongox-tar
+- mongox-admin
+- mongox-replica

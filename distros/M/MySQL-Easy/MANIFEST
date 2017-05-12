@@ -1,0 +1,18 @@
+Changes
+Easy.pm
+Easy.pod
+Makefile.PL
+MANIFEST
+README
+t/01_load.t
+t/05_mysql_connect.t
+t/06_last_insert_id.t
+t/07_mysql_do_error.t
+t/10_connection_loss.t
+t/15_warnings.t
+t/20_getput.t
+t/25_ready_selectall.t
+t/30_utf8.t
+t/35_error_propagation.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,57 @@
+{
+   "abstract" : "Mojolicious â¥ Mysql",
+   "author" : [
+      "Kostya Ten <kostya@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MojoX-Mysql",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::mysql" : "4.028",
+            "DBI" : "1.631",
+            "Mojolicious" : "6.11",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/MojoX/MojoX-Mysql/issues"
+      },
+      "license" : [
+         "http://opensource.org/licenses/Apache-2.0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/MojoX/MojoX-Mysql"
+      }
+   },
+   "version" : "0.22",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

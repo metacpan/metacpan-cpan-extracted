@@ -1,0 +1,91 @@
+#!/usr/bin/perl -T -w
+
+use strict ;
+use warnings ;
+use Carp ;
+
+=head1 NAME 
+
+ $> script - 
+
+=head1 USAGE
+
+ $> script command switch switch ...
+
+
+=head1 OPTIONS
+
+
+=head1 EXIT STATUS
+
+
+=head1 AUTHOR
+
+#MODIFY_ME_BEFORE_FIRST_RUN
+
+	your_name_here
+	CPAN ID: 
+	mailto:@cpan.org
+
+=cut
+
+#------------------------------------------------------------------------------------------------------------------------
+
+use Getopt::Long ;
+use IO::Select ;
+use English qw( -no_match_vars ) ;
+
+our $VERSION = '0.01' ;
+
+#------------------------------------------------------------------------------------------------------------------------
+
+my @extra_options ;
+my $io_select = IO::Select->new(\*STDIN) ;
+
+if($io_select->can_read(0))
+	{
+	@extra_options = <STDIN> ; ## no critic (InputOutput::ProhibitExplicitStdin)
+	chomp @extra_options ;
+	}
+	
+my @command_and_options = (@ARGV, @extra_options) ;
+
+die 'Error parsing options!'unless 
+	GetOptions
+		(
+		'h|help' => \&display_help, 
+		
+		'dump_options' => 
+			sub 
+				{
+				print join "\n", map {"-$_"} 
+					qw(
+					help
+					) ;
+				exit(0) ;
+				},
+		) ;
+	
+
+display_help() unless @command_and_options ;
+
+#------------------------------------------------------------------------------------------------------------------------
+
+sub display_help
+{
+
+#~ =head2 display_help()
+
+#~ I<Arguments> - None
+
+#~ I<Returns> - Nothing
+
+#~ I<Exceptions> - exits with status code B<1>
+
+#~ =cut
+
+my ($this_script) = ($PROGRAM_NAME =~m/(.*)/sxm ) ;
+
+print {*STDERR} `perldoc $this_script`  or croak 'Error: Can\'t display help!' ; ## no critic (InputOutput::ProhibitBacktickOperators)
+exit(1) ;
+}

@@ -1,0 +1,180 @@
+#!/home/pawel/perl5/perlbrew/perls/perl-5.12.1/bin/perl
+
+eval 'exec /home/pawel/perl5/perlbrew/perls/perl-5.12.1/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+package Mildew::script;
+BEGIN {
+  $Mildew::script::VERSION = '0.05';
+}
+use Bread::Board;
+use File::Slurp qw(slurp);
+use Getopt::Long qw(GetOptionsFromArray);
+use Encode;
+use lib 'lib';
+use utf8;
+use v5.10;
+
+# print the help message
+sub help {
+print <<'HELP';
+Usage: mildew [switches] [--] [programfile] [arguments]
+  -B<backend>     execute using the <backend> backend
+  -C<backend>     compile using the <backend> backend
+                  (valid backends are: via-C)
+  -F<frontend>      use the <frontend> frontend
+                  (valid frontends are: STD,STD-cached,m0ld)
+  -e
+  -o <file>       Place the output into <file>
+HELP
+exit;
+}
+
+sub MAIN {
+    # make sure we use utf8 
+    binmode STDOUT, ':utf8';
+    binmode STDIN, ':utf8';
+    
+    # get command line options
+    my ($C,$B,$F,$help,$e,$output);
+    my @args;
+    my %args;
+    my $subsystem;
+    my $level;
+    for (@ARGV) {
+        if (/\+\+ (\+*) (\w+)/x) {
+            $level = $1;
+            $subsystem = $2;
+            $args{$subsystem} = [];
+        } elsif ($subsystem && /\+\+ \Q$level\E \/ \Q$subsystem\E/x) {
+            $level = $subsystem = undef;
+        } elsif ($subsystem) {
+            push(@{$args{$subsystem}},$_);
+        } else {
+            push(@args,$_);
+        }
+    }
+    Getopt::Long::Configure(qw(bundling no_ignore_case pass_through require_order));
+    GetOptionsFromArray(
+        \@args,
+        "C=s" => \$C,
+        "B=s" => \$B,
+        "F=s" => \$F,
+        'h|help' => \$help,
+        'e=s' => \$e,
+        'o=s' => \$output
+    ) || help;
+    help if $help;
+    
+    
+    my $source;
+    if ($e) {
+        $source = Encode::decode_utf8($e);
+    } elsif ($args[0]) {
+        $source = Encode::decode_utf8(slurp($args[0]));
+    } else {
+        $source = join('', <STDIN>);
+    }
+    
+    if ($C and $B) {
+        die "You can't specify both -C and -B.\n";
+    } elsif (!$C and !$B) {
+        if ($output) {
+            $C = 'optC';
+        } else {
+            $B = 'optC';
+        }
+    }
+    
+    $F //= 'STD';
+    
+    my %frontends = (
+        "STD"   => 'Mildew::Frontend::STD',
+        "STD-cached" => 'Mildew::Frontend::STD::Cached',
+        "m0ld" => 'Mildew::Frontend::M0ld',
+    );
+    
+    unless ($frontends{$F}) {
+        die "Unknown frontend $F passed to -F.";
+    }
+    
+    
+    my %backends = (
+        "via-C"    => 'Mildew::Backend::C::M0ld',
+        optC       => 'Mildew::Backend::OptC',
+        Cso       => 'Mildew::Backend::C::So',
+        perlesque  => 'Mildew::Backend::Perlesque',
+        gtk        => 'Mildew::Backend::Gtk',
+        desugar    => sub {$_[0]->pretty."\n" },
+        simplified => sub {$_[0]->simplified->pretty."\n" },
+        m0ld       => sub {$_[0]->m0ld('$main')},
+        'simplified-dd' => sub {
+            use Data::Dumper::Concise;
+            Dumper($_[0]->simplified)
+        },
+        'ast-dd'    => sub {
+            use Data::Dumper::Concise;
+            Dumper($_[0]);
+        },
+        ssa => sub {require Mildew::SSA;Mildew::SSA::to_ssa($_[0]->simplified,{})->pretty."\n"},
+    );
+    my $c = container 'Mildew' => as {
+        (service 'options' => (block=>sub {\%args})),
+        service 'frontend'  => (class => $frontends{$F},
+            dependencies=>{options=>depends_on('options')}
+        );
+        (service 'backend'  => (block => sub {
+            my $s = shift;
+            my $backend = $backends{$B // $C};
+            if (ref $backend eq 'CODE') {
+                require Mildew::Backend::DumpAST;
+                return Mildew::Backend::DumpAST->new(format=>$backend);
+            } elsif ($backend) {
+                eval("require $backend");
+                return $backend->new(options=>$s->param('options'));
+            } elsif ($C) {
+                die "Unknown backend $C passed to -C.";
+            } elsif ($B) {
+                die "Unknown backend $B passed to -B.";
+            }
+        },dependencies=>{options=>depends_on('options')})),
+        service 'compiler' => (class => 'Mildew::Compiler',dependencies=>{backend=>depends_on('backend'),frontend=>depends_on('frontend')});
+    };
+    
+    if ($C) {
+        $c->fetch('compiler')->get->compile($source,$output);
+    } elsif ($B) {
+        $c->fetch('compiler')->get->run($source);
+    }
+}
+
+if (@ARGV == 1 && $ARGV[0] eq '--server') {
+    require App::Persistent::Server;
+    {
+    package Dummy;
+BEGIN {
+  $Dummy::VERSION = '0.05';
+}
+    require Mildew::Backend::C;
+    require Mildew::Backend::Perlesque;
+    require Mildew::Frontend::STD;
+    require Mildew::Compiler;
+    }
+    my $server = App::Persistent::Server->new(
+        code => sub {
+            my $info = shift;
+    
+            # fake environment
+            local %ENV = $info->environment;
+            local $0 = $info->program_name;
+            chdir $info->working_directory;
+            local @ARGV = $info->cmdline_args;
+    
+            MAIN;
+         },
+    );
+    $server->start;
+    exit if fork;
+    exit $server->completion_condvar->recv;
+} else {
+    MAIN;
+}

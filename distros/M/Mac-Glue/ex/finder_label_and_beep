@@ -1,0 +1,33 @@
+#!perl -w
+# we need to change the view arrangement because of a "feature"
+# of Mac OS 9!
+use Mac::Glue ':all';
+use strict;
+
+my($f, $vol, $label, @orig, @prop);
+
+$f        = new Mac::Glue 'Finder';
+$vol      = $f->prop('startup disk');
+$label    = $f->prop('label_index', $vol);
+@prop = (
+    $f->prop('position', $vol),
+    $f->prop(spatial_view_arrangement => of => 'desktop'),
+    $f->prop(button_view_arrangement => of => 'desktop'),
+);
+@orig = ($f->get($prop[0]), $f->get($prop[1]), $f->get($prop[2]));
+
+
+$f->activate();
+$f->set($prop[2], to => enum('not arranged'));
+$f->set($prop[1], to => enum('not arranged'));
+$f->set($prop[0], to => [10, 40]);
+
+for my $i (0 .. 2**5) {
+    $f->set($label, to => $i);
+}
+
+$f->set($prop[0], to => $orig[0]);
+$f->set($prop[1], to => param_type($orig[1], typeEnumerated));
+$f->set($prop[2], to => param_type($orig[2], typeEnumerated));
+
+$f->beep(3);

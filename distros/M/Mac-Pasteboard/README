@@ -1,0 +1,84 @@
+Mac-Pasteboard is Copyright (C) 2008, 2011-2017 by Thomas R. Wyant, III
+
+DESCRIPTION
+
+This XS module accesses Mac OS X pasteboards, which can be thought of as
+clipboards with bells and whistles. System-defined pasteboards can be
+accessed, and user-defined pasteboards can be created and accessed. Each
+pasteboard can contain multiple items of data, and each item can contain
+multiple 'flavors.'
+
+NOTE that Mac OS X appears to restrict pasteboard access to processes
+that are logged in interactively. Ssh sessions and cron jobs can not
+create the requisite pasteboard handles, giving coreFoundationUnknownErr
+(-4960).
+
+Flavors (Apple's technical term) correspond more or less to MIME types,
+but are specified as Uniform Type Identifiers, which look like Internet
+domain names, but reversed. A number of these are recognized by the
+system, and organized into a hierarchy. More-specific members of the
+hierarchy are considered to 'conform to' less-specific members, or not,
+as the case may be. For instance, 'public.utf16-plain-text' conforms to
+'public.plain-text', which in turn conforms to 'public.text'. But none
+of them conforms to 'public.image'.  Conformance is transitive, so
+'public.utf16-plain-text' also conforms to 'public.plain-text', and so
+on.
+
+This module makes all these features available to the user, but is (I
+hope!) organized in such a way that the user who does not wish to deal
+with them need not do so, since defaults are provided to cover what the
+author suspects to be the most common case: manipulating plain text on
+the system clipboard.
+
+The programming interface is object-oriented. Each object represents a
+pasteboard, with the default being the system clipboard. Item ID is an
+attribute of the object rather than a method argument, with the default
+(undef) being special-cased to write to item ID 1, but read from the
+most recent ID. Flavor _is_ an argument, but defaults to
+'com.apple.traditional-mac-plain-text', which is the flavor used by the
+'pbcopy' and 'pbpaste' executables provided with Mac OS X. A couple
+convenience subroutines (pbcopy() and pbpaste()) are provided to make
+things even simpler, and are exported by default. Also exported on
+demand are various manifest constants: pasteboard names, flavor and
+status flags, and pasteboard-related error codes.
+
+INSTALLATION
+
+This module is installable by either of the two usual incantations:
+
+  tar -xzf Mac-Pasteboard-9.999.tar.gz
+  cd Mac-Pasteboard-9.999
+  perl Makefile.PL
+  make
+  make test
+  sudo make install
+
+or
+
+  tar -xzf Mac-Pasteboard-9.999.tar.gz
+  cd Mac-Pasteboard-9.999
+  perl Build.PL
+  ./Build
+  ./Build test
+  sudo ./Build install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Scalar::Util 1.01 or later (in core since 5.8).
+
+This module also requires Mac OS 10.3 (Panther) or above. Because it is
+an XS module, you will need to install X Code tools. This probably came
+with your Mac, but updates are available from the Apple Developer
+Connection, http://developer.apple.com/.
+
+LICENSING INFORMATION
+
+This package is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.

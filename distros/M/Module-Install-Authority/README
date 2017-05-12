@@ -1,0 +1,46 @@
+NAME
+    Module::Install::Authority - Add an x_authority key to META.yml
+
+SYNOPSIS
+        use inc::Module::Install;
+        name 'Example';
+        all_from 'lib/Example.pm'
+        authority 'BOBTFISH';
+        WriteAll;
+
+DESCRIPTION
+    If you upload a distribution which contains an "x_authority" key in the
+    META.yml then PAUSE will assign 'firstcome' permissions on any packages
+    in that distribution to the user given by the "x_authority" key (and
+    assign co-maint to the uploader).
+
+    Traditionally, if you uploaded a dist containing A.pm, and then gave
+    someone else comaint, and they uploaded a subsequent release including
+    B.pm, then you had a problem as the initial author (you!) has no
+    permissions to release B.pm
+
+    Adding the "x_authority" key to your distribution fixes this, as it
+    ensures that any subsequent packages uploaded as part of the dist by
+    co-maintainers get their permissions set so that one person is the
+    canonical source of permissions for the dist.
+
+    This makes coordination (and maintainance sharing) much easier for large
+    distributions, or those maintained by a pool of people.
+
+METHODS
+  authority ($pause_id)
+    Adds an "x_authority" key to your META.yml or META.json
+
+BUGS
+    This module should be able to take x_authority from the $AUTHORITY
+    variable in the 'main' module of the dist if present.
+
+AUTHOR
+        Tomas Doran (t0m) <bobtfish@bobtfish.net>
+
+COPYRIGHT
+    Copyright (C) 2012 Tomas Doran
+
+LICENSE
+    This software is licensed under the same terms as perl itself.
+

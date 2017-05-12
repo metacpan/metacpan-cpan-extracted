@@ -1,0 +1,92 @@
+0.23 2017-03-11
+        - Fixed test for updated Mojo::URL.
+
+0.22 2016-09-09
+        - Update for Kwalitee compliance.
+
+0.21 2016-07-21
+        - Updated to recent version of M::P::XRD.
+
+0.20 2015-05-26
+        - Updated to recent versions of Mojolicious.
+
+0.19 2015-04-23
+        - Updated for Mojolicious 6.0.
+
+0.18 2015-02-01
+        - Fixed OO json in test (reneeb++).
+	- Updated dependency for XML::Loy.
+
+0.17 2014-10-20
+        - Add M::P::XML::Loy dependency.
+	  (Just for CPANTesters).
+
+0.16 2014-10-19
+        - Made test suite not rely on live systems.
+
+0.16_1 2014-10-18
+        - Probably fix a testing issue.
+
+0.15 2014-10-15
+        - Fixed requirements in Makefile.
+
+0.14 2014-10-10
+	- Improved test suite and docs for
+	  parallel requests.
+
+0.13 2014-08-18
+	- Update to Mojolicious 5.29.
+        - Improved documentation.
+
+0.12 2014-05-30
+        - Update to Mojolicious 4.77.
+	- Coherent license (Artistic 2).
+	- removed deprecated hostmeta_fetch.
+
+0.11 2013-08-03
+        - Update to Mojolicious 4.23.
+
+0.10 2013-04-15
+        - Trim tail of undefined values.
+
+0.09 2013-04-15
+        - Fixed bug in both example apps.
+
+0.08 2013-04-15
+        - Fixed documentation style.
+	- Warned for callbacks.
+	- Fixed bug in async example app.
+
+0.07 2013-04-12
+        - Update dependency for XRD ordering bug.
+
+0.06 2013-04-11
+        - Update title.
+	- Fixed bug in flag handling.
+
+0.05 2013-04-08
+        - Fixed small bug in hostmeta preparation.
+	- Improved documentation.
+	- Added live test.
+	⁻ Delete Useragent information.
+	- Deprecated hostmeta_fetch in favor of
+	  fetch_hostmeta.
+
+0.04 2013-04-06
+        - Use get_xrd() method from
+	  Mojolicious::Plugin::XRD 0.04.
+	- use filter_rel() method from XML::Loy::XRD 0.15.
+	- Initial release on CPAN.
+
+0.03 2013-04-05
+        - Added async methods.
+	- added async example.
+	- Fixed async-mode.
+	- Added support for configuration files.
+
+0.02 2013-04-01
+        - Added example script.
+
+0.01 2013-03-31
+        - Separation from Sojolicious.
+        - Initial submission to GitHub.

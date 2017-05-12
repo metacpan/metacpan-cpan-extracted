@@ -1,0 +1,79 @@
+{
+   "abstract" : "Add a tag with an arbitrary value to a an attribute",
+   "author" : [
+      "The Smithsonian Astrophysical Observatory"
+   ],
+   "dynamic_config" : "0",
+   "generated_by" : "Module::Install version 1.14, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooX-TaggedAttributes",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Module::Install" : "0",
+            "Module::Install::AuthorRequires" : "0",
+            "Module::Install::AuthorTests" : "0",
+            "Module::Install::AutoLicense" : "0",
+            "Module::Install::CPANfile" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::NoBreakpoints" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Method::Modifiers" : "0",
+            "Moo" : "0",
+            "Scalar::Util" : "0",
+            "Sub::Name" : "0",
+            "namespace::clean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::Lib" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-TaggedAttributes"
+      },
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.html"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/djerius/moox-taggedattributes"
+      }
+   },
+   "version" : "0.01"
+}

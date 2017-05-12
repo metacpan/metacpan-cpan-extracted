@@ -1,0 +1,11 @@
+Changes
+examples/cauchy.pl
+examples/cauchy.png
+lib/Math/Random/Cauchy.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00pod.t
+t/00podcover.t
+t/01basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

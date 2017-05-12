@@ -1,0 +1,8 @@
+^Makefile(.old)?$
+~$
+^ispMailGateD?$
+^output/
+^blib/
+^pm_to_blib$
+(^|/)CVS/
+^lib/Mail/IspMailGate/Config.pm$

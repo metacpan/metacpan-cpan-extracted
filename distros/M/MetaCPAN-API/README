@@ -1,0 +1,126 @@
+NAME
+    MetaCPAN::API - A comprehensive, DWIM-featured API to MetaCPAN
+    (DEPRECATED)
+
+VERSION
+    version 0.50
+
+SYNOPSIS
+        # simple usage
+        my $mcpan  = MetaCPAN::API->new();
+        my $author = $mcpan->author('XSAWYERX');
+        my $dist   = $mcpan->release( distribution => 'MetaCPAN-API' );
+
+        # advanced usage with cache (contributed by Kent Fredric)
+        require CHI;
+        require WWW::Mechanize::Cached;
+        require HTTP::Tiny::Mech;
+        require MetaCPAN::API;
+
+        my $mcpan = MetaCPAN::API->new(
+          ua => HTTP::Tiny::Mech->new(
+            mechua => WWW::Mechanize::Cached->new(
+              cache => CHI->new(
+                driver => 'File',
+                root_dir => '/tmp/metacpan-cache',
+              ),
+            ),
+          ),
+        );
+
+DESCRIPTION
+    This was the original hopefully-complete API-compliant interface to
+    MetaCPAN (<https://metacpan.org>). It has now been superseded by
+    MetaCPAN::Client.
+
+DEPRECATED
+    THIS MODULE IS DEPRECATED, DO NOT USE!
+
+    This module has been completely rewritten to address a multitude of
+    problems, and is now available under the new official name:
+    MetaCPAN::Client.
+
+    Please do not use this module.
+
+ATTRIBUTES
+  base_url
+        my $mcpan = MetaCPAN::API->new(
+            base_url => 'http://localhost:9999',
+        );
+
+    This attribute is used for REST requests. You should set it to where the
+    MetaCPAN is accessible. By default it's already set correctly, but if
+    you're running a local instance of MetaCPAN, or use a local mirror, or
+    tunnel it through a local port, or any of those stuff, you would want to
+    change this.
+
+    Default: *http://api.metacpan.org/v0*.
+
+    This attribute is read-only (immutable), meaning that once it's set on
+    initialize (via "new()"), you cannot change it. If you need to, create a
+    new instance of MetaCPAN::API. Why is it immutable? Because it's better.
+
+  ua
+    This attribute is used to contain the user agent used for running the
+    REST request to the server. It is specifically set to HTTP::Tiny, so if
+    you want to set it manually, make sure it's of HTTP::Tiny.
+
+    HTTP::Tiny is used as part of the philosophy of keeping it tiny.
+
+    This attribute is read-only (immutable), meaning that once it's set on
+    initialize (via "new()"), you cannot change it. If you need to, create a
+    new instance of MetaCPAN::API. Why is it immutable? Because it's better.
+
+  ua_args
+        my $mcpan = MetaCPAN::API->new(
+            ua_args => [ agent => 'MyAgent' ],
+        );
+
+    The arguments that will be given to the HTTP::Tiny user agent.
+
+    This attribute is read-only (immutable), meaning that once it's set on
+    initialize (via "new()"), you cannot change it. If you need to, create a
+    new instance of MetaCPAN::API. Why is it immutable? Because it's better.
+
+    The default is a user agent string: MetaCPAN::API/$version.
+
+METHODS
+  fetch
+        my $result = $mcpan->fetch('/release/distribution/Moose');
+
+        # with parameters
+        my $more = $mcpan->fetch(
+            '/release/distribution/Moose',
+            param => 'value',
+        );
+
+    This is a helper method for API implementations. It fetches a path from
+    MetaCPAN, decodes the JSON from the content variable and returns it.
+
+    You don't really need to use it, but you can in case you want to write
+    your own extension implementation to MetaCPAN::API.
+
+    It accepts an additional hash as "GET" parameters.
+
+  post
+        # /release&content={"query":{"match_all":{}},"filter":{"prefix":{"archive":"Cache-Cache-1.06"}}}
+        my $result = $mcpan->post(
+            'release',
+            {
+                query  => { match_all => {} },
+                filter => { prefix => { archive => 'Cache-Cache-1.06' } },
+            },
+        );
+
+    The POST equivalent of the "fetch()" method. It gets the path and JSON
+    request.
+
+AUTHOR
+    Sawyer X <xsawyerx@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Sawyer X.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

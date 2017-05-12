@@ -1,0 +1,11 @@
+Revision history for Perl extension MessagePack-RPC-HTTP-Client
+
+0.02 2013-09-18T15:04:56Z
+
+    - fix call() api with flat argument list
+    - add handler for server errors
+
+0.01 2013-09-18T14:28:12Z
+
+    - original version
+

@@ -1,0 +1,26 @@
+
+=head1 NAME
+
+five
+
+=head1 DESCRIPTION
+
+2+3=5
+
+=head1 FIELDS
+
+ five_col (integer) - this is a column for fives
+
+
+=head1 SCHEMA
+
+                            Table "doo.five"
+   Column  |  Type   | Modifiers | Storage |        Description         
+ ----------+---------+-----------+---------+----------------------------
+  five_col | integer |           | plain   | this is a column for fives
+ Has OIDs: no
+ 
+
+=cut
+
+

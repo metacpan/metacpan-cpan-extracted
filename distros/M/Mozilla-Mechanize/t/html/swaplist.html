@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+  <head>
+    <title>Swaplist Test Page</title>
+    <script type="text/javascript" language="JavaScript1.3"><!--
+function addThem()
+{
+    var notin = document.swaplist.notin;
+    var  isin = document.swaplist.isin;
+    var rmopt = new Array();
+    for ( var i = 0; i < notin.length; i++ )
+    {
+        if ( notin.options[ i ].selected )
+        {
+            var tmp = new Option( notin.options[ i ].text, 
+                                  notin.options[ i ].value );
+            isin.options[ isin.length ] = tmp;
+            notin.options[ i ].selected = 0;
+            rmopt[ rmopt.length ] = i;
+        }
+    }
+    removeByIndex( notin, rmopt );
+} //addThem
+
+function removeThem()
+{
+    var notin = document.swaplist.notin;
+    var  isin = document.swaplist.isin;
+    var rmopt = new Array();
+    for ( var i = 0; i < isin.length; i++ )
+    {
+        if ( isin.options[ i ].selected )
+        {
+            var tmp = new Option( isin.options[ i ].text, 
+                                  isin.options[ i ].value );
+            notin.options[ notin.length ] = tmp;
+            isin.options[ i ].selected = 0;
+            rmopt[ rmopt.length ] = i;
+        }
+    }
+    removeByIndex( isin, rmopt );
+} //removeThem
+
+// poor man's splice()
+function removeByIndex( from, which )
+{
+    for ( var w = which.length - 1; w >= 0; w-- )
+    {
+        for ( var d = which[ w ]; d < from.length - 1; d++ )
+        {
+            from.options[ d ] = new Option( from.options[ d + 1 ].text,
+                                            from.options[ d + 1 ].value );
+        }
+        from.options.length--;
+    }
+} //removeByIndex
+
+function selectAllIn()
+{
+    var notin = document.swaplist.notin;
+    var  isin = document.swaplist.isin;
+    for ( var i = 0; i < notin.length; i++ ) notin.options[ i ].selected = 1;
+    for ( var i = 0; i < isin.length; i++ )  isin.options[ i ].selected = 1;
+
+    var maysubmit = document.swaplist.dosubmit;
+    return maysubmit.value == 1 ? true : false;
+} //selectAllIn
+
+function swapSubmit()
+{
+    var swap = document.swaplist.dosubmit;
+    if ( swap.value == 1 ) { swap.value = 0 } else { swap.value = 1 };
+} //swapSubmit
+
+    // --></script>
+  </head>
+  <body>
+    <h1>Swaplist test page</h1>
+    <form name="swaplist" onsubmit="return selectAllIn()">
+    <input type="hidden" name="dosubmit" value="0" />
+    <table border="0">
+    <tr>
+      <td>Not in list</td>
+      <td>&nbsp;</td>
+      <td>In list</td>
+    </tr>
+    <tr>
+      <td>
+        <select name="notin" size="5" multiple="multiple" style="width: 20em;">
+          <option value="choice1">Line 1</option>
+          <option value="choice2">Line 2</option>
+          <option value="choice3">Line 3</option>
+          <option value="choice4">Line 4</option>
+          <option value="choice5">Line 5</option>
+        </select>
+      </td>
+      <td align="center">
+        <input type="button" value="Add >>"
+               onclick="addThem()" />
+        <br />
+        <input type="button" value="<< Remove"
+               onclick="removeThem()" />
+        <br />
+        <input type="button" value="May Submit"
+               onclick="swapSubmit()" />
+      </td>
+      <td>
+        <select name="isin" size="5" multiple="multple" style="width: 20em;">
+        </select>
+      </td>
+    </tr>
+    </table>
+<input type="submit" value="Submit" />
+    </form>
+  </body>
+</html>

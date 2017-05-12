@@ -1,0 +1,31 @@
+---
+abstract: 'Mojolicious plugin to find and parse RSS & Atom feeds'
+author:
+  - 'Dotan Dimet <dotan@corky.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-FeedReader
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  HTTP::Date: '6.02'
+  Mojolicious: '6.0'
+  Time::Zone: '2.2'
+  perl: '5.010001'
+resources:
+  bugtracker: http://github.com/dotandimet/Mojolicious-Plugin-FeedReader/issues
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: http://github.com/dotandimet/Mojolicious-Plugin-FeedReader
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

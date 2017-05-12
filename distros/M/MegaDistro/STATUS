@@ -1,0 +1,38 @@
+----   Critical   ----
+
+
+---- Improvements ----
+
+Spruce up the MegaDistro::DebMaker::Build code.
+
+Make tests (in general), more portable,
+  unless they are to be used specifically for versionchecking
+
+Lexically improve the code, formatting,
+  i.e. run perltidy (on all code)  ;)
+       (tabs bad!)
+  
+  Additionally, just "clean_up_the_code", as I go along (obviously). - Dave.
+        - particularly, the unique use of "Dave\'s " . "\quoting"; ;)
+          (e.g. ----------------->  printf "%15s", '[  ' . "Success!" . '  ]' . "\n"; 
+              could be written as:  printf "%15s[  Success!  ]\n"; )   - Schwern
+
+  *very very* minor, but fix formatting for main output (while preserving the API) - i.e. install rtypes, etc.
+          - Dave.
+          
+
+*Make a "MegaDistro" object and have the Configure script use that to
+  setup the configuration, and start the actions. [old]
+        -perhaps handle debate this later, for another release, 
+          since reworking the code base at this point, is not a viable option.
+
+Extend the Module list, to the YAML (standard) convention, such that it will have available options, 
+  whether they pertain to the building/testing -of the modules.
+
+  However, it's unknown to me, at the moment, whether this could be used, in the future,
+    to settle/work-around external dependency problems (dependencies), introduced by a given module
+      (e.g. DBD::mysql, GD, Net::SSLeay)
+
+Write my own, sort of, "dummy modules," to be shipped with the megadistro module, such that, 
+  the packaging/build tests won't have to "cheat," as they currently do (use of --force option).
+

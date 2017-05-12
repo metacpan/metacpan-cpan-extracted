@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Examples</title>
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    </head>
+
+    <body>
+        <div class="container">
+            
+
+<p>A simple pills navigation:</p>
+<pre>&lt;%= nav pills =&gt; [
+            [&#39;Item 1&#39;, [&#39;#&#39;] ],
+            [&#39;Item 2&#39;, [&#39;#&#39;], active ],
+            [&#39;Item 3&#39;, [&#39;#&#39;] ],
+            [&#39;Item 4&#39;, [&#39;#&#39;], disabled ],
+        ]
+%&gt;</pre>
+<pre>&lt;ul class=&quot;nav nav-pills&quot;&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Item 1&lt;/a&gt;&lt;/li&gt;
+    &lt;li class=&quot;active&quot;&gt;&lt;a href=&quot;#&quot;&gt;Item 2&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Item 3&lt;/a&gt;&lt;/li&gt;
+    &lt;li class=&quot;disabled&quot;&gt;&lt;a href=&quot;#&quot;&gt;Item 4&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</pre>
+<div>    <ul class="nav nav-pills">        <li><a href="#">Item 1</a></li>        <li class="active"><a href="#">Item 2</a></li>        <li><a href="#">Item 3</a></li>        <li class="disabled"><a href="#">Item 4</a></li>    </ul></div>
+<hr />
+<p>A tab navigation with a menu:</p>
+<pre>&lt;%= nav justified, id =&gt; &#39;my-nav&#39;, tabs =&gt; [
+            [&#39;Item 1&#39;, [&#39;#&#39;] ],
+            [&#39;Item 2&#39;, [&#39;#&#39;], active ],
+            [&#39;Item 3&#39;, [&#39;#&#39;] ],
+            [&#39;Dropdown&#39;, [&#39;#&#39;], caret, items =&gt; [
+                    [&#39;There are...&#39;, [&#39;#&#39;] ],
+                    [&#39;...three...&#39;, [&#39;#&#39;] ],
+                    [],
+                    [&#39;...choices&#39;, [&#39;#&#39;] ],
+                ],
+            ],
+        ]
+%&gt;</pre>
+<pre>&lt;ul class=&quot;nav nav-justified nav-tabs&quot; id=&quot;my-nav&quot;&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Item 1&lt;/a&gt;&lt;/li&gt;
+    &lt;li class=&quot;active&quot;&gt;&lt;a href=&quot;#&quot;&gt;Item 2&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;#&quot;&gt;Item 3&lt;/a&gt;&lt;/li&gt;
+    &lt;li class=&quot;dropdown&quot;&gt;
+        &lt;a class=&quot;dropdown-toggle&quot; data-toggle=&quot;dropdown&quot; href=&quot;#&quot;&gt;Dropdown &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;&lt;/a&gt;
+        &lt;ul class=&quot;dropdown-menu&quot;&gt;
+            &lt;li&gt;&lt;a href=&quot;#&quot;&gt;There are...&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href=&quot;#&quot;&gt;...three...&lt;/a&gt;&lt;/li&gt;
+            &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a href=&quot;#&quot;&gt;...choices&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/li&gt;
+&lt;/ul&gt;</pre>
+<div>    <ul class="nav nav-justified nav-tabs" id="my-nav">        <li><a href="#">Item 1</a></li>        <li class="active"><a href="#">Item 2</a></li>        <li><a href="#">Item 3</a></li>        <li class="dropdown">            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Dropdown <span class="caret"></span></a>            <ul class="dropdown-menu">                <li><a href="#">There are...</a></li>                <li><a href="#">...three...</a></li>                <li class="divider"></li>                <li><a href="#">...choices</a></li>            </ul>        </li>    </ul></div>
+        </div>
+        <pre style="background-color: #fff; border-width: 0px;">
+
+
+
+        </pre>
+    </body>
+</html>

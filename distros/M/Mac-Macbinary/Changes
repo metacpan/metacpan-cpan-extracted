@@ -1,0 +1,23 @@
+Revision history for Perl extension Mac::Macbinary.
+
+$Id: Changes,v 1.7 2004/07/02 08:25:02 miyagawa Exp $
+
+0.06	- Fixed warning using IO::Scalar
+	  (Thanks to Volker Moell)
+
+0.05	* Fixed bug in extracting resource fork
+	  (Thanks to Jorg Eschke <joerg@eschke.net>)
+
+0.04	- Documented the "validate" attribute.
+
+0.03	- Implemented _validate_header() method to check and see if a file
+	  is really a Macbinary file or not. Entire code is stolen from
+	  Mac::Conversions.
+
+0.02  Wed Nov 15 01:52:58 JST 2000
+	- Removed 05_fail.t, which has caused failure on some platforms.
+	  Improved document.
+
+0.01  Wed Oct 25 17:35:45 2000
+	- original version; created by h2xs 1.19
+

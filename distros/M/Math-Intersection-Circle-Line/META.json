@@ -1,0 +1,41 @@
+{
+   "abstract" : "Find the points at which a given circle and a line intersect.",
+   "author" : [
+      "PhilipRBrenan@gmail.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-Intersection-Circle-Line",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "utf8" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Math::Intersection::Circle::Line" : {
+         "file" : "lib/Math/Intersection/Circle/Line.pm",
+         "version" : "1.008"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.008"
+}

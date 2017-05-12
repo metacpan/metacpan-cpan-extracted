@@ -1,0 +1,14 @@
+Revision history for MooX-SetOnce
+
+0.001003 - 2014-11-18
+  - fix typo in pod (thanks mattp)
+
+0.001002 - 2014-08-21
+  - provide license correctly in metadata
+
+0.001001 - 2014-08-16
+  - refresh metadata
+  - hide optional prereqs from some static scanners
+
+0.001000 - 2013-05-05
+  - initial release

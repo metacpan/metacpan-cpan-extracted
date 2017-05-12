@@ -1,0 +1,29 @@
+Revision history for Perl module MooX::File::ConfigDir
+
+0.005	2015-03-04
+    - bump copyright year to 2015
+    - simplify construction
+    - increase test coverage
+    - splash out for attribute clearer ;)
+    - update meta-data and older eumm-support
+
+0.004	2014-11-25
+    - improve Makefile.PL for better distribution kwalitee
+    - add README.md
+
+0.003	2014-01-06
+    - move from Build.PL to Makefile.PL because of development dependencies
+    - change dependency from namespace::autoclean to namespace::clean
+      (Fixes PR#91890)
+    - prefer BAIL_OUT over printf in loading test
+    - update copyright period
+
+0.002	2013-09-26
+    - improve initialization support (builder for config_identifier)
+    - improve builders for the config dir attributes to call them from
+      within BUILDARGS
+    - fix singleapp_cfg_dir builder (using it with config_identifier is
+      tautologous)
+
+0.001	2013-09-21
+    - First version, released on an unsuspecting world.

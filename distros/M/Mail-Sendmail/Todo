@@ -1,0 +1,47 @@
+
+# random thoughts about what to do next.
+# suggestions welcome
+
+- Check on older Perl 
+
+- Also MIME-encode headers if they contain accented characters
+  Make it configurable?
+
+- support SMTP AUTH
+
+- Check with mod_perl
+
+- During Makefile.PL, try to find a local SMTP server and the user's e-mail
+address, and offer to pre-configure these as defaults in Sendmail.pm. And
+let the user enter defaults to override automatic detection.
+
+- Document $address_rx: which addresses it finds OK, and which not.
+
+- Add example scripts for CGI forms
+
+- Also accept hashrefs in place of hashes
+
+- Update web site
+
+- Create sourceforge site and mailing list
+
+- Does the test say OK if no mail could be sent? check and fix
+
+- Check we don't die if sending to multiple recipients, and one fails
+
+Also accept MIME::Lite objects?
+
+Have make dist generate README and html ?
+
+Add install.ppm for PPM installs?
+
+Use 8BITMIME if available from server?
+
+Encode only if accented chars really present?
+
+Rename to Mail::Simple?
+
+Not on my todo list anymore:
+
+- Setup Perl on an Amiga and see if it runs. (it should)
+(but if someone tries it, I would appreciate knowing about it)

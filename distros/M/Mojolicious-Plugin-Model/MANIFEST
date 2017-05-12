@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/MojoX/Model.pm
+lib/Mojolicious/Plugin/Model.pm
+minil.toml
+t/base.t
+t/lib/Lite/Model/Users.pm
+t/lite.t
+t/model-default.t
+t/model-params.t
+t/model.t
+META.yml
+MANIFEST

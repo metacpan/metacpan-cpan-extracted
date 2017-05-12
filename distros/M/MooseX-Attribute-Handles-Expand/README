@@ -1,0 +1,25 @@
+SYNOPSIS
+
+        package Foo;
+        use Moose;
+        use MooseX::Attribute::Handles::Expand;
+    
+        has [ qw/ bar baz / ] => (
+            traits => [ 'Array' ],
+            default => sub { [] },
+            handles => {
+                'size_*' => 'count',
+            },
+        );
+    
+    
+        my $foo = Foo->new;
+        ...;
+        print $foo->size_bar;
+        print $foo->size_baz;
+
+DESCRIPTION
+
+    Grooms the name of delegated methods in the handles and expands all
+    instances of * into the attribute name.
+

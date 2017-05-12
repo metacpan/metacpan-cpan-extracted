@@ -1,0 +1,55 @@
+Revision history for Metabase-Client-Simple
+
+0.012     2016-03-03 11:43:37-05:00 America/New_York
+
+  [Fixes]
+
+  - Fixed bug in new user registration.
+
+0.011     2016-03-01 22:50:27-05:00 America/New_York
+
+  [Changes]
+
+  - Switched from JSON.pm to JSON::MaybeXS for better insulation
+    from upstream volatility.
+
+  - Switched from LWP to HTTP::Tiny as web user-agent.
+
+0.010     2015-01-27 12:06:58-05:00 America/New_York
+
+  - Updated distribution metadata (repo, bugtracker, etc.)
+
+0.009     2012-07-24 23:09:55 America/New_York
+
+  - Note need for LWP::Protocol::https
+
+0.008     2010-07-13 11:21:08 EST5EDT
+
+  - Supports HTTP proxy environment variables
+
+  - Caches LWP::UserAgent and uses keep_alive
+
+  - Some minimal testing added
+
+  - Dependency on Net::SSL was removed in 0.007, but we
+    now checks that a scheme (e.g. 'https') is supported or
+    else die with a useful message about installing deps or
+    using 'http' instead
+
+0.007     2010-07-12 16:43:30 EST5EDT
+
+  - Ensure 'uri' argument has a trailing slash
+
+0.006     2010-03-29 15:22:22 EST5EDT
+
+  - Ensure JSON uses ASCII encoding
+
+0.005 Thu Mar 11 23:33:57 EST 2010
+
+  - Added Net::SSL to prereqs to ensure LWP can speak https
+
+0.004
+
+  - Changed 'url' parameter to 'uri' for consistency with other
+    Metabase framework components
+

@@ -1,0 +1,80 @@
+/* ================================================================== */
+/* THEME: Grue
+ */
+@import 'functions';
+@import 'fonts_grue';
+@import 'icon_light_on_dark';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: #336666;
+$verge-fg: set-fg($verge-bg);
+$verge-border: #005500;
+$main-bg: hsl(180, 20, 55);
+$main-fg: set-fg($main-bg);
+$button-bg: hsl(hue($main-bg) + 30, 50%, 30%);
+$button-fg: set-fg($button-bg);
+$button-border: #003300;
+$link-fg: set-link($main-bg);
+$link-visited: set-visited($main-bg);
+$verge-link-fg: set-link($verge-bg);
+$verge-link-visited: set-visited($verge-bg);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+}
+
+header,
+footer,
+.side {
+	@extend .verge;
+	background-image: url(grue1a.jpg);
+}
+
+body {
+	color: black;
+	background: #003333 url(grue1b.jpg);
+}
+
+#main-wrap {
+	color: $main-fg;
+	background: $main-bg;
+	border-color: #001100;
+    border-radius: 2em;
+    box-shadow:rgba(0,0,0,0.8) 3px 3px 10px;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+@include many-links($link-fg, $link-visited, $verge-link-fg, $verge-link-visited);
+@include fancy($verge-fg, $verge-bg, "grue1a.jpg");
+@include make-buttons;
+
+header nav a:link:hover,
+header nav a:visited:hover {
+	background-color: #99FF99;
+	color: navy;
+}
+header nav li {
+    	border-color: #7777dd;
+}
+header nav .selflink,
+header nav em,
+header nav .current a {
+	color: #336699;
+	background-color: white;
+}
+
+/* ------------------------------------------------------------------ */
+@media screen and (max-width: 50em) {
+#main-wrap {
+    border-radius: 0;
+    margin: 0;
+    box-shadow: none;
+}
+}

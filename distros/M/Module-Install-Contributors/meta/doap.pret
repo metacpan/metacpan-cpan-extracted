@@ -1,0 +1,19 @@
+# This file contains general metadata about the project.
+
+@prefix : <http://usefulinc.com/ns/doap#>.
+
+`Module-Install-Contributors`
+	:programming-language "Perl" ;
+	:shortdesc            "add an \"x_contributors\" section to your META.yml";
+	:homepage             <https://metacpan.org/release/Module-Install-Contributors>;
+	:download-page        <https://metacpan.org/release/Module-Install-Contributors>;
+	:bug-database         <http://rt.cpan.org/Dist/Display.html?Queue=Module-Install-Contributors>;
+	:repository           [ a :HgRepository; :browse <https://bitbucket.org/tobyink/p5-module-install-contributors> ];
+	:created              2013-03-24;
+	:license              <http://dev.perl.org/licenses/>;
+	:maintainer           cpan:TOBYINK;
+	:developer            cpan:TOBYINK.
+
+<http://dev.perl.org/licenses/>
+	dc:title  "the same terms as the perl 5 programming language system itself".
+

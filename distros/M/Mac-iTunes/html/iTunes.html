@@ -1,0 +1,75 @@
+<html>
+	<head><title>iTunes Web Interface</title></head>
+	
+<body>
+
+<h1>iTunes Web Interface</h1>
+
+player state is { $state }.<br>
+{ $current ? "current track is $current." : '' }<br>
+{ $playlist ? "current playlist is $playlist." : '' }<br>
+<b>
+||
+<a href="{$base}?command=play">Play</a> ||
+<a href="{$base}?command=stop">Stop</a> ||
+<a href="{$base}?command=pause">Pause</a> ||
+<a href="{$base}?command=back_track">Restart</a> ||
+</b><br>
+
+<table>
+	<tr>
+	<td bgcolor="#FFFF00"><b>Playlists</b></td>
+	<td bgcolor="#FFFF00"><b>Tracks</b></td>
+	</tr>
+
+	</tr>
+	<tr><td valign="top">
+		<table>
+			{
+			my $str;
+			foreach my $this ( @playlists )
+				{
+				if( $this eq $playlist )
+					{
+					$str .= qq|<tr><td bgcolor="#00ccff"><b>$this</b></td></tr>\n|;
+					}
+				else
+					{
+					$str .= "<tr><td>";
+					$str .= qq|<a href="$base?set_playlist=$this">$this</a>|;
+					$str .= "</td></tr>\n";
+					}
+				}
+				
+			$str;
+			}
+		</table>
+	</td>
+	<td valign="top">
+		<table>
+			{
+			my $str;
+			my $count = 0;
+			foreach my $track ( @tracks )
+				{
+				$count++;
+				if( $track eq $current )
+					{
+					$str .= qq|<tr><td bgcolor="#00ccff"><b>$track</b></td></tr>\n|;
+					}
+				else
+					{
+					$str .= "<tr><td>";
+					$str .= qq|<a href="$base?playlist=$playlist&track=$count">$track</a>|;
+					$str .= "</td></tr>\n";
+					}
+				}
+
+			$str;
+			}
+		</table>
+	</td></tr>
+</table>
+
+</body>
+</html>

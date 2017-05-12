@@ -1,0 +1,19 @@
+Revision history for Mojolicious-Plugin-SecureCORS
+
+v2.0.0  2016-02-19 09:47:11 EET
+	- Switch to Dist::Milla.
+
+1.0.4   2015-03-23 17:07:40 EET
+	- Require Mojolicious-6.0.
+
+1.0.3   2014-12-24 11:58:46 EET
+	- Fix dependencies.
+
+1.0.2   2014-11-18 01:32:39 EET
+	- Require Mojolicious-5.62.
+
+1.0.1   2014-06-20 13:46:50 EEST
+	- Fix typos in doc.
+
+1.0.0	2014-06-19 12:35:09 EEST
+	- Initial release.

@@ -1,0 +1,64 @@
+{
+   "abstract" : "Easily render rectangular data in many formats using Mojolicious",
+   "author" : [
+      "Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.018",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-ReplyTable",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.018"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Excel::Writer::XLSX" : "0",
+            "Spreadsheet::WriteExcel" : "0",
+            "Text::Table::Tiny" : "0"
+         },
+         "requires" : {
+            "Mojolicious" : "5.60",
+            "Text::CSV" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Without::Module" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::ReplyTable" : {
+         "file" : "lib/Mojolicious/Plugin/ReplyTable.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jberger/Mojolicious-Plugin-ReplyTable/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jberger/Mojolicious-Plugin-ReplyTable"
+      }
+   },
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

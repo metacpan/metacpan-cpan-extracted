@@ -1,0 +1,52 @@
+{
+   "abstract" : "Sample Morbo Inotify watcher",
+   "author" : [
+      "Marcus Ramberg <marcus.ramberg@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-Server-Morbo-Backend-Inotify",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Linux::Inotify2" : "0",
+            "Mojolicious" : "7.31"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/marcusramberg/mojo-server-morbo-backend-inotify/issues"
+      },
+      "homepage" : "https://github.com/marcusramberg/mojo-server-morbo-backend-inotify",
+      "repository" : {
+         "url" : "https://github.com/marcusramberg/mojo-server-morbo-backend-inotify.git"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

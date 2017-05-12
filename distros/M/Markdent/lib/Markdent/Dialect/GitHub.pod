@@ -1,0 +1,60 @@
+package Mardent::Dialect::GitHub;
+
+=pod
+
+=head1 NAME
+
+Markdent::Dialect::GitHub - Markdown extensions implemented on GitHub
+
+=head1 SYNOPSIS
+
+  use Markdent::Parser;
+
+  my $parser = Markdent::Parser->new( dialect => 'GitHub', handler => ... );
+
+=head1 DESCRIPTION
+
+The GitHub roles add parsing for some of the Markdown extensions used on
+GitHub. See http://github.github.com/github-flavored-markdown/ for details.
+
+=head2 DEVIATIONS
+
+The dialect differs from the GitHub implementation in a few ways.
+
+=over 4
+
+=item
+
+It doesn't yet implement the newline handling that GitHub specifies.
+
+=item
+
+It does not implement the GitHub specific auto-linking for SHAs, users, or
+projects. This is intentional.
+
+=back
+
+=head2 IMPLEMENTATION DETAILS
+
+When the start of a fenced code block includes a language indicator
+(C<```perl>), the HTML output will include that language as part of a class
+name on the C<< <code> >> tag:
+
+  <pre><code class="language-perl">...</code></pre>
+
+=head1 BUGS
+
+See L<Markdent> for bug reporting details.
+
+=head1 AUTHOR
+
+Dave Rolsky, E<lt>autarch@urth.orgE<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2012 Dave Rolsky, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

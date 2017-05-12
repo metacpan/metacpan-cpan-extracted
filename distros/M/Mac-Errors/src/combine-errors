@@ -1,0 +1,414 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+my $success = 1;
+
+sub read_exceptions($)
+{
+    my ($file) = @_;
+    my %exceptions = ();
+    open(EXCEPTIONS,"<$file") ||
+	die("unable to open exceptions file $file for reading");
+    while(<EXCEPTIONS>)
+    {
+	s/[\012\015]*$//;
+        s/\#.*$//;
+        s/ *$//;
+        if (/^CODE\s+([a-zA-Z0-9]+)\s+(\d+)/)
+        {
+            $exceptions{$1} = {
+                TYPE => 'SYMBOL_CODE',
+                SYMBOL => $1,
+                CODE => $2
+                };
+        }
+        elsif (/^CATEGORY\s+([a-z0-9_]+)\s+(.*)$/)
+        {
+            $exceptions{$1} = {
+                TYPE => 'CATEGORY_NAME',
+                CATEGORY => $1,
+                NAME => $2
+                };
+        }
+        else
+        {
+            die("unable to parse exception: $_");
+        }
+    }
+    close(EXCEPTIONS);
+    return \%exceptions;
+}
+
+sub descs_match($$)
+{
+    my ($a, $b) = @_;
+    foreach my $category 
+        (grep(exists($a->{CATEGORIES}{$_}),keys(%{$b->{CATEGORIES}})))
+    {
+        my @a = sort(@{$a->{CATEGORIES}{$category}});
+        my @b = sort(@{$b->{CATEGORIES}{$category}});
+        return 0 if (@a != @b);
+        while (@a)
+        {
+            my $a_desc = shift(@a);
+            my $b_desc = shift(@b);
+            $a_desc =~ tr/A-Z/a-z/;
+            $b_desc =~ tr/A-Z/a-z/;
+            return 0 if ($a_desc ne $b_desc);
+        }
+    }
+    return 1;
+}
+
+sub errors_match($$)
+{
+    my ($a, $b) = @_;
+    return 0 if ($a->{CLEAN_CODE} != $b->{CLEAN_CODE});
+    return descs_match($a,$b);
+}
+
+sub record_error($$$$@)
+{
+    my ($errors, $category, $symbol, $code, @descs) = @_;
+    return if (!defined($symbol));
+    my $clean_code = $code;
+    if ($clean_code =~ /^(\d+)L$/)
+    {
+        $clean_code = $1;
+        $clean_code = ($clean_code & 0xFFFF)
+            if ($clean_code > 0xFFFF);
+        $clean_code = -(($clean_code ^ 0xFFFF) + 1)
+            if ($clean_code > 0x8000);
+        $clean_code *= -1;
+    }
+    if ($clean_code =~ /^0x[a-fA-F0-9]+$/)
+    {
+	$clean_code = hex($clean_code);
+        $clean_code = ($clean_code & 0xFFFF)
+            if ($clean_code > 0xFFFF);
+        $clean_code = -(($clean_code ^ 0xFFFF) + 1)
+            if ($clean_code > 0x8000);
+        $clean_code *= -1;
+    }
+    if ($clean_code =~ /[a-zA-Z]/)
+    {
+	die("$symbol refers to unknown symbol $code")
+	    if (!exists($errors->{$code}));
+	if (@descs == 0)
+	{
+	    @descs = ("See $code");
+	}
+	elsif (@descs == 1)
+	{
+	    @descs = ("See $code ($descs[0])");
+	}
+	else
+	{
+	    die("referenced symbol has multiple descriptions");
+	}
+	$clean_code = $errors->{$code}{CLEAN_CODE};
+	$code = $errors->{$code}{CODE};
+    }
+    if ($clean_code > 0xFFFF)
+    {
+        $clean_code = ($clean_code & 0xFFFF)
+            if ($clean_code > 0xFFFF);
+        $clean_code = -(($clean_code ^ 0xFFFF) + 1)
+            if ($clean_code > 0x8000);
+    }
+    $category = '' if (!defined($category));
+    my $new_error = {
+	CATEGORIES => { $category => \@descs },
+	SYMBOL => $symbol,
+	CLEAN_CODE => $clean_code,
+	CODE => $code,
+	};
+    if (!exists($errors->{$symbol}))
+    {
+	$errors->{$symbol} = $new_error;
+    }
+    elsif (errors_match($errors->{$symbol},$new_error))
+    {
+        $errors->{$symbol}{CATEGORIES}{$category} = \@descs;
+    }
+    else
+    {
+        $errors->{$symbol}{CATEGORIES}{$category} = []
+            if (!defined($errors->{$symbol}{CATEGORIES}{$category}));
+        my $descs = $errors->{$symbol}{CATEGORIES}{$category};
+	my %new_descs = map(($_ => 1,),@descs,@{$descs});
+	@{$descs} = keys(%new_descs);
+    }
+}
+
+sub read_errors($$)
+{
+    my ($file, $exceptions) = @_;
+    open(ERRORS,"<$file") ||
+	die("unable to open error file $file for reading");
+    my %errors = ();
+    my %categories = ();
+    my $category = undef;
+    my $symbol = undef;
+    my $code = undef;
+    my @descs = ();
+  LINE:
+    while(<ERRORS>)
+    {
+	s/[\012\015]*$//;
+	s/ *$//;
+        my ($indent, $data) = (/^(\s*)(.*)$/);
+        $indent = length($indent);
+        if ($indent == 0)
+        {
+	    record_error(\%errors,$category,$symbol,$code,@descs);
+	    $symbol = undef;
+            my $name = $data;
+            $name =~ s/ mgr / Manager /gi;
+            $category = $name;
+            $category =~ s/ result codes$//i;
+            $category =~ s/ error codes$//i;
+            $category =~ s/ errors$//i;
+            $category =~ tr/A-Z /a-z_/;
+            my $url = undef;
+            if ($category eq 'result_codes')
+            {
+                $url = <ERRORS>;
+		$url =~ s/[\012\015]*$//;
+                die("FATAL ERROR: untitled error category with no URL")
+                    if ($url !~ /^  http/);
+                $url =~ s/^  //;
+                $category = $url;
+                $category =~ s/\/[^\/]*$//;
+                $category =~ s/^.*\///;
+                $category =~ tr/A-Z/a-z/;
+                if (!exists($exceptions->{$category}) ||
+                    $exceptions->{$category}{TYPE} ne 'CATEGORY_NAME')
+                {
+                    print STDERR "Untitled error category needs title\n";
+                    print STDERR "Add line of the following form to the exception file:\n";
+                    print STDERR "CATEGORY $category Category Name Result Codes\n\n";
+		    $exceptions->{$category}{NAME} = 'DUMMY CATEGORY NAME';
+		    $success = 0;
+                }
+                $name = $exceptions->{$category}{NAME};
+                $category = $name;
+                $category =~ s/ result codes$//i;
+                $category =~ s/ error codes$//i;
+                $category =~ s/ errors$//i;
+                $category =~ tr/A-Z /a-z_/;
+            }
+            if (exists($categories{$category}) &&
+                $categories{$category}{NAME} ne $name)
+            {
+                if (!exists($exceptions->{$category}) ||
+                    $exceptions->{$category}{TYPE} ne 'CATEGORY_NAME')
+                {
+                    print STDERR "Similar categories: $name and $categories{$category}{NAME}\n";
+                    print STDERR "Add one of the following lines to the exception file:\n";
+                    print STDERR "CATEGORY $category $name\n";
+                    print STDERR "CATEGORY $category $categories{$category}{NAME}\n\n";
+		    $exceptions->{$category}{NAME} = 'DUMMY CATEGORY NAME';
+		    $success = 0;
+                }
+                $name = $exceptions->{$category}{NAME};
+            }
+            $categories{$category} = {
+                NAME => $name,
+                SORT => $category,
+                URL => $url
+            };
+        }
+        elsif ($indent == 2)
+        {
+            if ($data =~ /^http/)
+            {
+                die("multiple category URL's") 
+                    if (defined($categories{$category}{URL}));
+                $categories{$category}{URL} = $data;
+            }
+            elsif (defined($categories{$category}{DESC}))
+            {
+                print STDERR "Multiple category descriptions:\n";
+                print STDERR "$categories{$category}{DESC}\n";
+		print STDERR "$data\n\n";
+		die;
+            }
+            else
+            {
+                $categories{$category}{DESC} = $data;
+            }
+        }
+        elsif ($indent == 4)
+        {
+	    record_error(\%errors,$category,$symbol,$code,@descs);
+            ($symbol, $code) = ($data =~ /^([^ ]+) ([^ ]+)$/);
+	    @descs = ();
+	}
+        else
+        {
+	    push(@descs,$data);
+	}
+    }
+    record_error(\%errors,$category,$symbol,$code,@descs);
+    close(ERRORS);
+    return ([map($errors{$_},keys(%errors))],
+            [map($categories{$_},keys(%categories))]);
+}
+
+sub add_errors($$$)
+{
+    my ($errors, $new_errors, $exceptions) = @_;
+    foreach my $new_error (@{$new_errors})
+    {
+        my $symbol = $new_error->{SYMBOL};
+        if (!exists($errors->{$symbol}))
+        {
+            $errors->{$symbol} = $new_error;
+            next;
+        }
+
+        my $old_error = $errors->{$new_error->{SYMBOL}};
+        if ($old_error->{CLEAN_CODE} != $new_error->{CLEAN_CODE} &&
+            exists($exceptions->{$symbol}) &&
+            $exceptions->{$symbol}{TYPE} eq 'SYMBOL_CODE')
+        {
+            $old_error->{CLEAN_CODE}  = $exceptions->{$symbol}{CODE};
+            $new_error->{CLEAN_CODE}  = $exceptions->{$symbol}{CODE};
+        }
+
+        if (errors_match($old_error,$new_error))
+        {
+            foreach my $category (keys(%{$new_error->{CATEGORIES}}))
+            {
+                next if (defined($old_error->{CATEGORIES}{$category}));
+                $old_error->{CATEGORIES}{$category} =
+                    $new_error->{CATEGORIES}{$category};
+            }
+            next;
+        }
+
+        if ($old_error->{CLEAN_CODE} != $new_error->{CLEAN_CODE})
+        {
+            print STDERR "Code Mismatch\n";
+            print STDERR "Add one of the following lines to the exceptions file:\n";
+            print STDERR "CODE $old_error->{SYMBOL} $old_error->{CODE}\n";
+            print STDERR "CODE $old_error->{SYMBOL} $new_error->{CODE}\n\n";
+	    $success = 0;
+	    $old_error->{CLEAN_CODE} = $new_error->{CLEAN_CODE};
+	    $old_error->{CODE} = $new_error->{CODE};
+        }
+
+        if ($old_error->{CODE} eq $new_error->{CODE})
+        {
+            foreach my $category (keys(%{$new_error->{CATEGORIES}}))
+            {
+		my %descs = map(($_ => 1),
+				@{$old_error->{CATEGORIES}{$category}},
+				@{$new_error->{CATEGORIES}{$category}});
+		$old_error->{CATEGORIES}{$category} = [keys(%descs)];
+            }
+            next;
+        }
+
+        die("FATAL ERROR: inconsistent errors");
+    }
+}
+
+sub add_categories($$$)
+{
+    my ($categories, $new_categories, $exceptions) = @_;
+    foreach my $category (@{$new_categories})
+    {
+        my $sort = $category->{SORT};
+        if (!exists($categories->{$sort}))
+        {
+            $categories->{$sort} = $category;
+            next;
+        }
+        
+        my $old_category = $categories->{$sort};
+	if (defined($old_category->{URL}) &&
+	    defined($category->{URL}) &&
+	    $old_category->{URL} ne $category->{URL})
+	{
+	    print STDERR "conflicting category URL's for $category->{SORT}:\n";
+	    print STDERR "$old_category->{URL}\n";
+	    print STDERR "$category->{URL}\n\n";
+	    die;
+	}
+	if (defined($old_category->{DESC}) &&
+	    defined($category->{DESC}) &&
+	    $old_category->{DESC} ne $category->{DESC})
+	{
+	    print STDERR "conflicting category descriptionss for $category->{SORT}:\n";
+	    print STDERR "$old_category->{DESC}\n";
+	    print STDERR "$category->{DESC}\n\n";
+	    die;
+	}
+        if (defined($old_category->{NAME}) &&
+            defined($category->{NAME}) &&
+            $old_category->{NAME} ne $category->{NAME})
+        {
+            if (!exists($exceptions->{$sort}) ||
+                $exceptions->{$sort}{TYPE} ne 'CATEGORY_NAME')
+            {
+                print STDERR "Similar categories: $old_category->{NAME} and $category->{NAME}\n";
+                print STDERR "Add one of the following lines to the exception file:\n";
+                print STDERR "CATEGORY $sort $old_category->{NAME}\n";
+                print STDERR "CATEGORY $sort $category->{NAME}\n\n";
+		$exceptions->{$sort}{NAME} = 'DUMMY CATEGORY NAME';
+		$success = 0;
+            }
+            $old_category->{NAME} = $exceptions->{$sort}{NAME};
+        }
+    }
+}
+
+sub main(@)
+{
+    my ($exceptions_file, @files) = @_;
+
+    print STDERR "Reading exceptions...\n";
+    my $exceptions = read_exceptions($exceptions_file);
+
+    my %categories = ( '' => { NAME => undef, SORT => '', URL => undef } );
+    my %errors = ();
+    foreach my $file (@files)
+    {
+	print STDERR "Reading $file...\n";
+	my ($new_errors, $new_categories) = read_errors($file,$exceptions);
+	add_errors(\%errors,$new_errors,$exceptions);
+        add_categories(\%categories,$new_categories,$exceptions);
+    }
+    
+
+    foreach my $category (sort { 
+        $categories{$a}{SORT} cmp $categories{$b}{SORT}
+        } keys(%categories))
+    {
+        my $data = $categories{$category};
+        my @errors = 
+            sort(grep(exists($errors{$_}{CATEGORIES}{$category}),keys(%errors)));
+        my $title = $categories{$category}{NAME} || "No Category";
+        my $desc = $data->{DESC} || '';
+        my $url ||= $data->{URL} || '';
+        print "$title\n";
+        print "  $desc\n";
+        print "  $url\n";
+        foreach my $error (@errors)
+        {
+	    my @descs = @{$errors{$error}{CATEGORIES}{$category}};
+	    @descs = ('No description available.')
+		if (!@descs);
+            print "    $errors{$error}{SYMBOL} $errors{$error}{CODE}\n".
+		join('',map("      $_\n",sort(@descs)));
+        }
+    }
+
+    return $success;
+}
+
+exit(main(@ARGV)?0:1);

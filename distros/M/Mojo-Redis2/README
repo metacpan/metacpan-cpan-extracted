@@ -1,0 +1,298 @@
+NAME
+    Mojo::Redis2 - Pure-Perl non-blocking I/O Redis driver
+
+VERSION
+    0.26
+
+DESCRIPTION
+    Mojo::Redis2 is a pure-Perl non-blocking I/O Redis <http://redis.io>
+    driver for the Mojolicious real-time framework.
+
+        Redis is an open source, BSD licensed, advanced key-value cache and
+        store. It is often referred to as a data structure server since keys
+        can contain strings, hashes, lists, sets, sorted sets, bitmaps and
+        hyperloglogs. - <http://redis.io>.
+
+    Features:
+
+    *   Blocking support
+
+        Mojo::Redis2 support blocking methods. NOTE: Calling non-blocking
+        and blocking methods are supported on the same object, but might
+        create a new connection to the server.
+
+    *   Error handling that makes sense
+
+        Mojo::Redis was unable to report back errors that was bound to an
+        operation. Mojo::Redis2 on the other hand always make sure each
+        callback receive an error message on error.
+
+    *   One object for different operations
+
+        Mojo::Redis had only one connection, so it could not do more than on
+        blocking operation on the server side at the time (such as BLPOP,
+        SUBSCRIBE, ...). This object creates new connections pr. blocking
+        operation which makes it easier to avoid "blocking" bugs.
+
+SYNOPSIS
+  Blocking
+      use Mojo::Redis2;
+      my $redis = Mojo::Redis2->new;
+
+      # Will die() on error.
+      $res = $redis->set(foo => "42"); # $res = OK
+      $res = $redis->get("foo");       # $res = 42
+
+  Non-blocking
+      Mojo::IOLoop->delay(
+        sub {
+          my ($delay) = @_;
+          $redis->ping($delay->begin)->get("foo", $delay->begin);
+        },
+        sub {
+          my ($delay, $ping_err, $ping, $get_err, $get) = @_;
+          # On error: $ping_err and $get_err is set to a string
+          # On success: $ping = "PONG", $get = "42";
+        },
+      );
+
+  Pub/sub
+    Mojo::Redis2 can "subscribe" and re-use the same object to "publish" or
+    run other Redis commands, since it can keep track of multiple
+    connections to the same Redis server. It will also re-use the same
+    connection when you (p)subscribe multiple times.
+
+      $self->on(message => sub {
+        my ($self, $message, $channel) = @_;
+      });
+
+      $self->subscribe(["some:channel"], sub {
+        my ($self, $err) = @_;
+
+        return $self->publish("myapp:errors" => $err) if $err;
+        return $self->incr("subscribed:to:some:channel");
+      });
+
+  Mojolicious app
+      use Mojolicious::Lite;
+
+      helper redis => sub { shift->stash->{redis} ||= Mojo::Redis2->new; };
+
+      get '/' => sub {
+        my $c = shift;
+
+        $c->delay(
+          sub {
+            my ($delay) = @_;
+            $c->redis->get('some:message', $delay->begin);
+          },
+          sub {
+            my ($delay, $err, $message) = @_;
+            $c->render(json => { error => $err, message => $message });
+          },
+        );
+      };
+
+      app->start;
+
+  Error handling
+    $err in this document is a string containing an error message or empty
+    string on success.
+
+EVENTS
+  connection
+      $self->on(connection => sub { my ($self, $info) = @_; ... });
+
+    Emitted when a new connection has been established. $info is a hash ref
+    with:
+
+      {
+        group => $str, # basic, blocking, blpop, brpop, brpoplpush, publish, ...
+        id => $connection_id,
+        nb => $bool, # blocking/non-blocking
+      }
+
+    Note: The structure of $info is EXPERIMENTAL.
+
+  error
+      $self->on(error => sub { my ($self, $err) = @_; ... });
+
+    Emitted if an error occurs that can't be associated with an operation.
+
+  message
+      $self->on(message => sub {
+        my ($self, $message, $channel) = @_;
+      });
+
+    Emitted when a $message is received on a $channel after it has been
+    subscribed to.
+
+  pmessage
+      $self->on(pmessage => sub {
+        my ($self, $message, $channel, $pattern) = @_;
+      });
+
+    Emitted when a $message is received on a $channel matching a $pattern,
+    after it has been subscribed to.
+
+ATTRIBUTES
+  encoding
+      $str = $self->encoding;
+      $self = $self->encoding('UTF-8');
+
+    Holds the encoding using for data from/to Redis. Default is UTF-8.
+
+  protocol
+    DEPRECATED! The protocol object cannot be shared in high load
+    environments.
+
+  protocol_class
+      $str = $self->protocol_class;
+      $self = $self->protocol_class('Protocol::Redis::XS');
+
+    Holds the class name used to parse/generate Redis messages. Defaults to
+    Protocol::Redis::XS or Protocol::Redis.
+
+    Protocol::Redis::XS need to be installed manually.
+
+  url
+      $url = $self->url;
+
+    Holds a Mojo::URL object with the location to the Redis server. Default
+    is "MOJO_REDIS_URL" or "redis://localhost:6379". The "url" need to be
+    set in constructor. Examples:
+
+      Mojo::Redis2->new(url => "redis://x:$auth_key\@$server:$port/$database_index");
+      Mojo::Redis2->new(url => "redis://10.0.0.42:6379");
+      Mojo::Redis2->new(url => "redis://10.0.0.42:6379/1");
+      Mojo::Redis2->new(url => "redis://x:s3cret\@10.0.0.42:6379/1");
+
+METHODS
+    In addition to the methods listed in this module, you can call these
+    Redis methods on $self:
+
+    append, echo, decr, decrby, del, exists, expire, expireat, get, getbit,
+    getrange, getset, hdel, hexists, hget, hgetall, hincrby, hkeys, hlen,
+    hmget, hmset, hset, hsetnx, hvals, incr, incrby, keys, lindex, linsert,
+    llen, lpop, lpush, lpushx, lrange, lrem, lset, ltrim, mget, move, mset,
+    msetnx, persist, ping, publish, randomkey, rename, renamenx, rpop,
+    rpoplpush, rpush, rpushx, sadd, scard, sdiff, sdiffstore, set, setbit,
+    setex, setnx, setrange, sinter, sinterstore, sismember, smembers, smove,
+    sort, spop, srandmember, srem, strlen, sunion, sunionstore, ttl, type,
+    zadd, zcard, zcount, zincrby, zinterstore, zrange, zrangebyscore, zrank,
+    zrem, zremrangebyrank, zremrangebyscore, zrevrange, zrevrangebyscore,
+    zrevrank, zscore and zunionstore.
+
+    See <http://redis.io/commands> for details.
+
+  new
+      $self = Mojo::Redis2->new(...);
+
+    Object constructor. Makes sure "url" is an object.
+
+  blpop
+      $self = $self->blpop(@keys, $timeout, sub { my ($self, $err, $res) = @_; });
+
+    This method will issue the BLPOP command on the Redis server, but in its
+    own connection. This means that $self can still be used to run other
+    commands instead of being blocking.
+
+    Note: This method will only work in a non-blocking environment.
+
+    See also <http://redis.io/commands/blpop>.
+
+  brpop
+      $self = $self->brpop(@keys, $timeout, sub { my ($self, $err, $res) = @_; });
+
+    Follows the same API as "blpop". See also
+    <http://redis.io/commands/brpop>.
+
+  brpoplpush
+      $self = $self->brpoplpush($from => $to, $timeout, sub { my ($self, $err, $res) = @_; });
+
+    Follows the same API as "blpop". See also
+    <http://redis.io/commands/brpoplpush>.
+
+  bulk
+      $obj = $self->bulk;
+
+    Returns a Mojo::Redis2::Bulk object which can be used to group Redis
+    operations.
+
+  client
+      $self->client->$method(@args);
+
+    Run "CLIENT" commands using Mojo::Redis2::Client.
+
+  backend
+      $self->backend->$method(@args);
+
+    Run server commands (CONFIG, INFO, SAVE, ...) using
+    Mojo::Redis2::Backend.
+
+  multi
+      $txn = $self->multi;
+
+    This method does not perform the "MULTI" Redis command, but returns a
+    Mojo::Redis2::Transaction object instead.
+
+    The Mojo::Redis2::Transaction object is a subclass of Mojo::Redis2,
+    which will run all the Redis commands inside a transaction.
+
+  psubscribe
+      $self = $self->psubscribe(\@patterns, sub { my ($self, $err, $res) = @_; ... });
+
+    Used to subscribe to channels that match @patterns. Messages arriving
+    over a matching channel name will result in "pmessage" events.
+
+    See <http://redis.io/topics/pubsub> for details.
+
+  punsubscribe
+      $self = $self->punsubscribe(\@patterns, sub { my ($self, $err, $res) = @_; ... });
+
+    The reverse of "psubscribe". See <http://redis.io/topics/pubsub> for
+    details.
+
+  scan, hscan, sscan, zscan
+      $cur = $self->scan(0, MATCH => 'namesoace*', COUNT => 15);
+      $cur = $self->hscan('hash.key', 0, MATCH => 'pref.*');
+      $cur = $self->sscan('set.key', 0);
+      $cur = $self->zscan('zset.key', 0);
+
+      $res = $cur->next();
+
+    Methods from "SCAN" family will return Mojo::Redis2::Cursor object to
+    iterate over elements collection.
+
+  subscribe
+      $self = $self->subscribe(\@channels, sub { my ($self, $err, $res) = @_; ... });
+
+    Used to subscribe to @channels. Messages arriving over a channel will
+    result in "message" events.
+
+    See <http://redis.io/topics/pubsub> for details.
+
+  unsubscribe
+      $self = $self->unsubscribe(\@channels, sub { my ($self, $err, $res) = @_; ... });
+      $self = $self->unsubscribe($event);
+      $self = $self->unsubscribe($event, $cb);
+
+    The reverse of "subscribe". It will also call "unsubscribe" in
+    Mojo::EventEmitter unless the first argument is an array-ref of
+    @channels.
+
+    See <http://redis.io/topics/pubsub> for details.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014, Jan Henning Thorsen
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+AUTHOR
+    Andre Parker
+
+    Ben Tyler - "benjamin.tyler@gmail.com"
+
+    Jan Henning Thorsen - "jhthorsen@cpan.org"
+

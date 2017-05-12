@@ -1,0 +1,12 @@
+MySQL::DateFormat
+
+This module provides an easy-to-use utility for converting dates
+to and from MySQL and human-readable formats. It has built-in
+error-checking and is highly customizable to fit your environment
+(although it works out of the box).
+
+This version requires Moose. Version 1.x is maintained for those who don't have Moose on their system.
+
+enjoy,
+
+- nick

@@ -1,0 +1,30 @@
+---
+doctype: dist
+
+header:
+  name: MoopsX-UsingMoose
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.014000
+      - Moo::Role
+      - Moops: 0.034
+  test:
+    requires:
+      - Moose: 2.000
+
+plugins:
+ - +config: Author::CSSON
+
+ - +add_plugin: TravisYML
+   +before: Git::Tag
+   perl_version: 5.14 5.16 5.20
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+
+  - +remove_plugin: Splint

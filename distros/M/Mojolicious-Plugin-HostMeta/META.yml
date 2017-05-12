@@ -1,0 +1,33 @@
+---
+abstract: 'Serve and Retrieve Host-Meta Documents'
+author:
+  - 'Nils Diewald'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-HostMeta
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '6.08'
+  Mojolicious::Plugin::Util::Callback: '0.02'
+  Mojolicious::Plugin::Util::Endpoint: '0.13'
+  Mojolicious::Plugin::XML::Loy: '0.13'
+  Mojolicious::Plugin::XRD: '0.17'
+  XML::Loy: '0.43'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/Akron/Mojolicious-Plugin-HostMeta/issues
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/Akron/Mojolicious-Plugin-HostMeta.git
+version: '0.23'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

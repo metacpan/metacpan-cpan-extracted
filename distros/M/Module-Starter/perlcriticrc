@@ -1,0 +1,25 @@
+[-CodeLayout::ProhibitParensWithBuiltins]
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+[-ControlStructures::ProhibitPostfixControls]
+
+[-Documentation::RequirePodAtEnd]
+[-Documentation::RequirePodSections]
+
+[-InputOutput::ProhibitInteractiveTest]
+[-InputOutput::ProhibitBacktickOperators]
+
+[-Miscellanea::RequireRcsKeywords]
+
+[-Modules::RequireVersionVar]
+
+[-NamingConventions::ProhibitMixedCaseSubs]
+
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireLineBoundaryMatching]
+
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+
+[-Variables::ProhibitPunctuationVars]
+[-BuiltinFunctions::ProhibitStringyEval]

@@ -1,0 +1,131 @@
+- Testing requirements after changes:
+  * Test all functions return either native or bigints.  Functions that
+    return raw MPU::GMP results will return strings, which isn't right.
+  * Valgrind, coverage
+  * use:  -O2 -g -Wall -Wextra -Wdeclaration-after-statement -fsigned-char
+  * Test on 32-bit Perl.  Test on Win32.
+
+
+- Move .c / .h files into separate directory.
+  version does it in a painful way.  Something simpler to be had?
+
+- finish test suite for bignum.  Work on making it faster.
+
+- An assembler version of mulmod for i386.
+
+- More efficient Mertens.  The current version has poor growth.
+  For 32-bit, consider doing XS followed by sum for remainder.
+
+- It may be possible to have a more efficient ranged totient.  We're using
+  the sieve up to n/2, which is better than most people seem to use, but I'm
+  not completely convinced we can't do better.  The method at:
+  http://codegolf.stackexchange.com/a/26747/30069 ends up very similar.  For
+  the monolithic results the main bottleneck seems to be the array return.
+
+- Big features:
+   - QS factoring
+
+- Figure out a way to make the internal FOR_EACH_PRIME macros use a segmented
+  sieve.
+
+- Rewrite 23-primality-proofs.t for new format (keep some of the old tests?).
+
+- Factoring in PP code is really wasteful -- we're calling _isprime7 before
+  we've done enough trial division, and later we're calling it on known
+  composites.  Note how the XS code splits the factor code into the public
+  API (small factors, isprime, then call main code) and main code (just the
+  algorithm).  The PP code isn't doing that, which means we're doing lots of
+  extra primality checks, which aren't cheap in PP.
+
+- Consider using Test::Number::Delta for many tests
+
+- More tweaking of LMO prime count.
+    - OpenMP.  The step 7 inner loop is available.
+    - Convert to 32-bit+GMP to support large inputs, add to MPU::GMP.
+    - Try __int128.
+    - Variable sieve size
+    - look at sieve.c style prime walking
+    - Fenwick trees for prefix sums
+
+- Iterators speedup:
+  1) config option for sieved next_prime.  Very general, would make
+     next_prime run fast when called many times sequentially.  Nasty
+     mixing with threads.
+  2) iterator, PrimeIterator, or PrimeArray in XS using segment sieve.
+
+- Perhaps have main segment know the filled in range.  That would allow
+  a sieved next_prime, and might speed up some counts and the like.
+
+- Benchmark simple SoEs, SoA.  Include Sisyphus SoE hidden in Math::GMPz.
+
+- Try using malloc/free for win32 cache memory.  #define NO_XSLOCKS
+
+- Investigate optree constant folding in PP compilation for performance.
+  Use B::Deparse to check.
+
+- Ensure a fast path for Math::GMP from MPU -> MPU:GMP -> GMP, and back.
+
+- We don't use legendre_phi for other functions any more, but it'd be nice
+  to speed it up using some ideas from the Ohana 2011 SAGE branch.  For example
+  (10**13,10**5) takes 2.5x longer, albeit with 6x less memory.
+
+- More Pari:  parforprime
+
+- znlog:
+    = GMP BSGS for znlog.
+    = Clean up znlog (PH, BSGS, Rho).
+    = Experiment with Wang/Zhang 2012 Rho cycle finding
+
+- consider using Ramanujan Li for PP code.
+
+- xt/pari-compare:  add chinese, factorial, vecmin, vecmax,
+                        bernfrac, bernreal, LambertW.
+
+- Proth test using LLR.  Change mersenne test file to test both.
+  Note: what does this mean?  Both LLR and Proth are in GMP now.
+
+- harmreal and harmfrac for general $k
+
+- For PP, do something like the fibprime examples.  At load time, look for
+  the best library (GMPz, GMP, Pari, BigInt) and set $BICLASS.  Then we
+  should use that class for everything.  Go ahead and return that type.
+  Make a config variable to allow get/set.
+
+- Support FH for print_primes.  PerlIO_write is giving me fits.
+
+- Test for print_primes.  Not as easy with filenos.
+
+- We should have a way to exit a forprimes loop.  E.g. add a lastfor() call.
+  Nested calls are doable, but threading is a bear.  Perhaps do a first
+  version that is non-threadsafe.
+
+- sum primes better than current method.  Especially using less memory.
+
+- bernreal and bernfrac using MPFR
+
+- divsum and divsummult as block functions.
+  The latter does sum = vecprod(1 + f(p_i) + f(p_i^2) + ... f(p_i^e) for all p.
+
+- surround_primes
+
+- More Montgomery: znlog, catalan
+
+- verify chinese to GMP is ok
+
+- numtoperm and permtonum.
+  Perhaps Bonet: https://github.com/soniakeys/perm/blob/master/lex.go
+  Also consider randperm(n)
+
+- polymul, polyadd, polydiv, polyneg, polyeval, polyorder, polygcd, polylcm, polyroots, ...
+  A lot of our ops do these mod n, we could make ..mod versions of each.
+
+---- \/ ------  Next release
+
+- put entropy_bytes call in XS.
+- have the RNG return a context and store it in our package context space.
+  Should help threaded performance by removing lock.
+  Careful to not leak state.
+- further processing on Ramanujan prime limits up to 4e14
+- consider random_nbit_semiprime(n, f = 0.5) f between 0 and 0.5
+
+- 5.8.5 gcdext complains about 3 vs. '3'.  ancient Test::More issue?

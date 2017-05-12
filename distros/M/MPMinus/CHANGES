@@ -1,0 +1,62 @@
+# Version/Revision history.
+
+1.00
+    * Initial release
+
+1.10 28 December 2011 MSK
+
+    * First release
+
+1.11 Tue Apr 16 10:54:51 2013 MSK
+
+    * To module-style start migration
+    * Added port number in url* configuration parameters
+
+1.12 Wed May  8 11:17:01 2013 MSK
+
+    * Documentation modified
+
+1.13 Fri May 10 10:48:33 2013 MSK
+
+    * Documentation modified
+    * Fixed distributive requirements
+    * MPMinus::BaseHandlers: Added extended methods
+
+1.14 Fri May 17 18:48:57 2013 MSK
+
+    * Documentation modified
+    * MPMinus::Transaction: MVC SKEL Transaction updated
+    * Added Manual page
+
+1.15 Wed May 29 13:32:57 2013 MSK
+
+    * Documentation modified
+    * MPMinus::Debug::System: Added documentation
+    * Added MPMinus::Helper::Skel module
+
+1.16 Mon Jul 15 20:50:33 2013 MSK
+
+    * Documentation modified
+    * Dependencies added
+
+1.17 Fri Jul 19 09:17:53 2013 MSK
+
+    * Documentation modified
+    * Helper: added project install command
+    * Fixed bug with skeleton location
+
+1.18 Fri Jul 26 13:11:35 2013 MSK
+
+    * Documentation modified
+    * MPMinus::Transaction: Introduced the concept of hooks and
+      fixed artifact #301
+    * Fixed without* bug
+
+1.19 Wed Oct  2 11:52:04 2013 MSK
+
+    * Documentation modified
+
+1.20 Tue Apr  4 08:14:50 2017 GMT
+
+    * Fixed and extended helper function: getApache, also added getApache2 alias
+    * Patched PATCH_20141100055: http://osdir.com/ml/modperl.perl.apache.org/2014-11/msg00055.html

@@ -1,0 +1,36 @@
+---
+abstract: 'Easy installation configuration for Mojolicious apps'
+author:
+  - 'Joel Berger'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-InstallablePaths
+no_index:
+  directory:
+    - t
+  file:
+    - README.pod
+provides:
+  Module::Build::Mojolicious:
+    file: lib/Module/Build/Mojolicious.pm
+    version: '0.03'
+  Mojolicious::Plugin::InstallablePaths:
+    file: lib/Mojolicious/Plugin/InstallablePaths.pm
+    version: '0.04'
+requires:
+  File::ShareDir: '1'
+  Module::Build: '0.38'
+  Module::Build::CleanInstall: '0.05'
+  Mojolicious: '3'
+resources:
+  bugtracker: http://github.com/jberger/Mojolicious-Plugin-InstallablePaths/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jberger/Mojolicious-Plugin-InstallablePaths
+version: '0.04'

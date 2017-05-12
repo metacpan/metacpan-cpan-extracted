@@ -1,0 +1,6 @@
+tell application "Finder"
+	set myTry to "Scratch"
+	set myDisks to every disk where startup is true
+	set myName to name of item 1 of myDisks
+	return myTry is myName
+end tell

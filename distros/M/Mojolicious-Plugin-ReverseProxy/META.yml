@@ -1,0 +1,31 @@
+---
+abstract: 'ReverseProxy plugin for the Mojolicious Perl framework'
+author:
+  - 'Tobias Oetiker <tobi@oetiker.ch>'
+build_requires:
+  CPAN::Uploader: '0'
+  Pod::Markdown::Github: '0.01'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-ReverseProxy
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+    - example
+    - setup
+requires:
+  Mojolicious: '7.00'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/oetiker/Mojolicious-Plugin-ReverseProxy/issues
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/oetiker/Mojolicious-Plugin-ReverseProxy
+version: '0.705'

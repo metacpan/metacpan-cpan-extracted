@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+dist.ini
+lib/Mason/Plugin/QuoteFilters.pm
+lib/Mason/Plugin/QuoteFilters/Filters.pm
+t/QuoteFilters.t
+t/perlcriticrc
+t/tests/QuoteFilters.pm

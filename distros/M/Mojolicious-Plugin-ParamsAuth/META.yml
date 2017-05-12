@@ -1,0 +1,19 @@
+---
+abstract: 'URL Parameters Auth Helper'
+author:
+  - 'Glen Hinkle <tempire@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-ParamsAuth
+requires:
+  Mojolicious: '1.41'
+resources:
+  repository: git://github.com/tempire/mojolicious-plugin-paramsauth.git
+version: '0.03'

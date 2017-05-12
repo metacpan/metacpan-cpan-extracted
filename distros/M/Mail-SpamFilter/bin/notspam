@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+#############################################################################
+## notspam
+## Copyright (C) 2004  Martin Ward  http://www.cse.dmu.ac.uk/~mward/
+## Email: martin@gkc.org.uk
+##
+## This program is free software; you can redistribute it and/or modify
+## it under the same terms as Perl itself, either Perl version 5.8.1 or, at
+## at your option, any later version of Perl 5 you may have available.
+##
+#############################################################################
+# Learn a message as not spam (HAM): train on errors only
+#
+
+use strict;
+use warnings;
+use Mail::SpamFilter ':all';
+
+my $HOME = $ENV{'HOME'} || $ENV{'LOGDIR'} ||
+                (getpwuid($<))[7] || die "You're homeless!\n";
+
+my @filters = @Mail::SpamFilter::FILTER_LIST;
+@filters = grep { $_ ne "dspam" } @filters;
+
+my $V = 1;
+if (@ARGV && $ARGV[0] eq "-s") {
+  shift(@ARGV);
+}
+
+if (@ARGV && $ARGV[0] eq "x" && -f "$HOME/Documents/x") {
+  $ARGV[0] = "$HOME/Documents/x";
+}
+
+# Slurp message from command line or STDIN:
+undef $/;
+my $msg = <>;
+die unless defined($msg);
+
+$msg =~ s/\nX-Spam-Votes:.*//;
+
+my ($tags, $header, $body) = filter_message($msg, @filters);
+
+my ($spam_count, $good_count, $spam_voters, $good_voters)
+  = count_votes($tags, @filters);
+
+print "Reporting message to: @{$spam_voters}\n" if $V;
+
+close(STDOUT);
+open(STDOUT, ">/dev/null");
+
+report_message("good", $msg, @{$spam_voters});
+

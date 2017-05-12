@@ -1,0 +1,17 @@
+Changes
+lib/MIME/EcoEncode.pm
+lib/MIME/EcoEncode.pod
+lib/MIME/EcoEncode/Fold.pm
+lib/MIME/EcoEncode/Fold.pod
+lib/MIME/EcoEncode/JP_B.pm
+lib/MIME/EcoEncode/JP_Q.pm
+lib/MIME/EcoEncode/Param.pm
+lib/MIME/EcoEncode/Param.pod
+Makefile.PL
+MANIFEST			This list of files
+README
+t/EcoEncode.t
+t/Fold.t
+t/Param.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

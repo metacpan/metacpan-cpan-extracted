@@ -1,0 +1,65 @@
+    Mojolicious::Plugin::Dotcloud - Easy access to your dotCloud environment
+    from your Mojolicious app.
+
+VERSION
+    version 1.01
+
+SYNOPSIS
+        use Mojolicious::Plugin::Dotcloud
+
+        $self->plugin('dotcloud' => {
+            ...
+        });
+
+HELPERS
+  dotcloud
+    This helper gives you access to the DotCloud::Environment object and all
+    it's methods. See the DotCloud::Environment documentation for more
+    information.
+
+SEE ALSO
+    DotCloud::Environment
+
+AUTHOR
+    Ben van Staveren, "<madcat at cpan.org>"
+
+BUGS / CONTRIBUTING
+    Please report any bugs or feature requests through the web interface at
+    <https://github.com/benvanstaveren/mojolicious-plugin-dotcloud/issues>.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Mojolicious::Plugin::Dotcloud
+
+    You can also look for information at:
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Mojolicious-Plugin-Authentication>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Mojolicious-Plugin-Authentication>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Mojolicious-Plugin-Authentication/>
+
+LICENSE AND COPYRIGHT
+    Copyright 2011-2012 Ben van Staveren.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 22:
+        =pod directives shouldn't be over one line long! Ignoring all 2
+        lines of content
+

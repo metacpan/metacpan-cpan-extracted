@@ -1,0 +1,31 @@
+Module/Locate
+=============
+
+Using locate(), return the path that require would find for a given module (it
+can also return a filehandle if a reference in INC has been used). This means
+you can test for the existence, or find the path for, modules without having to
+evaluate the code they contain.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  IO::File
+  File::Spec
+  Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2012 Dan Brook
+
+This code is distributed under the same copyright terms as Perl itself.
+

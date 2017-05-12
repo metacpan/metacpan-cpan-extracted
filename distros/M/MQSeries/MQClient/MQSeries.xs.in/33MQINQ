@@ -1,0 +1,162 @@
+# -*-c-*-
+#
+# $Id: 33MQINQ,v 33.4 2012/09/26 16:10:03 jettisu Exp $
+#
+# (c) 1999-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+void
+MQINQ(Hconn,Hobj,CompCode,Reason,...)
+        MQHCONN Hconn
+        MQHOBJ  Hobj
+        MQLONG  CompCode = NO_INIT
+        MQLONG  Reason = NO_INIT
+
+    PREINIT:
+        MQLONG    SelectorCount = 0L;
+        PMQLONG   pSelectors = (PMQLONG)0L;
+        MQLONG    IntAttrCount = 0L;
+        PMQLONG   pIntAttrs = (PMQLONG)0L;
+        MQLONG    CharAttrLength = 0;
+        PMQCHAR   pCharAttrs = (PMQCHAR)0L;
+        SV       *tempSV = (SV *)0;
+        SV      **svp;
+        MQLONG    loop = 0;
+        MQLONG    tempSelector = 0;
+        int       tempLen = 0;
+        char      attrKey[8];
+        HV       *AttributeLengthHV;
+
+    PPCODE:
+        /*
+         * Initialize these for the various random failure cases.
+         */
+        CompCode = MQCC_FAILED;
+        Reason = MQRC_UNEXPECTED_ERROR;
+        sv_setiv(ST(2),(IV)CompCode);
+        sv_setiv(ST(3),(IV)Reason);
+
+        if ( (AttributeLengthHV = perl_get_hv("MQSeries::Constants::AttributeLength",0)) == NULL ) {
+            warn("Unable to access %%MQSeries::Constants::AttributeLength hash\n");
+            XSRETURN_EMPTY;
+        }
+
+        /*
+         * I'd like this to be an error, but prior to touching this
+         * code, it wasn't.
+         * So, if you pass in nothing, you'll get nothing.
+         */
+        if ( (SelectorCount = (MQLONG)items - 4) <= 0 ) {
+            CompCode = MQCC_OK;
+            Reason = MQRC_NONE;
+            sv_setiv(ST(2),(IV)CompCode);
+            sv_setiv(ST(3),(IV)Reason);
+            XSRETURN_EMPTY;
+        }
+
+        if ( (pSelectors = (PMQLONG)malloc(SelectorCount*sizeof(MQLONG))) == NULL ) {
+            warn("Unable to allocate memory for Selectors in MQINQ.\n");
+            XSRETURN_EMPTY;
+        }
+
+        for (loop = 0; loop < SelectorCount; loop++) {
+            tempSV = ST(loop+4);
+            tempSelector = SvIV(tempSV);
+
+            if ( (tempSelector >= MQIA_FIRST) && (tempSelector <= MQIA_LAST) )
+                IntAttrCount++;
+            else if ( (tempSelector >= MQCA_FIRST) && (tempSelector <= MQCA_LAST) ) {
+                sprintf(attrKey, "%ld", (long)tempSelector);
+                svp = hv_fetch(AttributeLengthHV,attrKey,strlen(attrKey),0);
+                if ( svp == NULL ) {
+                    free(pSelectors);
+                    warn("Unknown attribute selector value '%d' passed to MQINQ\n",tempSelector);
+                    XSRETURN_EMPTY;
+                }
+                CharAttrLength += SvIV(*svp);
+            } else {
+                free(pSelectors);
+                warn("Selector value %d invalid in MQINQ\n",tempSelector);
+                XSRETURN_EMPTY;
+            }
+            pSelectors[loop] = tempSelector;
+        }
+
+        if ( IntAttrCount > 0 ) {
+            if ( (pIntAttrs = (PMQLONG)malloc(IntAttrCount*sizeof(MQLONG))) == NULL ) {
+                free(pSelectors);
+                warn("Unable to allocate memory in MQINQ\n");
+                XSRETURN_EMPTY;
+            }
+        }
+
+        if ( CharAttrLength > 0 ) {
+            if ( (pCharAttrs = (PMQCHAR)malloc(CharAttrLength)) == NULL ) {
+                free(pSelectors);
+                if (pIntAttrs)
+                    free(pIntAttrs);
+                warn("Unable to allocate memory in MQINQ\n");
+                XSRETURN_EMPTY;
+            }
+        }
+
+        MQINQ(Hconn,
+              Hobj,
+              SelectorCount,
+              pSelectors,
+              IntAttrCount,
+              pIntAttrs,
+              CharAttrLength,
+              pCharAttrs,
+              &CompCode,
+              &Reason);
+
+        sv_setiv(ST(2),(IV)CompCode);
+        sv_setiv(ST(3),(IV)Reason);
+
+        if (CompCode == MQCC_OK) {
+            PMQLONG pCurIntAttr = pIntAttrs;
+            PMQCHAR pCurCharAttr = pCharAttrs;
+
+            for (loop = 0; loop < SelectorCount; loop++) {
+                tempSelector = pSelectors[loop];
+                if ( (tempSelector >= MQIA_FIRST) && (tempSelector <= MQIA_LAST) ) {
+                    XPUSHs(sv_2mortal(newSViv(*pCurIntAttr)));
+                    pCurIntAttr++;
+                } else if ( (tempSelector >= MQCA_FIRST) && (tempSelector <= MQCA_LAST) ) {
+                    sprintf(attrKey, "%ld", (long)tempSelector);
+                    svp = hv_fetch(AttributeLengthHV,attrKey,strlen(attrKey),0);
+                    if ( svp == NULL ) {
+                        free(pSelectors);
+                        if (pIntAttrs)
+                            free(pIntAttrs);
+                        if (pCharAttrs)
+                            free(pCharAttrs);
+                        /* Reset cc/rc to the random failure case */
+                        CompCode = MQCC_FAILED;
+                        Reason = MQRC_UNEXPECTED_ERROR;
+                        sv_setiv(ST(2),(IV)CompCode);
+                        sv_setiv(ST(3),(IV)Reason);
+                        warn("Unknown selector attribute '%d' returned from MQINQ\n",tempSelector);
+                        XSRETURN_EMPTY;
+                    }
+                    tempLen = SvIV(*svp);
+                    XPUSHs(sv_2mortal(newSVpvn(pCurCharAttr,tempLen)));
+                    pCurCharAttr += tempLen;
+                } else {
+                    free(pSelectors);
+                    if (pIntAttrs)
+                        free(pIntAttrs);
+                    if (pCharAttrs)
+                        free(pCharAttrs);
+                    /* Reset cc/rc to the random failure case */
+                    CompCode = MQCC_FAILED;
+                    Reason = MQRC_UNEXPECTED_ERROR;
+                    sv_setiv(ST(2),(IV)CompCode);
+                    sv_setiv(ST(3),(IV)Reason);
+                    warn("Invalid selector attribute '%d' returned from MQINQ\n",tempSelector);
+                    XSRETURN_EMPTY;
+                }
+            }
+        } /* end if (CompCode == MQCC_OK) */

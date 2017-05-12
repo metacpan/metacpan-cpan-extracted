@@ -1,0 +1,88 @@
+# PODNAME: MarpaX::ESLIF::Recognizer::Interface
+
+# ABSTRACT: MarpaX::ESLIF's recognizer interface
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+MarpaX::ESLIF::Recognizer::Interface - MarpaX::ESLIF's recognizer interface
+
+=head1 VERSION
+
+version 2.0.4
+
+=head1 DESCRIPTION
+
+Recognizer interface is a list of methods that are required by MarpaX::ESLIF at run-time when it needs more data. It has to be an object instance, referenced with C<$recognizerInterface> below.
+
+=head1 METHODS
+
+=over
+
+=item $recognizerInterface->read()
+
+Performs read of user data and returns a true value on success, a false value otherwise. C<$recognizerInterface> is responsible to maintain the status in terms of: data content, data type (binary or character), eof flag, eventual encoding information, that are queried using the following methods:
+
+=item $recognizerInterface->isEof()
+
+Returns a boolean value indicating the end of the stream.
+
+=item $recognizerInterface->isCharacterStream()
+
+Returns a boolean value indicating if current chunk is a character stream or not.
+
+=item $recognizerInterface->encoding()
+
+Encoding of latest chunk of data, when the later is a character chunk. It is legal to return C<undef>.
+
+If current chunk of data is a character stream, and this method returns C<undef>, then marpaESLIF will either:
+
+=over
+
+=item guess the encoding if there previous chunk of data was not a character stream,
+
+=item continue with previous encoding if previous chunk of data was a character stream
+
+=back
+
+=item $recognizerInterface->data()
+
+Returns data content of current chunk, may be of zero size.
+
+=item $recognizerInterface->isWithDisableThreshold()
+
+Returns a boolean indicating if exhaustion should trigger an exhaustion event.
+
+When the parse is exhausted, the normal behavior is to exit with an error if the eof flag is not set. This method is saying that an exhaustion event should be raised instead, and is used at recognizer creation step only.
+
+=item $recognizerInterface->isWithNewline()
+
+Returns a boolean indicating if line/number accounting is on.
+
+Error reporting can be accurate up to line and column numbers when this is happening on a character stream enabled chunk of data. This is handy, but has an extra cost on parsing performance. This method is used at recognizer creation step only.
+
+=item $recognizerInterface->isWithTrack()
+
+Returns a boolean indicating if absolute position tracking is on.
+
+Absolute position tracking must be on if you plan to use one of the lastCompletedOffset(), lastCompletedLength() or lastCompletedLocation() recognizer methods. The information returned by these methods is not fully reliable, because ESLIF will not check if there is a turnaround with associated internal variables.
+
+=back
+
+=head1 AUTHOR
+
+Jean-Damien Durand <jeandamiendurand@free.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Jean-Damien Durand.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

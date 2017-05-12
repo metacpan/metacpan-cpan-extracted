@@ -1,0 +1,25 @@
+.cvsignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Memoize/.cvsignore
+lib/Memoize/Lift.pm
+lib/Memoize/Lift.xs
+t/bad_syntax.t
+t/basic.t
+t/context.t
+t/exception.t
+t/hint_in.t
+t/lex_in.t
+t/lex_out.t
+t/list.t
+t/pod_cvg.t
+t/pod_syn.t
+t/precedence.t
+t/struct.t
+t/undef.t
+SIGNATURE    Added here by Module::Build

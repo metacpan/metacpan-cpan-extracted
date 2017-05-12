@@ -1,0 +1,41 @@
+{
+   "abstract" : "MP3 files merger and streamer to web browser",
+   "author" : [
+      "Ahmed Amin ELsheshtawy <support@mewsoft.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MP3-Merge",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MPEG::Audio::Frame" : "0.08"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.01"
+}

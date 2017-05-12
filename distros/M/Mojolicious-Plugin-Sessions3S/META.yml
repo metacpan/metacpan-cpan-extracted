@@ -1,0 +1,24 @@
+---
+abstract: 'Manage Sessions Storage, State and Sid generation in Mojolicious'
+author:
+  - 'Jerome Eteve <jerome.eteve@gmail.com>'
+build_requires:
+  CHI: '0'
+  JSON: '0'
+  Test::MockTime: '0.15'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Sessions3S
+requires:
+  Mojolicious: '6.57'
+resources:
+  homepage: https://github.com/jeteve/Mojolicious-Plugin-Sessions3S
+  repository: https://github.com/jeteve/Mojolicious-Plugin-Sessions3S.git
+version: '0.004'

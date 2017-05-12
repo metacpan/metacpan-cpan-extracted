@@ -1,0 +1,41 @@
+-- MySQL dump 8.23
+--
+-- Host: localhost    Database: mobynamespace
+---------------------------------------------------------
+-- Server version	4.1.12-standard
+
+--
+-- Table structure for table `namespace`
+--
+
+CREATE TABLE namespace (
+  namespace_id int(10) unsigned NOT NULL auto_increment,
+  namespace_lsid varchar(255) NOT NULL default '',
+  namespace_type varchar(255) NOT NULL default '',
+  description text NOT NULL,
+  authority varchar(255) NOT NULL default '',
+  contact_email varchar(255) NOT NULL default '',
+  object text,
+  generic_url tinytext,
+  synonym text,
+  url_syntax text,
+  url_example text,
+  shorthand_name varchar(255) default NULL,
+  example_id varchar(255) default NULL,
+  note mediumtext,
+  PRIMARY KEY  (namespace_id),
+  UNIQUE KEY namespace_type (namespace_type)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `namespace_term2term`
+--
+
+CREATE TABLE namespace_term2term (
+  assertion_id int(10) unsigned NOT NULL auto_increment,
+  relationship_type varchar(255) NOT NULL default '',
+  namespace1_id int(11) NOT NULL default '0',
+  namespace2_id int(11) NOT NULL default '0',
+  PRIMARY KEY  (assertion_id)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+

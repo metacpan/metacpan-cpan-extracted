@@ -1,0 +1,32 @@
+---
+abstract: 'File backend for Minion'
+author:
+  - 'Nic Sandfield <niczero@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.3'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Minion-Backend-Storable
+no_index:
+  directory:
+    - t
+    - inc
+    - test
+requires:
+  Minion: '5'
+  Mojolicious: '6.3'
+  perl: '5.010001'
+resources:
+  IRC: irc://irc.perl.org/#mojo
+  bugtracker: https://github.com/niczero/minion-backend-storable/issues
+  homepage: https://niczero.github.io
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/niczero/minion-backend-storable.git
+version: 5.083
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

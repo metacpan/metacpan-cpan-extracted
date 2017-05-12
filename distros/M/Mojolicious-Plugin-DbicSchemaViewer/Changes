@@ -1,0 +1,119 @@
+Revision history for Mojolicious-Plugin-DbicSchemaViewer
+
+0.0200 2016-09-20 15:42:06 UTC
+ [New Features]
+ - The visualizer tab reimplemented to use improved
+   DBIx::Class::Visualizer.
+
+ [Requirements]
+ - DBIx::Class::Visualizer is now required.
+
+ [Documentation]
+ - The included static example file has been replaced with an online demo.
+
+ [Stats & Dependency Changes]
+ - 18 files changed, 953 insertions(+), 449 deletions(-)
+ - (run req) + DBIx::Class::Visualizer 0.0200
+ - (run req) + File::HomeDir (any)
+ - (run req) + File::ShareDir 1.102
+ - (run req) + PerlX::Maybe 1.001
+ - (run req) + String::Random (any)
+ - (run req) + String::Stomp 0.0102
+ - (run req) + Syntax::Feature::Qi (any)
+ - (run req) - File::ShareDir::Tarball
+ - (dev req) + Dist::Zilla::Plugin::ShareDir (any)
+ - (dev req) ~ Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0100
+   --> 0.0200
+ - (dev req) - Dist::Zilla::Plugin::ShareDir::Tarball
+
+0.0102 2016-09-04T20:50:39Z UTC
+ [Enhancements]
+ - If DBIx::Class::Visualized is installed, a graphical representation of
+   the schema can be rendered.
+
+ [Testing]
+ - Expanded the test schema (which is also used as an example).
+
+ [Documentation]
+ - Fixed some typos.
+
+ [Stats & Dependency Changes]
+ - 16 files changed, 445 insertions(+), 68 deletions(-)
+ - (run req) + DateTime::Tiny 1.06
+ - (run req) + Mojolicious::Plugin::BootstrapHelpers 0.0201
+ - (run req) ~ Path::Tiny (any) --> 0.072
+ - (run req) ~ Safe::Isa (any) --> 1.000005
+ - (test req) + IO::Handle (any)
+ - (test req) + IPC::Open3 (any)
+ - (conf req) + ExtUtils::MakeMaker (any)
+ - (conf req) + File::ShareDir::Install 0.06
+ - (conf req) - Module::Build::Tiny
+ - (dev req) + Badge::Depot 0.0103
+ - (dev req) + Badge::Depot::Plugin::Coverage (any)
+ - (dev req) + Badge::Depot::Plugin::Cpantesters (any)
+ - (dev req) + Badge::Depot::Plugin::Kwalitee (any)
+ - (dev req) + Badge::Depot::Plugin::Perl (any)
+ - (dev req) + Badge::Depot::Plugin::Travis (any)
+ - (dev req) + Dist::Zilla 5.000
+ - (dev req) + Dist::Zilla::Plugin::Authority 1.009
+ - (dev req) + Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.007
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0100
+ - (dev req) + Dist::Zilla::Plugin::Clean 0.07
+ - (dev req) + Dist::Zilla::Plugin::DistIller::MetaGeneratedBy (any)
+ - (dev req) + Dist::Zilla::Plugin::Git 2.036
+ - (dev req) + Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.013
+ - (dev req) + Dist::Zilla::Plugin::Git::Commit (any)
+ - (dev req) + Dist::Zilla::Plugin::Git::Contributors 0.017
+ - (dev req) + Dist::Zilla::Plugin::InstallRelease 0.008
+ - (dev req) + Dist::Zilla::Plugin::MakeMaker (any)
+ - (dev req) + Dist::Zilla::Plugin::MetaConfig (any)
+ - (dev req) + Dist::Zilla::Plugin::NextRelease::Grouped 0.0200
+ - (dev req) + Dist::Zilla::Plugin::PromptIfStale (any)
+ - (dev req) + Dist::Zilla::Plugin::RewriteVersion::Transitional 0.007
+ - (dev req) + Dist::Zilla::Plugin::Test::Compile 2.054
+ - (dev req) + Dist::Zilla::Plugin::Test::EOF 0.0501
+ - (dev req) + Dist::Zilla::Plugin::Test::EOL 0.18
+ - (dev req) + Dist::Zilla::Plugin::Test::Kwalitee::Extra v0.2.1
+ - (dev req) + Dist::Zilla::Plugin::Test::NoTabs 0.15
+ - (dev req) + Dist::Zilla::Plugin::Test::Version 1.05
+ - (dev req) + Pod::Weaver::Section::GenerateSection 1.01
+ - (dev req) + Test::EOF (any)
+ - (dev req) + Test::EOL (any)
+ - (dev req) + Test::More 0.88
+ - (dev req) + Test::NoTabs 1.4
+ - (dev req) + Test::Version 1
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild (any) --> 0.151680
+ - (dev req) ~ Dist::Zilla::Plugin::GithubMeta (any) --> 0.54
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package (any) -->
+   2.003001
+ - (dev req) ~ Dist::Zilla::Plugin::PodWeaver (any) --> 4.006
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod (any) --> 0.150250
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests (any) --> 0.028
+ - (dev req) ~ Dist::Zilla::Plugin::Test::ReportPrereqs (any) --> 0.021
+ - (dev req) ~ Dist::Zilla::Plugin::TravisYML (any) --> 1.15
+ - (dev req) ~ Pod::Weaver::Section::Badges (any) --> 0.0401
+ - (dev req) ~ Test::Warnings (any) --> 0.026
+ - (dev req) - Dist::Zilla::Plugin::CheckExtraTests
+ - (dev req) - Dist::Zilla::Plugin::ContributorsFromGit
+ - (dev req) - Dist::Zilla::Plugin::MetaProvides::Class
+ - (dev req) - Dist::Zilla::Plugin::ModuleBuildTiny
+ - (dev req) - Dist::Zilla::Plugin::NextRelease
+ - (dev req) - Dist::Zilla::Plugin::NextVersion::Semantic
+ - (dev req) - Dist::Zilla::Plugin::OurPkgVersion
+ - (dev req) - Dist::Zilla::Plugin::PodnameFromClassname
+ - (dev req) - Dist::Zilla::Plugin::Prereqs::Plugins
+ - (dev req) - Dist::Zilla::Plugin::PreviousVersion::Changelog
+ - (dev req) - Dist::Zilla::Plugin::ReversionOnRelease
+ - (dev req) - Pod::Weaver::Section::Homepage::DefaultCPAN
+ - (dev req) - Pod::Weaver::Section::Source::DefaultGitHub
+ - (dev sug) + Dist::Iller 0.1408
+ - (dev sug) + Dist::Iller::Config::Author::CSSON 0.0312
+
+0.0101 2015-10-28T19:08:49Z UTC
+ [Documentation]
+ - Fixed bad internal links.
+
+0.0100 2015-10-28T18:21:23Z UTC
+ - Initial release

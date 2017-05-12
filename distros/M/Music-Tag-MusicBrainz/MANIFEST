@@ -1,0 +1,12 @@
+CHANGES
+eg/printinfo.pl
+lib/Music/Tag/MusicBrainz.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/1-musicbranz.t
+t/2-pod.t
+t/3-pod-coverage.t
+Copying
+Artistic

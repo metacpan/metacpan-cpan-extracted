@@ -1,0 +1,85 @@
+NAME
+    Mock::Apache - mock Apache environment for testing and debugging
+
+SYNOPSIS
+        use Mock::Apache;
+
+        my $server  = Mock::Apache->setup_server(param => 'value', ...);
+        my $request = $server->new_request(method_name => 'value', ...);
+
+        $server->
+
+DESCRIPTION
+    "Mock::Apache" is a mock framework for testing and debugging mod_perl
+    1.x applications. Although that version of mod_perl is obsolete, there
+    is still a lot of legacy code that uses it. The framework is intended to
+    assist in understanding such code, by enabling it to be run and debugged
+    outside of the web server environment. The framework provides a tracing
+    facility that prints all methods called, optionally with caller
+    information.
+
+    "Mock::Apache" is based on "Apache::FakeRequest" but goes beyond that
+    module, attempting to provide a relatively comprehensive mocking of the
+    mod_perl environment.
+
+    NOTE: the module is still very much at an alpha stage, with much of the
+    Apache::* classes missing, and much of the emulation incomplete or
+    probably just wrong.
+
+    I am aiming to provide top-level methods to "process a request", by
+    giving the mock apache object enough information about the configuration
+    to identify handlers, etc. Perhaps passing the server_setup method the
+    pathname of an Apache configuration file even and minimally "parsing"
+    it.
+
+METHODS
+  setup_server
+  new_request
+  execute_handler
+    localizes elements of the %ENV hash
+
+DEPENDENCIES
+    Apache::FakeTable
+        for emulation of "Apache::Table" (but this is subclassed to emulate
+        pnotes tables, which can store references)
+
+    Module::Loaded
+        to pretend that the "Apache::*" modules are loaded.
+
+    IO::Scalar
+        for tieing "STDOUT" to the Apache response
+
+BUGS AND LIMITATIONS
+    The intent of this package is to provide an emulation of "mod_perl" 1.3
+    that that will allow straightforward handlers to be unit-tested outside
+    the Apache/mod_perl environment. However it will probably never provide
+    perfect emulation.
+
+    The package is still in an early alpha stage and is known to be
+    incomplete. Feedback and patches to improve the software are most
+    welcome.
+
+SEE ALSO
+    https://github.com/fordmason/Mock-Apache
+
+    *mod_perl Pocket Reference* by Andrew Ford, O'Reilly & Associates, Inc,
+    Sebastapol, 2001, ISBN: 0-596-00047-2
+
+ACKNOWLEDGEMENTS
+    Inspired by "Apache::FakeRequest" by Doug MacEachern, with contributions
+    from Andrew Ford <andrew@ford-mason.co.uk>.
+
+AUTHORS
+    Andrew Ford <andrew@ford-mason.co.uk>
+
+LICENSE AND COPYRIGHT
+    Copyright (C) 2013 Andrew Ford (<andrew@ford-mason.co.uk>). All rights
+    reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

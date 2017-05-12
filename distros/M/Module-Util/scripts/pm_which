@@ -1,0 +1,294 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+our $VERSION = '1.02';
+
+# Removing this dependency
+# use Text::Trim qw( trim );
+use List::Util qw( max );
+use Module::Util qw( :all );
+
+use Pod::Usage;
+use Getopt::Long qw( :config posix_default bundling );
+
+=head1 NAME
+
+pm_which - find installed modules
+
+=head1 SYNOPSIS
+
+    pm_which [ options ] module(s)
+
+    Returns the path to the given module(s)
+
+=head2 OPTIONS
+  
+    -q, --quiet     Just print paths
+    -p, --paths     Just convert the module name into a relative path
+    -a, --all       Print all paths, not just the first one found
+    -n, --namespace Print all modules in the given namespace
+    -m              Only print module names, not paths
+    -V              Show module version
+    -I libpath      Add a path to search (like perl -I)
+    -d, --dump      Dump paths that would be searched (@INC by default)
+    -h, --help      Print this message
+    -v, --version   Print version information
+    -               Read modules from stdin, one per line
+  
+=cut
+
+our($quiet, $all, $namespace, $name_only, $paths, $dump, $stdin, $version);
+our @search = @INC;
+
+GetOptions(
+    'q|quiet'       => \$quiet,
+    'a|all'         => \$all,
+    'p|paths'       => \$paths,
+    'd|dump'        => \$dump,
+    'n|namespace'   => \$namespace,
+    'm'             => \$name_only,
+    'V'             => \$version,
+    ''              => \$stdin,
+    'h|help'        => sub { pod2usage(-exitval => 0) },
+    'I=s'           => sub { unshift @search, $_[1] },
+    'v|version'     => \&version,
+) or pod2usage( -exitval => 1 );
+
+if ($dump) {
+    print join("\n", @search), "\n";
+    exit 0;
+}
+
+require ExtUtils::MakeMaker if $version;
+
+our @modules = @ARGV;
+
+# Also read module names from STDIN if we have '-' switch
+
+# Removing Text::Trim dependency
+# push @modules, trim <STDIN> if $stdin;
+
+if ($stdin) {
+    my @from_stdin = <STDIN>;
+
+    for (@from_stdin) {
+        s/\A\s*//;
+        s/\s*\z//;
+    }
+
+    push @modules, @from_stdin;
+}
+
+pod2usage( -exitval => 1, -message => 'No modules selected')
+    unless @modules;
+
+if ($namespace) {
+    my @found;
+
+    for my $ns (@modules) {
+        push @found, $ns if find_installed($ns, @search);
+        push @found, find_in_namespace($ns, @search);
+    }
+
+    @modules = @found;
+}
+
+# We can just print and exit if we're just interested in module names.
+# However, if we also want versions, we have to get the path(s) anyway.
+if ($name_only and not $version) {
+    print map { "$_\n" } @modules;
+    exit 0;
+}
+
+# Find the maximum length of module names
+my $width = max map { length } @modules;
+my $exit = 0;
+
+MODULE:
+for my $module (@modules) {
+    unless (is_valid_module_name($module)) {
+        # Maybe the module is actually a path:
+        my $new = path_to_module($module)
+               || fs_path_to_module($module);
+
+        if ($new) {
+            $module = $new;
+        }
+        else {
+            $exit = 2;
+            warn "'$module' is not a valid module name\n";
+            next MODULE;
+        }
+    }
+
+    if ($paths) {
+        print module_path $module, "\n";
+        next MODULE;
+    }
+
+    my @paths = $all ? all_installed($module, @search)
+                     : find_installed($module, @search)
+                     ;
+
+    my $prefix = '';
+    unless ($quiet or @modules == 1 or $name_only) {
+        # print the module name as well as the path
+        $prefix = sprintf("%-${width}s - ", $module);
+    }
+
+    if (@paths) {
+        for my $path (@paths) {
+            if ($version) {
+                my $version = eval { MM->parse_version($path) };
+                if ($@) {
+                    warn "$0: Error finding version for '$module': $@\n";
+                    $exit = 2;
+                }
+
+                # We might not want to display the path
+                $path = $module if $name_only;
+
+                $path .= defined $version ? " [ $version ]" : '';
+            }
+
+            print $prefix, $path, "\n";
+        }
+    }
+    else {
+        $exit = 2;
+        print $prefix, "not found\n" unless $quiet;
+    }
+}
+
+exit $exit;
+
+sub version {
+    my $path = module_is_loaded('Module::Util');
+    print "pm_which $VERSION\n",
+          "Using Module::Util $Module::Util::VERSION at $path\n";
+    exit 0;
+}
+
+__END__
+
+=head1 DESCRIPTION
+
+This tool reports the locations of installed perl modules.
+
+By default it lists the location of each specified module that would be loaded
+by require.
+
+=head1 OPTION DETAILS
+
+=head2 quiet
+
+Under quiet mode, module names are suppressed and missing modules are not
+reported.
+
+Normal output:
+
+    $ pm_which Module::One Module::Two Missing::Module
+    Module::One     - /path/to/Module/One.pm
+    Module::Two     - /path/to/Module/Two.pm
+    Missing::Module - not found
+
+Under --quiet:
+
+    $ pm_which -q Module::One Module::Two Missing::Module
+    /path/to/Module/One.pm
+    /path/to/Module/Two.pm
+
+=head2 paths
+
+In "paths" mode, each module is simply converted into a relative file path. This
+is possible even when the module is not installed.
+
+    $ pm_which -p Missing::Module
+    Missing/Module.pm
+
+=head2 all
+
+When the "all" switch is specified, all installed modules will be reported, not
+just the first one. This is useful for determining when there is a module
+installed in multiple locations.
+
+    $ pm_which -a MyModule
+    /path/to/MyModule.pm
+    /home/me/perl/MyModule.pm
+
+=head2 namespace
+
+Arguments are taken as namespaces to search under.
+
+    $ pm_which -n MyModule
+    MyModule            - /path/to/MyModule.pm
+    MyModule::Foo       - /path/to/MyModule/Foo.pm
+    MyModule::Foo::Bar  - /path/to/MyModule/Foo/Bar.pm
+
+=head2 -m
+
+Disables printing of module paths. This is only really useful in conjunction with --namespace.
+
+    $ pm_which -nm MyModule
+    MyModule
+    MyModule::Foo
+    MyModule::Foo::Bar
+
+=head2 -V
+
+Prints the version of each module, according to L<ExtUtils::MakeMaker>.
+
+    $ pm_which -V MyModule
+    MyModule - /path/to/MyModule.pm [ 1.00 ]
+
+    $ pm_which -Vnm MyModule
+    MyModule [ 1.00 ]
+    MyModule::Foo [ 0.01 ]
+    MyModule::Foo::Bar [ undef ]
+
+=head2 dump
+
+Dumps the paths that would be searched and exits. This is @INC modified by any
+-I switches.
+
+    $ pm_which --dump
+    /usr/lib/perl5/site_perl/5.8.6
+    /usr/lib/perl5/vendor_perl/5.8.6
+    ...
+
+    $ pm_which -I lib --dump -I blib/lib
+    lib
+    blib/lib
+    /usr/lib/perl5/site_perl/5.8.6
+    ...
+
+=head2 version
+
+Prints the version number of the script, plus the version and path of
+Module::Util that was loaded.
+
+=head1 EXIT CODES
+
+=over
+
+=item * 0 - Everything was OK
+
+=item * 1 - Initialisation failed (bad switches?)
+
+=item * 2 - Some modules were not installed
+
+=back
+
+=head1 SEE ALSO
+
+This utility comes with L<Module::Util>.
+
+=head1 AUTHOR
+
+Matt Lawrence E<lt>mattlaw@cpan.orgE<gt>
+
+=cut
+
+vim: ts=8 sts=4 sw=4 sr et

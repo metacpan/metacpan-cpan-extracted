@@ -1,0 +1,20 @@
+NAME
+
+MojoX::CPAN::Uploader - DEPRECATED Mojo way to upload on CPAN
+
+PLEASE NOTE THAT THIS MODULE IS DEPRECATED AND NO LONGER MAINTAINED.
+
+Please use CPAN::Uploader Mojolicious::Command::cpanify instead.
+
+
+DEPENDENCIES
+
+Mojolicious.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010-2011, Yaroslav Korshak
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

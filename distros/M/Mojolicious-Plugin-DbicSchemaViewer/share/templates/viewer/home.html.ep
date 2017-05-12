@@ -1,0 +1,29 @@
+% use experimental qw/postderef/;
+<div class="container">
+
+    %= form_for 'home', begin
+    %= formgroup 'Enter schema name', text_field => ['schema', size => 40]
+    %  end
+
+    %  if(scalar keys $all_schemas->%*) {
+            <p>Or choose any of these:</p>
+
+            <%= buttongroup vertical,
+                buttons => [
+                    map { [$_, [url_for('home')->query(schema => $_)]] } sort keys $all_schemas->%*
+                ]
+            %>
+    %   }
+
+    %   if(flash 'bad_schema') {
+            <p style="margin-top: 30px;">If you already tried to enter a schema class something went wrong. Reasons include:</p>
+            <ul>
+                <li>The schema is not in PERL5LIB</li>
+                <li>It is not a DBIx::Class schema</li>
+                <li>The name is misspelled.</li>
+                <li>No schema name was entered.</li>
+            </ul>
+
+            <p>See the log file for more information.</p>
+    %   }
+</div>

@@ -1,0 +1,30 @@
+---
+abstract: 'Mojo generator for a qooxdoo mojolicious app'
+author:
+  - 'Tobias Oetiker <tobi@oetiker.ch>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Command-generate-qx_mojo_app
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+    - lib/Mojolicious/Command/generate/qx_mojo_app
+requires:
+  Mojolicious: 5.0
+  Mojolicious::Plugin::Qooxdoo: 0.901
+  perl: 5.010001
+resources:
+  bugtracker: https://github.com/oetiker/qx-mojo-app/issues
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/oetiker/qx-mojo-app
+version: v0.2.2

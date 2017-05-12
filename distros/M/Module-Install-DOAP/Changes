@@ -1,0 +1,34 @@
+Module-Install-DOAP
+===================
+
+Created:      2011-09-30
+Home page:    <https://metacpan.org/release/Module-Install-DOAP>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Module-Install-DOAP>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.006  2013-07-31
+
+ - (Bugfix Packaging) Oops; hyphens.
+
+0.005  2013-07-31
+
+ - (Update) Support http://ontologi.es/doap-deps, and deprecate old
+   dependency predicates.
+
+0.004  2011-12-03
+
+ - (Bugfix) use base
+
+0.003  2011-11-26
+
+ - (Regression) use parent
+ - Use Module::Install::RDF's new heuristics for detecting the doap:Project
+   URI.
+
+0.002  2011-10-06
+
+ - (Packaging) Upgrade Module::Package::RDF version.
+
+0.001  2011-10-01  Initial release
+
+

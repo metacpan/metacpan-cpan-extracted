@@ -1,0 +1,30 @@
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Mason::Manual::Tutorial - Mason tutorial (DEPRECATED - SEE POET)
+
+=head1 DESCRIPTION
+
+This tutorial has moved to L<Poet::Manual::Tutorial|Poet::Manual::Tutorial>.
+
+=head1 SEE ALSO
+
+L<Mason|Mason>
+
+=head1 AUTHOR
+
+Jonathan Swartz <swartz@pobox.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Jonathan Swartz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

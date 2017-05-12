@@ -1,0 +1,18 @@
+0.005     2016-08-01 02:42:04 EDT
+  - Further fixes to error handling for credential change failure
+  - Fix to terminate prefork server properly on credential change failure in recent Mojolicious
+  - Don't attempt to set user and group if they are both already correct
+  - Add warning about morbo compatibility to docs
+
+0.004     2016-04-04 21:36:54 EDT
+  - Fix and improve syscall error handling
+
+0.003     2015-11-06 23:28:34 EST
+  - Switch installer to Module::Build::Tiny
+  - Fix test failure when no group exists with the same name as the current user
+
+0.002     2015-04-27 10:29:29 EDT
+  - Die on plugin register with nonexistent user or group (leejo)
+
+0.001     2015-04-26 20:23:40 EDT
+  - First release

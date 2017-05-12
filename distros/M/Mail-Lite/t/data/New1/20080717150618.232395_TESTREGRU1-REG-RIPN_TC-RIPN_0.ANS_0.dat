@@ -1,0 +1,28 @@
+---
+-
+  - rusu.response.new
+  -
+    - domain: air.ru
+      error_code: "Object 'AIR.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080717102653.793142
+      rule_id: rusu.response.new.fail
+    - domain: sex.ru
+      error_code: "Object 'SEX.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080717102653.793142
+      rule_id: rusu.response.new.fail
+    - domain: sex170004536743.ru
+      error_code: "Object 'SEX170004536743.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080717102653.793142
+      rule_id: rusu.response.new.fail
+    - domain: don2000.ru
+      error_code: "Object 'DON2000.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080717102653.793142
+      rule_id: rusu.response.new.fail
+    - domain: trax.ru
+      error_code: "Object 'TRAX.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080717102653.793142
+      rule_id: rusu.response.new.fail
+    - domain: upanishadi.ru
+      error_code: "Object 'UPANISHADI.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080717102653.793142
+      rule_id: rusu.response.new.fail

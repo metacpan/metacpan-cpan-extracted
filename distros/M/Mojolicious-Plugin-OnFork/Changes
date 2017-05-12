@@ -1,0 +1,21 @@
+Revision history for Mojolicious-Plugin-OnFork
+
+0.006   2017-05-08
+        - Exclude MYMETA.* from distribution
+
+0.005   2017-05-08
+        - Remove hypnotoad/srand test
+
+0.004   2015-03-08
+        - Fix Changes file (reneeb)
+
+0.003   2015-02-03
+        - Notice about srand() in Mojolicious 5.76.
+        - Give hypnotoad time to come up in test.
+
+0.002   2014-05-31
+        Fix test for Mojolicious 5.0.
+
+0.001   2012-10-17
+        First version, released on an unsuspecting world.
+

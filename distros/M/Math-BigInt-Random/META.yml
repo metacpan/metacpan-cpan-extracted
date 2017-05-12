@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Math-BigInt-Random
+version:             0.04
+abstract:            Create random very large integers
+license:             perl
+author:              
+    - William Hererra (whererra@skylightview.com)
+generated_by:        ExtUtils::MakeMaker version 6.42_01
+distribution_type:   module
+requires:     
+    Carp:                          0
+    Math::BigInt:                  0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

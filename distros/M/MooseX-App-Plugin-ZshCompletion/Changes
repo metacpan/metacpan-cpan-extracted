@@ -1,0 +1,11 @@
+Revision history for Perl module MooseX::App::Plugin::ZshCompletion
+
+
+0.002 2015-10-22
+
+  * Add support for parameters and enum type constraints
+
+0.001 2015-10-20
+
+  * First release to CPAN.
+

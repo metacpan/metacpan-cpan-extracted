@@ -1,0 +1,85 @@
+Revision history for Perl extension MIME::EcoEncode.
+
+0.95  2013-11-14
+	- Improved performance
+	- Added sub modules:
+	    MIME::EcoEncode::Param, MIME::EcoEncode::Fold
+	- Added support "Q" encoding of ISO-2022-JP
+	- Added support Shift_JIS charset
+	- Corrected the handling of CRLF of the end
+
+0.93  2013-09-27
+	- Improved performance : mime_eco()
+
+0.92  2013-09-09
+	- Fixed bug : mime_eco()
+	  (in the case of very long whitespace is contained)
+
+0.91  2013-08-29
+	- Fixed bug : "B" encoding of ISO-2022-JP
+	  (in the case of Hankaku-Katakana is contained)
+	- Improved performance
+
+0.90  2013-08-28
+	- Fixed bug : "B" encoding of ISO-2022-JP
+	- Fixed bug : "Q" encoding (in the case of TAB is contained, etc.)
+	- Fixed bug : "Q" decoding (in the case of parenthesis is contained)
+	- Added code to remove redundant ESC sequences in ISO-2022-JP
+	- Added code to return array in mime_deco()
+
+0.82  2012-10-17
+	- Fixed bug : in the case only of ASCII character string
+	  Thank you, SASAO-Sama
+
+0.81  2012-02-14
+	- Fixed bug : "B" encoding of UTF-8
+
+0.80  2012-02-02
+	- Added subroutine mime_deco()
+	- Added support RFC2231's language
+	- Added support "Q" encoding about all charset except ISO-2022-JP
+	- Added support all single-byte charsets
+
+0.70  2012-01-19
+	- Added support the following charset:
+	    ISO-8859-xx, GB2312, EUC-KR, Big5
+	- Added support "Q" encoding (only UTF-8 and ISO-8859-xx)
+	- Added support the charset name of lowercase letters
+
+0.61  2012-01-13
+	- Improved performance
+	- Corrected the mistakes
+
+0.60  2012-01-05
+	- Added option : $lss
+	- Added support 'comment' in 'comment' (max depth is 3)
+	- Fixed bug
+
+0.50  2011-12-21
+	- Improved encoding for continuous space/tab character
+	- Added support for recognizing 'comment's
+	  in structured field bodies
+	- Added option : $mode
+	- Deleted global variable : $MIME::EcoEncode::JCODE_COMPAT
+
+0.34  2011-11-30
+	- improve performance : add_enc_word_utf8()
+
+0.33  2011-11-29
+	- bug fix & improve performance : add_enc_word_utf8()
+
+0.32  2011-11-16
+	- support options : $lf and $bpl
+
+0.31  2011-10-12
+	- update Makefile.PL (added LICENSE)
+	- use "make dist" command for tarball
+
+0.30  2011-10-11
+	- rename : MimeEco -> MIME::EcoEncode
+
+0.20  2011-03-28
+	- improve performance
+
+0.10  2011-03-18
+	- First release

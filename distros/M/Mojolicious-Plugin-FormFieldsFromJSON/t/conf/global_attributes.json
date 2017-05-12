@@ -1,0 +1,43 @@
+  [
+    {
+      "type" : "select",
+      "name" : "language",
+      "data" : [
+        "de",
+        "en"
+      ]
+    },
+    {
+      "label" : "Name",
+      "type" : "text",
+      "name" : "name"
+    },
+    {
+        "label" : "Project",
+        "type" : "hidden",
+        "name" : "id",
+        "data" : "hello"
+    },
+    {
+        "label" : "Name",
+        "type" : "password",
+        "name" : "pwd"
+    },
+    {
+        "label" : "Name",
+        "type" : "checkbox",
+        "name" : "filter",
+        "data" : "age"
+    },
+    {
+        "label" : "Name",
+        "type" : "radio",
+        "name" : "type",
+        "data" : ["internal", "external" ]
+    },
+    {
+        "type" : "textarea",
+        "name" : "comment"
+    }
+
+  ]

@@ -1,0 +1,59 @@
+=head1 NAME
+
+Mozilla::DOM::Notation
+
+=for object Mozilla::DOM::Notation
+
+Mozilla::DOM::Notation is a wrapper around an instance of Mozilla's
+nsIDOMNotation interface. This class inherits from
+L<Node|Mozilla::DOM::Node>.
+
+ * The nsIDOMNotation interface represents a notation declared in the DTD.
+ * A notation  either declares, by name, the format of an unparsed entity,
+ * or is used for formal declaration of processing instruction targets.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-Core/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::Notation->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $publicid = $notation->B<GetPublicId>()
+
+Output:
+
+=over
+
+=item $publicid (string)
+
+=back
+
+=head2 $systemid = $notation->B<GetSystemId>()
+
+Output:
+
+=over
+
+=item $systemid (string)
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

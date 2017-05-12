@@ -1,0 +1,43 @@
+Revision history for Map::Tube::Plugin::Formatter
+
+0.12  Sun Sep 18 08:05:00 2016
+      - Added unit test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.11  Wed Aug 31 10:50:00 2016
+      - Added 'provides' to the Makefile.PL script.
+      - Updated dependency on Map::Tube::Exception v3.04.
+
+0.10  Wed Jul 13 10:05:00 2016
+      - Updated pod with regard to format Map::Tube::Route.
+      - Added SEE ALSO section to the pod.
+      - Tidied up test scripts.
+
+0.09  Wed May 04 20:35:00 2016
+      - Added support for object Map::Tube::Route.
+      - Updated copyright year information.
+
+0.08  Sat Sep 19 04:45:00 2015
+      - Replaced die() with exception Map::Tube::Exception::*.
+
+0.07  Fri Mar 27 15:35:00 2015
+      - Added code to the section "SYNOPSIS" to show formatting object of type Map::Tube::Line.
+
+0.06  Tue Mar 24 10:50:00 2015
+      - Added method to_string() to the package Map::Tube::Plugin::Formatter.
+      - Tidied up pod document with regards to the above changes.
+
+0.05  Mon Mar 23 18:10:00 2015
+      - Updated email address for reporting bug in the pod document.
+
+0.04  Mon Mar 23 11:40:00 2015
+      - Tidied up pod document of the package Map::Tube::Plugin::Formatter.
+
+0.03  Mon Mar 23 10:55:00 2015
+      - Added new method get_data() to the package Map::Tube::Plugin::Formatter::Utils.
+      - Refactored method to_json() and to_yaml() to make use of new method get_data().
+
+0.02  Sun Mar 22 22:12:00 2015
+      - Added support for YAML representation.
+
+0.01  Sun Mar 22 11:20:00 2015
+      - Module Created.

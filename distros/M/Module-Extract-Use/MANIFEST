@@ -1,0 +1,24 @@
+Changes
+corpus/PackageImports.pm
+corpus/PackageVersion.pm
+corpus/Repeated.pm
+corpus/RT79273.pm
+examples/extract_modules
+INSTALL.SKIP
+lib/Module/Extract/Use.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+t/get_modules.t
+t/imports.t
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/rt/79273.t
+t/test_manifest
+t/versions.t
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

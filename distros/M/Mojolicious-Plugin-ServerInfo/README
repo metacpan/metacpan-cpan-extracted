@@ -1,0 +1,44 @@
+NAME
+
+    Mojolicious::Plugin::ServerInfo - display Server and Perl environment
+    data
+
+SYNOPSIS
+
+     $app->plugin('Mojolicious::Plugin::ServerInfo');
+
+DESCRIPTION
+
+    Mojolicious::Plugin::ServerInfo is a Mojolicious-Plugin.
+
+    It creates a route
+
+      /serverinfo
+
+    where detailed info is displayed in formatted HTML.
+
+ METHODS
+
+    register
+
+      Do not use directly. It is called by Mojolicious.
+
+SEE ALSO
+
+      * Mojolicious
+
+SOURCE REPOSITORY
+
+    http://github.com/wollmers/Mojolicious-Plugin-ServerInfo
+
+AUTHOR
+
+    Helmut Wollmersdorfer, <helmut.wollmersdorfer@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2013-2015 by Helmut Wollmersdorfer
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

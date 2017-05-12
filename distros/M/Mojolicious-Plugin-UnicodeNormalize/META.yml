@@ -1,0 +1,30 @@
+---
+abstract: 'normalize incoming Unicode parameters'
+author:
+  - chromatic
+build_requires:
+  Mojolicious::Lite: '0'
+  Test::Mojo: '0'
+  Test::More: '0'
+  open: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-UnicodeNormalize
+requires:
+  Carp: '0'
+  Mojo::Base: '0'
+  Mojolicious: '6.41'
+  Unicode::Normalize: '0'
+resources:
+  homepage: https://github.com/chromatic/Mojolicious-Plugin-UnicodeNormalize
+  repository: https://github.com/chromatic/Mojolicious-Plugin-UnicodeNormalize.git
+version: '1.20160509'

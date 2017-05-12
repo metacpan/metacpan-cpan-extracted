@@ -1,0 +1,25 @@
+---
+abstract: 'The application module of Mojo-Zabbix .Using to get data from zabbix data include host,items, Triggers and warns and so on.'
+author:
+  - 'ORANGE <bollwarm@ijz.me>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-Zabbix-APP
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojo::Zabbix: '0.05'
+  perl: '5.006'
+resources:
+  repository: https://github.com/bollwarm/Mojo-Zabbix-APP
+version: '0.05'

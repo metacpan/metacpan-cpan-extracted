@@ -1,0 +1,86 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Monorail::Bootstrapper;
+use Getopt::Long;
+use Pod::Usage;
+
+=head1 NAME
+
+startup-monorail - Configure monorail for your project
+
+=head1 SYNOPSIS
+
+startup-monorail [options]
+
+ Options:
+   --schema-class   The classname for your DBIx::Class schema.  Required.
+   --schema-dsn     The DBI dsn passed to the connect method.  Required.
+   --scriptname     The name of the script to be generated.  Optional.
+   --basedir        The name of the directory were the migrations live. Optional.
+   --connect-method The method name used to connect the schema.  Optional.
+   --include        One or more dirs to add to @INC. Optional.
+   --include-relative One or more relative paths to add to @INC.  Optional.
+   --perl           The perl executable which is to run the monorail script. Optional.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+startup-monorail tries to generate a monorail script for use with your
+DBIx::Class based project.  It is early alpha code, and the resulting script
+will likely require manual tweaks.
+
+=cut
+
+my %opts;
+GetOptions(\%opts,
+    'schema-class=s',
+    'scriptname=s',
+    'basedir=s',
+    'connect-method=s',
+    'schema-dsn=s',
+    'include=s@',
+    'include-relative=s@',
+    'perl=s',
+);
+
+foreach my $required (qw/schema-class schema-dsn/) {
+    next if $opts{$required};
+    pod2usage("$0: $required option is required");
+}
+
+my %bootargs = (
+    dbix_schema_class => $opts{'schema-class'},
+    dbix_schema_dsn   => $opts{'schema-dsn'},
+);
+
+my %optional_map = (
+    basedir                    => 'basedir',
+    scriptname                 => 'scriptname',
+    dbix_schema_connect_method => 'connect-method',
+    lib_dirs                   => 'include',
+    relative_lib_dirs          => 'include-relative',
+    perl                       => 'perl',
+);
+
+foreach my $arg (keys %optional_map) {
+    if (exists $opts{$optional_map{$arg}}) {
+        $bootargs{$arg} = $opts{$optional_map{$arg}};
+    }
+}
+
+Monorail::Bootstrapper->new(%bootargs)->write_script_file;

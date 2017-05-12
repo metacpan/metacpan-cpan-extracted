@@ -1,0 +1,45 @@
+---
+abstract: 'Loading essential Perl Moose modules in the namespace of'
+author:
+  - "Jue\x81rgen von Brietzke <juergen.von.brietzke@t-online.de>"
+build_requires:
+  Test::More: '0'
+  Test::Perl::Critic: '0'
+  Test::Pod: '1.14'
+  Test::Pod::Coverage: '1.04'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Modern-PBP-Moose
+provides:
+  Modern::PBP::Moose:
+    file: lib/Modern/PBP/Moose.pm
+    version: '1.200'
+  Modern::PBP::Moose::Role:
+    file: lib/Modern/PBP/Moose/Role.pm
+    version: '1.200'
+  Modern::PBP::Moose::Role::Attribute:
+    file: lib/Modern/PBP/Moose/Role/Attribute.pm
+    version: '1.200'
+requires:
+  Hook::AfterRuntime: '0'
+  Modern::PBP::Perl: '0'
+  Moose: '0'
+  Moose::Exporter: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::AttributeShortcuts: '0'
+  MooseX::DeclareX: '0'
+  MooseX::DeclareX::Keyword::interface: '0'
+  MooseX::DeclareX::Plugin::abstract: '0'
+  MooseX::DeclareX::Plugin::singleton: '0'
+  MooseX::DeclareX::Privacy: '0'
+  MooseX::HasDefaults::RO: '0'
+  namespace::autoclean: '0'
+  perl: '5.012'
+version: '1.200'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

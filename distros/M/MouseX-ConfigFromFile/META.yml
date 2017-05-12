@@ -1,0 +1,30 @@
+---
+abstract: 'An abstract Mouse role for setting attributes from a configfile'
+author:
+  - 'NAKAGAWA Masaki <masaki@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.94
+  Test::UseAllModules: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MouseX-ConfigFromFile
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Mouse: 0.39
+  MouseX::Types::Path::Class: 0.06
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/masaki/mousex-configfromfile.git
+version: 0.05

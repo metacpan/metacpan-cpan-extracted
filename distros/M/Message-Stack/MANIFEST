@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.mkdn
+lib/Message/Stack.pm
+lib/Message/Stack/Message.pm
+lib/Message/Stack/Types.pm
+t/00-load.t
+t/01-simple.t
+t/02-finders.t
+t/03-clearers.t
+t/release-pod-syntax.t
+t/release-synopsis.t

@@ -1,0 +1,38 @@
+Revision history for perl distribution Mad-Mapper
+
+0.09 2016-02-13T11:54:38-0600
+ - Deprecated *_sst() in favor of *_sql()
+   Contributor: Stefan Adams
+
+0.08 2016-02-13T17:01:35+0100
+ - Improved documentation
+   Contributor: Stefan Adams
+
+0.07 2015-12-04T14:11:09+0100
+ - Using decamelize for table guessing #2
+   Contributor: Krasimir Berov
+
+0.06 2015-11-08T17:31:06+0100
+ - Allow specifying "has_many" SST
+ - Add TO_JSON() method to Mad::Mapper
+ - Add support for table aliases using "%x.alias"
+
+0.05 2015-09-01T10:22:07+0200
+ - Add support for Mojo::SQLite #1
+
+0.04 2015-09-01T07:17:52+0200
+ - Fix "Calling a synchronous function on an asynchronous handle"
+   Cannot change $db into async mode if already in sync mode
+
+0.03 2015-07-12T11:36:05+0200
+ - Fix "The getpwuid function is unimplemented"
+
+0.02 2015-04-22T08:27:17+0200
+ - More robust live database tests
+
+0.01 2015-04-20T20:44:10+0200
+ - Add col(), pk() and table() sugar
+ - Add delete(), load() and save()
+ - Add "has many" relationship
+ - Started project
+

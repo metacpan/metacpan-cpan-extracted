@@ -1,0 +1,66 @@
+NAME
+    Mojolicious::Plugin::ValidateMoose - Can validate using Moose objects
+
+VERSION
+    0.02
+
+DESCRIPTION
+    This module is handy if you want to validate POST/GET parameters using
+    Moose classes.
+
+SYNOPSIS
+        package MyApp;
+        use Mojo::Base 'Mojolicious';
+        sub startup {
+            my $self = shift;
+
+            $self->plugin('Mojolicious::Plugin::ValidateMoose');
+
+            # ...
+        }
+
+        package MyApp::Root;
+        use Mojo::Base 'Mojolicious::Controller';
+        sub foo {
+            my $self = shift;
+
+            if($self->req->method eq 'POST') {
+                if(my $obj = $self->validate_moose('My::Moose::Class')) {
+                    # input validate, and $obj created from My::Moose::Class
+                    # with the params set as attributes
+                }
+            }
+        }
+
+HELPERS
+  validate_moose
+        $obj = $controller->validate_moose($moose_class, \%args);
+        $obj = $controller->validate_moose($moose_obj, \%args);
+
+    Will either update an existing or create a new Moose object, if all the
+    attributes gets validated. If any of the attributes is not updated with
+    the right value from "param()", this method will set
+    "invalid_form_elements" in the stash to a datastructure like this:
+
+        {
+            $param_name_a => 'required', # fixed
+            $param_name_b => 'moose exception message', # custom
+        }
+
+    Example moose exception message:
+
+        Validation failed for 'Int' with value "asd"
+
+    The method will return empty list if it fail to validate the input.
+
+METHODS
+  register
+    Will register the methods undef "HELPERS" as Mojolicious helpers.
+
+COPYRIGHT & LICENSE
+    This library is free software. You can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Jan Henning Thorsen - jhthorsen at cpan.org
+

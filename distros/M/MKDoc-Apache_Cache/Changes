@@ -1,0 +1,33 @@
+Revision history for MKDoc::Apache_Cache
+
+0.71 Thu Feb  3 15:45:00 2005
+    - Fixed some 'uninitialized value in length' warnings when delivering
+      content without body
+    - Turn off some 'uninitialized value in lc' warnings when delivering
+      content to clients that don't specify accept-encoding:
+    - Don't deliver an Etag header calculated from the (empty) body when
+      responding to HEAD requests (this needs to be fixed properly).
+
+0.7 Thu Sep 23 12:54:00 2004
+    - Removed defunct email address as Jean-Michel is no longer maintainer
+    - bandage patch to fix always gzip encoded bug
+
+0.5 Thu Jul 29 12:53:36 2004
+    - Added 'expires' header
+    - Added ETag header
+    - Added GZip compression
+
+0.4 Tue Feb 10 16:45:36 2004
+    - Fixed some 'use of uninitialized value' issues
+    - Changed MKDoc::Apache_Cache to include an Expires: header
+    - Added MKDoc_Apache_Cache_NOEXPIRES option
+    - Added MKDoc_Apache_Cache_NOCOOKIES option 
+
+0.2 Thu Feb  5 12:47:44 2004
+    - Fixed 404 pages not serving any content at all
+    - Fixed no content sent with first uncached request
+    - Fixed default identifier not taking GET / HEAD into account
+    - Added 'use bytes' pragma
+
+0.1 Mon Dec 22 12:54:33 2003
+    - Initial Release 

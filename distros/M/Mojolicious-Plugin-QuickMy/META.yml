@@ -1,0 +1,32 @@
+---
+abstract: 'Mojolicious Plugin enables quick and simple access for Mojo::mysql'
+author:
+  - 'Pavel Kuptsov <pkuptsov@gmail.com>'
+build_requires:
+  Test::More: '0'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - mojo
+  - mojolicious
+  - mysql
+  - mojo-mysql
+  - plugin
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-QuickMy
+provides:
+  Mojolicious::Plugin::QuickMy:
+    file: lib/Mojolicious/Plugin/QuickMy.pm
+    version: '1.0'
+requires:
+  Mojo::mysql: '0.14'
+  Mojolicious: '6'
+  perl: '5.010001'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://bitbucket.org/pkuptsov/mojolicious-plugin-quickmy
+version: '1.0'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

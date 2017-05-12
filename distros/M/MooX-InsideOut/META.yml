@@ -1,0 +1,30 @@
+---
+abstract: 'Inside out objects for Moo'
+author:
+  - 'haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>'
+build_requires:
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-InsideOut
+no_index:
+  directory:
+    - t
+    - xt
+requires:
+  Hash::Util::FieldHash::Compat: '0.03'
+  Moo: '2.002005'
+  Sub::Quote: '2.002005'
+resources:
+  IRC: irc://irc.perl.org/#moose
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-InsideOut
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/haarg/MooX-InsideOut.git
+version: '0.001004'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

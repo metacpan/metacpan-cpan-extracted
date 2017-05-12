@@ -1,0 +1,52 @@
+=head1 NAME
+
+Mojolicious::Plugin::Sentry - A perl sentry client for Mojolicious
+
+=head1 VERSION
+
+version 0.11
+
+=head1 SYNOPSIS
+
+	# Mojolicious::Lite
+	plugin 'sentry' => {
+		sentry_dsn  => 'DSN',
+		server_name => 'HOSTNAME',
+		logger      => 'root',
+		platform    => 'perl',
+	};
+
+	# Mojolicious with config
+	$self->plugin('sentry' => {
+		sentry_dsn  => 'DSN',
+		server_name => 'HOSTNAME',
+		logger      => 'root',
+		platform    => 'perl',
+	});
+
+	# template: tmpl/exception.html.ep
+	% sentryCaptureMessage $exception;
+
+=head1 DESCRIPTION
+
+Mojolicious::Plugin::Sentry is a plugin for the Mojolicious web framework which allow you use Sentry L<https://getsentry.com>.
+
+See also L<Sentry::Raven|https://metacpan.org/pod/Sentry::Raven> for configuration parameters on init plugin and for use sentryCaptureMessage.
+
+=head1 SEE ALSO
+
+L<Sentry::Raven|https://metacpan.org/pod/Sentry::Raven>
+
+=head1 SOURCE REPOSITORY
+
+L<https://github.com/likhatskiy/Mojolicious-Plugin-Sentry>
+
+=head1 AUTHOR
+
+Alexey Likhatskiy, <likhatskiy@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2014 "Alexey Likhatskiy"
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.

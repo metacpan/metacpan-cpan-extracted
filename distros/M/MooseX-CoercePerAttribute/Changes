@@ -1,0 +1,8 @@
+Revision history for MooseX-CoercePerAttribute
+
+1.001 2014-04-11T15:56:18Z
+        - Migrated to Minilla
+        - Updated POD issues
+
+1.000  2013-08-15 23:21:15 EEST
+        - Initial release

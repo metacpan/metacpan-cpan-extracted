@@ -1,0 +1,66 @@
+{
+   "abstract" : "easy aliasing of methods and attributes in Moo",
+   "author" : [
+      "haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooX-Aliases",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {},
+      "configure" : {},
+      "develop" : {
+         "requires" : {
+            "Moose" : "0",
+            "Test::CleanNamespaces" : "0",
+            "namespace::autoclean" : "0",
+            "namespace::clean" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Method::Modifiers" : "1.05",
+            "Moo" : "1.001",
+            "perl" : "5.006",
+            "strictures" : "1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0.003",
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-MooX-Aliases@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Aliases"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/haarg/MooX-Aliases.git",
+         "web" : "http://github.com/haarg/MooX-Aliases"
+      },
+      "x_IRC" : "irc://irc.perl.org/#moose"
+   },
+   "version" : "0.001006",
+   "x_authority" : "cpan:HAARG"
+}

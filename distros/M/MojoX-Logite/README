@@ -1,0 +1,36 @@
+MojoX-Logite version 0.01
+=========================
+
+MojoX::Logite is a simple Mojo::Log implementation which logs to an SQLite database.
+A Mojolicious::Plugin::Logite plugin is also provided.
+
+The module by default logs to a SQLite database file. The module levergaes
+basic ORLite library and methods to do basic searching and bookkeeping
+of log information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Mojolicious
+  ORLite
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2011 by Alberto Reggiori
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+

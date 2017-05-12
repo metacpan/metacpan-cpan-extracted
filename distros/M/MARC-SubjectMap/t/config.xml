@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<config>
+
+<sourceLanguage>eng</sourceLanguage>
+
+<fields>
+
+<field tag="650">
+<translate>a</translate>
+</field>
+
+</fields>
+
+<rules>
+
+<rule field="650" subfield="a">
+<original>COMMON LISP (Computer program language)</original>
+<translation>Python (Computer program language)</translation>
+<source>bogus</source>
+</rule>
+
+</rules>
+
+</config>

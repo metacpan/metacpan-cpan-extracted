@@ -1,0 +1,59 @@
+% stash exclude_menu=>1;
+
+%# NOTE need to deprecate use of 'shipped' in templates.  
+%# Use stash only; confine 'shipped' to browser shipments only.
+
+% my $tablist  = shipped('tablist');
+% my $bytable  = shipped('bytable');
+% my $table    = shipped('table');
+% my $tinfo    = $bytable->{$table};
+% my $id       = shipped('id');
+% my $dml_mode = stash('dml_mode') || 'edit';
+% my $editing  = $dml_mode eq 'edit';
+% my $save_url = $editing
+%                    ? url_for("/tables/$table/$id/save")
+%                    : url_for("/tables/$table/save"    );
+
+% title $tinfo->{label};
+
+% my $edit_buts = begin
+    % my $act = $editing? 'view': 'list';
+    %= t div => (class=>"stats navigators right") => begin
+        %= t button => (class=>"button save", 'data-icon1'=>'ui-icon-check')      => 'Save'
+        %= t button => (class=>"button $act", 'data-icon1'=>'ui-icon-closethick') => 'Cancel'
+    % end
+% end
+
+<div id="tablesbuts" class="ui-widget-content ui-corner-all">
+    % for my $table1 (@$tablist) {
+        % my $tinfo1 = $bytable->{$table1};
+        % my $url    = url_for('tables')->query(start_with=>$table1);
+        %= link_to $tinfo1->{label} => $url => (class=>"button")
+    % }
+</div>
+
+<div id="tablesbody" class="accordion">
+
+    <h3><%=$tinfo->{label}%></h3>
+    <div class="pad12">
+        %= form_for $save_url => (method=>'post') => begin
+            %= t div => (class=>"ui-helper-clearfix") => begin
+                %= t h2 => (class=>"left no-tb-margin") => $editing? "$row": "New $table"
+                %= $edit_buts->();
+            % end
+
+            %= t fieldset => begin
+                %= t legend => $dml_mode
+                %= include 'tables/dml', table=>$table, tinfo=>$tinfo, dml_mode=>$dml_mode
+            % end
+
+        % end
+    </div>
+
+    <h3>Info</h3>
+    <div class="pad12">
+        %= t h3 => 'Any Other Edit-related Info?'
+    </div>
+
+</div>
+

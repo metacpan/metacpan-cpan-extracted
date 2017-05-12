@@ -1,0 +1,16 @@
+0.05 Monday March 01 17:36:46 PST 2010:
+    - Fix to work with latest MooseX::ClassAttribute
+
+0.04 Monday November 23 12:48:38 PST 2009:
+    - Updated to work with the latest Moose
+    - Made low priority, failing test TODO
+
+0.03 Friday October 17 15:30:09 PDT 2008:
+    - Added ->load_package (and ->load_class) convenience methods
+    - Added check + nice warning for lack of ->add_class_attribute
+
+0.02 Friday October 17 11:38:35 PDT 2008:
+    - Fixed documentation
+
+0.01 Thursday October 16 2008:
+    - Initial release

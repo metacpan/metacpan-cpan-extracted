@@ -1,0 +1,68 @@
+Revision history for MooseX-Role-WithOverloading
+
+0.17      2015-10-09 02:14:37Z
+          - mark this distribution as deprecated (now obsolete with modern
+            Moose)
+
+0.16      2014-11-16 03:50:29Z
+          - fix tests that failed due to an interaction between aliased.pm and
+            perl 5.21.6
+
+0.15      2014-08-12 05:16:31Z
+          - forward-compat mode added for Moose 2.1300, which cores all of
+            this distribution's functionality
+
+0.14      2014-07-30 20:05:32Z
+          - Fixed a bug with Perl 5.18+ that caused this module to simply blow
+            up with an error like "Use of uninitialized value in subroutine
+            entry at .../Class/MOP/Package.pm ..." (Dave Rolsky)
+          - Line numbers in shipped code are now almost the same (within 3) as
+            the repository source, for easier debugging
+          - Repository migrated to the github moose organization
+          - Unneeded init_meta method removed (Dave Rolsky)
+
+0.13      2013-01-08 04:59:07Z
+          - Resolve failure reports in 5.17.* due to changes in SVf_AMAGIC
+
+0.12      2013-01-05 20:10:02Z
+          - Bump dependency on namespace::autoclean (RT#69313)
+
+0.11      2012-11-17 22:09:00 +0000
+          - Fix dependency issues from AutoPrereqs. RT#81145
+
+0.10      2012-11-13 00:41:00 +0000
+          - Remove use of MooseX::Types to allow Catalyst to work on perl
+            5.8.5 RT#77100, RT#81124
+          - Fix bug causing attributes to get lost if they were added to a
+            role before composing a ::WithOverloading role onto it.
+
+0.09      2011-01-03 17:37:34 +0100
+          - get_package_symbol no longer autovififies - use
+            get_or_add_package_symbol instead (doy).
+
+0.08      2010-07-19 22:04:22 +0200
+          - Really avoid warnings from Moose 1.09 (Dave Rolsky).
+
+0.07      2010-07-19 05:56:05 +0200
+          - Avoid warnings from Moose 1.09 (Dave Rolsky).
+
+0.06      2010-05-07 19:00:11 +0200
+          - Improve distribution metadata.
+          - Disable workaround for Moose < 0.94 and bump the dependency
+            version.
+
+0.05      2010-01-18 18:15:00 +0000
+          - Work around changes in composition_class_role in Moose >= 0.93_01
+            to be compatible with both old and new Moose versions.
+
+0.04      2010-01-04 18:40:11 +0100
+          - Depend on Test::More 0.88 for done_testing.
+
+0.03      2009-11-20 07:57:25 +0100
+          - Make ToInstance application work on perl older than 5.8.9.
+
+0.02      2009-10-11 08:37:43 +0100
+          - Fix missing dependency on MooseX::Types (Closes: RT#50386).
+
+0.01      2009-10-07 00:22:14 +0200
+          - Initial release.

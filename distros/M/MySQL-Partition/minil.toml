@@ -1,0 +1,4 @@
+name = "MySQL-Partition"
+authority="cpan:SONGMU"
+badges = ["travis", "coveralls"]
+module_maker="ModuleBuildTiny"

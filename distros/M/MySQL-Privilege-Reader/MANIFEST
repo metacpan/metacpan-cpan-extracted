@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/MySQL/Privilege/Reader.pm
+t/00-load.t
+t/01-mysql-privilege-reader.t
+t/02-fail.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/boilerplate.t
+META.yml                                 Module meta-data (added by MakeMaker)

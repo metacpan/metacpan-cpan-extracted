@@ -1,0 +1,6 @@
+Revision history for Perl extension Mail::EXPN.
+
+0.01  Tue Feb  5 18:48:35 2002
+	- original version; created by h2xs 1.19
+0.04  Sat Feb  1 11:21:23 CET 2003
+	- Maintenance release - no functionality added or changed.

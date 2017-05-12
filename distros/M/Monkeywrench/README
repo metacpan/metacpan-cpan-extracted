@@ -1,0 +1,74 @@
+NAME
+
+    Monkeywrench - Web site testing application
+
+DESCRIPTION
+
+    Monkeywrench is a test-harness application to test the integrity
+    of a user's path through a web site.
+    
+    To run HTTP::Monkeywrench->test, first set up a Perl script that contains
+    sessions (described below), settings if desired (also described below),
+    and a call to HTTP::Monkeywrench->test, passing it the settings hashref
+    first, followed by the desired session hashrefs you want to test.
+    HTTP::Monkeywrench->test($settings, $session1,... $sessionN)
+    
+    Monkeywrench can also be used in an object-oriented fashion -- simply
+    take the result of HTTP::Monkeywrench->new (optionally passing the settings
+    hashref) and call the test() method against it as above (optionally
+    omitting the settings hashref.)
+    
+    Each session arrayref contains one or more hashrefs, called clicks,  
+    which contain descriptive elements of a specific web page to be tested. 
+    The elements are described below under SESSION.
+
+INSTALLATION
+
+    To install Monkeywrench, run the standard sequence:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+NEW IN VERSION 1.0
+
+    First public release!
+
+GETTING HELP
+
+	The Monkeywrench project homepage is at
+	http://opensource.cnation.com/projects/Monkeywrench/index.xpml
+	
+	Monkeywrench info can be found on Sourceforge at
+	http://www.sourceforge.com/projects/monkeywrench/
+
+    Monkeywrench discussion groups are currently hosted on sourceforge at
+    <http://sourceforge.net/projects/monkeywrench/>.  
+    To subscribe to the mailing list, go to 
+    http://lists.sourceforge.net/mailman/listinfo/monkeywrench-general
+
+
+REPORTING BUGS
+
+    Report bugs to the <monkeywrench-general@lists.sourceforge.net> mailing 
+    list.  To subscribe go to:
+    http://lists.sourceforge.net/mailman/listinfo/monkeywrench-general
+
+
+LICENSE
+
+    Copyright (c) 2000, Cnation Inc. All Rights Reserved. This program is free
+    software; you can redistribute it and/or modify it under the terms of the
+    GNU General Public License as published by the Free Software Foundation;
+    either version 2 of the License, or (at your option) any later version.
+    
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+MAINTAINER
+
+    Cnation
+    mailto:opensource@cnation.com
+    http://opensource.cnation.com

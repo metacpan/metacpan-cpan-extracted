@@ -1,0 +1,13 @@
+Get DROP VIEW into sql translator
+Get DROP TRIGGER into sql translator
+Get stored procedure support into sql translator
+Get view diffing into sql translator
+get trigger diffing into sql translator
+get stored proc diffing into sql translator
+
+Migration squashing.  (maybe...)
+
+Finish POD.
+
+Figure out the bootstrapping system.  Users need a script and a way to add
+monorail to an existing project.

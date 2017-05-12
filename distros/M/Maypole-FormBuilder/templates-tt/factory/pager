@@ -1,0 +1,48 @@
+[% RETURN UNLESS pager && ( pager.first_page != pager.last_page)  %]
+
+
+<p class="pager">Pages:
+
+[% PERL %]
+    my $pager = $stash->get('pager');
+    my $request = $stash->get('request');
+    my $begin_page = $pager->current_page - 10;
+    $begin_page = $pager->first_page if $begin_page < 1;
+
+    my $end_page = $pager->current_page + 10;
+    $end_page = $pager->last_page if $pager->last_page < $end_page;
+
+    foreach my $num ( $begin_page .. $end_page )
+    {
+        if ( $num == $pager->current_page )
+        {
+
+		print "<span class=\"current-page\">$num</span>";
+        }
+        else
+        {
+		my $args = "?page=$num";
+		my %params = %{$request->query};
+#		if($request->action eq 'do_search') {
+#			foreach my $col ( $request->model_class->display_columns ) {
+#			 	delete $params{$col} unless ( $request->params->{ $col } );
+#			}
+#		}
+
+		delete $params{page};
+		if($request->action ne 'list' && $request->action ne 'do_search') {
+			%params = ();
+		}
+		my $uri = new URI;	
+		$uri->query_form(%params);
+		$args .= "&".$uri->equery if $uri->equery;
+		print $request->link( table      => $request->model_class->table,
+			action     => $request->action,
+			additional => $args,
+			label      => $num
+		);
+	}
+    }
+[% END %]
+</p>
+

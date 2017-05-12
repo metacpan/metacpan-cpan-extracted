@@ -1,0 +1,46 @@
+{
+   "abstract" : "Schema class scaffold generator for DBIx::Class",
+   "author" : [
+      "Graham Barr"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mesoderm",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "0",
+            "Data::Dumper" : "0",
+            "File::Temp" : "0",
+            "Lingua::EN::Inflect::Number" : "0",
+            "Moose" : "0.98",
+            "MooseX::Getopt" : "0",
+            "MooseX::Types::Path::Class" : "0",
+            "Path::Class" : "0",
+            "SQL::Translator" : "0.11008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gbarr/Mesoderm.git",
+         "web" : "http://github.com/gbarr/Mesoderm"
+      }
+   },
+   "version" : "0.140780"
+}
+

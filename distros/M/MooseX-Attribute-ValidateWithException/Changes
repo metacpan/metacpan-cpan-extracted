@@ -1,0 +1,108 @@
+Release history for MooseX-Attribute-ValidateWithException
+
+v0.4.0 2017-03-12T02:32:28Z b0eb239
+ - Bugfix: Avoid test failures with -Ddefault_inc_excludes_dot
+ - Migrate to EUMM for installer ( may break downstreams, reason for v0.4 )
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.3.1, see misc/*.deps* for details
+ - build: -1
+ - configure: +2 -1 (recommends: +1)
+ - develop: +22 ↑3 -11 (recommends: +1, suggests: +2 -1)
+ - runtime: (recommends: +1)
+ - test: +3 ↓1 (recommends: +3)
+
+0.3.1 2014-01-08T04:40:40Z
+ [00 Minor]
+ - Functionally the same as 0.3.0 with -TRIAL removed.
+ - Minor docs improvements.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.3.0, see misc/*.deps* for details
+ - develop: +3 ↑1 -4
+ - runtime: ↑1
+
+0.3.0 2013-11-28T16:41:47Z
+ [00 Major]
+ - Refactored to work better with Moose 2.1100
+ - Code is now mostly a compatibility shim, because Moose has exceptions default
+
+ [Dependencies::Noteworthy]
+ - now requires Moose >2.1100
+ - now requires Module::Build 0.4203
+ - now requires Test::More 1.001002
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.2, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +45 -1 (recommends: -1, suggests: +1 -1)
+ - runtime: ↑1
+ - test: ↑1 -2
+
+0.2.2 2013-04-10T07:27:10Z
+ - Maint release
+
+ [Dependencies::Noteworthy]
+ - use Module::Build 0.4004
+ - use Test::More 0.98
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.1, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +5 (suggests: ↑1)
+ - test: ↑1
+
+ [Documentation]
+ - Update copyright year.
+ - add README.mkdn
+
+ [Internals]
+ - fix a warning about a value being undefined by making it lazy
+
+ [Meta]
+ - Bug tracker to github issues
+
+ [Packaging]
+ - use test_requires in Build.PL
+
+0.2.1 2012-03-17T04:49:40Z
+ - Minor maintenance release
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.0, see misc/*.deps* for details
+ - develop: (recommends: ↑1, suggests: ↑1)
+ - runtime: +3
+ - test: -1
+
+ [Internals]
+ - Version declaration moved out of BEGIN
+ - All namespaces declare $AUTHORITY
+
+ [Packaging]
+ - Update LICENSE ( Year, Indent, Address )
+ - Move author/release tests to xt/
+ - set x_authority
+
+0.2.0 2011-07-26T00:18:24Z
+ [Bugfix]
+ - Fix compatibility with Moose 2.020???. This hopefully fixes rt#60461 (
+   https://rt.cpan.org/Public/Bug/Display.html?id=69461 ), thanks ANDK for reporting.
+
+ [Dependencies::Noteworthy]
+ - upgrade to Moose 2.0200
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.1, see misc/*.deps* for details
+ - runtime: ↑1
+
+ [Packaging]
+ - Bumping minor version due to dependency changes being not reverse compatible.
+
+0.1.1 2011-06-18T02:24:30Z
+ [Bugfix]
+ - Now actually propagates exceptions thrown from inlined attributes.
+
+0.1.0 2011-06-18T00:27:59Z
+ - First version.

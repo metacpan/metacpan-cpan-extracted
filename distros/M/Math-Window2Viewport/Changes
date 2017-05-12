@@ -1,0 +1,19 @@
+Revision history for Math-Window2Viewport
+
+1.01    
+
+1.00    
+    - update copyright date
+    - fix bug tracker location    
+    - added examples to POD
+
+0.03    
+    - added github meta to makefile
+    - added examples
+
+0.02    
+    - no longer casting return vals with int (client must do this)
+
+0.01    
+    - First version, released on an unsuspecting world.
+

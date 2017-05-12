@@ -1,0 +1,18 @@
+0.22	Wednesday, 16th February, 2005
+	Add make_link method (Simon Wistow)
+	Some javascript doodlings to highlight message paths
+
+0.21	Thursday, 11th December, 2003
+	Note in the deps that we need Mail::Thread 2.41 (I released a
+	broken thing as	Mail::Thread 2.4, for I am a fool)
+
+	Use the inherited ->new
+
+0.20	Thursday, 11th December, 2003
+	Added in maximum_arc_height, plus a link to some sample output.
+
+	Switched the order of drawing (arcs first, messages after) -
+	fixes a small cosmetic glitch.
+	
+0.10	Thursday, 11th December, 2003
+	Initial CPAN release

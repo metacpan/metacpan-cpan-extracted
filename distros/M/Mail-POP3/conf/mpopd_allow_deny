@@ -1,0 +1,11 @@
+#--- A list of access rules to check the client host address against
+#
+#--- One flag plus one host address/subnet per line, separated by tabs/spaces.
+#--- 100.0.0. 100.0.0.* and 100.0.0.1 are all valid
+#--- DENY	100.0.0.
+#--- ALLOW	192.128.0.4
+#--- WARN	my.domain.co.uk
+
+#DENY	ALL
+#ALLOW	my.domain.co.uk
+#ALLOW	127.0.0.

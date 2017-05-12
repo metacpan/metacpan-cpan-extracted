@@ -1,0 +1,69 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 fa59669ebbbca02c5537aa965b6da560cce73716 Changes
+SHA1 375e537f37f4c03450fdf5e98112b9cd97959bd9 LICENSE
+SHA1 3995ba61e13a6b7031003754fe768b1811af95c7 MANIFEST
+SHA1 feeaff05b2ac4fd672cc3d1982f9951b22faceeb META.json
+SHA1 a09e507f73527a3211468773e347a10d0faab774 META.yml
+SHA1 2bbebc24b53bc41cd668bf3771ee3efc19405917 Makefile.PL
+SHA1 dc2da32de175821a4670217834fa2fac50bfa16e README
+SHA1 566ea601be999a88aaed096fa142c6b91ddb89b2 lib/Math/Currency.pm
+SHA1 9a77ab3348e1b6b5082c5eb79c00ae6e3cd61678 lib/Math/Currency/EUR.pm
+SHA1 27d9bd143d9fb8649713db9aee50a1edd50316de lib/Math/Currency/GBP.pm
+SHA1 7917bef690071800324e777937e6a9df2def4668 lib/Math/Currency/JPY.pm
+SHA1 8c9e39dcc151bc22a130b20647d78d83daad134f lib/Math/Currency/USD.pm
+SHA1 c3a6250b125134ad1b08201e4374da478855cf3d lib/Math/Currency/de_DE.pm
+SHA1 13f16cb6c1800d74d6b4f0e3bff58e85e78b542a lib/Math/Currency/en_GB.pm
+SHA1 1120f8b235e61291c546cc930f2d04ddddf5b0a0 lib/Math/Currency/en_US.pm
+SHA1 70faed50a09e1534b79698ae4d04e5d0d22d8b6b lib/Math/Currency/ja_JP.pm
+SHA1 e323840d8cdf2c218ceddeaf3d0f77966ca3c629 scripts/new_currency
+SHA1 1425b96c6029b994942a6f112d87ced716ae5435 scripts/perlbrew-test
+SHA1 bd6f16e74b9bbc571388fe9ba0faa2334db659bc t/001_load.t
+SHA1 e8152ac512041aaafec4a7b50ad677e1b97becca t/002_basic.t
+SHA1 60a60eb14d2a38dc7b02b501af355b2235c0bb64 t/003_subclass.t
+SHA1 17e6e03707a1d27b1d08e2b2f72730e2e22e57fe t/004_localize.t
+SHA1 827d1c707f96423871c33b7879852f3582d28d38 t/005_rounding.t
+SHA1 a852805df18e2422d0374c77436c09c8e0e4b49e t/006_defaults.t
+SHA1 3e9b3f17f9c88c4a9ba393e11a97d06db7c28a12 t/007_comparison.t
+SHA1 72e4bcfcfe893fcf3aba0507827e397d813f6728 t/008_restore_locale.t
+SHA1 a697c8e676bac508532241f6aa6358ba860e5487 t/009_localeconv_encoding.t
+SHA1 62fd4b745affcff6309e98b8d95a5f6776451222 t/010_bcmp.t
+SHA1 1bb59f24d84ee89e1ae262d04e99c612d7c3bd99 t/999_locale_de_DE.t
+SHA1 916434f12475d761edf3f9298d8fe250e36f636a t/999_locale_en_GB.t
+SHA1 f584bf407f3f3328cd132a7cbb3032941de34fd2 t/999_locale_en_US.t
+SHA1 2b02c98c884e03be26bd11acc9d186385132c574 t/999_locale_ja_JP.t
+SHA1 d361ce075754a8cc9307cfdd64e2729986714579 t/author-pod-coverage.t
+SHA1 d2eebabfd34d330bd59043a4b6879faf4de7229d t/author-pod-syntax.t
+SHA1 4d908a72650eeb52e482c30eb072a690b295606b t/lib/My/Test/Util.pm
+SHA1 975e54cbcc501c07ba754478ae45aadcdc650a49 t/release_signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIVAwUBWLRLIKQl27WkM10aAQjtjhAAxY+u4k6gkuRjv/QzuLiZ+b17nisGr9um
+V+DQ8uRWDK1qNaWPbAwoyZTgAlPXorg2HgnC2Mezx02+nHBETlpyZkpDrV9dQEfH
+PgVZoi5S7iup2Eze6j4SW5/peRZHNbtf3w4LXyz0aq/50t6/lFojMHWquYiem2Q2
+jUu9QVqfggFsXUY8DBXDZlOzTH4LZVcBXKNuQEhYiINHULi4m8IIjtVGS60uDJdd
+J+YiULZaR7pePaoFTf5NTAu2SpvEGfWrH1vqntpYlYlCqnRZvVEmO/MlA3BZvkiD
+JSZANbLNJ0HN3y63Lo2Uua9ZrA8PMWrQenfWepnmpmj2MJRPp9PixoIGM3Ple4hX
+TR6VHGJcFt7youUdTFbRpNNxKHb43xvXQw+CKTabLuw28SBxDgrY5kXFI3S6vJYQ
+b8KR9Fk5/bQYkhc4iIHIlnM9bhsY6bftKdw4puWzf2sENETgbqPNDyaMvUqQZe+E
+lsTsZJYfBQIpVArsSlmsqhqGhsWG4CT5Vy2iu3tzytUWKzFY9BUjQ4oRAok9JvVL
+1dNEY/jaEhsTirSc3SdD1DruXgHn5g9yRzPzz5pBqKGthtc7gRDnBhL6/01v0RPq
+OmQC+TZ/pOJwaqSjHmBfKa9oriS/AaNu1KkQr95Wcbb6riNLhZrKXzCf66aVxtRo
+WNgW8hEJb5s=
+=zSBJ
+-----END PGP SIGNATURE-----

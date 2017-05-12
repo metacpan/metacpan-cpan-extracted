@@ -1,0 +1,75 @@
+{
+   "abstract" : "Scrypt salted password hashing for Mojolicious",
+   "author" : [
+      "Munenori Sugimura <clicktx@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Scrypt",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::PRNG" : "0.041",
+            "Crypt::ScryptKDF" : "0.010",
+            "Mojolicious" : "7.10"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::Scrypt" : {
+         "file" : "lib/Mojolicious/Plugin/Scrypt.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/clicktx/p5-Mojolicious-Plugin-Scrypt/issues"
+      },
+      "homepage" : "https://github.com/clicktx/p5-Mojolicious-Plugin-Scrypt",
+      "repository" : {
+         "url" : "git://github.com/clicktx/p5-Mojolicious-Plugin-Scrypt.git",
+         "web" : "https://github.com/clicktx/p5-Mojolicious-Plugin-Scrypt"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:CLICKTX"
+}

@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name: Maypole-View-Mason
+version: 0.3
+author:
+  - Simon Cozens
+Marcus Ramberg
+abstract: A HTML::Mason view class for Maypole
+license: perl
+requires:
+  HTML::Mason: 1.2
+  Maypole: 2.06
+provides:
+  HTML::Mason::Commands:
+    file: lib/Maypole/View/Mason.pm
+    version: 0.3
+  Maypole::View::Mason:
+    file: lib/Maypole/View/Mason.pm
+    version: 0.3
+generated_by: Module::Build version 0.25

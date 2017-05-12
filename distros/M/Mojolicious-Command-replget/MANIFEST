@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+META.json
+Changes
+Makefile.PL
+cpanfile
+lib/Mojolicious/Command/replget.pm
+t/00-load.t

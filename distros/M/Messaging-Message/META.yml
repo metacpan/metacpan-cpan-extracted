@@ -1,0 +1,29 @@
+---
+abstract: 'message related modules'
+author:
+  - 'Lionel Cons <lionel.cons@cern.ch>'
+build_requires:
+  File::Temp: 0
+  POSIX: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Messaging-Message
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Digest::MD5: 0
+  Encode: 0
+  JSON: 0
+  MIME::Base64: 0
+  No::Worries: 1.1
+  Params::Validate: 0
+version: v1.6.1

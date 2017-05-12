@@ -1,0 +1,14 @@
+#!/usr/bin/perl -w
+
+#
+# opens the folder of the current "insertion location" in the Finder
+#
+
+use strict;
+use warnings;
+
+use Mac::AppleScript::Glue;
+
+my $finder = new Mac::AppleScript::Glue::Application('Finder');
+
+$finder->insertion_location->open;

@@ -1,0 +1,49 @@
+NAME
+
+MIME::Structure - determine structure of MIME messages
+
+
+SYNOPSIS
+
+    use MIME::Structure;
+    $parser = MIME::Structure->new;
+    $root = $parser->parse($filehandle);
+    print $root->{'header'};
+    $parts = $root->{'parts'};
+    foreach ($parts) {
+        $offset  = $_->{'offset'};
+        $type    = $_->{'type'};
+        $subtype = $_->{'subtype'};
+        $line    = $_->{'line'};
+        $header  = $_->{'header'};
+    }
+    print $parser->concise_structure($root), "\n";
+
+
+DESCRIPTION
+
+    perldoc lib/MIME/Structure.pm
+
+
+INSTALL
+
+Install it in the usual way:
+
+    perl Makefile.PL
+    make
+    make test
+    [sudo] make install
+
+
+AUTHOR
+
+Paul Hoffman <nkuitse (at) cpan (dot) org>
+
+
+COPYRIGHT
+
+Copyright 2008 Paul M. Hoffman. All rights reserved.
+
+This program is free software; you can redistribute it and modify it
+under the same terms as Perl itself.
+

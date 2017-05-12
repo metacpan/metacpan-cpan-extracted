@@ -1,0 +1,18 @@
+Revision history for Minion-Command-minion-jobx
+
+0.01    2016-08-05
+        First version, released on an unsuspecting world.
+
+0.02    2016-08-08
+	Fixed make prerequisites, update README
+
+0.03    2016-08-18
+	Added "created" time to list of jobs
+	Added columns headers to list of jobs
+	Convert README to README.md
+
+0.04    2016-08-18
+	Fix documentation to match latest list of jobs
+
+0.05    2016-09-21
+	Make compatible with Minion 6.0

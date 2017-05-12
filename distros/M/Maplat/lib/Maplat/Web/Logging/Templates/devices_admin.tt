@@ -1,0 +1,60 @@
+<p align="center">
+    <form name="powerdevices" method="post" action="[% webpath %]">
+    <table class="data" id="MainDataTable">
+        <tr class="tabheader">
+                <th>[% tr.tr("Hostname") %]</th>
+                <th>[% tr.tr("Type") %]</th>
+                <th>[% tr.tr("Description") %]</th>
+                <th>[% tr.tr("Scan speed") %]</th>
+                <th>[% tr.tr("IP") %]</th>
+                <th>[% tr.tr("User") %]</th>
+                <th>[% tr.tr("Password") %]</th>
+                <th>[% tr.tr("Active") %]</th>
+        </tr>
+        [% FOREACH device IN devices %]
+        <tr>
+                <td>[% device.hostname %]<input type="hidden" name="hostname" value="[% device.hostname %]"></td>
+                <td align="center">[% device.device_type %]</td>
+                <td><input type="text" size="30" maxlength="60" name="desc_[% device.hostname %]" value="[% device.description %]"></td>
+                <td>
+                        <select name="speed_[% device.hostname %]">
+                            <option value="slow"
+                                [% IF device.scanspeed == "slow" %]
+                                    selected="selected"
+                                [% END %]
+                                >[% tr.tr("Slow") %]
+                            </option>
+                            <option value="medium"
+                                [% IF device.scanspeed == "medium" %]
+                                    selected="selected"
+                                [% END %]
+                                >[% tr.tr("Medium") %]
+                            </option>
+                            <option value="fast"
+                                [% IF device.scanspeed == "fast" %]
+                                    selected="selected"
+                                [% END %]
+                                >[% tr.tr("Fast") %]
+                            </option>
+                        </select>
+                </td>
+                <td><input type="text" size="16" maxlength="40" name="ip_[% device.hostname %]" value="[% device.ip_addr %]"></td>
+                <td><input type="text" size="10" maxlength="40" name="user_[% device.hostname %]" value="[% device.username %]"></td>
+                <td><input type="text" size="10" maxlength="40" name="pass_[% device.hostname %]" value="[% device.password %]"></td>
+                <td><input type="checkbox" name="status_[% device.hostname %]"
+                [% IF device.is_active %]
+                checked
+                [% END %]
+                ></td>
+        </tr>
+        [% END %]
+        <tr>
+            <td colspan="8" align="center">
+                <input type="submit" value="[% tr.tr("Save") %]">
+                <input type="reset" value="[% tr.tr("Reset") %]">
+            </td>
+        </tr>
+    </table>
+    <input type="hidden" name="submitform" value="1">
+    </form>
+</p>

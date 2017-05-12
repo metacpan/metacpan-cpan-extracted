@@ -1,0 +1,7 @@
+MANIFEST
+Changes
+Makefile.PL
+README
+lib/MojoX/AIO.pm
+t/00_simple.t
+META.yml                                 Module meta-data (added by MakeMaker)

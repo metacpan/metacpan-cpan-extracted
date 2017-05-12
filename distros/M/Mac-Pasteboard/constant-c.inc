@@ -1,0 +1,138 @@
+
+#undef ROUTINE
+#define ROUTINE "pbl_badPasteboardFlavorErr"
+long pbl_badPasteboardFlavorErr () {
+    return badPasteboardFlavorErr;
+}
+
+#undef ROUTINE
+#define ROUTINE "pbl_badPasteboardIndexErr"
+long pbl_badPasteboardIndexErr () {
+    return badPasteboardIndexErr;
+}
+
+#undef ROUTINE
+#define ROUTINE "pbl_badPasteboardItemErr"
+long pbl_badPasteboardItemErr () {
+    return badPasteboardItemErr;
+}
+
+#undef ROUTINE
+#define ROUTINE "pbl_badPasteboardSyncErr"
+long pbl_badPasteboardSyncErr () {
+    return badPasteboardSyncErr;
+}
+
+#undef ROUTINE
+#define ROUTINE "pbl_coreFoundationUnknownErr"
+long pbl_coreFoundationUnknownErr () {
+    return coreFoundationUnknownErr;
+}
+
+#undef ROUTINE
+#define ROUTINE "pbl_duplicatePasteboardFlavorErr"
+long pbl_duplicatePasteboardFlavorErr () {
+    return duplicatePasteboardFlavorErr;
+}
+
+#undef ROUTINE
+#define ROUTINE "pbl_kPasteboardClientIsOwner"
+unsigned long pbl_kPasteboardClientIsOwner () {
+    return kPasteboardClientIsOwner;
+}
+
+#undef ROUTINE
+#define ROUTINE "pbl_kPasteboardClipboard"
+static char * cstring_kPasteboardClipboard = NULL;
+char * pbl_kPasteboardClipboard () {
+    if (cstring_kPasteboardClipboard == NULL && kPasteboardClipboard != NULL) {
+        cstring_kPasteboardClipboard = pblx_get_cstring (kPasteboardClipboard);
+	LOG_TEXT ("String cached for life of program");
+    }
+    return cstring_kPasteboardClipboard;
+}
+
+
+#undef ROUTINE
+#define ROUTINE "pbl_kPasteboardFind"
+static char * cstring_kPasteboardFind = NULL;
+char * pbl_kPasteboardFind () {
+    if (cstring_kPasteboardFind == NULL && kPasteboardFind != NULL) {
+        cstring_kPasteboardFind = pblx_get_cstring (kPasteboardFind);
+	LOG_TEXT ("String cached for life of program");
+    }
+    return cstring_kPasteboardFind;
+}
+
+
+#undef ROUTINE
+#define ROUTINE "pbl_kPasteboardFlavorNoFlags"
+unsigned long pbl_kPasteboardFlavorNoFlags () {
+    return kPasteboardFlavorNoFlags;
+}
+
+#undef ROUTINE
+#define ROUTINE "pbl_kPasteboardFlavorNotSaved"
+unsigned long pbl_kPasteboardFlavorNotSaved () {
+    return kPasteboardFlavorNotSaved;
+}
+
+#undef ROUTINE
+#define ROUTINE "pbl_kPasteboardFlavorPromised"
+unsigned long pbl_kPasteboardFlavorPromised () {
+    return kPasteboardFlavorPromised;
+}
+
+#undef ROUTINE
+#define ROUTINE "pbl_kPasteboardFlavorRequestOnly"
+unsigned long pbl_kPasteboardFlavorRequestOnly () {
+    return kPasteboardFlavorRequestOnly;
+}
+
+#undef ROUTINE
+#define ROUTINE "pbl_kPasteboardFlavorSenderOnly"
+unsigned long pbl_kPasteboardFlavorSenderOnly () {
+    return kPasteboardFlavorSenderOnly;
+}
+
+#undef ROUTINE
+#define ROUTINE "pbl_kPasteboardFlavorSenderTranslated"
+unsigned long pbl_kPasteboardFlavorSenderTranslated () {
+    return kPasteboardFlavorSenderTranslated;
+}
+
+#undef ROUTINE
+#define ROUTINE "pbl_kPasteboardFlavorSystemTranslated"
+unsigned long pbl_kPasteboardFlavorSystemTranslated () {
+    return kPasteboardFlavorSystemTranslated;
+}
+
+#undef ROUTINE
+#define ROUTINE "pbl_kPasteboardModified"
+unsigned long pbl_kPasteboardModified () {
+    return kPasteboardModified;
+}
+
+#undef ROUTINE
+#define ROUTINE "pbl_kPasteboardUniqueName"
+static char * cstring_kPasteboardUniqueName = NULL;
+char * pbl_kPasteboardUniqueName () {
+    if (cstring_kPasteboardUniqueName == NULL && kPasteboardUniqueName != NULL) {
+        cstring_kPasteboardUniqueName = pblx_get_cstring (kPasteboardUniqueName);
+	LOG_TEXT ("String cached for life of program");
+    }
+    return cstring_kPasteboardUniqueName;
+}
+
+
+#undef ROUTINE
+#define ROUTINE "pbl_noPasteboardPromiseKeeperErr"
+long pbl_noPasteboardPromiseKeeperErr () {
+    return noPasteboardPromiseKeeperErr;
+}
+
+#undef ROUTINE
+#define ROUTINE "pbl_notPasteboardOwnerErr"
+long pbl_notPasteboardOwnerErr () {
+    return notPasteboardOwnerErr;
+}

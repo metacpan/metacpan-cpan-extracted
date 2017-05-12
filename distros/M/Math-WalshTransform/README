@@ -1,0 +1,34 @@
+
+                       Math::WalshTransform.pm
+
+These routines implement fast Hadamard and Walsh Transforms and their
+inverse transforms.
+
+Also included are routines for converting a Hadamard to a Walsh
+transform and vice versa, for calculating the Logical Convolution
+of two lists, or the Logical Autocorrelation of a list, and for
+calculating the Walsh Power Spectrum - in short, almost everything
+you ever wanted to do with a Hadamard Transform.
+
+Intelligible speech can be reconstructed by transforming blocks of,
+say, 64 samples, deleting all but the several largest transform
+components, and inverse-transforming; in other words, these transforms
+extract from a time-series the most significant things that are going
+on.  They should be useful for noticing important things, for example
+in software that monitors time-series data such as system or network
+administration data, share-price, currency, ecological, opinion poll,
+process management data, and so on.
+
+As from version 1.10, Math::WalshTransform uses C routines to perform
+the transforms. This runs 25 to 30 times faster than previous versions.
+Also included is a call-compatible translation into Lua.
+
+To install:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+For up-to-date source, see http://search.cpan.org/~pjb/
+
+Peter J Billam    www.pjb.com.au/comp/contact.html    www.pjb.com.au

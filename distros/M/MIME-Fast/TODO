@@ -1,0 +1,5 @@
+
+- implement g_mime_cipher_ g_mime_session_ g_mime_gpg_
+  g_mime_multipart_encrypted_ g_mime_multipart_signed_
+  Planed for next major release.
+

@@ -1,0 +1,38 @@
+MooseX-Deprecated
+=================
+
+Created:      2013-10-29
+Home page:    <https://metacpan.org/release/MooseX-Deprecated>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Deprecated>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.005	2014-03-11
+
+ - Use Devel::Callsite to warn only once per callsite.
+
+0.004	2013-10-29
+
+ [ Documentation ]
+ - Mention Moose::Deprecated in SEE ALSO.
+ - Note Perl 5.8 limitations regarding warnings::warnif().
+
+ [ Test Suite ]
+ - Include a cut-down test for Perl 5.8.
+ - Skip basic tests in Perl < 5.10; they're not going to work.
+
+0.003	2013-10-29
+
+ [ Bug Fixes ]
+ - Stop relying on warnings::fatal_enabled() function which doesn't exist
+   on Perl < 5.12.
+
+ [ Other ]
+ - Make the undocumented E* functions handle the sprintf stuff within
+   themselves.
+
+0.002	2013-10-29
+
+ - Saner technique for skipping internals when issuing warnings (and also
+   when detecting the currently enabled warning categories).
+
+0.001	2013-10-29	Initial release

@@ -1,0 +1,10 @@
+ [
+    {
+        "label" : "Name",
+        "type" : "text",
+        "validation" : {
+            "required" : { "msg" : "text is required" }
+        },
+        "name" : "name"
+    }
+ ]

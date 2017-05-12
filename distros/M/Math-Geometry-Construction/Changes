@@ -1,0 +1,163 @@
+Revision history for Math-Geometry-Construction
+
+0.024	 Fri Apr 12 14:08:48 CEST 2013
+	 - Math::Geometry::Construction::Vector to unify access to
+	   sources for "vector values"
+	 - started using MooseX::Params::Validate
+	 - using MooseX::Types::Structured to enhance strictness
+	 - docu enhancements
+
+0.023	 Thu Apr  4 13:14:01 CEST 2013
+	 PointOnCircle derivate
+
+0.022	 Mon Mar 25 17:27:04 CET 2013
+	 Fixed test suite to work with perl 5.17.
+
+0.021	 Fri Mar 22 17:49:50 CET 2013 (unpublished)
+	 - extreme_position selector accepts Line objects as
+           direction
+	 - support for setting dash patterns in a unified way for SVG
+	   and TikZ output
+	 - partial drawing of circles
+
+0.020	 Sat Jan  7 15:36:16 NZDT 2012
+	 - The extend attribute is turned into an array reference
+	   with backward and forward extent. When setting the
+	   attribute, this change is transparent since a value x is
+	   coerced into [x, x]. However, when reading the value (not
+	   a typical scenario), you get the array reference instead
+	   of a single number.
+	 - dabbling with operator overloading
+	 - refactored and cleaned up test suite
+
+0.019	 Sun Nov 20 12:19:09 NZDT 2011
+	 - starting to use Moose types
+	 - using coercion in order to accept Math::VectorReal
+	   objects and array references as vectors; this means that
+	   these types can now be used in mutators as well, not only
+	   constructors
+
+0.018	 Sat Nov 19 19:17:28 NZDT 2011
+	 - bug fix: center and support of a Circle are made
+	   readonly; of course, their positions can change, but the
+	   point objects must stay the same, otherwise reuse of
+	   circles will break
+	 - result buffering to speed up large constructions
+
+0.017	 Thu Nov 17 20:14:53 NZDT 2011
+	 - find_or_add methods that allow the reuse of lines and
+	   circles even if no reference or id has been kept
+
+0.016	 Mon Nov 14 19:41:12 NZDT 2011
+	 - fixed bug in SVG generation: if the transform attribute
+	   was specified it leaked through to the SVG object and
+	   made renderers choke
+	 - the close_position and distant_position selectors now
+	   allow to give Point object as reference instead of a
+	   vector
+	 - started example script on Malfatti's problem
+
+0.015	 Sun Nov 13 15:23:37 NZDT 2011
+	 - the view_box attribute for Math::Geometry::Construction
+	   and its subclasses has gone; use the transform attribute
+	   instead
+	 - transform attribute allows simple coordinate
+	   transformations, specifically a swap to a "normal"
+	   mathematic right-handed system as opposed to SVG's
+	   matrix-like system (positive y axis pointing down)
+
+0.014	 Sat Nov 12 16:24:30 NZDT 2011
+	 - switched the underlying vector class from
+	   Math::VectorReal to Math::Vector::Real because the latter
+	   supports 2D vectors natively
+	 - expanded the test suite substantially
+
+0.013	 unpublished
+	 - Line offers a "normal" method now.
+	 - Draw::SVG and Draw::TikZ can both process RGB arrays as
+	   colors; this allows uniform color specification for both
+	   output types
+
+0.012	 Sat Nov  5 21:32:25 NZDT 2011
+	 - a default point size can be set on construction level
+	 - all roles have been moved into the
+	   Math::Geometry::Construction::Role namespace; this should
+	   have been done from the start
+	 - new role DrawPoint to homogenize the treatment of Point
+	   and DerivedPoint
+	 - fixed filling and text color in TikZ output
+
+0.011	 Thu Nov  3 19:35:09 NZDT 2011
+	 - creation of multiple derived points in one go was
+	   documented, but actually not implemented
+	 - close_position and distant_position selectors
+	 - docu corrections and extension
+	 - test suite is still far from exhaustive, but at least
+	   might deserve the title 'test suite' now
+
+0.010	 Tue Nov  1 21:32:18 NZDT 2011
+	 - Fixes two unprotected eval statements, please update.
+	 - All constructors that expect a Math::VectorReal object
+	   now also accept an ARRAY reference with [x, y] instead.
+	 - To construct a circle, you can now give a radius instead
+	   of a point on the periphery.
+	 - some more tests
+
+0.009	 Mon Oct 31 20:00:38 NZDT 2011
+	 - 'radius' attribute of Math::Geometry::Construction::Point
+	   is deprecated in favour of 'size'
+	 - some convenience changes like default values and the
+	   add_derived_point method
+	 - expanded docu considerably
+
+0.008	 Sun Oct 23 11:54:49 NZDT 2011
+	 - initial support for TikZ output; this is highly
+	   experimental and not documented, yet
+	 - fixes bug in PointOnLine with quantile
+
+0.007	 Wed Oct 19 20:44:11 NZDT 2011
+	 - modified drawing framework in order to prepare it for
+	   different output types than SVG; the method as_svg is now
+	   only an alias for draw("SVG", ...)
+	 - new derivates
+	 - fixed "my $_" that had been introduced by find/replace
+	   and blew smoke tests on Perl 5.8
+
+0.006	 Sun Oct 16 18:38:08 NZDT 2011
+	 - Changed point selection to position selection. This is
+	   less future-safe, but more natural and avoids some
+	   workarounds. The visible API change is that the point
+	   selection methods are renamed to position selection
+	   methods. They had not been documented, but showed up in
+	   the SYNOPSIS.
+	 - The width and height attributes have gone and should be
+	   given directly to the output method. Background is now
+	   transparent by default, but can be specified via the
+	   background attribute.
+	 - Lines now accept and expect the support points at
+	   construction time.
+	 - some more Derivative classes for user convenience
+
+0.005	 Sat Oct 15 19:53:35 NZDT 2011
+	 - circles and their intersections with lines and with each
+           other
+	 - some API simplifications for ease of use
+	 - docu fixes and expansion; docu of the main module kind of
+           complete
+
+0.004	 Wed Oct 12 19:52:51 NZDT 2011
+	 - labels for points and lines
+	 - started documentation
+
+0.003	 Tue Oct 11 15:14:33 NZDT 2011 (unpublished)
+	 - increased robustness against non-existing intersections
+           etc.
+	 - changed intersection framework: it can now cater also for
+	   other derived points than intersection points
+
+0.002	 Wed Oct  5 19:52:38 NZDT 2011 (unpublished)
+	 Intersection of lines with lines.
+
+0.001    Sun Sep 25 19:25:49 NZDT 2011 (unpublished)
+         Initial release, can draw points and lines.
+

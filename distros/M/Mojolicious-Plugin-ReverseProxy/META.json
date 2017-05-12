@@ -1,0 +1,57 @@
+{
+   "abstract" : "ReverseProxy plugin for the Mojolicious Perl framework",
+   "author" : [
+      "Tobias Oetiker <tobi@oetiker.ch>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-ReverseProxy",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t",
+         "example",
+         "setup"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "CPAN::Uploader" : "0",
+            "Pod::Markdown::Github" : "0.01"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "7.00",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/oetiker/Mojolicious-Plugin-ReverseProxy/issues"
+      },
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/oetiker/Mojolicious-Plugin-ReverseProxy"
+      }
+   },
+   "version" : "0.705"
+}

@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 2932c8fbd070b0dce376cf5acbf619c754770017 Changes
+SHA1 ad256b61f5d4a6c78d613c1bebbfc76d14ce28af MANIFEST
+SHA1 660716ca74a76b17506bebcd67c497a0440bcb53 META.json
+SHA1 effd9ec0b7f2d182b3a5a2dbe1aeb7b755229947 META.yml
+SHA1 b69bfd940635e10611bbcca6442739746d7a8bcb Makefile.PL
+SHA1 0aa1c54820ff572e7caff9c446e24bb28866c4a8 README
+SHA1 06f0a68a019be31f1a4853ca1f964c6114accc4e lib/Mafia.pm
+SHA1 7c4c5b3a7468763cce1e378aa9a748e573184a3d t/examples.t
+SHA1 5e5233898c2c92a31c2ca3e17aa979b1288bc049 t/examples/Newbie-0001.out
+SHA1 1f30bcec871c4455d8a466ec5236d445e01bb04b t/examples/Newbie-0001.pl
+SHA1 c53bd6cc493afebe33e6975198f54c422c42f2d6 t/examples/Newbie-0002.out
+SHA1 eabca2279e7c432c7e112431f6ac5f90e30ecdaf t/examples/Newbie-0002.pl
+SHA1 fe20491fb0c234d3be12112c338c4e10650ed200 t/examples/Newbie-0003.out
+SHA1 2a5443ffa459d2496f9e9841194a26c53d45739e t/examples/Newbie-0003.pl
+SHA1 fdac43c0578dadda0cb066874244ac36c01fad6f t/examples/Newbie-0004.out
+SHA1 9d708338cce4d448c87b5b3940df7e6b6b84dfdd t/examples/Newbie-0004.pl
+SHA1 81393a262555496aaf6d6750f9ebb1be78c9ac8f t/examples/Newbie-0005.out
+SHA1 76cabd9e0cd33398bad1521cedd587790eb6830b t/examples/Newbie-0005.pl
+SHA1 668edc62795d8e39f03af6fa6bff97f2cfdfba9f t/perlcritic.t
+SHA1 dc489a38ce827f3e366d7b98af6e5ce17b4bc99c t/perlcriticrc
+-----BEGIN PGP SIGNATURE-----
+
+iQJEBAEBCgAuFiEErVNvYICb0H7KK/jxygQ1vl7Bs2IFAlkEx1kQHG1hcml1c0Bp
+ZXZhbC5ybwAKCRDKBDW+XsGzYsE7D/9ngzla183mh4FJss3i3COh8IMwRMkadRIC
+QXFD3mB5F5qcvF1A3NMa46v6vz+2ZcadkJ++Z0XCLmL3nbX7S84LhY7FklBcaZjA
+PumCcP8vRxkd+bB5X06sgYVOhN5DDlI5zDy8s3qAouqP1i5CFUVmgE6c8Ts+CIfK
+cc3fx0Qo/XYc+mE/7M/0UMTQ/F8GAHhlXGwfHtvjtk7JkZWQxOxkYtEOLH7xyVBx
+XcYeSC9RIIVOQqhmvcrxyjnNh7IDX2xt2p2tY5dMZ8dhjo6FKIacTdSCnz2l9CVp
+PcC4iLldJ8cNldt4sFvcjiCalY+Mcc7SheboYSM31OfO5e81OaTC27xov2J+dqrb
+h5O3uW+PGKUJxCGfmdRrzXJ8AEh8K343fdWHfEYYRcoCGGH5uX7meJxAZm+q9vml
+H81IgWq/J3nL1JIxTRXDGbPYF3IFYtaySRAjRaGPiGsgX2Qpvudzh9UE9bxFVXwi
+uGtTjjyp23XjGX1yFw4Gig5KiI/CGO8fnPBFR9nq5MxMsvBsIqtcPanKRLvAvxtN
+Sizk0m+yF4kz/mmujvna3ngHnaNnfuje5w8VbXpefQykY46x5QvTlPdXTvhjNhdu
++6Tcq0qr2MoXfvam7Bgtrpt+de2O3v2fazFcpGiaspRydO1Ld28XVTN5r73UrHIf
+LkS3dbwAOw==
+=VD8d
+-----END PGP SIGNATURE-----

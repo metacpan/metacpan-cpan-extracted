@@ -1,0 +1,109 @@
+This module wraps the MPC library functions.
+
+This version of Math::MPC needs mpc-0.8 or later.
+
+The MPC library is a C library for multiple-precision complex number
+computations with exact rounding. It is based on the MPFR C library
+which, in turn, is based on the GMP C library.
+
+MPC, like MPFR and GMP, is free. It is distributed under the
+GNU Lesser General Public License (GNU Lesser GPL).
+
+Because this module wraps the MPC functions, it requires that the
+MPC library (version 0.8.0 or later), the GMP library (version 4.3.2
+or later) and the MPFR library (version 2.4.2 or later) have been
+installed.
+
+For the GMP library see:
+http://gmplib.org
+
+For the MPFR library see:
+http://www.mpfr.org
+Do not use the (outdated) MPFR library source that ships with the
+GMP source.
+
+For the MPC library see:
+http://www.multiprecision.org/mpc/
+
+You'll also need to have Math::MPFR (version 2.01 or later) installed.
+
+To build this module you need perl 5.6.0 or later. I'm not sure of all
+the requirements to get it to build with earlier versions of perl, but
+it's definite that the XS code relating to operator overloading will
+not compile with perl versions prior to 5.6.
+
+Build in the usual way:
+
+ perl Makefile.PL
+ make
+ make test
+ make install
+
+When building this module, the MPC, GMP and MPFR libraries will need to be
+accessible. If those files are in a location where your compiler does
+not find them by default, then instead of running 'perl Makefile.PL',
+you'll need to run:
+
+perl Makefile.pl INC="-I/path/to/gmp_includes -I/path/to/mpfr_includes -I/path/to/mpc/include"
+ LIBS="-L/path/to/mpc_lib -lmpc -L/path/to/mpfr_lib -lmpfr -L/path/to/gmp_lib -lgmp"
+
+==================================
+64-bit-int and long double support
+==================================
+
+If your perl's Config reports that 'ivsize' is greater than or
+equal to 8 && 'ivtype' is not 'long', then Math::MPC will, by default,
+be built with access to the mpc_*_uj and mpc_*_sj functions. Else,
+access to those functions is, by default, denied. You can override the
+default by opening up the Makefile.PL and uncommenting the appropriate
+line (just a few lines down from the top of the file ... the comments in
+that file should make it clear).
+
+Similarly, if your perl's Config reports that 'nvsize' is greater than
+8 then Math::MPC will be built with access to the mpc_*_ld functions.
+Else, access to those functions is, by default, denied. Again, you can
+override the default by opening up the Makefile.PL and uncommenting the
+appropriate line.
+
+I believe it to be both unnecessary and inadvisable to override the
+default - but if you do find that you need to override the default,
+please let me know. That you have found it necessary to override the
+default is something I probably ought to know about.
+
+===================
+__float128 support
+===================
+
+If $Config{nvtype} is __float128 then passing these values from perl
+to Math::MPC will be automatically supported - using Rmpc_set_NV
+and Rmpc_set_NV_NV functions.
+Returning the values (as __float128) from Math::MPC has to be done via
+accessing the real and imaginary parts as Math::MPFR objects (for which
+you use RMPC_RE and RMPC_IM) - and then using Rmpfr_get_NV to return the
+__float128 values.
+
+=========================
+_Complex C types support
+=========================
+
+The mpc library (beginning with version 0.9) provides support for assigning
+and returning the 'double _Complex' and 'long double _Complex' C data types.
+Therefore Math::MPC (beginning with version 0.90) provides optional support for
+assigning/returning Math::Complex_C (double _Complex) objects and Math::Complex_C::L
+(long double _Complex) objects, using the Rmpc_set_dc, Rmpc_set_ldc, Rmpc_get_dc and
+Rmpc_get_ldc functions.
+
+If Math::Complex_C or Math::Complex_C::L can be loaded then complex.h will be included
+in the compilation and, iff _MPC_H_HAVE_COMPLEX is thereby defined (in mpc.h), then
+Math::MPC will be built with support for the above mentioned set/get functions.
+
+If there's a need to override this default behaviour, just open the Makefile.PL and
+comment in the line of code that forces '$do_complex_h' to be assigned the value you
+want ... either -1 (to force exclusion of support), or 1 (to force support). Then
+run 'make realclean' and start over again.
+
+Any problems, let me know.
+
+I am contactable by email at sisyphus at(@) cpan dot (.) org.
+
+

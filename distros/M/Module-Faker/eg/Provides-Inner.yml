@@ -1,0 +1,12 @@
+--- #YAML:1.0
+name: Provides-Inner
+abstract: nothing to see here
+provides:
+  Provides::Inner:
+    file: lib/Provides/Inner.pm
+    version: 0.001
+  Provides::Inner::Util:
+    file: lib/Provides/Inner.pm
+    version: 0.867
+  Provides::Outer:
+    file: lib/Provides/Outer.pm

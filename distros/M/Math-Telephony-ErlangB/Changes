@@ -1,0 +1,45 @@
+Revision history for Perl extension Math::Telephony::ErlangB.
+
+1.0.2  Sun Jul 21 15:15:00 2013
+   - Fixed issues with encoding & POD
+   - Removed POD tests for non-authors
+
+1.0.1  Thu Feb  9 00:33:00 2012
+   - stepped revision to make CPAN Indexer happy. Why? Ehr...
+     I deleted 1.0.0 accidentally...
+
+1.0.0  Mon Sep  3 19:00:00 2007
+   - forced to jump to this version due to CPAN weirdnesses
+
+0.9.1  Mon Sep  3 18:30:00 2007
+   - clarified dimensions in example
+   - added previously "lost" test cases
+
+0.9    Mon Sep  3 14:53:00 2007
+   - had to step back for module numbering, CPAN indexer complaining
+
+0.0.8  Mon Sep  3 14:41:00 2007
+   - restored README to its previous content, plus some updates.
+   
+0.0.7  Mon Sep  3 12:21:04 2007
+   - changed general structure to my current module layout
+   - changed version numbering to three-numbers, don't know why I use 3 :)
+   - re-arranged documentation and added some tests for pod
+   - added an example for qwalitee whoring
+   - reverted this Changes file so that new stuff is in the head
+
+0.06  Tue Jul 05 01:03:00 2005
+   - _generic_traffic now checks relative precision, not absolute
+
+0.05  Wed Jun 29 03:35:00 2005
+   - added blocking_probability function (same as "gos")
+   - added generic methods to calculate servers and traffic
+
+0.03 and 0.04 were internal
+
+0.02  Fri May 13 00:29:00 2005
+	- moved to Math::Telephony::ErlangB, added tests from ITU
+
+0.01  Mon Jun  6 01:03:13 2005
+	- original version; created by h2xs 1.23 with options
+		-XAn TrafficModeling::ErlangB

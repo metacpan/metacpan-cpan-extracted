@@ -1,0 +1,39 @@
+Revision history for Mojolicious-Plugin-HamlRenderer
+(formerly MojoX-Renderer-Haml)
+
+2.100000 2013-04-04 14:30:00Z
+
+    - Fix API usage for Mojolicious 4.91+.
+
+2.000001 2012-09-19 13:00:00Z
+
+    [Documentation]
+    - Change top-level pod headings to be 'head1' instead of 'head2'
+
+2.000000 2012-09-15 16:00:00Z
+
+    - Attempt to merge diversions between multiple forks
+      (and bump version in both modules to make it apparent).
+    - Correct usage of get_data_template() to work with Mojolicious 3.34+
+      Closes rt-79209 (Thanks to ANDK for reporting).
+
+0.990103    2012-08-14
+
+    - updated code to newer Mojolicious versions.
+    - fixed RT #78333 (thanks ANDK for reporting)
+
+1.1 2011-11-28 18:21:04
+
+    - Require Mojolicious 1.3 and use get_data_template()
+      (which replaced get_inline_template()).
+
+1.0 2011-04-04 14:04:04
+
+    - Updated helper => helpers to stop deprecation warning
+    - Add docs for Haml renderer
+    - Disable caching in development mode
+    - Fix minor typos
+
+0.990101
+
+    - No changelog

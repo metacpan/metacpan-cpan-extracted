@@ -1,0 +1,29 @@
+---
+abstract: 'class that represents the moment in time'
+author:
+  - 'Ivan Bessarabov <ivan@bessarabov.ru>'
+build_requires:
+  Test::More: '0'
+  base: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Moment
+requires:
+  Carp: '0'
+  Scalar::Util: '0'
+  Term::ANSIColor: '0'
+  Time::Local: '0'
+  perl: v5.8.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/bessarabov/Moment/issues
+  homepage: https://github.com/bessarabov/Moment
+  repository: https://github.com/bessarabov/Moment.git
+version: 1.3.0

@@ -1,0 +1,59 @@
+Revision history for Mojolicious-Plugin-AccessLog
+
+0.010   2015-07-15
+        - Bug fix: Figure out request start line w/o side effects.
+        - Close severe memory leaks.
+
+0.009   2015-06-19
+        - Windows strftime again: Remove strftime("%T") in test.
+
+0.008   2015-06-18
+        - Workaround for strftime w/o %s support.
+        - Increase inactivity timeout in test.
+        - Switch to ExtUtils::MakeMaker.
+        - Apply remedy for insomnia.
+
+0.007   2015-06-15
+        - Fix deprecation warning.
+        - Replace auto-generated README by a gentle introduction in
+          markdown format.
+        - Increase minimum Mojolicious version to 3.28.
+        - Bug fix: %t is request start time rather than logging time.
+        - Support for new Apache time string format tokens.
+        - %b/%B counts bytes on wire rather than response content-length.
+        - Bug fix: %s is "-" if server did not sent a response.
+
+0.006   2015-03-23
+        - Requires Mojolicious 2.33.
+        - Fix inbound traffic accounting %I.
+        - Store user name in $c->req->env->{REMOTE_USER}
+          rather than on the stash.
+        - Deprecate uname_helper config option.
+        - Enable Travis CI.
+        - Compute response size (%B, %b) from outbound traffic
+          if no Content-Length exists in the response header.
+
+0.005   2015-01-29
+        - Add traffic measuring like Apache mod_logio.
+        - Test fix for localhost aka 127.0.0.1 (srezic, reneeb)
+
+0.004   2013-05-17
+        - Fix for Mojolicious 4.0 breaking changes (ChinaXing)
+
+0.003   2013-03-04
+        - Set perl_version in Makefile.PL to make Module::Install happy.
+        - Fix occasionally misformatted request serving time in
+          microseconds (%D).
+        - Escape spaces in usernames for standard log formats "common"
+          and "combined".
+        - New plugin parameter "uname_helper" to define a helper method
+          to set the username value (%u) of the log.
+        - Honour environment variable REMOTE_USER for %u (Joseph Frazer)
+
+0.002   2013-01-29
+        - Delay access log line until transaction is finished.
+        - Fix regex warnings from Perl 5.17.6.
+        - Fix a bug in tests, that became visible in 5.17.6.
+
+0.001   2012-11-03
+        First version, released on an unsuspecting world.

@@ -1,0 +1,389 @@
+# Convenience, actually out of WSP
+OCTET:          /[\x00-\xFF]/
+CHAR:           /[\x00-\x7F]/
+UPALPHA:        /[A-Z]/
+LOALPHA:        /[a-z]/
+ALPHA:          /[a-zA-Z]/
+DIGIT:          /\d/
+CTL:            /[\x00-\x1F\x7F]/
+CR:             "\x0D"
+LF:             "\x0A"
+SP:             "\x20"
+HT:             "\x09"
+RFC2616_QUOTE:  "\x22"
+#
+CRLF: CR LF { $return = "\r\n"; 1; }
+LWS:  CRLF(?) ( SP | HT )(1..) {
+   $return = join '', @{$item[1]}, @{$item[2]};
+   1;
+}
+#
+_non_CTL:  /[^\x00-\x1F\x7F]/
+TEXT: ( _non_CTL | LWS )(s) {
+   $return = join '', @{$item[1]};
+   1;
+}
+#
+HEX:  /[a-fA-F0-9]/
+separator:  "(" | ")" | "<" | ">" | "@"
+          | "," | ";" | ":" | "\\" | RFC2616_QUOTE
+          | "/" | "[" | "]" | "?" | "="
+          | "{" | "}" | SP | HT
+token: (...!CTL ...!separator CHAR)(s) {
+   $return = join '', @{$item[1]};
+   1;
+}
+# Convenience
+HIGHOCTET:    /[\x80-\xFF]/
+#
+# bit: undefined
+octet:   OCTET
+uint8:   OCTET     { $return = unpack 'C', $item[1]; 1; }
+uint16:  OCTET(2)  { $return = unpack 'n', join '', @{$item[1]}; 1; }
+uint32:  OCTET(4)  { $return = unpack 'N', join '', @{$item[1]}; 1; }
+uintvar:  HIGHOCTET(0..4) CHAR  {
+   $return = 0;
+   foreach my $high ( @{$item[1]} ) {
+      $return |= ord($high) & 0x7F;
+      $return <<= 7;
+   }
+   $return |= ord($item{CHAR});
+   1;
+}
+TID: uint8
+PDU_type: Reserved | Connect | ConnectReply | Redirect | Reply
+        | Disconnect | Push | ConfirmedPush | Suspend | Resume
+        | Unassigned
+        | Get | Options_GetPDU | Head_GetPDU | Delete_GetPDU | Trace_GetPDU 
+              | Unassigned_GetPDU | ExtendedMethod_GetPDU
+        | Post | Put_PostPDU 
+              | Unassigned_PostPDU | ExtendedMethod_PostPDU
+        | DataFragmentPDU
+Reserved: /[\x00\x81-\xff]/ { $return = $item[0]; 1; }
+Connect: "\x01" { $return = $item[0]; 1; }
+ConnectReply: "\x02" { $return = $item[0]; 1; }
+Redirect: "\x03" { $return = $item[0]; 1; }
+Reply: "\x04" { $return = $item[0]; 1; }
+Disconnect: "\x05" { $return = $item[0]; 1; }
+Push: "\x06" { $return = $item[0]; 1; }
+ConfirmedPush: "\x07" { $return = $item[0]; 1; }
+Suspend: "\x08" { $return = $item[0]; 1; }
+Resume: "\x09" { $return = $item[0]; 1; }
+Unassigned: /[\x10-\x3f]/ { $return = $item[0]; 1; }
+Get: "\x40" { $return = $item[0]; 1; }
+Options_GetPDU: "\x41" { $return = $item[0]; 1; }
+Head_GetPDU: "\x42" { $return = $item[0]; 1; }
+Delete_GetPDU: "\x43" { $return = $item[0]; 1; }
+Trace_GetPDU: "\x44" { $return = $item[0]; 1; }
+Unassigned_GetPDU: /[\x45-\x4f]/ { $return = $item[0]; 1; }
+ExtendedMethod_GetPDU: /[\x50-\x5f]/ { $return = $item[0]; 1; }
+Post: "\x60" { $return = $item[0]; 1; }
+Put_PostPDU: "\x61" { $return = $item[0]; 1; }
+Unassigned_PostPDU: /[\x62-\x6f]/ { $return = $item[0]; 1; }
+ExtendedMethod_PostPDU: /[\x70-\x7f]/ { $return = $item[0]; 1; }
+DataFragmentPDU: "\x80" { $return = $item[0]; 1; }
+# 8.4.2.1 Basic rules
+text_string: quote(?) TEXT(?) end_of_string {
+   $return = scalar @{$item[2]} ? $item[2][0] : '';
+   1;
+}
+#
+token_text: token end_of_string { $return = $item{token}; 1; }
+#
+quoted_string: "\x22" TEXT(?) end_of_string {
+   $return = scalar @{$item[2]} ? $item[2][0] : '';
+   1; 
+}
+#
+extension_media: TEXT(?) end_of_string {
+   $return = scalar @{$item[1]} ? $item[1][0] : '';
+   1;
+}
+#
+short_integer:  HIGHOCTET  { $return = ord($item{HIGHOCTET}) & 0x7F; 1; }
+#
+long_integer:  short_length {
+   my $len = $item{short_length};
+   if ($len >= 1 && $len <= 30 && $len <= length $text) {
+      $return = 0;
+      my $chunk = substr $text, 0, $len;
+      $text = substr $text, $len;
+      for my $char ( split //, $chunk ) {
+         $return = ($return << 8) | ord $char;
+      }
+      1;
+   }
+   else { undef; } # Reject
+}
+#
+# multi_octet_integer buried inside long_integer
+#
+uintvar_integer: uintvar
+#
+constrained_encoding: extension_media | short_integer
+#
+quote:          "\x7F"
+#
+end_of_string:  "\x00"
+#
+#
+# 8.4.2.2 Length
+#
+value_length: short_length | long_length
+#
+short_length:  uint8 {
+   if ($item[1] <= 30) {
+      $return = $item[1];
+      1;
+   }
+   else { undef } # Reject
+}
+#
+length_quote: "\x1F"
+#
+length_: uintvar
+long_length: length_quote length_
+# 8.4.2.3 Parameter Values
+#
+no_value: "\x00" { $return = ''; 1; }
+#
+text_value: no_value | token_text | quoted_string
+#
+integer_value: short_integer | long_integer
+#
+date_value: long_integer
+#
+delta_seconds_value: integer_value
+#
+q_value: HIGHOCTET(?) CHAR {
+   my $value = 0;
+   $value = (ord($item[1][0]) & 0x7F) << 7 if scalar @{$item[1]};
+   $value |= ord($item[2]);
+   if ($value <= 100) {
+      $return = ($value - 1) / 100;
+   }
+   else {
+      $return = ($value - 100) / 1000;
+   }
+   if ($return >= 1) {
+      $return = undef;
+   }
+   else {
+      1;
+   }
+}
+#
+version_value: _short_integer_version | text_string
+#
+_short_integer_version: short_integer {
+   my $version = $item{short_integer};
+   $return = ($version >> 4) & 0x07;
+   my $minor = $version & 0x0F;
+   $return .= ".$minor" if $minor < 15;
+   1;
+}
+#
+uri_value: text_string
+#
+#
+# 8.4.2.4 Parameter
+#
+parameter: typed_parameter | untyped_parameter
+#
+# expand   typed_parameter: well_known_parameter_token typed_value
+typed_parameter: q_parameter
+   | charset_parameter
+   | level_parameter
+   | type_parameter
+   | name_deprecated_parameter
+   | filename_deprecated_parameter
+   | differences_parameter
+   | padding_parameter
+   | type_related_parameter
+   | start_related_deprecated_parameter
+   | start_info_related_deprecated_parameter
+   | comment_deprecated_parameter
+   | domain_deprecated_parameter
+   | max_age_parameter
+   | path_deprecated_parameter
+   | secure_parameter
+   | SEC_wbxml_parameter
+   | MAC_wbxml_parameter
+   | creation_date_parameter
+   | modification_date_parameter
+   | read_date_parameter
+   | size_parameter
+   | name_parameter
+   | filename_parameter
+   | start_related_parameter
+   | start_info_related_parameter
+   | comment_parameter
+   | domain_parameter
+   | path_parameter
+# Parameter definition, build_parameter() defined in g-startup.pl
+# following fields: name, value, encoding
+q_parameter: "\x80" q_value 
+   { $return = build_parameter(@item, '1.1'); 1; }
+charset_parameter: "\x81" well_known_charset
+   { $return = build_parameter(@item, '1.1'); 1; }
+level_parameter: "\x82" version_value
+   { $return = build_parameter(@item, '1.1'); 1; }
+type_parameter: "\x83" integer_value
+   { $return = build_parameter(@item, '1.1'); 1; }
+name_deprecated_parameter: "\x85" text_string
+   { $return = build_parameter(@item, '1.1'); 1; }
+filename_deprecated_parameter: "\x86" text_string
+   { $return = build_parameter(@item, '1.1'); 1; }
+differences_parameter: "\x87" field_name
+   { $return = build_parameter(@item, '1.1'); 1; }
+padding_parameter: "\x88" short_integer
+   { $return = build_parameter(@item, '1.1'); 1; }
+type_related_parameter: "\x89" constrained_encoding
+   { $return = build_parameter(@item, '1.2'); 1; }
+start_related_deprecated_parameter: "\x8a" text_string
+   { $return = build_parameter(@item, '1.2'); 1; }
+start_info_related_deprecated_parameter: "\x8b" text_string
+   { $return = build_parameter(@item, '1.2'); 1; }
+comment_deprecated_parameter: "\x8c" text_string
+   { $return = build_parameter(@item, '1.3'); 1; }
+domain_deprecated_parameter: "\x8d" text_string
+   { $return = build_parameter(@item, '1.3'); 1; }
+max_age_parameter: "\x8e" delta_seconds_value
+   { $return = build_parameter(@item, '1.3'); 1; }
+path_deprecated_parameter: "\x8f" text_string
+   { $return = build_parameter(@item, '1.3'); 1; }
+secure_parameter: "\x90" no_value
+   { $return = build_parameter(@item, '1.3'); 1; }
+SEC_wbxml_parameter: "\x91" short_integer
+   { $return = build_parameter(@item, '1.4'); 1; }
+MAC_wbxml_parameter: "\x92" text_value
+   { $return = build_parameter(@item, '1.4'); 1; }
+creation_date_parameter: "\x93" date_value
+   { $return = build_parameter(@item, '1.4'); 1; }
+modification_date_parameter: "\x94" date_value
+   { $return = build_parameter(@item, '1.4'); 1; }
+read_date_parameter: "\x95" date_value
+   { $return = build_parameter(@item, '1.4'); 1; }
+size_parameter: "\x96" integer_value
+   { $return = build_parameter(@item, '1.4'); 1; }
+name_parameter: "\x97" text_value
+   { $return = build_parameter(@item, '1.4'); 1; }
+filename_parameter: "\x98" text_value
+   { $return = build_parameter(@item, '1.4'); 1; }
+start_related_parameter: "\x99" text_value
+   { $return = build_parameter(@item, '1.4'); 1; }
+start_info_related_parameter: "\x9a" text_value
+   { $return = build_parameter(@item, '1.4'); 1; }
+comment_parameter: "\x9b" text_value
+   { $return = build_parameter(@item, '1.4'); 1; }
+domain_parameter: "\x9c" text_value
+   { $return = build_parameter(@item, '1.4'); 1; }
+path_parameter: "\x9d" text_value
+   { $return = build_parameter(@item, '1.4'); 1; }
+# Actually unused, have expanded all above with correct codes
+typed_value: compact_value | text_value
+#
+compact_value: integer_value
+   | date_value | delta_seconds_value | q_value | version_value
+   | uri_value
+# Back to usefulness
+untyped_parameter: token_text untyped_value {
+   $return = { name => $item[1], value => $item[2] };
+   1;
+}
+#
+untyped_value: integer_value | text_value
+# Content-Type and its family
+content_type_value: ct_constrained_media | content_general_form
+ct_constrained_media: constrained_media {
+   $return = { text => $item[1], media_type => $item[1], parameters => {} };
+   1;
+}
+content_general_form: value_length {
+   my $len = $item[1];
+   if ($len <= length $text) {
+      my $ctdata = substr $text, 0, $len;
+      $text = substr $text, $len;
+      $return = $thisparser->_media_type($ctdata);
+      defined($return)|| undef;
+   }
+   else { undef }
+}
+_media_type: ( _trans_well_known_media | extension_media ) parameter(s?) {
+   my $media_type = $item[1];
+   if (defined $media_type) {
+      my @parameters = map { # param_encode() defined in g-startup.pl
+         $_->{name} . ' = ' . param_encode($_->{value});
+      } @{$item[2]};
+      my %parameters = map { $_->{name} => $_->{value} } @{$item[2]};
+      my $text = join '; ', $media_type, @parameters;
+      $return = {
+         text => $text,
+         media_type => $media_type,
+         parameters => \%parameters,
+      };
+      1;
+   }
+   else {undef}
+}
+media_type: _media_type {
+   my $media_type = $item[1] || {};
+   $return = $media_type->{text};
+   defined($return);
+}
+_trans_well_known_media: well_known_media {
+   # media_type_for() defined in g-startup.pl
+   $return = media_type_for($item{well_known_media});
+   1;
+}
+# Spurious definition, eventually integrated elsewhere
+well_known_charset: any_charset | _well_known_charset_wcode
+_well_known_charset_wcode: integer_value {
+   my %name_for = (
+      0x07ea => 'big5',
+      0x03e8 => 'iso-10646-ucs-2',
+      0x04 => 'iso-8859-1',
+      0x05 => 'iso-8859-2',
+      0x06 => 'iso-8859-3',
+      0x07 => 'iso-8859-4',
+      0x08 => 'iso-8859-5',
+      0x09 => 'iso-8859-6',
+      0x0a => 'iso-8859-7',
+      0x0b => 'iso-8859-8',
+      0x0c => 'iso-8859-9',
+      0x11 => 'shift_JIS',
+      0x03 => 'us-ascii',
+      0x6a => 'utf-8',
+   );
+   $return = $item[1];
+   $return = $name_for{$return} if exists $name_for{$return};
+   1;
+}
+any_charset: "\x80" { $return = '*'; 1; }
+field_name: token_text | well_known_field_name
+well_known_field_name: short_integer
+constrained_media: constrained_encoding
+well_known_media: integer_value
+#
+# Multipart
+#
+multipart: multipart_header multipart_entry(s)
+multipart_header: uintvar
+multipart_entry: multipart_headers_len multipart_data_len {
+   my ($hlen, $dlen) = @item[1,2];
+   $return = {
+      headers => $thisparser->multipart_headers(substr $text, 0, $hlen),
+      data => substr($text, $hlen, $dlen),
+   };
+   $text = substr $text, $hlen + $dlen;
+   1;
+}
+multipart_headers_len: uintvar
+multipart_data_len: uintvar
+multipart_headers: content_type_value {
+   $return = {
+      content_type => $item[1],
+      other_headers => $text,
+   };
+   1;
+}

@@ -1,0 +1,15 @@
+README
+MANIFEST
+Changes
+META.yml
+Makefile.PL
+test.pl
+ALSA.pm
+ALSA.xs
+examples/apmid
+examples/armid
+examples/midiclick
+examples/midiecho
+examples/midiedit
+examples/midifade
+examples/midikbd

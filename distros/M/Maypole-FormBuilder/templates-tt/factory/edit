@@ -1,0 +1,31 @@
+[% INCLUDE header %]
+[% FOREACH item IN objects %]
+
+<h2>Edit [% mclass.moniker %]: [% item %]</h2>
+
+<div class="fleft">
+<fieldset>
+<legend>[% item.stringify_self %]</legend>
+[% request.as_form.render %]
+
+<h2>Add related records</h2>
+
+[% FOREACH related IN item.edit_fields %]
+
+[% INCLUDE addto
+	add_to = item
+	field = related 
+%]
+[% END %]
+
+</fieldset>
+
+</div>
+<hr>
+[% INCLUDE edit_all_has_a
+	object = item
+%]
+
+[% END %]
+
+[% INCLUDE footer %]

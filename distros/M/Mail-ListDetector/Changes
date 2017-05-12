@@ -1,0 +1,72 @@
+Revision history for Perl extension Mail::ListDetector.
+
+0.01  Mon Jan 15 19:54:06 2001
+	- original version; created by h2xs 1.20 with options
+		-X -n Mail::ListDetector
+
+0.15 Thu Aug 09 20:00:00 2001
+	- support more lists,
+	- bugfixes
+	- use Test::More
+	- Patches from Andy Turner
+
+0.19 Wed Jan 02 20:59:19 2002
+  - assimilate Mail::ListDetector::Detector::Fml
+
+0.21 Mon May 06 22:19:00 2002
+  - unassimilate Fml
+  - Patch from Peter Oliver for list owner messages
+
+0.22 Thu Jun 27 21:15:00 2002
+  - Cleanup documentation to fix rt.cpan.org ticket 62
+  - Finally assimilate Mail::ListDetector::Detector::Fml properly
+  - Import into CVS
+
+0.24 Sun Jul 06 2003
+  - I've lost the CVS repository, oh well, that's what CPAN's for.
+  - Add recognition for some mailman lists with minimal headers.
+
+0.25 Mon Jul 21 2003
+  - Add mention of mailing list to README file.
+  - Integrate cleanup and new detector from Matthew Walker <matthew@walker.wattle.id.au>
+
+0.28 26 Aug 2003
+  - Add Patch from Mik Firestone for Mailman on freebsd mailing lists (
+  	and probably others).
+
+0.29 13 Oct 2003
+  - Add patch from Matthew Walker for Communigate.
+
+0.30 28 May 2004
+  - Add patch from Simon Cozens for use of Email::Abstract.
+
+0.31 8 June 2004
+  - Add correction to previous patch from Simon Cozens.
+  - Add the following from Matthew Walker:
+	- tweak docs for Listbox
+	- for RFC2369 List-Post has URI in <>'s but may have comments, now extract
+	  text from within <>'s to give to URI
+	- Majordomo now recognises lists using domo as unix user not just majordomo 
+	- added new detectors for AutoShare, Google Groups, LetterRip, ListSTAR,
+	  Lyris and Onelist
+	1- added tests for all changes and additions
+
+0.32 30 Oct 2005
+  - Add patch from Peter Oliver for some mailman lists
+
+0.34 08 Apr 2006
+  - Add patch for bare debug issue reported by Chip Salzenberg <chip@synthian.ath.cx>
+
+1.01 13 Mar 2007
+  - Increase CPANTS score.
+
+1.02 14 Nov 2009
+  - Fix CPAN RT bug 35320 - add missing dependency
+  - Add Test::Kwalitee to ensure we always have kwalitee.
+  - Add github repo http://github.com/mstevens/Mail--ListDetector
+
+1.03 30 Jun 2010
+  - Make license more explicit
+
+1.04 19 Feb 2011
+  - Fix pod warnings.

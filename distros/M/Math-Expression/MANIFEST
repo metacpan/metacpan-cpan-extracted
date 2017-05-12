@@ -1,0 +1,15 @@
+BuildDistribution.sh
+Changes
+Credits
+Expression.pm
+Makefile.PL
+MANIFEST
+README
+README.in
+Examples/UseOfOptions.pl
+Examples/BasicUse.pl
+Examples/Strings.pl
+t/test.t
+t/options.t
+TODO
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,21 @@
+---
+load_config_file: __path_to(root/forms/defaults.yml)__
+id: role_form
+
+elements:
+  - type: Text
+    name: name
+    label_loc: Role Name
+    constraints:
+      - Required
+  - type: Checkbox
+    name: active
+    label_loc: "Active?"
+  - type: Repeatable
+    increment_field_names: 0
+    elements:
+      - type: Text
+      - name: role_members
+  - type: Submit
+    name: submit
+    value_loc: Save

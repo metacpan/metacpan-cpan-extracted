@@ -1,0 +1,387 @@
+NAME
+    Mojolicious::Plugin::NetsPayment - Make payments using Nets
+
+VERSION
+    0.04
+
+DESCRIPTION
+    Mojolicious::Plugin::NetsPayment is a plugin for the Mojolicious web
+    framework which allow you to do payments using
+    <http://www.betalingsterminal.no|Nets>.
+
+    This module is EXPERIMENTAL. The API can change at any time. Let me know
+    if you are using it.
+
+SYNOPSIS
+      use Mojolicious::Lite;
+
+      plugin NetsPayment => {
+        merchant_id => '...',
+        token => '...',
+      };
+
+      # register a payment and send the visitor to Nets payment terminal
+      post '/checkout' => sub {
+        my $self = shift->render_later;
+        my %payment = (
+          amount => $self->param('amount'),
+          order_number => scalar $self->param('order_number'),
+        );
+
+        Mojo::IOLoop->delay(
+          sub {
+            my ($delay) = @_;
+            $self->nets(register => \%payment, $delay->begin);
+          },
+          sub {
+            my ($delay, $res) = @_;
+            return $self->render(text => "Ooops!", status => $res->code) unless $res->code == 302;
+            # store $res->param('transaction_id');
+            $self->redirect_to($res->headers->location);
+          },
+        );
+      };
+
+      # after redirected back from Nets payment terminal
+      get '/checkout' => sub {
+        my $self = shift->render_later;
+
+        Mojo::IOLoop->delay(
+          sub {
+            my ($delay) = @_;
+            $self->nets(process => {}, $delay->begin);
+          },
+          sub {
+            my ($delay, $res) = @_;
+            return $self->render(text => $res->param("message"), status => $res->code) unless $res->code == 200;
+            # store $res->param('transaction_id') and $res->param('authorization_id');
+            $self->render(text => "yay!");
+          },
+        );
+      };
+
+  Self contained
+      use Mojolicious::Lite;
+
+      plugin NetsPayment => {
+        merchant_id => '...',
+        token => \ "dummy",
+      };
+
+    Setting token to a reference will enable this plugin to work without a
+    working nets backend. This is done by replicating the behavior of Nets.
+    This is especially useful when writing unit tests.
+
+    The following routes will be added to your application to mimic nets:
+
+    *   /nets/Netaxept/Process.aspx
+
+        <http://www.betalingsterminal.no/Netthandel-forside/Teknisk-veiledni
+        ng/API/Process/>.
+
+    *   /nets/Netaxept/Query.aspx
+
+        <http://www.betalingsterminal.no/Netthandel-forside/Teknisk-veiledni
+        ng/API/Query/>.
+
+    *   /nets/Netaxept/Register.aspx
+
+        <http://www.betalingsterminal.no/Netthandel-forside/Teknisk-veiledni
+        ng/API/Register/>.
+
+    *   /nets/Terminal/default.aspx
+
+        <http://www.betalingsterminal.no/Netthandel-forside/Teknisk-veiledni
+        ng/Terminal/>.
+
+ATTRIBUTES
+  base_url
+      $str = $self->base_url;
+
+    This is the location to Nets payment solution. Will be set to
+    <https://epayment.nets.eu> if the mojolicious application mode is
+    "production" or <https://test.epayment.nets.eu> if not.
+
+  currency_code
+      $str = $self->currency_code;
+
+    The currency code, following ISO 4217. Default is "NOK".
+
+  merchant_id
+      $str = $self->merchant_id;
+
+    The value for the merchant ID, can be found in the Nets admin gui.
+
+  token
+      $str = $self->token;
+
+    The value for the merchant ID, can be found in the Nets admin gui.
+
+HELPERS
+  nets
+      $self = $c->nets;
+      $c = $c->nets($method => @args);
+
+    Returns this instance unless any args have been given or calls one of
+    the avaiable "METHODS" instead. $method need to be without "_payment" at
+    the end. Example:
+
+      $c->nets(register => { ... }, sub {
+        my ($c, $res) = @_;
+        # ...
+      });
+
+METHODS
+  process_payment
+      $self = $self->process_payment(
+        $c,
+        {
+          transaction_id => $str, # default to $c->param("transactionId")
+          operation => $str, # default to AUTH
+          # ...
+        },
+        sub {
+          my ($self, $res) = @_;
+        },
+      );
+
+    From
+    <http://www.betalingsterminal.no/Netthandel-forside/Teknisk-veiledning/A
+    PI/Process/>:
+
+      All financial transactions are encapsulated by the "Process"-call.
+      Available financial transactions are AUTH, SALE, CAPTURE, CREDIT
+      and ANNUL.
+
+    Useful $res values:
+
+    *   $res->code
+
+        Holds the response code from Nets. Will be set to 500 by this
+        module, if the message could not be parsed.
+
+    *   $res->param("code")
+
+        "OK" on success, something else on failure.
+
+    *   $res->param("authorization_id")
+
+        Only set on success. An ID identifying this authorization.
+
+    *   $res->param("operation")
+
+        Only set on success. This is the same value as given to this method.
+
+    *   $res->param("transaction_id")
+
+        Only set on success. This is the same value as given to this method.
+
+    *   $res->param("message")
+
+        Only set if "code" is not "OK". Holds a description of the error.
+        See also "ERROR HANDLING".
+
+    *   $res->param("source")
+
+        Only set if "code" is not "OK". See also "ERROR HANDLING".
+
+  query_payment
+      $self = $self->query_payment(
+        $c,
+        {
+          transaction_id => $str,
+        },
+        sub {
+          my ($self, $res) = @_;
+        },
+      );
+
+    From
+    <http://www.betalingsterminal.no/Netthandel-forside/Teknisk-veiledning/A
+    PI/Query/>:
+
+      To check the status of a transaction at any time, you can use the Query-call.
+
+    Useful $res values:
+
+    *   $res->param("amount")
+
+        Holds the "amount" given to "register_payment".
+
+    *   $res->param("amount_captured")
+
+        The amount which has been captured on this transaction. This value
+        is the "AmountCaptured" value devided by 100.
+
+    *   $res->param("amount_credited")
+
+        The amount which has been credited on this transaction. This value
+        is the "AmountCredited" value devided by 100.
+
+    *   $res->param("annulled")
+
+        Whether or not this transaction has been annulled. Boolean true or
+        false.
+
+    *   $res->param("authorized")
+
+        Whether or not this transaction has been authorized. Boolean true or
+        false.
+
+    *   $res->param("currency_code")
+
+        The currency code, following ISO 4217. Typical examples include
+        "NOK" and "USD". Often the same as "currency_code".
+
+    *   $res->param("order_description")
+
+        Holds the "order_description" given to "register_payment".
+
+    *   $res->param("order_number")
+
+        Holds the "order_number" given to "register_payment".
+
+    *   $res->param("authorization_id")
+
+        Same as "authorization_id" from "process_payment".
+
+    *   $res->param("customer_address1")
+
+    *   $res->param("customer_address2")
+
+    *   $res->param("customer_country")
+
+    *   $res->param("customer_email")
+
+    *   $res->param("customer_first_name")
+
+    *   $res->param("customer_ip")
+
+    *   $res->param("customer_last_name")
+
+    *   $res->param("customer_number")
+
+    *   $res->param("customer_phone_number")
+
+    *   $res->param("customer_postcode")
+
+    *   $res->param("expiry_date")
+
+        Which date the card expires on the format YYMM.
+
+    *   $res->param("issuer_country")
+
+        Which country the card was issued, following ISO 3166.
+
+    *   $res->param("masked_pan")
+
+        The personal account number used for this transaction, masked with
+        asterisks.
+
+    *   $res->param("payment_method")
+
+        Which payment method was used for this transaction. Examples:
+        "Visa", "MasterCard", "AmericanExpress", ...
+
+    See also "ERROR HANDLING".
+
+  register_payment
+      $self = $self->register_payment(
+        $c,
+        {
+          amount => $num, # 99.90, not 9990
+          order_number => $str,
+          redirect_url => $str, # default to current request URL
+          # ...
+        },
+        sub {
+          my ($self, $res) = @_;
+        },
+      );
+
+    From
+    <http://www.betalingsterminal.no/Netthandel-forside/Teknisk-veiledning/A
+    PI/Register/>:
+
+      The purpose of the register call is to send all the data needed to
+      complete a transaction to Netaxept servers. The input data is
+      organized into a RegisterRequest, and the output data is formatted
+      as a RegisterResponse.
+
+    NOTE: "amount" in this API need to be a decimal number, which will be
+    duplicated with 100 to match the Nets documentation.
+
+    There are many more options that can be passed on to "register_payment".
+    Look at
+    <http://www.betalingsterminal.no/Netthandel-forside/Teknisk-veiledning/A
+    PI/Register/> for a complete list. CamelCase arguments can be given in
+    normal form. Examples:
+
+      # NetsDocumentation   | perl_argument_name
+      # --------------------|----------------------
+      # currencyCode        | currency_code
+      # customerPhoneNumber | customer_phone_number
+
+    Useful $res values:
+
+    *   $res->code
+
+        Set to 302 on success.
+
+    *   $res->param("transaction_id")
+
+        Only set on success. An ID identifying this transaction. Generated
+        by Nets.
+
+    *   $res->headers->location
+
+        Only set on success. This holds a URL to the Nets terminal page,
+        which you will redirect the user to after storing the transaction ID
+        and other customer related details.
+
+  register
+      $app->plugin(NetsPayment => \%config);
+
+    Called when registering this plugin in the main Mojolicious application.
+
+ERROR HANDLING
+    There are some generic error handling in this module: The $res object
+    passed on to the callbacks will have "source" and "message" set. These
+    can be retrived using the code below:
+
+      $int = $res->code; # will be 500 on exception
+      $str = $res->param("source");
+      $str = $res->param("message");
+
+    The "source" might have to special values:
+
+    *   Same as "base_url".
+
+        If the "source" is set to the value of "base_url" then the "message"
+        will contain an exception from Nets.
+
+    *   "Mojolicious::Plugin::NetsPayment"
+
+        If the "source" is set to this package name, then the "message" will
+        be an exception from parse error.
+
+SEE ALSO
+    *   Overview
+
+        <http://www.betalingsterminal.no/Netthandel-forside/Teknisk-veiledni
+        ng/Overview/>
+
+    *   API
+
+        <http://www.betalingsterminal.no/Netthandel-forside/Teknisk-veiledni
+        ng/API/>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014, Jan Henning Thorsen
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+AUTHOR
+    Jan Henning Thorsen - "jhthorsen@cpan.org"
+

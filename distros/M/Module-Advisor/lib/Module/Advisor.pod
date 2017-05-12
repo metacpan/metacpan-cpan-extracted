@@ -1,0 +1,332 @@
+
+=encoding utf8
+
+=for stopwords ddf timezone segv eof x-up-devcap-multimedia StandAloneGPS filehandles colourful newlines big-endian x-up-devcap-multimedia(StandAloneGPS)
+
+=head1 NAME
+
+Module::Advisor - check a modules you are installed
+
+=head1 SYNOPSIS
+
+    use Module::Advisor;
+    Module::Advisor->new()->check();
+
+=head1 DESCRIPTION
+
+Module::Advisor checks a modules you are installed, and notice if:
+
+=over 4
+
+=item There is a module, have known bugs.
+
+=item There is a module, have optional XS module for better performance.
+
+=item Your are using broken version of CPAN module.
+
+=back
+
+=head1 RULES
+
+Here is a rules to check the modules.
+
+=head2 Modules have security issues.
+
+=over 4
+
+=item Digest E<lt> 1.17
+
+have a security issue. which could lead to the injection of arbitrary Perl code
+
+=item Encode E<lt> 2.44
+
+heap overflow
+
+=item Encode E<lt> 2.49
+
+memory leaks
+
+
+=back
+
+=head2 Modules have performance improvements
+
+=over 4
+
+
+=item UNIVERSAL::require E<lt> 0.11
+
+is 400% faster
+
+
+=back
+
+=head2 Modules have bugs
+
+=over 4
+
+
+=item Plack E<lt> 0.9982
+
+sanity check to remove newlines from headers
+
+
+=item Time::Piece E<lt> 1.16
+
+have timezone related issue
+
+
+=item DBD::SQLite E<lt> 1.20
+
+a lot of bugs.
+
+
+=item Mouse E<gt>= 1.07, E<lt> 1.12
+
+Memory leaks in trigger
+
+
+=item Text::Xslate E<lt> 1.0011
+
+&apos; bug.
+
+
+=item Text::Xslate E<lt> 1.5021
+
+segv in "render" recursion call
+
+
+=item Text::Xslate E<lt> 1.6001
+
+possibly memory leaks on VM stack frames. see https://github.com/xslate/p5-Text-Xslate/issues/71
+
+
+=item Text::Xslate E<lt> 2.0005
+
+Nested WRAPPER broken https://github.com/xslate/p5-Text-Xslate/issues/79
+
+
+=item Furl E<lt> 0.39
+
+unexpected eof in reading chunked body. It makes busy loop.
+
+
+=item AnyEvent::MPRPC E<lt> 0.15
+
+switch to Data::MessagePack::Stream
+
+
+=item Data::MessagePack E<lt> 0.46
+
+fixed unpacking issue on big-endian system.
+
+
+=item Data::MessagePack E<lt> 0.39
+
+packing float numbers fails on some cases
+
+
+=item FCGI::Client E<lt> 0.06
+
+fixed large packet issue
+
+
+=item Starlet E<lt> 0.12
+
+fix infinite loop when connection is closed while receiving response content
+
+
+=item Starman E<lt> 0.2014
+
+$res-E<gt>[1] is broken after output (This is actualized with Plack::Middleware::AccessLog::Timed) https://github.com/miyagawa/Starman/pull/31
+
+
+=item Starman E<lt> 0.1006
+
+Fixed 100% CPU loop when an unexpected EOF happens
+
+
+=item Twiggy E<lt> 0.1000
+
+busy loop
+
+
+=item Teng E<lt> 0.14
+
+fixed deflate bug.
+
+
+=item DBIx::Skinny E<lt> 0.0742
+
+txn_scope bug fixed
+
+
+=item DBIx::TransactionManager E<lt> 1.11
+
+not execute begin_work at AutoCommit=0.
+
+
+=item HTTP::MobileAgent E<lt> 0.36
+
+new x-up-devcap-multimedia(StandAloneGPS) support
+
+
+=item HTTP::MobileAgent E<lt> 0.35
+
+Updated $HTMLVerMap and $GPSModelsRe in DoCoMo.pm
+
+
+=item Encode::JP::Mobile E<lt> 0.25
+
+resolved FULLWIDTH TILDE issue, etc.
+
+
+=item Template E<lt> 2.15
+
+uri filter does not works properly https://rt.cpan.org/Public/Bug/Display.html?id=19593
+
+
+=item HTML::FillInForm::Lite E<lt> 1.11
+
+HTML5 style tags support
+
+
+=item Proc::Daemon E<lt> 0.12
+
+Init() did not close all filehandles reliably in some cases.
+
+
+=item ExclusiveLock::Guard E<lt> 0.04
+
+change of the file stat timing (measures under high load)
+
+
+=item autobox E<lt> 2.78
+
+segv in END block https://rt.cpan.org/Ticket/Display.html?id=80400
+
+
+=item Amon2::DBI == 0.31
+
+transaction management bug
+
+
+=item Math::Random::MT == 1.15
+
+rand() took no notice of argument RT #78200
+
+
+=item Module::Install == 1.04
+
+Broken, http://weblog.bulknews.net/post/33907905561/do-not-ship-modules-with-module-install-1-04
+
+
+=item Mouse == 1.04
+
+Broken, http://d.hatena.ne.jp/gfx/20130208/1360283357
+
+
+=item Plack::Middleware::AxsLog == 0.20
+
+Missing \n
+
+
+=back
+
+=head2 The version of this module was broken
+
+=over 4
+
+
+=back
+
+=head2 Recommended XS module for better performance
+
+=over 4
+
+
+=item JSON::XS is recommended
+
+If you are using JSON.
+
+
+=item HTTP::Parser::XS is recommended
+
+If you are using Plack.
+
+
+=item Linux::Inotify2 is recommended
+
+If you are using Filesys::Notify::Simple.
+
+
+=back
+
+=head2 Recommended version to enable good feature
+
+=over 4
+
+
+=item Amon2 E<lt> 3.29 does not have
+
+JSON hijacking detection.
+
+
+=item Log::Minimal E<lt> 0.10 does not have
+
+LM_COLOR
+
+
+=item Log::Minimal E<lt> 0.08 does not have
+
+colourful logging
+
+
+=item Log::Minimal E<lt> 0.03 does not have
+
+ddf
+
+
+=item Proclet E<lt> 0.12 does not have
+
+Proclet::Declare
+
+
+=item DBI E<lt> 1.614 does not have
+
+AutoInactiveDestroy
+
+
+=item Module::Install::XSUtil E<lt> 0.44 does not have
+
+PUREPERL_ONLY=1
+
+
+=back
+
+=head2 Recommend modules when using ...
+
+=over 4
+
+
+=item I recommend to install LWP::Protocol::https, if you are using LWP.
+
+Need to support https
+
+
+=back
+
+=head1 AUTHOR
+
+Tokuhiro Matsuno E<lt>tokuhirom AAJKLFJEF@ GMAIL COME<gt>
+
+=head1 SEE ALSO
+
+=head1 LICENSE
+
+Copyright (C) Tokuhiro Matsuno
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,81 @@
+See the GitHub repository for a list of individual changes. [1] As of
+the 1.06 release this document only lists high level changes.
+
+[1] https://github.com/blair/perl-math-interpolate/commits/master
+
+Sun Nov 10 15:39:39 PST 2013
+
+	Release 1.06.
+
+	New 'mydist' Makefile target to sign and build a tarball.
+
+	Pass ABSTRACT, AUTHOR, LICENSE and MIN_PERL_VERSION to
+	ExtUtils::MakeMaker::WriteMakefile().
+
+	Correctly set $VERSION that doesn't trigger warnings:
+	https://rt.cpan.org/Ticket/Display.html?id=89020
+
+	Update documentation to include the URL to the project's new
+	source code repository at github.com:
+	https://github.com/blair/perl-math-interpolate
+
+	Update author contact email address.
+
+Tue Aug 24 11:28:45 PDT 1999
+
+	Release 1.05.
+
+Tue Aug 24 11:28:19 PDT 1999
+
+	Make the module work with Perl 5.004_01.
+
+Tue Aug 17 11:42:49 PDT 1999
+
+	Release 1.04.
+
+Tue Aug 17 11:42:26 PDT 1999
+
+	Add one more test to check if a properly sorted array can be
+	created using interval_search.
+
+Tue Aug 17 11:12:12 PDT 1999
+
+	Release 1.03.
+
+Tue Aug 17 11:07:53 PDT 1999
+
+	Update the POD documentation in Math::IntervalSearch.  It was not
+	correctly listing the interval_search function, rather it was
+	listing a function named interval.
+
+Thu Apr  8 10:20:30 PDT 1999 <blair@geostaff.com> (Blair Zajac)
+
+	Have ok() in t/*.t return the success or failure of the
+	test instead of the number of tests performed.
+
+	Release 1.02.
+
+Mon Dec 28 12:35:33 PST 1998 <bzajac@geostaff.com> Blair Zajac
+
+	Add some more documentation for Math::IntervalSearch.
+
+	Update all email addresses from bzajac@geocities.com to
+	bzajac@geostaff.com.
+
+	Version 1.01.
+
+Wed Nov 18 09:01:13 PST 1998 <bzajac@geostaff.com> Blair Zajac
+
+	Change name of interval to interval_search.
+
+	Change "return;" of interval_search to "return -1;" when an
+	empty array is passed in.
+
+	Spell check the documentation.
+
+	Version 1.00.
+	
+Wed Aug  5 13:58:40 PDT 1998 <blair@geostaff.com> Blair Zajac
+
+	Version 0.01.
+	First version copied from the Borp source tree.

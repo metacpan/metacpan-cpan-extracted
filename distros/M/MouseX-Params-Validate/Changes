@@ -1,0 +1,40 @@
+Revision history for MouseX::Params::Validate
+
+0.10    Wed Nov 30 15:20:00 2016
+        - Updated test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.09    Fri Nov 18 21:45:00 2016
+        - Updated Copyright year information.
+
+0.08    Wed Jan 14 20:26:00 2015
+        - Updated Makefile.PL to generate the key 'provides' for META file correctly.
+        - Added unit test to test META files.
+        - Removed SIGNATURE file.
+        - Added LICENSE file.
+        - Updated Copyright year information.
+        - Tidied up the test scripts in general.
+
+0.07    Sun Sep 07 22:52:10 2014
+        - Updated Copyright year details.
+
+0.06    Sun Sep 07 10:53:20 2014
+        - Patched RT #98668
+        - Added section 'REPOSITORY' to the pod documentation.
+        - Added section 'CONTRIBUTORS' to the pod documentation.
+        - Added key "META_MERGE" to Makefile.PL file.
+        - Removed Build.PL file.
+
+0.05    Tue Apr 08 19:34:19 2014
+        - Patched RT #94389
+
+0.04    Thu Sep 08 16:17:20 2011
+        - Changed the name slightly.
+
+0.03    Wed Sep 07 16:17:18 2011
+        - Minor pod changes.
+
+0.02    Tue Aug 09 13:20:11 2011
+        - Prepared the distribution using the Module::Signature v0.68.
+
+0.01    Mon Aug 01 13:00:00 2011
+        - First version, released.

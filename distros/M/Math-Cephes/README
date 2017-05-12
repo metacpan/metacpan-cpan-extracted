@@ -1,0 +1,94 @@
+The Math::Cephes module provides a perl interface to over
+150 functions of the cephes math library of Stephen Moshier.
+Please read the INSTALL file for instructions on installation.
+The functions available are grouped as
+
+- trigonometric: sin, cos, etc., and their inverses; also
+  included are versions of sin, cos, tan, and cot which accept
+  angles in degrees, as well as a degree to radian converter.
+
+- hyperbolic: sinh, cosh, tanh, and their inverses.
+
+- exponential and logarithmic: exp and log functions,
+  with versions in base e (2.718282...), base 10, and base 2.
+
+- Bessel functions: various Bessel functions (J, Y, I, K)
+  of different orders.
+
+- Gamma functions: the gamma function, the incomplete gamma
+  integral and its inverse, and the digamma function (psi).
+
+- Beta functions: the beta function and the incomplete
+  beta integral and its inverse.
+
+- elliptic integrals: complete, incomplete, and Jacobian
+  elliptic integrals.
+
+- hypergeometric functions: 2F0, 2F1, 1F2, 3F0, and the
+  confluent hypergeometric function.
+
+- distributions: binomial, beta, chi-square, F, gamma, normal,
+  Poisson, and Student's t distribution, as well as their inverses.
+
+- miscellaneous: Airy function, Dawson's integral, exponential
+  integrals, error functions, sin/cos and sinh/cosh integrals,
+  Fresnel integral, dilogarithm (Spence integral), the Struve
+  function, Riemann zeta functions, polylogarithms, the Planck
+  distribution, finding the angle between two vectors, and Simpson's
+  rule for estimating an integral.
+
+- utilities: square and cube roots, ceiling, floor, round, pseudo random
+  number generators, the power function, the factorial function, and
+  some others.
+
+Some common constants, such as PI and SQRT2, are also available.
+As well, there is support for arithmetic operations for fractions
+(adding, subtracting, dividing, multiplying) and also for various
+functions of complex numbers (arithmetic, trigonometric, hyperbolic,
+exponential, logarithm, powers). Interfaces to these are available
+in the included Math::Cephes::Fraction and Math::Cephes::Complex
+modules. There is also support for some common operations for
+polynomials of a real variable (adding, subtracting, multiplying,
+dividing, evaluating, root finding) in the included module
+Math::Cephes::Polynomial, the coefficients of which can be real,
+fractional, or (for some operations) complex. Finally, routines for
+square matrices (adding, subtracting, multiplying, dividing,
+inverting) are available in the included module Math::Cephes::Matrix,
+which also includes routines for solving simultaneous equations and
+for finding the eigenvalues and eigenvectors of a real symmetric matrix.
+
+A description of these functions and their usage may be read
+either as a man page (eg, man Math::Cephes) or through perldoc
+(eg, perldoc Math::Cephes), for the relevant module.
+
+A simple "calculator" script (pmath) is included which provides
+a command line interface to this module; help on the various functions
+is also available within this script. The script will use the
+Term::ReadLine module if available. Help on its usage is available
+either though the man page (man pmath) or perldoc (perldoc pmath).
+
+This module has been built and tested on a Linux and on a WinXP machine
+running ActivePerl (build 6xx); to build on different systems will
+probably require editing of the file libmd/mconf.h, which
+among other things defines the type of computer arithmetic
+used. If you need to edit this file for your system, please
+let me know of the changes needed, so they can be automatically
+set in a future release.
+
+If you are running ActiveState's Win32 perl (build version 6xx), a
+ppm package is available at
+      http://theoryx5.uwinnipeg.ca/ppmpackages/
+To install, within the ppm shell set the repository to
+      http://theoryx5.uwinnipeg.ca/cgi-bin/ppmserver?urn:/PPMServer
+and then
+      ppm> install Math-Cephes
+For Win32 ActivePerl 8xx, the corresponding repository is
+     http://theoryx5.uwinnipeg.ca/ppms/
+with the repository location within the ppm shell as
+      http://theoryx5.uwinnipeg.ca/cgi-bin/ppmserver?urn:/PPMServer58
+
+The C code for the Cephes Math Library is Copyright 1984, 1987,
+1989, 2002 by Stephen L. Moshier, and is available at
+http://www.netlib.org/cephes/. The perl interface is Copyright 2000, 2002
+by Randy Kobes <randy@theoryx5.uwinnipeg.ca>, and may be
+distributed under the same terms as Perl itself.

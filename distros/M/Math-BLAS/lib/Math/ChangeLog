@@ -1,0 +1,4 @@
+2011-04-15  Ralph Schleicher  <rs@ralph-schleicher.de>
+
+	* BLAS.pm: Specify POD encoding.
+	($VERSION): Version 1.01.

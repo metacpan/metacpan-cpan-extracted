@@ -1,0 +1,22 @@
+This is Mac::OSA::Simple, a module for simple access to OSA scripting
+via Mac::OSA (part of the Mac::Carbon distribution).  It allows
+compiling of OSA scripts using any OSA language, as well as execution,
+saving to disk, and loading.
+
+This archive can always be obtained from:
+
+    http://sf.net/projects/pudge/
+    http://www.cpan.org/authors/id/CNANDOR/
+    http://www.cpan.org/modules/by-module/Mac/
+
+The project homepage is:
+
+    http://projects.pudge.net/
+
+Please let me know how well it does(n't) work, and any changes you'd 
+like to see.   Thanks to all of the people who have sent me feedback
+and ideas.
+
+Copyright (c) 1998-2005 Chris Nandor.  All rights reserved.  This program
+is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.

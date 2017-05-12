@@ -1,0 +1,32 @@
+Revision history for Mojolicious::Plugin::ServerInfo.
+
+0.010  2015-07-13 08:06:40 CEST
+       - improved author tests and doc
+
+0.009  2015-03-31 04:36:23 CEST
+       - add author kwalitee badge
+
+0.008  2015-03-31 04:21:29 CEST
+       - add version badge
+
+0.007  2015-03-31 04:08:33 CEST
+       - add version badge
+
+0.006  2015-03-31 03:44:38 CEST
+       - add kwalitee badge
+
+0.005  2015-03-26 17:59:38 CET
+       - update badges
+
+0.004  2015-03-26 17:03:52 CET
+       - move pod before DATA (workaround)
+
+0.003  2015-03-26 16:50:51 CET
+       - try workaround for readme
+
+0.002  2015-03-26 16:37:32 CET
+       - improve docs
+
+0.001  2015-03-26 16:01:34 CET
+       - initial version
+

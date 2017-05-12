@@ -1,0 +1,338 @@
+package Mozilla::Prefs::Simple;
+
+use warnings;
+use strict;
+
+use Carp;
+use File::Copy;
+use IO::File;
+use Regexp::Common qw( balanced );
+use Tie::Hash::Sorted 0.10;
+
+our $VERSION = '0.01';
+
+=head1 NAME
+
+Mozilla::Prefs::Simple - Manipulate Mozilla preferences
+
+=head1 SYNOPSIS
+
+  use Mozilla::Prefs::Simple;
+
+  my $p = new Mozilla::Prefs::Simple('prefs.js');
+
+  $p->set_pref("browser.blink_allowed", "true");
+  $p->set_pref("general.useragent.locale", "\"en-US\"");
+
+  if ($p->get_pref("mailnews.reply_header_type") == 2) {
+    ...
+  }
+
+  $p->save_file('prefs.js');
+
+=head1 DESCRIPTION
+
+This is a no-frills module for reading and writing Mozilla preference
+files.
+
+=begin readme
+
+More details can be found in the module documentation.
+
+=end readme
+
+=for readme stop
+
+=head1 METHODS
+
+=over
+
+=cut
+
+=item new
+
+Create a new preferences object.
+
+  my $p = new Mozilla::Prefs::Simple();
+
+  my $p = new Mozilla::Prefs::Simple('prefs.js');
+
+=cut
+
+sub new {
+    my $class = shift || __PACKAGE__;
+
+    my $self  = {
+	"_strip_comments"  => 1,
+	"_backup_original" => 1,
+    };
+    bless $self, $class;
+
+    $self->clear;
+    if (@_) {
+	my $file = shift;
+	$self->load_file($file);
+    }
+
+    return $self;
+}
+
+=item clear
+
+  $p->clear;
+
+Erase the existing preferences. Called by L</new>  method.
+
+=cut
+
+sub clear {
+    my $self = shift;
+    delete $self->{_prefs};
+
+    tie my %prefs, 'Tie::Hash::Sorted';
+    $self->{_prefs} = \%prefs;
+}
+
+
+sub _parse_line {
+    my $self = shift;
+    my $line = shift;
+
+    if ($line =~ /\buser_pref($RE{balanced}{-parens=>'()'})/) {
+	my $pref = $1;
+	if ($pref =~ /^\(\"(.+)\"\s*\,\s*(.*)\)$/) {
+	    return ($1, $2);
+	}
+	else {
+	    croak "Unable to parse line: $line";
+	}
+    }
+    else {
+	croak $line;
+    }
+}
+
+sub _read_file {
+    my $self = shift;
+    my $file = shift;
+
+    my $fh = new IO::File;
+    open ($fh, "< $file");
+
+    my $data = "";
+    while (<$fh>) {
+	$data .= $_;
+    }
+
+    close $fh;
+
+     if ($self->{_strip_comments}) {
+	 # TODO - comment parsing that does not strip URLs
+	 # Regexp::Common mistakes URLs for comments
+     }
+     else {
+ 	croak "Preserving comments is unsupported";
+     }
+
+    return $data;
+}
+
+=item load_file
+
+  $p->load_file('prefs.js');
+
+Loads a preferences file.
+
+If preferences are already set, they will be overwritten or merged with
+the ones in the file.
+
+=cut
+
+sub load_file {
+    my $self = shift;
+    my $file = shift;
+
+    foreach my $line (split /\;\s*\n/, $self->_read_file($file)) {
+	my ($key, $value) = $self->_parse_line($line);
+	$self->set_pref($key, $value);
+    }
+}
+
+=item set_pref
+
+=item set_pref_q
+
+  $p->set_pref("some.bool", "true");
+
+  $p->set_pref("some.int",  12345);
+
+  $p->set_pref("some.string", "\"value\"");
+
+Sets the values of preferences.
+
+Note that the values are JavaScript terms, so if you are setting a
+string value, then it should be enclosed in quotes.  To make this less
+annoying, you can use the L</set_pref_q> method, which adds quotes
+for you:
+
+  $p->set_pref_q("some.string", "value");
+
+=cut
+
+sub set_pref {
+    my $self  = shift;
+    my $key   = shift;
+    my $value = shift;
+    $self->{_prefs}->{$key} = "$value";
+}
+
+sub set_pref_q {
+    my $self  = shift;
+    my $key   = shift;
+    my $value = shift;
+    $self->{_prefs}->{$key} = "\"$value\"";
+}
+
+=item get_pref
+
+  my $val = $p->get_pref("some.pref");
+
+Returns the value of a preference.
+
+=cut
+
+sub get_pref {
+    my $self  = shift;
+    my $key   = shift;
+    return $self->{_prefs}->{$key};
+}
+
+=item has_pref
+
+  if ($p->has_pref("some.pref")) {
+    ...
+  }
+
+Checks for the existence of a preference.
+
+=cut
+
+sub has_pref {
+    my $self  = shift;
+    my $key   = shift;
+    return exists $self->{_prefs}->{$key};
+}
+
+=item print_pref
+
+  $p->print_pref("some.pref", $fh);
+
+Prints the JavaScript preference line to C<$fh>.
+
+=cut
+
+sub print_pref {
+    my $self  = shift;
+    my $key   = shift;
+    my $value = $self->get_pref($key);
+    my $fh    = shift;
+    print $fh "user_pref(\"$key\", $value);\n";
+}
+
+=item print_prefs
+
+  $p->print_prefs($fh);
+
+Prints out all of the preferences to the filehandle.
+If no filehandle is given, C<STDOUT> is assumed.
+=cut
+
+sub print_prefs {
+    my $self  = shift;
+    my $fh    = shift || \*STDOUT;
+    while (my ($key, $value) = each %{$self->{_prefs}}) {
+	$self->print_pref($key, $fh);
+    }
+}
+
+=item save_file
+
+  $p->save_file('prefs.js');
+
+Saves the preferences to the given filename.
+
+If the file exists, a backup copy is made of the original.
+
+=cut
+
+sub save_file {
+    my $self = shift;
+    my $file = shift;
+
+    if (-e $file) {
+	if ($self->{_backup_original}) {
+	    # TODO - if syscopy present (Perl 5.10), use that instead
+	    move($file, "$file.backup");
+	}
+	else {
+	    carp "Overwriting file $file";
+	}
+    }
+
+    my $fh = new IO::File;
+    open($fh, ">$file");
+
+#     print $fh "
+# 
+# /* Do not edit this file.
+#  *
+#  * If you make changes to this file while the application is running,
+#  * the changes will be overwritten when the application exits.
+#  *
+#  * To make a manual change to preferences, you can visit the URL about:config
+#  * For more information, see http://www.mozilla.org/unix/customizing.html#prefs
+#  */
+# ";
+
+    print $fh "\n/* Generated by " .
+	__PACKAGE__ . " on " . localtime() . " */\n\n"; 
+
+    $self->print_prefs($fh);
+
+    close $fh;
+}
+
+=back
+
+=head1 CAVEATS
+
+This module does very little to validate data.  When using it, make sure
+that you backup your preferences beforehand.
+
+The current version does not parse JavaScript comments.  In theory, a
+user-preference that occurs inside a comment will not be ignored. 
+In practice, applications like Firefox and Thunderbird do not save
+preferences in comments, so this should not be a problem. 
+
+=for readme continue
+
+=head1 AUTHOR
+
+Robert Rothenberg, C<< <rrwo at cpan.org> >>
+
+=head1 BUGS
+
+Please report bugs to 
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Mozilla-Prefs-Simple>.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2008 Robert Rothenberg, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+=cut
+
+1; # End of Mozilla::Prefs::Simple

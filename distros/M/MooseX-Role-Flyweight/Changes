@@ -1,0 +1,39 @@
+Revision history for MooseX-Role-Flyweight
+
+1.03    2014-02-14
+        Use a simple hash instead of MooseX::ClassAttribute.
+        Apply perltidy and perlcritic.
+
+1.02    2013-10-09
+        Change normalizer() to accept post-BUILARGS hashrefs so users don't
+        need to remember to do it. But it is still backwards compatible.
+
+1.01    2013-09-22
+        Upgrade MooseX::ClassAttribute version prereq to 0.27 to work with
+        Moose 2.08+
+
+1.00    2013-09-17
+        Promote to stable release.
+
+0.007   2013-08-22
+        Documentation adjustments
+
+0.006   2013-05-17
+        Fix tests with insecure dependency in taint mode
+
+0.005   2013-05-10
+        Weaken cache references
+
+0.004   2013-04-03
+        Add documentation to highlight differences with MooseX::Singleton
+        and notes on usage
+
+0.003   2013-04-02
+        Minor bug fixes
+        Add JSON::XS prerequisite recommendation
+
+0.002   2013-04-01
+        Fixed distribution configuration and set $VERSION
+
+0.001   2013-03-29
+        Initial release

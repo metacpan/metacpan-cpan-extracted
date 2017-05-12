@@ -1,0 +1,17 @@
+Things to do:
+
+Write more mailing list modules
+
+Add extra List methods
+
+Definately
+ owner
+ list description
+ subscribe
+ unsubscribe
+ comments
+ extra_data
+
+Fill in all the blanks in the docs.
+
+More fully document the API for writing your own plugin.

@@ -1,0 +1,128 @@
+NAME
+    MooseX::ErsatzMethod - provide a method implementation that isn't as good
+    as the real thing
+
+SYNOPSIS
+      package Greetable;
+      use Moose::Role;
+      use MooseX::ErsatzMethod;
+  
+      sub greet {
+        my $self = shift;
+        say "Hello ", $self->name;
+      }
+  
+      ersatz name => sub {
+        my $self = shift;
+        return Scalar::Util::refaddr($self);
+      };
+
+      package Person;
+      use Moose;
+      with 'Greetable';
+      has name => (is => 'ro', isa => 'Str');
+  
+      package Termite;
+      use Moose;
+      with 'Greetable';
+      # no need to implement 'name'.
+
+DESCRIPTION
+    MooseX::ErsatzMethod provides a mechanism for Moose roles to provide
+    fallback implementations of methods that they really want for consuming
+    classes to implement. In the SYNOPSIS section, the `Greetable` role really
+    wants consuming classes to implement a `name` method. The `Termite` class
+    doesn't implement `name`, but it's OK, because `Greetable` provides a
+    fallback (albeit rubbish) implementation of the method.
+
+    But wait! I hear you say. Don't roles already work that way? Can't a role
+    provide an implementation of a method which consuming classes can
+    override? Yes, they can. However, the precedence is:
+
+      consuming class's implementation (wins)
+      role's implementation
+      inherited implementation (e.g. from parent class)
+
+    That is, the role's method implementation overrides methods inherited from
+    the parent class. An ersatz method implementation sits right at the bottom
+    of the heirarchy; it is only used if the consuming class and its ancestors
+    cannot provide the method. (It still beats `AUTOLOAD` though.)
+
+    One other feature of ersatz methods is that they can never introduce role
+    composition conflicts. If you compose two different roles which both
+    provide ersatz method implementations, an arbitrary method implementation
+    is selected.
+
+  Functions
+    `ersatz $name => $coderef`
+        Defines an ersatz function.
+
+  Metarole Trait
+    Your metarole (i.e. `$metarole = Greetable->meta`) will have the following
+    additional methods:
+
+    `ersatz_methods`
+        Returns a name => object hashref of ersatz methods for this class. The
+        objects are instances of MooseX::ErsatzMethod::Meta::Method.
+
+    `all_ersatz_methods`
+        Returns just the values (objects) from the `ersatz_methods` hash.
+
+    `add_ersatz_method($name, $coderef)`
+        Given a name and coderef, creates a MooseX::ErsatzMethod::Meta::Method
+        object and adds it to the `ersatz_methods` hash.
+
+    `apply_all_ersatz_methods_to_class($class)`
+        Given a Moose::Meta::Class object, iterates through
+        `all_ersatz_methods` applying each to the class. This procedure skips
+        any ersatz method for which this role can provide a real method.
+
+  MooseX::ErsatzMethod::Meta::Method
+    Instances of this class represent an ersatz method.
+
+    `new(%attrs)`
+        Standard Moose constructor.
+
+    `code`
+        The coderef for the method.
+
+    `name`
+        The sub name for the method (not including the package).
+
+    `associated_role`
+        The metarole associated with this method (if any).
+
+    `apply_to_class($class)`
+        Given a Moose::Meta::Class object, installs this method into the class
+        unless the class (or a superclass) already has a method of that name.
+
+CAVEATS
+    If you use one-at-a-time role composition, then ersatz methods in one role
+    might end up "beating" a proper method provided by another role.
+
+      with 'Role1';  with 'Role2';   # No!
+      with qw( Role1 Role2 );        # Yes
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-ErsatzMethod>.
+
+SEE ALSO
+    Moose::Role.
+
+    <https://speakerdeck.com/u/sartak/p/moose-role-usage-patterns?slide=32>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012, 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

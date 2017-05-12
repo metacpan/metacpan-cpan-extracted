@@ -1,0 +1,73 @@
+{
+   "abstract" : "A representation of a Symbolic Calculator",
+   "author" : [
+      "Steffen Mueller <smueller@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-SymbolicX-Calculator",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Math::Symbolic" : "0.501",
+            "Math::Symbolic::Custom::Transformation" : "1.24",
+            "Params::Util" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Math::SymbolicX::Calculator" : {
+         "file" : "lib/Math/SymbolicX/Calculator.pm",
+         "version" : "0.02"
+      },
+      "Math::SymbolicX::Calculator::Command" : {
+         "file" : "lib/Math/SymbolicX/Calculator/Command.pm",
+         "version" : "0.02"
+      },
+      "Math::SymbolicX::Calculator::Command::Assignment" : {
+         "file" : "lib/Math/SymbolicX/Calculator/Command/Assignment.pm",
+         "version" : "0.02"
+      },
+      "Math::SymbolicX::Calculator::Command::DerivativeApplication" : {
+         "file" : "lib/Math/SymbolicX/Calculator/Command/DerivativeApplication.pm",
+         "version" : "0.02"
+      },
+      "Math::SymbolicX::Calculator::Command::Insertion" : {
+         "file" : "lib/Math/SymbolicX/Calculator/Command/Insertion.pm",
+         "version" : "0.02"
+      },
+      "Math::SymbolicX::Calculator::Command::Transformation" : {
+         "file" : "lib/Math/SymbolicX/Calculator/Command/Transformation.pm",
+         "version" : "0.02"
+      },
+      "Math::SymbolicX::Calculator::Interface" : {
+         "file" : "lib/Math/SymbolicX/Calculator/Interface.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02"
+}

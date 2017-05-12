@@ -1,0 +1,21 @@
+---
+before_install:
+  - sudo apt-get install aspell
+  - cpanm Module::Install
+  - cpanm Module::Install::AuthorRequires
+  - cpanm Module::Install::AuthorTests
+  - cpanm Module::Install::Authority
+  - cpanm Test::Pod
+  - cpanm Test::NoTabs
+  - cpanm Test::Pod::Coverage
+  - cpanm Pod::Coverage
+  - cpanm Pod::Coverage::TrustPod
+  - cpanm Test::Spelling
+language: perl
+notifications:
+  irc: irc.perl.org#message-passing
+perl:
+  - 5.16
+  - 5.14
+  - 5.12
+  - 5.10

@@ -1,0 +1,9 @@
+MANIFEST
+README
+Changes
+Makefile.PL
+Units.pm
+examples/convert.pl
+t/00.gunits.t
+t/01.regress.t
+META.yml                                 Module meta-data (added by MakeMaker)

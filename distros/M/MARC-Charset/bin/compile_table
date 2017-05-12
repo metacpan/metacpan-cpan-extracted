@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+
+=head1 NAME 
+
+compile_table - compile the LoC mapping table 
+
+=head1 SYNOPSIS
+
+    compile_table codetables.xml
+
+=head1 DESCRIPTION
+
+This is a command line utility for recompiling the database that MARC::Charset 
+uses for storing the Library of Congress XML mapping table.
+
+=head1 SEE ALSO
+
+=over 4 
+
+=item *
+
+MARC::Charset::Compiler
+
+=item *
+
+MARC::Charset::Table
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Ed Summers
+
+=back
+
+=cut
+
+use strict;
+use warnings;
+use MARC::Charset::Compiler;
+use Pod::Usage;
+
+my $file = shift;
+pod2usage( -message => 'please supply file', -verbose => 1 ) unless -f $file;
+
+
+my $compiler = MARC::Charset::Compiler->new();
+$compiler->compile($file);
+

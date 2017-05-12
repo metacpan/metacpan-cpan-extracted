@@ -1,0 +1,60 @@
+=pod
+
+=head1 NAME
+
+Mojolicious::Plugin::ParamLogger - Log request parameters
+
+=for html <a href="https://travis-ci.org/sshaw/Mojolicious-Plugin-ParamLogger"><img src="https://travis-ci.org/sshaw/Mojolicious-Plugin-ParamLogger.svg?branch=master"></a>
+
+=head1 SYNOPSIS
+
+  # Mojolicious
+  $self->plugin('ParamLogger', %options)
+
+  # Mojolicious::Lite
+  plugin 'ParamLogger', %options;
+
+=head1 DESCRIPTION
+
+This module automatically logs request parameters while in development mode.
+See L</OPTIONS> for details.
+
+C<Mojolicious> doesn't log request parameters. Of course -depending on your setup-
+they may be logged elsewhere but, when in development, I use C<morbo> and C<morbo>
+doesn't log them (same goes for C<hypnotoad>).
+
+=head1 OPTIONS
+
+=head2 C<filter>
+
+  $self->plugin('ParamLogger', filter => 'authtoken')
+  $self->plugin('ParamLogger', filter => [ qw{nome senha} ])
+
+Parmeter values to exclude from the log. Defaults to C<'password'>.
+
+=head2 C<level>
+
+  $self->plugin('ParamLogger', level => 'info')
+
+Log the request parameters at the given log level. Defaults to C<'info'> in production, C<'debug'> everywhere else.
+See L<Mojo::Log/level> for a list of log levels.
+
+=head2 C<mode>
+
+  $self->plugin('ParamLogger', production => 1)
+
+Turn on parameter logging for the given mode. By default parameters will only be logged when in development mode.
+
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojo::Log>
+
+=head1 LICENSE
+
+Copyright (c) 2012 Skye Shaw.
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+
+=cut
+

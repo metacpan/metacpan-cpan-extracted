@@ -1,0 +1,11 @@
+Revision history for MogileFS-Plugin-MultiHook
+
+0.03  2007-09-28 18:48
+      Add section, "SEE ALSO", to pod.
+
+0.02  2007-09-28 15:18
+      Remove package declaration, "MogileFS", and change to substitute glob.
+
+0.01  2007-09-27 17:25
+      First version.
+

@@ -1,0 +1,11 @@
+Revision history for Mail-SpamAssassin-Plugin-GoogleSafeBrowsing
+
+1.03    2007/08/05
+        Fixed Makefile.PL dependency problem
+
+1.02    2007/08/03
+        Stop testing -w on config dir
+
+1.01    2007/08/01
+        First version
+

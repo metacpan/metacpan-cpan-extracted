@@ -1,0 +1,111 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+titanium-starter - creates a skeleton Titanium project
+
+=cut
+
+use warnings;
+use strict;
+
+our $VERSION = '0.30';
+
+use Module::Starter qw(
+  Module::Starter::Plugin::CGIApp
+);
+
+# Provide a sane default
+use File::ShareDir qw( dist_dir );
+use File::Spec;
+if ( !$ENV{MODULE_TEMPLATE_DIR} ) {
+    $ENV{MODULE_TEMPLATE_DIR}
+      =    ## no critic 'Variables/RequireLocalizedPunctuationVars'
+      File::Spec->catdir( dist_dir('Module-Starter-Plugin-CGIApp'),
+        'titanium' );
+}
+
+use Module::Starter::App;
+Module::Starter::App->run;
+
+=head1 SYNOPSIS
+
+ titanium-starter --module=MyApp --author="Jaldhar H. Vyas" --email=jaldhar@braincells.com
+
+Result:
+
+    MyApp
+    MyApp/Changes
+    MyApp/lib
+    MyApp/lib/MyApp.pm
+    MyApp/LICENSE
+    MyApp/Makefile.PL
+    MyApp/MANIFEST.SKIP
+    MyApp/MANIFEST
+    MyApp/README
+    MyApp/server.pl
+    MyApp/share/templates
+    MyApp/share/templates/runmode1.html
+    MyApp/t
+    MyApp/t/00-signature.t
+    MyApp/t/01-load.t
+    MyApp/t/boilerplate.t
+    MyApp/t/test-app.t
+    MyApp/t/www
+    MyApp/t/www/PUT.STATIC.CONTENT.HERE
+    MyApp/xt
+    MyApp/xt/perlcriticrc
+    MyApp/xt/perl-critic.t
+    MyApp/xt/pod-coverage.t
+    MyApp/xt/pod.t
+
+Options:
+
+    --module=module  Module name 
+    --dir=dirname    Directory name to create new module in (optional)
+
+    --builder=module Build with 'ExtUtils::MakeMaker' or 'Module::Build'
+    --eumm           Same as --builder=ExtUtils::MakeMaker
+    --mb             Same as --builder=Module::Build
+    --mi             Same as --builder=Module::Install
+
+    --author=name    Author's name (required)
+    --email=email    Author's email (required)
+    --license=type   License under which the module will be distributed
+                     (default is the same license as perl)
+
+    --verbose        Print progress messages while working
+    --force          Delete pre-existing files if needed
+
+    --help           Show this message
+
+=head1 DESCRIPTION
+
+Set up the skeleton of a L<Titanium|Titanium>-based project, including a module,
+some templates and some automated tests. 
+
+By default the skeleton files will come within a shared directory
+where L<Module::Starter::Plugin::CGIApp|Module::Starter::Plugin::CGIApp> is stored.
+See L<File::ShareDir|File::ShareDir> for more information on how this works.
+
+=head1 CONFIGURATION
+
+titanium-starter will look for a configuration file before reading its command
+line parameters.  The default location is C<$HOME/.module-starter/config> but
+if the MODULE_STARTER_DIR environment variable is set, titanium-starter will look
+for C<config> in that directory.
+
+The configuration file is just a list of names and values, separated by colons.
+Values that take lists are just space separated.  A sample configuration file
+might read:
+
+ author: Jaldhar H. Vyas
+ email: jaldhar@braincells.com
+ template_dir: ~/.module-starter/cgiapp/templates
+ colors: red green blue
+
+This format may become more elaborate in the future, but a file of this type
+should remain valid.
+
+=cut
+

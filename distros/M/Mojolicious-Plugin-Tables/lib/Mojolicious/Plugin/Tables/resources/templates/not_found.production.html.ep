@@ -1,0 +1,30 @@
+% stash exclude_menu => 1;
+% title 'Oops';
+
+<div class="pad12 ui-state-error ui-corner-all">
+        <h3 style="margin:0">
+        Oops - not found. (Code <%=stash('status')%>)
+        Please send feedback and/or come back later.
+        </h3>
+</div>
+
+<table style="width:100%; border-collapse:collapse">
+    <tr>
+        <td style="vertical-align: top">
+            <a href="/" class="button">Home</a>
+        </td>
+        <td>
+            <div style="text-align: right; padding-right:4em;">
+                <div style="font-size: 48px; margin-bottom: 30px">Sorry</div>
+                <div style="font-size: 20px; margin-bottom: 10px">Can't find it</div>
+            </div>
+        </td>
+        <td style="width:50%;">
+            <img style="width:100%; height:300px;" src="/img/missing.jpg"/>
+        </td>
+    </tr>
+</table>
+
+<script>
+    $(init)
+</script>

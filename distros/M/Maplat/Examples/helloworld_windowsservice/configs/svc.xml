@@ -1,0 +1,43 @@
+<maplatsvc>
+	
+	<basedir>C:/src/maplat_framework/Examples/helloworld_windowsservice</basedir>
+	<memhserver>127.0.0.1:11211</memhserver>
+	<memhnamespace>RBSMem</memhnamespace>
+	<runonce>0</runonce>
+	
+	
+	<startup>
+		     <!--<run>C:/some/script.bat</run>-->
+		     <!--<run>C:/another/program.exe</run>-->
+		
+	</startup>
+	
+	<shutdown>
+		     <!--<run>C:/some/script.bat</run>-->
+		     <!--<run>C:/another/program.exe</run>-->
+	</shutdown>
+	
+	<module>
+		<description>Maplat WebGui</description>
+		<app>C:/src/maplat_framework/Examples/helloworld_windowsservice/webgui_cmd.exe</app>
+		<conf>C:/src/maplat_framework/Examples/helloworld_windowsservice/configs/webgui.xml</conf>
+		<lifetick>0</lifetick>
+	</module>
+	
+	<module>
+		<description>Maplat Worker</description>
+		<app>C:/src/maplat_framework/Examples/helloworld_windowsservice/worker_cmd.exe</app>
+		<conf>C:/src/maplat_framework/Examples/helloworld_windowsservice/configs/worker.xml</conf>
+		<lifetick>120</lifetick>
+	</module>
+
+	<module>
+		<description>MaplatAdm Worker</description>
+		<app>C:/src/maplat_framework/Examples/helloworld_windowsservice/worker_cmd.exe</app>
+		<conf>C:/src/maplat_framework/Examples/helloworld_windowsservice/configs/adminworker.xml</conf>
+		<lifetick>120</lifetick>
+	</module>
+
+</maplatsvc>	
+	
+

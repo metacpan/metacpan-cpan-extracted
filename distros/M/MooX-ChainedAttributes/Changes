@@ -1,0 +1,27 @@
+Revision history for Perl extension MooX::ChainedAttributes.
+
+0.06 2016-11-09
+
+ - Fix some non-helpful verbiage in the description.
+
+0.05 2016-05-20
+
+ - Apply chaining using an accessor generator role. (haarg)
+
+0.04      2015-02-04
+
+ - Don't instantiate class before modifying it in test. (haarg)
+
+0.03      2014-08-26
+
+ - Support Moo's 'is' attribute correctly.
+
+0.02      2014-08-25
+
+ - Add a chain() function, like how MooX::AliasedAttributes has an alias()
+   function.
+
+0.01      2014-08-22
+
+ - First release.
+

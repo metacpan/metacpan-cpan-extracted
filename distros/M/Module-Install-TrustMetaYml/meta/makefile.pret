@@ -1,0 +1,8 @@
+# This file provides instructions for packaging.
+
+`Module-Install-TrustMetaYml`
+	perl_version_from  m`Module::Install::TrustMetaYml`;
+	version_from       m`Module::Install::TrustMetaYml`;
+	readme_from        m`Module::Install::TrustMetaYml`;
+	requires           p`YAML::Tiny`.
+

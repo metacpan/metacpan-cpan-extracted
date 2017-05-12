@@ -1,0 +1,60 @@
+SHORT DESCRIPTION
+
+This Perl module provides routines for checking validity of email
+address.
+
+It makes several checks:
+
+1) it checks the syntax of an email address;
+
+2) it checks if there any MX records or A records for the
+   domain part of the email address;
+
+3) it tries to connect to an email server directly via SMTP to check
+   if mailbox is valid. Old versions of this module performed this
+   check via the VRFY command.  Now the module uses another check; it
+   uses a combination of MAIL and RCPT commands which simulates
+   sending an email. It can detect bad mailboxes in many cases.
+
+This module was designed with CGIs (or any other dynamic Web content
+programmed with Perl) in mind. Usually it is required to quickly check
+e-mail addresses in forms. If the check can't be finished in
+reasonable time, the e-mail address should be treated as valid.
+
+For details see pod documentation in Mail::CheckUser
+
+REQUIREMENTS
+
+This module requires next Perl modules:
+
+1) Net::SMTP  (libnet package)
+2) Net::DNS   (Net-DNS package)
+3) IO::Handle (IO package)
+4) Net::Ping  (Net-Ping package)
+
+Perl distributions before 5.6 contain version of IO::Handle which has
+bugs in timeouts handling. Download latest version from CPAN if you
+haven't done it before.
+
+INSTALLATION
+
+perl Makefile.PL
+make
+make test
+make install
+
+Tests may run very slow especially if networking is down.
+
+LICENSE
+
+Mail::CheckUser is provided "as is" and without any express or implied
+warranties, including, without limitation, the implied warranties of
+merchantibility and fitness for a particular purpose. Mail::CheckUser
+is released under the same terms as Perl itself. For more information
+see the "README" or "Artistic" files provided with the Perl
+distribution.
+
+BUGS
+
+If you have encountered any problems with this module fill free to
+contact author (Ilya Martynov <ilya@martynov.org>).

@@ -1,0 +1,46 @@
+NAME
+    Module::Install::Copyright - package a COPYRIGHT file with a
+    distribution
+
+SYNOPSIS
+    In Makefile.PL:
+
+            write_copyright_file;
+
+DESCRIPTION
+    Extracts copyright and licensing information from embedded pod and/or
+    RDF metadata included in the distribution, and outputs it as a text file
+    called "COPYRIGHT" which should roughly conform to the Debian copyright
+    file format.
+
+    This module provides one function for use in Module::Install-based
+    Makefile.PL scripts:
+
+    "write_copyright_file"
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Module-Install-Copyright>.
+
+SEE ALSO
+    This is a plugin for Module::Install.
+
+    It relies on metadata from Module::Install::RDF.
+
+    It outputs data roughly conforming to
+    <http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012-2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

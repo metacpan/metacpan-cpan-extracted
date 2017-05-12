@@ -1,0 +1,70 @@
+Name
+    Math::Permute::List - Generate all permutations of a list.
+
+Synopsis
+     use Math::Permute::List;
+
+     permute {say "@_"} qw(a b c);
+
+     #  a b c
+     #  a c b
+     #  b a c
+     #  c a b
+     #  b c a
+     #  c b a
+
+Description
+    Generate and process all the permutations of a list using the standard
+    Perl metaphor.
+
+    "permute()" returns the number of permutations in both scalar and array
+    context.
+
+    "permute()" is easy to use and fast. It is written in 100% Pure Perl.
+
+    Please note that the order in which the permutations are generated is
+    not guaranteed, so please do not rely on it.
+
+Export
+    The "permute()" function is exported.
+
+Installation
+    Standard Module::Build process for building and installing modules:
+
+      perl Build.PL
+      ./Build
+      ./Build test
+      ./Build install
+
+    Or, if you're on a platform (like DOS or Windows) that doesn't require
+    the "./" notation, you can do this:
+
+      perl Build.PL
+      Build
+      Build test
+      Build install
+
+Author
+    PhilipRBrenan@appaapps.com
+
+    http://www.appaapps.com
+
+Acknowledgements
+    With considerable, cogent and unfailing help from Philipp Rumpf for
+    which I am indebted.
+
+    http://www.appaapps.com
+
+See Also
+    Math::Cartesian::Product
+    Math::Disarrange::List
+    Math::Subsets::List
+    Algorithm::Permute
+    Algorithm::FastPermute
+
+Copyright
+    Copyright (c) 2009 Philip R Brenan.
+
+    This module is free software. It may be used, redistributed and/or
+    modified under the same terms as Perl itself.
+

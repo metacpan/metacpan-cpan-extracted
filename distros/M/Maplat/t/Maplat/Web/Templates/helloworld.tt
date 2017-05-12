@@ -1,0 +1,2 @@
+<h1>Text in module template</h1>
+<h2>[% DynamicText %]</h2>

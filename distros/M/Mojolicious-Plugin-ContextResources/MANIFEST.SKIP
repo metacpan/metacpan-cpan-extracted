@@ -1,0 +1,8 @@
+.project
+.includepath
+.git
+blib
+MYMETA\..*
+^.*\.bak
+^Makefile$
+\.tar\.gz$

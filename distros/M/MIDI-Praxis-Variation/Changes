@@ -1,0 +1,8 @@
+Revision history for Perl module MIDI::Praxis::Variation
+
+0.04 Sun Aug 21 13:39:22 2005
+    - original version; created by ExtUtils::ModuleMaker 0.36
+
+0.05 Fri Sep 30 13:01:46 EDT 2005
+    - Added prerequisite module 'MIDI::Simple'	=> '0.81' to Makefile.PL
+

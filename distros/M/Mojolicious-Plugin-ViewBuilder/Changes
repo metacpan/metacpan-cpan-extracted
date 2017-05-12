@@ -1,0 +1,27 @@
+Revision history for Perl extension Mojolicious-Plugin-ViewBuilder
+
+0.06 2015-01-26T23:02:53Z
+
+    - Tests support only Mojolicious 5.0
+
+0.05 2015-01-26T22:53:55Z
+
+    - Minor fixes
+
+0.04 2014-11-19T22:23:10Z
+
+    - POD fix
+
+0.03 2014-11-19T22:15:14Z
+
+    - POD fixes
+    - now pluggable_view() pass the args at the attached subs
+
+0.02 2014-11-19T21:54:55Z
+
+    - now add_view() support code refs as argument
+
+0.01 2014-09-07T12:17:47Z
+
+    - first release
+

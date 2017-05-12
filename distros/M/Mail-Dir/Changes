@@ -1,0 +1,25 @@
+Version 0.03
+
+    Nova Patch:
+
+        improve doc markup
+
+        fix repo resource in distro metadata
+
+        fix pod error: too few backs!
+
+    Aristotle Pagaltzis:
+
+        Allow choosing a queue when marking a message
+
+        Update Mail::Dir::Message dir field after marking
+
+        Allow unlinking messages
+
+Version 0.02
+
+    Fix issue preventing Mail::Dir inheritance
+
+Version 0.01
+
+    Initial release

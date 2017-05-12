@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Examples</title>
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    </head>
+
+    <body>
+        <div class="container">
+            
+
+<p>An input group with a checkbox:</p>
+<pre>&lt;%= input input =&gt; { text_field =&gt; [&#39;username&#39;] },
+          prepend =&gt; { check_box =&gt; [&#39;agreed&#39;] }
+%&gt;</pre>
+<pre>&lt;div class=&quot;input-group&quot;&gt;
+    &lt;span class=&quot;input-group-addon&quot;&gt;&lt;input name=&quot;agreed&quot; type=&quot;checkbox&quot; /&gt;&lt;/span&gt;
+    &lt;input class=&quot;form-control&quot; id=&quot;username&quot; type=&quot;text&quot; name=&quot;username&quot; /&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="input-group">        <span class="input-group-addon"><input name="agreed" type="checkbox" /></span>        <input class="form-control" id="username" type="text" name="username" />    </div></div>
+<hr />
+<p>A <code>large</code> input group with a radio button prepended and a string appended:</p>
+<pre>&lt;%= input large,
+          prepend =&gt; { radio_button =&gt; [&#39;yes&#39;] },
+          input =&gt; { text_field =&gt; [&#39;username&#39;] },
+          append =&gt; &#39;@&#39;
+%&gt;</pre>
+<pre>&lt;div class=&quot;input-group input-group-lg&quot;&gt;
+    &lt;span class=&quot;input-group-addon&quot;&gt;&lt;input name=&quot;yes&quot; type=&quot;radio&quot; /&gt;&lt;/span&gt;
+    &lt;input class=&quot;form-control&quot; id=&quot;username&quot; type=&quot;text&quot; name=&quot;username&quot; /&gt;
+    &lt;span class=&quot;input-group-addon&quot;&gt;@&lt;/span&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="input-group input-group-lg">        <span class="input-group-addon"><input name="yes" type="radio" /></span>        <input class="form-control" id="username" type="text" name="username" />        <span class="input-group-addon">@</span>    </div></div>
+<hr />
+<p>An input group with a button:</p>
+<pre>&lt;%= input input =&gt; { text_field =&gt; [&#39;username&#39;] },
+          append =&gt; { button =&gt; [&#39;Click me!&#39;] },
+%&gt;</pre>
+<pre>&lt;div class=&quot;input-group&quot;&gt;
+    &lt;input class=&quot;form-control&quot; id=&quot;username&quot; type=&quot;text&quot; name=&quot;username&quot; /&gt;
+    &lt;span class=&quot;input-group-btn&quot;&gt;&lt;button class=&quot;btn btn-default&quot; type=&quot;button&quot;&gt;Click me!&lt;/button&gt;&lt;/span&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="input-group">        <input class="form-control" id="username" type="text" name="username" />        <span class="input-group-btn"><button class="btn btn-default" type="button">Click me!</button></span>    </div></div>
+<hr />
+<p>An input group with a button dropdown appended. Note that <code>right</code> is manually applied:</p>
+<pre>&lt;%= input input  =&gt; { text_field =&gt; [&#39;username&#39;] },
+          append =&gt; { buttongroup =&gt; [[&#39;The button&#39;, caret, right, items =&gt; [
+                              [&#39;Item 1&#39;, [&#39;item1&#39;] ],
+                              [&#39;Item 2&#39;, [&#39;item2&#39;] ],
+                              [],
+                              [&#39;Item 3&#39;, [&#39;item3&#39;] ],
+                          ] ] ]
+                    }
+%&gt;</pre>
+<pre>&lt;div class=&quot;input-group&quot;&gt;
+    &lt;input class=&quot;form-control&quot; id=&quot;username&quot; type=&quot;text&quot; name=&quot;username&quot; /&gt;
+    &lt;div class=&quot;input-group-btn&quot;&gt;
+        &lt;button class=&quot;btn btn-default dropdown-toggle&quot; type=&quot;button&quot; data-toggle=&quot;dropdown&quot;&gt;The button &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;
+        &lt;/button&gt;
+        &lt;ul class=&quot;dropdown-menu dropdown-menu-right&quot;&gt;
+            &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item1&quot; tabindex=&quot;-1&quot;&gt;Item 1&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item2&quot; tabindex=&quot;-1&quot;&gt;Item 2&lt;/a&gt;&lt;/li&gt;
+            &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item3&quot; tabindex=&quot;-1&quot;&gt;Item 3&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="input-group">        <input class="form-control" id="username" type="text" name="username" />        <div class="input-group-btn">            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">The button <span class="caret"></span>            </button>            <ul class="dropdown-menu dropdown-menu-right">                <li><a class="menuitem" href="item1" tabindex="-1">Item 1</a></li>                <li><a class="menuitem" href="item2" tabindex="-1">Item 2</a></li>                <li class="divider"></li>                <li><a class="menuitem" href="item3" tabindex="-1">Item 3</a></li>            </ul>        </div>    </div></div>
+<hr />
+<p>An input group with a split button dropdown prepended:</p>
+<pre>&lt;%= input input   =&gt; { text_field =&gt; [&#39;username&#39;] },
+          prepend =&gt; { buttongroup =&gt; [
+                          buttons =&gt; [
+                            [&#39;Link 1&#39;, [&#39;http://www.example.com/&#39;] ],
+                            [undef, caret, items =&gt; [
+                                  [&#39;Item 1&#39;, [&#39;item1&#39;] ],
+                                  [&#39;Item 2&#39;, [&#39;item2&#39;] ],
+                                  [],
+                                  [&#39;Item 3&#39;, [&#39;item3&#39;] ],
+                              ],
+                           ],
+                        ],
+                     ],
+                  },
+%&gt;</pre>
+<pre>&lt;div class=&quot;input-group&quot;&gt;
+    &lt;div class=&quot;input-group-btn&quot;&gt;
+        &lt;a class=&quot;btn btn-default&quot; href=&quot;http://www.example.com/&quot;&gt;Link 1&lt;/a&gt;
+        &lt;div class=&quot;btn-group&quot;&gt;
+            &lt;button class=&quot;btn btn-default dropdown-toggle&quot; type=&quot;button&quot; data-toggle=&quot;dropdown&quot;&gt;&lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;
+            &lt;/button&gt;
+            &lt;ul class=&quot;dropdown-menu&quot;&gt;
+                &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item1&quot; tabindex=&quot;-1&quot;&gt;Item 1&lt;/a&gt;&lt;/li&gt;
+                &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item2&quot; tabindex=&quot;-1&quot;&gt;Item 2&lt;/a&gt;&lt;/li&gt;
+                &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+                &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item3&quot; tabindex=&quot;-1&quot;&gt;Item 3&lt;/a&gt;&lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;input class=&quot;form-control&quot; id=&quot;username&quot; type=&quot;text&quot; name=&quot;username&quot; /&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="input-group">        <div class="input-group-btn">            <a class="btn btn-default" href="http://www.example.com/">Link 1</a>            <div class="btn-group">                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span>                </button>                <ul class="dropdown-menu">                    <li><a class="menuitem" href="item1" tabindex="-1">Item 1</a></li>                    <li><a class="menuitem" href="item2" tabindex="-1">Item 2</a></li>                    <li class="divider"></li>                    <li><a class="menuitem" href="item3" tabindex="-1">Item 3</a></li>                </ul>            </div>        </div>        <input class="form-control" id="username" type="text" name="username" />    </div></div>
+        </div>
+        <pre style="background-color: #fff; border-width: 0px;">
+
+
+
+        </pre>
+    </body>
+</html>

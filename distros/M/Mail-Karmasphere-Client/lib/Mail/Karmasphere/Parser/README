@@ -1,0 +1,132 @@
+we'll be needing parsers for each of the following formats.
+
+ 20061109-18:01:58 mengwong@alexandre:~% psql -U karma_live karma_live -c 'select distinct(magic) from source'
+  magic
+ -------------------------
+  apwg.phish
+  cloudmark.phish
+  isipp.iadb
+  isipp.iddb
+  isipp.wadb
+  lashback.untrustedlinks
+  rbl.domain
+  rbl.mixed
+  rbl.simpleip
+  rbl.url
+  score.ip
+  simple.axfr
+  simple.domainlist
+  simple.emaillist
+  simple.iplist
+  simple.urllist
+  spamcop.bl
+  spamhaus.xbl
+  truste.seals
+  verisign.merchants
+ (20 rows)
+
+the legacy java parsers followed this directory structure:
+
+ 20061109-18:10:07 mengwong@newyears-wired:~/src/karma/src/java/com/karmasphere/pusher% tree -I .svn
+ .
+ |-- Parser.java
+ |-- ParserException.java
+ |-- ParserMap.java
+ |-- ParserRequest.java
+ |-- ParserWrapper.java
+ |-- README
+ |-- apwg
+ |   `-- ApwgPhishParser.java
+ |-- block
+ |   |-- AxfrParser.java
+ |   |-- BlockParser.java
+ |   |-- LineParser.java
+ |   `-- SimpleAxfrParser.java
+ |-- cloudmark
+ |   |-- CloudmarkPhishingParser.java
+ |   `-- CloudmarkRatingParser.java
+ |-- isipp
+ |   |-- IsippIadbParser.java
+ |   |-- IsippIddbParser.java
+ |   `-- IsippWadbParser.java
+ |-- lashback
+ |   `-- LashbackUntrustedLinksParser.java
+ |-- njabl
+ |   `-- NjablDnsblParser.java
+ |-- rbl
+ |   |-- DomainRblParser.java
+ |   |-- IpRblParser.java
+ |   |-- MixedRblParser.java
+ |   |-- RblParser.java
+ |   |-- SimpleDomainRblParser.java
+ |   |-- SimpleIpRblParser.java
+ |   `-- UrlRblParser.java
+ |-- score
+ |   `-- IpScoreParser.java
+ |-- simple
+ |   |-- DomainListParser.java
+ |   |-- EmailListParser.java
+ |   |-- IpListParser.java
+ |   |-- ListParser.java
+ |   |-- SimpleListParser.java
+ |   `-- UrlListParser.java
+ |-- spamcop
+ |   `-- SpamcopBlacklistParser.java
+ |-- spamhaus
+ |   `-- SpamhausXblParser.java
+ |-- surfcontrol
+ |   `-- SurfControlCategoryParser.java
+ |-- truste
+ |   `-- TrustESealParser.java
+ |-- util
+ |   |-- DomainGlob.java
+ |   |-- IpRange.java
+ |   |-- ParseUtil.java
+ |   `-- UrlGlob.java
+ `-- verisign
+     `-- VerisignMerchantsParser.java
+
+the corresponding Perl directory structure is:
+
+ .
+ |-- APWG
+ |   `-- Phish.pm
+ |-- Base.pm
+ |-- Cloudmark
+ |   `-- Phish.pm
+ |-- ISIPP
+ |   |-- IADB.pm
+ |   |-- IDDB.pm
+ |   `-- WADB.pm
+ |-- Lashback
+ |   `-- UntrustedLinks.pm
+ |-- Njabl
+ |-- RBL
+ |   |-- Domain.pm
+ |   |-- Mixed.pm
+ |   |-- SimpleIP.pm
+ |   `-- URL.pm
+ |-- README
+ |-- Record.pm
+ |-- Score
+ |   `-- IP.pm
+ |-- Simple
+ |   |-- AXFR.pm
+ |   |-- DomainList.pm
+ |   |-- EmailList.pm
+ |   |-- IPList.pm
+ |   |-- List.pm
+ |   `-- URLList.pm
+ |-- Spamcop
+ |   `-- BL.pm
+ |-- Spamhaus
+ |   `-- XBL.pm
+ |-- Surfcontrol
+ |-- Truste
+ |   `-- Seals.pm
+ `-- Verisign
+     `-- Merchants.pm
+
+
+
+

@@ -1,0 +1,82 @@
+<tmpl_var distro>
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the README
+file from a module distribution so that people browsing the archive
+can use it get an idea of the modules uses. It is usually a good idea
+to provide version information here so that people can decide whether
+fixes for the module are worth downloading.
+
+INSTALLATION
+
+<tmpl_var build_instructions>
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+Titanium
+File::ShareDir
+HTML::Template
+
+If you want to use the development server (server.pl) you will also need:
+
+CGI::Application::Server
+
+At build time you will need the above modules plus the following if you want
+to run the tests:
+
+Test::More
+Test::WWW::Mechanize::CGIApp
+
+The signature can be tested by installing the following module:
+
+Module::Signature
+
+and setting the environment variable TEST_SIGNATURE to 1.
+
+Further tests are enabled by setting the environment variable RELEASE_TESTING
+to 1 and installing the following modules:
+
+Perl::Critic           1.098
+Pod::Coverage          0.18
+Pod::Simple            3.07
+Test::Perl::Critic     1.01
+Test::Pod              1.26
+Test::Pod::Coverage    1.08
+
+They are all available on CPAN (http://www.cpan.org)
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc 
+command.
+
+    perldoc <tmpl_var main_module>
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/<tmpl_var distro>
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=<tmpl_var distro>
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/<tmpl_var distro>
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/<tmpl_var distro>
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) <tmpl_var year>, <tmpl_var author>.  All rights reserved.
+
+<tmpl_var license_blurb>
+
+The full text of the license can be found in the LICENSE file included
+with this distribution.

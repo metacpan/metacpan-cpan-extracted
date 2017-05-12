@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Money-PaymentPreparer.t
+lib/Money/PaymentPreparer.pm
+META.yml                                 Module meta-data (added by MakeMaker)

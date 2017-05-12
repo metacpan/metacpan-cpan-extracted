@@ -1,0 +1,5 @@
+(* $Id$ *)
+(* this works for the track currently selected *)
+tell application "iTunes"
+	return name of current track
+end tell

@@ -1,0 +1,31 @@
+---
+abstract: 'Mount MythTV recordings as a file system'
+author:
+  - 'Lincoln Stein <lincoln.stein@oicr.on.ca>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mythfs-perl
+provides:
+  Net::MythTV::Fuse:
+    file: lib/Net/MythTV/Fuse.pm
+    version: 1.33
+  Net::MythTV::Fuse::Recordings:
+    file: lib/Net/MythTV/Fuse/Recordings.pm
+    version: 0
+requires:
+  Date::Parse: 2.30
+  Fuse: 0.09
+  JSON: 0
+  LWP::UserAgent: 6.00
+  XML::Simple: 2.18
+  threads: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.33

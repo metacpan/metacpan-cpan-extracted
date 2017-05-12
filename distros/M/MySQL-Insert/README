@@ -1,0 +1,45 @@
+NAME
+    MySQL::Insert - extended inserts for MySQL via DBI
+
+    =hea1;3Bd1 SYNOPSIS
+
+    Quick summary of what the module does.
+
+    Perhaps a little code snippet.
+
+        use MySQL::Insert;
+
+        $MySQL::Insert::MAX_ROWS_TO_QUERY = 1000;
+
+        my $inserter = MySQL::Insert->new( $dbh, 'sample_table' );
+
+        $inserter->insert_row( { fldname => 'fldvalue' } );
+
+        undef $inserter;
+
+FUNCTIONS / METHODS
+    The following methods are available:
+
+  new
+    Create new MySQL::Insert object
+
+  insert_row
+    Schedule row for insertion
+
+AUTHORS
+    Gleb Tumanov "<gleb at reg.ru>" (original author) Walery Studennikov
+    "<despair at cpan.org>" (CPAN distribution)
+
+BUGS
+    Please report any bugs or feature requests to "bug-mysql-insert at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MySQL-Insert>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Gleb Tumanov (gleb at reg.ru), all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

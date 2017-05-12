@@ -1,0 +1,19 @@
+Revision history for Moose-Tiny
+
+0.04	2009-06-14
+		+ Update to use Moose::Exporter
+		+ Fix 02_subclass.t, changes in Moose mean that we can now tieout 100%
+        with Object::Tiny's version of that test
+
+0.0.3	2007-11-04
+		- Make classes immutable by default, this actually improves  
+		  compatibility with Object::Tiny and drastically improves 
+		  performance
+		- Add benchmarks to the POD and benchmarking code to ex/
+
+0.0.2	2007-11-04
+		- Update POD based on suggestions by Adam Kennedy (Alias).
+
+0.0.1	Thu Sep 13 02:15:16 2007
+		Initial release.
+

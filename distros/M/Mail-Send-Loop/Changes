@@ -1,0 +1,6 @@
+Revision history for Perl extension Mail::Send::Loop.
+
+0.1  Mon Oct 11 18:40:26 2010
+	- original version; created by h2xs 1.23 with options
+		-O -AX -n Mail::Send::Loop -v 0.1
+

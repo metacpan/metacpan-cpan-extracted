@@ -1,0 +1,91 @@
+Module-Package-RDF
+==================
+
+Created:      2011-10-01
+Home page:    <https://metacpan.org/release/Module-Package-RDF>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Module-Package-RDF>
+Maintainer:   Toby Inkster <mailto:tobyink@cpan.org>
+
+0.014  2013-03-19
+
+ - (Bugfix) use Module::Install::DOAP 0.006.
+
+0.013  2013-03-19
+
+ - (Update) Bump versions of several dependencies.
+ - (Update) Switch to doap-deps vocab for expressing project dependencies
+   (mkdist).
+
+0.012  2013-03-19
+
+ - (Addition) use Module::Install::Changes
+
+0.011  2013-03-16
+
+ - use Module::Install::RDF's new write_meta_ttl feature
+
+0.010  2013-03-11
+
+ - (Bugfix) Avoid auto-deps thingy from picking up
+   Module::Install::StandardDocuments as a dep - it's bundled
+   Fixes RT#82158
+   ++$CHORNY
+ - use Module::Install::Copyright
+
+0.009  2012-09-25
+
+ - (Addition) Module::Install::StandardDocuments.
+ - App::mkdist now pulls author tests from ~/perl5/xt rather than producing
+   hard-coded ones.
+ - bin/mkdist now sports a --package_flavour option.
+
+0.008  2012-07-05
+
+ - (Bugfix) Get t/01basic.t working again.
+
+0.007  2012-07-05  Bond, James Bond
+
+ - (Packaging Update) Bump versions of some dependencies.
+
+0.006  2012-07-04
+
+ - (Update) mkdist now creates Pretdsl instead of Turtle.
+ - Module::Package::RDF::Create is now App::mkdist.
+ - The ':standard' bit of 'RDF:standard' is now optional.
+
+0.005  2011-12-03
+
+ - (Bugfix) use base
+ - (Documentation) add 'DISCLAIMER OF WARRANTIES' section
+ - (Documentation) add 'NAME' section
+
+0.004  2011-11-21
+
+ - (Bugfix) Module::Package::RDF::Create now handles '--use boolean' and
+   '--use autodie' specially.
+ - (Documentation) The 'mkdist' functionality should be split into a
+   different release.
+ - (Regression) use parent
+
+0.003  2011-10-06
+
+ - (Addition) Generated modules will include $AUTHORITY variables.
+ - (Addition) Generated modules will include DISCLAIMER OF WARRANTIES in
+   pod.
+ - (Addition) Generated modules will include SYNOPSIS in pod.
+ - (Addition) Module::Package::Dist::RDF::standard to run code at user end.
+ - (Bugfix) Module::Package::Dist::RDF::standard uses
+   Meta::Install::TrustMetaYml - this resolves some dependency issues with
+   resultant packages.
+ - (Bugfix) Prevent Module::Package::RDF::Create's pod and the template
+   module's pod from getting muddled.
+ - (Update) Generated modules now default to using perl 5.010.
+ - (Update) use Module::Package 0.30
+
+0.002  2011-10-03
+
+ - (Addition) Include mkdist script and Module::Package::RDF::Create.
+
+0.001  2011-10-01  Initial release
+
+

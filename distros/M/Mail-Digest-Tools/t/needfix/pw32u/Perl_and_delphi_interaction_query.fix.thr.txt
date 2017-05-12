@@ -1,0 +1,131 @@
+Thread:       Perl_and_delphi_interaction_query
+Message:      001_0002_0002
+From:         "Lynn. Rickards" <lynn@some.web.address.com>
+Text:
+
+Can't help with delphi but in view of your analysis try using
+a .xpm image, which can be included in your script like so...
+
+$mw->Pixmap( 'myicon', -data => loadIcon());
+$mw->Icon( -image => 'myicon' );
+
+sub loadIcon
+{
+return <<'EOT';
+
+};
+EOT
+}
+
+HTH - Lynn.
+> 
+> It works perfectly under all circumstances.
+> 
+> I really want to use my icon, so does anyone know why it 
+> won't run when
+> fired off from delphi?
+
+--__--__--
+
+Thread:       Perl_and_delphi_interaction_query
+Message:      001_0002_0014
+From:         Baker Richard-qswi266 <Richard.Baker@some.web.address.com>
+Text:
+
+Huge thanks to Lynn Rickards, who suggested embedding the image into the
+perl script.
+
+Just so that those wanting to do the same know how...
+
+$mw->Pixmap( 'myicon', -data => loadIcon());
+$mw->Icon( -image => 'myicon' );
+
+sub loadIcon
+{
+return <<'EOT';
+
+};
+EOT
+}
+
+--__--__--
+
+Thread:       Perl_and_delphi_interaction_query
+Message:      001_0001_0002
+From:         Baker Richard-qswi266 <Richard.Baker@some.web.address.com>
+Text:
+
+Guys,
+
+I inherited a delphi GUI, which is too complicated to even consider
+re-writing.
+
+So, I added a button that fires of a perl .exe, made with perlapp.
+
+The perl .exe works perfectly when run alone. It uses Tk and a ROText widget
+to display the progress of the script, and I changed the Tk icon in the
+corner to my own, like this...
+
+my $mw = MainWindow -> new (-title => "   $title $version");
+$mw -> withdraw;
+$mw -> minsize (qw(600 400));
+my $status = $mw -> ROText()->pack(-expand, 1, -fill, 'both');
+my $button = $mw -> Button (
+-text , 'Cancel',
+-command, \&finished,
+) -> pack (-side, 'bottom');
+my $icon = $mw->Photo(-file => 'SpikeWare.gif');
+$mw->idletasks;
+$mw->iconimage($icon);
+$mw -> Popup;
+$mw -> focus;
+
+However, when I run this by clicking on the button from the delphi created
+gui, the script just dies.
+
+If I then remove the 3 lines that change the icon:
+my $icon = $mw->Photo(-file => 'SpikeWare.gif');
+$mw->idletasks;
+$mw->iconimage($icon); <- this seems to be the main culprit.
+
+It works perfectly under all circumstances.
+
+I really want to use my icon, so does anyone know why it won't run when
+fired off from delphi?
+
+THanks,
+
+R.
+
+--__--__--
+
+Thread:       Perl_and_delphi_interaction_query
+Message:      001_0001_0003
+From:         "Goldenrod, Christopher J" <Christopher.J.Goldenrod@some.web.address.com>
+Text:
+
+> -----Original Message-----
+> From: Baker Richard-qswi266 [mailto:Richard.Baker@some.web.address.com]
+> Sent: Tuesday, February 10, 2004 12:13
+> 
+> If I then remove the 3 lines that change the icon:
+> my $icon = $mw->Photo(-file => 'SpikeWare.gif');
+> $mw->idletasks;
+> $mw->iconimage($icon); <- this seems to be the main culprit.
+> 
+> It works perfectly under all circumstances.
+> 
+> I really want to use my icon, so does anyone know why it won't run when
+> fired off from delphi?
+
+Richard,
+
+Can you provide the Delphi code that you are using to launch the PerlApp?
+
+Chris
+
+LEGAL NOTICE
+Unless expressly stated otherwise, this message is confidential and may be privileged. It is intended for the addressee(s) only. Access to this E-mail by anyone else is unauthorized. If you are not an addressee, any disclosure or copying of the contents of this E-mail or any action taken (or not taken) in reliance on it is unauthorized and may be unlawful. If you are not an addressee, please inform the sender immediately.
+
+--__--__--
+

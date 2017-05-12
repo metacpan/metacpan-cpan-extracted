@@ -1,0 +1,64 @@
+{
+   "abstract" : "create a module like TOSHIOITO does",
+   "author" : [
+      "Toshio Ito <toshioito@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Module-Starter-TOSHIOITO",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "eg",
+         "inc",
+         "share"
+      ],
+      "file" : [
+         "README.pod",
+         "README.md"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42",
+            "Module::Build::Prereqs::FromCPANfile" : "0.02"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "ExtUtils::Command" : "0",
+            "File::Spec" : "0",
+            "Module::Starter::Simple" : "0",
+            "Test::CheckManifest" : "0.9",
+            "Test::Pod" : "1.22",
+            "perl" : "v5.10.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/debug-ito/Module-Starter-TOSHIOITO/issues"
+      },
+      "repository" : {
+         "url" : "git://github.com/debug-ito/Module-Starter-TOSHIOITO.git",
+         "web" : "https://github.com/debug-ito/Module-Starter-TOSHIOITO"
+      }
+   },
+   "version" : "0.09"
+}

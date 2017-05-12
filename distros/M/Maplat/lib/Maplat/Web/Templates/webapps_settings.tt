@@ -1,0 +1,55 @@
+<p align="center">
+    <form name="setlanguage" method="post" action="[% PostLink %]">
+        <table class="data" align="center" id="MainDataTable">
+            <tr class="tabheader">
+                <th>[% tr.tr("WebApp") %]</th>
+                <th>[% tr.tr("On") %]</th>
+                <th>[% tr.tr("Off") %]</th>
+                <th>[% tr.tr("Description") %]</th>
+            </tr>
+            <tr>
+                <td>[% tr.tr("Weather") %] (Beta)</td>
+                <td>
+                    <input type="radio" name="WebAppShowWeather" value="1"
+                    [% IF WebAppShowWeather == "1" %]
+                        checked="checked"
+                    [% END %]
+                    >
+                </td>
+                <td>
+                    <input type="radio" name="WebAppShowWeather" value="0"
+                    [% IF WebAppShowWeather == "0" %]
+                        checked="checked"
+                    [% END %]
+                    >
+                </td>
+                <td width="300px">[% tr.tr("Show weather information") %]</td>
+            </tr>
+            <tr>
+                <td>[% tr.tr("Snow") %] (Beta)</td>
+                <td>
+                    <input type="radio" name="WebAppShowSnow" value="1"
+                    [% IF WebAppShowSnow == "1" %]
+                        checked="checked"
+                    [% END %]
+                    >
+                </td>
+                <td>
+                    <input type="radio" name="WebAppShowSnow" value="0"
+                    [% IF WebAppShowSnow == "0" %]
+                        checked="checked"
+                    [% END %]
+                    >
+                </td>
+                <td width="300px">[% tr.tr("Add a little falling snow") %]</td>
+            </tr>
+            <tr>
+                <td colspan="4" align="center">
+                    <input type="hidden" name="mode" value="update">
+                    <input type="reset" value="[% tr.tr("Reset") %]">&nbsp;
+                    <input type="submit" value="[% tr.tr("Select") %]">
+                </td>
+            </tr>                
+        </table>
+    </form>
+</p>

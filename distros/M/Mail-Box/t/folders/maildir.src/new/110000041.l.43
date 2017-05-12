@@ -1,0 +1,87 @@
+Received: from ns.ATComputing.nl (ns.ATComputing.nl [195.108.229.25])
+	by atcmpg.ATComputing.nl (8.9.0/8.9.0) with ESMTP id WAA14913
+	for <markov@ATComputing.nl>; Tue, 1 Aug 2000 22:37:13 +0200 (MET DST)
+Received: (from nobody@localhost)
+	by ns.ATComputing.nl (8.8.8/8.8.8) id WAA04892
+	for <markov@ATComputing.nl>; Tue, 1 Aug 2000 22:37:12 +0200
+Received: from viper.oldcity.dca.net(216.158.38.4) by ns.ATComputing.nl via smap (V2.1)
+	id xma004890; Tue, 1 Aug 00 22:37:04 +0200
+Received: from unca-don.wizards.dupont.com ([204.183.81.133])
+	by viper.oldcity.dca.net (8.9.3/8.9.3/DCANET) with ESMTP id QAA28454;
+	Tue, 1 Aug 2000 16:36:07 -0400
+Received: (from majordomo@localhost)
+	by unca-don.wizards.dupont.com (8.9.3/8.9.3) id PAA24962
+	for magick-outgoing; Tue, 1 Aug 2000 15:46:55 -0400 (EDT)
+X-Authentication-Warning: unca-don.wizards.dupont.com: majordomo set sender to owner-magick@wizards.dupont.com using -f
+Message-Id: <4.3.1.0.20000801154753.00ae3ed0@mindspring.com>
+X-Sender: blburch@mindspring.com
+X-Mailer: QUALCOMM Windows Eudora Version 4.3.1
+Date: Tue, 01 Aug 2000 15:54:42 -0400
+To: magick@wizards.dupont.com
+From: Bryan Burchette <blburch@mindspring.com>
+Subject: Core Dump on ReadImage
+Mime-Version: 1.0
+Sender: owner-magick@wizards.dupont.com
+Precedence: bulk
+Reply-To: Bryan Burchette <blburch@mindspring.com>
+Content-Type: text/plain; charset="us-ascii"; format=flowed
+Status: RO
+X-Status: A
+Content-Length: 2042
+Lines: 55
+
+***********************************************************************
+This list is being decommissioned.  Please join one or more of the new
+ImageMagick mailing lists as described at
+http://www.imagemagick.org/www/magick-list.html.
+***********************************************************************
+
+Hey List,
+    This has me stumped! Maybe I am just missing something really obvious. 
+I am using ImageMagick 5.2.2 and for testing puposes I am using the little 
+test program on the website under the API section. No matter what I do, the 
+program cores on ReadImage().
+
+This is the program I am using to test:
+http://www.wizards.dupont.com/cristy/www/api.html
+
+I have pointed the MagickIncarnate() function to the appropriate directory 
+on my box.
+
+Does anybody have any ideas?? What could I be doing wrong.
+
+Here is my ouput from DBX
+(dbx) step
+stopped in main at line 29 in file "test.c"
+    29     GetExceptionInfo(&exception);
+(dbx) where
+=>[1] main(argc = 1, argv = 0xeffff3c4 "\xef\xff\xf5^H"), line 29 in "test.c"
+(dbx) step
+stopped in main at line 30 in file "test.c"
+    30     image_info=CloneImageInfo((ImageInfo *) NULL);
+(dbx) step
+stopped in main at line 31 in file "test.c"
+    31     (void) strcpy(image_info->filename,"test.jpg");
+(dbx) step
+stopped in main at line 32 in file "test.c"
+    32     printf("iamge_info->filename is %s\n",image_info->filename);
+(dbx) step
+iamge_info->filename is test.jpg
+stopped in main at line 33 in file "test.c"
+    33     image=ReadImage(image_info,&exception);
+(dbx) step
+signal SEGV (no mapping at the fault address) in getc at 0xef267b24
+0xef267b24: getc+0x0024:        ld      [%i0], %o0
+Current function is main
+    33     image=ReadImage(image_info,&exception);
+
+
+
+
+***********************************************************************
+To remove yourself from this mailing list, send mail to:
+	majordomo@wizards.dupont.com
+
+Include the following command in the body of your message:
+	unsubscribe magick
+***********************************************************************

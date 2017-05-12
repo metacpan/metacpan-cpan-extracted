@@ -1,0 +1,120 @@
+NAME
+    Module::Hash - a tied hash that requires modules for you
+
+SYNOPSIS
+            use strict;
+            use Test::More tests => 1;
+            use Module::Hash;
+        
+            tie my %MOD, "Module::Hash";
+        
+            my $number = $MOD{"Math::BigInt"}->new(42);
+        
+            ok( $number->isa("Math::BigInt") );
+
+DESCRIPTION
+    Module::Hash provides a tied hash that can be used to load and quote
+    module names.
+
+  Tied Interface
+            tie my %MOD, "Module::Hash", %options;
+
+    The hash is tied to Module::Hash. Every time you fetch a hash key, such as
+    $MOD{"Math::BigInt"} that module is loaded, and the module name is
+    returned as a string. Thus the following works without you needing to load
+    Math::BigInt in advance.
+
+            $MOD{"Math::BigInt"}->new(...)
+
+    You may wonder what the advantage is of this hash, rather that using good
+    old:
+
+            require Math::BigInt;
+            Math::BigInt->new(...)
+
+    Well, the latter is actually ambiguous. Try defining a sub called `BigInt`
+    in the `Math` package!
+
+    You can provide an optional minimum version number for the module. The
+    module will be checked against the required version number, but the
+    version number will not be included in the returned string. Thus the
+    following works:
+
+            $MOD{"Math::BigInt 1.00"}->new(...)
+
+    The following options are supported:
+
+    *   prefix - an optional prefix for modules
+
+                tie my $MATH, "Module::Hash", prefix => "Math";
+                my $number = $MATH{BigInt}->new(42);
+
+    *   optimistic - a boolean. If the hash is optimistic, then it doesn't
+        croak when modules are missing; it silently returns the module name
+        anyway. Hashes are optimistic by default; you need to explicitly
+        pessimize them:
+
+                tie my $MOD, "Module::Hash", optimistic => 0;
+
+    Attempting to modify the hash will croak.
+
+  Import-Oriented Interface
+    If you just want to use the default options, you can supply a reference to
+    the hash in the import statement:
+
+            my %MOD;
+            use Module::Hash \%MOD;
+            $MOD{"Math::BigInt"}->new(...);
+
+    Or:
+
+            my $MOD;
+            use Module::Hash $MOD;
+            $MOD->{"Math::BigInt"}->new(...);
+
+    Little known fact: Perl has a built-in global hash called `%\`. Unlike
+    `%+` and `%-` and some other built-in global hashes, the Perl core doesn't
+    use it for anything. And I don't think anybody else uses it either. The
+    following makes for some cute code...
+
+            use Module::Hash \%\;
+            $\{"Math::BigInt"}->new(...);
+
+    ... or an unmaintainable nightmare depending on your perspective.
+
+  Object-Oriented Interface
+    This module also provides an object-oriented interface, intended for
+    subclassing, etc, etc.
+
+    Methods:
+
+    `new(%options)`
+    `optimistic`
+    `has_prefix`
+    `prefix`
+    `use($hash_key)`
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Module-Hash>.
+
+SEE ALSO
+    Most of the tricky stuff is handled by Module::Runtime.
+
+    Module::Quote is similar to this, but more insane. If this module isn't
+    insane enough for you, try that.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

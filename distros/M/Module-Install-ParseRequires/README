@@ -1,0 +1,74 @@
+NAME
+    Module::Install::ParseRequires - A Module::Install extension that
+    provides an alternate way to specify dependencies
+
+VERSION
+    version 0.002
+
+SYNOPSIS
+        # In Makefile.PL
+
+        use inc::Module::Install;
+    
+        parse_requires build => <<_END_;
+        Test::More 1
+        _END_
+
+        parse_requires <<_END_;
+        DBI
+        DBIx::Class 
+        Moose
+        _END_
+
+DESCRIPTION
+    Module::Install::ParseRequires is a Module::Install extension that lets
+    you use a here-document to specify dependencies
+
+USAGE
+  parse_requires $document
+    Parse $document, treating each line as a space-separated
+    distribution/version combination. If no version is specified, then 0 is
+    assumed (as usual)
+
+        parse_requires <<_END_
+        Moose
+        Xyzzy 1.02
+        JSON 2
+        _END_
+
+    Is equivalent to:
+
+        requires 'Moose' => 0
+        requires 'Xyzzy' => 1.02
+        requires 'JSON' => 2
+
+  parse_requires $kind, $document
+    Parse $document similar to "parse_requires" above. Instead of calling
+    "requires" on each dependency, however, the kind of requirement will be
+    inferred from $kind, which can be "build", "test", etc.
+
+        parse_requires test => <<_END_
+        Test::More
+        Test::Xyzzy 1.02
+        _END_
+
+    Is equivalent to:
+
+        test_requires 'Test::More' => 0
+        test_requires 'Test::Xyzzy' => 1.02
+
+  parse_recommends $document
+    Same as "parse_requires" but does a "recommend" instead
+
+SEE ALSO
+    Module::Install
+
+AUTHOR
+    Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

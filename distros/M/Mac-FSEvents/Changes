@@ -1,0 +1,50 @@
+Revision history for Perl extension Mac::FSEvents.
+
+0.13    2017-01-17 23:00:00
+        - Alter version check so that Mac::FSEvents builds on Sierra.
+        - Fix warning due to global time destruction bug.
+
+0.12    2014-12-13 21:00:00
+        - Checking passing of references (like Path::Tiny) to ::new (thanks, Doug Bell!)
+
+0.11    2014-11-19 12:00:00
+        - Fix build problems on OS X Yosemite
+
+0.10    2013-06-20 12:00:00
+        - fix Pod coverage problem
+
+0.09    2012-08-01 19:00:00
+        - fix version detection for Mountain Lion
+        - fix building against older EU::MM
+
+0.08    2012-05-28 14:00:00
+        - fix broken MANIFEST
+
+0.07    2012-05-21 19:15:00
+        - Allow users to specify creation flags for FSEvents.
+        - Fix the compilation option detection process.
+        - Fix a bug that resulted in DESTROY getting called on filehandles returned by ->watch.
+
+0.06    2012-03-27 12:00:00
+        - Fix compilation flags on OS X Server and OS X 10.7
+
+0.05    2011-08-07 14:00:00
+        - Fixed hints for perlbrew installed perls.
+
+0.04    2009-10-22 10:00:00
+        - Fixed compile under OSX 10.5.
+
+0.03    2009-10-21 22:00:00
+        - Work around a weird bug under Snow Leopard where DESTROY can be
+          called for an object that was never created, leading to free()
+          errors.
+        - Updated hints file for Snow Leopard to build as 32/64-bit x86.
+
+0.02    2009-02-28 14:50:00
+        - When calling stop(), make sure thread has stopped.
+        - Return a real filehandle from watch() instead of a file
+          descriptor.
+
+0.01    2009-02-07 23:00:00
+        - Initial release.
+

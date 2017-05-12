@@ -1,0 +1,16 @@
+bin/mount-mogilefs
+Build.PL
+CHANGES
+lib/MogileFS/Client/Fuse.pm
+lib/MogileFS/Client/Fuse/BufferedFile.pm
+lib/MogileFS/Client/Fuse/Constants.pm
+lib/MogileFS/Client/Fuse/File.pm
+lib/MogileFS/Client/Fuse/FilePaths.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+scripts/mogilefuse-init.d
+t/00use.t

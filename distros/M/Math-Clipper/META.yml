@@ -1,0 +1,26 @@
+---
+abstract: 'Polygon clipping in 2D'
+author:
+  - 'Steffen Mueller (E<lt>smueller@cpan.orgE<gt>),'
+build_requires:
+  ExtUtils::Typemaps::Default: '0.05'
+  ExtUtils::XSpp: '0.18'
+  Test::Deep: '0'
+configure_requires:
+  ExtUtils::CppGuess: '0.07'
+  Module::Build: '0.38'
+  Module::Build::WithXSpp: '0.14'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Clipper
+provides:
+  Math::Clipper:
+    file: lib/Math/Clipper.pm
+    version: '1.23'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.23'

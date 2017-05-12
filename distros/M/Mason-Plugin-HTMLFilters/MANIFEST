@@ -1,0 +1,12 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+lib/Mason/Plugin/HTMLFilters.pm
+lib/Mason/Plugin/HTMLFilters/Filters.pm
+lib/Mason/Plugin/HTMLFilters/t/Basic.pm
+t/01-use.t
+t/Basic.t

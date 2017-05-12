@@ -1,0 +1,27 @@
+---
+abstract: 'Module::Starter plugin which creates debian package config files'
+author:
+  - 'Bradley Dean <bjdean@bjdean.id.au>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Fatal: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Starter-Plugin-DebPackage
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Module::Starter::Simple: 0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.000005

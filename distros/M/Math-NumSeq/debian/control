@@ -1,0 +1,38 @@
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+
+# This file is part of Math-NumSeq.
+#
+# Math-NumSeq is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3, or (at
+# your option) any later version.
+#
+# Math-NumSeq is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Math-NumSeq.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Build-Depends could have the "maximum_tests" modules from META.yml
+# for more tests, but they're optional author tests really and would
+# just make the build tools drag in more stuff.
+
+Source: libmath-numseq-perl
+Section: perl
+Priority: optional
+Build-Depends: perl (>= 5.6.2), cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 3.9.7
+Homepage: http://user42.tuxfamily.org/math-numseq/index.html
+Bugs: mailto:user42_kevin@yahoo.com.au
+
+Package: libmath-numseq-perl
+Architecture: all
+Depends: perl (>= 5.004), libfile-homedir-perl, libconstant-perl (>= 1.02) | perl (>= 5.6), libmath-libm-perl, libmath-factor-xs-perl (>= 0.39), libmath-prime-xs-perl (>= 0.23), libmodule-util-perl, libmodule-pluggable-perl (>= 4.7), libscalar-list-utils-perl | perl (>= 5.8), ${perl:Depends}, ${misc:Depends}
+Recommends: libmath-prime-xs-perl (>= 0.25.01)
+Suggests: libmath-symbolic-perl, libmath-expression-evaluator-perl, liblanguage-expr-perl
+Description: Mathematical number sequences
+ Perl code to generate some number sequences.

@@ -1,0 +1,39 @@
+---
+abstract: 'Scrypt salted password hashing for Mojolicious'
+author:
+  - 'Munenori Sugimura <clicktx@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Scrypt
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Mojolicious::Plugin::Scrypt:
+    file: lib/Mojolicious/Plugin/Scrypt.pm
+    version: '0.01'
+requires:
+  Crypt::PRNG: '0.041'
+  Crypt::ScryptKDF: '0.010'
+  Mojolicious: '7.10'
+resources:
+  bugtracker: https://github.com/clicktx/p5-Mojolicious-Plugin-Scrypt/issues
+  homepage: https://github.com/clicktx/p5-Mojolicious-Plugin-Scrypt
+  repository: git://github.com/clicktx/p5-Mojolicious-Plugin-Scrypt.git
+version: '0.01'
+x_authority: cpan:CLICKTX

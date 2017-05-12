@@ -1,0 +1,33 @@
+History for Mojolicious::Plugin::JSLoader
+=========================================
+
+0.06 2017-02-09
+
+  [IMPROVEMENTS]
+  * add support for 'on_ready' to make it easier to run
+    JavaScript when the document is loaded
+    (requires JQuery)
+
+0.05 2015-03-06
+
+  [IMPROVEMENTS]
+  * use url_for when building the URL
+
+0.04 2014-12-29
+
+  [IMPROVEMENTS]
+  * added support for filechecks
+
+0.03  2014-11-01
+
+      * fixed documentation
+
+0.02  2014-01-28
+
+      * added support for inplace loading
+      * added support for browser detection
+
+0.01  2013-10-24
+
+      * initial release
+

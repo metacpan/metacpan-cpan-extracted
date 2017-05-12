@@ -1,0 +1,82 @@
+{
+   "abstract" : "Ensures proper UTF8 rendering by forcing all response Content-Type headers to have the \"...; charset=utf-8\" suffix",
+   "author" : [
+      "Nour Sharabash <amirite@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-UTF8",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojo::Base" : "0",
+            "Mojolicious" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Requirements" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "List::Util" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::UTF8" : {
+         "file" : "lib/Mojolicious/Plugin/UTF8.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sharabash/mojolicious-plugin-utf8/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Mojolicious-Plugin-UTF8",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/sharabash/mojolicious-plugin-utf8.git",
+         "web" : "https://github.com/sharabash/mojolicious-plugin-utf8"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:AMIRITE",
+   "x_contributors" : [
+      "Nour Sharabash <nour.sharabash@gmail.com>"
+   ]
+}
+

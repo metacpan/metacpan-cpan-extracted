@@ -1,0 +1,155 @@
+Revision history for Metabase-Fact
+
+0.025     2016-02-28 23:15:39-05:00 America/New_York
+
+    [PREREQS]
+
+    - Changed from JSON to JSON::MaybeXS to insulate this module
+      from upstream volatility.
+
+0.024     2014-02-13 14:30:03-05:00 America/New_York
+
+    [CHANGED]
+
+    - Dropped use of Test::Exceptions in favor of Test::Fatal (Karen
+      Etheridge)
+
+0.023     2013-09-25 13:53:13 America/New_York
+
+    [FIXED]
+
+    - Compile test could hang on Windows
+
+    [PREREQS]
+
+    - Dropped configure_requires for ExtUtils::MakeMaker to 6.17
+
+0.022     2013-09-11 09:30:13 America/New_York
+
+  [FIXED]
+
+  - metabase-profile now prompts with IO::Prompt::Tiny to fix
+    some hanging bug on Win32
+
+0.021     2012-02-14 14:47:54 EST5EDT
+
+  - Fixed generated NAME Pod section for metabase-profile
+    [rt.cpan.org #62436; patch by Randy Stauner]
+
+  - Fixed various spelling errors in Pod
+
+0.020     2011-07-14 22:53:39 America/New_York
+
+  - Document limitations on content and resource metadata field names
+
+0.019     2010-10-11 00:02:19 EST5EDT
+
+  - Fix failing t/profile.t for CPAN build paths with spaces (RT#59580)
+    [Reini Urban]
+
+0.018     2010-09-01 18:22:44 EST5EDT
+
+  - Improve diagnostics when JSON decoding fails
+
+0.017     2010-08-14 16:08:05 EST5EDT
+
+  - Refactor save() and load() to use new as_json() and to_json() method.
+    Persistence is now possible to/from file, string, or unblessed
+    data structure.
+
+  - Loads any necessary class during as_struct() for improved flexibility
+
+0.016     2010-07-07 22:03:14 EST5EDT
+
+  - Removing 'use base' throughout to attempt to squash some heisenbugs
+
+0.015     2010-07-07 11:49:30 EST5EDT
+
+  - Identical to 0.014 (which was intentionally not released to CPAN to
+    test a Dist::Zilla upgrade)
+
+0.014     2010-07-07 11:45:42 EST5EDT
+
+  - Ensure metabase-profile gets installed (it was lost due to a stale
+    dist.ini)
+
+  - Make use of utf8::encode/decode conditional on 5.008
+
+0.013     2010-04-19 20:49:18 EST5EDT
+
+  - Weaken validation of keys in Metabase::Fact::Hash.  They must exist,
+    but may be undefined or zero length (suggested by H.Merijn Brand)
+
+  - Added documentation of the full_url() method for
+    Metabase::Resource::perl::commit
+
+0.012     2010-04-11 13:41:15 America/New_York
+
+  - Added Metabase::Resource::perl (contributed
+    by H.Merijn Brand)
+
+0.011     2010-03-29 08:04:26 EST5EDT
+
+  - Whoops.  Fix broken tests.
+
+0.010     2010-03-29 07:59:34 EST5EDT
+
+  - Whoops. Fix serialization of JSON in bin/metabase-profile, too
+
+  - Add a wide character to profile test
+
+0.009     2010-03-29 07:49:11 EST5EDT
+
+  - Fix serialization to ensure ASCII JSON
+
+0.008     2010-03-23 18:54:21 EST5EDT
+
+  - Fixed failing tests on 5.6.1 due to problems in overloaded
+    stringification of Metabase::Resource [Ricardo Signes, Apocalypse]
+
+  - Converted to Dist::Zilla for release management
+
+  - Changed to the Apache License, version 2.0; (it's clearer, relicensable,
+    and is explicit about contributions)
+
+0.007 Fri Mar 19 07:51:07 EDT 2010
+
+  - Remove dependency on Time::Piece
+
+0.006 Mon Mar 15 02:25:46 EDT 2010
+
+  - Fix bug in Metabase::Resource::cpan::distfile that prevents
+    compatibility on Perl before 5.10
+
+0.005 Sun Mar 14 19:20:05 EDT 2010
+
+  - Remove Encode as a dependency and use utf8::encode/decode instead
+    [suggested by Ricardo Signes]
+
+0.004 Sun Mar 14 09:44:02 EDT 2010
+
+  - Downgrade numerous prereqs
+
+0.003002 Thu Mar 11 18:47:54 EST 2010
+
+  - Worked around testing bug on bleadperl involving Test::Exception
+    and throws_ok
+
+  - Fixed docs for Metabase::Resource methods
+
+0.003001
+
+  - fixed bug in guid creation and testing
+
+0.003
+  - heavily revised for CPAN Testers 2.0 effort
+  - Added Metabase::Resouce classes and subclasses
+  - Revised Metabase::User::Profile and Secret
+
+0.002 (never released)
+  - private development version, never released to CPAN
+
+0.001 2009-06-24
+  - "YAPC::NA::2009, Pittsburgh" Release
+
+# vim: ts=2 sts=2 sw=2 et:

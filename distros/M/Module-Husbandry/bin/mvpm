@@ -1,0 +1,41 @@
+#!/usr/local/bin/perl -w
+
+use Module::Husbandry qw( parse_cli mvpm );
+
+mvpm parse_cli \@ARGV, {
+    param_count  => 2,
+    "-r|--recurse"
+         => "Recursively move all modules under <from> to be under <to> (TODO)",
+    examples => <<END_USAGE,
+%p From::Module       To::Module        # Use module names
+%p lib/From/Module.pm lib/To/Module.pm  # or paths from main project dir
+%p lib/From/Module.pm To::Module        # or mix and match
+%p -r From            To                # move dir tree
+%p -r lib/From        lib/To            # move dir tree
+END_USAGE
+    description => <<END_DESCRIPTION
+Renames one or more modules.  Changes all occurences of that module's
+package name in all files under the current directory.
+
+Backups of any files to be changed are placed in .mvpm/back_0001
+(where the 0001 is incremented each time), so you should be able to
+remove (manually) any new files and restore the old ones.
+
+TODO: The "or more" part (the -r option).
+
+TODO: Generate patch files for backups to make rollback easier.
+
+TODO: Generate patch files instead of acting, to allow a user to
+edit the patch file to determine what not to change by deleting or
+altering chunks.
+
+Limitations
+
+Does not remove newly empty directories.
+
+Will misfire when handed source module names that match other
+words in the source files:  mvpm a b would also change all
+occurences of the word "a" in all files under ., for instance.
+
+END_DESCRIPTION
+};

@@ -1,0 +1,24 @@
+Mail::SPF::Test 1.001 -- An SPF test-suite class
+(C) 2006-2007 Julian Mehnle <julian@mehnle.net>
+<http://search.cpan.org/dist/Mail-SPF-Test>
+==============================================================================
+
+Mail::SPF::Test is a class for reading and manipulating SPF test-suite data.
+
+See <http://www.openspf.org/Test_Suite> for information about the SPF test-
+suite.  See <http://www.openspf.org> for information about SPF.
+
+Reporting Bugs
+--------------
+
+Please report bugs in Mail::SPF::Test and its documentation to the CPAN bug
+tracker: <http://rt.cpan.org/Public/Dist/Display.html?Name=Mail-SPF-Test>
+
+License
+-------
+
+Mail::SPF::Test is free software.  You may use, modify, and distribute it
+under the terms of the BSD license.  See LICENSE for the BSD license text.
+
+# $Id: README 105 2007-05-30 20:41:57Z Julian Mehnle $
+# vim:tw=79

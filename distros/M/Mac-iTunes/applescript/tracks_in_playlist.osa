@@ -1,0 +1,11 @@
+(* $Id$ *)
+
+tell application "iTunes"
+	set myPlaylist to "Mac-iTunes test"
+	set myString to ""
+	repeat with i from 1 to count of tracks in playlist myPlaylist
+		set thisName to name of track i in playlist myPlaylist
+		set myString to myString & thisName & return
+	end repeat
+	return myString
+end tell

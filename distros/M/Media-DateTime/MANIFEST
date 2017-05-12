@@ -1,0 +1,20 @@
+bin/media-datetime
+Build.PL
+Changes
+lib/Media/DateTime.pm
+lib/Media/DateTime/JPEG.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+samples/dates.pl
+t/00-load.t
+t/10-basic.t
+t/11-noobj.t
+t/ex/src/empty.jpg
+t/ex/src/exif-corrupt.jpg
+t/ex/src/no-exif.jpg
+t/ex/src/normal.jpg
+t/ex/src/textfile.txt
+t/ex/src/zero-in-exif.jpg

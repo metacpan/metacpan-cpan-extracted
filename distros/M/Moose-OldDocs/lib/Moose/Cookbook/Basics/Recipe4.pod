@@ -1,0 +1,37 @@
+package Moose::Cookbook::Basics::Recipe4;
+
+#ABSTRACT: Renamed to Moose::Cookbook::Basics::Company_Subtypes
+
+
+
+=pod
+
+=head1 NAME
+
+Moose::Cookbook::Basics::Recipe4 - Renamed to Moose::Cookbook::Basics::Company_Subtypes
+
+=head1 VERSION
+
+version 0.04
+
+=head1 DESCRIPTION
+
+Renamed to L<Moose::Cookbook::Basics::Company_Subtypes>
+
+=head1 AUTHOR
+
+Dave Rolsky <autarch@urth.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Dave Rolsky.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut
+
+
+__END__
+

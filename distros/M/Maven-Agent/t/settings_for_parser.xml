@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<settings xmlns="http://maven.apache.org/SETTINGS/1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
+  <localRepository>${user.home}/.m2/repository</localRepository>
+  <interactiveMode>true</interactiveMode>
+  <usePluginRegistry>false</usePluginRegistry>
+  <offline>false</offline>
+
+  <proxies>
+    <proxy>
+      <active>true</active>
+      <protocol>http</protocol>
+      <username>proxy_user</username>
+      <password>proxy_pass</password>
+      <port>8080</port>
+      <host>proxy_host</host>
+      <nonProxyHosts>non_proxy_1|non_proxy_2</nonProxyHosts>
+      <id>default_proxy</id>
+    </proxy>
+  </proxies>
+
+  <servers>
+    <server>
+      <username>server_user</username>
+      <password>server_pass</password>
+      <privateKey>server_priv_key</privateKey>
+      <passphrase>server_priv_key_passphrase</passphrase>
+      <filePermissions>0660</filePermissions>
+      <directoryPermissions>0770</directoryPermissions>
+      <configuration>
+        <a>b</a>
+        <c>
+          <d>e</d>
+          <f>g</f>
+        </c>
+      </configuration>
+      <id>default_server</id>
+    </server>
+  </servers>
+
+  <mirrors>
+    <mirror>
+      <mirrorOf>central</mirrorOf>
+      <name>central_mirror</name>
+      <url>http://central.maven.org/maven2</url>
+      <layout>default</layout>
+      <mirrorOfLayouts>default</mirrorOfLayouts>
+      <id>default_mirror</id>
+    </mirror>
+  </mirrors>
+
+  <profiles>
+    <profile>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <jdk>1.7</jdk>
+        <os>
+          <name>os_name</name>
+          <family>os_family</family>
+          <arch>os_arch</arch>
+          <version>os_version</version>
+        </os>
+        <property>
+          <name>property_name</name>
+          <value>property_value</value>
+        </property>
+        <file>
+          <missing>missing_file</missing>
+          <exists>exists_file</exists>
+        </file>
+      </activation>
+      <properties>
+        <key>value</key>
+      </properties>
+
+      <repositories>
+        <repository>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>daily</updatePolicy>
+            <checksumPolicy>warn</checksumPolicy>
+          </snapshots>
+          <id>repository_id</id>
+          <name>repository_name</name>
+          <url>repository_url</url>
+          <layout>default</layout>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>daily</updatePolicy>
+            <checksumPolicy>warn</checksumPolicy>
+          </snapshots>
+          <id>repository_id</id>
+          <name>repository_name</name>
+          <url>repository_url</url>
+          <layout>default</layout>
+        </pluginRepository>
+      </pluginRepositories>
+      <id>profile_id</id>
+    </profile>
+  </profiles>
+
+  <activeProfiles>
+    <activeProfile>profile_id</activeProfile>
+  </activeProfiles>
+  <pluginGroups>
+    <pluginGroup>com.pastdev.plugins</pluginGroup>
+  </pluginGroups>
+</settings>

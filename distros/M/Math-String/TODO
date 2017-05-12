@@ -1,0 +1,16 @@
+See various .pm files.
+
+Math::String::Charset::Nested:
+ * ! finish bigram support
+
+Math::String::Charset::Grouped:
+ * finish
+ * {_end} is a simple set, but sometimes used like a hash, this must be wrong!
+
+Math::String::Charset:
+ * binary search in bstr() to find out base number?
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

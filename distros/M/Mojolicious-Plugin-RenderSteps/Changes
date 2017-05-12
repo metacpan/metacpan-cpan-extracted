@@ -1,0 +1,18 @@
+0.05 10-06-2014
+  - Fix render_exception and add test for error content
+  - Add bug tracker metadata (jht)
+
+0.04 10-06-2014
+  - Fix exception rendering
+  - Fix warning in undef.
+0.03 31-05-2014
+  - Implement support for nesting steps
+  - Capture tx for not_found
+  - Fix typo in SYNOPSIS
+
+0.02 26-05-2014
+  - Fix a pod typo
+  - Implicit wait for actions running without a IOLoop
+
+0.01 26-05-2014
+  - It runs, ship it.

@@ -1,0 +1,10 @@
+1.161240  2016-05-03 15:32:58-07:00 America/Los_Angeles
+    - Added short circuiting
+1.143160  2014-11-12 05:06:31-08:00 America/Los_Angeles
+    - Added static forwarding
+1.132960  2013-10-22 19:56:28 America/Los_Angeles
+    - Added hash-based route ordering
+1.132270  2013-08-14 18:28:09 PST8PDT
+    - Moved to Dist::Zilla
+0.1 Fri Mar 22 20:22:19 PDT 2013
+    - First Release

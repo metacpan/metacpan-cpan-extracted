@@ -1,0 +1,76 @@
+{
+   "abstract" : "declare type constraints and coercions inline with coderefs",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>",
+      ""
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-InlineTypes",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter::Tiny" : "0.030",
+            "Moose" : "2.00",
+            "MooseX::ErsatzMethod" : "0",
+            "Type::Tiny" : "1.000000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.96",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::InlineTypes" : {
+         "file" : "lib/MooseX/InlineTypes.pm",
+         "version" : "0.003"
+      },
+      "MooseX::InlineTypes::Trait::Attribute" : {
+         "file" : "lib/MooseX/InlineTypes.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/MooseX-InlineTypes/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=MooseX-InlineTypes"
+      },
+      "homepage" : "https://metacpan.org/release/MooseX-InlineTypes",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-moosex-inlinetypes.git",
+         "web" : "https://github.com/tobyink/p5-moosex-inlinetypes"
+      }
+   },
+   "version" : "0.003"
+}

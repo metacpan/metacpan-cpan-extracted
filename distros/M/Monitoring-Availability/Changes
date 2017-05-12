@@ -1,0 +1,100 @@
+Revision history for Perl extension Monitoring::Availability.
+
+0.46  Tue Mar 12 16:46:40 CET 2013
+    - fixed typo
+
+0.44  Tue Mar 12 14:32:48 CET 2013
+    - added support for livestatus logs from mysql logfilecache
+    - performance tunings
+
+0.42  Thu Feb 21 16:38:30 CET 2013
+    - fixed breakdown by weeks
+    - fixed calculation when report start is at the same time as log entry
+
+0.40  Sat Dec 29 20:51:55 CET 2012
+    - changed confess to warning on bogus logentries
+    - fixed breakdown by weeks
+
+0.38  Thu Jun 21 10:25:03 CEST 2012
+    - don't break on broken logfiles
+
+0.36  Mon May 21 16:53:29 CEST 2012
+    - fixed breakdown values with uneven report timeperiods
+    - added downtime information to result logs
+
+0.34  Tue May  8 21:25:56 CEST 2012
+    - another fix in calculation with no logs
+
+0.32  Fri May  4 19:06:03 CEST 2012
+    - fixed calculation with empty logs from livestatus
+
+0.30  Mon Apr 30 17:35:04 CEST 2012
+    - fixed breakdown support when no events happen between breakpoints
+
+0.28  Mon Apr 30 17:35:04 CEST 2012
+    - fixed breakdown support on bsd systems
+
+0.26  Mon Apr 23 17:23:24 CEST 2012
+    - added breakdown support
+
+0.24  Fri Jan 27 00:34:03 CET 2012
+    - fixed timeperiod support
+    - report time outside timeperiods as extra item
+
+0.22  Thu Jan 26 01:10:58 CET 2012
+    - added support for timeperiods (based on livestatus time transitions)
+
+0.20  Sun Jul 31 10:36:44 CEST 2011
+    - fixed problem with pending states in shinken
+
+0.18  Sat Apr 16 18:01:26 CEST 2011
+    - fixed tests with use english
+
+0.16  Fri Jun 18 13:18:29 CEST 2010
+    - added perl 5.8 requirement
+
+0.14  Fri Jun 18 11:53:49 CEST 2010
+    - excluded some tests on windows hosts
+
+0.12  Sun Feb 21 18:04:47 CET 2010
+    - fixed initial fake log for empty logs
+
+0.11  Sat Feb 20 20:22:48 CET 2010
+    - fixed logfile tests on windows
+
+0.10  Sun Feb  7 02:48:47 CET 2010
+    - fixed initial fake entry
+
+0.08  Sun Jan 24 21:39:55 CET 2010
+    - added on the fly calculation for livestatus logs
+
+0.07  Sun Jan 24 21:39:55 CET 2010
+    - fixed report log for hosts with services
+    - fixed test requirements
+
+0.06  Sun Jan 24 00:29:06 CET 2010
+    - fixed initial states 'current'
+
+0.05  Thu Jan 21 22:05:16 CET 2010
+    - fixed reports when logfiles are totally out of report range
+    - changed the way of settings options
+    - added new option services_inherit_hostdowntimes
+    - added new option timeformat which is used for log output
+    - moved logfile parsing to extra module
+    - fixed initialassumedservicestate
+
+0.04  Mon Jan 18 08:06:59 CET 2010
+    - added message when passing wrong services
+
+0.03  Sat Jan 16 20:46:54 CET 2010
+    - added resulting datastructure
+    - added read string/array/file/dir methods
+    - first tests
+    - implemented assumestatesduringnotrunning option
+    - implemented service availability calculation
+    - implemented hostdowntimes
+    - implemented servicedowntimes
+    - implemented hosts
+
+0.01  Fri Jan 15 16:40:00 CET 2010
+    - initial version

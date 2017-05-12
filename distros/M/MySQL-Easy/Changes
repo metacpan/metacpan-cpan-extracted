@@ -1,0 +1,163 @@
+2.1019: Sun Nov 16 2014
+   - try to repair connections on dhb methods like selectall_arrayref
+
+2.1017: Sat Feb 08 2014
+   - make the autoloads actually autoload
+
+2.1015: Thu Jan 30 2014
+   - improved autoloader for dbh
+
+2.1014: Fri Oct 04 2013
+   - firstrow()
+
+2.1012: Sun Nov 25 2012
+   - allow for DBIx::ContextualFetch, etc
+
+2.1011: Tue Oct 04 2011
+   - disable spurious warning
+
+2.1010: Thu Jun 30 2011
+   - more fixes on error checking
+
+2.1009: Wed Jun 29 2011
+   - slightly better error handling
+
+2.1008: Tue May 18 2010
+   - alternate locations for username and password info
+   - documented the new locations
+
+2.1007: Tue May 11 2010
+   - more introduced bugs
+
+2.1006: Mon May 10 2010
+   - I made various improvements to the API, nothing worth
+     mentioning.  Just little things to the new() call -- see the
+     POD.  Hrm, $dbo->firstval() is worth noting -- see the POD.
+
+2.1003: Fri Mar 26 2010
+   - got utf8 working
+
+2.1002: Tue Aug 04 2009
+   - make sure autoraise is explicit
+   - remove or die $dbo->errstr from docs
+
+2.1001: Wed May  6 07:22:23 EDT 2009
+   - the only place the tests actually run (my house)
+     ... they weren't being run.
+
+2.1000: Wed May  6 07:22:23 EDT 2009
+   - I cleaned up the pod a lot
+   - modernized the makefile
+   - fixed various mundane things
+   - got rid of version.pm (cursed object)
+
+2.0.4: Mon Jun  9 20:55:50 EDT 2008
+   - added a smarter last_insert_id
+
+2.0.3: Tue May 27 12:04:27 EDT 2008
+   - (wow, use version has to be on the same line as our $VERSION
+      for older EUMM)
+
+2.0.2: Mon May 26 15:56:50 EDT 2008
+   - I might as well do a new version of everything using
+     version.pm while I wait for all my CPAN deletes to go
+     through.  I just discovered that version.pm doesn't/didn't
+     go core until perl 5.9...  I really wish I'd have prereqed
+     it everywhere I used it, but I didn't.  *sigh*
+
+2.0.1: Sat May 24 09:37:56 EDT 2008
+   - using version.pm as suggested by Andreas Koenig
+
+2.0.0: May 29th 2007
+   - I have re moved this package back into the MySQL::Easy
+     namespace.  It's a terrible name, but the whole package is
+     very mysql specific and the DBIx::Easy::MySQL namespace did
+     not work out well at all.
+
+   - I also stripped out the sqlite portions.  There was nothing
+     to make easy about using it.
+
+1.42:  Tue Feb 20 11:29:41 EST 2007
+   - jettero made this still test ok even if you don't have
+     DBD::SQLite
+
+1.41:  Fri May 19 21:27:43 EDT 2006
+   - jettero added light_lock
+
+1.40:  Thu Mar 30 07:25:45 EST 2006
+   - jettero added sqlite
+
+1.33:  Thu Jul 14 08:26:49 EDT 2005
+   - jettero fixed the MANIFEST to include the new tests
+     (not that they run at all without being on my devel
+     machine).
+
+1.32:  Wed Jul 13 14:11:35 EDT 2005
+   - jettero added a test for the selectall_arrayref() ::sth
+     problem
+
+1.31:  Wed Jul 13 14:10:34 EDT 2005
+   - jettero added error checking to the Easy AUTOLOAD to
+     prevent passing the AUTOLOADing Easy version of sth to
+     DBI. It checks for SvMAGICAL and Jet can fake it
+     without doing a proper @ISA=qw(DBI::st). The
+     disadvantage of that redesign ... is a redesign.
+
+1.30:  Wed May 25 17:12:15 EDT 2005
+   - jettero created a comprehensive test to cover the new
+     stupid bugs...
+
+1.29:  Wed May 25 16:52:56 EDT 2005
+   - jettero fixed an AUTOLOAD bug in the new ::sth module.
+     Dumb.
+
+1.28:  Wed May 25 15:41:17 EDT 2005
+   - jettero fixed a couple STUPID bugs in the tests.
+
+1.27:  Wed May 25 15:17:48 EDT 2005
+   - jettero made the :sth returned by ready() a special
+     MySQL::Easy version that auto-reloads itself in the
+     case of the DBI connection fading and re-connecting.
+     This way you don't have to re-prepare the same
+     statements over and over -- by hand anyway.
+
+1.26:  Fri Feb 11 07:25:31 EST 2005
+   - jettero added a check_warnings function
+
+1.22:  Fri Oct  3 14:12:42 EDT 2003
+   - jettero made a minor change to the sub handle {} that
+     now pings the dbh to decide if it's still there.
+
+1.21:  Mon May 19 14:23:29 EDT 2003
+   - jettero added a better last_insert function
+
+1.2:  Tue Oct 29 09:13:58 EST 2002
+   - jettero added the johsr bind_execute function
+
+1.19:  Tue Oct 29 08:08:03 EST 2002
+   - jettero fixed some docs typos and added Josh's existing
+     handle support.
+
+1.18:  Thu Oct  3 09:40:15 EDT 2002
+   - jettero fixed a really stupid syntax bug ...
+
+1.17:  Fri Aug 30 07:01:19 EDT 2002
+   - jettero fixed two very stupid bugs in the AUTOLOADer
+     ... lost my webserver at 5am due to one of them. :(
+
+1.16:  Wed Aug 28 17:04:27 EDT 2002
+   - jettero made a heafty change .... and introduced that
+     AUTOLOAD ... why didn't I think of that before!?!?
+
+1.15:  Thu Jun  6 22:48:47 EDT 2002
+   - jettero did some things
+
+1.14:  Tue Jun  4 20:01:36 EDT 2002
+   - jettero fixed the test.t
+
+1.13:  Tue Jun  4 19:59:07 EDT 2002
+   - jettero made some distribution cleanups
+
+1.12:  Tue Jun  4 19:57:17 EDT 2002
+   - jettero made a couple changes ...
+

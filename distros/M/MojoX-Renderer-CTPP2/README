@@ -1,0 +1,151 @@
+NAME
+    MojoX::Renderer::CTPP2 - CTPP2 renderer for Mojo
+
+SYNOPSIS
+    Add the handler:
+
+      use MojoX::Renderer::CTPP2;
+
+      sub startup {
+         ...
+
+        my $ctpp2 = MojoX::Renderer::CTPP2->build(
+          mojo         => $self,
+
+          INCLUDE_PATH => '/tmp;/tmp/project1',
+          DELIMITER    => ';',
+
+          CACHE_ENABLE => 0,
+          COMPILE_DIR  => '/tmp/ctpp',
+          COMPILE_EXT  => '.ctp2',
+
+          template_options =>
+            { arg_stack_size => 1024,
+              steps_limit    => 1024*1024
+            }
+          );
+
+          $self->renderer->add_handler( ctpp2 => $ctpp2 );
+
+         ...
+      }
+
+    And then in the handler call render which will call the
+    MojoX::Renderer::CTPP2 renderer.
+
+      $c->render(templatename, format => 'htm', handler => 'ctpp2');
+
+    Template parameter are taken from $c->stash :
+
+      $c->stash(users => [John, Peter, Ann]);
+
+METHODS
+  build
+    This method returns a handler for the Mojo renderer.
+
+    Supported parameters are:
+
+    mojo
+        "build" currently uses a "mojo" parameter pointing to the base class
+        Mojo-object.
+
+    INCLUDE_PATH
+        The "INCLUDE_PATH" is used to specify one or more directories in
+        which template files are located. When a template is requested that
+        isn't defined locally as a "BLOCK", each of the "INCLUDE_PATH"
+        directories is searched in turn to locate the template file.
+        Multiple directories can be specified as a reference to a list or as
+        a single string where each directory is delimited by '":"'.
+
+          INCLUDE_PATH => '/project1/templates/1'
+
+          INCLUDE_PATH => '/myapp/path1:/myapp/path2:path3'
+
+          INCLUDE_PATH => [
+            '/project1/templates/1',
+            '/myapp/path2'
+          ]
+
+        On Win32 systems, a little extra magic is invoked, ignoring
+        delimiters that have '":"' followed by a '"/"' or '"\"'. This avoids
+        confusion when using directory names like '"C:\Blah Blah"'.
+
+    DELIMITER
+        Used to provide an alternative delimiter character sequence for
+        separating paths specified in the "INCLUDE_PATH". The default value
+        for "DELIMITER" is '":"'.
+
+          DELIMITER => ';'
+
+        On Win32 systems, the default delimiter is a little more
+        intelligent, splitting paths only on '":"' characters that aren't
+        followed by a '"/"'. This means that the following should work as
+        planned, splitting the "INCLUDE_PATH" into 2 separate directories,
+        "C:/foo" and "C:/bar".
+
+          # on Win32 only
+          INCLUDE_PATH => 'C:/Foo:C:/Bar'
+
+        However, if you're using Win32 then it's recommended that you
+        explicitly set the "DELIMITER" character to something else (e.g.
+        '";"') rather than rely on this subtle magic.
+
+    CACHE_ENABLE
+        The "CACHE_ENABLE" can be set 0 to disable templates caching.
+        Default - caching enable.
+
+    COMPILE_DIR
+        The "COMPILE_DIR" option is used to specify an alternate directory
+        root under which compiled template files should be saved.
+
+          COMPILE_DIR => '/tmp/ctpp'
+
+    COMPILE_EXT
+        The "COMPILE_EXT" option may be provided to specify a filename
+        extension for compiled template files. It is undefined by default
+        used extension '.ctpp2c' .
+
+          COMPILE_EXT => '.ccc'
+
+    template_options
+        A hash reference of options that are passed to HTML::CTPP2->new().
+        See also HTML::CTPP2
+
+AUTHOR
+    Victor M Elfimov, (victor@sols.ru)
+
+BUGS
+    Please report any bugs or feature requests to "bug-mojox-renderer-ctpp2
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MojoX-Renderer-CTPP2>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+      perldoc MojoX::Renderer::CTPP2
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=MojoX-Renderer-CTPP2>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/MojoX-Renderer-CTPP2>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/MojoX-Renderer-CTPP2/>
+
+SEE ALSO
+    HTML::CTPP2(3) Mojo(3) MojoX::Renderer(3)
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Victor M Elfimov
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

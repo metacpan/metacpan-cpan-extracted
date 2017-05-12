@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:               MediaWiki-Bot-Plugin-CUP
+version:            0.3.2
+abstract:           a plugin for MediaWiki::Bot which contains data retrieval tools for the 2009 WikiCup hosted on the English Wikipedia
+author:
+    - Dan Collins (ST47)
+license:            gpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    MediaWiki::Bot:  1.5.2
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

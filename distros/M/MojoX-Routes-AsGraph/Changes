@@ -1,0 +1,23 @@
+Revision history for MojoX-Routes-AsGraph
+
+0.07    Tue Jan 17 10:53:12 UTC 2017
+        * Fix CPANTS issues (thx manwar@github)
+
+0.06    Tue Jan 17 08:25:02 UTC 2017
+        * Merge request to fix kwalitee (thx Kharec@github)
+
+0.05    Mon Oct  5 06:11:10 UTC 2015
+        * Update to lastest Mojolicious (thx quicoju@github)
+
+0.04    Sat May  9 14:01:52 UTC 2009
+        * Fixed version number in package
+
+0.03    Sat May  9 12:57:59 UTC 2009
+        * Missed Changes update
+
+0.02    Sat May  9 12:56:47 UTC 2009
+        * Fixed PreReqs - missed Mojo
+        * Switched from Module::Install to Dist::Zilla
+
+0.01    Sat Apr 18 16:42:23 UTC 2009
+        * First release

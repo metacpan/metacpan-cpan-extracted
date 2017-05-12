@@ -1,0 +1,35 @@
+CACHE MANIFEST
+
+
+
+ /some/where.png
+
+ may/be.txt
+
+http://localhost/my/meh.jpg
+
+
+
+   test.css
+
+
+# hm
+
+   # huh?
+
+file.css
+  foo.css
+
+FALLBACK:
+/ /ugh.html
+
+CACHE:
+
+   foo.pdf
+
+bla.js
+
+SETTINGS:
+prefer-online
+NETWORK:
+*

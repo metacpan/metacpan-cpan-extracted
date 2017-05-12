@@ -1,0 +1,20 @@
+Module-Starter-Plugin-TT2
+
+This module is a plugin for Module::Starter, and allows the use of TT2 to
+render templates.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Ricardo SIGNES
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,1743 @@
+=encoding utf8
+
+=head1 NAME
+
+Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points and complex numbers.
+
+=head1 VERSION
+
+Version 0.08
+
+=head1 SYNOPSIS
+
+Math::AnyNum provides a transparent and easy-to-use interface to L<Math::GMPq>, L<Math::GMPz>, L<Math::MPFR> and L<Math::MPC>.
+
+    use 5.014;
+    use Math::AnyNum qw(:overload factorial);
+
+    # Integers
+    say factorial(30);                            #=> 265252859812191058636308480000000
+
+    # Floating-point numbers
+    say sqrt(1 / factorial(100));                 #=> 1.0351378111756264713204945[...]e-79
+
+    # Rational numbers
+    my $x = 2/3;
+    say ($x * 3);                                 #=> 2
+    say (2 / $x);                                 #=> 3
+    say $x;                                       #=> 2/3
+
+    # Complex numbers
+    say 3 + 4*i;                                  #=> 3+4i
+    say sqrt(-4);                                 #=> 2i
+    say log(-1);                                  #=> 3.1415926535897932384626433832[...]i
+
+=head1 DESCRIPTION
+
+Math::AnyNum focuses primarily on providing a friendly interface and good performance. In most cases, it can be used as
+a drop-in replacement for the L<bignum> and L<bigrat> pragmas.
+
+The philosophy of Math::AnyNum is that mathematics should just work, therefore the support for complex number is virtually transparent,
+without requiring any explicit conversions. All the needed conversions are done implicitly, using a sophisticated promotion system,
+that tries really hard to do the right thing and as efficiently as possible.
+
+In addition, each Math::AnyNum object is B<immutable>.
+
+=head1 HOW IT WORKS
+
+Internally, each Math::AnyNum object holds a reference to an object of type Math::GMPz, Math::GMPq, Math::MPFR or Math::MPC.
+Based on the internal types, it decides what functions to call on each operation and does automatic promotion whenever necessarily.
+
+The promotion rules can be summarized as follows:
+
+    (Integer, Integer)   -> Integer | Rational | Float | Complex
+    (Integer, Rational)  -> Rational | Float | Complex
+    (Integer, Float)     -> Float | Complex
+    (Integer, Complex)   -> Complex
+
+    (Rational, Rational) -> Rational | Float | Complex
+    (Rational, Float)    -> Float | Complex
+    (Rational, Complex)  -> Complex
+
+    (Float, Float)       -> Float | Complex
+    (Float, Complex)     -> Complex
+
+    (Complex, Complex)   -> Complex
+
+For explicit conversions, Math::AnyNum provides the following methods:
+
+    int(x)          # converts x to an integer (NaN if not possible)
+    rat(x)          # converts x to a rational (NaN if not possible)
+    float(x)        # converts x to a real-float (NaN if not possible)
+    complex(x)      # converts x to a complex number (always possible)
+
+=head1 IMPORT / EXPORT
+
+The following functions are exportable:
+
+    :trig
+        sin sinh asin asinh
+        cos cosh acos acosh
+        tan tanh atan atanh
+        cot coth acot acoth
+        sec sech asec asech
+        csc csch acsc acsch
+        atan2 rad2deg deg2rad
+
+    :special
+        beta eta gamma lgamma lngamma digamma zeta
+        Ai Ei Li Li2 LambertW BesselJ BesselY lgrt
+        pow sqrt cbrt root exp ln log log2 log10 mod
+        abs erf erfc sqr norm hypot agm bernreal harmreal
+
+    :ntheory
+        factorial dfactorial mfactorial primorial
+        binomial lucas fibonacci bernfrac harmfrac
+        lcm gcd valuation kronecker remdiv divmod
+        iadd isub imul idiv imod ipow iroot isqrt
+        icbrt ilog ilog2 ilog10 isqrtrem irootrem
+        powmod invmod is_power is_square is_prime
+        next_prime
+
+    :misc
+        rand irand seed iseed floor ceil round sgn neg inv
+        conj int rat float complex real imag reals digits
+        numerator denominator nude popcount as_bin as_hex
+        as_oct as_int as_dec as_frac is_pos is_neg is_int
+        is_rat is_real is_imag is_complex is_inf is_ninf
+        is_nan is_zero is_one is_mone is_even is_odd is_div
+
+Each function can be exported individually, as:
+
+    use Math::AnyNum qw(zeta);
+
+There is also the possibility of exporting an entire group of functions, as:
+
+    use Math::AnyNum qw(:trig);
+
+Additionally, by specifying the C<:all> keyword, will export all the exportable functions and all the constants.
+
+    use Math::AnyNum qw(:all);
+
+The C<:overload> keyword enables constant overloading, which makes
+each number a Math::AnyNum object and also exports the C<i>, C<Inf>
+and C<NaN> constants:
+
+    use Math::AnyNum qw(:overload);
+    say 42;                                       #=> "42"   (as Int)
+    say 1/2;                                      #=> "1/2"  (as Rat)
+    say 0.5;                                      #=> "0.5"  (as Float)
+    say 3 + 4*i;                                  #=> "3+4i" (as Complex)
+
+B<NOTE:> C<:overload> is lexical to the current scope only.
+
+The syntax for disabling the C<:overload> behavior in the current scope, is:
+
+    no Math::AnyNum;        # :overload will be disabled in the current scope
+
+In addition to the exportable functions, Math::AnyNum also provides a list with
+useful mathematical constants that can be exported.
+
+This constants are:
+
+    i           # imaginary unit             sqrt(-1)
+    e           # e mathematical constant    2.718281828459...
+    pi          # PI constant                3.141592653589...
+    tau         # TAU constant               6.283185307179...
+    ln2         # natural logarithm of 2     0.693147180559...
+    phi         # golden ratio               1.618033988749...
+    euler       # Euler-Mascheroni constant  0.577215664901...
+    catalan     # Catalan constant           0.915965594177...
+    Inf         # positive Infinity
+    NaN         # Not-a-Number
+
+The syntax for importing a constant, is:
+
+    use Math::AnyNum qw(pi);
+    say pi;                          # 3.141592653589...
+
+Nothing is exported by default.
+
+=head1 PRECISION
+
+The default precision for floating-point numbers is 192 bits, which is equivalent with about
+50 digits of precision in base 10.
+
+The precision can be changed by modifying the C<$Math::AnyNum::PREC> variable, such as:
+
+    local $Math::AnyNum::PREC = 1024;
+
+or by specifying the precision at import (this sets the precision globally):
+
+    use Math::AnyNum PREC => 1024;
+
+This precision is used internally whenever a C<Math::MPFR> or a C<Math::MPC> object is created.
+
+For example, if we change the precision to 3 decimal digits (where C<4> is the conversion factor),
+we get the following results:
+
+    local $Math::AnyNum::PREC = 3*4;
+    say sqrt(2);                                  #=> 1.41
+    say 98**7;                                    #=> 86812553324672
+    say 1 / 98**7                                 #=> 1/86812553324672
+
+As shown above, integers and rational numbers do not obey this precision, because they can grow and
+shrink dynamically, without a specific limit.
+
+A rational number never losses accuracy in rational operations, therefore if we say:
+
+    my $x = 1/3;
+    say $x*3;                                     #=> 1
+    say 1/$x;                                     #=> 3
+    say 3/$x;                                     #=> 9
+
+...the results are exact.
+
+=head1 NOTATIONS
+
+Methods that begin with an B<i> followed by the actual name (e.g.: C<isqrt>),
+do integer operations, by first truncating their arguments to integers, if necessary.
+
+The returned types are noted as follows:
+
+    Any         # any type of number
+    Int         # an integer value
+    Rat         # a rational value
+    Float       # a floating-point value
+    Complex     # a complex value
+    NaN         # "Not-a-Number" value
+    Inf         # +/-Infinity
+    Bool        # a Boolean value (1 or 0)
+    Scalar      # a Perl scalar
+
+When two or more types are separated with pipe characters (B<|>), it means that the
+corresponding function can return any of the specified types.
+
+=head1 INITIALIZATION / CONSTANTS
+
+This section includes methods for creating new B<Math::AnyNum> objects
+and some useful mathematical constants.
+
+=head2 new
+
+    Math::AnyNum->new(n)                          #=> Any
+    Math::AnyNum->new(n, base)                    #=> Any
+
+Returns a new AnyNum object with the value specified in the first argument,
+which can be a Perl numerical value, a string representing a number in a
+rational form, such as C<"1/2">, a string holding a floating-point number,
+such as C<"0.5">, a string holding an integer, such as C<"255"> or a string
+holding a complex number, such C<"3+4i">.
+
+    my $z = Math::AnyNum->new('42');        # integer
+    my $r = Math::AnyNum->new('3/4');       # rational
+    my $f = Math::AnyNum->new('12.34');     # float
+    my $c = Math::AnyNum->new('3+4i');      # complex
+
+The second argument specifies the base of the number, which can range from 2
+to 36 inclusive and defaults to 10.
+
+For setting an hexadecimal number, we can say:
+
+    my $n = Math::AnyNum->new("deadbeef", 16);
+
+B<NOTE:> no prefix, such as C<"0x"> or C<"0b">, is allowed as part of the number.
+
+=head2 new_si
+
+    Math::AnyNum->new_si(n)                       #=> Int
+
+Sets a I<signed> native integer.
+
+Example:
+
+    my $n = Math::AnyNum->new_si(-42);
+
+=head2 new_ui
+
+    Math::AnyNum->new_ui(n)                       #=> Int
+
+Sets an I<unsigned> native integer.
+
+Example:
+
+    my $n = Math::AnyNum->new_ui(42);
+
+=head2 new_z
+
+    Math::AnyNum->new_z(str)                      #=> Int
+    Math::AnyNum->new_z(str, base)                #=> Int
+
+Sets an arbitrary large integer from a given string.
+When no base is specified, it defaults to base 10.
+
+Example:
+
+    my $n = Math::AnyNum->new_z("12345678910111213141516");
+    my $m = Math::AnyNum->new_z("fffffffffffffffffff", 16);
+
+=head2 new_q
+
+    Math::AnyNum->new_q(frac)                     #=> Rat
+    Math::AnyNum->new_q(num, den)                 #=> Rat
+    Math::AnyNum->new_q(num, den, base)           #=> Rat
+
+Sets an arbitrary large rational from a given string.
+When no base is specified, it defaults to base 10.
+
+Example:
+
+    my $n = Math::AnyNum->new_q('12345/67890');
+    my $m = Math::AnyNum->new_q('12345', '67890');
+    my $o = Math::AnyNum->new_q('fffff', 'aaaaa', 16);
+
+=head2 new_f
+
+    Math::AnyNum->new_f(str)                      #=> Float
+    Math::AnyNum->new_f(str, base)                #=> Float
+
+Sets a floating-point real number from a given string.
+When no base is specified, it defaults to base 10.
+
+Example:
+
+    my $n = Math::AnyNum->new_f('12.345');
+    my $m = Math::AnyNum->new_f('-1.2345e-12');
+    my $o = Math::AnyNum->new_f('ffffff', 16);
+
+=head2 new_c
+
+    Math::AnyNum->new_c(real)                     #=> Complex
+    Math::AnyNum->new_c(real, imag)               #=> Complex
+    Math::AnyNum->new_c(real, imag, base)         #=> Complex
+
+Sets a complex number from a given string.
+When no base is specified, it defaults to base 10.
+
+Example:
+
+    my $n = Math::AnyNum->new_c('1.123');
+    my $m = Math::AnyNum->new_c('3', '4');
+    my $o = Math::AnyNum->new_c('f', 'a', 16);
+
+=head2 nan
+
+    Math::AnyNum->nan                             #=> NaN
+
+Returns an object holding the C<NaN> value.
+
+=head2 inf
+
+    Math::AnyNum->inf                             #=> Inf
+
+Returns an object representing positive infinity.
+
+=head2 ninf
+
+    Math::AnyNum->ninf                            #=> -Inf
+
+Returns an object representing negative infinity.
+
+=head2 one
+
+    Math::AnyNum->one                             #=> Int
+
+Returns an object containing the value C<1>.
+
+=head2 mone
+
+    Math::AnyNum->mone                            #=> Int
+
+Returns an object containing the value C<-1>.
+
+=head2 zero
+
+    Math::AnyNum->zero                            #=> Int
+
+Returns an object containing the value C<0>.
+
+=head2 i
+
+    Math::AnyNum->i                               #=> Float
+
+Returns the imaginary unit, which is C<sqrt(-1)>.
+
+=head2 e
+
+    Math::AnyNum->e                               #=> Float
+
+Returns the e mathematical constant, which is C<2.718...>.
+
+=head2 pi
+
+    Math::AnyNum->pi                              #=> Float
+
+Returns the number PI, which is C<3.1415...>.
+
+=head2 tau
+
+    Math::AnyNum->tau                             #=> Float
+
+Returns the number TAU, which is C<2*pi>.
+
+=head2 ln2
+
+    Math::AnyNum->ln2                             #=> Float
+
+Returns the natural logarithm of C<2>.
+
+=head2 phi
+
+    Math::AnyNum->phi                             #=> Float
+
+Returns the value of the golden ratio, which is C<1.61803...>.
+
+=head2 euler
+
+    Math::AnyNum->euler                           #=> Float
+
+Returns the Euler-Mascheroni constant, which is C<0.57721...>.
+
+=head2 catalan
+
+    Math::AnyNum->catalan                         #=> Float
+
+Returns the value of Catalan's constant, also known
+as Beta(2) or G, and starts as: C<0.91596...>.
+
+
+=head1 ARITHMETIC OPERATIONS
+
+This section includes basic arithmetic operations.
+
+=head2 add
+
+    x + y                                         #=> Any
+
+Adds C<x> and C<y> and returns the result.
+
+=head2 sub
+
+    x - y                                         #=> Any
+
+Subtracts C<y> from C<x> and returns the result.
+
+=head2 mul
+
+    x * y                                         #=> Any
+
+Multiplies C<x> by C<y> and returns the result.
+
+=head2 div
+
+    x / y                                         #=> Any
+
+Divides C<x> by C<y> and returns the result.
+
+=head2 mod
+
+    x % y                                         #=> Any
+    mod(x, y)                                     #=> Any
+
+Remainder of C<x> when is divided by C<y>. Returns NaN when C<y> is zero.
+
+Implemented as:
+
+    x % y = x - y*floor(x/y)
+
+=head2 conj
+
+    conj(x)                                       #=> Any
+
+Complex conjugate of C<x>. Return C<x> when C<x> is a real number.
+
+Example:
+
+    conj("3+4i") = 3-4*i
+
+=head2 inv
+
+    inv(x)                                        #=> Any
+
+Multiplicative inverse of C<x>. Equivalent with C<1/x>.
+
+=head2 neg
+
+    neg(x)                                        #=> Any
+
+Additive inverse of C<x>. Equivalent with C<-x>.
+
+=head2 abs
+
+    abs(x)                                        #=> Any
+
+Absolute value of C<x>.
+
+=head2 sqr
+
+    sqr(x)                                        #=> Any
+
+Multiplies C<x> with itself and returns the result. Equivalent with C<x*x>.
+
+=head2 norm
+
+    norm(x)                                       #=> Any
+
+The square of the absolute value of C<x>. Equivalent with C<abs(x)**2>.
+
+=head1 SPECIAL FUNCTIONS
+
+This section includes the special functions.
+
+=head2 sqrt
+
+    sqrt(x)                                       #=> Any
+
+Square root of C<x>. Returns a complex number when C<x> is negative.
+
+=head2 cbrt
+
+    cbrt(x)                                       #=> Any
+
+Cube root of C<x>. Returns a complex number when C<x> is negative.
+
+=head2 root
+
+    root(x, y)                                    #=> Any
+
+The C<y> root of C<x>. Equivalent with C<x**(1/y)>.
+
+=head2 pow
+
+    x ** y                                        #=> Any
+    pos(x, y)                                     #=> Any
+
+Raises C<x> to power C<y> and returns the result.
+
+When both C<x> and C<y> are integers, it does integer exponentiation and returns the exact result.
+
+When only C<y> is an integer, it does rational exponentiation based on the identity: C<(a/b)**n = a**n / b**n>,
+which also computes the exact result.
+
+Otherwise, it does floating-point exponentiation, which is equivalent with C<exp(log(x) * y)>.
+
+=head2 exp
+
+    exp(x)                                        #=> Any
+
+Natural exponentiation of C<x> (i.e.: C<e**x>).
+
+=head2 ln / log
+
+    ln(x)                                         #=> Any
+    log(x)                                        #=> Any
+    log(x, y)                                     #=> Any
+
+Logarithm of C<x> to base C<y> (or base I<e> when C<y> is omitted).
+
+B<NOTE:> C<log(x, y)> is equivalent with C<log(x) / log(y)>.
+
+=head2 log2 / log10
+
+    log2(x)                                       #=> Any
+    log10(x)                                      #=> Any
+
+Logarithm of C<x> to base 2 or base 10, respectively.
+
+=head2 lgrt
+
+    lgrt(x)                                       #=> Any
+
+Logarithmic-root of C<x>, which is the largest solution to C<a**a = b>, where C<b> is known.
+When the value of C<x> is less than C<e**(-1/e)>, it returns a complex number. It also accepts complex numbers as input.
+
+Example:
+
+     lgrt(100)            # solves for x in `x**x = 100` and returns: `3.59728...`
+
+=head2 LambertW
+
+    LambertW(x)                                   #=> Any
+
+The Lambert-W function. When the value of C<x> is less than C<-1/e>, it returns a complex number.
+It also accepts complex numbers as input.
+
+Example:
+
+     exp(LambertW(log(100)))    # solves for x in `x**x = 100` and returns: `3.59728...`
+
+=head2 bernfrac
+
+    bernfrac(n)                                   #=> Rat | NaN
+
+Returns the nth-Bernoulli number C<B_n> as an exact fraction, computed with
+an optimized version of Seidel's algorithm, starting with C<bernfrac(0) = 1>.
+
+For n >= 50, a more efficient algorithm is used, based on zeta(n).
+
+Returns NaN for negatives values of C<n>.
+
+=head2 bernreal
+
+    bernreal(n)                                   #=> Float | NaN
+
+Returns the nth-Bernoulli number, as a floating-point approximation, with C<bernreal(0) = 1>.
+
+Returns NaN for negatives values of C<n>.
+
+=head2 harmfrac
+
+    harmfrac(n)                                   #=> Rat | NaN
+
+Returns the nth-Harmonic number C<H_n>. The harmonic numbers are the sum of
+reciprocals of the first C<n> natural numbers: C<1 + 1/2 + 1/3 + ... + 1/n>.
+
+For values greater than 7000, binary splitting (Fredrik Johansson's elegant formulation) is used.
+
+=head2 harmreal
+
+    harmreal(n)                                   #=> Float | NaN
+
+Returns the nth-Harmonic number, as a floating-point approximation, for any real value of C<n>.
+
+Returns NaN for negative integers.
+
+Defined as:
+
+    harmreal(n) = digamma(n+1) + euler
+
+where C<euler> is the Euler-Mascheroni constant.
+
+=head2 agm
+
+    agm(x, y)                                     #=> Any
+
+Arithmetic-geometric mean of C<x> and C<y>. Also defined for complex numbers.
+
+=head2 hypot
+
+    hypot(x, y)                                   #=> Any
+
+The value of the hypotenuse for catheti C<x> and C<y>. Equivalent to C<sqrt(x**2 + y**2)>. Also defined for complex numbers.
+
+=head2 gamma
+
+    gamma(x)                                      #=> Float | Inf | NaN
+
+The Gamma function on C<x>. Returns Inf when C<x> is zero, and NaN when C<x> is a negative integer.
+
+=head2 lgamma
+
+    lgamma(x)                                     #=> Float | Inf | NaN
+
+The logarithm of the absolute value of the Gamma function.
+Returns Inf when C<x> is negative or equal to zero.
+
+=head2 lngamma
+
+    lngamma(x)                                    #=> Float | Inf
+
+The natural logarithm of the Gamma function on C<x>.
+Returns Inf when C<x> is negative or equal to zero.
+
+=head2 digamma
+
+    digamma(x)                                    #=> Float | Inf | NaN
+
+The Digamma function (sometimes called Psi).
+Returns Nan when C<x> is negative, and -Inf when C<x> is 0.
+
+=head2 beta
+
+    beta(x, y)                                    #=> Float | Inf | NaN
+
+The beta function (also called the Euler integral of the first kind).
+
+Defined as:
+
+    beta(x, y) = gamma(x)*gamma(y) / gamma(x+y)
+
+=head2 zeta
+
+    zeta(x)                                       #=> Float | Inf | NaN
+
+The Riemann zeta function at C<x>. Returns Inf when C<x> is 1.
+
+=head2 eta
+
+    eta(x)                                        #=> Float | Inf | NaN
+
+The Dirichlet eta function at C<x>.
+
+Defined as:
+
+    eta(1) = ln(2)
+    eta(x) = (1 - 2**(1-x)) * zeta(x)
+
+=head2 BesselJ
+
+    BesselJ(x, n)                                 #=> Float | NaN
+
+The first order Bessel function, C<J_n(x)>, where C<n> is a signed integer.
+
+Example:
+
+    BesselJ(x, n)        # represents J_n(x)
+
+=head2 BesselY
+
+    BesselY(x, n)                                 #=> Float | NaN
+
+The second order Bessel function, C<Y_n(x)>, where C<n> is a signed integer. Returns NaN for negative values of C<x>.
+
+Example:
+
+    BesselY(x, n)        # represents Y_n(x)
+
+=head2 erf
+
+    erf(x)                                        #=> Float
+
+The error function on C<x>.
+
+=head2 erfc
+
+    erfc(x)                                       #=> Float
+
+Complementary error function on C<x>.
+
+=head2 Ai
+
+    Ai(x)                                         #=> Float
+
+The Airy function on C<x>.
+
+=head2 Ei
+
+    Ei(x)                                         #=> Float | Inf | NaN
+
+Exponential integral of C<x>. Returns -Inf when C<x> is zero, and NaN when C<x> is negative.
+
+=head2 Li
+
+    Li(x)                                         #=> Float | Inf | NaN
+
+The logarithmic integral of C<x>, defined as: C<Ei(ln(x))>.
+Returns -Inf when C<x> is 1, and Nan when C<x> is less than or equal to 0.
+
+=head2 Li2
+
+    Li2(x)                                        #=> Float
+
+The dilogarithm function, defined as the integral of C<-log(1-t)/t> from 0 to C<x>.
+
+=head1 TRIGONOMETRIC FUNCTIONS
+
+=head2 sin / sinh / asin / asinh
+
+    sin(x)                                        #=> Any
+    sinh(x)                                       #=> Any
+    asin(x)                                       #=> Any
+    asinh(x)                                      #=> Any
+
+Sine, hyperbolic sine, inverse sine and inverse hyperbolic sine.
+
+=head2 cos / cosh / acos / acosh
+
+    cos(x)                                        #=> Any
+    cosh(x)                                       #=> Any
+    acos(x)                                       #=> Any
+    acosh(x)                                      #=> Any
+
+Cosine, hyperbolic cosine, inverse cosine and inverse hyperbolic cosine.
+
+=head2 tan / tanh / atan / atanh
+
+    tan(x)                                        #=> Any
+    tanh(x)                                       #=> Any
+    atan(x)                                       #=> Any
+    atanh(x)                                      #=> Any
+
+Tangent, hyperbolic tangent, inverse tangent and inverse hyperbolic tangent.
+
+=head2 cot / coth / acot / acoth
+
+    cot(x)                                        #=> Any
+    coth(x)                                       #=> Any
+    acot(x)                                       #=> Any
+    acoth(x)                                      #=> Any
+
+Cotangent, hyperbolic cotangent, inverse cotangent and inverse hyperbolic cotangent.
+
+=head2 sec / sech / asec / asech
+
+    sec(x)                                        #=> Any
+    sech(x)                                       #=> Any
+    asec(x)                                       #=> Any
+    asech(x)                                      #=> Any
+
+Secant, hyperbolic secant, inverse secant and inverse hyperbolic secant.
+
+=head2 csc / csch / acsc / acsch
+
+    csc(x)                                        #=> Any
+    csch(x)                                       #=> Any
+    acsc(x)                                       #=> Any
+    acsch(x)                                      #=> Any
+
+Cosecant, hyperbolic cosecant, inverse cosecant and inverse hyperbolic cosecant.
+
+=head2 atan2
+
+    atan2(x, y)                                   #=> Any
+
+The arctangent of the quotient of its arguments (i.e.: C<atan(x/y)>).
+
+=head2 deg2rad
+
+    deg2rad(x)                                    #=> Any
+
+Returns the value of C<x> converted from degrees to radians.
+
+Example:
+
+    deg2rad(180) = pi
+
+=head2 rad2deg
+
+    rad2deg(x)                                    #=> Any
+
+Returns the value of C<x> converted from radians to degrees.
+
+Example:
+
+    rad2deg(pi) = 180
+
+=head1 INTEGER FUNCTIONS
+
+All operations in this section are done with integers.
+
+=head2 iadd / isub / imul / idiv / ipow
+
+    iadd(x, y)                                    #=> Int | NaN
+    isub(x, y)                                    #=> Int | NaN
+    imul(x, y)                                    #=> Int | NaN
+    idiv(x, y)                                    #=> Int | NaN
+    ipow(x, y)                                    #=> Int | NaN
+
+Integer addition, subtraction, multiplication, division and exponentiation.
+
+=head2 imod
+
+    imod(x, y)                                    #=> Int | NaN
+
+The integer modulus operation. Returns NaN when C<y> is zero.
+
+=head2 divmod
+
+    divmod(x, y)                                  #=> (Int, Int) | (NaN, NaN)
+
+Returns the quotient and the remainder from division of C<x> by C<y>,
+where both are integers. When C<y> is zero, it returns two NaN values.
+
+=head2 invmod
+
+    invmod(x, y)
+
+Computes the inverse of C<x> modulo C<y> and returns the result.
+When no inverse exists, the NaN value is returned.
+
+=head2 powmod
+
+    powmod(x, y, z)                               #=> Int | NaN
+
+Computes C<(x ** y) % z>, where all three values are integers.
+
+Returns NaN when the third argument is 0, or when C<y> is negative and C<gcd(x, z) != 1>.
+
+=head2 isqrt / icbrt
+
+    isqrt(n)                                      #=> Int | NaN
+    icbrt(n)                                      #=> Int | NaN
+
+The integer square root of C<n> and the integer cube root of C<n>. Returns NaN when a real root does not exists.
+
+=head2 isqrtrem
+
+    isqrtrem(n)                                   #=> (Int, Int) | (NaN, NaN)
+
+The integer part of the square root of C<n> and the remainder C<n - isqrt(n)**2>, which will be zero when C<n> is a perfect square.
+
+=head2 iroot
+
+    iroot(n, m)                                   #=> Int | NaN
+
+The integer C<m-th> root of C<n>. Returns NaN when a real does not exists.
+
+=head2 irootrem
+
+    irootrem(n, m)                                #=> (Int, Int) | (NaN, NaN)
+
+The integer part of the root of C<n> and the remainder C<n - iroot(n,m)**m>.
+
+Returns C<(NaN,NaN)> when a real root does not exists.
+
+=head2 ilog
+
+    ilog(n)                                       #=> Int | NaN
+    ilog(n, m)                                    #=> Int | NaN
+
+The integer part of the logarithm of C<n> to base C<m> or base I<e> when C<m> is not specified.
+
+Return NaN when C<n> is negative.
+
+=head2 ilog2 / ilog10
+
+    ilog2(n)                                      #=> Int | NaN
+    ilog10(n)                                     #=> Int | NaN
+
+The integer part of the logarithm of C<n> to base C<2> or base C<10>, respectively.
+
+=head2 and / or / xor / not / lsft / rsft
+
+    x & y                                         #=> Int
+    x | y                                         #=> Int
+    x ^ y                                         #=> Int
+    ~x                                            #=> Int
+    x << y                                        #=> Int
+    x >> y                                        #=> Int
+
+The integer-logical operations.
+
+=head2 gcd
+
+    gcd(x, y)                                     #=> Int
+
+The greatest common divisor of C<x> and C<y>.
+
+=head2 lcm
+
+    lcm(x, y)                                     #=> Int
+
+The least common multiple of C<x> and C<y>.
+
+=head2 valuation
+
+    valuation(n, k)                               #=> Scalar
+
+Returns the number of times C<n> is divisible by C<k>.
+
+=head2 remdiv
+
+    remdiv(n, k)                                  #=> Int
+
+Removes all occurrences of the factor C<k> from integer C<n>.
+
+In general, the following statement holds true:
+
+    remdiv(n, k) == n / k**valuation(n, k)
+
+=head2 kronecker
+
+    kronecker(n, m)                               #=> Scalar
+
+Returns the Kronecker symbol I<(n|m)>, which is a generalization of the Jacobi symbol for all integers I<m>.
+
+=head2 lucas
+
+    lucas(n)                                      #=> Int | NaN
+
+The n-th Lucas number. Returns NaN when C<n> is negative.
+
+=head2 fibonacci
+
+    fibonacci(n)                                  #=> Int | NaN
+
+The n-th Fibonacci number. Returns NaN when C<n> is negative.
+
+=head2 factorial
+
+    factorial(n)                                  #=> Int | NaN
+
+Factorial of C<n>. Returns NaN when C<n> is negative. (C<1*2*3*...*n>)
+
+=head2 dfactorial
+
+    dfactorial(n)                                 #=> Int | NaN
+
+Double-factorial of C<n> (denoted as C<n!!>). Returns NaN when C<n> is negative. (requires GMP>=5.1.0)
+
+Example:
+
+    dfactorial(7)     # 1*3*5*7 = 105
+    dfactorial(8)     # 2*4*6*8 = 384
+
+=head2 mfactorial
+
+    mfactorial(n, m)                              #=> Int | NaN
+
+Generalized m-factorial of C<n>. Returns NaN when C<n> is negative. (requires GMP>=5.1.0)
+
+=head2 binomial
+
+    binomial(n, k)                                #=> Int
+
+Calculates the binomial coefficient C<n> over C<k>, also called the
+"choose" function. The result is equivalent to:
+
+           ( n )       n!
+           |   |  = -------
+           ( k )    k!(n-k)!
+
+=head2 primorial
+
+    primorial(n)                                  #=> Int
+
+Returns the product of all the primes less than or equal to C<n>. (requires GMP>=5.1.0)
+
+=head2 next_prime
+
+    next_prime(n)                                 #=> Int
+
+Returns the next prime after C<n>.
+
+=head2 is_prime
+
+    is_prime(n)                                   #=> Scalar
+    is_prime(n, r)                                #=> Scalar
+
+Returns 2 if C<n> is definitely prime, 1 if C<n> is probably prime (without
+being certain), or 0 if C<n> is definitely composite. This method does some
+trial divisions, then some Miller-Rabin probabilistic primality tests. It
+also accepts an optional argument for specifying the accuracy of the test.
+By default, it uses an accuracy value of 20.
+
+Reasonable accuracy values are between 15 and 50.
+
+See also:
+
+=over 4
+
+=item * L<https://en.wikipedia.org/wiki/Miller–Rabin_primality_test>
+
+=item * L<https://gmplib.org/manual/Number-Theoretic-Functions.html>
+
+=back
+
+=head2 is_power
+
+    is_power(n)
+    is_power(n, k)                                #=> Bool
+
+Return a true value when C<n> is a perfect power of a given integer C<k>.
+
+When C<n> is not an integer, it always returns false. On the other hand, when C<k> is not an integer,
+it will implicitly be truncated to an integer. If C<k> is not positive after truncation, C<0> is returned.
+
+A true value is returned iff there exists some integer C<a> satisfying the equation: C<a**k = n>.
+
+When C<k> is not specified, it returns true if C<n> can be expressed as C<a**b> for some integers C<a> and C<b>, with C<b> greater than 1.
+
+Example:
+
+    is_power(100, 2)       # true: 100 is a square (10**2)
+    is_power(125, 3)       # true: 125 is a cube   ( 5**3)
+    is_power(279841)       # true: 279841 is 23**4
+
+
+=head2 is_square
+
+    is_square(n)                                  #=> Bool
+
+Returns a true value when C<n> is a perfect square.
+When C<n> is not an integer, a false value is returned.
+
+=head1 MISCELLANEOUS
+
+This section includes various useful methods.
+
+=head2 floor
+
+    floor(x)                                      #=> Any
+
+Returns C<x> if C<x> is an integer, otherwise it rounds C<x> towards -Infinity.
+
+Example:
+
+    floor( 2.5) =  2
+    floor(-2.5) = -3
+
+=head2 ceil
+
+    ceil(x)                                       #=> Any
+
+Returns C<x> if C<x> is an integer, otherwise it rounds C<x> towards +Infinity.
+
+Example:
+
+    ceil( 2.5) =  3
+    ceil(-2.5) = -2
+
+=head2 round
+
+    round(x)                                      #=> Any
+    round(x, p)                                   #=> Any
+
+Rounds C<x> to the nth place. A negative argument rounds that many digits
+after the decimal point, while a positive argument rounds that many digits
+before the decimal point.
+
+Example:
+
+    round('1234.567')         = 1235
+    round('1234.567', 2)      = 1200
+    round('3.123+4.567i', -2) = 3.12+4.57*i
+
+=head2 rand
+
+    rand(x)                                       #=> Float
+    rand(x, y)                                    #=> Float
+
+Returns a pseudorandom floating-point value. When an additional argument is provided,
+it returns a number between C<x> (inclusive) and C<y> (exclusive). Otherwise, returns a number between
+C<0> (inclusive) and C<x> (exclusive).
+
+The PRNG behind this function is called the "Mersenne Twister". Although it generates pseudorandom
+numbers of very good quality, it is B<NOT> cryptographically secure!
+
+Example:
+
+    rand(10)        # a random number in the interval [0, 10)
+    rand(10, 20)    # a random number in the interval [10, 20)
+
+=head2 irand
+
+    irand(x)                                      #=> Int
+    irand(x, y)                                   #=> Int
+
+Returns a pseudorandom integer. Unlike the C<rand()> function, C<irand()> is inclusive in both sides.
+
+When an additional argument is provided, it returns an integer between C<x> (inclusive) and C<y> (inclusive),
+otherwise returns an integer between C<0> (inclusive) and C<x> (inclusive).
+
+If C<x> is greater that C<y>, the returned result will be in the range C<[y, x]>.
+
+The PRNG behind this method is called the "Mersenne Twister".
+Although it generates high-quality pseudorandom integers, it is B<NOT> cryptographically secure!
+
+Example:
+
+    irand(10)        # a random integer in the interval [0, 10]
+    irand(10, 20)    # a random integer in the interval [10, 20]
+
+=head2 seed / iseed
+
+    seed(n)                                       #=> Int
+    iseed(n)                                      #=> Int
+
+Reseeds the C<rand()> and the C<irand()> function, respectively, with the value of C<n>, which can be any arbitrary large integer.
+
+Returns back the integer part of C<n>. If C<n> cannot be truncated to an integer,
+the method dies with an appropriate error message.
+
+=head2 sgn
+
+    sgn(x)                                        #=> Scalar | Complex
+
+Returns C<-1> when C<x> is negative, C<1> when C<x> is positive, and C<0> when C<x> is zero.
+
+When C<x> is a complex number, it computes the sign using the identity:
+
+    sgn(x) = x / abs(x)
+
+=head2 length
+
+    length(x)                                     #=> Scalar
+
+Returns the number of digits in the integer part of C<x>.
+Returns C<-1> when C<x> cannot be truncated to an integer.
+
+For C<-1234.56>, it returns C<4>.
+
+=head2 inc
+
+    ++$x                                          #=> Any
+    $x++                                          #=> Any
+
+Returns C<x + 1>.
+
+=head2 dec
+
+    --$x                                          #=> Any
+    $x--                                          #=> Any
+
+Return C<x - 1>.
+
+=head2 copy
+
+    $x->copy                                      #=> Any
+
+Returns a deep-copy of the self-object.
+
+=head2 popcount
+
+    popcount(n)                                   #=> Scalar
+
+Returns the population count of the positive integer part of C<x>, which is the number of 1 bits in
+its binary representation.
+
+This value is also known as the Hamming weight.
+
+=head1 * Introspection
+
+=head2 is_int
+
+    is_int(x)                                     #=> Bool
+
+Returns a true value when C<x> is an integer.
+
+=head2 is_rat
+
+    is_rat(x)                                     #=> Bool
+
+Returns a true value when C<x> is a rational number.
+
+=head2 is_real
+
+    is_real(x)                                    #=> Bool
+
+Returns a true value when C<x> is a real number (i.e.: when the imaginary part is zero and it holds a real value in the real part).
+
+Example:
+
+    is_real(complex('4'))           # true
+    is_real(complex('4i'))          # false (is imaginary)
+    is_real(complex('3+4i'))        # false (is complex)
+
+=head2 is_imag
+
+Returns a true value when C<x> is an imaginary number (i.e.: when the real part is zero and it has a non-zero imaginary part).
+
+Example:
+
+    is_imag(complex('4'))           # false (is real)
+    is_imag(complex('4i'))          # true
+    is_imag(complex('3+4i'))        # false (is complex)
+
+=head2 is_complex
+
+    is_complex(x)                                 #=> Bool
+
+Returns a true value when C<x> is a complex number (i.e.: when the real part and the imaginary part are non-zero).
+
+Example:
+
+    is_complex(complex('4'))        # false (is real)
+    is_complex(complex('4i'))       # false (is imaginary)
+    is_complex(complex('3+4i'))     # true
+
+=head2 is_even
+
+    is_even(n)                                    #=> Bool
+
+Returns a true value when C<n> is a real integer divisible by 2.
+
+=head2 is_odd
+
+    is_odd(n)                                     #=> Bool
+
+Returns a true value when C<n> is a real integer not divisible by 2.
+
+=head2 is_div
+
+    is_div(x, y)                                  #=> Bool
+
+Returns a true value when C<x> is exactly divisible by C<y> (i.e.: when the remainder C<x % y> is zero).
+
+This is a generalized version of the above two methods and it also works with complex numbers.
+
+=head2 is_pos
+
+    is_pos(x)                                     #=> Bool
+
+Returns a true value when C<x> is positive.
+
+=head2 is_neg
+
+    is_neg(x)                                     #=> Bool
+
+Returns a true value when C<x> is negative.
+
+=head2 is_zero
+
+    is_zero(n)                                    #=> Bool
+
+Returns a true value when C<n> equals 0.
+
+=head2 is_one
+
+    is_one(n)                                     #=> Bool
+
+Returns a true value when C<n> equals 1.
+
+=head2 is_mone
+
+    is_mone(n)                                    #=> Bool
+
+Returns a true value when C<n> equals -1.
+
+=head2 is_inf
+
+    is_inf(x)                                     #=> Bool
+
+Returns a true value when C<x> holds the positive Infinity special value.
+
+=head2 is_ninf
+
+    is_ninf(x)                                    #=> Bool
+
+Returns a true value when C<x> holds the negative Infinity special value.
+
+=head2 is_nan
+
+    is_nan(x)                                     #=> Bool
+
+Returns a true value when C<x> holds the Not-a-Number special value.
+
+=head1 * Conversions
+
+=head2 int
+
+    int(x)                                        #=> Int | NaN
+
+Returns the integer part of C<x>. Returns C<NaN> when it's not possible to truncate the number to an integer.
+
+=head2 rat
+
+    rat(x)                                        #=> Rat | NaN
+    rat(str)                                      #=> Rat | NaN
+
+Convert C<x> to a rational number. Returns C<NaN> when this conversion is not possible.
+
+Example:
+
+    rat('0.5')       = 1/2
+    rat('1234/5678') = 617/2839
+
+=head2 float
+
+    float(x)                                      #=> Float | NaN
+    float(str)                                    #=> Float | NaN
+
+Converts C<x> to a floating-point real number.
+
+Example:
+
+    float('3.14159') = 3.14159
+    float('777/222') = 3.5
+
+=head2 complex
+
+    complex(x)                                    #=> Complex
+    complex(str)                                  #=> Complex
+
+Converts C<x> to a complex number.
+
+Example:
+
+    complex("3+4i") = 3+4*i
+
+=head2 stringify
+
+    "$x"                                          #=> Scalar
+
+Returns a string representing the value of C<x>, either as a base-10 integer,
+or a decimal expansion.
+
+=head2 boolify
+
+    !!$x                                          #=> Bool
+
+Returns a false value when the number is zero. True otherwise.
+
+=head2 numify
+
+    $x->numify                                    #=> Scalar
+
+Returns a Perl numerical scalar containing the value of C<x>, truncated if necessary.
+
+=head2 as_bin
+
+    as_bin(n)                                     #=> Scalar
+
+Returns a string representing the integer part of C<n> in binary (base 2).
+
+Example:
+
+    as_bin(42) = "101010"
+
+=head2 as_oct
+
+    as_oct(n)                                     #=> Scalar
+
+Returns a string representing the integer part of C<n> in octal (base 8).
+
+Example:
+
+    as_oct(42) = "52"
+
+=head2 as_hex
+
+    as_hex(n)                                     #=> Scalar
+
+Returns a string representing the integer part of C<n> in hexadecimal (base 16).
+
+Example:
+
+    as_hex(42) = "2a"
+
+=head2 as_int
+
+    as_int(n)                                     #=> Scalar
+    as_int(n, b)                                  #=> Scalar
+
+Returns the integer part of C<n> as a string, in a given base.
+When the base is omitted, it defaults to base 10.
+
+Example:
+
+    as_int(255)     = "255"
+    as_int(255, 16) = "ff"
+
+=head2 as_frac
+
+    as_frac(n)                                    #=> Scalar
+    as_frac(n, b)                                 #=> Scalar
+
+Returns C<n> as a fraction in a given base.
+When the base is omitted, it defaults to base 10.
+
+Example:
+
+    as_frac(42)      = "42/1"
+    as_frac("1/2")   = "1/2"
+    as_frac(255, 16) = "ff/1"
+
+=head2 as_dec
+
+    as_dec(n)                                     #=> Scalar
+    as_dec(n, digits)                             #=> Scalar
+
+Returns C<n> as a decimal expansion string, with an optional number of digits.
+When the second argument is undefined, it uses the default precision.
+
+The value of C<n> can also be a complex number.
+
+Example:
+
+    as_dec(1/2)        = "0.5"
+    as_dec(sqrt(2), 3) = "1.41"
+
+=head1 * Dissections
+
+=head2 numerator
+
+    numerator(x)                                  #=> Int | NaN
+
+Returns the numerator as a signed C<Math::AnyNum> object. When C<x> is not a rational number,
+it tries to convert it to a rational. Returns NaN when this is not possible.
+
+Example:
+
+    numerator("-42")  = -42
+    numerator("-3/4") = -3
+
+=head2 denominator
+
+    denominator(x)                                #=> Int | NaN
+
+Returns the numerator as an unsigned C<Math::AnyNum> object. When C<x> is not a rational number,
+it tries to convert it to a rational. Returns NaN when this is not possible.
+
+Example:
+
+    denominator("-42")  = 1
+    denominator("-3/4") = 4
+
+=head2 nude
+
+    nude(x)                                       #=> (Int | NaN, Int | NaN)
+
+Returns the numerator and the denominator of C<x>.
+
+Example:
+
+    nude("42")   = (42, 1)
+    nude("-3/4") = (-3, 4)
+
+=head2 real
+
+    real(x)                                       #=> Any
+
+Returns the real part of C<x>.
+
+Example:
+
+    real("42")   = 42
+    real("42i")  = 0
+    real("3-4i") = 3
+
+=head2 imag
+
+    imag(x)                                       #=> Any
+
+Returns the imaginary part of C<x>, if any. Otherwise, returns zero.
+
+Example:
+
+    imag("42")   =  0
+    imag("42i")  = 42
+    imag("3-4i") = -4
+
+=head2 reals
+
+    reals(x)                                      #=> (Any, Any)
+
+Return the real and the imaginary part of C<x> as real numbers.
+
+Example:
+
+    reals("42")   = (42, 0)
+    reals("42i")  = (0, 42)
+    reals("3-4i") = (3, -4)
+
+=head2 digits
+
+    digits(x)                                     #=> (Scalar, Scalar, ...)
+    digits(x, b)                                  #=> (Scalar, Scalar, ...)
+
+Returns a list with the digits of C<x> in a given base. When no base is specified, it defaults to base 10.
+
+Only the absolute integer part of C<x> is considered.
+
+Example:
+
+    digits(-1234.56) = (1,2,3,4)
+    digits(4095, 16) = ('f','f','f')
+
+=head1 * Comparisons
+
+=head2 eq
+
+    x == y                                        #=> Bool
+
+Equality check: returns a true value when C<x> and C<y> are equal.
+
+=head2 ne
+
+    x != y                                        #=> Bool
+
+Inequality check: returns a true value when C<x> and C<y> are not equal.
+
+=head2 gt
+
+    x > y                                         #=> Bool
+
+Returns a true value when C<x> is greater than C<y>.
+
+=head2 ge
+
+    x >= y                                        #=> Bool
+
+Returns a true value when C<x> is equal or greater than C<y>.
+
+=head2 lt
+
+    x < y                                         #=> Bool
+
+Returns a true value when C<x> is less than C<y>.
+
+=head2 le
+
+    x <= y                                        #=> Bool
+
+Returns a true value when C<x> is equal or less than C<y>.
+
+=head2 cmp
+
+    x <=> y                                       #=> Scalar
+
+Compares C<x> to C<y> and returns a negative value when C<x> is less than C<y>,
+0 when C<x> and C<y> are equal, and a positive value when C<x> is greater than C<y>.
+
+Complex numbers are compared as:
+
+    (real(x) <=> real(y)) ||
+    (imag(x) <=> imag(y))
+
+Comparing anything to NaN (including NaN itself), returns C<undef>.
+
+=head1 PERFORMANCE
+
+The performance varies greatly, but, in most cases, Math::AnyNum is between 2x up to 10x
+faster than L<Math::BigFloat> with the B<GMP> backend, and about 100x faster than L<Math::BigFloat>
+without the B<GMP> backend (to be modest).
+
+Math::AnyNum is fast because of the following facts:
+
+=over 4
+
+=item *
+
+minimal overhead in object creations and conversions.
+
+=item *
+
+minimal Perl code is executed per operation.
+
+=item *
+
+the B<GMP>, B<MPFR> and B<MPC> libraries are extremely efficient.
+
+=back
+
+To achieve the best performance, try to follow this rules:
+
+=over 4
+
+=item *
+
+use the B<i*> functions/methods wherever applicable.
+
+=item *
+
+use floating-point numbers when accuracy is not important.
+
+=item *
+
+pass Perl numbers as arguments to methods, if you can.
+
+=back
+
+=head1 MOTIVATION
+
+This module came into existence as a response to Dana Jacobsen's request for a transparent
+interface to L<Math::GMPz> and L<Math::MPFR>, which he talked about at the YAPC NA, in 2015.
+
+See his great presentation at: L<https://www.youtube.com/watch?v=Dhl4_Chvm_g>.
+
+The main aim of this module is to provide a fast and correct alternative to L<Math::BigInt>,
+L<Maht::BigFloat> and L<Math::BigRat>, as well as to L<bigint>, L<bignum> and L<bigrat> pragmas.
+
+The original project was called L<Math::BigNum>, but because of some design flaws, it was very difficult to add
+support for complex numbers, therefore that project was abandoned and much of its code ended up in this module.
+
+=head1 AUTHOR
+
+Daniel Șuteu, C<< <trizenx at gmail.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to L<https://github.com/trizen/Math-AnyNum/issues>.
+I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Math::AnyNum
+
+You can also look for information at:
+
+=over 4
+
+=item * GitHub
+
+L<https://github.com/trizen/Math-AnyNum>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Math-AnyNum>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Math-AnyNum>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Math-AnyNum/>
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * Fast math libraries
+
+L<Math::GMP> - High speed arbitrary size integer math.
+
+L<Math::GMPz> - perl interface to the GMP library's integer (mpz) functions.
+
+L<Math::GMPq> - perl interface to the GMP library's rational (mpq) functions.
+
+L<Math::MPFR> - perl interface to the MPFR (floating point) library.
+
+L<Math::MPC> - perl interface to the MPC (multi precision complex) library.
+
+=item * Portable math libraries
+
+L<Math::BigInt> - Arbitrary size integer/float math package.
+
+L<Math::BigFloat> - Arbitrary size floating point math package.
+
+L<Math::BigRat> - Arbitrary big rational numbers.
+
+=item * Math utilities
+
+L<Math::Prime::Util> - Utilities related to prime numbers, including fast sieves and factoring.
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2017 Daniel Șuteu.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+=cut

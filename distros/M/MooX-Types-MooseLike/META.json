@@ -1,0 +1,77 @@
+{
+   "abstract" : "some Moosish types and a type builder",
+   "author" : [
+      "mateu - Mateu X. Hunter (cpan:MATEU) <hunter@missoula.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooX-Types-MooseLike",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Moo" : "1.004002",
+            "bareword::filehandles" : "0",
+            "indirect" : "0",
+            "multidimensional" : "0",
+            "strictures" : "2"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "strictures" : "2"
+         },
+         "requires" : {
+            "Module::Runtime" : "0.014"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Requirements" : "0"
+         },
+         "requires" : {
+            "Moo" : "1.004002",
+            "Test::Fatal" : "0.003",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooX-Types-MooseLike"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mateu/MooX-Types-MooseLike.git",
+         "web" : "https://github.com/mateu/MooX-Types-MooseLike"
+      },
+      "x_IRC" : "irc://irc.perl.org/#web-simple"
+   },
+   "version" : "0.29",
+   "x_authority" : "cpan:MATEU"
+}

@@ -1,0 +1,25 @@
+# -*-c-*-
+#
+# $Id: 41MQBEGIN-v5,v 33.4 2012/09/26 16:10:06 jettisu Exp $
+#
+# (c) 1999-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+#ifdef MQBO_NONE
+
+void
+MQBEGIN(Hconn,BeginOpts,CompCode,Reason)
+	MQHCONN		Hconn
+	MQBO		BeginOpts
+	MQLONG		CompCode = NO_INIT
+	MQLONG		Reason = NO_INIT
+
+    CODE:
+	MQBEGIN(Hconn,&BeginOpts,&CompCode,&Reason);
+    OUTPUT:
+	BeginOpts
+	CompCode
+	Reason
+
+#endif

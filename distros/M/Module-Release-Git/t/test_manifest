@@ -1,0 +1,5 @@
+load.t
+pod.t
+pod_coverage.t
+check_vcs.t
+vcs_tag.t

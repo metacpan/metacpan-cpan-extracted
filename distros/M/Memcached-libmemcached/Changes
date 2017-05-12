@@ -1,0 +1,161 @@
+=head1 NAME
+
+Memcached::libmemcached::Changes - List of significant changes
+
+=head2 Changes in 1.001800 - 7th April 2014
+
+  Sync with libmemcached 1.0.18
+
+=head2 Changes in 1.001702 - 14th March 2014
+
+  Change bug tracker to GitHub
+  Fix link to current repository, also add to META. Thanks to dsteinbrunner
+  Work around missing libcloog-ppl0 compilation issues, RT#88378
+  Improve handling of case where last_return==MEMCACHED_ERRNO
+    but lmc_state->last_errno==0, RT#41299.
+
+=head2 Changes in 1.001701 - 2nd Sept 2013
+
+  Sync with libmemcached 1.0.17
+  Fixed links in docs, RT#66291
+  Fixed whatis in pod of Memcached::libmemcached::API, RT#71172
+  Fixed undef warnings related to expiration, RT#69996
+  Don't let DESTDIR env var upset libmemcached build (Chip Salzenberg).
+
+  Note that get_server_for_key() may have a memory leak.
+
+=head2 Changes in 0.4406 4th Jan 2011
+
+  Added get_server_for_key() thanks to Roy Hooper.
+
+=head2 Changes in 0.4405 29th Oct 2010
+
+  Fix crash if memcached_callback_get(MEMCACHED_CALLBACK_PREFIX_KEY) returns NULL.
+
+=head2 Changes in 0.4404 28th Oct 2010
+
+  Added memcached_callback_set() to enable MEMCACHED_CALLBACK_PREFIX_KEY.
+  Added memcached_callback_get()
+  Made test timing more robust.
+
+=head2 Changes in 0.4403 28th Oct 2010
+
+  Changed memcached_version() to return the lowest server version seen.
+  Added new memcached_{inc,dec}rement{_with_initial,}{_by_key,} methods.
+  Added new methods memcached_server_add_with_weight() and
+    memcached_server_add_unix_socket_with_weight().
+  Added new trace_level() method.
+
+=head2 Changes in 0.4402 26th Oct 2010
+
+  Changed walk_stats() API. Now uses the memcached_stat_execute() function
+    and no longer passes $stats_arg as the forth argument to the callback.
+  Minor updates to docs.
+
+=head2 Changes in 0.4401 21st Oct 2010
+
+  Sync with libmemcached 0.44
+  Fixed core dump in stats function.
+  Fixed memory leak in stats function. RT#41496
+  Improved error reporting in trace log.
+
+=head2 Changes in 0.4202  2nd Aug 2010
+
+  Fix memcached_version() to properly return a list when called in list context
+     this should resolve rt #59864
+
+=head2 Changes in 0.4201 16th Jul 2010
+
+  Sync with libmemcached 0.42
+  Squashed various compile warnings
+  Many updates to libmemcached API calls due to API changes
+  Merged existing svn tree (which was out of sync) with 
+  Daisuke's tree
+
+=head2 Changes in 0.3101 6th Sep 2009
+
+  Sync with libmemcached 0.31
+  Now tested against memcached 1.4.1
+  Now tested with binary protocol
+  Work with newer libmemcached, which returned MEMCACHED_END instead of
+    MEMCACHED_SUCCESS on fetch success
+
+=head2 Changes in 0.2501 (svn r163) 17th Dec 2008
+
+  Sync with libmemcached 0.25.
+
+=head2 Changes in 0.2101 (svn r156) 27th May 2008
+
+  Sync with libmemcached 0.21.
+  Report memcached version when running tests.
+  Skip flags test when using memcached <1.2.4.
+  Test consistent hashing thanks to Daisuke Maki.
+  Deprecated undocumented calling get() with an array ref as key
+    it now generates a warning.
+  Added way to specify multiple memcached servers for tests.
+  Added -bin option to Makefile.PL to install mem* utilities
+    thanks to Jos Boumans.
+
+=head2 Changes in 0.1902 (svn r144) 17th April 2008
+
+  Fixed leak of $memc which prevented DESTROY (and thus memcached_free)
+    being called, thanks to Jim Spath and Daisuke Maki.
+  Fixed tests to not use whitespace in keys, thanks to Daisuke Maki.
+
+=head2 Changes in 0.1901 (svn r140) 10th April 2008
+
+  Sync with libmemcached 0.19.
+  Added walk_stats method for fetching stats via a callback
+    thanks to Daisuke Maki.
+
+=head2 Changes in 0.1701 (svn r129) 3rd March 2008
+
+  Sync with libmemcached 0.17.
+  Perl API for memcached_version returns the version info.
+  Added auto-generated Memcached::libmemcached::constants docs.
+  Improved docs.
+  Assorted minor fixes.
+
+=head2 Changes in 0.1405 (svn rXXX)
+
+  Added official object-oriented API for perl-specific extensions.
+  Allow SubclassName->new as alias for memcached_create.
+  Deprecated perl-specific functions superceeded by methods:
+    memcached_errstr                - now $memc->errstr
+    memcached_mget_into_hashref     - now $memc->mget_into_hashref
+    memcached_set_callback_coderefs - now $memc->set_callback_coderefs
+  Added -g/-pg options to Makefile.PL to enable debug/profiling.
+  Changed memcache object to be blessed hash instead of blessed int.
+
+=head2 Changes in 0.1404 (svn r106) 29th Jan 2008
+
+  Fixes for perl 5.6.
+  Removed dependency on Time::HiRes for testing.
+
+=head2 Changes in 0.1402 (svn r102) 27th Jan 2008
+
+  Added tracing via PERL_LIBMEMCACHED_TRACE env var.
+  Added perl callbacks for get and set.
+  Added many more functions and improved the docs.
+  Reenable perl 5.006 as we supply our own xsubpp now.
+
+=head2 Changes in 0.1401
+
+  Added memcached_errstr and related $memc state management.
+  Changes functions to return simple boolean code.
+  Added memcached_replace, memcached_cas
+  More tests.
+
+=head2 Changes in 0.1308
+
+  Includes libmemcached-0.14
+  memcached_return values are now boolean (true, defined false, or undef)
+  Added memcached_errstr($memc) to access last error code and string.
+  Bundle xsubpp to avoid problems interfacing with our custom ParseXS.
+
+=head2 Changes in 0.1307
+
+  Min perl version now 5.008 due to XS length(other_arg) syntax.
+
+=cut
+

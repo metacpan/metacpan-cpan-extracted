@@ -1,0 +1,46 @@
+0.07 2015-10-16T12:08:53+02:00
+ - Improve description for get_lines() in doc.
+ - Update to Map::Tube 3.06.
+
+0.06 2015-10-07T13:07:12+02:00
+ - Add EXAMPLE4 to doc.
+ - Add get_line_by_id() and get_line_by_name() methods to doc.
+ - Add test comment.
+ - Add tests for get_node_by_id() and get_node_by_name() methods.
+ - Fix Test::Map::Tube and planning of tests.
+ - Move author tests to xt/ directory.
+ - Rewrite SEE ALSO section to new style.
+ - Update Module::Install to 1.16 version.
+
+0.05 2015-03-09T21:41:26+01:00
+ - Fix XML document to right map validity (Thanks Gisbert W. Selke).
+ - Update images/ex3.png image for EXAMPLE3 section in doc.
+
+0.04 2015-03-01T23:57:49+01:00
+ - Add lines to XML document.
+ - Add test of map validity.
+ - Rewrite line stations in XML map.
+ - Update map in EXAMPLE3 section in doc.
+
+0.03 2015-02-19T08:11:55+01:00
+ - Add <?xml> header to XML document.
+ - Add EXAMPLE3 section to doc.
+ - Add get_lines() method to doc.
+ - Add get_stations() method to doc.
+ - Remove executable bit from moscow-map.xml file.
+ - Update SEE ALSO section in doc.
+ - Update copyright years to 2015.
+
+0.02 2014-12-09T07:54:20+01:00
+ - Add Map::Tube::Berlin, Map::Tube::Minsk, Map::Tube::NYC,
+   Map::Tube::Tokyo and Map::Tube::Warsaw to SEE ALSO section in doc.
+ - Add Map::Tube::Kiev and Map::Tube::Sofia to SEE ALSO section in doc.
+ - Add metro name.
+ - Describe get_all_routes() method as EXPERIMENTAL.
+ - Fix REPOSITORY section in doc.
+ - Fix get_shortest_route() method description in doc.
+ - Improve abstract to readable version.
+ - Update LICENSE AND COPYRIGHT section in doc.
+
+0.01 2014-12-05T07:21:25+01:00
+ - First version

@@ -1,0 +1,10 @@
+Revision history for Perl extension Mail::Summary.
+
+0.02 Mon Jun 10 10:45:00 2002
+	- added prerequesites (thanks to CPAN testers! And Jost Krieger
+	  in patricular!)
+
+0.01  Mon May 27 21:41:38 2002
+	- original version; created by h2xs 1.21 with options
+		-Afn Mail::Summary
+

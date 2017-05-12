@@ -1,0 +1,283 @@
+NAME
+
+    MooseX::RelatedClasses - Parameterized role for related class
+    attributes
+
+VERSION
+
+    This document describes version 0.011 of MooseX::RelatedClasses -
+    released April 03, 2017 as part of MooseX-RelatedClasses.
+
+SYNOPSIS
+
+        # with this:
+        with 'MooseX::RelatedClasses' => {
+            name => 'Thinger', namespace => undef,
+        };
+    
+        # this:
+        use MooseX::RelatedClasses;
+        related_class name => 'Thinger', namespace => undef;
+    
+        # ...or this:
+        use MooseX::RelatedClasses;
+        related_class 'Thinger', namespace => undef;
+    
+        # ...we get three attributes:
+        #
+        #   thinger_class
+        #   thinger_class_traits
+        #   original_thinger_class
+        #
+        # ...and they look like this:
+    
+        has thinger_class => (
+            traits     => [ Shortcuts ],                # MooseX::AttributeShortcuts
+            is         => 'lazy',                       # MX::AttributeShortcuts
+            isa        => LoadableClass,                # MooseX::Types::LoadableClass
+            init_arg   => undef,
+            constraint => sub { $_->isa('Thinger') },   # MX::AttributeShortcuts
+            builder    => sub { ... compose original class and traits ... },
+        );
+    
+        has thinger_class_traits => (
+            traits  => [ Shortcuts ],
+            is      => 'lazy',
+            isa     => ArrayRef[LoadableRole],
+            builder => sub { [ ] },
+        );
+    
+        has original_thinger_class => (
+            traits     => [ Shortcuts ],
+            is         => 'lazy',
+            isa        => LoadableClass,
+            constraint => sub { $_->isa('Thinger') },
+            coerce     => 1,
+            init_arg   => 'thinger_class',
+            builder    => sub { 'My::Framework::Thinger' },
+        );
+
+DESCRIPTION
+
+    Have you ever built out a framework, or interface API of some sort, to
+    discover either that you were hardcoding your related class names (not
+    very extension-friendly) or writing the same code for the same type of
+    attributes to specify what related classes you're using?
+
+    Alternatively, have you ever been using a framework, and wanted to
+    tweak one tiny bit of behaviour in a subclass, only to realize it was
+    written in such a way to make that difficult-to-impossible without a
+    significant effort?
+
+    This package aims to end that, by providing an easy, flexible way of
+    defining "related classes", their base class, and allowing traits to be
+    specified.
+
+ROLE PARAMETERS
+
+    Parameterized roles accept parameters that influence their
+    construction. This role accepts the following parameters.
+
+ name
+
+    The name of a class, without the prefix, to consider related. e.g. if
+    My::Foo is our namespace and My::Foo::Bar is the related class:
+
+        name => 'Bar'
+
+    ...is the correct specification.
+
+    This parameter is optional, so long as either the names or
+    all_in_namespace parameters are given.
+
+ names [ ... ]
+
+    One or more names that would be legal for the name parameter.
+
+ all_in_namespace (Bool)
+
+    True if all findable packages under the namespace should be used as
+    related classes. Defaults to false.
+
+ namespace
+
+    The namespace our related classes live in. If this is not given
+    explicitly, the name of the consuming class will be used as the
+    namespace. If the consuming class' metaclass is not available (e.g. the
+    role is being constructed by something other than a consumer), then
+    this parameter is mandatory.
+
+    This parameter will also accept an explicit 'undef'. If this is the
+    case, then related classes must be specified by their full name and it
+    is an error to attempt to enable the all_in_namespace option.
+
+    e.g.:
+
+        with 'MooseX::RelatedClasses' => {
+            namespace => undef,
+            name      => 'LWP::UserAgent',
+        };
+
+    ...will provide the lwp__user_agent_class, lwp__user_agent_traits and
+    original_lwp__user_agent_class attributes.
+
+ load_all (Bool)
+
+    If set to true, all related classes are loaded as we find them.
+    Defaults to false.
+
+ private (Bool)
+
+    If true, attributes, accessors and builders will all be named according
+    to the same rules MooseX::AttributeShortcuts uses. (That is, in general
+    prefixed with an "_".)
+
+FUNCTIONS
+
+ related_class()
+
+    Synonym for "related_classes()".
+
+ related_classes()
+
+    Takes the same options that the role takes as parameters. That means
+    that this:
+
+        related_classes name => 'LWP::UserAgent', namespace => undef;
+
+    ...is effectively the same as:
+
+        with 'MooseX::RelatedClasses' => {
+            name      => 'LWP::UserAgent',
+            namespace => undef,
+        };
+
+ related_namespace()
+
+    Given a namespace, declares that everything under that namespace is
+    related. That is,
+
+        related_namespace 'Net::Amazon::EC2';
+
+    ...is the same as:
+
+        with 'MooseX::RelatedClasses' => {
+            namespace        => 'Net::Amazon::EC2',
+            name             => 'Net::Amazon::EC2',
+            all_in_namespace => 1,
+        };
+
+EXAMPLES
+
+ Multiple Related Classes at Once
+
+    Use the "names" option with an array reference of classes, and
+    attribute sets will be built for all of them.
+
+        related_classes [ qw{ Thinger Dinger Finger } ];
+    
+        # or longhand:
+        related_classes names => [ qw{ Thinger Dinger Finger } ];
+
+ Namespaces / Namespacing
+
+    Normally, related classes tend to be under the namespace of the class
+    they are related to. For example, let's say we have a class named
+    TimeLords. Related to this class are TimeLords::SoftwareWritten::Git,
+    TimeLords::Gallifrey and TimeLords::Enemies::Daleks.
+
+    The TimeLords package can start off like this, to include the proper
+    related classes:
+
+        package TimeLords;
+    
+        use Moose;
+        use timeandspace::autoclean;
+        use MooseX::RelatedClasses;
+    
+        related_classes [ qw{ Gallifrey Enemies::Daleks SoftwareWritten::Git } ];
+
+    And that will generate the expected related class attributes:
+
+        # TimeLords::Gallifrey
+        gallifrey_class
+        gallifrey_class_traits
+        original_gallifrey_class
+        # TimeLords::Enemies::Daleks
+        enemies__daleks_class
+        enemies__daleks_class_traits
+        original_enemies__daleks_class
+        # TimeLords::SoftwareWritten::Git
+        software_written__git_class
+        software_written__git_class_traits
+        original_software_written__git_class
+
+ Related classes outside the namespace
+
+    Occasionally you'll want to use something like LWP::UserAgent, which
+    has nothing to do with your class except that you use it, and would
+    like to be able to easily tweak it on the fly. This can be done with
+    the undef namespace:
+
+        related_class 'LWP::UserAgent', namespace => undef;
+
+    This will cause the following related class attributes to be generated:
+
+        lwp__user_agent_class
+        lwp__user_agent_class_traits
+        original_lwp__user_agent_class
+
+INSPIRATION / MADNESS
+
+    The Class::MOP / Moose MOP show the beginnings of this: with attributes
+    or methods named a certain way (e.g. *_metaclass()) the class to be
+    used for a particular thing (e.g. attribute metaclass) is stored in a
+    fashion such that a subclass (or trait) may overwrite and provide a
+    different class name to be used.
+
+    So too, here, we do this, but in a more flexible way: we track the
+    original related class, any additional traits that should be applied,
+    and the new (anonymous, typically) class name of the related class.
+
+    Another example is the (very useful and usable) Net::Amazon::EC2. It
+    uses Moose, is nicely broken out into discrete classes, etc, but does
+    not lend itself to easy on-the-fly extension by developers with traits.
+
+ANONYMOUS CLASS NAMES
+
+    Note that we use MooseX::Traitor to compose anonymous classes, so the
+    "anonymous names" will look less like:
+
+        Moose::Meta::Package::__ANON__::SERIAL::...
+
+    And more like:
+
+        My::Framework::Thinger::__ANON__::SERIAL::...
+
+    Anonymous classes are only ever composed if traits for a related class
+    are supplied.
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/moosex-relatedclasses/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+CONTRIBUTOR
+
+    Kulag <g.kulag@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2012 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

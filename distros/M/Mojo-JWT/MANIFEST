@@ -1,0 +1,10 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+cpanfile
+lib/Mojo/JWT.pm
+metamerge.json
+t/basic.t

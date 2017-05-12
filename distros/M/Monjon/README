@@ -1,0 +1,90 @@
+NAME
+    Monjon - create your Moo objects as blessed scalar refs
+
+SYNOPSIS
+            use v5.14;
+        
+            package MyClass {
+                    use Monjon;
+                    has id   => (is => 'ro', pack => 'L');
+                    has name => (is => 'rw', pack => 'Z32');
+            }
+        
+            my $obj = MyClass->new(id => 42, name => "The Answer");
+
+DESCRIPTION
+    Monjon is a subclass of Moo designed for efficient memory usage when you
+    need to deal with many thousands of very simple objects.
+
+    Attributes are stored using a variation on the `pack`/`unpack` technique
+    used by BrowserUK <http://www.perlmonks.org/?node_id=171588> on PerlMonks
+    at <http://www.perlmonks.org/?node_id=1040313>.
+
+    However, inside-out attributes are also offered for data which cannot be
+    reasonably serialized to a string. (But if you do need to store things
+    like references, perhaps Monjon is not for you.)
+
+  Differences from Moo
+    `has`
+        The attribute spec accepts an additional option `pack`. The presence
+        of this key in the specification makes your attribute be stored in the
+        object's packed string. Attributes without a `pack` option will be
+        stored inside-out.
+
+    `extends`
+        Extending non-Monjon classes is not supported. (But who knows? It
+        could work!)
+
+    `before`, `after`, and `around`
+        Monjon is sometimes forced to rebuild constructors and accessors at
+        run-time, which may lead to method modifiers being overwritten, if you
+        have tried to apply any modifiers to them.
+
+        Basically, don't apply method modifiers to accessors.
+
+  Benchmarking
+    Monjon's accessors are significantly slower than Moo's, especially when
+    Moo is able to make use of Class::XSAccessor.
+
+    However, if your data consists of mostly numbers, booleans, and small or
+    fixed-width strings, Monjon is likely to consume a lot less memory per
+    instance.
+
+    See:
+    <https://github.com/tobyink/p5-monjon/blob/master/devel.bench/bench.pl>.
+
+  What's a Monjon?
+    It's a very shy little wallaby, and it's near-threatened. See
+    <http://en.wikipedia.org/wiki/Monjon>.
+
+    If you like this module and want to help monjons, please see
+    <http://www.australianwildlife.org.au/Artesian-Range.aspx>.
+
+CAVEATS
+    Unless you have Moo 1.004_003 exactly (i.e. neither an older nor a newer
+    version of Moo), multiple inheritance is unlikely to work for Monjon
+    classes.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Monjon>.
+
+SEE ALSO
+    Moo.
+
+    <http://www.perlmonks.org/?node_id=1040313>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

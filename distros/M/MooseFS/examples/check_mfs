@@ -1,0 +1,77 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Nagios::Plugin;
+use MooseFS::Info;
+
+my $np = Nagios::Plugin->new(
+        usage => <<END_USAGE,
+Usage: %s [ -v|--verbose ] [-H|--host=<host>] [-p|--port=<port>] [-m|--metric=<metric>]
+[ -c|--critical=<critical threshold> ]
+[ -w|--warning=<warning threshold> ]
+END_USAGE
+);
+
+$np->add_arg(
+        spec => 'warning|w=s',
+        help => <<END_HELP,
+-w, --warning=INTEGER:INTEGER
+Minimum and maximum number of allowable result, outside of which a
+warning will be generated.  If omitted, no warning is generated.
+END_HELP
+);
+$np->add_arg(
+        spec => 'critical|c=s',
+        help => <<END_HELP,
+-c, --critical=INTEGER:INTEGER
+Minimum and maximum number of the generated result, outside of
+which a critical will be generated.
+END_HELP
+);
+$np->add_arg(
+        spec    => 'host|H=s',
+        default => '127.0.0.1',
+        help    => <<END_HELP,
+-H, --host
+MooseFS Master Host (defaults to 127.0.0.1)
+END_HELP
+);
+$np->add_arg(
+        spec    => 'port|p=s',
+        default => 9421,
+        help    => <<END_HELP,
+-p, --port
+MooseFS Master Port (defaults to 9421)
+END_HELP
+);
+
+$np->getopts;
+
+if (   !defined $np->opts->warning
+        && !defined $np->opts->critical
+        && !defined $np->opts->host )
+{
+        $np->nagios_die("You need to specify a threshold argument");
+}
+
+my $mfs = MooseFS::Info->new(
+        masterhost => $np->opts->host,
+        masterport => $np->opts->port,
+);
+
+$np->nagios_die("mfs have no space at all") unless $mfs->total_space > 0;
+
+my $percent = 100 - $mfs->avail_space *100.0 / $mfs->total_space;
+
+$np->add_perfdata(
+    label  => 'avail_percent',
+    value  => $percent,
+    uom    => '%',
+    threshold => $np->threshold,
+);
+
+$np->nagios_exit(
+    return_code => $np->check_threshold( $percent ),
+    message     => sprintf "%.2f%% in %d TB.\n", $percent, $mfs->total_space / 1099511627776,
+);
+

@@ -1,0 +1,25 @@
+---
+abstract: 'Method Extension port for perl'
+author:
+  - 'Tiago Peczenyj <tiago.peczenyj@gmail.com>'
+build_requires:
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.132661'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Method-Extension
+requires:
+  Attribute::Handlers: 0
+  perl: 5.006
+resources:
+  bugtracker: https://github.com/peczenyj/Method-Extension/issues
+  homepage: https://github.com/peczenyj/Method-Extension
+  repository: git://github.com/peczenyj/Method-Extension.git
+version: 0.1

@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/001.t
+lib/Math/EMA.pm
+mk_README.sh
+perl-Math-EMA.spec
+META.yml                                 Module meta-data (added by MakeMaker)

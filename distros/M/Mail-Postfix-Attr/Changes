@@ -1,0 +1,20 @@
+Revision history for Perl extension Mail::Postfix::Attr.
+
+0.06      2013-10-04 21:06:16 America/New_York
+          update Makefile.PL to just give up on Win32 and VMS
+
+0.05      2013-09-28 21:35:00 America/New_York
+          update repo metadata
+
+0.04      2013-01-02 11:31:01 America/New_York
+          longstanding patches applied; still sort of a mess
+
+0.03      Fri Dec 19 01:12:51 EST 2003
+          added support for INET sockets
+
+0.02      Wed Dec  3 00:45:07 EST 2003
+          fixed problem with plain format and test
+
+0.01      Sun Aug  3 01:10:50 2003
+	        original version; created by h2xs 1.21 with options
+          -X -n Mail::Postfix::Attr

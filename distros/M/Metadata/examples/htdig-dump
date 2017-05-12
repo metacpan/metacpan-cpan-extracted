@@ -1,0 +1,210 @@
+#!/usr/local/bin/perl
+#
+# $Id: htdig-dump,v 1.3 2001/01/09 12:03:54 cmdjb Exp $
+#
+# Dump ht://dig docs database
+#
+# Copyright (C) 1997-2001 Dave Beckett - http://purl.org/net/dajobe/
+#
+# USAGE: htdig-dump <htdig docs file>
+#
+# and the SOIF records are printed to stdout
+#
+
+
+
+require 5.004;
+
+use strict;
+use GDBM_File;
+use File::Basename;
+
+# Local modules
+use Metadata::SOIF;
+
+$::VERSION=(split(/ /, q$Id: htdig-dump,v 1.3 2001/01/09 12:03:54 cmdjb Exp $))[2];
+
+$::DEBUG=0;
+
+$::prog_name=basename $0;
+
+
+# CONSTANTS
+@::DOC_REF_TAGS=(
+  [qw(number ID)],
+  [qw(number Time)],
+  [qw(number Accessed)],
+  [qw(number State)],
+  [qw(number Size)],
+  [qw(number Links)],
+  [qw(number ImageSize)],
+  [qw(number HopCount)],
+  [qw(string URL)],
+  [qw(string Head)],
+  [qw(string Title)],
+  [qw(list   Descriptions)],
+  [qw(list   Anchors)],
+  [qw(string Email)],
+  [qw(string Notification)],
+  [qw(string Subject)],
+  [qw(number DOCSTRING)], # Not used
+);
+
+%::HTDIG_TO_SOIF=(
+  ID           => 'HTDIG-Object-Identifier',
+  Time         => 'Last-Modification-Time',
+  Accessed     => 'HTDIG-Last-Accessed-Time',
+  State        => 'HTDIG-State',
+  Size         => 'File-Size',
+  Links        => 'HTDIG-Links',
+  ImageSize    => 'HTDIG-ImageSize',
+  HopCount     => 'HTDIG-HopCount',
+  URL          => 'URL', # special, goes to URL field later
+  Head         => 'Body',
+  Title        => 'Title',
+  Descriptions => 'Abstract',
+  Anchors      => 'HTDIG-Anchors',
+  Email        => 'Author',
+  Notification => 'HTDIG-Notification',
+  Subject      => 'Keywords',
+);
+
+&main(@ARGV);
+exit 0;
+
+
+sub main (@) {
+  die "USAGE: $::prog_name: <htdig docs file>\n" unless @_;
+
+  my $file=shift;
+
+  my $mode=&GDBM_READER();
+
+  die "$::prog_name: No such htdig docs database file $file\n" unless -r $file;
+
+  warn "$::prog_name: Version $::VERSION reading $file\n";
+
+  my(%db);
+  tie %db, 'GDBM_File', $file, $mode, 0644 or die "$::prog_name: Could not tie GDBM_File $file\n";
+
+  my $count=0;
+  while(my($key,$data)=each %db) {
+    my $soif=new Metadata::SOIF;
+
+    deserialise_htdig_doc_ref($soif, $data);
+    convert_htdig_metadata($soif);
+    print $soif->as_string,"\n";
+
+    last if $count++>100;
+  }
+
+  untie %db;
+}
+
+
+sub deserialise_htdig_doc_ref ($$) {
+  my($md,$data)=@_;
+
+  $md->clear;
+
+  my $sizeof_int=length(pack('i',0));
+
+  my $d=$data;
+  $d=~ tr/[ -~]/./cd;
+  warn "Data is '$d' (", length($data), " bytes)\n" if $::DEBUG>3;
+
+  my $offset=0;
+  while($offset <= length($data)) {
+    my $tag=unpack('C', substr($data,$offset,1));
+    last if !defined $tag;
+    die "$::prog_name: Unknown tag $tag found\n" unless $::DOC_REF_TAGS[$tag];
+
+    my($type,$name)=@{$::DOC_REF_TAGS[$tag]};
+    my $soif_name=$::HTDIG_TO_SOIF{$name};
+
+    warn "$offset: Tag $tag - Type $type Name $name\n" if $::DEBUG;
+    $offset++;
+
+    if ($type eq 'number') {
+
+      # Original C: #define getnum(in, var) memcpy((char *) &var, in, sizeof(var)); in += sizeof(var)
+
+      my $num=unpack('i', substr($data,$offset,$sizeof_int));
+      warn "$offset: Number $num\n" if $::DEBUG;
+      $offset+=$sizeof_int;
+      $md->set($soif_name,$num);
+    } elsif ($type eq 'string') {
+
+      # Original C: #define getstring(in, str) getnum(in, length); str = 0; str.append(in, length); in += length
+
+      my $length=unpack('i', substr($data,$offset,$sizeof_int));
+      $offset+=$sizeof_int;
+      my $string=substr($data,$offset,$length);
+      my $qs=$string;
+      $qs=~ s/([^ -~])/sprintf("\\x%02X",ord($1))/ge;
+      warn "$offset: String '$qs'\n" if $::DEBUG;
+      $offset+=$length;
+
+      $md->set($soif_name,$string);
+    } else { # list
+
+      # Original C: #define getlist(in, list) getnum(in, count); for (i = 0; i < count; i++) { getnum(in, length); str = new String; str->append(in, length); list.Add(str); in += length; }
+
+      my $count=unpack('i', substr($data,$offset,$sizeof_int));
+      $offset+=$sizeof_int;
+
+      my(@list);
+      for my $i (1..$count) {
+	my $length=unpack('i', substr($data,$offset,$sizeof_int));
+	$offset+=$sizeof_int;
+	my $string=substr($data,$offset,$length);
+	warn "$offset: List String #$i '$string'\n" if $::DEBUG;
+	$offset+=$length;
+	push(@list, $string);
+      }
+
+      $md->set($soif_name,\@list);
+    }
+  }    
+
+}
+
+
+sub convert_htdig_metadata ($) {
+  my($soif)=shift;
+
+  my $url=$soif->get('URL');
+  $soif->delete('URL');
+  $soif->url($url);
+
+  my $title;
+  my $abstract;
+  if(!($title=$soif->get('Title')) && 
+     ($abstract=$soif->get('Abstract')) && 
+     length($abstract)<100) {
+    $soif->set('Title', $title=$abstract);
+    $soif->delete('Abstract');
+    $abstract=undef;
+  }
+
+  if ($title && $abstract) {
+    $title=~s/\s+$//;
+    $abstract=~s/\s+$//;
+    if ($title eq $abstract) {
+      $soif->delete('Abstract');
+      $abstract=undef;
+    }
+  }
+
+  
+  my $type='HTML';
+  $type='Postscript' if $url =~ /\.e?ps$/i;    
+  $soif->set('Type', $type);
+
+  #my $b=$soif->get('Body');
+  #my $digest=MD5->hexhash($b);
+  #$soif->set('MD5', $digest);
+}
+
+__END__
+

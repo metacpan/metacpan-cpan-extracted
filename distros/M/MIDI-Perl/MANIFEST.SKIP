@@ -1,0 +1,8 @@
+^MANIFEST\.bak$
+^MIDI-Perl-\d
+Makefile(\.old)?$
+\.rej$
+CVS
+blib
+~
+

@@ -1,0 +1,44 @@
+{
+   "abstract" : "get rid of an entire email thread",
+   "author" : [
+      "Dianne Skoll <dfs@roaringpenguin.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mail-ThreadKiller",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Email::Simple" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DB_File" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.0.1"
+}

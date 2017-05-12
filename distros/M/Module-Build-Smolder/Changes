@@ -1,0 +1,10 @@
+Revision history for Module-Build-Smolder
+
+0.02    April 4, 2009
+    + Require --username if --password is typed
+    + add tests for TAP Archive creation
+    + add tests for parameter validation
+
+0.01    March 29, 2009
+    + First version, released on an unsuspecting world.
+

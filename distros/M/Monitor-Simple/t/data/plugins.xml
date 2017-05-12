@@ -1,0 +1,66 @@
+<smon>
+  <services>
+
+    <service id="ok">
+      <plugin command="copy-message.pl">
+        <args>
+          <arg>0</arg>
+          <arg>This is OK</arg>
+        </args>
+      </plugin>
+    </service>
+    <service id="warning">
+      <plugin command="copy-message.pl">
+        <args>
+          <arg>1</arg>
+          <arg>This is WARNING</arg>
+        </args>
+      </plugin>
+    </service>
+    <service id="critical">
+      <plugin command="copy-message.pl">
+        <args>
+          <arg>2</arg>
+          <arg>This is CRITICAL</arg>
+        </args>
+      </plugin>
+    </service>
+    <service id="unknown">
+      <plugin command="copy-message.pl">
+        <args>
+          <arg>3</arg>
+          <arg>This is UNKNOWN</arg>
+        </args>
+      </plugin>
+    </service>
+
+    <service id="prg">
+      <plugin command="check-prg.pl">
+        <prg-test>
+          <program>date</program>
+          <args>
+            <arg>--date=03 Jan 1951</arg>
+          </args>
+          <stdout>
+            <contains>1951</contains>
+          </stdout>
+        </prg-test>
+      </plugin>
+    </service>
+    <service id="prgbad">
+      <plugin command="check-prg.pl">
+        <prg-test>
+          <program>date</program>
+          <args>
+            <arg>--date=03 Jan 1951 +0001</arg>
+          </args>
+          <stdout>
+            <contains>1951</contains>
+          </stdout>
+        </prg-test>
+      </plugin>
+    </service>
+
+  </services>
+
+</smon>

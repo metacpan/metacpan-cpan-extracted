@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Merror
+version:             1.4
+abstract:            Object oriented errorhandling with a stacktrace option
+license:             ~
+author:              
+    - Markus Mazurczak <coding@markus-mazurczak.de>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    strict:                        0
+    Test::More:                    0.94
+    warnings:                      0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

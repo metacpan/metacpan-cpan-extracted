@@ -1,0 +1,39 @@
+Revision history for MooseX-LogDispatch
+
+1.2002 Sun Apr 18 2010
+     - quote role names in synopsis
+
+1.2001 Thu Oct 23 2008
+     - fix some egregious typos in MooseX::LogDispatch::Levels docs (penfold)
+
+1.2000 Thu Oct 23 2008
+     - with Logger() syntax now removed after deprecation cycle 
+       Logger() now die()'s (penfold)
+	 - t/01basic.t rewritten to role-based syntax (penfold)
+	 - several attempts made at a less ugly ::Levels implementation, 
+	   copious comments added as to WHY it's the way it is (penfold)
+
+1.1003 Wed Sept 3 2008
+     - fix Levels not returning true
+
+1.1002 Wed May 7 2008
+     - allowing packaged to be used in Moose::Meta::Role (jgoulah) 
+
+1.1001 Wed Feb 6 2008
+     - Added use_logger_singleton attribute that if true will use the existing
+       instance from Log::Dispatch::Config (if any)
+     - POD fixes
+
+1.1000 Sun Jan 27 2008
+     - Completly reworked the way you configure the logger by incorporating
+       the work blblack did in MooseX::LazyLogDispatch.
+
+1.0001 Wed Nov 14 2007
+       Fix dist to include inc/Module/Install.pm et al.
+
+1.0000 Sat Nov 10 2007
+       Docs, tests and tiding up for release 
+
+0.0.1  Tue Jun 26 17:10:55 2007
+       Initial release. (Chris Prather)
+

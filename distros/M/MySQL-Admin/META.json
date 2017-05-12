@@ -1,0 +1,125 @@
+{
+   "abstract" : "Just a MySQL administration Web-App and CMS System",
+   "author" : [
+      "Dirk Lindner <lze@cpan.org>",
+      "Dirk Lindner <lze@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MySQL-Admin",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Authen::Captcha" : "1.024",
+            "Frontier::RPC2" : "0.06",
+            "Mail::Sendmail" : "0.79",
+            "Search::Tools::UTF8" : "1.003",
+            "Syntax::Highlight::Engine::Kate" : "0.10",
+            "XML::XSLT" : "0.48"
+         },
+         "requires" : {
+            "CGI" : "3.48",
+            "CGI::QuickForm" : "1.93",
+            "DBI" : "1.50",
+            "HTML::Menu::TreeView" : "1.15",
+            "MD5" : "2.03",
+            "Test::More" : "0.7",
+            "URI" : "1.40",
+            "perl" : "5.006000"
+         }
+      }
+   },
+   "provides" : {
+      "DBI::Library" : {
+         "file" : "lib/DBI/Library.pm",
+         "version" : "1.12"
+      },
+      "DBI::Library::Database" : {
+         "file" : "lib/DBI/Library/Database.pm",
+         "version" : "1.12"
+      },
+      "DBI::Library::Database::db" : {
+         "file" : "lib/DBI/Library/Database.pm"
+      },
+      "DBI::Library::Database::st" : {
+         "file" : "lib/DBI/Library/Database.pm"
+      },
+      "DBI::Library::db" : {
+         "file" : "lib/DBI/Library.pm"
+      },
+      "DBI::Library::st" : {
+         "file" : "lib/DBI/Library.pm"
+      },
+      "HTML::Editor" : {
+         "file" : "lib/HTML/Editor.pm",
+         "version" : "1.12"
+      },
+      "HTML::Editor::BBCODE" : {
+         "file" : "lib/HTML/Editor/BBCODE.pm",
+         "version" : "1.12"
+      },
+      "HTML::Menu::Pages" : {
+         "file" : "lib/HTML/Menu/Pages.pm",
+         "version" : "1.12"
+      },
+      "MySQL::Admin" : {
+         "file" : "lib/MySQL/Admin.pm",
+         "version" : "1.12"
+      },
+      "MySQL::Admin::Actions" : {
+         "file" : "lib/MySQL/Admin/Actions.pm",
+         "version" : "1.12"
+      },
+      "MySQL::Admin::Config" : {
+         "file" : "lib/MySQL/Admin/Config.pm",
+         "version" : "1.12"
+      },
+      "MySQL::Admin::Documentation" : {
+         "file" : "lib/MySQL/Admin/Documentation.pm",
+         "version" : "1.12"
+      },
+      "MySQL::Admin::GUI" : {
+         "file" : "lib/MySQL/Admin/GUI.pm",
+         "version" : "1.12"
+      },
+      "MySQL::Admin::Session" : {
+         "file" : "lib/MySQL/Admin/Session.pm",
+         "version" : "1.12"
+      },
+      "MySQL::Admin::Settings" : {
+         "file" : "lib/MySQL/Admin/Settings.pm",
+         "version" : "1.12"
+      },
+      "MySQL::Admin::Translate" : {
+         "file" : "lib/MySQL/Admin/Translate.pm",
+         "version" : "1.12"
+      },
+      "Template::Quick" : {
+         "file" : "lib/Template/Quick.pm",
+         "version" : "1.12"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt"
+      ],
+      "repository" : {
+         "url" : "https://sourceforge.net/p/lindnerei/code/ci/master/tree/"
+      }
+   },
+   "version" : "1.12",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

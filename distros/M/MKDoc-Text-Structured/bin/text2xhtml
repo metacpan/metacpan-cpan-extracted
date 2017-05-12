@@ -1,0 +1,164 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use lib ('lib');
+
+use Getopt::Declare;
+use MKDoc::Text::Structured;
+our $VERSION = $MKDoc::Text::Structured::VERSION;
+
+my $usage = q(
+
+  [nocase] [strict]
+  [mutex: --body-only --inline-only --entities-only]
+  -h				display this help
+  -v				display information about version
+  --external-stylesheet <path>	set external stylesheet as <path>
+  --title <title>		set page title as <title>
+  --body-only			output only the <body> tag content
+  --inline-only			don't create any block-level tags
+  --entities-only		don't create any tags at all
+
+);
+
+my $arg = new Getopt::Declare ($usage);
+
+my $title = '';
+if ($arg->{'--title'})
+{
+    $title = $arg->{'--title'};
+    $title = MKDoc::Text::Structured::Inline::process_entities_only ($title);
+}
+
+my $style = '';
+if ($arg->{'--external-stylesheet'})
+{
+    $style = $arg->{'--external-stylesheet'};
+    $style = MKDoc::Text::Structured::Inline::process_entities_only ($style);
+    $style = qq(<style media="screen" type="text/css" title="Screen style sheet">
+\@import url($style);
+</style>\n);
+}
+
+my $text = join '', <STDIN>;
+
+my $html;
+
+if ($arg->{'--inline-only'})
+{ $html = MKDoc::Text::Structured::Inline::process ($text); }
+
+elsif ($arg->{'--entities-only'})
+{ $html = MKDoc::Text::Structured::Inline::process_entities_only ($text); }
+
+else
+{ $html = MKDoc::Text::Structured::process ($text); }
+
+unless ($arg->{'--body-only'} or $arg->{'--inline-only'} or $arg->{'--entities-only'}) 
+{
+    print STDOUT qq(<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>$title</title>
+<meta name="generator" content="MKDoc::Text::Structured" />
+$style</head>
+<body>
+$html
+</body>
+</html>);
+}
+else
+{
+    print STDOUT $html;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+text2xhtml - Utility to convert plain text to HTML
+
+=head1 Synopsis
+
+  text2xhtml --title 'Read Me' < README > readme.html
+  text2xhtml --body-only < disclaimer.txt > ssi/disclaimer.html
+  echo '(c) Bruno Postle -- 2005' | text2xhtml --entities-only > ssi/copy.html
+
+=head1 DESCRIPTION
+
+`text2xhtml' is a command-line utility program for converting simple plain text
+into valid XHTML files or fragments.  It uses the L<MKDoc::Text::Structured>
+library to handle the conversion, so standard plain text formatting conventions
+such as asterisks for bulleted lists, dashes to underline a headline and two
+carriage returns to start a new paragraph are supported.
+
+Lots of other standard 'email' type formatting is supported, see the
+MKDoc::Text::Structured documentation for more details:
+
+L<http://search.cpan.org/dist/MKDoc-Text-Structured>
+
+=head1 Calling syntax
+
+  text2xhtml [-h] [-v] [--external-stylesheet <path>] [--title <title>] [--body-only|--inline-only|--entities-only]
+
+=head2 Options
+
+=over
+
+=item -h
+
+The I<-h> option will display a short usage summary.
+
+=item -v
+
+This option displays the version number of L<MKDoc::Text::Structured>
+
+=item --external-stylesheet <path>
+
+Use this option to specify an external stylesheet, this can be a relative path,
+or an absolute URL.  This option has no effect when producing XHTML fragments
+with any of the C<--body-only>, C<--inline-only> or C<--entities-only> options.
+
+=item --title <title>
+
+Use this option to set the page title.  If ommitted, the <title> tag is left
+empty.  This option has no effect when producing XHTML fragments with any of
+the C<--body-only>, C<--inline-only> or C<--entities-only> options.
+
+=item --body-only
+
+Output the fragment of text normally found inside the <body> tag.  This
+fragment will include block level tags such as <p> and <ul>, but since it has
+no enclosing tag is not well-formed XML.
+
+=item --inline-only
+
+Don't create any block-level tags, this will create a fragment with inline tags
+such as <strong> or <abbr>, but no block level tags such as <p> or <ul>.
+
+=item --entities-only
+
+Don't create any tags at all, this will still convert various constructs in the
+fragment to HTML entities such as &amp; &gt; &emdash; &copy; etc.. but will not
+generate any HTML tags such as <p> or <strong>.
+
+=back
+
+=head1 License
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 See Also
+
+L<perl>, L<MKDoc::Text::Structured>
+
+=head1 Author
+
+Bruno Postle, E<lt>bruno (at) mkdoc.comE<gt>
+
+=cut

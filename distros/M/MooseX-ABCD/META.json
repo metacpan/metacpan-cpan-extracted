@@ -1,0 +1,73 @@
+{
+   "abstract" : "MooseX::ABC, but checking required methods on make_immutable",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::7 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-ABCD",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MooseX::ABC" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.61"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::ABCD" : {
+         "file" : "lib/MooseX/ABCD.pm",
+         "version" : "0.003"
+      },
+      "MooseX::ABCD::Trait::Class" : {
+         "file" : "lib/MooseX/ABCD/Trait/Class.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/MooseX-ABCD/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=MooseX-ABCD"
+      },
+      "homepage" : "https://metacpan.org/release/MooseX-ABCD",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-moosex-abcd.git",
+         "web" : "https://github.com/tobyink/p5-moosex-abcd"
+      }
+   },
+   "version" : "0.003"
+}

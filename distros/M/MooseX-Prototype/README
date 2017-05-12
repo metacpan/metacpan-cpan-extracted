@@ -1,0 +1,164 @@
+NAME
+    MooseX::Prototype - prototype-based programming for Moose
+
+SYNOPSIS
+    From Wikipedia: *"Prototype-based programming is a style of
+    object-oriented programming in which classes are not present, and
+    behaviour reuse (known as inheritance in class-based languages) is
+    performed via a process of cloning existing objects that serve as
+    prototypes."*
+
+       use MooseX::Prototype;
+   
+       my $Person = object {
+          name       => undef,
+       };
+   
+       my $Employee = $Person->new->extend({
+          job        => undef,
+          employer   => undef,
+       });
+   
+       my $CivilServant = $Employee->new(
+          employer   => 'Government',
+       );
+   
+       $CivilServant->extend({
+          department => undef,
+       });
+   
+       my $bob = $CivilServant->new(
+          name       => 'Robert',
+          department => 'HMRC',
+          job        => 'Tax Inspector',
+       );
+   
+       print $bob->dump;
+   
+       # $VAR1 = bless( {
+       #    name       => 'Robert',
+       #    job        => 'Tax Inspector',
+       #    department => 'HMRC',
+       #    employer   => 'Government'
+       # }, 'MooseX::Prototype::__ANON__::0006' );
+
+DESCRIPTION
+    Due to familiarity with class-based languages such as Java, many
+    programmers assume that object-oriented programming is synonymous with
+    class-based programming. However, class-based programming is just one kind
+    of object-oriented programming style, and other varieties exist such as
+    role-oriented, aspect-oriented and prototype-based programming.
+
+    A prominent example of a prototype-based programming language is
+    ECMAScript (a.k.a. Javascript/JScript/ActionScript). ECMAScript does
+    provide a thin class-like layer over the top of its prototype-based OO
+    system, which some (even experienced) ECMAScript developers rarely see
+    beyond.
+
+    This module implements a thin prototype-like layer on top of Moose's
+    class/role-based toolkit.
+
+  Ex-Nihilo Object Creation
+    In prototype-based languages, objects are created by cloning other
+    objects. But it's often useful to be able to magic up an object out of
+    nowhere. MooseX::Prototype provides a convenience function to do this:
+
+    `object \%attrs`
+        Creates a new object with the given attributes. The hash is treated as
+        attribute-name, attribute-value pairs, but any names beginning with
+        "&" are installed as methods. For example:
+
+           my $person = object {
+              "name"         => "Robert",
+              "&changeName"  => sub {
+                 my ($self, $newname) = @_;
+                 $self->name($newname);
+              },
+           };
+
+        Objects created this way inherit from Moose::Object and perform the
+        `MooseX::Prototype::Trait::Object` role.
+
+  Creating Objects from a Prototype
+    A prototype is just an object. When you create a new object from it, the
+    prototype will be cloned and the new object will inherit all its
+    attributes and methods.
+
+    `$prototype->new(%attrs)`
+        Creates a new object which inherits its methods and attributes from
+        $prototype. The %attrs hash can override attribute values from the
+        prototype, but cannot add new attributes or methods.
+
+        This method is provided by the `MooseX::Prototype::Trait::Object`
+        role, so $prototype must perform that role.
+
+    `$prototype->create_class`
+        Rather than creating a new object from a prototype, this creates a
+        whole new Moose class which can be used to instantiate objects. If you
+        need to create a whole bunch of objects from a prototype, it is
+        probably more efficient to create a class and use that, rather than
+        just calling `new` a bunch of times.
+
+        The class can be given a name, a la:
+
+           $prototype->create_class("Foo::Bar");
+
+        Otherwise an arbitary name will be generated and returned.
+
+        This method is provided by the `MooseX::Prototype::Trait::Object`
+        role, so $prototype must perform that role.
+
+    `create_class_from_prototype($prototype)`
+        A convenience function allowing you to use arbitary Moose objects
+        (which lack the `create_class` method) as prototypes.
+
+        Also note:
+
+           my $obj = create_class_from_prototype($proto)->new(%attrs);
+
+        This function is not exported by default, but can be exported using:
+
+           use MooseX::Prototype -all;
+
+  Extending Existing Objects
+    A key feature of Javascript is that new attributes and methods can be
+    given to an object using simple assignment;
+
+       my_object.some_attribute = 123;
+       my_object.some_method = function () { return 456 };
+
+    In MooseX::Prototype, there is an explicit syntax for adding new
+    attributes and methods to an object.
+
+    `$object->extend(\%attrs)`
+        As per ex-nihilo object creation, the attribute hashref can define
+        attribute name-value pairs, or new methods with a leading "&".
+
+HISTORY
+    Version 0.001 of MooseX::Prototype consisted of just a single function,
+    `use_as_prototype` which was much the same as
+    `create_class_from_prototype`.
+
+    Version 0.002 is an almost complete rewrite.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Prototype>.
+
+SEE ALSO
+    Object::Prototype, Class::Prototyped, JE::Object.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

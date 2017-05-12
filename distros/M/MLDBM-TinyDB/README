@@ -1,0 +1,30 @@
+MLDBM::TinyDB version 0.19
+==============================
+More-than-flatfile-database 
+- it's designed as local database to manage rather small amount of data
+(text, numbers), grouped in related tables of defined record stucture (fields).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  MLDBM, Storable, Tie::IxHash, SDBM_File,
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2002 Darek Adamkiewicz <d.adamkiewicz@i7.com.pl> 
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

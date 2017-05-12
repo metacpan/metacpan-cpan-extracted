@@ -1,0 +1,3 @@
+<TMPL_INCLUDE NAME="include.inc">
+Include!
+<TMPL_INCLUDE NAME="includes/include.inc">

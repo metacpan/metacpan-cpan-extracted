@@ -1,0 +1,51 @@
+0.401 2017-05-04
+  - Upgrade for Mojolicious v7.15.
+
+0.341 2016-07-15
+  - Fix tz_offset (Util).
+
+0.331 2016-06-28
+  - Fix tz_offset (Util).
+
+0.322 2016-06-25
+  - Fix test (Util).
+  - Remove v5.24 from travisci cfg.
+
+0.311 2016-06-20
+  - Fix conditional declaration (Cron).
+
+0.301 2016-05-24
+  - Add experimental Date class (Date).
+  - Fix bug #1 (Datetime).
+
+0.241 2015-01-17
+  - Add date_dow (Util).
+
+0.231 2014-09-08
+  - Update handling of useragent errors (Holiday::*).
+  - Bump Mojolicious req s/3.33/5/.
+
+0.221 2014-09-02
+  - Add experimental tz_offset (Util).
+
+0.211 2014-08-25
+  - Remove class attributes (Datetime).
+
+0.202 2014-08-21
+  - Add loader from gov.uk (Holiday::UkGov).
+  - Add loader from kayaposoft.com (Holiday::Kayaposoft).
+  - Add date_today (Util).
+
+0.131 2014-05-27
+  - Add holiday base (Holiday).
+
+0.121 2014-03-03
+  - Add date_next (Util).
+
+0.112 2014-02-13
+  - Change to use Mojar::ClassShare (Datetime).
+  - Tidy packaging.
+
+0.100 2013-08-03
+  - Initial release.
+  - Fix bug mapping day names to numbers (Cron).

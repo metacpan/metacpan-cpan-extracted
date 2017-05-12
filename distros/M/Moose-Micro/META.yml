@@ -1,0 +1,12 @@
+--- 
+abstract: succinctly specify Moose attributes
+author: 
+  - Hans Dieter Pearcey <hdp@cpan.org>
+generated_by: Dist::Zilla::Plugin::MetaYaml version 1.003
+license: perl
+name: Moose-Micro
+requires: 
+  B::Hooks::EndOfScope: 0
+  Moose: 0
+  Test::More: 0
+version: 0.002

@@ -1,0 +1,12 @@
+20021019 Math-WalshTransform-1.00 Hadamard and Walsh Transforms and Inverses
+20040809 'perl Install' works better on solaris without Term::Size
+20041211 1.01 big performance improvement in convolution, O(N^2) -> O(NlogN)
+20041215 1.02 test.pl has use not require, for invocation from other dirs
+20050111 1.10 xs in transform subs brings 30x more speed !  Install dropped
+20060410 1.11 xs is size, product, distance and normalise; fix VERSION
+20060414 1.12 no change; just re-try the Upload into CPAN
+20091128 1.13 repaired POD, and mention Morse-Thue sequences
+20100519 1.14 fix Bug #52416: requires not 5.6.2 in Makefile.PL and META.yml
+20100520 1.15 remember to include new META.yml file in the tarball
+20100522 1.16 Thanks to sisyphus, XS now works with perl 5.6.*
+20100818 1.17 translation into Lua ./lua/WalshTransform.lua introduced

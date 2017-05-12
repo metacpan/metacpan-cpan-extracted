@@ -1,0 +1,6 @@
+Revision history for Perl extension Matlab::Engine.
+
+0.01  Thu Oct  4 14:54:07 2001
+	- original version; created by h2xs 1.21 with options
+		-O -n Matlab::Engine
+

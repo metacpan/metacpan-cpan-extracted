@@ -1,0 +1,27 @@
+Module/PrintUsed
+================
+
+This module helps you to check which modules (and scripts) were used or
+required during the runtime of your script. It prints the list of modules
+to STDERR, including version numbers and paths.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules and libraries.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2009 Christian Renz <crenz@web42.com>. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

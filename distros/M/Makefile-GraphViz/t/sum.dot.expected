@@ -1,0 +1,105 @@
+digraph all {
+	graph [rankdir=BT,
+		ratio=auto
+	];
+	node [fillcolor="#ffff99",
+		fontname=Arial,
+		fontsize=10,
+		label="\N",
+		shape=box,
+		style=filled
+	];
+	edge [color=red];
+	all	 [label=all,
+		shape=plaintext];
+	node1	 [label="sum1.exe"];
+	node1 -> all	 [style=dashed];
+	node2	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="link /NOLOGO ...\l",
+		shape=note];
+	node2 -> node1;
+	node3	 [label="sum1.obj"];
+	node3 -> node2;
+	node4	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="masm sum1.asm;\l",
+		shape=note];
+	node4 -> node3;
+	node5	 [label="sum1.asm"];
+	node5 -> node4;
+	node6	 [label="sum2.exe"];
+	node6 -> all	 [style=dashed];
+	node7	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="link /NOLOGO ...\l",
+		shape=note];
+	node7 -> node6;
+	node8	 [label="sum2.obj"];
+	node8 -> node7;
+	node9	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="masm sum2.asm;\l",
+		shape=note];
+	node9 -> node8;
+	node10	 [label="sum2.asm"];
+	node10 -> node9;
+	node11	 [label="sum3.exe"];
+	node11 -> all	 [style=dashed];
+	node12	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="link /NOLOGO ...\l",
+		shape=note];
+	node12 -> node11;
+	node13	 [label="sum3.obj"];
+	node13 -> node12;
+	node14	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="masm sum3.asm;\l",
+		shape=note];
+	node14 -> node13;
+	node15	 [label="sum3.asm"];
+	node15 -> node14;
+	node16	 [label="sum4.exe"];
+	node16 -> all	 [style=dashed];
+	node17	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="link /NOLOGO ...\l",
+		shape=note];
+	node17 -> node16;
+	node18	 [label="sum4.obj"];
+	node18 -> node17;
+	node19	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="masm sum4.asm;\l",
+		shape=note];
+	node19 -> node18;
+	node20	 [label="sum4.asm"];
+	node20 -> node19;
+	node21	 [label="sum5.exe"];
+	node21 -> all	 [style=dashed];
+	node22	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="link /NOLOGO ...\l",
+		shape=note];
+	node22 -> node21;
+	node23	 [label="sum5.obj"];
+	node23 -> node22;
+	node24	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="masm sum5.asm;\l",
+		shape=note];
+	node24 -> node23;
+	node25	 [label="sum5.asm"];
+	node25 -> node24;
+}

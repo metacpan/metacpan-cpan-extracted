@@ -1,0 +1,142 @@
+# -*-c-*-
+#
+# $Id: 54MQSETMP-v7,v 36.3 2012/09/26 16:10:08 jettisu Exp $
+#
+# (c) 2009-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+void
+MQSETMP(Hconn,Hmsg,SetPropOpts,Name,PropDesc,Type,Value,CompCode,Reason)
+        MQHCONN Hconn
+        MQHMSG  Hmsg
+        MQSMPO  SetPropOpts
+        SV     *Name
+        MQPD    PropDesc
+        MQLONG  Type
+        SV     *Value
+        MQLONG  CompCode = NO_INIT
+        MQLONG  Reason = NO_INIT
+
+    PREINIT:
+        MQCHARV    name = {MQCHARV_DEFAULT};
+        void      *value_ptr = NULL;
+        MQINT8     value_int8;
+        MQINT16    value_int16;
+        MQINT32    value_int32;
+        MQINT64    value_int64;
+        MQFLOAT32  value_float32;
+        MQFLOAT64  value_float64;
+        MQLONG     value_len;
+        STRLEN     len;
+
+    CODE:
+        /* Convert name.  Maybe a typemap entry? */
+        if (SvPOK(Name)) {
+            char   *val;
+            STRLEN  len;
+
+            val = SvPV(Name, len);
+            name.VSPtr = val;
+            name.VSLength = len;
+            name.VSOffset = 0;
+            name.VSBufSize  = 0;
+            name.VSCCSID = MQCCSI_APPL; /* Maybe UTF-8 */
+        } else {
+            croak("MQSETMP parameter 'Name' is not a string\n");
+        }
+
+        /* Convert value, based on declared type*/
+        switch(Type) {
+        case MQTYPE_BOOLEAN: /* 4 bytes */
+            if (SvTRUE(Value))
+                value_int32 = 1;
+            else
+                value_int32 = 0;
+            value_ptr = &value_int32;
+            value_len = 4;
+            break;
+        case MQTYPE_BYTE_STRING: /* zero size allowed */
+        case MQTYPE_STRING: /* zero size allowed */
+            if (SvOK(Value)) {
+                /* FIXME: for String type, should look at UTF-8 flag & such */
+                value_ptr = SvPV(Value, len);
+                value_len = len;
+            } else {
+                /* undef: zero size, NULL pointer */
+                value_ptr = NULL;
+                value_len = 0;
+            }
+            break;
+        case MQTYPE_INT8: /* 1 byte */
+        case MQTYPE_INT16: /* 2 bytes */
+        case MQTYPE_INT32: /* 4 bytes */
+        case MQTYPE_INT64: /* 8 bytes */
+        case MQTYPE_FLOAT32: /* 4 bytes */
+        case MQTYPE_FLOAT64: /* 8 bytes */
+            if ((!SvROK(Value)) && looks_like_number(Value)) {
+                switch(Type) {
+                case MQTYPE_INT8:
+                    value_int8 = (MQINT8)SvIV(Value);
+                    value_ptr = &value_int8;
+                    value_len = 1;
+                    break;
+                case MQTYPE_INT16:
+                    value_int16 = (MQINT16)SvIV(Value);
+                    value_ptr = &value_int16;
+                    value_len = 2;
+                    break;
+                case MQTYPE_INT32:
+                    value_int32 = (MQINT32)SvIV(Value);
+                    value_ptr = &value_int32;
+                    value_len = 4;
+                    break;
+                case MQTYPE_INT64:
+                    /*
+                     * On 32-bit systems, if a string is provided, it
+                     * might not fit in an IV.  On such systems, if a
+                     * string is provided, perform an sscanf of a 64 bit
+                     * value
+                     */
+                    if (sizeof(IV) >= 8 || SvIOKp(Value)) {
+                        value_int64 = (MQINT64)SvIV(Value);
+                    } else {
+                        value_ptr = SvPV(Value, len);
+                        if (!sscanf(value_ptr, "%" SCNdLEAST64, &value_int64)) {
+                            croak("Cannot turn string '%s' into 64-bit number", value_ptr);
+                        }
+                    }
+                    value_ptr = &value_int64;
+                    value_len = 8;
+                    break;
+                case MQTYPE_FLOAT32:
+                    value_float32 = (MQFLOAT32)SvNV(Value);
+                    value_ptr = &value_float32;
+                    value_len = 4;
+                    break;
+                case MQTYPE_FLOAT64:
+                    value_float64 = (MQFLOAT64)SvNV(Value);
+                    value_ptr = &value_float64;
+                    value_len = 8;
+                    break;
+                default:
+                    croak("Unexpected Type '%d'\n", Type);
+                }
+            } else {
+                croak("Illegal value for MQSETMP parameter '%*.*s': Value is not a number, but Type=%d\n", name.VSLength, name.VSLength, name.VSPtr, Type);
+            }
+            break;
+        case MQTYPE_NULL: /* Must be zero bytes */
+            value_len = 0;
+            break;
+        default:
+            croak("MQSETMP parameter 'Type' has unexpected value '%d'\n",
+                  Type);
+        }
+
+        MQSETMP(Hconn,Hmsg,&SetPropOpts,&name,&PropDesc,Type,value_len,value_ptr,&CompCode,&Reason);
+    OUTPUT:
+        PropDesc
+        CompCode
+        Reason
+

@@ -1,0 +1,9 @@
+Implement per-sprite collisions (so you can make some ghostly and some collide).
+
+Maybe implement some kind of 'landscape' that can roll by?
+
+Implement proper btree list sorting thingy for collision routine.
+
+Draw llamas to go into the llamadome demo.
+
+Implement support for reversing direction so that sprite doesn't get 'caught' while bouncing off a wall.

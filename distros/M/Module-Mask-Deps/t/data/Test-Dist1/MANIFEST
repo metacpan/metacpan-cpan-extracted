@@ -1,0 +1,6 @@
+Build.PL
+lib/Test/Dist1.pm
+MANIFEST			This list of files
+META.yml
+Makefile.PL
+META.json

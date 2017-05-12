@@ -1,0 +1,9 @@
+<h1>View sample author</h1>
+
+<p>
+You are viewing a author with the id number <b><% $author_id %></b>.
+</p>
+
+<%args>
+$author_id => undef;
+</%args>

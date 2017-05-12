@@ -1,0 +1,20 @@
+abstract: The Simple/Flexible Way to Create New Modules
+author: 'Ingy döt Net <ingy@cpan.org>'
+build_requires:
+  Test::Base: 0.50
+distribution_type: module
+generated_by: Module::Install version 0.61
+license: perl
+name: Module-Start
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Field: 0.10
+  IO::All: 0
+  Template: 0
+  Term::ReadLine: 0
+  XXX: 0
+  perl: 5.6.1
+version: 0.10

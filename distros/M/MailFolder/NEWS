@@ -1,0 +1,321 @@
+$Id: NEWS,v 1.6 1998/04/05 17:21:53 kjj Exp $
+
+-------------------------------------------------------------------------------
+Version 0.7
+-------------------------------------------------------------------------------
+
+Added dependancy on MIME::* package in Makefile.PL
+
+get_header, get_mime_header, get_message, get_mime_message,
+get_message_file, refile, and dup now generate a fatal error if a
+folder isn't open, or if the message number being retrieved isn't in
+the folder
+
+Mail::Folder::get_header now returns the header if it's already in the
+header cache.  This is for folder interfaces writers.
+(Nick.Ing-Simmons@tiuk.ti.com)
+
+Mail::Folder::Mbox no longer uses globbing when removing file in tmp
+directory.
+
+Mbox folder locking doesn't keep retrying if failure to acquire a lock
+was due to permissions.
+
+Renamed register_folder_type to register_type.  Also, the method only
+takes one argument now. (Nick.Ing-Simmons@tiuk.ti.com)
+
+Fixed incorrect calculation of Content-Length (doh!)
+
+Various bug fixes and performance tweaks.
+
+Various doc tweaks.
+
+Updated module requirements in Makefile.PL
+
+Added a new method 'get_fields'.  Suggested by Nick.Ing-Simmons@tiuk.ti.com.
+
+-------------------------------------------------------------------------------
+Version 0.6
+-------------------------------------------------------------------------------
+
+Added DefaultEmptyFileFormat class variable.
+
+Temporarily turned off flock locking in mbox interface.
+
+Added NFSLock option.
+
+Added DefaultFolderType option.
+
+Added some documentation about folder locking.
+
+Reduced race condition in emaul folder locking.
+
+No longer uses File::BasicFlock.
+
+Fixed a bug in the use of escape_from in mbox.
+
+Reduced race condition in mbox folder locking.
+
+Added ability for nntp interface to understand NNTPSERVER env variable.
+
+getpop.pl now does 'use strict;'.
+
+Added NotMUA option to folder opening in getpop.pl.
+
+Added 'Modify => 0' to Mail::Internet object creation in getpop.pl.
+
+Promoted _detect_folder_type to detect_folder_type.
+-------------------------------------------------------------------------------
+Version 0.5
+-------------------------------------------------------------------------------
+
+Added xmailfolder.pl to examples directory.
+
+Added NotMUA options to 'new' method to avoid updating persistant
+labels and persistant current_message if it's set.
+
+Added ability to optionally autodetect the folder type.
+
+Added documentation about use of Mail::Folder against folders in the
+system spool directory.
+
+Added get_mime_header and get_mime_message methods.
+
+Added Content-Length processing.
+
+Added documentation about certain times when a dup of a header should
+be passed instead of the original header.
+
+delete_message and undelete_message now accept a list or a list ref
+passed in as arguments.
+
+POSSIBLE BREAKAGE: message_list doesn't sort the list it is going to return.
+
+Added 'qty' method.
+
+next_message and prev_message now default to being relative to
+current_message is a message number is not passed in as an argument.
+
+Added inverse_select method.
+
+If list_labels is called in a scalar context, it returns the qty of
+labels associated with the given argument.
+
+POSSIBLE BREAKAGE: list_all_labels no longer sorts the list it is
+going to return.
+
+If list_all_labels is called in a scalar context, it returns the qty
+of labels that are associated with the messages.
+
+If select_label is called in a scalar context, it returns the qty of
+messages that have the given label.
+
+Rearranged a lot of the documentation related to writing folder interfaces.
+
+Added documentation about envelope handling.
+
+Added is_valid_folder_format function.
+
+Changed email address and updates copyright dates.
+
+Added Timeout option to 'new' method.
+
+Switched from FileHandle to IO::File.
+
+If we are root, we don't use things like -w.
+
+Renamed methods and functions are are internal to be prefixed with '_'.
+
+In sync, if current_message is marked for deletion then slide
+current_message until we land on an message not marked for deletion.
+
+Mail::Internet objects are created with the Modify option set to 0 and
+the MailFrom option set to 'COERCE'.
+
+The sleep duration for lock attempts is not 1 second.
+
+We now use select instead of sleep.
+
+Fixed a bug in _collapse_select_list that caused it to not complete
+collapse the list.
+
+We now require File::Sync because of how we write maildir files.
+
+We parse the info portion of maildir filenames.
+
+The renamed the 'delete' flag to 'deleted'.
+
+We now update the info portion based on the state of various labels.
+
+Many bug fixes in maildir interface. Geez, was the regression test ever
+botched...
+
+maildir file writing has autoflush set to 1.
+
+maildir file writing uses fsync.
+
+The mbox 'open' method now reads in and caches all of the headers.
+This was so that status information could be processed.
+
+Created files should all be readable only by the user now.
+
+The mbox interface now does 'Status' field processing.
+
+The pack method in the mbox interface now reduces gaps in the
+numbering sequence and tweaks current_message accordingly instead of
+being a no-op .
+
+get_message now sets the 'seen' label.
+
+from.pl now accepts a list of folders on the command line.
+
+from.pl now autodetects the folder type.
+
+Various cleanups, optimizations, and cosmetic changes.
+
+-------------------------------------------------------------------------------
+Version 0.4
+-------------------------------------------------------------------------------
+Now requires 5.003. It might work with 5.002 - anyone feel adventurous?
+
+Requires newer versions of MailTools.
+
+No longer requires File-Tools package.
+
+We now 'use strict'.
+
+Has a first stab at a Maildir (ala qmail) folder interface.
+
+Various fixes for 5.002->5.003 syntax changes.
+
+The mbox interface now splits thte folder into individual temp files.
+
+Rearranged the regression test directory.
+
+Added a 'Content-Length' option to honor the 'Content-Length' header
+field if present.
+
+Added a 'DotLock' option for Mbox folders to control whether .lock
+files are to be used when locking a mbox folder.
+
+Added a Creator variable to the Folder object and associated code to
+prevent a child process from nuking the temp files out from underneath
+the parent process if the child exits before the parent.
+
+Added get_message_file method.
+
+Added undelete_message method.
+
+Added debug and debug_print methods.
+
+Folder::delete_message now returns the result of it's own call to
+add_label.
+
+Mbox folder can now use either dotlocking or flock.
+
+Documented remember_message and forget_message functions.
+
+Now use FileHandle and DirHandle instead of local(*FILE) and local(*DIR).
+
+Append_message and update_message now append a dup of the $mref that
+it was passed.  This was necessary because of internal changes and
+because some folder interfaces might make 'cosmetic' changes to the
+message (like de'From 'itating).
+
+Emaul now always delete 'From ' line when appending or replacing a message.
+
+Various cleanups, optimizations, and cosmetic changes.
+
+-------------------------------------------------------------------------------
+Version 0.3
+-------------------------------------------------------------------------------
+Added an %options argument to 'new'.
+
+Added readonly attribute to folders.
+
+Added a Create option to automatically create folder if it doesn't exist.
+
+Added message labels. Added {first,last,next,prev}_labeled_message methods.
+
+delete_message now uses 'delete' message label instead of it's own
+assocarray.
+
+register_folder_type is now done implicitly.
+
+mbox now uses /\n?\nFrom / as the message separator instead of /^From /.
+
+Added a 'create' method.
+
+Added persistant storage of message labels to emaul.
+
+Mbox now also needs the following modules: TimeDate and File-BasicFLock.
+
+Mbox now uses flock instead of '.lock' for folder locking.
+
+Mbox now checks to see if it thinks the file to open is a valid folder.
+
+Mbox now synthesizes a envelope 'From ' if necessary.
+
+In some of the smaller methods, eliminated use of 'my' and went
+straight to members of @_.
+
+Removed a call to stat in open method in Folder.pm.
+
+Improved the cleanup in close method.
+
+superclass pack now always returns 1.
+
+update_message sets 'updated' label.
+
+0 is now the official message number for a failed operation for
+methods that are supposed to return a message number.
+
+Consolidated several members of object into Message member.
+
+Added documentation on some of the mechanics of writing a folder interface.
+
+Fix a lot of pod formatting problems.
+
+Added getpop.pl and from.pl example scripts.
+
+-------------------------------------------------------------------------------
+Version 0.2
+-------------------------------------------------------------------------------
+Added an mbox folder interface.
+
+Added dup method that copies a message to a given folder.
+
+Added a Header assoc array member to the Mail::Folder object.  The
+cached header is now no longer stuffed into the Messages assocarray.
+
+Added a SortedMessages array to Mail::Folder object and added a
+sort_message_list method for folder interface developers to allow the
+sort only when needed (eg: after a set of bulk updates like in the
+open method).  This should help for large folders.  The message_list
+method used to sort the message list every time it was called.  It now
+just returns the contents of the SortMessages member.  Besides, the
+list_messages used to have a sort in it that references $a and $b;
+this was interfering with the sort in the sort method (ugh).
+
+remember_message now takes one less arg than before.  This is due to
+adding the cache_header method.
+
+Added a call to an init method to new in the base class.
+
+Added several convenience methods for folder interface developers.
+
+All of the methods that would alter the folder now require a sync to
+commit the changes.  Emaul doesn't honor this yet, but will soon.
+
+next_message and prev_message now take an optional parm to specify a
+relative starting point.  next_message and prev_message used to scan
+the entire list of messages.  They now start at the current message or
+at the given parm passed to them.
+
+Various strategic uses of map and grep.
+
+Various bug fixes uncovered when implementing Mail::Folder::Mbox.
+-------------------------------------------------------------------------------
+Version 0.1
+-------------------------------------------------------------------------------
+Initial alpha release.

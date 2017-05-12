@@ -1,0 +1,27 @@
+Changes
+examples/config.yml
+examples/MyAppConfig.pm
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+INSTALL
+lib/Module/MultiConf.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/10-basic.t
+t/20-load.t
+t/30-loadfile.t
+t/31-loadfile-ok.t
+t/40-validate.t
+t/50-force.t
+t/60-mandatory.t
+t/70-defaults.t
+t/pod-coverage.t
+t/pod.t

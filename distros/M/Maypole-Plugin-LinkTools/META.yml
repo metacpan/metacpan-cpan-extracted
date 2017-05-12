@@ -1,0 +1,14 @@
+---
+name: Maypole-Plugin-LinkTools
+version: 0.21
+author:
+  - David Baird <cpan@riverside-cms.co.uk>
+abstract: convenient link construction
+license: perl
+requires:
+  Test::More: 0
+provides:
+  Maypole::Plugin::LinkTools:
+    file: lib/Maypole/Plugin/LinkTools.pm
+    version: 0.21
+generated_by: Module::Build version 0.2609

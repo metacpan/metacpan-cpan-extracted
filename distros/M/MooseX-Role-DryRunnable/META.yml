@@ -1,0 +1,24 @@
+---
+abstract: 'role for add a dry_run (or dryrun) option into your Moose Class'
+author:
+  - 'Tiago Peczenyj <tiago.peczenyj@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Role-DryRunnable
+requires:
+  MooseX::Role::Parameterized: 0
+  namespace::clean: 0
+  perl: 5.008
+resources:
+  bugtracker: https://github.com/peczenyj/MooseX-Role-DryRunnable/issues
+  homepage: https://github.com/peczenyj/MooseX-Role-DryRunnable
+  repository: git://github.com/peczenyj/MooseX-Role-DryRunnable.git
+version: 0.006

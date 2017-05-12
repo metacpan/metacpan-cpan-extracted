@@ -1,0 +1,200 @@
+Revision history for MARC::Charset
+
+1.35 Tue Aug 13 19:50:55 PDT 2013
+    - improve conversion of certain composed characters to MARC8
+    
+      Some characters should not be fully decomposed
+      before converting them to MARC8.  This patch adds
+      a table of such characters, based on Annex A of
+      http://www.loc.gov/marc/marbi/2006/2006-04.html
+      and on some sample records provided by Jason
+      Stephenson of MVLC.
+
+    - recognize G0 and G1 characters properly
+    
+      When converting from MARC8 to UTF8, MARC::Charset now
+      properly recognizes if a (single-byte) MARC8 character falls
+      in G0 or G1.
+
+      This is part of the fix for RT#63271 (converting characters
+      in the Extended Cyrillic character set), but should also
+      fix similar issues with converting characters in the extended
+      Arabic set.
+
+      This commit also means that all MARC8 character sets that support
+      both G0 and G1 wll be properly converted, regardless of whether
+      they're currently set as the G0 or G1 character set.  For example,
+      it is now possible to convert Extended Latin as G0 or Basic Latin
+      as G1.
+
+      This fixes RT#63271
+
+    - have MARC::Charset::Code->marc_value() handle G0/G1 conversion
+    
+      Since there's at present no need to do things like have
+      ANSEL be the G0 character set when converting from UTF8 to
+      MARC8, this commit centralizes the logic for deciding
+      whether to return the G0 or G1 MARC8 representation of a
+      character.
+    
+      Also add MARC::Charset::Code->g0_marc_value(), which returns
+      the G0 representation of the character for use by the
+      character DB.
+
+    - New test cases for converting Vietnamese and Extended Cyrillic
+      text.
+    
+1.34 Mon Feb 11 09:10:35 PST 2013
+    - RT#83257: use AnyDBM_File rather than hardcode GDBM_File
+    
+      To improve portability, use AnyDBM_File to select a DBM
+      rather than rely on GDBM_File.  GDBM_File apparently used
+      to be a core module, but not all distributions included it,
+      particularly OS X.  In any event, GDBM_File is no longer
+      core.
+    
+      This patch also includes a tweak to allow MARC::Charset to
+      work with NDBM_File and ODBM_File, neither of which
+      support 'exists'.
+    
+      I've tested MARC::Charset successfully on the following
+      DBMs:
+    
+      - GDBM_File
+      - DB_File
+      - NDBM_File
+      - ODBM_File
+      - SDBM_File
+    
+      This is also my preferred order; SDBM_File is selected last
+      because it produces the biggest data file on disk.
+
+    - RT#38912: fix mapping of double diacritics (ligature and double
+      tilde).
+      Thanks to Thomas P. Ventimiglia for the bug report and test case.
+
+1.33 Thu Aug  4 23:25:14 EDT 2011
+    - move build_db() to separate .PL script so that module can be
+      built even if Class::Accessor and other dependencies aren't
+      available before Makefile.PL is run.
+    - list GDBM_File as an explicit dependency, as some distributions
+      like ActivePerl don't include it even though it is a
+      core module.
+
+1.32 Thu Jun 30 16:38:32 EDT 2011
+    - make sure utf8 flag set in output of marc8_to_utf8
+
+1.31 Thu Sep 30 10:53:00 EDT 2010
+    - minor revision to get v1.3 Changes into the CPAN distro :-)
+
+1.3 Wed Sep 29 10:26:49 EDT 2010
+    - added latest codetables.xml from
+      http://www.loc.gov/marc/specifications/codetables.xml (thanks to 
+      Mark Muehlhaeusler for noticing that there were some Arabic updates.
+      I reapplied the changes that François Charette suggested in v0.98
+      which are still not present in LC's codetable :-(
+
+1.2 Tue May 11 22:21:13 EDT 2010
+     - use Storable::nfreeze instead of Storable::freeze to get a more
+       portable character set database. Reported and fixed by Niko Tyni
+       of debian http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=579517
+
+1.1 Tue Jun 30 15:51:16 EDT 2009
+     - Patch from Damyan Ivanov of the Debian Perl Group to trim the size
+       of the character mapping db by 70 times! Uses GDBM_File instead of 
+       SDBM_File.
+
+1.00 Tue May 27 08:30:56 EDT 2008
+     - Forgot to add etc/additional-iii-characters.xml to the MANIFEST
+     - seems like as good a time as any for a v1.0 release :-)
+
+0.99 Sun May 25 08:08:05 EDT 2008
+     - Addition of characters used by III ILSs which are not covered
+       by the official LoC codetables. Thanks go to Galen Charlton.
+     - Removed PREREQ_FATAL from Makefile.PL to make CPAN testers happy
+
+0.98 Tue Aug  7 08:28:24 EDT 2007
+     - addition of two code elements to etc/codetables.xml that enable 
+       the conversion of some Arabic records that contain 0x8D and 0x8E
+       which ought to map to 0x200D and 0x200C in Unicode. These mappings
+       are present for Basic and Extended Latin, but are not present
+       in Arabic codetables. There are actually some records that seem
+       to prove the need for these rules (LCCN 2006552991). Thanks to 
+       François Charette <fcharette@ankabut.net> for finding and proposing
+       the fix. Rules were forwarded on to LC for inclusion in canonical 
+       character set mapping.
+     - added t/farsi.t and t/farsi.marc to enable testing of new 
+       code rules. Hopefully this will fail if the codetables.xml is 
+       inadvertently removed without LC having added the new rules.
+
+0.97 Sun May 20 13:48:31 EDT 2007
+     - added t/null.t
+     - fixed Charset::Compiler to use the <alt> element when <ucs> is not 
+       defined. Previous versions of MARC::Charset would convert valid MARC8
+       to null when it encountered a mapping that lacked a UCS value 
+       many thanks to Michael O'Connor.
+     - allow carriage return and line feeds to pass unmolesteed, much the
+       same as spaces today.  Apparently, UNIMARC records embed these
+       formatting characters on a regular basis.
+
+0.96 Wed Mar 14 01:24:48 EDT 2007
+     - added ignore_errors() to skip MARC8 -> UTF8 snafus
+     - added assume_encoding() to treat transcoding failures as if they
+       are from a known, specific encoding.  Useful if you have a set of
+       records that, for instance, report being MARC8 but are actually
+       encoded in Latin1 (which, btw, is completely invalid and also very
+       common).  Only in effect when ignore_errors() is true.
+     - added assume_unicode() to treat invalid MARC8 as UTF8.  This is a
+       convenience function based on assume_encoding().
+
+0.92 Sat Feb  4 19:34:19 CST 2006
+     - marc8_to_utf8 and utf8_to_marc8 needed to pass along spaces 
+       without translation
+     - added tests to t/escape2.t and t/utf8.t to test space behavior
+
+0.91 Fri Feb  3 23:10:59 EST 2006
+     - fix in marc8_to_utf8 for error reporting when no mapping is found
+
+0.9 Fri Feb  3 22:25:39 EST 2006
+    - the utf8->marc8 will prefer the first mapping it runs across in the
+      LoC XML mapping table. v0.8 preferred the last mapping found which
+      meant that utf8_to_marc8 would escape to non-ascii character sets
+      for some punctuation. Thanks Mike Rylander for helping isolate
+      this problem.
+    - added a test that makes sure punctuation is working properly
+      to no_escape.t
+    - modified test of multiple combining characters in utf8.t to 
+      actually test for correct result
+
+0.8 Tue Dec  6 07:10:19 CST 2005
+    - complete overhaul to make MARC::Charset use LoC XML mapping table.
+
+0.7  Wed Sep  7 21:34:18 2005
+    - pod fixes
+
+0.6  Thu Feb 26 10:26:22 2004
+    - fixed MARC::Charset::EastAsian to not hexify results of character lookup
+      since we are now storing hex values in the BerkeleyDB.
+    - also fixed the method for looking up the location of the BerkeleyDB
+      so that the testing version takes precedence over one that is 
+      installed. This is why the above error was not detected during 
+      testing.
+
+0.5  Fri Apr 11 06:47:00 2003
+    - all Charset classes inherit from MARC::Charset::Generic
+    - added MARC::Charset::UTF8
+    - added MARC::Charset::to_marc8() for conversion of UTF8 back to MARC8
+    - t/115.utf8.t basic tests of to_marc8()
+    - modified Makefile.PL to create a reverse mapping database for mapping
+      UTF8 characters back to their MARC8 equivalent.
+
+0.3  Tue Dec  3 17:09:23 2002
+    - revamped to_utf8() to handle multibyte character sets. It is no longer
+      recursive, and didn't really need to be in the first place.
+    - created MARC::Charset::EastAsian!
+
+0.2  Sat Oct 19 03:24:22 2002
+    - Added the 'Final character' to identify Extended Latin.
+
+0.1  Fri Jul 26 09:10:36 2002
+    - Original version

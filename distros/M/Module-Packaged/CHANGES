@@ -1,0 +1,78 @@
+Revision history for Perl module Module::Packaged:
+
+0.86 Wed Aug 30 14:36:40 BST 2006
+  - fix the path we were fetching SUSE data from
+  - updated the test (prodded by jerakeen)
+
+0.85 Tue Jan 31 09:38:02 GMT 2006
+  - fix the path we were fetching Mandriva data from
+
+0.84 Fri Aug  5 19:04:55 PDT 2005
+  - rewrite the generator to use App::Cache and update Mandriva name
+  - fix Debian perl-tk misreporting (patch by Andreas Koenig)
+
+0.83 Thu Aug  4 09:30:04 PDT 2005
+  - 0.82 wasn't quite uploaded to CPAN, pesky wireless
+
+0.82 Thu Aug  4 09:16:13 PDT 2005
+  - updated the tests (thanks Andreas)
+
+0.81 Mon Jul  4 23:24:32 BST 2005
+  - we now cache the data for an hour using App::Cache
+  - added a pod coverage test
+  - updated the tests
+
+0.80 Sat Mar 26 09:33:04 CST 2005
+  - fixed tiny typo in pod (spotted by mcummings)
+  - updated the tests
+  - seperated into a generator and a client (so now faster for you!)
+
+0.79 Sun Feb  6 17:42:47 GMT 2005
+  - include Mandrake contrib (oops)
+
+0.78 Sat Feb  5 17:20:48 GMT 2005
+  - updated the tests
+  - fixed brokenness with Fedora, Mandrake, SUSE
+
+0.77 Thu Sep 23 11:45:51 BST 2004
+  - slightly more documentation
+  - renamed private methods to start with underscore
+
+0.76 Tue Aug 24 16:14:25 BST 2004
+  - removed dependency on Cache::Cache
+  - updated the tests (maybe I should fix the test suite, eh?)
+
+0.74 Thu Apr 22 17:17:21 BST 2004
+  - resupport Gentoo (thanks to patch from Michael Cummings)
+  - remove Perl6::Slurp dependency (sorry, too many deps)
+  - make it work with Parse::CPAN::Packages 2.20 (oops)
+  - added support for Fedora, Mandrake and SUSE
+  - updated the tests
+
+0.73 Thu Mar  4 09:33:38 GMT 2004
+  - use Perl6::Slurp instead of File::Slurp
+  - remove Gentoo support (the URL we were using is now a 404 and
+    packages.gentoo.org isn't easy to scrape)
+  - report OpenBSD packages in 3.4 (3.2 is old now)
+  - updated the tests
+  - now use Parse::CPAN::Packages
+
+0.72 Wed Jan  7 16:25:31 GMT 2004
+  - a new version of Archive::Tar came out, update the tests
+
+0.71 Mon Jan  5 16:14:32 GMT 2004
+  - a new version of DBI came out, update the tests
+
+0.67 Tue Nov 18 22:16:11 GMT 2003
+  - added OpenBSD support (thanks to Richard Clamp, again)
+
+0.54 Mon Nov 17 22:42:42 GMT 2003
+  - added Debian support (thanks to Richard Clamp)
+  - reworked caching
+
+0.41 Mon Nov 17 17:55:35 GMT 2003
+  - support FreeBSD too (thanks to Richard Clamp)
+  - added NINJA support
+
+0.34 Thu Nov 13 19:53:01 GMT 2003
+  - initial release

@@ -1,0 +1,66 @@
+Math::Prime::Util version 0.65
+
+A module for number theory in Perl.  This includes prime sieving, primality
+tests, primality proofs, integer factoring, counts / bounds / approximations
+for primes, nth primes, and twin primes, random prime generation,
+and much more.
+
+The default sieving and factoring are intended to be the fastest on CPAN.
+Current measurements show it is faster than:
+  Math::Prime::XS
+  Math::Prime::FastSieve
+  Math::Factor::XS
+  Math::Big
+  Math::Big::Factors
+  Math::Factoring
+  Math::Primality
+  Math::Prime::TiedArray
+  Crypt::Primes
+  Math::ModInt::ChineseRemainder
+For non-bignums, it is typically faster than Math::Pari (and doesn't
+require Pari to be installed).  With Math::Prime::Util::GMP installed
+it is usually faster than Math::Pari for bigints.
+
+
+SYNOPSIS
+
+  use Math::Prime::Util qw/primes/;
+
+  # Get a big array reference of many primes
+  my $aref = primes( 100_000_000 );
+
+  # All the primes between 5k and 10k inclusive in a regular array
+  my @primes = @{ primes( 5_000, 10_000 ) };
+
+See the POD module documentation for examples and more information on all the
+methods included.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+You will need a C compiler compatible with the compiler used to build Perl.
+Since the routines are meant to be used from Perl, the data types will match
+the ones used with the Perl you are installing for.  This means a 32-bit Perl
+running on a 64-bit machine will result in a 32-bit library.
+
+
+DEPENDENCIES
+
+Perl 5.6.2 or later (5.8 or later is preferred).
+
+Bytes::Random::Secure::Tiny 1.002 or later.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011-2017 by Dana Jacobsen <dana@acm.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

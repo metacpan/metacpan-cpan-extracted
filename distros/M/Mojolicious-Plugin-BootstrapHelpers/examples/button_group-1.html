@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Examples</title>
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    </head>
+
+    <body>
+        <div class="container">
+            
+
+<p>A basic button group:</p>
+<pre>&lt;%= buttongroup
+    buttons =&gt; [
+        [&#39;Button 1&#39;],
+        [&#39;Button 2&#39;],
+        [&#39;Button 3&#39;],
+    ]
+%&gt;</pre>
+<pre>&lt;div class=&quot;btn-group&quot;&gt;
+    &lt;button class=&quot;btn btn-default&quot; type=&quot;button&quot;&gt;Button 1&lt;/button&gt;
+    &lt;button class=&quot;btn btn-default&quot; type=&quot;button&quot;&gt;Button 2&lt;/button&gt;
+    &lt;button class=&quot;btn btn-default&quot; type=&quot;button&quot;&gt;Button 3&lt;/button&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="btn-group">        <button class="btn btn-default" type="button">Button 1</button>        <button class="btn btn-default" type="button">Button 2</button>        <button class="btn btn-default" type="button">Button 3</button>    </div></div>
+<hr />
+<p>Nested button group. Note that the <code>small</code> shortcut is only necessary once. The same classes are automatically applied to the nested <code>.btn-group</code>:</p>
+<pre>&lt;%= buttongroup small,
+    buttons =&gt; [
+        [&#39;Button 1&#39;],
+        [&#39;Dropdown 1&#39;, caret, items =&gt; [
+            [&#39;Item 1&#39;, [&#39;item1&#39;] ],
+            [&#39;Item 2&#39;, [&#39;item2&#39;] ],
+            [],
+            [&#39;Item 3&#39;, [&#39;item3&#39;] ],
+        ] ],
+        [&#39;Button 2&#39;],
+        [&#39;Button 3&#39;],
+    ],
+%&gt;</pre>
+<pre>&lt;div class=&quot;btn-group btn-group-sm&quot;&gt;
+    &lt;button class=&quot;btn btn-default&quot; type=&quot;button&quot;&gt;Button 1&lt;/button&gt;
+    &lt;div class=&quot;btn-group btn-group-sm&quot;&gt;
+        &lt;button class=&quot;btn btn-default dropdown-toggle&quot; type=&quot;button&quot; data-toggle=&quot;dropdown&quot;&gt;Dropdown 1 &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;
+        &lt;/button&gt;
+        &lt;ul class=&quot;dropdown-menu&quot;&gt;
+            &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item1&quot; tabindex=&quot;-1&quot;&gt;Item 1&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item2&quot; tabindex=&quot;-1&quot;&gt;Item 2&lt;/a&gt;&lt;/li&gt;
+            &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item3&quot; tabindex=&quot;-1&quot;&gt;Item 3&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+    &lt;button class=&quot;btn btn-default&quot; type=&quot;button&quot;&gt;Button 2&lt;/button&gt;
+    &lt;button class=&quot;btn btn-default&quot; type=&quot;button&quot;&gt;Button 3&lt;/button&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="btn-group btn-group-sm">        <button class="btn btn-default" type="button">Button 1</button>        <div class="btn-group btn-group-sm">            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Dropdown 1 <span class="caret"></span>            </button>            <ul class="dropdown-menu">                <li><a class="menuitem" href="item1" tabindex="-1">Item 1</a></li>                <li><a class="menuitem" href="item2" tabindex="-1">Item 2</a></li>                <li class="divider"></li>                <li><a class="menuitem" href="item3" tabindex="-1">Item 3</a></li>            </ul>        </div>        <button class="btn btn-default" type="button">Button 2</button>        <button class="btn btn-default" type="button">Button 3</button>    </div></div>
+<hr />
+<p>Nested button group, with the <code>vertical</code> shortcut:</p>
+<pre>&lt;%= buttongroup vertical,
+    buttons =&gt; [
+        [&#39;Button 1&#39;],
+        [&#39;Dropdown 1&#39;, caret, items =&gt; [
+              [&#39;Item 1&#39;, [&#39;item1&#39;] ],
+              [&#39;Item 2&#39;, [&#39;item2&#39;] ],
+              [],
+              [&#39;Item 3&#39;, [&#39;item3&#39;] ],
+        ] ],
+        [&#39;Button 2&#39;],
+        [&#39;Button 3&#39;],
+    ],
+%&gt;</pre>
+<pre>&lt;div class=&quot;btn-group-vertical&quot;&gt;
+    &lt;button class=&quot;btn btn-default&quot; type=&quot;button&quot;&gt;Button 1&lt;/button&gt;
+    &lt;div class=&quot;btn-group&quot;&gt;
+        &lt;button class=&quot;btn btn-default dropdown-toggle&quot; type=&quot;button&quot; data-toggle=&quot;dropdown&quot;&gt;Dropdown 1 &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;
+        &lt;/button&gt;
+        &lt;ul class=&quot;dropdown-menu&quot;&gt;
+            &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item1&quot; tabindex=&quot;-1&quot;&gt;Item 1&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item2&quot; tabindex=&quot;-1&quot;&gt;Item 2&lt;/a&gt;&lt;/li&gt;
+            &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item3&quot; tabindex=&quot;-1&quot;&gt;Item 3&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+    &lt;button class=&quot;btn btn-default&quot; type=&quot;button&quot;&gt;Button 2&lt;/button&gt;
+    &lt;button class=&quot;btn btn-default&quot; type=&quot;button&quot;&gt;Button 3&lt;/button&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="btn-group-vertical">        <button class="btn btn-default" type="button">Button 1</button>        <div class="btn-group">            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Dropdown 1 <span class="caret"></span>            </button>            <ul class="dropdown-menu">                <li><a class="menuitem" href="item1" tabindex="-1">Item 1</a></li>                <li><a class="menuitem" href="item2" tabindex="-1">Item 2</a></li>                <li class="divider"></li>                <li><a class="menuitem" href="item3" tabindex="-1">Item 3</a></li>            </ul>        </div>        <button class="btn btn-default" type="button">Button 2</button>        <button class="btn btn-default" type="button">Button 3</button>    </div></div>
+<hr />
+<p>A justified button group. Note the automatic (and necessary) wrapping of buttons in <code>.btn-groups</code>:</p>
+<pre>&lt;%= buttongroup justified,
+    buttons =&gt; [
+        [&#39;Button 1&#39;],
+        [&#39;Button 2&#39;],
+        [&#39;Button 3&#39;],
+    ]
+%&gt;</pre>
+<pre>&lt;div class=&quot;btn-group btn-group-justified&quot;&gt;
+    &lt;div class=&quot;btn-group&quot;&gt;
+        &lt;button class=&quot;btn btn-default&quot; type=&quot;button&quot;&gt;Button 1&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;btn-group&quot;&gt;
+        &lt;button class=&quot;btn btn-default&quot; type=&quot;button&quot;&gt;Button 2&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;btn-group&quot;&gt;
+        &lt;button class=&quot;btn btn-default&quot; type=&quot;button&quot;&gt;Button 3&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="btn-group btn-group-justified">        <div class="btn-group">            <button class="btn btn-default" type="button">Button 1</button>        </div>        <div class="btn-group">            <button class="btn btn-default" type="button">Button 2</button>        </div>        <div class="btn-group">            <button class="btn btn-default" type="button">Button 3</button>        </div>    </div></div>
+<hr />
+<p>Mix links and <code>dropup</code> menus in <code>justified</code> button groups:</p>
+<pre>&lt;%= buttongroup justified,
+    buttons =&gt; [
+        [&#39;Link 1&#39;, [&#39;http://www.example.com/&#39;] ],
+        [&#39;Link 2&#39;, [&#39;http://www.example.com/&#39;] ],
+        [&#39;Dropup 1&#39;, caret, dropup, items =&gt; [
+            [&#39;Item 1&#39;, [&#39;item1&#39;] ],
+            [&#39;Item 2&#39;, [&#39;item2&#39;] ],
+            [],
+            [&#39;Item 3&#39;, [&#39;item3&#39;] ],
+        ] ],
+    ]
+%&gt;</pre>
+<pre>&lt;div class=&quot;btn-group btn-group-justified&quot;&gt;
+    &lt;a class=&quot;btn btn-default&quot; href=&quot;http://www.example.com/&quot;&gt;Link 1&lt;/a&gt;
+    &lt;a class=&quot;btn btn-default&quot; href=&quot;http://www.example.com/&quot;&gt;Link 2&lt;/a&gt;
+    &lt;div class=&quot;btn-group dropup&quot;&gt;
+        &lt;button class=&quot;btn btn-default dropdown-toggle&quot; type=&quot;button&quot; data-toggle=&quot;dropdown&quot;&gt;Dropup 1 &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;
+        &lt;/button&gt;
+        &lt;ul class=&quot;dropdown-menu&quot;&gt;
+            &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item1&quot; tabindex=&quot;-1&quot;&gt;Item 1&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item2&quot; tabindex=&quot;-1&quot;&gt;Item 2&lt;/a&gt;&lt;/li&gt;
+            &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item3&quot; tabindex=&quot;-1&quot;&gt;Item 3&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="btn-group btn-group-justified">        <a class="btn btn-default" href="http://www.example.com/">Link 1</a>        <a class="btn btn-default" href="http://www.example.com/">Link 2</a>        <div class="btn-group dropup">            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Dropup 1 <span class="caret"></span>            </button>            <ul class="dropdown-menu">                <li><a class="menuitem" href="item1" tabindex="-1">Item 1</a></li>                <li><a class="menuitem" href="item2" tabindex="-1">Item 2</a></li>                <li class="divider"></li>                <li><a class="menuitem" href="item3" tabindex="-1">Item 3</a></li>            </ul>        </div>    </div></div>
+<hr />
+<p>Split button dropdowns uses the same syntax as any other multi-button dropdown. Set the <code>caret</code> button title to <code>undef</code>:</p>
+<pre>&lt;%= buttongroup
+    buttons =&gt; [
+        [&#39;Link 1&#39;, [&#39;http://www.example.com/&#39;] ],
+        [undef, caret, items =&gt; [
+            [&#39;Item 1&#39;, [&#39;item1&#39;] ],
+            [&#39;Item 2&#39;, [&#39;item2&#39;] ],
+            [],
+            [&#39;Item 3&#39;, [&#39;item3&#39;] ],
+        ] ],
+    ]
+%&gt;</pre>
+<pre>&lt;div class=&quot;btn-group&quot;&gt;
+    &lt;a class=&quot;btn btn-default&quot; href=&quot;http://www.example.com/&quot;&gt;Link 1&lt;/a&gt;
+    &lt;div class=&quot;btn-group&quot;&gt;
+        &lt;button class=&quot;btn btn-default dropdown-toggle&quot; type=&quot;button&quot; data-toggle=&quot;dropdown&quot;&gt;&lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;
+        &lt;/button&gt;
+        &lt;ul class=&quot;dropdown-menu&quot;&gt;
+            &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item1&quot; tabindex=&quot;-1&quot;&gt;Item 1&lt;/a&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item2&quot; tabindex=&quot;-1&quot;&gt;Item 2&lt;/a&gt;&lt;/li&gt;
+            &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item3&quot; tabindex=&quot;-1&quot;&gt;Item 3&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="btn-group">        <a class="btn btn-default" href="http://www.example.com/">Link 1</a>        <div class="btn-group">            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span>            </button>            <ul class="dropdown-menu">                <li><a class="menuitem" href="item1" tabindex="-1">Item 1</a></li>                <li><a class="menuitem" href="item2" tabindex="-1">Item 2</a></li>                <li class="divider"></li>                <li><a class="menuitem" href="item3" tabindex="-1">Item 3</a></li>            </ul>        </div>    </div></div>
+<hr />
+<p>Using the simpler single-button button group dropdown syntax:</p>
+<pre>&lt;%= buttongroup [&#39;Default&#39;, caret, items  =&gt; [
+                    [&#39;Item 1&#39;, [&#39;item1&#39;] ],
+                    [&#39;Item 2&#39;, [&#39;item2&#39;] ],
+                    [],
+                    [&#39;Item 3&#39;, [&#39;item3&#39;] ],
+                ] ]
+%&gt;
+
+&lt;%= buttongroup [&#39;Big danger&#39;, caret, large, danger, items =&gt; [
+                      [&#39;Item 1&#39;, [&#39;item1&#39;] ],
+                      [&#39;Item 2&#39;, [&#39;item2&#39;] ],
+                      [],
+                      [&#39;Item 3&#39;, [&#39;item3&#39;] ],
+                ] ]
+%&gt;</pre>
+<pre>&lt;div class=&quot;btn-group&quot;&gt;
+    &lt;button class=&quot;btn btn-default dropdown-toggle&quot; type=&quot;button&quot; data-toggle=&quot;dropdown&quot;&gt;Default &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;
+    &lt;/button&gt;
+    &lt;ul class=&quot;dropdown-menu&quot;&gt;
+        &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item1&quot; tabindex=&quot;-1&quot;&gt;Item 1&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item2&quot; tabindex=&quot;-1&quot;&gt;Item 2&lt;/a&gt;&lt;/li&gt;
+        &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item3&quot; tabindex=&quot;-1&quot;&gt;Item 3&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;btn-group&quot;&gt;
+    &lt;button class=&quot;btn btn-danger btn-lg dropdown-toggle&quot; type=&quot;button&quot; data-toggle=&quot;dropdown&quot;&gt;Big danger &lt;span class=&quot;caret&quot;&gt;&lt;/span&gt;
+    &lt;/button&gt;
+    &lt;ul class=&quot;dropdown-menu&quot;&gt;
+        &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item1&quot; tabindex=&quot;-1&quot;&gt;Item 1&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item2&quot; tabindex=&quot;-1&quot;&gt;Item 2&lt;/a&gt;&lt;/li&gt;
+        &lt;li class=&quot;divider&quot;&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a class=&quot;menuitem&quot; href=&quot;item3&quot; tabindex=&quot;-1&quot;&gt;Item 3&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/div&gt;</pre>
+<div>    <div class="btn-group">        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Default <span class="caret"></span>        </button>        <ul class="dropdown-menu">            <li><a class="menuitem" href="item1" tabindex="-1">Item 1</a></li>            <li><a class="menuitem" href="item2" tabindex="-1">Item 2</a></li>            <li class="divider"></li>            <li><a class="menuitem" href="item3" tabindex="-1">Item 3</a></li>        </ul>    </div>    <div class="btn-group">        <button class="btn btn-danger btn-lg dropdown-toggle" type="button" data-toggle="dropdown">Big danger <span class="caret"></span>        </button>        <ul class="dropdown-menu">            <li><a class="menuitem" href="item1" tabindex="-1">Item 1</a></li>            <li><a class="menuitem" href="item2" tabindex="-1">Item 2</a></li>            <li class="divider"></li>            <li><a class="menuitem" href="item3" tabindex="-1">Item 3</a></li>        </ul>    </div></div>
+        </div>
+        <pre style="background-color: #fff; border-width: 0px;">
+
+
+
+        </pre>
+    </body>
+</html>

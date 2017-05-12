@@ -1,0 +1,40 @@
+From 0fece4355e2a5d494936d285eb200314112c9a8b Mon Sep 17 00:00:00 2001
+From: ph10 <ph10@6239d852-aaf2-0410-a92c-79f79f948069>
+Date: Tue, 21 Mar 2017 16:25:01 +0000
+Subject: [PATCH] Fix memory leak when deserializing invalid data (Bugzilla
+ 2075).
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+git-svn-id: svn://vcs.exim.org/pcre2/code/trunk@693 6239d852-aaf2-0410-a92c-79f79f948069
+
+Petr Písař: Ported to 10.23.
+
+diff --git a/src/pcre2_serialize.c b/src/pcre2_serialize.c
+index 0af26d8..d2cc603 100644
+--- a/src/pcre2_serialize.c
++++ b/src/pcre2_serialize.c
+@@ -7,7 +7,7 @@ and semantics are as close as possible to those of the Perl 5 language.
+ 
+                        Written by Philip Hazel
+      Original API code Copyright (c) 1997-2012 University of Cambridge
+-         New API code Copyright (c) 2016 University of Cambridge
++          New API code Copyright (c) 2016-2017 University of Cambridge
+ 
+ -----------------------------------------------------------------------------
+ Redistribution and use in source and binary forms, with or without
+@@ -214,7 +214,10 @@ for (i = 0; i < number_of_codes; i++)
+   if (dst_re->magic_number != MAGIC_NUMBER ||
+       dst_re->name_entry_size > MAX_NAME_SIZE + IMM2_SIZE + 1 ||
+       dst_re->name_count > MAX_NAME_COUNT)
++    {   
++    memctl->free(dst_re, memctl->memory_data); 
+     return PCRE2_ERROR_BADSERIALIZEDDATA;
++    } 
+ 
+   /* At the moment only one table is supported. */
+ 
+-- 
+2.7.4
+

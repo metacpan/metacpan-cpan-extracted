@@ -1,0 +1,87 @@
+{
+   "abstract" : "SpamAssassin is an extensible email filter which is used to identify spam",
+   "author" : [
+      "The Apache SpamAssassin Project <dev@spamassassin.apache.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mail-SpamAssassin",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Archive::Tar" : "1.23",
+            "Compress::Zlib" : "0",
+            "DBI" : "0",
+            "DB_File" : "0",
+            "Encode::Detect" : "0",
+            "Geo::IP" : "0",
+            "Getopt::Long" : "2.32",
+            "HTTP::Date" : "0",
+            "IO::Socket::INET6" : "0",
+            "IO::Socket::SSL" : "0",
+            "IO::Zlib" : "1.04",
+            "LWP::UserAgent" : "0",
+            "MIME::Base64" : "0",
+            "Mail::DKIM" : "0.37",
+            "Mail::SPF" : "0",
+            "Net::Ident" : "0",
+            "Net::SMTP" : "0",
+            "Razor2::Client::Agent" : "2.61"
+         },
+         "requires" : {
+            "Archive::Tar" : "1.23",
+            "Digest::SHA1" : "0",
+            "Errno" : "0",
+            "File::Copy" : "2.02",
+            "File::Spec" : "0.8",
+            "HTML::Parser" : "3.43",
+            "IO::Zlib" : "1.04",
+            "Mail::DKIM" : "0.31",
+            "Net::DNS" : "0.34",
+            "NetAddr::IP" : "4.01",
+            "Pod::Usage" : "1.1",
+            "Sys::Hostname" : "0",
+            "Time::HiRes" : "0",
+            "Time::Local" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://issues.apache.org/SpamAssassin/"
+      },
+      "homepage" : "http://spamassassin.apache.com/",
+      "license" : [
+         "http://www.apache.org/licenses/LICENSE-2.0.html"
+      ],
+      "repository" : {
+         "url" : "http://svn.apache.org/repos/asf/spamassassin/"
+      },
+      "x_MailingList" : "http://wiki.apache.org/spamassassin/MailingLists"
+   },
+   "version" : "3.004001"
+}

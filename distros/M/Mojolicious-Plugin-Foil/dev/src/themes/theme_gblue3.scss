@@ -1,0 +1,60 @@
+/* ================================================================== */
+/* THEME: Grey-Blue 3
+ * dark_on_light
+ */
+@import 'functions';
+@import 'theme_gblue';
+@import 'fonts_gblue3';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: darken(#9999cc, 5%);
+$verge-fg: set-fg($verge-bg);
+$verge-border: navy;
+$main-bg: #9999cc;
+$main-fg: set-fg($main-bg);
+$button-bg: #bbbbee;
+$button-fg: set-fg($button-bg);
+$button-border: navy;
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+}
+
+header,
+footer,
+.side {
+	@extend .verge;
+}
+header,
+footer {
+    background-image: url(gblue_h.jpg);
+}
+
+.side {
+    background-image: url(gblue2_h.jpg);
+}
+
+body {
+	color: $main-fg;
+	background: $main-bg url(gblue3_body.jpg) repeat-x;
+}
+
+@include fancy($verge-fg, $verge-bg, "gblue2_h.jpg");
+@include make-buttons;
+
+header nav li {
+	border-color: #555588;
+}
+header nav .selflink,
+header nav em,
+header nav .current a {
+	color: #9900CC;
+	background-color: #9999cc;
+}
+

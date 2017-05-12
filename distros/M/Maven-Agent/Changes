@@ -1,0 +1,52 @@
+Revision history for Perl module Maven::Agent
+
+1.14 2016-12-14
+    - fixed bug in cygwin support for windows path in localRepository
+
+1.13 2016-10-21
+    - added support for mvn_options on MvnAgent at instance level
+
+1.12 2016-08-19
+    - fixed uninitialized use of variable when M2_HOME is not defined
+
+1.11 2016-08-19
+    - added support for external command runner for MvnAgent
+
+1.10 2016-07-28
+    - fixed bug when M2_HOME is not declared
+
+1.09 2016-03-25
+    - Fix issue: Undeclared dependency Class::Accessor #1 
+      https://github.com/lucastheisen/perl-maven/issues/1
+
+1.08 2016-02-26
+    - Fix artifact not found message in resolve_or_die
+
+1.07 2016-02-26
+    - Fix get/deploy/install_command to include global-settings
+    - Fix Maven_MvnAgent.t to skip tests if mvn fails
+    - Set proxy on test global settings
+
+1.06 2016-02-25
+    - Fix default 'user.home' when using cygwin
+
+1.05 2016-02-24
+    - Fix bug in naming when file is found in local repository and to is a 
+      directory
+
+1.04 2016-02-24
+    - Fix 1.03 build that had bad files included in tarball
+
+1.03 2016-02-21
+    - Renamed project to Maven-Agent to comply with pause naming restriction
+      on top level namespaces
+
+1.02 2016-02-21
+    - Fixed bug in download to directory
+
+1.01 2016-02-19
+    - Cleaned up logging
+
+1.00 2016-02-18
+    - Initial release
+

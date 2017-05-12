@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               Muldis-D-Manual
+version:            0.9.0
+abstract:           Muldis D language and implementations manual
+author:
+    - Darren Duncan <darren@DarrenDuncan.net>
+license:            gpl_3
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    perl:  5.006
+resources:
+    homepage:     http://www.muldis.com/
+    license:      http://www.fsf.org/licensing/licenses/gpl.html
+    MailingList:  http://mm.darrenduncan.net/mailman/listinfo
+    repository:   http://github.com/muldis/Muldis-D-Manual
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

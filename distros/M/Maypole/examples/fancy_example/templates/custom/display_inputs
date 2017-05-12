@@ -1,0 +1,114 @@
+[%# 
+
+=head1 display_inputs
+
+This *RECURSIVELY* displays inputs for a hash of html elements
+
+Vars it needs: 
+   classmetadata-- the hash of bunch of data:
+   cgi -- inputs keyed on column names
+   table -- table inputs are for
+   columns -- list  in order want displayed inputs
+   colnames -- hash of what to label inputs
+   
+errors		 -- hash of errors keyed on columns 
+
+
+TODO -- make it recognize a general submit button for redisplaying
+values on errors
+
+=cut
+
+#
+%]
+
+[% # some variables
+   foreign    = []; 
+   names      = [];
+   # get hash of related classes keyed on accessor for Foreign Inputs
+   USE this   = Class(classmetadata.name); 
+   tbl = classmetadata.table;
+   required = { }; 
+   FOR c IN request.config.$tbl.required_cols;
+   	 required.$c = 1;
+   END;
+
+%]	
+
+[% 
+SET heading_shown = 0; 
+FOR col = classmetadata.columns;  
+	NEXT IF !classmetadata.cgi.$col;
+	NEXT IF col == "id" OR col == classmetadata.table _ "_id";
+	# Display foreign inputs last 
+	IF (mykeys = classmetadata.cgi.$col.keys); 
+			foreign.push(col);
+			names.push(classmetadata.colnames.$col);
+			NEXT;
+	END;
+    IF ! heading_shown; 
+     	heading = classmetadata.moniker | ucfirst; 
+		"<h4> $heading </h4>";
+     	SET heading_shown = 1; 
+    END;
+%]
+
+[%  # Base case starts here 
+
+	SET elem = classmetadata.cgi.$col; #.clone; # not sure why clone
+	IF elem.type == 'hidden'; 
+		elem.as_XML;
+		NEXT;
+	ELSIF  cgi_params;
+		param_col = col_prefix _ col;
+		IF elem.tag == "textarea";
+			elem = elem.push_content(cgi_params.$param_col);
+		ELSIF elem.tag == "select";
+			oldval = set_selected(elem, cgi_params.$col);
+		ELSE;
+			oldval = elem.attr("value", cgi_params.$param_col);
+		END;
+	END;
+%]
+
+	<label>
+		[% indicator = '';
+           SET indicator = '*' IF (required.$col); 
+        %]
+		<span class="field">
+		    [% indicator _ classmetadata.colnames.$col || 
+     			col | replace('_',' ') | ucfirst  %] 
+		</span>
+		[% elem.as_XML; %]
+	</label>
+
+	[% IF errors.$col %]
+		<span class="error">[% errors.$col | html  %]</span>
+	[% END %]
+[% END; %]
+
+<!-- Display the differnt component inputs --> 
+
+[% 	USE this = Class(classmetadata.name); 
+	FOR col IN foreign; 
+		# has_many mapping throws a stick in our spokes because related_class returns the mapped 
+		# class. Sometimes we just want the has_many class. 
+
+        # In case of Pub Handpumps maps to Beer and we want to add Handpump to Pub, we dont 
+		# want the mapped data .
+        # In case of "Create New Handpump" -- we want the mapped data probably so we get
+        # Beer inputs and Pub select box.
+
+		fclass_rel_meta = this.related_meta(request, col);
+        fclass = fclass_rel_meta.foreign_class; # ignor args.mapping
+		fclass_meta = this.get_classmetadata(fclass);
+		fclass_meta.cgi = classmetadata.cgi.$col;
+ #       USE Dumper; Dumper.dump(fclass_meta);
+		INCLUDE display_inputs
+			col_prefix = col _ "__AF__" _ col_prefix
+			errors = errors.$col
+			heading = names.shift
+			classmetadata = fclass_meta; # localize 
+ 	END;
+%]
+

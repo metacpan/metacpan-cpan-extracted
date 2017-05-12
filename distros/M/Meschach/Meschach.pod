@@ -1,0 +1,315 @@
+
+=head1 NAME
+
+=head2 PDL::Meschach - Link PDL to meschach 1.2 matrix library 
+
+Version 0.03 alpha 
+
+PDL::Meschach Etienne Grossmann, 11/11/1996 [etienne@isr.ist.utl.pt]
+meschach 1.2  David E. Stewart [david.stewart@anu.edu.au]
+              Zbigniew Leyk   [zbigniew.leyk@anu.edu.au]
+
+=head1 DESCRIPTION
+
+ 
+ PDL::Meschach links PDL to a few matrix functions from meschach 1.2 : 
+
+    Diagonal,upper,lower triangle extraction ...
+
+    Matrix exponentiation ...
+
+    LU , Cholesky , QR Factorisation and associated 
+
+    Linear equation solvers.
+
+    Symmetric matrix eigenvector/eigenvalue extraction.
+
+    Singular value decomposition.
+
+
+=head1 INTRODUCTION
+
+ 
+ The functionalities are available either through "friendly"
+ functions, e.g. :
+
+   # Solve A.x == b using LU decomposition
+
+   $x = lusolve($A,$b);
+
+ or through "raw" functions :
+
+   $LU = $A + 0 ;             # Copy $A
+   lufac_($LU,$Perm)          # LU decomposition overwrites $LU
+   lusolve_($x,$b,$LU,$Perm) 
+
+ That may be more efficient in terms of memory allocation.
+
+ All "raw" function names have a trailing underscore.
+
+=head1 CAVEAT
+ 
+
+ * Dimensions are expressed 
+
+        ALWAYS as COLUMN, ROW 
+
+ instead of the usual matrix row, column.
+
+
+
+ * pdl members "incs" and "offs" are not yet handled correctly, and
+   neither can they be detected reliably. The pdls passed to Meschach
+   routines are assumed to hold data consecutively arranged in memory.
+
+
+=head1 USAGE
+
+=head2 To load Meschach in a script :  either :
+
+
+  use PDL::Meschach;           # Only "Friendly" functions.
+
+ or   
+
+  use PDL::Meschach qw( :Raw ) # "Raw" functions too.
+
+
+=head2 To use Meschach in perldl, :  insert
+
+
+        eval "use Meschach qw( :All )";
+        if($@ ne ""){
+          print "Meschach NOT AVAILABLE : \n$@\n";
+        } else { print "Meschach found\n";}
+
+
+  somewhere in it, e.g. before the line :
+
+        eval "use Term::ReadLine"; 
+
+
+
+=head1 AVAILABLE FUNCTIONS 
+
+
+=over 4
+
+=item ut, lt
+
+    $T = ut( $A );
+
+ Puts the upper triangle of $A in $T.
+
+    $T = ut( $Col, $Row );
+
+ Sets to 1 the upper-triangle of T, to 0 its strictly lower triangle.
+
+ Raw function :
+    
+    ut_($T,$A);
+    ut_($T,$Col,$Row);
+
+
+  The output is the same type as th input.
+
+  For lower triangle, use  lt_, lt. 
+
+=item diag
+
+    $Vec = diag( $Mat );
+
+    diag_( $Vec, $Mat);
+
+ Both put into $Vec the diagonal of $Mat. output is PDL_D (!).
+
+
+    $Mat = diag ( $Vec [,$cols, $rows] );
+
+    diag_($Vec,$Mat);
+
+ Make $Mat a diagonal matrix with $Vec as diagonal. $Mat may be
+ of arbitrary size if $cols, $rows are used :
+
+    $Mat = diag ( $Vec,$c );     # $c x $c 
+    $Mat = diag ( $Vec,$c, $r ); # $c x $m
+
+ output is PDL_F (!)
+
+=item ident
+
+  $Mat = ident($Cols [,$Rows = $Cols ] )
+
+  Returns a PDL_D Identity Matrix.
+
+=item  mpow     
+
+    $Out = mpow( $In, $Pow );
+
+    mpow_( $Out, $In, $Pow [,$Coerce] );
+
+ Integer (negative or positive) powers of a matrix,  If $Coerce is
+ true (default), the result is Real typed. Otherwise, $$Out{Datatype}
+ is unchanged. 
+
+=item		inv
+
+		$Out = inv( $In );
+
+    inv_( $Out, $In [,$Coerce] );
+
+ Inverse of a matrix.   
+
+=item lusolve
+
+ Solve $A x $x == $b , by LU Factorization, with pivoting.
+
+    ($LU,$Perm,$x) = lusolve( $b, $A );
+
+ $LU,$Perm describe the factorization. They may be re-used (which
+ spares some computation). $LU is a matrix the same size as $A. $Perm
+ is an integer vector describing the pivoting used in the
+ factorization.
+
+    $x = lusolve($b, $LU, $Perm );
+
+ The third argument is what decides lusolve not to factor. In all
+ cases ($LU,$Perm,$x) is returned. 
+
+ An estimate of the conditioning (the ratio of the greatest and
+ smallest eigenvalues) is returned by :
+
+		lucond($LU,$Perm);
+
+
+ Raw method :
+
+    $LU = $A + 0 ;                   # Copy $A. 
+    lufac_( $LU, $Perm );            # Factorize. 
+    lusolve_( $x, $b, $LU, $Perm );  # Solve.
+
+
+=item qrsolve
+
+ Solve $A x $x == $b , by QR Factorization 
+
+  (A = Q.R where Q is orthogonal, and R upper triangular).
+  The "QR" functions are almost equivalent to the "LU" ones.
+
+    ($QR,$V,$x) = qrsolve( $b, $A );
+
+    $x = qrsolve($b, $QR, $V );
+
+ $QR,$V describe the factorization. The "R" matrix is represented by
+ the strictly higher triangle in $QR, and its diagonal is $V. $Q is
+ represented by the lower triangle.
+
+ The third argument is what decides qrsolve not to factor. In all
+ cases ($QR,$V,$x) is returned. 
+
+ Raw method :
+
+    $QR = $A + 0 ;                   # Copy $A. 
+    qrfac_( $QR, $V );               # Factorize. 
+    qrsolve_( $x, $b, $QR, $V );     # Solve.
+
+
+ An estimate of the conditioning (the ratio of the greatest and
+ smallest eigenvalues) is returned by :
+
+		qrcond($QR);										 # only QR is passed.
+
+=item chsolve    
+
+ If A is positive definite, solving  $A x $x == $b 
+ by Cholesky Factorization may be more efficient :
+
+    ($CH,$x) = chsolve( $b, $A );
+
+ $CH may be re-used :
+
+    $x = chsolve ( $b , $CH , 1 );
+
+ If the third argument is true, chsolve considers that it is already
+ in factored form. 
+    
+
+ Raw method :
+    
+    $CH = $A + 0 ;            # Copy
+    chfac_($CH);              # Factor
+    chsolve_($x,$b,$CH);      # Solve
+
+
+=item symmeig 
+
+ Symmetric Matrix Eigenvalues/vectors 
+
+    ( $Mat, $Vec ) = symmeig( $A );
+
+ $Mat contains the eigenvectors of $A,
+ $Vec contains the eigenvalues  of $A,
+
+ Raw method :
+
+    symmeig_( $Mat, $Vec, $A );
+
+ symmeig_ returns true upon success.   
+
+
+=item  svd
+
+ Singular Value Decomposition of a  ncol,nrow matrix :
+
+    ($U,$V,$l) = svd( $A ) ;
+
+ $U Contains the left "singular vectors" (nrow,nrow matrix).
+ $V Contains the right "singular vectors" (ncol,ncol matrix).
+ $l Contains the "singular values"     (min(ncol,nrow) vector).
+
+ Raw method :
+   
+    svd_( $U, $V, $l, $A );
+
+ or
+
+    svd_( $l, $A );        # Only the "singular values".  
+
+ svd_ returns true upon success.   
+
+=back
+
+
+=head1 TYPE CONVERSION
+
+
+=over 4
+
+=item *
+
+"Real" is the floating point datatype used by Meschach. It probably
+always corresponds to PDL_D.
+
+Meschach should function even if it is PDL_F; but it hasn't been tested. 
+
+=item *
+
+Similar conversion is done for meschach's "u_int" and a PDL integer
+type (should be PDL_L).
+
+=back
+
+=head2
+
+The equivalence between types is done in the BOOT: part of Meschach.xs
+
+=head2
+
+The results of most functions are "Real"-typed pdls. 
+
+Sometimes (e.g. the $Perm argument in lufac_ ) it is an integer-typed
+pdls. 
+
+"Raw" functions may conserve the type of their return-argument when
+they accept a $coerce argument.
+

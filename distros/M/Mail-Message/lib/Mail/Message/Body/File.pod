@@ -1,0 +1,507 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Message::Body::File - body of a message temporarily stored in a file
+
+=head1 INHERITANCE
+
+ Mail::Message::Body::File
+   is a Mail::Message::Body
+   is a Mail::Reporter
+
+=head1 SYNOPSIS
+
+ See Mail::Message::Body
+
+=head1 DESCRIPTION
+
+The body (content) of a message can be stored in various ways.  In this
+documentation you find the description of extra functionality you have
+when a message is stored in a file.
+
+Storing a whole message is a file is useful when the body is large.  Although
+access through a file is slower, it is saving a lot of memory.
+
+Extends L<"DESCRIPTION" in Mail::Message::Body|Mail::Message::Body/"DESCRIPTION">.
+ 
+=head1 OVERLOADED
+
+Extends L<"OVERLOADED" in Mail::Message::Body|Mail::Message::Body/"OVERLOADED">.
+ 
+=over 4
+
+=item overload: B<"">
+
+Inherited, see L<Mail::Message::Body/"OVERLOADED">
+
+=item overload: B<'==' and '!='>
+
+Inherited, see L<Mail::Message::Body/"OVERLOADED">
+
+=item overload: B<@{}>
+
+Inherited, see L<Mail::Message::Body/"OVERLOADED">
+
+=item overload: B<bool>
+
+Inherited, see L<Mail::Message::Body/"OVERLOADED">
+
+=back
+
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Message::Body|Mail::Message::Body/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Mail::Message::Body|Mail::Message::Body/"Constructors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<clone>()
+
+Inherited, see L<Mail::Message::Body/"Constructors">
+
+=item Mail::Message::Body::File-E<gt>B<new>(%options)
+
+ -Option           --Defined in         --Default
+  based_on           Mail::Message::Body  undef
+  charset            Mail::Message::Body  'PERL' or <undef>
+  checked            Mail::Message::Body  <false>
+  content_id         Mail::Message::Body  undef
+  data               Mail::Message::Body  undef
+  description        Mail::Message::Body  undef
+  disposition        Mail::Message::Body  undef
+  eol                Mail::Message::Body  'NATIVE'
+  file               Mail::Message::Body  undef
+  log                Mail::Reporter       'WARNINGS'
+  message            Mail::Message::Body  undef
+  mime_type          Mail::Message::Body  'text/plain'
+  modified           Mail::Message::Body  <false>
+  trace              Mail::Reporter       'WARNINGS'
+  transfer_encoding  Mail::Message::Body  'none'
+
+=over 2
+
+=item based_on => BODY
+
+=item charset => CHARSET|'PERL'
+
+=item checked => BOOLEAN
+
+=item content_id => STRING
+
+=item data => ARRAY-OF-LINES | STRING
+
+=item description => STRING|FIELD
+
+=item disposition => STRING|FIELD
+
+=item eol => 'CR'|'LF'|'CRLF'|'NATIVE'
+
+=item file => FILENAME|FILEHANDLE|IOHANDLE
+
+=item log => LEVEL
+
+=item message => MESSAGE
+
+=item mime_type => STRING|FIELD|MIME
+
+=item modified => BOOLEAN
+
+=item trace => LEVEL
+
+=item transfer_encoding => STRING|FIELD
+
+=back
+
+=back
+
+=head2 Constructing a body
+
+Extends L<"Constructing a body" in Mail::Message::Body|Mail::Message::Body/"Constructing a body">.
+ 
+=over 4
+
+=item $obj-E<gt>B<attach>($messages, %options)
+
+Inherited, see L<Mail::Message::Body::Construct/"Constructing a body">
+
+=item $obj-E<gt>B<check>()
+
+Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
+
+=item $obj-E<gt>B<concatenate>($components)
+
+Inherited, see L<Mail::Message::Body::Construct/"Constructing a body">
+
+=item $obj-E<gt>B<decoded>(%options)
+
+Inherited, see L<Mail::Message::Body/"Constructing a body">
+
+=item $obj-E<gt>B<encode>(%options)
+
+Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
+
+=item $obj-E<gt>B<encoded>()
+
+Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
+
+=item $obj-E<gt>B<eol>( ['CR'|'LF'|'CRLF'|'NATIVE'] )
+
+Inherited, see L<Mail::Message::Body/"Constructing a body">
+
+=item $obj-E<gt>B<foreachLine>(CODE)
+
+Inherited, see L<Mail::Message::Body::Construct/"Constructing a body">
+
+=item $obj-E<gt>B<stripSignature>(%options)
+
+Inherited, see L<Mail::Message::Body::Construct/"Constructing a body">
+
+=item $obj-E<gt>B<unify>($body)
+
+Inherited, see L<Mail::Message::Body::Encode/"Constructing a body">
+
+=back
+
+=head2 The body
+
+Extends L<"The body" in Mail::Message::Body|Mail::Message::Body/"The body">.
+ 
+=over 4
+
+=item $obj-E<gt>B<isDelayed>()
+
+Inherited, see L<Mail::Message::Body/"The body">
+
+=item $obj-E<gt>B<isMultipart>()
+
+Inherited, see L<Mail::Message::Body/"The body">
+
+=item $obj-E<gt>B<isNested>()
+
+Inherited, see L<Mail::Message::Body/"The body">
+
+=item $obj-E<gt>B<message>( [$message] )
+
+Inherited, see L<Mail::Message::Body/"The body">
+
+=item $obj-E<gt>B<partNumberOf>($part)
+
+Inherited, see L<Mail::Message::Body/"The body">
+
+=back
+
+=head2 About the payload
+
+Extends L<"About the payload" in Mail::Message::Body|Mail::Message::Body/"About the payload">.
+ 
+=over 4
+
+=item $obj-E<gt>B<charset>()
+
+Inherited, see L<Mail::Message::Body/"About the payload">
+
+=item $obj-E<gt>B<checked>( [BOOLEAN] )
+
+Inherited, see L<Mail::Message::Body/"About the payload">
+
+=item $obj-E<gt>B<contentId>( [STRING|$field] )
+
+Inherited, see L<Mail::Message::Body/"About the payload">
+
+=item $obj-E<gt>B<description>( [STRING|$field] )
+
+Inherited, see L<Mail::Message::Body/"About the payload">
+
+=item $obj-E<gt>B<disposition>( [STRING|$field] )
+
+Inherited, see L<Mail::Message::Body/"About the payload">
+
+=item $obj-E<gt>B<dispositionFilename>( [$directory] )
+
+Inherited, see L<Mail::Message::Body::Encode/"About the payload">
+
+=item $obj-E<gt>B<isBinary>()
+
+Inherited, see L<Mail::Message::Body::Encode/"About the payload">
+
+=item $obj-E<gt>B<isText>()
+
+Inherited, see L<Mail::Message::Body::Encode/"About the payload">
+
+=item $obj-E<gt>B<mimeType>()
+
+Inherited, see L<Mail::Message::Body/"About the payload">
+
+=item $obj-E<gt>B<nrLines>()
+
+Inherited, see L<Mail::Message::Body/"About the payload">
+
+=item $obj-E<gt>B<size>()
+
+Inherited, see L<Mail::Message::Body/"About the payload">
+
+=item $obj-E<gt>B<transferEncoding>( [STRING|$field] )
+
+Inherited, see L<Mail::Message::Body/"About the payload">
+
+=item $obj-E<gt>B<type>( [STRING|$field] )
+
+Inherited, see L<Mail::Message::Body/"About the payload">
+
+=back
+
+=head2 Access to the payload
+
+Extends L<"Access to the payload" in Mail::Message::Body|Mail::Message::Body/"Access to the payload">.
+ 
+=over 4
+
+=item $obj-E<gt>B<endsOnNewline>()
+
+Inherited, see L<Mail::Message::Body/"Access to the payload">
+
+=item $obj-E<gt>B<file>()
+
+Inherited, see L<Mail::Message::Body/"Access to the payload">
+
+=item $obj-E<gt>B<lines>()
+
+Inherited, see L<Mail::Message::Body/"Access to the payload">
+
+=item $obj-E<gt>B<print>( [$fh] )
+
+Inherited, see L<Mail::Message::Body/"Access to the payload">
+
+=item $obj-E<gt>B<printEscapedFrom>($fh)
+
+Inherited, see L<Mail::Message::Body/"Access to the payload">
+
+=item $obj-E<gt>B<string>()
+
+Inherited, see L<Mail::Message::Body/"Access to the payload">
+
+=item $obj-E<gt>B<stripTrailingNewline>()
+
+Inherited, see L<Mail::Message::Body/"Access to the payload">
+
+=item $obj-E<gt>B<write>(%options)
+
+Inherited, see L<Mail::Message::Body/"Access to the payload">
+
+=back
+
+=head2 Internals
+
+Extends L<"Internals" in Mail::Message::Body|Mail::Message::Body/"Internals">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addTransferEncHandler>( $name, <$class|$object> )
+
+=item Mail::Message::Body::File-E<gt>B<addTransferEncHandler>( $name, <$class|$object> )
+
+Inherited, see L<Mail::Message::Body::Encode/"Internals">
+
+=item $obj-E<gt>B<contentInfoFrom>($head)
+
+Inherited, see L<Mail::Message::Body/"Internals">
+
+=item $obj-E<gt>B<contentInfoTo>($head)
+
+Inherited, see L<Mail::Message::Body/"Internals">
+
+=item $obj-E<gt>B<fileLocation>( [$begin, $end] )
+
+Inherited, see L<Mail::Message::Body/"Internals">
+
+=item $obj-E<gt>B<getTransferEncHandler>($type)
+
+Inherited, see L<Mail::Message::Body::Encode/"Internals">
+
+=item $obj-E<gt>B<isModified>()
+
+Inherited, see L<Mail::Message::Body/"Internals">
+
+=item $obj-E<gt>B<load>()
+
+Inherited, see L<Mail::Message::Body/"Internals">
+
+=item $obj-E<gt>B<modified>( [BOOLEAN] )
+
+Inherited, see L<Mail::Message::Body/"Internals">
+
+=item $obj-E<gt>B<moveLocation>( [$distance] )
+
+Inherited, see L<Mail::Message::Body/"Internals">
+
+=item $obj-E<gt>B<read>( $parser, $head, $bodytype, [$chars, [$lines]] )
+
+Inherited, see L<Mail::Message::Body/"Internals">
+
+=item $obj-E<gt>B<tempFilename>( [$filename] )
+
+Returns the name of the temporary file which is used to store this body.
+
+=back
+
+=head2 Error handling
+
+Extends L<"Error handling" in Mail::Message::Body|Mail::Message::Body/"Error handling">.
+ 
+=over 4
+
+=item $obj-E<gt>B<AUTOLOAD>()
+
+Inherited, see L<Mail::Message::Body/"Error handling">
+
+=item $obj-E<gt>B<addReport>($object)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+=item Mail::Message::Body::File-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<errors>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<log>( [$level, [$strings]] )
+
+=item Mail::Message::Body::File-E<gt>B<log>( [$level, [$strings]] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logPriority>($level)
+
+=item Mail::Message::Body::File-E<gt>B<logPriority>($level)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<notImplemented>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<report>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<reportAll>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<trace>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<warnings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=back
+
+=head2 Cleanup
+
+Extends L<"Cleanup" in Mail::Message::Body|Mail::Message::Body/"Cleanup">.
+ 
+=over 4
+
+=item $obj-E<gt>B<DESTROY>()
+
+The temporary file is automatically removed when the body is
+not required anymore.
+
+=back
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in Mail::Message::Body|Mail::Message::Body/"DETAILS">.
+ 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: Cannot write to temporary body file $filename: $!
+
+The message body is to be stored in a temporary file (probably because it is a
+large body), but for the indicated reason, this file cannot be created.
+
+=item Warning: Charset $name is not known
+
+The encoding or decoding of a message body encounters a character set which
+is not understood by Perl's Encode module.
+
+=item Warning: No decoder defined for transfer encoding $name.
+
+The data (message body) is encoded in a way which is not currently understood,
+therefore no decoding (or recoding) can take place.
+
+=item Warning: No encoder defined for transfer encoding $name.
+
+The data (message body) has been decoded, but the required encoding is
+unknown.  The decoded data is returned.
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=item Error: Unable to read file $filename for message body file: $!
+
+A L<Mail::Message::Body::File|Mail::Message::Body::File> object is to be created from a named file, but
+it is impossible to read that file to retrieve the lines within.  Therefore,
+no copy to a temporary file can be made.
+
+=item Warning: Unknown line terminator $eol ignored
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Message distribution version 3.000,
+built on February 02, 2017.
+
+Do not forget to read
+L</Mail::Box-Overview>,
+L</Mail::Box-Cookbook>, and
+L</Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L</Mail::Message>,
+L</Mail::Box>,
+L</Mail::Box::IMAP4>,
+L</Mail::Box::POP3>,
+L</Mail::Box::Parser::C>,
+L</Mail::Box::Dbx> (unpublished),
+L</Mail::Transport>,
+L</Object::Realize::Later>, and
+L</User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

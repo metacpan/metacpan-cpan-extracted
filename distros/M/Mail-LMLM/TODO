@@ -1,0 +1,7 @@
+* Replace all the "print {*{$self->{'out'}}}" in Render::HTML
+with a method call.
+
+* Add DocBook output.
+
+* Add a test to see that each input to Mail::LMLM is processed.
+

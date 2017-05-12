@@ -1,0 +1,36 @@
+Revision history for Perl module Math::NoCarry
+
+1.111 2016-01-27T20:21:05Z
+	* Freshen distro, remove prereq.t test
+
+1.11 - 2007-12-09
+	* Now all the functions are exportable on demand.
+	* Distro requires 5.006, although it probably stills works on
+	earlier versions. I'm not actively supporting those though.
+
+1.10 - 2007-01-09
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+1.09 - 2006-05-18
+	* Updates to distro and kwalitee. No need to upgrade.
+
+1.08 - 2005-03-11
+	* Updated docs for POD coverage tests
+	* No code changes, but the docs for subtract() are labelled
+	correctly now.
+
+1.07 - 2004-11-17
+	* no changes
+
+1.07 - 2004-10-08
+	* no feature changes: added strictures and removed unreachable statement
+
+1.06 - 2004-09-08
+	* cleaned up the distro and the docs
+	* no code changes, no need to upgrade
+
+0.01 - 2002-06-25
+	* original version; created by h2xs 1.21 with options
+		-AXn Math::NoCarry
+

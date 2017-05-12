@@ -1,0 +1,44 @@
+---
+abstract: 'create/store an object in a JSON-like hash'
+author:
+  - 'Peter Pentchev <roam@ringlet.net>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-Role-JSONObject
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MooseX::Role::JSONObject:
+    file: lib/MooseX/Role/JSONObject.pm
+    version: v0.1.0
+  MooseX::Role::JSONObject::Meta::Trait:
+    file: lib/MooseX/Role/JSONObject/Meta/Trait.pm
+    version: v0.1.0
+  MooseX::Role::JSONObject::Util:
+    file: lib/MooseX/Role/JSONObject/Util.pm
+    version: v0.1.0
+requires:
+  List::Util: '1.30'
+  Method::Signatures: '20141021'
+  Moose: '2'
+  perl: '5.012001'
+  version: '0.77'
+version: v0.1.0
+x_authority: cpan:ROAM
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

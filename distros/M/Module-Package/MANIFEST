@@ -1,0 +1,27 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/GithubMeta.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Package.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/Module/Package.pm
+lib/inc/Module/Package.pm
+lib/inc/Module/Package.pod
+lib/Module/Install/Package.pm
+lib/Module/Install/Package.pod
+lib/Module/Package.pm
+lib/Module/Package.pod
+lib/Module/Package/Plugin.pm
+lib/Module/Package/Plugin.pod
+lib/Module/Package/Tutorial.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/use_ok.t

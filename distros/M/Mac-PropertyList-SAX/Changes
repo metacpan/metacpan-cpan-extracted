@@ -1,0 +1,113 @@
+Revision history for Mac-PropertyList-SAX
+
+0.01    2006-06-18T17:25
+        First version, released on an unsuspecting world.
+
+0.02    2006-06-19T11:01
+        Minor changes, including copy-and-paste error fixes and actually
+        including the plist files for the tests in the MANIFEST so the whole
+        package gets built.
+
+0.03    2006-06-19T11:16
+        DOCTYPE declarations in test files were pointing to local paths that do
+        not exist on a non-Macintosh system; I changed these local paths to
+        http://www.apple.com/DTDs/PropertyList-1.0.dtd. This points out a
+        (perhaps unfortunate) consequence of using a real XML parser: it (at
+        least by default) needs access to the DTDs, which are usually on the
+        Internet.
+
+0.04    2006-07-10T12:35
+        Itty-bitty little changes, including fixing VERSION in pod, removing an
+        unused state enumeration, and fixing tabs and dates in Changes.
+
+0.05    2006-07-20T12:14
+        Added pod-coverage test for higher Kwalitee; removed test on XML
+        version 0.9, which is not supported by some XML parsers (removing a
+        test doesn't seem right, but I can't guarantee that the parser I get
+        will support XML 0.9, since I'm using XML::SAX::ParserFactory).
+
+0.06    2007-03-26T22:00
+        Updated META.yml to 1.2 spec; fixed version discrepancy between pm and
+        META.yml; added license 'perl' to META.yml.
+
+0.07    2007-03-27T22:49
+        Implement create_from_hash and create_from_array (generically as
+        create_from_ref) recursively, providing functionality that
+        Mac::PropertyList did not have.
+
+0.08    2007-03-27T23:00
+        Fix incorrect Changes date; include missing test for create_from_ref.
+
+0.09    2007-03-27T23:40
+        I don't really like releasing *this* much ... removed forgotten and
+        unnecessary stringification overload of Mac::PropertyList::Scalar that
+        caused PAUSE-indexer errors.
+
+0.50    2007-04-06T18:46
+        Fixed various small bugs, improved quality of plist-generation code,
+        reduced code duplication, updated tests, reformatted code, matched
+        Mac::PropertyList behavior better, updated exports, clarified POD, and
+        marked as 0.50 (signifiying a beta considered stable, nearly ready for
+        production).
+
+0.60    2007-04-06T22:18
+        Changed behavior with respect to Mac::PropertyList -- leading and
+        trailing whitespace in values is no longer stripped. Updated t/write.t
+        to test this as a side-effect of successive deserialization and
+        reserialization. This behavior may need to be revisited, since certain
+        datatypes like "integer" may benefit from whitespace modifications. As
+        a result of these modifications, this module no longer depends on
+        Text::Trim. See CAVEATS in the POD for more details.
+
+0.61    2007-04-07T12:55
+        Finally fixed the lack of LICENSE; updated old code like 'use vars' to
+        use newer Perl idioms; inlined functions that due to recent refactoring
+        were being called only once; reformatted code. Fixed dependency lists,
+        which were incorrect because I was modifying META.yml (generated)
+        instead of Makefile.PL. No behavioral changes.
+
+0.62    2007-08-18T11:21
+        Fixed typographical errors; unified tabbing in Changes; subclassed
+        Mac::PropertyList:: types to allow setting useful overloads for them.
+
+0.63    2007-08-24T22:50
+        Oops. Version 0.62 could break things that check ->isa on
+        Mac::PropertyList objects, and the new objects weren't being used
+        consistently anyway. I think I've got it now.
+
+0.64    2007-11-24T19:34
+        No functionality changes. Switched to Module::Install for installation;
+        fixed a typo; made POD more concise.
+
+0.70    2007-12-06T12:11
+        Rewrote POD for clarity and conciseness; added some function aliases;
+        potentially improved performance by ceasing to naively read in entire
+        file before starting a parse; made boolean objects descendants of
+        Object::MultiType (a new dependency) for ease of use in a boolean
+        context while maintaining backward compatibility and stringification;
+        removed dependence on unnecessary module UNIVERSAL::isa. Added
+        t/overload.t, which checks boolean and stringification overloads.
+
+0.80    2008-07-19T02:06
+        Removed globally-pollutive dependency on Alias.pm; addressed
+        roundtripping of XML entities (thanks to Jon Connell) and added tests.
+
+0.81    2008-07-19T09:35
+        Removed false dependency on Alias.pm in Makefile.PL.
+
+0.82    2008-08-21T15:14
+        create_from_ref() entity serialization was addressed in 0.80, but
+        plist_as_string() still output invalid XML. Thanks goes again to Jon Connell.
+
+0.83    2008-09-26T09:56
+        XML::SAX::ParserFactory might not return an XML-capable parser, so
+        start depending on XML::SAX::Expat and let the user change that
+        dependency at runtime with an environment variable if necessary.
+
+0.84    2008-11-23T11:54
+        Require LWP for test, since XML::Parser needs to fetch entity
+        definitions from the web.
+
+0.85	2010-12-04T11:10
+		Integrate bug fix from Bion Pohl / ingz-inc.com. Thanks !
+

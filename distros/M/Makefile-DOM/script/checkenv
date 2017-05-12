@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+# Check environment settings for the testers.
+
+use strict;
+use warnings;
+
+sub check ($$) {
+    my ($env, $desc) = @_;
+    my $val = $ENV{$env} || '<DEFAULT>';
+    print "$desc\t=>\t$env = $val\n";
+}
+
+check 'TEST_SHELL_PATH', 't/sh/*.t';
+print "\n";
+check 'GNU_MAKE_PATH', 't/gnu/*/*.t';
+check 'GNU_SHELL_PATH', 't/gnu/*/*.t';
+

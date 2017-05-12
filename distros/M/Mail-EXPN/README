@@ -1,0 +1,58 @@
+NAME
+    Mail::EXPN - Perl extension for validation of email addresses
+
+SYNOPSIS
+      use Mail::EXPN qw(isfake);
+
+      $reason = isfake('bill@microsoft.com');
+      if ($reason) {
+        print "Bad email: $reason\n";
+      } elsif (defined($reason)) {
+        print "Email address perfect\n";
+      } else {
+        print "Could not verify email address: EXPN is turned off at target computer";
+      }
+
+      $reason = isfake('bigboss', 'mail.acme.com');
+      ...
+
+DESCRIPTION
+    This module checks validity of email addresses. It ensure the existence
+    of a username and domain, unless you specified the MTA, searches the DNS
+    for the MTA (if not specified), and then attempts to use the SMTP
+    keyword EXPN to verify the username. Since EXPN is usually turned off,
+    the module will return *undef* in such cases, and defined but false if
+    the verification passed. If for any reason the check failed, the module
+    will return a string describing the reason.
+
+CAVEATS
+    Contemporary ISPs never turn EXPN on, to prevent mail abusers harass
+    more efficiently by molesting only existing addresses with junk mail.
+    Therefore, this is not an excellent solution to check the fill-out forms
+    in your site for users supplying false email addresses. Most addresses
+    associated with valid MTAs will return *undef*.
+
+NOTE ON RFC 2821
+    Mail::EXPN only checks the first mx specified, as it is likely to be the
+    only one to contain the user list.
+
+TO DO
+    I tried to rewrite the module using Net::SMTP, but could not figure how
+    to handle the expand and verify methods. They seemed to return an empty
+    reply.
+
+CREDITS
+    Idea by Raz Information Systems, http://www.raz.co.il.
+
+AUTHOR
+    Ariel Brosh, schop@cpan.org.
+
+MAINTAINER
+    Florian Helmberger, florian@cpan.org.
+
+VERSION
+    $Id: README,v 1.2 2003/02/01 10:45:49 florian Exp $
+
+SEE ALSO
+    perl(1).
+

@@ -1,0 +1,11 @@
+
+* make it possible to set the colors of the graphs from outside
+* more tests
+* Needs patch(es) to GD::Graph:
+  - graphs with angled text at the bottom (like 45° since the email addresses or
+    filter rules are pretty long)
+  - the linear and yearly prediction numbers overlap, this should be handled
+    better by GD::Graph (like placing the lower _below_ the line instead of
+    _over_ it and thus inside the upper number)
+* When the archive is newer than the index, re-create the index automatically.
+* SA scatter and daily_score graphs.

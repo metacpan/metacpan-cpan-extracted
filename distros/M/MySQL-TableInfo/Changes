@@ -1,0 +1,18 @@
+Revision history for Perl extension MySQL::TableInfo.
+
+0.01  Fri Sep 28, 2001
+        - original version; created by h2xs 1.21 with options
+                -X -n MySQL::TableInfo
+
+0.02 Fri Sep 28, 2001
+        - load_default() method has been added
+
+0.03 Fri Sep 28, 2001
+        - validate() method has been introduced for the first time
+          although pretty buggy.
+
+0.03 Sat Sep 29, 2001
+        - _valid_enum() and _valid_set() methods are introduced.
+          Not inmplemented yet.
+0.04 Wed Dec 12, 2001
+        - not much change in the interface, but comes with a test suite

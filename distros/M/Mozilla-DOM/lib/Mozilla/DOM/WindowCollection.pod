@@ -1,0 +1,68 @@
+=head1 NAME
+
+Mozilla::DOM::WindowCollection
+
+=head1 DESCRIPTION
+
+Mozilla::DOM::WindowCollection is a wrapper around an instance of Mozilla's
+nsIDOMWindowCollection interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+ * The nsIDOMWindowCollection interface is an interface for a
+ * collection of DOM window objects.
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::WindowCollection->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $len = $coll->B<GetLength>()
+
+=over
+
+   * Accessor for the number of windows in this collection.
+
+=back
+
+=head2 $window = $coll->B<Item>($i)
+
+=over
+
+=over
+
+=item * $i (integer (long))
+
+=back
+
+   * Method for accessing an item in this collection by index.
+
+=back
+
+=head2 $window = $coll->B<NamedItem>($name)
+
+=over
+
+=over
+
+=item * $name (string)
+
+=back
+
+   * Method for accessing an item in this collection by window name.
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut

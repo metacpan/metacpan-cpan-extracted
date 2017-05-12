@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Module-Packaged
+version: 0.86
+author:
+  - Leon Brocard, leon@astray.com
+abstract: Report upon packages of CPAN distributions
+license: perl
+generated_by: Module::Build version 0.2612, without YAML.pm

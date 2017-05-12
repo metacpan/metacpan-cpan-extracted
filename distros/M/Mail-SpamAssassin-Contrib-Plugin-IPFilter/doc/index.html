@@ -1,0 +1,183 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Mail::SpamAssassin::Contrib::Plugin::IPFilter - Blocks bad MTA behavior using IPTables and Redis/MySQL.</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<style type="text/css">
+body{font-size:1.1em;}
+hr {color:#999;margin-top:20px;}
+h1{margin: 20px 0 10px 0;}
+pre {
+ white-space: pre-wrap;       /* css-3 */
+ white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+ white-space: -pre-wrap;      /* Opera 4-6 */
+ white-space: -o-pre-wrap;    /* Opera 7 */
+ word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+li {margin-bottom:3px;}
+</style>
+</head>
+
+<body style="background-color: white">
+
+<div align="left" style="margin:5px;">
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+<b>Module Version</b>: 1.2 (20160722075010)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Latest Release</b>: <b><a href="http://www.inficron.com/resources/Mail-SpamAssassin-Contrib/Plugin/IPFilter/latest/">Mail-SpamAssassin-Contrib-Plugin-IPFilter-1.2</a></b><br>
+<ul>
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+        <li><a href="#preferences">PREFERENCES</a></li>
+        <li><a href="#author">AUTHOR</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<h1><a name="name">NAME</a></h1>
+<p>Mail::SpamAssassin::Contrib::Plugin::IPFilter - Blocks bad MTA behavior using IPTables.</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>To try this out, add this or uncomment this line in init.pre:</p>
+<pre>LoadPlugin     Mail::SpamAssassin::Contrib::Plugin::IPFilter</pre>
+<p>Configuration defaults:</p>
+
+<pre>
+iptables_support 6
+iptables_bin $PATH/iptables
+ip6tables_bin $PATH/ip6tables
+filter_name spamipfilter
+</pre>
+<pre>
+db_type	redis
+db_host 127.0.0.1
+db_port 6387
+db_user	 ''
+db_auth	 ''
+db_name spamipfilter
+</pre>
+<pre>
+trigger_score 6
+trigger_messages 3
+trigger_sensitivity 4
+average_score_for_rule 7
+expire_rule_seconds 172800
+seconds_between_messages 30
+seconds_to_decay_penalty 300
+expires_multiplier_penalty 1.5
+cache_decay_days 60
+blacklist_score 30
+</pre>
+<pre>
+log_dir /var/log
+common_hosts gmail.com, google.com, yahoo.com, hotmail.com, live.com
+admin_email ''
+admin_message Your message to $recipient from $email was blocked and
+  your IP address $ip blacklisted due to excessive unsolicited bulk
+  email. To reinstate your ability to send email to $recipient please
+  reply to $admin using a different off-network email, including the
+  body of this message, with a request for reinstatement.
+verbose 0
+</pre>
+
+<hr style="margin-top:10px;" />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Mail::SpamAssassin::Contrib::Plugin::IPFilter blacklists unsolicited bulk email senders using IPTables. It will blacklist the sender IP using the smallest network possible, up to /24, when UCE originates from multiple hosts on the same network. Depending on the diversity and frequency of spam received on a server, it may take a couple of days to become effective. Thereafter, the cache state will decay to prevent spammers from burning IP blocks.</p>
+
+<p>Responsible, well-known email hosts (common_hosts) are given special treatment to avoid blacklisting their networks and the score is increased for external filtering of UCE originating from those hosts. The plugin may be configured to email the blacklisted sender a warning for remediation.</p>
+
+<p>A crontab entry is created for maintenance. IPV6 support is experimental. Future versions may include a collaborative blacklist.</p>
+<hr />
+<h1><a name="preferences">PREFERENCES</a></h1>
+<p>The following options may be used in site-wide (local.cf) configuration files to customize operation, and must be prefixed by ipfilter_:</p>
+
+<b>filter_name</b><br>
+  The name of the chain that Mail::SpamAssassin::Contrib::Plugin::IPFilter will create to block spammers. [a-zA-Z0-9_.]
+
+  <br><br><b>iptables_support</b><br>
+    iptables support. 0 = disable iptables. 4 = support ipv4 only. 6 = support ipv4 and ipv6.
+
+  <br><br><b>iptables_bin</b><br>
+    The path to the iptables binary on your system.
+
+  <br><br><b>ip6tables_bin</b><br>
+    The path to the ip6tables binary on your system.
+
+  <br><br><b>db_type</b><br>
+    The type of storage to use (mysql/redis).
+
+  <br><br><b>db_host</b><br>
+    The IPv4 address of your database server.
+
+  <br><br><b>db_port</b><br>
+    The port that the database server is listening on.
+
+  <br><br><b>db_user</b><br>
+    The database user, if applicable.
+
+  <br><br><b>db_auth</b><br>
+    The database password, if applicable.
+
+  <br><br><b>db_name</b><br>
+    The database name (mysql) or the prefix for keys (redis) created and used by Mail::SpamAssassin::Contrib::Plugin::IPFilter. ^[a-zA-Z0-9_.]$
+
+  <br><br><b>log_dir</b><br>
+    The directory to use for apache style logs reflecting spam messages for export to analytics. Informational messages are still logged via SpamAssassin.
+
+  <br><br><b>average_score_for_rule</b><br>
+    The average spam score for a host required to trigger a rule after trigger_messages.
+
+  <br><br><b>seconds_between_messages</b><br>
+    After how long should messages with the same envelope to/from be considered.
+
+  <br><br><b>cache_decay_days</b><br>
+    After how long will entries in the cache decay, assuming no spam messages are seen. Note that the cache will decay according to: cumulative_spam_score_for_host * exp(-3*lastspam_delta/cache_decay_secs)
+
+  <br><br><b>expire_rule_seconds</b><br>
+    After how long will a block rule expire.
+
+  <br><br><b>expires_multiplier_penalty</b><br>
+    A factor used to penalize hosts with longer rule expiration based on the spam of score of the message resulting in a rule, relative to the average spam score required to set the rule.
+
+  <br><br><b>seconds_to_decay_penalty</b><br>
+    A frequency indicator used to tune penalization for a given host based on how many spam messages were seen for that host over a time period.
+
+  <br><br><b>trigger_score</b><br>
+    The score for which Mail::SpamAssassin::Contrib::Plugin::IPFilter will process a spam message. This should be greater than the SpamAssassin required_score.
+
+  <br><br><b>trigger_messages</b><br>
+    The minimum number of spam messages from a given host before a rule is triggered.
+
+  <br><br><b>trigger_sensitivity</b><br>
+    A quantity used to tune penalization for a given host based on how many spam messages were seen for that host.
+
+  <br><br><b>common_hosts</b><br>
+    Hosts which should not be blacklisted via IPTables rule, and fall back to SpamAssassin blacklist.
+
+  <br><br><b>blacklist_score</b><br>
+    A score to add to message headers of blacklisted senders originating from common_hosts.
+
+  <br><br><b>admin_email</b><br>
+    The email address to send blacklist warnings from. If left unconfigured, no warnings will be sent.
+
+  <br><br><b>admin_message</b><br>
+    The warning message that will be sent. Parameters $user, $domain, $ip, $email, $recipient and $admin may be used for templatization.
+
+  <br><br><b>whitelist</b><br>
+    Any email address or ip address to whitelist. Email addresses may be specified as foo@example.com or just @example.com to match the whole domain, and IPs may be specified as 1.2.3.4 or just 1.2.3. to match the class C address space.
+
+  <br><br><b>verbose</b><br>
+    Log additional information via Mail::SpamAssassin::Logger
+<br/><br/>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p style="line-height:1.4em;">&copy; 2016 Tamer Rizk, Inficron Inc. All rights reserved.<br/><i>This package is free software, distributed under the <a href="http://opensource.org/licenses/BSD-3-Clause">New BSD License</a>.</i></p>
+<hr />
+</div>
+</body>
+
+</html>

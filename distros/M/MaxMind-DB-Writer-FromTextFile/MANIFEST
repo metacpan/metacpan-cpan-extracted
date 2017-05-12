@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/MaxMind-DB-Writer-FromTextFile-00use.t
+t/MaxMind-DB-Writer-FromTextFile-01write.t
+t/text/ip.txt
+lib/MaxMind/DB/Writer/FromTextFile.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

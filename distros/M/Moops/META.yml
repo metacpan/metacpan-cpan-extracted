@@ -1,0 +1,138 @@
+---
+abstract: 'Moops Object-Oriented Programming Sugar'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.96'
+  Test::Requires: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+conflicts:
+  MooseX::Types::Common: '== 0.001011'
+  MooseX::Types::URI: '== 0.04'
+dynamic_config: 1
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.142690'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Moops
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features:
+  Moo:
+    description: 'allow classes and roles to be built with Moo'
+  Moose:
+    description: 'allow classes and roles to be built with Moose'
+    recommends:
+      MooseX::XSAccessor: '0'
+    requires:
+      Moose: '2.0600'
+  Mouse:
+    description: 'allow classes and roles to be built with Mouse'
+    requires:
+      Mouse: '1.00'
+  Tiny:
+    description: 'allow classes and roles to be built with Class::Tiny/Role::Tiny'
+    requires:
+      Class::Tiny::Antlers: '0'
+      Role::Tiny: '1.000000'
+provides:
+  Moops:
+    file: lib/Moops.pm
+    version: '0.034'
+  Moops::ImportSet:
+    file: lib/Moops/ImportSet.pm
+    version: '0.034'
+  Moops::Keyword:
+    file: lib/Moops/Keyword.pm
+    version: '0.034'
+  Moops::Keyword::Class:
+    file: lib/Moops/Keyword/Class.pm
+    version: '0.034'
+  Moops::Keyword::Library:
+    file: lib/Moops/Keyword/Library.pm
+    version: '0.034'
+  Moops::Keyword::Role:
+    file: lib/Moops/Keyword/Role.pm
+    version: '0.034'
+  Moops::MethodModifiers:
+    file: lib/Moops/MethodModifiers.pm
+    version: '0.034'
+  Moops::Parser:
+    file: lib/Moops/Parser.pm
+    version: '0.034'
+  Moops::TraitFor::Keyword::assertions:
+    file: lib/Moops/TraitFor/Keyword/assertions.pm
+    version: '0.034'
+  Moops::TraitFor::Keyword::dirty:
+    file: lib/Moops/TraitFor/Keyword/dirty.pm
+    version: '0.034'
+  Moops::TraitFor::Keyword::fp:
+    file: lib/Moops/TraitFor/Keyword/fp.pm
+    version: '0.034'
+  Moops::TraitFor::Keyword::mutable:
+    file: lib/Moops/TraitFor/Keyword/mutable.pm
+    version: '0.034'
+  Moops::TraitFor::Keyword::ro:
+    file: lib/Moops/TraitFor/Keyword/ro.pm
+    version: '0.034'
+  Moops::TraitFor::Keyword::rw:
+    file: lib/Moops/TraitFor/Keyword/rw.pm
+    version: '0.034'
+  Moops::TraitFor::Keyword::rwp:
+    file: lib/Moops/TraitFor/Keyword/rwp.pm
+    version: '0.034'
+  MooseX::FunctionParametersInfo:
+    file: lib/MooseX/FunctionParametersInfo.pm
+    version: '0.034'
+  MooseX::FunctionParametersInfo::Trait::Method:
+    file: lib/MooseX/FunctionParametersInfo.pm
+    version: '0.034'
+  MooseX::FunctionParametersInfo::Trait::WrappedMethod:
+    file: lib/MooseX/FunctionParametersInfo.pm
+    version: '0.034'
+  PerlX::Define:
+    file: lib/PerlX/Define.pm
+    version: '0.034'
+recommends:
+  Keyword::Simple: '0.02'
+requires:
+  Exporter::Tiny: '0.040'
+  Import::Into: '1.000000'
+  Kavorka: '0.034'
+  Keyword::Simple: '0.01'
+  Lexical::Accessor: '0.008'
+  Module::Runtime: '0.013'
+  Moo: '1.006000'
+  MooX::late: '0.015'
+  MooseX::MungeHas: '0.007'
+  Parse::Keyword: '0.006'
+  PerlX::Assert: '0.902'
+  Scalar::Util: '1.40'
+  Try::Tiny: '0.12'
+  Type::Utils: '1.000000'
+  Variable::Magic: '0'
+  namespace::autoclean: '0.20'
+  perl: '5.014'
+  'true': '0.18'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Moops/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Moops
+  homepage: https://metacpan.org/release/Moops
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-moops.git
+version: '0.034'
+x_breaks:
+  MooseX::Types::Common: '== 0.001011'
+  MooseX::Types::URI: '== 0.04'
+x_contributors:
+  - 'Maurice Mengel (MMAURICE) <mmaurice@cpan.org>'
+  - 'Aaron James Trevena (TEEJAY) <teejay@cpan.org>'

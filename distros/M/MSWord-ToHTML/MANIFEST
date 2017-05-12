@@ -1,0 +1,35 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/MSWord/ToHTML.pm
+lib/MSWord/ToHTML/Doc.pm
+lib/MSWord/ToHTML/DocX.pm
+lib/MSWord/ToHTML/HTML.pm
+lib/MSWord/ToHTML/Roles/HasHTML.pm
+lib/MSWord/ToHTML/Types/Library.pm
+t/constraints.t
+t/convert.t
+'t/data/From Iron  MInes to Iron Bars.docx'
+t/data/Greece(Giorgos).copy.doc
+t/data/Greece(Giorgos).doc
+'t/data/Henri_Crisis Final JG.doc'
+'t/data/Historical Moment.doc'
+t/data/InsurgentNotes(Cover).doc
+t/data/InsurgentNotes(Masthead).doc
+'t/data/Jackson_2nd rewrite (1).doc'
+t/data/Madison.doc
+t/data/Turkey.doc
+t/data/Turkey2.docx
+t/data/Wisconsin.doc
+t/data/california.doc
+t/data/fresh_idea.docx
+t/data/s-artesian2.docx
+t/data/transparent.png
+t/requires_external.t
+t/sanity.t

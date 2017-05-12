@@ -1,0 +1,36 @@
+---
+abstract: 'Moo eXtension to inject plugins to exist objects as a role'
+author:
+  - 'Huo Linhe <linhehuo@gmail.com>'
+build_requires:
+  Module::Build: '0.28'
+  Module::Find: '0'
+  Moo: '0'
+  MooX: '0'
+  Role::Tiny: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  lib: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-Object-Pluggable
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Modern::Perl: '0'
+  Module::Pluggable::Object: '0'
+  Moo::Role: '0'
+  Scalar::Util: '0'
+  namespace::clean: '0'
+version: 0.0.5
+x_serialization_backend: 'YAML::Tiny version 1.69'

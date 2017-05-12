@@ -1,0 +1,90 @@
+
+<style>
+
+div.myac {
+  background-color: #ffffff;
+  border-color: #ccc;
+  border-color: rgba(0, 0, 0, 0.2);
+  border-style: solid;
+  border-width: 1px;
+  -webkit-border-radius: 0 0 5px 5px;
+  -moz-border-radius: 0 0 5px 5px;
+  border-radius: 0 0 5px 5px;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box;
+  *border-right-width: 2px;
+  *border-bottom-width: 2px;
+}
+
+div.myac ul {
+  list-style: none;
+}
+
+div.myac ul li > a {
+    display: block;
+}
+
+div.myac ul li > a:hover {
+  color: #ffffff;
+  text-decoration: none;
+  background-color: #0088cc;
+}
+
+</style>
+
+% if (!model_class->can("autocomplete")) {
+<div class="well">
+    Please select <%= a_printable(current_object) %> using one of the other menu items.
+
+% if ($self->app->routes->find(current_object."/list")) {
+    <br> For instance, the <%= link_to current_object."/list" => begin %> list <% end %> page.
+    % if ($self->app->routes->find(current_object."/search")) {
+        <br> Or the <%= link_to current_object."/search" => begin %> search <% end %> page.
+    % }
+% } else {
+    % if ($self->app->routes->find(current_object."/search")) {
+        <br> For instance, the <%= link_to current_object."/search" => begin %> search <% end %> page.
+    % }
+% }
+
+</div>
+
+% } else {
+
+<div class="well">
+    Search for <%= a_printable(current_object) %>, then press tab to select one.<br>
+    <input type="text" data-provide="typeahead" id="ta" style='width:100%;margin-bottom:0px;'>
+    <div id="results" class="myac"> </div>
+</div>
+
+%# Uses https://github.com/mlmorg/bootstrap
+
+%= javascript begin
+$('#ta').typeahead({
+    source : function () {
+        $.get( "<%= url_for("$object/autocomplete") %>?q="
+                + encodeURIComponent($("#ta").val())
+                + "&tab="
+                + encodeURIComponent("<%= current_tab =%>")
+             , []
+             , function(data,textStatus,jqXHR) {
+                    $("#searchq").html($("#ta").val());
+                    var out = '<ul>';
+                    $.each(data, function ( i, v ) {
+                        out = out + '<li>' + '<a href="' + v.href + '">' + v.name + '</a>' + '</li>';
+                    } );
+                    out = out + '</ul>';
+                    $("#results").html(out);
+                }
+            );
+    }
+})
+
+%= end
+
+% }
+

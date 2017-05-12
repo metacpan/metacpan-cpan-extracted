@@ -1,0 +1,37 @@
+Revision history for Music-Intervals
+
+0.0502 2014-10-25
+    - Re-added the natural_freqencies() test.
+
+0.0501 2014-10-25
+    - Added missing POD and Changes file item.
+
+0.05  2014-10-25
+    - Clarified the limitations of equal temperament with this module.
+    - Added named output, so blocks are labled.
+    - Added integer_notation
+
+0.04  2014-09-27
+    - Added a nearly identical module for numeric-only notes.
+
+0.0301 2014-09-27
+    - Added a bunch of interval ratios.
+
+0.03  2014-09-27
+    - Added full tests for the C E G triad.
+    - Added a handy by_ratio() method.
+
+0.02  2014-09-27
+    - Added the ratio() method.
+    - Improved documentation.
+    - Fixed scale degree precision in test.
+
+0.0103 2014-09-25
+    - Improved documentation.
+
+0.0102 2014-09-25
+    - Fixed the distribution meta sources.
+
+0.0101 2014-09-25
+    - Ported functionality from the intervals script.
+    - Minted by Dist::Zilla

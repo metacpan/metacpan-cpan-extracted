@@ -1,0 +1,33 @@
+# Copyright 2010, 2011, 2012 Kevin Ryde
+#
+# This file is part of Math-Aronson.
+#
+# Math-Aronson is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3, or (at
+# your option) any later version.
+#
+# Math-Aronson is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Math-Aronson.  If not, see <http://www.gnu.org/licenses/>.
+
+Source: libmath-aronson-perl
+Section: perl
+Priority: optional
+Build-Depends: libtest-more-perl | perl (>= 5.6.2), cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42@zip.com.au>
+Standards-Version: 3.9.3
+Homepage: http://user42.tuxfamily.org/math-aronson/index.html
+Bugs: mailto:user42@zip.com.au
+
+Package: libmath-aronson-perl
+Architecture: all
+Depends: perl (>= 5.004), liblingua-en-numbers-perl (>= 1.01), liblingua-fr-numbers-perl (>= 0.04), ${perl:Depends}, ${misc:Depends}
+Recomments: liblingua-any-numbers-perl (>= 0.21)
+Description: Generate Aronson's sequence
+ English and French sequences are builtin and options allow other
+ languages, letters, or initial strings.

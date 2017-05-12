@@ -1,0 +1,11 @@
+# Revision history for Monitoring-Livestatus-Class-Lite
+
+0.07    Thu Jul 16 16:57:01 CEST 2015
+        - fix using this module in variants of hashes, single connection or array
+
+0.06    Thu Jul 16 16:25:46 CEST 2015
+        - performance tuning
+        - fix example
+
+0.05    Fri May 24 12:34:17 CEST 2013
+        - First version

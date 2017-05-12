@@ -1,0 +1,29 @@
+---
+abstract: 'the mildew Perl6 compiler'
+author:
+  - 'Pawel Murias <pawelmurias@gmail.com>'
+  - 'Daniel Ruoso <daniel@ruoso.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.101670'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mildew
+requires:
+  Bread::Board: 0.13
+  Data::Dumper::Concise: 1.200
+  Digest::MD4: 0
+  File::Slurp: 0
+  Forest::Tree: 0.08
+  Graph::Easy: 0.69
+  Moose: 1.03
+  MooseX::Declare: 0.33
+  Regexp::Grammars: 1.002
+  STD: 0.05
+  Set::Object: 1.26
+  YAML::XS: 0
+version: 0.05

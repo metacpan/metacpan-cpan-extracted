@@ -1,0 +1,63 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 bc4cc0df1a156d72e1e9a90bb739552891e71ac7 Changes
+SHA1 882221895a73bad18eb9f16a0ce523a968a932c1 LICENSE.artistic_2
+SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE.bsd
+SHA1 3d6d1a159c7123a68bee45acec3c55e0f9340bd0 MANIFEST
+SHA1 6e1c0ee506017889ec70aadd3d346b9a85b1acf8 META.yml
+SHA1 365cec4dc8ac3c9ed709f5e8a570423f93fb054f Makefile.PL
+SHA1 9beb7d2e541527a956c66ff1ce9a463bcbffb0fc README
+SHA1 7cf4d52b547a41ede2a8813dc150aab81cfbd7cc Warsaw.pm
+SHA1 08f47d37059ca6125a3d31c59c7a50696dd0ba53 examples/ex1.pl
+SHA1 5eeec5010383dd7068df0a063177f5ab48bc4470 examples/ex2.pl
+SHA1 02200d1c54b462b818936fb23ce54d77a4d5739d examples/ex3.pl
+SHA1 2d68b43316c436d008c52b311b2bd89ccafd5148 examples/ex4.pl
+SHA1 ea4eb50a717805077725f887cf322cb71c7cb3ce images/ex3.png
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 42de62df31eaf796d8bfd49a11fdc9cff1b50b74 inc/Module/Install/Share.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 bfd2d6b69f421b5fa9b24f0c32a0b3d2d417c2af share/warsaw-map.xml
+SHA1 57803b66b7a12d3cc78a7d6e3238529eae62b3d1 t/Map-Tube-Warsaw/01-use.t
+SHA1 e65abba789054496b542fb3738962f9d196cb940 t/Map-Tube-Warsaw/02-version.t
+SHA1 9bd78b09e1a6dd4d8f52e944a52729403d69e134 t/Map-Tube-Warsaw/03-map.t
+SHA1 ec1be383097bed1f1e12ec038e5d52ce56133106 t/Map-Tube-Warsaw/04-get_node_by_id.t
+SHA1 5907cd90855ae4bece855340b7800a88f320bda1 t/Map-Tube-Warsaw/05-get_node_by_name.t
+SHA1 3e4d16809bb4fe6fbda4088c026b57dbcb9703d8 t/Map-Tube-Warsaw/06-get_shortest_route.t
+SHA1 ee79737ed08f214009357930b29e01bc6aa9762c t/Map-Tube-Warsaw/07-name.t
+SHA1 f6c7f1de57fd37e35f12e6cfd6c0825b989ec72c t/Map-Tube-Warsaw/08-xml.t
+SHA1 da621315fbda63dcf36b8de026660bf7eaa22405 xt/Map-Tube-Warsaw/01-pod_coverage.t
+SHA1 e80d541ceefaddbbbdc8837c2300f4e7d3d1159d xt/Map-Tube-Warsaw/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWIMqBAAoJEJe+XXKaIuTlh7wH/iDzUCk6DC7rtyHlGFD7SP8e
+zKDpFFHHVbMAPMdFS1/8kvjYFCMEAH3j5BAP03Ig4qsT9+ZPepIA/L7hXKIWaErV
+HOEWG2Y5ux/5Cx/Jf5a0M9MAuzvOxVi3RmREqVw0ukdzM+pnAtj1G9bNafdrzmw3
++kOqA5MS2o4mHEyn/zDdg/V+kQyuAswWQe4HMLvJs+r9ST/xYNAPMm0bEvzzno5m
+MTMTmjE11raLzqVIrb6njWWGC5jX6Ee+67BqXLSzsw2whJhtvquq+oE6Ee/oIAxQ
+8CZ77/SffT3sZD8+4raV53suOcyN0lny8GcESXa8hP8lx69FOAhcjy91XX8ZzcI=
+=EKNQ
+-----END PGP SIGNATURE-----

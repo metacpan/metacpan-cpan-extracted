@@ -1,0 +1,20 @@
+/*
+Check whether cpow can be linked.
+*/
+
+#include <stdio.h>
+#include <complex.h>
+#include <math.h>
+
+int main(void) {
+ double _Complex rop, op;
+
+ __real__ op = 0.6;
+ __imag__ op = 0.5;
+
+ rop = cpow(op, op);
+
+ return 0;
+
+}
+

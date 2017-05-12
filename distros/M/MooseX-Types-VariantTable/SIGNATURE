@@ -1,0 +1,34 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 72f717631e0911476f734777fa20e44e5be26ea5 Changes
+SHA1 86ec73549737fe09882eac41327ed274a7cec2d3 MANIFEST
+SHA1 6de0c394f8ca013f6cbf28292d652979109e9b87 MANIFEST.SKIP
+SHA1 610e58e9a20558ba1ad9da14228146e553b1e350 META.yml
+SHA1 4725cff57368d4c9e0592820484e52d0e94df008 Makefile.PL
+SHA1 2e49ec8ab2161aadc7ef70ade552a9382d0705c4 lib/Moose/Meta/Method/VariantTable.pm
+SHA1 847534179a551601097928234fa0e77d81462cb8 lib/MooseX/Types/VariantTable.pm
+SHA1 5697c5af4dd63b487ec9972faf46a4e1ea703d45 lib/MooseX/Types/VariantTable/Declare.pm
+SHA1 6b23dc57cc9f59f18194fe6d9b9e1b465e889011 t/basic.t
+SHA1 d892988be83dc9817486b716ed09469ce46ca1c6 t/structured.t
+SHA1 39107eaf4d6407727f4cdbed69c2eab380131157 t/sugar.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAktDlUoACgkQdC8qQo5jWl5jagCcDWhFoK77f35GgY34ZWocO6se
+DIUAnjUR5UNOE7Px1VaOHAqTZxGw0Npm
+=dJW8
+-----END PGP SIGNATURE-----

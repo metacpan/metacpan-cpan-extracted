@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/MySQL/Partition.pm
+lib/MySQL/Partition/Handle.pm
+lib/MySQL/Partition/Type/List.pm
+lib/MySQL/Partition/Type/Range.pm
+minil.toml
+t/00_compile.t
+t/01_basic.t
+t/02_mysqld.t
+META.yml
+MANIFEST

@@ -1,0 +1,49 @@
+Revision history for Mooish-Caller-Util
+
+0.06    2015-07-30 (PERLANCAR)
+
+	- Add another detection check for Moo: sometimes Moo uses
+	  Method::Generate::Constructor instead of
+	  Method::Generate::BuildAll.
+
+	- Be safer when skipping frame with Mouse & older perl (make sure
+	  we're skipping eval frame).
+
+
+0.05    2015-07-27 (PERLANCAR)
+
+	- Add workaround for perl < 5.14 (apparently there is an extra eval
+	  frame with Mouse and these older perls) [CT].
+
+
+0.04    2015-07-27 (PERLANCAR)
+
+	- No functional changes.
+
+	- Make sure we test with Moo >= 2.000002 (which guarantees to call
+	  BUILDARGS).
+
+	- [test] Show Mo/Moo/Moose/Mouse version.
+
+	- [doc] Fix typo in example.
+
+
+0.03    2015-07-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- Downgrade TestRequires to Mo/Moo/Moose/Mouse to TestRecommends,
+	  to reduce deps.
+
+
+0.02    2015-07-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- Reduce startup overhead (Carp, feature, ...) by removing usage of
+	  experimental.
+
+
+0.01    2015-07-26 (PERLANCAR)
+
+        - First release.

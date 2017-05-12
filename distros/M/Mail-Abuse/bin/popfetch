@@ -1,0 +1,168 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+# $Id: popfetch,v 1.2 2004/03/01 15:31:08 lem Exp $
+
+use Net::POP3;
+use Pod::Usage;
+use Getopt::Std;
+
+our $VERSION = do { my @r = (q$Revision: 1.2 $ =~ /\d+/g); sprintf " %d."."%03d" x $#r, @r };
+
+=pod
+
+=head1 NAME
+
+popfetch - Extract messages from POP3 server in batch
+
+=head1 SYNOPSIS
+
+    popfetch [-h] [-v] [-d] [-s server] [-u user] [-p password] [-x exclude] [-S separator] 
+
+=head1 DESCRIPTION
+
+This is an alternative to C<Mail::Abuse::Reader::POP3> which might
+allow for batch fetching of messages from a POP3 account. Tipically
+this can be used as part of a pipeline.
+
+The pipeline I use looks like:
+
+    popfetch -d -u user -p pass -s server | abuso -R Stdin -c my.config
+
+The following options are recognized:
+
+=over
+
+=item B<-h>
+
+Outputs this documentation.
+
+=item B<-v>
+
+Be verbose about progress.
+
+=item B<-d>
+
+Delete messages after fetching them.
+
+=item B<-s server>
+
+The name of the server to use. This argument is mandatory.
+
+=item B<-u user>
+
+The username to use in the connection to the POP server.
+
+=item B<-p password>
+
+The password to authenticate the POP session.
+
+=item B<-x exclude>
+
+A regular expression that, upon matching the message, causes it to be
+discarded.
+
+=item B<-S separator>
+
+The separator to use. Defaults to B<___END_OF_REPORT___> to be
+consistent with other components of the distribution.
+
+=back
+
+=cut
+
+    ;
+use vars qw/ $opt_d $opt_x $opt_u $opt_p  $opt_s $opt_S $opt_t $opt_h $opt_v /;
+
+getopts('dhu:p:x:s:S:vt:');
+
+pod2usage(verbose => 2) if $opt_h;
+pod2usage(verbose => 1, message => 'No server specified') unless $opt_s;
+pod2usage(verbose => 1, message => 'No user/pass specified') 
+    unless $opt_u and $opt_p;
+
+$opt_S = '___END_OF_REPORT___' unless $opt_S;
+
+$opt_x = qr/$opt_x/ if $opt_x;
+
+my $pop3 = Net::POP3->new($opt_s);
+
+die "Failed to connect to server $opt_s: $!\n"
+    unless $pop3;
+
+warn "Connected to $opt_s\n" if $opt_v;
+
+die "Failed to login to POP server $opt_s as $opt_u\n"
+    unless $pop3->login($opt_u, $opt_p);
+
+warn "Logged in as $opt_u\n" if $opt_v;
+
+my $last = ($pop3->popstat)[0];
+
+warn "$last messages will be processed\n" if $opt_v;
+
+for my $count (1 .. $last)
+{
+    my $fh;
+    unless ($fh = $pop3->getfh($count))
+    {
+	warn "Failed to fetch message $count/$last\n";
+	next;
+    }
+
+    my $text = '';
+    $text .= $_ while <$fh>;
+
+    if ($opt_x and $text =~ m/$opt_x/mi)
+    {
+	warn "Message $count discarded\n" if $opt_v;
+	next;
+    }
+
+    print "$text\n$opt_S\n";
+
+    warn "Fetched message $count/$last\n" if $opt_v;
+    if ($opt_d)
+    {
+	$pop3->delete($count);
+	warn "Deleting message $count/$last\n";
+    }
+}
+
+warn "Quitting\n" if $opt_v;
+$pop3->quit;
+
+__END__
+
+=pod
+
+=head1 HISTORY
+
+$Log: popfetch,v $
+Revision 1.2  2004/03/01 15:31:08  lem
+Fixed getopts(d)
+
+Revision 1.1  2004/03/01 15:25:41  lem
+Added bin/popfetch, which is a nice alternative to Mail::Abuse::Reader::POP3
+
+
+=head1 LICENSE AND WARRANTY
+
+This code and all accompanying software comes with NO WARRANTY. You
+use it at your own risk.
+
+This code and all accompanying software can be used freely under the
+same terms as Perl itself.
+
+=head1 AUTHOR
+
+Luis E. Muñoz <luismunoz@cpan.org>
+
+=head1 SEE ALSO
+
+perl(1), C<acat(1)>, C<Mail::Abuse>
+
+=cut
+

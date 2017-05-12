@@ -1,0 +1,31 @@
+---
+abstract: 'The Illicit Love Child of Mouse and POE'
+author:
+  - 'Chris Prather <chris@prather.org>'
+  - 'Ash Berlin <ash@cpan.org>'
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+  - 'Yuval (nothingmuch) Kogman'
+  - 'Torsten Raudssus <torsten@raudssus.de> L<http://www.raudssus.de/>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Fatal: '0.003'
+  Test::More: '0.90'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MouseX-POE
+requires:
+  Mouse: '0.92'
+  MouseX::NativeTraits: '1.04'
+  POE: '1.311'
+resources:
+  homepage: https://github.com/bingos/mousex-poe
+  repository: https://github.com/bingos/mousex-poe.git
+version: '0.216'

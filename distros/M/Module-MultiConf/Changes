@@ -1,0 +1,76 @@
+libmodule-multiconf-perl (1.0401-1) UNRELEASED; urgency=low
+
+  * Move to Module::Install
+  * Fix MANIFEST file
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sat,  8 Nov 2008 16:31:44 +0000
+
+libmodule-multiconf-perl (0.0301-1) unstable; urgency=low
+
+  * Options in validate_with can now be poked by calling module
+  * Also, validation can be disabled
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Fri, 21 Sep 2007 12:30:00 +0100
+
+libmodule-multiconf-perl (0.0300-1) unstable; urgency=low
+
+  * Many thanks to Tom Hukins for assisting with the mysterious t/31 bug
+  * Alter Config::Any call to call use_ext => 1
+  * Fixed a bug Tom spotted in arg-less call to new
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Tue, 24 Jul 2007 09:50:00 +0100
+
+libmodule-multiconf-perl (0.0201-1) unstable; urgency=low
+
+  * Fix CPAN index of example
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Mon, 23 Jul 2007 21:24:00 +0100
+
+libmodule-multiconf-perl (0.0200-1) unstable; urgency=low
+
+  * Set dodgy test t/31 to TODO. Please, if you find a problem with this
+    module do get in touch, I would really appreciate a hand, as I cannot
+    reproduce the bug in t/31 on my own system.
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Mon, 23 Jul 2007 20:58:00 +0100
+
+libmodule-multiconf-perl (0.0100-06-1) unstable; urgency=low
+
+  * Set SUFFIX on temp filename
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sun, 22 Jul 2007 19:01:00 +0100
+
+libmodule-multiconf-perl (0.0100-05-1) unstable; urgency=low
+
+  * Split t/30 into two tests
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Tue, 17 Jul 2007 19:21:00 +0100
+
+libmodule-multiconf-perl (0.0100-04-1) unstable; urgency=low
+
+  * t/30 fails on some platforms, but cannot reporduce error locally
+  * add SEE ALSO to docs
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sun, 15 Jul 2007 10:23:00 +0100
+
+libmodule-multiconf-perl (0.0100-03-1) unstable; urgency=low
+
+  * Add example files to MANIFEST
+  * Remove use_ok from test files, needs proper use
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Thu, 12 Jul 2007 15:22:00 +0100
+
+libmodule-multiconf-perl (0.0100-02-1) unstable; urgency=low
+
+  * Remove restriction of only two arguments.
+  * Tighten up import() routing when run under testing
+  * Add example files
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sun,  8 Jul 2007 18:31:54 +0100
+
+libmodule-multiconf-perl (0.0100-01-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sat,  7 Jul 2007 18:19:54 +0100
+

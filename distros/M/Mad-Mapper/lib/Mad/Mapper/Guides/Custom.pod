@@ -1,0 +1,70 @@
+=head1 NAME
+
+Mad::Mapper::Guides::Custom - How to do custom queries
+
+=head1 OVERVIEW
+
+This guide will show how to run custom queries for full control.
+
+=head1 GUIDE
+
+=head2 Half control
+
+It is possible to override the private methods C<_find_sql()>,
+C<_insert_sql()>, C<_update_sql()> and C<_delete_sql()> for more
+control. The benefit of overriding these methods is if you want
+to use optional columns for doing queries. The example below can
+find a row based on both the "id" and "email" column.
+
+  sub _find_sql {
+    my $self = shift;
+
+    if ($self->email) {
+      return $self->expand_sql("SELECT %pc FROM %t WHERE email=?"), $self->email;
+    }
+    else {
+      return $self->expand_sql("SELECT %pc FROM %t WHERE id=?"), $self->id;
+    }
+  }
+
+=head2 Full control
+
+Instead of using the automatic generated methods from simple SQL statements,
+it is possible to do the complete query yourself. Below is an example of a
+completely custom C<_insert()>:
+
+  package MyApp::Model::User;
+  use Mad::Mapper -base;
+
+  sub _insert {
+    my ($self, $cb) = @_;
+
+    Mojo::IOLoop->delay(
+      sub {
+        my ($delay) = @_;
+        $self->db->query("INSERT INTO users (email) VALUES (?)", $self->email, $delay->begin);
+      },
+      sub {
+        my ($delay, $err, $res) = @_;
+        return $self->$cb($err) if $err;
+        $self->in_storage(1);
+        $self->id($db->dbh->last_insert_id(undef, undef, $self->table, $self->pk));
+        $self->$cb("");
+      },
+    );
+  }
+
+You can also override C<_find()>, C<_update()> and C<_delete()>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014-2016, Jan Henning Thorsen
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License version 2.0.
+
+=head1 AUTHOR
+
+Jan Henning Thorsen - C<jhthorsen@cpan.org>
+
+=cut

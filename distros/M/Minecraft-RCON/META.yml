@@ -1,0 +1,21 @@
+---
+abstract: 'Handles talking to the Minecraft remote console'
+author:
+  - 'Fredrik Vold <fredrik@webkonsept.com>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Minecraft-RCON
+provides:
+  Minecraft::RCON:
+    file: lib/Minecraft/RCON.pm
+    version: v0.1.4
+requires:
+  IO::Socket: 1.18
+  Term::ANSIColor: 3.02
+  perl: v5.8.8
+version: v0.1.4

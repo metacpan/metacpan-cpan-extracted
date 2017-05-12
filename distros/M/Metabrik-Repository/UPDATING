@@ -1,0 +1,495 @@
+20170110
+   AFFECTS: client::elasticsearch
+
+   - client::elasticsearch count_shards Command now returns the total number of shards instead 
+     of a HASH of indices status. Use list_indices_status if you want information about 
+     status of indices.
+   - client::elasticsearch open_bulk_mode, open_scroll_scan_mode and open_scroll Commands 
+     do not have a 3rd and 4th Argument anymore. And they require user to call open Command 
+     before being able to use them.
+   - client::elasticsearch count_*_shards renamed to count_*_indices
+   - client::elasticsearch import_from_csv do not take a 4th Argument anymore (size)
+
+20161227
+   AFFECTS: client::elasticsearch
+
+   - client::elasticsearch import_from_csv returned HASH has processed key renamed 
+     to imported and added key removed
+
+20161218
+   AFFECTS: client::elasticsearch
+
+   - client::elasticsearch timeout Attribute renamed to rtimeout
+
+20161213
+   AFFECTS: client::elasticsearch
+
+   - client::elasticsearch import_from_csv now returns a HASH instead of a SCALAR.
+     This HASH has read and processed keys.
+
+20161119
+   AFFECTS: client::elasticsearch
+
+   - client::elasticsearch export_as_csv Command now takes only two Args: index and size
+
+20161114
+   AFFECTS: file::csv
+
+   - file::csv append Attribute now defaults to 1
+   - file::csv overwrite Attribute now defaults to 0
+
+20161112
+   AFFECTS: client::elasticsearch
+
+   - client::elasticsearch get_cluster_health, get_process, get_stats_process now returns a HASH
+   - client::elasticsearch all Commands previously accepting a node as Argument do not anymore except for open* Commands
+
+20161029
+   AFFECTS: database::mysql, database::sqlite
+
+   - database::mysql renamed to client::mysql
+   - database::sqlite renamed to client::sqlite
+
+20161015
+   AFFECTS: forensic::volatility, system::virtualbox
+
+   - forensic::volatility pslist, netscan, hivelist Commands to return a parsed ARRAY of HASHes 
+   - system::virtualbox snapshot_list Command to return a parsed ARRAY of HASHes
+
+20161009
+   AFFECTS: database::redis
+
+   - database::redis Brik renamed to client::redis
+
+20161006
+   AFFECTS: system::freebsd::jail
+
+   - system::freebsd::jail Brik renamed to system::freebsd::ezjail
+
+20161005
+   AFFECTS: shell::command
+
+   - shell::command use_globbing Attribute default value change to false
+
+20160928
+   AFFECTS: system::docker
+
+   - system::docker delete Command now returns $name of deleted image
+
+20160927
+   AFFECTS: devel::git, devel::subversion, devel::mercurial, brik::tool
+
+   - devel::git, devel::subversion, devel::mercurial clone Command now returns target directory
+   - brik::tool create_brik and create_tool Command now return create filename
+
+20160406
+   AFFECTS: client::elasticsearch
+
+   - database::rir rir key renamed to source in returned data from next_record Command
+
+20160402
+   AFFECTS: system::file
+
+   - system::file create Command now returns created filename
+
+20160330
+   AFFECTS: client::elasticsearch
+
+   - client::elasticsearch query Command changes in query Argument structure, see SYNOPSIS
+
+20160328
+   AFFECTS: client::rsync
+
+   - client::rsync source_root and destination_root Attributes removed
+   - client::rsync sync Argument passing changed, no more auto-add of source/dest prefix
+
+20160321
+   AFFECTS: file::csv, client::whois, lookup::countrycode
+
+   - file::csv separator Attribute default value changed from `;' to `,' character
+   - client::whois parse_raw_whois Command renamed to parse_raw_ip_whois
+   - lookup::countrycode country_code_types Command renamed to list_types
+   - lookup::countrycode output Attribute removed
+
+20160226
+   AFFECTS: client::elasticsearch
+
+   - client::elasticsearch count Command to return only count score and no more a HASH
+
+20160224
+   AFFECTS: database::elasticsearch, client::elasticsearch
+
+   - database::elasticsearch obsolete
+   - database::elasticsearch replaced by server::elasticsearch and client::elasticsearch
+   - client::elasticsearch index_name Attribute renamed to index
+   - client::elasticsearch type_document Attribute renamed to type
+   - client::elasticsearch bulk_mode Attribute removed
+   - client::elasticsearch open Command Arguments changed, see help
+   - client::elasticsearch open Command Arguments changed, see help
+   - client::elasticsearch index Command renamed to index_document
+   - client::elasticsearch get Command renamed to get_from_id
+   - client::elasticsearch delete Command renamed to delete_index
+   - client::elasticsearch stop, start, status Commands removed (put in server::elasticsearch)
+   
+20160223
+   AFFECTS: client::elasticsearch
+
+   - client::elasticsearch list_indices Command renamed to show_indices
+
+20160213
+   AFFECTS: format::lncs, www::splunk
+
+   - format::lncs make_dvi and make_pdf Commands second Argument replaced by style file Argument
+   - format::lncs Brik renamed to format::latex
+   - www::splunk is obsolete, use client::splunk instead
+   - api::splunk max_count Attribute renamed to count
+   - api::splunk check_search_jobs_status Command renamed to search_jobs_sid
+   - api::splunk get_search_jobs_content Command renamed to search_jobs_sid_results
+   - api::splunk search_jobs_sid_results second Argument changed to count Attribute
+
+20160208
+   AFFECTS: client::whois, client::ssh
+
+   - client::whois ip Command renamed to from_ip
+   - client::whois domain Command renamed to from_domain
+   - client::ssh removed cat and listfiles Commands
+
+20160129
+   AFFECTS: system::process, network::portscan
+
+   - system::process daemonize Command renamed to start
+   - system::process close_output_on_daemonize Attribute renamed to close_output_on_start
+   - network::portscan tcp_syn Command renamed to tcp_syn_scan
+   - network::portscan no IPv4/IPv6 detection anymore, creation of use_ipv6 Attribute for that
+
+20160126
+   AFFECTS: file::compress
+
+   - file::compress uncompress Command always returns an ARRAY of uncompressed files
+   - file::compress unzip Command always returns an ARRAY of uncompressed files
+
+20160116
+   AFFECTS: network::tor
+
+   - network::tor obsolete, exit_nodes_list Command moved to server::tor list_exit_nodes Command
+
+20160111
+   AFFECTS: network::iptables
+
+   - network::iptables Brik renamed to network::linux::iptables
+
+20160109
+   AFFECTS: remote::wmi
+
+   - remote::wmi execute Command moved to its own Brik called remote::winexe
+   - remote::wmi request Command now returns an ARRAY of HASHes with parsed output
+
+20151230
+   AFFECTS: client::ssh, database::sqlite, shell::history, shell::rc, shell::script,
+           system::docker, system::freebsd::jail, log::dual, network::sqlmap
+
+   - all renamed exec and load_and_exec Commands to execute and load_and_execute
+   - log::dual renamed output_file Attribute to output
+   - network::sqlmap renamed output_file Attribute to output
+
+20151228
+   AFFECTS: network::address
+
+   - network::address renamed ipv4_routable_ranges Command to ipv4_public_ranges
+
+20151226
+   AFFECTS: convert::video
+
+   - convert::video renamed to video::convert
+
+20151220
+   AFFECTS: shell::rc, shell::script
+
+   - shell::rc renamed file Attribute to input
+   - shell::script renamed file Attribute to input
+
+20151215
+   AFFECTS: brik::tool, system::file
+
+   - brik::tool renamed install_ubuntu_packages to install_packages
+   - system::file get_mime_type, get_magic_type, is_mime_type and is_magic_type Commands
+     moved to new file::type Brik
+
+20151203
+   AFFECTS: brik::tool
+
+   - brik::tool renamed install_perl_modules Command to install_modules
+
+20151129
+   AFFECTS: file::create, file::fetch, server::agent
+
+   - file::create merged with system::file
+   - file::fetch merged with client::www (get Command is now mirror Command)
+   - server::agent is obsolete
+
+20151128
+   AFFECTS: network::arp, network::grep, network::read, file::pcap
+
+   - network::arp renamed max_read Attribute to count
+   - network::grep renamed from_string Command to from_network
+   - network::grep from_network Command now returns an ARRAY of matched frames
+   - network::read renamed max_read Attribute to count
+   - network::read read_next Command now always returns an ARRAY
+   - file::pcap read_next Command now always returns an ARRAY
+
+20151126
+   AFFECTS: network::dns
+
+   - network::dns renamed check_version Command to version_bind
+   - network::dns version_bind now returns only a SCALAR with $version and not a HASHREF
+
+20151122
+   AFFECTS: network::read
+
+   - network::read renamed next Command to read_next
+   - network::read renamed next_until_timeout Command to read_until_timeout
+
+20151121
+   AFFECTS: database::vfeed
+
+   - database::vfeed vfeed_version renamed to db_version
+
+20151118
+   AFFECTS: network::arp
+
+   - network::arp: timeout Attribute renamed to rtimeout for normalization purposes
+
+20151115
+   AFFECTS: address::generate
+
+   - address::generate ip_count Attribute renamed to count
+
+20151112
+   AFFECTS: client::dns, client::ssh, client::udp, client::tcp, client::whois, email::mbox, file::read
+
+   - client::dns timeout Attribute renamed to rtimeout (timeout Attribute is used to tag 
+     a specific error condition  like eof Attribute)
+   - client::ssh renamed readall Command to read, readline Command to read_line, readlineall 
+     Command to read_line_all
+   - client::udp renamed read Command to read_size and readall Command to read
+   - client::tcp renamed read Command to read_size and readall Command to read
+   - client::whois renamed available Command to is_available_domain
+   - client::whois removed expire, netname and abuse Commands
+   - email::mbox renamed read_all Command to read and read Command to read_next
+   - file::read renamed readall Command to read
+
+20151110
+   AFFECTS: audit::dns, client::rest
+
+   - audit::dns Commands (all Commands) now return different content for results. Example:
+     version Command: return { $nameserver => 'undef' }; # If the server does not support
+     version.
+   - client::rest: default output mode switched from XML to JSON
+
+20151031
+   AFFECTS: remote::ssh2
+
+   - remote::ssh2 renamed to client::ssh
+
+20151027
+   Metabrik 1.10 released
+
+20151011
+   AFFECTS: network::arp
+
+   - network::arp scan Command now returns a hashref with results sorted 
+     with keys named by_mac, by_ipv4 and by_ipv6
+
+20151003
+   AFFECTS: network::rsync
+
+   - network::rsync renamed to client::rsync
+
+20150418
+   AFFECTS: crypto::x509
+
+   - Argument order changed for ca_sign_csr and cert_verify Commands
+
+20150322
+   AFFECTS: file::csv
+
+   - removed get_col_by_name and get_col_by_number obsolete Commands
+
+20150319
+   Metabrik 1.08 released
+
+20150316
+   AFFECTS: http::proxy, iana::countrycode, network::arpdiscover
+
+   - http::proxy Brik renamed to proxy::http
+   - iana::countrycode Brik renamed lookup::countrycode
+   - network::arpdiscover removed: merged with network::arp
+
+20150311
+   AFFECTS: client::www
+
+   - post Command returns an HASHREF i/o of WWW::Mechanize object
+
+20150309
+   AFFECTS: network::portscan
+
+   - synscan Command renamed to tcp_syn
+
+20150226
+   AFFECTS: lookup::ethernet, lookup::ip, lookup::*
+
+   - string Command renamed to from_string
+   - int Command renamed to from_dec
+   - hex Command renamed to from_hex
+   - from_* Commands return 'unknown' in case no match is found instead of undef
+
+20150220
+   AFFECTS: network::whois
+
+   - rename domain Command to target
+
+20150217
+   AFFECTS: network::frame
+
+   - interface Attribute renamed to device_info
+   - update_interface Command renamed to update_device_info
+
+20150216
+   AFFECTS: network::device
+
+   - list Command returns an ARRAY of available devices
+   - get Command returns a HASH of attributes for a given device
+   - default Command returns default device name or a list of possible default names
+
+20150210
+   AFFECTS: file::compress
+
+   - unzip/gunzip Commands return $datadir instead of System Command result
+
+20150124
+   AFFECTS: database::elasticsearch, system::os
+
+   - database::elasticsearch search Command renamed to query
+   - database::elasticsearch new Command: search using query string
+   => http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax
+   - system::os arch Command now returns an ARRAYREF with arch name and number of bits
+
+20150122
+   AFFECTS: database::elasticsearch, file::csv
+
+   - database::elasticsearch open Command now returns connected nodes as an ARRAYREF
+   - file::csv read Command now returns partial data in case of incomplete read
+
+20150116
+   AFFECTS: network::dns
+
+   - network::dns lookup Command now takes host, query type and nameserver as Arguments
+
+20150107
+   AFFECTS: address:generate, convert::video, file::compress, server::http
+
+   - address::generate output_directory Attribute renamed to datadir
+   - conver::video output_directory Attribute renamed to datadir
+   - file::compress destdir Attribute renamed to datadir
+   - server::http root_directory Attribute renamed to datadir
+
+20150104
+   AFFECTS: database::cwe, database::keystore, file::json, iana::countrycode, log::dual
+
+   NOTE: require_used property is now deprecated
+
+   - database::cwe update Command returns destination datadir i/o status code
+   - database::keystore search Command returns ARRAYREF i/o status code
+   - file::json write Command returns output filename i/o string
+   - iana::countrycode country_code_types Command must take an argument containing data
+   - iana::countrycode load Command returns ARRAYREF i/o HASHREF
+   - iana::countrycode save Command must take a data argument
+   - log::dual error Command returns undef to state an error condition
+
+20141231
+   AFFECTS: file::csv
+
+   - switching from using Text::CSV::Hashify to Text::CSV
+   - renamed has_header Attribute to first_line_is_header
+   - changed default for Attribute first_line_is_header from 0 to 1
+   - removed key Attribute
+   - removed format Attribute
+   - read Command can now returns an ARRAY of HASHes or an ARRAY of ARRAYs
+
+20141229
+   AFFECTS: string::uri
+
+   - parse Command returns an HASHREF instead of a URI object
+
+20141227
+   AFFECTS: time::universal
+
+   - renamed timezone_list Command to list_timezones
+   - renamed timezone_search Command to search_timezone
+   - localtime now returns a HASHREF instead of a string
+   - timezone_search now returns an ARRAYREF instead of a string
+   - removed timezone_show Command
+
+20141220
+   AFFECTS: database::nvd
+
+   - removed Attributes uri_* and xml_*
+   - renamed xml Attribute to loaded_xml
+   - search Command renamed to cve_search
+   - getxml Command renamed to get_cve_xml
+   - search_by_cpe Command renamed to cpe_search
+
+20141216
+   AFFECTS: network::address
+
+   - removed default value for subnet Attribute
+   - block Command removed
+   - iplist Command renamed to ipv4_list
+   - first Command renamed to network_address
+   - last Command renamed to broadcast_address
+
+20141129
+   AFFECTS: address::netmask, network::netbios
+
+   - address::netmask renamed to network::address
+   - network::netbios nodestatus Command renamed to probe Command
+
+20141123
+   AFFECTS: system::route, system::arp
+
+   - system::route renamed to network::route
+   - system::arp renamed to network::arp
+
+20141119
+   AFFECTS: encoding::base64, encoding::hexa, encoding::html, encoding::json, encoding::rot13, encoding::xml
+            encoding::utf8
+
+   - encoding::utf8 removed
+   - encoding::* renamed to string::*
+
+20141116
+   AFFECTS: netbios::name, scanner::sqlmap, scanner::nikto, scanner::nmap, ssdp::ssdp, www::client
+
+   - netbios::name renamed to network::netbios
+   - scanner::nmap renamed to network::nmap
+   - scanner::sqlmap renamed to network::sqlmap
+   - scanner::nikto renamed to network::nikto
+   - ssdp::ssdp renamed to network::ssdp
+   - www::client renamed to client::www
+
+20141115:
+   AFFECTS: file::write
+
+   - text Command renamed to write
+   - write Command must now be called after an open Command
+   - close Command must now be called manually
+
+20141114:
+   AFFECTS: file::read
+
+   - text Command renamed to readall
+   - readall Command must now be called after an open Command
+   - json Command removed
+   - xml Command removed
+   - close Command must now be called manually
+

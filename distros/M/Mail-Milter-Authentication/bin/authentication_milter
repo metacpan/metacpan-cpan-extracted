@@ -1,0 +1,353 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use JSON;
+use List::MoreUtils qw{ uniq };
+use Mail::Milter::Authentication;
+use Mail::Milter::Authentication::Protocol::Milter;
+use Mail::Milter::Authentication::Protocol::SMTP;
+use Mail::Milter::Authentication::Config qw{ get_config default_config };
+use Module::Load;
+use Pod::Usage;
+
+# CONFIG
+my $pid_file = '/run/authentication_milter.pid';
+my $daemon = 0;
+my $help   = 0;
+my $prefix;
+my $control;
+my $ident;
+
+GetOptions (
+    "daemon"    => \$daemon,
+    "control=s" => \$control,
+    "pidfile=s" => \$pid_file,
+    "help:s"    => \$help,
+    "prefix=s"  => \$prefix,
+    "ident=s"   => \$ident,
+) or die "Error in command line arguments\n";
+
+# Reconstruct relevant ARGV line for restart
+push @ARGV, '--daemon' if $daemon;
+push @ARGV, '--pidfile=' . $pid_file if $pid_file;
+push @ARGV, '--prefix=' . $prefix if $prefix;
+push @ARGV, '--ident=' . $ident if $ident;
+
+if ( $help eq q{} ) {
+    usage();
+    exit 0;
+}
+elsif ( $help ) {
+    if ( $help eq 'installed' ) {
+        modules_installed();
+    }
+    elsif ( $help eq 'default_config' ) {
+        show_default_config();
+    }
+    else {
+        module_usage( $help );
+    }
+    exit 0;
+}
+
+if ( $prefix ) {
+    $Mail::Milter::Authentication::Config::PREFIX = $prefix;
+}
+
+if ( $ident ) {
+    $Mail::Milter::Authentication::Config::IDENT .= '_' . $ident;
+}
+
+if ( $control ) {
+    Mail::Milter::Authentication::control({
+        'command'    => $control,
+        'pid_file'   => $pid_file,
+    });
+    exit 0;
+}
+
+Mail::Milter::Authentication::start({
+    'pid_file'   => $pid_file,
+    'daemon'     => $daemon,
+});
+
+sub usage {
+    pod2usage( -verbose => 2 );
+    return;
+}
+
+sub module_usage {
+    my ( $module ) = @_;
+    $module =~ s/[^a-zA-Z0-9]//g;
+    my $full_module = 'Mail::Milter::Authentication::Handler::' . $module;
+    eval {
+        load $full_module;
+    };
+    if ( my $error = $@ ) {
+        die "Could not find help for $module";
+    }
+
+    my $part_path = $full_module;
+    $part_path =~ s/::/\//g;
+    $part_path .= '.pm';
+
+    my $module_file = $INC{ $part_path };
+    if ( ! $module_file ) {
+        die "Could not find help for $module";
+    }
+    pod2usage( -input => $module_file, -verbose => 2 );
+
+    return;
+}
+
+sub modules_installed {
+    my $installed_handlers = Mail::Milter::Authentication::get_installed_handlers();
+    print "Authentication Milter\n\n";
+    print join( "\n    ",
+        'Installed handlers:',
+        uniq sort @$installed_handlers,
+    );
+    print "\n\n";
+    return;
+}
+
+sub show_default_config {
+    my $default_config = default_config();
+    my $json = JSON->new();
+    $json->pretty();
+    $json->canonical( 1 );
+    print $json->encode( $default_config );
+    exit 0;
+}
+
+__END__
+
+=head1 NAME
+
+  Authentication Milter
+
+=head1 USAGE
+
+  authentication_milter [-c|--control <command>] [-d|--daemon] [--pidfile <file>] [-h|--help] [--prefix <dir>] [-i|--ident <ident>]
+
+=head1 OPTIONS
+
+=over
+
+=item -c|--control <command>
+
+  Control a running daemon process or start a new one.
+
+  start|restart
+
+    Start a new daemon process, or restart an existing process.
+
+  stop
+
+    Stop an already running daemon process.
+
+  status
+
+    Show the status of a running daemon process.
+
+
+  Control implies --daemon, and takes account of --pidfile
+  If no valid data is found in the pidfile then control will
+  search the process list for a master process.
+
+  If you are running multiple distinct instances of authentication
+  milter on a single host, each with differing configurations then you
+  should use the --ident identifier to differentiate between them.
+
+=item -h|--help
+
+  Show this help.
+
+=item -h|--help default_config
+
+  Output an example default configuration, including
+  config for all installed handler modules.
+
+=item -h|--help installed
+
+  Show a list of installed handler modules.
+
+=item -h|--help <ModuleName>
+
+  Show help for a particular handler module.
+
+  Modules installed by default include the following.
+
+  AddID Auth DKIM DMARC IPRev LocalIP PTR ReturnOK
+  Sanitize SenderID SpamAssassin SPF TrustedIP TLS
+
+=item -d|--daemon
+
+  detatch from shell and run as a daemon
+
+=item --pidfile <file>
+
+  Write the process PID to the given file.
+  defaults to /run/authentication_milter.pid
+
+=item --prefix <dir>
+
+  Read configuration from dir rather than /etc/
+
+=item -i|--ident <ident>
+
+  A string identifier for use in process management and logging
+
+  This should be used when you are running multiple instances of
+  authentication_milter on a single host, each with different configurations.
+
+=back
+
+=head1 CONFIGURATION
+
+  The milter reads configuration from /etc/authentication_milter.json
+
+  The configuration file format is as follows...
+
+  {
+    "debug"     : 0,                                    | Verbose debugging output
+    "dryrun"    : 0,                                    | Dryrun (do not alter or reject mail)
+    "logtoerr"  : 0,                                    | Also write logs to STDERR
+    "error_log" : "/var/log/authentication_milter.err", | Capture STDERR to logfile
+
+    "connection"             : "inet:12345@localhost",  | The connection to use
+    "umask"                  : "0000",                  | Set umask (for unix socket)
+
+    "connections" : {                                   | Other than the default connection, also bind to
+                                                        | these connections.
+
+        "name_two" : {                                  | Name of connection
+            "connection"   : "unix:/var/sock/a.sock",   | The connection to use
+            "umask"        : "0000",                    | Set umask
+        }
+        "name_one" : {                                  | Name of connection
+            "connection"   : "inet:12346@localhost",    | The connection to use
+        }
+    },
+
+
+    "runas"                  : "nobody",                | Drop privs and run as this user (root only)
+    "rungroup"               : "nogroup",               | Drop privs and run as this group (root daemon only)
+    "chroot"                 : "/path/to/chroot"        | Set chroot before forking (root only)
+                                                        | N.B. This path will need to be setup with all required
+                                                        | files or the server WILL segfault.
+    "listen_backlog"         : 20,                      | socket listen backlog limit (default 20)
+    "min_children"           : 20,                      | Max number of children to pre fork
+    "max_children"           : 200,                     | Max number of children to pre fork
+    "min_spare_children"     : 10,                      | Min number of spare children to maintain
+    "max_spare_children"     : 20,                      | Max number of spare children to maintain
+    "max_requests_per_child" : 200,                     | Max number of requests per child process (prefork)
+
+    "metric_port"            : 8081,                    | Optional port on which to expose metrics interface
+    "metric_host"            : "127.0.0.1",             | Optional host for binding metrics interface
+
+    "protocol"               : "milter",                | The protocol the milter is to use
+                                                        | can be either milter or smtp
+
+
+    "smtp" : {                                          | Parameters for use when protocol is smtp
+        "server_name"    : "scan.example.com",          | The server name to use for the server
+        "sock_type"      : "inet",                      | Socket type (inet or unix)
+        "sock_host"      : "localhost",                 | Host to connect to (when inet)
+        "sock_port"      : "2525",                      | Port to connect to (when inet)
+        "sock_path"      : "/var/run/smtp.sock",        | Socket path to connect to (when unix)
+        "timeout_in"     : "10",                        | Timeout when waiting for inbound SMTP data
+        "timeout_out"    : "10",                        | Timeout when waiting for outbound SMTP data
+        "pipeline_limit" : "50",                        | Limit the number of transactions accepted in an SMTP pipeline
+        "queue_type"     : "before",                    | SMTP Queue type, either before or after. After queues have
+                                                        | an upstream queue ID, before queues do not.
+
+        "tcp:12346" : {                                 | Outbound SMTP details can be set per inbound port/socket
+                                                        | This allows outbound SMTP to be routed differently for
+                                                        | different inbound ports. The key is the inbound port specified
+                                                        | as unix:<socket path> or inet:<port>
+                                                        | It is not currently possible to set based on listening host.
+                                                        | If a specific config set is not found them we use the default
+                                                        | set as defined above.
+            "server_name" : "scan.example.com",         | The server name to use for the server
+            "sock_type"   : "inet",                     | Socket type (inet or unix)
+            "sock_host"   : "localhost",                | Host to connect to (when inet)
+            "sock_port"   : "2526",                     | Port to connect to (when inet)
+            "timeout_in"  : "10",                       | Timeout when waiting for inbound SMTP data
+            "timeout_out" : "10"                        | Timeout when waiting for outbound SMTP data
+        },
+        "unix:/var/sock/a.sock" : {
+            "server_name" : "util.example.com",
+            "sock_type"   : "unix",
+            "sock_path"   : "/var/run/smtp.sock",
+            "timeout_in"  : "10",
+            "timeout_out" : "10"
+        }
+
+    },
+
+                                                        | Timeouts for callbacks, should be slightly lower
+                                                        | than the corresponding timeouts in Postfix
+                                                        | Timeouts are ignored if missing.
+    "connect_timeout"       : 30,                       | Timeout for Connect callbacks
+    "command_timeout"       : 30,                       | Timeout for Helo,Mail,Rcpt,Data and Unknown callbacks
+    "content_timeout"       : 300,                      | Timeout for Header,Eoh, Body and Eom callbacksa
+
+    "dns_resolvers"         : [                         | Explicit list of DNS resolvers to use
+        "8.8.8.8",
+        "127.0.0.1"
+    ],
+    "dns_timeout"           : 10,                       | Timeout for DNS lookups
+    "dns_retry"             : 2,                        | Number of times a lookup will retry per call
+
+    "tempfail_on_error"               : "1",            | Tempfail on errors
+    "tempfail_on_error_authenticated" : "0",            | Tempfail on errors for Authenticated IP Connections
+    "tempfail_on_error_local"         : "0",            | Tempfail on errors for Local IP Connections
+    "tempfail_on_error_trusted"       : "0",            | Tempfail on errors for Trusted IP Connections
+
+    "handlers" : {                                      | Config for each handlers, can be prefixed with !
+                                                        | to disable that handler without having to remove
+                                                        | its config.
+
+        "ActiveModule" : {
+            "foo" : "bar"
+        },
+        "!InactiveModule" : {},
+                                                        | Additionally, config for a module can be placed in a file
+                                                        | with filename /etc/authentication_milter.d/ModuleName.json
+                                                        | the contents of which should be the JSON assigned to the
+                                                        | entry here.
+
+                                                        | Please see the help for each handler for its individual
+                                                        | configuration requirements.
+    }
+  }
+
+=head1 DMARC
+
+This milter uses Mail::DMARC as a backend for DMARC checks, this module requires that a configuration file is setup.
+
+You should create and populate /etc/mail-dmarc.ini
+
+For DMARC reporting you are also required to setup a datastore, including creating a basic table structure.
+The detauls of this are to be found in the Mail::DMARC documentation.
+
+At this time forensic reports are not supported by Mail::DMARC or this milter. Only aggregate reports will be generated.
+
+To check reports please use the dmarc_view_reports command, to send reports please use the dmarc_send_reports command.
+These are included with the Mail::DMARC module.
+
+=head1 AUTHORS
+
+Marc Bradshaw E<lt>marc@marcbradshaw.netE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2017
+
+This library is free software; you may redistribute it and/or
+modify it under the same terms as Perl itself.
+

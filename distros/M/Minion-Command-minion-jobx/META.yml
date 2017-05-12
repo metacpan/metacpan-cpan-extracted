@@ -1,0 +1,26 @@
+---
+abstract: 'The clone of Minion::Command::minion::job but with some output changes.'
+author:
+  - 'Bob Faist <bfaist@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Minion-Command-minion-jobx
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Minion: '5'
+  Mojolicious: '6'
+  perl: '5.006'
+resources:
+  repository: git://github.com/bfaist/Minion-Command-minion-jobx.git
+version: '0.05'

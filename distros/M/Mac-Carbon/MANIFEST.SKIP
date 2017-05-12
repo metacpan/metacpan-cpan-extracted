@@ -1,0 +1,9 @@
+CVS
+\.DS_Store
+\.cvsignore
+\.lwpcookies
+\.releaserc
+MacPerl/XL.xs
+MacPerl/AutoInit.pl
+_do/*
+.*\.bak

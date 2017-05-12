@@ -1,0 +1,26 @@
+NAME
+    Mojo::Server::Morbo::Backend::Inotify - Sample Morbo Inotify watcher
+
+SYNOPSIS
+      my $backend=Mojo::Server::Morbo::Backend::Inotify->new();
+      if ($backend->modified_files) {...}
+
+DESCRIPTION
+    To use this module, start morbo with the argument -b Inotify
+
+METHODS
+    Mojo::Server::Morbo::Backend::Inotify inherits all methods from
+    Mojo::Server::Morbo::Backend.
+
+  modified_files
+    Looks for modified files using Linux::Inotify2
+
+SEE ALSO
+    Mojolicious, Mojolicious::Guides, <http://mojolicious.org>.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008-2017, Marcus Ramberg
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+

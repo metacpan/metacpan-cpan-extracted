@@ -1,0 +1,773 @@
+Vienna again :-(
+http://www.creative.com/soundblaster/soundfont/tutorials/welcome.asp?articleid=54142
+
+The following waorksamples, which would have been useful, have vanished :-(
+wget http://www.creative.com/soundblaster/soundfont/sawpad.wav
+wget http://www.creative.com/soundblaster/soundfont/snare.wav
+wget http://www.creative.com/soundblaster/soundfont/kick.wav
+wget http://www.creative.com/soundblaster/soundfont/hihat.wav
+
+Samples: Importing The Raw Samples
+
+To make a SoundFont bank, you will need a sample. More likely than not,
+you will actually need more than one sample. So let's assume you make
+one synth instrument and a percussion kit with four drums in it. To
+get started, you will need to lead the four needed samples into Vienna
+SoundFont Studio. The file format of the samples must be Microsoft's .wav
+format, Window's standard sound file format. .Wav files can be created
+using either a media recorder (Creative Media Source), or sample editors
+(such as Creative Wave Studio, Sony Sound Forge, or Steinberg WaveLab),
+dumped from sample CDs, or even downloaded from the internet. The process
+of creating .wav files will not be covered in this article.
+
+To get started, download the four samples needed for the examples here
+(ignore this if you have already downloaded these files from the previous
+lesson):
+
+SawPad.wav (125kb)
+Snare.wav (21.7kb)
+Kick.wav (16.6kb)
+Hihat.wav (24.2kb)
+
+The SoundFont Tree View
+The .wav files are first imported into Vienna SoundFont Studio. The
+SoundFont Tree Window in Vienna SoundFont Studio looks like this:
+   SoundFont Bank 
+      Sample Instrument Section
+         User Sample Pool
+         ROM Sample Pool
+      Instrument Pool
+      Preset Section
+         Melodic Pool
+         Percussive Pool
+
+All samples imported into Vienna SoundFont Studio are located in the
+"User Sample Pool" folder in the SoundFont Tree Window. If you right-click
+this folder, you will get a context-sensitive menu with the options:
+ 
+To import your samples, click the "Import User Sample(s)" menu item. From
+here, you will be able to navigate your drives and select the .wav files
+you want to import:
+
+Find the four samples you downloaded from this page, mark them, and click
+"Import." You have now imported your .wav files into Vienna SoundFont
+Studio and should see the samples in the tree list.
+
+-------------------------
+Global Sample Looping
+
+To perfectly make a looped sample, I would recommend you use an advanced
+sample editor such as Sony Sound Forge, or something similar that has a
+cross-fading function. Vienna will successfully import the loop-points
+saved with the .wav file created by such programs.
+
+Vienna SoundFont Studio will also let you loop a sample, but you will
+not be able to change the raw sample data which can only be done through
+a cross-fade operation. Vienna will only allow you to set the End/Start
+loop markers in the raw sample data which makes looping a little difficult
+(but it can be done anyway).
+
+In general, looping is about making a portion of the raw sample data
+repeat itself again and again, resulting in a sustained sound that goes
+on and on. If you enter the looping screen, you will see the following
+(enter the looping screen by left double-clicking the relevant sample
+in the Sample Pool):
+
+The green marker is the "Global Loop-Start" marker while the cyan is the
+"Global Loop-End" marker.
+
+The sample data in between these two markers is the sample data that
+will be repeated over and over again. The green and cyan loop markers
+themselves can be dragged by the mouse for coarse loop marking, while
+fine-tuning of the markers can be done from the extra screen accessible
+from "Loop Settings" (explained below). The reason the loop markers
+are called "Global" loop markers is explained in the section on Local
+Sample Looping.
+
+Normally, the coarse view of the sample is not good enough to make a
+good looping. You will need to be able to see a representation of every
+single sample "dot" in the sample data to make the loop perfect. To
+zoom in on the sample data, you can use the sliders beneath/beside the
+sample data view. It would of course be best if we could actually see
+the "splicing" point of the End/Start loop markers. To do this, click
+"Loop Settings." This will open up an additional area below the sample
+display. The extra space will show the "splicing" point of the loop
+markers and also every sample as needed (1:1 view). The loop markers can
+be changed in actual single samples here, which is essential in making a
+good loop. It is important that the two markers are located on two samples
+("dots") that are very close to each other in value or you will hear an
+audible "click" as the loop repeats itself. Also, the sampled material
+has to be smooth. Here is how the extra space looks:
+
+Try to change the SawPad sample's loop points and hear what happens. The
+SawPad sample was looped in Sound Forge using the CrossFade option which
+makes the loop extremely smooth (more or less perfect, actually). Don't
+count on your loops to be as good as the SawPad loop unless you are
+very lucky. The skill at making a good loop is an art in itself and
+requires keen analysis and experience (along with the proper tools,
+of course). After you have experimented with the loop markers, click
+"Reset" to set the markers back to their initial positions.
+
+Remember that if you make your loops with a full featured sample editor
+(such as Sound Forge), you do not need to worry about looping in Vienna
+SoundFont Studio. The only thing you have to do is enable the looping.
+
+-----------------------------
+
+Instruments
+
+Once you have imported the samples you need and set their global looping
+(if necessary), you can now create the instrument. Let's begin with the
+synth sample named "SawPad," one of those you've just imported. To make
+an instrument of the sample, consult the SoundFont Tree window again:
+   SoundFont Bank 
+      Sample Instrument Section
+         User Sample Pool
+            hihat
+            kick
+            sawpad
+            snare
+         ROM Sample Pool
+      Instrument Pool
+      Preset Section
+         Melodic Pool
+         Percussive Pool
+
+The instruments are all accessed through the "Instrument Pool" folder
+in the SoundFont Tree view. If you right-click this folder, you will get
+another context-sensitive menu with the option to select "New Instrument":
+
+Click "New Instrument" and a new screen will pop up to prompt you for
+the name of the instrument you are creating. For the example, type in
+the name "SawPad - Dry" and click "OK":
+
+This will bring you to the actual screen which allows you to choose
+which of the previously imported samples you would like to use in the
+instrument. All the samples that you have imported earlier will be shown
+here. You can mark several samples if you want the instrument to use
+more than one sample (as with a drum-kit for example), or you can mark
+just one sample if this is enough (as with most instruments).
+
+The screen looks like this: 
+      Select sample(s) to be used for the new Instrument zone(s):
+            hihat
+            kick
+            sawpad
+            snare
+
+If you are making a drum-kit, you should check the "Assign each sample
+to individual key" box. This is a very useful feature - it opens up yet
+another screen that prompts you for the keyboard Key-Number of every drum
+sample you are adding. The Key-Number can be seen at the lower-right
+corner of Vienna when you move the mouse pointer across the graphical
+keyboard of Vienna.
+
+When you have selected the samples you want to use (in this case, only
+the SawPad sample), click "Add" to create the instrument. After clicking
+"Add," you should see the newsly-created instrument in the SoundFont
+Tree view along with all the samples you've included in the instrument
+directly beneath it. Such a sample is now called an "Instrument Zone."
+
+You should be able to play the instrument by hitting a key on your
+keyboard. The sound will be that of the raw, unmodified "SawPad.wav"
+file you imported. You should be able to play the Instrument by hitting
+a key on your keyboard. If you do not have a keyboard connected to your
+computer via a MIDI I/O device (usually the joystick port with a MIDI
+adapter), you can left mouse click on the user interface in Vienna that
+looks like a keyboard. The sound will be that of the raw, unmodified
+"SawPad.wav" file you imported.
+
+The SoundFont Tree view should look like this now: 
+
+   SoundFont Bank 
+      Sample Instrument Section
+         User Sample Pool
+            hihat
+            kick
+            sawpad
+            snare
+         ROM Sample Pool
+      Instrument Pool
+         sawpad - dry
+            sawpad
+      Preset Section
+         Melodic Pool
+         Percussive Pool
+
+If you right-click this newly created instrument (the one with the trumpet
+icon), you will be given the option to add additional samples to this
+instrument just as when you created the instrument in the beginning.
+
+You can also add something called a "Global Zone" this way. Any parameter
+set in a Global Zone will be the global setting for all the samples
+(Instrument Zone) within the instrument. This way, you could set a given
+parameter of all Instrument Zones by simply changing the Global Zone's
+parameter. Just remember that if you change the same parameter in an
+Instrument Zone, this will have the first priority and thus cancel
+the Global Zone's setting (for that particular Instrument Zone only,
+of course).
+
+--------------------------------
+Local Sample Looping
+
+As explained earlier, Global looping was something you did on the samples
+in the Sample Pool. Local looping is instead done on the individual
+Instrument Zones of an Instrument. You enter the Local Loop screen by
+left double-clicking the Instrument Zone for which you wish to change
+Local Looping. The changing of the Local loop markers is the same as with
+the Global Loop markers except that they are specific for that single
+Instrument Zone. Other Instrument Zones may have other Local Loop points
+even though they use the sampe sample. The only thing that all Instrument
+Zones have in common regarding the looping is that their Local Loop
+markers are set to the same as the used sample's Global Loop points. This
+will save you from having to set up the same loop marker positions each
+time you create an Instrument Zone that uses the same sample.
+
+The only difference in the layout of the Global/Local looping screens
+is that the Local Looping screen has two additional check boxes:
+   Enable looping for this sample (y/n)
+and 
+   Release after loop region (y/n)
+
+The first check box lets you enable looping on the sample used by the
+Instrument Zone you are editing. The second check box lets you enable
+the "Release after loop region" feature which will play the sample data
+beyond the Loop-End marker when the key is released on the keyboard. This
+feature is not often used but there will come a time when you will need
+to use it. Remember that the later function is not available unless you
+have enabled the looping for the sample in the first place.
+
+As you may have noticed, the instrument you created in the previous
+chapter (the "SawPad" synth) is abruptly stopped as it reaches the
+end of the raw sample data. It would be nice if the sample was in fact
+looped. Try and make the "SawPad" Instrument Zone loop the sample it
+uses. It should be possible for you to do this with the information from
+this section. The loop points have already been saved with the .wav file,
+so you should not need to set the Global Loop markers yourself.
+
+------------------------------
+
+Keyboard And Velocity Range
+
+Highlighting the "SawPad" Instrument Zone in the SoundFont Tree view
+allows us to change its Keyboard and Velocity ranges. This can be done
+by dragging the low and high end of the Range markers located directly
+beneath the keyboard layout of Vienna SoundFont Studio:
+
+ 
+
+Note the three arrows on top of the keyboard view. The two white arrows
+show the location of the low and high Key-Range, while the red arrow
+shows the "Root-Key" of the current Instrument Zone.
+
+The Root-Key is the key at which the sample plays as originally
+sampled. The Root-Key needs to be the same as the sampled sound or the
+instrument will not play in tune with other instruments (that is, when
+you press the "C" on the keyboard, the instrument should of course play
+a "C" too). This means that if the raw sample you recorded is in fact a
+musical "D" and not a "C" as the red Root-Key arrow indicates above, then
+the sample's root-key is wrong. To change the root-key, just right-click
+on the key-range marker (the one highlighted in the illustration above)
+and a context-sensitive menu will appear with the following options:
+
+   Set to full range 
+   Set to default range 
+   MIDI set range
+   MIDI set root key
+   Properties ....
+
+Select "MIDI Set Root Key" and the following screen will appear: 
+
+   Press a key on you external MIDI keyboard ...
+
+Now play the proper Root-Key on your external keyboard. You will see the
+red arrow move accordingly to the location in the Keyboard View. You can
+also use this feature to set the Start and End Key-Range - just choose
+the "MIDI Set Range" menu item instead. If you do not have an external
+keyboard to do this, change the Root-Key using the "Properties...." menu
+item instead.
+
+If your sample is still slightly out of tune after setting the Root-Key
+(the Root-Key is set in half-tone intervals), you can fine tune the
+Instrument Zone in the "Generator Parameters" view, but this I'll tell
+you about in a later section.
+
+The Velocity Range 
+
+Vienna SoundFont Studio also allows you to change the "Velocity Range"
+of an Instrument Zone. Velocity is a measurement of how hard you play
+an external MIDI keyboard. If you play softly, the keyboard sends low
+velocity values to your computer and if you play hard, it sends high
+velocity values.
+
+NOTE: To test the velocity range with the Vienna user interface, all you
+need to do is click on a different part of the note vertically. Within
+the Vienna user interface, if you left mouse click towards the top of
+the key the note will play softer and if you left mouse click the key
+towards the bottom it will play louder.
+
+Setting the Velocity Range of an Instrument Zone will allow you to make it
+play only if the velocity values are in between two set values. Velocity
+is sent in vlues of between 0 and 127, with 0 being the softest and 127
+the hardest. If you want the Instrument Zone only to play when pressing
+hard, you could set the Velocity Low Range marker to 64 and the Velocity
+High Range marker to 127. This will do the trick.
+
+If you want to change the Velocity Range, you should switch the Keyboard
+View to the Velocity View by clicking the button which is shown depressed
+on the toolbar image below (to switch back to the Keyboard View again,
+click the button directly to the left of the Velocity View button):
+
+You should now see the Velocity View instead of the Keyboard View: 
+
+Changing the Velocity Range is done in the same fashion as the Keyboard
+Range. Drag the Range markers' ends to adjust the Velocity Range of an
+Instrument Zone. The blue region shows the low Velocity values while
+the black region shows the High Velocity values.
+
+How do you make use of this feature? For example, if you have an
+acoustic drum sampled at, let's say, four different hits: low, middle,
+hard and very hard, you will be able to assign the four samples to their
+own Velocity Range, thus simulating the effect of the real instrument
+better. Just remember that the Keyboard Ranges of the four instruments
+must be set to the same range or they will not play on the same pressed
+key.
+
+Now try and experiment a bit. Add a few Instrument Zones. Remove
+them again, and try to change the Key-Ranges, Velocity-Ranges and
+Root-Keys. Also try to make a drum-kit instrument with the three other
+samples you imported: "Kick," "Snare," and "Hihat." Every drum should
+be assigned to its own key on the keyboard.
+
+After creating the drum-kit instrument, add one more sample to it (the
+"Hihat" sample again). When a sample has been imported into the sample
+pool, it is available to all instruments. In other words, the samples
+can be used more than once, which saves a lot of memory.
+
+-----------------------------------
+
+The Generator Panel, Part I
+
+Exactly what is an "Envelope Generator?" Briefly stated, it is a curve
+that tells how a sound is modulated over time, that is, how a sound
+dynamically changes over time.
+
+The Volume Envelope
+The first Envelope we will look at is the "Volume Envelope
+Generator." This envelope can change the volume of a sound as it
+plays. The parameters for this envelope generator are found at the
+bottom of Vienna's screen and look like this (remember to highlight that
+particular Instrument Zone in the SoundFont Tree view for which you wish
+to change the Volume Envelope):
+
+ 
+
+When a sound is first initiated (by hitting a key on your keyboard),
+the volume will always start at "no sound" or zero, and it also ends at
+that value. The Volume Envelope then tells us how the volume will change
+over time from start to end.
+
+When you edit the values of the Envelope Generators, you will see a
+graphical representation of the "curve." It looks like this (it shows
+the curve as a "whole" including all the envelope parameters):
+
+ 
+
+Notice the different envelope phases: Delay, Attack, Hold, Decay, Sustain,
+and finally the Release phase. Here is an explanation of each parameter
+and phase in the Volume Envelope:
+
+Delay
+Before any change in volume starts, there is a delay; that is, no sound
+will be audible before the delay is finished (since the beginning volume
+is always zero). This delay can be set with the "Delay" parameter.
+
+Attack
+When the Delay is through; the volume starts to rise to its maximum
+and does so at a speed equal to the "Attack" parameter. The smaller
+the value, the faster the volume reaches its maximum. This is called
+the "Attack Phase." Remember that when the attack parameter is set to
+anything higher or equal to 0.007, the filter cut-off frequency (to be
+explained later) will be strangely altered to "soften" the sound when
+you press a key gently. It can be used for some nice effects though.
+
+Hold
+When the maximum volume has been reached through the Attack phase,
+the volume can be held there for a given period of time equal to the
+setting of the "Hold" parameter.
+
+Sustain + Decay
+When the "Hold" period is through, the volume will fade down until it
+reaches the value specified by the "Sustain" parameter. The speed at which
+it reaches the Sustain level is determined by the "Decay" parameter. When
+the volume reaches the value of the Sustain value at the end of the Decay
+phase, it will remain there for as long as you hold the key down. When
+you release the key, it will proceed to the "Release Phase."
+
+Release
+When the key is released on the keyboard, the "Release Phase" sets in. The
+Release Phase will take the volume from its current value (depends on
+when you release the key) to zero volume. This Release Phase happens at
+a speed equal to the Release parameter.
+
+It is important to note that the Release Phase will take its starting
+volume level from the volume's current value the moment you release
+the key (which is when the Release Phase will begin). This means that
+other Envelope parameters may be skipped (for example, if you release
+the key before the Attack Phase has ended, you would skip both the Hold,
+Decay and Sustain parameters; the Release Phase is always started when
+the key is released).
+
+Initial Attentuation Key Number To Hold/Decay
+This parameter has a specialized use. It allows you to change the value of
+the Hold and Decay parameter from above according to the key pressed. If
+you play a key above or below the key #60 (the one marked with a dot in
+the Keyboard View), the Hold/Decay parameters will gradually change from
+their initial values. If the Hold/Decay Key-num value is greater than 1,
+the value of the Hold/Decay parameters will fall if a key is pressed
+above key #60, and it will rise if a key below key #60 is pressed.
+
+If the Hold/Decay Key-num value is less than 1, the effect is of course
+reversed. A value of 1 is equal to no change of the Hold/Decay parameters
+(which is the default).
+
+This effect can be used for many purposes - an example would be a piano. A
+piano-string in the high-end of a piano is physically shorter and will
+thus fade more quickly than a low-end piano-string. This effect can be
+simulated using this parameter.
+
+The higher the values in these "Key-num" parameters, the more drastic
+the change will be. Experiment with them as it takes some time to get
+used to them.
+
+The Modulation Envelope (for Filter and Pitch Envelopes) 
+It is also possible to change the Dynamic Filter and the Pitch of the
+sound being played in real-time. The way to do this is similar to the
+Volume Envelope. The Delay, Attack, Hold, Decay, Sustain and Release
+phases are exactly the same as with the Volume Envelope. You just need to
+know what a dynamic filter and pitch actually are in order to understand
+their uses. Remember that when filter enveloping is used, you cannot at
+the same time use pitch enveloping. The filter will somehow cancel out
+the pitch.
+
+Here is the layout of the Modulation Envelope Generator: 
+
+ 
+
+The Dynamic Low-Pass Filter (To Filter Cutoff)
+
+A "Filter" is a piece of hardware that "filters" unwanted frequencies
+away. In short, frequencies that the human ear can hear are from about
+5 to 20.000 KHz. Low frequencies are usually the deep sounds while high
+frequencies are the high sounds. Thus, a hi-hat has much high frequency
+material and a bass very little. The type of filter in the Sound Blaster
+Live! and Sound Blaster Audigy series audio cards is called a "Low-Pass"
+filter. It lets all frequencies below the "Cut-off Frequency" (selectable
+in the "Effects" Parameter section) pass through while higher frequencies
+will be removed. The best way for you to learn what the effect really
+sounds like is for you to hear it yourself.
+
+The lower the value of the "To Filter Cut-off" parameter, the "duller"
+the sound will get during the Envelope phases. If the "To Filter Cut-off"
+value is a positive value, it will get "Brighter" during the Envelope
+phases (but this requires that you lower the "Cut-off" parameter value in
+the "Effects" parameter section as it is by default set to it's maximum
+of 8000 Hz - try 4000 Hz instead [the value can't exceed 8000 Hz]).
+
+Experiment a bit with the filter envelope. The filter envelope can be
+used to create nice cass sounds of virtually any sample. It is also
+useful in combination with the "Filter Q" parameter from the "Effects"
+parameter section (described later) for making cool "Rubber" like sweeps
+for Dance and Techno music.
+
+Dynamic Pitch Bending (To Pitch)
+The pitch of the playing sound can also be changed dynamically as you
+play. The pitch will start off at the normal pitch +/- the value in the
+"To-Pitch" parameter. The value is measured in cents. 1 cent is exactly
+one 100th of a half-note. Thus, if you wanted the pitch to start out,
+let's say, an octave lower than normal, you would write -1200 cents
+(there are 12 half-notes to an octave). When the sound sets in, the
+Envelope Generator will change the pitch according to the Envelope
+parameters. This is quite useful for sound effects and certain instruments
+like, for example, a violin. A violin always plays a bit out of tune
+when the bow hits the string. The pitch bending scheme here can easily
+make that emulation by making a fast "slide" from the "out of tune"
+pitch to the "normal" pitch. Experiment a little with it.
+As a test to see if you've got the idea of the Envelope generators, try
+and change the "extra" drum Instrument Zone you incorporated in the drum
+kit earlier. The drum-kit is lacking a closed hi-hat. This one could be
+created using the Volume Envelope on the extra copy of the open hi-hat.
+
+----------------------------
+
+The Generator Panel, Part II
+
+Now what is an LFO? An LOFO stards for "Low Frequency Oscillator" and as
+in the case of the Sound Blaster Live! and Sound Blaster Audigy series
+audio cards, a sine curve that changes very slowly over time (thus the
+word: Low fr..). A sine curve looks like this:
+
+ 
+
+When you hit a key on the keyboard, the LFO starts to oscillate up and
+down according to the sine curve above. It starts out at zero, then
+goes positive, down to zero again, then negative, and back to zero. This
+procedure goes on and on.
+
+This "Oscillating" can then be applied to the Filter, Pitch and Volume
+of an Instrument Zone. If the oscillating is applied to the Volume,
+you will get a Tremolo effect. If applied to Pitch, you get a Vibrato
+effect and lastly, if applied to the Filter, you get a WahWah effect.
+
+The speed at which the oscillator swings up and down can be set by the
+LFO parameters and so can the level at which it oscillates (the "height"
+of the sine curve). To help you better understand each parameter, here
+is a thorough explanation of view of them:
+
+ 
+
+As you can see, there are two LFOs available within the Sound Blaster
+Live! and Sound Blaster Audigy series audio cards. The Vibrato LFO (the
+lower one in the illustration above) is intended only for manipulating the
+pitch (Vibrato). The top one is meant for manipulating Pitch, Filter, and
+Volume. It is important to know that each of the three parameters assigned
+to the Modulation LFO will oscillate at the same speed (frequency). The
+three parameters can have their own "Level" or "Height," though.
+
+Delay
+This is like with the Envelope Generators. You set an initial delay
+before the oscillator will begin modulating anything.
+
+Frequency
+Defines the frequency or speed at which the LFO will oscillate. Frequency
+is measured in Hz which lets you decide how many times the sine curve will
+repeat itself within one second. This means that a frequency of 1 Hz will
+oscillate through the sine curve in one second. A frequency of 2 Hz will
+oscillate through the sine curve two times a second while a frequency
+of 44.000 Hz will oscillate through the sine curve 44.000 times per
+second! Just remember that it is a Low Frequency Oscillator. The frequency
+setting cannot exceed more than 10 Hz (which is a fair amount anyway).
+
+To Pitch: 
+Here you set the level of the Oscillating Pitch (Vibrato). The level
+measures how "wild" the vibrato will be. Normally a setting of 10 to
+30 is adequate for a nice instrument vibrato; higher settings will be
+too wild and are intended only for wild sound effects. The parameter is
+measured in cents like in the Pitch Envelope. Thus, you can calculate the
+"swing" of the pitch in half-notes by multiplying by 100. For example,
+if you want the pitch to swing an octave up and down, key in "1200"
+in the parameter (an octave is 12 keys or half-notes long).
+
+If the parameter is set to a negative value, the sine curve is
+reversed. This means that the curve does not start positive but negative
+instead. You may think that this does not matter, but it does in some
+cases.
+
+To Filter Cutoff:
+This parameter sets the level of filter modulation as with the pitch. The
+higher the value, the more WahWah effect is produced. Negative values
+again reverse the sine curve.
+
+To Volume:
+This parameter is identical in function to the "To Pitch" and "To Filter
+Cut-off" parameters except that it changes the modulation depth of the
+volume instead, creating a Tremolo effect.
+
+Try to make some wild sound effects using these LFO parameters in
+combination. Some rather strange results are actually possible.
+
+-----------------------------
+
+The Generator Panel, Part III
+
+The "Effects" and "Pitch" parameters in the Generator Parameter section
+let you add Tuning, Chorus, Reverb, Cut-off Filter, etc. to the Instrument
+Zone you are editing. The effects will be applied to the sound as it
+plays, allowing for rich and beautiful sound textures. The "Effects"
+and "Pitch" parameters look like this:
+
+ 
+
+The Pitch Parameters:
+Coarse Tune, Fine Tune and Scale Tune
+The "Pitch" Parameters let you fine-tune the Instrument Zone. The
+"Coarse Tune" parameter tunes in half-notes, the "Fine Tune" in Cents
+(which is a 100th of a half-note) and the "Scale Tune" lets you decide
+how many cents a half-note actually is (100 by default).
+
+The Effects Parameters:
+Filter Q, Filter Cut-off, Reverb, Chorus and Pan
+The "Effects" parameters consist of five parameters that enable you to
+add dynamic effects to the sound. The five parameters are explained in
+depth below:
+
+Filter Q
+The chosen frequency Cut-off point in the "Filter Cut-off" parameter (see
+below) can be enhanced with the "Filter Q" parameter. If, for example,
+the freqency Cut-off point is at 4000 Hz, then any frequencies in the
+sound at 4000 Hz will be enhanced (amplified) by the "Filter Q" parameter.
+
+The "Filter Q" parameter can lead to interesting sounds if you dynamically
+change (real-time) the Filter Cut-off Frequency as the sound is playing
+(many Techno instruments use this feature to a great extent). This can
+be done by using either a Filter Envelope or a Filter LFO modulation,
+or even better, by changing MIDI controllers in your sequencer real-time.
+
+Filter Cut-off
+This parameter lets you set a frequency point at which every frequency
+higher than this point will be removed. For example, if this parameter
+is set to 4000 Hz, then any frequencies in the playing sound which are
+higher than 4000 Hz will be removed. The lower the value, the duller
+the sound gets. In combination with the Filter Q parameter that enhances
+frequencies around the Filter Cut-off point, interesting sounds can be
+made. This type of filter is called a "Low-pass Filter" in technical
+terms. It lets the low frequencies pass and removes the high ones.
+
+Reverb:
+The Sound Blaster Live! and Sound Blaster Audigy series audio cards
+incorporate a hardware effects engine that allows you to add Reverb
+and Chorus effects directly to your sounds. The Reverb simulates
+room reflections in Halls, Rooms, etc. The Reverb type is set using
+the Environmental Audio section of the Sound Blaster Live! Audio
+H.Q. application. Or for users of the Sound Blaster Audigy series audio
+cards, the Audigy EAX Control Panel can be used to adjust the reverb
+type. The amount of this chosen reverb is selectable for each Instrument
+Zone in Vienna SoundFont Studio. The "Reverb" parameter is the one you
+use to set the Reverb Depth of the Instrument Zone you are editing. A
+mono sample will also become a "stereo" sample when Reverb is applied
+to the sound.
+
+Chorus:
+The "Chorus" parameter is set in the same fashion as the "Reverb"
+parameter. Chorus is an effect which simulates more voices playing
+together. Chorus adds "richness" and "warmth" to a sound. It also makes
+a "stereo" sound of a mono sample. Change the parameter and listen
+for yourself.
+
+Pan:
+The "Pan" parameter lets you place the Instrument Zone in the stereo
+perspective. A negative value places the sound more to the left while
+positive values will place the sound to the right. It does not matter
+if the sound is a mono sound; the sound will be placed in the stereo
+perspective anyway.
+
+Try changing the Effects parameters yourself and see what happens.
+
+-----------------------------
+
+Making the Final Preset
+
+Having created the Insrument, the final step now is to make a "Preset." In
+the same way that instruments are made up of samples (all the samples
+in an Instrument make up an Instrument Zone), a Preset is made up of
+Instruments (all the Instruments in a Preset make up a Preset Zone).
+
+If you right-click the "Melodic Pool" folder in the SoundFont Tree
+view, you get a context-sensitive menu which allows you to select a New
+Melodic Preset:
+
+Select "New Melodic Preset" and a new screen appears: 
+
+   Bank number ?
+   Preset number ?
+   Preset name ?
+
+Here you can key in the name of the Preset along with its Bank and Preset
+number. The Bank/Preset number can be anything between 0 and 127.
+
+The standard MIDI language does not allow for more than 128 different
+instruments, so when more are needed, you usually apply to "Bank Change"
+message through MIDI to a synthesizer. This lets the synthesizer choose
+another "Bank" of 128 instruments, thus allowing 128 Banks or 128 Presets
+of different instruments, or 16,384 different Presets in the case of
+the Sound Blaster Live! or the Sound Blaster Audigy series audio cards.
+
+When Vienna opens the above dialog box, it always does a search for empty
+space in the Bank and Preset positions (that is, a space not already
+occupied by another Preset). It then writes this location as the default
+Bank/Preset number, saving you from doing the search yourself (unless you
+want a specific Bank/Preset number for the Preset you are creating). Type
+in the name of the preset "SawPad - Dry" in the name field and click "OK."
+
+Now you get a screen that allows you to choose what instruments to use
+in the Preset you are creating:
+   Select instrument to be used for the new preset zone:
+      Sawpad - dry
+
+When you have chosen the "SawPad - Dry" Instrument, click "Add" to create
+the Preset. You now have the almost-finished Preset in the SoundFont Tree
+view, with all the used instruments directly beneath it (this is called a
+"Preset Zone"):
+
+   SoundFont Bank 
+      Sample Instrument Section
+         User Sample Pool
+            hihat
+            kick
+            sawpad
+            snare
+         ROM Sample Pool
+      Instrument Pool
+         sawpad - dry
+            sawpad
+         drum-kit
+            hihat
+            kick
+            snare
+      Preset Section
+         Melodic Pool
+            000-000 sawpad - dry
+               sawpad - dry
+         Percussive Pool
+            000 drum-kit
+               drum-kit
+
+More Preset Zones can be added just like with the Instrument Zones -
+just right-click the Preset's name (the one with the musical note icon)
+and choose "New Zone." It works just like with the Instrument Zones
+explained earlier. You can also add a Global Zone if you want to.
+
+Now that you have placed the Sawpad Preset, you only need to place the
+Drum-kit. The Drum-kit you created should not be put in the "Melodic
+Pool" folder but rather in the "Percussive Pool" folder instead. It is
+done in exactly the same way as with the "Melodic Pool" except that you
+do not choose a Bank number. You only select a Preset number (Vienna
+finds an empty preset for you). This gives you 128 possible drum-kits
+in one SoundFont file which should be more than enough.
+
+You can save your finished SoundFont file now - it's done! 
+
+--------------------------
+
+Using The SoundFont Bank
+
+Now that you have mastered the creation of a SoundFont bank, all you
+have to do is learn how to use it with your sequencer. There are many
+different sequencers on the market today - to go through all of them
+would be a daring task.
+
+Two prominent sequencers on the market today, Steinberg Cubase SX and
+Cakewalk Sonar both include SoundFont bank management tools within their
+respective applications. It's best to refer to the user manual of your
+sequencer on how to load and manager SoundFont banks.
+
+-------------------------
+
+Conclusion
+
+Well, is this it? Is this all there is to learn about designing sounds
+and instruments in Vienna SoundFont Studio?
+
+No. Definitely not! There is still a lot to learn. Not all aspects of
+Vienna SoundFont Studio have been covered in this tutorial. It's now up
+to you to explore the program further. You'll soon find that there's so
+many clever ways of using Vienna which can lead to interesting sounds
+and effects.
+
+Another tip for any budding musician: get yourself a decent wave editor
+like Sony Sound Forge, Adobe Audition, or Steinberg Wavelab. One of
+these editors, when used with Vienna SoundFont Studio, can sometimes
+create miracles. Starting with the highest quality sampled materials
+is just as important as mastering Vienna SoundFont Studio. With just
+practice and determination, you will be amazed at what you can do with
+a combination of such programs.

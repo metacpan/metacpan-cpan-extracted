@@ -1,0 +1,186 @@
+NAME
+    Math::LinearCombination - sum of variables with a numerical coefficient
+
+SYNOPSIS
+      use Math::LinearCombination;
+      use Math::SimpleVariable; # for the variable objects
+
+      # build a linear combination
+      my $x1 = new Math::SimpleVariable(name => 'x1');
+      my $x2 = new Math::SimpleVariable(name => 'x2');
+      my $lc = new Math::LinearCombination();
+      $lc->add_entry(var => $x1, coeff => 3.0);
+      $lc->add_entry(var => $x2, coeff => 1.7);
+      $lc->add_entry(var => $x2, coeff => 0.3); # so x2 has a coefficient of 2.0
+      print $lc->stringify(), "\n";
+
+      # do some manipulations
+      $lc->negate_inplace(); # reverts the coefficient signs
+      $lc->multiply_with_constant_inplace(2.0); # doubles all coefficients
+ 
+      # evaluate the linear combination
+      $x1->{value} = 3;
+      $x2->{value} = -1;
+      print $lc->evaluate(), "\n"; # prints -14
+
+DESCRIPTION
+    Math::LinearCombination is a module for representing mathematical linear
+    combinations of variables, i.e. expressions of the format
+
+      a1 * x1 + a2 * x2 + ... + an * xn
+
+    with x1, x2, ..., xn variables, and a1, a2, ..., an numerical
+    coefficients. Evaluation and manipulation of linear combinations is also
+    supported. The numerical coefficients a_i and variables x_i are stored
+    as pairs in an internal data structure and should not be manipulated
+    directly. All access and manipulation should be performed through the
+    methods.
+
+    It is important to note that no specific class is required for the
+    variable objects. You can provide objects of any class, provided that
+    the following methods are defined on those objects:
+
+    name()
+        returning a string with the variable name.
+
+    id()
+        returning a unique identifier for that variable. For most
+        applications it will suffice to have id() invoke name().
+
+    evaluate()
+        returning a numerical evaluation of the variable.
+
+    The Math::LinearCombination class was designed together with
+    Math::SimpleVariable. The latter supports all the required methods, and
+    it is thus logical to use only Math::SimpleVariable objects in your
+    linear combinations, or brew your own class which is derived from
+    Math::SimpleVariable.
+
+    The following methods are available for Math::LinearCombination objects:
+
+    $lc = new Math::SimpleVariable([$other_lc])
+        constructs a new Math::SimpleVariable object. An existing
+        Math::SimpleVariable object can be passed to it optionally, in which
+        case a clone of that object is returned. (see also the clone()
+        method).
+
+    $lc = make Math::SimpleVariable($x1,$a1,$x2,$a2,...)
+        also constructs a new Math::SimpleVariable object, but additionally
+        initializes it with variable-coefficient pairs x_i, a_i. The number
+        of arguments should thus be even, and the variable objects need to
+        obey the requirements imposed on variables.
+
+    $lc->clone()
+        returns an exact copy of $lc, with none of the variables or
+        coefficients shared. I.e. you can change the contents of the new
+        (old) linear combination without any impact on the old (new) one.
+
+    $lc->add_entry('var' => $x, 'coeff' => $a)
+        adds the variable $x to the linear combination with $a as
+        coefficient. add_entry() throws an error when a variable with the
+        same id() is already present in the linear combination. So do not
+        use add_entry() for adding linear combinations, but use
+        add_inplace() or the '+' operator (see below) instead.
+
+    $ra_entries = $lc->get_entries()
+        returns a ref to a hash with all the entries of the linear
+        combination. The hash is sorted on the id() of the variables, and
+        each entry is a ref to a hash with the following fields:
+
+        var the variable object
+
+        coeff
+            the numerical coefficient
+
+    @vars = $lc->get_variables()
+        returns an array with all the variable objects in the linear
+        combination. get_variables() is context aware, so you can invoke it
+        as
+
+          $ra_vars = $lc->get_variables
+
+        to return a reference to the array of variables instead. The
+        variables are sorted on their id().
+
+    @coeffs = $lc->get_coefficients()
+        same as get_variables(), but returns the coefficients instead. The
+        coefficients are also sorted on the id() of the corresponding
+        variables.
+
+    $lc->add_inplace($lc2)
+        mathematically adds the Math::LinearCombination object $lc2 to $lc
+        and returns the changed $lc.
+
+    $sum = $lc->add($lc2)
+        mathematically adds $lc2 to $lc. The result is stored in a newly
+        created Math::LinearCombination object. Both $lc and $lc2 are left
+        in the same state as before.
+
+    $lc->negate_inplace()
+        inverts the sign of the coefficient for each variable in the linear
+        combination.
+
+    $diff = $lc->subtract($lc2)
+        mathematically subtracts $lc2 from $lc. The results is stored in a
+        newly created Math::LinearCombination object. Both $lc and $lc2 are
+        left in the same state as before.
+
+    $lc->multiply_with_constant_inplace($c)
+        multiplies each coefficient in $lc with the numerical constant $c.
+
+    $prod = $lc->mult($lc2)
+        mathematically multiplies $lc with $lc2. The result is stored in a
+        newly created Math::LinearCombination object. Both $lc and $lc2 are
+        left in the same state as before.
+
+    $quot = $lc->div($c)
+        divides $lc by the numerical constant $c. The result is stored in a
+        newly created Math::LinearCombination object. $lc is left in the
+        same state as before. Note that it is not possible to divide a
+        linear combination by another linear combination, as the result is
+        generally not a linear combination.
+
+    $eval = $lc->evaluate()
+        evaluates the linear combination $lc numerically, using the values
+        of the variables obtained by invoking evaluate() on them.
+
+    $lc->remove_zeroes()
+        removes all variable-coefficient pairs with zero coefficients from
+        the linear combination. This method is used internally in the
+        methods above, so normally you should never need it.
+
+    $lc->stringify()
+        returns a string representing the linear combination. Returns '0.0'
+        for empty linear combinations.
+
+    In order to make the mathematical manipulation of linear combinations
+    less verbose, a number of operators have been overloaded to use the
+    methods above. The overloaded operators are:
+
+        '+' for adding two linear combinations;
+
+        '-' for subtracting two linear combinations;
+
+        '*' for multiplying two linear combinations;
+
+        '/' for dividing a linear combination by a number;
+
+        and '""' for stringifying a linear combination, i.e. you can use a
+        linear combination objects in any place where interpolation of
+        variables is possible and get the string representation.
+
+SEE ALSO
+    perl(1)
+    the Math::SimpleVariable manpage
+VERSION
+    This is CVS $Revision: 1.2 $ of Math::LinearCombination, last edited at
+    $Date: 2001/10/31 12:57:26 $.
+
+AUTHOR
+    Wim Verhaegen <wimv@cpan.org>
+
+COPYRIGHT
+    Copyright (C) 2001 Wim Verhaegen. All rights reserved. This program is
+    free software; you may redistribute and/or modify it under the same
+    terms as Perl itself.
+

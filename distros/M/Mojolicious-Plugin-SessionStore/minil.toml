@@ -1,0 +1,6 @@
+name = "Mojolicious-Plugin-SessionStore"
+# badges = ["travis"]
+authority="cpan:HAYAJO"
+
+module_maker="ModuleBuildTiny"
+

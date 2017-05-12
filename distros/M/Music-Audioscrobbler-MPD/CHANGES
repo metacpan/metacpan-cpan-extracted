@@ -1,0 +1,100 @@
+CHANGES
+    Release Name: 0.13
+        *   Added option allow_stream, which will allow scrobbling of http
+            streams if set to true (default false). Feature untested.
+
+        *   Fixed bug in password submition (thanks joeblow1102)
+
+        *   Added support for password@host value in MPD_HOST
+
+        *   Searched, without success, for memory leak. If anyone wants to
+            help, uncomment the Storable lines and start looking into it...
+
+        *   Added (documented) support for Proxy server
+
+    Release Name: 0.12
+        *   Fixed bug that sometimes prevented Music::Tag from working at
+            all. Added some level 4 debug messages.
+
+    Release Name: 0.11
+        *   Added musictag_overwrite option. This is false by default. It is
+            a workaround for problems with Music::Tag and unicode. Setting
+            this to true allows Music::Tag info to overwrite info from MPD.
+            Do not set this to true until Music::Tag returns proper unicode
+            consistantly.
+
+    Release Name: 0.1
+        *   Split off all scrobbling code to Music::Audioscrobbler::Submit
+
+        *   Added an error message if file is not found.
+
+        *   Added use warnings for better debugging.
+
+        *   Started using Pod::Readme for README and CHANGES
+
+    Release Name: 0.09
+        *   Added waffelmanna's patch to fix the password submital to MPD.
+
+    Release Name: 0.08
+        *   musicmpdscrobble daemonizes after creating
+            Music::Audioscrobber::MPD object which allows pidfile to be set
+            in options file (thanks K-os82)
+
+        *   Kwalitee changes such as pod fixes, license notes, etc.
+
+        *   Fixed bug which prevented working with a password to mpd.
+
+        *   Fixed bug causing reaper to block.
+
+    Release Name: 0.07
+        *   Fixed Unicode issues with double encoding (thanks slothck)
+
+        *   Stoped using URI::Encode which did NOT solve locale issues.
+
+    Release Name: 0.06
+        *   Configured get_mbid_from_mb to only grab if missing.
+
+        *   Changed to using URI::Encode
+
+        *   Fixed bug preventing log file from loading from command line.
+
+    Release Name: 0.05
+        *   Fixed bug with log file handles (thanks T0dK0n)
+
+        *   Fixed bug caused when music_directory not set (thanks T0dK0n)
+
+        *   Revised Documentation Slightly
+
+        *   Fixed bug in kill function for musicmpdscrobble
+
+        *   Added option get_mbid_from_mb to get missing mbids using
+            Music::Tag::MusicBrainz
+
+    Release Name: 0.04
+        *   Have been assigned Client ID. If you set this in your configs,
+            please remove.
+
+    Release Name: 0.03
+        *   Name change for module. Is now Music::Audioscrobbler::MPD.
+            Uninstall old version to facilitate change!
+
+        *   Repeating a song isn't a skip anymore (or rather skipping back a
+            scrobblable distance is not a skip)
+
+        *   Only submits a song <30 seconds long if it has an mbid.
+
+        *   Very basic test script for sanity.
+
+    Release Name: 0.02
+        *   Fixed bug caused my Music::Tag returning non-integer values for
+            "secs" (thanks tunefish)
+
+        *   Along same lines, configure to not use Music::Tag secs values,
+            but trust MPD
+
+    Release Name: 0.01
+        *   Initial Release
+
+        *   Basic routines for scrobbling MPD. Code from
+            Music::Audioscrobbler merged for now.
+

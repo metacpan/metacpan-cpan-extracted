@@ -1,0 +1,21 @@
+
+% foreach my $item ( @$objects ) {
+
+<h2><% ucfirst $item->moniker %>: <% $item %></h2>
+
+<div class="fleft">
+<div class="ViewTable">
+<% $request->quick_table( labels   => 'L', 
+                          vertical => 1,
+                          object   => $item,
+                          ) %>
+</div>
+
+<% $request->as_form( mode => 'edit_button',   entity => $item )->render %>
+<% $request->as_form( mode => 'delete_button', entity => $item )->render %>
+
+</div>
+
+<& view_all_has_a, object => $item &>
+
+% }

@@ -1,0 +1,22 @@
+Revision history for MooseX::Types::Digest;
+
+1.01   2017-01-24
+       - provided inlined versions of all the types. (pull request from Gregory Oschwald)
+
+1.00   2014-08-22
+       - bump version to 1.00
+
+0.04   2014-08-16
+       - added SHA3 formats SHA3_224, SHA3_256, SHA3_384 and SHA3_512
+
+0.0301 2014-01-05
+       - convert distribution to use Dist::Zilla, no functional changes
+
+0.03   2009-10-27
+       - updated pod and changlog for 0.02
+
+0.02   2009-10-27
+       - added SHA formats 224, 256, 384 and 512 (patch from Stevan Little)
+
+0.01   2009-10-25
+       - Initial release

@@ -1,0 +1,13 @@
+CHANGES
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Math/BaseMulti.pm
+t/author-critic.t
+t/basic.t
+t/release-pod-syntax.t
+t/use.t

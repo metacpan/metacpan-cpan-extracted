@@ -1,0 +1,248 @@
+NAME
+
+    Marketplace::Ebay - Making API calls to eBay (with XSD validation)
+
+VERSION
+
+    Version 0.191
+
+SYNOPSIS
+
+      my $ebay = Marketplace::Ebay->new(
+                                        production => 0,
+                                        site_id => 77,
+                                        developer_key => '1234',
+                                        application_key => '6789',
+                                        certificate_key => '6666',
+                                        token => 'asd12348',
+                                        xsd_file => 'ebay.xsd',
+                                       );
+      my $res = $ebay->api_call('GeteBayOfficialTime', {});
+      print Dumper($res);
+
+    http://developer.ebay.com/Devzone/XML/docs/Concepts/MakingACall.html
+
+DESCRIPTION
+
+ International Selling
+
+    Products propagate from your local selling account to all Ebay sites
+    where you are going to ship your items to:
+
+    http://sellercentre.ebay.co.uk/advanced-international-selling
+
+ACCESSORS
+
+ Credentials
+
+    The following are required for a successful API call.
+
+  developer_key
+
+  application_key
+
+  certificate_key
+
+  token
+
+  site_id
+
+    The id of the site. E.g., Germany is 77.
+
+    https://developer.ebay.com/DevZone/merchandising/docs/Concepts/SiteIDTo
+    GlobalID.html
+
+  xsd_file
+
+    Path to the XSD file with the eBay definitions.
+
+    http://developer.ebay.com/webservices/latest/ebaySvc.xsd
+
+  production
+
+    Boolean. Default to false.
+
+    By default, the API calls are done against the sandbox. Set it to true
+    in production.
+
+  endpoint
+
+    Set lazily by the class depending on the production value.
+
+  compatibility_level
+
+    The version of API and XSD used. Please keep this in sync with the XSD.
+
+  last_response
+
+    You can get the HTTP::Response object of the last call using this
+    accessor.
+
+ last_request
+
+    You can get the HTTP::Request object of the last call using this
+    accessor.
+
+  last_parsed_response
+
+    Return a Marketplace::Ebay::Response object (or undef on failure) out
+    of the return value of the last api_call.
+
+  log_file
+
+    A filename where to log requests and responses.
+
+  name_from_shipping_address
+
+    Passed to Marketplace::Ebay::Order. Defaults to true.
+
+METHODS
+
+ api_call($name, \%data, \%options)
+
+    Do the API call $name with payload in %data. Return the data structure
+    of the Marketplace::Ebay::Response object. In case of failure, return
+    nothing. In this case, you can inspect the details of the failure
+    inspecting, e.g.,
+
+      $self->last_response->status_line;
+
+    With option requires_struct set to a true value, the method doesn't
+    return the object, but a plain hashref with the structure returned (old
+    behaviour).
+
+    With an option no_validate, the XML is parsed using XMLin, not the
+    schema, so the result could be unstable, but on the other hand, you get
+    something out of XML which doesn't comply with the schema.
+
+ prepare_xml($name, \%data)
+
+    Create the XML document to send for the API call $name.
+
+ show_xml_template($call, $call_type)
+
+    Utility for development. Show the expected structure for the API call
+    $call. The second argument is optional, and may be Request or Response,
+    defaulting to Request.
+
+ log_event(@data)
+
+    Append the arguments to the log_file, if it was defined.
+
+CONVENIENCE METHODS
+
+ api_call_wrapper($call, $data, @ids)
+
+    Call Ebay's API $call with data $data. Then check the response and
+    return it. This ends calling $self->api_call($call, $data), but after
+    that the response is checked and diagnostics are printed out. If you
+    want something quiet and which is not going to die, or you're expecting
+    invalid structures, you should use api_call directly.
+
+    Return the response object. If no response object is found, it will
+    die.
+
+ api_call_wrapper_silent($call, $data, @ids)
+
+    Same as api_call_wrapper, but do not emit "warn" on warnings. Just
+    print them out. Also, do not print ids or fees.
+
+ cancel_item($identifier, $id, $reason)
+
+    $identifier is mandatory and can be SKU or ItemID (depending if you do
+    tracking by sku (this is possible only if the sku was uploaded with
+    InventoryTrackingMethod = SKU) or by ebay item id. The $id is mandatory
+    and is the sku or the ebay_id.
+
+    Reason can be one of the following, defaulting to OtherListingError:
+    Incorrect, LostOrBroken, NotAvailable, OtherListingError,
+    SellToHighBidder, Sold.
+
+    It calls EndFixedPriceItem, so this method is useful only for shops.
+
+ delete_sku_variations($sku, \@list_of_sku_variations)
+
+    It uses ReviseFixedPriceItem to cancel variations of a given sku, not
+    passing asking for a deletion, but instead setting the quantity to 0.
+    This because deleting a variation is not possible if a purchase has
+    been done against it.
+
+ get_category_specifics($id)
+
+    Return a dump of the structure found in the GetCategorySpecifics
+
+ get_orders($number_of_days)
+
+    Retrieve the last orders in the last number of days, defaulting to 7.
+    Return a list of Marketplace::Ebay::Order objects. You can access the
+    raw structures with $object->order.
+
+ get_orders_for_site
+
+    Like get_orders, but filter the orders by the site_id of the object
+    (otherwise you pull the orders from all the international sites).
+
+ ebay_site_code_types (internal)
+
+    http://developer.ebay.com/devzone/XML/docs/Reference/ebay/types/SiteCod
+    eType.html turned into an hashref to map the site name to an id.
+
+ ebay_sites_name_to_id
+
+    Return an hashref for mapping ebay site names and abbreviations to a
+    numeric id.
+
+ ebay_sites_id_to_name
+
+    Return an hashref for mapping ebay site id to its name. #
+    http://developer.ebay.com/devzone/XML/docs/Reference/ebay/types/SiteCod
+    eType.html
+
+AUTHOR
+
+    Marco Pessotto, <melmothx at gmail.com>
+
+BUGS
+
+    Please report any bugs or feature requests to bug-marketplace-ebay at
+    rt.cpan.org, or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Marketplace-Ebay. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Marketplace::Ebay
+
+    You can also look for information at:
+
+      * RT: CPAN's request tracker (report bugs here)
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Marketplace-Ebay
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/Marketplace-Ebay
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/Marketplace-Ebay
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/Marketplace-Ebay/
+
+ACKNOWLEDGEMENTS
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2014 Marco Pessotto.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

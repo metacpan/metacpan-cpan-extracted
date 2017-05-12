@@ -1,0 +1,14 @@
+Revision history for Perl extension MIDI::Trans.
+
+0.01  Thu May 16 13:02:45 2002
+	- original version; created by h2xs 1.21 with options
+		-A -X -n MIDI::Trans
+
+<= 0.14
+
+	- Development versions
+
+0.15
+
+	- first released version.
+

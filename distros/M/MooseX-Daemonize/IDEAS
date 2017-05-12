@@ -1,0 +1,16 @@
+* 2:36 : mike : A slightly different would be to have another object, which is a 
+daemon, which is the keeper of the PIDs. It can bind to a port and then your other 
+objects would actually cause things to happen without needing a PID file.
+
+
+[12:16]  <blblack> I guess what I'm saying is that start() has three possible results: success, already running, failed to start
+[12:17]  <stevan> I am not as familair as you are with this stuff so I am not 100% of al the things
+[12:17]  <blblack> and stop() does too: success, not running, failed to stop
+[12:17]  <stevan> k
+[12:17]  <stevan> perfect
+[12:17]  <stevan> I will add em :)
+...
+[12:18]  <stevan> can you map the exit value to those three states (sorry I am not familiar with these details myself)
+[12:18]  <blblack> for most people, the right answer is that start()'s success/already_running should return OK to the OS, failed returns error
+[12:18]  <stevan> OK = 0, ERROR = 1?
+[12:18]  <blblack> and stop()'s success/not_running should also be OK (exit 0)

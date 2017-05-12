@@ -1,0 +1,137 @@
+:default ::= action => [values]
+:start ::= units
+
+units ::= unit*
+
+unit ::= ESCAPED_CHARACTER                              action => addEscapedCharacterToRc
+       | INISPRINTEXCEPTCOMMA                           action => addCharacterToRc
+       | PERCENT                                        action => addPercentToRc
+       | C                                              action => addPrintPopToRc
+# Commented because our PRINT lexeme includes %s
+#       | S
+       | PRINT                                          action => addPrintToRc
+       | PUSH                                           action => addPushToRc
+       | DYNPOP                                         action => addDynPop
+       | DYNPUSH                                        action => addDynPush
+       | STATICPOP                                      action => addStaticPop
+       | STATICPUSH                                     action => addStaticPush
+       | L                                              action => addL
+       | PUSHCONST                                      action => addPushConst
+       | PUSHINT                                        action => addPushInt
+       | PLUS                                           action => addPlus
+       | MINUS                                          action => addMinus
+       | STAR                                           action => addStar
+       | DIV                                            action => addDiv
+       | MOD                                            action => addMod
+       | BITAND                                         action => addBitAnd
+       | BITOR                                          action => addBitOr
+       | BITXOR                                         action => addBitXor
+       | EQUAL                                          action => addEqual
+       | GREATER                                        action => addGreater
+       | LOWER                                          action => addLower
+       | AND                                            action => addLogicalAnd
+       | OR                                             action => addLogicalOr
+       | NOT                                            action => addNot
+       | COMPLEMENT                                     action => addComplement
+       | ADDONE                                         action => addOneToParams
+       | IF units THEN units elifUnits ELSE units ENDIF action => addIfThenElse
+       | IF units THEN units elifUnits ENDIF            action => addIfThen
+       # Look to wy350.is3: this look like an empty if
+       | IF ENDIF                                       action => ifEndif
+       | EOF                                            action => eof
+
+elifUnit ::= ELSE units THEN units                      action => elifUnit
+elifUnits ::= elifUnit*
+
+_CONST      ~ [^']              # It appears that SQUOTE never appears within %'' (always true ?)
+_CONST      ~ _BS _ALLOWED_BS   # or an escaped character
+_DIGITS     ~ [\d]+
+_DIGIT      ~ [\d]
+_LCHAR      ~ [a-z]
+_UCHAR      ~ [A-Z]
+_PERCENT    ~ '%'
+PERCENT     ~ _PERCENT _PERCENT
+_C          ~ 'c'
+C           ~ _PERCENT _C
+#_S          ~ 's'
+#S           ~ _PERCENT _S
+_COLON      ~ ':'
+_DOT        ~ '.'
+__FLAGS     ~ [-+# ]
+_FLAGS      ~ _COLON __FLAGS
+            | __FLAGS
+_FORMAT     ~ [doxXs]
+PRINT       ~ _PERCENT _FORMAT
+            | _PERCENT _DIGITS _FORMAT
+            | _PERCENT _DIGITS _DOT _DIGITS _FORMAT
+PRINT       ~ _PERCENT _FLAGS _FORMAT
+            | _PERCENT _FLAGS _DIGITS _FORMAT
+            | _PERCENT _FLAGS _DIGITS _DOT _DIGITS _FORMAT
+PUSH        ~ '%p' _DIGIT
+DYNPOP      ~ '%P' _LCHAR
+DYNPUSH     ~ '%g' _LCHAR
+STATICPOP   ~ '%P' _UCHAR
+STATICPUSH  ~ '%g' _UCHAR
+L           ~ 'ls'
+_SQUOTE     ~ [']
+PUSHCONST   ~ '%' _SQUOTE _CONST _SQUOTE
+_LCURLY     ~ '{'
+_RCURLY     ~ '}'
+PUSHINT     ~ _PERCENT _LCURLY _DIGITS _RCURLY
+_PLUS       ~ '+'
+PLUS        ~ _PERCENT _PLUS
+_MINUS      ~ '-'
+MINUS       ~ _PERCENT _MINUS
+_STAR       ~ '*'
+STAR        ~ _PERCENT _STAR
+_DIV        ~ '/'
+DIV         ~ _PERCENT _DIV
+_MOD        ~ 'm'
+MOD         ~ _PERCENT _MOD
+_BITAND     ~ '&'
+BITAND      ~ _PERCENT _BITAND
+_BITOR      ~ '|'
+BITOR       ~ _PERCENT _BITOR
+_BITXOR     ~ '^'
+BITXOR      ~ _PERCENT _BITXOR
+_EQUAL      ~ '='
+EQUAL       ~ _PERCENT _EQUAL
+_GREATER    ~ '>'
+GREATER     ~ _PERCENT _GREATER
+_LOWER      ~ '<'
+LOWER       ~ _PERCENT _LOWER
+_AND        ~ 'A'
+AND         ~ _PERCENT _AND
+_OR         ~ 'O'
+OR          ~ _PERCENT _OR
+_NOT        ~ '!'
+NOT         ~ _PERCENT _NOT
+_COMPLEMENT ~ '~'
+COMPLEMENT  ~ _PERCENT _COMPLEMENT
+_ADDONE     ~ 'i'
+ADDONE      ~ _PERCENT _ADDONE
+_IF         ~ '?'
+IF          ~ _PERCENT _IF
+_THEN       ~ 't'
+THEN        ~ _PERCENT _THEN
+_ELSE       ~ 'e'
+ELSE        ~ _PERCENT _ELSE
+_ENDIF      ~ ';'
+ENDIF       ~ _PERCENT _ENDIF
+_EOF        ~ ','
+# COMMA, at the end of string, IS LIKE AN ENDIF MARKER: quite often IF-THEN-ELSE-IF are MISSING
+# the %; symbol at the very end. This is really a PITY because it is
+# exactly with this symbol that the IF-THEN-ELSE-IF ambiguity is
+# disappearing. This mean that when parsing the string, one HAS to restore the ',' COMMA
+# at then end when parsing it with Marpa.
+ENDIF       ~ _EOF
+
+_CARET      ~ '^'
+_BS         ~ '\'
+_ALLOWED_BS ~ [abEeflnrst^\,:0]
+_ALLOWED_BS ~ _DIGIT _DIGIT _DIGIT
+_C0_AND_DEL ~ [@A-Z[\]^_ ?]
+ESCAPED_CHARACTER ~ _CARET _C0_AND_DEL
+                  | _BS _ALLOWED_BS
+INISPRINTEXCEPTCOMMA ~ [\p{MarpaX::Database::Terminfo::Grammar::CharacterClasses::InIsPrintExceptComma}]
+EOF         ~ _EOF

@@ -1,0 +1,74 @@
+NAME
+    Math::SymbolicX::Calculator - A representation of a Symbolic Calculator
+
+SYNOPSIS
+      # You probably want to use on of the interfaces instead such as
+      # Math::SymbolicX::Calculator::Interface::Shell
+
+      use Math::SymbolicX::Calculator;
+      my $calc = Math::SymbolicX::Calculator->new();
+      my $cmd = $calc->new_command(...);
+      # ...
+      $calc->execute($cmd);
+
+DESCRIPTION
+    This class represents the state of a symbolic calculator. It is mainly a
+    glorified state hash of variables and their contents.
+
+    It can execute commands which are represented by
+    Math::SymbolicX::Calculator::Command objects and which operate on the
+    symbol table on some way.
+
+    Any slot of the symbol table may either contain a Math::Symbolic tree or
+    a Math::Symbolic::Custom::Transformation object.
+
+METHODS
+new
+    Returns a new Calculator object.
+
+  new_command
+    This method is a short-cut to Math::SymbolicX::Calculator::Command's
+    "new" method and creates a new command object which can be executed
+    using the Calculator object.
+
+  execute
+    Executes the command given as first argument. The command should be a
+    Math::SymbolicX::Calculator::Command object. Returns any return values
+    of the command's execution. (This may be a list!)
+
+  stash
+    Accesses the symbol table hash with the symbol name given as first
+    argument. Valid symbol names match the regex "/[A-Za-z][A-Za-z0-9_]*/".
+
+    (This is read only.)
+
+  get_transformation
+    First argument must be a symbol name. Accesses the Calculator symbol
+    table to fetch a transformation from it that is saved as the symbol.
+
+    If the smybol table contains a transformation in the specified slot,
+    that transformation is returned.
+
+    If it contains a formula, it manufactures a transformation from that
+    formula which amounts to replacing the specified symbol with the
+    formula.
+
+    If an error occurrs, an error message will be returned instead of a
+    "Math::Symbolic::Custom::Transformation" object.
+
+SEE ALSO
+    Math::SymbolicX::Calculator::Command,
+    Math::SymbolicX::Calculator::Interface::Shell
+
+    Math::Symbolic, Math::Symbolic::Custom::Transformation
+
+AUTHOR
+    Steffen Müller, <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Steffen Müller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.6 or, at your
+    option, any later version of Perl 5 you may have available.
+

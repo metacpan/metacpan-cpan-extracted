@@ -1,0 +1,152 @@
+NAME
+    Mojo::APNS - Apple Push Notification Service for Mojolicious
+
+VERSION
+    1.00
+
+DESCRIPTION
+    This module provides an API for sending messages to an iPhone using
+    Apple Push Notification Service.
+
+    This module does not support password protected SSL keys.
+
+    NOTE! This module will segfault if you swap "key" and "cert" around.
+
+SYNOPSIS
+  Script
+      use Mojo::Base -strict;
+      use Mojo::APNS;
+
+      my $device_id = shift @ARGV;
+      my $apns = Mojo::APNS->new(
+        cert    => "/path/to/apns-dev-cert.pem",
+        key     => "/path/to/apns-dev-key.pem",
+        sandbox => 0,
+      );
+
+      # Emulate a blocking request with Mojo::IOLoop->start() and stop()
+      $apns->send($device_id, "Hey there!", sub { shift->ioloop->stop })->ioloop->start;
+
+  Web application
+      use Mojolicious::Lite;
+      use Mojo::APNS;
+
+      # set up a helper that holds the Mojo::APNS object
+      helper apns => sub {
+        state $apns
+          = Mojo::APNS->new(
+              cert    => "/path/to/apns-dev-cert.pem",
+              key     => "/path/to/apns-dev-key.pem",
+              sandbox => 0,
+            );
+      };
+
+      # send a notification
+      post "/notify" => sub {
+        my $c         = shift;
+        my $device_id = "c9d4a07c fbbc21d6 ef87a47d 53e16983 1096a5d5 faa15b75 56f59ddd a715dff4";
+
+        $c->delay(
+          sub {
+            my ($delay) = @_;
+            $c->apns->send($device_id, "hey there!", $delay->begin);
+          },
+          sub {
+            my ($delay, $err) = @_;
+            return $c->reply->exception($err) if $err;
+            return $c->render(text => "Message was sent!");
+          }
+        );
+      };
+
+      # listen for feedback events
+      app->apns->on(
+        feedback => sub {
+          my ($apns, $feedback) = @_;
+          warn "$feedback->{device} rejected push at $feedback->{ts}";
+        }
+      );
+
+      app->start;
+
+EVENTS
+  error
+      $self->on(error => sub { my ($self, $err) = @_; });
+
+    Emitted when an error occurs between client and server.
+
+  drain
+      $self->on(drain => sub { my ($self) = @_; });
+
+    Emitted once all messages have been sent to the server.
+
+  feedback
+      $self->on(feedback => sub { my ($self, $data) = @_; });
+
+    This event is emitted once a device has rejected a notification. $data
+    is a hash-ref:
+
+      {
+        ts     => $rejected_epoch_timestamp,
+        device => $device_token,
+      }
+
+    Once you start listening to "feedback" events, a connection will be made
+    to Apple's push notification server which will then send data to this
+    callback.
+
+ATTRIBUTES
+  cert
+      $self = $self->cert("/path/to/apns-dev-cert.pem");
+      $path = $self->cert;
+
+    Path to apple SSL certificate.
+
+  key
+      $self = $self->key("/path/to/apns-dev-key.pem");
+      $path = $self->key;
+
+    Path to apple SSL key.
+
+  sandbox
+      $self = $self->sandbox(0);
+      $bool = $self->sandbox;
+
+    Boolean true for talking with "gateway.sandbox.push.apple.com" instead
+    of "gateway.push.apple.com". Default is true.
+
+  ioloop
+      $self = $self->ioloop(Mojo::IOLoop->new);
+      $ioloop = $self->ioloop;
+
+    Holds a Mojo::IOLoop object.
+
+METHODS
+  on
+    Same as "on" in Mojo::EventEmitter, but will also set up feedback
+    connection if the event is "feedback".
+
+  send
+      $self->send($device, $message, %args);
+      $self->send($device, $message, %args, sub { my ($self, $err) = @_; });
+
+    Will send a $message to the $device. %args is optional, but can contain:
+
+    $cb will be called when the messsage has been sent or if it could not be
+    sent. $err will be false on success.
+
+    *   badge
+
+        The number placed on the app icon. Default is 0.
+
+    *   sound
+
+        Default is "default".
+
+    *   Custom arguments
+
+AUTHOR
+    Glen Hinkle - "tempire@cpan.org"
+
+    Jan Henning Thorsen - "jhthorsen@cpan.org"
+

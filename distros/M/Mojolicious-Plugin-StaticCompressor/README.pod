@@ -1,0 +1,199 @@
+=head1 NAME
+
+Mojolicious::Plugin::StaticCompressor - Automatic JS/CSS minifier & compressor for Mojolicious
+
+=head1 SYNOPSIS
+
+Into the your Mojolicious application:
+
+  sub startup {
+    my $self = shift;
+
+    $self->plugin('StaticCompressor');
+    ~~~
+
+(Also, you can read the examples using the Mojolicious::Lite, in a later section.)
+
+Then, into the template in your application:
+
+  <html>
+  <head>
+    ~~~~
+    <%= js '/foo.js', '/bar.js' %> <!-- minified and combined, automatically -->
+    <%= css '/baz.css' %> <!-- minified, automatically -->
+    ~~~~
+  </head>
+
+However, this module has just launched development yet. please give me your feedback.
+
+=head1 DESCRIPTION
+
+This Mojolicious plugin is minifier and compressor for static JavaScript file (.js) and CSS file (.css).
+
+=head1 INSTALLATION (from GitHub)
+
+  $ git clone git://github.com/mugifly/p5-Mojolicious-Plugin-StaticCompressor.git
+  $ cpanm ./p5-Mojolicious-Plugin-StaticCompressor
+
+=head1 METHODS
+
+Mojolicious::Plugin::StaticCompressor inherits all methods from L<Mojolicious::Plugin> and implements the following new ones.
+
+=head2 register
+
+Register plugin in L<Mojolicious> application.
+
+=head1 HELPERS
+
+You can use these helpers on templates and others.
+
+=head2 js $file_path [, ...]
+
+Example of use on template file:
+
+  <%= js '/js/foo.js' %>
+
+This is just available as substitution for the 'javascript' helper (built-in helper of Mojolicious).
+
+However, this helper will output a HTML-tag including the URL which is a compressed files. 
+
+  <script src="/auto_compressed/124015dca008ef1f18be80d7af4a314afec6f6dc"></script>
+
+When this script file has output (just received a request), it is minified automatically.
+
+Then, minified file are cached in the memory.
+
+=head3 Support for multiple files
+
+In addition, You can also use this helper with multiple js-files:
+
+  <%= js '/js/foo.js', '/js/bar.js' %>
+
+In this case, this helper will output a single HTML-tag.
+
+but, when these file has output, these are combined (and minified) automatically.
+
+=head2 css $file_path [, ...]
+
+This is just available as substitution for the 'stylesheet' helper (built-in helper of Mojolicious).
+
+=head2 js_nominify $file_path [, ...]
+
+If you don't want Minify, please use this.
+
+This helper is available for purposes that only combine with multiple js-files.
+
+=head2 css_nominify $file_path [, ...]
+
+If you don't want Minify, please use this.
+
+This helper is available for purposes that only combine with multiple css-files.
+
+=head1 CONFIGURATION
+
+You can set these options when call the plugin from your application.
+
+=head2 disable_on_devmode
+
+You can disable a combine (and minify) when running your Mojolicious application as 'development' mode (such as a running on  the 'morbo'), by using this option:
+
+  $self->plugin('StaticCompressor', disable_on_devmode => 1);
+
+(default: 0 (DISABLE))
+
+=head2 url_path_prefix
+
+You can set the prefix of directory path which stores away a automatic compressed (and cached) file.
+
+The directory that specified here, will be made automatically.
+
+(default: "auto_compressed")
+
+=head2 background
+
+You can allow background processing to this plugin. (This option is EXPERIMENTAL.)
+
+If this option is disabled, a delay may occur in front-end-processing because this module will re-process it when static file has re-write.
+
+This option will be useful to prevent it with automatic background processing.
+
+(default: 0 (DISABLE))
+
+=head2 background_interval_sec
+
+When you enable "background", this option is available.
+
+(default:  604800 sec (7 days))
+
+=head2 auto_cleanup
+
+This option provides automatic clean-up of old cache file.
+
+(default: 1 (ENABLE))
+
+=head2 auto_cleanup_expires_sec
+
+When you enable "auto_cleanup", this option is available.
+
+(default:  604800 sec (7 days))
+
+=head1 KNOWN ISSUES
+
+=over 4
+
+=item * Support for LESS and Sass.
+
+=back
+
+Your feedback is highly appreciated!
+
+https://github.com/mugifly/p5-Mojolicious-Plugin-StaticCompressor/issues
+
+=head1 EXAMPLE OF USE
+
+Prepared a brief sample app for you, with using Mojolicious::Lite:
+
+example/example.pl
+
+  $ morbo example.pl
+
+Let's access to http://localhost:3000/ with your browser.
+
+=head1 REQUIREMENTS
+
+=over 4
+
+=item * Mojolicious v3.8x or later (Operability Confirmed: v3.88, v4.25)
+
+=item * Other dependencies (cpan modules).
+
+=back
+
+=head1 SEE ALSO
+
+L<https://github.com/mugifly/p5-Mojolicious-Plugin-StaticCompressor>
+
+L<Mojolicious>
+
+L<CSS::Minifier>
+
+L<JavaScript::Minifier>
+
+=head1 CONTRIBUTORS
+
+Thank you to:
+
+=over 4
+
+=item * jakir-hayder L<https://github.com/jakir-hayder>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013, Masanori Ohgita (http://ohgita.info/).
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Thanks, Perl Mongers & CPAN authors. 

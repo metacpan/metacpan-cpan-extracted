@@ -1,0 +1,43 @@
+Microarray version 0.45
+=======================
+
+Microarray is a suite of object oriented Perl Modules for the handling and analysis of microarray experiment data. These include modules for handling common formats of microarray files, modules for the programmatic abstraction of a microarray experiment, and for the output of a variety of images describing microarray experiment data. 
+
+This distribution is not yet fully tested; there are 8 test scripts that cover 14 of the 18 modules included in this distribution, although only 10 of those modules are covered in detail. However, the data files required for execution of the majority of the tests are not included in this distribution because of their size, but instead they are available for download from our Laboratory's web site at the following address;
+
+http://www.instituteforwomenshealth.ucl.ac.uk/AcademicResearch/Cancer/trl/pipeline/microarray_test_files.zip
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Image::ExifTool
+  GD
+  FileHandle
+  File::Slurp
+  File::Basename
+  Module::List
+
+The test scripts accompanying the modules require the following modules and libraries:
+
+  Test::More
+  Test::Group
+  Test::Differences
+  Test::Deep
+  Test::Image::GD
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Christopher Jones, UCL EGA Institute for Women's Health, University College London
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself

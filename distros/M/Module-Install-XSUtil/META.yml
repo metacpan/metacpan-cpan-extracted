@@ -1,0 +1,35 @@
+---
+abstract: 'Utility functions for XS modules'
+author:
+  - ':'
+build_requires:
+  B::Hooks::OP::Annotation: 0.43
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.36
+  ExtUtils::ParseXS: 2.21
+  Test::More: 0.88
+  XSLoader: 0.1
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Module::Install::XSUtil
+name: Module-Install-XSUtil
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+    - xt
+requires:
+  Module::Install: 0.91
+  perl: 5.00503
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/gfx/Perl-Module-Install-XSUtil.git
+version: 0.45

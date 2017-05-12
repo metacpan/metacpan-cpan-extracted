@@ -1,0 +1,53 @@
+NAME
+----
+
+MooseX-Types-Locale-Country
+
+INSTALLATION
+------------
+
+To install this distribution,
+
+first, to make Makefile, build this distribution and run tests
+by the following command:
+
+    % cpan -t .
+
+next, to deploy this distribution
+by the following command:
+
+    % cpan -i .
+
+DEPENDENCIES
+------------
+
+See "Makefile.PL".
+
+DESCRIPTION
+-----------
+
+This is Locale::Country related constraints and coercions for Moose.
+
+See further document of this distribution by the following commands:
+
+    perldoc MooseX::Types::Locale::Country
+
+AUTHOR
+------
+
+MORIYA Masaki, alias Gardejo
+
+    <moriya at cpan dot org>,
+    http://gardejo.org/
+
+COPYRIGHT AND LICENSE
+---------------------
+
+Copyright (c) 2009-2010 MORIYA Masaki, alias Gardejo
+
+This library is free software;
+you can redistribute it and/or modify it under the same terms as Perl itself.
+See perlgpl and perlartistic.
+
+The full text of the license can be found in the "LICENSE" file
+included with this distribution.

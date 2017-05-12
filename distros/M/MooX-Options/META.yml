@@ -1,0 +1,339 @@
+---
+abstract: 'Explicit Options eXtension for Object Class'
+author:
+  - 'celogeek <me@celogeek.com>'
+build_requires:
+  Capture::Tiny: '0'
+  English: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Import::Into: '0'
+  Module::Build: '0.4211'
+  Moo: '1.003001'
+  POSIX: '0'
+  Role::Tiny::With: '0'
+  Test::More: '0.94'
+  Test::Requires: '0'
+  Test::Trap: '0'
+  Try::Tiny: '0'
+  lib: '0'
+  namespace::clean: '0'
+  perl: '5.006'
+configure_requires:
+  Module::Build: '0.4211'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-Options
+recommends:
+  Term::Size::Any: '0'
+requires:
+  Carp: '0'
+  Data::Record: '0'
+  Getopt::Long: '2.43'
+  Getopt::Long::Descriptive: '0.099'
+  JSON::MaybeXS: '0'
+  Locale::TextDomain: '0'
+  Module::Metadata: '1.000019'
+  Moo: '1.003001'
+  MooX::ConfigFromFile: '0'
+  Path::Class: '0.32'
+  Pod::Usage: '0'
+  Regexp::Common: '0'
+  Scalar::Util: '0'
+  Term::Size::Any: '0'
+  Text::LineFold: '0'
+  overload: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/celogeek/MooX-Options/issues
+  homepage: https://tasks.celogeek.com/projects/perl-modules-moox-options
+  repository: https://github.com/celogeek/MooX-Options.git
+version: '4.023'
+x_Dist_Zilla:
+  perl:
+    version: '5.020003'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename: []
+          exclude_match: []
+          follow_symlinks: '0'
+          include_dotfiles: '0'
+          prefix: ''
+          prune_directory: []
+          root: .
+      name: '@GRS/@Filter/GatherDir'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@GRS/@Filter/PruneCruft'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@GRS/@Filter/ManifestSkip'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@GRS/@Filter/MetaYAML'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@GRS/@Filter/License'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@GRS/@Filter/Readme'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@GRS/@Filter/ExtraTests'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@GRS/@Filter/ExecDir'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@GRS/@Filter/ShareDir'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@GRS/@Filter/Manifest'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@GRS/@Filter/TestRelease'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@GRS/@Filter/ConfirmRelease'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::ReportVersions
+      name: '@GRS/ReportVersions'
+      version: '1.110730'
+    -
+      class: Dist::Zilla::Plugin::OurPkgVersion
+      name: '@GRS/OurPkgVersion'
+      version: '0.06'
+    -
+      class: Dist::Zilla::Plugin::Prepender
+      name: '@GRS/Prepender'
+      version: '2.001'
+    -
+      class: Dist::Zilla::Plugin::MinimumPerl
+      name: '@GRS/MinimumPerl'
+      version: '1.006'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          bail_out_on_fail: '0'
+          fail_on_warning: author
+          fake_home: '0'
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          needs_display: '0'
+          phase: test
+          script_finder:
+            - ':ExecFiles'
+          skips: []
+      name: '@GRS/Test::Compile'
+      version: '2.053'
+    -
+      class: Dist::Zilla::Plugin::Test::UnusedVars
+      name: '@GRS/Test::UnusedVars'
+      version: '2.000007'
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@GRS/PodCoverageTests'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: '@GRS/PruneFiles'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::ReadmeMarkdownFromPod
+      name: '@GRS/ReadmeMarkdownFromPod'
+      version: '0.141140'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@GRS/MetaJSON'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@GRS/MetaConfig'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          config_plugins:
+            - '@GRS'
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Name
+              name: '@Default/Name'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Version
+              name: '@Default/Version'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Default/prelude'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: DESCRIPTION
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: SYNOPSIS
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: OVERVIEW
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: ATTRIBUTES
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: METHODS
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: FUNCTIONS
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: '@Default/Leftovers'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Default/postlude'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Bugs
+              name: '@Default/Bugs'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: '@Default/Authors'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: '@Default/Legal'
+              version: '4.012'
+      name: '@GRS/PodWeaver'
+      version: '4.006'
+    -
+      class: Dist::Zilla::Plugin::PerlTidy
+      name: '@GRS/PerlTidy'
+      version: '0.21'
+    -
+      class: Dist::Zilla::Plugin::Test::Perl::Critic
+      name: '@GRS/Test::Perl::Critic'
+      version: '3.000'
+    -
+      class: Dist::Zilla::Plugin::Test::Kwalitee::Extra
+      name: '@GRS/Test::Kwalitee::Extra'
+      version: v0.2.1
+    -
+      class: Dist::Zilla::Plugin::ModuleBuild
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: ModuleBuild
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: AutoPrereqs
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: recommends
+      name: RuntimeRecommends
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::MetaResourcesFromGit
+      name: MetaResourcesFromGit
+      version: '1.103620'
+    -
+      class: Dist::Zilla::Plugin::LocaleTextDomain
+      name: LocaleTextDomain
+      version: '0.90'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '5.036'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '5.036'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '5.036'

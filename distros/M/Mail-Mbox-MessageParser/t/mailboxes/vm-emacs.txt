@@ -1,0 +1,107 @@
+From xx@lawefni.erj  Sun Jun  1 23:26:30 2003
+X-VM-v5-Data: ([nil nil nil nil nil nil nil nil nil]
+	["573" "Sunday" "1" "June" "2003" "22:32:29" "+0100" "Xxxx & Xxxxxxx Xxxxxxx" "xx@lawefni.erj" nil nil "Speaker on Wednesday Evening" "^From:" nil nil "6" "2003060122:32:29" "Speaker on Wednesday Evening" (number " " mark "     " thread-indent " Xxxx xxx Xxxxxxx  Jun  1 Speaker on Wednesday Evening\n") nil nil nil nil nil nil]
+	nil)
+X-VM-Message-Order:
+	(1 2 3 4 5 6 7 8 9 10 11 12 13 14 16
+	 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+	 32 33 34 35 36 37 39 38 40 41 42 43 44 45 46
+	 47 48 50 51 52 53 54 55 49 56 57 58 59 60 61
+	 62 65 64 66 67 68 69 70 71 73 74 75 63 76 77
+	 78 72 79 80 81 82 83 84 85 86 87 88 89 90 91
+	 92 93 94 95 96 97 98 99 100 101 102 103 104 106 105
+	 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121
+	 122 15 123 125 124 126 127 128 129 130 131 132 133 134 135
+	 136 137 139 138 140 141 142 143 144 145 146 147 149 150 148
+	 151 152 153 154 155 156 158 157 159 160 161 162 163 164 165
+	 166 167 168 169 170 171 172 173 174 175 176 177 178 180 181
+	 183 184 179 182 185 186 187 188 189 190 191 192 193 194 196
+	 195 197 198 199 200 201 202 203 204 205 206 207 209 208 210
+	 211 212 213 214 215 216 217 218 220 219 221 222 223 224 225
+	 226 227 228 229 230 231 232 233 234 235 236 237 238 239 240
+	 241 242 243 244 245 246 247 248 249 250 251 252 253 254 255
+	 256 257 263 258 260 259 261 262 266 264 265 267 268 269 270
+	 272 271 273 274 275 292 276 277 279 278 280 281 282 283 284
+	 285 286 287 302 288 289 290 291 293 294 298 295 296 297 299
+	 300 301 303 304 305 306 307 308 309 310 311 312 313 314 315
+	 316 317 318 319 320 321 323 322 324 325 326 327 328 329 330
+	 331 332 333 335 334 338 336 337 339 342 340 341 343 346 344
+	 345 347 348 349 350 351 352 353 354 355 356 357 358 359 360
+	 361 362 363 364 365 366 367 368 369 370 371 372 373 374 375
+	 376 378 377 379 380 381 382 383 384 385 386 387 388 393 389
+	 390 392 391 394 395 397 396 398 399 400 402 401 403 404 405
+	 406 407 408 409 410 412 413 411 414 415 416 417 418 419 420
+	 421 422 423 424 425 426 427 428 429 430 431 432 433 434 435
+	 436 437 438 439 440 441 442 443 444 445 447 449 448 450 451
+	 452 453 454 455 456 457 458 459 446 460 461 463 462 464 465
+	 466 467 468 470 469 471 472 473 474 475 476 477 478 479 480
+	 481 482 483 484 485 486 487 488 489 490 491 492 493 494 495
+	 496 497 498 499)
+X-VM-Summary-Format: "%n %*%a %I %-17.17UB %-3.3m %2d %s\n"
+X-VM-Labels: nil
+X-VM-VHeader: ("Resent-" "From:" "Sender:" "To:" "Apparently-To:" "Cc:" "Subject:" "Date:") nil
+X-VM-Last-Modified: (16436 33211 279516)
+X-VM-IMAP-Retrieved: nil
+X-VM-POP-Retrieved: nil
+X-VM-Bookmark: 253
+Return-Path: <us@gillatt.org>
+Delivered-To: graham@localhost.cs.man.ac.uk
+Received: from localhost (unknown [127.0.0.1])
+	by xxxx.xx.xxx.xx.xx (Postfix) with ESMTP id 2693D56209
+	for <xxxxxx@localhost>; Sun,  1 Jun 2003 23:26:30 +0100 (BST)
+Received: from xxxxxxxx.xx.xxx.xx.xx
+	by localhost with POP3 (fetchmail-6.2.0)
+	for xxxxxx@localhost (single-drop); Sun, 01 Jun 2003 23:26:30 +0100 (BST)
+Received: from mta02-svc.ntlworld.com ([62.253.162.42])
+	by mailhost with esmtp (Exim 4.14)
+	id 19MaRj-0005iq-Hi
+	for xxxxxx@xx.xxx.xx.xx; Sun, 01 Jun 2003 22:32:55 +0100
+Received: from Newhome ([62.252.237.57]) by mta02-svc.ntlworld.com
+          (InterMail vM.4.01.03.37 201-229-121-137-20020806) with SMTP
+          id <92835982352378.AWFT23R2.mta02-svc.ntlworld.com@Newhome>
+          for <xxxxxx@xx.xxx.xx.xx>; Sun, 1 Jun 2003 22:32:29 +0100
+Reply-To: <xx@lawefni.erj>
+Message-ID: <NEBBKAAFCLPAKJHFEILMGECMCKAA.us@gillatt.org>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+X-Priority: 3 (Normal)
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Outlook IMO, Build 9.0.2416 (9.0.2911.0)
+Importance: Normal
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2800.1165
+X-Spam-Score: -6.7 (------)
+X-Scanner: exiscan for exim4 (http://duncanthrax.net/exiscan/) *19MaRj-0005iq-Hi*sOXrDe0UpvQ*
+X-Spam-Status: No, hits=-0.4 required=4.5
+	tests=MSGID_GOOD_EXCHANGE
+	version=2.54-gdg
+X-Spam-Level: 
+X-Spam-Checker-Version: SpamAssassin 2.54-gdg (1.174.2.17-2003-05-11-exp)
+From: "Xxxx x Xxxxxxx Xxxxxxx" <xx@lawefni.erj>
+To: "XXXXXX XXXXX" <XXXXXX@XX.XXX.XX.XX>
+Subject: XXXXXXX XX XXXXXXXXX XXXXXXX
+Date: Sun, 1 Jun 2003 22:32:29 +0100
+
+XX XXXXXX,
+
+XXXX XXXXXX XX X XXXXX XXXX XXXX XXXXXX XXXXX.  XX XXXXX XX XXXX XX XXX
+XXXXX XX XXX XXXXXX XXXXXXXXX' XXXXX. XXX XXXX XXXXX XXX XXXXXXX XXX XXXXXXX
+XX XXXXXXXXX.  XXXXXXXXX XX X XXX-XXXXXX XXX XXXXXX'X XX XXXX XX XXXX XXXX
+XX XXX XXXX XXX X'X XXXX XXXXX XX XX XXX XXX.
+
+XXXXXX XXXX XXXX XXX XXXXX XXXXXXXX XX X XXXXXX XXXXXXX XXXX XX XX XX "XXXXX
+XX XXXXXX X XXX XXXXXXXXX"!
+
+XXXXXX,
+
+
+XXXX
+-------------------------
+XXXX & XXXXXXX XXXXXXX :)
+XX XXX XXXXXX, XXXXXX,
+XXXXXX, XXXXX, XXX XXX
+XXX.  +XX (X)XXXX XXXXXX
+XXXXXX:XX@XXXXXXX.XXX
+XXXX://XXX.XXXXXXX.XXX
+

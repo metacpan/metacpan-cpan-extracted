@@ -1,0 +1,18 @@
+This is a module for doing integer arithmetic in arbitrary base
+representations.  A representation, or "flex", is determined by
+what symbols you use for +, -, and the digits.  The base that
+you are working in is the number of digits you use to represent
+your numbers.  Given a flex it can do the following:
+
+  o Convert string representations of numbers to a convenient
+    internal form for calculations as needed.
+
+  o Convert from one internal representation to another,
+    transparently changing bases as required.
+
+  o Write the internal representation back to a string.
+
+  o Handle large integer arithmetic.
+
+A sample use would be to write 128 bit MD5 hashes using whatever
+set of characters you want.

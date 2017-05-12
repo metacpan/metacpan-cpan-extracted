@@ -1,0 +1,37 @@
+NAME
+    MooseX::CoverableModifiers - Make Moose method modifiers Devel::Cover
+    friendly
+
+SYNOPSIS
+      use Moose;
+      use MooseX::CoverableModifiers;
+
+      after foo => sub {
+         # this sub is now coverable by Devel::Cover
+         # it is actually translated into:
+         #   after foo => \&after_foo_0; *after_foo_0 = sub {
+      };
+
+DESCRIPTION
+    Method modifiers are handy, but they are not Devel::Cover friendly. This
+    is because Perl makes package-level anonymous subroutines invisible to
+    Devel::Cover, and the modifiers are often anonymous subroutines.
+
+    MooseX::CoverableModifiers names the subroutines with Devel::Declare, so
+    they can be seen by Devel::Cover and take parts in you coverage reports.
+
+    The module has no effects unless Devel::Cover is loaded.
+
+TODO
+    Some magic tool that uses MooseX::CoverableModifiers for all Moose
+    classes when you run tests, so you don't even have to explicitly use the
+    module.
+
+AUTHOR
+    Chia-liang Kao <clkao@clkao.org>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO

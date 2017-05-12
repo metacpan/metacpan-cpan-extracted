@@ -1,0 +1,28 @@
+=head1 NAME
+
+Mozilla::DOM::EntityReference
+
+=for object Mozilla::DOM::EntityReference
+
+Mozilla::DOM::EntityReference is a wrapper around an instance of Mozilla's
+nsIDOMEntityReference interface. This inherits from
+L<Mozilla::DOM::Node|Mozilla::DOM::Node>.
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::EntityReference->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

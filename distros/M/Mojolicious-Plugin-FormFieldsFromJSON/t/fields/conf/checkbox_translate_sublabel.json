@@ -1,0 +1,10 @@
+ [
+    {
+        "label" : "Name",
+        "type" : "checkbox",
+        "name" : "type",
+        "show_value" : 1,
+        "translate_sublabels" : 1,
+        "data" : ["internal", "external" ]
+    }
+ ]

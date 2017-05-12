@@ -1,0 +1,42 @@
+Merror version 1.4
+===================
+
+ABOUT
+
+Merror is a perl class implementing an OOP way of errorhandling with the abbility of
+getting a stacktrace of an error.
+
+DOCUMENTATION
+
+See "perldoc Merror"
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+To install perl into another location (e.g.: you are not root)
+type:
+    perl Makefile.PL PREFIX=/home/foouser/perllib
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    strict
+    warnings
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Markus Mazurczak
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+
+lib/Mojolicious/Plugin/Captcha/reCAPTCHA.pm
+
+t/00-load.t
+t/99_check_manifest.t
+t/author-critic.t
+
+xt/release/pod-syntax.t
+xt/release/pod-coverage.t
+

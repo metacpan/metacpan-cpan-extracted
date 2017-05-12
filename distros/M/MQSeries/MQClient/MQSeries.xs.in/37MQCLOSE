@@ -1,0 +1,23 @@
+# -*-c-*-
+#
+# $Id: 37MQCLOSE,v 33.4 2012/09/26 16:10:05 jettisu Exp $
+#
+# (c) 1999-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+void
+MQCLOSE(Hconn,Hobj,Options,CompCode,Reason)
+	MQHCONN	Hconn
+	MQHOBJ	Hobj
+	MQLONG	Options
+	MQLONG	CompCode = NO_INIT
+	MQLONG	Reason = NO_INIT
+
+    CODE:
+	MQCLOSE(Hconn,&Hobj,Options,&CompCode,&Reason);
+    OUTPUT:
+	Hobj
+	CompCode
+	Reason
+

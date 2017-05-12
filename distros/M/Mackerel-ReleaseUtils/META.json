@@ -1,0 +1,86 @@
+{
+   "abstract" : "release utilities for Mackerel (https://mackerel.io)",
+   "author" : [
+      "Mackerel Developers <mackerel-developers@hatena.ne.jp>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mackerel-ReleaseUtils",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Devel::CheckBin" : "0",
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Which" : "0",
+            "HTTP::Tinyish" : "0",
+            "Path::Tiny" : "0",
+            "Scope::Guard" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Mackerel::ReleaseUtils" : {
+         "file" : "lib/Mackerel/ReleaseUtils.pm",
+         "version" : "v0.0.1"
+      },
+      "Mackerel::ReleaseUtils::Log" : {
+         "file" : "lib/Mackerel/ReleaseUtils/Log.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mackerelio/Mackerel-ReleaseUtils/issues"
+      },
+      "homepage" : "https://github.com/mackerelio/Mackerel-ReleaseUtils",
+      "repository" : {
+         "url" : "git://github.com/mackerelio/Mackerel-ReleaseUtils.git",
+         "web" : "https://github.com/mackerelio/Mackerel-ReleaseUtils"
+      }
+   },
+   "version" : "v0.0.1",
+   "x_authority" : "cpan:SONGMU",
+   "x_contributors" : [
+      "Songmu <y.songmu@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_static_install" : 1
+}

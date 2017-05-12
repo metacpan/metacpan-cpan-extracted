@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README.pod
+lib/Mojolicious/Plugin/RenderFile.pm
+t/basic.t
+t/sample.txt
+t/multibyte_filename.t
+t/unicode.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

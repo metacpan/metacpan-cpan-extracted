@@ -1,0 +1,19 @@
+Revision history for Mojo-Cloudflare
+
+0.04     Sun Oct  5 10:47:27 2014
+       * Fix id method so edit record works
+       * Tidy.
+
+0.03     Sat May 10 16:04:18 2014
+       * Add Mojo::Cloudflare::Record
+       * Add Mojo::Cloudflare::RecordSet
+
+0.02     Sat Apr 26 17:20:47 2014
+       * Add missing deps to Makefile.PL
+
+0.01     Tue Apr 15 11:19:41 2014
+       * Started project
+       * Add add_record()
+       * Add delete_record()
+       * Add edit_record()
+       * Add records()

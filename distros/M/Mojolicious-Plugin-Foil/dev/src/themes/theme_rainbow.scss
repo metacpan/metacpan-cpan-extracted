@@ -1,0 +1,61 @@
+/* ================================================================== */
+/* THEME: Rainbow
+ */
+@import 'functions';
+@import 'fonts_rainbow';
+@import 'icon_dark_on_light';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: #ffffcc;
+$verge-fg: set-fg($verge-bg);
+$verge-border: #005500;
+$main-bg: #d5caf2;
+$main-fg: set-fg($main-bg);
+$button-bg: adjust-hue(darken($main-bg, 10), 10);
+$button-fg: set-fg($button-bg);
+$button-border: navy;
+$link-fg: set-link($main-bg);
+$link-visited: set-visited($main-bg);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+}
+
+header,
+footer {
+	@extend .verge;
+	background-image: url(rainb1.jpg);
+}
+
+.side {
+	@extend .verge;
+	background: #d5caf2 url(rainb2.jpg);
+}
+
+body {
+	color: $main-fg;
+	background: $main-bg;
+}
+
+@include some-links($link-fg, $link-visited);
+@include fancy($verge-fg, $verge-bg, "rainb2.jpg");
+@include make-buttons;
+
+/* ------------------------------------*/
+/* MENUS: navbar */
+header nav li {
+	border-color: #555588;
+}
+header nav .selflink,
+header nav em,
+header nav .current a {
+	color: #660066;
+	background-color: #d9ffd9;
+}
+

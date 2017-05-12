@@ -1,0 +1,44 @@
+Revision history for Perl extension MOP
+
+0.06 2017-05-08
+    [INTERNALS]
+    - make all instance use UNIVERSAL::Object::Immutable
+
+    [MISC]
+    - bumped UNIVERSAL::Object to latest
+
+0.05 2017-02-07
+    [API]
+    - added `has_required_method` to MOP::Role
+        - added tests for this
+    - added `fully_qualified_name` to MOP::Method
+        - added tests for this
+
+    [MISC]
+    - switched everything from die to Carp::croack
+
+0.04 2017-01-15
+    [MISC]
+    - restored Test::Fatal, sorry that was
+      just stupid of me
+
+0.03 2017-01-13
+    [MISC]
+    - fixing some POD issues
+    - adjusting some dependencies
+        - removed Test::Fatal
+        - bumped UNIVERSAL::Object to latest
+
+0.02 2017-01-12
+	[ENHANCEMENT]
+	- fixing constructors to allow both named
+	  and positional argument forms
+	  	- added tests and docs for this
+
+	[MISC]
+	- adding in a few more tests
+	- fixing some POD issues
+	- fleshing out some documentation
+
+0.01 2017-01-11
+    - Initial release to an unsuspecting world

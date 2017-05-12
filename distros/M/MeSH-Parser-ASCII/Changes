@@ -1,0 +1,9 @@
+Version 0.03 29/11/2010
+Added support for querying of the tree hierarchy
+
+Version 0.02 6/8/2010
+BUX FIX: incorrect newline parsing for files created on a different platform
+than the one the module is running on
+
+Version 0.01 4/8/2010
+First public release

@@ -1,0 +1,26 @@
+---
+abstract: 'elliptic curve operations over prime fields'
+author:
+  - 'brian m. carlson <sandals@crustytoothpaste.net>'
+build_requires:
+  FindBin: 0
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Math-EllipticCurve-Prime
+recommends:
+  Math::BigInt::GMP: 0
+requires:
+  List::Util: 0
+  Math::BigInt: 1.78
+  perl: 5.006002
+  strict: 0
+  warnings: 0
+version: 0.003

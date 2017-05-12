@@ -1,0 +1,48 @@
+
+0.16: December 2011
+
+Corrected Mail::Builder to use Mail::Builder::Attachment instead of Mail::Builder::Attachment::Data.
+
+Mail::Builder::Attachment::Data used to (wrongly) warn that the program shouldn't use Mail::Builder::Attachment::File. This change solves this problem.
+
+0.15 - January 2011
+
+Refactored some methods and tidy up the code for making it perlcritic - friendly.
+
+0.13 - December 7th, 2009
+
+Made a correction in Simple.pm and now it can send again emails to multiple addresses one by one.
+
+0.8 - 2009-05-06
+
+Net::SMTP::SSL put out from the list of required modules. It can be installed only if required by some programs.
+
+Changed confess with cluck.
+
+0.06 - 2009-02-24
+
+Added a few bytes to the POD documentation for showing how to use an SMTP server that listens to a non-standard port.
+
+0.05 - 2009-02-24
+
+Wrongly built
+
+0.04 - 2009-02-20
+
+If only htmltext parameter was used, but not plaintext, the plaintext parameter was automaticly created from the htmltext.
+
+But if only the htmltext parameter was used and it was created using a template, and not the real content of the HTML part, the plaintext content used to be created wrong.
+
+The version 0.04 solves this problem.
+
+0.03 - 2009-02-05
+
+Added a few modules as requirements.
+
+0.02 - 2008-11-04
+
+Added a few modules as requirements.
+
+0.01 - 2008-11-01
+
+The first version

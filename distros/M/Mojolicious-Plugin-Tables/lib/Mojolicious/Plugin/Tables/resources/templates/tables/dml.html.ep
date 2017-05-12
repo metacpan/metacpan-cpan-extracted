@@ -1,0 +1,80 @@
+
+% my $bytable  = shipped('bytable');
+% my $tinfo    = $bytable->{$table};
+% my $bycolumn = $tinfo->{bycolumn};
+% my $source   = $schema->source($tinfo->{source});
+% my $tclass   = $source->result_class;
+% my $ptable   = stash('ptable') || '';
+% my $parent_id= stash('parent_id') || '';
+% my $cfkey    = stash('cfkey') || '';
+% my $child    = stash('child') || '';
+
+% for my $column (@{$tinfo->{columns}}) {
+    % my $cinfo = $bycolumn->{$column};
+    % $c->app->log->debug("$dml_mode $column: [" . (param($column)||'(empty)') . "]" . $c->dumper($cinfo)) if $ENV{TABLES_DEBUG};
+    % my $fkey  = $cinfo->{fkey};          # means this is a m-1 parent entry..
+    % next if $fkey && $bycolumn->{$fkey}; # which will be reported with the fkey itself
+    % my $val;
+    % if ($dml_mode eq 'edit') {
+        % $val = $row->present($column, $cinfo, foredit=>1);
+        % param($column=>$val) if defined $val;
+    % }
+    % my $label = $cinfo->{label};
+    % $label .= ' *' unless $cinfo->{is_nullable};
+    %= t div => (class=>"attrib ui-helper-clearfix", 'data-table'=>$table) => begin
+        % if (my $pk = $cinfo->{is_primary_key} and $dml_mode eq 'edit') {
+            %= label_for $column => "($label)", title => "$column:PK$pk"
+            %= t span => (class=>"data") => $val
+        % } elsif ($fkey) {
+            % my $label  = $cinfo->{label};
+            % my $ptable = $cinfo->{ptable};
+            % if ($cfkey eq $fkey) {
+                %= hidden_field $column => $parent_id
+            % } else {
+                % my $opts = ($dml_mode eq 'edit'? $row:$tclass)->options($column, $cinfo, $cinfo, $schema, $bytable);
+                %= label_for $column => $label, title => "$column -> $ptable.$fkey"
+                %= t span => (class=>"data") => begin
+                    %= select_field $column=>$opts, class=>"picklist"
+                % end
+            % }
+        % } elsif ($cinfo->{is_foreign_key} && $cinfo->{parent}) {
+            % my $parent = $cinfo->{parent};
+            % my $fkinfo = $bycolumn->{$parent};
+            % my $ftable = $fkinfo->{ptable};
+            % my $pfkey  = $fkinfo->{fkey};
+            % if ($cfkey eq $pfkey) {
+                %= hidden_field $column => $parent_id
+            % } else {
+                % my $finfo = $bycolumn->{$parent};
+                % my $opts  = ($dml_mode eq 'edit'? $row:$tclass)->options($column, $cinfo, $finfo, $schema, $bytable);
+                %= label_for $column => $label, title => "$column -> $parent"
+                %= t span => (class=>"data") => begin
+                    %= select_field $column=>$opts, class=>"picklist"
+                % end
+            % }
+        % } elsif (!$cinfo->{is_auto_increment}) {
+            %= label_for $column => $label, title => $column
+            % my %dflt_attrs = (id=>$column, class=>'ui-corner-all');
+            % my %more_attrs = %{$cinfo->{input_attrs}||{}};
+            %= t span => (class=>"data") => begin
+                % if ($cinfo->{data_type} eq 'text') {
+                    %= text_area $column, %dflt_attrs, %more_attrs
+                % } elsif ($cinfo->{data_type} eq 'boolean') {
+                    %# value is 'Yes' whether checked or not..
+                    %= check_box $column, 'Yes', %dflt_attrs, %more_attrs
+                    %= hidden_field "${column}_pre_checkbox" => ($dml_mode eq 'edit'? $row->$column: undef)
+                % } else {
+                    % $dflt_attrs{required} = 'required' unless $cinfo->{is_nullable};
+                    % $dflt_attrs{type} = 'text';
+                    % $dflt_attrs{size} = $cinfo->{size} if $cinfo->{size};
+                    %= input_tag $column, %dflt_attrs, %more_attrs
+                % }
+            % end
+        % }
+    % end
+% }
+% if ($ptable) {
+    %= hidden_field psource  =>$bytable->{$ptable}->{source}
+    %= hidden_field parent_id=>$parent_id
+    %= hidden_field child    =>$child
+% }

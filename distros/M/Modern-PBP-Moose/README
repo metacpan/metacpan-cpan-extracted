@@ -1,0 +1,65 @@
+Modern-PBP-Moose version 1.200
+================================================================================
+The PERL Moose modules listed below are included in the namespace of the
+including module:
+
+   - Moose
+   - Moose::Util::TypeConstraints
+   - MooseX::AttributeShortcuts
+   - MooseX::DeclareX
+   - MooseX::HasDefaults::RO
+   - namespace::autoclean
+
+When you exit the namespace an auto-mix 'meta> make_immutable' is executed.
+
+The parameter 'qw{pbp}' are separate getters and setters methods for the
+attributes (get_... and set_... or _get_... and _set_...) generated. The
+parameter 'qw{no_pbp}' (default), this behavior is suppressed.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+
+DEPENDENCIES
+
+The following pragmas and modules are required:
+
+   - namespace::autoclean
+   - Hook::AfterRuntime
+   - Modern::PBP::Perl
+   - Moose
+   - Moose::Exporter
+   - Moose::Role
+   - Moose::Util::MetaRole
+   - Moose::Util::TypeConstraints
+   - MooseX::AttributeShortcuts
+   - MooseX::DeclareX
+   - MooseX::DeclareX::Keyword::interface
+   - MooseX::DeclareX::Plugin::abstract
+   - MooseX::DeclareX::Plugin::singleton
+   - MooseX::DeclareX::Privacy
+   - MooseX::HasDefaults::RO
+
+INCOMPATIBILITIES
+
+The module works with PERL 5.12 or higher.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015, JueÅrgen von Brietzke
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

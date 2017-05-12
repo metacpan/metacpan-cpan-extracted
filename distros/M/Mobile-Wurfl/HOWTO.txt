@@ -1,0 +1,136 @@
+Mobile::Wurfl is a perl module that allows you to use the mobile device
+information stored in the Wireless Universal Resource File (WURFL -
+<http://wurfl.sourceforge.net/>). The WURFL file is a (pretty large - 2.5M) xml
+file, so in order to access it efficiently, the module stores the data in a SQL
+database. This can be any database supported by DBI, although the default is
+Mysql (<http://www.mysql.com/>).
+
+The first thing to do to use Mobile::Wurfl is to download and install it. the
+Latest version is available from CPAN
+(<http://www.cpan.org/modules/by-authors/id/A/AW/AWRIGLEY/>), although probably
+the simplest way to install it is to use the CPAN module; try:
+
+    > perl -MCPAN -e sell
+    cpan> install Mobile::Wurfl
+
+this should ensure that dependant modules are pre-installed. Once installed, you
+need also to install mysql, and create a database called "wurfl", and a user
+"wurfl" which has write permission for the database. The default password for
+the database is also "wurfl", although all these things are configurable.
+Assuming you have done all this, you can create a Mobile::Wurfl object thusly:
+
+    require Mobile::Wurfl;
+
+    my $wurfl = Mobile::Wurfl->new();
+
+if you have used a different database name, or user details, you can do this:
+
+    my $wurfl = Mobile::Wurfl->new(
+        db_descriptor => "DBI:mysql:database=yourdbname:host=yourdbhost", 
+        db_username => 'yourusername',
+        db_password => 'yourpassword',
+    );
+
+To set up the database (create the relevant tables) you need to run:
+
+    $wurfl->create_tables();
+
+If you are using a mysql database, this should work fine. If you are using a
+different database, you may need to pass some table creation SQL as an argument
+to create_tables(); e.g.
+
+    $wurfl->create_tables( <<EOF );
+CREATE TABLE capability (
+  name char(100),
+  value char(100),
+  groupid char(100),
+  deviceid char(100)
+);
+CREATE TABLE device (
+  user_agent char(100),
+  actual_device_root char(100),
+  id char(100),
+  fall_back char(100)
+);
+EOF
+
+You should only need to call the create_tables() once.
+
+Now you are ready to download the wurfl.xml file, and store all of its data in
+the database. You can do this as follows:
+
+    $wurfl->update();
+
+This will download the wurlf.xml file from
+<http://www.nusho.it/wurfl/dl.php?t=d&f=wurfl.xml>, parse it, and poplulate the
+database tables with the information it contains. If you want to use a different
+URL for the wurfl.xml file (perhaps a mirror) you can set this in the
+constructor:
+
+    my $wurfl = Mobile::Wurfl->new( wurfl_url => $my_wurlf_url );
+
+All constructor options can also be accessed by set / get methods:
+
+    my $old_wurlf_url = $wurfl->get( 'wurfl_url' );
+    $wurfl->set( wurfl_url => $my_wurlf_url );
+
+By default, the update() method checks the modification time (by doing a HEAD
+request) of the wurlf_url, and only downloads / parses / updates the data if it
+is newer than the locally cached copy (stored by default in the current
+directory of the script - although this is also configurable using the
+wurlf_home constructor option). If you want to force the update method to
+refresh the data in the database, you can do so:
+
+    $wurfl->update( force => 1 );
+
+You are now ready to access device information for a particular handset. If you
+have a user agent string, the first thing you need to do is to get a canonical
+version of this string:
+
+    my $ua = $wurfl->canonical_ua( "SonyEricssonK750i/R1J Browser/SEMC-Browser/4.2 Profile/MIDP-2.0 Configuration/CLDC-1.1" );
+
+The reason you need to do this is that many handsets report user agent strings
+that have extensions that don't correspond to the entry for that handset in
+WURFL. Basically, what the canonical_ua method does is to recursively doing a
+lookup on the string, and if this fails, chopping anything after and including
+the last "/" in the string. So, for example, for the user agent string:
+
+        SonyEricssonK750i/R1J Browser/SEMC-Browser/4.2 Profile/MIDP-2.0 Configuration/CLDC-1.1
+
+    the canonical_ua method would try the following:
+
+        SonyEricssonK750i/R1J Browser/SEMC-Browser/4.2 Profile/MIDP-2.0 Configuration/CLDC-1.1
+        SonyEricssonK750i/R1J Browser/SEMC-Browser/4.2 Profile/MIDP-2.0 Configuration
+        SonyEricssonK750i/R1J Browser/SEMC-Browser/4.2 Profile
+        SonyEricssonK750i/R1J Browser/SEMC-Browser
+        SonyEricssonK750i/R1J Browser
+        SonyEricssonK750i
+
+until it found a user agent string in WURFL, and then return it (or return undef
+if none were found). In the above case (for WURFL v2.0) it returns the string
+"SonyEricssonK750i".
+
+Now you are ready to look up a specific device capability for this handset. You
+can do this as follows:
+
+    my $width = $wurfl->lookup_value( $ua, "max_image_height" );
+
+This method will automatically "fall back" to more generic hansets if this
+capability is not set in WURFL for this handset. To control this behaviour, you
+can use:
+
+    my $width = $wurfl->lookup_value( $ua, "max_image_height", no_fall_back => 1 );
+
+Finally, you can use the lookup method:
+
+    my $capability = $wurfl->lookup( $ua, "max_image_height" );
+
+to return a hash of information about the capability returned, so that you can -
+for example - find out the device that was fallen back to:
+
+    my $fell_back_to = $capability->{deviceid};
+
+There are several other methods offered by the module, for example to access
+lists of capability groups, devices, etc., which are documented in the module.
+If you have any questions, bugs, or suggestions, please send them to
+<mailto:ave.wrigley@itn.co.uk>

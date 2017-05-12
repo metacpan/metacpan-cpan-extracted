@@ -1,0 +1,2 @@
+# Edge with attributes. OK.
+-> {color:cornflowerblue; label: Use various escaped chars (\' \" \< \>) in label}

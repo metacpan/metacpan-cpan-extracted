@@ -1,0 +1,16 @@
+Changes
+lib/Math/BigInt/Random/OO.pm
+Makefile.PL
+MANIFEST			This list of files
+Math_BigInt_Random_OO-pod2man.3pm
+Math_BigInt_Random_OO-pod2text-termcap.txt
+Math_BigInt_Random_OO-pod2text.txt
+META.yml
+README
+t/00-signature.t
+t/01-load.t
+t/02-pod.t
+t/03-pod-coverage.t
+t/10-new.t
+t/11-min-max.t
+t/12-length-base.t

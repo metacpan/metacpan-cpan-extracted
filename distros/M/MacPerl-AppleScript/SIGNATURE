@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.50.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 fac9c3445f21d3a2649651804ce7c42ee25d2ddb Changes
+SHA1 843eae714ad9017d5a9c014de44230f066d9d5ca MANIFEST
+SHA1 b21b3adbbc3dab2706ff884095a73f2ce7655435 META.yml
+SHA1 f65f0d28aa0032669fe692142d4cd7e6872cd89c Makefile.PL
+SHA1 4281dea24fa29ce00bf7d020931ad4275f5b3845 README
+SHA1 42ea91e6252f1b90f3c1a1b4d65497e929845e9f lib/MacPerl/AppleScript.pm
+SHA1 305aecc31d8683bcb6a0724eb7ea52b9b0046601 t/01basic.t
+SHA1 e02036995515f58c70f2cb0849fe49e13522179f t/02application.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (Darwin)
+
+iD8DBQFDj1tzMdK1M/JtLyMRArYJAKCSw+pU4ywUI6KJbO5pV+4LIsAMmACgpbjH
+K6i+aGj4dESuaMLsgMGMGj4=
+=icKE
+-----END PGP SIGNATURE-----

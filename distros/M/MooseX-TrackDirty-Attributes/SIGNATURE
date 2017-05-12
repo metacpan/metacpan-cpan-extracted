@@ -1,0 +1,80 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 55ac697642a18dd7d974736a3d06fd531aa82382 .travis.yml
+SHA1 d40acec5f8adb8ec1a25a65a926fa9883d7c27bc Changes
+SHA1 62c6886b1f14e9e9a39f6bf00f5490057d3c2885 LICENSE
+SHA1 613eea6350c33ad721dce818f76f0544c17f13a8 MANIFEST
+SHA1 95c716a70bc0552d3c2760b1ee569585cbc00f7f META.json
+SHA1 f036ed3c633d437eb8bde16550a2ecdb5c974e00 META.yml
+SHA1 b23d986d695e4ebb3f894411d0534a438792edc3 Makefile.PL
+SHA1 9c186a43060d6281d8801009b3da4948ee25ee20 README
+SHA1 07503e925a06ff4a247d5245c06d1a9def5a62a4 cpanfile
+SHA1 cbe89eaee854aa86b40e9f0e7561e56c726f9745 dist.ini
+SHA1 583a8ba545e86d33a35ad20c401d8b215c7f66b8 lib/MooseX/TrackDirty/Attributes.pm
+SHA1 34224fd4310f71edfd832e9f86944e25c5f0fef3 lib/MooseX/TrackDirty/Attributes/Trait/Attribute.pm
+SHA1 eed9f092c8f4877f845391cae2ade0a0f5518567 lib/MooseX/TrackDirty/Attributes/Trait/Attribute/Native/Trait.pm
+SHA1 4d7e331c96257bbf6a01284e8a943453f525c1fb lib/MooseX/TrackDirty/Attributes/Trait/Class.pm
+SHA1 382bf0aaa06d5c51b4296161848560b6e0df8c0e lib/MooseX/TrackDirty/Attributes/Trait/Method/Accessor.pm
+SHA1 ac4bcc35c38abe6b514d69ca3227b063b9e56161 lib/MooseX/TrackDirty/Attributes/Trait/Method/Accessor/Native.pm
+SHA1 f1f17bed671c9e44640cd049b47c9eb73faa5ff1 lib/MooseX/TrackDirty/Attributes/Trait/Role.pm
+SHA1 597c16a7e18e10131d0cb373727f2cd46f854c59 lib/MooseX/TrackDirty/Attributes/Trait/Role/Application/ToClass.pm
+SHA1 f2df6d9ccf7571e19d3b093de54eac6867601e52 lib/MooseX/TrackDirty/Attributes/Trait/Role/Application/ToInstance.pm
+SHA1 dec03ae38e45dbbc5215a3640e2d569dd2e3c720 lib/MooseX/TrackDirty/Attributes/Trait/Role/Application/ToRole.pm
+SHA1 366248e4472d9a80859120dc7ad459fca1963351 lib/MooseX/TrackDirty/Attributes/Trait/Role/Composite.pm
+SHA1 f1cb1f5f2422c8a9ded880271f0a8ebc3bd5edef lib/MooseX/TrackDirty/Attributes/Util.pm
+SHA1 c522c3928158e64bd97d34d20cbfe0b5305a7eb2 t/00-check-deps.t
+SHA1 8f73f30fc1d6b825376dfe32d3cceff6141e6004 t/00-compile.t
+SHA1 84f632620a3ea253f94e6c79bcee821d32b2453d t/000-report-versions-tiny.t
+SHA1 7b742b056fe1a8726425196e507dbab34806c7c7 t/01-moose.t
+SHA1 017e6a2b157b3f31a4cec0f382f09f29b8acc890 t/02-basic.t
+SHA1 4c03a479b24f25cf566ac4f26a077b651c1c36b5 t/extends.t
+SHA1 ae056d64c3695a2f284affae92f3f92609aa4430 t/funcs.pm
+SHA1 cb62b8a9b807eeb3d0d229bc838a7d7a22e36c40 t/native-traits/basic.t
+SHA1 812051bf51f109ae74ce65a1d7d573d6e3599ca2 t/native-traits/extends/basic.t
+SHA1 db5183b49f64d59294175f9cc8696f265b21b0bc t/native-traits/extends/in-same-class.t
+SHA1 ee3ae121503df557d5167a0c7f28fe22f29759d3 t/native-traits/extends/reversed-in-same-class.t
+SHA1 aff06d3abd3dc5c6d0fc7323d6ac73009c3fcc43 t/native-traits/extends/reversed.t
+SHA1 d539092f19df4ea24a6c4235f49f0b3861554868 t/native-traits/role.t
+SHA1 e8a8bb1b24b979a20956d338b58f7485a5870b35 t/native-traits/to-instance.t
+SHA1 657fe19fc5e20a5f34df51a59469f01ee93ccd00 t/native-traits/trait-combined.t
+SHA1 f09e96f46ac2364307142838d68b4f1953b5919d xt/author/eol.t
+SHA1 c717665c0b436728beb74845e47e42d333a878da xt/author/no-tabs.t
+SHA1 c6b40c731d796d2de5676728f809bcaa14c05866 xt/author/pod-spell.t
+SHA1 a7948d34cfaad400286ea5d5fa6206c4c7e2552c xt/release/consistent-version.t
+SHA1 5600f56db6336ab43376538c262c8d760d6b4b2a xt/release/has-version.t
+SHA1 d6d42941da8a2f7bbd92a06e7c39f7143f869c98 xt/release/minimum-version.t
+SHA1 7d2f199b903a20ba2370b8784f867618a24743b5 xt/release/no-smart-comments.t
+SHA1 e252150a0b6b51ae0cab537b2e6d7152cab3897a xt/release/pod-coverage.t
+SHA1 c306c78b392a612cd06db467ee4093153f811348 xt/release/pod-linkcheck.t
+SHA1 a6c213cfd67f78c7346f0773194a6bfc566fb142 xt/release/pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJUme9/AAoJEJ/Rlq0N/NXWQkIP/RM0g+k8+hCkHBbeCrqFpnPH
+gt3I54HLHq8mmmcbaiZMBTFAkdVLykbOlLdkonmYIV4sZfv37FsrVAOBJtG05xFu
+jpy3sdTwaW2caU7b2NtQp8jbi+yPxZS7noCJ1Qc31pA6luHKudiOhXQBJLgf77vE
+j6Ezi2R+cZDg2RBsCqvsbWyauTEmh7BYi1etsl/erE/aNbeEB3JyuurA5scqwp/s
+05tsibfJjUvhNwHYUFMY/OgZJthpMduEw550SPGERfG2MXta1rsmx2pmFTG+NrTu
+orx2Xpw+MxaQB64lVbsLZ6twHebX65oZ3IlQa390Q2WMLPhHWV2WtwzRjNLBpsBi
+5lq3CV9UqWXJUHpY1wEwlvD/9rT/erXiuHOP0gJ1SN7Kuu6DAmWInFwoVXc5JhLn
+/ySmGULVrywMWU5IXJJGxuCUMK6yFa34Z0wtlpYmyqJqQz3PAnpZ55gr5ZxDByng
+pERH+nRZVmyWKMqrr644yv+xNO4sta4snpv+jusKC9Dpv4y0vuENTq8xKLu6LLvv
+3eR32pUSbpcSw45RGF8AtV4AaxEGZNl2I0Y/a+iHo5EYCJAv4XKVJXUrGBFadFPj
+DfKCRSkiQcYr3GGES3n+cUnIQeJIfDAochgYyF5l1Ifh8AA9nX5DHKQYbTPEZYKW
+Rtw2k52fP/GFLbHocMiV
+=esPV
+-----END PGP SIGNATURE-----

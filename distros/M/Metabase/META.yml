@@ -1,0 +1,121 @@
+---
+abstract: 'A database framework and API for resource metadata'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+  - 'Ricardo Signes <rjbs@cpan.org>'
+  - 'Leon Brocard <acme@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Path: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  List::Util: 0
+  Metabase::Report: 0
+  Path::Class: 0
+  Test::Exception: 0
+  Test::Routine::Util: 0
+  base: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.17
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Metabase
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Metabase:
+    file: lib/Metabase.pm
+    version: 1.003
+  Metabase::Archive:
+    file: lib/Metabase/Archive.pm
+    version: 1.003
+  Metabase::Archive::Filesystem:
+    file: lib/Metabase/Archive/Filesystem.pm
+    version: 1.003
+  Metabase::Gateway:
+    file: lib/Metabase/Gateway.pm
+    version: 1.003
+  Metabase::Index:
+    file: lib/Metabase/Index.pm
+    version: 1.003
+  Metabase::Index::FlatFile:
+    file: lib/Metabase/Index/FlatFile.pm
+    version: 1.003
+  Metabase::Librarian:
+    file: lib/Metabase/Librarian.pm
+    version: 1.003
+  Metabase::Query:
+    file: lib/Metabase/Query.pm
+    version: 1.003
+  Metabase::Test::Archive:
+    file: lib/Metabase/Test/Archive.pm
+    version: 1.003
+  Metabase::Test::Archive::Null:
+    file: lib/Metabase/Test/Archive/Null.pm
+    version: 1.003
+  Metabase::Test::Fact:
+    file: lib/Metabase/Test/Fact.pm
+    version: 1.003
+  Metabase::Test::Factory:
+    file: lib/Metabase/Test/Factory.pm
+    version: 1.003
+  Metabase::Test::Index:
+    file: lib/Metabase/Test/Index.pm
+    version: 1.003
+requires:
+  CHI: 0
+  CPAN::DistnameInfo: 0
+  Carp: 0
+  Class::MOP: 0
+  Data::GUID: 0
+  Data::Stream::Bulk::Array: 0
+  Data::Stream::Bulk::Callback: 0
+  Data::Stream::Bulk::Filter: 0
+  Data::Stream::Bulk::Nil: 0
+  Fcntl: 0
+  File::Slurp: 0
+  IO::File: 0
+  JSON: 2
+  List::AllUtils: 0
+  Metabase::Fact: 0.018
+  Metabase::Fact::String: 0
+  Metabase::User::Profile: 0
+  Metabase::User::Secret: 0
+  Moose: 1.00
+  Moose::Role: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::Types::Moose: 0
+  MooseX::Types::Path::Class: 0
+  MooseX::Types::Structured: 0
+  Regexp::SQL::LIKE: 0.001
+  Test::Deep: 0
+  Test::More: 0.92
+  Test::Routine: 0
+  Tie::File: 0
+  namespace::autoclean: 0
+  parent: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/rjbs/metabase/issues
+  homepage: https://github.com/rjbs/metabase
+  repository: https://github.com/rjbs/metabase.git
+version: 1.003
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Florian Ragwitz <rafl@debian.org>'
+  - 'Graham Knop <haarg@haarg.org>'
+  - 'Leon Brocard <acme@astray.com>'
+  - 'Ricardo SIGNES <rjbs@cpan.org>'

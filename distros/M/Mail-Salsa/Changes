@@ -1,0 +1,125 @@
+Revision history for Perl extension Mail::Salsa.
+
+0.15  Fri May 28 19:27:17 WEST 2010
+	- Mail::Salsa - The version has been updated to 0.15.
+	- Mail::Salsa::Action::Admin - The problem with the file "list.txt"
+	  without the new line at the end of the file was fixed. The version
+	  has been updated to 0.06.
+
+0.14  Wed Mar 17 19:19:29 WET 2010
+	- Mail::Salsa - The version has been updated to 0.14.
+	- Mail::Salsa::Action::Post - The verification of the message to
+	  see if it's a bounce, is now done correctly. The version has
+          been updated to 0.05.
+
+0.13  Thu Feb 11 19:40:25 WET 2010
+	- Mail::Salsa - The version has been updated to 0.13.
+        - Mail::Salsa - The problem of the addresses are in upper or lower
+          case has been fixed. Now all addresses are converted to lowercase.
+
+0.12  Thu Nov 13 15:10:01 WET 2008
+	- Mail::Salsa - The version has been updated to 0.12.
+	- Mail::Salsa::Utils - Check if a mail address have characters with
+	  accents. The version has been updated to 0.05.
+	- Mail::Salsa::Admin - Check if a mail address have characters with
+	  accents. The version has been updated to 0.05.
+
+0.11  Mon Nov 06 16:55:18 WET 2006
+	- Mail::Salsa - The version has been updated to 0.11.
+	- Mail::Salsa::Action::Post - This release fix a incorrect
+	  calculation of stamp_life for the year. The version has been
+	  updated to 0.04.
+
+0.10  Wed Oct 18 12:11:27 WEST 2006
+	- Mail::Salsa - The version has been updated to 0.10.
+	- Mail::Salsa::Utils - The subscribe action not work, because
+	  the check4email function don't remove the newline from the end
+	  of an string. This problem has been fixed and the version was
+	  changed to 0.04.
+
+0.09  Fri Sep 22 18:23:18 WEST 2006
+	- Mail::Salsa - The version has been updated to 0.09.
+	- Mail::Salsa::Action::Admin - Now, when the list is submitted
+	  the system removes the duplicate e-mail addresses automatically
+	  from the list. The version has been updated to 0.04.
+
+0.08  Mon Oct 31 11:09:54 WET 2005
+	- Mail::Salsa - The version has been updated to 0.08.
+	- Mail::Salsa::Action::Admin - The function "check_address" not
+	  return error if the mail address in the end have spaces or tab
+	  characters. The version has been updated to 0.03.
+	- Mail::Salsa::Action::Post - The function "sendmail4all" don't
+	  send a dot "." if the dot it's located at the begin of the
+	  line. This problem has been corrected. The version has been
+	  updated to 0.03.
+	- Mail::Salsa::Template: The function "replace" have the same 
+	  problem of the module above. The version has been updated to 
+	  0.02.
+
+0.07  Sat Oct 15 17:23:20 WEST 2005
+	- Mail::Salsa - The version has been updated to 0.07.
+	- Mail::Salsa::Action::Post - Now is possible allow or deny
+	  mime-types like "application/vnd.pwg-xhtml-print+xml". The
+	  version has been updated to 0.02.
+
+0.06  Fri Sep 23 15:25:13 WEST 2005
+	- Mail::Salsa - The version has been updated to 0.06.
+	- Mail::Salsa::Action::Unsubscribe - A bug that affected
+	  "remove_from_list" method were fixed. The version has been
+	  updated to 0.04.
+
+0.05  Wed Apr 20 17:04:50 WEST 2005
+	- Mail::Salsa - The version has been updated to 0.05.
+	- The Makefile.PL was changed again to setup the initial
+	  scripts directory.
+	- Mail::Salsa::Utils - The function "make_dir_rec" has been 
+	  exported and the version was changed to 0.03.
+	- Mail::Salsa::Action::Return - The function "look4email" has 
+	  been added.
+	- The file "cucaracha.conf" has been removed from bin directory.
+	- A new tool to automatic generate the global configuration file
+	  has been added.
+
+0.04  Mon Apr 18 17:51:02 WEST 2005
+	- Mail::Salsa - The version has been updated to 0.04.
+	- The Makefile.PL was changed to install the fiesta and
+	  cucaracha scripts.
+	- bin/fiesta - A "Return" action has been added and the version
+          was updated to 0.03.
+	- bin/cucaracha - A "Return" action has been added and the
+          version was updated to 0.02.
+	- A new module Action "Mail::Salsa::Action::Return" were added.
+	- Added Mail-Salsa-Action-Return.t test script.
+	- Mail::Salsa::Action::Unsubscribe - A minor bug in
+          documentation were fixed. The method "remove_from_list" has
+          been rewrited and exported. The version has been updated
+	  to 0.03.
+
+0.03  Sat Apr  9 20:10:51 WEST 2005
+	- Mail::Salsa - The version has been updated to 0.03.
+	- bin/fiesta - The option "personalized" has been added and some 
+	  code was cleaned up. The version has been updated to 0.02.
+	- The directory "tools" changed the name to "bin".
+	- Mail::Salsa::Action::Unsubscribe - A bug in formatation
+	  of documentation was fixed and the version has been updated to
+	  0.02.
+	- Mail::Salsa::Lang::EN - The documentation section has been
+	  added. The version has been updated to 0.02.
+
+0.02  Wed Apr  6 16:11:20 WEST 2005
+	- Mail::Salsa - The version has been updated to 0.02.
+	- Mail::Salsa::Action::Admin - A bug in patterns that check the
+	  validity of the email has been fixed. The version has been
+	  updated to 0.02.
+	- Mail::Salsa::Action::Personalize - The function sendmail4all
+	  has changed to handling the username in email addresses. The
+	  version has been updated to 0.02.
+	- Mail::Salsa::Utils - "email_components" function has been 
+	  added and some bugs in email address patterns have been fixed. 
+	  The version has been updated to 0.02.
+	- Mail::Salsa::Logs - A debug method were added and the version
+	  has been updated to 0.02.
+
+0.01  Fri Apr  1 12:41:01 WEST 2005
+	- original version; created by h2xs 1.23 with options
+		-X -n Mail::Salsa

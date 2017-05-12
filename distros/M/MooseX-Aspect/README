@@ -1,0 +1,185 @@
+NAME
+    MooseX::Aspect - aspect-oriented programming toolkit for Moose
+
+SYNOPSIS
+      {
+        package User;
+        use Moose;
+        ...;
+      }
+  
+      {
+        package Computer;
+        use Moose;
+        ...;
+      }
+  
+      {
+        package Logging;
+        use MooseX::Aspect;
+    
+        has log_file => (is => 'rw');
+    
+        sub log {
+          $_[0]->log_file->append($_[1]);
+        }
+    
+        apply_to 'User', role {
+          before login => sub {
+            my $self   = shift;
+            my $aspect = __PACKAGE__->instance;
+            $aspect->log($self->name . " logged in");
+          };
+        };
+    
+        apply_to 'Computer', role {
+          after connect  => sub {
+            my $self   = shift;
+            my $aspect = __PACKAGE__->instance;
+            $aspect->log($self->id . " connected to network");
+          };
+          after disconnect  => sub {
+            my $self   = shift;
+            my $aspect = __PACKAGE__->instance;
+            $aspect->log($self->id . " disconnected from network");
+          };
+        };
+      }
+  
+      Logging->setup;  # apply all the aspect's roles to packages
+
+DESCRIPTION
+    Certain parts of code are cross-cutting concerns. A classic example is
+    the one shown in the example: logging. Other cross-cutting concerns
+    include access control, change monitoring (e.g. setting dirty flags) and
+    database transaction management. Aspects help you isolate cross-cutting
+    concerns into modules.
+
+    In Moose terms, an aspect is a package that defines multiple Moose
+    roles, along with instructions as to what packages the roles should be
+    applied to.
+
+  Sugar
+    "apply_to PACKAGE, role { ... };"
+        The "apply_to" and "role" functions are designed to be used
+        together. They define an anonymous role and specify the package
+        (which may be a class or another role) it is intended to be composed
+        with.
+
+        The role definition is a more limited version of a standard Moose
+        role definition. In particular, it cannot define methods or
+        attributes; however it can define method modifiers or required
+        methods.
+
+    "create_join_point NAME"
+        Defines a "join point". That is, a hook/event that packages
+        employing this aspect can trigger, and that roles within this aspect
+        can supply code to handle.
+
+        For example, an aspect called Local::DatabaseIntegrity might define
+        join points called "db-begin" and "db-end" which application code
+        can trigger using:
+
+           MooseX::Aspect::Util::join_point(
+                    'Local::DatabaseIntegrity' => 'db-begin'
+           );
+
+        Roles within the Local::DatabaseIntegrity aspect can then watch for
+        this join point (using the "whenever" sugar - see below) and execute
+        code when it is reached. That code might for instance, begin and end
+        database transactions.
+
+    "has ATTR => @OPTS"
+        Standard Moose attribute definition. An aspect is a class (albeit a
+        singleton) so can be instantiated and have attributes.
+
+    "extends CLASS"
+        Standard Moose superclass definition. An aspect is a class so can
+        inherit from other classes. It probably only makes sense to inherit
+        from other aspects.
+
+        May only be used outside role definitions.
+
+    "with ROLE"
+        Standard Moose role composition.
+
+        May be used inside or outside role definitions.
+
+    "before METHOD => sub { CODE };"
+        Standard Moose before modifier. Within roles, uses MooseX::RoleQR
+        which means that the method name can be specified as a regular
+        expression.
+
+        May be used inside or outside role definitions.
+
+    "after METHOD => sub { CODE };"
+        Standard Moose after modifier. Within roles, uses MooseX::RoleQR
+        which means that the method name can be specified as a regular
+        expression.
+
+        May be used inside or outside role definitions.
+
+    "around METHOD => sub { CODE };"
+        Standard Moose around modifier. Within roles, uses MooseX::RoleQR
+        which means that the method name can be specified as a regular
+        expression.
+
+        May be used inside or outside role definitions.
+
+    "guard METHOD => sub { CODE };"
+        Conceptually similar to "before", but if the coderef returns false,
+        then the original method is not called, and false is returned
+        instead. See also MooseX::Mangle.
+
+        May be used inside or outside role definitions.
+
+    "whenever JOIN_POINT => sub { CODE };"
+        Code that is triggered to run whenever a join point is reached.
+
+        May only be used inside role definitions.
+
+    "requires METHOD"
+        Standard Moose required method.
+
+        May only be used inside role definitions.
+
+  Methods
+    An aspect is a class (albeit a singleton), and thus can define methods.
+    By default it has the following methods:
+
+    "new", "instance", "initialize(%args)"
+        See MooseX::Singleton.
+
+    "setup"
+        By default, when an aspect is loaded the roles it defines are not
+        actually composed with anything. You need to call the "setup" class
+        method to compose the roles.
+
+    "is_setup"
+        Class method indicating whether "setup" has happened.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Aspect>.
+
+SEE ALSO
+    Moose, Aspect.
+
+    MooseX::Aspect::Util, MooseX::Singleton, MooseX::RoleQR.
+
+    <http://en.wikipedia.org/wiki/Aspect-oriented_programming>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

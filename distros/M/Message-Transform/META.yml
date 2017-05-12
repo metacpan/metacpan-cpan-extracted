@@ -1,0 +1,30 @@
+---
+abstract: 'Fast, simple message transformations'
+author:
+  - 'Dana M. Diederich <dana@realms.org>'
+build_requires:
+  English: 0
+  File::Spec: 0
+  Test::More: 0
+  Test::Perl::Critic: 0
+  Test::Perl::Critic::Progressive: 0
+  Test::PerlTidy: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Message-Transform
+requires:
+  Exporter: 0
+  strict: 0
+  vars: 0
+  warnings: 0
+resources:
+  homepage: https://metacpan.org/module/Message::Transform
+  repository: http://github.com/dana/perl-Message-Transform.git
+version: 1.132260

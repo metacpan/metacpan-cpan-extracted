@@ -1,0 +1,40 @@
+0.22  2016-05-12
+  - debug mode $ENV{'MOJO_MYSQL_DEBUG'} = 1
+
+0.21  2016-03-17
+  - fixed logging sql
+
+0.19  2016-02-28
+  - added logging sql
+
+0.18  2016-02-26
+  - new migration
+  - restore code
+
+0.14  2015-05-19
+  - added fake data command
+
+0.13  2015-05-19
+  - added migration command
+
+0.12  2015-02-15
+  - Fixed build
+
+0.11  2015-02-15
+  - Fixed bug with empty time
+
+0.09  2015-01-08
+  - Small fixed type int 0
+
+0.08  2015-01-07
+  - Fixed type int 0
+
+0.07  2014-12-29
+  - Added automatic conversion in the field "datetime" to Mojo::Date
+
+0.06  2014-11-04
+  - Skip test
+
+0.05  2014-11-04
+  - Beta version
+

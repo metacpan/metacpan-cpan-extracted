@@ -1,0 +1,180 @@
+version 0.014; 2014-02-06
+
+  * bugfix: suppress any CORE::GLOBAL::require override, where possible,
+    to avoid use_package_optimistically() being misled into treating
+    missing modules as broken
+
+  * bugfix: in use_module() and use_package_optimistically(), pass a
+    supplied VERSION parameter through for the version check even if it
+    is undef
+
+  * tighten use_package_optimistically()'s recognition of can't-locate
+    errors (the same way that base.pm has recently been tightened),
+    so that, when a module fails to load because a module that it uses
+    isn't available, the outer module will be perceived as broken rather
+    than missing
+
+  * update documentation notes about the state of Unicode handling for
+    module names
+
+  * in META.{yml,json}, point to public git repository
+
+version 0.013; 2012-02-16
+
+  * fix false failure of the test for lack of unintended dependencies
+    that occurred on systems using a sitecustomize.pl
+
+version 0.012; 2012-02-12
+
+  * work around Perl core bug [perl #68590] regarding leakage of %^H
+    into modules being loaded
+
+  * work around Perl core bug that made a failed module loading appear
+    successful when re-requiring the same module
+
+  * duplicate is_string() from Params::Classify, rather than importing it,
+    to avoid circular dependency problems (affecting both installation
+    and runtime)
+
+  * duplicate minimal exporting behaviour from Exporter, and avoid using
+    the "feature", "warnings", "strict", and "parent" pragmata, to allow
+    for possible future use of this module by any infrastructure module
+
+  * document core bug workarounds
+
+  * document module name syntax more prominently, and discuss the state
+    of Unicode handling
+
+  * tweak documentation of use_package_optimistically()
+
+  * test behaviour with tainted module name
+
+  * test lack of unwanted eval frame around require
+
+  * give test modules more meaningful names
+
+  * convert .cvsignore to .gitignore
+
+version 0.011; 2011-10-24
+
+  * bugfix: in require_module() and use_module(), work around a Perl
+    core bug affecting Perl 5.8 and 5.10 that could pass the wrong
+    context to the file scope of a required file, which breaks some
+    modules; this bug would only rarely afflict the core's require()
+    in situations where it would afflict require_module()
+
+version 0.010; 2011-10-07
+
+  * bugfix: in use_package_optimistically(), fix regexp interpolation
+    that broke operation if the module was loaded from a path containing
+    metacharacters
+
+version 0.009; 2011-10-04
+
+  * new function module_notional_filename()
+
+  * simplify behaviour of use_package_optimistically() to match simplified
+    base.pm 2.18
+
+version 0.008; 2011-05-16
+
+  * change usage of Params::Classify functions to take advantage of
+    custom ops in Params::Classify 0.012
+
+  * use full stricture in test suite
+
+  * in Build.PL, complete declaration of configure-time requirements
+
+  * explicitly state version required of Params::Classify
+
+  * include META.json in distribution
+
+  * add MYMETA.json and MYMETA.yml to .cvsignore
+
+version 0.007; 2010-03-19
+
+  * add "check_" functions for argument checking
+
+  * supply regexps to check module name and spec syntax
+
+  * in "is_" functions, also cleanly handle non-string arguments
+
+  * in require_module() (also affecting use_module()), call require()
+    as a function (with appropriate name translation) instead of using
+    string eval, to avoid unnecessary complication of exception handling
+
+  * provide the "is_valid_" functions under shorter "is_" names
+
+  * revise POD markup
+
+  * check for required Perl version at runtime
+
+  * in tests, supply test modules to avoid requiring unrelated math
+    modules
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+version 0.006; 2009-05-19
+
+  * bugfix: avoid unreliable "\w" in regexps in code
+
+  * document that module name syntax is restricted to ASCII
+
+  * use simpler "parent" pragma in place of "base"
+
+  * in documentation, use the term "truth value" instead of the less
+    precise "boolean"
+
+  * use full stricture in Build.PL
+
+version 0.005; 2007-09-17
+
+  * bugfix: override any ambient $SIG{__DIE__} handler when using eval { }
+
+  * use "base" pragma to import Exporter behaviour
+
+  * test POD syntax and coverage, and rename an internal function to
+    satisfy the coverage test
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * complete dependency list
+
+  * include signature in distribution
+
+  * in documentation, separate "license" section from "copyright" section
+
+version 0.004; 2007-08-12
+
+  * change choice of module to test use_package_optimistically(), because
+    some old versions of Math::BigInt don't have a version number which
+    was causing a false test failure
+
+version 0.003; 2007-01-27
+
+  * loosen tests to work with perl v5.9's changed diagnostics
+
+version 0.002; 2006-06-15
+
+  * new function use_package_optimistically() to duplicate the "base"
+    pragma's quiet module loading
+
+  * insert missing bracket in documentation for use_module()
+
+version 0.001; 2004-10-29
+
+  * new function use_module()
+
+  * document return value of require_module()
+
+  * more stringent tests for the return value of require_module()
+
+  * explicitly declare lack of module dependencies in Makefile.PL
+
+  * include Changes file
+
+version 0.000; 2004-02-15
+
+  * initial released version

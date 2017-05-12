@@ -1,0 +1,25 @@
+#!/usr/bin/env perl
+use FindBin qw/ $Bin /;
+use strict;
+use warnings;
+use Message::Passing;
+
+{
+    package # PAUSE hide
+        Message::Passing::Script::WebHooks;
+    use Moose;
+
+    extends 'Message::Passing';
+
+    has '+encoder' => (
+        init_arg => undef,
+        default => '+Message::Passing::Filter::Encoder::Null',
+    );
+
+    has '+output' => (
+        traits => ['NoGetopt'],
+    );
+}
+
+Message::Passing::Script::WebHooks->start( output => 'WebHooks' );
+

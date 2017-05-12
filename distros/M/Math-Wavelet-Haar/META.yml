@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Math-Wavelet-Haar
+version:             0.06
+abstract:            Perl extension for transforming data with the Haar Wavelet
+license:             ~
+author:              
+    - Ryan Voots <simcop2387@yahoo.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Storable:                      2.15
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

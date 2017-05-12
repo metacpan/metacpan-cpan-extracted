@@ -1,0 +1,13 @@
+<p align="center">
+    [% LogoDayText %]
+</p>
+
+<p class="footer" align="center">
+    LogoDay is an information campaign to celebrate
+    special events relevant to
+    [% IF ProjectName %]
+        [% ProjectName %].
+    [% ELSE %]
+        INSERT PROJECT NAME HERE.
+    [% END %]
+</p>

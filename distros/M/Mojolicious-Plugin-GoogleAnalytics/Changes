@@ -1,0 +1,11 @@
+Revision history for Mojolicious-Plugin-GoogleAnalytics
+
+1.005   2014-02-15
+	- Fix javascript syntax error (GH: #3)
+
+1.004  2013-09-05 21:23:37 EDT
+        - Fixes dependency list (GH: #1)
+
+1.003  2013-08-27 00:45:52 EDT
+	- Support sub-domains
+	- Support multiple top level domains

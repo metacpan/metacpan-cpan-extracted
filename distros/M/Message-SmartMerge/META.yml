@@ -1,0 +1,28 @@
+---
+abstract: 'Enforce downstream transformations on message streams'
+author:
+  - 'Dana M. Diederich <dana@realms.org>'
+build_requires:
+  Data::Dumper: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Message-SmartMerge
+requires:
+  Message::Match: '0'
+  Message::Transform: '0'
+  Storable: '0'
+  Test::More: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dana/perl-Message-SmartMerge/issues
+  homepage: https://github.com/dana/perl-Message-SmartMerge
+  repository: https://github.com/dana/perl-Message-SmartMerge.git
+version: '1.161240'

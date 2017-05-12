@@ -1,0 +1,660 @@
+<HTML>
+<HEAD>
+<TITLE>MHonArc FAQ: Supported Environments</TITLE></HEAD>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+<BODY>
+
+<!--X-NavButtons-Start-->
+<table width="100%"><tr><td align="left"><nobr>[<a href="general.html">Prev</a>]</nobr></td><td align="center" width="100%">[<a href="faq.html">TOC</a>][<a href="../mhonarc.html">Manual</a>][<a href="http://www.mhonarc.org/">Home</a>]</td><td align="right"><nobr>[<a href="usage.html">Next</a>]</nobr></td></tr></table>
+</p>
+<!--X-NavButtons-End-->
+
+<!-- ===================================================================== -->
+<HR>
+<H2><a name="supenvs">Supported Environments</a></H2>
+
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#platforms">What platforms can MHonArc run under?</a></li>
+<li><a href="#mac">What about Mac?</a></li>
+<li><a href="#vms">What about VMS?</a></li>
+<li><a href="#perl">What version of Perl is required to run MHonArc?</a></li>
+<li><a href="#muas">What mail user agents (MUA's) does MHonarc support?</a></li>
+<li><a href="#mdomodigests">Can MHonArc process Majordomo digests?</a></li>
+<li><a href="#listprocessor">Can MHonArc process Listprocessor archives?</a></li>
+<li><a href="#ezmlm">Can MHonArc process ezmlm archives?</a></li>
+<li><a href="#maildir">Can MHonArc process qmail's maildir style mail folders?</a></li>
+<li><a href="#netscape">Can MHonArc process Netscape Messenger folders?</a></li>
+<li><a href="#evolution">Can MHonArc process Evolution folders?</a></li>
+<li><a href="#compuserve">Can MHonArc process Compuserve messages?</a></li>
+<li><a href="#otherformats">What about other mailbox/folder formats?</a></li>
+<li><a href="#nonenglish">Can MHonArc create non-English archives?</a></li>
+<li><a href="#japanese">How about Japanese?</a></li>
+<li><a href="#bilingual">Can I create bilingual archives?</a></li>
+<li><a href="#unicode">Does MHonArc support Unicode?</a></li>
+</ul>
+<!--X-TOC-End-->
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="platforms">What platforms can MHonArc run under?</a></b></h3>
+</td></tr></table>
+
+<P>MHonArc is known to run under Unix-based operating systems,
+MS-DOS/Windows, WinNT, Win95/98, and OS/2.  If Perl is available for
+the system you are using, you can probably run MHonArc.
+</p>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="mac">What about Mac?</a></b></h3>
+</td></tr></table>
+
+<p>For OS X users, MHonArc can be used from the command-line in
+the same manner as a Unix-based system.
+<a href="http://liepins.net/">Lasar Liepins</a> provides an
+<a href="http://liepins.org/mhonarc/">installer</a>
+and a <a href="http://liepins.org/macmhonarc/">graphical front-end</a> for
+OS X.
+<p>
+
+<p>For MacPerl users, MHonArc has been coded to support MacPerl.
+A couple of users have reported success in running MHonArc under MacPerl.
+Try it out, and if you have problems, send a message
+to the
+<a href="http://www.mhonarc.org/archive/info/mhonarc-users.html"
+>MHonArc user's list</a>.
+</P>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="vms">What about VMS?</a></b></h3>
+</td></tr></table>
+
+<P>The following includes information from Walter F.J. Mueller,
+<a href="mailto:W.F.J.Mueller&#37;40gsi.de">W.F.J.Mueller<!--
+-->&#64;<!--
+-->gsi.de</a>:
+</P>
+<pre>
+ * The -outdir argument must be specified UNIX style.
+ * Avoid any $ in a filename, some interpolation will certainly mess it up.
+   It ended up defining a few extra logicals like
+        $ define kp3_root kp3$root
+   to have $ free absolute pathnames in the usual $-prone VMS environment.
+</pre>
+<p>Also, you will need to use Perl 5.004_04 or later and MHonArc
+v2.1.1 or later.
+</p>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="perl">What version of Perl is required to run MHonArc?</a></b></h3>
+</td></tr></table>
+
+<p>Perl 5, or later.  Older versions of MHonArc are Perl 4 compatible.
+So if you are under the unfortunate circumstances of only being able
+to use Perl 4, you will need to grab an older version of MHonArc.
+</p>
+
+<p>Perl 5 is required for MHonArc v2.3 or later.  The last Perl 4
+compatible release is v2.2.
+</p>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="muas">What mail user agents (MUA's) does MHonarc support?</a></b></h3>
+</td></tr></table>
+
+<p>The question is better stated as: <b>"What mail message storage formats
+MHonArc support?"</b></p>
+
+<P>MHonArc can convert mail that is stored in UUCP mailbox
+format (ie. all messages are in a single file), or in the format used
+by the 
+<a href="http://www.ics.uci.edu/~mh/">Rand Message Handler</a>
+(MH) (messages are contained in separate
+files within a directory). MHonArc is known to work with
+the following MUAs: <EM>MH/nmh</EM>, <EM>mail</EM>, <EM>Mail</EM>,
+<EM>Elm</EM>, <EM>Eudora</EM>, <EM>WinVN</EM>, <EM>Windows
+Trumpet</EM>, and <EM>NUPop</EM>.  </P>
+
+<table class="note" width="100%">
+<tr valign="baseline">
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>
+To support some MUA's, it may require redefining the
+<a href="../resources/msgsep.html">MSGSEP</a> or
+<a href="../resources/mhpattern.html">MHPATTERN</a>
+resource.  Please consult the documentation
+for more information about these resources.
+</p>
+</td>
+</tr>
+</table>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="mdomodigests">Can MHonArc process Majordomo digests?</a></b></h3>
+</td></tr></table>
+
+<p>Here is a couple messages from the
+<A HREF="http://www.rosat.mpe-garching.mpg.de/mailing-lists/mhonarc/"
+>MHonArc mailing list</A>:
+</p>
+<BLOCKQUOTE class="mail">
+<UL>
+<LI><em>Subject</em>: Re: Majordomo Digest -&gt; MHonarc?</LI>
+<LI><em>From</em>: "Christopher P. Lindsey" &lt;<A HREF="mailto:lindsey&#37;40mallorn.com">lindsey<!--
+-->&#64;<!--
+-->mallorn.com</A>&gt;</LI>
+<LI><em>Date</em>: Sun, 4 Jan 1998 22:33:31 -0600 (CST)</LI>
+<LI><em>List-Name</em>: mhonarc</LI>
+</UL>
+<PRE>
+&gt; Hi...
+&gt; 
+&gt;    Has anyone come up with a relatively clean method of converting 
+&gt; majordomo digests to a mailbox format that MHonarc can read?
+&gt; 
+&gt;    I was looking at it, and from what I can see its just a matter of
+&gt; changing the file so that there is a From &lt;&gt; line at the top of each
+&gt; message, so that something like:
+
+If you have the procmail package, formail should do it for you.
+
+   formail -ds &lt; digestfile &gt;&gt; newmailbox
+
+It auto-generates the initial 'From ' header.  Unfortunately, it
+also leaves the original digest message (probably).  If it's the
+first message output, do this:
+
+   formail +1 -ds &lt; digestfile &gt;&gt; newmailbox
+
+This tells formail to skip the first message (the one that came from
+list-digest-owner or whatever).
+
+Chris
+</PRE>
+</BLOCKQUOTE>
+<BLOCKQUOTE class="mail">
+<UL>
+<LI><em>Subject</em>: Majordomo Digests to mbox format for MHonarc (perl script)</LI>
+<LI><em>From</em>: The Hermit Hacker &lt;<A HREF="mailto:scrappy&#37;40hub.org">scrappy<!--
+-->&#64;<!--
+-->hub.org</A>&gt;</LI>
+<LI><em>Date</em>: Sun, 4 Jan 1998 23:44:43 -0400 (AST)</LI>
+<LI><em>List-Name</em>: mhonarc</LI>
+</UL>
+<PRE>
+Hi...
+
+	I've searched the archives for some brain dead simple way of bring in old
+digests so that MHonarc can use them, and couldn't find anything but some 
+references to procmail and -msgsep...nothing which seemed to work "easily"...
+
+	So, here is my contribution...a simple, brain dead script that takes a
+Majordomo digest and converts it to a format that can be used by MHonarc...
+I don't guarantee it, but if anyone can suggest what is wrong with it, I'd
+like to know and try to fix it
+
+	Just run it as: &lt;scriptname&gt; &lt;infile&gt; &gt; &lt;outfile&gt;
+
+Marc G. Fournier                                
+Systems Administrator <!--
+-->&#64;<!--
+--> hub.org 
+primary: scrappy<!--
+-->&#64;<!--
+-->hub.org           secondary: scrappy<!--
+-->&#64;<!--
+-->{freebsd|postgresql}.org 
+
+#!/usr/local/bin/perl
+$userid = getlogin();
+
+$ii = 0;
+while (&lt;&gt;) {
+  if($printline) {
+    $line{$ii} = $_;
+    $ii++;
+  }
+  if (/^----------------------------------------------------------------------/) {
+    $printline = 1;
+    $line{$ii} = "------------------------------";
+    $ii++;
+  }
+}
+
+for($jj = 0; $jj &lt; $ii; $jj++) {
+  if(/^------------------------------/, $line{$jj}) {
+    if($line{$jj+2} =~ "^Date:") {
+      print "From $userid\n";
+      $jj += 2;
+    } else {
+      if($line{$jj+2} =~ "^End of") {
+        exit;
+      }
+    }
+  }
+  print $line{$jj};
+}
+
+</PRE>
+</BLOCKQUOTE>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="listprocessor">Can MHonArc process Listprocessor archives?</a></b></h3>
+</td></tr></table>
+
+<p>An answer from a MHonArc user:
+</p>
+<blockquote class="mail">
+<UL>
+<LI><em>To</em>: <A HREF="mailto:mhonarc&#37;40rosat.mpe-garching.mpg.de">mhonarc<!--
+-->&#64;<!--
+-->rosat.mpe-garching.mpg.de</A></LI>
+<LI><em>Subject</em>: re: digest to mbox</LI>
+<LI><em>From</em>: <A HREF="mailto:KMcCann&#37;40idrc.ca">KMcCann<!--
+-->&#64;<!--
+-->idrc.ca</A></LI>
+<LI><em>Date</em>: 12 Jun 97 09:15:27 EDT</LI>
+<LI><em>List-Name</em>: mhonarc</LI>
+</UL>
+<!--X-Head-Body-Sep-Begin-->
+<!--X-Head-Body-Sep-End-->
+<!--X-Body-of-Message-->
+<PRE>
+Here is a simple script I wrote to process the archives of my Listprocessor 
+lists. 
+
+#!/usr/local/bin/perl5
+#
+# mhonarch.pl - Process all Listprocessor archives using MHonArc
+#
+# Kevin McCann
+#
+#### Directory locations:
+#
+# Listproc, Majordomo, or Listserv top archives dir 
+$ARCHDIR = "/usr/server/archives";
+#
+# MhonArch web archives directory   
+$MONDIR = "/u/www/htdocs/listproc/mhonarc";
+#
+## Let's figure out what lists exist
+opendir(DIR,"$ARCHDIR/") || die "Can't open directory";
+<!--
+-->&#64;<!--
+-->dirs = readdir(DIR);
+<!--
+-->&#64;<!--
+-->sorteddirs = sort <!--
+-->&#64;<!--
+-->dirs;
+closedir(DIR);
+for (<!--
+-->&#64;<!--
+-->sorteddirs) {      # processing a list
+   $listname = $_;
+   opendir(DIR,"$ARCHDIR/$listname") || die "Can't open directory";
+   <!--
+-->&#64;<!--
+-->logs = readdir(DIR);
+   <!--
+-->&#64;<!--
+-->sortedlogs = sort <!--
+-->&#64;<!--
+-->logs;
+   closedir(DIR);
+   for (<!--
+-->&#64;<!--
+-->sortedlogs) {
+     if (/log/) {                # processing files with name format 
+'logYYMM'
+       $log = $_;
+
+       system("/usr/local/bin/mhonarc  -outdir  $MONDIR/$listname/$log  
+$ARCHDIR/$listname/$log")
+
+                 # modify the above command line as needed 
+     }
+   }
+  }
+
+}             # end of script
+
+
+I processed over 100 lists that go back to 1995 with this. It took about 
+one hour. There may be more elegant ways to do it, but this was just a 
+quick hack to get the job done. If you are using an RCFILE, don't forget to 
+include it in the long mhonarc command seen above. Oh, and don't forget to 
+change the first line that specifies your Perl location if you need to - 
+mine is set to /usr/local/bin/perl5.
+
+Good luck!
+
+- Kevin McCann
+kmccann<!--
+-->&#64;<!--
+-->idrc.ca
+www.cruciverb.com
+</PRE>
+</blockquote>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="ezmlm">Can MHonArc process ezmlm archives?</a></b></h3>
+</td></tr></table>
+
+<p>From what I read from the <b>ezmlm(5)</b> manpage, the following example
+command will process all messages of list:
+</p>
+<pre class="shell">
+prompt&gt; <b>mhonarc <var>/list/archive/</var>[0-9]*</b>
+</pre>
+<p>Replace "<tt>/list/archive/</tt>" to what is appropriate for your
+configuration.
+</p>
+<p>Basically, each numeric subdirectory in the "<var>archive</var>" directory
+follows the same format as MH mail directories.
+</p>
+<p>If you are using a shell that cannot handle "<tt>[0-9]*</tt>", the following
+should work:
+</p>
+<pre class="shell">
+prompt&gt; <b>mhonarc `find <var>/list/archive/</var> -type d -name '[0-9]*' -print`</b>
+</pre>
+<p>Note, make sure to add any additional options to mhonarc as needed
+to get the effects you desire.
+</p>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="maildir">Can MHonArc process qmail's maildir style mail folders?</a></b></h3>
+</td></tr></table>
+
+<p>For simplicity, let "<var>MAILDIR</var>" represent the pathname
+to your qmail mail directory.
+</p>
+<p>To have mhonarc process <var>MAILDIR</var>,
+you pass "<var>MAILDIR</var><tt>/cur</tt>" and/or
+"<var>MAILDIR</var><tt>/new</tt>" as the mail folder arguments.
+Which subdirectory you choose to use depends on your needs.
+</p>
+<p>Also, you will need to define the MHPATTERN resource to process
+all non-dotfiles.  Example:
+</p>
+<pre class="shell">
+prompt&gt; <b>mhonarc -mhpattern '^[^\.]' <var>MAILDIR</var>/cur</b>
+</pre>
+<p>If all you will ever do is process qmail maildir folders, it may be best
+to set the M2H_MHPATTERN environment variable so you do not have
+to respecify each time you invoke mhonarc.  Examples:
+</p>
+<dl>
+<dt>csh:
+    <dd><b><tt class="ishell">setenv M2H_MHPATTERN '^[^\.]'</tt></b>
+<dt>sh:
+    <dd><b><tt class="ishell">M2H_MHPATTERN='^[^\.]'; export M2H_MHPATTERN</tt></b>
+</dl>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="netscape">Can MHonArc process Netscape Messenger folders?</a></b></h3>
+</td></tr></table>
+
+<p>Yes.  Each Netscape Messenger folder has a corresponding mailbox file
+that stores the raw mail messages for the folder.  The location
+of the mailbox file will be in your mail directory.  Under Unix, this
+is normally <b><tt>$HOME/nsmail</tt></b>.  For Windows, this is
+typically
+<b><tt>C:\Program Files\Netscape\Users\<var>&lt;username&gt;</var>\Mail</tt></b>.
+</p>
+
+<p>For each Netscape folder, there are two files: 
+<b><tt><i>&lt;folder-name&gt;</i></tt></b> and 
+<b><tt><i>&lt;folder-name&gt;</i>.summary</tt></b> (or
+<b><tt><i>&lt;folder-name&gt;</i>.snm</tt></b> under Windows).
+The <b><tt>.summary</tt></b> can be ignored with respect to MHonArc.
+The other file contains the raw mail messages and can be passed
+directly to MHonArc for processing.  For example, to process all the
+mail in your Inbox, do something like the following:
+</p>
+<pre class="shell">
+prompt&gt; <b>mhonarc $HOME/nsmail/Inbox</b>
+</pre>
+
+<p>Note, you may need to compress/compact folders in Netscape before
+running MHonArc.  If not, messages you have deleted from a folder may
+show up in the archive create by MHonArc.
+</p>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="evolution">Can MHonArc process Evolution folders?</a></b></h3>
+</td></tr></table>
+
+<p>Yes.  Each Evolution folder has a corresponding mailbox file
+that stores the raw mail messages for the folder.  The location
+of the mailbox file will be in your mail directory which is
+typically <b><tt>$HOME/evolution/local/<em>folder-name</em></tt></b>.
+In the directory is a file called <tt>mbox</tt> which contains
+the raw messages that can be passed into MHonArc directly.
+</p>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="compuserve">Can MHonArc process Compuserve messages?</a></b></h3>
+</td></tr></table>
+
+<p>Here is a response from a user:
+</p>
+<blockquote class="mail">
+<UL>
+<LI><em>Subject</em>: Re: CompuServe --&gt; html</LI>
+<LI><em>From</em>: Steve Pacenka &lt;<A HREF="mailto:sp17&#37;40cornell.edu">sp17<!--
+-->&#64;<!--
+-->cornell.edu</A>&gt;</LI>
+<LI><em>Date</em>: Thu, 06 Mar 1997 09:09:00 -0500</LI>
+</UL>
+<PRE>
+At 11:38 AM 3/6/97 +0100, Bernard Frit wrote:
+&gt;<i>Hi everybody,</i>
+&gt;
+&gt;<i>A friend of mine has a lot of archives in CompuServe</i>
+&gt;<i>thread and message format. He'd like to convert them</i>
+&gt;<i>in a convenient format (html or whatever) with thread</i>
+&gt;<i>indexing features as MHonArc is doing it for mail</i>
+&gt;<i>archives.</i>
+&gt;
+&gt;<i>At the first glance, I didn't find out how to configure</i>
+&gt;<i>MHonArc to do the job.</i>
+
+The Compuserve "file cabinet" format is too far from the basic SMTP message
+format that MHonArc recognizes.
+
+Your friend can find software on Compuserve to read the file cabinet format
+and emit ascii text that is closer to SMTP message format that MHonArc can
+use.  A search of IBMFF using the keywords "cabinet" and "convert" yielded
+several items including these two:
+
+Forum Name: CSNAVSUPPORT                 Library: Member Uploads  (6)
+  Accesses: 839                       Size: 11368
+      File: THRDCO.ZIP           Submitted: [72662,70]   26-Aug-94
+
+
+This program converts forum message threads to a plain text file  called
+COLLECT.TXT.  Your favorite word processor can then search  for any message
+on any topic that you have downloaded.  It is  public domain and was
+created because I have so many forum  thread messages which I can't search.
+
+-----
+Forum Name: PCEFORUM                 Library: Telecom/Reseaux  (8)
+  Accesses: 32                        Size: 30865
+      File: SHWCIM.ZIP           Submitted: [72241,2132]   08-Nov-96
+
+Une fois stockes dans le "Cabinet"  CompuServe, les messages des forums et
+les courriers sont codes dans des fichiers binaires que l'on ne peut pas
+relire directement. Cet utilitaire a pour but de convertir n'importe quel
+fichier de la base WinCIM en fichier ASCII pur. Freeware en anglais.
+
+-- SP
+
+</PRE>
+</blockquote>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="otherformats">What about other mailbox/folder formats?</a></b></h3>
+</td></tr></table>
+
+<p>The common technique is to convert the foreign format into
+a format recognized by MHonArc: UUCP mailbox or MH mail folders.  The
+conversion can also rely on the usage of the MSGSEP and MHPATTERN
+resources to make conversion potentially easier.
+</p>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="nonenglish">Can MHonArc create non-English archives?</a></b></h3>
+</td></tr></table>
+
+<p>Yes.  With MHonArc's page layout customizations features,
+you can have MHonArc create pages in any language supported
+by Web client software.  Plus, messages containing non-English text
+is supported during message conversion via the CHARSETCONVERTERS
+resource.
+</p>
+
+<dl>
+<dt>See also:</dt>
+<dd><a href="#unicde"
+    >Does MHonArc support Unicode?</a></dd>
+</dl>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="japanese">How about Japanese?</a></b></h3>
+</td></tr></table>
+
+<p>Yes.  For details about Japanese usage of MHonArc, goto:
+<a href="http://www.mhonarc.jp/">&lt;http://www.mhonarc.jp/&gt;</a>
+(documents are in Japanese).
+</p>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="bilingual">Can I create bilingual archives?</a></b></h3>
+</td></tr></table>
+
+<p>Yes.  You can actually create archives that have as many
+indexes as you want in as many languages that you want.  Through
+the OTHERINDEXES resource can define any number of extra indexes
+to create.  For each index, you can redfine the index resources
+to use whatever text (English or non-English) you desire.
+</p>
+<table class="note" width="100%">
+<tr valign="baseline">
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>
+There is no support for mulitple variations of message
+pages in an archive.  Therefore, a single language must be
+chosen for message pages, or you can include redundant information
+using multiple languages.
+</p>
+</td>
+</tr>
+</table>
+<p> </p>
+<table class="note" width="100%">
+<tr valign="baseline">
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>
+Actual message data will be in the language used in the
+message.  MHonArc has no built-in language translation.
+</p>
+</td>
+</tr>
+</table>
+
+<dl>
+<dt>See also:</dt>
+<dd><a href="#unicde"
+    >Does MHonArc support Unicode?</a></dd>
+</dl>
+
+<!-- ??????????????????????????????????????????????????????????????? -->
+<hr noshade size=1>
+<table border=0>
+<tr valign=baseline><td><img src="monicon.png" align="bottom" alt=""></td><td>
+<h3><b><a name="unicode">Does MHonArc support Unicode?</a></b></h3>
+</td></tr></table>
+
+<p>Yes.  Check out the following for more information:
+</p>
+<ul>
+<li><a href="../resources/textencode.html">TEXTENCODE</a>
+    resource.</li>
+<li><a href="../resources/charsetconverters.html">CHARSETCONVERTERS</a>
+    resource.</li>
+<li><a href="../rcfileexs/utf-8-encode.mrc.html"><tt>utf-8-enocde.mrc</tt></a>
+    and <a href="../rcfileexs/utf-8.mrc.html"><tt>utf-8.mrc</tt></a>
+    resource file examples.</li>
+</ul>
+
+<!-- ===================================================================== -->
+<hr>
+
+<!--X-NavButtons-Start-->
+<table width="100%"><tr><td align="left"><nobr>[<a href="general.html">Prev</a>]</nobr></td><td align="center" width="100%">[<a href="faq.html">TOC</a>][<a href="../mhonarc.html">Manual</a>][<a href="http://www.mhonarc.org/">Home</a>]</td><td align="right"><nobr>[<a href="usage.html">Next</a>]</nobr></td></tr></table>
+</p>
+<!--X-NavButtons-End-->
+
+<hr>
+<address>
+$Date: 2011/01/01 02:43:26 $ <br>
+<img align="top" src="monicon.png" alt="">
+<a href="http://www.mhonarc.org/"
+><strong>MHonArc</strong></a><br>
+Copyright &#169; 1997-1999, <a href="http://www.earlhood.com/"
+>Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org"
+>mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+</body>
+</html>

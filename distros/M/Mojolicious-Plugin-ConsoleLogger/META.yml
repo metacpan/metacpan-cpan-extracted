@@ -1,0 +1,19 @@
+---
+abstract: 'Console logging in your browser'
+author:
+  - 'Glen Hinkle <tempire@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-ConsoleLogger
+requires:
+  Mojolicious: '1.99'
+resources:
+  repository: git://github.com/tempire/mojolicious-plugin-consolelogger.git
+version: '0.06'

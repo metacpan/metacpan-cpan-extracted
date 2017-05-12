@@ -1,0 +1,20 @@
+Revision history for MediaWikiUtils.
+
+0.141410  2014-05-21 22:08:23CEST+0200 Europe/Paris
+
+0.141230  2014-05-03 15:11:28CEST+0200 Europe/Paris
+
+0.141210  2014-05-01 23:28:38CEST+0200 Europe/Paris
+
+    * Support of category for dokuwiki conversion.
+    * Remove useles duplicate file.
+
+0.141011  2014-04-12 00:08:17CEST+0200 Europe/Paris
+
+    * Add basic load test.
+    * Forget commit.
+
+0.141010  2014-04-11 23:45:49CEST+0200 Europe/Paris
+
+    * Initial version developed.
+

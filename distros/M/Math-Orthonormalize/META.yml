@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name: Math-Orthonormalize
+version: 1.00
+author:
+  - |-
+    Steffen Mueller <orthonormalize-module at steffen-mueller dot net>
+abstract: Gram-Schmidt Orthonormalization of vectors
+license: perl
+requires:
+  Math::Symbolic: 0.128
+  Parse::RecDescent: 1.8
+recommends:
+  Test::Pod: 1.0
+  Test::Pod::Coverage: 1.0
+build_requires:
+  Test::More: 0
+provides:
+  Math::Orthonormalize:
+    file: lib/Math/Orthonormalize.pm
+    version: 1.00
+generated_by: Module::Build version 0.2608

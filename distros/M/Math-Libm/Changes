@@ -1,0 +1,9 @@
+Revision history for Perl extension Math::Libm.
+
+0.01  Thu Jun 15 2000
+	- original version; created by h2xs 1.20 with options
+		-n Math::Libm /usr/include/math.h -lm
+
+1.00  Sun Jun 25 2000
+	- Tested on AIX 4.2, FreeBSD 4.0, Linux 2.2.16, and Solaris 2.5.1.
+	- Good enough for beta release!

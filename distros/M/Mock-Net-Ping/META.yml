@@ -1,0 +1,29 @@
+---
+abstract: "Mock Net::Ping's ping method"
+author:
+  - 'Matthew Musgrove <mr.muskrat@gmail.com>'
+build_requires:
+  Test::Exception: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mock-Net-Ping
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Net::Ping: 2.31
+  Socket: 0
+  perl: 5.006
+resources:
+  bugtracker: http://github.com/mrmuskrat/Mock-Net-Ping/issues/
+  homepage: http://github.com/mrmuskrat/Mock-Net-Ping/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/mrmuskrat/Mock-Net-Ping/
+version: 0.09

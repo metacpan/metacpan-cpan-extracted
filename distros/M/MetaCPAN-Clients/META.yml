@@ -1,0 +1,25 @@
+---
+abstract: 'A set of scripts to access MetaCPAN.org via its API and provide reports'
+author:
+  - 'Gabor Szabo <szabgab@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MetaCPAN-Clients
+requires:
+  Data::Dumper: 0
+  Getopt::Long: 0
+  MetaCPAN::API: 0.43
+  Path::Tiny: 0.015
+resources:
+  repository: https://github.com/szabgab/MetaCPAN-Clients.git
+version: 0.05
+x_contributors:
+  - SZABGAB
+  - DAGOLDEN

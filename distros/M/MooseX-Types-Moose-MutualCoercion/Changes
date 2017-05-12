@@ -1,0 +1,112 @@
+This file documents the revision history for Perl distribution
+`MooseX-Types-Moose-MutualCoercion`.
+
+
+VERSION HISTORY
+===============
+
+0.04 : Released on 2013-12-25 (JST)
+-----------------------------------
+
+### Bug fixes
+
+#### Following recent Moose
+
+-   Replaced `load_class()` and `is_class_loaded()` functions from
+    `Class::MOP` module as an internally-used class loader with namesake
+    functions from `Class::Load` module.
+    It intended to follow recent Moose (2.1200).
+    It is concerned with RT #90911 (by Upasana Shukla).
+    Thank you for your contributions.
+
+#### Packaging
+
+-   The package no longer includes test modules.
+    They caused a failure of the tests.
+    It is concerned with RT #89913 (by Poul Henning Sørensen), #91051
+    (by Slaven Rezić) and #91581 (by Caleb Cushing).
+    Thank you for your contributions.
+
+
+0.03 : Released on 2010-05-15 (JST)
+-----------------------------------
+
+(No code changes)
+
+-   `StrToClassName` is now deprecated.
+    Please use `MooseX::Types::LoadableClass`'s `LoadableClass`.
+
+
+0.02 : Released on 2010-04-28 (JST)
+-----------------------------------
+
+### Bug fixes
+
+-   Changed the parent type of `StrToClassName` from `NonEmptySimpleStr`
+    (provided by `MooseX::Types::Common::String`) to `NonEmptyStr`.
+    You can set a string more than 255 characters into an attribute with
+    the type.
+
+
+0.01 : Released on 2010-04-23 (JST)
+-----------------------------------
+
+(No code changes)
+
+-   Corrected testing for `use_ok`.
+
+
+0.00 : Released on 2010-04-23 (JST)
+-----------------------------------
+
+Initial release.
+
+
+META INFORMATION
+================
+
+Version notation
+----------------
+
+    V.vvrr_dd : Released on YYYY-MM-DD (Time Zone)
+
+### V  : Major version number
+
+-   Added ambitious features
+-   Changed in APIs
+    (older API will be keeped to compatibility for a some period)
+-   ...
+
+### vv : Minor version number (in major version)
+
+-   Added several features
+-   Improved any features
+-   Fixed bugs
+-   ...
+
+### rr : Revision number (in minor version, on demand)
+
+You would not need to update the distribution.
+
+-   Improved tests
+-   Updated documents
+-   ...
+
+### dd : Developer release number (in revision number, on demand)
+
+This is unstable version.
+Unless you are a developer, You will not be recommended to upgrade
+the distribution.
+
+-   Added experimental features
+-   Fixed bugs provisionally
+-   ...
+
+
+Document format
+---------------
+
+This `Changes` file was formatted in Markdown.
+
+    % perl -MText::Markdown -MFile::Slurp \
+      -e 'print (Text::Markdown->new->markdown(scalar read_file(q{Changes})));'

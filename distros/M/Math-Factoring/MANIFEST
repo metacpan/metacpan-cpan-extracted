@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Math/Factoring.pm
+spec/Integer.cc
+spec/Integer.h
+spec/pollard_rho.cc
+t/00-load.t
+t/01-basic.t
+t/boilerplate.t
+t/pod.t

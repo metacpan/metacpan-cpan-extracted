@@ -1,0 +1,21 @@
+
+http://cpants.cpanauthors.org/dist/Module-Install
+- "use warnings" everywhere
+- no LICENSE (see proposed changes in other dists for how to add one -- or MI's own license provider plugin, assuming there is one)
+- missing dependency on CPANPLUS?
+
+- no need to 'use vars', since we require perl 5.6 -- but be careful that the
+  difference between vars and 'our' isn't important somewhere.
+
+
+weird test results:
+http://www.cpantesters.org/cpan/report/326ca640-e74d-11e4-92fe-3843e14af301
+http://www.cpantesters.org/cpan/report/0ff78e10-f60f-11e4-a1d1-8536eb4f9f07
+
+
+modules such as Module::Install::Base::FakeAdmin shouldn't be in the index.
+mark their package declarations as # hide from PAUSE -- but search
+grep.cpan.me first just in case something breaks
+
+
+- create Test::DistManifest test to verify stuff... and a makefile.pl thingy to add xt/ to tests if -e .git

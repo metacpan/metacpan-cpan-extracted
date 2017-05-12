@@ -1,0 +1,60 @@
+
+Complete version history
+========================
+
+##############################################################################
+Math::Roman:
+
+2017-01-13 1.08 pjacklam
+
+ * Change order of entries in CHANGES file (this file) to have newest entries
+   at the top.
+
+ * Avoid barewords in Makefile.PL.
+
+ * "NAME" field in Makefile.PL must be a package name, so change "Math-Roman"
+   into "Math::Roman".
+
+ * Remove Math::BigFloat from the "PREREQ_PM" field in Makefile.PL, since
+   Math::BigFloat is not used.
+
+ * Required version of Math::BigInt is 1.35, not 1.70, so update Makefile.PL.
+
+ * Trim whitespace. This makes 'podchecker' happy.
+
+ * Fix POD formatting issues.
+
+ * Add more references to CPAN in the POD.
+
+2004-03-12 1.07 Tels
+
+ * require Math::BigInt v1.70 (v1.45 is now rather outdated)
+
+ * doc fix: "you define an 'IIX' token with a value of 12" should read:
+   "...value of 8" (Thanx to "Martin H. Sluka")
+
+ * add SIGNATURE
+
+2002-04-01 1.06 Tels (not released)
+
+ * fixed roman() (Thanx to Richard Jelinek)
+
+ * LXL is invalid (LX == 40 and is thus smaller than L (50))
+
+2001-11-08 1.05
+
+ * made seperate package
+
+2001-05-07 1.04
+
+ * got rid of C&P in overload section
+
+2001-04-14 1.03
+
+ * fixed as_number() to return BigInt
+
+2001-02-17 1.02
+
+ * require 5_005;
+
+Tels <http://bloodgate.com/>

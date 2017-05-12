@@ -1,0 +1,56 @@
+{
+   "abstract" : "A Mojolicious Plugin for generate share urls, buttons and meta for Twitter, Facebook, Google Buzz, VKontakte, MyMailRU and Google Plus",
+   "author" : [
+      "Anatoly Sharifulin <sharifulin@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "keywords" : [
+      "mojo",
+      "mojolicious",
+      "share",
+      "helper",
+      "plugin"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-ShareHelpers",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "1.17"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::ShareHelpers" : {
+         "file" : "lib/Mojolicious/Plugin/ShareHelpers.pm",
+         "version" : "0.7"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/sharifulin/Mojolicious-Plugin-ShareHelpers"
+      }
+   },
+   "version" : "0.7"
+}

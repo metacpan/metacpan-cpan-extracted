@@ -1,0 +1,4 @@
+(* $Id$ *)
+tell application "iTunes"
+	return player state
+end tell

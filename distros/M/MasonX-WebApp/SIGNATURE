@@ -1,0 +1,35 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.54.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 586168334ab3f0d57a7da01ad72c932becc1468d Build.PL
+SHA1 88b60dc8fe4b6059332365489eac54112869bfb4 Changes
+SHA1 f235ba4160673bcb7c9d58c2f09dbc7fc0efadea LICENSE
+SHA1 10bd49350f4fa917a6ae023536730f5edd1bc852 MANIFEST
+SHA1 062d535578cde86a9038b4f7ec47af424f97c2d3 META.yml
+SHA1 cd14ada78fb37a0d926edd86eddcdf7f939de582 Makefile.PL
+SHA1 58c440d3a752bf2841b2597e1b2f9527090494b8 README
+SHA1 6a1a2a0c0802f45701933880af3bbc9a65344533 lib/MasonX/WebApp.pm
+SHA1 f2c67a67f45e018b9da5836aa93c28eac3871c2b t/abort.t
+SHA1 9f515feaca7185cde52e0ea4264a999fe6e3f246 t/action.t
+SHA1 c73c1dd41b59e0e44bc60b7a2731ff9fe8bd79e8 t/new.t
+SHA1 8383dbcab2c6e97972fda00cff05465ed77ae5a2 t/session-wrapper.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.3 (GNU/Linux)
+
+iD8DBQFFwndF3Or3ZzQuifMRAiHEAKDhueCOV4GfQZwRSq1mb23Urx7VxACfX1pH
+pvHVYgGleHL8ZXfLUw0lol0=
+=ynxW
+-----END PGP SIGNATURE-----

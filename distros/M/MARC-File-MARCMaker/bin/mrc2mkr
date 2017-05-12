@@ -1,0 +1,147 @@
+#!perl
+
+=head2
+
+Converts raw MARC (ISO 2709) format files into  MARCMaker format.
+
+=head1 SYNOPSIS
+
+B<mrc2mkr> [options] file(s)
+
+=over 4
+
+=item options
+
+=over 4
+
+=item --help
+
+Print a summary of commands
+
+=item --[no]stats
+
+Print a record count by file at the end.  (Default: on)
+
+=back
+
+=back
+
+=head2 TODO
+
+Separate warnings printing from record printing.
+
+Print records to file rather than screen?
+
+Update once as_marcmaker() method is available for full record encoding.
+
+=cut
+
+###########################
+### Initialize includes ###
+### and basic needs     ###
+###########################
+use strict;
+use warnings;
+
+use MARC::Record;
+use MARC::File::USMARC;
+use MARC::File::MARCMaker;
+
+use Getopt::Long;
+
+use constant USAGE => <<"END";
+Usage: mkr2mrc [options] file(s)
+    options
+        --help
+            Print a summary of commands
+        --version
+            Print version
+        --[no]quiet
+            Suppress status messages
+        --[no]stats
+            Print a record count by file at the end
+END
+
+my $stats = 1;
+my $help = 0;
+my $quiet = 0;
+
+my $rc = GetOptions(
+    "stats!" => \$stats,
+    "quiet!" => \$quiet,
+    "help"   => \$help,
+    "version"   => sub { print "$0, using MARC::Record v$MARC::Record::VERSION and MARC::File::MARCMaker v$MARC::File::MARCMaker::VERSION\n"; exit 1; },
+    );
+
+my @files = @ARGV;
+
+die USAGE if $help or (not $rc) or (@files == 0);
+
+#########################
+### Start main program ##
+#########################
+
+print ("Welcome to MARC to MARCMaker script\n");
+
+my %counts;
+my %errors;
+
+for my $filename ( @files ) {
+    $counts{$filename} = 0;
+    $errors{$filename} = 0;
+
+    my $file = MARC::File::USMARC->in( $filename ) or die $MARC::File::ERROR;
+    warn "$filename\n" unless $quiet;
+
+    my $runningrecordcount = 0;
+
+    while (my $record = $file->next()) {
+        if ( not $record ) {
+            warn $MARC::Record::ERROR;
+            ++$errors{$filename};
+        } else {
+            ++$counts{$filename};
+        } #else record decoded
+
+        print MARC::File::MARCMaker->encode($record);
+
+        if ( my @warnings = $record->warnings() ) {
+            ++$errors{$filename};
+            print join( "\n", $record->title, @warnings, "" );
+        } #if warnings found during decoding process
+
+
+    } # while
+    $file->close();
+} # for 
+
+if ( $stats ) {
+    print "\n\n";
+    print " Recs  Errs Filename\n";
+    print "----- ----- --------\n";
+    for my $key ( sort keys %counts ) {
+        printf( "%5d %5d %s\n", $counts{$key}, $errors{$key}, $key );
+    } # for
+} # if stats
+
+#####################
+### END OF PROGRAM ##
+#####################
+
+=head1 LICENSE
+
+This code may be distributed under the same terms as Perl itself. 
+
+Please note that this code is not a product of or supported by the 
+employers of the various contributors to the code.
+
+=head1 AUTHOR
+
+Bryan Baldus
+eija [at] inwave [dot] com
+
+Based on marclint.
+
+Copyright (c) 2005
+
+=cut

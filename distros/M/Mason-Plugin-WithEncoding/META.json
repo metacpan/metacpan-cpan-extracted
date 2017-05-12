@@ -1,0 +1,72 @@
+{
+   "abstract" : "Add encoding support to Poet/Mason apps",
+   "author" : [
+      "Dave Baird <dave@zerofive.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mason-Plugin-WithEncoding",
+   "no_index" : {
+      "directory" : [
+         "lib/Mason/Plugin/WithEncoding/Test",
+         "lib/Mason/Plugin/WithEncoding/t"
+      ]
+   },
+   "prereqs" : {
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::Pod::Coverage" : "1.08",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "Guard" : "0.1",
+            "Mason" : "2.13",
+            "Moose" : "0.34",
+            "Plack::Request::WithEncoding" : "0",
+            "Poet" : "0.04",
+            "Try::Tiny" : "0.01",
+            "URI::Escape" : "3.29",
+            "encoding::warnings" : "0",
+            "perl" : "v5.12.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Class" : "0",
+            "Test::Class::Most" : "0",
+            "Test::More" : "0",
+            "perl" : "v5.12.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davebaird/mason-plugin-withencoding/issues"
+      },
+      "homepage" : "https://github.com/davebaird/mason-plugin-withencoding",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/davebaird/mason-plugin-withencoding.git",
+         "web" : "https://github.com/davebaird/mason-plugin-withencoding"
+      }
+   },
+   "version" : "0.2"
+}
+

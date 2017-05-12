@@ -1,0 +1,24 @@
+Changes
+=======
+
+0.00006 - 09 Mar 2010
+    - Use bundledeps command instead of cpanm -- We'd like to completely
+      detach from other environments when installing
+
+0.00005 - 02 Mar 2010
+    - Un-fixed. Today is just not my day.
+
+0.00004 - 02 Mar 2010
+    - Fix wrong flag name. Argh!
+    - use $(NOECHO)
+
+0.00003 - 02 Mar 2010
+    - No code changes. Repackaged with this Changes file for everybody's
+      peace of mind.
+
+0.00002 - 01 Mar 2010
+    - Use cpanm.
+    - Implement bundle_local_lib_fast action, which will skip tests
+
+0.00001 - 17 Dec 2009
+    - Initial release

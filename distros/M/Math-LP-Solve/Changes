@@ -1,0 +1,26 @@
+Revision history for Perl extension Math::LP::Solve.
+
+3.03  Fri Apr  6 13:31:01 METDST 2001
+
+        - NO CHANGES whatsoever except for the version number 
+          were made to the Perl API (Solve.pm)
+
+        - upgraded to linking with lp_solve 3.2, which includes some
+          bugfixes with respect to lp_solve 3.0.
+
+        - made compilation of liblpk.a more robust
+
+	- shortened the short explanations so search.cpan.org does
+ 	  not cut them
+
+3.02  Wed Nov  8 22:41:35 CET 2000
+
+	- fixed the wrong PERL5LIB setting in README
+
+	- added a version number to Solve.pm 
+	  (needed for correct installation of Math::LP)
+
+3.01  Tue Jul 25 15:22:03 2000
+
+	- original version; created by h2xs 1.20 with options
+		-AX -n Math::LP::Solve -v 3.01

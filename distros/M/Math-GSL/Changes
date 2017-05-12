@@ -1,0 +1,263 @@
+=head1 Math::GSL Changes
+
+=head1 v0.39 - September 2016
+    - Fix Debian Bug reported by Niko Tyni
+        https://bugs.debian.org/826009
+    - Extensive fixes to allow GSL 1.15 and GSL 1.16
+      to continue to work with GSL 2.x
+    - GSL 1.11 - 1.14 are no longer supported
+
+=head1 v0.38 - September 2016
+    - Fixes for compiling against various GSL
+      versions (thanks CPANtesters!)
+
+=head1 v0.37 - September 2016
+    - Support for GSL 2.0, 2.1 and 2.2
+    - Multilarge subsystem added for GSL >= 2.1
+
+=head1 v0.36 - Fri Mar 25 23:32:03 PDT 2016
+    - Fixed error messages on Matrix set_col and set_row
+      methods (Jon Schutz)
+    - Implemented array-based Bessel functions:
+               gsl_sf_bessel_Jn_array
+               gsl_sf_bessel_Yn_array
+               gsl_sf_bessel_In_array
+               gsl_sf_bessel_In_scaled_array
+               gsl_sf_bessel_Kn_array
+               gsl_sf_bessel_Kn_scaled_array
+               gsl_sf_bessel_jl_array
+               gsl_sf_bessel_jl_steed_array
+               gsl_sf_bessel_yl_array
+               gsl_sf_bessel_il_scaled_array
+
+=head1 v0.35 - April 2015
+
+    - Remotion of trailing whitespaces (Shlomi Fish)
+    - Documentation fixes (Shlomi Fish)
+    - Remotion of PkgConfig from runtime requirements
+      (Bartosz Jakubski)
+    - Indentation fixes (Bartosz Jakubski)
+    - Installation feedback improvements (Bartosz Jakubski)
+
+=head1 v0.34 - December 2014
+
+    - Fixed bug on uncleared error variable (5.8.9)
+    - Added OO transpose method for matrices (Ivan Baidakou)
+
+=head1 v0.33 - September 2014
+    - Added OO code for RNG->shuffle, RNG->choose and RNG->sample.
+    - Complain when opening (fopen) a file from a tainted string.
+    - Complex now has operator overloading for +,-, ==, !=, *, /
+    - Added write/load methods to save a matrix to file.
+
+=head1 v0.32 - June 2014
+    - Correctly split the compiler name.
+    - Added OO code to the QRNG module.
+    - Fixed QRNG code that was failing on some machines.
+
+=head1 v0.31 - June 2014
+    - Fixed Matrix multiplication that was forcing square matrices.
+
+=head1 v0.30 - June 2014
+    - Fixed generated C files with wrong GSL version numbers.
+    - Refactored Build.PL in order to use either gsl-config or PkgConfig.
+    - Change Build.PL to return 0 when GSL library not found.
+    - Use PkgConfig instead of ExtUtils::PkgConfig.
+    - Math::GSL::Matrix constructor from a GSL matrix.
+    - Reorganization on the Math::GSL::Matrix documentation.
+	- Add symbols introduced on gsl 1.15.
+	- Fixed in the correct way the prove/TAP::Harness problem.
+
+=head1 v0.29 - June 2014
+	- Fix issue when prove/TAP::Harness uses lib/ modules instead of blib/ ones.
+    - Add functions introduced in gsl 1.16.
+    - Fix issue when compiling on some Linuxes.
+	- Math::GSL ->each method.
+    - Math::GSL ->max and ->min methods.
+	- Math::GSL ->dim method.
+    - Math::GSL ->set_elem and ->get_elem methods.
+    - Math::GSL concat_vertically and concat_horizontally.
+
+=head1 v0.28 - Jan 2014
+    - Fix build errors with clang
+    - Improve POD to play nice with Perl 5.18
+    - Teach Math::GSL about new functions added in GSL 1.16
+    - Added 1D minimization tests
+
+=head1 v0.27 - July 2012
+    - Mathieu functions are now accessible
+    - Improved detection of gsl
+    - Fix bug in calling ->get() method on Math::GSL::Vectors
+    - Greatly improved HTML formatting of documentation
+
+=head1 v0.26 - September 2011
+    - The Math::GSL::Min and Math::GSL::Roots are now functional - Yury Zavarin
+    - Dirichlet random distribution support and greatly increased docs by Tom Nishimura <tnish@fastmail.jp>
+    - gsl_version() function which returns the version of GSL being used by Tom Nishimura <tnish@fastmail.jp>
+    - Fix '-bundle not allowed with -dynamiclib' build error on Mac OS X - Yury Zavarin
+    - Build swig wrappers for different versions of GSL (1.11 - 1.15) - Yury Zavarin
+    - Minimum SWIG version is now 2.x (only required for developers using the git repo)
+    - Removed deprecated stuff from Build.PL and added Module::Build to configure_requires
+    - Many small documentation improvements
+    - Fix build on Windows - Sisyphus
+
+=head1 v0.25 - April 2011
+    - TODO RT#66882 properly so that a stable release with a passing test suite can be used.
+
+=head1 v0.24 - April 2011
+    - Fix https://rt.cpan.org/Ticket/Display.html?id=66882 (Tests fail on Perl's with DUSELONGDOUBLE)
+
+=head1 v0.23 - March 2011
+    - Fixed the tolerance of some tests that were causing CPANtesters failures
+    - Fixed some doc typos
+
+=head1 v0.22 - June 2010
+    - Improved tests
+    - == and != operators for Vectors
+    - Fixed the export of hypergeometric functions (Thierry Moisan)
+    - In instantiation of GSLBuilder in Build.PL, the value for the parameter
+      include_dirs were corrected to an anonymous empty array, instead of an
+      empty string.  (Jakob Ilves)
+    - Operator overloading of vector equality (Thierry Moisan)
+    - Various doc fixes (Pjotr Prins)
+    - Typemap fixes (Vincent Danjean)
+
+=head1 v0.20 - May 19 2009
+    - $rng->get($n) will now return the next $n values of the random number generator
+    - Fixed + added test for RT#45044 math-gsl eigenpair bug, reported with patch by Ian Malone
+    - Added more tests for Randist
+    - Fixed some incorrectly written tests for BLAS and Linalg
+    - Improved NTuple support and tests
+    - Improvements to callbacks, thanks to patches from piotrj
+    - The following improvements were merged from Vincent Danjean's git repo:
+    - Fixed some memory leaks caused by in-typemaps without argout-typemaps
+    - Improved portable callback implementation
+    - Correct handling of double, float and size_t on x64
+    - Removed duplicate definition of fopen/fclose in VectorComplex
+    - Fix bug where proper flags to SWIG were not passed
+
+=head1 v0.18 - March 23 2009
+
+    - Make Math::GSL play nice with GSL 1.12
+    - Added swap() to Vector objects with tests and docs
+    - Added p-norms to Vector objects via norm() and normalize()
+    - Added operator overloading so that
+            abs $vector == $vector->norm
+    - Added as_vector() to Matrix and MatrixComplex objects
+    - Added inverse(), is_square(), det(),  lndet(), zero() and identity()
+        to Matrix objects
+    - Added inverse(), is_square(), det(),  lndet(), zero(), identity()
+        and hermitian() to MatrixComplex objects
+    - Added dot product to Matrix objects
+    - Fixed various typos in documentation
+    - Fixed warnings about overloaded operators in Matrix and BLAS
+    - Overloaded '==' and '!=' for MatrixComplex and Matrix objects
+    - Fixed amd64 -fPIC compile failure
+    - Added tests to Monte and refactor Sort tests
+    - Refactored and improve error checking in callback interface
+    - Fixed 'NaN' test failures (thanks CPANtesters!)
+
+=head1 v0.16 - December 14 2008 (Happy Snowpocalypse PDX!)
+
+    - Fixed RT#40947: configure_requires ExtUtils::PkgConfig bug
+    - Added reverse() and swap() methods to VectorComplex objects with tests and docs
+    - as_list() and get() now work on VectorComplex objects
+        as_list() returns a list of Math::Complex objects
+        get() returns a list of Math::GSL::Complex objects
+    - Math::GSL::Test::ok_status() now takes an optional message argument
+    - Added KNOWN_BUGS
+    - Added Math::GSL::Test::is_status_ok()
+    - New subsytems: VectorComplex and MatrixComplex
+    - Operator overloading for addition and subtraction with vectors
+    - Added example: examples/matrix/nonsymmetric_eigen
+        Shows how to find the eigenvalues of a nonsymmetric matrix
+    - Added copy() method to vectors
+    - Improved Vector docs
+    - Sped up vector dot products by 15x using BLAS function gsl_blas_ddot
+        NOTE: using gsl_blas_ddot($x->raw,$y->raw) directly is still about 10 times faster
+              than $x * $y due to error checking and function call overhead
+    - Separated POD and Perl code out of SWIG interface files, yay for proper syntax
+        highlighting
+    - Added stub test files for Heapsort, IEEEUtils, Multimin, Siman, Wavelet2D
+    - All test files now keep track of how many tests should run
+    - Fix an include bug in Histogram2D which caused the build to fail (Thierry)
+    - Operator overloading for addition, multiplication and subtraction on Matrix objects (Thierry)
+
+
+=head1 v0.14 - October 21 2008
+
+    - Chebyshev Series Approximation, with tests and docs
+    - Examples and new documentation in Statistics, as well as tests (Thierry)
+    - Bugfixes relating to compiling on 64bit Red Hat Linux, reported by Michael Roberge
+    - Improved FFT, Deriv, Integration, Chebyshev, Combination and Roots docs
+    - Documentation for Math::GSL::Test
+    - Improved introduction examples in Math::GSL
+    - Improved Minimization subsystem tests, but it is not functional
+    - Added examples/fft/forward_real
+    - Added example/deriv/basic
+
+        This shows the simple fact that d/dx(sin(x)) = cos(x)
+
+    - Added example/sf/erfc_check (thanks to Keith Lofstrom)
+
+        Script which tests the erfc() special function against computing
+        the integral definition with gsl_integration_qagiu()
+
+    - Added example/vector/speed
+
+        This shows a considerable performance boost using Math::GSL::Vectors
+        instead of List::Util when searching for the min and max elements of
+        large sets of random numbers.
+
+    - Fixed return signature of gsl_deriv_* functions to return a flat list
+    - Fixed some failing tests relating to  -Duselongdouble (Sisyphus)
+    - Fix location of shared objects (Sisyphus)
+    - Added raw() method to RNG objects
+
+=head1 v0.12 - September 14 2008
+
+    - Darwin support!
+    - Minimum Perl version changed to 5.8.0
+    - Make platform check compile time constants for performance
+        aka The Wilhelm Speedup (thanks to Eric Wilhelm <scratchcomputing@gmail.com>)
+    - FFT for real data
+    - Numerical derivatives fully implemented
+    - Integration subsystem, gsl_integrate_qags() and gsl_integrate_qagi(), etc..
+        - QNG    : Non-adaptive Gaussian (uses fixed number of sample points in interval)
+        - QAG(S) : Adaptive Gaussian (Singluar) (slices interval up based on properties of the function)
+        - QAGI   : Adaptive Gaussian with infinite integration range
+        - other are supported but not tested
+    - Initial Monte tests
+    - Initial Multiroots tests
+    - More nan/inf fixes on MSWin32 from <sisyphus@cpan.org>
+    - Stripping of binaries on Windows, which significantly reduces size
+        from <sisyphus@cpan.org>
+    - Full support and tests for all functions in the Sort subsystem
+    - Added 'examples/benchmark/sort' to show performance of gsl_sort()
+    - Added 'examples/clicker/chart' to show graphing of functions
+    - Added 'examples/gsl_repl' which is a rapid prototyping tool/interactive interpreter
+    - Compile support for GSL's as old as 1.8 (test suite still needs to be properly guarded)
+
+=head1 v0.10
+
+    - Continued porting to MSWin32, fixing many NaN and Inf handling issues
+
+=head1 v0.08
+
+    - Large documentation improvements
+    - MSWin32 support thanks to testing and feedback from <sisyphus@cpan.org>
+
+=head1 v0.07
+
+    - Initial CPAN release
+
+=head1 v0.042
+
+    - Started change to Test::Class
+
+=head1 v0.01
+
+    - Added swig interface files and swig-ified build script
+    - initial tests for special function library gsl_sf <--> Math::GSL::Sf
+    - Proof Of Concept: makegsl and testgsl
+

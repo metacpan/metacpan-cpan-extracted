@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use MozRepl;
+use Pod::Usage;
+
+my ($host, $port, $help);
+
+GetOptions(
+    "host=s" => \$host,
+    "port=i" => \$port,
+    "help|?" => \$help
+);
+
+pod2usage(-verbose => 1) if ($help);
+
+$host |= $ENV{MOZREPL_HOST} || "localhost";
+$port |= $ENV{MOZREPL_PORT} || 4242;
+
+my $ctx = MozRepl->new;
+$ctx->setup({
+    log => [qw/warn/],
+    client => {
+        host => $host,
+        port => $port
+    },
+    plugins => { plugins => [qw/Restart/] }
+});
+
+$ctx->restart;
+
+__END__
+
+=head1 NAME
+
+mozrestart -- Restart your firefox/thunderbird.
+
+=head1 SYNOPSIS
+
+mozrestart [options]
+
+'mozrestart' does restart your firefox/thunderbird if they are running MozRepl.
+
+ Options:
+   -help    this message
+   -host    Firefox/Thunderbird's MozRepl host (default localhost)
+            If $ENV{MOZREPL_HOST} was existed, then the env value will be using instead of this value. 
+   -port    Firefox/Thunderbird's MozRepl port (default 4242)
+            If $ENV{MOZREPL_PORT} was existed, then the env value will be using instead of this value. 
+
+ Examples:
+    mozrestart
+    mozrestart -port=1234
+    env MOZREPL_PORT=1234 mozrestart
+
+=head1 DESCRIPTION
+
+Restarting your firefox/thunderbird using MozRepl
+
+=head1 SEE ALSO
+
+L<MozRepl>, L<MozRepl::Plugin::Restart>
+
+=head1 AUTHOR
+
+Toru Yamaguchi, C<< <zigorou@cpan.org> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2007 Toru Yamaguchi, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

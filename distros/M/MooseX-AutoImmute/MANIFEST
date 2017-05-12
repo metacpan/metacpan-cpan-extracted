@@ -1,0 +1,6 @@
+Build.PL
+lib/MooseX/AutoImmute.pm
+MANIFEST			This list of files
+t/test.t
+README
+META.yml

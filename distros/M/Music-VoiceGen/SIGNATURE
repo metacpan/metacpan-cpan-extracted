@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e1907541d5dd30986d1b9568bddaf38bb1c57564 Changes
+SHA1 5c67ae1f730d63cf3674a9f6489808ba48e306bf LICENSE
+SHA1 c29bce5d3c3810752deee82866a56391feba16d9 MANIFEST
+SHA1 27fc07c8fbb514ac4e39234cde75c7981992c206 META.json
+SHA1 fe6f0c432d22fc52c5f0a3de35c9f0dc23de58f4 META.yml
+SHA1 b86bd1aadf156c8b861093aa66d9ec2de3727d93 Makefile.PL
+SHA1 00e6d23e9447b967c8f0fe6672496707481a79f1 README
+SHA1 6c5630f98ad811e0e8cd87017f8d033e3e9d6ebc eg/auditcontext
+SHA1 a617f65e91e47724cc70a9f55d198fe7fe1ad091 eg/consonance
+SHA1 62682c78306a5c80aa06a65b54f556ba09267d53 lib/Music/VoiceGen.pm
+SHA1 f6a1a81c7fdc4f6634f5b4635669eab04bf64a89 t/00-load.t
+SHA1 68a07ccdf6cd2cb6f77d12acb9ad53c38b552925 t/Music-VoiceGen.t
+SHA1 f93ae0e61e0c9d726649b671d661f6b7049b29ff t/pod-coverage.t
+SHA1 1215435630077ec0943874b332374ded9ae7fb47 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJXHXXOAAoJEKSYBH5dablgF4kH/3TMoXCmOKgTZY6MrUftCXBD
+cMv6739hhZ47q1z5BsrrmkCjH1xkztOPeXOPNoBHR7k6GFXtRB7mZY7APdxScIeX
+2+LUDV1SGE3D/CnHBKcBZNuJpvhxIJ2AKOhdhWcsUu+uE2h7JhYGs5IXynwij3Kw
+Vza+x3RvELlu3HvvN48fv9OqGB8S3Rd6mDk1D3pzNntLJugBllmRqwekis2igMob
+E04qMBOr68Y036Y2KNWeQ9Ea9ZJWcFs0yrfB12ikI/PeO638FOYgiDS7j5YS7p3C
+WJbYU7LEnfPE0P6QbamxGENPLQLodVbXU1h5BKR5BVJhuaqr2tM67n9NVYen/7w=
+=OsOB
+-----END PGP SIGNATURE-----

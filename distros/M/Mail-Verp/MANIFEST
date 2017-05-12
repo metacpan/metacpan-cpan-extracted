@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Verp.pm
+t/1.t
+doc/draft-varshavchik-verp-smtpext.txt
+doc/verp.txt
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,32 @@
+Revision history for Mojo-Zabbix
+
+0.08    2017-03-08/18
+* Change the die error info with warn.
+* Change defult timeout. 
+
+0.07    2016-11-29/18
+* fix pod style format error
+
+0.06    2016-10-25/19
+* option docs
+
+0.05    2016-10-17/20
+             
+* fixed some bugs and renew debug and trace system.
+
+0.04    2016-10-13/16
+
+* add a example for get warn info;
+
+0.03    2016-10-13/16
+
+*  add Chinese descriptadd Chinese descript
+
+0.02    2016-10-12/21
+
+* perldity and some descript changes
+
+0.01    2016-10-12/20
+
+* First version, released on an unsuspecting world.
+

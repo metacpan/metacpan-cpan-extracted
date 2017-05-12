@@ -1,0 +1,51 @@
+<html>
+<head>
+<script type="application/javascript;version=1.7"/>
+//<![CDATA[
+var cbid = 1;
+var pendingCallbacks = {};
+
+function postCallback (info,continuation) {
+    pendingCallbacks[cbid++] = [info,continuation];
+    // setTimeout( yield '...', 500);
+    // data = yield 'SUSPEND';
+    return data
+};
+
+function receiveCallbacks(items) {
+    for (var i in items) {
+        // var (i,payload) = pendingCallbacks[i];
+        // remove the callback
+        // now, continue the callback
+        // pendingCallbacks[i][1](payload)
+    };
+};
+
+function gen (m) {
+    var curr = 0;
+    while (curr < m) {
+        yield curr;
+        curr++
+    };
+};
+
+function callGenerator () {
+    var i = gen(10);
+    var v = i.next();
+    while (1) {
+        try {
+            alert(v);
+            v = i.next();
+        } catch (StopIteration) {
+            // end of our loop
+            break
+        };
+    };
+};
+
+callGenerator();
+//]]></script>
+</head>
+<body>
+</body>
+</html>

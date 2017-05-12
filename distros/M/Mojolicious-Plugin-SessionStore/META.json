@@ -1,0 +1,80 @@
+{
+   "abstract" : "session data store plugin for Mojolicious",
+   "author" : [
+      "hayajo <hayajo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-SessionStore",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA1" : "0",
+            "Mojolicious" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Plack::Middleware::Session" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::SessionStore" : {
+         "file" : "lib/Mojolicious/Plugin/SessionStore.pm",
+         "version" : "0.05"
+      },
+      "Mojolicious::Sessions::Storable" : {
+         "file" : "lib/Mojolicious/Sessions/Storable.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hayajo/Mojolicious-Plugin-SessionStore/issues"
+      },
+      "homepage" : "https://github.com/hayajo/Mojolicious-Plugin-SessionStore",
+      "repository" : {
+         "url" : "git://github.com/hayajo/Mojolicious-Plugin-SessionStore.git",
+         "web" : "https://github.com/hayajo/Mojolicious-Plugin-SessionStore"
+      }
+   },
+   "version" : "0.05",
+   "x_authority" : "cpan:HAYAJO"
+}

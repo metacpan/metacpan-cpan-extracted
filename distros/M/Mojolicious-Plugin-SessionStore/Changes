@@ -1,0 +1,18 @@
+Revision history for Mojolicious-Plugin-SessionStore
+
+0.05 2015-01-04T10:09:22Z
+        - Fixed a bug
+        - Minillaize
+
+0.04  2013-05-17 11:55:27 JST
+        - Changed Mojolicious::Controller#render from Mojolicious::Controller#render_text
+
+0.03  2013-05-14 08:36:44 JST
+        - Modified to return Mojolicious::Sessions::Storable object at Mojolicious::Plugin::SessionStore#register
+
+0.02  2013-05-07 21:54:23 JST
+        - Fixed version of the requried perl
+        - Added $Mojolicious::Sessions::Storable::VERSION
+
+0.01  2013-05-05 21:05:33 JST
+        - Initial release

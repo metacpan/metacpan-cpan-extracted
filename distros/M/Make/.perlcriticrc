@@ -1,0 +1,9 @@
+# please alpha sort config items as you add them
+
+severity = 4
+theme = core
+verbose = %f: [%p] %m at line %l, column %c.\n
+
+[-Modules::ProhibitMultiplePackages]
+[-Modules::RequireEndWithOne]
+[-Modules::RequireExplicitPackage]

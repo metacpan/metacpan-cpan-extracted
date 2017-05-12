@@ -1,0 +1,23 @@
+---
+abstract: 'Use MongoDB as if it were a key-value store.'
+author:
+  - 'Ido Perlmuter <ido@ido50.net>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MongoDBx-KeyValue
+requires:
+  Carp: 0
+  MongoDB: 0
+  perl: 5.006
+resources:
+  homepage: http://github.com/ido50/MongoDBx-KeyValue/tree
+  repository: git://github.com/ido50/MongoDBx-KeyValue.git
+version: 0.001001

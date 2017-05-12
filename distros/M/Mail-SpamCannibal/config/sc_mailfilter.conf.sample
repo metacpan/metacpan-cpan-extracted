@@ -1,0 +1,291 @@
+#!/usr/bin/perl
+
+# sc_mailfilter.conf
+# version 1.13, 11-27-10
+# Configuration for sc_mailfilter.pl, sc_abuse.pl
+
+my $MAILFILTER = {
+
+## additional KEYS may be included with an INCLUDE statement of the form:
+#
+#  INCLUDE => 'path/to/file.conf',
+#
+#  this file may include an INCLUDE statement, as may the next, etc...
+#
+#
+# Location of the "sc_BlackList.conf" file. The "IGNORE" array is used
+# to exclude listed hosts.
+#
+# [ REQUIRED ]
+
+	BLCONFIG	=> '/usr/local/spamcannibal/config/sc_BlackList.conf',
+#
+
+
+# A list of mail host which are terminating servers for incoming mail to
+# this site. Include the IP addresses of any acceptable relays and backup 
+# servers. The "sending" host to these servers are the ones that will be 
+# placed in the tarpit. At a minimum, this should include all servers
+# for which there are MX records for your domains.
+#
+# Entries may be dot.quad.addresses, host.names or CIDR netblocks of the 
+# form:		12.34.56.0/28
+#
+# The IP addresses of "named" hosts are resolved for multiple interfaces. 
+# If you do not want this behavior then always use dot.quad notation.
+#
+# [ REQUIRED ]
+#
+	MXhosts   => [qw(
+		mail2.ournetwork.net
+		mail2.foo.com
+		ns2.foo.com
+		ns2.ournetwork.net
+
+		mail1.ournetwork.net
+		mail3.ournetwork.net
+		mail1.foo.com
+		mail3.foo.com
+		ns3.ournetwork.net
+		ns3.foo.com
+
+		mailbackup.ournetwork.net
+		mail4.ournetwork.net
+	)],
+
+
+# Set the number of processes to run similtaneously
+#
+# Note: each running process takes 4 to 10 megabytes of memory
+# and can use substantial DNS processing. Default value is 1
+#
+# [ OPTIONAL ]
+
+#	CHILDREN => 1,
+
+# Do not automatically include private network addresses in MXhosts.
+#	127./8, 10./8, 172.16/12, 192.168/16
+#
+# [ OPTIONAL ]
+
+#	NOPRIVATE => 1,
+
+
+# Report exceptions and failed entry attempts
+#
+# [ OPTIONAL ] recommended
+
+	REPORT	  => 'my.email@addy.com',
+#
+
+
+# Count each message received for processing. This will
+# normally be approximately the number of added spams.
+#
+# specify the 	/absolute/path/to/count_file_name
+#
+# [ OPTIONAL ]
+
+	SPAMCOUNT  => '/usr/local/spamcannibal/spamcount.txt',
+
+
+# PGP or GPG configuration information to decrypt incoming messages.
+# Verify that a message has PGP encrypted content prior to decryption so
+# that plain text messages are not inadvertently passed to the to the
+# tarpit. Prevent unauthorized access/addition to the tarpit.
+#
+# See: man Mail::SpamCannibal::GoodPrivacy 'decrypt' for details
+#
+# [ RECOMMENDED ]
+
+	PGP	  => {
+#		ExeFile	   => '/usr/local/bin/pgp',
+		ExeFile    => '/usr/local/bin/gpg',
+#		KeyPath	   => '/usr/local/spamcannibal/.pgp',
+		KeyPath    => '/usr/local/spamcannibal/.gnupg',
+		Password   => 'mySPAMpasswd',
+		UserID	   => 'Spam',
+		Version	   => '',	# might be 2.62
+#		Exceptions => 0,
+	},
+
+# If "REPORT" is set above, and "Exceptions" is true. Non-PGP messages
+# will be forwarded to the REPORT target for evaluation.
+
+
+# Require that a least on of these headers is present. Use this in place of
+# PGP above to limit the source of entries to the database.
+# This is a single value or an array of values. The values may be regular
+# expressions. They will be matched in a case insensitive manner and the
+# pattern must be the 'start' of a header.
+#
+#	REQHEAD		=> 'received:.+myhost\.com',
+#	  or
+#	REQHEAD		=> [	'received:.+mylaptop',
+#				'received:.+desktop\.pc',
+#	],
+
+# Use dirty read of headers. Use this procedure only if you can not avoid
+# auto-wrapping in your mail client. Some goofy stuff can slip through or
+# headers may be mangled and not properly parsed.
+#
+# See man Mail::SpamCannibal::ParseMessage 'headers' and 'rfheaders'
+# for a detailed explanation.
+#
+# [ OPTIONAL ] not recommended, sigh... but usually needed
+
+	DIRTY	  => 1,
+
+
+# Trim the length of the message portion of spam samples
+# When batch submitting without manually editing the spam samples,
+# configuration variable limits the length to the lesser of the
+# set number of lines or the length of the sample
+#
+# NOTE: this behavior is overriden if the destination "spam" address
+#	i.e. spam@yourdomain.com
+# ends in the character "X" (not case sensitive)
+#	i.e. spamx@yourdomain.com
+#
+# [ OPTIONAL ]
+
+#	MAXMSG	  => 8,		# something useful?
+
+# Validate IP's spam hosts against SPMCNBL_DB_ARCHIVE
+# as a condition of adding to tarpit. 
+#
+# The ip address double checked against the 'archive' database to
+# to see if it exists before being added to the 'tarpit'. This is 
+# a belt and suspenders approach to validating spammers and won't
+# work well if the 'archive' is checked often since it will constantly
+# be emptied by sc_BLcheck.pl. This approach may provide some measure
+# of relief from false positive spam source identification in mail headers
+# if the archive is run once or twice a day and all mail is posted to the
+# spamcannibal user prior to the 'archive' run.
+#
+# [ OPTIONAL ] experimental
+
+#	VALIDATE  => 1,
+
+
+# For generic PTR records matching the regular expression
+# 'regexp', test the entire /24 for compliance and mark
+# all non-compliant records as "spammy"
+#
+# 'ignore'	array of perl regular expressions to ignore
+#		before testing with 'regexp' below, case insensitive
+#
+# 'regexp'	array of perl regular expression in single
+#		quotes that will be tested case insensitive
+#
+# 'message'	is a REQUIRED string inserted in all matching
+#		'generic' records to which the IP
+#		address of the spam record is appended
+#
+# 'agressive'	true will test all class C's for every 
+#		IP address submitted to the filter
+#
+#		false will test only those class C's
+#		for which the submitted IP address
+#		returns a missing or generic PTR record
+#
+# [ OPTIONAL ]
+
+	XCIDR24	  => {
+#	    ignore	=> [
+#		'dls-only',
+#	    ],
+	    regexp	=> [
+		# d+?d+?d+?d+ or 12 digits
+		'\d+[a-zA-Z_\-\.]\d+[a-zA-Z_\-\.]\d+[a-zA-Z_\-\.]\d+|\d{12}',
+#		'dynamic',
+	    ],
+	    message	=> "spam source, anonymous/un-named IP\nsee:\n",
+	    aggressive	=> 0,	# recommend false
+	},
+
+# FOR sc_abuse.pl
+# send copies of spam to fixed destinations for every abuse complaint
+# [ OPTIONAL ]
+#
+        spamCC  => [
+                'spam@uce.gov',         # FTC's spam collection database
+        ],
+
+# FOR sc_abuse.pl
+# If the of the originating spammer server is found as the key of the
+# ABUSE hash, instead of an abuse message being sent to abuse@domain.com,
+# if the domainkey is found in the ABUSE hash, the abuse message is
+# sent to the address(s) found in the corresponding data array
+#
+# [ OPTIONAL ]
+
+        ABUSE   => {
+                'adelphia.net'  => [qw(
+                                abuse@adelphia.net
+                                postmaster@adelphia.net
+                )],
+                'cox.net'       => [qw(
+                                abuse@cox.net
+                )],
+                'bellsouth.net' => [qw(
+                                ipoperations@bellsouth.net
+                                postmaster@bellsouth.net  
+                                abuse@bellsouth.net
+                )],
+                'blueyonder.co.uk' => [qw(
+                                abuse@blueyonder.co.uk
+                                abuse@telewest.co.uk  
+                )],
+                'cp.net'        => [qw(
+                                abuse@abuse.criticalpath.net
+                )],
+                'earthlink.net' => [qw(
+                                abuse@abuse.earthlink.net
+                                junkmail@earthlink.net   
+                                root@earthlink.net
+                                postmaster@earthlink.net
+                                epasupport@earthlink.net
+                )],
+                'eircom.net'    => [qw(
+                                cd@eircom.net
+                                dcurran@eircom.net
+                                abuse@ericom.net  
+                                postmaster@ericom.net
+                                root@ericom.net
+                                tech@indigo.ie 
+                                ross@eircom.net
+                )],
+                'tfbnw.net'     => [qw(
+                                abuse@facebook.com
+                )],
+                'hotmail.com'   => [qw(
+                                report_spam@hotmail.com
+                )],
+                'msn.com'       => [qw(
+                                report_spam@msn.com
+                )],
+                'yahoo.com'     => [qw(
+                                netblockadmin@yahoo-inc.com
+                                abuse@yahoo.com
+                                postmaster@yahoo.com
+                                postmaster@yahoo-inc.com
+                                root@yahoo-inc.com
+                                hank@yahoo-inc.com
+                )],
+                'myvzw.com'     => [qw(
+                                abuse@verizon.net
+                )],
+                'networksolutionsemail.com' => [qw(
+                                abuse@networksolutions.com
+                )],
+                'google.com'    => [qw(
+                                abuse@google.com
+                                bchang@google.com
+                )],
+                'btconnect.com' => [qw(
+                        abuse@bt.com   
+                        dnsreg@bt.com  
+                )],
+        },
+};

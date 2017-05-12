@@ -1,0 +1,84 @@
+---
+abstract: 'Terminfo interface'
+author:
+  - 'jddurand <jeandamiendurand@free.fr>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Path::Tiny: '0'
+  Test::File::ShareDir: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MarpaX-Database-Terminfo
+no_index:
+  directory:
+    - blog
+    - examples
+    - t
+    - xt
+provides:
+  MarpaX::Database::Terminfo:
+    file: lib/MarpaX/Database/Terminfo.pm
+    version: '0.012'
+  MarpaX::Database::Terminfo::Constants:
+    file: lib/MarpaX/Database/Terminfo/Constants.pm
+    version: '0.012'
+  MarpaX::Database::Terminfo::Grammar:
+    file: lib/MarpaX/Database/Terminfo/Grammar.pm
+    version: '0.012'
+  MarpaX::Database::Terminfo::Grammar::Actions:
+    file: lib/MarpaX/Database/Terminfo/Grammar/Actions.pm
+    version: '0.012'
+  MarpaX::Database::Terminfo::Grammar::CharacterClasses:
+    file: lib/MarpaX/Database/Terminfo/Grammar/CharacterClasses.pm
+    version: '0.012'
+  MarpaX::Database::Terminfo::Grammar::Regexp:
+    file: lib/MarpaX/Database/Terminfo/Grammar/Regexp.pm
+    version: '0.012'
+  MarpaX::Database::Terminfo::Interface:
+    file: lib/MarpaX/Database/Terminfo/Interface.pm
+    version: '0.012'
+  MarpaX::Database::Terminfo::String:
+    file: lib/MarpaX/Database/Terminfo/String.pm
+    version: '0.012'
+  MarpaX::Database::Terminfo::String::Grammar:
+    file: lib/MarpaX/Database/Terminfo/String/Grammar.pm
+    version: '0.012'
+  MarpaX::Database::Terminfo::String::Grammar::Actions:
+    file: lib/MarpaX/Database/Terminfo/String/Grammar/Actions.pm
+    version: '0.012'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  File::ShareDir: '0'
+  Log::Any: '0'
+  Marpa::R2: '0'
+  Sereal::Decoder: '3.015'
+  Time::HiRes: '0'
+  base: '0'
+  constant: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MarpaX-Database-Terminfo
+  homepage: https://metacpan.org/release/MarpaX-Database-Terminfo
+  repository: git://github.com/jddurand/marpax-database-terminfo.git
+version: '0.012'
+x_contributors:
+  - 'Jean-Damien Durand <jeandamiendurand@free.fr>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,6 @@
+2011/01/05	0.4
+
+- bugfix: the 'to'/'cc' options keys didn't work right
+- bugfix: when assembling a message with a body, make sure the body starts with a newline.
+- added regression tests
+

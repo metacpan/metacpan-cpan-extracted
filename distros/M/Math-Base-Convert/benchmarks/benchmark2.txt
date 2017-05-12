@@ -1,0 +1,474 @@
+
+
+make test BENCHMARK=2    t.backend.t
+
+	# benchmark TO base from internal format
+		  # bin
+				  # 215
+	# math_bigint	3.410 ms
+	# mbc::calcPP	1.422 ms
+	# mbcshortcut	1.029 ms
+				  # 123456
+	# math_bigint	5.230 ms
+	# mbc::calcPP	1.904 ms
+	# mbcshortcut	1.098 ms
+				  # 123456789abcde
+	# math_bigint	10.590 ms
+	# mbc::calcPP	3.781 ms
+	# mbcshortcut	1.084 ms
+				  # 123456789abcdef0123456
+	# math_bigint	17.166 ms
+	# mbc::calcPP	5.768 ms
+	# mbcshortcut	1.117 ms
+				  # 123456789abcdef0123456789abcde
+	# math_bigint	22.555 ms
+	# mbc::calcPP	8.057 ms
+	# mbcshortcut	1.097 ms
+				  # 123456789abcdef0123456789abcdefedcba98
+	# math_bigint	27.193 ms
+	# mbc::calcPP	10.724 ms
+	# mbcshortcut	1.142 ms
+				  # 123456789abcdef0123456789abcdefedcba9876543210
+	# math_bigint	34.505 ms
+	# mbc::calcPP	13.783 ms
+	# mbcshortcut	1.128 ms
+		  # dna
+				  # 215
+	# math_bigint	3.538 ms
+	# mbc::calcPP	1.211 ms
+	# mbcshortcut	1.238 ms
+				  # 123456
+	# math_bigint	5.516 ms
+	# mbc::calcPP	1.510 ms
+	# mbcshortcut	1.287 ms
+				  # 123456789abcde
+	# math_bigint	10.850 ms
+	# mbc::calcPP	2.418 ms
+	# mbcshortcut	1.319 ms
+				  # 123456789abcdef0123456
+	# math_bigint	17.005 ms
+	# mbc::calcPP	3.463 ms
+	# mbcshortcut	1.347 ms
+				  # 123456789abcdef0123456789abcde
+	# math_bigint	22.985 ms
+	# mbc::calcPP	4.614 ms
+	# mbcshortcut	1.432 ms
+				  # 123456789abcdef0123456789abcdefedcba98
+	# math_bigint	26.333 ms
+	# mbc::calcPP	5.929 ms
+	# mbcshortcut	1.408 ms
+				  # 123456789abcdef0123456789abcdefedcba9876543210
+	# math_bigint	34.725 ms
+	# mbc::calcPP	7.512 ms
+	# mbcshortcut	1.562 ms
+		  # oct
+				  # 215
+	# math_bigint	3.477 ms
+	# mbc::calcPP	1.198 ms
+	# mbcshortcut	1.258 ms
+				  # 123456
+	# math_bigint	5.613 ms
+	# mbc::calcPP	1.377 ms
+	# mbcshortcut	1.258 ms
+				  # 123456789abcde
+	# math_bigint	10.714 ms
+	# mbc::calcPP	2.008 ms
+	# mbcshortcut	1.315 ms
+				  # 123456789abcdef0123456
+	# math_bigint	17.421 ms
+	# mbc::calcPP	2.713 ms
+	# mbcshortcut	1.351 ms
+				  # 123456789abcdef0123456789abcde
+	# math_bigint	22.394 ms
+	# mbc::calcPP	3.463 ms
+	# mbcshortcut	1.298 ms
+				  # 123456789abcdef0123456789abcdefedcba98
+	# math_bigint	28.091 ms
+	# mbc::calcPP	4.354 ms
+	# mbcshortcut	1.410 ms
+				  # 123456789abcdef0123456789abcdefedcba9876543210
+	# math_bigint	32.842 ms
+	# mbc::calcPP	5.431 ms
+	# mbcshortcut	1.377 ms
+		  # hex
+				  # 215
+	# math_bigint	3.398 ms
+	# mbc::calcPP	1.107 ms
+	# mbcshortcut	1.115 ms
+				  # 123456
+	# math_bigint	5.633 ms
+	# mbc::calcPP	1.271 ms
+	# mbcshortcut	1.122 ms
+				  # 123456789abcde
+	# math_bigint	10.952 ms
+	# mbc::calcPP	1.740 ms
+	# mbcshortcut	1.132 ms
+				  # 123456789abcdef0123456
+	# math_bigint	17.005 ms
+	# mbc::calcPP	2.296 ms
+	# mbcshortcut	1.128 ms
+				  # 123456789abcdef0123456789abcde
+	# math_bigint	22.920 ms
+	# mbc::calcPP	2.875 ms
+	# mbcshortcut	1.125 ms
+				  # 123456789abcdef0123456789abcdefedcba98
+	# math_bigint	27.632 ms
+	# mbc::calcPP	3.598 ms
+	# mbcshortcut	1.098 ms
+				  # 123456789abcdef0123456789abcdefedcba9876543210
+	# math_bigint	34.835 ms
+	# mbc::calcPP	4.367 ms
+	# mbcshortcut	1.140 ms
+		  # bas32
+				  # 215
+	# math_bigint	3.463 ms
+	# mbc::calcPP	1.090 ms
+	# mbcshortcut	1.209 ms
+				  # 123456
+	# math_bigint	5.534 ms
+	# mbc::calcPP	1.259 ms
+	# mbcshortcut	1.262 ms
+				  # 123456789abcde
+	# math_bigint	10.986 ms
+	# mbc::calcPP	1.623 ms
+	# mbcshortcut	1.290 ms
+				  # 123456789abcdef0123456
+	# math_bigint	17.219 ms
+	# mbc::calcPP	2.027 ms
+	# mbcshortcut	1.282 ms
+				  # 123456789abcdef0123456789abcde
+	# math_bigint	23.358 ms
+	# mbc::calcPP	2.535 ms
+	# mbcshortcut	1.346 ms
+				  # 123456789abcdef0123456789abcdefedcba98
+	# math_bigint	28.108 ms
+	# mbc::calcPP	3.058 ms
+	# mbcshortcut	1.359 ms
+				  # 123456789abcdef0123456789abcdefedcba9876543210
+	# math_bigint	33.723 ms
+	# mbc::calcPP	3.675 ms
+	# mbcshortcut	1.408 ms
+		  # b64
+				  # 215
+	# math_bigint	3.428 ms
+	# mbc::calcPP	1.122 ms
+	# mbcshortcut	1.267 ms
+				  # 123456
+	# math_bigint	5.552 ms
+	# mbc::calcPP	1.213 ms
+	# mbcshortcut	1.243 ms
+				  # 123456789abcde
+	# math_bigint	10.986 ms
+	# mbc::calcPP	1.495 ms
+	# mbcshortcut	1.303 ms
+				  # 123456789abcdef0123456
+	# math_bigint	16.528 ms
+	# mbc::calcPP	1.917 ms
+	# mbcshortcut	1.255 ms
+				  # 123456789abcdef0123456789abcde
+	# math_bigint	23.015 ms
+	# mbc::calcPP	2.221 ms
+	# mbcshortcut	1.364 ms
+				  # 123456789abcdef0123456789abcdefedcba98
+	# math_bigint	28.739 ms
+	# mbc::calcPP	2.765 ms
+	# mbcshortcut	1.406 ms
+				  # 123456789abcdef0123456789abcdefedcba9876543210
+	# math_bigint	34.615 ms
+	# mbc::calcPP	3.313 ms
+	# mbcshortcut	1.417 ms
+		  # bas128
+				  # 215
+	# math_bigint	3.376 ms
+	# mbc::calcPP	1.080 ms
+	# mbcshortcut	1.270 ms
+				  # 123456
+	# math_bigint	5.542 ms
+	# mbc::calcPP	1.153 ms
+	# mbcshortcut	1.217 ms
+				  # 123456789abcde
+	# math_bigint	10.986 ms
+	# mbc::calcPP	1.444 ms
+	# mbcshortcut	1.239 ms
+				  # 123456789abcdef0123456
+	# math_bigint	17.273 ms
+	# mbc::calcPP	1.755 ms
+	# mbcshortcut	1.290 ms
+				  # 123456789abcdef0123456789abcde
+	# math_bigint	22.014 ms
+	# mbc::calcPP	2.085 ms
+	# mbcshortcut	1.259 ms
+				  # 123456789abcdef0123456789abcdefedcba98
+	# math_bigint	28.000 ms
+	# mbc::calcPP	2.411 ms
+	# mbcshortcut	1.372 ms
+				  # 123456789abcdef0123456789abcdefedcba9876543210
+	# math_bigint	33.936 ms
+	# mbc::calcPP	2.940 ms
+	# mbcshortcut	1.391 ms
+		  # bas256
+				  # 215
+	# math_bigint	3.413 ms
+	# mbc::calcPP	1.081 ms
+	# mbcshortcut	1.270 ms
+				  # 123456
+	# math_bigint	5.466 ms
+	# mbc::calcPP	1.160 ms
+	# mbcshortcut	1.235 ms
+				  # 123456789abcde
+	# math_bigint	10.884 ms
+	# mbc::calcPP	1.410 ms
+	# mbcshortcut	1.270 ms
+				  # 123456789abcdef0123456
+	# math_bigint	17.166 ms
+	# mbc::calcPP	1.679 ms
+	# mbcshortcut	1.271 ms
+				  # 123456789abcdef0123456789abcde
+	# math_bigint	22.761 ms
+	# mbc::calcPP	1.954 ms
+	# mbcshortcut	1.300 ms
+				  # 123456789abcdef0123456789abcdefedcba98
+	# math_bigint	28.559 ms
+	# mbc::calcPP	2.344 ms
+	# mbcshortcut	1.318 ms
+				  # 123456789abcdef0123456789abcdefedcba9876543210
+	# math_bigint	34.615 ms
+	# mbc::calcPP	2.702 ms
+	# mbcshortcut	1.377 ms
+
+
+make test BENCHMARK=2    t.frontend.t
+
+	# benchmark FROM base to internal format
+		  # bin
+				  # 215
+	# math_bigint	11.709 ms
+	# mbc::calcPP	0.860 ms
+	# mbcshortcut	0.634 ms
+				  # 123456
+	# math_bigint	22.971 ms
+	# mbc::calcPP	1.239 ms
+	# mbcshortcut	0.628 ms
+				  # 123456789abcde
+	# math_bigint	56.182 ms
+	# mbc::calcPP	2.518 ms
+	# mbcshortcut	0.658 ms
+				  # 123456789abcdef0123456
+	# math_bigint	91.176 ms
+	# mbc::calcPP	3.850 ms
+	# mbcshortcut	0.677 ms
+				  # 123456789abcdef0123456789abcde
+	# math_bigint	124.400 ms
+	# mbc::calcPP	5.359 ms
+	# mbcshortcut	0.696 ms
+				  # 123456789abcdef0123456789abcdefedcba98
+	# math_bigint	158.000 ms
+	# mbc::calcPP	6.958 ms
+	# mbcshortcut	0.726 ms
+				  # 123456789abcdef0123456789abcdefedcba9876543210
+	# math_bigint	192.500 ms
+	# mbc::calcPP	8.702 ms
+	# mbcshortcut	0.745 ms
+		  # dna
+				  # 215
+	# math_bigint	6.046 ms
+	# mbc::calcPP	0.852 ms
+	# mbcshortcut	0.844 ms
+				  # 123456
+	# math_bigint	12.045 ms
+	# mbc::calcPP	1.049 ms
+	# mbcshortcut	0.837 ms
+				  # 123456789abcde
+	# math_bigint	27.748 ms
+	# mbc::calcPP	1.686 ms
+	# mbcshortcut	0.877 ms
+				  # 123456789abcdef0123456
+	# math_bigint	44.507 ms
+	# mbc::calcPP	2.441 ms
+	# mbcshortcut	0.919 ms
+				  # 123456789abcdef0123456789abcde
+	# math_bigint	60.392 ms
+	# mbc::calcPP	3.211 ms
+	# mbcshortcut	0.953 ms
+				  # 123456789abcdef0123456789abcdefedcba98
+	# math_bigint	76.098 ms
+	# mbc::calcPP	4.028 ms
+	# mbcshortcut	0.998 ms
+				  # 123456789abcdef0123456789abcdefedcba9876543210
+	# math_bigint	92.353 ms
+	# mbc::calcPP	4.945 ms
+	# mbcshortcut	1.036 ms
+		  # oct
+				  # 215
+	# math_bigint	5.113 ms
+	# mbc::calcPP	0.919 ms
+	# mbcshortcut	0.934 ms
+				  # 123456
+	# math_bigint	7.668 ms
+	# mbc::calcPP	1.023 ms
+	# mbcshortcut	0.940 ms
+				  # 123456789abcde
+	# math_bigint	18.721 ms
+	# mbc::calcPP	1.494 ms
+	# mbcshortcut	1.010 ms
+				  # 123456789abcdef0123456
+	# math_bigint	29.537 ms
+	# mbc::calcPP	1.984 ms
+	# mbcshortcut	1.071 ms
+				  # 123456789abcdef0123456789abcde
+	# math_bigint	39.630 ms
+	# mbc::calcPP	2.478 ms
+	# mbcshortcut	1.133 ms
+				  # 123456789abcdef0123456789abcdefedcba98
+	# math_bigint	50.317 ms
+	# mbc::calcPP	3.058 ms
+	# mbcshortcut	1.202 ms
+				  # 123456789abcdef0123456789abcdefedcba9876543210
+	# math_bigint	61.731 ms
+	# mbc::calcPP	3.698 ms
+	# mbcshortcut	1.359 ms
+		  # hex
+				  # 215
+	# math_bigint	4.003 ms
+	# mbc::calcPP	1.186 ms
+	# mbcshortcut	1.183 ms
+				  # 123456
+	# math_bigint	6.843 ms
+	# mbc::calcPP	1.275 ms
+	# mbcshortcut	1.179 ms
+				  # 123456789abcde
+	# math_bigint	14.630 ms
+	# mbc::calcPP	1.623 ms
+	# mbcshortcut	1.202 ms
+				  # 123456789abcdef0123456
+	# math_bigint	22.463 ms
+	# mbc::calcPP	1.982 ms
+	# mbcshortcut	1.213 ms
+				  # 123456789abcdef0123456789abcde
+	# math_bigint	30.385 ms
+	# mbc::calcPP	2.388 ms
+	# mbcshortcut	1.231 ms
+				  # 123456789abcdef0123456789abcdefedcba98
+	# math_bigint	38.072 ms
+	# mbc::calcPP	2.875 ms
+	# mbcshortcut	1.263 ms
+				  # 123456789abcdef0123456789abcdefedcba9876543210
+	# math_bigint	45.942 ms
+	# mbc::calcPP	3.291 ms
+	# mbcshortcut	1.278 ms
+		  # bas32
+				  # 215
+	# math_bigint	3.068 ms
+	# mbc::calcPP	0.526 ms
+	# mbcshortcut	0.638 ms
+				  # 123456
+	# math_bigint	5.929 ms
+	# mbc::calcPP	0.624 ms
+	# mbcshortcut	0.633 ms
+				  # 123456789abcde
+	# math_bigint	11.825 ms
+	# mbc::calcPP	0.894 ms
+	# mbcshortcut	0.732 ms
+				  # 123456789abcdef0123456
+	# math_bigint	17.640 ms
+	# mbc::calcPP	1.172 ms
+	# mbcshortcut	0.819 ms
+				  # 123456789abcdef0123456789abcde
+	# math_bigint	24.646 ms
+	# mbc::calcPP	1.504 ms
+	# mbcshortcut	0.894 ms
+				  # 123456789abcdef0123456789abcdefedcba98
+	# math_bigint	30.294 ms
+	# mbc::calcPP	1.844 ms
+	# mbcshortcut	1.004 ms
+				  # 123456789abcdef0123456789abcdefedcba9876543210
+	# math_bigint	37.294 ms
+	# mbc::calcPP	2.239 ms
+	# mbcshortcut	1.213 ms
+		  # b64
+				  # 215
+	# math_bigint	3.068 ms
+	# mbc::calcPP	0.971 ms
+	# mbcshortcut	1.107 ms
+				  # 123456
+	# math_bigint	5.024 ms
+	# mbc::calcPP	1.052 ms
+	# mbcshortcut	1.115 ms
+				  # 123456789abcde
+	# math_bigint	9.846 ms
+	# mbc::calcPP	1.279 ms
+	# mbcshortcut	1.205 ms
+				  # 123456789abcdef0123456
+	# math_bigint	15.714 ms
+	# mbc::calcPP	1.562 ms
+	# mbcshortcut	1.287 ms
+				  # 123456789abcdef0123456789abcde
+	# math_bigint	20.921 ms
+	# mbc::calcPP	1.827 ms
+	# mbcshortcut	1.368 ms
+				  # 123456789abcdef0123456789abcdefedcba98
+	# math_bigint	25.600 ms
+	# mbc::calcPP	2.092 ms
+	# mbcshortcut	1.458 ms
+				  # 123456789abcdef0123456789abcdefedcba9876543210
+	# math_bigint	31.386 ms
+	# mbc::calcPP	2.426 ms
+	# mbcshortcut	1.674 ms
+		  # bas128
+				  # 215
+	# math_bigint	3.078 ms
+	# mbc::calcPP	0.842 ms
+	# mbcshortcut	0.965 ms
+				  # 123456
+	# math_bigint	4.079 ms
+	# mbc::calcPP	0.888 ms
+	# mbcshortcut	0.958 ms
+				  # 123456789abcde
+	# math_bigint	8.955 ms
+	# mbc::calcPP	1.108 ms
+	# mbcshortcut	1.042 ms
+				  # 123456789abcdef0123456
+	# math_bigint	14.000 ms
+	# mbc::calcPP	1.337 ms
+	# mbcshortcut	1.235 ms
+				  # 123456789abcdef0123456789abcde
+	# math_bigint	17.727 ms
+	# mbc::calcPP	1.553 ms
+	# mbcshortcut	1.329 ms
+				  # 123456789abcdef0123456789abcdefedcba98
+	# math_bigint	22.687 ms
+	# mbc::calcPP	1.844 ms
+	# mbcshortcut	1.429 ms
+				  # 123456789abcdef0123456789abcdefedcba9876543210
+	# math_bigint	26.529 ms
+	# mbc::calcPP	2.066 ms
+	# mbcshortcut	1.520 ms
+		  # bas256
+				  # 215
+	# math_bigint	3.068 ms
+	# mbc::calcPP	1.112 ms
+	# mbcshortcut	1.168 ms
+				  # 123456
+	# math_bigint	4.105 ms
+	# mbc::calcPP	1.150 ms
+	# mbcshortcut	1.175 ms
+				  # 123456789abcde
+	# math_bigint	7.990 ms
+	# mbc::calcPP	1.337 ms
+	# mbcshortcut	1.209 ms
+				  # 123456789abcdef0123456
+	# math_bigint	11.894 ms
+	# mbc::calcPP	1.539 ms
+	# mbcshortcut	1.254 ms
+				  # 123456789abcdef0123456789abcde
+	# math_bigint	15.764 ms
+	# mbc::calcPP	1.727 ms
+	# mbcshortcut	1.274 ms
+				  # 123456789abcdef0123456789abcdefedcba98
+	# math_bigint	19.630 ms
+	# mbc::calcPP	1.954 ms
+	# mbcshortcut	1.311 ms
+				  # 123456789abcdef0123456789abcdefedcba9876543210
+	# math_bigint	23.824 ms
+	# mbc::calcPP	2.223 ms
+	# mbcshortcut	1.341 ms

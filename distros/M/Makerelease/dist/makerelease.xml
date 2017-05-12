@@ -1,0 +1,205 @@
+<!-- the makerelease script for makerelease itself! -->
+
+<makerelease>
+  <steps>
+    <step type="section" title="Setup Steps" mandatory="1">
+      <text>
+	This set of steps will do some preliminary "safety" checks to
+	ensure the local environment is ok and setup some important
+	information.
+      </text>
+      <steps>
+	<step type="prompt" prompt="Enter the new version number:"
+	  title="Pick a Version Number"
+	  parameter="VERSION"
+	  values="^\d+\.?\d*$">
+	  <text>
+	    Please enter the version number to publish.
+	  </text>
+	</step>
+	<step type="prompt" prompt="CPAN Email Address:"
+	  title="Enter your CPAN email address"
+	  parameter="CPANEMAIL"
+	  default="wjhns117@hardakers.net">
+	  <text>This is needed to support automatic PAUSE uploading</text>
+	</step>
+	<step type="prompt" prompt="CPAN account name:"
+	  title="Enter your CPAN account name"
+	  parameter="CPANUSER"
+	  default="hardaker">
+	  <text>This is needed to support automatic PAUSE uploading</text>
+	</step>
+	<step type="prompt" prompt="SF account name:"
+	  title="Enter your Source Forge account name"
+	  parameter="SFUSER"
+	  default="hardaker">
+	  <text>This is needed to support automatic SF uploading</text>
+	</step>
+	<step type="informational" title="Verify the parameters" pause="1">
+	  <text>Please ensure the following are the proper settings
+	  before continuing:</text>
+
+	  Version:   {VERSION}
+
+	  CPANEMAIL: {CPANEMAIL}
+
+	  CPANUSER:  {CPANUSER}
+
+	  SFUSER:    {SFUSER}
+	</step>
+	<step type="command" title="running svn update">
+	  <text>This ensures the local checkout is up to date</text>
+	  <commands>
+	    <command>svn update</command>
+	  </commands>
+	</step>
+	<step type="command" stepname="update"
+	  title="Check for changes" pause="1">
+	  <text>This steps looks for outstanding files that have been
+	  modified.  There should be no outstanding modifications!  If
+	  this step finds outstanding modified files you need to check
+	  them in or revert them before continuing!</text>
+	  <commands>
+	    <command>svn -q status</command>
+	  </commands>
+	</step>
+      </steps>
+    </step>
+    <step type="section" title="Source Code Setup">
+      <text>
+	This set of steps will modify various places within the source
+	code tree to bring it up to date with the new version number
+	about to be published.
+      </text>
+      <steps>
+	<step type="command" title="make distclean on the current directory">
+	  <text>We need to update the local version number and thus
+	  the current Makefile needs to be regenerated after we update
+	  the version number, so we nuke everything from orbit first
+	  here.
+
+	    Note: this may fail if there is no current Makefile;
+	    continue if it fails.
+
+	  </text>
+	  <!-- makerelease needs a "accept failures" or "only do if" mode -->
+	  <commands>
+	    <command>make distclean</command>
+	  </commands>
+	</step>
+	<step type="modify" title="Modifying sources for the new version">
+	  <text>Modifying the sources to update to version {VERSION}</text>
+	  <modifications>
+	    <modify
+	      find="VERSION = '(.*)'"
+	      replace="VERSION = \'{VERSION}\'">
+	      <files>
+		<file>makerelease</file>
+		<file>*.pm</file>
+		<file>*/*.pm</file>
+		<file>*/*/*.pm</file>
+	      </files>
+	    </modify>
+	    <modify
+	      find='VERSION = "(.*)"'
+	      replace="VERSION = \'{VERSION}\'">
+	      <files>
+		<file>makerelease</file>
+		<file>*.pm</file>
+		<file>*/*.pm</file>
+		<file>*/*/*.pm</file>
+	      </files>
+	    </modify>
+	  </modifications>
+	</step>
+	<step type="command" title="Check Version Changes">
+	  <commands>
+	    <command>svn diff</command>
+	  </commands>
+	</step>
+	<step type="command" title="Commit the Version changes" interactive="1">
+	  <text>Only continue if the above changes look ok</text> 
+	  <commands>
+	    <command>svn commit -m "version update to {VERSION}"</command>
+	  </commands>
+	</step>
+
+	<step type="command" title="updating MANIFEST">
+	  <text>This will update the MANIFEST based on local files and
+	    regexp exceptions in MANIFEST.SKIP</text>
+	  <commands>
+	    <command>perl -e 'use ExtUtils::Manifest qw(mkmanifest); mkmanifest();'</command>
+	  </commands>
+	</step>
+	<step type="command" title="Check MANIFEST Changes">
+	  <commands>
+	    <command>svn diff</command>
+	  </commands>
+	</step>
+	<step type="command" title="Commit the MANIFEST changes" interactive="1">
+	  <text>Only continue if the above changes look ok</text> 
+	  <commands>
+	    <command>svn commit -m "MANIFEST update"</command>
+	  </commands>
+	</step>
+
+	<step type="command" title="Make Test">
+	  <text>Perform a make test to make sure everything works.</text>
+	  <commands>
+	    <command>make clean</command>
+	    <command>perl Makefile.PL</command>
+	    <command>make test</command>
+	  </commands>
+	</step>
+      </steps>
+    </step>
+    <step type="section" interactive="1" title="Create Release">
+      <text>
+	We'll now:
+         - create the SVN tag
+         - export the results to a tar ball.
+         - upload it to CPAN
+
+	Quit now if you're not ready to finish the release.
+      </text>
+      <steps>
+	<step type="command" title="svn tag the release">
+	  <commands>
+	    <command>svn copy -m "tag of version {VERSION}" https://makerelease.svn.sourceforge.net/svnroot/makerelease/trunk/makerelease https://makerelease.svn.sourceforge.net/svnroot/makerelease/tags/makerelease-{VERSION}</command>
+	  </commands>
+	</step>
+	<step type="command" title="make dist">
+	  <commands>
+	    <command>make dist</command>
+	  </commands>
+	</step>
+	<step type="command" title="upload to cpan" interactive="1">
+	  <text>This will upload the results to CPAN using the
+	  cpan-upload command</text>
+	  <commands>
+	    <command>cpan-upload -mailto {CPANEMAIL} -user {CPANUSER} -verbose Makerelease-{VERSION}.tar.gz</command>
+	  </commands>
+	</step>
+	<step prompt="true" type="command" stepname="publish:rsync"
+	  title="rsync the new files" interactive="1">
+	  <text>This will copy the results to the SF uploads directory
+	    in your account on frs.sourceforge.net</text>
+	  <commands>
+	    <command>rsync -v Makerelease-{VERSION}.tar.gz {SFUSER}@frs.sourceforge.net:uploads/</command>
+	  </commands>
+	</step>
+	<step type="command" stepname="publish:editrelease"
+	title="Update the SF release web page">
+	  <commands>
+	    <command>firefox 'https://sourceforge.net/project/admin/editpackages.php?group_id=206082'</command>
+	  </commands>
+	</step>
+	<step type="informational"
+	  title="Other External Updates?">
+	  <text>Consider creating a freshmeat entry or other listing
+	  services</text>
+	</step>
+      </steps>
+    </step>
+  </steps>
+</makerelease>

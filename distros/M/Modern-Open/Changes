@@ -1,0 +1,35 @@
+Revision history for this software.
+
+0.07 2014-06-21 00:00:00
+  - remove exit to PASS test of ActiveState Code
+  - created by INABA Hitoshi
+
+0.06 2014-08-10 00:00:00
+  - prevent from installing on newer perls
+  - rename Test/Simple.pm to Test/Simply.pm
+  - remove strict.pm_, warnings.pm, warnings/register.pm, and feature.pm_
+  - created by INABA Hitoshi
+
+0.05 2014-08-09 00:00:00
+  - add sub warnings::register_categories
+  - fix ABSTRACT
+  - created by INABA Hitoshi
+
+0.04 2014-08-07 00:00:00
+  - fix name of META.yml
+  - support Strict::Perl
+  - created by INABA Hitoshi
+
+0.03 2014-02-09 00:00:00
+  - error at Unknown open() mode
+  - add strict.pm_, feature.pm_
+  - SKIP 009_accept.t on cygwin
+  - created by INABA Hitoshi
+
+0.02 2014-02-03 00:00:00
+  - fix 002_open.t, 004_open.t
+  - created by INABA Hitoshi
+
+0.01 2014-02-02 00:00:00
+  - original version
+  - created by INABA Hitoshi

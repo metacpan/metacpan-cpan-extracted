@@ -1,0 +1,157 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+use Mail::DSPAM::Learning;
+
+warn "\nRunning dspam-lean version " . $Mail::DSPAM::Learning::VERSION . "\n\n";
+
+
+my $help;
+my $man;
+
+my $MyConfigFile;
+my $delay = 1;
+my $MyConfigDir = "/home/thhamon/.dspam-learning";
+my $spam_mailbox = "/home/thhamon/Mail/SPAMMailbox";
+
+my $resettingMyConfig = 0;
+my $test = 0;
+
+my $MyConfigNewFile;
+
+my $showconfig;
+
+# pod2usage(1) if $#ARGV==-1;
+
+
+GetOptions('help|?' => \$help, 
+	   man => \$man, 
+	   "delay=i" => \$delay, 
+	   "myconfig_dir=s" => \$MyConfigDir,
+	   resettingMyConfig => \$resettingMyConfig,
+	   "myconfig_file=s" => \$MyConfigNewFile,
+	   test => \$test,
+	   "mailbox=s" => \$spam_mailbox,
+	   showconfig => \$showconfig,
+    ) or pod2usage(2);
+
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+if (defined $MyConfigNewFile) {
+    $MyConfigFile = $MyConfigNewFile;
+} else {
+    $MyConfigFile = "$MyConfigDir/MyConfig.pm";
+}
+
+
+
+my $dspam_learner = Mail::DSPAM::Learning->new();
+
+$dspam_learner->setDelay($delay);
+
+if ($resettingMyConfig) {
+    warn "Deleting $MyConfigFile\n";
+    unlink($MyConfigFile);
+}
+
+$dspam_learner->defineMyConfig($MyConfigFile);
+require $MyConfigFile;
+$dspam_learner->setMyConfig;
+
+if ($showconfig) {
+    $dspam_learner->printMyConfig;
+    exit(0);
+}
+
+
+$dspam_learner->setMailbox($spam_mailbox);
+
+warn "\tParsing Mailbox\n";
+$dspam_learner->parseMailbox();
+
+$dspam_learner->askPassword();
+
+$dspam_learner->setMailer;
+
+my $c = $dspam_learner->forwardMessages(!$test);
+
+warn "\n\t $c messages have been sent\n\n";
+warn "I don't like spam !\n";
+
+exit;
+
+__END__
+
+
+=head1 NAME
+
+dspam_learn - Perl script for help the DSPAM learning process
+
+=head1 SYNOPSIS
+
+dspam-learn [options] [<] [Input_document | Directory] > Annotated_Output_Document
+
+=head1 OPTIONS
+
+=over 4
+
+=item    B<--help>            brief help message
+
+=item    B<--man>             full documentation
+
+=item    B<--delay=num>       delay between two spams message sending to DSPAM
+
+=item    B<--myconfig_dir=directory>    define the directory containing the MyConfig.pm module
+
+=item    B<--resettingMyConfig> Reset the personal configuration
+
+=item    B<--myconfig_file=filename>   define the path for the module Myconfig.pm containing personal configuration
+
+=item    B<--test>            for testing the configuration, no message is sent
+
+=item    B<--mailbox=filename>    define the path to the mailbox containing spams
+
+=item    B<--showconfig>    display the configuration and exit
+
+=back
+
+=head1 DESCRIPTION
+
+This script is used to parse a mailbox containing spams to send to
+your dpsam server in order to correct the learning. You have to
+specify the mailbox to parse thanks to the option C<--mailbox>.
+
+If no personal configuration exists, it first ask personal information
+to send the MyConfig.pm module. Personal information are domain,
+login, email address, SMTP server name, SMTP server port, email
+address for DSPAM,
+
+By default, the MyConfig.pm file is store in C<$HOME/.dspam-learning>,
+but other directory can be specified thanks to the C<--myconfig_dir>.
+
+The option C<--resettingMyConfig> can be used to reset personal
+information.
+
+=head1 SEE ALSO
+
+DSPAM web site: http://dspam.nuclearelephant.com/
+
+=head1 AUTHOR
+
+Thierry Hamon <thierry.hamon@lipn.univ-paris13.fr>
+
+=head1 LICENSE
+
+Copyright (C) 2008 by Thierry Hamon
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

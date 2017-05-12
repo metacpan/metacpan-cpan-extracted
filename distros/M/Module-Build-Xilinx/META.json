@@ -1,0 +1,62 @@
+{
+   "abstract" : "Xilinx ISE Webpack based FPGA Development using commandline",
+   "author" : [
+      "Vikas N Kumar <vikas@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Module-Build-Xilinx",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "Pod::Readme" : "0",
+            "Software::License" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config" : "0",
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "File::Basename" : "0",
+            "File::HomeDir" : "0",
+            "File::ShareDir" : "1.00",
+            "File::Spec" : "0",
+            "Module::Build" : "0",
+            "YAML" : "0",
+            "perl" : "5.0008"
+         }
+      }
+   },
+   "provides" : {
+      "App::mbxilinx" : {
+         "file" : "lib/App/mbxilinx.pm",
+         "version" : "0.13"
+      },
+      "Module::Build::Xilinx" : {
+         "file" : "lib/Module/Build/Xilinx.pm",
+         "version" : "0.13"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ]
+   },
+   "version" : "0.13"
+}

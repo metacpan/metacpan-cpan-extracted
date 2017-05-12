@@ -1,0 +1,11 @@
+bin/symbolic_calculator_web_server
+Build.PL
+Changes
+lib/Math/SymbolicX/Calculator/Interface/Web.pm
+lib/Math/SymbolicX/Calculator/Interface/Web/Server.pm
+MANIFEST			This list of files
+t/00pod.t
+t/01basic.t
+Makefile.PL
+META.yml
+README

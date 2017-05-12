@@ -1,0 +1,15 @@
+Changes
+lib/Mobile/Libwurfl.pm
+lib/Mobile/Libwurfl/Device.pm
+Libwurfl.xs
+Makefile.PL
+MANIFEST
+README
+README.md
+ppport.h
+examples/wurfld.pl
+examples/wurfld_http.pl
+t/Wurfl.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

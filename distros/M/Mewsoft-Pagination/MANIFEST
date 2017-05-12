@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+README
+t/Mewsoft-Pagination.t
+lib/Mewsoft/Pagination.pm
+META.yml                                 Module meta-data (added by MakeMaker)

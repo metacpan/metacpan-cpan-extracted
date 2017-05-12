@@ -1,0 +1,18 @@
+$Id: Changelog 2005/10/28 18:15 $
+
+version 0.16 (2005/10/28):
+
+	- now getmessage() returns undef if message doesn't exist
+
+version 0.15 (2005/08/29):
+
+	- fixed a bug in getmonths() introduced in 0.14
+
+version 0.14 (2005/08/10):
+
+	- getmonths() results are now enforced to be consistent
+
+version 0.13 (2003/10/02):
+
+	- started changelog
+	- fixed a bug which prevented access to messages with ID 1000+

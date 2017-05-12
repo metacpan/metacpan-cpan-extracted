@@ -1,0 +1,6 @@
+Revision history for Perl extension Merge::HashRef.
+
+0.01  Wed Nov 27 14:34:49 2002
+	- original version; created by h2xs 1.22 with options
+		-X Merge::HashRef
+

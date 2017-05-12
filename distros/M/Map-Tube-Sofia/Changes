@@ -1,0 +1,62 @@
+0.07 2015-10-16T12:14:26+02:00
+ - Improve description for get_lines() in doc.
+ - Update to Map::Tube 3.06.
+
+0.06 2015-10-11T11:52:43+02:00
+ - Add 04-map.t test.
+ - Add EXAMPLE4 to doc.
+ - Add get_line_by_id() and get_line_by_name() methods to doc.
+ - Add tests for get_node_by_id() and get_node_by_name() methods.
+ - Fix test dependencies.
+ - Move author tests to xt/ directory.
+ - Rewrite SEE ALSO section to new style.
+ - Update Module::Install to 1.16 version.
+ - Update examples/ex3.pl example.
+
+0.05 2015-01-25T20:06:37+01:00
+ - Add <?xml> header to XML document.
+ - Add Map::Tube::Graph and Task::Map::Tube to SEE ALSO section in doc.
+ - Add Map::Tube::Plugin::Graph to SEE ALSO section in doc.
+ - Add lines to XML document.
+ - Fix examples/ex3.pl.
+ - Remove obsolete code from EXAMPLE3 section in doc (neato driver is
+   default).
+ - Rename images/Sofia.png to images/ex3.png.
+ - Update copyright years to 2015.
+ - Update image in EXAMPLE3 section in doc.
+ - Update to Map::Tube 2.74 version (fix tests).
+
+0.04 2014-12-23T11:57:18+01:00
+ - Add EXAMPLE3 section to doc.
+ - Add Map::Tube::GraphViz, Map::Tube::Text::Table,
+   Map::Tube::Dnipropetrovsk, Map::Tube::Novosibirsk,
+   Map::Tube::SaintPetersburg, Map::Tube::Vienna and
+   Map::Tube::Yekaterinburg to SEE ALSO section in doc.
+ - Add get_lines() method to doc.
+ - Add get_stations() method to doc.
+ - Remove executable bit from sofia-map.xml file.
+
+0.03 2014-12-15T07:55:58+01:00
+ - Add Map::Tube::Berlin and Map::Tube::Moscow to SEE ALSO section.
+ - Add Map::Tube::Bucharest, Map::Tube::Kazan, Map::Tube::Kharkiv,
+   Map::Tube::Samara and Map::Tube::Tbilisi to SEE ALSO section in doc.
+ - Add Map::Tube::Kiev and Map::Tube::Minsk to SEE ALSO section.
+ - Add get_all_routes(), get_node_by_id() and get_node_by_name() methods to
+   doc.
+ - Add metro name.
+ - Describe get_all_routes() method as EXPERIMENTAL.
+ - Fix REPOSITORY section in doc.
+ - Fix get_shortest_route() method description in doc. Thanks Mohammad S
+   Anwar (#100768).
+ - Improve abstract to readable version.
+
+0.02 2014-12-04T07:52:59+01:00
+ - Add Map::Tube::Warsaw to SEE ALSO section in doc.
+ - Add tests for get_shortest_route() method.
+ - Fix XML map (Thanks Mohammad S Anwar). 
+ - Remove obsolete pragma from EXAMPLE2 section in doc.
+ - Update LICENSE AND COPYRIGHT section in doc.
+ - Update examples/ directory.
+
+0.01 2014-12-01T08:57:30+01:00
+ - First version

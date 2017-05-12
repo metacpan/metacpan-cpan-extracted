@@ -1,0 +1,26 @@
+Build.PL
+Changes
+lib/Math/Utils.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-compare.t
+t/02-signs.t
+t/03-logarithm.t
+t/04-fsum.t
+t/05-intfns.t
+t/06-moduli.t
+t/10-add.t
+t/11-subtract.t
+t/12-multiply.t
+t/13-divide.t
+t/14-derivative.t
+t/15-objcoeff.t
+t/16-evaluate.t
+t/17-derivative-eval.t
+t/manifest.t
+t/pod.t
+LICENSE
+META.yml
+META.json

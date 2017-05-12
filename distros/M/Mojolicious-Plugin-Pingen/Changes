@@ -1,0 +1,16 @@
+Revision history for Business::Payment::SwissESR
+
+0.2.2 2015-10-11
+  - better tests still
+  - unbreak json tests
+  - fix exception implementation
+
+0.2.1 2015-09-28
+  - better tests
+
+0.2.0 2015-08-04
+  - added exceptions option
+  - test sync mode
+
+0.1.1 2015-07-23
+  - initial

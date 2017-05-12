@@ -1,0 +1,13 @@
+0.0015 04-25-2011
+
+- Bumped mojolicious version to include its latest security patches.
+
+0.0014 04-08-2011
+
+- Added File::Path as dependency
+- Fixed typos in the pod of action-cache plugin.
+
+0.0013 02-25-2011
+
+- First release
+

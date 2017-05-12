@@ -1,0 +1,76 @@
+{
+   "abstract" : "shiny syntax for MooseX::Interface",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::7 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-DeclareX-Keyword-interface",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MooseX::DeclareX" : "0.002",
+            "MooseX::Interface" : "0.002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.61"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::DeclareX::Keyword::interface" : {
+         "file" : "lib/MooseX/DeclareX/Keyword/interface.pm",
+         "version" : "0.004"
+      },
+      "MooseX::DeclareX::Plugin::test_case" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/test_case.pm",
+         "version" : "0.004"
+      },
+      "MooseX::DeclareX::Plugin::test_case::MethodModifier" : {
+         "file" : "lib/MooseX/DeclareX/Plugin/test_case.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/MooseX-DeclareX-Keyword-interface/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=MooseX-DeclareX-Keyword-interface"
+      },
+      "homepage" : "https://metacpan.org/release/MooseX-DeclareX-Keyword-interface",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-moosex-declarex-keyword-interface.git",
+         "web" : "https://github.com/tobyink/p5-moosex-declarex-keyword-interface"
+      }
+   },
+   "version" : "0.004"
+}

@@ -1,0 +1,69 @@
+{
+   "abstract" : "Mixin methods for simple event/message dispatch framework",
+   "author" : [
+      "Tom Molesworth <cpan@perlsite.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mixin-Event-Dispatch",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.48"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Mojibake" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Synopsis" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::UtilsBy" : "0",
+            "Scalar::Util" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::Fatal" : "0.010",
+            "Test::More" : "0.98",
+            "Test::Refcount" : "0.07"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-mixin-event-dispatch at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Mixin-Event-Dispatch"
+      },
+      "homepage" : "http://search.cpan.org/dist/Mixin-Event-Dispatch/"
+   },
+   "version" : "2.000"
+}
+

@@ -1,0 +1,15 @@
+---
+name: MyModule
+version: 0.1
+author:
+  - 'Víctor Moral <victor@taquiones.net>'
+abstract: ~
+license: gpl
+requires:
+  Module::Build::PM_Filter: 0
+  Test::More: 0
+provides:
+  MyModule:
+    file: lib/MyModule.pm
+    version: 0.1
+generated_by: Module::Build version 0.26

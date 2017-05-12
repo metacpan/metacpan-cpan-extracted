@@ -1,0 +1,63 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.78.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 07f7bcab1d05b0f22322ac9afee5a2846c75d199 Changes
+SHA1 1362ed9d6d2f107e6f5eadb1e765d7b90a5e0aab MANIFEST
+SHA1 5583b480ed90b63f3d959d971aa61e6848c00eaf META.json
+SHA1 2857d0aedda0f3b4d4a9722e1d98002197592e6c META.yml
+SHA1 424a98f1f4b05205252675c80d2233e421c5e926 Makefile.PL
+SHA1 938ea04a733e0b7266c0de6615ad1c52abd04e32 README
+SHA1 a6abf1ac28f06acc974423d381fbf9d421f574d3 examples/matrix.pl
+SHA1 67756ae77eea912edc0c2dad4a271c069dda68e1 examples/scramble.pl
+SHA1 31a563e8cba5888a311232c79f026ecab9ed9745 lib/Math/ModInt.pm
+SHA1 8c0dd2ad936ea47a424d57593d9ed2821ad2920f lib/Math/ModInt/BigInt.pm
+SHA1 3a330374bacfdf51aeab3aa512741c8e9d41958a lib/Math/ModInt/ChineseRemainder.pm
+SHA1 21c8fceb514a83daf681054eb6fa74cdb5d0e767 lib/Math/ModInt/Event.pm
+SHA1 3334a9d2b6e13ac7cc6646f5214b28167773e0c5 lib/Math/ModInt/Event/Trap.pm
+SHA1 366073eeed93e2ec086ff3c3c62fb5807d0beb99 lib/Math/ModInt/GF2.pm
+SHA1 3a395e8cee6aef1270dfc71cf2403c85771b6c9f lib/Math/ModInt/GF3.pm
+SHA1 1615d16be51dd80d6618d0fa9894132156695cf1 lib/Math/ModInt/Perl.pm
+SHA1 3ce2a018fbf67bd0b3f253add8a62bbebe43ba9d lib/Math/ModInt/Trivial.pm
+SHA1 6b161aa5fb11b9caf9cc4822bf9c8c110ae1aea0 t/01_basics.t
+SHA1 a4578b551bf46e6d7dfbadf1c6e6ce6432a317be t/02_trivial.t
+SHA1 411d2e00f387f91bc7e242259542f29cc3abcecb t/03_gf2.t
+SHA1 d2330c45c829f6fac36e68e054aff33bec17194a t/04_perl.t
+SHA1 6ff5ef354db546bee859ab2e06f96ae4b6b40d87 t/05_bigint.t
+SHA1 7ee9b9579f3d4ca39996fa8c6eede8c1937956e8 t/06_validation.t
+SHA1 3d46dcf529b35b9533810bf4694b3d5e774d1d45 t/07_platform.t
+SHA1 494c3d4bece6a2260a8bbb90d60184ed1d391183 t/09_gf3.t
+SHA1 4057dcd1a1976c1082f7531f5a739fe71cb1f7e1 t/10_bigrat.t
+SHA1 69a8cd0affff8ecbe50d2f744d93b4248e243d7d t/11_chinese_rem.t
+SHA1 6cd304c339f6ac873b45dc380814b17e4f621dcc t/12_event.t
+SHA1 12ee5eb7013598c45007b488ade9b94f146d5c7e t/90_pod.t
+SHA1 c28ebf0fa25e9cb7a8fbbbf5ae78dc39952f607a t/91_pod_cover_cp.t
+SHA1 76b25fc1b302e9056874a951821b8f8d7cdc7e02 t/92_consistency.t
+SHA1 690c222221fa956f136f5277ef82ce96eb4b682b t/93_examples.t
+SHA1 1d5d8e199564f6d9baeadfef7ffef02a3b464f48 t/95_versions.t
+SHA1 1496e251e89201034ae1c6519408983a31f2ae5b t/99_signature.t
+SHA1 649876264f30e5bebfc2ade392542d599c7965fc t/data/KNOWN_VERSIONS
+SHA1 8360ca9f7fe25c200be597a49880efc57973d562 t/lib/Test/MyUtils.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (Darwin)
+
+iQEcBAEBAgAGBQJVWay1AAoJEGH3bZuRPycNBtsH/jH5dit9z0ymffnR37Du6k2h
+Q/43wxVrtOuAmUp5HNfaVjOWp9x5J/7+eppRHqppLRjFWGhVpY9IU6+++7POoUYh
+wIIBJFBYl+rJzBCpgI02uC/DorBj1B7ZjPeYiQRRikknIZ7YdFRGqpbQ1PYFayGs
+c2PBhuAZixjPnVPn0GsYFiQwk/3nM2NdT8re/KGA9lGM9OSY0jdKL39M0mu/qLxc
+gJ5wDvrswBzYCnfdQ9Ik8rz9ApI9S6d6urR8ZguP7jVe+/dHknyDXWdaDWXtp5mL
+SQAEGjIN4uenH7/QOgXwl+ssFqcBJdal9iYTF2zJua6YZo6V2E9bd4FTMBbF5rM=
+=66wB
+-----END PGP SIGNATURE-----

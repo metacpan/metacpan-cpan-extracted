@@ -1,0 +1,64 @@
+commit 4fc9cd37f9be7baf6a01cde5629eda63004a6084 (HEAD, master)
+Author: nadim khemir <nadim@khemir.net>
+Date:   Fri May 20 16:15:15 2011 +0200
+
+    FIXED: Changes files in template was not included in distribution
+
+commit 427a21f36435bc0b59d62c17600a3eff9037ab34
+Author: nadim khemir <nkh@cpan.org>
+Date:   Tue Apr 27 22:32:19 2010 +0200
+
+    ADDED: better error message if the template cna't be evaluated
+    CHANGES: divers changes to the default template
+
+commit a8b24bc998c823f73ea7d9f329b20acdafef079f
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Jan 14 21:56:37 2009 +0100
+
+    ADDED: prereq test
+
+commit 0f452e5bb652e2aa1f83f11c7ffe62286877cd19
+Author: nadim khemir <nkh@cpan.org>
+Date:   Tue Jan 13 11:49:31 2009 +0100
+
+    FIXED: displaying stderr output from the wrong test
+
+commit 390946ae9035bd83905fcb887739c8118cb05b3d
+Author: nadim khemir <nkh@cpan.org>
+Date:   Tue Jan 13 11:41:20 2009 +0100
+
+    ADDED: stdout output if test fails
+
+commit a88bd31bc6af3a1b743d9f67892ec5523a8f3afc
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sun Jan 11 23:33:17 2009 +0100
+
+    ADDED: default template installation
+
+commit ae9e019f61376389d7437334185cdcffd309180b
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sun Jan 11 23:01:50 2009 +0100
+
+    ADDED: test module creation
+    ADDED: help
+    CHANGED: fine tuned template
+
+commit ba99912d79100c9d1bc187daf34348a12631dc9e
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Fri Jan 2 01:02:38 2009 +0100
+
+    FIXED: input from user has to come from STDIN
+    FIXED: error in year constant
+
+commit 86a26f1530704e0bb37d1528a2d7751346c7e2ba
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Fri Jan 2 00:48:24 2009 +0100
+
+    FIXED: removed perl critic errors
+    CAHNGED: perl critic options
+
+commit 9daf70c0cf99adf379b7486f1b3a80cb910d5448
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Fri Jan 2 00:12:49 2009 +0100
+
+    ADDED: Initial commit

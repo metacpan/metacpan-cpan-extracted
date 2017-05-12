@@ -1,0 +1,12 @@
+Revision history for Mojo-Log-More
+
+1.02 - 01-03-2015
+ - Add compatibility with Mojolicious 6.0, while still being
+   compatible with Mojolicious 5.x.
+
+1.01 - 21-02-2015
+ - Fix tests on older versions of perl (5.14 and before)
+
+1.00 - 21-02-2015
+ - First version, released on an unsuspecting world.
+

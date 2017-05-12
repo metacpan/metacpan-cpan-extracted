@@ -1,0 +1,36 @@
+---
+abstract: 'print/graph module(s) information'
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+build_requires:
+  Test::Differences: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+keywords:
+  - module
+  - methods
+  - dump
+  - overview
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Overview
+provides:
+  Module::Overview:
+    file: lib/Module/Overview.pm
+    version: 0.01
+requires:
+  Carp: 0
+  Class::Accessor::Fast: 0
+  Class::Sniff: 0
+  Graph::Easy: 0
+  Module::ExtractUse: 0
+  Text::SimpleTable: 0
+resources:
+  bugtracker: http://github.com/jozef/Module-Overview/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jozef/Module-Overview
+version: 0.01

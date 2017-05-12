@@ -1,0 +1,171 @@
+---
+abstract: 'An object-oriented implementation of Sender Policy Framework'
+author:
+  - 'Julian Mehnle <julian@mehnle.net>'
+  - 'Shevek <cpan@anarres.org>'
+build_requires:
+  Module::Build: 0.2805
+  Net::DNS::Resolver::Programmable: 0.003
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.2805
+generated_by: 'Module::Build version 0.3607'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mail-SPF
+provides:
+  Mail::SPF:
+    file: lib/Mail/SPF.pm
+    version: v2.9.0
+  Mail::SPF::Base:
+    file: lib/Mail/SPF/Base.pm
+  Mail::SPF::EAbstractClass:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::EClassMethod:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::EDNSError:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::EDNSTimeout:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::EDuplicateGlobalMod:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::EInstanceMethod:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::EInvalidMacro:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::EInvalidMacroString:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::EInvalidMech:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::EInvalidMechQualifier:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::EInvalidMod:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::EInvalidOptionValue:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::EInvalidRecordVersion:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::EInvalidScope:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::EInvalidTerm:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::EJunkInRecord:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::EJunkInTerm:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::EMacroExpansionCtxRequired:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::ENoAcceptableRecord:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::ENoUnparsedText:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::ENothingToParse:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::EOptionRequired:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::EProcessingLimitExceeded:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::EReadOnlyValue:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::ERecordSelectionError:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::ERedundantAcceptableRecords:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::ESyntaxError:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::ETermDomainSpecExpected:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::ETermIPv4AddressExpected:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::ETermIPv4PrefixLengthExpected:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::ETermIPv6AddressExpected:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::ETermIPv6PrefixLengthExpected:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::EUnexpectedTermObject:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::Exception:
+    file: lib/Mail/SPF/Exception.pm
+  Mail::SPF::GlobalMod:
+    file: lib/Mail/SPF/Mod.pm
+  Mail::SPF::MacroString:
+    file: lib/Mail/SPF/MacroString.pm
+  Mail::SPF::Mech:
+    file: lib/Mail/SPF/Mech.pm
+  Mail::SPF::Mech::A:
+    file: lib/Mail/SPF/Mech/A.pm
+  Mail::SPF::Mech::All:
+    file: lib/Mail/SPF/Mech/All.pm
+  Mail::SPF::Mech::Exists:
+    file: lib/Mail/SPF/Mech/Exists.pm
+  Mail::SPF::Mech::IP4:
+    file: lib/Mail/SPF/Mech/IP4.pm
+  Mail::SPF::Mech::IP6:
+    file: lib/Mail/SPF/Mech/IP6.pm
+  Mail::SPF::Mech::Include:
+    file: lib/Mail/SPF/Mech/Include.pm
+  Mail::SPF::Mech::MX:
+    file: lib/Mail/SPF/Mech/MX.pm
+  Mail::SPF::Mech::PTR:
+    file: lib/Mail/SPF/Mech/PTR.pm
+  Mail::SPF::Mod:
+    file: lib/Mail/SPF/Mod.pm
+  Mail::SPF::Mod::Exp:
+    file: lib/Mail/SPF/Mod/Exp.pm
+  Mail::SPF::Mod::Redirect:
+    file: lib/Mail/SPF/Mod/Redirect.pm
+  Mail::SPF::PositionalMod:
+    file: lib/Mail/SPF/Mod.pm
+  Mail::SPF::Record:
+    file: lib/Mail/SPF/Record.pm
+  Mail::SPF::Request:
+    file: lib/Mail/SPF/Request.pm
+  Mail::SPF::Result:
+    file: lib/Mail/SPF/Result.pm
+  Mail::SPF::Result::Error:
+    file: lib/Mail/SPF/Result.pm
+  Mail::SPF::Result::Fail:
+    file: lib/Mail/SPF/Result.pm
+  Mail::SPF::Result::Neutral:
+    file: lib/Mail/SPF/Result.pm
+  Mail::SPF::Result::NeutralByDefault:
+    file: lib/Mail/SPF/Result.pm
+  Mail::SPF::Result::None:
+    file: lib/Mail/SPF/Result.pm
+  Mail::SPF::Result::Pass:
+    file: lib/Mail/SPF/Result.pm
+  Mail::SPF::Result::PermError:
+    file: lib/Mail/SPF/Result.pm
+  Mail::SPF::Result::SoftFail:
+    file: lib/Mail/SPF/Result.pm
+  Mail::SPF::Result::TempError:
+    file: lib/Mail/SPF/Result.pm
+  Mail::SPF::SenderIPAddrMech:
+    file: lib/Mail/SPF/SenderIPAddrMech.pm
+  Mail::SPF::Server:
+    file: lib/Mail/SPF/Server.pm
+  Mail::SPF::Term:
+    file: lib/Mail/SPF/Term.pm
+  Mail::SPF::UnknownMod:
+    file: lib/Mail/SPF/Mod.pm
+  Mail::SPF::Util:
+    file: lib/Mail/SPF/Util.pm
+  Mail::SPF::v1::Record:
+    file: lib/Mail/SPF/v1/Record.pm
+  Mail::SPF::v2::Record:
+    file: lib/Mail/SPF/v2/Record.pm
+recommends:
+  NetAddr::IP: 4.007
+requires:
+  Error: 0
+  Net::DNS: 0.62
+  NetAddr::IP: 4
+  URI: 1.13
+  perl: 5.006
+  version: 0
+resources:
+  license: http://opensource.org/licenses/bsd-license.php
+version: v2.9.0

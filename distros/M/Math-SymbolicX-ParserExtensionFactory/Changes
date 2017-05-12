@@ -1,0 +1,38 @@
+Revision history for Perl extension Math::SymbolicX::ParserExtensionFactory.
+
+3.02  Wed Mar  4 18:11 2009
+  - Fix regression introduced in 3.01 wrt. parsing *(...)
+  - Require Math::Symbolic 0.603
+
+3.01  Thu Feb  5 21:51 2009
+  - Support for object-private parser extensions.
+
+2.01  Sun Jan 27 14:36 2007
+* This is a critical bug fix release for 2.00 *
+  - Fix bug in the extension regex that would trigger only if there are
+    extension names which are substrings of another extension.
+    The other extension would have to be added after the short one.
+    In those cases, the longer extension would never match.
+
+2.00  Fri Jan 19 16:47 2007
+* This release contains incompatible changes *
+  - The extend-only-if-not-done-before logic now works even if the
+    parser object of Math::Symbolic is replaced.
+  - The previously very broken logic that would parse the argument
+    string for the custom functions was replaced by Text::Balanced's
+    extract_bracketed() which should reliably parse nested parenthesis.
+    This means that you cannot escape parenthesis in an argument string
+    any more!
+  - Slightly improved tests.
+  - If the parser is a Yapp parser instead of a RecDescent parser, this
+    module now works as well! (Yapp parsers were introduced to
+    Math::Symbolic somewhere around version 0.500. They are outrageously
+    fast compared to the RecDescent parser.)
+  - Now requiring Math::Symbolic 0.506 or better.
+
+1.00  Wed Oct 12 21:04 2005
+  - Distribution upgrade. Now using Module::Build
+
+0.01  Sat Jul 17 17:35 2004
+  - original version
+

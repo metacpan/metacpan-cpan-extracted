@@ -1,0 +1,17 @@
+<%doc>
+
+=head2 button
+
+This is a generic button, which performs an action on an object.
+
+=cut
+
+</%doc>
+<%args>
+    $obj
+    $action
+</%args>
+% return unless $obj->is_public( $action );
+<form class="actionform" action="<% $base %>/<% $obj->table %>/<% $action %>/<% $obj->id %>" method="post">
+<div class="field"><input class="actionbutton" type="submit" value="<% $action %>" /></div>
+</form>

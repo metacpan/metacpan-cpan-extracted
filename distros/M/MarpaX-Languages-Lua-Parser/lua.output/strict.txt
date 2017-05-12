@@ -1,0 +1,534 @@
+chunk
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat
+keyword local
+local
+namelist
+Name
+getinfo
+Name
+error
+Name
+rawset
+Name
+rawget
+optional namelist initialization
+=
+explist
+exp
+var
+prefixexp
+var
+Name
+debug
+.
+Name
+getinfo
+exp
+var
+Name
+error
+exp
+var
+Name
+rawset
+exp
+var
+Name
+rawget
+stat
+keyword local
+local
+namelist
+Name
+mt
+optional namelist initialization
+=
+explist
+exp
+exp
+var
+Name
+getmetatable
+args
+(
+optional explist
+explist
+exp
+var
+Name
+_G
+)
+stat
+keyword if
+if
+exp
+exp
+var
+Name
+mt
+==
+exp
+keyword nil
+nil
+keyword then
+then
+block
+chunk
+stat list
+stat list
+stat
+varlist
+var
+Name
+mt
+=
+explist
+exp
+tableconstructor
+{
+}
+stat
+functioncall
+prefixexp
+var
+Name
+setmetatable
+args
+(
+optional explist
+explist
+exp
+var
+Name
+_G
+exp
+var
+Name
+mt
+)
+elseif sequence
+optional else block
+keyword end
+end
+stat
+varlist
+var
+prefixexp
+var
+Name
+mt
+.
+Name
+__declared
+=
+explist
+exp
+tableconstructor
+{
+}
+stat
+keyword local
+local
+keyword function
+function
+Name
+what
+funcbody
+(
+optional parlist
+)
+block
+chunk
+stat list
+stat
+keyword local
+local
+namelist
+Name
+d
+optional namelist initialization
+=
+explist
+exp
+exp
+var
+Name
+getinfo
+args
+(
+optional explist
+explist
+exp
+Number
+3
+exp
+String
+double quoted string
+"S"
+)
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+exp
+exp
+var
+Name
+d
+keyword and
+and
+exp
+var
+prefixexp
+var
+Name
+d
+.
+Name
+what
+keyword or
+or
+exp
+String
+double quoted string
+"C"
+keyword end
+end
+stat
+varlist
+var
+prefixexp
+var
+Name
+mt
+.
+Name
+__newindex
+=
+explist
+exp
+function
+keyword function
+function
+funcbody
+(
+optional parlist
+namelist
+Name
+t
+Name
+n
+Name
+v
+)
+block
+chunk
+stat list
+stat list
+stat
+keyword if
+if
+exp
+keyword not
+not
+exp
+var
+prefixexp
+var
+prefixexp
+var
+Name
+mt
+.
+Name
+__declared
+[
+exp
+var
+Name
+n
+]
+keyword then
+then
+block
+chunk
+stat list
+stat list
+stat list
+stat
+keyword local
+local
+namelist
+Name
+w
+optional namelist initialization
+=
+explist
+exp
+exp
+var
+Name
+what
+args
+(
+optional explist
+)
+stat
+keyword if
+if
+exp
+exp
+exp
+var
+Name
+w
+~=
+exp
+String
+double quoted string
+"main"
+keyword and
+and
+exp
+exp
+var
+Name
+w
+~=
+exp
+String
+double quoted string
+"C"
+keyword then
+then
+block
+chunk
+stat list
+stat
+functioncall
+prefixexp
+var
+Name
+error
+args
+(
+optional explist
+explist
+exp
+exp
+String
+double quoted string
+"assign to undeclared variable '"
+..
+exp
+exp
+var
+Name
+n
+..
+exp
+String
+double quoted string
+"'"
+exp
+Number
+2
+)
+elseif sequence
+optional else block
+keyword end
+end
+stat
+varlist
+var
+prefixexp
+var
+prefixexp
+var
+Name
+mt
+.
+Name
+__declared
+[
+exp
+var
+Name
+n
+]
+=
+explist
+exp
+keyword true
+true
+elseif sequence
+optional else block
+keyword end
+end
+stat
+functioncall
+prefixexp
+var
+Name
+rawset
+args
+(
+optional explist
+explist
+exp
+var
+Name
+t
+exp
+var
+Name
+n
+exp
+var
+Name
+v
+)
+keyword end
+end
+stat
+varlist
+var
+prefixexp
+var
+Name
+mt
+.
+Name
+__index
+=
+explist
+exp
+function
+keyword function
+function
+funcbody
+(
+optional parlist
+namelist
+Name
+t
+Name
+n
+)
+block
+chunk
+stat list
+stat
+keyword if
+if
+exp
+exp
+keyword not
+not
+exp
+var
+prefixexp
+var
+prefixexp
+var
+Name
+mt
+.
+Name
+__declared
+[
+exp
+var
+Name
+n
+]
+keyword and
+and
+exp
+exp
+exp
+var
+Name
+what
+args
+(
+optional explist
+)
+~=
+exp
+String
+double quoted string
+"C"
+keyword then
+then
+block
+chunk
+stat list
+stat
+functioncall
+prefixexp
+var
+Name
+error
+args
+(
+optional explist
+explist
+exp
+exp
+String
+double quoted string
+"variable '"
+..
+exp
+exp
+var
+Name
+n
+..
+exp
+String
+double quoted string
+"' is not declared"
+exp
+Number
+2
+)
+elseif sequence
+optional else block
+keyword end
+end
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+exp
+var
+Name
+rawget
+args
+(
+optional explist
+explist
+exp
+var
+Name
+t
+exp
+var
+Name
+n
+)
+keyword end
+end

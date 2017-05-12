@@ -1,0 +1,14 @@
+0.04 2017-04-24T13:48:19+0200
+ - no_plan is redundant with done_testing
+
+0.03 2017-04-23T19:54:57+0200
+
+ - Stray line broke 0.02 :(
+
+0.02 2017-04-23T19:42:43+0200
+
+ - Update documentation
+
+0.01 2017-04-23T19:33:58+0200
+
+ - Initial release

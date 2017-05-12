@@ -1,0 +1,17 @@
+pushd /home/barries/src/Module-Husbandry/tmp && {
+    rm -rf Foo-*
+    (
+    newpmdist Foo-Bar \
+    && cd Foo-Bar \
+    && make test \
+    && newpm Foo::Bat \
+    && make test \
+    && mvpm Foo::Bat Foo::Ban \
+    && make test \
+    && mvpm Foo::Bar Foo::Baz \
+    && make test \
+    && rmpm Foo::Ban \
+    && make test \
+    ) || find .
+    popd
+}

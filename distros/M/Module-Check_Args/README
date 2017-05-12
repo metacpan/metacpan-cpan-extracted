@@ -1,0 +1,8 @@
+This is version 1.1 of Module::Check_Args, a Perl-only distribution.
+
+Module::Check_Args is a way to ensure that a subroutine or method is only
+called with the number of arguments it expects.  You add a line at the
+top of each subroutine or method for which you want to enable checking.
+You can specify if you want the program to die if the arguments don't match,
+or just give a warning, on a module-by-module basis.  You can also turn
+checking off but leave the hooks in your subroutines.

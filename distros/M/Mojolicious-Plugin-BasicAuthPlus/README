@@ -1,0 +1,292 @@
+NAME
+    Mojolicious::Plugin::BasicAuthPlus - Basic HTTP Auth Helper Plus
+
+VERSION
+    Version 0.10.2
+
+SYNOPSIS
+      # Mojolicious::Lite
+      plugin 'basic_auth_plus';
+  
+      get '/' => sub {
+          my $self = shift;
+  
+          $self->render(text => 'ok')
+            if $self->basic_auth(
+              "Realm Name" => {
+                  username => 'username',
+                  password => 'password'
+              }
+          );
+      };
+  
+      # Mojolicious
+      $self->plugin('BasicAuthPlus');
+  
+      sub index {
+          my $self = shift;
+  
+          $self->render(text => 'ok')
+              if $self->basic_auth(
+                  "My Realm" => {
+                      path => '/path/to/some/passwd/file.txt'
+                  }
+              );
+      }
+
+DESCRIPTION
+    Mojolicious::Plugin::BasicAuthPlus is a helper for basic HTTP
+    authentication that supports multiple authentication schemes, including
+    a callback, explicit username and password (plaintext or encrypted)
+    without a callback, a passwd file, LDAP, and Active Directory.
+
+METHODS
+    Mojolicious::Plugin::BasicAuthPlus inherits all methods from
+    Mojolicious::Plugin and implements the following new ones.
+
+  "register"
+        $plugin->register;
+
+    Register condition in Mojolicious application.
+
+  "basic_auth"
+    Configure specific auth method (see CONFIGURATION). Returns a
+    two-element list, where the first element is a hash reference and the
+    second is an integer (1 for success, 0 for failure).
+
+    In the future, the hash reference may contain additional values, but for
+    now it contains just one key/value pair for the username used to
+    authenticate. You can ignore this; thus, for example, both of the
+    following are valid:
+
+      my ($hash_ref, $auth_ok)
+          = $self->basic_auth(
+              "My Realm" => {
+                  username => 'zapp',
+                  password => 'brannigan'
+              }
+          );
+      if ($auth_ok) {
+          $self->app->log->info("Auth success for $hash_ref->{username}");
+          render(text => 'ok');
+      }
+
+      $self->render(text => 'ok')
+          if ($self->basic_auth(
+              "My Realm" => {
+                  username => 'zapp',
+                  password => 'brannigan'
+              }
+          );
+
+  "check_auth"
+
+    Check authentication does the same thing as C<basic_auth> without asking
+    for a password if authentication failed.
+
+      my ($hash_ref, $status) = $plugin->check_auth($c, $auth, $params);
+
+
+CONFIGURATION
+    The basic_auth method takes an HTTP Basic Auth realm name that is either
+    a code ref for a subroutine that will do the authentication check, or a
+    hash, where the realm is the hash name. When the realm represents a
+    named hash, the key/value pairs specify the source of user credentials
+    and determine the method used for authentication (e.g., passwd file,
+    LDAP, Active Directory).
+
+    Realm names may contain whitespace.
+
+    If a username and password are defined, then other options pertaining to
+    a passwd file or LDAP/ActiveDirectory authentication will be ignored,
+    because it it assumed you intend to compare the defined username and
+    password against those supplied by the user.
+
+    The following options may be set in the hash:
+
+  username
+    Specify the username to match.
+
+  password
+    Specify the password to match. The string may be plaintext or use any of
+    the formats noted in Authen::Simple::Password.
+
+  path
+    The location of a password file holding user credentials. Per
+    Authen::Simple::Passwd, "Any standard passwd file that has records
+    seperated with newline and fields seperated by ":" is supported. First
+    field is expected to be username and second field, plain or encrypted
+    password. Required."
+
+  host
+    The hostname or IP address of an LDAP or Active Directory server.
+
+  basedn
+    The base DN to use with LDAP or Active Directory.
+
+  binddn
+    The bind DN to use when doing an authenticated bind against LDAP or
+    Active Directory.
+
+  bindpw
+    The password to use when doing an authenticated bind to LDAP or Active
+    Directory.
+
+  filter
+    The LDAP/ActiveDirectory filter to use when searching a directory.
+
+EXAMPLES
+      # With callback
+      get '/' => sub {
+          my $self = shift;
+  
+          return $self->render(text => 'ok')
+              if $self->basic_auth(
+                  realm => sub { return 1 if "@_" eq 'username password' }
+              );
+      };
+  
+      # With callback and getting username from return hash ref.
+      get '/' => sub {
+          my $self = shift;
+  
+          my ($href, $auth_ok) = $self->basic_auth(
+              realm => sub { return 1 if "@_" eq 'username password' }
+          );
+
+          if ($auth_ok) {
+              return $self->render(
+                  status => 200,
+                  text   => 'ok',
+                  msg    => "Welcome $href->{username}"
+              );
+          }
+          else {
+              return $self->render(
+                  status => 401,
+                  text   => 'unauthorized',
+                  msg    => "Sorry $href->{username}"
+              );
+          }
+      };
+  
+      # With encrypted password
+      get '/' => sub {
+          my $self = shift;
+  
+          $self->render(text => 'ok')
+            if $self->basic_auth(
+              "Realm Name" => {
+                  username => 'username',
+                  password => 'MlQ8OC3xHPIi.'
+              }
+          );
+      };
+  
+      # Passwd file authentication
+      get '/' => sub {
+          my $self = shift;
+  
+          $self->render(text => 'ok')
+            if $self->basic_auth(
+              "Realm Name" => {
+                  path => '/path/to/passwd/file.txt'
+              }
+          );
+      };
+  
+      # LDAP authentication (with anonymous bind)
+      get '/' => sub {
+          my $self = shift;
+  
+          $self->render(text => 'ok')
+            if $self->basic_auth(
+              "Realm Name" => {
+                  host   => 'ldap.company.com',
+                  basedn => 'ou=People,dc=company,dc=com'
+              }
+          );
+      };
+  
+      # Active Directory authentication (with authenticated bind)
+      get '/' => sub {
+          my $self = shift;
+  
+          $self->render(text => 'ok')
+            if $self->basic_auth(
+              "Realm Name" => {
+                  host   => 'ldap.company.com',
+                  basedn => 'dc=company,dc=com',
+                  binddn => 'ou=People,dc=company,dc=com',
+                  bindpw => 'secret',
+                  filter =>
+                  '(&(objectClass=organizationalPerson)(userPrincipalName=%s))'
+              }
+          );
+      };
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-mojolicious-plugin-basicauthplus at rt.cpan.org", or through the
+    web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Mojolicious-Plugin-Basic
+    AuthPlus>. I will be notified, and then you'll automatically be notified
+    of progress on your bug as I make changes.
+
+DEVELOPMENT
+    <http://github.com/stregone/mojolicious-plugin-basicauthplus>
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Mojolicious::Plugin::BasicAuthPlus
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mojolicious-Plugin-BasicAu
+        thPlus>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Mojolicious-Plugin-BasicAuthPlus>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Mojolicious-Plugin-BasicAuthPlus>
+
+        item * Search CPAN
+
+        <http://search.cpan.org/dist/Mojolicious-Plugin-BasicAuthPlus/>
+
+ACKNOWLEDGEMENTS
+    Based on Mojolicious::Plugin::BasicAuth, by Glen Hinkle
+    <tempire@cpan.org>.
+
+AUTHOR
+    Brad Robertson <blr@cpan.org>
+
+CONTRIBUTORS
+    In alphabetical order:
+
+      G.Y. Park
+
+      Jay Mortensen
+
+      Nicolas Georges
+
+SEE ALSO
+    Mojolicious, Mojolicious::Guides, <http://mojolicio.us>,
+    Authen::Simple::Password, Authen::Simple::LDAP, Authen::Simple::Passwd
+
+COPYRIGHT
+    Copyright (c) 2013-2015 by Brad Robertson.
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

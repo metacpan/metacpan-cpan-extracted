@@ -1,0 +1,62 @@
+============================================================================
+NAME
+
+    MP4::Info - Fetch info from MPEG-4 files (.mp4, .m4a, .m4p, .3gp)
+
+============================================================================
+CHANGES
+
+    1.13 2010-07-30
+      - Fix reported bitrate
+
+============================================================================
+DESCRIPTION
+
+    The MP4::Info module can be used to extract tag and meta information
+    from MPEG-4 audio (AAC) and video files. It is designed as a drop-in
+    replacement for MP3::Info.
+
+    Note that this module does not allow you to update the information in
+    MPEG-4 files.
+
+============================================================================
+SYNOPSIS
+
+        use MP4::Info;
+        my $file = 'Pearls_Before_Swine.m4a';
+
+        my $tag = get_mp4tag($file) or die "No TAG info";
+        printf "$file is a %s track\n", $tag->{GENRE};
+
+        my $info = get_mp4info($file);
+        printf "$file length is %d:%d\n", $info->{MM}, $info->{SS};
+
+        my $mp4 = new MP4::Info $file;
+        printf "$file length is %s, title is %s\n",
+               $mp4->time, $mp4->title;
+
+============================================================================
+INSTALLATION
+
+    See the INSTALL file for details.
+
+============================================================================
+AUTHOR
+
+    Jonathan Harris <jhar@cpan.org>
+
+============================================================================
+SEE ALSO
+
+    Latest version is available from:
+
+        http://search.cpan.org/~jhar/MP4-Info/
+
+============================================================================
+COPYRIGHT and LICENSE
+
+    Copyright (c) 2004-2010, Jonathan Harris <jhar@cpan.org>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the the same terms as Perl itself.
+

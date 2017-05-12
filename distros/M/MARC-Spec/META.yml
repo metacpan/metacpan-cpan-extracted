@@ -1,0 +1,40 @@
+---
+abstract: 'A MARCspec parser and builder'
+author:
+  - 'Carsten Klee C<< <klee at cpan.org> >>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MARC-Spec
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Carp: '1.38'
+  Const::Fast: '0.014'
+  Moo: '1.0'
+  namespace::clean: '0.27'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/MARCspec/MARC-Spec/issues
+  homepage: https://github.com/MARCspec/MARC-Spec
+  repository: https://github.com/MARCspec/MARC-Spec.git
+version: 0.1.4
+x_contributors:
+  - 'Carsten Klee <cKlee@users.noreply.github.com>'
+  - 'Mirko Tietgen <mirko@abunchofthings.net>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

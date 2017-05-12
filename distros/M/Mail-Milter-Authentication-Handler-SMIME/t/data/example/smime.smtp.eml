@@ -1,0 +1,77 @@
+EHLO server.example.com
+XFORWARD HELO=mail-we0-f171.google.com
+XFORWARD ADDR=74.125.82.171
+XFORWARD NAME=mail-we0-f171.google.com
+MAIL FROM:marc@marcbradshaw.net
+RCPT TO:marc@fastmail.com
+DATA
+Received: from test.module (localhost [127.0.0.1])
+    by server.example.com (Authentication Milter) with ESMTP
+Authentication-Results: server.example.com;
+    smime=pass
+        body.smime-identifier=(test@example.com)
+        body.smime-part=TEXT
+        body.smime-serial=90cf589269ba42b1
+        body.smime-issuer="C=AU,CN=testca.example.net,O=FastMail SMIME Test Signing Authority"
+        x-smime-valid-from=XXX
+        x-smime-valid-to=XXX
+To: test@example.com
+From: Marc Bradshaw <marc@fastmail.com>
+Subject: SMIME Testing
+Message-ID: <56CA812E.10308@fastmail.com>
+Date: Mon, 22 Feb 2016 14:31:58 +1100
+MIME-Version: 1.0
+Content-Type: multipart/signed; protocol="application/x-pkcs7-signature"; micalg="sha-256"; boundary="----F126CEFDA7C6332ADACD13EC0AAEC7DE"
+
+This is an S/MIME signed message
+
+------F126CEFDA7C6332ADACD13EC0AAEC7DE
+Content-Type: text/plain
+
+This is an SMIME Signed Message.
+
+It should validate properly until it's certificates expire.
+
+------F126CEFDA7C6332ADACD13EC0AAEC7DE
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+
+MIIF2wYJKoZIhvcNAQcCoIIFzDCCBcgCAQExDzANBglghkgBZQMEAgEFADALBgkq
+hkiG9w0BBwGgggMmMIIDIjCCAgoCCQCQz1iSabpCsTANBgkqhkiG9w0BAQsFADBa
+MQswCQYDVQQGEwJBVTEuMCwGA1UECgwlRmFzdE1haWwgU01JTUUgVGVzdCBTaWdu
+aW5nIEF1dGhvcml0eTEbMBkGA1UEAwwSdGVzdGNhLmV4YW1wbGUubmV0MCAXDTE3
+MDQxNTAzNTI0OVoYDzMwMTYwODE2MDM1MjQ5WjBKMQswCQYDVQQGEwJBVTEgMB4G
+A1UECgwXRmFzdE1haWwgVGVzdCBVc2VyIFZlcnQxGTAXBgNVBAMMEHRlc3RAZXhh
+bXBsZS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDldmfw76PD
+NVZZUGpJj25LRjQLpKs3wrZoy2DwbwEGkkCIqeqelOeYxdFP4H0DFU6JFws5U8jO
+nP9t+S/3/jyCZjeTrITb84npmhgr6p7at210e8g6+IuuDOO8Kv0Kqhm6XmL2dHV3
+qxrDagXupk7zxwejXMuq5Y9c6snte4WPGqrwH5PCAY+/c5CknFp6NU0zbjTHwvvO
+PPLmroXZfpdtPbzotYwAPfibYvcmNnkPM2+muSJl0FAO9lXndkOQfoleACx5YX3T
+zEFUEu/Zco/VoOa2Z8fJktrtmxkawrc0Q4a/5mseojO3+Re8Jr42ky4zPlguRY+R
+maaeTjpSt1pXAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAAwBY4DRyF5/UZiJVxCT
+SjMAi3qwWL7w8mmgOmxSbQYBkE3jHW+lcy7tKSVcK2ZdHhVId4LFD275dl3p/8lO
+FWGEQkNB/qwKXzyV0dyKklBAbE2Slc3XFAvQZ26HiiPU1AurtddDHan81LxwWPIb
+3w2Y8g4fmNYPZYqQL3beqXvUSad2o7oLxyLGw7VidW3OwPZ7gC5sI0AAV5Unk1g1
+8BcYjmPBmeJdWWYIPba7/Es8pgd+VOg0FUXwuJfbtAIgcF0zBTWi2c6XmVfCkwQx
+InanurgK6F8yvxAzBdy/1xi/0klGFUIASQ/Hwbii93cMOQ9WeiYTkCb60jm0x+DK
+tTAxggJ5MIICdQIBATBnMFoxCzAJBgNVBAYTAkFVMS4wLAYDVQQKDCVGYXN0TWFp
+bCBTTUlNRSBUZXN0IFNpZ25pbmcgQXV0aG9yaXR5MRswGQYDVQQDDBJ0ZXN0Y2Eu
+ZXhhbXBsZS5uZXQCCQCQz1iSabpCsTANBglghkgBZQMEAgEFAKCB5DAYBgkqhkiG
+9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0xNzA0MTUwMzUyNDla
+MC8GCSqGSIb3DQEJBDEiBCDwMLdO91WIkYJOo0gHNO8yKV3K8D+bwU7WmRV8VlN6
+kjB5BgkqhkiG9w0BCQ8xbDBqMAsGCWCGSAFlAwQBKjALBglghkgBZQMEARYwCwYJ
+YIZIAWUDBAECMAoGCCqGSIb3DQMHMA4GCCqGSIb3DQMCAgIAgDANBggqhkiG9w0D
+AgIBQDAHBgUrDgMCBzANBggqhkiG9w0DAgIBKDANBgkqhkiG9w0BAQEFAASCAQBZ
+3n6ENGt775N5Irbn46Cc3WVS2lYT3zZnnI40xVgo2umcP+qQEzEru0BM3kscKJst
+qLBrHFqwX0uCEsn0j0kx8goz0Vn+ZfOBdq34zU/dgKwJLr9Ql9TtXejpoPSFG+nY
+P+wlcO+NEmZReUC9tXpb2tXNu8/3TbB+Y6G2EOTuySuqLvG0n5hQyPHOjUFg8yL7
+38S1hXGSqynlKQMvfUbA8j3YD8N2HBR4XpIcMI3MygpK5rG271LWyqje7AmCTWo9
+m4+HZHC3JJb36G97gAnPR9B6oc0Df3WKnhlqdPAqBt+JfLynknTDhRcf/23jkt5M
+Mhu2wtIBwBGDDuJsnnXk
+
+------F126CEFDA7C6332ADACD13EC0AAEC7DE--
+
+
+.
+QUIT

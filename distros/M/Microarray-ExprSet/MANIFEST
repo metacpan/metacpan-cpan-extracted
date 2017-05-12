@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Microarray/ExprSet.pm
+t/00-1load.t
+t/00-pod.t
+t/00-pod-coverage.t
+t/00-prototype.t
+t/basic.t
+t/error.t
+META.yml                                 Module meta-data (added by MakeMaker)

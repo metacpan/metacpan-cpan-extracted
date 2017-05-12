@@ -1,0 +1,17 @@
+Changes
+CheckUser.pm
+MANIFEST
+Makefile.PL
+README
+TODO
+procmail/cufilter
+procmail/.procmailrc
+t/check.pl
+t/dns.t
+t/smtp.t
+t/smtp-taint.t
+t/syntax.t
+t/timeout.t
+t/wildcard.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

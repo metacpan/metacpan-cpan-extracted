@@ -1,0 +1,158 @@
+Revision history for Perl extension MP3::Daemon
+
++ means it still needs to be done
+- means it's done
+
+1.00  TODO
+    + MP3::Daemon::Simple && MP3::Daemon::PIMP and both their
+      clients will be nice to use.
+    + freeze ls semantics
+    + implement "playOffList" 
+      [requested by Marc Lehmann]
+    + make all methods that do $player->load more robust
+      when they encounter bad mp3s.
+    + improve error messages
+      use syslog or some other logging mechanism?
+      `perldoc Sys::Syslog`
+
+0.63  Sun Feb  3 09:34:23 PST 2002
+    - fixed a bug where if random playing were turned on
+      and the playlist only had one song, it would lock up.
+    - added latest bin/pimp
+
+0.62  Sat Dec 29 01:49:51 PST 2001
+    - forgot to include an updated Changes file :-P
+
+0.61  Sat Dec 29 01:47:34 PST 2001
+    - added support for `mp3 loop`
+      which lets you change the playlist's looping behaviour.
+      Valid values are "all", "single", and "off".
+    - helpful information will be displayed via the
+      following commands.
+      mp3 -h
+      mp3 --help
+      mp3 help
+
+0.60  Wed Jul 25 13:58:39 PDT 2001
+    - fixed a serious bug in the randomization code that could
+      cause bad things to happen.
+    - added atExit() method which behaves a lot like
+      the C function atexit()
+    - API CHANGE!
+      made the new() and spawn() methods use named parameters:
+      socket_path => for specifying where in the filesystem to
+      map the socket to, and at_exit => which is an option arg
+      where one can give coderefs for the destructor to execute.
+    - changed bin/mp3 to call spawn w/ the new calling conventions.
+    - also made bin/mp3 tell the MP3::Daemon it spawns to delete
+      the pid file that bin/mp3 made when it DESTROYs itself.
+    - added a kill command to bin/mp3
+    - I found out that Audio::Play::MPG123 hangs when you try to
+      pause or stop when it's already stopped.  I accomodated for
+      that in MP3::Daemon::Simple.
+    - added THANKS, because gratitude needs to be expressed.
+
+0.54  Mon Jul 23 09:23:34 PDT 2001
+    - made bin/mp3 create a pid_file for the server process.
+    - added a public service announcement to INSTALL
+      regarding the proper configuration of the CPAN shell
+    - minor code and doc tweaks
+
+0.53  Wed Jul 11 12:00:07 PDT 2001
+    - leave statfreq() alone when instantiating A:P:MPG123.
+      let subclasses define statfreq policy, instead.
+    - updated the README* files
+    - made a site to describe MP3::Daemon
+    - put on freshmeat
+
+0.52  Mon Jul  9 07:26:45 PDT 2001
+    - added a random play feature to MP3::Daemon::Simple
+      [ requested by Sean E McSherry ]
+    - added 'rand' command to bin/mp3
+    - documented it
+    - changed permission on socket to 0600 (instead of 0700).
+      There's no need to execute it, after all.
+
+0.51  Mon Jun  4 21:19:06 MDT 2001
+    - implemented &MP3::Daemon::idle method, and
+      wrote POD for it.
+      [ for Patrik Tschudin ]
+
+0.50  (sourceforge.net special collectors' edition release)
+    - in Daemon.pm, add $SIG{__DIE__} to the list of signals
+      that gets intercepted.
+    - move to 0.50, because half of it is done.
+      It'll be 1.0 when MP3::Daemon::PIMP is sufficiently mature.
+    - put on sourceforge
+
+0.06  Mon Feb  5 01:15:07 MST 2001
+    - fixing documentation to be more accurate
+    - added a stub for MP3::Daemon::PIMP
+    - added a stub for bin/pimp
+      (actually it's the original undaemonized pimp)
+    - write documentation on how to subclass MP3::Daemon
+    - use MP3::Info in MP3::Daemon::Simple to
+      augment the "ls" information
+      [requested by Rene Mueller]
+    - allow regular expression filter on "ls"
+      [requested by Rene Mueller]
+    - changed "mp3 del" to delete current track when
+      no track is specified.  It used to delete the
+      last track.
+    - added ls -f
+    - added INSTALL instructions
+
+0.05  Fri Feb  2 09:43:02 MST 2001
+    - made MP3::Daemon a base-class for others to subclass.
+    - made MP3::Daemon::Simple what MP3::Daemon used to be
+    - updated /bin/mp3 to use M:D:S
+    - changed ./ex to default to use M:D:Pimp.
+      If you want to experiment with M:D:Simple, run it as
+      ./ex Simple
+
+0.04  Tue Jan 30 04:41:16 MST 2001
+    - wrote POD for bin/mp3 and Daemon.pm
+    - changed the behaviour of del such that it'll go loop back to the
+      beginning if the last track is deleted.
+    - fixed a bug where "mp3 play 0" would be interpreted as 
+      "mp3 play" which is not the same thing.
+    - changed the format of the info that info() and time()
+      return to be more human-readable.
+    - del can now handle negative indices
+    - made pod2usage output to STDOUT.  I didn't realize
+      it was going to STDERR.
+    - play now knows about negative indices, too
+
+0.03  Sun Jan 28 00:26:48 MST 2001
+    - changed the behaviour of play
+      only takes 0 or 1 parameter
+      if parameter is a non-negative integer, play the track at that index,
+      else add it to the end of the playlist and start playing it.
+    - changed the behaviour of del
+      no parameters deletes the last track from the playlist.
+      multiple parameters deletes multiple tracks
+    - ls now indicates current track with /^>/
+    - added time() which tells you
+      time elapsed
+      time left
+      time total
+    - added a bunch of shortcuts in bin/mp3
+    - removed debugging noise
+    - del() correctly reindexes itself
+    - made it so that only certain methods can be invoked
+      by clients.
+
+0.02  Tue Jan 23 20:57:31 MST 2001
+    - fleshed out
+    - added bin/mp3 which is the client
+    - Tue Jan 23 10:03:58 MST 2001
+      Got back to doing some serious work on this.
+    - Using IO::Socket::UNIX for communication.
+    - Made the server non-blocking.
+    - added all sorts of commands
+    - fixed all kinds of bugs
+    - ff and rw
+
+0.01  Thu Dec 14 05:34:11 MST 2000
+    - original version;
+

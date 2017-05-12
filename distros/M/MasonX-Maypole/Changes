@@ -1,0 +1,120 @@
+Revision history for MasonX-Maypole
+
+Change log
+==========
+
+0.32 Sun May 22, 23:15:00 2005
+    - view class now defaults to MasonX::Maypole::View
+
+0.31 Wed May 18, 19:46:00 2005
+    - fixed the package declaration in MasonX::Maypole::Application
+
+0.3  Mon May 16, 17:35:00 2005
+    - Fixed important bug where MasonX::Maypole::send_output() wasn't transferring 
+        headers_out from the Maypole request to the Apache request
+    - Ugh. The bug in 0.223 isn't fixed, just the warning.
+    - Removed extra warnings from View.pm
+    - Added MasonX::Maypole::Application until MP::App gets patched.
+
+0.223  Mon May 16, 17:30:00 2005
+    - it seems that Apache's register_cleanup method should not return undef. 
+        Who knew? Anyway, now returning 1 in the register_cleanup call in 
+        MasonX::Maypole::View::template(). This fixes an obscure bug where 
+        template vars were not getting cleaned up at the end of each request. 
+        It also fixes an annoying warning about using undefined variables, but 
+        without any file name or line number to find the damned thing. 
+
+0.222  Wed Apr 13, 13:30:00 2005
+    - added init anf flags sections to maypole.css to prevent Mason from 
+        wrapping the css content, and to ensure the file is served with 
+        the correct content type.
+
+0.221  Fri Apr  8, 15:00:00 2005
+    - slight modification to frontpage template to remove extra title
+    - added information about beerdb demo at http://beerdb.riverside-cms.co.uk
+
+0.220 Thur Apr  7, 03:20:00 2005
+    - fixed a couple of bugs in maybe_link_view template
+    - edited header template to place maypole.css in /css
+    - updated example httpd.conf and BeerDB.pm
+
+0.219  Sun Feb 20, 18:03:00 2005
+    - changed send_output() to add a component root based on the model moniker, rather 
+        than the table name. In most cases these will be identical. 
+    - fixed a bug where all custom component roots were compiled in the same subdirectory 
+        of the Mason data dir, thus breaking the ability of different versions of the 
+        same template to be called for different tables (mreece). Can't figure out why 
+        this never affected me, since it's pretty fundamental to the whole thing. 
+
+0.218  Tues Feb 15, 15:40:00 2005
+    - fixed bug in search_form template ($element->{tag} should be $element->tag)
+
+0.217  Fri  Feb 11, 11:55:00 2005
+    - fixed links in frontpage template 
+
+0.216  Thur Feb 10, 22:30:00 2005
+    - added Makefile.PL (was just Build.PL before)
+    - fixed typo in synopsis (mreece)
+    - fixed bug caused by not initialising the masonx config slot (mreece)
+
+0.215  Wed Dec 15, 15:00:00 2004
+    - fixed bug in pager template
+
+0.213  Thu Dec 9, 01:15:00 2004
+    - applied patch to view template, splitting part of it out into the
+        new view_item template
+
+0.212  Wed Dec 8, 13:15:00 2004
+    - applied patch to button template, to check if action is_public
+
+0.211  Tue Dec 7, 17:30:00 2004
+    - applied patch to maybe_link_view template (the UNIVERSAL::isa check)
+
+0.21   Tue Dec 7, 14:00:00 2004
+    - removed some bad POD from templates section
+    - removed developer status from version string - the module seems to be
+      working well on a development site
+
+0.2_05 Sat Nov 20, 22:32:00 2004
+    - fixed a bug in send_output - wasn't returning if delegating to SUPER
+
+0.2_04 Tue Nov 16, 01:05:00 2004
+    - removed debugging messages, fixed search path to use stringified table
+        instead of model moniker
+
+0.2_03 Tue Nov 16, 00:10:00 2004
+    - fixed bug in link template
+    - added dhandler back - it's still needed, though simplified
+
+0.2_02 Mon Nov 15, 23:20:00 2004
+    - fixed search path - table-specific paths were not being searched by
+        components other than the main request component
+    - removed the dhandler, no longer needed with fixed search path
+    - added set_mason_comp_roots method, which allows subclasses to fix up
+        their own component root search path
+    - minor tweaks to a couple of factory templates
+
+0.2_01 Thu Nov 12, 17:30:00 2004
+    - initial developer release with Maypole 2 support
+    - completely rebuilt to support Maypole 2
+    - new templates and css brought in from Maypole 2
+    - uses Module::Build for distribution
+    - now includes a view component (MasonX::Maypole::View)
+    - templates search path matches that in the main Maypole documentation
+    - ditto for path parsing
+
+0.04  Thu Aug 19 11:05:00 2004
+    - POD updates
+
+0.03  Fri Aug  6 09:45:00 2004
+    - minor additions to maypole.css
+    - completed XHTMLisation of templates
+
+0.02  Sun Aug  1 23:29:58 2004
+    - added missing CSS file, fixed typos in POD
+
+0.01  Sun Aug  1 15:30:53 2004
+	- original version; created by h2xs 1.21 with options
+		-XAn MasonX::Maypole
+
+

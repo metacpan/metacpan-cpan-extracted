@@ -1,0 +1,7 @@
+Changes
+lib/Module/Install/PadrePlugin.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-load.t
+META.yml                                 Module meta-data (added by MakeMaker)

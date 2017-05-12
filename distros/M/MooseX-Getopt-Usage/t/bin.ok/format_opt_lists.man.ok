@@ -1,0 +1,18 @@
+SYNOPSIS
+    format_opt_lists.pl : --doom=DOOM : [--help -? --usage] [--man]
+    [--stuff=STUFF] : [--help -? --usage] [--man] --doom=DOOM
+    [--stuff=STUFF]
+
+DESCRIPTION
+    Make sure format strings %a, %r and %o expand properly.
+
+OPTIONS
+    --help -? --usage
+        Display the usage message and exit
+
+    --man
+        Display man page
+
+    --doom
+    --stuff
+

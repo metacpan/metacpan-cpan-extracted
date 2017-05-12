@@ -1,0 +1,31 @@
+--- #YAML:1.0
+name:               MoneyWorks-pm
+version:            0.11
+abstract:           Perl interface to MoneyWorks accounting software
+author:
+    - Father Chrysostomos <sprout at, um, cpan dot org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:               0
+    constant:           1.03
+    constant::lexical:  0
+    Exporter:           5.57
+    File::Temp:         0
+    IPC::Open3:         0
+    Scalar::Util:       0
+    strict:             0
+    Symbol:             0
+    warnings:           0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

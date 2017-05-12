@@ -1,0 +1,12 @@
+{
+use Mac::iTunes::Item;
+
+my $string = "Playlist $playlist\n";
+
+foreach my $item ( @items )
+	{
+	$string .= join "\t", map { $item->$_ } qw(title artist);
+	}
+
+$string;
+}

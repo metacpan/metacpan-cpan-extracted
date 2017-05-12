@@ -1,0 +1,21 @@
+---
+abstract: 'Multi Method Dispatch based on Moose type constraints'
+author:
+  - 'Florian Ragwitz <rafl@debian.org>'
+generated_by: 'Dist::Zilla version 1.093400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-MultiMethods
+requires:
+  Devel::Declare: 0.004000
+  Devel::PartialDump: 0
+  Moose: 0
+  MooseX::Method::Signatures: 0.29
+  MooseX::Types::Moose: 0
+  MooseX::Types::VariantTable: 0.03
+  Sub::Install: 0
+  aliased: 0
+  namespace::autoclean: 0
+version: 0.10

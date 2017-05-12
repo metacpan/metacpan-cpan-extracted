@@ -1,0 +1,32 @@
+---
+abstract: 'Lite weight and inheritable object container'
+author:
+  - 'xaicron E<lt>xaicron@cpan.orgE<gt>'
+build_requires:
+  Test::More: 0.98
+  Test::Requires: 0.06
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Micro-Container
+no_index:
+  directory:
+    - inc
+provides:
+  Micro::Container:
+    file: lib/Micro/Container.pm
+    version: 0.03
+requires:
+  Class::Data::Inheritable: 0.08
+  parent: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/xaicron/p5-Micro-Container/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/xaicron/p5-Micro-Container
+version: 0.03

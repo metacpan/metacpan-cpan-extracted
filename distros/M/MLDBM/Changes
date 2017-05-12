@@ -1,0 +1,81 @@
+=head1 NAME
+
+HISTORY - public release history for MLDBM
+
+=head1 DESCRIPTION
+
+=over 8
+
+=item 2.05  (21 Feb 2013, by Alexandr Ciornii)
+
+Require perl 5.5
+
+Test for pod
+
+=item 2.04  (08 Mar 2010, by Alexandr Ciornii)
+
+Compatibility with old EU::MM.
+
+=item 2.03  (27 Feb 2010, by Alexandr Ciornii) 
+
+Error in test fixed.
+
+=item 2.02  (19 Feb 2010, by Alexandr Ciornii) 
+
+New tests added.
+
+Distribution upgraded
+
+=item 2.01  (07 July 2002)
+
+New testing method MLDBM::_compare($a, $b) used in t/*.t
+scripts to verify data structures are identical.  In 
+perl 5.8.0 RC2, the order of hashes changed, making the prior
+hard coded test case string comparisons invalid, so created
+this more flexible method for testing that should work in 
+future releases, without relying on specific hash ordering.
+
+=item 2.00  (10 May 1998)
+
+Added support for multiple serializing interfaces. (courtesy
+Raphael Manfredi <Raphael_Manfredi@grenoble.hp.com>)
+
+Split serializer wrappers into multiple files, and regularized
+the interface some.  Underlying TIEHASH object and serializer
+can now be set at runtime (with care).
+
+Miscellaneous pod tweaks.
+
+=item 1.25  (7 December 1997)
+
+Add RemoveTaint flag.
+
+require 5.004.
+
+require Data::Dumper 2.08.
+
+=item 1.24  (29 October 1997)
+
+Version 1.23 was seriously busted, and had \r's. :-(
+
+=item 1.23  (26 July 1997)
+
+Fixes to avoid 'undefined value' messages.
+
+=item 1.22  (26 August 1996)
+
+Add EXISTS and CLEAR methods.
+
+Add a flag to control which underlying DBM is used.
+
+=item 1.21  (9 April 1996)
+
+Add flag to control which D::D method is used.
+
+=item 1.20  (16 February 1996)
+
+Earliest stable version I can remember.
+
+=back
+
+=cut

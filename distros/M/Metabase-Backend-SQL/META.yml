@@ -1,0 +1,113 @@
+---
+abstract: 'Metabase backend role for SQL-based backends'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+  - 'Leon Brocard <acme@astray.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Spec::Functions: '0'
+  Path::Class: '0'
+  Test::Deep: '0'
+  Test::Fatal: '0'
+  Test::More: '0.92'
+  Test::Routine: '0'
+  Test::Routine::Util: '0'
+  lib: '0'
+  perl: '5.010'
+  re: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Metabase-Backend-SQL
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Metabase::Archive::PostgreSQL:
+    file: lib/Metabase/Archive/PostgreSQL.pm
+    version: '1.001'
+  Metabase::Archive::SQL:
+    file: lib/Metabase/Archive/SQL.pm
+    version: '1.001'
+  Metabase::Archive::SQLite:
+    file: lib/Metabase/Archive/SQLite.pm
+    version: '1.001'
+  Metabase::Archive::SQLite::Sharded:
+    file: lib/Metabase/Archive/SQLite/Sharded.pm
+    version: '1.001'
+  Metabase::Backend::PostgreSQL:
+    file: lib/Metabase/Backend/PostgreSQL.pm
+    version: '1.001'
+  Metabase::Backend::SQL:
+    file: lib/Metabase/Backend/SQL.pm
+    version: '1.001'
+  Metabase::Backend::SQLite:
+    file: lib/Metabase/Backend/SQLite.pm
+    version: '1.001'
+  Metabase::Index::PostgreSQL:
+    file: lib/Metabase/Index/PostgreSQL.pm
+    version: '1.001'
+  Metabase::Index::SQL:
+    file: lib/Metabase/Index/SQL.pm
+    version: '1.001'
+  Metabase::Index::SQLite:
+    file: lib/Metabase/Index/SQLite.pm
+    version: '1.001'
+  Metabase::Index::SQLite::Sharded:
+    file: lib/Metabase/Index/SQLite/Sharded.pm
+    version: '1.001'
+requires:
+  Carp: '0'
+  Class::Load: '0'
+  Compress::Zlib: '2'
+  DBD::SQLite: '0'
+  DBI: '1'
+  DBIx::RunSQL: '0'
+  DBIx::Simple: '0'
+  Data::Stream::Bulk::Array: '0'
+  Data::Stream::Bulk::Callback: '0'
+  Data::Stream::Bulk::DBI: '0'
+  Data::Stream::Bulk::Filter: '0'
+  Data::Stream::Bulk::Nil: '0'
+  File::Temp: '0'
+  JSON: '2'
+  List::AllUtils: '0'
+  List::Util: '0'
+  Metabase::Archive: '1'
+  Metabase::Fact: '0'
+  Metabase::Index: '1'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::Types::Path::Class: '0'
+  SQL::Abstract: '0'
+  SQL::Translator: '0.11006'
+  SQL::Translator::Diff: '0'
+  SQL::Translator::Schema: '0'
+  SQL::Translator::Schema::Constants: '0'
+  SQL::Translator::Utils: '0'
+  Storable: '0'
+  Try::Tiny: '0'
+  namespace::autoclean: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/metabase-backend-sql/issues
+  homepage: https://github.com/dagolden/metabase-backend-sql
+  repository: https://github.com/dagolden/metabase-backend-sql.git
+version: '1.001'
+x_authority: cpan:DAGOLDEN
+x_serialization_backend: 'YAML::Tiny version 1.69'

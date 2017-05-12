@@ -1,0 +1,49 @@
+--stations
+
+Hjulsta
+Tensta
+Rinkeby
+Rissne
+Duvbo
+Sundbybergs centrum
+Vreten
+Huvudsta
+Västra skogen
+Stadshagen
+Fridhemsplan
+Rådhuset
+T-Centralen
+Kungsträdgården
+
+Akalla
+Husby
+Kista
+Hallonbergen
+Näckrosen
+Solna centrum
+
+--lines
+10|T10|Blue line
+11|T11|Blue line
+
+--segments
+10|Hjulsta|Tensta
+10|Tensta|Rinkeby
+10|Rinkeby|Rissne
+10|Rissne|Duvbo
+10|Duvbo|Sundbybergs centrum
+10|Sundbybergs centrum|Vreten
+10|Vreten|Huvudsta
+10|Huvudsta|Västra skogen
+10,11|Västra skogen|Stadshagen
+10,11|Stadshagen|Fridhemsplan
+10,11|Fridhemsplan|Rådhuset
+10,11|Rådhuset|T-Centralen
+10,11|T-Centralen|Kungsträdgården
+
+11|Akalla|Husby
+11|Husby|Kista
+11|Kista|Hallonbergen
+11|Hallonbergen|Näckrosen
+11|Näckrosen|Solna centrum
+11|Solna centrum|Västra skogen

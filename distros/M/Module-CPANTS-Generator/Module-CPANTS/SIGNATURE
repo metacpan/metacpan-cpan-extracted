@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.21.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9e7891610b518f5a867a87c95971ee63b17b744c Build.PL
+SHA1 02d7577604804ecefb70a312c4fd7834a20bcca0 Changes
+SHA1 b31c17ce1e0dadcf2ad2c68016df8c8ff9728479 MANIFEST
+SHA1 a19e609fa88b803baf0cfe86261049a5d2ea8564 MANIFEST.SKIP
+SHA1 696b48f5ed0d98929655f9348de26aa9c5f7ac84 META.yml
+SHA1 5959719de8ffe9a234792c7161042c80bb4a12ca Makefile.PL
+SHA1 e040b4c1fc9ba7d1bbc4f97fc6a6b3fd1ab3ba42 README
+SHA1 6e3c692b0a09cb0349777fae48b8280b0ab45c3b examples/graph_deps.pl
+SHA1 2ef251d5e6d6366f9d033c97ef15d30c88ada6a7 examples/view.pl
+SHA1 52db6b5756c62b12fc0c92ba167cdac5d1b3c8d0 lib/Module/CPANTS.pm
+SHA1 724958eda6976846f0888e50d22b6b61d5bbeec3 lib/Module/CPANTS.tt
+SHA1 48e3ee556e3dd70385383ce4e8eaf0eb4580b6eb t/signature.t
+SHA1 042825d1d9dcdcfeb20d5acc28706d3b67c0d3b0 t/simple.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.2 (GNU/Linux)
+
+iD8DBQE/JD6lsgWvvfGvuWoRAqPaAJ9TXbnUabKF0wpbZzigKL+5tlOcFACdGvsD
+ftRrAf9h8UqTnTy9SBD4wd0=
+=+egK
+-----END PGP SIGNATURE-----

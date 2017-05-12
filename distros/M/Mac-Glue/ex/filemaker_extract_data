@@ -1,0 +1,65 @@
+#!perl -wl
+use Mac::MoreFiles;
+use Mac::Glue ':all';
+use strict;
+
+my $finder = new Mac::Glue 'Finder';
+my $fm = new Mac::Glue 'FileMaker Pro';
+
+$finder->activate;
+
+my $file = $finder->choose_file(
+    with_prompt => 'Select a FileMaker Pro file (a small one, like Check Tracker)'
+);
+die $^E if $^E;
+
+# use Finder to open ... opening from FileMaker opened
+# database with no records ... ?
+$finder->open($finder->obj(file => $file));
+die $^E if $^E;
+
+my @fields = $fm->get( $fm->prop(name => fields => database => 1) );
+
+my @data = $fm->get( $fm->obj(records => database => 1) );
+if (ref $data[0] ne 'ARRAY') {  # if ref $data[0] eq 'ARRAY',
+    @data = [@data];            # we have more than one record;
+}                               # else there is one record
+
+set_format(@fields);
+
+my @temp;
+foreach (@data) {
+    @temp = @$_;
+    local $^W;
+    write;
+}
+
+print "\n\nHere's all the records where the second cell isn't empty:\n";
+@data = $fm->get($fm->obj(
+    records => whose(NOT => [cell => 2 => equals => '']),
+    database => 1)
+);
+if (ref $data[0] ne 'ARRAY') {
+    @data = [@data];
+}
+
+foreach (@data) {
+    @temp = @$_;
+    local $^W;
+    write;
+}
+
+
+sub set_format {
+    my @fields = @_;
+    my $f;
+    $f  = "format STDOUT_TOP = \n"
+        . join('  ', map {sprintf("%-10.10s", $_)} @fields) . "\n"
+        . ('-' x (12 * @fields)) . "\n"
+        . ".\n\nformat STDOUT = \n"
+        . join('  ', map {'@<<<<<<<<<'} @fields) . "\n"
+        . join(', ', map {"\$temp[$_]"} 0 .. $#fields)
+        . "\n.\n";
+    eval $f;
+    die "Format failed: $@\n$f\n" if $@;
+}

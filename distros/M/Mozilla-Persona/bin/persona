@@ -1,0 +1,159 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use open 'utf8';
+use lib 'lib';    # during devel
+
+use Log::Report        qw/persona/;
+
+use Getopt::Long       qw/GetOptions  :config gnu_compat bundling/;
+use URI                ();
+use Term::ReadPassword qw/read_password/;
+
+sub run_setup();
+sub run_check();
+sub run_help();
+
+$Term::ReadPassword::USE_STARS = 1;
+
+my $action = shift @ARGV || 'help';
+
+   if($action eq 'setup') { run_setup }
+elsif($action eq 'check') { run_check }
+elsif($action eq 'help')  { run_help  }
+elsif(index $action, 0, 1 eq '-')
+{   print STDERR __x"missing 'action' parameter\n";
+    run_help;
+}
+else
+{   error __x"uknown action {action}, try 'help'", action => $action;
+}
+
+exit 0;
+
+sub run_setup()
+{   my $mode     = 0;
+    my $www_group;
+    my $secrets  = '/etc/persona';
+    my $restart  = 0;
+    my $website;
+    my $domain;
+    my $docroot;
+    my $help     = 0;
+ 
+    GetOptions
+        'verbose|v+'  => \$mode
+      , 'group|g=s'   => \$www_group
+      , 'secrets|s=s' => \$secrets
+      , 'restart|f!'  => \$restart
+      , 'website|w=s' => \$website
+      , 'docroot|r=s' => \$docroot
+      , 'domain|d=s'  => \$domain
+      , 'help|h!'     => \$help
+        or exit 1;
+    
+    if($help)
+    {   print <<__HELP; exit 0; }
+Usage: $0 setup [OPTIONS]
+  --domain  -d  DOMAINNAME  visibility of persona id (required)
+  --docroot -r  DIRECTORY   root of website docs (required)
+  --group   -f  GROUPNAME   groupname used by webserver
+  --help    -h              print this help
+  --restart -f              force full reinitation
+  --secrets -s  DIRECTORY   where to store the secrets (/etc/persona/)
+  --verbose -v              be more verbose during setup
+  --website -w  URI         alternative source for domain
+
+      $0 c
+__HELP
+
+    dispatcher mode => $mode, 'ALL';
+
+    defined $docroot
+        or error __x"doc-root (-r) parameter required";
+    
+    unless($domain)
+    {   $website
+            or error __x"provide domain-name (-d) or website (-w)";
+    
+        my $uri = URI->new($website);
+        $domain = $uri->host;
+    }
+
+    if($www_group)
+    {   getgrnam $www_group
+            or error __x"group {name} unknown", name => $www_group;
+    }
+    else
+    {   foreach my $try_group (qw/www-data wwwrun www/)
+        {   getgrnam $try_group or next;
+            $www_group = $try_group;
+            last;
+        }
+
+        $www_group
+            or error __x"please specify group of webserver (-g)";
+    }
+
+    umask 0022;
+
+    eval "require Mozilla::Persona::Setup";
+    error $@ if $@;
+
+    Mozilla::Persona::Setup::setup_persona
+      ( group   => $www_group
+      , secrets => $secrets
+      , domain  => $domain
+      , docroot => $docroot
+      , restart => $restart
+      );
+}
+
+sub run_check()
+{   my $mode    = 0;
+    my $help    = 0;
+
+    GetOptions
+        'verbose|v+'  => \$mode
+      , 'help|h!'     => \$help
+        or exit 1;
+    
+    if($help)
+    {   print <<__HELP; exit 0; }
+Usage: $0 check [OPTIONS] <idenitities>
+  --verbose -v                  be more verbose during setup
+  --help    -h                  print this help
+__HELP
+
+    @ARGV
+        or error __x"specify identity, like me\@example.com";
+
+    dispatcher mode => $mode, 'ALL';
+   
+    eval "require Mozilla::Persona::Check";
+    error $@ if $@;
+
+    foreach my $identity (@ARGV)
+    {   my $password = read_password("Password for $identity: ");
+        defined $password
+            or error __x"no password given, test interrupted.";
+
+        Mozilla::Persona::Check::check_identity
+          ( identity  => $identity
+          , password  => $password
+          );
+
+        print __x"Persona configuration for {id} seems ok.\n"
+          , id => $identity;
+    }
+}
+
+sub run_help()
+{   print <<__HELP;
+For usage try:
+   $0 setup --help
+   $0 check --help
+__HELP
+}
+
+exit 0;

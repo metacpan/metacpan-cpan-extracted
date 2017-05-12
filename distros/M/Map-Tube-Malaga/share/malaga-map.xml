@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tube name="Metro de Málaga">
+  <lines>
+    <line id="L1" name="Línea 1" color="red"/>
+    <line id="L2" name="Línea 2" color="blue"/>
+  </lines>
+  <stations>
+    <!-- https://es.wikipedia.org/wiki/Línea_1_(Metro_de_Málaga)  -->
+    <station id="L1-01" name="El Perchel" line="Línea 1" link="L1-02,L2-01"/>
+    <station id="L1-02" name="La Unión" line="Línea 1" link="L1-01,L1-03"/>
+    <station id="L1-03" name="Barbarela" line="Línea 1" link="L1-02,L1-04"/>
+    <station id="L1-04" name="Carranque" line="Línea 1" link="L1-03,L1-05"/>
+    <station id="L1-05" name="Portada Alta" line="Línea 1" link="L1-04,L1-06"/>
+    <station id="L1-06" name="Ciudad de la Justicia" line="Línea 1" link="L1-05,L1-07"/>
+    <station id="L1-07" name="Universidad" line="Línea 1" link="L1-06,L1-08"/>
+    <station id="L1-08" name="Clínico" line="Línea 1" link="L1-07,L1-09"/>
+    <station id="L1-09" name="El Cónsul" line="Línea 1" link="L1-08,L1-10"/>
+    <station id="L1-10" name="Paraninfo" line="Línea 1" link="L1-09,L1-11"/>
+    <station id="L1-11" name="Andalucía Tech" line="Línea 1" link="L1-10"/>
+
+    <!-- https://es.wikipedia.org/wiki/Línea_2_(Metro_de_Málaga) -->
+    <station id="L2-01" name="El Perchel" line="Línea 2" link="L2-02,L1-01"/>
+    <station id="L2-02" name="La Isla" line="Línea 2" link="L2-01,L2-03"/>
+    <station id="L2-03" name="Princesa-Huelin" line="Línea 2" link="L2-02,L2-04"/>
+    <station id="L2-04" name="El Torcal" line="Línea 2" link="L2-03,L2-05"/>
+    <station id="L2-05" name="La Luz-La Paz" line="Línea 2" link="L2-04,L2-06"/>
+    <station id="L2-06" name="Puerta Blanca" line="Línea 2" link="L2-05,L2-07"/>
+    <station id="L2-07" name="Palacio de los Deportes" line="Línea 2" link="L2-06"/>
+  </stations>
+</tube>

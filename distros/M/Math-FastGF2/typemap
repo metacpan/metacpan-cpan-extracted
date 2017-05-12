@@ -1,0 +1,6 @@
+gf2_u8     T_UV
+gf2_u16    T_UV
+gf2_u32    T_UV
+gf2_s8     T_IV
+gf2_s16    T_IV
+gf2_s32    T_IV

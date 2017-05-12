@@ -1,0 +1,20 @@
+Revision history for Perl module Mojolicious::Command::migration
+
+0.1 2015-04-21
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+0.11 2015-04-23
+    - fix tests
+
+0.12 2015-04-30
+    - force upgrade and downgrade. Deploy on prepare
+
+0.13 2015-05-07
+    - ability to customize upgrade and downgrade
+
+0.14 2016-03-24
+    - BUG: upgrade to several versions fail
+
+0.15 2016-10-31
+    - drop AUTO_INCREMENT from alter table
+    - add AFTER to alter table

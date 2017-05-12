@@ -1,0 +1,37 @@
+---
+abstract: 'patch MooseX::Declare for extensibility'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.61'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Moose::Meta::Class::__ANON__::SERIAL::6 version , CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-Declare-Context-WithOptions-Patch-Extensible
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  MooseX::Declare::Context::WithOptions::Patch::Extensible:
+    file: lib/MooseX/Declare/Context/WithOptions/Patch/Extensible.pm
+    version: '0.002'
+requires:
+  MooseX::Declare: '0.30'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/MooseX-Declare-Context-WithOptions-Patch-Extensible/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Declare-Context-WithOptions-Patch-Extensible
+  homepage: https://metacpan.org/release/MooseX-Declare-Context-WithOptions-Patch-Extensible
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-moosex-declare-context-withoptions-patch-extensible.git
+version: '0.002'

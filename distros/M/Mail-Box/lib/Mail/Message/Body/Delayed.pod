@@ -1,0 +1,252 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Message::Body::Delayed - body of a Mail::Message but not read yet.
+
+=head1 INHERITANCE
+
+ Mail::Message::Body::Delayed realizes a Mail::Message::Body
+
+ Mail::Message::Body::Delayed
+   is a Mail::Reporter
+
+=head1 SYNOPSIS
+
+ See Mail::Message::Body
+
+=head1 DESCRIPTION
+
+Message bodies of this type will be replaced by another type the moment you
+access the content.  In this documentation you will find the description of
+how a message body gets delay loaded.
+
+Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
+ 
+=head1 OVERLOADED
+
+=over 4
+
+=item overload: B<"">
+
+(stringification) Returns the body as string --which will trigger
+completion-- unless called to produce a string for C<Carp>.  The latter
+to avoid deep recursions.
+
+example: stringification of delayed body
+
+ print $msg->body;   # implicit by print
+
+ my $body = $msg->body;
+ my $x    = "$body"; # explicit by interpolation
+
+=item overload: B<@{}>
+
+When a body object is used as being an array reference, the lines of
+the body are returned.  This is the same as using the C<lines> method.
+
+=item overload: B<bool>
+
+Always returns a true value, which is needed to have overloaded
+objects to be used as in C<if($body)>.  Otherwise, C<if(defined $body)>
+would be needed to avoid a runtime error.
+
+=back
+
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Reporter|Mail::Reporter/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
+ 
+=over 4
+
+=item Mail::Message::Body::Delayed-E<gt>B<new>(%options)
+
+ -Option --Defined in     --Default
+  log      Mail::Reporter   'WARNINGS'
+  message                   <required>
+  trace    Mail::Reporter   'WARNINGS'
+
+=over 2
+
+=item log => LEVEL
+
+=item message => MESSAGE
+
+The MESSAGE object which contains this delayed body.
+
+=item trace => LEVEL
+
+=back
+
+=back
+
+=head2 The body
+
+=over 4
+
+=item $obj-E<gt>B<message>()
+
+=back
+
+=head2 About to the payload
+
+=over 4
+
+=item $obj-E<gt>B<guessSize>()
+
+=item $obj-E<gt>B<isDelayed>()
+
+=item $obj-E<gt>B<isModified>()
+
+=item $obj-E<gt>B<isMultipart>()
+
+=item $obj-E<gt>B<modified>()
+
+=item $obj-E<gt>B<nrLines>()
+
+=back
+
+=head2 Internals
+
+=over 4
+
+=item $obj-E<gt>B<fileLocation>( [$begin, $end] )
+
+=item $obj-E<gt>B<load>()
+
+Returns the loaded version of this body.
+
+=item $obj-E<gt>B<moveLocation>($distance)
+
+=item $obj-E<gt>B<read>($parser, $head, $bodytype)
+
+=back
+
+=head2 Error handling
+
+Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
+ 
+=over 4
+
+=item $obj-E<gt>B<AUTOLOAD>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<addReport>($object)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+=item Mail::Message::Body::Delayed-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<errors>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<log>( [$level, [$strings]] )
+
+=item Mail::Message::Body::Delayed-E<gt>B<log>( [$level, [$strings]] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logPriority>($level)
+
+=item Mail::Message::Body::Delayed-E<gt>B<logPriority>($level)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<notImplemented>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<report>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<reportAll>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<trace>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<warnings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=back
+
+=head2 Cleanup
+
+Extends L<"Cleanup" in Mail::Reporter|Mail::Reporter/"Cleanup">.
+ 
+=over 4
+
+=item $obj-E<gt>B<DESTROY>()
+
+Inherited, see L<Mail::Reporter/"Cleanup">
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Box distribution version 3.002,
+built on March 31, 2017.
+
+Do not forget to read
+L<Mail::Box-Overview>,
+L<Mail::Box-Cookbook>, and
+L<Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L<Mail::Message>,
+L<Mail::Box>,
+L<Mail::Box::IMAP4>,
+L<Mail::Box::POP3>,
+L<Mail::Box::Parser::C>,
+L<Mail::Box::Dbx> (unpublished),
+L<Mail::Transport>,
+L<Object::Realize::Later>, and
+L<User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

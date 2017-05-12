@@ -1,0 +1,210 @@
+% stash exclude_menu=>1;
+
+% my $tablist = shipped('tablist');
+% my $bytable = shipped('bytable');
+% my $table   = shipped('table');
+% my $tinfo   = shipped('tinfo');
+% my $id      = shipped('id');
+% my $bycolumn= $tinfo->{bycolumn};
+% my $dml_mode= stash('dml_mode') || 'view';
+
+% title $tinfo->{label};
+
+% my $paging_buts1 = begin
+    %= t div => (class=>'stats navigators right ui-helper-clearfix') => begin
+        %= t button => (class=>"button start", 'data-icon1'=>'ui-icon-seek-start') => 'First'
+        %= t button => (class=>"button prev" , 'data-icon1'=>'ui-icon-seek-prev' ) => 'Prev'
+        %= t button => (class=>"button next" , 'data-icon2'=>'ui-icon-seek-next' ) => 'Next'
+        %= t button => (class=>"button end"  , 'data-icon2'=>'ui-icon-seek-end'  ) => 'Last'
+        %= t button => (class=>"button edit",  'data-icon1'=>'ui-icon-pencil'    ) => 'Edit'
+        %= t button => (class=>"button del" ,  'data-icon1'=>'ui-icon-closethick') => 'Del'
+        %= t button => (class=>"button add" ,  'data-icon1'=>'ui-icon-plusthick' ) => 'Add'
+        %= t button => (class=>"button list",  'data-icon1'=>'ui-icon-script'    ) => 'List'
+    % end
+% end
+
+% my $del_buts = begin
+    %= t div => (class=>"stats navigators right ui-helper-clearfix") => begin
+        %= t button => (class=>"button nuke", 'data-icon1'=>'ui-icon-check')      => 'Delete'
+        %= t button => (class=>"button view", 'data-icon1'=>'ui-icon-closethick') => 'Cancel'
+    % end
+% end
+
+% my $paging_buts2 = begin
+    %= t div => (class=>"stats ui-helper-clearfix") => begin
+        %= t button => (class=>"button notxt start", 'data-icon1'=>'ui-icon-seek-start') => 'First'
+        %= t button => (class=>"button notxt prev" , 'data-icon1'=>'ui-icon-seek-prev' ) => 'Prev'
+        %= t button => (class=>"button notxt next" , 'data-icon2'=>'ui-icon-seek-next' ) => 'Next'
+        %= t button => (class=>"button notxt end"  , 'data-icon2'=>'ui-icon-seek-end'  ) => 'Last'
+        %= t button => (class=>"button notxt add" ,  'data-icon1'=>'ui-icon-plusthick' ) => 'Add'
+        %= t button => (class=>"button notxt list",  'data-icon1'=>'ui-icon-script'    ) => 'List'
+    % end
+% end
+
+% my $save_buts = begin
+    %= t div => (class=>"stats navigators right") => begin
+        %= t button => (class=>"button save", 'data-icon1'=>'ui-icon-check')      => 'Save'
+        %= t button => (class=>"button view", 'data-icon1'=>'ui-icon-closethick') => 'Cancel'
+    % end
+% end
+
+<div id="tablesbuts" class="ui-widget-content ui-corner-all">
+    % for my $table1 (@$tablist) {
+        % my $tinfo1 = $bytable->{$table1};
+        % my $url    = url_for('tables')->query(start_with=>$table1);
+        %= link_to $tinfo1->{label} => $url => (class=>"button")
+    % }
+</div>
+
+<div id="tablesbody" class="accordion <%=$dml_mode%>">
+
+    <h3><%=$tinfo->{label}%></h3>
+    <div>
+        %= t div => (class=>"ui-helper-clearfix") => begin
+            %= $dml_mode eq 'view'?  $paging_buts1->(): $del_buts->();
+            %= t h2 => (class=>"left no-tb-margin") => "$row"
+        % end
+
+        %= t fieldset => begin
+            %= t legend => "View"
+            % for my $column (@{$tinfo->{columns}}) {
+                % my $cinfo = $bycolumn->{$column};
+                % $c->app->log->debug("$dml_mode $column: " . $c->dumper($cinfo)) if $ENV{TABLES_DEBUG};
+                % my $fkey  = $cinfo->{fkey};          # means this is a m-1 parent entry..
+                % next if $fkey && $bycolumn->{$fkey}; # which will be reported with the fkey itself
+                %= t div => (class=>"attrib ui-helper-clearfix", 'data-table'=>$table) => begin
+                    % if ($fkey) { # show the foreign obj but hide the local fkey
+                        % my $label  = $cinfo->{label};
+                        % my $ptable = $cinfo->{ptable};
+                        % my $val    = $row->$column;
+                        % my $id     = ref $val? $val->id: $val;
+                        %= label_for $column => "* $label", title => "$column -> $ptable.$fkey"
+                        %= t span => (id=>$column, class=>"data") => begin
+                            % if (defined $id) {
+                                % my $url = url_for("/tables/$ptable/$id/view");
+                                %= link_to $row->present($column, $cinfo) => $url
+                            % } else {
+                                &nbsp;
+                            % }
+                        % end
+                    % } elsif ($cinfo->{is_foreign_key} && $cinfo->{parent}) {
+                        % my $parent = $cinfo->{parent};
+                        % my $pinfo  = $bycolumn->{$parent};
+                        % my $ptable = $pinfo->{ptable};
+                        % my $val    = $row->$column;
+                        %= label_for $column => "* $pinfo->{label}", title => "$column -> $parent"
+                        %= t span => (id=>$column, class=>"data") => ($val||'')
+                        %= t span => (id=>$parent, class=>"data") => begin
+                            % if (defined $val) {
+                                % my $url = url_for("/tables/$ptable/$val/view");
+                                %= link_to $row->present($parent, $pinfo) => $url
+                            % } else {
+                                &nbsp;
+                            % }
+                        % end
+                    % } elsif (!$fkey) {
+                        %= label_for $column => $cinfo->{label}, title => $column
+                        %= t span => (id=>$column, class=>"data") => $row->present($column, $cinfo)
+                    % }
+                % end
+            % }
+        %= include 'view_extra_100'
+        % end
+
+        % if (my $child = stash('child')) {
+
+            % my $ginfo  = $tinfo->{has_many}{$child} || die "$child is no child of $table";
+            % my $ctable = $ginfo->{ctable};
+            % my $cfkey  = $ginfo->{cfkey};
+            %= t fieldset => begin
+                %= t legend => "Add to $ginfo->{label} of $row"
+                % my $save_url = url_for("/tables/$ctable/save")->query(redirect_to=>"/tables/$table/$id/view");
+                %= form_for $save_url => (method=>'post') => begin
+                    %= $save_buts->();
+                    %= include 'tables/dml', ptable=>$table, table=>$ctable, dml_mode=>'add', parent_id=>$id, cfkey=>$cfkey, child=>$child
+                % end
+            % end
+
+        % } else {
+            %= t div => (class=>"ui-helper-clearfix") => begin
+                % for my $grp (keys %{$tinfo->{has_many}}) {
+                    % my $ginfo    = $tinfo->{has_many}{$grp};
+                    % my $ctable   = $ginfo->{ctable};
+                    % my $total    = $row->$grp->count;
+                    % my @children = $row->$grp({}, {rows=>10});
+                    % my $to       = scalar(@children);
+                    % my %cdata    = ('data-ctable'     => $ctable,
+                    %                 'data-collection' => $grp,
+                    %                 'data-to'         => $to,
+                    %                 'data-total'      => $total);
+                    %= t fieldset => (class=>"group", %cdata) => begin
+                        % my $nums = @children? sprintf('1 to %d of %d', $to, $total): 'none';
+                        %= t legend => (title=>$grp) => begin
+                            %== qq[$ginfo->{label}&nbsp;&mdash;&nbsp;<span class="numbers">$nums</span>]
+                        % end
+                        %= t div => begin
+                            %= $paging_buts2->();
+                            %= t table => (class=>'rows') => begin
+                                % for my $child (@children) {
+                                    % my $ckey = $child->id;
+                                    %= t tr => begin
+                                        %= t td => begin
+                                            %= link_to $child => url_for("/tables/$ctable/$ckey/view")
+                                        % end
+                                    % end
+                                % }
+                            % end
+                        % end
+                    % end
+                % }
+            % end
+        % }
+    </div>
+
+    <h3>Schema</h3>
+    <div class="pad12">
+        %= t h3 => begin
+            %= t span => (title=>'Label')         => $tinfo->{label}
+            /
+            %= t span => (title=>'DB SourceName') => $tinfo->{source}
+            /
+            %= t span => (title=>'DB Name')       => $table
+        % end
+        %= t table => (id=>'sources-table') => begin
+            %= t tr => begin
+                %= t th => 'Label'
+                %= t th => 'DB Name'
+                %= t th => 'Primary Key'
+                %= t th => 'Type'
+                %= t th => 'Size'
+                %= t th => 'Sequence'
+                %= t th => 'Nullable?'
+                %= t th => 'Refers To'
+                %= t th => 'Referred From'
+            % end
+            % for my $column (@{$tinfo->{columns}}) {
+                % my $info = $bycolumn->{$column};
+                %= t tr => begin
+                    %= t td => ($info->{label} . ($info->{fkey}?' *':''))
+                    %= t td => $column
+                    %= t td => $info->{is_primary_key}||''
+                    %= t td => $info->{data_type}||''
+                    %= t td => $info->{size}||''
+                    %= t td => $info->{sequence}||''
+                    %= t td => ($info->{is_nullable}?'Y':'')
+                    %= t td => $info->{parent}||''
+                    %= t td => $info->{fkey}||''
+                % end
+            % }
+            % for my $grp (keys %{$tinfo->{has_many}}) {
+                % my $ginfo = $tinfo->{has_many}{$grp};
+                %= t tr => begin
+                    %= t td => $ginfo->{label}
+                    %= t td => (colspan=>8) => "Collection: $grp / $ginfo->{ctable}"
+                % end
+            % }
+        % end
+    </div>
+
+</div>
+

@@ -1,0 +1,108 @@
+#!/usr/bin/env perl
+#
+# Modal canon brute forcer.
+
+use strict;
+use warnings;
+
+use List::Util qw/min/;
+use Music::Canon        ();
+use Music::LilyPondUtil ();
+use Try::Tiny;
+
+# Notes to iterate over (0..23 or similar might make output easier to grep for
+# particular patterns, as that way both the input and output will cover
+# particular pitch patterns in the output).
+my @input = 0 .. 11;
+
+# What modes to generate notes for (via Music::Scales, could also try Forte
+# Numbers or supply list of array refs, see Music::Canon docs on
+# set_modal_scale_* for details).
+#
+# Yet another option would be to vary the ascending vs. descending modes used,
+# in addition to the varying input and output modes, though that would require
+# ascending and descending input material to fully explore, and would generate
+# stupidly larger amounts of output. A better option might be to devise a
+# specific question to be answered, for example: "what are the possibilities
+# when using bVII in a descending line for various corresponding output
+# ascending modes when composing a contrary motion retrograde canon?" And then
+# write code to explore that specific space. Which was exactly the question
+# that prompted this entire module.
+my @modes = qw/ionian dorian phrygian lydian mixolydian aeolian locrian hm mm/;
+
+# Probably nothing to fiddle with below here, except perhaps whether to
+# retrograde or contrary, and what to transpose by, depending on the need (e.g.
+# for a contrary motion retrograde canon, probably want to iterate those just
+# being on).
+
+my $canon = Music::Canon->new;
+my $lyu   = Music::LilyPondUtil->new(
+  ignore_register => 1,
+  min_pitch       => -50,
+  mode            => 'relative'
+);
+
+my @in_notes = $lyu->p2ly(@input);
+my $pformat  = join ' ', ('%4s') x @input;
+my $nformat  = join ' ', ('%4s') x @input;
+
+my $in_pitch = sprintf $pformat, @input;
+my $in_notes = sprintf $nformat, @in_notes;
+
+for my $in_mode (@modes) {
+  $canon->set_modal_scale_in($in_mode);
+  for my $out_mode (@modes) {
+    $canon->set_modal_scale_out($out_mode);
+    for my $t ( 0 .. 11 ) {
+      $canon->set_transpose($t);
+      for my $c ( 0 .. 1 ) {
+        $canon->set_contrary($c);
+        for my $r ( 0 .. 1 ) {
+          $canon->set_retrograde($r);
+
+          my $set = gen_settings_str( $in_mode, $out_mode, $t, $c, $r );
+          my @output;
+          my $meh;
+          try {
+            @output = $canon->modal_map( \@input );
+          }
+          catch { $meh = 1 };
+          next if $meh;
+
+          if ( min( grep defined, @output ) < -10 ) {
+            for my $p (@output) {
+              $p += 12 if defined $p;
+            }
+          }
+          if ( min( grep defined, @output ) > 10 ) {
+            for my $p (@output) {
+              $p -= 12 if defined $p;
+            }
+          }
+          @output = map { defined() ? $_ : 'x' } @output;
+          my @out_notes = $lyu->p2ly(@output);
+
+          my $out_pitch = sprintf $pformat, @output;
+          my $out_notes = sprintf $nformat, @out_notes;
+
+          print "$set\n";
+          print "in\t$in_pitch\n";
+          print "out\t$out_pitch\n";
+          print "in\t$in_notes\n";
+          print "out\t$out_notes\n\n";
+        }
+      }
+    }
+  }
+}
+
+exit 0;
+
+##############################################################################
+#
+# SUBROUTINES
+
+sub gen_settings_str {
+  my ( $in, $out, $t, $c, $r ) = @_;
+  return "in=$in out=$out t=$t c=$c r=$r";
+}

@@ -1,0 +1,79 @@
+
+
+  Installation goes in two steps :
+
+I )  PREPARING meschach 1.2
+--------------------------- 
+
+- If meschach 1.2 is already installed,   you only need to replace : 
+
+    'LIBS'  => ['-Lmeschach-1.2 -lmes','-lm'],
+
+in Makefile.PL by 
+
+    'LIBS'  => ['-Lwhere_meschach_is -lmes','-lm'],
+
+and copy "meschach.a" to "libmes.a" in the directory "where_meschach_is". 
+
+
+- Otherwise,   you must cd to the Meschach/meschach-1.2 directory, and 
+install meschach-1.2, with the commands : 
+
+1)
+        sh configure
+        make basic
+        make clean
+
+
+If all went ok, you may test your installation (optionnal) :
+
+        make torture 
+
+   
+If something went wrong, the best is to see in meschach-1.2/READMEfor
+more detailed information about installaton. 
+
+Once the file meschach.a is made,  copy it to  libmes.a,  so that it
+can be linked with by using -lmes (*). 
+
+2)      cp meschach.a libmes.a 
+
+
+II)  PREPARING Meschach 
+-----------------------
+
+1)
+         perl Makefile.PL
+         make                 
+        
+        
+       for some timestamp reason, you must (*)
+
+2)
+         cd meschach-1.2
+         ranlib libmes.a
+         cd ..
+
+       before being able to run 
+
+3)
+         make test
+
+     which should say "ok" 28 times, and never "NOT ok".
+
+     The functionalities are described in Meschach.pod
+
+4) 
+         make install
+
+     Will allow you to use Meschach (see Meschach documentation).
+
+
+NOTES :
+-------
+
+
+(*) There should be a more elegant way of preparing meschach-1.2. The
+procedure should be simplified in the future. (It's time I mastered
+MakeMaker a little better).
+

@@ -1,0 +1,40 @@
+MARC::Detrans
+
+MARC::Detrans is a framework for detransliterating MARC records.
+For details see the POD in MARC::Detrans.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+   MARC::Record
+   XML::SAX
+
+EXAMPLES
+
+There are sample configuration files and an example driving program
+in the example directory of this distribution. It's hoped that they
+will prove to be starting places for your own de-transliterators, or
+perhaps you can use them as is, with a few tweaks.
+
+THANKYOUS
+
+This software was commissioned by Queens Borough Public Library who
+made it's creation possible, and had the generosity to make the 
+software opensource. Many thanks to Jane Jacobs and Elizabeth Ankerson 
+who expressed how the software should work, and built the configration
+file for Russian.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004, 2009 Ed Summers
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

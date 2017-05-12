@@ -1,0 +1,9 @@
+Revision history for MooseX-Types-Implements
+
+1.103350    Wed Dec  1 12:39:09 2010
+            Replace Test::Exceptions with evals to avoid:
+                Bizarre copy of HASH in sassign at... 
+
+1.103320    Sun Nov 28 21:21:12 2010
+            First version.
+

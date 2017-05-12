@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name: MILA-Transliterate
+version: 0.01
+author:
+  - Shlomo Yona <yona@cs.technion.ac.il>
+abstract: ! >-
+  A Perl Module for transliterating text from Hebrew to various
+  transliterations used in the Knowledge Center for Processing Hebrew (MILA)
+  and vise versa
+license: perl
+requires:
+  Test::More: 0.47
+  perl: 5.8.0
+provides:
+  MILA::Transliterate:
+    file: lib/MILA/Transliterate.pm
+    version: 0.01
+generated_by: Module::Build version 0.2604

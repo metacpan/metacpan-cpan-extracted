@@ -1,0 +1,19 @@
+Some users of this module have had issues installing, mainly through the complications of 
+needing SSL and Crypt::SSLeay.  Hopefully this file will help the Windows users out.
+
+Here are the steps that I follow to install Mail::Webmail::Gmail on a Windows XP machine.
+
+1) Install activestate perl (5.8)
+
+2) Install the windows version of openSSL - http://www.slproweb.com/products/Win32OpenSSL.html
+
+3) Install the ppm of Crypt::SSLeay by typing the following at a command prompt
+
+ppm
+install http://theoryx5.uwinnipeg.ca/ppms/Crypt-SSLeay.ppd
+
+4) Install nmake if you dont already have it - http://support.microsoft.com/default.aspx?scid=kb;en-us;Q132084
+
+5) Install Mail::Webmail::Gmail by typing the following at a command prompt
+
+perl -MCPAN -e "install Mail::Webmail::Gmail"

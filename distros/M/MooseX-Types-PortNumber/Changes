@@ -1,0 +1,18 @@
+0.03     2016-08-31
+
+- Fixed $VERSION to actually match distribution. RT #97634.
+
+- Added inlining for all types.
+
+- Fixed module metadata. Reported by Nick Morott. RT #115402.
+
+
+0.02    2009-12-17
+
+- Added missing prereq for namespace::autoclean.
+
+
+0.01    2009-11-14
+
+- Initial release
+

@@ -1,0 +1,125 @@
+--stations
+# 50
+Isolatorweg
+Sloterdijk
+De Vlugtlaan
+Jan van Galenstraat
+Postjesweg
+Lelylaan
+Heemstedestraat
+Henk Sneevlietweg
+Amstelveenseweg
+Station Zuid
+RAI
+Overamstel
+Van der Madeweg
+Duivendrecht
+Strandvliet
+Bijlmer/ArenA % :Bijlmer % :ArenA
+Bullewijk
+Holendrecht
+Reigersbos
+Gein
+
+# 51
+Centraal Station
+Nieuwmarkt
+Waterlooplein
+Weesperplein
+Wibautstraat
+Amstelstation
+Spaklerweg
+
+De Boelelaan/VU % :VU % :De Boelelaan
+A.J. Ernststraat % :Ernststraat
+Van Boshuizenstraat
+Uilenstede
+Kronenburg
+Zonnestein
+Onderuit
+Oranjebaan
+Amstelveen Centrum
+Ouderkerkerlaan
+Sportlaan
+Marne
+Gondel
+Meent
+Brink
+Poortwachter
+Spinnerij
+Sacharovlaan
+Westwijk
+
+# 53
+Venserpolder
+Diemen-Zuid
+Verrijn Stuartweg
+Ganzenhoef
+Kraaiennest
+Gaasperplas
+
+--lines
+50|50|Line 50|color:#049800, width:8
+51|51|Line 51|color:#f16426, width:8
+53|53|Line 53|color:#ec2128, width:8
+54|54|Line 54|color:#ffc015, width:8
+
+--transfers
+
+--segments
+
+50|Isolatorweg|Sloterdijk
+50|Sloterdijk|De Vlugtlaan
+50|De Vlugtlaan|Jan van Galenstraat
+50|Jan van Galenstraat|Postjesweg
+50|Postjesweg|Lelylaan
+50|Lelylaan|Heemstedestraat
+50|Heemstedestraat|Henk Sneevlietweg
+50|Henk Sneevlietweg|Amstelveenseweg
+50|Amstelveenseweg|Station Zuid
+50,51|Station Zuid|RAI
+50,51|RAI|Overamstel
+50|Overamstel|Van der Madeweg
+50,54|Van der Madeweg|Duivendrecht
+50,54|Duivendrecht|Strandvliet
+50,54|Strandvliet|Bijlmer/ArenA
+50,54|Bijlmer/ArenA|Bullewijk
+50,54|Bullewijk|Holendrecht
+50,54|Holendrecht|Reigersbos
+50,54|Reigersbos|Gein
+
+51,53,54|Centraal Station|Nieuwmarkt
+51,53,54|Nieuwmarkt|Waterlooplein
+51,53,54|Waterlooplein|Weesperplein
+51,53,54|Weesperplein|Wibautstraat
+51,53,54|Wibautstraat|Amstelstation
+51,53,54|Amstelstation|Spaklerweg
+51|Spaklerweg|Overamstel
+53,54|Spaklerweg|Van der Madeweg
+
+53|Van der Madeweg|Venserpolder
+53|Venserpolder|Diemen-Zuid
+53|Diemen-Zuid|Verrijn Stuartweg
+53|Verrijn Stuartweg|Ganzenhoef
+53|Ganzenhoef|Kraaiennest
+53|Kraaiennest|Gaasperplas
+
+51|Station Zuid|De Boelelaan/VU
+51|De Boelelaan/VU|A.J. Ernststraat
+51|A.J. Ernststraat|Van Boshuizenstraat
+51|Van Boshuizenstraat|Uilenstede
+51|Uilenstede|Kronenburg
+51|Kronenburg|Zonnestein
+51|Zonnestein|Onderuit
+51|Onderuit|Oranjebaan
+51|Oranjebaan|Amstelveen Centrum
+51|Amstelveen Centrum|Ouderkerkerlaan
+51|Ouderkerkerlaan|Sportlaan
+51|Sportlaan|Marne
+51|Marne|Gondel
+51|Gondel|Meent
+51|Meent|Brink
+51|Brink|Poortwachter
+51|Poortwachter|Spinnerij
+51|Spinnerij|Sacharovlaan
+51|Sacharovlaan|Westwijk

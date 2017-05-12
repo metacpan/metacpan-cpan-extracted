@@ -1,0 +1,80 @@
+This module wraps all of the 'mpq' (rational) functions that
+the Gnu MP (GMP) library provides. It requires gmp-4.2.0 or later.
+
+You therefore need the GMP library installed on your computer. See:
+http://gmplib.org/
+
+To build this module you need perl 5.6.0 or later. I'm not sure of all
+the requirements to get it to build with earlier versions of perl, but
+it's definite that the XS code relating to operator overloading will
+not compile with perl versions prior to 5.6.
+
+No OO interface - just plain access to GMP's rational number functions.
+
+Build in the usual way:
+
+ perl Makefile.PL
+ make
+ make test
+ make install
+
+When building this module, the GMP library will need to be accessible.
+If it's in a location where your compiler does not find it by default,
+then instead of running 'perl Makefile.PL', you'll need to run:
+
+perl Makefile.PL INC="-I/path/to/gmp_include" LIBS="-L/path/to/gmp_lib -lgmp"
+
+==============
+64-bit support
+==============
+
+If your perl's Config reports that 'ivsize' is greater than or
+equal to 8 && 'ivtype' is not 'long', then Math::GMPq will, by
+default, be built to enable you to use the 64-bit long long int
+values with the new() function and the overloaded operators.
+Else attempts to use long long int values with Math::GMPq will
+probably fail.
+If necessary, you can override the default by opening up the
+Makefile.PL and uncommenting the appropriate line (just a few
+lines down from the top of the file ... the comments in that file
+should make it clear).
+
+Similarly, if your perl's Config reports that 'nvsize' > 8,
+then Math::GMPq will, by default, be built to enable you to use the
+larger precision values (be they either 'long double' or '__float128'
+with the new() function and the overloaded operators.
+Else, attempts to use long doubles will probably fail.
+If you need, you can override the default by opening up the
+Makefile.PL and uncommenting the appropriate line (just a few lines
+down from the top of the file ... the comments in that file should
+make it clear).
+
+I believe it to be both unnecessary and inadvisable to override the
+default - but if you do find that you need to override the default,
+please let me know. That you have found it necessary to override the
+default is something I probably ought to know about.
+
+I am contactable by email at sisyphus at(@) cpan dot (.) org.
+
+==========
+MAC OS X
+==========
+
+If you have MacPorts installed, you may need to install gmp +universal
+for the bindings to work. After installing you'll need to run:
+
+perl Makefile.PL INC="-I/opt/local/include" LIBS="-L/opt/local/lib -lgmp"
+
+==========
+MS WINDOWS
+==========
+If building with an MSVC++ compiler against a MinGW-built gmp lib, you'll
+need to additionally link to MinGW's libgcc.a and libcoldname.a. First,
+create copies of the 3 '.a' files (named libgmp.lib, libgcc.lib, and
+libcoldname.lib) and then run:
+
+perl Makefile.PL INC="-IC:/path/to/gmp_include" LIBS="-LC:/path/to/gcc_lib -lgcc -LC:/path/to/coldname_lib -lcoldname -LC:/path/to/gmp_lib -lgmp"
+
+
+
+

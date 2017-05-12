@@ -1,0 +1,136 @@
+NAME
+    Math::LP - Object oriented interface to solving of linear programs using
+    the lp_solve library
+
+SYNOPSIS
+        use Math::LP qw(:types);             # imports optimization types
+        use Math::LP::Constraint qw(:types); # imports constraint types
+
+        # make a new LP
+        $lp = new Math::LP;
+
+        # make the variables for the LP
+        $x1 = new Math::LP::Variable(name => 'x1');
+        $x2 = new Math::LP::Variable(name => 'x2');
+
+        # maximize the objective function to x1 + 2 x2
+        $obj_fn = make Math::LP::LinearCombination($x1,1.0,$x2,2.0);  
+        $lp->set_objective_function(lhs => $obj_fn, type => $MAX);
+
+        # add the constraint x1 + x2 <= 2
+        $constr = new Math::LP::Constraint(
+            lhs  => make Math::LP::LinearCombination($x1,1.0,$x2,1.0),
+            rhs  => 2.0,
+            type => $LE,
+        );
+        $lp->add_constraint(lhs => $lc1, type => $LE, rhs => 2.0);
+ 
+        # solve the LP and print the results
+        $lp->solve() or die "Could not solve the LP";
+        print "Optimum = ", $lp->get_optimal_value(), "\n";
+        print "x1 = ", $x1->{value}, "\n";
+        print "x2 = ", $x1->{value}, "\n";
+
+DESCRIPTION
+    The Math::LP package provides an object oriented interface to defining
+    and solving mixed linear/integer programs. It uses the lp_solve library
+    as the underlying solver. Please note that this is not a two way
+    relation. An LP is defined using Math::LP, converted to an lp_solve data
+    structure, and solved with lp_solve functions. It is not possible to
+    grab an lp_solve structure somehow and convert it to a Math::LP object
+    for manipulation and inspection. If you want to do that kind of stuff in
+    Perl, use the Math::LP::Solve package instead.
+
+    That being said, the logical way of constructing an LP consists of
+
+    1   Construct Math::LP::Variable objects, marking integer variables as
+        integer before adding them to an LP
+
+    2   Construct Math::LP::LinearCombination objects with the variables and
+        use them as the objective function and constraints
+
+    3   Solve the LP
+
+    4   Fetch the variable values from the Math::LP::Variable objects, and
+        the slacks and dual values from the Math::LP::Constraint objects.
+
+DATA FIELDS
+    lprec
+        Pointer to an lprec struct from the underlying lp_solve library. It
+        can be manipulated through the Math::LP::Solve functions, but it is
+        better and safer to use the OO interface provided by Math::LP.
+
+    status
+        Holds the status of the last solve() or lag_solve() call. Can be
+        either $OPTIMAL, $MILP_FAIL, $INFEASIBLE, $UNBOUNDED, $FAILURE,
+        $RUNNING, $FEAS_FOUND, $NO_FEAS_FOUND or $BREAK_BB.
+
+    variables
+        A ref to a hash with all the Math::LP::Variable objects used in the
+        LP indexed on their name.
+
+    constraints
+        A ref to an array with all Math::LP::Constraint objects used in the
+        LP.
+
+METHODS
+    new()
+        returns a new, empty LP
+
+    nr_rows()
+        returns the number of rows, i.e. the number of constraints in the LP
+
+    nr_cols()
+        returns the number of columns, i.e. the number of variables in the
+        LP
+
+    add_variable($var)
+        registers the variable as belonging to the LP. The `index' field of
+        the variable is set as a side effect. For this reason it is not
+        allowed to use 1 variable in 2 LP objects.
+
+    add_constraint($constr)
+        adds a Math::LP::Constraint to the LP.
+
+    set_objective_function(lhs => $lincomb, type => $type)
+        sets the objective function of the LP, specified by the following
+        parameters:
+
+        lhs
+          a Math::LP::LinearCombination forming the objective function. New
+          variables in the linear combination are automatically added to the
+          LP.
+
+        type
+          the optimization type, either $MAX or $MIN
+
+    solve()
+        Solves the LP, returns true if succeeded (i.e. the status value is
+        $OPTIMAL), false otherwise. The status of the solver is available in
+        the `status' field afterwards.
+
+    lag_solve()
+        Same as solve(), except that it calls lag_solve() internally. I must
+        admit that I do not know the exact purpose of lag_solve(), and I do
+        not want to go into guessing attempts :-(
+
+    get_optimal_value()
+        returns the value of the objective function after solving
+
+SEE ALSO
+    More info on the packages used in Math::LP is found in the
+    Math::LP::Object manpage, the Math::LP::Variable manpage and the
+    Math::LP::LinearCombination manpage.
+
+    The underlying wrapper to the lp_solv library is documented in the
+    Math::LP::Solve manpage. More info on using the lp_solve library written
+    by Michel Berkelaar and adapted by Jeroen Dirks is found in its source
+    code available from ftp://ftp.ics.ele.tue.nl/pub/lp_solve/
+
+AUTHOR
+    Wim Verhaegen <wim.verhaegen@ieee.org>
+
+COPYRIGHT
+    Copyright(c) 2000 Wim Verhaegen. All rights reserved. 
+    This program is free software; you can redistribute
+    and/or modify it under the same terms as Perl itself.

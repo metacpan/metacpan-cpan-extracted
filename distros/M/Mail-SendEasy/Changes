@@ -1,0 +1,18 @@
+Revision history for Perl extension Mail::SendEasy.
+
+1.2  2004-04-09
+     - Fixed bug for spaces between ":" and "<" on command MAIL.
+       Thanks to Dave Rogers that sent that:
+       | According to RFC821 there cannot be a space between
+       | the ':' and the '<' in the "MAIL FROM:" or
+       | the "MAIL TO:" exchange.
+
+
+1.1  2004-02-05
+     - Fixed recursivety/loop use of the object.
+     - Fixed auth() call for SMTP servers that doesn't have AUTH.
+
+
+1.0  2004-01-23 18:20:59
+      - original version;
+

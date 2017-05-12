@@ -1,0 +1,19 @@
+<& search_form.mhtml, query => $query &>
+
+<hr>
+<h1>Search Results</h1>
+<p>
+You searched for: <b><% $query %></b>
+</p>
+<p>
+If this really worked, we could show results here.
+</p>
+<ul>
+<li><a href="../book/view/1">Book 1</a></li>
+<li><a href="../book/view/2">Book 2</a></li>
+<li><a href="../book/view/3">Book 3</a></li>
+</ul>
+
+<%args>
+$query => undef;
+</%args>

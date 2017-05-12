@@ -1,0 +1,25 @@
+---
+abstract: 'Automatic, Rotating Mojolicious Secrets'
+author:
+  - 'Meredith Howard <mhoward@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-AutoSecrets
+provides:
+  Mojolicious::Plugin::AutoSecrets:
+    file: lib/Mojolicious/Plugin/AutoSecrets.pm
+    version: '0.002'
+requires:
+  Mojolicious: '7.15'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/merrilymeredith/p5-Mojolicious-Plugin-AutoSecrets/issues
+  repository: git://github.com/merrilymeredith/p5-Mojolicious-Plugin-AutoSecrets.git
+version: '0.002'

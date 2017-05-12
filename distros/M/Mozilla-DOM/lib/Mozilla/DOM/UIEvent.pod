@@ -1,0 +1,83 @@
+=head1 NAME
+
+Mozilla::DOM::UIEvent
+
+=head1 DESCRIPTION
+
+Mozilla::DOM::UIEvent is a wrapper around an instance of Mozilla's
+nsIDOMUIEvent interface, from which L<Mozilla::DOM::KeyEvent|Mozilla::DOM::KeyEvent>
+and L<Mozilla::DOM::MouseEvent|Mozilla::DOM::MouseEvent> inherit.
+This class inherits from L<Event|Mozilla::DOM::Event>.
+
+ * The nsIDOMUIEvent interface is the datatype for all UI events in the
+ * Document Object Model.
+ *
+ * For more information on this interface please see
+ * L<http:E<sol>E<sol>www.w3.orgE<sol>TRE<sol>DOM-Level-2-EventsE<sol>>
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::UIEvent->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $int = $event->B<GetDetail>
+
+=over
+
+I don't know what a "detail" is. (Apparently it isn't used during
+dom_mouse_over or dom_mouse_out signals. When clicking the mouse,
+it seems to be the number of consecutive clicks, up to 3.)
+
+=back
+
+=head2 $abstract_view = $event->B<GetView>
+
+=over
+
+See the DOM Level 2 Views specification.
+
+=back
+
+=head2 $event->B<InitUIEvent>($eventType, $canbubble, $cancelable, $detail)
+
+=over
+
+=over
+
+=item * $eventtype (string)
+
+=item * $canbubble (boolean)
+
+=item * $cancelable (boolean)
+
+=item * $detail (integer (long))
+
+=back
+
+See L<Event::InitEvent|Mozilla::DOM::Event::InitEvent> for more
+information. This method is basically the same, but with two
+extra arguments.
+(XXX: add docs for args)
+
+Note: I don't see how you can Create or QueryInterface an AbstractView,
+and trying to pass in C<0> or C<undef> was just causing a segfault,
+so I've omitted what would normally be the 4th argument of this method.
+If someone can explain why you'd need it and how you'd use it,
+then I can put it back in.
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut

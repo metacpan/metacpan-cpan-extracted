@@ -1,0 +1,35 @@
+Revision history for Perl extension Math::Calc::Units.
+
+1.07  Tue Aug  4 2009
+	- Add a warning when -c used incorrectly
+
+1.06  Tue Oct 25 17:29:00 2005
+	- silly release to bump up kwalitee score
+
+1.05  Tue Oct 25 17:29:00 2005
+	- implemented distances
+	- cleaned up a few uses of uninitialized stuff
+
+1.04
+	- Implemented -a flag (aka abbreviate=>1 option) to spit out
+	  abbreviated units
+
+1.03
+	- Fixed 0.89 gigabytes getting described as gigabits
+
+1.02  Mon Oct 22 20:01:27 2001
+	- added timestamps
+        - added dates
+        - added constructor syntax for timestamps & dates
+        - fixed endless recursion bug
+        - added years (ugh... inexact unit)
+
+1.01  Fri Sep  4
+	- added unit breakdowns (2 hour 46 minute)
+	- added percentages (0.034 is now displayed as 3.4%)
+	- improved performance
+	- added major unit preference ordering
+	- added out-of-range preference estimation
+
+1.00  Fri Aug 10 12:36:10 2001
+	- original version; created by h2xs 1.19

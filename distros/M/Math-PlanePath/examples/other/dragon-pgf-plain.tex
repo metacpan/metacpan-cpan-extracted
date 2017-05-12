@@ -1,0 +1,67 @@
+%% Copyright 2013 Kevin Ryde
+%%
+%% This file is part of Math-PlanePath.
+%%
+%% Math-PlanePath is free software; you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by the Free
+%% Software Foundation; either version 3, or (at your option) any later
+%% version.
+%%
+%% Math-PlanePath is distributed in the hope that it will be useful, but
+%% WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+%% or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+%% for more details.
+%%
+%% You should have received a copy of the GNU General Public License along
+%% with Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
+
+
+%% Usage: tex dragon-pgf-latex.tex
+%%        xdvi dragon-pgf-latex.dvi
+%%
+%% This a dragon curve drawn with the PGF lindenmayersystems library.
+%%
+%%     http://sourceforge.net/projects/pgf/
+%%
+%% The PGF manual includes examles of Koch snowflake, Hilbert curve and
+%% Sierpinski arrowhead.  In the ``spy'' library section there's some
+%% magnifications of the Koch and of a quadric curve too.
+%%
+%% In the rule here \symbol{S} is a second drawing symbol.  It draws a
+%% line segment the same as F, but the two different symbols let the
+%% rules distinguish odd and even position line segments.
+%%
+%% F and S are always in pairs, F first and S second, F_S_F_S_F_S_F_S.
+%% At each even position F expands to a left bend, ie with a "+" turn.
+%% At each odd position S expands to a right bend, ie with a "-".
+%% This is the "successive approximation" method for generating the
+%% curve where each line segment is replaced by a bend to the left or
+%% right according as it's at an even or odd position.
+%%
+%% The sequence of + and - turns resulting in the expansion follows
+%% the "bit above lowest 1-bit" rule.  This works essentially because
+%% the bit above obeys an expansion rule
+%%
+%%    if k even
+%%      bitabovelowest1bit(2k)   = bitabovelowest1bit(k)
+%%      bitabovelowest1bit(2k+1) = 0         # the "+" in F -> F+S
+%%
+%%    if k odd
+%%      bitabovelowest1bit(2k)   = bitabovelowest1bit(k)
+%%      bitabovelowest1bit(2k+1) = 1         # the "-" in S -> F-S
+%%
+
+\input tikz.tex
+\usetikzlibrary{lindenmayersystems}
+
+\pgfdeclarelindenmayersystem{Dragon curve}{
+  \symbol{S}{\pgflsystemdrawforward}
+  \rule{F -> F+S}
+  \rule{S -> F-S}
+}
+\tikzpicture
+\draw
+  [lindenmayer system={Dragon curve, step=10pt, axiom=F, order=8}]
+  lindenmayer system;
+\endtikzpicture
+\bye

@@ -1,0 +1,40 @@
+Fix portability: currently we rely on some external programs.  These
+can all be replaced with perl modules.  N.B. It is okay to rely on the
+availability of non core modules.
+
+Make a test for the programs in the bin directory.
+
+Convert POD descriptions (taken from inside modules) into proper text,
+at least as an option
+
+Improve efficiency of ModList module by keeping the read in modlist
+available in class data..
+
+Explore other meta information formats.
+
+Teach DPKG to get meta information from this.
+
+Teach makerpm to get meta information from this (cpanflute, the RPM
+builder distributed with RPM already has a contributed patch)
+
+Go through all package formats carefully and list which meta
+information functions we should implement (add to this todo file those
+not implemented)
+
+Think clearly about dependencies information.  In order to
+automatically generate proper dependencies the module should be
+installed (normally in a temporary directory structure).  I have
+contributed code to RPM > 3.0.4 that can then work out the
+dependencies (in perl.prov and perl.dep).  It would probably be more
+useful if contributed into a CPAN module because then all packaging
+systems could use this.
+
+Add a verbose mode to the test scripts; make it not be the default;
+hide all the normal verbosity.
+
+Carefully check all points of failure (open() function calls etc) are
+being trapped.  
+
+Consider security more carefully (at present we could be tricked into
+generating wrong meta info since we trust directories in /tmp which
+might not belong to us.. we do this to allow sharing.)

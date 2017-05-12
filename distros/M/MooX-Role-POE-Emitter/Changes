@@ -1,0 +1,108 @@
+Revision history for Perl module MooX::Role::POE::Emitter
+
+1.001002 2015-03-05
+
+  - Test & POD improvements
+
+  - Depend on Moo-1.6 for 'coerce'; remove dependency on MooX::late
+
+  - 'use strictures 2;' for saner fatal warnings behavior
+
+  - Inline the RegisteredSession class (never part of public API)
+
+  - Packaging; switch to 'cpanfile' dependency list
+
+  - Remove dependency on Test::Exception
+
+1.001001 2014-08-16
+
+  - Stable release; no significant code changes.
+    (Happy CPAN Day!)
+
+0.120005 2014-01-13
+
+  - Documentation fixes & minor optimizations
+
+0.120004 2013-12-29
+
+  - Fix some test failures on perl <=5.14
+
+0.120003 2013-12-28
+
+  - POD improvements
+
+  - use List::Objects::WithUtils to add a little more internal sanity
+
+0.120002 2013-08-24
+
+  - Drop MooX::Types::MooseLike in favor of Type::Tiny / Types::Standard
+
+  - Fix 'Changes' to conform to CPAN::Changes::Spec
+
+  - Minor cleanups
+
+0.120001 2013-02-05
+
+  - Depend on newer Moo & MooX::Role::Pluggable
+    (Fixes Moose compat, see xt/)
+
+  - Drop a regex in favor of index()
+
+0.11 2012-11-15
+
+   - Added shutdown_signal() and tests for same.
+
+   - Fixed syntax error in POD SYNOPSIS.
+
+   - Many test cleanups/fixes.
+
+0.10 2012-11-03
+ 
+   - Expanded tests and POD
+
+0.09 2012-11-03
+
+   - Allow the Emitter's POE::Session alias to be changed on-the-fly.
+
+   - Fix dispatcher bug that could result in event misdelivery.
+ 
+   - Fix 'unsubscribe' with no arguments to always unsubscribe all events.
+
+   - Reworked tests; t/00_old.t will go away next release.
+
+0.08 2012-10-30
+ 
+   - Previous release left '_pluggable_event' broken when using Moose.
+     Fix and add xt/ tests for same.
+
+0.07 2012-10-27
+
+   - Moose compatibility tweaks; lazy attribs needed a default.
+
+0.06 2012-10-25
+
+   - Fix _emitter_default overrides, broken in 0.05.
+
+0.05 2012-10-26
+ 
+  - Add cute 'anonymous coderef callbacks' trick from dngor.
+    Allows coderefs to be passed to yield/call/timer:
+      $emitter->yield( sub { . . . }, @args )
+      $emitter->timer( $delay, sub { . . . }, @args )
+
+0.04 2012-10-25
+
+  - Add pluggable_type_prefixes attribute and tests for same;
+     can be used to configure plugin handler prefixes (MooX::Role::Pluggable)
+
+0.03 2012-10-25
+
+  - Improved tests and documentation.
+
+0.02 2012-10-21
+
+  - Documentation improvements.
+
+0.01 2012-10-20
+
+  - Initial release

@@ -1,0 +1,270 @@
+=for html <a href="https://travis-ci.org/jddurand/c-genericLogger"><img src="https://travis-ci.org/jddurand/c-genericLogger.svg?branch=master" alt="Travis CI build status" height="18"></a> <a href="https://badge.fury.io/gh/jddurand%2Fc-genericLogger"><img src="https://badge.fury.io/gh/jddurand%2Fc-genericLogger.svg" alt="GitHub version" height="18"></a> <a href="http://opensource.org/licenses/MIT" rel="nofollow noreferrer"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License MIT" height="18"></a>
+
+=head1 NAME
+
+genericLogger - generic logging interface
+
+=head1 SYNOPSIS
+
+  #include <genericLogger.h>
+
+  /* ---------------------------------- */
+  /* User-defined logger implementation */
+  /* ---------------------------------- */
+  typedef void (*genericLoggerCallback_t)(void *userDatavp,
+                                          genericLoggerLevel_t logLeveli,
+                                          const char *msgs);
+
+  /* ----------------------- */
+  /* Creation, Cloning, Free */
+  /* ----------------------- */
+  genericLogger_t *genericLogger_newp  (genericLoggerCallback_t logCallbackp,
+                                        void *userDatavp,
+                                        genericLoggerLevel_t genericLoggerLeveli);
+  genericLogger_t *genericLogger_clonep(genericLogger_t *genericLoggerp);
+  void             genericLogger_freev (genericLogger_t **genericLoggerpp);
+
+  /* ------- */
+  /* Logging */
+  /* ------- */
+  void genericLogger_logv  (genericLogger_t *genericLoggerp,
+                            genericLoggerLevel_t genericLoggerLeveli,
+                            const char *fmts,
+                            ...);
+  void genericLogger_logapv(genericLogger_t *genericLoggerp,
+                            genericLoggerLevel_t genericLoggerLeveli,
+                            const char *fmts,
+                            va_list ap);
+
+  /* ---------------- */
+  /* Level management */
+  /* ---------------- */
+  genericLoggerLevel_t genericLogger_logLevel_seti(genericLogger_t *genericLoggerp,
+                                                   genericLoggerLevel_t logLeveli);
+  genericLoggerLevel_t genericLogger_logLevel_geti(genericLogger_t *genericLoggerp);
+
+=head1 DESCRIPTION
+
+genericLogger is like a portable printf() with level filtering capability, designed to propagate already-formatted messages to user-defined log implementations.
+
+=head1 METHODS
+
+=head2 genericLogger_newp
+
+  typedef void    (*genericLoggerCallback_t)(void *userDatavp,
+                    genericLoggerLevel_t logLeveli,
+                    const char *msgs);
+  genericLogger_t  *genericLogger_newp(genericLoggerCallback_t logCallbackp,
+                                       void *userDatavp,
+                                       genericLoggerLevel_t genericLoggerLeveli);
+
+Creates and return a generic logger.
+
+The argument C<logCallbackp> may be NULL, or a function pointer to a logging implementation. Such callback will be called with the argument userDatavp, untouched (one call that the callback context), the level, and a pre-formatted message.
+
+The argument C<genericLoggerLeveli> may be one of
+
+=over
+
+=item GENERICLOGGER_LOGLEVEL_TRACE
+
+=item GENERICLOGGER_LOGLEVEL_DEBUG
+
+=item GENERICLOGGER_LOGLEVEL_INFO
+
+=item GENERICLOGGER_LOGLEVEL_NOTICE
+
+=item GENERICLOGGER_LOGLEVEL_WARNING
+
+=item GENERICLOGGER_LOGLEVEL_ERROR
+
+=item GENERICLOGGER_LOGLEVEL_CRITICAL
+
+=item GENERICLOGGER_LOGLEVEL_ALERT
+
+=item GENERICLOGGER_LOGLEVEL_EMERGENCY
+
+=back
+
+it is guaranteed that C<logCallbackp> will not be called whenever a message have a log level lower than C<genericLoggerLeveli>.
+
+If C<logCallbackp> is NULL, then a default built-in implementation is used, with a B<hardcoded> level set to GENERICLOGGER_LEVEL_TRACE (i.e. it will log everything), a B<hardcoded> format string set to C<%d/%m/%Y %H:%M:%S %9s %s> (i.e. date and time a-la-european style, a string giving the level, and the formatted message), and a B<hardcoded> output to standard error.
+
+Returns NULL on failure, system's errno will indicate the reason.
+
+=head2 genericLogger_clonep
+
+  genericLogger_t *genericLogger_clonep(genericLogger_t *genericLoggerp);
+
+Clone the current generic logger and return a new one. The clone becomes I<independant>, and must be freed using genericLogger_freev().
+
+Returns NULL on failure, system's errno will indicate the reason.
+
+=head2 genericLogger_freev
+
+  void genericLogger_freev(genericLogger_t **genericLoggerpp);
+
+Free the generic logger.
+
+=head2 genericLogger_logv
+
+  void genericLogger_logv(genericLogger_t *genericLoggerp,
+                          genericLoggerLevel_t genericLoggerLeveli,
+                          const char *fmts,
+                          ...);
+
+Format the message using C<fmts> format string and eventual remaining parameters, and send it to the log implementation.
+
+=head2 genericLogger_logapv
+
+  void genericLogger_logapv(genericLogger_t *genericLoggerp,
+                            genericLoggerLevel_t genericLoggerLeveli,
+                            const char *fmts,
+                            va_list ap);
+
+va_list version of genericLogger_logv().
+
+=head2 genericLogger_logLevel_seti
+
+  genericLoggerLevel_t genericLogger_logLevel_seti(genericLogger_t *genericLoggerp,
+                                                   genericLoggerLevel_t logLeveli);
+
+Set the log level to C<leveLeveli> and return it.
+
+=head2 genericLogger_logLevel_geti
+
+  genericLoggerLevel_t genericLogger_logLevel_geti(genericLogger_t *genericLoggerp);
+
+Return the current log level.
+
+=head2 genericLogger_versions
+
+  const char *genericLogger_versions();
+
+Return the version number.
+
+=head1 CONVENIENCE MACROS
+
+=head2 GENERICLOGGER_NEW
+
+maps to genericLogger_newp.
+
+=head2 GENERICLOGGER_CUSTOM
+
+maps to genericLogger_newp with a custom log implementation.
+
+=head2 GENERICLOGGER_CLONE
+
+maps to genericLogger_clonep.
+
+=head2 GENERICLOGGER_XXX
+
+=head2 GENERICLOGGER_XXXF
+
+=head2 GENERICLOGGER_XXXAP
+
+maps to all log levels, where C<XXX> is one of
+
+=over
+
+=item TRACE
+
+=item DEBUG
+
+=item INFO
+
+=item NOTICE
+
+=item WARN
+
+=item ERROR
+
+=item CRITICAL
+
+=item ALERT
+
+=item EMERGENCY
+
+=back
+
+For portability reasons, there are two different versions, depending if there are arguments or not: C<XXX> or C<XXXF>, respectively. The C<XXXAP> is when the argument is a C<va_list>.
+
+The C<XXX> and C<XXXF> macros maps to genericLogger_logv(), while C<XXXAP> maps to genericLogger_logapv(), and they all hardcode the level, so that the programmer do not have to write the later.
+
+=head2 GENERICLOGGER_LEVEL_SET
+
+maps to genericLogger_logLevel_seti.
+
+=head2 GENERICLOGGER_LEVEL_GET
+
+maps to genericLogger_logLevel_geti.
+
+=head1 EXAMPLE
+
+  #include <stdlib.h>
+  #include <stdio.h>
+  #include <errno.h>
+  #include <string.h>
+  #include <stdarg.h>
+  #include <genericLogger.h>
+
+  typedef struct localStruct { char *where; } localStruct_t;
+
+  static void localLogger(void *userDatavp, genericLoggerLevel_t logLeveli, const char *msgs);
+  static void forceTrace(genericLogger_t *loggerp, localStruct_t *localStructp, const char *fmts, ...);
+
+  int main() {
+    genericLogger_t *loggerp;
+    localStruct_t    localStruct;
+
+    loggerp = GENERICLOGGER_CUSTOM(localLogger, &localStruct, GENERICLOGGER_LOGLEVEL_WARNING);
+    if (loggerp == NULL) { perror("GENERICLOGGER_CUSTOM"); exit(1); }
+
+    localStruct.where = "main";
+    GENERICLOGGER_TRACE(loggerp, "Nothing is logged");
+    {
+      genericLogger_t *clonep = GENERICLOGGER_CLONE(loggerp);
+      if (clonep == NULL) { perror("GENERICLOGGER_CLONE"); exit(1); }
+
+      GENERICLOGGER_LEVEL_SET(clonep, GENERICLOGGER_LOGLEVEL_WARNING)
+      GENERICLOGGER_WARNF(loggerp, "Clone is warning, current level is %d", GENERICLOGGER_LEVEL_GET(loggerp));
+      forceTrace(clonep, &localStruct, "Clone is forced to trace");
+      GENERICLOGGER_FREE(clonep);
+    }
+    GENERICLOGGER_TRACE(loggerp, "Parent is still not logging");
+    GENERICLOGGER_LEVEL_SET(loggerp, GENERICLOGGER_LOGLEVEL_DEBUG)
+    GENERICLOGGER_DEBUGF(loggerp, "Parent is logging, current level is %d", GENERICLOGGER_LEVEL_GET(loggerp));
+    forceTrace(loggerp, &localStruct, "Parent is forced to trace");
+    GENERICLOGGER_FREE(loggerp);
+
+    return 0;
+  }
+
+  static void forceTrace(genericLogger_t *loggerp, localStruct_t *localStructp, const char *fmts, ...) {
+    va_list ap;
+    char *previousWhere = localStructp->where;
+    int previousLevel = GENERICLOGGER_LEVEL_GET(loggerp);
+
+    localStructp->where = "mainap";
+    va_start(ap, fmts);
+
+    GENERICLOGGER_LEVEL_SET(loggerp, GENERICLOGGER_LOGLEVEL_TRACE)
+    GENERICLOGGER_TRACEAP  (loggerp, fmts, ap);
+    GENERICLOGGER_LEVEL_SET(loggerp, previousLevel);
+
+    va_end(ap);
+    localStructp->where = previousWhere;
+  }
+
+  static void localLogger(void *userDatavp, genericLoggerLevel_t logLeveli, const char *msgs) {
+    localStruct_t *localStructp = (localStruct_t *) userDatavp;
+
+    fprintf(stderr, "[%-6s] msgs = %s\n", localStructp->where, msgs);
+  }
+
+  /*
+  [main  ] msgs = Clone is warning, current level is 4
+  [mainap] msgs = Clone is forced to trace
+  [main  ] msgs = Parent is logging, current level is 1
+  [mainap] msgs = Parent is forced to trace
+  */

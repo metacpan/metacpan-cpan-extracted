@@ -1,0 +1,46 @@
+<div id="tunnelWait" style="display: block">
+    <p align="center">
+        <img src="/static/loading.gif"><br>
+        <div class="infotext">[% tr.tr("Preparing connection...") %]</div>
+    </p>
+</div>
+<div id="tunnelReady" style="display: none">
+    <p align="center">
+        <form name="loadvnc" method="post" action="[% ShowLink %]" target="_blank">
+            <input type="hidden" name="ID" value="[% ProxyPort %]">
+            <input type="submit" value="[% tr.tr("Click to open viewer") %]">
+        </form>
+    </p>
+</div>
+
+<script language="javascript">
+    var waitDone = 0;
+    
+    function ajaxUpdateWaitStatus() {
+      var params = "ID=[% ProxyPort %]"
+      srefresh.open("POST", "[% WaitLink %]", true);
+      
+      //Send the proper header information along with the request
+      srefresh.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      srefresh.setRequestHeader("Content-length", params.length);
+      srefresh.setRequestHeader("Connection", "close");
+      
+      srefresh.onreadystatechange=function() {
+        if(srefresh.readyState == 4) {
+          if(srefresh.responseText == "SHOWLINK") {
+            document.getElementById('tunnelWait').style.display = 'none';
+            document.getElementById('tunnelReady').style.display = 'block';
+            waitDone = 1;
+          }
+        }
+      }
+      
+      if(waitDone == 0) {
+        srefresh.send(params);
+        setTimeout("ajaxUpdateWaitStatus()", 2000);
+        
+      }
+    }
+    
+    setTimeout("ajaxUpdateWaitStatus()", 2000);
+</script>

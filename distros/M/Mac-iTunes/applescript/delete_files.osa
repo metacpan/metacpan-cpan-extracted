@@ -1,0 +1,19 @@
+-- Delete Files v0.1
+-- Plaid Cow Solutions <itunes-as@plaidcow.net>
+-- http://www.plaidcow.net/
+   
+try
+  tell application "iTunes"
+    repeat with theTrack in (get the selection of browser window 1)
+      set trackLocation to the location of theTrack
+			
+      tell application "Finder"
+        delete trackLocation
+      end tell
+			
+      delete theTrack
+    end repeat
+  end tell -- application "iTunes"
+on error myErr
+  display dialog myErr
+end try

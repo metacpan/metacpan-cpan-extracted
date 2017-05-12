@@ -1,0 +1,153 @@
+NAME
+    MySQL::Admin 
+
+SYNOPSIS
+    MySQL administration Web-App and Content Management System
+
+    cpan MySQL::Admin
+
+This System works like following: index.html 
+
+Css Overview:
+
+/*
+#############################################
+#  .window                                  #
+#  #######################################  #
+#  #.tab                                 #  #   
+#  #######################################  #
+#  #.menu                  #.content     #  #
+#  # ##################### #             #  # 
+#  # #.menuContainer     # #             #  #
+#  # #.verticalMenuLayout# #.ShowTables  #  #
+#  # #.menuCaption       # #.caption     #  #
+#  # #.menuContent       # #             #  #
+#  # ##################### #             #  #
+#  #                       #             #  #
+#  #######################################  #
+#                                           #
+#############################################
+*/
+    
+javascript/cms.js
+    
+      // In the  function init() a ( xmlhttprequest ) load the Content.
+      // <a onclick="requestURI('$ENV{SCRIPT_NAME}?action=HelloWorld','HelloWorld','HelloWorld')">HelloWorld</a>      
+      requestURI(
+        url,     // Script url  
+        id,      // Tabwidget id
+        txt,     // Tabwidget text
+        bHistory,// Browser History
+        formData,// Form Data 
+        method,  // Submit Type GET or POST
+       );
+    or 
+    <form onsubmit="submitForm(this,'$m_sAction','$m_sTitle');return false;" method="GET" enctype="multipart/form-data">
+    <input type="hidden" name="action" value="">
+    
+    since apache 2.x GET have maxrequestline so use POST for alarge requests.
+    POST requests don't saved in the Browser history (back button ). 
+    
+install.sql
+    The actions will bill stored in actions.
+    
+    INSERT INTO actions (
+        `action`, #Name of the action
+        `file`,   #file contain the code
+        `title`,  #title 
+        `right`,  #right 0 guest 1 user 5 admin
+        `sub`     # sub name  main for the while file 
+        ) values('HelloWorld','HelloWorld.pl','HelloWorld','0','main');
+    
+    INSERT INTO actions (`action`,`file`,`title`,`right`,`sub`) values('HelloSub','HelloSub.pl','HelloWorld','0','HelloSub');
+
+    In action_set:
+    
+    INSERT INTO actions_set (
+        `action`,           #action called
+        `foreign_action`,   #foreign key
+        `output_id`         #output id 
+        ) values('HelloWorld','HelloWorld','content');
+
+    INSERT INTO actions_set (`action`,`foreign_action`,`output_id`) values('HelloWorld','HelloSub','otherOutput');
+    
+    
+    INSERT INTO mainMenu (
+        `title`,   # link title
+        `action`,  # action defined in actions_set
+        `right`,   # 0 guest 1 user 5 admin
+        `position`,# top 1 ... x bottom 
+        `menu`,    #top or left
+        `output`   #requestURI or javascript or loadPage  or href
+        )  values('HelloWorld','HelloWorld','0','1.08','top','requestURI');
+        )  values('HelloWorld','HelloWorld','0','1.07','top','requestURI');
+
+    This will call 2 files HelloWorld.pl HelloSub.pl with following output.
+        
+cgi-bin/Content/HelloWorld.pl
+    #Files are called via do ().
+    #you are in the MySQL::Admin::GUI namespace
+    print  "Hello World !"
+    .br()
+    .a(
+        {
+        -href => "mailto:$m_hrSettings->{admin}{email}"
+        },'Mail me')
+    .br()
+    1;
+cgi-bin/Content/HelloSub.pl
+    sub HelloSub{
+        print "sub called";
+    }
+    1;
+cgi-bin/mysql.pl
+    Returns a “actionset” stored in the Mysql Database.
+    One sub for every output id.
+    <xml>
+    <output id="otherOutput">sub called</output>
+    <output id="content">Hello World !<br /><a href="mailto:">Mail me</a><br /></output>
+    </xml>
+
+this file will be transformed trough xslt in main Template     
+    
+index.html
+    //result
+    <div id=otherOutput>sub called</div>
+    <div id=content>Hello World !<br /><a href="mailto:">Mail me</a><br /></div>
+
+
+Under mod_perl the whole page load in 0.1 seconds.
+
+I write a whole Documentation soon.No feedback so I'm not in rush.
+
+Look at http://lindnerei.sourceforge.net or http://lindnerei.de further Details.
+ 
+
+DEPENDENCIES
+
+This module requires these other modules and libaries:
+    Test::More >= 0.7,
+    DBI >= 1.50,
+    CGI >= 3.29,
+    MD5 >= 2.03,
+    URI >= 1.40
+    
+recommends
+    Authen::Captcha >= 1.024
+    Syntax::Highlight::Engine::Kate >= 0.10
+    Frontier::RPC2 >= 0.06
+    XML::XSLT >= 0.48
+    Search::Tools::UTF8 >=1.003 
+    Mail::Sendmail
+ 
+COPYRIGHT
+    Copyright (C) 2006-2015 by Hr. Dirk Lindner
+
+    perl -e'sub lze_Rocks{print/(...)/ for shift;}sub{&{"@_"}}->("lze_Rocks")'
+
+    This program is free software; you can redistribute it and/or modify it 
+    under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation; This program is distributed in the hope 
+    that it will be useful, but WITHOUT ANY WARRANTY; without even
+    the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details

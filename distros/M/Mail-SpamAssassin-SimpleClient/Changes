@@ -1,0 +1,29 @@
+Revision history for Mail-SpamAssassin-SimpleClient
+
+0.102     2013-10-02 08:36:09 America/New_York
+          update resources metadata
+
+0.101610  2010-06-10 19:54:07 America/New_York
+          prefer parsing X-Spam-Report header if present for determining scores
+          for run tests - Michael Peters
+
+0.008     2008-04-12
+          improve interaction with automated testers
+
+0.007     2008-04-09
+          packaging fixes
+
+0.006     2007-12-19
+          make the $result->email method, uh, work
+
+0.005     2007-09-17
+          fix bugs exposed by new Test::More
+
+0.004     2007-04-12
+          add email method to results
+
+0.002     2007-03-23
+          refresh Module::Install
+
+0.001     2007-03-21
+          first release

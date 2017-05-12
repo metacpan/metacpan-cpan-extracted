@@ -1,0 +1,25 @@
+---
+name: Math-SymbolicX-Inline
+version: 1.11
+author:
+  - 'Steffen Mueller <smueller@cpan.org>'
+abstract: Inlined Math::Symbolic functions
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Math::Symbolic: 0.129
+  Math::Symbolic::Custom::Contains: 0.1
+build_requires:
+  Test::More: 0
+recommends:
+  Test::Pod: 1.0
+  Test::Pod::Coverage: 1.0
+provides:
+  Math::SymbolicX::Inline:
+    file: lib/Math/SymbolicX/Inline.pm
+    version: 1.11
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

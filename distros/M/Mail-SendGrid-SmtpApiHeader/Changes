@@ -1,0 +1,6 @@
+0.02 Mon Jul 15 21:44:47 CEST 2013
+    - Update metadata in Makefile.PL (See rt-86897)
+    - Update manifests
+
+0.01  Mon Jul 30 21:23:03 CEST 2012
+    - Initial version

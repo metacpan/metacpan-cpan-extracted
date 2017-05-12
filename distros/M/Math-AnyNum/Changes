@@ -1,0 +1,85 @@
+Revision history for Math-AnyNum
+
+0.08    2017-05-08
+
+        [PERFORMANCE IMPROVEMENTS]
+
+        - Many internal simplifications and optimizations, which makes `Math::AnyNum` up to 30% faster.
+
+        [FIXES]
+
+        - Fixes a rounding error in ilog(n,b) when n is very large or when n is not a power of b.
+
+0.07    2017-04-28
+
+        [IMPROVEMENTS]
+
+        - Minor optimization in `numify()` for integers and rationals.
+        - Added checks for exact divisibility of two integers.
+        - Optimized the gcd() and lcm() functions when the second argument is a native integer.
+        - Documentation improvements.
+
+        [FIXES]
+
+        - Fixed the creation of very large constant integers in `:overload` mode.
+        - Fixed the creation of binary, octal and hexadecimal constants that contain underscores (in `:overload` mode).
+
+0.06    2017-04-18
+
+        [ADDITIONS]
+
+        - Added the `nude(x)` function.
+        - Added the `conj(x)` function.
+        - Added the `norm(x)` function.
+        - Added the `reals(x)` function.
+        - Added the `as_dec(x,y)` function.
+
+        [IMPROVEMENTS]
+
+        - Extended the `agm()` function to support complex numbers.
+        - Extended the `as_frac()` function to accept an optional base.
+        - Functions `inv(x)` and `neg(x)` are exportable.
+        - Math::AnyNum->new() is considerably faster.
+        - Many internal simplifications and optimizations.
+
+        [FIXES]
+
+        - Fixed a typo in `is_inf()` and `is_ninf()`.
+
+0.05    2017-04-09
+
+        [FIXES]
+
+        - Fixed the (in)equality checks when one of the operands is NaN.
+        - Comparing anything to NaN, now returns `undef` instead of `0`.
+
+        [IMPROVEMENTS]
+
+        - Refactored the method `is_power` to handle scalar arguments more efficiently.
+        - Optimized the `root` and `iroot` method when the second argument is a scalar.
+
+0.04    2017-04-08
+
+        [FIXES]
+
+        - Fixed some tests under GMP < 5.1.0 (thanks to Slaven Rezić; https://github.com/trizen/Math-AnyNum/issues/1).
+        - Workaround in log10() with MPC < 1.0 (thanks to Slaven Rezić; https://github.com/trizen/Math-AnyNum/issues/1).
+
+0.03    2017-04-08
+
+        [IMPROVEMENTS]
+
+        - Minor optimization in overloaded '-' and '/'.
+
+        [FIXES]
+
+        - Workaround for Math::GMPq::Rmpq_cmp_z() with a version of GMP older than 6.1.0. (https://rt.cpan.org/Public/Bug/Display.html?id=120910)
+        - Minor-fix in the stringification of Math::MPFR objects with exponents and trailing zeros.
+
+0.02    2017-04-03
+
+        Require perl>=5.014.
+
+0.01    2017-04-03
+
+        First release.

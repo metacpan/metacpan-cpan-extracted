@@ -1,0 +1,56 @@
+Revision history for Perl extension Mojolicious-Plugin-BootstrapPagination
+
+0.13 2015-01-08T12:20:05Z
+
+    - Add I18N feature  
+    - allow to set configs when plugin is registered  
+
+0.12 2014-10-25T00:47:43Z
+
+    - Inherit query parameters from the current request   
+    - Replace `..` in slice with `…`  c99358b 
+    - Changed markup for active page in Bootstrap 3
+ 
+0.11 2014-08-28T09:40:07Z
+
+    - add options
+
+0.10 2014-08-28T23:28:40Z
+
+    - add more options
+
+0.09 2014-03-31T12:20:23Z
+
+    - fix document
+
+0.08 2014-03-12T09:46:56Z
+
+    - add dependency to test
+
+0.07 2014-03-04T23:01:14Z
+
+    - add document
+
+0.06 2014-03-04T11:47:34Z
+
+    - add document
+
+0.05 2014-03-03T23:03:09Z
+    
+    - add tests
+
+0.04 2014-03-03T10:47:45Z
+    - add class option    
+
+0.03 2014-03-02T20:04:42Z
+
+    - change helper name
+
+0.02 2014-03-02T19:54:15Z
+
+    - fix document     
+
+0.01 2014-03-02T19:41:49Z
+
+    - original version
+

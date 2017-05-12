@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+MotionSensor.xs
+ppport.h
+unimotion.h
+unimotion.c
+README
+t/00-use.t
+t/api.t
+lib/Mac/MotionSensor.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,28 @@
+---
+abstract: 'Email message exchange'
+author:
+  - 'Mark Overmeer'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mail-Transport
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Errno: 0
+  File::Spec: 0.7
+  IO::Socket: 0
+  List::Util: 0
+  Mail::Reporter: 3
+  Net::SMTP: 0
+version: 3.000

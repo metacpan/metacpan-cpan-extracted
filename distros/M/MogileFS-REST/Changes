@@ -1,0 +1,10 @@
+0.04  Tue Aug 2 11:00:00 2012
+    - Don't return empty 204 instead of a 404 when file doesn't exist
+
+0.03  Tue Jul 3 12:00:00 2012
+    - Fix 200 response with empty body for ?paths when file doesn't exist.
+
+0.02  Wed Jun 27 10:00:00 2012
+    - Add ?paths=1 to get the paths, rather than relying on Perlbal headers
+    - Remove Content-Length from HEAD requests
+

@@ -1,0 +1,34 @@
+Summary: Barcode Printing
+Name: libmodule-portablepath
+Version: MPPMAJOR
+Release: MPPMINOR
+License: GPL
+Group: Applications
+Source: libmodule-portablepath-MPPMAJOR-MPPMINOR.tar.gz
+URL: http://search.cpan.org/~rpettett/Module-PortablePath/
+Distribution: psyphi.net
+Vendor: psyphi.net
+Packager: Roger Pettett <rmp@psyphi.net>
+AutoReqProv: no
+
+%description
+See README
+
+%prep
+
+%build
+tar -xzf *.tar.gz
+cd Module*
+perl Build.PL --prefix=$RPM_BUILD_ROOT/usr
+./Build
+
+%install
+cd Module*
+./Build install
+find $RPM_BUILD_ROOT -name \*1 -exec gzip {} \;
+find $RPM_BUILD_ROOT -name \*1p -exec gzip {} \;
+find $RPM_BUILD_ROOT -name \*3pm -exec gzip {} \;
+find $RPM_BUILD_ROOT -type f | sed "s|$RPM_BUILD_ROOT||g" > ../rpmbuild.manifest
+
+%files -f rpmbuild.manifest
+%defattr(-,root,root)

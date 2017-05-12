@@ -1,0 +1,26 @@
+---
+name: Module-Build-Smolder
+version: 0.02
+author:
+  - 'Michael Peters <mpeters@plusthree.com>'
+abstract: Extra build targets for sending smoke tests to a Smolder server
+license: perl
+resources:
+  license: ~
+requires:
+  Module::Build: 0.32
+  Module::Build::TAPArchive: 0
+  TAP::Harness::Archive: 0.13
+  WWW::Mechanize: 0
+build_requires:
+  Capture::Tiny: 0
+  File::Path: 0
+  Test::More: 0
+provides:
+  Module::Build::Smolder:
+    file: lib/Module/Build/Smolder.pm
+    version: 0.02
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

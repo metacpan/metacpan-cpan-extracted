@@ -1,0 +1,95 @@
+#!/usr/bin/perl
+# vim: ft=perl
+
+package morph;
+{
+  $morph::VERSION = '0.46';
+}
+
+# ABSTRACT: Morpheus configuration tree dumper.
+
+
+
+use strict;
+use Morpheus;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my $format = "json";
+my $template;
+my $type;
+my $help;
+
+GetOptions(
+    "format:s" => \$format,
+    "template:s" => \$template,
+    "type:s" => \$type, # @|%|$
+    "help" => \$help,
+) or pod2usage(-verbose => 1, -exitval => 2);
+pod2usage(-verbose => 2, -exitval => 0) if $help;
+
+pod2usage(-verbose => 1, -exitval => 2, message => "--template is required for --format=tt2") if $format eq "tt2" and not $template;
+pod2usage(-verbose => 1, -exitval => 2, message => "unknown format '$format'") unless $format =~ /^(?:dumper|json|xml|tt2)$/;
+my @keys = @ARGV or pod2usage(-verbose => 1, -exitval => 2, message => "at least one 'key' is required");
+
+for my $key (@keys) {
+    my $morph = eval { morph($key, $type) };
+    if ($@) {
+        warn "$key: ", $@;
+        next;
+    }
+
+    if ($format eq "dumper") {
+        require Data::Dumper;
+        print Data::Dumper->new([])->Terse(1)->Values([$morph])->Dump();
+    } elsif ($format eq "json") {
+        require JSON;
+        print JSON::to_json($morph, { ascii => 1, pretty => 1, allow_nonref => 1 });
+    } elsif ($format eq "xml") {
+        require XML::Simple;
+        print XML::Simple::XMLout($morph, NoAttr => 1);
+    } elsif ($format eq "tt2") {
+        require Template;
+        my $tt = Template->new(ABSOLUTE => 1);
+        $tt->process($template, $morph) or die $tt->error();
+    } else {
+        die;
+    }
+}
+
+
+
+
+__END__
+=pod
+
+=head1 NAME
+
+morph - Morpheus configuration tree dumper.
+
+=head1 VERSION
+
+version 0.46
+
+=head1 SYNOPSIS
+
+    morph [--format={json|dumper|xml|tt2}] [--template=<tt2-template>] [--help] <--type={@|%|$}> key1 [key2, ...]
+
+=head1 SEE ALSO
+
+perldoc Morpheus
+
+=head1 AUTHOR
+
+Andrei Mishchenko <druxa@yandex-team.ru>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Yandex LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

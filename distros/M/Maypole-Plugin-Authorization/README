@@ -1,0 +1,42 @@
+Maypole-Plugin-Authorization version 0.05
+=========================================
+
+Maypole::Plugin::Authorization provides simple role-based authorization
+for Maypole applications. It uses the database to store permissions,
+which fits well with Maypole.
+
+It determines whether users are authorized to invoke specific methods in
+classes. Normally these methods will be actions in model classes.
+Permission to invoke methods is not granted directly; it is assigned to
+roles, and each user may be assigned one or more roles.
+
+See the POD in the module for further details.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Maypole, version 2.09 or later.
+
+It also relies on some other module to authenticate the user, but we're
+not too picky about it. See the POD and the test files for ideas. It
+should run with Maypole::Plugin::Authentication::UserSessionCookie or
+Maypole::Plugin::Authentication::Abstract, for example.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Dave Howorth
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.1 or,
+at your option, any later version of Perl 5 you may have available.
+

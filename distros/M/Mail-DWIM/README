@@ -1,0 +1,180 @@
+######################################################################
+    Mail::DWIM 0.08
+######################################################################
+
+NAME
+    Mail::DWIM - Do-What-I-Mean Mailer
+
+SYNOPSIS
+        use Mail::DWIM qw(mail);
+
+        mail(
+          to      => 'foo@bar.com',
+          subject => 'test message',
+          text    => 'test message text'
+        );
+
+DESCRIPTION
+    "Mail::DWIM" makes it easy to send email. You just name the recipient,
+    the subject line and the mail text and Mail::DWIM does the rest.
+
+    This module isn't for processing massive amounts of email. It is for
+    sending casual emails without worrying about technical details.
+
+    "Mail::DWIM" lets you store commonly used settings (like the default
+    sender email address or the transport mechanism) in a local
+    configuration file, so that you don't have to repeat settings in your
+    program code every time you want to send out an email. You are certainly
+    free to override the default settings if required.
+
+    "Mail::DWIM" uses defaults wherever possible. So if you say
+
+        use Mail::DWIM qw(mail);
+
+        mail(
+          to      => 'foo@bar.com',
+          subject => 'test message',
+          text    => 'test message text',
+        );
+
+    that's enough for the mailer to send out an email to the specified
+    address. There's no "from" field, so "Mail::DWIM" uses 'user@domain.com'
+    where "user" is the current Unix user and "domain.com" is the domain set
+    in the Perl configuration ("Config.pm"). If you want to specify a
+    different 'From:' field, go ahead:
+
+        mail(
+          from    => 'me@mydomain.com',
+          to      => 'foo@bar.com',
+          subject => 'test message',
+          text    => 'test message text',
+        );
+
+    By default, "Mail::DWIM" connects to a running sendmail daemon to
+    deliver the mail. But you can also specify an SMTP server:
+
+        mail(
+          to          => 'foo@bar.com',
+          subject     => 'test message',
+          text        => 'test message text',
+          transport   => 'smtp',
+          smtp_server => 'smtp.foobar.com',
+          smtp_port   => 25, # defaults to 25
+        );
+
+    If your SMTP server has SASL support, you can also specify a user name
+    and a password:
+
+          user     => 'joeschmoe',
+          password => 'top5ecret',
+
+    Or, if you prefer that Mail::DWIM uses the "mail" Unix command line
+    utility, use 'mail' as a transport:
+
+        mail(
+          to          => 'foo@bar.com',
+          subject     => 'test message',
+          text        => 'test message text',
+          transport   => 'mail',
+          program     => '/usr/bin/mail',
+        );
+
+    On a given system, these settings need to be specified only once and put
+    into a configuration file. All "Mail::DWIM" instances running on this
+    system will pick them up as default settings.
+
+  Configuration files
+    There is a global "Mail::DWIM" configuration file in "/etc/maildwim"
+    with global settings and a user-specific file in "~user/.maildwim" which
+    overrides global settings. Both files are optional, and their format is
+    YAML:
+
+        # ~user/.maildwim
+        from:      me@mydomain.com
+        reply-to:  me@mydomain.com
+        transport: sendmail
+
+  Error Handling
+    By default, "Mail::DWIM" throws an error if something goes wrong (aka:
+    it dies). If that's not desirable and you want it to return a true/false
+    value code instead, set the "raise_error" option to a false value:
+
+        my $rc = mail(
+          raise_error => 0,
+          to          => 'foo@bar.com',
+          ...
+        );
+
+        if(! $rc) {
+            die "Release the hounds: ", Mail::DWIM::error();
+        }
+
+    The detailed error message is available by calling Mail::DWIM::error().
+
+  Attaching files
+    If you want to include an image, a PDF files or some other attachment in
+    an email, use the "attach" parameter
+
+        mail(
+          to          => 'foo@bar.com',
+          subject     => 'Pics of my new dog',
+          attach      => ['doggie1.jpg', 'doggie2.jpg'],
+          text        => "Hey, here's two cute pictures of Fritz :)",
+        );
+
+  Sending HTML Emails
+    Many people hate HTML emails, but if you also attach a plaintext version
+    for people with arcane email readers, everybody is happy. "Mail::DWIM"
+    makes this easy with the "html_compat" option:
+
+        mail(
+          to          => 'foo@bar.com',
+          subject     => 'test message',
+          html_compat => 1,
+          text        => 'This is an <b>HTML</b> email.'
+        );
+
+    This will create two attachments, the first one as plain text (generated
+    by HTML::Text to the best of its abilities), followed by the specified
+    HTML message marked as content-type "text/html". Non-HTML mail readers
+    will pick up the first one, and Outlook-using marketroids get fancy
+    HTML. Everyone wins.
+
+  Test Mode
+    If the environment variable "MAIL_DWIM_TEST" is set to a filename,
+    "Mail::DWIM" prepares mail as usual, but doesn't send it off using the
+    specified transport mechanism. Instead, it appends outgoing mail ot the
+    specified file.
+
+    "Mail::DWIM"'s test suite uses this mode to run a regression test
+    without needing an MTA.
+
+  Why another Mail Module?
+    The problem with other Mail:: or Email:: modules on CPAN is that they
+    expose more options than the casual user needs. Why create a mailer
+    object, call its accessors and then its "send" method if all I want to
+    do is call a function that works similarily to the Unix "mail" program?
+
+    "Mail::DWIM" tries to be as 'Do-What-I-mean' as the venerable Unix
+    "mail" command. Noboby has to read its documentation to use it:
+
+        $ mail m@perlmeister.com
+        Subject: foobar
+        quack! quack!
+        .
+        Cc:
+        CTRL-D
+
+LEGALESE
+    Copyright 2007 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+        2007, Mike Schilli <cpan@perlmeister.com>
+
+LICENSE
+    Copyright 2007-2014 by Mike Schilli, all rights reserved. This program
+    is free software, you can redistribute it and/or modify it under the
+    same terms as Perl itself.
+

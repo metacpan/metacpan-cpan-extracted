@@ -1,0 +1,53 @@
+=head1 NAME
+
+Mozilla::DOM::NSHTMLHRElement
+
+=for object Mozilla::DOM::NSHTMLHRElement
+
+Mozilla::DOM::NSHTMLHRElement is a wrapper around an instance of Mozilla's
+nsIDOMNSHTMLHRElement interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+ * The nsIDOMNSHTMLHRElement interface contains extensions to the
+ * interface for [X]HTML hr elements, for compatibility with IE.
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::NSHTMLHRElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $color = $nshtmlhrelement->B<GetColor>()
+
+Output:
+
+=over
+
+=item $color (string)
+
+=back
+
+=head2 $nshtmlhrelement->B<SetColor>($color)
+
+Input:
+
+=over
+
+=item $aColor (string)
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

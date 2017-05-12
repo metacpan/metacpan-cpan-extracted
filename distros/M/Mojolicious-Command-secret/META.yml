@@ -1,0 +1,26 @@
+---
+abstract: 'Create application secrets() consisting of random bytes'
+author:
+  - 'Skye Shaw <skye.shaw AT gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Command-secret
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: 4.63
+resources:
+  bugtracker: http://github.com/sshaw/Mojolicious-Command-secret/issues
+  homepage: http://github.com/sshaw/Mojolicious-Command-secret
+  repository: http://github.com/sshaw/Mojolicious-Command-secret
+version: 0.03

@@ -1,0 +1,26 @@
+0.04 2015-10-15T23:27:06+02:00
+ - Update to Map::Tube 3.06.
+
+0.03 2015-10-04T10:24:19+02:00
+ - Add 04-map.t test.
+ - Add EXAMPLE4 to doc.
+ - Add get_line_by_id() and get_line_by_name() methods to doc.
+ - Add tests for get_node_by_id() and get_node_by_name() methods.
+ - Move author tests to xt/ directory.
+ - Rewrite SEE ALSO section to new style.
+ - Update Module::Install to 1.16 version.
+
+0.02 2015-03-04T22:33:30+01:00
+ - Add <?xml> header to XML document.
+ - Add Map::Metro::Plugin::Map::Budapest and
+   Map::Metro::Plugin::Map::Budapest::Lines to SEE ALSO section in doc.
+ - Add Map::Tube::Graph to SEE ALSO section in doc.
+ - Add Map::Tube::Nanjing to SEE ALSO section in doc.
+ - Add Map::Tube::Plugin::Graph to SEE ALSO section in doc.
+ - Add Map::Tube::Singapore to SEE ALSO section in doc.
+ - Add lines to XML document.
+ - Update copyright years to 2015.
+ - Rewrite lines in XML map.
+
+0.01 2014-12-30T16:14:42+01:00
+ - First version

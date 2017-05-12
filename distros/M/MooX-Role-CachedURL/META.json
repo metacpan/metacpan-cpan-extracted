@@ -1,0 +1,58 @@
+{
+   "abstract" : "a role providing a locally cached copy of a remote file",
+   "author" : [
+      "Neil Bowers <neil@bowers.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MooX-Role-CachedURL",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::HomeDir" : "0",
+            "File::Spec::Functions" : "0",
+            "HTTP::Tiny" : "0",
+            "Moo::Role" : "0",
+            "PerlIO::gzip" : "0",
+            "Time::Duration::Parse" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Touch" : "0",
+            "Moo" : "0",
+            "Test::File" : "0",
+            "Test::More" : "0.88",
+            "autodie" : "0",
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/MooX-Role-CachedURL",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/MooX-Role-CachedURL.git",
+         "web" : "https://github.com/neilb/MooX-Role-CachedURL"
+      }
+   },
+   "version" : "0.07"
+}
+

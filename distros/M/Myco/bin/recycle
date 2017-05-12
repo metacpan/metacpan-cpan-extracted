@@ -1,0 +1,48 @@
+#!/usr/local/bin/perl -w
+
+use warnings;
+use strict;
+use FindBin qw($Bin);
+use Getopt::Std;
+
+# Figure out wher to find the test classes.
+use lib "$Bin/../classes";
+
+our ($opt_d, $opt_u, $opt_p, $opt_h, $opt_T, $opt_D);
+getopts('d:u:p:hTD:');
+
+usage() if $opt_h;
+
+my $db = $opt_d || $ENV{PGDATABASE} || getpwuid $>;
+my $user = $opt_u || $ENV{PGUSER} || getpwuid $>;
+my $pass = $opt_p || $ENV{PGPASSWORD} || '';
+$opt_D ||= 0;
+
+if ($pass) { local $ENV{PGPASSWORD} = $pass }
+system("dropdb", '-U', $user, $db);
+system("createdb", '-U', $user, $db);
+system("$Bin/deploy", '-u', $user, '-d', $db, '-p', $pass,
+       ($opt_T ? '-T' : ()), '-D', $opt_D);
+
+sub usage {
+    my $prog = substr($0, rindex($0, '/')+1);
+
+    print qq{
+Usage: $prog [options]
+
+Supported Options:
+  -d Database name. Defaults to PGDATABASE environment variable or, failing
+     that, to the name of the current user.
+  -u Database user login. Defaults to PGUSER environment variable or, failing
+     that, to the name of the current user.
+  -p Database user password. Defaults to PGPASSWORD environment variable or,
+     failing that, to an empty string.
+  -T Enable Tangram trace. Off by default.
+  -D Enable DBI trace. Supply a value between 0 and 9 depending on how much
+     trace information you want. See the DBI man page for more information.
+     Disabled (0) by default.
+  -h Display this usage message and exit.
+
+};
+    exit;
+}

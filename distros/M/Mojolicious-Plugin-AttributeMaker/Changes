@@ -1,0 +1,32 @@
+Revision history for Mojolicious-Plugin-AttributeMaker
+
+0.06    2014-09-04
+        - fix syntax tests for old perl
+
+0.04    2014-09-04
+        - use strict and warnings
+        - fix undefined $config var
+        - fix $VERSION 
+
+04.04_005    2014-09-04
+        - Add test
+        - fix bug in attribute parsing
+        
+
+04.04_004    2014-09-03
+        -  fix tests (maybe)
+
+0.03_001    2014-09-02
+        - Add simple tests
+        - Some fix for attribute parsing (maybe)
+
+0.03    2014-08-29
+        - Add Module::Find to BUILD_REQUIRES
+
+0.02    2014-08-27
+        - Fix pod
+
+0.01    2014-08-27
+       	- First release without test. Sorry ;)
+       	- Add simple routing extension
+

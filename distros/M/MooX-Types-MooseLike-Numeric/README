@@ -1,0 +1,50 @@
+NAME
+    MooX::Types::MooseLike::Numeric - Moo types for numbers
+
+SYNOPSIS
+      package MyPackage;
+      use Moo;
+      use MooX::Types::MooseLike::Numeric qw(PositiveInt);
+
+      has "daily_breathes" => (
+        is  => 'rw',
+        isa => PositiveInt
+      );
+
+DESCRIPTION
+    A set of numeric types to be used in Moo-based classes. Adapted from
+    MooseX::Types::Common::Numeric
+
+TYPES (subroutines)
+    Available types are listed below.
+
+    PositiveNum
+    PositiveOrZeroNum
+    PositiveInt
+    PositiveOrZeroInt
+    NegativeNum
+    NegativeOrZeroNum
+    NegativeInt
+    NegativeOrZeroInt
+    SingleDigit
+
+SEE ALSO
+    MooX::Types::MooseLike - a type builder.
+
+    MooX::Types::MooseLike::Base - a set of basic types.
+
+    MooX::Types::MooseLike::Email, MooX::Types::MooseLike::DateTime
+
+AUTHOR
+    mateu - Mateu X. Hunter (cpan:MATEU) <hunter@missoula.org>
+
+CONTRIBUTORS
+    amidos - Dmitry Matrosov (cpan:AMIDOS) <amidos@amidos.ru>
+
+COPYRIGHT
+    Copyright (c) 2011-2015 the MooX::Types::MooseLike::Numeric "AUTHOR"
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

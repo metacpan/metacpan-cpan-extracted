@@ -1,0 +1,1711 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="takahashi.css" type="text/css"?>
+
+<page xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+    id="presentation" xmlns:html="http:/www.w3.org/1999/xhtml"
+    orient="vertical" onkeypress="Presentation.onKeyPress(event);">
+
+<html:textarea id="builtinCode" style="visibility: collapse">
+
+<![CDATA[
+Note: You may need to
+"zoom out" in your browser
+or set it to display text
+smaller than normal (such as
+with Cmd/Ctrl-minus), so
+you can see the longer
+lines of code
+----
+Muldis D -
+Portable Databases
+At Full Power
+(2008 July Edition)
+(Stand Alone Version)
+----
+Darren Duncan
+Muldis Data Systems
+****
+Victoria, BC, Canada
+****
+Database Software
+Products and Services
+(Perl by Default)
+----
+Miss something?
+http://muldis.com
+has a copy of this talk,
+plus a Live Talk version,
+and a list of all urls
+----
+This talk is about
+introducing "Muldis D",
+a new programming language
+for truly relational
+databases; you can see its
+official spec on CPAN or at
+http://muldis.com
+----
+The spec is mostly done but
+has a few gaps, which I will
+fill in soon; ask me if you
+can't find something
+----
+I also have a reference
+implementation in the works,
+called "Muldis Rosetta", but
+that is mostly incomplete so
+you can't actually run
+Muldis D code yet; hopefully
+you can in a few weeks
+----
+Muldis D is effectively a
+generalization of all the
+dialects of SQL out there,
+as well as a modernization
+of SQL that isn't hobbled by
+ill-conceived or out-dated
+aspects and features
+----
+Muldis D is designed as an
+intermediate language for
+translating database code
+between SQL dialects, or
+between non-SQL languages,
+while accurately preserving
+all semantics
+----
+Muldis D is a homoiconic
+declarative language; you
+write Muldis D code by
+writing data which declares
+what you want the code to
+do; this code-as-data can be
+manipulated by Muldis D code
+----
+The fundamental grammar of
+Muldis D is abstract, and
+conceptually takes the form
+of an abstract syntax tree
+(AST); Muldis D can have any
+number of concrete grammars
+which are equivalent to that
+----
+This means you can choose
+whether you write Muldis D
+code as plain text strings
+like typical languages, or
+as multi-dimensional data
+structures of some other
+host language, such as Perl
+----
+The plain text choice makes
+more sense if you want to
+use Muldis D in a more
+isolated manner, and compile
+it into apps or libraries
+the same as you would with
+C or Haskell or Perl code
+----
+The hosted data choice makes
+more sense if you want to
+actually write your Muldis D
+code in the same language as
+your main application, such
+as when dynamically
+generating database queries
+----
+Hosted data means you aren't
+stitching code strings at
+runtime, and you never have
+to escape or quote values;
+so there's no exploitable
+analogy here to the common
+SQL injection attack
+----
+The code examples in the
+rest of this talk will come
+in a variety of concrete
+grammars / dialects, some
+that are official, named
+"Tiny", and some that are
+fake
+----
+Please treat all example
+code as pseudo-code, since
+in reality you can make and
+use any concrete grammar you
+want with Muldis D
+----
+As examples, here are some
+scalar literals in the
+PTMD_Tiny dialect:
+  Bool:true
+  Int:9:42
+  Blob:F:A705E
+  Text:'サンプル'
+  Rat:radix:9:3.14159
+  Rat:ratio:9:1/43
+----
+And here are the same scalar literals in the
+HDMD_Perl_Tiny dialect:
+  [ 'Bool', 'perl_bool', Bool::True ] # Perl 6 only
+  [ 'Bool', 'perl_bool', (1 == 1) ]  # alternative
+  [ 'Int', 'perl_int', 42 ]
+  [ 'Blob', 'md_blob', 'F', 'A705E' ]
+  [ 'Text', 'サンプル' ]
+  [ 'Rat', 'perl_rat', 3.14159 ]
+  [ 'Rat', 'perl_int_ratio', [ 1, 43 ] ]
+Note this grammar has more
+lit formats to choose from
+----
+Muldis D is intended to be
+used as a toolkit for
+building better database
+wrappers, persistence tools,
+abstraction frameworks,
+migration tools, ORMs, etc,
+in any gen purpose language
+----
+Such projects could use it
+as the design of their
+internal AST for database
+meta-data, schemas, queries,
+data, rather than
+proprietary ones, or as an
+interchange format for such
+----
+Muldis D is also intended to
+be used by actual DBMSs, as
+the design of their internal
+AST that input queries are
+parsed into, or as their
+public query language as an
+alternative to taking SQL
+----
+Please note that Muldis D is
+fundamentally verbose, like
+an AST; so this talk will
+just have trivial code
+examples, and will explain
+most language features in
+words
+----
+Also, most of the talk
+should be taken as a list
+of comparisons or contrasts
+between Muldis D and SQL,
+and many things are better
+explained in words than
+with code
+----
+Muldis D is not DWIM where
+DWIM means guessing;
+traditionally implicit
+semantic differences between
+various languages / dialects
+become explicit decisions
+or options in Muldis D
+----
+For example, the semantics
+for when and how a number
+loses precision or is
+rounded are made explicit;
+or when and how the case
+or accents or whitespace of
+text affects comparisons
+----
+How Muldis D specifies
+behaviour is done in as
+neutral and portable a
+manner as possible; for
+example, all numbers are
+radix-agnostic in concept,
+regardless of implementation
+----
+Muldis D is intended to be
+a "D" language as defined by
+"Databases, Types, and
+The Relational Model:
+The Third Manifesto" (TTM),
+a book by Hugh Darwen
+and Christopher J. Date
+----
+The main part of the book,
+chapter 4, is also a free
+download at their website
+****
+http://thethirdmanifesto.com
+----
+The "D" part of "Muldis D"
+refers to "D language;
+it doesn't refer my name
+****
+Also, "Muldis" means
+"Multiverse of Discourse"
+----
+Not accustomed to some
+basic relational terms?
+Here's what refers to what:
+  attribute : field/column
+  tuple     : row
+  relation  : rowset
+  relvar    : table
+  dbvar     : database
+----
+Muldis D doesn't use the
+word "object" since that
+doesn't distinguish between
+the concepts of "value"
+and "variable"; the latter
+terms are used instead
+----
+A value is conceptually
+unique, eternal, immutable,
+and isn't fixed in time
+or space; it has no address;
+a variable is the opposite
+----
+We also say "selector"
+rather than "constructor"
+for a routine; it doesn't
+make sense to say we are
+"building" a value; rather
+we're "selecting" one
+----
+A Muldis D "data type" is a
+set of values; a subtype /
+supertype relationship means
+subset / superset of values
+----
+A union type or intersection
+type is a type whose values
+are the union or
+intersection, respectively,
+of multiple other types
+----
+Subtyping in Muldis D, as in
+any "D" language, takes the
+form of "specialization by
+constraint", not
+"specialization
+by extension"
+----
+So an example type "circle"
+is a subtype of "ellipse",
+and "coloured circle" is
+neither a subtype of
+"circle" nor of "colour";
+rather, a "coloured circle"
+is a multi-component type
+----
+Most Muldis D types are
+scalar or nonscalar (tuple
+or relation) types, and a
+database can only be made of
+those; there also exist
+quasi- variants, used just
+with parameters and lexicals
+----
+Tuple and relation types
+are conceptually
+non-encapsulated; they are
+the fundamental
+heterogeneous and
+homogeneous collection
+types, respectively
+----
+A tuple is like a SQL row
+but that a tuple's attrs all
+have names, those names are
+all distinct, and the attrs
+are *not* ordered; you only
+ref them by name; also, a
+tuple may have zero attrs
+----
+A relation is like a SQL
+rowset as a tuple is like a
+SQL row, but that a relation
+is a set of tuples and never
+has duplicate tuples; also,
+a relation's tuples are
+never ordered
+----
+Tuples in PTMD_Tiny dialect:
+  Tuple:{}
+  Tuple:{
+    'login_name' => Text:'hartmark',
+    'login_pass' => Text:'letmein',
+    'is_special' => Bool:true,
+  }
+  Tuple:{
+    'name' => Text:'Michelle',
+    'age'  => Int:9:17,
+  }
+----
+Same in PTMD_Perl_Tiny dialect:
+  [ 'Tuple', {} ]
+  [ 'Tuple', {
+    'login_name' => [ 'Text', 'hartmark' ],
+    'login_pass' => [ 'Text', 'letmein' ],
+    'is_special' => [ 'Bool', 'md_enum', 'true' ],
+  } ]
+  [ 'Tuple', {
+    'name' => [ 'Text', 'Michelle' ],
+    'age'  => [ 'Int', 'perl_int', 17 ],
+  } ]
+----
+Relations in PTMD_Tiny dialect:
+  Relation:{}
+  Relation:{ {}, }
+  Relation:{ 'x', 'y', 'z', }
+  Relation:{
+    {
+      'login_name' => Text:'hartmark',
+      'login_pass' => Text:'letmein',
+      'is_special' => Bool:true,
+    },
+  }
+  Relation:[ 'name', 'age', ]:{
+    [ Text:'Michelle', Int:9:17, ],
+  }
+----
+Same in PTMD_Perl_Tiny dialect:
+  [ 'Relation', [] ]
+  [ 'Relation', [ {}, ] ]
+  [ 'Relation', [ 'x', 'y', 'z', ] ]
+  [ 'Relation', [
+    {
+      'login_name' => [ 'Text', 'hartmark' ],
+      'login_pass' => [ 'Text', 'letmein' ],
+      'is_special' => [ 'Bool', 'md_enum', 'true' ],
+    },
+  ] ]
+  [ 'Relation', [ 'name', 'age', ], [
+    [ [ 'Text', 'Michelle' ], [ 'Int', 'perl_int', 17 ], ],
+  ] ]
+----
+Muldis D also has canonical
+representations of plain
+sets, arrays, and bags,
+represented by the special
+Set, Array, and Bag types
+----
+These are just relations
+with pre-defined attributes,
+and the Tiny dialects also
+have special syntax for them
+----
+Scalar types are
+conceptually encapsulated;
+they're like OO languages'
+concepts of object classes
+where all their attributes
+are private, and only
+accessible indirectly
+----
+The definition of a scalar
+type comprises usually one
+or more named "possreps" or
+"possible representations",
+each of which looks like a
+tuple; a possrep is like an
+OO "role" or "interface"
+----
+Next are example literals of
+a user-defined WeekDay type,
+which is an enumerated type;
+it has 2 possreps called
+'name' and 'number', each of
+those having a single attr
+named with the empty string
+----
+PTMD_Tiny dialect:
+  Scalar:'fed.lib.the_db.WeekDay':'name':{
+    '' => Text:'monday',
+  }
+  Scalar:'fed.lib.the_db.WeekDay':'number':{
+    '' => Int:9:5,
+  }
+HDMD_Perl_Tiny dialect:
+  [ 'Scalar', 'fed.lib.the_db.WeekDay', 'name', {
+    '' => [ 'Text', 'monday' ],
+  } ]
+  [ 'Scalar', 'fed.lib.the_db.WeekDay', 'number', {
+    '' => [ 'Int', 'perl_int', 5 ],
+  } ]
+----
+A few scalar types are
+special and don't have any
+possreps: Bool, Int, Blob,
+Text; a few others exist too
+but those aren't intended
+for general purpose use
+----
+Next are a few details about
+the system-defined generic
+scalar types; all of them
+(where applicable) are
+"big", such that the size of
+their values is limited only
+by system resources
+----
+Boolean types
+----
+Muldis D:
+  Bool
+SQL:
+  BOOLEAN, TINYINT(1),
+  INTEGER, NUMBER(1), ...
+----
+Numeric types
+----
+Muldis D:
+  Int, Rat
+SQL:
+  TINYINT, SMALLINT,
+  MEDIUMINT, INTEGER,
+  BIGINT, NUMERIC, NUMBER,
+  DECIMAL, REAL, FLOAT,
+  DOUBLE, BIT, PLS_INTEGER,
+  BINARY_INTEGER, ...
+----
+The Int and Rat types are
+bigints / bugnums; they are
+radix agnostic and exact
+precision, able to represent
+all rational numbers, both
+fixed and floating point
+----
+The Int type has no possrep;
+the Rat type has 2 possreps
+and is defined in terms of
+Ints, either as the
+[numerator, denominator]
+pair or the [mantissa,
+radix, exponent] triple
+----
+Binary string types
+----
+Muldis D:
+  Blob
+SQL:
+  BIT, BINARY, VARBINARY,
+  TINYBLOB, BLOB,
+  MEDIUMBLOB, LONGBLOB,
+  BYTEA, RAW, LONG RAW, ...
+----
+Character string types
+----
+Muldis D:
+  Text
+SQL:
+  CHAR, VARCHAR, TINYTEXT,
+  TEXT, MEDIUMTEXT,
+  LONGTEXT, CLOB,
+  NATIONAL variants,
+  VARCHAR2, LONG, ...
+----
+All Muldis D character
+string types are Unicode
+----
+Muldis D has temporal and
+spatial data types, for
+dates, times, durations,
+2D geometrics, GIS
+components, etc; they have
+possreps defined over Int
+and Rat; they're incomplete
+----
+Muldis D routines mainly
+come in 3 kinds: functions,
+updaters and procedures
+----
+Functions
+----
+  create in fed.myapp
+  function cube {
+    result sys.std.Core.Type.Int
+    params { topic(sys.std.Core.Type.Int) }
+    exprs {
+      exp(sca_lit Int:9:3),
+      ''(func_invo sys.std.Integer.power
+        args { radix(lex.topic), exponent(lex.exp) }
+      ),
+    }
+  }
+----
+Functions are pure and
+may only be invoked in value
+expressions; a function has
+just read-only parameters
+may only consist of a value
+expression, and may only
+invoke functional routines
+----
+Updaters
+----
+  create in fed.myapp
+  updater chop_sign {
+    upd_params { topic(sys.std.Core.Type.Int) }
+    exprs {
+      abs_val(func_invo sys.std.Integer.abs
+        args { topic(lex.topic) }
+      ),
+    }
+    stmt {
+      sys.std.Core.Universal.assign
+        upd_args { target(lex.topic) }
+        ro_args { v(lex.abs_val) },
+    }
+  }
+----
+Updaters are imperative but
+all of their statements will
+execute simultaneously, as
+if they are just a single
+more complex statement that
+may update multiple
+subject-to-update params
+----
+Functions and updaters are
+fully deterministic, have no
+lexical vars, can't see
+global vars; they execute as
+an implicit atomic unit, and
+an implementation may safely
+refactor them, what they inv
+----
+Both have value expressions
+that are arbitrarily complex
+and are composed of sets of
+named nodes; this node
+naming helps with self-doc,
+and lets common sub-exprs
+be factored to one instance
+----
+Procedures
+----
+  create in fed.myapp
+  procedure fetch_all_people {
+    upd_params { people(type.var.fed.mydb.people) }
+    stmts [
+      proc_invo sys.std.Core.Universal.assign
+        upd_args { target(lex.people) }
+        ro_args { v(fed.mydb.people) },
+    ]
+  }
+----
+Procedures are imperative,
+can see/update global vars,
+can have lexical vars; they
+have a sequence of stmts
+that execute one at a time
+in order; some stmts may be
+non-deterministic
+----
+Only procedures may have
+side-effects in non-args;
+they can't have value exprs;
+they are pure imperative as
+functions are pure
+functional; updaters bridge
+the gap between these
+----
+All 3 routine kinds may, and
+often do, have other "inner"
+routines declared within
+themselves, allowing them to
+be arbitrarily complex
+without forcing parts to be
+externalized as public rtns
+----
+For example, to represent a
+SQL procedure like this:
+  CREATE PROCEDURE count_people
+      (INOUT p_count INT)
+    SELECT COUNT(*)
+    INTO p_count
+    FROM mydb.people;
+... a Muldis DB procedure would
+use an inner updater to hold the
+"COUNT(*) FROM people" portion,
+which is a value expression
+----
+  create in fed.myapp
+  procedure count_people {
+    upd_args { p_count(sys.std.Core.Type.UInt) }
+    stmts [
+      proc_invo inn.icount
+        upd_args { p_count(lex.p_count) }
+        ro_args { the_db(fed.mydb) },
+    ]
+    updater icount {
+      upd_params { p_count(sys.std.Core.Type.UInt) }
+      ro_params { the_db(type.var.fed.mydb) }
+      exprs {
+        pc(func_invo sys.std.Core.Relation.cardinality
+          args { topic(lex.the_db.people) }
+        ),
+      }
+      stmt {
+        sys.std.Core.Universal.assign
+          upd_args { target(lex.p_count) }
+          ro_args { v(lex.pc) },
+      }
+    }
+  }
+----
+Another use of inner
+routines is to support
+internal recursion; for
+functions, this is like
+a named WITH RECURSIVE
+section in SQL; inners
+are like WITH in general
+----
+All routine parameters are
+named, not positional; also,
+every argument is explicitly
+marked with whether it might
+be updated or not, both
+helping self-documentation
+----
+Muldis D merges the generic
+concept of an N-ary operator
+with the SQL concept of an
+aggregate operator; any
+built-in funcs that could be
+N-ary are so defined, and
+can be used in a summary
+----
+Examples are: boolean and,
+or, xor; ordinal min, max;
+numeric sum, product; string
+catenation; relational join,
+product, union, intersect;
+these are all associative,
+and almost all commutative
+----
+Nonscalar attributes
+----
+Data types and the
+relational model are
+orthogonal; a Muldis D
+attribute value may be a
+tuple or a relation, not
+just a scalar
+----
+All of the same relational
+ops work with relations in
+attributes as with relvars;
+Muldis D doesn't distinguish
+the SQL concept of a
+MULTISET from a table/rowset
+----
+Consistency is good
+----
+Support for tuple-valued
+attributes (TVAs) and
+relation-valued attributes
+(RVAs) is mandatory in a
+"D" language, and they are
+extremely useful
+----
+An RVA means a single query
+can return parent and child
+tuples together, without
+redundancy; child tuples are
+in an RVA of parent tuples
+----
+This form is natural for
+many forms of use, such as
+for display to users in a
+multi-level report
+----
+Similarly, you don't have to
+use association tables for a
+many-to-many relationship;
+you don't have to split up a
+relvar into several for
+normalization
+----
+  Relation:[ 'order_id', 'cust_id', 'order_item' ]:{
+    [ Int:9:5073, Int:9:209, Relation:{
+      { 'prod_id' => Text:'paint',  'qty' => Int:9:3 },
+    } ],
+    [ Int:9:5074, Int:9:332, Relation:{
+      { 'prod_id' => Text:'axle',  'qty' => Int:9:20 },
+      { 'prod_id' => Text:'lever', 'qty' => Int:9:50 },
+      { 'prod_id' => Text:'paint', 'qty' => Int:9:8 },
+    } ],
+    [ Int:9:5075, Int:9:17, Relation:{
+      { 'prod_id' => Text:'banana', 'qty' => Int:9:100 },
+      { 'prod_id' => Text:'orange', 'qty' => Int:9:160 },
+    } ],
+  }
+----
+Values in logic
+----
+Muldis D natively uses
+2-valued logic, and lacks
+the SQL concept of a 3+VL
+NULL where NULL doesn't
+equal itself (or sometimes
+does or doesn't); all Muldis
+D values equal themselves
+----
+However, Muldis D *does*
+have an alternate canonical
+way to say "N/A" or
+"unknown" etc, with just
+2-valued logic
+----
+The canonical way to make
+an attribute conceptually
+nullable is to make it an
+RVA, specifically a Maybe,
+which is a special subtype
+of Set having either zero
+tuples or one
+----
+So a test for IS (NOT) NULL
+becomes a test for is the
+Maybe/RVA empty or not;
+empty means IS NULL, and
+non-empty means IS NOT
+NULL, such that the tuple's
+attribute is the known value
+----
+This approach brings
+consistency for outer-joins;
+result attributes from the
+possibly missing tuples are
+RVAs with either zero or 1+
+tuples
+----
+Together with the use
+of RVAs to collect parent
+and child records, an outer
+join can mean the RVAs of
+child records have zero or
+more tuples rather than 1+
+----
+Identity matters
+----
+Muldis D's generic
+"is_identical" and "assign"
+operators work for all
+types, including nonscalars,
+so you can compare or assign
+whole relations without
+contrivances
+----
+With character data,
+"is_identical" treats any
+differences in case or
+accents or whitespace as
+significant, and so any
+derived ops like relational
+joins and unions do also
+----
+If one wants, for example,
+case-insensitive matching,
+they must explicitly
+normalize the operands in
+question to the same case
+----
+Muldis D works with text
+at the highest Unicode level
+of abstraction, in terms of
+language-independent
+graphemes, so the codepoints
+used are not a logical
+distinction for identity
+----
+With numeric data, Muldis D
+treats even floating-point
+derived values as exact
+values; "is_identical" will
+only result in TRUE if all
+bits of the significand and
+exponent are the same
+----
+If one wants, for example,
+approximate matching such as
+just on significant figures,
+they must explicitly round
+the operands to remove the
+insignificant portions
+----
+Muldis D is type safe and
+strongly typed; there is no
+implicit / automatic
+sideways type conversion or
+casting; for example, from
+a Rat to an Int or from a
+number to character data
+----
+Tuples in a relation are
+always identified by the
+values of their explicitly
+defined attrs; there are no
+special implicit extra attrs
+like an automatically
+generated SQL "row id"
+----
+Virtual reality
+----
+A fundamental feature of a
+relational database is that
+multiple perceptions of the
+same data can exist at once;
+each user can perceive the
+same data being organized
+according to their own prefs
+----
+Even if the actual means of
+storing data changes over
+time, users continue to be
+able to perceive it in the
+same ways as before the
+change
+----
+In Muldis D, an attr of a
+var can itself be treated as
+a var; if the latter is
+updated, the actual effect
+is to update the former to
+the same value it had but
+for one changed attr value
+----
+The most significant example
+of this feature is that an
+entire database is really
+just a single tuple variable
+whose attributes are all
+relations (or databases);
+the relvars are virtual
+----
+The SQL concept of multiple
+schemas in a database, as
+namespaces for organizing
+tables, is realized in
+Muldis D with DB attrs being
+themselves databases, whose
+attrs are relations
+----
+The SQL concept of viewed
+tables versus base tables is
+represented in Muldis D by
+declaring special functional
+dependencies between several
+database relvars, using
+mapping functions
+----
+The "virtual" relvars are
+defined that their values
+can always be generated,
+using the mapping functions,
+from other relvars, so
+updates to the latter always
+result in upd to the former
+----
+As with SQL's views, such
+"dependent" virtual relvars
+are sometimes directly
+updateable, such that their
+"determinant" base relvars
+are also updated, and
+sometimes they're read-only
+----
+This same virtual attribute
+concept also applies to
+tuples in general, so the
+same Muldis D feature covers
+the SQL concept of a
+"generated column" as well,
+generated from other attrs
+----
+As a use case example, say
+you conceptually want a
+simple (unique) key
+constraint on a relation's
+text attribute that is
+case-insensitive, but you
+want the text case preserved
+----
+You can do this by making a
+virtual attribute defined as
+a case-folded version of the
+first, and then you actually
+make a key of the virtual
+attribute
+----
+System Catalog
+----
+The SQL concept of an
+"information schema" is
+represented in Muldis D by
+its "system catalog", which
+is a special dbvar that is
+separate from the dbvar
+holding ordinary user data
+----
+The Muldis D system catalog
+is updateable, and in fact,
+updating the catalog is
+*the* fundamental way to do
+data-definition in Muldis D;
+any DD-specific routines are
+just abstractions of this
+----
+So, for example, to create a
+new data relvar, you insert
+records into appropriate
+catalog relvars that
+describe it; the data relvar
+then comes into existence as
+a side-effect of the inserts
+----
+Similarly, to create a new
+user-defined data type or
+routine, you insert its
+code-as-data into the
+catalog; the code compiles
+and becomes runnable as a
+side-effect
+----
+You even perform the analogy
+of connecting or
+disconnecting a DBMS by
+inserting or deleting
+catalog records that
+describe the connection
+----
+Generally speaking, users
+can do absolutely everything
+in the DBMS with just data
+querying and updating
+operations
+----
+In particular, you should
+see that SQL's ALTER
+statements have a much more
+flexible analogy in Muldis
+D, where you can just update
+records in an ad-hoc way;
+changed code auto-recompiles
+----
+Since the catalog contents
+are abstract AST-like data
+structures (that are tuples
+and relations), and not code
+strings, its easy for a DB
+wrapper to introspect the
+DB, even its stored routines
+----
+The system catalog also
+reflects all system-defined
+entities, but this portion
+is read-only
+----
+Depots
+----
+A depot is a local
+abstraction of a typically
+external storage system
+which holds 1 user data
+dbvar and 1 associated
+catalog dbvar (and maybe
+details to map actuality)
+----
+Generally speaking, the SQL
+concept of "the database"
+is represented by a depot,
+which packages together user
+data and user-defined types
+and routines
+----
+A depot can also have just
+code; then it is
+essentially a dynamically
+loaded library
+----
+A DBMS can mount multiple
+depots at once, under their
+own namespaces, like a
+filesystem
+----
+You can perform
+cross-database queries or
+updates on multiple depots
+by mounting them at once;
+they are like one database
+during that time,
+definition isolation aside
+----
+So cloning a database is
+essentially just a variable
+assignment from one depot's
+data/catalog dbvars to those
+of another depot
+----
+A depot is a completely
+independent unit; all types
+or constraints defining a
+dbvar or routine are always
+kept with it
+----
+A depot can't have external
+dependencies to understand
+its contents, implementing
+DBMS aside; there can't be
+any inter-depot constraints,
+but depots can call each
+others' routines
+----
+Even code and data that is
+conceptually part of the
+application lives in depots,
+and you do data definition
+or manipulation with such
+in the same way
+----
+A depot can be persistent
+or transient, the latter
+kind being where "temporary"
+entities probably should
+live, such as one-off
+generated query routines
+----
+A depot can be mounted
+read-only
+----
+Authentication details like
+DB user/pass apply per-depot
+mount, not on a whole DBMS;
+you can mount the same DB
+several times, say while
+authenticated as different
+users
+----
+Entity Names
+----
+Muldis D has a hierarchical
+namespace for all invokable
+DBMS entities, both system
+and user-defined, including
+depots, variables, types,
+and routines
+----
+Entities are always invoked
+fully-qualified with their
+namespace, rather than
+unqualified; for example,
+"sys.std.Rational.sum" is
+used rather than "sum"
+----
+Doing this reduces ambiguity
+and bugs that can result
+from name searches; for
+example, a call to just
+"sum" might break or change
+behaviour if a new "sum" is
+declared more locally
+----
+Another advantage is that
+picking which of multiple
+"sum" to dispatch to doesn't
+have to depend on names or
+declared types of arguments;
+only the routine name is
+needed to determine invocant
+----
+System-defined entities are
+under the top namespace
+"sys", which is subdivided
+mainly into "sys.std", for
+official Muldis D features,
+and "sys.imp", for extra
+implementation-specifics
+----
+Controls for mounting and
+unmounting depots are under
+the top namespace "mnt"
+----
+Global-scope user-defined
+entities are all under the
+top namespaces "fed", "dep",
+"sdp", "pkg"; they mean
+all depots, current depot,
+current schema, current
+Oracle-concept package
+----
+Lexical-scope user-defined
+entities are all under "inn"
+and "lex"; the first is for
+local inner types/routines,
+the second is for the curr
+routine's param args, vars,
+expression nodes, etc
+----
+Some Muldis D features make
+use of special prefixes or
+suffixes to entity names,
+such as for drilling into
+var attrs, or for avoiding
+type def explosions, or for
+taking the type of something
+----
+Entity names are as per
+delimited SQL identifiers,
+being case/etc sensitive and
+having no reserved words;
+they are Unicode strings and
+may be the empty string;
+users have complete freedom
+----
+Code comparisons
+----
+Muldis D:
+  'x'
+SQL (as a scalar query):
+  (SELECT 'x')
+or:
+  (SELECT 'x' FROM dual)
+----
+Muldis D:
+  tab1
+SQL:
+  SELECT * FROM tab1
+----
+Muldis D:
+  sys.std.Core.Relation.cardinality(
+    topic(tab1)
+  )
+SQL (as a scalar query):
+  (SELECT COUNT(*) FROM tab1)
+----
+Muldis D:
+  sys.std.Core.Relation.projection(
+    topic(tab1),
+    attrs(Set:{ 'col1', 'col2' }),
+  )
+SQL:
+  SELECT DISTINCT col1, col2
+  FROM tab1
+----
+Muldis D:
+  sys.std.Core.Relation.semijoin(
+    source(tab1),
+    filter(Relation:{
+      { col1(Text:'hello'), col2(Int:9:5) },
+      { col1(Text:'world'), col2(Int:9:7) },
+    }),
+  )
+----
+SQL:
+  SELECT *
+  FROM tab1
+  WHERE (col1, col2) IN (
+    SELECT 'hello' AS col1, 5 AS col2
+    UNION
+    SELECT 'world' AS col1, 7 AS col2
+  )
+or:
+  SELECT *
+  FROM tab1
+  WHERE col1 = 'hello' AND col2 = 5
+     OR col1 = 'world' AND col2 = 7
+----
+Alternately you can use
+"semidifference" if you want
+tuples that *don't* match,
+like a NOT IN subquery
+----
+Alternately you can use
+"restrict" for generic
+boolean expressions besides
+matches/not-matches,
+like a generic WHERE
+----
+The next example is a
+natural join of 2 relations
+whose attrs are as follows:
+  tab1(col1,col2,col3)
+  tab2(col2,col3,col4)
+such that the result is:
+  tab(col1,col2,col3,col4)
+----
+Muldis D:
+  sys.std.Core.Relation.join(
+    topic(QuasiSet:{ tab1, tab2 }),
+  )
+SQL:
+  SELECT DISTINCT tab1.*, tab2.col4
+  FROM tab1 NATURAL INNER JOIN tab2
+or:
+  SELECT DISTINCT tab1.*, tab2.col4
+  FROM tab1 INNER JOIN tab2 USING (col2, col3)
+or:
+  SELECT DISTINCT tab1.*, tab2.col4
+  FROM tab1 INNER JOIN tab2
+    ON tab2.col2 = tab1.col2 AND tab2.col3 = tab1.col3
+----
+Muldis D:
+  sys.std.Core.Relation.rename(
+    topic(tab1),
+    map(Relation:['before','after']:{
+      ['col1', 'foo'],
+      ['col3', 'bar'],
+    }),
+  )
+SQL:
+  SELECT col1 AS foo, col2, col3 AS bar
+  FROM tab1
+----
+Muldis D:
+  with { function myext {
+      result sys.std.Core.Type.Tuple
+      params { topic(sys.std.Core.Type.Tuple) }
+      body { Tuple:{
+        a => Text:'x',
+        b => sys.std.Integer.difference(
+          minuend(lex.topic.m),
+          subtrahend(lex.topic.n)
+        ), } }
+  }, }
+  sys.std.Core.Relation.extension(
+    topic(tab1), func(inn.myext), )
+SQL:
+  SELECT tab1.*, 'x' AS a, (tab1.m - tab1.n) AS b FROM tab1
+----
+Now that last Muldis D
+example shows the use of a
+closure; the "extension"
+operator takes a relation
+and a function reference,
+which it invokes on every
+tuple of the relation
+----
+Closures like this are used
+with many other functions
+too such as "projection"
+and "summary"; closures are
+exactly how a general
+purpose language would
+implement such functions
+----
+Database constraints
+----
+Given that "the database" in
+Muldis D is a variable, it
+has a data type, and most of
+the common database
+constraints are canonically
+expressed as type
+constraints
+----
+A generic constraint
+function can be applied to
+a whole database, or per
+whole relvar, or per relvar
+tuple; it takes the value to
+test as its argument and
+results in a boolean
+----
+A generic constraint
+function is a generalization
+of SQL's concept of a CHECK
+constraint, as well as some
+kinds of SQL triggers
+----
+The DBMS would automatically
+apply constraints to the
+database at the end of each
+executed statement, and it
+would throw an exception if
+any resulted in FALSE
+----
+Constraints can not be
+deferred, so the database is
+always in a valid state; but
+thanks to Muldis D being
+able to update multiple
+variables simultaneously,
+this isn't ever a problem
+----
+For example, if a constraint
+says that each bank account
+credit needs a corresponding
+debit, you don't need to
+defer constraint checking to
+the end of the latter; you
+can do both changes at once
+----
+As canonical abstractions of
+these constraint functions,
+Muldis D provides analagous
+syntax to SQL's unique key
+and foreign key constraints;
+the former is on a relation,
+the latter between db attrs
+----
+Muldis D also provides
+distributed unique/foreign
+key constraints; the first
+tests that several relations
+have no key values in
+common, the second lets any
+of mult rels have the parent
+----
+As an example use case of
+a distributed unique key,
+say a library has books and
+DVDs, each having different
+descriptive details, but
+there is a common catalogue
+id system shared by both
+----
+Say then that you have
+separate relvars for your
+book and DVD inventory; a
+distributed unique key can
+ensure that catalogue item
+ids are mutually distinct
+between the 2 relvars
+----
+And an example of a
+distributed foreign key?
+Take a loan record; a fk
+that targets books+DVDs
+ensures the cat id of the
+materials borrowing record
+matches a library property
+----
+Muldis D fully supports keys
+consisting of multiple
+attributes, for all kinds of
+key constraints
+----
+Transition constraints are a
+main exception; those apply
+to a variable rather than
+being a type constraint;
+they check that a var may
+change directly from its old
+value to its new value
+----
+Transactions
+----
+All "D" languages are ACID
+compliant and support
+arbitrary depth nested
+transactions; you can start
+a transaction within
+another one
+----
+This lets code blocks make
+themselves atomic without
+worry of how calling code
+uses transactions
+----
+Only a parent-most
+transaction commit will
+cause actual commit; child
+transactions make it easy to
+rollback just part of the
+overall transaction
+----
+A transaction will subjugate
+all mounted depots together,
+so they commit or rollback
+as a unit
+----
+Muldis D transactions are
+always explicitly tied to
+lexical scopes
+----
+They are also tied to the
+exception control-flow
+mechanism; when you enter a
+"try" block, that begins a
+new child transaction
+----
+If the "try" block executes
+to its end normally, its
+transaction commits; if the
+"try" block abnormally ends
+with an exception (that it
+catches), its transaction
+rolls back
+----
+So transactions are easy to
+get right even when a block
+has multiple exit points,
+or throws exceptions; no
+worry about mis-matched
+transaction start/end
+statement calls
+----
+A Muldis D DBMS *must*
+rollback incomplete
+transactions on disconnect;
+only an explicit success can
+commit; many SQL DBMSs do
+that too, which is good
+----
+Some SQL DBMSs will
+auto-commit an incomplete
+transaction, which is bad;
+that kind of behaviour makes
+a DBMS unreliable with any
+unexpected failure
+----
+In Muldis D, all kinds of
+changes are subject to
+transactions, including
+data definition; so schema
+changes due to updating the
+system catalog can also be
+rolled back
+----
+Muldis Rosetta
+----
+Muldis Rosetta is the
+reference implementation of
+Muldis D; it *is* a DBMS;
+it is mostly incomplete and
+can't run Muldis D code yet;
+it should be working soon
+----
+Muldis Rosetta presents the
+concept of a DBMS as a
+virtual machine; the DBMS is
+embedded in your development
+environment; it needn't be
+an external program from
+your app
+----
+The DBMS is like a module in
+your app, providing
+relational operators for
+munging app variables, as
+well as being a state
+managing solution for
+relvars/dbvars
+----
+Whether the DBMS is actually
+embedded or external, you
+code to it the same way,
+like local vs remote
+procedure calls; you write
+queries as named routines to
+invoke later
+----
+Muldis Rosetta is
+implemented in Perl,
+having twin Perl 5 and
+Perl 6 native versions
+----
+Perl has lots of fundamental
+Muldis D features built-in;
+we leverage those directly,
+just generating equivalent
+Perl code from Muldis D
+code, and execute this so
+Perl does most of the work
+----
+Perl builtins include: can
+invoke compiler at runtime,
+extensive meta-model, text
+is Unicode, unlim length,
+bigint/num, ad-hoc multi-dim
+data structures, closures,
+map|grep, garbage collection
+----
+Muldis Rosetta is a
+framework like the Perl DBI,
+with separate Interface and
+Engines; develop/test on
+one DBMS, deploy on another;
+has a common Validator test
+suite for all Engines
+----
+Standalone Example Engine is
+bundled with the Interface
+and Validator; develop/test
+a database app without a
+"real" DBMS; Example just
+demos semantics, is for
+learning from, doesn't scale
+----
+Most Engines likely to
+bridge with existing DBMSs;
+Muldis Rosetta is designed
+to expose all the features,
+speed of underlying DBMS;
+you get rigorous portability
+while operating full speed
+----
+Thank you!
+----
+Copyright © 2008,
+Darren Duncan
+****
+http://muldis.com
+for email, see above
+----
+This slideshow text is
+free documentation for software;
+you can redistribute it and/or
+modify it under the terms of the
+GNU General Public License (GPL) as
+published by the Free Software Foundation
+(http://www.fsf.org/); either
+version 3 of the License,
+or (at your option) any later version.
+]]>
+</html:textarea>
+
+<deck flex="1" id="deck">
+
+<vbox flex="1" onmousemove="Presentation.onMouseMoveOnCanvas(event);">
+  <toolbox id="canvasToolbar">
+    <toolbar>
+      <toolbarbutton oncommand="Presentation.home()" label="|&lt;&lt;"
+        observes="canBack"/>
+      <toolbarbutton oncommand="Presentation.back()" label="&lt;"
+        observes="canBack"/>
+      <toolbarbutton oncommand="Presentation.forward()" label="&gt;"
+        observes="canForward"/>
+      <toolbarbutton oncommand="Presentation.end()" label="&gt;&gt;|"
+        observes="canForward"/>
+      <toolbarseparator/>
+      <hbox align="center">
+        <textbox id="current_page" size="4"
+          oninput="if (this.value) Presentation.showPage(parseInt(this.value)-1);"/>
+        <description value="/"/>
+        <description id="max_page"/>
+      </hbox>
+      <toolbarseparator/>
+      <vbox flex="2">
+        <spacer flex="1"/>
+        <scrollbar id="scroller"
+          align="center" orient="horizontal"
+          oncommand="Presentation.showPage(parseInt(event.target.getAttribute('curpos')));"
+          onclick="Presentation.showPage(parseInt(event.target.getAttribute('curpos')));"
+          onmousedown="Presentation.onScrollerDragStart();"
+          onmousemove="Presentation.onScrollerDragMove();"
+          onmouseup="Presentation.onScrollerDragDrop();"/>
+        <spacer flex="1"/>
+      </vbox>
+      <toolbarseparator/>
+      <spacer flex="1"/>
+      <toolbarseparator/>
+      <toolbarbutton id="toggleEva" label="Eva"
+        type="checkbox"
+        autoCheck="false"
+        oncommand="Presentation.toggleEvaMode();"/>
+      <toolbarseparator/>
+      <toolbarbutton label="Edit"
+        oncommand="Presentation.toggleEditMode();"/>
+      <toolbarbutton oncommand="Presentation.reload();" label="Reload"/>
+    </toolbar>
+  </toolbox>
+  <vbox flex="1" id="canvas"
+    onclick="Presentation.onPresentationClick(event);">
+    <spacer flex="1"/>
+    <hbox flex="1">
+      <spacer flex="1"/>
+      <vbox id="content"/>
+      <spacer flex="1"/>
+    </hbox>
+    <spacer flex="1"/>
+  </vbox>
+</vbox>
+
+<vbox flex="1" id="edit">
+  <toolbox>
+    <toolbar>
+      <toolbarbutton label="New Page"
+        oncommand="Presentation.addPage()"/>
+      <spacer flex="1"/>
+      <toolbarseparator/>
+      <toolbarbutton label="View"
+        oncommand="Presentation.toggleEditMode();"/>
+      <toolbarbutton oncommand="Presentation.reload();" label="Reload"/>
+    </toolbar>
+  </toolbox>
+  <textbox id="textField" flex="1" multiline="true"
+    oninput="Presentation.onEdit()"/>
+  <hbox collapsed="true">
+    <iframe id="dataLoader" onload="if (window.Presentation) Presentation.onDataLoad();"/>
+  </hbox>
+</vbox>
+
+</deck>
+
+<broadcasterset>
+  <broadcaster id="canBack"/>
+  <broadcaster id="canForward"/>
+</broadcasterset>
+
+<commandset>
+  <command id="cmd_forward"
+    oncommand="if (Presentation.isPresentationMode) Presentation.forward();"/>
+  <command id="cmd_back"
+    oncommand="if (Presentation.isPresentationMode) Presentation.back();"/>
+  <command id="cmd_home"
+    oncommand="if (Presentation.isPresentationMode) Presentation.home();"/>
+  <command id="cmd_end"
+    oncommand="if (Presentation.isPresentationMode) Presentation.end();"/>
+</commandset>
+
+<keyset>
+  <key keycode="VK_ENTER"    command="cmd_forward"/>
+  <key keycode="VK_RETURN"   command="cmd_forward"/>
+  <key keycode="VK_PAGE_DOWN"  command="cmd_forward"/>
+  <key keycode="VK_RIGHT"    command="cmd_forward"/>
+  <key keycode="VK_DOWN"     command="cmd_forward"/>
+  <!-- key keycode="VK_BACK_SPACE" command="cmd_back"/-->
+  <key keycode="VK_PAGE_UP"  command="cmd_back"/>
+    <!-- <key keycode="VK_BACK_UP"  command="cmd_back"/>-->
+    <!-- <key keycode="VK_BACK_LEFT"  command="cmd_back"/>-->
+  <key keycode="VK_HOME"     command="cmd_home"/>
+  <key keycode="VK_END"    command="cmd_end"/>
+  <key key="n" modifiers="accel" oncommand="Presentation.addPage();"/>
+  <key key="r" modifiers="accel" oncommand="window.location.reload();"/>
+  <key key="e" modifiers="accel" oncommand="Presentation.toggleEditMode();"/>
+  <key key="a" modifiers="accel" oncommand="Presentation.toggleEvaMode();"/>
+</keyset>
+
+<script src="takahashi.js" type="application/x-javascript" />
+
+</page>
+
+<!-- ***** BEGIN LICENSE BLOCK *****
+   - Version: MPL 1.1
+   -
+   - The contents of this file [except for the slideshow text in the CDATA
+   - block, which is independent user data to display by the rest of the file]
+   - are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is the Takahashi-Method-based Presentation Tool in XUL.
+   -
+   - The Initial Developer of the Original Code is SHIMODA Hiroshi.
+   - Portions created by the Initial Developer are Copyright (C) 2005
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s): SHIMODA Hiroshi <piro@p.club.ne.jp>
+   -
+   - ***** END LICENSE BLOCK ***** -->

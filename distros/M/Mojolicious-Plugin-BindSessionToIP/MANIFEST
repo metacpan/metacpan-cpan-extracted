@@ -1,0 +1,9 @@
+lib/Mojolicious/Plugin/BindSessionToIP.pm
+t/basic.t
+t/on_error.t
+Changes
+Makefile.PL
+README.pod
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

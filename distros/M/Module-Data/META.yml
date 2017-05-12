@@ -1,0 +1,45 @@
+---
+abstract: 'Introspect context information about modules in @INC'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Carp: '0'
+  Data::Dump: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  Test::Fatal: '0'
+  Test::More: '0.96'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Data
+provides:
+  Module::Data:
+    file: lib/Module/Data.pm
+    version: '0.013'
+recommends:
+  Moo: '1.000008'
+  Path::Tiny: '0.058'
+requires:
+  Module::Metadata: '0'
+  Module::Runtime: '0'
+  Moo: '0'
+  Path::ScanINC: '0.011'
+  Path::Tiny: '0'
+  Sub::Quote: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Module-Data/issues
+  homepage: https://github.com/kentnl/Module-Data
+  repository: https://github.com/kentnl/Module-Data.git
+version: '0.013'

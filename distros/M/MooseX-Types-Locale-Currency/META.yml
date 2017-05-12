@@ -1,0 +1,36 @@
+---
+abstract: 'Moose Types related to Locale Currency'
+author:
+  - 'Caleb Cushing <xenoterracide@gmail.com>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Moose: 0
+  Test::Fatal: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.133380'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Types-Locale-Currency
+no_index:
+  file:
+    - perlcritic.rc
+requires:
+  Locale::Currency: 3
+  Module::Runtime: 0
+  MooseX::Types: 0
+  MooseX::Types::Moose: 0
+  perl: 5.008
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/xenoterracide/moosex-types-locale-currency/issues
+  homepage: https://metacpan.org/release/MooseX-Types-Locale-Currency
+  repository: git://github.com/xenoterracide/moosex-types-locale-currency.git
+version: 0.001005

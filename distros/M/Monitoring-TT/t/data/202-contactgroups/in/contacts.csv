@@ -1,0 +1,3 @@
+#NAME;ALIAS;E-MAIL;ROLES;TAGS;GROUPS
+test.user1;Test Alias1;test.user1@localhost;;;testgroup1
+test.user2;Test Alias2;test.user2@localhost;;;testgroup1,testgroup2

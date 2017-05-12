@@ -1,0 +1,22 @@
+Revision history for Perl extension Mac::SysProfile.
+
+0.05  Tue Nov 22 19:05:58 2011
+    - case 72570: clean up (finalized?) gettype()'s new return value
+
+0.04  Sun Nov 20 14:57:34 2011
+    - perltidy .pm
+    - rt 52983: parse a type's info from XML for more reliability and consistency
+        - There is an improvement needed per the "TODO" comments in gettype() before the format can be considered final
+
+0.03  Sat Aug 22 20:46:40 2009
+    - Thanks to Adadov:
+       - Adjusted parsing to work with newer OSX :: rt 48059 (applied patch from https://rt.cpan.org/Ticket/Attachment/636368/324402/)
+       - removed note 'It doesn't handle "SPLogsDataType" well at all so its a basically useless type unless you do it via $pro->xml() :)' since the patch appears to have addressed it!
+    
+0.02  Fri Aug 26 18:35:00 2005
+        - fixed issue with VERSION() that conflicted with UNIVERSAL's VERSION functionality
+
+0.01  Thu Jun 23 12:42:33 2005
+	- original version; created by h2xs 1.22 with options
+		-AXc -n Mac::SysProfile
+

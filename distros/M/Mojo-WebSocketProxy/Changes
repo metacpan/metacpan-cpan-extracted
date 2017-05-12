@@ -1,0 +1,17 @@
+Revision history for Perl module Mojo::WebSocketProxy
+
+0.05      2017-05-01 06:30:16+00:00 UTC
+
+    - remove Data::UUID
+
+0.04      2017-02-21 02:16:06+00:00 UTC
+    - Switch to dzil
+
+0.03 Thu Jun  9 15:50:00 2016
+    - Use before send hook to check response size
+
+0.02 Thu Jun  9 09:28:00 2016
+    - Minor fixes
+
+0.01 Thu Jun  2 06:02:18 2016
+    - First version, released on an unsuspecting world.

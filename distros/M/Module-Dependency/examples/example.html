@@ -1,0 +1,87 @@
+<html><head><title>Module::Dependency::Grapher Examples</title>
+<link rel="stylesheet" href="example.css" type="text/css">
+</head><body><h1>Module::Dependency::Grapher Examples</h1>
+<p>The actual HTML fragments produced are the DIVs below. The bits in between the
+DIVs are just to make things clearer. Additionally we have added in the example images
+produced that correspond to these HTML renditions.</p>
+<p>Note that all the visual styling is done with style sheets. This colour scheme is
+just for demonstration - see example.css for the classes used, or view the source.</p>
+
+<div class="MDGraph"><h2>Dependencies for all scripts</h2>
+<h4>Grapher.pm 1.22 - Thu Sep 26 00:07:00 2002</h4>
+Key:<br />Parent indicates parent dependencies<br />
+	**** indicates the item(s) from which the relationships are drawn<br />
+    Child are child dependencies<br />
+
+<table class="MDGraphTable">
+<tr><th>Kind</th><th>Items</th></tr>
+<tr><td class="MDGraphSeed">****</td><td class="MDGraphSeed">x.pl, y.pl, z.cgi</td></tr>
+<tr><td class="MDGraphChild">Child</td><td class="MDGraphChild">a, b, c</td></tr>
+<tr><td class="MDGraphChild">Child</td><td class="MDGraphChild">d, e</td></tr>
+<tr><td class="MDGraphChild">Child</td><td class="MDGraphChild">f, g, h</td></tr>
+</table>
+</div>
+
+<img src="example1.gif" alt="GIF version of that table"><hr />
+<div class="MDGraph"><h2>Parent & child dependencies for package d</h2>
+<h4>Grapher.pm 1.22 - Thu Sep 26 00:07:02 2002</h4>
+Key:<br />Parent indicates parent dependencies<br />
+	**** indicates the item(s) from which the relationships are drawn<br />
+    Child are child dependencies<br />
+
+<table class="MDGraphTable">
+<tr><th>Kind</th><th>Items</th></tr>
+<tr><td class="MDGraphParent">Parent</td><td class="MDGraphParent">x.pl, y.pl</td></tr>
+<tr><td class="MDGraphParent">Parent</td><td class="MDGraphParent">a, b, c</td></tr>
+<tr><td class="MDGraphSeed">****</td><td class="MDGraphSeed">d</td></tr>
+<tr><td class="MDGraphChild">Child</td><td class="MDGraphChild">f, g, h</td></tr>
+</table>
+</div>
+
+<img src="example2.gif" alt="GIF version of that table"><hr />
+<div class="MDGraph"><h2>Dependencies for package b</h2>
+<h4>Grapher.pm 1.22 - Thu Sep 26 00:07:03 2002</h4>
+Key:<br />Parent indicates parent dependencies<br />
+	**** indicates the item(s) from which the relationships are drawn<br />
+    Child are child dependencies<br />
+
+<table class="MDGraphTable">
+<tr><th>Kind</th><th>Items</th></tr>
+<tr><td class="MDGraphSeed">****</td><td class="MDGraphSeed">b</td></tr>
+<tr><td class="MDGraphChild">Child</td><td class="MDGraphChild">d, e</td></tr>
+<tr><td class="MDGraphChild">Child</td><td class="MDGraphChild">f, g, h</td></tr>
+</table>
+</div>
+
+<img src="example3.gif" alt="GIF version of that table"><hr />
+<div class="MDGraph"><h2>Parent dependencies for package e</h2>
+<h4>Grapher.pm 1.22 - Thu Sep 26 00:07:04 2002</h4>
+Key:<br />Parent indicates parent dependencies<br />
+	**** indicates the item(s) from which the relationships are drawn<br />
+    Child are child dependencies<br />
+
+<table class="MDGraphTable">
+<tr><th>Kind</th><th>Items</th></tr>
+<tr><td class="MDGraphParent">Parent</td><td class="MDGraphParent">x.pl, y.pl</td></tr>
+<tr><td class="MDGraphParent">Parent</td><td class="MDGraphParent">a, b</td></tr>
+<tr><td class="MDGraphSeed">****</td><td class="MDGraphSeed">e</td></tr>
+</table>
+</div>
+
+<img src="example4.gif" alt="GIF version of that table"><hr />
+<div class="MDGraph"><h2>Parent & child dependencies for packages e,b</h2>
+<h4>Grapher.pm 1.22 - Thu Sep 26 00:07:05 2002</h4>
+Key:<br />Parent indicates parent dependencies<br />
+	**** indicates the item(s) from which the relationships are drawn<br />
+    Child are child dependencies<br />
+
+<table class="MDGraphTable">
+<tr><th>Kind</th><th>Items</th></tr>
+<tr><td class="MDGraphParent">Parent</td><td class="MDGraphParent">a, x.pl, y.pl</td></tr>
+<tr><td class="MDGraphSeed">****</td><td class="MDGraphSeed">b, e</td></tr>
+<tr><td class="MDGraphChild">Child</td><td class="MDGraphChild">d, g</td></tr>
+<tr><td class="MDGraphChild">Child</td><td class="MDGraphChild">f, h</td></tr>
+</table>
+</div>
+
+<img src="example5.gif" alt="GIF version of that table"><hr /></body></html>

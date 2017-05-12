@@ -1,0 +1,128 @@
+=for stopwords XSUtil
+
+=head1 NAME
+
+Module::Build::Pluggable::XSUtil::Cookbook - Cookbook for XSUtil
+
+=head1 DESCRIPTION
+
+This document describes porting from L<Module::Install::XSUtil>
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item -g Option
+
+    use Module::Build::Pluggable (
+        'XSUtil',
+    );
+
+L<Module::Build::Pluggable::XSUtil> supports it.
+
+=item C<< cc_available >>
+
+    $builder->have_c_compiler()
+
+Module::Build supports to check the system having compiler natively.
+
+=item C<< c99_available >>
+
+    use Devel::CheckCompiler;
+
+    my $c99_available = check_c99();
+
+Use L<Devel::CheckCompiler>.
+
+=item C<< want_xs() >>
+
+    use Devel::WantXS;
+    my $want_xs = want_xs();
+
+L<Devel::WantXS> provides this feature.
+
+=item C<< use_ppport() >>
+
+    use Module::Build::Pluggable (
+        'XSUtil' => {
+            ppport => 1,
+        },
+    );
+
+L<Module::Build::Pluggable::XSUtil> provides this feature.
+
+=item C<< use_xshelper() >>
+
+    use Module::Build::Pluggable (
+        'XSUtil' => {
+            'xshelper' => 1,
+        },
+    );
+
+L<Module::Build::Pluggable::XSUtil> provides this feature.
+
+=item C<< cc_warnings() >>
+
+    use Module::Build::Pluggable (
+        'XSUtil' => {
+            cc_warnings => 1,
+        },
+    );
+
+L<Moule::Build::Pluggable::XSUtil> provides this feature.
+
+=item C<< cc_define(@macros) >>
+
+    Module::Build->new(
+        extra_compiler_flags => join(' ', @macros)
+    );
+
+=item C<< cc_src_paths(@source_paths) >>
+
+    Module::Build->new(
+        c_source => \@source_paths
+    );
+
+=item C<< cc_include_paths(@include_paths) >>
+
+    Module::Build->new(
+        include_dirs => \@include_paths
+    );
+
+=item C<< cc_libs(@libs) >>
+
+    Module::Build->new(
+        extra_linker_flags => join(' ', map { "-l$_" } @libs)
+    );
+
+=item C<< cc_assert_lib(%args) >>
+
+    use Module::Build::Pluggable (
+        'CheckLib' => {
+            %args
+        },
+    );
+
+L<Module::Build::Pluggable::CheckLib> provides this feature.
+
+=item C<< requires_c99() >>
+
+    use Module::Build::Pluggable (
+        'XSUtil' => {
+            c99 => 1,
+        },
+    );
+
+L<Module::Build::Pluggable::XSUtil> provides this feature.
+
+=item C<< requires_cplusplus() >>
+
+    use Module::Build::Pluggable (
+        'XSUtil' => {
+            'c++' => 1,
+        },
+    );
+
+L<Module::Build::Pluggable::XSUtil> provides this feature.
+
+=back

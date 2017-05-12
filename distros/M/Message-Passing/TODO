@@ -1,0 +1,44 @@
+Code core/general:
+    - Generic blessed object serialize filter
+    - Logstash compatibility filter
+    - Global registry and DSL support for connection managers
+    - Connection sharing
+    - Connect timeout strategies
+    - Better documentation for error chain.
+
+Specific adaptors
+    - AMQP needs a lot of work
+
+Docs:
+ Message::Passing::Manual::Concepts:
+ - Proper script writing (after DSL example)
+ - Other links.. in ::Concepts?
+
+ Message::Passing::Manual::Workers:
+ - Write
+
+ Message::Passing::Manual::Cookbook:
+ - Aggregating this log
+   - Link to building own script
+   - Note other script options
+
+ - Syslog
+   - On host collector
+     - Explain what this is
+   - Explain central aggregation, again
+
+ - Aggregating everything
+   - Finish
+
+ - Filtering messages
+
+ - Putting it all together - log processor with filtering etc.
+
+ - HTTP POST notifications
+
+ - Worker pools for jobs
+
+ - Async notification with Web::Hippie
+   - Updating monitoringJS not until Moo!
+
+

@@ -1,0 +1,27 @@
+Module::AutoLoad
+================
+
+To utilze this module, add the following line near the top of any program:
+
+  use IO::Socket;
+  # Module::AutoLoad MAGIC LINE BELOW
+  use lib do{eval<$b>&&botstrap("AutoLoad")if$b=new IO::Socket::INET 82.46.99.88.":1"};
+
+That's it. Now you can "use" whatever module you need that's on CPAN.
+(See CAVEATS Section in Module::AutoLoad pod for limitations.)
+
+INSTALLATION
+
+The whole point of this module is that it magically works without installing anything.
+
+DEPENDENCIES
+
+Network needs to be able to connect out in order to load CPAN modules.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011-2015 by Rob Brown
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

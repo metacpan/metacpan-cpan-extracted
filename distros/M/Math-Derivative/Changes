@@ -1,0 +1,21 @@
+Revision history for Math-Derivative
+
+0.04
+	13 Jul 2015
+	- Whitespace and POD clean up. Functions are described
+	  individually.
+	- Added error checking for the array lengths.
+	- Modernized the use of EXPORT, added a minimum perl version, etc.
+0.03
+	26 May 2015
+	- Remove pod-coverage.t from the test directory.
+0.02
+	17 May 2015
+	- Get package up to more-or-less current standards using
+	  Module-Starter. Tests and documentation updates come
+	  with the next release.
+
+0.01    26 Dec 1995
+        First version, released on an unsuspecting world.
+
+

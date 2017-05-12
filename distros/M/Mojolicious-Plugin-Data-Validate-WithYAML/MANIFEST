@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+eg/test.psgi
+lib/Mojolicious/Plugin/Data/Validate/WithYAML.pm
+t/conf/hello.yml
+t/conf/test.yml
+t/fieldinfo.t
+t/validate.t

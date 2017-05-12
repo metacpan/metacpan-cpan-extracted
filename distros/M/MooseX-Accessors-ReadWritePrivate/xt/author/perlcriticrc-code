@@ -1,0 +1,50 @@
+# Make things as strict as possible.
+profile-strictness = fatal
+severity = 1
+verbose = %f: %m at line %l, column %c.  %e.  (Severity: %s, %p)\n
+
+# Need to write CodeLayout::RequireUTF8
+[-CodeLayout::RequireASCII]
+
+# No Emacs around here.
+[-Editor::RequireEmacsFileVariables]
+
+[-ErrorHandling::RequireUseOfExceptions]
+
+# Perl::Tidy wouldn't know a properly formatted conditional expression
+# if one stomped all over Perl::Tidy.pm.  (Not to say that P::T isn't
+# useful.)
+[-CodeLayout::RequireTidyCode]
+
+[Documentation::PodSpelling]
+stop_words = accessor accessors affordance Bool mutator perl Rolsky rop rpw rpwp rw wo
+
+# I really don't want to deal with this right now.  Should probably use
+# Dist::Zilla.
+[-Documentation::RequirePodLinksIncludeText]
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | VERSION | SYNOPSIS | DESCRIPTION | DIAGNOSTICS | CONFIGURATION AND ENVIRONMENT | DEPENDENCIES | AUTHOR | LICENSE AND COPYRIGHT | DISCLAIMER OF WARRANTY
+
+[InputOutput::RequireCheckedSyscalls]
+functions = open close
+
+# Bazaar doesn't support these.
+[-Miscellanea::RequireRcsKeywords]
+
+# For some reason, this chokes on v-strings within a version constructor
+# and I don't have time to chase this down.
+[-Modules::PerlMinimumVersion]
+
+[RegularExpressions::ProhibitUnusualDelimiters]
+allow_all_brackets = 1
+
+[RegularExpressions::RequireBracesForMultiline]
+allow_all_brackets = 1
+
+[-Tics::ProhibitLongLines]
+
+
+# setup vim: set filetype=conf tabstop=4 softtabstop=4 expandtab :
+# setup vim: set shiftwidth=4 shiftround textwidth=78 nowrap autoindent :
+# setup vim: set foldmethod=indent foldlevel=0 :

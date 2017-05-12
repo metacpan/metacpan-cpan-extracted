@@ -1,0 +1,54 @@
+{
+   "abstract" : "DBM serializer uses JSON for language interoperability",
+   "author" : [
+      "Jens Rehsack <rehsack@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MLDBM-Serializer-JSON",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.9"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "JSON::XS" : "2.34",
+            "MLDBM" : "2.05"
+         },
+         "requires" : {
+            "JSON::Any" : "1.25",
+            "MLDBM" : "2.00"
+         }
+      }
+   },
+   "provides" : {
+      "MLDBM::Serializer::JSON" : {
+         "file" : "lib/MLDBM/Serializer/JSON.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/rehsack/MLDBM-Serializer-JSON/"
+      }
+   },
+   "version" : "0.002"
+}

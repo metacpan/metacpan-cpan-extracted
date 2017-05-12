@@ -1,0 +1,60 @@
+{
+   "abstract" : "Powertools for MySQL databases",
+   "author" : [
+      "Nic Sandfield <niczero@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojar-Mysql",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "data",
+         "test"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.3"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::mysql" : "3.0008",
+            "DBI" : "1.53",
+            "Mojar" : "2.02",
+            "Mojolicious" : "7.15",
+            "perl" : "5.014001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/niczero/mojar-mysql/issues"
+      },
+      "homepage" : "http://niczero.github.com/mojar",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "url" : "http://github.com/niczero/mojar-mysql"
+      }
+   },
+   "version" : 2.132,
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

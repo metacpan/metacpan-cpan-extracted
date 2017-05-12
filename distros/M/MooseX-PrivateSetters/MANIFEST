@@ -1,0 +1,15 @@
+Build.PL
+CHANGES
+INSTALL
+lib/MooseX/PrivateSetters.pm
+lib/MooseX/PrivateSetters/Role/Attribute.pm
+MANIFEST			This list of files
+README
+t/010-load.t
+t/020-basic.t
+TODO.org
+xt/pod-coverage.t
+xt/pod.t
+Makefile.PL
+META.yml
+META.json

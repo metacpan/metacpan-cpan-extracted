@@ -1,0 +1,10 @@
+Revision history for Perl extension MySQL-Warmer
+
+0.02 2017-01-20T11:36:38Z
+
+    - quote identifiers for reserved words (yano3++)
+
+0.01 2014-09-22T02:18:18Z
+
+    - original version
+

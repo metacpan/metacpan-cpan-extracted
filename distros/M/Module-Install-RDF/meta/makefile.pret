@@ -1,0 +1,4 @@
+`Module-Install-RDF`
+	perl_version_from   m`Module::Install::RDF`;
+	version_from        m`Module::Install::RDF`;
+	readme_from         m`Module::Install::RDF`.

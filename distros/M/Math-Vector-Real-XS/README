@@ -1,0 +1,25 @@
+Math-Vector-Real-XS
+===================
+
+This module reimplements some of the function in Math::Vector::Real in
+XS in order to improve performance.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012-2015 by Salvador Fandiño
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

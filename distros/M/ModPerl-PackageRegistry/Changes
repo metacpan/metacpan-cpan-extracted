@@ -1,0 +1,9 @@
+Revision history for Perl extension ModPerl::PackageRegistry.
+
+0.02  Mon Oct 31 12:23:00 2005
+	- added detection of hacking attempts
+
+0.01  Fri Oct 28 14:40:51 2005
+	- original version; created by h2xs 1.23 with options
+		-AXP -b 5.6.0 ModPerl::PackageRegistry
+

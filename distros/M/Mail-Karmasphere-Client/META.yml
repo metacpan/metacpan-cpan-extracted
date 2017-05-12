@@ -1,0 +1,20 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Mail-Karmasphere-Client
+version:      2.18
+version_from: lib/Mail/Karmasphere/Client.pm
+installdirs:  site
+requires:
+    Convert::Bencode:              0
+    HTTP::Request:                 0
+    IO::Select:                    0
+    IO::Socket:                    0
+    Lingua::EN::Inflect:           0
+    LWP:                           0
+    Text::CSV:                     0
+    Time::HiRes:                   0
+    Unix::Syslog:                  0
+    YAML:                          0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

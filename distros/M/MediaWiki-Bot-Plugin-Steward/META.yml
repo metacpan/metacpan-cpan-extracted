@@ -1,0 +1,29 @@
+---
+abstract: 'A plugin to MediaWiki::Bot providing steward functions'
+author:
+  - 'Mike.lifeguard <mike.lifeguard@gmail.com>'
+  - 'patch and bug report contributors'
+build_requires:
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102221, CPAN::Meta::Converter version 2.102160'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MediaWiki-Bot-Plugin-Steward
+requires:
+  Carp: 0
+  Exporter: 0
+  HTML::TreeBuilder: 0
+  MediaWiki::Bot: 3.0.0
+  Net::CIDR: 0
+  URI::Escape: 0
+  WWW::Mechanize: 1.30
+  perl: 5.006
+version: 0.0003

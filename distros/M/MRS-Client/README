@@ -1,0 +1,1292 @@
+NAME
+    MRS::Client - A SOAP-based client of the MRS Retrieval server
+
+VERSION
+    version 1.0.1
+
+SYNOPSIS
+        # 1. create a client that does all the work:
+        use MRS::Client;
+
+        # ...by default it connects to the MRS service at http://mrs.cmbi.ru.nl/m6
+        my $client = MRS::Client->new();
+
+        # ...or let the client talk to your own MRS servers
+        my $client = MRS::Client->new ( search_url  => 'http://localhost:18081/',
+                                        blast_url   => 'http://localhost:18082/',;
+                                        clustal_url => 'http://localhost:18083/');  # this only for MRS 5
+
+        # ...or specify only a host, assuming the default ports are used
+        my $client = MRS::Client->new ( host => 'localhost');
+
+        # 2a. make various queries to a selected database:
+        print $client->db ('uniprot')->find ('sapiens')->count;
+        175642
+
+        print $client->db ('uniprot')->find ('sapiens')->next;
+        ID   Q14547_HUMAN            Unreviewed;        60 AA.
+        AC   Q14547;
+        DT   01-NOV-1996, integrated into UniProtKB/TrEMBL.
+        DT   01-NOV-1996, sequence version 1.
+        DT   19-JAN-2010, entry version 51.
+        DE   SubName: Full=Homeobox-like;
+        DE   Flags: Fragment;
+        OS   Homo sapiens (Human).
+        ...
+
+        # show id, relevance score and title of two terms connected by AND
+        my $query = $client->db ('enzyme')->find ('and' => ['snake', 'human'],
+                                                  'format' => MRS::EntryFormat->HEADER);
+        while (my $record = $query->next) {
+           print $record . "\n";
+        }
+        enzyme  3.4.21.95   17.6527424   Snake venom factor V activator.
+
+        # ...show only title, but now the same two terms are connected by OR
+        my $query = $client->db ('enzyme')->find ('or' => ['snake', 'human'],
+                                                  'format' => MRS::EntryFormat->TITLE);
+        while (my $record = $query->next) {
+           print $record . "\n";
+        }
+        Snake venom factor V activator.
+        Jararhagin.
+        Bothropasin.
+        Trimerelysin I.
+        ...
+
+        # combine term-based (ranked) query with additional boolean expression
+        my $query = $client->db ('uniprot')->find ('and' => ['snake', 'human'],
+                                                   query => 'NOT (kinase OR reductase)',
+                                                   'format' => MRS::EntryFormat->HEADER);
+        print "Count: " . $query->count . "\n";
+        while (my $record = $query->next) {
+           print $record . "\n";
+        }
+        Count: 75
+        nxs11_micsu     23.3861961      Short neurotoxin MS11;
+        nxl2_micsu      22.7922745      Long neurotoxin MS2;
+        nxl5_micsu      22.2648716      Long neurotoxin MS5;
+        ...
+
+        # 2b. explore full information about a database
+        print $client->db ('enzyme');
+
+        # ...or extract only information parts you want
+        print $client->db ('enzyme')->version;
+        print $client->db ('enzyme')->count;
+
+        # 3. Or, almost all functionality is also available in a provided
+        # script I<mrsclient>:
+
+        mrsclient -h
+        mrsclient -C
+        mrsclient -c -n insulin
+        mrsclient -c -p -d enzyme -a 'endothelin tyrosine'
+
+        # 4. Run blastp on protein sequences:
+
+        my @run_args = (fasta_file => 'protein.fasta', db => 'uniprot');
+        my $job = $client->blast->run (@run_args);
+        print STDERR 'JOB ID: ' . $job->id . ' [' . $job->status . "]\n";
+        print $job;
+        while (not $job->completed) {
+           print STDERR 'Waiting for 10 seconds... [status: ' . $job->status . "]\n";
+           sleep 10;
+        }
+        print $job->error if $job->failed;
+        print $job->results;
+
+        # Or, use for it the provide script I<mrsblast>:
+
+        mrsblast -h
+        mrsblast -i /tmp/snake.protein.fasta -d uniprot -x result.xml
+
+        # 5. Run clustalw multiple alignment:
+        # (available only for MRS version 5 and lower)
+
+        my $result = $client->clustal->run (fasta_file => 'multiple.fasta' );
+        print "ERROR: " . $result->failed if $result->failed;
+        print $result->diagnostics;
+        print $result;
+
+        # Or, use for it the provide script I<mrsclustal>:
+
+        mrsclustal -h
+        mrsclustal -i multiple.fasta
+
+DESCRIPTION
+    This module is a SOAP-based (Web Services) client that can talk, and get
+    data from an MRS server, a search engine for biological and medical
+    databanks that searches well over a terabyte of indexed text. See
+    details about MRS and its author Maarten Hekkelman in "ACKNOWLEDGMENTS".
+
+    Because this module is only a client, you need an MRS server running.
+    You can install your own (see details in the MRS distribution), or you
+    need to know a site that runs it. By default, this module contacts the
+    MRS server at CMBI (http://mrs.cmbi.ru.nl/m6/).
+
+    The usual scenario is the following:
+
+    *   Create a new instance of a client by calling:
+
+            my $client = MRS::Client->new (%args);
+
+    *   Optionally, find out what databanks are available by calling:
+
+            my @ids = map { $_->id } $client->db;
+            print "Names:\n" . join ("\n", @ids) . "\n";
+
+    *   Make one or more queries on a selected databanks and iterate over
+        the result:
+
+            my $query = $client->db ('enzyme')->find (['cone', 'snail']);
+            while (my $record = $query->next) {
+               print $record . "\n";
+            }
+
+        Or, make the same query on all available databanks:
+
+            my $query = $client->find (['cone', 'snail']);
+            while (my $record = $query->next) {
+               print $record . "\n";
+            }
+
+        The format of returned records is specified by a parameter of the
+        *find* method (see more in "METHODS").
+
+    *   Additionally, this module provides access to *blastp* program, using
+        MRS indexed databases. And it can invoke multiple alignment program
+        *clustalw*.
+
+ATTENTION
+    *For those updating from previous versions of* "MRS::Client": Because
+    the latest version of MRS server (version 6) is not backward compatible
+    with the previous version of the MRS server (version 5), there are some
+    significant (but fortunately not huge) changes needed in your programs.
+    Read details in "MRS VERSIONS".
+
+METHODS
+  MRS::Client
+    The main module is "MRS::Client". It lets the user specify which MRS
+    server to use, and few other global options. It also has a factory
+    method for creating individual databanks objects. Additionally, it
+    allows making query over all databanks. Finally, it covers all the SOAP
+    communication with the server.
+
+   new
+        use MRS::Client;
+        my $client = MRS::Client->new (@parameters);
+
+    The parameters are name-value pairs. The following names are recognized:
+
+    search_url, blast_url, clustal_url
+        The URLs of the individual MRS servers, one providing searches (the
+        main one), one running blast and one running clustal. Default values
+        lead your searches to CMBI. If you have installed MRS servers on
+        your own site, and you are using the default values coming with the
+        MRS distribution, you create a client by (but see below parameter
+        *host* for a shortcut):
+
+            my $client = MRS::Client->new ( search_url  => 'http://localhost:18081/',
+                                            blast_url   => 'http://localhost:18082/',
+                                            clustal_url => 'http://localhost:18083/',   # this only for MRS 5
+                                           );
+
+        Technical detail: These URLs will be used in the location field of
+        the WSDL description.
+
+        Alternatively, you can specify these parameters by environment
+        variables (because they will be probably same for most users from
+        the same site). The parameters, however, still have precedence over
+        the values of environment variables (even if they exist). The
+        variables are: *MRS_SEARCH_URL*, *MRS_BLAST_URL* and
+        *MRS_CLUSTAL_URL*.
+
+        NOTE: Some sites may not have all MRS servers running.
+
+    host
+        A shortcut for specifying a host name in all URLs. The same as in
+        the above example can be accomplished by:
+
+            my $client = MRS::Client->new (host => 'localhost');
+
+        Again, you can specify this parameter by an environment variables
+        MRS_HOST.
+
+    search_service, blast_service, clustal_service
+        The MRS servers are SOAP-based Web Services. Every Web Service has
+        its own *service name* (the name used in the WSDL). You can change
+        this service name if you are accessing site where they use
+        non-default names. The default names - I guess almost always used -
+        are: mrsws_search, mrsws_blast, mrsws_clustal.
+
+    search_wsdl, blast_wsdl, clustal_wsdl
+        You can also specify your own WSDL file, each one for each set of
+        operations. It is meant more for debugging purposes because this
+        "MRS::Client" module understands only current operations and adding
+        new ones to a new WSDL does not magically start using them. These
+        parameters may be useful when extending the "MRS::Client".
+
+   setters/getters
+    The same names as the argument names described above can be used as
+    method names to get or set the parameter value. A method without an
+    argument gets the current value, a method with an argument sets the new
+    value. For example:
+
+       print $client->search_url;
+       $client->search_url ('http://my.own.server/mrs/search');
+
+   db
+    This is a factory method creating one or more databanks instances. It
+    accepts a single argument, a databank ID:
+
+       print $client->db ('enzyme');
+
+       Id:      enzyme
+       Name:    Enzyme
+       Version: 2013-05-27
+       Count:   6115
+       URL:     http://ca.expasy.org/enzyme/
+       Parser:  enzyme
+       Files:
+               Version:       2013-05-27
+               Modified:      2013-05-27 11:46 GMT
+               Entries count: 6115
+               Raw data size: 7436504
+               File size:     45563041
+               Unique Id:     fc0540bd-58a2-4de7-b3ff-6daff64ca13c
+       Indices:
+               enzyme         text               14881  Unique
+               enzyme         de                  3650  Unique    Description
+               enzyme         dr                420832  Unique    Database Reference
+               enzyme         id                  6114  Unique    Identification
+               enzyme         pr                   398  Unique    Prosite Reference
+
+    You can find out what databanks IDs are available by:
+
+       print join ("\n", map { $_->id } $client->db);
+
+    Which brings us to the usage of the *db* method without any parameter,
+    or with an empty parameter. In such cases, it creates an array of
+    "MRS::Client::Databank" instances.
+
+   find
+    Make the same query to all databanks. The parameters are the same as for
+    the *find* method called for an individual databank (see below).
+
+       print "Databank\tID\tScore\tTitle\n";
+       my $query = $client->find ('and' => ['cone', 'snail'],
+                                  'format' => MRS::EntryFormat->HEADER);
+       while (my
+          $record = $query->next) {
+          print $record . "\n";
+       }
+       print $query->count . "\n";
+
+       Databank  ID           Score       Title
+       interpro  ipr020242    29.7122746  Conotoxin I2-superfamily
+       interpro  ipr012322    27.8191032  Conotoxin, delta-type, conserved site
+       ...
+       omim      114020       3.40963793  cadherin 2
+       omim      192090       3.40769672  cadherin 1
+       sprot     cxd6d_concn  19.4017849  Delta-conotoxin CnVID;
+       sprot     cxd6c_concn  19.3984871  Delta-conotoxin CnVIC;
+       ...
+       taxonomy  6495         53.980381   Conus tulipa fish-hunting cone snail
+       trembl    q71ks8_contu 22.1446457  Four-loop conotoxin preproprotein;
+       trembl    q9u7q6_contu 20.6787205  Calmodulin;
+       ...
+       149
+
+    The query (method *next*) returns entries sequentially, one databank
+    after another. As with individual databanks, even here you can select
+    maximum number of entries to deliver - the number is applied for each
+    databank separately:
+
+       my $query = $client->find ('and' => ['cone', 'snail'],
+                                  max_entries => 2,
+                                  'format' => MRS::EntryFormat->HEADER);
+       while (my
+          $record = $query->next) {
+          print $record . "\n";
+       }
+
+       interpro  ipr020242    29.7122746  Conotoxin I2-superfamily
+       interpro  ipr012322    27.8191032  Conotoxin, delta-type, conserved site
+       omim      114020       3.40963793  cadherin 2
+       omim      192090       3.40769672  cadherin 1
+       sprot     cxd6d_concn  19.4017849  Delta-conotoxin CnVID;
+       sprot     cxd6c_concn  19.3984871  Delta-conotoxin CnVIC;
+       taxonomy  6495         53.980381   Conus tulipa fish-hunting cone snail
+       trembl    q71ks8_contu 22.1446457  Four-loop conotoxin preproprotein;
+       trembl    q9u7q6_contu 20.6787205  Calmodulin;
+
+   blast
+       $client->blast
+
+    A factory method for creating a singleton instance of
+    MRS::Client::Blast.
+
+   clustal
+       $client->clustal
+
+    A factory method for creating instances of MRS::Client::Clustal.
+
+  MRS::Client::Databank
+    This package represents an MRS databank and allows to query it. Each
+    databank consists of one or more files (represented by
+    "MRS::Client::Databank::File") and of indices
+    ("MRS::Client::Databank::Index").
+
+    A databank instance can be created by a *new* method but usually it is
+    created by a factory method available in the "MRS::Client":
+
+       my $db = $client->db ('enzyme');
+
+    The factory method, as well as the *new* method, creates only a "shell"
+    databank instance - that is good enough for making queries but which
+    does not contain any databank properties (name, indices, etc.) yet. The
+    properties will be fetched from the MRS server only when you ask for
+    them (using the "getter" methods described below).
+
+   new
+    The only, and mandatory, parameter is *id*:
+
+       $db = MRS::Client::Databank->new (id => 'interpro');
+
+    The arguments syntax (the hash) is prepared for more arguments later
+    (perhaps). But it should not bother you because you would rarely use
+    this method - having the factory method *db* in the client.
+
+    *Recommendation:* Do not use this method directly, or check first how it
+    is used in the module "MRS::Client".
+
+   find
+    This is the crucial method of the whole "MRS::Client" module. It queries
+    a databank and returns an "MRS::Client::Find" instance that can be used
+    to iterate over found entries.
+
+    It takes many arguments. At least one of the "query" arguments (which
+    are *query*, *and* and *or*) must be supplied; other arguments are
+    optional.
+
+    The arguments can always be specified as a hash, but for usual cases
+    there are few shortcuts. Let's look at the arguments as used in the
+    hash:
+
+    "and"
+        The value is an array reference where elements are terms that will
+        be combined by the AND boolean operator in a ranked query. For
+        example:
+
+           $find = $db->find ('and' => ['human', 'snake']);
+
+        This argument can also be used directly, not as a hash, assuming
+        that you do not need to use any other arguments:
+
+           $find = $db->find (['human', 'snake']);
+
+    "or"
+        The value is an array reference where elements are terms that will
+        be combined by the OR boolean operator in a ranked query. For
+        example:
+
+           $find = $db->find ('or' => ['human', 'snake']);
+
+        There can be either an *and* or an *or* argument, but not both. If
+        there are used both, a warning is issued and the *and* one will take
+        precedence.
+
+    "query"
+        The value is an expression, usually using some boolean operators (in
+        upper cases!):
+
+           $find = $db->find (query => 'hemoglobinase AND NOT human');
+
+        If there are no boolean operators, it is used as a single term. For
+        example, these are equivalent:
+
+           $find = $db->find (query => 'hemoglobinase activity');
+           $find = $db->find ('and' => ['hemoglobinase activity']);
+
+        You can also use both, *and* or *or*, and *query*. The query then is
+        an additional filter applied to the results found by the *and* or
+        *or* terms. For example:
+
+           $find = $db->find ('and' => ['human', 'snake'],
+                              query => 'NOT neurotoxin');
+
+        As a shortcut, the query parameter can also be used without a hash,
+        assuming again that you do not need to use any other arguments:
+
+           $find = $db->find ('hemoglobinase AND NOT human');
+
+    "algorithm"
+        Attention: This argument is used only by MRS version 5, See "MRS
+        VERSIONS" for details.
+
+        The ranked queries (the ones achieved by *and* or *or* arguments)
+        have assigned relevance score to their hits. The relevance score
+        depends on the used algorithm. The available values for this
+        arguments are defined in "MRS::Algorithm":
+
+           package MRS::Algorithm;
+           use constant {
+              VECTOR   => 'Vector',
+              DICE     => 'Dice',
+              JACCARD  => 'Jaccard',
+           };
+
+        The default algorithm is "Vector". For example (using the format
+        "header" - which is the only one that shows relevance scores):
+
+           $client->$db('enzyme')->find ('and' => 'venom',
+                                         algorithm => MRS::Algorithm->Dice,
+                                         max_entries => 3,
+                                         'format' => MRS::EntryFormat->HEADER);
+           enzyme  3.4.24.43    14.9607477      Atroxase.
+           enzyme  3.4.24.49    13.6817474      Bothropasin.
+           enzyme  3.4.24.73    13.2007284      Jararhagin.
+
+           $client->$db('enzyme')->find ('and' => 'venom',
+                                         algorithm => MRS::Algorithm->Vector,
+                                         max_entries => 3,
+                                         'format' => MRS::EntryFormat->HEADER);
+           enzyme  3.1.15.1     21.6520195      Venom exonuclease.
+           enzyme  3.4.21.60    19.3931656      Scutelarin.
+           enzyme  5.1.1.16     16.7410889      Protein-serine epimerase.
+
+    "start", "offset", "max_entries"
+        These arguments do not affect the query itself but it tells which
+        entries from the found ones to retrieve (by the *next* method - see
+        below).
+
+        All these three arguments have an integer value.
+
+        "start" tells to skip entries at the beginning of the whole result
+        and start returning only with the entry with this order number. The
+        counting start from 1.
+
+        "offset" is the same as the "start", except the counting starts from
+        zero.
+
+        "max_entries" is the maximum entries to retrieve.
+
+    "format"
+        This argument also does not affect the query itself but it defines
+        the format of the returned entries. The available values for this
+        arguments are defined in "MRS::EntryFormat":
+
+           package MRS::EntryFormat;
+           use constant {
+               PLAIN    => 'plain',
+               TITLE    => 'title',
+               HTML     => 'html',
+               FASTA    => 'fasta',
+               SEQUENCE => 'sequence',
+               HEADER   => 'header',
+           };
+
+        The default format is 'plain'. The 'fasta' and 'sequence' formats
+        are available only for databanks that have sequence data. For all
+        formats, except for the 'header', the entries are returned as
+        strings. For 'header', the entries are instances of
+        "MRS::Client::Hit".
+
+        Be aware that "format" is also a built-in Perl function, so better
+        quote it when used as a hash key (it seems to work also without
+        quotes except the emacs TAB key is confused if there are no
+        surrounding quotes; just a minor annoyance).
+
+    "xformat"
+        This argument ("eXtended format") enhances the "format" argument. It
+        is used (at least at the moment) only for HTML format; for other
+        formats, it is ignored. See, however, the "MRS VERSIONS" about the
+        abandoned HTML format.
+
+        Be aware, however, that the "xformat" depends on the structure of
+        the HTML provided by the MRS. This structure is not defined in the
+        MRS server API, so it can change easily. It even depends on the way
+        how the authors write their parsing scripts. When the HTML output
+        changes this module must be changed, as well. Caveat emptor.
+
+        The "xformat" is a hashref with keys that change (slightly or
+        significantly) the returned HTML. Here are all possible keys (with a
+        randomly picked up values):
+
+           xformat => { MRS::XFormat::CSS_CLASS()   => 'mrslink',
+                        MRS::XFormat::URL_PREFIX()  => 'http://cbrcgit:8080/mrs-web/'
+                        MRS::XFormat::REMOVE_DEAD() => 1, # 'or' => ['...']
+                        MRS::XFormat::ONLY_LINKS()  => 1 }
+
+        "MRS::XFormat::CSS_CLASS" specifies a CSS-class name that will be
+        added to all "a" tags in the returned HTML. It allows, for example,
+        an easy post-processing by various JavaScript libraries. For
+        example, if the original HTML contains:
+
+           <a href="entry.do?db=go&amp;id=0005576"></a>
+
+        it will become (using the value shown above):
+
+           <a class="mrslinks" href="entry.do?db=go&amp;id=0005576"></a>
+
+        "MRS::XFormat::URL_PREFIX" helps to keep the returned HTML
+        independent on the machine where it was created. This option
+        pre-pends the given prefix to the relative URLs in the hyperlinks
+        that point to the data in an MRS web application. For example, if
+        the original HTML contains:
+
+           <a href="entry.do?db=go&amp;id=0005576"></a>
+
+        it will become:
+
+           <a href="http://cbrcgit:8080/mrs-web/entry.do?db=go&amp;id=0005576"></a>
+
+        Other hyperlinks - those not starting with "query" or "entry" - are
+        not affected.
+
+        "XFormat::REMOVE_DEAD" deals with the fact that the MRS server
+        creates hyperlinks pointing to other MRS databanks without checking
+        that they actually exists in the local MRS installation. This may be
+        fixed later (quoting Maarten) but before it happens this option (if
+        with a true value) removes (from the returned HTML) all hyperlinks
+        that point to the not-installed MRS databanks. For example, if the
+        original HTML has these hyperlinks:
+
+            <a href="query.do?db=embl&amp;query=ac:AF536179">AF536179</a>
+            <a href="query.do?db=embl&amp;query=ac:D00735">D00735</a>
+            <a href="entry.do?db=pdb&amp;id=1VZN">1VZN</a>
+            <a href="entry.do?db=pdb&amp;id=2FK4">2FK4</a>
+
+        and the "pdb" database is not locally installed, the returned HTML
+        will change to:
+
+            <a href="query.do?db=embl&amp;query=ac:AF536179">AF536179</a>
+            <a href="query.do?db=embl&amp;query=ac:D00735">D00735</a>
+            1VZN
+            2FK4
+
+        There is a small caveat, however. The MRS::Client needs to know what
+        databanks are installed. It finds out by asking the MRS server by
+        using the method "db()" (explained elsewhere in this document). This
+        method returns much more than is needed, so it can be slightly
+        expensive. Therefore, if your concern is the highest speed, you can
+        help the MRS::Client by providing a list of databanks that you know
+        you have installed. Actually, in most cases, you can create such
+        list also by calling the "db()" method but depending on your code
+        you can call it just ones an reuse it. For example, if you wish to
+        keep hyperlinks only for 'uniprot' and 'embl', you specify;
+
+             xformat  => { MRS::XFormat::REMOVE_DEAD() => ['uniprot', 'embl'] }
+
+        Finally, there is an option "MRS::XFormat::ONLY_LINKS". It has a
+        very specific function: to extract and return "only" the hyperlinks,
+        not the whole HTML. It is, therefore, predestined for further
+        post-processing. Note that all changes in the hyperlinks described
+        earlier are also applied here (e.g. adding an absolute URL or a CSS
+        class).
+
+        When this option is used, the whole method "$find->next" (or
+        "db->entry") returns a reference to an array of extracted
+        hyperlinks:
+
+            my $find = $client->db('sprot')->find
+                (and      => ['DNP_DENAN'],
+                 'format' => MRS::EntryFormat->HTML,
+                 xformat  => {
+                     MRS::XFormat::ONLY_LINKS()  => 1,
+                     MRS::XFormat::CSS_CLASS()   => 'mrslink',
+                 },
+            );
+            while (my $record = $find->next) {
+            print join ("\n", @$record) . "\n";
+
+        Which prints something like:
+
+            <a class="mrslink" href="entry.do?db=taxonomy&amp;id=8618">8618</a>
+            <a class="mrslink" href="query.do?db=taxonomy&amp;query=Eukaryota">Eukaryota</a>
+            ...
+            <a class="mrslink" href="query.do?db=uniprot&amp;query=kw:Disulfide kw:bond ">Disulfide bond</a>
+            ...
+            <a class="mrslink" href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=...">92332489</a>
+            ...
+            <a class="mrslink" href="entry.do?db=go&amp;id=0009405"></a>
+
+   count
+    It returns a number of entries in the whole databank.
+
+       print $client->db ('enzyme')->count;
+       4645
+
+    Do not confuse it with the method of the same name but called on the
+    object returned by the *find* method - that one returns a number of hits
+    of that particular query.
+
+   entry
+    It takes an entry ID (mandatory), and optionally its format and extended
+    format, and it returns the given entry:
+
+       print $client->db ('enzyme')->entry ('3.4.21.60');
+       ID   3.4.21.60
+       DE   Scutelarin.
+       AN   Taipan activator.
+       CA   Selective cleavage of Arg-|-Thr and Arg-|-Ile in prothrombin to form
+       CA   thrombin and two inactive fragments.
+       CC   -!- From the venom of Taipan snake (Oxyuranus scutellatus).
+       CC   -!- Converts prothrombin to thrombin in the absence of coagulation factor
+       CC       Va, and is potentiated by phospholipid and calcium.
+       CC   -!- Specificity is similar to that of factor Xa.
+       CC   -!- Binds calcium via gamma-carboxyglutamic acid residues.
+       CC   -!- Similar enzymes are known from the venom of other Australian elapid
+       CC       snakes Pseudonaja textilis, Oxyuranus microlepidotus and Demansia
+       CC       nuchalis affinis.
+       CC   -!- Formerly EC 3.4.99.28.
+       //
+
+        print $client->db ('enzyme')->entry ('3.4.21.60',
+                                             MRS::EntryFormat->TITLE);
+        Scutelarin.
+
+    The optional "extended format" is a hashref and it was explained earlier
+    in the section about the "find()" method.
+
+   id, name, version, blastable, url, script, files, indices, aliases
+    There are several methods delivering databank properties. They have no
+    arguments:
+
+       my $db = $client->db('omim');
+       print $db->id        . "\n";
+       print $db->name      . "\n";
+       print $db->version   . "\n";
+       print $db->blastable . "\n";
+       print $db->url       . "\n";
+       print $db->script    . "\n";
+       print $db->aliases   . "\n";
+
+   files
+    Each databank consists of one or more files. This method returns a
+    reference to an array of "MRS::Client::Databank::File" instances. Each
+    such instance has properties reachable by the following "getters"
+    methods:
+
+       sub say { print @_, "\n"; }
+
+       my $db_files = $client->db('uniprot')->files;
+       foreach my $file (@{ $db_files }) {
+          say $file->id;
+          say $file->version;
+          say $file->last_modified;
+          say $file->entries_count;
+          say $file->raw_data_size;
+          say $file->file_size;
+          say '';
+       }
+
+   indices
+    Each databank is indexed by (usually several) indices. This method
+    returns a reference to an array of "MRS::Client::Databank::Index"
+    instances. Each such instance has properties reachable by the "getters"
+    method:
+
+       my $db_indices = $client->db('uniprot')->indices;
+       foreach my $idx (@{ $db_indices }) {
+          printf ("%-15s%-15s%9d  %-9s %s\n",
+                  $idx->db,
+                  $idx->id,
+                  $idx->count,
+                  $idx->type,
+                  $idx->description);
+       }
+
+    The index *id* is important because it can be used in the queries. For
+    example, assuming that the database has an index *os* (organism
+    species):
+
+       $db->find (query => 'rds AND os:human');
+
+  MRS::Client::Find
+    This object carries results of a query; it is returned by the *find*
+    method, called either on a databank instance or on the whole client.
+    Actually, in case of the whole client, the returned type is of type
+    "MRS::Client::MultiFind" which is a subclass "MRS::Client::Find".
+
+   db, terms, query, all_terms_required, max_entries
+    The getter methods just reflect query arguments (the ones given to the
+    "find" method):
+
+       sub say { print @_, "\n"; }
+
+       my $find = $client->db('uniprot')->find('sapiens');
+       say $find->db;
+       say join (", ", @ {$find->terms });
+       say $find->query;
+       say $find->max_entries;
+       say $find->all_terms_required;
+
+    The *terms* (a ref array) are either from the *and* or *or* argument,
+    and the *all_terms_required* is 1 (when terms are coming from the *and*)
+    or zero.
+
+   count
+    Finally, you can get the number of hits of this query. Be aware (as
+    mentioned elsewhere in this document) that boolean queries return only
+    an estimate, usually much higher than is the reality.
+
+  MRS::Client::MultiFind
+    This object is returned from the "find" method made to all databanks. It
+    is a subclass of the "MRS::Client::Find" with one additional method:
+
+   db_counts
+    It returns databank names and their total counts in a hash (not a
+    reference) where keys are the databank names and values the entry
+    counts:
+
+        my %counts = $find->db_counts;
+        foreach my $db (sort keys %counts) {
+            printf ("%-15s %9d\n", $db, $counts{$db});
+        }
+
+  MRS::Client::Hit
+    Finally, a tiny object representing a hit, a result of a query before
+    going to a databank for the full contents of a found entry. It contains
+    the databank's ID (where the hit was found), the score that this hit
+    achieved (for boolean queries, the score is always 1) and the ID and
+    title of the entry represented by this hit.
+
+    The corresponding getters methods are *db*, *score*, *id* and *title*.
+
+    The *next* method (as shown above) returns just hits (instead of the
+    full entries) when the format *MRS::EntryFormat-*HEADER> is specified.
+
+  MRS::Client::Blast
+    The MRS servers provide sequence homology searches, the famous Blast
+    program (namely the *blastp* program for protein sequences). An input
+    sequence (in FASTA format) is searched against one of the MRS databanks.
+    It can be any MRS databank whose method "blastable" returns true (e.g.
+    uniprot). An input sequence and a databank are the only mandatory input
+    parameters. Other common Blast parameters are also supported.
+
+    The invocation is asynchronous. It means that the *run* method returns
+    immediately, without waiting for the Blast program to finish, giving
+    back a *job id*, a handler that can be used later for polling for
+    status, and, once status indicates the Blast finishes, for getting
+    results (or an error message). This is the typical usage:
+
+        my @run_args = (fasta_file => '...', db => '...', ...);
+        my $job = $client->blast->run (@run_args);
+        sleep 10 while (not $job->completed);
+        print $job->error if $job->failed;
+        print $job->results;
+
+        529.0   1.346582e-149  [vsph_trije  ]  1 Snake venom serine protease homolog;
+        509.0   1.411994e-143  [vspa_triga  ]  1 Venom serine proteinase 2A;
+        508.0   2.823987e-143  [vsp1m_trist ]  1 Venom serine protease 1 homolog;
+        506.0   1.129595e-142  [vsp07_trist ]  1 Venom serine protease KN7 homolog;
+        488.0   2.961165e-137  [vsp2_trifl  ]  1 Venom serine proteinase 2;
+        487.0   5.922331e-137  [vsp1_trije  ]  1 Venom serine proteinase-like protein;
+        456.0   1.271811e-127  [vsp04_trist ]  1 Venom serine protease KN4 homolog;
+        ...
+
+    You can also use provided script "mrsblast" that polls for you (if you
+    wish so).
+
+    In order to create an "MRS::Client::Blast" instance, use the factory
+    method:
+
+       my $blast = $client->blast;
+
+   run
+    The main method that starts Blast with the given parameters and
+    immediately returns an object "MRS::Client::Blast::Job" that can be used
+    for all other important methods. If you plan to stop your Perl program
+    and start it again later, you need to remember the job ID:
+
+       my $job = $blast->run (...);
+       print $job->id;
+
+    The job ID can be later used to re-create the same (well, similar) Job
+    object (see method *job* below) that again provides all important
+    methods (such as getting results).
+
+    The method *run* has following arguments (the Job object has the same
+    "getter" methods), all given as a hash:
+
+    db  An MRS databank to search against. Mandatory parameter.
+
+    fasta
+        A protein sequence in a FASTA format. Mandatory parameter unless
+        "fasta_file" is given.
+
+    fasta_file
+        A name of a file containing a protein sequence in a FASTA format.
+        Mandatory parameter unless "fasta" is given.
+
+    filter
+        Low complexity filter. Boolean parameter. Default is 1.
+
+    expect
+        E-value cutoff. A float value. Default is 10.0.
+
+    word_size
+        An integer. Default is 3.
+
+    matrix
+        Scoring matrix. Default BLOSUM62.
+
+    open_cost
+        Gap opening penalty. An integer. Default is 11.
+
+    extend_cost
+        Gap extension penalty. Default is 1.
+
+    query
+        An MRS boolean query to limit the search space.
+
+    gapped
+        A boolean parameter. Its true value performs gapped alignment.
+        Default is true.
+
+    max_hits
+        Limit reported hits. An integer. Default is 250.
+
+   job
+    The method finds or re-creates a Job object of the given ID:
+
+       my $job = $client->blast->job ('0f37a544-a7a2-4239-b950-65a6aa07d1ef');
+       print $job->id;
+       print $job->status;
+
+    It dies with an error if such Job is not known to the MRS server.
+
+    The returned Job object can be used to ask for the Job status, or for
+    getting the Job results. There is one caveat, however. The re-created
+    Job object is not that "rich" as was its original version: it does not
+    know, for example, what parameters were used to start this blast job.
+    Unfortunately, the MRS server keeps only the Job ID and nothing else.
+    Fortunately, the parameters are needed only for the results in the XML
+    format (see more about available formats below, in the method
+    *$job->results*) - and you can add them (if you still have them), as a
+    hash, to the "job" method when re-creating a new Job instance:
+
+       my $job - $client->blast->job ('0f37a544-a7a2-4239-b950-65a6aa07d1ef',
+                                      fasta => '...',
+                                      db    => 'iniprot', ...);
+
+  MRS::Client::Blast::Job
+    The Job object represents a single Blast invocation with a set of input
+    parameters and, later, with results. It is also used to poll for the
+    status of the running job. Instances of this objects are created by the
+    *run* or *job* methods of the "blast" object. The Job's methods are:
+
+    id  Job ID, an important handler if you have to re-create an
+        "MRS::Client::Blast::Job" object.
+
+    "getter" methods
+        All these methods are equivalent to (and named the same as) the
+        parameters given to the "run" method (described above):
+
+        db
+        fasta
+        fasta_file
+        filter
+        expect
+        word_size
+        matrix
+        open_cost
+        extend_cost
+        query
+        max_hits
+        gapped
+
+
+    status, completed, failed
+        The *status* returns one of the "MRS::JobStatus":
+
+           use constant {
+              UNKNOWN  => 'unknown',
+              QUEUED   => 'queued',
+              RUNNING  => 'running',
+              ERROR    => 'error',
+              FINISHED => 'finished',
+            };
+
+        The *completed* returns true if the status is either "ERROR" or
+        "FINISHED". The *failed* returns true if the status is "ERROR".
+        Typical usage for polling a running job is:
+
+           sleep 10 while (not $job->completed);
+
+    error
+        It returns an error message, or undef if the status is not "ERROR".
+        Typical usage is:
+
+           print $job->error if $job->failed;
+
+    results
+        Finally, the more interesting method. It returns an object of type
+        "MRS::Client::Blast::Result" that can be either used on its own (see
+        its "getter" method below), or converted to strings of one of the
+        format predefined in "MRS::BlastOutputFormat":
+
+           use constant {
+              XML   => 'xml',
+              HITS  => 'hits',
+              FULL  => 'full',
+              STATS => 'stats',
+           };
+
+        The format is the only parameter of this method. Default format is
+        "HITS". The conversion to the given format is done by overloading
+        the double quotes operator, calling internally the method
+        "as_string". You just print the object:
+
+           print $job->results;
+
+           447.0   6.511672e-125  [vspgl_glosh ]  1 Thrombin-like enzyme gloshedobin;
+           429.0   1.706996e-119  [vsp2_viple  ]  1 Venom serine proteinase-like protein 2;
+           421.0   4.369909e-117  [vsp12_trist ]  1 Venom serine protease KN12;
+           419.0   1.747964e-116  [vsps1_trist ]  1 Thrombin-like enzyme stejnefibrase-1;
+           ...
+
+        Where lines are individual hits and columns are: *bit_score*,
+        *expect*, sequence ID, number of HSPs for this hit, sequence
+        description.
+
+        Or, giving just the Blast run statistics:
+
+           print $job->results (MRS::BlastOutputFormat->STATS);
+
+           DB count:     514212
+           DB length:    180900945
+           Search space: 23664675636
+           Kappa:        0.041
+           Lambda:       0.267
+           Entropy:      0.140
+
+        Or, showing everything (in a rather un-parsable form, useful more
+        for testing than anything else):
+
+           print $job->results (MRS::BlastOutputFormat->FULL);
+
+        Or, in an XML format:
+
+           print $job->results (MRS::BlastOutputFormat->XML);
+
+  MRS::Client::Blast::Result
+    You can explore the returned Blast results by the following "getter"
+    methods - going from the whole result to the individual hits and inside
+    hits to the individual HSPs (High-scoring pairs):
+
+    db_count
+    db_length
+    db_space
+           Effective search space.
+
+    kappa
+    lambda
+    entropy
+    hits
+        It returns a reference to an array of "MRS::Client::Blast::Hit"s
+        where each hit has methods:
+
+        id
+        title
+        sequences
+            It is a reference to an array of sequence IDs.
+
+        hsps
+            It is a reference to an array of "MRS::Client::Blast::HSP"s
+            where each HSP has methods:
+
+            score
+            bit_score
+            expect
+            query_start
+            subject_start
+            identity
+            positive
+            gaps
+            subject_length
+            query_align
+            subject_align
+            midline
+
+    Try to explore various result formats by using the provided script
+    "mrsblast". This waits for a job to be completed and then prints its
+    hits:
+
+       mrsblast -d sprot -i 'your.fasta'
+
+    This shows Blast statistics:
+
+       mrsblast -d sprot -i 'your.fasta' -N
+
+    This produces an XML output to a given file:
+
+       mrsblast -d sprot -i 'your.fasta' -x results.xml
+
+    Finally, this gives a long listing with all details:
+
+       mrsblast -d sprot -i 'your.fasta' -f
+
+  MRS::Client::Clustal
+    Attention: This module is used only by MRS version 5, See "MRS VERSIONS"
+    for details.
+
+    The module wrapping the multiple alignment program *clustalw*. The
+    program is optional and, therefore, not all MRS servers may have it. Use
+    the factory method for creating instances of MRS::Client::Clustal:
+
+       $client->clustal
+
+   run
+    The main method, invoking *clustalw* with mandatory input sequences and
+    optionally a couple of other parameters:
+
+       my $result = $client->clustal->run (fasta_file => 'my.proteins.fasta');
+
+    fasta_file
+        A file with multiple sequences in FASTA format.
+
+    open_cost
+        A gap opening penalty (an integer).
+
+    extend_cost
+        A gap extension penalty (a float).
+
+    It returns result in an instance of MRS::Client::Clustal::Result.
+
+   open_cost
+    It returns what gap opening penalty has been set in the *run* method.
+
+   extend_cost
+    It returns what gap extension penalty has been set in the *run* method.
+
+  MRS::Client::Clustal::Result
+    It is created by running:
+
+       $client->clustal->run (...);
+
+   alignment
+    It returns a reference to an array of MRS::Client::Clustal::Sequence
+    instances. Each of them has methods *id* and *sequence*. You can also
+    just print the formatted alignment (it uses its own *as_string* method
+    that overloads double quotes operator):
+
+       print $client->clustal->run (fasta_file => 'several.proteins.fasta');
+
+       vsph_trije : -VMGWGTISATKETHPDVPYCANINILDYSVCRAAYARLPATSRTLCAGILE-----GGKDSCLTD----SGGPLICNGQFQGIVSWGGHPCGQP-RKPGLYTKVFDHLDWIKSIIAGNKDATCPP
+       nxsa_latse : ----MKTLLLTLVVVTIV--CLDLGYTR--ICFNHQSSQPQTTKT-CS---------PGESSCYNK----QWS------DFRGTIIERG--CGCPTVKPGI------KLSCCESEVCNN-------
+       pa21b_pseau: NLIQFGNMIQCANKGSRP--SLDYADYG-CYCGWGGSGTPVDELDRCCQVHDNCYEQAGKKGCFPKLTLYSWKCTGNVPTCNSKPGCKSFVCACDAAAAKC----FAKAPYKKENYNIDTKKRCK-
+
+   diagnostics
+    It shows the standard output of the underlying clustalw program:
+
+       my $result = $client->clustal->run (fasta_file => 'several.proteins.fasta');
+       print $result->diagnostics;
+
+        CLUSTAL 2.0.10 Multiple Sequence Alignments
+
+       Sequence type explicitly set to Protein
+       Sequence format is Pearson
+       Sequence 1: vsph_trije    115 aa
+       Sequence 2: nxsa_latse     83 aa
+       Sequence 3: pa21b_pseau   118 aa
+       Start of Pairwise alignments
+       Aligning...
+
+       Sequences (1:2) Aligned. Score:  13
+       Sequences (1:3) Aligned. Score:  5
+       Sequences (2:3) Aligned. Score:  8
+       Guide tree file created: ...
+
+       There are 2 groups
+       Start of Multiple Alignment
+
+       Aligning...
+       Group 1:                     Delayed
+       Group 2:                     Delayed
+       Alignment Score -93
+
+       GDE-Alignment file created ...
+
+   failed
+    It returns standard error output of the underlying clustalw program. It
+    the program finished without problems, it returns undef.
+
+MRS VERSIONS
+    The SOAP API of the MRS server slightly (or significantly, depending on
+    what you were using) changed between version 5 and 6 (the version
+    numbers indicate the MRS server version, not the version of the
+    "MRS::Client" module). The "MRS::Client" module can work with both MRS
+    server versions, but sometimes you have to tell what version you are
+    planning to connect to.
+
+   new parameter "mrs_version"
+    By default, the "MRS::Client" assumes that it connects to an MRS server
+    version 6 (or higher). But for MRS servers version 5 you need to add a
+    new argument mrs_version to the client instance constructor with a value
+    that differs from 6 (and it not zero or undef):
+
+       my $client = MRS::Client->new (mrs_version => 5, host => '...');
+
+    You can also set the expected version by an environment variable
+    "MRS_VERSION":
+
+       $ENV{MRS_VERSION} = 5;
+       my $client = MRS::Client->new (host => '...');
+
+    You can also check what version your client is talking to, by a new
+    method is_v6 (mostly used rather internally):
+
+       $client->is_v6()   # returns 1 or 0
+
+    The command-line tool "mrsclient" got an additional parameter -V:
+
+       mrsclient -V5 -H... -l
+
+   missing some result formats
+    The MRS 6 server does not support anymore HTML and sequence result
+    formats. The "sequence" format does not matter much because the "fasta"
+    format continues to be provided and it is easy to get the pure sequence
+    from it. But the lack of the "HTML" format is probably the most
+    significant (downgrade) change.
+
+   search algorithm not supported
+    The MRS 6 server does not accept anymore requests for different search
+    algorithms; it uses always the Vector algorithm.
+
+   no ClustalW service
+    The MRS 6 server does not provide multiple sequence alignment service.
+    All remarks about ClustalW in this document are, therefore, valid only
+    for the MRS 5.
+
+   aliases
+    The MRS 6 brings a new concept: *aliases*. An alias is a set of
+    databases, usually closely related. A typical example is an alias
+    "uniprot" that combines together two databases, the "sprot" (SwissProt)
+    and "trembl" (TrEMBL). You can use an alias in all places where so far
+    only database IDs were possible.
+
+    However, the list of databases returned by the "db()" method does not
+    include the aliases. You need to ask individual databases for their
+    aliases:
+
+       $client->db('sprot')->aliases();
+
+MISSING FEATURES, CAVEATS, BUGS
+    *   The MRS distinguishes between so-called *ranked queries* and
+        *boolean queries*, and it recognizes also *boolean filters*. I
+        probably need to learn more about their differences. That's why you
+        may see some differences in query results shown by this module and
+        the mrsweb web application (an application distributed together with
+        the implementation of the MRS servers).
+
+        The contents of the search field in the *mrsweb* is first parsed in
+        order to find out if it is a boolean expression, or not. Depending
+        on the result it uses either a ranked or boolean query. It also
+        splits the terms and combine them (by default) with the logical AND.
+        For example, in *mrsweb* if you type (using the uniprot):
+
+           cone snail
+
+        you get 134 entries. You get the same number of hits by the
+        "MRS::Client" module when using an *and* argument:
+
+           print $client->db('uniprot')->find ('and' => ['cone','snail'])->count;
+           134
+
+        But you cannot just pass the whole expression as a query string (as
+        you do in *mrsweb*):
+
+           print $client->db('uniprot')->find ('cone snail')->count;
+           0
+
+        You get zero entries because the "MRS::Client" considers the above
+        as one term. And if you add a boolean operator:
+
+           print $client->db('uniprot')->find ('cone AND snail')->count;
+           4609
+
+        then the boolean query was used and, as explained by the MRS, the
+        "query did not return an exact result, displaying the closest
+        matches". But, fortunately, when you iterate over this result, you
+        will get, correctly, just the 134 entries.
+
+    *   The MRS servers provide few more operations that are not-yet covered
+        by this module. It would be useful to discuss which of those are
+        worth to implement. They are:
+
+           GetMetaData
+           FindSimilar
+           GetLinked
+           Cooccurrence
+           SpellCheck
+           SuggestSearchTerms
+           CompareDocuments
+           ClusterDocuments
+
+        There is also a potentially useful attribute *links* in the
+        databank's info which has not been yet explored by this module.
+
+ADDITIONAL FILES
+    Almost all functionality of the "MRS::Client" module is also available
+    from a command-line controlled scripts mrsclient, mrsblast and
+    mrsclustal. Try , for example:
+
+        mrsclient -h
+        mrsclient -C
+        mrsclient -c -n insulin
+        mrsclient -c -p -d enzyme -a 'endothelin tyrosine'
+        mrsblast -h
+        mrsclustal -h
+
+DEPENDENCIES
+    The "MRS::Client" module uses the following modules:
+
+       XML::Compile::SOAP11
+       XML::Compile::WSDL11
+       XML::Compile::Transport::SOAPHTTP
+       File::Basename
+       File::Path
+       Math::BigInt
+       FindBin
+       Getopt::Std
+
+BUGS
+    Please report any bugs or feature requests to
+    <http://github.com/msenger/MRS-Client/issues>.
+
+ACKNOWLEDGMENTS
+    This client module would be useless without having an MRS server (e.g.
+    at http://mrs.cmbi.ru.nl/m6/). The MRS stands for Maarten's Retrieval
+    System and was developed (and is maintained) by *Maarten Hekkelman* at
+    the CMBI (http://www.cmbi.ru.nl/), with the help and contributions from
+    many others.
+
+    The MRS itself has also its own Perl module MRS.pm, called plugin and
+    distributed together with the MRS, that accesses MRS server(s) directly,
+    without using the SOAP Web Services protocol. The plugin was helpful to
+    find out what the server might expect.
+
+    Additionally, the MRS distribution has few testing scripts that use SOAP
+    protocol to access data in the same way as this "MRS::Client" module
+    does. Therefore, this module can be seen as an extension of these
+    testing scripts into a slightly more comprehensive and perhaps more
+    documented package.
+
+    The MRS server provides Blast results that are not in XML. In order to
+    make an XML output, this module uses, hopefully, the same format and
+    conversion as found in the MRS web application.
+
+AUTHOR
+    Martin Senger <martin.senger@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Martin Senger, CBRC - KAUST
+    (Computational Biology Research Center - King Abdullah University of
+    Science and Technology) All Rights Reserved..
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

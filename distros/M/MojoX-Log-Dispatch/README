@@ -1,0 +1,48 @@
+MojoX-Log-Dispatch
+
+MojoX::Log::Dispatch - Log::Dispatch For Mojo
+MojoX::Log::Dispatch - wrapper around Log::Dispatch module. Log::Dispatch manages a set of Log::Dispatch::* objects, allowing you to add and remove output objects as desired.
+
+Include log statements at various levels throughout your code.
+Then when you create the new logging object, set the minimum log level you
+want to keep track off.
+Set it low, to 'debug' for development, then higher in production.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc MojoX::Log::Dispatch
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=MojoX-Log-Dispatch
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/MojoX-Log-Dispatch
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/MojoX-Log-Dispatch
+
+    Search CPAN
+        http://search.cpan.org/dist/MojoX-Log-Dispatch/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Konstantin Kapitanov
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

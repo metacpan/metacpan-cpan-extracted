@@ -1,0 +1,132 @@
+=head1 NAME
+
+Mojolicious::Plugin::DOCRenderer - Doc Renderer Plugin
+
+=head1 SYNOPSIS
+
+  # Mojolicious::Lite
+  plugin 'DOCRenderer';
+  plugin DOCRenderer => {module => 'MyApp'};
+  plugin DOCRenderer => {name => 'foo'};
+  plugin DOCRenderer => {url => '/mydoc'};
+  plugin DOCRenderer => {preprocess => 'epl'};
+
+  # Mojolicious
+  $self->plugin('DOCRenderer');
+  $self->plugin(DOCRenderer => {module => 'MyApp'});
+  $self->plugin(DOCRenderer => {name => 'foo'});
+  $self->plugin(DOCRenderer => {url => '/mydoc'});
+  $self->plugin(DOCRenderer => {preprocess => 'epl'});
+
+  #############################
+  # Mojolicious::Lite example #
+  #############################
+  use Mojolicious::Lite;
+  use File::Basename;
+
+  plugin 'DOCRenderer' => {
+      # use this script base name as a default module to show for "/doc"
+      module => fileparse( __FILE__, qr/\.[^.]*/ );
+  };
+
+  app->start;
+
+  __END__
+
+  =head1 NAME
+
+  MyApp - My Mojolicious::Lite Application
+
+  =head1 DESCRIPTION
+
+  This documentation will be available online, for example from L<http://localhost:3000/doc>.
+
+  =cut
+
+  #######################
+  # Mojolicious example #
+  #######################
+  package MyApp;
+  use Mojo::Base 'Mojolicious';
+
+  sub development_mode {
+    # Enable browsing of "/doc" only in development mode
+    shift->plugin( 'DOCRenderer' );
+  }
+
+  sub startup {
+    my $self = shift;
+    # some code
+  }
+
+  __END__
+
+  =head1 NAME
+
+  MyApp - My Mojolicious Application
+
+  =head1 DESCRIPTION
+
+  This documentation will be available online, for example from L<http://localhost:3000/doc>.
+
+  =cut
+
+=head1 DESCRIPTION
+
+L<Mojolicious::Plugin::DOCRenderer> generates on-the-fly and browses online
+POD documentation directly from your Mojolicious application source codes
+and makes it available under I</doc> (customizable).
+
+The plugin expects that you use POD to document your codes of course.
+
+The plugin is simple modification of L<Mojolicious::Plugin::PODRenderer>.
+
+=head1 OPTIONS
+
+=head2 C<module>
+
+  # Mojolicious::Lite
+  plugin DOCRenderer => {module => 'MyApp'};
+
+Name of the module to initially display. Default is C<$ENV{MOJO_APP}>.
+Mojolicious::Lite application may have undefined C<$ENV{MOJO_APP}>; in such
+case you should set C<module>, see Mojolicious::Lite example.
+
+=head2 C<name>
+
+  # Mojolicious::Lite
+  plugin DOCRenderer => {name => 'foo'};
+
+Handler name.
+
+=head2 C<preprocess>
+
+  # Mojolicious::Lite
+  plugin DOCRenderer => {preprocess => 'epl'};
+
+Handler name of preprocessor.
+
+=head2 C<url>
+
+  # Mojolicious::Lite
+  plugin DOCRenderer => {url => '/mydoc'};
+
+URL from which the documentation of your project is available. Default is I</doc>.
+
+=head1 METHODS
+
+L<Mojolicious::Plugin::DOCRenderer> inherits all methods from
+L<Mojolicious::Plugin> and implements the following new ones.
+
+=head2 C<register>
+
+  my $route = $plugin->register(Mojolicious->new);
+  my $route = $plugin->register(Mojolicious->new, {name => 'foo'});
+
+Register renderer in L<Mojolicious> application.
+
+=head1 SEE ALSO
+
+L<Mojolicious::Plugin::PODRenderer>, L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+
+=cut

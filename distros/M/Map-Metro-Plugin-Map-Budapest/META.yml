@@ -1,0 +1,38 @@
+---
+abstract: 'Map::Metro map for Budapest'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Map-Metro-Plugin-Map-Budapest
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+provides:
+  Map::Metro::Plugin::Map::Budapest:
+    file: lib/Map/Metro/Plugin/Map/Budapest.pm
+    version: '0.1001'
+requires:
+  Map::Metro: '0.1900'
+  Moose::Role: '2.0000'
+  perl: '5.016000'
+resources:
+  bugtracker: https://github.com/Csson/p5-Map-Metro-Budapest/issues
+  homepage: https://metacpan.org/release/Map-Metro-Plugin-Map-Budapest
+  repository: https://github.com/Csson/p5-Map-Metro-Budapest.git
+version: '0.1001'

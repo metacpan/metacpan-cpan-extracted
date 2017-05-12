@@ -1,0 +1,9 @@
+Revision history for Perl extension Math::Derivative_XS.
+
+0.02  Tue Oct 02 12:13:00 2012
+    - First CPAN uploaded version
+
+0.01  Thu May 24 17:13:53 2012
+	- original version; created by h2xs 1.23 with options
+		-A -n Math::Derivative_XS
+

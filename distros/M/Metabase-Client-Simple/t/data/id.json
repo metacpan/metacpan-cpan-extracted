@@ -1,0 +1,32 @@
+[
+   {
+      "content" : "[{\"content\":\"John Doe\",\"metadata\":{\"core\":{\"resource\":\"metabase:user:b3616bda-8e8a-11df-bca9-3b15b6cd6251\",\"update_time\":\"2010-07-13T14:27:01Z\",\"creator\":\"metabase:user:b3616bda-8e8a-11df-bca9-3b15b6cd6251\",\"type\":\"Metabase-User-FullName\",\"creation_time\":\"2010-07-13T14:27:01Z\",\"guid\":\"b363cb96-8e8a-11df-bca9-3b15b6cd6251\",\"schema_version\":1,\"valid\":1}}},{\"content\":\"jdoe@example.com\",\"metadata\":{\"core\":{\"resource\":\"metabase:user:b3616bda-8e8a-11df-bca9-3b15b6cd6251\",\"update_time\":\"2010-07-13T14:27:01Z\",\"creator\":\"metabase:user:b3616bda-8e8a-11df-bca9-3b15b6cd6251\",\"type\":\"Metabase-User-EmailAddress\",\"creation_time\":\"2010-07-13T14:27:01Z\",\"guid\":\"b363d8fc-8e8a-11df-bca9-3b15b6cd6251\",\"schema_version\":1,\"valid\":1}}}]",
+      "metadata" : {
+         "core" : {
+            "resource" : "metabase:user:b3616bda-8e8a-11df-bca9-3b15b6cd6251",
+            "update_time" : "2010-07-13T14:27:01Z",
+            "creator" : "metabase:user:b3616bda-8e8a-11df-bca9-3b15b6cd6251",
+            "type" : "Metabase-User-Profile",
+            "creation_time" : "2010-07-13T14:27:01Z",
+            "guid" : "b3616bda-8e8a-11df-bca9-3b15b6cd6251",
+            "schema_version" : 1,
+            "valid" : 1
+         }
+      }
+   },
+   {
+      "content" : "trustnoone",
+      "metadata" : {
+         "core" : {
+            "resource" : "metabase:user:b3616bda-8e8a-11df-bca9-3b15b6cd6251",
+            "update_time" : "2010-07-13T14:27:01Z",
+            "creator" : "metabase:user:b3616bda-8e8a-11df-bca9-3b15b6cd6251",
+            "type" : "Metabase-User-Secret",
+            "creation_time" : "2010-07-13T14:27:01Z",
+            "guid" : "b363e978-8e8a-11df-bca9-3b15b6cd6251",
+            "schema_version" : 1,
+            "valid" : 1
+         }
+      }
+   }
+]

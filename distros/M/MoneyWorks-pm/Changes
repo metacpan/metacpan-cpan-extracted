@@ -1,0 +1,66 @@
+Revision history for MoneyWorks.pm
+
+0.11  15 December, 2016
+      Fixed tests to work with MoneyWorks versions like 7.3.8r1.
+
+0.10  24 July, 2016
+      Fixed to work with perl 5.24.0.
+
+0.09  25 October, 2012
+    • Work around a bug in MoneyWorks,  which sometimes  begins  out-
+      put with  ‘Address already in use’  when  the  client  is  run-
+      ning as root.
+    • Fix tests to work with MoneyWorks 6. 
+
+0.08  21 November, 2010
+      Suppress a warning about tie being ambiguous in perl 5.13.x.
+
+0.07  20 June, 2010
+      Now the SIGPIPE code hopefully actually works, instead of dying.
+
+0.06  23 May, 2010
+    • Instead of ignoring SIGPIPEs, now we start a new MW process and
+      try again.
+    • Fixed to work in perl 5.12 and higher.
+    • The tests for the version method have been fixed to  work  with
+      MoneyWorks 5.3 (two numbers, not three).
+
+0.05  14 February, 2010
+      We now intercept  SIGPIPEs to stop the perl process from  being
+      killed if the MW process crashes.
+
+0.04  2 December, 2009
+      The  import  method no longer causes a  ‘Command cannot contain
+      line breaks’ error if the data contain a carriage return but no
+      line feed.
+
+0.03  7 September, 2009
+    • Error messages are now  more  verbose.  MoneyWorks.pm  used  to
+      choose between  Diagnostic  and  Error  headers,  but it’s  not
+      always easy to tell which would be the most helpful to the user,
+      so both are used.
+    • Documentation fix: passwd -> password
+    • The eval method now replaces line breaks with spaces instead of
+      dying (since MoneyWorks expressions cannot contain line breaks).
+      This makes it easier to write long expressions.
+    • The tie interface can now deal with  @ signs  (which MoneyWorks
+      usually  treats  specially),  so  you  can  write  things  like
+      $mw->tie("name","email")->{'clext@gled.blit'}.
+    • The export  method no longer requires the key to be in the list
+      of exported fields.
+    • The  command  method now strips nulls,  but warns when doing so.
+    • mw_cli_quote now warns if it sees line breaks.
+    • The export method no longer requires a list of fields.  It will
+      export all fields by default.
+
+0.02  16 May, 2009
+    • Port numbers are no longer inserted  automatically  into  money-
+      works://  URLs.  (I didn’t realise at first that there are *two*
+      default ports, depending on the type of server.)
+    • For the sake of security,  file names are no longer  passed  to
+      moneyworks on the command line, but through STDIN.
+    • Password-protected local files can now be opened  (this feature
+      was documented in the  first  release,  but  was  never  added).
+
+0.01  15 May, 2009
+      First release.

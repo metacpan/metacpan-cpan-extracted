@@ -1,0 +1,9 @@
+ChangeLog			Module History
+MANIFEST			This file
+MANIFEST.SKIP			Files to skip when making the dist
+Makefile.PL			Makefile script
+README                          What it says
+lib/Mail/Spool.pm		Base Module containing core functionality
+lib/Mail/Spool/Handle.pm	Base Module for directory encapsulization
+lib/Mail/Spool/Node.pm	        Base Module for inode encapsulization
+t/01_mail_spool.t               Basic test

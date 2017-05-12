@@ -1,0 +1,234 @@
+#!/usr/bin/env perl
+#
+# Accepts various inputs, applies Music::Chord::Positions functions to
+# that input, outputs lilypond data containing the results.
+#
+#   mcp2ly                inv 0 4 7 > inv.ly && lilypond inv.ly
+#   mcp2ly -f 0.1 -x -v 4 pos 0 4 7 > pos.ly && lilypond pos.ly
+#
+# Forte numbers (via Music::AtonalUtil) or chord names (via
+# Music::Chord::Note) are accepted. Non-root-position chords will
+# require manual pitch lists, as the lowest pitch number is used as
+# root; compare, for example:
+#
+#   mcp2ly pos 7 0  1  2
+#   mcp2ly pos 7 12 13 14
+#
+# Warning! Some pitch sets and looser restriction rules will result in
+# massive numbers of voicings.
+
+use strict;
+use warnings;
+
+use File::Basename qw/basename/;
+use List::Util qw/shuffle sum/;
+use Getopt::Long qw/GetOptions/;
+use Music::AtonalUtil  ();
+use Music::Chord::Note ();
+use Music::Chord::Positions;
+use POSIX qw/floor/;
+use Try::Tiny;
+
+my (
+  @orig_args,       %modes,           %params,
+  %pitch2note,      %registers,       $LY_DEFAULT_DURATION,
+  $chord_spec,      $cn,              $duration,
+  $flats,           $fudge,           $is_conventional,
+  $ly_lower_voices, $ly_upper_voices, $mode,
+  $omit_orig,       $pitch_set,       $reverse,
+  $shuffle,         $transpose,       $voice_count,
+);
+
+my $atu = Music::AtonalUtil->new;
+my $FORTE_NUMBER_RE = $atu->forte_number_re;
+
+@orig_args = ( map { $_ =~ tr/"/'/; $_ } basename($0), @ARGV );
+
+$duration = 1;      # whole note
+$fudge    = 0.5;    # used to help figure out what staff a voice ends up in
+$ly_lower_voices = $ly_upper_voices = '';
+$transpose       = 0;
+
+%pitch2note =
+  qw( 0 c 1 cis 2 d 3 dis 4 e 5 f 6 fis 7 g 8 gis 9 a 10 ais 11 b );
+%registers = (
+  -3 => ",,,",
+  -2 => ",,",
+  -1 => ",",
+  0  => "",
+  1  => "'",
+  2  => "''",
+  3  => "'''",
+  4  => "''''",
+  5  => "'''''"
+);
+
+GetOptions(
+  'conventional|c'  => \$is_conventional,
+  'duration|D=s'    => \$duration,
+  'exclude-orig|x'  => \$omit_orig,
+  'flats'           => \$flats,
+  'fudge|f=s'       => \$fudge,
+  'param|p=s'       => \%params,
+  'reverse|r'       => \$reverse,
+  'shuffle|s'       => \$shuffle,
+  'transpose|t=s'   => \$transpose,
+  'voice-count|v=s' => \$voice_count,
+) or print_help();
+$mode = 'chord_' . ( shift // '' );
+$mode =~ s/(voc|voice)$/pos/;
+
+print_help() if !defined $mode or !@ARGV;
+
+if ($flats) {
+  %pitch2note =
+    qw( 0 c 1 des 2 d 3 ees 4 e 5 f 6 ges 7 g 8 aes 9 a 10 bes 11 b );
+}
+
+$chord_spec = "@ARGV";
+
+if ( $chord_spec =~ m/($FORTE_NUMBER_RE)/ ) {
+  $pitch_set = $atu->forte2pcs($1);
+  die "unknown Forte Number '$chord_spec'\n" if !defined $pitch_set;
+} elsif ( $chord_spec =~ m/[A-Za-z()-]/ or $chord_spec =~ m/^\s*\d+\s*$/ ) {
+  try { $pitch_set = [ Music::Chord::Note->new->chord_num($chord_spec) ] }
+  catch {
+    warn
+      "Music::Chord::Note could not parse '$chord_spec', see list in module src\n";
+    exit 64;
+  };
+} else {
+  my @pitches = $chord_spec =~ m/(\d+)/g;
+  $pitch_set = \@pitches;
+}
+
+my $mcp = Music::Chord::Positions->new;
+
+# Get voice lines, convert to lilypond format, figure out what staff the
+# voices should be in. TODO messy, really should be templated or part of
+# the module.
+{
+  if ($is_conventional) {
+    my @ep = grep { $_ ne 'voice_count' } keys %params;
+    delete @params{@ep};
+    $params{'allow_transpositions'} = 1;
+    $params{'no_partial_closed'}    = 1;
+    $params{'pitch_max'}            = -1;
+  }
+
+  if ( $voice_count and exists $params{'voice_count'} ) {
+    die "error: voice_count specified twice??\n";
+  } elsif ( $voice_count and $mode eq 'chord_pos' ) {
+    $params{voice_count} = $voice_count;
+  }
+
+  my $chords = $mcp->$mode( $pitch_set, %params );
+  die "no chords generated" unless @$chords;
+
+  warn "notice: reverse and shuffle together? really?\n"
+    if $shuffle and $reverse;
+
+  unshift @$chords, $pitch_set unless $omit_orig;
+  @$chords = shuffle @$chords if $shuffle;
+  @$chords = reverse @$chords if $reverse;
+  my $voices = $mcp->chords2voices($chords);
+
+  my ( @uv, @lv );
+  for my $voice (@$voices) {
+    my ( @registers, $mean_reg_num );
+    for my $pitch (@$voice) {
+      $pitch += $transpose if $transpose;
+      my $ly_pitch = $pitch2note{ $pitch % $mcp->scale_degrees };
+      my $reg_num  = floor( $pitch / $mcp->scale_degrees );
+      push @registers, $reg_num;
+
+      $pitch = $ly_pitch . $registers{$reg_num};
+    }
+    my $mean_register = floor( sum(@registers) / @$voice + $fudge );
+
+    $voice->[0] .= $duration;
+    if ( $mean_register > 0 ) {
+      push @uv, join " ", @$voice;
+    } else {
+      push @lv, join " ", @$voice;
+    }
+  }
+
+  if (@uv) {
+    $ly_upper_voices = "<< {\n" . join( "\n} \\\\ {\n", @uv ) . "\n} >>\n";
+  }
+  if (@lv) {
+    $ly_lower_voices = "<< {\n" . join( "\n} \\\\ {\n", @lv ) . "\n} >>\n";
+  }
+}
+
+exit if lyify();
+die "warning: problem emitting lilypond data\n";
+
+########################################################################
+#
+# SUBROUTINES
+
+sub lyify {
+  print <<"END_TMPL";
+\\version "2.12.0"
+
+\\header {
+  title    = "Pitch set: @$pitch_set"
+  subtitle = "Music::Chord::Positions v.$Music::Chord::Positions::VERSION"
+}
+
+upper = {
+  \\clef treble
+  $ly_upper_voices
+}
+
+lower = {
+  \\clef bass
+  $ly_lower_voices
+}
+
+\\score {
+  \\new PianoStaff <<
+    \\new Staff = "upper" \\upper
+    \\new Staff = "lower" \\lower
+  >>
+  \\layout { }
+  \\midi { }
+}
+
+\\markup { Generated via: @orig_args }
+
+END_TMPL
+}
+
+sub print_help {
+  warn <<"END_USAGE";
+Usage: $0 [options] inv|pos
+
+Generates chord inversions or voicings in lilypond format to stdout.
+
+Options:
+
+  conventional     Set a bunch of parameters for "conventional" voicings.
+  duration|D=s     Specify custom duration for chords generated (default whole)
+  exclude-orig|x   Exclude original chord from output.
+  flats            Use flats instead of sharps in output.
+  fudge|f=s        Fudge factor for what clef voices end up in.
+  param|p=s        Custom parameters, see Music::Chord::Positions docs.
+  reverse|r        Reverse order of the generated chords.
+  shuffle|s        Shuffle chords randomly.
+  transpose|t=s    Value in semitones to transpose output by.
+  voice-count|v=s  How many voices to generate.
+
+END_USAGE
+
+  exit 64;
+}
+
+END {
+  unless ( close(STDOUT) ) {
+    warn "error: problem closing STDOUT: $!\n";
+    exit 74;
+  }
+}

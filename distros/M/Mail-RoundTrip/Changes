@@ -1,0 +1,8 @@
+Revision history for Mail-RoundTrip
+
+0.02    2013-11-07
+        Moved from Module::Install to Extutils::MakeMaker due to build errors on
+        some platforms.
+
+0.01    2013-11-05 
+        First version, released on an unsuspecting world.

@@ -1,0 +1,38 @@
+
+Perl fails to assign many floating point values correctly ... and by "many", I mean millions.
+(Perhaps there are some platforms where this is not the case, but I don't know of any.)
+
+The errors are not huge (generally off-by-one or off-by-two errors), and many people are not concerned
+about them.
+
+Anyway, this module just provides a few functions for examining the values, and an nv() function that
+assigns the values via the C compiler/libc.
+On perl builds that have an nvtype of "double", the nv() function is essentially the same as the
+POSIX::strtod() function.
+Unfortunately, the POSIX module doesn't provide a strtold() function (prior to 5.21), and can therefore
+not be used for the same purpose on builds of perl where the nvtype is "long double". The nv() function
+does, however, also work on "long double" builds of perl.
+It also works on perls (5.21.4 and later) where $config{nvtype} can be '__float128'.
+
+Then there's always the possibility of bugs in C's strtod()/strtold() functions. My mingw.org port
+of gcc-4.7.0 suffers a bug in strtod(), though it's the only compiler I've found to be buggy in this
+regard. It's a bug that doesn't strike very often, but it's enough to destroy one's confidence that
+strtod() is behaving correctly. (Just my luck !!)
+
+If you want to be really paranoid about it, the surest way of assigning the correct floating point
+value in perl is to have the mpfr library assign the value. That is, instead of doing:
+
+my $nv = 1e-298;
+
+Do something like:
+
+use Math::MPFR qw(:mpfr);
+Rmpfr_set_default_prec(Math::MPFR::_DBL_MANT_DIG());    # if nvtype is double
+# alternatively:
+# Rmpfr_set_default_prec(Math::MPFR::_LDBL_MANT_DIG()); # if nvtype is long double
+# or
+# Rmpfr_set_default_prec(Math::MPFR::_FLT128_MANT_DIG()); # if nvtype is __float128
+my $nv = Rmpfr_get_NV(Math::MPFR->new('1e-298'), MPFR_RNDN);
+
+Cheers,
+Rob

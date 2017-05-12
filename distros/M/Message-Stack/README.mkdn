@@ -1,0 +1,191 @@
+# NAME
+
+Message::Stack - Deal with a "stack" of messages
+
+# VERSION
+
+version 0.22
+
+# SYNOPSIS
+
+    my $stack = Message::Stack->new;
+
+    $stack->add(Message::Stack::Message->new(
+      msgid     => 'something_happened',
+      level     => 'error',
+      scope     => 'login_formm',
+      subject   => 'username',
+      text      => 'Something happened!'
+    ));
+    # Or... for those that want to type less
+    $stack->add({
+      msgid     => 'something_else_happened',
+      level     => 'error',
+      scope     => 'login_form',
+      subject   => 'password',
+      text      => 'Something else happened!'
+    });
+
+    # ...
+    my $errors = $stack->for_level('error');
+    # Or
+    my $login_form_errors = $stack->for_scope('login_form');
+    $login_form_errors->for_subject('username');
+    print "Username has ".$login_form_errors->count." errors.\n";
+
+# DESCRIPTION
+
+Message::Stack provides a mechanism for storing messages until they can be
+consumed.  A stack is used to retain order of occurrence.  Each message may
+have a id, level, scope, subject and text.  Consult the documentation for
+[Message::Stack::Message](http://search.cpan.org/perldoc?Message::Stack::Message) for an explanation of these attributes.
+
+This is not a logging mechanism.  The original use was to store various errors
+or messages that occur during processing for later display in a web
+application.  The messages are added via `add`.
+
+# NOTES
+
+## Note About msgid
+
+msgid used to be id.  It was renamed to be a bit more description.  All the
+methods that existed for id still exist and the id attribute is now aliased
+to msgid. In other words if you create an object using `id` then the msgid
+methods __and__ the `id` methods will work, and vice versa.
+
+# SERIALIZATION
+
+This module uses [MooseX::Storage::Deferred](http://search.cpan.org/perldoc?MooseX::Storage::Deferred) to facilitate easy serialization.
+Consult the documentation for [MooseX::Storage::Deferred](http://search.cpan.org/perldoc?MooseX::Storage::Deferred) options, but the
+gist is:
+
+  my $json = $stack->freeze({ format => 'JSON' });
+  ...
+  my $stack = Message::Stack->thaw($json, { format => 'JSON' });
+
+# ATTRIBUTES
+
+## messages
+
+Returns the full arrayref of messages for this stack.
+
+# METHODS
+
+## count
+
+Returns the number of messages in the stack.
+
+## first_message
+
+Returns the first message (if there is one, else undef)
+
+## get_message ($index)
+
+Get the message at the supplied index.
+
+## has_messages
+
+Returns true if there are messages in the stack, else false
+
+## last_message
+
+Returns the last message (if there is one, else undef)
+
+## reset
+
+Clear all messages, resetting this stack.
+
+## add ($message)
+
+Adds the supplied message to the stack.  `$message` may be either a
+[Message::Stack::Message](http://search.cpan.org/perldoc?Message::Stack::Message) object or a hashref with similar keys.
+
+## for_msgid ($msgid)
+
+Returns a new Message::Stack containing only the message objects with the
+supplied msgid. If there are no messages for that level then the stack
+returned will have no messages.
+
+## for_level ($level)
+
+Returns a new Message::Stack containing only the message objects with the
+supplied level. If there are no messages for that level then the stack
+returned will have no messages.
+
+## for_scope ($scope)
+
+Returns a new Message::Stack containing only the message objects with the
+supplied scope. If there are no messages for that scope then the stack
+returned will have no messages.
+
+## for_subject ($subject)
+
+Returns a new Message::Stack containing only the message objects with the
+supplied subject. If there are no messages for that subject then the stack
+returned will have no messages.
+
+## has_msgid ($msgid)
+
+Returns true if there are messages with the supplied msgid.
+
+## has_level ($level)
+
+Returns true if there are messages with the supplied level.
+
+## has_scope ($scope)
+
+Returns true if there are messages with the supplied scope.
+
+## has_subject ($subject)
+
+Returns true if there are messages with the supplied subject.
+
+## search (CODEREF)
+
+Returns a Message::Stack containing messages that return true when passed
+to the coderef argument.
+
+  $stack->search( sub { $_[0]->id eq 'someid' } )
+
+## reset_scope($scope)
+
+Clears the stack of all messages of scope $scope.
+
+## reset_level($level)
+
+Clears the stack of all messages of level $level.
+
+## reset_msgid($msgid)
+
+Clears the stack of all messages of msgid $msgid.
+
+## reset_subject($subject)
+
+Clears the stack of all messages of subject $subject.
+
+# CONTRIBUTORS
+
+Jay Shirley
+
+Stevan Little
+
+Justin Hunter
+
+Jon Wright
+
+Mike Eldridge
+
+Tomohiro Hosaka
+
+Andrew Nelson
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Cory G Watson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

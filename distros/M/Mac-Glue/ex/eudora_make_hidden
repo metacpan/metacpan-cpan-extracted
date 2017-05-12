@@ -1,0 +1,5 @@
+#!perl -w
+use Mac::Glue qw(:all);
+my $f = new Mac::Glue 'Finder';
+$f->set( $f->prop(visible => process => "Eudora"), to => enum('false'));
+warn $^E if $^E;

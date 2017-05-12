@@ -1,0 +1,196 @@
+#!/usr/bin/perl 
+
+=head1 NAME
+
+print_table.pl - print the marc8 conversion table as HTML
+
+=head1 SYNOPSIS
+
+    % print_table > table.html
+
+=head1 DESCRIPTION
+
+This command line utility will read the db created when MARC::Charset
+is installed and output the data as an HTML table. To tweak the look
+and feel modify the embedded stylesheet in the code.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * 
+
+MARC::Charset::Table
+
+=back
+
+=head1 AUTHOR
+
+=over 4
+
+=item * 
+
+Ed Summers
+
+=back
+
+=cut
+
+use strict;
+use warnings;
+use MARC::Charset::Table;
+use MARC::Charset::Code;
+use Storable qw(thaw);
+use CGI qw(escapeHTML table th td Tr);
+
+binmode(STDOUT,'utf8');
+my $table = MARC::Charset::Table->new();
+my $db = $table->db();
+
+print 
+<<HTML;
+<html>
+<head>
+    <style>
+
+    body 
+    { 
+        font-size: 18pt; 
+        margin: 10px;
+    }
+
+    table
+    {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        border: thin solid black;
+    }
+
+    tr
+    {
+        border: none;
+        padding: 0;
+    }
+
+    th
+    {
+        font-weight: bold;
+        background-color: #E89E71;
+        border: none;
+        text-align: left;
+    }
+
+    td
+    {
+        border: none;
+        padding: 0;
+    }
+
+    .menu
+    {
+        padding: 10px;
+        background: #F6F4E8;
+        text-align: center;
+    }
+
+    .character
+    {
+        text-align: center;
+        font-size: 20pt;
+        font-weight: bold;
+    }
+
+    .charset_name
+    {
+        font-size: 16pt;
+        text-align: center;
+    }
+
+    .even 
+    {
+        background-color: #FFFEF2;
+    }
+
+    .odd
+    {
+        background-color: #F6F4E8;
+    }
+
+    </style>
+</head>
+<body>
+
+    <h1 style="align: center">MARC-8 Mapping Table</h1>
+
+    <div class="menu">
+    <a href="#GREEK_SYMBOLS">Greek Symbols</a> | 
+    <a href="#SUBSCRIPTS">Subscripts</a> | 
+    <a href="#SUPERSCRIPTS">Superscripts</a> | 
+    <a href="#BASIC_ARABIC">Basic Arabic</a> | 
+    <a href="#EXTENDED_ARABIC">Extended Arabic</a> | 
+    <a href="#BASIC_LATIN">Basic Latin</a> | 
+    <a href="#EXTENDED_LATIN">Extended Latin</a> | 
+    <a href="#BASIC_CYRILLIC">Basic Cyrillic</a> | 
+    <a href="#EXTENDED_CYRILLIC">Extended Cyrillic</a> | 
+    <a href="#BASIC_GREEK">Greek</a> | 
+    <a href="#BASIC_HEBREW">Hebrew</a>
+    <a href="#CJK">Chinese/Japanese/Korean</a> 
+    </div>
+
+HTML
+
+my $lastCharset = '';
+my $count = 0;
+for my $k (sort(keys(%$db))) 
+{
+    # ignore the utf8 keys
+    next if $k =~ /^\d+$/;
+
+    # pull the Code object out
+    my $code = thaw($db->{$k});
+
+    # each character set goes into it's own table
+    my $attr = {};
+    if (!$lastCharset or $code->charset() ne $lastCharset)
+    {
+        print "</table>\n" if $lastCharset;
+        print_table_header($code->charset_name());
+        $lastCharset = $code->charset();
+    }
+
+    # determine the row shading
+    my $row_class = $count++ % 2 == 0 ? 'even' : 'odd';
+
+    # output the row
+    print 
+        qq(<tr class="$row_class">),
+        '<td class="character">&#',int(hex($code->ucs())),';</td>',
+        '<td>',$code->marc_value(),'</td>',
+        '<td>0x',$code->ucs(),'</td>',
+        '<td>',$code->name(),'</td>',
+        "</tr>\n";
+}
+
+print 
+<<HTML;
+    </table>
+</body>
+</html>
+HTML
+
+
+sub print_table_header 
+{
+    my $charset_name = shift;
+    print
+        '<p />',
+        qq(<table id="$charset_name" cellspacing="0" cellpadding="5">\n),
+        qq(<tr><th class="charset_name" colspan="5">$charset_name</th></tr>\n),
+        '<tr>',
+        '<th width="10%">&nbsp;</td>',
+        '<th width="15%">MARC-8</td>',
+        '<th width="15%">UCS</td>',
+        '<th width="70%">Name</td>',
+        "</tr>\n";
+}

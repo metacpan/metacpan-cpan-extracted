@@ -1,0 +1,37 @@
+Mac-CocoaDialog version 0.0.1
+
+This module eases calls to the CocoaDialog program in Mac. Be sure to
+look at CocoaDialog’s documentation at <http://cocoadialog.source‐
+forge.net/> to see what’s this all about. Briefly speaking, CocoaDialog
+gives you the possibility to let the user interact with a very basic
+GUI, providing basic input boxes, progress bars, etc.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+None, but it's pretty unuseful without CocoaDialog somewhere in your Mac
+system.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, Flavio Poletti
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

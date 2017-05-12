@@ -1,0 +1,48 @@
+It is a good idea to edit this file as -*- indented-text -*- when
+using Emacs.
+
+This file includes directions for special testing of modules that
+require additional (manual) steps to complete.
+
+Testing GoogleGroups
+====================
+
+To test the Google(tm) Groups reader
+(Mail::Abuse::Reader::GoogleGroups) when a proxy is required to reach
+the groups server, you should issue the following commands in your
+BASH-compatible shell
+
+		export GOOGLE_PROXY=YOUR-PROXY-NAME:port
+
+and rerun the tests.
+
+Note that the GoogleGroups reader is currently broken since the
+interface was changed. Patches will be incorporated to the
+distribution after light testing, but no active development by the
+author is going on in this module.
+
+This may be deprecated in future releases.
+
+Testing POP3
+============
+
+In order to test the POP3 reader (Mail::Abuse::Reader::POP3), you must
+create a config file in your working directory named
+"poptest.cfg". This file must contain the following directives
+
+     pop3 server
+     pop3 username
+     pop3 password
+     pop3 delete
+
+with suitable values for your installation. See the file
+etc/sample.conf for information on the format of these entries.
+
+It is also very good if the mailbox contains at least two messages so
+that fetching can be tested properly (if you're really paranoid).
+
+For the rest of the modules, autonomous tests are included. These
+tests automatically provide any configuration options they might need,
+so the whole process is automatic.
+
+# $Id: TESTING,v 1.5 2006/04/26 18:04:51 lem Exp $

@@ -1,0 +1,102 @@
+=head1 NAME
+
+MIME::EcoEncode::Param - RFC 2231 Encode/Decode
+
+=head1 SYNOPSIS
+
+ use MIME::EcoEncode::Param;
+ $encoded = mime_eco_param($str, 'UTF-8');       # encode utf8 string
+ $encoded = mime_eco_param($str, "UTF-8'XX'");   # XX is language
+ $encoded = mime_eco_param($str, 'UTF-8*XX?B');  # "B" encoding
+ $encoded = mime_eco_param($str, 'UTF-8*XX?Q');  # "Q" encoding
+ $encoded = mime_eco_param($str, 'GB2312');      # euc-cn string
+ $encoded = mime_eco_param($str, 'EUC-KR');      # euc-kr string
+ $encoded = mime_eco_param($str, 'Big5');        # big5 string
+ $encoded = mime_eco_param($str, 'Shift_JIS');   # cp932 string
+ $encoded = mime_eco_param($str, 'ISO-2022-JP'); # 7bit-jis string
+ $encoded = mime_eco_param($str, $sbcs);         # $sbcs :
+                                                 #   single-byte charset
+                                                 #   (e.g. 'ISO-8859-1')
+
+ $decoded = mime_deco_param($encoded);           # decode encoded string
+
+ ($decoded, $param, $charset, $lang, $value)     # return array
+          = mime_deco_param($encoded);
+
+=head1 DESCRIPTION
+
+This module implements RFC 2231 Mime Parameter Value Encoding.
+
+=head2 Options
+
+  $encoded = mime_eco_param($str, $charset, $lf, $bpl);
+               # $charset : 'UTF-8' / "UTF-8'XX'" /
+               #            'UTF-8*XX?B' / 'UTF-8*XX?Q' /
+               #            'GB2312' / 'EUC-KR' / 'Big5' /
+               #            'Shift_JIS' / 'ISO-2022-JP' / ...
+               #            (default: 'UTF-8')
+               #              Note: The others are all encoded as
+               #                    single-byte string.
+               # $lf      : line feed (default: "\n")
+               # $bpl     : bytes per line (default: 76)
+
+  $decoded = mime_deco_param($encoded, $bq_on);
+               # $bq_on   : 1 : ON decode "B/Q" encoding
+               #            0 : OFF
+               #            (default: 1)
+
+=head2 Examples
+
+Ex1 - RFC 2231 encoding
+
+  use MIME::EcoEncode::Param;
+  my $str = " filename=\xe5\xaf\x8c\xe5\xa3\xab\xe5\xb1\xb1_2013.jpeg";
+  print mime_eco_param($str, "UTF-8'ja'", "\n", 33), "\n";
+
+Ex1's output:
+
+   filename*0*=UTF-8'ja'%E5%AF%8C;
+   filename*1*=%E5%A3%AB%E5%B1%B1_;
+   filename*2=2013.jpeg
+
+Ex2 - "Q" encoding (for Windows)
+
+  use MIME::EcoEncode::Param;
+  my $str = " name=\xe5\xaf\x8c\xe5\xa3\xab\xe5\xb1\xb1_2013.jpeg";
+  print mime_eco_param($str, 'UTF-8?Q', "\n", 33), "\n";
+
+Ex2's output:
+
+   name="=?UTF-8?Q?=E5=AF=8C=E5?=
+   =?UTF-8?Q?=A3=AB=E5=B1=B1=5F20?=
+   =?UTF-8?Q?13.jpeg?="
+
+Ex3 - "B" encoding (for Windows)
+
+  use MIME::EcoEncode::Param;
+  my $str = " name=\xe5\xaf\x8c\xe5\xa3\xab\xe5\xb1\xb1_2013.jpeg";
+  print mime_eco_param($str, 'UTF-8?B', "\n", 33), "\n";
+
+Ex3's output:
+
+   name="=?UTF-8?B?5a+M5aOr5bGx?=
+   =?UTF-8?B?XzIwMTMuanBlZw==?="
+
+=head1 SEE ALSO
+
+L<MIME::EcoEncode>
+
+=head1 AUTHOR
+
+MURATA Yasuhisa E<lt>murata@nips.ac.jpE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2013 MURATA Yasuhisa
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,6 @@
+Revision history for Perl extension MPEG::LibMPEG3.
+
+0.01  Mon Mar  4 12:59:55 2002
+	- original version; created by h2xs 1.21 with options
+		-XA MPEG::LibMPEG3
+

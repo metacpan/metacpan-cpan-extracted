@@ -1,0 +1,32 @@
+Changes
+lib/MediaCloud/JobManager.pm
+lib/MediaCloud/JobManager/Admin.pm
+lib/MediaCloud/JobManager/Broker.pm
+lib/MediaCloud/JobManager/Broker/Null.pm
+lib/MediaCloud/JobManager/Broker/RabbitMQ.pm
+lib/MediaCloud/JobManager/Configuration.pm
+lib/MediaCloud/JobManager/Job.pm
+lib/MediaCloud/JobManager/Worker.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README.mdown
+samples/Addition.pm
+samples/AdditionAlwaysFails.pm
+samples/NinetyNineBottlesOfBeer.pm
+samples/sample_client.pl
+script/mjm_worker.pl
+t/brokers/broker-tests.inc.pl
+t/brokers/rabbitmq.t
+t/compile.t
+t/lib/FailsAlwaysWorker.pm
+t/lib/FailsOnceWillRetryWorker.pm
+t/lib/FailsOnceWorker.pm
+t/lib/RabbitMQ/FailsAlwaysWorker.pm
+t/lib/RabbitMQ/FailsOnceWillRetryWorker.pm
+t/lib/RabbitMQ/FailsOnceWorker.pm
+t/lib/RabbitMQ/ReverseStringWorker.pm
+t/lib/RabbitMQ/TestWorker.pm
+t/lib/ReverseStringWorker.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

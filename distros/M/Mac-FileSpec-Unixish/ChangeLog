@@ -1,0 +1,20 @@
+Revision history for Perl extension Mac::FileSpec::Unixish.
+                                        Time-stamp: "2004-12-29 19:00:08 AST"
+
+1998-05-28  Sean M. Burke  sburke@netadventure.net
+
+	* Posted a draft version with basically the same semantics
+	to the macperl list, with the name "Mac::Unixish", I think.
+
+1998-11-30  Sean M. Burke  sburke@netadventure.net
+
+	* Release 1.1 -- Dusted it off, documented it, spiffed it up,
+	first CPAN release.
+
+2000-05-14  Sean M. Burke  sburke@cpan.org
+
+	* Release 1.11 -- Just noting my new email address.
+
+2004-12-29  Sean M. Burke  sburke@cpan.org
+
+	* Release 1.12 -- just rebundling.  No code changes.

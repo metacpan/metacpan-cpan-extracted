@@ -1,0 +1,6 @@
+<%init>
+my $baz = "quux";
+</%init>
+
+Baz is <% $baz %>
+

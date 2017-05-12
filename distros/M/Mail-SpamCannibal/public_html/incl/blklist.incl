@@ -1,0 +1,25 @@
+<font size="+2">Use With Care</font>
+<br>
+Entries made from this page appear in the local DNSBL as entries contributed
+by a remote DNSBL.
+<br>
+Do not use for spam received at this site, use 
+<font size="+1">Spam Add</font> instead.
+<blockquote>
+<form name=BlkAdd action="" method=POST>
+<input type=hidden name=page value=blkadd>
+<input type=text name=host> host dot quad IP address<br>
+<input type=text name=response value="127.0.0.3"> local DNSBL &quot;A&quot; record response<br>
+<font size="-1">default &quot;TXT&quot; record response string for remote DNSBL</font><br>
+<input type=text name=error size=55><br>
+<input type=text name=remote value="127.0.0.2"> &quot;A&quot; response accepted from remote DNSBL<br>
+<input type=text name=expire> expires in seconds or 10w 90d 24h 60m 10s<br>
+<input type=text name=zone> remote DNSBL zone name
+<blockquote>
+<input type=submit value="ADD TO BLACKLIST" onClick="document.BlkAdd.action=location.pathname;">
+</blockquote>
+</form>
+</blockquote>
+<script language=javascript1.1>
+document.BlkAdd.host.focus();
+</script>

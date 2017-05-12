@@ -1,0 +1,27 @@
+examples/osm-to-png.pl
+lib/Memphis.pm
+maps
+memphis-perl.h
+t/map.osm
+t/rule.xml
+t/Memphis.t
+t/MemphisDataPool.t
+t/MemphisMap.t
+t/MemphisRenderer.t
+t/MemphisRule.t
+t/MemphisRuleAttr.t
+t/MemphisRuleSet.t
+xs/Memphis.xs
+xs/MemphisDataPool.xs
+xs/MemphisMap.xs
+xs/MemphisRenderer.xs
+xs/MemphisRule.xs
+xs/MemphisRuleAttr.xs
+xs/MemphisRuleSet.xs
+COPYING
+Changes
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+META.yml                                 Module meta-data (added by MakeMaker)

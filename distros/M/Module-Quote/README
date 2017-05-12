@@ -1,0 +1,71 @@
+NAME
+    Module::Quote - a quote-like operator that requires modules for you
+
+SYNOPSIS
+            use Test::More tests => 1;
+            use Module::Quote;
+        
+            my $number = qm( Math::BigInt 1.00 )->new(42);
+        
+            isa_ok $number, "Math::BigInt";
+
+DESCRIPTION
+    The `qm()` quote-like operator will load a module and return its name. So
+    the following should just work, even if you haven't `use`d Math::BigInt in
+    advance.
+
+            qm( Math::BigInt 1.00 )->new(42)
+
+    The more usual invocation:
+
+            Math::BigInt->new(42)
+
+    won't automatically load Math::BigInt, won't check a version number, and
+    crucially is ambiguous! (See what happens when you define a sub called
+    `BigInt` in the `Math` package.)
+
+    The `qm` operator interpolates variables, so this works too:
+
+            my $x = "BigInt 1.00";
+            qm( Math::$x )->new(42);
+
+    You may export `qm` with an alternative name:
+
+            use Module::Quote 'qmod';
+
+    You may provide a hashref of options for the quote-like operator:
+
+            use Module::Quote qm => { emulate => 'q' };
+
+    You can export the operator multiple times with different options:
+
+            use Module::Quote
+                    qm  => { emulate => 'q' },
+                    qqm => { emulate => 'qq' },
+            ;
+
+    The `optimistic` and `prefix` options from Module::Hash are supported. As
+    is `emulate` which can be set to "qq" (the default) or "q" (to disable
+    interpolation).
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Module-Quote>.
+
+SEE ALSO
+    Module::Hash - similar idea, but less magic.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

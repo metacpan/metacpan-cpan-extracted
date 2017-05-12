@@ -1,0 +1,15 @@
+Revision history for MoobX
+
+0.1.0 2017-01-14
+  [ ENHANCEMENTS ]
+    - Adding Moose traits.
+    - Warn if an observer observes nothing.
+
+  [ STATISTICS ]
+    - code churn: 9 files changed, 335 insertions(+), 16 deletions(-)
+
+0.0.1 2017-01-13
+  - First version, unleashed on an unsuspecting world.
+
+  [ STATISTICS ]
+    - code churn: 3 files changed, 38 insertions(+), 3 deletions(-)

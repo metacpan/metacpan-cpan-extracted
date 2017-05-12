@@ -1,0 +1,171 @@
+Revision history for Perl extension Math::Factor::XS.
+
+0.40  2012-08-14  <kryde@cpan.org>
+
+ - Stable release.
+
+0.39_01  2012-08-01  <kryde@cpan.org>
+
+ - factors() range check just with SvNV, so as to accept overloaded
+   types such as Math::BigInt (if fit ulong) and for big speedup.
+ - New count_prime_factors().
+
+0.39  2012-01-19  <kryde@cpan.org>
+
+ - Stable release.
+
+0.38_03  2012-01-08  <kryde@cpan.org>
+
+ - prime_factors() step by 2,4 to skip multiples of 3
+
+0.38_02  2011-12-30  <kryde@cpan.org>
+
+ - Use Perl's TRUE/FALSE to avoid trouble with enum{false,true} on
+   systems such as BSD which drag in stdbool.h
+
+0.38_01  2011-12-28  <kryde@cpan.org>
+
+ - New prime_factors().
+ - Clarify docs of factors() that it's all divisors.
+
+0.38  2010-03-26  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.37_02  2010-03-24  <schubiger@cpan.org>
+
+ - Allow validation of factors to succeed when none are supplied.
+   [rt #53739 - Tom Scheper]
+
+ - Return an empty list from xs_matches() if there are no factors.
+
+ - Add a test for no factors provided to matches().
+
+ - Don't force explicit scalar context where an implicit one exists.
+
+0.37_01  2010-03-01  <schubiger@cpan.org>
+
+ - Fix memory leak in xs_factors(). [reported by William P.N. Smith]
+
+0.37 Tue Nov 10 22:37:24 CET 2009
+
+ - Merged development version to stable.
+
+0.36_01 Fri Nov  6 10:17:32 CET 2009
+
+ - Save the quotient as factor only when it's greater than the iterator.
+   [rt #50999 - Thor Andreassen]
+
+ - Add a test for even numbers to be factorized.
+
+ - Check the numbers returned deeply against the expected ones.
+
+ - Update broken license links.
+
+0.36 Tue Sep 29 11:36:53 CEST 2009
+
+ - Merged development version to stable.
+
+0.35_02 Tue Sep 15 20:05:35 CEST 2009
+
+ - Check up to square root of a number to determine its factors.
+   [rt #46870 - Jonathan Leto]
+
+ - Declare the reference of the factors array which is passed to
+   xs_matches() as SV * (instead of AV *). This fixes an error
+   when running under perl 5.6.2.
+
+0.35_01 Fri Jun 12 16:35:25 CEST 2009
+
+ - Fix Build.PL related test failures. [rt #39211 - Slaven Rezic]
+
+ - Using the global 'Skip_multiple' does no longer have an effect;
+   passing the factors to matches() requires now a list reference.
+
+ - Validation of arguments is handled by Params::Validate.
+
+ - Use printf() instead of formats within the example script.
+   This circumvents a segmentation fault reported in [perl #64562].
+
+ - The options hash for the matches() function is being passed to
+   the according XSUB as reference.
+
+0.35 Sun Feb  3 14:40:33 CET 2008
+
+ - Reworded documentation.
+
+ - Removed unneeded code within scripts/factors_matches.pl.
+
+ - Renamed the calc_factors.t test-file to the more generic functions.t.
+
+ - Updated ppport.h.
+
+0.34 Tue Aug 14 18:40:38 CEST 2007
+
+ - Beautified documentation (added code tags where suitable).
+
+0.33 Sat Apr  1 16:47:21 CEST 2006
+
+ - Changed Build.PL argument create_makefile_pl from 'passtrough'
+   to 'traditional' for the sake of compatibility.
+
+0.30 Fri Nov  4 20:52:13 CET 2005
+
+ - Converted Math::Factor over to XS.
+
+0.29 2005/09/21
+
+ - factors() takes a single number and returns now a flat array
+   of factors. matches() likewise. [Ricardo Signes, <rjbs@cpan.org>]
+
+ - Removed each_factor() & each_match() due to data that
+   is no longer preserved in multidimensional hash structures
+   and therefore doesn't require these accessors.
+
+0.19 2004/01/19
+
+ - Formats are not evaled in loops.
+
+0.17 2004/01/18
+
+ - Matching multiplications that contain smaller factors may
+   be skipped.
+
+0.16 2004/01/17
+
+ - factor.pl revisioned.
+
+0.12 2004/01/13
+
+ - Hashes are returned as refs.
+
+0.1 2004/01/12
+
+ - Minor additions.
+
+0.09 2004/01/12
+
+ - Evaluation of ranges implemented.
+
+0.07 2004/01/10
+
+ - show_factor() & show_match() have been moved out of the
+   package to bin/factor.pl.
+
+0.05 2004/01/07
+
+ - Iteration over factors and multiplication matches by
+   each_factor() & each_match().
+
+0.03 2004/01/06
+
+ - Heredocs mostly replaced with format in show_factor()
+   & show_match().
+
+0.02 2004/01/06
+
+ - Documentation covers functionality.
+
+0.01 2004/01/06
+
+ - Initial version.

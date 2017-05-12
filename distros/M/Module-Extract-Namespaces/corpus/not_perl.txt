@@ -1,0 +1,6 @@
+This is a file that is not Perl code.
+
+if Foo = blah )
+then do something
+
+s//;

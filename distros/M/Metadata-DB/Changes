@@ -1,0 +1,45 @@
+2008-10-27 10:59  cvs
+
+	* MANIFEST, lib/Metadata/DB.pm, lib/Metadata/DB/Base.pm,
+	  t/00_generate_dbdata.pl, t/00_regenerate_test-db_datafile.pl,
+	  t/21_autoid_newdbaltogether.t, t/99_cleanup_after_tests.pl,
+	  t/test.db: added auto id that means you don't have to set and
+	  id() manually any more.  look at
+	  Metadata::DB::Base::table_metadata_last_record_id() and the
+	  changes to Metadata::DB::save()
+
+2008-10-24 22:19  cvs
+
+	* lib/Metadata/DB.pm, lib/Metadata/DB/Base.pm,
+	  t/18_record_by_lookup.t, t/99_cleanup_after_tests.pl: Added
+	  method to Metadata::DB::Base, that looks up a record's id with
+	  the argument being a metadata struct.  Added a method to
+	  Metadata::DB that uses the previous mentioned method, to
+	  automatically load without knowing a record's id.
+
+2008-06-11 14:26  cvs
+
+	* Makefile.PL, lib/Metadata/DB.pm: added prerequisite to
+	  Makefile.PL
+
+2008-03-01 21:53  cvs
+
+	* MANIFEST, lib/Metadata/DB/Search/InterfaceHTML.pm,
+	  t/03_Analizer.t: moving InterfaceHTML to Metadata::DB::WUI, makes
+	  more sense!
+
+2007-10-19 11:08  cvs
+
+	* lib/Metadata/DB.pm, lib/Metadata/DB/Base.pm,
+	  lib/Metadata/DB/Object.pm, t/00_functional.t, t/01_oo.t:
+	  committed
+
+2007-10-10 12:25  cvs
+
+	* lib/Metadata/DB.pm, lib/Metadata/DB/Object.pm, t/00.t: Initial
+	  revision
+
+2007-10-10 12:25  cvs
+
+	* lib/Metadata/DB.pm, lib/Metadata/DB/Object.pm, t/00.t: init
+

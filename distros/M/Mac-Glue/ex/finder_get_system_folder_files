@@ -1,0 +1,57 @@
+#!perl -wl
+use Mac::Files;
+use Mac::Glue ':glue';
+use strict;
+my $f = new Mac::Glue 'Finder';
+my $sf = $f->prop('System Folder');
+
+my %params = (
+	_1first   => $f->obj(file => gFirst, $sf),
+	_2second  => $f->obj(file => gPrevious, file => 3, $sf),
+	_3third   => $f->obj(file => 3, $sf),
+	_4fourth  => $f->obj(file => gNext, file => 3, $sf),
+	_5middle  => $f->obj(file => gMiddle, $sf),
+	_6any     => $f->obj(file => gAny, $sf),
+	_7last    => $f->obj(file => gLast, $sf),
+);
+
+print <<EOT;
+Here are some files in your System Folder ... note that your idea
+of ordering might not be the same as the Finder's.  :)
+EOT
+
+for my $key (sort keys %params) {
+	my $file = $params{$key};
+	my $text = substr($key, 2);
+	printf "%-11.11s: %s\n", "$text file", $f->get($file, as => 'string');
+	warn $^E if $^E;
+}
+
+
+print "\n\nThe second through fifth files are:\n";
+my @files = $f->get(
+	$f->obj(files => range(2, 5), $sf),
+	as => 'string'
+);
+warn $^E if $^E;
+for (@files) { print }
+
+
+print "\n\nFiles with 'MACS' as the creator are:\n";
+my @macs = $f->get(
+	$f->obj(files => whose(creator_type => equals => 'MACS'), $sf),
+	as => 'string'
+);
+warn $^E if $^E;
+for (@macs) { print }
+
+
+print "\n\nAll the items (requires list_folder addition, in Standard Additions):\n";
+if ($f->can('list_folder')) {
+	print join "\n", $f->list_folder(FindFolder(kOnSystemDisk, kSystemFolderType));
+} else {
+	print "Whoops, can't find list_folder event.\n";
+}
+warn $^E if $^E;
+
+__END__

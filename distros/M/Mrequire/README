@@ -1,0 +1,44 @@
+NAME
+    Mrequire - require on Perl extensions at run time
+
+SYNOPSIS
+      require Mrequire;
+      my $class = ('Foo::Bar', 'Bar::Baz')[int(rand + .5)];
+      Mrequire::mrequire($class);
+      &Mrequire::new($class, $arg1, $arg2, ...);
+
+      use Mrequire qw(mrequire);
+      mrequire(...)
+
+DESCRIPTION
+    Mrequire can be used to dynamically load Perl extensions at run time.
+    This becomes necessary if the decision of what kind of module you want
+    to use (or is available at all) is made at run time.
+
+    In addition you can call constructor-like functions (which assume the
+    package name as their first argument, see pertoot(1) for details) of
+    dynamically loaded modules via Mrequire.
+
+METHODS
+    mrequire($class)
+       Does a "require" on package $class. If a respective library file
+       cannot be loaded the process dies.
+
+    &Mrequire::constructor($class, $arg1, $arg2, ...)
+       Calls function "constructor" in package $class. It is assumed that
+       "constructor" expects the package name as a first argument.
+
+BUGS
+    Yes. Please let me know!
+
+SEE ALSO
+    perl(1), perltoot(1).
+
+AUTHOR
+    Norbert Gövert <goevert@ls6.cs.uni-dortmund.de>
+
+COPYRIGHT
+    Copyright (c) 2003 Norbert Gövert. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+

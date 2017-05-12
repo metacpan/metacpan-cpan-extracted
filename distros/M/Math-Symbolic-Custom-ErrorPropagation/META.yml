@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Math-Symbolic-Custom-ErrorPropagation
+version:            0.11
+abstract:           Calculate Gaussian Error Propagation
+author:
+    - Steffen Mueller <symbolic-module at steffen-mueller dot net>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Math::Symbolic:  0.132
+    Test::More:      0.44
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

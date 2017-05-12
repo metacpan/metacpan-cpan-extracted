@@ -1,0 +1,9 @@
+t/test.html
+ConsoleService.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Mozilla-ConsoleService.t
+lib/Mozilla/ConsoleService.pm
+META.yml                                 Module meta-data (added by MakeMaker)

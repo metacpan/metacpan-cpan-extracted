@@ -1,0 +1,500 @@
+#!/usr/local/bin/perl
+#
+# $Id: psync,v 0.71 2005/08/19 06:11:26 dankogai Exp $
+#
+
+use strict;
+use Getopt::Long;
+use Fcntl;
+use DB_File;
+use File::Basename;
+use MacOSX::File;
+use MacOSX::File::Copy;
+use MacOSX::File::Info;
+use Fcntl qq(:mode);
+
+my $Debug = 0;
+my $Psync_DB = '.psync.db';
+
+my (
+    $opt_a,
+    $opt_d,
+    $opt_f,
+    $opt_n,
+    $opt_r,
+    $opt_q,
+    $opt_v,
+    $opt_c,
+    );
+
+Getopt::Long::Configure("bundling");
+GetOptions(
+	   "D"	 => \$Debug,
+	   "a"	 => \$opt_a,
+	   "d:n" => \$opt_d,
+	   "f"	 => \$opt_f,
+	   "n"	 => \$opt_n,
+	   "r"	 => \$opt_r,
+	   "q"	 => \$opt_q,
+	   "v:n" => \$opt_v,
+	   "c" => \$opt_c,
+	   );
+
+defined $opt_d and $opt_d ||= 1;
+$opt_v ||= 1;
+$opt_q and $opt_v = 0;
+
+$Debug and print <<"EOT";
+\$opt_a = $opt_a,
+\$opt_d = $opt_d,
+\$opt_f = $opt_f,
+\$opt_n = $opt_n,
+\$opt_r = $opt_r,
+\$opt_q = $opt_q,
+\$opt_v = $opt_v,
+EOT
+
+my $IgnorePat =
+    qr[
+	^/+(?:
+	     tmp/+.*
+	   | dev/+.*
+	   | private/+var/+tmp/+.*
+	   | private/+var/+vm/+.*
+	   | private/+var/+run/+.*
+	 | Temporary\ Items/+.*
+	  )
+       ]xo;
+
+my %IgnoreFiles = map { $_ => 1 }
+(
+ $Psync_DB,
+ '.DS_Store',
+ '.FBCIndex',
+ '.FBCLockFolder',
+ '.Trashes',
+ 'AppleShare PDS',
+ 'Desktop DB',
+ 'Desktop DF',
+ 'TheFindByContentFolder',
+ 'TheVolumeSettingsFolder',
+ );
+
+my $Del_Ignored = $opt_d > 1 ? -1 : 0;
+my $Del_IgFiles = $opt_c ? -1 : 0;
+
+my $Topdev;
+# Maybe we should tie them to DB_File to save memory
+my (%Signature, %Attribs, %Action, %Root) = ();
+
+select(STDOUT);
+$|=1; #autoflush
+
+my $Dst = pop @ARGV;
+-d $Dst or help();
+scalar @ARGV >= 1 or help();
+if ($opt_r){
+    scalar @ARGV != 1 and help();
+    if (-f "$ARGV[0]/$Psync_DB"){ # remote restore mode
+	$opt_v and
+	    do_log("Using $ARGV[0]/$Psync_DB to retrieve extra attributes.");
+	tie (%Attribs, 'DB_File', "$ARGV[0]/$Psync_DB",
+	     O_RDONLY, 0440, $DB_HASH) or die "$Dst/$Psync_DB : $!";
+	$opt_r = 1;
+    }else{
+	$opt_r = 2;		  # remote backup mode
+    }
+}
+
+my $ScanCount = 0;
+
+$opt_v and do_log("Scanning Destination Directory $Dst ...");
+$Topdev = (lstat($Dst))[0];
+scantree($Dst, '', -1);
+$opt_v and do_log("\n$ScanCount items found.");
+
+for my $src (@ARGV){
+    $ScanCount = 0;
+    $opt_v and do_log("Scanning Source Item $src ...");
+    $Topdev = (lstat($src))[0];
+    scantree($src, '' , +1);
+    $opt_v and do_log("\n$ScanCount items found.");
+}
+
+if ($opt_v){
+    my ($n_del, $n_unchg, $n_copy) = (0,0,0);
+    while(my ($k, $v) = each %Action){
+	$k or next;
+	$v <  0 and $n_del++;
+	$v == 0 and $n_unchg++;
+	$v >  0 and $n_copy++;
+    }
+    do_log(sprintf "%8d items to delete,", $n_del);
+    do_log(sprintf "%8d items unchanged,", $n_unchg);
+    do_log(sprintf "%8d items to copy.", $n_copy);
+}
+if ($opt_d){
+    $opt_v and do_log("deleting items ...");
+    # sort must be this order for depth-first traversal
+    for my $k (sort {$b cmp $a} keys %Action){
+	$k or next; $Action{$k} <  0 or next;
+	my $dpath = $Dst . $k;
+	$opt_v and do_log("- $dpath");
+	unless ($opt_n){
+	    -e $dpath or -l $dpath or next;
+	    unlink $dpath or rmdir $dpath or warn "$dpath : $!";
+	    my $atticf = dirname($dpath) . '/._' . basename($dpath);
+	    if (-f $atticf){
+		unlink $atticf or warn "$atticf : $!";
+	    }
+	}
+    }
+}
+$opt_v and do_log("copying items ...");
+# sort must be this order for depth-last traversal
+for my $k (sort keys %Action){
+    my $spath = $Root{$k} . $k; $spath =~ s,^/+,/,o;
+    my $dpath = $Dst . $k;
+    $Action{$k} == 0 and $opt_v > 1 and do_log("== $spath");
+    $Action{$k} >  0 or next;
+    unless ($opt_n){
+	my ($size, $mtime)		  = unpack("N2", $Signature{$k});
+	my ($mode, $uid,  $gid,	 $atime)  = unpack("N4", $Attribs{$k});
+	if     (S_ISDIR($mode)){ # -d
+	    unless (-d $dpath){
+		$opt_v and do_log("+d $spath");
+		mkdir $dpath, 0755 or warn "$dpath : $!";
+	    }else{
+		$opt_v > 1 and do_log("=d $spath");
+	    }
+	}elsif (S_ISREG($mode)){ # -f
+	    $opt_v and do_log("+f $spath");
+	    $opt_a or copy ($spath, $dpath)
+		or $Debug ?
+		warn "$spath -> $dpath : ", &MacOSX::File::strerr :
+		warn "$spath -> $dpath : $MacOSX::File::CopyErr" ;
+	    copyattrib($spath, $dpath, $mode, $uid, $gid, $atime, $mtime);
+	}elsif (S_ISLNK($mode)){ # -l
+	    $opt_v and do_log("+l $spath");
+	    my $slink = readlink($spath);
+	    if ($slink ne readlink($dpath)){
+		unlink $dpath && symlink(readlink($spath), $dpath);
+	    }
+	}
+    }
+}
+
+$opt_v and do_log("fixing directory attributes ...");
+# sort must be this order for depth-first traversal
+for my $k (sort {$b cmp $a} keys %Action){
+    $Action{$k} >  0 or next;
+    my ($size, $mtime)		      = unpack("N2", $Signature{$k});
+    my ($mode, $uid,  $gid,  $atime)  = unpack("N4", $Attribs{$k});
+    S_ISDIR($mode) or next;  # -d
+    my $spath = $Root{$k} . $k; $spath =~ s,^/+,/,o;
+    my $dpath = $Dst . $k;
+
+    unless ($opt_n){
+	copyattrib($spath, $dpath, $mode, $uid, $gid, $atime, $mtime);
+	$opt_v and do_log(sprintf "0%04o,%s,%s $dpath", ($mode & 07777),
+			  (getpwuid($uid))[0],(getgrgid($gid))[0] );
+    }
+}
+
+if ($opt_r >= 2){
+    # these are to make DB operation fast enough
+    my $hashinfo = DB_File::HASHINFO->new;
+    $hashinfo->{nelem} = scalar keys %Action;
+    $hashinfo->{bsize} = 1024; # MAXPATHLEN
+    $hashinfo->{cachesize} = 4 * 1024 * 1024;
+    tie (my %db, 'DB_File', $Psync_DB,	O_CREAT|O_RDWR, 0640, $hashinfo)
+	or die "$Psync_DB : $!";
+    $opt_v and do_log("Using $Dst/$Psync_DB to store extra attributes.");
+    my $count;
+    while ( my ($k, $v) = each %Action){
+	if ($v >= 0){
+	    $db{$k} = $Attribs{$k};
+	    $count++ % 10000 == 0 and do_log("$count items stored.");
+	}
+    }
+    untie %db;
+    move $Psync_DB, "$Dst/$Psync_DB" or die "Can't move $Psync_DB";
+}
+
+sub copyattrib{
+    my ($spath, $dpath, $mode, $uid, $gid, $atime, $mtime) = @_;
+    my $finfo = getfinfo($spath);
+    unless ($opt_r > 1){
+	chmod $mode & 07777, $dpath;
+	chown $uid,   $gid,  $dpath;
+    }
+    $finfo and $finfo->set($dpath);
+    utime $atime, $mtime,  $dpath;
+}
+
+exit;
+sub do_log{
+    print shift, "\n";
+}
+
+sub sig2txt{
+    return sprintf("0x%08x,0x%08x",unpack("N2",shift));
+}
+
+sub addsig{
+    my ($path, $mode,$uid,$gid,$size,$atime,$mtime, $action) = @_;
+    my $sig  = pack("N2", (S_ISREG($mode) ? $size : 0), $mtime);
+    tied %Attribs or $Attribs{$path} = pack("N4", $mode, $uid, $gid, $atime);
+    if ($opt_v > 3 and $action > 0){
+	do_log qq(was: ) . sig2txt($Signature{$path});
+	do_log qq(now: ) . sig2txt($sig);
+    }
+    if ($Signature{$path} eq $sig){
+	$opt_f or $action = 0;	   # same file
+    }else{
+	$Signature{$path} =  $sig; # different
+    }
+    $Action{$path} = $action;
+    $opt_v > 2 and
+	do_log(join("," => $Action{$path},
+		    sprintf("0x%08x,0x%08x,0x%08x",
+			    unpack("N2",$Signature{$path})),
+		    $path));
+}
+
+# File::Find is too general purpose thus slow.
+# we implement our own traversal routine
+
+sub scantree {
+    my ($root, $path, $action) = @_;
+    if ($opt_v){
+	$ScanCount % 8192 == 0 and  printf "\n%10d:", $ScanCount;
+	$ScanCount % 128  == 0 and  print  ".";
+	$ScanCount++;
+    }
+    if ($path =~ $IgnorePat){
+	addsig($path, 0, 0, 0, 0, 0, 0, $Del_Ignored);
+	return;
+    }
+    $action > 0 and $Root{$path} = $root;
+    my $fpath = $root . $path;
+    my ($dev, $mode, $nlink, $uid, $gid, $size, $atime, $mtime) =
+	(lstat($fpath))[0,2,3,4,5,7,8,9] or warn "can't stat $fpath";
+
+    addsig($path, $mode, $uid, $gid, $size, $atime, $mtime, $action);
+
+    if (-d _){
+	$dev != $Topdev and return;
+	opendir my $d, $fpath or warn "$fpath:$!";
+	# see ._* is avoided
+	my @f = grep !/^\.(?:\.?$|_)/o, readdir $d;
+	closedir $d;
+	for my $f (@f){
+	    my $spath = "$path/$f";
+	    if ($IgnoreFiles{$f}){
+		addsig($spath, $mode, $uid, $gid, $size, $mtime, $atime,
+		       $Del_IgFiles) unless $f eq $Psync_DB;
+	    }else{
+		scantree($root, $spath, $action);
+	    }
+	}
+    }
+}
+
+sub help{
+    print <<"EOT";
+psync	[-c][-d][-n][-q|-v] source_items ... target_directory
+psync -r[-c][-d][-n][-q|-v] source_directory target_directory
+EOT
+exit;
+}
+1;
+__END__
+=head1 NAME
+
+psync -- update copy
+
+=head1 SYNOPSIS
+
+ psync   [-c][-d][-n][-q|-v] source_items ... target_directory
+ psync -r[-c][-d][-n][-q|-v] source_directory target_directory
+
+=head1 TIGER
+
+As of Mac OS X v10.4 (Tiger) L<rsync(1)> does support resorce fork
+with -E option. You should also consider using it.
+
+=head1 DESCRIPTION
+
+psync does an update copy. It compares source directory and target
+directory at first, then erases items that are nonexistent on source
+directory if specified and finally copies everything on source directory.
+Items with the same modification date and (data fork) size remain
+untouched, saving time on operation.
+
+Currently psync supports options below
+
+=over 4
+
+=item -r
+
+Remote backup/restore mode. Ownership and permissions are
+stored/retrieved via C<.psync.db>
+
+If the source directory contains a file C<.psync.db>, psync
+turns into remote restore mode. It uses .psync.db on source
+directory to restore ownership and permissions.
+
+If not, psync turns into remote backup mode. After the backup
+it stores ownership and permissions to C<.psync.db>
+
+As the name suggests, this option is imperative when the backup
+directory is on remote volume such as AFP, NFS, and Samba.
+
+=item -dI<n>
+
+Delete nonexistent files before starting copy. If the number larger
+than 2 is specified, it also deletes ignored directories.
+
+CAVEAT:	 Prior to 0.50 this option was default.
+
+=item -c
+
+Clean ignored files. It removes following files from the Destination
+Directory:
+
+ '.DS_Store',
+ '.FBCIndex',
+ '.FBCLockFolder',
+ '.Trashes',
+ 'AppleShare PDS',
+ 'Desktop DB',
+ 'Desktop DF',
+ 'TheFindByContentFolder',
+ 'TheVolumeSettingsFolder',
+
+This option is used with -d 1 or -d 2. For example psync can't remove a
+folder that contains a .DS_Store file without this option.
+
+=item -f
+
+Force copy. Copy files even when the file remains unchanged.
+
+=item -n
+
+"Simulation mode". It prints what it would do on standard output but
+does nothing thus far.
+
+=item -vI<n>
+
+Sets verbose level. Default verbose level is 1; It prints only items
+that are changed. Level 2 prints unchanged files also. Level 3 and
+above are practically debugging mode.
+
+=item -q
+
+Quiet mode. Sets verbose level to 0.
+
+=back
+
+=head1 EXAMPLE
+
+To backup everything in startup volume, all you have to say is
+
+  sudo psync -d / /Volumes/I<backup>
+
+And the resulting I<backup> volume is fully-bootable copy thereof.
+Note C<sudo> or root privilege is necessary to restore file
+ownership.
+
+=head1 PERFORMANCE
+
+On PowerBook G3 (pismo) with G3/400, 384MB Memory, I tested with
+C</usr/bin/time -l sudo psync -d / /Volumes/backup>. The boot volume
+contains no more than vanilla OS X 10.1.2 and Developer kit. It
+had a little over 10000 items and 1.8 GB of used space.	 Here is
+the result;
+
+  HFS+ on Pismo's Expansion Bay
+     2539.48 real	121.97 user	  290.78 sys
+      452.98 real	 47.29 user	   39.38 sys
+
+  UFS on Pismo's Expansion Bay
+     9278.25 real	775.60 user	  667.82 sys
+     1086.35 real	 69.19 user	   53.68 sys
+
+  HFS+ Disk Image on AFP Volume
+     3127.60 real	217.51 user	  445.04 sys
+     1059.37 real	 69.80 user	   52.00 sys
+
+  DVD-RAM formatted as HFS+
+    12258.39 real	210.52 user	  441.67 sys
+      564.49 real	 62.47 user	   46.65 sys
+
+  NFS
+    13227.76 real	429.44 user	  583.40 sys
+     2348.72 real	 83.87 user	   88.10 sys
+
+Note screensaver was on with some other background programs. I used
+this program happily with my PowerBook G4 (Ti) while I am surfing the web
+and listening to iTunes at the same time letting SETI@Home search for
+cosmic programmers :) With MacOS X, background backup is no problem
+
+=head1 FILES
+
+=over 4
+
+=item .psync.db
+
+Berkeley DB Hash file used to store ownership and permission
+information when -r option is set.
+
+=back
+
+=head1 BUGS
+
+Backing up to AFP volume may lose some files with Unicode names other
+than the language you specified when you mount the volume. That is,
+When you mount the volume with "Japanese" support, You may fail to
+backup files with Korean and Chinese names. AFP prior to MacOSX (
+including Netatalk 1.5.x) is also vulnerable to file names that are
+longer than 31 bytes. Old AFP also suffers the problem of 2GB file
+size limit. This may stand in your way when you try to backup on
+disk image on AFP volume.
+
+AFP on MacOS X (that is, AFP server is MacOS X) does not have this
+problem.
+
+In theory the backup also works on WebDAV and SMB but they remain
+untested.
+
+=head1 DISCLAIMER
+
+The author of this utility will be held no responsibility for any
+damages and losses of data and/or files that may be caused by the use
+thereof.
+
+B<Use me at your own risk!>
+
+=head1 AUTHOR
+
+Dan Kogai <dankogai@dan.co.jp>
+
+=head1 SEE ALSO
+
+L<rsync/1>
+
+L<pcpmac/1>
+
+hfstar F<http://www.geocities.com/paulotex/tar/>
+
+hfspax F<http://homepage.mac.com/howardoakley/>
+
+C<The Finder and File Operations> F<http://developer.apple.com/techpubs/macosx/Essentials/SystemOverview/Finder/The_Finder___Operations.html>
+
+=head1 COPYRIGHT
+
+Copyright 2002-2005 Dan Kogai <dankogai@dan.co.jp>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.

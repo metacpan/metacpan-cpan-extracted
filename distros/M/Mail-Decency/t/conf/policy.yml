@@ -1,0 +1,31 @@
+---
+
+include:
+    - defaults.yml
+    #- database.yml
+    #- cache.yml
+
+weight_threshold: -100
+force_check_local: 1
+disable_prepend: 0
+forward_scoring: 1
+forward_sign_key: sign.key
+
+default_reject_message: "use decency"
+no_reject_detail: 0
+
+server:
+    host: 127.0.0.1
+    port: 15000
+
+
+policy:
+    # - Honeypot: policy/honeypot.yml
+    # - CWL: policy/cwl.yml
+    # - DNSBL: policy/dnsbl.yml
+    # - CBL: policy/cbl.yml
+    # - SPF: policy/spf.yml
+    # - Greylist: policy/greylist.yml
+    # - Throttle: policy/throttle.yml
+
+

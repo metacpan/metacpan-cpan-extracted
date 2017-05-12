@@ -1,0 +1,7 @@
+UniqueEstimator*	O_OBJECT
+PTopEstimator*	O_OBJECT
+PQuantileEstimator*	O_OBJECT
+uint64_t	T_UV
+uint32_t	T_UV
+int64_t	T_IV
+int32_t	T_IV

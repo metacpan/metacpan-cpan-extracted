@@ -1,0 +1,51 @@
+---
+abstract: 'handle IMAP4 folders with SSL'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0.86
+  File::Spec::Functions: 0
+  IO::CaptureOutput: 1.06
+  List::Util: 0
+  Mail::Box::Manager: 0
+  Probe::Perl: 0.01
+  Proc::Background: 1.08
+  Test::More: 0.74
+configure_requires:
+  ExtUtils::MakeMaker: 6.17
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.132830'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mail-Box-IMAP4-SSL
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Mail::Box::IMAP4::SSL:
+    file: lib/Mail/Box/IMAP4/SSL.pm
+    version: 0.03
+requires:
+  IO::Socket::SSL: 1.12
+  Mail::Box::IMAP4: 2.079
+  Mail::IMAPClient: 3.02
+  Mail::Reporter: 2.079
+  Mail::Transport::IMAP4: 2.079
+  perl: 5.006
+  strict: 0
+  superclass: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/dagolden/Mail-Box-IMAP4-SSL/issues
+  homepage: https://github.com/dagolden/Mail-Box-IMAP4-SSL
+  repository: https://github.com/dagolden/Mail-Box-IMAP4-SSL.git
+version: 0.03
+x_authority: cpan:DAGOLDEN

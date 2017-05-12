@@ -1,0 +1,3 @@
+--- !!perl/hash:MyClass
+bar: !!perl/hash:MyValue
+  -value: 200

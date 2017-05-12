@@ -1,0 +1,18 @@
+Revision history for Perl extension MarpaX::Demo::SampleScripts.
+
+1.04  Thu Aug 20 12:57:00 2015
+	- Add examples/action.parse.pl and examples/heredoc.pl. See docs for details.
+	- Remove Build.PL.
+
+1.03  Wed Feb 18 16:32:00 2015
+	- Add examples/config.file.01.pl.
+
+1.02  Tue Nov 25 09:38:00 2014
+	- Add scripts/quoted.strings.05.pl for HTML.
+
+1.01  Fri Oct 31 11:26:00 2014
+	- Add scripts/match.parentheses.02.pl, which uses Ruby Slippers to provide missing brackets.
+	- Update pre-reqs to Marpa::R2 V 2.098000, as needed by the new script.
+
+1.00  Fri Oct 24 14:14:00 2014
+	- Initial version.

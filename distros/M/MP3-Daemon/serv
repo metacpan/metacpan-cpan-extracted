@@ -1,0 +1,32 @@
+#!/usr/bin/perl -w
+use strict;
+use lib qw(blib/lib);
+
+BEGIN {
+    unless (-d "$ENV{HOME}/.mp3") {
+        mkdir("$ENV{HOME}/.mp3", 0755);
+    }
+    unless (-f "Makefile") {
+        system "perl *PL";
+    }
+    system "make";
+}
+
+my $subclass = shift || "Simple";
+my $class    = "MP3::Daemon::$subclass";
+
+eval "use $class";
+my $mp3d = $class->new(socket_path => "$ENV{HOME}/.mp3/mp3_socket");
+# $mp3d->idle(
+#     sub {
+#         my $self = shift;
+#         my $player = $self->{player};
+#         my $f = $player->{frame};
+# 
+#         print "odd\n" if (int($f->[2]) & 1);
+#     }
+# );
+$mp3d->main();
+
+# this if for testing the server w/o having it fork
+# $Id: serv,v 1.7 2001/07/25 23:01:45 beppu Exp $

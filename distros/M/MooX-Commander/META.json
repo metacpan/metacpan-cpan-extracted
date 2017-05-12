@@ -1,0 +1,94 @@
+{
+   "abstract" : "Build command line apps with subcommands and option parsing",
+   "author" : [
+      "Eric Johnson <eric.git@iijo.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooX-Commander",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "Getopt::Long" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "Path::Tiny" : "0",
+            "String::CamelSnakeKebab" : "0",
+            "Syntax::Keyword::Junction" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Compile" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MooX::Commander" : {
+         "file" : "lib/MooX/Commander.pm",
+         "version" : "0.03"
+      },
+      "MooX::Commander::HasOptions" : {
+         "file" : "lib/MooX/Commander/HasOptions.pm"
+      },
+      "MooX::Commander::HasSubcommands" : {
+         "file" : "lib/MooX/Commander/HasSubcommands.pm"
+      },
+      "MooX::Commander::IsaHelpCommand" : {
+         "file" : "lib/MooX/Commander/IsaHelpCommand.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kablamo/MooX-Commander/issues"
+      },
+      "homepage" : "https://github.com/kablamo/MooX-Commander",
+      "repository" : {
+         "url" : "git://github.com/kablamo/MooX-Commander.git",
+         "web" : "https://github.com/kablamo/MooX-Commander"
+      }
+   },
+   "version" : "0.03",
+   "x_authority" : "cpan:KABLAMO",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Eric Johnson <github@iijo.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

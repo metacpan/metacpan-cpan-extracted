@@ -1,0 +1,78 @@
+Revision history for Perl module Mac::Errors
+
+1.191 2016-08-29T06:28:33Z
+	* Bump to stable version
+
+1.18_01 2016-05-30T02:39:34Z
+	* Escape literal { in regex, per change in v5.25
+
+1.18 - 2014-01-03
+	* Get rid of MYMETA
+
+1.17_02 - 2013-06-05
+	* Add Github info to Makefile.PL and README
+
+1.17_01 - 2013-06-01
+	* Restrict $MacError to just MacPerl
+
+1.17 - 2013-05-30
+	* Update pointer to source in Github
+	* Fix RT #85730 (Missing MYMETA files)
+
+1.16 - 2012-07-05
+	* Clean up the file and pod encodings from src/Errors.pl
+	which generates the module
+	* Add Errors.pl to the distro
+
+1.15 - 2012-07-03
+	* Fix Pod encoding issue for Test::Pod
+
+1.14 - 2007-12-09
+	* Clean up docs: the synopsis code section was screwy
+	* Clean up for move from CVS to SVN
+	* Requires 5.006 now, although there isn't any reason for it
+	notto work on earlier versions that I've decided not to support :)
+	* NOT updated for Leopard yet. There might be new error codes.
+
+1.13 - 2007-01-09
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+1.12 - 2006-06-08
+	* Distro fixes, include support scripts with distro (src/)
+
+1.11 - 2006-01-25
+	* Fixed a bug in the argument list in TIESCALAR for $MacError
+	* If you're using MacPerl, you probably want to upgrade
+
+1.10 - 2005-03-11
+	* added POD coverage tests, fixed issues
+	* no code changes: no need to upgrade
+
+1.00 - 2004-09-02
+	* fixed RT bug 3660: errors without a description return its symbol
+	instead.
+	* some distro clean-ups
+
+0.91 - 2003-03-20
+	* Dropped dependencies on many modules
+	* Fixed export of $MacError (Thanks, Chris)
+	* Beefed up tests a bit (Ditto)
+
+0.9 - 2002-11-04
+	* cleaned up distribution
+	* added macerror script from Chris Nandor
+	* man pages install correctly
+	* no code changes otherwise
+
+0.07 - 2002-10-08
+	* added $MacError magic to translate MacPerl $^E
+	to error description
+
+0.06 - 2002-09-26
+	*	added %MacErrors exportable hash
+
+0.01 - 2002-09-09
+	* original version; created by h2xs 1.21 with options
+		Mac::Errors
+

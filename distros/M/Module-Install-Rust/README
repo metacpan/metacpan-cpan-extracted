@@ -1,0 +1,27 @@
+Module-Install-Rust
+
+Helpers to build Perl extensions written in Rust.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Module::Install::Rust
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2016 Vickenty Fesunov
+
+This module may be used, modified, and distributed under the same terms as Perl
+itself. Please see the license that came with your Perl distribution for
+details.

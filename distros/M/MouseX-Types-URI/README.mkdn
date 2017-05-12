@@ -1,0 +1,111 @@
+# NAME
+
+MouseX::Types::URI - A URI type library for Mouse
+
+# SYNOPSIS
+
+## CLASS TYPES
+
+  package MyApp;
+  use Mouse;
+  use MouseX::Types::URI;
+
+  has 'uri' => (
+      is     => 'rw',
+      isa    => 'URI',
+      coerce => 1,
+  );
+
+  has 'data' => (
+      is     => 'rw',
+      isa    => 'URI::data',
+      coerce => 1,
+  );
+
+  has 'file' => (
+      is     => 'rw',
+      isa    => 'URI::file',
+      coerce => 1,
+  );
+
+## CUSTOM TYPES
+
+  package MyApp;
+  use Mouse;
+  use MouseX::Types::URI qw(Uri DataUri FileUri);
+
+  has 'uri' => (
+      is     => 'rw',
+      isa    => Uri,
+      coerce => 1,
+  );
+
+  has 'data' => (
+      is     => 'rw',
+      isa    => DataUri,
+      coerce => 1,
+  );
+
+  has 'file' => (
+      is     => 'rw',
+      isa    => FileUri,
+      coerce => 1,
+  );
+
+# DESCRIPTION
+
+MouseX::Types::URI creates common [Mouse](http://search.cpan.org/search?mode=module&query=Mouse) types,
+coercions and option specifications useful for dealing
+with [URI](http://search.cpan.org/search?mode=module&query=URI)s as [Mouse](http://search.cpan.org/search?mode=module&query=Mouse) attributes.
+
+Coercions (see [Mouse::Util::TypeConstraints](http://search.cpan.org/search?mode=module&query=Mouse::Util::TypeConstraints)) are made from
+`Str`, `ScalarRef`, `HashRef`,
+[Path::Class::Dir](http://search.cpan.org/search?mode=module&query=Path::Class::Dir) and [Path::Class::File](http://search.cpan.org/search?mode=module&query=Path::Class::File) to
+[URI](http://search.cpan.org/search?mode=module&query=URI), [URI::data](http://search.cpan.org/search?mode=module&query=URI::data) and [URI::file](http://search.cpan.org/search?mode=module&query=URI::file) objects.
+
+# TYPES
+
+## Uri
+
+Either [URI](http://search.cpan.org/search?mode=module&query=URI) or [URI::WithBase](http://search.cpan.org/search?mode=module&query=URI::WithBase).
+
+Coerces from `Str` via L<URI/new>.
+
+Coerces from [Path::Class::File](http://search.cpan.org/search?mode=module&query=Path::Class::File) and [Path::Class::Dir](http://search.cpan.org/search?mode=module&query=Path::Class::Dir) via L<URI::file/new>.
+
+Coerces from `ScalarRef` via L<URI::data/new>.
+
+Coerces from `HashRef` using [URI::FromHash](http://search.cpan.org/search?mode=module&query=URI::FromHash).
+
+## DataUri
+
+A URI whose scheme is `data`.
+
+Coerces from `Str` and `ScalarRef` via L<URI::data/new>.
+
+## FileUri
+
+A [URI::file](http://search.cpan.org/search?mode=module&query=URI::file) class type.
+
+Coerces from `Str`, [Path::Class::File](http://search.cpan.org/search?mode=module&query=Path::Class::File) and [Path::Class::Dir](http://search.cpan.org/search?mode=module&query=Path::Class::Dir) via L<URI::file/new>
+
+# AUTHOR
+
+NAKAGAWA Masaki <masaki@cpan.org>
+
+# THANKS TO
+
+Yuval Kogman, L<MooseX::Types::URI/AUTHOR>
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+# SEE ALSO
+
+[Mouse](http://search.cpan.org/search?mode=module&query=Mouse), [MouseX::Types](http://search.cpan.org/search?mode=module&query=MouseX::Types),
+
+[URI](http://search.cpan.org/search?mode=module&query=URI), [URI::data](http://search.cpan.org/search?mode=module&query=URI::data), [URI::file](http://search.cpan.org/search?mode=module&query=URI::file), [URI::WithBase](http://search.cpan.org/search?mode=module&query=URI::WithBase), [URI::FromHash](http://search.cpan.org/search?mode=module&query=URI::FromHash),
+
+[MooseX::Types::URI](http://search.cpan.org/search?mode=module&query=MooseX::Types::URI)

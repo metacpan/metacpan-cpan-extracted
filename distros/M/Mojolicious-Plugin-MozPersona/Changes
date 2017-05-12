@@ -1,0 +1,33 @@
+
+0.05      2015-01-25 19:52:23+01:00 Europe/Berlin
+	- Deprecate the default meaning of the "autoHook"/"jquery"
+	  option to automatically include the jQuery file that
+	  comes bundled with Mojolicious: it is intended for
+	  internal use only (kraih)
+	- Use functional Mojo::JSON API since the object-oriented
+	  API was removed in Mojolicious 5.73; require at least 
+	  Mojolicious v4.82, since this was when decode_json was added
+	  Patch provided by THUNTER
+
+0.04      2014-01-02 19:34:05 Europe/Berlin
+	- Fix for newer Mojo: use UA->post($url, form => {...})
+	  instead of the now deprecated UA->post_form
+	  Patch by moritz - thanks!
+	- Use default URL of jQuery library which is part of the
+	  Mojolicious distribution
+	  Patch by moritz - thanks!
+
+0.03      2013-01-27 18:36:07 Europe/Berlin
+	- Forgot to explicitly mention Mojolicious as dependency
+	  as CPAN testers reminded me
+
+0.02      2013-01-24 22:59:34 Europe/Berlin
+	- Minor doc changes
+	- Moved to github
+
+0.01      2013-01-23 23:13:21 Europe/Berlin
+	- Only changed the version number to have the dist
+	  indexed by CPAN
+
+0.01_01   2013-01-23 21:28:37 Europe/Berlin
+	Initial release

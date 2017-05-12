@@ -1,0 +1,183 @@
+#!/usr/bin/env perl
+#
+# Determine invariant linkages between the various forms of a particular
+# set class. Not all set classes support Neo-Riemannian operations; for
+# example, 3-11 has both [0,3,7] and [0,4,7], while 3-6 consists only of
+# the 3-6 form. This is probably tied up in whether the pitch set is
+# different when inverted or not. Correspondingly, the graph for 3-11
+# does look markedly different from that of 3-6.
+#
+# Usage: the output should ideally be fed to Graphviz or similar:
+#
+#   ./nrt-study-setclass      3-11 | neato -Tpng -ofoo
+#   ./nrt-study-setclass      3-6  | neato -Tpng -ofoo
+#   ./nrt-study-setclass      4-27 | neato -Tpng -ofoo
+#   ./nrt-study-setclass -i=3 4-27 | neato -Tpng -ofoo
+#   ./nrt-study-setclass      5-20 | neato -Tpng -ofoo
+#   ./nrt-study-setclass -i=3 5-20 | neato -Tpng -ofoo
+#   ./nrt-study-setclass -i=4 5-20 | neato -Tpng -ofoo
+#   ./nrt-study-setclass      6-35   # mode of limited transposition
+#
+# http://en.wikipedia.org/wiki/Forte_number will be handy if you do not
+# know what 3-11 and friends are. See also atonal-util of App::MusicTools
+# for means to convert between pitch numbers and lilypond note names.
+
+use strict;
+use warnings;
+use feature qw/say/;
+
+use Getopt::Long qw/GetOptions/;
+use Math::Combinatorics         ();
+use Music::AtonalUtil           ();
+use Music::LilyPondUtil         ();
+use Music::NeoRiemannianTonnetz ();
+
+my $atu = Music::AtonalUtil->new;
+my $lyu = Music::LilyPondUtil->new(
+  ignore_register => 1,
+  keep_state      => 0,
+  mode            => 'relative',
+);
+my $nrt = Music::NeoRiemannianTonnetz->new;
+
+my $FORTE_NUMBER_RE = $atu->forte_number_re;
+
+GetOptions(
+  'exclusive|E' => \my $Flag_Exclusive,
+  'invary|i=i'  => \my $Flag_Invary_Count,
+) or @ARGV = ();
+if ( !@ARGV ) {
+  warn "Usage: $0 --invary=# [--exclusive|-E] forte-number|list of pitches\n";
+  exit 64;
+}
+my $pitch_set;
+if ( $ARGV[0] =~ m/($FORTE_NUMBER_RE)/ ) {
+  $pitch_set = $atu->forte2pcs($1);
+  die "unknown Forte Number '$ARGV[0]'\n" if !defined $pitch_set;
+} else {
+  for my $arg (@ARGV) {
+    for my $p ( $arg =~ /([-\d\w]+)/g ) {
+      push @$pitch_set, $lyu->notes2pitches($p);
+    }
+  }
+}
+
+# figure out disposition of the input set class
+my ( %consists, %variations );
+for my $base ( 0 .. $atu->scale_degrees - 1 ) {
+  my ( @new, @newinverse );
+  for my $i (@$pitch_set) {
+    push @new, ( $base + $i ) % $atu->scale_degrees;
+    push @newinverse, ( $base - $i ) % $atu->scale_degrees;
+  }
+  $variations{ ps2bits($_) }++ for \@new, \@newinverse;
+  $consists{ $nrt->normalize( \@new ) }++;
+  $consists{ $nrt->normalize( \@newinverse ) }++;
+}
+for my $v ( values %variations ) {
+  if ( $v > 1 ) {
+    warn 'notice: set class ', ps2str($pitch_set),
+      " likely not suitable for N-R operations\n";
+    last;
+  }
+}
+warn 'info: set class ', ps2str($pitch_set), ' consists of { ',
+  join( ', ', map ps2str($_), keys %consists ), " }\n";
+
+$Flag_Invary_Count //= 2;    # as both 3-11 and 4-27 operations use this
+if ( $Flag_Invary_Count >= @$pitch_set ) {
+  # well, you could, but the results would be unedifying
+  die "error: cannot invary $Flag_Invary_Count elements in a ",
+    scalar(@$pitch_set), " element set class\n";
+}
+
+# In hindsight these could be set with the -G flag to neato or whatnot
+say <<"GRAPHVIZ_HEADER";
+graph links {
+  size="32,32";
+  ratio="fill";
+  splines=polyline;
+
+GRAPHVIZ_HEADER
+
+my %seen;
+for my $pset ( keys %variations ) {
+  # Exclude any three invariant pitch matches if given for example 4-27
+  # and --invary=2.
+  if ($Flag_Exclusive) {
+    my $higher_invary_count = @$pitch_set - $Flag_Invary_Count;
+    if ( $higher_invary_count > 1 ) {
+      for my $i ( $Flag_Invary_Count + 1 .. @$pitch_set - 1 ) {
+        my $c = Math::Combinatorics->new(
+          count => $i,
+          data  => bits2ps($pset),
+        );
+        while ( my @tomask = $c->next_combination ) {
+          my $invary_mask = ps2bits( \@tomask );
+          for my $set ( keys %variations ) {
+            if ( $invary_mask == ( $set & $invary_mask ) ) {
+              $seen{ join ':', sort $pset, $set }++;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  my $c = Math::Combinatorics->new(
+    count => $Flag_Invary_Count,
+    data  => bits2ps($pset),
+  );
+  while ( my @tomask = $c->next_combination ) {
+    my $invary_mask = ps2bits( \@tomask );
+
+    for my $set ( keys %variations ) {
+      next if $pset == $set;    # exclude link to self
+      if ( $invary_mask == ( $set & $invary_mask ) ) {
+        # omit "b to a" if already have "a to b" for cleaner output
+        next if $seen{ join ':', sort $pset, $set }++;
+
+        printf qq{  "%s" -- "%s";\n}, ps2str( bits2ps($pset) ),
+          ps2str( bits2ps($set) );
+      }
+    }
+  }
+}
+
+say <<"GRAPHVIZ_FOOTER";
+}
+GRAPHVIZ_FOOTER
+
+exit;
+
+########################################################################
+#
+# SUBROUTINES (some of which having been added to Music::AtonalUtil)
+
+sub bits2ps {
+  my ($bits) = @_;
+  my @pset;
+
+  for my $p ( 0 .. 11 ) {
+    push @pset, $p if $bits & ( 1 << $p );
+  }
+
+  return \@pset;
+}
+
+sub ps2bits {
+  my ($ps) = @_;
+  my $bs = 0;
+  for my $p (@$ps) {
+    $bs |= 1 << $p;
+  }
+  return $bs;
+}
+
+sub ps2str {
+  if ( ref $_[0] eq 'ARRAY' ) {
+    '[' . join( ',', @{ $_[0] } ) . ']';
+  } else {
+    '[' . $_[0] . ']';
+  }
+}

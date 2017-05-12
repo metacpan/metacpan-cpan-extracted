@@ -1,0 +1,76 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 1dfee61f665354afeb4a14cd18364b541a93b335 Changes
+SHA1 8ebf9e6e14e77589ed2690e499863c32ed94c89d MANIFEST
+SHA1 6e3dfa4a933a1a5da6c934cca324fc40495b2f5d MANIFEST.SKIP
+SHA1 99160abc217aeed73ed1df87a52e9c6e06429f62 META.yml
+SHA1 5f35097405eac1922747f028545c2f9fd4c1508f Makefile.PL
+SHA1 61396e919c9b2bed188574c5a698ae21cc0b965a debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 4fb4e969267f46b26e01f71b4ac5789fa2d305fc debian/control
+SHA1 ea11dfb17eaf75c6e92aed6a2634c0224c604f42 debian/copyright
+SHA1 2dbc73a7cf261f7dc9c4b6e64c9aacc3cfc41307 debian/patches/pod-examples-dir.diff
+SHA1 260a610f68684b44c17a69faa0ca408fd9c8107a debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 f27d0e82f3daff43b34aae35bdc7f836051fe246 debian/watch
+SHA1 7b1062dbfbe21f06629b1642e4ccd81c25660dbd devel/Iterator/Aronson.pm
+SHA1 d06c5e5e45441d166f504319a27653d63b625990 devel/Iterator/Simple/Aronson.pm
+SHA1 9bf09533bee0a1cdc14b8478f0e84b94ae390872 devel/latin.pl
+SHA1 e7f543ff80e87dc2d588ebccd3ce3106afb23208 devel/misc.pl
+SHA1 503e72b1b485487295a8b4467b74b8f3dfa7ac54 devel/non-ascii.pl
+SHA1 6cb6d3b8f688529db7aebac488adb26d596f8a8c devel/run.pl
+SHA1 49d75cb5e26480a6e73a758b4c9dfcb77eb6d47b devel/sloane-a.pl
+SHA1 0d7e3f70f7d024df9bc6faefa2c097041424ac24 devel/unaccent.pl
+SHA1 8f20290885952c625d3f7ee482b5851d76158387 examples/terminate.pl
+SHA1 355b182e01f918114bc6c85967b2de758e1dc9fe inc/MyMakeMakerExtras.pm
+SHA1 4a024a274c779f4355bb09b95c68d940c2eb48d6 lib/Math/Aronson.pm
+SHA1 6610351b3375ba8c516ea74fd32e2a27f842a373 lib/Math/NumSeq/Aronson.pm
+SHA1 4f14a17f94c95db9cb0265eb2b1f41bb1582395f lib/Math/NumSeq/OEIS/Catalogue/Plugin/Aronson.pm
+SHA1 4bd52d129d48002cd09725d1ceb5e9db4c2c0813 t/Aronson-NumSeq.t
+SHA1 481b03dd9e03ce7fb73a551e76c776c4741301b3 t/Aronson-ithreads.t
+SHA1 240f03f9a8ea78e4153337e168b6d35a6f090bbf t/Aronson-weaken.t
+SHA1 fe7c83aaf5d9202afe492f083fb0189b0da120bf t/Aronson.t
+SHA1 3855de075da37f5bc4e6a5534b2f00cc14872a98 t/MyTestHelpers.pm
+SHA1 811028548aa4b360b5086d1af3150f9dde348aa6 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
+SHA1 ec454b1b524d2d0b35e5a7d8292ad13d82becab5 xt/0-Test-YAML-Meta.t
+SHA1 bdc59bfb29089f4c801a4282c0c3498f9a7982e5 xt/0-examples-xrefs.t
+SHA1 2fb2ce60ce5c740d1eb7e3b55a96f3ccb84d38c3 xt/0-file-is-part-of.t
+SHA1 daba2840c7f128371d42516619a0e04fee2f5ff4 xt/0-no-debug-left-on.t
+SHA1 c05c244378910476c4adf04740c2978f49b5b2a6 xt/Aronson-NumSeq-oeis.t
+SHA1 066a54192ec6df1e9bd4f8871107a558e5cd7f59 xt/MyOEIS.pm
+SHA1 84a47c1d71fd58797a2754030998dfb673b62811 xtools/my-check-copyright-years.sh
+SHA1 bfb75ffb7a834c345288e01f561b12695f191d12 xtools/my-check-file-part-of.sh
+SHA1 aeade3655ca27d0860b1c33e94ae4159823ddbb5 xtools/my-check-spelling.sh
+SHA1 fad81dac3edf7be728f70b50d772571ff31f1bdb xtools/my-deb.sh
+SHA1 c6a29febf601937262018cfb14fbbe7e0a3b0d7a xtools/my-diff-prev.sh
+SHA1 7fdd8ebda52e9729fa3a4e008cde866ec4a4cd5d xtools/my-kwalitee.sh
+SHA1 b91ca4a0349c8992cd6249fee9a93d06ecbedab5 xtools/my-manifest.sh
+SHA1 4db9c30b1fc96b04a794218ca19561b368f59679 xtools/my-pc.sh
+SHA1 7b1e948c88915689b3782d872ef9b92a2912c593 xtools/my-tags.sh
+SHA1 631dabf52c65a7b8613d6565fef2c2416ebba7e9 xtools/my-wunused.sh
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iD8DBQFPz+uGLFMCIV9q3ToRAgrhAKChKC4p3IE4BNgbnwVTz06lwjgcGACdEtw8
+ZAHIWPQHnS4Bz/1iGy8gR9w=
+=kq3q
+-----END PGP SIGNATURE-----

@@ -1,0 +1,17 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/MooseX/AttributeCloner.pm
+t/00-critic.t
+t/00-distribution.t
+t/00-kwalitee.t
+t/00-pod.t
+t/00-podcoverage.t
+t/10-AttributeCloner.t
+t/lib/TestAttributeCloner.pm
+t/lib/TestNewAttributeCloner.pm
+t/lib/TestExtraNewAttributeCloner.pm
+t/perlcriticrc
+Makefile.PL
+META.yml

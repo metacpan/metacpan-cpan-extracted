@@ -1,0 +1,13 @@
+Changes
+examples/gauss.pl
+examples/gauss.png
+examples/inverse_of_x.pl
+examples/inverse_of_x.png
+lib/Math/Random/AcceptReject.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00pod.t
+t/00podcover.t
+t/01basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

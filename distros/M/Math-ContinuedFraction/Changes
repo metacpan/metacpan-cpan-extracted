@@ -1,0 +1,21 @@
+Revision history for Math-ContinuedFraction
+
+0.11
+	21 January 2011
+	- Got the named changed to its CamelCase form.
+	- More tests.
+	17 January 2011
+	- Introduce from_root() method.
+	11 January 2011
+	- Changed new() to allow creation of a continued fraction
+	  from a Math::BigRat object.
+	4 January 2011
+	- Added code to from_ratio() to check for a zero divisor.
+	2 January 2011
+	- Inevitable missing test files put in MANIFEST.
+
+0.10    1 January 2011
+	- Very basic version released: Can create CF objects two
+	  different ways, and return array form, ascii array form,
+	  and convergents using BigRat and BigInt types.
+

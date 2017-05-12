@@ -1,0 +1,37 @@
+---
+name: Mozilla-Mechanize
+version: 0.06
+author:
+  - 'Scott Lanning <slanning@cpan.org>'
+abstract: Like WWW::Mechanize but using Gtk2::MozEmbed
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0.54
+requires:
+  Gtk2::MozEmbed: 0.04
+  Mozilla::DOM: 0.20
+  perl: v5.8.0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Mozilla::Mechanize:
+    file: lib/Mozilla/Mechanize.pm
+    version: 0.06
+  Mozilla::Mechanize::Browser:
+    file: lib/Mozilla/Mechanize/Browser.pm
+  Mozilla::Mechanize::Browser::Gtk2MozEmbed:
+    file: lib/Mozilla/Mechanize/Browser/Gtk2MozEmbed.pm
+  Mozilla::Mechanize::Form:
+    file: lib/Mozilla/Mechanize/Form.pm
+  Mozilla::Mechanize::Image:
+    file: lib/Mozilla/Mechanize/Image.pm
+  Mozilla::Mechanize::Input:
+    file: lib/Mozilla/Mechanize/Input.pm
+  Mozilla::Mechanize::Link:
+    file: lib/Mozilla/Mechanize/Link.pm
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

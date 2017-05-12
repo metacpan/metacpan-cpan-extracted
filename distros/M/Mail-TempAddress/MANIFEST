@@ -1,0 +1,14 @@
+Build.PL
+ChangeLog
+MANIFEST            This list of files
+META.yml
+lib/Mail/TempAddress.pm
+lib/Mail/TempAddress/Address.pm
+lib/Mail/TempAddress/Addresses.pm
+README
+t/address.t
+t/addresses.t
+t/customer.t
+t/tempaddress.t
+t/lib/FakeIn.pm
+t/lib/FakeMail.pm

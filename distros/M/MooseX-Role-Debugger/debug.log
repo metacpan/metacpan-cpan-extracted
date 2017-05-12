@@ -1,0 +1,17 @@
+Debug is on.
+Adding debugger for method BUILD
+Adding debugger for method test_method
+Skipping method an_attr
+Skipping method write_an_attr
+Skipping method DESTROY
+Skipping method new
+Skipping method meta
+test_method called with parameters: $VAR1 = [
+          'blark'
+        ];
+
+test_method returned: $VAR1 = [
+          'a list',
+          'of things'
+        ];
+

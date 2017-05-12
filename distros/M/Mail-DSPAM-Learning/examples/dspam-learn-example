@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+use Mail::DSPAM::Learning;
+
+warn "\nRunning dspam-lean version " . $Mail::DSPAM::Learning::VERSION . "\n\n";
+
+
+my $help;
+my $man;
+
+my $MyConfigFile;
+my $delay = 1;
+my $spam_mailbox = "mbox":
+
+my $test = 1;
+
+$MyConfigFile = "MyConfig.pm";
+
+my $dspam_learner = Mail::DSPAM::Learning->new();
+
+$dspam_learner->setDelay(1);
+
+$dspam_learner->defineMyConfig($MyConfigFile);
+require $MyConfigFile;
+$dspam_learner->setMyConfig;
+
+warn "Here is my personal configuration\n";
+
+    $dspam_learner->printMyConfig;
+
+
+$dspam_learner->setMailbox($spam_mailbox);
+
+warn "\tParsing Mailbox\n";
+$dspam_learner->parseMailbox();
+
+$dspam_learner->askPassword();
+
+$dspam_learner->setMailer;
+
+my $c = $dspam_learner->forwardMessages(!$test);
+
+warn "\n\t $c messages have been sent\n\n";
+warn "I don't like spam !\n";
+
+exit;
+
+__END__
+

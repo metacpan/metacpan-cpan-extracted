@@ -1,0 +1,10 @@
+#!/usr/bin/perl
+# 315JEHVb:cnv (CoNVert number bases) <NumberString> <FromBase> <ToBase> created by Pip Stuart <Pip@CPAN.Org> as part of the Math::BaseCnv package.
+#   If you only supply a number, it will convert to HEX if it's decimal and decimal if it contains only valid HEX digits. If you just provide one
+#     base parameter, it assumes that your number is already base10 and that you've supplied the ToBase. Otherwise, you need from and to parameters.
+# Examples: `cnv 127   10 16` ==    "7F"
+#           `cnv 7F    16  3` == "11201"
+#           `cnv 11201  3  7` ==   "241"
+#           `cnv 241    7 10` ==   "127"    # Eror checking is minimal.
+use strict;use warnings;use utf8;use Math::BaseCnv;
+my $numb=shift;die("USAGE: `cnv <NumberString> <FromBase> <ToBase>`\n") if(!defined($numb) || $numb =~ /^-+[h\?]/i);print(cnv($numb,shift,shift));

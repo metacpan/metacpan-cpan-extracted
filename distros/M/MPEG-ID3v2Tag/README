@@ -1,0 +1,21 @@
+This is a writer/reader for ID3 v2.3 tags.
+
+This should be considered beta code.  
+
+This is free software, and may be redistributed under the same terms
+as Perl itself.
+
+There is NO WARRANTY.  It might work.  It might not.  It might cause
+demons to fly out of your nose.  YMMV.
+
+I am interested in hearing bug reports (mattd@mp3.com), but it's very
+unlikely I will fix them in a timely fashion.  Patches gratefully accepted,
+and usually applied and released quickly.  I do not actively "support"
+this module, as it does what I need it to do.
+
+The code was designed in such a way as to make it very easy to add
+support for new frame types.  If you you need a frame that isn't
+implemented, please feel free to implement it and send me a patch.
+Don't forget to update the relevent section of the POD documentation;
+I won't accept a frame implementation without documentation.
+

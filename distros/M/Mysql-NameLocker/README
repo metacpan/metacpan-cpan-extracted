@@ -1,0 +1,28 @@
+Mysql::NameLocker
+=================
+
+Description
+-----------
+This is an object wrapper for MySQL's named locks. Using this
+object in code is safe because as soon as the object goes out of scope,
+the lock is automatically released. This is especially important in
+mod_perl scripts, daemons, and any other persistent code.
+I've included a HTML version of the POD docs in the html subdirectory.
+
+Copyright
+---------
+Copyright (C) 2001 Craig Manley <cmanley@cpan.org>. All rights reserved.
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. There is NO warranty; not even for
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Installation
+------------
+perl Makefile.PL
+make
+make install
+perldoc Mysql::NameLocker
+
+Author
+------
+Craig Manley cmanley@cpan.org

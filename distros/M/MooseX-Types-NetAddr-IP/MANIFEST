@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+t/MooseX-Types-NetAddr-IP.t
+lib/MooseX/Types/NetAddr/IP.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,2 @@
+0.03  2014-05-10
+  - Changed render_text to render(text => ...) in tests (stephan48)

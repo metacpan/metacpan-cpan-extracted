@@ -1,0 +1,225 @@
+=head1 NAME
+
+MySQL::Easy - Perl extension to handle various mundane DBI session related things specific to mysql.
+
+=head1 SYNOPSIS
+
+  use MySQL::Easy;
+
+  my $dbo = MySQL::Easy->new("stocks");
+
+  my $symbols = $dbo->firstcol(
+      "select symbol from ohlcv where symbol=?", "msft" );
+
+  my $q = $dbo->ready("select * from ohlcv where symbol=?");
+  for my $s (@$symbols) {
+      my @a;
+
+      $q->execute($s);
+      # Although the regular DBI will reconnect to the server when it loses
+      # it's connection, any queries you had previously prepared will fail
+      # until it reconnects.  easy::mysql handles all that for you so this
+      # execute() will always work, if it's syntactically correct, even if
+      # your server connection was lost since the last ready();
+
+      print "@a" while @a = $q->fetchrow_array;
+  }
+
+=head1 DESCRIPTION
+
+I don't remember how I used to live without this...  I do like the way L<DBI>
+and L<DBD::mysql> work, but I wanted something I<slightly> prettier...
+I<slightly> handier.
+
+Here are the functions L<MySQL::Easy> provides:
+
+=over
+
+=item B<new>
+
+    $dbo = MySQL::Easy->new( $db_name, $trace )
+
+C<$db_name> is the name of the database you're connecting to...  If you don't
+pick anything, it'll pick "test" for you.  C<$trace> is a 1 or false, ... it's
+the L<< DBI->trace()|DBI/trace >> ...
+
+    $dbo = MySQL::Easy->new( $db_name, {user=>"blarg", host=>"whatever"})
+
+Alternatively, you can pass a hashref of options in place of the trace argument.
+Passing C<< user=>"blarg" >> in this way is the same as calling
+C<< $dbo->set_user() >> -- so this is really only good for avoiding calls to
+C<set_user>, C<set_pass>, and C<set_host>; although, C<trace> also works as an
+attribute here by calling the function of the same name.
+
+=item B<do>
+
+    $dbo->do("sql statement bind=? bind=?", $bind1, $bind2);
+
+This immediately executes the SQL with the bind vars given.  You can pas in a
+statement handle instead of the string... this is faster if you're going to use
+the SQL over and over.  Returns a bool like you'd expect.  Example:
+
+    $dbo->do("stuff");
+
+=item B<lock>
+
+    $dbo->lock("table1", "table2", "table3");
+
+    # code
+
+    $dbo->unlock;
+
+L<MySQL::Easy> uses only write locks.  Those are the ones where nobody can read
+or write to the table except the locking thread.  If you need a read lock, let
+me know.  Most probably though, if you're using this, it's a smaller app, and it
+doesn't matter anyway.
+
+=item B<ready>
+
+   $sth = $dbo->ready("Sql Sql Sql=? and Sql=?");
+   $sth->execute($bindvar);
+   $sth->fetchrow_hashref; # etc...
+
+C<ready()> returns a L<DBI statement handle|DBI/Notation_and_Conventions>,
+mostly.  The L<MySQL::Easy> statement handles automatically recover from
+disconnects.  At the time of this writing, L<DBI> statement handles do not do
+this (although the database handle does).
+
+=item B<firstcol>
+
+   $arr = $dbo->firstcol("select col from tab where x=? and y=?", $x, $y)
+
+returns an arrayref of values for the sql.
+
+=item B<firstval>
+
+   $val = $dbo->firstval("select blarg from table where unique_id=?", $id);
+
+Returns the value asked for or C<undef> (as a scalar) if the query didn't work
+out.
+
+=item B<firstrow>
+
+   $val = $dbo->firstrow("select * from table where unique_id=?", $id);
+
+Returns the first row found as an array or as an arrayref.
+
+=item B<last_insert_id>
+
+   $id = $dbo->last_insert_id;
+
+Fetches the last insert id (relating to auto_increment fields) from MySQL.
+
+=item B<trace>
+
+   $dbo->trace(1); $dbo->do("sql"); $dbo->trace(0);
+
+Turns the DBI trace on and off.
+
+=item B<errstr>
+
+   $dbo->errstr
+
+Returns an error string for the last error on the thread. Works roughly the same
+as a L<< $sth->errstr|DBI/errstr >> and is described in detail there.
+
+=item B<check_warnings>
+
+I'll just give this example:
+
+    $dbo->do("create temporary table cool( field enum('test1', 'test2') not null )");
+    $dbo->do("insert into cool set field='test3'");
+    $dbo->check_warnings 
+        or die "SQL WARNING: $@\twhile inserting test field\n\t";
+
+=item B<set_host> B<set_user> B<set_port> B<set_pass>
+
+   $dbo->set_host($h); $dbo->set_port($p); 
+   $dbo->set_user($U); $dbo->set_pass($p);
+
+The first time you do a L</do>/L</ready>/L</firstcol>/etc, L<MySQL::Easy>
+connects to the database.  You may use these set functions to override values
+found in your C<~/.my.cnf> for user and pass.  They can also be passed during
+the call to L<new>.
+
+L<MySQL::Easy> reads the user and pass from that file.  The host name will
+default to I<localhost> unless explicitly set.
+
+=item B<bind_execute>
+
+   my $table;
+   my $sth = $dbo->bind_execute("show tables", \( $table ) );
+
+This was Josh's idea (see L</THANKS>).
+
+   die $dbo->errstr unless $sth;  
+       # bind_execute returns undef if either the bind
+       # or execute phases fail.
+
+   print "$table\n" while fetch $sth;
+
+=back
+
+=head1 B<AUTOLOAD>
+
+Any functions from L<DBI> will work with the C<$dbo>.
+
+=head1 B<AUTHENTICATION>
+
+L<MySQL::Easy> actually checks a few places for the username and password
+(largely so it needn't be included in your script).  These alternate locations
+are checked in the following order until something is found.
+
+=over
+
+=item B<$ENV{ME_USER}> and B<$ENV{ME_PASS}>
+
+Then environment variables C<ME_USER> and C<ME_PASS> override any file based
+guesses.  This only works if both are set.
+
+=item B<$ENV{ME_CNF}>
+
+Then environment variable C<ME_CNF> may contain the location of a file.  If it
+does, it's checked for username and password info.  If only one is found, the
+value falls through to the next file.
+
+=item B<$ENV{HOME}/.my.cnf>
+
+If the file exists, C<~yourname/.my.cnf> is checked for username and password
+info.  If only one is found, the value falls through to the next file.
+
+=item B</etc/mysql-easy.cnf>
+
+If the file exists, it is checked for username and password info.  If only one
+is found, the value falls through to the next file.
+
+=item B</etc/mysql/my.cnf>
+
+If the file exists, it is checked for username and password info.
+
+=back
+
+The environment variable I<names> and file locations are also all configurable
+(use the source for further information).
+
+=head1 AUTHOR
+
+Paul Miller C<< <jettero@cpan.org> >>
+
+I am using this software in my own projects.  If you find bugs, please let me
+know. :) Actually, let me know if you find it handy at all.  Half the fun of
+releasing this stuff is knowing that people use it.
+
+=head1 THANKS
+
+For bugs and ideas: Josh Rabinowitz C<< <joshr-cpan@joshr.com> >>
+
+=head1 COPYRIGHT
+
+Copyright 2009 Paul Miller
+
+Released under the LGPL
+
+=head1 SEE ALSO
+
+perl(1), L<DBI>, L<DBD::mysql>

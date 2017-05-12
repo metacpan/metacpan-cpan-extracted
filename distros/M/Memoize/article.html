@@ -1,0 +1,968 @@
+<HTML>
+<HEAD>
+<TITLE>Bricolage: Memoization</TITLE>
+<LINK REV="made" HREF="mailto:mjd-perl-tpj@plover.com">
+<BASE HREF="http://perl.plover.com/MiniMemoize/memoize.html">
+</HEAD>
+
+<BODY BGCOLOR=white>
+
+<p align=right><font size=-1>&copy; Copyright 1999 The Perl Journal.  Reprinted with permission.</font></p>
+	
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#I_Bricolage_Memoization"><EM>Bricolage</EM>: Memoization</A>
+	<UL>
+
+		<LI><A HREF="#Recursive_Functions">Recursive Functions</A>
+		<LI><A HREF="#Automatic_Memoization">Automatic Memoization</A>
+		<LI><A HREF="#Internals_of_C_Memoize_">Internals of <CODE>Memoize</CODE></A>
+	</UL>
+
+	<LI><A HREF="#Some_Other_Applications_of_Memoi">Some Other Applications of Memoization</A>
+	<UL>
+
+		<LI><A HREF="#Persistent_Cache">Persistent Cache</A>
+		<LI><A HREF="#Profiling_Execution_Speed">Profiling Execution Speed</A>
+		<LI><A HREF="#_Orcish_Maneuver_">`Orcish Maneuver'</A>
+		<LI><A HREF="#Dynamic_Programming">Dynamic Programming</A>
+	</UL>
+
+	<LI><A HREF="#When_Memoizing_Doesn_t_Work">When Memoizing Doesn't Work</A>
+	<LI><A HREF="#Historical_Note">Historical Note</A>
+	<LI><A HREF="#Bibliography">Bibliography</A>
+</UL>
+<!-- INDEX END -->
+
+<P>
+<H1><A NAME="I_Bricolage_Memoization"><EM>Bricolage</EM>: Memoization</A></H1>
+<P>
+<img src="../pics/medium-sigils.gif" align=left>
+<EM>Caching</EM> is a useful general technique that sometimes makes programs run faster. It
+does this by exchanging space for time: Caching tries to save previously
+computed results in an attempt to reuse them later rather than recomputing
+them.
+
+<P>
+Caching is useful in all kinds of situations, including, almost any kind of
+searching (cache the results of the search so that you can skip it next
+time), HTML generation (cache the results of the generation process so that
+you don't have to generate the page next time), and numeric computation
+(cache the results of the computation). As a specific example, consider a
+function for preparing graphic images to be printed on an industrial offset
+printer. Four-color printing processes, commonly used in books and
+magazines, use four colors of ink: cyan, magenta, yellow, and black,
+collectively referred to as CMYK. Graphics files, however, usually record
+colors by indicating the desired levels of red, green, and blue light
+(RGB.) The RGB format will have to be converted to CMYK values prior to
+printing.
+
+<P>
+Each pixel will need to have its color converted; this typically requires a
+fairly expensive calculation. But in many graphics formats, such as GIF,
+there are few colors relative to the number of pixels. A naive approach
+would compute the CMYK values for each color repeatedly.  
+
+<P> To speed up the caculation of CMYK values, we save each CMYK set
+in a data structure, called a <EM>cache</EM>. Later, if we use the
+function to compute the CMYK values for the same color, the function
+looks in the data structure to see if it already knows the right
+values. If it finds them there, it returns them immediately, avoiding
+the lengthy calculation. If not, it computes them, installs them in
+the data structure, and returns them to the caller.
+
+<P>
+Caching therefore trades space for time. A function with caching may run
+faster than one without, but it uses up more memory. The basic strategy
+looks like this:
+
+<P>
+<PRE>        sub fake_function {
+          if (@_ looks familiar) {
+            return cached value from the cache;
+          } else {
+            $val = real_function(@_);
+            store $val in the cache;
+            return $val;
+          }
+        }
+</PRE>
+<P>
+Then you call <CODE>fake_function</CODE> instead of <CODE>real_function</CODE> and it takes care of managing the cache and returning the values that
+<CODE>real_function</CODE> would have returned if you called it directly. If
+<CODE>real_function</CODE> takes a long time to run, this can yield a substantial savings.
+
+<P>
+Obviously this is inappropriate for many functions. For example, you
+wouldn't like it if the `time' or `rand' functions used caching, because then
+they would return the same time or the same random number every time you
+called them. But for many functions the result depends only on the
+arguments, and not on anything in the outside world like the time of day.
+Some of these functions are candidates for caching strategues.
+
+<P>
+Here's a common example: The <EM>factorial</EM> function. This function accepts an argument which is an integer, at least
+0. The factorial is defined as follows:
+
+<P>
+<PRE>        sub factorial {
+          my $n = shift;
+          if ($n == 0) { return 1 }
+          else         { return $n * factorial($n-1) }
+        }
+</PRE>
+<P>
+<CODE>factorial</CODE> is suitable for caching because it's what is called a
+<EM>pure</EM> function. A pure function is one with no side effects, whose return value
+depends only on the values of its arguments. It's easy to see that no
+matter how many times we compute <CODE>factorial(7)</CODE> the result will always be the same. This is just the property that makes it
+suitable for caching: Since it'll always be the same, we'll remember the
+result from the first time we call it, and return that same result on the
+subsequent calls.
+
+<P>
+It's easy to take the <CODE>factorial()</CODE> function above and turn it into a version with caching. This process is
+called <EM>memoization</EM>. Since the argument to <CODE>factorial()</CODE> is always a non-negative integer, we'll just use an ordinary Perl array as
+the cache. When we compute
+<CODE>factorial($n)</CODE>, we'll store the result in <CODE>$cache[$n]</CODE>. Then when we need to see if we've computed <CODE>factorial($n)</CODE> previously, we'll just look to see if <CODE>$cache[$n]</CODE> is defined. The code is simple:
+
+<P>
+<PRE>
+ 1        { my @cache;
+ 2          sub factorial {
+ 3            my $n = shift;
+ 4            return $cache[$n] if defined $cache[$n];
+ 5
+ 6            my $result;
+ 7            if ($n == 0) { $result = 1 }
+ 8            else         { $result = $n * factorial($n-1) }
+ 9                    
+10            $cache[$n] = $result;
+11            return $result;
+12          }
+13        }
+</PRE>
+<P>
+Line 1 sets up the cache array; the <CODE>my</CODE> confines it to the block that ends on line 13, so it's only visible to the <CODE>factorial</CODE> function. After the function gets the argument on line 3, it checks on line
+4 to see if it already knows the factorial. If so, it returns the result
+immediately. 
+
+<P>
+Something interesting and a little subtle is going on here: The memoization
+is a bigger win than it might at first appear. Suppose we've used <CODE>factorial(12)</CODE> to compute the factorial of 12 and next for some reason we want to compute <CODE>factorial(13)</CODE>.  <CODE>$cache[13]</CODE> isn't defined yet, so control passes to line 8, which wants to compute <CODE>13
+* factorial(12)</CODE>, so it makes a recursive call. But the recursive call for <CODE>factorial(12)</CODE> returns immediately, because <CODE>$cache[12]</CODE>
+
+<EM>is</EM> already defined. We got <CODE>factorial(13)</CODE> almost immediately, even though the value wasn't in the cache yet, because
+we did have the result of a <EM>partial</EM> compution in the cache.
+
+<P>
+Now similarly, let's ask for <CODE>factorial(11)</CODE>. Even though we never explicitly asked for this before, the result is
+already in the cache, because it was computed and recorded in the process
+of computing
+<CODE>factorial(12)</CODE>.  
+
+<P>
+Memoization not only speeds up calls for arguments that we've used before,
+it sometimes also speeds up the computations for arguments that we haven't
+used before.
+
+<P>
+Here's an example where memoizing turns into a huge win for this reason:
+The <EM>Fibonacci</EM> function. In 1202 the Italian mathematician Leonardo of Pisa, also called
+`Fibonacci', asked how quickly a colony of immortal rabbits would increase
+if every month each pair of adult rabbits spawned a new baby pair that took
+another month to grow up to be adults themselves.
+
+<P>
+It's not hard to discover that if <EM>F(n)</EM> is the number of pairs of rabbits in month <EM>n</EM>, then 
+
+<P>
+<PRE>        f(n) = n                (if n &lt; 2)
+        f(n) = f(n-1) + f(n-2)  (otherwise)
+</PRE>
+<P>
+The outputs of this function, 1, 1, 2, 3, 5, 8, 13, 21, ..., are the famous <EM>Fibonacci Numbers</EM>. The code for the function to compute them is very simple:
+
+<P>
+<PRE>  # Compute nth Fibonacci number
+  sub fib {       
+    my $n = shift;
+    if ($n &lt; 2) { return $n } 
+    else        { return fib($n-1) + fib($n-2) }
+  }
+</PRE>
+<P>
+However, this simple function is very slow. It takes a long time to compute <CODE>fib(20)</CODE>, because it first wants to compute <CODE>fib(19)</CODE> and
+<CODE>fib(18)</CODE>, and add to the results. But to compute <CODE>fib(19)</CODE>, it first has to compute <CODE>fib(18)</CODE> and <CODE>fib(17)</CODE>, and then when it is done it comes back and computes <CODE>fib(18)</CODE> all over again even though the answer is the same as it was before. Both of
+the times that it wants to compute <CODE>fib(18)</CODE>, it has to compute <CODE>fib(17)</CODE> from scratch, and then it has to do that again each time it wants to
+compute <CODE>fib(19)</CODE>. This function does so much recomputing of old results that it takes a
+really long time to run.  <CODE>fib(20)</CODE> makes about 22,000 recursive calls, to compute and recompute things that it
+already computed.
+
+<P>
+Here's a memoized version:
+
+<P>
+<PRE>        { my @cache;
+          sub fib {
+            my $n = shift;
+            return $cache[$n] if defined $cache[$n];
+</PRE>
+<P>
+<PRE>            my $result;
+            if ($n &lt; 2) { $result = $n }
+            else { $result = fib($n-1) + fib($n-2) }
+</PRE>
+<P>
+<PRE>            $cache[$n] = $result;
+            return $result;
+          }
+        }
+</PRE>
+<P>
+Memoizing here is a big win; you reduce those 22,000 recursive calls to
+about 40. Even if you never ask for <CODE>fib(20)</CODE> again, you get a huge benefit.
+
+<P>
+We can write the memoized version a little more tidily this way:
+
+<P>
+<PRE> 1        { my @cache;
+ 2          BEGIN { @cache = (0, 1) }
+ 3          sub fib {
+ 4            my $n = shift;
+ 5            return $cache[$n] if defined $cache[$n];
+ 6
+ 7            return $cache[$n] = fib($n-1) + fib($n-2);
+ 8         }
+ 9       }
+</PRE>
+<P>
+There are two tricks here. One is that by initializing the cache to contain
+the two special cases <EM>n=0</EM> and <EM>n=1</EM>, we can eliminate the code that deals with those special cases. The other
+trick is that we can eliminate the <CODE>$result</CODE> variable: We compute the result, stick it right into the cache, and return
+it, all on line 7.
+
+<P>
+<HR>
+<H2><A NAME="Recursive_Functions">Recursive Functions</A></H2>
+<P>
+Lots of people want to advise you to avoid recursion, because recursive
+functions are often so much less efficient than iterative ones. But for
+some problems, recursion leads to much simpler and more natural code, and
+it can be hard to decide whether to trade off efficiency for simplicity.
+
+<P>
+Memoization will often improve the performance of recursive functions to
+the point that you don't care about the small additional gain you might get
+by rewriting the function iteratively. So before you rewrite, try
+memoizing.
+
+<P>
+<HR>
+<H2><A NAME="Automatic_Memoization">Automatic Memoization</A></H2>
+<P>
+<QUOTATION> Civilization advances by extending the number of
+important operations which we can perform without thinking. (Alfred North
+Whitehead) </QUOTATION>
+
+<P>
+Like all tools, memoization is better when you don't have to think about
+it. I like memoization, so I wrote a module that memoizes functions
+automatically. If you have the module, you can say
+
+<P>
+<PRE>  use Memoize;
+  memoize 'fib';
+</PRE>
+<P>
+and it'll automatically memoize the <CODE>fib</CODE> function. You can try memoizing a function to see if you get a performance
+increase, and if not you can turn it off again without wasting any time
+actually modifying the code or thinking about how to organize the cache.
+Very handy, and available from CPAN.
+
+<P>
+<HR>
+<H2><A NAME="Internals_of_C_Memoize_">Internals of <CODE>Memoize</CODE></A></H2>
+<P>
+Usually when I write a <EM>Bricolage</EM> module, I try to make it readable, even if that means leaving out features
+or sacrificing efficiency. In this case the module was already written, and
+it's a three-hundred-line monster full of all sorts of bells and whistles.
+So for this article, I wrote a little tiny version of <CODE>Memoize.pm</CODE>. It leaves out the fancy features and weighs in at a mere 31 lines of
+code.
+
+<p><a href="numberedlines.html" target="memoize code">View just the code in a new window</a></p>
+
+<PRE>
+     1  package MiniMemoize;
+     2  use Exporter;
+     3  @ISA = qw(Exporter);
+     4  @EXPORT = qw(memoize);
+     5  use Carp;
+     6  use strict;
+     7  
+     8  my %memotable;
+     9  
+    10  sub memoize {
+    11    my $function = shift;
+    12    my $funcname;
+    13    if (ref $function eq '') { 
+    14      my $caller = caller;
+    15      # Convert to code reference
+    16      $function = $caller . &quot;::$function&quot; unless $function =~ /::/;
+    17      $funcname = $function;
+    18      no strict 'refs';
+    19      $function = \&amp;$function;
+    20    }
+    21  
+    22    my $stub = eval qq{sub { _check_cache(&quot;$function&quot;, \@_) }};
+    23    $memotable{$function} =
+    24      { original =&gt; $function,
+    25        cache =&gt; { },
+    26      };
+    27  
+    28
+    29    { no strict 'refs';
+    30      *{$funcname} = $stub if defined $funcname;
+    31    }
+    32    $stub;
+    33  }
+    34  
+    35  
+    36  sub _check_cache {
+    37    my $what_func = shift;
+    38    unless (exists $memotable{$what_func}) {
+    39      # This `should never happen'
+    40      croak(&quot;Tried to check cache of non-memoized function `$what_func'; aborting&quot;);
+    41    }
+    42  
+    43    my $cache         = $memotable{$what_func}{cache};
+    44    my $argstr = join $;, @_;
+    45    if (exists $cache-&gt;{$argstr}) { return $cache-&gt;{$argstr} }
+    46  
+    47    my $real_function = $memotable{$what_func}{original};
+    48    $cache-&gt;{$argstr} = $real_function-&gt;(@_);
+    49  }
+    50  
+    51  1;
+</PRE>
+<p><a href="numberedlines.html" target="memoize code">View just the code in a new window</a></p>
+
+<P>
+There are two functions here.  <CODE>_check_cache</CODE> is private, and is responsible for maintaining the cached function values
+and returning them when appropriate.  <CODE>memoize</CODE> is called directly by the user of the package, whom we'll call `you', and
+sets things up so that when you think you're calling your own function,
+you're really calling
+<CODE>_check_cache</CODE> instead.
+
+<P>
+We'll see <CODE>memoize</CODE> first, because it's called first.  <CODE>memoize</CODE> is reponsible for memoizing a function and setting up the cache. Suppose
+you call <CODE>memoize 'fib'</CODE> in the main package. What does <CODE>memoize</CODE> do to set up the cache and arrange to have the cache checked at the right
+time?
+
+<P>
+The first thing it needs to do is find the actual function and get a
+reference to it. This occurs on lines 14--19. If the argument you passed to <CODE>memoize</CODE> was already a reference to a function, we find that out on line 13 and skip
+this part. Supposing that what we got is a function name, we first find out
+the name of the calling package with <CODE>caller</CODE> (line 14). Then we put the function name together with the package name to
+get the full name of the function, something like
+<CODE>main::fib</CODE>. If the name contained <CODE>::</CODE>, we assume that it already has its package name attached and skip that
+part. We save the complete name in <CODE>$funcname</CODE> (we'll need it again later) and replace the name of the function in <CODE>$function</CODE> with a reference to the function itself on line 19. Turning a name into a
+reference this way is usually something people do by accident, so <CODE>strict</CODE> will abort the program if we do it. But here it's really on purpose, so we
+shut off <CODE>strict 'refs'</CODE> for just that one line.
+
+<P>
+Now <CODE>$function</CODE> has a reference to the function you wanted to memoize, and <CODE>$funcname</CODE> has the full name of that function, if you told us what the name was.
+
+<P>
+Now let's jump ahead a little. You might like to memoize more than one
+function at a time, so we need some way of keeping the caches for separate
+functions separate. It would be terrible if you memoized
+<CODE>fib</CODE> and <CODE>fact</CODE> and then <CODE>fib(7)</CODE> returned 5040 instead of 13.
+
+<P>
+Each cache will be an anonymous hash. The keys will look like function
+arguments, and the values will be function return values. The cache hashes
+will be stored in another hash, keyed by function name. Given the name of a
+function, we can look in the main hash to find the cache hash for that
+function. This main hash is
+<CODE>%memotable</CODE>, declared on line 8.  <CODE>%memotable</CODE> is the most important data structure in the module.
+
+<P>
+Actually I fibbed a little. The keys of <CODE>%memotable</CODE> aren't function names, because <CODE>memoize</CODE> might not know the function name. You can ask <CODE>memoize</CODE> to memoize a reference to a function, like this:
+
+<P>
+<PRE>        memoize \&amp;fib;
+</PRE>
+<P>
+in which case the name won't be available to <CODE>memoize</CODE>. You can also memoize an anonymous function:
+
+<P>
+<PRE>        memoize sub { gethostbyname(@_) || 'Sorry.' };
+</PRE>
+<P>
+in which case there is no name at all. But how can <CODE>Memoize</CODE>
+identify a function if it doesn't have a name? We'll play a sly trick. If
+we have a reference to a function, we can convert it to a string, and we
+will get something that looks like <CODE>CODE(0x811f744)</CODE>. Two references to the same function always yield the same string, and
+references to different functions always yield different strings. This
+means that the `stringified' references serve to identify the functions.
+We'll use these stringified references as the keys into
+<CODE>%memotable</CODE>.
+
+<P>
+We're now ready to create a new function that will replace <CODE>fib</CODE> when
+<CODE>fib</CODE> becomes memoized. This happens on line 22. The new function won't have a
+name, but it's very simple:
+
+<P>
+<PRE>        sub { _check_cache(&quot;CODE(0x811f744)&quot;, @_) }
+</PRE>
+<P>
+We'll call this a <EM>stub</EM>, because it's so small.
+<CODE>&quot;CODE(0x811f744)&quot;</CODE> here is the stringified version of <CODE>$function</CODE>, which as you'll recall is a reference to <CODE>fib</CODE>. Every time you memoize a new function, we'll create a new stub, each one
+slightly different from the others. Each will call <CODE>_check_cache</CODE> with a slightly different <CODE>$_[0]</CODE> that uniquely identifies the memoized function it was called on behalf of.
+
+<P>
+All the stub really does is pass along the memoized function's arguments to <CODE>_check_cache</CODE>, with an extra argument slapped on the front to say which function was
+originally called.  <CODE>_check_cache</CODE>
+can use the first argument to know which cache to consult and which real
+function to call to populate the cache. When it sees
+<CODE>&quot;CODE(0x811f744)&quot;</CODE> it'll remember that that was the string that corresponded to <CODE>fib</CODE>, and it'll consult <CODE>fib</CODE>'s private cache and call the real <CODE>fib</CODE> function if necessary.  
+
+<P>
+Lines 23--26 fill in the <CODE>%memotable</CODE>. In addition to the cache, which is initially empty, the <CODE>%memotable</CODE> records the location of the original, unmemoized function so that <CODE>_check_cache</CODE> can call it if it needs to.
+
+<P>
+Line 30 is the real magic. If we know the name of the function we are
+memoizing, we reach into the Perl symbol table and replace that function
+with the stub that will call <CODE>_check_cache</CODE>. Afterwards, when you try to call <CODE>fib</CODE>, you'll really be calling the stub, which will hand off control to <CODE>_check_cache</CODE>. We saved a reference to the original function in the <CODE>%memotable</CODE> so that <CODE>_check_cache</CODE> will be able to find it again when it needs to. Tampering with the symbol
+table is another thing that <CODE>use strict</CODE> wants to protect us from, so we turn it off again.
+
+<P>
+Finally we return the stub, which is your entry to the memoized version of
+the original function. You will need this if we weren't able to install it
+into the symbol table, which would happen if you didn't tell <CODE>memoize</CODE> the name of the memoized function. For example, just saying this:
+
+<P>
+<PRE>        memoize sub { gethostbyname(@_) || 'Sorry.' };
+</PRE>
+<P>
+is useless, because the memoized version of the function is lost. You need
+to be able to say this:
+
+<P>
+<PRE>        $fast_gethostbyname = memoize sub { gethostbyname(@_) || 'Sorry.' };
+        $name = $fast_gethostbyname-&gt;('tpj.com');
+</PRE>
+<P>
+This would be impossible if <CODE>memoize</CODE> didn't return the stub.
+
+<P>
+Compared with all the tricky things we've been doing so far, the code to
+actually <EM>call</EM> a memoized function is very simple. There's only one strange trick, and
+because it isn't really very strange, I'm going to explain it up front so
+we can run it right over it when we meet it on the road.
+
+<P>
+Cached function return values are stored in the cache hash, and we need
+some way to turn the function's arguments into a hash key so that we can
+look up the cached return value associated with a particular argument list.
+But the arguments are a list, and hash keys can only be strings, not lists.
+The method we use to turn a list into a string has some problems, but in
+practice the problems don't come up very often. You can see how we turn an
+argument list into a hash key on line 44:
+
+<P>
+<PRE>    44    my $argstr = join $; , @_;
+</PRE>
+<P>
+<CODE>$;</CODE> is a special Perl variable whose value is normally a string containing the
+single unlikely and unprintable character `control-backslash'.
+
+<P>
+It's important that different argument lists turn into different hash keys.
+Suppose that this weren't always the case, and that argument lists <EM>A</EM> and <EM>B</EM> both turned into key <EM>K</EM>. Then consider what happens if you call <EM>F(A)</EM>: The result is computed and stored in the cache, associated with key <EM>K</EM>. Now try to compute <EM>F(B)</EM>. Since
+<EM>B</EM> also turns into hash key <EM>K</EM>, the <CODE>_check_cache</CODE> function won't bother to actually call the real <EM>F(B)</EM>; it'll just return <EM>F(A)</EM>
+from the cache again. This is probably wrong.
+
+<P>
+Joining the arguments into a single string with `join' is a little risky,
+because it <EM>doesn't</EM> always turn different lists into different strings. For example, the two
+argument lists <CODE>(&quot;x$;&quot;,
+&quot;y&quot;)</CODE> and <CODE>(&quot;x&quot;, &quot;$;y&quot;)</CODE> both turn into the string <CODE>&quot;x$;$;y&quot;</CODE> under this transformation. But it works properly <EM>almost</EM> all the time. It always works when there's only a single argument, and it
+always works when none of the arguments contain control-backslash, so for
+real applications it's almost good enough, and for a demonstration it is
+good enough.
+
+<P>
+With that out of the way, let's suppose that <CODE>fib</CODE> has been memoized, and the user asks for <CODE>fib(7)</CODE>. The name <CODE>fib</CODE> is no longer attached to the real <CODE>fib</CODE> function, but instead it's attached to the stub. The stub, as we saw, looks
+something like this:
+
+<P>
+<PRE>        sub { _check_cache(&quot;CODE(0x811f744)&quot;, @_) }
+</PRE>
+<P>
+The stub calls <CODE>_check_cache</CODE> with two arguments: First, the stringified version of the reference to the
+real <CODE>fib</CODE>; second, the number 7. The first thing <CODE>_check_cache</CODE> does is grab the stringified reference (line 37), which is its key into <CODE>%memotab</CODE>. If there <EM>isn't</EM> any entry in the <CODE>%memotab</CODE> for that key, it aborts the program (lines 38--41), but that should never
+happen, because we installed the entry back on line 23.
+
+<P>
+Supposing that the entry exists, <CODE>_check_cache</CODE> retrieves the cache hash on line 43. On line 44, it turns the argument list
+into a hash key.  <CODE>_check_cache</CODE> then checks the cache. If there is a cached return value available, <CODE>_check_cache</CODE> returns it immediately. (Line 45.) Otherwise, it retrieves a reference to
+the original, unmemoized version of the function (line 47), and invokes it,
+stores the result in the cache, and returns the result. (Line 48.)
+
+<P>
+That was a lot of magic, but the end result is that it's totally
+transparent for you. The web site has a sample demonstration program that
+looks like this:
+
+<P>
+<PRE>        print &quot;fib(20) = &quot;, fib(20), &quot;\n&quot;;
+        memoize 'fib';    # Make `fib' go faster
+        print &quot;fib(20) = &quot;, fib(20), &quot;\n&quot;;
+</PRE>
+<P>
+<CODE>memoize 'fib'</CODE> is supposed to magically make <CODE>fib</CODE> go faster, and that's exactly what it does. The goal was to advance
+civilization by extending the number of important operations which you
+could perform without thinking, and we certainly did meet the goal.
+
+<P>
+<HR>
+<H1><A NAME="Some_Other_Applications_of_Memoi">Some Other Applications of Memoization</A></H1>
+<P>
+<HR>
+<H2><A NAME="Persistent_Cache">Persistent Cache</A></H2>
+<P>
+Storing the cache in memory is handy and can speed up a function. But when
+your process exits, the cache is lost. Since the function is pure, its
+values will be the same from run to run of the program, and it's a shame to
+have later invocations recompute the values that were already computed by
+earlier invocations.
+
+<P>
+If the cache is in a file instead of in memory, your program will never
+have to compute the function twice for the same arguments. After the first
+time, it'll just retrieve the value that it saved on the disk.
+
+<P>
+You can even populate the cache in advance, with a throwaway program that
+runs over the weekend and does nothing but call the memoized function with
+different arguments. Then when you come back on Monday you'll find that <EM>any</EM> program that calls your slow function is faster, because the formerly slow
+function now returns almost instantaneously.
+
+<P>
+You could write the code to do this yourself and stick it into all your
+programs. But the real <CODE>Memoize</CODE>
+module on CPAN already has an option to record the cache results on disk,
+and using it is simple:
+
+<P>
+<PRE>        use DB_File;
+        Memoize 'fib', 
+          SCALAR_CACHE =&gt; [ TIE, DB_File, $filename, O_RDWR | O_CREAT, 0666];
+</PRE>
+<P>
+or
+
+<P>
+<PRE>        use Memoize::Storable;
+        # Memoize::Storable is a front-end on `Storable' that makes it
+        # suitable for use with `Memoize'.
+        Memoize 'fib', SCALAR_CACHE =&gt; [TIE, Memoize::Storable, $filename];
+</PRE>
+<P>
+This is a very powerful and useful feature, and the programming required to
+support it couldn't be simpler: The <CODE>memoize</CODE> function just <CODE>tie</CODE>s the cache hash before it installs it in the
+<CODE>%memotable</CODE>.
+
+<P>
+<HR>
+<H2><A NAME="Profiling_Execution_Speed">Profiling Execution Speed</A></H2>
+<P>
+If your program is too slow, you will need to speed it up by making the
+slow functions faster. But it is notoriously difficult to decide which are
+the slow functions! If you guess wrong, you might waste effort trying to
+speed up a function that only contributes to 1% of the program's entire run
+time; at best this will make the program 1% faster.  
+
+<P>
+The first thing you should always do in this situation is to
+<EM>profile</EM> the program to find out which parts are really taking the most time, and
+then concentrate your efforts on just those parts. Profiling can be a pain,
+and the Perl profiler, <CODE>Devel::DProf</CODE>, isn't as well-developed as one might like.
+
+<P>
+You can use memoizing as an alternative, and it's sometimes preferable.
+Suppose you have a function <CODE>f</CODE> which you think is a possible candidate to be rewritten to be faster. Run
+your program three times: Once with no memoizing, once with <CODE>f</CODE> memoized (this will populate the cache), and once with <CODE>f</CODE> memoized and the cache already populated. This last run will simulate the
+speed of the program with <CODE>f</CODE>'s contributions removed. If the run time with the cache populated is 98%
+of the run time with no memoizing, then no possible rewriting of <CODE>f</CODE> can speed up the program more than about 2%---so you'll know to look
+elsewhere.  
+
+<P>
+<HR>
+<H2><A NAME="_Orcish_Maneuver_">`Orcish Maneuver'</A></H2>
+<P>
+Memoizing is very useful for sort comparison functions, which tend to get
+called over and over again with the same arguments, and which are almost
+always pure.
+
+<P>
+Suppose you have a bunch of strings in the form <CODE>&quot;Jan 14, 1994&quot;</CODE> and you want to sort them into chronological order. The obvious way is:
+
+<P>
+<PRE>  %m2n = 
+    ( jan =&gt; 0, feb =&gt;  1,  mar =&gt;  2,
+      apr =&gt; 3, may =&gt;  4,  jun =&gt;  5, 
+      jul =&gt; 6, aug =&gt;  7,  sep =&gt;  8, 
+      oct =&gt; 9, nov =&gt; 10,  dec =&gt; 11, );
+</PRE>
+<P>
+<PRE>  sub compare_dates {
+    my ($am, $ad, $ay) = 
+      ($a =~ /(\w{3}) (\d+), (\d+)/);
+</PRE>
+<P>
+<PRE>    my ($bm, $bd, $by) = 
+      ($b =~ /(\w{3}) (\d+), (\d+)/);
+</PRE>
+<P>
+<PRE>               $ay  &lt;=&gt;         $by  
+    || $m2n{lc $am} &lt;=&gt; $m2n{lc $bm} 
+    ||         $ad  &lt;=&gt;         $bd;
+  }
+</PRE>
+<P>
+<PRE>  sort compare_dates @datestrings;
+</PRE>
+<P>
+Now, suppose <CODE>@datestrings</CODE> contains 1,000 of these strings. You're going to make about 8,700 calls to <CODE>compare_dates</CODE>, so about 17,500 pattern matches, and that means that each date string was
+parsed and split an average of 17.5 times, the last 16.5 of which were a
+complete waste of time.
+
+<P>
+One way out of this is to use the Schwartzian Transform, which builds a
+list of data structures that contain both the numeric and printable
+versions of the dats, sorts this list by the numeric versions, and then
+throws away the numeric version leaving only the printables ones in the
+result. Another way is to define an auxiliary function that turns a date
+into a number, and then memoize it:
+
+<P>
+<PRE>  use Memoize;
+</PRE>
+<P>
+<PRE>  sub compare_dates {
+    to_number($a) &lt;=&gt; to_number($b);
+  }
+</PRE>
+<P>
+<PRE>  # Convert &quot;Nov 5, 1605&quot; to &quot;16051105&quot;
+  sub to_number {
+    my ($m, $d, $y) = 
+      ($_[0] =~ /(\w{3}) (\d+), (\d+)/);
+</PRE>
+<P>
+<PRE>    sprintf(&quot;%04d%02d%02d&quot;, 
+            $y, $m2n{$m}, $d);
+  }
+</PRE>
+<P>
+<PRE>  memoize 'to_number';
+</PRE>
+<P>
+Now you only do 1,000 pattern matches, which is a big improvement. The
+other 16,500 times, the result is already in the cache.
+
+<P>
+In sort comparators, you often need more speed, and the slow part of this
+comparator is the two calls to <CODE>to_number</CODE>. We've replaced 17,500 pattern matches with 17,500 calls to <CODE>to_number</CODE>, which is an improvement, but not as much of an improvement as we'd like.
+So instead of using the <CODE>Memoize</CODE> module, we can just inline the memoization, like this:
+
+<P>
+<PRE>  { my %cache;
+</PRE>
+<P>
+<PRE>    sub compare_dates {
+      ($cache{$a} ||= to_number($a)) &lt;=&gt;
+      ($cache{$b} ||= to_number($b))
+    }
+  }
+</PRE>
+<P>
+<CODE>||=</CODE> is a perl operator which suits this application perfectly. It gets the
+value of the expression on the left and returns it, unless it's a false
+value, in which case it evaluates the thing on the right, assigns it to the
+thing on the left, and returns it. If the numeric version is already in the
+cache, we get it immediately; otherwise we compute it and put it in the
+cache. Result: Exactly 1,000 calls to
+<CODE>to_number</CODE>.
+
+<P>
+Joseph Hall, author of <EM>Effective Perl Programming</EM>, dubbed this the `Orcish Maneuver', because the notable features of this
+approach are the
+<CODE>||</CODE> and the cache.
+
+<P>
+<HR>
+<H2><A NAME="Dynamic_Programming">Dynamic Programming</A></H2>
+<P>
+You might have heard of `dynamic programming'; it's a technique in which
+you break down a problem into smaller subproblems, solve them separately,
+and then build up the solutions into a solution to the big problem. Merge
+sort is a good example. For a more interesting example, we'll look at the <EM>partition problem</EM>.  
+
+<P>
+In the partition problem, you have a list of numbers. You want to divide
+the list into two groups so that the sum of the numbers in each group is
+the same.
+
+<P>
+If you learned about dynamic programming in school (assuming you went to
+school) you probably spent a lot of time working out the details of how to
+represent and locate the solutions to the subproblems. But you can think of
+memoization as an automatic dynamic programming technique.
+
+<P>
+We're going to solve the partition problem by writing a recursive function.
+Suppose the list has five elements, whose sum is 30. Then what we really
+need to do is find some subset of those elements whose sum is 15. If we can
+do that, or prove there is no such subset, we've solved the partition
+problem.
+
+<P>
+Now, suppose the first element is an 8. This 8 might be part of the subset
+we want to find, or it might not. If it is part of the subset, then the
+remaining elements of the subset must add up to 7; if it isn't, then they
+add up to 15. So throw away the 8, and recursively inquire if some subset
+of the remaining elements can be made to add up to 7 or 15.
+
+<P>
+Repeat this until you've thrown away all but one of the elements, at which
+point the solution is trivial; it's either equal to the target sum, or it
+isn't.
+
+<P>
+Our recursive function <CODE>T</CODE> will take a list of numbers and a target sum, and it'll try to see whether
+there's a subset of the numbers that adds up to the target sum. If it can
+find such a subset, it will return a list of them, and otherwise, it will
+return undef. Here's the code:
+
+<P>
+<PRE>  # Take a list of numbers and a target sum.  return a sublist that
+  # add up to the target, if possible, or undef otherwise.
+</PRE>
+<P>
+<PRE>  sub T {
+    my ($list, $target) = @_;
+    my $answer;
+</PRE>
+<P>
+<PRE>    if (@$list == 0) { 
+      return ($target == 0) ? [] : undef 
+    }
+</PRE>
+<P>
+<PRE>    my ($first, @rest) = @$list;
+</PRE>
+<P>
+<PRE>    # Does the rest of the list contain a solution?      
+    $solution = T(\@rest, $target);
+    return $solution if defined $solution;
+</PRE>
+<P>
+<PRE>    # Try the other way
+    $solution = T(\@rest, $target - $first);
+    return [$first, @$solution] if defined $solution;
+</PRE>
+<P>
+<PRE>    # Nope.
+    return undef;
+  }
+    
+</PRE>
+<P>
+Now let's ask it if it can find a way to split the elements of
+<CODE>(8,2,7,3,10)</CODE> into two lists each of which adds up to 15. The call looks like this:
+
+<P>
+<PRE>  T([8,2,7,3,10], 15)
+</PRE>
+<P>
+And sure enough, the function returns <CODE>(2,3,10)</CODE>.
+
+<P>
+Actually this function is too slow to use for large problems; it takes
+exponential time just like the Fibonacci number function did. And again, we
+can solve the problem by memoizing. A sample run of the program on a list
+of 21 numbers took 90 seconds and called  <CODE>T()</CODE>
+4,194,303 times; the memoized version took 0.42 seconds and called
+<CODE>T()</CODE> only 1,521 times.
+
+<P>
+There's a slight problem here that we didn't discuss before: The caching
+strategy that I showed earlier in the article doesn't work. It stores the
+cached value in a hash, keyed by 
+
+<P>
+<PRE>        join $; , @_;
+</PRE>
+<P>
+In this case, the two arguments to <CODE>T()</CODE> are a reference to a list of numbers, and a target sum. When we use the
+reference in the <CODE>join</CODE>
+statement, we get something like <CODE>&quot;ARRAY(0xae050)&quot;</CODE>. These strings are always different for different arrays, even if the
+contents of the arrays are the same. This means that <CODE>_check_cache</CODE> can't tell that the arguments are the same even when they are.
+
+<P>
+The CPAN <CODE>Memoize</CODE> module has a feature that solves this problem: It lets you override the
+function that converts argument lists to hash keys, so you can tell the
+memoizer explicitly what parts of the arguments aren't important. This lets
+us say that in a call like
+<CODE>T([1,2,3], 7)</CODE>, the 1,2, and 3 are important, but the identity of the array that happens
+to contain them is not important. Here's what the call to <CODE>memoize</CODE> looks like:
+
+<P>
+<PRE>        memoize 'T', NORMALIZER =&gt; 
+                     sub { my ($arr, $t) = @_; 
+                           join ' ', @$arr, $t;
+                         };
+</PRE>
+<P>
+The <CODE>NORMALIZER</CODE> is the function that converts argument lists to hash keys. In this case, it
+extracts the numbers from the array and joins those together into a string.
+The results of the call <CODE>T([1,2,3],
+7)</CODE> will be stored in the hash under the key <CODE>&quot;1 2 3 7&quot;</CODE>.
+
+<P>
+<HR>
+<H1><A NAME="When_Memoizing_Doesn_t_Work">When Memoizing Doesn't Work</A></H1>
+<P>
+The function that you memoize must be pure, or disaster will ensue. That
+means that its return value must depend only on its arguments, and it must
+not have any side effects.
+
+<P>
+To see what happens when the function depends on something other than its
+arguments, consider this:
+
+<P>
+<PRE>        # Return the current time of day as &quot;5:24:32&quot;
+        sub time { my ($s, $m, $h) = localtime;
+                   sprintf &quot;%d:$02d:%02d&quot;, $s, $m, $h;
+                 }
+</PRE>
+<P>
+If you memoize this, it'll return the correct time the first time you call
+it, but after that the time will be in the cache and whenever you call it
+you'll get the cached value.
+
+<P>
+To see what happens when the function has side effects, consider this:
+
+<P>
+<PRE>        sub squawk {
+          my $a = shift;
+          print STDERR &quot;There were only $a fields in the record!\n&quot;;
+        }
+</PRE>
+<P>
+Suppose that the main program is reading a file whose records have 15
+fields each. It uses this function to deliver an error message each time it
+encounters a record with the wrong number of fields. The first time you see
+a record with only 14 fields, it works properly. The second time, the
+memoizer sees that the argument is the same and returns the cached return
+value (which is 1, not that you cared) without actually calling the
+function---so no message comes out.
+
+<P>
+There's one other kind of function that you must avoid memoizing, and the
+problem is a little more subtle. If the function returns a reference to a
+structure that will be modified by its callers, you must not memoize it. To
+see why not, consider this function:
+
+<P>
+<PRE>        sub iota {
+          my $n = shift;
+          return [ 1 .. $n ];
+        }
+</PRE>
+<P>
+<CODE>iota()</CODE> returns a reference to a list of the numbers from 1 to <EM>n</EM>, where <EM>n</EM> is its argument. If <CODE>iota()</CODE> is memoized, the cached value will be a reference to the list. 
+
+<P>
+Suppose that <CODE>iota()</CODE> is memoized, and the caller does something like this:
+
+<P>
+<PRE>
+        $i10 = iota(10);
+        $j10 = iota(10);
+</PRE>
+        
+<TT>$i10</TT> and <TT>$j10</TT> look like they're both arrays containing the
+numbers from 1 to 10.  But they're not really; they're both references
+to the same array!  If <TT>iota()</TT> hadn't been memoized, they would be
+references to different arrays.  Now the punch line:
+<P>
+<PRE>        pop @$i10;
+</PRE>
+<P>
+This modifies <TT>$j10</TT> also, because it's the same array. If <TT>iota()</TT>
+weren't memoized, <TT>$j10</TT> would have been unaffected.
+
+<P>
+Sometimes there are exceptions to these perils. For example, the
+<TT>gethostbyname()</TT> function often takes a long time, because Perl has to open a network
+socket, send data to the name server, and wait for the reply to come back.
+Memoizing <TT>gethostbyname()</TT> is technically incorrect, because the address data <EM>might</EM> change between calls. But in practice, address data doesn't change very
+quickly, and memoizing <TT>gethostbyname()</TT> doesn't lead to any real problems except in long-running programs.
+
+<P>
+<HR>
+<H1><A NAME="Historical_Note">Historical Note</A></H1>
+<P>
+The word `memoize' was coined by Donald Michie in 1968.
+
+<P>
+<HR>
+<H1><A NAME="Bibliography">Bibliography</A></H1>
+<P>
+``<a href="http://www.apl.jhu.edu/~hall/text/Papers/Monterrey-Memoization.ps">Improving the Performance of AI Software: Payoffs and Pitfalls in Using
+Automatic Memoization</a>''. Hall, Marty and James Mayfield.
+<EM>Proceedings of the Sixth International Symposium on Artificial
+Intelligence</EM>, Monterrey, Mexico, September 1993.
+
+<P>
+``Memo Functions and Machine Learning''. Michie, Donald.  <EM>Nature</EM>, 218, #1, April 1968, pp. 19-22.
+
+<P>
+<EM>Structure and Interpretation of Computer Programs</EM>. Abelson, Hal, and Gerald Jay Sussman. MIT Press, Cambridge, 1985. pp.
+218--219. 
+
+<P>
+The <TT>Memoize</TT> module is available from CPAN, and also from <A
+HREF="http://www.plover.com/~mjd/perl/Memoize/.">http://www.plover.com/~mjd/perl/Memoize/.</A>
+The source code for the
+<TT>MiniMemoize</TT> module, and the other programs described in this article, is available from
+<A HREF="http://www.tpj.com/">http://www.tpj.com/</A> and from <A
+HREF="http://www.plover.com/~mjd/perl/MiniMemoize/">http://www.plover.com/~mjd/perl/MiniMemoize/.</A>
+
+<HR>
+
+<img src="../pics/small-sigils.gif" align=right>
+<p>Return to: 
+<a href="http://www.plover.com/~mjd/">Universe of Discourse main page</a> |
+<a href="http://www.plover.com/~mjd/whatsnew.html">What's new page</a> |
+<a href="../">Perl Paraphernalia</a>|
+<a href="../Memoize/"><tt>Memoize.pm</tt> Page</a>|
+<a href="./">Memoization Page</a>
+</p>
+
+<p><a href="mailto:mjd-tpj-memoize+@plover.com">mjd-tpj-memoize+@plover.com</a></p>
+
+</BODY>
+
+</HTML>

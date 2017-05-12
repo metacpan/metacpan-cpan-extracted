@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Mail-Barracuda-API.t
+lib/Mail/Barracuda/API.pm
+META.yml                                 Module meta-data (added by MakeMaker)

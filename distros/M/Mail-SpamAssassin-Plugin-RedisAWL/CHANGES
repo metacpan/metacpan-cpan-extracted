@@ -1,0 +1,71 @@
+==================================================
+Changes from 2015-02-05 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.001 at 2016-02-05 14:15:33 +0000
+------------------------------------------
+
+  Change: cde220fe4403e6a2dfd88f211e415c2625692132
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-02-05 15:15:00 +0000
+
+    fix remove redis_prefix line 
+
+  Change: 4f7138e4823379f7728bcca005611d2a6640cf93
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2016-02-05 15:11:45 +0000
+
+    Additional redis connection parameters
+
+    The followin configuration parameters have been added:
+
+    * auto_whitelist_redis_password
+
+    * auto_whitelist_redis_database
+
+    * auto_whitelist_redis_debug 
+
+  Change: c78fe2e7d186eee6b30a55b8aa13d0bf840cd847
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 16:59:18 +0000
+
+    build with system perl and apt-get packages 
+
+  Change: 36e05bb6381e9038d3745c904a403e8beb0c42b7
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 14:50:29 +0000
+
+    apt-get update and sudo in travis 
+
+  Change: 64c910d369deed26def50a0774c60e83da881d3f
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 10:11:06 +0000
+
+    install spamassassin before build in travis 
+
+  Change: 840224d5321a2dc260252f8f8c89ce4cdda834da
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-08-31 09:18:58 +0000
+
+    updated build env 
+
+------------------------------------------
+version 1.000 at 2015-06-08 18:37:48 +0000
+------------------------------------------
+
+  Change: 8cf0bb84d318ab015e4ecc3f0f2bc93cda365771
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-06-08 20:37:48 +0000
+
+    add abstract 
+
+  Change: f31d22526cd5c5a7687df5bf05bf073fb29a131e
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-06-08 20:32:22 +0000
+
+    initial checkin 
+
+================
+End of releases.
+================

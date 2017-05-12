@@ -1,0 +1,20 @@
+Changes
+lib/Marketplace/Ebay.pm
+lib/Marketplace/Ebay/Order.pm
+lib/Marketplace/Ebay/Order/Address.pm
+lib/Marketplace/Ebay/Order/Item.pm
+lib/Marketplace/Ebay/Response.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-get-xsd.t
+t/basic.t
+t/manifest.t
+t/order.t
+t/pod-coverage.t
+t/pod.t
+t/request.t
+t/response.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

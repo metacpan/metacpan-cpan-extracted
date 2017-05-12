@@ -1,0 +1,21 @@
+Revision history for Perl extension MOP4Import::Declare
+
+0.004    2015-12-16
+    * [GH #19] - Add rlib to configure_requires.
+    * [GH #18] - Fix Base::CLI->run exit code handling.
+
+0.002    2015-11-25
+    * [GH #17] Split Types and Types::Extend
+        - Types are now based on Pairs protocol.
+    * Fix dist_name/module_name
+    * Split dist into namespace and real implementation.
+
+0.000_002    2015-10-21
+    * Mainly for CPAN, travis-ci and coveralls.
+    * Changes
+        - [GH #15] CLI should not eat options for subcommand
+	- s/take_hash_opts_maybe/take_hash_maybe/
+        - [GH #13] Fields declaration order was shuffled for subclass bug
+
+0.000_001    2015-09-23
+        - Alpha release.

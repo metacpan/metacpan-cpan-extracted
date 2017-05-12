@@ -1,0 +1,11 @@
+Version history for MojoX::GlobalEvents
+=======================================
+
+0.02 2014-06-12
+
+  * fixed prereq list in dist.ini
+
+0.01 2014-06-05
+
+  * initial release
+

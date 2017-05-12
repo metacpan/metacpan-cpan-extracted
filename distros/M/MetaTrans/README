@@ -1,0 +1,46 @@
+                        MetaTrans version 1.04
+                        ======================
+
+MetaTrans is a plug-in based Perl module for dealing with online translators
+like http://ultralingua.net/. It provides an interface for easy creation of
+multilingual metatranslators.
+
+The package also contains a Perl/Tk frontend to MetaTrans. To try it
+out type:
+
+    metatrans
+
+
+DOCUMENTATION
+=============
+
+All source codes are written in pure Perl and are well pod-documented.
+Man pages are generated using pod2man and installed upon package installation.
+Please read
+
+    man 3 MetaTrans
+
+first if you are a developer. Otherwise, you can only read
+
+    man 1 metatrans
+
+
+INSTALLATION
+============
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+=====================
+
+Copyright (C) 2004 by Jan Pomikálek
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.

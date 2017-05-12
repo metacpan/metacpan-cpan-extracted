@@ -1,0 +1,43 @@
+2005-04-27  Ulrich Pfeifer  <upf@de.uu.net>
+
+	* Added support for GetByteString
+	* Added rudimentary support for display packets 
+
+2005-04-17  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* Removed bang line from install.pl and call it via $^X
+
+	The last test did fail on every system were /usr/local/bin/perl
+	was not a Perl binary compatible with the $^X perl.
+
+	* New code to locate libML.a and mathlink.h
+
+	The code to spot the files is even more ugly but works with at
+	least one 5.0 Installation.
+	
+2000-12-19  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* ematica.xs, emathica.pm: do not call LinkClose during global
+	destruction.
+
+2000-12-10  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* ematica.pm: Solaris nroff seems to hav eproblems with the output
+	generated for '=item C<something>'.
+
+	* Makefile.PL: Added MAN3PODS to WriteMakefile call.  Newer
+	versions of Perl would not generate manual pages without that.
+
+	* Added ppport.h for compatibility with newer Perls.  Verified
+	that the module works with Mathematica 4.0 for Solaris.
+
+Sun Dec 21 12:40:58 1997  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* ematica.xs: Added GetFunction
+
+Revision history for Perl extension Math::ematica.
+
+1.00  Sat Dec 20 14:35:09 1997
+        - original version; created by h2xs 1.18
+	
+

@@ -1,0 +1,37 @@
+NAME
+    Math::Base36 - Encoding and decoding of base36 strings
+
+SYNOPSIS
+      use Math::Base36 ':all';
+
+      $b36 = encode_base36( $number, $padlength );
+      $number = decode_base36( $b36 );
+
+DESCRIPTION
+    This module converts to and from Base36 numbers (0..9 - A..Z)
+
+    It was created because of an article/challenge in "The Perl Review"
+
+METHODS
+  encode_base36( $number, [$padlength] )
+    Accepts a unsigned int and returns a Base36 string representation of the
+    number. optionally zero-padded to $padlength.
+
+  decode_base36( $b36 )
+    Accepts a base36 string and returns a Base10 string representation of
+    the number.
+
+AUTHOR
+    Rune Henssel <perl@henssel.dk>
+
+MAINTAINER
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2002 by Rune Henssel
+
+    Copyright 2007-2015 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

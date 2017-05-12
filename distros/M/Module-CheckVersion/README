@@ -1,0 +1,16 @@
+SYNOPSIS
+
+    Check latest version of modules:
+
+     use Module::CheckVersion qw(check_module_version);
+    
+     my $res = check_module_version(module => 'Clone');
+     # sample result: [200, "OK", {latest_version=>'0.38', installed_version=>'0.37', is_latest_version=>0}]
+    
+     say "Module Clone is the latest version ($res->[2]{latest_version})"
+         if $res->[2]{is_latest_version};
+
+SEE ALSO
+
+    The distribution comes with a CLI: check-module-version.
+

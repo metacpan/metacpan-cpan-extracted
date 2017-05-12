@@ -1,0 +1,25 @@
+Changes
+MANIFEST
+MP3Play.pm
+MP3Play.xs
+lib/MPEG/MP3Play/XA_Version.pm
+README
+README.FreeBSD
+Makefile.PL
+typemap
+t/1.t
+samples/play.pl
+samples/handler.pl
+samples/gtk.pl
+samples/gtkhandler.pl
+samples/gtkinherit.pl
+samples/synopsis.pl
+samples/MyMP3Play.pm
+tools/gen_conv_msg
+tools/gen_constant
+tools/genreadme
+version/0.0/constants.h
+version/0.0/conv_msg.c
+version/2.2/constants.h
+version/2.2/conv_msg.c
+META.yml                                 Module meta-data (added by MakeMaker)

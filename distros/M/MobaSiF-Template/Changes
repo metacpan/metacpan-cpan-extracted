@@ -1,0 +1,8 @@
+Revision history for Perl extension MobaSiF::Template.
+
+0.02  Thu Sep 10 01:58:13 2009
+    - Change pod encoding to eucjp
+
+0.01  Sun Sep 06 23:20:10 2009
+    - Remame MTemplate to MobaSiF::Template
+

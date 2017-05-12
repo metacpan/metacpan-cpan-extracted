@@ -1,0 +1,26 @@
+ARTISTIC
+Changes
+GPL
+lib/Encode/MIME/EncWords.pm
+lib/MIME/EncWords.pm
+lib/MIME/EncWords/Defaults.pm.sample
+lib/POD2/JA/Encode/MIME/EncWords.pod
+lib/POD2/JA/MIME/EncWords.pod
+Makefile.PL
+MANIFEST			This list of files
+META.yml			Module meta-data (added by author)
+README
+t/01decode.t
+t/02encode.t
+t/03Encode-MIME-EncWords.t
+t/04Encode-MIME-EncWords-ISO_2022_JP.t
+t/05encode_utf.t
+t/pod.t
+testin/decode-ascii.txt
+testin/decode-multibyte.txt
+testin/decode-singlebyte.txt
+testin/encode-ascii.txt
+testin/encode-multibyte.txt
+testin/encode-singlebyte.txt
+testin/encode-utf-8.txt
+META.json                                Module JSON meta-data (added by MakeMaker)

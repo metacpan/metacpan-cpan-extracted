@@ -1,0 +1,156 @@
+<html>
+<head>
+<title>MHonArc Resources: PERLINC</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="outdir.html">OUTDIR</a>]</td><td><nobr>[<a href="../resources.html#perlinc">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="posixstrftime.html">POSIXSTRFTIME</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>PERLINC</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+ 
+<dt><strong>Envariable</strong></dt>
+<dd><p>
+<code>M2H_PERLINC=</code><var>path1</var><code>:</code><var
+>path2</var><code>:</code><var>...</var><code>:</code><var
+>pathN</var>
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p>
+<code>&lt;PERLINC&gt;<br></code>
+<var>path1</var><code>:</code><var>path2</var><code>:</code><var
+>...</var><br>
+<var>pathi</var><code>:</code><var>...</var><code>:</code><var
+>pathN</var><br>
+<code>&lt;/PERLINC&gt;<br></code>
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p>
+<code>-perlinc </code><var>path1</var><code>:</code><var
+>path2</var><code>:</code><var>...</var><code>:</code><var
+>pathN</var>
+</p>
+</dd>
+ 
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>PERLINC defines a list of paths to search for MIME filters.
+When setting
+the PERLINC resource, the filenames are separated by colons
+(or semicolons under MSDOS/Windows).  Line-breaks can be used
+to separate filenames if setting PERLINC via the
+<code>PERLINC</code> element.
+</p>
+
+<p>PERLINC augments the <code><strong><!--
+-->&#64;<!--
+-->INC</strong></code>
+array in Perl.  The paths listed in PERLINC will be searched
+before the paths in <code><strong><!--
+-->&#64;<!--
+-->INC</strong></code>.
+</p>
+
+<table class="note" width="100%">
+<tr valign="baseline">
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>During the installation of <em>MHonArc</em>, the 
+<em>MHonArc</em> library location gets prepended to
+<code><strong><!--
+-->&#64;<!--
+-->INC</strong></code>.
+</p>
+</td>
+</tr>
+</table>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<p>Empty.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>When hooking in your own MIME filters, you may want to
+put all the source libraries in a single location for maintenance
+purposes.  Therefore, you will need to define PERLINC similiar
+to the following:
+</p>
+
+<pre class="code">
+<b>&lt;PerlINC&gt;</b>
+/usr/local/lib/MHonArc/filters
+<b>&lt;/PerlINC&gt;</b>
+</pre>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>1.0
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+<a href="mimefilters.html">MIMEFILTERS</a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="outdir.html">OUTDIR</a>]</td><td><nobr>[<a href="../resources.html#perlinc">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="posixstrftime.html">POSIXSTRFTIME</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2005/05/13 18:50:39 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"><strong>MHonArc</strong></a><br>
+Copyright &#169; 1997-1998, <a href="http://www.earlhood.com/">Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org">mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

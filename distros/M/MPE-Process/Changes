@@ -1,0 +1,7 @@
+Revision history for Perl extension MPE::Process.
+
+0.01  Tue Jun 25 10:16:09 2002
+	- original version; created by h2xs 1.20 with options
+		-cfn MPE::Process
+
+      Not all options have been tested.

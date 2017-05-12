@@ -1,0 +1,79 @@
+Revision history for Mojolicious-Plugin-NYTProf
+
+0.20     2016-05-17
+        - Transfer repo from G3S to Humanstate
+
+0.19     2016-01-07
+        - [Fix] Remove URL query params from output profile files
+
+0.18     2015-11-28
+        - [Fix] Skip some tests if nytprofhtml can't be found
+        - [Doc] For the above and what to do in that case
+
+0.17     2015-10-21
+        - [Doc] Move github repo to Humanstate org
+
+0.16     2015-08-04
+        - [Fix] MSWin32 filename invalid chars ':','?' and length limitation of
+            260 chars (GH #8, thanks to xlat for the patch)
+
+0.15     2015-08-03
+        - [Fix] Test on Win32 platforms due to use of : and = chars in NYTProf
+            opts and env variables (GH #6, thanks to xlat for the patch)
+
+0.14     2015-02-25
+        - [Fix] ->render_not_found becomes ->reply->not_found in v6 of Mojo
+            have to bump min version of Mojolicious required to 6.00 for this
+        - [Fix] bump min version of Devel::NYTProf to 5.07 so will install
+            with blead perl
+
+0.13     2015-01-22
+        - [Fix] Lack of flame graph in profile for certain combinations of
+            mojolicious code layout by changing default post hook to
+            around_dispatch (thanks to gmorten1 for the bug report)
+
+0.12     2014-10-15
+        - [Fix] Default path for nytprofhtml when not supplied tweaked to use
+            more sensible ordering
+
+0.11     2014-10-14
+        - [Fix] Broken POD for coverage/build badges
+
+0.10     2014-10-14
+        - [Fix] Add couple of files to MANIFEST that may have been causing test
+            failues on some platforms / version of perl
+
+0.09     2014-09-06
+        - [Fix] Kwalitee issues in distribution
+
+0.08     2014-09-04
+        - [Fix] compatible with latest version of Mojolicious (5.37)
+
+0.07     2014-07-18
+        - [Fix] Tests will BAIL_OUT when nytprofhtml is not found
+        - [Fix] Warning from bad entry in MANIFEST file
+        - [Add] Travis CI config
+
+0.06     2014-04-25
+        - [Fix] Errors in perldoc
+
+0.05     2014-04-25
+        - [Fix] Don't profile static files
+        - [Add] perldoc for configuration
+        - [Add] Disable in production unless forced by config
+        - [Add] Allow passthrough of Devel::NYTProf env options
+        - [Add] Allow config of hooks used to start/stop profiling
+
+0.04     2014-04-25
+        - [Fix] Better attempt to find nytprofhtml script
+
+0.03     2014-04-24
+        - [Add] Best attempt to find nytprofhtml script
+
+0.02     2014-04-24
+        - [Fix] Tweak tests for content of Devel::NYTProf output
+            as calling ->content_like doesn't DTRT all the time
+        - [Add] t/test_app.pl for running to test actual browser interaction
+
+0.01     2014-04-24
+        - First release, inspired by Dancer::Plugin::NYTProf

@@ -1,0 +1,40 @@
+---
+abstract: 'Parser for result of EXPLAIN of MySQL'
+author:
+  - 'moznion <moznion@gmail.com>'
+build_requires:
+  Test::Deep: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v1.1.0, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MySQL-Explain-Parser
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MySQL::Explain::Parser:
+    file: lib/MySQL/Explain/Parser.pm
+    version: '0.02'
+requires:
+  Text::VisualWidth::PP: '0'
+  parent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/moznion/MySQL-Explain-Parser/issues
+  homepage: https://github.com/moznion/MySQL-Explain-Parser
+  repository: git://github.com/moznion/MySQL-Explain-Parser.git
+version: '0.02'
+x_authority: cpan:MOZNION

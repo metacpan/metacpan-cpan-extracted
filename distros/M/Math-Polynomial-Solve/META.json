@@ -1,0 +1,67 @@
+{
+   "abstract" : "Find the roots of polynomial equations",
+   "author" : [
+      "John M. Gamble <jgamble@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-Polynomial-Solve",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Math::Complex" : "1.36",
+            "Math::Utils" : "1.06",
+            "perl" : "v5.10.1"
+         }
+      }
+   },
+   "provides" : {
+      "Math::Polynomial::Solve" : {
+         "file" : "lib/Math/Polynomial/Solve.pm",
+         "version" : "2.75"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/jgamble/Math-Polynomial-Solve.git"
+      }
+   },
+   "version" : "2.75",
+   "x_keyword" : [
+      "math",
+      "polynomial",
+      "quadratic",
+      "cubic",
+      "quartic",
+      "matrix",
+      "companion-matrix",
+      "Sturm",
+      "Nickalls",
+      "Ferrari",
+      "Laguerre",
+      "Hessenberg",
+      "Newton-Raphson"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

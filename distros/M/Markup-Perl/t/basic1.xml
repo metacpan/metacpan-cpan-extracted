@@ -1,0 +1,32 @@
+use blib;
+use Markup::Perl;
+<html>
+<body>
+<h1><perl>
+	print (0..9)
+	</perl></h1>
+<h2><perl> print join('', 'a'..'c'); # abc</perl><perl>my $x="def"; print $x</perl></h2>
+<perl>
+	sub print_h3 {
+		print "<h3>", shift, "</h3>";
+	}
+</perl>
+<perl>
+	print_h3($x."ghi");
+	
+	{	package foo;
+		our $y = "xyz";
+	}
+</perl>
+
+<p>
+plain text
+</p>
+
+<perl>print_h3($foo::y)</perl>
+
+<h4><perl>foreach (1..3) { # three times </perl>bang! <perl>}</perl></h4>
+
+<perl>print_h3("end perl with '<"."/perl>'")</perl><perl>header('color', 'red')</perl>
+</body>
+</html>

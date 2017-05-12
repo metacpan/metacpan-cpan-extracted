@@ -1,0 +1,90 @@
+{
+   "abstract" : "allow \"before qr{...} => sub {...};\" in roles",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::8 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-RoleQR",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "2.00",
+            "Scalar::Does" : "0.002",
+            "namespace::sweep" : "0",
+            "thanks" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.61"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::RoleQR" : {
+         "file" : "lib/MooseX/RoleQR.pm",
+         "version" : "0.004"
+      },
+      "MooseX::RoleQR::Meta::DeferredModifier" : {
+         "file" : "lib/MooseX/RoleQR.pm",
+         "version" : "0.004"
+      },
+      "MooseX::RoleQR::Trait::Application::ToClass" : {
+         "file" : "lib/MooseX/RoleQR.pm",
+         "version" : "0.004"
+      },
+      "MooseX::RoleQR::Trait::Application::ToRole" : {
+         "file" : "lib/MooseX/RoleQR.pm",
+         "version" : "0.004"
+      },
+      "MooseX::RoleQR::Trait::Role" : {
+         "file" : "lib/MooseX/RoleQR.pm",
+         "version" : "0.004"
+      },
+      "MooseX::RoleQR::Trait::Role::Composite" : {
+         "file" : "lib/MooseX/RoleQR.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/MooseX-RoleQR/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=MooseX-RoleQR"
+      },
+      "homepage" : "https://metacpan.org/release/MooseX-RoleQR",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-moosex-roleqr.git",
+         "web" : "https://github.com/tobyink/p5-moosex-roleqr"
+      }
+   },
+   "version" : "0.004"
+}

@@ -1,0 +1,32 @@
+GOOD
+("\xc3\xa1rv\xc3\xadzt\xc5\xb1r\xc5\x91 t\xc3\xbck\xc3\xb6rf\xc3\xbar\xc3\xb3g\xc3\xa9p", Charset=>'utf-8')
+=?UTF-8?B?w6FydsOtenTFsXLFkSB0w7xrw7ZyZsO6csOzZ8OpcA==?=
+
+GOOD
+("\xc3\x81rv\xc3\xadzt\xc5\xb1r\xc5\x91 t\xc3\xbck\xc3\xb6rf\xc3\xbar\xc3\xb3g\xc3\xa9p, ETAOIN SHRDLU CMFWYP VBGKQJ XZ.", Charset=>'utf-8')
+=?UTF-8?B?w4FydsOtenTFsXLFkSB0w7xrw7ZyZsO6csOzZ8OpcCw=?= ETAOIN SHRDLU
+ CMFWYP VBGKQJ XZ.
+
+GOOD
+("\xc3\x81rv\xc3\xadzt\xc5\xb1r\xc5\x91 t\xc3\xbck\xc3\xb6rf\xc3\xbar\xc3\xb3g\xc3\xa9p---lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do!", Charset=>'utf-8') 
+=?UTF-8?B?w4FydsOtenTFsXLFkSB0w7xrw7ZyZsO6csOzZ8OpcC0tLWxvcmVt?= ipsum dolor
+ sit amet, consectetur adipisicing elit, sed do!
+
+GOOD
+("\xc3\x81rv\xc3\xadzt\xc5\xb1r\xc5\x91 t\xc3\xbck\xc3\xb6rf\xc3\xbar\xc3\xb3g\xc3\xa9p---lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do!!", Charset=>'utf-8')
+=?UTF-8?Q?=C3=81rv=C3=ADzt=C5=B1r=C5=91_t=C3=BCk=C3=B6rf=C3=BAr=C3=B3g?=
+ =?UTF-8?Q?=C3=A9p---lorem?= ipsum dolor sit amet, consectetur adipisicing
+ elit, sed do!!
+
+GOOD
+([["\xc3\x81rv\xc3\xadzt\xc5\xb1r\xc5\x91",'utf-8'], [" t\xc3\xbck\xc3\xb6rf\xc3\xbar\xc3\xb3g\xc3\xa9p",'utf-8'], ['---lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do!!']])
+=?UTF-8?Q?=C3=81rv=C3=ADzt=C5=B1r=C5=91_t=C3=BCk=C3=B6rf=C3=BAr=C3=B3g?=
+ =?UTF-8?Q?=C3=A9p---lorem?= ipsum dolor sit amet, consectetur adipisicing
+ elit, sed do!!
+
+GOOD
+([["\xc3\x81rv\xc3\xadzt\xc5\xb1r\xc5\x91",'utf-8'], ["t\xc3\xbck\xc3\xb6rf\xc3\xbar\xc3\xb3g\xc3\xa9p",'utf-8'], ['---lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore'], ["\xa1\xc4", 'euc-jp']])
+=?UTF-8?B?w4FydsOtenTFsXLFkXTDvGvDtnJmw7pyw7Nnw6lwLS0tbG9yZW0=?= ipsum dolor
+ sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt
+ ut labore et =?ISO-2022-JP?B?ZG9sb3JlGyRCIUQbKEI=?=
+

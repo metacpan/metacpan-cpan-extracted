@@ -1,0 +1,40 @@
+# this is an example style configuration file for GeneXplorer
+# lines with a hash mark are comments
+# these are the fields being parsed out:
+#
+# colname = name of the column from feature info file
+# bgcolor = background color of table cell 
+# color   = text color
+# url     = a URL to use for building a link with the column content
+# image   = an image that replaces the cell content
+# url_append  = One value that gets appended to the URL (or self, see below)
+# url_replace = what value/text should be put into the placeholder 
+#               positions in the URL string. The values have to be '|' delimited.
+#               The placeholders have to be three uppercase letters, 
+#               starting with Z and descending (ZZZ, YYY, XXX, WWW etc.)
+#               There can be multiple replacement values for each URL.
+#               They will be put in in the given order.
+#               A special replacement value is 'self', which is the column value.
+# url_target  = target window for the URL to be build.
+# font        = desired font for display
+# the following is a block describing the style of one column
+# the delimimter are two slashes
+#
+
+colname = UID
+bgcolor = white
+color   = white
+font_face    = verdana,arial,sans-serif
+font_size    = 1
+url     = genome-www5.stanford.edu/cgi-bin/SMD/source/sourceResult?organism=Hs&option=CloneID&choice=cDNA&criteria=
+url_append = self
+target = sc
+//
+
+colname = NAME
+# bgcolor = white
+color   = white
+font_face = verdana,arial,sans-serif
+font_size = 1
+
+

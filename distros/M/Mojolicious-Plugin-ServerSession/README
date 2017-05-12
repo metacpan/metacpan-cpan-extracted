@@ -1,0 +1,83 @@
+Mojolicious-Plugin-ServerSession version 0.01
+=============================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+USAGE
+
+  #Basic example
+  $self->plugin('ServerSession' => {
+    key => "server_session_key",
+    load => sub { 
+      my ($c, $key) = @_;
+
+      my $session_object = MySessionDataStore->find_or_create_by_key($key);
+
+      return( $session_object->key, $session_object->session_hash_ref );
+    },
+    store => sub { 
+      my ($c, $key, $session_hash) = @_;
+
+      my $session_object = MySessionDataStore->find_by_key($key);
+      $session_object->session_data($session_hash);
+      $session_object->save();
+    }
+  });
+
+  #Then to use in controller or views
+  $c->server_session->{Some_key} = "Value"; #Note: Its just a hash ref for simplicity 
+
+
+  #Real world example using DBIx::Class
+  $app->plugin('ServerSession' => {
+    key => "server_session_key",
+    load => sub { 
+      my ($c, $key) = @_;
+      my $session_row;
+      use JSON;
+
+      unless($session_row = $c->app->schema->resultset('Session')->find($key)) {
+        $session_row = $c->app->schema->resultset('Session')->new({ content => "{}" })->insert();
+        $key = $session_row->id();
+      }
+
+      return( $key, decode_json($session_row->content));
+    },
+    store => sub { 
+      my ($c, $key, $session_hash) = @_;
+      use JSON;
+
+      my $session = $c->app->schema->resultset('Session')->find($key);
+      if($session) {
+        $session->content( encode_json($session_hash) );
+        $session->update();
+      }
+    }
+  });
+
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Mojo
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2012 by Jonathan Taylor
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

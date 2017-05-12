@@ -1,0 +1,7 @@
+{
+    "dedicated_setting": 4711,
+    "merged_frame": {
+        "kept_value": "sane",
+        "overwritten_value": "insane"
+    }
+}

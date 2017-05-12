@@ -1,0 +1,164 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Box::Tie::HASH - access an existing message folder as a hash
+
+=head1 SYNOPSIS
+
+ tie my(%inbox), 'Mail::Box::Tie::HASH', $folder;
+
+ foreach my $msgid (keys %inbox)
+ {   print $inbox{$msgid};
+     delete $inbox{$msgid};
+ }
+
+ $inbox{$msg->messageId} = $msg;
+
+=head1 DESCRIPTION
+
+Certainly when you look at a folder as being a set of related messages
+based on message-id, it is logical to access the folder through a hash.
+
+For a tied hash, the message-id is used as the key.  The message-id is usually
+unique, but when two or more instances of the same message are in the same
+folder, one will be flagged for deletion and the other will be returned.
+
+This implementation uses basic folder access routines which are related
+to the message-id.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item B<TIEHASH>('Mail::Box::Tie::HASH', FOLDER)
+
+Connects the FOLDER object to a HASH.
+
+example: 
+
+ my $mgr    = Mail::Box::Manager->new;
+ my $folder = $mgr->open(access => 'rw');
+ tie my(%inbox), 'Mail::Box::Tie::HASH', $folder;
+
+=back
+
+=head2 Tied Interface
+
+=over 4
+
+=item $obj-E<gt>B<CLEAR>()
+
+Remove the contents of the hash.  This is not really possible, but all
+the messages will be flagged for deletion.
+
+example: 
+
+ %inbox = ();
+ %inbox = ($msg->messageId, $msg); #before adding msg
+
+=item $obj-E<gt>B<DELETE>($message_id)
+
+Remove the message with the specified $message_id.
+
+example: 
+
+ delete $inbox{$msgid};
+
+=item $obj-E<gt>B<EXISTS>($message_id)
+
+Check whether a message with a certain $message_id exists.
+
+example: 
+
+ if(exists $inbox{$msgid}) ...
+
+=item $obj-E<gt>B<FETCH>($message_id)
+
+Get the message with the specified id.  The returned message may be
+a dummy if message thread detection is used.  Returns C<undef> when
+there is no message with the specified id.
+
+example: 
+
+ my $msg = $inbox{$msgid};
+ if($inbox{$msgid}->isDummy)  ...
+
+=item $obj-E<gt>B<FIRSTKEY>()
+
+See L<NEXTKEY()|Mail::Box::Tie::HASH/"Tied Interface">.
+
+=item $obj-E<gt>B<NEXTKEY>($previous)
+
+L<FIRSTKEY()|Mail::Box::Tie::HASH/"Tied Interface"> returns the first message-id/message pair from the folder,
+and NEXTKEY returns the message-id/message pair for the next message,
+in the order in which the message is stored in the folder.
+
+Messages flagged for deletion will B<not> be returned. See the
+L<Mail::Box::messages()|Mail::Box/"The messages"> method of the folder type for more information
+about the folder message order.
+
+example: 
+
+ foreach my $msgid (keys %inbox) ...
+ foreach my $msg (values %inbox) ...
+
+ while(my ($msgid, $msg) = each %inbox) {
+    $msg->print unless $msg->isDeleted;
+ }
+
+=item $obj-E<gt>B<STORE>(undef, $message)
+
+Store a message in the folder.  The key must be C<undef>, because the
+message-id of the specified message is taken.  This is shown in the
+first example.  However, as you see, it is a bit complicated to specify
+C<undef>, therefore the string C<"undef"> is accepted as well.
+
+The message may be converted into something which can be stored in the
+folder type which is at stake.  The added instance is returned.
+
+example: 
+
+ $inbox{ (undef) } = $msg;
+ $inbox{undef} = $msg;
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Box distribution version 3.002,
+built on March 31, 2017.
+
+Do not forget to read
+L<Mail::Box-Overview>,
+L<Mail::Box-Cookbook>, and
+L<Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L<Mail::Message>,
+L<Mail::Box>,
+L<Mail::Box::IMAP4>,
+L<Mail::Box::POP3>,
+L<Mail::Box::Parser::C>,
+L<Mail::Box::Dbx> (unpublished),
+L<Mail::Transport>,
+L<Object::Realize::Later>, and
+L<User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

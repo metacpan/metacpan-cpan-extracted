@@ -1,0 +1,9 @@
+load.t
+compile.t
+pod.t
+pod_coverage.t
+extract_package_names.t
+guess_package_names.t
+reporter/base.t
+app/backpan.t
+app/defaults.t

@@ -1,0 +1,57 @@
+use strict;
+use warnings;
+use Module::Build;
+
+my $builder = Module::Build->new(
+    module_name         => 'Miril',
+    license             => 'perl',
+    dist_author         => q{Peter Shangov <pshangov@yahoo.com>},
+    dist_version_from   => 'lib/Miril.pm',
+    build_requires => {
+        'Test::More' => 0,
+    },
+	requires => {
+		'App::Cmd'                                 => 0,
+		'autodie'                                  => 0,
+		'Carp'                                     => 0,
+		'CGI'                                      => 0,
+		'CGI::Application'                         => 0,
+		'CGI::Application::Emulate::PSGI'          => 0,
+		'CGI::Application::Plugin::Authentication' => 0,
+		'CGI::Application::Plugin::Forward'        => 0,
+		'CGI::Application::Plugin::Redirect'       => 0,
+		'CGI::Cookie'                              => 0,
+		'Class::Autouse'                           => 0,
+		'Cwd'                                      => 0,
+		'Data::AsObject'                           => 0,
+		'Data::Page'                               => 0,
+		'Digest::MD5'                              => 0,
+		'Exception::Class'                         => 0,
+		'File::Copy'                               => 0,
+		'File::Path'                               => 0,
+		'File::Slurp'                              => 0,
+		'File::Spec'                               => 0,
+		'HTML::Template::Pluggable'                => 0,
+		'HTML::Template::Plugin::Dot'              => 0,
+		'IO::File'                                 => 0,
+		'List::Util'                               => 0,
+		'Module::Load'                             => 0,
+		'Number::Format'                           => 0,
+		'Plack::Loader'                            => 0,
+		'Object::Tiny'                             => 0,
+		'POSIX'                                    => 0,
+		'Ref::List'                                => 0,
+		'Scalar::Util'                             => 0,
+		'Syntax::Keyword::Gather'                  => 0,
+		'Text::MultiMarkdown'                      => 0,
+		'Text::Sprintf::Named'                     => 0,
+		'Time::Format'                             => 0,
+		'Time::Local'                              => 0,
+		'Try::Tiny'                                => 0,
+		'XML::TreePP'                              => 0,
+	},
+    add_to_cleanup      => [ 'Miril-*' ],
+    create_makefile_pl => 'passthrough',
+);
+
+$builder->create_build_script();

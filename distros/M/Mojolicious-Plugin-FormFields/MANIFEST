@@ -1,0 +1,24 @@
+Changes
+INSTALL.SKIP
+lib/Mojolicious/Plugin/FormFields.pm
+Makefile.PL
+MANIFEST			This list of files
+out.html
+README.pod
+t/00field.t
+t/checkbox.t
+t/each.t
+t/fields.t
+t/file.t
+t/filters.t
+t/hidden.t
+t/input.t
+t/label.t
+t/password.t
+t/radio.t
+t/select.t
+t/TestHelper.pm
+t/text.t
+t/validations.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

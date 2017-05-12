@@ -1,0 +1,30 @@
+---
+abstract: 'The return value of the method is cached to your storage'
+author:
+  - 'Satoshi Ohkubo <s.ohkubo@gmail.com>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.79'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Method-Cached
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Cache::FastMmap: 1.28
+  Digest::SHA: 5.47
+  Filter::Util::Call: 0
+  JSON::XS: 2.2222
+  MIME::Base64: 3.07
+  Storable: 2.18
+  Sub::Attribute: 0.02
+  UNIVERSAL::require: 0.11
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.051

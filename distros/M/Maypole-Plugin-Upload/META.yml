@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name: Maypole-Plugin-Upload
+version: 0.02
+author:
+  - Marcus Ramberg C<marcus@thefeed.no>
+abstract: Handle file uploads in Maypole
+license: perl
+requires:
+  Maypole: 2
+provides:
+  Maypole::Plugin::Upload:
+    file: lib/Maypole/Plugin/Upload.pm
+    version: 0.02
+generated_by: Module::Build version 0.26

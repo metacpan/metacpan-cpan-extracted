@@ -1,0 +1,10 @@
+Revision history for Perl extension Math::JSpline.
+
+0.02  Sat Jan 19 15:34:00 2013
+	- fixed pod to describe paramaters :-)
+
+
+0.01  Fri Jan 18 12:56:12 2013
+	- original version; created by h2xs 1.23 with options
+		-AX Math::JSpline
+

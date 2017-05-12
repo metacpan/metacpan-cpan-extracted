@@ -1,0 +1,15 @@
+Name:
+    usage_sections - Test usage_sections option.
+
+Usage:
+     usage_sections.pl [OPTIONS] [MANS]
+
+Options:
+    Should get options added under here:
+
+     --help -? --usage - Bool. Display the usage message and exit
+     --man             - Bool. Display man page
+
+Author:
+    Invader Flobee
+

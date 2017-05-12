@@ -1,0 +1,6 @@
+name = "Mojolicious-Plugin-Renderer-WithoutCache"
+badges = ["travis", "coveralls"]
+authority="cpan:SIMBABQUE"
+
+module_maker="ModuleBuildTiny"
+

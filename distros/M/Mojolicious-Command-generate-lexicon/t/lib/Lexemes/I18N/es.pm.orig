@@ -1,0 +1,12 @@
+package Lexemes::I18N::es;
+use base 'Lexemes::I18N';
+
+# Uncoment to use non-latin symbols
+# use utf8;
+
+our %Lexicon = (
+    'lexemes' => 'lexemas',
+    "hard\ntest" => "prueba\ndifícil",
+);
+
+1;

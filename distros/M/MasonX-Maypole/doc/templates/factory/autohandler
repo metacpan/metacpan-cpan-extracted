@@ -1,0 +1,6 @@
+<& header &>
+<& title &>
+
+% $m->call_next;
+
+<& footer &>

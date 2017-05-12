@@ -1,0 +1,86 @@
+# -*- perl -*-
+#
+# Author: Gisbert W. Selke, TapirSoft Selke & Selke GbR.
+#
+# Copyright (C) 2015 Gisbert W. Selke. All rights reserved.
+# This package is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+#
+# Mail: gws@cpan.org
+#
+package Map::Tube::Glasgow;
+use strict;
+use warnings;
+
+our $VERSION = '0.07';
+
+=encoding utf8
+
+=head1 NAME
+
+Map::Tube::Glasgow - Interface to the Glasgow tube map
+
+=cut
+
+use File::Share ':all';
+use Moo;
+use namespace::clean;
+
+has xml => ( is => 'ro', default => sub { return dist_file('Map-Tube-Glasgow', 'glasgow-map.xml') } );
+
+with 'Map::Tube';
+
+=head1 SYNOPSIS
+
+    use Map::Tube::Glasgow;
+    my $tube = Map::Tube::Glasgow->new();
+
+    my $route = $tube->get_shortest_route('Cowcaddens', 'Bridge Street');
+
+    print "Route: $route\n";
+
+=head1 DESCRIPTION
+
+This module allows to find the shortest route between any two given tube
+stations in Glasgow. All interesting methods are provided by the role L<Map::Tube>.
+
+=head1 METHODS
+
+=head2 CONSTRUCTOR
+
+    use Map::Tube::Glasgow;
+    my $tube = Map::Tube::Glasgow->new();
+
+The only argument, C<xml>, is optional; if specified, it should be a code ref
+to a function that returns either the path the XML map file, or a string
+containing this XML content. The default is the path to F<glasgow-map.xml>
+that is a part of this distribution. For further information see L<Map::Tube>.
+
+=head2 xml()
+
+This read-only accessor returns whatever was specified as the XML source at
+construction.
+
+=head1 ERRORS
+
+If something goes wrong, maybe because the map information file was corrupted,
+the constructor will die.
+
+=head1 AUTHOR
+
+Gisbert W. Selke, TapirSoft Selke & Selke GbR.
+
+=head1 COPYRIGHT AND LICENCE
+
+The data for the XML file were taken from an image in the English-language
+Wikipedia in the entry "Glasgow Subway". It is CC BY-SA 2.0 David Arthur, 2006.
+The module itself is free software; you may redistribute and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Map::Tube>, L<Map::Tube::GraphViz>.
+
+=cut
+
+1;

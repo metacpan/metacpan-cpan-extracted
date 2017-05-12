@@ -1,0 +1,60 @@
+Mozilla::Mechanize
+
+WWW::Mechanize is great, but it has a major shortcoming: it completely
+ignores JavaScript. There's a port of WWW::Mechanize, Win32::IE::Mechanize
+by Abe Timmerman, that uses OLE automation to control an Internet Explorer
+browser, and therefore does deal with JavaScript. However, it has its own
+shortcoming: it only works with Internet Explorer.
+
+This module, Mozilla::Mechanize, is a port of Win32::IE::Mechanize that uses
+an embedded Gecko widget. I say "an embedded Gecko widget" and not "Mozilla",
+because it doesn't use a technology like OLE automation or DCOM to remotely
+control a separate, "real" browser. Instead, using Mozilla::DOM, you control
+an embedded Gecko widget (currently based on Gtk2::MozEmbed). Since Gecko is
+the HTML rendering engine of Mozilla/Firefox, it's the same as Mozilla,
+at least as far as the DOM is concerned.
+
+I haven't found the Holy Grail of web automation yet, though. That would
+involve rendering an HTML page exactly as a real browser does, on any platform,
+but without having to open a browser window. The quest continues... :)
+
+
+DEPENDENCIES
+
+Mozilla::DOM
+Gtk2::MozEmbed
+URI
+Mime::Base64 (only if Basic auth (currently unimplemented) is used)
+
+
+INSTALLATION
+
+To install this module, execute the following commands:
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+or you can instead do the traditional
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+
+BUGS
+
+slanning@cpan.org
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2005,2009 Scott Lanning. This library is free software;
+you can redistribute it and/or modify it under the same terms
+as Perl itself.
+
+This program is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty
+of merchantability or fitness for a particular purpose.

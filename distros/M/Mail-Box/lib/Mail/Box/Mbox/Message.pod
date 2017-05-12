@@ -1,0 +1,131 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Box::Mbox::Message - one message in a Mbox folder
+
+=head1 INHERITANCE
+
+ Mail::Box::Mbox::Message
+   is a Mail::Box::File::Message
+   is a Mail::Box::Message
+   is a Mail::Message
+   is a Mail::Reporter
+
+=head1 SYNOPSIS
+
+ my $folder  = new Mail::Box::Mbox folder => $ENV{MAIL}, ...;
+ my $message = $folder->message(0);
+
+=head1 DESCRIPTION
+
+Maintain one message in an L<Mail::Box::Mbox|Mail::Box::Mbox> folder.
+
+Extends L<"DESCRIPTION" in Mail::Box::File::Message|Mail::Box::File::Message/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Box::File::Message|Mail::Box::File::Message/"METHODS">.
+ 
+=head1 DETAILS
+
+Extends L<"DETAILS" in Mail::Box::File::Message|Mail::Box::File::Message/"DETAILS">.
+ 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: Cannot coerce a $class object into a $class object
+
+=item Error: Cannot include forward source as $include.
+
+Unknown alternative for the L<forward(include)|Mail::Message::Construct::Forward/"Constructing a message">.  Valid choices are
+C<NO>, C<INLINE>, C<ATTACH>, and C<ENCAPSULATE>.
+
+=item Error: Cannot include reply source as $include.
+
+Unknown alternative for the C<include> option of L<reply()|Mail::Message::Construct::Reply/"Constructing a message">.  Valid
+choices are C<NO>, C<INLINE>, and C<ATTACH>.
+
+=item Error: Method bounce requires To, Cc, or Bcc
+
+The message L<bounce()|Mail::Message::Construct::Bounce/"Constructing a message"> method forwards a received message off to someone
+else without modification; you must specified it's new destination.
+If you have the urge not to specify any destination, you probably
+are looking for L<reply()|Mail::Message::Construct::Reply/"Constructing a message">. When you wish to modify the content, use
+L<forward()|Mail::Message::Construct::Forward/"Constructing a message">.
+
+=item Error: Method forwardAttach requires a preamble
+
+=item Error: Method forwardEncapsulate requires a preamble
+
+=item Error: No address to create forwarded to.
+
+If a forward message is created, a destination address must be specified.
+
+=item Error: No default mailer found to send message.
+
+The message L<send()|Mail::Message/"The message"> mechanism had not enough information to automatically
+find a mail transfer agent to sent this message.  Specify a mailer
+explicitly using the C<via> options.
+
+=item Error: No rebuild rule $name defined.
+
+=item Error: Only build() Mail::Message's; they are not in a folder yet
+
+You may wish to construct a message to be stored in a some kind
+of folder, but you need to do that in two steps.  First, create a
+normal L<Mail::Message|Mail::Message>, and then add it to the folder.  During this
+L<Mail::Box::addMessage()|Mail::Box/"The folder"> process, the message will get L<coerce()|Mail::Message/"Internals">-d
+into the right message type, adding storage information and the like.
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=item Error: Unable to read delayed body.
+
+=item Error: coercion starts with some object
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Box distribution version 3.002,
+built on March 31, 2017.
+
+Do not forget to read
+L<Mail::Box-Overview>,
+L<Mail::Box-Cookbook>, and
+L<Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L<Mail::Message>,
+L<Mail::Box>,
+L<Mail::Box::IMAP4>,
+L<Mail::Box::POP3>,
+L<Mail::Box::Parser::C>,
+L<Mail::Box::Dbx> (unpublished),
+L<Mail::Transport>,
+L<Object::Realize::Later>, and
+L<User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

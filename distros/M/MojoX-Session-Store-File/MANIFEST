@@ -1,0 +1,20 @@
+Changelog
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/MojoX/Session/Store/File.pm
+lib/MojoX/Session/Store/File/Driver.pm
+lib/MojoX/Session/Store/File/Driver/FreezeThaw.pm
+lib/MojoX/Session/Store/File/Driver/Storable.pm
+Makefile
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+t/00-compile.t
+t/01-basic.t

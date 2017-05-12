@@ -1,0 +1,94 @@
+[% SET title = loc('All Pages in x',  page.path) %]
+
+[% WRAPPER page/wrapper.tt title = title %]
+<div id="content">
+
+<div id="categories">
+    <strong>[%loc('Tags')%]</strong>:
+    [% WHILE( tag = tags.next ) %]
+        [% IF tag.tag == activetag +%]
+    <b>[% tag.tag %]</b>
+        [% ELSE +%]
+    <a href="[% c.uri_for('list', tag.tag) %]">[% tag.tag %]</a> ([% tag.refcount %])
+        [% END %]
+    [% END +%]
+</div>
+
+<div id="allPages">
+    <h2>[%loc('All Pages')%]</h2>
+    [%loc('All pages in x listed alphabetically', page.name )%]
+    <ul>
+      [% FOREACH subpage IN pages +%]
+        <li><a href="[% c.uri_for(subpage.path) %]">[% subpage.path %]</a> [% subpage.content.abstract %]</li>
+      [% END +%]
+    </ul>
+    
+
+    <p>
+      [% IF pager.previous_page %]
+        <a href="[% c.uri_for('/.list', {page => pager.previous_page}) %]">[% loc('Previous page') %]</a>
+      [% END %]
+
+      [% IF pager.previous_page AND pager.next_page %]
+        |
+      [% END %]
+
+      [% IF pager.next_page %]
+        <a href="[% c.uri_for('/.list', {page => pager.next_page}) %]">[% loc('Next page') %]</a>
+      [% END %]
+    </p>
+  
+</div>
+
+[% IF ! activetag +%]
+<div id="wantedPages">
+    <h2>[%loc('Sub Page Tools')%]</h2>
+
+    <ul id="path_links">
+        <li><a href="[% c.uri_for('recent') %]">[% loc('Recent changes in x', page.path) %]</a></li>
+        <li><a href="[% c.uri_for('tags') %]" title="[% loc('All tags in this path') %]">[% loc('Tags') %]</a></li>
+        <li><a href="[% c.uri_for('users') %]" title="[% loc('Who wrote what') %]" accesskey="">[% loc('Authors in this path') %]</a></li>
+        <li><a href="[% c.uri_for('feeds') %]" title="[% loc('Subscribe to changes by RSS') %]">[% loc('Feeds') %]</a></li>
+        [%+ IF (user) %]<li><a href="[% c.uri_for('export') %]" title="[% loc('Download a zip with all the pages in this path') %]" accesskey="X" rel="nofollow">[% loc('Export') %]</a></li>[% END %]
+    </ul>
+
+    <h2>[%loc('Backlinks')%]</h2>
+    [% loc('Other pages that link to this page.') %]
+    [% IF backlinks.size +%]
+    <ul style="margin-bottom: 10px">
+      [% FOR backlink IN backlinks.list +%]
+        <li>[% c.wikiword( backlink.from_page.path, base ) %]</li>
+      [% END +%]
+    </ul>
+    [% END +%]
+
+    <h2>[%loc('Wanted Pages')%]</h2>
+    [% loc('Links to non-existent pages.') %]
+
+  [% IF wanted.size +%]
+    <ul style="margin-bottom: 10px">
+      [% FOR wanted IN wanted.list +%]
+        <li>
+            <span class="newWikiWord">[% wanted.to_path %]<a title="[%loc('Not found. Click to create this page.')%]" href="[%c.uri_for(wanted.to_path,'.edit')%]" rel="nofollow">?</a></span>
+            <span class="wantedBy">[% loc('referenced by x', wanted.from_page.path) %]</a></span>
+        </li>
+      [% END +%]
+    </ul>
+  [% END +%]
+
+    <h2>[% loc('Orphaned Pages') %]</h2>
+    [% loc('Pages to which no other pages link.') %]
+
+  [% IF orphans.size +%]
+    <ul style="margin-bottom: 35px">
+      [% FOR orphan IN orphans.list %]
+        <li><a href="[% c.uri_for( orphan.path) %]">[%orphan.path%]<a href="[%c.uri_for(_orphan.path,edit)%]" rel="nofollow">_</a></span></li>
+      [% END +%]
+    </ul>
+  [% END +%]
+</div>
+
+[%+ END # !activetag +%]
+
+</div>
+[% END # WRAPPER %]

@@ -1,0 +1,8 @@
+Math::Rand48 is an interface to drand48() family of random functions.
+
+It provides "better" random numbers for older perls which do 
+not use drand48() by default. It also allows multiple independent
+streams of random numbers using the erand48() style calling 
+convention.
+            
+

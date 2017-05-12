@@ -1,0 +1,119 @@
+
+=head1 NAME
+
+DATABASE - RECOVERY
+
+=head2 Nothing works!
+
+It is possible to corrupt the Berkeley DB environment or one or more of the
+databases if a task is shutdown unexpectedly
+with the databases open. 
+
+=for html The BerkeleyDB documentation says: <a
+href="http://www.sleepycat.com/docs/ref/transapp/app.html">www.sleepycat.com/docs/ref/transapp/app.html</a>
+<blockquote><font color="#990000">
+&nbsp;&nbsp;...if any thread of control
+exits for any reason while holding Berkeley DB resources, recovery must
+be performed to do the following:
+<ul>
+<li>Recover the Berkeley DB resources.
+<li>Release any locks or mutexes that may have been held to avoid
+starvation as the remaining threads of control convoy behind the failed
+thread's locks.
+<li>Clean up any partially completed operations that may have left a
+database in an inconsistent or corrupted state.
+</ul>
+Complicating this problem is the fact that the Berkeley DB library
+itself cannot determine whether recovery is required; the application
+itself must make that decision. A further complication is that recovery
+must be single-threaded; that is, one thread of control or process must 
+perform recovery before any other thread of control or
+processes attempts to create or join the Berkeley DB environment.
+</font>
+</blockquote>
+
+
+If your SpamCannibal installation runs the B<sc_dbwatch> daemon then database recovery is 
+ordinarily done automatically. In the event things fail badly,
+you can check for a corrupted database by attempting to view one or more of the
+databases with sc_admin.pl. If you are running sc_BLcheck.pl periodically
+then the order of the databases by size is usually as shown below. If you can
+not view one or more of the databases then then the environment and/or the databases have
+been corrupted and the Berkeley DB db_recover program should be run.
+
+To view:
+
+  ./sc_admin archive view (small)
+  ./sc_admin blcontrib view (large)
+  ./sc_admin evidence view
+  ./sc_admin tarpit view
+
+
+=head2 Repairing the database
+
+If the databases appear to be corrupted,
+you should be able to restore the database environment running the recovery
+procedure. Stop all SpamCannibal daemons that access the
+database then su - root and type:
+
+  cd /usr/local/spamcannibal/scripts
+  ./sc_initdb -R
+
+If that does not work then use the manual procedure.
+Stop all SpamCannibal daemons that access the
+database and run db_recover.
+
+  rc.sc_dbwatch stop
+    or
+  rc.dbtarpit stop
+  rc.bdbaccess stop
+  rc.dnsbls stop
+
+  you must also block any Cron jobs
+
+  cd /var/run/dbtarpit
+  db_recover -v
+
+If that still does not work then use the B<sc_recoverdb.pl> script to
+verify/copy the records from the existing database files to new files, then
+replace the old files with the new. su - root and type FOR EACH DB FILE
+(typically tarpit, archive, blcontrib, evidence):
+
+  cd /usr/local/spamcannibal/scripts
+  ./sc_recoverdb.pl -v tarpit
+
+
+If the DB fails to verify, then type:
+
+  ./sc_recoverdb.pl tarpit
+  cd /var/run/dbtarpit
+  mv tarpit.new tarpit
+
+=head2 Last resort recovery
+
+Ok, so none of that worked either. As a last resort, you can dump a damaged
+database file using Berkeley DB's db_dump and the reload it with db_load.
+
+=for html See: <a
+href="http://www.oracle.com/technology/documentation/berkeley-db/db/ref/dumpload/utility.html">The db_dump and db_load utilities</a>
+on the Oracle / BerkeleyDB web site.
+
+=head2 Reinitializing the database environment
+
+To reinitialize the database environment su - root and type:
+
+  cd /usr/local/spamcannibal/scripts
+  ./sc_initdb.pl
+
+
+=head2 Restart SpamCannibal daemons
+
+Restart the SpamCannibal daemons that were previously running.
+
+  rc.sc_dbwatch start
+    or
+  rc.dbtarpit start
+  rc.sc_lbdaemon start
+  rc.bdbaccess start
+  rc.dnsbls start
+

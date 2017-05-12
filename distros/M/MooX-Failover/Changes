@@ -1,0 +1,88 @@
+Revision history for MooX-Failover
+
+v0.3.3    2015-01-05 16:04:04+00:00 Europe/London
+  [Other Changes]
+  - Minor tweaks to Changes file.
+
+  - Moved test prerequisties into test phase.
+
+v0.3.3    2014-12-24 10:07:09+00:00 Europe/London
+  [Documentation]
+  - Fixed typo in POD markup.
+
+  [Other Changes]
+  - Made prereq for version explicit.
+
+v0.3.2    2014-12-22 15:34:54+00:00 Europe/London
+  [Other Changes]
+  - Fixed tests to work with Moo v1.001000 or earlier.
+
+v0.3.1    2014-12-22 15:10:27+00:00 Europe/London
+  [Documentation]
+  - Reorganized documentation, and added more information.
+
+  - Added acknowledgment.
+
+  [Other Changes]
+  - Added more tests.
+
+v0.3.0    2014-12-17 13:06:55+00:00 Europe/London
+  [Documentation]
+  - Changed description of the "constructor" option to remove any
+    confusion which class it applies to.
+
+  - Documented the need for quoting values in the "args" option.
+
+  - Fixed typos in POD.
+
+  [Enhancements]
+  - Added the ability to specify an alternative constructor name
+    on the original class.
+
+  - Added the ability to pass all of the original arguments in a
+    single constructor parameter to the failover class.
+
+  [Bug Fixes]
+  - Fixed bug with handling the "args" option.
+
+v0.2.1    2014-12-16 12:20:06+00:00 UTC
+  [Enhancements]
+  - Added check that we don't failover to the same class.
+
+  - Minor performance tweaks.
+
+  [Documentation]
+  - Minor wording changes.
+
+  [Bug Fixes]
+  - Fixed bad prereqs for tests, which now uses Types::Standard.
+
+  [Other Changes]
+  - Added more tests
+
+v0.2.0_01 2014-12-12 15:49:50+00:00 Europe/London
+  [Incompatability]
+  - Rewrote the interface entirely, so that the failover is specified
+    as part of the class definition. See the POD for details.
+
+  [Enhancements]
+  - Significant optimizations at the expense of incompatability.
+
+  - Added the ability to use an alternative name of the constructor
+    for the failover class.
+
+  - Arguments for the constructor can be a hash reference, array
+    reference or scalar.
+
+  - Added the ability to save the name of the class that triggered to
+    error.
+
+  [Other Changes]
+  - Added missing MANIFEST.SKIP and removed dist.ini from
+    distribution.
+
+  - Added an example using Web::Machine.
+
+v0.1.0_01 2014-12-08 17:51:22+00:00 Europe/London
+  - An initial port of MooseX-Failover to Moo.
+

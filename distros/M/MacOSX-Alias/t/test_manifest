@@ -1,0 +1,9 @@
+# $Id$
+load.t
+pod.t
+pod_coverage.t
+#prereq.t
+export.t
+export_tags.t
+make_alias.t
+read_alias.t

@@ -1,0 +1,42 @@
+Version history for Math::BigInt::Named:
+
+2016-12-03 v0.04 pjacklam
+
+ * Use ExtUtils::MakeMaker rather than Module::Install in Makefile.PL
+
+ * Remove Build.PL. It is no longer supported.
+
+ * Fix subclassing in Math::BigInt::Named, i.e., replace
+  "use Math::BigInt::Named" by "use Math::BigInt".
+
+ * Remove use of the discouraged "base" package in subclasses of
+   Math::BigInt::Named.
+
+ * Better documentation in .pm files.
+
+ * Remove author information in LICENSE file.
+
+ * Update README file.
+
+ * Trim whitespace.
+
+ * Inform that the TODO file is not up to date.
+
+2007-02-24 v0.03 Tels 181 tests
+
+ * modernize package (META.yml, SIGNATURE, etc.)
+
+ * bundle and use Module::Install
+
+ * add POD tests
+
+2001-12-30 v0.02 Tels
+
+ * added German and English (own subclass), some tests and some real code.
+
+2001-11-20 v0.01 Tels
+
+ * first release
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!

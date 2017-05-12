@@ -1,0 +1,164 @@
+NAME
+    MooseX::Types::Implements - Require objects to implement a
+    role/interface
+
+VERSION
+    version 1.103350
+
+SYNOPSIS
+        package My::Class;
+
+        use Moose;
+        use MooseX::Types::Implements qw( Implements );
+
+        has 'vehicle' => (
+            is => 'rw',
+            isa => Implements[qw( My::Interfaces::Driveable )],
+        );
+
+        has 'pet_animal' => (
+            is => 'rw',
+            isa => Implements[qw( My::Interfaces::Pet My::Interfaces::Animal )],
+        );
+
+    Interfaces definitions:
+
+        package My::Interfaces::Driveable;
+        use Moose::Role;
+
+        requires qw( drive stop );
+
+
+        package My::Interfaces::Pet;
+        use Moose::Role;
+
+        requires qw( play obey );
+
+
+        package My::Interfaces::Animal;
+        use Moose::Role;
+
+        requires qw( eat sleep roam );
+
+    Classes:
+
+        package My::Car;
+        use Moose;
+        with qw( My::Interfaces::Driveable );
+
+        sub drive { ... };
+        sub stop { ... };
+
+
+        package My::Bicycle;
+        use Moose;
+        with qw( My::Interfaces::Driveable );
+
+        sub drive { ... };
+        sub stop { ... };
+
+
+        package My::TimeMachine;
+        use Moose;
+
+        sub teleport { ... };
+
+
+        package My::Dog;
+        use Moose;
+        with qw( My::Interfaces::Pet My::Interfaces::Animal );
+
+        sub play { ... };
+        sub obey { ... };
+
+        sub eat { ... };
+        sub sleep { ... };
+        sub roam { ... };
+
+
+        package My::Skunk;
+        use Moose;
+        with qw( My::Interfaces::Animal );
+
+        sub eat { ... };
+        sub sleep { ... };
+        sub roam { ... };
+
+    And finally:
+
+        package main;
+
+        my $class = My::Class->new();
+
+        # My::Car and My::Bicycle implement My::Interfaces::Driveable
+        $class->vehicle( My::Car->new() );
+        $class->vehicle( My::Bicycle->new() );
+
+        # throws error - you cannot drive TimeMachine
+        $class->vehicle( My::TimeMachine->new() );
+
+
+        # dog is a Pet and an Animal
+        $class->pet_animal( My::Dog->new() );
+
+        # throws error - Skunk is an Animal, but not really a Pet
+        $class->pet_animal( My::Skunk->new() );
+
+DESCRIPTION
+    This class provides parameterizable polymorphic type constraint.
+
+TYPES
+  Implements
+        # single role
+        has 'vehicle' => (
+            is => 'rw',
+            isa => Implements[qw( My::Interfaces::Driveable )],
+        );
+
+        # all roles need to be implemented
+        has 'pet_animal' => (
+            is => 'rw',
+            isa => Implements[qw( My::Interfaces::Pet My::Interfaces::Animal )],
+        );
+
+    "Implements" is a parameterizable type constraint that requires
+    "Objects" to implement specified roles (automatically loaded).
+
+    Subtyping is also supported:
+
+        package My::Types;
+        use MooseX::Types::Implements qw( Implements );
+        use MooseX::Types -declare => [qw(
+            Driveable
+        )];
+
+        subtype Driveable,
+            as Implements[qw( My::Interfaces::Driveable )],
+            message {
+                "Object '$_' needs to implement My::Interfaces::Driveable"
+            };
+
+        package My::Class;
+        use Moose;
+        use My::Types qw( Driveable );
+
+        has 'vehicle' => (
+            is => 'rw',
+            isa => Driveable,
+        );
+
+SEE ALSO
+    *   MooseX::Types::Parameterizable
+
+    *   MooseX::Types
+
+AUTHOR
+    Alex J. G. Burzyński <ajgb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Alex J. G. Burzyński
+    <ajgb@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

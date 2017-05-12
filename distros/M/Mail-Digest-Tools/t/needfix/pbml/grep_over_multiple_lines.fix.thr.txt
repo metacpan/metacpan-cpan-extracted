@@ -1,0 +1,112 @@
+Thread:       grep_over_multiple_lines
+Message:      00001_0011
+From:         "Tom George Samson" <tomgeorgesamson@some.web.address.com>
+Text:
+
+Hi Chris,
+Thank you for the reply.
+Please bear with me if I appear to be a little naive, but this is my 
+problem. 
+I've already opened a file and have the data in an array.
+I want to perform this operation on that array. How do I do that ?
+open (FILE,$file);
+@my_array = <FILE> ;
+now my_array contains the day limited by START_PATTERN and 
+END_PATTERN.
+How do I filter it out from there ?
+
+Thomas.
+
+_X_X_X_X_X_X_X_X_X_X_
+_X_X_X_X_X_X_X_X_X_X_
+
+
+Thread:       grep_over_multiple_lines
+Message:      00001_0010
+From:         "chcst53" <charley@some.web.address.com>
+Text:
+
+--- In perl-beginner@yahoogroups.com, "Tom George Samson" 
+<tomgeorgesamson@y...> wrote:
+> Hi Folks,
+> 
+> How do you do a grep over multiple lines in perl?
+> I have a file that is already read into an array and the array     
+looks like this.
+> 
+> sldjflsdfjlskd          (line0)
+> START_PATTERN lsdjflsd  (line1)
+> lskdfljsld lkjsldflskd  (line2)
+> sldjflsjdfsldfjlsjdflj  (line3)
+> ljsdfsdf END_PATTERN    (line4)
+> 
+> I want to grab the stuff between START_PATTERN and END_PATTERN 
+> and dump it into a different array.
+> Thank you very much.
+> Thomas.
+
+This will do it, if I understand the problem correctly.
+
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @a;
+
+while(<DATA>) {
+next unless /START_PATTERN/../END_PATTERN/;
+push @a, /([a-z]+(?:\s+[a-z]+)*)/;
+}
+print "$_\n" for @a;
+
+__DATA__
+sldjflsdfjlskd
+START_PATTERN lsdjflsd
+lskdfljsld lkjsldflskd
+sldjflsjdfsldfjlsjdflj
+ljsdfsdf END_PATTERN
+
+The regular expression captures lowercased text _and_ optional space 
+followed by lowercase text, just like in thw sample data you have 
+here.
+
+Chris
+
+_X_X_X_X_X_X_X_X_X_X_
+_X_X_X_X_X_X_X_X_X_X_
+
+
+Thread:       grep_over_multiple_lines
+Message:      00001_0009
+From:         "Tom George Samson" <tomgeorgesamson@some.web.address.com>
+Text:
+
+Hi Folks,
+
+How do you do a grep over multiple lines in perl?
+I have a file that is already read into an array and the array looks 
+like this.
+
+sldjflsdfjlskd          (line0)
+START_PATTERN lsdjflsd  (line1)
+lskdfljsld lkjsldflskd  (line2)
+sldjflsjdfsldfjlsjdflj  (line3)
+ljsdfsdf END_PATTERN    (line4)
+
+I want to grab the stuff between START_PATTERN and END_PATTERN 
+and dump it into a different array.
+It can be done in a couple of lines, I'm sure, but How do you do 
+with a one liner or some other short way?
+
+I tried to use Text::Balanced qw(extract_tagged) as a different 
+way to do this .. but somehow it does not work for me :-(.
+Could somebody also point me to some sites where they show examples 
+of text manipulating perl modules at work ?
+
+Thank you very much.
+Thomas.
+
+_X_X_X_X_X_X_X_X_X_X_
+_X_X_X_X_X_X_X_X_X_X_
+
+

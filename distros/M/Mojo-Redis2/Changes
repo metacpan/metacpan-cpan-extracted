@@ -1,0 +1,112 @@
+Revision history for perl distribution Mojo-Redis2
+
+0.26 2016-06-04T13:09:20+0200
+ - Fix missing POD and removed code that is not in use #18
+
+0.25 2016-06-04T13:01:53+0200
+ - Enable tests to run in OS X
+ - Add Mojo::Redis2::Cursor and support for scan, hscan, sscan, zscan #18
+   Contributor: Andre Parker
+
+0.24 2015-07-18T08:19:34+0200
+ - Mark t/connection-refused.t as TODO, since it fail because of i18n
+
+0.23 2015-07-16T09:32:21+0200
+ - Fix Mojo::Redis2::Server need to bind to 127.0.0.1 and not localhost #12
+   Issues arise when ::1 and 127.0.0.1 is set to "localhost" in /etc/hosts
+
+0.22 2015-07-15T08:22:37+0200
+ - Remove "tcp-keepalive" as default config parameter from Mojo::Redis2::Server
+ - Something is odd with local($@), scoping and 5.10/5.12
+
+0.21 2015-07-14T17:53:28+0200
+ - Will use Mojo::Redis2 to check if test redis server is up and running
+
+0.20 2015-07-11T12:35:34+0200
+ - Add hidden methods to t/00-basic.t to fix POD coverage
+
+0.19 2015-07-06T21:10:01+0200
+ - Remove "THIS MODULE IS UNDER DEVELOPMENT" warning
+
+0.18 2015-03-02T08:36:10Z
+ - Fix documenation #10
+ - Add examples/chat.pl
+
+0.17 2015-01-29T08:58:00Z
+ - Will requeue actions on disconnect
+ - Deprecated "protocol" attribute
+ - One protocol per connection
+
+0.16 2015-01-02T13:47:53Z
+ - Change psubscribe() and subscribe() require an array-ref of channel
+   names
+ - Add punsubscribe()
+ - Add unsubscribe()
+
+0.15 2014-11-13T17:50:21Z
+ - Skip tests on Win32
+
+0.14 2014-10-26T09:32:58Z
+ - Fix empty collection evaluation Contributor: Jan Tore Morken
+
+0.13 2014-10-22T20:53:41Z
+ - Fix "Connection refused" now makes blocking requests die with correct
+   error message.
+
+0.12 2014-09-16T21:13:54Z
+ - Fix response list in POD for blpop, brpop and brpoplpush.
+ - emit_safe() is deprecated in Mojolicious
+
+0.11 2014-08-26T15:05:16Z
+ - Add simpler "CONFIG GET key" result
+
+0.10 2014-08-26T14:07:30Z
+ - Add Mojo::Redis2::Backend for server commands
+
+0.09 2014-08-24T12:00:43Z
+ - Improved detection of running server
+
+0.08 2014-08-23T18:24:11Z
+ - Fix t/start-server.t test for DESTROY()-ed server
+
+0.07 2014-08-22T16:34:14Z
+ - Replace start_server() with Mojo::Redis2::Server
+
+0.0602 2014-08-20T12:06:20Z
+ - Fix failed CPAN index, by adding $VERSION to Mojo::Redis2::Transaction
+
+0.0601 2014-08-20T11:59:46Z
+ - Fix failed CPAN index, by adding $VERSION to Mojo::Redis2::Transaction
+
+0.06 2014-08-20T11:49:23Z
+ - Add Mojo::Redis2::Bulk for grouped commands
+ - Add Mojo::Redis2::Client for CLIENT commands
+
+0.05 2014-08-19T14:29:23Z
+ - Add connection event
+
+0.0401 2014-08-13T16:41:39Z
+ - Fix "Could not start Redis" test
+
+0.04 2014-08-13T16:39:28Z
+ - Fix Not enough arguments for grep at Mojo/Redis2.pm line 444, near "};"
+ - Add blpop(), brpop() and brpoplpush() as invalid methods on
+   Mojo::Redis2::Transaction
+
+0.03 2014-08-06T11:35:43Z
+ - Add watch() to Mojo::Redis2::Transaction
+ - Add blpop(), brpop() and brpoplpush() to Mojo::Redis2
+
+0.02 2014-08-06T10:20:32Z
+ - Fix the order commands are sent
+ - Fix missing dependency: Protocol::Redis
+ - Add support for transactions
+
+0.01 2014-08-05T13:32:27Z
+ - Started project
+ - Add blocking support
+ - Add message/pmessage events for pub/sub
+ - Add support for basic Redis operations
+ - Add error handling
+ - Can start Redis server
+

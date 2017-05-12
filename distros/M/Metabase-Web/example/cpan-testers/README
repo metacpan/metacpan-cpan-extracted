@@ -1,0 +1,15 @@
+These commands create and run a simple CPAN Testers metabase
+
+  $ generate_config.pl /tmp/cpan-testers-metabase/
+  $ cpan-testers-metabase.pl -C /tmp/cpan-testers-metabase/config.json
+
+Or, use the quickstart.pl script.  If you provide a directory, it will
+use that, otherwise, it will use temporary one that will be cleaned up when the
+server is terminated.
+
+  $ quickstart.pl
+
+Or
+
+  $ quickstart.pl /some/directory
+

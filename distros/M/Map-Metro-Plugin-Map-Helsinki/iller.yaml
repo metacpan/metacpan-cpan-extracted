@@ -1,0 +1,37 @@
+---
+doctype: dist
+
+header:
+  name: Map-Metro-Plugin-Map-Helsinki
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010000
+      - Moose
+      - Map::Metro: 0.2405
+      - namespace::autoclean
+
+plugins:
+  - +config: Author::CSSON
+  
+  - +replace_plugin: TravisYML
+    +with: TravisYML
+    sudo: 1
+    perl_version: 5.14 5.16 5.20
+    post_before_install: sudo apt-get install graphviz
+
+  - +extend_plugin: Git::GatherDir
+    exclude_match: \.png
+
+  - +plugin: MapMetro::MakeGraphViz
+
+  - +plugin: MapMetro::MakeLinePod
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+
+  - +remove_plugin: Splint

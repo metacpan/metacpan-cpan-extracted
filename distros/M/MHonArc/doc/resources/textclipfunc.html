@@ -1,0 +1,267 @@
+<html>
+<head>
+<title>MHonArc Resources: TEXTCLIPFUNC</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="tendlinkia.html">TENDLINKIA</a>]</td><td><nobr>[<a href="../resources.html#textclipfunc">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="textencode.html">TEXTENCODE</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>TEXTCLIPFUNC</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<ul>
+<li><small><a href="#writing">Writing a Clipping Function</a></small>
+</ul>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p>
+<code>&lt;TEXTCLIPFUNC&gt;</code><br>
+<var>function_name</var>;<var>source_file</var><br>
+<code>&lt;/TEXTCLIPFUNC&gt;</code><br>
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>TEXTCLIPFUNC defines the the Perl function to invoke when
+MHonArc clips text.  For example, the function specified would
+be invoked when a length specifier is used for a
+<a href="../rcvars.html">resource variable</a>, e.g.
+<tt>$SUBJECTNA:72$</tt>.
+</p>
+
+<p>The syntax for TEXTCLIPFUNC is as follows:
+</p>
+
+<pre>
+<var>routine-name</var>;<var>file-of-routine</var></pre>
+
+<p>The definition of each semi-colon-separated value is as follows:
+</p>
+
+<dl>
+<dt><var>routine-name</var></dt>
+    <dd><p>The actual routine name of the filter. The name
+    should be fully qualified by the package it is defined in
+    (e.g. "<code>mypackage::filter</code>").
+    </p>
+    <dd>
+<dt><var>file-of-routine</var></dt>
+    <dd><p>The name of the file that defines
+    <var>routine-name</var>. If the file is not a full
+    pathname, MHonArc finds the file by looking in the
+    standard include paths of Perl, and the paths specified by the
+    <A HREF="perlinc.html">PERLINC</A>
+    resource. 
+    </p>
+    <p><var>file-of-routine</var> can be left blank if it is
+    known that <var>routine-name</var> will already be loaded, as
+    is the case for the default value for this resource since the
+    routine is an internal MHonArc function.
+    </p>
+    </dd>
+</dl>
+
+<h3><a name="writing">Writing a Clipping Function</a></h3>
+
+<p>If you want to write your own function, you need to know the Perl
+programming language. The following information assumes you know Perl.
+</p>
+
+<h4>Function Interface</h4>
+
+<P>MHonArc interfaces with text clipping function by calling the routine
+with a specific set of arguments. The prototype of the interface
+routine is as follows: </P>
+
+<pre>
+sub <var>clip</var> {
+    my(<b>$text</b>, <b>$clip_length</b>, <b>$is_html</b>, <b>$has_tags</b>) = <!--
+-->&#64;<!--
+-->_;
+    <var># code here
+}
+</pre>
+
+<h5>Parameter Descriptions</h5>
+
+<table cellspacing=1 border=0 cellpadding=4>
+
+<tr valign=top>
+<td><strong><code>$text</code></strong></td>
+<td><p>The text to be clipped.
+</p>
+<p><b>NOTE:</b> Since Perl allows one to modify the data passed into
+it, the first argument should <strong>NOT</strong> be modified.  If
+you copy arguments from <tt><!--
+-->&#64;<!--
+-->_</tt> as shown above, then you will be
+okay since the <tt>my</tt> operation creates a copy of the arguments
+in <tt><!--
+-->&#64;<!--
+-->_</tt>.
+</p>
+</td>
+</tr>
+
+<tr valign=top>
+<td><strong><code>$clip_length</code></strong></td>
+<td><p>The number of characters <code>$text</code> should be clipped to.
+</p>
+</td>
+</tr>
+
+<tr valign=top>
+<td><strong><code>$is_html</code></strong></td>
+<td><p>The text may contain entity references, e.g. "<tt>&amp;amp;</tt>".
+Entity references should be considered a single character when
+clipping <code>$text</code>.
+</p>
+</td>
+</tr>
+
+<tr valign=top>
+<td><strong><code>$has_tags</code></strong></td>
+<td><p>The text may contain HTML tags, and the tags should be stripped
+from <code>$text</code> when generating the clip string.  For example,
+if <code>$text</code> equals "<tt>&lt;b&gt;MHonArc&lt;/b&gt;</tt>" and
+<code>$clip_length</code> equals 2, then the return value of the
+function should be "<tt>MH</tt>".
+</p>
+    <table border=0 cellpadding=4>
+    <tr valign=top>
+    <td><strong>NOTE</strong></td>
+    <td><p>The <code>$has_tags</code> argument is currently
+    not used within MHonArc, but it will likely be used in a future release.
+    </p>
+    </td>
+    </tr>
+    </table>
+</td>
+</tr>
+
+</table>
+
+<h5>Return Value</h5>
+
+<p>The return value should be the clipped version of <code>$text</code>.
+</p>
+
+<H4>Writing Tips</h4>
+
+<ul>
+<li><p>Qualify your filter in its own package. This eliminates possible 
+variable/routine conflicts with MHonArc.
+</p>
+
+<li><p>Make sure your Perl source file ends with a true statement
+(like "<code>1;</code>").  MHonArc just performs a
+<strong><code>require</code></strong>
+on the file, and if the file does not return
+true, MHonArc will revert to the default value for TEXTCLIPFUNC.
+</p>
+
+<li><p>Test your function before production use.
+</p>
+
+</ul>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<pre>
+mhonarc::clip_text;
+</pre>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>See <a href="charsetconverters.html">CHARSETCONVERTERS</a> and
+<a href="textencode.html">TEXTENCODE</a> resources for example usages
+of TEXTCLIPFUNC.
+</p>
+
+<p>The <a href="../rcfileexs/utf-8.mrc.html">utf-8.mrc</a> example
+resource file sets TEXTCLIPFUNC to a routine that understands UTF-8
+text.
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>2.5.10
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+<a href="charsetconverters.html">CHARSETCONVERTERS</a>,
+<a href="textencode.html">TEXTENCODE</a>
+</p>
+<p><a href="../rcvars.html"><cite>Resource Variables</cite></a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="tendlinkia.html">TENDLINKIA</a>]</td><td><nobr>[<a href="../resources.html#textclipfunc">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="textencode.html">TEXTENCODE</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2003/10/06 22:04:21 $<br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"><strong>MHonArc</strong></a><br>
+Copyright &#169; 2002, <a href="http://www.earlhood.com/"
+>Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org"
+>mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

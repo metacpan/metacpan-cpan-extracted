@@ -1,0 +1,33 @@
+MooseX-ErsatzMethod
+===================
+
+Created:      2012-10-02
+Home page:    <https://metacpan.org/release/MooseX-ErsatzMethod>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-ErsatzMethod>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.004	2014-09-06
+
+ [ Packaging ]
+ - use Dist::Inkt.
+
+ [ Other ]
+ - Drop the dependency on thanks.pm; use Module::Runtime (which Moose
+   already requires) instead.
+
+0.003	2012-10-02
+
+ [ Bug Fixes ]
+ - Remove smartmatch usage from test suite, for Perl 5.8 compatibility.
+
+0.002	2012-10-02
+
+ [ Bug Fixes ]
+ - When classes consume roles which provide an ersatz method plus a real
+   implementation, they should get the real implementation. Yes this does
+   happen - e.g. when roles are composed.
+
+ [ Packaging ]
+ - Improved test suite.
+
+0.001	2012-10-02	Initial release

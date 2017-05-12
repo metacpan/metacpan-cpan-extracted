@@ -1,0 +1,29 @@
+Revision history for Perl module Memoize::ExpireLRU
+
+0.56 2016-07-07 NEILB
+    - Switched from using the deprecated TIE interface for Memoize
+    - Refactored to current traditional directory structure
+    - Switched to Dist::Zilla
+
+0.55_02 2016-07-02 NEILB
+    - Switched from using the deprecated TIE interface for Memoize,
+      RT#115091
+
+0.55_01 2016-03-09 NEILB
+    - Switched to Dist::Zilla
+    - Moved ExpireLRU.pm to lib/Memoize/ExpireLRU.pm
+    - Moved test.pl to t/02-original.t
+    - Updated this file to follow CPAN::Changes::Spec, and most recent
+      release first.
+    - Added github repo to doc
+
+0.55 2000-04-12 BPOWERS
+	- Just why can't you save from a screwed up upload on PAUSE?
+	- Big bug fixes. Consider this the first working version
+
+0.53 2000-04-07 BPOWERS
+	- Tiny bug fixes (!= -> ne)
+
+0.52 2000-03-14 BPOWERS
+	- original version
+

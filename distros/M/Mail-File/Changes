@@ -1,0 +1,76 @@
+Revision history for Mail-File
+==============================
+
+0.13    2014-10-12
+        - fixed license fields in META.json to be lists.
+
+0.12    2014-05-21
+        - fixed distribution name in META.
+        - added git repo to resources.
+
+0.11    2013-07-14
+        - change file dates changed to meet W3CDTF standards.
+        - documentation updates.
+
+0.10	2012-08-08
+	    - forgot to update the MANIFEST!
+        - Devel::Cover - 97.5%
+
+0.09    2012-08-05
+        - removed License files from distro.
+        - Artistic License v2 now sole license.
+        - removed DSLIP info.
+        - spelling fixes. (thanks to Nicholas Bamber, Florian Schlichting &
+          Gregor Herrmann).
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - updated META.yml testing.
+        - added META.json
+        - added Change file tests
+
+0.08    2007-03-02
+        - Added Time::Piece to the mix to ensure we have a valid date written
+          to the file to conform to the Internet Mail RFC specs.
+        - Directory created only when we "send" the mail to disk. Also now
+          checks we have created the directory before writing the file.
+        - Refined tests.
+        - Handwritten META.yml to conform to current specs.
+        - Changed all instances of LICENCE to LICENSE.
+        - Added META.yml test script.
+        - Added LICENSE and Artistic files.
+        - Added an examples directory. Nothing in it yet, except a request
+          for interesting scripts.
+        - POD/README updates
+        - Devel::Cover - 99.2%
+
+0.07    2005-03-21
+        - more tests to fill the holes Devel::Cover found.
+        - Added DSLIP information
+
+0.06    2005-03-19
+        - reinserted structures
+
+0.05    2005-01-26
+        - removed unnecessary comments
+        - removed uncecessary Exporter functionality
+
+0.04    2003-10-28
+        - extracated the cpan-testing directory out of Mail-File. This is now
+          going to be a special distribution of it's own.
+        - Message now Body.
+        - X-Headers can be passed via the hash.
+        - sprintf overhead removed ... no idea why I did that!
+
+0.03    2003-10-08
+        - POD updates
+
+0.02    2003-10-07
+        - cpan-testing files updated to use /.smoke/mailfiles
+          for reports directory.
+        - removed move-mailfiles.pl as the change above renders
+          it obsolete.
+        - Mail::File creates the directory of the template (if
+          there is one) if it can.
+
+0.01    2003-10-06
+        - original version;

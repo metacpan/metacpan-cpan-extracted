@@ -1,0 +1,42 @@
+---
+abstract: 'Simple Framework for MapReduce'
+author:
+  - 'Toshiaki Yokoda <adokoy001@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MapReduce-Framework-Simple
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MapReduce::Framework::Simple:
+    file: lib/MapReduce/Framework/Simple.pm
+    version: '0.04'
+requires:
+  Data::MessagePack: '0'
+  Mouse: '0'
+  Parallel::ForkManager: '0'
+  Plack: '0'
+  Plack::Runner: '0'
+  WWW::Mechanize: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/adokoy001/MapReduce-Framework-Simple/issues
+  homepage: https://github.com/adokoy001/MapReduce-Framework-Simple
+  repository: git://github.com/adokoy001/MapReduce-Framework-Simple.git
+version: '0.04'

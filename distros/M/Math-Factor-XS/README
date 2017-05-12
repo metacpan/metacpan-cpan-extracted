@@ -1,0 +1,88 @@
+NAME
+    Math::Factor::XS - Factorize numbers and calculate matching
+    multiplications
+
+SYNOPSIS
+     use Math::Factor::XS ':all';
+     # or
+     use Math::Factor::XS qw(factors prime_factors matches);
+
+     $number = 30107;
+
+     @factors = factors($number);
+     @primes = prime_factors($number);
+     @matches = matches($number, \@factors);
+
+     print "$factors[1]\n";
+     print "$number == $matches[0][0] * $matches[0][1]\n";
+
+DESCRIPTION
+    "Math::Factor::XS" factorizes numbers by applying trial divisions.
+
+FUNCTIONS
+  factors
+    Find all factors (ie. divisors) of a number.
+
+     @factors = factors($number);
+
+    The number is factorized and its factors are returned as a list. For
+    example,
+
+     @factors = factors(30);
+     #  @factors = (2, 3, 5, 6, 10, 15);
+
+  prime_factors
+    Find prime factors of a number.
+
+     @factors = prime_factors($number);
+
+    The number is factorized and its prime factors are returned as a list.
+    Multiplying the list together gives $number. For example,
+
+     @primes = prime_factors(90);
+     #  @primes = (2, 3, 3, 5);
+
+  count_prime_factors
+    Return the count of prime factors of a number. This is the number of
+    values returned by "prime_factors()".
+
+     my $count = count_prime_factors($number);
+
+  matches
+    Calculates matching multiplications.
+
+     @matches = matches($number, \@factors, { skip_multiples => [0|1] });
+
+    The factors will be multiplied against each other and all combinations
+    that equal the number itself will be returned as a two-dimensional list.
+    The matches are accessible through the indexes; for example, the first
+    two numbers that matched the number may be accessed by $matches[0][0]
+    and $matches[0][1], the second pair by $matches[1][0] and
+    $matches[1][1], and so on.
+
+    The hashref provided at the end is optional. If "skip_multiples" is set
+    to a true value, then matching multiplications that contain
+    multiplicated small factors will be discarded. Example:
+
+     11 * 2737 == 30107 # accepted
+     77 * 391  == 30107 # discarded
+
+    Direct use of $Math::Factor::XS::Skip_multiple does no longer have an
+    effect as it has been superseded by "skip_multiples".
+
+EXPORT
+  Functions
+    "factors()", "matches()" and "prime_factors()" are exportable.
+
+  Tags
+    ":all - *()"
+
+AUTHOR
+    Steven Schubiger <schubiger@cpan.org>
+
+LICENSE
+    This program is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://dev.perl.org/licenses/>
+

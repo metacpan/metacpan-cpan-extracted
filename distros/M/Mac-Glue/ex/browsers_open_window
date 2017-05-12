@@ -1,0 +1,16 @@
+#!perl -w
+use Mac::Glue;
+
+my($n, @browsers);
+
+@browsers = qw(Safari OmniWeb Firefox Camino Mozilla);
+
+for my $browser (@browsers) {
+	my $n = eval {
+		new Mac::Glue $browser
+	};
+	next unless $n;
+	
+	$n->activate;
+	$n->open_location('http://projects.pudge.net/');
+}

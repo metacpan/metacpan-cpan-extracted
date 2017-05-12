@@ -1,0 +1,9 @@
+severity  = 5
+
+[-Subroutines::ProhibitSubroutinePrototypes]
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Evo
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Evo

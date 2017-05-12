@@ -1,0 +1,6 @@
+use blib;
+use utf8;
+use Markup::Perl;
+<h1>smile ☺</h1>
+<perl>print "<h2>€1</h2>";</perl>
+<h3><perl>src('t/utf2.xml')</perl></h3>

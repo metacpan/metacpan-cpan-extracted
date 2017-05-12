@@ -1,0 +1,13 @@
+Revision history for Module-PluginFinder
+
+0.04    CHANGES:
+         * Various small updates to keep CPANTS happy
+
+0.03    CHANGES:
+         * Ignore modules whose typefunc returns 'undef'
+
+0.02    CHANGES:
+         * Added Module::PluginFinder->rescan() method
+
+0.01    First version, released on an unsuspecting world.
+

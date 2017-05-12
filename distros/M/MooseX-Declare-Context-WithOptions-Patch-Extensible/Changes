@@ -1,0 +1,14 @@
+MooseX-Declare-Context-WithOptions-Patch-Extensible
+===================================================
+
+Created:      2012-08-20
+Home page:    <https://metacpan.org/release/MooseX-Declare-Context-WithOptions-Patch-Extensible>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Declare-Context-WithOptions-Patch-Extensible>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.001	2012-08-20	Initial release

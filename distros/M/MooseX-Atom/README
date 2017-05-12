@@ -1,0 +1,78 @@
+NAME
+    MooseX::Atom - Non-immutable classes are silly. Lets fix that.
+
+SYNOPSIS
+      # Catalyst the official way
+      package Foo;
+      
+  use Moose;
+      use namespace::autoclean;
+      
+  BEGIN {
+          extends 'Catalyst::Controller::REST';
+          
+      with 'My::Something';
+      }
+      
+  __PACKAGE__->meta->make_immutable;
+      
+  
+  
+  # Catalyst the (equivalent) atomic way
+      package Bar;
+      
+  use MooseX::Atom [
+            extends => 'Catalyst::Controller::REST',
+            with    => 'My::Something',
+      ];
+
+DESCRIPTION
+    WARNING: THIS MODULE IS PRIMARILY A POLITICAL STATEMENT AT THIS TIME AND
+    MAY CHANGE WITHOUT NOTICE IN RESPONSE TO FEEDBACK
+
+    Moose is an interesting object system, but it's interface can leave a
+    lot to be desired.
+
+    Classes are built incrementally at post-BEGIN time despite the
+    appearance to being declared at compile time.
+
+    Classes are also polluted by exported symbols by default.
+
+    Additionally, the syntax of the workarounds to reverse some of this
+    weirdness is ugly. "__PACKAGE__-"meta->make_immutable> is possibly one
+    of the worst official API interactions of all time.
+
+    MooseX::Atom attempts to resolve as much of this as possible, in as
+    little code as possible and with no additional dependencies or dramatic
+    parser-alterations such as with MooseX::Declare.
+
+    Declarations are passed directly in the "use" line, nothing is left in
+    the calling class, and the class will be automatically and immediately
+    immutable.
+
+    The resulting alternative syntax for Moose may not be ideal, but it
+    demonstrates the kind of alternative syntactic sugar that would at least
+    be far nicer than the one we get out of the box.
+
+    Equivalent syntactic sugar for roles is provided by MooseX::Role::Atom.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MooseX-Atom>
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    Moose
+
+COPYRIGHT
+    Copyright 2010 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

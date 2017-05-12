@@ -1,0 +1,5 @@
+=pod
+
+package Foo;
+
+=cut

@@ -1,0 +1,41 @@
+INSTALLING MUCKOS:
+
+These are the basic high level instructions - more details to follow:
+
+0) If you are using Fuse-0.08, apply the etc/Fuse-0.08-get-context.diff patch
+   and install it.  If Fuse 0.09 is stable on CPAN, just use that - it should
+   have the patch.
+
+1) Install Muck from CPAN - the tests will fail since we don't yet mount a 
+filesystem for testing. 
+
+2) Install memcached from www.danga.com
+
+3) Install MySQL 5.1.x from www.mysql.com
+
+4) Setup MySQL:
+   a) Create database and account
+      mysql> CREATE DATABASE muckfsdb;
+      mysql> GRANT SELECT, INSERT, UPDATE, DELETE ON muckfsdb.* TO muckfs@"%"\
+             IDENTIFIED BY 'password';
+      mysql> FLUSH PRIVILEGES;
+
+   b) Create tables
+      $ mysql -uroot -p muckfsdb < etc/muckfs.sql
+
+5) Create local cache directory:
+   # mkdir /mnt/muckFScache
+
+6) Copy etc/muckfs.conf.orig to yourpath/muckfs.conf and edit it with your
+   AWS info, your local cache dir (should be under /mnt for EC2 instances)
+
+7) Start memcached:
+   #  memcached -u nobody
+
+8) Mount muckFS as a filesystem
+   $ mkdir /mnt/muckfs
+   $ sudo ./muckFS etc/muckfs.conf /mnt/muckfs
+
+9) export MUCKFS_TESTDIR= /mnt/muckfs
+
+10) run the bin/test-muckFS.pl

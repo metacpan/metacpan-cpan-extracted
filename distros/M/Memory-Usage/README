@@ -1,0 +1,42 @@
+Memory-Usage
+
+This module lets you attempt to measure, from your operating system's
+perspective, how much memory a process is using at any given time.
+
+Precision is currently limited to the system's page size (assumed to be 4kb).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Memory::Usage
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Memory-Usage
+
+    Search CPAN
+        http://search.cpan.org/dist/Memory-Usage/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Dave O'Neill
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

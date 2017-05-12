@@ -1,0 +1,10 @@
+Revision history for MooseX-Params
+
+0.003   07/11/2012
+        * New extensible handler interface
+
+0.002   04/04/2011
+        * Minimum required version for Package::Stash
+
+0.001   30/03/2011
+        * Initial upload to CPAN

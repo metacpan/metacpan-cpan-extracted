@@ -1,0 +1,28 @@
+---
+abstract: 'mro::* interface compatibility for Perls < 5.9.5'
+author:
+  - 'Brandon L. Black <blblack@gmail.com>'
+build_requires:
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MRO-Compat
+no_index:
+  directory:
+    - t
+    - xt
+requires:
+  perl: '5.006'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MRO-Compat
+  homepage: https://metacpan.org/release/MRO-Compat
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/moose/MRO-Compat.git
+version: '0.13'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,26 @@
+
+
+
+SV *     newSVi128 (pTHX_ int128_t i128)
+SV *     newSVu128 (pTHX_ uint128_t u128) 
+int128_t SvI128    (pTHX_ SV *sv)
+int128_t SvU128    (pTHX_ SV *sv)
+int      SvI128OK  (pTHX_ SV*)
+int      SvU128OK  (pTHX_ SV*)
+
+module_c_beginning = <<FRAG
+
+#if ((__GNUC__ == 4) && (__GNUC_MINOR__ < 6))
+
+/* workaroung for gcc 4.4/4.5 - see http://gcc.gnu.org/gcc-4.4/changes.html */
+typedef int int128_t __attribute__ ((__mode__ (TI)));
+typedef unsigned int uint128_t __attribute__ ((__mode__ (TI)));
+
+#else
+
+typedef __int128 int128_t;
+typedef unsigned __int128 uint128_t;
+
+#endif
+
+FRAG

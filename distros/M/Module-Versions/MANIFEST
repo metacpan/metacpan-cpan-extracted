@@ -1,0 +1,18 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01-Module-Versions.t
+t/02-new.t
+t/03-get.t
+t/04-list.t
+t/05-data.t
+t/06-preform.t
+t/98-pod_coverage.t
+t/99-pod.t
+lib/Module/Versions.pm
+examples/01_app.pl
+examples/02_app.pl
+examples/win32/01_app.bat
+examples/win32/02_app.bat
+META.yml                                 Module meta-data (added by MakeMaker)

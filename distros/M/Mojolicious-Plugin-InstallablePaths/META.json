@@ -1,0 +1,62 @@
+{
+   "abstract" : "Easy installation configuration for Mojolicious apps",
+   "author" : [
+      "Joel Berger"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-InstallablePaths",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ],
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "1",
+            "Module::Build" : "0.38",
+            "Module::Build::CleanInstall" : "0.05",
+            "Mojolicious" : "3"
+         }
+      }
+   },
+   "provides" : {
+      "Module::Build::Mojolicious" : {
+         "file" : "lib/Module/Build/Mojolicious.pm",
+         "version" : "0.03"
+      },
+      "Mojolicious::Plugin::InstallablePaths" : {
+         "file" : "lib/Mojolicious/Plugin/InstallablePaths.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jberger/Mojolicious-Plugin-InstallablePaths/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jberger/Mojolicious-Plugin-InstallablePaths"
+      }
+   },
+   "version" : "0.04"
+}

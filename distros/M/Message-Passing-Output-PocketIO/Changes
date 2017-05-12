@@ -1,0 +1,6 @@
+Revision history for Perl extension Message::Passing::Output::PocketIO.
+
+0.01  Sun Dec 23 21:21:07 2012
+	- original version; created by h2xs 1.23 with options
+		-XA -n Message::Passing::Output::PocketIO
+

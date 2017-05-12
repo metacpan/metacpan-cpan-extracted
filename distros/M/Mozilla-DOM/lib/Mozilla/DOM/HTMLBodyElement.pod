@@ -1,0 +1,122 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLBodyElement
+
+=for object Mozilla::DOM::HTMLBodyElement
+
+Mozilla::DOM::HTMLBodyElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLBodyElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLBodyElement interface is the interface to a [X]HTML
+ * body element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLBodyElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $alink = $htmlbodyelement->B<GetALink>()
+
+=head2 $background = $htmlbodyelement->B<GetBackground>()
+
+=head2 $bgcolor = $htmlbodyelement->B<GetBgColor>()
+
+=head2 $link = $htmlbodyelement->B<GetLink>()
+
+=head2 $text = $htmlbodyelement->B<GetText>()
+
+=head2 $vlink = $htmlbodyelement->B<GetVLink>()
+
+=head2 $htmlbodyelement->B<SetALink>($alink)
+
+=over
+
+=over
+
+=item * $alink (string)
+
+=back
+
+=back
+
+=head2 $htmlbodyelement->B<SetBackground>($background)
+
+=over
+
+=over
+
+=item * $background (string)
+
+=back
+
+=back
+
+=head2 $htmlbodyelement->B<SetBgColor>($bgcolor)
+
+=over
+
+=over
+
+=item * $bgcolor (string)
+
+=back
+
+=back
+
+=head2 $htmlbodyelement->B<SetLink>($link)
+
+=over
+
+=over
+
+=item * $link (string)
+
+=back
+
+=back
+
+=head2 $htmlbodyelement->B<SetText>($text)
+
+=over
+
+=over
+
+=item * $text (string)
+
+=back
+
+=back
+
+=head2 $htmlbodyelement->B<SetVLink>($vlink)
+
+=over
+
+=over
+
+=item * $vlink (string)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

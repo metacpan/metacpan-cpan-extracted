@@ -1,0 +1,34 @@
+---
+name: Mail-DSPAM-Learning
+version: 0.1
+author:
+  - 'Thierry Hamon <thierry.hamon@lipn.univ-paris13.fr>'
+abstract: Perl extension for correcting spam learning of a DPSAM server
+license: gpl
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+requires:
+  Email::Send: 0
+  File::Basename: 0
+  File::Path: 0
+  Getopt::Long: 0
+  Mail::Box::Manager: 0
+  Mail::Builder: 0
+  Mail::MboxParser: 0
+  Module::TestConfig: 0
+  Net::DNS: 0
+  Pod::Usage: 0
+  Sys::HostIP: 0
+  Term::ReadKey: 0
+  perl: 5.8.8
+build_requires:
+  Module::Build: 0.28
+  Test::More: 0.62
+provides:
+  Mail::DSPAM::Learning:
+    file: lib/Mail/DSPAM/Learning.pm
+    version: 0.1
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

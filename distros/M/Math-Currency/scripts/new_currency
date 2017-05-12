@@ -1,0 +1,236 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use Getopt::Std;
+use Math::Currency qw($LC_MONETARY);
+use Fatal qw(open);
+
+Math::Currency->import('$LC_MONETARY');
+
+my %opts;
+getopts('hf', \%opts);
+
+if ($opts{h}) {
+    usage();
+}
+
+my $lang = shift @ARGV;
+
+if ($lang) {
+    require POSIX;
+    my $locale = POSIX::setlocale(&POSIX::LC_ALL, $lang);
+    if ($locale ne $lang) {
+        die "Locale $lang is not available on this system";
+    }
+}
+else {
+    $lang = $ENV{'LANG'};
+}
+
+my $format = {};
+
+Math::Currency->localize( \$format )
+    or die "Cannot determine your locale currency format";
+
+my ($localename) = split(/\./,$lang);
+
+generate_packages($localename);
+
+sub generate_packages {
+    my $localename = shift;
+
+    (my $currency = $format->{INT_CURR_SYMBOL}) =~ s/ //g; # strip trailing spaces
+
+    generate_locale_class($localename, $currency);
+    generate_currency_class($localename, $currency);
+    generate_test_case($localename, $currency);
+}
+
+sub generate_locale_class {
+    my ($localename, $symbol_locale) = @_;
+
+    my $package = << "EOL";
+package Math::Currency::${localename};
+
+# ABSTRACT: ${localename} Module for Math::Currency
+
+use utf8;
+use strict;
+use warnings;
+use Math::Currency qw(\$LC_MONETARY \$FORMAT);
+use base qw(Exporter Math::Currency);
+
+our \$LANG    = '$localename';
+
+\$LC_MONETARY->{$localename} = {
+EOL
+
+    # en_US is hard-coded into Math::Currency, so we can pull the param names
+    # from that.
+    my @param_lines;
+    for my $param (sort keys %{ $LC_MONETARY->{en_US} }) {
+        unless (defined $format->{$param}) {
+            die "Missing $param from locale; cannot proceed";
+        }
+
+        push @param_lines, sprintf(q[    %-17s => '%s'], $param, $format->{$param});
+    }
+
+    $package .= join (",\n", @param_lines) . "\n};\n";
+
+    $package .= <<"EOL";
+
+require Math::Currency::${symbol_locale};
+
+1;
+EOL
+
+    my $filename = "lib/Math/Currency/$localename.pm";
+
+    unless ($opts{f}) {
+        if (-f $filename) {
+            die "The $localename locale has already been generated\n";
+        }
+    }
+
+    print "Outputting subclass for $localename\n";
+
+    open my $fh, '>', $filename
+        or die "Cannot open the module output file: $filename: $!";
+
+    print $fh $package;
+    close $fh;
+}
+
+sub generate_currency_class {
+    my ($localename, $symbol_locale) = @_;
+
+    my $filename = "lib/Math/Currency/${symbol_locale}.pm";
+
+    unless ($opts{f}) {
+        if (-f $filename) {
+            die "The $symbol_locale package has already been generated\n";
+        }
+    }
+
+    open my $fh, '>', $filename
+        or die "Cannot open module output file: $filename: $!";
+
+    print $fh <<"EOL";
+package Math::Currency::${symbol_locale};
+
+# ABSTRACT: ${symbol_locale} Currency Module for Math::Currency
+
+use strict;
+use warnings;
+use base 'Math::Currency::${localename}';
+
+\$Math::Currency::LC_MONETARY->{$symbol_locale} =
+    \$Math::Currency::LC_MONETARY->{$localename};
+
+1;
+EOL
+
+    close $fh;
+}
+
+sub generate_test_case {
+    my ($localename, $symbol_locale) = @_;
+
+    my $filename = "t/999_locale_$localename.t";
+
+    unless ($opts{f}) {
+        if (-f $filename) {
+            die "test output file $filename already exists\n";
+        }
+    }
+
+    open my $fh, '>:encoding(UTF-8)', $filename;
+
+    my $num_tests = scalar(keys %{ $LC_MONETARY->{en_US} }) + 4;
+
+    print $fh <<EOT;
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use lib 't/lib';
+
+use Test::More;
+use Test::More::UTF8;
+use My::Test::Util;
+use Math::Currency qw(\$LC_MONETARY);
+use POSIX;
+
+plan tests => 2;
+
+my \$format = {};
+
+my \%LocaleData = (
+EOT
+
+    for my $param (sort keys %{ $LC_MONETARY->{en_US} }) {
+        print $fh sprintf(q[    %-17s => '%s',], $param, $$format{$param}), "\n";
+    }
+
+    print $fh <<EOT;
+);
+
+EOT
+
+    for my $locale ($localename, $symbol_locale) {
+        print $fh <<EOT;
+subtest '$locale' => sub {
+    plan_locale($localename => $num_tests);
+
+    use_ok('Math::Currency::${locale}');
+
+    Math::Currency->localize(\\\$format);
+
+    for my \$param (sort keys \%LocaleData) {
+        is \$format->{\$param}, \$LocaleData{\$param};
+    }
+
+    my \$obj = new_ok 'Math::Currency', ['12345.67', '$locale'];
+
+    ok index("\$obj", \$LocaleData{CURRENCY_SYMBOL}) != -1,
+        'string contains currency symbol';
+    ok index("\$obj", \$LocaleData{MON_THOUSANDS_SEP}) != -1,
+        'string contains thousands separator';
+};
+
+EOT
+    }
+
+    close $fh;
+}
+
+
+exit 0;
+
+sub usage {
+    print <<EOL;
+USAGE:
+
+    perl scripts/new_currency -f [locale]
+
+    Create a new currency format module.  If the locale is not specified;
+    attempt to use the current locale settings.  Otherwise, load the
+    specified locale and attempt to use that instead.  Use the standard 
+    names for locale's as returned by `locale -a` e.g. en_GB.
+
+    The program will attempt to create a module in the following directory:
+
+        lib/Math/Currency/
+
+    so the script should be run from the base of the Math::Currency build
+    tree.  If the requested locale format file already exists, the
+    program will stop with an error unless you also include the '-f' option.
+
+    Once you have built all of the additional locale subclasses, you can 
+    rerun `./Build install` and the additional files will be added to your
+    local Perl installation.
+EOL
+    exit 1;
+}

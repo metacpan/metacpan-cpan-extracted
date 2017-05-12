@@ -1,0 +1,53 @@
+Mac::iPod::GNUpod
+=============================
+v. 0.1
+
+ABOUT
+
+This module allows you to manipulate the databases and files on your iPod. It
+is a re-implementation of the GNUpod package for manipulating an iPod. This
+module provides methods for initializing your iPod, adding and removing songs,
+and reading and writing databases in the iTunes and GNUpod formats. This module
+is based on the GNUpod script package, written and distributed by Adrian
+Ulrich, (pab at blinkenlights.ch). URL: L<http://www.gnu.org/software/gnupod/>.
+
+This module is currently only available for Unix and Unix-like systems, which
+probably includes GNU/Linux, FreeBSD, MacOSX and above, and Solaris. YMMV.
+
+DEPENDENCIES
+
+The following perl modules are required:
+
+MP3::Info
+MP4::Info
+XML::Parser
+Unicode::String
+File::Copy
+File::Spec::Mac
+Audio::Wav
+
+No other external programs are needed.
+
+INSTALLATION
+
+Recommended: use the CPAN shell (part of the standard CPAN module) or another
+perl package manager.
+
+Otherwise: At the shell type:
+    perl ./Makefile.pl
+    make
+    make test
+    make install
+
+As a last resort, you can simply unzip and untar the package yourself and put
+the files where you'd like them.
+
+COPYRIGHT AND LICENSE
+
+The original GNUpod toolset is (c) 2002-2003 Adrian Ulrich and is distributed
+under the GNU General Public License. The adaptation for CPAN is (c) 2003-2008
+JS Bangs, and is distributed under the same terms as Perl itself. A copy of the
+GPL is included in the LICENSE file.
+
+iTunes and iPod are trademarks of Apple. This product is neither supported nor
+associated with Apple.

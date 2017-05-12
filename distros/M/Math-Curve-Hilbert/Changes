@@ -1,0 +1,21 @@
+Revision history for Perl extension Math::Curve::Hilbert.
+
+0.01  Wed May 21 22:25:46 2003
+	- original version; created by h2xs 1.21 with options
+		-X Math::Curve::Hilbert
+
+0.02  Thu May 22 13:30 2003
+    - fixed errors in documentation
+    - added optional step size
+
+0.03  [ forgotten ]
+    - fixed some bugs probably
+
+0.04  Fri Jan 30 18:44 2004
+    - now Object Oriented !
+    - fixed error in step size
+    - can now get coords from point or vice-versa
+    - added ability to get range of points from set of coords
+    - added small test suite to check sanity
+    - improved pod
+    - fixed error when starting bottom right and working anti-clockwise

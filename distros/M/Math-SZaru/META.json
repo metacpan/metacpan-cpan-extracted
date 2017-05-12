@@ -1,0 +1,61 @@
+{
+   "abstract" : "Perl wrapper for the SZaru C++ library",
+   "author" : [
+      "Steffen Mueller, E<lt>smueller@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-SZaru",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::Typemaps::Default" : "0.01",
+            "ExtUtils::XSpp" : "0.16"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Devel::CheckLib" : "0",
+            "ExtUtils::CChecker" : "0",
+            "ExtUtils::CppGuess" : "0.07",
+            "File::Copy" : "0",
+            "File::Find" : "0",
+            "Module::Build" : "0.40",
+            "Module::Build::WithXSpp" : "0.13"
+         }
+      }
+   },
+   "provides" : {
+      "Math::SZaru" : {
+         "file" : "lib/Math/SZaru.pm",
+         "version" : "0.01"
+      },
+      "Math::SZaru::QuantileEstimator" : {
+         "file" : "lib/Math/SZaru/QuantileEstimator.pm",
+         "version" : 0
+      },
+      "Math::SZaru::TopEstimator" : {
+         "file" : "lib/Math/SZaru/TopEstimator.pm",
+         "version" : 0
+      },
+      "Math::SZaru::UniqueEstimator" : {
+         "file" : "lib/Math/SZaru/UniqueEstimator.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01"
+}

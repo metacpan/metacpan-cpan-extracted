@@ -1,0 +1,3 @@
+MYSQL_HOST=localhost
+MYSQL_DBNAME=mysql_querymulti
+MYSQL_USER=root

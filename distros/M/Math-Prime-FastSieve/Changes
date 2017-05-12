@@ -1,0 +1,124 @@
+Revision history for Perl extension Math::Prime::FastSieve.
+
+0.19 2013-07-26
+  - Fixed a POD formatting issue.
+  - Renamed the ranged_primes test in t/03sieve_object.t to make it easier to
+    locate.
+  - Added examples/ranged_primes.pl to show how to use the method.
+  
+0.18 2012-12-07
+  - C++ code improvemenets (readability via typedef, pre-increment
+    micro-optimization)
+
+0.17 2012-11-24
+  - Fixed #RT81399: count_sieve()'s cached value was being clobbered by calls
+    to primes().  Closes #RT81399.
+  - Added t/13synopsis.t to test the POD synopsis code (which turned out to
+    exercise the bug reported in #RT81399).
+
+0.16 2012-11-23
+  - Fixed a versioning issue that was preventing CPAN indexing.
+  - Minor POD revisions.
+  - Added tests for META.*
+
+0.15 2012-11-20
+  - Added a test to the nth_prime tests.
+  - is_prime() is now an alias for the isprime() method.
+
+0.14 2012-11-02
+  - "Changes" is now CPAN::Changes::Spec compliant
+  - Added t/09changes.t
+  - Moved t/09primes_test.t to t/10primes_test.t
+
+0.13 2012-09-17
+  - Switched the sieve member data from explicit dynamic allocation (pointer)
+    to STL-handled allocation (no explicit pointers involved).
+  - Converted constructor to use an initializer list instead of in-body
+    initialization.
+
+0.12 2012-05-30
+  - Fixed version number consistancy.
+  - Bumped version number to 0.12.
+
+0.11 2012-05-30
+  - Memory and speed performance improvements contributed by Dana Jacobsen:
+    Represent only odds in the bit sieve (halving the size).
+  - Improved type safety (explicitly specify UL and static casting of
+    size_type to UL where it makes sense to do so).
+  - Added proper (modern) C++ class member data initializers.
+  - FastSieve.pm now perlcritic friendly at all severity levels.
+  - Worked through a bunch of Perl::Critic issues in the test suite.
+
+0.10 2012-05-24
+  - Added an END{} block with code that will satisfy Inline so that no
+    warnings are generated if M::P::FS is "require"d instead of "use"d.
+    (Issue raised by Dana Jacobsen, patch by Sisyphus -- Thanks all!)
+  - Patched both implementations of the Primes Sieve of Eratosthenes to
+    increment inner loop j+=2 instead of ++j.  This optimization yields a
+    substantial performance increase (in the area of 20-30%) for the
+    exported 'primes()' function, for example. ( Suggestion from
+    Dana Jacobsen ).
+  - Converted all subs to accept longs instead of ints as parameters, as
+    well as to return longs.  That means for Perls compiled with long
+    support, the prime sieve can go past 2.7 billion. ( Again, thanks to
+    Dana Jacobsen for the suggestion.
+  - NOTE: If smoke testing determines that the 'long' support breaks
+    compatibility with 32 bit Perls this particular patch may be rolled
+    back, or may be implemented as a separate function that only compiles
+    into 64 bit Perls.  In this release, 'long' support is experimental.
+
+0.09 2012-05-10
+  - Fixed email address in Makefile.PL.  How did I miss that for so long?
+  - Added 'META_MERGE => provides' field to Makefile.PL
+
+0.08 2012-05-08
+  - Inline::CPP version requirement is now 0.39.
+  - Inline and Inline::C requirement is now v0.50.
+  - Explicit version number requirements for ExtUtils::MakeMaker and
+    Test::More.
+  - MIN_PERL_VERSION meta tag now used instead of 'use 5.006000;' at the top
+    of Makefile.PL.  This is cleaner and nicer.
+  - Added optional RELEASE_TESTING tests for Perl::Critic, Test::Pod,
+    and Test::Pod::Coverage.
+
+0.07 2012-02-07
+  - Bump Inline::CPP version requirement to 0.34 to gain broader
+    install success.  Inline::CPP v0.33 was failing for a lot of smokers.
+    V0.34 seems to be much better in that regard, so by requiring that
+    version more smokers will be able to set up M::P::FS.
+
+0.06 2012-01-20
+  - Fixed "world writable" directories (that's what I get for preparing
+    a distro via Windows.
+
+0.05 2012-01-20
+  - Repaired test suite (mistakenly omitted from previous distribution).
+  - Converted all C++ subs to type-safe unsigned ints and
+    std::vector<bool>::size_type to eliminate potential for signed
+    roll-over errors.  Note: input params are still signed ints because
+    pure-Perl offers no means of creating an SV containing a UV.
+
+0.04 2011-12-14
+  - Listed Inline::MakeMaker as both a BUILD_REQUIRES and a
+    CONFIG_REQUIRES so that the various installation tools (cpan, cpanm,
+    cpanplus) pull in the module prior to running Makefile.PL.
+  - Documentation improvements.
+  - Added a few more tests.
+  - Set minimum Perl version to 5.6.0.  If this causes smoke test failures
+    I will revert to 5.8.0 again.
+
+0.03 2011-12-13
+  - Revisions to the documentation.
+  - Listed Inline as a build dependency in an effort to get better
+    successful install rate, particularly among people who haven't
+    already installed Inline.  This should deal with the issue that
+    Inline::MakeMaker isn't found, causing Makefile.PL to abort.
+  - Added ranged_primes() method.
+  - Added tests for ranged_primes method.
+
+0.02 2011-12-11
+  - Fixed minimum Perl version: was 5.14.2.  Now 5.8.0.
+
+0.01 2011-12-10
+  - original version; created by h2xs 1.23 with options
+  -PAXn Math::Prime::FastSieve

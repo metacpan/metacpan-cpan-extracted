@@ -1,0 +1,252 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use IO::File;
+use Pod::Usage;
+use Getopt::Std;
+use Mail::Abuse::Report;
+
+use constant DEBUG	=> 'debug abuso';
+use constant READER	=> 'abuso reader';
+use constant PARSERS	=> 'abuso parsers';
+use constant FILTERS	=> 'abuso filters';
+use constant PROCESSORS	=> 'abuso processors';
+
+use vars qw/$opt_I $opt_F $opt_P $opt_R $opt_c $opt_d $opt_v/;
+
+our $VERSION = do { my @r = (q$Revision: 1.8 $ =~ /\d+/g); sprintf " %d."."%03d" x $#r, @r };
+
+getopts('I:P:F:R:c:dv');
+
+my $config = {};
+
+my $fh = new IO::File $opt_c;
+
+die "Failed to open config file $opt_c: $!\n" unless ($fh);
+
+while (<$fh>)
+{
+    chomp;
+    s/\#.*$//g;
+    next unless /^([^:]+):\s*(.*)$/;
+    $config->{lc $1} = $2;
+}
+
+# eval { $config = Config::Auto::parse($opt_c, format => 'colon'); };
+
+sub norm($)
+{
+    if (ref $config->{$_[0]})
+    {
+	return $config->{$_[0]};
+    }
+    elsif (defined $config->{$_[0]})
+    {
+	return $config->{$_[0]} = [ split /[\s,]+/, $config->{$_[0]} ];
+    }
+    else
+    {
+	return;
+    }
+}
+
+sub _use($$)
+{
+    my $new;
+
+    eval "use $_[0];";
+
+    if ($@)
+    {
+	eval "use $_[1]$_[0];";
+	die "Failed to load module $_[0] (or $_[1]$_[0]): $@\n" if $@;
+	warn "Base-loaded '$_[1]$_[0]'\n" if $opt_d;
+	$new = "$_[1]$_[0]"->new;
+	die "Failed to create new object of $_[1]$_[0]\n" unless $new;
+    }
+    else
+    {
+	warn "Loaded '$_[0]'\n" if $opt_d;
+	$new =  "$_[0]"->new;
+	die "Failed to create new object of $_[0]\n" unless $new;
+    }
+    return $new;
+}
+
+$opt_I = [ split(/[,\s]+/, $opt_I) ] if $opt_I;
+$opt_F = [ split(/[,\s]+/, $opt_F) ] if $opt_F;
+$opt_P = [ split(/[,\s]+/, $opt_P) ] if $opt_P;
+
+$opt_d = $config->{&DEBUG} 	unless $opt_d;
+$opt_R = $config->{&READER}	unless $opt_R;
+
+unless ($opt_R)
+{
+    pod2usage
+	(
+	 message => 'A reader must be specified',
+	 verbose => 1,
+	 );
+}
+
+$opt_I = norm PARSERS		unless $opt_I;
+$opt_F = norm FILTERS		unless $opt_F;
+$opt_P = norm PROCESSORS	unless $opt_P;
+
+$opt_I = []			unless $opt_I;
+$opt_F = []			unless $opt_F;
+$opt_P = []			unless $opt_P;
+
+if (0 && $opt_d)
+{
+    warn "< Parsers: ",		join(',', @$opt_I), "\n";
+    warn "< Filters: ",		join(',', @$opt_F), "\n";
+    warn "< Processors: ",	join(',', @$opt_P), "\n";
+    warn "< Reader: ",		$opt_R, "\n";
+}
+
+my @I = ();
+my @F = ();
+my @P = ();
+
+push @I,	map { _use($_, 'Mail::Abuse::Incident::') }	@$opt_I;
+push @F,	map { _use($_, 'Mail::Abuse::Filter::') } 	@$opt_F;
+push @P,	map { _use($_, 'Mail::Abuse::Processor::') }	@$opt_P;
+
+my $R =		_use($opt_R, 'Mail::Abuse::Reader::');
+
+if (0 && $opt_d)
+{
+    warn "> Parsers: ",		join(',', @I), "\n";
+    warn "> Filters: ",		join(',', @F), "\n";
+    warn "> Processors: ",	join(',', @P), "\n";
+    warn "> Reader: ",		$R, "\n";
+}
+
+my $report = Mail::Abuse::Report->new
+    (
+     config	=> $opt_c,
+     reader	=> $R,
+     parsers	=> \@I,
+     filters	=> \@F,
+     processors	=> \@P,
+     ($opt_d ? (debug => $opt_d) : ()),
+     );
+
+warn "Processing started\n" if $opt_d or $opt_v;
+
+while ($report->next)
+{
+    warn "Processing a report\n" if $opt_d or $opt_v;
+}
+
+warn "Done\n" if $opt_d or $opt_v;
+
+1;
+
+__END__
+
+=head1 NAME
+
+abuso - Front-end for Mail::Abuse
+
+=head1 SYNOPSIS
+
+    abuso [-Iincident1,incident2,...] [-Pproc1,proc2,...] [-Ffilter1,filter2,...] [-Rreader] [-c config] [-d] [-v]
+
+=head1 DESCRIPTION
+
+C<abuso>, spanish for "abuse" is really a front-end that helps use the
+services provided by the C<Mail::Abuse> classes. This is designed to
+be a tool for parsing and hopefully, responding promptly to abuse
+complaints sent to abuse desks at ISPs and other entities connected to
+the Internet.
+
+C<abuso> has a configuration file that can supply all of its
+operational parameters, such as which filters to use, etc. The name of
+this file can be specified in the command line with the B<-c>
+switch. Alternatively, you can leave C<abuso> look for its config file
+according to the documentation of L<Config::Auto>.
+
+The entries that are supported in the config file, are described
+below. Note that all of them can be overrided by the corresponding
+option in the command line.
+
+=over
+
+=item B<abuso reader>
+
+The name of the class that will be instantiated to "read" new abuse
+reports. This can be overriden with the B<-R> option. C<abuso> will
+try to C<require> the class as given, tacking a
+B<Mail::Abuse::Reader::> if failed.
+
+A reader is mandatory. C<abuso> will terminate if no reader can be
+loaded.
+
+=item B<abuso parsers>
+
+The classes that will be instantiated to parse the abuse reports and
+extract individual incident information. This can be overriden with
+the B<-P> option. C<abuso> will try to C<require> the class as given,
+tacking a B<Mail::Abuse::Incident::> if failed.
+
+Although the parsers are not mandatory, this code can be quite useless
+without specifying at least one parser.
+
+=item B<abuso filters>
+
+The classes that will be instantiated to filter the incidents found in
+the abuse reports. This can be overriden with the B<-F>
+option. C<abuso> will try to C<require> the class as given, tacking a
+B<Mail::Abuse::Filter::> if failed.
+
+Filtering the incidents is very important because in many cases,
+you will end up receiving reports for things outside your control.
+
+=item B<abuso processors>
+
+The classes that will be instantiated process the reports once parsed
+and filtered. This can be overriden with the B<-P> option. C<abuso>
+will try to C<require> the class as given, tacking a
+B<Mail::Abuse::Processor::> if failed.  
+
+=back
+
+By giving the <-d> option, debug messages are produced via
+C<warn()>. C<-v> produces some progress indications, also through the
+use ow C<warn()>.
+
+This is where the final part of the work is done, be it storing the
+report, opening a ticket, sending an email, etc.
+
+=head1 HISTORY
+
+=over
+
+=item Jun, 2003
+
+Begin working in the first version of the code, as a replacement of a
+more rudimentary proof of concept.
+
+=back
+
+=head1 LICENSE AND WARRANTY
+
+This code and all accompanying software comes with NO WARRANTY. You
+use it at your own risk.
+
+This code and all accompanying software can be used freely under the
+same terms as Perl itself.
+
+=head1 AUTHOR
+
+Luis E. Muñoz <luismunoz@cpan.org>
+
+=head1 SEE ALSO
+
+perl(1), C<Mail::Abuse>.
+
+=cut

@@ -1,0 +1,33 @@
+---
+abstract: 'Check for leaky attributes'
+author:
+  - 'Chad Granum <exodist7@gmail.com>'
+build_requires:
+  Test::More: 0.71
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-LeakCheck
+provides:
+  MooseX::LeakCheck:
+    file: lib/MooseX/LeakCheck.pm
+    version: 0.003
+  MooseX::LeakCheck::Attribute:
+    file: lib/MooseX/LeakCheck/Attribute.pm
+    version: 0
+  MooseX::LeakCheck::Base:
+    file: lib/MooseX/LeakCheck/Base.pm
+    version: 0
+requires:
+  Moose: 0
+  Scalar::Util: 0
+resources:
+  bugtracker: http://github.com/exodist/MooseX-LeakCheck/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/exodist/MooseX-LeakCheck
+version: 0.003

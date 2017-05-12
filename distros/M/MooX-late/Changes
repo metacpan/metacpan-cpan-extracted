@@ -1,0 +1,110 @@
+MooX-late
+=========
+
+Created:      2012-11-30
+Home page:    <https://metacpan.org/release/MooX-late>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-late>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.015	2013-08-18
+
+ [ Documentation ]
+ - Make the list of stuff this module does more concise.
+
+ [ Test Suite ]
+ - Improve test cases for class type constraints.
+
+ [ Packaging ]
+ - Depend on Moo 1.006000.
+ - Depend on Type::Utils 1.000001.
+
+ [ Other ]
+ - Removed: Drop support for `coerce => 1` because Moo 1.006000 supports
+   this natively now.
+
+0.014	2013-07-16
+
+ - Added: Support `coerce => 1` for Type::Tiny type constraints and those
+   providing a similar API.
+
+0.013	2013-07-16
+
+ - Added: Support Moose attribute traits using MooX::HandlesVia.
+ - Removed: Retire support for non-reference attribute defaults because Moo
+   now does this natively.
+ - Updated: Use Type::Utils::dwim_type to translate strings to type
+   constraint expressions.
+
+0.012	2013-06-28
+
+ - Updated: Use Type::Registry/Type::Parser to translate strings to type
+   constraint expressions.
+
+0.011	2013-04-27
+
+ [ Bug Fixes ]
+ - Fix support for class types.
+   SHLOMIF++
+
+0.010	2013-04-23
+
+ [ Bug Fixes ]
+ - Fix support for Maybe[`a] type constraint. (It was being interpreted as
+   an object blessed into package 'Maybe'.)
+   SHLOMIF++
+
+0.009	2013-04-15
+
+ - Updated: Switch from MooX::Types::MooseLike::Base to Types::Standard.
+
+0.008	2013-03-11
+
+ [ Documentation ]
+ - Minor documentation updates.
+
+ [ Packaging ]
+ - Make MooX::Types::MooseLike::Base a required dependency (was optional).
+
+0.007	2012-12-26
+
+ [ Documentation ]
+ - Documentation for use with Moo::Role.
+   SHLOMIF++
+   <https://bitbucket.org/tobyink/p5-moox-late/pull-request/1/-/diff>
+ - Link to MooX::HandlesVia on github.
+
+0.006	2012-12-11
+
+ [ Bug Fixes ]
+ - Skip t/02inflation.t if no MooX::Types::MooseLike::Base.
+
+0.005	2012-12-09
+
+ [ Bug Fixes ]
+ - Cope with has \@attributes => (...).
+
+ [ Documentation ]
+ - Document test suite.
+
+ [ Packaging ]
+ - Bump required version of Moo to 1.000004.
+
+0.004	2012-12-03
+
+ - Added: Issue warnings when type constraint cannot be interpreted
+   correctly. Warning is not issued at the time the attribute is built, but
+   the first time the type constraint is checked against. Don't attempt to
+   inflate these type constraints when Moose is loaded.
+
+0.003	2012-12-02
+
+ - Added: Inflation of type constraints to Moose.
+ - General refactoring of type constraint code.
+ - Use MooX::Types::MooseLike::Base for type checks.
+
+0.002	2012-12-02
+
+ [ Bug Fixes ]
+ - use re 'eval' on Perl 5.8 to fix regexp compilation problem
+
+0.001	2012-12-01	Initial release

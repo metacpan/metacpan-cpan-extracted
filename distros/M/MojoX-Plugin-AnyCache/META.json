@@ -1,0 +1,78 @@
+{
+   "abstract" : "Cache plugin with blocking and non-blocking support",
+   "author" : [
+      "Companies House <chgovuk@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MojoX-Plugin-AnyCache",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Cache::Memcached" : "0",
+            "Cache::Memcached::AnyEvent" : "0",
+            "Data::MessagePack" : "0",
+            "EV" : "0",
+            "MIME::Base64" : "0",
+            "Memcached::Client" : "0",
+            "Mojo::Base" : "0",
+            "Mojo::Redis" : "0",
+            "Mojo::Util" : "0",
+            "Mojolicious" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "Mojo::IOLoop" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/companieshouse/MojoX-Plugin-AnyCache/issues"
+      },
+      "homepage" : "https://github.com/companieshouse/MojoX-Plugin-AnyCache",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/companieshouse/MojoX-Plugin-AnyCache.git",
+         "web" : "https://github.com/companieshouse/MojoX-Plugin-AnyCache"
+      }
+   },
+   "version" : "0.04"
+}
+

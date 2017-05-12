@@ -1,0 +1,76 @@
+=head1 NAME
+
+MIME::EcoEncode::Fold - folding multi-byte string
+
+=head1 SYNOPSIS
+
+ use MIME::EcoEncode::Fold;
+ $folded = mime_eco_fold($str, 'UTF-8');        # fold utf8 string
+ $folded = mime_eco_fold($str, 'GB2312');       # fold euc-cn string
+ $folded = mime_eco_fold($str, 'EUC-KR');       # fold euc-kr string
+ $folded = mime_eco_fold($str, 'Big5');         # fold big5 string
+ $folded = mime_eco_fold($str, 'Shift_JIS');    # fold cp932 string
+ $folded = mime_eco_fold($str, 'ISO-2022-JP');  # fold 7bit-jis string
+ $folded = mime_eco_fold($str, $sbcs);          # $sbcs :
+                                                #   single-byte charset
+                                                #   (e.g. 'ISO-8859-1')
+
+=head1 DESCRIPTION
+
+This is a module for folding multi-byte string.
+
+When the line of the e-mail text is long,
+SMTP server may insert line feed code
+and the multi-byte string might break.
+This module was written in order to prevent it.
+
+=head2 Options
+
+  $folded = mime_eco_fold($str, $charset, $lf, $bpl);
+               # $charset : 'UTF-8' / 'GB2312' / 'EUC-KR' / 'Big5' /
+               #            'Shift_JIS' / 'ISO-2022-JP' / ...
+               #            (default: 'UTF-8')
+               #              Note: The others are all folded as
+               #                    single-byte string.
+               # $lf      : line feed (default: "\n ")
+               # $bpl     : bytes per line (default: 990)
+               #              Note: 990 is postfix's default.
+
+=head2 Examples
+
+Ex1
+
+  use MIME::EcoEncode::Fold;
+  my $str =<<"END";
+  This document specifies an Internet standards track protocol for the
+  Internet community, and requests discussion and suggestions for
+  improvements.
+  END
+  print mime_eco_fold($str, 'UTF-8', undef, 50);
+
+Ex1's output:
+
+  This document specifies an Internet standards trac
+   k protocol for the
+  Internet community, and requests discussion and su
+   ggestions for
+  improvements.
+
+=head1 SEE ALSO
+
+L<MIME::EcoEncode>
+
+=head1 AUTHOR
+
+MURATA Yasuhisa E<lt>murata@nips.ac.jpE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2013 MURATA Yasuhisa
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

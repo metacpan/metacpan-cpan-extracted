@@ -1,0 +1,50 @@
+Mail::SNCF
+
+This module is designed for the users of the French rail company
+website. It provides a parser for messages sent after booking on the
+website. Its goal is to summarize information in a format readable by
+agenda programs. Backends for ICal, Remind and a pretty text output are
+provided.
+
+To use it, you should say your MDA to redirect messages sent by SNCF to
+some mailbox and run the script sncf onto it. See the help of this
+script for more information.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Mail::SNCF
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=SNCF
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/SNCF
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/SNCF
+
+    Search CPAN
+        http://search.cpan.org/dist/SNCF
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Olivier Schwander
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

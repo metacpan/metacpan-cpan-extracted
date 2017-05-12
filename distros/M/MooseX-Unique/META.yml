@@ -1,0 +1,344 @@
+---
+abstract: 'Make your Moose instances as unique as you are'
+author:
+  - 'Edward Allen <ealleniii@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Moose::Util::TypeConstraints: 0
+  Scalar::Util: 0
+  Test::More: 0.88
+  overload: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Unique
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+    - examples
+    - eg
+provides:
+  MooseX::Unique:
+    file: lib/MooseX/Unique.pm
+    version: 0.005
+  MooseX::Unique::Meta::Trait::Attribute:
+    file: lib/MooseX/Unique/Meta/Trait/Attribute.pm
+    version: 0.005
+  MooseX::Unique::Meta::Trait::Class:
+    file: lib/MooseX/Unique/Meta/Trait/Class.pm
+    version: 0.005
+  MooseX::Unique::Meta::Trait::Object:
+    file: lib/MooseX/Unique/Meta/Trait/Object.pm
+    version: 0.005
+  MooseX::Unique::Meta::Trait::Role:
+    file: lib/MooseX/Unique/Meta/Trait/Role.pm
+    version: 0.005
+  MooseX::Unique::Meta::Trait::Role::ApplicationToClass:
+    file: lib/MooseX/Unique/Meta/Trait/Role/ApplicationToClass.pm
+    version: 0.005
+  MooseX::Unique::Meta::Trait::Role::ApplicationToRole:
+    file: lib/MooseX/Unique/Meta/Trait/Role/ApplicationToRole.pm
+    version: 0.005
+  MooseX::Unique::Meta::Trait::Role::Composite:
+    file: lib/MooseX/Unique/Meta/Trait/Role/Composite.pm
+    version: 0.005
+requires:
+  List::MoreUtils: 0
+  Moose: 1.9900
+  MooseX::InstanceTracking: 0.06
+  perl: 5.10.0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Unique
+  homepage: http://search.cpan.org/dist/MooseX-Unique/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/riemann42/MooseX-Unique.git
+version: 0.005
+x_BuiltWith:
+  modules:
+    File::Temp: 0.22
+    List::MoreUtils: 0.32
+    Module::Build: 0.38
+    Moose: 2.0102
+    Moose::Util::TypeConstraints: 2.0102
+    MooseX::InstanceTracking: 0.06
+    Scalar::Util: 1.23
+    Test::More: 0.98
+    overload: 1.10
+    perl: 'NA(skipped: perl)'
+  perl:
+    original: v5.12.3
+    qv: 1
+    version:
+      - 5
+      - 12
+      - 3
+  platform: linux
+x_Dist_Zilla:
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@Filter/GatherDir'
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Filter/PruneCruft'
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Filter/ManifestSkip'
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Filter/MetaYAML'
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Filter/License'
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@Filter/Readme'
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@Filter/ExtraTests'
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Filter/ExecDir'
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Filter/ShareDir'
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@Filter/MakeMaker'
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Filter/Manifest'
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Filter/TestRelease'
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Filter/ConfirmRelease'
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::GitHub::Meta
+      name: '@GitHub/GitHub::Meta'
+      version: 0.10
+    -
+      class: Dist::Zilla::Plugin::GitHub::Update
+      name: '@GitHub/GitHub::Update'
+      version: 0.10
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: Git::NextVersion
+      version: 1.111590
+    -
+      class: Dist::Zilla::Plugin::Prepender
+      name: Prepender
+      version: 1.103470
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: Authority
+      version: 1.005
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: PkgVersion
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: PodWeaver
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::CompileTests
+      name: CompileTests
+      version: 1.110930
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: ExtraTests
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: PodCoverageTests
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: PodSyntaxTests
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::PodSpellingTests
+      name: PodSpellingTests
+      version: 1.111520
+    -
+      class: Dist::Zilla::Plugin::ReportVersions::Tiny
+      name: ReportVersions::Tiny
+      version: 1.03
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: ExecDir
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::MinimumPerl
+      name: MinimumPerl
+      version: 1.003
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: AutoPrereqs
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::RemovePrereqs
+      config:
+        Dist::Zilla::Plugin::RemovePrereqs:
+          modules_to_remove:
+            - Moose::Exporter
+            - utf8
+            - Moose::Util::MetaRole
+            - Moose::Util
+            - Moose::Role
+      name: RemovePrereqs
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::Bugtracker
+      name: Bugtracker
+      version: 1.111080
+    -
+      class: Dist::Zilla::Plugin::Homepage
+      name: Homepage
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: MetaConfig
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::MetaData::BuiltWith
+      config:
+        Dist::Zilla::Plugin::MetaData::BuiltWith:
+          _stash_key: x_BuiltWith
+          show_uname: 0
+      name: MetaData::BuiltWith
+      version: 0.01018204
+    -
+      class: Dist::Zilla::Plugin::Repository
+      name: Repository
+      version: 0.18
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: MetaResources
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::MetaNoIndex
+      name: MetaNoIndex
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      name: MetaProvides::Package
+      version: 1.12060501
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: MetaJSON
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::ModuleBuild
+      name: ModuleBuild
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::DualBuilders
+      name: DualBuilders
+      version: 1.001
+    -
+      class: Dist::Zilla::Plugin::ReadmeFromPod
+      name: ReadmeFromPod
+      version: 0.14
+    -
+      class: Dist::Zilla::Plugin::InstallGuide
+      name: InstallGuide
+      version: 1.101461
+    -
+      class: Dist::Zilla::Plugin::ChangelogFromGit
+      name: ChangelogFromGit
+      version: 0.002
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: Git::Check
+      version: 1.111590
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: Git::Tag
+      version: 1.111590
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: TestRelease
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: ConfirmRelease
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: UploadToCPAN
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: Git::Commit
+      version: 1.111590
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: Git::Push
+      version: 1.111590
+    -
+      class: Dist::Zilla::Plugin::InstallRelease
+      name: InstallRelease
+      version: 0.007
+    -
+      class: Dist::Zilla::Plugin::ArchiveRelease
+      name: ArchiveRelease
+      version: 3.01
+    -
+      class: Dist::Zilla::Plugin::Clean
+      name: Clean
+      version: 0.02
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.200007
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 4.200007
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.200007
+x_authority: cpan:EALLENIII

@@ -1,0 +1,7 @@
+Bayesian.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+test.pl
+contrib/bayesian_update.pl

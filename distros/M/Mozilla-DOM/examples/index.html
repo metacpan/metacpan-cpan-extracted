@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Testing Mozilla::DOM Events</title>
+<script type="text/javascript">
+function onclick_cb() {
+    alert('Button was (scriptically?) clicked');
+    return true;
+}
+</script>
+</head>
+
+<body bgcolor="#abcdef">
+<h3>Hands-off web surfing</h3>
+
+<p>Whatever will you do if you don't have to use your
+hands while surfing the web, hm?</p>
+
+<form name="theform">
+
+Self-filling text: <input type="text" value=""><br/>
+
+<input type="button" name="b" value="Press me (or not)" onclick="onclick_cb();"><br/>
+
+<select name="list">
+<option value="value 0">label 0</option>
+<option value="value 1" selected>label 1</option>
+<option value="value 2">label 2</option>
+</select><br/>
+
+<input type="radio" name="radgrp" value="rad 0" />
+<input type="radio" name="radgrp" value="rad 1" selected />
+<input type="radio" name="radgrp" value="rad 2" /><br/>
+
+</form>
+
+<p>Do you want to see <a href="index2.html">the browser objects page</a>, now?</p>
+
+</body>
+</html>

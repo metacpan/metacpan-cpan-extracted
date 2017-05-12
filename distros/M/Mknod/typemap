@@ -1,0 +1,4 @@
+TYPEMAP
+const char *    T_PV
+mode_t          T_U_LONG
+dev_t           T_IV

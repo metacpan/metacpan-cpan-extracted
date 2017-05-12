@@ -1,0 +1,63 @@
+Vector-Math-BestRotation
+
+This module takes two equally sized sets of vectors and calculates the best
+orthogonal transformation to turn one of the vector sets into the
+other. "Best" means here to minimize the root mean square deviation between
+the sets.
+
+An orthogonal transformation can be a rotation or a rotation combined with a
+reflection. If this is desired also the best rotation or the best flipped
+rotation can be calculated.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+Math::Vector::BestRotation depends on the following modules:
+    Carp,                 tested with module version 1.08
+    Math::MatrixReal,	  tested with module version 2.05
+
+Math::Vector::BestRotation requires Perl version 5.8.8. This is because it has
+not been tested with older versions of Perl although it is likely that it
+works at least with all 5.8 versions.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Math::Vector::BestRotation
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Vector-BestRotation
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Math-Vector-BestRotation
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Math-Vector-BestRotation
+
+    Search CPAN
+        http://search.cpan.org/dist/Math-Vector-BestRotation/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Lutz Gehlen
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

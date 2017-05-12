@@ -1,0 +1,5 @@
+Copyright (C) <tmpl_var year>, <tmpl_var author>.  All rights reserved.
+
+<tmpl_var license_blurb>
+
+Insert license text here.

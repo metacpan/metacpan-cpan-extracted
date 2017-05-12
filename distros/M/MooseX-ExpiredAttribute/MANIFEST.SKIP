@@ -1,0 +1,11 @@
+\.komodoproject$
+\bblib\b
+Makefile\.old$
+^pm_to_blib$
+\.git
+^Makefile$
+\.bak$
+^MooseX-ExpiredAttribute-.*?/
+\.tar\.gz$
+MYMETA\.json
+MYMETA\.yml

@@ -1,0 +1,32 @@
+---
+abstract: 'Module::Install extension to make POD from'
+author:
+  - 'Florent Angly <florent.angly@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  File::Temp: 0
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Install-PodFromEuclid
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Getopt::Euclid: 0.3.4
+  Module::Install: 1
+  perl: 5.6.0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Install-PodFromEuclid
+  homepage: http://search.cpan.org/search?query=module-install-podfromeuclid
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/fangly/module-install-podfromeuclid.git
+version: 0.01

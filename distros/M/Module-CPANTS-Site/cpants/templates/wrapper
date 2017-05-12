@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>CPANTS - CPAN Testing Service</title>
+    <meta http-equiv="Content-Language" content="en" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf8">
+    <link href="/static/cpants.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+<div class="top" id="top"><a href="/index.html">CPANTS - The CPAN Testing Service</a></div>
+<div class="nav">
+<a href='/index.html'>Home</a> |
+<a href='/news.html'>News</a> |
+<a href='/kwalitee.html'>Kwalitee</a> |
+<a href='/highscores/'>The CPANTS game</a> |
+<a href='/stats.html'>Stats</a> |
+<a href='/graphs.html'>Graphs</a> &nbsp; &nbsp; || &nbsp; &nbsp;
+<a href='/dist/search'>Distributions</a> | 
+<a href='/author/search'>Authors</a> 
+&nbsp; &nbsp; || &nbsp; &nbsp;
+<span style="color:#f00"><a href="/toggle_experimental" class="dragon">[% IF show_experimental %]pugnate draconis[% ELSE %]Hic sunt dracones[% END %]!</a></span>
+</div>
+
+[% USE Number.Format %]
+
+[% IF cpants_is_analysing %]
+<div class="warning">
+CPANTS is currently analysing dists. Results might be inconsistent!
+</div>
+[% END %]
+
+<div class="content">
+
+[% content %]
+</div>
+
+<div class="footer">
+<p>
+Site generated with <a href="http://search.cpan.org/dist/Module-CPANTS-Site/">Module::CPANTS::Site</a> [% VERSION %].<br />
+CPANTS data generated with Perl [% perlversion %], <a href="http://search.cpan.org/dist/Module-CPANTS-Analyse/">Module::CPANTS::Analyse</a> [% run.mcanalyse_version %] and <a href="http://search.cpan.org/dist/Module-CPANTS-ProcessCPAN/">Module::CPANTS::ProcessCPAN</a> [% run.mcprocess_version %], at <b>[% run.date %].</b><br />
+CPANTS and Site maintained by Thomas Klausner - domm@cpan.org
+<p>
+<p>Hosting and bandwidth provided by <a
+href="http://vienna.pm.org">Vienna.pm</a>.</p>
+</div>
+
+</body>
+</html>

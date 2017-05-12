@@ -1,0 +1,60 @@
+NAME
+    Module::Install::PodFromEuclid - Module::Install extension to make POD
+    from Getopt::Euclid-based scripts
+
+SYNOPSIS
+      # In Makefile.PL:
+      use inc::Module::Install;
+      author 'John Doe';
+      license 'perl';
+      pod_from 'scripts/my_script.pl';
+
+DESCRIPTION
+    Module::Install::PodFromEuclid is a Module::Install extension that
+    generates a `POD' file automatically from an indicated script containing
+    Getopt::Euclid command-line specifications.
+
+    The POD file is generated using the --podfile option of Getopt::Euclid,
+    but only whenever authors run `Makefile.PL'. While this extension will
+    be bundled in your distribution, the pod_from command does nothing on
+    the user-side.
+
+    Note: Authors should make sure that `Module::Install::PodFromEuclid' is
+    installed before running `Makefile.PL'.
+
+    This module was inspired and borrows a lot from
+    `Module::Install::ReadmeFromPod'.
+
+COMMANDS
+    This plugin adds the following Module::Install command:
+
+    `pod_from'
+        Does nothing on the user-side. On the author-side it will generate a
+        `POD' file that has the same base name as the Perl file, using
+        Getopt::Euclid's --podfile feature:
+
+          pod_from 'scripts/my_script.pl';  # generate scripts/my_script.pod
+
+        If you use the `all_from' command, `pod_from' will default to this
+        value.
+
+          all_from 'scripts/my_script.pl';
+          pod_from;                         # create scripts/my_script.pod
+
+AUTHOR
+    Florent Angly <florent.angly@gmail.com>
+
+LICENSE
+    Copyright Florent Angly
+
+    This module may be used, modified, and distributed under the same terms
+    as Perl itself. Please see the license that came with your Perl
+    distribution for details.
+
+SEE ALSO
+    Getopt::Euclid
+
+    Module::Install
+
+    Module::Install::ReadmeFromPod
+

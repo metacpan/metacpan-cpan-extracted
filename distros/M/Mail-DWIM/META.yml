@@ -1,0 +1,29 @@
+---
+abstract: 'Do-What-I-Mean Mailer'
+author:
+  - 'Mike Schilli <cpan@perlmeister.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mail-DWIM
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Temp: 0
+  Log::Log4perl: 1
+  Mail::Mailer: 0
+  Sys::Hostname: 1
+  Test::More: 0
+  YAML: 0
+resources:
+  repository: http://github.com/mschilli/mail-dwim-perl
+version: 0.08

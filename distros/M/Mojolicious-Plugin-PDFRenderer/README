@@ -1,0 +1,83 @@
+NAME
+
+    Mojolicious::Plugin::PDFRenderer - Uses wkhtmltopdf via PDF::WebKit to
+    render your app exactly as it looks in Chrome/WebKit but vector
+    scalable and in PDF.
+
+VERSION
+
+    version 0.09
+
+SYNOPSIS
+
+        package App;
+        use Mojo::Base 'Mojolicious';
+    
+        sub startup {
+            my $self = shift;
+    
+            $self->plugin( 'Mojolicious::Plugin::PDFRenderer', {
+                javascript_delay => 1000
+                , load_error_handling => 'ignore'
+                , page_height => '5in'
+                , page_width => '10.5in'
+                # options that would otherwise be passed to PDF::WebKit,
+                # see `wkhtmltopdf --extended-help` for more (replace dashes w/ underscores)
+            } );
+            # ...
+        }
+
+    Then go to http://yourapp:3000/any/route, take a good look, then go to
+    http://yourapp:3000/any/route.pdf. Cool, huh?
+
+REQUIREMENTS
+
+    PDF::WebKit
+
+    "wkhtmltopdf" <http://wkhtmltopdf.org/>
+
+    A preforking server instance running (e.g. ./script/app prefork [...]
+    or ./script/app hypnotoad [...], etc) with at least 2 connections /
+    workers available so that the extension can hit the back-end again,
+    i.e. a request in a request.
+
+SEE ALSO
+
+    Other cool stuff I've written
+
+SUPPORT
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests through the issue tracker at
+    https://github.com/sharabash/mojolicious-plugin-pdfrenderer/issues. You
+    will be notified automatically of any progress on your issue.
+
+ Source Code
+
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    https://github.com/sharabash/mojolicious-plugin-pdfrenderer
+
+      git clone git://github.com/sharabash/mojolicious-plugin-pdfrenderer.git
+
+AUTHOR
+
+    Nour Sharabash <amirite@cpan.org>
+
+CONTRIBUTORS
+
+      * Nour Sharabash <nour.sharabash@gmail.com>
+
+      * Nour Sharabash <nour@hellosign.com>
+
+      * gabriele.ceranto <gabriele.ceranto@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Nour Sharabash.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,8 @@
+Revision history for Perl extension MKDoc::Control_List
+
+0.31 Thu Nov  3 16:16:00 2005
+        - Pod documentation was very wrong
+        - Added Changes, README, MANIFEST, META.yml
+        - Removed defunct email address
+        - Added more tests
+        - operate in the namespace of the calling module

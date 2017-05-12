@@ -1,0 +1,23 @@
+Revision history for Mojolicious-Plugin-Database
+
+1.10      2015-09-25 16:13:17+02:00 Europe/Paris
+    on_connect support
+
+1.09      2015-06-16 22:15:51+07:00 Asia/Jakarta
+    Merged a few pull requests for Kwalitee fixes
+    Fixed a bug where the plugin could clobber existing app attributes or
+        have it's own attribute clobbered.
+
+1.08      2012-11-24 12:58:12 Asia/Jakarta
+    Added the ability to connect to multiple databases at the same time.
+
+1.07      2012-09-02 18:10:10 Asia/Jakarta
+    Updated tests to use tmpnam() so that things will work on Windows (alabamapaul)
+
+1.06      2012-08-04 05:02:43 Asia/Jakarta
+    Changed the way the DBI connection is made; instead of doing this 
+    on startup which would cause bad things(tm) to happen when running
+    under Hypnotoad, it is now lazily instantiated.
+
+1.05      2011-04-24 20:26:45 Asia/Jakarta
+    First release

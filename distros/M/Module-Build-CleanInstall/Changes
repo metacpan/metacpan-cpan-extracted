@@ -1,0 +1,16 @@
+Revision history for Perl module Module::Build::CleanInstall.
+
+0.05  November 13, 2012
+	- MANIFEST issues on last release
+
+0.04  November 13, 2012
+	- Prevent false negatives by some CPANtesters
+
+0.03  November 3, 2012
+	- Include this Changes file
+
+0.02  November 3, 2012
+	- Various bugfixes
+
+0.01  November 3, 2012
+	- Initial release

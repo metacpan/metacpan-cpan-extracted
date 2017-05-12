@@ -1,0 +1,69 @@
+[% IF statustext %]
+<p align="center">
+    <div class="[% statuscolor %]">[% tr.tr(statustext) %]</div>
+</p>
+[% END %]
+
+
+<p align="center">
+    <form name="report_selector" method="post" action="[% webpath %]">
+        <table class="data" id="HelperTable1">
+            <tr class="tabheader">
+                <th>[% tr.tr("Report") %]</th>
+                [% IF ReportID != "" %]
+                    <th>[% tr.tr("Timeframe") %]</th>
+                    <th>[% tr.tr("Device") %]</th>
+                [% END %]
+            </tr>
+            <tr>
+                <td>
+                    <select name="reportid" onChange="document.report_selector.submit();">
+                    <option value=""></option>
+                    [% FOREACH Report IN AvailReports %]
+                        <option value="[% Report.reportid %]"
+                        [% IF Report.reportid == ReportID %]
+                            selected
+                        [% END %]
+                        >[% Report.device_type %] : [% Report.report_name %]</option>
+                    [% END %]
+                    </select>
+                </td>
+                [% IF ReportID != "" %]
+                    <td>
+                        <select name="timeframe" onChange="document.report_selector.submit();">
+                        [% FOREACH Timeframe IN Timeframes %]
+                            <option value="[% Timeframe %]"
+                            [% IF Timeframe == SelectedTimeframe %]
+                                selected
+                            [% END %]
+                            >[% tr.tr(Timeframe) %]</option>
+                        [% END %]
+                        </select>
+                    </td>
+                    <td>
+                        <select name="device" onChange="document.report_selector.submit();">
+                        [% FOREACH Device IN Devices %]
+                            <option value="[% Device.hostname %]"
+                            [% IF Device.hostname == SelectedDevice %]
+                                selected
+                            [% END %]
+                            >[% Device.hostname %] : [% Device.description %]</option>
+                        [% END %]
+                        </select>                        
+                    </td>
+                [% END %]
+            </tr>
+        </table>
+    </form>
+</p>
+
+[% IF ReportID != "" %]
+    [% FOREACH Graph IN Graphs %]
+        <p align="center">
+            <img src="[% graphpath %]/[% Graph.graph_name %]/[% Graph.rndsuffix %]">
+            <br/>&nbsp;<br/>
+        </p>
+    [% END %]
+[% END %]
+
+</form>

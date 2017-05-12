@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+nsID.xs
+ppport.h
+README
+t/Mozilla-nsID.t
+lib/Mozilla/nsID.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,159 @@
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/Module-Package-RDF/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix toby:    <http://tobyinkster.co.uk/#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+my:project :release my:v_0-001 .
+my:v_0-001
+	a               :Version ;
+	dc:issued       "2011-10-01"^^xsd:date ;
+	:revision       "0.001"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.001.tar.gz> ;
+	rdfs:label      "Initial release" .
+
+my:project :release my:v_0-002 .
+my:v_0-002
+	a               :Version ;
+	dc:issued       "2011-10-03"^^xsd:date ;
+	:revision       "0.002"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.002.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-001 ;
+		dcs:item   [ a dcs:Addition ; rdfs:label "Include mkdist script and Module::Package::RDF::Create."@en ]
+	] .
+
+my:project :release my:v_0-003 .
+my:v_0-003
+	a               :Version ;
+	dc:issued       "2011-10-06"^^xsd:date ;
+	:revision       "0.003"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.003.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-002 ;
+		dcs:item   [ a dcs:Bugfix ; rdfs:label "Prevent Module::Package::RDF::Create's pod and the template module's pod from getting muddled."@en ] ;
+		dcs:item   [ a dcs:Update ; rdfs:label "Generated modules now default to using perl 5.010."@en ] ;
+		dcs:item   [ a dcs:Addition ; rdfs:label "Generated modules will include $AUTHORITY variables."@en ] ;
+		dcs:item   [ a dcs:Addition ; rdfs:label "Generated modules will include SYNOPSIS in pod."@en ] ;
+		dcs:item   [ a dcs:Addition ; rdfs:label "Generated modules will include DISCLAIMER OF WARRANTIES in pod."@en ] ;
+		dcs:item   [ a dcs:Addition ; rdfs:label "Module::Package::Dist::RDF::standard to run code at user end."@en ] ;
+		dcs:item   [ a dcs:Update ; rdfs:label "use Module::Package 0.30"@en ] ;
+		dcs:item   [ a dcs:Bugfix ; rdfs:label "Module::Package::Dist::RDF::standard uses Meta::Install::TrustMetaYml - this resolves some dependency issues with resultant packages."@en ] ;
+	] .
+
+my:project :release my:v_0-004 .
+my:v_0-004
+	a               :Version ;
+	dc:issued       "2011-11-21"^^xsd:date ;
+	:revision       "0.004"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.004.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-003 ;
+		dcs:item   [ a dcs:Bugfix ; rdfs:label "Module::Package::RDF::Create now handles '--use boolean' and '--use autodie' specially."@en ] ;
+		dcs:item   [ a dcs:Documentation ; rdfs:label "The 'mkdist' functionality should be split into a different release."@en ] ;
+		dcs:item   [ a dcs:Regression ; rdfs:label "use parent"@en ] ;
+	] .
+
+my:project :release my:v_0-005 .
+my:v_0-005
+	a               :Version ;
+	dc:issued       "2011-12-03"^^xsd:date ;
+	:revision       "0.005"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.005.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-004 ;
+		dcs:item   [ a dcs:Bugfix ; rdfs:label "use base"@en ] ;
+		dcs:item   [ a dcs:Documentation ; rdfs:label "add 'NAME' section" ] ;
+		dcs:item   [ a dcs:Documentation ; rdfs:label "add 'DISCLAIMER OF WARRANTIES' section" ] 
+	] .
+
+my:project :release my:v_0-006 .
+my:v_0-006
+	a               :Version ;
+	dc:issued       "2012-07-04"^^xsd:date ;
+	:revision       "0.006"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.006.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-005 ;
+		dcs:item   [ a dcs:Update ; rdfs:label "mkdist now creates Pretdsl instead of Turtle."@en ] ;
+		dcs:item   [ rdfs:label "Module::Package::RDF::Create is now App::mkdist."@en ] ;
+		dcs:item   [ rdfs:label "The ':standard' bit of 'RDF:standard' is now optional."@en ] ;
+	] .
+
+my:project :release my:v_0-007 .
+my:v_0-007
+	a               :Version ;
+	dc:issued       "2012-07-05"^^xsd:date ;
+	:revision       "0.007"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.007.tar.gz> ;
+	rdfs:label      "Bond, James Bond";
+	dcs:changeset [
+		dcs:versus my:v_0-006 ;
+		dcs:item   [ a dcs:Update, dcs:Packaging ; rdfs:label "Bump versions of some dependencies."@en ] ;
+	] .
+
+my:project :release my:v_0-008 .
+my:v_0-008
+	a               :Version ;
+	dc:issued       "2012-07-05"^^xsd:date ;
+	:revision       "0.008"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.008.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-007 ;
+		dcs:item   [ a dcs:Bugfix ; rdfs:label "Get t/01basic.t working again."@en ] ;
+	] .
+
+my:project :release my:v_0-009 .
+my:v_0-009
+	a               :Version ;
+	dc:issued       "2012-09-25"^^xsd:date ;
+	:revision       "0.009"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Module-Package-RDF-0.009.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-008 ;
+		dcs:item   [ rdfs:label "App::mkdist now pulls author tests from ~/perl5/xt rather than producing hard-coded ones."@en ] ;
+		dcs:item   [ rdfs:label "Module::Install::StandardDocuments."@en; a dcs:Addition ] ;
+		dcs:item   [ rdfs:label "bin/mkdist now sports a --package_flavour option."@en ] ;
+	] .
+
+### PretDSL below this point...
+
+`Module-Package-RDF 0.010 cpan:TOBYINK`
+	issued        2013-03-11;
+	changeset     [
+		item "use Module::Install::Copyright"^^Change;
+		item [
+			a dcs:Bugfix;
+			label "Avoid auto-deps thingy from picking up Module::Install::StandardDocuments as a dep - it's bundled";
+			dcs:fixes RT#82158;
+			dcs:thanks cpan:CHORNY;
+		];
+	] .
+
+`Module-Package-RDF 0.011 cpan:TOBYINK`
+	issued        2013-03-16;
+	changeset     [
+		item "use Module::Install::RDF's new write_meta_ttl feature"^^Change;
+	] .
+
+`Module-Package-RDF 0.012 cpan:TOBYINK`
+	issued        2013-03-19;
+	changeset     [
+		item "use Module::Install::Changes"^^Addition;
+	] .
+
+`Module-Package-RDF 0.013 cpan:TOBYINK`
+	issued        2013-03-19;
+	changeset     [
+		item "Bump versions of several dependencies."^^Update;
+		item "Switch to doap-deps vocab for expressing project dependencies (mkdist)."^^Update;
+	] .
+
+`Module-Package-RDF 0.014 cpan:TOBYINK`
+	issued        2013-03-19;
+	changeset     [
+		item "use Module::Install::DOAP 0.006."^^Bugfix;
+	] .

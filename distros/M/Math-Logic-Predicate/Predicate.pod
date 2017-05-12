@@ -1,0 +1,455 @@
+=pod
+
+=head1 NAME
+
+Math::Logic::Predicate - Manage and query a predicate assertion database.
+
+=head1 VERSION
+
+Math::Logic::Predicate version 0.03, July 28, 2002. I first began work on this module
+July 26, 2002.
+
+=head1 SYNOPSIS
+
+    use Math::Logic::Predicate;
+    
+    $db = new Math::Logic::Predicate;
+
+    # Enter some predicates into the database
+    $db->add(<<EOA);
+        human(lister).
+        human(kochanski).
+        plays(lister, guitar).
+        smart(holly).
+        smart(rimmer).
+        name(lister, 'Dave Lister').
+        name(kochanski, 'Kristine Kochanski').
+        name(rimmer, 'Arnold Rimmer').
+    EOA
+
+    # Retract a predicate
+    $db->retract( 'plays(lister, guitar)' );
+    # Or based on a pattern
+    $db->retract( 'smart(_)' );
+
+    # Make a query
+    $query = $db->parse( 'human(H) & name(H, X) ?' );
+    $iter = $db->match($query, $iter);
+
+    # Get the results
+    $name = $db->get($iter, 'X');
+    
+    # Store it in a rule
+    $db->add( 'human_name(H, N) := human(H) & name(H, N).' );
+    
+    # Use it in a query
+    $iter = $db->match( 'human_name(lister, N) ?' );
+    
+    # Save it to a file
+    use Storable;
+    store($db->rules, 'red_dwarf'); 
+
+=head1 DESCRIPTION
+
+=head2 Overview
+
+C<Math::Logic::Predicate> implements a solver for a subset of First Order
+Predicate Calculus.  By version 1.0, it will support the entire First
+Order Predicate Calculus. It provides:
+
+=over 4
+
+=item %
+
+A miniture Prolog-like language with which to specify rules and predicates.
+
+=item %
+
+The option to not use that language and build rules by hand.
+
+=item %
+
+A fast solver.
+
+=item %
+
+The ability to specify coded rules, rather than asserted ones (see below).
+
+=item %
+
+A smart data organizer, to make solving even faster.
+
+=back
+
+And it differs from the Predicate Calculus as follows:
+
+=over 4
+
+=item %
+
+You may only use the existential quantifier in queries.
+
+=item %
+
+You may only use the universal quantifier on variables in assertions. To use
+the existential quantifier, you must know precicely which object it is you
+are talking about.
+
+=item %
+
+There is no support for functions, that is, properties
+of objects, beyond simple predicates.
+
+=back
+
+Fortunately, the first two of these are often what you need, and the last
+poses no restriction on what is representable; however, its existance does
+make things a lot easier in some cases.  All of these things will be 
+implemented soon.
+
+=head2 Using C<Math::Logic::Predicate>
+
+C<Math::Logic::Predicate> is fully object-oriented and is created in the standard
+way.  There is no set up beyond this, except for just adding the rules you
+want.
+
+As far as this goes, C<Math::Logic::Predicate> supports two methods: A high-level
+and low-level specification.  Really the high-level is just a small 
+C<Parse::RecDescent> grammar interface, but it helps a lot. The low-level
+is better for automated building, for instance, when traversing a parse tree
+(Though I plan to make this easier to use, as it's strangely reminiscent of
+C, and that's just terrible).
+
+=head2 The High Level Interface
+
+This interface uses a parser to implement a small Prolog-like language in 
+which you can specify rules and assertions. This language is described here.
+
+To assert something, follow it by a period.  To query, follow with a question
+mark.
+
+    color(orange, orange).      # Assertion    
+    color(orange, orange)?      # Query
+
+(Note that comments are not recognized and would result in a syntax error.)
+
+In the above example, the word "color" is the I<predicate> and the "orange"s
+are it's I<arguments>.  In multi-argument predicates, the first argument
+usually refers to the target and the rest to properties of the target (seems
+a little like Perl's OO style, doesn't it?).
+
+Variables start with uppercase letters (by default; see below) and can
+appear anywhere. If they are used in an assertion, they refer to a "wildcard"
+which matches anything. You can use the special variable C<_> as an anonymous
+variable if you don't need to use it later.  If you use them as the predicate 
+itself, it will only work if the variable is already bound (i.e. already has a 
+value).
+
+    color(orange, X)?           # X now refers to the color of an orange
+    color(Everything, black).   # The gothic ideal
+
+I have only used symbols so far, but everywhere I used /\w+/, I could use
+a whole variety of data types.
+
+    weight(duck, 13.75).
+    weight(witch, 13.75).
+
+    speech('Old man from scene 24', 'Who would cross the Bridge of Death...').
+    q{Favorite color}(galahad, "Blue--no, yel--ahhhhhhhhh").
+
+Note that if the first character of a string is a capital letter, it doesn't
+count as a variable.
+
+Of course, to get more use out of predicates, you have to chain them.  To
+make a list of dependent predicates, do this:
+
+    weight(duck, W) & weight(X, W) ? # Find all things X that
+                                     # weigh the same as a duck
+
+The & denotes "and," where following predicates will match only if the
+predicate to the right does. There's also | "or," which guarantees that
+only one of the series will bind it's argumens. And finally, there's -
+"minus," which succeeds only if left side succeeds and the right side
+fails. These all end up working like you expect.
+
+For instane, to find all humans or holograms I<X> that aren't smart:
+
+    human(X) | hologram(X) - smart(X) ?
+
+All operators are left-associative and have the same precedence.
+
+To define a rule, i.e. a predicate that expands to a query, use the :=
+operator.
+
+    dumb_human_like(X) := human(X) | hologram(X) - smart(X).
+
+Then you can use C<dumb_human_like> in place of that other long string. You
+get another benefit: rules can recurse.
+
+Finally, you can define a rule to execute Perl code instead of going through
+the matcher.  See the section on that below.
+
+=head2 Interface Functions
+
+There's just a couple of functions involved here.  You can add a rule to
+the database with C<add>:
+
+    $db->add( 'color(orange, orange).' );
+ 
+You can retract a rule from the database with C<retract>:
+
+    $db->retract( 'color(_, orange).' );  # Get rid of all orange things
+
+You can create a rule or query without doing anything with it with C<parse>.
+
+    $query = $db->parse( 'human(X) - smart(X)?' );
+
+You need this to match pattern, which is the hardest part.  First, you need
+an iterator, which stores your results and is capable of getting the rest
+of the answers.
+
+    $iter = $db->match($query, $iter);      # Get the first match
+
+Once the iterator is defined, you need to pass it to match.  You don't have
+to the first time, but I do for consistency.  You C<get> the variable you want
+out of C<$iter>:
+
+    $dumb = $db->get($iter, 'X');
+
+And to get the next match, call C<match> again with that iterator as an
+argument.
+
+    $iter = $db->match($query, $iter);      # Get the next match
+
+When there are no more iterators, C<match> returns C<undef>.  Keep in mind
+that the assignment in that last one was still just for consistency; C<match>
+modifies C<$iter> in place.
+
+You can throw away the iterator once you're done with that particular query.
+
+=head2 How It Works
+
+If you're wondering why this section is awkwardly in the middle, it's because
+you'll need to know it to write embedded code. So, say you have a query:
+
+    month(X) & person(X) ?
+
+This finds all people who are named after a month of the year (with suitable
+definitions of C<month> and C<person>). Say we're running that on top of this
+data set:
+
+    month('January'). month('February').            # ... et cetera
+    person('Larry'). person('Damian').              # ... and of course
+    person('April'). person('May'). person('June'). # ... et cetera
+
+It would start in by looking at C<month>, and trying the first thing it found
+that would fit into I<X>, which would be "January."  Since C<month> succeeded,
+it would move on to C<person>, fill in the variable, and see if 
+C<person('January')> existed. Well, she doesn't, so it I<backtracks> to
+C<month> and tries the next month.  It tries them in alphabetical order;
+strings first, then numbers, then symbols (I munged a bit, as the example didn't
+take note of this).
+
+It does this up until "April." Then it tries C<person('April')>, succeeds and
+returns from C<match>, with I<X> bound to "'April." (Remember the apostraphe
+thing?) If you tell C<match> to try again, it goes back as if whatever came
+after C<person> had failed.  It sees if there's another person named "April,"
+and since there aren't, it goes back to C<month>. Finally, if C<month> fails,
+it backtracks through the beginning, which causes the whole query to fail.
+
+In an | "or," each operand is tried in sequence, as if you had taken all the
+others out.
+
+    human(P) | hologram(P) | android(P) ?
+
+This first returns a match for each human, then each hologram, then each 
+android.  Each one is tried only when it needs to be. On backtracking,
+it's only tried again if it's the one that was tried going forward.
+
+In a - "minus," the second operand is only tried if the first one succeeded. 
+That's because nothing minus anything (in set theory) is still nothing. 
+The second rule of a minus never tries on backtracking.
+
+=head2 Embedding Code
+
+The built in data management is quite useful, but sometimes you'd like more
+functionality; for instance, the ability to do arithmetic, or the ability to
+print the value of a variable en passent.  So rather than trying to satisfy
+everyone by bloating with built-in predicates, I just allow you to write your 
+own.
+
+    print(X) := { $track ? print "$X\n" : undef }.
+
+Let's talk about that.  First, you can only embed code like that if you give
+it a name. You can't put it in the middle of a chain.
+
+    # WRONG
+    printcolors := color(X) & { $track ? print "$X\n" : undef } & fail.
+
+In that example, C<$track> tells us if we're matching or backtracking. It will
+be true when matching, and false otherwise.  Usually you don't want your 
+predicates to do anything on backtracking but fail.
+
+C<$X> is conveniently bound to the variable I<X>, so you can just use it.
+If I<X> was not bound upon entrance, it will be C<undef>. To bind it, just
+assign to it (note that it works a lot of magic to make it this easy).
+To unbind a variable, just C<undef> it.
+
+There's one more special variable: C<$local>. It's a reference to a hash where
+you can store persistant local data. Each time C<$track> is true, you get a
+new C<$local>. Thus, C<$local> is a good place to store an iterator 
+(incidentally, it's where normal-behaving predicates store their iterator data).
+
+Here's an example predicate C<whole> which says whether it's argument is a
+whole number.  If it's argument was unbound, it gives all whole numbers
+starting from 1.
+
+    whole(X) := {
+        if (defined $X) {
+            $track ? $X =~ /^[1-9]\d*$/ : undef
+        }
+        else {
+            $X = ++$local->{num}
+        }
+    }.
+
+(Don't forget that period.)  You could combine that with the print example
+above to print all numbers in [1, inf):
+
+    whole(X) & print(X) & fail ?
+
+The C<fail> needs to be there so the query doesn't succeed and exit.
+
+=head2 The Low Level Interface
+
+This interface is pretty yucky, but it's faster than building a string and
+running it through the parser (but don't use it just because of that). It's 
+also good for automated generation of queries and rules.
+
+Basically, everything is called a I<procedure>.  You can make a procedure
+using C<newproc>. C<newproc> takes the following form:
+
+    $proc = $db->newproc($name, [ @args ], $context, $next, $prev);
+
+C<$context> and C<$next> are optional.
+
+C<$name> is a string containing the name of the new procedure. It should
+start with a lowercase letter, a number, or an apostrophe indicating that
+it's a string.  This can be accessed through C<< $proc->{rule} >>.
+
+C<@args> (or C<$args> if you already have a reference) is a list of the
+arguments that this procedure takes. They should all be strings (for now).
+If they start with a capital letter or an underscore, they are assumed to
+be a variable.  As before, if they start with an apostrophe, they are a string,
+and anything else, they are a constant. This can be accessed through
+C<< $proc->{args} >>.
+
+C<$context> is a string indicating the I<context> of this procedure.  In a 
+chain, this is the type of operator that comes before it (or "and" if it's the 
+first).  This can be accessed through C<< $proc->{context} >>. Valid contexts 
+are:
+
+=over 4
+
+=item true
+
+Indicating that this procedure is always true, but in only one way (this is
+often what you want).
+
+=item false
+
+At the moment, does exactly the same as the rule not being defined at all.
+See the "Future Direction" section.
+
+=item and
+
+Indicates that the match should only proceed if this procedure matches.
+
+=item or
+
+Indicates that this procedure may be entered without it's preceeding one
+necessarily matching.  Also that if it's preceeding one did match, that
+this should blindly succeed.
+
+=item sub
+
+Indicates that this procedure may only proceed if its preceeding one succeeded
+(whew!) and this one failed.
+
+=item bind
+
+Indicates that this is the left side of a binding (C<:=>) operation.
+
+=back
+
+Finally, C<$next> and C<$prev> are references to the next and previous items 
+in the chain. These can be accessed through C<< $proc->{next} >> and 
+C<< $proc->{fail} >> (because this is where it goes when it fails), 
+respectively. If you supply C<$next>, C<$next>'s C<$prev> is set for you, so
+long as it's not already set.
+
+You can C<add> procedure's you've made with this interface. In fact, all
+C<parse> does is builds a procedure with these functions through
+C<Parse::RecDescent>.
+
+As an example, here's how you would build and add this:
+
+    crew(X) := human(X) | hologram(X) - smart(X).
+
+With the low level interface:
+
+    my $proc = $db->newproc('smart', [ 'X' ], 'sub');
+    $proc = $db->newproc('hologram', [ 'X' ], 'or',   $proc);
+    $proc = $db->newproc('human',    [ 'X' ], 'and',  $proc);
+    $proc = $db->newproc('crew',     [ 'X' ], 'bind', $proc);
+    $db->add($proc);
+
+=head1 FUTURE DIRECTION
+
+In the future, I plan to add:
+
+=over 4
+
+=item %
+
+Structures! This is the big one.  This makes it so arguments can have
+arguments, and you can match against them.
+
+=item %
+
+The ability to differentiate between unprovable and false.  This will give
+C<false> context some meaning.
+
+=item %
+
+Perhaps comments in the parser. This isn't that important.
+
+=item %
+
+Easy access to the parser, so you can define infix operators, etc. The
+parser can now be accessed through C<< $db->{parser} >>, so long as it
+has already parsed at least one thing.
+
+=item %
+
+Predicate searching. This would be cool, but inevitably slow. This is when
+you can give an unbound variable as the name of a predicate, and it would
+bind it to each predicate that matched those arguments.
+
+=back
+
+=head1 BUGS
+
+I can't find any bugs at the moment, but it's semi-dirty code, so there might 
+be.
+
+=head1 AUTHOR
+
+Luke Palmer (fibonaci@babylonia.flatirons.org).
+
+=head1 COPYRIGHT
+
+Copyright (C) 2002, Luke Palmer. All Rights Reserved. This module is free
+software.  It may be used, redistributed, and/or modified under the terms
+of the Perl Artistic License
+        (http://www.perl.com/perl/misc/Artistic.html)

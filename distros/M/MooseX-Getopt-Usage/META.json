@@ -1,0 +1,79 @@
+{
+   "abstract" : "Extend MooseX::Getopt with usage message and man page generated from attribute meta and POD.",
+   "author" : [
+      "Mark Pitchless <markpitchless@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132661",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Getopt-Usage",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0.08",
+            "File::Slurp" : "0",
+            "Test::Class" : "0.36",
+            "Test::Differences" : "0.5",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "FindBin" : "0",
+            "Module::Loaded" : "0.06",
+            "Moose" : "1.23",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::Getopt" : "0",
+            "Pod::Text" : "0",
+            "Pod::Usage" : "1.36",
+            "Term::ANSIColor" : "0",
+            "Term::ReadKey" : "0",
+            "Text::Wrap" : "0",
+            "Try::Tiny" : "0.09"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::Getopt::Usage" : {
+         "file" : "lib/MooseX/Getopt/Usage.pm",
+         "version" : "0.24"
+      },
+      "MooseX::Getopt::Usage::Formatter" : {
+         "file" : "lib/MooseX/Getopt/Usage/Formatter.pm",
+         "version" : "0.24"
+      },
+      "MooseX::Getopt::Usage::Pod::Text" : {
+         "file" : "lib/MooseX/Getopt/Usage/Pod/Text.pm",
+         "version" : "0.24"
+      },
+      "MooseX::Getopt::Usage::Role::Man" : {
+         "file" : "lib/MooseX/Getopt/Usage/Role/Man.pm",
+         "version" : "0.24"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/markpitchless/moosex-getopt-usage/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/markpitchless/moosex-getopt-usage"
+      }
+   },
+   "version" : "0.24"
+}

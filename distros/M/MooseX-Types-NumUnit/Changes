@@ -1,0 +1,16 @@
+Revision history for Perl module MooseX::Types::NumUnit
+
+0.04  Jun 18, 2012
+	- Cache type object relating to same units
+
+0.03  Apr 13, 2012
+	- Depend only on Physics::Unit for units handling
+	- Added definition of mm (for millimeter)
+
+0.02  Feb 7, 2012
+	- Uses Module::Build
+	- Now compliant with MooseX::Types
+
+0.01  Dec 9, 2011
+	- Initial release
+

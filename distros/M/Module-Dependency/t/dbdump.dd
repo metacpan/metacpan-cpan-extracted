@@ -1,0 +1,152 @@
+# canned database for testing
+# $Id: dbdump.dd,v 1.2 2002/04/01 11:17:14 piers Exp $
+
+use vars qw/$DB/;
+
+$DB = {
+          'scripts' => [
+                         'y.pl',
+                         'x.pl'
+                       ],
+          'allobjects' => {
+                            'a' => {
+                                     'filename' => '/home/piers/src/dependency/t/u/a.pm',
+                                     'package' => 'a',
+                                     'depended_upon_by' => [
+                                                             'x.pl'
+                                                           ],
+                                     'depends_on' => [
+                                                       'lib',
+                                                       'd',
+                                                       'e'
+                                                     ]
+                                   },
+                            'b' => {
+                                     'filename' => '/home/piers/src/dependency/t/u/b.pm',
+                                     'package' => 'b',
+                                     'depended_upon_by' => [
+                                                             'x.pl',
+                                                             'y.pl',
+                                                             'i'
+                                                           ],
+                                     'depends_on' => [
+                                                       'lib',
+                                                       'd',
+                                                       'e'
+                                                     ]
+                                   },
+                            'c' => {
+                                     'filename' => '/home/piers/src/dependency/t/u/c.pm',
+                                     'package' => 'c',
+                                     'depended_upon_by' => [
+                                                             'x.pl',
+                                                             'y.pl'
+                                                           ],
+                                     'depends_on' => [
+                                                       'lib',
+                                                       'd'
+                                                     ]
+                                   },
+                            'd' => {
+                                     'filename' => '/home/piers/src/dependency/t/u/d.pm',
+                                     'package' => 'd',
+                                     'depended_upon_by' => [
+                                                             'a',
+                                                             'b',
+                                                             'c'
+                                                           ],
+                                     'depends_on' => [
+                                                       'lib',
+                                                       'f',
+                                                       'g',
+                                                       'h'
+                                                     ]
+                                   },
+                            'e' => {
+                                     'filename' => '/home/piers/src/dependency/t/u/e.pm',
+                                     'package' => 'e',
+                                     'depended_upon_by' => [
+                                                             'a',
+                                                             'b'
+                                                           ],
+                                     'depends_on' => [
+                                                       'lib',
+                                                       'g',
+                                                       'i'
+                                                     ]
+                                   },
+                            'f' => {
+                                     'filename' => '/home/piers/src/dependency/t/u/f.pm',
+                                     'package' => 'f',
+                                     'depended_upon_by' => [
+                                                             'd'
+                                                           ],
+                                     'depends_on' => [
+                                                       'strict'
+                                                     ]
+                                   },
+                            'g' => {
+                                     'filename' => '/home/piers/src/dependency/t/u/g.pm',
+                                     'package' => 'g',
+                                     'depended_upon_by' => [
+                                                             'd',
+                                                             'e'
+                                                           ],
+                                     'depends_on' => [
+                                                       'strict'
+                                                     ]
+                                   },
+                            'h' => {
+                                     'filename' => '/home/piers/src/dependency/t/u/h.pm',
+                                     'package' => 'h',
+                                     'depended_upon_by' => [
+                                                             'd'
+                                                           ],
+                                     'depends_on' => [
+                                                       'CGI'
+                                                     ]
+                                   },
+                            'i' => {	# this makes a circular dependency
+                                     'filename' => '/home/piers/src/dependency/t/u/i.pm',
+                                     'package' => 'i',
+                                     'depended_upon_by' => [
+                                                             'e'
+                                                           ],
+                                     'depends_on' => [
+                                                       'b'
+                                                     ]
+                                   },
+                            'j' => {	# this is totally unrelated to anything else
+                                     'filename' => '/home/piers/src/dependency/t/u/j.pm',
+                                     'package' => 'j',
+                                     'depended_upon_by' => [
+                                                           ],
+                                     'depends_on' => [
+                                                     ]
+                                   },
+                            'x.pl' => {
+                                        'filename' => '/home/piers/src/dependency/t/u/x.pl',
+                                        'package' => 'x.pl',
+                                        'depends_on' => [
+                                                          'lib',
+                                                          'a',
+                                                          'b',
+                                                          'c',
+                                                          'Socket',
+                                                          'strict'
+                                                        ]
+                                      },
+                            'y.pl' => {
+                                        'filename' => '/home/piers/src/dependency/t/u/y.pl',
+                                        'package' => 'y.pl',
+                                        'depends_on' => [
+                                                          'lib',
+                                                          'b',
+                                                          'c',
+                                                          'integer'
+                                                        ]
+                                      },
+                          }
+        };
+
+1;

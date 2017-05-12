@@ -1,0 +1,1 @@
+.//structDeclarationList[not (descendant::*[self::structDeclarationList])]

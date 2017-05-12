@@ -1,0 +1,59 @@
+Mojolicious::Plugin::UnicodeNormalize
+=====================================
+normalize incoming Unicode parameters
+
+    # Mojolicious
+    sub startup {
+        my $self = shift;
+        $self->plugin( 'UnicodeNormalize' );
+
+        ...
+    }
+
+    # Mojolicious::Lite
+    plugin 'UnicodeNormalize';
+
+    ...
+
+Mojolicious::Plugin::UnicodeNormalize allows you to normalize all incoming
+Unicode parameters to a single normalization form. (For more information on why
+Unicode normalization is important, see Tom Christiansen's Unicode cookbook,
+especially
+<http://www.perl.com/pub/2012/05/perlunicookbook-unicode-normalization.html>.
+
+This plugin sets up a normalization hook to run before Mojolicious dispatch. It
+will normalize all non-reference parameters. By default, this uses Unicode
+Normalization Form C, which is almost always what you want. You may specify
+another form when you register the plugin:
+
+    # Mojolicious
+    sub startup {
+        my $self = shift;
+        $self->plugin( 'UnicodeNormalize', { form => 'NFD' } );
+
+        ...
+    }
+
+Any normalization form supported by Unicode::Normalize is valid; currently this
+list is:
+
+    * NFC (the default)
+    * NFD
+    * NFKC
+    * NFKD
+
+Unless you know why you might use an alternate form, use the default of NFC.
+
+AUTHOR
+
+    chromatic <chromatic@cpan.org>, sponsored by Blender Recipe Reviews
+    <https://blenderrecipereviews.com/>.
+
+SEE ALSO
+    Mojolicious, Unicode::Normalize
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of the Artistic License, version 2 (the same terms as Perl
+    itself).

@@ -1,0 +1,8 @@
+=== version 0.3
+
+  * bug fix when Maildir directory does not exists
+ 
+  * add mqd_get()
+
+  * add version macros
+

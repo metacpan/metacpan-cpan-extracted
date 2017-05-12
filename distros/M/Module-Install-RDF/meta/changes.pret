@@ -1,0 +1,55 @@
+`Module-Install-RDF 0.001 cpan:TOBYINK`
+	issued   2011-10-01;
+	label    "Initial release".
+
+`Module-Install-RDF 0.002 cpan:TOBYINK`
+	issued   2011-10-06;
+	changeset [
+		item "Upgrade Module::Package::RDF version."^^Packaging;
+	] .
+
+`Module-Install-RDF 0.003 cpan:TOBYINK`
+	issued   2011-11-26;
+	changeset [
+		item [ a dcs:Regression; label "use parent" ];
+		item [ a dcs:Addition; label "rdf_project_uri function which provides heuristics to determine the URI of the primary doap:Project described in the meta directory." ];
+		item [ a dcs:Change; label "Use Object::ID::object_id instead of Scalar::Util::refaddr to uniquely identity Module::Install objects. (Though in a typical installation scenario, this shouldn't matter much.)" ];
+	].
+
+`Module-Install-RDF 0.004 cpan:TOBYINK`
+	issued   2011-12-03;
+	changeset [
+		item "use base"^^Bugfix;
+	] .
+
+`Module-Install-RDF 0.005 cpan:TOBYINK`
+	issued   2012-07-04;
+	changeset [
+		item "Support metadata written in Pretdsl."^^Addition;
+	] .
+
+`Module-Install-RDF 0.006 cpan:TOBYINK`
+	issued   2012-07-04;
+	changeset [
+		item "Add Module::Runtime dependency."^^Packaging;
+	] .
+
+`Module-Install-RDF 0.007 cpan:TOBYINK`
+	issued   2012-07-05;
+	label    "Bond, James Bond";
+	changeset [
+		item "Bump RDF::TriN3 dependency to 0.201."^^Packaging;
+	] .
+
+`Module-Install-RDF 0.008 cpan:TOBYINK`
+	issued   2013-03-16;
+	changeset [
+		item "write_meta_ttl method."^^Addition;
+	] .
+
+`Module-Install-RDF 0.009 cpan:TOBYINK`
+	issued   2013-07-31;
+	changeset [
+		item "Add a hard-coded prefix for doap-deps."^^Update;
+		item "Change the hard-coded prefix for doap-bugs."^^Change;
+	] .

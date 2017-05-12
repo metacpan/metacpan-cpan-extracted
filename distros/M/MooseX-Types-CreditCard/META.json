@@ -1,0 +1,88 @@
+{
+   "abstract" : "Moose Types related to Credit Cards",
+   "author" : [
+      "Caleb Cushing <xenoterracide@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Types-CreditCard",
+   "no_index" : {
+      "file" : [
+         "perlcritic.rc"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Business::CreditCard" : "0",
+            "Module::Runtime" : "0",
+            "MooseX::Types" : "0",
+            "MooseX::Types::Common::String" : "0.001005",
+            "MooseX::Types::DateTime" : "0",
+            "MooseX::Types::Moose" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Requirements" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "List::Util" : "0",
+            "Moose" : "0",
+            "Test::Exception" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::Types::CreditCard" : {
+         "file" : "lib/MooseX/Types/CreditCard.pm",
+         "version" : "0.002003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/xenoterracide/moosex-types-creditcard/issues"
+      },
+      "homepage" : "https://metacpan.org/dist/MooseX-Types-CreditCard",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/xenoterracide/moosex-types-creditcard.git",
+         "web" : "https://github.com/xenoterracide/moosex-types-creditcard"
+      }
+   },
+   "version" : "0.002003"
+}
+

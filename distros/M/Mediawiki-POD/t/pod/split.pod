@@ -1,0 +1,22 @@
+=pod
+
+=head1 DESCRIPTION
+
+=for graph-common node { color: red; }
+
+=begin graph
+
+ node { color: silver; }
+
+ [ Some \[\] ||
+  Autosplit  ||
+  Node        ]
+
+ {
+ 
+ basename: u; color: blue|;
+  }
+
+=end graph
+
+=cut

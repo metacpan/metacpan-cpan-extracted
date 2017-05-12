@@ -1,0 +1,7 @@
+perltidy version 20130922 log file on a darwin system, OLD_PERL_VERSION=5.018002
+Configuration and command line parameters for this run:
+-html -pre
+To find error messages search for 'WARNING' with your editor
+Line 1 implies starting-indentation-level = 0
+Suggest including 'use warnings;'
+Suggest including 'use strict;'

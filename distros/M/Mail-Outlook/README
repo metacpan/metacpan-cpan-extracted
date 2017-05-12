@@ -1,0 +1,69 @@
+Mail::Outlook
+=============
+
+DESCRIPTION
+
+This module was written to overcome the problem of sending mail messages, 
+where Microsoft (R) Outlook (R) is the only mail application available.
+However, since it's inception the module has expanded to handle a range of 
+Outlook mail functionality.
+
+Note that when sending messages, the module uses the named owner of the 
+Outbox MAPI Folder in order to access the correct objects. Thus the From 
+field of a new message is predetermined, and a read only property.
+
+If using the 'Win32::OLE::Const' constants, only the following are currently 
+supported:
+
+  olFolderInbox
+  olFolderOutbox
+  olFolderSentMail
+  olFolderDrafts
+  olFolderDeletedItems
+
+DEPENDENCIES
+
+The distribution requires the following modules:
+
+  Win32::OLE
+  Win32::OLE::Const
+
+For testing purposes, the following modules are desireable, but not essential:
+
+  Test::Pod
+  Test::Pod::Coverage
+
+DISCLAIMER
+
+Please note that there are no tests for the display, send, move or delete
+methods, due to the potential havoc they could cause. You are advised to 
+test this functionality safely should you need it. Any damage to your mail
+environment is your sole responsibility. The software herein is provided as
+is and the author accepts no liability as to its reliability.
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+TODO
+
+  X-Header support - unlikely as Exchange ignores them
+  Other Mail Folders
+  More Tests
+
+AUTHOR
+
+Barbie <barbie@cpan.org>
+for Miss Barbell Productions, http://www.missbarbell.co.uk
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2003-2013 Barbie & Miss Barbell Productions.
+
+This distribution is free software; you can redistribute it and/or
+modify it under the Artistic License v2.

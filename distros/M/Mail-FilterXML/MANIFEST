@@ -1,0 +1,9 @@
+Changes
+FilterXML.pm
+Makefile.PL
+MANIFEST
+test.pl
+mailfilter.pl
+mail_rules.xml
+README
+TODO

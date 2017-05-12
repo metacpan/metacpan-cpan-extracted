@@ -1,0 +1,7 @@
+Revision history for Perl extension MIME::Expander
+
+0.02  2015-02-01 00:00:00 JST
+    - Support 'multipart/mixed'
+
+0.01  2013-03-12 00:50:36 JST
+    - original version

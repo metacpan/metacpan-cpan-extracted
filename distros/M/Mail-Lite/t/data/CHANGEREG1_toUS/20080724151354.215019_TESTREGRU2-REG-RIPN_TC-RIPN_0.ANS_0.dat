@@ -1,0 +1,22 @@
+---
+-
+  - rusu.response.update
+  -
+    - domain: air.ru
+      error_code:
+        - 'Authentication failed. - FATAL ERROR !'
+        - Access to object is denied!
+      req_id: 20080724151353.125859
+      rule_id: rusu.response.update.fail
+    - domain: upanishadixxx21.ru
+      error_code:
+        - "Object 'UPANISHADIXXX21.RU' not found - FATAL ERROR !"
+        - 'unrecognized statment - line ignored'
+      req_id: 20080724151353.125859
+      rule_id: rusu.response.update.fail
+    - domain: trax007.ru
+      error_code:
+        - 'unrecognized statment - line ignored'
+        - 'Too many warnings (max. 2) - FATAL ERROR !'
+      req_id: 20080724151353.125859
+      rule_id: rusu.response.update.fail

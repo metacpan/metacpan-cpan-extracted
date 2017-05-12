@@ -1,0 +1,90 @@
+Revision history for MongoDBx-Queue
+
+1.002     2014-01-24 23:05:20-05:00 America/New_York
+
+    [FIXES]
+
+    - Updated for changes in MooseX::Role::MongoDB 0.006
+
+1.001     2013-10-15 19:35:26 America/New_York
+
+    [FIXES]
+
+    - Consumes MooseX::Role::Logger as required by MooseX::Role::MongoDB
+      version 0.003 or later
+
+1.000     2013-09-22 20:57:32 America/New_York
+
+    [INCOMPATIBLE CHANGES]
+
+    - MongoDBx::Queue prior to version 1.000 were not fork-safe.  A fork
+      could cause MongoDB connections to hang.  As of 1.000, MongoDB
+      connections are managed via MooseX::Role::MongoDB, which provides
+      fork-safety.
+
+    - As result of this change, attributes have changed.  MongoDBx::Queue
+      no longer has a C<db> attributed taking a MongoDB::Database argument
+      and the C<name> attribute has been renamed to C<collection_name>
+
+    - Now, you provide C<client_options> controlling the connection to
+      the database.  You provide C<database_name> to indicate the database
+      to hold your queue.  And you provide C<collection_name> to indicate
+      the collection to hold the queue.
+
+    - No attributes are required any more.  By default, MongoDBx::Queue
+      will connect to localhost on the default MongoDB port, will use
+      the 'test' database and the 'queue' collection.
+
+    [ADDED]
+
+    - Automatically ensures an index on priority is in place on the
+      collection
+
+    [FIXES]
+
+    - Fixed task reservation on Perl v5.18 that borke due to hash-order
+      randomization. MongoDB expects command documents to be ordered a
+      certain way so we now use array references instead of hash references
+      to pass such commands.
+
+    [INTERNAL]
+
+    - Dropped Const::Fast as prerequisite
+
+0.004     2013-04-17 20:06:53 America/New_York
+
+    [FIXED]
+
+    - Have peek() do the right thing for list or scalar return context
+
+0.003     2013-03-28 18:34:49 America/New_York
+
+    [ADDED]
+
+    - Added 'search' and 'peek' methods to allow inspection of the queue
+
+0.002     2012-09-05 18:08:14 America/New_York
+
+    [INCOMPATIBLE CHANGES]
+
+    - reschedule_task() now takes a hashref of options using the same format
+        as add_task() instead of taking a scalar epoch seconds time argument
+
+    [ADDED]
+
+    - add_task() now supports setting arbitrary priority
+
+    [CHANGED]
+
+    - reserve_task() only find tasks up to a maximum priority; defaults to
+        time(); this makes "future" tasks invisible unless a different
+        maximum priority is requested
+
+    - generally improved documentation for consistency describing new
+        features
+
+0.001     2012-08-30 17:34:16 America/New_York
+
+    - First release
+
+# vim: ts=4 sts=4 sw=4 et:

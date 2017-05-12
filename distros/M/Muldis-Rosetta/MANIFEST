@@ -1,0 +1,17 @@
+Changes
+INSTALL
+lib/Muldis/Rosetta.pm
+lib/Muldis/Rosetta/Engine/Example.pm
+lib/Muldis/Rosetta/Interface.pm
+lib/Muldis/Rosetta/SeeAlso.pod
+lib/Muldis/Rosetta/Validator.pm
+LICENSE/GPL
+LICENSE/LGPL
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/Muldis_Rosetta_00_Compile.t
+t/Muldis_Rosetta_50_Validate_Example.t
+TODO
+META.yml                                 Module meta-data (added by MakeMaker)

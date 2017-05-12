@@ -1,0 +1,33 @@
+---
+abstract: 'create README.mkdn from POD'
+author:
+  - 'Marcel GrE<uuml>nauer, C<< <marcel@cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.70
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Install-ReadmeMarkdownFromPod
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  Module::Install::ReadmeFromPod: 0
+requires:
+  Module::Install: 0
+  Pod::Markdown: 0
+  perl: 5.6.0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Module-Install-ReadmeMarkdownFromPod
+  homepage: http://search.cpan.org/dist/Module-Install-ReadmeMarkdownFromPod/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hanekomu/module-install-readmemarkdownfrompod.git
+version: 0.03

@@ -1,0 +1,95 @@
+use strict;
+use warnings;
+use Test::More tests => 14;
+use Test::Fatal;
+
+use MooseX::Method::Signatures::Meta::Method;
+
+{
+    package Foo;
+    use metaclass;
+
+    my $method = MooseX::Method::Signatures::Meta::Method->wrap(
+        sub {
+            my ($class, $foo, $bar) = @_;
+            return $bar x $foo;
+        },
+        signature    => '($class: Int :$foo, Str :$bar)',
+        package_name => 'Foo',
+        name         => 'bar',
+    );
+    ::isa_ok($method, 'Moose::Meta::Method');
+
+    Foo->meta->add_method(bar => $method);
+}
+
+is(exception {
+    is(Foo->bar(foo => 3, bar => 'baz'), 'bazbazbaz');
+}, undef);
+
+ok(exception {
+    Foo->bar(foo => 'moo', bar => 'baz');
+});
+
+# Makes sure we still support the old API.
+
+{
+    package Bar;
+    use metaclass;
+
+    my $method = MooseX::Method::Signatures::Meta::Method->wrap(
+        signature    => '($class: Int :$foo, Str :$bar)',
+        package_name => __PACKAGE__,
+        name         => 'bar',
+        body         => sub {
+            my ($class, $foo, $bar) = @_;
+            return $bar x $foo;
+        },
+    );
+    ::isa_ok($method, 'Moose::Meta::Method');
+
+    Bar->meta->add_method(bar => $method);
+}
+
+is(exception {
+    is(Bar->bar(foo => 3, bar => 'baz'), 'bazbazbaz');
+}, undef);
+
+ok(exception {
+    Bar->bar(foo => 'moo', bar => 'baz');
+});
+
+
+# CatalystX::Declare seems to create a method without a code at all.
+is(exception {
+    package Baz;
+    use metaclass;
+
+    my $method = MooseX::Method::Signatures::Meta::Method->wrap(
+        signature    => '($class: Int :$foo, Str :$bar)',
+        package_name => __PACKAGE__,
+        name         => 'baz',
+    );
+    ::isa_ok($method, 'Moose::Meta::Method');
+
+    # CatalystX::Declare uses reify directly. too bad.
+    my $other = $method->reify
+      ( actual_body => sub {
+            my ($self, $foo, $bar) = @_;
+            return $bar x $foo;
+        },
+      );
+    ::isa_ok($method, 'Moose::Meta::Method');
+
+
+    Baz->meta->add_method(baz => $other);
+}, undef);
+
+is(exception {
+    is(Baz->baz(foo => 3, bar => 'baz'), 'bazbazbaz');
+}, undef);
+
+ok(exception {
+    Baz->baz(foo => 'moo', bar => 'baz');
+});
+

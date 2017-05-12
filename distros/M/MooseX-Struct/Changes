@@ -1,0 +1,13 @@
+Revision history for MooseX-Struct
+
+0.03     May 21, 2008 6:06
+         First version packaged via module-starter and Module::Build
+
+0.05     Jun 6, 2008
+         Removed default immutability, added separate immutable() sub
+
+0.06     Jun 10, 2008
+         Minor pod changes, no functionality changes
+
+
+

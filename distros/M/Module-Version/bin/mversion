@@ -1,0 +1,111 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Module::Version::App;
+
+my $app = Module::Version::App->new;
+
+exit $app->run;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+mversion - Program to get module versions
+
+=head1 SYNOPSIS
+
+This program shows you the version of a module or several modules, in a
+comfortable manner.
+
+    mversion Dancer
+    mversion --dev --full This That Another
+    mversion -q -i modules.txt
+
+In Perl-world, we have many ways to determine a version of a module. You can
+run C<perl -MModule -le'print $Module::Version'>, but once the name is very long
+it becomes tiresome to write.
+
+We can try to load the module in a specific version that is (hopefully) greater
+than what we already have installed (if at all). That way we purposely inflict
+an error on the compiler and try to read the error msg. C<perl -MModule\ 9999>.
+This does not work on multiple modules at once. Some modules even have long
+version numbers, such as a date, and then you need to run C<perl
+-MModule\ 9999999999> which is seriously annoying.
+
+There are a few modules out there that get you the version number of other
+modules but none of them are applications, nor do they have enough options for
+comfortable day-to-day usage. This is where C<mversion> comes in.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -f, --full
+
+This outputs both the name and the version of module, instead of just the
+version number.
+
+    mversion -f ThisModule ThatModule
+    mversion --full ThisModule ThatModule
+
+=item -I, --include DIRECTORY, -I MORE, -I EVENMORE
+
+This lets you add any number of directories to include when trying to get a
+version number. This is very helpful when you're trying to check if the version
+of a module in a specific folder is different than the default one.
+
+    # get the version of ThisModule
+    mversion ThisModule
+
+    # get the version of ThisModule from directory dev_releases
+    mversion -I dev_releases ThisModule
+
+You can include more directories by repeating the flag and argument again. There
+is no limit to how many directories you can include.
+
+=item -i, --input FILE
+
+This reads a list of modules from a file.
+
+    mversion -i my_modules.txt
+    mversion --input my_modules.txt
+
+=item -d, --dev
+
+This shows the developer versions (0.01_01) just as that instead of eval()ing
+them.
+
+    mversion -d Test::More
+    mversion --dev Test::More
+
+=item -q, --quiet
+
+Usually if a module does not exist, C<mversion> will warn about it. This
+allows you to silent those warnings and just carry on.
+
+    mversion -q This::Does::Not::Exist But::This::Does
+    mversion --quiet This::Does::Not::Exist But::This::Does
+
+=back
+
+=head1 SEE ALSO
+
+L<Module::Version>
+
+Github page at L<http://github.com/xsawyerx/module-version>.
+
+=head1 COPYRIGHT
+
+Copyright 2010 Sawyer X.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

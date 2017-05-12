@@ -1,0 +1,24 @@
+Changes
+examples/newton_raphson.pl
+lib/Math/Polynom.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/01_test_compile.t
+t/02_test_new.t
+t/03_test_stringify.t
+t/04_test_clone.t
+t/05_test_negate.t
+t/06_test_eval.t
+t/07_test_add.t
+t/08_test_minus.t
+t/09_test_multiply.t
+t/10_test_divide.t
+t/11_test_derivate.t
+t/12_test_newton_raphson.t
+t/13_test_error_codes.t
+t/14_test_secant.t
+t/15_test_brent.t
+t/pod-coverage.t
+t/pod.t

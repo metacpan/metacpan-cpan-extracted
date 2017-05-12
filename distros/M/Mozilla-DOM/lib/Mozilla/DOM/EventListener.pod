@@ -1,0 +1,92 @@
+=head1 NAME
+
+Mozilla::DOM::EventListener
+
+=for object Mozilla::DOM::EventListener
+
+THIS CLASS IS EXPERIMENTAL. SEE README FOR HOW TO ENABLE EXPERIMENTAL FEATURES.
+
+Mozilla::DOM::EventListener is a wrapper around an instance of Mozilla's
+nsIDOMEventListener interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+ * The nsIDOMEventListener interface is a callback interface for
+ * listening to events in the Document Object Model.
+ *
+ * For more information on this interface please see 
+ * L<http:E<sol>E<sol>www.w3.orgE<sol>TRE<sol>DOM-Level-2-EventsE<sol>>
+
+From DOM 2 spec:
+The EventListener interface is the primary method
+for handling events. Users implement the EventListener interface and
+register their listener on an EventTarget using the AddEventListener
+method. The users should also remove their EventListener from its
+EventTarget after they have completed using the listener.
+
+Here is why support for EventListener is considered "experimental".
+If your listener goes out of scope, HandleEvent will segfault
+because the class's destructor gets called. (So you have to put
+the listener in some "global" variable.) Obviously I need to prevent
+the segfault from happening, but the current workaround is to make
+sure there's always something pointing to an EventListener so that
+it doesn't go out of scope.
+  The ideal situation would be the following. Say that you
+call AddEventListener in one signal handler with a certain
+EventListener. You're not likely to want to also call RemoveEventListener
+from the same handler. However, how would you access the original
+EventListener if it's out of scope? You could create a new
+EventListener with the same parameters as the one you previously
+passed to AddEventListener. It wouldn't even matter what subref you
+passed to it; calling RemoveEventListener with this EventListener
+would have the same effect as calling it with the original EventListener.
+  But the problem is keeping the internal event listener object alive
+even after the Mozilla::DOM::EventListener object has been destroyed,
+because otherwise when HandleEvent is called it will point to an
+invalid event listener. I think the way to do this will be to only
+create the internal event listener object when AddEventListener is
+called, and only if no previous EventListener of the same type has
+been added. Then only destroy the internal event listener when
+RemoveEventListener is called, checking first that one exists to
+be destroyed. I think these changes would be backwards compatible.
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::EventListener->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head2 Mozilla::DOM::EventListener->B<new>(\&handler)
+
+The constructor for this class. Pass a subroutine reference
+as its argument. This subroutine will be called from the
+HandleEvent method.
+
+=head1 METHODS
+
+=head2 $listener->HandleEvent($event)
+
+Note: you cannot call this method from Perl. Instead you pass
+a handler (subroutine reference) to this class's `new' method.
+The handler's argument will be the event being handled by HandleEvent.
+
+This method is called whenever an event occurs of the type for which 
+the EventListener interface was registered.
+
+The L<Event|Mozilla::DOM::Event> contains contextual information about
+the event. It also contains the
+L<StopPropagation|Mozilla::DOM::Event/StopPropagation> and
+L<PreventDefault|Mozilla::DOM::Event/PreventDefault> methods
+which are used in determining the event's flow and default action.
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

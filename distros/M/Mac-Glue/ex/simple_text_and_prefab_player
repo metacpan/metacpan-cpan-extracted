@@ -1,0 +1,15 @@
+#!perl -w
+use Mac::Glue ':glue';
+use Mac::Apps::Launch;
+$p = new Mac::Glue 'PreFab Player';
+
+LaunchApps('ttxt', 1);  # launch SimpleText
+
+$p->do_menu_menu_item(New        => of_menu => 'File');
+$p->do_menu_menu_item(Palatino   => of_menu => 'Font');
+$p->type('This land is your land, this land is my land.');
+$p->do_menu_menu_item('Select All', of_menu => 'Edit');
+$p->do_menu_menu_item('36 Point',   of_menu => 'Size');
+$p->do_menu_menu_item(Replace    => of_menu => 'Edit');
+$p->type("your\tmy");   # s/your/my/
+$p->type(enum('enter'));

@@ -1,0 +1,35 @@
+<ul class="nav nav-list">
+
+% my $n = stash 'nav_item';
+% my @selected;
+% for my $a (@{ toto_config->{sidebar}{$n} } ) {
+    % if ($a !~ /\//) {
+        % my $is_selected = (current_object eq $a) && ((stash 'show_tabs') || (stash 'key'));
+        <li class="dropdown <%== $is_selected ? q[ active] : '' %>">
+            <a class="dropdown-toggle" style='float:right;z-index:10000' data-toggle="dropdown" data-target="#">
+                <b class="caret"></b></a>
+            <ul class="dropdown-menu" role="menu">
+                % for my $t (tabs($a)) {
+                <li>
+                 %= link_to "$a/$t" => { key => "" } => begin
+                 <%= $t %>
+                 %= end
+                </li>
+                % }
+            </ul>
+        <%= link_to "$a/default" => { key => "" } => begin =%>
+            <%= $a %>
+        <%= end =%>
+        </li>
+    % next;
+    % }
+    <li <%== $a eq current_route() ? q[ class="active"] : '' %>>
+        <%= link_to $a => begin =%>
+            <%= $a =%>
+        <%= end =%>
+    </li>
+% }
+
+</ul>
+
+

@@ -1,0 +1,27 @@
+Find the source and code repository at http://mac-itunes.googlecode.com
+
+Drew Stephens <drew@dinomite.net> (http://dinomite.net)
+    Your intrepid author
+
+Scott Lawrence (http://linkedin.com/in/scottdlawrence)
+  - Scott contributed examples/scan.pl and assisted in making the
+    documentation more understandable.
+
+Garrett Scott <garrett@gothik.org> (http://www.gothik.org)
+  - Handling of Boolean values in XML library parser; spurred me to clean up
+    Item as well, to handle all values.
+  - Fixed the handling of character sequences in XML parsing. (r77)
+
+Mark Grimes <mgrimes@cpan.org> (http://www.peculiarities.com)
+  - Parsing playlists from the XML file
+    https://rt.cpan.org/Ticket/Display.html?id=50668
+
+Steven Scholnick <steve@scholnick.net> (http://www.scholnick.net)
+  - Reported bug in playlist parsing, fixed in 0.80
+
+Michael G Schwern <mschwern@cpan.org> (http://schwern.dreamhosters.com)
+  - Added Track Count and Track Number to Item
+    https://rt.cpan.org/Public/Bug/Display.html?id=57673
+
+David Rostcheck <davidr@thisisdavidr.net>
+  - iTunesU support in Item.pm

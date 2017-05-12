@@ -1,0 +1,77 @@
+0.13
+ - Add nnumflag(), set_nnum() and clear_nnum() functions. Also start using the perl
+   API function looks_like_number() to detect non-numeric strings.
+ - Change default ouptput precision from 15 to 17 decimal digits.
+
+0.12
+ - Try to detect if references to "cpow" will not be resolved - and abort the build
+   if this problem is found to exist. (This enables us to avoid some FAIL reports
+   from cpan-testers.)
+ - Rewrite tests 4 and 5 in t/overload_string.t so that they don't register a fail
+   if the libc bug that causes 'nan nan' to be returned (instead of the correct
+   'inf inf') is present.
+
+0.11
+ - Remove is_neg_zero() and get_neg_zero(). (Sick of the bugs with this.)
+ - Rename Math::Complex_C::Long to Math::Complex_C::L and move to a separate distro.
+ - Add metadata to Makefile.PL
+ - Remove negative NaN support. Makes no sense to provide a sign to something that
+   is not a number ... next thing they'll be wanting is red nans and green nans ....
+
+0.09
+ - Define __USE_MINGW_ANSI_STDIO in Complex_C.xs for the MinGW compiler so that
+   signed zero errors are avoided under Windows XP (and, presumably, earlier).
+   This symbol was already being defined in Long.xs.
+ - Define PERL_NO_GET_CONTEXT.
+
+0.08
+ - Fix bug in t/arith.t and t/arithl.t
+ - Use float.h's DBL_DIG and LDBL_DIG to set the initial value of precision
+   for "printf".
+ - Add _DBL_DIG() and _LDBL_DIG() XSubs so that we can see the value of float.h's
+   DBL_DIG and LDBL_DIG.
+
+0.07
+ - Add Math::LongDouble conversions(LD2cl, imag_cl2LD and real_cl2LD).
+ - Alter the way that strEQ gets hold of HvNAME(SvSTASH(SvRV(sv))) - so that -Wall
+    doesn't emit "null argument" warnings. (Thanks Daniel Kahn Gillmor.)
+ - Add precision setting/getting functions - d_set_prec, d_get_prec, long_set_prec
+   and long_get_prec. This enables control over precision presented by the various
+   stringification sub routines (d_to_str, d_to_strp, ld_to_str, ld_to_strp and
+   _overload_string).
+ - Add to_string conversions - d_to_str, d_to_strp, ld_to_str and ld_to_strp.
+ - Change the print overloading (sub _overload_string) to use the new to_string
+   conversion functions. This standardises the printing of double and long double
+   objects, and handles the printing in the same way as Math::LongDouble does.
+
+0.06
+ - Fix is_inf() and is_infl() in Complex_C.xs and Long.xs respectively.
+  (They were reporting a NaN to be an Inf.)
+
+0.05
+ - Remove 'not' from overloads. Apparently achieved nothing anyway, and 5.16
+   warns that it's invalid.
+ - Devel::Peek::Dump() a couple of variables in t/arith.t, to try and see
+   why tests 10-12 fail - ie iff they fail && if Devel::Peek is available.
+   (Only reported failure I know of is
+   http://www.cpantesters.org/cpan/report/e8c48154-9492-11e0-9abf-e615ed0326e0.)
+
+0.04
+ - Add is_neg_zero() function. (Perl will often present '-0' as '0'.)
+ - Add aab_neg_zero.t to check how the compiler deals with -0, and whether
+   is_neg_zero() functions correctly.
+
+0.03
+ - Fix assign_cl - internally it was assigning a double instead of a long double.
+ - Skip (rather than fail) tests that are known to be failing because
+   of compiler bugs.
+ - Change _overload_equiv to cater for comparison with real numbers, as
+   well as complex numbers.
+ - Move the files in Long/t to top-level t folder, and delete Long/t.
+
+0.02
+ - Remove Long/t/aab_basic.t. (Served no additional purpose.)
+ - Add Long/Long.xs to MANIFEST.
+
+0.01
+ - First release.

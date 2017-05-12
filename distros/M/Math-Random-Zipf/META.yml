@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Math-Random-Zipf
+version:             0.11
+abstract:            Generate Zipf-distributed random integers
+license:             perl
+author:              
+    - Jon Schutz <jon at jschutz.net>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    List::MoreUtils:               0
+    POSIX:                         0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,3 @@
+This is a text template.
+
+A fruit's name: <TMPL_VAR fruit_name>.

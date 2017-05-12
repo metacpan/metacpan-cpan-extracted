@@ -1,0 +1,54 @@
+1.3       2014-02-15 17:30:11 Europe/Paris
+
+1.2       2013-02-04 21:09:14 Europe/Paris
+
+    Fix missing plot
+
+1.1       2012-12-08 21:09:40 Europe/Paris
+
+    Fix UserAgent
+    Get first element for imdbapi response if multiple one possible
+
+1.0       2012-12-01 00:59:47 Europe/Paris
+
+    Use imdbapi.org
+
+0.9       2012-11-26 08:19:56 Europe/Paris
+
+    Change tracker and repos
+
+
+0.8       2012-07-29 18:16:42 Europe/Paris
+
+    Fix and add with_aka
+
+0.7       2012-07-20 09:40:46 Europe/Paris
+
+    require File::Path 2.08
+
+0.6       2012-07-18 14:09:13 Europe/Paris
+
+    update changes
+
+0.5       2012-07-18 14:07:45 Europe/Paris
+
+    add synopsis to bin
+
+0.4       2012-07-17 19:00:52 Europe/Paris
+
+    Use Dist::Zilla::PluginBundle::Author::Celogeek v0.7
+
+0.3 - 2012-06-08
+=====
+
+    change author name
+
+0.2 - 2012-06-01
+=====
+
+    fix dist, add changes
+
+0.1 - 2012-01-09
+=====
+
+    first version

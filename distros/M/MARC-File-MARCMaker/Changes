@@ -1,0 +1,26 @@
+Version History
+
+Version 0.05: First CPAN release, Oct. 30, 2005.
+
+  -Moved 00.load.t.txt to 00.load.t 
+  -Removed ABSTRACT_FROM from Makefile.PL since it wasn't working
+  -Modified t/marmaker.t to not emit warnings and output that might confuse
+   the test harness. 
+
+Version 0.04: Updated Oct. 20. Initial commit to SourceForge CVS, Oct. 23, 2005.
+
+ -Initial commit to CVS on SourceForge.
+ -Misc. cleanup.
+ -Basic versions of bin/mrc2mkr and bin/mkr2mrc example programs.
+
+Version 0.03: Updated Aug. 2, 2005. Released Aug. 14, 2005.
+
+ -Revised decode() to fix problem with dollar sign conversion from mnemonics to characters.
+
+Version 0.02: Updated July 12-13, 2005. Released July 16, 2005.
+
+ -Preliminary version of encode() for fields and records
+
+Version 0.01: Initial version, Nov. 21, 2004-Mar. 7, 2005. Released Mar. 7, 2005.
+
+ -Basic version, translates .mrk format file into MARC::Record objects.

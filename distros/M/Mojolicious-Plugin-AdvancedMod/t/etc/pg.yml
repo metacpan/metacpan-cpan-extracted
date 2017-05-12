@@ -1,0 +1,11 @@
+user: 'www'
+password: 'q1w2e3'
+dbname: test
+host: 127.0.0.1
+port: 5432
+dsn: 'dbi:Pg:dbname=${dbname};port=${port};host=${host}'
+options:
+  PrintWarn: 0
+  PrintError: 0
+  RaiseError: 1
+  pg_enable_utf8: 1

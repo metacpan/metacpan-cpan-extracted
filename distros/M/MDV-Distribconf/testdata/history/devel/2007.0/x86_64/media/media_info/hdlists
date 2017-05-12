@@ -1,0 +1,7 @@
+hdlist_main.cz	media/main/release	Main	(3400m)
+noauto:hdlist_main_testing.cz	media/main/testing	Main	(3400m)
+noauto:hdlist_debug_main.cz	media/debug_main/release	debug_main_release	
+noauto:hdlist_debug_main_testing.cz	media/debug_main/testing	debug_main_testing	
+hdlist_contrib.cz	media/contrib/release	Contrib	(4300m)
+noauto:hdlist_debug_contrib.cz	media/debug_contrib/release	debug_contrib_release	
+noauto:hdlist_non-free.cz	media/non-free/release	non-free_release	

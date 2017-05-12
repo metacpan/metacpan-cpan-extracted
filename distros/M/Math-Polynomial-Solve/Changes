@@ -1,0 +1,589 @@
+Revision history for Perl extension Math::Polynomial::Solve.
+
+2.75
+     May 22 2016
+	- Updated the cubics paper by Dr. Nickalls, as I could no
+	  longer remember if the one in the references directory
+	  was the most recent version.
+     May 19 2016
+	- Remove the commented out setting of fltcmp tolerance in
+	  21-poly.t. Note to self: will have to remove fltcmp
+	  tests in 02-limit.t once deprecated functions and
+	  fltcmp tolerance are removed.
+2.72_01 (TRIAL)
+     May 15 2016
+	- The major change: Will now warn on exit (via the END block)
+	  about the use of deprecated functions. But that's okay,
+	  because you've already made that change over half a year
+	  ago, and don't use those functions anymore, right?
+	- Also the test files for the deprecated functions are gone.
+	- Hmm, I've been inconsistently using Test::Simple and Test::More
+	  in the test files. Settled on Test::More and made that change
+	  in Build.PL too.
+	- Some small improvements in the documentation.
+	- Some 2001-era usage looks pretty dated now ("use vars" in
+	  particular). Updated that.
+2.72
+     Oct 21 2015
+	- Changed tests to use Math::Utils's polynomial and compare code.
+	- More POD reformatting and clarification, extend the POD docs,
+	  and change some code based on aesthetics.
+	- Gave up on putting unicode directly in POD (Heinrich Dorrie's
+	  name seems to defeat the pod-to-html parser, which fails to
+	  recognize an o with an umlaut
+	  (<http://www.fileformat.info/info/unicode/char/f6/index.htm>).
+	- Bump the version numbers, up to CPAN.
+     Oct 19 2015
+	- Reformat to POD-as-function-head (becoming both documentation
+	  and function comment description), as is currently done in
+	  most perl modules.
+	- I'm pretty firm about (most of) the :utility functions going
+	  away by 2.80, but I also have it written that they're being
+	  removed in two releases in some parts of the documentation,
+	  which is way too restrictive. Changed all mentions of "two
+	  releases" to "version 2.80".
+2.71
+     Oct 8 2015
+	- Document functions deprecated by Math-Utils and Math-VecStat.
+	- Change internal use from now-deprecated functions to functions
+	  in Math-Utils and Math-VecStat (this is mostly in the Sturm
+	  functions.)
+	- New function sturm_bisection(). Code comes from
+	  sturm_bisection_root(), which now calls it.
+	- Fix (deprecated, but in use) fltcmp() to avoid an error that
+	  could result in fltcmp thinking equal values are less than.
+
+2.70
+     Jan 27 2014
+	- Made documentation changes to the README file in anticipation
+	  of removing set_hessenberg() and get_hessenberg(). Also made
+	  version number 2.70.
+	- Removed get_hessenberg() and set_hessenberg() from the code.
+2.67
+     May  3 2013
+	- Some documentation tweaks on the use of ascending_order().
+	- Code seems stable after use; time to upload to CPAN.
+     Apr 19 2013
+	- Add --ascending flag to the perl scripts in the eg/ directory.
+	- Added files hqr.pl, laguerre.pl, and nr.pl to the eg/
+	  directory, and added them to the MANIFEST. Again, new scripts
+	  for trying individual functions.
+     Apr 17 2013
+	- Fix $ascending_flag checks in sturm functions with early
+	  returns, or the sturm functions that use the first entry
+	  in the chain for the (unreversed) polynomial.
+	- Removed zyxw.t, as the existing test files now check
+	  ascending_order() themselves.
+     Apr 15 2013
+	- Test files sturm1.t, sturm2.t, and sturm3.t also use
+	  Test::More and test with the ascending_order().
+	- Add ascending_order() tests to pderival.t.
+	- Add ascending_order() tests to peval.t.
+     Apr 12 2013
+	- Get sturm0.t testing with ascending_order(), and Test::More.
+     Apr 11 2013
+	- Testing via division.t tests correctly again, with or without
+	  the ascending_order() set.
+	- Start in on the :sturm functions to recognize $ascending_flag.
+     Apr 4 2013
+	- Completed (maybe) adding $ascending_flag to the :utility
+	  functions.
+     Apr 1 2013
+	- Start in on using $ascending_flags for the :utility functions.
+	- Note ascending_order()'s use at length in the README file.
+     Mar 28 2013
+	- Fixed use of $ascending_flag in the :classical and :numeric
+	  functions. Left to do are :sturm and :utility functions.
+	- Updated test files for quadratic, cubic, quartic, and the
+	  generic poly_roots() functions. They now use Test::More
+	  and a new allzeroes() function for testing.
+	- New test file zyxw.t for the ascending_order() checks.
+     Mar 25 2013
+	- Added the ascending_order() function, the $asending_flag
+	  variable, and the documentation for the function. Actual
+	  code comes later.
+2.66
+     Jan 25 2013
+	- Wrote a better paragraph describing balance_matrix().
+     Jan 15 2013
+	- Corrected the build_companion() example (varible was a scalar
+	  instead of an array).
+	- Took a first stab at documenting balance_matrix().
+     Jan 14 2013
+	- Document existence of Fortran code.
+     Jan 3 2013
+	- Found Hiroshi Murakami's Fortran code on an old flash drive!
+	  Added it to the references directory, under 'qralg' (he stated
+	  it was freely available for this purpose in an e-mail Nick
+	  Ing-Simmons forwarded to me).
+	- Replaced Dick Nickalls's cubic paper with an updated one that
+	  he pointed me to (it has a few corrections).
+     Dec 24 2012
+	- Added a reference in the documentation for balance_matrix().
+     Dec 19 2012
+	- Corrected a line in the documentation that stated build_companion()
+	  returned a reference to an array of arrays. It used to, but now
+	  that it's exported, it returns an array of arrays (no reference).
+	- Fixed a brace mismatch in example code, and deleted a redundant
+	  line about laguerre() in Sturm documentation.
+2.65
+     Dec 16 2012
+	- Removed the early return if-block in build_companion(). The code
+	  it was skipping is no longer in the function to be skipped, having
+	  been moved to balance_matrix().
+	- Changed the single-index loops in build_companion() to map operations.
+     Dec 15 2012
+	- Having made build_companion() and balance_matrix()
+	  exportable, change their return values from array references
+	  to arrays. This makes them easier to use with other modules.
+	- balance_matrix() and hqr_eigen_hessenberg() now take an array
+	  as a parameter, for the same reason.
+	- Moved hqr_eigen_hessenberg() local variables deeper into
+	  the loop in which they're used.
+     Dec 12 2012
+	- Split balance_matrix() off of build_companion() to let
+	  build_companion() return a 'pure' companion matrix.
+	- Start documenting all this.
+     Dec 11 2012
+	- Add build_companion() and hqr_eigen_hessenberg() to the
+	  EXPORT list.
+     Dec 6 2012
+	- Merged in changes: eliminated a loop in build_companion() and
+	  changed one of the foreach loops to a map.
+	- Added cubic.pl and quartic.pl scripts to the eg/ directory.
+     Sep 28 2012
+	- De-Fortran'd the matrix used by build_companion() and
+	  hqr_eigen_hessenberg(): it is now zero-based instead of one-based.
+	  The amount of memory it saves is probably not significant, but
+	  it does put the routines in line with other matrix-handling
+	  modules, which may be useful down the road.
+2.64
+     Sep 10 2012
+	- Added Newton-Raphson to the keyword list in Build.PL. Someday
+	  those keywords will get used...
+	- Time to upload to CPAN.
+     Sep  6 2012
+	- I was confused about the use of the MYMETA files. They are
+	  now removed from the MANIFEST listing.
+2.63
+     Sep  4 2012
+	- Yet more documentation improvement involving some minor
+	  re-organization of the Sturm functions and a correction
+	  in the poly_iteration() example.
+	- Get all the files's VERSION number up to 2.63.
+	- Added 'create_license => 1' to the Build.PL list of attributes.
+	- Added 'dynamic_config => 0' to the Build.PL list of attributes.
+	- Added LICENSE to the MANIFEST file.
+	- Up to CPAN we go.
+     Aug 27 2012
+	- Documentation of 'newtonraphson' option for poly_tolerance()
+	  accidentally left off.
+	- Better documentation for newtonraphson().
+	- Removed some debugging code from laguerre() that I forgot to
+	  remove earlier.
+2.62_3
+     Aug 23 2012
+	- sturm_bisection_roots(), which was supposed to only
+	  return a polynomial's real roots, could occasionally
+	  return complex roots. This was because the laguerre()
+	  function could occasionally slip into the Complex
+	  plane while doing its hunting. Put a "no Math::Complex"
+	  line at the start of the function to prevent this.
+	- Did the same for newtonraphson(), as its primary use
+	  is to find real roots.
+	- Made sure the documentation makes the real-roots-only
+	  condition of laguerre() and newtonraphson() clear.
+     Jul 18 2012
+	- Changed the Test::Pod requirement in pod.t from
+	  version 1.00 to 1.41. Didn't put the version
+	  requirement in Build.PL because it's silly to
+	  block installation because of POD testing.
+	- Put "=encoding utf8" command in the first line of my
+	  POD. One of my references has a non-ASCII character in
+	  his name, and Pod-Simple now warns about that as of May.
+	  Some searching seems to indicate that =encoding was
+	  introduced in Pod-Simple during perl version 5.10; we'll
+	  see whether older perls got the updated Pod-Simple.
+     Jul 10 2012
+	- Comment and Smart-Comment changes. Also removed the late
+	  Nick Ing-Simmons's e-mail address from comments.
+	- Changed the remaining C/Fortran-style down-count loop in
+	  hqr_eigen_hessenberg() to a Perl-style loop using reverse.
+	  Made sure edge cases were handled, and commented *why*
+	  early checks are made in that loop.
+	- Made variables $s and $z in hqr_eigen_hessenberg() local
+	  to their loops in an attempt to make the algorithm more
+	  easily read.
+     Jul 5  2012
+	- Changed the first C/Fortran-style down-count loop in
+	  hqr_eigen_hessenberg() to a Perl-style loop using reverse.
+
+2.62_2
+     Jan 2  2012
+	- And more tests added to derivaluate.t. Up to CPAN we go.
+     Dec 23 2011
+	- Bug in poly_derivaluat(). For polynomials degree 5 or higher,
+	  was returning the wrong second derivative value.
+	  Unfortunately, the testing of the function was only done
+	  indirectly in laguerre.t, and it only had third degree
+	  polynomials. Extended laguerre.t, and added derivaluate.t
+	  to test files.
+     Nov 17 2011
+	- Perl version requirement changed to 5.8.3 (from 5.6.0). Support
+	  for 5.6.0 in various perl development tools is being dropped,
+	  and 5.8.3 seems to be a safe minimum, at least for the next
+	  year or so. Change made in Build.PL and Solve.pm.
+	- Changed "repository" key in Build.PL from a hash to a string,
+	  as seems to be currently required under the version of
+	  Module::Build that I'm developing with (the hash form looks
+	  to be for a later version that I cannot install yet).
+2.62_1
+     Oct 30 2011
+	- A couple more changes to Build.PL (dist_author and resources).
+	  Time to push this up to git and add it to CPAN.
+     Sep 20 2011
+	- CPAN::Meta::Spec had a lot to say about the changes to Build.PL
+	  scripts. Made those changes.
+     Sep 19 2011
+	- The pre-September items for this version were done separate
+	  from the git and github installation. Merged it all in.
+     Sep 9 2011
+	- Added carp messages to get_hessenberg() and set_hessenberg().
+	  Now anyone still using these functions gets nagged about it.
+     July 20 2011
+	- Emphasize in the documentation the fact that roots are mixed
+	  real and Math::Complex - there was some confusion.
+     Mar 24 2011
+	- Gah. EXPORT list didn't have poly_tolerance!
+	- Put in a check for accidental refs in poly_derivaluate().
+     Mar 23 2011
+	- Test file nr.t created, and added to MANIFEST.
+	- A couple more keywords added to Build.PL.
+     Mar 12 2011
+	- Added Newton-Raphson function newtonraphson() to the module, just
+	  to provide a comparison with laguerre().
+	- Added Newton-Raphson to the keyword list.
+     Mar 9 2011
+	- New function poly_derivaluate(), to be used internally by
+	  laguerre(). Added it to the :utility EXPORT list.
+	- laguerre() now uses poly_derivaluate().
+	- Documented poly_derivaluate().
+	- Fixed an L<> typo.
+	- Improved the Sturm function documentation.
+     Mar 2 2011
+	- Three more tests to cubic.t (polynomial representations
+	  of trisecting a 60 deg. angle; duplicating the cube; and
+	  construction a septagon; all with straightedge and compass).
+	- Instead of a copy of the @cases in cubic.t with negative
+	  coefficients, just use poly_constmult() in the loop.
+	- Did the same to quartic.t.
+	- And quadratic.t.
+2.61
+     Feb 21 2011
+	- %iteration hash was checked in poly_tolerance(). Changed
+	  to checking %tolerance, which makes much more sense.
+     Jan 27 2011
+	- README wasn't up to date.
+	- Added some more keywords in Build.PL.
+	- Documentation changes to grammar, spelling, and L<>s.
+2.60
+     Dec 15 2010
+	- Moved fltcmp() from the test directory to the module, and
+	  added it to the :utility list. Added a "fltcmp" key to the
+	  %tolerance list.
+	- Changed all of the test files to use the module's fltcmp();
+	- More documentation clean-up!
+	- Released!
+     Dec 14 2010
+	- Created and documented poly_tolerance(), letting the user
+	  set the tolerance value for laguerre().
+	- Documentation clean-up.
+2.55_4
+     Dec 3 2010
+	- Function laguerre() now works with a better tolerance value.
+	- Added a %tolerance hash for the iterative functions. Currently
+	  only laguerre() makes use of it, and I may change the way of
+	  handling later.
+	- Fixed poly_iteration() - iteration limits weren't getting
+	  changed.
+	- Checking the t directory, I found four or so test files that
+	  weren't in the MANIFEST file. Fixed that.
+     Nov 30 2010
+	- New version of laguerre() now takes multiple x-values.
+	- Documented the changes in poly_evaluate().
+     Nov 18 2010
+	- Function poly_evaluate() can now detect whether it is being passed
+	  an array of x-values, or a single x-value. Return checks to see if
+	  an array of y-values is wanted, or a single value.
+     Nov 17 2010
+	- Add function poly_iteration() to make iteration limits adjustable.
+	- Add function laguerre() for use by sturm_bisection_roots().
+     Nov 7 2010
+	- Add function sturm_bisection_roots(). Not complete yet.
+	- De-Fortran'd some loops in hqr_eigen_hessenberg(). Now uses
+	  the range operator, '..'.
+2.55_3
+     Oct 22 2010
+	- The Sturm functions sturm_sign_minus_inf() and sturm_sign_minus_inf()
+	  had been documented as exported, but they weren't. They are now.
+	- Documentation for the Sturm functions was cut short - either I had
+	  accidentally chopped it, or I left off writing it and forgot to get
+	  back to it. Took a stab at completing it.
+	- Added function sturm_real_root_range_count().
+	- Added test file sturm2.t to the t directory, and to the MANIFEST.
+     Oct 19 2010
+	- The keyword metadata key isn't an argument to the Module::Build
+	  constructor, it's part of the meta_merge hash which *is* an
+	  argument to the constructor. Fixed that.
+	- Document the varsubst option in poly_option().
+	- Made the variable substitution method more efficient by
+	  actually removing primes from the list as they're checked.
+	  Extended the prime list that gets checked.
+     Oct 18 2010
+	- Aaaaaaand of course I forgot to put varsubst.t in the MANIFEST.
+	- Updated Module::Build on my system. Maybe get keywords in
+	  META.yml now?
+2.55_2
+     Oct 18 2010
+	- Got the variable substitution code in, and created test file
+	  varsubst.t. Undocumented for now.
+     Oct 15 2010
+	- More documentation improvments, as I clear away old
+	  numeric vs. classical confusion, and add documentation
+	  for poly_option().
+	- Read the latest Module::Build documentation, and decided
+	  to try the keyword item in Build.PL.
+     Oct 12 2010
+	- Added division.pl to the eg directory and to the MANIFEST.
+	- Was removing leading zeros in poly_nonzero_term_count(),
+	  which is pretty pointless. Removed those lines of code.
+2.55_1
+     Oct 12 2010
+	- And one more document change: I found a call to set_hessenberg(0)
+	  where we now want poly_option(hessenberg => 0);
+     Oct 8 2010
+	- Added rootf.t to test directory and MANIFEST; it tests poly_roots()
+	  with the option "root_function" set.
+	- Changes to the poly_option() function for better
+	  option handling.
+	- Change test files poly0.t and polyfp0.t (which used
+	  set_hessenberg($value)) to now use
+	  poly_option(hessenberg => $value) instead.
+     Oct 5 2010
+	- Documentation change to EXPORT section. Instead of listing
+	  exported functions, link to the head3 Functions sections,
+	  which are now organized by tag (see Sep 28 2010).
+	- Added the poly_option() function.
+     Sep 28 2010
+	- Documentation improvement by categorizing the functions by
+	  tag and improving the Sturm sequence explanation.
+2.54
+     Sep 7 2010
+	- Documentation updates. Time to release the module.
+     Sep 2 2010
+	- Added an %option variable. Currently its fields are hessenberg,
+	  varsubs, and roots; hessenberg (which has replaced
+	  $use_hessenberg) is in use, the other two might not even keep
+	  their names the same.
+	- Let epsilon() function change the calculated machine epsilon
+	  value. This is probably something you want to do rarely, if at all.
+2.53_3
+     Aug 31 2010
+	- Added early return to poly_sturm_chain() when it's passed a
+	  constant or a linear equation (yeah, I know, but one still has to
+	  check).
+	- A couple more tests each for sturm0.t and sturm1.t.
+	- Finally used (and then fixed) sturm_sign_chain().
+	- Expose some more internal functions under the :sturm tag, and
+	  document them.
+2.53_2
+     Aug 26 2010
+	- Added another cubic test to cubic.t and poly0.t.
+     Aug 25 2010
+	- CPAN testers found a failing test in sturm0.t for some machines.
+	  Altered the test to make use of fltcmp(), which I hope will solve
+	  what I suspect is a precision problem.
+	- Made consistent the book references in the Acknowledgements section.
+2.53_1
+     Aug 23 2010
+	- poly_real_roots() becomes poly_real_root_count().
+	- Added test files sturm0.t and sturm1.t.
+	- Many documentation additions. Of note: the documentation
+	  notes the FUTURE DEPRECATION of set_hessenberg() and
+	  get_hessenberg().
+	- Set $VERSION to reflect beta condition, particularly
+	  the (lone) sturm function.
+     Aug 14 2010
+	- Added poly_real_roots().
+     Jul 22 2010
+	- Added the functions to create the sign rows, currently named
+	  sturm_sign_minus_infinity(), sturm_sign_plus_infinity(), and
+	  sturm_sign_chains().
+     Jul 21 2010
+	- Added function poly_sturm_chain(). Started a test file for it.
+	- Added a test file for the poly_division() function and of course
+	  made the function available under the :utility tag.
+     Jun 24 2010
+	- Stefan Petrea suggested adding Sturm's sequence to the module.  After
+	  looking it up, it seemed like a good idea, so I began by:
+	- Added poly_derivative() to the export list and to the :utility tag.
+	- Added poly_antiderivative() to the export list and to the :utility
+	  tag, mostly for completeness's sake, although I may find a legitimate
+	  use for it.
+     Jun 22 2010
+	- Added epsilon() to the export list and to the :utility tag. It
+	  existed in v2.52, I just forgot to add it.
+	- Formatting changes to the POD with respect to the functions'
+	  documentation.
+
+2.52
+     Jun 16 2010
+	- Added export tags. You can export the analytic functions
+	  linear_roots(), quadratic_roots(), cubic_roots(), and quartic_roots()
+	  via the :classical tag; poly_roots(), get_hessenberg(), and
+	  set_hessenbert() via the :numeric tag; and poly_evaluate() and
+	  simplified_form() via the :utility tag.
+	- Fixed spelling error, mostly in the comments: it's "resolvent" cubic,
+	  not "resolvant".
+	- Documentation upgrade, particularly for poly_roots(), which was
+	  worded a little funny given the change from the default solving
+	  method in version 2.50. Added documentation for the new export tags
+	  and the new functions.
+     Jun 15 2010
+	- Strunk & White'd the possesive form of Dr. Nickalls's name.
+	  (I'm not sure how Strunk & White would react to verbing their names.)
+	  I had randomly dropped the 's' before or after the apostrophe.
+	- Opened up the internals a bit by providing a a simplified_form()
+	  function that removes leading zero coefficients and divides the
+	  remaining coefficients by the coefficient of the highest power.
+     Jun 14 2010
+	- Added a poly_evaluate() function to return y values of the
+	  polynomial at given x values. Partly done for my own testing but
+	  it's too useful not to provide generally.
+2.51
+     Jun 1 2010
+	- Jean Connelly found a quartic where $g is greater than $epsilon,
+	  but $g**2 isn't. Since it's the squared value that's used in
+	  Ferrari's method, we eventually wind up dividing by zero.
+	  This is a floating point representation sample that slipped
+	  past my tests (which up to now were all based on integers).
+	  Changed the check to use $g**2, since that's what we're
+	  protecting ourselves from anyway.
+	- Connelly's case is 0.9216 times an integer coeffecient set. Put
+	  the integer version in poly0.t, and then created the floating point
+	  tests in the new file polyfp0.t by taking the poly0.t tests and
+	  multiplying everything by 0.9216. I'll extend this later.
+	- Added Dr. Nickalls's quartic article to the distribution. Both of
+	  his articles are in the subdirectory "reference".
+     Apr 19 2010
+	- Bowed to convention and reversed the order of the Change entries.
+	  (And moved an obviously out-of-place Change entry to its proper
+	  position).
+	- Added Dr. Nickalls's article to the distribution, with his permission.
+	- Abandoned backward compatibility with perl version 5.05, which was
+	  present despite the 5.6 requirement in Build.PL (I was supporting
+	  the module on a very old server). The module now requires version 5.6,
+	  which admittedly isn't cutting edge but does allow more modern
+	  constructs like 'our'.
+
+2.50 Mar 7 2009
+	- Function poly_roots() now uses the QR Hessenberg method by
+	  default.  To return to the old version's behavior, use
+	  set_hessenberg(0).
+	- Update tests and documentation to reflect this.
+	- Update Dr. Nickalls's e-mail address and his paper's url.
+
+2.12 Jan 28 2009
+	- Add "requires" item in Build.PL to insist on a Math::Complex
+	  version greater than 1.36.  This makes the Complex.txt file
+	  unnecessary since I won't have to explain about the old
+	  bug in the Im() function.
+
+2.11 Feb 19 2007
+	- Andy Stein sent me cubic.m, an update to Herman Bruyninckx's
+	  matlab script. The script is in the eg directory.
+	- Change all debugging code to use Smart::Comments.
+	  Replaces not only debug print statements but also the
+	  show_matrix() subroutine.
+	- Found some "$var = $var op ..." code that is now
+	  "$var op= ..." in hqr_eigen_hessenberg().
+	- More documentation changes.
+	- Found a spot where $#coefficients was used where @coefficients
+	  would be less likely to cause an infinite loop.
+     Sep 5 2008
+	- Added some quadratic tests.
+
+2.10 Jul 4 2006
+	- Released.
+
+2.00 Feb 18 2004
+	- For some idiotic reason, I thought that I had already uploaded the
+	  module to CPAN.  Time to rectify that mistake.
+	- Well, as long as I'm here, reviewed the code again, and found some
+	  inconsistant epsilon comparisons ('<' vs. '<=').  Changed them all
+	  to '<'.
+	- Double-checked the links too.  Dr. Nickalls's article keeps moving
+	  around
+     Apr 3 2006
+	- Upgraded the test files to use Test::Simple.
+	- Moved the internal structure of the module directory around
+	  to match the current layout made by the current h2xs.
+	- Added a Build.PL file.
+	- Generated a Meta.yml file and a Makefile.PL from Build.PL
+	- Added new tests to cubic.t to cover catastrophic
+	  cancellation conditions.
+	- Re-factored an expression in the ($dis < -$epsilon) branch
+	  of cubic_roots(), in preparation for tracking down the
+	  cancellation error.  This is the branch that was failing
+	  the tests for certain values of the leading coefficient
+	  (a negative, for one thing).  Wouldn't you know, the tests
+	  passed after doing this.  I suspect that this will not be the
+	  final chapter in this story.
+	- Updated the link to www.2dcurves.com in the documentation.
+     Jun 26 2006
+	- Added a test to poly1.t (x**5 + x + 1).  Nothing special
+	  except that it's solvable in radicals, and there was an
+	  article on Galois theory that missed that.
+
+1.99 April 30 2003
+	- More documentation changes, including updating links to Dr.
+	  Nickalls's paper.
+	- Added many, many more tests.
+	- Added the set_ and get_hessenberg() functions.
+	- Put some code that was in a text file in one of the helper
+	  perl files.
+
+1.90 March 17 2003
+	Nick Ing-Simmons had been working on a perl binding to the GNU
+	Scientific Library that performed, among other things, polynomial
+	solving.  He graciously (indeed, FAR beyond the call of duty)
+	provided a perl version the Fortran code written by Hiroshi
+	Murakami, and gave me permission to use the perl version of the code
+	in this module (as Hiroshi Murakami gave permission to Nick Ing-Simmons).
+	For further information on his efforts, see Math::GSL::Polynomial.
+	Putting in the code resulted in:
+	- Some formatting changes.  Sorry, I'm a tab user.
+	- Removal of some redundant code.  Math::Polynomial::Solve
+	  already calculated epsilon, and the wrapper function already
+	  removed leading zero coefficients.
+	- Coefficients to be passed in from higher power to lower,
+	  rather than the reverse.  This matches current usage in this
+	  module.
+	- Roots to be returned as Complex number objects, rather than paired
+	  real and imaginary parts.
+	- An early return for the really simple case.
+
+1.01
+	- Web site address of Karl's Calculus Tutor has changed.  Document
+	  changed with it.
+	- Code that popped off leading zero coefficients was flawed.
+	  Negative values could get popped off too since the check was
+	      $coefficients[0] <= $epsilon
+	  instead of
+	      abs($coefficients[0]) <= $epsilon.
+	- Began writing code for symbolic solutions.
+	- And then I got the e-mail from Nick Ing-Simmons.
+
+1.00 Wed Feb 14 17:51:04 2001
+	- original version
+

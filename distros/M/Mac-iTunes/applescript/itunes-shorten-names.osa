@@ -1,0 +1,156 @@
+(* "Make Mine 31" for iTunes 2 
+version 1.0
+written by Doug Adams 
+dougadams@mac.com
+
+Get more free AppleScripts and info on writing your own
+at Doug's AppleScripts for iTunes and SoundJam
+http://www.malcolmadams.com/itunes/ *)
+-------------------------------------
+global source_folder, fixed_filename, location_in_finder, location_in_finder_info_name, itunes_track_name, okflag, selectedTracks
+--------------------------------------
+set okflag to false
+-- check if iTunes is running 
+tell application "Finder"
+	if (get name of every process) contains "iTunes" then set okflag to true
+end tell
+if okflag then
+	try
+		tell application "iTunes"
+			copy (a reference to (get view of front window)) to thePlaylist
+			
+			if item 1 of selection exists then
+				set using_selection to true
+				set thesetracks to " the selected tracks "
+				copy (count selection's items) to ix
+				set yep_all to false
+			else -- its the whole playlist
+				set selectedTracks to (get a reference to thePlaylist)
+				set using_selection to false
+				set thesetracks to " every track "
+				set yep_all to true
+				copy (count thePlaylist's tracks) to ix
+			end if
+			
+			repeat with i from 1 to ix
+				
+				if using_selection then
+					copy item i of selection to thisTrack
+				else
+					copy track i of selectedTracks to thisTrack
+				end if
+				-- thisTrack now set
+				
+				copy (thisTrack's name) as string to itunes_track_name
+				
+				copy (thisTrack's location) to location_in_finder
+				-- parse this for last item
+				copy last item of (my TextToList(location_in_finder as string, ":")) to last_item_of_location
+				
+				tell application "Finder"
+					copy (get name of (get info for (location_in_finder as alias))) as string to fixed_filename
+					copy (get container of location_in_finder) as string to source_folder
+				end tell
+				
+				copy length of fixed_filename to x
+				set new_fileName to ""
+				
+				if fixed_filename is not equal to last_item_of_location then
+					set new_fileName to last_item_of_location
+					--display dialog "Stop here"
+					set addenda to ""
+					repeat
+						
+						with timeout of 3000 seconds
+							display dialog (addenda & "Track name: " & return & itunes_track_name & return & return Â
+								& "Finder name: (" & x as string) & " chars):" & return & fixed_filename & return & return Â
+								& "New filename:" default answer new_fileName
+						end timeout
+						copy text returned of result to new_fileName
+						ignoring case
+							if new_fileName does not end with ".mp3" then
+								copy (new_fileName & ".mp3" as string) to new_fileName
+							end if
+						end ignoring
+						if (length of new_fileName) is less than or equal to 31 then exit repeat
+						set addenda to ("Error!" & return)
+					end repeat
+					copy (source_folder & fixed_filename) as string to location_in_finder_info_name
+					my set_item_name(location_in_finder_info_name, new_fileName)
+				end if
+				
+			end repeat
+			display dialog "Done" buttons {"Thanks!"} default button 1
+		end tell -- iTunes
+	on error error_message number error_number
+		tell me to display dialog error_message & return & "Error number " & error_number
+	end try
+end if -- okflag
+(* 
+
+SUB-ROUTINES 
+Parts of the "set_item_name" sub-routine code was descended from Apple sample
+code, and modified by me, Doug Adams.
+  *)
+on set_item_name(this_item, new_item_name)
+	tell application "Finder"
+		--activate
+		copy source_folder as string to parent_container_path
+		if not (exists item (the parent_container_path & new_item_name)) then
+			try
+				set the name of file this_item to new_item_name
+			on error the error_message number the error_number
+				if the error_number is -59 then
+					set the error_message to "This name contains improper characters, such as a colon (:)."
+				else if the error_number is -37 then
+					set the error_message to "This name is too long, please rename."
+				else
+					set the error_message to error_message -- fix for OS 9
+				end if
+				tell application "iTunes" to display dialog the error_message default answer new_item_name Â
+					buttons {"Cancel", "Skip", "OK"} default button 2 with icon 2
+				copy the result as list to {new_item_name, button_pressed}
+				if the button_pressed is "Skip" then return 0
+				my set_item_name(this_item, new_item_name)
+			end try
+		else --the name already exists
+			tell application "iTunes" to display dialog "This name is being used, please rename." default answer new_item_name Â
+				buttons {"Cancel", "Skip", "OK"} default button 2 with icon 2
+			copy the result as list to {new_item_name, button_pressed}
+			if the button_pressed is "Skip" then return 0
+			--SORRY, Can't replace ,too many troubles
+			my set_item_name(this_item, new_item_name)
+		end if
+	end tell
+end set_item_name
+
+to get_index_of_a_track(ref_to_track)
+	return (get index of ref_to_track) as string
+end get_index_of_a_track
+
+on TextToList(theText, theDelimiter)
+	set saveDelim to AppleScript's text item delimiters
+	try
+		set AppleScript's text item delimiters to {theDelimiter}
+		set theList to every text item of theText
+	on error errStr number errNum
+		set AppleScript's text item delimiters to saveDelim
+		error errStr number errNum
+	end try
+	set AppleScript's text item delimiters to saveDelim
+	return (theList)
+end TextToList
+
+on ListToText(theList, theDelimiter)
+	set saveDelim to AppleScript's text item delimiters
+	try
+		set AppleScript's text item delimiters to {theDelimiter}
+		set theText to theList as text
+	on error errStr number errNum
+		set AppleScript's text item delimiters to saveDelim
+		error errStr number errNum
+	end try
+	set AppleScript's text item delimiters to saveDelim
+	return (theText)
+end ListToText
+

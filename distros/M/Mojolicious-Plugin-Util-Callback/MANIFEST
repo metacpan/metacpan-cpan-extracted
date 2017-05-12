@@ -1,0 +1,10 @@
+lib/Mojolicious/Plugin/Util/Callback.pm
+t/callback.t
+t/callback-param.t
+t/callback-example.t
+Changes
+MANIFEST
+LICENSE
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

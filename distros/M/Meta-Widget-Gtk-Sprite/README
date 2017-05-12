@@ -1,0 +1,28 @@
+Sprite version 0.01
+===================
+
+Sprite.pm is a pure-perl module that uses Gnome Canvas to implement C64 style sprites.  A number of convenient methods are provided to help move the sprites around and tell if they have collided.  This functionality should probably go into C at some point.
+
+This module requires that Gtk.pm and Gnome.pm be installed in order to run, however you may install it without these (it just won't do any good :).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Gtk.pm (and Gtk)
+Gnome.pm (and Gnome)
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2002 jeremy.price@member.sage-au.org.au
+

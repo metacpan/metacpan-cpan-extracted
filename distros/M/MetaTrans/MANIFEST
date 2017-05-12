@@ -1,0 +1,19 @@
+bin/metatrans			# Perl/Tk frontend to MetaTrans.pm
+bin/runtrans			# auxiliary script, which should only be run by MetaTrans.pm
+Changes				# changelog
+config/metatrans.conf		# configuration file for metatrans
+lib/MetaTrans.pm
+lib/MetaTrans/Base.pm
+lib/MetaTrans/Languages.pm
+lib/MetaTrans/SeznamCz.pm
+lib/MetaTrans/SlovnikCz.pm
+lib/MetaTrans/SmsCz.pm
+lib/MetaTrans/UltralinguaNet.pm
+lib/MetaTrans/WordbookCz.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			# Will be created by "make dist"
+README
+t/00.load.t			# load test
+t/pod.t				# pod coverage test

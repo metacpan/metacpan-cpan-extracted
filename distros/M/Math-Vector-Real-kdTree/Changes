@@ -1,0 +1,67 @@
+Revision history for Perl extension Math::Vector::Real::kdTree.
+
+0.15  Apr 14, 2015
+        - add find_nearest_vector_in_box_chebyshev and find_in_box
+          methods
+
+0.14  Apr 14, 2015
+        - add find_nearest_vector_in_box
+
+0.13  Mar 11, 2015
+        - improve find_two_nearest_vectors algorithm
+        - add tests
+
+0.12  Mar 11, 2015
+        - add method find_two_nearest_vectors
+        - dump_to_string now supports the options remark and pole_id
+        - find_in_ball was broken
+        - rename k_means_start to k_means_seed
+
+0.11  Jun 2, 2014
+        - find_farthest_vector was failing for the case where all the
+          vectors on the tree were equal
+
+0.10  Jun 1, 2014
+        - add k_means* methods
+        - add find_farthest_vector* methods
+        - rename find_nearest_neighbor* methods to
+          find_nearest_vector* (though, the old names are keep in
+          order to preserve backward compatibility)
+        - most methods have been rewritten from scratch using better
+          algorithms and removing recursion when possible
+        - change internal data structure
+        - lots of new tests
+
+0.09  Jun 17, 2013
+        - add support for excluding more than one point in neighbor
+          searching methods
+
+0.08  Feb 16, 2013
+        - add test for RT but #83330
+
+0.07  Feb 15, 2013
+        - insert method was broken (bug report by Greg Bronevetsky)
+        - add test suite
+
+0.06  Oct 22, 2012
+        - add a clone method
+
+0.05  Sep 21, 2012
+        - insert now accepts several points and returns the index of
+          the first element inserted
+
+0.04  Jun 19, 2012
+        - add hide method
+        - move and _delete methods were broken
+        - add ordered_by_proximity method
+
+0.03  Jun 22, 2011
+        - solve bug on find_nearest_neighbor when distance is limited
+
+0.02  Jun 16, 2011
+        - add find_in_ball method
+
+0.01  Wed Jun 15 18:09:43 2011
+	- original version; created by h2xs 1.23 with options
+		-AXn Math::Vector::Real::kdTree
+

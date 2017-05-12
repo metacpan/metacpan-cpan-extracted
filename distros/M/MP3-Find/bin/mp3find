@@ -1,0 +1,115 @@
+#!/usr/bin/perl -w
+use strict;
+
+use Getopt::Long qw(:config pass_through); # use pass_through so we can get the query args
+
+use MP3::Find qw(Filesystem);
+use MP3::Find::Util qw(build_query);
+use File::Spec::Functions qw(catfile);
+
+GetOptions(
+    'ignore-case|i' => \my $IGNORE_CASE,
+    'exact-match|w' => \my $EXACT_MATCH,
+    'sort|s=s'      => \my $SORT_TAG,
+    'printf=s'      => \my $FORMAT,
+);
+
+my ($DIRS, $QUERY) = build_query(@ARGV);
+push @$DIRS, '.' unless @$DIRS;
+
+print "$_\n" foreach find_mp3s(
+    dir         => $DIRS,
+    query       => $QUERY,
+    ignore_case => $IGNORE_CASE,
+    exact_match => $EXACT_MATCH,
+    ($SORT_TAG ? (sort => [split(/,/, $SORT_TAG)]) : ()),
+    printf      => $FORMAT,
+    db_file     => catfile($ENV{HOME}, 'mp3.db'),
+    use_id3v2   => 1,  # search using ID3v2 tags by default
+);
+
+=head1 NAME
+
+mp3find - Find MP3 files based on their ID3 tags or info
+
+=head1 SYNOPSIS
+
+    $ mp3find ~/cds -i -artist beatles -sort year,album,tracknum -printf '%2n. %a - %t (%b: %y)'
+     1. The Beatles - Magical Mystery Tour (Magical Mystery Tour: 1967)
+     2. The Beatles - The Fool on the Hill (Magical Mystery Tour: 1967)
+     3. The Beatles - Flying (Magical Mystery Tour: 1967)
+     4. The Beatles - Blue Jay Way (Magical Mystery Tour: 1967)
+     5. The Beatles - Your Mother Should Know (Magical Mystery Tour: 1967)
+     6. The Beatles - I Am The Walrus (Magical Mystery Tour: 1967)
+    # etc.
+    
+    # shuffle and play your entire mp3 collection
+    $ mp3find | xargs madplay -z
+    
+    # ...or just your Sabbath
+    $ mp3find -i -artist 'black sabbath' | xargs madplay -z
+
+=head1 DESCRIPTION
+
+    $ mp3find [options] [directory] [<-field> <pattern> [<-field> <pattern> ...]]
+
+The real guts of the operation are in L<MP3::Find>.
+
+=head2 OPTIONS
+
+=over
+
+=item C<-ignore-case>, C<-i>
+
+Case insensitive matching.
+
+=item C<-exact-match>, C<-w>
+
+All search patterns must match the entire value, and not just a
+substring. This has the same effect as putting a C<^> and C<$>
+around each pattern.
+
+=item C<-sort>
+
+Which ID3 fields to sort the results by; separate multiple fields
+with commas. The default behavior just returns the filenames in the
+order that L<File::Find> finds them.
+
+=item C<-printf>
+
+The output format for each file found. The available format codes are:
+
+    %a - artist
+    %t - title
+    %b - album
+    %n - track number
+    %y - year
+    %g - genre
+    %% - literal '%'
+
+Numeric modifiers may be used; they are interpreted like modifiers to
+the C<%s> code in Perl's C<printf> function.
+
+If no C<-printf> option is used, the full path to the file is printed
+instead.
+
+=item C<< -<field> <pattern> [patterns...] >>
+
+The fields you are searching on. More than one pattern for a given field
+are combined with 'OR', while the fields to be matched are 'AND'-ed together.
+For the list of recognized fields, see L<MP3::Find>.
+
+=back
+
+=head1 AUTHOR
+
+Peter Eichman <peichman@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2006 by Peter Eichman. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

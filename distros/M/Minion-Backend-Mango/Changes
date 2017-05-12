@@ -1,0 +1,57 @@
+Revision history for Perl extension Minion-Backend-Mango
+
+1.01 2017-03-29T06:17:56Z
+    - Added dummy broadcast and receive methods to allow use Mango backend
+      with new versions of Minion.
+
+1.00 2016-05-03T10:32:20Z
+    - Added queue options to list_jo method.
+    - Added delayed_jobs field to stats.
+    - Improved tests for new Minion 5 features.
+
+0.99_50 2016-05-03T07:56:26Z
+    - Fixed bug with wrong removing abandoned jobs.
+
+0.99 2016-01-04T20:11:41Z
+    - Fully compatible with Minion 4.01.
+    - Fixed bug with wait timeout in dequeue.
+    - Fixed bug with update jobs if worker went away.
+    - Improved retry method for allow retry already inactive jobs.
+    - Improved tests.
+
+0.98 2015-10-30T10:04:49Z
+    - Added support for retrying jobs with a new priority.
+    - Added support for queues.
+    - Added attempts option for enqueue method.
+    - Improved tests.
+
+0.97 2015-05-19T04:28:55Z
+    - Improved documentation.
+    - Fixed versions in cpanfile: Minion (1.15), Mango (1.17).
+
+0.96 2015-05-18T17:58:06Z
+    - Added support for retrying jobs with delays.
+    - Improved job_info method for compatibility with Minion. Renamed error
+      to result field.
+
+0.95 2015-03-13T07:07:47Z
+    - Added notified field to worker_info output.
+
+0.94 2015-03-12T16:07:19Z
+    - Added support for monitoring workers with heartbeats.
+    - Set limit for capped collection size to 128.
+    - Improved performance by following only new jobs at the start.
+
+0.93 2015-03-07T08:51:04Z
+    - Added indexes for jobs collection.
+
+0.92 2015-01-17T07:24:14Z
+    - Improved timeout management.
+    - Capped collection for notifications limited only by size, not max number
+      of documents.
+
+0.91 2015-01-07T17:59:19Z
+    - First authorized release.
+
+0.90 2015-01-06T17:07:25Z
+    - First release.

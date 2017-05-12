@@ -1,0 +1,6 @@
+Revision history for Perl extension Math::Preference::SVD.
+
+0.01  Sun May 11 23:30:30 2008
+	- original version; created by h2xs 1.23 with options
+		-n Math::Preference::SVD -f
+

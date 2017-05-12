@@ -1,0 +1,296 @@
+MIME-Version: 1.0
+Content-Transfer-Encoding: binary
+Content-Type: multipart/related; boundary="alian-mime-lite-html"
+
+Subject: Mail in HTML with images
+To: MIME-Lite@alianwebserver.com
+From: MIME-Lite@alianwebserver.com
+X-Mailer: MIME::Lite::HTML 1.24
+
+This is a multi-part message in MIME format.
+
+--alian-mime-lite-html
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset=iso-8859-1
+
+
+<html>
+	<head>
+		<title>~kdz13.net</title>
+		<style>
+			.title_link {
+				color : #FFFFFF;
+				text-decoration: none;
+			}
+=09=09=09
+			.calend_link:active {
+				color : #FF0000;
+			}
+
+			.calend_link:visited {
+				color : #00BD00;
+				text-decoration: line-through;
+			}
+			.calend_link:hover {
+				color : #FF0000;
+				text-decoration: none;
+			}
+=09=09=09
+			.calend_link:link {
+				color : #000000;
+			}
+
+			.boring_link:active {
+                                color : #FF0000;
+                                text-decoration: none;
+                        }
+
+                        .boring_link:visited {
+                                color : #000000;
+                                text-decoration: none;
+                        }
+
+                        .boring_link:hover {
+                                color : #FF0000;
+                                text-decoration: none;
+                        }
+
+			.boring_link:link {
+				color : #000000;
+                                text-decoration: none;
+			}
+		</style>
+	</head>
+	<body topmargin=3D"0" leftmargin=3D"0" marginheight=3D"0" marginwidth=3D"0=
+">
+		<table cellpadding=3D"0" cellspacing=3D"0" border=3D"1" ID=3D"Table1">
+			<tr height=3D"65">
+				<td width=3D"175" align=3D"center" valign=3D"middle">
+					<a href=3D"file:///">~kdz13.net</a><br>
+				</td>
+				<td align=3D"center" valign=3D"middle">
+<table cellpadding=3D"0" cellspacing=3D"0" boroder=3D"0" width=3D"100%"><tr=
+><td align=3D"left"><a href=3D"file:///comics?name=3Dnorm"><img  border=3D"=
+0" src=3D"cid:6e6f726d2e676966@MIME-Lite-HTML-1.24"></a></td></tr></table>	=
+			</td>
+			</tr>
+			<tr>
+				<td align=3D"left" valign=3D"top">
+					<a href=3D"file:///">~home</a><br>
+					<br>
+					<a href=3D"file:///comics">~comics</a><br>
+					<a href=3D"file:///spamalyzer">~spamalyzer</a>
+				</td>
+				<td>
+				<TABLE width=3D"100%" align=3D"center" border=3D"0" cellspacing=3D"1" c=
+ellpadding=3D"0" bgcolor=3D"#dddddd">
+					<TR><td valign=3D"top" align=3D"middle" colspan=3D"9" height=3D"26px" =
+width=3D"648px" style=3D
+						"color:#ffffff; background-repeat:no-repeat"  background=3D"cid:f6261=
+722e676966@MIME-Lite-HTML-1.24">
+						<a href=3D"file:///comics?name=3Dnorm&date=3D20020919"><img  border=
+=3D"0" src=3D"cid:765f6d6f6e74682e676966@MIME-Lite-HTML-1.24"></a>
+							&nbsp;&nbsp;&nbsp;
+							October 2002
+							&nbsp;&nbsp;&nbsp;
+						<a href=3D"file:///comics?name=3Dnorm&date=3D20021119"><img  border=
+=3D"0" src=3D"cid:745f6d6f6e74682e676966@MIME-Lite-HTML-1.24"></a>
+					</td></TR>
+					<tr height=3D"0">
+						<td width=3D"29%" bgcolor=3D"#ffffff" rowspan=3D"8" border=3D"0">
+							<a class=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D2=
+0021018"><--previous day</a>
+						</td>
+						<td colspan=3D"7" bgcolor=3D"#ffffff" border=3D"0"></td>
+						<td width=3D"29%" align=3D"right" bgcolor=3D"#ffffff" rowspan=3D"8">
+							<a class=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D2=
+0021020">next day--></a>
+						</td>
+					</tr>
+				 	<tr height=3D"32">
+						<td width=3D"35" align=3D"center"><cite>&nbsp;S&nbsp;</cite></TD>
+						<td width=3D"35" align=3D"center"><cite>&nbsp;M&nbsp;</cite></TD>
+						<td width=3D"35" align=3D"center"><cite>&nbsp;T&nbsp;</cite></TD>
+						<td width=3D"35" align=3D"center"><cite>&nbsp;W&nbsp;</cite></TD>
+						<td width=3D"35" align=3D"center"><cite>&nbsp;T&nbsp;</cite></TD>
+						<td width=3D"35" align=3D"center"><cite>&nbsp;F&nbsp;</cite></TD>
+						<td width=3D"35" align=3D"center"><cite>&nbsp;S&nbsp;</cite></TD>
+					</tr>
+				 	<tr height=3D"32">
+<td>&nbsp;</td><td>&nbsp;</td>						<td width=3D"35" align=3D"center" bgcol=
+or=3D"#ffffff">&nbsp;<a class=3D"calend_link" href=3D"file:///comics?name=
+=3Dnorm&date=3D20021001"> 1</a>&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021002"> 2</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021003"> 3</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021004"> 4</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021005"> 5</a>=
+&nbsp;</td>
+					</tr>
+				 	<tr height=3D"32">
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021006"> 6</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021007"> 7</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021008"> 8</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021009"> 9</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021010">10</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021011">11</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021012">12</a>=
+&nbsp;</td>
+					</tr>
+				 	<tr height=3D"32">
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021013">13</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021014">14</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021015">15</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021016">16</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021017">17</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021018">18</a>=
+&nbsp;</td>
+					<td align=3D"center" bgcolor=3D"#ffffff">&nbsp;<B>19</B>&nbsp;</td>
+					</tr>
+				 	<tr height=3D"32">
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021020">20</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021021">21</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021022">22</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021023">23</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021024">24</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021025">25</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021026">26</a>=
+&nbsp;</td>
+					</tr>
+				 	<tr height=3D"32">
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021027">27</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021028">28</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021029">29</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021030">30</a>=
+&nbsp;</td>
+						<td width=3D"35" align=3D"center" bgcolor=3D"#ffffff">&nbsp;<a class=
+=3D"calend_link" href=3D"file:///comics?name=3Dnorm&date=3D20021031">31</a>=
+&nbsp;</td>
+<td>&nbsp;</td><td>&nbsp;</td>					</tr>
+				</TABLE><br>
+				<table width=3D"100%" border=3D"0" cellpadding=3D"0" cellspacing=3D"0">
+					<tr>
+						<form   action=3D"file:///comics?name=3Dnorm&date=3D20021019" method=
+=3D"GET" valign=3D"middle">
+							<td align=3D"center" valign=3D"middle" width=3D"100%" height=3D"26px=
+" style=3D
+	        		                                        "background-repeat:no-re=
+peat;color:#ffffff"  background=3D"cid:f6261722e676966@MIME-Lite-HTML-1.24">
+								<span style=3D"width:100px"></span>
+                        		                        <a href=3D"file:///comics=
+?name=3Dnorm&date=3D20021019&howmany=3D1" class=3D"title_link">The Norm</a>
+								<span style=3D"width:100px"></span>
+								<input type=3D"hidden" name=3D"name" value=3D"norm" />
+								<input type=3D"hidden" name=3D"date" value=3D"20021019" />
+								<input type=3D"text" align=3D"right" size=3D"2" maxlength=3D"3" val=
+ue=3D"1" name=3D"howmany">&nbsp;images per page&nbsp;&nbsp;
+								<input type=3D"submit" value=3D"change" style=3D"height:20;backgrou=
+nd-color:#ffffff;padding:0px" />
+                                        		</td>
+						</form>
+					</tr>
+					<tr><td align=3D"center">
+						<a href=3D"file:///comics?name=3Dnorm&date=3D20021019"><img  src=3D"c=
+id:67693f6e616d653d6e6f726d26646174653d3230303231303139@MIME-Lite-HTML-1.24=
+" border=3D"0"></a>
+						<br><br>
+					</td></tr>
+				</table>				</td>=0D
+			</tr>=0D
+		</table>=0D
+	</body>=0D
+</html>=0D
+
+--alian-mime-lite-html
+MIME-Version: 1.0
+Content-Id: <6e6f726d2e676966@MIME-Lite-HTML-1.24>
+Content-Transfer-Encoding: base64
+Content-Type: image/gif
+
+
+
+--alian-mime-lite-html
+MIME-Version: 1.0
+Content-Id: <f6261722e676966@MIME-Lite-HTML-1.24>
+Content-Transfer-Encoding: base64
+Content-Type: image/gif
+
+
+
+--alian-mime-lite-html
+MIME-Version: 1.0
+Content-Id: <765f6d6f6e74682e676966@MIME-Lite-HTML-1.24>
+Content-Transfer-Encoding: base64
+Content-Type: image/gif
+
+
+
+--alian-mime-lite-html
+MIME-Version: 1.0
+Content-Id: <745f6d6f6e74682e676966@MIME-Lite-HTML-1.24>
+Content-Transfer-Encoding: base64
+Content-Type: image/gif
+
+
+
+--alian-mime-lite-html
+MIME-Version: 1.0
+Content-Id: <67693f6e616d653d6e6f726d26646174653d3230303231303139@MIME-Lite-HTML-1.24>
+Content-Transfer-Encoding: base64
+Content-Type: application/x-shockwave-flash
+
+
+
+--alian-mime-lite-html--
+

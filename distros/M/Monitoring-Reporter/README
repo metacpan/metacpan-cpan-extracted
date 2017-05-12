@@ -1,0 +1,41 @@
+NAME
+    Monitoring::Reporter - Monitoring dashboard
+
+METHODS
+  triggers
+    Retrieve all matching triggers.
+
+  disabled_actions
+    Retrieve all disabled actions.
+
+  enable_actions
+    Enables all actions.
+
+  unsupported_items
+    Retrieve all unsupported items.
+
+  unattended_alarms
+    Retrieve all unsupported items.
+
+  history
+    Retrieve all triggers.
+
+  selftest
+    Perform a quick self assessment.
+
+  _do_backend_action
+    Execute the given action with the passed argument ref on all available
+    backends.
+
+NAME
+_
+Monitoring::Reporter - Monitoring dashboard
+AUTHOR
+    Dominik Schulz <dominik.schulz@gauner.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Dominik Schulz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

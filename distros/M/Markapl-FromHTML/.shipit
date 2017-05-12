@@ -1,0 +1,8 @@
+# auto-generated shipit config file.
+steps = FindVersion, ChangeVersion, CheckChangeLog, DistTest, MakeDist, UploadCPAN, Twitter
+
+CheckChangeLog.files = Changes
+twitter.config = /Users/gugod/.twitterrc
+twitter.distname = Markapl-FromHTML
+twitter.message = Shipped %d %v - soon at %u
+

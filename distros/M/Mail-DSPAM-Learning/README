@@ -1,0 +1,56 @@
+Mail::DSPAM::Learning version 0.1
+=================================
+
+This is a module to annotate Web document in the ALVIS pipeline.
+
+Contains this :
+
+    dspam-learn (for learning missed spams)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Or if you don't have the "make" program:
+
+   perl Build.PL
+   Build
+   Build test
+   Build install
+
+DEPENDENCIES
+
+This module requires the other modules and libraries:
+
+	Mail::MboxParser
+	Mail::Builder
+	Email::Send
+	Mail::Box::Manager
+	Term::ReadKey
+	File::Basename
+	File::Path
+	Net::DNS
+	Sys::HostIP
+	Module::TestConfig
+	Getopt::Long
+	Pod::Usage
+
+EXAMPLE
+
+Go into the example directory and run dspam-learn-example (it don't
+really send messages to your dspam server)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Thierry Hamon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

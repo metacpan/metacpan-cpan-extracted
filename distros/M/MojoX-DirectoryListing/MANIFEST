@@ -1,0 +1,21 @@
+Changes
+lib/MojoX/DirectoryListing.pm
+lib/MojoX/DirectoryListing/Icons.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/10-app1.t
+t/20-content-types.t
+t/30-stylesheets.t
+t/31-header-footer.t
+t/60-icons.t
+t/app1/Server1.pm
+t/app1/Server2.pm
+t/app1/Server3.pm
+t/app1/Server4.pm
+t/app1/Server5.pm
+t/app1/Server6.pm
+t/app1/Server7.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

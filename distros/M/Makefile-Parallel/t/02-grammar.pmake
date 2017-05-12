@@ -1,0 +1,25 @@
+# -*- makefile -*-
+
+foo: (5:00)
+	cat /etc/passwd
+
+bar: foo (10:00) [50]
+  	sub{  
+   for (1..20){ $nada = $_ }
+   print "bah!" 
+ }
+
+%%
+
+sub abc{
+ my $x=shift;
+
+ "$x$x$x"
+}
+
+sub abcd{
+ my $x=shift;
+
+ "$x$x". abc($x)
+}
+

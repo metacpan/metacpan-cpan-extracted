@@ -1,0 +1,4 @@
+MooseX::Test::Role
+==================
+
+Test functions to aid in testing roles. See the perldoc for more info.

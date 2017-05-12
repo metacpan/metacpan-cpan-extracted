@@ -1,0 +1,24 @@
+---
+abstract: 'Markup As YAML'
+author:
+  - 'Kang-min Liu  C<< <gugod@gugod.org> >>'
+build_requires:
+  Test::More: 0.42
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Markaya
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  HTML::Entities: 0
+  YAML::XS: 0.16
+  perl: 5.8.3
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.40

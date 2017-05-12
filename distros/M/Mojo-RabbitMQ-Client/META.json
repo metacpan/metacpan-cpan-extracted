@@ -1,0 +1,102 @@
+{
+   "abstract" : "Mojo::IOLoop based RabbitMQ client",
+   "author" : [
+      "-2017, Sebastian Podjasek and others"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.6",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-RabbitMQ-Client",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "0",
+            "List::Util" : "1.33",
+            "Mojolicious" : "6.10",
+            "Net::AMQP" : "0.06",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0.43",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Mojo::RabbitMQ::Client" : {
+         "file" : "lib/Mojo/RabbitMQ/Client.pm",
+         "version" : "v0.0.9"
+      },
+      "Mojo::RabbitMQ::Client::Channel" : {
+         "file" : "lib/Mojo/RabbitMQ/Client/Channel.pm"
+      },
+      "Mojo::RabbitMQ::Client::Consumer" : {
+         "file" : "lib/Mojo/RabbitMQ/Client/Consumer.pm"
+      },
+      "Mojo::RabbitMQ::Client::LocalQueue" : {
+         "file" : "lib/Mojo/RabbitMQ/Client/LocalQueue.pm"
+      },
+      "Mojo::RabbitMQ::Client::Method" : {
+         "file" : "lib/Mojo/RabbitMQ/Client/Method.pm"
+      },
+      "Mojo::RabbitMQ::Client::Method::Publish" : {
+         "file" : "lib/Mojo/RabbitMQ/Client/Method/Publish.pm"
+      },
+      "Mojo::RabbitMQ::Client::Publisher" : {
+         "file" : "lib/Mojo/RabbitMQ/Client/Publisher.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/inway/mojo-rabbitmq-client/issues"
+      },
+      "homepage" : "https://github.com/inway/mojo-rabbitmq-client",
+      "repository" : {
+         "url" : "git://github.com/inway/mojo-rabbitmq-client.git",
+         "web" : "https://github.com/inway/mojo-rabbitmq-client"
+      }
+   },
+   "version" : "0.0.9",
+   "x_contributors" : [
+      "Vidar Tyldum <vidar@tyldum.com>",
+      "Stephan Kulow <coolo@suse.de>",
+      "Richard Lippmann <lippmann@findus-internet-opac.de>",
+      "Sebastian Podjasek <sebastian@podjasek.pl>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

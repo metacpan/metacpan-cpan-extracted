@@ -1,0 +1,12 @@
+0.003  2014-06-14
+
+    - Fixed failing unit test when 
+      comparing hash key values
+
+0.002  2014-06-12
+
+    - Fixed bug rt-95727
+
+0.001  2014-05-01
+
+    - Initial release

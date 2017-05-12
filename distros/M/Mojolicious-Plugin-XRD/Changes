@@ -1,0 +1,64 @@
+0.18 2017-04-09
+        - Removed deprecated is_status_class() method.
+
+0.17 2016-07-21
+        - Added reply->xrd.
+        - Deprecated render_xrd in favor of reply->xrd.
+
+0.16 2015-05-26
+        - Updated to recent versions of Mojolicious.
+
+0.15 2015-04-26
+        - Updated to recent XML::Loy version.
+
+0.14 2015-04-24
+        - Updated dependencies.
+
+0.13 2015-01-26
+        - Updated XML::Loy dependency.
+
+0.12 2014-12-09
+        - Remove deprecated oo-json usage.
+        - Remove route definitions per "route".
+
+0.11 2014-10-11
+        - Fix minimum requirement in makefile.
+
+0.10 2014-10-10
+        - Improved test suite for parallel requests with delay.
+
+0.09 2014-10-10
+        - Update to Mojolicious 5.48.
+
+0.08 2014-08-18
+        - Update to Mojolicious 5.29.
+        - Using indirect helper object.
+        - Fixed License issue (now coherent Artistic License 2.0).
+
+0.07 2013-08-03
+        - Update to Mojolicious 4.23.
+
+0.06 2013-04-15
+        - Trim tail of undefined values.
+        - Support HEAD method.
+
+0.05 2013-04-15
+        - Raised max_redirections to 10.
+        - Lowerded connect_timeout to 7.
+        - Some async tests.
+
+0.04 2013-04-07
+        - Added headers to get_xrd().
+
+0.03 2013-04-06
+        - Added get_xrd() method.
+        - Update dependency.
+
+0.02 2013-03-28
+        - Improved documentation.
+        - Small code improvements.
+
+0.01 2013-03-27
+        - Separation from Sojolicious package.
+        - Initial submission to GitHub.
+        - Initial submission to CPAN.

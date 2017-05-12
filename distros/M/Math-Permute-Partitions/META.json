@@ -1,0 +1,42 @@
+{
+   "abstract" : "Generate all the permutations of a partitioned list.",
+   "author" : [
+      "PhilipRBrenan@appaapps.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-Permute-Partitions",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Math::Cartesian::Product" : "0",
+            "Math::Permute::List" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Math::Permute::Partitions" : {
+         "file" : "lib/Math/Permute/Partitions.pm",
+         "version" : "1.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.001"
+}

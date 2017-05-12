@@ -1,0 +1,8 @@
+CHANGES
+
+Changes since 0.001:
+
+  * Reorganized to be a better-behaved CPAN module.
+
+  * Added documentation, including an interesting Historical Note.
+

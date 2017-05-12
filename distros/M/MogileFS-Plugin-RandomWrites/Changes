@@ -1,0 +1,15 @@
+0.05
+    - Reduce warnings.
+    - If there's not enough disc space, try anyway.
+
+0.04
+    - Replication policy for randomising writes.
+
+0.03
+    - Add a utility method for monitoring how many devices are available for writes.
+
+0.02
+    - Avoid suggesting writes to dead devices.
+
+0.01
+	- Original release.

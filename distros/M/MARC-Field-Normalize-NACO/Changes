@@ -1,0 +1,20 @@
+Revision history for MARC-Field-Normalize-NACO
+
+0.05  2016-10-26 15:21:24 PDT
+
+0.05  2016-10-26 15:20:36 PDT
+
+0.04  2014-05-09 17:01:32 PDT
+
+0.03  2013-08-08 13:50:14 PDT
+
+0.01  2013-06-04 17:03:27 PDT
+        - Initial release
+0.02  2013-06-20 13:58:00 PDT
+        - Update defaults to naco_from_field()
+0.03  2013-06-20 13:58:00 PDT
+        - Fix dependencies listing
+0.04  2014-05-09 17:00:00 PDT
+        - Use only first 1xx in naco_from_authority()
+0.05  2016-10-26 15:15:00 PDT
+        - Always remove terminal comma

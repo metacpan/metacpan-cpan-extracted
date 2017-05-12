@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Mail-SMTP-Honeypot
+version:             0.11
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Net::DNS::Codes:               0.09
+    Net::DNS::ToolKit:             0.41
+    Net::NBsocket:                 0.15
+    Proc::PidUtil:                 0.07
+    Sys::Hostname::FQDN:           0.07
+    Unix::Syslog:                  0.97
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

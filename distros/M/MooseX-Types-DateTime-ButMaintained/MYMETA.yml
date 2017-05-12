@@ -1,0 +1,36 @@
+---
+abstract: 'L<DateTime> related constraints and coercions for Moose'
+author:
+  - '=head2 Modern'
+  - 'Evan Carroll <me@evancarroll.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::Exception: 0.27
+  Test::More: 0
+  Test::use::ok: 0.02
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Types-DateTime-ButMaintained
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DateTime: 0.4302
+  DateTime::Locale: 0.4001
+  DateTime::TimeZone: 0.96
+  Moose: 0.41
+  MooseX::Types: 0.30
+  Olson::Abbreviations: 0.03
+  namespace::autoclean: 0
+resources:
+  homepage: http://www.evancarroll.com
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/EvanCarroll/mx-t-datetime-butmainted.git
+version: 0.16

@@ -1,0 +1,62 @@
+NAME
+    MooseX::Tree - Moose Role to provide simple hierarchical tree
+    functionality to objects
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+        package My::Node;
+    
+        use Moose;
+        with 'MooseX::Tree';
+    
+        ... then: ...
+    
+        my $node = My::Node->new();
+    
+        my $parent      = $node->parent;
+        my @children    = $node->children;
+        my @ancestors   = $node->ancestors;
+        my @descendants = $node->descendants;
+
+DESCRIPTION
+    Under development.
+
+    Moose Role to provide simple tree functionality.
+
+METHODS
+    Note: method names can be overridden by providing parameters when
+    consuming this role.
+
+  parent
+  children
+  ancestors
+  descendants
+TODO
+    *   Document and test role parameters (to set attribute/method names)
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/mjemmeson/moosex-tree/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/mjemmeson/moosex-tree>
+
+      git clone git://github.com/mjemmeson/moosex-tree.git
+
+AUTHOR
+    Michael Jemmeson <mjemmeson@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Michael Jemmeson
+    <mjemmeson@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

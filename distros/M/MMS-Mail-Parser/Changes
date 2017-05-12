@@ -1,0 +1,35 @@
+Revision history for MMS-Mail-Parser
+
+0.14	17-Jul-2006 / 12:04
+	Modified Makefile.PL to require MMS::Mail::Message 0.06 for header_received_from required method
+0.13	06-Jul-2006 / 18:47
+	Added storage of header_received_from
+0.12	06-Jul-2006 / 18:32
+	Added orange.net to orange message detection
+0.11	13-Mar-2006 / 14:31
+	Changed 02 message detection - patch from C May 
+0.10    07-Feb-2006 / 20:30
+        Clean up of perldoc and made minor documentation corrections
+0.09    01-Feb-2006 / 13:00
+        Modified tutorial location
+0.08    21-Jan-2006 / 13:00
+        Added support for UK 3 network
+0.07    13-Jan-2006 / 17:50
+        Updated dependancies to include version numbers for MMS classes
+0.06	09-Jan-2006 / 16:00
+	Used Class::Accessor to manage accessors
+	Updated README
+	Improved pod
+0.05	29-Sep-2005 / 11:14
+	Improved pod by adding formatting codes
+0.04    26-Sep-2005 / 12:30
+	Added strip_characters method and element to contructor to allow MMS::Mail::Message and MMS::Mail::Message character stripping
+0.03    17-Sep-2005 / 16:40
+        Added ability to use MMS::Mail::Provider::02 parser for parsing UK02 messages.
+	Added evals around Provider parse calls to prevent errors when Providers are not installed.
+	Changed Providers from static class calls to objects supplied via provider method.
+0.02    11-Sep-2005 / 21:30
+        Added missing use MMS::Mail::Provider.
+0.01    11-Sep-2005 / 21:30
+        First version, released on an unsuspecting world.
+

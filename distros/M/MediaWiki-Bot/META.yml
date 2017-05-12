@@ -1,0 +1,60 @@
+---
+abstract: 'a high-level bot framework for interacting with MediaWiki wikis'
+author:
+  - 'Dan Collins <dcollins@cpan.org>'
+  - 'Mike.lifeguard <lifeguard@cpan.org>'
+  - 'Alex Rowe <alex.d.rowe@gmail.com>'
+  - 'Oleg Alexandrov <oleg.alexandrov@gmail.com>'
+  - 'jmax.code <jmax.code@gmail.com>'
+  - 'Stefan Petrea <stefan.petrea@gmail.com>'
+  - 'kc2aei <kc2aei@gmail.com>'
+  - bosborne@alum.mit.edu
+  - 'Brian Obio <brianobio@gmail.com>'
+  - 'patch and bug report contributors'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  List::MoreUtils: '0'
+  Test::Is: '0'
+  Test::More: '0.96'
+  Test::RequiresInternet: '0'
+  Test::Warn: '0'
+  blib: '1.01'
+  perl: '5.008'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MediaWiki-Bot
+no_index:
+  directory:
+    - corpus
+    - examples
+    - inc
+requires:
+  Carp: '0'
+  Constant::Generate: '0'
+  Digest::MD5: '2.39'
+  Encode: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  HTML::Entities: '3.28'
+  LWP::Protocol::https: '6.06'
+  List::Util: '0'
+  MediaWiki::API: '0.36'
+  Module::Pluggable: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/MediaWiki-Bot/MediaWiki-Bot/issues
+  homepage: https://metacpan.org/module/MediaWiki::Bot
+  repository: git://github.com/MediaWiki-Bot/MediaWiki-Bot.git
+version: '5.006003'

@@ -1,0 +1,133 @@
+This module wraps the long double complex arithmetic functions defined in complex.h.
+Consequently, you need a C compiler that provides complex.h.
+
+Build in the usual way:
+
+ perl Makefile.PL
+ make
+ make test
+ make install
+
+
+=====================
+Which Math::Complex_C
+=====================
+
+There are three Math::Complex_C modules, each now in it's own separate distro:
+
+1) Math::Complex_C
+  Accesses C's 'double' precision (53-bit) complex arithemtic operations;
+
+2) Math::Complex_C::L
+  Accesses C's 'long double' precision (usually 64-bit) complex arithemtic operations;
+
+3) Math::Complex_C::Q
+  Accesses C's '__float128' precision (113-bit) complex arithemtic operations;
+
+You can use any/all of those 3 modules (assuming they build ok for you) on any perl - irrespective
+of whether your NV-type is 'double', 'long double' or '__float128' - though you need to go about
+things a little judiciously if the precision of your NV is less than the precision of the complex
+arithemtic operations for the Math::Complex_C module that you're using.
+
+For example, if your NV is double, and you're using Math::Complex_C::Q:
+
+########################
+
+use warnings;
+use Math::Complex_C::Q qw(:all);
+
+$obj = sqrt(MCQ(-2.123, 0));
+$nv = imag_cq($obj);     # returns NV
+$str = imag_cq2str($obj);# returns string
+
+print "$nv\n$str\n";
+
+########################
+
+This outputs:
+1.45705181788432
+1.45705181788431952124809953480556e+00
+
+Clearly, you've lost the full __float128 precision by calling imag_cq(), whereas imag_cq2str()
+allows you to capture the full precision.
+
+But there's another loss of precision in the above. When the NV (bareword) -2.123 was assigned
+it was assigned only with 'double' (53-bit) precision. Assigning the value with full 113-bit
+precision is quite simple - we just have to quote the bareword '-2.123':
+
+########################
+
+use warnings;
+use Math::Complex_C::Q qw(:all);
+
+$obj = sqrt(MCQ('-2.123', 0));
+$nv = imag_cq($obj);     # returns NV
+$str = imag_cq2str($obj);# returns string
+
+print "$nv\n$str\n";
+
+########################
+
+This doesn't change the value of $nv, but $str changes to:
+1.45705181788431944566113502812563e+00
+
+which is now (hopefully) the correct 33-digit approximation of sqrt(2.123).
+
+Another alternative is to assign to a Math::Float128 object instead of to a string:
+
+########################
+
+use warnings;
+use Math::Complex_C::Q qw(:all);
+use Math::Float128 qw(:all);
+
+$obj = sqrt(MCQ('-2.123', 0));
+# $obj = sqrt(MCQ(Math::Float128->new('-2.123'), 0)); # same result
+$f128_obj = imag_cq2F($obj);# returns Math::Float128 object
+
+print "$f128_obj\n";
+
+########################
+
+This also prints out:
+1.45705181788431944566113502812563e+00
+
+but this time the value is stored in a Math::Float128 object, not a string.
+So ... just make sure that values are assigned/retrieved as either strings or Math::Float128 objects.
+The capability for this is provided.
+Similarly if you're using Math::Complex_C::L on a perl whose NV is 'double' - grab/assign
+the values as either strings or Math::LongDouble objects.
+
+For example, again with NV type of double:
+
+##############################
+
+use warnings;
+use Math::Complex_C::L qw(:all);
+use Math::LongDouble qw(:all);
+
+$obj = sqrt(MCL('-2.123', 0));
+# $obj = sqrt(MCL(Math::LongDouble->new('-2.123'), 0)); # same result
+$nv = imag_cl($obj);       # returns NV
+$str = imag_cl2str($obj);  # returns string
+$ld_obj = imag_cl2LD($obj);# returns Math::LongDouble object
+
+print "$nv\n$str\n$ld_obj\n";
+
+##############################
+
+This outputs:
+1.45705181788432
+1.45705181788431945e+000
+1.45705181788431945e+000
+
+If your NV precision matches the precision of the complex (real and imaginary) parts then
+assigning/retrieving values as NVs is fine.
+
+If your NV precision is greater than the precision of the complex components then you're simply
+wasting the extra precision your NV has - which is something you are entirely free to do.
+
+In short, I'd recommend using Math::Complex_C::Q - unless you have some reason to not do so.
+Valid reasons would include not needing that level of precision or quadmath not being available
+for your system.
+

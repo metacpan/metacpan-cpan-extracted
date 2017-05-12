@@ -1,0 +1,112 @@
+#!/usr/bin/perl -w
+
+package main;
+
+use warnings;
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use Module::License::Report;
+
+our $VERSION = '0.02';
+
+my %opts = (
+   verbose => 0,
+   all     => 0,
+   help    => undef,
+   version => undef,
+);
+
+Getopt::Long::Configure('bundling');
+GetOptions('v|verbose'    => \$opts{verbose},
+           'a|all'        => \$opts{all},
+           'h|help'       => \$opts{help},
+           'V|version'    => \$opts{version},
+          ) or pod2usage(1);
+if ($opts{help})
+{
+   pod2usage(-exitstatus => 0, -verbose => 2, -input => \*DATA);
+}
+if ($opts{version})
+{
+   print "Module::License::Report v$Module::License::Report::VERSION\n";
+   exit 0;
+}
+if (@ARGV == 0)
+{
+   pod2usage(1);
+}
+
+my $reporter = Module::License::Report->new({verbose => $opts{verbose}});
+my %licenses;
+for my $module_name (@ARGV)
+{
+   if ($opts{all})
+   {
+      %licenses = (%licenses, $reporter->license_chain($module_name));
+   }
+   else
+   {
+      my $license = $reporter->license($module_name);
+      if ($license)
+      {
+         $licenses{$license->package_name} = $license;
+      }
+      else
+      {
+         warn "Can't find a license for $module_name\n";
+      }
+   }
+}
+
+for my $pkg_name (sort keys %licenses)
+{
+   printf "%-11s %s\n", $licenses{$pkg_name}->name(), $pkg_name;
+}
+
+__DATA__
+
+=head1 NAME
+
+license-report - List the license of CPAN modules
+
+=head1 SYNOPSIS
+
+license-report [options] module1 module2 ...
+
+ Options:
+   -a --all            recursive check license of dependencies
+   -v --verbose        print status messages
+   -h --help           verbose help message
+   -V --version        print AnnoCPAN::Perldoc::SyncDB version
+
+=head1 DESCRIPTION
+
+Prints a table of license for CPAN distributions.
+
+=head1 EXAMPLE
+
+    % license-report -a PAR
+    perl        Archive-Zip
+    perl        Compress-Zlib
+    perl        Module-ScanDeps
+    perl        PAR
+    perl        PAR-Dist
+
+=head1 SEE ALSO
+
+L<Module::License::Report>
+
+=head1 LICENSE
+
+Copyright 2005 Clotho Advanced Media, Inc., <cpan@clotho.com>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Clotho Advanced Media Inc., I<cpan@clotho.com>
+
+Primary developer: Chris Dolan
+

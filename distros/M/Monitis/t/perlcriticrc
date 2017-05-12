@@ -1,0 +1,9 @@
+verbose = 6
+include = WWW::Monitis::API
+
+[BuiltinFunctions::ProhibitStringyEval]
+allow_includes = 1
+
+[TestingAndDebugging::ProhibitNoStrict]
+allow = refs
+

@@ -1,0 +1,45 @@
+{
+   "abstract" : "Mojolicious plugin for caching",
+   "author" : [
+      "Siddhartha Basu <biosidd@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Cache",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CHI" : "0.36",
+            "File::Path" : "2.08",
+            "Mojolicious" : "1.21"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/cybersiddhu/Mojolicious-Plugin-Caching.git",
+         "web" : "http://github.com/cybersiddhu/Mojolicious-Plugin-Caching"
+      }
+   },
+   "version" : "0.0015"
+}
+

@@ -1,0 +1,31 @@
+---
+version: 0.04
+date:    2008-10-01
+note:    Initial release
+
+---
+version: 0.05
+date:    2008-10-02
+changes:
+  - Patched POD (thanks to tupinek@gmail.com)
+  - Documented concise_structure()
+  - Other documentation tweaks
+
+---
+version: 0.06
+date:    2008-10-07
+changes:
+  - Added entity numbering (1, 1.1, 1.2, 1.2.1, etc.)
+  - concise_structure() includes entity numbers
+  - parse() returns list of entities
+  - new() was ignoring args passed to it
+  - Removed header unfolding, which was messing up offsets
+  - Print epilogue if desired
+
+---
+version: 0.07
+date:    2008-10-10
+changes:
+  - parse() now returns message entity when called in scalar context
+  - documented structure of data returned by parse()
+  - added lots of tests

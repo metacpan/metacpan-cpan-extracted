@@ -1,0 +1,50 @@
+{
+   "abstract" : "Deal with a \"stack\" of messages",
+   "author" : [
+      "Cory G Watson <gphat@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Message-Stack",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Moose" : 0,
+            "MooseX::Aliases" : 0,
+            "MooseX::Storage" : 0,
+            "MooseX::Storage::Deferred" : 0,
+            "MooseX::Types" : 0,
+            "MooseX::Types::Moose" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/gphat/message-stack",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/gphat/message-stack",
+         "web" : "http://github.com/gphat/message-stack"
+      }
+   },
+   "version" : "0.22"
+}
+

@@ -1,0 +1,119 @@
+
+% layout 'standard';
+% title 'Mercury Message Broker';
+
+<script src="example.js"></script>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-8">
+            <h1>Mercury Message Broker</h1>
+        </div>
+        <div class="col-md-4">
+            <label for="url-root">Broker Root: </label>
+            <div class="input-group">
+                <span class="input-group-addon">ws://</span>
+                <input type="text" id="url-root" class="form-control"
+                    value="<%= url_for( 'bus' )->to_abs->host_port %>"
+                />
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 1em">
+            <li role="presentation" class="active">
+                <a href="#info" aria-controls="info" role="tab" data-toggle="tab">
+                    Info
+                </a>
+            </li>
+            <li role="presentation">
+                <a href="#bus" aria-controls="bus" role="tab" data-toggle="tab">
+                    Bus
+                </a>
+            </li>
+            <li role="presentation">
+                <a href="#pubsub" aria-controls="pubsub" role="tab" data-toggle="tab">
+                    Pub/Sub
+                </a>
+            </li>
+            <li role="presentation">
+                <a href="#pushpull" aria-controls="pushpull" role="tab" data-toggle="tab">
+                    Push/Pull
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade in active" id="info">
+                <div class="container-fluid">
+                    <div class="row">
+
+                        <div class="col-md-6">
+
+                            <p>Mercury is a WebSocket message broker that
+                            enables some simple messaging patterns.</p>
+
+                            <dl>
+                                <dt>Bus</dt>
+                                <dd>A message bus is a many-to-many,
+                                peer-to-peer message pattern. All peers connect
+                                to a topic and receive all messages published
+                                on that topic.</dd>
+
+                                <dt>Pub/Sub</dt>
+                                <dd>A pub/sub allows one or more publishers to
+                                send messages to one or more subscribers.
+                                Pub/sub topics are hierarchal, allowing
+                                subscribers to broaden or narrow the messages
+                                recieved.</dd>
+
+                                <dt>Push/Pull</dt>
+                                <dd>A push/pull allows one or more publishers to
+                                send messages that will be handled by exactly
+                                one subscriber in a rotation.</dd>
+                            </dl>
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <p>WebSockets are a powerful tool, enabling many
+                            features previously impossible, difficult, or ugly
+                            for web developers to implement. Where once only an
+                            HTTP request could get data from a server, now a
+                            persistent socket can allow the server to send
+                            updates without the client needing to specifically
+                            request it.</p>
+
+                            <p>WebSockets do not need to be a communication
+                            channel purely between browser and server. The
+                            Mojolicious web framework has excellent support for
+                            WebSockets. Using that support, we can communicate
+                            between different server processes. This solves the
+                            problem with client-to-client communication in a
+                            parallelized web server where all clients may not
+                            be connected to the same server process. The server
+                            processes can use a central message broker to
+                            coordinate and pass messages from one client to
+                            another.</p>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="bus">
+                %= include 'bus'
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="pubsub">
+                %= include 'pubsub'
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="pushpull">
+                %= include 'pushpull'
+            </div>
+        </div>
+
+    </div>
+
+
+</div>

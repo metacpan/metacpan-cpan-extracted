@@ -1,0 +1,63 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d1805a5bc51ce86ad094912c50034c560d6ce488 Changes
+SHA1 882221895a73bad18eb9f16a0ce523a968a932c1 LICENSE.artistic_2
+SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE.bsd
+SHA1 524cd7596e0eb9af310d32ac00311452ad9eb73e MANIFEST
+SHA1 f38db66647b2ab6935da653d7a26069985c8b60d META.yml
+SHA1 90f13d3a3606dec829e1a882c14001a8412173fc Makefile.PL
+SHA1 1a1e03a6943366d91dda829e676d184222a58767 NizhnyNovgorod.pm
+SHA1 0bb3d6fe68b916fcc1cd1b5ce73bfa84479d139f README
+SHA1 d470c71b4d2d8c73f891c0e1f928409231709ba0 examples/ex1.pl
+SHA1 8d59bba2b1b0cd9f321459ae25b7b63d2e904a05 examples/ex2.pl
+SHA1 658f6b8df40bed8a48618368e03aecd39b40271d examples/ex3.pl
+SHA1 a55ecf522aca68ac5e736ded4596738c60796c04 examples/ex4.pl
+SHA1 9d1d09adc1618aaf1fc064ba132248e783d58297 images/ex3.png
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 42de62df31eaf796d8bfd49a11fdc9cff1b50b74 inc/Module/Install/Share.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 63e29be466f765bbbe8493d78be8f3552b6de942 share/nizhny_novgorod-map.xml
+SHA1 0c0bc05801f1a548a02b546394bf97e6375d87a9 t/Map-Tube-NizhnyNovgorod/01-use.t
+SHA1 b5a3d7ac6f4ecb6362c80c6846644b40509a05ee t/Map-Tube-NizhnyNovgorod/02-version.t
+SHA1 12126da09ebced5834d063334d0b4577093cd1d7 t/Map-Tube-NizhnyNovgorod/03-map.t
+SHA1 36a157a9fd8a747dee086e34ed72da2419b92315 t/Map-Tube-NizhnyNovgorod/04-get_node_by_id.t
+SHA1 fbcbff36675f6babb607dacf6a2e49635d5fd96f t/Map-Tube-NizhnyNovgorod/05-get_node_by_name.t
+SHA1 62023e92dc0756a78ab904db44ad9ed3ce4e2d05 t/Map-Tube-NizhnyNovgorod/06-get_shortest_route.t
+SHA1 9b4bf6e8917824f3175950e66bbc7f7561f42d50 t/Map-Tube-NizhnyNovgorod/07-name.t
+SHA1 db73703ca8d5ce1cc5de2c02361f4c2570140a4e t/Map-Tube-NizhnyNovgorod/08-xml.t
+SHA1 1d749c6a1635206f382208b14e70343b24fbf2ca xt/Map-Tube-NizhnyNovgorod/01-pod_coverage.t
+SHA1 c7c0551d6163c02f142074d15f791a62ded0654a xt/Map-Tube-NizhnyNovgorod/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWIMVvAAoJEJe+XXKaIuTlr3oH/iSZXzX32PTzdTmxcfZdMj/X
+kgtDINmlqTC2FDf3/WFdZKbJW6NBAPiQVyuZ1xm7zznQ1p/gKmbizVSEZXDpE+z3
+8AHcFghe/R8QinbcB0qAuYzsT5cOVfanBvFF0nYBqJJYKHuAjD2XT2jBEZty9XFy
+upDNNl3GAr/5e8ICN1cbCJAQ6taPvWMZcFRIb5pxUhXCIk2z10znlpvqONgTxsQc
+c3bH73aoOk5SfiyHSgxPZS327tyTDn7G85LhwsNLKF5uaVLoqbaAcLZjavdRteYf
+Cy8Psi49VEg51vq0TpWcLP49ct8JVLV2tyBAEheSagEwIo6wzC73DdKn4Kjovd8=
+=qapX
+-----END PGP SIGNATURE-----

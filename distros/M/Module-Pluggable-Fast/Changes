@@ -1,0 +1,35 @@
+Revision history for Perl extension Module::Pluggable::Fast
+
+0.19  Fri Dec 25 00:00:00 2009
+	- Add untaint patch from GEOFFR
+
+0.18  Fri Dec 16 00:00:00 2005
+
+        - Fixed tests
+
+0.17  Thu Dec 15 00:00:00 2005
+        - Added tests from Module::Pluggable
+        - Updated regex
+        - Fixed to properly die on error messages from components.
+          (Andy Grundman)
+
+0.16  Fri Jun 03 02:47:00 2005
+        - added callback option
+
+0.15  Wen Apr 27 00:00:00 2005
+        - added require option
+
+0.14  Sat Apr 23 16:42:00 2005
+        - die on syntax errors
+
+0.13  Mon Mar 7 20:00:00 2005
+        - fixed prereqs (Juergen Peters)
+
+0.12  Tue Jan 25 20:00:00 2005
+        - fixed dependencies (Marcus Ramberg)
+
+0.11  Mon Dec 20 20:00:00 2004
+        - faster instantiation
+
+0.10  Sun Dec 19 18:00:00 2004
+        - original version.

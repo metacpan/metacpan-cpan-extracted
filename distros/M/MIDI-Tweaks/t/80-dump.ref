@@ -1,0 +1,41 @@
+MIDI::Opus->new({
+  'format' => 1,
+  'ticks'  => 480,
+  'tracks' => [   # 2 tracks...
+
+    # Track #1 ...
+    MIDI::Track->new({
+      'type' => 'MTrk',
+      'events' => [  # 5 events.
+        ['copyright_text_event', 0, 'Unknown'],   #       0  001-01-00-00
+        ['cue_point', 0, 'Created by Rosegarden'],  #       0  001-01-00-00
+        ['cue_point', 0, 'http://www.rosegardenmusic.com/'],  #       0  001-01-00-00
+        ['set_tempo', 0, 500000],                 #       0  001-01-00-00  Tempo: q = 120
+        ['time_signature', 0, 6, 3, 36, 8],       #       0  001-01-00-00  Time = 6/8, Click = 36, NoteQ = 8
+      ]
+    }),
+    
+    # Track #2 ...
+    MIDI::Track->new({
+      'type' => 'MTrk',
+      'events' => [  # 14 events.
+                                                  #       0  001-01-00-00  Time = 6/8, Click = 36, NoteQ = 8
+        ['track_name', 0, ''],                    #       0  001-01-00-00
+        ['patch_change', 0, 0, 0],                #       0  001-01-00-00  Channel 1, patch = Acoustic Grand
+        ['note_on', 0, 0, 64, 100],               #       0  001-01-00-00  On:  E3
+        ['note_off', 240, 0, 64, 127],            #     240  001-01-08-00  Off: E3
+        ['note_on', 0, 0, 65, 100],               #     240  001-01-08-00  On:  F3
+        ['note_off', 240, 0, 65, 127],            #     480  001-01-16-00  Off: F3
+        ['note_on', 0, 0, 67, 100],               #     480  001-01-16-00  On:  G3
+        ['note_off', 240, 0, 67, 127],            #     720  001-02-00-00  Off: G3
+        ['note_on', 0, 0, 69, 100],               #     720  001-02-00-00  On:  A3
+        ['note_off', 240, 0, 69, 127],            #     960  001-02-08-00  Off: A3
+        ['note_on', 0, 0, 71, 100],               #     960  001-02-08-00  On:  B3
+        ['note_off', 240, 0, 71, 127],            #    1200  001-02-16-00  Off: B3
+        ['note_on', 0, 0, 74, 100],               #    1200  001-02-16-00  On:  D4
+        ['note_off', 240, 0, 74, 127],            #    1440  002-01-00-00  Off: D4
+      ]
+    }),
+    
+  ]
+});

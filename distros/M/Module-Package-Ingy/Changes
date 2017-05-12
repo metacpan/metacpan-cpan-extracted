@@ -1,0 +1,107 @@
+---
+version: 0.20
+date:    Wed Jul 25 21:10:50 PDT 2012
+changes:
+- Add support for Alt- modules.
+---
+version: 0.19
+date:    Sun Jul  1 06:46:10 PDT 2012
+changes:
+- Return a true value
+---
+version: 0.18
+date:    Mon Nov  7 20:24:32 PST 2011
+changes:
+- Support release version 0.01
+- Update versions
+- Get rid of Gloom support
+---
+version: 0.17
+date:    Sun Sep 25 22:14:14 CEST 2011
+changes:
+- Ignore Test::Base deps in author deps
+---
+version: 0.16
+date:    Thu Sep 22 00:03:07 CEST 2011
+changes:
+- Ignore Pegex::* in author deps
+- Released from Liz++ and Wendy++'s servver closet.
+---
+version: 0.15
+date:    Sat Aug 20 18:21:13 CEST 2011
+changes:
+- Require M:P 0.28
+---
+version: 0.14
+date:    Fri Aug 19 20:55:54 EEST 2011
+changes:
+- Support Gloom
+---
+version: 0.13
+date:    Sun Jul  3 20:03:36 EDT 2011
+changes:
+- Support Test::Common
+---
+version: 0.12
+date:    Mon Jun 13 00:40:37 EST 2011
+changes:
+- Add Module::Install::RequiresList
+---
+version: 0.11
+date:    Sun Jun 12 03:50:53 EST 2011
+changes:
+- Add auto_license and githubmeta
+- Add \o/
+---
+version: 0.10
+date:    Fri Jun 10 01:45:35 EST 2011
+changes:
+- Make release quieter.
+---
+version: 0.09
+date:    Tue Jun  7 17:35:38 EST 2011
+changes:
+- Release with Module::Package 0.22.
+- Make release purge after upload quiet so I can see the upload result.
+---
+version: 0.08
+date:    Mon Jun  6 01:01:32 EST 2011
+changes:
+- Check for and add github 'repository' (to META).
+---
+version: 0.07
+date:    Tue May 31 20:32:11 EST 2011
+changes:
+- Forgot to change the Makefile.PL call to the new style.
+---
+version: 0.06
+date:    Tue May 31 20:28:28 EST 2011
+changes:
+- Clean up make release script
+- Release with new Module::Package
+---
+version: 0.05
+date:    Mon May 30 20:26:45 EST 2011
+changes:
+- Add 'make release' support.
+---
+version: 0.04
+date:    Mon May 30 15:15:56 EST 2011
+changes:
+- Repackage with Module::Package 0.17 required.
+---
+version: 0.03
+date:    Mon May 30 00:16:31 EST 2011
+changes:
+- Refactoring
+- Add new basic plugins
+---
+version: 0.02
+date:    Sat May 28 15:02:24 EST 2011
+changes:
+- Repackage with Module::Package 0.14 required.
+---
+version: 0.01
+date:    Sat May 28 01:18:18 EST 2011
+changes:
+- First Release

@@ -1,0 +1,185 @@
+<HTML>
+<HEAD>
+<TITLE>MHonArc Reference Manual</TITLE>
+<link rel="stylesheet" type="text/css" href="docstyles.css">
+<style>
+body {
+  background-image: url(ssbg75.jpg);
+  background-attachment: fixed;
+  color: #000000;
+}
+</style>
+</HEAD>
+<BODY>
+<hr>
+<h1 align="center"><img src="stampwb2.png" alt="[Cool Logo Here]"><br>
+<br>
+MHonArc</h1>
+<p align="center">
+A Mail-to-HTML converter.
+</p>
+
+<hr>
+<h2>Table of Contents</h2>
+
+<!--X-TOC-Start-->
+<ul>
+<li><a name="intro" href="intro.html">Introduction</a>
+<ul>
+<li><a name="whatis" href="intro.html#whatis">What is MHonArc?</a></li>
+<li><a name="whyuse" href="intro.html#whyuse">Why Use MHonArc?</a></li>
+<li><a name="availability" href="intro.html#availability">Availability</a></li>
+<li><a name="license" href="intro.html#license">License</a></li>
+<li><a name="help" href="intro.html#help">Where to Get Help?</a></li>
+<li><a name="nomenclature" href="intro.html#nomenclature">Documentation Nomenclature</a></li>
+</ul>
+</ul>
+<ul>
+<li><a name="relnotes" href="relnotes.html">Release Notes</a>
+<ul>
+<li><a name="important" href="relnotes.html#important">Compatibility Notes</a></li>
+<li><a name="v2.6.9" href="relnotes.html#v2.6.9">v2.6.9 Notes</a></li>
+<li><a name="v2.6.0" href="relnotes.html#v2.6.0">v2.6.0 Notes</a></li>
+<li><a name="general" href="relnotes.html#general">General Notes</a></li>
+</ul>
+</ul>
+<ul>
+<li><a name="installation" href="install.html">Installation</a>
+<ul>
+<li><a name="impatient" href="install.html#impatient">For the Impatient</a></li>
+<li><a name="vendors" href="install.html#vendors">Vendor Supplied Packages</a></li>
+<li><a name="sysreqs" href="install.html#sysreqs">System Requirements</a></li>
+<li><a name="download" href="install.html#download">Downloading MHonArc</a></li>
+<li><a name="rpminstall" href="install.html#rpminstall">RPM Installation</a></li>
+<li><a name="extraction" href="install.html#extraction">Extracting the MHonArc Distribution</a></li>
+<li><a name="installingviainstallme" href="install.html#installingviainstallme">Installing with <tt>install.me</tt></a></li>
+<li><a name="p5install" href="install.html#p5install">The Perl 5 Way</a></li>
+<li><a name="win32" href="install.html#win32">Win32 Notes</a></li>
+<li><a name="altos" href="install.html#altos">Alternate Operating Systems</a></li>
+<li><a name="manual" href="install.html#manual">Manual Installation</a></li>
+<li><a name="postinstall" href="install.html#postinstall">Post Installation Configuration</a></li>
+<li><a name="rcfileedit" href="install.html#rcfileedit">Resource File Editing</a></li>
+</ul>
+</ul>
+<ul>
+<li><a name="quickstart" href="quickstart.html">Quick Start</a>
+<ul>
+<li><a name="folders" href="quickstart.html#folders">Converting mail</a></li>
+<li><a name="adding" href="quickstart.html#adding">Adding Messages to an Archive</a></li>
+<li><a name="single" href="quickstart.html#single">Converting a single message</a></li>
+</ul>
+</ul>
+<ul>
+<li><a name="commontasks" href="commontasks.html">Common Tasks</a>
+<ul>
+<li><a name="chgtitle" href="commontasks.html#chgtitle">Setting the Index Title</a></li>
+<li><a name="chg-idx-order" href="commontasks.html#chg-idx-order">Changing Index Listing Order</a></li>
+<li><a name="rmm" href="commontasks.html#rmm">Removing Messages</a></li>
+<li><a name="layout" href="commontasks.html#layout">Customizing Page Layout</a></li>
+</ul>
+</ul>
+<ul>
+<li><a name="pagelayout" href="layout.html">Page Layout</a>
+<ul>
+<li><a name="notaion" href="layout.html#notaion">Notation</a></li>
+<li><a name="mainidxpg" href="layout.html#mainidxpg">Main Index Page</a></li>
+<li><a name="threadidxpg" href="layout.html#threadidxpg">Thread Index Page</a></li>
+<li><a name="msgpg" href="layout.html#msgpg">Message Page</a></li>
+</ul>
+</ul>
+<ul>
+<li><a name="resources" href="resources.html">Resources</a>
+<ul>
+<li><a name="overview" href="resources.html#overview">Overview</a></li>
+<li><a name="types" href="resources.html#types">Resource Types</a></li>
+<li><a name="index" href="resources.html#index">Resource Index</a></li>
+</ul>
+</ul>
+<ul>
+<li><a name="rcvars" href="rcvars.html">Resource Variables</a>
+<ul>
+<li><a name="overview" href="rcvars.html#overview">Overview</a></li>
+<li><a name="rcvar_syntax" href="rcvars.html#rcvar_syntax">Resource Variable Syntax</a></li>
+<li><a name="rcvar_index" href="rcvars.html#rcvar_index">Resource Variable Index</a></li>
+</ul>
+</ul>
+<ul>
+<li><a name="contacts" href="contacts.html">Contacts</a>
+<ul>
+<li><a name="consulting" href="contacts.html#consulting">Professional Consulting</a></li>
+<li><a name="mailinglists" href="contacts.html#mailinglists">Mailing Lists</a></li>
+<li><a name="people" href="contacts.html#people">People</a></li>
+</ul>
+</ul>
+<ul>
+<li><a name="rcidxes" href="app-rcidx.html">Appendix: Resource Indexes</a>
+<ul>
+<li><a name="envars" href="app-rcidx.html#envars">Environment Variables</a></li>
+<li><a name="elements" href="app-rcidx.html#elements">Resource Elements</a></li>
+<li><a name="clopts" href="app-rcidx.html#clopts">Command-Line Options</a></li>
+</ul>
+</ul>
+<ul>
+<li><a name="rcidxes" href="app-rcfileexs.html">Appendix: Resource File Examples</a>
+<ul>
+</ul>
+</ul>
+<ul>
+<li><a name="diagnostics" href="app-diagnos.html">Appendix: Diagnostics</a>
+<ul>
+<li><a name="infomsgs" href="app-diagnos.html#infomsgs">Informative messages</a></li>
+<li><a name="warnings" href="app-diagnos.html#warnings">Warnings</a></li>
+<li><a name="errors" href="app-diagnos.html#errors">Errors</a></li>
+<li><a name="perlmsgs" href="app-diagnos.html#perlmsgs">Perl Messages</a></li>
+</ul>
+</ul>
+<ul>
+<li><a name="appendixA" href="app-utilsprg.html">Appendix: Utility Programs</a>
+<ul>
+<li><a name="mha-dbedit" href="app-utilsprg.html#mha-dbedit">mha-dbedit</a></li>
+<li><a name="mha-dbrecover" href="app-utilsprg.html#mha-dbrecover">mha-dbrecover</a></li>
+<li><a name="mha-decode" href="app-utilsprg.html#mha-decode">mha-decode</a></li>
+</ul>
+</ul>
+<ul>
+<li><a name="appendixA" href="app-api.html">Appendix: Application Programming Interface</a>
+<ul>
+<li><a name="init" href="app-api.html#init">Initialization</a></li>
+<li><a name="process_input" href="app-api.html#process_input">Processing Input</a></li>
+<li><a name="callback" href="app-api.html#callback">Callbacks</a></li>
+<li><a name="utilities" href="app-api.html#utilities">Utility Routines</a></li>
+<li><a name="notes" href="app-api.html#notes">Notes</a></li>
+</ul>
+</ul>
+<ul>
+<li><a name="appendix-mimeconf" href="app-mimeconf.html">Appendix: MIME Conformance</a>
+<ul>
+<li><a name="mime-conformance" href="app-mimeconf.html#mime-conformance">MIME-Conformance</a></li>
+<li><a name="otherstuff" href="app-mimeconf.html#otherstuff">Other Stuff Supported</a></li>
+</ul>
+</ul>
+<ul>
+<li><a name="bugs" href="app-bugs.html">Appendix: Bugs</a>
+<ul>
+<li><a name="bugreport" href="app-bugs.html#bugreport">Reporting Bugs</a></li>
+<li><a name="open-bugs" href="app-bugs.html#open-bugs">Open Bugs</a></li>
+<li><a name="fixed-bugs" href="app-bugs.html#fixed-bugs">Fixed Bugs</a></li>
+</ul>
+</ul>
+<!--X-TOC-End-->
+
+<hr>
+<address>
+$Date: 2005/07/11 00:14:26 $ <br>
+<img align="top" src="monicon.png" alt="">
+<a href="http://www.mhonarc.org"
+><strong>MHonArc</strong></a><br>
+Copyright &#169; 1995-2001, <a href="http://www.mhonarc.org/~ehood/"
+>Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org"
+>mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</BODY>
+</HTML>

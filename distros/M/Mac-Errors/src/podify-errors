@@ -1,0 +1,70 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+my $file = $ARGV[0];
+open(ERRORS,"<$file") ||
+    die("unable to open error file $file for reading");
+my $in_list = 0;
+my $queued_sub = '';
+print "\n";
+while (<ERRORS>)
+{
+    s/[\012\015]*$//;
+    my ($indent, $data) = (/^(\s*)(.*)$/);
+    $indent = length($indent);
+    if ($data eq '')
+    {
+    }
+    elsif ($indent == 0)
+    {
+	if ($queued_sub)
+	{
+	    print $queued_sub;
+	    $queued_sub = '';
+	}
+	print "=back\n\n" if ($in_list);
+        print "=head2 $data\n\n";
+        $in_list = 0;
+    }
+    elsif ($indent == 2 && $data =~ /^http/)
+    {
+        print " See also $data\n\n";
+    }
+    elsif ($indent == 2)
+    {
+        print "$data\n\n";
+    }
+    elsif ($indent == 4 &&
+           $data =~ /^([^ ]+) ([^ ]+)$/)
+    {
+	if ($queued_sub)
+	{
+	    print $queued_sub;
+	    $queued_sub = '';
+	}
+	if (!$in_list)
+	{
+	    print "=over 4\n\n";
+	    $in_list = 1;
+	}
+        my $symbol = $1;
+        my $code = $2;
+        print "=item $symbol\n\n";
+	$queued_sub = "=cut\n\nsub $symbol { ".
+	    (($code =~ /^\d+$/)?'-':'').
+	    "$code }\n\n";
+    }
+    elsif ($indent == 6)
+    {
+	print "Z<>" if ($data =~ /^=/);
+	print "$data\n\n";
+    }
+    else
+    {
+        die("$indent: $data");
+    }
+}
+print $queued_sub if ($queued_sub);
+print "=back\n\n=cut\n\n" if ($in_list);

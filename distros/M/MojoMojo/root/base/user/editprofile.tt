@@ -1,0 +1,5 @@
+[% WRAPPER page/wrapper.tt simple_footer=1 title=loc('Editing user profile for x', user.name) %]
+<div id="content">
+    [% form %]
+</div>
+[% END %]

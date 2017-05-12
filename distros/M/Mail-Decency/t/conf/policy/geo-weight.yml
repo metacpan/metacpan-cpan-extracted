@@ -1,0 +1,21 @@
+---
+
+disable: 0
+
+# do write stats ?
+enable_stats: 1
+
+# classes for weighting (spam response)
+weight_classes:
+    -
+        countries:
+            - DE
+        weight: 20
+    -
+        countries:
+            - US
+        weight: 10
+
+# classes for weighting (spam response)
+weight_default: -10
+

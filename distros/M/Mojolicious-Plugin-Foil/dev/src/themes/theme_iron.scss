@@ -1,0 +1,59 @@
+/* ================================================================== */
+/* THEME: Iron
+ */
+@import 'functions';
+@import 'fonts_iron';
+@import 'icon_light_on_dark';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: #808080;
+$verge-fg: set-fg($verge-bg);
+$verge-border: black;
+$button-bg: darken(#746b67, 10);
+$button-fg: set-fg($button-bg);
+$button-border: #111111;
+$main-fg: #333333;
+$main-bg: set-fg($main-fg);
+$link-hue: 70;
+$link-fg: hsl($link-hue, 100%, 25%);
+$link-visited: hsl($link-hue - 30, 100%, 25%);
+$verge-link-fg: hsl($link-hue, 50%, 80%);
+$verge-link-visited: hsl($link-hue - 30, 50%, 80%);
+$fancy-base: hsl(30, 4%,60%);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+}
+
+header,
+footer,
+.side {
+	@extend .verge;
+	background-image: url(iron1.jpg);
+}
+
+body {
+	color: $main-fg;
+	background: $main-bg;
+}
+
+@include many-links($link-fg, $link-visited, $verge-link-fg, $verge-link-visited);
+@include fancy(set-fg($fancy-base), $fancy-base, "iron1.jpg");
+@include make-buttons;
+
+header nav li {
+	border-color: #666666;
+}
+header nav .selflink,
+header nav em,
+header nav .current a {
+	background-color: #746b67;
+	color: white;
+}
+

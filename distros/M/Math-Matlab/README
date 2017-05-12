@@ -1,0 +1,35 @@
+Math::Matlab README
+===================
+
+The Math::Matlab package provides an interface for running Matlab
+programs from Perl and capturing the output (what the Matlab program
+prints to STDOUT) into a string. For more information on Matlab see The
+MathWorks web-site at http://www.mathworks.com/.
+
+Math::Matlab, the base class, provides the interface which is then
+implemented by a number of sub-classes. Math::Matlab::Local is the
+simplest such sub-class which requires that a Matlab executeable be
+available on the machine running the Perl program.
+
+Math::Matlab::Remote is a sub-class which passes the execution request
+on to a Server (implemented using the mod_perl handler in
+Math::Matlab::Server).
+
+Math::Matlab::Pool is a sub-class which simply passes on the execution
+request to another Math::Matlab object, selected sequentially from a
+list (round-robin). Syncronization is done via file-locking to ensure
+that multiple Perl processes using the same Pool configuration will
+distribute execution requests sequentially to the members of the pool.
+
+Note: This package require the Test::More module available as part of
+the Test-Simple package on CPAN and included in perl-5.8.0 (and probably
+later) for running the tests.
+
+Copyright (c) 2002 PSERC. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Ray Zimmerman, <rz10@cornell.edu>
+
+$Id: README,v 1.3 2002/11/01 20:51:04 ray Exp $

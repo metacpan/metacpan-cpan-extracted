@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+cpanfile
+lib/Minion/Notifier.pm
+lib/Minion/Notifier/Transport.pm
+lib/Minion/Notifier/Transport/Pg.pm
+lib/Minion/Notifier/Transport/Redis.pm
+lib/Minion/Notifier/Transport/WebSocket.pm
+lib/Mojolicious/Plugin/Minion/Notifier.pm
+t/pg.t
+t/redis.t
+t/websocket.t

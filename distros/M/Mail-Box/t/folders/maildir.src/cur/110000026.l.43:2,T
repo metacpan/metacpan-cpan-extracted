@@ -1,0 +1,49 @@
+Received: from ns.ATComputing.nl (ns.ATComputing.nl [195.108.229.25])
+	by atcmpg.ATComputing.nl (8.9.0/8.9.0) with ESMTP id SAA10314
+	for <markov@ATComputing.nl>; Thu, 29 Jun 2000 18:01:15 +0200 (MET DST)
+Received: (from nobody@localhost)
+	by ns.ATComputing.nl (8.8.8/8.8.8) id SAA00740
+	for <markov@ATComputing.nl>; Thu, 29 Jun 2000 18:01:14 +0200
+Received: from mustang.oldcity.dca.net(216.158.38.3) by ns.ATComputing.nl via smap (V2.1)
+	id xma000732; Thu, 29 Jun 00 18:01:07 +0200
+Received: from unca-don.wizards.dupont.com ([204.183.81.133])
+	by mustang.oldcity.dca.net (8.9.3/8.9.3/DCANET) with ESMTP id MAA07078;
+	Thu, 29 Jun 2000 12:00:36 -0400
+Received: (from majordomo@localhost)
+	by unca-don.wizards.dupont.com (8.9.3/8.9.3) id LAA10740
+	for magick-outgoing; Thu, 29 Jun 2000 11:48:25 -0400 (EDT)
+X-Authentication-Warning: unca-don.wizards.dupont.com: majordomo set sender to owner-magick@wizards.dupont.com using -f
+Message-ID: <395B7519.F40670B@northrim.net>
+Date: Thu, 29 Jun 2000 10:11:05 -0600
+From: Karl Sloth <karl@northrim.net>
+X-Mailer: Mozilla 4.72 [en] (X11; I; Linux 2.2.14 i586)
+X-Accept-Language: en
+MIME-Version: 1.0
+To: magick@wizards.dupont.com
+Subject: mailing list archives
+Content-Transfer-Encoding: 7bit
+Sender: owner-magick@wizards.dupont.com
+Precedence: bulk
+Reply-To: Karl Sloth <karl@northrim.net>
+Content-Type: text/plain; charset=us-ascii
+Status: RO
+Content-Length: 552
+Lines: 17
+
+Hi all-
+
+The folks at The Aims Group have added the ImageMagick mailing list to
+their online mailing list archives. They have a searchable history going
+back to 1996.  Very handy.
+
+http://marc.theaimsgroup.com/?l=imagemagick&r=1&w=2
+
+-karl
+
+***********************************************************************
+To remove yourself from this mailing list, send mail to:
+	majordomo@wizards.dupont.com
+
+Include the following command in the body of your message:
+	unsubscribe magick
+***********************************************************************

@@ -1,0 +1,61 @@
+Revision history for Perl extension MRO::Compat.
+
+0.13 - 2017-03-28
+    - don't run pod tests on user installs
+    - stop using Module::Install to fix installation when @INC doesn't have
+      the current directory (RT#119016)
+    - repository migrated to the github moose organization
+
+0.12 - 2012-12-04
+    - Bump Class::C3 dependency on 5.8 which in turn will automatically
+      install Class::C3::XS if possible
+    - Fix nonfunctional SYNOPSIS (RT#78325)
+
+0.11 - 2009-05-27
+    - Fix misspelled docs for get_isarev. Closes RT#46401.
+    - Bump optional prereq on Class::C3 to 0.20.
+
+0.10 - 2009-03-25
+    - Remove the fake Build.PL. Module::Install doesn't support that anymore.
+      (Florian Ragwitz)
+    - Remove auto_install from Makefile.PL. Its use is strongly discouraged.
+      (Closes RT#44542) (Simon Betrang)
+
+0.09 - 2008-06-05
+    - No change from 0.08_01
+
+0.08_01 - 2008-06-02
+    - Add fixup (and new tests) for RT#36256
+
+0.07 - 2008-05-20
+    - Add explicit dependency on perl 5.6.0 or higher
+      in Makefile.PL + META.yml
+
+0.06_01 - 2008-05-19
+    - Fix for false classnames in mro::get_isarev, I guess
+      I missed an instance during the 0.04 fixes.
+      (reported by Daniel Austin)
+
+0.05 - 2007-09-09
+    - Fix for RT#28661 (ill-formated %INC filenames aren't nice)
+
+0.04 - 2007-07-18
+    - Removed doc warning now that 5.9.5 is out
+    - Stopped the code from assuming valid classnames
+      are true in boolean context
+    - Misc small tweaks
+
+0.03 - 2007-06-04
+    - Bumped C3 requirements
+    - Loads mro.pm on 5.9.5+
+
+0.02 - 2007-05-12
+    - Added mro::get_pkg_gen (which optionally works
+      even faster with Class::C3::XS 0.04) in
+      anticipation of it being added to 5.9.5
+    - Changed mro::get_isarev to return arrayref in
+      anticipation of that change in 5.9.5
+    - Bumped requirements, added more docs
+
+0.01_01 - 2007-05-11
+    - Initial dev release

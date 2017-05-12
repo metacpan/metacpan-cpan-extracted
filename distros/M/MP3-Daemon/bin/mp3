@@ -1,0 +1,457 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Getopt::Long;
+use MP3::Daemon::Simple;
+use Cwd;
+
+eval "use Pod::Usage";
+if ($@) {
+    sub pod2usage { system("perldoc mp3"); exit 1 }
+}
+
+my $conf_dir    = "$ENV{HOME}/.mp3";
+my $socket_path = "$conf_dir/mp3_socket";
+my $pid_file    = "$conf_dir/mp3.pid";
+
+# spawn an MP3::Daemon::Simple if necessary, and 
+# return a client handle always
+sub init {
+    unless (-S $socket_path) {
+        unless (-d $conf_dir) {
+            mkdir($conf_dir, 0755) || die($!);
+        }
+        my $pid = MP3::Daemon::Simple->spawn (
+            socket_path => $socket_path,
+            at_exit     => sub { unlink($pid_file) },
+        );
+        open(PID_FILE, "> $pid_file") || die($!);
+        print PID_FILE "$pid\n";
+        close(PID_FILE);
+    }
+    return MP3::Daemon::Simple->client($socket_path);
+}
+
+# prefix things that look like relative paths with cwd
+sub fullpath {
+    my $cwd = cwd;
+    map {
+        if (m{^http://} || m{^/}) {
+            "$_\n";
+        } else {
+            "$cwd/$_\n";
+        }
+    } @_;
+}
+
+# get pid of currently running daemon or 0 if no daemon is running
+sub daemon_pid {
+    my $pid = 0;
+    if (-f $pid_file) {
+        open(PID_FILE, "< $pid_file") || die($!);
+        $pid = <PID_FILE>;
+        close(PID_FILE);
+        chomp($pid);
+    }
+    return $pid;
+}
+
+# line 0 => method
+# line n => args
+# line $ => /^$/
+#           a blank line signifies the end of a request
+sub send_command {
+    my $client = shift;
+    print $client map { "$_\n" } @_, "";
+}
+
+sub send_add_command {
+    my $client = shift;
+    print $client "add\n";
+    print $client fullpath(@_);
+    print $client "\n";
+}
+
+sub send_play_command {
+    my $client = shift;
+    my $mp3    = shift;
+
+    if (defined $mp3) {
+        if ($mp3 =~ /^[-+]?\d+$/) {
+            $mp3 = "$mp3\n";
+        } else { 
+            $mp3 = (fullpath($mp3))[0];
+        }
+        print $client "play\n", $mp3, "\n";
+    } else {
+        print $client "play\n\n";
+    }
+}
+
+#
+# alias => command dictionary
+#
+my %alias = (
+    a     => 'add',
+    add   => 'add',
+    d     => 'del',
+    del   => 'del',
+    ff    => 'ff',
+    i     => 'info',
+    info  => 'info',
+    j     => 'jump',
+    jump  => 'jump',
+    loop  => 'loop',
+    l     => 'ls',
+    ls    => 'ls',
+    next  => 'next',
+    pause => 'pause',
+    p     => 'play',
+    play  => 'play',
+    prev  => 'prev',
+    q     => 'quit',
+    quit  => 'quit',
+    rand  => 'rand',
+    rw    => 'rw',
+    s     => 'stop',
+    stop  => 'stop',
+    t     => 'time',
+    time  => 'time',
+);
+
+#
+# the fun begins here
+#
+unless (@ARGV) {
+    pod2usage(-verbose => 0, -output => \*STDOUT);
+    exit 1;
+}
+
+my $cmd = shift(@ARGV);
+my $method;
+my $line;
+
+# a few commands don't need to do things before init() is called
+if ($cmd eq "kill") {
+    my $pid = daemon_pid();
+    if ($pid) {
+        kill(9, $pid);
+        unlink($pid_file)    or warn($!);
+        unlink($socket_path) or warn($!);
+        print "an MP3::Daemon::Simple w/ pid => $pid was kill -9'd\n";
+        exit 0;
+    } else {
+        print 
+            "Losing my reason\n",
+            "I was driven to such behaviour\n",
+            "illusion?\n";
+        exit 1;
+    }
+} elsif ($cmd eq "quit") {
+    unless (-S $socket_path) {
+        print "Is this thing on?\n";
+        exit 1;
+    }
+} elsif (grep { /^$cmd$/ } qw(-h --help help)) {
+    pod2usage(-verbose => 0, -output => \*STDOUT);
+    exit 0;
+}
+
+# handle normal commands
+if (defined $alias{$cmd}) {
+    my $client = init;
+    $method = $alias{$cmd};
+    if ($method eq "add") {
+        send_add_command($client, @ARGV);
+    } elsif ($method eq "play") {
+        send_play_command($client, @ARGV);
+    } else {
+        send_command($client, $method, @ARGV);
+    }
+    while (defined ($line = <$client>)) {
+        print $line;
+    }
+} else {
+    print "$cmd yourself!\n"; 
+    exit 1;
+}
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+mp3 - an mpg123 front-end for UNIX::Philosophers
+
+=head1 SYNOPSIS
+
+General syntax
+
+    mp3 [COMMAND] [PARAMETER]...
+
+Building the playlist
+
+    mp3 add Blue_Six-Conga_Lounge_Mix.mp3
+    mp3 add /c/mp3/*.mp3
+    mp3 add http://132.216.57.19:15005/3/motw141.mp3
+    mp3 del 0 2 4 -1
+
+Playing from the list
+
+    mp3 play 5
+    mp3 next
+    mp3 prev
+
+Other controls
+
+    mp3 rw 2.00
+    mp3 ff 32.32
+    mp3 jump 420
+    mp3 pause
+    mp3 stop
+    mp3 rand
+    mp3 loop single
+
+Getting information
+
+    mp3 time
+    mp3 info
+    mp3 ls
+    mp3 help
+
+Unloading the daemon
+
+    mp3 quit
+    mp3 kill
+
+=head1 DESCRIPTION
+
+I have combined my favourite features of dcd, cdcd, and mpg123 to
+create Yet Another Front-End For Mpg123.  Mine is special, though.  ;-)
+
+From dcd, I derived the ability to fork itself into the background.
+
+From cdcd, I derived its intuitive interface.
+
+With mpg123, I do the CPU-intensive work of actually
+playing the mp3s.
+
+The end result is an MP3 player that is compliant with the
+UNIX::Philosophy.  Note that mp3 does not have a Captive User
+Interface.  Requests are made by mp3 to an MP3::Daemon::Simple and mp3
+returns immediately after getting a reply.  The commands that generate
+output do so on STDOUT.  This makes mp3 easy to combine with other
+Unix utilities via pipes and filters.
+
+=head1 COMMANDS
+
+Most of these commands are self-explanatory.  One thing that may
+confuse some people is that the playlist has a B<zero-based> index.
+Otherwise, if you're familiar with the cdcd interface, this should
+feel vaguely familiar.
+
+=over 8
+
+=item add
+
+This adds mp3s to the playlist.  Multiple files may be specified.
+
+=item del
+
+This deletes items from the playlist by index.  More than one
+index may be specified.  If no index is specified, the current mp3
+in the playlist is removed.  Indices may also be negative in
+which case they count from the end of the playlist.
+
+=item play
+
+This plays the current mp3 if no other parameters are given.  This
+command also takes an optional parameter where the index of an mp3
+in the playlist may be given.
+
+=item next
+
+This loads the next mp3 in the playlist.
+
+=item prev
+
+This loads the previous mp3 in the playlist.
+
+=item pause
+
+This pauses the currently playing mp3.  If the mp3 was already
+paused, this will unpause it.  Note that using the play command
+on a paused mp3 makes it start over from the beginning.
+
+=item rw
+
+This rewinds an mp3 by the specified amount of seconds.
+
+=item ff
+
+This fastforwards an mp3 by the specified amount of seconds.
+
+=item jump
+
+This will go directly to a part of an mp3 specified by
+seconds from the beginning of the track.  If the number of
+seconds is prefixed with either a "-" or a "+", a relative
+jump will be made.  This is another way to rewind or
+fastforward.
+
+=item stop
+
+This stops the player.
+
+=item time
+
+This sends back the index of the current track, the amount of time
+that has elapsed, the amount of time that is left, and the total
+amount of time.  All times are reported in seconds.
+
+=item info
+
+This sends back information about the current track.
+
+=item ls [-fl] [REGEX]
+
+First, a warning -- I'm beginning to realize how GNU/ls became so
+bloated.  The C<ls> interface should not be considered stable.  I'm
+still playing with it.
+
+This sends back a list of the titles of all mp3s currently in the
+playlist.  The current track is denoted by a line matching the regexp
+/^>/.  
+
+=over 8
+
+=item -f
+
+This makes C<ls> return a listing with index and filename.
+
+=item -l
+
+This makes C<ls> return a long listing that includes index,
+title, and filename.
+
+=item [REGEX]
+
+This allows one to filter the playlist for only titles matching
+this regex.  Of course, one may use grep, instead.
+
+=back
+
+=item rand
+
+Calling this with no parameters toggles the random play feature.
+Randomness can be set to be specifically "on" or "off" by
+passing the scalar "on" or "off" to this method.
+
+=item loop
+
+This option controls the playlist's looping behaviour.  When called with
+a parameter, loop can be set to "all", "single", or "off".  Calling this
+with no parameters displays the current looping status.
+
+=item quit
+
+This unloads the MP3::Daemon::Simple that was automagically spawned
+when you first invoked mp3.
+
+=item kill
+
+If for some reason the daemon hangs on you, you can use this as a
+last resort.
+
+=back
+
+=head2 The UNIX::Philosophy In Action
+
+Saving playlists
+
+    mp3 ls -f | perl -pe 's/.*\d+ //' > playlist
+
+Loading a playlist
+
+    xargs mp3 add < playlist
+
+Deleting songs 6..12
+
+    mp3 del `seq 6 12`
+
+Sorting your playlist from shortest to longest mp3
+
+    mp3 ls -l | sed 's/^>/ /' | sed 's/:/./' | sort -g -k 2
+
+Playing part of an mp3 over and over again
+
+    while true ; do mp3 j 1300 ; sleep 386 ; done
+
+Monitoring the progress of the daemon
+
+    watch mp3 time
+    watch mp3 info
+
+=head1 FILES
+
+=over 4
+
+=item $HOME/.mp3/mp3_socket
+
+This is the socket used to communicate with the daemon.  In the event
+that the daemon is not cleanly shut down, this file may need to be
+deleted before another MP3::Daemon::Simple can be started up.
+
+=item $HOME/.mp3/mp3.pid
+
+This is the pid of the daemonized process.
+
+=back
+
+=head1 COPYLEFT
+
+Copyleft (!c) 2001 John BEPPU.  All rights reversed.  This program is
+free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+=head1 AUTHOR
+
+John BEPPU B<E<lt>beppu@ax9.orgE<gt>>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item My inspirations
+
+dcd(1), cdcd(1), mpg123(1)
+
+=item Other perl modules
+
+Audio::Play::MPG123(3pm), MP3::Daemon::Simple(3pm), MP3::Daemon(3pm)
+
+=item The UNIX Philosophy
+
+If you want to know what UNIX is all about, check this book out.  It's
+only 151 pages, and it's really easy and fun to read.   Some parts are
+a little biased and/or dated, but there is still a lot of wisdom in it.
+I highly recommend it. 
+
+    {
+        title  => 'The UNIX Philosophy',
+        author => 'Mike Gancarz',
+        isbn   => '1-55558-123-4',
+    }
+
+=item cvsweb
+
+    http://lbox.org/cgi-bin/cvsweb.cgi/pm/MP3-Daemon/
+
+=item the web site
+
+    http://beppu.lbox.org/proj/mp3-daemon.html
+
+=back
+
+=cut

@@ -1,0 +1,2 @@
+# Named node with escape chars. OK.
+[" a \' b \" c"]

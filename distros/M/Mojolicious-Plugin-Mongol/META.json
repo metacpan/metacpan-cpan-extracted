@@ -1,0 +1,41 @@
+{
+   "abstract" : "Mongol plugin for Mojolicious",
+   "author" : [
+      "Tudor Marghidanu"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Mongol",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "0",
+            "Mongol" : "0",
+            "Moose" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::Mongol" : {
+         "file" : "lib/Mojolicious/Plugin/Mongol.pm",
+         "version" : "1.0"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.0"
+}

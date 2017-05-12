@@ -1,0 +1,157 @@
+=head1 NAME
+
+MooseX::Interface::Internals - the classes and traits used under the hood of MooseX::Interface
+
+=head1 METAROLE TRAIT
+
+=head2 MooseX::Interface::Trait::Role
+
+This role is applied to your interface's metarole object. If you want to
+get to know the internals of MooseX::Interface, this is the place to start.
+
+As well as providing the following methods, it also includes method modifiers
+for C<add_required_methods> (to deal with method signatures) and C<apply>
+(to trigger interface integrity checks).
+
+=over
+
+=item C<is_interface>
+
+Boolean attribute.
+
+=item C<test_cases>
+
+Arrayref of MooseX::Interface::Meta::TestCase objects.
+
+=item C<integrity_checked>
+
+Boolean indicating whether the interface's integrity has been checked
+yet. An explicit C<one> or C<< __PACKAGE__->meta->check_interface_integrity >>
+will happily check the interface integrity every single time, but when
+a class implements an interface, we don't want to have to keep rechecking.
+
+=item C<installed_modifiers>
+
+Hashref of sub name to refaddr pairs of all "before" method modifiers that
+have been set up to implement required method signature checks.
+
+=item C<< add_constant($name, $value) >>
+
+Define a constant.
+
+=item C<< add_test_case($coderef, $name) >>
+
+=item C<< add_test_case($blessed_testcase) >>
+
+Accepts either a coderef+name pair, or a MooseX::Interface::Meta::TestCase
+object.
+
+=item C<< test_implementation($object) >>
+
+Tests an instance of an implementation of the interface.
+
+=item C<< find_problematic_methods >>
+
+Returns a list of L<Moose::Meta::Method> objects judged to be
+problematic to the integrity of the interface.
+
+=item C<< find_problematic_method_modifiers >>
+
+All method modifiers are problematic, except those that implement
+method signature checks.
+
+=item C<< check_interface_integrity >>
+
+Calls C<find_problematic_methods> and C<find_problematic_method_modifiers>,
+and croaks if either of them return any problems.
+
+=back
+
+=head1 CLASSES
+
+=head2 MooseX::Interface::Meta::Method::Constant
+
+Trivial subclass of L<Moose::Meta::Role::Method>.
+
+=head2 MooseX::Interface::Meta::Method::Required
+
+Trivial subclass of L<Moose::Meta::Role::Method::Required>.
+
+=head2 MooseX::Interface::Meta::Method::Required::WithSignature
+
+Subclass of L<Moose::Meta::Role::Method::Required>.
+
+=over
+
+=item C<signature>
+
+An arrayref of strings or Moose::Meta::TypeConstraint objects.
+
+=item C<< check_signature($arglist) >>
+
+Given an arrayref of method arguments (not including the invocant), checks
+them against the signature. Returns false if the signature is violated.
+
+=back
+
+=head2 MooseX::Interface::Meta::TestCase
+
+Represents an embedded test case.
+
+=over
+
+=item C<name>
+
+=item C<code>
+
+=item C<associated_interface>
+
+=item C<< test_instance($instance) >>
+
+=back
+
+=head2 MooseX::Interface::Meta::TestReport
+
+Class with much overloading, returned by C<test_implementation>.
+
+B<< TODO: >> these objects might want attributes to retrieve the
+object tested plus the interface metarole.
+
+=over
+
+=item C<passed>
+
+Arrayref of passing test cases.
+
+=item C<failed>
+
+Arrayref of failing test cases.
+
+=back
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Interface>.
+
+=head1 SEE ALSO
+
+L<MooseX::Interface>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2012 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,0 +1,25 @@
+
+use strict;
+$^W = 1;
+
+use DBI;
+use vars qw! $dbh !;
+
+# load the config values
+use MyConText::TestConfig;
+
+$dbh = DBI->connect(@MyConText::TestConfig::Config{ qw! dsn user password !},
+	{ 'PrintError' => 0, 'RaiseError' => 0 });
+if (not defined $dbh) {
+	print "1..0\n";
+	exit;
+	}
+$dbh->{'PrintError'} = 1;
+
+END {
+	if (defined $dbh) {
+		$dbh->disconnect;
+		}
+	}
+1;
+

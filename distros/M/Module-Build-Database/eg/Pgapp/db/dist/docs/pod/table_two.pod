@@ -1,0 +1,29 @@
+
+=head1 NAME
+
+two
+
+=head1 DESCRIPTION
+
+
+
+=head1 FIELDS
+
+ y (character varying(20)) - 
+
+
+=head1 SCHEMA
+
+                            Table "doo.two"
+  Column |         Type          | Modifiers | Storage  | Description 
+ --------+-----------------------+-----------+----------+-------------
+  y      | character varying(20) |           | extended | 
+ Has OIDs: no
+ 
+
+=cut
+
+
+
+
+

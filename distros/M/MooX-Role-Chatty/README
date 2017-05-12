@@ -1,0 +1,172 @@
+NAME
+    MooX::Role::Chatty - Simple way to generate progress messages
+
+SYNOPSIS
+      package My::Worker;
+      use Moo 2;
+      with 'MooX::Role::Chatty';
+
+      sub munge_widget {
+        ...
+        # Produce informational message
+        $self->remark("Starting to munge widget #$ct\n") if $self->verbose;
+        ...
+        # More detailed trace; output only if $self->verbose >= 2
+        $self->remark({ level => 2,
+                        message => "Munging step 3 yielded $result\n" });
+        # Ditto for level 3, with simple formatting
+        $self->remark({ level => 3,
+                        message => [ "Munging params: %d, %d, %s\n",
+                                     $gain, $threshold, $algorithm ] });
+      }
+
+      # Or use Log::Any-style API with compatible logger
+      sub munge_widget_more {
+        ...
+        $self->logger->notice("Starting to munge widget #$ct\n");
+        ...
+        $self->logger->info("Munging step 3 yielded $result\n");
+        $self->logger->debugf("Munging params: %d, %d, %s\n",
+                               $gain, $threshold, $algorithm);
+        # Logs even when $self->verbose == 0
+        $self->logger->emergency("The sky is falling!")
+      }
+
+      # Elsewhere
+      my $worker = My::Worker->new(verbose => 2, ...);
+      $worker->munge_widget(...);  # Sit back and watch log
+
+DESCRIPTION
+    One of the common uses for logging packages is providing feedback to the
+    user about the progress of long-running operations, or about details of
+    what the program is doing to aid in debugging. MooX::Role::Chatty aims
+    to provide a few simple, lightweight tools you can use to make this job
+    a bit easier. It does not provide logging facilities itself, just a way
+    to connect to them, and to let the user specify how much information she
+    wants to see.
+
+    In keeping with the idea of TMTOWTDI, there are a few different ways to
+    use MooX::Role::Chatty. The simplest is to examine the "verbose"
+    attribute directly in your code, and call "remark" whenever you want to
+    say something based on the current verbosity level. If you prefer
+    labelling your logging calls by name, you can also call "logger" to get
+    at the logging engine, on which you can call any of the logging methods
+    it supports.
+
+  MANAGING LOGGERS
+    MooX::Role::Chatty tries to make the common cases easy. To that end, you
+    don't need to worry about setting up "logger" if you don't want to. If
+    you haven't explicitly set this attribute, the first time you need it
+    (by calling "logger" or "remark") a default logger will be instantiated
+    for you. This logger is a Log::Any::Proxy, so you can call any of the
+    methods supported by Log::Any to generate messages. A corollary of this
+    behavior is that you have to have Log::Any installed, or a fatal error
+    occurs.
+
+    A brief timestamp is prepended to each line of the message. The logger
+    is connected to a Log::Any::Adapter::Carp adapter that passes on logged
+    messages but suppresses file/line information. The result is that log
+    messages are sent to STDERR, though you can redirect them via
+    $SIG{__WARN__} if you want.
+
+    The "verbose" attribute determines the level of logging: a level of 1
+    corresponds to a log level of "notice", 2 to "info", and so on. Although
+    less common, you can also go the other way: -1 corresponds to "warn", -2
+    to "error", etc. A "verbose" level of 0 is special: it suppresses any
+    output from "remark", and of the Log::Any levels only "emergency" will
+    produce output.
+
+    If you want to use the default Log::Any::Proxy, but not the default
+    output adapter, you're free to register your own adapter to deal with
+    the MooX::Role::Chatty category. If you do, though, you need to manage
+    the adapter if you change "verbose", since Log::Any doesn't provide an
+    API to update the "log_level" of an existing adapter.
+
+    Finally, if Log::Any isn't your favorite among the plethora of logging
+    packages available, you can set "logger" yourself, to any object that
+    responds to "info" and "warn" methods. Most of the more established Perl
+    logging packages fill the bill, like Log::Dispatch or Log::Log4perl, in
+    addition to Log::Any. For that matter, if you like the behavior of
+    Log::Any but want output from your module to be different from
+    MooX::Role::Chatty logging elsewhere in your application, you can use an
+    instance of an adapter class directly. Again, if you set "logger"
+    directly, it's your responsibility to update the logger's behavior as
+    appropriate if you reset "verbose".
+
+  ATTRIBUTES
+    verbose
+        The level of output logged. Higher values typically indicate that
+        more detailed information should be provided.
+
+        For the behavior of the default logger in response to different
+        "verbose" settings, see "MANAGING LOGGERS".
+
+        Defaults to 0, and can be updated.
+
+    logger
+    get_logger
+        The logging engine to be used for output.
+
+        The default is described above in "MANAGING LOGGERS".
+
+        Although you usually won't want to, you can update "logger", or
+        clear it via "clear_logger". In the latter case, if you output a
+        message before setting "logger", a new default logger will be
+        instantiated.
+
+        The "get_logger" alias is provided for ease of use by writers
+        accustomed to Log::Any; it is identical to "logger".
+
+  METHODS
+    In addition to the attribute accessors, one method is provided:
+
+    remark(*$info*)
+        If "verbose" is non-zero, produce a log message, based on the
+        contents of *$info* as described below. This message is output
+        output at the "notice" log level (or "info" if "logger" doesn't
+        respond to "notice").
+
+        *   If *$info* is a hash reference, check the value associated with
+            the "level" key against "verbose". If "level" is less than
+            "verbose", do nothing. Otherwise, use the value associated with
+            the "message" key as the log message in place of *$info*
+            (subject to the two rules below).
+
+            Note: It's important, but sometimes confusing, to keep in mind
+            the difference between the target verbosity level (which is what
+            "level" specifies), and the actual call to the logger, which is
+            always at the "notice" (or "info") log level. In other words,
+            saying "level => -3" does NOT get you a call to "critical".
+
+        *   If *$info* is a simple scalar, use it as the log message.
+
+        *   If *$info* is an array reference, use the contents as arguments
+            to format a message. For a Log::Any-based logger, they're simply
+            passed to "noticef". Otherwise, they're passed to "sprintf" in
+            perfunc, and the result passed to "notice" (or "info").
+
+EXPORT
+    None.
+
+SEE ALSO
+    MooX::Role::Logger, an even more lightweight way for your code to use
+    Log::Any.
+
+    Log::Any, Log::Any::Adapter::Carp
+
+BUGS AND CAVEATS
+    Are there, for certain, but have yet to be cataloged.
+
+VERSION
+    version 1.01
+
+AUTHOR
+    Charles Bailey <cbail@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2015 by Charles Bailey
+
+    This software may be used under the terms of the Artistic License
+    version 2 or the GNU Lesser General Public License version 3, as the
+    user prefers.
+

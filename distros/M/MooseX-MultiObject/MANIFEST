@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/MooseX/MultiObject.pm
+lib/MooseX/MultiObject/Meta/Class.pm
+lib/MooseX/MultiObject/Meta/Method/MultiDelegation.pm
+lib/MooseX/MultiObject/Role.pm
+t/basic.t
+t/release-pod-syntax.t

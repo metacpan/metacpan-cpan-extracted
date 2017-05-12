@@ -1,0 +1,26 @@
+---
+abstract: unknown
+author:
+  - 'Evan Carroll <me@evancarroll.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Types-Vehicle
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Moose: 2.06
+  MooseX::Types: 0.35
+  MooseX::Types::Moose: 0.35
+  perl: 5.008
+version: 0.03

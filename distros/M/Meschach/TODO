@@ -1,0 +1,14 @@
+
+
+  There's plenty to be done :
+
+
+  - Arrange the functions to control the type of the result better.
+
+  - Trim down the meschach-1.2 library, adapt it to PDL datatypes.
+
+  - Link more functions.
+
+  - Document the performance of perl-functions vs. C-functions.
+
+  - Debugging : Memory management as it is now may have flaws.

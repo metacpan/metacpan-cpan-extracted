@@ -1,0 +1,39 @@
+-*- Outline -*- $Format: "* Version $modsRelease$"$
+* Version 0.004
+
+* DLSI
+mods				One-stop imports, exports, decls, &c.		adpO
+
+* Description
+Pragma to support a compact, highly readable replacement for twenty-odd `use'
+statements per module.
+
+* Synopsis
+
+** Basic
+
+use mods;   # Various defaults.
+
+use mods qw(SomePkg Other::Pkg(somefunc, $somevar));
+somefunc($somevar);
+
+use mods qw(foo bar());    # No imports from bar.pm; default from foo.pm.
+
+** Advanced
+
+use mods q{
+  diagnostics,     # Integral comments! Commas optional.
+  Foo (bar, baz)   # Whitespace ignored.
+  Quux   Jolt();   # As you think.
+  vars (	    # Multilines fine.
+	 $foo, $bar, $baz
+	)
+  !strict(refs)    # Unimport.
+  $foo, $bar;      # Alternate declaration of vars.
+  {$bar=7}	    # Compile-time code.
+  <this, $that, @theother!> # Export; &this and $that optional.
+  [Foo, Bar::Baz]  # Inherit from these.
+};
+
+** Author
+Jesse Glick, <jglick@sig.bsh.com>.

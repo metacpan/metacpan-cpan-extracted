@@ -1,0 +1,83 @@
+Module::ConfigureRequires, version 0.03 (beta)
+
+A CPAN distribution's META.yml can contain a configure_requires entry,
+that  lists  modules  needed  for  Makefile.PL  or  Build.PL  to  run.
+
+Tools such as CPAN.pm and CPANPLUS automatically read this file,  and
+everything just works, *if* you have the latest version.
+
+The problem is that perl 5.10.1 and earlier do not ship with a suffic-
+iently recent version of  CPAN.pm,  and even the one that comes  with
+5.12.x has problems.
+
+This module attempts to solve  this  problem  by  using  a  different
+approach:  The  Makefile  (or  Build  script)  can be made to  re-run
+Makefile.PL (or Build.PL),  if it was generated without the necessary
+modules, and then re-run the make command.
+
+The Makefile.PL script will,  of course,  have to be able to generate
+at least a dummy Makefile  if the configuration prerequisites are not
+present,  in order for this to work.  It must also list the configura-
+tion prerequisites along with the build-  or  run-time  prerequisites.
+
+So,  this is  how  it  would  work  under  an  old  CPAN  shell  with
+this setup:
+
+ 1. User types ‘install Your::Module’ at the CPAN shell.
+ 2. CPAN.pm downloads and unpacks Your::Module.
+ 3. CPAN.pm runs Makefile.PL.
+ 4. CPAN.pm installs the modules that  Makefile.PL  claims  it  needs,
+    including Some::ConfigurePrereq.
+ 5. CPAN.pm runs make.
+ 6. The Makefile runs Makefile.PL, and then re-runs make.
+ 7. CPAN.pm proceeds with the tests and installation.
+
+See the POD  documentation  in  lib/Module/ConfigureRequires.pod  (or
+use perldoc or man after installation) for more information.
+
+
+CHANGES IN THIS RELEASE
+
+Fixed to work with XS modules that use ExtUtils::MakeMaker.
+
+
+INSTALLATION
+
+The easiest way to install this module is to use the CPAN  module  or
+the cpan script:
+
+    [sudo] perl -MCPAN -e "install Module::ConfigureRequires"
+
+    [sudo] cpan Module::ConfigureRequires
+
+Or you can use the following:
+
+    perl Makefile.PL
+    make
+    make test
+    [sudo] make install
+
+
+PREREQUISITES
+
+This module requires perl 5 or higher.
+
+
+DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Module::ConfigureRequires
+
+Or try using man (it’s faster, in my experience):
+
+    man Module::ConfigureRequires
+
+
+AUTHOR & COPYLEFT
+
+Copyright © 2010 Father Chrysostomos
+
+This program is free software; you may redistribute it, modify it, or
+both, under the same terms as perl.

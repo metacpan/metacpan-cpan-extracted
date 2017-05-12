@@ -1,0 +1,28 @@
+---
+abstract: 'Syntax sugar for transactional methods'
+author:
+  - 'Daniel Ruoso <daniel@ruoso.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-TransactionalMethods
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: '1.21'
+  Sub::Name: 0
+  aliased: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/mjg17/MooseX-TransactionalMethods/
+version: 0.009

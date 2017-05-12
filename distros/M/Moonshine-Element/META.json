@@ -1,0 +1,63 @@
+{
+   "abstract" : "Build some more html.",
+   "author" : [
+      "Robert Acock <thisusedtobeanemail@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Moonshine-Element",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Moonshine::Test" : "0.14",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Autoload::AUTOCAN" : "0.004",
+            "Data::GUID" : "0.048",
+            "Ref::Util" : "0.113",
+            "UNIVERSAL::Object" : "0.06",
+            "feature" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Moonshine::Element" : {
+         "file" : "lib/Moonshine/Element.pm",
+         "version" : "0.11"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/Moonshine-Element.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/Moonshine-Element"
+      }
+   },
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,65 @@
+NAME
+    MMS::Mail::Provider::UKTMobile - This provides a class for parsing an
+    MMS::Mail::Message object that has been sent via the UK T-Mobile
+    network.
+
+VERSION
+    Version 0.04
+
+SYNOPSIS
+    This class provides a parse method for parsing an MMS::Mail::Message
+    object into an MMS::Mail::Message::Parsed object for MMS messages sent
+    from the UK T-Mobile network.
+
+METHODS
+    The following are the top-level methods of the
+    MMS::Mail::Parser::UKTMobile class.
+
+  Constructor
+    "new()"
+        Return a new MMS::Mail::Provider::UKTMobile object.
+
+  Regular Methods
+    "parse" MMS::Mail::Message
+        The "parse" method is called as an instance method. It parses the
+        MMS::Mail::Message object and returns an MMS::Mail::Message::Parsed
+        object.
+
+AUTHOR
+    Rob Lee, "<robl at robl.co.uk>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-mms-mail-provider-uktmobile at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MMS-Mail-Provider-UKTMob
+    ile>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc MMS::Mail::Provider::UKTMobile
+
+    You can also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/MMS-Mail-Provider-UKTMobile>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/MMS-Mail-Provider-UKTMobile>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=MMS-Mail-Provider-UKTMobil
+        e>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/MMS-Mail-Provider-UKTMobile>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2006 Rob Lee, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

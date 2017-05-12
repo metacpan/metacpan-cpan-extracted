@@ -1,0 +1,46 @@
+0.1.6 2010-07-12 Ulrich Kautz <uk@fortrabbit.de>
+    * Updated description to clearify the goal of this approach
+    * Updated M::D::LogParser::Core::PostfixParser docs for others as a background to implement other MTAs
+    * Removed Geo::IP from dependencies, test will be skipped if not installed.
+    * Added Net::DNSBL::Client as dependency in tests
+    * Implemented DSPAM via Net::LMTP (instead of command line client)
+    * Converted M::D::ContentFilter::Core::* to Moose::Role
+    * Implemented SpamAsssassin via Mail::SpamAssassin::Client
+    * Enabled train mode for CF without cmd_-methods (DSPAM, SpamAssassin)
+
+0.1.5 2010-07-02 Ulrich Kautz <uk@fortrabbit.de>
+    * Association module passes mails which pass SPF
+    * Added policy module: Basic (re-implement postfix basic checks, such as reverse hostname and hostname fqdn checks.. but with weighting)
+    * Updated maintenance for M::D::Core::Stats
+    * Added uninstall and install methods to init script
+    * Added Mail::SPF, Email::Valid and Regexp::Common to PREREQ_PM
+    * Added new M::D::Policy::Basic module for weighted postfix basic checks
+
+0.1.4 2010-06-30 Ulrich Kautz <uk@fortrabbit.de>
+    * Added the capability of printing SQL CREATE syntax via M::D::Core::DatabaseCreate module (server.pl .. --print-sql)
+    * Updated Moduel documentation with correct SQL syntax
+    * Updated tables.sql with current SQL (debian package)
+    * empty FROM is now allowed (bounce..)
+    * Reduced module "version" from 0.77 to 0.74, cause this is debian stable.
+    * Updated some content filter documentations
+    * Exclusions added (elide module per recipient/sender domain/address)
+
+0.1.3 2010-06-25 Ulrich Kautz <uk@fortrabbit.de>
+    * Tests fixed (28, 31, 45 and 67): skip if certain modules are not there
+    * M::D::LogParser docu updated
+    * Cookbooks updated (added Hook explanation)
+
+0.1.2 2010-06-23 Ulrich Kautz <uk@fortrabbit.de>
+    * forgot one last version ..
+    * update M::D::ContentFilter description
+    * update M::D::Policy description
+    * added M::D::ContentFilter::Cookbook module for introduction
+    * added M::D::Policy::Cookbook module for introduction
+
+0.1.1 2010-06-23 Ulrich Kautz <uk@fortrabbit.de>
+    * Forgot some versions..
+
+0.1.0 2010-06-21 Ulrich Kautz <uk@fortrabbit.de>
+    * Packed for CPAN
+    * Reset version to 0.1.0
+

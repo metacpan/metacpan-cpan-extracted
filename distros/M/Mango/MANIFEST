@@ -1,0 +1,42 @@
+Changes
+CONTRIBUTING.md
+lib/Mango.pm
+lib/Mango/Auth.pm
+lib/Mango/Auth/SCRAM.pm
+lib/Mango/BSON.pm
+lib/Mango/BSON/Binary.pm
+lib/Mango/BSON/Code.pm
+lib/Mango/BSON/Document.pm
+lib/Mango/BSON/Number.pm
+lib/Mango/BSON/ObjectID.pm
+lib/Mango/BSON/Time.pm
+lib/Mango/BSON/Timestamp.pm
+lib/Mango/Bulk.pm
+lib/Mango/Collection.pm
+lib/Mango/Cursor.pm
+lib/Mango/Cursor/Query.pm
+lib/Mango/Database.pm
+lib/Mango/GridFS.pm
+lib/Mango/GridFS/Reader.pm
+lib/Mango/GridFS/Writer.pm
+lib/Mango/Protocol.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/auth/auth.t
+t/auth/authenticate.t
+t/bson.t
+t/bulk.t
+t/collection.t
+t/connection.t
+t/cursor.t
+t/database.t
+t/gridfs.t
+t/leaks/auth.t
+t/pod.t
+t/pod_coverage.t
+t/protocol.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

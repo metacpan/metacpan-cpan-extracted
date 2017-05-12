@@ -1,0 +1,49 @@
+Revision history for Media-Info-Mplayer
+
+0.08    2016-06-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Replace Log::Any::For::Builtins with IPC::System::Options.
+
+
+0.07    2016-04-06 (PERLANCAR)
+
+	- Reverted previous commit, '-nosound' option will be used if
+	  function is called with audio_info => 0.
+
+
+0.06    2016-04-05 (PERLANCAR)
+
+	- Add -nosound option to 'mplayer -identify' command.
+
+
+0.05    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.04    2015-08-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.03    2013-10-31 (SHARYANTO)
+
+        - No functional changes. Add sample result.
+
+
+0.02    2013-09-21 (SHARYANTO)
+
+        - No functional changes. Tweak Abstract and add Synopsis.
+
+
+0.01    2013-09-21 (SHARYANTO)
+
+        - First release.

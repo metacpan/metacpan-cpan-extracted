@@ -1,0 +1,69 @@
+
+dn: cn=A JHD Test,mail=jhd@radix.net
+cn: A JHD Test
+sn: Test
+objectclass: top
+objectclass: person
+mail: jhd@radix.net
+givenname: A JHD
+uid: ajhdtest
+xnavnickname: ajhdtest
+xmozillanickname: ajhdtest
+
+dn: cn=Aaron Spacemuseum,mail=aaron@noplace.com
+cn: Aaron Spacemuseum
+sn: Spacemuseum
+objectclass: top
+objectclass: person
+mail: aaron@noplace.com
+givenname: Aaron
+uid: aaronspacemuseum
+xnavnickname: aaronspacemuseum
+xmozillanickname: aaronspacemuseum
+
+dn: cn=Alisa Car,mail=acar@noplace.siwash.edu
+cn: Alisa Car
+sn: Car
+objectclass: top
+objectclass: person
+mail: acar@noplace.siwash.edu
+givenname: Alisa
+uid: alisacar
+xnavnickname: alisacar
+xmozillanickname: alisacar
+
+dn: cn=Ben Dover,mail=devrep1@nowhere.com
+cn: Ben Dover
+sn: Dover
+objectclass: top
+objectclass: person
+mail: devrep1@nowhere.com
+givenname: Ben
+uid: bendover
+xnavnickname: bendover
+xmozillanickname: bendover
+
+dn: cn=list1,mail=
+cn: list1
+sn: list1
+objectclass: top
+objectclass: person
+mail: 
+givenname: 
+uid: list1a
+xnavnickname: list1a
+xmozillanickname: list1a
+
+dn: cn=list1
+cn: list1
+objectclass: top
+objectclass: groupOfNames
+uid: list1
+xnavnickname: list1
+
+dn: cn=list2
+cn: list2
+objectclass: top
+objectclass: groupOfNames
+uid: list2
+xnavnickname: list2

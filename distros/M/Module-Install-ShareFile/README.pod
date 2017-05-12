@@ -1,0 +1,60 @@
+=head1 NAME
+
+Module::Install::ShareFile - Install non-code files for use during run-time
+
+=head1 SYNOPSIS
+
+  install_sharefile 'file.txt';
+  
+  install_sharefile 'file.txt';
+      dist => 'file.csv';
+  
+  install_sharefile 'file.txt',
+      type => 'module'
+      module => 'MyApp::Web',
+      dist => 'file.csv';
+
+=head1 DESCRIPTION
+
+Module::Install::Share is very useful but It's can install only directory. This module can install a file to share directory.
+
+=head1 METHODS
+
+=head2  install_sharefile( $from, I<%args> )
+
+Adds file to install.
+
+Attributes are as follows:
+
+=over 4
+
+=item type: String
+
+Specify install type as 'dist' or 'module'. default is 'dist'
+
+=item module: String
+
+If type is 'module', module name is required.
+
+=item dist: String
+
+Destination path. If not defined original file name is used.
+
+=back
+
+=head1 AUTHOR
+
+Masahiro Nagano E<lt>kazeburo {at} gmail.comE<gt>
+
+=head1 SEE ALSO
+
+L<Module::Install::Share>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=cut
+

@@ -1,0 +1,45 @@
+{
+   "abstract" : "Moose role for generating Data::Verifier profiles from Moose objects.",
+   "author" : [
+      "Cory G Watson <gphat@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Role-Data-Verifier",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : 0,
+            "Moose::Role" : 0,
+            "Test::More" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Moose" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gphat/moosex-role-data-verifier"
+      }
+   },
+   "version" : "0.01"
+}
+

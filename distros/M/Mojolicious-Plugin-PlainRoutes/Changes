@@ -1,0 +1,7 @@
+Revision history for Mojolicious-Plugin-PlainRoutes
+
+0.03    01-May-2014
+        Fixed behaviour of ANY routes
+
+0.01    30-Apr-2014
+        First version released, fit for initial purpose

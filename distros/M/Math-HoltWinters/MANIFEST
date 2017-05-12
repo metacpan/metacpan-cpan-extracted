@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Math-HoltWinters.t
+lib/Math/HoltWinters.pm
+META.yml                                 Module meta-data (added by MakeMaker)

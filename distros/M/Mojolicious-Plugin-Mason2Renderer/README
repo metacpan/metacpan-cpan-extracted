@@ -1,0 +1,159 @@
+***** DESCRIPTION
+
+Mojolicous::Plugin::Mason2Renderer is a renderer for Mason 2 (aka Mason 2.x)
+template system, plugabble into Mojolicious web framework.
+
+Mojolicious : http://www.mojolicious.org/ http://search.cpan.org/~kraih/Mojolicious/
+Mason (2) : http://search.cpan.org/~jswartz/Mason/
+
+
+***** SYNOPSIS
+
+  ## Mojolicious::Lite
+
+  # example -1-
+    use Mojolicious::Lite;
+    plugin 'mason2_renderer';
+    get '/' => sub {
+        my $self = shift;
+        $self->render('/index', handler => "mason" );
+    };
+    app->start;
+
+    # template: MOJO_HOME/mason/index.mc
+    <html>
+      <body>Welcome</body>
+    </html>
+
+  # example -2-
+    use Mojolicious::Lite;
+    plugin 'mason2_renderer' => { preload_regexps => [ '.mc$', '/path/to/comps/to/preload', ... ],
+                                  interp_params   => { comp_root => "/path/to/mason/comps",
+                                                       ... (other parameters to the new() Mason::Interp constructor)
+                                                     },
+                                  request_params  => { ... (other parameters to the new() Mason::Request constructor)
+                                                     },
+    };
+    get '/' => sub {
+        my $self = shift;
+        $self->render('/index', handler => "mason", mytext => "Hello world" );
+    };
+    app->start;
+
+    # template: /path/to/mason/comps/index.mc
+    <%class>
+    has 'mytext';
+    </%class>
+    <html>
+      <body>Welcome : <% $self->mytext %></body>
+    </html>
+
+
+  ## Mojolicious
+
+  # example -1-
+    package MyApp;
+    use Mojo::Base 'Mojolicious';
+
+    sub startup {
+      my $self = shift;
+      $self->plugin('mason2_renderer');
+      $self->routes->get('/' => sub {
+          my $self = shift;
+          $self->render('/index', handler => "mason" );
+        }
+      );
+    }
+    1;
+
+    # template: MOJO_HOME/mason/index.mc
+    <html>
+      <body>Welcome</body>
+    </html>
+
+  # example -2-
+    package MyApp;
+    use Mojo::Base 'Mojolicious';
+
+    sub startup {
+      my $self = shift;
+      $self->plugin('mason2_renderer', { preload_regexps => [ '.mc$', '/path/to/comps/to/preload', ... ],
+                                         interp_params   => { comp_root => "/path/to/mason/comps",
+                                                             ... (other parameters to the new() Mason::Interp constructor)
+                                                            },
+                                         request_params  => { ... (other parameters to the new() Mason::Request constructor)
+                                                            },
+                                       }
+      );
+      $self->routes->get('/' => sub {
+          my $self = shift;
+          $self->render('/index', handler => "mason", mytext => "Hello World" );
+        }
+      );
+    }
+    1;
+
+    # template: /path/to/mason/comps/index.mc
+    <%class>
+    has 'mytext';
+    </%class>
+    <html>
+      <body>
+        Welcome : <% $self->mytext %><br/>
+        Mason root_comp is <% $c->app->home %><br/>
+      </body>
+    </html>
+
+
+***** ACKNOWLEDGEMENTS
+
+Original idea was taken from Graham BARR (http://search.cpan.org/~gbarr/)
+MojoX::Renderer::Mason module. This module was not longer adapted to Mojolicious new
+Plugin philosophy.
+
+Many, many thanks to Sebastian RIEDEL for developping Mojolicious and Jonathan SWARTZ
+for developping HTML::Mason and Mason (2).
+
+
+***** INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+***** SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Mojolicious::Plugin::Mason2Renderer
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mojolicious-Plugin-Mason2Renderer
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Mojolicious-Plugin-Mason2Renderer
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Mojolicious-Plugin-Mason2Renderer
+
+    Search CPAN
+        http://search.cpan.org/dist/Mojolicious-Plugin-Mason2Renderer/
+
+
+***** LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Alexandre SIMON
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

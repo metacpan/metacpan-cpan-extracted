@@ -1,0 +1,44 @@
+---
+-
+  - rusu.response.update
+  -
+    - domain: air.ru
+      error_code:
+        - 'Authentication failed. - FATAL ERROR !'
+        - Access to object is denied!
+      req_id: 20080724151906.685440
+      rule_id: rusu.response.update.fail
+    - domain: upanishadixxx21.ru
+      error_code: "Object 'UPANISHADIXXX21.RU' not found - FATAL ERROR !"
+      req_id: 20080724151906.685440
+      rule_id: rusu.response.update.fail
+    - domain: sex.ru
+      error_code:
+        - 'Authentication failed. - FATAL ERROR !'
+        - Access to object is denied!
+      req_id: 20080724151906.685440
+      rule_id: rusu.response.update.fail
+    - domain: trax007.ru
+      error_code:
+        - 'Authentication failed. - FATAL ERROR !'
+        - Access to object is denied!
+      req_id: 20080724151906.685440
+      rule_id: rusu.response.update.fail
+    - domain: don22200.ru
+      registrar:
+        - TESTREGRU1-REG-RIPN
+        - TESTREGRU2-REG-RIPN
+      req_id: 20080724151906.685440
+      rule_id: rusu.response.update.ok
+    - domain: xn--sex170004536_74323-.ru
+      error_code:
+        - 'Invalid domain name - FATAL ERROR !'
+        - "Domain name contains forbidden character. Must be just letters, digits or `-'. "
+      req_id: 20080724151906.685440
+      rule_id: rusu.response.update.fail
+    - domain: upanishadi.ru
+      error_code:
+        - 'Authentication failed. - FATAL ERROR !'
+        - Access to object is denied!
+      req_id: 20080724151906.685440
+      rule_id: rusu.response.update.fail

@@ -1,0 +1,8 @@
+--- #YAML:1.0
+attributes:
+  charisma: 0.33
+  constitution: 1.00
+  dexterity: 0.33
+  intelligence: 0.13
+  strength: 0.33
+  wisdom: 0.20

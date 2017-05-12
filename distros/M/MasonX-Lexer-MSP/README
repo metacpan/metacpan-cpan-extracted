@@ -1,0 +1,35 @@
+MasonX/Lexer/MSP version 0.02
+=============================
+
+MasonX::Lexer::MSP is a subclass of the Mason Lexer.
+
+This lexer subclass changes the Mason syntax to make it closer
+to the syntax used by ASP and JSP.  These changes are incompatible
+with the default Mason syntax, unfortunately.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  HTML::Mason
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002-2004 by John Williams. All rights reserved.
+
+MasonX::Lexer::MSP is released under the same terms as
+HTML::Mason and perl itself.
+
+AUTHOR
+
+John Williams <williams@tni.com>
+

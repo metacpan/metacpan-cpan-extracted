@@ -1,0 +1,95 @@
+=head1 NAME
+
+tconv - iconv-like interface with automatic charset detection
+
+=head1 SYNOPSIS
+
+  #include <tconv.h>
+
+  size_t tconv(tconv_t cd,
+               char **inbuf, size_t *inbytesleft,
+               char **outbuf, size_t *outbytesleft);
+
+=head1 DESCRIPTION
+
+tconv is like iconv, but without the need to know the input charset. Caller might want to play with macros e.g.
+
+  #define iconv_t                       tconv_t
+  #define iconv_open(tocode, fromcode)  tconv_open(tocode, fromcode)
+  #define iconv(cd, ipp, ilp, opp, olp) tconv(cd, ipp, ilp, opp, olp)
+  #define iconv_close(cd)               tconv_close(cd)
+
+When calling L<tconv_open>:
+
+  tconv_open(const char *tocode, const char *fromcode)
+
+it is I<legal> to have NULL for C<fromcode>. In this case the I<first chunk> of input will be used for charset detection, it is therefore recommended to use enough bytes at the very beginning. If C<fromcode> is not NULL, no charset detection will occur, and tconv will behave like L<iconv(3)>, modulo the engine being used (see below).
+If C<tocode> is NULL, it will default to C<fromcode>.
+
+=head1 ENGINES
+
+tconv support two engine types: one for charset detection, one for character conversion, please refer to the L<tconv_open_ext> documentation for technical details. Engines, whatever their type, are supposed to have three entry points: C<new>, C<run> and C<free>. They can be:
+
+=over
+
+=item external
+
+The application already have the C<new>, C<run> and C<free> entry points.
+
+=item plugin
+
+The application give the path of a shared library, and tconv will look at it.
+
+=item built-in
+
+Python's L<cchardet> charset detection engine, bundled with tconv, is always available.
+If tconv is compiled with ICU support, then ICU charset and conversion engines will be available.
+If tconv is compiled with ICONV support, then ICONV conversion engine will be available.
+
+=back
+
+=head1 DEFAULTS
+
+=over
+
+=item charset detection
+
+The default charset detection engine is cchardet, bundled statically with tconv.
+
+=item character conversion
+
+The default character conversion engine is ICU, if tconv has been compiled with ICU support, else ICONV if compiled with ICONV support, else I<none>.
+
+=back
+
+=head1 NOTES
+
+=over
+
+=item Windows platform
+
+On Windows, an ICONV-like conversion engine is always available, via the L<win-iconv> package, bundled with tconv.
+
+=item iconv compliance
+
+=over
+
+=item semantics
+
+tconv() only guarantees that his plug-ins support the C<//TRANSLIT> and C<//IGNORE> iconv notation.
+
+=item output
+
+It is guaranteed that tconv() will behave exactly like iconv() if the character conversion engine is ICONV on an UNIX platform, since in this case tconv() will call iconv() internally. In any other case, the plug-ins have a best-effort policy to behave like C<iconv>.
+
+=item POSIX compliance
+
+By POSIX compliance, we mean that, when the output buffer is too small, iconv should stop updating the input and output pointers prior to when the limit is reached. When the character conversion engine is ICONV on an UNIX platform, it is the behaviour of this UNIX platform that happen. In any other case, the plug-ins guarantee at least that input and output pointers are left in a state that, if being called again, will correctly handle the continuation of the conversion.
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<tconv_ext(3)>, L<iconv(3)>, L<cchardet|https://pypi.python.org/pypi/cchardet/>, L<win-iconv|https://github.com/win-iconv/win-iconv>, L<ICU|http://icu-project.org/>

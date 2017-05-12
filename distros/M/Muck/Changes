@@ -1,0 +1,10 @@
+Revision history for Perl module Muck
+
+0.02 Tue Jan 23 15:03:09 2007
+   - fixes to MANIFEST, missing files, dependencies, patches, etc
+   - much thanks to andyg on #poe channel for feedback
+
+0.01 Tue Jan 23 15:03:09 2007
+    - original alpha release with muckFS capabilities
+
+

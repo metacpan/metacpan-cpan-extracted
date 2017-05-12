@@ -1,0 +1,35 @@
+---
+abstract: 'Instant one class CLI App'
+author:
+  - 'Tom Bloor <t.bloor@shadowcat.co.uk>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-Options-Actions
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Import::Into: '0'
+  Moo: '0'
+  MooX::Options: '0'
+  namespace::clean: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/TBSliver/MooX-Options-Actions/issues
+  homepage: https://github.com/TBSliver/MooX-Options-Actions
+  repository: https://github.com/TBSliver/MooX-Options-Actions.git
+version: '0.001'

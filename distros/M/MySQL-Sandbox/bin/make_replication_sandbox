@@ -1,0 +1,635 @@
+#!/usr/bin/perl 
+# make_replication_sandbox
+#    The MySQL Sandbox
+#    Copyright (C) 2006-2017 Giuseppe Maxia
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+
+use strict;
+use warnings;
+use English qw( -no_match_vars ); 
+use Data::Dumper;
+use Getopt::Long qw(:config no_ignore_case );
+use MySQL::Sandbox qw(get_ranges runs_as_root use_env sbinstr);
+use MySQL::Sandbox::Scripts;
+
+my $DEBUG = $MySQL::Sandbox::DEBUG;
+
+runs_as_root();
+
+my %defaults = (
+    replication_base_port => $MySQL::Sandbox::default_base_port{replication},
+    circular_base_port    => $MySQL::Sandbox::default_base_port{circular},
+    replication_directory => 'rsandbox',
+);
+
+unless ( $ENV{SANDBOX_HOME} ) { 
+    $ENV{SANDBOX_HOME} = "$ENV{HOME}/sandboxes";
+}
+# 
+# $SANDBOX_HOME must be set BEFORE loading MyScripts
+#
+#if ( -d "$ENV{HOME}/sandboxes" ) {
+#    $ENV{SANDBOX_HOME} = $ENV{SANDBOX_HOME} || "$ENV{HOME}/sandboxes";
+#}
+#
+unless ( -d $ENV{'SANDBOX_HOME'} ) {
+    mkdir $ENV{'SANDBOX_HOME'} 
+        or die "can't create $ENV{'SANDBOX_HOME'} ($CHILD_ERROR) \n";
+}
+
+#my $install_dir;
+#$install_dir = $PROGRAM_NAME;
+#$install_dir =~ s{/\w+(\.pl)?$}{};
+# eval "use lib q($install_dir)";
+
+my $msb = MySQL::Sandbox->new();
+
+$msb->parse_options( MySQL::Sandbox::Scripts::parse_options_replication() ); 
+
+GetOptions (
+    map { $msb->{parse_options}{$_}{parse}, \$msb->{options}{$_} }        
+        grep { $msb->{parse_options}{$_}{parse}}  keys %{$msb->{parse_options}}  
+) or $msb->get_help();
+
+$msb->get_help() if $msb->{options}{'help'};
+
+unless ($msb->{options}{server_version}) {
+    $msb->{options}{server_version} = shift
+        or $msb->get_help('server version required');
+}
+
+if ($msb->{options}{master_options})
+{
+    $ENV{MASTER_OPTIONS} = $msb->{options}{master_options};
+}
+if ($msb->{options}{node_options})
+{
+    $ENV{NODE_OPTIONS} = $msb->{options}{node_options};
+}
+if ($msb->{options}{slave_options})
+{
+    $ENV{SLAVE_OPTIONS} = $msb->{options}{slave_options};
+}
+
+
+if ($msb->{options}{one_node_options})
+{
+    for my $node_opt (@{ $msb->{options}{one_node_options}} )
+    {
+        if ($node_opt =~ /^(\d+):\s*(\S.+)/)
+        {
+            $ENV{"NODE${1}_OPTIONS"} = $2;
+        }
+        else
+        {
+            get_help("invalid format for --one_node_option ($node_opt)");    
+        }
+    }
+}
+if ($msb->{options}{one_slave_options})
+{
+    for my $node_opt (@{ $msb->{options}{one_slave_options}} )
+    {
+        if ($node_opt =~ /^(\d+):\s*(\S.+)/)
+        {
+            $ENV{"SLAVE${1}_OPTIONS"} = $2;
+        }
+        else
+        {
+            get_help("invalid format for --one_slave_option ($node_opt)");    
+        }
+    }
+}
+
+
+for my $opt (qw(repl_user repl_password remote_access)) {
+    if (defined $msb->{options}{$opt}) {
+        $MySQL::Sandbox::default_users{$opt} = $msb->{options}{$opt};
+    }
+}
+
+my $base_version ;
+my $release_no;
+my $create_gtid_script=0;
+my $master_use_gtid=0;
+my $dashed_version ;
+my $replication_port = 0;
+my $prefix='';
+my $additional_master_options = $ENV{MASTER_OPTIONS} || '';
+my $temp_path = $msb->{options}{server_version};
+$temp_path =~ s{.*/}{};
+if ( $temp_path =~ /^(\D+)\d+/ ) {
+    $prefix = $1;
+}
+if ( $temp_path =~ /(\d+)\.(\d+)\.(\d+)/ ) {
+    my ($major, $minor, $rev) = ($1, $2, $3);
+    $base_version = "${major}${minor}${rev}";
+    $release_no = $rev;
+    $dashed_version = "${prefix}${major}_${minor}_${rev}";
+    $base_version =~ s/^0+//;
+    $base_version += $major + ($minor * 10) + ($rev * 100);
+    if (    ($major > 5)    # MySQL 6
+        or (($major == 5) && ($minor == 6) && ($rev >= 9 ))  #MySQL 5.6.9 and newer
+        or (( $major == 5) && ($minor > 6))  # MySQL 5.7 and newer
+       )
+    {
+        $create_gtid_script=1;
+    } 
+    if ($create_gtid_script && ($major == 10))
+    {
+        $create_gtid_script =0;
+        $master_use_gtid=1;
+    }
+}
+else {
+    $msb->get_help("No recognizable version pattern in $msb->{options}{server_version}\n");
+}
+
+my @supported_topologies = qw(standard circular);
+#
+# deals with circular replication
+#
+
+my $node_list_text = 'master';
+my @node_list = ('master');
+
+if ($msb->{options}{master_master}) {
+    $msb->{options}{topology} = 'circular';
+    $msb->{options}{how_many_slaves} = 2;
+}
+
+if ($msb->{options}{circular} && ($msb->{options}{circular} =~ /^\d+$/)) {
+    $msb->{options}{topology} = 'circular';
+    $msb->{options}{how_many_slaves} = $msb->{options}{circular};
+}
+
+if ($msb->{options}{topology} eq 'circular')
+{
+    $node_list_text = '';
+    @node_list = ();
+}
+
+for my $n (1 .. $msb->{options}{how_many_slaves})
+{
+    $node_list_text .= " node$n";
+    push @node_list, "node$n";
+}
+
+if ($msb->{options}{'topology'} ) {
+    if ($msb->{options}{'topology'} eq 'standard') {
+        # do nothing. default behavior
+    }
+    elsif ($msb->{options}{'topology'} eq 'circular') {
+        make_circular_replication();
+    }
+    else {
+        die qq(unsupported topology "$msb->{options}{topology}". Allowed options: {@supported_topologies}\n);
+    }
+}
+
+# print Dumper(\%{$msb->{options}});
+
+my $replication_directory ;
+
+if ( $msb->{options}{replication_directory}) {
+    $replication_directory = "$msb->{options}{upper_directory}/$msb->{options}{replication_directory}";
+}
+else {
+    $replication_directory = "$msb->{options}{upper_directory}/$defaults{replication_directory}_$dashed_version";
+}
+
+if ( -d $replication_directory ) {
+    if ( -x "$replication_directory/clear_all") {
+        system "$replication_directory/clear_all";
+    }
+    system "rm -rf $replication_directory/*";
+}
+else {
+    print "creating replication directory $replication_directory\n" if $msb->{options}{verbose};
+    mkdir $replication_directory;
+    unless ( -d $replication_directory ) {
+        die "error creating replication directory n";
+    }
+}
+
+for my $dir ( 1 .. $msb->{options}{how_many_slaves}) {
+    if ( -d "$replication_directory/node$dir" ) {
+        system "rm -rf $replication_directory/node$dir" 
+            and die "unable to clean $replication_directory/node$dir\n";
+    }
+}
+
+if ( -d "$replication_directory/master" ) {
+    system "rm -rf $replication_directory/master"
+        and die "unable to clean $replication_directory/master\n";
+}
+
+if ( $msb->{options}{sandbox_base_port}) {
+    $replication_port = $msb->{options}{sandbox_base_port};
+}
+else {
+    $replication_port = $defaults{replication_base_port} + $base_version + ($release_no * 100);
+}
+
+if ( $msb->{options}{check_base_port}) {
+    $replication_port = get_ranges({
+                min_range   => $replication_port,
+                range_size  => $msb->{options}{how_many_slaves},
+                max_range   => 64000,
+                search_path => $ENV{SANDBOX_HOME},
+            }, 1);
+}
+
+print "installing and starting master\n";
+my $additional_slave_options = $ENV{SLAVE_OPTIONS} || '';
+if ($ENV{NODE_OPTIONS}) {
+    $additional_master_options .= q{ } . $ENV{NODE_OPTIONS};
+    $additional_slave_options  .= q{ } . $ENV{NODE_OPTIONS};
+}
+$additional_master_options .=  q{ };
+$additional_slave_options  .=  q{ };
+if ( $msb->{options}{gtid}) {
+    $additional_master_options .= ' --gtid ';
+    $additional_slave_options  .= ' --gtid ';
+}
+
+my $install_master='';
+my $install_master_command  = qq(
+   make_sandbox $msb->{options}{server_version} -- \\
+    --datadir_from=script \\
+    --no_confirm \\
+    --no_check_port \\
+    --upper_directory=$replication_directory \\
+    --sandbox_directory=master \\
+    --sandbox_port=$replication_port \\
+    --repl_user=$msb->{options}{repl_user} \\
+    --repl_password=$msb->{options}{repl_password} \\
+    --remote_access=$msb->{options}{remote_access} \\
+    --load_grants \\
+    --prompt_prefix=master \\
+    --history_dir=$replication_directory \\
+    -c relay-log-index=mysql-relay \\
+    -c relay-log=mysql-relay \\
+    -c log-bin=mysql-bin \\
+    -c server-id=1 $additional_master_options
+    );
+if ($msb->{options}{interactive} 
+       or ($additional_master_options =~ /\binteractive\b/)) {
+    my $result = system($install_master_command);
+}
+else {
+    my $install_master = qx($install_master_command);
+    print $install_master if $msb->{options}{verbose};
+}
+    if ($CHILD_ERROR) {
+        print "error installing the master\n";
+        print "$install_master\n($CHILD_ERROR $OS_ERROR)\n";
+        exit(1)
+    }
+
+# sleep 1 ;
+
+for my $slave (1 .. $msb->{options}{how_many_slaves}) {
+   my $slave_port = $replication_port+ $slave;
+   my $slave_id = 100 + $slave;
+   print "installing slave $slave\n";
+   my $this_slave_options = $ENV{"SLAVE${slave}_OPTIONS"} || '';
+   my $install_slave_command = qq(
+    make_sandbox $msb->{options}{server_version} -- \\
+    --datadir_from=script \\
+    --upper_directory=$replication_directory \\
+    --sandbox_directory=node$slave \\
+    --no_confirm \\
+    --no_load_grants \\
+    --prompt_prefix=slave$slave \\
+    --sandbox_port=$slave_port \\
+    --repl_user=$msb->{options}{repl_user} \\
+    --repl_password=$msb->{options}{repl_password} \\
+    --remote_access=$msb->{options}{remote_access} \\
+    --history_dir=$replication_directory \\
+    -c server-id=$slave_id \\
+    -c report-host=SBslave$slave \\
+    -c report-port=$slave_port \\
+    -c relay-log-index=mysql-relay \\
+    -c relay-log=mysql-relay \\
+    -c log-bin=mysql-bin $additional_slave_options $this_slave_options
+    );
+    my $install_slave ='';
+    if ($msb->{options}{interactive} 
+       or ($additional_slave_options =~ /\binteractive\b/)) {
+        system($install_slave_command);
+    }
+    else {
+        $install_slave = qx($install_slave_command);
+        print $install_slave if $msb->{options}{verbose};
+    }
+    if ($CHILD_ERROR) {
+        print "error installing slave $slave\n";
+        print "$install_slave\n ($CHILD_ERROR)\n";
+        exit(1)
+    }
+    # sleep 1;
+}
+
+my $current_dir = $ENV{PWD};
+
+chdir $replication_directory;
+
+for my $cmd ( qw(start stop clear send_kill ) ) {
+    my $cmd_fname = $cmd . '_all';
+    $msb->write_to($cmd_fname, '>', '#!/bin/sh');
+    $msb->write_to($cmd_fname, '>>', qq(echo '# executing "$cmd"' on $replication_directory));
+    if ($cmd eq 'start') {
+        $msb->write_to ($cmd_fname, '>>', qq(echo 'executing "$cmd" on master') );
+        $msb->write_to ($cmd_fname, '>>', qq($replication_directory/master/$cmd "\$@") );
+    }
+    for my $slave (1 .. $msb->{options}{how_many_slaves} ) {
+        $msb->write_to ($cmd_fname, '>>', qq(echo 'executing "$cmd" on slave $slave'));
+        $msb->write_to ($cmd_fname, '>>', qq($replication_directory/node$slave/$cmd "\$@"));
+    }
+    if ($cmd ne 'start') {
+        $msb->write_to ($cmd_fname, '>>', qq(echo 'executing "$cmd" on master') );
+        $msb->write_to ($cmd_fname, '>>', qq($replication_directory/master/$cmd "\$@"));
+    }
+    chmod 0755, $cmd_fname;
+}
+
+my $rw_splitting = '/usr/local/share/mysql-proxy/rw-splitting.lua';
+my $mysql_proxy = '/usr/local/sbin/mysql-proxy';
+if ( ( -x $mysql_proxy ) &&  ( -f $rw_splitting) ) {
+    my $port = $replication_port;
+    $msb->write_to('run_proxy',  '>',  '#!/bin/sh'); 
+    $msb->write_to('run_proxy',  '>>', "$mysql_proxy \\" ); 
+    $msb->write_to('run_proxy',  '>>', "  --proxy-backend-addresses=127.0.0.1:$port \\" ); 
+    for my $slave ( 1 .. $msb->{options}{how_many_slaves}) {
+        $port++;
+        $msb->write_to('run_proxy',  '>>', "  --proxy-read-only-backend-addresses=127.0.0.1:$port \\" ); 
+    }
+    $msb->write_to('run_proxy',  '>>', "  --proxy-lua-script=$rw_splitting" ); 
+    chmod 0755, 'run_proxy';
+}
+$msb->write_to('clear_all', '>>', "date > $replication_directory/needs_initialization");
+
+$msb->write_to('start_all', '>>', "if [ -f $replication_directory/needs_initialization ] ");
+$msb->write_to('start_all', '>>', "then");
+$msb->write_to('start_all', '>>', "    $replication_directory/initialize_slaves");
+$msb->write_to('start_all', '>>', "    rm -f $replication_directory/needs_initialization");
+$msb->write_to('start_all', '>>', "fi");
+
+
+$msb->write_to('m',    '>',    "#!/bin/sh");
+$msb->write_to('m',    '>>',   qq($replication_directory/master/use "\$@") );
+chmod 0755, 'm';
+
+$msb->write_to('restart_all', '>',  '#!/bin/sh');
+$msb->write_to('restart_all', '>>', qq($replication_directory/stop_all));
+$msb->write_to('restart_all', '>>', qq($replication_directory/start_all "\$@"));
+
+chmod 0755, 'restart_all';
+$msb->write_to('use_all', '>', '#!/bin/sh');
+my $slave_list = join(' ', (1 .. $msb->{options}{how_many_slaves}) );
+
+$msb->write_to('use_all', '>>', 'if [ "$1" = "" ]');
+$msb->write_to('use_all', '>>', 'then');
+$msb->write_to('use_all', '>>', '  echo "syntax: $0 command"');
+$msb->write_to('use_all', '>>', '  exit 1');
+$msb->write_to('use_all', '>>', 'fi');
+$msb->write_to('use_all', '>>', '');
+$msb->write_to('use_all', '>>', 'echo "# master  " ' );
+$msb->write_to('use_all', '>>', 'echo "$@" | ' . $replication_directory . '/master/use  ');
+$msb->write_to('use_all', '>>', '');
+$msb->write_to('use_all', '>>', 'for SNUM in ' . $slave_list);
+$msb->write_to('use_all', '>>', 'do ' );
+$msb->write_to('use_all', '>>', '  echo "# server: $SNUM: " ' );
+$msb->write_to('use_all', '>>', '  echo "$@" | ' . $replication_directory . '/node$SNUM/use $MYCLIENT_OPTIONS ');
+$msb->write_to('use_all', '>>', 'done ' );
+chmod 0755, 'use_all';
+
+$msb->write_to('status_all', '>', '#!/bin/sh');
+my $rdir = $replication_directory;
+$rdir =~ s{.*/}{};
+$msb->write_to('status_all', '>>', "echo REPLICATION $rdir");
+$msb->write_to('status_all', '>>', $replication_directory . '/master/status');
+$msb->write_to('status_all', '>>', $replication_directory . '/master/use -BN -e'
+            . qq( "select CONCAT('port: ', \@\@port) AS port" ));
+$msb->write_to('status_all', '>>', '');
+$msb->write_to('status_all', '>>', 'for SNUM in ' . $slave_list);
+$msb->write_to('status_all', '>>', 'do ' );
+$msb->write_to('status_all', '>>', '  ' . $replication_directory . '/node$SNUM/status');
+$msb->write_to('status_all', '>>', '  ' . $replication_directory . '/node$SNUM/use -BN -e'
+            . qq( "select CONCAT('port: ', \@\@port) AS port" ));
+$msb->write_to('status_all', '>>', 'done ' );
+chmod 0755, 'status_all';
+
+
+$msb->write_to('check_slaves', '>', '#!/bin/sh' );
+$msb->write_to('check_slaves', '>>', 'echo "master"');
+$msb->write_to('check_slaves', '>>', $replication_directory . '/master/use -BN -e'
+            . qq( "select CONCAT('port: ', \@\@port) AS port" ));
+$msb->write_to('check_slaves', '>>', $replication_directory . '/master/use -e'
+            . qq( 'show master status\\G' | grep "File\\|Position\\|Executed" ));
+$msb->write_to('check_slaves', '>>', 'for NNUM in ' . $slave_list );
+$msb->write_to('check_slaves', '>>', 'do' );
+$msb->write_to('check_slaves', '>>', '  echo "slave # $NNUM"');
+$msb->write_to('check_slaves', '>>', '  ' . $replication_directory . '/node$NNUM/use -BN -e'
+            . qq( "select CONCAT('port: ', \@\@port) AS port" ));
+$msb->write_to('check_slaves', '>>', '  ' . $replication_directory . '/node$NNUM/use -e'
+            . qq( 'show slave status\\G' | grep "\\(Running:\\|Master_Log_Pos\\|\\<Master_Log_File\\|Retrieved\\|Executed\\)") );
+$msb->write_to('check_slaves', '>>', 'done ' );
+chmod 0755, 'check_slaves';
+
+system "cp m n1";
+chmod 0755, "n1";
+
+for my $slave (1 .. $msb->{options}{how_many_slaves} ) {
+    $msb->write_to("s$slave", '>', "#!/bin/sh");
+    $msb->write_to("s$slave", '>', qq($replication_directory/node$slave/use "\$@"));
+    chmod 0755, "s$slave";
+    my $N=$slave+1;
+    system "cp s$slave n$N";
+    chmod 0755, "s$slave";
+    chmod 0755, "n$N";
+}
+
+$msb->write_to('initialize_slaves', '>', "#!/bin/sh");
+$msb->write_to('initialize_slaves', '>>', "");
+$msb->write_to('initialize_slaves', '>>', "# Don't use directly.");
+$msb->write_to('initialize_slaves', '>>', "# This script is called by 'start_all' when needed");
+$msb->write_to('initialize_slaves', '>>', "");
+for my $slave (1 .. $msb->{options}{how_many_slaves} ) {
+    print "starting slave $slave\n";
+    system "./node$slave/start"
+        and die "can't execute ./node$slave/start ($CHILD_ERROR $OS_ERROR)";
+
+    $msb->write_to('initialize_slaves', '>>', qq(echo "initializing slave $slave"));
+
+    $msb->write_to('initialize_slaves', '>>',  
+             qq(echo 'CHANGE MASTER TO )
+           . qq( master_host="$msb->{options}{master_ip}", )
+           . qq( master_port=$replication_port, )
+           . qq( master_user="$MySQL::Sandbox::default_users{'repl_user'}", )
+           . qq( master_password="$MySQL::Sandbox::default_users{'repl_password'}" ));
+    if ($master_use_gtid)
+    {
+        $msb->write_to('initialize_slaves', '>>',  
+             qq(, master_use_gtid=current_pos) );
+    }
+    if ($msb->{options}{gtid}) 
+    {
+        $msb->write_to('initialize_slaves', '>>',  ', MASTER_AUTO_POSITION=1');
+    }
+    $msb->write_to('initialize_slaves', '>>',  
+             qq(' | $replication_directory/node$slave/use -u root  ) );
+
+    $msb->write_to('initialize_slaves', '>>', 
+            qq( echo 'START SLAVE' )
+           . qq( | $replication_directory/node$slave/use -u root ) );
+    system "perl -i -pe 's/^password/#password/' ./node$slave/my.sandbox.cnf"
+}
+
+#
+# Creates the replication user
+#
+##system qq(./m -u root -e 'grant replication slave on *.* )
+##    . qq( to "$MySQL::Sandbox::default_users{'repl_user'}"\@"127.%" ) 
+##    . qq( identified by "$MySQL::Sandbox::default_users{'repl_password'}"')
+##        and die "can't create slave user";
+
+chmod 0755, "initialize_slaves";
+
+system "./initialize_slaves"
+        and die "can't initialize slave";
+
+# 
+# For the first run, there is root without password. 
+# After the first run, a password is assigned
+#
+for my $slave (1 .. $msb->{options}{how_many_slaves} ) {
+    system "perl -i -pe 's/^#password/password/' ./node$slave/my.sandbox.cnf"
+}
+# system q( perl -i -pe 's/(-u root) (--password=)/$1/g' initialize_slaves );
+
+post_installation($replication_directory);
+$msb->write_to('README', '>', MySQL::Sandbox::Scripts::get_readme_master_slave());
+$msb->write_to('README', '>>', MySQL::Sandbox::Scripts::get_readme_common_replication());
+$msb->write_to('README', '>>', MySQL::Sandbox::Scripts::get_readme_common());
+
+for my $json (qw(connection.json default_connection.json))
+{
+    my $json_text = MySQL::Sandbox::get_json_from_dirs(\@node_list, $json);
+    $msb->write_to($json, '>', $json_text);
+}
+chdir $current_dir;
+print "replication directory installed in ", use_env($replication_directory), "\n";
+
+#
+# instrumentation
+#
+sbinstr( "replication_directory installed in  <"
+        . use_env($replication_directory) . ">");
+
+sub make_circular_replication {
+    my $cmd =  "make_multiple_sandbox --circular";
+    my $group_dir = 'rcsandbox_' . $dashed_version;
+    if ($msb->{options}{replication_directory} ) {
+        $group_dir = $msb->{options}{replication_directory};
+    }        
+
+    if ($msb->{options}{how_many_slaves}) {
+        $cmd .= ' --how_many_nodes=' . $msb->{options}{how_many_slaves};
+    }
+    $cmd .= ' --group_directory=' . $group_dir; 
+    if ($msb->{options}{sandbox_base_port} ) {
+        $cmd .= ' --sandbox_base_port=' . $msb->{options}{sandbox_base_port}
+    }
+    else {
+        $cmd .= ' --sandbox_base_port=' . ($defaults{circular_base_port} + ($release_no * 100));
+    }
+    my $result = system "$cmd $msb->{options}{server_version}" ;
+
+    post_installation("$msb->{options}{upper_directory}/$group_dir") unless $result;
+    exit $result;
+}
+
+sub post_installation
+{
+    my ($replication_directory) = @_;
+    # print "++ post_installation: <$replication_directory> <$node_list_text> <$create_gtid_script>\n";
+    unless (-d $replication_directory)
+    {
+        die "Error in post_installation procedure. $replication_directory not found\n";
+    }
+    chdir $replication_directory;
+
+my $gtid_script_template=<<'END_TEMPLATE';
+#!/bin/bash
+cd _REPLICATION_DIR_
+OPTIONS="master-info-repository=table "
+OPTIONS="$OPTIONS relay-log-info-repository=table"
+OPTIONS="$OPTIONS gtid_mode=ON"
+OPTIONS="$OPTIONS log-slave-updates enforce-gtid-consistency"
+CHANGED=""
+for NODE in _NODE_LIST_
+do
+    for OPTION in $OPTIONS
+    do
+        option_exists=$(grep $OPTION $NODE/my.sandbox.cnf)
+        if [ -z "$option_exists" ]
+        then
+            echo "$OPTION" >> $NODE/my.sandbox.cnf
+            echo "# option '$OPTION' added to $NODE configuration file"
+            CHANGED=1
+        else
+            echo "# option '$OPTION' already exists in $NODE configuration file"
+        fi
+    done
+done
+if [ -n "$CHANGED" ]
+then
+    ./restart_all
+    for NODE in _NODE_LIST_
+    do
+        if [ "$NODE" != "master" ]
+        then
+            $NODE/use -e 'stop slave'
+            $NODE/use -e 'CHANGE MASTER TO MASTER_AUTO_POSITION=1'
+            $NODE/use -e 'start slave'
+        fi
+    done
+fi
+END_TEMPLATE
+
+    $msb->write_to('test_replication', '>', '#!/bin/bash' );
+    my $test_replication="$ENV{SANDBOX_HOME}/test_replication";
+    $msb->write_to('test_replication', '>>', "cd $replication_directory" );
+    $msb->write_to('test_replication', '>>', "TEST_REPLICATION=$test_replication" );
+    $msb->write_to('test_replication', '>>', 'if [ -x $TEST_REPLICATION ]' );
+    $msb->write_to('test_replication', '>>', 'then' );
+    $msb->write_to('test_replication', '>>', '    $TEST_REPLICATION' );
+    $msb->write_to('test_replication', '>>', 'else' );
+    $msb->write_to('test_replication', '>>', '    echo "$TEST_REPLICATION not found"' );
+    $msb->write_to('test_replication', '>>', '    exit 1' );
+    $msb->write_to('test_replication', '>>', 'fi' );
+    chmod 0755, 'test_replication';
+    if ($create_gtid_script)
+    {
+        $gtid_script_template =~ s/_REPLICATION_DIR_/$replication_directory/;
+        $gtid_script_template =~ s/_NODE_LIST_/$node_list_text/g;
+        $msb->write_to('enable_gtid', '>', $gtid_script_template);
+        chmod 0755, 'enable_gtid';
+    }
+    
+}
+
+__END__

@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Mail-Send-Loop
+version:            0.3
+abstract:           Perl extension for sending emails that attach each file in a specified folder and loop a set of users
+author:
+    - Jing Kang <kxj@hotmail.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    LWP::UserAgent:  5
+    MIME::Lite:      3
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

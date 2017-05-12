@@ -1,0 +1,11 @@
+Revision history for Mojolicious-Plugin-Bcrypt
+
+0.04    2013-02-22
+        Fix utf-8 issue in tests
+
+0.03    2011-07-22
+        Edit some meta files
+
+0.01    2011-07-19
+        First version, released.
+

@@ -1,0 +1,186 @@
+SYNOPSIS
+        use Markup::TreeNode;
+        my $new_node = Markup::TreeNode->new(tagname => 'p');
+
+DESCRIPTION
+    This module exists pretty much soley for Markup::Tree. I'm sure you can
+    find plenty of other uses for it, but that's probably the best. Please
+    let me know if and how you use this outside of it's purpose, I'm very
+    intrested :).
+
+PROPERTIES
+    At object instantiation (initilization) the following properties can be
+    set. Addtionally, they can be read/written in a standard hash way: print
+    $node->{'text'}.
+
+    element_type
+        The type of element in question. Valid values follow:
+
+        tag This is the default value and it represents a standard document
+            element.
+
+        -->text
+            TreeNodes of this element type represent textual objects.
+
+        -->declaration
+            In the real-world you'll probably have one or none of these. It
+            is the declaration that the XML or HTML tree has provided. Look
+            at the "text" property to see what the declaration was (intact
+            minus the <! >.
+
+        -->comment
+            This is a representation of comments in markup.
+
+        -->ignore
+            "element_types" marked with -->ignore will be overlooked (but
+            not children of -->ignore (unless they also are -->ignore)) by
+            Markup::Tree's "foreach_node" and "save_as" methods.
+
+        -->pi
+            Processing Instruction. The "tagname" will be either "asp-style"
+            or "php-style" depending on wheter the tag was started and ended
+            with % or ?.
+
+            Because it would disturb the natural flow of things later, pis
+            are treated differently when they are found within quotes, as in
+            an attribute. Instead of thier normal tagging, <pi
+            language="style"></pi> they are instead represented in the
+            following format: {pi:language=style:the pi information found}.
+
+            Example:
+
+                    <p>some text</p>
+                    <?php print "<p>some more text</p>"; ?>
+
+            becomes
+
+                    <p>
+                            some text
+                    </p>
+                    <pi language = "php-style">
+                            print "<p>some more text</p>";
+                    </pi>
+
+            whereas
+
+                    <p class = "<?=print "classname";?>">some text</p>
+
+            becomes
+
+                    <p class = "{pi:language=php-style:=print %QUOTE%classname%QUOTE%;}">
+                            some text
+                    </p>
+
+            Make sense?
+
+        -->section
+            Indicates a marked section. The tagname is the name of the
+            section. In the future you will be able to use this section to
+            get different object of a marked-up page.
+            $tree->get_section('navigation') or something like that.
+            Currently used only by the "Markup::Match*" modules.
+
+    tagname
+        For tag "element_type"s this is the name of the element.
+
+        For -->pi "element_type"s this is either "asp-style" or "php-style"
+        depending on wheter the tag was started and ended with % or ?.
+
+        For all other elements it is usually the same as "element_type".
+
+    attr
+        A reference to an anonymous hash. This represents the elements
+        attributes in name => value pairs (a hash).
+
+    level
+        Internally this setting is never used. Markup::Tree uses it to
+        represent the depth or indentation level. You may find other uses
+        for it. Default value is 0.
+
+    parent
+        When present, this is the reference to the parent
+        "Markup::TreeNode". If empty the value of this property is
+        '(empty)'.
+
+    child_num
+        Internally this is used to represent which child number of our
+        parent we are. Again, you may find another use for it.
+
+    children
+        A reference to an anonymous array of "Markup::TreeNodes"s.
+
+    text
+        The text of the object. Likely -->text or -->declaration will have
+        this set.
+
+METHODS
+    attach_parent ("Markup::TreeNode")
+        The safe way of assigning a parent. Adds the current node to the
+        last of the new parent's children list.
+
+    attach_child ("Markup::TreeNode")
+        The safe way of assigning a child. Adds proper parent links and
+        "child_num"s.
+
+    attach_child_before ("Markup::TreeNode")
+        The safe way of assigning a child. Adds proper parent links and
+        "child_num"s.
+
+        The difference between this method and the "attach_child" method is
+        that this method will add the specified child as the first child of
+        it's children, rather than the last.
+
+    attach_children (ARRAYREF)
+        The safe way of assigning a children to a parent. Adds proper parent
+        links and "child_num"s.
+
+    get_text ( )
+        If the current object is a -->text object it simply returns its
+        text; Otherwise if the "next_node" is a text, returns its text. If
+        all fails, undef is returned.
+
+    next_node ( )
+        Returns the next "Markup::TreeNode" in the tree or undef if at the
+        bottom (or if the algo screwed up).
+
+    previous_node ( )
+        Returns the previous "Markup::TreeNode" in the tree or undef if at
+        the top (or if the algo screwed up).
+
+    drop ( )
+        Drops (deletes) the current node and all of its children. Returns
+        the dropped node.
+
+    replace ("Markup::TreeNode")
+        Replaces the current node with the specified one. Returns the
+        replaced node.
+
+    insert ("Markup::TreeNode", position)
+        Arguments:
+
+        "Markup::TreeNode"
+            The node you want to insert
+
+        position
+            May be one of 'before' or 'after'. The default is 'after'.
+
+        This method will insert the specified node either before or after
+        itself, depending on the "position".
+
+    copy_of
+        Returns a copy of the current node. This means you can safely modify
+        the returned node without affecting the original node or node tree.
+        All references to children or are also copies, but refrences to
+        parents are, in fact, refrences.
+
+BUGS
+    Please let me know if you find any bugs.
+
+SEE ALSO
+    Markup::Tree
+
+AUTHOR
+    BPrudent (Brandon Prudent)
+
+    Email: xlacklusterx@hotmail.com
+

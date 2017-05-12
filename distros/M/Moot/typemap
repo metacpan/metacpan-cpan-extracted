@@ -1,0 +1,192 @@
+# -*- Mode: Perl -*-
+
+mootLexfreqs*     O_OBJECT
+mootNgrams*       O_OBJECT
+mootHMM*          O_OBJECT
+mootDynHMM*       O_OBJECT
+mootDynLexHMM*    O_OBJECT
+mootDynLexHMM_Boltzmann*  O_OBJECT
+wasteLexicon*	  O_OBJECT
+
+TokenReader*	    O_OBJECT
+TokenWriter*	    O_OBJECT
+TokenReaderNative*  O_OBJECT
+TokenWriterNative*  O_OBJECT
+TokenReaderExpat*   O_OBJECT
+TokenWriterExpat*   O_OBJECT
+wasteTokenScanner*  O_OBJECT
+wasteLexerReader*   O_OBJECT
+wasteDecoder* 	    O_OBJECT
+wasteAnnotatorWriter* O_OBJECT
+
+#mootSentence*     T_AV
+TagStr            T_CHAR
+
+LexfreqCount      T_FLOAT
+NgramCount        T_FLOAT
+
+bool              T_BOOL
+
+size_t		  T_UV
+TagID             T_UV
+TokID             T_UV
+mootEnumID        T_UV
+mootTokenType     T_UV
+#wasteScannerType  T_UV
+#wasteLexerType    T_UV
+TokenIOFormatMask  T_UV
+
+CountT            T_DOUBLE
+ProbT             T_DOUBLE
+
+
+
+######################################################################
+# perl->C
+INPUT
+
+#T_std_string
+#  {
+#    char *cstr = SvPV_nolen($arg);
+#    $var.assign(cstr, SvCUR($arg));
+#  }
+
+T_BYTE
+  {
+      $var = *( SvPV($arg,1) );
+  }
+
+T_INT
+  {
+      $var = SvIV($arg);
+  }
+
+T_UINT
+  {
+      $var = SvUV($arg);
+  }
+
+T_FLOAT
+  {
+      $var = SvNV($arg);
+  }
+
+T_GFSM_WEIGHT
+  {
+      gfsm_perl_weight_setfloat($var,SvNV($arg));
+  }
+
+T_LABELID_VECTOR
+  {
+      //-------------------------- BEGIN T_LABELID_VECTOR perl->C
+      int _i;
+      AV *av=NULL;
+
+      if (SvROK($arg) && (SvTYPE(SvRV($arg)) == SVt_PVAV) )
+	  av = (AV*)SvRV( $arg );
+      else {
+	  warn( \"${Package}::$func_name() -- $var is not an AV reference\" );
+	  XSRETURN_UNDEF;
+      }
+
+      $var = g_ptr_array_sized_new(av_len(av));
+      for (_i=0; _i <= av_len(av); _i++) {
+	  SV **sv = av_fetch(av,_i,0);
+	  if (sv && *sv) {
+	      g_ptr_array_add($var, GUINT_TO_POINTER(SvUV(*sv)));
+	  } else {
+	      g_ptr_array_add($var, GUINT_TO_POINTER((guint)gfsmNoLabel));
+	  }
+      }
+      //-------------------------- END T_LABELID_VECTOR perl->C
+  }
+
+T_STATEID_VECTOR
+  {
+      //-------------------------- BEGIN T_STATEID_VECTOR perl->C
+      int _i;
+      AV *av=NULL;
+
+      if (SvROK($arg) && (SvTYPE(SvRV($arg)) == SVt_PVAV) )
+	  av = (AV*)SvRV( $arg );
+      else {
+	  warn( \"${Package}::$func_name() -- $var is not an AV reference\" );
+	  XSRETURN_UNDEF;
+      }
+
+      $var = g_ptr_array_sized_new(av_len(av));
+      for (_i=0; _i <= av_len(av); _i++) {
+	  SV **sv = av_fetch(av,_i,0);
+	  if (sv && *sv) {
+	      g_ptr_array_add($var, GUINT_TO_POINTER(SvUV(*sv)));
+	  } else {
+	      g_ptr_array_add($var, GUINT_TO_POINTER(gfsmNoState));
+	  }
+      }
+      //-------------------------- END T_STATEID_VECTOR perl->C
+  }
+
+
+######################################################################
+# C->perl
+OUTPUT
+
+#T_std_string
+#  $arg = newSVpvn($var.data(), $var.length());
+
+T_BYTE
+  {
+      sv_setpvn($arg,&$var,1);
+  }
+
+T_INT
+  {
+      sv_setiv($arg,$var);
+  }
+
+T_UINT
+  {
+      sv_setuv($arg,$var);
+  }
+
+T_FLOAT
+  {
+      sv_setnv($arg,$var);
+  }
+
+T_GFSM_WEIGHT
+  {
+      sv_setnv($arg, gfsm_perl_weight_getfloat($var));
+  }
+
+T_LABELID_VECTOR
+  {
+      //-------------------------- BEGIN T_LABELID_VECTOR C->perl
+      int _i;
+      AV *av = newAV();
+      if ($var) {
+	  for (_i=0; _i < $var->len; _i++) {
+	      av_push(av, newSVuv((UV)GPOINTER_TO_UINT(g_ptr_array_index($var,_i))));
+	  }
+      }
+      sv_2mortal((SV*)av);
+      $arg = newRV((SV*)av);
+      sv_2mortal($arg);
+      //-------------------------- END T_LABELID_VECTOR C->perl
+  }
+
+T_STATEID_VECTOR
+  {
+      //-------------------------- BEGIN T_STATEID_VECTOR C->perl
+      int _i;
+      AV *av = newAV();
+      if ($var) {
+	  for (_i=0; _i < $var->len; _i++) {
+	      av_push(av, newSVuv((UV)GPOINTER_TO_UINT(g_ptr_array_index($var,_i))));
+	  }
+      }
+      sv_2mortal((SV*)av);
+      $arg = newRV((SV*)av);
+      sv_2mortal($arg);
+      //-------------------------- END T_STATEID_VECTOR C->perl
+  }

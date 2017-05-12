@@ -1,0 +1,26 @@
+Revision history for MIDI-Drummer
+
+0.05  2014-10-14
+    - Rollback naive "swing"
+
+0.0401 2014-10-14
+    - Added missing POD for triplet durations
+
+0.04  2014-10-14
+    - Added rudimentary swing time (a la triplets)
+
+0.03  2014-10-14
+    - Added patch change command
+    - Improved documentation
+
+0.0201 2014-10-13
+    - Made metronome() more accurately honor the time signature
+    - Improved documentation
+
+0.02  2014-10-12
+    - Improved documentation
+    - Fixed time signature handling
+
+0.01  2014-10-08
+    - Ported essential functionality from M::S::D
+    - Minted by Dist::Zilla

@@ -1,0 +1,39 @@
+---
+abstract: 'package a COPYRIGHT file with a distribution'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.61
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Module::Install::Copyright
+name: Module-Install-Copyright
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  List::MoreUtils: 0
+  Module::Install::Admin::RDF: 0
+  Module::Install::Contributors: 0
+  Module::Manifest: 0
+  MooX::Struct: 0
+  Path::Class: 0
+  Software::License: 0
+  perl: 5.6.0
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Module-Install-Copyright
+  homepage: https://metacpan.org/release/Module-Install-Copyright
+  license: http://dev.perl.org/licenses/
+version: 0.009

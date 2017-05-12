@@ -1,0 +1,61 @@
+{
+   "abstract" : "Mojolicious::Plugin::SemanticUIPageNavigator",
+   "author" : [
+      "yanxq <yanxueqing621@163.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-SemanticUIPageNavigator",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Modern::Perl" : "0",
+            "Mojo::Base" : "0",
+            "Mojo::ByteStream" : "0",
+            "Mojo::DOM" : "0",
+            "POSIX" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Module::Find" : "0",
+            "Mojolicious::Lite" : "0",
+            "Test::Mojo" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.0.3"
+}
+

@@ -1,0 +1,27 @@
+---
+-
+  - rusu.response.new
+  -
+    - domain: air.ru
+      error_code: "Object 'AIR.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080717152945.254883
+      rule_id: rusu.response.new.fail
+    - domain: sex.ru
+      error_code: "Object 'SEX.RU' already present in TC Database - FATAL ERROR !"
+      req_id: 20080717152945.254883
+      rule_id: rusu.response.new.fail
+    - domain: sex17000453674323.ru
+      req_id: 20080717152945.254883
+      rule_id: rusu.response.new.ok
+    - domain: trax007.ru
+      req_id: 20080717152945.254883
+      rule_id: rusu.response.new.ok
+    - domain: don22200.ru
+      req_id: 20080717152945.254883
+      rule_id: rusu.response.new.ok
+    - domain: xn--upanishadi_xxx-.ru
+      error_code:
+        - 'Invalid domain name - FATAL ERROR !'
+        - "Domain name contains forbidden character. Must be just letters, digits or `-'. "
+      req_id: 20080717152945.254883
+      rule_id: rusu.response.new.fail

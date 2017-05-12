@@ -1,0 +1,20 @@
+Revision history for MAD::Scrambler
+
+0.0.5       2015-02-27
+                - Updating dependency list
+                - Some housekeeping
+
+0.0.4       2014-12-13
+                - Renaming constant
+                - Perl::Critic stuff
+                - Setting minumum version of dependencies
+
+0.0.3       2014-09-06
+                - Correcting typos
+
+0.0.2       2014-09-06
+                - A nibble more of documentation
+
+0.0.1       2014-09-06
+                - Initial Version
+

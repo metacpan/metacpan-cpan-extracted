@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Memcached-Server
+version:            0.04
+abstract:           A pure perl Memcached server helper, that help you create a server speaking Memcached protocol
+author:
+    - Cindy Wang (CindyLinz)
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    AnyEvent::Handle:  0
+    AnyEvent::Socket:  0
+    callee:            0
+    Hash::Identity:    0
+    Test::More:        0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

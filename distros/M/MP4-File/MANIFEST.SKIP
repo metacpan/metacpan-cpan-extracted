@@ -1,0 +1,16 @@
+^Makefile$
+^nlspath\.h$
+~$
+\.old(?:\..*)?$
+\.swp$
+\.o$
+\.bs$
+\.bak$
+\.orig$
+\.cache\.cm$
+^blib
+^pm_to_blib
+^backup
+^testing
+^devel
+NLS-TextCatalog.*\.tar\.gz$

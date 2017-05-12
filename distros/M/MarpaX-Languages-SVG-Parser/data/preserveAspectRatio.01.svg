@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg width="450px" height="300px" version="1.1"
+		xmlns="http://www.w3.org/2000/svg">
+	<desc>Example PreserveAspectRatio - illustrates preserveAspectRatio attribute</desc>
+	<rect x="1" y="1" width="448" height="298" fill="none" stroke="blue"/>
+	<g font-size="9">
+	    <g id="meet-group-1" transform="translate(100, 60)">
+			<g>
+				<text y="-10">xMin*
+				</text>
+				Viewport1
+				<svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 30 40" width="50" height="30">
+					Smile
+				</svg>
+			</g>
+			<g transform="translate(70,0)">
+				<text y="-10">xMid*
+				</text>
+				Viewport1
+				<svg preserveAspectRatio="xMidYMid meet" viewBox="0 0 30 40" width="50" height="30">
+					Smile
+				</svg>
+			</g>
+		</g>
+	</g>
+</svg>

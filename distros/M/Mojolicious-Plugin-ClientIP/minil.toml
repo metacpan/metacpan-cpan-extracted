@@ -1,0 +1,4 @@
+name = "Mojolicious-Plugin-ClientIP"
+badges = ["travis"]
+authority="cpan:SIXAPART"
+module_maker="ModuleBuildTiny"

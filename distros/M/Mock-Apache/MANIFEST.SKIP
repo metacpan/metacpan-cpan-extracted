@@ -1,0 +1,12 @@
+MANIFEST.bak
+MYMETA.json
+MYMETA.yml
+Makefile$
+Makefile.old
+Mock-Apache-\d+\.\d+.*
+README.md
+\.git/
+\.gitignore
+blib
+pm_to_blib
+~$

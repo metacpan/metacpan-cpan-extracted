@@ -1,0 +1,11 @@
+-*- Outline -*-
+
+* Profile
+
+** Inlining
+Determine if, e.g., sim_use vars should be inlined.
+
+* Autouse
+Foo::Bar?(foo,bar) to use autouse.pm.
+
+* Fuller test

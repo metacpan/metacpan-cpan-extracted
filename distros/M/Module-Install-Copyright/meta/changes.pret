@@ -1,0 +1,54 @@
+# This file acts as the project's changelog.
+
+`Module-Install-Copyright 0.001 cpan:TOBYINK`
+	issued  2012-12-04;
+	label   "Initial release".
+
+`Module-Install-Copyright 0.002 cpan:TOBYINK`
+	issued  2013-01-21;
+	changeset [
+		item "Drop Debian::Copyright dependency; serialize Debian copyright format ourselves; we can do a better job!"^^Change;
+	].
+
+`Module-Install-Copyright 0.003 cpan:TOBYINK`
+	issued  2013-01-22;
+	changeset [
+		item "Underscores in stanza properties are now properly replaced with hyphens."^^Bugfix;
+	].
+
+`Module-Install-Copyright 0.004 cpan:TOBYINK`
+	issued  2013-03-19;
+	changeset [
+		item "Module::Install::Credits."^^Addition;
+	].
+
+`Module-Install-Copyright 0.005 cpan:TOBYINK`
+	issued  2013-03-20;
+	changeset [
+		item "Ensure CREDITS file is UTF-8 encoded."^^Change;
+	].
+
+`Module-Install-Copyright 0.006 cpan:TOBYINK`
+	issued  2013-03-24;
+	changeset [
+		item "Module::Install::Credits now adds 'x_contributors' key to META.yml."^^Change;
+	].
+
+`Module-Install-Copyright 0.007 cpan:TOBYINK`
+	issued  2013-04-14;
+	label   "Bond; James Bond";
+	changeset [
+		item "Only list contributors in 'x_contributors', not thanked people."^^Change;
+	].
+
+`Module-Install-Copyright 0.008 cpan:TOBYINK`
+	issued  2013-05-01;
+	changeset [
+		item "Fix auto-generated CPAN e-mail addresses in CREDITS file."^^Bugfix;
+	].
+
+`Module-Install-Copyright 0.009 cpan:TOBYINK`
+	issued  2013-05-03;
+	changeset [
+		item "Don't include 'mailto:' in x_contributors for META.yml; MetaCPAN doesn't seem to like it."^^Change;
+	].

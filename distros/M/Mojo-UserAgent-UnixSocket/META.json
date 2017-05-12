@@ -1,0 +1,54 @@
+{
+   "abstract" : "User Agent connections over UNIX sockets.",
+   "author" : [
+      "Ben Tyler"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-UserAgent-UnixSocket",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Socket::UNIX" : "1.23",
+            "Mojolicious" : "5.00"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kanatohodets/mojo-useragent-unixsocket/issues"
+      },
+      "homepage" : "https://github.com/kanatohodets/mojo-useragent-unixsocket",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/kanatohodets/mojo-useragent-unixsocket"
+      }
+   },
+   "version" : "0.021"
+}

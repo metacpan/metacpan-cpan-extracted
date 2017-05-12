@@ -1,0 +1,57 @@
+{
+   "abstract" : "Provide NTLM authentication by forwarding requests to an upstram AD server",
+   "author" : [
+      "Tobias Oetiker <tobi@oetiker.ch>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-SPNEGO",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t",
+         "eg"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "CPAN::Uploader" : "0",
+            "Pod::Markdown::Github" : "0.01"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "7.01",
+            "Net::LDAP::SPNEGO" : "v0.1.4",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/oetiker/mojolicious-plugin-spnego/issues"
+      },
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/oetiker/mojolicious-plugin-spnego"
+      }
+   },
+   "version" : "v0.2.4"
+}

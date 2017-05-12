@@ -1,0 +1,192 @@
+
+Complete version history
+========================
+
+2016-12-03 v1.14 pjacklam
+
+ * Remove BENCHMARK file. The information there was obsolete.
+
+ * Remove INSTALL file. The information is in the README file.
+
+ * Use ExtUtils::MakeMaker rather than Module::Install in Makefile.PL.
+
+ * Explicitly set required version of Math::BigInt in Math/Big.pm.
+
+ * Trim whitespace.
+
+ * Remove author information in LICENSE file.
+
+ * Update README file.
+
+ * Inform that the TODO file is not up to date.
+
+2016-04-26 v1.13 pjacklam
+
+ * Replace "use vars ..." with "our ...".
+
+ * Fix documentation error in Math::Big. (CPAN RT #60614)
+
+ * Add patch to speed up primes(). (CPAN RT #81986)
+
+ * Fix documentation error in Math::Big::Factors. (CPAN RT #100917)
+
+ * Use OO-style calls, e.g., Math::BigInt->bzero(), not Math::BigInt::bzero().
+   (CPAN RT #113959)
+
+ * Use "=pod" to start POD section.
+
+ * In the POD, replace "METHODS" header with "FUNCTIONS". OO-style calls are
+   not supported, so they are functions, not methods.
+
+ * In the POD, use "=item" for each function, not "=head2".
+
+ * Code reformatting.
+
+ * Remove trailing whitespace.
+
+ * Remove unnecessary "1;" at end of file.
+
+ * Add "use warnings" to all modules.
+
+ * In Makefile.PL, add "#!perl" to the top, as it gives nice syntax
+   highlighting in some editors.
+
+ * In Makefile.PL, update author information.
+
+ * In Makefile.PL, change required version of Math::BigInt to 1.82 (which
+   shipped with Math::BigFloat 1.54). This is the oldest version of
+   Math::BigInt (and Math::BigFloat) that work with this distribution.
+
+ * In Makefile.PL, change "build_requires 'Test::More' => 0.42" to
+   "test_requires 'Test::More' => 0.47". Test::More is only needed for testing,
+   not building, and version 0.47 is the required version.
+
+ * In Makefile.PL, change "require 5.6.2" to "require 5.006001". Math::BigInt
+   requires only Perl v5.6.1, not v5.6.2.
+
+ * Edit the "BUGS" file so it points to "rt.cpan.org".
+
+ * Edit the "NEW" file so it points to the "CHANGES" file.
+
+ * Remove stuff from POD that is covered in the more complete "CREDITS" file.
+
+ * Update the bundled version of Module::Install from v0.65 to v1.16.
+
+ * Add more entries to "MANIFEST.SKIP".
+
+2007-04-17 1.12 Tels 182 tests
+
+ * speed up fibonacci():
+   + by not making the argument a BigInt
+   + caching a few more numbers
+   + removing a few needless scalar computations
+
+ * fix bug in fibonacci() missing a few intermidiate results
+
+ * euler() just uses BigInt's fast bexp() method and is thus now MUHC faster
+
+ * require Math::BigInt v1.83 (and thus Perl v5.6.2)
+
+ * bundle and use Module::Install
+
+##############################################################################
+Older changelog for Math::Big:
+
+2001-03-17 1.00
+
+ * first version with primes(), fibonacci(), base()
+
+2001-03-24 1.01
+
+ * added: hailstone()
+
+2001-04-12 1.02
+
+ * added: factors(), wheel() fixed: primes() 2001-05-07 1.03
+
+ * added: factorial()
+
+2001-06-11 1.04
+
+ * added: euler, bernoulli, cos, tan, sin, cosh, sinh, arctan, arctanh, arcsin,
+   arcsinh
+
+ * moved: wheel, factor_wheel => Math::Big::Factorial
+
+2001-07-09 1.05
+
+ * version increase for CPAN release
+
+2002-27-03 1.07
+
+ * fixed testsuite to play nice with newest BigInt
+
+ * small doc fixes
+
+ * require v1.56, since v1.55 is broken on Windows
+
+2002-08-13 1.08
+
+ * pi() finally works (thanx to Robert Jaeger)
+
+ * require BigInt v1.61
+
+ * some more tests
+
+2003-12-11 1.09 Tels
+
+ * require Math::BigInt v1.67
+
+ * factorial() uses simple BigInt bfac() for speed
+
+2004-08-13 1.10 Tels 161 tests
+
+ * __END__ in Big.pm, remove shebang line
+
+ * removed needless return statements for more speed
+
+ * log() now simple calls BigFloat log for speed (it was unusable slow before)
+
+ * hailstone() is between two and three times faster
+
+ * pi() is slightly faster by caching two objects for '5' and '236'
+
+ * require Math::BigInt v1.72
+
+ * arctan(), tan(), sin(), cos() etc are now about 10% faster
+
+ * arcsin($x) were $x != 0 was broken
+
+2005-01-02 1.11 Tels 177 tests
+
+ * streamlined euler()
+
+ * @k = hailstone() is about 3..4 times faster
+
+ * $k = scalar hailstone() is about 6..7 times faster
+
+ * primes() is about 1.5 times faster
+
+ * fix documentation for primes() (Thanx Es Allen Smith!)
+
+ * add to_base($n, $base, [$alphabet]) (Thanx Tilghman Lesher!)
+
+##############################################################################
+Math::Big::Factors:
+
+2001-06-15 1.00
+
+ * first version from Math::Big
+
+2004-08-13 1.01
+
+ * cleanups, remove shebang line and needless return statements
+
+##############################################################################
+Math::BigInt::Constant and Math::Roman are now separate CPAN packages. Please
+see L<http://search.cpan.org/>.
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

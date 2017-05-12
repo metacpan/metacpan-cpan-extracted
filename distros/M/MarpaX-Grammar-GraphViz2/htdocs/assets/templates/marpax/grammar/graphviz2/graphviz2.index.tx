@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns = 'http://www.w3.org/1999/xhtml' xml:lang = 'en' lang = 'en'>
+<head>
+	<title>Index of sample files created by MarpaX::Grammar::GraphViz2 V <: $version :></title>
+	<meta http-equiv = 'content-type' content='text/html;charset=utf-8' />
+	<meta http-equiv = 'cache-control' content='no-cache'>
+	<meta http-equiv = 'pragma' content='no-cache'>
+	<link rel = 'stylesheet' type = 'text/css' href = '<: $default_css :>'>
+	<link rel = 'stylesheet' type = 'text/css' href = '<: $fancy_table_css :>'>
+</head>
+<body>
+	<a name = 'top'>
+	<h1 align = 'center'>Index of sample files created by <a href="http://metacpan.org/release/MarpaX-Grammar-GraphViz2">MarpaX::Grammar::GraphViz2</a> V <: $version :>.</h1>
+
+	<p align = 'center'>All scripts and input files required to generate these examples are shipped with the MarpaX::Grammar::GraphViz2 distro. Output files are shipped too.</p>
+
+	<p align = 'center'>Note 1: The SVG file for c.ast.bnf has been omitted from this demo page because of its size.<br>
+		It takes Graphviz's 'dot' program 6 m 25 s to generate (off-line), and is 1.4 Mb in size.<br>
+		These are not problems, only facts. The problem is the width of the image. So I skipped it.</p>
+
+	<p align = 'center'>Note 2: Some images have a tiny subgraph whose root is, e.g., 'comma'. This is due to the author using<br>
+		both 'comma' and '&lt;comma&gt;' as tokens within the grammar. So far this module does not handle that.</p>
+
+	<p align = 'center'>Note 3: A similar thing (as in Note 2) can happen elsewhere, e.g. with named event statements,
+		when the rhs name uses (say) '&lt;xyz&gt;' and the rule referred to uses just 'xyz'.<br>
+		In all such cases, there will be 2 nodes, with 2 names differing in just the brackets.</p>
+
+	<p align = 'center'>Note 4: Some characters are replaced by similar Unicode characters, because Graphviz teats those characters<br>
+		as special. These characters are: &lt;, &gt;, " and :. Indeed, the " char is replaced by 2 single quotes.</p>
+
+	<p align = 'center'>Note 5: The legend is experimental, and it's form may change at any time. It is displayed here on all<br>
+		images, but is of course optional.</p>
+
+	<p align = 'center'>Note 6: There is a problem displaying any grammar, when a token is used on the right-hand side of a rule<br>
+		both with and without a qualifier. An example is 'value' in these 2 rules in the json.1.bnf:</p>
+
+	<table align = 'center' border = '1'>
+		<tr><td>pair</td><td>::=</td><td>string ':' value</td><td>action => do_pair</td></tr>
+		<tr><td>elements</td><td>::=</td><td>value+</td><td>separator => comma action => do_list</td></tr>
+	</table>
+
+	<p align = 'center'>There is no way to display the text 'value' both with and without that '+' sign.</p>
+
+	<p align = 'center'>Note 7: Numbers on nodes are rule numbers within the input stream.</p>
+
+	<p align = 'center'>Table of Contents</p>
+
+<table align = 'center' border = '1'>
+:for $index -> $row {
+<tr>
+  <td><a href = './index.html#<: $row.bnf_name :>'>Input file # <: $row.count :> - <: $row.bnf_name :></a></td>
+</tr>
+:}
+</table>
+
+	<p align = 'center'>Due to its width, the SVG file for the c.ast.bnf case is not in this table,
+		but can be <a href = './c.ast.svg'>viewed here.</a></p>
+
+<table border = '1'>
+:for $data -> $row {
+<tr>
+  <td><a name = '<: $row.bnf_name :>'></a>Input file # <: $row.count :> - <: $row.bnf_name :></td>
+  <td><object data = '<: $row.image :>'></object><br />Output file # <: $row.count :> - <: $row.image_name :>. <a href = '#top'>Top</a></td>
+</tr>
+:}
+</table>
+
+<hr />
+
+<h3 class = 'global_toc_text'>Links</h3>
+
+<h2 align = 'center'>Index page for <a href = 'http://savage.net.au/Graphviz.html'>all graph module demos</a></h2>
+
+<hr />
+
+<h3 class = 'global_toc_text'>Environment</h3>
+
+: include 'fancy.table.tx' { data => $environment };
+
+<hr />
+
+</body>
+</html>

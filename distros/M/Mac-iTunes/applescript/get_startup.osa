@@ -1,0 +1,3 @@
+(* $Id$ *)
+
+return path to startup disk as string

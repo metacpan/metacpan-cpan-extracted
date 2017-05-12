@@ -1,0 +1,25 @@
+MooseX-RoleQR
+=============
+
+Created:      2012-10-17
+Home page:    <https://metacpan.org/release/MooseX-RoleQR>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-RoleQR>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.004	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.003	2012-10-19	changelog redacted
+
+0.002	2012-10-18
+
+ [ Bug Fixes ]
+ - Play nicely with other composite role metaclass traits.
+
+ [ Packaging ]
+ - Add missing dep on thanks.pm.
+ - Bundle an 'examples' dir.
+
+0.001	2012-10-18	Initial release

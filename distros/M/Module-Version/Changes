@@ -1,0 +1,49 @@
+Revision history for Module-Version
+
+0.12    29.06.10
+        * Missed another one :(
+
+0.11    29.06.10
+        * Fixing some more documentation I missed.
+
+0.10    28.06.10
+        * Adding -I option, GH #1.
+        * Using cleanup regex for dev versions instead of eval.
+          (otherwise, versions like 0.10 don't work)
+        * Fixing some documentations to refer to new CLI app name.
+
+0.09    20.06.10
+        * CLI app now called "mversion" instead of "module-version".
+        * Using autodie, it's fun!
+        * 100% testing coverage! (I was bored...)
+
+0.08    25.05.10
+        * Improving documentation of module-version program.
+
+0.07    25.05.10
+        * Documenting module-version program.
+
+0.06    24.05.10
+        * Adding --dev (RT #57795):
+          (using --dev you get 0.01_01 on dev instead of 0.0101)
+
+0.05    23.04.10
+        * Using high minimum version of ExtUtils::MakeMaker to avoid test
+          errors.
+
+0.04    21.04.10
+        * Switched to use ExtUtils::MakeMaker instead of evaling.
+        (it's now _way_ faster than before)
+
+0.03    10.04.10
+        * Docs fix.
+        * Better test coverage.
+
+0.02    10.04.10
+        * Bumping version for test script.
+        * Adding Module::Version::App.
+        * Adding module-version script.
+
+0.01    10.04.10
+        First version, released on an unsuspecting world.
+

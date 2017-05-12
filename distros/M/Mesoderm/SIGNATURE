@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 bf3f15431296e756adabef99d0b606039d8ef41c Changes
+SHA1 2bf572da781c106f615754e11dd1523480f4a25b LICENSE
+SHA1 400184b660dfe44acfe5497f1d79290a73e4da83 MANIFEST
+SHA1 42b58a47f05316352861585d6a4fb629d55fbd47 META.json
+SHA1 4119160a2562e17115dcfd5b823e77cf6a62d0ef META.yml
+SHA1 83a6f94e980240f2bf454ec5d1b0fcb98c303584 Makefile.PL
+SHA1 47696d3a8d5d37186a42b6eb857749660e6e4ee9 README.md
+SHA1 2f957afaa86feaed371efd196b4f89a836a67b73 bin/mesoderm
+SHA1 4cd54f769fd6db5e90f3114119d5238773edd497 dist.ini
+SHA1 ed77344353cc9c80ab72e3d17bafc81ebec55222 lib/Mesoderm.pm
+SHA1 ffe8585d6dfd0e7f4fdc9fa4e801b87f5b2b4c72 lib/Mesoderm/Command.pm
+SHA1 dc35693d47d49305e15e9040ea0cbf7b05d7d4ea lib/Mesoderm/Component.pm
+SHA1 55562c26b01bea5ad6f9bbde3578e27dc3d8ab33 lib/Mesoderm/Mapping.pm
+SHA1 dab0669c3226052a0dda034fe2a77d2f6dc1c9b5 lib/Mesoderm/Relationship.pm
+SHA1 85630ed0a3557e8225527d7e86e374084b43844c t/tests.t
+SHA1 4625d336e4125e86d95ae00b098f8db8cd51b8cb t/tests/belongs_to.out
+SHA1 2d2c3ba2444fd8f8ce220bcfc567109c7ff172f3 t/tests/belongs_to.sql
+SHA1 3e6a67b130c1b413ef24fc41a0008f899abb95a8 t/tests/index_prefix.out
+SHA1 593f8c8ab8299b0fa7ddce5cd96cb0fcfffb2ba3 t/tests/index_prefix.sql
+SHA1 fa829bb4f16545ffdfcbc98caadb32a362289488 t/tests/might_have.out
+SHA1 064a27fab5e336d512d250fb515649c2c6a53ff8 t/tests/might_have.sql
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (Darwin)
+
+iQIcBAEBAgAGBQJTKhJVAAoJEF0awSLzqjNN2KgP/jYRh5RWiyOC0e+yIC93JEIs
+pd7+8IsUa8j9P2SjHb12pCkHRefXc0o6TFtbiXikZMs6K4+8sYjEFoB6pNmcxvGZ
+S4FMVgCme6b3JtSirPJWlq16oAWod1bg8lyuoI66s9PiDskaSRKoFVJn3pUrHMj5
+TZoSXW2IKFPgl31LU7V5JufhwubrPP/PzZPpvrdAnEln5+o/XARzJ4EuFuue0V+X
+eRed6+38WeTrSd4m7qveV6fWW68Qqp0yrjhIddv7URYOIo35i+JtKWCwx7gkw5US
+bgrooLxndqdf56psLVOIMI1TX1X5OMyUrua5HJ7tD33ynHI/rdtgQBX8j/wqNWch
+2Ysn4gfLqnXRBa5WZp/LKNArzNEjEUZb5dOkJKmbghdb4d9V3V9adLUWFTJppE74
+aNsjqO77n84w2erSUOQ5xOPcGa4HgZnjZQ4E7x9o+HZptkR5n11wbJ4iS6bFP4Am
+H6b+dyIybXm/8EFv6Us+K4H8mUzOTLXhpNseVABjpbRWHU1W5+3wvyAM0wSoNvXM
+t+uwV3zS94McbVSi1ny8Dd9xNuCLPnqyR2ZwhA8cClixtd8brgtfi304Supzbp/x
+Cnvejepcd43QApjpi1bWqILlORccXtbw2yQTcXRFSPWzxpZy1hFroHHv744TMVWI
+/UrZpgbeFuxAkI6szEsY
+=zK6Z
+-----END PGP SIGNATURE-----

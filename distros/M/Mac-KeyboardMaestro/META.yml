@@ -1,0 +1,33 @@
+---
+abstract: 'Run Keyboard Maestro macros'
+author:
+  - 'Written by Mark Fowler <mark@twoshortplanks.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mac-KeyboardMaestro
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Mac::AppleScript: 0.04
+  Test::More: 0
+  perl: 5.6.0
+resources:
+  homepage: https://github.com/2shortplanks/Mac-KeyboardMaestro/tree
+  license: http://dev.perl.org/licenses/
+  repository:
+    type: git
+    url: git://github.com/2shortplanks/Mac-KeyboardMaestro.git
+    web: https://github.com/2shortplanks/Mac-KeyboardMaestro/tree
+version: 1.01

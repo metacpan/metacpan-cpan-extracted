@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b69663c69fd46547a5b3c3395f8f586d9bfe7002 COPYRIGHT
+SHA1 0642b16733116d6101cd82bfdb9dd54247ef8c66 CREDITS
+SHA1 0792e25eb96e639d8227de85694534f99e0b1a91 Changes
+SHA1 9a930f0a7cd2cc48e82f39a6cf4054bfcb1bb63e INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 ba8f170896f52e915eb9495b24389c4ff0e274bf MANIFEST
+SHA1 f2981c55c59073f6daae7f39ba4c2202b021942e META.json
+SHA1 2eb557702e0cd2d6da41533496e211df5d296353 META.yml
+SHA1 905d0e3db8e2cf2c121a85b4cacd35608f39c087 Makefile.PL
+SHA1 5b1e26db525c6d55e87f805bdea14e6fb599579e README
+SHA1 e81357bfbb51ed84ea6ab2b0417f1425d5fa5323 dist.ini
+SHA1 3bd3bd452f56785c7874204aa594d647b1a1c755 doap.ttl
+SHA1 22210e2dee46a0825cce213e5586a2b4d3fa6bc6 examples/binomial_name.pl
+SHA1 7f9dfb385c9c80a75505491cfe16b0f910ff283d examples/hooks/track-consumers.pl
+SHA1 7c67c4f2ace1f7ed3659defedc6198ad0de0bf33 lib/Method/Generate/ClassAccessor.pm
+SHA1 b10bc14dbf7c1c873301b27fc0d10faede8be570 lib/MooX/CaptainHook.pm
+SHA1 656a370c7f31cd90a133af93e35846b97ca2830c lib/MooX/ClassAttribute.pm
+SHA1 c90297819a100a600f4397d929b5b790747c94cd lib/MooX/ClassAttribute/HandleMoose.pm
+SHA1 1066638f41ba247cdce1ea366d05dade40b5e5a2 t/01basic.t
+SHA1 6c43a212ad779996adb712592aa84d88389ed312 t/02class.t
+SHA1 a253b748e0c941f43a63773dfc620362ad6d5d8d t/03role.t
+SHA1 23b731db9fd31c079253b4d9005d7f1b7f4870a5 t/10class_moose.t
+SHA1 b61b4f6919fa529428c1e751cda504c5213e201e t/11role_moose.t
+SHA1 dd28a2955a62793937b1857208fc8b1687aee9b0 t/20hook_appl.t
+SHA1 13fae4e8b6ae89d9cd5701b32ca3187f05186d2a t/21hook_appl_moose.t
+SHA1 19573e5221b2ba759f2a5ef16af61feb705564fc t/22hook_infl.t
+SHA1 3045d4de7715e54521fd1945ad3d4c5f83f5bfe7 t/23hook_infl_noop.t
+SHA1 ce1c70022cba965ae444af6e98c0f1f3a362a17b t/24hook_infl_backwards.t
+SHA1 4eba72cd796a5c8c866549201b8abd4114a69736 t/30mgca.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlRVBFUACgkQzr+BKGoqfTnCmwCdFWCo/WxeJGsglJDwR3UowMSh
+1/IAn0dgwGVtD3ls/dQGrbTcMtf/lsYb
+=l0dj
+-----END PGP SIGNATURE-----

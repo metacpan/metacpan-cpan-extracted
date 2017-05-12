@@ -1,0 +1,12 @@
+  [
+    {
+      "type" : "select",
+      "name" : "language",
+      "data" : [
+        "cn",
+        "de",
+        "en"
+      ],
+      "disabled" : "en"
+    }
+  ]

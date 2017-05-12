@@ -1,0 +1,41 @@
+Revision history for Perl module Math::Decimal128
+0.08
+    - Remove occurrences of 'aTHX' that had been auto-implanted in some error messages
+    - Replace SvIV/SvUV/SvNV with SvIVX/SvUVX/SvNVX where appropriate.
+    - Amend _atodecimal() to correctly handle the case where the string begins with '-+'
+    - In Decimal128, following the _Decimal128 typedef, replace all occurrences of
+      "_Decimal128" with "D128".
+    - Fix alignment issue on nvtype=double -DDEBUGGING perls
+
+0.07
+    - Fix overloading of comparison operators when operands are reversed.
+
+0.06
+    - Add $Math::Decimal128::NNW (set to 0). If this variable is set to 1,
+      then non-numeric warnings will be given whenever a string containing
+      any non-numeric characters is given to Math::Decimal128::_atodecimal().
+    - Remove looks_like_number() from _atodecimal.
+    - Rename nnumflagl, set_nnuml, clear_nnuml to nnumflag, set_nnum and
+      clear_nnum and no longer export them.
+
+0.05
+    - Workarounds in _atodecimal() and assignPVl.t to cater for broken
+      compiler/libc handling of signed zero _Decimal128 values.
+
+0.04
+    - Add PV overloading.
+    - Add assignD128().
+    - Rewrite assignPVl in XS. (Now uses _atodecimal XSub.)
+    - Rewrite PVtoD128. (Now uses _atodecimal XSub.)
+
+0.03
+    - Fix bug in overload_sub by adding overload_neg.
+    - No longer allow new() to assign an NV. (NVtoD128 must now be used instead.)
+    - Add assignIVl(), assignUVl() and assignNVl().
+    - Add D128toFSTR() and D128toRSTR()
+
+0.02
+    - Add DPDtoD128() and d128_bytes()
+
+0.01
+    - First release

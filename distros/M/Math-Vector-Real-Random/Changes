@@ -1,0 +1,14 @@
+Revision history for Perl extension Math::Vector::Real::Random.
+
+0.03  Aug 24, 2013
+        - fix random_in_sphere method which was ignoring the radio
+          parameter (bug report by Demian Riccardi)
+
+0.02  Jun 30, 2011
+        - honor $scale in 2D random_versor generator
+	- add Math::Random as a dependency
+
+0.01  Thu Jun  9 11:52:51 2011
+	- original version; created by h2xs 1.23 with options
+		-An Math::Vector::Real::Random
+

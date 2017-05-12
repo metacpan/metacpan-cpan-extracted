@@ -1,0 +1,19 @@
+#!/usr/bin/perl -w
+
+# Example 1: Solve  y'' + 2y' + y = 0, y(0) = 0, y'(0) = 1
+#            Solution: y = x*exp(-x)
+
+use Math::ODE;
+
+my $o = new Math::ODE ( file => 'data',
+			step => 0.1,
+			initial => [0,1], 
+			ODE => [ \&DE1, \&DE2 ], 
+			t0 => 0,
+			tf => 10 );
+$o->evolve;
+system("gnuplot -persist gnuplot.2");
+
+# y'' + 2y' + y = 0
+sub DE1 { my ($t,$y) = @_; return $y->[1]; }
+sub DE2 { my ($t,$y) = @_; return -2 * $y->[1] - $y->[0]; }

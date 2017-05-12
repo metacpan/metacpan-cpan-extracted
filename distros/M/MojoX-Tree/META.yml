@@ -1,0 +1,29 @@
+---
+abstract: "Mojolicious â\x99¥ Tree"
+author:
+  - 'Kostya Ten <kostya@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MojoX-Tree
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  MojoX::Mysql: '0.12'
+  Mojolicious: '6.10'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/MojoX/MojoX-Tree/issues
+  license: http://opensource.org/licenses/Apache-2.0
+  repository: https://github.com/MojoX/MojoX-Tree
+version: '0.06'

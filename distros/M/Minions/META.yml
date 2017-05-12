@@ -1,0 +1,50 @@
+---
+abstract: 'Simplifies the creation of loosely coupled object oriented code.'
+author:
+  - 'Arun Prasaad <arunbear@cpan.org>'
+build_requires:
+  Test::Lib: '0.002'
+  Test::Most: '0.34'
+  Test::Output: '1.03'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.141520'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Minions
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Minions:
+    file: lib/Minions.pm
+    version: '1.000000'
+  Minions::Implementation:
+    file: lib/Minions/Implementation.pm
+  Minions::Role:
+    file: lib/Minions/Role.pm
+requires:
+  Exception::Class: '1.38'
+  List::MoreUtils: '0.33'
+  Package::Stash: '0.36'
+  Params::Validate: '1.10'
+  Readonly: '2.00'
+  Sub::Name: '0.09'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/arunbear/Minions/issues
+  homepage: https://github.com/arunbear/Minions
+  repository: git://github.com/arunbear/Minions.git
+version: '1.000000'
+x_contributors:
+  - 'Arun Prasaad <arunbear@gmail.com>'

@@ -1,0 +1,64 @@
+NAME
+    MP3::ID3Lib - ID3v1/ID3v2 Tagging of MP3 files
+
+SYNOPSIS
+      use MP3::ID3Lib;
+      my $id3 = MP3::ID3Lib->new($filename);
+
+      foreach my $frame (@{$id3->frames}) {
+        my $code = $frame->code;
+        my $description = $frame->description;
+        my $value = $frame->value;
+        $frame->set("Orange") if $code eq 'TPE1';
+        print "$description: $value\n";
+      }
+
+      $id3->add_frame("TIT2", "Title goes here");
+      $id3->commit;
+
+DESCRIPTION
+    This module allows you to edit and add ID3 tags in MP3 files.
+
+    ID3 tags are small pieces of information stored inside the MP3 file.
+    They can contain bits of metadata about the MP3, such as album name,
+    song name, artist, original artist, genre, composer, year of release,
+    additional comment fields, and many more.
+
+    This module is an interface to the high-quality id3lib library available
+    from http://id3lib.sourceforge.net/, which must be installed. At the
+    moment, it is a bit of a low-level interface and some knowledge of ID3v2
+    is useful. You should know about tag names and tag usage. The best
+    website for this is http://www.id3.org/.
+
+    However, to get started, a few frame names you may find useful are:
+
+    * TIT2: Title/songname/content description
+    * TPE1: Lead performer(s)/Soloist(s) (artist)
+    * TALB: Album/Movie/Show title
+    * TRCK: Track number/Position in set
+    * TYER: Year
+    * TCON: Content type ('genre')
+    * COMM: Comments
+
+    Please note that id3v1 has length restrictions on these fields.
+
+BUGS
+    The API could be better and there are a couple of small memory leaks.
+
+    This module currently only returns the first 100 ASCII characters of a
+    text tag.
+
+    This module is currently unable to read or write ID3 v2.4.0 tags.
+
+THANKS
+    Thanks go to Chris Nandor for letting me use his test MP3s and to Paul
+    Mison for the idea.
+
+AUTHOR
+    Leon Brocard, leon@astray.com
+
+COPYRIGHT
+    Copyright (c) 2002 Leon Brocard. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+

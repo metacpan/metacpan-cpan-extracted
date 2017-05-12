@@ -1,0 +1,37 @@
+Mojo-IRC-Server-Chinese v1.8.1
+========================
+使用Perl语言编写的IRC服务端，基于Mojolicious的异步事件驱动，支持中文昵称和频道名称
+
+运行效果
+[15/08/29 15:56:17] [debug] C[127.0.0.1:40918] 已连接
+[15/08/29 15:56:17] [debug] C[127.0.0.1:40918] NICK root
+[15/08/29 15:56:17] [info] [127.0.0.1:40918] 设置昵称为 [root]
+[15/08/29 15:56:17] [debug] C[127.0.0.1:40918] USER root 0 * :root
+[15/08/29 15:56:17] [debug] S[127.0.0.1:40918] :chinese-irc-server 001 root :欢迎
+[15/08/29 15:56:30] [debug] C[127.0.0.1:40918] NICK 测试
+[15/08/29 15:56:30] [debug] S[127.0.0.1:40918] :root!root@127.0.0.1 NICK :测试
+[15/08/29 15:56:30] [info] [root] 修改昵称为 [测试]
+[15/08/29 15:56:40] [debug] C[127.0.0.1:40918] JOIN #中国人
+[15/08/29 15:56:40] [debug] S[127.0.0.1:40918] :测试!root@127.0.0.1 JOIN :#中国人
+[15/08/29 15:56:40] [info] [测试] 加入频道 #中国人
+[15/08/29 15:56:42] [debug] C[127.0.0.1:40918] MODE #中国人
+[15/08/29 15:56:42] [debug] S[127.0.0.1:40918] :chinese-irc-server 324 测试 #中国人 :+
+[15/08/29 15:56:52] [debug] C[127.0.0.1:40918] PRIVMSG #中国人 :中国人当然要用中文IRC！
+[15/08/29 15:56:52] [info] [测试] 在频道 #中国人 说: 中国人当然要用中文IRC！
+
+安装步骤
+
+   $ cpan -i App::cpanminus               #安装cpanm工具
+   $ cpanm -v Mojo::IRC::Server::Chinese  #使用cpanm工具自带的cpanm命令来在线安装模块
+
+版本更新记录
+
+  请参见 Changes 文件
+
+COPYRIGHT 和 LICENCE
+
+Copyright (C) 2014 by sjdy521
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.

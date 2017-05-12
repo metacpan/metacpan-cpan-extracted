@@ -1,0 +1,34 @@
+---
+abstract: 'ALPHA QUALITY PSGI adaptor for Message::Passing'
+author:
+  - 'Tomas Doran (t0m) C<< <bobtfish@bobtfish.net> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: agpl_3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Message::Passing::PSGI
+name: Message-Passing-PSGI
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  AnyEvent: 0
+  JSON: 2.00
+  Message::Passing: 0.007
+  Message::Passing::ZeroMQ: 0.005
+  Moose: 0
+  Plack: 0
+  Try::Tiny: 0
+  namespace::autoclean: 0
+resources:
+  repository: git://github.com/suretec/Message-Passing-PSGI.git
+version: 0.001
+x_authority: GHENRY

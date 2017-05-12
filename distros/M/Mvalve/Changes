@@ -1,0 +1,69 @@
+Changes
+=======
+
+0.00014 - 08 Sep 2008
+  - Recent versions of Moose (properly) unimport blessed() and confess(), 
+    which breaks my code depending on it.
+  - Recent versions of MooseX::ClassAttribute (properly) makes class
+    attributes /not/ able to be required, which breaks my code depending on it.
+
+0.00013 - 29 Aug 2008
+  - Add missing requirements to Makefile.PL
+
+0.00012 - 27 Aug 2008
+  - Forgot to add a few modules to MANIFEST. Repackaging.
+
+0.00011 - 27 Aug 2008
+  - When emergency messages are sent, messages on other queues are DROPPED.
+    the 'X-Mvalve-Duration' header is used to determine the amount of time
+    to drop messages for (33rpm)
+  - Properly handle fill() (33rpm)
+  - Add logging for throttling (daisuke)
+  - Fix "mvalve create" table name, also create statslog
+
+0.00010 - 16 Jul 2008
+  - Correct how timed queue works (hopefully)
+  - Add a simple mvalve command. Currently just creates the required queues.
+    (more to come later)
+
+0.00009 - 15 Jul 2008
+  - Refactor common stuff to Mvalve::Base
+  - Fix how timed queue works
+  - Protect calls by using MooseX::KeyedMutex
+
+0.00008 - 15 Jul 2008
+  - Split Mvalve into Mvalve::Reader and Mvalve::Writer
+
+0.00007 - 14 Jul 2008
+  - Change the nested constructor specification. Everything now must
+    be eplicitly stated as { module => "...", args => { } }
+  - Slightly refactor the coersion/default methods
+  - Fix t/00_compile.t to actually skip the test if Test::Compile
+    was not found in the system
+
+0.00006 - 09 Jul 2008
+  - q_retry is no longer needed, and hence q_retry_wait
+    q_timed is used now.
+  - next_retry() insert_retry() are no longer needed.
+  - Fix tests
+  - Require new Queue::Q4M for speed
+
+0.00005 - 07 Jul 2008
+  - Fix up things so the tests pass
+  - Update bunch of tests
+
+0.00004 - 25 Jun 2008
+  - Complete refactor
+  - Never released
+
+0.00003 - 22 May 2008
+  - Use retry queue to queue back throttled messages
+  - Never released
+
+0.00002 - 05 May 2008
+  - Updated to work with hipri queues
+  - Never released
+
+0.00001 - 01 May 2008
+  - First commit
+  - Never released

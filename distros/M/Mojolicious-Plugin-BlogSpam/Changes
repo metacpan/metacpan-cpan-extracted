@@ -1,0 +1,36 @@
+0.09 2015-04-23
+        - Update to recent versions of Mojolicious.
+
+0.08 2014-06-02
+        - Update year.
+        - Coherent license.
+
+0.07 2013-05-20
+        - Update year.
+	- Documentation tweaks.
+	- Fix non-blocking bug.
+	- Check for Mojolicious 4.0 compatibility.
+
+0.06 2013-01-31
+        - Small improvements of the documentation.
+        - Small improvements of the code.
+
+0.05 2012-11-28
+        - Major bugfix for response string checking.
+        - Small improvements of the documentation.
+        - Small improvements of the code.
+
+0.04 2012-11-04
+        - Small improvements of the documentation.
+	- Minor bugfixes for return values.
+
+0.03 2012-11-03
+        - Initial submission to CPAN.
+        - Now all methods are blocking as well as non-blocking.
+
+0.02 2012-10-28
+        - Allow for defining options on registering.
+	- Allow for defining register parameters in Config file.
+
+0.01 2012-10-25
+        - Initial submission to GitHub.

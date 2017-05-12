@@ -1,0 +1,27 @@
+Revision history for Module-Build-IkiWiki
+
+- 0.0.6 lun abr  7 11:33:15 CEST 2008
+    * Fixed minor bugs.
+    * Add a little script that convert POD sources into Markdown sources.
+    * Add a Perl::Critic configuration file.
+
+- 0.0.5 mar abr  1 08:42:01 CEST 2008
+    * Add new action 'fakeinstall' to the package.
+    * Changes to access a Module::Build's private member properties.
+    * Use only the basename of the ikiwiki sources for installation. 
+    * New tiny test for create new objects. 
+
+- 0.0.4 lun mar 31 19:11:44 CEST 2008
+    * Minor changes in the debian/control file.
+
+- 0.0.3 mon mar 31 14:34:47 CEST 2008
+    * Added debian packaging files.
+    * Minor corrections in the documentation.
+
+- 0.0.2 lun mar 31 12:16:52 CEST 2008
+    * Minor fixes in the test scripts.
+
+- 0.0.1  Mon Mar 31 08:32:49 2008
+    * Initial release.
+
+

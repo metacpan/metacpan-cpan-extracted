@@ -1,0 +1,78 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2dfe96f459fbb08e492df188e88751b74334eddf Changes
+SHA1 79e60268799d60057c9aa5d4f63d3fb8f2012967 MANIFEST
+SHA1 04822f168c3f635c044912791ae9e47028064385 META.yml
+SHA1 dad26f85fefe0245522fd45aaa35176c8c9ce4a1 Makefile
+SHA1 e4123816d137d52794407255b920dc710ebe4884 Makefile.PL
+SHA1 788d281f339c7fa838a9d9e3a8cc75d551eef173 TODO
+SHA1 78edb89a439463e44c33a72bbee84c54d0dc8aaf inc/Module/Install.pm
+SHA1 8ea4e37df83fd0c1c050be5c8da75545c3828d9b inc/Module/Install/Base.pm
+SHA1 1da6031583c32f0d1ec073b8376102fc51427dcc inc/Module/Install/Can.pm
+SHA1 b779375b90c16af2f31f38a1dd2b5df223c7f2fb inc/Module/Install/Fetch.pm
+SHA1 2054450e1e9c1dd8056362bf4a64ae70d5d71476 inc/Module/Install/Makefile.pm
+SHA1 5d6189b2cad15cf9932a28faafd55130c8247e83 inc/Module/Install/Metadata.pm
+SHA1 8015c2aceacb9b793e8a472036f93d0bac67c0db inc/Module/Install/Scripts.pm
+SHA1 02af973fae2ac3531fa6b704574b2b8cb2a08148 inc/Module/Install/Win32.pm
+SHA1 3a2eab96e91cca8d99938cda7791759ae9d97b3a inc/Module/Install/WriteAll.pm
+SHA1 f6b5190e7c892adfc7a72b730e557dac75b47d52 lib/Mail/Summary/Tools.pm
+SHA1 e3c057741f72fbc03d6c30c8406627ad0869bd13 lib/Mail/Summary/Tools/ArchiveLink.pm
+SHA1 0437b85f621ff8daf92b19c9ed32ea3d60c15cf5 lib/Mail/Summary/Tools/ArchiveLink/Base.pm
+SHA1 f3d4d5a043e1737412dd6356c528fdde01e26fb2 lib/Mail/Summary/Tools/ArchiveLink/Easy.pm
+SHA1 7f482a10170a89975580590db5d0b51ba997a153 lib/Mail/Summary/Tools/ArchiveLink/Gmane.pm
+SHA1 9d8c44be0c14f24ff8ae5c42f5d2470bf36de2f7 lib/Mail/Summary/Tools/ArchiveLink/GoogleGroups.pm
+SHA1 5fc33d8c5b101f4542f3f823b9b76086dcf701fa lib/Mail/Summary/Tools/ArchiveLink/Hardcoded.pm
+SHA1 307934730fdafd934d1919c008062709cf8efad6 lib/Mail/Summary/Tools/CLI.pm
+SHA1 3b424538cb0a18a4a8860d971ac8306fab00b1f8 lib/Mail/Summary/Tools/CLI/Command.pm
+SHA1 22fe764d385662bcf67462d5d21199f5bc752196 lib/Mail/Summary/Tools/CLI/Config.pm
+SHA1 2e5526c662cddc4ef9a6cefcda0c936c9d697a00 lib/Mail/Summary/Tools/CLI/Context.pm
+SHA1 e63c413070b3eb1c629900084369189e6f55b823 lib/Mail/Summary/Tools/CLI/Create.pm
+SHA1 93803047fc8355d46cc781415abaf8a47f30cf79 lib/Mail/Summary/Tools/CLI/Download.pm
+SHA1 dc518ac24d12b587662804e27cbfffa768af4810 lib/Mail/Summary/Tools/CLI/Download/nntp.pm
+SHA1 77d9be631df0feba04df2f3e7b98c45db246c2a0 lib/Mail/Summary/Tools/CLI/Edit.pm
+SHA1 8b74c6dc6345d16bbaaaeae6d19fad56d50a9f43 lib/Mail/Summary/Tools/CLI/ToHTML.pm
+SHA1 4aab84cdc7a4709e1d6a82463bce24e9b9f9f81a lib/Mail/Summary/Tools/CLI/ToText.pm
+SHA1 ab23adedad40643d945e27a08172ac53ea198144 lib/Mail/Summary/Tools/Downloader/NNTP.pm
+SHA1 2b6ec74078a9a492ab6c71bfb6ea932e7c94fa0d lib/Mail/Summary/Tools/FlatFile.pm
+SHA1 65292b5ebe8f2f5d3d20dbdd02a6a88270ea86de lib/Mail/Summary/Tools/Output/HTML.pm
+SHA1 dad9d0274e0fb3a9d95e8b91d6f1b683958de156 lib/Mail/Summary/Tools/Output/TT.pm
+SHA1 aaa2cda0e925ab52691123d3f11cc697f817c9e3 lib/Mail/Summary/Tools/Summary.pm
+SHA1 d5de417237dd8b6f219fe488923ef87443fd6b0b lib/Mail/Summary/Tools/Summary/List.pm
+SHA1 76d5bfd1e49edc27cb2137352ce7c05315c8c67f lib/Mail/Summary/Tools/Summary/Thread.pm
+SHA1 d28ec88140c27fad1a9af8d75eb4983666f825dd lib/Mail/Summary/Tools/ThreadFilter.pm
+SHA1 9c5de85af7a17cdc671fe3f4d7611968adcfc3cd lib/Mail/Summary/Tools/ThreadFilter/Util.pm
+SHA1 c6d20cf5a5a25fa0a8bf80c17652c5bdcc1b3f66 lib/Mail/Summary/Tools/YAMLCache.pm
+SHA1 4c06c298396d44767c0404e70d12178479b0dca6 script/mailsum
+SHA1 5dade8e54841123b1a7658aae5ecfa2a8cd749a5 t/001_use.t
+SHA1 ce63a5ea81175228900978af2640e9e4eb00a524 t/011_archive_links_gmane.t
+SHA1 ed435c4a422974b07527ae33bf84c371a2edfdc0 t/012_archive_links_google.t
+SHA1 425d3411c206b334dffd923cef3817d0954daa95 t/022_thread_filter.t
+SHA1 7b8708937d12fba7b0637618c970fb59a20c13aa t/030_summary.t
+SHA1 84d879899d35c02fa523565714d15fbeea62757a t/031_summary_load.t
+SHA1 5666ad3f1d57b29b8b5fb1e471eba4ddd0861ed3 t/040_yamlcache.t
+SHA1 04ed46c4034a4496a8a883eb056e00271f88e75d t/041_flatfile_save.t
+SHA1 01a9cc752c124b441f65002a9c57d8837794a0b0 t/042_flatfile_load.t
+SHA1 1206d874e9e4cea17a81bb60e13627e42d66e9c7 t/050_output_tt.t
+SHA1 97c2504e53a57e4736504f66254951d1201b9854 t/060_thread_merge.t
+SHA1 d625385baa3ae6e01471f4abdb8ea97ea17549bb t/data/summary.yaml
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFG5CgQVCwRwOvSdBgRAt7kAKC1yH6NcgwBX8SaNQjBhKPFGrwB1ACgtp32
+iAWFrgIAjRWkxStvfxhiOh8=
+=JB7g
+-----END PGP SIGNATURE-----

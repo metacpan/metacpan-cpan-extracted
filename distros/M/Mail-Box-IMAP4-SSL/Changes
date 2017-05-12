@@ -1,0 +1,20 @@
+Revision history for Perl module Mail::Box::IMAP4::SSL
+
+0.03      2013-12-31 12:02:34 America/New_York
+
+    - reports folder type as 'imaps'
+
+    - added documentation for registering type with Mail::Box::Manager
+    
+    - added minimum perl version to Makefile.PL
+
+    - updated distribution metadata and updated distribution management
+      files to Dist::Zilla
+    
+0.02 Thu Dec 13 07:27:28 EST 2007
+
+    - cleaned up error handling code
+
+0.01 Wed Dec 12 08:43:36 EST 2007
+
+    - initial public release

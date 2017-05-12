@@ -1,0 +1,16 @@
+---
+sudo: false
+language: perl
+perl:
+  - '5.20'
+  - '5.10'
+branches:
+  only:
+    - master
+env:
+  global:
+    - AUTHOR_TESTING=0
+before_install:
+  - cpanm -n Devel::Cover
+script:
+  perl Build.PL && ./Build && ./Build testcover

@@ -1,0 +1,193 @@
+0.29     2016-05-29
+
+- Fix test prereqs on MooseX::AttributeHelpers and MooseX::Role::Strict.
+
+
+0.28     2016-05-16
+
+- Repository migrated to the github moose organization. (Karen Etheridge)
+
+- Removed dependency on List::MoreUtils. (Karen Etheridge)
+
+
+0.27   2013-03-28
+
+- The latest Moose release (2.08) broke this module. This release fixes
+  MooseX::ClassAttribute to work with both new and old Mooses. Reported by
+  Jonathan Stowe. RT #84263.
+
+
+0.26   2011-06-06
+
+- The default() method for class attributes always returned a value, even if
+  the default was a subroutine ref, which isn't how the method works for
+  regular attributes. This broke inlining with Moose HEAD.
+
+
+0.25   2011-06-05
+
+- Class attributes now have a definition context set, which means that errors
+  thrown from generated methods associated with these attributes say something
+  like "X at accessor MyClass::ClassAttribute (defined at path/to/file line
+  42)" rather than "generated method (unknown origin)".
+
+
+0.24   2011-02-22
+
+- This release provides forward compatibility with Moose 1.99+. It will still
+  work with Moose 1.23 as well. Partially based on work originally done by
+  Moritz Onken.
+
+
+0.23   2011-02-13
+
+- Fixed a bug where applying a role with class attributes didn't record the
+  role as actually being applied in the meta class (or role) to which it was
+  applied. Reported by Karen Etheridge. RT #59610.
+
+- Applying multiple roles to a class lost all class attributes from those
+  roles. Fixed by Andrew Rodland. RT #59572.
+
+
+0.22   2011-02-02
+
+- Explicitly require namespace::clean 0.20 to avoid some bad interactions
+  between namespace::clean and Package::Stash.
+
+
+0.21   2010-10-29
+
+- Switch from Test::Exception to Test::Fatal.
+
+
+0.20   2010-10-07
+
+- A test file tried to load MooseX::Role::Parameterized, which was not listed
+  as a dep. Reported by Andreas Koenig. RT #61957.
+
+
+0.19   2010-10-06
+
+- Removed references to MooseX::ClassAttribute::Meta::Method::Accessor, which
+  was removed in 0.18. This caused lots of test failures if you hadn't
+  installed a previous version of this distribution.
+
+
+0.18   2010-10-05
+
+- Changes to work with (and require) Moose 1.15.
+
+
+0.17   2010-09-26
+
+- Changes to work with (and require) Moose 1.09.
+
+
+0.16   2010-07-15
+
+- More warnings fixes for next Moose release.
+
+- Fix bad repo metadata.
+
+
+0.15   2010-07-14
+
+- Fix bad uri for bugtracker in metadata
+
+
+0.14   2010-07-14
+
+- Use modern Moose APIs, to avoid warnings with the next Moose release.
+
+
+0.13   2010-02-11
+
+- Fixed tests that failed if you had an older version of
+  MooseX::AttributeHelpers installed.
+
+
+0.12   2010-02-10
+
+- Fixed so that applying a role with class attributes to an instance works
+  with Moose 0.98.
+
+
+0.11   2010-02-09
+
+- Roles can now have class attributes, which will be fully initialized when
+  the role is applied to a class.
+
+- Many modules have been renamed from MooseX::ClassAttribute::Role::Meta::* to
+  MooseX::ClassAttribute::Trait::*.
+
+- Deprecated the get_class_attribute_map method.
+
+- Added a version number to every .pm file.
+
+
+0.10   2009-08-26
+
+- Fixed to make triggers work with Moose 0.89+, and made triggers pass the old
+  attribute value when appropriate just like non-class attributes.
+
+
+0.09   2009-07-09
+
+- An attribute with a builder that wasn't also lazy caused an
+  exception when the attribute's accessor was called. Reported by
+  Josh.
+
+
+0.08   2009-04-07
+
+- Make this module work with Moose 0.73_01+.
+
+- Deprecated compute_all_applicable_class_attributes. Use
+  get_all_class_attributes instead.
+
+
+0.07   2008-11-10
+
+- Fixed a bug where class attributes did not honor the
+  Class::MOP::Attribute properly, so things that used it directly
+  failed. This bug could be tickled by using certain
+  MooseX::AttributeHelpers attribute metaclasses with a class
+  attribute. Fixed by Shawn Moore.
+
+
+0.06   2008-09-06
+
+- No code changes, just added a missing prereq for
+  MooseX::AttributeHelpers.
+
+
+0.05   2008-09-05
+
+* Totally rewritten as proper meta classes, so it supports
+  introspection and all that good stuff. This breaks some old code
+  because there is no longer a "containing class" for class
+  attributes.
+
+
+0.04   2008-01-21
+
+- An internals change to make this class work with Moose 0.34.
+
+
+0.03   2007-12-08
+
+- Split main functionality out of sugar sub class_has(), into
+  process_class_attribute(). This makes it easier to create attributes
+  on behalf of other classes.
+
+
+0.02   2007-11-25
+
+- Inherit from Exporter, rather than trying to import its
+  import(). Unfortunately, older Exporters as shipped with Perl 5.6.x
+  only allow subclassing.
+
+
+0.01   2007-11-24
+
+- First version, released on an unsuspecting world.

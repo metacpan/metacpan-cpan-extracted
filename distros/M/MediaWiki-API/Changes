@@ -1,0 +1,201 @@
+Revision history for MediaWiki-API
+
+0.41    2015-11-13
+        When using the max_lag configuration, if max_lag_retries was reached - the reported number tries were incorrect. Fixed up the api->list function not continuing due to lack of rawcontinue parameter that is needed after MediaSiki 1.26. Thanks to Derbeth for the bug reports.
+
+0.40    2014-09-13
+        Apologies for the lack of updates and the speed to implement some fixes but I have been busy on other projects.
+        Edit token code has been reworked somewhat to make it simpler, and a bugfix applied for an issue with downloading
+        images over https using the buildin Download() function.
+
+0.39    2012-05-20
+        Added automatic support for handling tokens in the MediaWiki::API->Edit function for (Un)watch, Send e-mail
+        and Patrol changes. (Un)watch already worked but wasn't documented.
+
+0.38    2012-05-19
+        Allow the actions the API supports with an http GET request to be configurable.
+        MediaWiki::API->{config}->{get_actions} defaults to { 'query' => 1, 'logout' => 1, purge' => 1, 'paraminfo' => 1 }
+        but can be added to/ammended as needed for any extensions that add additional functions to the API that support
+        a GET request.
+        
+        Make the version of Test::More required to be 0.98 to avoid an issue with older versions missing functionality
+        (eg. on centos 5.x).
+
+0.37    2011-08-10
+        The MediaWiki::API->Edit call was not getting a token correctly for an import action. Thanks to Mike Lifeguard
+        for the report.
+
+0.36    2011-08-07
+        Since 1.16 MediaWiki now supports uploading files via the API, we no longer need to post directly to
+        Special:Upload. Although now the MediaWiki::API->Upload function will use the api to upload if using a
+        recent mediawiki, it has also been deprecated, as uploads can be done directly via the MediaWiki::API->API
+        call, or if you prefer MediaWiki::API->Edit (where it will automatically get a token for you). Thanks to
+        Jeremy Muhlich for the original patch. Some details about uploading files via the API / Edit calls can be
+        found in the API section of the pod documentation. 
+        
+        There are now some tests included with the module. They run a few api functions against a test wiki -
+        http://testwiki.exotica.org.uk to make sure everything is working correctly. Feel free to use this wiki for
+        testing the module with your own code also. It is wiped/cleaned regularly.
+
+0.35    2010-08-29
+        The module now is a little bit more intelligent about utf-8 strings. If you have the "use utf8" pragma set in
+        your code and pass utf-8 strings in the query, you no longer need to set the skip_encoding config option. The
+        option is only needed if you are passing utf-8 strings but the utf-8 flag is not set on the strings. Note that
+        this may not work correctly if the version of URI module is less than 1.36, and in that case you may well need
+        to specify skip_encoding still (The module does contains a workaround however for older URI versions). Thanks
+        to Nikolay Shaplov for patches and testing relating to this new functionality.
+
+0.34    2010-07-25
+        if skip_encoding encoding was used in conjuctions with use_http_get the querystring was not correctly encoded
+        (parameters were not treated as utf8). Thanks to Nikolay Shaplov for reporting the problem.
+
+0.33    2010-06-09
+        Download function checked for image description, instead of checking for imageinfo. This meant that some
+        images were not downloaded. Thanks to "ke" for reporting this problem
+
+0.32    2010-06-05
+        Config options passed when creating a new instance of the mediawiki api object were overwritten with default
+        values. Now fixed. Thanks to Brian for reporting this problem. Note the version number has been bumped twice
+        since I forgot to update this changes file for 0.31. oops.
+
+0.30    2010-04-08
+        MediaWiki >= 1.15.3 and MediaWiki >= 1.16.0beta2 now require a login token to be sent when logging in. Please
+        see https://bugzilla.wikimedia.org/show_bug.cgi?id=23076 for more details. The MediaWiki::API login method is
+        now adjusted to handle this automatically. Thanks to Brent Garber for the heads up and the patch which I used
+        with some minor modifications.
+
+0.29    2010-01-10
+        Module will now use any proxy settings if set in the environment. To force the module not to use a proxy even
+        if set there is a new configuration option MediaWiki::API->{config}->{noproxy} that can be set. Thanks to
+        Andy Jenkinson for the suggestion and patch.
+
+0.28    2009-09-09
+        The skip_encoding option was ignored for the list function. Thanks to Estelle for reporting the problem.
+
+0.27    2009-05-14
+        Updated README installation instructions including some notes for building debian packages and dependencies.
+        Fixed old reference to JSON::XS
+
+0.26    2009-05-12
+        A new configuration option $mw->{config}->{use_http_get} to tell the module to use http GET requests for
+        those API calls that allow it. By default the module will use POST for all API requests. Fixes bug #45974.
+        Switched the module to ask for the JSON module and not specifically JSON::XS. If JSON::XS is available the
+        JSON module will use it by default, but if not it will fallback to a pure perl JSON parser.
+
+0.25    2009-03-19
+        Support the skip_encoding option in the list and edit calls. Thanks to Brent Garber for
+        reporting this problem.
+
+0.24    2009-01-13
+        MediaWiki::API->list was returning an array instead of arraref when no results/warning from api.
+
+0.23    2008-12-09
+        Was passing parameter to Response->decoded_content as hashref instead of hash.
+        Thanks to Dan Collins for the report.
+
+0.22    2008-11-20
+        Reworked the http connection and errors handling code to be more resiliant (and removed some bugs).
+        Fixed up some copy and paste documentation errors.
+        
+        Note that this version needs some testing. It should be more resialiant than the old version,
+        which in some respects had slightly wrong error handling (I was cutting corners a bit).
+
+0.21    2008-11-20
+        Fixed some errors in the documentation including one which caused the module to fail a POD check.
+
+0.20    2008-11-19
+        The retry limit was reached whether or not the mediawiki api.php returned valid data. Oops. That's what
+        I get for not testing new features properly.
+
+        Now returns the response object as part of the MediaWiki::API object in case the user wants direct access
+        to data returned by the mediawiki api.php such as cookies etc.
+        
+        Now the API doesn't try and encode undefined parameters sent to the API, which was causing the Encode
+        module to spit out warnings.
+        
+        Small improvement to documentation including the new features.
+        
+        Thanks to Dan Collins and Dan Bolser for bug reports and feedback.
+
+0.19    2008-11-01
+        Removed debug line. oops!
+
+0.18    2008-11-01
+        Fixed small error with the on_error example. It showed to use $mw->{on_error} instead of
+        $mw->{config}->{on_error}.
+
+        Improved http error messages. 
+
+0.17    2008-10-30
+        My understanding on the way rollback worked was flawed. The rollback call always rolled back the last users edit 
+        for a page, whereas it should only rollback "the requested" users edits if they were the last editor for a page.
+        This is now fixed. The timestamp code for editing was also broken. By default the edit call will not handle any 
+        conflicts for you. When you get the contents of a page, you should save the timestamp and pass this back to the
+        edit call, which will give you an error if someone else had edited the page in the meantime (or at least if their
+        edit has caused a conflict)
+
+        Big thanks to Steve Sanbeg for help/support/patches and bringing these problems to my attention.
+
+0.16    2008-10-16
+        Licensed the code under GPL v3.
+
+        Added support for maxlag (see http://www.mediawiki.org/wiki/Manual:Maxlag_parameter). This is
+        controlled with configuration options 'max_lag', 'max_lag_retries' and 'max_lag_delay'.
+
+        There are two more configuration options to deal with http or connection problems. These are 'retries' and
+        'retry_delay'.
+
+        There is an additional error field now {error}->{stacktrace) which contains a Carp stacktrace
+        to aid with debugging.
+
+        For help on using these new configuration parameters please see the documentation.
+
+        Thanks to Dan Collins for the maxlag suggestion/report.
+
+0.15    2008-10-12
+        Internal test release with some new options.
+
+0.14    2008-09-21
+        Module now traps and reports errors with the JSON decoding. This helps if for some reason
+        api.php returns an error (such as a PHP error) rather than JSON formatted data. Thanks to Steve
+        Sanbeg for this patch.
+
+0.13    2008-08-10
+        As requested by Kjell, an option has been added to the api call to skip encoding of parameters
+        to utf-8.
+
+0.12    2008-07-30
+        I shouldn't rush things. Removed a debug line I left in.
+
+0.11    2008-07-30
+        Fixed a big bug where I was returning a failure when getting edit tokens if the page didn't
+        exist. This certainly doesn't make sense when you are creating a page! The consequences were
+        it was actually impossible to create a new page.
+        Thanks to Stuart Caie for the patch. 
+
+0.10    2008-07-14
+        Some fixes to documentation examples (Were not updated after some changes in the interface).
+
+0.09    2008-07-13
+        Automatically encode API parameter values to utf-8.
+
+0.08    2008-06-30
+        A lot of releases for one day I know. Minor stuff again, but some dependencies had been left out
+        of the makefile which mean't the module was failing some automatic testing. Also made the config
+        options a bit more clear in the documentation.
+
+0.07    2008-06-30
+        Fixed a bug in some of the example code which was written when using XML::Simple (which meant
+        a lightly different returned hash structure).
+
+0.06    2008-06-30
+        Fixed documentation to pass pod test.
+
+0.05    2008-06-29
+        Various code cleanups and fixes. Documentation improvements. Addition of download function.
+
+0.04    2008-06-27
+        Switched to json api and JSON::XS module. Faster than using XML. Added GZIP header/support.
+
+0.03    2008-06-18
+        First version. Includes some documentation for functions and probably lots of bugs.

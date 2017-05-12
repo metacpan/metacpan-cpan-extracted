@@ -1,0 +1,44 @@
+Acknowledgements on the production and testing of DBD::mysql
+-----------------------------------------------------------
+
+	o Michael Widenius
+
+	  - for writing mysql in the first place (and patching this file)
+
+	o Tim Bunce <Tim.Bunce@ig.co.uk>
+
+	  - for DBI and occassional helpful hints, debugging and general
+	    driver-changing at the least opportune moments!
+	
+	o Andreas Koenig <k@anna.mind.de> 
+
+          - for Msqlperl, perl module listings, support, and moans about
+	    the lack of test suite.
+
+	o Karsten Heinze
+
+          - for getting me to tidy the damn thing up and test it!
+
+	o Sven Verdoolaege <skimo@ufsia.ac.be>
+
+          - for pointing out *far* too many bugs and plenty of patching.
+	  - fixing 'ListFields' function to have hashes returned.
+
+	o Marti Rijken 
+
+          - for spotting DBIc_ENDING bug
+
+	o Doug MacEachern
+
+	  - for bug-spotting and comments on tkmSQL.
+
+	o Gary Shea <shea@xmission.com>
+
+	  - for pointing out several bugs, glitches and short-comings
+	    in the 0.60pl10 code.
+	  - for adding '_ListSelectedFields' code
+
+And all the other poor individuals that have tried and, with varying amounts 
+of success to use DBD::mysql or DBD::mSQL
+
+A.

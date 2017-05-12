@@ -1,0 +1,32 @@
+Roughly in order of priority:
+
+Currently the user-agent is hardcoded.
+Would be better if you could plugin/inherit your own browser code.
+(I think that as long as you use a Gtk2::MozEmbed + Mozilla::DOM
+user-agent, and don't fiddle with the net_start, net_stop, or delete_event
+signals, you should be able to subclass and just override the `open' method
+in Mechanize.pm .)
+
+Unimplemented methods: success, set_property. success might be 
+gettable from a signal: progress, net_state?
+[ From the FAQ: You may also use the
+progress listener to query the request supplied in OnStateChange for 
+more information. For example, if you wanted to check the server 
+response headers, you might check OnStateChange for STATE_START | 
+STATE_IS_REQUEST flags, and from the nsIRequest argument QI for 
+nsIHttpChannel and call methods on that to determine response codes 
+and other information from the server. ]
+
+Basic authentication is unimplemented because I'm not sure how
+to set headers - possibly nsIWebNavigation, if I can figure out
+nsIInputStream.
+
+Handle popped-up windows (a la Pumzilla in Gtk2::MozEmbed).
+
+Sync up with version 0.009_17 of Win32::IE::Mechanize
+(currently based on 0.009).
+
+Cleaning up, documentation
+
+Suppress annoying confirmation dialog when submitting a form
+for the first time (thereafter saved in profile).

@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 368aad530df83a803d7a6d3ca5f587452986fc36 COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 5a38f25adb85e9f6f52161e416af789e636f64d6 Changes
+SHA1 e633bf4775c76ef32b4ff3e8d918d6e4506c38b7 INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 92faca12d0421e68ddee5ce9b2c500b99b03be4d MANIFEST
+SHA1 02921ef697a9c91451df5cce27e2ca78377d8e4b META.json
+SHA1 1c1eb01ab19eebf4f12022ab71e68f3737a2cfc2 META.yml
+SHA1 dab2b7756148f892d3abe049990cd240c1d53cf6 Makefile.PL
+SHA1 161209d2030c6b830c5b6f3b5e45643778518b97 README
+SHA1 3cbd5f2d73506806c362029fb466e5ab23c2b4d0 dist.ini
+SHA1 ccec97ebd8794160cb3a345b4671273b12c456f9 doap.ttl
+SHA1 03eea48c228ac9aaf7dae63150455930d550dfab examples/benchmark.pl
+SHA1 7a662fcefe2722022c4ba150d89a4f37826c9a73 examples/synopsis.pl
+SHA1 6315fb91c92e96f743cb85c22303b768b6eb16c4 lib/MooseX/ArrayRef.pm
+SHA1 b090f7ccc734fe4472d0716caa270eb16b9223b5 lib/MooseX/ArrayRef/Meta/Class.pm
+SHA1 8bf4cf64399fdc6c361e56daac155c854546f281 lib/MooseX/ArrayRef/Meta/Instance.pm
+SHA1 e3d0c03dea534213850c3916e0d929d25d971b53 t/01basic.t
+SHA1 cd87212bc82025f03a5cd3fa1515913e04dbfa62 t/02indexmap.t
+SHA1 b7a8d058715c8ddd727d7e35ce5ee8c8aa8063e7 t/03objects.t
+SHA1 8878286f597091d56d06c66b9192fe9c351cc62b t/04inlining.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQQyvUACgkQzr+BKGoqfTnZuQCeLqU1k0pXolU7ggBPpXRg5d0R
+iK0AoIkO0E+r+w+jeF5BWtxzMJLjnzyY
+=azPA
+-----END PGP SIGNATURE-----

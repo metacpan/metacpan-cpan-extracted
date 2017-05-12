@@ -1,0 +1,50 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+runtrans - Command line application for running MetaTrans plug-ins
+
+=head1 SYNOPSIS
+
+    runtrans PLUGIN_CLASS [ OPTIONS ] EXPRESSION [ EXPRESSION ... ]
+
+The C<OPTIONS> are plug-in specific. See
+
+    runtrans PLUGIN_CLASS -h
+
+for a complete list.
+
+=cut
+
+use MetaTrans::Base;
+
+$package = shift @ARGV;
+
+eval "require $package";
+my $trans = new $package;
+
+$trans->run;
+
+__END__
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-metatrans@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.  I will be notified, and then you'll automatically
+be notified of progress on your bug as I make changes.
+
+=head1 AUTHOR
+
+Jan Pomikalek, C<< <xpomikal@fi.muni.cz> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2004 Jan Pomikalek, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<MetaTrans>, L<MetaTrans::Base>

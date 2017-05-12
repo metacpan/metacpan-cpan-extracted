@@ -1,0 +1,12 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Math/ContinuedFraction.pm
+t/convergent0.t
+t/convergent1.t
+t/from_ratio.t
+t/to_ascii.t
+t/pod.t
+Makefile.PL
+META.yml

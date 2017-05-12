@@ -1,0 +1,50 @@
+{
+   "abstract" : "Simple Mongo ORM for Perl",
+   "author" : [
+      "Naoto ISHIKAWA <toona at seesaa.co.jp>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MongoDBx-Tiny",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Trigger" : "0",
+            "Data::Dumper" : "0",
+            "Digest::SHA" : "0",
+            "IO::File" : "0",
+            "MongoDB" : "0",
+            "Params::Validate" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
+            "Tie::IxHash" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.04"
+}

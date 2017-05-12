@@ -1,0 +1,7 @@
+ [
+    {
+        "type" : "textarea",
+        "name" : "message",
+        "data" : "Current message"
+    }
+ ]

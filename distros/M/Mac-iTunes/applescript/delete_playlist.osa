@@ -1,0 +1,12 @@
+(* $Id$ *)
+
+tell application "iTunes"
+	repeat with i from 1 to (the count of the playlists)
+		set this_playlist to playlist i
+		try
+			if the name of this_playlist is "iTunes test" then
+				delete playlist i
+			end if
+		end try
+	end repeat
+end tell

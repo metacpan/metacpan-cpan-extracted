@@ -1,0 +1,84 @@
+{
+   "abstract" : "Generate Pseudorandom Binary Sequences using an Iterator-based Linear Feedback Shift Register",
+   "author" : [
+      "Peter C. jones <petercj AT cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [
+      "Pseudorandom Binary Sequence",
+      "PRBS",
+      "Linear Feedback Shift Register",
+      "LFSR"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-PRBS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Config" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0.86",
+            "constant" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "5.57",
+            "perl" : "5.006000",
+            "strict" : "0",
+            "version" : "0.77",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config" : "0",
+            "Test::More" : "0.86",
+            "constant" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Math::PRBS" : {
+         "file" : "lib/Math/PRBS.pm",
+         "version" : "v0.2.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Math-PRBS@rt.cpan.org",
+         "web" : "https://github.com/pryrt/Math-PRBS/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pryrt/Math-PRBS.git",
+         "web" : "https://github.com/pryrt/Math-PRBS"
+      }
+   },
+   "version" : "v0.002",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

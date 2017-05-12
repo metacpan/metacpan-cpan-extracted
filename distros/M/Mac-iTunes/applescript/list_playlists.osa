@@ -1,0 +1,6 @@
+(* $Id$ *)
+
+tell application "iTunes"
+		set thisList to playlists
+		set foo to choose from list playlists with prompt "This is"
+end tell

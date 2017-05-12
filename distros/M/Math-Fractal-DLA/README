@@ -1,0 +1,51 @@
+Math::Fractal::DLA version 0.20
+===============================
+
+Math::Fractal::DLA is a Diffusion Limited Aggregation (DLA) fractal generator
+
+The Diffusion Limited Aggregation (DLA) fractal belongs to the group of stochastic fractals.
+
+It was invented by the two physicists T.A. Witten and L.M. Sander in 1981. The fractal is created by single particles which move randomly towards an target area. By hitting the area the particle becomes a part of it and the fractal grows.
+
+Math::Fractal::DLA is just the framework for subclasses like Math::Fractal::DLA::Explode and doesn't implement any methods for fractal generation. To generate a fractal, you have to create a Math::Fractal::DLA object and load the subclass by calling the method setType. Otherwise you have to use an object from a subclass directly without calling the method setType. For the specific methods of the subclasses, take a look at their perldoc.
+
+INSTALLATION
+
+To install this module with the Module::Build system type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+(or perl Build, perl Build test, perl Build install)
+To use the ExtUtils::MakeMaker and make type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+libGD (http://www.boutell.com/gd) - ANSI C library for the dynamic creation of images.
+libpng (http://www.libpng.org/pub/png) - This is the official PNG reference library.
+zlib (http://www.info-zip.org/pub/infozip/zlib) - zlib is a free, general-purpose, legally unencumbered, lossless data-compression library.
+libjpeg (http://www.ijg.org) - This package contains C software to implement JPEG image compression and decompression.
+decompression.
+GD (http://search.cpan.org/~lds/GD-2.19/) - GD.pm is a Perl interface to Thomas Boutell's gd graphics library
+Log::LogLite (http://search.cpan.org/~rani/Log-LogLite-0.82/) - A simple logger 
+
+AUTHOR
+
+Wolfgang Gruber, w.gruber@urldirect.at
+
+REMARKS
+
+This is my first CPAN package.  I hope that it is useful for you and you enjoy generating these wonderful fractal images. If you have questions, comments or suggestions, don't hesitate to send me an email.
+
+COPYRIGHT
+
+Copyright (c) 2002-2005 by Wolfgang Gruber. All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

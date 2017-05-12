@@ -1,0 +1,22 @@
+
+Mail::Graph - visualize mails via graphs (spams, bug reports etc)
+
+I wrote this utility because I wanted to prove that the spam problem is real
+and becoing more and more a real problem.
+
+In the directory samples/ is a short example. For a real-life example
+please visit <http://bloodgate.com/spams/>.
+
+To install:
+
+	perl Makefile.PL
+	make
+	make test
+
+and then as root:
+
+	make install
+
+Have fun!
+
+(c) Tels <http://bloodgate.com/> 2002

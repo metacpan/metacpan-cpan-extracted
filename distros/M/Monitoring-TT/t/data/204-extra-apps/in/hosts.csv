@@ -1,0 +1,2 @@
+#HOSTNAME;ALIAS;ADDRESS;TYPE;TAGS;GROUPS;APPS
+localhost;;127.0.0.1;linux;;;testapp

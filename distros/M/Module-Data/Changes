@@ -1,0 +1,135 @@
+Release history for Module-Data
+
+0.013 2017-03-06T11:43:10Z 095bcf3
+ [Bugfix]
+ - Avoid test failures with -Ddefault_inc_excludes_dot
+ - Closes https://github.com/kentnl/Module-Data/issues/2
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.012, see misc/*.deps* for details
+ - build: -1
+ - configure: +2 -1 (recommends: +1)
+ - develop: +24 ↑3 -14 (recommends: +1, suggests: +2 -1)
+ - runtime: (recommends: +2)
+ - test: +3 ↓1 (recommends: +3)
+
+ [Tooling]
+ - Switched from Module::Build to EUMM. WARNING: This could break some vendors.
+
+0.012 2013-11-25T08:27:23Z
+ [Bugfix]
+ - Don't try to construct a path if underlying mechanisms returned no path.
+
+0.011 2013-11-25T02:13:53Z
+ [Dependencies::Noteworthy]
+ - Require newer Path::ScanINC
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.010, see misc/*.deps* for details
+ - develop: ↑1
+ - runtime: ↑1
+
+ [Maintenance]
+ - Changelog retroactively tidied.
+
+0.010 2013-11-21T12:25:03Z
+ [00 Minor]
+ - Internals reimplemented in Path::Tiny
+ - Trial release to give end users a bit of warning, because Path::Class objects were previously emitted.
+
+ [Dependencies::Noteworthy]
+ - Requires Path::Tiny
+ - No longer requires Path::Class
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.007, see misc/*.deps* for details
+ - runtime: +1 -1
+ - test: -1
+
+0.007 2013-11-20T13:09:23Z
+ [00 BugFix]
+ - Prevent test failure with new Path::ScanINC
+
+ [Dependencies::Noteworthy]
+ - require newer Module::Build
+ - require newer Test::More
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.006, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +50 -1 (recommends: -1, suggests: +1 -1)
+ - test: ↑1 -2
+
+ [Documentation]
+ - Add README.mkdn
+ - Update ©
+ - use UTF∞8
+
+ [Meta]
+ - Bugtracker to GH Issues
+
+ [Packaging]
+ - Use test_requires
+
+ [Tests]
+ - use Test::Compile::PerFile
+ - Update ReportVersions::Tiny
+ - Update CPAN::Changes
+ - Update Test::Kwalitee
+
+0.006 2012-04-13T04:02:46Z
+ [Tests]
+ - Replace call to Data::Dump::pp with a hand-written simple dumper as pp is for some bizzare reason entering
+   recursion.
+
+0.005 2012-04-11T20:33:42Z
+ [Bugfixes]
+ - Update of the test code to not fail prematurely under Test::Builder2
+
+ [Tests]
+ - Refactored Whitelisting logic into its own t/tlib/ module 'Whitelist'
+ - Updated 02 & 03 to whitelist modules loaded by Test::Builder2
+
+0.004 2012-04-11T06:01:11Z
+ [Dependencies::Noteworthy]
+ - Path::ScanINC is now 0.002 minimum
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003, see misc/*.deps* for details
+ - runtime: ↑1
+
+0.003 2012-04-10T09:11:18Z
+ [Dependencies::New]
+ - Test requires: Carp
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002, see misc/*.deps* for details
+ - test: +1
+
+ [Tests]
+ - Improved 03_fake_system.t reporting to reveal why win32 is requring() "wrong".
+
+0.002 2012-04-09T02:01:46Z
+ [Dependencies::Noteworthy]
+ - uses Module::Metadata
+ - uses Path::ScanINC
+ - uses Path::Class
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001, see misc/*.deps* for details
+ - runtime: +2 -1
+ - test: +2
+
+ [Internals]
+ - Rework module discovery to be optimistic, check %INC if its there already, and if it is, report where it was found,
+   otherwise, ask Path::ScanINC to tell us where it is WITHOUT loading it. This will hopefully be usefull in many cases
+   allowing us to detect module availability without needing the compile/memory overheads of actually loading said
+   modules
+ - Rework ->version call to be optimistic, ask PACKAGE->VERSION for version if the package appears to be loaded,
+   otherwise, fall back on Path::ScanINC to find the file, and Module::Metadata to extract the version out of it. The
+   hope is that will eliminate the need to load the whole module permenantly into memory *just* to discern what version
+   it is.
+
+0.001 2012-03-23T15:37:57Z
+ - First version.

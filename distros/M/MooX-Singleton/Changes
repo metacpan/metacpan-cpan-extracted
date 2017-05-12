@@ -1,0 +1,12 @@
+Revision history for MooX-Singleton
+
+1.20   2013-04-07 23:38:25
+    FIXES:
+        [gh#1] Incorrectly added test classes as dependencies.
+        Reported by BOWTIE, patch provided by FAYLAND.
+    NOTICES:
+        Dependency on strictures replaced by plain old use strict & warnings.
+
+1.121160    Wed Apr 25 23:55:16 2012
+            First version
+

@@ -1,0 +1,34 @@
+MANIFEST
+README
+Changes
+Makefile.PL
+lib/Math/Random/MT/Auto.pm
+lib/Math/Random/MT/Auto/Range.pm
+MRMA.xs
+ppport.h
+t/00-load.t
+t/01-mersenne.t
+t/02-gaussian.t
+t/03-threads.t
+t/04-win32.t
+t/05-dev_urandom.t
+t/06-dev_random.t
+t/07-random_org.t
+t/08-hotbits.t
+t/09-state.t
+t/10-deviates.t
+t/11-range.t
+t/12-rn_info.t
+t/13-overload.t
+t/14-serialize.t
+t/15-shared.t
+t/99-pod.t
+examples/timings.pl
+examples/bell.pl
+examples/decay.pl
+examples/erlang.pl
+examples/poisson.pl
+examples/binomial.pl
+examples/cards.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

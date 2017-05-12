@@ -1,0 +1,356 @@
+#!/usr/bin/perl
+
+#
+# spfd: Simple forking daemon to provide SPF query services
+# 
+# (C) 2003-2004 Meng Weng Wong <mengwong+spf@pobox.com>
+#     2005-2006 Julian Mehnle <julian@mehnle.net>
+# 
+# If you're reading source code, you should probably be on
+# spf-devel@v2.listbox.com.
+#
+# $Id: spfd 141 2006-02-07 00:04:51Z julian $
+#
+##############################################################################
+
+=head1 NAME
+
+spfd - simple forking daemon to provide SPF query services
+
+=head1 VERSION
+
+2006-02-07
+
+=head1 SYNOPSIS
+
+B<spfd> B<--port> I<port> [B<--set-user> I<uid>|I<username>] [B<--set-group>
+I<gid>|I<groupname>]
+
+B<spfd> B<--socket> I<filename> [B<--socket-user> I<uid>|I<username>]
+[B<--socket-group> I<gid>|I<groupname>] [B<--socket-perms> I<octal-perms>]
+[B<--set-user> I<uid>|I<username>] [B<--set-group> I<gid>|I<groupname>]
+
+B<spfd> B<--help>
+
+=head1 DESCRIPTION
+
+B<spfd> is a simple forking Sender Policy Framework (SPF) query proxy server.
+spfd receives and answers SPF query requests on a TCP/IP or UNIX domain
+socket.
+
+The B<--port> form listens on a TCP/IP socket on the specified I<port>.  The
+default port is B<5970>.
+
+The B<--socket> form listens on a UNIX domain socket that is created with the
+specified I<filename>.  The socket can be assigned specific user and group
+ownership with the B<--socket-user> and B<--socket-group> options, and specific
+filesystem permissions with the B<--socket-perms> option.
+
+Generally, spfd can be instructed with the B<--set-user> and B<--set-group>
+options to drop root privileges and change to another user and group before it
+starts listening for requests.
+
+The B<--help> form prints usage information for B<spfd>.
+
+=head1 REQUEST
+
+A request consists of a series of lines delimited by \x0A (LF) characters (or
+whatever your system considers a newline).  Each line must be of the form
+I<key>B<=>I<value>, where the following keys are required:
+
+=over
+
+=item B<ip>
+
+The sender IP address.
+
+=item B<sender>
+
+The envelope sender address (from the SMTP C<MAIL FROM> command).
+
+=item B<helo>
+
+The envelope sender hostname (from the SMTP C<HELO> command).
+
+=back
+
+=head1 RESPONSE
+
+spfd responds to query requests with similar series of lines of the form
+I<key>B<=>I<value>.  The most important response keys are:
+
+=over
+
+=item B<result>
+
+The result of the SPF query:
+
+=over 10
+
+=item I<pass>
+
+The specified IP address is an authorized mailer for the sender domain/address.
+
+=item I<fail>
+
+The specified IP address is not an authorized mailer for the sender
+domain/address.
+
+=item I<softfail>
+
+The specified IP address is not an authorized mailer for the sender
+domain/address, however the domain is still in the process of transitioning to
+SPF.
+
+=item I<neutral>
+
+The sender domain makes no assertion about the status of the IP address.
+
+=item I<unknown>
+
+The sender domain has a syntax error in its SPF record.
+
+=item I<error>
+
+A temporary DNS error occurred while resolving the sender policy.  Try again
+later.
+
+=item I<none>
+
+There is no SPF record for the sender domain.
+
+=back
+
+=item B<smtp_comment>
+
+The text that should be included in the receiver's SMTP response.
+
+=item B<header_comment>
+
+The text that should be included as a comment in the message's C<Received-SPF:>
+header.
+
+=item B<spf_record>
+
+The SPF record of the envelope sender domain.
+
+=back
+
+For the description of other response keys see L<Mail::SPF::Query>.
+
+For more information on SPF see L<http://www.openspf.org>.
+
+=head1 EXAMPLE
+
+A running spfd could be tested using the C<netcat> utility like this:
+
+    $ echo -e "ip=11.22.33.44\nsender=user@pobox.com\nhelo=spammer.example.net\n" | nc localhost 5970
+    result=neutral
+    smtp_comment=Please see http://spf.pobox.com/why.html?sender=user%40pobox.com&ip=11.22.33.44&receiver=localhost
+    header_comment=localhost: 11.22.33.44 is neither permitted nor denied by domain of user@pobox.com
+    guess=neutral
+    smtp_guess=
+    header_guess=
+    guess_tf=neutral
+    smtp_tf=
+    header_tf=
+    spf_record=v=spf1 ?all
+
+=head1 SEE ALSO
+
+L<Mail::SPF::Query>, L<http://www.openspf.org>
+
+=head1 AUTHORS
+
+This version of B<spfd> was written by Meng Weng Wong <mengwong+spf@pobox.com>.
+Improved argument parsing was added by Julian Mehnle <julian@mehnle.net>.
+
+This man-page was written by Julian Mehnle <julian@mehnle.net>.
+
+=cut
+
+use warnings;
+use strict;
+
+use Mail::SPF::Query;
+use Getopt::Long qw(:config gnu_compat);
+use Socket;
+
+use constant DEBUG => $ENV{DEBUG};
+
+sub usage () {
+  print STDERR <<'EOT';
+Usage:
+    spfd --port <port>
+        [--set-user <uid>|<username>] [--set-group <gid>|<groupname>]
+    spfd --socket <filename> [--socket-user <uid>|<username>]
+        [--socket-group <gid>|<groupname>] [--socket-perms <octal-perms>]
+        [--set-user <uid>|<username>] [--set-group <gid>|<groupname>]
+EOT
+}
+
+my %opt;
+
+my $getopt_result = GetOptions(
+  \%opt,
+  'port=i',
+  'socket|path=s',
+  'socket-user|pathuser=s',
+  'socket-group|pathgroup=s',
+  'socket-perms|pathmode=s',
+  'set-user|setuser=s',
+  'set-group|setgroup=s',
+  'help!'
+);
+
+if ($opt{help}) {
+  usage;
+  exit 0;
+}
+
+if ($opt{port} and $opt{socket}) {
+  usage;
+  exit 1;
+}
+
+if (not $opt{port} and not $opt{socket}) {
+  print STDERR "Using default TCP/IP port.  Run `spfd --help` for possible options.\n";
+  $opt{port} = 5970;
+}
+
+$| = 1;
+
+my @args;
+my $sock_type;
+
+if ($opt{port}) {
+  $sock_type = 'inet';
+  @args = (Listen    => 1,
+           LocalAddr => '127.0.0.1',
+           LocalPort => $opt{port},
+           ReuseAddr => 1
+           );
+  print "$$: will listen on TCP port $opt{port}\n";
+  $0 = "spfd listening on TCP port $opt{port}";
+} elsif ($opt{socket}) {
+  $sock_type = 'unix';
+  unlink $opt{socket} if -S $opt{socket};
+  @args = (Listen => 1,
+           Local => $opt{socket},
+           );
+  print "$$: will listen at UNIX socket $opt{socket}\n";
+  $0 = "spfd listening at UNIX socket $opt{socket}";
+}
+
+print "$$: creating server with args @args\n";
+
+my $server = $sock_type eq 'inet' ? IO::Socket::INET->new(@args) : IO::Socket::UNIX->new(@args);
+
+if ($opt{socket}) {
+  if (defined $opt{'socket-user'} or defined $opt{'socket-group'}) {
+    $opt{'socket-user'}  = -1 if not defined($opt{'socket-user'});
+    $opt{'socket-group'} = -1 if not defined($opt{'socket-group'});
+
+    if ($opt{'socket-user'} =~ /\D/) {
+      $opt{'socket-user'} = getpwnam($opt{'socket-user'}) || die "User: $opt{'socket-user'} not found\n";
+    }
+
+    if ($opt{'socket-group'} =~ /\D/) {
+      $opt{'socket-group'} = getgrnam($opt{'socket-group'}) || die "Group: $opt{'socket-group'} not found\n";
+    }
+
+    chown $opt{'socket-user'}, $opt{'socket-group'}, $opt{socket} or die "chown call failed on $opt{socket}: $!\n";
+  }
+  if (defined $opt{'socket-perms'}) {
+    chmod oct($opt{'socket-perms'}), $opt{socket} or die "Cannot fixup perms on $opt{socket}: $!\n";
+  }
+}
+
+DEBUG and print "$$: server is $server\n";
+
+if ($opt{'set-group'}) {
+  if ($opt{'set-group'} =~ /\D/) {
+    $opt{'set-group'} = getgrnam($opt{'set-group'}) || die "Group: $opt{'set-group'} not found\n";
+  }
+  $( = $opt{'set-group'};
+  $) = $opt{'set-group'};
+  unless ($( == $opt{'set-group'} and $) == $opt{'set-group'}) {
+    die( "setgid($opt{'set-group'}) call failed: $!\n" );
+  }
+}
+
+if ($opt{'set-user'}) {
+  if ($opt{'set-user'} =~ /\D/) {
+    $opt{'set-user'} = getpwnam($opt{'set-user'}) || die "User: $opt{'set-user'} not found\n"; 
+  }
+  $< = $opt{'set-user'};
+  $> = $opt{'set-user'};
+  unless ($< == $opt{'set-user'} and $> == $opt{'set-user'}) {
+    die( "setuid($opt{'set-user'}) call failed: $!\n" );
+  }
+}
+
+while (my $sock = $server->accept()) {
+  if    (fork) { close $sock; wait; next; } # this is the grandfather trick.
+  elsif (fork) {                    exit; } # the child exits immediately, so no zombies.
+
+  my $oldfh = select($sock); $| = 1; select($oldfh);
+
+  my %in;
+
+  while (<$sock>) {
+    chomp; chomp;
+    last if (/^$/);
+    my ($lhs, $rhs) = split /=/, $_, 2;
+    $in{lc $lhs} = $rhs;
+  }
+
+  my $peerinfo = $sock_type eq "inet" ? ($sock->peerhost . "/" . gethostbyaddr($sock->peeraddr, AF_INET)) : "";
+
+  my $time = localtime;
+  
+  DEBUG and print "$time $peerinfo\n";
+  foreach my $key (sort keys %in) { DEBUG and print "learned $key = $in{$key}\n" };
+
+  my %q = map { exists $in{$_} ? ($_ => $in{$_}) : () } qw ( ip ipv4 ipv6 sender helo guess_mechs trusted local );
+
+  my %a;
+
+  my $query = eval { Mail::SPF::Query->new(%q); };
+
+  my $error = $@; for ($error) { s/\n/ /; s/\s+$//; }
+
+  if ($@) { @a{qw(result smtp_comment header_comment)} = ("unknown", $error, "SPF error: $error"); }
+  else {
+    @a{qw(result    smtp_comment header_comment spf_record)} = $query->result();
+    @a{qw(guess     smtp_guess   header_guess  )} = $query->best_guess();
+    @a{qw(guess_tf  smtp_tf      header_tf     )} = $query->trusted_forwarder();
+  }
+
+  if (DEBUG) {
+    for (qw(result    smtp_comment header_comment
+            guess     smtp_guess   header_guess
+            guess_tf  smtp_tf      header_tf
+            spf_record
+            )) {
+      print "moo!  $_=$a{$_}\n";
+    }
+  }
+
+  for (qw(result    smtp_comment header_comment
+          guess     smtp_guess   header_guess
+          guess_tf  smtp_tf      header_tf
+          spf_record
+          )) {
+    no warnings 'uninitialized';
+    print $sock "$_=$a{$_}\n";
+  }
+
+  DEBUG and print "moo!  output all done.\n";
+  print $sock "\n";
+  DEBUG and print "\n";
+
+  close $sock;
+
+  exit;
+}

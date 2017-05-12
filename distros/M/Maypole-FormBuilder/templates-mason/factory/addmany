@@ -1,0 +1,12 @@
+% our $how_many; our $add_to;
+
+<h1>Add <% $how_many %> <% $request->model_class->plural_moniker %> to <% $add_to->moniker %>: <% $add_to %></h1>
+
+<div class="AddMany" style="float:left">
+<fieldset>
+<% $request->as_multiform( 'addmany', how_many  => $how_many, 
+                                      mode_args => { addto    => $add_to, 
+                                                     how_many => $how_many },
+                           )->render %>
+</fieldset>
+</div>

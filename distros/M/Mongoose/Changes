@@ -1,0 +1,225 @@
+1.02      2017-03-23 12:33:01+01:00 Europe/Madrid
+    [ BUGS ]
+    * Keep bools and dates untouched when collapsing hashrefs
+
+1.01      2017-03-12 22:36:57+01:00 Europe/Madrid
+    [ BUGS ]
+    * Fixed MongoDB min version on dist.ini file
+
+    [ DOCS ]
+    * Updated version to 1.00 on driver usage warning
+
+1.00      2017-03-12 21:57:53+01:00 Europe/Madrid
+    [ CLEANUP ]
+    * Remove support for pre 1.x MongoDB drivers, version bumped to 1.0 to reflex this!
+
+    [ ENHANCEMENTS ]
+    * Replace all deprecated methods
+    * Mongoose::File is now a wrapper to handle files over the default MongoDB::GridFSBucket
+    * Emulate count on a cursor to keep this deprecated functionality
+
+    [ DOCS ]
+    * Cleaned up and updated Intro and Cookbook to reflex current usage
+
+0.39      2017-02-09 01:55:51+01:00 Europe/Madrid
+    [ ENHANCEMENTS ]
+    * Replace deprecated methods on Engine::V1 and some tests
+
+0.38      2016-07-08 12:39:07+02:00 Europe/Madrid
+    [ ENHANCEMENTS ]
+    * GH#44 - Make boolean objects roundtrip without force Bool types into booleans (yet)
+    * GH#47 - Add test prereq on HTTP::Headers
+
+0.37      2016-04-19 11:20:04+02:00 Europe/Madrid
+    [ ENHANCEMENTS ]
+    * GH#23 - Move document class config to the singleton object
+
+    [ BUGS ]
+    * Fixed Mongoose::Join method to inflate rels (used by fix_integrity).
+    * Pass string as is to find_one() when failing to inflate it into MongoDB::OID
+
+0.36      2015-12-27 15:33:50+01:00 Europe/Madrid
+    [ BUGS ]
+    * Tests sould be skipped when there is no server available.
+    * Tests sould not drop db when it was not created.
+
+0.35      2015-09-25 04:09:11+02:00 Europe/Madrid
+    [ ENHANCEMENTS ]
+    * Ensure GridFS relations are DBRef's on v1.x.x
+    * Each tests now creates a random db and drops it at the END (allow parallel run)
+
+0.34      2015-09-25 02:55:32+02:00 Europe/Madrid
+    [ CLEANUP ]
+    * Removed debug code from GridFS tests
+
+0.33      2015-09-25 02:49:43+02:00 Europe/Madrid
+    [ ENHANCEMENTS ]
+    * #42 - Support for MongoDB driver v1.x.x series while still supporting v0.x
+
+    [ CLEANUP ]
+    * Some code cleanup
+
+0.32      2015-06-28 17:04:24+02:00 Europe/Madrid
+    [ BUGS ]
+    * GH#40 - Prevent unsaved objects from removing all docs when calling delete().
+
+    [ ENHANCEMENTS ]
+    * Skip unblessing for DateTime::Tiny the same way as for DateTime objects.
+    * GH#32 - Ensure numbers are stored as numbers for Num based types.
+
+    [ CLEANUP ]
+    * Cursor wrapper cleanup
+    * Engine collapse/expand small refactor
+
+    [ DOCS ]
+    * GH#31 - Remove cookbook recomendation to use Raw trait on DateTime fields.
+
+0.31      2015-04-19 03:00:50+02:00 Europe/Madrid
+    [ CLEANUP ]
+    * Changes file fixed after last release problems
+
+0.30 Sun Apr 19 2:56:00 CEST 2015
+    [ ENHANCEMENTS ]
+    * find_one() now accepts a MongoDB::OID object
+
+    [ CLEANUP ]
+    * Removed unused class Mongoose::Digest
+    * Bumped dependency versions and removed back-compat code
+
+0.29 Sat Apr 18 23:56:30 CEST 2015
+    [ BUGS ]
+    * Fixed test that was failing randombly on mongodb v2.6.x (diegok)
+
+0.28 Sat Apr 18 16:51:40 CEST 2015
+    [ BUGS ]
+    * ensure all DBRef's are sorted hashes to make it work with mongodb v2.6.x (diegok)
+
+0.27 Mon Sep  1 19:25:23 CEST 2014
+    [ ENHANCEMENTS ]
+    * add optional auth_db_name param for auth against other dbs (gmorten1)
+    * testing against remote dbs (gmorten1)
+
+0.26 Sun Aug 24 11:18:25 PDT 2014
+    [ CLEANUP ]
+    * GH#36 - "package DB" gets $VERSION added by dzil auto-versioning plugin
+
+0.25 Thu Aug 21 16:53:40 PDT 2014
+    [ CLEANUP ]
+    * .24 inadvertently brought local-libs into dist
+
+0.24 Wed Aug 20 09:12:41 PDT 2014
+    [ BUGS ]
+    * GH#35 - Hack to prevent engine from creating self-references
+
+0.23 Mon Jan 28 19:28:58 CET 2013
+    [ ENHANCEMENTS ]
+    * GH#26 - multiple hosts/dbs for different classes (diegok)
+
+0.22 Mon Jan 21 16:14:38 CET 2013
+    [ BUGS ]
+    * RT#81725 - save HashRef[ArrayRef[Class]] now works; loading does not (yet).
+    * GH#22 - load_schema with shorten MOP issue fixed (dagolden)
+    * GH#24 - Support for both MongoDB::Connection (deprecated) && MongoDB::MongoClient (MongoDB 0.503)
+    * Deprecation warnings removed from tests
+        - get_collection now required, no more implicit $db-><collecion>() method calling
+
+    [ ENHANCEMENTS ]
+    * GH#21 - use insert() if PK defined and no _id in doc (dagolden)
+
+0.20 Sun Nov  4 13:05:21 CET 2012
+    [ BUGS ]
+    * Nested joins save error fixed ("not an ARRAY ref")
+    * EmbeddedDocument incorrect -pk and -engine parameters (allanwhiteford)
+
+    [ ENHANCEMENTS ]
+    * hash_on and hash_array Join and Cursor methods.
+    * some doc fixes and clarifications.
+    * allow Mongoose to disconnect from Mongo (allanwhiteford)
+    * use Mongoose Documents in intermediate roles (allanwhiteford)
+
+0.13 Mon Jan  2 23:10:08 BRST 2012
+    [ DOCS ]
+    * #15 fixed Mongoose::Join docs, missing initialization info,
+            added test case (kthakore)
+
+0.12 Wed Dec 28 12:30:19 BRST 2011
+    [ ENHANCEMENTS ]
+    * #16 Mongoose::Document can now be consumed by an intermediate rol (allanwhiteford)
+
+    [ BUGS ]
+    * #14 after save now is triggered only once for every save (gugod)
+
+0.11 Fri Oct 28 15:36:50 CEST 2011
+    [ BUGS ]
+    * Problem with calling db method without hostname (allanwhiteford)
+
+    [ ENHANCEMENTS ]
+    * has_one now accepts more parameters on simplyfied mode
+    * documentation on Mongoose::Class and belongs_to sweetness
+
+0.10 Sat May 21 12:15:34 CEST 2011
+    [ ENHANCEMENTS ]
+
+    * find_one now takes a single SCALAR arg and turns it into
+      a MongoDB::OID. No breakage expected.
+
+0.09 Thu Apr 21 21:34:00 CEST 2011
+    [ BUGS ]
+    * new circularity errors fixed (gugod)
+
+0.08 Tue Mar 22 17:05:45 CET 2011
+    [ BUGS ]
+
+    * DoNotSerialize renamed to DoNotMongoSerialize to avoid clashing with
+      MooseX::Storage own (gentili)
+    * Circularity errors fixed.
+
+    [ API CHANGES ]
+
+    * DateTime always stored as a raw type - the MongoDB driver handles
+      it on its own.
+
+0.07 Wed Feb  2 22:42:59 CET 2011
+    * Changed Mongoose->db to connect to Mongo only when needed. That
+      makes it easier to initialize Mongoose in a forked server environment.
+    * Changed Mongoose->load_schema to handle package namespaces
+      in a flexible way.
+
+0.06 Sat Jan 29 14:17:24 CET 2011
+    * Fixed error in 'expand' method for ArrayRef with Mongoose::EmbeddedDocument (shonorio)
+
+0.05 Fri Jan 14 09:43:54 CET 2011
+    * Fixed crash with attributes 'read-only' (shonorio)
+
+0.04 Tue Sep  7 00:46:45 CEST 2010
+    * Fixed incorrect serialization of objects stored within hashes
+    * New Mongoose::Join::fix_integrity method to check for
+      invalid foreign keys.
+
+0.03 Thu Aug 26 09:42:31 CEST 2010
+    * Fixed has_many with belongs_to circularity error (arthur)
+    * Fixed live join object errors
+    * New FileHandler with GridFS support
+
+0.02 Wed Aug 25 14:08:07 CEST 2010
+    * New Raw trait for storing without processing
+    * Raw DateTime recipe
+
+0.01 Tue Aug 24 10:39:39 CEST 2010
+    * more tests
+
+0.01_04 Mon Aug 23 15:11:19 CEST 2010
+    * cookbook clarifications
+
+0.01_03 Mon Aug 23 10:15:17 CEST 2010
+    * fixed more broken depndencies on tests
+    * load_schema method implemented
+
+0.01_02 Mon Aug 23 00:45:39 CEST 2010
+    * Fixed docs, better cookbook
+    * Skip tests when no MongoDB installed
+    * Joining with Mongoose::Join
+    * New Mongoose::Class sugar: has_many, has_one, belongs_to
+
+0.01_01 2010-08-16 00:10:37
+    * Initial release

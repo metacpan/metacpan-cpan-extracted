@@ -1,0 +1,6 @@
+Revision history for Perl extension MFor.
+
+0.01  Fri Jan 23 00:43:17 2009
+	- original version; created by h2xs 1.23 with options
+		-AXc -n MFor
+

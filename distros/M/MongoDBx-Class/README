@@ -1,0 +1,271 @@
+NAME
+    MongoDBx::Class - Flexible ORM for MongoDB databases
+
+VERSION
+    version 1.030002
+
+SYNOPSIS
+    Normal usage:
+
+            use MongoDBx::Class;
+
+            # create a new instance of the module and load a model schema
+            my $dbx = MongoDBx::Class->new(namespace => 'MyApp::Model::DB');
+
+            # if MongoDBx::Class can't find your model schema (possibly because
+            # it exists in some different location), you can do this:
+            my $dbx = MongoDBx::Class->new(namespace => 'MyApp::Model::DB', search_dirs => ['/path/to/model/dir']);
+
+            # connect to a MongoDB server
+            my $conn = $dbx->connect(host => 'localhost', port => 27017);
+
+            # be safe by default
+            $conn->safe(1); # we could've also just passed "safe => 1" to $dbx->connect() above
+
+            # get a MongoDB database
+            my $db = $conn->get_database('myapp');
+
+            # insert a person
+            my $person = $db->get_collection('people')->insert({ name => 'Some Guy', birth_date => '1984-06-12', _class => 'Person' });
+
+            print "Created person ".$person->name." (".$person->id.")\n";
+
+            $person->update({ name => 'Some Smart Guy' });
+
+            $person->delete;
+
+    See MongoDBx::Class::ConnectionPool for simple connection pool usage.
+
+DESCRIPTION
+    MongoDBx::Class is a flexible object relational mapper (ORM) for MongoDB
+    databases. Given a schema-like collection of document classes,
+    MongoDBx::Class expands MongoDB objects (hash-refs in Perl) from the
+    database into objects of those document classes, and collapses such
+    objects back to the database.
+
+    MongoDBx::Class takes advantage of the fact that Perl's MongoDB driver
+    is Moose-based to extend and tweak the driver's behavior, instead of
+    wrapping it. This means MongoDBx::Class does not define its own syntax,
+    so you simply use it exactly as you would the MongoDB driver directly.
+    That said, MongoDBx::Class adds some sugar that enhances and simplifies
+    the syntax unobtrusively (either use it or don't). Thus, it is
+    relatively easy to convert your current MongoDB applications to
+    MongoDBx::Class. A collection in MongoDBx::Class
+    "isa('MongoDB::Collection')", a database in MongoDBx::Class
+    "isa('MongoDB::Database')", etc.
+
+    As opposed to other ORMs (even non-MongoDB ones), MongoDBx::Class
+    attempts to stay as close as possible to MongoDB's non-schematic nature.
+    While most ORMs enforce using a single collection (or table in the SQL
+    world) for every object class, MongoDBx::Class allows you to store
+    documents of different classes in different collections (and even
+    databases). A collection can hold documents of many different classes.
+    Not only that, as MongoDBx::Class is Moose based, you can easily create
+    very flexible schemas by using concepts such as inheritance and roles.
+    For example, say you have a collection called 'people' with documents
+    representing, well, people, but these people can either be teachers or
+    students. Also, students may assume the role "hall monitor". With
+    MongoDBx::Class, you can create a common base class, say "People", and
+    two more classes that extend it - "Teacher" and "Student" with
+    attributes that are only relevant to each one. You also create a role
+    called "HallMonitor", possibly with some methods of its own. You can
+    save all these "people documents" into a single MongoDB collection, and
+    when fetching documents from that collection, they will be properly
+    expanded to their correct classes (though you will have to apply roles
+    yourself - at least for now).
+
+  COMPARISON WITH OTHER MongoDB ORMs
+    As MongoDB is rather young, there aren't many options out there, though
+    CPAN has some pretty good ones, and will probably have more as MongoDB
+    popularity rises.
+
+    The first MongoDB ORM in CPAN was Mongoose, and while it's a very good
+    ORM, MongoDBx::Class was mainly written to overcome some limitations of
+    Mongoose. The biggest of these limitations is that in order to provide a
+    more comfortable syntax than MongoDB's native syntax, Mongoose makes the
+    unfortunate decision of being implemented as a singleton, meaning only
+    one instance of a Mongoose-based schema can be used in an application.
+    That essentially kills multithreaded applications. Say you have a
+    Plack-based (doesn't have to be Plack-based though) web application
+    deployed via Starman (or any other web server for that matter), which is
+    a pre-forking web server - you're pretty much doomed. As MongoDB's
+    driver states, it doesn't support connection pooling, so every fork has
+    to have its own connection to the MongoDB server. Mongoose being a
+    singleton means your threads will not have a connection to the server,
+    and you're screwed. MongoDBx::Class does not suffer this limitation. You
+    can start as many connections as you like. If you're running in a
+    pre-forking environment, you don't have to worry about it at all.
+
+    Other differences from Mongoose include:
+
+    *   Mongoose creates its own syntax, MongoDBx::Class doesn't, you use
+        MongoDB's syntax directly.
+
+    *   A document class in Mongoose is connected to a single collection
+        only, and a collection can only have documents of that class.
+        MongoDBx::Class doesn't have that limitation. Do what you like.
+
+    *   Mongoose has limited support for multiple database usage. With
+        MongoDBx::Class, you can use as many databases as you want.
+
+    *   MongoDBx::Class is way faster. While I haven't performed any real
+        benchmarks, an application converted from Mongoose to
+        MongoDBx::Class showed an increase of speed in orders of magnitude.
+
+    *   In Mongoose, your document class attributes are expected to be
+        read-write (i.e. "is => 'rw'" in Moose), otherwise expansion will
+        fail. This is not the case with MongoDBx::Class, your attributes can
+        safely be read-only.
+
+    Another ORM for MongoDB is Mongrel, which doesn't use Moose and is thus
+    lighter (though as MongoDB is already Moose-based, I see no benefit
+    here). It uses Oogly for data validation (while Moose has its own type
+    validation), and seems to define its own syntax as well. Unfortunately,
+    documentation is currently lacking, and I haven't given it a try, so I
+    can't draw specific comparisons here.
+
+    Even before Mongoose was born, you could use MongoDB as a backend for
+    KiokuDB, by using KiokuDB::Backend::MongoDB. However, KiokuDB is
+    considered a database of its own and uses some conventions which doesn't
+    fit well with MongoDB. Mongoose::Intro already gives a pretty convincing
+    case when and why you should or shouldn't want to use KiokuDB.
+
+  CONNECTION POOLING
+    Since version 0.9, "MongoDBx::Class" provides experimental, simple
+    connection pooling for applications. Take a look at
+    MongoDBx::Class::ConnectionPool for more information.
+
+  CAVEATS AND THINGS TO CONSIDER
+    There are a few caveats and important facts to take note of when using
+    MongoDBx::Class as of today:
+
+    *   MongoDBx::Class's flexibility is dependant on its ability to
+        recognize which class a document in a MongoDB collection expands to.
+        Currently, MongoDBx::Class requires every document to have an
+        attribute called "_class" that contains the name of the document
+        class to use. This isn't very comfortable, but works. I'm still
+        thinking of ways to expand documents without this. This pretty much
+        means that you will have to perform some preparations to use
+        existing MongoDB database with MongoDBx::Class - you will have to
+        update every document in the database with the "_class" attribute.
+
+    *   References (representing joins) are expected to be in the DBRef
+        format, as defined in
+        <http://www.mongodb.org/display/DOCS/Database+References>. If your
+        database references aren't in this format, you'll have to convert
+        them first.
+
+    *   The '_id' attribute of all your documents has to be an internally
+        generated MongoDB::OID. This limitation may or may not be lifted in
+        the future.
+
+  TUTORIAL
+    To start using MongoDBx::Class, please read MongoDBx::Class::Tutorial.
+    It also contains a list of frequently asked questions.
+
+ATTRIBUTES
+  namespace
+    A string representing the namespace of the MongoDB schema used (e.g.
+    "MyApp::Schema"). Your document classes, structurally speaking, should
+    be descendants of this namespace (e.g. "MyApp::Schema::Article",
+    "MyApp::Schema::Post").
+
+  search_dirs
+    An array-ref of directories in which to search for the document classes.
+    Not required, useful if for some reason MongoDBx::Class can't find your
+    document classes.
+
+  doc_classes
+    A hash-ref of document classes found when loading the schema.
+
+CLASS METHODS
+  new( namespace => $namespace )
+    Creates a new instance of this module. Requires the namespace of the
+    database schema to use. The schema will be immediately loaded, but no
+    connection to a MongoDB server is made yet.
+
+OBJECT METHODS
+  connect( %options )
+    Initiates a new connection to a MongoDB server running on a certain host
+    and listening to a certain port. %options is the hash of attributes that
+    can be passed to "new()" in MongoDB::Connection, plus the 'safe'
+    attribute from MongoDBx::Class::Connection. You're mostly expected to
+    provide the 'host' and 'port' options. If a host is not provided,
+    'localhost' is used. If a port is not provided, 27017 (MongoDB's default
+    port) is used. Returns a MongoDBx::Class::Connection object.
+
+    NOTE: Since version 0.7, the created connection object isn't saved in
+    the top MongoDBx::Class object, but only returned, in order to be more
+    like how connection is made in MongoDB (and to allow multiple
+    connections). This change breaks backwords compatibility.
+
+  pool( [ type => $type, max_conns => $max_conns, params => \%params, ... ] )
+    Creates a new connection pool (see MongoDBx::Class::ConnectionPool for
+    more info) and returns it. "type" is either 'rotated' or 'backup' (the
+    default). "params" is a hash-ref of parameters that can be passed to
+    "MongoDB::Connection->new()" when creating connections in the pool. See
+    "ATTRIBUTES" in MongoDBx::Class::ConnectionPool for a complete list of
+    attributes that can be passed.
+
+INTERNAL METHODS
+    The following methods are only to be used internally.
+
+  BUILD()
+    Automatically called when creating a new instance of this module. This
+    loads the schema and saves a hash-ref of document classes found in the
+    object. Automatic loading courtesy of Module::Pluggable.
+
+AUTHOR
+    Ido Perlmuter, "<ido at ido50.net>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-mongodbx-class at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MongoDBx-Class>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+            perldoc MongoDBx::Class
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=MongoDBx::Class>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/MongoDBx::Class>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/MongoDBx::Class>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/MongoDBx::Class/>
+
+SEE ALSO
+    MongoDB, Mongoose, Mongrel, KiokuDB::Backend::MongoDB.
+
+ACKNOWLEDGEMENTS
+    *   Rodrigo de Oliveira, author of Mongoose, whose code greatly assisted
+        me in writing MongoDBx::Class.
+
+    *   Thomas MÃ¼ller, for adding support for the Transient trait.
+
+    *   Dan Dascalescu, for fixing typos and other problems in the
+        documentation.
+
+LICENSE AND COPYRIGHT
+    Copyright 2010-2014 Ido Perlmuter.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

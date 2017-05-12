@@ -1,0 +1,46 @@
+For an updated list of bugs, see
+
+  https://rt.cpan.org/Public/Dist/Display.html?Name=Math-BigInt
+
+The following list is not up to date:
+
+Known bugs:
+
+* TODO BUGS:
+  + implement test for the upgrading bug in bsub()
+
+* NaN handling in comparisons slightly broken. See also [perl #33106].
+
+* General:
+  + BigInt can not the IEEE '-0'. Currently there are no plans to add this. If
+    you need it, please bug the author(s) about it.
+
+* BigFloat:
+  + comparing (<=> or == or !=) a BigFloat to a BigInt don't work yet
+  + new is first running the entire number trough _split, then again the parts
+    to construct BigInts. Could be a bit more optimized.
+  + fdiv() using F (fallback) mode does not work properly in all cases of
+    local (aka $x's or $y's) A or P settings. Not definite test case yet, but
+    it might calculate not enough digits to satisfy the rounding needs.
+
+* BigInt:
+  + exponent on input is limited to a Perl int (bigger numbers won't fit
+    into your memory, anyway - use BigFloat)
+  + doesn't have a mode akin to 'use integer;', e.g. it always emulates Perl
+    (this is solved partially by use bigint ;)
+  + Handling of undef arguments is somewhat broken (no proper warnings)
+  + eval('use...') and use Math::BigInt qw/:constant/ fail on Perl prior 5.6.0
+    This is likely an Exporter bug, and causes Math::BigInt to eval require on
+    earlier Perls when loading the core math lib. Thus the loading can fail
+    under older Perls on filesystems that can not cope with the
+    'Math/BigInt/Calc.pm'-style filenames.
+
+###############################################################################
+
+Mixing of classes does not always work like expected. "use bignum;",
+"use bigint;" and "use bigrat;" should solve this problem for most cases.
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

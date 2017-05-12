@@ -1,0 +1,16 @@
+MooseX-DeclareX-Plugin-abstract
+===============================
+
+Created:      2012-08-22
+Home page:    <https://metacpan.org/release/MooseX-DeclareX-Plugin-abstract>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-DeclareX-Plugin-abstract>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.005	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.004	2013-06-28
+
+0.003	2012-08-22	Split out from MooseX-DeclareX; no functional changes

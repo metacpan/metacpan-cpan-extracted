@@ -1,0 +1,238 @@
+Revision history for Moxy
+
+0.70
+
+    - Added OpenSocial Plugin
+      (Masayuki Matsuki, Shinichiro Sei)
+
+    - add html tag at rewrite_html for content not having html element.
+      (Masayuki Matsuki)
+    - add smartphone useragents in useragent.yaml and Plugin::DisplayWidth could handle smartphone.
+      (Masayuki Matsuki)
+    - Fixed broken link rewriting, that should not remove query parameters.
+      (mix3)
+
+0.63
+
+    - use File storage for deafult session storage
+
+0.62
+
+    - depend to latest NDBM_File
+
+0.61
+
+    - depend to NDBM_File
+
+0.60 - Switch to Plack release
+
+    - switch to plack!(tokuhirom)
+    - updated useragent data
+    - bump up deps
+    - fixed uri_escape error. thanks haoyayoi.(walf443)
+    - patu_queryの値は最初からun_escapeされているので、double unscapeになっていた
+      unescape処理を消した
+      anchorに対する特別扱いは不要なので戻した
+      (mikihoshi)
+    - QRCodeのバージョン増やす。長いURL対応(kan)
+    - テスト例が単純すぎるのでもろもろの要素の入ってるURLにする(walf443)
+    - フラグメント(#など)を含んだURLにアクセスした際にリンクの書き変えなどがうまく動作しなくなるbugを修正(walf443)
+    - 中のコードをいじらずに、Plugin::ShowHTMLSourceを使いたいのです(walf443)
+    - added Google::Chart support on Plugin::QRCode(typester)
+    - updated docomo display map(tokuhirom)
+    - remove HDML model support(tokuhirom)
+    - fixed better path detection(tokuhirom)
+    - remote default configuration(tokuhirom)
+    - simplified code(tokuhirom)
+    - better detection algorithm for assets_dir.(tokuhirom)
+    - setup default session store automatically(tokuhirom)
+    - make default log level as 'info'(tokuhirom)
+    - cleanup test code(tokuhirom)
+    - Add plugin AuthorizationCutter(koshian)
+    - tel: link convert to javascript popup(suggested by lopnor++)(tokuhirom)
+    - do not mention the mailto: link(tokuhirom)
+
+0.56
+
+    - added '404 file not found' handler
+
+0.55
+
+    - better startup page
+    - better default settings
+    - load major plugins automatically
+
+0.54
+
+    - do not hide control panel when got a text/plain internal server error message
+    - support basic-auth
+
+0.53
+
+    - process request filter on redirection
+    - updated docomo display map
+    - added N02A! i want recent phone data :)
+
+0.52
+
+    - [BUG] au phone data fetcher is not working... fixed!
+    - updated au phone data
+
+0.51
+
+    - [BUG] fixed uri related bug(injected at 0.50)
+    - depend to HTTP::Engine 0.1.4
+
+0.50
+
+    - [BUG] append port number on 'Host' header.
+    - [FEATURE] support redirect with relative path.
+    - [FEATURE] Plugin::UserID: added softbank support
+    - depend to HTTP::Engine 0.1.2
+    - depend to HTTP::Session 0.29
+
+0.49
+
+    - use HTTP::Session 0.20
+
+0.49_01
+
+    - use HTTP::Session for better session management
+
+0.48
+
+    - fixed mojibake in Plugin::UserAgentSwitcher
+
+0.47
+
+    - ignore optionalEndTags(don't strip </p>)
+    - rewrite url() in the css
+    - added Plugin::ShowHTMLSource
+    - added Plugin::ResponseTime
+
+0.46
+
+    - use HTTP::Engine 0.17
+    - depend to latest version of Encode::JP::Mobile
+    - depend to latest version of App::Cmd
+    - remove Accept-Encoding header.
+    - added Plugin::Bookmark(by acotie++)
+
+0.45
+
+    - use HTTP::Engine 0.14
+    - no HTTP::Engine::Compat
+    - added Plugin::StripScripts.
+    - added Plugin::Scrubber.
+
+0.44
+
+    - use HTTP::Engine::Compat
+
+0.43
+
+    (NO FEATURE CHANGES)
+    re-packaging.
+
+0.42
+
+    (NO FEATURE CHANGES)
+    - depend to HTTP::Engine 0.0.11
+    - some tests moved to xt/
+
+0.41
+
+    (NO FEATURE CHANGES)
+    - HTTP::Engine 0.05 is broken. Moxy depend to 0.06.
+    - oops. fixed deps to HTML::TreeBuilder::XPath
+
+0.40
+
+    - MAJOR VERSION UP RELEASE - HTTP::Engine based
+    - use HTTP::Engine! yappo++
+    - based on App::Cmd.
+    - set parse_head => 0(thanks lestrrat++)
+    - performance tuning
+    - added Plugin::Hosts by yappo++
+    - do not depend to
+      - HTTP::MobileAgent
+      - Web::Scraper
+
+0.32
+
+    - depend to HTML::ReplacePictogramMobileJp 0.04
+    -- sjis dec cref support for docomo.
+    - bug fixed in Plugin::DisplayWidth.
+
+0.31
+
+    - Server::HTTPProxy: bug fixed... orz
+
+0.30
+
+    - MAJOR VERSION UP RELEASE!!
+    - THIS RELEASE HAVE MANY INCOMPATIBLE CHANGES
+    
+    - based on Class::Component(tokuhirom)
+    - Plugin::Filter::* renamed to Plugin::*(tokuhirom)
+    - Plugin::Server::* renamed to Server::*(tokuhirom)
+    - added many tests!(tokuhirom)
+
+    - new features!
+    -- guid=ON support(tokuhirom).
+    -- focus to location bar(requested by nekokak++)
+    -- controll panel is moved to 右上.(precuredaisuki++)
+
+    - bug fixed
+    -- DisableTableTag: bug fixed...
+
+0.25
+
+    - (SECURITY FIX) do not allow the file schema.(reported by yappo++)
+    - added Plugin::Filter::QRCode::Imager by typester++
+
+0.24
+
+    - bug fixed in Moxy::Plugin::QRCode.
+
+0.23
+
+    - fixed dependnecies. use Test::Base.
+
+0.22
+
+    - return valid Content-Length.
+
+0.21
+
+    - added Moxy::Plugin::Server::POE
+
+0.20 (BIG CHANGE!!)
+
+    - this release have a BIG CHANGE.
+      config.yaml is INCOMPATIBLE.
+    - Moxy::Plugin::Server is rewrite from scratch.
+    - proxy mode is removed.
+
+0.08
+
+    - (INCOMPATIBLE CHANGE) plugin hook point is all changed.
+    - internal code is utf-8 instead of euc-jp.
+    - Moxy::Plugin::Application is direct access to the server.
+
+0.07
+
+    - rewrote Moxy::Plugin::Pictogram by HTML::ReplacePictogramMobileJp
+
+0.06
+
+    - added new plugin: Plugin::HTTPHeader.easy to rewrite HTTP headers.
+    - Plugin::GPS support DoCoMo posinfo
+
+0.05  Wed Feb 2 22:06:54 2008
+        - update documents
+
+0.04  Wed Feb 2 03:14:30 2008
+        - include pictogram image
+
+

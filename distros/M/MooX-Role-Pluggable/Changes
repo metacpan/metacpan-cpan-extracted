@@ -1,0 +1,125 @@
+Revision history for Perl module MooX::Role::Pluggable
+
+1.002002 2015-07-17
+
+  - Minor optimizations
+
+1.002001 2015-03-05
+
+  - plugin_alias_list now returns properly ordered list; suggested by caipre
+
+  - POD; merge edits from caipre + other cleanups and fixes;
+    https://github.com/avenj/moox-role-pluggable/issues/1
+
+  - Drop Test::Exception, MooX::late dependencies
+
+  - Packaging; switch to cpanfile
+
+1.001002 2015-02-28
+
+  - 'use strictures 2;' for saner fatal warning behavior
+
+1.001001 2014-08-16
+
+  - Fatals instead of warnings where they make more sense;
+    attempting to (un)subscribe to a nonexistant event type and passing bad
+    arguments to (un)subscribe should die rather than warn.
+
+  - Use Type::Tiny
+
+  - Happy CPAN Day!
+
+0.120006 2013-08-25
+
+  - Drop minimum version to perl-5.8.9
+
+0.120005 2013-08-22
+
+  - Set '$@' in plugin_pipe_unshift
+
+  - Fix 'Changes' to conform to CPAN::Changes::Spec
+
+0.120004 2013-05-09
+
+  - Fix '_default' dispatch to plugins; event name was missing from args.
+
+  - POD cleanups/clarifications. Could still use work.
+
+0.120003 2013-04-19
+
+  - Drop constant.pm
+
+0.120002 2013-02-07
+
+  - Missing dependency on Test::Exception
+
+0.120001 2013-02-05
+
+  - Depend on newer Moo (fixes Moose compat)
+  
+  - Switch to Dist::Zilla
+
+0.11 2012-10-29
+ 
+   - More optimizations & test tweaks.
+
+0.10 2012-10-29
+
+   - Squeeze a couple hundred more calls/sec out of dispatch by skipping
+     an unnecessary method call:
+        object-pluggable    6135/s
+        moox-role-pluggable 10239/s
+
+  - Documentation improvements.
+
+0.09 2012-10-28
+
+   - Fix args dispatched via plugin_error.
+     Include the object/src unconditionally.
+
+    - More dispatcher optimizations:
+         object-pluggable    6061/s
+         moox-role-pluggable 8174/s
+
+0.08 2012-10-28
+
+   - Fix _pluggable_init ev_prefix vs event_prefix
+     Documentation was incorrect, but no harm in accepting both.
+     (Same goes for reg_prefix vs register_prefix)
+
+
+0.07 2012-10-28
+
+   - Further dispatcher optimizations:
+                           Rate
+       object-pluggable    6098/s
+       moox-role-pluggable 7009/s
+
+0.06 2012-10-28
+
+   - Optimize dispatcher.
+
+0.05 2012-10-28
+
+   - Fix plugin_error plugin object dispatch.
+
+0.04 2012-10-25
+
+   - Improved POD / tests
+
+0.03 2012-10-21
+
+   - When pipeline manipulation methods fail, carp() in addition to setting 
+     $@ and returning empty list (or similar).
+
+   - Improved POD
+
+0.02 2012-10-20
+
+   - perl-5.10.1 should do, drop 5.12.1 dep
+
+   - Improved POD
+
+0.01 2012-10-19
+
+   - Initial release

@@ -1,0 +1,89 @@
+Revision history for Perl extension MMapDB.
+
+0.15  Mon Sep 10 10:37:44 CEST 2012
+      - make "map {local $_} values %{$d->main_index}" work
+        map creates an alias ($_) and local tries to assign to it.
+        Prior this threw an exception.
+
+0.14  Sun Apr  3 20:57:57 CEST 2011
+      - index_lookup and index_lookup_position now accept 0 or undef in
+      	place of the index parameter. In this case the mainidx is looked up.
+	Should be a bit faster than passing $db->mainidx.
+      - index_lookup_records(), index_lookup_values(), index_lookup_sorts()
+      - speed up writing: mmap _tmpfh and _stringfh to avoid sysseek+syswrite
+
+        v0.13: 20.7612 (19.09 usr +  1.63 sys = 20.72 CPU) @  1.06/s (n=22)
+        v0.14: 20.299 (20.20 usr +  0.05 sys = 20.25 CPU) @  1.68/s (n=34)
+                Rate v0.13 v0.14
+        v0.13 1.06/s    --  -37%
+        v0.14 1.68/s   58%    --
+
+0.13  Thu Mar 31 12:27:39 CEST 2011
+      - MMDB-lookup tool
+      - data_record, data_value and data_sort now work on a position list
+        instead of a single position.
+
+0.12  Sun Oct 31 14:22:53 CET 2010
+      - fixed subtle UTF8 problem: 2 strings consisting of the same ascii
+      	characters were considered different if one of them had the UTF8
+	flag set while the other had not.
+
+	Example:
+
+	  no utf8;      # just to make sure
+	  Encode::decode_utf8('hello') eq 'hello'
+
+	In Perl this is true. The MMapDB index_lookup function reported them
+	as different up to version 0.11.
+
+0.11  Sat Jun  5 16:37:48 CEST 2010
+      - removed _rwdata, since File::Map provides protect() now (since 0.21)
+      - avoid lvalue substr() in invalidate since this prevents the
+        file map to be destroyed in time.
+
+0.10  Fri May 14 13:58:13 CEST 2010
+      - make references to the MMapDB object from MMapDB::_base objects
+        (tied interface) weak.
+
+0.09  Mon May  3 19:54:25 CEST 2010
+      - declare @attributes as 'our'
+      - data_value, data_sort accessors
+      - DATAMODE_SIMPLE
+      - untie in stop() to break circular refs
+
+0.08  Wed Apr 21 10:38:55 CEST 2010
+      - make POD coverage happy
+
+0.07  Sun Jan 24 14:19:28 CET 2010
+      - UTF-8 support
+      - iterator class
+
+0.06  Thu Jan 21 13:18:33 CET 2010
+      - returning nitems in array context for index_iterator and
+        id_index_iterator()
+      - new: is_datapos() as shortcut for $pos<$db->mainidx
+
+0.05  Wed Nov 25 12:56:21 CET 2009
+      - correct index_lookup behavior to return an empty list
+        if the key was not found
+
+0.04  Sun Jul  5 09:59:18 CEST 2009
+      - allow for method chaining with start():
+        MMapDB->new->start->main_index->{...}
+      - lockfile
+
+0.03  Fri Jul  3 11:36:07 CEST 2009
+      - read-only strings in data_record() result (avoid unnecessary copying)
+      - data_record() now returns an array ref instead of a list
+        (also avoid unnecessary copying)
+      - data_record() is inplemented in C.
+      - insert() takes now an array ref instead of a parameter list
+        to be consistent with data_record()
+
+0.02  Thu Jun 25 12:19:15 CEST 2009
+      - backup(), restore(), invalidate(), is_valid()
+
+0.01  Fri Jun 12 09:53:46 2009
+	- original version; created by h2xs 1.23 with options
+		-A -b 5.8.8 -n MMapDB
+

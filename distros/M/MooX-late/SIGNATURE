@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 10a180a41f91e5461699b5a32d83af4eb2019063 COPYRIGHT
+SHA1 502c559978c40e9248b93b179985933644ebfca1 CREDITS
+SHA1 d540676247c6223ce63af2e24dd27ec597172804 Changes
+SHA1 4b001f59d6016da8f1dd32e32c92340d098f4e4d INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 116b15d3035daeef65599f9c3d17da12a8a16b6e MANIFEST
+SHA1 95d62b7d820562b9cab86d1ef25e85e71b481bf1 META.json
+SHA1 f1b3c39140ce0efa4863837742633fc63b563a06 META.yml
+SHA1 5f987fbb0941e6958dfe94859126be66ee4f3a5a Makefile.PL
+SHA1 848b6a996d0e479d6cc8d279214891df84843e44 README
+SHA1 82a5dbef757dbba311ab59332cd5c3092dc1dc4a TODO
+SHA1 19114c43d58f7b89287f77b0a2318ea72d7d9983 dist.ini
+SHA1 0f0783dd1b2c74f19c23c34f224ef959b45d5c4b doap.ttl
+SHA1 6c115a020133c60ececeae3b2fde21abdcb83179 examples/simple.pl
+SHA1 eb8f9f75bbec3fce01fae54dec155d3189867439 lib/MooX/late.pm
+SHA1 f8833de7f2ab9f1d40f29c32943da5d513d7e623 t/01basic.t
+SHA1 888f8a494a4d43c821e6bc581d59f577859b0c5d t/02inflation.t
+SHA1 ff6dd69d308062933193712fe88abad29490838c t/03invalid_tc.t
+SHA1 904411100b6e3c06629020bb2bc52eeca3afa802 t/04arrayofattrs.t
+SHA1 de4ffc50f992e994565223480950ced4456976e2 t/05haveimissedanytypes.t
+SHA1 7a6b642014d821f39bca5c5570b17ed8805843e1 t/06handlesvia.t
+SHA1 5367c78be6846f7f71fcdbbc77a4a9495e024451 t/07coerce1.t
+SHA1 066a4a083faf2ec211c72d346e0ab7ad6a710f95 t/08doesrole.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlPx7dQACgkQzr+BKGoqfTnS2gCffhbs29dRF02DkXg+eMRqw1MU
+ZhIAmwR7bblwp6hX4jU76hcv3e+MGE/5
+=kcLS
+-----END PGP SIGNATURE-----

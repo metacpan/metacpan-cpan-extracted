@@ -1,0 +1,96 @@
+0.030
+  - Fix fallback store_file behaviour.
+
+0.029
+  - Shutdown writes on our socket as soon as we're done.
+  - Pass through the checksum calculated in store_file.
+
+0.028
+  - Add a replacement implementation for store_file.
+
+0.027
+  - Add more documentation.
+  - Handle HTTP failures better.
+  - Don't repeetedly report checksum timeouts.
+
+0.026
+  - Code clean ups.
+  - Handle uploading large files on 32 bit machines.
+  - Handle uploading large files on 64 bit machines.
+  - Handle timeouts caused by waiting for large files to be checksummed.
+  - Remove the old Callback code, now disused.
+
+0.025
+  - Retag correctly.
+
+0.024
+  - Fix error path when the remote host gives you a non-200 response.
+
+0.023
+  - Don't lose create_close error messages.
+
+0.022
+  - Pass through a calculated checksum.
+
+0.020
+  - Correctly recover should create_close fail.
+
+0.019
+  - More helpful error when files grow during writing.
+  - Allow a coderef to be passed rather than a dkey, for possibly safer
+    re-uploading.
+
+0.018
+  - Handle things better if the call to the tracker explodes.
+
+0.017
+  - Fix bug affecting files written in multiple calls.
+
+0.016
+  - New CallbackFile client.
+
+0.015
+  - Update repository for release.
+
+0.014
+  - TCP_CORK added for the async client.
+  - Don't use TCP_CORK on non-Linux OSs.
+  - Try to connect to another host if the first fails (callback client.)
+
+0.013
+  - Performance monitoring for Callback writes.
+
+0.012
+  - Data can be passed by reference.
+
+0.011
+  - "Callback" subclass for when you don't have the entire file to send at
+    the start.
+
+0.008
+  - Advise the OS about our file accessing through posix_fadvise(2).
+
+0.007
+  - Fix the "Connection error: unknown error" issue on first retry
+
+0.006
+  - Have a much longer timeout for HTTP response than general IO as
+    lighty will move the temporary file before responding.
+
+0.005
+  - Bump timeout on read/write to 60 seconds for when machines are busy.
+
+0.004
+  - Deal with servers which reply with HTTP 1.1 to 1.0 requests.
+
+0.003
+  - Fix retrying to work correctly.
+
+0.002
+  - Add one retry to PUT request on each path given by the tracker
+  - Move use of $! up to hopefully capture the socket error before it
+    is removed by clearing the timeout guard.
+
+0.001
+  - Initial very rough cut
+

@@ -1,0 +1,392 @@
+Revision history for Map::Tube::London
+
+0.82  Mon Mar 20 13:30:00 2017
+      - Tidied up test scripts and removed "-T" switch.
+
+0.81  Thu Mar 16 11:10:00 2017
+      - Upgraded to use Test::Map::Tube v0.25.
+
+0.80  Tue Mar 07 10:45:00 2017
+      - Upgraded to use Map::Tube v3.28.
+
+0.79  Sun Feb 12 08:55:00 2017
+      - Upgraded to use Map::Tube v3.22.
+      - Changed map data file format to JSON.
+
+0.78  Sat Oct 22 08:00:00 2016
+      - Upgraded to use Map::Tube v3.21.
+      - Upgraded to use Test::Map::Tube v0.17.
+
+0.77  Tue Aug 16 12:00:00 2016
+      - Upgraded to use Map::Tube v3.18.
+      - Tidied up github repo url.
+
+0.76  Mon Jun 27 10:00:00 2016
+      - Upgraded to use Map::Tube v3.15.
+      - Consolidated routes testing functions using method ok_map_routes().
+
+0.75  Wed Jun 15 10:05:00 2016
+      - Upgraded to use Map::Tube v3.13.
+      - Updated unit test to respect the above changes.
+      - Updated copyright year information.
+
+0.74  Mon Sep 21 11:30:00 2015
+      - Upgraded to use Map::Tube v3.01.
+      - Updated unit test to respect the above changes.
+
+0.73  Sat Jul 25 12:00:00 2015
+      - Upgraded to use Map::Tube v3.00.
+
+0.72  Thu Mar 26 23:05:00 2015
+      - Upgraded to use Map::Tube v2.95.
+      - Updated unit test t/route.t with regards to the changes in the package Map::Tube::Route in v2.95.
+
+0.71  Sun Mar 22 10:35:00 2015
+      - Upgraded to use Map::Tube v2.90.
+      - Added unit test t/route.t to test the new method preferred() that was added to Map::Tube::Route in v2.90.
+
+0.70  Sun Mar 15 17:35:00 2015
+      - Upgraded to use Map::Tube v2.89.
+      - Updated map data with respect to other link type attribute (new).
+      - Added new test case to respect the above changes.
+
+0.69  Sun Mar 01 03:20:00 2015
+      - Added package to list tube stations for Piccadilly lines.
+      - Updated link information for the station "Green Park".
+      - Updated link information for the station "Osterley".
+      - Updated link information for the station "Hatton Cross".
+      - Added map for Piccadilly lines.
+      - Updated map for London Tube.
+      - Tidied up the pod document.
+
+0.68  Sat Feb 28 12:20:00 2015
+      - Added package Map::Tube::London::Line::Overground to the 'provides' list in Makefile.PL file.
+
+0.67  Sat Feb 28 12:15:00 2015
+      - Added File::ShareDir::Install as configure requires in the Makefile.PL file.
+      - Added package to list tube stations for London Overground lines.
+      - Added map for London Overground lines.
+      - Updated map for London Tube.
+      - Updated link information for the station "Harrow & Wealdstone".
+      - Updated link information for the station "Kensington (Olympia)".
+      - Updated link information for the station "West Brompton".
+      - Tidied up the pod document.
+
+0.66  Sun Feb 22 20:20:00 2015
+      - Upgraded to use Map::Tube v2.87.
+      - Updated link information for the station "East Acton".
+      - Updated link information for the station "West Acton".
+      - Updated Central Line map image to reflect the above changes to the map data.
+      - Updated London Tube map image to reflect the above changes to the map data.
+
+0.65  Sun Feb 22 17:17:00 2015
+      - Updated london tube line maps post change in the data xml.
+      - Tidied up the pod document.
+
+0.64  Fri Feb 20 16:40:00 2015
+      - Upgraded to use Map::Tube v2.86.
+      - Added unit test to validate map data (xml) using Test::Map::Tube.
+
+0.63  Thu Feb 19 15:45:00 2015
+      - Updated link information for the station "Green Park".
+      - Updated link information for the station "Leicester Square".
+      - Updated link information for the station "Surrey Quays".
+      - Updated link information for the station "Sydenham".
+      - Updated the name of station "Sydenham".
+      - Updated London map to reflect the change in the xml data.
+
+0.62  Thu Feb 19 13:20:00 2015
+      - Added 'skip' data for DLR line.
+      - Added following stations to the DLR Line:
+        - Abbey Road
+        - Star Lane
+        - Stratford High Street
+        - Stratford International
+      - Updated the link information for the station "Westferry".
+      - Updated the line and link information for the station "West Ham".
+      - Updated the link information for the station "Stratford".
+      - Updated the link information for the station "Shadwell".
+      - Updated the line information for the station "Monument".
+      - Updated the link information for the station "Canning Town".
+      - Updated station name "Hampstead Heath".
+      - Updated station name "Gallions Reach".
+      - Updated the map for DLR line.
+
+0.61  Wed Feb 18 15:30:00 2015
+      - Added package Map::Tube::London::Line::DLR to the 'provides' list in Makefile.PL file.
+
+0.60  Wed Feb 18 15:20:00 2015
+      - Upgraded to use Map::Tube v2.84.
+      - Added package to list tube stations for Dockland Light Railway lines.
+
+0.59  Tue Feb 17 16:00:00 2015
+      - Minor changes to the name of line packages.
+
+0.58  Tue Feb 17 15:20:00 2015
+      - Linked the station "Waterloo" in the Jubilee Line to Waterloo & City Line in the pod document.
+
+0.57  Tue Feb 17 14:50:00 2015
+      - Added package Map::Tube::London::Line::WaterlooCity to the 'provides' list in Makefile.PL file.
+
+0.56  Tue Feb 17 14:10:00 2015
+      - Added package to list tube stations for Waterloo & City lines.
+
+0.55  Mon Feb 16 23:25:00 2015
+      - Corrected London Tube map image name.
+
+0.54  Mon Feb 16 18:10:00 2015
+      - Upgraded to use Map::Tube v2.83.
+      - Updated sample code in the pod document of Map::Tube::London.
+      - Added London tube map.
+
+0.53  Mon Feb 09 13:40:00 2015
+      - Fixed the typo in the line name 'Piccadilly' in the xml data file.
+
+0.52  Tue Feb 03 14:40:00 2015
+      - Updated 'skip' data for Bakerloo line.
+      - Added sample map to the pod document of Map::Tube::London.
+      - Updated Circle line map visual settings in the pod document.
+      - Updated line color code in the xml data file.
+      - Re-generated all the london line maps.
+
+0.51  Sun Feb 01 20:35:00 2015
+      - Added package to list tube stations for Victoria lines.
+      - Updated the line maps as generated by Map::Tube::Plugin::Graph v0.11.
+
+0.50  Sat Jan 31 11:20:00 2015
+      - Updated line informations for the stations 'Elephant & Castle' and 'King's Cross St. Pancras'.
+      - Updated link informations for the stations 'Stockwell' and 'Waterloo'.
+      - Updated section "MAP" of the pod document.
+      - Updated Northern line tube map.
+
+0.49  Fri Jan 30 23:20:00 2015
+      - Updated link informations for the station 'Euston' in the xml data.
+      - Updated Northern line tube map.
+
+0.48  Thu Jan 29 15:25:00 2015
+      - Fixed the line information for the station 'Tottenham Court Road'.
+      - Updated the line color information as hex code.
+      - Updated the line maps as generated by Map::Tube::Plugin::Graph v0.10.
+
+0.47  Wed Jan 28 15:25:00 2015
+      - Upgraded to use Map::Tube v2.77.
+      - Added package to list tube stations for Northern lines.
+
+0.46  Thu Jan 22 16:45:00 2015
+      - Patched RT: 101669 (Gisbert W. Selke)
+      - Upgraded to use Map::Tube v2.70.
+      - Updated map xml data and add detailed line informations.
+      - Updated generated tube line images using Map::Tube v2.70 and Map::Tube::Plugin::Graph v0.07.
+
+0.45  Wed Jan 21 21:35:00 2015
+      - Upgraded to use Map::Tube v2.69.
+      - Updated map name in the xml data.
+      - Updated tube map images.
+      - Updated pod document of District and Jubilee Line regarding map height and width.
+      - Updated MANIFEST.SKIP file to exclude maps from the distribution.
+
+0.44  Tue Jan 20 20:45:00 2015
+      - Upgraded to use Map::Tube v2.68.
+      - Updated section "MAP" in the pod document of all packages Map::Tube::London::Line::*.
+
+0.43  Tue Jan 20 14:30:00 2015
+      - Upgraded to use Map::Tube v2.67.
+      - Added map image for some of the tube lines.
+      - Updated pod documented and linked the map image.
+      - Updated link informations for the stations 'East Acton' and 'West Acton'.
+
+0.42  Tue Jan 20 00:30:00 2015
+      - Upgraded to use Map::Tube v2.66 to bring better plugin handler.
+
+0.41  Mon Jan 19 16:25:00 2015
+      - Upgraded to use Map::Tube v2.65 to bring in the map data validation feature.
+      - Updated the link information for the station 'White City'.
+
+0.40  Mon Jan 19 11:35:00 2015
+      - Fixed the code in the pod document about method as_image().
+
+0.39  Sun Jan 18 23:50:00 2015
+      - Upgraded to use Map::Tube v2.64 to bring in the graph pluggin support.
+      - Added tube name to the xml data.
+      - Added new optional attribute 'skip' to the package Map::Tube::London.
+      - Fixed the link information for the following stations:
+        - Aldgate East
+        - Buckhurst Hill
+        - Earl's Court
+        - High Street Kensington
+        - Holborn
+        - Kensington (Olympia)
+        - Latimer Road
+        - Oxford Circus
+        - Tottenham Court Road
+        - West Brompton
+        - White City
+        - West Brompton
+        - Wood Lane
+      - Fixed the line information for the following stations:
+        - Paddington
+        - Upton Park
+
+0.38  Thu Jan 15 17:40:20 2015
+      - Updated the link for the station 'Westminster'.
+
+0.37  Thu Jan 15 17:07:20 2015
+      - Removed the incorrect link of station 'Harrow-on-the-Hill' to 'Uxbridge'.
+      - Fixed the typo in the station name of 'Northwick Park'.
+      - Updated the line information of the station 'Rayners Lane'.
+      - Updated the line information of the station 'West Ham'.
+      - Fixed the typo in the station name of "King's Cross St. Pancras" in the pod document.
+      - Upgraded to use Map::Tube v2.63.
+
+0.36  Tue Jan 13 15:05:00 2015
+      - Upgraded to use Map::Tube v2.62.
+
+0.35  Wed Jan 07 17:45:20 2015
+      - Upgraded to use Map::Tube v2.61 as it brings in new fix and feature.
+      - Tidied up the test scripts meta-yml.t and meta-json.t.
+
+0.34  Tue Jan 06 17:00:00 2015
+      - Tidied up the MANIFEST.SKIP file.
+
+0.33  Sun Jan 04 03:20:10 2015
+      - Added the missing package Map::Tube::London::Line::District to the 'provides' list.
+      - Fixed the typo in the package name Map::Tube::London::Line::Jubilee in the 'provides' list.
+
+0.32  Sun Jan 04 01:40:00 2015
+      - Upgraded to use Map::Tube v2.57 as it brings in new fix and feature.
+      - Updated Makefile.PL to generate the key 'provides' for META file correctly.
+      - Added unit test to test META files.
+      - Added LICENSE file.
+      - Updated Copyright year information.
+
+0.31  Sat Jan 03 11:35:00 2015
+      - Defined $AUTHORITY in each package of the distribution Map-Tube-London.
+      - Added the following files to the MANIFEST.SKIP file
+        - '_eumm/META_new.json'
+        - '_eumm/META_new.yml'
+        - '_eumm/Map-Tube-London.ppd'
+
+0.30  Thu Jan 01 10:25:10 2015
+      - Upgraded to use Map::Tube v2.50 to keep it up to date.
+      - Updated link information for station 'Barons Court'.
+      - Updated link information for station 'Bayswater'.
+      - Updated link information for station 'Earl's Court'.
+      - Updated line information for station 'Earl's Court'.
+      - Updated line information for station 'Gloucester Road'.
+      - Updated link information for station 'Paddington'.
+      - Updated link information for station 'South Kensington'.
+      - Updated line information for station 'South Kensington'.
+      - Updated unit test to respect the changes in the map xml data.
+
+0.29  Wed Dec 31 12:10:10 2014
+      - Updated link information for station 'Bank'.
+      - Updated link information for station 'Monument'.
+      - Updated link information for station 'Shadwell'.
+      - Updated link information for station 'Victoria'.
+      - Updated unit test to reflect the changes in the xml map data.
+      - Updated package Map::Tube::London::Line::Circle w.r.t. station 'Monument'.
+      - Updated package Map::Tube::London::Line::District w.r.t. station 'Monument'.
+
+0.28  Fri Dec 19 12:40:20 2014
+      - Added package to list tube stations for Metropolitan lines.
+      - Updated pod document for Map::Tube::London about the above changes.
+
+0.27  Thu Dec 18 14:10:20 2014
+      - Added package to list tube stations for Jubilee lines.
+      - Updated pod document for Map::Tube::London about the above changes.
+
+0.26  Thu Dec 18 01:54:45 2014
+      - Updated line information for station "Baker Street", "Livepool Street",
+        "Paddington".
+      - Some minor tidied up.
+
+0.25  Wed Dec 17 17:25:45 2014
+      - Fixed the link in pod document of the package Map::Tube::London::Line::Bakerloo.
+
+0.24  Wed Dec 17 14:35:30 2014
+      - Added package to list tube stations for Hammersmith & City lines.
+      - Updated pod document for Map::Tube::London about the above changes.
+
+0.23  Tue Dec 16 16:58:15 2014
+      - Added section "NOTE" to all line stations package.
+
+0.22  Tue Dec 16 15:51:10 2014
+      - Added package to list tube stations for District lines.
+      - Updated pod document for Map::Tube::London about the above changes.
+
+0.21  Tue Dec 16 11:35:30 2014
+      - Added package to list tube stations for Circle lines.
+      - Updated pod document for Map::Tube::London about the above changes.
+
+0.20  Mon Dec 15 17:35:40 2014
+      - Fixed the typo in pod document of Map::Tube::London regarding Bakerloo Line.
+      - List the common station names in the Map::Tube::London::Line::Bakerloo and
+        Map::Tube::London::Line::Central.
+
+0.19  Mon Dec 15 15:55:20 2014
+      - Added package to list tube stations for Bakerloo and Central lines.
+      - Updated pod document for Map::Tube::London about the above changes.
+
+0.18  Sat Dec 07 11:15:10 2014
+      - Upgraded to use Map::Tube v2.34 to keep it up to date.
+
+0.17  Fri Dec 05 19:50:10 2014
+      - Upgraded to use Map::Tube v2.33 to keep it up to date.
+
+0.16  Fri Dec 05 10:42:10 2014
+      - Upgraded to use Map::Tube v2.32 as it brings in new fix and feature.
+      - Fixed the test data.
+      - Updated unit test to reflect the changes in Map::Tube v2.32.
+
+0.15  Fri Dec 05 10:42:10 2014
+      - Updated the description of method get_shortest_route().
+
+0.14  Thu Dec 04 21:43:10 2014
+      - Updated unit test to make use of new class provided by Map::Tube role.
+      - Updated description of method get_shortest_route() in the pod documemt.
+      - Corrected the map data (fixed missing links)
+      - Fixed broken test because of change in map data.
+
+0.13  Mon Nov 11 20:23:10 2014
+      - Upgraded to use Map::Tube v2.31 as it brings in new fix and feature.
+      - Added test script test-case-01.t.
+      - Removed SIGNATURE file.
+
+0.12  Mon Nov 10 20:23:10 2014
+      - Added test script test-case-00.t.
+
+0.11  Fri Nov 07 23:19:10 2014
+      - Tidied up the pod document.
+
+0.10  Thu Oct 23 23:35:10 2014
+      - Made the package File::ShareDir::Install pre-requisite in the Makefile.PL file.
+
+0.09  Sat Sep 20 22:16:30 2014
+      - Fixed the typo in the Makefile.PL
+
+0.08  Sat Aug 30 02:59:00 2014
+      - Added key "META_MERGE" key on condition (ExUtils::MakeMake->VERSION(6.46).
+
+0.07  Sat Aug 16 10:40:19 2014
+      - Added section "REPOSITORY" to the pod document.
+      - Added key "META_MERGE" to Makefile.PL file.
+
+0.06  Fri Aug 08 23:05:00 2014
+      - Tidied up README file.
+
+0.05  Sun Aug 03 05:30:09 2014
+      - Patch for RT #97672.
+
+0.04  Tue Jul 08 03:50:20 2014
+      - Setting the default value for attribute 'xml' correctly.
+
+0.03  Mon Jul 07 20:52:00 2014
+      - Added missing pre-requisite 'namespace::clean' to Build.PL and Makefile.PL
+      - Also updated the pre-requisite version of 'Map::Tube' as 2.22
+
+0.02  Sun Jul 06 03:20:19 2014
+      - Updated Build.PL and Makefile.PL to have correct version of Map::Tube as pre-requisite.
+      - Updated Makefile.PL to set the correct License details.
+
+0.01  Sat Jul 05 12:00:01 2014
+      - First version, released.

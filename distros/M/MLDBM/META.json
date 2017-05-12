@@ -1,0 +1,63 @@
+{
+   "abstract" : "store multi-level Perl hash structure in single level tied hash",
+   "author" : [
+      "Gurusamy Sarathy <gsar@umich.edu>",
+      "Alexandr Ciornii (alexchorny@gmail.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MLDBM",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Data::Dumper" : "2.08",
+            "perl" : "5.005"
+         }
+      }
+   },
+   "provides" : {
+      "MLDBM" : {
+         "file" : "lib/MLDBM.pm",
+         "version" : "2.05"
+      },
+      "MLDBM::Serializer" : {
+         "file" : "lib/MLDBM.pm",
+         "version" : "2.05"
+      },
+      "MLDBM::Serializer::Data::Dumper" : {
+         "file" : "lib/MLDBM/Serializer/Data/Dumper.pm",
+         "version" : 0
+      },
+      "MLDBM::Serializer::FreezeThaw" : {
+         "file" : "lib/MLDBM/Serializer/FreezeThaw.pm",
+         "version" : 0
+      },
+      "MLDBM::Serializer::Storable" : {
+         "file" : "lib/MLDBM/Serializer/Storable.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/chorny/MLDBM/"
+      }
+   },
+   "version" : "2.05"
+}

@@ -1,0 +1,2233 @@
+<html>
+<head>
+<title>MHonArc Resources: MIMEFILTERS</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="mimeexcs.html">MIMEEXCS</a>]</td><td><nobr>[<a href="../resources.html#mimefilters">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="mimeincs.html">MIMEINCS</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>MIMEFILTERS</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<ul>
+<li><small><a href="#defaultfilters">Default Filters</a></small>
+<li><small><a href="#writefilters">Writing Filters</a></small>
+</ul>
+<li><a href="#filters">Available Filters</a>
+<ul>
+<li><small><a href="#m2h_external">m2h_external::filter</a></small>
+<li><small><a href="#m2h_msg_extbody">m2h_msg_extbody::filter</a></small>
+<li><small><a href="#m2h_text_enriched">m2h_text_enriched::filter</a></small>
+<li><small><a href="#m2h_text_html">m2h_text_html::filter</a></small>
+<li><small><a href="#m2h_text_plain">m2h_text_plain::filter</a></small>
+<li><small><a href="#m2h_text_tsv">m2h_text_tsv::filter</a></small>
+<li><small><a href="#m2h_null">m2h_null::filter</a></small>
+</ul>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p>
+<code>&lt;MIMEFILTERS&gt;</code><br>
+<var>filter-specification</var><br>
+<var>...</var><br>
+<code>&lt;/MIMEFILTERS&gt;</code><br>
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p>N/A
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<P>The resource MIMEFILTERS is used to hook in user specifed filters
+into MHonArc.  The MIMEFILTERS resource can only be set via the
+<CODE>MIMEFILTERS</CODE> element.  The syntax for each line of the
+the <CODE>MIMEFILTERS</CODE> element is as follows: </P>
+
+<P><var>content-type</var><CODE>;</CODE><var>routine-name</var><CODE>;</CODE><var>file-of-routine</var> </P>
+
+<P>The definition of each semi-colon-separated value is as follows:
+</P>
+
+<DL>
+<DT><var>content-type</var> 
+ 
+<DD><P>The MIME content-type the filter processes.  An explicit
+content-type (base/subtype) or a base content-type (base/*)
+can be specified.
+</P>
+
+<DT><var>routine-name</var>
+<DD><P>The actual routine name of the filter. The name
+should be fully qualified by the package it is defined in
+(e.g. "<CODE>mypackage::filter</CODE>").  </P>
+
+<DT><var>file-of-routine</var>
+<DD><P>The name of the file that defines
+<var>routine-name</var>. If the file is not a full
+pathname, MHonArc finds the file by looking in the
+standard include paths of Perl, and the paths specified by the
+<A HREF="perlinc.html">PERLINC</A>
+resource.
+</P>
+
+</DL>
+
+<P>Whitespace is stripped out for each filter specification.
+</P>
+
+<H3><a name="defaultfilters">Default Filters</a></H3>
+
+<p>MHonArc provides an existing set of filters which should be sufficient
+for most of your needs.  For information about the filters, see
+the <a href="#filters"><cite>Available Filters</cite></a> section below.
+</p>
+
+<H3><a name="writefilters">Writing Filters</a></H3>
+
+<P>If you want to write your own filter for use in MHonArc,
+you need to know the Perl programming language. The following
+information assumes you know Perl.
+</P>
+
+<table class="note" width="100%">
+<tr valign=top>
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>As of v2.5 of MHonArc, the API for filters is different from
+v2.4.x, and earlier.  The following describes the v2.5 API for
+filters.
+</p>
+</td>
+</tr>
+</table>
+
+<H4>Function Interface of Filter</H4>
+
+<P>MHonArc interfaces with MIME filters by calling a routine
+with a specific set of arguments. The prototype of the interface
+routine is as follows: </P>
+
+<PRE class="code">
+sub <var>filter</var> {
+    my(<b>$fields_hash_ref</b>, <b>$body_data_ref</b>, <b>$is_decoded</b>, <b>$filter_args</b>) = <!--
+-->&#64;<!--
+-->_;
+
+    <var># Filter code here
+
+    # The last statement should be the return value, unless an
+    # explicit return is done. See the following for the format of the
+    # return value.</var>
+}
+</PRE>
+
+<H5>Parameter Descriptions</H5>
+
+<table cellspacing=1 border=0 cellpadding=4>
+
+<tr valign=top>
+<td><strong><code><a name="fields_hash_ref"
+>$fields_hash_ref</a></code></strong></td>
+<td><p>A reference to hash of message/part header
+fields.  Keys are field names in lowercase
+and values are array references containing the
+field values.  For example, to obtain the
+content-type, if defined, you would do:
+</p>
+<pre class="code">
+  $fields_hash_ref-&gt;{'content-type'}[0]</pre>
+<p>Values for a fields are stored in arrays since
+duplication of fields are possible.  For example,
+the <tt>Received:</tt> header field is typically repeated
+multiple times.  For fields that only occur once,
+the array for the field will only contain one
+item.
+</p>
+<p>See <a href="#xmhafields"><cite>Special Variables and Header
+Fields</a> for more information about this parameter.
+</p>
+</td>
+</tr>
+
+<tr valign=top>
+<td><strong><code>$body_data_ref</code></strong></td>
+<td><p>Reference to body data.  The filter can safely
+modify referenced data.
+</p>
+</td>
+</tr>
+
+<tr valign=top>
+<td><strong><code>$is_decoded</code></strong></td>
+<td><p>Boolean flag if body data has been decoded.
+This is normally true unless some non-standard
+content-transfer-encoding is used.  See
+<a href="mimedecoders.html">MIMEDECODERS</a> on how
+to register decoders for various content-transfer-encodings.
+</p>
+</td>
+</tr>
+
+<tr valign=top>
+<td><strong><code>$filter_args</code></strong></td>
+<td><P>This is an optional argument string that may be used to modify the 
+behavior of the filter. The format of this string is determined by the filter 
+itself.  The value of the string is set by the
+<a href="mimeargs.html">MIMEARGS</a> resource.
+</P>
+</td>
+</tr>
+
+</table>
+
+<H5>Return Value</H5>
+
+<p>The return value is treated as a list. The first item of the list
+is a string representing the HTML markup to insert in the HTMLized
+message. An empty string, or <tt>undef</tt> may be returned to tell MHonArc
+that the routine was unable to filter data.
+</p>
+<p>Any other list items are treated as names of any files that were
+generated by the filter. MHonArc needs to keep track if any
+extra files that a filter may generate in order for MHonArc to
+delete those files if the message gets removed from the archive.
+</p>
+
+<table class="note" width="100%">
+<tr valign=top>
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>If you want MHonArc to treat the data as filtered, but not
+have anything displayed on the page, just return a string with
+a single space character.
+</p>
+</td>
+</tr>
+</table>
+<p> </p>
+<table class="note" width="100%">
+<tr valign=top>
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>If the filter creates a subdirectory with files, the filter
+only needs to return the subdirectory in the return list.  If
+the message gets removed, MHonArc will delete the entire
+directory.
+</p>
+</td>
+</tr>
+</table>
+
+<H4><a name="xmhafields">Special Variables and Header Fields</a></H4>
+
+<p>The following global variables are made available to filters:
+</p>
+
+<table cellspacing=1 border=0 cellpadding=4>
+
+<tr valign=top>
+<td><b><tt><nobr>$mhonarc::MHAindex</nobr></tt></b></td>
+<td><p>Index key of message.  Various MHonArc data structures and
+    utility routines require the index key of the message.
+    </p>
+    </td>
+</tr>
+<tr valign=top>
+<td><b><tt><nobr>$mhonarc::MHAmsgid</nobr></tt></b></td>
+<td><p>Message ID of message.
+    </p>
+    </td>
+</tr>
+<tr valign=top>
+<td><b><tt><nobr>$mhonarc::MHAmsgnum</nobr></tt></b></td>
+<td><p>Message number.  The format of the number will at least
+    be five digits wide, with leading zero padding.  For example,
+    if the number for a message is <tt>15</tt>, <tt>$mhonarc::$MHAmsgnum</tt>
+    will be equal to <tt>00015</tt>.
+    </p>
+    </td>
+</tr>
+<tr valign=top>
+<td><b><tt><nobr>$mhonarc::OUTDIR</nobr></tt></b></td>
+<td><p>Pathname to archive directory.  This variable is useful for
+    filters that create derived files.
+    </p>
+    </td>
+</tr>
+</table>
+
+<p>The <code><a href="#fields_hash_ref">$fields_hash_ref</a></code>
+parameter will have special MHonArc-specific keys defined.  Unlike
+regular header field values, the values are <strong>not</strong> arrays
+(unless noted).  The following special keys are defined:
+</p>
+
+<dl>
+
+<dt><b><tt>x-mha-charset</tt></b></dt>
+<dd><pre class="code">my $charset = $fields_hash_ref-&gt;{'x-mha-charset'}</pre>
+<p>Only defined for <tt>text</tt> entities, the value
+represents the character set encoding of the text entity.
+</p>
+<p>If your filter will take character encoding into account, you
+should use this value vs what is specified in regular entity header
+fields because <a href="textencode.html">TEXTENCODE</a> may be affect,
+so the effective character encoding of the data may be different from
+the original encoding specified in the message.
+</p>
+</dd>
+
+<dt><b><tt>x-mha-content-type</tt></b></dt>
+<dd><pre class="code">my $content_type = $fields_hash_ref-&gt;{'x-mha-content-type'}</pre>
+<p>The media type of the entity extracted from content-type entity header.
+</p>
+</dd>
+
+<dt><b><tt>x-mha-part-number</tt></b></dt>
+<dd><pre class="code">
+my $part_no      = $fields_hash_ref-&gt;{'x-mha-part-number'}
+my $full_part_no = readmail::gen_full_part_number($fields_hash_ref);</pre>
+<p>The child number of the entity within a multipart entity.  Numbering
+starts with 1, and if data is not part of a multipart entity, this
+key may not be defined.
+</p>
+</dd>
+
+<dt><b><tt>x-mha-parent-header</tt></b></dt>
+<dd><pre class="code">
+my $parent_header = $fields_hash_ref-&gt;{'x-mha-parent-header'}
+</pre>
+<p>The header field hash for the parent entity, if applicable.
+</p>
+</dd>
+
+</dl>
+
+<H4><a name="cidhash">Accessing Other Parts</a></H4>
+
+<p>For some media-types, a filter may need to access other entity
+parts to properly process a given part.
+For example,
+<a href="#m2h_text_html">m2h_text_html::filter</a> must access
+other entity parts when processing MHTML messages.
+</p>
+
+<p>When MHonArc parses a multipart message, it fills the
+<tt><b>%readmail::Cid</b></tt> hash for each entity that defines either
+a <tt>Content-Id</tt> or <tt>Content-Location</tt>.
+The <tt>%readmail::Cid</tt> hash is mainly for use by media types,
+like <tt>multipart/related</tt> where message parts may reference other
+message parts.
+</p>
+
+<p>The keys of the <tt>%readmail::Cid</tt> hash will be the
+<tt>Content-Id</tt>s and <tt>Content-Location</tt>s and each value
+will be a reference to an entity hash structure.  Code example:
+</p>
+<pre class="code">my $entity = $readmail::Cid{$content_id};</pre>
+<p>The hash structure defines the following fields: </p>
+
+<dl>
+<dt><strong><code>body</code></strong></td>
+<dd><pre class="code">
+my $entity_body_ref = $readmail::Cid{$content_id}-&gt;{'body'}
+</pre>
+<p>Scalar reference to the body of the entity.
+</p>
+</dd>
+</tr>
+<tr valign=top>
+<td><strong><code>fields</code></strong></td>
+<dd><pre class="code">
+my $entity_header_ref = $readmail::Cid{$content_id}-&gt;{'fields'}
+</pre>
+<p>Entity header fields hash reference.  The format is the same
+as described for <code><a href="#fields_hash_ref">$fields_hash_ref</a></code>.
+</p>
+</dd>
+</tr>
+<tr valign=top>
+<td><strong><code>filtered</code></strong></td>
+<dd><pre class="code">
+my $is_filtered = $readmail::Cid{$content_id}-&gt;{'filtered'}
+</pre>
+<p>Boolean if part has already been filtered.  This field should
+be set to a true value by filters that explicitly filters other entity parts.
+This tells MHonArc to not invoke a filter for the entity.
+</p>
+</dd>
+</tr>
+<tr valign=top>
+<td><strong><code>uri</code></strong></td>
+<dd><pre class="code">
+my $entity_uri = $readmail::Cid{$content_id}-&gt;{'uri'}
+</pre>
+<p>The URI to the filtered version of the entity.  This field should
+be set by filters that explicitly filters other entity parts.
+</p>
+</dd>
+</dl>
+
+<p>For a detailed example on how <tt>%readmail::Cid</tt> can be used, see
+the MHonArc library <tt>mhtxthtml.pl</tt>.
+</p>
+
+<H4>Utility Routines</H4>
+
+<p>See <cite><a href="../app-api.html#utilities">Utilities
+Routines</a></cite> in the appendix for various helper routines that
+can be used by your filter.
+</p>
+
+<H4>Filter Writing Tips</H4>
+
+<P>The following recommendations/tips are given to help you write
+filters: </P>
+
+<UL>
+<LI><P>Qualify your filter in its own package. This eliminates possible 
+variable/routine conflicts with MHonArc.
+</P>
+
+<LI><P>If the filter creates derived files (like the image filters),
+you may use the variable <strong><CODE>$mhonarc::OUTDIR</CODE></strong>
+to determine the
+location of the mail archive.
+</P>
+<table class="note" width="100%">
+<tr valign=top>
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p><strong>Do not include</strong> 
+<strong><CODE>$mhonarc::OUTDIR</CODE></strong> as part as the
+filename that is returned to MHonArc.  If the filter
+does create files, just return the base name.
+</p>
+</td>
+</tr>
+</table>
+<p></p>
+
+<LI><P>Look at the default filters contained in the distribution
+of MHonArc. You can use these as templates for writing
+your own.  </P>
+
+<LI><P>Make sure your Perl source file ends with a true statement
+(like "<CODE>1;</CODE>").  MHonArc just performs a
+<strong><CODE>require</CODE></strong>
+on the file, and if the file does not return
+true, Perl will abort execution.  </P>
+
+<li><p>Test your filter before production use.
+</p>
+
+</UL>
+
+<H4>Using C</H4>
+
+<P>If a MIME filter requires the utilization of a C program, or
+other non-Perl executable, a Perl wrapper must be written for the
+program in-order to interface with MHonArc.  The wrapper must
+follow the conventions described in
+<a href="#writefilters">Writing Filters</a>.
+</P>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="filters">Available Filters</a></h2>
+
+<p>The following is the list of filters available in the standard
+MHonArc distribution:
+</p>
+
+<table class="note" width="100%">
+<tr valign=top>
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>The filters use a <a href="mimeargs.html">MIMEARGS</a>
+argument style similiar to HTML attribute values.  For example:
+</p>
+<pre class="code">
+<b>&lt;MIMEArgs&gt;</b>
+m2h_text_plain::filter; attachcheck fancyquote maxwidth=80
+<b>&lt;/MIMEArgs&gt;</b>
+</pre>
+<p>If writing your own filters, you are encouraged to use the same
+style for consistency.
+</p>
+</td>
+</tr>
+</table>
+
+<H3><a name="m2h_external">m2h_external::filter</a></h3>
+
+<P>The filter extracts the data into a separate file and puts
+a hyperlink to the file into the HTMLized message.  The following
+is an example how the link is formatted:
+</P>
+<dl>
+<dd><p><strong>Attachment:
+<a href=""><tt>blueball.gif</tt></a></strong><br>
+<em>Description:</em> Blue ball GIF icon</p>
+</dd></dl>
+
+<p>The description text is retrieved from the <tt>Content-Disposition</tt>
+message header field, if defined.  If not defined, a generic description
+will be provided based on the specified content-type of the data.
+</p>
+
+<p>If the <tt>useicon</tt> filter argument has been specified for the
+filter, the following format will be used:
+</p>
+<dl><dd><p><strong><a href="" ><img src="../monicon.png" align="left" border=0 alt="Attachment:"></a>
+<a href="" ><tt>blueball.gif</tt></a></strong><br>
+<em>Description:</em> Blue ball GIF icon</p>
+</dd></dl>
+
+<p>The actual icon used is based upon the <a href="icons.html">ICONS</a>
+resource.
+</p>
+
+<P>By default, the filter ignores any filename specification
+given in the message when writing the data to disk. 
+A unique filename with an extension based upon sub-type is
+generated.
+</P>
+
+<p><strong><tt>m2h_external::filter</tt></strong> can take the
+following
+<a href="mimeargs.html">MIMEARGS arguments</a>:
+</p>
+
+<table cellspacing=1 border=0 cellpadding=4>
+<tr valign=top>
+<td><strong><tt>excludeexts=</tt></strong><var>ext1</var><tt>,</tt>...</td>
+<td width="100%"><p>A comma separated list of message specified filename extensions
+to exclude.  I.e.  If the filename extension matches an extension
+in excludeexts, the content will not be written.  The return markup
+will contain the name of the attachment, but no link to the data.
+This option is best used with application/octet-stream to exclude
+unwanted data that is not tagged with the proper content-type.
+</p>
+</td>
+</tr>
+<tr valign=top>
+<td><strong><tt>ext=<var>ext</var></tt></strong></td>
+<td><p>Use <var>ext</var> as the filename extension.
+The filter already has a large list of extensions for various
+content-types.  Use this argument if you process a
+content-type not recognized by the filter.
+</p></td>
+</tr>
+<tr valign=top>
+<td><strong><tt>forceattach</tt></strong></td>
+<td><p>Force images to never be displayed inline, overriding any
+Content-Disposition setting.
+</p></td>
+</tr>
+<tr valign=top>
+<td><strong><tt>forceinline</tt></strong></td>
+<td><p>Force images to be displayed inline, overriding any
+Content-Disposition setting.
+</p></td>
+</tr>
+<tr valign=top>
+<td><strong><tt>frame</tt></strong></td>
+<td><p>Draw a border around the attachment link.
+</p></td>
+</tr>
+<tr valign=top>
+<td><strong><tt>iconurl="<var>url</var>"</tt></strong></td>
+<td><p>Use "<var>url</var>" as the url for the icon to use
+if the <strong><tt>useicon</tt></strong> option is set.
+This option will override any setting defined by the
+<a href="icons.html">ICONS</a> resource.
+The double quotes are required.
+</p></td>
+</tr>
+<tr valign=top>
+<td><strong><tt>inline</tt></strong></td>
+<td><p>Inline image data by default if content-disposition not defined.
+</p></td>
+</tr>
+<tr valign=top>
+<td><strong><tt>inlineexts=</tt></strong><var>ext1</var><tt>,</tt>...</td>
+<td><p>A comma separated list of message specified filename
+extensions to treat as possible inline data.
+Applicable when content-type is not <tt>image/</tt><var>*</var> and
+<b><tt>usename</tt></b> or <b><tt>usenameext</tt></b> is in effect.
+</p></td>
+</tr>
+<tr valign=top>
+<td><strong><tt>type="<var>description</var>"</tt></strong></td>
+<td><p>Use "<var>description</var>" as type description of the
+data.  The double quotes are required.
+The filter already has a large list of descriptions for various
+content-types.  Use this argument if you process a
+content-type not recognized by the filter.
+</p></td>
+</tr>
+<tr valign=top>
+<td><strong><tt>subdir</tt></strong></td>
+<td><p>Place derived file in a subdirectory of the archive.
+The subdirectory will be called "<tt>msg<var>MSGNUM</var></tt>".
+This option may be useful if <strong><tt>usename</tt></strong> is
+specified to minimize security and name conflict problems.
+</p></td>
+</tr>
+<tr valign=top>
+<td><strong><tt>target=</tt></strong><var>name</var></td>
+<td><p>Set the TARGET attribute of anchor link to file
+Default value is undefined (ie. no TARGET attribute will be
+written).
+</p></td>
+</tr>
+<tr valign=top>
+<td><strong><tt>useicon</tt></strong></td>
+<td><p>Include a content-type icon with the hyperlink to
+the derived file.  The icon used is the value of the
+<strong><tt>iconurl</tt></strong> option or the icon
+defined by the <a href="icons.html">ICONS</a> resource.
+</p></td>
+</tr>
+<tr valign=top>
+<td><strong><tt>usename</tt></strong></td>
+<td><p>Use (file)name attribute for determining name
+of derived file.
+</p>
+<table class="caution" width="100%">
+<tr valign=top>
+<td><strong style="color: red;">CAUTION:</strong></td>
+<td width="100%"><p>
+Use this option with caution
+since it can lead to filename conflicts and
+security problems.
+</p>
+</td></tr></table>
+</td>
+</tr>
+<tr valign=top>
+<td><strong><tt>usenameext</tt></strong></td>
+<td><p>Use (file)name attribute for determining the extension
+of derived file.
+</p>
+<table class="caution" width="100%">
+<tr valign=top>
+<td><strong style="color: red;">CAUTION:</strong></td>
+<td width="100%"><p>
+Use this option with caution since it can lead to
+security problems.
+</p>
+</td></tr></table>
+</td>
+</tr>
+</table>
+
+<p>All arguments should be separated by at least one space.</p>
+
+<p>The following table shows the default list of content-types with the
+filename extension used and a short
+description that <strong><tt>m2h_external::filter</tt></strong>
+recognizes:
+</p>
+
+<center>
+<!--X-Ext-CType-Start-->
+<table border=1 cellpadding=1>
+<tr bgcolor="#C0C0C0">
+<th align=left>Content-type</th><th align=center>Extension</th><th align=left>Description</th></tr>
+<tr valign="top">
+<td align=left><strong>application/astound</strong></td>
+<td align=center><tt>asd</tt></td>
+<td>Astound presentation</td></tr>
+<tr valign="top">
+<td align=left><strong>application/envoy</strong></td>
+<td align=center><tt>evy</tt></td>
+<td>Envoy file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/fastman</strong></td>
+<td align=center><tt>lcc</tt></td>
+<td>fastman file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/fractals</strong></td>
+<td align=center><tt>fif</tt></td>
+<td>Fractal Image Format</td></tr>
+<tr valign="top">
+<td align=left><strong>application/iges</strong></td>
+<td align=center><tt>iges</tt></td>
+<td>IGES file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/mac-binhex40</strong></td>
+<td align=center><tt>hqx</tt></td>
+<td>Mac BinHex archive</td></tr>
+<tr valign="top">
+<td align=left><strong>application/mathematica</strong></td>
+<td align=center><tt>ma</tt></td>
+<td>Mathematica Notebook document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/mbedlet</strong></td>
+<td align=center><tt>mbd</tt></td>
+<td>mbedlet file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/ms-excel</strong></td>
+<td align=center><tt>xls</tt></td>
+<td>MS-Excel spreadsheet</td></tr>
+<tr valign="top">
+<td align=left><strong>application/ms-powerpoint</strong></td>
+<td align=center><tt>ppt</tt></td>
+<td>MS-Powerpoint presentation</td></tr>
+<tr valign="top">
+<td align=left><strong>application/ms-project</strong></td>
+<td align=center><tt>mpp</tt></td>
+<td>MS-Project file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/msword</strong></td>
+<td align=center><tt>doc</tt></td>
+<td>MS-Word document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/octet-stream</strong></td>
+<td align=center><tt>bin</tt></td>
+<td>Binary data</td></tr>
+<tr valign="top">
+<td align=left><strong>application/oda</strong></td>
+<td align=center><tt>oda</tt></td>
+<td>ODA file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/pdf</strong></td>
+<td align=center><tt>pdf</tt></td>
+<td>Adobe PDF document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/pgp</strong></td>
+<td align=center><tt>pgp</tt></td>
+<td>PGP message</td></tr>
+<tr valign="top">
+<td align=left><strong>application/pgp-signature</strong></td>
+<td align=center><tt>pgp</tt></td>
+<td>PGP signature</td></tr>
+<tr valign="top">
+<td align=left><strong>application/pkcs7-mime</strong></td>
+<td align=center><tt>p7m</tt></td>
+<td>S/MIME encrypted message</td></tr>
+<tr valign="top">
+<td align=left><strong>application/pkcs7-signature</strong></td>
+<td align=center><tt>p7s</tt></td>
+<td>S/MIME cryptographic signature</td></tr>
+<tr valign="top">
+<td align=left><strong>application/postscript</strong></td>
+<td align=center><tt>ps</tt></td>
+<td>PostScript document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/rtf</strong></td>
+<td align=center><tt>rtf</tt></td>
+<td>RTF file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/sgml</strong></td>
+<td align=center><tt>sgml</tt></td>
+<td>SGML document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/studiom</strong></td>
+<td align=center><tt>smp</tt></td>
+<td>Studio M file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/timbuktu</strong></td>
+<td align=center><tt>tbt</tt></td>
+<td>timbuktu file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vis5d</strong></td>
+<td align=center><tt>v5d</tt></td>
+<td>Vis5D dataset</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.framemaker</strong></td>
+<td align=center><tt>fm</tt></td>
+<td>FrameMaker document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.hp-hpgl</strong></td>
+<td align=center><tt>hpg</tt></td>
+<td>HPGL file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.lotus-1-2-3</strong></td>
+<td align=center><tt>123</tt></td>
+<td>Lotus 1-2-3</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.lotus-approach</strong></td>
+<td align=center><tt>apr</tt></td>
+<td>Lotus Approach</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.lotus-freelance</strong></td>
+<td align=center><tt>prz</tt></td>
+<td>Lotus Freelance</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.lotus-organizer</strong></td>
+<td align=center><tt>org</tt></td>
+<td>Lotus Organizer</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.lotus-screencam</strong></td>
+<td align=center><tt>scm</tt></td>
+<td>Lotus Screencam</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.lotus-wordpro</strong></td>
+<td align=center><tt>lwp</tt></td>
+<td>Lotus WordPro</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.mif</strong></td>
+<td align=center><tt>mif</tt></td>
+<td>Frame MIF document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.ms-excel</strong></td>
+<td align=center><tt>xls</tt></td>
+<td>MS-Excel spreadsheet</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.ms-powerpoint</strong></td>
+<td align=center><tt>ppt</tt></td>
+<td>MS-Powerpoint presentation</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.ms-project</strong></td>
+<td align=center><tt>mpp</tt></td>
+<td>MS-Project file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.stardivision.calc</strong></td>
+<td align=center><tt>sdc</tt></td>
+<td>StarCalc spreadsheet</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.stardivision.chart</strong></td>
+<td align=center><tt>sds</tt></td>
+<td>StarChart document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.stardivision.draw</strong></td>
+<td align=center><tt>sda</tt></td>
+<td>StarDraw document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.stardivision.impress</strong></td>
+<td align=center><tt>sdd</tt></td>
+<td>StarImpress presentation</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.stardivision.impress-packed</strong></td>
+<td align=center><tt>sdp</tt></td>
+<td>StarImpress packed file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.stardivision.mail</strong></td>
+<td align=center><tt>smd</tt></td>
+<td>StarMail mail file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.stardivision.math</strong></td>
+<td align=center><tt>smf</tt></td>
+<td>StarMath document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.stardivision.writer</strong></td>
+<td align=center><tt>sdw</tt></td>
+<td>StarWriter document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.stardivision.writer-global</strong></td>
+<td align=center><tt>sgl</tt></td>
+<td>StarWriter global document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.sun.xml.calc</strong></td>
+<td align=center><tt>sxc</tt></td>
+<td>OpenOffice Calc spreadsheet</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.sun.xml.calc.template</strong></td>
+<td align=center><tt>stc</tt></td>
+<td>OpenOffice Calc template</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.sun.xml.draw</strong></td>
+<td align=center><tt>sxd</tt></td>
+<td>OpenOffice Draw document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.sun.xml.draw.template</strong></td>
+<td align=center><tt>std</tt></td>
+<td>OpenOffice Draw Template</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.sun.xml.impress</strong></td>
+<td align=center><tt>sxi</tt></td>
+<td>OpenOffice Impress presentation</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.sun.xml.impress.template</strong></td>
+<td align=center><tt>sti</tt></td>
+<td>OpenOffice Impress template</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.sun.xml.math</strong></td>
+<td align=center><tt>sxm</tt></td>
+<td>OpenOffice Math documents</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.sun.xml.writer</strong></td>
+<td align=center><tt>sxw</tt></td>
+<td>OpenOffice Writer document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.sun.xml.writer.global</strong></td>
+<td align=center><tt>sxg</tt></td>
+<td>OpenOffice Writer global document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/vnd.sun.xml.writer.template</strong></td>
+<td align=center><tt>stw</tt></td>
+<td>OpenOffice Write template</td></tr>
+<tr valign="top">
+<td align=left><strong>application/winhlp</strong></td>
+<td align=center><tt>hlp</tt></td>
+<td>WinHelp document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/wordperfect5.1</strong></td>
+<td align=center><tt>wp</tt></td>
+<td>WordPerfect 5.1 document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-asap</strong></td>
+<td align=center><tt>asp</tt></td>
+<td>asap file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-bcpio</strong></td>
+<td align=center><tt>bcpio</tt></td>
+<td>BCPIO file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-bzip2</strong></td>
+<td align=center><tt>bz2</tt></td>
+<td>BZip2 compressed data</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-compress</strong></td>
+<td align=center><tt>Z</tt></td>
+<td>Unix compressed data</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-cpio</strong></td>
+<td align=center><tt>cpio</tt></td>
+<td>CPIO file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-csh</strong></td>
+<td align=center><tt>csh</tt></td>
+<td>C-Shell script</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-dot</strong></td>
+<td align=center><tt>dot</tt></td>
+<td>dot file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-dvi</strong></td>
+<td align=center><tt>dvi</tt></td>
+<td>TeX dvi file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-earthtime</strong></td>
+<td align=center><tt>etc</tt></td>
+<td>Earthtime file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-envoy</strong></td>
+<td align=center><tt>evy</tt></td>
+<td>Envoy file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-excel</strong></td>
+<td align=center><tt>xls</tt></td>
+<td>MS-Excel spreadsheet</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-gtar</strong></td>
+<td align=center><tt>gtar</tt></td>
+<td>GNU Unix tar archive</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-gzip</strong></td>
+<td align=center><tt>gz</tt></td>
+<td>GNU Zip compressed data</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-hdf</strong></td>
+<td align=center><tt>hdf</tt></td>
+<td>HDF file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-javascript</strong></td>
+<td align=center><tt>js</tt></td>
+<td>JavaScript source</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-ksh</strong></td>
+<td align=center><tt>ksh</tt></td>
+<td>Korn Shell script</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-latex</strong></td>
+<td align=center><tt>latex</tt></td>
+<td>LaTeX document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-maker</strong></td>
+<td align=center><tt>fm</tt></td>
+<td>FrameMaker document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-mif</strong></td>
+<td align=center><tt>mif</tt></td>
+<td>Frame MIF document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-mocha</strong></td>
+<td align=center><tt>moc</tt></td>
+<td>mocha file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-msaccess</strong></td>
+<td align=center><tt>mdb</tt></td>
+<td>MS-Access database</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-mscardfile</strong></td>
+<td align=center><tt>crd</tt></td>
+<td>MS-CardFile</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-msclip</strong></td>
+<td align=center><tt>clp</tt></td>
+<td>MS-Clip file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-msmediaview</strong></td>
+<td align=center><tt>m14</tt></td>
+<td>MS-Media View file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-msmetafile</strong></td>
+<td align=center><tt>wmf</tt></td>
+<td>MS-Metafile</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-msmoney</strong></td>
+<td align=center><tt>mny</tt></td>
+<td>MS-Money file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-mspublisher</strong></td>
+<td align=center><tt>pub</tt></td>
+<td>MS-Publisher document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-msschedule</strong></td>
+<td align=center><tt>scd</tt></td>
+<td>MS-Schedule file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-msterminal</strong></td>
+<td align=center><tt>trm</tt></td>
+<td>MS-Terminal</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-mswrite</strong></td>
+<td align=center><tt>wri</tt></td>
+<td>MS-Write document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-net-install</strong></td>
+<td align=center><tt>ins</tt></td>
+<td>Net Install file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-netcdf</strong></td>
+<td align=center><tt>cdf</tt></td>
+<td>Cdf file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-ns-proxy-autoconfig</strong></td>
+<td align=center><tt>proxy</tt></td>
+<td>Netscape Proxy Auto Config</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-patch</strong></td>
+<td align=center><tt>patch</tt></td>
+<td>Source code patch</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-perl</strong></td>
+<td align=center><tt>pl</tt></td>
+<td>Perl program</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-pointplus</strong></td>
+<td align=center><tt>css</tt></td>
+<td>pointplus file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-salsa</strong></td>
+<td align=center><tt>slc</tt></td>
+<td>salsa file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-script</strong></td>
+<td align=center><tt>script</tt></td>
+<td>A script file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-sh</strong></td>
+<td align=center><tt>sh</tt></td>
+<td>Bourne shell script</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-shar</strong></td>
+<td align=center><tt>shar</tt></td>
+<td>Unix shell archive</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-sprite</strong></td>
+<td align=center><tt>spr</tt></td>
+<td>sprite file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-stuffit</strong></td>
+<td align=center><tt>sit</tt></td>
+<td>Macintosh archive</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-sv4cpio</strong></td>
+<td align=center><tt>sv4cpio</tt></td>
+<td>SV4Cpio file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-sv4crc</strong></td>
+<td align=center><tt>sv4crc</tt></td>
+<td>SV4Crc file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-tar</strong></td>
+<td align=center><tt>tar</tt></td>
+<td>Unix tar archive</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-tcl</strong></td>
+<td align=center><tt>tcl</tt></td>
+<td>Tcl script</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-tex</strong></td>
+<td align=center><tt>tex</tt></td>
+<td>TeX document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-texinfo</strong></td>
+<td align=center><tt>texinfo</tt></td>
+<td>TeXInfo document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-timbuktu</strong></td>
+<td align=center><tt>tbp</tt></td>
+<td>timbuktu file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-tkined</strong></td>
+<td align=center><tt>tki</tt></td>
+<td>tkined file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-troff</strong></td>
+<td align=center><tt>roff</tt></td>
+<td>Troff document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-troff-man</strong></td>
+<td align=center><tt>man</tt></td>
+<td>Unix manual page</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-troff-me</strong></td>
+<td align=center><tt>me</tt></td>
+<td>Troff ME-macros document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-troff-ms</strong></td>
+<td align=center><tt>ms</tt></td>
+<td>Troff MS-macros document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-ustar</strong></td>
+<td align=center><tt>ustar</tt></td>
+<td>UStar file</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-wais-source</strong></td>
+<td align=center><tt>src</tt></td>
+<td>WAIS Source</td></tr>
+<tr valign="top">
+<td align=left><strong>application/x-zip-compressed</strong></td>
+<td align=center><tt>zip</tt></td>
+<td>Zip compressed data</td></tr>
+<tr valign="top">
+<td align=left><strong>application/xml</strong></td>
+<td align=center><tt>xml</tt></td>
+<td>XML document</td></tr>
+<tr valign="top">
+<td align=left><strong>application/zip</strong></td>
+<td align=center><tt>zip</tt></td>
+<td>Zip archive</td></tr>
+<tr valign="top">
+<td align=left><strong>audio/basic</strong></td>
+<td align=center><tt>snd</tt></td>
+<td>Basic audio</td></tr>
+<tr valign="top">
+<td align=left><strong>audio/echospeech</strong></td>
+<td align=center><tt>es</tt></td>
+<td>Echospeech audio</td></tr>
+<tr valign="top">
+<td align=left><strong>audio/microsoft-wav</strong></td>
+<td align=center><tt>wav</tt></td>
+<td>Wave audio</td></tr>
+<tr valign="top">
+<td align=left><strong>audio/midi</strong></td>
+<td align=center><tt>midi</tt></td>
+<td>MIDI audio</td></tr>
+<tr valign="top">
+<td align=left><strong>audio/wav</strong></td>
+<td align=center><tt>wav</tt></td>
+<td>Wave audio</td></tr>
+<tr valign="top">
+<td align=left><strong>audio/x-aiff</strong></td>
+<td align=center><tt>aif</tt></td>
+<td>AIF audio</td></tr>
+<tr valign="top">
+<td align=left><strong>audio/x-epac</strong></td>
+<td align=center><tt>pae</tt></td>
+<td>epac audio</td></tr>
+<tr valign="top">
+<td align=left><strong>audio/x-midi</strong></td>
+<td align=center><tt>midi</tt></td>
+<td>MIDI audio</td></tr>
+<tr valign="top">
+<td align=left><strong>audio/x-mpeg</strong></td>
+<td align=center><tt>mp2</tt></td>
+<td>MPEG audio</td></tr>
+<tr valign="top">
+<td align=left><strong>audio/x-pac</strong></td>
+<td align=center><tt>pac</tt></td>
+<td>pac audio</td></tr>
+<tr valign="top">
+<td align=left><strong>audio/x-pn-realaudio</strong></td>
+<td align=center><tt>ra</tt></td>
+<td>PN Realaudio</td></tr>
+<tr valign="top">
+<td align=left><strong>audio/x-wav</strong></td>
+<td align=center><tt>wav</tt></td>
+<td>Wave audio</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/chem3d</strong></td>
+<td align=center><tt>c3d</tt></td>
+<td>Chem3d chemical test</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/chemdraw</strong></td>
+<td align=center><tt>chm</tt></td>
+<td>Chemdraw chemical test</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/cif</strong></td>
+<td align=center><tt>cif</tt></td>
+<td>CIF chemical test</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/cml</strong></td>
+<td align=center><tt>cml</tt></td>
+<td>CML chemical test</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/cmsl</strong></td>
+<td align=center><tt>cml</tt></td>
+<td>Chemical Structure Markup</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/cxf</strong></td>
+<td align=center><tt>cxf</tt></td>
+<td>Chemical Exhange Format file</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/daylight-smiles</strong></td>
+<td align=center><tt>smi</tt></td>
+<td>SMILES format file</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/embl-dl-nucleotide</strong></td>
+<td align=center><tt>emb</tt></td>
+<td>EMBL nucleotide format file</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/gaussian</strong></td>
+<td align=center><tt>gau</tt></td>
+<td>Gaussian data</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/gaussian-input</strong></td>
+<td align=center><tt>gau</tt></td>
+<td>Gaussian input data</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/gaussian-log</strong></td>
+<td align=center><tt>gal</tt></td>
+<td>Gaussian log</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/gcg8-sequence</strong></td>
+<td align=center><tt>gcg</tt></td>
+<td>GCG format file</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/genbank</strong></td>
+<td align=center><tt>gen</tt></td>
+<td>GENbank data</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/jcamp-dx</strong></td>
+<td align=center><tt>jdx</tt></td>
+<td>Jcamp chemical spectra test</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/kinemage</strong></td>
+<td align=center><tt>kin</tt></td>
+<td>Kinemage</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/macromodel-input</strong></td>
+<td align=center><tt>mmd</tt></td>
+<td>Macromodel chemical test</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/mdl-molfile</strong></td>
+<td align=center><tt>mol</tt></td>
+<td>MOL mdl chemical test</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/mdl-rdf</strong></td>
+<td align=center><tt>rdf</tt></td>
+<td>RDF chemical test</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/mdl-rxn</strong></td>
+<td align=center><tt>rxn</tt></td>
+<td>RXN chemical test</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/mdl-sdf</strong></td>
+<td align=center><tt>sdf</tt></td>
+<td>SDF chemical test</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/mdl-tgf</strong></td>
+<td align=center><tt>tgf</tt></td>
+<td>TGF chemical test</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/mif</strong></td>
+<td align=center><tt>mif</tt></td>
+<td>MIF chemical test</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/mmd</strong></td>
+<td align=center><tt>mmd</tt></td>
+<td>Macromodel data</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/mopac-input</strong></td>
+<td align=center><tt>mop</tt></td>
+<td>MOPAC data </td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/ncbi-asn1</strong></td>
+<td align=center><tt>asn</tt></td>
+<td>NCBI data</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/ncbi-asn1-binary</strong></td>
+<td align=center><tt>val</tt></td>
+<td>NCBI data</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/pdb</strong></td>
+<td align=center><tt>pdb</tt></td>
+<td>Protein Databank data</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/rosdal</strong></td>
+<td align=center><tt>ros</tt></td>
+<td>Rosdal data</td></tr>
+<tr valign="top">
+<td align=left><strong>chemical/xyz</strong></td>
+<td align=center><tt>xyz</tt></td>
+<td>Xmol XYZ data</td></tr>
+<tr valign="top">
+<td align=left><strong>image/bmp</strong></td>
+<td align=center><tt>bmp</tt></td>
+<td>Windows bitmap</td></tr>
+<tr valign="top">
+<td align=left><strong>image/cgm</strong></td>
+<td align=center><tt>cgm</tt></td>
+<td>Computer Graphics Metafile</td></tr>
+<tr valign="top">
+<td align=left><strong>image/fif</strong></td>
+<td align=center><tt>fif</tt></td>
+<td>Fractal Image Format image</td></tr>
+<tr valign="top">
+<td align=left><strong>image/g3fax</strong></td>
+<td align=center><tt>g3f</tt></td>
+<td>Group III FAX image</td></tr>
+<tr valign="top">
+<td align=left><strong>image/gif</strong></td>
+<td align=center><tt>gif</tt></td>
+<td>GIF image</td></tr>
+<tr valign="top">
+<td align=left><strong>image/ief</strong></td>
+<td align=center><tt>ief</tt></td>
+<td>IEF image</td></tr>
+<tr valign="top">
+<td align=left><strong>image/ifs</strong></td>
+<td align=center><tt>ifs</tt></td>
+<td>IFS image</td></tr>
+<tr valign="top">
+<td align=left><strong>image/jpeg</strong></td>
+<td align=center><tt>jpg</tt></td>
+<td>JPEG image</td></tr>
+<tr valign="top">
+<td align=left><strong>image/pbm</strong></td>
+<td align=center><tt>pbm</tt></td>
+<td>Portable bitmap</td></tr>
+<tr valign="top">
+<td align=left><strong>image/pgm</strong></td>
+<td align=center><tt>pgm</tt></td>
+<td>Portable graymap</td></tr>
+<tr valign="top">
+<td align=left><strong>image/png</strong></td>
+<td align=center><tt>png</tt></td>
+<td>PNG image</td></tr>
+<tr valign="top">
+<td align=left><strong>image/tiff</strong></td>
+<td align=center><tt>tif</tt></td>
+<td>TIFF image</td></tr>
+<tr valign="top">
+<td align=left><strong>image/vnd</strong></td>
+<td align=center><tt>dwg</tt></td>
+<td>VND image</td></tr>
+<tr valign="top">
+<td align=left><strong>image/wavelet</strong></td>
+<td align=center><tt>wi</tt></td>
+<td>Wavelet image</td></tr>
+<tr valign="top">
+<td align=left><strong>image/x-cmu-raster</strong></td>
+<td align=center><tt>ras</tt></td>
+<td>CMU raster</td></tr>
+<tr valign="top">
+<td align=left><strong>image/x-pbm</strong></td>
+<td align=center><tt>pbm</tt></td>
+<td>Portable bitmap</td></tr>
+<tr valign="top">
+<td align=left><strong>image/x-pcx</strong></td>
+<td align=center><tt>pcx</tt></td>
+<td>PCX image</td></tr>
+<tr valign="top">
+<td align=left><strong>image/x-pgm</strong></td>
+<td align=center><tt>pgm</tt></td>
+<td>Portable graymap</td></tr>
+<tr valign="top">
+<td align=left><strong>image/x-pict</strong></td>
+<td align=center><tt>pict</tt></td>
+<td>Mac PICT image</td></tr>
+<tr valign="top">
+<td align=left><strong>image/x-pnm</strong></td>
+<td align=center><tt>pnm</tt></td>
+<td>Portable anymap</td></tr>
+<tr valign="top">
+<td align=left><strong>image/x-portable-anymap</strong></td>
+<td align=center><tt>pnm</tt></td>
+<td>Portable anymap</td></tr>
+<tr valign="top">
+<td align=left><strong>image/x-portable-bitmap</strong></td>
+<td align=center><tt>pbm</tt></td>
+<td>Portable bitmap</td></tr>
+<tr valign="top">
+<td align=left><strong>image/x-portable-graymap</strong></td>
+<td align=center><tt>pgm</tt></td>
+<td>Portable graymap</td></tr>
+<tr valign="top">
+<td align=left><strong>image/x-portable-pixmap</strong></td>
+<td align=center><tt>ppm</tt></td>
+<td>Portable pixmap</td></tr>
+<tr valign="top">
+<td align=left><strong>image/x-ppm</strong></td>
+<td align=center><tt>ppm</tt></td>
+<td>Portable pixmap</td></tr>
+<tr valign="top">
+<td align=left><strong>image/x-rgb</strong></td>
+<td align=center><tt>rgb</tt></td>
+<td>RGB image</td></tr>
+<tr valign="top">
+<td align=left><strong>image/x-xbitmap</strong></td>
+<td align=center><tt>xbm</tt></td>
+<td>X bitmap</td></tr>
+<tr valign="top">
+<td align=left><strong>image/x-xbm</strong></td>
+<td align=center><tt>xbm</tt></td>
+<td>X bitmap</td></tr>
+<tr valign="top">
+<td align=left><strong>image/x-xpixmap</strong></td>
+<td align=center><tt>xpm</tt></td>
+<td>X pixmap</td></tr>
+<tr valign="top">
+<td align=left><strong>image/x-xpm</strong></td>
+<td align=center><tt>xpm</tt></td>
+<td>X pixmap</td></tr>
+<tr valign="top">
+<td align=left><strong>image/xwd</strong></td>
+<td align=center><tt>xwd</tt></td>
+<td>X window dump</td></tr>
+<tr valign="top">
+<td align=left><strong>image/xwindowdump</strong></td>
+<td align=center><tt>xwd</tt></td>
+<td>X window dump</td></tr>
+<tr valign="top">
+<td align=left><strong>message/news</strong></td>
+<td align=center><tt>822</tt></td>
+<td>News post</td></tr>
+<tr valign="top">
+<td align=left><strong>message/rfc822</strong></td>
+<td align=center><tt>822</tt></td>
+<td>Mail message</td></tr>
+<tr valign="top">
+<td align=left><strong>model/iges</strong></td>
+<td align=center><tt>iges</tt></td>
+<td>IGES model</td></tr>
+<tr valign="top">
+<td align=left><strong>model/mesh</strong></td>
+<td align=center><tt>mesh</tt></td>
+<td>Mesh model</td></tr>
+<tr valign="top">
+<td align=left><strong>model/vrml</strong></td>
+<td align=center><tt>wrl</tt></td>
+<td>VRML model</td></tr>
+<tr valign="top">
+<td align=left><strong>text/enriched</strong></td>
+<td align=center><tt>rtx</tt></td>
+<td>Text-enriched document</td></tr>
+<tr valign="top">
+<td align=left><strong>text/html</strong></td>
+<td align=center><tt>html</tt></td>
+<td>HTML document</td></tr>
+<tr valign="top">
+<td align=left><strong>text/plain</strong></td>
+<td align=center><tt>txt</tt></td>
+<td>Text document</td></tr>
+<tr valign="top">
+<td align=left><strong>text/richtext</strong></td>
+<td align=center><tt>rtx</tt></td>
+<td>Richtext document</td></tr>
+<tr valign="top">
+<td align=left><strong>text/setext</strong></td>
+<td align=center><tt>stx</tt></td>
+<td>Setext document</td></tr>
+<tr valign="top">
+<td align=left><strong>text/sgml</strong></td>
+<td align=center><tt>sgml</tt></td>
+<td>SGML document</td></tr>
+<tr valign="top">
+<td align=left><strong>text/tab-separated-values</strong></td>
+<td align=center><tt>tsv</tt></td>
+<td>Tab separated values</td></tr>
+<tr valign="top">
+<td align=left><strong>text/x-speech</strong></td>
+<td align=center><tt>talk</tt></td>
+<td>Speech document</td></tr>
+<tr valign="top">
+<td align=left><strong>text/x-vcard</strong></td>
+<td align=center><tt>vcf</tt></td>
+<td>Vcard</td></tr>
+<tr valign="top">
+<td align=left><strong>text/xml</strong></td>
+<td align=center><tt>xml</tt></td>
+<td>XML document</td></tr>
+<tr valign="top">
+<td align=left><strong>video/isivideo</strong></td>
+<td align=center><tt>fvi</tt></td>
+<td>isi video</td></tr>
+<tr valign="top">
+<td align=left><strong>video/mpeg</strong></td>
+<td align=center><tt>mpg</tt></td>
+<td>MPEG movie</td></tr>
+<tr valign="top">
+<td align=left><strong>video/msvideo</strong></td>
+<td align=center><tt>avi</tt></td>
+<td>MS Video</td></tr>
+<tr valign="top">
+<td align=left><strong>video/quicktime</strong></td>
+<td align=center><tt>mov</tt></td>
+<td>QuickTime movie</td></tr>
+<tr valign="top">
+<td align=left><strong>video/vivo</strong></td>
+<td align=center><tt>viv</tt></td>
+<td>vivo video</td></tr>
+<tr valign="top">
+<td align=left><strong>video/wavelet</strong></td>
+<td align=center><tt>wv</tt></td>
+<td>Wavelet video</td></tr>
+<tr valign="top">
+<td align=left><strong>video/x-sgi-movie</strong></td>
+<td align=center><tt>movie</tt></td>
+<td>SGI movie</td></tr>
+</table>
+<!--X-Ext-CType-End-->
+</center>
+
+<H3><a name="m2h_msg_extbody">m2h_msg_extbody::filter</a></h3>
+
+<p>This filter is designed to process <tt>message/external-body</tt>
+data.
+The filter attempts to translate the external-body paramaters
+into a linked URL with some descriptive information,
+if provided.  The following access-types are supported:
+ANON-FTP, FTP, TFTP, HTTP, LOCAL-FILE, and URL.  Note, LOCAL-FILE is
+only supported if the <tt>local-file</tt> option is specified.
+</p>
+
+<p><strong><tt>m2h_msg_extbody::filter</tt></strong> can take the
+following
+<a href="mimeargs.html">MIMEARGS arguments</a>:
+</p>
+
+<table cellspacing=1 border=0 cellpadding=4>
+<tr valign=top>
+<td><strong><tt>local-file</tt></strong></td>
+<td><p>Support LOCAL-FILE access-type.  This option
+is best used for internal local mail archives
+where it is known that readers will have
+direct access to the file.
+</p>
+</tr>
+</table>
+
+
+<H3><a name="m2h_text_enriched">m2h_text_enriched::filter</a></h3>
+
+<p>This filter is designed to process text/enriched, or
+text/richtext, data.  The following table summarizes the
+translation of text/enriched commands to HTML tags:
+</p>
+
+<center>
+<table border=1 cellpadding=2>
+<tr valign=top align=left bgcolor="#C0C0C0">
+<th>Text/Enriched Command</th><th>HTML Translation</th>
+</tr>
+<tr valign=top>
+<td><strong>&lt;Bold&gt;</strong></td>
+<td>&lt;b&gt;</td>
+</tr>
+<tr valign=top>
+<td><strong>&lt;Italic&gt;</strong></td>
+<td>&lt;i&gt;</td>
+</tr>
+<tr valign=top>
+<td><strong>&lt;Underline&gt;</strong></td>
+<td>&lt;u&gt;</td>
+</tr>
+<tr valign=top>
+<td><strong>&lt;Fixed&gt;</strong></td>
+<td>&lt;tt&gt;</td>
+</tr>
+<tr valign=top>
+<td><strong>&lt;Smaller&gt;</strong></td>
+<td>&lt;small&gt;</td>
+</tr>
+<tr valign=top>
+<td><strong>&lt;Bigger&gt;</strong></td>
+<td>&lt;big&gt;</td>
+</tr>
+<tr valign=top>
+<td><strong>&lt;FontFamily&gt;&lt;Param&gt;<var>family</var>&lt;/Param&gt;</strong></td>
+<td>&lt;font face="<var>family</var>"&gt;</td>
+</tr>
+<tr valign=top>
+<td><strong>&lt;Color&gt;&lt;Param&gt;<var>color</var>&lt;/Param&gt;</strong></td>
+<td>&lt;font color="<var>color</var>"&gt;</td>
+</tr>
+<tr valign=top>
+<td><strong>&lt;Center></strong></td>
+<td>&lt;p align="center"&gt;</td>
+</tr>
+<tr valign=top>
+<td><strong>&lt;FlushLeft&gt;</strong></td>
+<td>&lt;p align="left"&gt;</td>
+</tr>
+<tr valign=top>
+<td><strong>&lt;FlushRight&gt;</strong></td>
+<td>&lt;p align="right"&gt;</td>
+</tr>
+<tr valign=top>
+<td><strong>&lt;FlushBoth&gt;</strong></td>
+<td>&lt;p align="justify"&gt;</td>
+</tr>
+<tr valign=top>
+<td><strong>&lt;ParaIndent&gt;</strong></td>
+<td>&lt;blockquote&gt;</td>
+</tr>
+<tr valign=top>
+<td><strong>&lt;Excerpt&gt;</strong></td>
+<td>&lt;blockquote&gt;</td>
+</tr>
+<tr valign=top>
+<td><strong>&lt;Lang&gt;&lt;Param&gt;<var>lang</var>&lt;/Param&gt;</strong></td>
+<td>&lt;div lang="<var>lang</var>"&gt;</td>
+</tr>
+</table>
+</center>
+
+<p>Character data will be translated as specified by the
+<a href="charsetconverters.html">CHARSETCONVERTERS</a> resources.
+</p>
+
+<H3><a name="m2h_text_html">m2h_text_html::filter</a></h3>
+
+<table class="caution" width="100%">
+<tr valign=top>
+<td><strong style="color: red;">CAUTION:</strong></td>
+<td width="100%"><p>For
+<a href="../faq/security.html#htmldata">security reasons</a>,
+it is highly recommended to disable
+support of HTML messages in your mail archives.  There is no
+guarantee this filter is robust enough to eliminate all possible
+exploits that can occur with HTML data.
+See the following <a href="../faq/faq.html">FAQ</a> questions for more
+information:
+</p>
+<ul>
+<li><a href="../faq/security.html#htmldata">Why are HTML messages a security risk?</a></li>
+<li><a href="../faq/security.html#htmlexchow">So how can I exclude HTML mail?</a></li>
+</ul>
+<p> </p>
+</td>
+</tr>
+</table>
+
+<p>This filter is designed to process <tt>text/html</tt>, or
+<tt>text/x-html</tt>, data.
+The following modifications are done to HTML documents when
+processed by MHonArc:
+</p>
+<ul>
+<li><p>The HEAD element is removed.  Since some content within the HEAD
+element may be relevant to the rest of the document, the following is
+done when the HEAD element is removed:</p>
+    <ul>
+    <li>The title will be extracted and prepended
+    to the body data.</li>
+    <li>Any BASE URL will be propogated to relative URLs in the
+    document.</li>
+    </ul>
+    <p></p>
+</li>
+<li><p>Any markup related to scripting is removed for security
+reasons.  Javascript URLs are munged to make them ineffective.
+At a minimum, the following tags are stripped:
+<tt>&lt;applet&gt;</tt>,
+<tt>&lt;base&gt;</tt>,
+<tt>&lt;embed&gt;</tt>,
+<tt>&lt;form&gt;</tt>,
+<tt>&lt;ilayer&gt;</tt>,
+<tt>&lt;input&gt;</tt>,
+<tt>&lt;layer&gt;</tt>,
+<tt>&lt;link&gt;</tt>,
+<tt>&lt;meta&gt;</tt>,
+<tt>&lt;object&gt;</tt>,
+<tt>&lt;option&gt;</tt>,
+<tt>&lt;param&gt;</tt>,
+<tt>&lt;script&gt;</tt>,
+<tt>&lt;select&gt;</tt>,
+<tt>&lt;style&gt;</tt>,
+<tt>&lt;textarea&gt;</tt>.
+At a minimum, the following attributes are removed:
+<tt>onload</tt>,
+<tt>onunload</tt>,
+<tt>onclick</tt>,
+<tt>ondblclick</tt>,
+<tt>onmousedown</tt>,
+<tt>onmouseup</tt>,
+<tt>onmouseover</tt>,
+<tt>onmousemove</tt>,
+<tt>onmouseout</tt>,
+<tt>onkeypress</tt>,
+<tt>onkeydown</tt>,
+<tt>onkeyup</tt>.
+The <strong><tt>allowscript</tt></strong> option can be
+be used to override this behavior (see below).
+</p></li>
+<li><p><b><tt>cid:</tt></b> URLs are resolved, if possible.  Therefore,
+if image data related to the HTML document is included with the message,
+the URLs in the HTML will be modified to reference the decoded image
+data.
+</p>
+</li>
+</ul>
+
+<p><strong><tt>m2h_text_html::filter</tt></strong> can take the
+following
+<a href="mimeargs.html">MIMEARGS arguments</a>:
+</p>
+
+<table cellspacing=1 border=0 cellpadding=4>
+<tr valign=top>
+<td><strong><tt>allowcomments</tt></strong></td>
+<td><p>Preserve any comment declarations.
+By default, comment declarations are munged
+to protect against potential exploits, but this option will
+disable that behavior.
+</p>
+<table class="caution" width="100%">
+<tr valign=top>
+<td><strong style="color: red;">CAUTION:</strong></td>
+<td width="100%"><p>
+Using this option can open up security vulnerabilies, including the
+accessing of server resources.  If you have server-side includes
+enabled for your site, you SHOULD NOT use this option.
+</p>
+</td></tr></table>
+</td>
+</tr>
+<tr valign=top>
+<td><strong><tt>allownoncidurls</tt></strong></td>
+<td><p>Preserve URL-based attributes that are not cid: URLs.
+By default, any URL-based attribute -- <tt>href</tt>, <tt>src</tt>,
+<tt>background</tt>, <tt>classid</tt>, <tt>data</tt>, <tt>longdesc</tt>
+-- will be stripped if it is not a cid URL.
+This prevents
+malicious URLs from verifying mail addresses, secretly
+setting cookies, or gathering statistical data with the
+use of elements that cause browsers to automatically fetch data without
+user interaction:
+<tt>IMG</tt>, <tt>BODY</tt>, <tt>IFRAME</tt>, <tt>FRAME</tt>,
+<tt>OBJECT</tt>, <tt>SCRIPT</tt>, <tt>INPUT</tt>.
+</p>
+<table class="note" width="100%">
+<tr valign=top>
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p><tt>Href</tt> attributes for anchor, <tt>&lt;A&gt;</tt>,
+elements are preserved, even if <tt>allownoncidurls</tt> is
+not specified.  This is so regular hyperlinks will function.  Javascript
+URLs will still be munged (unless the <tt>allowscript</tt> option is
+specified).
+</p>
+</td></tr></table>
+</td>
+</tr>
+<tr valign=top>
+<td><strong><tt>allowscript</tt></strong></td>
+<td><p>Preserve any markup associated with scripting.
+This includes elements and attributes related to scripting.
+</p>
+<table class="caution" width="100%">
+<tr valign=top>
+<td><strong style="color: red;">CAUTION:</strong></td>
+<td width="100%"><p>
+Use of this option can open up your archives to cross-site scripting (XSS)
+attacks.  It is highly recommended to NOT use this option, especially
+for publicly accessible archives.
+</p>
+</td></tr></table>
+</td>
+</tr>
+<tr valign=top>
+<td><strong><tt>attachcheck</tt></strong></td>
+<td><p>Honor attachment disposition.  By default,
+all text/html data is displayed inline on
+the message page.  If <tt>attachcheck</tt> is specified
+and Content-Disposition specifies the data as
+an attachment, the data is saved to a file
+with a link to it from the message page.
+</p>
+<table class="caution" width="100%">
+<tr valign=top>
+<td><strong style="color: red;">CAUTION:</strong></td>
+<td width="100%"><p>
+If <tt>attachcheck</tt> is specified, the HTML
+data is saved "as-is".  For example, no stripping of scripting-based
+markup is performed and no resolution of cid URLs are performed, allowing
+your archive to be used for cross-site scripting (XSS) exploits.
+This option <strong>SHOULD NOT BE USED</strong> for archives unless all mail
+from all senders can be trusted.
+</p>
+</td></tr></table>
+</td>
+</tr>
+<tr valign=top>
+<td><strong><tt>disablerelated</tt></strong></td>
+<td><p>Disable processing of related parts processing:
+cid URLs will not be resolved.
+</p></td>
+</tr>
+<tr valign=top>
+<td><strong><tt>nofont</tt></strong></td>
+<td><p>Remove font tags and styles, including CSS styles.
+</p></td>
+</tr>
+<tr valign=top>
+<td><strong><tt>notitle</tt></strong></td>
+<td><p>Do not print extracted title at the beginning of converted
+output.  By default, the title is printed before the document
+body.  The <tt>notitle</tt> argument disables this behavior.
+</p></td>
+<tr valign=top>
+<td><strong><tt>subdir</tt></strong></td>
+<td><p>Place attachment files in a subdirectory of the archive.
+This option is used for MHTML messages that include inline images
+are other referenced data.
+</p></td>
+</tr>
+</table>
+
+<H3><a name="m2h_text_plain">m2h_text_plain::filter</a></h3>
+
+<p>This filter is designed to process text/plain messages and
+messages with no MIME information.  The
+filter is also used to process text messages of an unknown
+subtype.
+</p>
+
+<p>The default behavior of the filter is to wrap the data in
+the HTML <tt>PRE</tt> element and escape special characters.  It
+also converts text that looks like a URL into a hyperlink.
+Character data will be translated as specified by the
+<a href="charsetconverters.html">CHARSETCONVERTERS</a> resources.
+</p>
+
+<p>This filter supports text data donoted with flowed sematics as
+defined by <a href="http://www.ietf.org/rfc/rfc2646.txt">RFC 2646</a>.
+Quoted text will be wrapped in HTML <tt>BLOCKQUOTE</tt> tags with
+inline CSS styles to highlight quoted text with a vertical bar in the
+left margin:
+</p>
+<blockquote style="border-left: #0000FF solid 0.1em; margin-left: 0.0em; padding-left: 1.0em">This is some quoted text.
+This is some quoted text.
+This is some quoted text.
+This is some quoted text.
+This is some quoted text.</blockquote>
+
+<p>CSS style customization can be done by using the
+<tt>quoteclass</tt> argument described below.
+</p>
+
+<p><strong><tt>m2h_text_plain::filter</tt></strong> can take the
+following
+<a href="mimeargs.html">MIMEARGS arguments</a>:
+</p>
+
+<table cellspacing=1 border=0 cellpadding=4>
+
+<tr valign=top>
+<td><strong><tt>asis=</tt></strong><var>set1</var><tt>:</tt>...</td>
+<td><p>Colon separated lists of charsets to leave as-is.
+Only HTML special characters will be converted into entities.
+</p>
+<table class="note" width="100%">
+<tr valign=top>
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>The <tt>asis</tt> option is deprecated.
+It is recommended to use the
+<a href="charsetconverters.html">CHARSETCONVERTERS</a> resource to
+control how character data is converted.
+</p>
+</td></tr></table>
+</tr>
+<tr valign=top>
+<td><strong><tt>attachcheck</tt></strong></td>
+<td><p>Honor attachment disposition.  By default,
+all text/plain data is displayed inline on
+the message page.  If <tt>attachcheck</tt> is specified
+and Content-Disposition specifies the data as
+an attachment, the data is saved to a file
+with a link to it from the message page.
+</p>
+</tr>
+<tr valign=top>
+<td><strong><tt>disableflowed</tt></strong></td>
+<td><p>Flowed sematics will be ignored for text denoted with flowed
+formatting.
+</p>
+<table class="note" width="100%">
+<tr valign=top>
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>
+The effects of <tt>fancyquote</tt> and
+<tt>quote</tt> will still occur if either option is specified.
+</p>
+</td></tr></table>
+</tr>
+<tr valign=top>
+<td><strong><tt>fancyquote</tt></strong></td>
+<td><p>Highlight quoted message text.  Quoted text will be wrapped
+in HTML <tt>BLOCKQUOTE</tt> elements.  By default, inline CSS style
+settings are generated to render a vertical bar in the left margin.  The
+inline styles are suppressed if the <tt>quoteclass</tt> option is set.
+</p>
+<p>This option generates similiar rendering of quoted text as is done
+for flowed text data, but without the flowed text wrapping sematics.
+</p>
+<table class="note" width="100%">
+<tr valign=top>
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>
+If message text is denoted as flowed text by
+message headers, the text will always be rendered with flowed sematics
+unless the <tt>disableflowed</tt> option is specified.
+</p>
+</td></tr></table>
+</tr>
+<tr valign=top>
+<td><strong><tt>htmlcheck</tt></strong></td>
+<td><p>Check if message is actually an HTML message
+(to get around abhorrent MUAs).  The message
+is treated as HTML if the first non-whitespace
+data looks like the start of an HTML document.
+</p>
+<p>If the data looks like HTML, the <a href="#m2h_text_html">HTML filter</a>
+will be invoked on it.
+</p>
+</tr>
+<tr valign=top>
+<td><strong><tt>inlineexts=</tt></strong><var>ext1</var><tt>,</tt>...</td>
+<td><p>A comma separated list of message specified filename
+extensions to treat as inline data.
+Applicable only when <b><tt>uudecode</tt></b> and
+<b><tt>usename</tt></b> are specified.
+</p>
+</tr>
+<tr valign=top>
+<td><strong><tt>keepspace</tt></strong></td>
+<td><p>Preserve all spaces if the <strong><tt>nonfixed</tt></strong>
+option is specified.  All spaces and tabs will be translated to the
+equivalent number of <strong>&amp;nbsp;</strong> entity references.
+</p>
+</tr>
+<tr valign=top>
+<td><strong><a name="tpa_link"><tt>link=</tt></strong><var>scheme1</var><tt>,</tt>...</a></td>
+<td><p>A comma separated list of URL schemes denoting which URLs
+to convert into hyperlinks.  By default, all URLs will be converted
+into hyperlinks.  This option allows you to restrict the set of
+URLs converted.
+</p>
+<p>Compare this argument with <a href="#tpa_nolink"><tt>nolink</tt></a>.
+</p>
+</tr>
+<tr valign=top>
+<td><strong><tt>maxwidth=</tt></strong><var>#</var></td>
+<td><p>Force the maximum width of lines to be <var>#</var> characters
+in length.  Any lines longer than <var>#</var> characters will be
+wrapped.
+</p>
+<table class="note" width="100%">
+<tr valign=top>
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>A line that contains no whitespace and is longer
+than <tt>maxwidth</tt>, will not be wrapped.
+</p>
+</td></tr></table>
+</tr>
+<tr valign=top>
+<td><strong><a name="tpa_nolink"><tt>nolink=</tt></strong><var>scheme1</var><tt>,</tt>...</a></td>
+<td><p>A comma separated list of URL schemes denoting which URLs
+to <strong>not</strong> convert into hyperlinks.  By default, all
+URLs will be converted into hyperlinks.
+This option allows you to specify URLs that should never be converted.
+</p>
+<p>Compare this argument with <a href="#tpa_link"><tt>link</tt></a>.
+</p>
+</tr>
+<tr valign=top>
+<td><strong><tt>nonfixed</tt></strong></td>
+<td><p>Do not wrap message text in the HTML <tt>PRE</tt> element.  This will
+cause text to be rendered in the default font (which is normally
+proportionally spaced).  Each line of the message will have
+a <tt>&lt;br&gt;</tt> appended in order to preserve the line representation
+of the message.
+</p>
+</tr>
+<tr valign=top>
+<td><strong><tt>nourl</tt></strong></td>
+<td><p>Do not hyperlink URLs.  This option overrides
+<tt>link</tt> and <tt>nolink</tt>.
+</p>
+</tr>
+<tr valign=top>
+<td><strong><tt>quote</tt></strong></td>
+<td><p>Italicize quoted message text.  Any quoted lines in the message
+will be wrapped in the HTML <tt>I</tt> element.
+Compare this option with the <tt>fancyquote</tt> option.
+</p>
+</tr>
+<tr valign=top>
+<td><strong><tt>quoteclass=</tt></strong><var>classname</var></td>
+<td><p>CSS classname to use for quoted text.  This option applies only
+for flowed text data or if <tt>fancyquote</tt> is specified.  The
+<var>classname</var> will be the value of the <tt>CLASS</tt> attbribute
+for the <tt>BLOCKQUOTE</tt> elements, and this option suppresses the
+generation of inline styles.
+</p>
+<p>This option is useful if a master stylesheet controls the
+appearance of archives.  By using this option, the master stylesheet
+can be used to control the rendering of quoted text.
+</p>
+</tr>
+<tr valign=top>
+<td><strong><tt>subdir</tt></strong></td>
+<td><p>Place attachment files in a subdirectory of the archive.
+This option is only applicable if <b><tt>uudecode</tt></b> is specified.
+</p></td>
+</tr>
+<tr valign=top>
+<td><strong><tt>target=</tt></strong><var>name</var></td>
+<td><p>Set the TARGET attribute of anchors generated from
+hyperlinking URLs.
+</p>
+</tr>
+<tr valign=top>
+<td><strong><tt>usename</tt></strong></td>
+<td><p>When decoding uuencoded data, use the full filename specified
+in the message instead of the filename extension.
+</p>
+<table class="caution" width="100%">
+<tr valign=top>
+<td><strong style="color: red;">CAUTION:</strong></td>
+<td width="100%"><p>
+Use this option with caution
+since it can lead to filename conflicts and
+security problems.  If you plan on using <tt>usename</tt>, consider
+using the <tt>subdir</tt> option with it.
+</p>
+</td></tr></table>
+</td>
+</tr>
+<tr valign=top>
+<td><strong><tt>uudecode</tt></strong></td>
+<td><p>Decode any embedded uuencoded data.  Including uuencoded data
+within messages was a way to transmit binary data
+via email before MIME was developed.  The inclusion of uuencoded
+data is deprecated within email, but is still common in the
+USENET (binary) newsgroups.
+</p>
+<p>Uuencoded data is treated as <tt>application/octet-stream</tt>
+for data exclusion purposes: <a href="mimeexcs.html">MIMEEXCS</a>.
+If <tt>application/octet-stream</tt> data is listed
+in MIMEEXCS, uuencoded data will be excluded.
+</p>
+<table class="note" width="100%">
+<tr valign="baseline">
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>Specifying <b><tt>uudecode</tt></b>
+adds extra
+overhead in the processing of text messages, including messages without
+any uuencoded data.
+</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+</table>
+
+<H3><a name="m2h_text_tsv">m2h_text_tsv::filter</a></h3>
+
+<p>This filter converts text/tab-separated-values to HTML.  The
+tabular data will be converted into an HTML table.
+</p>
+
+<H3><a name="m2h_null">m2h_null::filter</a></h3>
+
+<p>This filter can be used to exclude message content from archives.
+You can register this filter to any content-type you do not want
+to store in your archives.  For example, the following resource setting
+excludes all images:
+</p>
+<pre class="code">
+<b>&lt;MIMEFilters&gt;</b>
+image/*; m2h_null::filter</a>; mhnull.pl
+<b>&lt;/MIMEFilters&gt;</b>
+</pre>
+<p>The markup returned by this filter displays the one line description
+of what was excluded.  Examples:
+</p>
+<pre class="code">
+&lt;&lt;attachment: HelloWorld.jpg&gt;&gt;
+&lt;&lt;application/postscript&gt;&gt;
+&lt;&lt;inline: image/jpg&gt;&gt;
+</pre>
+<p>If the disposition is available, it will be shown.  If a filename
+was specified, it will be shown.  If there was no filename, the
+content-type is shown.
+</p>
+
+<table class="note" width="100%">
+<tr valign=top>
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>The sematics of using the
+<a href="mimeexcs.html">MIMEEXCS</a> resource vs this filter are different.
+When using this filter, MHonArc considers the data
+successfully converted.  But with <a href="mimeexcs.html">MIMEEXCS</a>,
+MHonArc does not consider the data converted.  This is relevant when
+MHonArc determines which alternative part to use for an
+<tt>multipart/alternative</tt> entity.
+</p>
+</td>
+</tr>
+</table>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<table class="note" width="100%">
+<tr valign=top>
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>It is important to have an explicit entry for
+<b><tt>application/octet-stream</tt></b> for handling unknown
+media-types.
+</p>
+</td>
+</tr>
+</table>
+
+<PRE class="code">
+<b>&lt;MIMEFilters&gt;</b>
+application/octet-stream;  <a href="#m2h_external">m2h_external::filter</a>;	mhexternal.pl
+application/*;		   <a href="#m2h_external">m2h_external::filter</a>;	mhexternal.pl
+application/x-patch;	   <a href="#m2h_text_plain">m2h_text_plain::filter</a>;	mhtxtplain.pl
+audio/*;		   <a href="#m2h_external">m2h_external::filter</a>;	mhexternal.pl
+chemical/*;		   <a href="#m2h_external">m2h_external::filter</a>;	mhexternal.pl
+model/*;		   <a href="#m2h_external">m2h_external::filter</a>;	mhexternal.pl
+image/*;		   <a href="#m2h_external">m2h_external::filter</a>;	mhexternal.pl
+message/delivery-status;   <a href="#m2h_text_plain">m2h_text_plain::filter</a>;	mhtxtplain.pl
+message/external-body;     <a href="#m2h_msg_extbody">m2h_msg_extbody::filter</a>;	mhmsgextbody.pl
+message/partial;	   <a href="#m2h_text_plain">m2h_text_plain::filter</a>;	mhtxtplain.pl
+text/*;			   <a href="#m2h_text_plain">m2h_text_plain::filter</a>;	mhtxtplain.pl
+text/enriched;		   <a href="#m2h_text_enriched">m2h_text_enriched::filter</a>;	mhtxtenrich.pl
+text/html;		   <a href="#m2h_text_html">m2h_text_html::filter</a>;	mhtxthtml.pl
+text/plain;		   <a href="#m2h_text_plain">m2h_text_plain::filter</a>;	mhtxtplain.pl
+text/richtext;		   <a href="#m2h_text_enriched">m2h_text_enriched::filter</a>;	mhtxtenrich.pl
+text/tab-separated-values; <a href="#m2h_text_tsv">m2h_text_tsv::filter</a>;	mhtxttsv.pl
+text/x-html;		   <a href="#m2h_text_html">m2h_text_html::filter</a>;	mhtxthtml.pl
+video/*;		   <a href="#m2h_external">m2h_external::filter</a>;	mhexternal.pl
+x-sun-attachment;	   <a href="#m2h_text_plain">m2h_text_plain::filter</a>;	mhtxtplain.pl
+<b>&lt;/MIMEFilters&gt;</b>
+</PRE>
+
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<p>N/A
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>The following code is an example filter for converting
+<tt>text/tab-separated-values</tt> into an HTML table:
+</p>
+<pre class="code">
+package m2h_text_tsv;
+
+sub filter {
+    my($fields, $data, $isdecode, $args) = <!--
+-->&#64;<!--
+-->_;
+    my($field, $line, $ret);
+    local($_);
+
+    $$data =~ s/^\s+//;
+    $ret  = "&lt;table border=1&gt;\n";
+    foreach $line (split(/\r?\n/, $$data)) {
+	$ret .= "&lt;tr&gt;";
+	foreach $field (split(/\t/, $line)) {
+	    $ret .= '&lt;td&gt;' . mhonarc::htmlize($field) . '&lt;/td&gt;';
+	}
+	$ret .= "&lt;/tr&gt;\n";
+    }
+    $ret .= "&lt;/table&gt;\n";
+    ($ret);
+}
+
+1;
+</pre>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>1.0
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+<a href="charsetconverters.html">CHARSETCONVERTERS</a>,
+<a href="mimealtprefs.html">MIMEALTPREFS</a>,
+<a href="mimeargs.html">MIMEARGS</a>,
+<a href="mimedecoders.html">MIMEDECODERS</a>,
+<a href="mimeexcs.html">MIMEEXCS</a>,
+<a href="perlinc.html">PERLINC</a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="mimeexcs.html">MIMEEXCS</a>]</td><td><nobr>[<a href="../resources.html#mimefilters">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="mimeincs.html">MIMEINCS</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2010/12/31 20:33:59 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org"><strong>MHonArc</strong></a><br>
+Copyright &#169; 1997-2005 <a href="http://www.mhonarc.org/~ehood/">Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org">mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

@@ -1,0 +1,167 @@
+Revision history for Perl extension Mail::ClamAV.
+
+0.29  Wed Apr 29 18:02:17 CDT 2009
+  - Makefile.PL dies with 'No support for OS' when OS is unsupported, per
+    recommended solution at http://wiki.cpantesters.org/wiki/CPANAuthorNotes
+
+0.28  Mon Apr 27 03:18:53 CDT 2009
+  - META.yml contained wrong version number (0.26).
+
+0.27  Mon Apr 27 03:13:03 CDT 2009
+  - &main returns zero on success of WriteMakefile().
+
+0.26  Fri Apr 24 15:11:22 CDT 2009
+  - Added 'no_index' for directory Inline to META.yml to hide from indexer.
+
+0.25  Fri Apr 24 14:11:10 CDT 2009
+  - Added 'provides' mapping to META.yml to conceal private copy of Inline::MakeMaker from indexers. FAILED.
+
+0.24  Wed Apr 22 13:33:06 CDT 2009
+  - Update to work with clamav-0.95.1 API. clamav libs version 0.95.1 or greater required.
+  - Modified Makefile.PL to exit zero instead of dying if clamav version too old.
+
+0.23  Wed Sep  3 20:33:40 EDT 2008
+  - removed CL_EFSYNC CL_ELOCKDB to work with clamav-0.94
+
+0.22  Sun May 18 09:10:19 EDT 2008
+  - removed constant CL_SCAN_PHISHING_DOMAINLIST
+  - removed support for maxratio and maxmailrec
+
+0.21  Mon Jan 14 14:39:43 MST 2008
+  - updated to work with missing defines in new libclamav-0.92
+
+0.17  Tue Feb 20 06:20:19 MST 2007
+   - Updated for new clamav release 0.90
+
+0.16  Fri Mar  4 15:43:20 PST 2005
+   - I forgot to run make test before I uploaded :(
+
+0.15  Fri Mar  4 15:43:20 PST 2005
+   - A quicky release. Somehow my version of libclamav
+     (the latest) can scan the test virus without the
+     ZIP option turned on. We now use CL_SCAN_STDOPT
+     for all test scans.
+
+0.14  Fri Feb 25 10:27:06 PST 2005
+   - The test for scanbuff was broken. Thanks to
+     Werner Lemberg <wl [] gnu dot org> for reporting this
+   - Fixing this test uncovered a taint bug, fixed.
+   - Made the warning in Makefile.PL stand out more.
+   - Some doc updates.
+   - Bundled Inline::MakeMaker so we no longer fatal on
+     missing deps Inline::C.
+
+0.13  Fri Oct 22 06:44:19 PM 2004
+   - Updated example code to use the new CL_SCAN_*
+     constants.
+   - Added CL_SCAN_STDOPT to exports.
+   - Added backwards compatible constants.
+   Thanks to Mark Martinec <Mark * Martinec [] ijs * si>
+     for reporting all these.
+
+0.12  Mon Oct 18 05:22:54 PM 2004
+   - 0.80 came out today. Updated code to work with the new
+     version, this however breaks backwards compatibility.
+   - Updated tests for all the changes.
+
+0.12  Thu Aug 12 02:12:55 PM 2004
+   - Fixed an issue in Makefile.PL which was causing problems
+     with Solaris make implementation thanks to
+     Mike Brudenell <pmb1 [] york * ac * uk>.
+   - Added taint checking to scan(). It now croaks if
+     a file path passed in is tainted. This only happens
+     under -T. Reported by
+     Mark Martinec <Mark * Martinec [] ijs * si>
+   - Added "+" overload for the status object. Also reported
+     by Mark Martinec <Mark * Martinec [] ijs * si>
+   - Added tests for the above changes.
+
+0.11  Mon Jun 28 10:26:50 AM 2004
+   - Inline_Stack_Item() is indexed at zero. All set/get
+     methods are broken because of this mistake. Thanks to
+     Michael Carmack <karmak [] karmak * org> for reporting
+     this.
+   - Added tests for settings so this doesn't happen again.
+
+0.10  Thu Jun 17 01:35:17 PM 2004
+   - Whoops, should always make test before upload..
+
+0.09  Thu Jun 17 01:10:58 PM 2004
+   - More fun with the hook to remove config code. It has now
+     been made a top level target that works on the code in the
+     blib directory. This was needed for systems like Gentoo.
+
+0.09  Thu Jun 17 01:06:09 PM 2004
+   - Updated to use 0.73's clamav-config program to get
+     include paths and compiler flags.
+
+0.09  Fri Apr  2 08:02:49 AM 2004
+   - fixed statchkdir, it was not returning the proper value
+   - updated documentation
+
+0.09  Fri Apr  2 07:49:08 AM 2004
+   - Moved hook for removing temporary code from
+     ClamAV.pm from after install to during the all
+     target.
+
+0.08  Thu Apr  1 04:59:27 PM 2004
+   - Perl 5.6.1 does not understand a 'const' C function
+     for binding with XS. Removed the 'const' definiton from
+     clamav_perl_retdbdir(). Thanks to Homer <hparker _at_ homershut.net>
+     for reporting this
+
+0.07  Wed Mar 24 02:34:47 PM 2004
+    - Added support for the new 0.70_rc library. This
+      unfortunatly it no longer works with anything
+      older than 0.70_rc.
+
+0.06  Tue Mar  9 17:45:43 PST 2004
+    - Mention deps in INSTALL mentioned by
+      Andre Felipe Machado <andremachado at techforce.com dot br>
+
+0.06  Thu Feb 12 08:11:38 AM 2004
+    - added INC for include paths, LIBS does not work for includes
+    - updated README
+
+0.06  Thu Feb 12 08:04:27 AM 2004
+    - added back accidentally removed code which removes the require
+      code from ClamAV.pm.
+      Reported by Julian Field <mailscanner at ecs.soton.ac.uk>
+
+0.05  Tue Feb 10 10:12:42 AM 2004
+    - Finished up statchkdir
+    - more docs updates
+    - removed real virus and added eicar
+    - added INSTALL and updated Makefile.PL
+      so LIBS can be configured
+
+0.05  Tue Jan 27 01:27:44 PM 2004
+    - New method statchkdir
+    - Updated documentation URLs
+
+0.04  Wed Oct 15 09:26:10 AM 2003
+    - Added a test for the overloaded status object
+
+0.04  Wed Oct 15 09:24:10 AM 2003
+    - Fixed problems with _scanfd not returning the correct type of scalar.
+      Reported by Michael Werski <mwe at nwu.net>
+
+0.03  Tue Oct 14 05:11:42 AM 2003
+    - Set number scanned to zero if an error happend
+
+0.03  Tue Oct 14 05:02:16 AM 2003
+    - Default number scanned to one
+
+0.03  Sun Oct 12 06:56:23 AM 2003
+    - Documentation fix by Spoon
+
+0.02  Fri Oct 10 06:46:52 PM 2003
+    - fixed problems in overloading code for the status object
+
+0.01  Fri Oct 10 14:43:38 PDT 2003
+    - moved to use Inline::MakeMaker
+
+0.01  Fri Oct 10 06:21:03 2003
+    - original version; created by h2xs 1.23 with options
+        -F -lclamav -g -n Mail::ClamAV clamav
+

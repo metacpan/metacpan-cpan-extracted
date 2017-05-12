@@ -1,0 +1,79 @@
+NAME
+    MathML::Entities - Convert XHTML+MathML Named Entities to Numeric
+    Character References
+
+SYNOPSIS
+     use MathML::Entities;
+ 
+     $html    = '<b>&copy;</b> by me';
+ 
+     # convert named HTML entities to character references:
+     $numeric = name2numbered($html);    # <b>&#x000A9;</b> by me
+
+     # convert named HTML entities to character references:
+     $utf8 = name2utf8($html);    # utf8 
+ 
+DESCRIPTION
+    MathML::Entities a content conversion filter for named XHTML+MathML
+    entities. There are over two thousand named entities in the XHTML+MathML
+    DTD. All the Entities defined in the XHTML+MathML DTD except the five
+    "safe" ones ("&lt;", "&gt;", "&amp;", "&quot;", "&apos;"), will be
+    converted to the equivalent numeric character references or to utf-8
+    characters. Named entities which are not in the XHTML+MathML DTD are
+    escaped. This makes the resulting XHTML (or XHTML+MathML) safe for
+    consumption by non-validating XML parsers.
+
+    Unlike, HTML::Entities, the mapping between MathML named entities and
+    codepoints is many-to-one. Therefore, there's no particular sense in
+    having an inverse function, which takes codepoints to named entities.
+
+    Based on: HTML::Entities by Koichi Taniguchi <taniguchi@livedoor.jp>
+
+FUNCTIONS
+    The following functions are exported by default.
+
+    * name2numbered
+        XHTML+MathML named entities (except for the five "safe" XML named
+        entities) in the argument of "name2numbered()" are replaced by the
+        corresponding numbered character references.
+
+    * name2utf8
+        XHTML+MathML named entities (except for the five "safe" XML named
+        entities) in the argument of "name2utf8()" are replaced by the
+        corresponding utf-8 characters.
+
+INSTALLATION ON UNIX
+
+You install MathML::Entities as you would install any perl module library,
+by running these commands:
+
+From the command line, type the following:
+
+   > perl Makefile.PL
+   > make
+   > make test
+   > make install
+
+INSTALLATION ON WIN32 PLATFORMS
+
+   > perl Makefile.PL
+   > nmake
+   > nmake test
+   > nmake install
+
+
+AUTHOR
+        Jacques Distler <distler@golem.ph.utexas.edu>
+
+COPYRIGHT
+        Copyright (c) 2005-2009 Jacques Distler. All rights reserved.
+
+        This library is free software; you can redistribute it and/or modify
+        it under the same terms as Perl itself.
+
+SEE ALSO
+        HTML::Entities, HTML::Entities::Numbered,
+        <http://www.w3.org/TR/REC-html40/sgml/entities.html>,
+        <http://www.w3.org/2003/entities/2007doc/overview.html>,
+        <http://www.w3.org/Math/characters/>
+

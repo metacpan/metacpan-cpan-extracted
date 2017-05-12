@@ -1,0 +1,16 @@
+DESCRIPTION
+
+    The Mooish and MooishX namespaces are reserved for modules related to
+    the Mo* modules family (Mo, Moo, Moose, Mouse, and possibly others)
+    instead of certain specific implementation.
+
+SEE ALSO
+
+    Mo, Mo::*
+
+    Moo, MooX, MooX::*
+
+    Mouse
+
+    Moose, MooseX, MooseX::*
+

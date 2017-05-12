@@ -1,0 +1,193 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Mail::SRS qw(:all);
+
+my ($secretfile, $alias, $forward, $reverse, $help);
+my $separator = $SRSSEP;
+my $hashlength = 4;
+my @addresses;
+my @secrets;
+my $result = GetOptions (
+				"separator=s"	=> \$separator,
+				"address=s"		=> \@addresses,
+				"secret=s"		=> \@secrets,
+				"secretfile=s"	=> \$secretfile,
+				"forward"		=> \$forward,
+				"reverse"		=> \$reverse,
+				"alias=s"		=> \$alias,
+				"hashlength=i"	=> \$hashlength,
+				"help"			=> \$help,
+					);
+if (!$result || $help) {
+	print << "EOH";
+Usage: srs [flags] [address ...]
+   --separator=s      Specify the initial separator to be - + or =
+   --address=s        Specify an address to transform
+   --secret=s         Specify an SRS cryptographic secret
+   --secretfile=s     Specify a file from which to read the secret
+   --forward          Perform forward transformation
+   --reverse          Perform reverse transformation
+   --hashlength=i     Specify number of characters to use in the hash
+   --help             Display this help
+       =s denotes a string argument. =i denotes an integer argument
+Multiple addresses are permitted. Multiple secrets are permitted.
+EOH
+	exit(1);
+}
+
+die "Separator character must be a single + - or =, not $separator"
+				unless $separator =~ /^[=+-]$/;
+die "Hash length _should_ be nonzero"
+				unless $hashlength;
+
+push(@addresses, @ARGV);
+die "No address given!"
+				unless @addresses;
+
+if (defined $secretfile) {
+	die "Secret file $secretfile not readable" unless -r $secretfile;
+	local *FH;
+	open(FH, "<$secretfile") or die "Cannot open $secretfile: $!";
+	while (<FH>) {
+		next unless /\S/;
+		next if /^#/;
+		push(@secrets, $_);
+	}
+	close(FH);
+}
+
+die "No secret or secretfile given. Use --secret or --secretfile, " .
+				"and ensure the secret file is not empty."
+					unless @secrets;
+
+my $srs = new Mail::SRS(
+				Secret		=> \@secrets,
+				Separator	=> $separator,
+				HashLength	=> $hashlength,
+					);
+my $newaddress;
+if ($reverse) {
+	print $srs->reverse($_), "\n" for @addresses;
+}
+else {
+	die "I need an alias address or domain to do forwards transform. " .
+					"Use --alias"
+					unless defined $alias;
+	print $srs->forward($_, $alias), "\n" for @addresses;
+}
+
+__END__
+
+=head1 NAME
+
+srs - command line interface to Mail::SRS
+
+=head1 SYNOPSIS
+
+srs --alias=alias@forwarder.com --secretfile=/etc/srs_secret \
+		sender@source.com
+
+=head1 DESCRIPTION
+
+The srs commandline interface will create an instance of L<Mail::SRS>
+with parameters derived from the commandline arguments and perform
+forward or reverse transformations for all addresses given.
+
+It is usually invoked from a sendmail envelope address
+transformation rule, a qmail alias, or similar. See
+http://www.anarres.org/projects/srs/ for examples.
+
+Arguments take the form --name or --name=value.
+
+=head1 ARGUMENTS
+
+=head2 --separator
+
+String, specified at most once. Defaults to $SRSSEP (C<=>).
+
+Specify the initial separator for the SRS address. See L<Mail::SRS> for
+details.
+
+=head2 --address
+
+String, may be specified multiple times, must be specified at least
+once.
+
+Specify a sender address to transform.
+
+=head2 --secret
+
+String, may be specified multiple times, at least one of --secret or
+--secretfile must be specified.
+
+Specify an SRS secret. The first specified secret is used for
+encoding. All secrets are used for decoding.
+
+=head2 --secretfile
+
+String, specified at most once, at least one of --secret or
+--secretfile must be specified.
+
+A file to read for secrets. Secrets are specified once per line. The
+first specified secret is used for encoding. Secrets are written
+one per line. Blank lines and lines starting with a # are ignored.
+If --secret is not given, then the secret file must be nonempty.
+
+--secret will specify a primary secret and override --secretfile
+if both are specified. However, secrets read from --secretfile will
+still be used for decoding if both are specified.
+
+=head2 --forward
+
+No argument.
+
+Specifies a forwards transformation. This is the default. --reverse
+must not also be given.
+
+=head2 --reverse
+
+No argument.
+
+Specifies a reverse transformation. --forward must not also be given.
+
+=head2 --alias
+
+String, must be specified exactly once if doing forwards transformation.
+
+Provides the alias address to which the mail was sent. The domain-part
+of this address is used in the generated SRS address. The local-part
+and @ are optional and may be omitted.
+
+=head2 --hashlength
+
+Integer, may be specified at most once, defaults to 4.
+
+Specify the number of base64 characters to use for the cryptographic
+authentication code.
+
+=head2 --help
+
+Print some basic help.
+
+=head1 SEE ALSO
+
+L<Mail::SRS>, http://www.anarres.org/projects/srs/
+
+=head1 AUTHOR
+
+    Shevek
+    CPAN ID: SHEVEK
+    cpan@anarres.org
+    http://www.anarres.org/projects/
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004 Shevek. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

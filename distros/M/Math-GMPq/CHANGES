@@ -1,0 +1,135 @@
+0.45
+ - Fix and test for division by 0. (Now croaks on divby0 instead of crashing.)
+   Fix (and test) Rmpq_z_div for the case when z == 0.
+
+0.44
+ - Fix bugs in t/z_arith_2.t and t/z_arith_overload.t. (Hadn't checked for
+   Math::GMPz availability.)
+ - In a couple of Newxz() calls, cast "buffer_size + 5" to int. (Previously missed.)
+
+0.43
+ - Add Rmpq_add_z, Rmpq_sub_z, Rmpq_z_sub, Rmpq_mul_z, Rmpq_div_z, Rmpq_z_div
+   and Rmpq_pow_ui. (With assistance from Trizen.)
+ - Allow overloading of '+', '-', '/', '*' and '**' operations with Math::GMPz
+   objects.
+ - Extend Rmpq_cmp_z to work with Math::GMPq built against earlier (pre 6.1.0)
+   versions of the gmp library.
+
+0.42
+ - Replace the condition "if(SvNOK(x))" with "if(SvNOK(x) && !SvPOK(x))".
+   See https://github.com/sisyphus/math-gmpz/issues/1 (Thanks trizen.)
+ - Add __float128 support for perls whose NV is __float128
+ - Remove _Rmpq_set_ld, add Rmpq_set_NV and Rmpq_cmp_NV.
+ - Add _is_infstring, for use with overloaded comparison operators.
+
+0.41
+ - Remove gmp_v from Math::GMPq::V as we don't want any library functions in that module
+ - Replace SvUV/SvIV/SvNV with SvUVX/SvIVX/SvNVX where appropriate. (In typemap, too.)
+ - In Rmpq_set_si() change prototypes from 'int' to 'long'. (Thanks trizen.)
+
+0.39
+ - Add Rmpq_integer_p(), though mpq_integer_p() is not currently implemented in gmp.
+ - PREREQ_PM => {'Exporter' => '5.58'} to avoid test failures on pre perl-5.8.4
+   (Thanks Peter Acklam.)
+
+0.38
+ - Tweaks to Math::GMPq::gmp_v() and Math::GMPq::V::gmp_v()
+ - Add metadata to Makefile.PL.
+ - No longer define USE_64_BIT_INT if ivtype is 'long'.
+ - Rename USE_64_BIT_INT #define to MATH_GMPQ_NEED_LONG_LONG_INT.
+ - Replace mpq_cmp() with the faster mpq_equal() in overload_equiv and overload_not_equiv.
+ - Add mpq_cmp_z support. (Added in gmp-6.1.0.)
+ - Modify overloaded comparison functions to cover comparison with mpz_t (gmp-6.0.99 and later only)
+
+0.37
+ - Alter wrap_gmp_sprintf and wrap_gmp_snprintf to take an extra arg (length of
+   buffer to which we write).
+ - Remove Rmpq_sprintf_ret and Rmpq_snprintf_ret. (These now seem pointless in
+   view of the changes to wrap_gmp_sprintf and wrap_gmp_snprintf.)
+ - Add Math::GMPq::__GNU_MP_RELEASE.
+ - Alter V.xs to accommodate the possibility that the global constant gmp_version
+   has not been set in gmp.h. I've assumed this can only happen if the gmp
+   library version is earlier than 4.0.0. (The gmp ChangeLog indicates that this
+   is so.)
+ - No longer include inttypes.h on the basis of USE_LONG_DOUBLE being defined.
+   (Was harmless ... but didn't make much sense.)
+ - Define PERL_NO_GET_CONTEXT (in XS code).
+
+0.36
+ - Fix test 3i in new.t. (It wasn't allowing for the case where perl was built
+   with long double support, but ivsize was still 4.
+ - Alter the way that strEQ gets hold of HvNAME(SvSTASH(SvRV(sv))) - so that -Wall
+    doesn't emit "null argument" warnings. (Thanks Daniel Kahn Gillmor.)
+
+0.35
+ - Add Math::GMPq::V
+ - Add overload_inc and overload_dec functions.
+ - Accommodate cross-class overloaded arithmetic with Math::MPFR.
+
+0.33
+ - Remove 'not' from overloads. Apparently achieved nothing anyway, and 5.16
+   warns that it's invalid.
+
+0.32
+ - In the documentation, elaborate on the way that Math::GMPq::get_v() and
+   __GNU_MP_VERSION & friends determine their values. (Thanks Vincent Lefevre.)
+
+0.31
+ - Fix Random.xs so that it compiles with gmp-4 (not just gmp-5).
+   Thanks Rob Kuo (https://rt.cpan.org/Ticket/Display.html?id=58501)
+
+0.29
+ - Add random functions.
+ - Add Rmpq_snprintf and Rmpq_snprintf_ret.
+ - If there's no variable to be formatted, Rmpq_(f/s)printf no longer
+   need to be supplied with a dummy variable.
+ - Some buggy tests in printf.t hopefully fixed.
+
+0.28
+ Requires gmp-4.2.0 or later.
+ In response to bug http://rt.cpan.org/Ticket/Display.html?id=46499:
+ - Amendment to Makefile.PL wrt 'long long' and 'long double' support.
+ - Remove reliance on $Config{use64bitint} in t/new.t and t/out_str.t
+ - Add some MAC OS X notes to README and fix some typos.
+
+ In response to bug http://rt.cpan.org/Ticket/Display.html?id=46604
+ - Fix ___GMP__CC() and ___GMP_CFLAGS() so that they return undef
+   if __GMP_CC and __GMP_CFLAGS are not defined by the gmp library.
+
+ Thanks, Bob Kuo and Jonathan Leto.
+
+0.27
+ - Requires gmp-4.2.3 0r later.
+ - Add Rmpq_fprintf, Rmpq_sprintf and Rmpq_sprintf_ret.
+ - Change Rmpq_sprintf to return the number of characters written.
+ - Add __GNU_MP_VERSION, __GNU_MP_VERSION_MINOR, __GNU_MP_VERSION_PATCHLEVEL,
+   __GMP_CC and __GMP_CFLAGS
+ - Change Rmpq_printf() so that, like its fprintf and sprintf counterparts,
+   it formats only one variable at a time.
+
+0.24
+ - Replace the PerlIO* objects stuff in _TRmpfr_* functions (added in
+   0.23) with FILE* objects  ... so that the module will still build
+   on perl 5.6.
+
+0.23
+ - Add TRmpq_out_str and TRmpq_inp_str.
+ - Rmpq_out_str now takes an optional (leading) string argument - a
+   string that will be prepended to the mpq_out_str() output.
+ - Remove the tests in the Makefile.PL that test for the presence of
+   a suitable compiler and GMP library.
+
+0.11
+ - Add overloaded int() function
+ - Rewrite new()
+ - Rmpq_out_str() now takes an optional third argument - a string
+   that will be appended to the mpq_out_str() output. Also stdout is
+   fflush()'d each time Rmpq_out_str() is called.
+ - The overload functions and new() can now handle a long double value
+   correctly
+
+0.10
+ - First CPAN release
+ - No longer assign Exporter and DynaLoader to @Math::GMPq::ISA.
+ - Add support for perls built with use64bitint
+ - add new() function/method to facilitate initialization/assignment

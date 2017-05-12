@@ -1,0 +1,10 @@
+20130701 1.08 typo fixed in examples/csound_scoresynth.csd
+20130518 1.07 Makepfile.PL specifies PREREQ_PM, to improve test results :-)
+20130515 1.06 test.pl skips Gravis.zip test if String::Approx not installed
+20120809 1.05 added the csound_scoresynth and csound_midisynth examples
+20120322 1.04 pack a=zeropadded rather than A=spacepadded; introduce
+              new_gf(), gravis2file now works, and make_bank5 does gravis too
+20120320 1.03 new_sf(), and chCorrection is packed as signed
+20120318 1.02 detect duplicate Preset, Inst & Sample names and uniquely rename
+20120316 1.01 gravis2file writes .zip files
+20120314 1.00 basic translation to and from .sf2 .pat and .zip file formats

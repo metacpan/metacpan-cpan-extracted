@@ -1,0 +1,35 @@
+---
+abstract: 'A distributed parallel makefile'
+author:
+  - 'Ruben Fonseca <root@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Makefile-Parallel
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Clone: '0.20'
+  Date::Parse: '2.27'
+  Digest::MD5: '2.36'
+  GraphViz: '2.02'
+  Log::Log4perl: '1.07'
+  Parse::Yapp::Driver: '1.05'
+  Proc::Reliable: '1.16'
+  Proc::Simple: '1.21'
+  Test::More: '0.63'
+  Text::Balanced: v2.0.0
+  Time::HiRes: '1.550'
+  Time::Interval: '1.2'
+  Time::Piece::ISO: '0.10'
+version: '0.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

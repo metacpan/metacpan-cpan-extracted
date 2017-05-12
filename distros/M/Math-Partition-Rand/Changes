@@ -1,0 +1,17 @@
+Revision history for Math-Partition-Rand
+
+0.0301 2017-02-23 16:35:19
+    - Improve package description.  Thanks to Dana Jacobsen.
+
+0.03 2017-02-22 19:38:14
+    - Fixed the case of the missing \!
+    - Fixed documentation.
+    - Updated test to look for an ARRAYREF.
+
+0.02 2017-02-22 19:27:54
+    - Refactored to return a list of numbers, instead of a hash.
+    - Fixed up documentation.
+
+0.01 2017-02-19 23:41:12
+    - Minted by Dist::Zilla.
+    - Moved algorithm from personal development script.

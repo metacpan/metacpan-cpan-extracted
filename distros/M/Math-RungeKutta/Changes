@@ -1,0 +1,14 @@
+20031116 Math::RungeKutta Numerical Integration
+20031117 rk_auto works using double-step
+20031118 adopt Merson's method as the default rk4
+20031118 rk4_auto saves and reuses @f0
+20031119 more robust timestep adjustment
+20031119 bugs fixed & extra robustness in rk4_auto
+20040809 'perl Install' works better on solaris without Term::Size
+20050121 1.01 test.pl uses Test::Simple
+20051203 1.02 ./example scripts tidied up
+20080919 1.03 translation into JavaScript ./js/RungeKutta.js introduced
+20080919 1.04 fix js bug copying elements of array _rk_saved_k0 into k0
+20081008 1.05 minor documentation improvements, especially in JS section
+20100801 1.06 translation into Lua ./lua/RungeKutta.lua introduced
+20100821 1.07 works with assocarrays as well as with arrays

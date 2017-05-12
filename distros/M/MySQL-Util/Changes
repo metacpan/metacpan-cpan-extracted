@@ -1,0 +1,47 @@
+Revision history for MySQL-Util
+
+0.29    fixed 0.28 empty dist
+
+0.28    added Module::Load to the prereqs because DBIx::Inspector needs it
+
+0.27    updated get_tables() to exclude views
+        converted Makefile.PL to use Module::Build::Prereq
+
+0.26    modified data creation module
+
+0.25    Major update:
+            added MySQL::Util::Data::Create
+            moved MySQL::Util::Cache to MySQL::Util::Data::Cache
+            added workaround for DBD::mysql bug
+                see: https://rt.cpan.org/Public/Bug/Display.html?id=81329
+            added utility scripts to bin/
+            unit test scripts added to eg/
+            
+            new functions:
+                create_data
+                describe_column
+                find_parent_table
+                get_ak_constraint
+                get_ak_name
+                get_constraint
+                get_dbname
+                get_fk_column_names
+                get_pk_name
+                has_ak
+                has_fks
+                has_pk
+                is_column_nullable
+                is_fk_column
+                is_pk_auto_inc
+                is_self_referencing
+                
+            deprecated:
+                get_ak_constraints
+                
+0.10	Added drop_fks() and clear_cache()
+
+0.02    Bug fixes for automated test cases.
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

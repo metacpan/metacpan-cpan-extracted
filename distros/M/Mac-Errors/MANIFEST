@@ -1,0 +1,28 @@
+bin/macerror
+Changes
+examples/README
+INSTALL.SKIP
+lib/Mac/Errors.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+src/combine-errors
+src/depodify-errors
+src/download-errors
+src/download-sources
+src/errors-exceptions.dat
+src/Errors.pl
+src/podify-errors
+src/README
+t/errors.t
+t/import.t
+t/load.t
+t/object.t
+t/pod.t
+t/pod_coverage.t
+t/test_manifest
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

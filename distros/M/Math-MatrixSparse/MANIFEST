@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+MatrixSparse.pm
+README
+test.pl
+t/00init.t
+t/01load.t
+t/02arith.t
+t/03part.t
+t/04assign.t
+t/05solve.t
+t/ibm32.mtx
+t/bcsstk06.rsa

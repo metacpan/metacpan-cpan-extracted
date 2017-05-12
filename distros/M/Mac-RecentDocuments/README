@@ -1,0 +1,171 @@
+README for Mac::RecentDocuments
+                                        Time-stamp: "2000-10-12 17:07:29 MDT"
+
+NAME
+     Mac::RecentDocuments -- add items to the MacOS Recent Documents menu
+
+SYNOPSIS
+       use Mac::RecentDocuments qw(:ARGV);
+        # Adds all files in @ARGV to Recent Documents folder,
+        #  and imports recent_documents and recent_document
+
+       foreach my $in (@ARGV) {
+         open(IN, "<$in") or die "Can't read-open $in: $!";
+         my $out = $in . '2';
+         die "But $out already exists!" if -e $out;
+         open(OUT, ">$out") or die "Can't write-open $out: $!";
+
+         ...do whatever to $out...
+
+         recent_documents($out); # add to Recent Documents folder
+       }
+
+DESCRIPTION
+     This module provides a function that adds specified files to
+     the MacOS Apple Menu "Recent Documents" folder.  You can use
+     this module under non-MacOS environments, and it will
+     compile, but it will do nothing.
+
+FUNCTIONS
+     recent_documents( ...files... )
+          This adds the given items to the Recent Documents
+          folder, for each item that is a pathspec to an existing
+          file. Relative (":bar.txt") as well as absolute
+          filespecs ("Lame Drive:stuff:bar.txt") should work
+          equally well.
+
+          The number of aliases that this creates in the Recent
+          Documents folder is returned.
+
+          Under non-MacOS environments, this function does
+          nothing at all, and always returns 0.
+
+     recent_document( file )
+          This is just an alias to recent_documents
+
+     Mac::RecentDocuments::OK()
+          This function returns true iff you are running under
+          MacOS, and if, at compile-time, Mac::RecentDocuments
+          was able to find your Recent Documents folder, and
+          verified that it was a writeable directory.  In all
+          other cases, this returns false.
+
+IMPORTING, AND :ARGV
+
+     If you say
+
+       use Mac::RecentDocuments;
+
+     then this will by default import the functions
+     recent_documents and recent_document.
+
+     This is equivalent to:
+
+       use Mac::RecentDocuments qw(:all);
+
+     If you want to use the module but import no functions, you
+     can say:
+
+       use Mac::RecentDocuments ();
+
+     or
+
+       use Mac::RecentDocuments qw(:none);
+
+     This module also defines a use-option ":ARGV" that causes
+     Mac::RecentDocuments to also call recent_documents(@ARGV),
+     at compile time.  This should be rather useful with MacPerl
+     droplets.
+
+     That is, this:
+
+       use Mac::RecentDocuments qw(:ARGV);
+
+     is basically equivalent to:
+
+       BEGIN {
+         use Mac::RecentDocuments;
+         Mac::RecentDocuments(@ARGV);
+       }
+
+     (The only difference is that if several instances of use
+     Mac::RecentDocuments qw(:ARGV) are seen in a given session,
+     Mac::RecentDocuments(@ARGV) is called only the first time.)
+
+     When "qw(:ARGV)" is the whole option list, it is interpreted
+     as equivalent to "qw(:ARGV :all)".  If you want the :ARGV
+     option without importing anything, explicitly specify the
+     ":none" option:
+
+       use Mac::RecentDocuments qw(:ARGV :none);
+
+CAVEAT
+     The module is called Mac::RecentDocuments (no underscore),
+     but the function is called recent_documents (with
+     underscore).
+
+     The module is called Mac::RecentDocuments, not Mac::RecentFiles.
+
+THANKS
+     Thanks to Chris Nandor for the kRecentDocumentsFolderType
+     tips.
+
+COPYRIGHT
+     Copyright (c) 2000 Sean M. Burke. All rights reserved.
+
+     This library is free software; you can redistribute it
+     and/or modify it under the same terms as Perl itself.
+
+AUTHOR
+     Sean M. Burke sburke@cpan.org
+
+
+PREREQUISITES
+
+This suite requires Perl 5; I've only used it under Perl 5.004, so for
+anything lower, you're on your own.
+
+Mac::RecentDocuments doesn't use any nonstandard modules.
+
+
+MACPERL INSTALLATION NOTES
+
+Don't bother with the makefiles.  Just make a Mac directory in your
+MacPerl site_lib or lib directory, and move RecentDocuments.pm into there.
+
+
+INSTALLATION
+
+You install Mac::RecentDocuments, as you would install any perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of Mac::RecentDocuments in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL LIB=~/perl
+
+
+DOCUMENTATION
+
+POD-format documentation is included in ISA.pm.  POD is readable with
+the 'perldoc' utility or the Shuck program under MacOS.  See ChangeLog
+for recent changes.
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+Mac::RecentDocuments should just be sent to me at sburke@cpan.org
+
+
+AVAILABILITY
+
+The latest version of Mac::RecentDocuments is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN/> to find a CPAN site near you.

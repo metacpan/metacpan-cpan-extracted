@@ -1,0 +1,41 @@
+Revision history for Perl extension Mail::Thread.
+
+2.55   Mon Oct 30 08:37:50 GMT 2006
+    - Tony Bowden now maintaining
+    - Refactor to make Threaders open-ended (Ricardo Signes)
+
+2.5   Thu May 27 13:47:02 BST 2004
+    - Use Email::Abstract to avoid requiring particular mail
+      representations.
+    - This change obsoletes Email::Thread, incidentally.
+
+2.41  Wednesday 10th December, 2003
+      Bugfix of 2.4 (bad programmer, no cookie!)
+
+2.4   Wednesday 10th December, 2003
+      New instance method.  Mail::Thread::Container->header( $name )
+
+2.3   Wednesday 7th May, 2003
+     - Container->topmost now scans depth first.  Incidentally makes t/1.t work correctly
+       under both 5.8 and 5.6
+
+2.2   Thurday 1st May, 2003
+    - Changes to the pruning algorithm based on the Java implementation.
+    - Implementation of subject based threading, also based on Grendel
+    - Added support for ordering
+    - Properly supports out-of-order message sources
+
+2.0   Tue Mar 25 15:36:10 GMT 2003
+    - Major update
+    - Inheritability
+    - Fixes to the algorithm based on the Python implementation.
+
+1.1   Wed Jan 15 12:01:28 GMT 2003
+    - Tweaks to the algorithm
+    - More tests
+    - Debug and noprune modes
+
+0.01  Fri Jan 10 10:18:47 2003
+	- original version; created by h2xs 1.22 with options
+		-b 5.5.3 -AX -n Mail::Thread
+

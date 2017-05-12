@@ -1,0 +1,34 @@
+TODO
+
+*	Short term
+
+	* Update lyrics tags
+
+	* Update Bundle
+
+*	Medium term
+
+	* Write code to use new capabilities methods on plugins
+
+	* Revise testing, document testing module
+
+	* Improve data value support accross plugins
+
+	* Produce a yaml plugin
+
+	* Produce database plugin
+
+*	Long Term
+
+	* Develop album based system, allowing Music::Tag::Amazon, et. al. to
+	  see the whole album for comparison.  This will require some new methods
+	  and some new thinking.
+
+	* I had developed an Ipod module.  Ipods have change so darn much, and apple
+	  has disturbed me enough that I think this is on hold indefinetly, but other
+	  ideas might be:
+
+	  * last.fm plugin
+	  * rss plugin
+	  * twitter plugin (now I'm getting really silly.)
+	  * facebook plugin (I've never used facebook, actually.)

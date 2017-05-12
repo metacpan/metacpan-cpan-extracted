@@ -1,0 +1,62 @@
+{
+   "abstract" : "Easier implementation of an OAuth2 Authorization Server / Resource Server with Mojolicious",
+   "author" : [
+      "Lee Johnson <leejo@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-OAuth2-Server",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Find" : "0",
+            "FindBin" : "0",
+            "Test::Deep" : "0.113",
+            "Test::Exception" : "0.32",
+            "Test::Mojo" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Mojolicious" : "5.37",
+            "Net::OAuth2::AuthorizationServer" : "0.14",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Humanstate/mojolicious-plugin-oauth2-server/issues"
+      },
+      "homepage" : "https://metacpan.org/module/Mojolicious::Plugin::OAuth2::Server",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/Humanstate/mojolicious-plugin-oauth2-server"
+      }
+   },
+   "version" : "0.36",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

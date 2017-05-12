@@ -1,0 +1,108 @@
+^DATABASE = GeoMiame
+!Database_name = Gene Expression Omnibus (GEO)
+!Database_institute = NCBI NLM NIH
+!Database_web_link = http://www.ncbi.nlm.nih.gov/geo
+!Database_email = geo@ncbi.nlm.nih.gov
+^SERIES = GSE10626
+!Series_title = MuRF1-dependent regulation of systemic carbohydrate metabolism as revealed from transgenic mouse studies
+!Series_geo_accession = GSE10626
+!Series_platform_id = GPL6526
+^PLATFORM = GPL6526
+!Platform_title = [Mouse4302_Mm_UG] Affymetrix GeneChip Mouse Genome 430 2.0 Array [Brainarray Version 9]
+!Platform_geo_accession = GPL6526
+#ID = 
+#UniGeneID = Unigene ID
+#GeneName = Gene Name
+#GeneSymbol = Gene Symbol
+#EnsemblID = Ensembl ID
+#EntrezID = Entrez ID
+#SPOT_ID = spot identifier
+!platform_table_begin
+ID	UniGeneID	GeneName	GeneSymbol	EnsemblID	EntrezID	SPOT_ID
+Mm.100043_at	Mm.100043	glucokinase regulatory protein	Gckr		231103	Mm.100043
+Mm.100065_at	Mm.100065	RIKEN cDNA 1300012G16 gene	1300012G16Rik		71772	Mm.100065
+Mm.100068_at	Mm.100068	angiomotin	Amot		27494	Mm.100068
+Mm.100084_at	Mm.436887	ST6 (alpha-N-acetyl-neuraminyl-2,3-beta-galactosyl-1,3)-N-acetylgalactosaminide alpha-2,6-sialyltransferase 1	St6galnac1	ENSMUSG00000000384	20445	Mm.436887
+Mm.100112_at	Mm.100112	bromodomain and WD repeat domain containing 3	Brwd3		382236	Mm.100112
+Mm.100116_at	Mm.100116	ZXD family zinc finger C	Zxdc	ENSMUSG00000002930	80292	Mm.100116
+Mm.100117_at	Mm.100117	RIKEN cDNA 5730406M06 gene	5730406M06Rik	ENSMUSG00000001981	66625	Mm.100117
+Mm.100125_at	Mm.100125	SH3 domain binding glutamic acid-rich protein like 2	Sh3bgrl2		212531	Mm.100125
+Mm.100144_at	Mm.100144	S100 calcium binding protein A6 (calcyclin)	S100a6	ENSMUSG00000000077	20200	Mm.100144
+Mm.100163_at	Mm.100163	insulin-like 5	Insl5		23919	Mm.100163
+!platform_table_end
+^SAMPLE = GSM267838
+!Sample_title = MuRF1 transgene_1
+!Sample_geo_accession = GSM267838
+!Sample_platform_id = GPL6526
+#ID_REF = 
+#VALUE = normalized intensities (quantile normalization)
+!sample_table_begin
+ID_REF	VALUE
+Mm.100043_at	7.22752096
+Mm.100065_at	7.51407726
+Mm.100068_at	6.37172696
+Mm.100084_at	7.22954904
+Mm.100112_at	6.49817153
+Mm.100116_at	5.65498103
+Mm.100117_at	6.01076819
+Mm.100125_at	5.43911375
+Mm.100144_at	6.22383683
+Mm.100163_at	6.73311161
+!sample_table_end
+^SAMPLE = GSM267839
+!Sample_title = MuRF1 transgene_2
+!Sample_geo_accession = GSM267839
+!Sample_platform_id = GPL6526
+#ID_REF = 
+#VALUE = normalized intensities (quantile normalization)
+!sample_table_begin
+ID_REF	VALUE
+Mm.100043_at	7.49104226
+Mm.100065_at	7.30508432
+Mm.100068_at	6.09111343
+Mm.100084_at	6.85639478
+Mm.100112_at	6.17991646
+Mm.100116_at	5.57618963
+Mm.100117_at	5.91880328
+Mm.100125_at	5.69914672
+Mm.100144_at	6.26349932
+Mm.100163_at	6.59055609
+!sample_table_end
+^SAMPLE = GSM267840
+!Sample_title = WT1
+!Sample_geo_accession = GSM267840
+!Sample_platform_id = GPL6526
+#ID_REF = 
+#VALUE = normalized intensities (quantile normalization)
+!sample_table_begin
+ID_REF	VALUE
+Mm.100043_at	7.3947774
+Mm.100065_at	7.33833394
+Mm.100068_at	6.24705081
+Mm.100084_at	6.92176632
+Mm.100112_at	6.24780619
+Mm.100116_at	5.67986972
+Mm.100117_at	5.93402874
+Mm.100125_at	5.8617909
+Mm.100144_at	6.21180735
+Mm.100163_at	6.74064981
+!sample_table_end
+^SAMPLE = GSM267841
+!Sample_title = WT2
+!Sample_geo_accession = GSM267841
+!Sample_platform_id = GPL6526
+#ID_REF = 
+#VALUE = normalized intensities (quantile normalization)
+!sample_table_begin
+ID_REF	VALUE
+Mm.100043_at	7.4995578
+Mm.100065_at	7.04893023
+Mm.100068_at	6.13454236
+Mm.100084_at	6.63020148
+Mm.100112_at	6.15177601
+Mm.100116_at	5.53934223
+Mm.100117_at	5.91875684
+Mm.100125_at	5.84267197
+Mm.100144_at	6.25351158
+Mm.100163_at	7.06860838
+!sample_table_end

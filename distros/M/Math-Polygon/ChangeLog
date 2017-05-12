@@ -1,0 +1,124 @@
+Revision history for Perl extension Math::Polygon
+
+20070425 Request by Christian Sauer: polygon intersection
+   paper with nice algorithm: http://citeseer.ist.psu.edu/cache/papers/cs/25021/http:zSzzSzfractal.dam.fmph.uniba.skzSz~sccgzSzproceedingszSz1998zSzZalik.pdf/zalik98quick.pdf
+20121024 Request by Rick Rutgers: widening polygon contour
+
+version 1.05: Wed Dec 28 12:55:41 CET 2016
+
+	Fixes:
+	- spelling fix.  rt.cpan.org#118297 [Angel Abad]
+
+	Improvements:
+	- add distance to polygon calculation [Andreas Koenig]
+	- use Perl from PATH when running in tests stand-alone.
+
+version 1.04: Fri 23 Sep 16:03:17 CEST 2016
+
+	Fixes:
+	- contains on vertical edge
+	  rt.cpan.org#118030 [Marcus Robst]
+
+	Improvements:
+	- remove duplicate points in chainHull_2D
+	  reported by [Michael R. Davis]
+
+version 1.03: Tue Jan 21 14:33:07 CET 2014
+
+	Improvements:
+	- add example to centroid, suggested by [Michael R. Davis]
+	- change documentation style.
+
+version 1.02: Mon Sep 19 12:06:32 CEST 2011
+
+	Improvements:
+	- Added centroid functions, implemented by [Fred Zellinger]
+
+version 1.01: Mon May 25 14:35:26 CEST 2009
+
+	Improvements:
+	- Added Math::Polygon::Convex with chainHull_2D implementation by
+	  [Jari Turkia] with many improvements.  Tests in t/50chainhull.t
+	- do not run t/pod.t in devel environment.
+
+version 1.00: Fri Feb  1 15:32:20 CET 2008
+
+	- ::Calc::polygon_is_open() will die on empty polygon
+
+	- correct ::Calc::polygon_contains_point() for point on vertical
+	  edge. Spotted by [Rino Ingenito]
+
+version 0.99: Fri Jun  8 16:31:33 CEST 2007
+
+	- fillClip1() did not handle empty result connectly, neither
+	  did ::Clip::polygon_fill_clip1().  Reported by [Christian Sauer]
+
+	- added t/pod.t
+
+version 0.98: Tue Apr  3 09:38:57 CEST 2007
+
+	- missing export of polygon_is_closed [Christian Sauer]
+
+version 0.97: Thu Mar 29 08:48:14 CEST 2007
+
+	- fix prototype of polygon_rotate, to fix method rotate()
+	  [Christian Sauer]
+
+version 0.96: Fri Mar  9 14:19:41 CET 2007
+
+	- refer to webpage http://perl.overmeer.net/geo
+
+	- email address geo@overmeer.net
+
+	- removed stuff to create own manual-pages.
+
+	- all error messages should start with lower-case
+
+version 0.95: Mon Feb 26 11:23:44 CET 2007
+
+	- polygon_contains_point() only work if poly is closed: croak
+	  otherwise. [Dennis Hartigan-O'Connor]
+
+	- polygon_is_clockwise() will also croak when the poly is not
+	  closed.
+
+	- new polygon_is_closed() and $poly->isClosed.
+
+	- use oodist to generate manuals, not own scripts.
+
+	- bumped version number to indicate that the module interface
+	  is stable: no major changes expected before 1.00
+
+version 0.004: Fri Jul 21 10:17:44 CEST 2006
+
+	- simplify() could get in an endless loop.
+
+	- doc updates to fit into Geo::Point doc-set.
+
+	- ring detection failed in Calc::polygon_start_minxy(), reported
+	  by [mtworek]
+
+version 0.003: Fri Dec  3 13:20:37 CET 2004
+
+	- simplify will average close points.  Before, points could get
+	  removed one after the other, until points over a long distance
+	  were stripped.  That will not happen anymore.
+
+	- polygon_start_minxy/Math::Polygon::startMinXY now returns the
+	  point most close to (xmin,ymin) of the bounding box first. Was
+	  the point with the smallest x.
+
+	- new method Math::Polygon::contains(point) and function
+	  Math::Polygon::Calc::polygon_contains_point(point, @poly)
+	  with tests in t/14contains.t
+
+version 0.002: Fri Nov 12 16:05:18 CET 2004
+
+	- Created Math::Polygon::Transform, and added loads of test for it
+
+	- Math::Polygon added interface to transform routines
+
+version 0.001: Wed Sep  1 17:45:51 CEST 2004
+
+	- Initial version
+

@@ -1,0 +1,44 @@
+Revision history for Mojolicious-Plugin-CountryDropDown
+
+0.06      2013-01-04 21:39:56 Europe/Berlin
+	  Please note that 0.06 is incompatible with prior non-dev release 0.04!
+      + Minor POD corrections
+	  + Fixed error logging: method call on the appropriate object
+	  + More tests
+
+0.0504    2012-09-20 16:08:49 Europe/Berlin
+      + Extensive rewrite with many API changes
+      + Support for Mojolicious::Plugin::I18N
+      + Support for ALPHA_3 and NUMERIC codesets for country codes
+
+0.0503    2012-04-24
+      + Added List::MoreUtils to Prereqs (thanks, CPAN Testers)
+      + PerlTidy	
+
+0.0502    2012-04-22 22:13:33 Europe/Berlin
+      Development release
+      + removed method "show_country_list" which added the HTML code
+        to the stash
+      + renamed helper method "country_drop_down" to "country_select_field"
+      + made Mojolicious generate the HTML (shaw [at] cpan.org)
+      + massive speed-up through code rewrite (shaw [at] cpan.org)
+      + adjusted tests
+      + added method "country_select_field_conf" to change the default
+        values for all following method calls
+
+0.05_01 2012-04-04
+      Development release
+      + Added helper method "country_drop_down"
+
+0.04  2012-03-14
+      Minor adjustments for the initial CPAN release
+
+0.03  2012-02-15
+      Rewritten to take advantage of Locale::Country::Multilingual
+        instead of providing our own translations
+
+0.02  2011-12-??
+      ??
+
+0.01  2011-11-29
+      + initial version

@@ -1,0 +1,24 @@
+From: Dan Sugalski <dan@sidhe.org>
+
+Hey, folks.
+
+I got mail from a consultant/recruiter in Leicester asking if I knew 
+of any perl gurus looking for work. Since I'm not sure where everyone 
+is, relatively speaking, I figured I'd pass it on. If anyone's 
+interested, get in touch with me and I'll forward your info on, and 
+we'll see where things go from there.
+-- 
+                                         Dan
+
+--------------------------------------"it's like this"-------------------
+Dan Sugalski                          even samurai
+dan@sidhe.org                         have teddy bears and even
+                                       teddy bears get drunk
+__END__
+
+This message has a "Hey, folks" line in it that we really want to ignore
+as that doesn't tell us about anything.
+
+In theory we would like to be able to do this for every langauge, but
+we don't yet.  Never mind, people in other langauges just have to be
+more inteligent about not saying Hi than english speakers ;-)

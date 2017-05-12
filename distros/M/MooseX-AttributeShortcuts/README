@@ -1,0 +1,428 @@
+NAME
+
+    MooseX::AttributeShortcuts - Shorthand for common attribute options
+
+VERSION
+
+    This document describes version 0.029 of MooseX::AttributeShortcuts -
+    released May 08, 2017 as part of MooseX-AttributeShortcuts.
+
+SYNOPSIS
+
+        package Some::Class;
+    
+        use Moose;
+        use MooseX::AttributeShortcuts;
+    
+        # same as:
+        #   is => 'ro', lazy => 1, builder => '_build_foo'
+        has foo => (is => 'lazy');
+    
+        # same as: is => 'ro', writer => '_set_foo'
+        has foo => (is => 'rwp');
+    
+        # same as: is => 'ro', builder => '_build_bar'
+        has bar => (is => 'ro', builder => 1);
+    
+        # same as: is => 'ro', clearer => 'clear_bar'
+        has bar => (is => 'ro', clearer => 1);
+    
+        # same as: is => 'ro', predicate => 'has_bar'
+        has bar => (is => 'ro', predicate => 1);
+    
+        # works as you'd expect for "private": predicate => '_has_bar'
+        has _bar => (is => 'ro', predicate => 1);
+    
+        # extending? Use the "Shortcuts" trait alias
+        extends 'Some::OtherClass';
+        has '+bar' => (traits => [Shortcuts], builder => 1, ...);
+    
+        # or...
+        package Some::Other::Class;
+    
+        use Moose;
+        use MooseX::AttributeShortcuts -writer_prefix => '_';
+    
+        # same as: is => 'ro', writer => '_foo'
+        has foo => (is => 'rwp');
+
+DESCRIPTION
+
+    Ever find yourself repeatedly specifying writers and builders, because
+    there's no good shortcut to specifying them? Sometimes you want an
+    attribute to have a read-only public interface, but a private writer.
+    And wouldn't it be easier to just say "builder => 1" and have the
+    attribute construct the canonical "_build_$name" builder name for you?
+
+    This package causes an attribute trait to be applied to all attributes
+    defined to the using class. This trait extends the attribute option
+    processing to handle the above variations.
+
+ Some Notes On History
+
+    Moose has long had a lazy_build attribute option. It was once
+    considered a best practice, but that has, ah, changed. This trait began
+    as a desire to still leverage bits of lazy_build (and a tacit
+    acknowledgment that fat-finger bugs rank among the most embarrassing,
+    right up there with "the TV was unplugged the entire time").
+
+    This author does not recommend you use lazy_build, unless you know
+    exactly what you're doing (probably) and that it's a good idea
+    (probably not).
+
+    Nonetheless, this lazy_build option is why we set certain options the
+    way we do below; while lazy_build in its entirety is not optimal, it
+    had the right idea: regular, predictable accessor names for regular,
+    predictable attribute options.
+
+    As an example, just looking at the below it doesn't seem logical that:
+
+        has _foo => (is => 'ro', clearer => 1);
+
+    ...becomes:
+
+        has _foo => (is => 'ro', clearer => '_clear_foo');
+
+    After reading the lazy_build attribute option, however, we see that the
+    choice had already been made for us.
+
+USAGE
+
+    This package automatically applies an attribute metaclass trait. Unless
+    you want to change the defaults, you can ignore the talk about
+    "prefixes" below.
+
+EXTENDING A CLASS
+
+    If you're extending a class and trying to extend its attributes as
+    well, you'll find out that the trait is only applied to attributes
+    defined locally in the class. This package exports a trait shortcut
+    function "Shortcuts" that will help you apply this to the extended
+    attribute:
+
+        has '+something' => (traits => [Shortcuts], ...);
+
+PREFIXES
+
+    We accept two parameters on the use of this module; they impact how
+    builders and writers are named.
+
+ -writer_prefix
+
+        use MooseX::::AttributeShortcuts -writer_prefix => 'prefix';
+
+    The default writer prefix is '_set_'. If you'd prefer it to be
+    something else (say, '_'), this is where you'd do that.
+
+ -builder_prefix
+
+        use MooseX::::AttributeShortcuts -builder_prefix => 'prefix';
+
+    The default builder prefix is '_build_', as this is what lazy_build
+    does, and what people in general recognize as build methods.
+
+NEW ATTRIBUTE OPTIONS
+
+    Unless specified here, all options defined by Moose::Meta::Attribute
+    and Class::MOP::Attribute remain unchanged.
+
+    Want to see additional options? Ask, or better yet, fork on GitHub and
+    send a pull request. If the shortcuts you're asking for already exist
+    in Moo or Mouse or elsewhere, please note that as it will carry
+    significant weight.
+
+    For the following, "$name" should be read as the attribute name; and
+    the various prefixes should be read using the defaults.
+
+ is => 'rwp'
+
+    Specifying is => 'rwp' will cause the following options to be set:
+
+        is     => 'ro'
+        writer => "_set_$name"
+
+    rwp can be read as "read + write private".
+
+ is => 'lazy'
+
+    Specifying is => 'lazy' will cause the following options to be set:
+
+        is       => 'ro'
+        builder  => "_build_$name"
+        lazy     => 1
+
+    NOTE: Since 0.009 we no longer set init_arg => undef if no init_arg is
+    explicitly provided. This is a change made in parallel with Moo, based
+    on a large number of people surprised that lazy also made one's
+    init_def undefined.
+
+ is => 'lazy', default => ...
+
+    Specifying is => 'lazy' and a default will cause the following options
+    to be set:
+
+        is       => 'ro'
+        lazy     => 1
+        default  => ... # as provided
+
+    That is, if you specify is => 'lazy' and also provide a default, then
+    we won't try to set a builder, as well.
+
+ builder => 1
+
+    Specifying builder => 1 will cause the following options to be set:
+
+        builder => "_build_$name"
+
+ builder => sub { ... }
+
+    Passing a coderef to builder will cause that coderef to be installed in
+    the class this attribute is associated with the name you'd expect, and
+    builder => 1 to be set.
+
+    e.g., in your class,
+
+        has foo => (is => 'ro', builder => sub { 'bar!' });
+
+    ...is effectively the same as...
+
+        has foo => (is => 'ro', builder => '_build_foo');
+        sub _build_foo { 'bar!' }
+
+ clearer => 1
+
+    Specifying clearer => 1 will cause the following options to be set:
+
+        clearer => "clear_$name"
+
+    or, if your attribute name begins with an underscore:
+
+        clearer => "_clear$name"
+
+    (that is, an attribute named "_foo" would get "_clear_foo")
+
+ predicate => 1
+
+    Specifying predicate => 1 will cause the following options to be set:
+
+        predicate => "has_$name"
+
+    or, if your attribute name begins with an underscore:
+
+        predicate => "_has$name"
+
+    (that is, an attribute named "_foo" would get "_has_foo")
+
+ trigger => 1
+
+    Specifying trigger => 1 will cause the attribute to be created with a
+    trigger that calls a named method in the class with the options passed
+    to the trigger. By default, the method name the trigger calls is the
+    name of the attribute prefixed with "_trigger_".
+
+    e.g., for an attribute named "foo" this would be equivalent to:
+
+        trigger => sub { shift->_trigger_foo(@_) }
+
+    For an attribute named "_foo":
+
+        trigger => sub { shift->_trigger__foo(@_) }
+
+    This naming scheme, in which the trigger is always private, is the same
+    as the builder naming scheme (just with a different prefix).
+
+ handles => { foo => sub { ... }, ... }
+
+    Creating a delegation with a coderef will now create a new, "custom
+    accessor" for the attribute. These coderefs will be installed and
+    called as methods on the associated class (just as readers, writers,
+    and other accessors are), and will have the attribute metaclass
+    available in $_. Anything the accessor is called with it will have
+    access to in @_, just as you'd expect of a method.
+
+    e.g., the following example creates an attribute named 'bar' with a
+    standard reader accessor named 'bar' and two custom accessors named
+    'foo' and 'foo_too'.
+
+        has bar => (
+    
+            is      => 'ro',
+            isa     => 'Int',
+            handles => {
+    
+                foo => sub {
+                    my $self = shift @_;
+    
+                    return $_->get_value($self) + 1;
+                },
+    
+                foo_too => sub {
+                    my $self = shift @_;
+    
+                    return $self->bar + 1;
+                },
+            },
+        );
+
+    ...and later,
+
+    Note that in this example both foo() and foo_too() do effectively the
+    same thing: return the attribute's current value plus 1. However, foo()
+    accesses the attribute value directly through the metaclass, the pros
+    and cons of which this author leaves as an exercise for the reader to
+    determine.
+
+    You may choose to use the installed accessors to get at the attribute's
+    value, or use the direct metaclass access, your choice.
+
+ANONYMOUS SUBTYPING AND COERCION
+
+        "Abusus non tollit usum."
+
+    Note that we create new, anonymous subtypes whenever the constraint or
+    coercion options are specified in such a way that the Shortcuts trait
+    (this one) is invoked. It's fully supported to use both constraint and
+    coerce options at the same time.
+
+    This facility is intended to assist with the creation of one-off type
+    constraints and coercions. It is not possible to deliberately reuse the
+    subtypes we create, and if you find yourself using a particular isa /
+    constraint / coerce option triplet in more than one place you should
+    really think about creating a type that you can reuse. MooseX::Types
+    provides the facilities to easily do this, or even a simple constant
+    definition at the package level with an anonymous type stashed away for
+    local use.
+
+ isa => sub { ... }
+
+        has foo => (
+            is  => 'rw',
+            # $_ == $_[0] == the value to be validated
+            isa => sub { die unless $_[0] == 1 },
+        );
+    
+        # passes constraint
+        $thing->foo(1);
+    
+        # fails constraint
+        $thing->foo(5);
+
+    Given a coderef, create a type constraint for the attribute. This
+    constraint will fail if the coderef dies, and pass otherwise.
+
+    Astute users will note that this is the same way Moo constraints work;
+    we use MooseX::Meta::TypeConstraint::Mooish to implement the
+    constraint.
+
+ isa_instance_of => ...
+
+    Given a package name, this option will create an isa type constraint
+    that requires the value of the attribute be an instance of the class
+    (or a descendant class) given. That is,
+
+        has foo => (is => 'ro', isa_instance_of => 'SomeThing');
+
+    ...is effectively the same as:
+
+        use Moose::TypeConstraints 'class_type';
+        has foo => (
+            is  => 'ro',
+            isa => class_type('SomeThing'),
+        );
+
+    ...but a touch less awkward.
+
+ isa => ..., constraint => sub { ... }
+
+    Specifying the constraint option with a coderef will cause a new
+    subtype constraint to be created, with the parent type being the type
+    specified in the isa option and the constraint being the coderef
+    supplied here.
+
+    For example, only integers greater than 10 will pass this attribute's
+    type constraint:
+
+        # value must be an integer greater than 10 to pass the constraint
+        has thinger => (
+            isa        => 'Int',
+            constraint => sub { $_ > 10 },
+            # ...
+        );
+
+    Note that if you supply a constraint, you must also provide an isa.
+
+ isa => ..., constraint => sub { ... }, coerce => 1
+
+    Supplying a constraint and asking for coercion will "Just Work", that
+    is, any coercions that the isa type has will still work.
+
+    For example, let's say that you're using the File type constraint from
+    MooseX::Types::Path::Class, and you want an additional constraint that
+    the file must exist:
+
+        has thinger => (
+            is         => 'ro',
+            isa        => File,
+            constraint => sub { !! $_->stat },
+            coerce     => 1,
+        );
+
+    thinger will correctly coerce the string "/etc/passwd" to a
+    Path::Class:File, and will only accept the coerced result as a value if
+    the file exists.
+
+ coerce => [ Type => sub { ...coerce... }, ... ]
+
+    Specifying the coerce option with a hashref will cause a new subtype to
+    be created and used (just as with the constraint option, above), with
+    the specified coercions added to the list. In the passed hashref, the
+    keys are Moose types (well, strings resolvable to Moose types), and the
+    values are coderefs that will coerce a given type to our type.
+
+        has bar => (
+            is     => 'ro',
+            isa    => 'Str',
+            coerce => [
+                Int    => sub { "$_"                       },
+                Object => sub { 'An instance of ' . ref $_ },
+            ],
+        );
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * MooseX::Types
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/moosex-attributeshortcuts/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+CONTRIBUTORS
+
+      * David Steinbrunner <dsteinbrunner@pobox.com>
+
+      * Graham Knop <haarg@haarg.org>
+
+      * Karen Etheridge <ether@cpan.org>
+
+      * Olaf Alders <olaf@wundersolutions.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2017, 2015, 2014, 2013, 2012, 2011 by
+    Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

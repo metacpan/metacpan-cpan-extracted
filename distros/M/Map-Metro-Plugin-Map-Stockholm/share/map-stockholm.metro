@@ -1,0 +1,339 @@
+--stations
+
+# Blue line
+# T10
+Hjulsta
+Tensta
+Rinkeby
+Rissne
+Duvbo
+Sundbybergs centrum
+Solna strand % :Vreten
+Huvudsta
+Västra skogen % :Vastra skogen
+Stadshagen
+Fridhemsplan
+Rådhuset
+T-Centralen
+Kungsträdgården % :Kungstradgarden
+
+# T11
+Akalla
+Husby
+Kista
+Hallonbergen
+Näckrosen % :Nackrosen
+Solna centrum
+
+# Green line
+# T19
+Hässelby strand
+Hässelby gård
+Johannelund
+Vällingby
+Råcksta
+Blackeberg
+Islandstorget
+Ängbyplan
+Åkeshov
+Brommaplan
+Abrahamsberg
+Stora mossen
+Alvik
+Kristineberg
+Thorildsplan
+S:t Eriksplan
+Odenplan
+Rådmansgatan
+Hötorget
+Gamla stan
+Slussen
+Medborgarplatsen
+Skanstull
+Gullmarsplan
+Globen
+Enskede gård
+Sockenplan
+Svedmyra
+Stureby
+Bandhagen
+Högdalen
+Rågsved
+Hagsätra
+
+# T17
+Skärmarbrink
+Hammarbyhöjden
+Björkhagen
+Kärrtorp
+Bagarmossen
+Skarpnäck
+
+# T18
+Blåsut
+Sandsborg
+Skogskyrkogården
+Tallkrogen
+Gubbängen
+Hökarängen
+Farsta
+Farsta strand
+
+# Red line
+# T13
+Ropsten
+Gärdet
+Karlaplan
+Östermalmstorg
+
+Mariatorget
+Zinkensdamm
+Hornstull
+Liljeholmen
+Aspudden
+Örnsberg
+Axelsberg
+Mälarhöjden
+Bredäng
+Sätra
+Skärholmen
+Vårberg
+Vårby gård
+Masmo
+Fittja
+Alby
+Hallunda
+Norsborg
+
+# T14
+Mörby centrum
+Danderyds sjukhus
+Bergshamra
+Universitetet
+Tekniska högskolan
+Stadion
+
+Midsommarkransen
+Telefonplan
+Hägerstensåsen
+Västertorp
+Fruängen
+
+# Tram Spårväg City
+Sergels torg
+Kungsträdgården
+Nybroplan
+Styrmansgatan
+Djurgårdsbron
+Nordiska muséet
+Gröna Lund
+Skansen
+Djurgårdsskolan
+Bellmansro
+Waldemarsudde
+
+# Tram Nockebybanan
+Nockeby
+Nockeby torg
+Olovslund
+Höglandstorget
+Ålstens gård
+Ålstensgatan
+Smedslätten
+Klövervägen
+Alléparken
+
+# Tram Tvärbanan
+Solna station
+Solna Business Park
+Bällsta bro
+Karlsbodavägen
+Norra Ulvsunda
+Johannesfred
+Alviks strand
+Stora Essingen
+Gröndal
+Trekanten
+Årstadal
+Årstaberg
+Årstafältet
+Valla torg
+Linde
+Mårtensdal
+Luma
+Sickla kaj
+Sickla udde
+
+--transfers
+T-Centralen|Sergels torg|weight:4
+
+--lines
+10|T10|Blue line|color:#1c388c,width:6
+11|T11|Blue line|color:#1c388c,width:6
+13|T13|Red line|color:#f15e25,width:6
+14|T14|Red line|color:#f15e25,width:6
+17|T17|Green line|color:#79c142,width:6
+18|T18|Green line|color:#79c142,width:6
+19|T19|Green line|color:#79c142,width:6
+7|L7|Spårväg City|color:#00bfff,width:4
+12|L12|Nockebybanan|color:#bbbbbb,width:4
+22a|L22|Tvärbanan|color:#888888,width:4
+22b|L22|Tvärbanan|color:#888888,width:4
+
+
+--segments
+10|Hjulsta|Tensta
+10|Tensta|Rinkeby
+10|Rinkeby|Rissne
+10|Rissne|Duvbo
+10|Duvbo|Sundbybergs centrum
+10|Sundbybergs centrum|Solna strand
+10|Solna strand|Huvudsta
+10|Huvudsta|Västra skogen
+10,11|Västra skogen|Stadshagen
+10,11|Stadshagen|Fridhemsplan
+10,11|Fridhemsplan|Rådhuset
+10,11|Rådhuset|T-Centralen
+10,11|T-Centralen|Kungsträdgården
+
+11|Akalla|Husby
+11|Husby|Kista
+11|Kista|Hallonbergen
+11|Hallonbergen|Näckrosen
+11|Näckrosen|Solna centrum
+11|Solna centrum|Västra skogen
+
+19|Hässelby strand|Hässelby gård
+19|Hässelby gård|Johannelund
+19|Johannelund|Vällingby
+19|Vällingby|Råcksta
+19|Råcksta|Blackeberg
+19|Blackeberg|Islandstorget
+19|Islandstorget|Ängbyplan
+19|Ängbyplan|Åkeshov
+17,19|Åkeshov|Brommaplan
+17,19|Brommaplan|Abrahamsberg
+17,19|Abrahamsberg|Stora mossen
+17,19|Stora mossen|Alvik
+17,18,19|Alvik|Kristineberg
+17,18,19|Kristineberg|Thorildsplan
+17,18,19|Thorildsplan|Fridhemsplan
+17,18,19|Fridhemsplan|S:t Eriksplan
+17,18,19|S:t Eriksplan|Odenplan
+17,18,19|Odenplan|Rådmansgatan
+17,18,19|Rådmansgatan|Hötorget
+17,18,19|Hötorget|T-Centralen
+13,14,17,18,19|T-Centralen|Gamla stan
+13,14,17,18,19|Gamla stan|Slussen
+17,18,19|Slussen|Medborgarplatsen
+17,18,19|Medborgarplatsen|Skanstull
+17,18,19|Skanstull|Gullmarsplan
+17,18|Gullmarsplan|Skärmarbrink
+17|Skärmarbrink|Hammarbyhöjden
+17|Hammarbyhöjden|Björkhagen
+17|Björkhagen|Kärrtorp
+17|Kärrtorp|Bagarmossen
+17|Bagarmossen|Skarpnäck
+18|Skärmarbrink|Blåsut
+18|Blåsut|Sandsborg
+18|Sandsborg|Skogskyrkogården
+18|Skogskyrkogården|Tallkrogen
+18|Tallkrogen|Gubbängen
+18|Gubbängen|Hökarängen
+18|Hökarängen|Farsta
+18|Farsta|Farsta strand
+19|Gullmarsplan|Globen
+19|Globen|Enskede gård
+19|Enskede gård|Sockenplan
+19|Sockenplan|Svedmyra
+19|Svedmyra|Stureby
+19|Stureby|Bandhagen
+19|Bandhagen|Högdalen
+19|Högdalen|Rågsved
+19|Rågsved|Hagsätra
+
+13|Ropsten|Gärdet
+13|Gärdet|Karlaplan
+13|Karlaplan|Östermalmstorg
+13,14|Östermalmstorg|T-Centralen
+
+13,14|Slussen|Mariatorget
+13,14|Mariatorget|Zinkensdamm
+13,14|Zinkensdamm|Hornstull
+13,14|Hornstull|Liljeholmen
+13|Liljeholmen|Aspudden
+13|Aspudden|Örnsberg
+13|Örnsberg|Axelsberg
+13|Axelsberg|Mälarhöjden
+13|Mälarhöjden|Bredäng
+13|Bredäng|Sätra
+13|Sätra|Skärholmen
+13|Skärholmen|Vårberg
+13|Vårberg|Vårby gård
+13|Vårby gård|Masmo
+13|Masmo|Fittja
+13|Fittja|Alby
+13|Alby|Hallunda
+13|Hallunda|Norsborg
+
+14|Mörby centrum|Danderyds sjukhus
+14|Danderyds sjukhus|Bergshamra
+14|Bergshamra|Universitetet
+14|Universitetet|Tekniska högskolan
+14|Tekniska högskolan|Stadion
+14|Stadion|Östermalmstorg
+
+14|Liljeholmen|Midsommarkransen
+14|Midsommarkransen|Telefonplan
+14|Telefonplan|Hägerstensåsen
+14|Hägerstensåsen|Västertorp
+14|Västertorp|Fruängen
+
+7|Sergels torg|Kungsträdgården
+7|Kungsträdgården|Nybroplan
+7|Nybroplan|Styrmansgatan
+7|Styrmansgatan|Djurgårdsbron
+7|Djurgårdsbron|Nordiska muséet
+7|Nordiska muséet|Gröna Lund
+7|Gröna Lund|Skansen
+7|Skansen|Djurgårdsskolan
+
+7->|Djurgårdsskolan|Waldemarsudde
+7->|Waldemarsudde|Bellmansro
+7->|Bellmansro|Djurgårdsskolan
+
+12|Nockeby|Nockeby torg
+12|Nockeby torg|Olovslund
+12|Olovslund|Höglandstorget
+12|Höglandstorget|Ålstens gård
+12|Ålstens gård|Ålstensgatan
+12|Ålstensgatan|Smedslätten
+12|Smedslätten|Klövervägen
+12|Klövervägen|Alléparken
+12|Alléparken|Alvik
+
+22a|Solna station|Solna centrum
+22a|Solna centrum|Solna Business Park
+22a|Solna Business Park|Sundbybergs centrum
+22a|Sundbybergs centrum|Bällsta bro
+22a|Bällsta bro|Karlsbodavägen
+22a|Karlsbodavägen|Norra Ulvsunda
+22a|Norra Ulvsunda|Johannesfred
+22a|Johannesfred|Alvik
+
+22b|Alvik|Alviks strand
+22b|Alviks strand|Stora Essingen
+22b|Stora Essingen|Gröndal
+22b|Gröndal|Trekanten
+22b|Trekanten|Liljeholmen
+22b|Liljeholmen|Årstadal
+22b|Årstadal|Årstaberg
+22b|Årstaberg|Årstafältet
+22b|Årstafältet|Valla torg
+22b|Valla torg|Linde
+22b|Linde|Globen
+22b|Globen|Gullmarsplan
+22b|Gullmarsplan|Mårtensdal
+22b|Mårtensdal|Luma
+22b|Luma|Sickla kaj
+22b|Sickla kaj|Sickla udde

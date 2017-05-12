@@ -1,0 +1,31 @@
+#------------------#
+# This is Todo.txt #
+#------------------#
+
+Add COPYRIGHT_YEAR variable that is automatically set by the Module
+
+
+split the template data from the Module
+
+have a Module::Build and a MakeMaker template
+
+give multiple templates as input so one can reuse, say, the test  template in other templates
+
+add an interactive wizard (something very simple)
+
+
+add tem::readline support ?
+
+test build
+Build.pl installs default template in ~
+
+--USER_VARIABLES script (plugin)
+	give the possibility to act on the default variables and add new ones
+	before generating the module
+	
+	also give the list of files and allow modification of the list?
+	
+how do we add extra modules to a distribution?
+what if the template is full path ? or contains '..' ?
+
+

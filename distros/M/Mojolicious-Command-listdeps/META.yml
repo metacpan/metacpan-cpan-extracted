@@ -1,0 +1,39 @@
+---
+abstract: 'Command to list dependencies for a Mojolicious project '
+author:
+  - 'Paul Durden <alabama@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Command-listdeps
+requires:
+  Cwd: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  Module::CoreList: '0'
+  Module::Info: '0'
+  Mojo::Base: '0'
+  Mojolicious: '3.0'
+  PPI: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/alabamapaul/perl5-Mojolicious-Command-listdeps/issues
+  homepage: https://github.com/alabamapaul/perl5-Mojolicious-Command-listdeps
+  repository: https://github.com/alabamapaul/perl5-Mojolicious-Command-listdeps.git
+version: '0.08'

@@ -1,0 +1,7 @@
+Revision history for Mojolicious-Plugin-Breadcrumbs
+
+1.001002 2015-03-24
+    - Fixed failing tests
+
+1.001001 2015-03-23
+    - First version released on an unsuspecting world

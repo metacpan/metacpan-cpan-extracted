@@ -1,0 +1,65 @@
+/*
+ * <% $module_h_filename %> - This file is in the public domain
+ * Author: <% $author %>
+ * Version: 2.1
+ *
+ * Generated on: <% $now %>
+ * <% $module_name %> version: <% $module_version %>
+ * Module::CAPIMaker version: <% $module_capimaker_version %>
+ */
+
+#if !defined (PERL_MATH_INT64_H_INCLUDED)
+#define PERL_MATH_INT64_H_INCLUDED
+
+#define MATH_INT64_C_API_REQUIRED_VERSION <% $max_version %>
+#define MATH_INT64_VERSION MATH_INT64_C_API_REQUIRED_VERSION
+
+int perl_math_int64_load(int required_version);
+
+#define PERL_MATH_INT64_LOAD perl_math_int64_load(MATH_INT64_C_API_REQUIRED_VERSION)
+#define PERL_<% uc $c_module_name %>_LOAD_OR_CROAK \
+    if (PERL_<% uc $c_module_name %>_LOAD);        \
+    else croak(NULL);
+#define MATH_INT64_BOOT PERL_MATH_INT64_LOAD_OR_CROAK
+
+extern HV *math_int64_c_api_hash;
+extern int math_int64_c_api_min_version;
+extern int math_int64_c_api_max_version;
+#define math_int64_capi_version math_int64_c_api_max_version
+
+#if (defined(MATH_INT64_NATIVE_IF_AVAILABLE) && (IVSIZE == 8))
+#define MATH_INT64_NATIVE 1
+#endif
+
+<%
+    for my $n (sort keys %function) {
+        my $f = $function{$n};
+        my $var = "${c_module_name}_c_api_$n";
+        $OUT .= "extern $f->{type} (*$var)($f->{args});\n";
+        if ($f->{pTHX}) {
+            $OUT .= "#define $export_prefix$n($f->{macro_args}) ((*$var)($f->{call_args}))\n";
+        }
+        else {
+            $OUT .= "#define $export_prefix$n (*$var)\n";
+        }
+    }
+%>
+
+#if MATH_INT64_NATIVE
+
+#undef newSVi64
+#define newSVi64 newSViv
+#undef newSVu64
+#define newSVu64 newSVuv
+
+#define sv_seti64 sv_setiv_mg
+#define sv_setu64 sv_setuv_mg
+
+#else
+
+#define sv_seti64(target, i64) (sv_setsv_mg(target, sv_2mortal(newSVi64(i64))))
+#define sv_setu64(target, u64) (sv_setsv_mg(target, sv_2mortal(newSVu64(u64))))
+
+#endif
+
+#endif

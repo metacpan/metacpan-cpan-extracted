@@ -1,0 +1,57 @@
+---
+abstract: 'a CPAN distribution to handle the various formats that'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  Test::More: '0'
+  vars: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142060'
+keywords:
+  - modules
+  - formats
+  - cpan
+  - installation
+  - rpm
+  - debs
+  - debian
+  - mandriva
+  - fedora
+  - install
+  - convert
+  - apt-get
+  - urpmi
+  - yum
+  - conversion
+  - perl
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Format
+provides:
+  Module::Format:
+    file: lib/Module/Format.pm
+    version: v0.0.7
+  Module::Format::Module:
+    file: lib/Module/Format/Module.pm
+    version: v0.0.7
+  Module::Format::ModuleList:
+    file: lib/Module/Format/ModuleList.pm
+    version: v0.0.7
+  Module::Format::PerlMF_App:
+    file: lib/Module/Format/PerlMF_App.pm
+    version: v0.0.7
+requires:
+  Getopt::Long: '2.36'
+  Pod::Usage: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: http://www.shlomifish.org/open-source/projects/Module-Format/
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: http://bitbucket.org/shlomif/web-cpan
+version: v0.0.7

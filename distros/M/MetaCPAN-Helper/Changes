@@ -1,0 +1,18 @@
+Revision history for Perl module MetaCPAN::Helper
+
+0.04 2015-02-27 NEILB
+    - Added method release2repo (mickeyn)
+    - Added method dist2repo (latest release's repo) (mickeyn)
+    - Added method dist2favorite_count (mickeyn)
+
+0.03 2015-01-25 NEILB
+    - When passing a dist or module, you can now pass the relevent
+      object from MetaCPAN::Client, or just a scalar name.
+      mickeyn++
+
+0.02 2015-01-24 NEILB
+    - Added methods dist2releases and dist2latest_release (mickeyn++).
+
+0.01 2015-01-14 NEILB
+    - First release to CPAN, with module2dist method.
+

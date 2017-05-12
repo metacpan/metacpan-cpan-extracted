@@ -1,0 +1,439 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Box::Thread::Node - one node in a message thread
+
+=head1 INHERITANCE
+
+ Mail::Box::Thread::Node
+   is a Mail::Reporter
+
+=head1 SYNOPSIS
+
+ my $node = Mail::Box::Thread::Node->new;
+ $node->addMessage($message);
+ ...
+
+=head1 DESCRIPTION
+
+The C<Mail::Box::Thread::Node> maintains one node in the linked list of
+threads.  Each node contains one message, and a list of its follow-ups.
+Next to that, it refers to its own ancestor and contains information
+about the trustworthiness of that relationship.
+
+To complicate things a little, because the thread-manager can maintain
+multiple folders, and merge there content, you may find the same message
+in more folders.  All versions of the same message (based on message-id)
+are stored in the same node.
+
+Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Reporter|Mail::Reporter/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
+ 
+=over 4
+
+=item Mail::Box::Thread::Node-E<gt>B<new>(%options)
+
+You will not call this method yourself. The L<Mail::Box::Thread::Manager|Mail::Box::Thread::Manager>
+object will call it to construct C<Mail::Box::Thread::Node> objects.
+Either a C<message> or a C<messageId> must be supplied.
+
+ -Option    --Defined in     --Default
+  dummy_type                   undef
+  log         Mail::Reporter   'WARNINGS'
+  message                      undef
+  messageId                    undef
+  trace       Mail::Reporter   'WARNINGS'
+
+=over 2
+
+=item dummy_type => CLASS
+
+Indicates the class name of dummy messages. Dummy messages are
+placeholders in a L<Mail::Box::Thread::Manager|Mail::Box::Thread::Manager> data structure.
+
+=item log => LEVEL
+
+=item message => MESSAGE
+
+The MESSAGE which is stored in this node.  The message
+must be a Mail::Box::Message.
+
+=item messageId => MESSAGE-ID
+
+The MESSAGE-ID for the message which is stored in this node.  Only
+specify it when you don't have the message yet.
+
+=item trace => LEVEL
+
+=back
+
+=back
+
+=head2 The thread node
+
+=over 4
+
+=item $obj-E<gt>B<addMessage>($message)
+
+Add one message to the thread node.  If the node contains a dummy, then
+the dummy is replaced. Otherwise, the messages is added to the end of the
+list.
+
+=item $obj-E<gt>B<expand>( [BOOLEAN] )
+
+Returns whether this (part of the) folder has to be shown expanded or not.
+This is simply done by a label, which means that most folder types can
+store this.
+
+=item $obj-E<gt>B<isDummy>()
+
+Returns true if the message is a dummy. A dummy is a "hole" in a thread
+which has follow-ups but does not have a message.
+
+=item $obj-E<gt>B<message>()
+
+Get the message which is stored in this thread node.  NOTE: the same
+message may be located in many folders at the same time, and these
+folders may be controlled by the same thread manager.
+
+In scalar context, this method returns the first instance of the
+message that is not deleted. If all instances are flagged for deletion,
+then you get the first deleted message. When the open folders only
+contain references to the message, but no instance, you get a dummy
+message (see L<Mail::Message::Dummy|Mail::Message::Dummy>).
+
+In list context, all instances of the message which have been found are
+returned.
+
+example: 
+
+ my $threads = $mgr->threads(folders => [$draft, $sent]);
+ my $node    = $draft->message(1)->thread;
+
+ foreach my $instance ($node->message) {
+    print "Found in ", $instance->folder, ".\n";
+ }
+
+ print "Subject is ", $node->message->subject, ".\n";
+
+=item $obj-E<gt>B<messageId>()
+
+Return the message-id related to this thread node.  Each of the messages
+listed in this node will have the same ID.
+
+=back
+
+=head2 The thread order
+
+=over 4
+
+=item $obj-E<gt>B<followUps>()
+
+Returns the list of follow-ups to this thread node.  This list
+may contain parsed, not-parsed, and dummy messages.
+
+=item $obj-E<gt>B<followedBy>($threads)
+
+Register that the $threads are follow-ups to this message. These
+follow-ups need not be related to each other in any way other than
+sharing the same parent.
+
+Defining the same relation more than once will not cause information to
+be duplicated.
+
+=item $obj-E<gt>B<follows>($thread, $quality)
+
+Register that the current thread is a reply to the specified $thread. The
+$quality of the relation is specified by the second argument.  The method
+returns C<undef> if the link is not accepted in order to avoid circular
+references.
+
+The relation may be specified more than once, but only the most confident
+relation is used. For example, if a reply ($quality equals C<REPLY>) is
+specified, later calls to the follow method will have no effect. If
+C<follows> is called with a $quality that matches the current quality, the
+new thread overrides the previous.
+
+=item $obj-E<gt>B<repliedTo>()
+
+Returns the message(s) to which the message in this node replies. In
+scalar context, this method will return the message to which the message
+in this node replies. This message object may be a dummy message.
+
+If the message seems to be the first message of a thread, the value C<undef>
+is returned.  (Remember that some MUA are not adding reference information
+to the message's header, so you can never be sure a message is the
+start of a thread)
+
+In list context, this method returns a second string value indicating the
+confidence that the messages are related.  When extended thread discovery
+is enabled, then some heuristics are applied to determine if messages are
+related. Values for the STRING may be:
+
+=over 4
+
+=item * C<'REPLY'>
+
+This relation was directly derived from an `in-reply-to' message header
+field. The relation has a high confidence.
+
+=item * C<'REFERENCE'>
+
+This relation is based on information found in a `Reference' message
+header field.  One message may reference a list of messages which
+precede it in the thread. The heuristic attempts to determine
+relationships between messages assuming that the references are in order.
+This relation has a lower confidence.
+
+=item * C<'GUESS'>
+
+The relation is a big guess, with low confidence.  It may be based on
+a subject which seems to be related, or commonalities in the message's
+body.
+
+=back
+
+More constants may be added later.
+
+example: 
+
+ my $question = $answer->repliedTo;
+ my ($question, $quality) = $answer->repliedTo;
+ if($question && $quality eq 'REPLY') { ... };
+
+=item $obj-E<gt>B<sortedFollowUps>( [$prepare, [$compare]] )
+
+Returns the list of L<followUps()|Mail::Box::Thread::Node/"The thread order">, but sorted.  By default
+sorting is based on the estimated time of the reply. See
+startTimeEstimate().
+
+=back
+
+=head2 On the whole thread
+
+Some convenience methods are added to threads, to simplify retrieving
+information from it.
+
+=over 4
+
+=item $obj-E<gt>B<endTimeEstimate>()
+
+Returns a guess as to when the thread has ended (although you never
+know for sure whether there fill follow messages in the future).
+
+=item $obj-E<gt>B<ids>()
+
+Returns all the ids in the thread starting at the current thread node.
+
+example: 
+
+ $newfolder->addMessages($folder->ids($thread->ids));
+ $folder->delete($thread->ids);
+
+=item $obj-E<gt>B<numberOfMessages>()
+
+Number of messages in the thread starting at the current thread node, but
+not counting the dummies.
+
+=item $obj-E<gt>B<recurse>(CODE)
+
+Execute a function for all sub-threads.  If the subroutine returns true,
+sub-threads are visited recursively. Otherwise, the current branch
+traversal is aborted. The routine is called with the thread-node as the
+only argument.
+
+=item $obj-E<gt>B<startTimeEstimate>()
+
+Returns a guess as to when the thread was started.  Each message contains
+various date specifications (each with various uncertainties resulting
+from timezones and out-of-sync clocks). One of these date specifications
+is used as the timestamp for the message. If the node contains a dummy
+message the lowest timestamp of the replies is returned. Otherwise the
+estimated timestamp of the node's message is returned.
+
+=item $obj-E<gt>B<threadMessages>()
+
+Returns all the messages in the thread starting at the current thread
+node.  This list will not include dummies.
+
+example: 
+
+ my @t = $folder->message(3)
+                ->threadStart
+                ->threadMessages;
+
+=item $obj-E<gt>B<threadToString>( [CODE] )
+
+Translate a thread into a string. The string will contain at least one
+line for each message which was found, but tries to fold dummies.  This
+is useful for debugging, but most message readers will prefer to
+implement their own thread printer.
+
+The optional CODE argument is a reference to a routine which will be called
+for each message in the thread.  The routine will be called with the
+message as the first argument.  The default shows the subject of the message.
+In the first example below, this routine is called seven times.
+
+example: 
+
+ print $node->threadToString;
+
+may result in
+
+ Subject of this message
+ |- Re: Subject of this message
+ |-*- Re: Re: Subject of this message
+ | |- Re(2) Subject of this message
+ | |- [3] Re(2) Subject of this message
+ | `- Re: Subject of this message (reply)
+ `- Re: Subject of this message
+
+The `*' represents a missing message (a "dummy" message).  The `[3]'
+presents a folded thread with three messages.
+
+ print $node->threadToString(\&show);
+
+ sub show($) {
+    my $message = shift;
+    my $subject = $message->head->get('subject');
+    length $subject ? $subject : '<no subject>';
+ }
+
+=item $obj-E<gt>B<totalSize>()
+
+Returns the sum of the size of all the messages in the thread.
+
+=back
+
+=head2 Error handling
+
+Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
+ 
+=over 4
+
+=item $obj-E<gt>B<AUTOLOAD>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<addReport>($object)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+=item Mail::Box::Thread::Node-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<errors>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<log>( [$level, [$strings]] )
+
+=item Mail::Box::Thread::Node-E<gt>B<log>( [$level, [$strings]] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logPriority>($level)
+
+=item Mail::Box::Thread::Node-E<gt>B<logPriority>($level)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<notImplemented>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<report>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<reportAll>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<trace>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<warnings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=back
+
+=head2 Cleanup
+
+Extends L<"Cleanup" in Mail::Reporter|Mail::Reporter/"Cleanup">.
+ 
+=over 4
+
+=item $obj-E<gt>B<DESTROY>()
+
+Inherited, see L<Mail::Reporter/"Cleanup">
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Box distribution version 3.002,
+built on March 31, 2017.
+
+Do not forget to read
+L<Mail::Box-Overview>,
+L<Mail::Box-Cookbook>, and
+L<Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L<Mail::Message>,
+L<Mail::Box>,
+L<Mail::Box::IMAP4>,
+L<Mail::Box::POP3>,
+L<Mail::Box::Parser::C>,
+L<Mail::Box::Dbx> (unpublished),
+L<Mail::Transport>,
+L<Object::Realize::Later>, and
+L<User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

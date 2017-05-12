@@ -1,0 +1,30 @@
+Mail/MXplus version 0.02
+========================
+
+Mail::MXplus - Perl extension for testing if a domain and IP pass the MX+ test
+The MX+ test passes if the MX of the domain matches the IP,
+or if the rDNS of the IP is a subdomain of the domain (or is the domain)
+See http://www.mxplus.org for a more detailed description of the MX+ tests
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Net::DNS
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Hurricane Electric
+
+This library is free software; you may redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,73 @@
+0.00903    Sept 15, 2009
+          - Silence a test warning from Moose 0.90 (Dave Rolsky).
+
+0.00902    July 10, 2009
+          - Bump required Moose version to avoid issues with is => 'bare'
+            when an older version of Moose is already installed.
+
+0.00901    July 06, 2009
+          - Fix to not warn with newer versions of Moose by passing is => 'bare'
+            to process_accessors method.
+
+0.00900    May 29, 2009
+          - Fix so that classes which implement BUILD themselves still get
+            all attributes passed to their constuctor placed into the instance
+            hash (t0m)
+
+0.00802    Apr 23, 2009
+          - Declare test dependency on Test::Exception. Closes RT#43194. (rafl)
+          - Turn build_requires on Test::More into test_requires. (rafl)
+          - Fix doc typos in SYNOPSIS. Closes RT#40380. (rafl)
+
+0.00801    Apr 09, 2009
+          - Make the accessor meta method class compatible with recent Moose.
+          - Stop using deprecated Moose api to avoid warnings.
+          - Bump Moose dependency to 0.74.
+
+0.00800    Feb 03, 2009
+          - Fix assigning a list to an accessor stores a list ref
+             - tests
+          - TODO test for Class::Accessor::Chained::Fast compatibility
+
+0.00701    Jan 02, 2009
+          - Better errors when trying to modify an immutable class
+          - Fix typo in Makefile.PL description
+          - Missing dep in Makefile.PL (rafl)
+
+0.00700    Dec 29, 2008
+          - Creating a new accessor with the same name as an old one would
+            result in a new attribute with no reader/writer/accessor.
+            Reported by t0m
+             - tests (t0m)
+
+0.00600    Dec 17, 2008
+          - Add test for a 'meta' accessor, which we need to treat as a
+            special case (t0m)
+          - Add test for not replacing pre-existing accessors generally,
+            which is behavior we don't want to lose (t0m)
+          - Don't use ->meta
+          - Don't use ->can
+          - Attempt to support attrs named meta with no success. test marked
+            as todo.
+
+0.00500    Dec 9, 2008
+          - make_accessor, make_ro_accessor, make_rw_accessor
+            - tests
+
+0.00400    Oct 28, 2008
+           - Fix bug where a bad assumption was causing us to infinitely loop
+             on badly-written code like Data::Page. (Reported by marcus)
+             - Tests for this
+             - Up Moose dep to 0.31
+
+0.00300    Jul 30, 2008
+           - Replace around 'new' with a BUILD method. Faster and avoids Moose
+             bug with around/immutable and sub-classes. (t0m)
+
+0.00200    Mar 28, 2008
+           - Extend BUILDALL to store constructor keys in the obj. hashref
+           - Minor fix to make sure Adopt doesn't trip PAUSE perms
+           - Bye bye auto_install.
+
+0.00100    Mar 15, 2008
+           - Initial Release!

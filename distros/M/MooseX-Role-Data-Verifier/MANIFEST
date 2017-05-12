@@ -1,0 +1,10 @@
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.mkdn
+lib/MooseX/Role/Data/Verifier.pm
+t/basic.t
+t/lib/DVTest.pm

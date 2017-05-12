@@ -1,0 +1,9 @@
+TODO
+
+* Allow list queries
+* Support write queries via query() (not just json_query)
+* Support uploads
+* Figure out interface for Metaweb::Result object
+* Test coverage is really shoddy.  I'm a bad bad girl.
+* Set up a config file so you don't have to keep entering
+  username/password/etc

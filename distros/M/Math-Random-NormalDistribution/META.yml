@@ -1,0 +1,19 @@
+---
+abstract: 'Normally distributed random numbers.'
+author:
+  - 'Oleg Alistratov <zero@cpan.org>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Math-Random-NormalDistribution
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  repository: https://github.com/alistratov/math-random-normaldistribution.git
+version: 0.01

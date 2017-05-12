@@ -1,0 +1,39 @@
+Revision history for Perl extension MarpaX::Grammar::GraphViz2.
+
+2.00  2015-03-29T18:10:00
+	- Update logic and docs to use MarpaX::Grammar::Parser V 2.00, which now uses Tree::DAG_Node.
+	- Update pre-reqs to match.
+	- Copy into share/ the latest version of metag.bnf etc, from MarpaX::Grammar::Parser.
+	- No longer exclude share/metag.bnf from the list of files returned by
+		MarpaX::Grammar::GraphViz2::Filer. This means metag.svg is included in the output be the
+		scripts/generate.demo.pl.
+	- Adopt new repo structure. See
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Change licence from Artistic to Perl.
+
+1.05  2014-10-22T17:31:00
+	- Bump the required version of MarpaX::Grammar::Parser from V 1.04 to V 1.07. This is necessary
+		because the latter version bumps the pre-req for Marpa::R2 to 2.096000, which allows usage
+		of the 'forgiving' and 'latm' tokens.
+	- Fix bug in handling unspecified attributes.
+	- Regenerate demo files. This affects all output due to patches to MarpaX::Grammar::Parser.
+	- Clean up visual breaks, which should have all be 50 chars long.
+
+1.04  2014-09-19T16:32:00
+	- Update version # in /all/ modules this time.
+
+1.03  2014-09-19T13:10:00
+	- Update Makefile.PL and docs re this module now being on github.
+
+1.02  2014-09-09T09:57:00
+	- Switch from Perl6::Slurp to File::Slurp.
+	- Copy share/*.bnf from MarpaX::Grammar::Parser.
+	- Re-generate html/*.svg.
+	- Re-generate http://savage.net.au/Ron/html/graphviz2.marpa/Marpa.Grammar.svg.
+
+1.01  2014-02-22T17:44:00
+	- Add 'lexeme default = latm => 1' to the grammar.
+	- Make V 2.082 the minimum version for Marpa::R2.
+
+1.00  2013-08-27T11:00:00
+	  - Original version

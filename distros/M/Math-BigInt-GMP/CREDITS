@@ -1,0 +1,5 @@
+
+* Sysiphus for commenting on my work, pointing out the strlen() and malloc
+  issues
+* Chip Turner for the XS code from Math::GMP
+* All the people working on the GMP library - you rock!

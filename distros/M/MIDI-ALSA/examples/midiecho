@@ -1,0 +1,1191 @@
+#! /usr/bin/perl
+#########################################################################
+#        This Perl script is Copyright (c) 2006, Peter J Billam         #
+#     c/o P J B Computing, GPO Box 669, Hobart TAS 7001, Australia      #
+#                                                                       #
+#     This script is free software; you can redistribute it and/or      #
+#            modify it under the same terms as Perl itself.             #
+#########################################################################
+# Simulates (very roughly) a tape-delay echo on a particular MIDI-channel
+# in a MIDI-file, or, since 2.0. on real-time-MIDI,
+# by issuing repeated note_on events with diminishing volume.  YMMV!
+
+use Term::ReadKey;
+use bytes;
+
+my $Version      = '4.5';   # -E specifies which controllers get echoed
+my $VersionDate  = '13jun2016';
+my %Channel      = ('0',1); # MIDI channel on which the echoes will be added
+my %EchoNotes    = ();      # MIDI notes to which the echoes will be added
+my @Delays       = (300);   # incremental milliseconds of the various delays
+my @Echoes       = ();      # the channels that the echoes will be sent to
+my @PitchChanges = (0);     # the pitch-changes of the various channels
+my %PitchWheel   = ();      # pitch_wheel, -1..+1 semitones, -4095..+4096
+my @PitchDelta   = ();      # int(PitchChange/100) added to note-pitch
+my @Patches      = ();      # the Patches that the echo-channels will be set to
+my @Softenings   = (25);    # decremental velocites (loudness) of the echoes
+my %DoEchoCC     = map {$_,1} (1,5,11,64,65,66,84);
+# do echo Modulation,Portamento,Expression and Pedals
+my $Debug        = 0;
+my $AlsaName     = "midiecho pid=$$";   # 4.3 for -N option
+# no display in real-time-mode; for use in background, and in scripts:
+my $Quiet        = 0;
+my $RealTimeMode = 0;
+my $InputPort    = q{};
+my $OutputPort   = q{};
+my $E_option     = 0;
+# vt100 globals
+my $CursorRow    = 7;
+my $Irow         = 1;
+my $Icol         = 1;
+my $MidCol       = 32;
+
+# use Data::Dumper;  # to send the event array from parent to child
+use Time::HiRes;
+
+# check format of options args...
+while ($ARGV[$[] =~ /^-(\w)/) {
+	if ($1 eq 'v')      { shift;
+		my $n = $0; $n =~ s{^.*/([^/]+)$}{$1};
+        print "$n version $Version $VersionDate\n";
+        exit 0;
+	} elsif ($1 eq 'c')      { shift; %Channel = ();
+		my $a = shift; if ($a !~ /^\d[\d,]*$/) { die "bad -c arg: $a\n"; }
+		foreach (split (',', $a)) { $Channel{$_} = 1; }
+	} elsif ($1 eq 'd') { shift;
+		my $a = shift; if ($a !~ /^\d[\d,]*$/) { die "bad -d arg: $a\n"; }
+		@Delays      = split (',', $a);   # 4.2 don't sort !
+	} elsif ($1 eq 'e') { shift;
+		my $a = shift; if ($a !~ /^\d[\d,]*$/) { die "bad -e arg: $a\n"; }
+		@Echoes      = split (',', $a);
+	} elsif ($1 eq 'E') { shift;
+		my $a = shift; if ($a !~ /^\d[\d,]*$/) { die "bad -E arg: $a\n"; }
+		%DoEchoCC  = map { $_, 1 } split (',', $a);
+		$E_option = 1;
+	} elsif ($1 eq 'p') { shift;
+		my $a = shift; if ($a !~ /^[\d,]*$/)   { die "bad -p arg: $a\n"; }
+		@Patches = split (',', $a);
+	} elsif ($1 eq 'w') { shift;   # 3.1
+		my $a = shift; if ($a !~ /^[-\d,]*$/)  { die "bad -w arg: $a\n"; }
+		@PitchChanges = split (',', $a);
+	} elsif ($1 eq 's' or $1 eq 'q') { shift;
+		my $a = shift; if ($a !~ /^\d[\d,]*$/) { die "bad -s arg: $a\n"; }
+		@Softenings = split (',', $a);
+	} elsif ($1 eq 'n') { shift;
+		my $a = shift; if ($a !~ /^\d[\d,]*$/) { die "bad -n arg: $a\n"; }
+		shift; foreach (split (',', $a)) { $EchoNotes{$_} = 1; }
+	} elsif ($1 eq 'i') { shift; $RealTimeMode = 1; $InputPort  = shift;
+	} elsif ($1 eq 'o') { shift; $RealTimeMode = 1; $OutputPort = shift;
+	} elsif ($1 eq 'N') { shift;   # 4.3
+		$AlsaName = shift;
+	} elsif ($1 eq 'Q') { shift; $Quiet      = 1;
+	} elsif ($1 eq 'D') { shift; $Debug      = 1;
+	} else {
+		my $n = $0; $n =~ s#^.*/([^/]+)$#$1#;
+		print "usage:\n";
+		my $synopsis = 0;
+		while (<DATA>) {
+			if (/^=head1 SYNOPSIS/) { push @Synopsis,$_; $synopsis=1; next; }
+			if ($synopsis && /^=head1/) { last; }
+			if ($synopsis)      { print $_; next; }
+		}
+		exit 1;
+	}
+}
+
+# pre-extend @Softenings @Echoes and @PitchChanges to same length as @Delays
+my $i=$[; while (1) {
+	last if ($i > $#Delays);
+	if ($Delays[$i] < 1) { $Delays[$i] = 1; } # 1.6; delay=0 causes midi chaos
+	$i++;
+}
+$i=$[; while (1) { last if ($i > $#Delays);
+	if (!defined $Softenings[$i]) { $Softenings[$i] = $Softenings[$i-1]; }
+	$i++;
+}
+$#Softenings = $#Delays;
+# if (@Echoes) {
+{
+	my $i=$[; while (1) { last if ($i > $#Delays);
+		my @c = sort keys %Channel;
+		if (!defined $Echoes[$i]) { $Echoes[$i] = $c[$[] or 0; }
+		$i++;
+	}
+}
+$#Echoes = $#Delays;
+@Echoes = map { 0+$_ } @Echoes;   # 3.5
+
+if (@PitchChanges) {
+	my $i=$[; while (1) {
+		last if ($i > $#PitchChanges);
+		if (defined $PitchChanges[$i]) {  # 3.1
+			$PitchDelta[$i] = int ($PitchChanges[$i]/100); # 4.0
+			$PitchWheel{$Echoes[$i]}
+			 = int (40.96 * ($PitchChanges[$i]-100*$PitchDelta[$i]));
+			# %PitchWheel is not so clear, because it's a cc10=
+		}
+		$i++;
+	}
+}
+$#PitchChanges = $#Delays;
+$#PitchDelta  = $#Delays;
+
+if ($RealTimeMode) {
+	eval 'require MIDI::ALSA'; if ($@) {
+		die "you need to install the MIDI::ALSA module from www.cpan.org\n";
+	}
+
+	if (! defined $OutputPort) { $OutputPort = $ENV{'ALSA_OUTPUT_PORTS'}; }
+	if (! defined $OutputPort) {   # 4.4
+    	warn "OutputPort not specified and ALSA_OUTPUT_PORTS not set\n";
+	}
+	if ($Quiet and !$InputPort) {  # 3.1
+		die "in -Q Quiet-mode you must specify the -i InputPort\n";
+	}
+	MIDI::ALSA::client( $AlsaName, 1, 1, 1 );
+	foreach my $cl_po (split /,/, $InputPort) {  # 3.6
+    	if ($cl_po ne '0' and ! MIDI::ALSA::connectfrom(0, $cl_po)) { # 4.4
+        	die "can't connect from ALSA client $cl_po\n";
+    	}
+	}
+	foreach my $cl_po (split /,/, $OutputPort) {  # 3.6
+    	if ($cl_po ne '0' and ! MIDI::ALSA::connectto(1, $cl_po)) { # 4.4
+        	die "can't connect to ALSA client $cl_po\n";
+    	}
+	}
+	if (! MIDI::ALSA::start()) {
+		die "can't start the queue of the ALSA client\n";
+	}
+	$CursorRow = default_cursor_row();
+	display_alsa(); display_channel(); display_keystrokes(); display_echoes();
+
+	# output the patch-change events on the channels that need them
+	#warn "Patches=@Patches\n";
+	foreach my $i_echo ($[ .. $#Patches) {
+		MIDI::ALSA::output(MIDI::ALSA::pgmchangeevent(
+			$Echoes[$i_echo],$Patches[$i_echo],));
+	#warn "pgmchangeevent($Echoes[$i_echo],$Patches[$i_echo],)\n";
+	}
+	# output the pitch-change events on the channels that need them
+	foreach my $channel (keys %PitchWheel) {
+		my $change = $PitchWheel{$channel};
+		MIDI::ALSA::output(MIDI::ALSA::pitchbendevent($channel,$change,));
+		# if abs(cents)>100 (e.g. cents==1200) then we keep track
+		# of that in @PitchDelta and add it into the note events!
+	}
+
+	# How can we respond to keystrokes as well as to alsaevents?
+	# defined ($key = ReadKey(-1))     tests if a char is waiting,
+	# MIDI::ALSA::inputpending()       tests if an alsaevent is waiting,
+	# but how do we just sit there waiting for the next of either ?
+	# I don't want to do an ugly 1ms-loop ...
+	# The plan is to use Up/Down to select an Echo, then offering keystrokes
+	# (all case-insensitive, for ergonomics _and_ comptibility with midikbd)
+	# but how to respond to both keystrokes and alsaevents?
+	# Could fork a ReadKey process which writes the char to its stdout, then
+	# sends a signal to the parent process where a handler reads the char ?
+	# Alternatively, the child could do all the user-interface and
+	# the parent just run as an ALSA client. But no, the UI and the
+	# resulting manipluations on the midi are tightly linked in the app;
+	# so the parent should do both, and the child just getc and signal.
+	# The child should have a 1-sec-timeout read, so the parent
+	# can update its "Connected to|from" lines every second
+	# or so; this again is an app-related functionality.
+	# Attempts with no signalling (so each process updates the screen)
+	# will interrupt each other's dialogues;  except if you could set
+	# up a "I'm in the middle of a dialogue" lock-flag on the UI.
+	# AHA... The parent would like to run choose() and ask() as part
+	# of its UI; but the parent _can't_, because it must keep the
+	# midi-loop going.  Therefore either the parent has to pass 
+	# sophisticated requests to the child (like choose and ask)
+	# or the child has to run the whole UI and pass somewhat
+	# sophisticated data back to the parent, like setting variables;
+	# this is probably best because it's one-way: $Delay[3]=480;
+	if (! $Quiet) {  # 3.1
+		my $parent_pid = $$;
+		my $child_pid  = open(CHILD_STDOUT, "-|");
+		sub handle_child_output {
+			my $cmd = <CHILD_STDOUT>;
+			eval $cmd; if ($@) { warn "can't eval $cmd $@\n"; }
+		}
+		if (! $child_pid) {   # The child does all the UI
+			while (1) {
+				ReadMode(4, STDIN);
+				my $c = ReadKey(0, STDIN);
+				if ($c =~ /^\e$/) { # reduce an escape sequence to just 1 char
+					$c = ReadKey(0, STDIN);
+					if ($c eq '[') {
+						$c = ReadKey(0, STDIN);
+						if ($c =~ /^\d$/) {   # e.g. Delete; throw away the ~
+							my $tilde = ReadKey(0, STDIN);
+						}
+					}
+				}
+				if ($c =~ /^q$/i) {
+					$CursorRow = default_cursor_row();
+					gotoxy(1, $CursorRow); display_keystrokes('quit');
+					ReadMode(0, STDIN);
+					print STDOUT "wait; exit;\n"; kill 'HUP', $parent_pid;
+					exit;
+				}
+				if ($c eq 'A') {   # Up
+					if ($CursorRow > 2) {
+						$CursorRow -= 1; gotoxy(1, $CursorRow);
+						display_keystrokes();
+					}
+				} elsif ($c eq 'B') {   # Down
+					if ($CursorRow < default_cursor_row()) {	
+						$CursorRow += 1; gotoxy(1, $CursorRow);
+						display_keystrokes();
+					}
+				} elsif ($c eq '3') {   # Delete
+				} elsif ($c eq 'c' and $CursorRow == 4) {  # change dry-channel
+					my $ch = get_int('apply echo to which channel');
+					if (defined $ch) {
+						%Channel = ($ch, 1);
+						print STDOUT "%Channel = ($ch, 1);\n";
+						kill 'HUP', $parent_pid;
+					}
+    				display_channel();
+				} elsif ($c eq 'n' and $CursorRow == default_cursor_row()) {
+					push @Delays,350;
+					push @Softenings,25;
+					push @Echoes,0;
+					print STDOUT 'push @Delays,350; '
+				 	.'push @Softenings,25; push @Echoes,0;'."\n";
+					kill 'HUP', $parent_pid;
+    				display_echoes(); display_keystrokes();
+				} elsif ($CursorRow > 4 and $CursorRow < default_cursor_row()) {
+					my $i_echo = $CursorRow-5+$[;
+					if ($c eq 'c') {  # change an echo-channel
+						my $ch = get_int('send echo to which channel');
+						if (defined $ch) {
+							$Echoes[$i_echo] = $ch;
+							print STDOUT "\$Echoes[$i_echo]  = $ch;\n";
+							kill 'HUP', $parent_pid;
+						}
+    					display_echoes(); display_keystrokes();
+					} elsif ($c eq 'd') {  # change an echo-delay
+						my $d = get_int('delay in millisecs');
+						if (defined $d) {
+							$Delays[$i_echo] = $d;
+							print STDOUT "\$Delays[$i_echo]  = $d;\n";
+							kill 'HUP', $parent_pid;
+						}
+    					display_echoes(); display_keystrokes();
+					} elsif ($c eq 'n' and $CursorRow > 4) {  # a New echo
+						splice @Delays,$i_echo,0,350;
+						splice @Softenings,$i_echo,0,25;
+						splice @Echoes,$i_echo,0,0;
+						splice @Patches,$i_echo,0,undef;
+						print STDOUT "splice \@Delays,$i_echo,0,350; "
+                     	. "splice \@Softenings,$i_echo,0,25; "
+                     	. "splice \@Echoes,$i_echo,0,0;\n";
+						kill 'HUP', $parent_pid;
+    					display_echoes(); display_keystrokes();
+					} elsif ($c eq 's') {  # softer by how much
+						my $d = get_int('softer by how much');
+						if (defined $d) {
+							$Softenings[$i_echo] = $d;
+							print STDOUT "\$Softenings[$i_echo]  = $d;\n";
+							kill 'HUP', $parent_pid;
+						}
+    					display_echoes(); display_keystrokes();
+					} elsif ($c eq 'p' and defined $Echoes[$i_echo]) {
+						my $d = get_int('Patch');
+						if (defined $d) {
+							$Patches[$i_echo] = $d;
+							print STDOUT "MIDI::ALSA::output(MIDI::ALSA::"
+						 	."pgmchangeevent($Echoes[$i_echo],$d,));\n";
+							kill 'HUP', $parent_pid;
+						}
+    					display_echoes(); display_keystrokes();
+					} elsif ($c eq 'w') {  # MIDI-controller
+						my $d = get_int('pitch-Wheel (cents)');
+						if (defined $d) {
+							my $cha = $Echoes[$i_echo];
+							$PitchChanges[$i_echo] = $d;  # for us, the child
+							my $cmd = "\$PitchChanges[$i_echo] = $d; ";
+							my $delta = int($d/100);
+							$cmd .= "\$PitchDelta[$i_echo] = $delta; ";
+							my $w = int (40.96 * ($d-100*$delta));
+							$PitchWheel{$cha} = $w;
+							print STDOUT "$cmd MIDI::ALSA::output(MIDI::ALSA::"
+							 ."pitchbendevent($cha,$w,));\n";
+							kill 'HUP', $parent_pid;
+						}
+    					display_echoes(); display_keystrokes();
+					}
+				}
+				# every second or so, the child should display_alsa()
+				# print STDOUT "$cmd\n"; kill 'HUP', $parent_pid;
+			}
+		}
+		$SIG{'HUP'} = \&handle_child_output;
+		close STDIN;  # end of child
+	}  # end of   if(!$Quiet)
+
+	while (1) {
+		my @alsaevent = MIDI::ALSA::input();
+		if ($alsaevent[0] == MIDI::ALSA::SND_SEQ_EVENT_PORT_UNSUBSCRIBED()
+		 or $alsaevent[0] == MIDI::ALSA::SND_SEQ_EVENT_PORT_SUBSCRIBED()) {
+			display_alsa();  # shit. The parent shouldn't be doing this :-(
+			# we could signal HUP the child. But even then, that only
+			# detects connects and disconnects on the input-port...
+			# Probably the child should do display_alsa every second
+			# This will become a big problem in a more general case :-(
+			next;
+		}
+		# could detect a 0-delay arg and change the volume accordingly...
+		MIDI::ALSA::output(@alsaevent);  # direct dry output
+		my ($is_running,$now,$nevents) = MIDI::ALSA::status();
+		# now output it, at all the various delays, to the right channels
+		# Don't echo patch-change, or start of sysex, or pitchbend
+		# (why not pitchbend, if it's going to a different channel ?)
+		if ($alsaevent[0] == MIDI::ALSA::SND_SEQ_EVENT_PGMCHANGE) { next; }
+		if ($alsaevent[0] == MIDI::ALSA::SND_SEQ_EVENT_SYSEX)     { next; }
+		# noteon, noteoff, pitch_wheel, controller, pressure:
+		my $cha  = $alsaevent[$#alsaevent][0];
+		if (! $Channel{$cha}) { next; }
+		if ($alsaevent[0] == MIDI::ALSA::SND_SEQ_EVENT_CONTROLLER()) { # 3.4
+			my $cc = $alsaevent[7][4];
+			if (!$DoEchoCC{$cc}) { next; }
+		}
+		if ($alsaevent[0] == MIDI::ALSA::SND_SEQ_EVENT_NOTEON()
+		 or $alsaevent[0] == MIDI::ALSA::SND_SEQ_EVENT_NOTEOFF()) {
+			my $note = $alsaevent[$#alsaevent][1];
+			if (%EchoNotes and !$EchoNotes{"$note"}) { next; }
+		}
+		my %already = (0+$cha, 1); # 3.5
+		$alsaevent[3] = 0;   # reset "queue"
+		my $cumulative_delay = 0;
+		my $dry_note = $alsaevent[$#alsaevent][1];
+		foreach my $j ($[ .. $#Delays) {
+			$cumulative_delay += $Delays[$j]/1000;
+       		my $secs  = $now + $cumulative_delay;
+			$alsaevent[4] = $secs;
+			if (defined $Echoes[$j]) {   # set the -e output-channel
+				$alsaevent[$#alsaevent][0] = $Echoes[$j];
+			 	if ($alsaevent[0] == MIDI::ALSA::SND_SEQ_EVENT_PITCHBEND()
+				 or $alsaevent[0] == MIDI::ALSA::SND_SEQ_EVENT_CONTROLLER()) {
+					if (! $already{$Echoes[$j]}) {   # 3.5
+						MIDI::ALSA::output(@alsaevent);
+						$already{$Echoes[$j]} = 1;
+					}
+					next;
+				}
+			}
+			if ($alsaevent[0] == MIDI::ALSA::SND_SEQ_EVENT_NOTEON()
+			 or $alsaevent[0] == MIDI::ALSA::SND_SEQ_EVENT_NOTEOFF()) {
+				my $quietenedvol = $alsaevent[$#alsaevent][2];
+				if ($quietenedvol > 0) {
+					$quietenedvol -= $Softenings[$j];
+					if ($quietenedvol < 1) { $quietenedvol = 1; }
+					$alsaevent[$#alsaevent][2] = $quietenedvol;
+				}
+				$alsaevent[$#alsaevent][1] = $dry_note + $PitchDelta[$j]; #4.0
+				my $rc = MIDI::ALSA::output(@alsaevent);
+			}
+		}
+	}
+	exit 0;   # end of RealTime mode
+}
+
+#--------- RealTime UI and infrastructure, recycled from midikbd ---------
+sub display_alsa {
+	return if $Quiet;
+	@ConnectedTo = ();
+	my $id = MIDI::ALSA::id();
+	foreach (MIDI::ALSA::listconnectedto()) {
+		my @cl = @$_;
+		push @ConnectedTo, "$cl[1]:$cl[2]"
+	}
+	@ConnectedFrom = ();
+	foreach (MIDI::ALSA::listconnectedfrom()) {
+		my @cl = @$_;
+		push @ConnectedFrom, "$cl[1]:$cl[2]"
+	}
+	gotoxy(1,1);       puts_30c("ALSA client $id");
+	gotoxy($MidCol,1); puts_clr("midiecho pid=$$");
+	my $s = "Input port $id:0 is ";
+	if (@ConnectedFrom) { $s .= "connected from ".join(',',@ConnectedFrom);
+	} else {              $s .= "not connected from anything";
+	}
+	gotoxy(1,2); puts_clr($s);
+	my $s = "Ouput port $id:1 is ";
+	if (@ConnectedTo) { $s .= "connected to ".join(',',@ConnectedTo);
+	} else {            $s .= "not connected to anything";
+	}
+	gotoxy(1,3); puts_clr($s);
+    gotoxy(1,$CursorRow);
+}
+
+sub display_channel {
+	# %Channel      # MIDI channel on which the echoes will be added
+	# %EchoNotes    # MIDI notes to which the echoes will be added
+	return if $Quiet;
+	my @c = sort keys %Channel;
+	gotoxy(1,4);
+	if (1 == @c) { puts("Echo is being applied to input channel $c[$[]");
+	} else { puts("Echo is being applied to input channels @c");
+	}
+    gotoxy(1,$CursorRow);
+}
+
+sub display_echoes {
+	return if $Quiet;
+	my $i = 0; while ($i <= $#Delays) {
+		my $s = "Delay $Delays[$i] ms";
+		if (defined $Echoes[$i]) { $s .= ", to Channel $Echoes[$i]"; }
+		if ($Softenings[$i]) { $s .= ", Softer by $Softenings[$i]"; }
+		if ($Patches[$i]) { $s .= ", Patch=$Patches[$i]"; }
+		if ($PitchChanges[$i]) {$s.=", pitchWheel $PitchChanges[$i] cents";}
+		gotoxy(1,5+$i); puts_clr($s);
+		$i += 1;
+	}
+	# $CursorRow = 5+$i;
+    gotoxy(1,default_cursor_row()); puts_clr("");
+    gotoxy(1,$CursorRow);
+}
+
+sub default_cursor_row {  # The default CursorRow, beneath the Echos
+	return 5+@Delays;
+}
+
+sub display_keystrokes {
+	if ($Quiet) { return; }
+	# or on the  "Connected to"  line, offer keystrokes:  Delete, n=New
+	# or on the "Connected from" line, offer keystrokes:  Delete, n=New
+	if      ($CursorRow == 2) {   # Input port
+		$s = "Down, Delete, n=New";
+	} elsif ($CursorRow == 3) {   # Output port
+		$s = "Up, Down, Delete, n=New";
+	} elsif ($CursorRow == 4) {   # Echo is applied to channel
+		$s ="Up, Down, c=Channel";
+	} elsif ($_[$[] eq 'quit') {
+		gotoxy(1, default_cursor_row()+2); puts_clr('');
+		gotoxy(1, default_cursor_row()); display_equivalent_cmd();
+		gotoxy(1, default_cursor_row()+1); puts_clr('');
+		return;
+	} elsif ($CursorRow == default_cursor_row()) {
+		gotoxy(1, default_cursor_row()+1);
+		puts_clr("Up, n=New echo, q=Quit");
+		gotoxy(1, default_cursor_row()+2);
+		display_equivalent_cmd();
+		gotoxy(1,$CursorRow);
+		return;
+	} else {   # an echo
+		# should not offer p=Patch if there is no Channel set
+		$s = "Up, Down, Delete, n=New, d=Delay, c=Channel, s=Softer, "
+		 . "p=Patch, w=pitchWheel";
+		gotoxy(1, default_cursor_row()+2);
+		display_equivalent_cmd();
+	}
+	gotoxy(1, default_cursor_row()+1); puts_clr($s); gotoxy(1,$CursorRow);
+}
+
+sub display_equivalent_cmd {
+	my @c = sort keys %Channel;
+	my $s = "midiecho -c $c[$[] -d ".join(",",@Delays);
+	if (@Echoes) { $s .= " -e ".join(",",@Echoes); }
+	if ($E_option) { $s .= " -E ".join(",",sort keys %DoEchoCC); }
+	$s .= " -s ".join(",",@Softenings);
+	if (@Patches) { $s .= " -p ".join(",",@Patches); }
+	if (@PitchChanges) { $s .= " -w ".join(",",@PitchChanges); }
+	puts_clr($s);
+}
+
+sub get_int { my $s = $_[$[];   # this runs in the child
+	my $min_int = 0;
+	my $max_int = 127;
+	if    ($s =~ /channel/i) { $max_int = 15;
+	} elsif ($s =~ /quiet/i) { $max_int = 50;
+	} elsif ($s =~ /delay/i) { $max_int = 10000;
+	} elsif ($s =~ /wheel/i) { $min_int = -2400; $max_int = 2400;
+	}
+	ReadMode(0, STDIN);
+	my $int;
+	while (1) {
+		puts_clr("$s ($min_int..$max_int) ? ");
+		$int = <STDIN>;
+		print STDERR "\e[A";
+		if ($int =~ /^-?[0-9]+$/ and $int >= $min_int and $int <= $max_int) {
+			ReadMode(4, STDIN);
+			return 0+$int;
+		}
+		if ($int =~ /^\s*$/) {
+			ReadMode(4, STDIN);
+			return undef;
+		}
+	}
+}
+
+# --------------- vt100 stuff, evolved from Term::Clui ---------------
+sub puts   { my $s = join q{}, @_;
+	$Irow += ($s =~ tr/\n/\n/);
+	if ($s =~ /\r\n?$/) { $Icol = 0;
+	} else { $Icol += length($s);   # BUG, wrong on multiline strings!
+	}
+	# print STDERR "$s\e[K";   # and clear-to-eol
+	# should be caller's responsibility ? or an option ? a different sub ?
+	print STDERR $s;
+}
+sub puts_30c {  my $s = $_[$[];   # assumes no newlines
+	my $rest = 30-length($s);
+	print STDERR $s, " "x$rest, "\e[D"x$rest;
+	$Icol += length($s);
+}
+sub puts_clr {  my $s = $_[$[];   # assumes no newlines
+	my $rest = 30-length($s);
+	print STDERR "$s\e[K";
+	$Icol += length($s);
+}
+sub clrtoeol {
+	print STDERR "\e[K";
+}
+sub up    {
+	# if ($_[$[] < 0) { down(0 - $_[$[]); return; }
+	print STDERR "\e[A" x $_[$[]; $Irow -= $_[$[];
+}
+sub down  {
+	# if ($_[$[] < 0) { up(0 - $_[$[]); return; }
+	print STDERR "\n" x $_[$[]; $Irow += $_[$[];
+}
+sub right {
+	# if ($_[$[] < 0) { left(0 - $_[$[]); return; }
+	print STDERR "\e[C" x $_[$[]; $Icol += $_[$[];
+}
+sub left  {
+	# if ($_[$[] < 0) { right(0 - $_[$[]); return; }
+	print STDERR "\e[D" x $_[$[]; $Icol -= $_[$[];
+}
+sub gotoxy { my $newcol = shift; my $newrow = shift;
+	if ($newcol == 0) { print STDERR "\r" ; $Icol = 0;
+	} elsif ($newcol > $Icol) { right($newcol-$Icol);
+	} elsif ($newcol < $Icol) { left($Icol-$newcol);
+	}
+	if ($newrow > $Irow)      { down($newrow-$Irow);
+	} elsif ($newrow < $Irow) { up($Irow-$newrow);
+	}
+}
+
+
+# ===================================================================
+
+# we're in MIDI-file mode (not RealTime-mode) ...
+# 20120908 work in score form :-)
+eval 'require MIDI'; if ($@) {
+	die "you'll need to install the MIDI::Perl module from www.cpan.org\n";
+}
+import MIDI;
+my @Score = file2ms_score($ARGV[$[] || '-');
+my @Track = @{$Score[$[+1]};
+my @NewTrack = ();  # 
+my $Now   = 1;
+
+foreach my $cha (keys %PitchWheel) {
+	push @NewTrack, ['pitch_wheel_change',$Now,$cha,$PitchWheel{$cha}];
+	$Now = $Now + 1;
+}
+foreach my $i ($[..$#Patches) {   # 3.9
+	push @NewTrack, ['patch_change',$Now,$Echoes[$i],$Patches[$i]];
+	$Now = $Now + 1;
+}
+foreach my $eventref (@Track) {
+	push @NewTrack, $eventref;   # straight-through
+	my @event = @$eventref;
+	if ($event[$[] eq 'note') {  # this is a dry-note
+		my ($evtype, $time, $duration, $cha, $note, $vol) = @event;
+		if ($Channel{$cha} && (!%EchoNotes || $EchoNotes{$note})) {
+			my $quietenedvol = $vol;
+			my $cumulative_delay = 0;
+			foreach my $i ($[ .. $#Delays) {
+				my @new_event = ( @event );   # make a new copy
+				$cumulative_delay += $Delays[$i];
+				$new_event[$[+1] = $time + $cumulative_delay;
+				if (defined $Echoes[$i]) { $new_event[$[+3] = $Echoes[$i];
+				} else { $new_event[$[+3] = $cha;
+				}
+				$new_event[$[+4] = $note + $PitchDelta[$i];
+				$quietenedvol -= $Softenings[$i];
+				if ($quietenedvol < 1) { next; }
+				$new_event[$[+5] = $quietenedvol;
+				push @NewTrack, \@new_event;   # time-order doesn't matter :-)
+			}
+		}
+	} elsif ($event[$]] eq 'pitch_wheel_change') {
+		my ($evtype, $time, $cha, $val) = @event;
+		if ($Channel{$cha}) {
+			my $cumulative_delay = 0;
+			foreach my $i ($[ .. $#Delays) {
+				my @new_event = ( @event );   # make a new copy
+				$cumulative_delay += $Delays[$i];
+				$new_event[$[+1] = $time + $cumulative_delay;
+				my $echocha = $cha;
+				if (defined $Echoes[$i]) { $echocha = $Echoes[$i]; }
+				$new_event[$[+2] = $echocha;
+				if ($PitchWheel{$echocha}) { push @NewTrack, \@new_event; }
+			}
+		}
+	} elsif ($event[$]] eq 'control_change') {
+		my ($evtype, $time, $cha, $cc, $val) = @event;
+		if ($Channel{$cha} and $DoEchoCC{$cc}) {
+			my $cumulative_delay = 0;
+			foreach my $i ($[ .. $#Delays) {
+				my @new_event = ( @event );   # make a new copy
+				$cumulative_delay += $Delays[$i];
+				$new_event[$[+1] = $time + $cumulative_delay;
+				my $echocha = $cha;
+				if (defined $Echoes[$i]) { $echocha = $Echoes[$i]; }
+				$new_event[$[+2] = $echocha;
+				push @NewTrack, \@new_event;
+			}
+		}
+	}
+}
+score2file('-', 1000,\@NewTrack);
+
+#--------------------- Non-real-time infrastructure ------------------
+
+#    api_for_perl.txt    -    Peter Billam 2012
+#
+# This bit of Perl code will wrap the CPAN MIDI module
+#   http://search.cpan.org/perldoc?MIDI
+# so as to present a calling-interface compatible with the Lua module
+#   http://www.pjb.com.au/comp/lua/MIDI.html
+# and the Python module
+#   http://www.pjb.com.au/midi/MIDI.html
+#
+# This code is used in midisox_pl
+#   http://www.pjb.com.au/midi/midisox.html
+# and in midiedit
+#   http://www.pjb.com.au/midi/midiedit.html
+#
+# The original is at
+#   http://www.pjb.com.au/midi/free/api_for_perl.txt
+
+#------------ MIDI infrastructure from midisox_pl ------------
+
+sub round   { my $x = $_[$[];
+	if ($x > 0.0) { return int ($x + 0.5); }
+	if ($x < 0.0) { return int ($x - 0.5); }
+	return 0;
+}
+sub deepcopy {
+	use Storable;
+	if (1 == @_ and ref($_[$[])) { return Storable::dclone($_[$[]);
+	} else { my $b_ref = Storable::dclone(\@_); return @$b_ref;
+	}
+}
+sub vol_mul {
+	my $vol = $_[$[] || 100;
+	my $mul = $_[$[+1] || 1.0;
+	my $new_vol = round($vol*$mul);
+	if ($new_vol < 0) { $new_vol = 0 - $new_vol; }
+	if ($new_vol > 127) { $new_vol = 127;
+	} elsif ($new_vol < 1) { $new_vol = 1; # some synths see vol=0 as default
+	}
+	return $new_vol;
+}
+
+#---------------------- Encoding stuff -----------------------
+
+sub opus2file {
+	my ($filename, @opus) = @_;
+	my $format = 1;
+	if (2 == @opus) { $format = 0; }
+	my $cpan_opus = MIDI::Opus->new(
+		{'format'=>$format, 'ticks'  => 1000, 'tracks' => []});
+	my @list_of_tracks = ();
+	my $itrack = $[+1;
+	while ($itrack <= $#opus) {
+		push @list_of_tracks,
+		 MIDI::Track->new({ 'type' => 'MTrk', 'events' => $opus[$itrack]});
+		$itrack += 1;
+	}
+	$cpan_opus->tracks(@list_of_tracks);
+	if ($filename eq '-') {
+		$cpan_opus->write_to_file( '>-' );
+	} elsif ($filename eq '-d') {
+		$PID = fork;
+		if ($PID) {
+			eval "sub END { kill 'INT', $PID; wait;}";
+			$SIG{'HUP'} = sub { exit; };
+		} else {
+			if (!open(P, '| aplaymidi -')) { die "can't run aplaymidi: $!\n"; }
+			$cpan_opus->write_to_handle( *P{IO}, {} );
+			close P;
+			exit 0;
+		}
+	} else {
+		$cpan_opus->write_to_file($filename);
+	}
+}
+
+sub score2opus {
+	if (2 > @_) { return (1000, []); }
+	my ($ticks, @tracks) = @_;
+	my @opus = ($ticks,);
+	my $itrack = $[;
+	while ($itrack <= $#tracks) {
+		my %time2events = ();
+		foreach my $scoreevent_ref (@{$tracks[$itrack]}) {
+			my @scoreevent = @{$scoreevent_ref};
+			if ($scoreevent[0] eq 'note') {
+				my @note_on_event = ('note_on',$scoreevent[1],
+				 $scoreevent[3],$scoreevent[4],$scoreevent[5]);
+				my @note_off_event = ('note_off',$scoreevent[1]+$scoreevent[2],
+				 $scoreevent[3],$scoreevent[4],$scoreevent[5]);
+				if ($time2events{$note_on_event[1]}) {
+				   push @{$time2events{$note_on_event[1]}}, \@note_on_event;
+				} else {
+				   @{$time2events{$note_on_event[1]}} = (\@note_on_event,);
+				}
+				if ($time2events{$note_off_event[1]}) {
+				   push @{$time2events{$note_off_event[1]}}, \@note_off_event;
+				} else {
+				   @{$time2events{$note_off_event[1]}} = (\@note_off_event,);
+				}
+			} elsif ($time2events{$scoreevent[1]}) {
+			   push @{$time2events{$scoreevent[1]}}, \@scoreevent;
+			} else {
+			   @{$time2events{$scoreevent[1]}} = (\@scoreevent,);
+			}
+		}
+
+		my @sorted_events = (); # list of event_refs sorted by time
+		for my $time (sort {$a <=> $b} keys %time2events) {
+			push @sorted_events, @{$time2events{$time}};
+		}
+
+		my $abs_time = 0;
+		for my $event_ref (@sorted_events) {  # convert abstimes => deltatimes
+			my $delta_time = ${$event_ref}[1] - $abs_time;
+			$abs_time = ${$event_ref}[1];
+			${$event_ref}[1] = $delta_time;
+		}
+		push @opus, \@sorted_events;
+		$itrack += 1;
+	}
+	return (@opus);
+}
+
+sub score2file { my ($filename, @score) = @_;
+	my @opus = score2opus(@score);
+	return opus2file($filename, @opus);
+}
+
+#--------------------------- Decoding stuff ------------------------
+
+sub file2opus {
+	my $opus_ref;
+	if ($_[$[] eq '-') {
+		$opus_ref = MIDI::Opus->new({'from_handle' => *STDIN{IO}});
+	} elsif ($_[$[] =~ /^[a-z]+:\//) {
+		eval 'require LWP::Simple'; if ($@) {
+			die "you need to install libwww-perl from www.cpan.org\n";
+		}
+		$midi = LWP::Simple::get($_[$[]);
+		if (! defined $midi) { die("can't fetch $_[$[]\n"); }
+		open(P, '<', \$midi) or die("can't open FileHandle, need Perl5.8\n");
+		$opus_ref = MIDI::Opus->new({'from_handle' => *P{IO}});
+		close P;
+	} else {
+		$opus_ref = MIDI::Opus->new({'from_file' => $_[$[]});
+	}
+	my @my_opus = (${$opus_ref}{'ticks'},);
+	foreach my $track ($opus_ref->tracks) {
+		push @my_opus, $track->events_r;
+	}
+	return (@my_opus);
+}
+
+sub opus2score {  my ($ticks, @opus_tracks) = @_;
+	if (!@opus_tracks) { return (1000,[],); }
+	my @score = ($ticks,);
+	my @tracks = deepcopy(@opus_tracks); # couple of slices probably quicker...
+	foreach my $opus_track_ref (@tracks) {
+		my $ticks_so_far = 0;
+		my @score_track = ();
+		my %chapitch2note_on_events = ();    # 4.4 XXX!!! Must be by Channel !!
+		foreach $opus_event_ref (@{$opus_track_ref}) {
+			my @opus_event = @{$opus_event_ref};
+			$ticks_so_far += $opus_event[1];
+			if ($opus_event[0] eq 'note_off'
+			 or ($opus_event[0] eq 'note_on' and $opus_event[4]==0)) { # YY
+				my $cha = $opus_event[2];
+				my $pitch = $opus_event[3];
+				my $key = $cha*128 + $pitch;
+				if ($chapitch2note_on_events{$key}) {
+					my $new_event_ref = shift @{$chapitch2note_on_events{$key}};
+					${$new_event_ref}[2] = $ticks_so_far - ${$new_event_ref}[1];
+					push @score_track, $new_event_ref;
+				} else {
+				  warn("note_off without a note_on, cha=$cha pitch=$pitch\n");
+				}
+			} elsif ($opus_event[0] eq 'note_on') {
+				my $cha = $opus_event[2];  # 4.4
+				my $pitch = $opus_event[3];
+				my $new_event_ref = ['note', $ticks_so_far, 0,
+				 $cha, $pitch, $opus_event[4]];
+				my $key = $cha*128 + $pitch;
+				push @{$chapitch2note_on_events{$key}}, $new_event_ref;
+			} else {
+				$opus_event[1] = $ticks_so_far;
+				push @score_track, \@opus_event;
+			}
+		}
+		# 4.7 check for unterminated notes, see: ~/lua/lib/MIDI.lua
+		while (my ($k1,$v1) = each %chapitch2note_on_events) {
+			foreach my $new_e_ref (@{$v1}) {
+				${$new_e_ref}[2] = $ticks_so_far - ${$new_e_ref}[1];
+				push @score_track, $new_e_ref;
+				warn("opus2score: note_on with no note_off cha="
+				 . ${$new_e_ref}[3] . ' pitch='
+				 . ${$new_e_ref}[4] . "; adding note_off at end\n");
+			}
+		}
+		push @score, \@score_track;
+	}
+	return @score;
+}
+
+sub file2score {
+	return opus2score(file2opus($_[$[]));
+}
+
+sub file2ms_score {
+	my @score = opus2score(to_millisecs(file2opus($_[$[])));
+	# must merge the tracks of a format-2 file; could perhaps even
+	# extend the @event to indicate which Track it originated in...
+	my $itrack = $#score; while ($itrack > ($[+1.5)) {
+		foreach my $event_ref (@{$score[$itrack]}) {
+			push @{$score[$[+1]}, $event_ref; # push them onto track 1
+		}
+		$itrack -= 1;
+		$#score = $itrack;  # and jettison the last track
+	}
+	return @score;
+}
+
+#------------------------ Other Transformations ---------------------
+
+sub to_millisecs {
+	my @old_opus = @_;
+	if (!@old_opus) {
+		return (1000,[],);
+	}
+	my $old_tpq  = $_[$[];
+	my @new_opus = (1000,);
+	my $millisec_per_old_tick = 1000.0 / $old_tpq;  # float: will round later
+	$itrack = $[+1;
+	while ($itrack <= $#old_opus) {
+		my $millisec_so_far = 0.0;
+		my $previous_millisec_so_far = 0.0;
+		my @new_track = (['set_tempo',0,1000000],);  # new "crochet" is 1 sec
+		foreach my $old_event_ref (@{$old_opus[$itrack]}) {
+			my @old_event = @{$old_event_ref};
+			if ($old_event[0] eq 'note') {
+				die "to_millisecs needs an opus, not a score\n";
+			}
+			my @new_event = deepcopy(@old_event);  # copy.deepcopy ?
+			$millisec_so_far += ($millisec_per_old_tick * $old_event[1]);
+			$new_event[1] = round($millisec_so_far-$previous_millisec_so_far);
+			if ($old_event[0] eq 'set_tempo') {
+				$millisec_per_old_tick = $old_event[2] / (1000.0 * $old_tpq);
+			} else {
+				$previous_millisec_so_far = $millisec_so_far;
+				push @new_track, \@new_event;
+			}
+		}
+		push @new_opus, \@new_track;
+		$itrack += 1;
+	}
+	return @new_opus;
+}
+
+
+sub usecs {
+	my ($secs, $usecs) = Time::HiRes::gettimeofday();
+	return 1000000*$secs + $usecs;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+midiecho - Simulates tape-delay echo, on MIDI files or on real-time MIDI
+
+=head1 SYNOPSIS
+
+ # on midi-files (e.g. *.mid ) :
+ midiecho -c 3 fn            # echo will be added to midi channel 3
+ midiecho -c 3 -d 450,450,450 fn      # three echoes at 450 mS gaps
+ midiecho -c 3 -d 450,450 -s 30 fn  # each echo is (MIDI) 30 softer
+ midiecho -c 2 -d 450 -e 5 -s 30 fn # the echo appears on channel 5
+ midiecho -c 3 -d 40 -e 4 -w 10 -s 0    # Automatic-Double-Tracking
+ midiecho filename          #  defaults: midiecho -c 0 -d 300 -s 30
+ muscript -midi f.txt | midiecho -c 1 -d 300 -s 25 -e 2 >f.mid
+
+ # on real-time (raw) midi :
+ ~> xterm -g 80x16+1+1 -exec 'midiecho -i 32 -d 22 -c 3 -e 4' &
+ ~> midiecho -i 32:0 -o 128:0 -c 3 -d 450,400 -e 4,5
+ ALSA client 129                midiecho pid=2157
+ Input port 129:0 is connected from 32:0
+ Ouput port 129:1 is connected to 128:0
+ Echo is being applied to input channel 3
+ Delay 450 ms, to Channel 4, Softer by 25
+ Delay 400 ms, to Channel 5, Softer by 25
+ _
+ Up, n=New echo, q=Quit
+ midiecho -c 3 -d 450,400 -e 3,3 -s 25,25
+
+ http://www.pjb.com.au/midi/midiecho.html
+
+=head1 DESCRIPTION
+
+Simulates a tape-delay echo on a particular MIDI-channel
+by issuing repeated note_on events with diminishing volume.
+Since version 2.0, the -i and -o options
+allow I<midiecho> to work on real-time (raw) midi inputs,
+as well as on midi files.
+
+Midiecho sounds best if the -e option is used, to assign the
+echoes to different MIDI-channels; this avoids notes being
+restarted before they have finished.
+Without -e, I<midiecho> works much better on transient sounds,
+e.g. banjo, or snare-drum.
+
+If the -e option is not being used,
+then the echo note is played on the same channel as the original note.
+If this leaves your synth chopping of lots of notes
+(when the original note is not finished by the time the echo note starts),
+then your synth is probably stateless, 
+and you should try invoking midiecho with the -S option.
+
+Since version 4.5, the -E option specifies the list of CC controllers
+which get echoed to the echo-channels.
+This is different from previous versions,
+in which the -E option did not work and was undocumented.
+
+Since version 2.6, the delays are incremental (since the previous delay)
+not absolute (since the original note);
+this is a bug-fix, but it was a well-established bug.
+
+Version 3.0 brings major changes,
+involving some loss of backward-compatibility.
+Since version 3.0:
+
+=over 3
+
+=item *
+
+In real-time mode,
+the MIDI::ALSA module
+is used to create a proper ALSA client,
+so Virtual-MIDI clients are no longer needed.
+
+=item *
+
+The real-time mode
+now has a keyboard interface,
+allowing real-time adjustment of the delay parameters.
+If you don't want the interface (e.g. in a Makefile),
+the -Q option sets Quiet-mode.
+
+=item *
+
+The -d option specifies delays
+I<incrementally> in milliseconds since the previous signal,
+not in absolute milliseconds since the dry signal.
+
+=item *
+
+The -p option
+specifies the Patches of the various echoes,
+in the same order as they were given delays.
+
+=item *
+
+The former "Pitch" option is now called "Wheel" and is invoked by
+B<-w>;
+it allows the echo to be detuned (in 1/100's of a semitone)
+which makes possible an "Automatic Double-Tracking" effect.
+
+=item *
+
+The B<-m> option
+specifies
+MIDI-Controller settings of the various Echoes;
+
+ midiecho -c 0 -d 300,300 -e 1,2 -p 0,74 -m cc10=15,cc10=103
+
+This option is currently unimplemented.
+In this example, the echo on
+channel 1 is panned (MIDI-controller number 10) over to the left (cc10=15),
+and the echo on channel 2 is panned over to the right (cc10=103).
+
+=item *
+
+The B<-s> option replaces the -q option,
+because in the real-time mode keyboard interface B<q> means quit.
+
+=back
+
+=head1 OPTIONS
+
+=over 3
+
+=item I<-c 3>
+
+Echo will be added to midi B<C>hannel 3.  The channels are numbered
+from 0...15 If -c is not specified, the default channel is 0.
+Currently, I<midiecho> can only add echoes to one channel at once;
+the other channels pass through unaltered.
+
+=item I<-d 350,300,250>
+
+The echo notes will be B<D>elayed at gaps of 350, 300, and 250 mS,
+which means at 350, 300 and 250 mS after the previous.
+If -d is not specified, the default delay is just 300 mS
+
+=item I<-e 4,5,4>
+
+The B<E>choes are produced not on the original (-c) channel
+but on the channels 4 then 5 then 4 again
+(in this example there are three echoes).
+This is a really useful option :-)
+
+As one example usage, you might have set up your synth's channel 4 and 5
+with the same patch (instrumental sound) as the original channel (e.g. 3),
+but panned to different places in the stereo image.
+This creates a very realistic echo-effect.
+
+Another example usage could be to set up the echo-channels with a
+completely different sound, maybe something atmospheric or ethereal.
+
+Another example usage could be to set up the echo-channels
+with a different patch, and use a 1ms delay, thus doubling
+the original channel with a different sound.
+
+If the number of echo-channels (-e) is fewer than the number of delays
+in the -d list, then the last echo-channel is repeated as necessary.
+
+=item I<-n 38,40>
+
+Echo will be added only to midi B<N>otes 38 and 40.
+This option is mainly useful with General-MIDI channel 9,
+which represents a drumkit, with each note representing a different drum,
+see http://www.pjb.com.au/muscript/gm.html#perc
+
+In this I<-c 9 -n 38,40> example, echoes would only be added to
+the Acoustic Snare and the Electric Snare sounds.
+
+=item I<-p 74,93>
+
+The channels specifed by the B<-e> option
+will be preset to use MIDI-Patches
+74 and 93 (in this example).
+
+=item I<-w 8>
+
+The echo will be changed by the pitch-B<W>heel up 8 cents
+(hundredth's of a semitone).
+
+This can be used in conjunction with the B<-e>, B<-d> and B<-s>
+options to produce the "Automatic-Double-Tracking" effect, e.g.
+ midiecho -c 3 -e 4 -d 40 -w -10 -s 0
+
+which assumes that the original channel 3 is panned over to one extreme,
+and the echo-channel 4 is set up with the same patch but panned over
+the other way.  It then produces an "echo" of the same volume and just
+40mS late and just 10 cents lower. Because the two sounds are in
+different speakers they don't beat with each other, and sound almost
+like two instruments playing in unison.
+
+With larger parameters, it can be used to produce doubling at
+a large interval; e.g. I<-d 10 -w 1200> causes the original
+voice to be doubled (with a delay of 10ms) at the octave (1200 cents).
+
+=item I<-s 35,20>
+
+The first delayed note is 35 (MIDI) B<S>ofter than the original,
+and the second is 20 softer still.
+If the number of softenings (-e) is fewer than the number of delays
+in the -d list, then the last softening is repeated as necessary.
+If an echo ends up with zero volume or less, then it is suppressed.
+
+If -s is not specified, by default each echo is 30 softer
+than the previous.
+
+=item I<-S>
+
+You'll need to use the -S option if you're not using -e,
+and if the sythesiser you're going to be using is B<S>tateless.
+In other words, if the sythesiser does not keep a count
+of how many note_on's there have been on a given note,
+and switches the note off if receives even just one note_off command.
+So if your synth seems to be chopping off lots of notes,
+you should try invoking midiecho with the -S option.
+
+=item I<-i 32:0> or I<-i ProKeys>
+
+This option puts I<midiecho> into raw-midi
+(or real-time, or midi-on-the-wire)
+mode, and takes the midi-data from the specified port.
+
+The port is specified as an ALSA-port;
+you can check out the available ports with the command
+I<arecordmidi -l> or I<aconnect -il>.
+
+Since Version 3.6,
+you may supply a comma-separated list of ports, e.g. B<-i 28:0,32>
+
+=item I<-o 128:0> or I<-o TiMidity>
+
+This option puts I<midiecho> into raw-midi mode
+and sets the ouput-port to which the midi output will be sent.
+You can check out the available ports with the command
+I<aplaymidi -l> or I<aconnect -ol>.
+The default ouput-port
+(if only B<-i> option is present)
+is the environment variable $ALSA_OUTPUT_PORTS
+
+Since Version 3.6,
+you may supply a comma-separated list of ports, e.g. B<-o Roland,128:1>
+
+=item I<-N my_echo_1>
+
+This option sets the ALSA Client-Name,
+to I<my_echo_1> in this example,
+that I<midiecho> will adopt
+if an I<-i> or I<-o> option is used to put it into raw-midi mode,
+This is useful if starting up I<midiecho>, or especially multiple I<midiecho>s,
+from a script which will then need to connect them to other ALSA clients.
+
+The default ALSA-name is I<midiecho pid=456> or whatever the pid is
+of the midiecho process.
+
+=back
+
+=head1 AUTHOR
+
+Peter J Billam  http://www.pjb.com.au/comp/contact.html
+
+=head1 CREDITS
+
+Based on the MIDI::Perl CPAN module in midi-file mode,
+and the MIDI::ALSA CPAN module in real-time mode.
+
+=head1 SEE ALSO
+
+ http://search.cpan.org/perldoc?MIDI
+ http://search.cpan.org/perldoc?MIDI::ALSA
+ http://www.pjb.com.au/muscript
+ http://www.pjb.com.au/midi
+ http://www.pjb.com.au/midi/midiedit.html
+ http://www.pjb.com.au/midi/midithru.html
+
+=cut

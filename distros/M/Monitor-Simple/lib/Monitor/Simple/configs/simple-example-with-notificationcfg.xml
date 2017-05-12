@@ -1,0 +1,31 @@
+<smon>
+
+  <general>
+    <notifier on="all" command="send-email" email="senger@localhost,jitka@localhost" />
+  </general>
+
+  <services>
+
+    <service id="pubmed" name="NCBI PubMed page">
+      <plugin command="check-url.pl">
+        <head-test>
+          <url>http://www.ncbi.nlm.nih.gov/pubmed/</url>
+        </head-test>
+      </plugin>
+    </service>
+
+    <service id="memory" name="Memory Check">
+      <plugin command="check_mem.pl">
+        <args>
+          <arg>-u</arg> <!-- check USED memory -->
+          <arg>-w</arg> <!-- -w PERCENT   Percent free/used when to warn -->
+          <arg>55</arg>
+          <arg>-c</arg> <!-- -c PERCENT   Percent free/used when critical -->
+          <arg>80</arg>
+        </args>
+      </plugin>
+    </service>
+
+  </services>
+
+</smon>

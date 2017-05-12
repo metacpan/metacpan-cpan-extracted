@@ -1,0 +1,57 @@
+{
+   "abstract" : "Use XS JSON with Mojolicious",
+   "author" : [
+      "Nic Sandfield <niczero@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-JSON_XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "data",
+         "test"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.3"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cpanel::JSON::XS" : "3.0109",
+            "Mojolicious" : "5.66",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/niczero/mojo-jsonxs/issues"
+      },
+      "homepage" : "http://niczero.github.io/mojo-jsonxs",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "url" : "http://github.com/niczero/mojo-jsonxs"
+      }
+   },
+   "version" : 0.101
+}

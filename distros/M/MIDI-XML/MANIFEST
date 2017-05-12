@@ -1,0 +1,12 @@
+Changes
+edit.pl
+lib/MIDI/XML.pm
+lib/MIDI/XML/Editor.pm
+Makefile.PL
+MANIFEST
+README
+t/MIDI-XML.t
+test.pl
+test_src/h16128.mid
+test_src/test.mid
+META.yml                                 Module meta-data (added by MakeMaker)

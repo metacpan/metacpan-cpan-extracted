@@ -1,0 +1,8 @@
+Changes
+lib/Mojolicious/Plugin/CSSCompressor.pm
+Makefile.PL
+MANIFEST
+README
+t/_use.t
+t/lite.t
+META.yml                                 Module meta-data (added by MakeMaker)

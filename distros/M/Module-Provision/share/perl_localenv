@@ -1,0 +1,148 @@
+#!/usr/bin/env perl
+# If you have a $LOCAL_LIB directory then this script will set it up for
+# you as it executes
+
+# If used like /usr/bin/env then it will run other commands based on
+# your current path settings (with a local::lib environment if present)
+
+#  e.g. use FindBin qw( $Bin );
+#       BEGIN { do catfile( $Bin, q(<appname>_localenv) ) or croak $EVAL_ERROR }
+
+# The local::lib behavior can be explicitly enabled or disabled by setting
+# the <APPNAME>_LOCAL_LIB enviromnent variable to true or false.
+
+use lib;
+use strict;
+use warnings;
+
+use Config;
+use Cwd                   qw( abs_path );
+use English               qw( -no_match_vars );
+use File::Basename        qw( basename dirname );
+use File::Spec::Functions qw( catdir catfile );
+
+my $LOCAL_LIB  = 'local'; # This is the only configurable parameter
+
+my $extend     = sub {
+   my ($k, $v, $sep) = @_; $sep //= $Config::Config{path_sep};
+
+   return $ENV{ $k } = $v.($ENV{ $k } ? $sep.$ENV{ $k } : q());
+};
+my $untaint    = sub {
+   my $v = shift;
+
+   $v = $v =~ m{ \A ([^\$%&\*;<>\`|]+) \z }mx ? $1 : die "Path ${v} tainted";
+
+   return $v;
+};
+my $was_called = caller() ? 1 : 0;
+my $our_path   = $was_called ? (caller())[ 1 ] : $PROGRAM_NAME;
+my $bindir     = $untaint->( abs_path( dirname( $our_path ) ) );
+my $basedir    = -f catfile( $bindir, 'Build.PL' )
+              || -f catfile( $bindir, 'Makefile.PL' )
+               ? $bindir : dirname( $bindir );
+my $libdir     = catdir( $basedir, 'lib' );
+my $local_lib  = catdir( $basedir, $LOCAL_LIB );
+my $appname    = (split m{ [\-_] }mx, basename( $our_path, '.pl' ))[ 0 ];
+my $active_key = (uc $appname).'_LOCAL_LIB';
+my $active     = -d $local_lib;
+
+exists $ENV{ $active_key } and defined $ENV{ $active_key }
+   and $active = !! $ENV{ $active_key };
+
+if ($active) {
+   not -d $local_lib and warn "Path ${local_lib} not found from ${our_path}\n";
+   # So we can find local::lib when fully self contained
+   lib->import( catdir( $local_lib, 'lib', 'perl5' ) );
+
+   require local::lib; local::lib->import( $local_lib );
+
+   $extend->( 'PATH', catdir( $local_lib, 'bin' ) );
+   $extend->( 'PERL5_MB_OPT', 'INSTALLMAN1DIR=none INSTALLMAN3DIR=none', q( ) );
+}
+
+$extend->( 'PATH', $bindir ); $extend->( 'PERL5LIB', $libdir );
+
+lib->import( $libdir );
+
+not $was_called and @ARGV and exec @ARGV;
+
+1;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 Name
+
+perl-localenv - Set environment to use a local library of Perl modules
+
+=head1 Synopsis
+
+   use English qw( -no_match_vars );
+   use FindBin qw( $Bin );
+   use File::Spec;
+
+   BEGIN {
+      my $bind = $Bin; $bind =~ m{ \A ([^\$%&\*;<>\`|]+) \z }mx and $bind = $1;
+      my $path = File::Spec->catfile( $bind, 'coverage-localenv' );
+
+      -f $path and (do $path or die $EVAL_ERROR || "Path ${path} not done\n");
+   }
+
+=head1 Description
+
+Set environment to use a local library of Perl modules
+
+=head1 Required Arguments
+
+None
+
+=head1 Options
+
+None
+
+=head1 Diagnostics
+
+Prints errors to stderr
+
+=head1 Exit Status
+
+None
+
+=head1 Configuration
+
+Edit the C<$LOCAL_LIB> variable definition if a directory other than
+F<local> is required
+
+=head1 Dependencies
+
+None
+
+=head1 Incompatibilities
+
+None
+
+=head1 Bugs and limitations
+
+Send reports to address below
+
+=head1 Author
+
+[% author %], C<< <[% author_email %]> >>
+
+=head1 License and copyright
+
+Copyright (c) [% copyright_year %] [% copyright %]
+
+This is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+# Local Variables:
+# mode: perl
+# tab-width: 3
+# End:

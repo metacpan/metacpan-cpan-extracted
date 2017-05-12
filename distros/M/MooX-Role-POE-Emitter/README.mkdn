@@ -1,0 +1,463 @@
+# NAME
+
+MooX::Role::POE::Emitter - Pluggable POE event emitter role for cows
+
+# SYNOPSIS
+
+    ## A POE::Session that can broadcast events to listeners:
+    package My::EventEmitter;
+    use POE;
+    use Moo;
+    with 'MooX::Role::POE::Emitter';
+
+    sub spawn {
+      my ($self, %args) = @_;
+
+      $self->set_object_states(
+        [
+          $self => {
+            ## Add some extra handlers to our Emitter:
+            'emitter_started' => '_emitter_started',
+            'emitter_stopped' => '_emitter_stopped',
+          },
+
+          ## Include any object_states we had previously
+          ## (e.g. states added at construction time):
+          (
+            $self->has_object_states ?
+              @{ $self->object_states } : ()
+          ),
+
+          ## Maybe include from named arguments, for example:
+          (
+            ref $args{object_states} eq 'ARRAY' ?
+              @{ $args{object_states} } : ()
+          ),
+        ],
+      );
+
+      ## Start our Emitter's POE::Session:
+      $self->_start_emitter;
+    }
+
+    sub shutdown {
+      my ($self) = @_;
+      ## .. do some cleanup, whatever ..
+      $self->_shutdown_emitter;
+    }
+
+    sub _emitter_started {
+      my ($kernel, $self) = @_[KERNEL, OBJECT];
+      ## A POE state called when the emitter's session starts.
+      ## (Analogous to a normal '_start' handler)
+      ## Could load plugins, do initialization, etc.
+    }
+
+    sub _emitter_stopped {
+      ## Opposite of 'emitter_started'
+    }
+
+    sub do_something {
+      my ($self, @things) = @_;
+      # ... do some work ...
+      # ... emit an event:
+      $self->emit( did_stuff => @things )
+    }
+
+    ## A listening POE::Session:
+    package My::Listener;
+    use POE;
+
+    sub spawn {
+      # This spawn() takes an alias/session to subscribe to:
+      my ($self, $alias_or_sessionID) = @_;
+
+      POE::Session->create(
+        ## Set up a Session, etc
+        object_states => [
+          $self => [
+              'emitted_did_stuff',
+              # ...
+          ],
+        ],
+      );
+
+      ## Subscribe to all events from $alias_or_sessionID:
+      $poe_kernel->call( 
+        $alias_or_sessionID => subscribe => 'all'
+      );
+    }
+
+    sub emitted_did_stuff {
+      my ($kernel, $self) = @_[KERNEL, OBJECT];
+      ## Received 'did_stuff' from Emitter
+      my @things = @_[ARG0 .. $#_];
+      # ...
+    }
+
+# DESCRIPTION
+
+Consuming this [Moo::Role](https://metacpan.org/pod/Moo::Role) gives your class a [POE::Session](https://metacpan.org/pod/POE::Session) capable of 
+processing events via loaded plugins and/or emitting them to registered 
+"listener" sessions.
+
+It is derived from [POE::Component::Syndicator](https://metacpan.org/pod/POE::Component::Syndicator) by BINGOS, HINRIK, APOCAL 
+et al, but with more cows ;-) and a few extra features (such as anonymous 
+coderef callbacks; see ["yield"](#yield)), as well as the 
+faster plugin dispatch system that comes with [MooX::Role::Pluggable](https://metacpan.org/pod/MooX::Role::Pluggable).
+
+The Emitter role consumes [MooX::Role::Pluggable](https://metacpan.org/pod/MooX::Role::Pluggable), 
+making your emitter pluggable (see the 
+[MooX::Role::Pluggable](https://metacpan.org/pod/MooX::Role::Pluggable) documentation for plugin-related details).
+
+You do not need to create your own [POE::Session](https://metacpan.org/pod/POE::Session); calling 
+["\_start\_emitter"](#_start_emitter) will spawn one for you.
+
+You also get some useful sugar over POE event dispatch; see ["Methods"](#methods).
+
+## Creating an Emitter
+
+["SYNOPSIS"](#synopsis) contains an emitter that uses **set\_$attrib** methods to
+configure itself when `spawn()` is called; attributes can, of course,
+be set when your Emitter is constructed:
+
+    my $emitter = MyEmitter->new(
+      alias => 'my_emitter',
+      pluggable_type_prefixes => {
+        NOTIFY  => 'Notify',
+        PROCESS => 'Proc',
+      },
+      # . . .
+    );
+
+### Attributes
+
+Most of these can be altered via **set\_$attrib** methods at any time before 
+["\_start\_emitter"](#_start_emitter) is called. Changing an emitter's configuration after it has
+been started may result in undesirable behavior ;-)
+
+Public attributes provide **has\_** prefixed predicates; e.g.
+**has\_event\_prefix**.
+
+#### alias
+
+**alias** specifies the POE::Kernel alias used for our [POE::Session](https://metacpan.org/pod/POE::Session); 
+defaults to the stringified object.
+
+Set via **set\_alias**. If the emitter is running, a prefixed **alias\_set** 
+event is emitted to notify listeners that need to know where to reach the emitter.
+
+#### event\_prefix
+
+**event\_prefix** is prepended to notification events before they are
+dispatched to listening sessions. It is also used for the plugin 
+pipeline's internal events; see ["\_pluggable\_event" in MooX::Role::Pluggable](https://metacpan.org/pod/MooX::Role::Pluggable#pluggable_event) 
+for details.
+
+Defaults to `emitted_`
+
+Set via **set\_event\_prefix**
+
+#### pluggable\_type\_prefixes
+
+**pluggable\_type\_prefixes** is a hash reference that can optionally be set 
+to change the default [MooX::Role::Pluggable](https://metacpan.org/pod/MooX::Role::Pluggable) plugin handler prefixes for 
+`PROCESS` and `NOTIFY` (which default to `P` and `N`, respectively):
+
+    my $emitter = $class->new(
+      pluggable_type_prefixes => {
+        PROCESS => 'P',
+        NOTIFY  => 'N',
+      },
+    );
+
+Set via **set\_pluggable\_type\_prefixes**
+
+#### object\_states
+
+**object\_states** is an array reference suitable for passing to
+[POE::Session](https://metacpan.org/pod/POE::Session); the subclasses own handlers should be added to
+**object\_states** prior to calling ["\_start\_emitter"](#_start_emitter).
+
+Set via **set\_object\_states**
+
+#### register\_prefix
+
+**register\_prefix** is prepended to 'register' and 'unregister' methods
+called on plugins at load time (see [MooX::Role::Pluggable](https://metacpan.org/pod/MooX::Role::Pluggable)).
+
+Defaults to _Emitter\__
+
+Set via **set\_register\_prefix**
+
+#### session\_id
+
+**session\_id** is our emitter's [POE::Session](https://metacpan.org/pod/POE::Session) ID, set when our Session is 
+started via ["\_start\_emitter"](#_start_emitter).
+
+#### shutdown\_signal
+
+**shutdown\_signal** is the name of the [POE](https://metacpan.org/pod/POE) signal that will trigger a 
+shutdown (used to shut down multiple Emitters). See ["Signals"](#signals)
+
+### \_start\_emitter
+
+**\_start\_emitter()** should be called on our object to spawn the actual
+[POE::Session](https://metacpan.org/pod/POE::Session). It takes no arguments and should be called after the 
+object has been configured.
+
+### \_shutdown\_emitter
+
+**\_shutdown\_emitter()** must be called to terminate the Emitter's 
+[POE::Session](https://metacpan.org/pod/POE::Session)
+
+A 'shutdown' event will be emitted before sessions are dropped.
+
+## Listening sessions
+
+### Session event subscription
+
+An external [POE::Session](https://metacpan.org/pod/POE::Session) can subscribe to receive events via 
+normal POE event dispatch by sending a `subscribe`:
+
+    $poe_kernel->post( $emitter->session_id,
+      'subscribe',
+      @events
+    );
+
+Listening sessions are consumers; they cannot modify event arguments in 
+any meaningful way, and will receive arguments as-normal (in @\_\[ARG0 .. 
+$#\_\] like any other POE state). Plugins operate differently and receive 
+references to arguments that can be modified -- see 
+[MooX::Role::Pluggable](https://metacpan.org/pod/MooX::Role::Pluggable) for details.
+
+### Session event unregistration
+
+An external Session can unregister subscribed events using the same syntax 
+as above:
+
+    $poe_kernel->post( $emitter->session_id,
+      'unsubscribe',
+      @events
+    );
+
+If no events are specified, then any previously subscribed events are 
+unregistered.
+
+Note that unsubscribing from 'all' does not carry the same behavior; that 
+is to say, a subscriber can subscribe/unsubscribe for 'all' separately from 
+some set of specifically named events.
+
+## Receiving events
+
+### Events delivered to listeners
+
+Events are delivered to subscribed listener sessions as normal POE events, 
+with the configured ["event\_prefix"](#event_prefix) prepended and arguments available via 
+` @_[ARG0 .. $#_] ` as normal.
+
+    sub emitted_my_event {
+      my ($kernel, $self) = @_[KERNEL, OBJECT];
+      my @args = @_[ARG0 .. $#_];
+      # . . .
+    }
+
+See ["Session event subscription"](#session-event-subscription) and ["emit"](#emit)
+
+### Events delivered to this session
+
+The emitter's [POE::Session](https://metacpan.org/pod/POE::Session) provides a '\_default' handler that 
+redispatches unknown POE-delivered events to ["process"](#process) 
+(except for events prefixed with '\_', which are reserved).
+
+You can change this behavior by overriding '\_emitter\_default' -- here's a 
+direct adaption of the example from [POE::Component::Syndicator](https://metacpan.org/pod/POE::Component::Syndicator):
+
+    use Moo;
+    use POE;
+    with 'MooX::Role::POE::Emitter';
+    around '_emitter_default' => sub {
+      my $orig = shift;
+      my ($kernel, $self) = @_[KERNEL, OBJECT];
+      my ($event, $args)  = @_[ARG0, ARG1];
+
+      ## process(), then do something else, for example
+      return if $self->process( $event, @$args ) == EAT_ALL;
+
+      . . .
+    };
+
+(Note that due to internal redispatch $\_\[SENDER\] will be the Emitter's 
+Session.)
+
+## EAT values
+
+[MooX::Role::Pluggable](https://metacpan.org/pod/MooX::Role::Pluggable) uses `EAT_*` constants to indicate event 
+lifetime.
+
+If a plugin in the pipeline returns EAT\_CLIENT or EAT\_ALL, events 
+are not dispatched to subscribed listening sessions; a dispatched NOTIFY 
+event goes to your emitter's Session if it is subscribed to receive it, 
+then to the plugin pipeline, and finally to other subscribed listener 
+Sessions **unless** a plugin returned EAT\_CLIENT or EAT\_ALL.
+
+See ["emit"](#emit) for more on dispatch behavior and event lifetime. See 
+[MooX::Role::Pluggable](https://metacpan.org/pod/MooX::Role::Pluggable) for details regarding plugins.
+
+### NOTIFY events
+
+**NOTIFY** events are intended to be dispatched asynchronously to our own
+session, any loaded plugins in the pipeline, and subscribed listening 
+sessions, respectively.
+
+See ["emit"](#emit).
+
+### PROCESS events
+
+**PROCESS** events are intended to be processed by the plugin pipeline
+immediately; these are intended for message processing and similar
+synchronous action handled by plugins.
+
+Handlers for **PROCESS** events are prefixed with `P_`
+
+See ["process"](#process).
+
+## Sending events
+
+### emit
+
+    $self->emit( $event, @args );
+
+**emit()** dispatches ["NOTIFY events"](#notify-events) -- these events are dispatched
+first to our own session (with ["event\_prefix"](#event_prefix) prepended), then any
+loaded plugins in the pipeline (with `N_` prepended), then registered
+sessions (with ["event\_prefix"](#event_prefix) prepended):
+
+    ## With default event_prefix:
+    $self->emit( 'my_event', @args )
+    #  -> Dispatched to own session as 'emitted_my_event'
+    #  -> Dispatched to plugin pipeline as 'N_my_event'
+    #  -> Dispatched to registered sessions as 'emitted_my_event'
+    #     *unless* a plugin returned EAT_CLIENT or EAT_ALL
+
+See ["Receiving events"](#receiving-events), ["EAT values"](#eat-values)
+
+### emit\_now
+
+    $self->emit_now( $event, @args );
+
+**emit\_now()** synchronously dispatches ["NOTIFY events"](#notify-events) -- see
+["emit"](#emit).
+
+### process
+
+    $self->process( $event, @args );
+
+**process()** calls registered plugin handlers for ["PROCESS events"](#process-events)
+immediately; these are **not** dispatched to listening sessions.
+
+Returns the same value as ["\_pluggable\_process" in MooX::Role::Pluggable](https://metacpan.org/pod/MooX::Role::Pluggable#pluggable_process).
+
+See [MooX::Role::Pluggable](https://metacpan.org/pod/MooX::Role::Pluggable) for details on pluggable 
+event dispatch.
+
+## Methods
+
+These methods provide easy proxy mechanisms for issuing POE events and 
+managing timers within the context of the emitter's [POE::Session](https://metacpan.org/pod/POE::Session).
+
+### yield
+
+    $self->yield( $poe_event, @args );
+
+Provides an interface to [POE::Kernel](https://metacpan.org/pod/POE::Kernel)'s yield/post() method, dispatching 
+POE events within the context of the emitter's session.
+
+The event can be either a named event/state dispatched to your Emitter's 
+[POE::Session](https://metacpan.org/pod/POE::Session):
+
+    $emitter->yield( 'some_event', @args );
+
+... or an anonymous coderef, which is executed as if it were a named 
+POE state belonging to your Emitter:
+
+    $emitter->yield( sub {
+      ## $_[OBJECT] is the Emitter's object:
+      my ($kernel, $self) = @_[KERNEL, OBJECT];
+      my @params          = @_[ARG0 .. $#_];
+
+      ## $_[STATE] is the current coderef
+      ## Yield ourselves again, for example:
+      $self->yield( $_[STATE], @new_args )
+        if $some_condition;
+    }, $some, $args );
+
+Inside an anonymous coderef callback such as shown above, `$_[OBJECT]` is 
+the Emitter's `$self` object and `$_[STATE]` contains the callback 
+coderef itself.
+
+### call
+
+    $self->call( $poe_event, @args );
+
+The synchronous counterpart to ["yield"](#yield).
+
+### timer
+
+    my $alarm_id = $self->timer(
+      $delayed_seconds,
+      $event,
+      @args
+    );
+
+Set a timer in the context of the emitter's [POE::Session](https://metacpan.org/pod/POE::Session). Returns the 
+POE alarm ID.
+
+The event can be either a named event/state or an anonymous coderef (see 
+["yield"](#yield)).
+
+A prefixed (["event\_prefix"](#event_prefix)) 'timer\_set' event is emitted when a timer is 
+set. Arguments are the alarm ID, the event name or coderef, the delay time, 
+and any event parameters, respectively.
+
+### timer\_del
+
+    $self->timer_del( $alarm_id );
+
+Clears a pending ["timer"](#timer).
+
+A prefixed (["event\_prefix"](#event_prefix)) 'timer\_deleted' event is emitted when a timer 
+is deleted. Arguments are the removed alarm ID, the event name or coderef, 
+and any event parameters, respectively.
+
+## Signals
+
+### Shutdown Signal
+
+The attribute ["shutdown\_signal"](#shutdown_signal) defines a POE signal that will trigger a 
+shutdown; it defaults to `SHUTDOWN_EMITTER`:
+
+    ## Shutdown *all* emitters (with a default shutdown_signal()):
+    $poe_kernel->signal( $poe_kernel, 'SHUTDOWN_EMITTER' );
+
+See ["Signal Watcher Methods" in POE::Kernel](https://metacpan.org/pod/POE::Kernel#Signal-Watcher-Methods) for details on [POE](https://metacpan.org/pod/POE) signals.
+
+# SEE ALSO
+
+For details regarding POE, see [POE](https://metacpan.org/pod/POE), [POE::Kernel](https://metacpan.org/pod/POE::Kernel), [POE::Session](https://metacpan.org/pod/POE::Session)
+
+For details regarding Moo classes and Roles, see [Moo](https://metacpan.org/pod/Moo), [Moo::Role](https://metacpan.org/pod/Moo::Role), 
+[Role::Tiny](https://metacpan.org/pod/Role::Tiny)
+
+# AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+Written from the ground up, but conceptually derived from
+[POE::Component::Syndicator](https://metacpan.org/pod/POE::Component::Syndicator)-0.06 copyright Hinrik Orn Sigurosson (HINRIK),
+Chris Williams (BINGOS), APOCAL et al -- that will probably do you for
+non-Moo(se) use cases; I needed something cow-like that worked with
+[MooX::Role::Pluggable](https://metacpan.org/pod/MooX::Role::Pluggable). 
+
+Licensed under the same terms as Perl 5; see the license that came with your
+Perl distribution for details.

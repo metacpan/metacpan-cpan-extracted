@@ -1,0 +1,15 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+lib/Mason/Plugin/Cache.pm
+lib/Mason/Plugin/Cache/Component.pm
+lib/Mason/Plugin/Cache/Filters.pm
+lib/Mason/Plugin/Cache/Interp.pm
+lib/Mason/Plugin/Cache/Request.pm
+lib/Mason/Plugin/Cache/t/Basic.pm
+t/01-use.t
+t/Basic.t

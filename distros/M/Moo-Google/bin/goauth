@@ -1,0 +1,125 @@
+#!perl
+
+package goauth;
+$goauth::VERSION = '0.01';
+
+# ABSTRACT: CLI tool for easily getting of Google Mojo access tokens. Supports multiple users
+
+
+use Mojolicious::Commands;
+use Data::Dumper;
+use Config::JSON;
+use Tie::File;
+use feature 'say';
+use Net::EmptyPort qw(empty_port);
+
+my $filename;
+if ( $ARGV[0] ) {
+    $filename = $ARGV[0];
+}
+else {
+    $filename = 'config.json';
+}
+
+if ( -e $filename ) {
+    say "File $filename exists";
+    input_if_not_exists( [ 'gapi/client_id', 'gapi/client_secret' ] );
+    runserver();
+}
+else {
+    say "JSON file $filename with Mojo tokens not found. Creating new file...";
+    setup();
+    runserver();
+}
+
+sub setup {
+    my $oauth = {};
+    say
+"Obtain app client_id and client_secret from http://console.developers.google.com/";
+    print "client_id: ";
+    chomp( $oauth->{client_id} = <STDIN> );
+    print "client_secret: ";
+    chomp( $oauth->{client_secret} = <STDIN> );
+    my $tokensfile = Config::JSON->create($filename);
+    $tokensfile->set( 'gapi/client_id',     $oauth->{client_id} );
+    $tokensfile->set( 'gapi/client_secret', $oauth->{client_secret} );
+    say 'OAuth details was updated!';
+
+    # Remove comment for Mojolicious::Plugin::JSONConfig compatibility
+    tie my @array, 'Tie::File', $filename or die $!;
+    shift @array;
+    untie @array;
+}
+
+sub input_if_not_exists {
+    my $fields = shift;
+    my $config = Config::JSON->new($filename);
+    for my $i (@$fields) {
+        if ( !defined $config->get($i) ) {
+            print "$i: ";
+            chomp( my $val = <STDIN> );
+            $config->set( $i, $val );
+        }
+    }
+}
+
+sub runserver {
+    my $port = empty_port(3000);
+    say
+"Starting web server. Before authorization don't forget to set redirect_uri to http://127.0.0.1:$port/";
+    $ENV{'GOAUTH_TOKENSFILE'} = $filename;
+    Mojolicious::Commands->start_app( 'Mojo::Google::Server', 'daemon', '-l',
+        'http://*:' . $port );
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+goauth - CLI tool for easily getting of Google Mojo access tokens. Supports multiple users
+
+=head1 VERSION
+
+version 0.01
+
+=head1 SYNOPSIS
+
+    goauth [tokens.json]
+
+    By default if will create config.json in current directory
+
+    Structure of config will be like
+
+    { "gapi":
+      {
+        "client_id": "001122334455-abcdefghijklmnopqrstuvwxyz012345.apps.googleusercontent.com",
+        "client_secret": "1ayL76NlEKjj85eZOipFZkyM",
+        "tokens": {
+            "email_1@gmail.com": {
+                "refresh_token": "1/cI5jWSVnsUyCbasCQpDmz8uhQyfnWWphxvb1ST3oTHE",
+                "access_token": "ya29.Ci-KA8aJYEAyZoxkMsYbbU9H_zj2t9-7u1aKUtrOtak3pDhJvCEPIdkW-xg2lRQdrA"
+            },
+            "email_2@gmail.com": {
+                "access_token": "ya29.Ci-KAzT9JpaPriZ-ugON4FnANBXZexTZOz-E6U4M-hjplbIcMYpTbo0AmGV__tV5FA",
+                "refresh_token": "1/_37lsRFSRaUJkAAAuJIRXRUueft5eLWaIsJ0lkJmEMU"
+            }
+        }
+      }
+    }
+
+=head1 AUTHOR
+
+Pavel Serikov <pavelsr@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Pavel Serikov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

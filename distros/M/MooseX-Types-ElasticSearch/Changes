@@ -1,0 +1,12 @@
+0.0.4 2014-04-26
+  - Search::Elasticsearch will be used for coercions
+
+0.0.3 2014-01-08
+  - ElasticSearch is deprecated, switching to Elasticsearch for coercion form Str
+  - ES will also accept ElasticSearch as well as Elasticsearch::Compat
+
+0.0.2 2012-01-13
+  - scan and count query_types
+
+0.0.1 2011-07-06
+  - initial release

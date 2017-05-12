@@ -1,0 +1,17 @@
+Revision history for MARC-Record-Stats
+
+0.04	02.09.2011
+		Fix: marcstats.pl is not placed into a distribution
+		
+0.03	19.08.2011
+		M::R::Stats->get_record_stat is renamed to get_record_stats
+		POD is added to that method
+		All reporting is moved to M::R::Stats::Report
+		M::R::Stats->report method is added
+
+0.02	13.08.2011
+		Second version: refactorings and marcstats.pl script
+		
+0.01    07.06.2011
+        First version, released on an unsuspecting world.
+

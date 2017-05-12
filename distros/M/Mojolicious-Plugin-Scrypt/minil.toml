@@ -1,0 +1,5 @@
+name = "Mojolicious-Plugin-Scrypt"
+badges = ["travis"]
+authority="cpan:CLICKTX"
+
+module_maker="ModuleBuildTiny"

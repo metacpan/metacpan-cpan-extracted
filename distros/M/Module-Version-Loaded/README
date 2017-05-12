@@ -1,0 +1,82 @@
+NAME
+    Module::Version::Loaded - Get a versioned list of currently loaded
+    modules
+
+VERSION
+    version 0.000003
+
+SYNOPSIS
+        use Module::Version::Loaded qw( versioned_modules );
+
+        my %modules = versioned_modules();
+        # %modules contains: ( Foo::Bar => 0.01, Bar::Foo => 1.99, ... )
+
+        # You can test this with a series of one-liners
+        perl -MModule::Version::Loaded=store_versioned_modules -MTest::More -e "store_versioned_modules('test-more.txt')"
+        perl -MModule::Version::Loaded=store_versioned_modules -MApp::Prove -e "store_versioned_modules('app-prove.txt')"
+        perl -MModule::Version::Loaded=diff_versioned_modules -e "diff_versioned_modules('test-more.txt','app-prove.txt')"
+
+DESCRIPTION
+    BETA BETA BETA
+
+    This module exists solely to give you a version of your %INC which
+    includes the versions of the modules you have loaded. This is helpful
+    when troubleshooting different environments. It makes it easier to see,
+    at glance, which versions of modules you have actually loaded.
+
+FUNCTIONS
+  versioned_modules
+    Returns a "Hash" of module versions, which is keyed on module name.
+
+            use Module::Version::Loaded qw( versioned_modules );
+            my %modules = versioned_modules();
+            # contains:
+            ...
+            vars                         => 1.03,
+            version                      => 0.9912,
+            version::regex               => 0.9912,
+            version::vxs                 => 0.9912,
+            ...
+
+  versioned_inc
+    Returns a "Hash" of module versions, which uses the same keys as %INC.
+    This makes it easier to compare this data which %INC, since both Hashes
+    will share the same keys.
+
+            use Module::Version::Loaded qw( versioned_inc );
+            my %inc = versioned_inc();
+            # contains:
+            ...
+            version.pm                    => 0.9912,
+            version/regex.pm              => 0.9912,
+            version/vxs.pm                => 0.9912,
+            warnings.pm                   => 1.18,
+            ...
+
+            foreach my $key ( %INC ) {
+                print "$key $INC{$key} $inc{$key}\n";
+            }
+
+  store_versioned_modules( $file )
+    Serializes your versioned module list to an arbitrary file name which
+    you must provide.
+
+  diff_versioned_modules( $file1, $file2 )
+    Requires the name of two files, which have previously been serialized
+    via "store_versioned_modules". Uses "Data::Difflet" to print a
+    comparison of these data structures to STDOUT.
+
+    You can do this with a one-line to save time:
+
+        perl -MModule::Version::Loaded=diff_versioned_modules -e "diff_versioned_modules('file1','file2')"
+
+AUTHOR
+    Olaf Alders <olaf@wundercounter.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2015 by MaxMind, Inc..
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

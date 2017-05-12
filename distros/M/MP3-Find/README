@@ -1,0 +1,62 @@
+MP3::Find version 0.07
+======================
+
+DESCRIPTION
+    This module allows you to search for MP3 files by their ID3 tags. You
+    can ask for the results to be sorted by one or more of those tags, and
+    return either the list of filenames (the deault), a "printf"-style
+    formatted string for each file using its ID3 tags, or the actual Perl
+    data structure representing the results.
+
+    There are currently two backends to this module: MP3::Find::Filesystem
+    and MP3::Find::DB. You choose which one you want by passing its name as
+    the argument to you "use" statement; MP3::Find will look for a
+    MP3::Find::$BACKEND module. If no backend name is given, it will default
+    to using MP3::Find::Filesystem.
+
+    Note: I'm still working out some kinks in the DB backend, so it is
+    currently not as stable as the Filesystem backend.
+
+    Note the second: This whole project is still in the alpha stage, so I
+    can make no guarentees that there won't be significant interface changes
+    in the next few versions or so. Also, comments about what about the API
+    rocks (or sucks!) are appreciated.
+
+INSTALL
+    To install this module type the following:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+SYNOPSIS
+        # select with backend you want
+        use MP3::Find qw(Filesystem);
+    
+        print "$_\n" foreach find_mp3s(
+            dir => '/home/peter/cds',
+            query => {
+                artist => 'ilyaimy',
+                title => 'deep in the am',
+            },
+            ignore_case => 1,
+            exact_match => 1,
+            sort => [qw(year album tracknum)],
+            printf => '%2n. %a - %t (%b: %y)',
+        );
+
+REQUIRES
+    File::Find, MP3::Info, and Scalar::Util are needed for the filesystem
+    backend (MP3::Find::Filesystem). In addition, if MP3::Tag is available,
+    you can search by explicit ID3v2 tag frames.
+
+    DBI, DBD::SQLite, and SQL::Abstract are needed for the database backend
+    (MP3::Find::DB).
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2006 by Peter Eichman. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

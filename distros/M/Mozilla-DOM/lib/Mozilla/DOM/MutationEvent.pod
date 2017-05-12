@@ -1,0 +1,105 @@
+=head1 NAME
+
+Mozilla::DOM::MutationEvent
+
+=head1 DESCRIPTION
+
+Mozilla::DOM::MutationEvent is a wrapper around an instance of Mozilla's
+nsIDOMMutationEvent interface. This inherits from
+L<UIEvent|Mozilla::DOM::Event>.
+
+The following constants are available to be compared with GetAttrChange.
+You can access these either through the event object,
+export them all with
+C<use Mozilla::DOM::MutationEvent qw(:changes)>, or export them individually.
+
+=over 4
+
+=item MODIFICATION
+
+=item ADDITION
+
+=item REMOVAL
+
+=back
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::MutationEvent->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $mutationevent->B<GetAttrChange>()
+
+=over
+
+=back
+
+=head2 $name = $mutationevent->B<GetAttrName>()
+
+=over
+
+=back
+
+=head2 $value = $mutationevent->B<GetNewValue>()
+
+=over
+
+=back
+
+=head2 $value = $mutationevent->B<GetPrevValue>()
+
+=over
+
+=back
+
+=head2 $node = $mutationevent->B<GetRelatedNode>()
+
+=over
+
+=back
+
+=head2 $event->B<InitMutationEvent>($eventType, $canbubble, $cancelable, $node, $prevValue, $newValue, $attrName, $attrChange)
+
+=over
+
+=over
+
+=item * $eventtype (string)
+
+=item * $canbubble (boolean)
+
+=item * $cancelable (boolean)
+
+=item * $node (Mozilla::DOM::Node)
+
+=item * $prevval (string)
+
+=item * $newval (string)
+
+=item * $attrname (string)
+
+=item * $attrchange (integer (short))
+
+=back
+
+See L<Event::InitEvent|Mozilla::DOM::Event/InitEvent> for more
+information. This method is basically the same as InitEvent,
+but with five extra arguments.
+(XXX: add docs for args)
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut

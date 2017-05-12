@@ -1,0 +1,7 @@
+steps = FindVersion, ChangeVersion, CheckChangeLog, Commit, MakeDeb, Tag, AddToSVNDir
+
+git.tagpattern = %v
+git.push_to = origin
+CheckChangeLog.files = Changes, debian/changelog
+AddToSVNDir.dir = ~/apt/web/dists/lucid/main/binary-noarch/
+

@@ -1,0 +1,53 @@
+[mobycentral]
+username = @MYSQL_USER@
+password = @MYSQL_PASS@
+url = @URL@
+port = @PORT@
+dbname = @MOBYCENTRAL@
+lsid_authority = biomoby.org
+lsid_namespace = serviceinstance
+resourceURL = @RDF_SERVICEINSTANCES@
+allResources = @RDF_FULL@
+rdfagent = @FULLPATH_RDFAGENT@
+service_tester_path = @SERVICE_TESTER_PATH@
+rdf_cache = @RDF_CACHE@
+keyphrase = @PASS_PHRASE@
+
+[mobyobject]
+username = @MYSQL_USER@
+password = @MYSQL_PASS@
+url = @URL@
+port = @PORT@
+dbname = @MOBYOBJECT@
+lsid_authority = biomoby.org
+lsid_namespace = objectclass
+resourceURL = @RDF_OBJECTS@
+
+[mobynamespace]
+username = @MYSQL_USER@
+password = @MYSQL_PASS@
+url = @URL@
+port = @PORT@
+dbname = @MOBYNAMESPACE@
+lsid_authority = biomoby.org
+lsid_namespace = namespacetype
+resourceURL = @RDF_NAMESPACES@
+
+[mobyservice]
+username = @MYSQL_USER@
+password = @MYSQL_PASS@
+url = @URL@
+port = @PORT@
+dbname = @MOBYSERVICE@
+lsid_authority = biomoby.org
+lsid_namespace = servicetype
+resourceURL = @RDF_SERVICES@
+
+[mobyrelationship]
+username = @MYSQL_USER@
+password = @MYSQL_PASS@
+url = @URL@
+port = @PORT@
+dbname = @MOBYRELATIONSHIP@
+lsid_authority = biomoby.org
+lsid_namespace = relationshiptype

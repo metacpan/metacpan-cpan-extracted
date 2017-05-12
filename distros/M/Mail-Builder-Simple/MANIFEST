@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Mail/Builder/Simple.pm
+lib/Mail/Builder/Simple/HTML/Template.pm
+lib/Mail/Builder/Simple/Scalar.pm
+lib/Mail/Builder/Simple/TT.pm
+t/001_load.t
+t/002_pod.t
+t/scalar.t
+t/simple.t
+t/template.t
+t/tt.t

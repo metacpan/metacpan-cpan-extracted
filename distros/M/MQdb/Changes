@@ -1,0 +1,17 @@
+Revision history for Perl module package MQdb.
+
+0.954	June 3, 2009
+        - added some more perldoc
+        - fixed MQdb::Database to work better with sqlite and 
+          other file-based database engines
+        - removed ->isa() check when setting database in DBObject for speed
+
+0.953	Friday 17 April, 2009
+	- improved the perldoc formating and content
+	- removed some deprecated methods
+
+0.952 	Thursday April 2, 2009
+	- perldoc formating
+
+0.951 	Thursday April 2, 2009
+	- original version and first upload to CPAN

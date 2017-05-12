@@ -1,0 +1,17 @@
+Revision history for MojoX-Log-Dispatch
+0.1 28-08-2009
+	Updated for latest Mojo release.
+0.06 22-07-2009
+	Makefile.pl fix (add Mojo dependence)
+0.05 21-07-2009 
+	 First CPAN release
+
+0.04 21-07-2009 
+	 more tests and doc
+	 
+0.03 21-07-2009 
+	 more tests and fix
+	 	 
+0.01    20-07-2009
+        First version.
+

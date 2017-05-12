@@ -1,0 +1,20 @@
+Revision history for MongoX
+
+0.05 Sat Oct 23 2010 00:44:13 GMT+0800 (CST)
+  - fix with_context
+
+0.04 Fri Oct 22 2010 22:40:13 GMT+0800 (CST)
+  - add db_find_by_id, db_remove_by_id
+  - db_find_and_modify return undef if no result
+
+0.03 Fri Oct 15 2010 13:14:09 GMT+0800 (CST)
+  - add db_ensure_index/db_drop_index/db_get_indexes helpers
+ 
+0.02 Thu Aug 12 2010 17:56:19 GMT+0800 (CST)
+  - new package: MongoX::Helper, wrap most useful mongodb commands.
+  - new keywords: with_context, for_dbs, for_connections, for_collections
+  - add import 'utf8' option to turn on/off utf8 flag.
+  - minor docs fixes
+
+0.01 first release
+  - basic DSL syntax

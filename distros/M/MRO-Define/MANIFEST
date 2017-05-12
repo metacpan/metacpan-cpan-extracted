@@ -1,0 +1,17 @@
+Changes
+Define.xs
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/MRO/Define.pm
+t/00load.t
+t/proto-mro.t
+t/release-eol.t
+t/release-no-tabs.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/utf8.t

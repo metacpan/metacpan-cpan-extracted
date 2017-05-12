@@ -1,0 +1,21 @@
+---
+abstract: 'Generate specified transformations of a list.'
+author:
+  - PhilipRBrenan@appaapps.com
+build_requires: {}
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Transform-List
+provides:
+  Math::Transform::List:
+    file: lib/Math/Transform/List.pm
+    version: '1.005'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.005'

@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>HTML::Mason::ApacheHandler</title>
+<link rel="stylesheet" href="pod.css" type="text/css" />
+<link rev="made" href="mailto:test@cathy.beaucox.com" />
+</head>
+
+<body>
+<table class="hdrtable" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td>HTML::Mason::ApacheHandler</td></tr></table>
+
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#parameters_to_the_new___constructor">PARAMETERS TO THE <code>new()</code> CONSTRUCTOR</a></li>
+	<li><a href="#accessor_methods">ACCESSOR METHODS</a></li>
+	<li><a href="#other_methods">OTHER METHODS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="name">NAME</a><a name="__H1_1__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+</tr></table>
+<p>HTML::Mason::ApacheHandler - Mason/mod_perl interface</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="synopsis">SYNOPSIS</a><a name="__H1_2__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_1__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;NAME</td>
+</tr></table>
+<pre>
+    use HTML::Mason::ApacheHandler;</pre>
+<pre>
+    my $ah = HTML::Mason::ApacheHandler-&gt;new (..name/value params..);
+    ...
+    sub handler {
+        my $r = shift;
+        $ah-&gt;handle_request($r);
+    }</pre>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="description">DESCRIPTION</a><a name="__H1_3__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_2__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;SYNOPSIS</td>
+</tr></table>
+<p>The ApacheHandler object links Mason to mod_perl, running components in
+response to HTTP requests. It is controlled primarily through
+parameters to the <code>new()</code> constructor.</p>
+<p><a href="#item_handle_request"><code>handle_request()</code></a> is not a user method, but rather is called from the
+HTML::Mason::handler() routine in handler.pl.</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="parameters_to_the_new___constructor">PARAMETERS TO THE <code>new()</code> CONSTRUCTOR</a><a name="__H1_4__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_3__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;DESCRIPTION</td>
+</tr></table>
+<dl>
+<dt><strong><a name="item_apache_status_title">apache_status_title</a></strong><br />
+</dt>
+<dd>
+Title that you want this ApacheHandler to appear as under
+Apache::Status.  Default is ``HTML::Mason status''.  This is useful if
+you create more than one ApacheHandler object and want them all
+visible via Apache::Status.
+</dd>
+<p></p>
+<dt><strong><a name="item_args_method">args_method</a></strong><br />
+</dt>
+<dd>
+Method to use for unpacking GET and POST arguments. The valid options
+are 'CGI' and 'mod_perl'; these indicate that a <code>CGI.pm</code> or
+<code>Apache::Request</code> object (respectively) will be created for the
+purposes of argument handling.
+</dd>
+<dd>
+<p>'mod_perl' is the default and requires that you have installed the
+<code>Apache::Request</code> package.</p>
+</dd>
+<dd>
+<p>If args_method is 'mod_perl', the <code>$r</code> global is upgraded to an
+Apache::Request object. This object inherits all Apache methods and
+adds a few of its own, dealing with parameters and file uploads.  See
+<code>Apache::Request</code> for more information.</p>
+</dd>
+<dd>
+<p>If the args_method is 'CGI', the Mason request object (<code>$m</code>) will have a
+method called <code>cgi_object</code> available.  This method returns the CGI
+object used for argument processing.</p>
+</dd>
+<dd>
+<p>While Mason will load <code>Apache::Request</code> or <code>CGI</code> as needed at runtime, it
+is recommended that you preload the relevant module either in your
+<em>httpd.conf</em> or <em>handler.pl</em> file, as this will save some memory.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_decline_dirs">decline_dirs</a></strong><br />
+</dt>
+<dd>
+True or false, default is true. Indicates whether Mason should decline
+directory requests, leaving Apache to serve up a directory index or a
+<code>FORBIDDEN</code> error as appropriate. See the <a href="/mason/docs/HTML/Mason/Admin.html#allowing_directory_requests">allowing directory requests</a> section of the administrator's manual
+for more information about handling directories with Mason.
+</dd>
+<p></p>
+<dt><strong><a name="item_interp">interp</a></strong><br />
+</dt>
+<dd>
+The interpreter object to associate with this compiler. By default a
+new object of the specified <a href="/mason/docs/HTML/Mason/Params.html#interp_class">interp_class</a> will be created.
+</dd>
+<p></p>
+<dt><strong><a name="item_interp_class">interp_class</a></strong><br />
+</dt>
+<dd>
+The class to use when creating a interpreter. Defaults to
+<a href="/mason/docs/HTML/Mason/Interp.html">HTML::Mason::Interp</a>.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="accessor_methods">ACCESSOR METHODS</a><a name="__H1_5__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_4__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;PARAMETERS TO THE <code>new()</code> CONSTRUCTOR</td>
+</tr></table>
+<p>All of the above properties, except interp_class, have standard accessor
+methods of the same name: no arguments retrieves the value, and one
+argument sets it, except for args_method, which is not settable.  For
+example:</p>
+<pre>
+    my $ah = HTML::Mason::ApacheHandler-&gt;new;
+    my $decline_dirs = $ah-&gt;decline_dirs;
+    $ah-&gt;decline_dirs(1);</pre>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="other_methods">OTHER METHODS</a><a name="__H1_6__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_5__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;ACCESSOR METHODS</td>
+</tr></table>
+<p>The ApacheHandler object has a few other publically accessible methods
+that may be of interest to end users.</p>
+<dl>
+<dt><strong><a name="item_handle_request">handle_request ($r)</a></strong><br />
+</dt>
+<dd>
+This method takes an Apache object representing a request and
+translates that request into a form Mason can understand.  It's return
+value is an Apache status code.
+</dd>
+<p></p>
+<dt><strong><a name="item_prepare_request">prepare_request ($r)</a></strong><br />
+</dt>
+<dd>
+This method takes an Apache object representing a request and returns
+a new Mason request object or an Apache status code.  If it is a
+request object you can manipulate that object as you like, and then
+call the request object's <code>exec</code> method to have it generate output.
+</dd>
+<dd>
+<p>If this method returns an Apache status code, that means that it could
+not create a Mason request object.</p>
+</dd>
+<dd>
+<p>This method is useful if you would like to have a chance to decline a
+request based on properties of the Mason request object or a component
+object.  For example:</p>
+</dd>
+<dd>
+<pre>
+    my $req = $ah-&gt;prepare_request($r);
+    # $req must be an Apache status code if it's not an object
+    return $req unless ref($req);</pre>
+</dd>
+<dd>
+<pre>
+    return DECLINED
+        unless $req-&gt;request_comp-&gt;source_file =~ /\.html$/;</pre>
+</dd>
+<dd>
+<pre>
+    $req-&gt;exec;</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_request_args">request_args ($r)</a></strong><br />
+</dt>
+<dd>
+Given an Apache request object, this method returns a three item list.
+The first item is a hash reference containing the arguments passed by
+the client's request.
+</dd>
+<dd>
+<p>The second is an Apache request object.  This is returned for
+backwards compatibility from when this method was responsible for
+turning a plain Apache object into an Apache::Request object.</p>
+</dd>
+<dd>
+<p>The third item may be a CGI.pm object or <code>undef</code>, depending on the
+value of the <a href="/mason/docs/HTML/Mason/Params.html#args_method">args_method</a> parameter.</p>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="see_also">SEE ALSO</a><a name="__H1_7__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_6__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;OTHER METHODS</td>
+</tr></table>
+<p><a href="/mason/docs/HTML/Mason.html">HTML::Mason</a>,
+<a href="/mason/docs/HTML/Mason/Admin.html">HTML::Mason::Admin</a>,
+<a href="/mason/docs/HTML/Mason/Interp.html">HTML::Mason::Interp</a></p>
+<table class="hdrtable" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td>HTML::Mason::ApacheHandler</td></tr></table>
+
+
+</body>
+
+</html>

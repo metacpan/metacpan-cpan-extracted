@@ -1,0 +1,150 @@
+Revision history for Module::Build::Tiny
+
+0.039     2014-10-12 10:38:39+02:00 Europe/Amsterdam
+          Supply basename to *.PL files as its args
+
+0.038     2014-09-06 11:28:23+02:00 Europe/Amsterdam
+          Scrub PERL_MB_OPT in tests too
+
+0.037     2014-07-27 16:14:54+02:00 Europe/Amsterdam
+          Scrub environment variable in tests
+
+0.036     2014-05-02 14:51:02CEST+0200 Europe/Amsterdam
+          Add --jobs argument to MBT
+          Add xs directory to include list
+
+0.035     2014-02-17 23:18:54CET+0100 Europe/Amsterdam
+          Fix install test in absence of a compiler
+
+0.034     2014-01-22 03:40:21CET+0100 Europe/Amsterdam
+          Make install tests more platform independent
+
+0.033     2014-01-21 03:27:32CET+0100 Europe/Amsterdam
+          Require Getopt::Long 2.36
+          Add install tests
+
+0.032     2014-01-20 20:07:13CET+0100 Europe/Amsterdam
+          Fix env options and Build.PL options being ignored (regression in 0.031)
+
+0.031     2014-01-20 16:24:58CET+0100 Europe/Amsterdam
+          Process argument sources separately
+          Use mod2fname appropriately
+
+0.030     2013-10-11 12:01:24 Europe/Amsterdam
+          Added workaround for #54606 
+
+0.029     2013-10-11 00:39:20 Europe/Amsterdam
+          Respect harness environmental variables
+          Add main dir to include path
+
+0.028     2013-09-29 19:58:39 Europe/Amsterdam
+          Revert "Removed clean and realclean actions"
+          Build .c and .o in temp/ instead of lib
+          Got rid of IO layers
+          Separate libdoc and bindoc checks
+
+0.027     2013-09-09 11:43:12 Europe/Amsterdam
+          Various documentation updates
+
+0.026     2013-08-19 22:09:00 Europe/Amsterdam
+          Safe PERL_MB_OPT during configuration stage
+
+0.025     2013-07-12 16:09:45 Europe/Amsterdam
+          Use local tempdir
+
+0.024     2013-06-29 21:57:13 Europe/Amsterdam
+          Generate man pages in the correct section
+
+0.023     2013-06-03 01:13:05 Europe/Amsterdam
+          Implement --pureperl-only
+          Skip compilation test when not having a compiler
+
+0.022     2013-06-01 03:31:05 Europe/Amsterdam
+          Fix dirname code for toplevel XS modules
+
+0.021     2013-05-27 14:35:05 Europe/Amsterdam
+          Add XS support
+          Only manify if really installable
+
+0.020     2013-05-20 14:29:59 Europe/Amsterdam
+          Accept a --create_packlist argument
+
+0.019     2013-04-30 01:20:54 Europe/Amsterdam
+          Accept --pureperl-only
+
+0.018     2013-04-24 16:22:44 Europe/Amsterdam
+          Lazily load Pod::Man and TAP::Harness
+          Don't manify unless necessary
+
+0.017     2013-04-13 09:13:22 Europe/London
+          Fix redefined warning for find
+
+0.016     2013-04-12 17:24:52 Europe/London
+          Fix loading of File::Find
+
+0.015     2013-04-12 15:58:14 Europe/London
+          Switched back from JSON to JSON::PP
+          Remove dependency on File::Find::Rule
+          Switched back to ExtUtils::Helpers for detildefy
+          Drop .modulebuildrc support per Lancaster consensus
+
+0.014     2013-04-04 15:58:50 Europe/Amsterdam
+          Added sharedir support
+          Fixed Synopsis [tokuhirom]
+          Make blib/arch, to satisfy blib.pm
+          Removed dependencies on Test::Exception, Capture::Tiny and File::Slurp
+
+0.013     2013-02-12 20:17:25 Europe/Amsterdam
+          Detildefy input
+
+0.012     2012-01-09 22:59:13 Europe/Amsterdam
+          Move manify from ExtUtils::Helpers to Module::Build::Tiny
+          Don't adapt too much to VMS's wiles (let EU::Helpers take care of the Build.com)
+
+0.011     2011-09-26 15:56:28 Europe/Amsterdam
+          Fix Module::Build::Tiny on Windows
+
+0.010     2011-08-23 19:46:29 Europe/Amsterdam
+          Don't let the test and install actions depend on build (was rather broken)
+          Add support for *.PL files
+          chmod more robustly (may fix bugs on Windows)
+          Various documentation updates
+
+0.009     2011-05-08 12:05:01 Europe/Amsterdam
+          Install packlists to the right location
+
+0.008     2011-05-07 11:25:39 Europe/Amsterdam
+          Removed clean and realclean commands
+          Fix writability for scripts and modules
+
+0.007     2011-05-01 22:36:17 Europe/Bucharest
+          Now with corrent configure-requires meta-information
+
+0.006     2011-04-29 11:56:37 Europe/Bucharest
+          Complete rewrite of Acme::Module::Build::Tiny into Module::Build::Tiny
+           * Now uses dependencies
+           * Either implements a feature correctly or not at all
+
+0.05 - Fri Oct  8 15:19:31 EDT 2010
+
+  - If $^X looks like a perl found in the path, use $Config{perlpath}
+
+  - Avoid issuing a warning when Build is run with no arguments
+
+0.04 - Wed Mar 24 22:59:50 EDT 2010
+
+  - Fix test bug when running a versioned perl (e.g. perl5.10.1)
+
+0.03 - Wed Mar 24 09:48:55 EDT 2010
+
+  - Fix SYNOPSIS documentation
+
+0.02 - Tue Mar 23 15:20:19 EDT 2010
+
+  - Add support for .modulebuildrc and PERL_MB_OPT so it works
+    with local::lib
+  
+0.01  - Tue Mar 23 14:21:29 EDT 2010
+
+  - First release
+

@@ -1,0 +1,22 @@
+Changes
+lib/MKDoc/ECommerce.pm
+lib/MKDoc/ECommerce/Address.pm
+lib/MKDoc/ECommerce/Basket.pm
+lib/MKDoc/ECommerce/Item.pm
+lib/MKDoc/ECommerce/Order.pm
+lib/MKDoc/ECommerce/Plugin/Basket.pm
+lib/MKDoc/ECommerce/Plugin/Basket/Add.pm
+lib/MKDoc/ECommerce/Plugin/Basket/Del.pm
+lib/MKDoc/ECommerce/Plugin/Basket/Help.pm
+lib/MKDoc/ECommerce/Plugin/Basket/Mail.pm
+lib/MKDoc/ECommerce/Plugin/Basket/Modify.pm
+lib/MKDoc/ECommerce/Plugin/Basket/View.pm
+lib/MKDoc/ECommerce/Plugin/Details.pm
+lib/MKDoc/ECommerce/Plugin/Order.pm
+lib/MKDoc/ECommerce/Plugin/Order/SecPay.pm
+lib/MKDoc/ECommerce/Plugin/Order/WorldPay.pm
+lib/MKDoc/ECommerce/Rules.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README

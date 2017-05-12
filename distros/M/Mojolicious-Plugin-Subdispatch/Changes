@@ -1,0 +1,13 @@
+Revision history for Mojolicious-Plugin-Subdispatch
+
+0.04    2013-05-20
+        Mojolicious 4.0 compatibility (stephan48)
+
+0.03    2012-12-09
+        added the base_url option
+
+0.02    2012-02-07
+        Created POD
+
+0.01    2012-01-08
+        First version

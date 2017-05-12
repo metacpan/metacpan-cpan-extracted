@@ -1,0 +1,47 @@
+Revision history for perl module MBclient
+
+1.57 2014-11-27
+
+     - Fix pod documentation: examples with parameters swaped (issue #8).
+     - Reset constant FRAME_RTU_MAXSIZE.
+     - Improve _recv_mbus() for RTU mode.
+     - Optimize _crc_is_ok().
+
+1.56 2014-08-05
+
+     - Fix bug in pod documentation (samples with "$@" instead of "@$").
+     - Fix bug in write_single_coil(), pack/unpack skip the last padding byte.
+
+1.55 2014-07-15
+
+     - Add POD coverage test to dist test.
+     - Improve POD documentation (coverage = 100%).
+     - Add MANIFEST.SKIP for Build.PL.
+     - Add a simple example with Perl Tk.
+
+1.54 2014-07-05
+
+     - Add perl min version to Build.PL.
+
+1.53 2014-07-05
+
+     - Add Build.PL. It's now possible to use Module::Build
+       has dist maker.
+       "create_makefile_pl" is comment in Build.PL to avoid
+       destroy the old Makefile.PL at every build.
+
+     - Improve POD documentation.
+
+1.52 2014-07-04
+
+     - Fix Makefile.PL: "use 5.014002" not compatible with old
+       perl version. Now set to 5.006.
+
+1.51 2014-07-04
+
+     - Add "use warnings;", now require perl version >= 5.6.1.
+
+1.50 2014-07-03
+
+     - First release to be compliant with CPAN archive format.
+

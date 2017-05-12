@@ -1,0 +1,14 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Mac-Glue-Apps-AddressBookExport
+version:      0.2
+version_from: lib/Mac/Glue/Apps/AddressBookExport.pm
+installdirs:  site
+requires:
+    Mac::Glue:                     1.22
+    Encode:                        0.1
+    Text::vCard:                   1.9
+    Template:                      2
+    Test::More:                    0.1
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

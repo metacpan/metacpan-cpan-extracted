@@ -1,0 +1,30 @@
+Revision history for Mock::Person
+
+0.01    2010-10-26
+        * First release.
+
+0.02    2013-06-23
+        * Switched to Dist::Zilla
+
+1.0.0   2013-07-29
+        [Major]
+        * Using SemVer for version numbers
+
+        [Minor]
+        * Added CONTRIBUTORS section to POD
+        * Fix typo in filename, move to examples directory
+
+        [Patch]
+        * Reformat as per CPAN::Changes::Spec
+
+1.0.1   2013-07-30
+        [Patch]
+        * Fixing russian symbols on cpan page
+
+1.0.2   2013-08-07
+        [Patch]
+        * Correct usage of Pod::Weaver
+
+1.1.0   2013-12-13
+        [Minor]
+        * Added US person handling

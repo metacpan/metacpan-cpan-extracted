@@ -1,0 +1,21 @@
+Changes
+lib/Marketplace/Rakuten.pm
+lib/Marketplace/Rakuten/Order.pm
+lib/Marketplace/Rakuten/Order/Address.pm
+lib/Marketplace/Rakuten/Order/Item.pm
+lib/Marketplace/Rakuten/Response.pm
+lib/Marketplace/Rakuten/Utils.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/basic.t
+t/manifest.t
+t/order-parsing.t
+t/orders.t
+t/pod-coverage.t
+t/pod.t
+t/response.t
+t/utils.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

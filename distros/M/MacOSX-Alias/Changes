@@ -1,0 +1,9 @@
+0.10_01 - Sun Dec  9 13:58:42 2007
+	* New module to make and read Mac OS X aliases
+
+0.11 - Sun Aug 31 11:56:05 2008
+	* Bumping to a release version.
+
+0.10_02 - Sat Aug  9 08:44:58 2008
+	* Give the right "OS unsupported" message
+

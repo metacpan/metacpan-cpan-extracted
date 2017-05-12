@@ -1,0 +1,180 @@
+{
+   "abstract" : "Semantic extensions to Moose",
+   "author" : [
+      "konstantin baierer <kba@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.3901, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Semantic",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Carp::Always" : "0",
+            "Data::Printer" : "0",
+            "Devel::PartialDump" : "0",
+            "LWP::Protocol::PSGI" : "0",
+            "Pod::Readme" : "0",
+            "Pod::Select" : "0",
+            "RDF::Endpoint" : "0.04",
+            "RDF::Trine::Serializer::SparqlUpdate" : "0.0002",
+            "SUPER" : "0",
+            "String::Diff" : "0",
+            "Term::ANSIColor" : "0",
+            "YAML::XS" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38",
+            "Pod::Readme" : "0",
+            "Pod::Select" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Printer" : "0",
+            "Data::UUID" : "1.217",
+            "File::Path" : "0",
+            "File::Slurp" : "9999.19",
+            "File::Temp" : "0",
+            "LWP::UserAgent" : "0",
+            "Module::Load" : "0.18",
+            "Moose" : "2.0",
+            "MooseX::ClassAttribute" : "0.26",
+            "MooseX::HasDefaults" : "0.03",
+            "MooseX::Role::Parameterized" : "0",
+            "MooseX::Types" : "0.30",
+            "MooseX::Types::URI" : "0.03",
+            "RDF::NS" : "20111124",
+            "RDF::RDFa::Parser" : "1.096",
+            "RDF::Trine" : "0.136",
+            "Scalar::Util" : "0",
+            "Set::Object" : "1.28",
+            "Sort::Naturally" : "0",
+            "Try::Tiny" : "0.09",
+            "URI" : "0",
+            "namespace::clean" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Moose::Meta::Attribute::Custom::Trait::Semantic" : {
+         "file" : "lib/Moose/Meta/Attribute/Custom/Trait/Semantic.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic" : {
+         "file" : "lib/MooseX/Semantic.pm",
+         "version" : "0.006"
+      },
+      "MooseX::Semantic::Meta::Attribute::Trait" : {
+         "file" : "lib/MooseX/Semantic/Meta/Attribute/Trait.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Role::Graph" : {
+         "file" : "lib/MooseX/Semantic/Role/Graph.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Role::PortableResource" : {
+         "file" : "lib/MooseX/Semantic/Role/PortableResource.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Role::RdfBackend" : {
+         "file" : "lib/MooseX/Semantic/Role/RdfBackend.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Role::RdfExport" : {
+         "file" : "lib/MooseX/Semantic/Role/RdfExport.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Role::RdfImport" : {
+         "file" : "lib/MooseX/Semantic/Role/RdfImport.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Role::RdfImportAll" : {
+         "file" : "lib/MooseX/Semantic/Role/RdfImportAll.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Role::RdfObsolescence" : {
+         "file" : "lib/MooseX/Semantic/Role/RdfObsolescence.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Role::RdfSchemaImport" : {
+         "file" : "lib/MooseX/Semantic/Role/RdfSchemaImport.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Role::Resource" : {
+         "file" : "lib/MooseX/Semantic/Role/Resource.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Role::WithRdfType" : {
+         "file" : "lib/MooseX/Semantic/Role/WithRdfType.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Test" : {
+         "file" : "lib/MooseX/Semantic/Test.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Test::BackendPerson" : {
+         "file" : "lib/MooseX/Semantic/Test/BackendPerson.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Test::MetaPerson" : {
+         "file" : "lib/MooseX/Semantic/Test/MetaPerson.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Test::ModelContainingPerson" : {
+         "file" : "lib/MooseX/Semantic/Test/ModelContainingPerson.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Test::Person" : {
+         "file" : "lib/MooseX/Semantic/Test/Person.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Test::StrictPerson" : {
+         "file" : "lib/MooseX/Semantic/Test/StrictPerson.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Types" : {
+         "file" : "lib/MooseX/Semantic/Types.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Util::SchemaExport" : {
+         "file" : "lib/MooseX/Semantic/Util/SchemaExport.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Util::SchemaImport" : {
+         "file" : "lib/MooseX/Semantic/Util/SchemaImport.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Util::SchemaImport::Attribute" : {
+         "file" : "lib/MooseX/Semantic/Util/SchemaImport/Attribute.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Util::SchemaImport::Class" : {
+         "file" : "lib/MooseX/Semantic/Util/SchemaImport/Class.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Util::TypeConstraintWalker" : {
+         "file" : "lib/MooseX/Semantic/Util/TypeConstraintWalker.pm",
+         "version" : 0
+      },
+      "MooseX::Semantic::Util::ValueHeuristics" : {
+         "file" : "lib/MooseX/Semantic/Util/ValueHeuristics.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.006"
+}

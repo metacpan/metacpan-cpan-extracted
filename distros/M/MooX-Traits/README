@@ -1,0 +1,91 @@
+NAME
+    MooX::Traits - automatically apply roles at object creation time
+
+SYNOPSIS
+    Given some roles:
+
+       package Role;
+       use Moo::Role;
+       has foo => ( is => 'ro', required => 1 );
+
+    And a class:
+
+       package Class;
+       use Moo;
+       with 'MooX::Traits';
+
+    Apply the roles to the class:
+
+       my $class = Class->with_traits('Role');
+
+    Then use your customized class:
+
+       my $object = $class->new( foo => 42 );
+       $object->isa('Class'); # true
+       $object->does('Role'); # true
+       $object->foo; # 42
+
+DESCRIPTION
+    Was any of the SYNOPSIS unexpected? Basically, this module is the same
+    thing as MooseX::Traits and MouseX::Traits, only for Moo. *Quelle
+    surprise*, right?
+
+  Methods
+    `$class->with_traits( @traits )`
+        Return a new class name with the traits applied.
+
+    `$class->new_with_traits(%args, traits => \@traits)`
+        `new_with_traits` can also take a hashref, e.g.:
+
+           my $instance = $class->new_with_traits({ traits => \@traits, foo => 'bar' });
+
+        This method exists for compatibility with the MooseX and MouseX
+        equivalents of this module, but generally speaking you should prefer
+        to use `with_traits`.
+
+    `$class->_trait_namespace`
+        This returns undef, but you can override it in your class to
+        automatically prepend a namespace to supplied traits.
+
+        This differs slightly from the MooseX and MouseX versions of this
+        module which have `_trait_namespace` as an attribute instead of a
+        method.
+
+  Compatibility
+    Although called MooX::Traits, this module actually uses Role::Tiny, so
+    doesn't really require Moo. If you use it in a non-Moo class, you should
+    be able to safely consume any Role::Tiny-based traits.
+
+    If you use it in a Moo class, you should also be able to consume
+    Moo::Role-based traits and Moose::Role-based traits.
+
+    Package::Variant and MooseX::Role::Parameterized roles should be usable;
+    just provide a hashref of arguments:
+
+       $class->with_traits( $param_role => \%args )->new( ... )
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Traits>.
+
+SEE ALSO
+    MooX::Traits::Util.
+
+    Moo::Role, Role::Tiny.
+
+    MooseX::Traits, MouseX::Traits.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

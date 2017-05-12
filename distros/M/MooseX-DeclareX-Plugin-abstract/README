@@ -1,0 +1,60 @@
+NAME
+    MooseX::DeclareX::Plugin::abstract - shiny syntax for MooseX::ABCD
+
+SYNOPSIS
+            class Shape is abstract {
+                    requires 'draw';
+            }
+        
+            class Circle extends Shape {
+                    method draw { ... }
+            }
+        
+            class Square extends Shape {
+                    # does not implement 'draw'
+            } # dies
+        
+            my $shape  = Shape->new;  # dies
+            my $circle = Circle->new; # succeeds
+
+DESCRIPTION
+    This distribution adds two new plugins to MooseX::DeclareX.
+
+    `is abstract`
+        Declares that a class cannot be instantiated.
+
+        Also allows the standard Moose `requires` function to work within
+        classes (it normally only works within roles).
+
+        When a class requires a method, then subclasses are supposed to
+        provide that method. If the subclass itself is also abstract, then it
+        doesn't need to provide the required methods. (There's also a little
+        cheat: classes which are mutable may extend abstract classes without
+        implementing required methods. You should not do this though.)
+
+    `is concrete`
+        A counterpart to `is abstract`. Currently, this is a no-op, but in
+        future it might enable some checks related to abstract classes.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-DeclareX-Plugin-abstrac
+    t>.
+
+SEE ALSO
+    MooseX::DeclareX, MooseX::ABCD.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

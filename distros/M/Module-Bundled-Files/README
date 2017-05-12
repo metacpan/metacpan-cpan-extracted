@@ -1,0 +1,159 @@
+NAME
+    Module::Bundled::Files - Access files bundled with Module
+
+VERSION
+    Version 0.03
+
+SYNOPSIS
+    Access files installed with your module without needing to specify an
+    install location on the target filesystem.
+
+  Setup
+    In *Build.PL*:
+
+      my $build = new Module::Build(...);
+      map{$build->add_build_element($_);}
+        qw{txt html tmpl};
+      # installs all .txt, .html and .tmpl files found in the lib/ tree
+  
+    Create files:
+
+      Build.PL
+      lib/
+        My/
+          Module.pm
+          Module/
+            index.html
+            data.txt
+            form.tmpl
+  
+  Object-Oriented Interface
+      use base qw{Module::Bundled::Files};
+  
+      if($self->mbf_exists('data.txt')){...}
+  
+      my $filename = $self->mbf_path('data.txt');
+      # $filename = '/usr/local/share/perl/5.8.7/My/Module/data.txt';
+      open my $fh, '<', $filename or die $@;
+  
+      my $fh = $self->mbf_open('data.txt');
+      while(<$fh>)
+      {
+        ...
+      }
+  
+      my $data = $self->mbf_read('data.txt');
+
+  Non-Object-Oriented Interface
+      use Module::Bundled::Files qw{:all};
+      my $object = new Other::Object;
+
+      if(mf_exists($other,'otherfile.txt')){...}
+
+      my $filename = mbf_path($object,'otherfile.txt');
+
+      open my $fh, '<', $filename or die $@;
+  
+      my $fh = mbf_open($object,'otherfile.txt');
+      while(<$fh>)
+      {
+        ...
+      }
+  
+      my $data = mbf_read($object,'otherfile.txt');
+  
+DESCRIPTION
+    This module provides an simple method of accessing files that need to be
+    bundled with a module.
+
+    For example, a module My::Module, which needs to access a seperate file
+    *data.txt*.
+
+    In your development directory you would place your *data.txt* in your
+    *lib/My/Module/* directory.
+
+      lib/
+        My/
+          Module.pm
+          Module/
+            data.txt
+
+    Using *add_build_element(...)* in your *Build.PL* file allows the
+    *data.txt* file to be installed in the same relative location.
+
+    The file(s) can then be accessed using the *mbf_** functions provided by
+    this module.
+
+EXPORT
+    The following functions can be exported if you will not be using the
+    Object-Oriented Interface.
+
+      :all
+        mbf_validate
+        mbf_dir
+        mbf_exists
+        mbf_path
+        mbf_open
+        mbf_read
+
+FUNCTIONS
+  mbf_validate(FILENAME)
+    Returns true if the filename does not contain illegal sequences (i.e.
+    '..')
+
+    Dies if filename is invalid.
+
+  mbf_dir([MODULE])
+    Returns the path of the directory where all files would be installed.
+
+    The non-OO interface requires an object reference or module name as the
+    only parameter.
+
+  mbf_exists([MODULE,] FILENAME)
+    Returns true of the named file has been bundled with the module.
+
+    The non-OO interface requires an object reference or module name as the
+    first parameter.
+
+  mbf_path([MODULE,] FILENAME)
+    Returns the full path to the named file. Dies if the file does not
+    exist.
+
+    Will look for file in inherited classes (by reading @ISA) if the file is
+    not found for the derived class. @ISA navigation is the same as per Perl
+    searching for methods. See Class::ISA for more details.
+
+    The non-OO interface requires an object reference or module name as the
+    first parameter.
+
+  mbf_open([MODULE,] FILENAME)
+    Returns an open file handle for the named file. Dies if the file does
+    not exist.
+
+    The non-OO interface requires an object reference or module name as the
+    first parameter.
+
+  mbf_read([MODULE,] FILENAME)
+    Returns the content of the named file. Dies if the file does not exist.
+
+    The non-OO interface requires an object reference or module name as the
+    first parameter.
+
+AUTHOR
+    Paul Campbell, "<kemitix@gmail.com>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-module-bundled-files@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Module-Bundled-Files>. I
+    will be notified, and then you will automatically be notified of
+    progress on your bug as I make changes.
+
+    #=head1 ACKNOWLEDGEMENTS
+
+COPYRIGHT & LICENSE
+    Copyright 2005 Paul Campbell, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

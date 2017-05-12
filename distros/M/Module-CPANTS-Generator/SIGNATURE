@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.21.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d8ca0ad82e4c6dac5799a4d19250c44041a9151e Build.PL
+SHA1 76d1e39b541b49540643b9a1e6d889b4f6c6015d Changes
+SHA1 30ffb1a42d3f71c787a1ae0d3a405b0bf551f175 MANIFEST
+SHA1 e5b14f7b35c9c60470c69b165f080611a48b5dd1 MANIFEST.SKIP
+SHA1 bdb8b41c265dddd433e2a7d5a13b57722db99863 META.yml
+SHA1 75d28f9ac1de97abc1719364cb9f4708aca58b40 Makefile.PL
+SHA1 9e7891610b518f5a867a87c95971ee63b17b744c Module-CPANTS/Build.PL
+SHA1 02d7577604804ecefb70a312c4fd7834a20bcca0 Module-CPANTS/Changes
+SHA1 b31c17ce1e0dadcf2ad2c68016df8c8ff9728479 Module-CPANTS/MANIFEST
+SHA1 a19e609fa88b803baf0cfe86261049a5d2ea8564 Module-CPANTS/MANIFEST.SKIP
+SHA1 696b48f5ed0d98929655f9348de26aa9c5f7ac84 Module-CPANTS/META.yml
+SHA1 5959719de8ffe9a234792c7161042c80bb4a12ca Module-CPANTS/Makefile.PL
+SHA1 e040b4c1fc9ba7d1bbc4f97fc6a6b3fd1ab3ba42 Module-CPANTS/README
+SHA1 d70dfb5d1121ed705f8c020a19f7fa8c0dbe904f Module-CPANTS/SIGNATURE
+SHA1 6e3c692b0a09cb0349777fae48b8280b0ab45c3b Module-CPANTS/examples/graph_deps.pl
+SHA1 2ef251d5e6d6366f9d033c97ef15d30c88ada6a7 Module-CPANTS/examples/view.pl
+SHA1 5f748238202f9da58f8d32a8cd35016543c92e6d Module-CPANTS/lib/Module/CPANTS.tt
+SHA1 48e3ee556e3dd70385383ce4e8eaf0eb4580b6eb Module-CPANTS/t/signature.t
+SHA1 0c7fcdc4378dbf72fb6c7f4d4758c2c2d7010a0e Module-CPANTS/t/simple.t
+SHA1 2464b57ff0d520cd06cd1cd10c991aedba0af0f6 README
+SHA1 5634910beba8839266d69c5e1cfb261c90f0a471 TODO
+SHA1 629724092ade4a1ad13c7ff5f4b6079c3d7793bb examples/generate.pl
+SHA1 2a7681932cc0d743575cfa3a11924937dac714d3 examples/view.pl
+SHA1 3d938f6f36f0bb7d19dbca65810273d4a3b7e1f6 lib/Module/CPANTS/Generator.pm
+SHA1 7ef1e828704cb359994a6b23afd2f87d6b2d53ce lib/Module/CPANTS/Generator/Backpan.pm
+SHA1 fb42f687e972ab4e89763f9bb67bc6522d492294 lib/Module/CPANTS/Generator/Files.pm
+SHA1 eb456b59ee58cbce043f21b165d7eacaedd00bbf lib/Module/CPANTS/Generator/ModuleInfo.pm
+SHA1 a02a92006b3ec481bf98ed095ee0836b1d0a389b lib/Module/CPANTS/Generator/Pod.pm
+SHA1 9ac7016636239aecec6932464e4f85182f1d68de lib/Module/CPANTS/Generator/Prereq.pm
+SHA1 2392ad0cf4b064f21e59feab0f7abb7a4e8fe0aa lib/Module/CPANTS/Generator/Testers.pm
+SHA1 3312b93f31ef848226be725b13dc5ad0906c0fee lib/Module/CPANTS/Generator/Unpack.pm
+SHA1 17a21f4f42e093d66f6cbe27d073a8712b29e219 lib/Module/CPANTS/Generator/Uses.pm
+SHA1 48e3ee556e3dd70385383ce4e8eaf0eb4580b6eb t/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.2 (GNU/Linux)
+
+iD8DBQE/WaZBsgWvvfGvuWoRAgDcAKDFx59kz75pb1q4lHXEiczDZ8qRwACfXBfu
+485AzOxdafYI0zbW50Snfbg=
+=HPn7
+-----END PGP SIGNATURE-----

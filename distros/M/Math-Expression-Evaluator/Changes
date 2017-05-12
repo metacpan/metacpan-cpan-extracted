@@ -1,0 +1,74 @@
+Revision History for Perl module Math::Expression::Evaluator
+
+0.3.2 Thu Aug 19 13:58:26 CEST 2010
+- allow ** for powers as alias to ^
+
+0.3.1 Sun Apr 25 13:41:00 CEST 2010
+- avoid indirect method call syntax in documentation
+- fix [cpan #55709], signed numbers in exponentials
+
+0.3.0 Fri Jan 15 11:28:02 CET 2010
+- allow the user to add custom functions, and override built-in functions.
+  Thanks to Leonardo Herrera for the initial patch.
+
+0.2.0 Wed Oct  7 23:35:22 CEST 2009
+- allow the user to install a callback for undefined variables (much like
+  AUTOLOAD in perl for subroutines)
+- document the effect of multiple calls to parse() on the same object
+- stylistic improvements
+
+0.1.3 Thu Sep 17 12:05:44 CEST 2009
+- made '+' in operations work in binary context, so that overloaded objects
+  without a neutral element for addtion can work.
+- documentation fixes - MEE now lives on github
+
+0.1.2 Mon Jul 14 11:45:23 CEST 2008
+- fixed timestamps, they are all in the past now 
+
+0.1.1 Wed Jun 18 22:28:48 CEST 2008
+- require perl version 5.006001, not 5.6.1. Perl 5.5something doesn't
+  understand the latter.
+
+0.1.0 Sun Jun  8 12:30:06 CEST 2008
+- ast_size is now a public method
+- added two examples
+- increased submajor version number to 1 to reflect increasing maturity
+- don't hide modules from PAUSE indexer, cpants complains about missing
+  dependencies otherwie
+
+0.0.6 Thu Apr  3 09:09:37 CEST 2008
+- added modulo operator %
+- documented variable handling of compiled functions
+- more test cases for associativity, builtins and variables
+
+0.0.5 Mon Mar 31 13:02:29 CEST 2008
+- Added ability to compile expression to a perl function
+- Many more tests, checked with Devel::Cover
+- Added "See Also" list to MEE documentation
+- Lexer: track .pos in tokens
+- Parser: Annotate error messages with position
+- Documentation in Lexer.pm: more details on regex matching
+- non-recursive 'variables' method
+- more parse tree documentation
+- removed many trailing spaces in source code
+- simplify AST while parsing, not in a separate step
+
+0.0.4 Wed Sep 19 17:51:01 CEST 2007
+- add variables() method
+- more documentation on optimization
+- added another optimization method (flattening)
+- test that prove optimize() actually does something
+
+0.0.3 Tue Sep 18 08:21:21 CEST 2007
+- Dropped 'use Regexp::Common' 
+
+0.0.2 Mon Sep 17 13:34:27 CEST 2007
+- Splitted MEE::Util and MEE::Parser from main module
+- Added optimize() and the underlying MEE::Optimizer
+- Most tests now run once with optimize() and once without
+- Added LICENSE section to ME::Evaluator
+- Dropped Regexp::Common dependency
+- Added this Changes file
+
+0.0.1 Mon Sep 10 13:13:13 CEST 2007
+- Initial release

@@ -1,0 +1,3 @@
+fred@nowhere.net
+@everywhere.com
+foo@bar.com

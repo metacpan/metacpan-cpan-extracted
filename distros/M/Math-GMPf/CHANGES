@@ -1,0 +1,146 @@
+0.42
+ - Remove gmp_v from Math::GMPf::V as we don't want any library functions in that module.
+ - Replace SvUV/SvIV/SvNV with SvUVX/SvIVX/SvNVX where appropriate. (In typemap, too.)
+ - Add Rmpf_get_NV and Rmpf_set_NV.
+ - Handle NOK/POK dualvars.
+ - Add Rmpf_set_IV, Rmpf_get_IV, Rmpf_fits_IV_p and Rmpf_fits_UV_p.
+
+0.41
+ - Tweaks to Math::GMPf::gmp_v() and Math::GMPf::V::gmp_v()
+ - Add metadata to Makefile.PL.
+ - No longer define USE_64_BIT_INT if ivtype is 'long'.
+ - Rename USE_64_BIT_INT #define to MATH_GMPF_NEED_LONG_LONG_INT
+ - PREREQ_PM => {'Exporter' => '5.58'} to avoid test failures on pre perl-5.8.4
+   (Thanks Peter Acklam.)
+
+0.39
+ - Additional tweaks to t/overload.t and t/use64bitint.t in relation to accommodating
+   the possibility that the underlying gmp library represents the decimal point with
+   a comma.
+
+0.38
+ - Fix t/new.t, t/overload.t, t/printf.t, t/test1.t, t/TRmpf_out_str.t, t/use64bitint.t
+   to accommodate the possibility that the underlying gmp library represents the decimal
+   point with a comma.
+
+0.37
+ - Add Math::GMPf::__GNU_MP_RELEASE.
+ - The gmp library incorrectly returns false for mpfr_fits_uint_p(x) for
+   -1.0 < x < 0.0. (This should be fixed in versions of gmp later than 5.1.1.)
+   Have Rmpf_fits_uint_p() return a correct result irrespective of the
+   version of gmp being used - and have the Math:GMPf test suite test for this.
+ - Alter V.xs to accommodate the possibility that the global constant gmp_version
+   has not been set in gmp.h. I've assumed this can only happen if the gmp
+   library version is earlier than 4.0.0. (The gmp ChangeLog indicates that this
+   is so.)
+ - Alter wrap_gmp_sprintf and wrap_gmp_snprintf to take an extra arg (length of
+   buffer to which we write).
+   This now means that Rmpf_sprintf and Rmpf_snprintf require an extra argument.
+ - Remove Rmpf_sprintf_ret and Rmpf_snprintf_ret. (These now seem pointless in
+   view of the changes to wrap_gmp_sprintf and wrap_gmp_snprintf.)
+ - No longer include inttypes.h on the basis of USE_LONG_DOUBLE being defined.
+   (Was harmless ... but didn't make much sense.)
+ - Define PERL_NO_GET_CONTEXT (in XS code).
+
+
+0.36
+ - Fix test 3i in new.t. (It wasn't allowing for the case where perl was built
+   with long double support, but ivsize was still 4.
+ - Alter the way that strEQ gets hold of HvNAME(SvSTASH(SvRV(sv))) - so that -Wall
+    doesn't emit "null argument" warnings. (Thanks Daniel Kahn Gillmor.)
+
+0.35
+ - Add Math::GMPf::V
+ - Add overload_inc and overload_dec functions.
+ - Accommodate cross-class overloaded arithmetic with Math::MPFR.
+
+0.34
+ - Remove 'not' from overloads. Apparently achieved nothing anyway, and 5.16
+   warns that it's invalid.
+
+0.33
+ - In the documentation, elaborate on the way that Math::GMPf::get_v() and
+   __GNU_MP_VERSION & friends determine their values. (Thanks Vincent Lefevre.)
+
+0.32
+ - Fix Random.xs so that it compiles with gmp-4 (not just gmp-5).
+   Thanks Rob Kuo (https://rt.cpan.org/Ticket/Display.html?id=58501)
+
+0.31
+ - Improved coverage of 'random' functions.
+
+0.30
+ - Add Rmpf_snprintf and Rmpf_snprintf_ret.
+ - Fix test 18 in test1.t. (It *was* checking the first 96 bits of two
+   64-bit numbers for equality ... which seems a bit dubious, and not
+   always guaranteed to succeed.)
+
+0.29
+ - 2 missing ';' in the XS file (subs ___GMP_CC and ___GMP_CFLAGS) meant
+   that version 0.28 wouldn't build with some compilers. Now fixed.
+ - If there's no variable to be formatted, Rmpf_(f/s)printf no longer
+   need to be supplied with a dummy variable.
+ - Some buggy tests in printf.t hopefully fixed.
+
+0.28
+ Requires gmp-4.2.0 or later
+ In response to bug http://rt.cpan.org/Ticket/Display.html?id=46499:
+ - Amendment to Makefile.PL wrt 'long long' and 'long double' support.
+ - Remove reliance on $Config{use64bitint} in t/new.t and t/out_str.t
+ - Add some MAC OS X notes to README and fix some typos.
+
+ In response to bug http://rt.cpan.org/Ticket/Display.html?id=46603
+ - In Rmpf_get_d_2exp, change data type of 'exp' from unsigned to signed,
+   and return exp as an IV not a UV.
+
+ In response to bug http://rt.cpan.org/Ticket/Display.html?id=46604
+ - Fix ___GMP__CC() and ___GMP_CFLAGS() so that they return undef
+   if __GMP_CC and __GMP_CFLAGS are not defined by the gmp library.
+
+ Thanks, Bob Kuo and Jonathan Leto.
+
+0.27
+ - Requires gmp-4.2.3 or later.
+ - Remove (the need for) INLINE.h.
+ - Change Rmpf_sprintf to return the number of characters written.
+ - Add __GNU_MP_VERSION, __GNU_MP_VERSION_MINOR, __GNU_MP_VERSION_PATCHLEVEL,
+   __GMP_CC and __GMP_CFLAGS
+ - Fix overload_copy sub so that the copy preserves the precision of the original.
+ - Change Rmpf_printf() so that, like its fprintf and sprintf counterparts,
+   it formats only one variable at a time.
+
+0.26
+ - Add Rmpf_fprintf, Rmpf_sprintf and Rmpf_sprintf_ret
+ - Finally fix (hopefully) the bug in the test1.t test script (that was
+   supposed to be fixed by the release of 0.25).
+
+0.25
+ - Fix bug in test1.t tests script that resulted in a reported
+   'make test' failure on many platforms.
+
+0.24
+ - Add TRmpf_out_str and TRmpf_inp_str.
+ - Rmpf_out_str now also takes an optional prefix argument.
+ - Remove the tests in the Makefile.PL that test for the presence of
+   a suitable compiler and GMP library.
+ - Minor bugfix to Rmpf_out_str. (Zero was being returned as '0.' and
+   therefore boolean "true".)
+
+0.15
+ - Fix bug in test suite. (Test 12 in test1.t improperly constructed.)
+ - Rewrite new().
+ - Rmpf_out_str() now takes an optional fourth argument - a string
+   that will be appended to the mpf_out_str() output. Also stdout is
+   fflush()'d each time Rmpf_out_str() is called.
+ - The overload functions and new() can now handle a long double value
+   correctly
+ - Rewrite Rmpf_get_str to start with a leading zero, and to use 'e'
+   instead of '@' (for bases <= 10).
+
+0.14
+ - First CPAN release
+ - No longer assign Exporter and DynaLoader to @Math::GMPf::ISA.
+ - Fix bug in tests 35, 26 and 37 in overload.t
+ - Add support for perls built with -Duse64bitint.
+ - add new() function/method to facilitate initialization/assignment
+

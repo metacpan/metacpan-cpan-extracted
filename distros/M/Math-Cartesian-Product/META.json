@@ -1,0 +1,36 @@
+{
+   "abstract" : "Generate the cartesian product of zero or more lists.",
+   "author" : [
+      "PhilipRBrenan@appaapps.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-Cartesian-Product",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      }
+   },
+   "provides" : {
+      "Math::Cartesian::Product" : {
+         "file" : "lib/Math/Cartesian/Product.pm",
+         "version" : "1.009"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.009"
+}

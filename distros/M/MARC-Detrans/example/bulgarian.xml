@@ -1,0 +1,1028 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes" ?>
+
+<config>
+
+        <!-- the language we are detransliterating -->
+        <language name="Bulgarian" code="bul" />
+        <script name="Cyrillic" code="(N" />
+	<!-- which fields/subfields to detransliterate -->
+        <detrans-fields>            
+            <field  tag="100">
+                <subfield code="a" />
+                <subfield code="q" />
+	<subfield code="d"  copy="true" />
+                <subfield code="n"  copy="true" />
+            </field> 
+            <field  tag="110">
+                <subfield code="a" />
+                <subfield code="b" />
+            </field> 
+            <field  tag="111">
+                <subfield code="a" />
+                <subfield code="e" />
+            </field> 
+            <field  tag="130">
+                <subfield code="a" />
+                <subfield code="p" />
+            </field> 
+            <field  tag="245">
+                <subfield code="a" />
+                <subfield code="b" />
+                <subfield code="p" />
+                <subfield code="c" />
+            </field> 
+            <field  tag="246">
+                <subfield code="a" />
+                <subfield code="b" />
+                <subfield code="p" />
+            </field> 
+            <field  tag="250">
+                <subfield code="a" />
+            </field> 
+            <field  tag="260">
+                <subfield code="a" />
+                <subfield code="b" />
+                <subfield code="c"  copy="true" />
+            </field> 
+            <field  tag="440">
+                <subfield code="a" />
+                <subfield code="p" />
+                <subfield code="v"  copy="true" />
+            </field>   
+            <field  tag="490">
+                <subfield code="a" />
+                <subfield code="v"  copy="true" />
+            </field> 
+            <field  tag="505">
+                <subfield code="a" />
+                <subfield code="t" />
+                <subfield code="g"  copy="true" />
+            </field> 
+            <field  tag="700">
+                <subfield code="a" />
+                <subfield code="q" />
+                <subfield code="t" />
+                <subfield code="p" />
+	<subfield code="d"  copy="true" />
+                <subfield code="n"  copy="true" />
+            </field>   
+            <field  tag="710">
+                <subfield code="a" />
+                <subfield code="q" />
+                <subfield code="t" />
+                <subfield code="p" />
+                <subfield code="n"  copy="true" />
+            </field>  
+            <field  tag="711">
+                <subfield code="a" />
+                <subfield code="e" />
+                <subfield code="t" />
+                <subfield code="p" />
+            </field> 
+            <field  tag="730">
+                <subfield code="a" />
+                <subfield code="p" />
+            </field> 
+            <field  tag="740">
+                <subfield code="a" />
+            </field> 
+            <field  tag="800">
+                <subfield code="a" />
+                <subfield code="q" />
+                <subfield code="t" />
+                <subfield code="p" />
+                <subfield code="n"  copy="true" />
+		<subfield code="d"  copy="true" />
+            </field>  
+            <field  tag="830">
+                <subfield code="a" />
+                <subfield code="p" />
+                <subfield code="n"  copy="true" />
+                <subfield code="v"  copy="true" />
+            </field> 
+        </detrans-fields> 
+
+        <!-- space character mapping -->
+        <rule>
+            <roman> </roman>
+            <marc escape="(N"> </marc>
+        </rule>
+        <!-- a single character mapping -->
+        <rule>
+            <roman>A</roman>
+            <marc escape="(N">a</marc>
+        </rule>
+        <rule>
+            <roman>a</roman>
+            <marc escape="(N">A</marc>
+        </rule>
+        <rule>
+            <roman>B</roman>
+            <marc escape="(N">b</marc>
+        </rule>
+        <rule>
+            <roman>b</roman>
+            <marc escape="(N">B</marc>
+        </rule>
+        <rule>
+            <roman>V</roman>
+            <marc escape="(N">w</marc>
+        </rule>
+        <rule>
+            <roman>v</roman>
+            <marc escape="(N">W</marc>
+        </rule>
+        <rule>
+            <roman>G</roman>
+            <marc escape="(N">g</marc>
+        </rule>
+        <rule>
+            <roman>g</roman>
+            <marc escape="(N">G</marc>
+        </rule>
+        <rule>
+            <roman>D</roman>
+            <marc escape="(N">d</marc>
+        </rule>
+        <rule>
+            <roman>d</roman>
+            <marc escape="(N">D</marc>
+        </rule>
+        <rule>
+            <roman>E</roman>
+            <marc escape="(N">e</marc>
+        </rule>
+        <rule>
+            <roman>e</roman>
+            <marc escape="(N">E</marc>
+        </rule>
+        <rule>
+            <roman>èE</roman>
+            <marc escape="(Q">D</marc>
+        </rule>
+        <rule>
+            <roman>èe</roman>
+            <marc escape="(Q">D</marc>
+        </rule>
+        <rule>
+            <roman>Zh</roman>
+            <marc escape="(N">v</marc>
+        </rule>
+        <rule>
+            <roman>zh</roman>
+            <marc escape="(N">V</marc>
+        </rule>
+        <rule>
+            <roman>Z</roman>
+            <marc escape="(N">z</marc>
+        </rule>
+        <rule>
+            <roman>z</roman>
+            <marc escape="(N">Z</marc>
+        </rule>
+        <rule>
+            <roman>I</roman>
+            <marc escape="(N">i</marc>
+        </rule>
+        <rule>
+            <roman>i</roman>
+            <marc escape="(N">I</marc>
+        </rule>
+        <rule>
+            <roman>æI</roman>
+            <marc escape="(N">j</marc>
+        </rule>
+        <rule>
+            <roman>æi</roman>
+            <marc escape="(N">J</marc>
+        </rule>
+        <rule>
+            <roman>æU</roman>
+            <marc escape="(Q">o</marc>
+        </rule>
+        <rule>
+            <roman>æu</roman>
+            <marc escape="(N">_</marc>
+        </rule>
+        <rule>
+            <roman>ïU</roman>
+            <marc escape="(Q">s</marc>
+        </rule>
+        <rule>
+            <roman>ïu</roman>
+            <marc escape="(Q">S</marc>
+        </rule>
+        <rule>
+            <roman>K</roman>
+            <marc escape="(N">k</marc>
+        </rule>
+        <rule>
+            <roman>k</roman>
+            <marc escape="(N">K</marc>
+        </rule>
+        <rule>
+            <roman>L</roman>
+            <marc escape="(N">l</marc>
+        </rule>
+        <rule>
+            <roman>l</roman>
+            <marc escape="(N">L</marc>
+        </rule>
+        <rule>
+            <roman>M</roman>
+            <marc escape="(N">m</marc>
+        </rule>
+        <rule>
+            <roman>m</roman>
+            <marc escape="(N">M</marc>
+        </rule>
+        <rule>
+            <roman>N</roman>
+            <marc escape="(N">n</marc>
+        </rule>
+        <rule>
+            <roman>n</roman>
+            <marc escape="(N">N</marc>
+        </rule>
+        <rule>
+            <roman>O</roman>
+            <marc escape="(N">o</marc>
+        </rule>
+        <rule>
+            <roman>o</roman>
+            <marc escape="(N">O</marc>
+        </rule>
+        <rule>
+            <roman>P</roman>
+            <marc escape="(N">p</marc>
+        </rule>
+        <rule>
+            <roman>p</roman>
+            <marc escape="(N">P</marc>
+        </rule>
+        <rule>
+            <roman>R</roman>
+            <marc escape="(N">r</marc>
+        </rule>
+        <rule>
+            <roman>r</roman>
+            <marc escape="(N">R</marc>
+        </rule>
+        <rule>
+            <roman>S</roman>
+            <marc escape="(N">s</marc>
+        </rule>
+        <rule>
+            <roman>s</roman>
+            <marc escape="(N">S</marc>
+        </rule>
+        <rule>
+            <roman>T</roman>
+            <marc escape="(N">t</marc>
+        </rule>
+        <rule>
+            <roman>t</roman>
+            <marc escape="(N">T</marc>
+        </rule>
+        <rule>
+            <roman>U</roman>
+            <marc escape="(N">u</marc>
+        </rule>
+        <rule>
+            <roman>u</roman>
+            <marc escape="(N">U</marc>
+        </rule>
+        <rule>
+            <roman>F</roman>
+            <marc escape="(N">f</marc>
+        </rule>
+        <rule>
+            <roman>f</roman>
+            <marc escape="(N">F</marc>
+        </rule>
+        <rule>
+            <roman>Kh</roman>
+            <marc escape="(N">h</marc>
+        </rule>
+        <rule>
+            <roman>kh</roman>
+            <marc escape="(N">H</marc>
+        </rule>
+        <rule>
+            <roman>ëTìS</roman>
+            <marc escape="(N">c</marc>
+        </rule>        
+        <rule>
+            <roman>ëTìs</roman>
+            <marc escape="(N">c</marc>
+        </rule>
+        <rule>
+            <roman>ëtìs</roman>
+            <marc escape="(N">C</marc>
+        </rule>
+        <rule>
+            <roman>Ch</roman>
+            <marc escape="(N">~</marc>
+        </rule>
+        <rule>
+            <roman>ch</roman>
+            <marc escape="(N">^</marc>
+        </rule>
+        <rule>
+            <roman>Sht</roman>
+            <marc escape="(N">}</marc>
+        </rule>
+        <rule>
+            <roman>sht</roman>
+            <marc escape="(N">]</marc>
+        </rule>
+        <rule>
+            <roman>Sh</roman>
+            <marc escape="(N">{</marc>
+        </rule>
+        <rule>
+            <roman>sh</roman>
+            <marc escape="(N">[</marc>
+        </rule>
+        <rule>
+            <roman>·</roman>
+            <marc escape="(N">_</marc>
+        </rule> 
+        <rule>
+            <roman>Y</roman>
+            <marc escape="(N">y</marc>
+        </rule>
+        <rule>
+            <roman>y</roman>
+            <marc escape="(N">Y</marc>
+        </rule>
+        <rule>
+            <roman>§</roman>
+            <marc escape="(N">X</marc>
+        </rule>
+        <rule>
+            <roman>ëIìE</roman>
+            <marc escape="(Q">p</marc>
+        </rule>
+        <rule>
+            <roman>ëIìe</roman>
+            <marc escape="(Q">p</marc>
+        </rule>
+        <rule>
+            <roman>ëiìe</roman>
+            <marc escape="(Q">P</marc>
+        </rule>
+        <rule>
+            <roman>çE</roman>
+            <marc escape="(N">|</marc>
+        </rule>
+        <rule>
+            <roman>çe</roman>
+            <marc escape="(N">\</marc>
+        </rule>
+        <rule>
+            <roman>ëIìU</roman>
+            <marc escape="(N">`</marc>
+        </rule>
+        <rule>
+            <roman>ëIìu</roman>
+            <marc escape="(N">`</marc>
+        </rule>
+        <rule>
+            <roman>ëiìu</roman>
+            <marc escape="(N">@</marc>
+        </rule>
+        <rule>
+            <roman>ëIìA</roman>
+            <marc escape="(N">q</marc>
+        </rule>
+        <rule>
+            <roman>ëIìa</roman>
+            <marc escape="(N">q</marc>
+        </rule> 
+        <rule>
+            <roman>ëiìa</roman>
+            <marc escape="(N">Q</marc>
+        </rule>
+        <!-- punctuation ... -->       
+        <rule>
+            <roman>!</roman>
+            <marc escape="(N">!</marc>
+        </rule>
+        <rule>
+            <roman>"</roman>
+            <marc escape="(N">"</marc>
+        </rule>
+        <rule>
+            <roman>#</roman>
+            <marc escape="(N">#</marc>
+        </rule>
+        <rule>
+            <roman>$</roman>
+            <marc escape="(N">$</marc>
+        </rule>
+        <rule>
+            <roman>%</roman>
+            <marc escape="(N">%</marc>
+        </rule>
+        <rule>
+            <roman>'</roman>
+            <marc escape="(N">'</marc>
+        </rule>
+       <rule>
+            <roman>(</roman>
+            <marc escape="(N">(</marc>
+       </rule>
+       <rule>
+            <roman>)</roman>
+            <marc escape="(N">)</marc>
+       </rule>
+       <rule>
+            <roman>*</roman>
+            <marc escape="(N">*</marc>
+       </rule>
+       <rule>
+            <roman>+</roman>
+            <marc escape="(N">+</marc>
+       </rule>
+       <rule>
+            <roman>,</roman>
+            <marc escape="(N">,</marc>
+       </rule>
+       <rule>
+            <roman>-</roman>
+            <marc escape="(N">-</marc>
+       </rule>
+       <rule>
+            <roman>.</roman>
+            <marc escape="(N">.</marc>
+       </rule>
+       <rule>
+            <roman>/</roman>
+            <marc escape="(N">/</marc>
+       </rule>
+       <rule>
+            <roman>0</roman>
+            <marc escape="(N">0</marc>
+       </rule>
+       <rule>
+            <roman>1</roman>
+            <marc escape="(N">1</marc>
+       </rule>
+       <rule>
+            <roman>2</roman>
+            <marc escape="(N">2</marc>
+       </rule>
+       <rule>
+           <roman>3</roman>
+            <marc escape="(N">3</marc>
+       </rule> 
+       <rule>
+            <roman>4</roman>
+            <marc escape="(N">4</marc>
+         </rule>
+         <rule>
+            <roman>5</roman>
+            <marc escape="(N">5</marc>
+         </rule>
+         <rule>
+            <roman>6</roman>
+            <marc escape="(N">6</marc>
+         </rule>
+         <rule>
+            <roman>7</roman>
+            <marc escape="(N">7</marc>
+         </rule>
+         <rule>
+            <roman>8</roman>
+            <marc escape="(N">8</marc>
+         </rule>
+         <rule>
+            <roman>9</roman>
+            <marc escape="(N">9</marc>
+         </rule>
+         <rule>
+            <roman>:</roman>
+            <marc escape="(N">:</marc>
+         </rule>
+         <rule>
+            <roman>;</roman>
+            <marc escape="(N">;</marc>
+         </rule>
+         <rule>
+            <roman>=</roman>
+            <marc escape="(N">=</marc>
+         </rule>
+         <rule>
+            <roman>?</roman>
+            <marc escape="(N">?</marc>
+         </rule>
+         <rule>
+            <roman>[</roman>
+            <marc escape="(Q">[</marc>
+         </rule>
+         <rule>
+            <roman>]</roman>
+            <marc escape="(Q">]</marc>
+         </rule>
+         <!-- Roman Numerals -->
+         <rule>
+            <roman> II </roman>
+            <marc escape="(B"> II </marc>
+         </rule>
+         <rule>
+            <roman> III </roman>
+            <marc escape="(B"> III </marc>
+         </rule>
+         <rule>
+            <roman> IV </roman>
+            <marc escape="(B"> IV </marc>
+         </rule>
+         <rule>
+            <roman> VI </roman>
+            <marc escape="(B"> VI </marc>
+        </rule>
+        <rule>
+            <roman> VII </roman>
+            <marc escape="(B"> VII </marc>
+        </rule>
+        <rule>
+            <roman>VIII</roman>
+            <marc escape="(B">VIII</marc>
+        </rule>
+        <rule>
+            <roman>X</roman>
+            <marc escape="(B">X</marc>
+       </rule>
+       <rule>
+            <roman>XI</roman>
+            <marc escape="(B">XI</marc>
+       </rule>
+       <rule>
+            <roman>XII</roman>
+            <marc escape="(B">XII</marc>
+       </rule>
+       <rule>
+            <roman>XIII</roman>
+            <marc escape="(B">XIII</marc>
+       </rule>
+       <rule>
+            <roman>XIV</roman>
+            <marc escape="(B">XIV</marc>
+       </rule>
+       <rule>
+            <roman>XV</roman>
+            <marc escape="(B">XV</marc>
+       </rule>
+       <rule>
+            <roman>XVI</roman>
+            <marc escape="(B">XVI</marc>
+       </rule>
+       <rule>
+            <roman>XVII</roman>
+            <marc escape="(B">XVII</marc>
+       </rule>
+       <rule>
+            <roman>XVIII</roman>
+            <marc escape="(B">XVIII</marc>
+       </rule>
+       <rule>
+            <roman>XIX</roman>
+            <marc escape="(B">XIX</marc>
+       </rule>
+       <rule>
+            <roman>XX</roman>
+            <marc escape="(B">XX</marc>
+       </rule>
+       <rule>
+            <roman>XXI</roman>
+            <marc escape="(B">XXI</marc>
+       </rule>
+       <rule>
+            <roman>Russia</roman>
+            <marc escape="(N">rOSSIQ</marc>
+       </rule>
+       <rule>
+            <roman>Michael</roman>
+            <marc escape="(N">mIHAIL</marc>
+       </rule>
+       <rule>
+            <roman>Moscow</roman>
+            <marc escape="(N">mOSKWA</marc>
+       </rule>
+       <rule>
+            <roman>St. Petersburg</roman>
+            <marc escape="(N">sANKT-pETERBURG</marc>
+       </rule>
+       <rule>
+            <roman>et al.</roman>
+            <marc escape="(N">I DR.</marc>
+       </rule>
+       <rule>
+            <roman>Short stories</roman>
+            <marc escape="(N">pOWESTI I RASSKAZY</marc>
+       </rule>
+        <!-- a single authority mapping -->
+
+       	<name>
+   	 	<roman>$aAfanasiæi, $cArchbishop of Kholmogory, $d1641-1702.</roman>
+    		<marc>$a^ESC(NaFANASIJ^ESCs, $c^ESC(NhOLMOGORSKIJ^ESCs, $d1641-1702.</marc>
+	</name>
+	<name>
+   	 	<roman>$aAleksei Mikhailovich, $cCzar of Russia, $d1629-1676.</roman>
+    		<marc>$a^ESC(NaLEKSEJ^ESCs ^ESC(NmIHAJLOWI^^ESCs, $c^ESC(NcARX^ESCs ^ESC(NwSEROSSIJSKIJ^ESCs, $d1629-1676.</marc>
+	</name>
+	<name>
+    		<roman>$aAlexander $bI, $cEmperor of Russia, $d1777-1825.</roman>
+    		<marc>$a^ESC(NaLEKSANDR^ESCs, $bI, $c^ESC(NiMPERATOR^ESCs ^ESC(NwSEROSSIJSKIJ^ESCs,  $d1777-1825.</marc>
+    	</name>
+  	<name>
+    		<roman>$aAlexander $bII, $cEmperor of Russia, $d1818-1881.</roman>
+    		<marc>$a^ESC(NaLEKSANDR^ESCs, $bII, $c^ESC(NiMPERATOR^ESCs ^ESC(NwSEROSSIJSKIJ^ESCs,  $d1818-1881.</marc>
+    	</name>
+    	<name>
+    		<roman>$aAlexander $bIII, $cEmperor of Russia, $d1845-1894.</roman>
+    		<marc>$a^ESC(NaLEKSANDR^ESCs, $bIII, $c^ESC(NiMPERATOR^ESCs ^ESC(NwSEROSSIJSKIJ^ESCs,  $d1845-1894.</marc>
+      	</name>
+  	<name>
+    		<roman>$aAlexandra, $cEmpress, consort of Nicholas I, Emperor of Russia, $d1798-1860.</roman>
+   		<marc>$a^ESC(NaLEKSANDRA^ESCs, $c^ESC(NiMPERATRICA^ESCs, ^ESC(NsUPRUGA^ESCs ^ESC(NnIKOLAQ^ESCs I, ^ESC(NiMPERATOR^ESCs ^ESC(NwSEROSSIJSKIJ^ESCs, $d11798-1860.</marc>
+	</name>
+  	<name>
+    		<roman>$aAlexandra, $cEmpress, consort of Nicholas II, Emperor of Russia, $d1872-1918.</roman>
+    		<marc>$a^ESC(NaLEKSANDRA^ESCs, $c^ESC(NiMPERATRICA^ESCs, ^ESC(NsUPRUGA^ESCs ^ESC(NnIKOLAQ^ESCs, II, ^ESC(NiMPERATOR^ESCs ^ESC(NwSEROSSIJSKIJ^ESCs, $d1872-1918.</marc>
+	</name>
+  	<name>
+    		<roman>$aAndreyev, Leonid, $d1871-1919.</roman>
+    		<marc>$a^ESC(NaNDREEW^ESCs, ^ESC(NlEONID^ESCs, $d1871-1919.</marc>
+	</name>
+  	<name>
+    		<roman>$aAnna, $cEmpress of Russia, $d1693-1740.</roman>
+    		<marc>$a^ESC(NaNNA^ESCs, $c^ESC(NiMPERATRICA^ESCs ^ESC(NwSEROSSIJSKAQ^ESCs, $d1693-1740.</marc>
+	</name>
+  	<name>
+   		<roman>$aBely, Andrey, $d1880-1934.</roman>
+    		<marc>$a^ESC(NbELYJ^ESCs, ^ESC(NaNDREJ^ESCs, $d1880-1934.</marc>
+	</name>
+  	<name>
+     		<roman>$aBenois, Alexandre, $d1870-1960</roman>
+    		<marc>$a^ESC(NbENUA^ESCs, ^ESC(NaLEKSANDR^ESCs ^ESC(NnIKOLAEWI~^ESCs, $d1870-1960</marc>
+	</name>
+  	<name>
+     		<roman>$aBoris Fyodorovich Godunov, $cCzar of Russia, $d1551 or 2-1605.</roman>
+    		<marc>$a^ESC(NbORIS^ESCs ^ESC(NfEDOROWI^^ESCs ^ESC(NgODUNOW^ESCs, $c^ESC(NcARX^ESCs ^ESC(NwSEROSSIJSKIJ^ESCs, $d1551 or 2-1605.</marc>
+	</name>
+  	<name>
+     		<roman>$aBrodsky, Joseph, $d1940-</roman>
+    		<marc>$a^ESC(NbRODSKIJ^ESCs, ^ESC(NiOSIF^ESCs, $d1940-</marc>
+  	</name>
+  	<name>
+     		<roman>$aBryusov Valery Yakovlevich, $d1873 1924.</roman>
+    		<marc>$a^ESC(NbR@SOW^ESCs, ^ESC(NwALERIJ^ESCs ^ESC(NqKOWLEWI^^ESCs, $d1873-1924.</marc>
+	</name>
+  	<name>
+     		<roman>$aCatherine $bI, $cEmpress of Russia, $d1684-1727.</roman>
+    		<marc>$aeKATERINA^ESCs, $bI, $c^ESC(NiMPERATRICA^ESCs ^ESC(NwSEROSSIJSKAQ^ESCs, $d1684-1727.</marc>
+	</name>
+  	<name>
+     		<roman>$aCatherine $bII, $cEmpress of Russia, $d1729-1796.</roman>
+    		<marc>$a^ESC(NeKATERINA^ESCs $bII, $c^ESC(NiMPERATRICA^ESCs ^ESC(NwSEROSSIJSKAQ^ESCs, $d1729-1796.</marc>
+	</name>
+  	<name>
+     		<roman>$aChaliapin, Fyodor Ivanovich, $d1873-1938.</roman>
+    		<marc>$a^ESC(N{ALQPIN^ESCs, ^ESC(NfEDOR^ESCs ^ESC(NiWANOWI^^ESCs, $d1873-1938.</marc>
+	</name>
+  	<name>
+     		<roman>$aChekhov, Michael, $d1891-1955.</roman>
+    		<marc>$a^ESC(N~EHOW^ESCs, ^ESC(NmIHAIL^ESCs, $d1873-1938.</marc>
+	</name>
+  	<name>
+     		<roman>$aChernyshevsky, Nikolay Gavrilovich, $d1828-1889.</roman>
+    		<marc>$a^ESC(N~ERNY[EWSKIJ^ESCs, ^ESC(NnIKOLAJ^ESCs ^ESC(NgAWRILOWI^^ESCs, $d1828-1889.</marc>
+	</name>
+  	<name>
+     		<roman>$aCui, César, $d1835-1918.</roman>
+    		<marc>$a^ESC(Nk@I^ESCs, ^ESC(NcEZARX^ESCs, $d1835-1918.</marc>
+  	</name>
+  	<name>
+     		<roman>$aCyril, $cSaint, Apostle of the Slavs, $dca. 827-869.</roman>
+    		<marc>$a^ESC(NkIRILL^ESCs, $c^ESC(NsWQTOJ^ESCs, ^ESC(NsLAWQNSKIJ^ESCs ^ESC(NPROSWETITELX^ESCs, $dca. 827-869.</marc>
+	</name>
+  	<name>
+    		<roman>$aDargomyzhski, Aleksandr Sergeevich, $d1813-1869.</roman>
+    		<marc>$a^ESC(NdARGOMYVSKIJ^ESCs, ^ESC(NaLEKSANDR^ESCs ^ESC(NsERGEEWI^^ESCs, $d1813-1869.</marc>
+	</name>
+  	<name>
+      		<roman>$aDiaghilev, Serge, $d1872-1929.</roman>
+     		<marc>$a^ESC(NdQGILEW^ESCs, ^ESC(NsERGEJ^ESCs, $d1872-1929.</marc>
+	</name>
+  	<name>
+     		<roman>$aDimitrii, Saint, Metropolitan of Rostov, $d1651-1709.</roman>
+    		<marc>$a^ESC(NdMITRIJ^ESCs, $c^ESC(NsWQTOJ^ESCs, ^ESC(NMITROPOLIT^ESCs ^ESC(NrOSTOWSKIJ^ESCs, $d1651-1709.</marc>
+	</name>
+  	<name>
+     		<roman>$aDostoyevsky, Fyodor, $d1821-1881.</roman>
+    		<marc>$a^ESC(NdOSTOEWSKIJ^ESCs, ^ESC(NfEDOR^ESCs, $d1821-1881.</marc>
+	</name>
+  	<name>
+     		<roman>$aEisenstein, Sergei, $d1898-1948.</roman>
+    		<marc>$a^ESC(N|JZEN[TEJN^ESCs, ^ESC(NsERGEJ^ESCs, $d1898-1948.</marc>
+	</name>
+  	<name>
+     		<roman>$aElizabeth, $cEmpress of Russia, $d1709-1762.</roman>
+    		<marc>$a^ESC(NeLISAWET^ESCs, $c^ESC(NiMPERATRICA^ESCs ^ESC(NwSEROSSIJSKAQ^ESCs, $d1709-1762.</marc>
+	</name>
+  	<name>
+     		<roman>$aFeofan, $cAbp. of Novgorod, $d1681-1736.</roman>
+    		<marc>$a^ESC(NfEOFAN^ESCs, $c^ESC(NePISKOP^ESCs ^ESC(NnOWGORODSKIJ^ESCs, $d1681-1736.</marc>
+	</name>
+  	<name>
+     		<roman>$aFokine, Michel, $d1880-1942.</roman>
+    		<marc>$a^ESC(NfOKIN^ESCs, ^ESC(NmIHAIL^ESCs, $d1880-1942.</marc>
+	</name>
+  	<name>
+     		<roman>$aFyodor $bI, $cCzar of Russia, $d1557-1598.</roman>
+    		<marc>$a^ESC(NfEODOR^ESCs, $bI, $c^ESC(NcARX^ESCs ^ESC(NwSEROSSIJSKIJ^ESCs, $d1557-1598.</marc>
+	</name>
+  	<name>
+     		<roman>$aFyodor $bIII, $cCzar of Russia, $d1661-1682.</roman>
+    		<marc>$a^ESC(NfEODOR^ESCs,  $bIII, $c^ESC(NcARX^ESCs ^ESC(NwSEROSSIJSKIJ^ESCs, $d1661-1682.</marc>
+	</name>
+  	<name>
+     		<roman>$aGorky, Maksim, $d1868-1936.</roman>
+    		<marc>$a^ESC(NgORXKIJ^ESCs, ^ESC(NmAKSIM^ESCs, $d1868-1936.</marc>
+	</name>
+  	<name>
+     		<roman>$aGriboyedov, Aleksandr Sergeyevich, $d1795-1829.</roman>
+    		<marc>$a^ESC(NgRIBOEDOW^ESCs, ^ESC(NaLEKSANDR^ESCs ^ESC(NsERGEEWI^^ESCs, $d1795-1829.</marc>
+	</name>
+  	<name>
+     		<roman>$aHerzen, Aleksandr, $d1812-1870.</roman>
+    		<marc>$a^ESC(NgERCEN^ESCs, ^ESC(NaLEKSANDR^ESCs, $d1812-1870.</marc>
+	</name>
+  	<name>
+     		<roman>$aIAroslav, $cGrand Duke of Kiev, $d978-1054.</roman>
+    		<marc>$a^ESC(qROSLAW^ESCs, $c^ESC(NWELIKIJ^ESCs ^ESC(NKNQZX^ESCs ^ESC(NkEWSKIJ^ESCs, $d978-1054.</marc>
+	</name>
+  	<name>
+     		<roman>$aIlarion, $cMetropolitan of Kiev, $dfl. 1037-1050.</roman>
+    		<marc>$a^ESC(NiLARION^ESCs, $c^ESC(NMITROPOLIT^ESCs ^ESC(NkIEWSKIJ^ESCs, $dfl. 1037-1050.</marc>
+	</name>
+  	<name>
+     		<roman>$aIvan, $bIV, $cCzar of Russia, $d1530-1584.</roman>
+    		<marc>$a^ESC(NiWAN^ESCs, $c^ESC(NcARX^ESCs ^ESC(NwSEROSSIJSKIJ^ESCs, $d1530-1584.</marc>
+	</name>
+  	<name>
+     		<roman>$aIvan, $bIII, $cGrand Duke of Russia, 1440-1505.</roman>
+    		<marc>$a^ESC(NiWAN^ESCs, $bIII, $c^ESC(NWELIKIJ^ESCs ^ESC(NKNQZX^ESCs ^ESC(NWSEQ^ESCs ^ESC(NrUSI^ESCs, $d1440-1505.</marc>
+  	</name>
+  	<name>
+     		<roman>$aIvan, $bV, Alekseevich, $cCzar of Russia, 1666-1696.</roman>
+    		<marc>$a^ESC(NiWAN^ESCs, $bV, ^ESC(NaLEKSEEWI^^ESCs, $c^ESC(NcARX^ESCs ^ESC(NwSEROSSIJSKIJ^ESCs, $d1661-1682.</marc>
+	</name>
+  	<name>
+     		<roman>$aIvan, $bVI, Antonovich, $cEmperor of Russia, $d1740-1764.</roman>
+    		<marc>$a^ESC(NiWAN^ESCs, $bVI, ^ESC(NaNTONOWI^^ESCs, $c^ESC(NiMPERATOR^ESCs ^ESC(NwSEROSSIJSKIJ^ESCs, $d1740-1764.</marc>		
+	</name>
+  	<name>
+     		<roman>$aJakobson, Roman, $d1896-</roman>
+    		<marc>$a^ESC(NqKOBSON^ESCs, ^ESC(NrOMAN^ESCs, $d1896-</marc>
+	</name>
+  	<name>
+     		<roman>$aKerensky, Aleksandr Fyodorovich, $d1881-1970.</roman>
+    		<marc>$a^ESC(NkERENSKIJ^ESCs, ^ESC(NaLEKSANDR^ESCs ^ESC(NfEDOROWI^^ESCs, $d1881-1970.</marc>
+	</name>
+  	<name>
+     		<roman>$aKirill, Saint, Bishop of Turov, 1130- ca.1182.</roman>
+    		<marc>$a^ESC(NkIRILL^ESCs, $c^ESC(NsWQTOJ^ESCs, ^ESC(NtUROWSKIJ^ESCs, $d1130-ca. 1182.</marc>
+	</name>
+  	<name>
+     		<roman>$aKozhinov, Vadim Valerianovich</roman>
+    		<marc>$a^ESC(NkOVINOW^ESCs, ^ESC(NwADIM ^ESC(NwALERQNOWI^^ESCs</marc>
+	</name>
+  	<name>
+     		<roman>$aLifar, Serge, $d1905-  </roman>
+    		<marc>$a^ESC(NlIFARX^ESCs, ^ESC(NsERGEJ^ESCs, $d1905-</marc>
+	</name>
+  	<name>
+     		<roman>$aLunacharsky, Anatoly Vasilievich, $d1875-1933.</roman>
+    		<marc>$a^ESC(NlUNA^ARSKIJ^ESCs, ^ESC(NaNATOLIJ^ESCs ^ESC(NwASILXEWI^^ESCs, $d1875-1933.</marc>
+	</name>
+  	<name>
+     		<roman>$aMakarii, $cSaint, Metropolitan of Moscow and All Russia, $d1482-1563.</roman>
+    		<marc>$a^ESC(NmAKARIJ^ESCs, $c^ESC(NsWQTOJ^ESCs, ^ESC(NmOSKOWSKIJ^ESCs ^ESC(NMITROPOLIT^ESCs ^ESC(NI^ESCs ^ESC(NWSEQ^ESCs ^ESC(NrUSI^ESCs, $d1482-1563.</marc>
+	</name>
+  	<name>
+     		<roman>$aMassine, Leonide, $c1896-</roman>
+    		<marc>$a^ESC(NmQSIN^ESCs, ^ESC(NlEONID^ESCs, $d1896-</marc>
+	</name>
+  	<name>
+     		<roman>$aMaximus, the Greek, Saint, $c1480-1556.</roman>
+    		<marc>$a^ESC(NmAKSIM^ESCs, $c^ESC(NgREK^ESCs, ^ESC(NsWQTOJ^ESCs, $d1480-1556.</marc>
+	</name>
+  	<name>
+     		<roman>$aMayakovsky, Vladimir, $d1893-1930.</roman>
+    		<marc>$a^ESC(NmAQKOWSKIJ^ESCs, ^ESC(NwLADIMIR^ESCs,$d1893-1930.</marc>
+	</name>
+  	<name>
+     		<roman>$aMedtner, Nikolay Karlovich, $d1880-1951.</roman>
+    		<marc>$a^ESC(NmETNER^ESCs, ^ESC(NnIKOLAJ^ESCs ^ESC(NkARLOWI^^ESCs, $d1880-1951.</marc>
+	</name>
+  	<name>
+     		<roman>$aMedvedev, Roy Aleksandrovich, $d1925-</roman>
+    		<marc>$a^ESC(NmEDWEDEW^ESCs, ^ESC(NrOJ^ESCs ^ESC(NaLEKSANDROWI^^ESCs, $d1925-</marc>
+	</name>
+  	<name>
+     		<roman>$aMerezhkovsky, Dmitry Sergeyevich, $d1865-1941.</roman>
+    		<marc>$a^ESC(NmEREVKOWSKIJ^ESCs, ^ESC(NdMITRIJ^ESCs ^ESC(NsERGEEWI^^ESCs, $d1865-1941.</marc>
+	</name>
+  	<name>
+     		<roman>$aMethodius, $cSaint, Apostle of the Slavs, $dca. 825-884 or 5.</roman>
+    		<marc>$aMefodii, $c^ESC(NsWQTOJ^ESCs, ^ESC(NsLAWQNSKIJ^ESCs ^ESC(NPROSWETITELX^ESCs, $dca. 825-884 or 5.</marc>
+	</name>
+  	<name>
+     		<roman>$aMichael, $cCzar of Russia, $d1596-1645.</roman>
+    		<marc>$a^ESC(NmIHAIL^ESCs, $c^ESC(NcARX^ESCs ^ESC(NwSEROSSIJSKIJ^ESCs, $d1661-1682.</marc>
+	</name>
+  	<name>
+     		<roman>$aMikhail Vsevolodovich, $cGrand Duke of Kiev, $dd. 1245.</roman>
+    		<marc>$a^ESC(NmIHAIL^ESCs ^ESC(NwSEWOLODOWI^^ESCs, $c^ESC(NWELIKIJ^ESCs ^ESC(NKNQZX^ESCs ^ESC(NkEWSKIJ^ESCs, $dd. 1245.</marc>
+	</name>
+  	<name>
+     		<roman>$aMirsky, D.S., $cPrince, $d1890-1939.</roman>
+    		<marc>$a^ESC(NmIRCKIJ^ESCs, ^ESC(Nd.s.^ESCs, $c^ESC(NkNQZX^ESCs, $d1890-1939.</marc>
+  	</name>
+  	<name>
+     		<roman>$aMolotov, Vyacheslav Mikhaylovich, $d1890-</roman>
+    		<marc>$a^ESC(NmOLOTOW^ESCs, ^ESC(NwQ^ESLAW^ESCs ^ESC(NmIHAJLOWI^^ESCs,$d1890-</marc>
+	</name>
+  	<name>
+     		<roman>$aMussorgsky, Modest Petrovich, $d1839-1881.</roman>
+    		<marc>$a^ESC(NmUSORGSKIJ^ESCs, ^ESC(NmODEST^ESCs ^ESC(NpETROWI^^ESCs  $d1839-1881.</marc>
+	</name>
+  	<name>
+     		<roman>$aNabokov, Nicolas, $d1903-</roman>
+    		<marc>$a^ESC(NnABOKOW^ESCs, ^ESC(NnIKOLAJ^ESCs, $d1903-</marc>
+	</name>
+  	<name>
+     		<roman>$aNicholas $bI, $cEmperor of Russia, $d1796-1855.</roman>
+    		<marc>$a^ESC(NnIKOLAJ^ESC[s, $bI, $c^ESC(NiMPERATOR^ESCs ^ESC(NwSEROSSIJSKIJ^ESCs, $d1796-1855.</marc>
+    	</name>
+  	<name>
+     		<roman>$aNicholas $bII, $cEmperor of Russia, $d1868-1918.</roman>
+    		<marc>$a^ESC(NnIKOLAJ^ESCs, $bII, $c^ESC(NiMPERATOR^ESCs ^ESC(NwSEROSSIJSKIJ^ESCs, $d1868-1918.</marc>
+	</name>
+  	<name>
+     		<roman>$aNijinsky, Waslaw, $d1890-1950.</roman>
+    		<marc>$a^ESC(NnIVINSKIJ^ESCs, ^ESC(NwACLAW^ESCs, $d1890-1950.</marc>
+	</name>
+  	<name>
+     		<roman>$aNikon, $cPatriarch of Moscow and of Russia, $d1605-1681.</roman>
+    		<marc>$a^ESC(NnIKON^ESCs, $c^ESC(NpATRIARH^ESCs ^ESC(NmOSKOWSKIJ^ESCs ^ESC(NWSEQ^ESCs ^ESC(NrOSSII^ESCs, $d1605-1681.</marc>
+	</name>
+  	<name>
+     		<roman>$aNureyev, Rudolf, $d1938-  </roman>
+    		<marc>$a^ESC(NnUREEW^ESCs, ^ESC(NrUDOLXF^ESCs, $d1938-</marc>
+  	</name>  
+  	<name>
+     		<roman>$aOstrovsky, Aleksandr Nikolaevich, $d1823-1886.</roman>
+    		<marc>$a^ESC(NoSTROWSKIJ^ESCs, ^ESC(NaLEKSANDR^ESCs ^ESC(NnIKOLAEWI^^ESCs, $d1823-1886.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aOstrovsky, Nikolay, $d1904-1936.</roman>
+    		<marc>$a^ESC(NoSTROWSKIJ^ESCs ^ESC(NnIKOLAJ^ESCs, $d1904-1936.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aPaul $bI, $cEmperor of Russia, $d1754-1801.</roman>
+    		<marc>$a^ESC(NpAWEL^ESCs, $bI, $c^ESC(NiMPERATOR^ESCs ^ESC(NwSEROSSIJSKIJ^ESCs, $d1754-1801.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aPaustovsky, Konstantin, $ d 1892-1968.</roman>
+    		<marc>$a^ESC(NpAUSTOWSKIJ^ESCs, ^ESC(NkONSTANTIN^ESCs, $ d 1892-1968.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aPeter $bI, $cEmperor of Russia, $d1672-1725.</roman>
+    		<marc>$a^ESC(NpETR^ESCs $bI, $c^ESC(NiMPERATOR^ESCs ^ESC(NwSEROSSIJSKIJ^ESCs, $d1672-1725.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aPeter $bII, $cEmperor of Russia, $d1715-1730.</roman>
+    		<marc>$a^ESC(NpETR^ESCs $bII, $c^ESC(NiMPERATOR^ESCs ^ESC(NwSEROSSIJSKIJ^ESCs, $d1715-1730.</marc>   		
+  	</name>  
+  	<name>
+     		<roman>$aPeter $bIII, $cEmperor of Russia, $d1728-1762.</roman>
+    		<marc>$a^ESC(NpETR^ESCs $bIII, $c^ESC(NiMPERATOR^ESCs ^ESC(NwSEROSSIJSKIJ^ESCs, $d1728-1762.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aProkofiev, Sergey, $d1891-1953.</roman>
+    		<marc>$a^ESC(NpROKOFXEW^ESCs, ^ESC(NsERGEJ^ESCs, $d1891-1953.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aRachmaninoff, Sergei, $d1873-1943.</roman>
+    		<marc>$a^ESC(NrAHMANINOW^ESCs, ^ESC(NsERGEJ^ESCs, $d1873-1943.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aRasputin, Grigori Efimovich, $dca. 1870-1916.</roman>
+    		<marc>$a^ESC(NrASPUTIN^ESCs, ^ESC(NgRIGORIJ^ESCs ^ESC(NeFIMOWI^^ESCs,  $dca. 1871-1916.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aRimsky-Korsakov, Nikolay, $d1844-1908.</roman>
+    		<marc>$a^ESC(NrIMSKIJ^ESCs-^ESC(NkORSAKOW^ESCs, ^ESC(NnIKOLAJ^ESCs, $d1844-1908.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aRussia (Federation)</roman>
+    		<marc>$a^ESC(NrOSSIJSKAQ^ESCs, ^ESC(NfEDERAcIQ^ESCs</marc>
+  	</name>  
+  	<name>
+     		<roman>$aScriabin, Aleksandr Nikolayevich, $d1872-1915.</roman>
+    		<marc>$a^ESC(NsKRQBIN^ESCs, ^ESC(NaLEKSANDR^ESCs ^ESC(NnIKOLAEWI^^ESCs, $d1872-1915.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aSerapion, $cBishop of Vladimir, $dd. 1275.</roman>
+    		<marc>$a^ESC(NsERAPION^ESCs, ^ESC(NwLADIMIRSKJ^ESCs $c^ESC(NePISKOP^ESCs ^ESC(NwLADIMIRSKIJ^ESCs, $dd. 1275.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aShlapentokh, Vladimir, $d1940-</roman>
+    		<marc>$a^ESC(N{ALENTOH^ESCs, ^ESC(NwLADIMIR^ESCs, $d1940-</marc>
+  	</name>  
+  	<name>
+     		<roman>$aShcharansky, Anatoly.</roman>
+    		<marc>$aS^ESC(N}ARANKIC^ESCs, ^ESC(NaNATOLIJ^ESCs.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aStravinsky, Igor, $d1882-1971.</roman>
+    		<marc>$a^ESC(NsTRAWINSKIJ^ESCs, ^ESC(NiGORX^ESCs, $d1882-1971.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aTchaikovsky, Peter Ilich, $d1840-1893.</roman>
+    		<marc>$a^ESC(N^AJKOWSKIJ^ESCs, ^ESC(NpETR^ESCs ^ESC(NiLXI^^ESCs, $d1840-1893.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aTheodosius, of the Caves, Saint, ca. 1008-1074.</roman>
+    		<marc>$a^ESC(NfEODOSIJ^ESCs, $c^ESC(NpE^ERSKIJ^ESCs, ^ESC(NsWQTOJ^ESCs$dca. 1008-1074.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aTolstoy, Aleksey Konstantinovich, $cgraf, $d1817-1875.</roman>
+    		<marc>$a^ESC(NtOLSTOJ^ESCs, ^ESC(NaLEKSEJ^ESCs ^ESC(NkONSTANTINOWI^^ESCs, $c^ESC(NGRAF^ESCs, $d1817-1875.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aTolstoy, Alexandra, $d1884-1979.</roman>
+    		<marc>$a^ESC(NtOLSTAQ^ESCs, ^ESC(NaLEKSANDRA^ESCs, $d1884-1979.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aTolstoy, Aleksey Nikolayevich, $cgraf, $d1883-1945.</roman>
+    		<marc>$a^ESC(NtOLSTOJ^ESCs, ^ESC(NaLEKSEJ^ESCs ^ESC(NnIKOLAEWI^^ESCs,  $c^ESC(NGRAF^ESCs,  $d1883-1945.</marc>
+    	</name>  
+  	<name>
+     		<roman>$aTolstoy, Leo, $cgraf, $d1828-1910.</roman>
+    		<marc>$a^ESC(NtOLSTOJ^ESCs, ^ESC(NlEW^ESCs, $c^ESC(NGRAF^ESCs, $d1828-1910.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aTopol, Edward, $d1938-</roman>
+    		<marc>$a^ESC(NtOPOLX^ESCs, ^ESC(N|DUARD^ESCs, $d1938-</marc>
+  	</name>  
+  	<name>
+     		<roman>$aTrotsky, Leon, $d1879-1940.</roman>
+    		<marc>$a^ESC(NtROCKIJ^ESCs, ^ESC(NlEW^ESCs,  $d1879-1940.</marc>
+  	</name>
+  	<name>
+     		<roman>$aTsypkin,Leonid, $d1926-198</roman>
+    		<marc>$a^ESC(NcYPKIN^ESCs, ^ESC(NlEONID^ESCs, $d1926-198</marc>
+  	</name>  
+  	<name>
+     		<roman>$aVasilii $bI, $cGrand Prince of Moscow, $d1371-1425.</roman>
+    		<marc>$a^ESC(NwASILIJ^ESCs $bI, $c^ESC(NWELIKIJ^ESCs ^ESC(NKNQZX^ESCs ^ESC(NmOSKOWSKIJ^ESCs, $d1371-1425.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aVasily $bII, $cGrand Prince of Moscow, $d1415-1462.</roman>
+    		<marc>$a^ESC(NwASILIJ^ESCs $bII, $c^ESC(NWELIKIJ^ESCs ^ESC(NKNQZX^ESCs ^ESC(NmOSKOWSKIJ^ESCs, $d1415-1462.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aVernadsky, George, $d1887-1973</roman>
+    		<marc>$a^ESC(NwERNADSKIJ^ESCs, ^ESC(NgEORGIJ^ESCs ^ESC(NwLADIMIROWI^^ESCs, $d1887-1973</marc>
+    	</name>  
+  	<name>
+     		<roman>$aVladimir Vsevolodovich,$cGrand Duke of Kiev, $d1053-1125.</roman>
+    		<marc>$a^ESC(NwLADIMIR^ESCs ^ESC(NwSEWOLODOWI^^ESCs, $c^ESC(NWELIKIJ^ESCs ^ESC(NKNQZX^ESCs ^ESC(NkEWSKIJ^ESCs, $d1053-1125.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aVladimir, $cGrand Duke of Kiev, $dca. 956-1015.</roman>
+    		<marc>$a^ESC(NwLADIMIR^ESCs, $c^ESC(NWELIKIJ^ESCs ^ESC(NKNQZX^ESCs ^ESC(NkEWSKIJ^ESCs, $dca. 956-1015.</marc>
+  	</name>  
+  	<name>
+     		<roman>$aVysotsky, Vladimir, $d1938-1980</roman>
+    		<marc>$a^ESC(NwYSOCKIJ^ESCs, ^ESC(NwLADIMIR^ESCs, $d1938-1980</marc>
+  	</name>  
+  	<name>
+     		<roman>$aYeltsin, Boris Nikolayevich, $d1931-</roman>
+    		<marc>$a^ESC(NeLXCIN^ESCs, ^ESC(NbORIS^ESCs ^ESC(NnIKOLAEWI^^ESCs, $d1931-</marc>
+  	</name>  
+  	<name>
+     		<roman>$aYevtushenko, Yevgeny Aleksandrovich, $d1933-</roman>
+    		<marc>$a^ESC(NeWTU[ENKO^ESCs, ^ESC(NeWGENIJ^ESCs ^ESC(NaLEKSANDROWI^^ESCs, $d1933-</marc>
+  	</name>  
+  	<name>
+     		<roman>$aZinoviev, Aleksandr, $d1922-</roman>
+    		<marc>$a^ESC(NzINOWXEW^ESCs, ^ESC(NaLEKSANDR^ESCs, $d1922-</marc>
+  	</name>
+     
+</config>

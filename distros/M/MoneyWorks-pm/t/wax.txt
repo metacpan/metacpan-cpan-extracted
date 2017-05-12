@@ -1,0 +1,2 @@
+WAX-C	Ceiling Wax
+WAX-F	Floor Wax

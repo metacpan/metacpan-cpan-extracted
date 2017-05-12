@@ -1,0 +1,36 @@
+Revision history for MooseX-ClassCompositor
+
+0.008     2013-10-20 16:02:57 America/New_York
+          replace Class::MOP::load_class with Class::Load
+
+0.007     2013-10-05 09:01:06 America/New_York
+          update bugtracker and repo metadata
+
+0.006     2012-11-11 10:01:51 America/New_York
+          replace some ->DOES with ->isa to work on 5.8 without further
+          shenanigans
+
+0.005     2012-10-09 22:42:13 America/New_York
+          make it possible to pass Moose::Meta::Role objects to ->class_for
+          (Thanks, Toby Inkster!)
+
+          ...also make it possible to forbid them again!
+
+0.004     2012-02-14 16:45:48 America/New_York
+          [CRITICAL BUG FIX]
+          apply metaroles before other roles, to avoid losing minor details
+          like method modifiers!
+
+0.003     2011-12-21 20:27:43 America/New_York
+          add the fixed_roles parameter
+
+0.002     2011-08-19 14:13:41 America/New_York
+          fix boneheaded arrangement of documentation; synopsis now comes FIRST
+          and is labeled "SYNOPSIS" instead of "ABSTRACT"
+
+          give MJD an author credit
+
+          thank Pobox.com for paying for me to write this
+
+0.001     2011-08-19 11:29:33 America/New_York
+          first release, split from internal Pobox projects

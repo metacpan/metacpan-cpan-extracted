@@ -1,0 +1,16 @@
+Revision history for Moonshine-Element
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.05   Update MANIFEST to fix failures
+
+0.06    03/02/2017
+        Add more base attributes, a set function and refactor tests to use Moonshine::Test.
+
+0.09    05/03/2017
+        Adds - get_element_by_id('')
+
+0.10    05/03/2017
+        Adds - get_element('', []) - get_elements('', []), get_elements_by_class(), get_elements_by_tag()
+       

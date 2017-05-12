@@ -1,0 +1,319 @@
+--- /home/test/src/mason/MasonX-Request-WithApacheSession-0.25/lib/MasonX/Request/WithApacheSession.pm	2004-02-11 08:46:34.000000000 -1000
++++ /home/test/src/mason/MasonX-Request-WithApache2Session/lib/MasonX/Request/WithApache2Session.pm	2004-03-21 22:36:31.971392320 -1000
+@@ -1,18 +1,22 @@
+-package MasonX::Request::WithApacheSession;
++package MasonX::Request::WithApache2Session;
+ 
+ use 5.005;
+ use strict;
+ 
+ use vars qw($VERSION @ISA);
+ 
+-$VERSION = '0.25';
++$VERSION = '0.04';
+ 
+ use Apache::Session;
++use Apache::RequestRec;
++use Apache::RequestUtil;
+ 
+ use HTML::Mason 1.16;
+ use HTML::Mason::Exceptions ( abbr => [ qw( param_error error ) ] );
+ use HTML::Mason::Request;
+ 
++use Data::Dumper;
++
+ use Exception::Class ( 'HTML::Mason::Exception::NonExistentSessionID' =>
+ 		       { isa => 'HTML::Mason::Exception',
+ 			 description => 'A non-existent session id was used',
+@@ -48,7 +52,7 @@
+ 
+       session_cookie_name =>
+       { type => SCALAR,
+-	default => 'MasonX-Request-WithApacheSession-cookie',
++	default => 'MasonX-Request-WithApache2Session-cookie',
+ 	descr => 'Name of cookie used by this module' },
+ 
+       session_cookie_expires =>
+@@ -201,7 +205,7 @@
+ 
+ # What set of parameters are required for each session class.
+ # Multiple array refs represent multiple possible sets of parameters
+-my %ApacheSessionParams =
++my %Apache2SessionParams =
+     ( Flex     => [ [ qw( store lock generate serialize ) ] ],
+       MySQL    => [ [ qw( data_source user_name password
+                           lock_data_source lock_user_name lock_password ) ],
+@@ -214,20 +218,20 @@
+       PHP      => [ [ qw( save_path ) ] ],
+     );
+ 
+-$ApacheSessionParams{Oracle} =
+-      $ApacheSessionParams{Sybase} =
+-      $ApacheSessionParams{Postgres};
++$Apache2SessionParams{Oracle} =
++      $Apache2SessionParams{Sybase} =
++      $Apache2SessionParams{Postgres};
+ 
+-my %OptionalApacheSessionParams =
++my %OptionalApache2SessionParams =
+     ( Sybase => [ [ qw( textsize ) ] ],
+       Oracle => [ [ qw( long_read_len ) ] ],
+     );
+ 
+-my %ApacheSessionFlexParams =
++my %Apache2SessionFlexParams =
+     ( store =>
+       { MySQL    => [ [ qw( data_source user_name password ) ],
+ 		      [ qw( handle ) ] ],
+-	Postgres => $ApacheSessionParams{Postgres},
++	Postgres => $Apache2SessionParams{Postgres},
+ 	File     => [ [ qw( directory ) ] ],
+ 	DB_File  => [ [ qw( file_name ) ] ],
+       },
+@@ -250,11 +254,11 @@
+       },
+     );
+ 
+-$ApacheSessionFlexParams{store}{Oracle} =
+-      $ApacheSessionFlexParams{store}{Sybase} =
+-      $ApacheSessionFlexParams{store}{Postgres};
++$Apache2SessionFlexParams{store}{Oracle} =
++      $Apache2SessionFlexParams{store}{Sybase} =
++      $Apache2SessionFlexParams{store}{Postgres};
+ 
+-my %OptionalApacheSessionFlexParams =
++my %OptionalApache2SessionFlexParams =
+     ( Sybase => { store => [ qw( textsize ) ] },
+       Oracle => { store => [ qw( long_read_len ) ] },
+     );
+@@ -270,12 +274,12 @@
+     ( map { $_ => _studly_form($_) }
+       map { ref $_ ? @$_ :$_ }
+       map { @$_ }
+-      ( values %ApacheSessionParams ),
+-      ( values %OptionalApacheSessionParams ),
+-      ( map { values %{ $ApacheSessionFlexParams{$_} } }
+-	keys %ApacheSessionFlexParams ),
+-      ( map { values %{ $OptionalApacheSessionFlexParams{$_} } }
+-	keys %OptionalApacheSessionFlexParams ),
++      ( values %Apache2SessionParams ),
++      ( values %OptionalApache2SessionParams ),
++      ( map { values %{ $Apache2SessionFlexParams{$_} } }
++	keys %Apache2SessionFlexParams ),
++      ( map { values %{ $OptionalApache2SessionFlexParams{$_} } }
++	keys %OptionalApache2SessionFlexParams ),
+     );
+ 
+ # why Apache::Session does this I do not know
+@@ -286,8 +290,8 @@
+ 
+     my $class = shift;
+ 
+-    $class->alter_superclass( $HTML::Mason::ApacheHandler::VERSION ?
+-                              'HTML::Mason::Request::ApacheHandler' :
++    $class->alter_superclass( $MasonX::Apache2Handler::VERSION ?
++                              'MasonX::Request::Apache2Handler' :
+                               $HTML::Mason::CGIHandler::VERSION ?
+                               'HTML::Mason::Request::CGI' :
+                               'HTML::Mason::Request' );
+@@ -317,7 +321,7 @@
+     $self->{session_class_piece} = $self->{session_class};
+     $self->{session_class_piece} =~ s/^Apache::Session:://;
+ 
+-    my $sets = $ApacheSessionParams{ $self->{session_class_piece} }
++    my $sets = $Apache2SessionParams{ $self->{session_class_piece} }
+ 	or param_error "Invalid session class: $self->{session_class}";
+ 
+     my $complete = $self->_check_sets($sets);
+@@ -327,10 +331,10 @@
+ 
+     if ( $self->{session_class_piece} eq 'Flex' )
+     {
+-	foreach my $key ( keys %ApacheSessionFlexParams )
++	foreach my $key ( keys %Apache2SessionFlexParams )
+ 	{
+ 	    my $subclass = $self->{"session_$key"};
+-	    my $sets = $ApacheSessionFlexParams{$key}{$subclass}
++	    my $sets = $Apache2SessionFlexParams{$key}{$subclass}
+ 		or param_error "Invalid class for $key: $self->{$key}";
+ 
+ 	    my $complete = $self->_check_sets($sets);
+@@ -362,27 +366,27 @@
+     my %params;
+ 
+     $self->_sets_to_params
+-	( $ApacheSessionParams{ $self->{session_class_piece} },
++	( $Apache2SessionParams{ $self->{session_class_piece} },
+ 	  \%params );
+ 
+     $self->_sets_to_params
+-	( $OptionalApacheSessionParams{ $self->{session_class_piece} },
++	( $OptionalApache2SessionParams{ $self->{session_class_piece} },
+ 	  \%params );
+ 
+ 
+     if ( $self->{session_class_piece} eq 'Flex' )
+     {
+-	foreach my $key ( keys %ApacheSessionFlexParams )
++	foreach my $key ( keys %Apache2SessionFlexParams )
+ 	{
+ 	    my $subclass = $self->{"session_$key"};
+ 	    $params{ $StudlyForm{$key} } = $subclass;
+ 
+ 	    $self->_sets_to_params
+-		( $ApacheSessionFlexParams{$key}{$subclass},
++		( $Apache2SessionFlexParams{$key}{$subclass},
+ 		  \%params );
+ 
+ 	    $self->_sets_to_params
+-		( $OptionalApacheSessionFlexParams{$key}{$subclass},
++		( $OptionalApache2SessionFlexParams{$key}{$subclass},
+ 		  \%params );
+ 	}
+     }
+@@ -397,7 +401,9 @@
+             unless ($@)
+             {
+                 $self->{cookie_class} = 'Apache::Cookie';
+-                $self->{new_cookie_args} = [ $self->apache_req ];
++                $self->{new_cookie_args} =
++		    [ $self->apache_req->can( 'env' ) ?
++		      $self->apache_req->env : $self->apache_req ];
+             }
+         }
+ 
+@@ -517,7 +523,11 @@
+ {
+     my $self = shift;
+ 
+-    my %c = $self->{cookie_class}->fetch;
++    my %c = $self->{cookie_class} eq 'Apache::Cookie' ?
++	$self->{cookie_class}->fetch
++	( $self->apache_req->can( 'env' ) ?
++	  $self->apache_req->env : $self->apache_req ) :
++	$self->{cookie_class}->fetch ;
+ 
+     return $c{ $self->{session_cookie_name} }->value
+         if exists $c{ $self->{session_cookie_name} };
+@@ -577,14 +587,14 @@
+         if ( $self->can('apache_req') )
+         {
+             # works when we're a subclass of
+-            # HTML::Mason::Request::ApacheHandler
+-            $self->apache_req->err_header_out( 'Set-Cookie' => $cookie );
++            # MasonX::Request::Apache2Handler
++            $self->apache_req->err_headers_out->{'Set-Cookie'} = $cookie;
+         }
+         elsif ( $self->can('cgi_request') )
+         {
+             # works when we're a subclass of
+             # HTML::Mason::Request::CGIHandler
+-            $self->cgi_request->header_out( 'Set-Cookie' => $cookie );
++            $self->cgi_request->headers_out->{ 'Set-Cookie' } = $cookie;
+         }
+         else
+         {
+@@ -680,27 +690,25 @@
+ 
+ =head1 NAME
+ 
+-MasonX::Request::WithApacheSession - Add a session to the Mason Request object
++MasonX::Request::WithApache2Session - Add a session to the Mason Request object
+ 
+ =head1 SYNOPSIS
+ 
+ In your F<httpd.conf> file:
+ 
+-  PerlSetVar  MasonRequestClass            MasonX::Request::WithApacheSession
+-  PerlSetVar  MasonSessionCookieDomain     .example.com
+-  PerlSetVar  MasonSessionClass            Apache::Session::File
+-  PerlSetVar  MasonSessionDirectory        /tmp/sessions/data
+-  PerlSetVar  MasonSessionLockDirectory    /tmp/sessions/locks
++  PerlSetVar  MasonRequestClass         MasonX::Request::WithApache2Session
++  PerlSetVar  MasonSessionCookieDomain  .example.com
++  PerlSetVar  MasonSessionClass         Apache::Session::MySQL
++  PerlSetVar  MasonSessionDataSource    dbi:mysql:somedb
+ 
+-Or when creating an ApacheHandler object:
++Or when creating an Apache2Handler object:
+ 
+   my $ah =
+-      HTML::Mason::ApacheHandler->new
+-          ( request_class => 'MasonX::Request::WithApacheSession',
+-            session_cookie_domain  => '.example.com',
+-            session_class          => 'Apache::Session::File',
+-            session_directory      => '/tmp/sessions/data',
+-            session_lock_directory => '/tmp/sessions/locks',
++      MasonX::Apache2Handler->new
++          ( request_class => 'MasonX::Request::WithApache2Session',
++            session_cookie_domain => '.example.com',
++            session_class         => 'Apache::2Session::MySQL',
++            session_data_source   => 'dbi:mysql:somedb',
+           );
+ 
+ In a component:
+@@ -710,6 +718,22 @@
+ 
+ =head1 DESCRIPTION
+ 
++B<MasonX::Request::WithApache2Session is experimental ( beta ) and
++should only be used in a test environment.>
++
++MasonX::Request::WithApache2Session is a clone of
++MasonX::Request::WithApacheSession
++changed to work under a pure mod_perl2 environment. The external
++interface is unchanged, see L<MasonX::Request::WithApacheSession>.
++
++The actual changes I made can be found in the distribution in
++B<diff/WithApacheSession.diff> ( made with 'diff -Naru' ... ).
++
++A HOWTO for MasonX::Apache2Handler and friends may be found at
++L<Mason-with-mod_perl2>.
++
++The following documentation is from MasonX::Request::WithApacheSession, 
++
+ This module integrates C<Apache::Session> into Mason by adding methods
+ to the Mason Request object available in all Mason components.
+ 
+@@ -721,12 +745,12 @@
+ requests.  This can be done in one of two ways.  If you are
+ configuring Mason via your F<httpd.conf> file, simply add this:
+ 
+-  PerlSetVar  MasonRequestClass  MasonX::Request::WithApacheSession
++  PerlSetVar  MasonRequestClass  MasonX::Request::WithApache2Session
+ 
+ If you are using a F<handler.pl> file, simply add this parameter to
+ the parameters given to the ApacheHandler constructor:
+ 
+-  request_class => 'MasonX::Request::WithApacheSession'
++  request_class => 'MasonX::Request::WithApache2Session'
+ 
+ =head1 METHODS
+ 
+@@ -997,10 +1021,25 @@
+ 
+ =head1 AUTHOR
+ 
++Beau E. Cox <mason@beaucox.com> L<http://beaucox.com>.
++
++The real authors (I just made mod_perl2 changes) is
+ Dave Rolsky, <autarch@urth.org>
+ 
++Version 0.01 as of January, 2004.
++
+ =head1 SEE ALSO
+ 
+-HTML::Mason
++My documents, including:
++L<HOWTO Run Mason with mod_perl2|Mason-with-mod_perl2>,
++L<MasonX::Apache2Handler|Apache2Handler>,
++L<MasonX::Request::WithMulti2Session|WithMulti2Session>,
++
++Original Mason documents, including:
++L<HTML::Mason::ApacheHandler|ApacheHandler>,
++L<MasonX::Request::WithApacheSession|WithApacheSession>,
++L<MasonX::Request::WithMultiSession|WithMultiSession>.
++
++Also see the Mason documentation at L<http://masonhq.com/docs/manual/>.
+ 
+ =cut

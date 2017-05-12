@@ -1,0 +1,28 @@
+.mon-line, .mon-header-line {
+   vertical-align:text-top;
+}
+.mon-header-line {
+   font-weight: bold;
+   background: grey;
+}
+.mon-line-ok {
+   background: lightgreen;
+}
+.mon-line-warning {
+   background: lightblue;
+}
+.mon-line-critical, .mon-line-unknown, .mon-line-fatal {
+   background: red;
+   color: yellow;
+}
+.mon-date {
+   white-space: nowrap;
+}
+.mon-date, .mon-service, .mon-code, .mon-msg, .mon-header-date, .mon-header-service, .mon-header-code, .mon-header-msg {
+   padding: 3px;
+}
+.mon-caption {
+   color: brown;
+   font-style: italid;
+   font-size: 80%;
+}

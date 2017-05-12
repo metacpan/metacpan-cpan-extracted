@@ -1,0 +1,23 @@
+NAME
+    Maypole::Plugin::Upload - Handle file uploads in Maypole
+
+SYNOPSIS
+      my %upload = $r->upload('file');
+      return unless $upload{mimetype} =~ m|^image/|;
+
+DESCRIPTION
+    This plugin adds a upload method to your Maypole request object to allow
+    you to access file uploads in a platform neutral way.
+
+METHODS
+    upload
+        This method takes the form name as parameter, and returns either a
+        hash with 'content', 'filename' and 'mimetype', or the content if
+        used in scalar context.
+
+AUTHOR
+    Marcus Ramberg "marcus@thefeed.no"
+
+LICENSE
+    You may distribute this code under the same terms as Perl itself.
+

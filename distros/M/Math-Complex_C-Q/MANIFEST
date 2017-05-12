@@ -1,0 +1,25 @@
+Makefile.PL
+MANIFEST
+README
+Changes
+Q.pm
+Q.xs
+quad.in
+try.in
+t/01load.t
+t/abs_arg.t
+t/bool.t
+t/arith.t
+t/conj_proj.t
+t/log_exp.t
+t/new.t
+t/new_F128.t
+t/nnum.t
+t/overload_string.t
+t/overload_xtra.t
+t/pow.t
+t/prec.t
+t/nan.t
+t/trig.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

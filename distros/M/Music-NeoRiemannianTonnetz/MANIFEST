@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+SIGNATURE
+eg/nrt-normalize-notes
+eg/nrt-primes-to-normalized
+eg/nrt-study-setclass
+lib/Music/NeoRiemannianTonnetz.pm
+t/Music-NeoRiemannianTonnetz.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,26 @@
+#ifndef MARPAWRAPPER_CONFIG_H
+#define MARPAWRAPPER_CONFIG_H
+
+#cmakedefine C_INLINE @C_INLINE@
+#cmakedefine C_INLINE_IS_INLINE @C_INLINE_IS_INLINE@
+#cmakedefine NULL_IS_ZEROES @NULL_IS_ZEROES@
+#cmakedefine C_VA_COPY @C_VA_COPY@
+#cmakedefine C_VSNPRINTF @C_VSNPRINTF@
+
+#ifndef __cplusplus
+#  ifndef C_INLINE
+#    define inline
+#  else
+#    ifndef C_INLINE_IS_INLINE
+/* Next line is never executed when inline is "inline" */
+#      define inline @C_INLINE@
+#    endif
+#  endif
+#endif
+
+#cmakedefine SIZEOF_SIZE_T @SIZEOF_SIZE_T@
+#ifndef SIZEOF_SIZE_T
+#define size_t unsigned int
+#endif
+
+#endif /* MARPAWRAPPER_CONFIG_H */

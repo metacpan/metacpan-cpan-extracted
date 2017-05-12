@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:                Module-Depends-Tree
+version:             1.00
+abstract:            A container for functions for the deptree program
+license:             unknown
+generated_by:        ExtUtils::MakeMaker version 6.30_01
+author:              Andy Lester <andy@petdance.com>
+distribution_type:   module
+requires:     
+    Archive::Extract:              0
+    CPANPLUS::Backend:             0
+    ExtUtils::Command:             0
+    Getopt::Long:                  0
+    LWP::UserAgent:                0
+    Module::CoreList:              0
+    Module::Depends:               0
+    Module::Depends::Intrusive:    0
+    Test::More:                    0
+meta-spec:
+    url: <http://module-build.sourceforge.net/META-spec-new.html>;
+    version: 1.1

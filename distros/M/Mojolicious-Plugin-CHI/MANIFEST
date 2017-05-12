@@ -1,0 +1,13 @@
+lib/Mojolicious/Plugin/CHI.pm
+lib/Mojolicious/Plugin/CHI/chi.pm
+t/CHI.t
+t/CHI-File.t
+t/CHI-Log.t
+t/CHI-Command.t
+t/CHI-NoIOLoop.t
+Changes
+MANIFEST
+LICENSE
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

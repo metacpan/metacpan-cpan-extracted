@@ -1,0 +1,53 @@
+---
+abstract: 'Parses a custom Mojo template file format (deprecated)'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  Data::Dump::Streamer: '2.37'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Deep: '0.110'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, Dist::Iller version 0.1202, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MojoX-CustomTemplateFileParser
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  MojoX::CustomTemplateFileParser:
+    file: lib/MojoX/CustomTemplateFileParser.pm
+    version: '0.1002'
+  MojoX::CustomTemplateFileParser::Plugin::To::Html:
+    file: lib/MojoX/CustomTemplateFileParser/Plugin/To/Html.pm
+    version: '0.1002'
+  MojoX::CustomTemplateFileParser::Plugin::To::Pod:
+    file: lib/MojoX/CustomTemplateFileParser/Plugin/To/Pod.pm
+    version: '0.1002'
+  MojoX::CustomTemplateFileParser::Plugin::To::Test:
+    file: lib/MojoX/CustomTemplateFileParser/Plugin/To/Test.pm
+    version: '0.1002'
+requires:
+  HTML::Entities: '3.65'
+  Moose: '2.12'
+  MooseX::Object::Pluggable: '0.0013'
+  Path::Tiny: '0.050'
+  Storable: '2.24'
+  perl: '5.014000'
+resources:
+  bugtracker: https://github.com/Csson/p5-mojox-customtemplatefileparser/issues
+  homepage: https://metacpan.org/release/MojoX-CustomTemplateFileParser
+  repository: https://github.com/Csson/p5-mojox-customtemplatefileparser.git
+version: '0.1002'
+x_deprecated: 1

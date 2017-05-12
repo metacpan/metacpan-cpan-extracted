@@ -1,0 +1,320 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use Module::Changes;
+use Getopt::Attribute;
+use Pod::Usage;
+use Perl::Version;
+
+
+our $VERSION = '0.05';
+
+
+sub usage ($;$$) {
+    my ($message, $exitval, $verbose) = @_;
+
+    # make sure there's exactly one newline;
+    1 while chomp $message;
+    $message .= "\n";
+
+    $exitval ||= 1;
+    $verbose ||= 2;
+
+    pod2usage({
+        -message => $message,
+        -exitval => $exitval,
+        -verbose => $verbose,
+        -output  => \*STDERR
+    });
+}
+
+
+our $filename       : Getopt(file|f=s);
+our $new_file       : Getopt(new|n);    # don't read from file
+our $show_entire    : Getopt(show|s);   # don't write to file
+
+our $add_revision   : Getopt(ar);
+our $add_version    : Getopt(av);
+our $add_subversion : Getopt(as);
+our $add_alpha      : Getopt(aa);
+our $set_version    : Getopt(sv=s);   # of the newest release
+
+our $add_change     : Getopt(ac=s);   # from newest release
+our $add_tag        : Getopt(at=s);   # to newest release
+our $remove_tag     : Getopt(rt=s);   # from newest release
+our $author         : Getopt(au=s);
+our $touch_date     : Getopt(td);
+our $name           : Getopt(name=s);
+
+our $format_yaml    : Getopt(fy);
+our $format_free    : Getopt(ff);
+
+our $help           : Getopt(help|h);
+
+pod2usage(-verbose => 2, -exitval => 0) if $help || Getopt::Attribute->error;
+
+$_ ||= 0 for
+    $add_revision, $add_version, $add_subversion, $add_alpha,
+    $format_yaml, $format_free, $new_file, $show_entire;
+
+if (defined($filename) && $new_file && $show_entire) {
+    usage '--file has no effect because both --new and --show are used.';
+}
+
+$filename = 'Changes' unless defined $filename;
+
+if ($add_revision + $add_version + $add_subversion + $add_alpha > 1) {
+    usage 'Use only one of --ar, --av, --as and --aa.';
+}
+
+if ($format_yaml + $format_free > 1) {
+    usage 'Use only one of --fy and --ff.';
+}
+
+my $changes;
+
+if ($new_file) {
+    $changes = Module::Changes->make_object_for_type('entire');
+    my $release = Module::Changes->make_object_for_type('release');
+    $release->version(Perl::Version->new('0.01'));
+    $release->touch_date;
+    $changes->releases_unshift($release);
+} else {
+    my $parser = Module::Changes->make_object_for_type('parser_yaml');
+    $changes = $parser->parse_from_file($filename);
+}
+
+# first handle new revisions/versions/...
+
+$changes->add_new_revision   if $add_revision;
+$changes->add_new_version    if $add_version;
+$changes->add_new_subversion if $add_subversion;
+$changes->add_new_alpha      if $add_alpha;
+
+
+# Now handle added changes or tags so if you combine with adding a version,
+# you can add a change to it in the same application call
+
+$changes->newest_release->changes_push($add_change) if $add_change;
+$changes->newest_release->tags_push($add_tag)       if $add_tag;
+$changes->newest_release->remove_tag($remove_tag)   if $remove_tag;
+$changes->newest_release->author($author)           if $author;
+$changes->newest_release->touch_date                if $touch_date;
+$changes->name($name)                               if $name;
+
+$changes->newest_release->version(Perl::Version->new($set_version))
+    if $set_version;
+
+
+# At the end, we format the changes object
+
+my $format_type = 'formatter_yaml';    # default
+$format_type = 'formatter_free' if $format_free;
+
+my $did_change_something = 0;
+for ($add_revision, $add_version, $add_subversion, $add_alpha,
+    $set_version, $add_change, $add_tag, $remove_tag, $author,
+    $touch_date, $name) {
+
+    # if the option is defined and something else than '0', it's a change
+
+    next unless defined && /^(?!0)./;
+    $did_change_something++;
+}
+
+my $formatter = Module::Changes->make_object_for_type($format_type);
+if ($show_entire || !$did_change_something) {
+    print $formatter->format($changes);
+} else {
+    $formatter->format_to_file($changes, $filename);
+}
+
+__END__
+
+=head1 NAME
+
+changes - interact with the Changes file
+
+=head1 SYNOPSIS
+
+    changes -av -at APIBREAK -ac "Complete rewrite"
+
+=head1 DESCRIPTION
+
+You can use this program to interact with a Changes file. Basically it first
+either reads an existing Changes file or creates a new one, then manipulates
+it, then either stores the results back in the file or displays it on STDOUT.
+
+To make the Changes file machine-readble, YAML is used as the Changes file
+format. See Module::Changes for a discussion of the YAML schema used for the
+Changes file, and for the definition of the terms I<revision>, I<version>,
+I<subversion> and I<alpha>.
+
+All is explained in the documentation of the command-line options.
+
+=head1 COMMAND-LINE OPTIONS
+
+=over 4
+
+=item --file <file>, -f <file>
+
+The filename of the Changes file you would like to interact with. The C<--new>
+and C<--show> options influence how this is used. Normally the Changes file is
+read, manipulated, and overwritten. If you omit this argument, the filename
+C<Changes> in the current directory is used.
+
+If you use both C<--new> and C<--show>, the C<--file> won't have any effect
+and the program exits with a corresponding error message.
+
+=item --new, -n
+
+Don't read from the file indicated by C<--file>, but create a new Changes
+file. It will have a default release. Unless you also use the C<--sv> option,
+its release number will be C<v0.01>. You can still use the other options
+like C<--au>, C<--ac> and so forth to manipulate that first release.
+
+=item --show, -s
+
+Don't write to the file indicated by C<--file>, but print the results to
+STDOUT.
+
+=item --ar
+
+Add a new release. Its version number is taken from the previously most recent
+release, increased to the next revision. Its author is also taken from the the
+previous release.
+
+For example, if the previous release was version C<v0.02>, the new release
+will be version C<v1.00>.
+
+=item --av
+
+Add a new release. Its version number is taken from the previous release,
+increased to the next version. Its author is also taken from the the
+previous release.
+
+For example, if the previous release was version C<v0.02>, the new release
+will be version C<v0.03>. If it was C<v0.02_01>, it will still be C<v0.03>.
+
+=item --as
+
+Add a new release. Its version number is taken from the previous release,
+increased to the next subversion. Its author is also taken from the the
+previous release.
+
+For example, if the previous release was version C<v0.02>, the new release
+will be version C<v0.02.01>.
+
+=item --aa
+
+Add a new release. Its version number is taken from the previous release,
+increased to the next alpha. Its author is also taken from the the
+previous release.
+
+For example, if the previous release was version C<v0.02>, the new release
+will be version C<v0.02_01>.
+
+=item --sv <version>
+
+Set the version of the most recent release. This does not create a new
+release.
+
+=item --ac <change>
+
+Add a change to the most recent release.
+
+=item --at <tag>
+
+Add a tag to the most recent release. Tags are a way to help other programs understand (or at least guess) what has happened in each release. Tags will obviously be more useful if there is a standard tag set, so here are a few proposals:
+
+=over 4
+
+=item FEATURE
+
+This release adds one or more new features.
+
+=item BUGFIX
+
+This release fixes one or more bugs.
+
+=item SECURITYFIX
+
+This release fixes one or more security vulnerabilities.
+
+=item APIBREAK
+
+This release breaks backwards compatibility.
+
+=back
+
+=item --rt <tag>
+
+Remove a tag.
+
+=item --au <author>
+
+Set the most recent release's author. It is recommended that you use a string
+like
+
+    --au "Marcel Gruenauer <marcel@cpan.org>"
+
+=item --td
+
+Touch the date of the most recent release, setting it to the current date and
+time.
+
+=item --name <name>
+
+Set the distribution's name.
+
+=item --fy
+
+Output in YAML format. This is the default.
+
+=item --ff
+
+Output in "free" format. This makes the Changes file look more or less like
+most traditional Changes files do.
+
+=item --help, -h
+
+Show this documentation.
+
+=back
+
+=head1 TAGS
+
+If you talk about this module in blogs, on del.icio.us or anywhere else,
+please use the C<modulechanges> tag.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+C<bug-module-changes@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.
+
+=head1 INSTALLATION
+
+See perlmodinstall for information and options on installing Perl modules.
+
+=head1 AVAILABILITY
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a CPAN
+site near you. Or see <http://www.perl.com/CPAN/authors/id/M/MA/MARCEL/>.
+
+=head1 AUTHOR
+
+Marcel GrE<uuml>nauer, C<< <marcel@cpan.org> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2007 by Marcel GrE<uuml>nauer
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

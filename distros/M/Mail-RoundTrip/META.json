@@ -1,0 +1,49 @@
+{
+   "abstract" : "Management routines for round trip validation of users' emails",
+   "author" : [
+      "Chris Travers <chris.travers@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mail-RoundTrip",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Email::Sender::Simple" : "0",
+            "Email::Simple" : "0",
+            "Email::Simple::Creator" : "0",
+            "File::Slurp" : "0",
+            "JSON" : "0",
+            "Moo" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "UUID::Tiny" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02"
+}

@@ -1,0 +1,5 @@
+Revision history for Perl extension MIME::DecodeText.
+
+0.01  Mon Sep  6 07:40:57 2004
+	- recognizing of Base64, QuotedPrintable encoded and plain text parts
+	  of text string and converting into plain text string

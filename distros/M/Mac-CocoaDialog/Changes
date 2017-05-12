@@ -1,0 +1,12 @@
+Revision history for Mac-CocoaDialog
+
+0.0.3  Sun Jul 21 15:06:00 2013
+       Fixed issue with encoding in POD.
+       Excluded POD tests for non-authors.
+
+0.0.2  Fri Jul 18 15:21:00 2008
+       Added Test::Exception to the prerequisites.
+
+0.0.1  Sun Jul 13 14:18:57 2008
+       Initial release.
+

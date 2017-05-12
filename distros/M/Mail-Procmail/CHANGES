@@ -1,0 +1,84 @@
+Change information for Mail::Procmail.
+
+Version 1.08, released Sep 19, 2004
+
+ * Documentation and example changes.
+
+Version 1.07, released Sep 19, 2004
+
+ * Added pm_gethdr_raw, to get headers unprocessed.
+
+ * Added pm_body, to get an array ref to the lines of the message body.
+
+Version 1.06, released Aug  5, 2003
+
+ * pm_init now takes a 'fh' attribute to have it read the message from
+   that file handle. Thanks to Tom Metro.
+
+ * The self tests now use Test::More.
+
+Version 1.05, released Apr 26, 2003
+
+ * The logging messages now include the message size in the log file. 
+   The pm_stats utility reports the sizes in the summary.
+
+Version 1.04, released Apr 24, 2003
+
+ * Procmail.pm: Small fixes w.r.t. pm_dupcheck. Thanks to Frederik Eaton.
+
+ * Document procmail problems with big files.
+
+Version 1.03, released May 8, 2002.
+
+ * Make self-test more robust.
+
+ * Provide (experimental) perl-Mail-Procmail.spec to build .rpm for
+   RedHat 7.x. Note that this requires Mail::Internet and
+   LockFile::Simple to be installed as RedHat packages as well. Spec
+   files are provided to build these packages; you know where to get
+   the sources...
+
+Version 1.02, released March 21, 2001.
+
+ * Just some small typos.
+
+Version 1.01, released January 24, 2001.
+
+ * Explicitly seek to the end of the file when doing a mailbox
+   delivery. This seems to be necessary for some older systems.
+
+Version 1.0, released January 17, 2001.
+
+ * First 'official' release after several months of testing.
+
+ * pm_pipe_to: Fix catching of broken pipe errors.
+
+Version 0.91
+
+ * Starting Beta phase.
+ * Allow pm_gethdr to be called in array context, to deliver all
+   occurrences of a header.
+   Also, allow an optional 2nd argument, to select a specific occurrence.
+ * Add pm_dupcheck to check for duplicate message IDs.
+ * Correct call to gethdr in pm_deliver, in the case of maildir
+   delivery. It should have been pm_gethdr.
+
+Version 0.04, released Sun Aug 27 19:47:42 CEST 2000
+
+ * Add pm_report routine to produce summary reports.
+ * Enhance documentation.
+
+Version 0.03, released Fri Aug 11 15:45:29 CEST 2000
+
+ * Add pm_command routine.
+ * Enhance documentation.
+ * Strip examples.
+
+Version 0.02, released Wed Aug  9 10:25:28 CEST 2000
+
+ * Retrofit to Perl 5.005.
+
+Version 0.01, released Tue Aug  8 21:24;59 VEST 2000
+
+ * Initial release for Perl 5.6.
+

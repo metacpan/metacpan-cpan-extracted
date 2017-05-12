@@ -1,0 +1,161 @@
+=pod
+
+=head1 NAME
+
+MP3::Album - Perl extension to manage a music album built of mp3 files.
+
+=head1 SYNOPSIS
+
+  use MP3::Album;
+
+  $mp3_album = MP3::Album->new(files=>\@files); 
+
+  #check is as set of mp3 has a uniform encoding
+  if ($mp3_album->bitrate_check()) && 
+      $mp3_album->frequency_check()) {
+  	print "This set of mp3 is well encoded\n";
+  } else {
+	print "not so good\n";
+  }
+
+  #get tracks and artistic information (layout) from cddb
+  @layouts = $mp3_album->fetch_layout(method=>'CDDB');
+
+  #using one of the above matches to generate tags
+  $mp3_album->layout($layouts[0]); # set the album layout to
+  				  # on of your choice
+  $mp3_album->generate_tags();
+
+  #and then rename the files
+  $mp3_album->rename_files();
+
+=head1 DESCRIPTION
+
+The general idea is to assume you can construct a set of mp3 files that , burnt into a cd, is equal to the "original" cd album.
+This modules helps to check if in every case this assumption is valid, and gives a set of utilities to manage that set of mp3 (ie: Generate mp3 tags or rename files according to a cddb match). 
+
+The so called album info is divided into two sets: the technical info and the layout info.
+
+=over
+
+=item Technical info
+
+Gives all the information about the mp3 file and about the album as a group of those files. For an example it gives you the general encoding(s) of the album and if it has a uniform encoding (all the tracks are encoding at the same bitrate).
+
+=item Layout info
+
+Gives you all the information about the disc layout. This is track names, album artist, etc. You can get layouts of various ways; for now three of them where implemented : information extracted from mp3 tags, from cddb, imported from a text file.
+for more info about the layouts read the perldoc of MP3::Album::Layout
+
+=back
+
+=head1 PUBLIC METHODS
+
+=over
+
+=item new([option=>value,...])
+
+
+Creates a new MP3::Album object.
+returns undef if error occurs. Error information will be in $@.
+
+options can be:
+
+=over
+
+=item files => [ $filename1, $filename2, .. ]
+
+Ordered list of mp3 files that contains the mp3s. Note that the tracks will have the order on album that they have on the array.
+
+=back
+
+=item add( track => $filename [, position => $position ])
+
+Adds a file to the list of tracks in position $position. If no position defined the track will be added to the end of the track list.
+Returns 1 on success undef on error. Error information will be in $@.
+
+=item tracks()
+
+Returns a list, or a reference to a list,  of the album tracks. All the list elements are objects of the type MP3::Album::Track. Read MP3::Album::Track documentation to further information.
+Returns undef on error. Error information will be in $@.
+
+=item info()
+
+return an hash, or a reference to an hash, containing the technical info of the album.
+The hash keys are:
+
+	number_oF_tracks	Number of tracks of this album
+	bitrates		List of encoding bitrates on this album
+	uniform_bitrate		1 if the encoding bitrate is uniform on this album, 0 if not
+	frequency		List of encoding frequency on this album
+	uniform_frequency	1 if the encoding frequency is uniform on this album, 0 if not
+	cddb_disc_id		this album disc_id if burnt into a audio cd
+
+=item frequency_check()
+
+Checks if the album has a uniform encoding frequency. returns 1 if so, 0 else.
+
+=item bitrate_check()
+
+Checks if the album has a uniform encoding bitrate. returns 1 if so, 0 else.
+
+=item fetch_layout(method=>'fetch method' [, param => value, .. ])
+
+Fetches layouts for this album by a given method. It returns an array, or a reference to an array, of MP3::Album::Layout objects. You can apply any of this layouts using the layout function described below.
+Besides the 'method' parameter you can passe any other parameter required by the fetcher module.
+Any of this layouts can be edited using the MP3::Album::Layout api, read MP3::Album::Layout documentation for further information.
+Returns undef in error case.
+
+=item layout([$chosen_layout])
+
+Sets or retrieves the current layout. If no parameter is passed, it retrieves the current layout of this album; read MP3::Album::Layout documentation for further information.
+If you pass a layout to this function it will set it as the current layout, this layout will be used in tasks such as generating tags.
+if you call this method without passing any layout, and the current layout is not set, it will try to fetch a layout by his default method (mp3 tags at the time) and tries to set the first layout returned.
+
+=item generate_tags()
+
+Uses the current layout to set mp3 files tags. It sets the title, artist, album, year, genre, comment and track_number Fields in the tag. If any of this values is not defined in the layout it will be set as an empty string.
+
+=item rename_files([option=>value, ..])
+
+uses the current layout to rename the mp3 files.
+options:
+
+
+	keep_copy	boolean 	if true it will copy the mp3's to 
+					the new filename instead of renaming them
+	out_dir		string		output dir for renaming the files
+	format		string		template for the name of the files
+					check the RENAMING FILENAME FORMAT section.
+=item available_fetchers()
+
+Returns a list of the available fetching methods.
+
+=back
+
+=head1 PRIVATE METHODS
+
+Documented as being not documented.
+
+=head1 RENAMING FILENAME FORMAT
+
+To specify a filename format you must pass a string in the "format" parameter of the rename_files functions.
+The string can have 
+
+=head1 BUGS
+
+There are no known bugs, if catch one please let me know.
+
+=head1 TODO
+
+Provide methods to change musics order.
+
+Provide a callback to the rename_files function, to permit the "beautify" of the generated filenames. Specially usefull in filesystems that are not so flexible about the filenames.
+
+Improve install tests.
+
+=head1 CONTACT AND COPYRIGHT
+
+Copyright 2003 Bruno Tavares <bmavt@cpan.org>. All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

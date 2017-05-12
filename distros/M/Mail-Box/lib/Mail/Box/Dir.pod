@@ -1,0 +1,630 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Box::Dir - handle folders with a file per message.
+
+=head1 INHERITANCE
+
+ Mail::Box::Dir
+   is a Mail::Box
+   is a Mail::Reporter
+
+ Mail::Box::Dir is extended by
+   Mail::Box::MH
+   Mail::Box::Maildir
+
+=head1 SYNOPSIS
+
+ # Do not instantiate this object
+
+=head1 DESCRIPTION
+
+This documentation describes the way directory organized mailboxes work.
+At the moment, this object is extended by
+
+=over 4
+
+=item * L<Mail::Box::MH|Mail::Box::MH>
+
+MH folders, which are represented by a directory containing files which
+are sequentially numbered.
+
+=item * L<Mail::Box::Maildir|Mail::Box::Maildir>
+
+Maildir folders, which are located in a directory which has sub-directories
+named C<tmp>, C<new>, and C<cur>.  Each of these directories may contain
+files with names which are a combination of a numeric timestamp and some
+status flags.
+
+=item * Mail::Box::Netzwert
+
+This folder type was especially developed for Netzwert AG, optimized to
+run on a cluster of servers with folders on NFS.  The code is not publicly
+available (yet).
+
+=back
+
+Extends L<"DESCRIPTION" in Mail::Box|Mail::Box/"DESCRIPTION">.
+ 
+=head1 OVERLOADED
+
+Extends L<"OVERLOADED" in Mail::Box|Mail::Box/"OVERLOADED">.
+ 
+=over 4
+
+=item overload: B<"">
+
+Inherited, see L<Mail::Box/"OVERLOADED">
+
+=item overload: B<@{}>
+
+Inherited, see L<Mail::Box/"OVERLOADED">
+
+=item overload: B<cmp>
+
+Inherited, see L<Mail::Box/"OVERLOADED">
+
+=back
+
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Box|Mail::Box/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Mail::Box|Mail::Box/"Constructors">.
+ 
+=over 4
+
+=item Mail::Box::Dir-E<gt>B<new>(%options)
+
+ -Option           --Defined in     --Default
+  access             Mail::Box        'r'
+  body_delayed_type  Mail::Box        Mail::Message::Body::Delayed
+  body_type          Mail::Box        Mail::Message::Body::Lines
+  coerce_options     Mail::Box        []
+  create             Mail::Box        <false>
+  directory                           <derived from folder name>
+  extract            Mail::Box        10240
+  field_type         Mail::Box        undef
+  fix_headers        Mail::Box        <false>
+  folder             Mail::Box        $ENV{MAIL}
+  folderdir          Mail::Box        undef
+  head_delayed_type  Mail::Box        Mail::Message::Head::Delayed
+  head_type          Mail::Box        Mail::Message::Head::Complete
+  keep_dups          Mail::Box        <false>
+  lock_file          Mail::Box        <folder>/.lock
+  lock_timeout       Mail::Box        1 hour
+  lock_type          Mail::Box        Mail::Box::Locker::DotLock
+  lock_wait          Mail::Box        10 seconds
+  locker             Mail::Box        undef
+  log                Mail::Reporter   'WARNINGS'
+  manager            Mail::Box        undef
+  message_type       Mail::Box        <folder-class>::Message
+  multipart_type     Mail::Box        Mail::Message::Body::Multipart
+  remove_when_empty  Mail::Box        <true>
+  save_on_exit       Mail::Box        <true>
+  trace              Mail::Reporter   'WARNINGS'
+  trusted            Mail::Box        <depends on folder location>
+
+=over 2
+
+=item access => MODE
+
+=item body_delayed_type => CLASS
+
+=item body_type => CLASS|CODE
+
+=item coerce_options => ARRAY
+
+=item create => BOOLEAN
+
+=item directory => DIRECTORY
+
+For rare folder types, the directory name may differ from the folder
+name.
+
+=item extract => INTEGER | CODE | METHOD | 'LAZY'|'ALWAYS'
+
+=item field_type => CLASS
+
+=item fix_headers => BOOLEAN
+
+=item folder => FOLDERNAME
+
+=item folderdir => DIRECTORY
+
+=item head_delayed_type => CLASS
+
+=item head_type => CLASS
+
+=item keep_dups => BOOLEAN
+
+=item lock_file => FILENAME
+
+=item lock_timeout => SECONDS
+
+=item lock_type => CLASS|STRING|ARRAY
+
+=item lock_wait => SECONDS
+
+=item locker => OBJECT
+
+=item log => LEVEL
+
+=item manager => MANAGER
+
+=item message_type => CLASS
+
+=item multipart_type => CLASS
+
+=item remove_when_empty => BOOLEAN
+
+=item save_on_exit => BOOLEAN
+
+=item trace => LEVEL
+
+=item trusted => BOOLEAN
+
+=back
+
+=back
+
+=head2 The folder
+
+Extends L<"The folder" in Mail::Box|Mail::Box/"The folder">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addMessage>($message, %options)
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item $obj-E<gt>B<addMessages>(@messages)
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item Mail::Box::Dir-E<gt>B<appendMessages>(%options)
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item $obj-E<gt>B<close>(%options)
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item $obj-E<gt>B<copyTo>($folder, %options)
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item $obj-E<gt>B<delete>(%options)
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item $obj-E<gt>B<directory>()
+
+Returns the directory related to this folder.
+
+example: 
+
+ print $folder->directory;
+
+=item $obj-E<gt>B<folderdir>( [$directory] )
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item $obj-E<gt>B<name>()
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item $obj-E<gt>B<organization>()
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item $obj-E<gt>B<size>()
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item $obj-E<gt>B<type>()
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item $obj-E<gt>B<update>(%options)
+
+Inherited, see L<Mail::Box/"The folder">
+
+=item $obj-E<gt>B<url>()
+
+Inherited, see L<Mail::Box/"The folder">
+
+=back
+
+=head2 Folder flags
+
+Extends L<"Folder flags" in Mail::Box|Mail::Box/"Folder flags">.
+ 
+=over 4
+
+=item $obj-E<gt>B<access>()
+
+Inherited, see L<Mail::Box/"Folder flags">
+
+=item $obj-E<gt>B<isModified>()
+
+Inherited, see L<Mail::Box/"Folder flags">
+
+=item $obj-E<gt>B<modified>( [BOOLEAN] )
+
+Inherited, see L<Mail::Box/"Folder flags">
+
+=item $obj-E<gt>B<writable>()
+
+Inherited, see L<Mail::Box/"Folder flags">
+
+=back
+
+=head2 The messages
+
+Extends L<"The messages" in Mail::Box|Mail::Box/"The messages">.
+ 
+=over 4
+
+=item $obj-E<gt>B<current>( [$number|$message|$message_id] )
+
+Inherited, see L<Mail::Box/"The messages">
+
+=item $obj-E<gt>B<find>($message_id)
+
+Inherited, see L<Mail::Box/"The messages">
+
+=item $obj-E<gt>B<findFirstLabeled>( $label, [BOOLEAN, [$msgs]] )
+
+Inherited, see L<Mail::Box/"The messages">
+
+=item $obj-E<gt>B<message>( $index, [$message] )
+
+Inherited, see L<Mail::Box/"The messages">
+
+=item $obj-E<gt>B<messageId>( $message_id, [$message] )
+
+Inherited, see L<Mail::Box/"The messages">
+
+=item $obj-E<gt>B<messageIds>()
+
+Inherited, see L<Mail::Box/"The messages">
+
+=item $obj-E<gt>B<messages>( <'ALL'|$range|'ACTIVE'|'DELETED'|$label| !$label|$filter> )
+
+Inherited, see L<Mail::Box/"The messages">
+
+=item $obj-E<gt>B<nrMessages>(%options)
+
+Inherited, see L<Mail::Box/"The messages">
+
+=item $obj-E<gt>B<scanForMessages>($message, $message_ids, $timespan, $window)
+
+Inherited, see L<Mail::Box/"The messages">
+
+=back
+
+=head2 Sub-folders
+
+Extends L<"Sub-folders" in Mail::Box|Mail::Box/"Sub-folders">.
+ 
+=over 4
+
+=item $obj-E<gt>B<listSubFolders>(%options)
+
+=item Mail::Box::Dir-E<gt>B<listSubFolders>(%options)
+
+Inherited, see L<Mail::Box/"Sub-folders">
+
+=item $obj-E<gt>B<nameOfSubFolder>( $subname, [$parentname] )
+
+=item Mail::Box::Dir-E<gt>B<nameOfSubFolder>( $subname, [$parentname] )
+
+Inherited, see L<Mail::Box/"Sub-folders">
+
+=item $obj-E<gt>B<openRelatedFolder>(%options)
+
+Inherited, see L<Mail::Box/"Sub-folders">
+
+=item $obj-E<gt>B<openSubFolder>($subname, %options)
+
+Inherited, see L<Mail::Box/"Sub-folders">
+
+=item $obj-E<gt>B<topFolderWithMessages>()
+
+=item Mail::Box::Dir-E<gt>B<topFolderWithMessages>()
+
+Inherited, see L<Mail::Box/"Sub-folders">
+
+=back
+
+=head2 Internals
+
+Extends L<"Internals" in Mail::Box|Mail::Box/"Internals">.
+ 
+=over 4
+
+=item $obj-E<gt>B<coerce>($message, %options)
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<create>($foldername, %options)
+
+=item Mail::Box::Dir-E<gt>B<create>($foldername, %options)
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<determineBodyType>($message, $head)
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<folderToDirectory>($foldername, $folderdir)
+
+(class method)  Translate a foldername into a filename, with use of the
+$folderdir to replace a leading C<=>.
+
+=item Mail::Box::Dir-E<gt>B<foundIn>( [$foldername], %options )
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<lineSeparator>( [<STRING|'CR'|'LF'|'CRLF'>] )
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<locker>()
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<read>(%options)
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<readMessageFilenames>($directory)
+
+Returns a list of all filenames which are found in this folder
+directory and represent a message.  The filenames are returned as
+relative path.
+
+=item $obj-E<gt>B<readMessages>(%options)
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<storeMessage>($message)
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<toBeThreaded>($messages)
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<toBeUnthreaded>($messages)
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<updateMessages>(%options)
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<write>(%options)
+
+Inherited, see L<Mail::Box/"Internals">
+
+=item $obj-E<gt>B<writeMessages>(%options)
+
+Inherited, see L<Mail::Box/"Internals">
+
+=back
+
+=head2 Other methods
+
+Extends L<"Other methods" in Mail::Box|Mail::Box/"Other methods">.
+ 
+=over 4
+
+=item $obj-E<gt>B<timespan2seconds>($time)
+
+=item Mail::Box::Dir-E<gt>B<timespan2seconds>($time)
+
+Inherited, see L<Mail::Box/"Other methods">
+
+=back
+
+=head2 Error handling
+
+Extends L<"Error handling" in Mail::Box|Mail::Box/"Error handling">.
+ 
+=over 4
+
+=item $obj-E<gt>B<AUTOLOAD>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<addReport>($object)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+=item Mail::Box::Dir-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<errors>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<log>( [$level, [$strings]] )
+
+=item Mail::Box::Dir-E<gt>B<log>( [$level, [$strings]] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logPriority>($level)
+
+=item Mail::Box::Dir-E<gt>B<logPriority>($level)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<notImplemented>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<report>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<reportAll>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<trace>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<warnings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=back
+
+=head2 Cleanup
+
+Extends L<"Cleanup" in Mail::Box|Mail::Box/"Cleanup">.
+ 
+=over 4
+
+=item $obj-E<gt>B<DESTROY>()
+
+Inherited, see L<Mail::Box/"Cleanup">
+
+=back
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in Mail::Box|Mail::Box/"DETAILS">.
+ 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Warning: Changes not written to read-only folder $self.
+
+You have opened the folder read-only --which is the default set
+by L<new(access)|Mail::Box/"Constructors">--, made modifications, and now want to close it.
+Set L<close(force)|Mail::Box/"The folder"> if you want to overrule the access mode, or close
+the folder with L<close(write)|Mail::Box/"The folder"> set to C<NEVER>.
+
+=item Error: Copying failed for one message.
+
+For some reason, for instance disc full, removed by external process, or
+read-protection, it is impossible to copy one of the messages.  Copying will
+proceed for the other messages.
+
+=item Error: Destination folder $name is not writable.
+
+The folder where the messages are copied to is not opened with write
+access (see L<new(access)|Mail::Box/"Constructors">).  This has no relation with write permission
+to the folder which is controled by your operating system.
+
+=item Warning: Different messages with id $msgid
+
+The message id is discovered more than once within the same folder, but the
+content of the message seems to be different.  This should not be possible:
+each message must be unique.
+
+=item Error: Folder $name is opened read-only
+
+You can not write to this folder unless you have opened the folder to
+write or append with L<new(access)|Mail::Box/"Constructors">, or the C<force> option is set true.
+
+=item Error: Folder $name not deleted: not writable.
+
+The folder must be opened with write access via L<new(access)|Mail::Box/"Constructors">, otherwise
+removing it will be refused.  So, you may have write-access according to
+the operating system, but that will not automatically mean that this
+C<delete> method permits you to.  The reverse remark is valid as well.
+
+=item Warning: Folder directory $directory is write-protected.
+
+The folder directory does already exist and is write protected, which may
+interfere with the requested write access.  Change new(access) or the
+permissions on the directory.
+
+=item Error: Invalid timespan '$timespan' specified.
+
+The string does not follow the strict rules of the time span syntax which
+is permitted as parameter.
+
+=item Warning: Message-id '$msgid' does not contain a domain.
+
+According to the RFCs, message-ids need to contain a unique random part,
+then an C<@>, and then a domain name.  This is made to avoid the creation
+of two messages with the same id.  The warning emerges when the C<@> is
+missing from the string.
+
+=item Warning: No directory $name for folder of $class
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=item Error: Unable to create subfolder $name of $folder.
+
+The copy includes the subfolders, but for some reason it was not possible
+to copy one of these.  Copying will proceed for all other sub-folders.
+
+=item Error: Writing folder $name failed
+
+For some reason (you probably got more error messages about this problem)
+it is impossible to write the folder, although you should because there
+were changes made.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Box distribution version 3.002,
+built on March 31, 2017.
+
+Do not forget to read
+L<Mail::Box-Overview>,
+L<Mail::Box-Cookbook>, and
+L<Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L<Mail::Message>,
+L<Mail::Box>,
+L<Mail::Box::IMAP4>,
+L<Mail::Box::POP3>,
+L<Mail::Box::Parser::C>,
+L<Mail::Box::Dbx> (unpublished),
+L<Mail::Transport>,
+L<Object::Realize::Later>, and
+L<User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

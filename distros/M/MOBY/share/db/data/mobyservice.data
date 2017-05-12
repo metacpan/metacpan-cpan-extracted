@@ -1,0 +1,15 @@
+INSERT INTO service VALUES (1,'urn:lsid:biomoby.org:servicetype:Service','Service','The base type','openinformatics.com','markw@illuminae.com');
+INSERT INTO service VALUES (2,'urn:lsid:biomoby.org:servicetype:Retrieval','Retrieval','The base retrieval type','openinformatics.com','markw@illuminae.com');
+INSERT INTO service VALUES (3,'urn:lsid:biomoby.org:servicetype:Resolution','Resolution','resolve data','openinformatics.com','markw@illuminae.com');
+INSERT INTO service VALUES (4,'urn:lsid:biomoby.org:servicetype:Parsing','Parsing','parse data','openinformatics.com','markw@illuminae.com');
+INSERT INTO service VALUES (5,'urn:lsid:biomoby.org:servicetype:Registration','Registration','register data','openinformatics.com','markw@illuminae.com');
+INSERT INTO service VALUES (6,'urn:lsid:biomoby.org:servicetype:Analysis','Analysis','analyze data','openinformatics.com','markw@illuminae.com');
+
+
+
+INSERT INTO service_term2term VALUES (8,'urn:lsid:biomoby.org:servicerelation:isa',2,1);
+INSERT INTO service_term2term VALUES (4,'urn:lsid:biomoby.org:servicerelation:isa',3,1);
+INSERT INTO service_term2term VALUES (5,'urn:lsid:biomoby.org:servicerelation:isa',4,1);
+INSERT INTO service_term2term VALUES (6,'urn:lsid:biomoby.org:servicerelation:isa',5,1);
+INSERT INTO service_term2term VALUES (7,'urn:lsid:biomoby.org:servicerelation:isa',6,1);
+

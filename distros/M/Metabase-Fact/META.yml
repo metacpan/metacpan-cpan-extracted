@@ -1,0 +1,105 @@
+---
+abstract: 'base class for Metabase Facts'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+  - 'Ricardo Signes <rjbs@cpan.org>'
+  - 'H.Merijn Brand <hmbrand@cpan.org>'
+build_requires:
+  Cwd: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0.20'
+  Test::Fatal: '0'
+  Test::More: '0.88'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Metabase-Fact
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Metabase::Fact:
+    file: lib/Metabase/Fact.pm
+    version: '0.025'
+  Metabase::Fact::Hash:
+    file: lib/Metabase/Fact/Hash.pm
+    version: '0.025'
+  Metabase::Fact::String:
+    file: lib/Metabase/Fact/String.pm
+    version: '0.025'
+  Metabase::Report:
+    file: lib/Metabase/Report.pm
+    version: '0.025'
+  Metabase::Resource:
+    file: lib/Metabase/Resource.pm
+    version: '0.025'
+  Metabase::Resource::cpan:
+    file: lib/Metabase/Resource/cpan.pm
+    version: '0.025'
+  Metabase::Resource::cpan::distfile:
+    file: lib/Metabase/Resource/cpan/distfile.pm
+    version: '0.025'
+  Metabase::Resource::metabase:
+    file: lib/Metabase/Resource/metabase.pm
+    version: '0.025'
+  Metabase::Resource::metabase::fact:
+    file: lib/Metabase/Resource/metabase/fact.pm
+    version: '0.025'
+  Metabase::Resource::metabase::user:
+    file: lib/Metabase/Resource/metabase/user.pm
+    version: '0.025'
+  Metabase::Resource::perl:
+    file: lib/Metabase/Resource/perl.pm
+    version: '0.025'
+  Metabase::Resource::perl::commit:
+    file: lib/Metabase/Resource/perl/commit.pm
+    version: '0.025'
+  Metabase::User::EmailAddress:
+    file: lib/Metabase/User/EmailAddress.pm
+    version: '0.025'
+  Metabase::User::FullName:
+    file: lib/Metabase/User/FullName.pm
+    version: '0.025'
+  Metabase::User::Profile:
+    file: lib/Metabase/User/Profile.pm
+    version: '0.025'
+  Metabase::User::Secret:
+    file: lib/Metabase/User/Secret.pm
+    version: '0.025'
+requires:
+  CPAN::DistnameInfo: '0'
+  Carp: '0'
+  Data::GUID: '0'
+  Getopt::Long: '0'
+  IO::Prompt::Tiny: '0'
+  JSON::MaybeXS: '0'
+  Pod::Usage: '0'
+  overload: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Metabase-Fact/issues
+  homepage: https://github.com/dagolden/Metabase-Fact
+  repository: https://github.com/dagolden/Metabase-Fact.git
+version: '0.025'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Nathan Gary Glenn <nglenn@cpan.org>'
+  - 'Randy Stauner <rwstauner@cpan.org>'

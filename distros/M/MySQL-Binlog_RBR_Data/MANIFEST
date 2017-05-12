@@ -1,0 +1,8 @@
+Changes
+lib/MySQL/Binlog_RBR_Data.pm
+Makefile.PL
+MANIFEST
+README
+t/binlog.000005
+t/MySQL-Binlog_RBR_Data.t
+META.yml                                 Module meta-data (added by MakeMaker)

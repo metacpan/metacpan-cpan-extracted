@@ -1,0 +1,27 @@
+---
+abstract: 'Simulate screen sizes'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  Test::More: 0.90
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-Responsinator
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: 4.87
+resources:
+  bugtracker: https://github.com/jhthorsen/mojolicious-plugin-responsinator/issues
+  homepage: https://metacpan.org/release/Mojolicious-Plugin-Responsinator
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/jhthorsen/mojolicious-plugin-responsinator.git
+version: 0.03

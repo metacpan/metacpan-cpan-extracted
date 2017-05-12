@@ -1,0 +1,131 @@
+Revision history for Module::Install::CPANfile
+
+1.1002  2016-02-12 08:23:00 PST
+        - Make it work under the taint mode (-T) #41
+
+1.1001  2015-09-04 14:07:14 CEST
+        - Fixed tests to avoid using subtests. #38
+
+1.1000  2014-08-29 13:48:13 JST
+        - Make it non-development release
+
+1.0905  2013-12-09 16:26:08 PST
+        - Support mirror syntax (masaki) #22
+
+1.0904  2013-09-21 07:56:31 JST
+        - Removed git/ref accessor from Requirement
+        - Added $requirement->has_options
+
+1.0903  2013-09-20 15:36:30 JST
+        - Added $cpanfile->merged_requirements to get the CPAN::Meta::Requirements for all prereqs
+
+1.0902  2013-09-20 13:45:15 JST
+        - s/rev/ref/ for git options
+
+1.0901  2013-09-19 18:59:55 JST
+        - Remove unused code
+
+1.0900  2013-09-19 18:45:59 JST
+        - Experimental support for git URL specification
+        - Complete rewrite of internal to preserve original prereq statement as much as possible
+
+1.0002  2013-09-06 12:26:11 PDT
+        - Add cpanfile-dump utility (xdg)
+
+1.0001  2013-08-05 14:24:07 PDT
+        - Updated documentation about syntax
+
+1.0000  2013-08-04 12:28:32 PDT
+        - Make the cpanfile spec 1.0
+        - Updated documentation
+
+0.9036  2013-07-24 13:11:42 PDT
+        - Repackage after git rebase
+
+0.9035  2013-07-24 13:10:29 PDT
+        - Fix a bug where warnings will be raised if the content of cpanfile has sprintf-style
+          %X content somewhere (reported by frew)
+
+0.9034  2013-06-05 12:09:11 JST
+        - split .pm files, mainly for PAUSE
+
+0.9033  2013-06-05 11:38:56 JST
+        - merge with git master
+
+0.9032  2013-06-05 11:35:58 JST
+        - repackage for PAUSE
+
+0.9031  2013-04-17 08:39:17 JST
+        - Revert EXPERIMENTAL git URL options since it causes failures when stringified
+          inside CPAN::Meta #13
+
+0.9030  2013-04-14 17:05:46 JST
+        - Fixed a bug where prereqs_with with an empty feature list causes an exception
+
+0.9029  2013-04-14 13:05:30 JST
+        - Support EXPERIMENTAL git URL parsing (ikasam_a)
+        - Allow feature DSL to omit description
+        - Add better error messages for feature syntax errors
+
+0.9028  2013-04-14 01:27:29 JST
+        - Add new 'feature' DSL and features support for CPAN::Meta::Feature
+
+0.9027  2013-03-31 12:45:10 PDT
+        - Improved error message shows filename and line number
+
+0.9026  2013-03-28 12:07:27 PDT
+        - Updated FAQ to mention tools that support cpanfile
+
+0.9025  2013-03-24 23:27:57 PDT
+        - rebuild package with new Milla to support script
+
+0.9024  2013-03-23 21:29:41 PDT
+        - Make it non-trial
+
+0.9023  2013-03-23 21:26:07 PDT
+        - mymeta-cpanfile: Added options to filter specific phases and types
+
+0.9022  2013-03-23 20:34:30 America/Los_Angeles
+        - Convert to Milla
+        - Made CPAN::Meta and ::Prereqs a hard requirement than runtime optional
+
+0.9021  Sat Mar 23 09:11:46 PDT 2013
+        - added mymeta-cpanfile utility script for migration from Makefile.PL/Build.PL
+
+0.9020  Sat Mar 23 02:48:50 PDT 2013
+        - Implemeneted from_prereqs, to_string and save utility methods,
+          to allow creating a new cpanfile out of (MY)META files
+
+0.9010  Fri Feb 15 13:24:40 PST 2013
+        - Fix the package name in the example
+
+0.9009  Thu Feb  7 09:24:11 PST 2013
+        - Fixed CPAN::Meta dependency in the test (Chris Weyl)
+
+0.9008  Wed Jan 30 21:53:32 PST 2013
+        - Added merge_meta method to be used in Module::Install::CPANfile
+
+0.9007  Sat Apr 14 14:55:49 CST 2012
+        - Fixed documentation
+
+0.9006  Fri Apr 13 07:30:33 JST 2012
+        - Alias prereqs method to prereq
+
+0.9005  Thu Apr 12 20:41:27 JST 2012
+        - Include all files into Module/CPANfile.pm
+
+0.9004  Thu Apr 12 18:31:59 JST 2012
+        - Renamed the distribution
+
+0.9003  Sat Apr  7 01:26:04 PDT 2012
+        - Don't use $! in error checks because we don't open file there.
+          This also caused issues in 5.8 where $! isn't often cleared
+
+0.9002  Sat Apr  7 01:14:00 PDT 2012
+        - Fixed the test again to not fail on 5.8
+
+0.9001  Tue Apr  3 04:30:31 CEST 2012
+        - Added t/samples in the directory so the test won't fail
+
+0.9000  Sun Apr  1 15:10:36 CEST 2012
+        - Initial version

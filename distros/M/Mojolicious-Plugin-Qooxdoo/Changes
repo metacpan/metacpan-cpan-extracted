@@ -1,0 +1,47 @@
+Revision history for Mojolicious::Pugin::Qooxdoo
+
+0.905 2017-02-24
+  - replace deprecated rel_dir with rel_file
+
+0.904 2015-08-22
+  - don't timeout when trying to open non existing file
+
+0.903 2015-07-16
+  - fix debug output regression from 0.902
+
+0.902 2015-03-19
+  - only log the first 60 characters of each request unless the 
+    environment variable MOJO_QX_FULL_RPC_DETAILS is set.
+
+0.901 2014-10-31
+  - adapt to loosing JSON OO in mojo
+
+0.9   2014-09-24
+  - fix tests and improve coverage
+
+0.8   2014-08-23
+  - added missing example file
+
+0.7   2014-08-23
+  - fix prefix handling
+
+0.6   2014-04-04
+  - fixed regression in the index file redirection
+  - improved documentation consistency
+
+0.5   2014-03-21
+  - plugin unecessarily installed a catch all rule messing with the file not
+    found handling
+
+0.4   2014-02-14
+  - mojo 4.80 does not recognize ; as query separator anymore ... fix tests
+
+0.3   2013-11-21
+  - added support for handling async callbacks
+
+0.2   2013-11-20
+  - do not index the example module
+
+0.1   2013-11-20
+  - Rewrite of MojoX::Dispatcher::Qooxdoo::Jsonrpc into a Controller centric object
+

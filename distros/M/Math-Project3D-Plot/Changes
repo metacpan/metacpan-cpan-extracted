@@ -1,0 +1,36 @@
+Revision history for Perl extension Math::Project3D::Plot.
+
+1.02  Sun Nov  5 18:56 2006
+    - Distribution upgrade: Clear licenses, spec-conformant META.yml,
+      etc.
+
+1.011  Mon May 12 14:01:21 2003
+	- Fixed minor documentation bug.
+	- Now using Imager's box() method for setting the background.
+
+1.010  Sun Feb 23 16:18:10 2003
+	- New support for 'multiline' plot_range drawing method.
+	- Now requires version 1.010 of Math::Project3D due to this
+          new feature.
+	- Added tests and fixed old tests.
+
+1.005  Wed Nov 27 22:23:32 2002
+	- Support for rotation as defined in Math::Project3D since
+          version 1.006. Good grief, what an evil hack.
+	- Fixed packaging issues.
+
+1.004  Sat Nov 23 20:30:10 2002
+	- Documentation fixes
+
+1.003  Sat Nov 23 19:02:23 2002
+	- Added plot_axis function
+	- More docs
+	- Bugfixes
+
+1.002  Sat Nov 23 17:02:23 2002
+	- Added plot_list function
+	- Added plot_range function
+	- Added documentation
+
+1.001  Fri Nov 22 18:22:05 2002
+	- Original version

@@ -1,0 +1,92 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+use Module::Checkstyle;
+
+my ($all_files, $config_path);
+GetOptions('h|help|?'  => sub { pod2usage({-verbose => 0, -input => \*DATA}); exit; },
+           'H|man'     => sub { pod2usage({-verbose => 2, -input => \*DATA}); exit; },
+           'a|all'     => \$all_files,
+           'c|config'  => \$config_path,
+           'd|debug'   => \$Module::Checkstyle::debug,
+           'v|version' => sub { print_version(); exit; },
+       ) or exit 1;
+    
+
+my $cs = Module::Checkstyle->new($config_path);
+$cs->check(@ARGV);
+
+print "$_\n" foreach($cs->get_problems);
+
+if ($cs->get_problems) {
+    exit 1;
+}
+
+sub print_version {
+    printf( "module-checkstyle v%s and Perl v%vd\n", $Module::Checkstyle::VERSION, $^V);
+}
+    
+__END__
+
+=head1 NAME
+
+module-checkstyle - Check that your code keeps style
+
+=head1 SYNOPSIS
+
+module-checkstyle [options] [file and directories ...]
+
+ Options:
+  -help        brief help message
+  -man         full documentation
+  -all         turn off ignoring common files
+  -debug       turn on debugging
+  -version     display version information
+
+=head1 DESCRIPTION
+
+B<This program> is the command-line interface to B<Module::Checkstyle>.
+
+You invoke it by supplying a list of files or directories that contain Perl code
+that should be checked aginst the configuration. Any problems found will be reported on
+standard out.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exists.
+
+=item B<-config>
+
+Use an alternate config file instead of I<~/.module-checkstyle/config>.
+
+=item B<-all>
+
+Don't ignore common files when traversing directories. Common files are
+things such as blib/* t/* Makefile.PL etc.
+
+=item B<-debug>
+
+Turn on debugging information.
+
+=item B<-version>
+
+Display version information.
+
+=back
+
+SEE ALSO
+
+L<Module::Checkstyle>

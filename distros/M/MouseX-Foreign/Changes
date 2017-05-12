@@ -1,0 +1,35 @@
+Revision history for Perl extension MouseX::Foreign
+
+1.000 2014-04-10T22:07:50Z
+    [CHANGES]
+    - BUILDARGS is now called before constructors (#4 by schwern)
+      See https://github.com/gfx/p5-MouseX-Foreign/pull/4 for details
+
+0.008 2014-02-11 23:08:12+0900
+    - Make Any::Moose test_requires; thanks to @acidlemon
+
+0.007 2011-10-17 18:57:02
+    - Declare Any::Moose version (rsimoes)
+    - Fix duplicated code in meta methods (rsimoes)
+
+0.006 2011-10-13 10:47:07
+    - Add MouseX::NonMoose for drop-in compatibility with Any::Moose
+    - Add test files for new module
+
+0.005 2011-10-13 09:40:21
+    - No code changes
+    - Fix module name in README, .gitignore, xt/podspell.t and Changes (this file)
+
+0.004 2011-03-27 16:16:43
+    - Missing dependencies: Test::Exception
+
+0.003 Wed Sep 29 23:24:01 2010
+    - Classes that use MouseX::Foreign were not treated as foreign classes.
+
+0.002 Sun Sep 26 13:44:40 2010
+    - No code changes
+    - Fix packaging issues
+
+0.001 
+    - original version; created by Module::Setup
+      at Fri Feb 26 22:24:38 2010.

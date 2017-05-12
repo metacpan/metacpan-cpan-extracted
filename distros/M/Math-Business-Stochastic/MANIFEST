@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Math-Business-Stochastic.t
+lib/Math/Business/Stochastic.pm
+META.yml                                 Module meta-data (added by MakeMaker)

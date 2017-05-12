@@ -1,0 +1,11 @@
+
+requires "A";
+
+on test => sub {
+    requires "B";
+    requires "B2" => "2.00";
+};
+
+on develop => sub {
+    requires "C";
+};

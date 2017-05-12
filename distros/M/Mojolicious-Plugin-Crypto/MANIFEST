@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Mojolicious-Plugin-Crypto.t
+t/Mojolicious-Plugin-Crypto-HASH.t
+t/Mojolicious-Plugin-Crypto-HMAC.t
+lib/Mojolicious/Plugin/Crypto.pm
+examples/lite_example.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

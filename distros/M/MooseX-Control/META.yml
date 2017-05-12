@@ -1,0 +1,21 @@
+---
+name: MooseX-Control
+version: 0.03
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+abstract: Simple class to manage a execute deamon
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Moose: 0.32
+  MooseX::Types::Path::Class: 0
+  Test::More: 0
+provides:
+  MooseX::Control:
+    file: lib/MooseX/Control.pm
+    version: 0.03
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

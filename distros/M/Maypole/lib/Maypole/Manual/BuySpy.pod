@@ -1,0 +1,361 @@
+=head1 NAME
+
+Maypole::Manual::BugSpy - The Maypole iBuySpy Portal
+
+=head1 DESCRIPTION
+
+I think it's good fun to compare Maypole against other frameworks,
+so here's how to build the ASP.NET tutorial site in Maypole.
+
+We begin with a lengthy process of planning and investigating the
+sources. Of prime interest is the database schema and the initial data,
+which we convert to a MySQL database. Converting MS SQL to MySQL is not fun.
+I shall spare you the gore. Especially the bit where the default insert IDs
+didn't match up between the tables.
+
+The C<ibsportal> database has a number of tables which describe how the
+portal should look, and some tables which describe the data that should
+appear on it. The portal is defined in terms of a set of modules; each
+module takes some data from somewhere, and specifies a template to be
+used to format the data. This is quite different from how Maypole
+normally operates, so we have a choice as to whether we're going to
+completely copy this design, or use a more "natural" implementation in 
+terms of having the portal display defined as a template itself, with
+all the modules specified right there in Template Toolkit code rather
+than picked up from the database. This would be much faster, since you
+get one shot of rendering instead of having to process each module's
+template independently. The thing is, I feel like showing off
+precisely how flexible Maypole is, so we'll do it the hard way.
+
+The first thing we need to do is get the database into some sort of
+useful shape, and work out the relationships between the tables. This of
+course requires half a day of playing with GraphViz, Omnigraffle and
+mysql, but ended up with something like this:
+
+=for html
+<img src="ibs-schema.png">
+
+This leads naturally to the following driver code:
+
+    package Portal;
+    use Maypole::Application;
+    Portal->setup("dbi:mysql:ibsportal");
+    use Class::DBI::Loader::Relationship;
+    Portal->config->loader->relationship($_) for (
+        "A module has a definition",  "A module has settings",
+        "A tab has modules",          "A portal has tabs",
+        "A role has a portal",        "A definition has a portal",
+        "A module has announcements", "A module has contacts",
+        "A module has discussions",   "A module has events",
+        "A module has htmltexts",     "A module has links",
+        "A module has documents",
+        "A user has roles via userrole"
+    );
+    1;
+
+As you can see, a portal is made up of a number of different tabs;
+the tabs contain modules, but they're separated into different panes,
+so a module knows whether it belongs on the left pane, the right pane
+or the center. A module also knows where it appears in the pane.
+
+We'll begin by mocking up the portal view in plain text, like so:
+
+    use Portal;
+    my $portal = Portal::Portal->retrieve(2);
+    for my $tab ($portal->tabs) {
+        print $tab,"\n";
+        for my $pane (qw(LeftPane ContentPane RightPane)) {
+            print "\t$pane:\n";
+            for (sort { $a->module_order <=> $b->module_order }
+                $tab->modules(pane => $pane)) {
+                print "\t\t$_:\t", $_->definition,"\n";
+            }
+        }
+        print "\n";
+    }
+
+This dumps out the tabs of our portal, along with the modules in each
+tab and their types; this lets us check that we've got the database
+set up properly. If we have, it should produce something like this:
+
+    Home
+            LeftPane:
+                    Quick link:     Quicklink
+            ContentPane:
+                    Welcome to the IBuySpy Portal:  Html Document
+                    News and Features:      announcement
+                    Upcoming event: event
+            RightPane:
+                    This Week's Special:    Html Document
+                    Top Movers:     XML/XSL
+
+    ...
+
+Now we want to get the front page up; for the moment, we'll just have it
+display the module names and their definitions like our text mock-up,
+and we'll flesh out the actual modules later.
+
+But before we do that, we'll write a front-end URL handler method, to
+allow us to ape the ASP file names. Why do we want to make a Maypole
+site look like it's running C<.aspx> files? Because we can! - and
+because I want to show we don't necessarily B<have> to follow the
+Maypole tradition of having our URLs look like
+C</I<table>/I<action>/I<id>/I<arguments>>. 
+
+    our %pages = (
+        "DesktopDefault.aspx" => { action => "view", table => "tab" },
+        "MobileDefault.aspx"  => { action => "view_mobile", table => "tab" },
+    );
+
+    sub parse_path {
+        my $self = shift;
+        $self->path("DesktopDefault.aspx") unless $self->path;
+        return $self->SUPER::parse_path if not exists $pages{$self->path};
+        my $page = $pages{$self->path} ;
+        $self->action($page->{action});
+        $self->table($page->{table});
+        my %query = $self->ar->args;
+        $self->args( [ $query{tabid} || $query{ItemID} || 1] );
+    }
+
+    1;
+
+Here we're overriding the C<parse_path> method which takes the C<path>
+slot from the request and populates the C<table>, C<action> and
+C<args> slots. If the user has asked for a page we don't know
+about, we ask the usual Maypole path handling method to give it a try;
+this will become important later on. We turn the default page,
+C<DesktopDefault.aspx>, into the equivalent of C</tab/view/1> unless
+another C<tabid> or C<ItemID> is given in the query parameters; this allows us
+to use the ASP.NET-style C<DesktopDefault.aspx?tabid=3> to select a tab.
+
+Now we have to create our C<tab/view> template; the majority of
+this is copied from the F<DesktopDefault.aspx> source, but our panes
+look like this:
+
+    <td id="LeftPane" Width="170">
+        [% pane("LeftPane") %]
+    </td>
+    <td width="1">
+    </td>
+    <td id="ContentPane" Width="*">
+        [% pane("ContentPane") %]
+    </td>
+    <td id="RightPane" Width="230">
+        [% pane("RightPane") %]
+    </td>
+    <td width="10">
+        &nbsp;
+   </td>
+
+The C<pane> macro has to be the Template Toolkit analogue of the Perl code
+we used for our mock-up:
+
+    [% MACRO pane(panename) BLOCK;
+        FOR module = tab.modules("pane", panename);
+            "<P>"; module; " - "; module.definition; "</P>";
+        END;
+    END;
+
+Now, the way that the iBuySpy portal works is that each module has a
+definition, and each definition contains a path to a template:
+C<$module-E<gt>definition-E<gt>DesktopSrc> returns a path name for an C<ascx>
+component file. All we need to do is convert those files from ASP to the
+Template Toolkit, and have Maypole process each component for each module,
+right?
+
+=head2 Components and templates
+
+Dead right, but it was here that I got too clever. I guess it was the word
+"component" that set me off. I thought that since the page was made up of a
+large number of different modules, all requiring their own set of objects, I
+should use a separate Maypole sub-request for each one, as shown in the
+"Component-based pages" recipe in the
+L<Request Cookbook|Maypole::Manual::Request>.
+
+So this is what I did. I created a method in C<Portal::Module> that would
+set the template to the appropriate C<ascx> file:
+
+    sub view_desktop :Exported {
+        my ($self, $r) = @_;
+        $r->template($r->objects->[0]->definition->DesktopSrc);
+    }
+
+and changed the C<pane> macro to fire off a sub-request for each module:
+
+    [% MACRO pane(panename) BLOCK;
+        FOR module = tab.modules("pane", panename);
+            SET path = "/module/view_desktop/" _ module.id;
+            request.component(path);
+        END;
+    END; %]
+
+This did the right thing, and a call to C</module/view_desktop/12> would
+look up the C<Html Document> module definition, find the C<DesktopSrc> to
+be F<DesktopModules/HtmlModule.ascx>, and process module 12 with that
+template. Once I had converted F<HtmlModule.ascx> to be a Template Toolkit
+file (and we'll look at the conversion of the templates in a second) it
+would display nicely on my portal.
+
+Except it was all very slow; we were firing off a large number of Maypole
+requests in series, so that each template could get at the objects it
+needed. Requests were taking 5 seconds.
+
+That's when it dawned on me that these templates don't actually need different
+objects at all. The only object of interest that C</module/view_desktop> is
+passing in is a C<module> object, and each template figures everything out by
+accessor calls on that. But we already have a C<module> object, in our C<FOR>
+loop - we're using it to make the component call, after all! Why not just
+C<PROCESS> each template inside the loop directly?
+
+    [% MACRO pane(panename) BLOCK;
+        FOR module = tab.modules("pane", panename);
+            SET src = module.definition.DesktopSrc;
+            TRY;
+                PROCESS $src;
+            CATCH DEFAULT;
+                "Bah, template $src broke on me!";
+            END;
+        END;
+    END; %]
+
+This worked somewhat better, and took request times from 5 seconds down
+to acceptable sub-second levels again. I could take the C<view_desktop>
+method out again; fewer lines of code to maintain is always good. Now
+all that remained to do for the view side of the portal was to convert
+our ASP templates over to something sensible.
+
+=head2 ASP to Template Toolkit
+
+They're all much of a muchness, these templating languages. Some of
+them, though, are just a wee bit more verbose than others. For instance,
+the banner template which appears in the header consists of 104 lines
+of ASP code; most of those are to create the navigation bar of tabs
+that we can view. Now I admit that we're slightly cheating at the moment
+since we don't have the concept of a logged-in user and so we don't
+distinguish between the tabs that anyone can see and those than only an
+admin can see, but we'll come back to it later. Still, 104 lines, eh?
+
+The actual tab list is presented here: (reformated slightly for sanity)
+
+    <tr>
+        <td>
+            <asp:datalist id="tabs" cssclass="OtherTabsBg" 
+ repeatdirection="horizontal" ItemStyle-Height="25" 
+ SelectedItemStyle-CssClass="TabBg" ItemStyle-BorderWidth="1" 
+ EnableViewState="false" runat="server">
+                <ItemTemplate>
+                    &nbsp;<a href='<%= Request.ApplicationPath %>/
+ DesktopDefault.aspx?tabindex=<%# Container.ItemIndex %>&tabid=
+ <%# ((TabStripDetails) Container.DataItem).TabId %>' class="OtherTabs">
+ <%# ((TabStripDetails) Container.DataItem).TabName %></a>&nbsp;
+                </ItemTemplate>
+                <SelectedItemTemplate>
+                    &nbsp;<span class="SelectedTab">
+ <%# ((TabStripDetails) Container.DataItem).TabName %></span>&nbsp;
+                </SelectedItemTemplate>
+            </asp:datalist>
+        </td>
+    </tr>
+
+But it has to be built up in some 22 lines of C# code which creates and
+populates an array and then binds it to a template parameter. See those
+C<E<lt>%#> and C<E<lt>%=> tags? They're the equivalent of our Template
+Toolkit C<[% %]> tags. C<Request.ApplicationPath>? That's our C<base>
+template argument. 
+
+In our version we ask the portal what tabs it has, and display the
+list directly, displaying the currently selected tab differently:
+
+    <table id="Banner_tabs" class="OtherTabsBg" cellspacing="0" border="0">
+        <tr>
+    [% FOR a_tab = portal.tabs %]
+        [% IF a_tab.id == tab.id %]
+            <td class="TabBg" height="25">
+                &nbsp;<span class="SelectedTab">[%tab.name%]</span>&nbsp;
+        [% ELSE %]
+            <td height="25">
+                &nbsp;<a href='[%base%]DesktopDefault.aspx?tabid=[%a_tab.id%]' 
+                class="OtherTabs">[%a_tab.name%]</a>&nbsp;
+        [% END %]
+            </td>
+    [% END %]
+        </tr>
+    </table>
+
+This is the way the world should be. But wait, where have we pulled this
+C<portal> variable from? We need to tell the C<Portal> class to put the
+default portal into the template arguments:
+
+    sub additional_data {
+        shift->{template_args}{portal} = Portal::Portal->retrieve(2);
+    }
+
+Translating all the other ASP.NET components is a similar exercise in drudgery;
+on the whole, there was precisely nothing interesting about them at all - we
+merely converted a particularly verbose templating language (and if I never see
+C<asp:BoundColumn> again, it'll be no loss) into a rather more sophisticated
+one.
+
+The simplest component, F<HtmlModule.ascx>, asks a module for its associated
+C<htmltexts>, and then displays the C<DesktopHtml> for each of them in a table.
+This was 40 lines of ASP.NET, including more odious C# to make the SQL calls
+and retrieve the C<htmltexts>. But we can do all that retrieval by magic, so
+our F<HtmlModule.ascx> looks like this:
+
+    [% PROCESS module_title %]
+    <portal:title EditText="Edit" EditUrl="~/DesktopModules/EditHtml.aspx" />
+    <table id="t1" cellspacing="0" cellpadding="0">
+        <tr valign="top">
+            <td id="HtmlHolder">
+            [% FOR html = module.htmltexts; html.DesktopHtml; END %]
+            </td>
+        </tr>
+    </table>
+
+Now I admit that we've cheated here and kept that C<portal:title> tag
+until we know what to do with it - it's obvious that we should turn
+it into a link to edit the HTML of this module if we're allowed to.
+
+The next simplest one actually did provide a slight challenge;
+F<ImageModule.ascx> took the height, width and image source properties
+of an image from the module's C<settings> table, and displayed an C<IMG>
+tag with the appropriate values. This is only slightly difficult because
+we have to arrange the array of C<module.settings> into a hash of
+C<key_name> => C<setting> pairs. Frankly, I can't be bothered to do this
+in the template, so we'll add it into the C<template_args> again. This
+time C<additional_data> looks like:
+
+    sub additional_data {
+        my $r = shift;
+        shift->template_args->{portal} = Portal::Portal->retrieve(2);
+        if ($r->objects->[0]->isa("Portal::Module")) {
+            $r->template_args->{module_settings} =
+                { map { $_->key_name, $_->setting } 
+                  $r->objects->[0]->settings };
+        }
+    }
+
+And the F<ImageModule.ascx> drops from the 30-odd lines of ASP into:
+
+    [% PROCESS module_title; %]
+    <img id="Image1" border="0" src="[% module_settings.src %]" 
+      width="[% module_settings.width %]" 
+      height="[% module_settings.height %]" />
+    <br>
+
+Our portal is taking shape; after a few more templates have been translated,
+we now have a complete replica of the front page of the portal and all its
+tabs. It's fast, it's been developed rapidly, and it's less than 50 lines
+of Perl code so far. But it's not finished yet.
+
+=head2 Adding users
+
+...
+
+=head2 Links
+
+L<Contents|Maypole::Manual>,
+Next B<That's all folks! Time to start coding ...>,
+Previous L<Flox|Maypole::Manual::Flox>
+

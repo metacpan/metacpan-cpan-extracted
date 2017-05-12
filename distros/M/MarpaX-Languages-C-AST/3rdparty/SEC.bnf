@@ -1,0 +1,1004 @@
+/*
+ * Copyright 2002-2009 ISP RAS (http://www.ispras.ru), UniTESK Lab (http://www.unitesk.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * @author <A href="mailto:demakov@ispras.ru">Alexey Demakov</A>
+ * @author <A href="mailto:hed@ispras.ru">Alexey Khoroshilov</A>
+ * @version $Id$
+ */
+
+/*
+ * List of modifications of standard C grammar:
+ *
+ *  1. MSVS supports a comma at the end of enumerators list in enum_specifier (MSVS).
+ *  2. MSVS attributes has been added to declaration and function definition (MSVS).
+ *  3. GCC attributes has been added to struct_or_union_specifier, enum_specifier,
+ *     declaration_specifiers, declarator and pointer (GCC).
+ *  4. MSVS declspec specifier has been added to storage_class_specifier (MSVS).
+ *  5. MSVS supports struct declarations without declarators (MSVS).
+ *  6. MSVS inline assembler instructions has been added (MSVS).
+ *  7. MSVS supports sized integer types __int8,..,__int64 (MSVS).
+ *  8. GCC extension specifier has been added to declaration_specifiers and
+ *     unary_expr (GCC 3.2.1).
+ *  9. initializer_list is optional in initializer because specification
+ *     typedef SEC construction syntax requires it.
+ *  10. GCC allows struct specifiers with empty list of struct_declarations.
+ *  11. MSVS inline function specifiers have been added (MSVS).
+ *  12. GCC asm statements have been added (GCC).
+ *  13. gcc_statement_expression has been added as primary expression (GCC).
+ *  14. Translation unit may contain empty list of declarations (MSVS,GCC).
+ *  15. GCC keyword "__restrict__" has been added (GCC).
+ *  16. GCC type modifiers have been added into array declarators (GCC).
+ *  17. GCC asm has been added into declarator (GCC).
+ *  18. GCC "__builtin_va_arg" function invocation has been added to postfix_expr (GCC)
+ *  19. GCC "typeof" type specifier has been added to type_specifier (GCC)
+ *  20. GCC "__builtin_offsetof" function invocation has been added to postfix_expr (GCC).
+ */
+
+/*
+ * A.2.4 External definitions
+ */
+
+/*
+ * Modification of standard syntax:
+ *    Translation unit may contain empty list of declarations.
+ */
+translation_unit ::= ( external_declaration )* ;
+
+external_declaration ::=   function_definition
+                         | declaration
+                         | se_invariant_definition
+                           // since 2.3
+                         | se_coverage_declaration
+                     ;
+
+function_definition ::= declaration_specifiers
+                        declarator
+                        ( declaration )*
+                        compound_statement
+                    ;
+
+se_invariant_definition ::=   "invariant" "(" <ID> ")" compound_statement
+                            | "invariant" "(" parameter_declaration ")" compound_statement
+                        ;
+
+// since 2.3
+se_coverage_declaration ::= ( "extern" )?
+                            "coverage"
+                            ( "enum" )?
+                            <ID>
+                            ( "(" ( parameter_type_list )? ")" )?
+                            (   se_coverage_function_initializer
+                              | (   se_coverage_elements_initializer
+                                  | se_coverage_derivation_initializer
+                                )?
+                                ";"
+                            )
+                        ;
+
+// since 2.3
+se_coverage_elements_initializer ::= "="
+                                     "{"
+                                     se_coverage_element_declaration
+                                     ( "," se_coverage_element_declaration )*
+                                     "}"
+                                  ;
+
+// since 2.3
+se_coverage_element_declaration ::= <ID>
+                                    ( "=" <STRING_LITERAL> )?
+                                ;
+
+// since 2.3
+se_coverage_derivation_initializer ::= "="
+                                       se_base_coverage
+                                       ( "*" se_base_coverage )*
+                                       ( se_coverage_filter )?
+                                   ;
+
+// since 2.3
+se_coverage_filter ::= ":" expression ;
+
+// since 2.3
+se_base_coverage ::= se_coverage_name
+                     ( "("
+                       ( assignment_expr ( "," assignment_expr )* )?
+                       ")"
+                     )?
+                 ;
+
+
+se_coverage_name ::= ( <ID> "." )?  // spec function name
+                     <ID>           // coverage name
+                 ;
+
+// since 2.3
+se_coverage_function_initializer ::= compound_statement;
+
+/*
+ * A.2.2 Declarations
+ */
+
+declaration ::= declaration_specifiers ( init_declarator  ( "," init_declarator )* )? ";" ;
+
+/*
+ * Modification of standard syntax:
+ *    GCC declaration specifiers have been added.
+ */
+declaration_specifiers ::= (   storage_class_specifier
+                             | type_specifier
+                             | type_qualifier
+                             | function_specifier
+                             | gcc_declaration_specifier
+                             | se_declaration_specifier
+                           )+
+                       ;
+
+init_declarator ::= declarator ( "=" initializer )? ;
+
+/*
+ * Modification of standard syntax:
+ *    1. MSVS declspec specifier has been added.
+ *    2. se_storage_class_specifier has been added.
+ */
+storage_class_specifier ::=   "typedef"
+                            | "extern"
+                            | "static"
+                            | "auto"
+                            | "register"
+                            | msvs_declspec
+                            | se_storage_class_specifier
+                        ;
+
+se_storage_class_specifier ::= "stable" ;
+
+/*
+ * Modification of standard syntax:
+ *    Sized integer types (from MSVS) have been added.
+ */
+type_specifier ::=   "void"
+                   | "char"
+                   | "short"
+                   | "int"
+                   | "long"
+                   | "float"
+                   | "double"
+                   | "signed"
+                   | "unsigned"
+                   | "_Bool"
+                   | "_Complex"
+                   | "_Imaginary"
+                   | struct_or_union_specifier
+                   | enum_specifier
+                     // since 2.3
+                   | coverage_specifier
+                   | typedef_name
+                   | msvs_builtin_type
+                   | gcc_typeof
+               ;
+
+/*
+ * Modification of standard syntax:
+ *    1. GCC attributes have been added.
+ *    2. GCC allows empty list of struct_declarations.
+ */
+struct_or_union_specifier ::=   struct_or_union
+                                ( gcc_attribute )*
+                                ( <ID> )?
+                                "{"
+                                ( struct_declaration )*
+                                "}"
+                              | struct_or_union
+                                ( gcc_attribute )*
+                                <ID>
+                          ;
+
+struct_or_union ::= "struct" | "union" ;
+
+/*
+ * Modification of standard syntax:
+ *    MSVS supports struct declarations without declarators.
+ *    GCC supports empty struct declarations.
+ */
+struct_declaration ::=   ( specifier_qualifier )+
+                         ( struct_declarator ( "," struct_declarator )* )?
+                         ";"
+                       | // GCC extension
+                         ";"
+                   ;
+
+/*
+ * Modification of standard syntax:
+ *    GCC declaration specifier has been added.
+ */
+specifier_qualifier ::=   type_specifier
+                        | type_qualifier
+                        | gcc_declaration_specifier
+                    ;
+
+/*
+ * Modification of standard syntax:
+ *    GCC attributes optional list has been added.
+ */
+struct_declarator ::=   declarator
+                      | ( declarator )? ":" constant_expr ( gcc_attribute )*
+                  ;
+
+/*
+ * Modification of standard syntax:
+ *    1. MSVS supports a comma at the end of enumerators list.
+ *    2. GCC attributes have been added.
+ */
+enum_specifier ::=   "enum"
+                     ( gcc_attribute )*
+                     ( <ID> )?
+                     "{"
+                     enumerator
+                     ( "," enumerator )*
+                     ( "," )?
+                     "}"
+                   | "enum"
+                     ( gcc_attribute )*
+                     <ID>
+               ;
+
+enumerator ::= <ID> ( "=" constant_expr )? ;
+
+// since 2.3
+coverage_specifier ::= "coverage" se_coverage_name ;
+
+
+/*
+ * Modification of standard syntax:
+ *    GCC keyword "__restrict__" has been added.
+ */
+type_qualifier ::= "const" | "restrict" | "volatile" | "__restrict__" ;
+
+/*
+ * Modification of standard syntax:
+ *    MSVS inline function specifiers have been added.
+ */
+function_specifier ::=   "inline"
+                       | msvs_function_specifier
+                   ;
+
+se_declaration_specifier ::=   "invariant"
+                             | "specification"
+                             | "reaction"
+                             | "mediator" <ID> "for"
+                             | "iterator"
+                             | "scenario"
+                         ;
+
+/*
+ * Modification of standard syntax:
+ *    1. GCC asm and attributes optional list has been added.
+ *    2. MSVS attributes optional lists have been added.
+ */
+declarator ::= ( pointer )? ( msvs_attribute )* direct_declarator ( gcc_asm_expression )? ( gcc_attribute )* ;
+
+/*
+ * Modification of standard syntax:
+ *    1. GCC attributes optional list has been added.
+ *    2. GCC type modifiers has been added into array declarators.
+ */
+direct_declarator ::=   <ID>
+                      | "(" ( gcc_attribute )* declarator ")"
+                      | direct_declarator "[" ( gcc_array_type_modifier )* ( assignment_expr )? "]"
+                      | direct_declarator "[" ( gcc_array_type_modifier )* "*" "]"
+                      | direct_declarator
+                        "("
+                        parameter_type_list
+                        ")"
+                        ( se_access_description )*
+                        ( se_local_coverage_description )*
+                      | direct_declarator
+                        "("
+                        ( <ID> ( "," <ID> )* )?
+                        ")"
+                        ( se_access_description )*
+                        ( se_local_coverage_description )*
+                  ;
+
+/*
+ * Modification of standard syntax:
+ *    1. GCC attributes have been added.
+ *    2. MSVS attributes optional lists have been added.
+ */
+pointer ::= ( ( msvs_attribute )* "*" ( pointer_qualifier )* )+ ;
+
+pointer_qualifier ::= type_qualifier | gcc_attribute ;
+
+parameter_type_list ::= parameter_declaration
+                        ( "," parameter_declaration )*
+                        ( "," "..." )?
+                    ;
+
+parameter_declaration ::=   declaration_specifiers declarator
+                          | declaration_specifiers ( abstract_declarator )?
+                      ;
+
+se_access_description ::= se_access_specifier se_access ( "," se_access )* ;
+
+se_access_specifier ::= "reads" | "writes" | "updates" ;
+
+se_access ::= ( se_access_alias )? assignment_expr ;
+
+se_access_alias ::= <ID> "=" ;
+
+// since 2.3
+se_local_coverage_description ::= "coverage"
+                                  <ID>
+                                  (   se_coverage_elements_initializer
+                                    | se_coverage_derivation_initializer
+                                    | ( "," <ID> )*
+                                  )
+                              ;
+
+type_name ::= ( specifier_qualifier )+ ( abstract_declarator )? ;
+
+/*
+ * Modification of standard syntax:
+ *    1. GCC asm and attributes optional list has been added.
+ *    2. MSVS attributes optional lists have been added.
+ */
+abstract_declarator ::=     pointer    ( msvs_attribute )*
+                        | ( pointer )? ( msvs_attribute )* direct_abstract_declarator ( gcc_asm_expression )? ( gcc_attribute )*
+                    ;
+
+/*
+ * Modification of standard syntax:
+ *    1. GCC attributes optional list has been added.
+ *    2. GCC type modifiers has been added into array declarators.
+ */
+direct_abstract_declarator ::=   "(" ( gcc_attribute )* abstract_declarator ")"
+                               | ( direct_abstract_declarator )?
+                                 "["
+                                 ( gcc_array_type_modifier )*
+                                 ( assignment_expr )?
+                                 "]"
+                               | ( direct_abstract_declarator )? "[" ( gcc_array_type_modifier )* "*" "]"
+                               | ( direct_abstract_declarator )?
+                                 "("
+                                 ( parameter_type_list )?
+                                 ")"
+                           ;
+
+typedef_name ::= <ID> ;
+
+/*
+ * Modification of standard syntax:
+ *    initializer_list is optional for specification typedef SEC construction.
+ */
+initializer ::=   assignment_expr
+                | "{" ( initializer_list )? ( "," )? "}"
+            ;
+
+initializer_list ::= ( designation )?
+                     initializer
+                     ( "," ( designation )? initializer )*
+                 ;
+
+designation ::= ( designator )+ "=" ;
+
+/*
+ * Modification of standard syntax:
+ *    1. GCC range designator added
+ */
+designator ::=   "[" constant_expr "]"
+               | "." <ID>
+                 // GCC extension
+               | "[" constant_expr "..." constant_expr "]"
+           ;
+
+/*
+ * A.2.3 Statements
+ */
+
+/*
+ * Modification of standard syntax:
+ *    1. MSVS inline assembler statements have been added.
+ *    2. GCC asm statements have been added.
+ */
+statement ::=   labeled_statement
+              | compound_statement
+              | expression_statement
+              | selection_statement
+              | iteration_statement
+              | jump_statement
+              | msvs_asm_statement
+              | gcc_asm_statement
+              | se_iteration_statement
+              | se_iterate_coverage_statement
+              | se_block_statement
+                // since 2.3
+              | se_coverage_statement
+          ;
+
+labeled_statement ::=   <ID> ":" statement
+                      | "case" constant_expr ":" statement
+                      | "default" ":" statement
+                  ;
+
+compound_statement ::= "{" ( block_item )* "}" ;
+
+block_item ::= declaration | statement ;
+
+expression_statement ::= ( expression )? ";" ;
+
+selection_statement ::=   "if"
+                          "("
+                          expression
+                          ")"
+                          statement
+                          ( "else" statement )?
+                        | "switch" "(" expression ")" statement
+                    ;
+
+iteration_statement ::=   "while" "(" expression ")" statement
+                        | "do" statement "while" "(" expression ")" ";"
+                        | "for"
+                          "("
+                          ( declaration | ( expression )? ";" )
+                          ( expression )?
+                          ";"
+                          ( expression )?
+                          ")"
+                          statement
+                    ;
+
+jump_statement ::=   "goto" <ID> ";"
+                   | "continue" ";"
+                   | "break" ";"
+                   | "return" ( se_return_expression )? ";"
+               ;
+
+se_return_expression ::=   expression
+                         | se_coverage_element_return_expression
+                     ;
+
+// since 2.3
+se_coverage_element_return_expression ::= "{"
+                                          (   <ID> ( "," <STRING_LITERAL> )?
+                                            | <STRING_LITERAL>
+                                          )
+                                          "}"
+                                      ;
+
+se_iteration_statement ::= "iterate"
+                           "("
+                           declaration
+                           ( expression )?
+                           ";"
+                           ( expression )?
+                           ( ";"
+                             ( expression )?
+                           )?
+                           ")"
+                           statement
+                       ;
+
+se_iterate_coverage_statement ::= "iterate"
+                                  "coverage"
+                                  (   "("
+                                      se_coverage_name
+                                      ( se_coverage_filter )?
+                                      ")"
+                                    | se_coverage_name
+                                  )
+                                  statement
+                              ;
+
+se_block_statement ::=   se_pre_block_statement
+                       // since 2.3
+                       // | se_coverage_block_statement
+                       | se_post_block_statement
+                       | se_call_block_statement
+                       | se_state_block_statement
+                       | se_parallel_block_statement
+                   ;
+
+se_pre_block_statement ::= "pre" compound_statement ;
+
+// since 2.3
+// coverage_block_statement -> coverage_statement
+se_coverage_statement ::= // deprecated since 2.3
+                          ( "default" )?
+                          // since 2.3
+                          // "coverage" <ID> se_coverage_function_initializer
+                          // or
+                          // "coverage" <ID> se_coverage_derivation_initializer
+                          se_coverage_declaration
+                      ;
+
+se_post_block_statement ::= "post" compound_statement ;
+
+se_call_block_statement ::= "call" compound_statement ;
+
+se_state_block_statement ::= "state" compound_statement ;
+
+se_parallel_block_statement ::= "parallel" <ID>
+                                "("
+                                ( assignment_expr ( "," assignment_expr )* )?
+                                ")"
+                                compound_statement
+                            ;
+
+/*
+ * A.2.1 Expressions
+ */
+
+constant ::=   <INTEGER_CONSTANT>
+             | <FLOATING_CONSTANT>
+             | <ENUMERATION_CONSTANT>
+             | <CHARACTER_CONSTANT>
+             ;
+
+/*
+ * Modification of standard syntax:
+ *    GCC statement expression has been added as primary expression.
+ */
+primary_expr ::=   <ID>
+                 | constant
+                 | <STRING_LITERAL>
+                 | "(" expression ")"
+                 | gcc_statement_expression
+                 | se_primary_expr
+             ;
+
+se_primary_expr ::=   "invariant"
+                    | "pre" ( <ID> )?
+                    | "scenario" <ID>
+                    | // @since 2.3
+                      se_trace_expression
+                ;
+
+postfix_expr ::=   primary_expr
+                 | postfix_expr "[" expression "]"
+                 | postfix_expr
+                   "("
+                   ( assignment_expr ( "," assignment_expr )* )?
+                   ")"
+                 | // @since 2.6.264
+                   gcc_builtin_va_start
+                 | // @since 2.6.264
+                   gcc_builtin_va_end
+                 | gcc_builtin_va_arg
+                 | gcc_builtin_offsetof
+                 | postfix_expr "."  <ID>
+                 | postfix_expr "->" <ID>
+                 | postfix_expr "++"
+                 | postfix_expr "--"
+                 | "(" type_name ")" "{" initializer_list ( "," )? "}"
+             ;
+
+/*
+ * @since 2.3
+ */
+se_trace_expression ::= "trace" "(" assignment_expr ")" ;
+
+/*
+ * Modification of standard syntax:
+ *    GCC extension specifier has been added.
+ */
+unary_expr ::=   postfix_expr
+               | "++" unary_expr
+               | "--" unary_expr
+               | unary_operator cast_expr
+               | "sizeof" unary_expr
+               | "sizeof" "(" type_name ")"
+                 // gcc extension
+               | "__alignof__" unary_expr
+               | "__alignof__" "(" type_name ")"
+               | gcc_extension_specifier cast_expr
+           ;
+
+unary_operator ::= "&" | "*" | "+" | "-" | "~" | "!" | "@" ;
+
+cast_expr ::=   unary_expr
+              | "(" type_name ")" cast_expr
+              ;
+
+multiplicative_expr ::=   cast_expr
+                        | multiplicative_expr ( "*" | "/" | "%" ) cast_expr
+                    ;
+
+additive_expr ::=   multiplicative_expr
+                  | additive_expr ( "+" | "-" ) multiplicative_expr
+              ;
+
+shift_expr ::=   additive_expr
+               | shift_expr ( "<<" | ">>" ) additive_expr
+           ;
+
+relational_expr ::=   shift_expr
+                    | relational_expr ( "<" | ">" | "<=" | ">=" ) shift_expr
+                ;
+
+equality_expr ::=   relational_expr
+                  | equality_expr ( "==" | "!=" ) relational_expr
+              ;
+
+AND_expr ::=   equality_expr
+             | AND_expr "&" equality_expr
+         ;
+
+exclusive_OR_expr ::=   AND_expr
+                      | exclusive_OR_expr "^" AND_expr
+                  ;
+
+inclusive_OR_expr ::=   exclusive_OR_expr
+                      | inclusive_OR_expr "|" exclusive_OR_expr
+                  ;
+
+logical_AND_expr ::=   inclusive_OR_expr
+                     | logical_AND_expr "&&" inclusive_OR_expr
+                 ;
+
+logical_OR_expr ::=   logical_AND_expr
+                    | logical_OR_expr "||" logical_AND_expr
+                ;
+
+se_logical_impl_expr ::=   logical_OR_expr
+                         | se_logical_impl_expr "=>" logical_OR_expr
+                     ;
+
+/*
+ * Modification of standard syntax:
+ *    The else branch of conditional_expr makes optional for conditional access_descs.
+ * GCC extension:
+ *    Then-part of conditional expression can be omitted
+ */
+conditional_expr ::=   se_logical_impl_expr
+                     | se_logical_impl_expr "?" expression ( ":" conditional_expr )?
+                       // gcc extension
+                     | se_logical_impl_expr "?" ":" conditional_expr
+                 ;
+
+assignment_expr ::=   conditional_expr
+                    | unary_expr assignment_operator assignment_expr
+                ;
+
+assignment_operator ::=   "="
+                        | "*="
+                        | "/="
+                        | "%="
+                        | "+="
+                        | "-="
+                        | "<<="
+                        | ">>="
+                        | "&="
+                        | "^="
+                        | "|="
+                    ;
+
+expression ::= assignment_expr ( "," assignment_expr )* ;
+
+constant_expr ::= conditional_expr ;
+
+
+/*
+ * Microsoft Extensions
+ */
+msvs_attribute ::= "__asm" | "__fastcall" | "__based" | "__cdecl" | "__stdcall" ;
+
+msvs_builtin_type ::=  "__int8"
+                     | "__int16"
+                     | "__int32"
+                     | "__int64"
+                  ;
+
+msvs_declspec ::= "__declspec" "(" ( msvs_extended_decl_modifier )* ")" ;
+
+msvs_extended_decl_modifier ::=   "allocate" "(" <STRING_LITERAL> ")"
+                                | "dllimport"
+                                | "dllexport"
+                                | "naked"
+                                | "noreturn"
+                                | "nothrow"
+                                | "novtable"
+                                | "property" "(" ( <ID> "=" <ID> ( "," <ID> "=" <ID> )* )? ")"
+                                | "selectany"
+                                | "thread"
+                                | "uuid" "(" <STRING_LITERAL> ")"
+                            ;
+
+msvs_function_specifier ::=   "__inline"
+                            | "__forceinline"
+                        ;
+
+msvs_asm_statement ::=   "__asm" msvs_asm_directive
+                       | "__asm"
+                         "{"
+                         ( msvs_asm_directive )+
+                         "}"
+                 ;
+
+msvs_asm_directive ::=   ( msvs_asm_label_def )? msvs_asm_segment_directive
+                       | msvs_asm_label_def
+                   ;
+
+msvs_asm_label_def ::=   <ID> ":"
+                       | <ID> ":" ":"
+                       | "@" "@" ":"
+                   ;
+
+/*
+ * msvs_asm_segment_directive ::=   msvs_asm_instruction
+ *                                | msvs_asm_data_directive
+ *                                | msvs_asm_control_directive
+ *                                | msvs_asm_startup_directive
+ *                                | msvs_asm_exit_directive
+ *                                | msvs_asm_offset_directive
+ *                                | msvs_asm_label_directive
+ *                                | msvs_asm_proc_directive
+ *                                  ( msvs_asm_local_directive )*
+ *                                  ( msvs_asm_directive )*
+ *                                  msvs_asm_endp_directive
+ *                                | msvs_asm_invoke_directive
+ *                                | msvs_asm_general_directive
+ *                            ;
+ *
+ * The full MASM instruction set is not supported.
+ */
+msvs_asm_segment_directive ::=   msvs_asm_instruction ;
+
+msvs_asm_instruction ::= ( msvs_asm_instr_prefix )?
+                         msvs_asm_mnemonic
+                         ( msvs_asm_expr ( "," msvs_asm_expr )* )?
+                     ;
+
+msvs_asm_instr_prefix ::= "REP" | "REPE" | "REPZ" | "REPNE" | "REPNZ" | "LOCK" ;
+
+msvs_asm_mnemonic ::= <ID> | "AND" | "MOD" | "NOT" | "OR" | "SEG" | "SHL" | "SHR" | "XOR" ;
+
+/*
+ * msvs_asm_expr ::=   "SHORT"  msvs_asm_expr05
+ *                   | ".TYPE"  msvs_asm_expr01
+ *                   | "OPATTR" msvs_asm_expr01
+ *                   | msvs_asm_expr01
+ *               ;
+ *
+ * The full MASM instruction set is not supported.
+ */
+msvs_asm_expr ::= msvs_asm_expr01 ;
+
+msvs_asm_expr01 ::=   msvs_asm_expr01 "OR"  msvs_asm_expr02
+                    | msvs_asm_expr01 "XOR" msvs_asm_expr02
+                    | msvs_asm_expr02
+                ;
+
+msvs_asm_expr02 ::=   msvs_asm_expr02 "AND" msvs_asm_expr03
+                    | msvs_asm_expr03
+                ;
+
+msvs_asm_expr03 ::=   "NOT" msvs_asm_expr04
+                    | msvs_asm_expr04
+                ;
+
+msvs_asm_expr04 ::=   msvs_asm_expr04 "EQ" msvs_asm_expr05
+                    | msvs_asm_expr04 "NE" msvs_asm_expr05
+                    | msvs_asm_expr04 "LT" msvs_asm_expr05
+                    | msvs_asm_expr04 "LE" msvs_asm_expr05
+                    | msvs_asm_expr04 "GT" msvs_asm_expr05
+                    | msvs_asm_expr04 "GE" msvs_asm_expr05
+                    | msvs_asm_expr05
+                ;
+
+msvs_asm_expr05 ::=   msvs_asm_expr05 "+" msvs_asm_expr06
+                    | msvs_asm_expr05 "-" msvs_asm_expr06
+                    | msvs_asm_expr06
+                ;
+
+msvs_asm_expr06 ::=   msvs_asm_expr06 "*"   msvs_asm_expr07
+                    | msvs_asm_expr06 "/"   msvs_asm_expr07
+                    | msvs_asm_expr06 "MOD" msvs_asm_expr07
+                    | msvs_asm_expr06 "SHR" msvs_asm_expr07
+                    | msvs_asm_expr06 "SHL" msvs_asm_expr07
+                    | msvs_asm_expr07
+                ;
+
+msvs_asm_expr07 ::=   "+" msvs_asm_expr08
+                    | "-" msvs_asm_expr08
+                    | msvs_asm_expr08
+                ;
+
+msvs_asm_expr08 ::=   "HIGH"     msvs_asm_expr09
+                    | "LOW"      msvs_asm_expr09
+                    | "HIGHWORD" msvs_asm_expr09
+                    | "LOWWORD"  msvs_asm_expr09
+                    | msvs_asm_expr09
+                ;
+
+msvs_asm_expr09 ::=   "OFFSET"   msvs_asm_expr10
+                    | "SEG"      msvs_asm_expr10
+                    | "LROFFSET" msvs_asm_expr10
+                    | "TYPE"     msvs_asm_expr10
+                    | "THIS"     msvs_asm_expr10
+                    | msvs_asm_expr09 "PTR" msvs_asm_expr10
+                    | msvs_asm_expr09 ":"   msvs_asm_expr10
+                    | msvs_asm_expr10
+                ;
+
+msvs_asm_expr10 ::=   msvs_asm_expr10 "." msvs_asm_expr11
+                    | msvs_asm_expr10 "[" msvs_asm_expr "]"
+                    | msvs_asm_expr11
+                ;
+
+/*
+ * msvs_asm_expr11 ::=   "(" msvs_asm_expr ")"
+ *                     | "[" msvs_asm_expr "]"
+ *                     | "WIDTH" <ID>
+ *                     | "MASK"  <ID>
+ *                     | "SIZE"    msvs_asm_size_arg
+ *                     | "SIZEOF"  msvs_asm_size_arg
+ *                     | "LENGTH"   <ID>
+ *                     | "LENGTHOF" <ID>
+ *                     | msvs_asm_record_const
+ *                     | msvs_asm_string
+ *                     | msvs_asm_constant
+ *                     | msvs_asm_type
+ *                     | <ID>
+ *                     | "$"
+ *                     | msvs_asm_segment_register
+ *                     | msvs_asm_register
+ *                     | "ST"
+ *                     | "ST" "(" msvs_asm_expr ")"
+ *                 ;
+ *
+ * The full MASM instruction set is not supported.
+ */
+msvs_asm_expr11 ::=   "(" msvs_asm_expr ")"
+                    | "[" msvs_asm_expr "]"
+                    | msvs_asm_constant
+                    | msvs_asm_type
+                    | <ID>
+                    | "$"
+                    | msvs_asm_segment_register
+                    | msvs_asm_register
+                ;
+
+msvs_asm_type ::=   <ID>
+                  | msvs_asm_distance
+                  | msvs_asm_data_type
+              ;
+
+msvs_asm_distance ::=   msvs_asm_nearfar
+                      | "NEAR16"
+                      | "NEAR32"
+                      | "FAR16"
+                      | "FAR32"
+                  ;
+
+msvs_asm_nearfar ::= "NEAR" | "FAR" ;
+
+msvs_asm_data_type ::=   "BYTE"
+                       | "SBYTE"
+                       | "WORD"
+                       | "SWORD"
+                       | "DWORD"
+                       | "SDWORD"
+                       | "FWORD"
+                       | "QWORD"
+                       | "TBYTE"
+                       | "REAL4"
+                       | "REAL8"
+                       | "REAL10"
+                   ;
+
+msvs_asm_segment_register ::= "CS" | "DS" | "ES" | "FS" | "GS" | "SS" ;
+
+msvs_asm_register ::=   msvs_asm_special_register
+                      | msvs_asm_gp_register
+                      | msvs_asm_byte_register
+                  ;
+
+msvs_asm_special_register ::=   "CR0" | "CR2" | "CR3"
+                              | "DR0" | "DR1" | "DR2" | "DR3" | "DR6" | "DR7"
+                              | "TR3" | "TR4" | "TR5" | "TR6" | "TR7"
+                          ;
+
+msvs_asm_gp_register ::=   "AX" | "EAX" | "BX" | "EBX" | "CX" | "ECX" | "DX" | "EDX"
+                         | "BP" | "EBP" | "SP" | "ESP" | "DI" | "EDI" | "SI" | "ESI"
+                     ;
+
+msvs_asm_byte_register ::= "AL" | "AH" | "BL" | "BH" | "CL" | "CH" | "DL" | "DH" ;
+
+msvs_asm_constant ::= <INTEGER_CONSTANT> ;
+
+
+/*
+ * GCC Extensions
+ */
+gcc_declaration_specifier ::=   gcc_attribute
+                              | gcc_extension_specifier
+                          ;
+
+gcc_attribute ::= "__attribute__" "(" "(" gcc_attribute_parameter ( "," gcc_attribute_parameter )* ")" ")" ;
+
+gcc_attribute_parameter ::=   ( gcc_any_word )?
+                            | gcc_any_word "(" ( assignment_expr ( "," assignment_expr )* )? ")"
+                        ;
+
+gcc_any_word ::=   <ID>
+                 | storage_class_specifier
+                 | type_specifier
+                 | type_qualifier
+                 | function_specifier
+             ;
+
+gcc_extension_specifier ::= "__extension__" ;
+
+gcc_asm_statement ::= gcc_asm_expression ";" ;
+
+gcc_asm_expression ::= "__asm__"
+                       ( type_qualifier )?
+                       "("
+                       expression
+                         (
+                          ":" ( gcc_asm_operand ( "," gcc_asm_operand )* )?
+                            (
+                             ":" ( gcc_asm_operand ( "," gcc_asm_operand )* )?
+                               (
+                                ":"   gcc_asm_clobber ( "," gcc_asm_clobber )*
+                               )?
+                            )?
+                         )?
+                       ")"
+                   ;
+
+gcc_asm_operand ::= ( "[" <ID> "]" )? <STRING_LITERAL> "(" expression ")" ;
+
+gcc_asm_clobber ::= <STRING_LITERAL> ;
+
+gcc_statement_expression ::= "(" compound_statement ")" ;
+
+gcc_array_type_modifier ::=   type_qualifier
+                            | gcc_attribute
+                        ;
+
+// @since 2.6.264
+gcc_builtin_va_start ::= "__builtin_va_start"
+                         "("
+                         assignment_expr
+                         ","
+                         assignment_expr // for error handling: it's always last parameter name
+                         ")"
+                     ;
+
+// @since 2.6.264
+gcc_builtin_va_end ::= "__builtin_va_end"
+                        "("
+                        assignment_expr
+                        ")"
+                   ;
+
+gcc_builtin_va_arg ::= "__builtin_va_arg"
+                       "("
+                           assignment_expr
+                           ","
+                           type_name
+                       ")"
+                   ;
+
+gcc_typeof ::= "typeof" "(" ( type_name | assignment_expr ) ")" ;
+
+gcc_builtin_offsetof ::= "__builtin_offsetof" "(" typename "," offsetof_member_designator ")" ;
+     
+offsetof_member_designator ::=   identifier
+                               | offsetof_member_designator "." identifier
+                               | offsetof_member_designator "[" expr "]"
+                           ;

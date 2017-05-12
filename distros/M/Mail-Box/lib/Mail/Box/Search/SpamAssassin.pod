@@ -1,0 +1,307 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Box::Search::SpamAssassin - select spam messages with Mail::SpamAssassin
+
+=head1 INHERITANCE
+
+ Mail::Box::Search::SpamAssassin
+   is a Mail::Box::Search
+   is a Mail::Reporter
+
+=head1 SYNOPSIS
+
+ use Mail::Box::Manager;
+ my $mgr    = Mail::Box::Manager->new;
+ my $folder = $mgr->open('Inbox');
+
+ my $spam = Mail::Box::Search::SpamAssassin->new;
+ if($spam->search($message)) {...}
+
+ my @msgs   = $filter->search($folder);
+ foreach my $msg ($folder->messages)
+ {   $msg->delete if $msg->label('spam');
+ }
+
+ my $spam2 = Mail::Box::Search::SpamAssassin
+               ->new(deliver => 'DELETE');
+ $spam2->search($folder);
+ $mgr->moveMessages($spamfolder, $folder->messages('spam'));
+
+=head1 DESCRIPTION
+
+I<Spam> means "unsollicited e-mail", and is as name derived from a
+Monty Python scatch.  Although Monty Python is fun, spam is a pain:
+it needlessly spoils minutes of time from most people: telephone
+bills, overful mailboxes which block honest e-mail, and accidentally
+removal of honest e-mail which looks like spam.  Spam is the pest
+of Internet.
+
+Happily, Mail::Box can be used as spam filter, in combination with
+the useful Mail::SpamAssassin module (which must be installed separately).
+Each message which is searched is wrapped in a
+L<Mail::Message::Wrapper::SpamAssassin|Mail::Message::Wrapper::SpamAssassin> object.
+
+The spam-assassin module version 2 is not really well adapted for
+L<Mail::Message|Mail::Message> objects, which will make this search even slower than
+spam-detection already is.
+
+Extends L<"DESCRIPTION" in Mail::Box::Search|Mail::Box::Search/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Box::Search|Mail::Box::Search/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Mail::Box::Search|Mail::Box::Search/"Constructors">.
+ 
+=over 4
+
+=item Mail::Box::Search::SpamAssassin-E<gt>B<new>(%options)
+
+Create a spam filter.  Internally, a Mail::SpamAssassin object is
+maintained.
+
+Only the whole message can be searched; this is a limitation of
+the Mail::SpamAssassin module.
+
+ -Option       --Defined in       --Default
+  binaries       Mail::Box::Search  <false>
+  decode         Mail::Box::Search  <true>
+  delayed        Mail::Box::Search  <true>
+  deleted        Mail::Box::Search  <false>
+  deliver        Mail::Box::Search  undef
+  in             Mail::Box::Search  'MESSAGE'
+  label                             c<'spam'>
+  limit          Mail::Box::Search  0
+  log            Mail::Reporter     'WARNINGS'
+  logical        Mail::Box::Search  'REPLACE'
+  multiparts     Mail::Box::Search  <true>
+  rewrite_mail                      <true>
+  sa_options                        { }
+  spam_assassin                     undef
+  trace          Mail::Reporter     'WARNINGS'
+
+=over 2
+
+=item binaries => BOOLEAN
+
+=item decode => BOOLEAN
+
+=item delayed => BOOLEAN
+
+=item deleted => BOOLEAN
+
+=item deliver => undef|CODE|'DELETE'
+
+=item in => 'HEAD'|'BODY'|'MESSAGE'
+
+=item label => STRING|undef
+
+Mark all selected message with the specified STRING.  If this
+option is explicitly set to C<undef>, the label will not be set.
+
+=item limit => NUMBER
+
+=item log => LEVEL
+
+=item logical => 'REPLACE'|'AND'|'OR'|'NOT'|'AND NOT'|'OR NOT'
+
+=item multiparts => BOOLEAN
+
+=item rewrite_mail => BOOLEAN
+
+Add lines to the message header describing the results of the spam
+scan. See Mail::SpamAssassin::PerMsgStatus subroutine rewrite_mail.
+
+=item sa_options => HASH
+
+Options to create the internal Mail::SpamAssassin object; see its
+manual page for the available options.  Other setting may be provided
+via SpamAssassins configuration file mechanism, which is explained in
+L<Mail::SpamAssassin::Conf>.
+
+=item spam_assassin => OBJECT
+
+Provide a Mail::SpamAssassin object to be used for searching spam.  If
+none is specified, one is created internally.  The object can be
+retrieved with assassinator().
+
+=item trace => LEVEL
+
+=back
+
+example: 
+
+ my $filter = Mail::Box::Search::SpamAssassin
+               ->new( found => 'DELETE' );
+
+=back
+
+=head2 Searching
+
+Extends L<"Searching" in Mail::Box::Search|Mail::Box::Search/"Searching">.
+ 
+=over 4
+
+=item $obj-E<gt>B<assassinator>()
+
+Returns the internally maintained assassinator object.  You may want
+to reach this object for complex configuration.
+
+=item $obj-E<gt>B<inBody>($part, $body)
+
+Inherited, see L<Mail::Box::Search/"Searching">
+
+=item $obj-E<gt>B<inHead>($part, $head)
+
+Inherited, see L<Mail::Box::Search/"Searching">
+
+=item $obj-E<gt>B<search>($folder|$thread|$message|ARRAY)
+
+Inherited, see L<Mail::Box::Search/"Searching">
+
+=item $obj-E<gt>B<searchPart>($part)
+
+Inherited, see L<Mail::Box::Search/"Searching">
+
+=back
+
+=head2 The Results
+
+Extends L<"The Results" in Mail::Box::Search|Mail::Box::Search/"The Results">.
+ 
+=over 4
+
+=item $obj-E<gt>B<printMatch>( [$fh], HASH )
+
+Inherited, see L<Mail::Box::Search/"The Results">
+
+=back
+
+=head2 Error handling
+
+Extends L<"Error handling" in Mail::Box::Search|Mail::Box::Search/"Error handling">.
+ 
+=over 4
+
+=item $obj-E<gt>B<AUTOLOAD>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<addReport>($object)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+=item Mail::Box::Search::SpamAssassin-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<errors>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<log>( [$level, [$strings]] )
+
+=item Mail::Box::Search::SpamAssassin-E<gt>B<log>( [$level, [$strings]] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logPriority>($level)
+
+=item Mail::Box::Search::SpamAssassin-E<gt>B<logPriority>($level)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<notImplemented>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<report>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<reportAll>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<trace>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<warnings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=back
+
+=head2 Cleanup
+
+Extends L<"Cleanup" in Mail::Box::Search|Mail::Box::Search/"Cleanup">.
+ 
+=over 4
+
+=item $obj-E<gt>B<DESTROY>()
+
+Inherited, see L<Mail::Reporter/"Cleanup">
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Box distribution version 3.002,
+built on March 31, 2017.
+
+Do not forget to read
+L<Mail::Box-Overview>,
+L<Mail::Box-Cookbook>, and
+L<Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L<Mail::Message>,
+L<Mail::Box>,
+L<Mail::Box::IMAP4>,
+L<Mail::Box::POP3>,
+L<Mail::Box::Parser::C>,
+L<Mail::Box::Dbx> (unpublished),
+L<Mail::Transport>,
+L<Object::Realize::Later>, and
+L<User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

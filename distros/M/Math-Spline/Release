@@ -1,0 +1,19 @@
+Announcing the release of Perl Module Math::Spline Version 0.02
+
+Math::Spline  - Cubic Spline Interpolation of data
+
+This package provides cubic spline interpolation of numeric data. The
+data is passed as references to two arrays containing the x and y
+ordinates. It may be used as an exporter of the the numerical
+functions or, more easily as a class module.
+
+Module Entry
+
+6) Data Types and Data Type Utilities (see also Database Interfaces)
+
+Name           DSLI  Description                                  Info
+-----------    ----  -------------------------------------------- -----
+Math::
+::Spline       RdpO  Cubic Spline Interpolation of data           JARW
+
+  JARW John A.R. Williams <J.A.R.Williams@aston.ac.uk>

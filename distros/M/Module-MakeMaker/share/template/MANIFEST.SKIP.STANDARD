@@ -1,0 +1,6 @@
+^mmm.mk$
+^Makefile$
+^blib/
+\.svn$
+^pm_to_blib$
+^MANIFEST\.SKIP$

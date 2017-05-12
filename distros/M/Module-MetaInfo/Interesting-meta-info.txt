@@ -1,0 +1,81 @@
+There is a fair bit of meta information which is interesting about
+software distributions.  Here is a summary.  
+
+	EXPLAINING THE CONTENTS
+
+summary - a less than one line description (CPAN / DPKG / RPM etc)
+
+description - a description sufficient for a person to understand what
+	    the module is for (DPKG / RPM etc.)
+	  
+
+URL - a url for the "homepage" of the module (RPM / ?? )
+
+grouping - a category for the module.  N.B. only one best fit in
+	 normal modules (DPKG / RPM)
+
+	ABOUT DEVELOPMENT 
+
+version - current version number (CPAN / DPKG / RPM / etc. )
+
+status - alpha / beta / stable / supported / depreciated
+       (CPAN )
+
+
+	ABOUT AUTHORSHIP
+
+author - who wrote it (majority of code / owner of the package name)
+       (CPAN / RPM )
+
+packager - who build the current package
+	 (DPKG / RPM)
+
+license - under what terms can it be used
+	(CPAN / RPM ) 
+
+source-URL - where the software contained in the package was taken from 
+	   (RPM : sort of )
+
+	ABOUT DEPENDENCIES
+
+requires - what is needed for this sofware to work
+	 ( DPKG / RPM ) 
+
+conflicts - what is incompatible with this software
+	  ( DPKG / RPM )
+
+recommendations - what packages should probably be installed if you
+	    install this one
+
+suggestions - what packages might be interesting to install if you
+	    install this one 
+	    ( DPKG )
+
+	ABOUT CONTENT FILES
+
+documentation - files not needed for software function, but which
+	      explain how it works and probably should be available to
+	      users.
+	      ( RPM ) 
+
+sub packages - grouping of files into different independent packages
+	     which don't all need to be installed together
+	     (e.g. libraries and programs which use them)
+	     ( RPM ) 
+
+	MISCELLANEOUS
+
+priority - how important is it to install this package / does the
+	 previous version have security bugs etc..  
+		  (DPKG) 
+
+
+
+A comparison of DPKG and RPM was done by the author of Alien.  This
+can be found by looking for the keywords DPKG/RPM/Comparison on the
+nearest working search engine such as http://www.google.com.  The
+above list is at least partly based on that.  The mistakes, however,
+are probably mine.
+
+E.g. http://debian-br.sourceforge.net/txt/alien.html
+

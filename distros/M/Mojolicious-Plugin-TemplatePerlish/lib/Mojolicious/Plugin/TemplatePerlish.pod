@@ -1,0 +1,137 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Mojolicious::Plugin::TemplatePerlish - Template::Perlish renderer plugin for
+Mojolicious
+
+=head1 VERSION
+
+This document describes Mojolicious::Plugin::TemplatePerlish version 0.002.
+
+=head1 SYNOPSIS
+
+   # Mojolicious
+   $app->plugin('TemplatePerlish');
+   $app->plugin(TemplatePerlish => {name => 'tpt'});
+   $app->plugin(TemplatePerlish => {template_perlish => {start => '<%', stop => '%>'}});
+
+   # Mojolicious::Lite
+   plugin 'TemplatePerlish';
+   plugin TemplatePerlish => {name => 'tpt'};
+   plugin TemplatePerlish => {template_perlish => {start => '<%', stop => '%>'}});
+
+   # Set as default handler, default name is 'tp'
+   $app->renderer->default_handler('tp');
+
+   # Render without setting as default handler
+   $c->render(template => 'foo', handler => 'tp');
+
+=head1 DESCRIPTION
+
+L<Mojolicious::Plugin::TemplatePerlish> is a renderer for L<Template::Perlish>
+templates. See L<Template::Perlish> for details on the template format and
+available opitons, and L<Mojolicious::Guides::Rendering> for general
+information on rendering in L<Mojolicious>.
+
+L<Mojolicious> helpers and stash values will be exposed directly as variables
+in the templates, and the current controller object will be available as C<c>
+or C<self>, similar to L<Mojolicious::Plugin::EPRenderer>. See
+L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>
+for a list of all built-in helpers.
+
+   $c->stash(description => 'template engine');
+   $c->stash(engines => [qw(Template::Perlish Template::Toolkit)]);
+
+   [% for my $engine (A 'engines') { %]
+      [% engine %] is a [% description %].
+   [% } %]
+
+   [%= V('link_to')->('Perl', 'http://www.perl.org') %]
+
+Along with standard template files, inline and data section templates can be
+rendered in the standard way. Template files and data sections will be
+retrieved using L<Mojolicious::Renderer>, so you should set
+L<Mojolicious::Renderer/"paths"> to the appropriate paths towards the templates.
+
+=head1 OPTIONS
+
+The following options are supported.
+
+=head2 B<< cache >>
+
+   # Mojolicious::Lite
+   plugin TemplatePerlish => {cache => 0};
+
+By default this plugin caches templates to avoid recompiling the over and over.
+If you plan to have a long running job, or a lot of templates, you can disable
+caching passing a false value (like in the example above). A true value enables
+caching. If you pass a hash reference, it will be used as cache (so you can
+e.g. pre-populate it with subroutines, see
+L<Template::Perlish/compile_as_sub>).
+
+=head2 B<< name >>
+
+   # Mojolicious::Lite
+   plugin TemplatePerlish => {name => 'foo'};
+
+Handler name, defaults to C<tp>.
+
+=head2 B<< read_binmode >>
+
+   # Mojolicious::Lite
+   plugin TemplatePerlish => {read_binmode => ':raw'};
+
+When a template is loaded from a file, this is the C<binmode> that is applied
+upon opening the file. Defaults to the string C<:encoding(UTF-8)>.
+
+=head2 B<< template_perlish >>
+
+   # Mojolicious::Lite
+   plugin TemplatePerlish => {
+      template_perlish => {
+         start => '<%', # default is '[%'
+         stop  => '%>', # default is '%]'
+         variables => {foo => bar}, # default is {}
+      }
+   };
+
+Options for L<Template::Perlish constructor|Template::Perlish/new>.
+
+=head1 METHODS
+
+=head2 B<< register >>
+
+   $plugin->register(Mojolicious->new());
+   $plugin->register(Mojolicious->new(), {name => 'foo'});
+
+Register renderer in L<Mojolicious> application.
+
+
+=head1 BUGS AND LIMITATIONS
+
+Report bugs either through RT or GitHub (patches welcome).
+
+=head1 SEE ALSO
+
+L<Mojolicious>. Most of the documentation and tests is copied from
+L<Mojolicious::Plugin::TemplateToolkit>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

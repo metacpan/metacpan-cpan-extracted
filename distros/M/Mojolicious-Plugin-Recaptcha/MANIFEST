@@ -1,0 +1,7 @@
+Build.PL
+lib/Mojolicious/Plugin/Recaptcha.pm
+MANIFEST			This list of files
+README
+Makefile.PL
+META.yml
+META.json

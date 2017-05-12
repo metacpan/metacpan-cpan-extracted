@@ -1,0 +1,21 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/examples.t
+t/examples/Newbie-0005.out
+t/examples/Newbie-0003.pl
+t/examples/Newbie-0001.out
+t/examples/Newbie-0004.pl
+t/examples/Newbie-0003.out
+t/examples/Newbie-0001.pl
+t/examples/Newbie-0004.out
+t/examples/Newbie-0002.pl
+t/examples/Newbie-0005.pl
+t/examples/Newbie-0002.out
+t/perlcritic.t
+t/perlcriticrc
+lib/Mafia.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

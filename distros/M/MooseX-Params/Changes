@@ -1,0 +1,34 @@
+Revision history for MooseX-Params
+
+0.010   03/02/2012
+        * True read-only support for %_ values
+
+0.009   25/01/2012
+        * Prevent CPAN from indexing Moose::Util::TypeConstraints
+
+0.008   25/01/2012
+        * Add return value validation
+
+0.007   17/01/2012
+        * Mitigation for incompatibility with Moose 2.0401
+
+0.006   11/01/2012
+        * Switch from Attribute::Handlers to Attribute::Lexical
+        * Set minimum Moose version requirement
+
+0.005   12/06/2011
+        * Removed 'method' keyword interface
+        * Updated documentation and tests
+
+0.004   03/05/2011
+        * Add attributes-based interface
+
+0.003   08/04/2011
+        * Add mimimum required version of Package::Stash
+
+0.002   01/04/2011
+        * Fixed dos line endings
+		* Removed tabs
+
+0.001   31/03/2011
+        * Initial upload to CPAN

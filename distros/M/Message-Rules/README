@@ -1,0 +1,32 @@
+NAME
+    Message::Rules - Apply a pile of rules to incoming messages
+
+SYNOPSIS
+        use Message::Rules;
+
+DESCRIPTION
+        my $r = Message::Rules->new();
+        $r->load_rules_from_directory('conf/dir');
+        my $m = $r->merge_rules({main => 'thing'});
+
+METHODS
+  load_rules_from_directory($directory);
+    Iterate through the passed directory tree and load all of the rules
+    found therein.
+
+  merge_rules($message);
+    Pass $message through the loaded ruleset, and return the updated
+    message.
+
+TODO
+    Tons.
+
+BUGS
+    None known.
+
+COPYRIGHT
+    Copyright (c) 2013 Dana M. Diederich. All Rights Reserved.
+
+AUTHOR
+    Dana M. Diederich <dana@realms.org>
+

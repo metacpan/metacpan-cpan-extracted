@@ -1,0 +1,19 @@
+Revision history for MooseX-Types-Locale-Currency
+
+0.001005  2013-12-16
+	- remove Class::Load
+
+0.001004  2012-08-29
+	- lazy load Locale::Currency
+
+0.001003  2011-10-24
+	- require version 3 of Locale::Currency
+
+0.001002  2011-10-23
+	- move to decimal versions
+
+v0.1.1    2011-09-09
+	- document and test coercion
+
+v0.1.0    2011-08-31
+	- Initial release for review

@@ -1,0 +1,31 @@
+0.05 2015-10-15T23:32:47+02:00
+ - Update to Map::Tube 3.06.
+
+0.04 2015-10-03T18:21:43+02:00
+ - Add <?xml> header to XML document.
+ - Add EXAMPLE4 in doc.
+ - Add get_line_by_id() and get_line_by_name() methods to doc.
+ - Add lines to XML document.
+ - Add test of map validity.
+ - Add tests for get_node_by_id() and get_node_by_name() methods.
+ - Move author tests to xt/ directory.
+ - Rewrite SEE ALSO section to new style.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years to 2015.
+
+0.03 2014-12-23T14:20:09+01:00
+ - Add Map::Tube::GraphViz, Map::Tube::Text::Table, Map::Tube::Bucharest,
+   Map::Tube::Dnipropetrovsk, Map::Tube::Kazan, Map::Tube::Novosibirsk,
+   Map::Tube::Prague, Map::Tube::SaintPetersburg, Map::Tube::Samara,
+   Map::Tube::Tbilisi, Map::Tube::Vienna and Map::Tube::Yekaterinburg to
+   SEE ALSO section in doc.
+ - Add EXAMPLE3 section to doc.
+ - Add get_lines() method to doc.
+ - Add get_stations() method to doc.
+ - Remove executable bit from kharkiv-map.xml file.
+
+0.02 2014-12-11T09:30:17+01:00
+ - Fix kharkiv-map.xml file.
+
+0.01 2014-12-10T01:16:56+01:00
+ - First version

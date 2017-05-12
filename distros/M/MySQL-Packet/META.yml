@@ -1,0 +1,13 @@
+abstract: encode and decode the MySQL binary protocol
+author: Tavin Cole C<< <tavin at cpan.org> >>.
+build_requires:
+  Test::More: 0.42
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: MySQL-Packet
+no_index:
+  directory:
+    - inc
+    - t
+version: 0.2007054

@@ -1,0 +1,243 @@
+NAME
+    Mysql::PrettyPrinter - A lean, efficient SQL pretty-printer for MySQL
+
+VERSION
+    Version 0.10
+
+SYNOPSIS
+    The pretty-printer uses capitalisation, line-breaks, and indentation to
+    reformat the given chunk of SQL into a standardised form.
+
+        $formatted = Mysql::PrettyPrinter->format(sql => $sql);
+
+    or
+
+        my $pp = Mysql::PrettyPrinter->new;
+        $pp->sql($sql);
+        $pp->add_sql($sql2);
+        $pp->make_tokens;
+        $pp->add_tokens($tok0, $tok1, $tok2);
+        # ...do some processing on @{$pp->{tokens}}
+        my $output = $pp->format(indent => '  ');
+
+    or
+
+        mysqlbinlog /data/log/binlog.001 \
+            | head -n 40 \
+            | perl -MMysql::PrettyPrinter \
+                -e'Mysql::PrettyPrinter->passthrough' \
+            | a2ps
+
+DESCRIPTION
+    Very simple-minded pretty-printer for MySQL SQL. It gets 'almost there'
+    results with terse efficient code. It sets line-breaks and
+    probably-appropriate indentation, and optionally wraps token classes in
+    markup.
+
+    If your requirements are more sophisticated, this class will never do
+    the whole job for you, however you might get a lot of mileage from using
+    this class as a pre-processor, extracting the tokens from $pp->tokens
+    (and never calling $pp->format).
+
+METHODS
+    new(wordsep => ' ', linesep => "\n", indent => ' ', wrap => undef, sql
+    => $sql)
+        Constructor. If you're only invoking format once then you can
+        probably skip the constructor. On the other hand, if you want to
+        construct the object once and use it many times, you can set your
+        default options here.
+
+        wordsep
+            Character or string to use as a word separator, default: ' '.
+
+        linesep
+            Character or string to use as a line separator, default: "\n".
+            You may want to specify "\r\n" for Windows, or "\n\r" for old
+            Mac.
+
+        indent
+            String equating to one level of indentation, default: wordsep x
+            4. You may want to specify "\t" if that suits your coding
+            standard.
+
+        wrap
+            Markup for wrapping token classes, default: undef. The example
+            from SQL::Beautify is
+
+                wrap => { keyword => [ "\x1B[0;31m", "\x1B[0m" ] }
+
+            which will make keywords red on some terminals.
+
+            Another example is
+
+                wrap => { keyword => [ '<div class="keyword">', '</div>' ] }
+
+            which will wrap keywords in HTML+CSS markup.
+
+            If you specify a hash for wrap, you must specify a pair of
+            strings for one or more of the token classes: keyword, function,
+            literal. (If you want to omit one half of the wrapping pair, use
+            an empty string in its place.)
+
+        sql The SQL string to be formatted. Useful if you want to manipulate
+            the SQL or token list before calling format, or you are going to
+            invoke format several times on the same SQL string. Otherwise
+            just specify it when calling format.
+
+    sql($sql)
+        Another place for specifying the string to be formatted. Useful if
+        you want to re-use the same object with different SQL.
+
+        Returns the current SQL string if invoked without argument.
+
+    add_sql($sql)
+        Lets you append a string before lexical analysis. Useful if you want
+        to build up SQL in more than one pass.
+
+    make_tokens(sql => $sql)
+        Invokes lexical analysis. An additional place where you can specify
+        the SQL. Useful if you want to examine or manipulate tokens before
+        formatting.
+
+    tokens(@tokens)
+        Lets you specify your own list of tokens, perhaps a result of your
+        own lexical analysis or a result of manipulation you performed on
+        the previous list.
+
+        Returns the current token list if invoked without argument.
+        Relevance depends on you invoking make_tokens or tokens beforehand.
+
+    add_tokens(@tokens)
+        Lets you append a list of tokens to the current token list.
+        Usefulness depends on you invoking make_tokens or tokens beforehand.
+
+    format(wordsep => ' ', linesep => "\n", indent => ' ', wrap => undef,
+    sql => $sql)
+        Returns the formatted output string. Takes same arguments as new.
+        Can be invoked as a class method, which is very convenient in the
+        simple (most common) use case.
+
+            my $pp = Mysql::PrettyPrinter->new;
+            print $pp->format(sql => 'SELECT 1 + 1');
+
+        or
+
+            print Mysql::PrettyPrinter->format(sql => 'SELECT 1 + 1');
+
+    lexicals($sql, $omit_whitespace_tokens)
+        Utility method for lexical analysis, returning the list of lexical
+        tokens from a given string of SQL. This is not specific to MySQL,
+        and is only a minor performance enhancement over SQL::Tokenizer. A
+        true value for $omit_whitespace_tokens causes it to strip out tokens
+        of pure whitespace such as blank lines.
+
+    passthrough(%options)
+        A convenience method for invoking format from the commandline. It's
+        arguable whether the example at the top of these notes is any more
+        convenient than using
+
+            | perl -MMysql::PrettyPrinter -e'BEGIN{$/=q{}}
+                print Mysql::PrettyPrinter->format(%options, sql => <>)'
+
+        One advantage is it avoids issues when using double quotes.
+
+INVOCATION STYLE
+    Most methods support method chaining. So you can invoke
+
+        print Mysql::PrettyPrinter->new
+        ->sql('SELECT')->add_sql('1 + 1')
+        ->make_tokens->tokens('SELECT')->add_tokens('2', '+', '2')
+        ->format
+
+    The exceptions are when used as getters:
+
+        my $sql = $pp->sql;
+        my @tokens = $pp->tokens;
+
+LIMITATIONS
+    The strengths of this module are simplicity and speed. The main weakness
+    is that it does very little semantic processing. So the "IF" in "DROP
+    TABLE IF EXISTS" is treated the same as in "SELECT IF (...".
+
+    The second weakness is it provides little flexibility on style. You can
+    specify strings for line-break and word-break, what string equates to a
+    'tab', and whether keywords, functions, and constants should be wrapped
+    in any markup, but that's about it. You cannot say "I want to align on
+    neighbouring 'ON'/'AS'/comparitor". The simplicity of its approach means
+    it can be adapted easily to other purposes, eg modify the keywords to
+    let it handle oracle instead, eg modify its I/O so it can process on a
+    pipeline with minimal lookahead and buffering.
+
+    Ideas for future enhancements include:
+
+    It should be extended to handle comments, both in indentation and
+    markup. It should provide more output options, eg PHP, Perl, HTML+CSS.
+    It could provide smart processing, eg remove redundant parentheses. If
+    the list of options grows, it would be nice to support having a
+    configuration file.
+
+AUTHOR
+    Nic Sandfield, "<niczero at cpan.org>"
+
+BUGS
+    It has no unit tests.
+
+    Please report bugs, issues, or feature requests to
+    "bug-mysql-prettyprinter at rt.cpan.org", or through the web interface
+    at <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Mysql-PrettyPrinter>.
+    I will be notified and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+INSTALLATION
+    To install this module from its CPAN source package, run the following
+    commands:
+
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Mysql::PrettyPrinter
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mysql-PrettyPrinter>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Mysql-PrettyPrinter>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Mysql-PrettyPrinter>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Mysql-PrettyPrinter/>
+
+ACKNOWLEDGEMENTS
+    SQL::Beautify
+        My module owes its existence to the fine beginnings in this module
+        (C) 2009 Jonas Kramer. I merely fixed some bugs, extended the
+        usability, made it more efficient, and specialised it to the syntax
+        of MySQL (v5.1).
+
+    SQL::Tokenizer
+        The regular expression within lexicals was lifted from this module
+        (C) 2010 Igor Sutton. I merely made it fractionally more efficient.
+
+LICENCE AND COPYRIGHT
+    Copyright 2010 Nic Sandfield. All rights reserved.
+
+    This program is free software; you may use it, redistribute it, or
+    modify it under the terms of the GNU General Public Licence (GPL) v3 (or
+    any later version) as published by the Free Software Foundation.
+
+    See <http://dev.perl.org/licenses/> or
+    <http://www.gnu.org/licenses/license-list.html> for more information.
+

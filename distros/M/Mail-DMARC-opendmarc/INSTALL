@@ -1,0 +1,41 @@
+PREREQUISITES
+
+You need libopendmarc from Trusted Domain Project's opendmarc distribution.
+You don't need the complete opendmarc package. Please check README and/or Changelog to verify
+the version of the libopendmarc this module has been built with.
+If your OS distro provides a libopendmarc package use that one, you'll also need
+the -dev package for library headers, which are needed to build this module.
+(E.g. on Ubuntu 12: libopendmarc1 AND libopendmarc-dev)
+If your OS doesn't provide a package for libopendmarc, or you'd rather have your own build
+follow these instructions:
+
+- Download opendmarc-x.x.x-tar.gz from the project's Sourceforge area
+- Extract the downloaded file in some directory (it will be normally named opendmarc-x.x.x)
+- cd opendmarc-x.x.x
+- ./configure --disable-filter [additional configure options if applicable, e.g. prefix=somewhere]
+- make
+- make check
+- make install
+This will install the libopendmarc libraries and includes "somewhere".
+
+INSTALL
+
+If the libopendmarc libraries and headers are in your system's default search paths just 
+use the usual mantra:
+
+perl Makefile.PL
+make
+make test
+make install
+
+
+If the libopendmarc libraries and headers are not in your system's default search paths,
+or if you build your own libopendmarc, you need to know where the "somewhere" (see above) is, unless the "somewhere" is a standard location 
+that Perl is be able to find without help.
+
+In case it isn't kindly tell Makefile.PL where to locate the include and libraries using -L and INC:
+
+perl Makefile.PL LIBS="-Lsomewhere/lib -lopendmarc -lresolv" INC="-Isomewhere/include"
+
+
+

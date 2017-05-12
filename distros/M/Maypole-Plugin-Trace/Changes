@@ -1,0 +1,9 @@
+Revision history for Maypole-Plugin-Trace
+
+0.1     19th Nov 2005, 00:20
+        - fixed bug, forgot to pass extra args in _process() calls 
+            to trace methods
+
+0.01    18th Nov 2005, 16:40
+        First version, released on an unsuspecting world.
+

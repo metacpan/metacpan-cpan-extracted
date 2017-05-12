@@ -1,0 +1,85 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use MARC::SubjectMap;
+use MARC::Batch;
+use Getopt::Long;
+use Pod::Usage;
+use IO::File;
+
+=head1 NAME
+
+subjmap - translate subject headings in MARC records 
+
+=head1 SYNOPSIS
+
+    subjmap --in=in.dat --out=out.dat --err=err.dat --config=config.xml --log=map.log
+
+=head1 DESCRIPTION
+
+subjmap is a command line utility for using the MARC::SubjectMap framework to
+translate subject headings in MARC data. For the translation to work you'll
+need to use a configuration file. See the subjmap-template application for
+generating a configuration file.
+
+You'll need to pass subjmap the location of the MARC data you want to
+translate (--in), a file to write the new MARC data to (--out) the location of
+the configuration file (--config) and an optional log file to use (--log).
+If a log file is not specified log info will be sent to STDERR.
+
+=cut
+
+my ($in,$out,$err,$config,$log); 
+GetOptions(
+    'in=s'      => \$in,
+    'out=s'     => \$out,
+    'err=s'     => \$err,
+    'config=s'  => \$config,
+    'log:s'     => \$log,
+);
+
+## sanity check options
+pod2usage( verbose => 1 ) if ! -f $in; 
+pod2usage( verbose => 1 ) if ! -f $config;
+
+## read configuration, add log file if necessary
+my $map = MARC::SubjectMap->newFromConfig( $config );
+$map->setLog( $log ) if $log;
+
+my $outHandle = IO::File->new(">$out") 
+    or fatal( "unable to open output file: $out" );
+
+my $errHandle = 0;
+if ($err) {
+    $errHandle = IO::File->new(">$err") 
+        or fatal( "unable to open error file: $err" );
+}
+
+## open MARC batch file
+my $batch = MARC::Batch->new( 'USMARC', $in );
+$batch->warnings_off();
+$batch->strict_off();
+
+## process each record, writing out translated record 
+## if it could be translated
+while ( my $record = $batch->next() ) {
+    my $new = $map->translateRecord( $record );
+    if ($new) {
+        $outHandle->print( $new->as_usmarc() );
+    }
+    elsif ($errHandle) {
+        $errHandle->print( $record->as_usmarc() );
+    }
+}
+
+my %stats = $map->stats();
+
+print "records processed: " , $stats{recordsProcessed}, "\n";
+print "headings added: " , $stats{fieldsAdded} , "\n";
+print "errors: " , $stats{errors} , "\n";
+
+sub fatal {
+    print "fatal: " . localtime() . ": ".shift;
+    exit 1;
+}

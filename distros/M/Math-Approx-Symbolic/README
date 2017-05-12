@@ -1,0 +1,39 @@
+Math::Approx::Symbolic version 0.100
+====================================
+
+This module is a thin wrapper around the Math::Approx module. It
+subclasses Math::Approx and adds the "symbolic" subroutine that returns
+a Math::Symbolic object representing the calculated approximation.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Math::Approx (>= 0.200)
+  Math::Symbolic (>= 0.123)
+  Test::More
+
+SEE ALSO
+
+Current versions of this module may be found on http://steffen-mueller.net or
+CPAN.
+
+Please send your suggestions, inquiries, and feedback to the author at
+approx-symbolic-module at steffen-mueller dot net
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Steffen Müller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

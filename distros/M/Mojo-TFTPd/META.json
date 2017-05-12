@@ -1,0 +1,51 @@
+{
+   "abstract" : "Trivial File Transfer Protocol daemon",
+   "author" : [
+      "Svetoslav Naydenov <harryl@cpan.org>",
+      "Jan Henning Thorsen <jhthorsen@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-TFTPd",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "4.30"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jhthorsen/mojo-tftpd/issues"
+      },
+      "homepage" : "https://github.com/jhthorsen/mojo-tftpd",
+      "repository" : {
+         "url" : "https://github.com/jhthorsen/mojo-tftpd.git"
+      }
+   },
+   "version" : "0.04"
+}

@@ -1,0 +1,230 @@
+Revision history for MooseX-Types
+
+0.50      2017-02-07 18:59:30Z
+        - reverted the is_Fo and to_Foo refactoring again temporarily to
+          resolve issues with Sub::Defer
+
+0.49      2016-12-23 00:12:12Z
+        - made the exported is_Foo and to_Foo subs much faster, especially for
+          type constraints which can be inlined. (Dave Rolsky) [reverted in
+          0.50)
+
+0.48      2016-12-07 01:15:14Z
+        - reverted is_Foo and to_Foo refactoring [from 0.47] for now, so they
+          can be reworked
+
+0.47      2016-12-07 00:40:34Z
+        - allow type libraries built with MooseX::Types::Combine to be
+          combined with MooseX::Types::Combine. (GH #1, Mark Fowler).
+        - made the exported is_Foo and to_Foo subs much faster, especially for
+          type constraints which can be inlined [reverted in 0.48,
+          reimplemented in 0.49, reverted in 0.50]
+
+0.46      2015-08-16 00:43:46Z
+        - make use of Sub::Exporter::ForMethods's new rebless option
+
+0.45      2014-09-02 01:17:50Z
+        - increase the required versions of some prerequisites
+
+0.44      2014-03-09 04:16:20Z
+        - full respect for namespaces: declared types are now properly
+          installed into the proper package, so they survive
+          namespace::autoclean; however, types imported from the declaration
+          class are still properly cleaned by namespace::autoclean (as
+          implemented in trial versions 0.40-0.43)
+
+0.43      2014-01-17 01:25:55Z (TRIAL RELEASE)
+        - line numbers in shipped code are now almost the same (within 3) as
+          the repository source, for easier debugging
+        - skipped new namespacing tests that fail with older Moose versions,
+          due to an inability to install blessed subs
+
+0.42      2014-01-04 23:31:58Z (TRIAL RELEASE)
+        - declared (not imported) types are now properly installed into the
+          proper package, so they survive namespace::autoclean (fixed this
+          time)
+
+0.41      2013-12-21 17:21:41Z
+        - reversed changes in 0.40, until compatibility issues with older
+          Moose versions are figured out
+
+0.40      2013-12-20 06:38:15Z
+        - types are now properly installed into the proper package, so they
+          survive namespace::autoclean
+
+0.39      2013-11-30 18:31:32Z
+        - more strict warnings checking in tests
+        - re-release to fix compile test
+
+0.38      2013-09-17 00:44:16Z
+        - removed use of deprecated enum syntax
+
+0.37      2013-09-08 21:58:26Z
+        - removed use of deprecated Class::MOP::load_class
+        - repository has moved to the GitHub Moose organization
+
+0.36    2013-06-22 20:51:54Z
+        - fixed failing tests on 5.8.5 due to incorrect == overload
+        (RT#77100, Graham Knop)
+
+0.35    2012-05-19
+        - The new delegation code could fail when a type had no
+          parent. Attempting to subtype Any was one way to trigger the
+          bug. (Dave Rolsky)
+
+        - The new delegation code broke calling ->can or ->isa on
+          MooseX::Types::TypeDecorator as a class method. (Dave Rolsky)
+
+0.34    2012-05-18
+        - Special case new to avoid unexpected exceptions on unloaded classes
+
+0.33    2012-05-18
+        - Switch delegation order to prioritise type over class except for new
+
+0.32    2012-05-18
+        - Support delegation of methods to the class for class types
+        - Factor out _try_delegate method
+
+0.31    2011-12-22
+        - Add support for qw( :all ) on MooseX::Types::Combine libraries. (kentnl)
+
+0.30    2011-09-17
+        - Fix a bug in the tests that caused failures with Moose HEAD. (doy)
+
+0.29    2011-08-20
+        - Require namespace::clean 0.19. Tests fail with 0.18. Reported by
+          Ruslan Zakirov. RT #67923.
+
+0.28    2011-08-02
+        - Fixed git and bug tracking info in META.{yml,json}. Reported by
+          Petter Rabbitson. (Dave Rolsky)
+
+0.27    2011-06-06
+        - A better fix for type constraint changes in Moose 2.0100. (doy)
+
+0.26    2011-06-05
+        - Small changes for forward compatibility with Moose 2.0100, when it
+          is released. (Dave Rolsky)
+        - Some small doc cleanup and improvements. (Dave Rolsky)
+
+0.25    2010-11-30
+        - The test suite now uses Test::Fatal instead of Test::Exception
+          (Karen Etheridge).
+        - Modernized tests to use Test::Requires and done_testing. (Dave
+          Rolsky)
+        - MooseX::Types::Combine is a little more efficient, and only tries to
+          load the libraries it's combining when that list is set. It also
+          checks that each lib in the list actually provides types. (Dave
+          Rolsky).
+        - The MooseX::Types docs now contain a pointer to
+          MooseX::Types::Combine. (Dave Rolsky)
+
+0.24    2010-09-11
+        - Avoid more warnings from Moose 1.09 in tests (Dave Rolsky).
+
+0.23    2010-07-19
+        - Avoid warnings from Moose 1.09 in tests (Dave Rolsky).
+
+0.22    2010-06-01
+        - Update docs to mention MRO::Compat rather than Class::C3.
+        - Added '0+' overloading to solve the type constraint equality
+          regression introduced when Moose 1.05 tightened the rules
+          determing type constraint equality.  Added tests for the
+          regression.
+
+0.21    2009-12-23
+        - Attempting to import a non-existent type from a combined type
+          library gave a very confusing error message from the
+          MooseX::Types::Combined internals. Now it gives you a much more
+          useful message. (Dave Rolsky)
+        - bump up Moose dep (RT#53016)
+
+0.20    2009-09-10
+        - fix "empty export" warning (doy).
+
+0.19    2009-08-23
+        - un-fix coercions on parameterized types, since it broke
+          MooseX::Method::Signatures, as well as any other code that relied on
+          new type constraint objects being generated each time a type was
+          parameterized (hdp).
+
+0.18    2009-08-22
+        - fix coercions on parameterized types (Hans Dieter Pearcey).
+
+0.17    2009-08-18
+        - Documentation typo fix (Dave Rolsky).
+        - Stop blowing up in has_available_type_export if the introspected code
+          symbol exists but is not a type export (Florian Ragwitz).
+        - Reorganize author/copyright sections at the request of Debian
+          packagers (Rafael Kitover).
+
+0.16    2009-06-29
+        - Ship with Module::Install 0.91
+
+0.15    2009-06-27
+        - Change all uses of croak in TypeDecorator to use the Moose
+          throw_exception method.
+        - More test cases for the union mixed string type issue, and
+          better handling of this in the | overload in TypeDecorator
+
+0.14    2009-06-26
+        - Fix union with string type
+
+0.13    2009-06-23
+        - Add Test::Moose to build_requires for Fedora
+
+0.12    2009-06-14
+        - fix mixing of typelibs with regular Moose classes
+
+0.11    2009-05-23
+        - warning on string types and unregistered class/role types
+        - better error for missing comma
+        - MooseX::Types::Combine for combining type libs
+
+0.10    2009-03-06
+        - Removed unneeded debugging code from one of the tests, which was
+          causing installation errors for people that didn't already have
+          Data::Dump installed. (jjnapiork)
+
+0.09    2009-03-03
+        - Added MooseX::Types::Util::has_available_type_export($p, $n) to
+          allow introspection of available types for other libraries wanting
+          to use type export names for type specifications.
+
+0.08    2008-12-09
+        - Added experimental support for recursive type constraints.  Pod and
+          tests for this feature.  Let the madness begin.
+        - Documentation updates.
+        - Workaround test case for the SUb::Exporter compatibility issue.  Also
+          documented in Pod.
+
+0.07    2008-10-07
+        - Bumped minimum allowed Moose version to fix problem with overloading
+          on some versions of Perl
+        - Tiny documentation updates.
+
+0.06    2008-10-24
+        - Added support for parameterized types and type unions, tests for all
+        that and documentation updates.
+
+0.05    2008-02-19
+        - moved export mechanism to Sub::Exporter. ::Base contains
+          a bunch of wrapping logic to allow the export-along functionality
+          for the helper symbols
+        - removed vestigial load of Sub::UpLevel since it breaks
+          the argument display in confess()
+
+0.04    2007-08-09
+        - Automatically set strict and warnings like Moose does
+
+0.03    2007-08-09
+        - Minor POD typo correction
+        - Added some error messages for wrong type names
+        - Coercion handler not exported without type object
+        - Moved from Class::Inspector to Class::MOP::load_class
+
+0.02    2007-08-08
+        - Changed declaration to croak when it sees '::' in a typename
+
+0.01    2007-08-08
+        - Initial release

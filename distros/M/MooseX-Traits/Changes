@@ -1,0 +1,55 @@
+Revision history for MooseX-Traits
+
+0.13      2015-08-16 04:10:59Z
+        - update some distribution tooling
+
+0.12      2013-11-13 07:21:32Z
+        - removed use of deprecated Class::MOP::load_class
+        - repository migrated from shadowcat to the github moose organization
+        - uses of Test::Exception converted to Test::Fatal
+
+0.11   2010-05-13 12:31:00Z
+        - Fix doc typo. jawnsy++
+
+0.10   2010-05-12 15:53:56Z
+        - Stop pretending the created classes are anonymous.
+          They used to close over their own metaclass, so they were never
+          cleaned up anyway and only made debugging unnecessarily hard as
+          all instances referenced the metaclass as well.
+        - Require newer version of MX::Role::Parameterized in the parameterized
+          role test. (RT#49873).
+
+0.09   2010-04-07 03:51:40Z
+        - Class->with_traits(...)->new is now preferred over
+          Class->new_with_traits(...).
+
+0.08   2010-02-13 17:05:23Z
+        - Allow you to pass traits => 'OneTrait' rather than having to say
+          traits => ['OneTrait'] to help when getting traits from things that
+          want to send a scalar (e.g. Config::General)
+
+0.07   2009-08-16 15:38:47Z
+        - deprecate apply_traits ("no warnings" to disable warning)
+        - add MooseX::Traits::Util so that other modules can resolve trait names
+        - add new_class_with_traits util function to create classes with traits
+
+0.06   2009-06-28 22:30:58Z
+        - use "is => bare" on newer moosen (Closes: RT#47011) (hdp)
+        - depend on a Moose version that provides
+          meta->constructor_name (Closes RT#46936)
+
+0.05   2009-05-28 15:37:21Z
+        - support subclasses of classes that use MX::Traits
+
+0.04   2009-05-27 06:00:29Z
+        - add apply_traits method
+        - use meta->constructor_name instead of 'new'
+
+0.03   2008-06-12 16:57:29Z
+        - stevan changed some stuff
+
+0.02   2008-06-02 23:40:55Z
+        - leave "new" alone, add a new "new_with_traits" instead
+
+0.01   2008-05-24 23:54:26Z
+        - inital release

@@ -1,0 +1,126 @@
+%perlcode %{
+
+@EXPORT_OK = qw/
+   gsl_min_fminimizer_alloc
+   gsl_min_fminimizer_free
+   gsl_min_fminimizer_set
+   gsl_min_fminimizer_set_with_values
+   gsl_min_fminimizer_iterate
+   gsl_min_fminimizer_name
+   gsl_min_fminimizer_x_minimum
+   gsl_min_fminimizer_x_lower
+   gsl_min_fminimizer_x_upper
+   gsl_min_fminimizer_f_minimum
+   gsl_min_fminimizer_f_lower
+   gsl_min_fminimizer_f_upper
+   gsl_min_fminimizer_minimum
+   gsl_min_test_interval
+   gsl_min_find_bracket
+   $gsl_min_fminimizer_brent
+   $gsl_min_fminimizer_goldensection
+/;
+
+%EXPORT_TAGS = ( all => [ @EXPORT_OK ] );
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+Math::GSL::Min - 1-D Minimization
+
+=head1 SYNOPSIS
+
+    use Math::GSL::Min qw/:all/;
+    use Math::GSL::Const qw/$M_PI/;
+
+    my $m = gsl_min_fminimizer_alloc($gsl_min_fminimizer_goldensection);
+
+    gsl_min_fminimizer_set_with_values($m,
+        sub { cos($_[0]) },
+        3, cos(3),
+        0, cos(0),
+        2*$M_PI, cos(2*$M_PI)
+    );
+    my $status  = gsl_min_fminimizer_iterate($m);
+
+    my $x_min   = gsl_min_fminimizer_x_minimum($m);
+    my $x_lower = gsl_min_fminimizer_x_lower($m);
+    my $x_upper = gsl_min_fminimizer_x_upper($m);
+
+    my $f_min   = gsl_min_fminimizer_f_minimum($m);
+    my $f_lower = gsl_min_fminimizer_f_lower($m);
+    my $f_upper = gsl_min_fminimizer_f_upper($m);
+
+=head1 DESCRIPTION
+
+Here is a list of all the functions in this module :
+
+=over
+
+=item * C<gsl_min_fminimizer_alloc($type)>
+
+=item * C<gsl_min_fminimizer_free>
+
+Don't call this function explicitly. It will be called automatically in DESTROY for fminimizer.
+
+=item * C<gsl_min_fminimizer_set >
+
+Don't apply this function twice to the same fminimizer. It will cause a memory leak. Instead of this you should create new fminimizer.
+
+=item * C<gsl_min_fminimizer_set_with_values>
+
+Don't apply this function twice to the same fminimizer. It will cause a memory leak. Instead of this you should create new fminimizer.
+
+=item * C<gsl_min_fminimizer_iterate($m)>
+
+=item * C<gsl_min_fminimizer_name >
+
+=item * C<gsl_min_fminimizer_x_minimum($m)>
+
+=item * C<gsl_min_fminimizer_x_lower($m) >
+
+=item * C<gsl_min_fminimizer_x_upper($m) >
+
+=item * C<gsl_min_fminimizer_f_minimum($m)>
+
+=item * C<gsl_min_fminimizer_f_lower($m) >
+
+=item * C<gsl_min_fminimizer_f_upper($m) >
+
+=item * C<gsl_min_fminimizer_minimum($m) >
+
+=item * C<gsl_min_test_interval($m) >
+
+=item * C<gsl_min_find_bracket($m) >
+
+=back
+
+This module also includes the following constants :
+
+=over
+
+=item * C<$gsl_min_fminimizer_brent>
+
+=item * C<$gsl_min_fminimizer_goldensection>
+
+=back
+
+For more informations on the functions, we refer you to the GSL offcial
+documentation: L<http://www.gnu.org/software/gsl/manual/html_node/>
+
+=head1 AUTHORS
+
+Jonathan "Duke" Leto <jonathan@leto.net> and Thierry Moisan <thierry.moisan@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2008-2014 Jonathan "Duke" Leto and Thierry Moisan
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+%}

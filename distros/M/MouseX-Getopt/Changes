@@ -1,0 +1,273 @@
+Revision history for Perl extension MouseX-Getopt
+
+0.37 2016-07-13T03:23:39Z
+  * Cope with GLD output changes in version 0.100 (#10, by pghmcfc)
+
+0.36 2015-04-02T00:04:11Z
+  * Fix tests that follow GLD changes (#6)
+
+0.35 2014-03-10T07:02:02Z
+
+  * GLD 0.097 no longer defaults to no_ignore_case
+    https://rt.cpan.org/Public/Bug/Display.html?id=93593
+    See also
+    https://github.com/moose/MooseX-Getopt/commit/c8459ee3ab47cdd7e0b1ccde1787f
+
+0.32 Thu Jul 29 20:21:56 JST 2010
+
+  * added workaround for $@ issue in Data::Util.
+
+0.31 Mon Jul 26 20:52:38 2010
+  * Just copied from MooseX-Getopt 0.31. See MouseX-Getopt.diff for details.
+
+NOTE: This distribution is a copy of MooseX-Getopt, so the following history
+      is that of MooseX-Getopt's, not MouseX-Geopt's.
+
+0.31 Wed 7 Jul 2010
+  * Fix issue causing tests to fail if MooseX::SimpleConfig isn't installed.
+
+0.30 Tue 6 Jul 2010
+  * MooseX::Getopt::Basic
+    - uses attribute insertion order when determining the order in which
+      options are documented in the usage (e.g. in $obj->usage->text). (Karen
+      Etheridge)
+
+  * MooseX::Getopt::Basic
+    - store the usage object to the usage attr (RT#58715)
+    - properly checks whether the *option* --help, --usage, or --? were used,
+      rather than the attribute 'help', 'usage' or '?' were set
+  * MooseX::Getopt::GLD
+    - add the usage attribute for storing the Getopt::Long::Descriptive::Usage
+      object, and the help attribute for storing --help, --usage and --? state
+  (RT#47865, RT#56783, RT#52474).  (Karen Etheridge)
+
+  * MooseX::Getopt::Basic
+    - Disable auto_help config in Getopt::Long, to avoid calling into
+    pod2usage when the --help option is used while MooseX::ConfigFromFile
+    is in use (the intent is just to fetch the value of the configfile
+    option) (RT#57683). (Karen Etheridge)
+
+0.29 Tue. Jun 15 2010
+  * Fix repository metadata. Thanks Robert Bohne for noticing!
+
+0.28 Sat. Jun 05 2010
+  * MooseX::Getopt::Strict
+    - Make it work with Getopt attribute traits in addition to
+      attribute metaclasses.
+
+  * Switch from Module::Install to Dist::Zilla.
+
+0.27 Sun. Feb 10 2010
+  * Makefile.PL:
+    - Bump dependency to Getopt::Long::Descriptive to 0.081 in an attempt to
+      avoid test failures.
+
+  * MooseX::Getopt::Dashes
+    - Document that using a cmd_flag argument to attributes can be used to
+      override the tr/_/-/ replacement ::Dashes does on attribute names
+
+0.26 Thu. Dec 10 2009
+  * MooseX::Getopt::Basic
+    - Fix bug with attribute names containing upper case letters.
+  * Test suite:
+    - Add t/106_no_ignore_case.t for testing the compatibility with
+      no_ignore_case
+
+0.25 Thu. Nov 26 2009
+  * MooseX::Getopt
+   - Split out the warnings and the exception from Getopt so that they can be
+     overridden.
+   - Split out calling ->die on Getopt::Long::Descriptive::Usage so that
+     it can be overridden.
+   - Properly split roles as promised in 0.22.
+
+0.24 Fri. Oct  23 2009
+  * MooseX::Getopt
+    - Fix bug with mixed case attribute names (MAROS)
+
+0.23 Fri. Oct  02 2009
+  * MooseX::Getopt
+    - Allow the config file to return a code ref which is called to return
+      the config file location (Gordon Irving)
+
+0.22 Sat. Sept 05 2009
+    - Require GLD 0.077 for RT#49427 as some versions are broken
+
+  * MooseX::Getopt
+    - Split into MooseX::Getopt::Basic (without the G::L::Descriptive support)
+    and MooseX::Getopt::GLD.
+
+  * Tests
+     - Ensure author tests get run when in author mode.
+
+0.21 Thu. Aug 27 2009
+  * MooseX::Getopt
+    - Enable and document the argv parameter to the constructor.
+    - Applied patches in RT43200 and RT43255
+    - Applied patch from RT#47766 to not die if SimpleConfig cannot find the
+      default config file name.
+
+0.20 Wed. July 9 2009
+    - fix MANIFEST.SKIP to avoid double-packaging
+
+0.19 Wed. July 8 2009
+  * MooseX::Getopt
+    - Fix Getopt config spec for --configfile (t0m)
+    - Add support for --usage/--help/--? (drew@drewtaylor.com)
+    - Fix new_with_options to accept a hashref (DOUGDUDE@cpan.org)
+
+  * Tests
+    - Fix warning from tests with new Moose (t0m)
+    - Fix tests on Win32 from RT#44909 (taro-nishino)
+
+0.18 Thu. April 9 2009
+  * MooseX::Getopt::Dashes
+    - New module, for converting undercores to dashes (ilmari)
+
+0.17 Wed. April 8 2009
+  * MooseX::Getopt
+    - work with latest Moose (hdp)
+
+    ~ unify module version numbers with dist version (hdp)
+
+0.16 Tue. February 17 2009
+    * t/
+        - run pod tests only if RELEASE_TESTING env var is set
+
+0.15 Sat. July 26 2008
+    * MooseX::Getopt::OptionTypeMap
+      - Accept type constraint objects in the type mapping, not just names
+
+0.14 Thurs. July 10, 2008
+    * MooseX::Getopt::OptionTypeMap
+      - Change 'Float' which doesn't exist to 'Num' which does (perigrin)
+
+    * MooseX::Getopt
+      - removed the default handling with Getopt::Long::Descriptive
+        as it would override constructor parameters and that was
+        bad. Besides, Moose will just DWIM on this anyway. (stevan)
+        - added test for it (stevan)
+
+    * t/
+      - fixed Getopt::Long::Descriptive specific tests to only run
+        if Getopt::Long::Descriptive is there (stevan)
+
+0.13 Saturday, May 24, 2008
+    * MooseX::Getopt
+      - Commandline option shouldn't be required in the
+        case that the given "required" attribute has
+        been loaded from config (MooseX::ConfigFromFile)
+      - Support for MooseX::ConfigFromFile shouldn't require
+        that role be added at the same level as Getopt.
+      - fixed miscapitalization of NoGetopt in the docs
+      - added links to the traits in the docs
+
+    ~ converted to Module::Install instead of
+      Module::Build
+
+0.12 Fri. March 14, 2008
+    ~~ updated copyright dates ~~
+
+    - upped the Moose dependency to support
+      the custom metaclass traits
+    - added Getopt::Long::Descriptive as an
+      optional dependency
+
+    * MooseX::Getopt
+      MooseX::Getopt::Meta::Attribute
+      MooseX::Getopt::Meta::Attribute::Trait
+      MooseX::Getopt::Meta::Attribute::NoGetopt
+      MooseX::Getopt::Meta::Attribute::Trait::NoGetopt
+      - added support for custom metaclass traits
+        - added tests for this
+
+0.11 Sun. Jan. 27, 2008
+    * MooseX::Getopt
+      - Commandline option shouldn't be required in the
+        case that the given "required" attribute has
+        a default or a builder method.
+
+0.10 Wed. Jan. 23, 2008
+    * MooseX::Getopt
+      - Support default configfile attribute when
+        used with MooseX::ConfigFromFile-based roles
+
+0.09 Tues. Jan. 22, 2008
+    * MooseX::Getopt
+      - Use Getopt::Long::Descriptive if it's available
+
+0.08 Tues. Dec. 8, 2007
+    * MooseX::Getopt
+      - Added support for configfile loading via
+        MooseX::ConfigFromFile-based roles with
+        the -configfile commandline option.
+
+0.07 Tues. Dec. 4, 2007
+    * MooseX::Getopt::Meta::Attribute::NoGetopt
+      - fixed miscapitalization of NoGetopt in the docs
+
+0.06 Fri. Nov. 23, 2007
+    * MooseX::Getopt
+      - refactored &new_with_option some so that
+        this will work better with other Getopt
+        modules (nuffin)
+
+    + MooseX::Getopt::Strict
+      - version of MooseX::Getopt which requires
+        you to specify which attributes you want
+        processed explicity
+        - added tests for this
+
+    + MooseX::Getopt::Meta::Attribute::NoGetopt
+      - a custom meta-attribute which can be
+        used to specify that an attribute should
+        not be processed
+        - added tests for this
+
+0.05 Tues. July 3, 2007
+    * MooseX::Getopt::OptionTypeMap
+      - added some checks to make sure that the type
+        constraints are found properly and to give
+        better diagnostics
+
+0.04 Tues. June 26, 2007
+    * MooseX::Getopt::OptionTypeMap
+      - Added support for subtype constraint inference
+        from parent types
+        - added tests and docs for this
+    * MooseX::Getopt
+      - Added extra_argv attribute
+        - added tests and docs for this
+      - We now unmangle the Getopt::Long-mangled @ARGV
+        - added tests and docs for this
+      - We now throw an exception from new_with_options
+        if Getopt fails due to bad arguments.
+        - added tests and docs for this
+
+0.03 Wed. May 2nd, 2007
+    ~ downgraded the Getopt version requirement
+      to 2.35 as per RT #26844
+    ~ adding blblack to the authors list
+
+    * MooseX::Getopt
+      - doc update to show simple way to of excluding
+        an attribute, but not having accessors with
+        underscores (thanks to Zaba on #moose for this)
+    * MooseX::Getopt::Meta::Attribute
+      - tightening up the type constraint in the
+        cmd_alias coercion to only accept strings
+
+0.02 Friday, April 6, 2007
+    * MooseX::Getopt
+      - added the ARGV attribute (thanks to blblack)
+        - added tests and docs for this
+
+    * MooseX::Getopt::Meta::Attribute
+      - added the cmd_aliases attribute (thanks to blblack)
+        - added tests and docs for this
+      - added support for Moose 0.19's custom
+        attribute metaclass alias registry.
+        - added tests and docs for this
+
+0.01 Friday, March 9, 2007
+    - module released to CPAN

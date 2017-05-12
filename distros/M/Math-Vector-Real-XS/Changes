@@ -1,0 +1,42 @@
+Revision history for Perl extension Math::Vector::Real::XS.
+
+0.10  Apr 15, 2015
+        - Check if macro SvNOK_nog is available before using it
+
+0.09  Apr 14, 2015
+        - add method chebyshev_dist
+        - inside most mvr methods, unfold code into two versions, one
+          that can handle arrays with magic and other faster for plain
+          arrays
+
+0.08  Mar 11, 2015
+        - add support for dist2_between_boxes method
+
+0.07  Jun 1, 2014
+        - fix dist2_to_box method
+        - add more tests
+
+0.06  May 30, 2014
+	- add new dist2_box, max_dist2_to_box and sum methods
+	- add C mvr_2mortal helper
+        - operator '/=' was broken
+
+0.05  Apr 24, 2014
+        - add first_orthant_reflection method
+        - add max_dist2_between_boxes method
+
+0.04  27 Aug, 2013
+        - eliminate redefined warnings when called with $^W set (bug
+          report by Demian Riccardi)
+
+0.03  23 Jul, 2012
+        - The way object references were being created was
+          incompatible with perl 5.10 and older
+
+0.02  Jul 18, 2012
+        - on tests, when comparing floats allow for a small error
+
+0.01  Wed Jun 27 13:41:53 2012
+	- original version; created by h2xs 1.23 with options
+		-An Math::Vector::Real::XS
+

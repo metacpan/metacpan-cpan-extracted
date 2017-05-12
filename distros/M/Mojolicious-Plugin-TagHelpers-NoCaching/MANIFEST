@@ -1,0 +1,15 @@
+Changes
+lib/Mojolicious/Plugin/TagHelpers/NoCaching.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01.t
+t/02.t
+t/lite-01.pl
+t/lite-02.pl
+t/public/app.css
+t/public/app.js
+t/public/p1/style.css
+t/public/t.gif
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

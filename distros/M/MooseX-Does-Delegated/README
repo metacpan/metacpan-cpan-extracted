@@ -1,0 +1,96 @@
+NAME
+    MooseX::Does::Delegated - allow your class's DOES method to respond the
+    affirmative to delegated roles
+
+SYNOPSIS
+       use strict;
+       use Test::More;
+   
+       {
+          package HttpGet;
+          use Moose::Role;
+          requires 'get';
+       };
+   
+       {
+          package UserAgent;
+          use Moose;
+          with qw( HttpGet );
+          sub get { ... };
+       };
+   
+       {
+          package Spider;
+          use Moose;
+          has ua => (
+             is         => 'ro',
+             does       => 'HttpGet',
+             handles    => 'HttpGet',
+             lazy_build => 1,
+          );
+          sub _build_ua { UserAgent->new };
+       };
+   
+       my $woolly = Spider->new;
+   
+       # Note that the default Moose implementation of DOES
+       # ignores the fact that Spider has delegated the HttpGet
+       # role to its "ua" attribute.
+       #
+       ok(     $woolly->DOES('Spider') );
+       ok( not $woolly->DOES('HttpGet') );
+   
+       Moose::Util::apply_all_roles(
+          'Spider',
+          'MooseX::Does::Delegated',
+       );
+   
+       # Our reimplemented DOES pays attention to delegated roles.
+       #
+       ok( $woolly->DOES('Spider') );
+       ok( $woolly->DOES('HttpGet') );
+   
+       done_testing;
+
+DESCRIPTION
+    According to UNIVERSAL the point of `DOES` is that it allows you to check
+    whether an object does a role without caring about *how* it does the role.
+
+    However, the default Moose implementation of `DOES` (which you can of
+    course override!) only checks whether the object does the role via
+    inheritance or the application of a role to a class.
+
+    This module overrides your object's `DOES` method, allowing it to respond
+    the affirmative to delegated roles. This module is a standard Moose role,
+    so it can be used like this:
+
+       with qw( MooseX::Does::Delegated );
+
+    Alternatively, if you wish to apply this role ubiqitously (i.e. to all
+    Moose objects in your application) - as is your prerogative - you can use:
+
+       use MooseX::Does::Delegated -everywhere;
+
+    This will apply the role to the Moose::Object base class.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Does-Delegated>.
+
+SEE ALSO
+    Moose::Manual::Delegation.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

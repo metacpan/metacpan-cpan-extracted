@@ -1,0 +1,22 @@
+.travis.yml
+Changes
+lib/Mojolicious/Plugin/UniqueTagHelpers.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/10-stylesheet.t
+t/11-stylesheet-block.t
+t/12-stylesheet-mojo-url.t
+t/20-javascript.t
+t/21-javascript-block.t
+t/22-javascript-mojo-url.t
+t/30-unique.t
+t/31-unique-block.t
+t/32-unique-long-key.t
+t/33-unique-utf8.t
+t/manifest.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

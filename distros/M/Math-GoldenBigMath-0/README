@@ -1,0 +1,51 @@
+Math-GoldenBigMath version 0.802
+===============================
+
+Math::GoldenBigMath - Verified Big Real Number Calcualtion With Operators + - * / %
+
+It uses pure Perl (no compilation needed), so you can run it from a
+USB stick.
+
+This module implements the algorithms I (and all other german
+childrens) learned in my school, in german called "Schriftliches
+Rechnen". That means exact calculation with pencil and paper, before
+computers or electronical calculators come up.
+
+All of these alogrithms are exact, simple, well known and mathematical
+completely proven. But they are not very fast, even for computers.
+
+So GoldenBigMath can be used for calculation, if high speed is not
+necessary or you have time to wait for the results.
+
+It was designed to be used as a golden device to check all the other
+existing libraries handling big numbers, which are fast and
+complicated and so can contain errors.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2014 by Ralf Peine, Germany.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.

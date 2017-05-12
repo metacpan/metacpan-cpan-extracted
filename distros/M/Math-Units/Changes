@@ -1,0 +1,11 @@
+Revision history for Math-Units
+
+1.3  Thu Jul 24 20:37:06  2008
+     - new co-maintainer, DMUEY, release to initially address rt34138
+     - ran 1.2 Units.pm and tests through perltidy
+     - made tests use Test::More and other new style practice and renamed them
+     - move TODO list in POD
+     - minor tweak to README
+
+1.2  6:21 pm Friday, August 14, 1998
+    - first official release by Ken Fox

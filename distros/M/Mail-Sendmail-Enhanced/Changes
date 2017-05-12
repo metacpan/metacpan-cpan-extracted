@@ -1,0 +1,18 @@
+Revision history for Mail-Sendmail-Enhanced
+
+0.03    2015-02-03
+        1. Possibility to use the letters k,K,m,M in assignment of attachments sizes.
+        2. Commit operation added. Now its possible to send email only "new" function using.
+        3. POD document was supplemented.
+
+0.02    2015-02-01
+        1. Refurbished encoding_qp function to correct division multibyte Subject header field into different rows
+        2. Changed Message declaration from "Content-Transfer-Encoding: quoted-printable" to "Content-Transfer-Encoding: 8bit"
+        3. Added errors connected with attachments, argument attachments_size_max:
+          a) "Attachments are not allowed whereas some are preperad to send!" : attachments_size_max < 0
+          b) "Attachment does not exists!"                                    : attachments_size_max >= 0
+          c) "Attachment too big!"                                            : attachments_size_max = maximum size of file
+
+0.01    2015-01-31
+        First version, released on an unsuspecting world.
+

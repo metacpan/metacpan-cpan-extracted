@@ -1,0 +1,9 @@
+Math::LP Installation instructions
+
+The standard procedure for installing Perl modules applies:
+
+	% perl Makefile.PL
+	% make
+	% make test
+	% make install
+

@@ -1,0 +1,16 @@
+0.15 2015-10-16T12:05:58+02:00
+ - Add EXAMPLE4 to doc.
+ - Add tests for get_node_by_id() and get_node_by_name() methods.
+ - Improve description for get_lines() in doc.
+ - Update to Map::Tube 3.06.
+
+0.14 2015-09-22T22:19:45+02:00
+ - Move author tests to xt/ directory.
+
+0.13 2015-09-03T17:09:49+02:00
+
+0.02 2015-09-02T10:47:02+02:00
+ - Fix version in module.
+
+0.01 2015-09-02T10:43:25+02:00
+ - First version

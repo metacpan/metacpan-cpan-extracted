@@ -1,0 +1,28 @@
+---
+abstract: 'Create XS modules with Module::Starter'
+author:
+  - 'John Peacock <jpeacock@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Starter-XSimple
+provides:
+  Module::Starter::XSimple:
+    file: lib/Module/Starter/XSimple.pm
+    version: v0.0.2
+requires:
+  Devel::PPPort: 3.06
+  Module::Build: 0.38
+  Module::Starter: 1.58
+  Path::Class: 0.26
+  Test::More: 0.98
+  version: 0.88
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.0.2

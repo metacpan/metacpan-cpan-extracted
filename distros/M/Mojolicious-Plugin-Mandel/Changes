@@ -1,0 +1,14 @@
+Revision history for Mojolicious-Plugin-Mandel
+
+0.1.1 2015-04-24T01:14:37
+ [Huo Linhe]
+ - Fix log funtion error
+
+0.1.0 2015-04-23T08:41:19
+ [Huo Linhe]
+ - Auto commited by dzil with version 0.1.0 at 23-Apr-2015
+ - Add documents for helpers
+ - Add mojo lite test
+ - Add helpers mandel and mandel_documents
+ - Initialize gitrepo with `dzil new`
+

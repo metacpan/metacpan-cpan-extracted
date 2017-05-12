@@ -1,0 +1,115 @@
+Revision history for perl distribution Mojolicious-Plugin-OpenAPI
+
+1.13 2017-03-03T00:35:26+0100
+ - Forgot to bump JSON::Validator version in cpanfile #32
+
+1.12 2017-03-02T23:10:18+0100
+ - Compatible with JSON::Validator 0.95
+
+1.11 2017-03-01T19:42:58+0100
+ - Fix adding routes with wildcards after routes without wildcards
+ - Add fallback to default renderer, unless "openapi" is set in stash
+
+1.10 2017-02-21T15:35:45+0100
+ - Fix resolve of specification twice #19
+ - Require JSON::Validator 0.94 #30
+
+1.09 2017-01-30T13:11:52+0000
+ - Prevent stomping of status in before_render hook
+
+1.08 2017-01-25T17:27:12+0100
+ - Add EXPERIMENTAL openapi.not_implemented helper
+
+1.07 2016-12-11T11:39:46+0100
+ - Compatible with JSON::Validator 0.90
+
+1.06 2016-11-18T15:57:26+0100
+ - Will rewrite basePath in generated spec, relative to base URL
+ - Documented x-mojo-placeholder #16
+
+1.05 2016-10-26T13:23:38+0200
+ - Add support for path parameters #11
+ - Fix typos in tutorial regarding example snippets #13
+ - Fix default OPTIONS path, when it has placeholders
+
+1.04 2016-10-06T21:39:06+0200
+ - Fix responding with an empty string #9
+ - Fix responding with null
+
+1.03 2016-09-27T23:58:41+0200
+ - Bumped required JSON::Validator version to 0.85 #8
+
+1.02 2016-09-27T09:52:02+0200
+ - Fix bug for collectionFormat handling in JSON::Validator
+ - Add support for "version_from_class"
+ - Add TOC to .html rendering of API
+
+1.01 2016-09-21T16:07:45+0200
+ - Fix documentation regarding the "reply.openapi" helper #7
+
+1.00 2016-09-04T15:08:56+0200
+ - Removed EXPERIMENTAL
+
+0.14 2016-08-20T14:04:58+0200
+ - Fix rendering UTF-8 characters
+
+0.13 2016-08-16T19:54:48+0200
+ - Removed $c->openapi->invalid_input()
+ - Add support for rendering specification on OPTIONS #1
+
+0.12 2016-08-10T21:16:54+0200
+ - Add support for $c->render(openapi => $data);
+ - Started DEPRECATING $c->reply->openapi()
+
+0.11 2016-08-09T13:35:16+0200
+ - Add support for retrieving the complete API spec
+ - Improved tutorial
+
+0.10 2016-08-07T22:16:38+0200
+ - Add $c->openapi->validate()
+ - Deprecated $c->openapi->invalid_input()
+ - Fix validating YAML specifications #3 #4
+   Contributor: Ilya Rassadin
+
+0.09 2016-08-04T09:30:23+0200
+ - Add basic support for rendering spec as HTML
+ - Add check for $ref in the right place in the input specification
+   Contributor: Lari Taskula
+
+0.08 2016-07-29T14:33:14+0200
+ - Add check for unique operationId and route names
+ - All route names will have "spec_route_name." as prefix
+
+0.07 2016-07-26T21:53:56+0200
+ - Add support for serving binary data
+
+0.06 2016-07-26T18:56:50+0200
+ - Add support for naming baseUrl (specification) route
+ - Add openapi.valid_input helper
+ - Fix loading the plugin twice
+
+0.05 2016-07-26T15:04:25+0200
+ - Fix "false" must be false and not true
+ - Make sure 404 is returned as default format and not html
+
+0.04 2016-07-25T15:03:31+0200
+ - Fix setting default values in JSON::Validator::OpenAPI 0.76
+ - Fix registering correct HTTP method for action in a class
+
+0.03 2016-07-25T11:25:43+0200
+ - Add openapi.invalid_input helper
+ - Add Mojolicious::Plugin::OpenAPI::Guides::Tutorial
+ - Remove openapi.validate helper
+ - Remove openapi.input helper
+ - Will store validated data into $c->validation->output
+
+0.02 2016-06-11T07:32:51-0700
+ - Improved documentation
+ - Add support for MOJO_OPENAPI_LOG_LEVEL=error
+
+0.01 2016-06-10T19:34:35-0700
+ - Add logging of request/response errors
+ - Add rendering of API spec from base URL
+ - Exceptions returns structured JSON data instead of HTML
+ - Making an improved version of Mojolicious::Plugin::Swagger2
+ - Started project

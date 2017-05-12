@@ -1,0 +1,333 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Reporter - base-class and error reporter for Mail::Box
+
+=head1 INHERITANCE
+
+ Mail::Reporter is extended by
+   Mail::Box::Parser
+   Mail::Message
+   Mail::Message::Body
+   Mail::Message::Convert
+   Mail::Message::Field
+   Mail::Message::Field::Attribute
+   Mail::Message::Head
+   Mail::Message::Head::FieldGroup
+   Mail::Message::TransferEnc
+
+=head1 SYNOPSIS
+
+ $folder->log(WARNING => 'go away');
+ print $folder->trace;        # current level
+ $folder->trace('PROGRESS');  # set level
+ print $folder->errors;
+ print $folder->report('PROGRESS');
+
+=head1 DESCRIPTION
+
+The C<Mail::Reporter> class is the base class for all classes, except
+L<Mail::Message::Field::Fast|Mail::Message::Field::Fast> because it would become slow...  This
+base class is used during initiation of the objects, and for configuring
+and logging error messages.
+
+=head1 METHODS
+
+The C<Mail::Reporter> class is the base for nearly all other
+objects.  It can store and report problems, and contains the general
+constructor L<new()|Mail::Reporter/"Constructors">.
+
+=head2 Constructors
+
+=over 4
+
+=item Mail::Reporter-E<gt>B<new>(%options)
+
+This error container is also the base constructor for all modules, (as long
+as there is no need for another base object)  The constructor always accepts
+the following %options related to error reports.
+
+ -Option--Default
+  log     'WARNINGS'
+  trace   'WARNINGS'
+
+=over 2
+
+=item log => LEVEL
+
+Log messages which have a priority higher or equal to the specified
+level are stored internally and can be retrieved later.  The global
+default for this option can be changed with L<defaultTrace()|Mail::Reporter/"Error handling">.
+
+Known levels are C<INTERNAL>, C<ERRORS>, C<WARNINGS>, C<PROGRESS>,
+C<NOTICES> C<DEBUG>, and C<NONE>.  The C<PROGRESS> level relates to
+the reading and writing of folders.  C<NONE> will cause only C<INTERNAL>
+errors to be logged.
+By the way: C<ERROR> is an alias for C<ERRORS>, as C<WARNING> is an alias
+for C<WARNINGS>, and C<NOTICE> for C<NOTICES>.
+
+=item trace => LEVEL
+
+Trace messages which have a level higher or equal to the specified level
+are directly printed using warn.  The global default for this option can
+be changed with L<defaultTrace()|Mail::Reporter/"Error handling">.
+
+=back
+
+=back
+
+=head2 Error handling
+
+=over 4
+
+=item $obj-E<gt>B<AUTOLOAD>()
+
+By default, produce a nice warning if the sub-classes cannot resolve
+a method.
+
+=item $obj-E<gt>B<addReport>($object)
+
+Add the report from other $object to the report of this object. This is
+useful when complex actions use temporary objects which are not returned
+to the main application but where the main application would like to know
+about any problems.
+
+=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+=item Mail::Reporter-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+Reports the default log and trace level which is used for object as list
+of two elements.  When not explicitly set, both are set to C<WARNINGS>.
+
+This method has three different uses. When one argument is specified, that
+$level is set for both loglevel as tracelevel.
+
+With two arguments, the second determines which configuration you like.  If
+the second argument is a CODE reference, you install a $callback.  The loglevel
+will be set to NONE, and all warnings produced in your program will get
+passed to the $callback function.  That function will get the problem level,
+the object or class which reports the problem, and the problem text passed
+as arguments.
+
+In any case two values are returned: the first is the log level, the
+second represents the trace level.  Both are special variables: in numeric
+context they deliver a value (the internally used value), and in string
+context the string name.  Be warned that the string is always in singular
+form!
+
+example: setting loglevels
+
+ my ($loglevel, $tracelevel) = Mail::Reporter->defaultTrace;
+ Mail::Reporter->defaultTrace('NOTICES');
+
+ my ($l, $t) = Mail::Reporter->defaultTrace('WARNINGS', 'DEBUG');
+ print $l;     # prints "WARNING"  (no S!)
+ print $l+0;   # prints "4"
+ print "Auch" if $l >= $self->logPriority('ERROR');
+
+ Mail::Reporter->defaultTrace('NONE');  # silence all reports
+
+ $folder->defaultTrace('DEBUG');   # Still set as global default!
+ $folder->trace('DEBUG');          # local default
+
+example: installing a callback
+
+ Mail::Reporter->defaultTrace
+
+=item $obj-E<gt>B<errors>()
+
+Equivalent to
+
+ $folder->report('ERRORS')
+
+=item $obj-E<gt>B<log>( [$level, [$strings]] )
+
+=item Mail::Reporter-E<gt>B<log>( [$level, [$strings]] )
+
+As instance method, this function has three different purposes.  Without
+any argument, it returns one scalar containing the number which is internally
+used to represent the current log level, and the textual representation of
+the string at the same time. See Scalar::Util method C<dualvar> for
+an explanation.
+
+With one argument, a new level of logging detail is set (specify a number
+of one of the predefined strings).  With more arguments, it is a report
+which may need to be logged or traced.
+
+As class method, only a message can be passed.  The global configuration
+value set with L<defaultTrace()|Mail::Reporter/"Error handling"> is used to decide whether the message is
+shown or ignored.
+
+Each log-entry has a $level and a text string which will
+be constructed by joining the $strings.  If there is no newline, it will
+be added.
+
+example: 
+
+ print $message->log;      # may print "NOTICE"
+ print $message->log +0;   # may print "3"
+ $message->log('ERRORS');  # sets a new level, returns the numeric value
+
+ $message->log(WARNING => "This message is too large.");
+ $folder ->log(NOTICE  => "Cannot read from file $filename.");
+ $manager->log(DEBUG   => "Hi there!", reverse sort @l);
+
+ Mail::Message->log(ERROR => 'Unknown');
+
+=item $obj-E<gt>B<logPriority>($level)
+
+=item Mail::Reporter-E<gt>B<logPriority>($level)
+
+One error level (log or trace) has more than one representation: a
+numeric value and one or more strings.  For instance, C<4>, C<'WARNING'>,
+and C<'WARNINGS'> are all the same.  You can specify any of these,
+and in return you get a dualvar (see Scalar::Util method C<dualvar>)
+back, which contains the number and the singular form.
+
+The higher the number, the more important the message.
+Only messages about C<INTERNAL> problems are more important than C<NONE>.
+
+example: 
+
+ my $r = Mail::Reporter->logPriority('WARNINGS');
+ my $r = Mail::Reporter->logPriority('WARNING');    # same
+ my $r = Mail::Reporter->logPriority(4);            # same, deprecated
+ print $r;      # prints 'WARNING'  (no S!)
+ print $r + 0;  # prints 4
+ if($r < Mail::Reporter->logPriority('ERROR')) {..} # true
+
+=item $obj-E<gt>B<logSettings>()
+
+Returns a list of C<(key => value)> pairs which can be used to initiate
+a new object with the same log-settings as this one.
+
+example: 
+
+ $head->new($folder->logSettings);
+
+=item $obj-E<gt>B<notImplemented>()
+
+A special case of L<log()|Mail::Reporter/"Error handling">, which logs a C<INTERNAL>-error
+and then croaks.  This is used by extension writers.
+
+=item $obj-E<gt>B<report>( [$level] )
+
+Get logged reports, as list of strings.  If a $level is specified, the log
+for that level is returned.
+
+In case no $level is specified, you get all messages each as reference
+to a tuple with level and message.
+
+example: 
+
+ my @warns = $message->report('WARNINGS');
+   # previous indirectly callable with
+   my @warns = $msg->warnings;
+
+ print $folder->report('ERRORS');
+
+ if($folder->report('DEBUG')) {...}
+
+ my @reports = $folder->report;
+ foreach (@reports) {
+    my ($level, $text) = @$_;
+    print "$level report: $text";
+ }
+
+=item $obj-E<gt>B<reportAll>( [$level] )
+
+Report all messages which were produced by this object and all the objects
+which are maintained by this object.  This will return a list of triplets,
+each containing a reference to the object which caught the report, the
+level of the report, and the message.
+
+example: 
+
+ my $folder = Mail::Box::Manager->new->open(folder => 'inbox');
+ my @reports = $folder->reportAll;
+ foreach (@reports) {
+    my ($object, $level, $text) = @$_;
+
+    if($object->isa('Mail::Box')) {
+       print "Folder $object: $level: $message";
+    } elsif($object->isa('Mail::Message') {
+       print "Message ".$object->seqnr.": $level: $message";
+    }
+ }
+
+=item $obj-E<gt>B<trace>( [$level] )
+
+Change the trace $level of the object. When no arguments are specified, the
+current level is returned only.  It will be returned in one scalar which
+contains both the number which is internally used to represent the level,
+and the string which represents it.  See L<logPriority()|Mail::Reporter/"Error handling">.
+
+=item $obj-E<gt>B<warnings>()
+
+Equivalent to
+
+ $folder->report('WARNINGS')
+
+=back
+
+=head2 Cleanup
+
+=over 4
+
+=item $obj-E<gt>B<DESTROY>()
+
+Cleanup the object.
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Message distribution version 3.000,
+built on February 02, 2017.
+
+Do not forget to read
+L</Mail::Box-Overview>,
+L</Mail::Box-Cookbook>, and
+L</Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L</Mail::Message>,
+L</Mail::Box>,
+L</Mail::Box::IMAP4>,
+L</Mail::Box::POP3>,
+L</Mail::Box::Parser::C>,
+L</Mail::Box::Dbx> (unpublished),
+L</Mail::Transport>,
+L</Object::Realize::Later>, and
+L</User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,35 @@
+---
+abstract: 'Arbitrary size precision for integers, rationals, floating-points and complex numbers.'
+author:
+  - 'Daniel Șuteu <trizenx@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4222, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-AnyNum
+provides:
+  Math::AnyNum:
+    file: lib/Math/AnyNum.pm
+    version: '0.08'
+requires:
+  Carp: '0'
+  Class::Multimethods: '1.7'
+  Math::GMPq: '0.45'
+  Math::GMPz: '0.39'
+  Math::MPC: '1.07'
+  Math::MPFR: '3.29'
+  POSIX: '0'
+  perl: v5.14.0
+resources:
+  bugtracker: https://github.com/trizen/Math-AnyNum/issues
+  homepage: https://github.com/trizen/Math-AnyNum
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: https://github.com/trizen/Math-AnyNum
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

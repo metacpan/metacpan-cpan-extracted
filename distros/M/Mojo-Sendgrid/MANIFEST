@@ -1,0 +1,18 @@
+.perltidyrc
+Changes
+cpanfile
+examples/sendgrid.pl
+lib/Mojo/Sendgrid.pm
+lib/Mojo/Sendgrid/Mail.pm
+lib/Mojolicious/Command/sendgrid.pm
+lib/Mojolicious/Command/sendgrid/mail.pm
+lib/Mojolicious/Command/sendgrid/mail/send.pm
+lib/Mojolicious/Plugin/Sendgrid.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/sendgrid.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

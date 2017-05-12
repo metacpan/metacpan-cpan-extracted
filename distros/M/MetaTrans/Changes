@@ -1,0 +1,42 @@
+Revision history for Perl extension MetaTrans
+
+v1.05 (2009/09/03) Michal Špaček
+- fixed bug with procedure calling from Config::General.
+- updated MetaTrans::WordbookCz because of new interface
+  of http://www.wordbook.cz/
+- update MetaTrans::SmsCz because of new interface of http://www.sms.cz/
+- update MetaTrans::SlovnikCz because of new interface
+  of http://www.slovnik.cz/
+- update MetaTrans::SeznamCz because of new interface
+  of http://slovnik.seznam.cz/
+- update MetaTrans::UltralinguaNet because of new interface
+  of http://ultralingua.net/
+- remove some warnings in bin/metatrans
+- added MetaTrans::SlovnikZcuCz for http://slovnik.zcu.cz/
+
+v1.04 (2005/03/07) Jan Pomikálek
+- updated MetaTrans::WordbookCz because of new interface
+  of http://www.wordbook.cz/
+- fixed another bug in MetaTrans::sort_translations function
+
+v1.03 (2005/01/04) Jan Pomikálek
+- updated MetaTrans::UltralinguaNet because of new interface
+  of http://ultralingua.net/
+- fixed a bug in MetaTrans::sort_translations function
+- added cookies support
+- some minor bug-fixes in metatrans
+
+v1.02 (2004/12/15) Jan Pomikálek
+- fixed a bug, which caused trouble when plugins returned no
+  translations for given input expression
+- updated translations sorting algorithm towards better performance
+  on input expressions consisting of multiple words
+
+v1.01 (2004/12/13) Jan Pomikálek
+- the very first release
+- 5 plug-ins provided for 5 online translators:
+    - MetaTrans::UltralinguaNet for http://ultralingua.net/
+    - MetaTrans::SlovnikCz      for http://www.slovnik.cz/
+    - MetaTrans::SeznamCz       for http://slovnik.seznam.cz/
+    - MetaTrans::SmsCz          for http://slovniky.sms.cz/
+    - MetaTrans::WordbookCz     for http://www.wordbook.cz/

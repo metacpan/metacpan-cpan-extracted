@@ -1,0 +1,572 @@
+=head1 NAME
+
+Maypole::Manual::View - Maypole View Classes
+
+=head1 DESCRIPTION
+
+In a large application, you will almost certainly want to customize the
+layout and design of the output pages. This task may even be the purview
+of a separate team of HTML designers rather than the programmers. Since
+a typical programmer will try to avoid touching HTML as much as possible
+and a typical designer will try to avoid touching Perl code, programmers
+have evolved a system of templating to separate the concerns of
+programming and designing. 
+
+One of the core concepts in Maypole is the I<view class>, and this is
+responsible for routing the data produced in the model class into the
+templates produced by the designers. Of course, there are a great many
+possible templating systems and styles, and so there can be a great many
+possible Maypole view classes. Each view class will take the data from
+the controller, locate a template to be processed, and hand the whole
+lot to its preferred templating module, which will then do the hard work
+of filling in the template and coming up with the output.
+
+You can choose whatever Maypole view class you want, but the default
+view class is L<Maypole::View::TT>, and it feeds its data and templates
+to a module called the Template Toolkit.
+
+=head2 The Template Toolkit
+
+The Template Toolkit, written by Andy Wardley, is a very powerful and
+generic templating system. It provides its own little formatting language
+which supports loops, conditionals, hash and array dereferences and
+method calls, macro processing and a plug-in system to connect it to
+external Perl modules.
+Its homepage is C<http://www.template-toolkit.org/>.
+There are several good introductions to the
+Template Toolkit available: you should have one installed as
+L<Template::Tutorial::Datafile>; there's one at
+L<http://www.perl.com/pub/a/2003/07/15/nocode.html>, and of course
+there's the "Badger Book" - I<The Perl Template Toolkit>, by Andy et al.
+C<http://www.oreilly.com/catalog/perltt/index.html>
+
+We'll present a brief introduction here by deconstructing some of the 
+templates used by Maypole applications. For more deconstruction, see
+L<Standard Templates and Actions|Maypole::Manual::StandardTemplates>,
+which is an entire chapter dealing with the
+factory supplied templates.
+
+Here's a template that could be called for the front page of the example
+beer database application, C<custom/frontpage>.
+
+    [% INCLUDE header %]
+
+    <h2> The beer database </h2>
+
+    <TABLE BORDER="0" ALIGN="center" WIDTH="70%">
+    [% FOR table = config.display_tables %]
+    <TR>
+    <TD>
+    <A HREF="[%table%]/list">List by [%table %]</A>
+    </TD>
+    </TR>
+    [% END %]
+    </TABLE>
+
+The first thing to note about this is that everything outside of the
+Template Toolkit tags (C<[%> and C<%]>) is output verbatim. That is,
+somewhere in the output you're guaranteed to see 
+
+    <h2> The beer database </h2>
+
+    <TABLE BORDER="0" ALIGN="center" WIDTH="70%">
+
+Inside the tags, magic happens. The first piece
+of magic is the C<[% INCLUDE header %]> directive. This goes away and
+finds a file called F<header> - don't worry about how it finds that yet,
+we'll come to that later on - and processes the file's contents as
+though they were right there in the template. Our F<header> file happens
+not to contain any C<[% %]> tags, but if it did, they would be processed
+in the same way as the ones in F<frontpage>. 
+
+The next piece of magic is this line:
+
+    [% FOR table = config.display_tables %]
+
+We're seeing a lot of things here at once. C<config> is where we should
+start looking. This is a template variable, which is what templates are
+all about - templating means getting data from somewhere outside and
+presenting it to the user in a useful way, and C<config> is a
+prime example of data that we want to use. It's actually an object
+containing configuration parameters for this Maypole application, and
+one of the methods is C<display_tables>, which returns a list of the
+database tables that we're supposed to show. In the application, we
+probably said something like
+
+    BeerDB->config->display_tables([qw[beer brewery pub style]]);
+
+This stores the four values - C<beer>, C<brewery>, C<pub> and C<style> -
+in an array, which is placed in the config object using the
+accessor/mutator method C<display_tables>. Now we're getting them back
+again. Note that we're not going to show the handpump table.
+
+The Template Toolkit's dot operator is a sort of do-the-right-thing
+operator; we can say C<array.0> to get the first element of an array,
+C<hash.key> to look up the C<key> key in a hash, and C<object.method> to
+call C<method> on an object. So, for instance, if we said
+C<config.display_tables.2>, we'd look up the C<display_tables> method in
+the configuration object and get our array back, then look up the 3rd
+element and get C<pub>.
+Thing is, you don't have to care whether C<display_tables> is an object
+or a hash. You can pretend it's a hash if you want. The syntax is the
+same, and Template Toolkit knows the right thing to do.
+
+The C<FOR> loop will repeat the code four times, setting our new
+variable C<table> to the appropriate array element. This code:
+
+    [% FOR table = config.display_tables %]
+        Hello [% table %]!
+    [% END %]
+
+will produce something like
+
+    Hello beer!
+    Hello brewery!
+    Hello pub!
+    Hello style!
+
+In our case, though, we're printing out a table element linking to each
+database table in turn.
+
+Here's a slightly more complicated example, adapted from F<factory/pager>.
+This template is responsible for printing the little page menu at the
+bottom of a listing if there are more rows in the listing than we want
+on a single page.
+
+    [% PROCESS macros %]
+    <P ALIGN="center">Pages:
+    [%
+         FOREACH num = [pager.first_page .. pager.last_page];
+              IF num == pager.current_page;
+                "["; num; "] ";
+              ELSE;
+                SET args = "?page=" _ num;
+                SET label = "[" _ num _ "]";
+                link(classmetadata.table, "list", args, label);
+              END;
+         END;
+    %]
+    </P>
+
+Maypole will be providing a whole bunch of variables to this template,
+and we'll look at them all in a moment, but the only ones we need to care
+about are C<pager> and C<classmetadata>. 
+
+We start by loading in a bunch of macros. Macros are Template Toolkit's
+functions - you can provide them some parameters and they'll run a little
+sub-template based on them. The C<macros> file contains some handy macros
+that I've found useful for constructing Maypole templates; again, these
+will be covered in full detail in
+L<Standard Templates and Actions|Maypole::Manual::StandardTemplates>.
+
+We're going to be displaying something like this:
+
+    Pages: [1] [2] [3] [4]
+
+with most of those numbers being a link to the appropriate page. This
+mean we're going to have to have a list of numbers, and the C<FOREACH> loop
+provides this: (C<FOREACH> and C<FOR> are identical, just like in Perl.)
+
+         FOREACH num = [pager.first_page .. pager.last_page];
+
+Here we're manually constructing an array of numbers, using the range
+operator (C<..>) to fill in all the numbers from the C<first_page> (1)
+to the C<last_page> (4). The same dot operator is used to ask the C<pager>
+object what its C<first_page> and C<last_page> are.
+
+Now we're going to be executing this loop four times, once each for C<num>
+being set to 1, 2, 3, and 4. At some point, we'll come across the page
+that we're actually on right now:
+
+      IF num == pager.current_page;
+
+and in that case, we don't want to produce a link to it. We just want
+to output it as text, surrounded by square brackets:
+
+                "["; num; "] ";
+
+We're using string literals to output the brackets. We don't have to
+do that. We could say it this way:
+
+    [% ...
+      IF num == pager.current_page;
+    %]
+        [ [% num %] ] 
+    [% ELSE %]
+       ...
+    [% END %]
+
+But you know, I quite like it my way.
+
+Now if the number we're printing isn't the number of the current page,
+we want to make a link. Here's how we do it:
+
+    SET args = "?page=" _ num;
+    SET label = "[" _ num _ "]";
+    link(classmetadata.table, "list", args, label);
+
+C<SET> declares a new variable of our own. If there was anything called
+C<args> before, there isn't now. It's going to be the result of our
+statement C<"?page=" _ num>. C<_> is the concatenation operator, and
+glues C<?page=> onto the front of our number. So if we want to link to
+page 4, then the C<args> variable will contain C<?page=4>. Similarly,
+the C<label> variable will be C<[4]>.
+
+Now we call a macro, C<link> with these two variables and the value of
+C<classmetadata.table>. This macro takes four arguments, C<table>, 
+C<action>, C<args> and C<label>, and constructs a link of the form
+
+    <A HREF="[% base %]/[% table %]/[% action %][% args %]">
+    [% label %]
+    </A>
+
+In our case, it'll be filled in like so:
+
+    <A HREF="[% base %]/[% classmetadata.table %]/list?page=4">
+    [ 4 ]
+    </A>
+
+Where C<classmetadata.table> will actually be the name of the current
+table, and C<base> will be replaced by the appropriate URL for
+this application.
+
+=head2 Locating Templates
+
+Another feature of C<Maypole::View::TT> which may not be present in
+alternate view class implementations - although they are strongly
+encouraged to provide it - is the way that templates are located.
+(Remember, I B<did> say I'd tell you about that later.) Template Toolkit
+allows whatever uses it to provide a path for template files to be
+located in. C<Maypole::View::TT> feeds it up to three possible
+directories to look things up in, and it will try to find a template in
+each of these in turn.
+
+When you configure a Maypole application, you can tell it the base
+directory of your templates like so:
+
+    BeerDB->config->template_root("/var/www/beerdb/templates");
+
+If you don't do this, most Maypole front-ends will use the current
+directory, which may be what you want anyway. Off this directory,
+Maypole will look for a set of subdirectories.
+
+For instance, I said we were in the middle of processing the front page
+and looking up a template file called F<header>. Maypole will first look
+for this file in the F<custom> subdirectory. (say,
+F</var/www/beerdb/templates/custom>) If it doesn't find one, then it
+looks in the F<factory> subdirectory. If it doesn't find one there, then
+it gives up and dies with an error. But that's your fault, since you've
+called for a template which doesn't exist. Don't do that. 
+
+This behaviour means that you can provide your own site-specific
+templates, but if you don't do so, then you get to use a generic one
+provided by Maypole. Maypole's "factory setting" templates are written
+in such a way as to try and do the right thing no matter what your
+application does. They are occasionally successful at this. 
+
+Now the front page was a pretty simple example, since Maypole only looks
+up two directories. In most cases, it checks an additional directory,
+and this directory depends entirely on what Maypole is doing.
+
+If you're writing an e-commerce application, for example, you may well
+have a table which represents the product catalogue and all the products
+you can buy. Let's call this the C<product> table. You'll also have a
+data source which is specific to the user which contains all the
+products that they're buying on this particular visit to the site. In
+time-honoured tradition, we'll call this the C<basket> table.
+
+Now it ought to be reasonably apparent that you don't want the basket
+to be displayed in exactly the same way as the product catalogue. The
+templates for C<product/list> and C<basket/list> need to be different.
+This is where the third directory comes in. The other directory, which
+Maypole checks very first of all, is specific to the table that you're
+viewing. So if you go to C<http://your.shop.com/basket/list>, Maypole
+will look in the F<basket> directory first for a file called F<list>,
+and second in the F<custom> directory for a site-wide list template,
+and then fall-back to the F<factory> directory for a generic list
+template. It should be obvious that you probably want to provide all
+of F<basket/list>, F<basket/view>, F<product/list>, F<product/view>
+and any other combination of classes and actions that you can think of.
+
+=head2 What Maypole provides to a template
+
+C<Maypole::View::TT> provides quite a variety of template variables to
+the template. As these are the building blocks of your pages, it's worth
+looking at precisely what variables are available.
+
+=head3 objects
+
+The most important variable is called C<objects>, and is a list of all
+the objects that this page is going to deal with. For instance,
+if the URL is C<http://localhost/beerdb/beer/view/23>, then
+in the template F</beer/view>, C<objects> will contain the C<BeerDB::Beer>
+object for the 23rd item in the database, while for the F</brewery/list>
+template, the view will fill C<objects> with all the breweries; or at
+least, all the breweries on the current page.
+
+=head3 breweries!
+
+This variable is so important that to help design templates with it,
+C<Maypole::View::TT> provides a helpful alias to it depending on
+context. For instance, if you're writing your own F</brewery/list>
+template, the data in C<objects> is also available in a template
+variable called C<breweries>. If you're working on F</brewery/view>,
+though, it's available in C<brewery>, since there's only one brewery to
+be displayed.
+
+=head3 base
+
+Additionally, you can get the base URL for the application from the
+C<base> template variable; this allows you to construct links, as we
+saw earlier:
+
+    <A HREF="[% base %]/brewery/edit/[% brewery.id %]">Edit this brewery</A>
+
+=head3 config
+
+You can also get at the rest of the configuration for the site with the
+C<config> variable as we saw above.
+
+=head3 request
+
+The entire request object is made available in 
+C<request>, should you really need to poke at it. (I've only found this
+useful when working with authentication modules which stash a current user
+object in C<request.user>.)
+
+=head3 classmetadata
+
+To allow the construction of the "generic" templates which live in
+F<factory>, Maypole also passes in a hash called C<classmetadata>,
+which contains all sorts of useful information about the class under
+examination:
+
+=over 3
+
+=item C<table>
+
+This is the name of the table that is represented by the class.
+
+=item C<name>
+
+This is the Perl's idea of the class; you don't need this unless you're
+doing really tricky things.
+
+=item C<moniker>
+
+This is a more human-readable version of the table name, that can be
+used for display. "brewery" for example.
+
+=item C<plural>
+
+The same, but a correctly-formed plural. For instance, "breweries".
+
+=item C<columns>
+
+The list of columns for display; see the
+L<hard way|Maypole::Manual::Beer/"The hard way"> section in the Beer
+Database chapter.
+
+=item C<list_columns>
+
+As for C<columns>, but these are the columns to be displayed on a
+F<list> page.
+
+=item C<colnames>
+
+This is a hash mapping the database's name for a column to a more
+human-readable name. Again, see "Customizing Generic CRUD Applications".
+
+=item C<cgi>
+
+This is a slightly trickier one. It is a hash mapping column names to
+a C<HTML::Element> suitable for entering data into a new instance of
+that class. That is, for the C<beer> table, C<classmetadata.cgi.style>
+should be a C<HTML::Element> object containing a drop-down list of
+beer styles.
+
+=item C<related_accessors>
+
+This is a list of accessors which can be called on an object to get
+lists of other things that this object "has". For instance, on a
+brewery, it would return C<beers>, since calling C<brewery.beers> would
+give you a list of beers produced by the brewery. Note that this only
+caters for accessors defining one-to-many relationships, not the
+ordinary one-to-one relationships, such as C<style>.
+
+=back
+
+=head3 Additional variables and overrides
+
+You can pass additional data to templates by creating new variables.
+You'd typically do this in your view class.
+Just add the name of your template variable as a key to the
+C<template_args> hash in the request object, and supply its value:
+
+  $r->template_args->{your_variable_name} = 'some_value';
+
+You can also override the value of any of the standard variables by
+giving their name as the key.
+
+=head2 Accessing other classes
+
+When building a frontpage, login or other template that isn't directly
+linked to a particular table, (and therefore it's class,) that you wish to
+use, you can access the classes directly.
+
+When using C<Maypole::View::TT> you are reccomended to use Richard Clamp's
+incredibly useful Template::Plugin::Class -- see the and Template::Plugin::Class
+and C<Maypole::View::TT> documentation for details.
+
+Mason and MasonX views also allow you to pull in arbitary classes, see
+the relevent Mason and Plugin/View documentation for details.
+
+If you are using HTML::Template you are out of luck on this front due
+to philosophy and architecture this templating system cannot call code,
+and only reads the data provided when the template is processed.
+
+=head2 Other view classes
+
+Please note that these template variables, C<config>, C<classmetadata>,
+C<objects> and its user-friendly alias, as well as the rest of them are
+a function of one particular view class, the default
+C<Maypole::View::TT> class. Other view classes may need to present an
+entirely different set of template variables, since the default ones
+might not make sense. The templates may look wildly different in other
+view class implementations. But that's OK, because you couldn't
+necessarily use the same templates with a different templating system
+anyway.
+
+For instance, in really dumb templating languages which can't handle
+dereferencing hashes or arrays - no wait, that's most of them - passing
+in a hash reference like C<classmetadata> won't help you since you can't
+get at any of its elements. So you'll need to take a look at the
+documentation for the appropriate view class to see what template
+variables it provides.
+
+So if, for some perverse reason, the Template Toolkit just isn't good
+enough for you, then you can set your own view class while configuring
+your application:
+
+   package BeerDB;
+   use base Maypole::Application;
+   ...
+   BeerDB->setup("dbi:SQLite:t/beerdb.db");
+   BeerDB->config->uri_base(http://localhost/beerdb/");
+   BeerDB->config->rows_per_page(10);
+   BeerDB->config->view("Maypole::View::Mason"); 
+
+Where do these alternate view classes come from? Gentle reader, they
+come from B<you>.
+
+=head2 Building your own view class
+
+I<You should probably skip this section for the first few readings of this manual. It's only intended for people extending Maypole.>
+
+Imagine you've found a brand new templating system that's B<much better>
+than the Template Toolkit. I know I'm stretching your imagination a bit
+here, but try. You'd like to use it with Maypole, which means writing your
+own view class. How is it done?
+
+We'll demonstrate by implementing a view class for L<HTML::Mason>,
+although no value judgement is implied. C<HTML::Mason> is a templating
+system which embeds pure Perl code inside its magic tags. The good side
+of this is that it can get into hash references and objects, and so
+providing C<classmetadata>, C<config> and the Maypole request object
+will work out just fine. The down side is that C<HTML::Mason> is used to
+running more or less standalone, and having all the template variables
+it wants already at its disposal through CGI parameters and the like, so
+we have to fiddle a bit to get these variables into our template.
+
+The key to building view classes is L<Maypole::View::Base>. This is the
+base class that you're going to inherit from and, to be honest, it does
+pretty much everything you need. It provides a method called C<vars>
+which returns a hash of all the template variables described above, so
+it would be good to feed those into C<HTML::Mason>. It also provides a
+C<paths> method which turns returns the full filesystem path of the
+three possible template paths as shown above. Again, it would be good to
+use this as our component paths if we can. It also has some methods we
+can override if we want to, but they're not massively important, so you
+can see L<Maypole::View::Base> for more about them. 
+
+The module will do the right thing for us if we agree to provide a
+method called C<template>. This is responsible for taking the Maypole
+request object C<$r> (of which more later) and putting the appropriate output
+either into C<$r-E<gt>output> or C<$r-E<gt>error>, depending, of
+course, whether things are OK or whether we got an error.
+
+Thankfully, C<HTML::Mason> makes things really easy for us. We B<can>
+use multiple template roots, so we can use the C<paths> method; we
+B<can> pass in a hash full of interesting data structures, so we can use
+the C<vars> method too. In fact, we have to do very little to make
+C<Maypole::View::Mason> work. Which is somewhat annoying, because it
+makes a boring example. But it means I can leave the fun ones to you!
+
+The doing-the-templating, in Mason and in any templating system, depends on
+three things: the paths that we're going to use to find our templates, the
+template name that we've been asked to fill out, and the set of variables that
+are going to be fed to the template. We'll assemble these for reference:
+
+    sub template {
+        my ($self, $r) = @_;
+        my @paths = $self->paths($r);
+        my $template = $r->template;
+        my %vars = $self->args($r);
+
+We'll also declare somewhere to temporarily store the output:
+
+        my $output;
+
+Now comes the part where we have to actually do something
+templating-language specific, so we open up our copy of "Embedding Perl
+in HTML with Mason" and find the bit where it talks about running Mason
+standalone. We find that the first thing we need to do is create a
+C<HTML::Mason::Interp> object which knows about the component roots.
+There's a slight subtlety in that the component roots have to be
+specified as an array of arrays, with each array being a two-element
+list of label and path, like so:
+
+    comproot => [
+        [ class   => "/var/www/beerdb/templates/brewery" ],
+        [ custom  => "/var/www/beerdb/templates/custom" ],
+        [ factory => "/var/www/beerdb/templates/factory" ],
+    ]
+
+We also find that we can set the output method here to capture Mason's
+output into a scalar, and also that we can tell Mason to generate
+sensible error messages itself, which saves us from having to worry
+about catching errors. At the end of all this, we come up with a
+constructor for our C<HTML::Mason::Interp> object which looks like this:
+
+    my $label = "path0";
+    my $mason = HTML::Mason::Interp->new(
+        comproot => [ map { [ $label++ => $_ ] } @paths ],
+        output_method => \$output,
+        error_mode => "output" 
+    );
+
+The next thing we need to do is run the template with the appropriate
+template variables. This turns out to be really easy:
+
+    $mason->exec($template, %vars);
+
+Now we've got the data in C<$output>, we can put it into the request object,
+and return a true value to indicate that we processed everything OK. (If there
+was an error, then Mason will have produced some suitable output, so we can
+pretend that everything's OK anyway.)
+
+    $r->output($output);
+    return 1;
+
+And that's all we need to do. Barely twenty lines of code for the finished
+product. Wasn't that easy? Don't you feel inspired to write Maypole view
+classes for your favourite templating language? Well, don't let me stop you!
+Patches are always welcome!
+
+=head2 Links
+
+L<Contents|Maypole::Manual>,
+Next L<Standard Templates and Actions|Maypole::Manual::StandardTemplates>,
+Previous L<Maypole Model Classes|Maypole::Manual::Model>,
+
+=cut

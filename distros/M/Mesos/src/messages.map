@@ -1,0 +1,52 @@
+TYPEMAP
+mesos::Credential    O_MESOS_CREDENTIAL
+mesos::ExecutorID    O_MESOS_EXECUTORID
+mesos::Filters       O_MESOS_FILTERS
+mesos::FrameworkInfo O_MESOS_FRAMEWORKINFO
+mesos::OfferID       O_MESOS_OFFERID
+mesos::SlaveID       O_MESOS_SLAVEID
+mesos::TaskID        O_MESOS_TASKID
+mesos::TaskStatus    O_MESOS_TASKSTATUS
+
+std::vector<mesos::OfferID>    O_MESOS_OFFERID_VEC
+std::vector<mesos::Request>    O_MESOS_REQUEST_VEC
+std::vector<mesos::TaskInfo>   O_MESOS_TASKINFO_VEC
+std::vector<mesos::TaskStatus> O_MESOS_TASKSTATUS_VEC
+
+INPUT
+O_MESOS_CREDENTIAL
+    $var = ($type) toMsg<mesos::Credential>($arg);
+
+O_MESOS_EXECUTORID
+    $var = ($type) toMsg<mesos::ExecutorID>($arg);
+
+O_MESOS_FILTERS
+    $var = ($type) toMsg<mesos::Filters>($arg);
+
+O_MESOS_FRAMEWORKINFO
+    $var = ($type) toMsg<mesos::FrameworkInfo>($arg);
+
+O_MESOS_OFFERID
+    $var = ($type) toMsg<mesos::OfferID>($arg);
+
+O_MESOS_SLAVEID
+    $var = ($type) toMsg<mesos::SlaveID>($arg);
+
+O_MESOS_TASKID
+    $var = ($type) toMsg<mesos::TaskID>($arg);
+
+O_MESOS_TASKSTATUS
+    $var = ($type) toMsg<mesos::TaskStatus>($arg);
+
+O_MESOS_OFFERID_VEC
+    $var = ($type) toMsgVec<mesos::OfferID>($arg);
+
+O_MESOS_REQUEST_VEC
+    $var = ($type) toMsgVec<mesos::Request>($arg);
+
+O_MESOS_TASKINFO_VEC
+    $var = ($type) toMsgVec<mesos::TaskInfo>($arg);
+
+O_MESOS_TASKSTATUS_VEC
+    $var = ($type) toMsgVec<mesos::TaskStatus>($arg);
+

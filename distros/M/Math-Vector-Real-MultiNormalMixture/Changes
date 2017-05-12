@@ -1,0 +1,9 @@
+Revision history for Perl extension Math::Vector::Real::MultiNormalMixture.
+
+0.02  Jun 30, 2011
+        - add module dependencies
+
+0.01  Mon Jun 20 15:44:42 2011
+	- original version; created by h2xs 1.23 with options
+		-AXn Math::Vector::Real::MultiNormalMixture
+

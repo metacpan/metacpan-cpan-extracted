@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name: Module-Require
+version: 0.05
+license: perl
+distribution_type: module
+requires: {}
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Module::Require:
+    file: lib/Module/Require.pm
+    version: 0.05
+generated_by: Module::Build version 0.21

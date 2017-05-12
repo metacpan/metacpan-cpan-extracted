@@ -1,0 +1,33 @@
+---
+abstract: 'Defend CSRF automatically in Mojolicious Application'
+author:
+  - 'Yuki Shibazaki <shibayu36@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Mojolicious::Lite: 0
+  Test::Class: 0
+  Test::Mojo: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-CSRFDefender
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Class::Accessor::Fast: 0
+  Mojolicious: 1.43
+  Path::Class: 0
+  String::Random: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.0.8

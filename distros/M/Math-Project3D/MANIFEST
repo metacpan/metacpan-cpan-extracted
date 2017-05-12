@@ -1,0 +1,10 @@
+Changes
+lib/Math/Project3D.pm
+lib/Math/Project3D/Function.pm
+MANIFEST
+Makefile.PL
+META.yml
+README
+t/00pod.t
+t/00podcover.t
+t/01test.t

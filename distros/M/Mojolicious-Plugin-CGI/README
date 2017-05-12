@@ -1,0 +1,135 @@
+NAME
+    Mojolicious::Plugin::CGI - Run CGI script from Mojolicious
+
+VERSION
+    0.36
+
+DESCRIPTION
+    This plugin enable Mojolicious to run Perl CGI scripts. It does so by
+    forking a new process with a modified environment and reads the STDOUT
+    in a non-blocking manner.
+
+SYNOPSIS
+  Standard usage
+      use Mojolicious::Lite;
+      plugin CGI => [ "/cgi-bin/script" => "/path/to/cgi/script.pl" ];
+
+    Using the code above is enough to run "script.pl" when accessing
+    <http://localhost:3000/cgi-bin/script>.
+
+  Complex usage
+      plugin CGI => {
+        # Specify the script and mount point
+        script => "/path/to/cgi/script.pl",
+        route  => "/some/route",
+
+        # %ENV variables visible from inside the CGI script
+        env => {}, # default is \%ENV
+
+        # Path to where STDERR from cgi script goes
+        errlog => "/path/to/file.log",
+
+        # The "before" hook is called before script start
+        # It receives a Mojolicious::Controller which can be modified
+        before => sub {
+          my $c = shift;
+          $c->req->url->query->param(a => 123);
+        },
+      };
+
+    The above contains all the options you can pass on to the plugin.
+
+  Helper
+      plugin "CGI";
+
+      # GET /cgi-bin/some-script.cgi/path/info?x=123
+      get "/cgi-bin/#script_name/*path_info" => {path_info => ''}, sub {
+        my $c    = shift;
+        my $name = $c->stash("script_name");
+        $c->cgi->run(script => File::Spec->rel2abs("/path/to/cgi/$name"));
+      };
+
+    The helper can take most the arguments that "register" takes, with the
+    exception of "support_semicolon_in_query_string".
+
+    It is critical that "script_name" and "path_info" is present in stash.
+    If the values are extracted directly from the path or set manually does
+    not matter.
+
+    Note that the helper is registered in all of the examples.
+
+  Running code refs
+      plugin CGI => {
+        route => "/some/path",
+        run   => sub {
+          my $cgi = CGI->new;
+          # ...
+        }
+      };
+
+    Instead of calling a script, you can run a code block when accessing the
+    route. This is (pretty much) safe, even if the code block modifies
+    global state, since it runs in a separate fork/process.
+
+  Support for semicolon in query string
+      plugin CGI => {
+        support_semicolon_in_query_string => 1,
+        ...
+      };
+
+    The code above need to be added before other plugins or handler which
+    use "url" in Mojo::Message::Request. It will inject a "before_dispatch"
+    hook which saves the original QUERY_STRING, before it is split on "&" in
+    Mojo::Parameters.
+
+ATTRIBUTES
+  env
+    Holds a hash ref containing the environment variables that should be
+    used when starting the CGI script. Defaults to %ENV when this module was
+    loaded.
+
+    This plugin will create a set of environment variables depenendent on
+    the request passed in which is according to the CGI spec. In addition to
+    "env", these dynamic variables are set:
+
+      CONTENT_LENGTH, CONTENT_TYPE, HTTPS, PATH, PATH_INFO, QUERY_STRING,
+      REMOTE_ADDR, REMOTE_HOST, REMOTE_PORT, REMOTE_USER, REQUEST_METHOD,
+      SCRIPT_NAME, SERVER_PORT, SERVER_PROTOCOL.
+
+    Additional static variables:
+
+      GATEWAY_INTERFACE = "CGI/1.1"
+      SERVER_ADMIN = $ENV{USER}
+      SCRIPT_FILENAME = Script name given as argument to register.
+      SERVER_NAME = Sys::Hostname::hostname()
+      SERVER_SOFTWARE = "Mojolicious::Plugin::CGI"
+
+    Plus all headers are exposed. Examples:
+
+      .----------------------------------------.
+      | Header          | Variable             |
+      |-----------------|----------------------|
+      | Referer         | HTTP_REFERER         |
+      | User-Agent      | HTTP_USER_AGENT      |
+      | X-Forwarded-For | HTTP_X_FORWARDED_FOR |
+      '----------------------------------------'
+
+  register
+      $self->register($app, [ $route => $script ]);
+      $self->register($app, %args);
+      $self->register($app, \%args);
+
+    "route" and path need to exist as keys in %args unless given as plain
+    arguments.
+
+    $route can be either a plain path or a route object.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2014, Jan Henning Thorsen
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+AUTHOR
+    Jan Henning Thorsen - "jhthorsen@cpan.org"
+

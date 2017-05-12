@@ -1,0 +1,66 @@
+#!/usr/bin/env perl
+
+die "remoos expects a single argument: the class name to remoos as."
+    unless @ARGV == 1;
+
+__PACKAGE__->remoos(@ARGV);
+
+sub remoos {
+    my ($self, $class_name) = @_;
+
+    require Moos;
+
+    my $header = "# $class_name generated from Moos-$Moos::VERSION\n\n";
+
+    my $moos_pm_path = $INC{'Moos.pm'};
+    open my $fh, '<', $moos_pm_path
+        or die "Can't open $moos_pm_path for input\n:$!";
+    my $code = do {local $/; <$fh>};
+    close $fh;
+
+    $code =~ s/^\ *#.*\n//gm;
+    $code =~ s/^=\w.*//ms;
+    $code =~ s/Moos\b/$class_name/g;
+    $code =~ s/^(our \$VERSION =)/# $1/m;
+
+    print $header . $code;
+}
+
+=encoding utf8
+
+=head1 Name
+
+remoos - Rewrite Moos.pm into Your Own Module
+
+=head1 Synopsis
+
+    remoos My::Base::Class > lib/My/Base/Class.pm
+
+=head1 Description
+
+L<Moos> is a L<Moose>-esque Perl OO framework that lives in one single file.
+That makes it easy to turn it into your Perl module distribution's own OO base
+class. This L<remoos> utility makes it easier.
+
+The C<remoos> utility simply reads in a copy of Moos.pm, changes all the
+references of I<Moos> to your module's name, and writes the result to stdout.
+
+It will also remove comments and documentation, and add a comment at the top
+indicating that it was derived from L<Moos>.
+
+=head1 Authors
+
+Ingy döt Net <ingy@cpan.org>
+
+Toby Inkster <tobyink@cpan.org>
+
+=head1 Copyright and License
+
+Copyright 2012-2014. Ingy döt Net.
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html
+
+=cut

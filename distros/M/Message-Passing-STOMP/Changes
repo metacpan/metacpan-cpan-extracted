@@ -1,0 +1,40 @@
+0.006
+  - Fix checking AnyEvent::STOMP version to be done in a way PAUSE
+    hopefully won't object to.
+
+  - Internal refactoring to use roles common to other components.
+
+  - Support subscribing to multiple queues or topics with a single
+    Message::Passing::Input::STOMP
+
+0.005
+  - Better documentation in the Input and Output classes.
+
+  - Drop dependencies on JSON modules.
+
+  - Link to STOMP protocol documentation
+
+  - Link to RabbitMQ and ActiveMQ as the recommended queues.
+
+  - Document the semantics for STOMP queue names as implemented
+    by RabbitMQ and ActiveMQ.
+
+0.004
+   - Work with changes in Message::Passing 0.006
+
+0.003
+   - Fix to use the correct ->_set_connected(0) API in the
+     connection manager, so that upcoming reconnect features
+     work as expected.
+
+0.002
+   - Fix input and output to be able to connect to a configureable
+     queue or topic.
+
+   - Fix documentation to be vagely useful
+
+   - Note code is currently alpha quality
+
+0.001_01
+    - Initial version for smoking
+

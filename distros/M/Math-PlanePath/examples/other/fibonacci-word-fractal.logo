@@ -1,0 +1,74 @@
+#!/usr/bin/ucblogo
+
+; Copyright 2014 Kevin Ryde
+;
+; This file is part of Math-PlanePath.
+;
+; Math-PlanePath is free software; you can redistribute it and/or modify it
+; under the terms of the GNU General Public License as published by the Free
+; Software Foundation; either version 3, or (at your option) any later
+; version.
+;
+; Math-PlanePath is distributed in the hope that it will be useful, but
+; WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+; or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+; for more details.
+;
+; You should have received a copy of the GNU General Public License along
+; with Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
+
+
+; Usage: ucblogo fibonacci-word-fractal.logo
+;
+; Draw the Fibonacci word fractal.  fibonacci.word.fractal draws any
+; given number of steps.  The self-similar nature of the pattern is
+; best seen by making it a Fibonacci number, hence 377 below.
+;
+; The turns are based on the Fibonacci word values which are 0 or 1.
+; Those values are calculated by the least significant bit of the
+; fibbinary values.  Fibbinary values are integers which have no "11"
+; adjacent 1-bits.  They're iterated by some bit twiddling.
+
+
+; Return the low 1-bits of :n
+; For example if n = binary 10110111 = 183
+;        then return binary      111 = 7
+to low.ones :n
+  output ashift (bitxor :n (:n+1)) -1
+end
+
+; :fibbinary should be a fibbinary value
+; return the next larger fibbinary value
+to fibbinary.next :fibbinary
+  localmake "filled  bitor :fibbinary (ashift :fibbinary -1)
+  localmake "mask    low.ones :filled
+  output (bitor :fibbinary :mask) + 1
+end
+
+to fibonacci.word.fractal :steps
+  localmake "step.length 5  ; length of each step
+  localmake "fibbinary 0
+  repeat :steps [
+    forward :step.length
+    if (bitand 1 :fibbinary) = 0 [
+      ifelse (bitand repcount 1) = 1 [right 90] [left 90]
+    ]
+    make "fibbinary  fibbinary.next :fibbinary
+  ]
+end
+
+setheading 0    ; initial line North
+fibonacci.word.fractal 377
+
+
+
+
+
+;------------------------------------------------------------------------------
+; Print the fibbinary values as iterated by fibbinary.next.
+;
+; make "fibbinary 0
+; repeat 20 [
+;   print :fibbinary
+;   make "fibbinary  fibbinary.next :fibbinary
+; ]

@@ -1,0 +1,14 @@
+Build.PL
+Changes
+ignore.txt
+lib/Mojolicious/Plugin/MostTagHelpers.pm
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/00-load.t
+t/basic.t
+t/boilerplate.t
+t/manifest.t
+t/most_tag_helpers.t
+t/pod-coverage.t
+t/pod.t

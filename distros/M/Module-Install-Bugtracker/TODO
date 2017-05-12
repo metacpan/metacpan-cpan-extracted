@@ -1,0 +1,3 @@
+- Support other bug trackers than CPAN.
+  https://rt.cpan.org/Ticket/Display.html?id=70912. Thanks to Florent Angly
+  <florent.angly@gmail.com> for the suggestion.

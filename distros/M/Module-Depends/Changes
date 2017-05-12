@@ -1,0 +1,63 @@
+0.16 Thursday 3rd May, 2012
+    Add configure_requires accessor
+    Fake a version for inc::Module::Install
+
+0.15 Tuesday 23rd February, 2010
+	Allow Makefile.PL/Build.PL exit non-true (Ryan Niebur)
+	Use Parse::CPAN::Meta rather than YAML to parse the
+	META.yml (Takatoshi Kitano)
+
+0.14 Wednesday 13th February, 2008
+	Set $0 to be $file, this allows the use of FindBin in your
+	Makefile.PL (if you're so inclined)
+
+0.13 Tuesday 26th June, 2007
+	File::chdir 0.08 changed its behaviour and is not backwards
+	compatible - avoid using it.
+
+0.12 Thursday 1st March, 2007
+	Implement a y_n for the Module::Build fakery
+
+0.11 Saturday 3rd February, 2007
+	Fixed the emulation of Module::Install::require
+	Change the base test case so that it doesn't need a 
+        ./Build dist first (for when building out of SVN rather 
+       than a released dist)
+
+0.10 Thursday 2nd June, 2005
+	Ship the file for the test suite.  Doh.
+
+0.09 Thursday 2nd June, 2005
+	Dummy out that pesky inc::Module::Install
+
+0.08 Thursday 21st April, 2005
+	Make use of Cwd::realpath to normalise paths with relative 
+	components in them. (Tom Insam)
+
+0.07 Friday 18th February, 2005
+	Fixed the relative, non-intrusive case (I forgot we went to
+	chdiring all over the shop)
+
+0.06 Tuesday 14th September, 2004
+	Rewrote source code example in synopsis so it works
+
+0.05 Thursday 17th June, 2004
+	Dummy out Inline::MakeMaker too
+
+0.04 Wednesday 19th May, 2004
+	Supply a dummy $VERSION for our fake Module::Build
+
+0.03 Friday 23rd January, 2004
+	The "Oh damnit, MakeMaker.pm was subtly different to
+	ModuleBuild.pm" release.  Changes from gutting Fotango::Build.
+
+	Modified the fakeout of Module::Build
+	On failure methods now set ->error rather than croaking
+
+0.02 Friday 23rd January, 2004
+	NINJA compliance
+	<environment barbie> Chdir is hard!  Uses File::chdir to
+	dynamically change back to where we started </>
+
+0.01 Thursday 22nd January, 2004
+	Initial CPAN release

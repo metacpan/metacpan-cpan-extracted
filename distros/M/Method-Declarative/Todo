@@ -1,0 +1,12 @@
+TODO list for Perl module Method::Declarative
+
+- Rewrite the module creation code to compile a more complete method
+  closure - the current implementation just sticks all of the parameters
+  into arrays and wraps a call to do_method in a closure, passing all of
+  the arrays in as arguments.  It would certainly be faster if I could
+  unroll the loops and put `em all into a whoppin' big subroutine that's
+  generated on the fly.
+
+- Do a better job of cloning the passed-in data structures.  Current
+  copies are only two levels deep, and could cause some amusing results if
+  the data structures are changed out from under us.

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<collection xmlns="http://www.loc.gov/MARC21/slim" xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <record xmlns="">
+      <leader>-----nas-a22-----z--4500</leader>
+      <controlfield tag="007">cr |n|---|||||</controlfield>
+      <datafield tag="022" ind1="" ind2="">
+         <subfield code="a">0148-2076</subfield>
+      </datafield>
+      <datafield tag="035" ind1="" ind2="">
+         <subfield code="a">(IlDesEIS)954925475457</subfield>
+      </datafield>
+      <datafield tag="210" ind1="0" ind2="">
+         <subfield code="a">NINETEENTH CENTURY MUSIC</subfield>
+      </datafield>
+      <datafield tag="245" ind1="0" ind2="0">
+         <subfield code="a">19th century music</subfield>
+         <subfield code="h">[electronic resource]</subfield>
+      </datafield>
+      <datafield tag="550" ind1="" ind2="">
+         <subfield code="a">Made available online through EBSCO Academic Search Premier:getFullTxt</subfield>
+      </datafield>
+      <datafield tag="710" ind1="2" ind2="">
+         <subfield code="a">EBSCO Publishing (Firm)</subfield>
+      </datafield>
+      <datafield tag="866" ind1="" ind2="0">
+         <subfield code="a"> Availability: from 2000</subfield>
+         <subfield code="x">EBSCO Academic Search Premier:getFullTxt</subfield>
+      </datafield>
+      <datafield tag="776" ind1="0" ind2="">
+         <subfield code="x">1533-8606</subfield>
+      </datafield>
+   </record>
+</collection>

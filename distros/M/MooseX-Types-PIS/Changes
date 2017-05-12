@@ -1,0 +1,11 @@
+Revision history for MooseX-Types-PIS
+
+0.02    2012-03-30
+        - making sure documentation is rendered in utf8
+        - Updating bundled Module::Install
+        - Updating Changes file for compliance against latest
+        CPAN::Changes specification
+
+0.01    2009-12-29
+        - First version, released on an unsuspecting world.
+

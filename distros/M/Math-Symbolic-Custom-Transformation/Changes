@@ -1,0 +1,49 @@
+Revision history for Perl extension Math::Symbolic::Custom::Transformation.
+
+2.02  Sun May 26 11:30 2013
+    - Do not run POD tests by default.
+    - POD encoding fixes.
+
+2.01  Wed Jul 23 14:16 2008
+    - Documentation patches.
+
+2.00  Sat Jan 20 12:16 2007
+    - Now works with the fast Math::Symbolic::Parser::Yapp parser!
+      (With this, the tests go from > 4 seconds to about 1/2 second.
+      Considering the test overhead, this is pretty damn impressive.)
+    - Requiring Math::Symbolic 0.507.
+
+1.24  Wed Dec 13 14:12 2006
+    - Fixed bug in distribution packaging.
+
+1.23  Wed Dec 13 11:38 2006
+    - Fixed bug in handling of '|' and '&' groups.
+
+1.22  Tue Dec 12 21:25 2006
+    - Fixed bug in value{} and simplify{} constructs
+      for reused transformations.
+    - *curses*. This is the fourth release today!?
+    - Added Math::Symbolic::Custom::Transformation::Group which is a
+      conjunction of transformations that can be handled as a single
+      transformation.
+    - More tests for value{} and simplify{}.
+
+1.21  Tue Dec 12 20:09 2006
+    - Removed debug statements from last release. You may laugh at me now.
+
+1.20  Tue Dec 12 20:05 2006
+    - Fixed major bug in transformations of single variables
+      via VAR_...
+    - Added the apply_recursive() method.
+
+1.10  Tue Dec 12 16:21 2006
+    - Upgraded ::Pattern dependency.
+    - Added to_string() method.
+
+1.01  Sun Jan 15 18:37 2006
+    - Fixed stupid bug in tests.
+    - Upgraded ::Pattern dependency.
+
+1.00  Tue Oct 11 20:15 2005
+    - original version as uploaded to CPAN
+

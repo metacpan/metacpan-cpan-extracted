@@ -1,0 +1,144 @@
+MiscUtils(3)          User Contributed Perl Documentation         MiscUtils(3)
+
+
+
+NNAAMMEE
+       MiscUtils - Miscellanous Utitlies. Provided in hopes that you will add
+       your own functions.
+
+SSYYNNOOPPSSIISS
+           use MiscUtils;
+
+           print rindent(4).'I am 4 tabs over!';
+
+           mkdirs('/xtra/shared/mp3s/by/author/m/mo/mono/life_in_mono.mp3');
+
+           # hypothetical - see discussion below
+           this_useful_function_I_wrote_and_use_constantly ('I added it in myself');
+
+DDEESSCCRRIIPPTTIIOONN
+       MiscUtils is a collection of utility functions I found myself using in
+       alot of my scripts. Then I thought it would be better to just throw
+       them all into one huge unrelated, incoherant module. Then I thought it
+       would be good to share with the world. Then I thought the world would
+       benifit even more if they threw in thier own functions they constantly
+       use.
+
+       DDIISSCCLLAAIIMMEERR
+
+       This module is mostly provided as a means of making quick hacks
+       quicker. For a serious or distributed script you should not rely on or
+       require anyone to have this module. To get the functions out of this
+       module into your serious or distributed scripts, just cut and paste
+       directly into your script or module(s). The module is nothing special,
+       so don't be afraid to hack it up.
+
+PPRROOVVIIDDEEDD FFUUNNCCTTIIOONNSS
+       rriinnddeenntt
+
+       Returns x number of tabs.
+
+       Arguments
+
+       1   The number of spaces to indent.
+
+       Returns: (string) argument number of tabs
+
+       Example:
+           print _r_i_n_d_e_n_t(4).'I am 4 tabs over!';
+
+       iinnddeenntt
+
+       Prints onto a filehandle or stdout x number of tabs.
+
+       Arguments
+
+       1   The number of spaces to indent.
+
+       2   A reference to a filehandle [optional] [default:STDOUT]
+
+       Returns: nothing
+
+       Example:
+           _i_n_d_e_n_t(4);
+           print "I am 4 tabs over!\n";
+
+       mmkkddiirrss
+
+       Makes the directories specified in the path.
+
+       Arguments
+
+       1   The full file/path name to be made if it does not exist.
+
+       Returns: 1 upon success, 0 upon failure.
+
+       Example:
+           if
+       (mkdirs('/xtra/shared/mp3s/by/author/m/mo/mono/life_in_mono.mp3')) {
+               # /xtra/shared/mp3s/by/author/m/mo/mono/ will definitaly exist.
+           }
+
+       sswwaapp__ddiirrss
+
+       Simplify relative path, path blending.
+
+       Arguments
+
+       1   The full file/path name
+
+       2   The first part of the path that will be swapped.
+
+       3   The first part of the path that you want to swap with.
+
+       Returns: The new path.
+
+       Example:
+           print swap_dirs('/publicwww/oldsite/index.php', '/publicwww/',
+       'http://lackluster.tzo.com:1024/');
+           # prints http://lackluster.tzo.com:1024/oldsite/index.php
+
+       ddeebbuugg
+
+       Debug (pretty print) array ref, hash ref, or scalar. Not as cool as
+       Data::Dumper
+
+       Arguments
+
+       1   The item to be debugged. Arrays and Hashes must be in reference
+           form.
+
+       2   Variable/Output name.
+
+       3   Indentation level [optional|internal]
+
+       Returns: nothing
+
+       Example:
+           my @words = qw(a ab abc abcd);
+           debug (\@words, 'my words');
+
+       ffiilltteerr__tteexxtt
+
+       Transforms non-XML-data elements to useful stoarge.
+
+       Arguments
+
+       1   Text to transform.
+
+       Returns: Transformed Text.
+
+       Example:
+           print $some_var_with_smart_quotes_and_punctuation;
+
+BBUUGGSS
+       Uh.... are you sure they aren't yours? Let me know if you find any.
+
+AAUUTTHHOORR
+       BPrudent (Brandon Prudent)
+
+       email: xlacklusterx@hotmail.com
+
+
+
+perl v5.8.0                       2003-11-02                      MiscUtils(3)

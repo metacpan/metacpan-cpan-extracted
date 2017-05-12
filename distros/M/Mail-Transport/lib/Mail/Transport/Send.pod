@@ -1,0 +1,367 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Transport::Send - send a message
+
+=head1 INHERITANCE
+
+ Mail::Transport::Send
+   is a Mail::Transport
+   is a Mail::Reporter
+
+ Mail::Transport::Send is extended by
+   Mail::Transport::Exim
+   Mail::Transport::Mailx
+   Mail::Transport::Qmail
+   Mail::Transport::SMTP
+   Mail::Transport::Sendmail
+
+=head1 SYNOPSIS
+
+ my $message = Mail::Message->new(...);
+
+ # Some extensions implement sending:
+ $message->send;
+ $message->send(via => 'sendmail');
+
+ my $sender = Mail::Transport::SMTP->new(...);
+ $sender->send($message);
+
+=head1 DESCRIPTION
+
+Send a message to the destinations as specified in the header.  The
+C<Mail::Transport::Send> module is capable of autodetecting which of the
+following modules work on your system; you may simply call C<send>
+without C<via> options to get a message transported.
+
+=over 4
+
+=item * L<Mail::Transport::Sendmail|Mail::Transport::Sendmail>
+
+Use sendmail to process and deliver the mail.  This requires the
+C<sendmail> program to be installed on your system.  Whether this
+is an original sendmail, or a replacement from Postfix does matter.
+
+=item * L<Mail::Transport::Exim|Mail::Transport::Exim>
+
+Use C<exim> to distribute the message.
+
+=item * L<Mail::Transport::Qmail|Mail::Transport::Qmail>
+
+Use C<qmail-inject> to distribute the message.
+
+=item * L<Mail::Transport::SMTP|Mail::Transport::SMTP>
+
+In this case, Perl is handling mail transport on its own.  This is
+less desired but more portable than sending with sendmail or qmail.
+The advantage is that this sender is environment independent, and easier
+to configure.  However, there is no daemon involved which means that
+your program will wait until the message is delivered, and the message
+is lost when your program is interrupted during delivery (which may take
+hours to complete).
+
+=item * L<Mail::Transport::Mailx|Mail::Transport::Mailx>
+
+Use the external C<mail>, C<mailx>, or C<Mail> programs to send the
+message.  Usually, the result is poor, because some versions of these
+programs do not support MIME headers.  Besides, these programs are
+known to have exploitable security breaches.
+
+=back
+
+Extends L<"DESCRIPTION" in Mail::Transport|Mail::Transport/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Transport|Mail::Transport/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Mail::Transport|Mail::Transport/"Constructors">.
+ 
+=over 4
+
+=item Mail::Transport::Send-E<gt>B<new>(%options)
+
+ -Option    --Defined in     --Default
+  executable  Mail::Transport  undef
+  hostname    Mail::Transport  'localhost'
+  interval    Mail::Transport  30
+  log         Mail::Reporter   'WARNINGS'
+  password    Mail::Transport  undef
+  port        Mail::Transport  undef
+  proxy       Mail::Transport  undef
+  retry       Mail::Transport  <false>
+  timeout     Mail::Transport  120
+  trace       Mail::Reporter   'WARNINGS'
+  username    Mail::Transport  undef
+  via         Mail::Transport  'sendmail'
+
+=over 2
+
+=item executable => FILENAME
+
+=item hostname => HOSTNAME|ARRAY
+
+=item interval => SECONDS
+
+=item log => LEVEL
+
+=item password => STRING
+
+=item port => INTEGER
+
+=item proxy => PATH
+
+=item retry => NUMBER|undef
+
+=item timeout => SECONDS
+
+=item trace => LEVEL
+
+=item username => STRING
+
+=item via => CLASS|NAME
+
+=back
+
+=back
+
+=head2 Sending mail
+
+=over 4
+
+=item $obj-E<gt>B<destinations>( $message, [$address|ARRAY] )
+
+Determine the destination for this message.  If a valid $address is defined,
+this is used to overrule the addresses within the message.  If the $address
+is C<undef> it is ignored.  It may also be an ARRAY of addresses.
+
+If no $address is specified, the message is scanned for resent groups
+(see L<Mail::Message::Head::Complete::resentGroups()|Mail::Message::Head::Complete/"Access to the header">).  The addresses
+found in the first (is latest added) group are used.  If no resent groups
+are found, the normal C<To>, C<Cc>, and C<Bcc> lines are taken.
+
+=item $obj-E<gt>B<putContent>($message, $fh, %options)
+
+Print the content of the $message to the $fh.
+
+ -Option     --Default
+  body_only    <false>
+  undisclosed  <false>
+
+=over 2
+
+=item body_only => BOOLEAN
+
+Print only the body of the message, not the whole.
+
+=item undisclosed => BOOLEAN
+
+Do not print the C<Bcc> and C<Resent-Bcc> lines.  Default false, which
+means that they are not printed.
+
+=back
+
+=item $obj-E<gt>B<send>($message, %options)
+
+Transmit the $message, which may be anything what can be coerced into a
+L<Mail::Message|Mail::Message>, so including Mail::Internet and MIME::Entity
+messages.  It returns true when the transmission was successfully completed.
+
+ -Option  --Default
+  interval  new(interval)
+  retry     new(retry)
+  to        undef
+
+=over 2
+
+=item interval => SECONDS
+
+=item retry => INTEGER
+
+=item to => STRING
+
+Overrules the destination(s) of the message, which is by default taken
+from the (Resent-)To, (Resent-)Cc, and (Resent-)Bcc.
+
+=back
+
+=item $obj-E<gt>B<trySend>($message, %options)
+
+Try to send the message. This will return true if successful, and
+false in case some problems where detected.  The C<$?> contains
+the exit status of the command which was started.
+
+=back
+
+=head2 Server connection
+
+Extends L<"Server connection" in Mail::Transport|Mail::Transport/"Server connection">.
+ 
+=over 4
+
+=item $obj-E<gt>B<findBinary>( $name, [@directories] )
+
+Inherited, see L<Mail::Transport/"Server connection">
+
+=item $obj-E<gt>B<remoteHost>()
+
+Inherited, see L<Mail::Transport/"Server connection">
+
+=item $obj-E<gt>B<retry>()
+
+Inherited, see L<Mail::Transport/"Server connection">
+
+=back
+
+=head2 Error handling
+
+Extends L<"Error handling" in Mail::Transport|Mail::Transport/"Error handling">.
+ 
+=over 4
+
+=item $obj-E<gt>B<AUTOLOAD>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<addReport>($object)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+=item Mail::Transport::Send-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<errors>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<log>( [$level, [$strings]] )
+
+=item Mail::Transport::Send-E<gt>B<log>( [$level, [$strings]] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logPriority>($level)
+
+=item Mail::Transport::Send-E<gt>B<logPriority>($level)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<notImplemented>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<report>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<reportAll>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<trace>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<warnings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=back
+
+=head2 Cleanup
+
+Extends L<"Cleanup" in Mail::Transport|Mail::Transport/"Cleanup">.
+ 
+=over 4
+
+=item $obj-E<gt>B<DESTROY>()
+
+Inherited, see L<Mail::Reporter/"Cleanup">
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Warning: Message has no destination
+
+It was not possible to figure-out where the message is intended to go
+to.
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=item Warning: Resent group does not specify a destination
+
+The message which is sent is the result of a bounce (for instance
+created with L<Mail::Message::bounce()|Mail::Message::Construct::Bounce/"Constructing a message">), and therefore starts with a
+C<Received> header field.  With the C<bounce>, the new destination(s)
+of the message are given, which should be included as C<Resent-To>,
+C<Resent-Cc>, and C<Resent-Bcc>.
+
+The C<To>, C<Cc>, and C<Bcc> header information is only used if no
+C<Received> was found.  That seems to be the best explanation of the RFC.
+
+As alternative, you may also specify the C<to> option to some of the senders
+(for instance L<Mail::Transport::SMTP::send(to)|Mail::Transport::Send/"Sending mail"> to overrule any information
+found in the message itself about the destination.
+
+=item Error: Transporters of type $class cannot send.
+
+The L<Mail::Transport|Mail::Transport> object of the specified type can not send messages,
+but only receive message.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Transport distribution version 3.000,
+built on February 02, 2017.
+
+Do not forget to read
+L</Mail::Box-Overview>,
+L</Mail::Box-Cookbook>, and
+L</Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L</Mail::Message>,
+L</Mail::Box>,
+L</Mail::Box::IMAP4>,
+L</Mail::Box::POP3>,
+L</Mail::Box::Parser::C>,
+L</Mail::Box::Dbx> (unpublished),
+L</Mail::Transport>,
+L</Object::Realize::Later>, and
+L</User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

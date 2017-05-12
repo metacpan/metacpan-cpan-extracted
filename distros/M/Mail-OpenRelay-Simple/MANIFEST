@@ -1,0 +1,7 @@
+Changes
+Copying
+Makefile.PL
+MANIFEST
+README
+t/Simple.t
+lib/Mail/OpenRelay/Simple.pm

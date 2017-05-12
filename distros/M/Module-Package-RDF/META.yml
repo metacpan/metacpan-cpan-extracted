@@ -1,0 +1,65 @@
+---
+abstract: 'drive your distribution with RDF'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+keywords:
+  - CPAN
+  - Install
+  - Packaging
+  - Perl
+  - RDF
+  - 'Semantic Web'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Module::Package::RDF
+name: Module-Package-RDF
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  DateTime: 0
+  File::HomeDir: 0
+  Getopt::ArgvFile: 0
+  Getopt::Long: 0
+  IO::All: 0
+  Log::Log4perl: 0
+  Module::Install: 1.04
+  Module::Install::AutoInstall: 0
+  Module::Install::AutoLicense: 0.08
+  Module::Install::AutoManifest: 0
+  Module::Install::Copyright: 0.009
+  Module::Install::Credits: 0.009
+  Module::Install::DOAP: 0.006
+  Module::Install::DOAPChangeSets: 0.206
+  Module::Install::RDF: 0.009
+  Module::Install::ReadmeFromPod: 0.12
+  Module::Install::TrustMetaYml: 0.003
+  Module::Package: 0.30
+  RDF::TriN3: 0.201
+  RDF::Trine: 0.135
+  Software::License: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+  Test::RDF::DOAP::Version: 0.007
+  Text::Template: 0
+  URI::Escape: 0
+  URI::file: 4.0
+  perl: 5.10.0
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Module-Package-RDF
+  homepage: https://metacpan.org/release/Module-Package-RDF
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/tobyink/p5-module-package-rdf
+version: 0.014

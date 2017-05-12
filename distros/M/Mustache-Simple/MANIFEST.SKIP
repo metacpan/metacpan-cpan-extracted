@@ -1,0 +1,7 @@
+\..*\.sw.$
+\.bak$
+^\.git/
+^\.gitignore$
+^Makefile$
+^.travis.yml
+tags$

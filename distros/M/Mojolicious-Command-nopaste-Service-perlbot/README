@@ -1,0 +1,6 @@
+NAME
+    Mojolicious::Command::nopaste::Service::perlbot - A Mojo-nopaste service
+    for https://perlbot.pl/
+
+AUTHOR
+Ryan Voots simcop@cpan.org <mailto:SIMCOP@cpan.org>

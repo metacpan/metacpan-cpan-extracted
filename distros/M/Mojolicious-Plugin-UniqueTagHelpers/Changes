@@ -1,0 +1,32 @@
+Revision history for Mojolicious-Plugin-UniqueTagHelpers
+
+1.3     06-04-2017
+        Fix utf8 with md5_sum.
+
+
+1.2     01-12-2016
+        Objects as string. Fix Mojo::URL.
+
+1.1     03-11-2016
+        CPU and debug optimization: do not use md5 for small content
+
+1.0     03-11-2016
+        First stable release
+
+0.05    26-09-2016
+        Fix tests
+
+0.04    22-09-2016
+        Fix distribution
+
+0.03    22-09-2016
+        Reduce memory usage.
+        Fix block support
+        Rename tests
+
+0.02    21-09-2016
+        Documentation.
+
+0.01    21-09-2016
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,58 @@
+<%args>
+$pager=>''
+$search=>''
+</%args>
+
+<& header, %ARGS &>
+
+%if ($search) {
+<h2> Search results </h2>
+%} else {
+<h2> Listing of all <% $classmetadata->{plural} %></h2>
+%}
+
+<& navbar, config        => $config,
+           classmetadata => $classmetadata,
+           base          => $base &>
+<& search_form, %ARGS &>
+
+<div class="list">
+<table id="matrix" width="100%">
+<tr>
+%foreach my $col (@{$classmetadata->{columns}}) {
+%next if ($col eq "id");
+    <th>
+<%perl>
+    my $additional = "?order=" . $col;
+    $additional .= "&amp;page=" . $pager->{current_page} if $pager;
+    $additional .= "&amp;o2=desc"
+    if ($col eq $request->{query}->{order} && 
+        $request->{query}->{o2} ne "desc");
+    </%perl>
+     <& macros/link, table=> $classmetadata->{table},
+              command=>"list", 
+	      config=>$config,
+	      base=>$base,
+              additional=>$additional, 
+              label=>$classmetadata->{colnames}->{$col}
+      &>
+    </th>
+%   }
+    <th>Actions</th>
+    </tr>
+
+%my $count;
+%foreach my $item (@$objects) {
+%$count++;
+    <tr <%($count %2 ? 'class="alternate"':'')%> >
+    <&macros/display_line, %ARGS, item=>$item &>
+    </tr>
+%}
+</table>
+</div>
+
+<& pager,  %ARGS &>
+<& addnew, %ARGS &>
+</div>
+
+<& footer, %ARGS &>

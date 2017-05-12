@@ -1,0 +1,34 @@
+	Release Name: 0.4101 2010-08-16
+		*	Updated to use new method system
+
+		*	POD Changes
+
+	Release Name: 0.4001    2010-07-28
+		*	Normalized version number with other core plugins
+
+		*	Started using git and github
+
+		*	Added set_values method to meet 0.40_01 requirements
+
+		*	Revised test to use any available lyrics plugin
+
+    Release Name: 0.04   
+        *   Changed license to explicitly include GPL
+
+        *   Started using Pod::Readme
+
+    Release Name: 0.03 2008-02-22
+        *   Improved test
+
+        *   Now requires Lyrics::Fetcher::LeosLyrics
+
+        *   Fixed type-o in Synopsis
+
+    Release Name: 0.02 2008-02-21
+        *   Fixed default_options method
+
+        *   Kwalitee changes
+
+    Release Name: 0.01 2008-02-10
+        *   Initial Public Release
+

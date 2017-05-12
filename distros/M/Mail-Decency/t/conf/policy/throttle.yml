@@ -1,0 +1,25 @@
+---
+
+disable: 0
+require_sasl_username: 0
+use_stats_cache: 0
+
+default_limits:
+    sender_domain:
+        -
+            maximum: 2
+            interval: 600
+
+exception_databases:
+    - sender_domain
+    - account
+
+reject_messages:
+    1:
+        message: 'One mail per second..'
+        code: 450
+
+default_reject_message:
+    message: 'Not more then %maximum% Mails in %interval_minutes% minutes'
+    code: 450
+

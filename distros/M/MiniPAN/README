@@ -1,0 +1,64 @@
+MiniPAN
+
+MiniPan is a try to write a minimalistic replacement for the 'cpan' command
+line tool mainly for the iPhone as limited resources make it impossible to use
+it on that platform (cpan tries to load the whole package list into the memory,
+even with CPAN::SQLite installed...
+
+Currently only installation of single modules and their dependencies is
+supported.
+
+
+DEPENDENCIES
+
+Of course you need Perl installed on your iPhone already.
+There is a Perl 5.10.0 version for the iPhone OS 2.x in CoreDev's Cydia
+repository. Installation instructions can be found on their page:
+
+http://coredev.nl/
+
+
+following packages are also required:
+
+- sudo
+- make and anything build related (build-essential under debian)
+- OpenSSH (for remote login)
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc MiniPAN
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=MiniPAN
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/MiniPAN
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/MiniPAN
+
+    Search CPAN
+        http://search.cpan.org/dist/MiniPAN
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Tobias Kirschstein
+
+This program is released under the following license: BSD
+

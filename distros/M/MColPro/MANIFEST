@@ -1,0 +1,31 @@
+Changes
+lib/MColPro/Collect.pm
+lib/MColPro/CollectConf.pm
+lib/MColPro/Exclude.pm
+lib/MColPro/Platform.pm
+lib/MColPro/Dispatch.pm
+lib/MColPro/PortCheck.pm
+lib/MColPro/Claim.pm
+lib/MColPro.pm
+lib/MColPro/Process.pm
+lib/MColPro/Process/Event.pm
+lib/MColPro/Process/Policy.pm
+lib/MColPro/Record.pm
+lib/MColPro/Report.pm
+lib/MColPro/SqlBase.pm
+lib/MColPro/TimeList.pm
+lib/MColPro/Util/Logger.pm
+lib/MColPro/Util/PID.pm
+lib/MColPro/Util/Plugin.pm
+lib/MColPro/Util/Serial.pm
+lib/MColPro/Util/TimeHelper.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

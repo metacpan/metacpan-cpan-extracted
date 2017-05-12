@@ -1,0 +1,158 @@
+NAME
+    MooseX::Types::MoreUtils - utility methods to apply to Moose type
+    constraints
+
+SYNOPSIS
+       {
+          package Spruce;
+      
+          use Moose;
+          use MooseX::Types::Moose qw(ArrayRef Str);
+          use MooseX::Types::MoreUtils;
+          use Local::TextUtils qw( csv_to_arrayref );
+      
+          has goose => (
+             is      => 'ro',
+             isa     => ArrayRef->$_plus_coercions( Str, \&csv_to_arrayref ),
+             coerce  => 1,
+          );
+       }
+
+DESCRIPTION
+    This module provides a bunch of methods for working with Moose type
+    constraints, which it exposes as lexical coderef variables. (Like
+    Object::Util.)
+
+    See "Rationale" in Object::Util.
+
+  Methods
+    The invocants for these methods are type constraints. These may be
+    Moose::Meta::TypeConstraint, MooseX::Types::TypeDecorator, or Type::Tiny
+    objects. As a convenience, strings are also accepted, which will be looked
+    up via Moose's `find_or_create_type_constraint` utility function. Various
+    other conveniences are provided; see "Shortcuts for type constraints".
+
+   Constraint manipulation
+    $_where
+        Creates an anonymous subtype with an additional constraint. For
+        example to create a type constraint that accepts odd-numbered
+        integers, you could use:
+
+           isa => Int->$_where(sub { $_ % 2 })
+
+        Alternatively the coderef can be replaced with a string of Perl code:
+
+           isa => Int->$_where('$_ % 2')
+
+    $_of
+        Can be used to parameterize type constraints. For example, for an
+        arrayref of odd integers:
+
+           isa => ArrayRef->$_of(  Int->$_where('$_ % 2')  )
+
+        Or if you'd prefer, an arrayref of integers, where the arrayref
+        contains an odd number of items:
+
+           isa => ArrayRef->$_of(Int)->$_where('@$_ % 2')
+
+    $_type
+        The identity function. `Int->$_type` just returns `Int`.
+
+        This is occasionally useful if you're taking advantage of the fact
+        that the invocant doesn't have to be a *real* type constraint but can
+        instead use a shortcut. In these cases it's not quite the identity,
+        because it returns a real type constraint object.
+
+   Coercion manipulation
+    $_plus_coercions
+        Given an existing type constraint, creates a new child type with some
+        extra coercions.
+
+           isa => ArrayRef->$_plus_coercions(
+              Str,         \&csv_to_arrayref,
+              "HashRef",   sub { [ values(%$_) ] },
+           ),
+           coerce => 1,
+
+    $_minus_coercions
+        Given an existing type constraint, creates a new child type with fewer
+        coercions.
+
+           use MooseX::Types::Moose qw( HashRef );
+           use MooseX::Types::URI qw( Uri );
+   
+           # Don't want to coerce from HashRef,
+           # but keep the coercion from Str.
+           #
+           isa => Uri->$_minus_coercions(HashRef)
+
+    $_no_coercions
+        Given an existing type constraint, creates a new child type with no
+        coercions at all.
+
+           isa => Uri->$_no_coercions
+
+        As above, it's just equivalent to `coerce => 0` so might seem a bit
+        useless. But it is handy when chained with $_plus_coercions to provide
+        a stable base to build your coercions on:
+
+           # This doesn't just create a type like Uri but
+           # with extra coercions; it explicitly ignores any
+           # coercions that were already attached to Uri.
+           #
+           isa => Uri->$_no_coercions->$_plus_coercions(
+              Str, sub { ... }
+           );
+
+  Shortcuts for type constraints
+    Where type constraints are expected by this module, you can take some
+    shortcuts. Strings are passed to `find_or_create_type_constraint` for
+    example, meaning that the following two exampes are identical:
+
+    With MooseX::Types...
+
+       use MooseX::Types::Moose qw( ArrayRef Str );
+       ArrayRef->$_plus_coercions( Str, \&csv_to_arrayref );
+
+    Without MooseX::Types...
+
+       "ArrayRef"->$_plus_coercions( "Str", \&csv_to_arrayref );
+
+    If, instead of a type constraint you give a coderef, this will be
+    converted into a subtype of `Any`.
+
+    You may also give a hashref with a single key-value pair, such as:
+
+       { class => "Some::Class::Name" }
+       { role => "Some::Role::Name" }
+       { duck => \@method_names }
+       { union => \@type_constraints }
+       { enum => \@strings }
+
+    These do what I think you'd expect them to do.
+
+CAVEATS
+    This module does not remove the need for `coerce => 1`!
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Types-MoreUtils>.
+
+SEE ALSO
+    If you use Types::Standard, this module is fairly redundant, as these
+    features and shortcuts are mostly built-in!
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

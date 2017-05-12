@@ -1,0 +1,34 @@
+---
+abstract: 'All-singing, all-dancing Perl client for Memcached'
+author:
+  - 'Michael Alan Dorman <mdorman@ironicdesign.com>'
+build_requires:
+  IO::Socket::INET: 0
+  JSON::XS: 0
+  POSIX: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200003, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Memcached-Client
+requires:
+  AnyEvent: 0
+  AnyEvent::Handle: 0
+  Compress::Zlib: 0
+  Config: 0
+  Data::Dumper: 0
+  Exporter: 0
+  IO::File: 0
+  JSON: 0
+  Module::Load: 0
+  Scalar::Util: 0
+  Storable: 0
+  String::CRC32: 0
+  bytes: 0
+  constant: 0
+version: 2.01

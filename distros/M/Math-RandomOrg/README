@@ -1,0 +1,43 @@
+==============================================================================
+                 Release of version 0.02 of Math::RandomOrg
+==============================================================================
+
+
+NAME
+
+    Math::RandomOrg - Retrieve random numbers and data from random.org.
+
+
+DESCRIPTION
+
+    Math::RandomOrg provides functions for retrieving random data from
+    the random.org server. Data may be retrieved in an integer or byte
+    stream format using the C<randnum> and C<randbyte> functions
+    respectively.
+
+REQUIRES
+
+    Carp
+    LWP::Simple
+    Math::BigInt
+
+INSTALLING
+
+    To install, run the following commands:
+    
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+AUTHOR
+
+    Gregory Todd Williams <gwilliams@cpan.org>
+
+
+COPYRIGHT
+
+	 Copyright (c) 2001--2006, Gregory Williams. All rights reserved.
+	 This module is free software. It may be used, redistributed
+	 and/or modified under the same terms as Perl itself.
+

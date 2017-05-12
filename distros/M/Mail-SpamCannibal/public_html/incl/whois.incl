@@ -1,0 +1,19 @@
+<script language=javascript1.1>
+// version 1.02 2-6-04
+document.writeln('<center>',
+'Who is the IP address  owner.<br>',
+'<font size="-1">enter IP address</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br>',
+'<form name="whois" action="' + location.pathname + '" method=POST>',
+'<input type=text name=whois value="">',
+'<input type=hidden name=page value=whois>',
+'<input type=hidden name=lookup value=""',
+'<input type=submit value="Whois IP">',
+'</form>',
+'</center>')
+document.whois.whois.focus();
+</script>
+<noscript>
+<p>
+<font size=4 color=red>Javascript must be enabled to use this page</font>
+<p>
+</noscript>

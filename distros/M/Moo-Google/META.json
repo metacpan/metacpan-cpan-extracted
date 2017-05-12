@@ -1,0 +1,66 @@
+{
+   "abstract" : "Server-side client library for any Google App API. Based on Moose",
+   "author" : [
+      "Pavel Serikov <pavelsr@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Moo-Google",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "DateTime" : "0",
+            "DateTime::Format::RFC3339" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::JSON" : "0",
+            "Crypt::JWT" : "0",
+            "Data::Dumper" : "0",
+            "Data::Printer" : "0",
+            "Hash::Slice" : "0",
+            "List::Util" : "0",
+            "Mojo::UserAgent" : "0",
+            "Mojo::Util" : "0",
+            "Mojolicious::Commands" : "0",
+            "Mojolicious::Lite" : "0",
+            "Mojolicious::Plugin::OAuth2" : "0",
+            "Moo" : "0",
+            "MooX::Singleton" : "0",
+            "Moose" : "0",
+            "Net::EmptyPort" : "0",
+            "Tie::File" : "0",
+            "feature" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

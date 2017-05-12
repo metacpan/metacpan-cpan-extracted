@@ -1,0 +1,72 @@
+use MooseX::Declare; {
+	class SexyFur::Preview
+	with MooseX::Role::XXXGenerator => {
+		target => {
+			'SexyFur::Album' => {
+				prefix => 'album', 
+				constructor => 'create', 
+				args => { {}, {} },
+			},
+		}
+
+
+		target => {
+			'SexyFur::Album' => {
+				album => {
+					constructor => 'create', 
+					args => {},
+					extra_args => {},
+				},
+				oldies => {
+					constructor => "create_oldies",
+					args => {},
+					extra_args => {},
+				}
+			},
+			'MyApp::Photos' => {
+				photos => {
+					constructor => 'new', 
+					args => {},
+					extra_args => {},
+
+		}
+
+
+
+	
+		target => [
+			'SexyFur::Album' => {
+				prefix => 'album',
+				constructor => 'new',
+				args => {},
+				extra_args => {},
+			},
+
+
+
+			'SexyFur::Help' => {
+				prefix => 'help', 
+				constructor => 'create', 
+				args => { {}, {} },
+			},
+			'SexyFur::Help' => {
+				prefix => 'help', 
+				constructor => 'create', 
+				args => { {}, {} },
+			},
+
+		}
+
+
+	} {
+
+		has '+album_args' => ( default => {aaa=>111} 
+
+		around _build_album_args {
+			my $args = $self->$orig;
+			return {
+				%args,
+
+
+	}
+}

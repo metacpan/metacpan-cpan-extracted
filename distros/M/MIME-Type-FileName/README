@@ -1,0 +1,23 @@
+MIME-Type-FileName
+==================
+
+MIME::Type::FileName is a no-frills, not-very clever library that gives you a
+mime type supposed to be on par with a given file extension.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+none
+
+COPYRIGHT AND LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

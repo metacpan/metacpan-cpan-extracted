@@ -1,0 +1,9 @@
+Build.PL
+Changes
+MANIFEST
+README.pod
+lib/Mojolicious/Plugin/ShareHelpers.pm
+t/share_helpers.t
+Makefile.PL
+META.yml
+META.json

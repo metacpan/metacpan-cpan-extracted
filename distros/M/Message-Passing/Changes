@@ -1,0 +1,225 @@
+0.116 2015-02-23T18:00:00+01:00
+  - Fix link in 'Writing Filters' section of
+    Message::Passing::Manual::Components
+  - Fix daemonize_if_needed spelling
+  - Add documentation for all command line options
+  - Add Linux::IO_Prio to recommended modules for io_priority option
+  - Recommend newer Message::Passing::Output::Search::Elasticsearch in docs
+
+0.115 2014-08-23T09:55:00+03:00 YAPC::EU 2014 release
+  - Fix internal and therefore undocumented type parameter swallows
+    Output::Search::Elasticsearches type parameter
+  - Use JSON::MaybeXS instead of JSON in Filter::De/Encoder::JSON
+
+0.114 2013-09-17T10:30:00+02:00
+  - Fix test failures under Perl 5.18
+  - Improve documentation
+
+0.113 2013-08-02T09:25:00+02:00
+  - Add Message::Passing::Filter::Mangle for use with Message::Passing::DSL
+    when you don't want to write a named filter.
+
+0.112 2013-04-25T23:45:39+0100
+  - Change to LGPL_2_1.
+
+0.111 2013-03-03T15:54:12+0000
+  - Fix STDIN input to exit on EOF.
+
+0.110 2012-10-08T16:51:49+0100
+  - Fix v-string to work with perl 5.8. RT#80034
+  - Fix issues stopping multiple FileTail inputs being used in the
+    same process.
+
+0.109 2012-09-27T16:11:50+0100
+  - Really fix test fail :(
+
+0.108 2012-09-27T14:59:43+0100
+  - Fix test fail on some machines.
+
+0.107 2012-09-27T10:03:30+0100
+  - Change Input::FileTail to use Sys::Hostname::Long
+
+  - Fix bug causing crash with no helpful error message if PID file
+    location is not writeable.
+
+0.106 2012-09-12T23:59:13+0100
+  - Remove debug warning accidentally left in the UDP input.
+
+0.105 2012-09-12T23:55:36+0100
+  - Depend on latest MooX::Options to stop install fails.
+
+0.104 2012-09-06T18:36:27+0200
+  - Fix to work with MooX::Options 3.7
+
+0.103 2012-09-05T09:07:00+0100
+  - Message::Passing::Input::FileTail now defaults to outputting a hash
+    of data which contains additional metadata to the message line,
+    such as the hostname, timestamp, filename. A 'raw => 1' option has
+    been added which can be used to restore the original behaviour.
+
+  - Add an experimental (and undocumented)
+    Message::Passing::Filter::ToLogstash
+
+  - Fix issue in JSON decoder when processing exceptions.
+
+0.102 2012-08-26T21:12:52+0100
+  - Add error chain support to the JSON encoder and decoder so that an
+    error is logged if JSON encoding or decoding fails.
+
+  - Make default error chain do JSON encoding on errors so that they're
+    readable.
+
+  - Make CLI error chain have options for the error encoder.
+
+0.101 2012-08-23T21:23:52+0100
+  - Fix daemonization features provided by Message::Passing::Role::Script
+    to work on the command line again by exlicitly using MooX::Options
+
+  - Fix Message::Passing::Input::FileTail to not die if the tail process
+    is killed for any reason. It is instead re-spawned.. RT#78851
+
+0.100 2012-08-19T08:12:32+0100
+  - Port the dist to Moo, so that the core of Message::Passing
+    uses no XS code. Components can still be written using full
+    Moose, as Moo supports upgrading classes to full Moose classes.
+
+    Note however that this implies the following changes to custom scripts:
+
+    - Scripts should use MooX::Options instead of MooseX::Getopt,
+      attributes will need to be updated to use the 'option' keyword
+      rather than 'has'.
+
+    - Message::Passing::Role::CLIComponent is now built on top of
+      Package::Variant rather than MooseX::Role::Parameterized,
+      and so scripts should now import it and use the function
+      provided to generate roles.
+
+  - Add UDP socket Input and Output, allowing transit of arbitrary
+    UDP packets.
+
+  - Add Travis continuous integration to the project.
+
+0.010 2012-07-11T19:17:44+0100
+  - Doc fix in Message::Passing::Manual::Cookbook
+    https://github.com/suretec/Message-Passing/pull/2
+
+  - Add Crypt::CBC encoder and decoder.
+
+  - Add Gzip and Bzip2 encoders and decoders.
+
+0.009 2012-06-13T15:53:35-0500
+  - Add Message::Passing::Manual::Components.
+
+  - Add SYNOPSIS to Message::Passing::Role::Filter.
+
+  - Additional documentation in Message::Passing::Manual.
+
+  - Refactor building connection managers so less duplicate code
+    is needed in components.
+
+  - Make STDIN input saner.
+
+  - Add an 'error chain' concept, allowing components to have a
+    way of reporting connection (or other) issues out of band
+    with the message stream.
+    This defaults to STDERR, however can be overridden per component,
+    or for a whole chain.
+
+  - Add error_log() function to the DSL for setting the error chain up
+    for a whole chain.
+
+  - Use the error chain in Message::Passing::Role::ConnectionManager
+    to output errors when connections disconnect / timeout / reconnect.
+
+  - Cleanups to Message::Passing::Input::FileTail to not leak processes
+    and file handles if the instance of the Input class is destroyed.
+
+0.008 2012-06-10T20:51:51+0100
+  - Add standard roles to unify the names of connection attributes:
+    Message::Passing::Role::HasHostnameAndPort
+    Message::Passing::Role::HasUsernameAndPassword
+
+  - Lots of additional documentation.
+
+  - Add STDERR output.
+
+  - Rename the log_chain function to message_chain and run_log_server
+    function to run_message_server, in Message::Passing::DSL
+    to follow the general rename, as we're not just about logs.
+
+0.007 2012-06-10T11:07:45+0100
+  - Documentation in the message-pass script
+
+  - Add --configfile option to default script, allowing
+    you to load config from a file, rather than supplying
+    it on command line.
+
+  - Make JSON encoder pass non refs straight through,
+    so that if a previous filter generates a scalar,
+    then this gets sent as-is.
+
+  - Make JSON decoder pass refs straight through, to
+    act as a no-op if the input has already decoded
+    it's data into a hash.
+
+  - Remove spurious warnings from reconnect code.
+
+0.006 2012-06-08T01:30:53+0100
+  - Rip JSON encoders and decoders out of inputs and
+    outputs, making them optional and/or replaceable.
+    *NOTE* Current Input / Output code will need updating
+    for this change!!
+  - Allow Null encoders or decoders.
+
+0.005 2012-06-01T10:07:42+0100
+   - Get connection timeouts and connection reconnects
+     working in the generic ConnectionManager role.
+
+   - Add link to syslog input
+
+   - AMQP input/output is on CPAN
+
+   - Add link to STOMP input/output.
+
+0.004 2012-05-28T10:20:32+0100
+   - Fix script name
+
+   - Note irc channel and bug trackers in docs.
+
+0.003 2012-05-28T08:53:17+0100
+   - Updates and fixes to documentation.
+
+   - Unify license/author/copyright to main file.
+
+0.002_01 2012-05-27T08:21:31+0100
+   - Add more core roles for use by extensions which need to make
+     a connection.
+
+   - Rename to Message::Passing, as it's a better description
+     of what we do, and will cause less confusion with other projects.
+
+0.002 2012-05-13T17:34:49+0100
+    - Support a --daemonize option in logstash scripts.
+
+    - Support a --pid_file option in logstash scripts.
+
+    - Allow inputs to coerce a hash in output_to to an output,
+      which is more verbose than the DSL, but also allows you
+      to setup simple output chains from a simple data structure
+      (such as you might read in from a config file).
+
+    - Explicitly turn off output buffering in STDOUT output.
+      This means that piping the STDOUT output to a file (for
+      logging or debugging purposes) works as expected, without
+      batching writes.
+
+    - Change logstash script to use the perl interpreter it is
+      installed with, rather than the one in $PATH right now.
+
+    - Fix issue using Filter::T in the DSL
+
+    - Fix multiple inputs going to the same output.
+
+0.001 2012-03-21T22:26:21+0000
+    - Initial version.
+

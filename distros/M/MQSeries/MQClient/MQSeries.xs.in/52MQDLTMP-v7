@@ -1,0 +1,46 @@
+# -*-c-*-
+#
+# $Id: 52MQDLTMP-v7,v 33.5 2012/09/26 16:10:07 jettisu Exp $
+#
+# (c) 2009-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+void
+MQDLTMP(Hconn,Hmsg,DltPropOpts,Name,CompCode,Reason)
+        MQHCONN Hconn
+        MQHMSG  Hmsg
+        MQDMPO  DltPropOpts
+        SV     *Name
+        MQLONG  CompCode = NO_INIT
+        MQLONG  Reason = NO_INIT
+
+    PREINIT:
+        MQCHARV  name = {MQCHARV_DEFAULT};
+
+    CODE:
+        CompCode = MQCC_FAILED;
+        Reason = MQRC_UNEXPECTED_ERROR;
+        sv_setiv(ST(4),(IV)CompCode);
+        sv_setiv(ST(5),(IV)Reason);
+
+        /* Convert name from scalar to MQCHARV */
+        if (SvPOK(Name)) {
+            char   *val;
+            STRLEN  len;
+
+            val = SvPV(Name, len);
+            name.VSPtr = val;
+            name.VSLength = len;
+            name.VSOffset = 0;
+            name.VSBufSize  = 0;
+            name.VSCCSID = MQCCSI_APPL; /* Maybe UTF-8 */
+        } else {
+            croak("MQDLTMP parameter 'Name' is not a string\n");
+        }
+
+        MQDLTMP(Hconn,Hmsg,&DltPropOpts,&name,&CompCode,&Reason);
+    OUTPUT:
+        CompCode
+        Reason
+

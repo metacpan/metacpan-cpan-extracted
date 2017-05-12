@@ -1,0 +1,80 @@
+{
+   "abstract" : "Calculate the Graham's Function of a Natural",
+   "author" : [
+      "Shlomi Fish <shlomif@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "keywords" : [
+      "factors",
+      "fun",
+      "function",
+      "graham",
+      "math",
+      "mathematics",
+      "maths",
+      "mjd",
+      "obscure",
+      "pure-perl",
+      "riddle",
+      "riddles",
+      "quizzes",
+      "qotw",
+      "quiz",
+      "quiz-of-the-week",
+      "square",
+      "week"
+   ],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-GrahamFunction",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.39"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : "0",
+            "List::Util" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Math::GrahamFunction" : {
+         "file" : "lib/Math/GrahamFunction.pm",
+         "version" : "0.02001"
+      },
+      "Math::GrahamFunction::Object" : {
+         "file" : "lib/Math/GrahamFunction/Object.pm"
+      },
+      "Math::GrahamFunction::SqFacts" : {
+         "file" : "lib/Math/GrahamFunction/SqFacts.pm"
+      },
+      "Math::GrahamFunction::SqFacts::Dipole" : {
+         "file" : "lib/Math/GrahamFunction/SqFacts/Dipole.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/shlomif/perl-math-grahamfunction/"
+      }
+   },
+   "version" : "0.02001"
+}

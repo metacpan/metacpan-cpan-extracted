@@ -1,0 +1,44 @@
+{
+   "abstract" : "Migrate MBX mailboxes to Maildir",
+   "author" : [
+      "Xan Tronix <xan@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.94, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mail-MBX",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Time::Local" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "x_type" : "git",
+      "x_url" : "git://github.com/xantronix/Mail-Dir-MBX.git",
+      "x_web" : "https://github.com/xantronix/Mail-Dir-MBX"
+   },
+   "version" : "0.01"
+}

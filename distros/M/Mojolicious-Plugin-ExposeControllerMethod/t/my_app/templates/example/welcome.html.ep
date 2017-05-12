@@ -1,0 +1,10 @@
+% use Mojo::JSON qw(j);
+
+<!DOCTYPE html>
+<html>
+<body>
+  <div id='name'><%= ctrl->name %></div>
+  <div id='rose'><%= ctrl->rose %></div>
+  <div id='repeat'><%= ctrl->repeat('foo',3) %></div>
+</body>
+</html>

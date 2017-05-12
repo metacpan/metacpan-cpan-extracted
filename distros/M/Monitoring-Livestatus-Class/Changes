@@ -1,0 +1,32 @@
+# Revision history for Monitoring-Livestatus-Class
+# Date format: %Y-%m-%d %H:%M:%S %z or %F %T %z
+
+0.06    2013-12-07 11:21:13 +0100
+        fixed leak test case
+
+0.05    2013-12-02 12:12:53 +0100
+        replaced deprecated Class::MOP::load_class with Class::Load
+        fixed memory leak due to circular dependency
+
+0.04    2012-11-23 21:36:39 +0100
+        Fixed test:t/10-filter.t - stupid 'sort' problem with hash keys.
+        Fixed debug output
+
+0.03    2010-09-19 11:39:19 +0200
+        Added -isa operator ( inspired by Sven Nierlein )
+        Added ability to define multiple peers (Sven Nierlein)
+        Added new class tables and fixed names of current ones (Sven Nierlein)
+        Added hashref_pk (Sven Nierlein)
+        Added name option (Sven Nierlein)
+        Added options method (Sven Nierlein)
+        Added primary key stuff
+        Added sum,min,max,avg and std as status operator
+        Added new trace handling
+        Made recursive arrayrefs work (Sven Nierlein)
+
+0.02    2010-01-10 
+        Rename module from Nagios::MKLivestatus::Class into Monitoring::Livestatus::Class
+
+0.01    2010-01-02 18:41 +0200
+        First version
+

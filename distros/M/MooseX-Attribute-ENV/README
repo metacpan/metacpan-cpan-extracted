@@ -1,0 +1,69 @@
+MooseX-Attribute-ENV
+
+This is a L<Moose> attribute trait that you use when you want the default value
+for an attribute to be populated from the %ENV hash.  So, for example if you
+have set the environment variable MYAPP_MYCLASS_USERNAME = 'John' you can do:
+
+	package MyApp::MyClass;
+	
+	use Moose;
+	use MooseX::Attribute::ENV;
+	
+	has 'username' => (is=>'ro', traits=>['ENV']);
+	
+	package main;
+	
+	my $myclass = MyApp::MyClass->new();
+	
+	print $myclass->username; # STDOUT => 'John';
+
+This is basically similar functionality to something like:
+
+	has 'attr' => (
+		is=>'ro',
+		default=> sub {
+			$ENV{uc __PACKAGE_.'attr'};
+		},
+	);
+	
+but this module has a few other features that offer merit, as well as being a
+simple enough attribute trait that I hope it can serve as a learning tool.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc MooseX-Attribute-ENV
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooseX-Attribute-ENV
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/MooseX-Attribute-ENV
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/MooseX-Attribute-ENV
+
+    Search CPAN
+        http://search.cpan.org/dist/MooseX-Attribute-ENV
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 John Napiorkowski
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

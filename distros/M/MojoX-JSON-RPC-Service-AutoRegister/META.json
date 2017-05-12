@@ -1,0 +1,79 @@
+{
+   "abstract" : "Base class for RPC Services",
+   "author" : [
+      "mudler <mudler@dark-lab.net>, vytas <vytas@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MojoX-JSON-RPC-Service-AutoRegister",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojo::Base" : "0",
+            "MojoX::JSON::RPC::Service" : "0",
+            "perl" : "5.008_005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Mojolicious::Lite" : "0",
+            "Test::Mojo" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "MojoX::JSON::RPC::Service::AutoRegister" : {
+         "file" : "lib/MojoX/JSON/RPC/Service/AutoRegister.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/IntelliHome/MojoX-JSON-RPC-Service-AutoRegister/issues"
+      },
+      "homepage" : "https://github.com/IntelliHome/MojoX-JSON-RPC-Service-AutoRegister",
+      "repository" : {
+         "url" : "git://github.com/IntelliHome/MojoX-JSON-RPC-Service-AutoRegister.git",
+         "web" : "https://github.com/IntelliHome/MojoX-JSON-RPC-Service-AutoRegister"
+      }
+   },
+   "version" : "0.001",
+   "x_contributors" : [
+      "Vytas Dauksa <vytdau@gmail.com>"
+   ]
+}

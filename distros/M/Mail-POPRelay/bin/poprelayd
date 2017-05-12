@@ -1,0 +1,85 @@
+#!/bin/sh
+#
+# Startup script for the poprelay_ipop3d agent on Redhat 7.0
+#
+# chkconfig: 345 85 15
+# description: Mobile POP Relay Control
+# processname: poprelayd
+# pidfile: /var/run/poprelayd.pid
+
+# Source function library.
+if [ -f /etc/rc.d/init.d/functions ]
+then
+	. /etc/rc.d/init.d/functions
+else
+	echo "This init file is designed to work only with Redhat based distributions."
+	echo "Create a new init file or modify this one to run."
+	echo "Please send any init files to the author for incorporation into the next release."
+	exit 1
+fi
+
+# Path to the poprelayd binary and config-file.
+poprelayd=
+
+# Comment the following two lines out
+echo "Edit this file and specify which agent and configuration file to use."
+exit 1
+
+process=`basename $poprelayd`;
+RETVAL=0
+
+# Until glibc's locale support is working right again, work around it.
+LANG=C
+
+start() {
+	echo "Starting poprelayd: "
+	echo -n "	o Using agent `basename $poprelayd`:"
+	daemon ${poprelayd}
+	RETVAL=$?
+	echo
+	[ $RETVAL = 0 ] && touch /var/lock/subsys/poprelayd
+	return $RETVAL
+}
+stop() {
+	echo -n "Shutting down poprelayd: "
+	killproc $process
+	RETVAL=$?
+	echo
+	[ $RETVAL = 0 ] && rm -f /var/lock/subsys/poprelayd /var/run/poprelayd
+}
+
+# See how we were called.
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  status)
+	status ${poprelayd}
+	;;
+  restart)
+	stop
+	start
+	;;
+  reload)
+	echo -n "Reloading poprelayd: "
+	killproc ${poprelayd} -HUP
+	RETVAL=$?
+	echo
+	;;
+  condrestart)
+	if [ -f /var/run/poprelayd.pid ] ; then
+		stop
+		start
+	fi
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart|reload|condrestart|status}"
+	exit 1
+esac
+
+exit $RETVAL
+
+# $Id: poprelayd,v 1.1.1.1 2002/05/28 07:32:59 keith Exp $

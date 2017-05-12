@@ -1,0 +1,15 @@
+Revision history for Perl extension Module::PortablePath.
+
+0.16 packaging & build updates
+0.10 trivial documentation update
+0.09 perlcritic fixes, changed to standard Makefile build process.
+0.08 Moved to Build.PL
+0.05 kwalitee improvements
+0.04 cleaned up for perlcritic
+0.03 support for changing LD_LIBRARY_PATH via the [ldlibs] config section
+
+0.02 very minor mods to make it pass tests without /etc/perlconfig.ini
+     also added an example eg/siteexample.pm demonstrating one way to override the default paths
+     for example for those who don't have access to /etc
+
+0.01 initial version based on internal SangerPaths.pm

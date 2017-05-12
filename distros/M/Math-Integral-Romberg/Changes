@@ -1,0 +1,17 @@
+Math::Integral::Romberg - Numeric integration of single-variable functions
+
+This Perl package numerically integrates single-variable functions
+over a finite interval using the Romberg method.  It takes a
+reference to a function, the two limit values, and various optional
+error thresholds, and returns the area of the function between those
+two points.
+
+Version 0.02 allows the convergence parameters (e.g. absolute and
+relative tolerances) to be set using package variables as well as
+optional parameters. The default values have also been made less
+stringent.  (Doug Burke)
+
+Version 0.03 -- same as 0.02, but with tests and updated packaging.
+
+Eric Boesch
+ericboesch@gmail.com

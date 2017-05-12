@@ -1,0 +1,38 @@
+Name:            Joe Davidson1-1
+Key:             jhd11key
+E-mail address:  jhd1-1@radix.net
+Notes:           
+Name:            Joe Davidson1-2
+Key:             jhd12key
+E-mail address:  jhd1-2@interguru.com
+Notes:           
+Name:            Joe Davidson1-3
+Key:             jhd13key
+E-mail address:  jdavidson1-3@interguru.com
+Notes:           
+Name:            Joe Davidson2-1
+Key:             jhd21key
+E-mail address:  jhd2-1@interguru.com
+Notes:           
+Name:            Joe Davidson2-2
+Key:             jhd22key
+E-mail address:  jhd2-2@rinterguru.com
+Notes:           
+Name:            Joe Davidson2-3
+Key:             jhd23key
+E-mail address:  jhd2-3@rinterguru.com
+Notes:           
+pega2distlist.pml
+\TITLE pega2distlist 
+\NOSIG Y
+
+Joe Davidson2-1
+Joe Davidson1-3
+pega1distlist.pml
+\TITLE pega1distlist 
+\NOSIG Y
+
+Joe Davidson1-3
+Joe Davidson1-1
+Joe Davidson2-3
+@pega2distlist

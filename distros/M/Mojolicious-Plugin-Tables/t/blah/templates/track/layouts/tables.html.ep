@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+
+TRACKS WRAPPER
+
+<h2 style="background-color:red">
+here goes
+<%= content %>
+</h2>
+

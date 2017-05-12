@@ -1,0 +1,46 @@
+{
+   "abstract" : "Use MongoDB as if it were a key-value store.",
+   "author" : [
+      "Ido Perlmuter <ido@ido50.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MongoDBx-KeyValue",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "MongoDB" : 0,
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/ido50/MongoDBx-KeyValue/tree",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ido50/MongoDBx-KeyValue.git",
+         "web" : "http://github.com/ido50/MongoDBx-KeyValue/tree"
+      }
+   },
+   "version" : "0.001001"
+}
+

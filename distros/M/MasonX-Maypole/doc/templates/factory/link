@@ -1,0 +1,16 @@
+<%doc>
+
+=head2 link
+
+This creates an <a href="... to a command in the Apache::MVC system by
+catenating the base URL, table, command, and any arguments.
+
+</%doc>
+<%args>
+    $table
+    $command
+    $additional
+    $label
+</%args>
+% $additional &&= "/$additional";
+<a href="<% $base %>/<% $table %>/<% $command %><% $additional %>"><% $label %></a>

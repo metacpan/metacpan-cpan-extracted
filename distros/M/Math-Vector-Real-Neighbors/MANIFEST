@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Math-Vector-Real-Neighbors.t
+lib/Math/Vector/Real/Neighbors.pm
+samples/cairo.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

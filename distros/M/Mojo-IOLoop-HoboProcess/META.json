@@ -1,0 +1,69 @@
+{
+   "abstract" : "Like Mojo::IOLoop::Subprocess, spawns subprocesses with MCE::Hobo instead",
+   "author" : [
+      "Mario E. Roy <marioeroy AT gmail DOT com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.55_02, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-IOLoop-HoboProcess",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0.88",
+            "perl" : "5.010001"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "MCE::Shared" : "1.817",
+            "Mojolicious" : "7.07",
+            "Scalar::Util" : "0",
+            "Socket" : "0",
+            "perl" : "5.010001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojo::IOLoop::HoboProcess" : {
+         "file" : "lib/Mojo/IOLoop/HoboProcess.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/marioroy/Mojo-IOLoop-HoboProcess/issues"
+      },
+      "homepage" : "https://github.com/marioroy/Mojo-IOLoop-HoboProcess",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/marioroy/Mojo-IOLoop-HoboProcess.git"
+      }
+   },
+   "version" : "0.005"
+}

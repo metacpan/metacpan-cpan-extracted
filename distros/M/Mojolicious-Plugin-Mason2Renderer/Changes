@@ -1,0 +1,7 @@
+Revision history for Mojolicious-Plugin-Mason2Renderer
+
+0.02    2011-04-19
+        Add "decode" before send $$output to Mojolicious
+
+0.01    2011-03-24
+        First version.

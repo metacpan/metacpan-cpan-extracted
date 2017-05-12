@@ -1,0 +1,32 @@
+Math::SO3 - Implementation of Rotation Group
+
+Copyright (C) 1999 Thomas Fischbacher
+(tf@cip.physik.uni-muenchen.de, http://www.cip.physik.uni-muenchen.de/~tf)
+
+License: GNU Lesser General Public License (LGPL)
+
+This package provides a simple (direct), fast (in C) implementation of
+three-dimensional rotations, more widely known as "the SO(3) group".
+
+It looks a bit object-oriented, but in fact isn't; just as it does not
+make much sense to inherit from complex numbers, say, there is no
+point in inheriting from rotations. In a way, rotations are just
+"numbers". This package uses object-oriented syntax, though. Mainly to
+prevent namespace pollution.
+
+Furthermore, it can not immediately cooperate with PDL; the overhead
+to support PDL would be so big it would kill a LOT of
+performance. (Hey, look -- one may interpret complex numbers as real
+2x2 matrices, and the Complex package also doesn't support
+PDL. Remember: rotations are just some strange kind of "numbers".)
+
+A word of warning: though I have tried hard to get everything right, I
+still can not exclude with 100% confidence that this code contains
+bugs, since I didn't prove its correctness. Especially the euler_angle
+stuff probably will, in some rare cases (relative probability >1e-8 or
+so), produce somewhat incorrect results. As always, no warranty.
+
+However, I tried to make the code as readable as possible, which sadly
+is not usual with numerical code in our decade.
+
+For more info, see the Math::SO3 manpage.

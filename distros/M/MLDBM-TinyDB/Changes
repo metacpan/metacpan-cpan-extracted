@@ -1,0 +1,9 @@
+Revision history for Perl extension MLDBM-TinyDB-0.20
+
+0.16 	use of Exporter module to export 'db' and 'add_common' subs
+	on request
+0.17	'search' method added, 'get_recs' a little bit performance improvment,
+	test subs added
+0.18	'sort' and 'lsort' methods added
+0.19	'lsearch' method added
+0.20	'search' and 'lsearch' bugs fixed

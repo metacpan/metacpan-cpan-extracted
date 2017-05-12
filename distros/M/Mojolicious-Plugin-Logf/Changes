@@ -1,0 +1,34 @@
+Revision history for perl distribution Mojolicious-Plugin-Logf
+
+0.10 2016-05-03T14:23:47+0200
+ - Bumped required Mojolicious version to 6.47
+
+0.09 2016-03-21T16:41:35+0100
+ - is_$level() is deprecated
+
+0.08 2016-02-19T14:27:08+0100
+ - Add option for logging with RFC3339 timestamp
+
+0.07 2015-08-29T10:15:15+0200
+ - Fix "defined" without parentheses #1
+ - Fix "ref" without parentheses #1
+
+0.06 2015-08-19T18:17:16+0200
+ - Add support for $ENV{MOJO_LOGF_UNDEF}
+ - Provided copy/paste code
+
+0.05 2015-08-19T17:18:30+0200
+ - Code refs are called, and the results flattened
+
+0.04 2014-06-17T22:34:40Z
+ - Replace "package Test {}" to makes CPAN testers happy
+
+0.03 2014-06-13T11:49:33Z
+ - This was a NOOP release.
+
+0.02 2014-06-12T10:02:45Z
+ - Forgot dependencies
+
+0.01 2014-06-12T09:59:03Z
+ - Add logf() helper
+ - Add flatten() method

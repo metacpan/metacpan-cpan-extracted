@@ -1,0 +1,9 @@
+Revision history for Perl extension Mac::PropertyList::XS.
+
+0.02	Sat Aug 20 13:22:00 2011
+	- fix t/entity_encode.t to expect proper roundtripped encodings
+
+0.01	Tue Jan  5 20:15:24 2010
+	- original version; created by h2xs 1.23 with options
+		-B -n Mac::PropertyList::XS
+

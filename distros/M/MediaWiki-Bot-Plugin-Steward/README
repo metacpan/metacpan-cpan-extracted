@@ -1,0 +1,117 @@
+NAME
+    MediaWiki::Bot::Plugin::Steward - A plugin to MediaWiki::Bot providing
+    steward functions
+
+VERSION
+    version 0.0003
+
+SYNOPSIS
+        use MediaWiki::Bot;
+        my $bot = MediaWiki::Bot->new({
+            operator    => 'Mike.lifeguard',
+            assert      => 'bot',
+            protocol    => 'https',
+            host        => 'secure.wikimedia.org',
+            path        => 'wikipedia/meta/w',
+            login_data  => { username => "Mike.lifeguard", password => $pass },
+        });
+        $bot->g_block({
+            ip => '127.0.0.1',
+            ao => 0,
+            summary => 'bloody vandals...',
+        });
+
+DESCRIPTION
+    A plugin to the MediaWiki::Bot framework to provide steward functions to
+    a bot.
+
+METHODS
+  import()
+    Calling import from any module will, quite simply, transfer these
+    subroutines into that module's namespace. This is possible from any
+    module which is compatible with MediaWiki::Bot.
+
+  steward_new($data_hashref)
+  g_block($data_hashref)
+    This places a global block on an IP or IP range. You can provide either
+    CIDR or classful ranges. To easily place a vandalism block, pass just
+    the IP.
+
+    *   ip - the IP or IP range to block. Use a single IP, CIDR range, or
+        classful range.
+
+    *   ao - whether to block anon-only; default is true.
+
+    *   reason - the log summary. Default is 'cross-wiki abuse'.
+
+    *   expiry - the expiry setting. Default is 31 hours.
+
+        $bot->g_block({
+            ip     => '127.0.0.1',
+            ao     => 0,
+            reason => 'silly vandals',
+            expiry => '1 week',
+        });
+
+        # Or, use defaults
+        $bot->g_block('127.0.0.0-127.0.0.255');
+
+  g_unblock($data)
+    Remove the global block affecting an IP or range. The hashref is:
+
+    *   ip - the IP or range to unblock. You don't need to convert your
+        range into a CIDR, just pass in your range in
+        xxx.xxx.xxx.xxx-yyy.yyy.yyy.yyy format and let this method do the
+        work.
+
+    *   reason - the log reason. Default is 'Removing obsolete block'.
+
+    If you pass only the IP, a generic reason will be used.
+
+        $bot->g_unblock({
+            ip      => '127.0.0.0-127.0.0.255',
+            reason  => 'oops',
+        });
+        # Or
+        $bot->g_unblock('127.0.0.1');
+
+  ca_lock($data)
+    Locks and hides a user with CentralAuth. $data is a hash:
+
+    *   user - the user to target
+
+    *   lock - whether to lock or unlock the account - default is lock
+        (0=unlocked, 1=locked)
+
+    *   hide - how hard to hide the account - default is not at all (0=none,
+        1=lists, 2=oversight)
+
+    *   reason - default is 'cross-wiki abuse'
+
+    If you pass in only a username, the account will be locked but not
+    hidden, and the default reason will be used:
+
+        $bot->ca_lock("Mike.lifeguard");
+        # Or, the more complete call:
+        $bot->ca_lock({
+            user    => "Mike.lifeguard",
+            reason  => "test",
+        });
+
+  ca_unlock($data)
+    Same parameters as ca_lock(), but with the default setting for lock
+    reversed (ie, default is *unlock*).
+
+AUTHORS
+    *   Mike.lifeguard <mike.lifeguard@gmail.com>
+
+    *   patch and bug report contributors
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2010 by the MediaWiki::Bot team
+    <perlwikibot@googlegroups.com>.
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 3, June 2007
+

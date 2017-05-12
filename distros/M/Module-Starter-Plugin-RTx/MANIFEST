@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Module/Starter/Plugin/RTx.pm
+t/00.load.t
+t/release-pod-syntax.t

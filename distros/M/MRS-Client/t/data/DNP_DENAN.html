@@ -1,0 +1,97 @@
+<div class="entry"><script type="text/javascript">
+function getSeqSegmentsForID(id)
+{
+	var items = new Array();
+
+	if (id == '0') {
+		items[0] = document.getElementById('fs_0');
+		items[1] = document.getElementById('fs_1');
+		items[2] = document.getElementById('fs_2');
+	}
+	else if (id == '1') {
+		items[0] = document.getElementById('fs_1');
+	}
+
+
+	return items;
+}
+
+function highlightFeature(id) {
+	var i;
+
+	for (i = 0; i < 3; ++i)
+	{
+		var item = document.getElementById('fs_' + i);
+		if (item && item.className == 'highlighted')
+			item.className = '';
+	}
+
+	for (i = 0; i < 2; ++i)
+	{
+		var item = document.getElementById('feature_' + i);
+		if (item && item.className == 'highlighted')
+			item.className = '';
+	}
+
+	var item = document.getElementById('feature_' + id);
+	if (item)
+		item.className = 'highlighted';
+
+	var items = getSeqSegmentsForID(id);
+
+	for (i in items)
+	{
+		if (items[i])
+			items[i].className = 'highlighted';
+	}
+}
+
+function enterFeature(id)
+{
+	var item = document.getElementById('feature_' + id);
+	
+	if (item && item.className != 'highlighted')
+		item.className = 'clickable';
+	
+	var items = getSeqSegmentsForID(id);
+
+	for (i in items)
+	{
+		if (items[i] && items[i].className != 'highlighted')
+			items[i].className = 'hover-feature';
+	}
+	
+	return true;
+}
+
+function leaveFeature(id)
+{
+	var item = document.getElementById('feature_' + id);
+	
+	if (item && item.className != 'highlighted')
+		item.className = '';
+
+	var items = getSeqSegmentsForID(id);
+
+	for (i in items)
+	{
+		if (items[i] && items[i].className != 'highlighted')
+			items[i].className = '';
+	}
+	
+	return true;
+}
+
+</script>
+ <table cellpadding="0" cellspacing="0" width="100%"><tr><th colspan="2">Entry information</th></tr> <tr><td width="20%">Entry name</td> <td><strong>DNP_DENAN</strong></td></tr> <tr><td>Primary accession</td> <td><strong>P28374</strong></td></tr> <tr><td>integrated into UniProtKB/Swiss-Prot</td> <td>01 December 1992</td></tr> <tr><td>sequence version 1</td> <td>01 December 1992</td></tr> <tr><td>entry version 46</td> <td>19 January 2010</td></tr> <tr><th colspan="2">Name and origin of the protein</th></tr> <tr><td rowspan="2">Protein name</td> <td>Natriuretic peptide</td></tr> <tr><td>DNP</td></tr> <tr><td rowspan="1">From</td> <td>Dendroaspis angusticeps (Eastern green mamba) (Taxon ID: <a href="entry.do?db=taxonomy&amp;id=8618">8618</a>)</td></tr> <tr><td>Taxonomy</td> <td><a href="query.do?db=taxonomy&amp;query=Eukaryota">Eukaryota</a>; <a href="query.do?db=taxonomy&amp;query=Metazoa">Metazoa</a>; <a href="query.do?db=taxonomy&amp;query=Chordata">Chordata</a>; <a href="query.do?db=taxonomy&amp;query=Craniata">Craniata</a>; <a href="query.do?db=taxonomy&amp;query=Vertebrata">Vertebrata</a>; <a href="query.do?db=taxonomy&amp;query=Euteleostomi">Euteleostomi</a>; <a href="query.do?db=taxonomy&amp;query=Lepidosauria">Lepidosauria</a>; <a href="query.do?db=taxonomy&amp;query=Squamata">Squamata</a>; <a href="query.do?db=taxonomy&amp;query=Scleroglossa">Scleroglossa</a>; <a href="query.do?db=taxonomy&amp;query=Serpentes">Serpentes</a>; <a href="query.do?db=taxonomy&amp;query=Colubroidea">Colubroidea</a>; <a href="query.do?db=taxonomy&amp;query=Elapidae">Elapidae</a>; <a href="query.do?db=taxonomy&amp;query=Elapinae">Elapinae</a>; <a href="query.do?db=taxonomy&amp;query=Dendroaspis">Dendroaspis</a></td></tr> <tr><td>Keywords</td> <td><a href="query.do?db=uniprot&amp;query=kw:Direct kw:protein kw:sequencing ">Direct protein sequencing</a>; <a href="query.do?db=uniprot&amp;query=kw:Disulfide kw:bond ">Disulfide bond</a>; <a href="query.do?db=uniprot&amp;query=kw:Ionic kw:channel kw:inhibitor ">Ionic channel inhibitor</a>; <a href="query.do?db=uniprot&amp;query=kw:Potassium kw:channel kw:inhibitor ">Potassium channel inhibitor</a>; <a href="query.do?db=uniprot&amp;query=kw:Secreted ">Secreted</a>; <a href="query.do?db=uniprot&amp;query=kw:Toxin ">Toxin</a>; <a href="query.do?db=uniprot&amp;query=kw:Vasoactive ">Vasoactive</a></td></tr> <tr><th colspan="2">References</th></tr> <tr><td>1</td> <td class="sub_entry">Schweitz H., Vigne P., Moinier D., Frelin C., Lazdunski M.;  <strong>"A new member of the natriuretic peptide family is present in the venom of the green mamba (Dendroaspis angusticeps)." </strong> J. Biol. Chem. 267:13928-13932(1992)  <br /> <table cellpadding="0" cellspacing="0" width="100%"><tr><td class="label" width="20%">MEDLINE</td> <td><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&amp;db=PubMed&amp;list_uids=92332489&amp;dopt=Abstract">92332489</a></td></tr> <tr><td class="label" width="20%">PubMed</td> <td><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&amp;cmd=search&amp;term=1352773">1352773</a></td></tr> <tr><td class="label" width="20%">Reference Position</td> <td>protein sequence, function, subcellular location, and tissue specificity. </td></tr> <tr><td class="label" width="20%">Reference Comment</td> <td>tissue=venom</td></tr></table></td></tr> <tr><td>2</td> <td class="sub_entry">Lisy O., Jougasaki M., Heublein D.M., Schirger J.A., Chen H.H., Wennberg P.W., Burnett J.C.;  <strong>"Renal actions of synthetic dendroaspis natriuretic peptide." </strong> Kidney Int. 56:502-508(1999)  <br /> <table cellpadding="0" cellspacing="0" width="100%"><tr><td class="label" width="20%">PubMed</td> <td><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&amp;cmd=search&amp;term=10432389">10432389</a></td></tr> <tr><td class="label" width="20%">DOI</td> <td><a href="http://dx.doi.org/10.1046/j.1523-1755.1999.00573.x">10.1046/j.1523-1755.1999.00573.x</a></td></tr> <tr><td class="label" width="20%">Reference Position</td> <td>function. </td></tr></table></td></tr> <tr><td>3</td> <td class="sub_entry">Collins E., Bracamonte M.P., Burnett J.C. Jr., Miller V.M.;  <strong>"Mechanism of relaxations to dendroaspis natriuretic peptide in canine coronary arteries." </strong> J. Cardiovasc. Pharmacol. 35:614-618(2000)  <br /> <table cellpadding="0" cellspacing="0" width="100%"><tr><td class="label" width="20%">PubMed</td> <td><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&amp;cmd=search&amp;term=10774793">10774793</a></td></tr> <tr><td class="label" width="20%">DOI</td> <td><a href="http://dx.doi.org/10.1097/00005344-200004000-00015">10.1097/00005344-200004000-00015</a></td></tr> <tr><td class="label" width="20%">Reference Position</td> <td>function. </td></tr></table></td></tr> <tr><td>4</td> <td class="sub_entry">Lisy O., Lainchbury J.G., Leskinen H., Burnett J.C. Jr.;  <strong>"Therapeutic actions of a new synthetic vasoactive and natriuretic peptide, dendroaspis natriuretic peptide, in experimental severe congestive heart failure." </strong> Hypertension 37:1089-1094(2001)  <br /> <table cellpadding="0" cellspacing="0" width="100%"><tr><td class="label" width="20%">PubMed</td> <td><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&amp;cmd=search&amp;term=11304508">11304508</a></td></tr> <tr><td class="label" width="20%">Reference Position</td> <td>function. </td></tr></table></td></tr> <tr><td>5</td> <td class="sub_entry">Chai O.H., Kim E.K., Lee Y.H., Kim J.G., Baik B.J., Lee M.S., Han E.H., Kim H.T., Song C.H.;  <strong>"Histamine release induced by dendroaspis natriuretic peptide from rat mast cells." </strong> Peptides 22:1421-1426(2001)  <br /> <table cellpadding="0" cellspacing="0" width="100%"><tr><td class="label" width="20%">PubMed</td> <td><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&amp;cmd=search&amp;term=11514023">11514023</a></td></tr> <tr><td class="label" width="20%">DOI</td> <td><a href="http://dx.doi.org/10.1016/S0196-9781(01)00483-1">10.1016/S0196-9781(01)00483-1</a></td></tr> <tr><td class="label" width="20%">Reference Position</td> <td>function. </td></tr></table></td></tr> <tr><td>6</td> <td class="sub_entry">Best P.J., Burnett J.C., Wilson S.H., Holmes D.R. Jr., Lerman A.;  <strong>"Dendroaspis natriuretic peptide relaxes isolated human arteries and veins." </strong> Cardiovasc. Res. 55:375-384(2002)  <br /> <table cellpadding="0" cellspacing="0" width="100%"><tr><td class="label" width="20%">PubMed</td> <td><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&amp;cmd=search&amp;term=12123777">12123777</a></td></tr> <tr><td class="label" width="20%">DOI</td> <td><a href="http://dx.doi.org/10.1016/S0008-6363(02)00402-9">10.1016/S0008-6363(02)00402-9</a></td></tr> <tr><td class="label" width="20%">Reference Position</td> <td>function. </td></tr></table></td></tr> <tr><td>7</td> <td class="sub_entry">Chen H.H., Lainchbury J.G., Burnett J.C. Jr.;  <strong>"Natriuretic peptide receptors and neutral endopeptidase in mediating the renal actions of a new therapeutic synthetic natriuretic peptide dendroaspis natriuretic peptide." </strong> J. Am. Coll. Cardiol. 40:1186-1191(2002)  <br /> <table cellpadding="0" cellspacing="0" width="100%"><tr><td class="label" width="20%">PubMed</td> <td><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&amp;cmd=search&amp;term=12354448">12354448</a></td></tr> <tr><td class="label" width="20%">DOI</td> <td><a href="http://dx.doi.org/10.1016/S0735-1097(02)02127-7">10.1016/S0735-1097(02)02127-7</a></td></tr> <tr><td class="label" width="20%">Reference Position</td> <td>degradation of dnp. </td></tr></table></td></tr> <tr><td>8</td> <td class="sub_entry">Singh G., Kuc R.E., Maguire J.J., Fidock M., Davenport A.P.;  <strong>"Novel snake venom ligand dendroaspis natriuretic peptide is selective for natriuretic peptide receptor-A in human heart: downregulation of natriuretic peptide receptor-A in heart failure." </strong> Circ. Res. 99:183-190(2006)  <br /> <table cellpadding="0" cellspacing="0" width="100%"><tr><td class="label" width="20%">PubMed</td> <td><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&amp;cmd=search&amp;term=16778132">16778132</a></td></tr> <tr><td class="label" width="20%">DOI</td> <td><a href="http://dx.doi.org/10.1161/01.RES.0000232322.06633.d3">10.1161/01.RES.0000232322.06633.d3</a></td></tr> <tr><td class="label" width="20%">Reference Position</td> <td>function, and npr1 binding. </td></tr></table></td></tr> <tr><td>9</td> <td class="sub_entry">Johns D.G., Ao Z., Heidrich B.J., Hunsberger G.E., Graham T., Payne L., Elshourbagy N., Lu Q., Aiyar N., Douglas S.A.;  <strong>"Dendroaspis natriuretic peptide binds to the natriuretic peptide clearance receptor." </strong> Biochem. Biophys. Res. Commun. 358:145-149(2007)  <br /> <table cellpadding="0" cellspacing="0" width="100%"><tr><td class="label" width="20%">PubMed</td> <td><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&amp;cmd=search&amp;term=17475216">17475216</a></td></tr> <tr><td class="label" width="20%">DOI</td> <td><a href="http://dx.doi.org/10.1016/j.bbrc.2007.04.079">10.1016/j.bbrc.2007.04.079</a></td></tr> <tr><td class="label" width="20%">Reference Position</td> <td>function, and npr3 binding. </td></tr></table></td></tr> <tr><td>10</td> <td class="sub_entry">Guo H.-S., Yang Y.-Z., Zou Y., Xu J., Cai Z.-X., Qi Q.-H.;  <strong>"Effects of dendroaspis natriuretic peptide on calcium-activated potassium current and its mechanism." </strong> J. Physiol. Sci. 58:1-6(2008)  <br /> <table cellpadding="0" cellspacing="0" width="100%"><tr><td class="label" width="20%">PubMed</td> <td><a href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=pubmed&amp;cmd=search&amp;term=18096107">18096107</a></td></tr> <tr><td class="label" width="20%">DOI</td> <td><a href="http://dx.doi.org/10.2170/physiolsci.RP010507">10.2170/physiolsci.RP010507</a></td></tr> <tr><td class="label" width="20%">Reference Position</td> <td>function on potassium channel. </td></tr></table></td></tr> <tr><th colspan="2">Comments</th></tr> <tr><td>function</td> <td class="sub_entry">Exhibits vasodilator, natriuretic and diuretic properties in animal models and human tissues. Acts by stimulating
+ cGMP via the natriuretic peptide receptor A (NPR1). Is a poor
+ agonist of the atrial natriuretic peptide receptor B (NPR2). Is
+ not degradated by neutral endopeptidase (NEP / MME). Binds to
+ atrial natriuretic peptide clearance receptor (NPR3 / NPR-C),
+ which may be responsible of the removal of DNP from the
+ circulation. Increases calcium uptake and induces histamine
+ release from rat peritoneal mast cells. Increases calcium-
+ activated potassium current in gastric antral circular smooth
+ muscle cells by increasing cGMP production and activating inositol
+ trisphosphate receptors (IP3Rs).
+</td></tr> <tr><td>subcellular location</td> <td class="sub_entry">Secreted.</td></tr> <tr><td>tissue specificity</td> <td class="sub_entry">Expressed by the venom gland.</td></tr> <tr><td>similarity</td> <td class="sub_entry">Belongs to the natriuretic peptide family.</td></tr> <tr><th colspan="2">Copyright</th></tr> <tr><td colspan="2"><small>Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms Distributed under the Creative Commons Attribution-NoDerivs License </small></td></tr> <tr><th colspan="2">Cross-references</th></tr> <tr><td rowspan="1">PIR</td> <td>A42974; A42974.</td></tr> <tr><td rowspan="5">GO</td> <td><a href="entry.do?db=go&amp;id=0005576"></a>; C:extracellular region; IEA:UniProtKB-SubCell.</td></tr> <tr><td><a href="entry.do?db=go&amp;id=0005179"></a>; F:hormone activity; IEA:InterPro.</td></tr> <tr><td><a href="entry.do?db=go&amp;id=0019870"></a>; F:potassium channel inhibitor activity; IEA:UniProtKB-KW.</td></tr> <tr><td><a href="entry.do?db=go&amp;id=0009405"></a>; P:pathogenesis; IEA:UniProtKB-KW.</td></tr> <tr><td><a href="entry.do?db=go&amp;id=0050880"></a>; P:regulation of blood vessel size; IEA:UniProtKB-KW.</td></tr> <tr><td rowspan="1">InterPro</td> <td><a href="entry.do?db=interpro&amp;id=IPR000663">IPR000663</a>; Natr_peptide.</td></tr> <tr><td rowspan="1">Pfam</td> <td><a href="query.do?db=pfama&amp;query=ac:PF00212">PF00212</a>; ANP; 1.</td></tr> <tr><td rowspan="1">PROSITE</td> <td><a href="query.do?db=prosite&amp;query=ac:PS00263">PS00263</a>; NATRIURETIC_PEPTIDE; 1.</td></tr> <tr><th colspan="2">Features</th></tr> <tr><td class="sub_entry" colspan="2"><div class="feature_table"><table cellpadding="0" cellspacing="0" width="100%"><tr><th width="10%">Key</th> <th style="text-align:right" width="5%">From</th> <th style="text-align:right" width="5%">To</th> <th style="text-align:right" width="5%">Length</th> <th width="75%">Description</th></tr> <tr onmouseout="leaveFeature('0');" onclick="highlightFeature('0')" onmouseover="enterFeature('0');" id="feature_0"><td>peptide</td> <td style="text-align:right">1</td> <td style="text-align:right">38</td> <td style="text-align:right">38</td> <td>       Natriuretic peptide.<br /> /FTId=PRO_0000045068.</td></tr> <tr onmouseout="leaveFeature('1');" onclick="highlightFeature('1')" onmouseover="enterFeature('1');" id="feature_1"><td>disulfid</td> <td style="text-align:right">7</td> <td style="text-align:right">23</td> <td style="text-align:right">17</td> <td>       By similarity.</td></tr></table></div></td></tr> <tr><th colspan="2">Sequence information</th></tr> <tr><td colspan="2">Length: <strong>38 aa</strong>, molecular weight <strong>4193 Da</strong>, CRC64 checksum <strong>BCAD19AB95B52258 </strong></td></tr> <tr><td class="sequence" colspan="2"><pre><span id="fs_0">EVKYDP</span><span id="fs_1">CFGH KIDRINHVSN LGC</span><span id="fs_2">PSLRDPR PNAPSTSA</span></pre></td></tr></table></div>

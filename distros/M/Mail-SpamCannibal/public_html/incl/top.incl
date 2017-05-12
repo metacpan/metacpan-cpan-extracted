@@ -1,0 +1,75 @@
+<html>
+<!-- revision 2.01 6-12-15 -->
+<head><title>SpamCannibal</title>
+<link rel="shortcut icon" type="image/ico" href="/favicon.ico" />
+<META name="description" content="DNS black block list">
+<META name="keywords" content="dnsbl, black, block, list, blacklist,
+blocklist, spam, antispam, anti-spam, database, data, base, dns, 
+blackhole, blocked, ip address, smtp, mail, server, filter, filters, 
+rbl, listed">
+<style type="text/css">
+  body {
+    z-index: 1;
+  }
+  #gotop {
+    position: fixed;
+    width: 100%;
+    bottom: 10px;
+    z-index: 100;
+  }
+  #atop {
+    float: right;
+    padding-right: 30px;
+  }
+  .min { font-size: 4px; }
+  td { font-family: ARIAL,HELVETICA,SAN-SERIF; font-size: medium; }
+  .gry { background-color: #f0f0f0; font-weight: bold; font-size: small; }
+  .wht { font-weight: bold; font-size: small; }
+  .bld { font-family: ARIAL,HELVETICA,SAN-SERIF; font-weight: bold; }
+  .hot { font-family: ARIAL,HELVETICA,SAN-SERIF; font-size: small; font-weight: bold; background-color: #ffff99; color: red; text-decoration: none; }
+  .cold { font-family: ARIAL,HELVETICA,SAN-SERIF; font-size: small; font-weight: bold; background-color: #000000; color: white; text-decoration: none; }
+  .nav { width: 100px; float: right; }
+/* in Netscape 4.xx,  this is broken
+    border-left: 1px solid #000000;
+    border-right: 1px solid #000000;
+    border-top: 1px solid #000000;
+    border-bottom: 1px solid #000000;
+    margin: 10px 5px 10px 5px;
+    margin  top  rgt btm  lft
+*/
+</style>
+<script language=javascript1.2>
+var navwidth = 100 + 10; // from above + margin of 10
+var bgcolor = '#ffffcc';
+var labrea = '';
+var passwd = '';
+function cleanPath() {
+  self.focus();
+  var reload = self.location.pathname;
+  document.open();
+  document.write("<html><body bgcolor='" + bgcolor + "' </html>\n");
+  self.location = reload;
+}  
+function toTop() {
+  if (self.location != top.location) {
+      top.location = self.location.href;
+  }
+}
+function nav(search) {
+  document.navbar.action = location.pathname;
+  document.navbar.page.value = search;
+  document.navbar.submit();
+  return false;
+}
+function show(val) {
+  self.status = val;
+  return true;
+}
+function off() {
+  self.status = '';
+  return true;
+}
+</script>
+</head>
+<body
+  onFocus="if (!(passwd == (void 0) || !passwd) && (!passwd.closed)) { passwd.close(); };"

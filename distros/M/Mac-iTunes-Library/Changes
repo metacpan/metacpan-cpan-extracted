@@ -1,0 +1,71 @@
+# $Revision: 87 $
+# $Date: 2010-05-30 20:48:35 -0700 (Sun, 30 May 2010) $
+# $Author: drewgstephens@gmail.com $
+
+Revision history for Perl extension Mac::iTunes::Library
+
+0.9   30 May 2010
+    - Integrated patch for trackCount and trackNumber provided by
+        Michael G Schwern.
+        RT #57673 https://rt.cpan.org/Public/Bug/Display.html?id=57673
+
+0.8   20 Jan 2010
+    - Fixed playlist parsing to properly grab Smart Playlist information
+        and all playlist metadata.
+        Bug reported by Steve Scholnick.
+
+0.71  09 Jan 2010
+    - Add support for the "grouping" element in the XML file.
+        Patch submitted by Mark Allen.
+        RT #53553 (https://rt.cpan.org/Public/Bug/Display.html?id=53553)
+
+0.70  30 Dec 2009
+    - Handle charachter sequences that come to the callback as multiple chunks.
+        Patch submitted by Garrett Scott.
+
+0.62  08 Nov 2009
+    - Get rid of Data::Dump rather than declaring a dependency, since it is
+        only used for development; RT #51029
+
+0.61  08 Nov 2009
+    - Get rid of Switch, which displeased CPANTesters
+        http://stackoverflow.com/questions/844616
+
+0.6   28 Oct 2009
+    - Added playlist parsing patch from Mark Grimes <mgrimes@cpan.org>
+        https://rt.cpan.org/Public/Bug/Display.html?id=50668
+
+0.5   03 May 2009
+    - Reorganized constructor in Item.pm
+    - Added support for Skip Count, Skip Date, Album Rating,
+        Album Rating Computed, and Compilation
+    - Includes contributions from Garrett Scott <garrett@gothik.org>
+
+0.4   27 Apr 2009
+    - Added Album, Album Artist, and Composer to Item, Library, and XML
+    - Added Album Artist support to examples/iTunesStats.pl
+
+0.3   04 Jan 2009
+    - Added examples/scan.pl, contributed by Scott Lawrence
+    - Clarified the documentation in Mac::iTunes::Library
+
+0.2   05 Aug 2008
+    - Added songs-per-artist ratio
+    - SVN keywords stuff
+
+0.10  08 May 2008
+    -Added Playlist object
+    -Re-wrote POD in all files 
+
+0.02  Wed Apr  7 00:00:47 2008
+    -Added plist version
+    -Added the rest of the top-level library attributes
+        -Major, Minor, Application Versions
+        -Features
+        -Show Content Ratings
+        -Music Folder
+        -Library Persistent ID
+
+0.01  Sun Oct  7 00:00:47 2007
+    - original version; created by h2xs 1.23 with options
+        -XAn Mac::iTunes::Item

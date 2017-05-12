@@ -1,0 +1,14 @@
+NAME
+    MooX::Types::SetObject - Set::Object type
+
+SYNOPSIS
+        package MyPackage;
+        use Moo;
+        use MooX::Types::MooseLike::Base qw(Int);
+        use MooX::Types::SetObject qw(SetObject);
+
+        # a Set::Object of integers
+        has "int_objects" => (
+            isa => SetObject[Int],
+        );
+

@@ -1,0 +1,8 @@
+0.01
+    First release.
+
+0.02
+    Replaced render_text calls for compatibility with Mojolicious 4.*
+
+0.03
+    Fixed test issue when redirecting to relative url

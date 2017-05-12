@@ -1,0 +1,44 @@
+0.23 Sat Aug 16 11:40:16 PDT 2014
+ - Meta 0.0.2
+
+0.22 Sat Aug 16 02:24:02 PDT 2014
+ - Eliminate File::Basename from test/
+
+0.21 Fri Aug 15 16:06:58 PDT 2014
+ - Add t/000-compile-modules.t
+ - CPAN Day 2014 - 21 Release Salute!
+
+0.20 Wed Jul 30 15:51:56 PDT 2014
+ - Switch IRC to
+
+0.19 Fri Jul 25 14:04:56 PDT 2014
+ - Get rid of "Use of bareword filehandle in open" test warnings.
+
+0.18 Thu Jul 24 23:21:33 PDT 2014
+ - Switch to Zilla::Dist
+
+0.17 Sun Jul 15 16:59:21 PDT 2012
+ - added ^old/ and ^Old/
+
+0.16 Fri Oct  7 21:08:15 EDT 2011
+ - Altered the match for Mac OSX .DS_Store so we find those more
+   aggressively (jnap++)
+
+0.15 Wed Jun 15 11:32:27 EST 2011
+ - Fixed bug in test on Win32. Need to close file before unlink.
+
+0.14 Sun Jun 12 12:08:33 EST 2011
+ - Left debugging code (Test::Differences) in test.
+
+0.13 Sun Jun 12 03:38:24 EST 2011
+ - csjewell++ added Mercurial files
+
+0.12 Sat Jun 11 12:33:55 EST 2011
+ - add dist.ini and .ttc$ and .pmc$
+
+0.11 Sun Jun  5 12:36:53 EST 2011
+ - No longer require -e1 on command line usage.
+
+0.10 Sun Jun  5 00:35:36 EST 2011
+ - Initial version.
+

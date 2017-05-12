@@ -1,0 +1,27 @@
+---
+abstract: 'Perl extension for computing any permutation of an array.'
+author:
+  - 'jean-noel quintin <jnquintin@local>'
+build_requires:
+  Exporter: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Math-Permute-Array
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: 0
+  Test::Pod: 1.00
+  Test::Pod::Coverage: 1.00
+  perl: 5.006001
+version: 0.043

@@ -1,0 +1,52 @@
+---
+abstract: "A support script for \"MySQL Master HA\" running on AWS"
+author:
+  - 'FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.14.1, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MHA-AWS
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MHA::AWS:
+    file: lib/MHA/AWS.pm
+    version: 0.05
+  MHA::AWS::MasterIpFailover:
+    file: lib/MHA/AWS/MasterIpFailover.pm
+  MHA::AWS::MasterIpOnlineChange:
+    file: lib/MHA/AWS/MasterIpOnlineChange.pm
+  MHA::AWS::Shutdown:
+    file: lib/MHA/AWS/Shutdown.pm
+requires:
+  AWS::CLIWrapper: 0
+  JSON: 0
+  Log::Minimal: 0
+  Moo: 0
+  Net::SSH: 0
+  Pod::Usage: 0
+  String::CamelCase: 0
+  parent: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/fujiwara/MHA-AWS/issues
+  homepage: https://github.com/fujiwara/MHA-AWS
+  repository: https://github.com/fujiwara/MHA-AWS
+version: 0.05

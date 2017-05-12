@@ -1,0 +1,13 @@
+Revision history for Perl extension MultiProcFactory.
+
+0.01  Fri Sep 10 17:17:20 2004
+	- original version; created by h2xs 1.22 with options
+		-AX MultiProcFactory
+
+0.02  Mon Sep 20 12:43:00 2004
+        - Fixed relative class bug in factory method.  Updated docs and tests.
+
+0.04  Tues Sep 21 18:32:00 2004
+	- Added option IPC_OFF to turn off default allocation of shared memory.
+
+

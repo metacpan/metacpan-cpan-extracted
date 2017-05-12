@@ -1,0 +1,93 @@
+:default				::= action => [values]
+
+lexeme default			=  latm => 1		# Longest Acceptable Token Match.
+
+graph_grammar			::= graph_definition
+
+# Graph stuff.
+
+graph_definition		::= node_definition
+							| edge_definition
+# Node stuff
+
+node_definition			::= node_statement
+							| node_statement graph_definition
+
+node_statement			::= node_name_token
+							| node_name_token attribute_definition
+							| node_statement (',') node_statement
+
+node_name_token			::= start_node end_node		# Allow for the anonymous node.
+							| start_node node_name end_node
+
+# Edge stuff
+
+edge_definition			::= edge_statement
+							| edge_statement graph_definition
+
+edge_statement			::= edge_name
+							| edge_name attribute_definition
+							| edge_statement (',') edge_statement
+
+edge_name				::= directed_edge
+							| undirected_edge
+
+# Attribute stuff.
+
+attribute_definition	::= attribute_statement+
+
+attribute_statement		::= start_attributes string_token_set end_attributes
+
+string_token_set		::= string_token_pair+
+
+string_token_pair		::= literal_label
+							| attribute_name (':') attribute_value
+
+# Lexemes in alphabetical order.
+
+:lexeme					~ attribute_name	pause => before		event => attribute_name
+
+attribute_name			~ string_char_set+
+
+:lexeme					~ attribute_value	pause => before		event => attribute_value
+
+attribute_value			~ string_char_set+
+
+:lexeme					~ directed_edge		pause => before		event => directed_edge		priority => 2
+directed_edge			~ '->'
+
+:lexeme					~ end_attributes	pause => before		event => end_attributes		priority => 1
+end_attributes			~ '}'
+
+:lexeme					~ end_node			pause => before		event => end_node			priority => 1
+end_node				~ ']'
+
+escaped_char			~ '\' [[:print:]]
+
+# Use ' here just for the UltraEdit syntax hiliter.
+
+:lexeme					~ literal_label		pause => before		event => literal_label		priority => 1
+literal_label			~ 'label'
+
+:lexeme					~ node_name			pause => before		event => node_name
+
+node_name				~ string_char_set+
+
+:lexeme					~ start_attributes	pause => before		event => start_attributes
+start_attributes		~ '{'
+
+:lexeme					~ start_node		pause => before		event => start_node
+start_node				~ '['
+
+string_char_set			~ escaped_char
+							| [^;:}\]] # Neither a separator [;:] nor a terminator [}\]].
+
+:lexeme					~ undirected_edge	pause => before		event => undirected_edge	priority => 2
+undirected_edge			~ '--'
+
+# Lexemes in alphabetical order.
+
+# Boilerplate.
+
+:discard				~ whitespace
+whitespace				~ [\s]+

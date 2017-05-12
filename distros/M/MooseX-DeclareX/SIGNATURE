@@ -1,0 +1,69 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 f0686325b957d82ffc5899d25a25338127ec2f38 COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 b4fe2d336ffe8618d85c66ff9bbcd266f57ea1e5 Changes
+SHA1 ddb47788792fdbd880bf7d0a5e97b0c691ddc1bb INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 ffb2ab601338b118ccdd328699572d77a395a316 MANIFEST
+SHA1 bc7e519b64fa2b8b3901d797d81e4a5a2fe06c46 META.json
+SHA1 5396ba0ce6bf3b4a5946e81c369ab89be6480246 META.yml
+SHA1 e87c3a16b1dd3bc2f8ef1587db379f124b62b15c Makefile.PL
+SHA1 805b104f6f057a8aad90287bf328c1b228e251f9 README
+SHA1 45a62ed3e94fb31b1ff25612ac74fe6f8961eeed dist.ini
+SHA1 4f8cd9162dd3973488043288e975225b00146f05 doap.ttl
+SHA1 c5c143e3c0721a098bc83d6b87c72c168a77aac2 examples/SYNOPSIS.pl
+SHA1 cc5c4e98576d3196c48b904724b71ce5569e4eda examples/build.pl
+SHA1 0b2b3e5016edffc912be2ba0944994c40498c3fc examples/exceptions.pl
+SHA1 ea1fe713f00d199520277d7ec00a055ff57ed370 examples/guards.pl
+SHA1 e7c902af7c9d7aefdeef0ace4400bc529bcc59fd examples/having.pl
+SHA1 a6c5e9ed1231fa0a55b9525c5aab4ee3b2eacdcd examples/imports.pl
+SHA1 e6fe409eda2e6f115174f46926a2c2164dd79782 examples/pre-post-process.pl
+SHA1 dd53e44e281386d3ab0f9080f63cdbc87c3b3669 examples/types.pl
+SHA1 052b012de782a75f0fb29e0e207d997ec243de2d lib/MooseX/DeclareX.pm
+SHA1 fcfbf398ec1b9ee933ff628f94a0d7b09d78affe lib/MooseX/DeclareX/Keyword/class.pm
+SHA1 45dcf72410f6f47dc1a70547943c6c2a5389d765 lib/MooseX/DeclareX/Keyword/exception.pm
+SHA1 6158de2f2a16508fdc2f66d6f07f3dd18d1af9d7 lib/MooseX/DeclareX/Keyword/namespace.pm
+SHA1 da9b8ecdb8ce89ce84fc36d88347b8389b189b6c lib/MooseX/DeclareX/Keyword/role.pm
+SHA1 de6c8ba7ec8e43a8955782b8d9177a74b6f1edbe lib/MooseX/DeclareX/MethodPrefix.pm
+SHA1 d42b3abba9dd117f8e645a81000bd556cd0f5666 lib/MooseX/DeclareX/Plugin.pm
+SHA1 76d087fbb56a7559be2f872bfb06624ac8328fdb lib/MooseX/DeclareX/Plugin/build.pm
+SHA1 db2bde2e3f1ba71e5d60a84af29cf618bd134976 lib/MooseX/DeclareX/Plugin/guard.pm
+SHA1 fd4c81e99965fcba9eb4d0b6feb008da61fbbe72 lib/MooseX/DeclareX/Plugin/having.pm
+SHA1 43aea0ec856b38643a7176cf29421f0a8099b18d lib/MooseX/DeclareX/Plugin/imports.pm
+SHA1 3328b30f98c3f922a6bda2c8b7cb9a6075359869 lib/MooseX/DeclareX/Plugin/postprocess.pm
+SHA1 b0151046335294657f5ad69f35b51f18e78ef869 lib/MooseX/DeclareX/Plugin/preprocess.pm
+SHA1 3abc65d0405185cfa30b2358afe662eb052b487a lib/MooseX/DeclareX/Plugin/std_constants.pm
+SHA1 8d44dd82cd5d3629e54daa8d3f54bfe98d9f056e lib/MooseX/DeclareX/Plugin/types.pm
+SHA1 b5d7adf8c8e3676dfe52b8ebcdeb4f57d2c8d424 lib/MooseX/DeclareX/Registry.pm
+SHA1 c6740c28c02cf8e2f273d71a234bbe9a2da933a6 lib/MooseX/DeclareX/RegistryUsing.pm
+SHA1 9668b5e0a5e648899e6882d04ca53ba44a22b18b t/01basic.t
+SHA1 a6d2a686b6e60a64bd8feb858e0e5df73fa0d355 t/02namespaces.t
+SHA1 62bbcf44112ea21b059fbaf8e0f6037f9e6d9e6b t/03build.t
+SHA1 760d80526d339305f1036f98b6bfc09c185e4ef3 t/04exceptions.t
+SHA1 b36469a5d1a1e3358b1b4ec9ccfa67ca0c7e5023 t/05guards.t
+SHA1 defa9bd083e539c53b09613268439337d57758be t/06having.t
+SHA1 ea8cae4f8fd0892cf4bf018a6a438bcd2dcf66ad t/07pre-post-process.t
+SHA1 42fada5cd80ac2bc21ccdc94655b96c400062842 t/08types.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQQ3LsACgkQzr+BKGoqfTnkBQCdE6M/u94L5zW7S7Tk5GIUWCUz
+BfYAnR6ba+eDtmdwBqIOD/nNS4uiRT6j
+=3BaY
+-----END PGP SIGNATURE-----

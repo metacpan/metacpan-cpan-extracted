@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/MasonX/WebApp.pm
+LICENSE
+MANIFEST			This list of files
+META.yml
+README
+t/abort.t
+t/action.t
+t/new.t
+t/session-wrapper.t
+Makefile.PL
+SIGNATURE    Added here by Module::Build

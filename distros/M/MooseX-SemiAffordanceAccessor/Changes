@@ -1,0 +1,61 @@
+0.10     2014-10-05
+
+- Distro and POD cleanup. Fixes RT #98388.
+
+
+0.09   2011-02-26
+
+- In Moose 1.9900+, attributes from roles no longer acquire the consuming
+  class's attribute traits. However, you can apply attribute traits like this
+  one to attributes in roles, and that trait is preserved when the role is
+  applied to a class.
+
+  See the documentation for more details.
+
+
+0.08   2010-07-20
+
+- Fix a bad example in the SYNOPSIS.
+
+
+0.07   2010-07-14
+
+- Fix bad uri for bugtracker in metadata
+
+
+0.06   2010-07-14
+
+- Use modern Moose APIs, to avoid warnings with the next Moose release.
+
+
+0.05   2009-07-15
+
+- Now requires Moose 0.84 to prevent test failures.
+
+
+0.04   2009-07-09
+
+- This module unconditionally deleted the "is" parameter, which meant
+  it broke any use of "is => 'bare'". Reported by Jerome Quelin. Fixed
+  by Jesse Luehrs. RT #47711.
+
+
+0.03   2008-08-30
+
+- Renamed to MooseX::SemiAffordanceAccessor because it no longer
+  requires the Moose::Policy module. Instead it uses
+  Moose::Util::MetaRole.
+
+
+0.02   2007-11-15
+
+- Require 5.6.1 in the Build.PL.
+
+- Added missing Moose & Moose::Policy prereqs.
+
+- No code changes.
+
+
+0.01   2007-11-14
+
+- First version, released on an unsuspecting world.

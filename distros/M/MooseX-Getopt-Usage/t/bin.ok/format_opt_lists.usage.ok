@@ -1,0 +1,13 @@
+Usage:
+    format_opt_lists.pl : --doom=DOOM : [--help -? --usage] [--man]
+    [--stuff=STUFF] : [--help -? --usage] [--man] --doom=DOOM
+    [--stuff=STUFF]
+
+Options:
+     Required:
+         --doom            - Int. 
+     Optional:
+         --help -? --usage - Bool. Display the usage message and exit
+         --man             - Bool. Display man page
+         --stuff           - String.
+

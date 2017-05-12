@@ -1,0 +1,24 @@
+---
+abstract: 'A perl sentry client for Mojolicious'
+author:
+  - 'Alexey Likhatskiy <likhatskiy\@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Sentry
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '0'
+  Sentry::Raven: '0'
+  Test::Simple: '0.44'
+version: 0.11

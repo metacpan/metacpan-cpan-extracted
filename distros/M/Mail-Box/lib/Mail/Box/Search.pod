@@ -1,0 +1,365 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Box::Search - select messages within a mail box
+
+=head1 INHERITANCE
+
+ Mail::Box::Search
+   is a Mail::Reporter
+
+ Mail::Box::Search is extended by
+   Mail::Box::Search::Grep
+   Mail::Box::Search::SpamAssassin
+   Mail::Server::IMAP4::Search
+
+=head1 SYNOPSIS
+
+ use Mail::Box::Manager;
+ my $mgr    = Mail::Box::Manager->new;
+ my $folder = $mgr->open('Inbox');
+
+ my $filter = Mail::Box::Search::[something]->new;
+ my @msgs   = $filter->search($folder, ...);
+ if($filter->search($message)) {...}
+
+=head1 DESCRIPTION
+
+This C<Mail::Box::Search> class is the base class for various message scan
+algorithms.  The selected messages can be labeled.  Boolean operations on
+messages are supported.
+
+Currently implemented searches:
+
+=over 4
+
+=item L<Mail::Box::Search::Grep|Mail::Box::Search::Grep>
+
+Match header or body against a regular expression in a UNIX C<grep> like
+fashion.
+
+=item L<Mail::Box::Search::SpamAssassin|Mail::Box::Search::SpamAssassin>
+
+Try to detect spam, using Mail::SpamAssassin.
+
+=item Mail::Box::Search::IMAP
+
+Search an IMAP folder for special interface IMAP folders provide for it.
+UNDER CONSTRUCTION till L<Mail::Transport::IMAP4|Mail::Transport::IMAP4> is complete.
+
+=back
+
+Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Reporter|Mail::Reporter/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
+ 
+=over 4
+
+=item Mail::Box::Search-E<gt>B<new>(%options)
+
+Create a filter.
+
+ -Option    --Defined in     --Default
+  binaries                     <false>
+  decode                       <true>
+  delayed                      <true>
+  deleted                      <false>
+  deliver                      undef
+  in                           'BODY'
+  label                        undef
+  limit                        0
+  log         Mail::Reporter   'WARNINGS'
+  logical                      'REPLACE'
+  multiparts                   <true>
+  trace       Mail::Reporter   'WARNINGS'
+
+=over 2
+
+=item binaries => BOOLEAN
+
+Whether to include binary bodies in the search.
+
+=item decode => BOOLEAN
+
+Decode the messages before the search takes place.  Even plain text messages
+can be encoded, for instance as C<quoted-printable>, which may disturb the
+results.  However, decoding will slow-down the search.
+
+=item delayed => BOOLEAN
+
+Include the delayed messages (which will be parsed) in the search.  If you
+set this to false, you may find fewer hits.
+
+=item deleted => BOOLEAN
+
+In most cases, you will not be interested in results which are
+found in messages flagged to be deleted.  However, with this option
+you can specify you want them to be searched too.
+
+=item deliver => undef|CODE|'DELETE'
+
+The exact functionality of this parameter differs per search method, so
+read the applicable man-page.  In any case C<undef> means that details
+are not collected for this search, which is the fastest search.
+
+C<DELETE> will flag the message to be flagged for deletion.
+You may also specify your own CODE reference.  With an reference
+to an array, the information about the matches is collected as a list
+of hashes, one hash per match.
+
+=item in => 'HEAD'|'BODY'|'MESSAGE'
+
+Where to look for the match.
+
+=item label => STRING
+
+Mark all selected messages with the specified STRING.  If this field is
+not specified, the message will not get a label; search() also returns
+a list of selected messages.
+
+=item limit => NUMBER
+
+Limit the search to the specified NUMBER of messages.  When the NUMBER
+is positive, the search starts at the first message in the folder or
+thread.  A negative NUMBER starts at the end of the folder.  If the limit
+is set to zero, there is no limit.
+
+=item log => LEVEL
+
+=item logical => 'REPLACE'|'AND'|'OR'|'NOT'|'AND NOT'|'OR NOT'
+
+Only applicable in combination with a C<label>.
+How to handle the existing labels.  In case of C<REPLACE>, messages
+which already are carrying the label are stripped from their
+selection (unless they match again).  With C<AND>, the message must
+be selected by this search and already carry the label, otherwise the
+label will not be set.  Specify C<OR> to have newly selected messages
+added to the set of already selected messages.
+
+C<NOT> is true for messages which do not fulfil the search.  The
+details output will still contain the places where the match was
+found, however those messages will complementary set of messages will
+be labeled and returned.
+
+=item multiparts => BOOLEAN
+
+Are multiparts to be included in the search results?  Some MUA have
+problems handling details received from the search.  When this flag
+is turned off, the body of multiparts will be ignored.  The parts
+search will include the preamble and epilogue.
+
+=item trace => LEVEL
+
+=back
+
+=back
+
+=head2 Searching
+
+=over 4
+
+=item $obj-E<gt>B<inBody>($part, $body)
+
+Tests whether body contains the requesting information.  See the
+specific search module for its parameters.
+
+=item $obj-E<gt>B<inHead>($part, $head)
+
+Tests whether header contains the requesting information.  See the
+specific search module for its parameters.
+
+=item $obj-E<gt>B<search>($folder|$thread|$message|ARRAY)
+
+Check which messages from the $folder (Mail::Box) match the
+search parameters.  The matched messages are returned as list.  You
+can also specify a $thread (a L<Mail::Box::Thread::Node|Mail::Box::Thread::Node>), one single
+$message (a L<Mail::Message|Mail::Message>), or an ARRAY of messages.
+
+Sometimes we know how only one match is needed.  In this case, this
+searching will stop at the first match.  For instance, when C<limit> is C<-1>
+or C<1>, or when the search in done in scalar context.
+
+example: 
+
+ my $grep = Mail::Box::Search::Grep->new
+  ( match   => 'My Name Is Nobody'
+  , deliver => 'PRINT'
+  );
+
+ $grep->search($folder);
+
+ my $message = $folder->message(3);
+ $grep->search($message);
+
+ my $thread  = $message->threadStart;
+ $grep->search($thread);
+
+=item $obj-E<gt>B<searchPart>($part)
+
+Search this message $part for matches.
+
+=back
+
+=head2 The Results
+
+=over 4
+
+=item $obj-E<gt>B<printMatch>( [$fh], HASH )
+
+Print the information about the match (see L<new(deliver)|Mail::Box::Search/"METHODS">) in
+some understandable way.  If no file handle
+is specified, the output will go to the selected filehandle (see
+C<perldoc -f select>).
+
+=back
+
+=head2 Error handling
+
+Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
+ 
+=over 4
+
+=item $obj-E<gt>B<AUTOLOAD>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<addReport>($object)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+=item Mail::Box::Search-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<errors>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<log>( [$level, [$strings]] )
+
+=item Mail::Box::Search-E<gt>B<log>( [$level, [$strings]] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logPriority>($level)
+
+=item Mail::Box::Search-E<gt>B<logPriority>($level)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<notImplemented>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<report>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<reportAll>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<trace>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<warnings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=back
+
+=head2 Cleanup
+
+Extends L<"Cleanup" in Mail::Reporter|Mail::Reporter/"Cleanup">.
+ 
+=over 4
+
+=item $obj-E<gt>B<DESTROY>()
+
+Inherited, see L<Mail::Reporter/"Cleanup">
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: Cannot search in body.
+
+Th search object does not implement L<inBody()|Mail::Box::Search/"Searching">, and can therefore
+not search a message body.
+
+=item Error: Cannot search in header.
+
+Th search object does not implement L<inHead()|Mail::Box::Search/"Searching">, and can therefore
+not search a message header.
+
+=item Error: Don't know how to deliver via results in $way.
+
+The search results cannot be delivered in the specific way, because that is
+not a defined alternative.
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=item Error: Search in BODY, HEAD or MESSAGE not $in.
+
+The C<in> option defines only three names.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Box distribution version 3.002,
+built on March 31, 2017.
+
+Do not forget to read
+L<Mail::Box-Overview>,
+L<Mail::Box-Cookbook>, and
+L<Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L<Mail::Message>,
+L<Mail::Box>,
+L<Mail::Box::IMAP4>,
+L<Mail::Box::POP3>,
+L<Mail::Box::Parser::C>,
+L<Mail::Box::Dbx> (unpublished),
+L<Mail::Transport>,
+L<Object::Realize::Later>, and
+L<User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
+

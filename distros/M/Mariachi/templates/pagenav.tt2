@@ -1,0 +1,12 @@
+[% IF page.last_page > 1 %]
+<p>[% IF page.previous_page %]<a href="[% base %][% mariachi.nthpage( page.previous_page, spool ) %]">&lt; mari</a>[% ELSE %]mari[% END %]
+
+[% FOREACH p = [1 .. page.last_page] %]
+[% IF p == page.current_page ; "<b>a</b>"; ELSE %]
+<a href="[% base %][% mariachi.nthpage( p, spool ) %]">a</a>[% END %]
+[% END %]
+[% IF page.next_page %]<a href="[% base %][% mariachi.nthpage( page.next_page, spool ) %]">chi &gt;</a>[% ELSE %]chi[% END %]
+<br />[ Page [% page.current_page %] of [% page.last_page %] ]
+</p>
+[% END %]
+

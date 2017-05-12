@@ -1,0 +1,18 @@
+Revision history for Perl extension Module::Build::Pluggable::CPANfile
+
+0.05 2013-09-19T05:32:46Z
+
+    - skip test cast on Windows
+      https://github.com/tokuhirom/Module-Build-Pluggable/issues/2
+
+0.04    Mon Apr 8 11:29:10 2013
+    - fixed test. Previous version failed test on Windows platform.
+
+0.03    Wed Apr 3 14:27:59 2013
+    - added prereqs test support. display warnings unsuppoted prereqs type/phase
+
+0.02    Sun Mar 3 14:22:32 2013
+    - added JSON to build_requires
+
+0.01    Thu Feb 28 14:09:31 2013
+    - original version

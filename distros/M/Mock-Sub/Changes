@@ -1,0 +1,104 @@
+Revision history for Mock-Sub
+
+1.07    2016-10-05
+        - POD fix (closes #20)
+        - changed croak() to confess()
+        - you can now add "no_warnings => 1" to the 'use Mock::Sub' line to
+          disable warnings about mocking non-existent subs (closes #22)
+
+1.06    2016-01-23
+        - new remock() method does what Child::mock() used to do.
+        - Child::mock() renamed to Child::_mock(), and is now private
+          (fixes #17)
+        - more documentation cleanup
+
+1.05    2016-01-22
+        - added tests for mocked_objects()
+        - Child.pm now has basic pod (mostly to satisfy pod tests) (closes #15)
+        - added .list to MANIFEST.SKIP to ignore RHEL vendor specific build
+          files (reported by Denis Fateyev) (also #15)
+        - this was previously fixed (closes #13)
+
+1.04    2016-01-08
+        - MANIFEST updates
+
+1.03    2015-12-10
+        - completely reworked distribution into two modules (parent and Child)
+        - we now have the ability to mock out CORE::GLOBAL functions
+          (eg: caller()). You MUST do the mock within a BEGIN block
+
+1.02    2015-12-09
+        - fixed bug where if the mocked sub isn't called, the original sub
+          wasn't being restored
+        - called_count() now returns 0 instead of undef if there isn't a count
+        - fix issue #11: called_count wasn't being reset to 0 after reset()
+        - side_effect param can now be sent into new() which will be retained
+          in all child objects created by mock()
+        - return_value param can be send into new(), passed into all child
+          objects
+        - added mocked_objects(), returns a list of objects that have mocked
+          subs (if unmocked(), obj won't be returned)
+        - added mocked_names(), same as mocked_objects() but returns the sub
+          names only
+        - mocked_state(), returns bool whether the named sub is currently
+          mocked
+
+1.01    2015-12-08
+        - DESTROY() always calls unmock() now. The option to disable this has
+          been removed
+
+0.11    2015-12-08
+        - if mock() is called in void context, we'll croak (except in the
+          instance where you're re-mocking an unmock()ed sub with the same
+          object)
+        - fixes bug where DESTROY() wasn't able to properly clean up prior
+          to END
+
+0.10    2015-12-07
+        - all bugs fixed in this release reported by Joel Berger (jberger)
+        - fix issue #5: we now pass in any parameters passed to the mocked
+          function into the side_effect cref
+        - fix issue #6: return_value() now accepts lists (however, using the
+          param version of return_value, only a scalar is accepted).
+        - fix issue #8: called_with() now die()s if it's called before the
+          mocked sub has been
+        - fix issue #7: mocked sub (and the object) is now much more context
+          aware
+        - fix issue #9: DESTROY() now unmock()s by default
+          (keep_mock_on_destroy param to override)
+
+0.09    2015-12-01
+        - mocking a non-existent sub is now allowed, and spits out a warning
+          message
+        - unmock() removes the symtab entry if mock() created a fake
+          (non-existent) sub entry in the symbol table
+        - added side_effect() and return_value()
+
+0.08    2015-11-30
+        - fixes bug #3: add eval() in side_effect in SYNOPSIS
+        - fixes bug #2: having side_effect after return_value breaks t/06
+        - fixes bug #1: add called_with(), to extract the args passed in to
+          the mocked sub
+        - fixes bug #4: completely validate that the sub param is a valid sub
+        - 'main::' is now prepended to subs if they don't have a package
+        - side_effect now properly returns last expression evaluated
+        - side_effect and return_value can now be sent in simultaneously
+
+0.07    2015-11-29
+        - code cleanup
+        - pod updates 
+        - opened bug 1: need to add with_args()
+
+0.04    2015-11-29
+        - added name()
+        - many more tests
+        - major POD updates/fixes
+
+0.02    2015-11-29
+        - renamed project from Test::MockSub to Mock::Sub
+        - added numerous test files
+        - added initial POD
+
+0.01    2015-11-29
+        - initial import
+

@@ -1,0 +1,21 @@
+
+
+                         TODO for Math::Fibonacci
+            $Id: TODO,v 1.1.1.1 2001/04/28 19:17:52 vipul Exp $
+
+-------------------------------------------------------------------------------
+P No Task                                              Status
+- -- ------------------------------------------------  ------------------------
+
+*  1 Should be able to decompose Math::Pari integers
+*  2 Should return Math::Pari integers if the return 
+     value is too big to fit in a perl int.
+
+-------------------------------------------------------------------------------
+
+LEGEND
+ - Date in the Status field indicates the task was completed on that date.
+ - `*' in P field distinguishes pending tasks.
+ - `+' before the task description indicates a sub-task.
+
+

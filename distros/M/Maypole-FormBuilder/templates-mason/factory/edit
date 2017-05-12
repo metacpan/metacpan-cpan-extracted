@@ -1,0 +1,29 @@
+
+% foreach my $item ( @$objects ) {
+
+<h2>Edit <% $request->model_class->moniker %>: <% $item %></h2>
+
+<div class="fleft">
+<fieldset>
+<legend><% $item->stringify_self %></legend>
+<% $request->as_form->render %>
+
+% if ( $item->edit_fields ) {
+<h2>Add related records</h2>
+
+% foreach my $related ( $item->edit_fields ) {
+<& addto, add_to => $item, field => $related &>
+% }
+% }
+
+</fieldset>
+
+% # this form does *not* work yet - it's just a placeholder for when CDBI::FB implements this
+% # <& edit_with_related, item => $item &>
+
+</div>
+
+<& edit_all_has_a, object => $item &>
+
+% }
+

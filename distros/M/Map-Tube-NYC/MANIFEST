@@ -1,0 +1,23 @@
+Changes
+share/nyc-map.xml
+lib/Map/Tube/NYC.pm
+lib/Map/Tube/NYC/Line/INDSixthAvenue.pm
+lib/Map/Tube/NYC/Line/INDEighthAvenue.pm
+lib/Map/Tube/NYC/Line/INDCrosstown.pm
+lib/Map/Tube/NYC/Line/IRTFlushing.pm
+lib/Map/Tube/NYC/Line/BMTCanarsie.pm
+lib/Map/Tube/NYC/Line/BMTNassauStreet.pm
+lib/Map/Tube/NYC/Line/IRTLexingtonAvenue.pm
+Makefile.PL
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/manifest.t
+t/pod.t
+t/map-tube-nyc.t
+t/meta-yml.t
+t/meta-json.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

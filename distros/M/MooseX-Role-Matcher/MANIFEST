@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/MooseX/Role/Matcher.pm
+t/000-load.t
+t/001-basic-matching.t
+t/002-complicated-matching.t
+t/003-methods.t
+t/004-submatching.t
+t/005-synopsis.t
+t/100-collection.t
+t/101-parameterized.t
+t/102-missing.t

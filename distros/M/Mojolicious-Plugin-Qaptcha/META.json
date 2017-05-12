@@ -1,0 +1,60 @@
+{
+   "abstract" : "jQuery QapTcha Plugin for Mojolicious",
+   "author" : [
+      "Holger Rupprecht <holger.rupprecht@gmx.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Qaptcha",
+   "no_index" : {
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.4205",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "1.00",
+            "Mojolicious" : "5"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::Qaptcha" : {
+         "file" : "lib/Mojolicious/Plugin/Qaptcha.pm",
+         "version" : "0.11"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/hrupprecht/Mojolicious-Plugin-Qaptcha/issues"
+      },
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "http://github.com/hrupprecht/Mojolicious-Plugin-Qaptcha"
+      }
+   },
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

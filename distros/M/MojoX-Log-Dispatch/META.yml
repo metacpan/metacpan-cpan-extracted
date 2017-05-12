@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               MojoX-Log-Dispatch
+version:            0.1
+abstract:           Log::Dispatch For Mojo
+author:
+    - Konstantin Kapitanov <perlovik@gmail.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Log::Dispatch:  2.22
+    Mojo:           0.99125
+    Test::More:     0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

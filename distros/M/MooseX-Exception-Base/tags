@@ -1,0 +1,507 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ABSPERL	.build/latest/Makefile	/^ABSPERL = $(PERL)$/;"	m
+ABSPERL	.build/ouSednPxT8/Makefile	/^ABSPERL = $(PERL)$/;"	m
+ABSPERLRUN	.build/latest/Makefile	/^ABSPERLRUN = $(ABSPERL)$/;"	m
+ABSPERLRUN	.build/ouSednPxT8/Makefile	/^ABSPERLRUN = $(ABSPERL)$/;"	m
+ABSPERLRUNINST	.build/latest/Makefile	/^ABSPERLRUNINST = $(ABSPERLRUN) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"$/;"	m
+ABSPERLRUNINST	.build/ouSednPxT8/Makefile	/^ABSPERLRUNINST = $(ABSPERLRUN) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"$/;"	m
+AR	.build/latest/Makefile	/^AR = ar$/;"	m
+AR	.build/ouSednPxT8/Makefile	/^AR = ar$/;"	m
+AR_STATIC_ARGS	.build/latest/Makefile	/^AR_STATIC_ARGS = cr$/;"	m
+AR_STATIC_ARGS	.build/ouSednPxT8/Makefile	/^AR_STATIC_ARGS = cr$/;"	m
+AUTOSPLITFILE	.build/latest/Makefile	/^AUTOSPLITFILE = $(ABSPERLRUN)  -e 'use AutoSplit;  autosplit($$$$ARGV[0], $$$$ARGV[1], 0, 1, 1)' --$/;"	m
+AUTOSPLITFILE	.build/ouSednPxT8/Makefile	/^AUTOSPLITFILE = $(ABSPERLRUN)  -e 'use AutoSplit;  autosplit($$$$ARGV[0], $$$$ARGV[1], 0, 1, 1)' --$/;"	m
+BASEEXT	.build/latest/Makefile	/^BASEEXT = Base$/;"	m
+BASEEXT	.build/ouSednPxT8/Makefile	/^BASEEXT = Base$/;"	m
+BOOTDEP	.build/latest/Makefile	/^BOOTDEP = $/;"	m
+BOOTDEP	.build/ouSednPxT8/Makefile	/^BOOTDEP = $/;"	m
+BOOTSTRAP	.build/latest/Makefile	/^BOOTSTRAP =$/;"	m
+BOOTSTRAP	.build/ouSednPxT8/Makefile	/^BOOTSTRAP =$/;"	m
+CC	.build/latest/Makefile	/^CC = cc$/;"	m
+CC	.build/ouSednPxT8/Makefile	/^CC = cc$/;"	m
+CCCDLFLAGS	.build/latest/Makefile	/^CCCDLFLAGS = -fPIC$/;"	m
+CCCDLFLAGS	.build/ouSednPxT8/Makefile	/^CCCDLFLAGS = -fPIC$/;"	m
+CCDLFLAGS	.build/latest/Makefile	/^CCDLFLAGS = -Wl,-E$/;"	m
+CCDLFLAGS	.build/ouSednPxT8/Makefile	/^CCDLFLAGS = -Wl,-E$/;"	m
+CHMOD	.build/latest/Makefile	/^CHMOD = chmod$/;"	m
+CHMOD	.build/ouSednPxT8/Makefile	/^CHMOD = chmod$/;"	m
+CI	.build/latest/Makefile	/^CI = ci -u$/;"	m
+CI	.build/ouSednPxT8/Makefile	/^CI = ci -u$/;"	m
+COMPRESS	.build/latest/Makefile	/^COMPRESS = gzip --best$/;"	m
+COMPRESS	.build/ouSednPxT8/Makefile	/^COMPRESS = gzip --best$/;"	m
+CONFIGDEP	.build/latest/Makefile	/^CONFIGDEP = $(PERL_ARCHLIB)$(DFSEP)Config.pm $(PERL_INC)$(DFSEP)config.h$/;"	m
+CONFIGDEP	.build/ouSednPxT8/Makefile	/^CONFIGDEP = $(PERL_ARCHLIB)$(DFSEP)Config.pm $(PERL_INC)$(DFSEP)config.h$/;"	m
+CP	.build/latest/Makefile	/^CP = cp$/;"	m
+CP	.build/ouSednPxT8/Makefile	/^CP = cp$/;"	m
+C_FILES	.build/latest/Makefile	/^C_FILES  = $/;"	m
+C_FILES	.build/ouSednPxT8/Makefile	/^C_FILES  = $/;"	m
+Carp qw/longmess/	.build/latest/lib/MooseX/Exception/Base.pm	/^use Carp qw\/longmess\/;$/;"	u
+Carp qw/longmess/	.build/ouSednPxT8/lib/MooseX/Exception/Base.pm	/^use Carp qw\/longmess\/;$/;"	u
+Carp qw/longmess/	lib/MooseX/Exception/Base.pm	/^use Carp qw\/longmess\/;$/;"	u
+DEFINE_VERSION	.build/latest/Makefile	/^DEFINE_VERSION = -D$(VERSION_MACRO)=\\"$(VERSION)\\"$/;"	m
+DEFINE_VERSION	.build/ouSednPxT8/Makefile	/^DEFINE_VERSION = -D$(VERSION_MACRO)=\\"$(VERSION)\\"$/;"	m
+DESTDIR	.build/latest/Makefile	/^DESTDIR = $/;"	m
+DESTDIR	.build/ouSednPxT8/Makefile	/^DESTDIR = $/;"	m
+DESTINSTALLARCHLIB	.build/latest/Makefile	/^DESTINSTALLARCHLIB = $(DESTDIR)$(INSTALLARCHLIB)$/;"	m
+DESTINSTALLARCHLIB	.build/ouSednPxT8/Makefile	/^DESTINSTALLARCHLIB = $(DESTDIR)$(INSTALLARCHLIB)$/;"	m
+DESTINSTALLBIN	.build/latest/Makefile	/^DESTINSTALLBIN = $(DESTDIR)$(INSTALLBIN)$/;"	m
+DESTINSTALLBIN	.build/ouSednPxT8/Makefile	/^DESTINSTALLBIN = $(DESTDIR)$(INSTALLBIN)$/;"	m
+DESTINSTALLMAN1DIR	.build/latest/Makefile	/^DESTINSTALLMAN1DIR = $(DESTDIR)$(INSTALLMAN1DIR)$/;"	m
+DESTINSTALLMAN1DIR	.build/ouSednPxT8/Makefile	/^DESTINSTALLMAN1DIR = $(DESTDIR)$(INSTALLMAN1DIR)$/;"	m
+DESTINSTALLMAN3DIR	.build/latest/Makefile	/^DESTINSTALLMAN3DIR = $(DESTDIR)$(INSTALLMAN3DIR)$/;"	m
+DESTINSTALLMAN3DIR	.build/ouSednPxT8/Makefile	/^DESTINSTALLMAN3DIR = $(DESTDIR)$(INSTALLMAN3DIR)$/;"	m
+DESTINSTALLPRIVLIB	.build/latest/Makefile	/^DESTINSTALLPRIVLIB = $(DESTDIR)$(INSTALLPRIVLIB)$/;"	m
+DESTINSTALLPRIVLIB	.build/ouSednPxT8/Makefile	/^DESTINSTALLPRIVLIB = $(DESTDIR)$(INSTALLPRIVLIB)$/;"	m
+DESTINSTALLSCRIPT	.build/latest/Makefile	/^DESTINSTALLSCRIPT = $(DESTDIR)$(INSTALLSCRIPT)$/;"	m
+DESTINSTALLSCRIPT	.build/ouSednPxT8/Makefile	/^DESTINSTALLSCRIPT = $(DESTDIR)$(INSTALLSCRIPT)$/;"	m
+DESTINSTALLSITEARCH	.build/latest/Makefile	/^DESTINSTALLSITEARCH = $(DESTDIR)$(INSTALLSITEARCH)$/;"	m
+DESTINSTALLSITEARCH	.build/ouSednPxT8/Makefile	/^DESTINSTALLSITEARCH = $(DESTDIR)$(INSTALLSITEARCH)$/;"	m
+DESTINSTALLSITEBIN	.build/latest/Makefile	/^DESTINSTALLSITEBIN = $(DESTDIR)$(INSTALLSITEBIN)$/;"	m
+DESTINSTALLSITEBIN	.build/ouSednPxT8/Makefile	/^DESTINSTALLSITEBIN = $(DESTDIR)$(INSTALLSITEBIN)$/;"	m
+DESTINSTALLSITELIB	.build/latest/Makefile	/^DESTINSTALLSITELIB = $(DESTDIR)$(INSTALLSITELIB)$/;"	m
+DESTINSTALLSITELIB	.build/ouSednPxT8/Makefile	/^DESTINSTALLSITELIB = $(DESTDIR)$(INSTALLSITELIB)$/;"	m
+DESTINSTALLSITEMAN1DIR	.build/latest/Makefile	/^DESTINSTALLSITEMAN1DIR = $(DESTDIR)$(INSTALLSITEMAN1DIR)$/;"	m
+DESTINSTALLSITEMAN1DIR	.build/ouSednPxT8/Makefile	/^DESTINSTALLSITEMAN1DIR = $(DESTDIR)$(INSTALLSITEMAN1DIR)$/;"	m
+DESTINSTALLSITEMAN3DIR	.build/latest/Makefile	/^DESTINSTALLSITEMAN3DIR = $(DESTDIR)$(INSTALLSITEMAN3DIR)$/;"	m
+DESTINSTALLSITEMAN3DIR	.build/ouSednPxT8/Makefile	/^DESTINSTALLSITEMAN3DIR = $(DESTDIR)$(INSTALLSITEMAN3DIR)$/;"	m
+DESTINSTALLSITESCRIPT	.build/latest/Makefile	/^DESTINSTALLSITESCRIPT = $(DESTDIR)$(INSTALLSITESCRIPT)$/;"	m
+DESTINSTALLSITESCRIPT	.build/ouSednPxT8/Makefile	/^DESTINSTALLSITESCRIPT = $(DESTDIR)$(INSTALLSITESCRIPT)$/;"	m
+DESTINSTALLVENDORARCH	.build/latest/Makefile	/^DESTINSTALLVENDORARCH = $(DESTDIR)$(INSTALLVENDORARCH)$/;"	m
+DESTINSTALLVENDORARCH	.build/ouSednPxT8/Makefile	/^DESTINSTALLVENDORARCH = $(DESTDIR)$(INSTALLVENDORARCH)$/;"	m
+DESTINSTALLVENDORBIN	.build/latest/Makefile	/^DESTINSTALLVENDORBIN = $(DESTDIR)$(INSTALLVENDORBIN)$/;"	m
+DESTINSTALLVENDORBIN	.build/ouSednPxT8/Makefile	/^DESTINSTALLVENDORBIN = $(DESTDIR)$(INSTALLVENDORBIN)$/;"	m
+DESTINSTALLVENDORLIB	.build/latest/Makefile	/^DESTINSTALLVENDORLIB = $(DESTDIR)$(INSTALLVENDORLIB)$/;"	m
+DESTINSTALLVENDORLIB	.build/ouSednPxT8/Makefile	/^DESTINSTALLVENDORLIB = $(DESTDIR)$(INSTALLVENDORLIB)$/;"	m
+DESTINSTALLVENDORMAN1DIR	.build/latest/Makefile	/^DESTINSTALLVENDORMAN1DIR = $(DESTDIR)$(INSTALLVENDORMAN1DIR)$/;"	m
+DESTINSTALLVENDORMAN1DIR	.build/ouSednPxT8/Makefile	/^DESTINSTALLVENDORMAN1DIR = $(DESTDIR)$(INSTALLVENDORMAN1DIR)$/;"	m
+DESTINSTALLVENDORMAN3DIR	.build/latest/Makefile	/^DESTINSTALLVENDORMAN3DIR = $(DESTDIR)$(INSTALLVENDORMAN3DIR)$/;"	m
+DESTINSTALLVENDORMAN3DIR	.build/ouSednPxT8/Makefile	/^DESTINSTALLVENDORMAN3DIR = $(DESTDIR)$(INSTALLVENDORMAN3DIR)$/;"	m
+DESTINSTALLVENDORSCRIPT	.build/latest/Makefile	/^DESTINSTALLVENDORSCRIPT = $(DESTDIR)$(INSTALLVENDORSCRIPT)$/;"	m
+DESTINSTALLVENDORSCRIPT	.build/ouSednPxT8/Makefile	/^DESTINSTALLVENDORSCRIPT = $(DESTDIR)$(INSTALLVENDORSCRIPT)$/;"	m
+DEV_NULL	.build/latest/Makefile	/^DEV_NULL = > \/dev\/null 2>&1$/;"	m
+DEV_NULL	.build/ouSednPxT8/Makefile	/^DEV_NULL = > \/dev\/null 2>&1$/;"	m
+DFSEP	.build/latest/Makefile	/^DFSEP = $(DIRFILESEP)$/;"	m
+DFSEP	.build/ouSednPxT8/Makefile	/^DFSEP = $(DIRFILESEP)$/;"	m
+DIRFILESEP	.build/latest/Makefile	/^DIRFILESEP = \/$/;"	m
+DIRFILESEP	.build/ouSednPxT8/Makefile	/^DIRFILESEP = \/$/;"	m
+DISTNAME	.build/latest/Makefile	/^DISTNAME = MooseX-Exception-Base$/;"	m
+DISTNAME	.build/ouSednPxT8/Makefile	/^DISTNAME = MooseX-Exception-Base$/;"	m
+DISTVNAME	.build/latest/Makefile	/^DISTVNAME = MooseX-Exception-Base-0.0.4$/;"	m
+DISTVNAME	.build/ouSednPxT8/Makefile	/^DISTVNAME = MooseX-Exception-Base-0.0.4$/;"	m
+DIST_CP	.build/latest/Makefile	/^DIST_CP = best$/;"	m
+DIST_CP	.build/ouSednPxT8/Makefile	/^DIST_CP = best$/;"	m
+DIST_DEFAULT	.build/latest/Makefile	/^DIST_DEFAULT = tardist$/;"	m
+DIST_DEFAULT	.build/ouSednPxT8/Makefile	/^DIST_DEFAULT = tardist$/;"	m
+DLBASE	.build/latest/Makefile	/^DLBASE = $(BASEEXT)$/;"	m
+DLBASE	.build/ouSednPxT8/Makefile	/^DLBASE = $(BASEEXT)$/;"	m
+DLEXT	.build/latest/Makefile	/^DLEXT = so$/;"	m
+DLEXT	.build/ouSednPxT8/Makefile	/^DLEXT = so$/;"	m
+DLSRC	.build/latest/Makefile	/^DLSRC = dl_dlopen.xs$/;"	m
+DLSRC	.build/ouSednPxT8/Makefile	/^DLSRC = dl_dlopen.xs$/;"	m
+DOC_INSTALL	.build/latest/Makefile	/^DOC_INSTALL = $(ABSPERLRUN) -MExtUtils::Command::MM -e 'perllocal_install' --$/;"	m
+DOC_INSTALL	.build/ouSednPxT8/Makefile	/^DOC_INSTALL = $(ABSPERLRUN) -MExtUtils::Command::MM -e 'perllocal_install' --$/;"	m
+ECHO	.build/latest/Makefile	/^ECHO = echo$/;"	m
+ECHO	.build/ouSednPxT8/Makefile	/^ECHO = echo$/;"	m
+ECHO_N	.build/latest/Makefile	/^ECHO_N = echo -n$/;"	m
+ECHO_N	.build/ouSednPxT8/Makefile	/^ECHO_N = echo -n$/;"	m
+EQUALIZE_TIMESTAMP	.build/latest/Makefile	/^EQUALIZE_TIMESTAMP = $(ABSPERLRUN) -MExtUtils::Command -e 'eqtime' --$/;"	m
+EQUALIZE_TIMESTAMP	.build/ouSednPxT8/Makefile	/^EQUALIZE_TIMESTAMP = $(ABSPERLRUN) -MExtUtils::Command -e 'eqtime' --$/;"	m
+EXE_EXT	.build/latest/Makefile	/^EXE_EXT = $/;"	m
+EXE_EXT	.build/ouSednPxT8/Makefile	/^EXE_EXT = $/;"	m
+EXPORT_LIST	.build/latest/Makefile	/^EXPORT_LIST        = $/;"	m
+EXPORT_LIST	.build/ouSednPxT8/Makefile	/^EXPORT_LIST        = $/;"	m
+Eg::Exception	.build/latest/eg/throws.pl	/^extends 'Eg::Exception';$/;"	e
+Eg::Exception	.build/latest/eg/throws.pl	/^package Eg::Exception;$/;"	p
+Eg::Exception	.build/ouSednPxT8/eg/throws.pl	/^extends 'Eg::Exception';$/;"	e
+Eg::Exception	.build/ouSednPxT8/eg/throws.pl	/^package Eg::Exception;$/;"	p
+Eg::Exception	eg/throws.pl	/^extends 'Eg::Exception';$/;"	e
+Eg::Exception	eg/throws.pl	/^package Eg::Exception;$/;"	p
+Eg::Exception::Bad	.build/latest/eg/throws.pl	/^package Eg::Exception::Bad;$/;"	p
+Eg::Exception::Bad	.build/ouSednPxT8/eg/throws.pl	/^package Eg::Exception::Bad;$/;"	p
+Eg::Exception::Bad	eg/throws.pl	/^package Eg::Exception::Bad;$/;"	p
+FALSE	.build/latest/Makefile	/^FALSE = false$/;"	m
+FALSE	.build/ouSednPxT8/Makefile	/^FALSE = false$/;"	m
+FIRST_MAKEFILE	.build/latest/Makefile	/^FIRST_MAKEFILE = Makefile$/;"	m
+FIRST_MAKEFILE	.build/ouSednPxT8/Makefile	/^FIRST_MAKEFILE = Makefile$/;"	m
+FIXIN	.build/latest/Makefile	/^FIXIN = $(ABSPERLRUN) -MExtUtils::MY -e 'MY->fixin(shift)' --$/;"	m
+FIXIN	.build/ouSednPxT8/Makefile	/^FIXIN = $(ABSPERLRUN) -MExtUtils::MY -e 'MY->fixin(shift)' --$/;"	m
+FULLEXT	.build/latest/Makefile	/^FULLEXT = MooseX\/Exception\/Base$/;"	m
+FULLEXT	.build/ouSednPxT8/Makefile	/^FULLEXT = MooseX\/Exception\/Base$/;"	m
+FULLPERL	.build/latest/Makefile	/^FULLPERL      = \/usr\/bin\/perl$/;"	m
+FULLPERL	.build/latest/Makefile	/^FULLPERL = \/usr\/bin\/perl$/;"	m
+FULLPERL	.build/ouSednPxT8/Makefile	/^FULLPERL      = \/usr\/bin\/perl$/;"	m
+FULLPERL	.build/ouSednPxT8/Makefile	/^FULLPERL = \/usr\/bin\/perl$/;"	m
+FULLPERLRUN	.build/latest/Makefile	/^FULLPERLRUN = $(FULLPERL)$/;"	m
+FULLPERLRUN	.build/ouSednPxT8/Makefile	/^FULLPERLRUN = $(FULLPERL)$/;"	m
+FULLPERLRUNINST	.build/latest/Makefile	/^FULLPERLRUNINST = $(FULLPERLRUN) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"$/;"	m
+FULLPERLRUNINST	.build/ouSednPxT8/Makefile	/^FULLPERLRUNINST = $(FULLPERLRUN) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"$/;"	m
+FULL_AR	.build/latest/Makefile	/^FULL_AR = \/usr\/bin\/ar$/;"	m
+FULL_AR	.build/ouSednPxT8/Makefile	/^FULL_AR = \/usr\/bin\/ar$/;"	m
+H_FILES	.build/latest/Makefile	/^H_FILES  = $/;"	m
+H_FILES	.build/ouSednPxT8/Makefile	/^H_FILES  = $/;"	m
+INSTALLARCHLIB	.build/latest/Makefile	/^INSTALLARCHLIB = $(PERLPREFIX)\/lib\/perl\/5.18$/;"	m
+INSTALLARCHLIB	.build/ouSednPxT8/Makefile	/^INSTALLARCHLIB = $(PERLPREFIX)\/lib\/perl\/5.18$/;"	m
+INSTALLBIN	.build/latest/Makefile	/^INSTALLBIN = $(PERLPREFIX)\/bin$/;"	m
+INSTALLBIN	.build/ouSednPxT8/Makefile	/^INSTALLBIN = $(PERLPREFIX)\/bin$/;"	m
+INSTALLDIRS	.build/latest/Makefile	/^INSTALLDIRS = site$/;"	m
+INSTALLDIRS	.build/ouSednPxT8/Makefile	/^INSTALLDIRS = site$/;"	m
+INSTALLMAN1DIR	.build/latest/Makefile	/^INSTALLMAN1DIR = none$/;"	m
+INSTALLMAN1DIR	.build/ouSednPxT8/Makefile	/^INSTALLMAN1DIR = none$/;"	m
+INSTALLMAN3DIR	.build/latest/Makefile	/^INSTALLMAN3DIR = none$/;"	m
+INSTALLMAN3DIR	.build/ouSednPxT8/Makefile	/^INSTALLMAN3DIR = none$/;"	m
+INSTALLPRIVLIB	.build/latest/Makefile	/^INSTALLPRIVLIB = $(PERLPREFIX)\/share\/perl\/5.18$/;"	m
+INSTALLPRIVLIB	.build/ouSednPxT8/Makefile	/^INSTALLPRIVLIB = $(PERLPREFIX)\/share\/perl\/5.18$/;"	m
+INSTALLSCRIPT	.build/latest/Makefile	/^INSTALLSCRIPT = $(PERLPREFIX)\/bin$/;"	m
+INSTALLSCRIPT	.build/ouSednPxT8/Makefile	/^INSTALLSCRIPT = $(PERLPREFIX)\/bin$/;"	m
+INSTALLSITEARCH	.build/latest/Makefile	/^INSTALLSITEARCH = $(SITEPREFIX)\/lib\/perl\/5.18.2$/;"	m
+INSTALLSITEARCH	.build/ouSednPxT8/Makefile	/^INSTALLSITEARCH = $(SITEPREFIX)\/lib\/perl\/5.18.2$/;"	m
+INSTALLSITEBIN	.build/latest/Makefile	/^INSTALLSITEBIN = $(SITEPREFIX)\/bin$/;"	m
+INSTALLSITEBIN	.build/ouSednPxT8/Makefile	/^INSTALLSITEBIN = $(SITEPREFIX)\/bin$/;"	m
+INSTALLSITELIB	.build/latest/Makefile	/^INSTALLSITELIB = $(SITEPREFIX)\/share\/perl\/5.18.2$/;"	m
+INSTALLSITELIB	.build/ouSednPxT8/Makefile	/^INSTALLSITELIB = $(SITEPREFIX)\/share\/perl\/5.18.2$/;"	m
+INSTALLSITEMAN1DIR	.build/latest/Makefile	/^INSTALLSITEMAN1DIR = $(SITEPREFIX)\/man\/man1$/;"	m
+INSTALLSITEMAN1DIR	.build/ouSednPxT8/Makefile	/^INSTALLSITEMAN1DIR = $(SITEPREFIX)\/man\/man1$/;"	m
+INSTALLSITEMAN3DIR	.build/latest/Makefile	/^INSTALLSITEMAN3DIR = $(SITEPREFIX)\/man\/man3$/;"	m
+INSTALLSITEMAN3DIR	.build/ouSednPxT8/Makefile	/^INSTALLSITEMAN3DIR = $(SITEPREFIX)\/man\/man3$/;"	m
+INSTALLSITESCRIPT	.build/latest/Makefile	/^INSTALLSITESCRIPT = $(SITEPREFIX)\/bin$/;"	m
+INSTALLSITESCRIPT	.build/ouSednPxT8/Makefile	/^INSTALLSITESCRIPT = $(SITEPREFIX)\/bin$/;"	m
+INSTALLVENDORARCH	.build/latest/Makefile	/^INSTALLVENDORARCH = $(VENDORPREFIX)\/lib\/perl5$/;"	m
+INSTALLVENDORARCH	.build/ouSednPxT8/Makefile	/^INSTALLVENDORARCH = $(VENDORPREFIX)\/lib\/perl5$/;"	m
+INSTALLVENDORBIN	.build/latest/Makefile	/^INSTALLVENDORBIN = $(VENDORPREFIX)\/bin$/;"	m
+INSTALLVENDORBIN	.build/ouSednPxT8/Makefile	/^INSTALLVENDORBIN = $(VENDORPREFIX)\/bin$/;"	m
+INSTALLVENDORLIB	.build/latest/Makefile	/^INSTALLVENDORLIB = $(VENDORPREFIX)\/share\/perl5$/;"	m
+INSTALLVENDORLIB	.build/ouSednPxT8/Makefile	/^INSTALLVENDORLIB = $(VENDORPREFIX)\/share\/perl5$/;"	m
+INSTALLVENDORMAN1DIR	.build/latest/Makefile	/^INSTALLVENDORMAN1DIR = $(VENDORPREFIX)\/share\/man\/man1$/;"	m
+INSTALLVENDORMAN1DIR	.build/ouSednPxT8/Makefile	/^INSTALLVENDORMAN1DIR = $(VENDORPREFIX)\/share\/man\/man1$/;"	m
+INSTALLVENDORMAN3DIR	.build/latest/Makefile	/^INSTALLVENDORMAN3DIR = $(VENDORPREFIX)\/share\/man\/man3$/;"	m
+INSTALLVENDORMAN3DIR	.build/ouSednPxT8/Makefile	/^INSTALLVENDORMAN3DIR = $(VENDORPREFIX)\/share\/man\/man3$/;"	m
+INSTALLVENDORSCRIPT	.build/latest/Makefile	/^INSTALLVENDORSCRIPT = $(VENDORPREFIX)\/bin$/;"	m
+INSTALLVENDORSCRIPT	.build/ouSednPxT8/Makefile	/^INSTALLVENDORSCRIPT = $(VENDORPREFIX)\/bin$/;"	m
+INST_ARCHAUTODIR	.build/latest/Makefile	/^INST_ARCHAUTODIR = $(INST_ARCHLIB)\/auto\/$(FULLEXT)$/;"	m
+INST_ARCHAUTODIR	.build/ouSednPxT8/Makefile	/^INST_ARCHAUTODIR = $(INST_ARCHLIB)\/auto\/$(FULLEXT)$/;"	m
+INST_ARCHLIB	.build/latest/Makefile	/^INST_ARCHLIB = blib\/arch$/;"	m
+INST_ARCHLIB	.build/ouSednPxT8/Makefile	/^INST_ARCHLIB = blib\/arch$/;"	m
+INST_ARCHLIBDIR	.build/latest/Makefile	/^INST_ARCHLIBDIR  = $(INST_ARCHLIB)\/MooseX\/Exception$/;"	m
+INST_ARCHLIBDIR	.build/ouSednPxT8/Makefile	/^INST_ARCHLIBDIR  = $(INST_ARCHLIB)\/MooseX\/Exception$/;"	m
+INST_AUTODIR	.build/latest/Makefile	/^INST_AUTODIR     = $(INST_LIB)\/auto\/$(FULLEXT)$/;"	m
+INST_AUTODIR	.build/ouSednPxT8/Makefile	/^INST_AUTODIR     = $(INST_LIB)\/auto\/$(FULLEXT)$/;"	m
+INST_BIN	.build/latest/Makefile	/^INST_BIN = blib\/bin$/;"	m
+INST_BIN	.build/ouSednPxT8/Makefile	/^INST_BIN = blib\/bin$/;"	m
+INST_BOOT	.build/latest/Makefile	/^INST_BOOT        = $/;"	m
+INST_BOOT	.build/ouSednPxT8/Makefile	/^INST_BOOT        = $/;"	m
+INST_DYNAMIC	.build/latest/Makefile	/^INST_DYNAMIC     = $/;"	m
+INST_DYNAMIC	.build/ouSednPxT8/Makefile	/^INST_DYNAMIC     = $/;"	m
+INST_LIB	.build/latest/Makefile	/^INST_LIB = blib\/lib$/;"	m
+INST_LIB	.build/ouSednPxT8/Makefile	/^INST_LIB = blib\/lib$/;"	m
+INST_LIBDIR	.build/latest/Makefile	/^INST_LIBDIR      = $(INST_LIB)\/MooseX\/Exception$/;"	m
+INST_LIBDIR	.build/ouSednPxT8/Makefile	/^INST_LIBDIR      = $(INST_LIB)\/MooseX\/Exception$/;"	m
+INST_MAN1DIR	.build/latest/Makefile	/^INST_MAN1DIR = blib\/man1$/;"	m
+INST_MAN1DIR	.build/ouSednPxT8/Makefile	/^INST_MAN1DIR = blib\/man1$/;"	m
+INST_MAN3DIR	.build/latest/Makefile	/^INST_MAN3DIR = blib\/man3$/;"	m
+INST_MAN3DIR	.build/ouSednPxT8/Makefile	/^INST_MAN3DIR = blib\/man3$/;"	m
+INST_SCRIPT	.build/latest/Makefile	/^INST_SCRIPT = blib\/script$/;"	m
+INST_SCRIPT	.build/ouSednPxT8/Makefile	/^INST_SCRIPT = blib\/script$/;"	m
+INST_STATIC	.build/latest/Makefile	/^INST_STATIC      = $/;"	m
+INST_STATIC	.build/ouSednPxT8/Makefile	/^INST_STATIC      = $/;"	m
+LD	.build/latest/Makefile	/^LD = cc$/;"	m
+LD	.build/ouSednPxT8/Makefile	/^LD = cc$/;"	m
+LDDLFLAGS	.build/latest/Makefile	/^LDDLFLAGS = -shared -L\/usr\/local\/lib -fstack-protector$/;"	m
+LDDLFLAGS	.build/ouSednPxT8/Makefile	/^LDDLFLAGS = -shared -L\/usr\/local\/lib -fstack-protector$/;"	m
+LDFLAGS	.build/latest/Makefile	/^LDFLAGS =  -fstack-protector -L\/usr\/local\/lib$/;"	m
+LDFLAGS	.build/ouSednPxT8/Makefile	/^LDFLAGS =  -fstack-protector -L\/usr\/local\/lib$/;"	m
+LDFROM	.build/latest/Makefile	/^LDFROM = $(OBJECT)$/;"	m
+LDFROM	.build/ouSednPxT8/Makefile	/^LDFROM = $(OBJECT)$/;"	m
+LIBC	.build/latest/Makefile	/^LIBC = $/;"	m
+LIBC	.build/ouSednPxT8/Makefile	/^LIBC = $/;"	m
+LIBPERL_A	.build/latest/Makefile	/^LIBPERL_A = libperl.a$/;"	m
+LIBPERL_A	.build/ouSednPxT8/Makefile	/^LIBPERL_A = libperl.a$/;"	m
+LIB_EXT	.build/latest/Makefile	/^LIB_EXT = .a$/;"	m
+LIB_EXT	.build/ouSednPxT8/Makefile	/^LIB_EXT = .a$/;"	m
+LINKTYPE	.build/latest/Makefile	/^LINKTYPE = dynamic$/;"	m
+LINKTYPE	.build/ouSednPxT8/Makefile	/^LINKTYPE = dynamic$/;"	m
+MACROEND	.build/latest/Makefile	/^MACROEND = $/;"	m
+MACROEND	.build/ouSednPxT8/Makefile	/^MACROEND = $/;"	m
+MACROSTART	.build/latest/Makefile	/^MACROSTART = $/;"	m
+MACROSTART	.build/ouSednPxT8/Makefile	/^MACROSTART = $/;"	m
+MAKE	.build/latest/Makefile	/^MAKE = make$/;"	m
+MAKE	.build/ouSednPxT8/Makefile	/^MAKE = make$/;"	m
+MAKEFILE_OLD	.build/latest/Makefile	/^MAKEFILE_OLD = Makefile.old$/;"	m
+MAKEFILE_OLD	.build/ouSednPxT8/Makefile	/^MAKEFILE_OLD = Makefile.old$/;"	m
+MAKEMAKER	.build/latest/Makefile	/^MAKEMAKER   = \/usr\/share\/perl\/5.18\/ExtUtils\/MakeMaker.pm$/;"	m
+MAKEMAKER	.build/ouSednPxT8/Makefile	/^MAKEMAKER   = \/usr\/share\/perl\/5.18\/ExtUtils\/MakeMaker.pm$/;"	m
+MAKE_APERL_FILE	.build/latest/Makefile	/^MAKE_APERL_FILE = Makefile.aperl$/;"	m
+MAKE_APERL_FILE	.build/ouSednPxT8/Makefile	/^MAKE_APERL_FILE = Makefile.aperl$/;"	m
+MAN1EXT	.build/latest/Makefile	/^MAN1EXT = 1p$/;"	m
+MAN1EXT	.build/ouSednPxT8/Makefile	/^MAN1EXT = 1p$/;"	m
+MAN1PODS	.build/latest/Makefile	/^MAN1PODS = $/;"	m
+MAN1PODS	.build/ouSednPxT8/Makefile	/^MAN1PODS = $/;"	m
+MAN3EXT	.build/latest/Makefile	/^MAN3EXT = 3pm$/;"	m
+MAN3EXT	.build/ouSednPxT8/Makefile	/^MAN3EXT = 3pm$/;"	m
+MAN3PODS	.build/latest/Makefile	/^MAN3PODS = $/;"	m
+MAN3PODS	.build/ouSednPxT8/Makefile	/^MAN3PODS = $/;"	m
+MAP_TARGET	.build/latest/Makefile	/^MAP_TARGET    = perl$/;"	m
+MAP_TARGET	.build/ouSednPxT8/Makefile	/^MAP_TARGET    = perl$/;"	m
+MKPATH	.build/latest/Makefile	/^MKPATH = $(ABSPERLRUN) -MExtUtils::Command -e 'mkpath' --$/;"	m
+MKPATH	.build/ouSednPxT8/Makefile	/^MKPATH = $(ABSPERLRUN) -MExtUtils::Command -e 'mkpath' --$/;"	m
+MM_REVISION	.build/latest/Makefile	/^MM_REVISION = 66600$/;"	m
+MM_REVISION	.build/ouSednPxT8/Makefile	/^MM_REVISION = 66600$/;"	m
+MM_Unix_VERSION	.build/latest/Makefile	/^MM_Unix_VERSION = 6.66$/;"	m
+MM_Unix_VERSION	.build/ouSednPxT8/Makefile	/^MM_Unix_VERSION = 6.66$/;"	m
+MM_VERSION	.build/latest/Makefile	/^MM_VERSION  = 6.66$/;"	m
+MM_VERSION	.build/ouSednPxT8/Makefile	/^MM_VERSION  = 6.66$/;"	m
+MOD_INSTALL	.build/latest/Makefile	/^MOD_INSTALL = $(ABSPERLRUN) -MExtUtils::Install -e 'install([ from_to => {@ARGV}, verbose => '\\''$(VERBINST)'\\'', uninstall_shadows => '\\''$(UNINST)'\\'', dir_mode => '\\''$(PERM_DIR)'\\'' ]);' --$/;"	m
+MOD_INSTALL	.build/ouSednPxT8/Makefile	/^MOD_INSTALL = $(ABSPERLRUN) -MExtUtils::Install -e 'install([ from_to => {@ARGV}, verbose => '\\''$(VERBINST)'\\'', uninstall_shadows => '\\''$(UNINST)'\\'', dir_mode => '\\''$(PERM_DIR)'\\'' ]);' --$/;"	m
+MV	.build/latest/Makefile	/^MV = mv$/;"	m
+MV	.build/ouSednPxT8/Makefile	/^MV = mv$/;"	m
+Manifest	.build/latest/Makefile	/^	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'eval { maniadd({q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}}) } ' \\$/;"	m
+Manifest	.build/latest/Makefile	/^	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'exit unless -e q{META.yml};' \\$/;"	m
+Manifest	.build/latest/Makefile	/^	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'exit unless -f q{META.json};' \\$/;"	m
+Manifest	.build/latest/Makefile	/^	$(PERLRUN) "-MExtUtils::Manifest=manicopy,maniread" \\$/;"	m
+Manifest	.build/ouSednPxT8/Makefile	/^	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'eval { maniadd({q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}}) } ' \\$/;"	m
+Manifest	.build/ouSednPxT8/Makefile	/^	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'exit unless -e q{META.yml};' \\$/;"	m
+Manifest	.build/ouSednPxT8/Makefile	/^	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'exit unless -f q{META.json};' \\$/;"	m
+Manifest	.build/ouSednPxT8/Makefile	/^	$(PERLRUN) "-MExtUtils::Manifest=manicopy,maniread" \\$/;"	m
+Moose	.build/latest/eg/throws.pl	/^use Moose;$/;"	u
+Moose	.build/latest/lib/MooseX/Exception/Base.pm	/^use Moose;$/;"	u
+Moose	.build/ouSednPxT8/eg/throws.pl	/^use Moose;$/;"	u
+Moose	.build/ouSednPxT8/lib/MooseX/Exception/Base.pm	/^use Moose;$/;"	u
+Moose	eg/throws.pl	/^use Moose;$/;"	u
+Moose	lib/MooseX/Exception/Base.pm	/^use Moose;$/;"	u
+Moose::Role	.build/latest/lib/MooseX/Exception/Base/Stringify.pm	/^use Moose::Role;$/;"	u
+Moose::Role	.build/ouSednPxT8/lib/MooseX/Exception/Base/Stringify.pm	/^use Moose::Role;$/;"	u
+Moose::Role	lib/MooseX/Exception/Base/Stringify.pm	/^use Moose::Role;$/;"	u
+MooseX::Exception::Base	.build/latest/eg/throws.pl	/^extends 'MooseX::Exception::Base';$/;"	e
+MooseX::Exception::Base	.build/latest/lib/MooseX/Exception/Base.pm	/^package MooseX::Exception::Base;$/;"	p
+MooseX::Exception::Base	.build/ouSednPxT8/eg/throws.pl	/^extends 'MooseX::Exception::Base';$/;"	e
+MooseX::Exception::Base	.build/ouSednPxT8/lib/MooseX/Exception/Base.pm	/^package MooseX::Exception::Base;$/;"	p
+MooseX::Exception::Base	eg/throws.pl	/^extends 'MooseX::Exception::Base';$/;"	e
+MooseX::Exception::Base	lib/MooseX/Exception/Base.pm	/^package MooseX::Exception::Base;$/;"	p
+MooseX::Exception::Base::Stringify	.build/latest/lib/MooseX/Exception/Base.pm	/^use MooseX::Exception::Base::Stringify;$/;"	u
+MooseX::Exception::Base::Stringify	.build/latest/lib/MooseX/Exception/Base/Stringify.pm	/^package MooseX::Exception::Base::Stringify;$/;"	p
+MooseX::Exception::Base::Stringify	.build/ouSednPxT8/lib/MooseX/Exception/Base.pm	/^use MooseX::Exception::Base::Stringify;$/;"	u
+MooseX::Exception::Base::Stringify	.build/ouSednPxT8/lib/MooseX/Exception/Base/Stringify.pm	/^package MooseX::Exception::Base::Stringify;$/;"	p
+MooseX::Exception::Base::Stringify	lib/MooseX/Exception/Base.pm	/^use MooseX::Exception::Base::Stringify;$/;"	u
+MooseX::Exception::Base::Stringify	lib/MooseX/Exception/Base/Stringify.pm	/^package MooseX::Exception::Base::Stringify;$/;"	p
+NAME	.build/latest/Makefile	/^NAME = MooseX::Exception::Base$/;"	m
+NAME	.build/ouSednPxT8/Makefile	/^NAME = MooseX::Exception::Base$/;"	m
+NAME_SYM	.build/latest/Makefile	/^NAME_SYM = MooseX_Exception_Base$/;"	m
+NAME_SYM	.build/ouSednPxT8/Makefile	/^NAME_SYM = MooseX_Exception_Base$/;"	m
+NOECHO	.build/latest/Makefile	/^NOECHO = @$/;"	m
+NOECHO	.build/ouSednPxT8/Makefile	/^NOECHO = @$/;"	m
+NOOP	.build/latest/Makefile	/^NOOP = $(TRUE)$/;"	m
+NOOP	.build/ouSednPxT8/Makefile	/^NOOP = $(TRUE)$/;"	m
+OBJECT	.build/latest/Makefile	/^OBJECT = $/;"	m
+OBJECT	.build/ouSednPxT8/Makefile	/^OBJECT = $/;"	m
+OBJ_EXT	.build/latest/Makefile	/^OBJ_EXT = .o$/;"	m
+OBJ_EXT	.build/ouSednPxT8/Makefile	/^OBJ_EXT = .o$/;"	m
+OSNAME	.build/latest/Makefile	/^OSNAME = linux$/;"	m
+OSNAME	.build/ouSednPxT8/Makefile	/^OSNAME = linux$/;"	m
+OSVERS	.build/latest/Makefile	/^OSVERS = 3.2.0-58-generic$/;"	m
+OSVERS	.build/ouSednPxT8/Makefile	/^OSVERS = 3.2.0-58-generic$/;"	m
+O_FILES	.build/latest/Makefile	/^O_FILES  = $/;"	m
+O_FILES	.build/ouSednPxT8/Makefile	/^O_FILES  = $/;"	m
+PARENT_NAME	.build/latest/Makefile	/^PARENT_NAME = MooseX::Exception$/;"	m
+PARENT_NAME	.build/ouSednPxT8/Makefile	/^PARENT_NAME = MooseX::Exception$/;"	m
+PASTHRU	.build/latest/Makefile	/^PASTHRU = LIBPERL_A="$(LIBPERL_A)"\\$/;"	m
+PASTHRU	.build/ouSednPxT8/Makefile	/^PASTHRU = LIBPERL_A="$(LIBPERL_A)"\\$/;"	m
+PERL	.build/latest/Makefile	/^PERL = \/usr\/bin\/perl$/;"	m
+PERL	.build/ouSednPxT8/Makefile	/^PERL = \/usr\/bin\/perl$/;"	m
+PERLMAINCC	.build/latest/Makefile	/^PERLMAINCC = $(CC)$/;"	m
+PERLMAINCC	.build/ouSednPxT8/Makefile	/^PERLMAINCC = $(CC)$/;"	m
+PERLPREFIX	.build/latest/Makefile	/^PERLPREFIX = $(PREFIX)$/;"	m
+PERLPREFIX	.build/ouSednPxT8/Makefile	/^PERLPREFIX = $(PREFIX)$/;"	m
+PERLRUN	.build/latest/Makefile	/^PERLRUN = $(PERL)$/;"	m
+PERLRUN	.build/ouSednPxT8/Makefile	/^PERLRUN = $(PERL)$/;"	m
+PERLRUNINST	.build/latest/Makefile	/^PERLRUNINST = $(PERLRUN) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"$/;"	m
+PERLRUNINST	.build/ouSednPxT8/Makefile	/^PERLRUNINST = $(PERLRUN) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"$/;"	m
+PERL_ARCHIVE	.build/latest/Makefile	/^PERL_ARCHIVE       = $/;"	m
+PERL_ARCHIVE	.build/ouSednPxT8/Makefile	/^PERL_ARCHIVE       = $/;"	m
+PERL_ARCHIVE_AFTER	.build/latest/Makefile	/^PERL_ARCHIVE_AFTER = $/;"	m
+PERL_ARCHIVE_AFTER	.build/ouSednPxT8/Makefile	/^PERL_ARCHIVE_AFTER = $/;"	m
+PERL_ARCHLIB	.build/latest/Makefile	/^PERL_ARCHLIB = \/usr\/lib\/perl\/5.18$/;"	m
+PERL_ARCHLIB	.build/ouSednPxT8/Makefile	/^PERL_ARCHLIB = \/usr\/lib\/perl\/5.18$/;"	m
+PERL_CORE	.build/latest/Makefile	/^PERL_CORE = 0$/;"	m
+PERL_CORE	.build/ouSednPxT8/Makefile	/^PERL_CORE = 0$/;"	m
+PERL_DL_NONLAZY	.build/latest/Makefile	/^	PERL_DL_NONLAZY=1 $(FULLPERLRUN) "-MExtUtils::Command::MM" "-e" "test_harness($(TEST_VERBOSE), '$(INST_LIB)', '$(INST_ARCHLIB)')" $(TEST_FILES)$/;"	m
+PERL_DL_NONLAZY	.build/latest/Makefile	/^	PERL_DL_NONLAZY=1 $(FULLPERLRUN) $(TESTDB_SW) "-I$(INST_LIB)" "-I$(INST_ARCHLIB)" $(TEST_FILE)$/;"	m
+PERL_DL_NONLAZY	.build/ouSednPxT8/Makefile	/^	PERL_DL_NONLAZY=1 $(FULLPERLRUN) "-MExtUtils::Command::MM" "-e" "test_harness($(TEST_VERBOSE), '$(INST_LIB)', '$(INST_ARCHLIB)')" $(TEST_FILES)$/;"	m
+PERL_DL_NONLAZY	.build/ouSednPxT8/Makefile	/^	PERL_DL_NONLAZY=1 $(FULLPERLRUN) $(TESTDB_SW) "-I$(INST_LIB)" "-I$(INST_ARCHLIB)" $(TEST_FILE)$/;"	m
+PERL_INC	.build/latest/Makefile	/^PERL_INC = \/usr\/lib\/perl\/5.18\/CORE$/;"	m
+PERL_INC	.build/ouSednPxT8/Makefile	/^PERL_INC = \/usr\/lib\/perl\/5.18\/CORE$/;"	m
+PERL_LIB	.build/latest/Makefile	/^PERL_LIB = \/usr\/share\/perl\/5.18$/;"	m
+PERL_LIB	.build/ouSednPxT8/Makefile	/^PERL_LIB = \/usr\/share\/perl\/5.18$/;"	m
+PERL_MALLOC_DEF	.build/latest/Makefile	/^PERL_MALLOC_DEF = -DPERL_EXTMALLOC_DEF -Dmalloc=Perl_malloc -Dfree=Perl_mfree -Drealloc=Perl_realloc -Dcalloc=Perl_calloc$/;"	m
+PERL_MALLOC_DEF	.build/ouSednPxT8/Makefile	/^PERL_MALLOC_DEF = -DPERL_EXTMALLOC_DEF -Dmalloc=Perl_malloc -Dfree=Perl_mfree -Drealloc=Perl_realloc -Dcalloc=Perl_calloc$/;"	m
+PERM_DIR	.build/latest/Makefile	/^PERM_DIR = 755$/;"	m
+PERM_DIR	.build/ouSednPxT8/Makefile	/^PERM_DIR = 755$/;"	m
+PERM_RW	.build/latest/Makefile	/^PERM_RW = 644$/;"	m
+PERM_RW	.build/ouSednPxT8/Makefile	/^PERM_RW = 644$/;"	m
+PERM_RWX	.build/latest/Makefile	/^PERM_RWX = 755$/;"	m
+PERM_RWX	.build/ouSednPxT8/Makefile	/^PERM_RWX = 755$/;"	m
+PM_TO_BLIB	.build/latest/Makefile	/^PM_TO_BLIB = lib\/MooseX\/Exception\/Base.pm \\$/;"	m
+PM_TO_BLIB	.build/ouSednPxT8/Makefile	/^PM_TO_BLIB = lib\/MooseX\/Exception\/Base.pm \\$/;"	m
+POD2MAN	.build/latest/Makefile	/^POD2MAN = $(POD2MAN_EXE)$/;"	m
+POD2MAN	.build/ouSednPxT8/Makefile	/^POD2MAN = $(POD2MAN_EXE)$/;"	m
+POD2MAN_EXE	.build/latest/Makefile	/^POD2MAN_EXE = $(PERLRUN) "-MExtUtils::Command::MM" -e pod2man "--"$/;"	m
+POD2MAN_EXE	.build/ouSednPxT8/Makefile	/^POD2MAN_EXE = $(PERLRUN) "-MExtUtils::Command::MM" -e pod2man "--"$/;"	m
+POSTOP	.build/latest/Makefile	/^POSTOP = $(NOECHO) $(NOOP)$/;"	m
+POSTOP	.build/ouSednPxT8/Makefile	/^POSTOP = $(NOECHO) $(NOOP)$/;"	m
+PREFIX	.build/latest/Makefile	/^PREFIX = \/usr$/;"	m
+PREFIX	.build/ouSednPxT8/Makefile	/^PREFIX = \/usr$/;"	m
+PREOP	.build/latest/Makefile	/^PREOP = $(NOECHO) $(NOOP)$/;"	m
+PREOP	.build/ouSednPxT8/Makefile	/^PREOP = $(NOECHO) $(NOOP)$/;"	m
+RANLIB	.build/latest/Makefile	/^RANLIB = :$/;"	m
+RANLIB	.build/ouSednPxT8/Makefile	/^RANLIB = :$/;"	m
+RCS_LABEL	.build/latest/Makefile	/^RCS_LABEL = rcs -Nv$(VERSION_SYM): -q$/;"	m
+RCS_LABEL	.build/ouSednPxT8/Makefile	/^RCS_LABEL = rcs -Nv$(VERSION_SYM): -q$/;"	m
+RM_F	.build/latest/Makefile	/^RM_F = rm -f$/;"	m
+RM_F	.build/ouSednPxT8/Makefile	/^RM_F = rm -f$/;"	m
+RM_RF	.build/latest/Makefile	/^RM_RF = rm -rf$/;"	m
+RM_RF	.build/ouSednPxT8/Makefile	/^RM_RF = rm -rf$/;"	m
+SHAR	.build/latest/Makefile	/^SHAR = shar$/;"	m
+SHAR	.build/ouSednPxT8/Makefile	/^SHAR = shar$/;"	m
+SHELL	.build/latest/Makefile	/^SHELL = \/bin\/sh$/;"	m
+SHELL	.build/ouSednPxT8/Makefile	/^SHELL = \/bin\/sh$/;"	m
+SITEARCHEXP	.build/latest/Makefile	/^SITEARCHEXP = \/usr\/local\/lib\/perl\/5.18.2$/;"	m
+SITEARCHEXP	.build/ouSednPxT8/Makefile	/^SITEARCHEXP = \/usr\/local\/lib\/perl\/5.18.2$/;"	m
+SITELIBEXP	.build/latest/Makefile	/^SITELIBEXP = \/usr\/local\/share\/perl\/5.18.2$/;"	m
+SITELIBEXP	.build/ouSednPxT8/Makefile	/^SITELIBEXP = \/usr\/local\/share\/perl\/5.18.2$/;"	m
+SITEPREFIX	.build/latest/Makefile	/^SITEPREFIX = $(PREFIX)\/local$/;"	m
+SITEPREFIX	.build/ouSednPxT8/Makefile	/^SITEPREFIX = $(PREFIX)\/local$/;"	m
+SO	.build/latest/Makefile	/^SO = so$/;"	m
+SO	.build/ouSednPxT8/Makefile	/^SO = so$/;"	m
+SUFFIX	.build/latest/Makefile	/^SUFFIX = .gz$/;"	m
+SUFFIX	.build/ouSednPxT8/Makefile	/^SUFFIX = .gz$/;"	m
+TAR	.build/latest/Makefile	/^TAR = tar$/;"	m
+TAR	.build/ouSednPxT8/Makefile	/^TAR = tar$/;"	m
+TARFLAGS	.build/latest/Makefile	/^TARFLAGS = cvf$/;"	m
+TARFLAGS	.build/ouSednPxT8/Makefile	/^TARFLAGS = cvf$/;"	m
+TESTDB_SW	.build/latest/Makefile	/^TESTDB_SW = -d$/;"	m
+TESTDB_SW	.build/ouSednPxT8/Makefile	/^TESTDB_SW = -d$/;"	m
+TEST_F	.build/latest/Makefile	/^TEST_F = test -f$/;"	m
+TEST_F	.build/ouSednPxT8/Makefile	/^TEST_F = test -f$/;"	m
+TEST_FILE	.build/latest/Makefile	/^TEST_FILE = test.pl$/;"	m
+TEST_FILE	.build/ouSednPxT8/Makefile	/^TEST_FILE = test.pl$/;"	m
+TEST_FILES	.build/latest/Makefile	/^TEST_FILES = t\/*.t$/;"	m
+TEST_FILES	.build/ouSednPxT8/Makefile	/^TEST_FILES = t\/*.t$/;"	m
+TEST_TYPE	.build/latest/Makefile	/^TEST_TYPE=test_$(LINKTYPE)$/;"	m
+TEST_TYPE	.build/ouSednPxT8/Makefile	/^TEST_TYPE=test_$(LINKTYPE)$/;"	m
+TEST_VERBOSE	.build/latest/Makefile	/^TEST_VERBOSE=0$/;"	m
+TEST_VERBOSE	.build/ouSednPxT8/Makefile	/^TEST_VERBOSE=0$/;"	m
+TOUCH	.build/latest/Makefile	/^TOUCH = touch$/;"	m
+TOUCH	.build/ouSednPxT8/Makefile	/^TOUCH = touch$/;"	m
+TO_INST_PM	.build/latest/Makefile	/^TO_INST_PM = lib\/MooseX\/Exception\/Base.pm \\$/;"	m
+TO_INST_PM	.build/ouSednPxT8/Makefile	/^TO_INST_PM = lib\/MooseX\/Exception\/Base.pm \\$/;"	m
+TO_UNIX	.build/latest/Makefile	/^TO_UNIX = $(NOECHO) $(NOOP)$/;"	m
+TO_UNIX	.build/ouSednPxT8/Makefile	/^TO_UNIX = $(NOECHO) $(NOOP)$/;"	m
+TRUE	.build/latest/Makefile	/^TRUE = true$/;"	m
+TRUE	.build/ouSednPxT8/Makefile	/^TRUE = true$/;"	m
+UMASK_NULL	.build/latest/Makefile	/^UMASK_NULL = umask 0$/;"	m
+UMASK_NULL	.build/ouSednPxT8/Makefile	/^UMASK_NULL = umask 0$/;"	m
+UNINST	.build/latest/Makefile	/^UNINST = 0$/;"	m
+UNINST	.build/ouSednPxT8/Makefile	/^UNINST = 0$/;"	m
+UNINSTALL	.build/latest/Makefile	/^UNINSTALL = $(ABSPERLRUN) -MExtUtils::Command::MM -e 'uninstall' --$/;"	m
+UNINSTALL	.build/ouSednPxT8/Makefile	/^UNINSTALL = $(ABSPERLRUN) -MExtUtils::Command::MM -e 'uninstall' --$/;"	m
+USEMAKEFILE	.build/latest/Makefile	/^USEMAKEFILE = -f$/;"	m
+USEMAKEFILE	.build/ouSednPxT8/Makefile	/^USEMAKEFILE = -f$/;"	m
+VENDORARCHEXP	.build/latest/Makefile	/^VENDORARCHEXP = \/usr\/lib\/perl5$/;"	m
+VENDORARCHEXP	.build/ouSednPxT8/Makefile	/^VENDORARCHEXP = \/usr\/lib\/perl5$/;"	m
+VENDORLIBEXP	.build/latest/Makefile	/^VENDORLIBEXP = \/usr\/share\/perl5$/;"	m
+VENDORLIBEXP	.build/ouSednPxT8/Makefile	/^VENDORLIBEXP = \/usr\/share\/perl5$/;"	m
+VENDORPREFIX	.build/latest/Makefile	/^VENDORPREFIX = $(PREFIX)$/;"	m
+VENDORPREFIX	.build/ouSednPxT8/Makefile	/^VENDORPREFIX = $(PREFIX)$/;"	m
+VERBINST	.build/latest/Makefile	/^VERBINST = 0$/;"	m
+VERBINST	.build/ouSednPxT8/Makefile	/^VERBINST = 0$/;"	m
+VERSION	.build/latest/Makefile	/^VERSION = 0.0.4$/;"	m
+VERSION	.build/latest/lib/MooseX/Exception/Base.pm	/^our $VERSION     = version->new('0.0.4');$/;"	o
+VERSION	.build/latest/lib/MooseX/Exception/Base/Stringify.pm	/^our $VERSION     = version->new('0.0.4');$/;"	o
+VERSION	.build/ouSednPxT8/Makefile	/^VERSION = 0.0.4$/;"	m
+VERSION	.build/ouSednPxT8/lib/MooseX/Exception/Base.pm	/^our $VERSION     = version->new('0.0.4');$/;"	o
+VERSION	.build/ouSednPxT8/lib/MooseX/Exception/Base/Stringify.pm	/^our $VERSION     = version->new('0.0.4');$/;"	o
+VERSION	lib/MooseX/Exception/Base.pm	/^our $VERSION     = version->new('0.0.5');$/;"	o
+VERSION	lib/MooseX/Exception/Base/Stringify.pm	/^our $VERSION     = version->new('0.0.5');$/;"	o
+VERSION_FROM	.build/latest/Makefile	/^VERSION_FROM = $/;"	m
+VERSION_FROM	.build/ouSednPxT8/Makefile	/^VERSION_FROM = $/;"	m
+VERSION_MACRO	.build/latest/Makefile	/^VERSION_MACRO = VERSION$/;"	m
+VERSION_MACRO	.build/ouSednPxT8/Makefile	/^VERSION_MACRO = VERSION$/;"	m
+VERSION_SYM	.build/latest/Makefile	/^VERSION_SYM = 0_0_4$/;"	m
+VERSION_SYM	.build/ouSednPxT8/Makefile	/^VERSION_SYM = 0_0_4$/;"	m
+WARN_IF_OLD_PACKLIST	.build/latest/Makefile	/^WARN_IF_OLD_PACKLIST = $(ABSPERLRUN) -MExtUtils::Command::MM -e 'warn_if_old_packlist' --$/;"	m
+WARN_IF_OLD_PACKLIST	.build/ouSednPxT8/Makefile	/^WARN_IF_OLD_PACKLIST = $(ABSPERLRUN) -MExtUtils::Command::MM -e 'warn_if_old_packlist' --$/;"	m
+XS_DEFINE_VERSION	.build/latest/Makefile	/^XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\\"$(XS_VERSION)\\"$/;"	m
+XS_DEFINE_VERSION	.build/ouSednPxT8/Makefile	/^XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\\"$(XS_VERSION)\\"$/;"	m
+XS_FILES	.build/latest/Makefile	/^XS_FILES = $/;"	m
+XS_FILES	.build/ouSednPxT8/Makefile	/^XS_FILES = $/;"	m
+XS_VERSION	.build/latest/Makefile	/^XS_VERSION = 0.0.4$/;"	m
+XS_VERSION	.build/ouSednPxT8/Makefile	/^XS_VERSION = 0.0.4$/;"	m
+XS_VERSION_MACRO	.build/latest/Makefile	/^XS_VERSION_MACRO = XS_VERSION$/;"	m
+XS_VERSION_MACRO	.build/ouSednPxT8/Makefile	/^XS_VERSION_MACRO = XS_VERSION$/;"	m
+ZIP	.build/latest/Makefile	/^ZIP = zip$/;"	m
+ZIP	.build/ouSednPxT8/Makefile	/^ZIP = zip$/;"	m
+ZIPFLAGS	.build/latest/Makefile	/^ZIPFLAGS = -r$/;"	m
+ZIPFLAGS	.build/ouSednPxT8/Makefile	/^ZIPFLAGS = -r$/;"	m
+_stack	.build/latest/lib/MooseX/Exception/Base.pm	/^has _stack => ($/;"	a
+_stack	.build/ouSednPxT8/lib/MooseX/Exception/Base.pm	/^has _stack => ($/;"	a
+_stack	lib/MooseX/Exception/Base.pm	/^has _stack => ($/;"	a
+_stringify_attributes	.build/latest/lib/MooseX/Exception/Base.pm	/^sub _stringify_attributes {$/;"	s
+_stringify_attributes	.build/ouSednPxT8/lib/MooseX/Exception/Base.pm	/^sub _stringify_attributes {$/;"	s
+_stringify_attributes	lib/MooseX/Exception/Base.pm	/^sub _stringify_attributes {$/;"	s
+_verbose	.build/latest/lib/MooseX/Exception/Base.pm	/^has _verbose => ($/;"	a
+_verbose	.build/ouSednPxT8/lib/MooseX/Exception/Base.pm	/^has _verbose => ($/;"	a
+_verbose	lib/MooseX/Exception/Base.pm	/^has _verbose => ($/;"	a
+bad	.build/latest/eg/throws.pl	/^has bad => ($/;"	a
+bad	.build/latest/eg/throws.pl	/^sub bad {$/;"	s
+bad	.build/ouSednPxT8/eg/throws.pl	/^has bad => ($/;"	a
+bad	.build/ouSednPxT8/eg/throws.pl	/^sub bad {$/;"	s
+bad	eg/throws.pl	/^has bad => ($/;"	a
+bad	eg/throws.pl	/^sub bad {$/;"	s
+error	.build/latest/lib/MooseX/Exception/Base.pm	/^has error => ($/;"	a
+error	.build/ouSednPxT8/lib/MooseX/Exception/Base.pm	/^has error => ($/;"	a
+error	lib/MooseX/Exception/Base.pm	/^has error => ($/;"	a
+main	.build/latest/eg/throws.pl	/^package main;$/;"	p
+main	.build/ouSednPxT8/eg/throws.pl	/^package main;$/;"	p
+main	eg/throws.pl	/^package main;$/;"	p
+overload '""' => 'verbose'	.build/latest/lib/MooseX/Exception/Base.pm	/^use overload '""' => 'verbose';$/;"	u
+overload '""' => 'verbose'	.build/ouSednPxT8/lib/MooseX/Exception/Base.pm	/^use overload '""' => 'verbose';$/;"	u
+overload '""' => 'verbose'	lib/MooseX/Exception/Base.pm	/^use overload '""' => 'verbose';$/;"	u
+strict	.build/latest/eg/throws.pl	/^use strict;$/;"	u
+strict	.build/latest/lib/MooseX/Exception/Base/Stringify.pm	/^use strict;$/;"	u
+strict	.build/ouSednPxT8/eg/throws.pl	/^use strict;$/;"	u
+strict	.build/ouSednPxT8/lib/MooseX/Exception/Base/Stringify.pm	/^use strict;$/;"	u
+strict	eg/throws.pl	/^use strict;$/;"	u
+strict	lib/MooseX/Exception/Base/Stringify.pm	/^use strict;$/;"	u
+stringify	.build/latest/lib/MooseX/Exception/Base/Stringify.pm	/^has stringify => ($/;"	a
+stringify	.build/ouSednPxT8/lib/MooseX/Exception/Base/Stringify.pm	/^has stringify => ($/;"	a
+stringify	lib/MooseX/Exception/Base/Stringify.pm	/^has stringify => ($/;"	a
+stringify_post	.build/latest/lib/MooseX/Exception/Base/Stringify.pm	/^has stringify_post => ($/;"	a
+stringify_post	.build/ouSednPxT8/lib/MooseX/Exception/Base/Stringify.pm	/^has stringify_post => ($/;"	a
+stringify_post	lib/MooseX/Exception/Base/Stringify.pm	/^has stringify_post => ($/;"	a
+stringify_pre	.build/latest/lib/MooseX/Exception/Base/Stringify.pm	/^has stringify_pre => ($/;"	a
+stringify_pre	.build/ouSednPxT8/lib/MooseX/Exception/Base/Stringify.pm	/^has stringify_pre => ($/;"	a
+stringify_pre	lib/MooseX/Exception/Base/Stringify.pm	/^has stringify_pre => ($/;"	a
+throw	.build/latest/lib/MooseX/Exception/Base.pm	/^sub throw {$/;"	s
+throw	.build/ouSednPxT8/lib/MooseX/Exception/Base.pm	/^sub throw {$/;"	s
+throw	lib/MooseX/Exception/Base.pm	/^sub throw {$/;"	s
+verbose	.build/latest/lib/MooseX/Exception/Base.pm	/^sub verbose {$/;"	s
+verbose	.build/ouSednPxT8/lib/MooseX/Exception/Base.pm	/^sub verbose {$/;"	s
+verbose	lib/MooseX/Exception/Base.pm	/^sub verbose {$/;"	s
+version	.build/latest/lib/MooseX/Exception/Base.pm	/^use version;$/;"	u
+version	.build/latest/lib/MooseX/Exception/Base/Stringify.pm	/^use version;$/;"	u
+version	.build/ouSednPxT8/lib/MooseX/Exception/Base.pm	/^use version;$/;"	u
+version	.build/ouSednPxT8/lib/MooseX/Exception/Base/Stringify.pm	/^use version;$/;"	u
+version	lib/MooseX/Exception/Base.pm	/^use version;$/;"	u
+version	lib/MooseX/Exception/Base/Stringify.pm	/^use version;$/;"	u
+warnings	.build/latest/eg/throws.pl	/^use warnings;$/;"	u
+warnings	.build/latest/lib/MooseX/Exception/Base.pm	/^use warnings;$/;"	u
+warnings	.build/latest/lib/MooseX/Exception/Base/Stringify.pm	/^use warnings;$/;"	u
+warnings	.build/ouSednPxT8/eg/throws.pl	/^use warnings;$/;"	u
+warnings	.build/ouSednPxT8/lib/MooseX/Exception/Base.pm	/^use warnings;$/;"	u
+warnings	.build/ouSednPxT8/lib/MooseX/Exception/Base/Stringify.pm	/^use warnings;$/;"	u
+warnings	eg/throws.pl	/^use warnings;$/;"	u
+warnings	lib/MooseX/Exception/Base.pm	/^use warnings;$/;"	u
+warnings	lib/MooseX/Exception/Base/Stringify.pm	/^use warnings;$/;"	u

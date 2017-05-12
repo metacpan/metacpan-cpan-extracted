@@ -1,0 +1,4 @@
+Test::More
+XML::NamespaceSupport
+XML::SAX
+XML::Simple

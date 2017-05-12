@@ -1,0 +1,24 @@
+0.006
+  - Make the ::Read plugin properly work to recieve metrics
+    (tested with ZeroMQ)
+
+0.005
+  - Add repository metadata
+
+0.004
+  - Change all config keys to lower case, as puppet doesn't
+    seem to like upper case keys in hashes.
+
+0.003
+  - Fix data to be munged into a saner form so that we get the data
+    type information, the hostname and other metadata.
+  - Make GAUGE/COUNTER types strings rather than numbers.
+  - Add a sketch for a read plugin, untested / not complete yet!
+  - Fix various documentation bugs.
+
+0.002
+  - Fix important error in the SYNOPSIS for configuring outputs.
+
+0.001
+  - First version released on the the unsuspecting world.
+

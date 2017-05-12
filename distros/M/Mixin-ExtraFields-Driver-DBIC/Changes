@@ -1,0 +1,14 @@
+Revision history for Mixin-ExtraFields-Driver-DBIC
+
+0.004     2013-10-02 12:15:46 America/New_York
+        - update bugtracker, repo
+        - update to @RJBS dzil configuration
+
+0.003     2008-10-06
+          eliminate accidental prereq on parent.pm in tests
+
+0.002     2008-10-05
+          add prereq for module used in testing
+
+0.001     2008-10-03
+          first revision

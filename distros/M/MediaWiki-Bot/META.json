@@ -1,0 +1,108 @@
+{
+   "abstract" : "a high-level bot framework for interacting with MediaWiki wikis",
+   "author" : [
+      "Dan Collins <dcollins@cpan.org>",
+      "Mike.lifeguard <lifeguard@cpan.org>",
+      "Alex Rowe <alex.d.rowe@gmail.com>",
+      "Oleg Alexandrov <oleg.alexandrov@gmail.com>",
+      "jmax.code <jmax.code@gmail.com>",
+      "Stefan Petrea <stefan.petrea@gmail.com>",
+      "kc2aei <kc2aei@gmail.com>",
+      "bosborne@alum.mit.edu",
+      "Brian Obio <brianobio@gmail.com>",
+      "patch and bug report contributors"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MediaWiki-Bot",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "examples",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "English" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::Synopsis" : "0",
+            "Test::Vars" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Constant::Generate" : "0",
+            "Digest::MD5" : "2.39",
+            "Encode" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "HTML::Entities" : "3.28",
+            "LWP::Protocol::https" : "6.06",
+            "List::Util" : "0",
+            "MediaWiki::API" : "0.36",
+            "Module::Pluggable" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "List::MoreUtils" : "0",
+            "Test::Is" : "0",
+            "Test::More" : "0.96",
+            "Test::RequiresInternet" : "0",
+            "Test::Warn" : "0",
+            "blib" : "1.01",
+            "perl" : "5.008",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/MediaWiki-Bot/MediaWiki-Bot/issues"
+      },
+      "homepage" : "https://metacpan.org/module/MediaWiki::Bot",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/MediaWiki-Bot/MediaWiki-Bot.git",
+         "web" : "https://github.com/MediaWiki-Bot/MediaWiki-Bot"
+      }
+   },
+   "version" : "5.006003"
+}
+

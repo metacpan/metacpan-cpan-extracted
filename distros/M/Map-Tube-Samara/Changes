@@ -1,0 +1,43 @@
+0.06 2015-11-05T10:23:20+01:00
+ - Add EXAMPLE5 section to doc.
+ - Add commented line 3 to XML map.
+ - Fix commented line 2 in XML map.
+ - Implement station order.
+ - Rewrite XML map to new version with line IDs.
+
+0.05 2015-10-16T12:43:32+02:00
+ - Add tests for get_line_by_id(), get_line_by_name(), get_lines(), and
+   get_stations() methods.
+ - Fix test dependencies.
+
+0.04 2015-10-16T11:49:15+02:00
+ - Add lines to XML document.
+ - Update to Map::Tube 3.06.
+
+0.03 2015-10-13T10:31:14+02:00
+ - Add <?xml> header to XML document.
+ - Add 04-map.t test.
+ - Add EXAMPLE4 to doc.
+ - Add get_line_by_id() and get_line_by_name() methods to doc.
+ - Add tests for get_node_by_id() and get_node_by_name() methods.
+ - Improve description for get_lines() in doc.
+ - Move author tests to xt/ directory.
+ - Rewrite SEE ALSO section to new style.
+ - Update Module::Install to 1.16 version.
+
+0.02 2015-01-09T07:35:58+01:00
+ - Add EXAMPLE3 section to doc.
+ - Add Map::Tube::GraphViz, Map::Tube::Text::Table, Task::Map::Tube,
+   Map::Tube::Bucharest, Map::Tube::Budapest, Map::Tube::Dnipropetrovsk,
+   Map::Tube::Kazan, Map::Tube::Kharkiv, Map::Tube::Nanjing,
+   Map::Tube::Novosibirsk, Map::Tube::SaintPetersburg, Map::Tube::Tbilisi,
+   Map::Tube::Vienna and Map::Tube::Yekaterinburg to SEE ALSO section in
+   doc.
+ - Add get_lines() method to doc.
+ - Add get_stations() method to doc.
+ - Remove executable bit from samara-map.xml file.
+ - Remove obsolete utf8 pragma from EXAMPLE2 section in doc.
+ - Update copyright years to 2015.
+
+0.01 2014-12-09T10:30:44+01:00
+ - First version

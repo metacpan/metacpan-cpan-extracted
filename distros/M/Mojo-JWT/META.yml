@@ -1,0 +1,30 @@
+---
+abstract: 'JSON Web Token the Mojo way'
+author:
+  - 'Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.018, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-JWT
+provides:
+  Mojo::JWT:
+    file: lib/Mojo/JWT.pm
+    version: '0.05'
+recommends:
+  Crypt::OpenSSL::RSA: '0'
+requires:
+  Digest::SHA: '0'
+  MIME::Base64: '3.11'
+  Mojolicious: '5.00'
+resources:
+  bugtracker: http://github.com/jberger/Mojo-JWT/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jberger/Mojo-JWT
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

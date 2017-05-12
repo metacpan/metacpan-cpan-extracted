@@ -1,0 +1,35 @@
+---
+abstract: 'Send reminders to Google calendar event guests'
+author:
+  - 'Daniel Muey <http://drmuey.com/cpan_contact.pl>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.120630'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mail-GcalReminder
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  DateTime: 0
+  DateTime::Format::ISO8601: 0
+  DateTime::TimeZone: 0
+  Email::Send::SMTP::Gmail: 0
+  File::Temp: 0
+  HTML::Tiny: 0
+  Moo: 0
+  Net::Detect: 0
+  Role::Multiton::New: 0
+  Test::Deep: 0
+  Test::More: 0
+  Test::Warn: 0
+  iCal::Parser: 0
+version: 0.5

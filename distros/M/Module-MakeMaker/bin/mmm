@@ -1,0 +1,5 @@
+#!/usr/bin/perl
+
+use Module::MakeMaker;
+
+Module::MakeMaker->_run_command(@ARGV);

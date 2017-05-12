@@ -1,0 +1,77 @@
+{
+   "abstract" : "Reddit OAuth Plugin for Mojolicious::Plugin::Web::Auth",
+   "author" : [
+      "Olaf Alders <olaf@wundercounter.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-Web-Auth-Site-Reddit",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Code::TidyAll" : "0.50",
+            "Test::More" : "0.88",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Pit" : "0",
+            "FindBin" : "0",
+            "MIME::Base64" : "0",
+            "Mojo::Base" : "0",
+            "Mojolicious::Lite" : "0",
+            "Mojolicious::Plugin::Web::Auth" : "0.13",
+            "URI::FromHash" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/oalders/mojolicious-plugin-web-auth-site-reddit/issues"
+      },
+      "homepage" : "https://github.com/oalders/mojolicious-plugin-web-auth-site-reddit",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/oalders/mojolicious-plugin-web-auth-site-reddit.git",
+         "web" : "https://github.com/oalders/mojolicious-plugin-web-auth-site-reddit"
+      }
+   },
+   "version" : "0.000004",
+   "x_contributors" : [
+      "Olaf Alders <olaf@wundersolutions.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

@@ -1,0 +1,141 @@
+NAME
+
+    Mojo::JSON::MaybeXS - use JSON::MaybeXS as the JSON encoder for
+    Mojolicious
+
+SYNOPSIS
+
+     use Mojo::JSON::MaybeXS;
+     use Mojo::JSON qw/encode_json decode_json true false/;
+     
+     # Preload for scripts using Mojo::JSON
+     $ perl -MMojo::JSON::MaybeXS -S morbo myapp.pl
+     
+     # Must be set in environment for hypnotoad
+     $ PERL5OPT=-MMojo::JSON::MaybeXS hypnotoad myapp.pl
+
+DESCRIPTION
+
+    Mojo::JSON::MaybeXS is a monkey-patch module for using JSON::MaybeXS as
+    the JSON encoder for a Mojolicious application, or anything else using
+    Mojo::JSON. It must be loaded before Mojo::JSON so the new functions
+    will be properly exported.
+
+CAVEATS
+
+    JSON::MaybeXS may load different modules behind the scenes depending on
+    what is available, and these modules have slightly different behavior
+    from Mojo::JSON and occasionally from each other. References to the
+    behavior of JSON::MaybeXS below are actually describing the behavior
+    shared among the modules it loads.
+
+    JSON::MaybeXS is used with the options canonical, allow_nonref,
+    allow_unknown, allow_blessed, and convert_blessed. canonical enables
+    sorting of hash keys when encoding to JSON objects as Mojo::JSON does.
+    allow_nonref allows encoding and decoding of bare values outside of
+    hash/array references, since Mojo::JSON does not prevent this, in
+    accordance with RFC 7159 <http://tools.ietf.org/html/rfc7159>. The
+    other options prevent the encoder from blowing up when encountering
+    values that cannot be represented in JSON to better match the behavior
+    of Mojo::JSON; in most cases, where Mojo::JSON would stringify a
+    reference, JSON::MaybeXS with these settings will encode it to null.
+    See below for more specifics.
+
+    To better match the behavior of Mojo::JSON, certain options may be
+    enabled depending on the backend that is used. If Cpanel::JSON::XS
+    version 3.0112 or greater is loaded, it will be used with the option
+    stringify_infnan. If either Cpanel::JSON::XS of at least version 3.0206
+    or JSON::PP is loaded, it will be used with the option escape_slash.
+
+    As of this writing, the author has found the following
+    incompatibilities:
+
+ Object Conversion
+
+    Both JSON::MaybeXS and Mojo::JSON will attempt to call the TO_JSON
+    method of a blessed reference to produce a JSON-friendly structure. If
+    that method does not exist, Mojo::JSON or Cpanel::JSON::XS version
+    3.0207 or greater will stringify the object, while JSON::XS or JSON::PP
+    will always encode it to null.
+
+     print encode_json([DateTime->now]);
+     # Mojo::JSON or Cpanel::JSON::XS >= 3.0207: ["2014-11-30T04:31:13"]
+     # JSON::XS or JSON::PP: [null]
+
+ Unblessed References
+
+    JSON::MaybeXS does not allow unblessed references other than to hashes,
+    arrays, or the scalar values 0 and 1, and will encode them to null.
+    Mojo::JSON will treat all scalar references the same as references to 0
+    or 1 and will encode them to true or false depending on their boolean
+    value. Other references (code, filehandle, etc) will be stringified.
+
+     print encode_json([\'asdf', sub { 1 }]);
+     # Mojo::JSON: [true,"CODE(0x11d1650)"]
+     # JSON::MaybeXS: [null,null]
+
+ Escapes
+
+    Mojo::JSON currently escapes the slash character / for security
+    reasons, as well as the unicode characters u2028 and u2029.
+    Cpanel::JSON::XS version 3.0206 or greater and JSON::PP will have the
+    option set to escape the slash character, and JSON::XS does not escape
+    these characters. This does not affect decoding of the resulting JSON.
+
+     print encode_json(["/\x{2028}/\x{2029}"]);
+     # Mojo::JSON: ["\/\u2028\/\u2029"]
+     # Cpanel::JSON::XS >= 3.0206 or JSON::PP: ["\/ \/ "]
+     # JSON::XS: ["/ / "]
+     # Both decode to arrayref containing: "/\x{2028}/\x{2029}"
+
+ inf and nan
+
+    Mojo::JSON encodes inf and nan to strings. Cpanel::JSON::XS version
+    3.0112 or greater will also stringify inf and nan. However, JSON::XS or
+    JSON::PP will encode them as numbers (barewords) producing invalid
+    JSON.
+
+     print encode_json([9**9**9, -sin 9**9**9]);
+     # Mojo::JSON or Cpanel::JSON::XS >= 3.0112: ["inf","nan"] (on Linux)
+     # JSON::XS or JSON::PP: [inf,nan]
+
+ Upgraded Numbers
+
+    JSON::MaybeXS, if using JSON::XS or JSON::PP, will attempt to guess if
+    a value to be encoded is numeric or string based on its last usage.
+    Therefore, using a variable containing 13 in a string will cause it to
+    be encoded as "13" even if the variable itself was not changed.
+    Mojo::JSON or Cpanel::JSON::XS version 3.0109 or greater will encode 13
+    as 13 regardless of whether it has been used as a string.
+
+     my ($num1, $num2) = (13, 14);
+     my $str = "$num1";
+     print encode_json([$num1, $num2, $str]);
+     # Mojo::JSON or Cpanel::JSON::XS >= 3.0109: [13,14,"13"]
+     # JSON::XS or JSON::PP: ["13",14,"13"]
+
+BUGS
+
+    This is a monkey-patch of one of a few possible modules into another,
+    and they have incompatibilities, so there will probably be bugs. Report
+    any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book, dbook@cpan.org
+
+CREDITS
+
+    Sebastian Riedel, author of Mojolicious, for basic implementation.
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2014, Dan Book.
+
+    This library is free software; you may redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+SEE ALSO
+
+    Mojo::JSON, JSON::MaybeXS, Cpanel::JSON::XS, JSON::XS, JSON::PP
+

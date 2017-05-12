@@ -1,0 +1,11 @@
+0.01 - Jan 13 2010
+	initial
+
+0.02 - Jan 14 2010
+	minor bugs fixed, isa not overloaded
+
+0.03 - Jan 14 2010
+	adapted for custom writer/reader/accessor/clearer and is=>bare
+
+0.04 - Jan 14 2010
+	added a cleaner mode when "writer" is specified

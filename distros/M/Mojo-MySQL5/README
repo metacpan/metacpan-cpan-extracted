@@ -1,0 +1,280 @@
+NAME
+    Mojo::MySQL5 - Pure-Perl non-blocking I/O MySQL Connector
+
+SYNOPSIS
+      use Mojo::MySQL5;
+
+      # Create a table
+      my $mysql = Mojo::MySQL5->new('mysql://username@/test');
+      $mysql->db->query(
+        'create table names (id integer auto_increment primary key, name text)');
+
+      # Insert a few rows
+      my $db = $mysql->db;
+      $db->query('insert into names (name) values (?)', 'Sara');
+      $db->query('insert into names (name) values (?)', 'Stefan');
+
+      # Insert more rows in a transaction
+      {
+        my $tx = $db->begin;
+        $db->query('insert into names (name) values (?)', 'Baerbel');
+        $db->query('insert into names (name) values (?)', 'Wolfgang');
+        $tx->commit;
+      };
+
+      # Insert another row and return the generated id
+      say $db->query('insert into names (name) values (?)', 'Daniel')
+        ->last_insert_id;
+
+      # Select one row at a time
+      my $results = $db->query('select * from names');
+      while (my $next = $results->hash) {
+        say $next->{name};
+      }
+
+      # Select all rows blocking
+      $db->query('select * from names')
+        ->hashes->map(sub { $_->{name} })->join("\n")->say;
+
+      # Select all rows non-blocking
+      Mojo::IOLoop->delay(
+        sub {
+          my $delay = shift;
+          $db->query('select * from names' => $delay->begin);
+        },
+        sub {
+          my ($delay, $err, $results) = @_;
+          $results->hashes->map(sub { $_->{name} })->join("\n")->say;
+        }
+      )->wait;
+
+      # Send and receive notifications non-blocking
+      $mysql->pubsub->listen(foo => sub {
+        my ($pubsub, $payload) = @_;
+        say "foo: $payload";
+        $pubsub->notify(bar => $payload);
+      });
+      $mysql->pubsub->listen(bar => sub {
+        my ($pubsub, $payload) = @_;
+        say "bar: $payload";
+      });
+      $mysql->pubsub->notify(foo => 'MySQL rocks!');
+
+      Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
+DESCRIPTION
+    Mojo::MySQL5 makes MySQL <http://www.mysql.org> a lot of fun to use with
+    the Mojolicious <http://mojolicio.us> real-time web framework.
+
+    Database handles are cached automatically, so they can be reused
+    transparently to increase performance. And you can handle connection
+    timeouts gracefully by holding on to them only for short amounts of
+    time.
+
+      use Mojolicious::Lite;
+      use Mojo::MySQL5;
+
+      helper mysql =>
+        sub { state $mysql = Mojo::MySQL5->new('mysql://sri:s3cret@localhost/db') };
+
+      get '/' => sub {
+        my $c  = shift;
+        my $db = $c->mysql->db;
+        $c->render(json => $db->query('select now() as time')->hash);
+      };
+
+      app->start;
+
+    Every database connection can only handle one active query at a time,
+    this includes asynchronous ones. So if you start more than one, they
+    will be put on a waiting list and performed sequentially. To perform
+    multiple queries concurrently, you have to use multiple connections.
+
+      # Performed sequentially (10 seconds)
+      my $db = $mysql->db;
+      $db->query('select sleep(5)' => sub {...});
+      $db->query('select sleep(5)' => sub {...});
+ 
+      # Performed concurrently (5 seconds)
+      $mysql->db->query('select sleep(5)' => sub {...});
+      $mysql->db->query('select sleep(5)' => sub {...});
+
+    All cached database handles will be reset automatically if a new process
+    has been forked, this allows multiple processes to share the same
+    Mojo::MySQL5 object safely.
+
+    Note that this whole distribution is EXPERIMENTAL and will change
+    without warning!
+
+EVENTS
+    Mojo::MySQL5 inherits all events from Mojo::EventEmitter and can emit
+    the following new ones.
+
+  connection
+      $mysql->on(connection => sub {
+        my ($mysql, $db) = @_;
+        ...
+      });
+
+    Emitted when a new database connection has been established.
+
+ATTRIBUTES
+    Mojo::MySQL5 implements the following attributes.
+
+  max_connections
+      my $max = $mysql->max_connections;
+      $mysql  = $mysql->max_connections(3);
+
+    Maximum number of idle database handles to cache for future use,
+    defaults to 5.
+
+  migrations
+      my $migrations = $mysql->migrations;
+      $mysql         = $mysql->migrations(Mojo::MySQL5::Migrations->new);
+
+    Mojo::MySQL5::Migrations object you can use to change your database
+    schema more easily.
+
+      # Load migrations from file and migrate to latest version
+      $mysql->migrations->from_file('/home/sri/migrations.sql')->migrate;
+
+    MySQL does not support nested transactions and DDL transactions. DDL
+    statements cause implicit "COMMIT". "ROLLBACK" will be called if any
+    step of migration script fails, but only DML statements after the last
+    implicit or explicit "COMMIT" can be reverted. Not all MySQL storage
+    engines (like "MYISAM") support transactions.
+
+    This means database will most likely be left in unknown state if
+    migration script fails. Use this feature with caution and remember to
+    always backup your database.
+
+  pubsub
+      my $pubsub = $mysql->pubsub;
+      $mysql     = $mysql->pubsub(Mojo::MySQL5::PubSub->new);
+
+    Mojo::MySQL5::PubSub object you can use to send and receive
+    notifications very efficiently, by sharing a single database connection
+    with many consumers.
+
+      # Subscribe to a channel
+      $mysql->pubsub->listen(news => sub {
+        my ($pubsub, $payload) = @_;
+        say "Received: $payload";
+      });
+
+      # Notify a channel
+      $mysql->pubsub->notify(news => 'MySQL rocks!');
+
+  url
+      my $url = $mysql->url;
+      $url  = $mysql->url(
+        Mojo::MySQL5::URL->new('mysql://user@host/test?connect_timeout=0'));
+
+    Connection URL.
+
+  options
+    Use url->options.
+
+    See Mojo::MySQL5::Connection for list of supported options.
+
+  password
+    Use url->password.
+
+  username
+    Use url->username.
+
+METHODS
+    Mojo::MySQL5 inherits all methods from Mojo::EventEmitter and implements
+    the following new ones.
+
+  db
+      my $db = $mysql->db;
+
+    Get Mojo::MySQL5::Database object for a cached or newly created database
+    handle. The database handle will be automatically cached again when that
+    object is destroyed, so you can handle connection timeouts gracefully by
+    holding on to it only for short amounts of time.
+
+      # Add up all the money
+      say $mysql->db->query('select * from accounts')
+        ->hashes->reduce(sub { $a->{money} + $b->{money} });
+
+  from_string
+      $mysql = $mysql->from_string('mysql://user@/test');
+
+    Parse configuration from connection string.
+
+      # Just a database
+      $mysql->from_string('mysql:///db1');
+
+      # Username and database
+      $mysql->from_string('mysql://batman@/db2');
+
+      # Username, password, host and database
+      $mysql->from_string('mysql://batman:s3cret@localhost/db3');
+
+      # Username, domain socket and database
+      $mysql->from_string('mysql://batman@%2ftmp%2fmysql.sock/db4');
+
+      # Username, database and additional options
+      $mysql->from_string('mysql://batman@/db5?PrintError=1');
+
+  new
+      my $mysql = Mojo::MySQL5->new;
+      my $mysql = Mojo::MySQL5->new('mysql://user:s3cret@host:port/database');
+      my $mysql = Mojo::MySQL5->new(
+        url => Mojo::MySQL5::URL->new(
+          host => 'localhost',
+          port => 3306,
+          username => 'user',
+          password => 's3cret',
+          options => { utf8 => 1, found_rows => 1 }
+        )
+      );
+
+    Construct a new Mojo::MySQL5 object and parse connection string with
+    "from_string" if necessary.
+
+REFERENCE
+    This is the class hierarchy of the Mojo::MySQL5 distribution.
+
+    * Mojo::MySQL5
+
+    * Mojo::MySQL5::Connection
+
+    * Mojo::MySQL5::Database
+
+    * Mojo::MySQL5::Migrations
+
+    * Mojo::MySQL5::PubSub
+
+    * Mojo::MySQL5::Results
+
+    * Mojo::MySQL5::Transaction
+
+    * Mojo::MySQL5::URL
+
+AUTHOR
+    Jan Henning Thorsen, "jhthorsen@cpan.org".
+
+    Svetoslav Naydenov, "harryl@cpan.org".
+
+    A lot of code in this module is taken from Sebastian Riedel's Mojo::Pg.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2015, Svetoslav Naydenov.
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+SEE ALSO
+    <https://github.com/harry-bix/mojo-mysql5>,
+
+    Mojo::Pg Async Connector for PostgreSQL using DBD::Pg,
+    <https://github.com/kraih/mojo-pg>,
+
+    Mojo::mysql Async Connector for MySQL using DBD::mysql,
+    <https://github.com/jhthorsen/mojo-mysql>,
+
+    Mojolicious::Guides, <http://mojolicio.us>.
+

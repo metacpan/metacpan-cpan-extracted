@@ -1,0 +1,10 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/MARC/File/JSON.pm
+t/001-basic.t
+t/002-batch.t
+t/records.json

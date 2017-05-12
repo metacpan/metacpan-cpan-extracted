@@ -1,0 +1,11 @@
+ * Allow unix sockets (just needs some recognition of the format of
+   args)
+
+ * Extend test suite to run under multiple AnyEvent event loops, to
+   give it a real compatiblity test.
+
+ * Binary stats is not yet implemented.
+
+ * Other hashing mechanisms. Consistent Hashing (patches welcome)
+
+ * Implement cas/cas_multi/gets/gets_multi a la C::M::Fast.

@@ -1,0 +1,16 @@
+0.91	2013-05-07
+
+	Output json in canonical form so the tests can succeed.
+
+0.90	2013-05-06
+
+	Initial CPAN release.
+	Documenting...
+	Test for new, simplified song API.
+	Add json sub.
+	Example using abbreviated chords API.
+	Use Opus exporters.
+	Add chord subroutines for much easier access.
+	Small improvements and fixes.
+	Add method for editMode.
+	Add wrapup method to determine the desired value of editMode and set it.

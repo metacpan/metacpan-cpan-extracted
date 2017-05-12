@@ -1,0 +1,11 @@
+Revision history for MetaCPAN-API-Tiny: 1.150270
+
+1.150270  2015-01-27 18:12:48+01:00 Europe/Andorra
+	This module is now marked as deprecated.
+1.131730  2013-06-22 10:29:19 Europe/Amsterdam
+
+1.121020  2012-04-11 19:55:15 Europe/Amsterdam
+    Fix the dependency on HTTP::Tiny to be at least 0.017
+
+1.120920  2012-04-01 11:55:23 Europe/Amsterdam
+    Initial release of a Tiny version of MetaCPAN::API

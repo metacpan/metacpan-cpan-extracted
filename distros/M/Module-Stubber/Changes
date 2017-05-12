@@ -1,0 +1,6 @@
+Revision history for Module-Stubber
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.03    Added test dependency Dir::Self into Makefile.PL

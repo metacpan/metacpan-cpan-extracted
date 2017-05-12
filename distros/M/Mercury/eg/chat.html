@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:ng="http://angularjs.org" id="ng-app" ng-app="Mercury.Example.Chat">
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <title>Mercury Chat</title>
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" />
+        <style type="text/css">
+            [ng-click] {
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+
+        <div class="container-fluid" ng-controller="Chat">
+            <div class="row">
+                <div class="col-md-12">
+                    <ul id="tabs" class="nav nav-pills" role="tablist">
+                        <li role="presentation" class="active">
+                            <a role="tab" ng-click="show_home()" data-target="#home">
+                                Home
+                            </a>
+                        </li>
+                        <li role="presentation" ng-repeat="tab in tabs">
+                            <a role="tab" data-target="#tab-{{ $index }}" ng-click="show_tab( tab )">
+                                {{ tab.name }}
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+
+                        <div id="home" role="tabpanel" class="tab-pane fade in active">
+                            <form ng-submit="send( tab )">
+                                <div class="form-group">
+                                    <label for="name">Name</label>
+                                    <input type="text" class="form-control" id="name"
+                                        ng-model="name">
+                                </div>
+                                <div class="input-group">
+                                    <input type="text" class="form-control"
+                                        placeholder="Type a command!"
+                                        ng-model="text"
+                                    >
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-primary">Send</buttom>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div id="tab-{{ $index }}" role="tabpanel" class="tab-pane fade" ng-repeat="tab in tabs">
+                            <ul>
+                                <li ng-repeat="line in tab.lines">
+                                    {{ line[0].format('hh:mm:ss') }}
+                                    {{ line[1] }} &gt; {{ line[3] }}
+                                </li>
+                            </ul>
+                            <form ng-submit="send( tab )">
+                                <div class="input-group">
+                                    <input type="text" class="form-control"
+                                        placeholder="Say something!"
+                                        ng-model="tab.text"
+                                    >
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-primary">Send</buttom>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular-cookies.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular-sanitize.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.js"></script>
+        <script>
+            var app = angular.module( 'Mercury.Example.Chat', [ 'ngCookies', 'ngSanitize' ] );
+
+            function ChannelTab( $scope, name ) {
+                this.lines = [];
+                this.name = "#" + name;
+                this.ws = new WebSocket( $scope.server + '/bus/' + name );
+                var channel = this;
+                this.ws.onmessage = function ( event ) {
+                    var msg = angular.fromJson( event.data );
+                    msg[0] = moment( msg[0] );
+                    channel.lines.push( msg );
+                    $scope.$digest();
+                };
+            }
+
+            ChannelTab.prototype.send = function ( msg ) {
+                var out = msg.slice();
+                out[0] = out[0].format();
+                this.ws.send( angular.toJson( out ) );
+                this.lines.push( msg );
+            };
+
+            app.controller( 'Chat', [
+                '$scope',
+                function ( $scope ) {
+                    $scope.server = "ws://localhost:3000";
+                    $scope.name = "User" + Math.floor( Math.random() * 100000 );
+                    $scope.tabs = [
+                        new ChannelTab( $scope, "lobby" )
+                    ];
+
+                    $scope.send = function ( tab ) {
+                        tab.send( [ moment(), $scope.name, 'TEXT', tab.text ] );
+                        tab.text = '';
+                    };
+
+                    $scope.show_home = function () {
+                        $( '#tabs li:eq( 0 ) a' ).tab( 'show' );
+                    };
+
+                    $scope.show_tab = function ( tab ) {
+                        var i = $scope.tabs.indexOf( tab ) + 1;
+                        $( '#tabs li:eq( ' + i + ') a' ).tab( 'show' );
+                    };
+                }
+            ] );
+
+        </script>
+    </body>
+</html>
+

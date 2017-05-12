@@ -1,0 +1,1 @@
+.//*[not (descendant::*[self::declarationSpecifiers])]/structOrUnionSpecifier

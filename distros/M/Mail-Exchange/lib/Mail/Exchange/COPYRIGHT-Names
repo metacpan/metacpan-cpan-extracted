@@ -1,0 +1,22 @@
+The ID names from 
+	PidLidIDs.pm
+	PidTagDefs.pm
+	PidTagIDs.pm
+
+are taken from Microsoft documentation [MS-OXPROPS], which states:
+
+	Copyrights. This documentation is covered by
+	Microsoft copyrights. Regardless of any other terms
+	that are contained in the terms of use for the
+	Microsoft website that hosts this documentation,
+	you may make copies of it in order to develop
+	implementations of the technologies described
+	in the Open Specifications and may distribute
+	portions of it in your implementations using these
+	technologies or your documentation as necessary to
+	properly document the implementation. You may also
+	distribute in your implementation, with or without
+	modification, any schema, IDL’s, or code samples
+	that are included in the documentation. This
+	permission also applies to any documents that are
+	referenced in the Open Specifications.

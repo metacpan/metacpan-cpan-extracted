@@ -1,0 +1,44 @@
+{
+   "abstract" : "Calculate and evaluate thin plate splines",
+   "author" : [
+      "Steffen Mueller, E<lt>smueller@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-ThinPlateSpline",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::Typemaps::Default" : "0.05",
+            "ExtUtils::XSpp" : "0.15"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CppGuess" : "0.07",
+            "Module::Build" : "0.38",
+            "Module::Build::WithXSpp" : "0.10"
+         }
+      }
+   },
+   "provides" : {
+      "Math::ThinPlateSpline" : {
+         "file" : "lib/Math/ThinPlateSpline.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.06"
+}

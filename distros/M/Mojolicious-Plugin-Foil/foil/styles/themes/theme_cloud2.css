@@ -1,0 +1,46 @@
+/* ================================================================== */
+/* THEME: Cloud2
+ * dark_on_light
+ */
+@import url(theme_cloud.css);
+/* ================================================================== */
+/* THEME: Cloud2 - fonts
+ */
+/* ------------------------------------------------------------------ */
+/* Fonts */
+h1, h2, h3, h4 {
+  font-family: "Lucida Calligraphy", Merlin, "Black", verdana, helvetica, arial, sans-serif;
+  color: black;
+}
+
+/* ================================================================== */
+/* General */
+.verge, header,
+footer,
+.side {
+  color: #001133;
+  background: #8ca6d9;
+  border-color: navy;
+  border-radius: 0;
+}
+
+header,
+footer,
+.side {
+  background-image: url(cloud_h.jpg);
+  background-attachment: fixed;
+}
+
+#main-wrap {
+  color: #001133;
+  background: #b5c4e3;
+  border: solid 1px navy;
+  box-shadow: rgba(0, 0, 0, 0.8) 3px 3px 10px;
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+body {
+  color: #8ca6d9;
+  background: #001133 url(cloud_body.jpg) fixed;
+}

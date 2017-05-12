@@ -1,0 +1,1 @@
+.//declaration[not (descendant::*[self::declaration])][.//TYPEDEF]

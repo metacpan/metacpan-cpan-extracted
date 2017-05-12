@@ -1,0 +1,23 @@
+---
+abstract: 'Swat command'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Command-swat
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '0'
+  swat: '0'
+version: v0.0.5

@@ -1,0 +1,9 @@
+^\.
+\.bak$
+\.swp$
+^Makefile$
+^Makefile.old$
+^Module-Install-AuthorRequires-
+^cover_db\b
+^blib\b
+^pm_to_blib$

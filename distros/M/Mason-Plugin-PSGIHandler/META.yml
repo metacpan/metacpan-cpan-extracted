@@ -1,0 +1,31 @@
+---
+abstract: 'Filters related to HTML generation'
+author:
+  - 'Jonathan Swartz <swartz@pobox.com>'
+build_requires:
+  HTTP::Request::Common: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+  File::ShareDir::Install: 0.03
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mason-Plugin-PSGIHandler
+no_index:
+  directory:
+    - lib/Mason/Plugin/HTMLFilters
+requires:
+  Devel::StackTrace: 0
+  File::Path: 0
+  File::ShareDir: 0
+  Mason: 2.05
+  Plack: 0.9910
+  Try::Tiny: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mason-Plugin-PSGIHandler
+  repository: git://github.com/jonswar/perl-mason-plugin-psgihandler.git
+version: 0.06

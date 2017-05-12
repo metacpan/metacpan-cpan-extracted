@@ -1,0 +1,64 @@
+Revision history for Perl extension Math::ModInt.
+
+0.011   Mon, 18 May 2015 08:38:13 +0200
+        Compatibility fix:
+        - older perls (before 5.14.0) lost text of LoadingFailure
+          exception due to improper localization of $@
+
+0.010   (not released)
+
+0.009   Sun, 17 May 2015 23:17:21 +0200
+        Extension:
+        - add functions divmod and qmod
+        - add method new2
+
+0.008   Wed, 29 Apr 2015 22:57:39 +0200
+        Small extensions:
+        - add method centered_residue
+        Cleanup:
+        - disable operators "abs" and "int"
+        - remove some leftovers of Math::Pari support
+        Documentation:
+        - minor corrections
+
+0.007   Sun, 26 Aug 2012 14:56:35 +0200
+        Compatibility fixes:
+        - remove Math::Pari support for now,
+          waiting for upstream bugfix (#rt 67639)
+        - add workaround for bug in overload-1.19 (#rt 78149)
+        Performance improvement:
+        - add Math::ModInt::GF3
+
+0.006   (not released)
+        Performance improvement:
+        - add Math::ModInt::Pari to use Math::Pari if available
+        Test suite extension:
+        - add several maintainer-only checks
+
+0.005   Fri, 11 Jan 2010 19:20:07 +0100
+        Dependency update:
+        - disallow broken Math-BigInt-1.99 (rt #63215)
+        Documentation:
+        - minor corrections
+
+0.004   Sun, 3 Oct 2010 14:24:42 +0200
+        Performance improvement:
+        - determine maximal modulus for native arithmetic at runtime
+
+0.003   Fri, 1 Oct 2010 23:10:26 +0200
+        Compatibility fix:
+        - work around a bug in perl-5.6.2:
+          avoid using bigints in boolean context
+
+0.002   Mon, 27 Sep 2010 19:49:03 +0200
+        Test suite bug fixes:
+        - t/05_bigint.t got a couple of conversions wrong
+        - t/06_validation.t had trouble emulating a "loading failure"
+        Test suite compatibility fix:
+        - t/92_consistency.t used a perl-5.10 feature in regexes
+
+0.001   Sat, 25 Sep 2010 06:48:16 +0200
+        Initial version ready for release.
+
+0.000   Thu, 21 May 2009 22:36:27 +0200
+        Coding begins.  Author and Maintainer: Martin Becker.

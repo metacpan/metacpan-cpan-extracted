@@ -1,0 +1,52 @@
+#
+# $Id: typemap,v 33.4 2012/09/26 16:10:13 jettisu Exp $
+#
+# (c) 1999-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+
+PMQCHAR		T_PV
+
+MQCFH		T_MQCFH
+
+INPUT
+
+T_MQCFH
+    {
+	/* input a MQCFH */
+        STRLEN len = 0;
+	MQCFH default_MQCFH = { MQCFH_DEFAULT };
+
+	if (!SvROK($arg))
+	    croak(\"Reference expected for parameter $var\");
+	/* copy in the default value of structure... */
+	memcpy((char *)&$var, &default_MQCFH, sizeof(MQCFH));
+
+	if (hv_exists((HV*)SvRV($arg),\"Type\",4))
+	  $var.Type = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"Type\",4,0)));
+	if (hv_exists((HV*)SvRV($arg),\"StrucLength\",11))
+	  $var.StrucLength = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"StrucLength\",11,0)));
+	if (hv_exists((HV*)SvRV($arg),\"Version\",7))
+	  $var.Version = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"Version\",7,0)));
+	if (hv_exists((HV*)SvRV($arg),\"Command\",7))
+	  $var.Command = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"Command\",7,0)));
+	if (hv_exists((HV*)SvRV($arg),\"MsgSeqNumber\",12))
+	  $var.MsgSeqNumber = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"MsgSeqNumber\",12,0)));
+	if (hv_exists((HV*)SvRV($arg),\"Control\",7))
+	  $var.Control = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"Control\",7,0)));
+	if (hv_exists((HV*)SvRV($arg),\"CompCode\",8))
+	  $var.CompCode = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"CompCode\",8,0)));
+	if (hv_exists((HV*)SvRV($arg),\"Reason\",6))
+	  $var.Reason = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"Reason\",6,0)));
+	if (hv_exists((HV*)SvRV($arg),\"ParameterCount\",14))
+	  $var.ParameterCount = SvIV(*(hv_fetch((HV*)SvRV($arg),
+		\"ParameterCount\",14,0)));
+    }

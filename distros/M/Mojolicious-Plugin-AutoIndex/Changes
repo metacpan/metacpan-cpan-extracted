@@ -1,0 +1,7 @@
+0.0006    2013-07-17 17:39:31 Asia/Shanghai
+	  Fix missing prerequires by add prerequirs (Mojo::Base and others)
+0.0005    2013-06-15 00:49:30 Asia/Harbin
+          Adjust dist.ini.
+0.0004    2013-06-15 00:12:23 Asia/Harbin
+          Add Changes and Fix dist.ini, code function no changes.
+     

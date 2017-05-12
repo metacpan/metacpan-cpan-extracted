@@ -1,0 +1,6 @@
+TODO list for Perl module MooX::Role::Reconstruct
+
+- Fix bugs as discovered
+- Determine exactly why "class->reconstruct" works even though
+  "class->can('reconstruct')" fails in the test suite.
+- Add means to change name of installed method

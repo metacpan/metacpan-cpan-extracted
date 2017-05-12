@@ -1,0 +1,41 @@
+
+                       Math::RungeKutta.pm
+
+This module offers algorithms for the numerical integration of
+simultaneous differential equations of the form  dY/dt = F(t,Y)
+where Y is an array, or a hash, of variables whose initial values Y(0)
+are known; and F is a function known from the dynamics of the problem.
+
+Three main algorithms are offered.  rk2 is Heun's 2nd-order Runge-Kutta
+algorithm, which is relatively imprecise, but does have a large range
+of stability which might be useful in some problems.  rk4 is Merson's
+4th-order Runge-Kutta algorithm, which should be the normal choice in
+situations where the step-size must be specified.  rk_auto uses Merson's
+4th-order Runge-Kutta algorithm to adjust the step-size automatically
+to achieve a specified precision; this saves much fiddling around
+trying to choose a good step-size, and much CPU time by automatically
+increasing the step-size when the solution is changing only slowly.
+
+Perl is not the right language for high-end numerical integration like
+global weather simulation, colliding galaxies and so on, but as Gear
+says, "Many equations that are solved on digital computers can be
+classified as trivial by the fact that even with an inefficient method
+of solution, little computer time is used. Economics then dictates
+that the best method is the one that minimises the human time of
+preparation of the program."  The Lua version runs much faster.
+
+This module should be helpful in solving systems of differential
+equations which arise within a Perl context, such as economic, financial,
+demographic or ecological modelling, mechanical or process dynamics, etc.
+
+Also included are call-compatible translations into JavaScript and Lua.
+
+To install:
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+For up-to-date source, see http://search.cpan.org/~pjb
+
+Peter J Billam    www.pjb.com.au   www.pjb.com.au/comp/contact.html

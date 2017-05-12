@@ -1,0 +1,91 @@
+---
+abstract: 'Manage MongoDB documents as Moose objects'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Data::Faker: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  MooX::Types::MooseLike::Base: '0'
+  Test::Deep: '0'
+  Test::FailWarnings: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  Test::Requires: '0'
+  Test::Roo: '0'
+  Test::Roo::Role: '0'
+  Time::HiRes: '0'
+  lib: '0'
+  perl: v5.10.0
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: v5.10.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Meerkat
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Meerkat:
+    file: lib/Meerkat.pm
+    version: '0.015'
+  Meerkat::Collection:
+    file: lib/Meerkat/Collection.pm
+    version: '0.015'
+  Meerkat::Cursor:
+    file: lib/Meerkat/Cursor.pm
+    version: '0.015'
+  Meerkat::DateTime:
+    file: lib/Meerkat/DateTime.pm
+    version: '0.015'
+  Meerkat::Role::Document:
+    file: lib/Meerkat/Role/Document.pm
+    version: '0.015'
+  Meerkat::Types:
+    file: lib/Meerkat/Types.pm
+    version: '0.015'
+requires:
+  Carp: '0'
+  DateTime: '0'
+  Module::Runtime: '0'
+  MongoDB: '1'
+  MongoDB::OID: '0'
+  Moose: '2'
+  Moose::Role: '2'
+  MooseX::AttributeShortcuts: '0'
+  MooseX::Role::Logger: '0'
+  MooseX::Role::MongoDB: '0.01'
+  MooseX::Storage: '0'
+  MooseX::Storage::Engine: '0'
+  MooseX::Types: '0'
+  Scalar::Util: '0'
+  Syntax::Keyword::Junction: '0'
+  Tie::IxHash: '0'
+  Try::Tiny: '0'
+  Try::Tiny::Retry: '0.002'
+  Type::Params: '0'
+  Types::Standard: '0'
+  aliased: '0'
+  namespace::autoclean: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Meerkat/issues
+  homepage: https://github.com/dagolden/Meerkat
+  repository: https://github.com/dagolden/Meerkat.git
+version: '0.015'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Todd Bruner <todd.bruner@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

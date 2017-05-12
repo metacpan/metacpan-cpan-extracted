@@ -1,0 +1,220 @@
+NAME
+    Module::Build::Convert - Makefile.PL to Build.PL converter
+
+SYNOPSIS
+     use Module::Build::Convert;
+
+     # example arguments (empty %args is sufficient too)
+     %args = (Path => '/path/to/perl/distribution(s)',
+              Verbose => 2,
+              Use_Native_Order => 1,
+              Len_Indent => 4);
+
+     $make = Module::Build::Convert->new(%args);
+     $make->convert;
+
+DESCRIPTION
+    "ExtUtils::MakeMaker" has been a de-facto standard for the common
+    distribution of Perl modules; "Module::Build" is expected to supersede
+    "ExtUtils::MakeMaker" in some time (part of the Perl core as of 5.9.4).
+
+    The transition takes place slowly, as the converting process manually
+    achieved is yet an uncommon practice. The Module::Build::Convert
+    Makefile.PL parser is intended to ease the transition process.
+
+CONSTRUCTOR
+  new
+    Options:
+
+    * "Path"
+        Path to a Perl distribution. May point to a single distribution
+        directory or to one containing more than one distribution. Default:
+        ''
+
+    * "Makefile_PL"
+        Filename of the Makefile script. Default: Makefile.PL
+
+    * "Build_PL"
+        Filename of the Build script. Default: Build.PL
+
+    * "MANIFEST"
+        Filename of the MANIFEST file. Default: MANIFEST
+
+    * "RC"
+        Filename of the RC file. Default: .make2buildrc
+
+    * "Dont_Overwrite_Auto"
+        If a Build.PL already exists, output a notification and ask whether
+        it should be overwritten. Default: 1
+
+    * "Create_RC"
+        Create a RC file in the homedir of the current user. Default: 0
+
+    * "Parse_PPI"
+        Parse the Makefile.PL in the PPI Parser mode. Default: 0
+
+    * "Exec_Makefile"
+        Execute the Makefile.PL via 'do Makefile.PL'. Default: 0
+
+    * "Verbose"
+        Verbose mode. If set to 1, overridden defaults and skipped arguments
+        are printed while converting; if set to 2, output of "Verbose = 1"
+        and created Build script will be printed. May be set via the
+        make2build switches "-v" (mode 1) and "-vv" (mode 2). Default: 0
+
+    * "Debug"
+        Rudimentary debug facility for examining the parsing process.
+        Default: 0
+
+    * "Process_Code"
+        Process code embedded within the arguments list. Default: 0
+
+    * "Use_Native_Order"
+        Native sorting order. If set to 1, the native sorting order of the
+        Makefile arguments will be tried to preserve; it's equal to using
+        the make2build switch "-n". Default: 0
+
+    * "Len_Indent"
+        Indentation (character width). May be set via the make2build switch
+        "-l". Default: 3
+
+    * "DD_Indent"
+        "Data::Dumper" indendation mode. Mode 0 will be disregarded in favor
+        of 2. Default: 2
+
+    * "DD_Sortkeys"
+        "Data::Dumper" sort keys. Default: 1
+
+METHODS
+  convert
+    Parses the Makefile.PL's "WriteMakefile()" arguments and converts them
+    to "Module::Build" equivalents; subsequently the according Build.PL is
+    created. Takes no arguments.
+
+DATA SECTION
+  Argument conversion
+    "ExtUtils::MakeMaker" arguments followed by their "Module::Build"
+    equivalents. Converted data structures preserve their native structure,
+    that is, "HASH" -> "HASH", etc.
+
+     NAME                  module_name
+     DISTNAME              dist_name
+     ABSTRACT              dist_abstract
+     AUTHOR                dist_author
+     VERSION               dist_version
+     VERSION_FROM          dist_version_from
+     PREREQ_PM             requires
+     PL_FILES              PL_files
+     PM                    pm_files
+     MAN1PODS              pod_files
+     XS                    xs_files
+     INC                   include_dirs
+     INSTALLDIRS           installdirs
+     DESTDIR               destdir
+     CCFLAGS               extra_compiler_flags
+     EXTRA_META            meta_add
+     SIGN                  sign
+     LICENSE               license
+     clean.FILES           @add_to_cleanup
+
+  Default arguments
+    "Module::Build" default arguments may be specified as key/value pairs.
+    Arguments attached to multidimensional structures are unsupported.
+
+     #build_requires       HASH
+     #recommends           HASH
+     #conflicts            HASH
+     license               unknown
+     create_readme         1
+     create_makefile_pl    traditional
+
+    Value may be either a string or of type "SCALAR, ARRAY, HASH".
+
+  Sorting order
+    "Module::Build" arguments are sorted as enlisted herein. Additional
+    arguments, that don't occur herein, are lower prioritized and will be
+    inserted in unsorted order after preceedingly sorted arguments.
+
+     module_name
+     dist_name
+     dist_abstract
+     dist_author
+     dist_version
+     dist_version_from
+     requires
+     build_requires
+     recommends
+     conflicts
+     PL_files
+     pm_files
+     pod_files
+     xs_files
+     include_dirs
+     installdirs
+     destdir
+     add_to_cleanup
+     extra_compiler_flags
+     meta_add
+     sign
+     license
+     create_readme
+     create_makefile_pl
+
+  Begin code
+    Code that preceeds converted "Module::Build" arguments.
+
+     use strict;
+     use warnings;
+
+     use Module::Build;
+
+     $MAKECODE
+
+     my $b = Module::Build->new
+     $INDENT(
+
+  End code
+    Code that follows converted "Module::Build" arguments.
+
+     $INDENT);
+
+     $b->create_build_script;
+
+     $MAKECODE
+
+INTERNALS
+  co-opting "WriteMakefile()"
+    This behavior is no longer the default way to receive WriteMakefile()'s
+    arguments; the Makefile.PL is now statically parsed unless one forces
+    manually the co-opting of WriteMakefile().
+
+    In order to convert arguments, a typeglob from "WriteMakefile()" to an
+    internal sub will be set; subsequently Makefile.PL will be executed and
+    the arguments are then accessible to the internal sub.
+
+  Data::Dumper
+    Converted "ExtUtils::MakeMaker" arguments will be dumped by
+    "Data::Dumper's" "Dump()" and are then furtherly processed.
+
+BUGS & CAVEATS
+    "Module::Build::Convert" should be considered experimental as the
+    parsing of the Makefile.PL doesn't necessarily return valid arguments,
+    especially for Makefiles with bad or even worse, missing intendation.
+
+    The parsing process may sometimes hang with or without warnings in such
+    cases. Debugging by using the appropriate option/switch (see
+    CONSTRUCTOR/new) may reveal the root cause.
+
+SEE ALSO
+    <http://www.makemaker.org>, ExtUtils::MakeMaker, Module::Build,
+    <http://www.makemaker.org/wiki/index.cgi?ModuleBuildConversionGuide>
+
+AUTHOR
+    Steven Schubiger <schubiger@cpan.org>
+
+LICENSE
+    This program is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,9 @@
+Changes
+eg/mindcal
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+Mindcal.pm
+README
+t/Mindcal.t
+META.yml                                 Module meta-data (added by MakeMaker)

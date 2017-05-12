@@ -1,0 +1,189 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Makefile::GraphViz;
+
+my $layout = 'dot';
+GetOptions(
+    'help|h' => \(my $help),
+    'file|f=s' => \(my $makefile),
+    'all|a'  => \(my $make_all),
+    'out|o=s'  => \(my $outfile),
+    'edge-len=f' => \(my $edge_len),
+    'layout=s' => \($layout),
+    'debug' => \(my $debug),
+    'size|s=s' => \(my $size),
+) or die help();
+
+if ($help) { print help(); exit;  }
+
+sub help {
+    return <<'_EOC_';
+Usage:
+    gvmake [options] [target]*
+
+Options:
+    --all
+    -a                Plot all the goals.
+    -f <filename>
+    -file <filename>  Use filename as Makefile.
+    --help
+    -h                Print this help.
+    --size
+    -s <w>x<h>        Specify the size (both for width and height)
+    --out
+    -o <filename>     Use filename as output PNG file.
+    --edge-len <len>  Specify the "len" attribute for edges.
+    --debug           Generate .dot file rather than PNG
+
+_EOC_
+}
+
+my ($width, $height);
+($width, $height) = split 'x', $size if $size;
+
+my $parser = Makefile::GraphViz->new;
+
+$makefile ||= 'Makefile';
+warn "parsing $makefile...\n";
+$parser->parse($makefile) or die $parser->error;
+
+if ($make_all) {
+    my $gv = $parser->plot_all;
+    $outfile = "$makefile.png";
+    $gv->as_png($outfile);
+} else {
+    my $tar = shift @ARGV || $parser->target;
+    warn "plotting target $tar...\n";
+    my $gv = $parser->plot(
+        $tar,
+        init_args => {
+            width => $width, height => $height,
+            layout => $layout,
+        },
+        $edge_len ?
+            (edge_style => {
+                 len => $edge_len,
+                 color => 'red',
+            }) : (),
+    );
+    if ($debug || $outfile && $outfile =~ /\.dot$/i) {
+        if ($outfile) {
+            open my $out, ">$outfile" or
+                die "Can't open $outfile for writing: $!\n";
+            print $out $gv->as_debug;
+            close $out;
+            warn "$outfile generated.\n";
+        } else {
+            print $gv->as_debug;
+        }
+    } else {
+        $outfile ||= "$tar.png";
+        $gv->as_png($outfile);
+        warn "$outfile generated.\n";
+    }
+}
+
+__END__
+
+=head1 NAME
+
+gvmake - A make tool that generates pretty graphs from Makefiles
+
+=head1 SYNOPSIS
+
+    # print usage info to stdout:
+    gvmake -h
+
+    # if the default target is 'all', the following
+    # command will generate all.png
+    gvmake
+
+    # this command will generate 'test.png' where
+    # 'test' is a target defined in the Makefile:
+    gvmake test
+
+    # override the default output file name:
+    gvmake -o make.png test
+
+    # specify the Makefile name explicitly:
+    gvmake -f t/Makefile.old install
+
+    # generate Makefile.png which contains all the goals
+    gvmake -a
+
+    # specify the size of the output image:
+    gvmake -s 5x8    # width is 5 inch, and height is 8 inch
+
+    # use neato rather than the default dot layout program:
+    gvmake -o foo.dot -f foo.mk -a
+    neato -o a.png -Tpng foo.dot
+
+=head1 DESCRIPTION
+
+This is a make tool that generates pretty graphs for the building
+process according to user's Makefile instead of actually building
+something. It is a simple command-line frontend for the
+L<Makefile::GraphViz> module.
+
+For GNU makefile, it's I<highly> recommended to
+use L<Makefile::Parser>'s L<makesimple>
+script to convert your GNU makefile to the simplest form I<before> running
+this script. Because this L<Makefile::GraphViz> uses the
+toy L<Makefile::Parser> engine which can only handle a very limited
+set of GNU makefile features while the L<Makefile::Parser::GmakeDB> engine
+used by the L<makesimple> script reuses the GNU make executable
+to do the (first-pass) parsing.
+
+Thus you normally should do something like this:
+
+    cd dir_where_your_project_lives
+    makesimple -f your_makefile > simplest.mk
+    gvmake -f simplest.mk some_target
+
+Currently only PNG format and the default settings for the graph
+style are used. This inflexible design will be changed soon.
+
+=head1 TODO
+
+=over
+
+=item *
+
+Add more command-line options to control the graph appearance
+
+=item *
+
+To support more output file format
+
+=item *
+
+Add support for multiple goals passed in via command-line.
+
+=back
+
+=head1 BUGS
+
+Please report bugs or send wish-list to
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Makefile-GraphViz>.
+
+=head1 SEE ALSO
+
+L<Makefile::GraphViz>, L<Makefile::Parser>, L<plmake>.
+
+=head1 AUTHOR
+
+Zhang "agentzh" Yichun, E<lt>agentzh@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005, 2006, 2007 by Zhang "agentzh" Yichun. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+

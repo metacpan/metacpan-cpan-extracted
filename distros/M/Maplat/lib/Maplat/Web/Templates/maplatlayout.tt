@@ -1,0 +1,296 @@
+<html>
+    <head>
+        <link REL="stylesheet" TYPE="text/css" href="/static/maplat.css"></link>
+        <title>[% PageTitle %]</title>
+        <link rel="shortcut icon" href="/static/favicon.ico" type="image/vnd.microsoft.icon">
+        <link rel="icon" href="/static/favicon.ico" type="image/vnd.microsoft.icon">
+        <script type="text/javascript" src="/static/formhelpers.js"></script>
+        <script type="text/javascript" src="/static/ajaxhelpers.js"></script>
+        <script type="text/javascript" src="/static/jquery-1.3.2.min.js" ></script>
+        <script type="text/javascript" src="/static/jquery.MetaData.js"></script>
+        <script type="text/javascript" src="/static/jquery.colorize-1.5.0.js" ></script>
+        <script type="text/javascript" src="/static/jquery.sha1.js"></script>
+        <script type="text/javascript" src="/static/jquery.sparkline.js"></script>
+        <script type="text/javascript" src="/static/jquery.hashmask.js"></script>
+        <script type="text/javascript" src="/static/jquery.form.js"></script>
+        <script type="text/javascript" src="/static/jquery.FCKEditor.js"></script>
+        <script type="text/javascript" src="/static/jquery.sheet-0.53/jquery.sheet.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $("#MainDataTable").colorize({bgColor:'#F0F8F0',
+                                                altColor:'#E0E0F8',
+                                                oneClick:true,
+                                                ignoreHeaders :true
+                                            });
+                $("#HelperTable1").colorize({bgColor:'#F0F8F0',
+                                altColor:'#E0E0F8',
+                                oneClick:true,
+                                ignoreHeaders :true
+                            });    
+                $("#HelperTable2").colorize({bgColor:'#F0F8F0',
+                                altColor:'#E0E0F8',
+                                oneClick:true,
+                                ignoreHeaders :true
+                            });
+                $("#HelperTable3").colorize({bgColor:'#F0F8F0',
+                                altColor:'#E0E0F8',
+                                oneClick:true,
+                                ignoreHeaders :true
+                            });
+                $("#SubHelperTable1").colorize({bgColor:'#E0F8F8',
+                                altColor:'#F8F8E0',
+                                oneClick:false,
+                                ignoreHeaders :true
+                            });
+
+            });
+        </script>
+
+        [% IF ExtraHEADElements %]
+            [% ExtraHEADElements %]
+        [% END %]
+    </head>
+    <body
+    [% IF OnLoad %]
+        onLoad="[% OnLoad %]"
+    [% END %]
+    >
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" height="60px">
+            [% MainHeaderLogo %]
+        </table>
+        
+        [% IF header_info %]
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" height="20px">
+                <tr>
+                    <td bgcolor="#dce2ff" align="center">[% header_info %]</td>
+                </tr>
+            </table>
+        [% END %]
+        
+        [% IF header_message %]
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" height="60px">
+                <tr>
+                    <td bgcolor="#fff000" align="left">&nbsp;<img src="/pics/hackman.gif"></td>
+                    <td bgcolor="#fff000" colspan="3" align="center">[% header_message %]</td>
+                    <td bgcolor="#fff000" align="right"><img src="/pics/hackman.gif">&nbsp;</td>
+                </tr>
+            </table>
+        [% END %]
+
+        
+        [% IF PageTitle == "Login" %]
+            <table border="0" cellpadding="2" cellspacing="0" class="header" align="center">
+                <tr align="center" valign="center">
+                    <td align="center" width="[% toplink_width %]" class="rbspageactive">
+                        <a class="bodylink" href="/user/login">Login</a>
+                    </td>
+                </tr>
+            </table>
+        [% ELSIF PageTitle == "Logout" %]
+            <table border="0" cellpadding="2" cellspacing="0" class="header" align="center">
+                <tr align="center" valign="center">
+                    <td align="center" width="[% toplink_width %]" class="rbspageactive">
+                        <a class="bodylink" href="/user/logout">Logout</a>
+                    </td>
+                    <td align="center" width="[% toplink_width %]" class="rbspageinactive">
+                        <a class="bodylink" href="/user/login">Login</a>
+                    </td>
+                </tr>
+            </table>
+        [% ELSE %]
+            
+            <table border="0" cellpadding="2" cellspacing="0" class="header" align="center">
+                <tr align="center" valign="center">
+                    [% FOREACH menuItem IN menuItems %]
+                        <td align="center" width="[% toplink_width %]" class="[% menuItem.Class %]">
+                        [% IF menuItem.isActive == "1" %]
+                            <a class="bodylink" href="[% menuItem.link %]">[% menuItem.DisplayName %]</a>
+                        [% ELSE %]
+                            <div class="body_no_link">[% menuItem.DisplayName %]</div>
+                        [% END %]
+                        [% IF menuItem.warning %]
+                            <img src="/pics/rufzeichen.gif">[% menuItem.warning %]<img src="/pics/rufzeichen.gif">
+                        [% END %]
+                        </td>                        
+                    [% END %]
+
+
+                    [% IF HasSpecialLogo == "1" %]
+                        [% IF PageTitle == "LogoDay" %]
+                            <td align="center" width="[% toplink_width %]" class="specialpageactive">
+                        [% ELSE %]
+                            <td align="center" width="[% toplink_width %]" class="specialpageinactive">
+                        [% END %]
+                            <a class="bodylink" href="/user/special">LogoDay</a>
+                        </td>
+                    [% END %]
+
+                    [% IF userData.type == "user" %]
+                        [% IF PageTitle == "Change Password" %]
+                            <td align="center" width="[% toplink_width %]" class="rbspageactive">
+                        [% ELSE %]
+                            <td align="center" width="[% toplink_width %]" class="rbspageinactive">
+                        [% END %]
+                            <a class="bodylink" href="/user/pwchange">Password</a>
+                        </td>
+                    [% END %]
+
+                    <td align="center" width="[% toplink_width %]" class="rbspageinactive">
+                        <a class="bodylink" href="/user/logout" onClick="return confirmLogout()">Logout</a>
+                    </td>
+                    
+                    <td align="center" valign="center" width="[% toplink_width %]" class="rbspageinactive">
+                        <form name="viewselect" method="post" action="/user/viewselect">
+                            <select name="viewname" onChange="document.viewselect.submit();">
+                                <option value=""></option>
+                                [% FOREACH userView IN userViews %]
+                                    <option value="[% userView.name %]" class="[% userView.class %]">[% userView.name %]</option>
+                                [% END %]
+                            </select>
+                        </form>
+                    </td>
+
+
+                </tr>
+            </table>
+            [% IF PageTitle == "Scheduler" OR PageTitle == "Scheduler Filter" %]
+                <table border="0" cellpadding="2" cellspacing="0" class="header" align="center">
+                    <tr align="center" valign="center">
+                        [% IF PageTitle == "Scheduler" %]
+                            <td align="center" width="[% toplink_width %]" class="rbspageactive">
+                        [% ELSE %]
+                            <td align="center" width="[% toplink_width %]" class="rbspageinactive">
+                        [% END %]
+                            <a class="bodylink" href="/rbs/scheduler/main">Orders</a>
+                        </td>
+                        
+                        [% IF PageTitle == "Scheduler Filter" %]
+                            <td align="center" width="[% toplink_width %]" class="rbspageactive">
+                        [% ELSE %]
+                            <td align="center" width="[% toplink_width %]" class="rbspageinactive">
+                        [% END %]
+                            <a class="bodylink" href="/rbs/scheduler/filter">Filter</a>
+                        </td>
+                    </tr>
+                </table>
+                [% IF PageTitle == "Scheduler" AND filtercount > 0 %]
+                <table border="0" cellpadding="2" cellspacing="0" align="center">
+                    <tr class="odd" align="center" valign="center">
+                        <td align="center" valign="center" colspan="2">
+                            <form name="orders_quickfilter" method="post" action="[% webpath %]">
+                                Quickfilter: <select name="filtername" onChange="document.orders_quickfilter.submit();">
+                                    <option value=""></option>
+                                    [% FOREACH loadfilter IN loadfilters %]
+                                        <option value="[% loadfilter %]">[% loadfilter %]</option>
+                                    [% END %]
+                                </select>
+                                <input type="hidden" name="submitform" value="1">
+                                <input type="hidden" name="mode" value="loadfilter">
+                            </form>
+                        </td>
+                    </tr>
+                </table>
+                [% END %]
+
+            [% END %]
+            
+        [% END %]
+        </table>
+        </table>
+        </table>
+        <table border="0" width="100%" align="center" cellpadding="10">
+            <tr>
+                <td width="100%">
+                    <div id="dataarea" name="dataarea" align="center">
+                        XX_BODY_XX
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <br>
+        <table class="footer" width="400px" align="right" valign="top" border="0">            <tr>
+                <td colspan="3" height="20px">&nbsp;</td>
+            </tr>
+            <tr>
+                <th align="left">App</th>
+                <th align="left">Version</th>
+                <th align="left">Build</th>
+            </tr>
+            [% IF SVCVersion %]
+            <tr>
+                <td>Maplat SVC</td>
+                <td>[% SVCVersion %]</td>
+                <td>[% SVCBuildNum %]</td>
+            </tr>
+            [% END %]
+            [% IF WebGuiVersion %]
+            <tr>
+                <td>WebGUI</td>
+                <td>[% WebGuiVersion %]</td>
+                <td>[% WebGuiBuildNum %]</td>
+            </tr>
+            [% END %]
+            [% IF RBSWorkerVersion %]
+            <tr>
+                <td>RBS Worker</td>
+                <td>[% RBSWorkerVersion %]</td>
+                <td>[% RBSWorkerBuildNum %]</td>
+            </tr>
+            [% END %]
+            [% IF RBSAdmWorkerVersion %]
+            <tr>
+                <td>RBSAdm Worker</td>
+                <td>[% RBSAdmWorkerVersion %]</td>
+                <td>[% RBSAdmWorkerBuildNum %]</td>
+            </tr>
+            [% END %]
+            [% IF WDNEWorkerVersion %]
+            <tr>
+                <td>WDNE Worker</td>
+                <td>[% WDNEWorkerVersion %]</td>
+                <td>[% WDNEWorkerBuildNum %]</td>
+            </tr>
+            [% END %]
+            [% IF AFMWorkerVersion %]
+            <tr>
+                <td>AFM Worker</td>
+                <td>[% AFMWorkerVersion %]</td>
+                <td>[% AFMWorkerBuildNum %]</td>
+            </tr>
+            [% END %]
+            <tr>
+                <td>Doc. created</td>
+                <td colspan="2">[% CurrentTime %]</td>
+            </tr>
+            [% IF PageTitle != "Login" && PageTitle != "Logout" %]
+                <tr>
+                    <td>Sessionrefresh</td>
+                    <td colspan="2">
+                        <div id="lastsessionrefresh">[% CurrentTime %]</div>
+                    </td>
+                </tr>
+            [% END %]
+            <tr>
+                <td><img src="/pics/mascot_small.gif"></td>
+                <td colspan="2">
+                    (C) 2008-2010 Rene Schickbauer<br/>
+                    <i>This software is licensed under the<br/>
+                    Artistic License 2.0</i><br/>
+                </td>
+            </tr>
+        </table>
+        [% IF PageTitle != "Login" && PageTitle != "Logout" %]
+            <script>
+                startSessionRefresh('lastsessionrefresh', '/user/sessionrefresh');
+            </script>
+        [% END %]
+        
+        [% IF BrowserData %]
+        <!-- BrowserWorkarounds activated for:
+            Browser: [% BrowserData.Browser %]
+            Browser detection from UserAgent string [% BrowserData.UserAgent %]
+        -->
+        [% END %]
+        
+    </body>
+</html>

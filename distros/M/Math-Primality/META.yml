@@ -1,0 +1,33 @@
+---
+abstract: 'Check for primes with Perl'
+author:
+  - "Jonathan \"Duke\" Leto <jonathan@leto.net>"
+build_requires:
+  POSIX: 0
+  Test::Exception: 0
+  Test::More: 0
+  bigint: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Math-Primality
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Exporter: 0
+  Math::GMPz: 0.34
+  base: 0
+  constant: 0
+  integer: 0
+  strict: 0
+  warnings: 0
+resources:
+  homepage: http://github.com/leto/math--primality
+  repository: http://github.com/leto/math--primality.git
+version: 0.08

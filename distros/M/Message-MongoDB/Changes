@@ -1,0 +1,6 @@
+1.142810  2014-10-07 22:04:59-07:00 America/Los_Angeles
+    - Moved to Dist::Zilla
+    - Switched update to multi and upsert
+
+0.1 Fri Apr  5 21:50:31 PDT 2013
+    - First release

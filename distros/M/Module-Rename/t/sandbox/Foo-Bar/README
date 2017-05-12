@@ -1,0 +1,24 @@
+######################################################################
+    Foo::Bar 0.01
+######################################################################
+
+NAME
+    Foo::Bar - blah blah blah
+
+SYNOPSIS
+        use Foo::Bar;
+
+DESCRIPTION
+    Foo::Bar blah blah blah.
+
+EXAMPLES
+      $ perl -MFoo::Bar -le 'print $foo'
+
+LEGALESE
+    Copyright 2005 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2005, Mike Schilli <cpan@perlmeister.com>
+

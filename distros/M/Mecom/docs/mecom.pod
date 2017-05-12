@@ -1,0 +1,310 @@
+=head1 NAME
+
+Mecom - A Perl program for protein contact interfaces evolutive analysis
+
+=head1 VERSION
+
+Version 1.15
+
+=head1 INTRODUCTION
+
+MECOM is a command line program. It can be launch just by typing mecom in the command line. However, several params are request in order to carry out the analysis.
+
+Once MECOM is correctly installed, this manual can be obtained by typing:
+
+$ man mecom
+
+Also, you can obtain a summarized help as following:
+
+$ mecom --help
+
+NOTE: This manual is also available at http://mecom.hval.es/manual
+
+=head1 SYNOPSIS
+
+$ mecom [--pdb <pdbfile> --contactfile <strfile>] --chain <chainid> --alignment <msafile>
+[ --proximityth <float> --exposureth <float> --exposuretherror <float> --informat <msaformat>
+--oformat <msaformat> --gc <int> --ocontact <filepath> --report <htmpath>]
+
+=head1 OPTION SUMMARY
+
+(*) Required arguments
+[1] Just one of them is required
+
+--help
+    Display a summarized help document
+
+--pdb [1]
+    A valid PDB file path
+
+--contactfile [1]
+    A valid *.str file path. See Contact File section for further explanation.
+
+--alignment (*)
+    A valid multiple sequence alignment (MSA) file path
+
+--chain (*)
+    Chain Id annotated at PDB file for the current subunits
+
+--ocontact
+    A valid file path where output structural analysis will be written (default 'data.str'). See Contact File section for further explanation.
+
+--exposureth
+    Exposure threshold. The value used to distinguish between exposed and buried residues (default 0.05)
+
+--exposuretherror
+    Exposure threshold margin (default 0)
+
+--proximityth
+    The value in Angstroms for the maximum distance between two atoms to be considered as contact pair (default 4)
+
+--informat
+    File format for multiple alignment provided by the user (default 'fasta'). See MSA Valid format section for a complete list of readable MSA formats
+
+--oformat
+File format for multiple alignment retrieved by MECOM (default 'clustalw'). See MSA Valid format section for a complete list of readable MSA formats
+
+--gc
+Genetic code for sequences within the input alignment (default 0). See Genetic codes section for a complete list of genetic codes available
+
+--report
+    File path where the program will write a HTML report with the results (default ./report.html)
+
+--struct
+    Carry out just the structural analysis
+
+
+=head1 OUTPUT
+
+This program provide multiple output files in order to report a detailed view of each step. Four different classes of files are created after running:
+
+Structural file: A file (usually with the extension *.str) containing the results from structural analysis (surface exposure and residue proximity). Path can be set by the option --ocontact
+
+Sub-alignments: Several MSA files, one for each existent category, with the specified format by the option --informat (default fasta)
+
+Evolutive results: Several files, one for each existent category, with the extension *.dat containing the results from evolutive analysis (carried out by PAML -yn00-)
+
+HTML report: A html file with a summary of the input data and params, path to the recently created files, statistical results and the list of codon positions corresponding to each category. This html output file path can be set by the option --report
+
+=head1 DATA PREPARATION
+
+Before run MECOM, input data (PDB or MSA files) must meet certain criteria:
+
+For PDB files: chain ids must be unique. That it means, in PDBs with more than one atomic models such as homomonomers, each chain must be identified differently than the others. If it is necessary, the user will need to edit the PDB file before use it as structural input data
+
+For MSA files: the alignment must be an ungapped alignment. Unexpected error could be occur if MSA file contains gaps.
+
+=head1 CONTACT FILE
+
+The called "Contact file", which usually uses the extension .str, is a plain text file which contains a table with the results of the structural analysis carried out by the first step of the program. It contains the information about which subunits and residues are involved in intermolecular contacts, as well as the information about exposure and residue type.
+
+Example:
+
+Raw Table for subunit M
+
+ChainID	ChainID2	Res num.	AA	AA2	        Contact (th=4)	Exposition (th=0.05)
+
+M	    A	        1	        I	V(A)|K(A)|D(A)|T(A)	1	1
+
+M	    A	        2	        T	V(A)|L(A)|T(A)	        1	1
+
+M	    A	        3	        A	L(A)|T(A)|E(A)	        1	1
+
+M	    A|D	        4	        K	S(D)|E(A)|R(A)|L(A)	1	1
+
+M	    --	        5	        P	-	                0	1
+
+M	    A	        6	        A	K(A)|S(A)	        1	1
+
+M	    A	        7	        K	K(A)|S(A)|E(A)	        1	1
+
+M	    A|L	        8	        T	S(A)|K(A)|A(A)|K(L)	1	1
+
+
+ChainID: The subunit where the current residue is part from
+
+ChainID2: The subunit or subunits where the residue/s is/are in contact with the current residue
+
+Res num.: The PDB annotated residue number
+
+AA: The current residue type
+
+AA2: The residue type/s and, in brackets, the corresponding owner chain
+
+Contact (th=prox. th.): If the value is 1, the current residue is in close proximity (<--proximityth) from other subunit and 0 if not
+
+Exposition (th= exp. th.): If the value is 1, the current residue is exposed (>--exposureth) and 0 if not
+
+This information is used as conventional database. MECOM extract fractions of this table in order to build multiple sequences alignments as evolutionary data.
+
+This contact file can be used as input. By this way, the more heavy computational process is bypassed. On the contrary, if the input contact file is not set, MECOM will write this file into the specified path through the argument --ocontact. This is set as data.str by default.
+
+
+
+=head1 GENETIC CODES
+
+There are 11 different genetic codes, corresponding to transl_table of GENEBANK. As value for the argument --gc, the user must provide one of the following integers to specify the genetic code used to translate DNA alignments. The default value is 0 (Standar).
+
+Value	Genetic code
+
+0	Standar
+
+1	Mammalian mitochondrial
+
+2	Yeast mitochondrial
+
+3	Mold mitochondrial
+
+4	Invertebrate mitochondrial
+
+5	Ciliate nuclear
+
+6	Echinoderm mitochondrial
+
+7	Euplotid mitochondrial
+
+8	Alternative yeast nuclear
+
+9	Ascidian mitochondrial
+
+10	Blepharisma nuclear
+
+
+If the selected genetic code do not correspond with the origin of the user provided MSA, stop codons may be introduced in translation. If it occurs, the program will not work correctly and a unexpected error will be dumped.
+
+
+=head1 MSA VALID FORMATS
+
+By the argument --informat and/or --oformat, user must give a valid MSA format (see above). The valid MSA formats are listed below:
+
+
+bl2seq	    Bl2seq Blast output
+
+clustalw    clustalw (.aln) format
+
+emboss	    EMBOSS water and needle format
+
+fasta	    FASTA format
+
+maf	    Multiple Alignment Format
+
+mase	    mase (seaview) format
+
+mega	    MEGA format
+
+meme	    MEME format
+
+msf	    msf (GCG) format
+
+nexus	    Swofford et al NEXUS format
+
+pfam	    Pfam sequence alignment format
+
+phylip	    Felsenstein PHYLIP format
+
+prodom	    prodom (protein domain) format
+
+psi	    PSI-BLAST format
+
+selex	    selex (hmmer) format
+
+stockholm   stockholm format
+
+Specifically, mase, stockholm and prodom have only been implemented for input.
+If no format is specified and a filename is given, then the module will attempt to deduce it from the filename suffix. If this is unsuccessful, fasta format is assumed.
+
+The format name is case insensitive; FASTA, Fasta and fasta are all treated equivalently.
+
+=head1 SINGLE SUBUNIT ANALYSIS EXAMPLES
+
+The workflow for a single subunit analysis is carried out as explained in home page. The simplest way to launch it, using the datasets provided as examples here, is leaving all the optionals values by default, and only the requested arguments are introduced:
+
+$ mecom --pdb 2OCC.pdb --chain M --alignment ChainM_alignment.fas
+
+By this way, MECOM will carry out the analysis for the subunit M, also called subunit 8B.
+
+
+In complex IV of respiratory chain, the subunits A, B and C are encoded by the mitochondrial genome. Thus, the option --gc, whose default value is 0 (Standar) must be set to 1 (Vertebrate mitochondrial) in the case of the example alignments. Thus, the command line instruction must be as follow to analyze a mtDNA-encoded subunit:
+
+$ mecom --pdb 2OCC.pdb --chain A --alignment ChainA_alignment.fas --gc 1
+
+
+Those above explained examples will be computationally slow due to the heavy and unperformed structural analysis. However, once those calcules has been carried out, a new file with the structural result is written an allocated in the path specified by the option --ocontact (default data.str). Thus, if this file is provided by the user as an input file through the option --contactfile, the analysis will be faster:
+
+$ mecom --pdb 2OCC.pdb --contactfile data_for_chain_A.str --chain A --alignment ChainA_alignment.fas --gc 1
+
+By this way, the option --pdb becomes optional.
+
+
+Other interesting option is --contactwith. The user can choose what chains will be considered to label close residues as contact ones. For examples, the user wants ignore contacts from chain A with the others mtDNA-encoded subunits (B and C), and only consider this residues in close proximity with nDNA-encoded subunits. To get this kind of analysis, the user must specify the subunits to consider as follow:
+
+$ mecom --pdb 2OCC.pdb --contactfile data_for_chain_A.str --chain A --alignment ChainA_alignment.fas --gc 1 --contactwith "D E F G H I J K L M Q R S T U V W X Y Z"
+
+Ignoring chains A, B, C, N, O and P, which are encoded by the mitochondrial genome.
+
+
+=head1 MULTIPLE SUBUNITS ANALYSIS EXAMPLE
+
+MECOM implements a Bioperl method to concatenate alignments. Thus, the program can carry out evolutive analysis for several subunits together.
+
+The following example adress the evolutive behaviour of mitochondrial encoded subunits, considering as contact residues just those in close proximity with nuclear encoded subunits:
+
+$ mecom --pdb 2OCC.pdb --contactfile data_for_chains_ABC.str --chain "A B C" --alignment "ChainA_alignment.fas ChainB_alignment.fas ChainC_alignment.fas" --gc 1 --contactwith "D E F G H I J K L M Q R S T U V W X Y Z" --report reportABC_nu.html
+
+
+This kind of analysis are a little fussy. It is important to maintain the same order within the values of the options --chain and --alignment, marked between quotes and provide the same number of MSA files than chains identifiers. In this example, the results will be written in the file reportABC_nu.html.
+
+
+=head1 OTHER EXAMPLES
+
+As described above, multiple parameters can be set, such as the proximity threshold, --proximityth, or exposure threshold, --exposureth. The following example is a series of executions where the value of proximity threshold changes in order to evaluate how it affects on the evolutive results:
+
+$ mecom --pdb 2OCC.pdb --chain M --alignment ChainM_alignment.fas --proximityth 1 --ocontact pth1_M.str --report pth1_M.html
+
+$ mecom --pdb 2OCC.pdb --chain M --alignment ChainM_alignment.fas --proximityth 2 --ocontact pth2_M.str --report pth2_M.html
+
+$ mecom --pdb 2OCC.pdb --chain M --alignment ChainM_alignment.fas --proximityth 4 --ocontact pth4_M.str --report pth4_M.html
+
+$ mecom --pdb 2OCC.pdb --chain M --alignment ChainM_alignment.fas --proximityth 7 --ocontact pth7_M.str --report pth7_M.html
+
+$ mecom --pdb 2OCC.pdb --chain M --alignment ChainM_alignment.fas --proximityth 10 --ocontact pth10_M.str --report pth10_M.html
+
+$ mecom --pdb 2OCC.pdb --chain M --alignment ChainM_alignment.fas --proximityth 15 --ocontact pth15_M.str --report pth15_M.html
+
+=head1 AUTHOR - Hector Valverde
+
+Hector Valverde, C<< <hvalverde@uma.es> >>
+
+=head1 CONTRIBUTORS
+
+Juan Carlos Aledo, C<< <caledo@uma.es> >>
+
+=head1 OR CONTACT WITH US AT
+
+    http://mecom.hval.es/contact
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-Mecom at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Mecom>.
+I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+Further information about this project is available at:
+
+    http://mecom.hval.es/
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2013 Hector Valverde and Juan Carlos Aledo.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut
+

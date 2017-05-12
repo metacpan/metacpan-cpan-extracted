@@ -1,0 +1,32 @@
+---
+load_config_file: __path_to(root/forms/defaults.yml)__
+
+elements:
+  - type: Text
+    name: login
+    label_loc: Login
+    filters:
+      - HTMLEscape
+      - LowerCase
+      - TrimEdges
+    constraints:
+      - Required
+      - Word
+  - type: Text
+    name: name
+    label_loc: Name
+    filters:
+      - HTMLEscape
+      - TrimEdges
+  - type: Text
+    name: email
+    label_loc: Email
+    filters:
+      - HTMLEscape
+      - TrimEdges
+    constraints:
+      - Required
+      - Email
+  - type: Submit
+    name: submit
+    value_loc: Save

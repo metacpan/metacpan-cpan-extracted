@@ -1,0 +1,15 @@
+.perltidyrc
+.ship.conf
+.travis.yml
+Changes
+cpanfile
+lib/Mojolicious/Plugin/PayPal.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-basic.t
+t/communication.t
+t/production.t
+t/sandbox.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

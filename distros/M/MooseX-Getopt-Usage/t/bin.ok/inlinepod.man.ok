@@ -1,0 +1,19 @@
+NAME
+    inlinepod - Can still read pod when all in one file like this.
+
+SYNOPSIS
+     inlinepod$ inlinepod.pl [OPTIONS] [THINGS]
+
+OPTIONS
+    Some extra options text.
+
+    --help -? --usage
+        Display the usage message and exit
+
+    --man
+        Display man page
+
+DESCRIPTION
+    This program will read the given input THINGS and do something useful
+    with the contents thereof.
+

@@ -1,0 +1,150 @@
+File::MultiCat version 0.04
+======================
+A very simple concatenating website preprocessor/
+  multiple file concatenator.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ strict
+ warnings
+
+ .......which you very probably already have if you have Perl.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Michael B. Stevens.  All rights reserved.
+This is free software, and may be
+destributed under terms of the Gnu Public License.
+
+--------------------------------------------------
+--------------------------------------------------
+WHY PREPROCESSING?
+
+Usually, many pages on a website contain common elements,
+(menus, logos, headers, footers, document type definition,
+and links to a common CSS file).
+
+You can cope with this by using cut-and-paste
+with a text editor, by using SSI (server side includes),
+or by generating the pages with a server side language
+like Perl or PHP.  I generate a lot of pages on my sites
+with Perl as a server side language, but also find
+preprocessing extremely useful.
+
+Another reason to preprocess is to
+avoid having to use html frames.
+Frames are usually a *bad idea*.
+Why?  See:
+http://www.html-faq.com/htmlframes/?framesareevil
+http://www.useit.com/alertbox/9612.html
+This suite is a good tool to help remove old framed
+sites from thir frames.
+
+Preprocessing a website is easy, and allows you to change the look
+and content of a whole site easily.  Here are the steps:
+
+1) Create text files that will be combined to make the pages.
+   This is the part that takes a bit of thought: Exactly where
+   do I want to split these files so that when they are combined
+   they will make a valid HTML or XHTML page?
+2) Run a preprocessor scripts over these text files
+   to create finished HTML or XHTML files.
+3) Upload the newly changed (X)HTML files to your web space
+   while you go drink a cup of coffee and give yourself a big
+   pat on the back.
+
+It's all very easy and quick, and you can do the whole thing again
+tomorrow if you have a new idea about how the site should fit
+together.
+
+This module differs from other preprocessors in that it does not
+use an internal macro language in the file it processes.  Instead,
+it builds files from other files, as you will see below.
+---------------------------------------------------------------
+---------------------------------------------------------------
+
+HOW TO USE THIS MODULE
+
+Add the line:
+
+use File::MultiCat
+
+...to use the MultiCat module.
+
+Make the text files to combine, and then write a text
+file (defaults to multicat.dat) showing how to
+combine them.  This is easy.  Here is an example:
+
+xhtmlTrans.txt menu.txt mid0.txt bottom.txt x0.html
+xhtmlTrans.txt menu.txt mid1.txt bottom.txt x1.html
+xhtmlTrans.txt menu.txt mid2.txt bottom.txt x2.html
+xhtmlTrans.txt menu.txt mid3.txt bottom.txt x3.html
+xhtmlTrans.txt menu.txt mid4.txt bottom.txt x4.html
+html4.txt.txt  menu.txt mid5.txt bottom.txt x5.html
+html4.txt.txt  menu.txt mid6.txt bottom.txt x6.html
+
+On each line of the example, the last filename is the output
+file.  All the other files named on the line
+are combined (concatenated), in
+the order they appear, to make this final file.
+
+Common menus, footers, and the like can be used
+for different pages easily.
+
+__________
+NEW in 0.04:  You can now have comments in the
+site description file.  Comments start with the
+start ('#') character, just as in most 'nix
+configuration files.
+
+Be sure to look at the example 'xot' site description file
+to get all the gory details.
+_______
+
+You can name the site description file anything you want.
+If you name it 'xot' then the call would be:
+
+my $ob = File::MultiCat->new();
+$ob->multicat('xot');
+
+If you call mcat.pl without a file (or the complete path to a file),
+the script will look for the default
+
+multicat.dat
+
+...in your working
+directory.
+
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+CONTACT:
+webmaster@mbstevens.com
+http://www.mbstevens.com/preprocessor/index.html
+(...where you can find a similar, non-module, script version
+and a different macro-preprocessing script in the same package.)
+
+I hope you find the tiny module useful.  If you find new
+uses for it in addition to preprocessing web pages, let me
+know!  If you're writing a more sophisticated preprocessor,
+say one that incorporates a macro language, you can add this
+module's non-macro preprocessor with 3 lines of code plus
+your site description file.
+
+Cheers,
+Michael B. Stevens
+
+
+
+
+

@@ -1,0 +1,23 @@
+<html>
+<head>
+	<title>Playlist { $playlist }</title>
+</head>
+
+<body>
+<table>
+
+	{
+	use Mac::iTunes::Item;
+	use CGI qw(:html);
+	
+	foreach my $item ( @items )
+		{
+		$string .= Tr( td( $item->title ), td( $item->artist ) );
+		}
+	
+	$string;
+	}
+
+</table>
+</body>
+</html>

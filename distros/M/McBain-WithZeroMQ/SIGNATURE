@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 f21f6a5a08088c018f3c62509b6f172d9dd775d5 Changes
+SHA1 27383173b36262226d9ea1601f50778144449dc8 INSTALL
+SHA1 8582065cd14fffaec80bf3b157124ec6fbaef873 LICENSE
+SHA1 92f45beb9fa543926d341b3036f4911d6a079d10 MANIFEST
+SHA1 7324bbfad1ea1d38502fc4ebd935fdbda9096b83 MANIFEST.SKIP
+SHA1 85b3a4a40f72c085732b8d17196d912af0de3664 META.json
+SHA1 4244d61c4e4677009fccd8cde43c52911910e932 Makefile.PL
+SHA1 e80b7362b452ef2bf70a4ad3ccc9548e565122e9 README
+SHA1 a3aac29f70b780a1c126ad7e941c4d6d6f743152 bin/mcbain-zmq-broker
+SHA1 d3bcad9901e4067f713a9374f504c952d5025baf bin/mcbain-zmq-client
+SHA1 d63adfa15b18ebb487a2838fcb814127e1f35878 dist.ini
+SHA1 a690db078c5ab6acebc913d1620d4ec6135cf7b2 lib/McBain/WithZeroMQ.pm
+SHA1 6ebb6140eb176b96dcd78ff7dd8582d1b24e26a2 t/00-load.t
+SHA1 a3e66100cc7f82d2cf18ffef60a8e3c2b9b84cab t/lib/Mendoza.pm
+SHA1 6a24b38d5fe6a486e2a82362822e4b619fdbb7e1 t/lib/Mendoza/Math.pm
+SHA1 d3f317af734cbe21130f8480c728d6e599b40112 t/lib/Mendoza/Math/Constants.pm
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iF4EAREIAAYFAlPzc7kACgkQa4OHQAFM10fLigEAlM4uW6IWK0nsPLXfZaMhZqju
+aVNSSGCRMPhXUPapx/kA/1tM1q9CvIlwVKfXOWYWQMP0qJF3JSnWPUMajIU4lvgD
+=WJkO
+-----END PGP SIGNATURE-----

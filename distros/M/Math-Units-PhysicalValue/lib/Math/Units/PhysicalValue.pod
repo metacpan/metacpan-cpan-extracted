@@ -1,0 +1,163 @@
+=head1 NAME
+
+Math::Units::PhysicalValue - An OO interface for automatically calculating values with units.
+
+=head1 SYNOPSIS
+
+    use Math::Units::PhysicalValue;
+
+    my $exit  = new Math::Units::PhysicalValue "10,000 ft";
+    my $open  = "3500 ft";
+    my $delay = "43 s";
+
+    my $dist  = $exit - $open;
+    my $rate  = $dist / $delay;
+
+    my $weight = "180 lbs";
+    my $momentum = ($weight * ( ($exit - $open) / $delay )) + "0 kg*m/s";
+
+    print "$momentum\n";                     # prints 3,761.82 kg*m/s
+    print ($rate + "0 miles/hour"), "\n"     # prints 103.07 miles/hour
+
+=head1 DESCRIPTION
+
+In more detail than the synopsis, Math::Units::PhysicalValue (aka PV) keeps
+track of the units on values that might work in the real world.  It splits and
+stores the value and units separately as an array.
+
+Using operator overloading, you can use them how you'd normally use any numeric
+value.  There are probably more gotchas than I can enumerate, but you should be
+able to stay out of trouble if you keep string values on the right hand side of
+operators.
+
+    my $example1 = new Math::Units::PhysicalValue "10,000 ft";  
+    my $example2 = "3500 ft";
+    my $example3 = "1000 ft";
+
+    print ($example1 + $example2 + $example3), "\n"; # prints: 13,500 ft
+    print ($example3 + $example2 + $example1), "\n"; # generates an error...
+
+Perl is smart enough to do C<$example1> and C<$example2> in any order, but 
+C<$example3 + $example2> is evaluated as the number 4500 (with no units) before
+it gets added to C<$example1> -- where the units won't match!
+
+=head2 WATCH OUT FOR PLURALS
+
+L<Math::Units> can handle them (mostly), but L<Math::Algebra::Symbols> cannot.
+
+    my $v1 = new Math::Units::PhysicalValue "1 hour";
+    my $v2 = new Math::Units::PhysicalValue "2 hours";
+    my $v3 = $v1 + $v2;
+    my $v4 = $v1 / $v2;
+
+    print "$v3\n"; # prints 3 hours
+    print "$v4\n"; # prints 0.5 hour/hours  .. and that's probably not what you want.
+
+=head2 Export PV
+
+There is a shortcut.  You can use C<Math::Units::PhysicalValue "PV"> to import
+the magical shortcut function.  C<my $v = PV "10,000 ft"> is the same as C<$example1>
+above.  Handy.
+
+    my $handy = (PV "8miles") + (PV "72ft");
+    my $time  = PV "90s";
+    my $fast  = $handy / $time;  # neato
+
+You can also choose to import C<"pv"> for this.
+
+=head2 $StrictTypes
+
+Presently, by default, you can create C<$wierd_units = PV "5 Saxons";> without
+any real trouble.  When you try to convert it to something real, L<Math::Units>
+will have an opportunity to complain.  If your Saxon units cancel out before
+L<Math::Units> sees it, though, it's perfectly fine to make it up as you go.
+
+WATCH OUT FOR PLURALS (again) though.
+
+=head2 $PrintPrecision
+
+There is a L<Number::Format> object in the head of PV.  C<$PrintPrecision> is
+the precision passed to format_number when PV is evaluated in a string context.
+
+C<$Math::Units::PhysicalValue::PrintPrecision> defaults to 2
+
+You can set C<$Math::Units::PhysicalValue::PrintPrecision = -1> to disable it
+and lastly, you can set all sorts of format settings like so:
+
+    $Math::Units::PhysicalValue::fmt = 
+        new Number::Format(-thousands_sep   => '.',
+                                -decimal_point   => ',',
+                                -int_curr_symbol => 'DEM');
+
+Though, at this time, there's no way to change which format function it uses.
+
+=head2 deunit()
+
+If you want to get the numerical value back out, you can use C<deunit()>;
+
+    my $v = deunit PV("8 miles"); # makes $v = 8;
+
+=head1 0 + PV or 0 - PV
+
+I introduced a special hack on 12/7/5 to allow you to add ANY PV
+unit to 0 iff 0 had no units previously.  That is:
+
+    my $v = 0 + PV("3 ft"); # sets $v = PV("3 ft");
+
+This functions by converting the scalar 0 to 0 ft before adding.
+If you wish to make sure to raise an error on addition to 0,
+choose to PV the 0 first.
+
+   my $v = PV(0) + PV("3 ft"); # will still raise an error
+
+=head1 AUTHOR
+
+Paul Miller C<< <jettero@cpan.org> >>
+
+I am using this software in my own projects...  If you find bugs, please please
+please let me know.  If you use this at all, let me know.  In fact, feel free to
+email me for almost any reason.  So far, this policy has never been irritating.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2009 Paul Miller -- LGPL2
+
+=head1 TODO
+
+Here's a list of things I'd still like to do.  
+
+If you'd like to add a couple, please float me an email.
+
+=over
+
+=item 1) Significant digit support (until it's done, there is C<$value->sci( $digits )>
+
+=item 2) Error interval support
+
+=item 3) C<(PV("7 m/s") ** 9) ** (1/9)> should produce '7 m/s', not an error
+
+=item *) Better handling of metric units (e.g, 3g == 0.003kg == 3000mg)
+
+=back
+
+Concerning metric units, I expected them to work much worse than they do.  In
+fact, they appear to function correctly.  If you can produce and examples of
+failures, please let me know.  For now I'm going to assume they work.
+
+=head1 SPECIAL THANKS
+
+L<Math::Units> and L<Math::Algebra::Symbols> do all the real work here.
+
+So really, say thanks to these guys:
+
+Ken Fox C<< <fox ta vulpes.com> >>
+
+Philip R Brenan at C<< <philiprbrenan ta yahoo.com> >>
+
+And here's a nod to Number::Format.  I use the module constantly.
+
+William R. Ward, C<< <wrw ta bayview.com> >>
+
+=head1 SEE ALSO
+
+perl(1), L<Math::Units>, L<Math::Algebra::Symbols>, L<Number::Format>

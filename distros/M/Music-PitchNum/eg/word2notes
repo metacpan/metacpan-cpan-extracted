@@ -1,0 +1,109 @@
+#!/usr/bin/env perl
+#
+# Illustrates the potential of the quite permissive lexer in Music::PitchNum to
+# derive notes from arbitrary text. Productive uses of this for society are
+# left as an exercise to the reader.
+#
+# Assuming App::MusicTools is installed and ly-fu is setup to feed data to
+# lilypond and configured for a PDF viewer, one might run something like:
+#
+#   hexdump `which ls` | perl -- ./word2notes --limit=640 --rests \
+#   | atonal-util pitch2ly | tr -d ,\' | ly-fu --open --relative=c\'\' -
+#
+# Though this output will doubtless need adjustment, or to use strings(1)
+# instead of a hex dumper, or to exclude the file offset numbers from the hex
+# dump output, etc. Binaries appear to be good sources, as they can create
+# motifs from various repeated elements present in their structure. Image file
+# formats might be another source of ideas.
+#
+# The --limit=integer flag prevents too much data from being collected.
+#
+# The --rests flag will replace otherwise unparsable notes in the input with
+# rests; the default is to throw these out:
+#
+#   $ echo cat xxx | perl ./word2notes | atonal-util pitch2ly
+#   c
+#   $ echo cat xxx | perl -- ./word2notes --rests | atonal-util pitch2ly
+#   c r
+
+package MuPiNo;
+use Moo;
+with('Music::PitchNum');
+
+my $prev = -1;
+
+# example of constraint on the results from ->pitchnum
+around 'pitchnum' => sub {
+  my $orig = shift;
+  my $ret = $orig->(@_) // return;
+
+  # reduce notes to be within the 12-tone octave and nix duplicated values;
+  # lilypond relative motion will then cause such voices to drift (which
+  # may then require manual interval tweaks at suitable locations).
+  $ret %= 12;
+  return if $ret == $prev;
+  $prev = $ret;
+  return $ret;
+};
+
+package main;
+
+use feature qw/state/;
+use Getopt::Long qw(GetOptions);
+
+GetOptions( 'limit=i' => \my $Flag_Limit, 'rests|r' => \my $Flag_Rests )
+  or die "Usage: $0 [--limit=i] [--rests] file [file2 ..]\n";
+
+# Output may need to be truncated; too many notes from say a hexdump of say a
+# 60K binary can result in lilypond segfaulting. Whoops!
+$Flag_Limit //= 100;
+
+my $mpn = MuPiNo->new;
+
+my @notes;
+while ( my $line = <> ) {
+  push @notes, grep defined, map {
+    my $x = $mpn->pitchnum($_);
+    collapse(
+      ( !defined($x) and $Flag_Rests )
+      ? 'r'
+      : $x
+      )
+    }
+    split /\s+/, $line;
+
+  if ( @notes > $Flag_Limit ) {
+    $#notes = $Flag_Limit;
+    last;
+  }
+}
+
+# to convert to ASPN form (or send the pitch numbers to MIDI::Simple, etc.)
+#@notes = map $mpn->pitchname($_), @notes;
+
+my $i = 0;
+for my $n (@notes) {
+  print "$n ";
+  print "\n" if ++$i % 4 == 0;
+}
+
+exit 0;
+
+##############################################################################
+#
+# SUBROUTINES
+
+# mostly to strip runs of rests
+sub collapse {
+  my $n = shift;
+  return if !defined $n;
+
+  state $rest_count;
+  if ( $n eq 'r' ) {
+    return if ++$rest_count > 5;    # May need to fiddle with this
+  } else {
+    $rest_count = 0;
+  }
+
+  return $n;
+}

@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use Math::SymbolicX::Calculator::Interface::Shell;
+
+our $VERSION = 0.01;
+
+my $source;
+GetOptions(
+    'source|s=s'    => \$source,
+    'man'        => sub { pod2usage(-verbose => 2, -exitstatus => 0) },
+    'h|help'    => sub { pod2usage(-verbose => 1, -exitstatus => 0) },
+);
+
+my $in_handle = \*STDIN;
+my $prompt = '~> ';
+my $continued_prompt = '>> ';
+
+# Commands from file?
+if (defined $source) {
+    open(my $fh, '<', $source)
+      or pod2usage(
+          "The source file '".$source."' could not be opened."
+      );
+    $in_handle = $fh;
+    $prompt = '';
+    $continued_prompt = '';
+}
+
+my $shell = Math::SymbolicX::Calculator::Interface::Shell->new(
+    input_handle => $in_handle,
+    prompt => $prompt,
+    continued_prompt => $continued_prompt,
+);
+
+$shell->run();
+
+__END__
+
+=head1 NAME
+
+symbolic_calculator_shell
+
+=head1 SYNOPSIS
+
+  symbolic_calculator [-s FILE] [--man] [--help]
+
+=head1 OPTIONS
+
+  -s or --source FILE
+    Read from this file instead of STDIN
+  --man
+    Display the full manual (which is currently rather lacking).
+  -h or --help
+    Display (this) short help.
+
+=head1 DESCRIPTION
+
+This is a shell interface for the Math::SymbolicX::Calculator Perl module.
+(See also "perldoc Math::SymbolicX::Calculator::Interface::Shell")
+
+=cut

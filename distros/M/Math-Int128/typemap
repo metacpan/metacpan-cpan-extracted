@@ -1,0 +1,19 @@
+
+TYPEMAP
+int128_t        T_INT128
+uint128_t       T_UINT128
+
+INPUT
+T_INT128
+        $var = SvI128(aTHX_ $arg);
+
+T_UINT128
+        $var = SvU128(aTHX_ $arg);
+
+OUTPUT
+T_INT128
+        $arg = newSVi128($var);
+
+T_UINT128
+        $arg = newSVu128($var);
+

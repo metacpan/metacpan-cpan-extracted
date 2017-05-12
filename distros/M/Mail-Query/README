@@ -1,0 +1,138 @@
+NAME
+    Mail::Query - Write Mail::Audit criteria in SQL-like syntax
+
+SYNOPSIS
+      use Mail::Query;
+      my $mail = new Mail::Query;
+      if ($mail->query('To LIKE /modperl/i')) {
+        $mail->accept('lists/modperl');
+      } elsif ($mail->query('Recipient LIKE /ken@mathforum/i')) {
+        $mail->accept('forum-mail');
+      } elsif ($mail->query("Precedence LIKE 'bulk%'")) {
+        $mail->accept('lists/unknown');
+      }
+  
+      # Or put rules in a data structure:
+      my @rules = (
+                   'lists/modperl' => 'To LIKE /modperl/i',
+                   'forum-mail'    => 'Recipient LIKE /ken@mathforum/i',
+                   'lists/unknown' => "Precedence LIKE 'bulk%'",
+                  );
+      while (my ($mbox, $criteria) = splice @rules, 0, 2) {
+        $mail->accept($mbox) if $mail->query($criteria);
+      }
+
+DESCRIPTION
+    The Mail::Query module adds a criteria-specifying language to the
+    Mail::Audit class. Rather than inventing a new (probably ill-considered)
+    language and making you learn it, Mail::Query uses SQL (Structured Query
+    Language) as its starting point, because SQL is perfectly suited for writing
+    arbitrarily complex boolean criteria in a fairly readable format.
+
+    Mail::Query is a subclass of Mail::Audit, so any of Mail::Audit's methods
+    are available on a Mail::Query object too.
+
+    The full syntax of `WHERE' clauses is available when writing criteria, so
+    you may join criteria with `AND' or `OR', using parentheses when necessary
+    to specify precedence. You may negate criteria with `NOT'. See the SPECIFICS
+    manpage for details on what various bits of SQL will mean about the email
+    message you're examining.
+
+    Currently, the left side of a comparison must be the name of a header field.
+    This name can contain letters, numbers, the underscore character, and the
+    hyphen character. The header name is analogous to a database column name.
+    Two special pseudo-headers are defined - a `Recipient' pesudo-header
+    contains the contents of the `To', `Cc', and `Bcc' headers, joined by
+    commas, and a `Body' pseudo-header contains the body of the message. All
+    other header names are passed through to `Mail::Audit''s `get()' method.
+
+SPECIFICS
+    Here is what various SQL operators/identifiers mean.
+
+    * <header> LIKE /regex/
+        Checks to see whether the given header matches the given regular
+        expression. You may also use trailing regex modifiers like `/i'.
+
+        Currently any `@' or `$' characters in the regular expression are
+        escaped, which means you may write `To LIKE /ken@mathforum/' instead of
+        `To LIKE /ken\@mathforum/'. If this doesn't suit your needs, let me
+        know.
+
+    * <header> LIKE 'spec'
+        This is similar to the regular-expression form of `LIKE', but `'spec''
+        is a normal SQL `LIKE' string, not a full-blown regular expression. The
+        `%' character is a wildcard matching zero or more unspecified
+        characters, and all other characters just match themselves.
+
+    * <header> = 'string'
+    * <header> < 'string'
+    * <header> > 'string'
+    * <header> != 'string'
+    * <header> <= 'string'
+    * <header> >= 'string'
+        Does a string-based comparison (using `eq', `lt', and so on) of the
+        given header with the given string. Note that currently `Mail::Audit'
+        doesn't trim whitespace off the end of a header value, so the value will
+        usually contain a newline at the end. Keep this in mind when using the
+        `=' operator (and consider using a `LIKE' clause instead).
+
+        You may use any of Perl's string-quoting constructs for the `'string'',
+        including `"string"', `'string'', `qq{string}', or `q{string}'.
+
+    * <header> BETWEEN "string1" AND "string2"
+        This does what you would expect, if you expect something sane.
+
+    * <header> IS NULL / <header> IS NOT NULL
+        Indicates the absence/presence of a certain header.
+
+
+MOTIVATION
+    I was using Mail::Audit to filter my incoming mail, and I found that as I
+    added more filtering rules, my filtering script got uglier and uglier. Lots
+    of Perl `if' statements proliferated, and I found that the bulk of my code
+    looked quite overwrought - I was supposedly using "the power of Perl" to
+    write my criteria, but it was all `if's, `and's, and `or's. I tend not to
+    like Perl code that uses lots of `if's, `and's, and `or's.
+
+    Therefore, I decided to take all the filtering rules out of the code, and
+    put them into a data structure that my main code could simply iterate over.
+    However, the criteria didn't fit very easily into a data structure - I
+    didn't relish the thought of translating arbitrarily complicated boolean
+    criteria into some sort of nested data structure, nor did I look forward to
+    looking at the structure later and trying to figure out what they meant.
+
+    So I decided that we already had this perfectly adequate SQL language for
+    specifying boolean criteria, which would let me flatten my criteria
+    specifications into nice easily readable strings.
+
+CAVEATS
+    I get a lot of mail (yes, we all do), but not so much that my mail filtering
+    program needs to be particularly fast. Accordingly, I care much more about
+    ease-of-use than execution speed. `Mail::Query' isn't very fast - it uses a
+    full `Parse::RecDescent' grammar to parse the criteria statements and figure
+    out whether the message matches. Even `Mail::Audit' isn't particularly fast
+    when compared with something like procmail (though I haven't benchmarked it,
+    since I don't really care very much), and `Mail::Query' is about one order
+    slower yet. So don't expect it to handle several pieces of mail per second
+    or anything.
+
+TO DO
+    It would be nice to add some functions for use in criteria, like
+
+     format_date(Date) < '2000-02-02'
+
+    Once this is done, it would be trivial to let users define their own
+    functions too.
+
+    `Parse::RecDescent' has a way to pre-compile a grammar so that it doesn't
+    have to be compiled every time the program is run. I'll probably do that in
+    a future release so that the user doesn't have to install
+    `Parse::RecDescent' either. It's fairly easy to do, but for (my)
+    simplicity's sake I haven't done it yet.
+
+AUTHOR
+    Ken Williams, ken@mathforum.org
+
+SEE ALSO
+    perl(1), Mail::Audit(3)
+

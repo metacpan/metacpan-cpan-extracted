@@ -1,0 +1,34 @@
+Copyright (c) 1998 by Brian Guarraci. All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+MVPoly is a multi-variable polynomial algebra library and command interpreter.  It implements the core algebraic functionality to support operations upto and including determining Groebner Basis.  Four monomial orderings are supported: grlex, grevlex, lex, and total degree.  Variable orderings are also supported.  A parser is included as a means to construct a simple command-line interfaces similar to that of Maple.
+
+Version 0.8b is the first releast of MVPoly.  The largest weakness is the Parser.  It needs to be simplified.  The algebra library will be extended as time allows.
+
+To install MVPoly, run the standard sequence:
+
+	perl Makefile.PL
+	make
+	make install
+
+The included pod docs have been pre-converted to HTML for you and
+placed in the htdocs/ directory. The MVPoly overview (a good place to
+start) is in MVPoly.html.
+
+MVPoly is provided "as is" and without any express or implied
+warranties, including, without limitation, the implied warranties of
+merchantibility and fitness for a particular purpose.  MVPoly is
+released under the same terms as Perl itself.  For more information
+see the "README" or "Artistic" files provided with the Perl
+distribution.
+
+Send feedback, questions, bug reports, etc. to the mod_perl list
+(modperl@apache.org; see http://perl.apache.org for more information);
+that way other folks will benefit from the communciation. Or, if you
+prefer, send directly to swartz@transbay.net.
+
+For all bug reports indicate your architecture, Apache/Perl/module
+versions, etc. For installation problems send your handler.pl and
+httpd.conf. For component problems try to isolate the bug in a single
+small component or set of components, and send those.

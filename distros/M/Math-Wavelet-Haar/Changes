@@ -1,0 +1,7 @@
+Revision history for Perl extension Math::Wavelet::Haar.
+
+0.01  Fri Nov 30 22:38:14 2007
+	- added 1D and 2D transforms
+	- original version; created by h2xs 1.23 with options
+		-n Math::Wavelet::Haar
+

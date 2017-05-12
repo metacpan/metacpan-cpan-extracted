@@ -1,0 +1,83 @@
+=encoding utf8
+
+=pod
+
+=head1 NAME
+
+MooseX::App::WritingPlugins - Writing plugins for MooseX::App
+
+=head1 SYNOPSIS
+
+ package MooseX::App::Plugin::MyPlugin;
+ 
+ use Moose::Role;
+ 
+ sub plugin_metaroles {
+     my ($self,$class) = @_;
+     return {
+         class   => ['MooseX::App::Plugin::MyPlugin::Meta::Class'],
+     }
+ }
+ 
+ around 'initialize_command_class' => sub {
+    ...
+ };
+
+=head1 DESCRIPTION
+
+Plugins are implemented as Moose roles and must reside in the
+MooseX::App::Plugin::* namespace. Metaclasses can be altered via the
+'plugin_metaroles' callback method. Furthermore Moose method modifiers
+(around, after, before) can be used to alter the behaviour of MooseX::App or
+its meta classes.
+
+=head1 CALLBACKS
+
+=head2 plugin_metaroles
+
+Optional callback method that should return a hash reference specifying which
+metaroles will be applied to the class metaclass and its contained metaclasses
+and helper classes.
+
+Each key should in turn point to an array reference of role names.
+
+It accepts the following keys:
+
+=over
+
+=item * class
+
+=item * attribute
+
+=item * method
+
+=item * wrapped_method
+
+=item * instance
+
+=item * constructor
+
+=item * destructor
+
+=item * error
+
+=back
+
+=head1 METACLASSES
+
+Most of MooseX-App behaviour is implemented in metaclass roles. When writing
+plugins you will most likely need to alter/augument the behaviour of these
+roles. Implementation details can be found in the respective packages.
+
+=over
+
+=item * L<MooseX::App::Meta::Role::Class::Base> is applied to the base metaclass
+
+=item * L<MooseX::App::Meta::Role::Class::Command> is applied to the command metaclass
+
+=item * L<MooseX::App::Meta::Role::Attribute::Option> is applied to all attributes
+in the base and command meta classes
+
+=back
+
+=cut

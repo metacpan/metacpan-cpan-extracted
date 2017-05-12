@@ -1,0 +1,38 @@
+<p align="center">
+    <form name="selectcomputer_[% computer.computer_name %]" method="post" action="[% webpath %]">
+        <table class="data" id="MainFilterTable">
+            <thead>
+                <tr class="tabheader">
+                    <th></th>
+                    <th>[% tr.tr("Hostname") %]</th>
+                    <th>[% tr.tr("Prodline") %]</th>
+                    <th>[% tr.tr("Cost Unit") %]</th>
+                    <th>[% tr.tr("Description") %]</th>
+                </tr>
+            </thead>
+    
+            <tbody>
+                [% FOREACH computer IN computers %]
+                    <tr>
+                        <td><input type="radio" name="old_computer_name" value="[% computer.computer_name %]"</td>
+                        <td>[% computer.computer_name %]</td>
+                        <td>[% computer.line_id %]</td>
+                        <td>[% computer.costunit %]</td>
+                        <td>[% computer.description %]</td>
+                    </tr>
+                [% END %]
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="6" align="center">
+                        <input type="hidden" name="mode" value="select">
+                        <input type="submit" value="[% tr.tr("Select") %]">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6" align="center"><a href="[% pdflist %]" target="_new">[% tr.tr("Download list") %]</a></td>
+                </tr>
+            </tfoot>
+        </table>
+    </form>
+</p>

@@ -1,0 +1,193 @@
+<h2>News</h2>
+
+<dl>
+<dt>2008-06-03: Gabor added more metrics</dt>
+<dd>
+Gabor added yet more metrics:
+<ul>
+<li>uses_test_nowarnings
+<li>latest_version_distributed_by_debian
+<li>has_no_bugs_reported_in_debian
+<li>has_no_patches_in_debian
+<li>distributed_by_debian
+</ul>
+<p>
+I finally adapted the use_strict metric to also accept 'use Moose'
+</p>
+</dd>
+
+
+
+<dt>2008-04-09: QA Hackathon Achievements</dt>
+<dd>
+<ul><li> added a lot of new metrics:
+<ul><li> no_generated_files
+</li><li> has_tests_in_t_dir
+</li><li> no_stdin_for_prompting
+</li><li> no_large_files
+</li><li> metayml_declares_perl_version
+</li><li> has_version_in_each_file
+</li><li> fits_fedora_license
+</li><li> easily_repackageable
+</li><li> easily_repackageable_by_debian
+</li><li> easily_repackageable_by_fedora
+</li></ul>
+</li><li> add support for aggegregated and experimental metrics
+</li><li> start to integrate Testing Best Practices
+</li><li> fixed lots of bugs in prereq_matches_use and build_prereq_matches_use
+</li><li> mark core and dual-life distributions
+</li><li> added a page with various <a href="http://cpants.perl.org/stats.html">stats</a> to the website
+</li><li> added a JSON view of 'Prerequisites' page
+</li><li> various small and not so small improvements all over the place
+</li><li> collected tons of further ideas and feedback&nbsp;:-)
+</li></ul>
+</dd>
+
+<dt>2008-04-05: QA Hackathon</dt>
+<dd>We hack on CPANTS, so things might break this weekend...</dd>
+
+
+
+<dt>2008-03-31: Preparing for the QA Hackathon</dt>
+<dd><p>
+This weekend, I'm participating in the <a
+href="http://perl-qa.hexten.net/wiki/index.php/Oslo_QA_Hackathon_2008">QA
+Hackathon</a> in Oslo. My journey there is sponsored by <a
+href="http://vienna.pm.org">Vienna.pm</a> - thanks!</p>
+<p>
+To prepare for the hacking, I finally set up a mailinglist for svn commit
+messages: <a
+href="http://lists.useperl.at/listinfo/cpants-commit">http://lists.useperl.at/listinfo/cpants-commit</a>.
+If you're interested in what is happening in the wonderfull world of CPANTS,
+go ahead and subscribe!
+</p>
+</dd>
+
+
+<dt>2008-01-14: up again</dt>
+<dd>After a very long downtime caused by a combination of Christmas and me
+changing jobs, CPANTS will be soon back up to regular (daily) updates. I'm
+currently in the middle of setting things up on a new server provided by <a
+href="http://vienna.pm.org">Vienna.pm</a>. cpants.perl.org already points to
+the new server.<br>
+<br><br>
+Thanks for your patience, and sorry for any inconveniences...
+</dd>
+
+
+<dt>2007-11-07: better data</dt>
+<dd>
+I fixed a few bugs and generated new data (which took a bit more than 6 hours). But nothing fancy...
+</dd>
+
+<dt>2007-10-30: reworked dist view</dt>
+<dd>
+The view for a dist is now broken up into several subpages. This makes the data more easy to read. I've also fixed some minor problems in the list of prereqs etc (links are now going to the dist each module is in).
+</dd>
+
+<dt>2007-10-29: new optional metric: <i>use_warnings</i></dt>
+<dd>
+I've added a new metric: <code>use_warnings</code>. This metric checks if all of your modules include a line like 'use warnings;'. As this does not work for old Perls, I've made it an optional metric (for now..). 
+<br><br>
+A patch submitted by Adriano Ferreira enhances MANIFEST-checking (and removes a bug caused by chdir). See RT #28982 for details.
+<br><br>
+Andy Armstrong suggested to also look in <code>xt/</code> for tests, because this is becoming the new place for optional author tests (like pod-coverage). Which I implemented...
+<br><br>
+I've also re-analysed all of CPAN. The only thing left to do now (besides adding more metrics) is to make the various graphs work again...
+</dd>
+
+
+<dt>2007-07-13: CPANTS up again</dt>
+<dd>The server now has more memory (Thanks, Andy!), so CPANTS is back to a regular update interval of once a day. I had to revert some of the recent changes, though, so various patches sent in by Barbie and Gabor are not live at the moment.
+<br>
+Additionally, I'm now off for one month of trecking in Mongolia, with no net access. So if CPANTS has a problem again, I won't be able to tend to it until end of August (where I won't have much time either, thanks to <a href="http://vienna.yapceurope.org">YAPC::Europe</a>).
+</dd>
+
+<dt>2007-06-15: CPANTS down</dt>
+<dd>Due to some problems that CPANTS caused on the server (taking to much
+memory..) currently no new data is beeing calculated. And the data shown might
+be wrong... I do hope to find some time to fix this, but it't not going to
+happen today.</dd>
+<dt>2007-04-23: New releases<dt>
+<dd>
+I've fixed lots of bugs reported via RT and email. Thanks for the hints and patches! Quality of CPANTS data should be a bit better now...
+</dd>
+
+<dt>2007-04-02: Old metrics<dt>
+<dd>Now that April 1sth is over, we're back to the regular metrics...</dd>
+
+<dt>2007-04-01: New metrics</dt>
+<dd>Thanks to Catalyst & DBIx::Class I finished my <a
+href="http://oe1.orf.at">$big_project</a> a bit early. I
+used this time to implement a few long-pending metrics:
+
+<ul>
+<li>docs_make_sense
+<li>mentions_kwalitee
+<li>uses_version_control
+<li>reuses_code
+<li>uses_recursion
+<li>correct_speling
+<li>nice_code_layout
+</ul>
+
+You can find a more detailed description <a
+href="/kwalitee_april_1st_2007.html">here</a><br><br>
+Happy gaming!</dd>
+
+<dt>2007-03-10: New server! SQLite Dump!</dt>
+<dd>CPANTS now lives on a <b>new server provided by <a
+href="http://hexten.net">hexten.net</a></b>. Thanks!!<br>
+Starting tomorrow, there will again be daily updates, so you can now continue
+playing the CPANTS game and raising your kwalitee (and hopefully making CPAN a
+nicer place in the process...)<br><br>
+
+Thanks to the nice <a
+href="http://search.cpan.org/dist/DBD-PgLite/">DBD::PgLite::MirrorPgToSQLite</a>
+there is now a daily SQLite dump of the CPANTS database available. I hope you
+won't get blind from looking at the schema...<br>
+You can get the latest dump from this URL: <a
+href="http://cpants.perl.org/static/sqlite/cpants_all.db.gz">http://cpants.perl.org/static/sqlite/cpants_all.db.gz</a>.<br>
+Have fun playing with the data!
+</dd>
+
+<dt>2006-11-04: metayml_conforms_spec_1_0 and _current</dt>
+<dd>After some discussions on perl-qa I split metayml_conforms_spec into metayml_conforms_spec_1_0 and
+metayml_conforms_spec_current (which is an optional metric).</dd>
+
+<dt>2006-10-30: More Graphs & has_license changes</dt>
+<dd>There are now graphs showing the kwalitee of a distribution and the
+average kwalitee and number of dists of an author over time. They are located
+at the bottom of the authors page and the kwalitee detail page of a dist. I
+also reworked the has_license metric a bit. It has been replaced by
+has_humanreadable_license, metayml_has_license and the new
+metayml_conforms_spec.</dd>
+
+<dt>2006-09-28: Cronjob</dt>
+<dd>I finally managed to set up a working cronjob for CPANTS. You can expect new data each day around 02:45 EDT. Only newly uploaded dists will be checked daily. I will only do a full run (which takes some hours) if there's a change to the metrics.</dd>
+
+<dt>2006-09-26: Revamped Website</dt>
+<dd>Thanks to the incredibly helpful <a href="http://search.cpan.org/~bricas/">Brian Cassidy</a> the site is now working much better than before. He submitted several patches that cleaned up my horrible Catalyst code in Module::CPANTS::Site.</dd>
+
+<dt>2006-09-13: has_license</dt>
+<dd>A new metric, implemented by <a href="http://www.szabgab.com/">Gabor Szabo</a>, has_license checks if there is a license specified in META.yml. This metric will be soon enhances to also look in other places for a license.</dt>
+
+<dt>2006-09-05: New metrics</dt>
+<dd>During YAPC::Europe 2007 I did a small CPANTS hackathon, which resulted in several new metrics: manifest_matches_dist, buildtool_not_executable and has_exampel (which is an optional metric).<br>
+I also changed the authors page a bit so: optional metrics are now clearly marked as such.
+</dd>
+
+<dt>2006-07-19</dt>
+<dd>
+Added News section<br>
+New metric: <code>has_working_buildtool</code>. Thanks to <a href="http://steffen-mueller.net">Steffen Müller</a> for suggesting & implementing it!
+Re-indexed the whole of CPAN.
+</dd>
+<dt>2006-07-18</dt>
+<dd>
+Added support for optional metrics (eg <code>is_prereq</code>).<br>
+Changed Kwalitee from absolut to relative values (i.e. percentages)<br>
+Changed ranking in CPANTS game to only use non-optional metrics. Now releasing a new distribution (which fulfills all core metrics) won't lower owns rank.
+</dd>
+</dl>
+

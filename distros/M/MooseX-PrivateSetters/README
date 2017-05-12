@@ -1,0 +1,73 @@
+NAME
+    MooseX::PrivateSetters - Names your accessors foo() and _set_foo()
+
+SYNOPSIS
+        use Moose;
+        use MooseX::PrivateSetters;
+
+        # make some attributes
+
+        has 'foo' => ( is => 'rw' );
+        ...
+
+        package main;
+
+        sub bar {
+            $self = shift;
+            $self->_set_foo(1) unless $self->foo
+        }
+
+DESCRIPTION
+    This module does not provide any methods. Simply loading it changes the
+    default naming policy for the loading class so that accessors are
+    separated into get and set methods. The get methods have the same name
+    as the accessor, while set methods are prefixed with "_set_".
+
+    If you declare an attribute with a leading underscore, then the set
+    method will start with "_set" (i.e. "has '_foo'" will get a setter
+    called "_set_foo". Note that if you have attributes "foo" and "_foo",
+    they will both get a setter called "_set_foo", so don't do that.
+
+    If you explicitly set a "reader" or "writer" name when creating an
+    attribute, then that attribute's naming scheme is left unchanged.
+
+    Load order of this module is important. It must be "use"d after Moose.
+
+SEE ALSO
+    There are a number of similar modules on the CPAN.
+
+  Moose
+    The original. A single mutator method is generated with the same name as
+    the attribute itself.
+
+  MooseX::Accessors::ReadWritePrivate
+    Changes the parsing of the "is" clause, making new options available.
+    For example,
+
+        has baz => ( is => 'rpwp', # private reader, private writer
+
+    gets you "_get_baz()" and "_set_baz".
+
+  MooseX::FollowPBP
+    Names accessors in the style recommended by *Perl Best Practices*:
+    "get_size" and "set_size".
+
+  MooseX::SemiAffordanceAccessor
+    Has separate methods for getting and setting. The getter has the same
+    name as the attribute, and the setter is prefixed with "set_".
+
+AUTHOR
+    brian greenfield "<briang@cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-moosex-privatesetters@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>. I will be notified, and then you'll automatically
+    be notified of progress on your bug as I make changes.
+
+COPYRIGHT & LICENSE
+    Copyright 2010 brian greenfield
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

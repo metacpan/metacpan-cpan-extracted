@@ -1,0 +1,12 @@
+store: 'Memory'
+endpoint: 
+  endpoint_path: '/'
+  update: 1
+  load_data: 1
+  html: 
+    resource_links: 1    # turn resources into links in HTML query result pages
+    embed_images: 0    # display foaf:Images as images in HTML query result pages
+    image_width: 200  # with 'embed_images' scale images to this width
+  service_description: 
+      default: 1    # generate dataset description of the default graph
+      named_graphs: 1    # generate dataset description of the available named graphs

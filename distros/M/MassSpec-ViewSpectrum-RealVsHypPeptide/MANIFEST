@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/MassSpec-ViewSpectrum-RealVsHypPeptide.t
+lib/MassSpec/ViewSpectrum/RealVsHypPeptide.pm
+META.yml                                 Module meta-data (added by MakeMaker)

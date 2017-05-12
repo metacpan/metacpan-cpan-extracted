@@ -1,0 +1,84 @@
+{
+   "abstract" : "I18N(GNU getext) for Mojolicious.",
+   "author" : [
+      "Munenori Sugimura <clicktx@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.2",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-LocaleTextDomainOO",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "I18N::LangTags" : "0",
+            "I18N::LangTags::Detect" : "0",
+            "Locale::TextDomain::OO" : "1.023",
+            "Mojolicious" : "6.64",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::LocaleTextDomainOO" : {
+         "file" : "lib/Mojolicious/Plugin/LocaleTextDomainOO.pm",
+         "version" : "0.04"
+      },
+      "Mojolicious::Plugin::LocaleTextDomainOO::I18N" : {
+         "file" : "lib/Mojolicious/Plugin/LocaleTextDomainOO.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/clicktx/p5-Mojolicious-Plugin-LocaleTextDomainOO/issues"
+      },
+      "homepage" : "https://github.com/clicktx/p5-Mojolicious-Plugin-LocaleTextDomainOO",
+      "repository" : {
+         "url" : "git://github.com/clicktx/p5-Mojolicious-Plugin-LocaleTextDomainOO.git",
+         "web" : "https://github.com/clicktx/p5-Mojolicious-Plugin-LocaleTextDomainOO"
+      }
+   },
+   "version" : "0.04"
+}

@@ -1,0 +1,64 @@
+Release history for MooX-LSub
+
+0.002001 2017-03-03T12:23:13Z 6a03f10
+ [Bugfix]
+ - Avoid test failures on 5.26 w/ -Ddefault_inc_excludes_dot
+ - Closes https://github.com/kentnl/MooX-Lsub/issues/2
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002000, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +14 ↑4 -3 (recommends: +1, suggests: ↑2)
+ - test: +2 ↓1 -1 (recommends: +1 ↑2 ↓1)
+
+ [Misc]
+ - use Test::Needs instead of Test::Require for faster skipping when deps aren't installed ( avoids spurious load of
+   Test::More and reams of Test2 for a simple noop )
+
+0.002000 2014-08-30T11:24:12Z
+ [00 Minor]
+ - Switch to Sub::Util
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001003, see misc/*.deps* for details
+ - develop: +2 ↑1 -1 (suggests: ↑2)
+ - runtime: (recommends: +1 -1)
+
+ [Meta]
+ - use kentnl for author
+
+0.001003 2014-08-15T23:15:29Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - tests augmented.
+ - whitespace reduced.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001002, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: +1 (suggests: ↑1)
+ - test: -4 (recommends: ↑1 -2)
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+ [Tests]
+ - update Test::ReportPrereqs
+
+0.001002 2014-07-21T05:05:52Z
+ [Bugfix]
+ - Name the builder sub where possible
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001001, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑2)
+ - runtime: +1 (recommends: +1)
+ - test: +2 ↑1 (recommends: +1)
+
+0.001001 2014-07-08T07:29:43Z
+ [Bugfix]
+ - Test failures erroneously if Moo is not installed.
+
+0.001000 2014-07-07T06:33:32Z
+ - First version.

@@ -1,0 +1,580 @@
+chunk
+stat list
+stat list
+stat list
+stat list
+stat list
+stat
+varlist
+var
+Name
+delta
+=
+explist
+exp
+Number
+1e-6
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+bisect
+optional colon name element
+funcbody
+(
+optional parlist
+namelist
+Name
+f
+Name
+a
+Name
+b
+Name
+fa
+Name
+fb
+)
+block
+chunk
+stat list
+stat list
+stat list
+stat list
+stat list
+stat list
+stat
+keyword local
+local
+namelist
+Name
+c
+optional namelist initialization
+=
+explist
+exp
+exp
+(
+exp
+exp
+var
+Name
+a
++
+exp
+var
+Name
+b
+)
+/
+exp
+Number
+2
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+var
+Name
+n
+exp
+String
+double quoted string
+" c="
+exp
+var
+Name
+c
+exp
+String
+double quoted string
+" a="
+exp
+var
+Name
+a
+exp
+String
+double quoted string
+" b="
+exp
+var
+Name
+b
+exp
+String
+double quoted string
+"\n"
+)
+stat
+keyword if
+if
+exp
+exp
+exp
+exp
+var
+Name
+c
+==
+exp
+var
+Name
+a
+keyword or
+or
+exp
+exp
+var
+Name
+c
+==
+exp
+var
+Name
+b
+keyword or
+or
+exp
+exp
+exp
+var
+prefixexp
+var
+Name
+math
+.
+Name
+abs
+args
+(
+optional explist
+explist
+exp
+exp
+var
+Name
+a
+-
+exp
+var
+Name
+b
+)
+<
+exp
+var
+Name
+delta
+keyword then
+then
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+var
+Name
+c
+exp
+exp
+var
+Name
+b
+-
+exp
+var
+Name
+a
+elseif sequence
+optional else block
+keyword end
+end
+stat
+varlist
+var
+Name
+n
+=
+explist
+exp
+exp
+var
+Name
+n
++
+exp
+Number
+1
+stat
+keyword local
+local
+namelist
+Name
+fc
+optional namelist initialization
+=
+explist
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+var
+Name
+c
+)
+stat
+keyword if
+if
+exp
+exp
+exp
+var
+Name
+fa
+*
+exp
+var
+Name
+fc
+<
+exp
+Number
+0
+keyword then
+then
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+exp
+var
+Name
+bisect
+args
+(
+optional explist
+explist
+exp
+var
+Name
+f
+exp
+var
+Name
+a
+exp
+var
+Name
+c
+exp
+var
+Name
+fa
+exp
+var
+Name
+fc
+)
+elseif sequence
+optional else block
+keyword else
+else
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+exp
+var
+Name
+bisect
+args
+(
+optional explist
+explist
+exp
+var
+Name
+f
+exp
+var
+Name
+c
+exp
+var
+Name
+b
+exp
+var
+Name
+fc
+exp
+var
+Name
+fb
+)
+keyword end
+end
+keyword end
+end
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+solve
+optional colon name element
+funcbody
+(
+optional parlist
+namelist
+Name
+f
+Name
+a
+Name
+b
+)
+block
+chunk
+stat list
+stat list
+stat list
+stat
+varlist
+var
+Name
+n
+=
+explist
+exp
+Number
+0
+stat
+keyword local
+local
+namelist
+Name
+z
+Name
+e
+optional namelist initialization
+=
+explist
+exp
+exp
+var
+Name
+bisect
+args
+(
+optional explist
+explist
+exp
+var
+Name
+f
+exp
+var
+Name
+a
+exp
+var
+Name
+b
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+var
+Name
+a
+)
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+var
+Name
+b
+)
+)
+stat
+functioncall
+prefixexp
+var
+prefixexp
+var
+Name
+io
+.
+Name
+write
+args
+(
+optional explist
+explist
+exp
+exp
+var
+prefixexp
+var
+Name
+string
+.
+Name
+format
+args
+(
+optional explist
+explist
+exp
+String
+double quoted string
+"after %d steps, root is %.17g with error %.1e, f=%.1e\n"
+exp
+var
+Name
+n
+exp
+var
+Name
+z
+exp
+var
+Name
+e
+exp
+exp
+var
+Name
+f
+args
+(
+optional explist
+explist
+exp
+var
+Name
+z
+)
+)
+)
+keyword end
+end
+stat
+keyword function
+function
+funcname
+dotted name
+Name
+f
+optional colon name element
+funcbody
+(
+optional parlist
+namelist
+Name
+x
+)
+block
+chunk
+laststat
+keyword return
+return
+optional explist
+explist
+exp
+exp
+exp
+exp
+exp
+var
+Name
+x
+*
+exp
+var
+Name
+x
+*
+exp
+var
+Name
+x
+-
+exp
+var
+Name
+x
+-
+exp
+Number
+1
+keyword end
+end
+stat
+functioncall
+prefixexp
+var
+Name
+solve
+args
+(
+optional explist
+explist
+exp
+var
+Name
+f
+exp
+Number
+1
+exp
+Number
+2
+)

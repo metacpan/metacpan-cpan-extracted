@@ -1,0 +1,15 @@
+Build.PL
+lib/Module/Build/TestReporter.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP		A list of files to ignore
+META.yml
+README
+t/0-signature.t
+t/base.t
+t/inherit.t
+t/override.t
+t/try_prereqs.t
+t/fake_tests/fail.t
+t/fake_tests/pass.t
+SIGNATURE    Added here by Module::Build

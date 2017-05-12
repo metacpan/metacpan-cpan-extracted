@@ -1,0 +1,62 @@
+<html>
+<head>
+<style>
+#p1 {
+	background-color: #90034f;
+	width: 20%;
+	height: 100%;
+	float: left;
+}
+#p2 {
+	background-color: yellow;
+	width: 20%;
+	height: 100%;
+	float: left;
+}
+#p3 {
+	background-color: red;
+	height: 100%;
+	float: left;
+	width: 60%;
+}
+</style>
+<script>
+function p1_mouse_down(e) {
+	alert("p1_mouse_down " + e.clientX + " " + e.clientY);
+}
+
+function p1_mouse_up(e) {
+	alert("p1_mouse_up " + e.clientX + " " + e.clientY);
+}
+
+function p2_mouse_down(e) {
+	alert("p2_mouse_down " + e.clientX + " " + e.clientY);
+}
+
+function p3_mouse_move(e) {
+	alert("p3_mouse_move " + e.clientX + " " + e.clientY);
+}
+
+function on_load() {
+	var d = document.getElementById("p1");
+	d.addEventListener("mousedown", p1_mouse_down, true);
+	d.addEventListener("mouseup", p1_mouse_up, true);
+
+	d = document.getElementById("p2");
+	d.addEventListener("mousedown", p2_mouse_down, true);
+
+	d = document.getElementById("p3");
+	d.addEventListener("mousemove", p3_mouse_move, true);
+}
+window.addEventListener("load", on_load, false);
+</script>
+</head>
+<body>
+<div id="p1">
+</div>
+<div id="p2">
+</div>
+<div id="p3">
+</div>
+</body>
+</html>

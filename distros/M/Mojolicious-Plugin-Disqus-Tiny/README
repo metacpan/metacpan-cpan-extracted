@@ -1,0 +1,42 @@
+NAME
+    Mojolicious::Plugin::Disqus::Tiny - Mojolicious Plugin
+
+SYNOPSIS
+      # Mojolicious
+      $self->plugin('Disqus::Tiny');
+
+      # Mojolicious::Lite
+      plugin 'Disqus::Tiny';
+
+      # In the template where comments should be
+      <%= disqus_inc 'astokes' %>
+
+DESCRIPTION
+    Mojolicious::Plugin::Disqus::Tiny is a Mojolicious plugin. Inserts
+    Disqus code and associates your forum id. If you need more control over
+    api please see Mojolicious::Plugin::Disqus. In order to get the
+    shortname visit <https://disqus.com> and check your dashboard.
+
+METHODS
+    Mojolicious::Plugin::Disqus::Tiny inherits all methods from
+    Mojolicious::Plugin and implements the following new ones.
+
+  register
+      $plugin->register(Mojolicious->new);
+
+    Register plugin in Mojolicious application.
+
+AUTHOR
+    Adam Stokes adamjs@cpan.org
+
+COPYRIGHT
+    Copyright 2013- Adam Stokes
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+SEE ALSO
+    Mojolicious::Plugin::Disqus, Mojolicious, Mojolicious::Guides,
+    <http://mojolicio.us>.
+

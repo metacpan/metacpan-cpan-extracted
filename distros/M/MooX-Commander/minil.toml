@@ -1,0 +1,6 @@
+name = "MooX-Commander"
+badges = ["travis", "coveralls"]
+authority="cpan:KABLAMO"
+
+module_maker="ModuleBuildTiny"
+

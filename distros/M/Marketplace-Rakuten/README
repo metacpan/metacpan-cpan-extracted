@@ -1,0 +1,371 @@
+NAME
+
+    Marketplace::Rakuten - Interface to
+    http://webservice.rakuten.de/documentation
+
+VERSION
+
+    Version 0.04
+
+CATEGORIES
+
+    The list of categories for the German marketplace can be downloaded
+    from the http://api.rakuten.de/categories/csv/download.
+
+    When adding or editing a product, you can pass the rakuten_category_id
+    to add_product or edit_product
+
+SYNOPSIS
+
+        use Marketplace::Rakuten;
+        my $rakuten = Marketplace::Rakuten->new(key => 'xxxxxxx',
+                                                endpoint => 'http://webservice.rakuten.de/merchants/'
+                                                );
+        my $res = $rakuten->get_key_info;
+
+ACCESSORS
+
+ key
+
+    The API key (required).
+
+ endpoint
+
+    The URL of the endpoint. Default to
+    http://webservice.rakuten.de/merchants/
+
+    If you need a specific api version, it could be something like
+    http://webservice.rakuten.de/v2.05/merchants
+
+ ua
+
+    The user-agent. Built lazily.
+
+METHODS
+
+ api_call($method, $call, $data);
+
+    Generic method to do any call. The first argument is the HTTP request
+    method (get or post). The second argument is the path of the api, e.g.
+    (misc/getKeyInfo). The third is the structure to send (an hashref).
+
+    Return a Marketplace::Rakuten::Response object.
+
+    The key is injected into the data hashref in any case.
+
+ API CALLS
+
+  Miscellaneous
+
+    get_key_info
+
+  Product creation
+
+    add_product(\%data)
+
+      http://webservice.rakuten.de/documentation/method/add_product
+
+      Mandatory params: name, price, description
+
+      Recommended: product_art_no (the sku)
+
+      Return hashref: product_id
+
+    add_product_image(\%data)
+
+      http://webservice.rakuten.de/documentation/method/add_product_image
+
+      Mandatory params: product_art_no (the sku) or product_id (rakuten
+      id).
+
+      Return hashref: image_id
+
+    add_product_variant(\%data)
+
+      http://webservice.rakuten.de/documentation/method/add_product_variant
+
+      Mandatory params: product_art_no (the sku) or product_id, price,
+      color, label
+
+      Return hashref: variant_id
+
+    add_product_variant_definition
+
+      http://webservice.rakuten.de/documentation/method/add_product_variant
+
+      Mandatory params: product_art_no (the sku) or product_id
+
+      Recommended: variant_1 Size variant_2 Color
+
+      You need to call this method before trying to upload variants. The
+      data returned are however just a boolean (kind of) success.
+
+    add_product_multi_variant
+
+      http://webservice.rakuten.de/documentation/method/add_product_multi_variant
+
+      Mandatory params: product_art_no (the sku) or product_id,
+      variation1_type, variation1_value, price
+
+      Recommended: variant_art_no
+
+      Return hashref: variant_id
+
+    add_product_link
+
+      http://webservice.rakuten.de/documentation/method/add_product_link
+
+      Mandatory params: product_art_no (the sku) or product_id, name (100
+      chars), url (255 chars)
+
+      Return hashref: link_id
+
+    add_product_attribute
+
+      http://webservice.rakuten.de/documentation/method/add_product_attribute
+
+      Mandatory params: product_art_no (the sku) or product_id, title (50
+      chars), value
+
+      Return hashref: attribute_id
+
+  Product editing
+
+    The following methods require and id passed (sku or id) and work the
+    same as for product adding, but no argument is mandatory.
+
+    They all return just a structure with a boolean success (-1 is failure,
+    1 is success).
+
+    edit_product(\%data)
+
+      Requires product_id or product_art_no
+
+    edit_product_variant(\%data);
+
+      Requires variant_id or variant_art_no
+
+    edit_product_variant_definition(\%data)
+
+      Requires product_id or product_art_no
+
+    edit_product_multi_variant(\%data);
+
+      Requires variant_id or variant_art_no
+
+    edit_product_attribute
+
+      Requires attribute_id, title, value
+
+  Product deletion
+
+    The following methods require just an id or sku. Return a boolean
+    success.
+
+    delete_product(\%data)
+
+      Requires product_id or product_art_no
+
+    delete_product_variant(\%data);
+
+      Requires variant_id or variant_art_no
+
+    delete_product_image(\%data)
+
+      Requires image_id (returned by add_product_image).
+
+    delete_product_link(\%data);
+
+      Requires link_id (returned by add_product_link).
+
+    delete_product_attribute
+
+      Requires attribute_id (returned by add_product_attribute).
+
+  Orders
+
+    get_orders(\%params)
+
+      No argument is required, but you probably want to pass something like
+
+       { status => pending }
+
+      See http://webservice.rakuten.de/documentation/method/get_orders for
+      the full list of options.
+
+      List of statuses:
+
+      pending
+
+      editable
+
+	This is what you want to get for importing.
+
+      shipped
+
+      payout
+
+	Order is paid. Unclear when the status switches to this one.
+
+      cancelled
+
+      The response is paginated and from here you get only the raw data.
+
+      Use get_parsed_orders to get the full list of objects.
+
+    get_parsed_orders(\%params)
+
+      The hashref with the parameters is the same of get_orders (which get
+      called). This method takes care of the pagination and return a list
+      of Marketplace::Rakuten::Order objects. You can access the raw
+      structures with $object->order.
+
+    get_pending_orders
+
+      Shortcut for $self->get_parsed_orders({ status => 'pending' });
+
+    get_editable_orders
+
+      Shortcut for $self->get_parsed_orders({ status => 'editable' });
+
+    set_order_shipped(\%params)
+
+      Required parameter: order_no (the rakuten's order number).
+
+      Accepted parameters:
+
+      dhl (boolean, true if Rakuten-DHL-Rahmenvertrag is used)
+
+      carrier
+
+      tracking_number
+
+      tracking_url
+
+    set_order_cancelled(\%params)
+
+      Required paramater: order_no (rakuten's order number)
+
+      Optional: comment
+
+    set_order_returned(\%params)
+
+      Required paramater: order_no (rakuten's order number) and type (fully
+      or partly):
+
+      http://webservice.rakuten.de/documentation/method/set_order_returned
+
+  Category management
+
+    add_shop_category(\%params)
+
+      Required parameter: name
+
+      http://webservice.rakuten.de/documentation/method/add_shop_category
+
+      Returned: shop_category_id
+
+    edit_shop_category(\%params)
+
+      Required parameter shop_category_id or external_shop_category_id
+
+      http://webservice.rakuten.de/documentation/method/edit_shop_category
+
+    get_shop_categories
+
+      No mandatory parameter.
+
+      http://webservice.rakuten.de/documentation/method/get_shop_categories
+
+    delete_shop_category
+
+      Required parameter shop_category_id or external_shop_category_id
+
+      http://webservice.rakuten.de/documentation/method/delete_shop_category
+
+    add_product_to_shop_category
+
+      Required parameters: shop_category_id or external_shop_category_id,
+      product_id or product_art_no (Rakuten's id or our sku).
+
+      http://webservice.rakuten.de/documentation/method/add_product_to_shop_category
+
+AUTHOR
+
+    Marco Pessotto, <melmothx at gmail.com>
+
+BUGS
+
+    Please report any bugs or feature requests to bug-marketplace-rakuten
+    at rt.cpan.org, or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Marketplace-Rakuten. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Marketplace::Rakuten
+
+    You can also look for information at:
+
+      * RT: CPAN's request tracker (report bugs here)
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Marketplace-Rakuten
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/Marketplace-Rakuten
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/Marketplace-Rakuten
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/Marketplace-Rakuten/
+
+ACKNOWLEDGEMENTS
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2015 Marco Pessotto.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a
+    copy of the full license at:
+
+    http://www.perlfoundation.org/artistic_license_2_0
+
+    Any use, modification, and distribution of the Standard or Modified
+    Versions is governed by this Artistic License. By using, modifying or
+    distributing the Package, you accept this license. Do not use, modify,
+    or distribute the Package, if you do not accept this license.
+
+    If your Modified Version has been derived from a Modified Version made
+    by someone other than you, you are nevertheless required to ensure that
+    your Modified Version complies with the requirements of this license.
+
+    This license does not grant you the right to use any trademark, service
+    mark, tradename, or logo of the Copyright Holder.
+
+    This license includes the non-exclusive, worldwide, free-of-charge
+    patent license to make, have made, use, offer to sell, sell, import and
+    otherwise transfer the Package with respect to any patent claims
+    licensable by the Copyright Holder that are necessarily infringed by
+    the Package. If you institute patent litigation (including a
+    cross-claim or counterclaim) against any party alleging that the
+    Package constitutes direct or contributory patent infringement, then
+    this Artistic License to you shall terminate on the date that such
+    litigation is filed.
+
+    Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+    AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+    THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+    PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+    YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+    CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

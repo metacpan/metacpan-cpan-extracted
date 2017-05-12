@@ -1,0 +1,131 @@
+#!/usr/bin/perl
+#
+# $Id: metabrik,v 59b28ae3a2c8 2016/10/06 16:11:23 gomor $
+#
+use strict;
+use warnings;
+
+use FindBin;
+
+BEGIN {
+   @INC = ( "$ENV{HOME}/metabrik/repository/lib", @INC ); # Metabrik personal repository 
+                                                          # for Briks takes precedence
+   push @INC, "$FindBin::Bin/../lib";                     # Metabrik Perl modules
+   push @INC, "$FindBin::Bin/../../repository/lib";       # Metabrik main repository for Briks
+
+   # Everything should be fine now, but we prefer to check anyway.
+   eval("use Metabrik::Core::Context;");
+   if ($@) {
+      die("[F] metabrik: you have to set PERL5LIB environment variable like:\n\n".
+          'shell$ export PERL5LIB=/path/to/metabrik/core/lib:PERL5LIB='.
+          '/path/to/metabrik/repository/lib:'."\n\n".
+          "ERROR: $@\n"
+      );
+   }
+}
+
+use Getopt::Long;
+
+# Default values
+my %lopts = (
+   verbose => 2,
+   debug => 0,
+   no_splash => 0,
+   rc => $ENV{HOME}."/.metabrik_rc",
+   script_rc => $ENV{HOME}."/.metabrik_script_rc",
+);
+GetOptions(
+   "script=s" => \$lopts{script},
+   "rc=s" => \$lopts{rc},
+   "script-rc=s" => \$lopts{script_rc},
+   "verbose=i" => \$lopts{verbose},
+   "debug=i" => \$lopts{debug},
+   "no-splash" => \$lopts{no_splash},
+) or usage();
+
+my $con = Metabrik::Core::Context->new;
+
+$con->brik_init
+   or die("[F] metabrik: context init: failed\n");
+
+$con->set('core::log', 'level', $lopts{verbose});
+
+$con->set('core::log', 'debug', $lopts{debug});
+$con->set('core::context', 'debug', $lopts{debug});
+$con->set('core::shell', 'debug', $lopts{debug});
+$con->set('core::global', 'debug', $lopts{debug});
+
+if (defined($lopts{script})) {
+   if ($con->is_available('shell::script')) {
+      if (-f $lopts{script_rc}) {
+         if ($con->is_available('shell::rc')) {
+            $con->use('shell::rc')
+               or die("[F] metabrik: use: shell::rc: failed\n");
+
+            $con->set('shell::rc', 'input', $ENV{HOME}."/.metabrik_script_rc");
+            $con->set('shell::rc', 'debug', $lopts{debug});
+
+            $con->run('shell::rc', 'load_and_execute')
+               or die("[F] metabrik: run: shell::rc: load_and_execute: failed\n");
+         }
+         else {
+            print("[!] metabrik: script-rc: shell::rc: Brik not found, cannot use it\n");
+         }
+      }
+      else {
+         print("[!] metabrik: script-rc: shell::rc: file not found: $lopts{script_rc}\n");
+      }
+
+      $con->use('shell::script')
+         or die("[F] metabrik: use: shell::script: failed\n");
+
+      $con->set('shell::script', 'input', $lopts{script});
+      $con->set('shell::script', 'debug', $lopts{debug});
+
+      $con->run('shell::script', 'load_and_execute')
+         or die("[F] metabrik: run: shell::script: load_and_execute: failed\n");
+   }
+   else {
+      die("[F] metabrik: script: shell::script: Brik not available, cannot use it\n");
+   }
+}
+elsif ($con->is_available('shell::rc')) {
+   $con->use('shell::rc')
+      or die("[F] metabrik: use: shell::rc: failed\n");
+
+   $con->set('shell::rc', 'input', $lopts{rc});
+   $con->set('shell::rc', 'debug', $lopts{debug});
+
+   $con->run('shell::rc', 'load_and_execute')
+      or die("[F] metabrik: run: shell::rc: load_and_execute: failed\n");
+}
+else {
+   print("[!] metabrik: rc: shell::rc: Brik not found, cannot use it\n");
+}
+
+unless ($lopts{no_splash}) {
+   $con->run('core::shell', 'splash')
+      or die("[F] metabrik: run: core::shell: splash: failed\n");
+}
+
+$con->run('core::shell', 'cmdloop');
+
+exit(0);
+
+sub usage {
+   print<<EOF
+
+Usage: metabrik [options]
+
+   --rc <file>           use specified rc file (default: ~/.metabrik_rc)
+   --no-splash           don't print the splash screen
+   --verbose <0|1|2|3>   verbosity level (default: 2)
+   --debug <0|1>         enable debugging (default: 0)
+   --script <file>       execute given script
+   --script-rc <file>    use specified script rc file (default: ~/.metabrik_script_rc)
+
+EOF
+;
+
+   exit(0);
+}

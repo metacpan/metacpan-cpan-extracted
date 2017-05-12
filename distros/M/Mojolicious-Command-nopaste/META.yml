@@ -1,0 +1,47 @@
+---
+abstract: 'A clone of App::Nopaste using Mojolicious'
+author:
+  - 'Joel Berger <joel.a.berger@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Command-nopaste
+provides:
+  Mojolicious::Command::nopaste:
+    file: lib/Mojolicious/Command/nopaste.pm
+    version: '0.10'
+  Mojolicious::Command::nopaste::Service:
+    file: lib/Mojolicious/Command/nopaste/Service.pm
+  Mojolicious::Command::nopaste::Service::debian:
+    file: lib/Mojolicious/Command/nopaste/Service/debian.pm
+  Mojolicious::Command::nopaste::Service::fpaste:
+    file: lib/Mojolicious/Command/nopaste/Service/fpaste.pm
+  Mojolicious::Command::nopaste::Service::gist:
+    file: lib/Mojolicious/Command/nopaste/Service/gist.pm
+  Mojolicious::Command::nopaste::Service::mathbin:
+    file: lib/Mojolicious/Command/nopaste/Service/mathbin.pm
+  Mojolicious::Command::nopaste::Service::pastie:
+    file: lib/Mojolicious/Command/nopaste/Service/pastie.pm
+  Mojolicious::Command::nopaste::Service::shadowcat:
+    file: lib/Mojolicious/Command/nopaste/Service/shadowcat.pm
+  Mojolicious::Command::nopaste::Service::sprunge:
+    file: lib/Mojolicious/Command/nopaste/Service/sprunge.pm
+  Mojolicious::Command::nopaste::Service::ubuntu:
+    file: lib/Mojolicious/Command/nopaste/Service/ubuntu.pm
+recommends:
+  IO::Socket::SSL: '1.94'
+requires:
+  File::HomeDir: '0'
+  Mojolicious: '7.13'
+resources:
+  bugtracker: https://github.com/jberger/Mojolicious-Command-nopaste/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/jberger/Mojolicious-Command-nopaste
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

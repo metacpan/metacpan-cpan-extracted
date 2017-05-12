@@ -1,0 +1,10 @@
+  [
+    {
+      "type" : "select",
+      "name" : "language",
+      "data" : [
+        "de",
+        "en"
+      ]
+    }
+  ]

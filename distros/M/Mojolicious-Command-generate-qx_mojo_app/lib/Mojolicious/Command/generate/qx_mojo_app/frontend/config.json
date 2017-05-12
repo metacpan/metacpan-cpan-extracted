@@ -1,0 +1,22 @@
+% my $p = shift;
+{
+  "name"    : "<%= $p->{name} %>",
+
+  "include" :
+  [
+    {
+      "path" : "${QOOXDOO_PATH}/tool/data/config/application.json"
+    }
+  ],
+
+  "let" :
+  {
+    "APPLICATION"  : "<%= $p->{name} %>",
+    "QXTHEME"      : "qx.theme.Simple",
+    "API_EXCLUDE"  : ["qx.test.*"],
+    "LOCALES"      : [ "en" ],
+    "CACHE"        : "./cache",
+    "ROOT"         : "."
+  }
+}
+

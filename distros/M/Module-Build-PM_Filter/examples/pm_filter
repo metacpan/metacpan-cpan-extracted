@@ -1,0 +1,9 @@
+#!/usr/bin/perl -pl
+
+#
+#   Setting the final directories for the module
+#
+# s{##\s*PACKAGE_LIB\s*##}{use lib qw(/usr/share/mypackage);}g;
+
+#   for the tests
+s{##\s*PACKAGE_LIB\s*##}{## PM_Filter is working !!}g;

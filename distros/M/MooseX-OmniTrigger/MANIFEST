@@ -1,0 +1,25 @@
+Build.PL
+Changes
+lib/MooseX/OmniTrigger.pm
+MANIFEST			This list of files
+README
+t/000-synopsis.t
+t/001-basic.t
+t/002-native.t
+t/003-edge.t
+t/004-rebless.t
+t/005-clone.t
+t/006-recursion.t
+t/007-mooseisms.t
+t/050-moosex-declare.t
+t/051-moosex-attribute-env.t
+t/052-moosex-lazy_require.t
+t/099-cleanup.t
+t/100-STOLEN_MOOSE_TEST-attribute_triggers.t
+t/101-STOLEN_MOOSE_TEST-trigger_and_coerce.t
+t/102-STOLEN_MOOSE_TEST-immutable_trigger_from_constructor.t
+t/103-STOLEN_MOOSE_TEST-array_trigger.t
+t/104-STOLEN_MOOSE_TEST-hash_trigger.t
+Makefile.PL
+META.yml
+META.json

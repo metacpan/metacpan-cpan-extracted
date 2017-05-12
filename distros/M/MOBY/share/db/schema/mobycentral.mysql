@@ -1,0 +1,116 @@
+-- MySQL dump 8.23
+--
+-- Host: localhost    Database: mobycentral
+---------------------------------------------------------
+-- Server version	4.1.12-standard
+
+--
+-- Table structure for table `authority`
+--
+
+CREATE TABLE authority (
+  authority_common_name varchar(255) default NULL,
+  authority_uri varchar(255) NOT NULL default '',
+  contact_email varchar(255) NOT NULL default '',
+  authority_id int(10) unsigned NOT NULL auto_increment,
+  PRIMARY KEY  (authority_id)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `collection_input`
+--
+
+CREATE TABLE collection_input (
+  collection_input_id int(10) unsigned NOT NULL auto_increment,
+  article_name varchar(255) default NULL,
+  service_instance_id int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (collection_input_id)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `collection_output`
+--
+
+CREATE TABLE collection_output (
+  collection_output_id int(10) unsigned NOT NULL auto_increment,
+  article_name varchar(255) default NULL,
+  service_instance_id int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (collection_output_id)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `secondary_input`
+--
+
+CREATE TABLE secondary_input (
+  secondary_input_id int(10) unsigned NOT NULL auto_increment,
+  default_value text,
+  maximum_value float default NULL,
+  minimum_value float default NULL,
+  enum_value text,
+  datatype enum('String','Integer','DateTime','Float','Boolean') default NULL,
+  article_name varchar(255) default NULL,
+  description text,
+  service_instance_id int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (secondary_input_id)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `service_instance`
+--
+
+CREATE TABLE service_instance (
+  category enum('moby','soap','wsdl','cgi','moby-async', 'cgi-async', 'doc-literal', 'doc-literal-async') default NULL,
+  servicename varchar(255) NOT NULL default '',
+  service_type_uri varchar(255) NOT NULL default '',
+  authority_id int(10) unsigned NOT NULL default '0',
+  url varchar(255) NOT NULL default '',
+  contact_email varchar(255) NOT NULL default '',
+  authoritative enum('1','0') NOT NULL default '0',
+  description text NOT NULL,
+  service_instance_id int(10) unsigned NOT NULL auto_increment,
+  signatureURL varchar(255) default NULL,
+  lsid varchar(255) NOT NULL default '',
+  PRIMARY KEY  (service_instance_id),
+  UNIQUE KEY servicename (servicename,authority_id)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `service_validation`
+--
+
+CREATE TABLE service_validation (
+  signatureURL varchar(255) NOT NULL default '',
+  error_code int(4) NOT NULL default '0',
+  counter int(1) NOT NULL default '0',
+  PRIMARY KEY  (signatureURL)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `simple_input`
+--
+
+CREATE TABLE simple_input (
+  simple_input_id int(10) unsigned NOT NULL auto_increment,
+  object_type_uri varchar(255) NOT NULL default '',
+  namespace_type_uris text,
+  article_name varchar(255) default NULL,
+  service_instance_id int(10) unsigned default NULL,
+  collection_input_id int(10) unsigned default NULL,
+  PRIMARY KEY  (simple_input_id)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `simple_output`
+--
+
+CREATE TABLE simple_output (
+  simple_output_id int(10) unsigned NOT NULL auto_increment,
+  object_type_uri varchar(255) NOT NULL default '',
+  namespace_type_uris text,
+  article_name varchar(255) default NULL,
+  service_instance_id int(10) unsigned default NULL,
+  collection_output_id int(10) unsigned default NULL,
+  PRIMARY KEY  (simple_output_id)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+

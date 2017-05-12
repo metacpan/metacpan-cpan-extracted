@@ -1,0 +1,16 @@
+NAME
+
+Mojo::SMTP::Client - SMTP client based on Mojo::IOLoop
+
+DESCRIPTION
+
+With Mojo::SMTP::Client you can easily send emails from your Mojolicious application without blocking of Mojo::IOLoop.
+
+DEPENDENCIES
+
+Mojolicious 5.0+
+
+INSTALLATION
+
+perl Makefile.PL
+make && make test && make install

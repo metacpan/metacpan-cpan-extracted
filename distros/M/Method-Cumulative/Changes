@@ -1,0 +1,19 @@
+Revision history for Perl extension Method::Cumulative
+
+0.05 Sat Aug 15 16:53:09 2009
+	- use XS::MagicExt, instead of mgx.h
+	- fix examples
+	- update Module::Install to 0.09
+
+0.04 Tue Aug 11 17:11:48 2009
+	- update Module::Install::XSUtil 0.07
+
+0.03 Wed Jul 29 11:52:51 2009
+	- update Module::InstallXSUtil to 0.04
+
+0.02 Mon Jul 27 13:09:03 2009
+	- use XS::MRO::Compat
+	- use Module::Install::XSUtil
+
+0.01 Sun Apr 26 16:13:19 2009
+        - original version; created by Module::Setup

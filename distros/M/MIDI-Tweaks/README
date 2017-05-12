@@ -1,0 +1,45 @@
+MIDI-Tweaks
+===========
+
+This module implements a number of MIDI tweaks using the Sean Burke's
+MIDI module.
+
+Tweaks include: selecting tracks, changing volume and velocity,
+splitting multiple notes into separate tracks.
+
+More tweaks to follow.
+
+Two scripts are provided:
+
+  midi-tweak: applies some tweaks to MIDI files
+  midi-dump: dumps contents of a MIDI file in an understandable format
+
+THIS IS ALPHA SOFTWARE. The code works fine, but the interface may
+change when new feaures are added.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make all test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc MIDI::Tweaks
+
+Development of this module is hosted on GitHub:
+https://github.com/sciurius/perl-MIDI-Tweaks. Feel free to fork and
+contribute.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008,2017 Johan Vromans, Squirrel Consultancy
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

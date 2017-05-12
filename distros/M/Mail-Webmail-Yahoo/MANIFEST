@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+README.1ST
+CREDITS
+TODO
+Yahoo.pm
+MessageParser.pm
+snagmail.pl
+sendhoo.pl
+yahootils.pl
+t/all.t

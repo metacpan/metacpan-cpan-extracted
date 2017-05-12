@@ -1,0 +1,187 @@
+#!/usr/bin/perl -Iblib/arch -Iblib/lib -w
+#!/usr/bin/perl -w
+
+use strict;
+use DBI;
+use MyConText;
+use Getopt::Long;
+
+my $dummy;
+
+my $USAGE = <<'EOF';
+Usage: mycontextadmin [ --version | [ datasource [ --create | --list |
+		context_index_name [ --contains list_of_words |
+			--econtains list_of_expressions ] ] ] ]
+
+Examples:
+mycontextadmin adelton/heslo@test --list	# lists context_indexes
+mycontextadmin adelton/heslo@test --create index1 --frontend file --backend blob
+						# creates index
+EOF
+
+unless (@ARGV) { die $USAGE; }
+
+
+if ($ARGV[0] eq '--version' or $ARGV[0] eq '-v') {
+	print "This is mycontextadmin version $MyConText::VERSION.\n";
+	exit;
+	}
+
+
+unless (@ARGV) { die "Specify the user/password\@database (or just the database) data source.\n"; }
+
+
+my $datasource = shift;
+my ($user, $password, $dsn) = ($datasource =~ m!^(?:(.*?)(?:/(.*))?\@)?(.*)$!);
+my $text_dsn = (defined $user ? $user.'@' : '' ) . $dsn;
+
+$dsn = 'dbi:mysql:' . $dsn unless $dsn =~ /^dbi:/;
+my $dbh = DBI->connect($dsn, $user, $password)
+	or die "Error connecting to database: $DBI::errstr\n";
+
+
+
+unless (@ARGV) { die "Command or ConText index name expected after datasource.\n"; }
+
+if ($ARGV[0] eq '--list') {
+	my @list = MyConText->list_context_indexes($dbh);
+	for my $name (@list) { print $name, "\n"; }
+	exit;
+	}
+
+if ($ARGV[0] eq '--create') {
+	$dummy = shift;
+	if (not @ARGV) { die "Name of index to create expected.\n"; }
+	my $create_name = shift;
+
+	my %options = ();
+	GetOptions(\%options,
+		'frontend=s', 'backend=s',
+		'word_id_bits=i', 'doc_id_bits=i', 'count_bits=i'
+		'word_length=i', 'blob_direct_fetch=i', 'data_table=s',
+		'name_length=i', 'position_bits=i', 'filter=s',
+		'splitter=s', 'init_env=s', 'word_id_table=s',
+		'doc_id_table=s', 'table_name=s', 'column_name=s',
+		'column_id_name=s',
+		);
+
+	MyConText->create($dbh, $create_name, %options)
+						or die $MyConText::errstr, "\n";
+	exit;
+	}
+
+
+unless (@ARGV) { die "Name of index to work with expected.\n"; }
+
+my $index_name = shift;
+my $ctx = MyConText->open($dbh, $index_name) or die $MyConText::errstr, "\n";
+
+
+unless (@ARGV) { die "Command for index `$index_name' expected.\n"; }
+
+if ($ARGV[0] eq '--contains') {
+	$dummy = shift;
+	print join "\n", $ctx->contains(@ARGV), '';
+	}
+elsif ($ARGV[0] eq '--econtains') {
+	$dummy = shift;
+	print join "\n", $ctx->econtains(@ARGV), '';
+	}
+elsif ($ARGV[0] eq '--drop') {
+	$ctx->drop;
+	}
+elsif ($ARGV[0] eq '--index') {
+	$dummy = shift;
+	$ctx->index_document(@ARGV);
+	}
+else {
+	die "Command `$ARGV[0]' not recognized.\n";
+	}
+
+1;
+
+=head1 NAME
+
+mycontextadmin - command line admin utility for MyConText
+
+=head1 SYNOPSIS
+
+  mycontextadmin jez/hes@test --create zvirata --frontend=string
+  mycontextadmin jez/hes@test zvirata --index slon 'Slon ma chobot'
+  mycontextadmin jez/hes@test zvirata --index krtek 'Krtek ma bodliny'
+  mycontextadmin jez/hes@test zvirata --contains bodliny
+
+=head1 DESCRIPTION
+
+Mycontextadmin is a command line utility for listing, creating
+and dropping of MyConText indexes and for indexing new documents and
+searching for matches. The schematic listing of mycontextadmin arguments
+is:
+
+  mycontextadmin --version
+  mycontextadmin user@pass/db --list
+  mycontextadmin user@pass/db --create index_name [ parameters ]
+  mycontextadmin user@pass/db index_name --index doc_name [ content ]
+  mycontextadmin user@pass/db index_name --contains list_of_words
+  mycontextadmin user@pass/db index_name --econtains list_of_words
+  mycontextadmin user@pass/db index_name --drop
+
+For command --version that return the version information of the
+underlying MyConText module no user or database specification is needed.
+
+For all other commands you need to specify a way to connect to the
+database. The general way is user@password/database but you can omit the
+password or even the username part, thus
+
+	jezek/heslo@test
+	jezek@test
+	test
+
+are all valid database specification (valid semantically, of course; you
+should specify one that will elad to access to the database).
+
+After the database specification, you can either pass commands that do
+not operate on existing indexes, or add a name of the index and then
+commands with possible further arguments.
+
+The command --list lists all available MyConText indexes in the
+database.
+
+The command --create creates new index. The name of the index is the
+first mandatory parameter after the --create command, after that you can
+specify index options. For the list of them and their meaning, please
+see the MyConText(3) man page.
+
+If you want to work with existing index, you hve to specify the index
+name as the second parameter, and as third the command.
+
+To index a document (add new document or update existing document in
+the index), use the --index command. This is followed by either the
+document name (file and url frontends) or the name and the content of the
+document (the default and string frontends).
+
+Commands --contains and --econtains return list of documents as their
+counterpart MyConText methods do.
+
+You can drop existing index with --drop command.
+
+This program is meant as a fast utility that you can use to easily test
+various storage parameters of the indexes. For production use you'll
+probably want to write your own Perl code, using the MyConText module
+directly.
+
+=head1 AUTHOR
+
+(c) 1999 Jan Pazdziora, adelton@fi.muni.cz,
+http://www.fi.muni.cz/~adelton/ at Faculty of Informatics, Masaryk
+University in Brno, Czech Republic
+
+All rights reserved. This package is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+MyConText(3).
+
+=cut
+

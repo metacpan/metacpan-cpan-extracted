@@ -1,0 +1,22 @@
+SYNOPSIS
+    bool_defaults.pl [OPTIONS]
+
+DESCRIPTION
+    Make sure Bool attr get their defaults shown if set.
+
+OPTIONS
+    --help -? --usage
+        Display the usage message and exit
+
+    --man
+        Display man page
+
+    --verbose
+        Say lots about what we do
+
+    --warnings
+        Show warnings
+
+    --other
+        Say other things
+

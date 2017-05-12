@@ -1,0 +1,148 @@
+package MooseX::Privacy;
+BEGIN {
+  $MooseX::Privacy::VERSION = '0.05';
+}
+
+# ABSTRACT: Provides the syntax to restrict/control visibility of your methods
+
+use Moose::Exporter;
+
+Moose::Exporter->setup_import_methods(
+    with_meta => [qw( private_method protected_method )], );
+
+sub private_method {
+    my ( $meta, $name, $body ) = @_;
+    $meta->add_private_method($name, $body);
+}
+
+sub protected_method {
+    my ( $meta, $name, $body ) = @_;
+    $meta->add_protected_method($name, $body);
+}
+
+sub init_meta {
+    my ( $me, %options ) = @_;
+
+    my $for = $options{for_class};
+    Moose->init_meta(%options);
+
+    Moose::Util::MetaRole::apply_metaroles(
+        for             => $for,
+        class_metaroles => { class => [ 'MooseX::Privacy::Meta::Class', ] },
+    );
+}
+
+1;
+
+
+=pod
+
+=head1 NAME
+
+MooseX::Privacy - Provides the syntax to restrict/control visibility of your methods
+
+=head1 VERSION
+
+version 0.05
+
+=head1 SYNOPSIS
+
+    use MooseX::Privacy;
+
+    has config => (
+        is     => 'rw',
+        isa    => 'Some::Config',
+        traits => [qw/Private/],
+    );
+
+    has username => (
+        is     => 'rw',
+        isa    => 'Str',
+        traits => [qw/Protected/],
+    );
+
+    private_method foo => sub {
+        return 23;
+    };
+
+    protected_method bar => sub {
+        return 42;
+    };
+
+=head1 DESCRIPTION
+
+MooseX::Privacy brings the concept of private and protected methods to your class.
+
+=head1 METHODS
+
+=head2 Private
+
+When you declare a method as B<private>, this method can be called only within the class.
+
+    package Foo;
+
+    use Moose;
+    use MooseX::Privacy;
+
+    private_method foo => sub { return 23 };
+
+    sub mul_by_foo { my $self = shift; $self->foo * $_[0] }
+
+    1;
+
+    my $foo = Foo->new;
+    $foo->foo;           # die
+    $foo->mul_by_foo;    # ok
+
+=head2 Protected
+
+When you declare a method as B<protected>, this method can be called only
+within the class AND any of it's subclasses.
+
+    package Foo;
+
+    use Moose;
+    use MooseX::Privacy;
+
+    protected_method foo => sub { return 23 };
+
+    package Bar;
+
+    use Moose;
+    extends Foo;
+
+    sub bar { my $self = shift; $self->foo }
+
+    1;
+
+    my $foo = Foo->new;
+    $foo->foo;    # die
+    my $bar = Bar->new;
+    $bar->bar;    # ok
+
+=head2 Attributes
+
+=head3 Private
+
+When the B<Private> traits is applied to an attribute, this attribute can only be read or set within the class.
+
+=head3 Protected
+
+When the B<Protected> traits is applied to an attribute, this attribute can only be read or set within the class AND any of his subclasses.
+
+=head1 AUTHOR
+
+franck cuny <franck@lumberjaph.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by franck cuny.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+
+__END__
+

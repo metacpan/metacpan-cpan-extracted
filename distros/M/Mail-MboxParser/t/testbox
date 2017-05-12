@@ -1,0 +1,907 @@
+
+From friedrich@pythonpros.com  Thu Feb 26 17:23:40 1998
+Received: from dnstx.unitedspacealliance.com (dnstx.unitedspacealliance.com [161.40.254.10])
+	by python.org (8.8.5/8.8.5) with SMTP id RAA24304
+	for <mailman-developers@python.org>; Thu, 26 Feb 1998 17:23:40 -0500 (EST)
+Received: from pythonpros.com by dnstx.unitedspacealliance.com (SMI-8.6/SMI-SVR4)
+	id QAA07985; Thu, 26 Feb 1998 16:23:18 -0600
+Message-ID: <34F5EB6C.4F37CD1E@pythonpros.com>
+Date: Thu, 26 Feb 1998 16:23:40 -0600
+From: Robin Friedrich <friedrich@pythonpros.com>
+Organization: Python Professional Services, Inc.
+X-Mailer: Mozilla 4.04 [en] (Win95; I)
+MIME-Version: 1.0
+To: mailman-developers@python.org
+Subject: List entry indexing
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+In a prior round of email, Ken mentioned that we would need to key the
+mail list entries to something other than the person's actual email
+address in order to implement the flexible user information editing
+capability of the web (changing one's sendto address, etc.). I agree
+that this is needed, sooner or later. Since I haven't seen the code yet,
+how difficult is it to just make a unique key for each subscriber and
+key the database off that with address as just one value?
+
+I hope I'm not using this list too soon.
+
+--
+Robin K. Friedrich     Houston, Texas
+  Python Professional Services, Inc.
+      friedrich@pythonpros.com
+     http://www.pythonpros.com
+
+
+
+
+From nobody@p11.speed-link.de Thu Jul 05 08:03:22 2001
+Received: from ethan ([127.0.0.1] helo=localhost)
+	by ethan with esmtp (Exim 3.22 #1 (Debian))
+	id 15I2EU-00005N-00
+	for <tp517810@localhost>; Thu, 05 Jul 2001 08:03:22 +0200
+Received: from mails.rz.rwth-aachen.de [134.130.1.251]
+	by localhost with POP3 (fetchmail-5.8.10)
+	for tp517810@localhost (single-drop); Thu, 05 Jul 2001 08:03:22 +0200 (CEST)
+Received: from ue250-1.rz.RWTH-Aachen.de
+ ("port 65230"@ue250-1.rz.RWTH-Aachen.DE [134.130.3.33])
+ by mails.rz.rwth-aachen.de
+ (Sun Internet Mail Server sims.4.0.2000.10.12.16.25.p8)
+ with ESMTP id <0GFZ00G8TE4KGH@mails.rz.rwth-aachen.de> for
+ tp517810?post.rwth-aachen.de@sims-ms-daemon
+ (ORCPT rfc822;tassilo.parseval@post.rwth-aachen.de); Thu,
+ 5 Jul 2001 05:38:44 +0200 (MET DST)
+Received: from ue250-1.rz.RWTH-Aachen.de (relay1.RWTH-Aachen.DE [134.130.3.3])
+	by ue250-1.rz.RWTH-Aachen.de (8.10.1/8.11.3-2) with ESMTP id f653chN02016	for
+ <tassilo.parseval@post.rwth-aachen.de>; Thu, 05 Jul 2001 05:38:43 +0200 (MEST)
+Received: from pause.perl.org (IDENT:root@dubravka.kbx.de [212.40.160.59])
+	by ue250-1.rz.RWTH-Aachen.de (8.10.1/8.11.3/4) with ESMTP id f653cg902012	for
+ <tassilo.parseval@post.rwth-aachen.de>; Thu, 05 Jul 2001 05:38:43 +0200 (MEST)
+Received: (from nobody@localhost)	by pause.perl.org (8.9.3/8.9.3)
+ id FAA01527; Thu, 05 Jul 2001 05:38:38 +0200
+Date: Thu, 05 Jul 2001 05:38:38 +0200
+From: Perl Authors Upload Server <upload@p11.speed-link.de>
+Subject: Welcome new user VPARSEVAL
+To: tassilo.parseval@post.rwth-aachen.de, andreas.koenig@anima.de
+Reply-to: modules@perl.org
+Message-id: <200107050338.FAA01527@pause.perl.org>
+Status: RO
+Content-Length: 977
+Lines: 25
+
+
+
+(This mail has been generated automatically by the Perl Authors Upload
+Server on behalf of the admin andreas.koenig@anima.de)
+
+As already described in a separate message, you're a registered Perl
+Author with the userid VPARSEVAL. For the sake of approval I have
+assigned to you a change-password-only-password that enables
+you to pick your own password. This password is ``a76dd6f7''
+(without the enclosing quotes). Please visit either
+
+  https://pause.perl.org/pause/authenquery?ACTION=change_passwd
+or
+  http://pause.perl.org/pause/authenquery?ACTION=change_passwd
+
+and use this password to initialize yourself in the ordinary
+authentication database. Once you have entered your password there,
+your one-time password is expired automatically.
+
+If for whatever reason the procedure doesn't work the first time you
+try, please visit http://pause.perl.org/password.html and send me a
+password of your choice according to these guidelines. Thanks.
+
+--
+andreas.koenig@anima.de
+
+From nobody@p11.speed-link.de Thu Jul 05 08:03:22 2001
+Received: from ethan ([127.0.0.1] helo=localhost)
+	by ethan with esmtp (Exim 3.22 #1 (Debian))
+	id 15I2ET-00005N-00
+	for <tp517810@localhost>; Thu, 05 Jul 2001 08:03:21 +0200
+Received: from mails.rz.rwth-aachen.de [134.130.1.251]
+	by localhost with POP3 (fetchmail-5.8.10)
+	for tp517810@localhost (single-drop); Thu, 05 Jul 2001 08:03:21 +0200 (CEST)
+Received: from ue250-1.rz.RWTH-Aachen.de
+ ("port 65221"@ue250-1.rz.RWTH-Aachen.DE [134.130.3.33])
+ by mails.rz.rwth-aachen.de
+ (Sun Internet Mail Server sims.4.0.2000.10.12.16.25.p8)
+ with ESMTP id <0GFZ00G8QE4GGH@mails.rz.rwth-aachen.de> for
+ tp517810?post.rwth-aachen.de@sims-ms-daemon
+ (ORCPT rfc822;tassilo.parseval@post.rwth-aachen.de); Thu,
+ 5 Jul 2001 05:38:41 +0200 (MET DST)
+Received: from ue250-1.rz.RWTH-Aachen.de (relay1.RWTH-Aachen.DE [134.130.3.3])
+	by ue250-1.rz.RWTH-Aachen.de (8.10.1/8.11.3-2) with ESMTP id f653ceN02001	for
+ <tassilo.parseval@post.rwth-aachen.de>; Thu, 05 Jul 2001 05:38:40 +0200 (MEST)
+Received: from pause.perl.org (IDENT:root@dubravka.kbx.de [212.40.160.59])
+	by ue250-1.rz.RWTH-Aachen.de (8.10.1/8.11.3/4) with ESMTP id f653cd901996	for
+ <tassilo.parseval@post.rwth-aachen.de>; Thu, 05 Jul 2001 05:38:39 +0200 (MEST)
+Received: (from nobody@localhost)	by pause.perl.org (8.9.3/8.9.3)
+ id FAA01533; Thu, 05 Jul 2001 05:38:38 +0200
+Date: Thu, 05 Jul 2001 05:38:38 +0200
+From: Perl Authors Upload Server <upload@p11.speed-link.de>
+Subject: Welcome new user VPARSEVAL
+To: tassilo.parseval@post.rwth-aachen.de
+Reply-to: modules@perl.org
+Message-id: <200107050338.FAA01533@pause.perl.org>
+Status: RO
+Content-Length: 1123
+Lines: 33
+
+
+Welcome Tassilo von Parseval,
+
+PAUSE, the Perl Authors Upload Server, has a userid for you:
+
+    VPARSEVAL
+
+Once you've gone through the procedure of password approval (see the
+separate mail you should receive about right now), this userid will be
+the one that you can use to upload your work or edit your credentials
+in the PAUSE database.
+
+This is what we have stored in the database now:
+
+  Name:      Tassilo von Parseval
+  email:     tassilo.parseval@post.rwth-aachen.de
+  homepage:  http://www-users.rwth-aachen.de/tassilo.parseval
+  enteredby: Kurt D. Starsinic
+
+Please note that your email address is exposed in various listings and
+database dumps. You can register with both a public and a secret email
+if you want to protect yourself from SPAM. If you want to do this,
+please visit
+  https://pause.perl.org/pause/authenquery?ACTION=edit_cred
+or
+  http://pause.perl.org/pause/authenquery?ACTION=edit_cred
+
+If you need any further information, please visit
+  $CPAN/modules/04pause.html.
+If this doesn't answer your questions, contact modules@perl.org.
+
+Thank you for your prospective contributions,
+The Pause Team
+
+From nobody@p11.speed-link.de Thu Jul 05 08:18:51 2001
+Received: from ethan ([127.0.0.1] helo=localhost)
+	by ethan with esmtp (Exim 3.22 #1 (Debian))
+	id 15I2TS-00008H-00
+	for <tp517810@localhost>; Thu, 05 Jul 2001 08:18:50 +0200
+Received: from mails.rz.rwth-aachen.de [134.130.1.251]
+	by localhost with POP3 (fetchmail-5.8.10)
+	for tp517810@localhost (single-drop); Thu, 05 Jul 2001 08:18:50 +0200 (CEST)
+Received: from ue250-1.rz.RWTH-Aachen.de
+ ("port 51581"@ue250-1.rz.RWTH-Aachen.DE [134.130.3.33])
+ by mails.rz.rwth-aachen.de
+ (Sun Internet Mail Server sims.4.0.2000.10.12.16.25.p8)
+ with ESMTP id <0GFZ00IE0LGXCS@mails.rz.rwth-aachen.de> for
+ tp517810?post.rwth-aachen.de@sims-ms-daemon
+ (ORCPT rfc822;tassilo.parseval@post.rwth-aachen.de); Thu,
+ 5 Jul 2001 08:17:21 +0200 (MET DST)
+Received: from ue250-1.rz.RWTH-Aachen.de (relay1.RWTH-Aachen.DE [134.130.3.3])
+	by ue250-1.rz.RWTH-Aachen.de (8.10.1/8.11.3-2) with ESMTP id f656HLN28064	for
+ <tassilo.parseval@post.rwth-aachen.de>; Thu, 05 Jul 2001 08:17:21 +0200 (MEST)
+Received: from pause.perl.org (IDENT:root@dubravka.kbx.de [212.40.160.59])
+	by ue250-1.rz.RWTH-Aachen.de (8.10.1/8.11.3/4) with ESMTP id f656HJ928050	for
+ <tassilo.parseval@post.rwth-aachen.de>; Thu, 05 Jul 2001 08:17:20 +0200 (MEST)
+Received: (from nobody@localhost)	by pause.perl.org (8.9.3/8.9.3)
+ id IAA02787; Thu, 05 Jul 2001 08:17:19 +0200
+Date: Thu, 05 Jul 2001 08:17:19 +0200
+From: Perl Authors Upload Server <upload@p11.speed-link.de>
+Subject: Password Update
+To: Tassilo von Parseval <tassilo.parseval@post.rwth-aachen.de>
+Reply-to: modules@perl.org
+Message-id: <200107050617.IAA02787@pause.perl.org>
+Status: RO
+Content-Length: 325
+Lines: 11
+
+Password update on PAUSE:
+
+VPARSEVAL (Tassilo von Parseval) visited the
+password changer on PAUSE at Thu Jul  5 06:17:19 2001 GMT
+and changed the password for VPARSEVAL (Tassilo von Parseval).
+
+No action is required, but it would be a good idea if somebody
+would check the correctness of the new password.
+
+Thanks,
+The Pause
+
+From nobody@p11.speed-link.de Thu Jul 05 08:24:05 2001
+Received: from ethan ([127.0.0.1] helo=localhost)
+	by ethan with esmtp (Exim 3.22 #1 (Debian))
+	id 15I2YX-00009D-00
+	for <tp517810@localhost>; Thu, 05 Jul 2001 08:24:05 +0200
+Received: from mails.rz.rwth-aachen.de [134.130.1.251]
+	by localhost with POP3 (fetchmail-5.8.10)
+	for tp517810@localhost (single-drop); Thu, 05 Jul 2001 08:24:05 +0200 (CEST)
+Received: from ue250-1.rz.RWTH-Aachen.de
+ ("port 53048"@ue250-1.rz.RWTH-Aachen.DE [134.130.3.33])
+ by mails.rz.rwth-aachen.de
+ (Sun Internet Mail Server sims.4.0.2000.10.12.16.25.p8)
+ with ESMTP id <0GFZ00IOELQK5H@mails.rz.rwth-aachen.de> for
+ tp517810?post.rwth-aachen.de@sims-ms-daemon
+ (ORCPT rfc822;tassilo.parseval@post.rwth-aachen.de); Thu,
+ 5 Jul 2001 08:23:08 +0200 (MET DST)
+Received: from ue250-1.rz.RWTH-Aachen.de (relay1.RWTH-Aachen.DE [134.130.3.3])
+	by ue250-1.rz.RWTH-Aachen.de (8.10.1/8.11.3-2) with ESMTP id f656N7N00305	for
+ <tassilo.parseval@post.rwth-aachen.de>; Thu, 05 Jul 2001 08:23:07 +0200 (MEST)
+Received: from pause.perl.org (IDENT:root@dubravka.kbx.de [212.40.160.59])
+	by ue250-1.rz.RWTH-Aachen.de (8.10.1/8.11.3/4) with ESMTP id f656N6900294	for
+ <tassilo.parseval@post.rwth-aachen.de>; Thu, 05 Jul 2001 08:23:07 +0200 (MEST)
+Received: (from nobody@localhost)	by pause.perl.org (8.9.3/8.9.3)
+ id IAA02829; Thu, 05 Jul 2001 08:23:05 +0200
+Date: Thu, 05 Jul 2001 08:23:05 +0200
+From: Perl Authors Upload Server <upload@p11.speed-link.de>
+Subject: Notification from PAUSE
+To: Tassilo von Parseval <tassilo.parseval@post.rwth-aachen.de>,
+ andreas.koenig@anima.de
+Reply-to: modules@perl.org
+Message-id: <200107050623.IAA02829@pause.perl.org>
+Status: RO
+Content-Length: 966
+Lines: 24
+
+
+VPARSEVAL (Tassilo von Parseval) visited the PAUSE
+and requested an upload into his/her directory.
+The request used the following parameters
+
+  HIDDENNAME                 [VPARSEVAL]
+  CAN_MULTIPART              [1]
+  pause99_add_uri_httpupload [Mail-MboxParser-0.01.tar.gz]
+  SUBMIT_pause99_add_uri_httpupload [ Upload this file from my disk ]
+  pause99_add_uri_uri        []
+  pause99_add_uri_sub        [pause99_add_uri_httpupload]
+
+
+The request is now entered into the database where the PAUSE Daemon
+will pick it up as soon as possible. Allow a few minutes, and be aware
+that it may take longer if other requests are running. We proceed only
+one at a time.
+
+During upload you can watch ftp://pause.perl.org/tmp/V/VP/VPARSEVAL
+(temporary upload directory), and
+then https://pause.perl.org/pub/PAUSE/authors/id/V/VP/VPARSEVAL (final
+upload directory). The logfile is in
+https://pause.perl.org/perl/user/tail_log/2000
+(replace 2000 with any offset from the end).
+
+From root@p11.speed-link.de Thu Jul 05 08:29:17 2001
+Received: from ethan ([127.0.0.1] helo=localhost)
+	by ethan with esmtp (Exim 3.22 #1 (Debian))
+	id 15I2dZ-0000Bf-00
+	for <tp517810@localhost>; Thu, 05 Jul 2001 08:29:17 +0200
+Received: from mails.rz.rwth-aachen.de [134.130.1.251]
+	by localhost with POP3 (fetchmail-5.8.10)
+	for tp517810@localhost (single-drop); Thu, 05 Jul 2001 08:29:17 +0200 (CEST)
+Received: from ue250-1.rz.RWTH-Aachen.de
+ ("port 53428"@ue250-1.rz.RWTH-Aachen.DE [134.130.3.33])
+ by mails.rz.rwth-aachen.de
+ (Sun Internet Mail Server sims.4.0.2000.10.12.16.25.p8)
+ with ESMTP id <0GFZ00I09LSQRF@mails.rz.rwth-aachen.de> for
+ tp517810?post.rwth-aachen.de@sims-ms-daemon
+ (ORCPT rfc822;tassilo.parseval@post.rwth-aachen.de); Thu,
+ 5 Jul 2001 08:24:27 +0200 (MET DST)
+Received: from ue250-1.rz.RWTH-Aachen.de (relay1.RWTH-Aachen.DE [134.130.3.3])
+	by ue250-1.rz.RWTH-Aachen.de (8.10.1/8.11.3-2) with ESMTP id f656OQN00791	for
+ <tassilo.parseval@post.rwth-aachen.de>; Thu, 05 Jul 2001 08:24:26 +0200 (MEST)
+Received: from onion.perl.org (onion.valueclick.com [209.85.157.220])
+	by ue250-1.rz.RWTH-Aachen.de (8.10.1/8.11.3/4) with SMTP id f656OO900781	for
+ <tassilo.parseval@post.rwth-aachen.de>; Thu, 05 Jul 2001 08:24:25 +0200 (MEST)
+Received: (qmail 62466 invoked by uid 1008); Thu, 05 Jul 2001 06:24:23 +0000
+Received: (qmail 62440 invoked from network); Thu, 05 Jul 2001 06:24:23 +0000
+Received: from dubravka.kbx.de (HELO pause.perl.org) (root@212.40.160.59)
+ by onion.valueclick.com with SMTP; Thu, 05 Jul 2001 06:24:23 +0000
+Received: (from root@localhost)	by pause.perl.org (8.9.3/8.9.3)
+ id IAA02849; Thu, 05 Jul 2001 08:24:20 +0200
+Date: Thu, 05 Jul 2001 08:24:20 +0200
+From: PAUSE <upload@p11.speed-link.de>
+Subject: CPAN Upload: V/VP/VPARSEVAL/Mail-MboxParser-0.01.tar.gz
+To: Tassilo von Parseval <VPARSEVAL@cpan.org>, cpan-testers@perl.org
+Reply-to: cpan-testers@perl.org
+Message-id: <200107050624.IAA02849@pause.perl.org>
+MIME-version: 1.0
+Content-type: Text/Plain; Charset=UTF-8
+Content-transfer-encoding: 8bit
+Delivered-to: cpanmail-VPARSEVAL@cpan.org
+X-Spam-Rating: onion.valueclick.com 1.6.2 0/1000/N
+Status: RO
+Content-Length: 457
+Lines: 17
+
+The uploaded file
+
+    Mail-MboxParser-0.01.tar.gz
+
+has entered CPAN as
+
+  file: $CPAN/authors/id/V/VP/VPARSEVAL/Mail-MboxParser-0.01.tar.gz
+  size: 5135 bytes
+   md5: 3253b705a2ecaff07d368165895e66b9
+
+No action is required on your part
+Request entered by: VPARSEVAL (Tassilo von Parseval)
+Request entered on: Thu, 05 Jul 2001 06:23:03 GMT
+Request completed:  Thu, 05 Jul 2001 06:24:20 GMT
+
+	Virtually Yours,
+	Id: paused,v 1.74 2001/05/20 14:59:52 k Exp k 
+
+From nobody@p11.speed-link.de Thu Jul 05 08:43:16 2001
+Received: from ethan ([127.0.0.1] helo=localhost)
+	by ethan with esmtp (Exim 3.22 #1 (Debian))
+	id 15I2r6-0000Di-00
+	for <tp517810@localhost>; Thu, 05 Jul 2001 08:43:16 +0200
+Received: from mails.rz.rwth-aachen.de [134.130.1.251]
+	by localhost with POP3 (fetchmail-5.8.10)
+	for tp517810@localhost (single-drop); Thu, 05 Jul 2001 08:43:16 +0200 (CEST)
+Received: from ue250-1.rz.RWTH-Aachen.de
+ ("port 57951"@ue250-1.rz.RWTH-Aachen.DE [134.130.3.33])
+ by mails.rz.rwth-aachen.de
+ (Sun Internet Mail Server sims.4.0.2000.10.12.16.25.p8)
+ with ESMTP id <0GFZ00J8DMIV0Q@mails.rz.rwth-aachen.de> for
+ tp517810?post.rwth-aachen.de@sims-ms-daemon
+ (ORCPT rfc822;tassilo.parseval@post.rwth-aachen.de); Thu,
+ 5 Jul 2001 08:40:07 +0200 (MET DST)
+Received: from ue250-1.rz.RWTH-Aachen.de (relay1.RWTH-Aachen.DE [134.130.3.3])
+	by ue250-1.rz.RWTH-Aachen.de (8.10.1/8.11.3-2) with ESMTP id f656e6N07733	for
+ <tassilo.parseval@post.rwth-aachen.de>; Thu, 05 Jul 2001 08:40:06 +0200 (MEST)
+Received: from pause.perl.org (IDENT:root@dubravka.kbx.de [212.40.160.59])
+	by ue250-1.rz.RWTH-Aachen.de (8.10.1/8.11.3/4) with ESMTP id f656e5907717	for
+ <tassilo.parseval@post.rwth-aachen.de>; Thu, 05 Jul 2001 08:40:06 +0200 (MEST)
+Received: (from nobody@localhost)	by pause.perl.org (8.9.3/8.9.3)
+ id IAA02973; Thu, 05 Jul 2001 08:40:05 +0200
+Date: Thu, 05 Jul 2001 08:40:05 +0200
+From: Perl Authors Upload Server <upload@p11.speed-link.de>
+Subject: Module submission Mail::MboxParser
+To: tassilo.parseval@post.rwth-aachen.de
+Reply-to: modules@perl.org
+Message-id: <200107050640.IAA02973@pause.perl.org>
+Status: RO
+Content-Length: 1550
+Lines: 43
+
+
+The following module was proposed for inclusion in the Module List:
+
+  modid:       Mail::MboxParser
+  DSLIP:       adpOp
+  description: simple access to UNIX-mailboxes
+  userid:      VPARSEVAL (Tassilo von Parseval)
+  chapterid:   19 (Mail_and_Usenet_News)
+  communities:
+
+  similar:
+    Mail::Cclient Mail::Box
+
+  rationale:
+
+    Mail::MboxParser focuses, unlike Mail::Cclient and Mail::Box, on a
+    read-only access to UNIX-mailboxes. It provides wrapper-methods
+    derived from MIME::Entity to get a very straight-forward handling of
+    attachements. Since most methods are applied to MIME::Entity objects
+    the appropriate methods from the MIME::Tools can be directly
+    involved to extend functionality. As for namespace: The module
+    certainly belongs under the Mail-namespace while MboxParser
+    indicates that it is really just about parsing mailboxes and not
+    creating them.
+
+  enteredby:   VPARSEVAL (Tassilo von Parseval)
+  enteredon:   Thu Jul  5 06:40:05 2001 GMT
+
+The resulting entry would be:
+
+Mail::
+::MboxParser      adpOp simple access to UNIX-mailboxes              VPARSEVAL
+
+
+Thanks for registering,
+The Pause Team
+
+PS: The following links are only valid for module list maintainers:
+
+Registration form with editing capabilities:
+  https://pause.perl.org/pause/authenquery?ACTION=add_mod&USERID=21000000_293b5faf2547cbe8&SUBMIT_pause99_add_mod_preview=1
+Immediate (one click) registration:
+  https://pause.perl.org/pause/authenquery?ACTION=add_mod&USERID=21000000_293b5faf2547cbe8&SUBMIT_pause99_add_mod_insertit=1
+
+From nobody@p11.speed-link.de Thu Jul 05 09:54:12 2001
+Received: from ethan ([127.0.0.1] helo=localhost)
+	by ethan with esmtp (Exim 3.22 #1 (Debian))
+	id 15I3xj-0000Fq-00
+	for <tp517810@localhost>; Thu, 05 Jul 2001 09:54:11 +0200
+Received: from mails.rz.rwth-aachen.de [134.130.1.251]
+	by localhost with POP3 (fetchmail-5.8.10)
+	for tp517810@localhost (single-drop); Thu, 05 Jul 2001 09:54:11 +0200 (CEST)
+Received: from ue250-1.rz.RWTH-Aachen.de
+ ("port 45963"@ue250-1.rz.RWTH-Aachen.DE [134.130.3.33])
+ by mails.rz.rwth-aachen.de
+ (Sun Internet Mail Server sims.4.0.2000.10.12.16.25.p8)
+ with ESMTP id <0GFZ00KMLPPSKE@mails.rz.rwth-aachen.de> for
+ tp517810?post.rwth-aachen.de@sims-ms-daemon
+ (ORCPT rfc822;tassilo.parseval@post.rwth-aachen.de); Thu,
+ 5 Jul 2001 09:49:05 +0200 (MET DST)
+Received: from ue250-1.rz.RWTH-Aachen.de (relay1.RWTH-Aachen.DE [134.130.3.3])
+	by ue250-1.rz.RWTH-Aachen.de (8.10.1/8.11.3-2) with ESMTP id f657n4N08557	for
+ <tassilo.parseval@post.rwth-aachen.de>; Thu, 05 Jul 2001 09:49:04 +0200 (MEST)
+Received: from pause.perl.org (IDENT:root@dubravka.kbx.de [212.40.160.59])
+	by ue250-1.rz.RWTH-Aachen.de (8.10.1/8.11.3/4) with ESMTP id f657n3908551	for
+ <tassilo.parseval@post.rwth-aachen.de>; Thu, 05 Jul 2001 09:49:04 +0200 (MEST)
+Received: (from nobody@localhost)	by pause.perl.org (8.9.3/8.9.3)
+ id JAA03431; Thu, 05 Jul 2001 09:49:03 +0200
+Date: Thu, 05 Jul 2001 09:49:03 +0200
+From: Perl Authors Upload Server <upload@p11.speed-link.de>
+Subject: Module submission Mail::MboxParser
+To: tassilo.parseval@post.rwth-aachen.de
+Reply-to: modules@perl.org
+Message-id: <200107050749.JAA03431@pause.perl.org>
+Status: RO
+Content-Length: 1550
+Lines: 43
+
+
+The following module was proposed for inclusion in the Module List:
+
+  modid:       Mail::MboxParser
+  DSLIP:       adpOp
+  description: simple access to UNIX-mailboxes
+  userid:      VPARSEVAL (Tassilo von Parseval)
+  chapterid:   19 (Mail_and_Usenet_News)
+  communities:
+
+  similar:
+    Mail::Cclient Mail::Box
+
+  rationale:
+
+    Mail::MboxParser focuses, unlike Mail::Cclient and Mail::Box, on a
+    read-only access to UNIX-mailboxes. It provides wrapper-methods
+    derived from MIME::Entity to get a very straight-forward handling of
+    attachements. Since most methods are applied to MIME::Entity objects
+    the appropriate methods from the MIME::Tools can be directly
+    involved to extend functionality. As for namespace: The module
+    certainly belongs under the Mail-namespace while MboxParser
+    indicates that it is really just about parsing mailboxes and not
+    creating them.
+
+  enteredby:   VPARSEVAL (Tassilo von Parseval)
+  enteredon:   Thu Jul  5 07:49:03 2001 GMT
+
+The resulting entry would be:
+
+Mail::
+::MboxParser      adpOp simple access to UNIX-mailboxes              VPARSEVAL
+
+
+Thanks for registering,
+The Pause Team
+
+PS: The following links are only valid for module list maintainers:
+
+Registration form with editing capabilities:
+  https://pause.perl.org/pause/authenquery?ACTION=add_mod&USERID=31000000_e431fde986fbb444&SUBMIT_pause99_add_mod_preview=1
+Immediate (one click) registration:
+  https://pause.perl.org/pause/authenquery?ACTION=add_mod&USERID=31000000_e431fde986fbb444&SUBMIT_pause99_add_mod_insertit=1
+
+From markov@proxy.ATComputing.nl Fri Jul 06 16:47:17 2001
+Received: from ethan ([127.0.0.1] helo=localhost)
+	by ethan with esmtp (Exim 3.22 #1 (Debian))
+	id 15IWt3-0000C0-00
+	for <tp517810@localhost>; Fri, 06 Jul 2001 16:47:17 +0200
+Received: from mails.rz.rwth-aachen.de [134.130.1.251]
+	by localhost with POP3 (fetchmail-5.8.10)
+	for tp517810@localhost (single-drop); Fri, 06 Jul 2001 16:47:17 +0200 (CEST)
+Received: from ue250-1.rz.RWTH-Aachen.de
+ ("port 37342"@ue250-1.rz.RWTH-Aachen.DE [134.130.3.33])
+ by mails.rz.rwth-aachen.de
+ (Sun Internet Mail Server sims.4.0.2000.10.12.16.25.p8)
+ with ESMTP id <0GG2006OS3M0SY@mails.rz.rwth-aachen.de> for
+ tp517810?post.rwth-aachen.de@sims-ms-daemon
+ (ORCPT rfc822;tassilo.parseval@post.rwth-aachen.de); Fri,
+ 6 Jul 2001 16:44:25 +0200 (MET DST)
+Received: from ue250-1.rz.RWTH-Aachen.de (relay1.RWTH-Aachen.DE [134.130.3.3])
+	by ue250-1.rz.RWTH-Aachen.de (8.10.1/8.11.3-2) with ESMTP id f66EiON07088	for
+ <tassilo.parseval@post.rwth-aachen.de>; Fri, 06 Jul 2001 16:44:24 +0200 (MEST)
+Received: from atcmpg.ATComputing.nl (proxy.ATComputing.nl [195.108.229.1])
+	by ue250-1.rz.RWTH-Aachen.de (8.10.1/8.11.3/4) with ESMTP id f66EiM907081	for
+ <tassilo.parseval@post.rwth-aachen.de>; Fri, 06 Jul 2001 16:44:23 +0200 (MEST)
+Received: (from markov@localhost)	by atcmpg.ATComputing.nl (8.9.3+Sun/8.9.3)
+ id QAA15785	for tassilo.parseval@post.rwth-aachen.de; Fri,
+ 06 Jul 2001 16:43:07 +0200 (MEST)
+Date: Fri, 06 Jul 2001 16:43:07 +0200
+From: Mark Overmeer <markov@ATComputing.nl>
+Subject: Re: Mail::MboxParser
+In-reply-to: <20010706162345.A573@ethan>; from
+ tassilo.parseval@post.rwth-aachen.de on Fri, Jul 06, 2001 at 04:23:45PM +0200
+To: Tassilo von Parseval <tassilo.parseval@post.rwth-aachen.de>
+Message-id: <20010706164307.B12625@atcmpg.ATComputing.nl>
+MIME-version: 1.0
+Content-type: multipart/mixed; boundary="LQksG6bCIzRHxTLp"
+Content-disposition: inline
+User-Agent: Mutt/1.2.5i
+References: <20010706111041.B22522@atcmpg.ATComputing.nl>
+ <20010706162345.A573@ethan>
+Status: RO
+X-Status: A
+Content-Length: 12338
+Lines: 376
+
+
+--LQksG6bCIzRHxTLp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+* Tassilo von Parseval (tassilo.parseval@post.rwth-aachen.de) [010706 16:22]:
+> Two problems with yours: See the following output from your parser and mine
+
+Ok, the results differ.  That's not a good sign: this means that investigation
+is needed.  I'm not a bad guy: if I get a signal from someone that there is
+a problem, I fix it.  So please send me the data.
+
+I think fixing problems is more useful than rewriting existing code... there
+will be other bugs.
+
+> ethan@ethan:~$ time perl -MMail::MboxParser
+> real    0m15.226s
+> 
+> ethan@ethan:~$ time perl -MMail::Box::Mbox
+> real    0m3.468s
+
+I am rather pleased by these results ;) ;)
+
+> Another thing is: If you really want access to only the mail and, say, the attachements, if there are any, the immense functionality of your modules becomes a little bit confusing...at least I felt so. And often you still have to fiddle around with MIME::Tools which is an equally complex set of modules.
+
+I agree that MIME::Entity, Mail::Internet, MIME::Parser, and MIME::Tools are
+quite hard to use.  That's why David Coppit (Mail::Box::FastReader) and I
+are planning to replace it.  I have a global design of functionality ready,
+but need some hours to write some C ;)  We'll meet at O'Reilly's PerlConf,
+in two weeks time.
+
+> Perhaps a structure like that:
+> 	Mail::Mbox::Lite	(just the essential things but easy to use)
+Don't need that, because my delayed autoloading takes care of that.  One
+of the reasons that my module is much faster than yours is because messages
+are basically skipped, and only really read when used.
+
+> 	Mail::Mbox::Parser
+Will be the C implementation
+
+> 	Mail::Mbox::Parser::Body (perhaps detecting quotations, signatures etc.)
+> 	Mail::Mbox::Parser::Header
+> 	Mail::Mbox::Parser::Entity
+Actually, the planned names will be
+  Mail::Message
+  Mail::Message::Body
+  Mail::Message::Head
+
+Mail::Box::Mbox::Message isa Mail::Box::Message isa Mail::Message
+
+> So, what do you suggest? Of course we could start to write such a
+> system from scratch but this would just ignore the efforts other people
+> already took with their modules.
+
+I attach the design, which I discussed (not in full detail) with David.
+Maybe you have some bright contributions.  Then... writing the C-code is
+probably a good task for me (23 years of experience, mainly in C), and
+I have some parts ready.
+
+Then: most difficult is designing tests.  It would be very nice if you
+could contribute in testing.
+
+Yes, I want to throw away all old code, for the main reason that it
+looks like being OO, but it certainly isn't.  And it is too slow too.
+Perl needs a good mail-parser which is fast.
+
+See attachment.
+-- 
+               MarkOv       %-]
+
+------------------------------------------------------------------------
+drs Mark A.C.J. Overmeer                           markov@ATComputing.nl
+AT Computing, UNIX Training and Consultancy    http://www.ATComputing.nl
+http://Mark.Overmeer.net                               Mark@Overmeer.net
+
+--LQksG6bCIzRHxTLp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename=Plans
+
+
+All items with #) are implemented, but those with *) not yet.
+
+Mail::Message     design version 1.113
+-------------
+
+Targets
+*) replace MIME::Entity, Mail::Internet and MIME::Parser to speed-up
+   low-level mail processing.
+   Why replace existing modules?
+   1) they do not use C on the lowest level.  Rewrite of parts of them
+      would be more work than reimplementation of all.
+   2) certainly MIME::Entity is not smart enough, not defining enough
+      simple objects.
+   3) they are not conveniently supporting delay-loading.
+   4) they ofter use old-fashioned perl.
+   The reimplementation will be done with a close look at the
+   well documented code in the two existing modules.
+*) extend features of Mail::Folder::FastReader.
+*) eventually speed-up all mail-processing Perl-modules.
+*) handle Mbox-like folders.
+*) handle one file (one message) in MH-like folders.
+*) support for delay-loading (saves time and memory)
+
+Parts
+*) Mail::Box and grepmail (via Mail::Box?) maintain overview over the
+   mail-folders.
+*) Mail::Message                  Basic messages as stored in a file.
+                                  contains some stuff from Mail::Box::Message
+*) Mail::Message::Part            isa Mail::Message
+*) Mail::Box::Parser              Contains inlined C for simple character
+                                  processing on headers and bodiess.
+*) Mail::Box                      Added wrappers around Mail::Box::Parser and
+                                  `left-overs' from the replace modules.
+*) Mail::Message::Head, comparible to Mail::Head
+*) Mail::Message::Head::Field, one line from header.
+*) Mail::Message::Body
+*) Mail::Message::Body::NotParsed isa Mail::Message::Body
+*) Mail::Message::Body::Lines     isa Mail::Message::Body
+*) Mail::Message::Body::Scalar    isa Mail::Message::Body
+*) Mail::Message::Body::File      isa Mail::Message::Body
+*) Mail::Message::Body::Multipart isa Mail::Message::Body
+
+All Mail::Message::Body* may reside in one file.
+
+= Mail::Box additions
+
+Keeps track on:
+   - debug-level
+   - class of message-objects
+   - default class of head-objects       [Mail::Message::Head]
+   - default class of body-objects       [Mail::Message::Body::Lines]
+   - default class of multiparts-objects [Mail::Message::Body::Multipart]
+
+#) log warnings and errors
+
+#) report warnings and errors
+
+*) my Mail::Message::Head $head = $folder->readHead()
+   - return Mail::Message::Head object
+   - lines already `unfolded'
+   - newlines removed from the end.
+
+*) my $body = $folder->readBody(want => 'Mail::Message::BodyLines'
+      , size => $msg->head->get('Content-Length'));
+   $msg->body($body);
+   - returns any Mail::Message::Body based on flag.
+   - calls $args{want}->get($fh)
+   - while reading the body, various trics are used to try determining
+     where a message ends.  If there is a size in the message-header,
+     it should be checked.
+
+*) $msg->sourceCopy($newfile)
+   - Copy the message as located in the original folder file into a different
+     file.
+   - This is much faster than printing the message from structures.
+   - The copy will be exact (so even no header-line order changes and such)
+
+*) $msg->writeToFile($newfile, encode => 'BASE64')
+   - Write message from perl-structures into file.
+   - calls $msg->head->write and $msg->body->write.
+   - ability to encode body (see Mail::Message::Body)
+
+
+= Mail::Box::Parser
+
+Manages a C-pointer to a structure which handles the file-reading.
+Keeps track on:
+   - filename
+   - filehandle
+   - fold headerline
+   - current linenumber
+   - dos-mode (\r\n at end line, while on UNIX)
+   - open status
+
+*) my $fh = Mail::Box::Parser->open(...)
+   various options on the file are set.  Called by Mail::Box->open
+
+*) $fh->close
+   when the application calls close(), but the application might try
+   to use it later which shouldn't result in a core-dump.
+   - set open status to 'close'
+   Called by Mail::Box->close
+
+*) $fh->DESTROY
+   perl's DESTROY removes the folder-object
+   - free allocated memory.
+   Called by Mail::Box->DESTROY
+
+*) my Mail::Message $msg = $fh->read()
+   Simplified access to folder to get one message.  It calls getHead and
+   getBody.  About the same as:
+      my $msg = new Mail::Message(file => $fh);
+      $msg->readHead;
+      $msg->readBody;
+      return $msg;
+
+
+= Methods in Mail::Message
+
+#) You may supply a Mail::Message::Head and/or ::Body at instantiation.
+
+*) print $msg->fromLine;
+   $msg->fromline('From me in 2001');
+   get/set from-line for Mbox-like folders
+
+#) my Mail::Message::Head $head = $msg->head;
+   Get the headers of this message
+
+#) my Mail::Message::Body $body = $msg->body;
+   Get the body of this message
+
+*) $msg->encode(type)  or $part->encode(type)
+
+*) $msg->decode        or $part->decode
+
+*) $msg->signature
+
+*) $msg->remove_sig
+
+*) $reply = $msg->reply;
+   Specialy complicated for reply on message-part.
+
+
+= Mail::Message::Body
+  extended by Mail::Message::Body::NotParsed
+              Mail::Message::Body::Lines
+              Mail::Message::Body::Scalar
+              Mail::Message::Body::File
+              Mail::Message::Body::Multipart
+
+*) $body->nrlines
+
+*) my $file_offset = $body->begin;
+
+*) my $bytesize = $body->size;
+
+*) if($body->isMultipart)
+   same as if($body isa 'Mail::Message::Body::Multipart')
+
+*) my Mail::Message::Body $body = Mail::Message::Body::get($fh)
+   To be overruled by each sub-class.
+
+*) $body->addPart(@parts);
+   Auto-multiparts message
+
+Conversions:
+
+*) $body->write(FILE)
+   results in a move when already BodyFile object
+   - supports encoding and decoding
+   - automatically updates Content-Length field
+
+*) my $whole = $body->string
+   use overload '""' => 'string';
+   No work for BodyBlock, otherwise conversion.
+
+*) my @lines = $body->lines
+   my $lines = $body->lines;   # returns [$body->lines]
+   use overload '@{}' => 'lines';
+   No work for BodyLines, otherwise conversion.
+
+
+= Mail::Message::Part isa Mail::Message
+
+*) my $nr = $part->partnr;
+   - All parts shall be sequentially numbered within the message,
+     even when the multipart is nested.
+
+But I'm sure more functionality is required here, for instance to
+support that attachments reside outside the folder-file to improve
+speed in opening the folder.
+
+
+= Mail::Message::Body::NotParsed isa Mail::Message::Body
+  but will autoload on any method performed on the body.
+
+Does not convert body from file to memory-structures, but only collects
+info to read it later.
+
+*) my $realbody = $body->load
+   returns a real subclass of Mail::Message::Body.
+
+
+= Mail::Message::Body::Scalar isa Mail::Message::Body
+
+Reads the whole message body into one scalar.
+
+
+= Mail::Message::Body::Lines isa Mail::Message::Body
+
+Reads the whole message body into a list of scalars, each containing
+one line.
+
+
+= Mail::Message::Body::Multipart isa Mail::Message::Body
+
+Each part is a Mail::Message (-subclass) by itself.
+
+*) print $body->separator || 'no sep yet';
+   $body->separator(time . "--$me--$$");
+   Get/set part boundary.
+
+*) print $body->preamble      ->string
+   Get/set preamble.  Should be empty, but not always is.
+   Returns a Mail::Message::Body instance
+
+*) print $body->epilogue      ->string
+   Get/set epiloque.  Returns a Mail::Message::Body instance.
+
+*) my @parts = $body->parts()
+   get/set all parts
+
+*) my $part = $body->part(42)
+   get/set one part   (set to undef means removal)
+
+*) $body->addPart(-1, @parts)
+   $body->addPart(@parts)
+   Add parts before the specified place, or at the end.
+
+
+= Mail::Message::Head
+
+Header-fields are used case-insensitive.  
+
+*) my $mime  = $msg->head->get('Subject')
+   my @mime  = $head->get('Received')
+   return the content of the header-field without trailing newline
+
+*) my @fields = $head->fields;
+   ordered list of read headers.  The order is used when write a message
+   to a file, while the data is stored in an (unordered) hash with
+   lowercased field-names.
+
+*) my Mail::Message::Head::Field $set = $header->set('Field', contents)
+   $header->set($mime);
+   $header->set(@mime);
+   removes old values (when present).  Adds name to end in field-order,
+   when new.
+
+*) my Mail::Message::Head::Field @set = $head->add('Received', contents)
+   $head->add($mime);
+   $head->add(@mime);
+   Adds after header-lines with the same name.  Returns all.
+
+
+= Mail::Message::Head::Field
+
+One line from the header.  This module will supply some methods to
+simplify understanding the headerlines, but not as far as Mail::Field
+has implemented.
+
+*) my $mime = Mail::Message::Head::Field->new(
+      Content-Type => 'text/plain', charset => 'US-ASCII');
+   my $mime = Mail::Message::Head::Field->new(
+       'Content-Type: text/plain; charset=US-ASCII');
+   my $mime = Mail::Message::Head::Field->new(
+       Content-Type => 'text/plain; charset=US-ASCII');
+
+*) my $name    = $mime->field;
+   => content-type           [lowercased]
+
+*) my $content = $mime->content;
+   => 'text/plain; charset=US-ASCII'
+
+*) my $value   = $mime->value;
+   => 'text/plain'
+
+*) my $charset = $mime->option('charset');
+   => US-ASCII
+
+*) my %options = $mime->options;
+
+*) print $mime->toString;
+   => Content-Type: text/plain; charset=US-ASCII
+
+--LQksG6bCIzRHxTLp--

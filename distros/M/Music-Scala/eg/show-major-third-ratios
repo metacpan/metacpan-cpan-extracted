@@ -1,0 +1,41 @@
+#!/usr/bin/env perl
+#
+# Show the ratios of the "major third" for 12-pitch octave-bounded
+# scales, though only if the ratio of the "major third" is greater than
+# the mean of the ratios of the minor thirds and less than the means of
+# the ratios of the fourth, as some scales have very curious "major
+# thirds" in them. (Another search might consider all scales, and print
+# those ratios that appear to be in the "major third" range, but what
+# that range is and how much overlap there is with adjacent intervals
+# between the various scales is an open question.)
+
+use strict;
+use warnings;
+use feature qw/say/;
+
+use List::Util qw/sum/;
+use Music::Scala ();
+
+my $s = Music::Scala->new;
+
+my ( @ma_thirds, @mi_thirds, @p_fourths );
+
+for my $file ( glob('*.scl') ) {
+  my @ratios = $s->read_scala($file)->get_ratios;
+  # limit to scales that are octave bounded (ultimate ratio is 2) and
+  # have 12 elements in them.
+  if ( $ratios[-1] == 2 and @ratios == 12 ) {
+    # index 0 is the "minor second", 1 the "major second", and then
+    # so forth
+    push @mi_thirds, $s->ratio2cents( $ratios[2] );
+    push @ma_thirds, $s->ratio2cents( $ratios[3] );
+    push @p_fourths, $s->ratio2cents( $ratios[4] );
+  }
+}
+
+my $mi_mean = sum(@mi_thirds) / @mi_thirds;
+my $pf_mean = sum(@p_fourths) / @mi_thirds;
+
+for my $ma (@ma_thirds) {
+  say $ma if $ma > $mi_mean and $ma < $pf_mean;
+}

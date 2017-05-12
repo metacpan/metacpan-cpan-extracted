@@ -1,0 +1,10 @@
+Revision history for Perl extension Math::HoltWinters.
+
+0.01  Fri May 27 15:10:20 2011
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Math::HoltWinters
+
+0.03  Sun Jan 29 2011
+	- finally ready to upload
+
+

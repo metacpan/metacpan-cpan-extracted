@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Memchmark.t
+lib/Memchmark.pm
+META.yml                                 Module meta-data (added by MakeMaker)

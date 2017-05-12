@@ -1,0 +1,70 @@
+uri SPAMCOP_URI_RBL      eval:check_spamcop_uri_rbl('multi.surbl.org','127.0.0.0+2')
+describe SPAMCOP_URI_RBL Has URI in SC at http://www.surbl.org/lists.html
+tflags SPAMCOP_URI_RBL   net
+                                                                                                            
+uri WS_URI_RBL           eval:check_spamcop_uri_rbl('multi.surbl.org','127.0.0.0+4')
+describe WS_URI_RBL      Has URI in WS at http://www.surbl.org/lists.html
+tflags WS_URI_RBL        net
+                                                                                                            
+uri PH_URI_RBL           eval:check_spamcop_uri_rbl('multi.surbl.org','127.0.0.0+8')
+describe PH_URI_RBL      Has URI in PH at http://www.surbl.org/lists.html
+tflags PH_URI_RBL        net
+                                                                                                            
+uri OB_URI_RBL           eval:check_spamcop_uri_rbl('multi.surbl.org','127.0.0.0+16')
+describe OB_URI_RBL      Has URI in OB at http://www.surbl.org/lists.html
+tflags OB_URI_RBL        net
+
+uri AB_URI_RBL           eval:check_spamcop_uri_rbl('multi.surbl.org','127.0.0.0+32')
+describe AB_URI_RBL      Has URI in AB at http://www.surbl.org/lists.html
+tflags AB_URI_RBL        net
+
+uri JP_URI_RBL           eval:check_spamcop_uri_rbl('multi.surbl.org','127.0.0.0+64')
+describe JP_URI_RBL      Has URI in JP at http://www.surbl.org/lists.html
+tflags JP_URI_RBL        net
+
+
+score SPAMCOP_URI_RBL  4.0
+score WS_URI_RBL  1.5
+score PH_URI_RBL  3.0
+score OB_URI_RBL  2.2
+score AB_URI_RBL  3.0
+score JP_URI_RBL  2.5
+
+
+# open redirect resolution off by default
+# spamcop_uri_resolve_open_redirects 1 
+
+open_redirect_list_spamcop_uri   snurl.com              *.snurl.com
+open_redirect_list_spamcop_uri   snipurl.com            *.snipurl.com
+open_redirect_list_spamcop_uri   tinyclick.com          *.tinyclick.com
+open_redirect_list_spamcop_uri   babyurl.com            *.babyurl.com
+open_redirect_list_spamcop_uri   lin.kz                 *.lin.kz
+open_redirect_list_spamcop_uri   *.v3.net
+open_redirect_list_spamcop_uri   shorl.com              *.shorl.com
+open_redirect_list_spamcop_uri   tinyurl.com            *.tinyurl.com
+open_redirect_list_spamcop_uri   xrl.us
+
+
+# local exclusion list, don't bother checking these URIs, they're clean
+whitelist_spamcop_uri   *.yahoo.com
+whitelist_spamcop_uri   *.w3.org
+whitelist_spamcop_uri   *.msn.com
+whitelist_spamcop_uri   *.com.com
+whitelist_spamcop_uri   *.yimg.com
+whitelist_spamcop_uri   *.hotmail.com
+whitelist_spamcop_uri   *.doubleclick.com
+whitelist_spamcop_uri   *.ebaystatic.com
+whitelist_spamcop_uri   *.aol.com
+whitelist_spamcop_uri   *.akamai.net
+whitelist_spamcop_uri   *.yahoogroups.com
+whitelist_spamcop_uri   *.ebay.com
+whitelist_spamcop_uri   *.classmates.com
+whitelist_spamcop_uri   *.akamaitech.com
+whitelist_spamcop_uri   *.google.com
+whitelist_spamcop_uri   *.microsoft.com
+whitelist_spamcop_uri   *.paypal.com
+whitelist_spamcop_uri   *.amazon.com
+
+# blacklist_spamcop_uri   *medz4cheap.com
+
+

@@ -1,0 +1,12 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Math::GSL::RNG qw/:all/;
+
+my $rng = Math::GSL::RNG->new($gsl_rng_knuthran, int rand(1e5) );
+my ($num,$min,$max) = @ARGV;
+$num ||= 10;
+$min ||= 0;
+$max ||= 100;
+
+print join("\n", map { $min + $rng->get % ($max-$min+1)  } (1..$num)) . "\n";

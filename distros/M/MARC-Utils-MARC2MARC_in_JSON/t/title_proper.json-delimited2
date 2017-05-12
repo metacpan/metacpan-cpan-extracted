@@ -1,0 +1,2377 @@
+---
+{
+   "leader" : "02179cas  2200553 a 45e0",
+   "fields" : [
+      {
+         "001" : "913380"
+      },
+      {
+         "005" : "20030124101153.0"
+      },
+      {
+         "008" : "751101c19479999dcuuu1m      f0   a0eng  "
+      },
+      {
+         "010" : {
+            "subfields" : [
+               {
+                  "a" : "   52002169 "
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "035" : {
+            "subfields" : [
+               {
+                  "a" : "(OCoLC)ocm01768314"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "035" : {
+            "subfields" : [
+               {
+                  "9" : "ADZ9243AM"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "035" : {
+            "subfields" : [
+               {
+                  "a" : "913380"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "040" : {
+            "subfields" : [
+               {
+                  "a" : "DLC"
+               },
+               {
+                  "c" : "MUL"
+               },
+               {
+                  "d" : "COO"
+               },
+               {
+                  "d" : "NSD"
+               },
+               {
+                  "d" : "DLC"
+               },
+               {
+                  "d" : "GPO"
+               },
+               {
+                  "d" : "NST"
+               },
+               {
+                  "d" : "DLC"
+               },
+               {
+                  "d" : "RCS"
+               },
+               {
+                  "d" : "GPO"
+               },
+               {
+                  "d" : "AIP"
+               },
+               {
+                  "d" : "OCL"
+               },
+               {
+                  "d" : "NSD"
+               },
+               {
+                  "d" : "OCL"
+               },
+               {
+                  "d" : "IUL"
+               },
+               {
+                  "d" : "HUL"
+               },
+               {
+                  "d" : "NST"
+               },
+               {
+                  "d" : "IUL"
+               },
+               {
+                  "d" : "HUL"
+               },
+               {
+                  "d" : "NST"
+               },
+               {
+                  "d" : "MYG"
+               },
+               {
+                  "d" : "SYS"
+               },
+               {
+                  "d" : "TXA"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "016" : {
+            "subfields" : [
+               {
+                  "a" : "C56643000"
+               },
+               {
+                  "2" : "DNLM"
+               }
+            ],
+            "ind1" : "7",
+            "ind2" : " "
+         }
+      },
+      {
+         "019" : {
+            "subfields" : [
+               {
+                  "a" : "2260037"
+               },
+               {
+                  "a" : "2260038"
+               },
+               {
+                  "a" : "5087003"
+               },
+               {
+                  "a" : "853216"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "022" : {
+            "subfields" : [
+               {
+                  "a" : "0363-6836"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "035" : {
+            "subfields" : [
+               {
+                  "a" : "0755033"
+               },
+               {
+                  "b" : "MULS"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "042" : {
+            "subfields" : [
+               {
+                  "a" : "nsdp"
+               },
+               {
+                  "a" : "lc"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "043" : {
+            "subfields" : [
+               {
+                  "a" : "n-us---"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "050" : {
+            "subfields" : [
+               {
+                  "a" : "HA195"
+               },
+               {
+                  "b" : ".A53"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : "0"
+         }
+      },
+      {
+         "060" : {
+            "subfields" : [
+               {
+                  "a" : "W2 A B9CU"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "074" : {
+            "subfields" : [
+               {
+                  "a" : "0142-C-01"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "082" : {
+            "subfields" : [
+               {
+                  "a" : "312.9"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "086" : {
+            "subfields" : [
+               {
+                  "a" : "C 56.218:P-20/"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "086" : {
+            "subfields" : [
+               {
+                  "a" : "C 3.186:P-20/"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "049" : {
+            "subfields" : [
+               {
+                  "a" : "TXAM"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "210" : {
+            "subfields" : [
+               {
+                  "a" : "Curr. popul. rep., Ser. P-20, Popul. char."
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "222" : {
+            "subfields" : [
+               {
+                  "a" : "Current population reports. Series P-20, Population characteristics"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : "0"
+         }
+      },
+      {
+         "245" : {
+            "subfields" : [
+               {
+                  "a" : "Current population reports."
+               },
+               {
+                  "n" : "Series P-20,"
+               },
+               {
+                  "p" : "Population characteristics."
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : "0"
+         }
+      },
+      {
+         "246" : {
+            "subfields" : [
+               {
+                  "a" : "Population characteristics"
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : "0"
+         }
+      },
+      {
+         "260" : {
+            "subfields" : [
+               {
+                  "a" : "[Washington, D.C.] :"
+               },
+               {
+                  "b" : "U.S. Dept. of Commerce, Bureau of the Census :"
+               },
+               {
+                  "b" : "For sale by the Supt. of Docs., U.S. G.P.O.,"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "265" : {
+            "subfields" : [
+               {
+                  "a" : "Supt. of Docs., U.S. Govt. Print. Off., Washington, DC 20402"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "300" : {
+            "subfields" : [
+               {
+                  "a" : "v. :"
+               },
+               {
+                  "b" : "ill., maps ;"
+               },
+               {
+                  "c" : "27 cm."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "362" : {
+            "subfields" : [
+               {
+                  "a" : "Began with No. 1."
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : " "
+         }
+      },
+      {
+         "500" : {
+            "subfields" : [
+               {
+                  "a" : "Description based on: No. 352."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "500" : {
+            "subfields" : [
+               {
+                  "a" : "Prior to January 1976 issues were classified C 56.218:P-20/(nos.)"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "510" : {
+            "subfields" : [
+               {
+                  "a" : "Population index"
+               },
+               {
+                  "x" : "0032-4701"
+               }
+            ],
+            "ind1" : "2",
+            "ind2" : " "
+         }
+      },
+      {
+         "510" : {
+            "subfields" : [
+               {
+                  "a" : "American statistics index"
+               },
+               {
+                  "x" : "0091-1658"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "530" : {
+            "subfields" : [
+               {
+                  "a" : "Some issues also available online via the World Wide Web, in PDF format."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "651" : {
+            "subfields" : [
+               {
+                  "a" : "United States"
+               },
+               {
+                  "x" : "Population"
+               },
+               {
+                  "v" : "Statistics"
+               },
+               {
+                  "v" : "Periodicals."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : "0"
+         }
+      },
+      {
+         "710" : {
+            "subfields" : [
+               {
+                  "a" : "United States."
+               },
+               {
+                  "b" : "Bureau of the Census."
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : " "
+         }
+      },
+      {
+         "740" : {
+            "subfields" : [
+               {
+                  "a" : "Population-special subjects."
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "780" : {
+            "subfields" : [
+               {
+                  "t" : "Current population reports. Series P-27, Farm population"
+               },
+               {
+                  "x" : "1048-6283"
+               },
+               {
+                  "w" : "(DLC)sf 87037999"
+               },
+               {
+                  "w" : "(OCoLC)7226532"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : "5"
+         }
+      },
+      {
+         "850" : {
+            "subfields" : [
+               {
+                  "a" : "AU"
+               },
+               {
+                  "a" : "DLC"
+               },
+               {
+                  "a" : "InU"
+               },
+               {
+                  "a" : "MH-KG"
+               },
+               {
+                  "a" : "MH-PA"
+               },
+               {
+                  "a" : "MH-SR"
+               },
+               {
+                  "a" : "MdU"
+               },
+               {
+                  "a" : "PU-W"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "856" : {
+            "subfields" : [
+               {
+                  "u" : "http://www.census.gov/mp/www/pub/pop/mspop01.html"
+               }
+            ],
+            "ind1" : "4",
+            "ind2" : "1"
+         }
+      },
+      {
+         "891" : {
+            "subfields" : [
+               {
+                  "9" : "853"
+               },
+               {
+                  "8" : "1"
+               },
+               {
+                  "a" : "no."
+               },
+               {
+                  "i" : "(year)"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : "3"
+         }
+      },
+      {
+         "891" : {
+            "subfields" : [
+               {
+                  "9" : "863"
+               },
+               {
+                  "8" : "1"
+               },
+               {
+                  "a" : "<324>-"
+               },
+               {
+                  "i" : "<1978>-"
+               },
+               {
+                  "x" : "provisional"
+               }
+            ],
+            "ind1" : "4",
+            "ind2" : "0"
+         }
+      },
+      {
+         "936" : {
+            "subfields" : [
+               {
+                  "a" : "No. 404 (Nov. 1985) LIC"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "994" : {
+            "subfields" : [
+               {
+                  "a" : "E0"
+               },
+               {
+                  "b" : "TXA"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      }
+   ]
+}
+---
+{
+   "leader" : "01858cas  2200457 a 4500",
+   "fields" : [
+      {
+         "001" : "913385"
+      },
+      {
+         "005" : "20030124101154.0"
+      },
+      {
+         "008" : "790313c19489999dcuuu1m      f0   a0eng  "
+      },
+      {
+         "010" : {
+            "subfields" : [
+               {
+                  "a" : "   52002108 //r822"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "019" : {
+            "subfields" : [
+               {
+                  "a" : "01779114"
+               },
+               {
+                  "a" : "07619124"
+               },
+               {
+                  "a" : "11810351"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "022" : {
+            "subfields" : [
+               {
+                  "a" : "0730-4803"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "035" : {
+            "subfields" : [
+               {
+                  "a" : "(OCoLC)04738786"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "035" : {
+            "subfields" : [
+               {
+                  "9" : "ADZ9248AM"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "035" : {
+            "subfields" : [
+               {
+                  "a" : "913385"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "040" : {
+            "subfields" : [
+               {
+                  "a" : "DLC"
+               },
+               {
+                  "c" : "CPO"
+               },
+               {
+                  "d" : "NLM"
+               },
+               {
+                  "d" : "MUL"
+               },
+               {
+                  "d" : "GPO"
+               },
+               {
+                  "d" : "NSD"
+               },
+               {
+                  "d" : "GPO"
+               },
+               {
+                  "d" : "HUL"
+               },
+               {
+                  "d" : "DLC"
+               },
+               {
+                  "d" : "NST"
+               },
+               {
+                  "d" : "DLC"
+               },
+               {
+                  "d" : "NST"
+               },
+               {
+                  "d" : "RCS"
+               },
+               {
+                  "d" : "OCL"
+               },
+               {
+                  "d" : "NSD"
+               },
+               {
+                  "d" : "HUL"
+               },
+               {
+                  "d" : "NST"
+               },
+               {
+                  "d" : "DLC"
+               },
+               {
+                  "d" : "OCL"
+               },
+               {
+                  "d" : "NST"
+               },
+               {
+                  "d" : "DLC"
+               },
+               {
+                  "d" : "NST"
+               },
+               {
+                  "d" : "MYG"
+               },
+               {
+                  "d" : "TXA"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "042" : {
+            "subfields" : [
+               {
+                  "a" : "nsdp"
+               },
+               {
+                  "a" : "lc"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "043" : {
+            "subfields" : [
+               {
+                  "a" : "n-us---"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "049" : {
+            "subfields" : [
+               {
+                  "a" : "TXAO"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "050" : {
+            "subfields" : [
+               {
+                  "a" : "HC110.I5"
+               },
+               {
+                  "b" : "A53"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : "0"
+         }
+      },
+      {
+         "060" : {
+            "subfields" : [
+               {
+                  "a" : "W2 A B9CUBM"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "069" : {
+            "subfields" : [
+               {
+                  "a" : "C56641000"
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : " "
+         }
+      },
+      {
+         "074" : {
+            "subfields" : [
+               {
+                  "a" : "0142-C-07"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "082" : {
+            "subfields" : [
+               {
+                  "a" : "339.2/2/0973"
+               },
+               {
+                  "2" : "19"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : "0"
+         }
+      },
+      {
+         "086" : {
+            "subfields" : [
+               {
+                  "a" : "C 3.186:P-60/"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "210" : {
+            "subfields" : [
+               {
+                  "a" : "Curr. popul. rep., Ser. P-60, Consum. income"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "222" : {
+            "subfields" : [
+               {
+                  "a" : "Current population reports. Series P-60, Consumer income"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : "0"
+         }
+      },
+      {
+         "245" : {
+            "subfields" : [
+               {
+                  "a" : "Current population reports."
+               },
+               {
+                  "n" : "Series P-60,"
+               },
+               {
+                  "p" : "Consumer income."
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : "0"
+         }
+      },
+      {
+         "246" : {
+            "subfields" : [
+               {
+                  "a" : "Consumer income"
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : "0"
+         }
+      },
+      {
+         "260" : {
+            "subfields" : [
+               {
+                  "a" : "[Washington, D.C.?] :"
+               },
+               {
+                  "b" : "U.S. Dept. of Commerce, Bureau of the Census :"
+               },
+               {
+                  "b" : "For sale by the Supt. of Docs, U.S. G.P.O.,"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "265" : {
+            "subfields" : [
+               {
+                  "a" : "Supt. of Docs., U.S. Govt. Print. Off., Washington, DC, 20402"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "300" : {
+            "subfields" : [
+               {
+                  "a" : "v. ;"
+               },
+               {
+                  "c" : "27 cm."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "362" : {
+            "subfields" : [
+               {
+                  "a" : "Began with No. 1."
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : " "
+         }
+      },
+      {
+         "500" : {
+            "subfields" : [
+               {
+                  "a" : "Prior to January 1976 issues were classified C 56.218:P-60/ during the time the Census Bureau was subordinate to the Social and Economic Statistics Administration."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "500" : {
+            "subfields" : [
+               {
+                  "a" : "Description based on: No. 115."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "510" : {
+            "subfields" : [
+               {
+                  "a" : "American statistics index"
+               },
+               {
+                  "x" : "0091-1658"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "530" : {
+            "subfields" : [
+               {
+                  "a" : "Some issues available also online via the World Wide Web, in PDF format."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "500" : {
+            "subfields" : [
+               {
+                  "a" : "Poverty in the United States is classed under C 3.186/22:"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "650" : {
+            "subfields" : [
+               {
+                  "a" : "Income"
+               },
+               {
+                  "z" : "United States."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : "0"
+         }
+      },
+      {
+         "650" : {
+            "subfields" : [
+               {
+                  "a" : "Consumers"
+               },
+               {
+                  "z" : "United States."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : "0"
+         }
+      },
+      {
+         "710" : {
+            "subfields" : [
+               {
+                  "a" : "United States."
+               },
+               {
+                  "b" : "Bureau of the Census."
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : " "
+         }
+      },
+      {
+         "856" : {
+            "subfields" : [
+               {
+                  "u" : "http://www.census.gov/ftp/pub/mp/www/pub/pop/mspop10.html"
+               }
+            ],
+            "ind1" : "4",
+            "ind2" : "1"
+         }
+      }
+   ]
+}
+---
+{
+   "leader" : "01866cas  2200469 a 4500",
+   "fields" : [
+      {
+         "001" : "1665454"
+      },
+      {
+         "005" : "20030124102744.0"
+      },
+      {
+         "008" : "970618c199u9999mdumr1p       0   a0eng d"
+      },
+      {
+         "006" : "m        d        "
+      },
+      {
+         "007" : "crucnu"
+      },
+      {
+         "010" : {
+            "subfields" : [
+               {
+                  "a" : "sn 97004211 "
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "022" : {
+            "subfields" : [
+               {
+                  "a" : "1094-1622"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "035" : {
+            "subfields" : [
+               {
+                  "a" : "(OCoLC)37142044"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "035" : {
+            "subfields" : [
+               {
+                  "9" : "AHN6270AM"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "035" : {
+            "subfields" : [
+               {
+                  "a" : "1665454"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "040" : {
+            "subfields" : [
+               {
+                  "a" : "NSD"
+               },
+               {
+                  "c" : "NSD"
+               },
+               {
+                  "d" : "HLS"
+               },
+               {
+                  "d" : "OCL"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "042" : {
+            "subfields" : [
+               {
+                  "a" : "nsdp"
+               },
+               {
+                  "a" : "lcd"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "049" : {
+            "subfields" : [
+               {
+                  "a" : "TXAM"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "082" : {
+            "subfields" : [
+               {
+                  "a" : "530"
+               },
+               {
+                  "2" : "12"
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : "0"
+         }
+      },
+      {
+         "130" : {
+            "subfields" : [
+               {
+                  "a" : "Physical review.  A (Online)"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "210" : {
+            "subfields" : [
+               {
+                  "a" : "Phys. rev., A At. mol. opt. phy."
+               },
+               {
+                  "b" : "(Online)"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "222" : {
+            "subfields" : [
+               {
+                  "a" : "Physical review. A, Atomic, molecular, and optical physics"
+               },
+               {
+                  "b" : "(Online)"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : "0"
+         }
+      },
+      {
+         "245" : {
+            "subfields" : [
+               {
+                  "a" : "Physical review."
+               },
+               {
+                  "n" : "A,"
+               },
+               {
+                  "p" : "Atomic, molecular, and optical physics"
+               },
+               {
+                  "h" : "[electronic resource]."
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : "0"
+         }
+      },
+      {
+         "246" : {
+            "subfields" : [
+               {
+                  "i" : "Title on \"entry\" page:"
+               },
+               {
+                  "a" : "Physical review A online"
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : " "
+         }
+      },
+      {
+         "246" : {
+            "subfields" : [
+               {
+                  "a" : "PRA"
+               }
+            ],
+            "ind1" : "3",
+            "ind2" : " "
+         }
+      },
+      {
+         "246" : {
+            "subfields" : [
+               {
+                  "a" : "Atomic, molecular, and optical physics"
+               }
+            ],
+            "ind1" : "3",
+            "ind2" : "0"
+         }
+      },
+      {
+         "260" : {
+            "subfields" : [
+               {
+                  "a" : "College Park, MD :"
+               },
+               {
+                  "b" : "American Physical Society"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "310" : {
+            "subfields" : [
+               {
+                  "a" : "Monthly"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "500" : {
+            "subfields" : [
+               {
+                  "a" : "Description based on: Vol. 55, issue 1 (Jan. 1997); title from title screen."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "506" : {
+            "subfields" : [
+               {
+                  "a" : "Available to those with print subscription; requires special login ID and password."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "516" : {
+            "subfields" : [
+               {
+                  "a" : "Table of contents available in HTML and PDF format; articles are Acrobat PDF only (electronic journal)"
+               }
+            ],
+            "ind1" : "8",
+            "ind2" : " "
+         }
+      },
+      {
+         "530" : {
+            "subfields" : [
+               {
+                  "a" : "Online version of the print publication: Physical review. A."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "538" : {
+            "subfields" : [
+               {
+                  "a" : "Mode of access: World Wide Web."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "500" : {
+            "subfields" : [
+               {
+                  "a" : "Text (electronic journal)"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "650" : {
+            "subfields" : [
+               {
+                  "a" : "Physics"
+               },
+               {
+                  "x" : "Periodicals."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : "0"
+         }
+      },
+      {
+         "650" : {
+            "subfields" : [
+               {
+                  "a" : "Nuclear physics"
+               },
+               {
+                  "x" : "Periodicals."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : "0"
+         }
+      },
+      {
+         "650" : {
+            "subfields" : [
+               {
+                  "a" : "Physical optics"
+               },
+               {
+                  "x" : "Periodicals."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : "0"
+         }
+      },
+      {
+         "655" : {
+            "subfields" : [
+               {
+                  "a" : "Computer network resources."
+               },
+               {
+                  "2" : "lcsh"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : "7"
+         }
+      },
+      {
+         "710" : {
+            "subfields" : [
+               {
+                  "a" : "American Physical Society."
+               }
+            ],
+            "ind1" : "2",
+            "ind2" : " "
+         }
+      },
+      {
+         "776" : {
+            "subfields" : [
+               {
+                  "t" : "Physical review. A"
+               },
+               {
+                  "x" : "1050-2947"
+               },
+               {
+                  "w" : "(DLC) 90656533"
+               },
+               {
+                  "w" : "(OCoLC) 21266025"
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : " "
+         }
+      },
+      {
+         "780" : {
+            "subfields" : [
+               {
+                  "t" : "Physical review.  A, General physics"
+               },
+               {
+                  "x" : "0556-2791"
+               },
+               {
+                  "w" : "(DLC)   75021361"
+               },
+               {
+                  "w" : "(OCoLC) 1083925"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : "0"
+         }
+      },
+      {
+         "856" : {
+            "subfields" : [
+               {
+                  "u" : "http://ojps.aip.org/prao/"
+               },
+               {
+                  "2" : "http"
+               }
+            ],
+            "ind1" : "7",
+            "ind2" : " "
+         }
+      }
+   ]
+}
+---
+{
+   "leader" : "02267cas  2200517 a 45e0",
+   "fields" : [
+      {
+         "001" : "1665455"
+      },
+      {
+         "005" : "20030124102745.0"
+      },
+      {
+         "006" : "m        d        "
+      },
+      {
+         "007" : "cr cnu--------"
+      },
+      {
+         "008" : "970826d199u1997mdusr1p s     0   a0eng d"
+      },
+      {
+         "010" : {
+            "subfields" : [
+               {
+                  "a" : "sn 97004477 "
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "035" : {
+            "subfields" : [
+               {
+                  "a" : "(OCoLC)ocm37528569"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "035" : {
+            "subfields" : [
+               {
+                  "a" : "(OCoLC)37528569"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "035" : {
+            "subfields" : [
+               {
+                  "9" : "AHN6271AM"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "035" : {
+            "subfields" : [
+               {
+                  "a" : "1665455"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "040" : {
+            "subfields" : [
+               {
+                  "a" : "NSD"
+               },
+               {
+                  "c" : "NSD"
+               },
+               {
+                  "d" : "EYM"
+               },
+               {
+                  "d" : "OCL"
+               },
+               {
+                  "d" : "IUL"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "022" : {
+            "subfields" : [
+               {
+                  "a" : "1095-3795"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "042" : {
+            "subfields" : [
+               {
+                  "a" : "nsdp"
+               },
+               {
+                  "a" : "lcd"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "082" : {
+            "subfields" : [
+               {
+                  "a" : "530"
+               },
+               {
+                  "2" : "12"
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : "0"
+         }
+      },
+      {
+         "049" : {
+            "subfields" : [
+               {
+                  "a" : "TXAM"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "050" : {
+            "subfields" : [
+               {
+                  "a" : "QC176.A1"
+               },
+               {
+                  "b" : "P513"
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : "4"
+         }
+      },
+      {
+         "130" : {
+            "subfields" : [
+               {
+                  "a" : "Physical review."
+               },
+               {
+                  "n" : "B,"
+               },
+               {
+                  "p" : "Condensed matter (Online)"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "210" : {
+            "subfields" : [
+               {
+                  "a" : "Phys. rev., B, Condens. matter"
+               },
+               {
+                  "b" : "(Online)"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : " "
+         }
+      },
+      {
+         "222" : {
+            "subfields" : [
+               {
+                  "a" : "Physical review. B, Condensed matter"
+               },
+               {
+                  "b" : "(Online)"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : "0"
+         }
+      },
+      {
+         "245" : {
+            "subfields" : [
+               {
+                  "a" : "Physical review."
+               },
+               {
+                  "n" : "B,"
+               },
+               {
+                  "p" : "Condensed matter"
+               },
+               {
+                  "h" : "[electronic resource]."
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : "0"
+         }
+      },
+      {
+         "246" : {
+            "subfields" : [
+               {
+                  "i" : "Title on journal home page:"
+               },
+               {
+                  "a" : "Physical review B online"
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : " "
+         }
+      },
+      {
+         "246" : {
+            "subfields" : [
+               {
+                  "i" : "Also known as:"
+               },
+               {
+                  "a" : "PRB online"
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : " "
+         }
+      },
+      {
+         "246" : {
+            "subfields" : [
+               {
+                  "a" : "PRB"
+               }
+            ],
+            "ind1" : "3",
+            "ind2" : "0"
+         }
+      },
+      {
+         "246" : {
+            "subfields" : [
+               {
+                  "a" : "Condensed matter"
+               }
+            ],
+            "ind1" : "3",
+            "ind2" : "0"
+         }
+      },
+      {
+         "260" : {
+            "subfields" : [
+               {
+                  "a" : "College Park, Md. :"
+               },
+               {
+                  "b" : "American Physical Society,"
+               },
+               {
+                  "c" : "-1997."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "310" : {
+            "subfields" : [
+               {
+                  "a" : "Semimonthly"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "362" : {
+            "subfields" : [
+               {
+                  "a" : "Ceased with Vol. 56, no. 24 (15 Dec. 1997)."
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : " "
+         }
+      },
+      {
+         "500" : {
+            "subfields" : [
+               {
+                  "a" : "Description based on: Vol. 55, issue 1 (Jan. 1997); title from title screen of HTML file (viewed on June 9, 1998)."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "500" : {
+            "subfields" : [
+               {
+                  "a" : "Description based on: Vol. 55, issue 1 (Jan. 1, 1997); title from title screen."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "500" : {
+            "subfields" : [
+               {
+                  "a" : "Text (electronic journal)"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "506" : {
+            "subfields" : [
+               {
+                  "a" : "Available by subscription only."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "516" : {
+            "subfields" : [
+               {
+                  "a" : "Table of contents and abstracts available in HTML and PDF format; articles are Acrobat PDF only (electronic journal)"
+               }
+            ],
+            "ind1" : "8",
+            "ind2" : " "
+         }
+      },
+      {
+         "530" : {
+            "subfields" : [
+               {
+                  "a" : "Online version of print publication including Rapid communications and Briefs."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "538" : {
+            "subfields" : [
+               {
+                  "a" : "Mode of access: World Wide Web."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "650" : {
+            "subfields" : [
+               {
+                  "a" : "Condensed matter"
+               },
+               {
+                  "v" : "Periodicals."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : "0"
+         }
+      },
+      {
+         "710" : {
+            "subfields" : [
+               {
+                  "a" : "American Physical Society."
+               }
+            ],
+            "ind1" : "2",
+            "ind2" : " "
+         }
+      },
+      {
+         "776" : {
+            "subfields" : [
+               {
+                  "t" : "Physical review. B, Condensed matter"
+               },
+               {
+                  "x" : "0163-1829"
+               },
+               {
+                  "w" : "(DLC)   80644831"
+               },
+               {
+                  "w" : "(OCoLC)4206245"
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : " "
+         }
+      },
+      {
+         "785" : {
+            "subfields" : [
+               {
+                  "t" : "Physical review. B, Condensed matter and materials physics"
+               },
+               {
+                  "w" : "(DLC)sn 98034465"
+               },
+               {
+                  "w" : "(OCoLC)39296657"
+               }
+            ],
+            "ind1" : "0",
+            "ind2" : "0"
+         }
+      },
+      {
+         "856" : {
+            "subfields" : [
+               {
+                  "u" : "http://library.tamu.edu/resources/ASP/track.asp?resource=Physical+Review+Online+Archive+%28PROLA%29"
+               },
+               {
+                  "z" : "Online version of articles available through Physical Review Online Archive (PROLA)"
+               }
+            ],
+            "ind1" : "4",
+            "ind2" : "0"
+         }
+      },
+      {
+         "856" : {
+            "subfields" : [
+               {
+                  "x" : "http://ojps.aip.org/journals/doc/PRBMDO-home/"
+               }
+            ],
+            "ind1" : "4",
+            "ind2" : "0"
+         }
+      },
+      {
+         "994" : {
+            "subfields" : [
+               {
+                  "a" : "E0"
+               },
+               {
+                  "b" : "TXA"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      }
+   ]
+}
+---
+{
+   "leader" : "01121nam  2200301 a 4500",
+   "fields" : [
+      {
+         "001" : "1665456"
+      },
+      {
+         "005" : "19991130062525.0"
+      },
+      {
+         "008" : "970908s1997    enk      b    001 0 eng d"
+      },
+      {
+         "020" : {
+            "subfields" : [
+               {
+                  "a" : "1860641067"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "035" : {
+            "subfields" : [
+               {
+                  "a" : "(OCoLC)37587441"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "035" : {
+            "subfields" : [
+               {
+                  "9" : "AHN6272AM"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "040" : {
+            "subfields" : [
+               {
+                  "a" : "DGU"
+               },
+               {
+                  "c" : "DGU"
+               },
+               {
+                  "d" : "TXA"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "043" : {
+            "subfields" : [
+               {
+                  "a" : "e-uk---"
+               },
+               {
+                  "a" : "n-us---"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "049" : {
+            "subfields" : [
+               {
+                  "a" : "TXAM"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "090" : {
+            "subfields" : [
+               {
+                  "a" : "E183.8.G7"
+               },
+               {
+                  "b" : "J65 1997"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "100" : {
+            "subfields" : [
+               {
+                  "a" : "Jones, Peter,"
+               },
+               {
+                  "d" : "1945-"
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : " "
+         }
+      },
+      {
+         "245" : {
+            "subfields" : [
+               {
+                  "a" : "America and the British Labour Party :"
+               },
+               {
+                  "b" : "the \"special relationship\" at work /"
+               },
+               {
+                  "c" : "Peter Jones."
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : "0"
+         }
+      },
+      {
+         "260" : {
+            "subfields" : [
+               {
+                  "a" : "London ;"
+               },
+               {
+                  "a" : "New York :"
+               },
+               {
+                  "b" : "Tauris Academic Studies,"
+               },
+               {
+                  "c" : "1997."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "300" : {
+            "subfields" : [
+               {
+                  "a" : "252 p. ;"
+               },
+               {
+                  "c" : "22 cm."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "490" : {
+            "subfields" : [
+               {
+                  "a" : "Library of international relations ;"
+               },
+               {
+                  "v" : "10"
+               }
+            ],
+            "ind1" : "1",
+            "ind2" : " "
+         }
+      },
+      {
+         "504" : {
+            "subfields" : [
+               {
+                  "a" : "Includes bibliographical references and index."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      },
+      {
+         "651" : {
+            "subfields" : [
+               {
+                  "a" : "Great Britain"
+               },
+               {
+                  "x" : "Foreign relations"
+               },
+               {
+                  "z" : "United States."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : "0"
+         }
+      },
+      {
+         "651" : {
+            "subfields" : [
+               {
+                  "a" : "United States"
+               },
+               {
+                  "x" : "Foreign relations"
+               },
+               {
+                  "z" : "Great Britain."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : "0"
+         }
+      },
+      {
+         "651" : {
+            "subfields" : [
+               {
+                  "a" : "Great Britain"
+               },
+               {
+                  "x" : "Foreign relations"
+               },
+               {
+                  "y" : "1945-"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : "0"
+         }
+      },
+      {
+         "651" : {
+            "subfields" : [
+               {
+                  "a" : "United States"
+               },
+               {
+                  "x" : "Foreign relations"
+               },
+               {
+                  "y" : "20th century."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : "0"
+         }
+      },
+      {
+         "610" : {
+            "subfields" : [
+               {
+                  "a" : "Labour Party (Great Britain)"
+               },
+               {
+                  "x" : "History"
+               },
+               {
+                  "y" : "20th century."
+               }
+            ],
+            "ind1" : "2",
+            "ind2" : "0"
+         }
+      },
+      {
+         "830" : {
+            "subfields" : [
+               {
+                  "a" : "Library of international relations (Series) ;"
+               },
+               {
+                  "v" : "v. 10."
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : "0"
+         }
+      },
+      {
+         "948" : {
+            "subfields" : [
+               {
+                  "a" : "c:cer"
+               },
+               {
+                  "d" : "20021105"
+               }
+            ],
+            "ind1" : " ",
+            "ind2" : " "
+         }
+      }
+   ]
+}
+---

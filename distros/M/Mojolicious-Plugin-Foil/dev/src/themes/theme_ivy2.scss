@@ -1,0 +1,43 @@
+/* ================================================================== */
+/* THEME: Ivy 2
+ * light_on_dark
+ */
+@import 'functions';
+@import 'theme_ivy.css';
+@import 'fonts_ivy2';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: black;
+$verge-fg: set-fg($verge-bg);
+$verge-border: white;
+$main-bg: #003300;
+$main-fg: set-fg($main-bg);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+}
+
+header {
+    @extend .verge;
+    background-image: url(ivy1.jpg);
+    background-attachment: fixed;
+}
+
+footer,
+.side {
+    @extend .verge;
+    background-image: url(ivy2.jpg);
+    background-attachment: fixed;
+}
+
+body {
+	color: $main-fg;
+	background: $main-bg;
+}
+

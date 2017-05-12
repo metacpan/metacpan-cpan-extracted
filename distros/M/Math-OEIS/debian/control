@@ -1,0 +1,36 @@
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016 Kevin Ryde
+
+# This file is part of Math-OEIS.
+#
+# Math-OEIS is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3, or (at
+# your option) any later version.
+#
+# Math-OEIS is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Math-OEIS.  If not, see <http://www.gnu.org/licenses/>.
+
+
+Source: libmath-oeis-perl
+Section: perl
+Priority: optional
+Build-Depends: perl (>= 5.6), cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 3.9.7
+Homepage: http://user42.tuxfamily.org/math-oeis/index.html
+Bugs: mailto:user42_kevin@yahoo.com.au
+
+Package: libmath-oeis-perl
+Architecture: all
+Depends: perl (>= 5.6), libfile-homedir-perl, libclass-singleton-perl, libconstant-defer-perl, libmodule-load-perl | perl (>= 5.10), ${perl:Depends}, ${misc:Depends}
+Recommends: libfile-map-perl
+Description: Things for Online Encyclopedia of Integer Sequences
+ Some code related to Sloane's Online Encyclopedia of Integer
+ Sequences, including reading the names and stripped files, and
+ grepping for values in the stripped file.  A -search option of the
+ grep module allows it to be used from the command line too.

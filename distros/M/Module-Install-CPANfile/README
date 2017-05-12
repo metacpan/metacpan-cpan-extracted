@@ -1,0 +1,71 @@
+NAME
+    Module::Install::CPANfile - Include cpanfile
+
+SYNOPSIS
+      # cpanfile
+      requires 'Plack', 0.9;
+      on test => sub {
+          requires 'Test::Warn';
+      };
+
+      # Makefile.PL
+      use inc::Module::Install;
+      name 'Dist-Name';
+      all_from 'lib/Dist/Name.pm';
+      # ...
+      cpanfile;
+      WriteAll;
+
+DESCRIPTION
+    Module::Install::CPANfile is a plugin for Module::Install to include
+    dependencies from cpanfile into meta files. "MYMETA" files are always
+    merged with cpanfile, as well as "META" files when you run "Makefile.PL"
+    as an author mode (as in preparation for "make dist").
+
+WHY?
+    If you have read cpanfile and cpanfile-faq you might wonder why this
+    plugin is necessary, since *cpanfile* is meant to be used by Perl
+    applications and not distributions.
+
+    Well, for a couple reasons.
+
+  Co-exist as a Github project and CPAN distribution
+    One particular use case is a script or web application that you develop
+    on github, and you start with writing dependencies in *cpanfile*. Other
+    users or developers pull the code from git, use carton to bundle
+    dependencies. So far, so good.
+
+    One day you decide to release the script or application to CPAN as a
+    CPAN distribtuion, and that means you have to duplicate *cpanfile* into
+    *Makefile.PL* or *Build.PL*, and that's not DRY! This plugin will allow
+    you to have just one *cpanfile* and reuse it from *Makefile.PL* for CPAN
+    client use.
+
+  CPAN Meta Spec 2.0 support.
+    The other, kind of unfortunate reason is that as of this writing,
+    Module::Install and ExtUtils::MakeMaker don't have a complete support
+    for expressing CPAN::Meta::Spec version 2.0 vocabularies.
+
+    There are many of known issues that the metadata you specify with
+    Module::Install are somehow discarded or down converted, and eventually
+    lost in *MYMETA* files. The examples of those issues are that test
+    dependencies gets merged with build dependencies, and that *recommends*
+    is not saved into MYMETA files.
+
+    This plugin lets you write prerequisites in *cpanfile* which is more
+    powerful and has a complete support for CPAN::Meta::Spec 2.0 and makes
+    your application forward compatible.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+COPYRIGHT
+    Copyright 2012- Tatsuhiko Miyagawa
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    cpanfile Module::CPANfile Module::Install
+

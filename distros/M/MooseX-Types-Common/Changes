@@ -1,0 +1,60 @@
+Revision history for MooseX-Types-Common
+
+0.001014  2017-01-19 02:29:46Z
+  - provide inlined version of NumericCode (Gregory Oschwald, GitHub PR#4)
+
+0.001013  2015-03-28 22:16:00Z
+  - better fix for fully-qualified type names, made to MooseX::Types directly
+  - whitespace is now permitted in the NumericCode type (Denis Ibaev)
+
+0.001012  2013-12-17 23:09:36Z
+  - fully-qualified type names like MooseX::Types::Common::String::SimpleStr
+    work again (removed in 0.001011)
+
+0.001011  2013-12-14 18:15:31Z
+  - update configure_requires checking in Makefile.PL, add CONTRIBUTING file
+
+0.001010  2013-09-27 04:39:30Z
+  - add incomplete prereq on Test::Warnings (haarg)
+  - re-release with fixed compile test
+
+0.001009  2013-09-14 22:11:25Z
+  - converted to Dist::Zilla
+  - SingleDigit now supports zero and negative numbers (RT#86738)
+  - UpperCase and LowerCase string types now properly understand unicode
+    characters (RT#84547)
+  - repository moved to the github moose organization
+
+0.001008   2012-06-14 18:29:50Z
+  - Upper* and Lower* string types now accept non-alphabetic characters (Karen
+    Etheridge)
+
+0.001007   2012-02-23 16:50:00Z
+  - remove Test::Exception from a test
+
+0.001006   2012-02-21 18:50:00Z
+  - fix POD per RT #75168
+
+0.001005   2012-02-20 01:45:00Z
+  - add NumericCode type, RT #74346
+
+0.001004   2011-12-06 04:30:00Z
+  - use Test::Fatal instead of Test::Exception (Justin Hunter)
+  - Added {Lower,Upper}CaseSimpleStr and {Lower,Upper}CaseStr, RT #71133
+
+0.001003   2011-08-31 16:35:00Z
+  - The positive and negative number types mistakenly accepted zero. Reported
+    by Eric Brine. RT #53234.
+  - Added PositiveOrZero{Int,Num} and NegativeOrZero{Int,Num} types. (Dave
+    Rolsky)
+
+0.001002   2010-02-22 22:00:00Z
+  - Add Test::Exception to the test_requires (RT#54357)
+  - Warning when you try to import things from MooseX::Types::Common rather
+    than one of the specific String/Numeric modules in the distribution.
+
+0.001001   2010-01-04
+  - POD updates
+
+0.001000   2009-02-02
+  - Initial release. This is a spin off from Reaction.

@@ -1,0 +1,29 @@
+---
+abstract: 'A convenient way to make many Moosen immutable (or mutable) in one shot'
+author:
+  - 'Robert Krimen, C<< <rkrimen at cpan.org> >>'
+build_requires:
+  Test::Most: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.760'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-MakeImmutable
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp::Clan: 0
+  Class::Inspector: 0
+  Devel::InnerPackage: 0
+  List::MoreUtils: 0
+  Module::Pluggable: 3.8
+  Moose: 0
+  Scalar::Util: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/robertkrimen/moosex-makeimmutable/tree/master
+version: 0.02

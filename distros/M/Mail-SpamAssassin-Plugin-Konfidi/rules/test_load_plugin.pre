@@ -1,0 +1,5 @@
+# load the plugin from locally (TODO: test what happens when the module is already installed in @INC)
+# working dir is ./t/log/localrules.tmp/
+loadplugin Mail::SpamAssassin::Plugin::Konfidi ../../../lib/Mail/SpamAssassin/Plugin/Konfidi.pm
+# load the plugin from system
+loadplugin Mail::SpamAssassin::Plugin::OpenPGP

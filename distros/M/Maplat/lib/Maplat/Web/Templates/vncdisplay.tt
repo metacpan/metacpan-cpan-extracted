@@ -1,0 +1,60 @@
+<p align="left">
+    [% ComputerData.computer_name %] [% tr.tr("Windows login") %]:<br>
+    [% tr.tr("Username") %]: [% ComputerData.account_user %] / [% tr.tr("Password") %]: [% ComputerData.account_password %] / [% tr.tr("Domain") %]: [% ComputerData.account_domain %]<br>
+    <b>[% tr.tr("You are not allowed to use any other login!") %]</b>
+</p>
+<p align="center">
+    <APPLET CODE="VncViewer.class" ARCHIVE="VncViewer.jar" CODEBASE="/static/vnc/" width="1300" height="1100">
+        <PARAM NAME="PORT" VALUE="[% ProxyPort %]">
+        <PARAM NAME="Scaling factor" VALUE="90">
+        <PARAM NAME="Password" VALUE="[% ComputerData.vnc_password %]">
+        <PARAM NAME="Offer relogin" VALUE="No">
+        <PARAM NAME="Cursor shape updates" VALUE="Disable">
+        <PARAM NAME="Defer update requests" VALUE="10">
+            
+    </APPLET>
+</p>
+&nbsp;
+<p align="left">
+    
+    <div id="vncrefreshstatus">Connection status:</div>
+</p>
+
+<script language="javascript">
+    var refreshHasErrors = 0;
+    
+    function ajaxVNCRefresh() {
+      var status_c = document.getElementById("vncrefreshstatus");
+      var params = "ID=[% ProxyPort %]"
+      srefresh.open("POST", "[% WaitLink %]", true);
+      
+      //Send the proper header information along with the request
+      srefresh.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      srefresh.setRequestHeader("Content-length", params.length);
+      srefresh.setRequestHeader("Connection", "close");
+      
+      srefresh.onreadystatechange=function() {
+        if(srefresh.readyState == 4) {
+          if(srefresh.responseText == "OK") {
+            refreshHasErrors = 0;
+          } else {
+            refreshHasErrors = 1;
+          }
+          if(status_c) {
+            status_c.innerHTML = "Connection status:" + srefresh.responseText;
+          }
+        }
+      }
+      
+      
+        srefresh.send(params);
+      if(refreshHasErrors == 0) {
+        setTimeout("ajaxVNCRefresh()", 10000);
+      } else {
+        // We had errors, try again in a short interval
+        setTimeout("ajaxVNCRefresh()", 5000);
+      }
+    }
+    
+    setTimeout("ajaxVNCRefresh()", 1000);
+</script>

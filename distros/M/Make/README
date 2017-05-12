@@ -1,0 +1,19 @@
+Copyright (c) 1996-1999 Nick Ing-Simmons. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+This package implements 'make' in perl.  
+
+Requires perl5.005 or later as it uses some of new regular expression features.
+
+To install 
+
+perl Makefile.PL
+perl -I. pmake 
+perl -Mblib pmake test 
+perl -Mblib pmake install 
+
+No other make required!
+
+This version can build Tk800.015 (one of the more complicated extensions)
+on both UNIX (Solaris2) and Win32. 

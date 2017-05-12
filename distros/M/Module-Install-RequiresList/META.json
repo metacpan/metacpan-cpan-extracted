@@ -1,0 +1,60 @@
+{
+   "abstract" : "Report prerequisite modules and version numbers",
+   "author" : [
+      "Ingy döt Net <ingy@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Module-Install-RequiresList",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt",
+         "example"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Meta::YAML" : "0.003",
+            "IO::All" : "0.41",
+            "JSON" : "2.53",
+            "Module::Install" : "1.10",
+            "Template::Toolkit::Simple" : "0.13",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ingydotnet/module-install-requireslist-pm/issues"
+      },
+      "homepage" : "https://github.com/ingydotnet/module-install-requireslist-pm",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ingydotnet/module-install-requireslist-pm.git",
+         "web" : "https://github.com/ingydotnet/module-install-requireslist-pm"
+      }
+   },
+   "version" : "0.15"
+}
+

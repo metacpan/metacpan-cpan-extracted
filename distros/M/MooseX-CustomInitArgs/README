@@ -1,0 +1,101 @@
+NAME
+    MooseX::CustomInitArgs - define multiple init args with custom processing
+
+SYNOPSIS
+       package Circle {
+          use Moose;
+          use MooseX::CustomInitArgs;
+      
+          has radius => (
+             is        => 'ro',
+             isa       => 'Num',
+             required  => 1,
+             init_args => [
+                'r',
+                'diameter' => sub { $_ / 2 },
+             ],
+          );
+       }
+   
+       # All three are equivalent...
+       my $circle = Circle->new(radius => 1);
+       my $circle = Circle->new(r => 1);
+       my $circle = Circle->new(diameter => 2);
+
+DESCRIPTION
+    `MooseX::CustomInitArgs` allows Moose attributes to be initialized from
+    alternative initialization arguments. If you find yourself wishing that
+    Moose's built-in `init_arg` option took an arrayref, then this is what you
+    want.
+
+    MooseX::MultiInitArg also does this, but `MooseX::CustomInitArgs` has an
+    additional feature: it can optionally pre-process each initialization
+    argument. This happens prior to type coercian and constraint checks.
+
+    (Also at the time of writing, `MooseX::MultiInitArg` suffers from a bug
+    where it breaks when a class is immutablized.)
+
+    The constructor cannot be called with multiple initialization arguments
+    for the same attribute. Given the class in the example, this would throw
+    an error:
+
+       my $circle = Circle->new(radius => 1, diameter => 100);
+
+    The following would also throw an error, even though it's slightly more
+    sensible:
+
+       my $circle = Circle->new(radius => 1, diameter => 2);
+
+    The `init_args` attribute option is conceptually a hash mapping
+    initialization argument names to methods which pre-process them. The
+    methods can be given as coderefs, or the names of class methods as strings
+    (or scalar refs).
+
+    You can provide this hash mapping as an actual hashref, or (as in the
+    "SYNOPSIS") as an arrayref suitable for input to Data::OptList. In either
+    case it will be coerced to `MooseX::CustomInitArgs`'s internal
+    representation which is a `Data::OptList`-style arrayref of arrayrefs.
+
+  Interaction with type constraints and coercion
+    Normally, custom init arg coderefs run *before* the value has been through
+    type constraint checks and coercions. This allows the coderef to massage
+    the value into passing its type constraint checks.
+
+    However, if you wish to run type constraint checks before the coderef, use
+    the `after_typecheck` helper:
+
+       init_args => [
+          'r',
+          'diameter' => after_typecheck { $_ / 2 },
+       ],
+
+    (There's a corresponding `before_typecheck` helper for clarity.)
+
+    After the coderef has been run, type constraint checks and coercions will
+    happen *again* on the result.
+
+CAVEATS
+    `init_args` cannot be used on attributes with `init_arg => undef`.
+    `MooseX::CustomInitArgs` will throw an error if you do.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-CustomInitArgs>.
+
+SEE ALSO
+    MooseX::MultiInitArg, MooseX::FunkyAttributes.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

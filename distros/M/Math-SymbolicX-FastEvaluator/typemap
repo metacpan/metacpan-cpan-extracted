@@ -1,0 +1,7 @@
+TYPEMAP
+FastEval::Evaluator *         O_OBJECT
+
+FastEval::Expression*         O_OBJECT
+
+FastEval::op_t *         O_OBJECT
+

@@ -1,0 +1,28 @@
+---
+abstract: 'Mojolicious Plugin to use unique javascript and stylesheet links.'
+author:
+  - 'Roman V. Nikolaev <rshadow@rambler.ru>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-UniqueTagHelpers
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '5.54'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/rshadow/mojolicious-plugin-unique_tag_helpers/issues
+  homepage: https://github.com/rshadow/mojolicious-plugin-unique_tag_helpers
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com:rshadow/mojolicious-plugin-unique_tag_helpers.git
+version: '1.3'

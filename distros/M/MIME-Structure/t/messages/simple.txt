@@ -1,0 +1,7 @@
+X-Header-Lines: 5
+From: Paul Hoffman <nkuitse@nkuitse.com>
+To: Paul Hoffman <nkuitse@nkuitse.com>
+Subject: Testing 1, 2, 3
+Description: Simple message
+
+This is a test.

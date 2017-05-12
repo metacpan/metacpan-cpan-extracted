@@ -1,0 +1,33 @@
+2001-01-28 12:36  stevegt
+
+	* ChangeLog, mh.pm, t/base.t, t/fetch.t, t/store.t, t/unseen.t:
+	reworked mh.pm and tests to handle +foldername correctly more docs
+
+2001-01-20 16:58  stevegt
+
+	* ChangeLog, Changes, MANIFEST: CPAN v0.03 release
+
+2001-01-20 16:23  stevegt
+
+	* t/: base.t, fetch.t, store.t, unseen.t: convert tests to
+	Mail::TieFolder usage
+
+2001-01-20 16:13  stevegt
+
+	* mh.pm: fix constructor so Mail::TieFolder can inherit from us
+
+2001-01-19 16:45  stevegt
+
+	* Changes, Makefile.PL, mh.pm, t/base.t, t/fetch.t, t/store.t,
+	t/unseen.t: rename from Mail::Tie::mh to Mail::TieFolder::mh
+
+2001-01-19 16:37  stevegt
+
+	* mh.pm, t/store.t, t/unseen.t: use mh Path to allow for
+	autocreation of new folders
+
+2000-11-11 22:42  stevegt
+
+	* Changes, MANIFEST, Makefile.PL, mh.pm, t/base.t, t/fetch.t,
+	t/inbox, t/msg1, t/msg2, t/store.t: version 0.1, for CPAN release
+

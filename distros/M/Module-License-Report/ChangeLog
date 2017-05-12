@@ -1,0 +1,67 @@
+2005-11-01 17:58  chris
+
+	* Build.PL: typo
+
+2005-11-01 17:57  chris
+
+	* Build.PL, MANIFEST, bin/license-report,
+	  lib/Module/License/Report.pm,
+	  lib/Module/License/Report/CPANPLUS.pm,
+	  lib/Module/License/Report/CPANPLUSModule.pm,
+	  lib/Module/License/Report/Object.pm: v0.02 Add command line
+	  program
+
+2005-11-01 17:28  chris
+
+	* lib/Module/License/: Report.pm, Report/CPANPLUS.pm,
+	  Report/CPANPLUSModule.pm, Report/Object.pm: Undo flaky anchors in
+	  docs
+
+2005-11-01 17:19  chris
+
+	* lib/Module/License/: Report.pm, Report/CPANPLUS.pm,
+	  Report/CPANPLUSModule.pm, Report/Object.pm: Documentation updates
+
+2005-11-01 16:32  chris
+
+	* Build.PL, lib/Module/License/Report.pm, t/license.t: Fixes for
+	  Linux
+
+2005-11-01 16:30  chris
+
+	* MANIFEST, t/license.t, t/lib/Mockery.pm: Fix path issues
+
+2005-11-01 15:42  chris
+
+	* MANIFEST, lib/Module/License/Report.pm,
+	  lib/Module/License/Report/CPANPLUS.pm,
+	  lib/Module/License/Report/CPANPLUSModule.pm,
+	  lib/Module/License/Report/Object.pm, t/license.t,
+	  t/sample/CPANPLUS/META.yml, t/sample/File-Slurp/Build.PL,
+	  t/lib/Mockery.pm, t/sample/File-Slurp/lib/File/Slurp.pm,
+	  t/sample/File-Slurp/lib/File/Slurp.pod,
+	  t/sample/No-License/LICENSE, t/sample/No-License/META.yml,
+	  t/sample/No-License/Makefile.PL, t/sample/No-License/README,
+	  t/sample/Unknown-License/Build.PL,
+	  t/sample/Unknown-License/Makefile.PL,
+	  t/sample/Unknown-License/README, t/sample/YAML/README: Working
+	  version
+
+2005-11-01 12:27  chris
+
+	* Build.PL, LICENSE, MANIFEST, MANIFEST.SKIP, README,
+	  lib/Module/License/Report.pm,
+	  lib/Module/License/Report/CPANPLUS.pm,
+	  lib/Module/License/Report/CPANPLUSModule.pm,
+	  lib/Module/License/Report/Object.pm, t/license.t,
+	  t/pod-coverage.t, t/pod.t: Initial revision
+
+2005-11-01 12:27  chris
+
+	* Build.PL, LICENSE, MANIFEST, MANIFEST.SKIP, README,
+	  lib/Module/License/Report.pm,
+	  lib/Module/License/Report/CPANPLUS.pm,
+	  lib/Module/License/Report/CPANPLUSModule.pm,
+	  lib/Module/License/Report/Object.pm, t/license.t,
+	  t/pod-coverage.t, t/pod.t: initial import
+

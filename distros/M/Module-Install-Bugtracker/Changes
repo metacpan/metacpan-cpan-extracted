@@ -1,0 +1,27 @@
+Version 0.0301: Sat May 2 2015
+- Prevent CPAN from indexing private-lib
+- Add Test::Module::Builder dependency in an attempt to fix local module
+  incompatibilities with inc/Test/More.pm
+  http://www.cpantesters.org/cpan/report/19eb410c-bf6d-1014-a84f-b9092b825c07
+
+Version 0.0300: Sun Apr 26 2015
+- Clarified the documentation that the URLs are CPAN bug tracker URLs.
+  https://rt.cpan.org/Ticket/Display.html?id=70912. Thanks to
+  Florent Angly <florent.angly@gmail.com> for the bug report.
+- Dynamically specify that configure_reauires 'URI::Escape', so that users of
+  this module don't have to.
+- Enable verbose CPAN testers testing
+- Fix odd elements warning in 08_synopsis.t
+- Fix 03_podspell.t for author names
+- Move to X.YYZZ versioning. ZZ for bugs, YY for features, X for major or
+  API-breaking changes
+- Add DEVELOPERNOTES
+- Start github repo based on 0.02. Marcel says that he lost the original repo
+  years ago.
+
+0.02 Sun 2010.02.07 16:35:54 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - fixed bugtracker URL
+     - now uses uri_escape() for distribution name in URL
+
+0.01 Mon Sep  7 17:43:43 MSZ 2009 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

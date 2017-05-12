@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Math/DyckWords.pm
+t/Math-DyckWords.t
+META.yml                                 Module meta-data (added by MakeMaker)

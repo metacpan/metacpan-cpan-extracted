@@ -1,0 +1,17 @@
+Revision history for Perl extension Math::CheckDigits
+
+0.05 2013-04-15T14:46:35Z
+
+        - fix packaging only
+
+0.04 2013-04-15T02:28:52Z
+
+        - can specify single scalar as `weight`
+        - can pass `options` to constractor
+        - switch to Minilla
+
+0.03    Tue Aug  6 16:11:23 2012
+        - add tests
+
+0.01    Wed Jan  6 11:46:23 2010
+        - original version

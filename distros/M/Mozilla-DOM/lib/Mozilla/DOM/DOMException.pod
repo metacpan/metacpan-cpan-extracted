@@ -1,0 +1,177 @@
+=head1 NAME
+
+Mozilla::DOM::DOMException
+
+=for object Mozilla::DOM::DOMException
+
+XXX: this class isn't supported yet here, as I've ignored catching
+any exceptions that are raised (though they are all noted
+in comments). Will soon.
+
+Mozilla::DOM::DOMException is a wrapper around an instance of Mozilla's
+nsIDOMDOMException interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+ * In general, DOM methods return specific error values in ordinary
+ * processing situations, such as out-of-bound errors.
+ * However, DOM operations can raise exceptions in "exceptional"
+ * circumstances, i.e., when an operation is impossible to perform
+ * (either for logical reasons, because data is lost, or because the
+ * implementation has become unstable)
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-Core/
+
+The following constants are available.
+You can export them all with C<use Mozilla::DOM::DOMException qw(:errcodes)>
+or export them individually.
+
+=over 4
+
+=item INDEX_SIZE_ERR
+
+=item DOMSTRING_SIZE_ERR
+
+=item HIERARCHY_REQUEST_ERR
+
+=item WRONG_DOCUMENT_ERR
+
+=item INVALID_CHARACTER_ERR
+
+=item NO_DATA_ALLOWED_ERR
+
+=item NO_MODIFICATION_ALLOWED_ERR
+
+=item NOT_FOUND_ERR
+
+=item NOT_SUPPORTED_ERR
+
+=item INUSE_ATTRIBUTE_ERR
+
+=item INVALID_STATE_ERR
+
+=item SYNTAX_ERR
+
+=item INVALID_MODIFICATION_ERR
+
+=item NAMESPACE_ERR
+
+=item INVALID_ACCESS_ERR
+
+=back
+
+=cut
+
+=begin comment
+
+  If you want to throw an exception object, assign the object to $@ and then pass
+  "Nullch" to croak():
+
+    errsv = get_sv("@", TRUE);
+    sv_setsv(errsv, exception_object);
+    croak(Nullch);
+
+  But how do I create a nsIDOMDOMException object? Is one thrown
+  when an exception occurs? (I was under the impression that
+  methods generally just return error codes.)
+
+=end comment
+
+=cut
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::DOMException->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=cut
+
+=begin comment
+
+# found code:
+nsresult rv;
+rv=aTarget->GetValue(&Url);
+if (NS_FAILED(rv)) return 2;
+(also have NS_SUCCEEDED)
+
+  enum { INDEX_SIZE_ERR = 1U };
+
+  enum { DOMSTRING_SIZE_ERR = 2U };
+
+  enum { HIERARCHY_REQUEST_ERR = 3U };
+
+  enum { WRONG_DOCUMENT_ERR = 4U };
+
+  enum { INVALID_CHARACTER_ERR = 5U };
+
+  enum { NO_DATA_ALLOWED_ERR = 6U };
+
+  enum { NO_MODIFICATION_ALLOWED_ERR = 7U };
+
+  enum { NOT_FOUND_ERR = 8U };
+
+  enum { NOT_SUPPORTED_ERR = 9U };
+
+  enum { INUSE_ATTRIBUTE_ERR = 10U };
+
+  enum { INVALID_STATE_ERR = 11U };
+
+  enum { SYNTAX_ERR = 12U };
+
+  enum { INVALID_MODIFICATION_ERR = 13U };
+
+  enum { NAMESPACE_ERR = 14U };
+
+  enum { INVALID_ACCESS_ERR = 15U };
+
+  /* readonly attribute unsigned long code; */
+#=for apidoc Mozilla::DOM::DOMException::GetCode
+#
+#=for signature $exception->GetCode(PRUint32 *aCode)
+#
+#
+#
+#=cut
+#
+### GetCode(PRUint32 *aCode)
+#somereturn *
+#moz_dom_GetCode (exception, aCode)
+#	nsIDOMexception *exception;
+#	PRUint32 *aCode ;
+#    PREINIT:
+#	
+#    CODE:
+#	exception->GetCode(&);
+#	RETVAL = ;
+#    OUTPUT:
+#	RETVAL
+
+=end comment
+
+=cut
+
+
+
+
+=head1 METHODS
+
+
+
+Some methods defined for Mozilla::DOM::DOMException::nsIDOMDOMException are not available in the particular
+library versions against which this module was compiled. 
+
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+
+=cut
+

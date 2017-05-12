@@ -1,0 +1,33 @@
+Revision history for Macro-Micro
+
+0.054     2013-09-22 00:27:13 Asia/Tokyo
+          repackage to update bugtracker and repo
+
+0.053     2009-04-10
+          drop support for perl5 v6
+
+0.052     2008-10-22
+          replace splicing while loop with for loop
+
+0.051     2007-02-24
+          fix packaging
+
+0.05      2006-10-15
+          add a clear_macros method
+          add "study" and M-M-Templates
+
+0.04      2005-12-22
+          allow "" as a macro value
+          fix manifest
+
+0.03      2005-12-10
+          provide ::perl56 for 5.6.1 use without memory leaks
+          fast_expander is faster (it encloses, rather than constructs, its
+          $expander)
+
+0.02      2005-12-09
+          allow undef values for expansion -- just don't alter them
+
+0.01      2005-12-07
+          first release
+

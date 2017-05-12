@@ -1,0 +1,45 @@
+---
+abstract: 'Template Toolkit renderer plugin for Mojolicious'
+author:
+  - 'Dan Book <dbook@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-TemplateToolkit
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Mojolicious::Plugin::TemplateToolkit:
+    file: lib/Mojolicious/Plugin/TemplateToolkit.pm
+    version: '0.002'
+  Template::Provider::Mojo:
+    file: lib/Template/Provider/Mojo.pm
+    version: '0.002'
+requires:
+  Class::Method::Modifiers: '0'
+  Mojolicious: '6.0'
+  Scalar::Util: '0'
+  Template: '2.26'
+  Template::Provider: '2.94'
+  parent: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/Grinnz/Mojolicious-Plugin-TemplateToolkit/issues
+  homepage: https://github.com/Grinnz/Mojolicious-Plugin-TemplateToolkit
+  repository: https://github.com/Grinnz/Mojolicious-Plugin-TemplateToolkit.git
+version: '0.002'
+x_contributors:
+  - 'Dan Book <grinnz@grinnz.com>'

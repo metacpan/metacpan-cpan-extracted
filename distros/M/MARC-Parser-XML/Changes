@@ -1,0 +1,7 @@
+Revision history for MARC-Parser-XML
+
+0.02  2016-09-09 11:24:29 CEST
+ - declare minimum perl version
+
+0.01  2016-09-02 12:46:52 CEST
+ - Initial release

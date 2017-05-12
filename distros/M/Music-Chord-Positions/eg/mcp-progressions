@@ -1,0 +1,402 @@
+#!/usr/bin/env perl
+#
+# Generate combinations of different chord voicings between different
+# scale degrees, and using the 'no_partial_closed' parameter to prevent
+# awkward 3rds in middle of otherwise open chords.
+#
+#   mcp-progressions --mode=minor --key='c minor' --flats \
+#    --max-leap=7 --max-root-leap=8   I VI     > minor-I-VI.ly
+#
+# Longer phrases will need output file splitting, as lilypond may be
+# incapable of rendering all the combinations in a single document:
+#
+#   mcp-progressions -t=2 -f=0.1 --ties --mode=major --key='d major' \
+#    --output=sequence I V VI III IV I IV V
+#
+# TODO really needs much more work, to allow 7ths, or 9ths, or
+# (optional?) inversions, or other chord naming schemes, or ideally
+# arbitrary pitch sets. (using automatic voicings or autochange or staff
+# changes would probably improve the lilypond output, too)
+
+use strict;
+use warnings;
+
+use File::Basename qw/basename/;
+use Getopt::Long qw/GetOptions/;
+use List::Util qw/sum/;
+use Music::Chord::Positions;
+use POSIX qw/floor/;
+
+my (
+  @orig_args,       @phrase,       @voices,       %interval_sets,
+  %params,          %pitch2note,   %Scale_Degs,   %registers,
+  $duration,        $exit_status,  $file_counter, $flats,
+  $fudge,           $instrument,   $inversions,   $key,
+  $leap_root_max,   $leap_max,     $mode,         $output_file,
+  $output_file_max, $phrase_count, $transpose,    $use_ties,
+);
+$exit_status     = 0;
+$output_file_max = 100;
+
+%params = (
+  allow_transpositions => 0,
+  no_partial_closed    => 0,
+  voice_count          => 4,
+);
+
+$duration      = 1;
+$fudge         = 0.5;
+$instrument    = 'Church Organ';    # as suits --ties better than Piano
+$key           = 'c major';
+$leap_max      = 5;
+$leap_root_max = 7;
+$transpose     = 0;
+
+%pitch2note =
+  qw( 0 c 1 cis 2 d 3 dis 4 e 5 f 6 fis 7 g 8 gis 9 a 10 ais 11 b );
+%registers = (
+  -3 => ",,,",
+  -2 => ",,",
+  -1 => ",",
+  0  => "",
+  1  => "'",
+  2  => "''",
+  3  => "'''",
+  4  => "''''",
+  5  => "'''''"
+);
+@orig_args = (
+  map { my $s = $_; $s =~ tr/\\"'//d; $s } basename($0),
+  grep { $_ !~ m/(?:instrument|output)/ } @ARGV
+);
+GetOptions(
+  'flats'           => \$flats,
+  'fudge|f=s'       => \$fudge,
+  'instrument=s'    => \$instrument,
+  'inversions'      => \$inversions,
+  'key=s'           => \$key,
+  'mode=s'          => \$mode,
+  'max-leap=s'      => \$leap_max,
+  'max-per-file=s'  => \$output_file_max,
+  'max-root-leap=s' => \$leap_root_max,
+  'output|o=s'      => \$output_file,
+  'param|p=s'       => \%params,
+  'ties'            => \$use_ties,
+  'transpose|t=s'   => \$transpose,
+) || print_help();
+@phrase = @ARGV;
+
+my $mcp = Music::Chord::Positions->new;
+
+# TODO vov code could greatly simplify following static mess
+%interval_sets = (
+  '5th-major' => $mcp->chord_pos( [qw/0 4 7/],    %params ),
+  '5th-minor' => $mcp->chord_pos( [qw/0 3 7/],    %params ),
+  '5th-dim'   => $mcp->chord_pos( [qw/0 3 6/],    %params ),
+  '5th-aug'   => $mcp->chord_pos( [qw/0 4 8/],    %params ),
+  '7th-dom'   => $mcp->chord_pos( [qw/0 4 7 10/], %params ),
+);
+%Scale_Degs = (
+  major => {
+    I   => { ps => $interval_sets{'5th-major'}, t => 0 },
+    II  => { ps => $interval_sets{'5th-minor'}, t => 2 },
+    III => { ps => $interval_sets{'5th-minor'}, t => 4 },
+    IV  => { ps => $interval_sets{'5th-major'}, t => 5 },
+    V   => { ps => $interval_sets{'5th-major'}, t => 7 },
+    VI  => { ps => $interval_sets{'5th-minor'}, t => 9 },
+    VII => { ps => $interval_sets{'5th-dim'},   t => 11 },
+  },
+  minor => {
+    I   => { ps => $interval_sets{'5th-minor'}, t => 0 },
+    II  => { ps => $interval_sets{'5th-dim'},   t => 2 },
+    III => { ps => $interval_sets{'5th-major'}, t => 3 },
+    IV  => { ps => $interval_sets{'5th-minor'}, t => 5 },
+    V   => { ps => $interval_sets{'5th-minor'}, t => 7 },
+    VI  => { ps => $interval_sets{'5th-major'}, t => 8 },
+    VII => { ps => $interval_sets{'5th-major'}, t => 10 },
+  },
+  dorian => {
+    I   => { ps => $interval_sets{'5th-minor'}, t => 0 },
+    II  => { ps => $interval_sets{'5th-minor'}, t => 2 },
+    III => { ps => $interval_sets{'5th-major'}, t => 3 },
+    IV  => { ps => $interval_sets{'5th-major'}, t => 5 },
+    V   => { ps => $interval_sets{'5th-minor'}, t => 7 },
+    VI  => { ps => $interval_sets{'5th-dim'},   t => 9 },
+    VII => { ps => $interval_sets{'5th-major'}, t => 10 },
+  },
+  phrygian => {
+    I   => { ps => $interval_sets{'5th-minor'}, t => 0 },
+    II  => { ps => $interval_sets{'5th-major'}, t => 1 },
+    III => { ps => $interval_sets{'5th-major'}, t => 3 },
+    IV  => { ps => $interval_sets{'5th-minor'}, t => 5 },
+    V   => { ps => $interval_sets{'5th-dim'},   t => 7 },
+    VI  => { ps => $interval_sets{'5th-major'}, t => 8 },
+    VII => { ps => $interval_sets{'5th-minor'}, t => 10 },
+  },
+  lydian => {
+    I   => { ps => $interval_sets{'5th-major'}, t => 0 },
+    II  => { ps => $interval_sets{'5th-major'}, t => 2 },
+    III => { ps => $interval_sets{'5th-minor'}, t => 4 },
+    IV  => { ps => $interval_sets{'5th-dim'},   t => 6 },
+    V   => { ps => $interval_sets{'5th-major'}, t => 7 },
+    VI  => { ps => $interval_sets{'5th-minor'}, t => 9 },
+    VII => { ps => $interval_sets{'5th-minor'}, t => 11 },
+  },
+  mixolydian => {
+    I   => { ps => $interval_sets{'5th-major'}, t => 0 },
+    II  => { ps => $interval_sets{'5th-minor'}, t => 2 },
+    III => { ps => $interval_sets{'5th-dim'},   t => 4 },
+    IV  => { ps => $interval_sets{'5th-major'}, t => 5 },
+    V   => { ps => $interval_sets{'5th-minor'}, t => 7 },
+    VI  => { ps => $interval_sets{'5th-minor'}, t => 9 },
+    VII => { ps => $interval_sets{'5th-major'}, t => 10 },
+  },
+  locrian => {
+    I   => { ps => $interval_sets{'5th-dim'},   t => 0 },
+    II  => { ps => $interval_sets{'5th-major'}, t => 1 },
+    III => { ps => $interval_sets{'5th-minor'}, t => 3 },
+    IV  => { ps => $interval_sets{'5th-minor'}, t => 5 },
+    V   => { ps => $interval_sets{'5th-major'}, t => 6 },
+    VI  => { ps => $interval_sets{'5th-major'}, t => 8 },
+    VII => { ps => $interval_sets{'5th-minor'}, t => 10 },
+  },
+);
+
+$Scale_Degs{'ionian'}  = $Scale_Degs{'major'};
+$Scale_Degs{'aeolian'} = $Scale_Degs{'minor'};
+
+if ( !defined $mode or !@phrase or @phrase < 2 ) {
+  print_help();
+  exit 64;
+}
+
+if ($flats) {
+  %pitch2note =
+    qw( 0 c 1 des 2 d 3 ees 4 e 5 f 6 ges 7 g 8 aes 9 a 10 bes 11 b );
+}
+
+for my $ps ( @{ $Scale_Degs{$mode}{ $phrase[0] }{'ps'} } ) {
+  gen_phrase( 1,
+    [ [ map { $_ + $Scale_Degs{$mode}{ $phrase[0] }{'t'} } @$ps ] ],
+    \@voices );
+}
+die "error: no voicings generated (options too restrictive?)\n" if !@voices;
+warn "info: generated $phrase_count phrases\n";
+
+if ( !$output_file ) {
+  @voices = @{ $mcp->chords2voices( \@voices ) };
+  unless ( lyify( \@voices ) ) {
+    warn "warning: problem emitting lilypond data\n";
+    $exit_status = 1;
+  }
+} else {
+  $output_file =~ s/\.ly$//;
+  my $file_count_pad = length int( $phrase_count / $output_file_max );
+
+  while ( my @subset = splice( @voices, 0, $output_file_max * @phrase ) ) {
+    @subset = @{ $mcp->chords2voices( \@subset ) };
+    my $out_file = $output_file
+      . sprintf( "%0*d", $file_count_pad, ++$file_counter ) . ".ly";
+    open( my $out_fh, '>', $out_file )
+      or die "error: cannot write '$out_file': $!\n";
+    select $out_fh or die "error: cannot select filehandle: $!\n";
+
+    unless ( lyify( \@subset ) ) {
+      warn "warning: problem emitting lilypond data\n";
+      $exit_status = 1;
+    }
+  }
+}
+
+exit $exit_status;
+
+########################################################################
+#
+# SUBROUTINES
+
+# Audit that voices do not leap too far between two chords of a phrase.
+# If transpositions allowed in generation, may need to audit for repeated
+# interval sets (same chords in different register).
+sub check_dest {
+  my ( $from, $to ) = @_;
+  my %seen;
+
+  return 0 if abs( $to->[0] - $from->[0] ) > $leap_root_max;
+  for my $vi ( 1 .. $#$from ) {
+    return 0 if abs( $to->[$vi] - $from->[$vi] ) > $leap_max;
+  }
+
+  # Exclude parallel 5ths and octaves
+  for my $i ( 0 .. $#$from - 1 ) {
+    for my $j ( 1 .. $#$from ) {
+      my $interval = $from->[$j] - $from->[$i];
+      if (
+        (    $interval == 7
+          or $interval == 12
+          or $interval == 19
+          or $interval == 24
+          or $interval == 31
+          or $interval == 36
+        )
+        and $to->[$j] - $to->[$i] == $interval
+        ) {
+        return 0;
+      }
+    }
+  }
+
+  return 1;
+}
+
+# This method keeps the voices within a certain range, as all the roots
+# are those above and below 0 (transposed as necessary for the scale
+# degree), and the voices will only wander as far as the leap settings
+# and available chord voicings permit. A different method could be
+# devised that would pick new roots around the root of the previous
+# chord; this would likely cause the musical line to wander more, as the
+# chord voicings could end up in progressively distant registers from 0.
+sub gen_phrase {
+  my ( $index, $pphrase, $voices ) = @_;
+
+  for my $ps ( @{ $Scale_Degs{$mode}{ $phrase[$index] }{'ps'} } ) {
+    for my $offset (
+      $Scale_Degs{$mode}{ $phrase[$index] }{'t'},
+      -12 + $Scale_Degs{$mode}{ $phrase[$index] }{'t'}
+      ) {
+      my $potential = [ @$pphrase, [ map { $_ + $offset } @$ps ] ];
+
+      if ( !check_dest( $potential->[-2], $potential->[-1] ) ) {
+        next;
+      }
+
+      if ( $index < $#phrase ) {
+        gen_phrase( $index + 1, $potential, $voices );
+      } else {
+        push @$voices, @{$potential};
+        $phrase_count++;
+      }
+    }
+  }
+}
+
+sub lyify {
+  my ($voices) = @_;
+  my ( @lv, @uv, $ly_lower_voices, $ly_upper_voices );
+  $ly_lower_voices = $ly_upper_voices = '';
+
+  $key =~ s/^(\w+)\s+(\w+)/\\key $1 \\$2/;
+
+  for my $voice (@$voices) {
+    my ( @registers, $mean_reg_num );
+    for my $pi ( 0 .. $#$voice ) {
+      $voice->[$pi] += $transpose if $transpose;
+      my $ly_pitch = $pitch2note{ $voice->[$pi] % $mcp->scale_degrees };
+      my $reg_num  = floor( $voice->[$pi] / $mcp->scale_degrees );
+      push @registers, $reg_num;
+
+      $voice->[$pi] = $ly_pitch . $registers{$reg_num};
+      $voice->[ $pi - 1 ] .= '~'
+        if $use_ties
+        and $voice->[ $pi - 1 ] eq $voice->[$pi]
+        and $pi % @phrase != 0;
+    }
+    my $mean_register = floor( sum(@registers) / @$voice + $fudge );
+
+    $voice->[0] =~ s/^(\w+[',]+)/$1$duration/;
+
+    my $bar_count = 0;
+    if ( $mean_register > 0 ) {
+      push @uv, join " ",
+        map { $_, ( ++$bar_count % @phrase == 0 ) ? '\\bar "||"' . "\n" : () }
+        @$voice;
+    } else {
+      push @lv, join " ",
+        map { $_, ( ++$bar_count % @phrase == 0 ) ? '\\bar "||"' . "\n" : () }
+        @$voice;
+    }
+  }
+
+  if (@uv) {
+    $ly_upper_voices = "<< {\n" . join( "\n} \\\\ {\n", @uv ) . "\n} >>\n";
+  }
+  if (@lv) {
+    $ly_lower_voices = "<< {\n" . join( "\n} \\\\ {\n", @lv ) . "\n} >>\n";
+  }
+
+  my $Mode = ucfirst $mode;
+
+  print <<"END_TMPL";
+\\version "2.14.0"
+
+\\header {
+  title    = "@phrase in $Mode"
+  subtitle = "Music::Chord::Positions v.$Music::Chord::Positions::VERSION"
+  tagline  = ##f
+}
+
+upper = {
+  \\clef treble
+  \\tempo 4=168
+  \\autoBeamOff
+  $key
+  $ly_upper_voices
+}
+
+lower = {
+  \\clef bass
+  \\autoBeamOff
+  $key
+  $ly_lower_voices
+}
+
+\\score {
+  \\new PianoStaff <<
+    \\set Score.midiChannelMapping = #'instrument
+    \\set Score.tempoHideNote = ##t
+    \\set PianoStaff.midiInstrument = #"$instrument"
+    \\new Staff = "upper" \\upper
+    \\new Staff = "lower" \\lower
+  >>
+  \\layout { }
+  \\midi { }
+}
+
+\\markup { @orig_args }
+END_TMPL
+}
+
+sub print_help {
+  warn <<"END_USAGE";
+Usage: $0 [options] --mode=[mode] scale degrees
+
+Generates combinations of progressions for the scale degrees mentioned
+in the named mode. Scale degrees use uppercase Roman Numerals e.g. I VI
+regardless of mode.
+
+Options:
+  mode=s           Mode, such as major, minor, dorian, etc. Required.
+
+  flats            Use flats instead of sharps in output.
+  fudge|f=s        Fudge factor for what clef voices end up in.
+  instrument=s     Lilypond MIDI instrument to use (Church Organ).
+  key=s            Lilypond key, such as '\\key c \\minor' or whatever.
+  max-leap=s       Largest semitone leap a non-root voice can make (5).
+  max-root-leap=s  Largest semitone leap the root can make (7).
+  param|p=s        Custom voicing parameters, see Music::Chord::Positions.
+  ties             Generate ties between shared pitches.
+  transpose=s      Value in semitones to transpose output by.
+
+If lilypond chokes on the results of a longer phrase, use:
+
+  output|o=s       Output to named file (counter will be added for split).
+  max-per-file=s   Limit output files to this number of phrases.
+
+END_USAGE
+}
+
+END {
+  if ( !$output_file and !close(STDOUT) ) {
+    warn "error: problem closing STDOUT: $!\n";
+    exit 74;
+  }
+}

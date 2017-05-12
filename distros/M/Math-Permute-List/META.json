@@ -1,0 +1,36 @@
+{
+   "abstract" : "Generate all the permutations of a list.",
+   "author" : [
+      "PhilipRBrenan@handybackup.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4208",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-Permute-List",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      }
+   },
+   "provides" : {
+      "Math::Permute::List" : {
+         "file" : "lib/Math/Permute/List.pm",
+         "version" : "1.007"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.007"
+}

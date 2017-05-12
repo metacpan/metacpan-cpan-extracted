@@ -1,0 +1,129 @@
+MIDI::Music - Perl interface to /dev/music.
+
+Version 0.01
+
+Description
+
+    MIDI::Music is a high-level interface to /dev/music, and
+    is designed to function on any *NIX system supported by
+    Open Sound System v.3.8 or higher.
+
+    Playback through internal and external MIDI devices is
+    supported, as is the "recording" of events from an
+    external device. Additional goals in designing MIDI::Music
+    were:
+
+        1. to provide an API with as few methods necessary to
+           satisfy 99% of MIDI programmers' purposes.
+
+        2. to provide easy integration with Sean M. Burke's
+           MIDI-Perl suite by means of a common event
+           specification.
+
+    There are, at present, essentially three things you can do
+    with MIDI::Music:
+
+        1. Play a MIDI file.
+
+        2. Play a series of events defined in an event structure,
+           which is a LoL as described in the the MIDI::Event
+           manpage documentation.
+
+        3. Read a series events from an external device. These
+           events are returned as the same type of event
+           structure as in [2].
+
+Requirements
+
+    1. You must have Open Sound System v.3.8 or greater installed on your 
+       system. For "realtime" support in recording (see MIDI::Music POD),
+       the commercial version of OSS is, to the author's knowledge,
+       necessary. OSS is available from the 4Front Technologies website:
+
+           http://www.opensound.com/
+
+    2. In order to use the playmidifile() method for playing standard MIDI 
+       files, Sean Burke's MIDI-Perl modules must be installed. MIDI-Perl 
+       is available from the CPAN:
+
+           http://www.cpan.org/
+
+Download
+
+    The latest version may be downloaded from the MIDI::Music homepage:
+
+        http://www.pdamusic.com/computer/midi-music.html
+
+Installation
+
+    If you have OSSLib installed, edit Makefile.PL so that the variable
+    "$OSSPATH" points to the appropriate location (if you have the 
+    commercial release of OSS installed, $OSSPATH should point to the
+    directory in which you installed it).
+
+    Then, the usual:
+
+    perl Makefile.PL
+    make
+    make test (optional)
+    make install
+
+To Do
+
+    * Add methods for obtaining synthesizer information
+      (number, types of available devices).
+
+    * At present, MIDI::Music supports the interface with
+      only one open device at a time. Future versions will
+      allow for simultaneous instances of initialized
+      devices, if possible.
+
+    * At present, system-exclusive events (produced by bulk
+      dumps, etc.) are not included in the event structures
+      returned by the readevents() manpage. This should be
+      fixed in the next release.
+
+    * Streamline the playmidifile() code for greater
+      memory-efficiency, if possible.
+
+Author
+
+    Seth David Johnson
+    seth@pdamusic.com
+
+Copyright
+
+    Copyright (c) 2001 Seth David Johnson. All Rights Reserved. This
+    program is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.
+
+See Also
+
+    The Open Sound System homepage (4Front Technologies):
+
+        http://www.opensound.com/
+
+    The OSS Programming Guide (PDF), describing in some detail
+    the /dev/music API on which MIDI::Music is based:
+
+        http://www.opensound.com/pguide/oss.pdf
+
+    Sean M. Burke's MIDI-Perl extensions provide methods for
+    dealing with MIDI files; you will need to have them
+    installed if you wish to use the playmidifile() method.
+
+    The documentation for the MIDI::Events manpage provides a
+    description of the "event structures" common to
+    MIDI::Music and MIDI-Perl.
+
+    Alex McLean's experimental the MIDI::Realtime manpage is
+    an earlier attempt to provide a synthesizer interface to
+    Perl. MIDI::Realtime takes an entirely different approach
+    both in terms of interface and in terms of implementation,
+    and may be better suited than MIDI::Music to specific
+    purposes.
+
+    The aforementioned extensions can be obtained from the
+    CPAN:
+
+        http://www.cpan.org/

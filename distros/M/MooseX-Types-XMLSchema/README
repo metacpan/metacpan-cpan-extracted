@@ -1,0 +1,360 @@
+NAME
+    MooseX::Types::XMLSchema - XMLSchema compatible Moose types library
+
+VERSION
+    version 0.06
+
+SYNOPSIS
+        package My::Class;
+        use Moose;
+        use MooseX::Types::XMLSchema qw( :all );
+
+        has 'string'       => ( is => 'rw', isa => 'xs:string' );
+
+        has 'boolean'      => ( is => 'rw', isa => 'xs:boolean' );
+
+        has 'byte'         => ( is => 'rw', isa => 'xs:byte' );
+        has 'short'        => ( is => 'rw', isa => 'xs:short' );
+        has 'int'          => ( is => 'rw', isa => 'xs:int' );
+        has 'long'         => ( is => 'rw', isa => 'xs:long', coerce => 1 );
+        has 'integer'      => ( is => 'rw', isa => 'xs:integer', coerce => 1 );
+        has 'float'        => ( is => 'rw', isa => 'xs:float', coerce => 1 );
+        has 'double'       => ( is => 'rw', isa => 'xs:double', coerce => 1 );
+        has 'decimal'      => ( is => 'rw', isa => 'xs:decimal', coerce => 1 );
+
+        has 'duration'     => ( is => 'rw', isa => 'xs:duration', coerce => 1 );
+        has 'datetime'     => ( is => 'rw', isa => 'xs:dateTime', coerce => 1 );
+        has 'time'         => ( is => 'rw', isa => 'xs:time', coerce => 1 );
+        has 'date'         => ( is => 'rw', isa => 'xs:date', coerce => 1 );
+        has 'gYearMonth'   => ( is => 'rw', isa => 'xs:gYearMonth', coerce => 1 );
+        has 'gYear'        => ( is => 'rw', isa => 'xs:gYear', coerce => 1 );
+        has 'gMonthDay'    => ( is => 'rw', isa => 'xs:gMonthDay', coerce => 1 );
+        has 'gDay'         => ( is => 'rw', isa => 'xs:gDay', coerce => 1 );
+        has 'gMonth'       => ( is => 'rw', isa => 'xs:gMonth', coerce => 1 );
+
+        has 'base64Binary' => ( is => 'rw', isa => 'xs:base64Binary', coerce => 1 );
+
+        has 'anyURI'            => ( is => 'rw', isa => 'xs:anyURI', coerce => 1 );
+
+        has 'nonPositiveInteger' => ( is => 'rw', isa => 'xs:nonPositiveInteger', coerce => 1 );
+        has 'positiveInteger'    => ( is => 'rw', isa => 'xs:positiveInteger', coerce => 1 );
+        has 'nonNegativeInteger' => ( is => 'rw', isa => 'xs:nonNegativeInteger', coerce => 1 );
+        has 'negativeInteger'    => ( is => 'rw', isa => 'xs:negativeInteger', coerce => 1 );
+
+        has 'unsignedByte'    => ( is => 'rw', isa => 'xs:unsignedByte' );
+        has 'unsignedShort'   => ( is => 'rw', isa => 'xs:unsignedShort' );
+        has 'unsignedInt'     => ( is => 'rw', isa => 'xs:unsignedInt' );
+        has 'unsignedLong'    => ( is => 'rw', isa => 'xs:unsignedLong', coerce => 1 );
+
+    Then, elsewhere:
+
+        my $object = My::Class->new(
+            string          => 'string',
+            decimal         => Math::BigFloat->new(20.12),
+            duration        => DateTime->now - DateTime->(year => 1990),
+            base64Binary    => IO::File->new($0),
+        );
+
+DESCRIPTION
+    This class provides a number of XMLSchema compatible types for your
+    Moose classes.
+
+TYPES
+  xs:string
+        has 'string'       => (
+            is => 'rw',
+            isa => 'xs:string'
+        );
+
+    A wrapper around built-in Str.
+
+  xs:integer
+        has 'integer'      => (
+            is => 'rw',
+            isa => 'xs:integer',
+            coerce => 1
+        );
+
+    A Math::BigInt object. Set to coerce from Int/Str.
+
+    This is defined in XSchema to be an arbitrary size integer.
+
+  xs:positiveInteger
+        has 'positiveInteger' => (
+            is => 'rw',
+            isa => 'xs:positiveInteger',
+            coerce => 1,
+        );
+
+    A Math::BigInt object. Set to coerce from Int/Str.
+
+    This is defined in XSchema to be an arbitrary size integer greater than
+    zero.
+
+  xs:nonPositiveInteger
+        has 'nonPositiveInteger' => (
+            is => 'rw',
+            isa => 'xs:nonPositiveInteger',
+            coerce => 1,
+        );
+
+    A Math::BigInt object. Set to coerce from Int/Str.
+
+    This is defined in XSchema to be an arbitrary size integer less than or
+    equal to zero.
+
+  xs:negativeInteger
+        has 'negativeInteger' => (
+            is => 'rw',
+            isa => 'xs:negativeInteger',
+            coerce => 1,
+        );
+
+    A Math::BigInt object. Set to coerce from Int/Str.
+
+    This is defined in XSchema to be an arbitrary size integer less than
+    zero.
+
+  xs:nonNegativeInteger
+        has 'nonPositiveInteger' => (
+            is => 'rw',
+            isa => 'xs:nonNegativeInteger',
+            coerce => 1,
+        );
+
+    A Math::BigInt object. Set to coerce from Int/Str.
+
+    This is defined in XSchema to be an arbitrary size integer greater than
+    or equal to zero.
+
+  xs:long
+        has 'long' => (
+            is => 'rw',
+            isa => 'xs:long',
+            coerce => 1,
+        );
+
+    A 64-bit Integer. Represented as a Math::Bigint object, but limited to
+    the 64-bit (signed) range. Set to coerce from Int/Str.
+
+  xs:unsignedLong
+        has 'unsignedLong' => (
+            is => 'rw',
+            isa => 'xs:unsignedLong',
+            coerce => 1,
+        );
+
+    A 64-bit Integer. Represented as a Math::Bigint object, but limited to
+    the 64-bit (unsigned) range. Set to coerce from Int/Str.
+
+  xs:int
+        has 'int' => (
+            is => 'rw',
+            isa => 'xs:int'
+        );
+
+    A 32-bit integer. Represented natively.
+
+  xs:unsignedInt
+        has 'unsignedInt' => (
+            is => 'rw',
+            isa => 'xs:unsignedInt'
+        );
+
+    A 32-bit integer. Represented natively.
+
+  xs:short
+        has 'short' => (
+            is => 'rw',
+            isa => 'xs:short'
+        );
+
+    A 16-bit integer. Represented natively.
+
+  xs:unsignedShort
+        has 'unsignedShort' => (
+            is => 'rw',
+            isa => 'xs:unsignedShort'
+        );
+
+    A 16-bit integer. Represented natively.
+
+  xs:byte
+        has 'byte' => (
+            is => 'rw',
+            isa => 'xs:byte'
+        );
+
+    An 8-bit integer. Represented natively.
+
+  xs:unsignedByte
+        has 'unsignedByte' => (
+            is => 'rw',
+            isa => 'xs:unsignedByte'
+        );
+
+    An 8-bit integer. Represented natively.
+
+  xs:boolean
+        has 'boolean' => (
+            is => 'rw',
+            isa => 'xs:boolean'
+        );
+
+    A wrapper around built-in Bool.
+
+  xs:float
+        has 'float' => (
+            is => 'rw',
+            isa => 'xs:float',
+            coerce => 1,
+        );
+
+    A single-precision 32-bit Float. Represented as a Math::BigFloat object,
+    but limited to the 32-bit range. Set to coerce from Num/Str.
+
+  xs:double
+        has 'double' => (
+            is => 'rw',
+            isa => 'xs:double',
+            coerce => 1,
+        );
+
+    A double-precision 64-bit Float. Represented as a Math::BigFloat object,
+    but limited to the 64-bit range. Set to coerce from Num/Str.
+
+  xs:decimal
+        has 'decimal' => (
+            is => 'rw',
+            isa => 'xs:decimal',
+            coerce => 1,
+        );
+
+    Any base-10 fixed-point number. Represented as a Math::BigFloat object.
+    Set to coerce from Num/Str.
+
+  xs:duration
+        has 'duration' => (
+            is => 'rw',
+            isa => 'xs:duration',
+            coerce => 1,
+        );
+
+    A wrapper around Str. If you enable coerce you can pass a
+    DateTime::Duration object.
+
+  xs:dateTime
+        has 'datetime' => (
+            is => 'rw',
+            isa => 'xs:dateTime',
+            coerce => 1
+        );
+
+    A wrapper around Str. If you enable coerce you can pass a DateTime
+    object.
+
+  xs:time
+        has 'time' => (
+            is => 'rw',
+            isa => 'xs:time',
+            coerce => 1
+        );
+
+    A wrapper around Str. If you enable coerce you can pass a DateTime
+    object.
+
+  xs:date
+        has 'date'  => (
+            is => 'rw',
+            isa => 'xs:date',
+            coerce => 1
+        );
+
+    A wrapper around Str. If you enable coerce you can pass a DateTime
+    object.
+
+  xs:gYearMonth
+        has 'gYearMonth' => (
+            is => 'rw',
+            isa => 'xs:gYearMonth',
+            coerce => 1
+        );
+
+    A wrapper around Str. If you enable coerce you can pass a DateTime
+    object or a ArrayRef of two integers.
+
+  xs:gYear
+        has 'gYear' => (
+            is => 'rw',
+            isa => 'xs:gYear',
+            coerce => 1
+        );
+
+    A wrapper around Str. If you enable coerce you can pass a DateTime
+    object.
+
+  xs:gMonthDay
+        has 'gMonthDay' => (
+            is => 'rw',
+            isa => 'xs:gMonthDay',
+            coerce => 1
+        );
+
+    A wrapper around Str. If you enable coerce you can pass a DateTime
+    object or a ArrayRef of two integers.
+
+  xs:gDay
+        has 'gDay' => (
+            is => 'rw',
+            isa => 'xs:gDay',
+            coerce => 1
+        );
+
+    A wrapper around Str. If you enable coerce you can pass a DateTime
+    object or Int eg. 24.
+
+  xs:gMonth
+        has 'gMonth' => (
+            is => 'rw',
+            isa => 'xs:gMonth',
+            coerce => 1
+        );
+
+    A wrapper around Str. If you enable coerce you can pass a DateTime
+    object or Int eg. 10.
+
+  xs:base64Binary
+        has 'base64Binary' => (
+            is => 'rw',
+            isa => 'xs:base64Binary',
+            coerce => 1
+        );
+
+    A wrapper around Str. If you enable coerce you can pass a IO::Handle
+    object - the content of the file will be encoded to UTF-8 before
+    encoding with base64.
+
+  xs:anyURI
+        has 'anyURI' => (
+            is => 'rw',
+            isa => 'xs:anyURI',
+            coerce => 1
+        );
+
+    A wrapper around Str. If you enable coerce you can pass a URI object.
+
+SEE ALSO
+    *   Enable attributes coercion automatically with
+
+        MooseX::AlwaysCoerce
+
+AUTHOR
+    Alex J. G. Burzyński <ajgb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Alex J. G. Burzyński
+    <ajgb@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

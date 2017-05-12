@@ -1,0 +1,227 @@
+NAME
+    Mail::OpenDKIM - Provides an interface to libOpenDKIM
+
+SYNOPSIS
+     # sign outgoing message
+
+     use Mail::DKIM::Signer;
+
+     # create a signer object
+     my $dkim = Mail::OpenDKIM::Signer->new(
+      Algorithm => 'rsa-sha1',
+      Method => 'relaxed',
+      Domain => 'example.org',
+      Selector => 'selector1',
+      KeyFile => 'private.key',
+     );
+
+     # read an email and pass it into the signer, one line at a time
+     while(<STDIN>) {
+      # remove local line terminators
+      chomp;
+      s/\015$//;
+
+      # use SMTP line terminators
+      $dkim->PRINT("$_\015\012");
+     }
+     $dkim->CLOSE();
+
+     # what is the signature result?
+     my $signature = $dkim->signature;
+     print $signature->as_string;
+
+     # check validity of incoming message
+     my $o = Mail::OpenDKIM->new();
+     $o->dkim_init();
+
+     my $d = $o->dkim_verify({
+      id => 'MLM',
+     });
+
+     $msg =~ s/\n/\r\n/g;
+
+     $d->dkim_chunk({ chunkp => $msg, len => length($msg) });
+
+     $d->dkim_chunk({ chunkp => '', len => 0 });
+
+     $d->dkim_eom();
+
+     my $sig = $d->dkim_getsignature();
+
+     $d->dkim_sig_process({ sig => $sig });
+
+     printf "0x\n", $d->dkim_sig_getflags({ sig => $sig });
+
+     $d->dkim_free();
+
+     $o->dkim_close();
+
+DESCRIPTION
+    Mail::OpenDKIM, coupled with Mail::OpenDKIM::DKIM, provides a means of
+    calling libOpenDKIM from Perl. Mail::OpenDKIM implements those routine
+    taking a DKIM_LIB argument; those taking a DKIM argument have been
+    implemented in Mail::OpenDKIM::DKIM.
+
+    Mail::OpenDKIM::Signer provides a drop in replacement for the signature
+    process provided by Mail::DKIM::Signer.
+
+    When an error is encountered, an Error::Simple object is thrown.
+
+SUBROUTINES/METHODS
+  new
+    Create a new signing/verifying object. After doing this you will need to
+    call the dkim_init method before you can do much else.
+
+  dkim_init
+    For further information, refer to http://www.opendkim.org/libopendkim/
+
+  dkim_close
+    For further information, refer to http://www.opendkim.org/libopendkim/
+
+  dkim_flush_cache
+    For further information, refer to http://www.opendkim.org/libopendkim/
+
+  dkim_libfeature
+    For further information, refer to http://www.opendkim.org/libopendkim/
+
+  dkim_sign
+    For further information, refer to http://www.opendkim.org/libopendkim/
+
+    Returns a Mail::OpenDKIM::DKIM object.
+
+  dkim_verify
+    For further information, refer to http://www.opendkim.org/libopendkim/
+
+    Returns a Mail::OpenDKIM::DKIM object. The memclosure argument is
+    ignored.
+
+  dkim_getcachestats
+    For further information, refer to http://www.opendkim.org/libopendkim/
+
+  dkim_set_dns_callback
+    For further information, refer to http://www.opendkim.org/libopendkim/
+
+  dkim_set_key_lookup
+    For further information, refer to http://www.opendkim.org/libopendkim/
+
+  dkim_set_signature_handle
+    For further information, refer to http://www.opendkim.org/libopendkim/
+
+  dkim_set_signature_handle_free
+    For further information, refer to http://www.opendkim.org/libopendkim/
+
+  dkim_set_signature_tagvalues
+    For further information, refer to http://www.opendkim.org/libopendkim/
+
+  dkim_dns_set_query_cancel
+    For further information, refer to http://www.opendkim.org/libopendkim/
+
+  dkim_dns_set_query_service
+    For further information, refer to http://www.opendkim.org/libopendkim/
+
+  dkim_dns_set_query_start
+    For further information, refer to http://www.opendkim.org/libopendkim/
+
+  dkim_dns_set_query_waitreply
+    For further information, refer to http://www.opendkim.org/libopendkim/
+
+  dkim_options
+    For further information, refer to http://www.opendkim.org/libopendkim/
+
+  dkim_libversion
+    Static method.
+
+  dkim_ssl_version
+    Static method.
+
+  dkim_getcachestats
+    Static method.
+
+  dkim_getresultstr
+    Calls C routine of same name.
+
+  dkim_sig_geterrorstr
+    Calls C routine of same name.
+
+  dkim_mail_parse
+    Calls C routine of same name.
+
+EXPORT
+    Many DKIM_* constants, e.g. DKIM_STAT_OK are exported.
+
+SEE ALSO
+    Mail::DKIM
+
+    http://www.opendkim.org/libopendkim/
+
+    RFC 4870, RFC 4871
+
+REPOSITORY
+    <https://github.com/infracaninophile/Mail-OpenDKIM.git>
+
+DEPENDENCIES
+    This module requires these other modules and libraries:
+
+      Test::More
+      libOpenDKIM 2.10 (http://www.opendkim.org/libopendkim/)
+      C compiler
+
+NOTES
+    Tested against libOpenDKIM 2.10.3.
+
+    Only portions of Mail::DKIM::Signer interface, and the support for it,
+    have been implemented.
+
+    Please report any bugs or feature requests to "bug-mail-opendkim at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Mail-OpenDKIM>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+    The signature creation rountines have been tested more thoroughly than
+    the signature verification routines.
+
+    Feedback will be greatfully received.
+
+AUTHOR
+    Nigel Horne
+
+    Vick Khera, "<vivek at khera.org>"
+
+    Matthew Seaman, "<m.seaman@infracaninophile.co.uk>"
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Mail::OpenDKIM
+
+    You can also look for information at:
+
+    *   MailerMailer Project page
+
+        <http://www.mailermailer.com/labs/projects/Mail-OpenDKIM.rwp>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mail-OpenDKIM>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Mail-OpenDKIM>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Mail-OpenDKIM>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Mail-OpenDKIM/>
+
+SPONSOR
+    This code has been developed under sponsorship of MailerMailer LLC,
+    http://www.mailermailer.com/
+
+COPYRIGHT AND LICENCE
+    This module is Copyright 2014 Khera Communications, Inc. Copyright 2015
+    Matthew Seaman It is licensed under the same terms as Perl itself.
+

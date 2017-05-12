@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                Math-Polynom
+version:             0.13
+abstract:            Operations on polynomials
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    accessors:                     0
+    Carp:                          0
+    constant:                      0
+    Data::Dumper:                  2.10
+    Data::Float:                   0
+    Scalar::Util:                  1.14
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Erwan Lemonnier <erwan@cpan.org>

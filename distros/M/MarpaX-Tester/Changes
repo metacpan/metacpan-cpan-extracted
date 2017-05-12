@@ -1,0 +1,8 @@
+Revision history for MarpaX::Tester
+
+0.01 2014-05-03
+ - First stab.
+
+0.02 2014-05-03
+ - Fixed manifest, also fixed a bug in the default HTML (not escaping <>)
+

@@ -1,0 +1,109 @@
+NAME
+    Module::Install::ReadmeFromPod - A Module::Install extension to
+    automatically convert POD to a README
+
+SYNOPSIS
+      # In Makefile.PL
+
+      use inc::Module::Install;
+      author 'Vestan Pants';
+      license 'perl';
+      readme_from 'lib/Some/Module.pm';
+      readme_from 'lib/Some/Module.pm', { clean => 1, format => 'htm', output_file => 'SomeModule.html' };
+
+    A "README" file will be generated from the POD of the indicated module
+    file.
+
+    Note that the author will need to make sure
+    "Module::Install::ReadmeFromPod" is installed before running the
+    "Makefile.PL". (The extension will be bundled into the user-side
+    distribution).
+
+DESCRIPTION
+    Module::Install::ReadmeFromPod is a Module::Install extension that
+    generates a "README" file automatically from an indicated file
+    containing POD, whenever the author runs "Makefile.PL". Several output
+    formats are supported: plain-text, HTML, PDF or manpage.
+
+COMMANDS
+    This plugin adds the following Module::Install command:
+
+    "readme_from"
+        Does nothing on the user-side. On the author-side it will generate a
+        "README" file.
+
+          readme_from 'lib/Some/Module.pm';
+
+        If a second parameter is set to a true value then the "README" will
+        be removed at "make distclean".
+
+          readme_from 'lib/Some/Module.pm', 1;
+
+        A third parameter can be used to determine the format of the
+        "README" file.
+
+          readme_from 'lib/Some/Module.pm', 1, 'htm';
+
+        Valid formats for this third parameter are:
+
+        txt, text
+            Produce a plain-text "README" file using Pod::Text. The 'txt'
+            format is the default.
+
+        htm, html
+            Produce an HTML "README.htm" file using Pod::Html.
+
+        man Produce a "README.1" manpage using Pod::Man.
+
+        md  Produce a "README.md" file using Pod::Markdown.
+
+        pdf Produce a PDF "README.pdf" file with App::pod2pdf if this module
+            is installed.
+
+        A fourth parameter can be used to supply an output filename.
+
+          readme_from 'lib/Some/Module.pm', 0, 'pdf', 'SomeModule.pdf';
+
+        Finally, you can pass additional arguments to the POD formatter that
+        handles the requested format.
+
+          my @options = ( 'release' => 1.03, 'section' => 8 ); # options for Pod::Man
+          readme_from 'lib/Some/Module.pm', 1, 'man', undef, @options;
+
+        But instead of passing this long list of optional arguments to
+        readme_from, you should probably pass these arguments as a named
+        hashref for clarity.
+
+          my @options = ( 'release' => 1.03, 'section' => 8 );
+          readme_from 'lib/Some/Module.pm', {clean => 1, format => 'man', output_file => undef, options => @options};
+
+        If you use the "all_from" command, "readme_from" will default to
+        that value.
+
+          all_from 'lib/Some/Module.pm';
+          readme_from;              # Create README from lib/Some/Module.pm
+          readme_from '','clean';   # Put a empty string before 'clean'
+
+AUTHOR
+    Chris "BinGOs" Williams
+
+LICENSE
+    Copyright © Chris Williams
+
+    This module may be used, modified, and distributed under the same terms
+    as Perl itself. Please see the license that came with your Perl
+    distribution for details.
+
+SEE ALSO
+    Module::Install
+
+    Pod::Text
+
+    Pod::Html
+
+    Pod::Man
+
+    Pod::Markdown
+
+    App::pod2pdf
+

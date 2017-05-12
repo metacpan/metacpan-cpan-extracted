@@ -1,0 +1,60 @@
+Math-Prime-FastSieve - Fast prime number utilities.
+
+======================================
+
+This module implements the Sieve of Eratosthenes to find all primes
+up to (and including) 'n'.  The Sieve is one of the fastest means known.
+This module implements it using a bit vector for memory efficiency, and
+does so using C++ for speed efficiency.  The module depends on
+Inline::CPP, which itself is a subclass of Inline::C.
+
+Use this module if you need a list of prime numbers, and need it fast.
+How fast?  Well at the time of writing it is the fastest solution I can
+find on CPAN, including Math::Prime::XS.  And it works all the way up to
+'n' of 2.14 billion (higher if your Perl was compiled with support for longs).
+Because it uses a bit sieve, the result set will actually consume more memory
+than the prime sieve.
+
+This module also provides several other prime numbers related functions.
+
+INSTALLATION
+
+First, you need a C++ compiler that is compatible with the C compiler used to
+build Perl itself.
+
+Next, to install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+It will be necessary to have the modules described below installed prior
+to attempting to install this module.  If you install it using the
+cpan shell, or cpanm, or cpanplus, the dependencies should get dragged
+down and installed automatically.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Inline::MakeMaker - Used by Makefile.PL instead of ExtUtils::MakeMaker.
+  Inline::CPP       - A primary dependency.
+  Inline::C         - Inline::CPP is a subclass of Inline::C.
+  Inline            - Inline::CPP and Inline::C plug into Inline.
+  Parse::RecDescent - Used to parse the grammar.
+  Test::More        - Core module, used in testing.
+  English           - Core module, used in testing.
+  Perl version 5.006 or later.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2011, 2012 by David Oswald
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,51 @@
+SYNOPSIS
+
+     package MyClass;
+     use Moo; # or Mo 'build', or Moose, or Mouse
+     use Mooish::Util::Caller qw(get_constructor_caller get_constructor_callers);
+    
+     sub BUILD { # or BUILDARGS
+         $caller = get_constructor_caller();
+         say $caller->[3]; # subroutine name
+     }
+    
+     package main;
+     sub f1 { MyClass->new }
+     sub f2 { f1 }
+     f2; # prints 'main::f1'
+
+FUNCTIONS
+
+ get_constructor_caller([ $start=0 [, $with_args] ]) => ARRAYREF
+
+    Like [caller($start)], but skips Mo/Moo/Moose/Mouse wrappers. Result
+    will be like:
+
+     #  0          1           2       3             4          5            6           7             8        9          10
+     [$package1, $filename1, $line1, $subroutine1, $hasargs1, $wantarray1, $evaltext1, $is_require1, $hints1, $bitmask1, $hinthash1],
+
+    If $with_args is true, will also return subroutine arguments in the
+    11th element, produced by retrieving @DB::args.
+
+ get_constructor_callers([ $start=0 [, $with_args] ]) => LIST
+
+    A convenience function to return the whole callers stack, akin to what
+    is produced by collecting result from get_constructor_caller($start+1)
+    up until the last frame in caller stack. Result will be like:
+
+     (
+         # for frame 0
+         #  0          1           2       3             4          5            6           7             8        9          10
+         [$package1, $filename1, $line1, $subroutine1, $hasargs1, $wantarray1, $evaltext1, $is_require1, $hints1, $bitmask1, $hinthash1],
+    
+         # for next frame
+         [$package2, $filename2, $line2, ...]
+    
+         ...
+     )
+
+    If $with_args is true, will also return subroutine arguments in the
+    11th element for each frame, produced by retrieving @DB::args.
+
+SEE ALSO
+

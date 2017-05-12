@@ -1,0 +1,56 @@
+Mail-DMARC-opendmarc version 0.11
+=================================
+
+CAVEAT EMPTOR - Experimental code
+	No production use track record.
+	Use with caution.
+
+This module provides a wrapper to Trusted Domain Project's libopendmarc
+library. Its primary use is expected to be together the Mail::DMARC
+module, but it can conceivably used standalone, if you really are
+determined to do it.
+The wrapper is rather thin.
+
+Intended to (hopefully) become part of a slightly larger project providing DMARC support
+for spamassasin. Or who knows what else.
+
+Please refer to www.dmarc.org if you don't know what DMARC is,
+if you are curious, interested, or willing to contribute to
+its success. If you have anything to do with email, it's very
+likely you'll want to contribute to its success.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL 
+   make
+   make test
+   make install
+
+BUT, *please* read the INSTALL file as you might need to do 
+something else besides the standard steps outlined above.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Trusted Domain Project's libopendmarc from the opendmarc distribution
+http://sourceforge.net/projects/opendmarc/
+(please read INSTALL)
+
+File::Sharedir::Install to install the TLD file maintained by mozilla.org.
+You will have to update this file yourself.
+
+ 
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012,2013 by Davide Migliavacca and ContactLab
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+Includes TLD list file from http://mxr.mozilla.org, 
+subject to Mozilla Public License, v. 2.0

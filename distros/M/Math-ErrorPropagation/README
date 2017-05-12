@@ -1,0 +1,49 @@
+Statistics::ErrorPropagation version 0.01
+=============================
+
+DESCRIPTION
+
+A function f({X_i}) of a set of n independent stochastic variables 
+{X_i}={X_0, X_1, ..., X_(n-1)}
+with means {x_i}={x_0, x_1, ..., x_(n-1)}
+and corresponding variances {var_i}={var_0, var_1, ..., var_(n-1)}, 
+has mean f({x_i}) and a variance var_f which is the sum 
+of the squared partial derivatives multiplied by the variances 
+
+var_f  = (df/dx_i)**2 var_i
+
+This package allows the propagation of errors on the variables through
+various simple mathematical operations to automatically compute the error of 
+the function. Use it to define  data each with a central (mean) value and 
+either the variance or standard deviation (square root of the variance), 
+then apply perl's mathematical operators to them to calculate your function 
+f. These operators are overloaded so that f automatically has the correct
+variance.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp 
+  Test::Harness 
+  Test::More 
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002 Zbigniew Sroczynski. All rights reserved. 
+This program is free software; you can redistribute it and/or modify it 
+under the same terms as Perl itself; i.e. only under the terms of either 
+the Artistic License or the GNU General Public License, which may be found 
+in the Perl 5 source kit.
+
+Copyright (C) 2002 Zbigniew Sroczynski
+

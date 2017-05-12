@@ -1,0 +1,38 @@
+---
+abstract: 'Mojolicious plugin for integrating Disqus forum'
+author:
+  - 'Adam Stokes L<adamjs@cpan.org>'
+build_requires:
+  Mojolicious::Lite: '0'
+  Test::Mojo: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.037'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.5, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-Disqus-Tiny
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Mojo::Base: '0'
+resources:
+  bugtracker: https://github.com/battlemidget/Mojolicious-Plugin-Disqus-Tiny/issues
+  homepage: https://github.com/battlemidget/Mojolicious-Plugin-Disqus-Tiny
+  repository: https://github.com/battlemidget/Mojolicious-Plugin-Disqus-Tiny.git
+version: '1.004'
+x_contributors:
+  - 'Adam Stokes <adam.stokes@ubuntu.com>'
+  - 'Adam Stokes <battlemidget@users.noreply.github.com>'
+  - 'Bitdeli Chef <chef@bitdeli.com>'
+  - 'adam.stokes <battlemidget@users.noreply.github.com>'
+  - 'mudler <mudler@dark-lab.net>'

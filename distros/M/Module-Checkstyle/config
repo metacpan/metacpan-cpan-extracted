@@ -1,0 +1,34 @@
+# This is an example config for Module::Checkstyle
+# it implements perlstyle
+
+global-error-level            = WARN
+
+[Package]
+matches-name                  = qr/^([A-Z][A-Za-z]+)(::[A-Z][A-Za-z]+)*$/
+max-per-file                  = 1
+is-first-statement            = true
+has-matching-filename         = true
+
+[Whitespace]
+after-comma                   = true
+before-comma                  = true
+after-fat-comma               = true
+before-fat-comma              = true
+
+[Subroutine]
+matches-name                  = qr/^([a-z]+)(_[a-z0_9]+)*$/
+max-length                    = 50
+no-fully-qualified-names      = true
+no-calling-with-ampersand     = true
+
+[Variable]
+arrays-in-plural              = true
+hashes-in-singular            = true
+
+[Block]
+default-style                 = pbp
+
+[Label]
+matches-name                  = qr/^[A-Z]+(_[A-Z]+)*$/
+position                      = same
+require-for-break             = false

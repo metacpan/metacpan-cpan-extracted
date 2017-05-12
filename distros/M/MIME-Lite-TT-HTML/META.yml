@@ -1,0 +1,26 @@
+---
+name: MIME-Lite-TT-HTML
+version: 0.04
+author:
+  - 'Sheng Chun E<lt>chunzi@cpan.orgE<gt>'
+abstract: Create html mail with MIME::Lite and TT
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  DateTime::Format::Mail: 0
+  Encode: 0
+  HTML::FormatText::WithLinks: 0
+  MIME::Lite: 0
+  MIME::Words: 0
+  Template: 0
+  perl: 5.6.0
+provides:
+  MIME::Lite::TT::HTML:
+    file: lib/MIME/Lite/TT/HTML.pm
+    version: 0.04
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

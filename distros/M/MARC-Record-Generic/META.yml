@@ -1,0 +1,17 @@
+---
+abstract: 'read/write MARC data into Perl primitives'
+author:
+  - 'Clay Fouts <cfouts@khephera.net>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MARC-Record-Generic
+requires:
+  MARC::Record: 2
+version: 0.001

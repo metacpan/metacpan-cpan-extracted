@@ -1,0 +1,102 @@
+MP3/Icecast version 0.01
+========================
+
+NAME
+       MP3::Icecast - Generate Icecast streams, as well as M3U and PLSv2
+       playlists.
+
+SYNOPSIS
+         use MP3::Icecast;
+         use MP3::Info;
+         use IO::Socket;
+
+         my $listen_socket = IO::Socket::INET->new(
+           LocalPort => 8000, #standard Icecast port
+           Listen    => 20,
+           Proto     => 'tcp',
+           Reuse     => 1,
+           Timeout   => 3600);
+
+         #create an instance to find all files below /usr/local/mp3
+         my $finder = MP3::Icecast->new();
+         $finder->recursive(1);
+         $finder->add_directory('/usr/local/mp3');
+         my @files = $finder->files;
+
+         #accept TCP 8000 connections
+         while(1){
+           next unless my $connection = $listen_socket->accept;
+
+           defined(my $child = fork()) or die "Can't fork: $!";
+           if($child == 0){
+             $listen_socket->close;
+
+             my $icy = MP3::Icecast->new;
+
+             #stream files that have an ID3 genre tag of "jazz"
+             while(@files){
+               my $file = shift @files;
+               my $info = new MP3::Info $file;
+               next unless $info;
+               next unless $info->genre =~ /jazz/i;
+               $icy->stream($file,0,$connection);
+             }
+             exit 0;
+           }
+
+           #a contrived example to demonstrate that MP3::Icecast
+           #can generate M3U and PLSv2 media playlists.
+           print STDERR $icy->m3u, "\n";
+           print STDERR $icy->pls, "\n";
+
+           $connection->close;
+         }
+
+ABSTRACT
+       MP3::Icecast supports streaming Icecast protocol over socket or other
+       filehandle (including STDIN).  This is useful for writing a streaming
+       media server.
+
+       MP3::Icecast also includes support for generating M3U and PLSv2
+       playlist files.  These are common formats supported by most modern
+       media players, including XMMS, Windows Media Player 9, and Winamp.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  MP3::Info      => 1.02
+  File::Spec     => 0.86
+  File::Basename => 2.71
+  File::MimeInfo => 0.8
+  URI::Escape    => 0
+  IO::File       => 1.09
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Allen Day
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+SEE ALSO
+
+The Icecast project
+http://www.icecast.org
+
+Namp! (Apache::MP3)
+http://namp.sourceforge.net
+
+Unofficial M3U and PLS specifications
+http://forums.winamp.com/showthread.php?threadid=65772
+
+

@@ -1,0 +1,3 @@
+Root
+
+[% request.component("/beer/view_as_comp/1"); %]

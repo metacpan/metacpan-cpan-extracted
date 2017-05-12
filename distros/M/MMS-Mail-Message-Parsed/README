@@ -1,0 +1,85 @@
+NAME
+    MMS::Mail::Message::Parsed - A class representing a parsed MMS (or
+    picture) message, that has been parsed by an MMS::Mail::Provider class.
+
+VERSION
+    Version 0.06
+
+SYNOPSIS
+    This class is used by MMS::Mail::Parser to provide a final data storage
+    class after the MMS has been parsed by the MMS::Mail::Provider class. It
+    inherits from the MMS::Mail::Message class and extends it's methods to
+    allow access to parsed properties.
+
+METHODS
+    The MMS::Mail::Message::Parsed class inherits all the methods from it's
+    parent class MMS::Mail::Message.
+
+  Constructor
+    "new()"
+        Return a new MMS::Mail::Message::Parsed object.
+
+  Regular Methods
+    "add_image" MIME::Entity
+        Instance method - Adds the supplied MIME::Entity attachment to the
+        image stack for the message. This method is mainly used by the
+        MMS::Mail::Provider class to add images while parsing.
+
+    "add_video" MIME::Entity
+        Instance method - Adds the supplied MIME::Entity attachment to the
+        video stack for the message. This method is mainly used by the
+        MMS::Mail::Provider class to add videos while parsing.
+
+    "images"
+        Instance method - Returns an array reference to an array of images
+        from the message.
+
+    "videos"
+        Instance method - Returns an array reference to an array of videos
+        from the message.
+
+    "phone_number" STRING
+        Instance method - Returns the MMS mobile number the message was sent
+        from when invoked with no supplied parameter. When supplied with a
+        parameter it sets the object property to the supplied parameter.
+        This property is not set by the MMS::Mail::Provider class but is set
+        by it's subclasses.
+
+    "retrieve_attachments" STRING
+        Instance method - Expects a mime-type to be passed as an argument
+        and a regular expression match using the supplied string is applied
+        to each attachment in the attachment stack of the message object and
+        a reference to an array of objects where the mime-type matches the
+        supplied string is returned. In the event no attachment was matched
+        to the supplied mime-type an undef value is returned.
+
+AUTHOR
+    Rob Lee, "<robl at robl.co.uk>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-mms-mail-message-parsed@rt.cpan.org", or through the web interface
+    at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MMS-Mail-Message-Parsed>
+    . I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+NOTES
+    Please read the Perl artistic license ('perldoc perlartistic') :
+
+    10. THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+ACKNOWLEDGEMENTS
+    As per usual this module is sprinkled with a little Deb magic.
+
+COPYRIGHT & LICENSE
+    Copyright 2005 Rob Lee, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    MMS::Mail::Message, MMS::Mail::Message::Parsed, MMS::Mail::Provider
+

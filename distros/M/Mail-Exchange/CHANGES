@@ -1,0 +1,15 @@
+0.04:	Added subclasses for Appointments and Sticky Notes
+	Added PidLid Definitions including GUIDs
+	Updated generated files to October version of MS documentation
+	Setting known PidLids now doesn't need GUIDs anymore
+	Added an alternative code path for machines that can't use Q
+		in pack and unpack
+	Added Endian-ness to all pack/unpack patterns
+	Added examples subdirectory & content
+
+0.03.1:	no changes to code, but added Email::Address
+	dependency in Makefile
+
+0.03:	added some tests and fixed bugs exposed by them,
+	especially made PidLid stuff work
+

@@ -1,0 +1,19 @@
+Revision history for Module-Starter-Plugin-DebPackage
+
+0.0.5   Tue, 26 Jan 2010 20:30:23 +1100
+        Added tests of the added debian configuration files
+
+0.0.4   Mon, 25 Jan 2010 23:43:33 +1100
+        Added dependency on libversion-perl (version) to package configuration
+
+0.0.3   Wed, 20 Jan 2010 08:04:11 +1100
+        Added POD (pod-coverage.t now passes)
+        Removed TODO from boilerplate.t (as this was done)
+        Added filters to manifest.t to ignore .git and *.swp files
+
+0.0.2   Wed, 20 Jan 2010 03:20:33 +1100
+        Added missing Module::Install and dpkg dependencies on module-starter
+
+0.0.1   Wed, 20 Jan 2010 02:14:37 +1100
+        First version, released on an unsuspecting world.
+

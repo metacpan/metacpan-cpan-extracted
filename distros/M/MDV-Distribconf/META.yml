@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         MDV-Distribconf
+version:      3.14
+version_from: lib/MDV/Distribconf.pm
+installdirs:  site
+requires:
+    Config::IniFiles:              
+    Digest::MD5:                   
+    MDV::Packdrakeng:              
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

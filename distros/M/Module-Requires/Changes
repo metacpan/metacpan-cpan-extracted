@@ -1,0 +1,11 @@
+Revision history for Perl extension Module::Requires
+
+0.03    2009-12-25T14:59:29+09:00
+        - fixed 'use ModuleName ()' syntax bug
+
+0.02    2009-12-25T14:29:53+09:00
+        - use `require` for module load
+        - rename loading tmp package name
+
+0.01    2009-12-25T13:28:40+09:00
+        - original version

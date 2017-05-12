@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/MPEG/ID3v2Tag.pm
+t/MPEG-ID3v2Tag.t

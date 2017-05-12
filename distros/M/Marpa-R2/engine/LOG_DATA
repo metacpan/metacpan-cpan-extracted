@@ -1,0 +1,29 @@
+commit b8fd74b26434563e4b56599a36657a59ceea98c7
+Author: Jeffrey Kegler <jeffreykegler@jeffreykegler.com>
+Date:   Sat Feb 25 19:35:06 2017 -0800
+
+    Add progress report bug fix from Marpa::R3: t+
+
+commit a2e19108721f78b41f59c5e9c0511505e2a4242d
+Author: Jeffrey Kegler <jeffreykegler@jeffreykegler.com>
+Date:   Mon May 2 10:27:04 2016 -0700
+
+    "Too many YIMs" duplicate warnings elminated: t+
+
+commit 77ed0f9930a11101ed0c85e83bdda8a5fd69d27e
+Author: Jeffrey Kegler <jeffreykegler@jeffreykegler.com>
+Date:   Mon May 2 09:57:33 2016 -0700
+
+    update HOWTO
+
+commit 8c331df900181b14870fa8eb3c44ac912b95c37a
+Author: Jeffrey Kegler <jeffreykegler@jeffreykegler.com>
+Date:   Mon May 2 09:57:19 2016 -0700
+
+    realclean target
+
+commit 2e6727b0c36bc003e8aa8cbc6417b0d8f6085ca4
+Author: Jeffrey Kegler <jeffreykegler@jeffreykegler.com>
+Date:   Mon May 2 08:15:28 2016 -0700
+
+    Add a HOWTO file: t+

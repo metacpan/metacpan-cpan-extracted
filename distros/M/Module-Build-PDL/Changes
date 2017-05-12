@@ -1,0 +1,10 @@
+Revision history for Module-Build-PDL
+
+0.0.1  Mon Feb  8 09:58:03 2010
+       Initial release.
+0.0.2  Mon Feb  8 12:47 2010
+       Fixed the broken pod.
+       Added acknowledged for Judd.
+0.0.3  Tuesday March 2, 2010
+       Added checks so that only .pd files that change get reprocessed.
+

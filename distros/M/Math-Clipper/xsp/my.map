@@ -1,0 +1,181 @@
+Clipper*		O_OBJECT
+
+PolyType		T_UV
+ClipType		T_UV
+PolyFillType		T_UV
+JoinType		T_UV
+
+ClipperLib::Polygon			T_VECTOR_POINT
+ClipperLib::Polygon*		T_VECTOR_POINT_PTR
+ClipperLib::Polygons		T_VECTOR_VECTOR_POINT
+ClipperLib::Polygons*		T_VECTOR_VECTOR_POINT_PTR
+ClipperLib::PolyTree*		T_POLYTREE_PTR
+ExPolygon		T_EXPOLY
+ExPolygon*		T_EXPOLY_PTR
+ExPolygons		T_VECTOR_EXPOLY
+ExPolygons*		T_VECTOR_EXPOLY_PTR
+
+INPUT
+T_VECTOR_POINT
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV) {
+	  $type* tmp = perl2polygon(aTHX_ (AV*)SvRV($arg));
+	  if (tmp == NULL) {
+	    Perl_croak(aTHX_ \"%s: %s is not an array reference or contains invalid data\",
+	               ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	               \"$var\");
+	  }
+	  else {
+	    $var = *tmp;
+	    delete tmp;
+	  }
+	}
+	else
+	  Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+	             ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	             \"$var\");
+
+T_VECTOR_POINT_PTR
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV) {
+	  $var = perl2polygon(aTHX_ (AV*)SvRV($arg));
+	  if (($var) == NULL) {
+	    Perl_croak(aTHX_ \"%s: %s is not an array reference or contains invalid data\",
+	               ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	               \"$var\");
+	  }
+	}
+	else
+	  Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+	             ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	             \"$var\");
+
+T_VECTOR_VECTOR_POINT
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV) {
+	  $type* tmp = perl2polygons(aTHX_ (AV*)SvRV($arg));
+	  if (tmp == NULL) {
+	    Perl_croak(aTHX_ \"%s: %s is not an array reference or contains invalid data\",
+	               ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	               \"$var\");
+	  }
+	  else {
+	    $var = *tmp;
+	    delete tmp;
+	  }
+	}
+	else
+	  Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+	             ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	             \"$var\");
+
+T_VECTOR_VECTOR_POINT_PTR
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV) {
+	  $var = perl2polygons(aTHX_ (AV*)SvRV($arg));
+	  if (($var) == NULL) {
+	    Perl_croak(aTHX_ \"%s: %s is not an array reference or contains invalid data\",
+	               ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	               \"$var\");
+	  }
+	}
+	else
+	  Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+	             ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	             \"$var\");
+
+T_EXPOLY
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVHV) {
+	  $type* tmp = perl2expolygon(aTHX_ (HV*)SvRV($arg));
+	  if (tmp == NULL) {
+	    Perl_croak(aTHX_ \"%s: %s is not a hash reference or contains invalid data\",
+	               ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	               \"$var\");
+	  }
+	  else {
+	    $var = *tmp;
+	    delete tmp;
+	  }
+	}
+	else
+	  Perl_croak(aTHX_ \"%s: %s is not a hash reference\",
+	             ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	             \"$var\");
+
+T_EXPOLY_PTR
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVHV) {
+	  $var = perl2expolygon(aTHX_ (HV*)SvRV($arg));
+	  if (($var) == NULL) {
+	    Perl_croak(aTHX_ \"%s: %s is not a hash reference or contains invalid data\",
+	               ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	               \"$var\");
+	  }
+	}
+	else
+	  Perl_croak(aTHX_ \"%s: %s is not a hash reference\",
+	             ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	             \"$var\");
+
+T_VECTOR_EXPOLY
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV) {
+	  $type* tmp = perl2expolygons(aTHX_ (AV*)SvRV($arg));
+	  if (tmp == NULL) {
+	    Perl_croak(aTHX_ \"%s: %s is not an array reference or contains invalid data\",
+	               ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	               \"$var\");
+	  }
+	  else {
+	    $var = *tmp;
+	    delete tmp;
+	  }
+	}
+	else
+	  Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+	             ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	             \"$var\");
+
+T_VECTOR_EXPOLY_PTR
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV) {
+	  $var = perl2expolygons(aTHX_ (AV*)SvRV($arg));
+	  if (($var) == NULL) {
+	    Perl_croak(aTHX_ \"%s: %s is not an array reference or contains invalid data\",
+	               ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	               \"$var\");
+	  }
+	}
+	else
+	  Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+	             ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	             \"$var\");
+
+
+OUTPUT
+
+T_VECTOR_POINT
+	$arg = polygon2perl(aTHX_ $var);
+
+T_VECTOR_POINT_PTR
+	$arg = polygon2perl(aTHX_ *$var);
+	delete $var;
+
+T_VECTOR_VECTOR_POINT
+	$arg = polygons2perl(aTHX_ $var);
+
+T_VECTOR_VECTOR_POINT_PTR
+	$arg = polygons2perl(aTHX_ *$var);
+	delete $var;
+
+T_EXPOLY
+	$arg = expolygon2perl(aTHX_ $var);
+
+T_EXPOLY_PTR
+	$arg = expolygon2perl(aTHX_ *$var);
+	delete $var;
+
+T_VECTOR_EXPOLY
+	$arg = expolygons2perl(aTHX_ $var);
+
+T_VECTOR_EXPOLY_PTR
+	$arg = expolygons2perl(aTHX_ *$var);
+	delete $var;
+
+T_POLYTREE_PTR
+	$arg = polytree2perl(aTHX_ *$var);
+	delete $var;
+

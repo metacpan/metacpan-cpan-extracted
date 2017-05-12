@@ -1,0 +1,13 @@
+Revision history for Mojolicious-Plugin-Renderer-WithoutCache
+
+0.04 2017-02-04T13:04:30Z
+
+0.04 2017-02-04T13:01:16Z
+	Switch to Perl licence
+0.03    25 Jan 2017
+        Require Mojolicious 5.29 properly
+0.02    25 Jan 2017
+        Require Mojolicious 5.29
+0.01    20 Jan 2017
+        First developer release.
+

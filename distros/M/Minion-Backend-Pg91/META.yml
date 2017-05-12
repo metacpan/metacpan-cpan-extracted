@@ -1,0 +1,29 @@
+---
+abstract: 'Minion::Backend for Postgresql 9.1'
+author:
+  - 'Vikas N Kumar <vikas@cpan.org>'
+build_requires:
+  Sys::Hostname: '0'
+  Test::More: '0'
+  Time::HiRes: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0511, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Minion-Backend-Pg91
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Minion: '4.06'
+  Mojo::Pg: '2.18'
+  Mojolicious: '0'
+resources:
+  repository: https://github.com/vikasnkumar/minion-backend-pg91
+version: '6.00'
+

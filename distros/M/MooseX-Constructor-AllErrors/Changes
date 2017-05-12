@@ -1,0 +1,93 @@
+Revision history for MooseX-Constructor-AllErrors
+
+0.025     2015-08-16 03:15:27Z
+  - modernize some bits of the distribution packaging
+
+0.024     2014-03-11 02:20:42Z
+  - restore params hash to call to throw_error (RT#93709)
+
+0.023     2014-01-22 04:01:40Z
+  - use $meta->throw-error when there is an error_class (pre-Moose-2.1100)
+
+0.022     2013-10-31 05:59:07Z
+  - compatibility updates for Moose::Exception objects new in Moose 2.1200
+    (ether)
+  - repository migrated from shadowcat to the github moose organization
+
+0.021     2012-06-21 22:01:04Z
+  - use of auto_deref in MooseX::Constructor::AllErrors::Error::Constructor
+    attributes is replaced by the Array native trait (ether)
+  - new error class for 'Misc' errors has been experimentally added (ether)
+
+0.020     2012-04-10 17:02:51Z
+  - add explicit prereq for Test::CheckDeps, until the dzil plugin is fixed
+    (ether)
+
+0.019     2012-04-01 01:18:48Z
+  - remove inlined versions of BUILD - it's useless to perform any checks
+    *after* construction. BUILD is not the same as BUILDARGS! (ether)
+
+0.018_001 2012-03-23
+  - avoid reporting errors for undef attributes when MooseX::UndefTolerant is
+    also being employed (ssoriche)
+
+0.017   2012-01-23
+  - Errors are always returned consistent with attributes' insertion_order.
+    (ether)
+
+0.016   2011-04-26
+  - Remove warning from new test; added repository meta-information. (ether)
+
+0.015   2011-04-26
+  - Fix BUILD methods not being called in immutable classes (ether)
+
+0.014   2011-04-26
+  - Fix test suite for Moose error message changes (doy)
+
+0.013   2011-02-09
+  - The test suite now uses Test::Fatal instead of Test::Exception. (ether)
+  - Use modern Moose APIs, to avoid warnings with Moose 1.09 (ether)
+  - fix documentation mixup in
+    MooseX::Constructor::AllErrors::Error::Constructor (ether)
+  - moose inlining changes (doy)
+
+0.012   2010-07-19
+  - fix for moose deprecation stuff
+
+0.011   2010-06-15
+  - fix test for moose doublefail stuff
+
+0.010   2009-01-17
+  - dep on Test::Exception, since Moose only test_requires
+
+0.009   2009-12-20
+  - document the error classes
+
+0.008   2009-12-19
+  - fix constructor trait using find_type_constraint without importing it
+  - don't fail if the value given for an attribute would pass validation after
+    coercions
+
+0.007   2009-04-27 15:26:35
+  - avoid Moose deprecation warning
+
+0.006   2009-04-05
+  - switch from deprecated method name compute_all_applicable_attributes
+  - fix Changes to be latest-first
+ 
+0.005   2009-03-01
+  - add constructor metarole for inlining
+
+0.004   2009-03-01
+  - INCOMPATIBLE CHANGE: using AllErrors no longer uses Moose implicitly
+  - implementation wrapping BUILDARGS instead of hooking into several different
+    parts of object construction
+
+0.003   2009-02-04
+  - avoid compile-time death
+
+0.002   2009-02-04
+  - rethrow errors that aren't from us
+
+0.001   2009-02-03
+  - the "is this crazy?" release

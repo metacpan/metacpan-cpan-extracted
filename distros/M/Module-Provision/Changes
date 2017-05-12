@@ -1,0 +1,147 @@
+Revision history for Module::Provision                           .
+
+0.42.1    2017-05-08 20:29:42
+          - Adds whitelist t::boilerplate to share
+          - CVE-2016-1238 adds inline sublass to Build.PL
+          - Trace method will show selected env variables
+          - Adds trace method to control environment variables
+          - Boilerplate now also pattern matches hosts
+
+0.41.1    2016-04-04 13:14:24
+          - Setting LWP::Protocol::https version to 0
+            Ten months RT#104150. Module abandoned?
+          - Prereq diff remove section also shows version update
+          - Can now run mp test release upload in that order
+          - Fixed wrong quote char error in gitpre-commit
+          - Added coverage server to badge output
+          - Refactored smoker exceptions to dump file
+          - Smarter changelog parsing in git hook
+            Will not include this line
+          - Fewer test dependencies in boilerplate
+          - Added configuration options for remote testing
+          - Include Travis integration in new distributions
+          - Clear dist_version and module_metadata after update_version
+          - Release can optionally push to remote and upload test and CPAN
+          - Install dist on test server vi test-upload command
+          - TraitFor::Badges sets requires and now even quieter
+          - Allow dashes in changlog entries
+          - Git commit hook no longer adding version tag to message
+          - Adding version to tag message when releasing
+          - Default tag message tense reflects why not what
+          - Dropped support for Module::Install
+          - Added Test::ReportMetaData to dist.ini and share/dist.ini
+          - Deleted t/01always_pass.t
+          - Added localdir config attr for M:P:TF:Debian
+
+0.40.1    2015-06-08 22:46:08
+          - Added our own MetaData::Provider since PPI is *so* slow
+          - Updated toolchain
+          - Readded ShareDir to dist ini
+          - Added cover method
+          - Updated prereqs
+          - Documented configuration options
+          - Added public repo prefix to config options
+          - Added TraitFor::Badges
+
+0.39.1    2015-02-11 19:02:24
+          - Fixed tests some more
+
+0.38.1    2015-02-11 17:50:11
+          - Fixed tests
+
+0.37.1    2015-02-11 16:02:39
+          - Made _license_keys public
+          - Replaced C::U::TraitFor::MetaData with CPAN::Meta
+          - Fixed appbase logic, again
+          - Added module_metadate attribute
+          - Can load multiple plugins. Comma separated list
+          - Added loading of plugin module
+          - Switched to private lexical subroutines
+0
+0.36.1    2014-10-28 13:45:12
+          - Fixed spelling
+
+0.35.11   2014-10-28 13:29:54
+          - Added release method to ::VCS
+          - Added t::boilerplate.pm
+          - Add .pm files to prereq_diffs for build_requires
+          - Ignore t/* files in prereq_diffs for requires
+          - Replaced namespace::sweep with namespace::autoclean
+          - Added fury badge
+          - Better parsing of module name from project file
+          - Validate args in call to update_copyright_year
+
+0.34.1    2014-05-19 12:45:10
+          - c6a96d00-df30-11e3-84c4-fc77f9652e90 Test::Requires Hash::MoreUtils
+
+0.33.1    2014-05-15 21:54:47
+          - Removed dependency on File::Slurp. Not needed since
+            D:Z:P:ManifestInRoot became a seperate dist
+
+0.32.1    2014-05-01 15:32:09
+          - Removed Ident and VERSION lines
+
+0.31.2    2014-01-24 21:04:29
+          - Updated dependencies
+          - Select project does better job of picking the project dir
+
+0.30.1    2014-01-15 18:05:13
+          - Using Unexpected exception classes
+          - Stopped using C::U::File::io
+          - Apply C::U::T::MetaData for get_package_meta method
+          - Stopped localizing error messages
+          - Added update_file method to copy from template dir
+
+0.29.1    2013-12-12 21:26:25
+          - Remove prereqs below min_perl_ver
+
+0.28.1    2013-12-12 14:16:26
+          - Allow CPAN Testing to smoke below min_perl_ver
+
+0.27.1    2013-12-11 17:23:36
+          - Dropped create_readme_md from share/Build.PL
+            Closes RT#91320
+          - Tweaked boilerplate in share/*.t
+          - Simplified share/DZ_Build.PL
+          - Use DZ::P::AbstractFromPOD
+          - Use DZ::P::LicenseFromModule
+          - Fixed fd3 usage in select_project
+
+0.26.1    2013-11-25 21:28:18
+          - Dropped DZ::P::MarkdownInRoot from dist.ini
+          - Added select_project
+          - Added ::Config::test_env_vars
+
+0.25.1    2013-11-23 13:35:51
+          - Dropped dependency on MooX::Options
+          - Made ensure_class_loaded into a function
+
+0.24.1    2013-09-16 21:22:24
+          - Stopped re interpretaion of homedir in appldir builder
+
+0.23.1    2013-09-14 10:37:11
+          - Bumped Moo dependency closes RT#87575
+
+0.22.1    2013-08-21 13:54:58
+          - Bumped version to fix indexing
+
+0.21.1    2013-08-21 13:25:21
+          - Renamed Github repository to p5-module-provision
+
+0.20.2    2013-08-19 14:59:28
+          - Filter Dzil project file from prereq report
+          - Fixed prereq report with Dzil
+          - Bumped dependencies
+
+0.19.5    2013-08-17 16:37:36
+          - Switched to Dist::Zilla
+
+0.18.4    2013-08-10 22:17:28
+          - Updated share/dist.ini. Added share/DZ_Build.PL
+          - Stopping testing on windows until RT#87575 is fixed
+            febd397b-6bf5-1014-b508-69147d50f5d1
+          - Toolchain update. Attempt to filter out residual noise
+          - Misconfigured smoker 3c25f6a5-6c83-1014-9715-b1a9b77d427c
+            c.f. df2446e9-6c38-1014-8bcf-004655012b15. Cannot see error
+            because of RT#87575. Toolchain updated
+          - Moved D::Z::P::ManifestInRoot to own dist

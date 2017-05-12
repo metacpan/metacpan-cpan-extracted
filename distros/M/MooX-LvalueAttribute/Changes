@@ -1,0 +1,23 @@
+0.16      2013-10-09 12:16:47 Europe/Paris
+
+  * fix issues when attribute value is not an integer (issue #3) (moznion)
+
+0.15      2013-09-02 17:08:34 Europe/Paris
+
+  * disable XS optimization per attribute using lvalue, not per entire class
+
+0.14      2013-09-02 15:14:18 Europe/Paris
+
+  * Fix tests when Class::XSAccessor is installed
+
+0.13      2013-08-27 17:55:49 Europe/Paris
+
+0.12      2013-08-21 16:43:14 Europe/Paris
+
+  * can be used from a Moo::Role
+
+0.11      2013-08-21 15:54:27 Europe/Paris
+
+0.10      2013-02-11 23:01:08 Europe/Paris
+
+  * first implementation

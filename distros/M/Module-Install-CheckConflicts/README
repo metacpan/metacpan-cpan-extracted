@@ -1,0 +1,53 @@
+NAME
+    Module::Install::CheckConflicts - notify users of possible conflicts
+    with the distribution they're installing
+
+SYNOPSIS
+        check_conflicts(
+
+            # Until version 0.08, Some::Module relied on a deprecated function we
+            # removed now. It has been ported to the new API in 0.09.
+            'Some::Module' => '0.08',
+
+            ...
+        );
+
+DESCRIPTION
+    Sometimes APIs need to be broken in incompatible ways. That's fine, as
+    long as all dependencies that relied on the old way have been updated
+    already. If users install install a new version of your module, but
+    aren't aware that they need to update other modules that might have been
+    broken by that new version, they'll be left with a non-functional
+    installation of those depending modules.
+
+    This module allows to declare modules your distribution breaks in your
+    "Makefile.PL". If a user is installing your distribution, a message
+    explaining the situation and a list of additional modules he needs to
+    upgrade will presented.
+
+COMMANDS
+  check_conflicts
+        check_conflicts($module => $version, ...);
+
+    Declares conflicts of your distribution. Takes a list of module/version
+    pairs. The version number is the version of the incompatible code, not
+    the version number of the fixed version.
+
+    If the user installing your distribution has any conflicting module
+    installed, a warning message will be printed. That warning will contain
+    the list of conflicts, including the installed version and the declared
+    conflicting version.
+
+    When running the "Makefile.PL" from an interactive terminal, there'll be
+    a pause of 4 seconds after print a warning, to give the user a better
+    chance of noticing it.
+
+AUTHOR
+    Florian Ragwitz <rafl@debian.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2009 Florian Ragwitz
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

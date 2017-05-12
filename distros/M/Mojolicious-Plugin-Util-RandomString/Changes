@@ -1,0 +1,19 @@
+0.06 2016-03-03
+        - Update to recent version of Session::Token.
+
+0.05 2014-04-06
+        - Coherent Artistic License 2.0.
+
+0.04 2014-01-28
+        - Finally fixed IOLoop-bug.
+
+0.03 2014-01-25
+        - Improved test suite.
+	- Fixed IOLoop-bug (sri, akron).
+
+0.02 2013-05-27
+        - Establish helper only once.
+
+0.01 2013-05-26
+        - Initial release on GitHub.
+	- Initial release to CPAN.

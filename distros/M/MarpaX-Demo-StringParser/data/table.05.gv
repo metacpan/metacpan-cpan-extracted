@@ -1,0 +1,7 @@
+digraph Perl
+{
+graph [ rankdir="TB" ]
+node [ shape="oval" ]
+edge [ color="grey" ]
+"node.1" [ color="red" label=<<table border='0'><tr><td>HTML-style label but without borders</td></tr></table>> shape="tripleoctagon" ]
+}

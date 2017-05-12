@@ -1,0 +1,79 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Cpanel::JSON::XS;
+use Getopt::Long;
+use IO::Handle;
+use MaxMind::DB::Reader;
+use Net::Works::Network;
+
+no warnings 'once';
+*Math::BigInt::TO_JSON = sub { return $_[0] . q{} }
+    unless Math::BigInt->can('TO_JSON');
+
+sub main {
+    my $file;
+    GetOptions(
+        'file:s' => \$file,
+    );
+
+    my $reader = MaxMind::DB::Reader->new( file => $file );
+    my $ip_version = $reader->ip_version;
+
+    # For large databases this iteration could take a long time so it's good
+    # to send output as it's available.
+    STDOUT->autoflush(1);
+    print "[\n";
+    $reader->iterate_search_tree( sub { _dump_entry( $ip_version, @_ ) } );
+    print "]\n";
+}
+
+{
+    my $alias_ffff
+        = Net::Works::Network->new_from_string( string => '::ffff:0:0/96' );
+    my $alias_2002
+        = Net::Works::Network->new_from_string( string => '2002::/16' );
+
+    my @ignore_ranges = (
+        [
+            $alias_ffff->first->as_integer,
+            $alias_ffff->last->as_integer,
+        ],
+        [
+            $alias_2002->first->as_integer,
+            $alias_2002->last->as_integer,
+        ],
+    );
+
+    my $JSON
+        = Cpanel::JSON::XS->new->utf8->allow_nonref->pretty->convert_blessed;
+
+    sub _dump_entry {
+        my $ip_version = shift;
+        my $ipnum      = shift;
+        my $depth      = shift;
+        my $entry_data = shift;
+
+        if ( $ip_version == 6 ) {
+            for my $range (@ignore_ranges) {
+                return if $ipnum >= $range->[0] && $ipnum <= $range->[1];
+            }
+        }
+
+        my $network = Net::Works::Network->new_from_integer(
+            integer     => $ipnum,
+            mask_length => $depth,
+            ip_version  => $ip_version,
+        );
+
+        my $encoded = $JSON->encode( { $network->as_string => $entry_data } );
+        $encoded =~ s/^/  /mg;
+        $encoded =~ s/}$/},/s;
+
+        print $encoded;
+    }
+}
+
+main();

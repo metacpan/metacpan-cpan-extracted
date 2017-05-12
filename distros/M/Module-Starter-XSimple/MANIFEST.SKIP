@@ -1,0 +1,11 @@
+\.lwpcookies
+\.releaserc
+.+\.diff
+.+\.bak
+.+~
+.+\.orig
+.hg
+.shipit
+Makefile$
+MYMETA.yml
+.+\.tar\.gz

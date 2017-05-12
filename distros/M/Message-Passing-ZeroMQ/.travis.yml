@@ -1,0 +1,35 @@
+---
+sudo: required
+before_install:
+  - cpanm Module::Install
+  - cpanm Module::Install::AuthorRequires
+  - cpanm Module::Install::AuthorTests
+  - cpanm Module::Install::Authority
+  - cpanm Test::Pod
+  - cpanm Test::NoTabs
+  - cpanm Test::Pod::Coverage
+  - cpanm Pod::Coverage
+  - cpanm Pod::Coverage::TrustPod
+  - cpanm Compress::Zlib
+  - cpanm Crypt::Blowfish
+  - cpanm Compress::Bzip2
+  - cpanm Crypt::CBC
+  - cpanm Message::Passing
+  - sudo apt-get install -y build-essential uuid-dev
+  - git clone --depth 1 git://github.com/zeromq/zeromq2-x.git zmqlib
+  - cd zmqlib
+  - ./autogen.sh
+  - ./configure
+  - make
+  - sudo make install
+  - sudo /sbin/ldconfig
+  - cd ..
+language: perl
+notifications:
+  irc: irc.perl.org#message-passing
+perl:
+  - "5.16"
+#  - "5.14"
+  - "5.12"
+  - "5.10"
+

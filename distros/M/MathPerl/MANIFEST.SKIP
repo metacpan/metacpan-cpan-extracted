@@ -1,0 +1,62 @@
+# [[[ EXCLUDE ALL GITHUB, UNUSED, AND AUTOMATICALLY-GENERATED FILES FROM CPAN ]]]
+# [ GitHub ]
+^\.git
+^\.gitignore$
+^\.travis\.yml$
+
+# [ Inline Build ]
+# NEED UPDATE, CORRELATION #mp00: list of _Inline directories to delete/exclude in Makefile.PL, .gitignore, and MANIFEST.SKIP
+^_Inline
+^lib\/_Inline
+^script\/_Inline
+^script\/demo\/_Inline
+^script\/development\/_Inline
+^script\/development\/unused\/_Inline
+^t\/_Inline
+^lib\/MathPerl\/_Inline
+^lib\/MathPerl\/Test\/GeometricAlgebraProducts\/_Inline
+^lib\/MathPerl\/Test\/GeometryPiDigits\/_Inline
+^lib\/MathPerl\/Test\/_Inline
+^lib\/MathPerl\/Color\/_Inline
+^lib\/MathPerl\/Fractal\/_Inline
+^lib\/MathPerl\/Geometry\/_Inline
+^lib\/MathPerl\/GeometricAlgebra\/_Inline
+
+# [ CPAN Build & Distribution ]
+# NEED UPDATE, CORRELATION #mp01: list of CPAN files & directories to delete/exclude in Makefile.PL, .gitignore, and MANIFEST.SKIP
+# MANIFEST.SKIP is not auto-generated, do not exclude self
+# MANIFEST is needed by CPAN, do not exclude
+^MANIFEST\.bak
+# META.yml & META.json are needed by CPAN, do not exclude
+^MYMETA\.
+^Makefile$
+^Makefile\.old
+^blib
+^pm_to_blib
+^MathPerl-
+^MakeMaker-
+
+# [ Temporary Files, Ending With Tilde ~ Or swp ]
+~$
+swp$
+
+# [ POD ]
+^pod2htmd\.tmp$
+
+# [ MathPerl Unused ]
+^backup
+^script\/development\/unused
+
+# [ MathPerl Placeholders ]
+^lib\/MathPerl\/Color/CMYK\.pm
+^lib\/MathPerl\/ConjugateGradient\.pm
+^lib\/MathPerl\/Determinant\.pm
+^lib\/MathPerl\/Discriminant\.pm
+^lib\/MathPerl\/FastFourierTransform\.pm
+^lib\/MathPerl\/GaussJordanElimination\.pm
+^lib\/MathPerl\/GeometricAlgebra\/Rotations\.pm
+^lib\/MathPerl\/Test\/AlgebraSolve\/algebra_solve_bad_00\.pl\.DISABLED_NEED_IMPLEMENT
+^lib\/MathPerl\/Test\/AlgebraSolve\/algebra_solve_good_00\.pl\.DISABLED_NEED_IMPLEMENT
+^lib\/MathPerl\/Test\/AlgebraSolve\/algebra_solve_good_01\.pl\.DISABLED_NEED_IMPLEMENT
+^lib\/MathPerl\/Test\/AlgebraSolve\/algebra_solve_good_02\.pl\.DISABLED_NEED_IMPLEMENT
+^script\/mathperl

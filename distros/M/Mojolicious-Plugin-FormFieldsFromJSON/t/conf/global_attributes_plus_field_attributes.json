@@ -1,0 +1,49 @@
+  [
+    {
+      "type" : "select",
+      "name" : "language",
+      "attributes" : { "class" : "c1" },
+      "data" : [
+        "de",
+        "en"
+      ]
+    },
+    {
+      "label" : "Name",
+      "type" : "text",
+      "attributes" : { "class" : "c2" },
+      "name" : "name"
+    },
+    {
+        "label" : "Project",
+        "type" : "hidden",
+        "name" : "id",
+        "data" : "hello"
+    },
+    {
+        "label" : "Name",
+        "type" : "password",
+        "attributes" : { "class" : "c3" },
+        "name" : "pwd"
+    },
+    {
+        "label" : "Name",
+        "type" : "checkbox",
+        "name" : "filter",
+        "attributes" : { "class" : "c4" },
+        "data" : "age"
+    },
+    {
+        "label" : "Name",
+        "type" : "radio",
+        "name" : "type",
+        "attributes" : { "class" : "c5" },
+        "data" : ["internal", "external" ]
+    },
+    {
+        "type" : "textarea",
+        "attributes" : { "class" : "c6" },
+        "name" : "comment"
+    }
+
+  ]

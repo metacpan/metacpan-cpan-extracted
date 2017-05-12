@@ -1,0 +1,78 @@
+package Mardent::Dialect::Standard;
+
+=pod
+
+=head1 NAME
+
+Markdent::Dialect::Standard - Markdown as defined by John Gruber
+
+=head1 SYNOPSIS
+
+  use Markdent::Parser;
+
+  my $parser = Markdent::Parser->new( handler => ... );
+
+=head1 DESCRIPTION
+
+The "Standard" dialect is plain Markdown as defined by John Gruber
+(L<http://daringfireball.net/projects/markdown/>) and as implemented by Dingus
+(L<http://daringfireball.net/projects/markdown/dingus>).
+
+This is the default dialect, so you do not need to ask for it explicitly.
+
+=head2 DEVIATIONS
+
+The Standard dialect as implemented by Markdent differs from Dingus in a few
+ways:
+
+=over 4
+
+=item
+
+HTML attribute quote delimiters are not preserved, so a single quote may be
+converted into a double quote.
+
+=item
+
+Whitespace on an empty line in a code block is preserved by Markdent, but not
+by Dingus.
+
+=item
+
+Markdent will not generate bad HTML from Markdown markup. Markdent does not
+allow unbalanced markup events to propagate, and will turn unbalanced events
+into plain text.
+
+Here is an example:
+
+  *em **strong* wtf**
+
+Dingus turns this into:
+
+  <p><em>em <strong>strong</em> wtf</strong></p>
+
+Markdent's HTML output for the same:
+
+  <p><em>em **strong</em> wtf**</p>
+
+Note that with inline HTML, Markdent echoes it more or less as-is, so you can
+still produce bad HTML with Markdent.
+
+=back
+
+=head1 BUGS
+
+See L<Markdent> for bug reporting details.
+
+=head1 AUTHOR
+
+Dave Rolsky, E<lt>autarch@urth.orgE<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2009-2012 Dave Rolsky, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

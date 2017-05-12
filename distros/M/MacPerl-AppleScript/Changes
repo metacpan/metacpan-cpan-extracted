@@ -1,0 +1,13 @@
+Revision history for Perl extension MacPerl::AppleScript.
+
+0.02  Fri Nov 11 20:03:45 2005
+        - Added register_class and get_registered_class method to
+          allow easy overloading of this class
+        - Expansion of the grammar to recognize AppleScript data
+        - handling for unix/Mac path names
+        - using Module::Build for coming CPAN Upload
+        - added complex syntax for execute()
+
+0.01  Sat Oct 29 19:21:06 2005
+	- original version; created by h2xs 1.23 with options
+		-AXn MacPerl::AppleScript

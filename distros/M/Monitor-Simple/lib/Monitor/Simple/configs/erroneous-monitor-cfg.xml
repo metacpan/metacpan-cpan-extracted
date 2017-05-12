@@ -1,0 +1,75 @@
+<smon>
+  <!--
+
+       This is an example of a configuration file that includes mostly
+       wrongly configured srevices, or trivial services (such as
+       receiving current date)
+
+       -->
+  <general>
+    <plugins-dir></plugins-dir>
+  </general>
+
+  <services>
+
+    <service id="date" name="Current timestamp">
+      <description>Show current date</description>
+      <plugin command="get-date.pl">
+      </plugin>
+    </service>
+
+    <service id="memory" name="Memory Check">
+      <description>Checking warning and critical usage of memory</description>
+      <plugin command="check_mem.pl">
+        <args>
+          <arg>-u</arg> <!-- check USED memory -->
+          <!-- <arg>-f</arg> --> <!-- check FREE memory -->
+          <arg>-w</arg> <!-- -w PERCENT   Percent free/used when to warn -->
+          <arg>75</arg>
+          <arg>-c</arg> <!-- -c PERCENT   Percent free/used when critical -->
+          <arg>80</arg>
+        </args>
+      </plugin>
+    </service>
+
+    <service id="a-killer" name="Born To Be Killed">
+      <description>What happens if a plugin is killed</description>
+      <plugin command="born-to-be-killed.pl">
+      </plugin>
+    </service>
+
+    <service id="synonia-bad-params" name="Synonia Bad Params">
+      <description>Exploring synonyms in life-science datasets</description>
+      <plugin command="check-url.pl">
+        <head-test>
+          <url>http://Xdb.cbrc.kaust.edu.sa/synonia/start</url>
+        </head-test>
+      </plugin>
+    </service>
+
+    <service id="synonia-missing-params" name="Synonia Missing Params">
+      <description>Exploring synonyms in life-science datasets</description>
+      <plugin command="check-url.pl">
+        <head-test>
+        </head-test>
+      </plugin>
+    </service>
+
+    <!--
+    <service id="timeout" name="Checking timeout">
+      <plugin command="check-url.pl">
+        <head-test>
+          <url>http://localhost/cgi-bin/tmp/sleeper.cgi?sleep=2</url>
+          <timeout>5</timeout>
+        </head-test>
+        <head-test>
+          <url>http://localhost/cgi-bin/tmp/sleeper.cgi?sleep=15</url>
+          <timeout>2</timeout>
+        </head-test>
+      </plugin>
+    </service>
+    -->
+
+  </services>
+
+</smon>

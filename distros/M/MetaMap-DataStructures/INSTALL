@@ -1,0 +1,60 @@
+MetaMap-DataStructures
+    This package provides a container for the information extracted from
+    machine readable MetaMap mapped text.
+
+TESTING PLATFORMS
+    MetaMap-DataStructures has been developed and tested on Linux primarily
+    using Perl and the Bash shell.
+
+REQUIREMENTS
+    MetaMap-DataStructures REQUIRES that the following software be
+    installed. More details on how to obtain and install appear below.
+
+    --Programming Languages Perl (version 5.8.5 or better)
+
+    --CPAN modules <MODULE NAME>
+
+PROGRAMMING LANGUAGES
+  Perl (version 5.8.5 or better)
+    Perl is freely available at:
+
+    <http://www.perl.org>
+
+    It is very likely that you will already have Perl installed if you are
+    using a Unix/Linux based system.
+
+INSTALLATION
+    If you have supervisor access, or have configured MCPAN for local
+    install, you can install via:
+
+     perl -MCPAN -e shell
+     > install MetaMap-DataStructures
+
+    If not, you can, "manually" install by downloading the *.tar.gz file,
+    unpacking, and executing the following commands.
+
+                    perl Makefile.PL PREFIX=/home/programs LIB=/home/lib
+                    make
+                    make test
+                    make install
+
+    Note that the PREFIX and LIB settings are just examples to help you
+    create a local install, if you do not have supervisor (su) access.
+
+    You must include /home/lib in your PERL5LIB environment variable to
+    access this module when running.
+
+    If you have the super-user access, then you can install
+    MetaMap-DataStructures into system directories via : perl Makefile.PL
+    make make install make clean
+
+    The exact location of where MetaMap-DataStructures will be installed
+    depends on your system configuration. A message will be printed out
+    after 'make install' telling your exactly where it was installed.
+
+CONTACT US
+    If you have any trouble installing and using MetaMap::DataStructures,
+    please contact us:
+
+     Sam Henry: henryst at vcu.edu
+

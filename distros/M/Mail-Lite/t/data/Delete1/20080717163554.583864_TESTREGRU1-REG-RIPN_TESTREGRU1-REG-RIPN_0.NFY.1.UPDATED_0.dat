@@ -1,0 +1,6 @@
+---
+-
+  - rusu.notify
+  -
+    - domain: AIR.RU
+      rule_id: rusu.notify.deleted

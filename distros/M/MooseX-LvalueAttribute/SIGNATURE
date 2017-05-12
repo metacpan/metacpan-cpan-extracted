@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 0de888219a1be2bd0406592bb5d8e914352b3dbd COPYRIGHT
+SHA1 b2935f235da8a307ab61bcbf5262c5bee6023b36 CREDITS
+SHA1 85e22fdd33a3dbd9a687ad8b2238289b1958ab71 Changes
+SHA1 512f76cbcfbdce46838f9c550407c63829a1d8f6 INSTALL
+SHA1 93072af4200727a2cb7f9b6ff87788f8924e4478 LICENSE
+SHA1 4ef627e3263ebf1a26a6759d298da681a65317a1 MANIFEST
+SHA1 3206b2880e24bb67daeafeb077ada1b3b877f9b0 META.json
+SHA1 d6f2e4ec2b85ec5f07d0026b65bbaa3e8afdb60d META.yml
+SHA1 11571e773e2e5de2cd9966274d2543f07292af42 Makefile.PL
+SHA1 d04ec0b088ac1feb09c998375b82c98596b2f56c README
+SHA1 2fd04771360b1203fe51f5a1ff5a31403fbda3ed dist.ini
+SHA1 7a59a9988a9e68ded51014aad83f50e7245eb60d doap.ttl
+SHA1 e730f852d83acede4a18d64da7c2b5268560d01c examples/benchmarking.pl
+SHA1 8226fb4db8c247e8ba4b16fdabab466b231c4fe5 lib/MooseX/LvalueAttribute.pm
+SHA1 b6325240d95b13894f5dea41cafbef0078b4a5ee lib/MooseX/LvalueAttribute/Trait/Accessor.pm
+SHA1 ac20f345eb18e0ae0c5c546877003d59171fa590 lib/MooseX/LvalueAttribute/Trait/Attribute.pm
+SHA1 44c9657b43ce93b27c257461e1a97a407dc8a3dc lib/MooseX/Meta/Attribute/Lvalue.pm
+SHA1 e234152510260929c988bb86a0bfeb5c612a0454 t/01basic.t
+SHA1 f164ea2cd5292f0aea16e6aaa0d47e80961f39b3 t/02typeconstraints.t
+SHA1 5ce22b71dd0b8d4e70031b64d692c9d52bfb412b t/03typecoercions.t
+SHA1 973eb8e6df9fe6f23537059675935c24e08ea7b6 t/04triggers.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQwEU4ACgkQzr+BKGoqfTkpawCbBIs/8LNjh8llay8f3jSiBZz8
+1w8AoIJvBCP5GF0sxXuNKxKS6VAeQCtc
+=cthF
+-----END PGP SIGNATURE-----

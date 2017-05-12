@@ -1,0 +1,33 @@
+# Old Installation Instructions (should still work):
+
+## Preliminary steps for use with Perl prior to version 5.002:
+
+Edit the "Makefile.PL" file in this package and change the line
+
+    'VERSION_FROM'	=> 'MatrixReal.pm',
+
+to
+
+    'VERSION'		=> '2.04',
+
+
+## How to install it:
+
+Please unpack and build this package OUTSIDE the Perl source and distribution
+tree!!
+
+ 1) Change directory to the directory that has been created by unpacking this
+    package ("Math-MatrixReal-1.3/").
+
+ 2) Type "perl Makefile.PL".
+    (Or whatever the name and path of your Perl 5 binary is)
+    Alternatively you can type, e.g., "perl Makefile.PL PREFIX=/home/doe"
+    to install the module in the home directory, e.g. John Doe...
+
+ 3) Type "make".
+
+ 3.5) Optionally, type "make test" to test the build and/or benchmark
+    your system a little.
+
+ 4) Type "make install".
+

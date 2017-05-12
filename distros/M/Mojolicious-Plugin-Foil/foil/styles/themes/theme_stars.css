@@ -1,0 +1,106 @@
+/* ================================================================== */
+/* THEME: Stars
+ */
+/* ================================================================== */
+/* THEME: Stars - fonts
+ */
+/* ------------------------------------------------------------------ */
+/* Fonts */
+h1, h2, h3, h4 {
+  font-family: "Flipside BRK", "Metal Lord", Fantazian, Ethnocentric, ESP, Scott, Illusion, Slant, verdana, arial, helvetica, sans-serif;
+  font-weight: normal;
+  color: white;
+}
+
+/* ================================================================== */
+/* ICONS - light on dark
+ * Nav arrows with transparent backgrounds
+ */
+.side nav li > ul {
+  list-style-image: url(nav_white.png);
+}
+
+/* ================================================================== */
+/* General */
+.verge, header,
+footer, .side, .fancy {
+  color: #eeeeee;
+  background: #333333;
+  border-color: white;
+}
+
+header,
+footer {
+  background-image: url(stars.png);
+}
+
+.side {
+  background: #111111;
+}
+
+body {
+  color: #e0e0eb;
+  background: #000033;
+}
+
+a:link {
+  color: #a3ccf5;
+}
+
+a:visited {
+  color: #cca3f5;
+}
+
+.fancy {
+  color: #eeeeee;
+  background-image: url("stars.png");
+  border: 5px double #eeeeee;
+  padding: 0;
+}
+.fancy li {
+  padding: 0.5em;
+  margin: 5px;
+  border: 5px solid #eeeeee;
+  background-color: #333333;
+  background: linear-gradient(#333333, #0d0d0d);
+}
+.fancy li a:link {
+  color: #e6deed;
+}
+.fancy li a:visited {
+  color: #dee6ed;
+}
+
+.button, input[type=submit], header nav a,
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: #e0e0eb;
+  border-color: grey;
+  background-color: #000033;
+}
+
+.button a:link, input[type=submit] a:link, header nav a a:link,
+header nav .selflink a:link,
+header nav em a:link,
+header nav .current a a:link, a.button:link, header nav a:link {
+  color: #e0e0eb;
+}
+
+.button a:visited, input[type=submit] a:visited, header nav a a:visited,
+header nav .selflink a:visited,
+header nav em a:visited,
+header nav .current a a:visited, a.button:visited, header nav a:visited {
+  color: #cca3f5;
+}
+
+header nav li {
+  border-color: grey;
+}
+
+header nav .selflink,
+header nav em,
+header nav .current a {
+  color: white;
+  background-color: black;
+}

@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e8b32e1468843acab987a49494655d552a6a4fc5 Changes
+SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
+SHA1 0ce294f887820dbb07c2239beb7e9dda9ca6be6f MANIFEST
+SHA1 89e524121667a0ae60e4bdd531ce5deec93ef5eb META.json
+SHA1 610c1be295e303df13a852933595deb0cadb9bd6 META.yml
+SHA1 36a2d2089b2fda8e0bb2443b0372b349f2f6636a Makefile.PL
+SHA1 523d042978c59939b4c44774f8dabf1db4297c08 README
+SHA1 cf9ef48f5cb0e4456ce99bd4906de3b9236f1eac gena
+SHA1 86295c6281dfd748c5ae11c656dfbc75900a92b5 genc
+SHA1 ce81dfb660e3c5d66b1238d61a77683f687c1969 lib/Math/SlideRule.pm
+SHA1 2014611cf1677eba814ecc695033fe562c6e4700 lib/Math/SlideRule/PickettPocket.pm
+SHA1 59bce3997d6b42ab36c8fd8c2f7346bca1c58c8d t/00-Math-SlideRule.t
+SHA1 838140c22b375b7b6443d3fe1114e0ad2505cca0 t/01-PickettPocket.t
+SHA1 9e6e8302c6371ed788b40cd7ecff1eaed834b22f t/pod-coverage.t
+SHA1 6c20761b6a8f5ab2e199ce47aa25b1413ca0115e t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWhW7WAAoJEDTEVWqwTuCUp6sIAJNPUUt5RfsJCw/aMMRvq7/k
+OlGXu6EYLpjAQeAklLsPpHflFXsXpl7Li4rC11lPzYSznZqW9QepTenHSJ0aCmkZ
+yOZBG0EF0Ro3yKyhISKZDFXxpNM04dl+Sc3Xl1ve4sn3m/IxKO1toJXCFIYmF2fl
+woJkCa8yW1ae+9MITCsfihhfRek+D0aKuZhiAXc5jkLyT6V/bhF452ZfulVeUV7c
+tZl6fr0Hvj9EtgOMB6sFNfFGMOJdhUfyNuC5fwD6NubnZg43uEO1yDe5QwYNyZYI
+oIldK+SxPfkvBtNMXWFfXyPmKWcariEH2XgjylAXZR92g72zo1hbjXW+ascRPWU=
+=SQYG
+-----END PGP SIGNATURE-----

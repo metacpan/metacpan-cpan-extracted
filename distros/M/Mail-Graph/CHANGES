@@ -1,0 +1,144 @@
+
+2002-03-29 v0.01 Tels first version
+  - derived from stand-alone script
+  - graphs: per day
+	    per month of year
+	    per month
+            per day of month
+            per year
+            per day of week
+	    per top-level domain
+  - made package, with MANIFEST et al.
+  - added some basic pod
+  - added two basic tests
+  - read in template, and write out as html
+  - refined template and made it using a stylesheet
+2002-03-31 v0.02 Tels
+  - use Date::Calc for Date_to_Days and some others
+  - tests for _parse_date
+  - _parse_date(): return 0 for undefined or invalid dates, return numerical
+    values, correct year to be 4 digits
+  - added graph: daily (w/ rolling average) 
+		 rule (filter rules)
+		 target (per target address)
+  - renamed graphs: per_month => monthly, year => yearly
+  - added the ability to supress generation of each graph
+  - refined sample template
+2002-04-07 v0.03 Tels 01:29 (first released version)
+  - refined samples to be really generic
+  - fixed bug: the last mail per archive was always dropped
+  - graph's have now a minimum width to prevent cut-off texts
+2002-04-07 v0.04 Tels 05:30
+  - /^From/ detection a bit more strict
+  - don't die, but warn and skip files that don't look like mail-archives
+  - gather_mail: handle non-gziped mail-archives, too
+  - gather_files: take all ordinary files (not just *.gz)
+  - better doc
+2002-04-07 v0.05 Tels 16:43
+  - draw values for yearly, and per domain stats
+  - draw light-gray y grid
+  - fixed width for bars for domain/yearly stats
+  - 15% instead 5% on top if values are shown
+  - 25% instead 5% on top if values are shown and vertical
+  - count items in last 30 days and instert as last_30_days into template
+  - fixed pod =hea1 NAME
+  - added 'hour' stats
+  - can filter out target domains and/or addresses (these appear as unknown)
+2002-04-08 v0.06 Tels 00:05 (damn, nearly four releases in one day ;)
+  - prediction for current year/month (thanx Bill Kearney)
+  - the prediction code made necc. a different algorithmn for determining the
+    maximum value, this also fixed the dailys stats, which were too spacy
+2002-04-08 v0.07 Tels (never released)
+  - fixed CREDITS file
+  - fixed history (speling, times)
+  - removed some debug prints
+2002-04-27 v0.08 Tels
+  - added graph: last x days (w/ rolling average for 7 days) 
+  - added stats for compressed/uncompressed archive size
+  - tests for _average function (testsuite still highly incomplete)
+  - option 'average' (for average over Y days) works now
+  - removed useless sorting of keys when doing average
+  - fixed sample template, and sample script to show new options
+  - 38 tests
+2002-05-09 v0.09 Tels (never released)
+  - refined rule cleaner
+  - fixed: input can be a file, too
+  - color brown looked ugly, added some more colors to prevent wrap around
+2002-08-03 v0.10 Tels
+ tests: added some for default and overwritten options, and for month_to_num
+	93 tests
+ added: param last_date to make stats that end on a different day than today
+        param average_daily to have a different average there
+	param graph_ext to have specify png, jpg, gif etc
+ fixed: skip any mails newer than last_date (or today)
+        sample.pl to show new options
+        filter rules are now converted to lowercase
+	default params had "templates" instead of "template"
+	pod for new() and all it's parameters
+ misc:  slightly faster (17.9 vs 18.2 seconds on my system for my archives)		50% of the time is spent splitting the mail archive into lines and then
+	separating these into mails, and these in headers and bodies. There is
+	surely room for improvement...
+2002-08-31 v0.11_1 Tels (not released)
+ tests: test target address extraction
+	99 tests
+ fixed: much improved target address extraction
+        bug in _prediction() that used Today() instead of last_data 
+ added: valid_forwarders to ease target extraction
+        prediction for yearly stat based on last 60 days
+2002-09-23 v0.11_2 Tels (not released)
+ tests: add_percantage
+	99 tests
+ added: can add percentage values in parens after value (for rule)
+ fixed: removed needless use Exporter;
+2002-11-14 v0.11_3 Tels (not released)
+ added: create index file for each archive and re-read it if available
+        (makes it MUCH faster on subsequent runs)
+        use File::Spec whenever possible
+2002-11-16 v0.11_4 Tels (not released)
+ added: re-read the index files
+        prefer gzipped index files
+ fixed: use Compress::Zlib for reading gzip files instead of unportable zcat
+	actually call the target extraction routine (but still does not work)
+2002-11-18 v0.11_5 Tels (not released)
+ fixed: use Compress::Zlib for writing gzipped index files
+	target extraction works now again (at least a bit 3/6 failed tests)
+	don't need to write out 'target_domain' to index, 'domain' suffices
+ added: replace ##took## in template by time taken (use Time::Hires)
+	percentages for target and domain
+2002-11-19 v0.11_6 Tels (not released)
+ fixed: some "unitialized warnings"
+        writing out skipped items and compressed size to fix these on read
+        (items_skipped vs. skipped_mails and archive_size_uncompressed vs.
+	 size_uncompressed)
+	don't write out "domain" to index, extract it on read from target
+	skip mails w/ dates w/ year < 1970 and > 2038 (make Mktime() happy)
+ added: keep track of scores (SpamAssassin) and make histogram
+        (still needs todo the scatter and daily_score graph, though)
+	die() if an unknown option is passed/found
+2003-10-24 v0.11_7 Tels (not released)
+ added: first_date - exclude any mail with a date earlier than this (as bogus)
+	support for the following date formats:
+        # Sun, 19 Jul 03 23:49:16 +0200
+        # 18 Oct 2003 23:45:29 -0000
+2003-11-02 v0.12 Tels 110 tests
+ fixed: uses much less memory when reading in a mail-archive (not index)
+	(mail was hold in memory twice, while creating a big structure
+	 containing the mail headers and id. Now it is processed line by line
+	 and the stats are calculated directly)
+	calculate size of mails correctly (forgot to take body into account)
+	don't write 'toplevel' to index, we can reconstruct it from 'target'
+	target address extraction works now
+2003-12-21 v0.13a Tels 110 tests (not released)
+  * samples/convert: Had a bug of "Return-path" vs. "Return-Path:"
+  * when extracting target, don't look into From:
+  * limit SA score to 200, not 100000
+2004-01-04 v0.13 Tels 112 tests
+  * create the output dir if it does not exist (Thanx Paul Wolters!)
+  * added BUGS section to doc
+  * converted makegraph.t to Test::More and added some tests
+  * output dir no longer gets a trailing slash (good for OS/2?) and we use
+    File::Spec to construct output file names
+  * better reasons for skipping mails (string vs. some number)
+2004-01-04 v0.14 Tels 112 tests
+  * forgot to remove debug output. Duh.
+

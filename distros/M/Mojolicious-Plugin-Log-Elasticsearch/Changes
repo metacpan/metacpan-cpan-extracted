@@ -1,0 +1,38 @@
+Revision history for Mojolicious::Plugin::Log::Elasticsearch
+
+1.162530  2016-09-09 10:17:56+09:30 Australia/Adelaide
+
+  * Allow for specifying a timestamp field, since the automatic timestamps
+    have been removed in recent ElasticSearch
+
+1.152120  2015-07-31 17:02:34+09:30 Australia/Adelaide
+
+  * Add a hook for running custom code to output/override other values
+
+1.152051  2015-07-24 16:55:10+09:30 Australia/Adelaide
+
+  * Improve distribution with README.md
+
+1.152031  2015-07-22 12:45:23+09:30 Australia/Adelaide
+
+  * Add suggested Geo::IP dependency to metadata
+
+1.152030  2015-07-22 11:09:45+09:30 Australia/Adelaide
+
+  * Add support for arbitrary stash keys to also be sent to Elasticsearch
+
+1.152021  2015-07-21 21:02:06+09:30 Australia/Adelaide
+
+  * Add TODO file
+  * Change examples to use the standard port number
+  * Geo::IP support for logging lat/long
+
+1.152020  2015-07-21 09:53:41+09:30 Australia/Adelaide
+
+  * Remove some dzil cruft and improve metadata
+  * Fix version in main module file
+  * Improve documentation
+
+1.152010  2015-07-20 23:26:29+09:30 Australia/Adelaide
+
+  * Initial public version

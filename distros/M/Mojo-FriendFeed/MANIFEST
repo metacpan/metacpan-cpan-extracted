@@ -1,0 +1,10 @@
+Build.PL
+Changes
+ex/cpan.conf
+ex/cpan.pl
+lib/Mojo/FriendFeed.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README.pod
+t/listen.t

@@ -1,0 +1,13 @@
+Changes
+examples/iphoto-shell
+iphoto
+lib/Mac/iPhoto/Shell.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/compile.t
+t/pod.t
+t/pod_coverage.t

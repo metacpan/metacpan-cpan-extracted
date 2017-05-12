@@ -1,0 +1,66 @@
+Revision history for Perl module Mojo::IOLoop::ForkCall
+
+0.17 2015-04-17
+  - Fixed an error handling bug in the helper
+
+0.16 2014-12-22
+  - Added Mojolicious::Plugin::ForkCall, provides fork_call helper (Grinnz++)
+
+0.15 2014-09-17
+  - Replaced use of emit_safe which has been deprecated in Mojo::EventEmitter
+
+0.14 2014-08-17
+  - Fixed test failure on Perl < v5.14 (though the bug is unfixable!)
+    - Added pod warning that fork_call on old Perls certain errors can be silently missed
+
+0.13 2014-08-16
+  - Added error event for parent-process errors
+
+0.12 2014-07-24
+  - Change return value from pid to instance (pid was broken by 0.11)
+  - Added spawn event
+  - Fixed bug while send result to main process if socket already closed (avkhozov++)
+
+0.11 2014-07-23
+  - Fix bug in which children might try to trigger each other's callbacks
+  - Fork is now called on the next tick, rather than immediately
+
+0.10 2014-07-04
+  - Child now resets the IOLoop
+  - Bump Mojolicious version to 5.08
+
+0.09 2014-06-21
+  - Added additional tests
+  - De-emphasize the functional interface in the documentation
+
+0.08 2014-06-15
+  - Set stream timeout to 0 to prevent long-running processes failing
+  - Add note about future work on timeouts
+
+0.07 2014-05-21
+  - Stable release of 0.060_001 which did fix the cygwin bug.
+    - Windows perls now use buffered write
+
+0.060_001 2014-02-27
+  - Trial to attempt to fix cygwin test failures, lumping native windows in too
+
+0.06 2014-02-09
+  - Fix bug in tests
+
+0.05 2014-01-25 
+  - Optimize windows checking
+  - Fix useless (broken?) test
+
+0.04 2014-01-25
+  - Attempt an even better method of exitting the child
+  - Add test for sending largish messages from the child
+
+0.03 2014-01-19
+  - Remove Child.pm in hopes of stomping some strange bugs
+
+0.02 2013-12-21
+  - Fix some nagging warnings and test failures
+
+0.01 2013-11-28
+  - Initial release
+

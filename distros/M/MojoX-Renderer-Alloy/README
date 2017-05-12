@@ -1,0 +1,34 @@
+NAME
+    MojoX::Renderer::Alloy - Base class for Template::Alloy renderer
+
+VERSION
+    version 1.121150
+
+SYNOPSIS
+    Base abstract class for following renderers:
+
+    *   MojoX::Renderer::Alloy::TT
+
+    *   MojoX::Renderer::Alloy::Velocity
+
+    *   MojoX::Renderer::Alloy::Tmpl
+
+    *   MojoX::Renderer::Alloy::HTE
+
+METHODS
+  build
+    Build handler for selected renderer.
+
+    Please note that for all renderers a Mojolicious::Controller is
+    available as "c" variable, while helpers are available as "h" variable.
+
+AUTHOR
+    Alex J. G. Burzyński <ajgb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Alex J. G. Burzyński
+    <ajgb@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

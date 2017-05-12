@@ -1,0 +1,25 @@
+<p align="center">
+    <table class="data" id="MainFilterTable">
+        <thead>
+            <tr class="tabheader">
+                    <th>[% tr.tr("Planned Starttime") %]</th>
+                    <th>[% tr.tr("Command") %]</th>
+                    <th>[% tr.tr("Arguments") %]</th>
+            </tr>
+        </thead>
+        <tbody>
+            [% FOREACH command IN commands %]
+                <tr>
+                    <td>[% command.starttime %]</td>
+                    [% IF command.class  %]
+                        <td class="[% command.class %]">
+                    [% ELSE %]
+                        <td>
+                    [% END %]
+                        [% command.name %]</td>
+                    <td>[% command.args %]</td>
+                </tr>
+            [% END %]
+        </tbody>
+    </table>
+</p>

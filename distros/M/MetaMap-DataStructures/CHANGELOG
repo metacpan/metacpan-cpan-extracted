@@ -1,0 +1,9 @@
+NAME
+    MetaMap::DataStructures CHANGES
+
+  version 0.03
+    1. bug fixes with DataStructures.pm
+
+  version 0.01
+    1. initial creation of package
+

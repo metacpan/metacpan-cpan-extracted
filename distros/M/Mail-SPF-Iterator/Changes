@@ -1,0 +1,138 @@
+1.113 2016-05-17
+- fix bug in generating the Received-SPF header, introduced in 1.112
+- samples/spf-lookup.pl has now option to specify DNS server
+
+1.112 2015-12-16
+- optimize debugging and make it usable from outsite (for
+  Mail::DMARC::Iterator).
+- method todo() to get a list of open DNS queries
+- hash in result contains all the information which are also contained in
+  the Received-SPF header, i.e. also client-ip, envelope-from...
+
+1.111 2015-11-15
+- adapt tests to recent changes in Net::DNS (use of undocumented function
+  stopped working). RT#108914. Thanks to SREZIC
+
+1.11 2012-06-02
+- adapt to changed behavior in newer Net::DNS versions regarding
+  encoding of special characters like spaces. Nothing changed for
+  normal DNS names, only for the sometimes esoteric rfc4408 test suite
+
+1.10 2011-08-30
+- return ('') also if TXT was NXDOMAIN but SPF query is still open etc
+
+1.09 2011-08-29
+- let next() report ('') if given packet matched query, but got
+  ignored or () if packet did not match any query, instead of 
+  reporting () in both cases
+
+1.08 2009-09-08
+- fixed case where problem part in SPF-Received Header contained
+  newlines
+
+1.07 2009-08-31
+- fix for SPF with multiple includes on same level where not the 
+  first matches
+
+1.06 2009-02-06
+- fix for DNS names with spaces and Net::DNS <0.64 (for SPF test 
+  suite, should be irrelevant for real life DNS names)
+
+1.05_01 2009-02-02
+- add test when ptr record results in cname which then results in
+  another ptr record
+1.05 2009-01-19
+- work around changes between Net::DNS 0.63 and 0.64
+
+1.04 2009-01-19
+- fix bug in mailheader for empty or invalid SPF records
+
+1.03 2008-12-07
+- more useful debugging messages
+- switch on debugging via use/import
+- can set own debug function via use/import
+
+1.02 2008-11-26
+- document all fields in module
+- report identity=helo in Received-SPF if helo, not mailfrom, is used
+- fix and document regex in _check_macro_domain
+
+1.01 2008-11-26
+- lots of code cleanups to make it better maintainable
+- detect and fix bug with deeply nested includes, where a Match
+  (Pass) from a lower level gets directly propagated to the top
+- detect and fix bugs, where final result (errors) where not
+  saved in $self->{result}
+- better SenderID support, some tests for SenderID records
+- no more cbid in next(), instead track DNS header ids of send 
+  DNS packets and make sure that reply matches id of query
+- set minimal version for Net::DNS to 0.62 , older versions have 
+  problems with SPF
+- more tests
+
+1.00 2008-11-25
+- declare all $self as Mail::SPF::Iterator object
+- add method to get/set default explanation string
+- call it feature complete -> set version to 1.0
+
+0.10 2008-11-24
+- license clarification for SPF test suite in COPYRIGHT and add
+  t/rfc4408-tests.LICENSE to distribution
+- documentation update
+- samples/spflookup shows explanation on Fail
+
+0.09 2008-11-24
+- internal restructuring, better checking that DNS answers match
+  the question
+- expansion of %{p} in exp= modifier
+- more tests outside of official SPF test suite
+
+0.08 2008-11-22
+- accepts also SenderID records (only spf2.0/mfrom or 
+  spf2.0/pra,mfrom or spf2.0/mfrom,pra) and handle them like 
+  v=spf1 records. Prefer "real" SPF records
+
+0.07 2008-11-22
+- %{p} macro gets now expanded in TXT for explain (but still not in
+  exp=..%{p}.. modifiers)
+- method result to get result (before next gives the final result,
+  in case one don't want to lookup %{p} in explain)
+- method mailheader doesn't take arguments anymore, because result
+  gets stored in the object
+
+0.06 2008-11-21
+- exp method works for most cases, except when it contains %{p} macro
+  which in most cases will be replaced with 'unknown'
+- fix for interpretation of %{i} for IP6
+- better debugging
+- script samples/spflookup.pl which does lookup from the command line
+  and returns SPF-Received header
+
+0.05 2008-11-20
+- sub mailheader which gives SPF-Received header
+- sub lookup_blocking for simple blocking lookup (for convinience)
+- clean up 'problem' messages, returns mechanism which matcht
+- better debugging
+
+0.04 2008-11-20
+- do not depend on additional DNS RR for resolving CNAME and finding 
+  address for MX but still use them if found
+  test suite expanded to test with and w/o additional RR
+- do not depend on YAML for executing SPF test suite. The YAML file
+  is converted to perl file (with Data::Dumper) which is used instead
+  of the YAML file
+
+0.03 2008-11-19
+- fixes for Socket6 detection
+- fixes for test suite
+- fixes for cases, where DNS name contains special chars (qname from
+  Net::DNS::Question returns presentation format, not wire format, if
+  it got the data from the wire)
+
+0.02 2008-11-17
+- specify URI as prereq
+- if YAML is not installed show why test suite got skipped
+- skip parts of test suite of Socket6 not installed
+
+0.01 2008-11-13
+- first release which passes SPF test suite

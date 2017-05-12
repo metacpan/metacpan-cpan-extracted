@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               MooseX-Collect
+version:            0.92
+abstract:           provides method modifier for collecting method calls from roles and superclasses
+author:
+    - Alessandro Ranellucci <aar@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  6.31
+build_requires:
+    Moose:       1.21
+    Test::Deep:  0
+    Test::More:  0.96
+requires:
+    Moose:  1.21
+resources:
+    repository:  git://git@github.com:alexrj/MooseX-Collect.git
+no_index:
+    directory:
+        - t
+        - inc
+    package:
+        - MooseX::Collect::Method
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

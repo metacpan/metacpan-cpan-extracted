@@ -1,0 +1,79 @@
+NAME
+    Mac::PropertyList::XS - work with Mac plists at a low level, really fast
+
+SYNOPSIS
+    See Mac::PropertyList and Mac::PropertyList::SAX
+
+DESCRIPTION
+    Mac::PropertyList::SAX was my first attempt to speed up property-list
+    parsing. It achieves about a 30x speed boost, but large files still take
+    too long for my taste. This module addresses some remaining speed gains
+    by implementing some expensive operations in C.
+
+    This module is intended to be a drop-in replacement for
+    Mac::PropertyList::SAX, which is itself a drop-in replacement for
+    Mac::PropertyList.
+
+EXPORTS
+    By default, no functions are exported. Specify individual functions to
+    export as usual, or use the tags ':all', ':create', and ':parse' for the
+    appropriate sets of functions (':create' includes the create* functions
+    as well as plist_as_string; ':parse' includes the parse* functions).
+
+FUNCTIONS
+    parse_plist_file
+        See "parse_plist_file" in Mac::PropertyList
+
+    parse_plist_fh
+        See "parse_plist_fh" in Mac::PropertyList
+
+    parse_plist
+        See "parse_plist" in Mac::PropertyList
+
+    parse_plist_string
+        An alias to parse_plist, provided for better regularity compared to
+        Perl SAX.
+
+    create_from_ref( HASH_REF | ARRAY_REF )
+        Create a plist from an array or hash reference.
+
+        The values of the hash can be simple scalars or references. Hash and
+        array references are handled recursively, and Mac::PropertyList
+        objects are output correctly. All other scalars are treated as
+        strings (use Mac::PropertyList objects to represent other types of
+        scalars).
+
+        Returns a string representing the reference in serialized plist
+        format.
+
+    create_from_hash( HASH_REF )
+        Provided for backward compatibility with Mac::PropertyList: aliases
+        create_from_ref.
+
+    create_from_array( ARRAY_REF )
+        Provided for backward compatibility with Mac::PropertyList: aliases
+        create_from_ref.
+
+BUGS / CAVEATS
+    Certainly !
+
+SUPPORT
+    Please contact the author with bug reports or feature requests.
+
+AUTHOR
+    Darren M. Kulp, "<kulp @ cpan.org>"
+
+THANKS
+    brian d foy, who created the Mac::PropertyList module whose tests were
+    appropriated for this module.
+
+SEE ALSO
+    Mac::PropertyList, the inspiration for this module.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Darren Kulp
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.4 or, at
+    your option, any later version of Perl 5 you may have available.
+

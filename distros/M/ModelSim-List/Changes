@@ -1,0 +1,22 @@
+Revision history for Perl extension ModelSim::List.
+
+0.01  Sat Jul  2 18:24:47 2005
+	- original version; created by h2xs 1.23 with options
+		-XOA -b 5.8.1 ModelSim::List
+
+0.02  2005-7-10
+	- Add support for normal (non-event) list format. Agent++, Sal++
+	  288 tests passed.
+
+0.03  2005-7-19
+        - Prepare for uploading to CPAN. Use Module::Install in Makefile.PL
+
+0.04  2005-7-19
+        - Strip CR from my dos-format source files, add list file samples to
+          the POD document.
+
+0.05  2007-6-2
+        - Some minor cleanups including META.yml/MANIFEST/tests/etc
+
+0.06  2007-602
+        - Fixed the formatting mistake in the CODE COVERAGE section.

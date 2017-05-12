@@ -1,0 +1,44 @@
+/* ================================================================== */
+/* THEME: Midnight Blue
+ */
+@import 'functions';
+@import 'fonts_midblu';
+@import 'icon_light_on_dark';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: #000033;
+$verge-fg: set-fg($verge-bg);
+$verge-border: #ccccff;
+$button-bg: #001144;
+$button-fg: set-fg($button-bg);
+$button-border: #000099;
+$main-bg: #000080;
+$main-fg: set-fg($main-bg);
+$link-fg: set-link($main-bg);
+$link-visited: set-visited($main-bg);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+}
+
+header,
+footer,
+.side {
+	@extend .verge;
+}
+
+body {
+	color: $main-fg;
+	background: $main-bg url(midnightblue1.jpg);
+}
+
+@include some-links($link-fg, $link-visited);
+@include fancy($verge-fg, $verge-bg, "midnightblue1.jpg");
+@include make-buttons;
+

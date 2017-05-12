@@ -1,0 +1,30 @@
+Math with strings that are represented by big integers
+
+(C) ..--- ----- ----- .---- by - . .-.. ... .-.-.-  All rights reserved.
+
+You need the new Math::BigInt and Math::BigFloat versions of at least v1.33 as
+they can be found on CPAN or in perl newer than v5.7.1.
+
+To install, untar, unzip and then run
+
+	perl Makefile.PL
+	make
+	make test
+
+If all tests pass, you might do:
+
+	make install
+
+to install this package.
+
+See also ./examples for some example scripts.
+
+More information including HTMLified help and preliminary benchmark results
+are available under:
+
+	http://bloodgate.com/perl/
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

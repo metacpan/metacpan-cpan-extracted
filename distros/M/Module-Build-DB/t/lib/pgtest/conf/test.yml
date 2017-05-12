@@ -1,0 +1,5 @@
+---
+dbi:
+  dsn: dbi:Pg:dbname=foo_test
+  username: postgres
+  password: ''

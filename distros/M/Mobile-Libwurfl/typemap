@@ -1,0 +1,10 @@
+const char *					T_PV
+const void *					T_PV
+wurfl_cache_provider				T_IV
+wurfl_device_capability_enumerator_handle	T_PTROBJ
+wurfl_device_handle				T_PTROBJ
+wurfl_engine_target				T_IV
+wurfl_error					T_IV
+wurfl_handle					T_PTROBJ
+wurfl_header_retrieve_callback			T_PTROBJ
+wurfl_match_type				T_IV

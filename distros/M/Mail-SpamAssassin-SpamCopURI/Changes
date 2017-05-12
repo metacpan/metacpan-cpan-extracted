@@ -1,0 +1,189 @@
+0.24  Sun Mar  6 01:54:09 PST 2005
+   - updating rules/spamcop_uri.cf with latest scores, exclusions, etc.
+
+
+0.23  Sun Mar  6 01:04:46 PST 2005
+   - updated diffs against SA 2.63 and 2.64
+   - fixing regex for port stripping of urls
+   - fixing configuration for xrl.us / openredirect
+
+0.22 Thu Aug  5 13:09:15 PDT 2004
+   - Updated Makefile.pl to support 2.64 and including
+     PerMsgStatus.pm from 2.64 release.  Install
+     process now figures out what version you have
+     and installs correct patched version of PerMsgStatus.pm.
+
+0.21 Wed Aug  4 16:41:31 PDT 2004
+   - Defaulting config param spamcop_uri_limit to 20.  If
+     the number of URLs in a message exceeds the limit, they
+     are shuffled and only up to the number specified for the limit
+     are tested.  
+
+   - New syntax for specifying the address match for multi.surbl.org:
+     Instead of '127.0.0.0/2' use '127.0.0.0+2' this is being
+     done to eliminate any confusion with CIDR syntax.
+     The old '/' syntax is still supported, but will be deprecated
+     in a future version.
+
+0.20 Sat Jul 31 22:02:20 PDT 2004
+  - adding max url config param to limit number of URLs checked 
+    in an email.  Usage (place into .cf file):
+      spamcop_uri_limit 50
+    Default is unlimited.
+  
+  - adding support for multi.surbl.org / bitmasked results.  
+    query results are cached on a per msg basis to prevent additional
+    lookups.
+
+    Modify your configuration to look like the following for sc.surbl.org:
+
+     uri SPAMCOP_URI_RBL           eval:check_spamcop_uri_rbl('multi.surbl.org','127.0.0.0/2')
+     describe SPAMCOP_URI_RBL      URI's domain appears in spamcop database at sc.surbl.org
+     tflags SPAMCOP_URI_RBL	net
+     score SPAMCOP_URI_RBL  3.0
+
+    ws.surbl.org would look like this:
+
+      uri WS_URI_RBL           eval:check_spamcop_uri_rbl('multi.surbl.org','127.0.0.0/4')
+      describe WS_URI_RBL      URI's domain appears in ws database at ws.surbl.org
+      tflags WS_URI_RBL       net
+      score WS_URI_RBL  2.0
+
+  - Removed configuration params: spamcop_uri_src 
+    and spamcop_uri_path since
+    these should never be used anymore.
+
+  - added cleanup for hosts that come in with a dot in front of
+    of the host (e.g. http://.spammy-site.org)
+
+0.19 Wed Jul 21 08:56:57 PDT 2004
+   - fix for hex-encoded urls that have a port
+   - skipping open_redirect tests until reliable open_redirector is found
+
+0.18 Wed May 26 13:41:14 PDT 2004
+   - fixed pack template for de-base 10 to use network byte
+     order.  This release is only needed by users
+     with big endian machines.
+
+
+0.17 Mon May 24 18:23:55 PDT 2004
+    - added code to handle hex encoded and base 10 encoded 
+      IP addresses
+    - added backslash handling in urls (http:/\www.google.com)
+    - handling case when host of a URL is a '.'
+    - calling env_proxy on LWP::UserAgent to support proxied
+      users
+
+0.16 Sat May 15 00:58:05 PDT 2004
+    - modified extract to catch AOL redirs
+    - fixed handling of IP's in URLs when normalization occurs
+    - adding env_proxy to LWP stuff so proxies work 
+      (thanks to bluebanana at users.sourceforge.net)
+
+0.15 Thu May  6 22:18:17 PDT 2004
+    - making Makefile.PL install intelligently
+    - added url extraction that should take care of rd.yahoo.com, 
+      g.msn.com, ads.msn.com, google.com, etc. 
+      Basically pulls urls out of paths and query strings.
+    - removed *.msn.com, *.yahoo.com and *.google.com from
+      open_redirect list since url extraction should handle
+      this
+    - added snurl.com to open_redirect_list_spamcop_uri
+    - added host cleanup for www=2eseo500=2ecom -> www.seo500.com
+    - making URI >= 1.28 PREREQ instead of 0
+
+
+0.14 Thu Apr 22 17:57:11 PDT 2004
+    - fixing empty host in url case 'http://'
+
+
+0.13 Thu Apr 22 17:14:11 PDT 2004
+    - fix method call to work with 5.005
+    - only doing one query per host instead of both 2nd and 3rd level 
+      stripping the host down to the registrar domain using SA code 
+      from Util.pm and http://www.bestregistrar.com/help/ccTLD.htm
+    - added query caching to reduce queries even more
+
+
+0.12 Wed Apr 21 07:34:28 PDT 2004
+    - fix to open_redirect test
+
+0.11 Tue Apr 20 20:37:04 PDT 2004
+    - major refactor - removed all deprecated tests
+      that depended on local cache of data 
+      see upgrade section about cleaning up your local install
+      in the INSTALL doc
+    - adding open redirect resolution that will
+      attempt to resolve the Location header for 
+      hosts that appear in the open_redirect_list_spamcop_uri.
+      this should take care of spammers hiding behind
+      rd.yahoo.com or snipurl.com. this is off 
+      by default and requires enabling it with 
+      spamcop_uri_resolve_open_redirects 1
+    - fixed local whitelisting and blacklisting
+    - sanitizing host portion of the URL by stripping
+      non alpha characters from the TLD 
+    - added more info in the INSTALL section
+      to help with installation issues
+    - removed spamcopuri-update
+    - fixed prereqs in Makefile.PL 
+
+0.10 Tue Apr 13 14:56:37 PDT 2004
+    - fixing dnsrbl test...again
+    - removing erroneous test from spamcop_fetch
+
+0.09 Thu Apr  8 07:36:33 PDT 2004
+    - fixing dnsrbl test
+    - commenting out local tests and adjusting score for
+      RBL test to 3.0
+
+0.08 Thu Apr  1 09:04:43 PST 2004
+     - adding check_spamcop_uri_rbl() method that 
+       allows checking of uri's domain against DNS based
+       RBL list.  This checks the 2nd and 3rd level domains
+       of the URI.
+
+0.07 Sat Mar 13 15:19:56 PST 2004
+     - using URI instead of URI::URL internally
+     - got rid of check_spamcop_host_uri() in favor of 
+       generic method that takes fields as args
+     - place spamcop_uri_src in to Conf.pm so we can
+       define src in one place without having to passing it in
+       as a arg to the tests
+
+0.06 Thu Mar 11 07:53:29 PST 2004
+     - putting  scheme back in local database data structure
+     - adding more debugging around storing urls
+     - allowing spamcop_url to be defined in conf
+     - adding EXE_FILES section to Makefile.pm
+
+0.05 Sun Mar  7 04:34:57 PST 2004
+     - no longer using freeapp.net / fetching urls from spamcop.net directly
+     - locally caching urls in __userstate__/spamcop_uri using Storable
+       expiring URLs older than 4 days (configured via symbol table entry - URL_TIMEOUT)
+       checking for new data after CACHE_TIMEOUT currently 10 minutes
+
+0.04 Sun Feb 29 14:05:39 PST 2004
+    - now caching queries for 60 seconds by hostname
+    - blacklist and whitelisting by hostname is now possible in .cf
+    - simplified configuration, URL_HOME can be specified in eval: rule
+    - using new hashed directory structure instead of searching 
+      against the cgi (http://spamcheck.freeapp.net/domains/)
+    - including test suite
+    - using SA core debugging instead of STDERR
+    - displaying useful message in SUMMARY information
+      in email when hits occur 
+      (e.g. "http://193.27.84.78/link48r.php?site=x&file=fs2 is blacklisted
+             in http://spamcheck.freeapp.net/domains");
+
+0.03 Thu Feb 26 09:20:02 PST 2004
+    - adding allowed_scheme hash to check_spamcop method
+      to restrict urls to http, https, and ftp
+      need to come up with more general way for other schemes
+
+0.02 Mon Feb 23 17:10:19 PST 2004
+    - updating URL_HOME to http://spamcheck.freeapp.net/search-uri.cgi
+
+0.01 Tue Feb 17 22:45:48 PST 2004
+    - Initial spamcop check in
+    - spamcop uri tests against server  

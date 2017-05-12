@@ -1,0 +1,876 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+# $Id: scan,v 1.13 2006/04/26 12:45:34 lem Exp $
+
+use Mail::RBL;
+use Pod::Usage;
+use Getopt::Std;
+use NetAddr::IP;
+
+our $VERSION = do { my @r = (q$Revision: 1.13 $ =~ /\d+/g); sprintf " %d."."%03d" x $#r, @r };
+
+=pod
+
+=head1 NAME
+
+scan - Looks into a number of public DNS blacklists wether a host is listed
+
+=head1 SYNOPSIS
+
+    scan [-h] [-d delay] [-v] [-m regexp] [-M regexp]
+
+=head1 DESCRIPTION
+
+This script automates the task of verifying that your address space is
+in a given list. You can supply a single host, a subnet or a list of
+hosts or subnets in the command line. Every host is listed against a
+built-in list of more than 100 public RBLs.
+
+=head2 Do not abuse this script
+
+RBLs are operated on a wide variety of hardware and network
+conditions. Some RBLs can take millions of queries a day. Other RBLs
+do not have the resources for such a large usage.
+
+This script allows you to scan a very large range with a simple
+command. The code introduces a delay (which you could bypass, but be
+sure to understand the implications) in order to avoid crowding the
+resources of said RBLs. Note that some RBLs will consider a large
+scan, as an abuse incident B<and probably list your site> as a
+response.
+
+The intend of this code is to help you establish a status about the
+listings within your network. I assume it is ok to run this script
+periodically, provided that you do not abuse doing things as running
+multiple instances in parallel.
+
+The following options are recognized:
+
+=over
+
+=item B<-h>
+
+Outputs this documentation.
+
+=item B<-d delay>
+
+Delay in seconds between a set of queries to the RBLs.
+
+=item B<-m regexp>
+
+Only query RBLs whose tags match the given regular expression.
+
+=item B<-M regexp>
+
+Similar to B<-m>, but the regexp B<must not match> to use the given RBL.
+
+This is very useful as there are some RBLs that match a significant
+proportion of the address space or that are not helpful in your
+particular scenario.
+
+Another potential use of B<-M> and B<-m>, is to taylor the list of
+RBLs to search in order to speed up the lookups. This is specially
+true if you are interested in a scan of a large piece of address
+space.
+
+=item B<-v>
+
+Be verbose about progress.
+
+=cut
+
+    ;
+use vars qw/ $opt_d $opt_h $opt_M $opt_m $opt_v /;
+
+getopts('d:hM:m:v');
+
+$opt_d = 1 unless defined $opt_d;
+pod2usage(verbose => 2) if $opt_h;
+
+$opt_m = qr/$opt_m/ if $opt_m;
+$opt_M = qr/$opt_M/ if $opt_M;
+
+my %rbl = map { $_ => Mail::RBL->new($_) }
+qw(
+
+3y.spam.mrs.kithrup.com
+a2000.blackholes.us
+above.blackholes.us
+accept.the-carrot-and-the-stick.com
+access.redhawk.org
+ad.countries.nerd.dk
+ad.rbl.cluecentral.net
+adnc.blackholes.us
+ae.countries.nerd.dk
+ae.rbl.cluecentral.net
+affinity.blackholes.us
+ag.rbl.cluecentral.net
+al.countries.nerd.dk
+al.rbl.cluecentral.net
+all.rbl.cluecentral.net
+all.rbl.kropka.net
+all.spamblock.unit.liu.se
+am.countries.nerd.dk
+am.rbl.cluecentral.net
+an.countries.nerd.dk
+an.rbl.cluecentral.net
+ao.countries.nerd.dk
+ao.rbl.cluecentral.net
+ap.countries.nerd.dk
+ap.rbl.cluecentral.net
+aplushosting.blackholes.us
+ar.countries.nerd.dk
+ar.rbl.cluecentral.net
+argentina.blackholes.us
+as.rbl.cluecentral.net
+assholes.madscience.nl
+at.countries.nerd.dk
+at.rbl.cluecentral.net
+att.blackholes.us
+au.countries.nerd.dk
+au.rbl.cluecentral.net
+aw.rbl.cluecentral.net
+az.countries.nerd.dk
+az.rbl.cluecentral.net
+ba.countries.nerd.dk
+ba.rbl.cluecentral.net
+bb.countries.nerd.dk
+bb.rbl.cluecentral.net
+bd.countries.nerd.dk
+bd.rbl.cluecentral.net
+be.countries.nerd.dk
+be.rbl.cluecentral.net
+bellsouth.blackholes.us
+bf.countries.nerd.dk
+bf.rbl.cluecentral.net
+bg.countries.nerd.dk
+bg.rbl.cluecentral.net
+bh.countries.nerd.dk
+bh.rbl.cluecentral.net
+bj.rbl.cluecentral.net
+bl.borderworlds.dk
+bl.csma.biz
+bl.deadbeef.com
+bl.redhatgate.com
+bl.spamcannibal.org
+bl.spamcop.net
+bl.starloop.com
+bl.technovision.dk
+bl.tolkien.dk
+blackhole.compu.net
+blackholes.alphanet.ch
+blackholes.brainerd.net
+blackholes.five-ten-sg.com
+blackholes.intersil.net
+blackholes.mail-abuse.org
+blackholes.sandes.dk
+blackholes.uceb.org
+blackholes.wirehub.net
+blacklist.fpsn.net
+blacklist.informationwave.net
+blacklist.sci.kun.nl
+blacklist.spambag.org
+block.blars.org
+block.dnsbl.sorbs.net
+blocked.hilli.dk
+blocklist.squawk.com
+blocklist2.squawk.com
+blocktest.relays.osirusoft.com
+bm.countries.nerd.dk
+bm.rbl.cluecentral.net
+bn.countries.nerd.dk
+bn.rbl.cluecentral.net
+bo.countries.nerd.dk
+bo.rbl.cluecentral.net
+bogons.cymru.com
+bogons.dnsiplists.completewhois.com
+br.countries.nerd.dk
+br.rbl.cluecentral.net
+brazil.blackholes.us
+broadwing.blackholes.us
+bs.countries.nerd.dk
+bs.rbl.cluecentral.net
+bt.countries.nerd.dk
+bt.rbl.cluecentral.net
+burst.blackholes.us
+bw.countries.nerd.dk
+bw.rbl.cluecentral.net
+by.countries.nerd.dk
+by.rbl.cluecentral.net
+bz.countries.nerd.dk
+bz.rbl.cluecentral.net
+ca.countries.nerd.dk
+ca.rbl.cluecentral.net
+cart00ney.surriel.com
+cbl.abuseat.org
+ch.countries.nerd.dk
+ch.rbl.cluecentral.net
+charter.blackholes.us
+china.blackholes.us
+chinanet.blackholes.us
+ciberlynx.blackholes.us
+cihost.blackholes.us
+ck.countries.nerd.dk
+ck.rbl.cluecentral.net
+cl.countries.nerd.dk
+cl.rbl.cluecentral.net
+cm.countries.nerd.dk
+cm.rbl.cluecentral.net
+cn-kr.blackholes.us
+cn.countries.nerd.dk
+cn.rbl.cluecentral.net
+co.countries.nerd.dk
+co.rbl.cluecentral.net
+cogentco.blackholes.us
+comcast.blackholes.us
+covad.blackholes.us
+cr.countries.nerd.dk
+cr.rbl.cluecentral.net
+cu.countries.nerd.dk
+cu.rbl.cluecentral.net
+cw.blackholes.us
+cy.countries.nerd.dk
+cy.rbl.cluecentral.net
+cybercon.blackholes.us
+cz.countries.nerd.dk
+cz.rbl.cluecentral.net
+de.countries.nerd.dk
+de.rbl.cluecentral.net
+dev.null.dk
+devnull.drbl.be.net.ru
+dews.qmail.org
+dialtone.blackholes.us
+dialup.blacklist.jippg.org
+dialup.drbl.novsu.ac.ru
+dialup.drbl.sandy.ru
+dialup.rbl.kropka.net
+dialups.mail-abuse.org
+dialups.relays.osirusoft.com
+dialups.visi.com
+dk.countries.nerd.dk
+dk.rbl.cluecentral.net
+dm.rbl.cluecentral.net
+dnsbl-1.uceprotect.net
+dnsbl-2.uceprotect.net
+dnsbl-3.uceprotect.net
+dnsbl.ahbl.org
+dnsbl.antispam.or.id
+dnsbl.cbn.net.id
+dnsbl.cyberlogic.net
+dnsbl.isoc.bg
+dnsbl.jammconsulting.com
+dnsbl.kempt.net
+dnsbl.njabl.org
+dnsbl.solid.net
+dnsbl.sorbs.net
+dnswl.isoc.bg
+do.countries.nerd.dk
+do.rbl.cluecentral.net
+doubleclick.blackholes.us
+dsbl.dnsbl.net.au
+duinv.aupads.org
+dul.dnsbl.sorbs.net
+dul.ru
+dun.dnsrbl.net
+dynablock.njabl.org
+dynablock.wirehub.net
+dynamicpipe.blackholes.us
+dz.countries.nerd.dk
+dz.rbl.cluecentral.net
+ec.countries.nerd.dk
+ec.rbl.cluecentral.net
+ee.countries.nerd.dk
+ee.rbl.cluecentral.net
+eg.countries.nerd.dk
+eg.rbl.cluecentral.net
+eli.blackholes.us
+emperion.blackholes.us
+epoch.blackholes.us
+es.countries.nerd.dk
+es.rbl.cluecentral.net
+et.countries.nerd.dk
+et.rbl.cluecentral.net
+eu.countries.nerd.dk
+eu.rbl.cluecentral.net
+ev1.blackholes.us
+fi.countries.nerd.dk
+fi.rbl.cluecentral.net
+fj.countries.nerd.dk
+fj.rbl.cluecentral.net
+fl.chickenboner.biz
+flowgoaway.com
+fm.rbl.cluecentral.net
+fo.countries.nerd.dk
+fo.rbl.cluecentral.net
+forbidden.icm.edu.pl
+form.rbl.kropka.net
+formmail.relays.monkeys.com
+fr.countries.nerd.dk
+fr.rbl.cluecentral.net
+fresh.dict.rbl.arix.com
+frontiernet.blackholes.us
+ga.countries.nerd.dk
+ga.rbl.cluecentral.net
+gb.countries.nerd.dk
+gblx.blackholes.us
+gd.countries.nerd.dk
+gd.rbl.cluecentral.net
+ge.countries.nerd.dk
+ge.rbl.cluecentral.net
+gh.countries.nerd.dk
+gh.rbl.cluecentral.net
+gi.countries.nerd.dk
+gi.rbl.cluecentral.net
+gl.countries.nerd.dk
+gl.rbl.cluecentral.net
+gm.countries.nerd.dk
+gm.rbl.cluecentral.net
+gn.countries.nerd.dk
+gp.rbl.cluecentral.net
+gr.countries.nerd.dk
+gr.rbl.cluecentral.net
+gt.countries.nerd.dk
+gt.rbl.cluecentral.net
+gu.countries.nerd.dk
+gu.rbl.cluecentral.net
+gy.rbl.cluecentral.net
+he.blackholes.us
+hijacked.dnsiplists.completewhois.com
+hil.habeas.com
+hk.countries.nerd.dk
+hk.rbl.cluecentral.net
+hn.countries.nerd.dk
+hn.rbl.cluecentral.net
+hongkong.blackholes.us
+hopone.blackholes.us
+hostcentric.blackholes.us
+hr.countries.nerd.dk
+hr.rbl.cluecentral.net
+ht.countries.nerd.dk
+ht.rbl.cluecentral.net
+http.dnsbl.sorbs.net
+http.opm.blitzed.org
+hu.countries.nerd.dk
+hu.rbl.cluecentral.net
+id.countries.nerd.dk
+id.rbl.cluecentral.net
+ie.countries.nerd.dk
+ie.rbl.cluecentral.net
+il.countries.nerd.dk
+il.rbl.cluecentral.net
+in.countries.nerd.dk
+in.rbl.cluecentral.net
+inflow.blackholes.us
+inflow.noflow.org
+infolink.blackholes.us
+inputs.relays.osirusoft.com
+intellispace.blackholes.us
+interbusiness.blackholes.us
+internap.blackholes.us
+intruders.docs.uu.se
+io.countries.nerd.dk
+io.rbl.cluecentral.net
+ip.rbl.kropka.net
+ipwhois.rfc-ignorant.org
+ir.countries.nerd.dk
+ir.rbl.cluecentral.net
+is.countries.nerd.dk
+is.rbl.cluecentral.net
+it.countries.nerd.dk
+it.rbl.cluecentral.net
+iwayhosting.blackholes.us
+japan.blackholes.us
+jaring.blackholes.us
+jm.countries.nerd.dk
+jm.rbl.cluecentral.net
+jo.countries.nerd.dk
+jo.rbl.cluecentral.net
+jp.countries.nerd.dk
+jp.rbl.cluecentral.net
+ke.countries.nerd.dk
+ke.rbl.cluecentral.net
+kg.countries.nerd.dk
+kg.rbl.cluecentral.net
+kh.countries.nerd.dk
+kh.rbl.cluecentral.net
+kn.rbl.cluecentral.net
+kodak.blackholes.us
+korea.blackholes.us
+korea.services.net
+kr.countries.nerd.dk
+kr.rbl.cluecentral.net
+kw.countries.nerd.dk
+kw.rbl.cluecentral.net
+ky.rbl.cluecentral.net
+kz.countries.nerd.dk
+kz.rbl.cluecentral.net
+l1.spews.dnsbl.sorbs.net
+l2.spews.dnsbl.sorbs.net
+la.countries.nerd.dk
+la.rbl.cluecentral.net
+lame-av.rbl.kropka.net
+lauderdale.blackholes.us
+lb.countries.nerd.dk
+lb.rbl.cluecentral.net
+lbl.lagengymnastik.dk
+level3.blackholes.us
+li.countries.nerd.dk
+li.rbl.cluecentral.net
+list.dsbl.org
+lk.countries.nerd.dk
+lk.rbl.cluecentral.net
+ls.countries.nerd.dk
+ls.rbl.cluecentral.net
+lt.countries.nerd.dk
+lt.rbl.cluecentral.net
+lu.countries.nerd.dk
+lu.rbl.cluecentral.net
+lv.countries.nerd.dk
+lv.rbl.cluecentral.net
+ly.countries.nerd.dk
+ly.rbl.cluecentral.net
+ma.countries.nerd.dk
+ma.rbl.cluecentral.net
+mail-abuse.blacklist.jippg.org
+mail.people.it
+maildeflector.net
+malaysia.blackholes.us
+map.spam-rbl.com
+mc.countries.nerd.dk
+mci.blackholes.us
+md.countries.nerd.dk
+md.rbl.cluecentral.net
+media3.blackholes.us
+mexico.blackholes.us
+misc.dnsbl.sorbs.net
+mk.countries.nerd.dk
+mk.rbl.cluecentral.net
+ml.countries.nerd.dk
+ml.rbl.cluecentral.net
+mm.countries.nerd.dk
+mm.rbl.cluecentral.net
+mn.countries.nerd.dk
+mn.rbl.cluecentral.net
+mo.countries.nerd.dk
+mo.rbl.cluecentral.net
+mp.rbl.cluecentral.net
+msgid.bl.gweep.ca
+mt.countries.nerd.dk
+mt.rbl.cluecentral.net
+mu.countries.nerd.dk
+mu.rbl.cluecentral.net
+multihop.dsbl.org
+mv.countries.nerd.dk
+mv.rbl.cluecentral.net
+mx.countries.nerd.dk
+mx.rbl.cluecentral.net
+my.countries.nerd.dk
+my.rbl.cluecentral.net
+mz.countries.nerd.dk
+na.countries.nerd.dk
+na.rbl.cluecentral.net
+navisite.blackholes.us
+nc.countries.nerd.dk
+nc.rbl.cluecentral.net
+ne.countries.nerd.dk
+ng.countries.nerd.dk
+ng.rbl.cluecentral.net
+ni.countries.nerd.dk
+ni.rbl.cluecentral.net
+nigeria.blackholes.us
+nl.countries.nerd.dk
+nl.rbl.cluecentral.net
+no-more-funn.moensted.dk
+no.countries.nerd.dk
+no.rbl.cluecentral.net
+nonconfirm.mail-abuse.org
+np.countries.nerd.dk
+np.rbl.cluecentral.net
+nr.countries.nerd.dk
+nu.rbl.cluecentral.net
+nz.countries.nerd.dk
+nz.rbl.cluecentral.net
+ohps.bl.reynolds.net.au
+ohps.dnsbl.net.au
+olm.blackholes.us
+om.countries.nerd.dk
+omrs.bl.reynolds.net.au
+omrs.dnsbl.net.au
+op.rbl.kropka.net
+openlists.orbs.org
+opm.blitzed.org
+or.rbl.kropka.net
+orbs.dorkslayers.com
+orid.dnsbl.net.au
+orvedb.aupads.org
+osps.bl.reynolds.net.au
+osps.dnsbl.net.au
+osrs.bl.reynolds.net.au
+osrs.dnsbl.net.au
+outputs.relays.osirusoft.com
+owfs.bl.reynolds.net.au
+owfs.dnsbl.net.au
+owps.bl.reynolds.net.au
+owps.dnsbl.net.au
+pa.countries.nerd.dk
+pa.rbl.cluecentral.net
+pajo.blackholes.us
+panamsat.blackholes.us
+pdl.blackholes.us
+pdl.bofh.it
+pdl.dnsbl.net.au
+pdl.pan-am.ca
+pe.countries.nerd.dk
+pe.rbl.cluecentral.net
+peer1.blackholes.us
+pf.countries.nerd.dk
+pf.rbl.cluecentral.net
+pg.countries.nerd.dk
+pg.rbl.cluecentral.net
+ph.countries.nerd.dk
+ph.rbl.cluecentral.net
+pk.countries.nerd.dk
+pk.rbl.cluecentral.net
+pl.countries.nerd.dk
+pl.rbl.cluecentral.net
+pm0-no-more.compu.net
+postfix.bondedsender.org
+ppbl.beat.st
+pr.countries.nerd.dk
+pr.rbl.cluecentral.net
+probes.dnsbl.net.au
+procmail.bondedsender.org
+proxies.exsilia.net
+proxies.mail-abuse.org
+proxies.relays.monkeys.com
+proxy.bl.gweep.ca
+proxy.relays.osirusoft.com
+ps.countries.nerd.dk
+ps.rbl.cluecentral.net
+psbl.surriel.com
+pss.spambusters.org.ar
+pt.countries.nerd.dk
+pt.rbl.cluecentral.net
+pw.rbl.cluecentral.net
+py.countries.nerd.dk
+py.rbl.cluecentral.net
+qa.countries.nerd.dk
+qmail.bondedsender.org
+query.bondedsender.org
+qwest.blackholes.us
+rackspace.blackholes.us
+random.bl.gweep.ca 
+razor.bondedsender.org
+rbl.cluecentral.net
+rbl.drbl.wplus.net
+rbl.echelon.pl
+rbl.firstbase.com
+rbl.ma.krakow.pl
+rbl.mail-abuse.org
+rbl.ntvinet.net
+rbl.pil.dk
+rbl.rangers.eu.org
+rbl.rope.net
+rbl.schulte.org
+rbl.snark.net
+rbl.spam.org.tr
+rbl.triumf.ca
+rblmap.tu-berlin.de
+rdts.bl.reynolds.net.au
+rdts.dnsbl.net.au
+real.blackholes.us
+reject.the-carrot-and-the-stick.com
+relays.bl.gweep.ca
+relays.bl.kundenserver.de
+relays.dorkslayers.com
+relays.mail-abuse.org
+relays.nether.net
+relays.ordb.org
+relays.osirusoft.com
+relays.visi.com
+relaywatcher.n13mbl.com
+relcom.blackholes.us
+ricn.bl.reynolds.net.au
+ricn.dnsbl.net.au
+rmst.bl.reynolds.net.au
+rmst.dnsbl.net.au
+ro.countries.nerd.dk
+ro.rbl.cluecentral.net
+rogers.blackholes.us
+rol.drbl.bmik.ru
+rr.blackholes.us
+rsbl.aupads.org
+ru.countries.nerd.dk
+ru.rbl.cluecentral.net
+russia.blackholes.us
+sa.bondedsender.org
+sa.countries.nerd.dk
+sa.rbl.cluecentral.net
+sagonet.blackholes.us
+satos.rbl.cluecentral.net
+sb.countries.nerd.dk
+sbbl.they.com
+sbl-xbl.spamhaus.org
+sbl.csma.biz
+sbl.spamhaus.org
+sd.countries.nerd.dk
+sd.rbl.cluecentral.net
+se.countries.nerd.dk
+se.rbl.cluecentral.net
+sendmail.bondedsender.org
+servepath.blackholes.us
+serverbeach.blackholes.us
+sg.countries.nerd.dk
+sg.rbl.cluecentral.net
+si.countries.nerd.dk
+si.rbl.cluecentral.net
+singapore.blackholes.us
+sk.countries.nerd.dk
+sk.rbl.cluecentral.net
+sl.countries.nerd.dk
+sm.countries.nerd.dk
+sm.rbl.cluecentral.net
+smtp.dnsbl.sorbs.net
+sn.countries.nerd.dk
+socks.dnsbl.sorbs.net
+socks.opm.blitzed.org
+socks.relays.osirusoft.com
+sorbs.dnsbl.net.au
+spam.dnsbl.sorbs.net
+spam.dnsrbl.net
+spam.exsilia.net
+spam.olsentech.net
+spam.wytnij.to
+spamblock.outblaze.com
+spamguard.leadmon.net
+spamhaus.relays.osirusoft.com
+spammers.v6net.org
+spamsites.dnsbl.net.au
+spamsites.relays.osirusoft.com
+spamsources.dnsbl.info
+spamsources.fabel.dk
+spamsources.relays.osirusoft.com
+spamsources.yamta.org
+spews.blackholes.us
+spews.dnsbl.net.au
+spews.relays.osirusoft.com
+sprint.blackholes.us
+sr.countries.nerd.dk
+stale.dict.rbl.arix.com
+sterlingnetwork.blackholes.us
+sv.countries.nerd.dk
+sv.rbl.cluecentral.net
+swbell.blackholes.us
+sy.countries.nerd.dk
+sz.countries.nerd.dk
+sz.rbl.cluecentral.net
+t1.bl.reynolds.net.au
+t1.dnsbl.net.au
+t3direct.dnsbl.net.au
+taiwan.blackholes.us
+tc.rbl.cluecentral.net
+telefonica.blackholes.us
+telstra.blackholes.us
+telus.blackholes.us
+tg.countries.nerd.dk
+th.countries.nerd.dk
+th.rbl.cluecentral.net
+thailand.blackholes.us
+tm.countries.nerd.dk
+tm.rbl.cluecentral.net
+tn.countries.nerd.dk
+to.countries.nerd.dk
+tr.countries.nerd.dk
+tr.rbl.cluecentral.net
+tt.countries.nerd.dk
+tt.rbl.cluecentral.net
+turkey.blackholes.us
+tv.countries.nerd.dk
+tw.countries.nerd.dk
+tw.rbl.cluecentral.net
+tz.countries.nerd.dk
+tz.rbl.cluecentral.net
+ua.countries.nerd.dk
+ua.rbl.cluecentral.net
+ucepn.dnsbl.net.au
+ug.countries.nerd.dk
+uk.countries.nerd.dk
+uk.rbl.cluecentral.net
+un.rbl.cluecentral.net
+unconfirmed.dsbl.org
+unsure.nether.net
+us.countries.nerd.dk
+us.rbl.cluecentral.net
+usinternet.blackholes.us
+uy.countries.nerd.dk
+uy.rbl.cluecentral.net
+uz.countries.nerd.dk
+uz.rbl.cluecentral.net
+va.countries.nerd.dk
+valuenet.blackholes.us
+vbl.messagelabs.com
+vbl.mookystick.com
+ve.countries.nerd.dk
+ve.rbl.cluecentral.net
+verio.blackholes.us
+verisign.blackholes.us
+verizon.blackholes.us
+vi.rbl.cluecentral.net
+virus.drbl.novsu.ac.ru
+vn.countries.nerd.dk
+vn.rbl.cluecentral.net
+vote.drbl.balakovo.ru
+vote.drbl.be.net.ru
+vote.drbl.bilim-systems.net
+vote.drbl.bmik.ru
+vote.drbl.caravan.ru
+vote.drbl.carb.ibch.ru
+vote.drbl.croco.net
+vote.drbl.democracy.ru
+vote.drbl.east.ru
+vote.drbl.gremlin.ru
+vote.drbl.inter.ru
+vote.drbl.kaa.ru
+vote.drbl.kis.ru
+vote.drbl.mokr.ru
+vote.drbl.novsu.ac.ru
+vote.drbl.nsk.eldorado.ru
+vote.drbl.piter.net
+vote.drbl.rinet.ru
+vote.drbl.sampo.ru
+vote.drbl.sandy.ru
+vote.drbl.sotcom.ru
+vote.drbl.studio.ibch.ru
+vote.drbl.sub.ru
+vote.drbl.tomsknet.ru
+vote.drbl.trecom.tomsk.ru
+vote.drbl.vimas.kiev.ua
+vote.drbl.volgadmin.ru
+vote.rbl.ntvinet.net
+vote.rsbs.express.ru
+vox.schpider.com
+vu.countries.nerd.dk
+vu.rbl.cluecentral.net
+wanadoo-fr.blackholes.us
+web.dnsbl.sorbs.net
+whitelist.sci.kun.nl
+will-spam-for-food.eu.org
+wingate.opm.blitzed.org
+work.drbl.be.net.ru
+work.drbl.bilim-systems.net
+work.drbl.bmik.ru
+work.drbl.caravan.ru
+work.drbl.carb.ibch.ru
+work.drbl.croco.net
+work.drbl.democracy.ru
+work.drbl.east.ru
+work.drbl.gremlin.ru
+work.drbl.inter.ru
+work.drbl.kaa.ru
+work.drbl.kis.ru
+work.drbl.mokr.ru
+work.drbl.novsu.ac.ru
+work.drbl.sampo.ru
+work.drbl.sandy.ru
+work.drbl.studio.ibch.ru
+work.drbl.trecom.tomsk.ru
+work.drbl.volgadmin.ru
+work.rsbs.express.ru
+ws.countries.nerd.dk
+ws.rbl.cluecentral.net
+xbl.selwerd.cx
+xbl.spamhaus.org
+xo.blackholes.us
+ybl.megacity.org
+ye.countries.nerd.dk
+ye.rbl.cluecentral.net
+yipes.blackholes.us
+yu.countries.nerd.dk
+yu.rbl.cluecentral.net
+za.countries.nerd.dk
+za.rbl.cluecentral.net
+zm.rbl.cluecentral.net
+zombie.dnsbl.sorbs.net
+ztl.dorkslayers.com
+zw.countries.nerd.dk
+zw.rbl.cluecentral.net
+zz.countries.nerd.dk
+
+   );
+
+print "Scanning arguments against ", scalar keys %rbl, " RBLs\n"
+    if $opt_v;
+
+for my $ip (map { $_->hostenum if $_ } map { NetAddr::IP->new($_) } @ARGV)
+{
+    next unless defined $ip;
+    my $matched = 0;
+    local $| = 1;
+    for my $rbl (sort keys %rbl)
+    {
+	next unless !$opt_m or $rbl =~ m/${opt_m}/;
+	next unless !$opt_M or $rbl !~ m/${opt_M}/;
+
+	if (my $res = $rbl{$rbl}->check($ip->addr))
+	{
+	    print $ip->addr, " is listed in $rbl (", $res->addr, ")\n"; 
+	}
+	elsif ($opt_v)
+	{
+	    print $ip->addr, " is NOT listed in $rbl\n";
+	}
+	++ $matched;
+    }
+    sleep $opt_d if $opt_d and $matched;
+}
+
+__END__
+
+=pod
+
+=back
+
+=head1 EXAMPLES
+
+A typical scenario where this script is useful, is when a subnet needs
+to be checked against a set of RBLs. This command is most likely what
+you need:
+
+    scan -M 'blars|jamm|jippg|squawk|uu.se|xbl' 10.10.10.0/24
+
+The usage of -M in the example, excludes the named lists as they seem
+to be too agressive for our purposes, at least in the networks from
+our country.
+
+
+=head1 HISTORY
+
+=over
+
+=item B<Oct, 2003>
+
+First version of this code.
+
+=back
+
+=head1 LICENSE AND WARRANTY
+
+This code and all accompanying software comes with NO WARRANTY. You
+use it at your own risk.
+
+This code and all accompanying software can be used freely under the
+same terms as Perl itself.
+
+=head1 AUTHOR
+
+Luis E. Muñoz <luismunoz@cpan.org>
+
+=head1 SEE ALSO
+
+perl(1), C<Mail::RBL(3)>.
+
+=cut
+

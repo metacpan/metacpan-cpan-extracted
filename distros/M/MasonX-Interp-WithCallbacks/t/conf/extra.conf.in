@@ -1,0 +1,41 @@
+<IfModule mod_perl.c>
+  PerlSetVar MasonCompRoot @DocumentRoot@
+  <IfDefine !MODPERL2>
+    <Perl>
+      use File::Spec::Functions qw(catdir);
+      use lib catdir '@ServerRoot@', 'lib';
+      use lib catdir '@ServerRoot@', '..', 'blib';
+      use lib catdir '@ServerRoot@', '..', 'lib';
+    </Perl>
+  </IfDefine>
+  PerlModule TestCallbacks
+  SetHandler perl-script
+  PerlHandler TestCallbacks
+  <Location /ooconf>
+    SetHandler perl-script
+    PerlSetVar MasonCbClasses _ALL_
+    PerlSetVar MasonInterpClass MasonX::Interp::WithCallbacks
+    PerlHandler HTML::Mason::ApacheHandler
+  </Location>
+  <Location /conf>
+    SetHandler perl-script
+    PerlSetVar MasonDefaultPriority 3
+    PerlSetVar MasonDefaultPkgKey CBFoo
+    PerlSetVar MasonCbExceptionHandler "sub {}"
+    PerlAddVar MasonCallbacks "{ cb_key  => 'priority', cb => sub { $_[0]->params->{result} = $_[0]->priority } }"
+    PerlAddVar MasonCallbacks "{ cb_key  => 'pkg_key', cb => sub { $_[0]->params->{result} = $_[0]->pkg_key } }"
+    PerlAddVar MasonCallbacks "{ cb_key  => 'die', cb => sub { die 'Ow!' } }"
+    PerlAddVar MasonPreCallbacks "sub { my $params = $_[0]->params; $params->{result} = uc $params->{result} if $params->{do_upper} }"
+    PerlAddVar MasonPostCallbacks "sub { my $params = $_[0]->params; $params->{result} = lc $params->{result} if $params->{do_lower} }"
+    PerlSetVar MasonInterpClass MasonX::Interp::WithCallbacks
+    PerlHandler HTML::Mason::ApacheHandler
+  </Location>
+  <Location /nulls_conf>
+    SetHandler perl-script
+    PerlSetVar MasonDefaultPkgKey CBFoo
+    PerlSetVar MasonIgnoreNulls 1
+    PerlAddVar MasonCallbacks "{ cb_key  => 'exec', cb => sub { $_[0]->params->{result} = 'executed' } }"
+    PerlSetVar MasonInterpClass MasonX::Interp::WithCallbacks
+    PerlHandler HTML::Mason::ApacheHandler
+  </Location>
+</IfModule>

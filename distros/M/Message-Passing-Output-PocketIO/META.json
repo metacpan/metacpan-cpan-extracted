@@ -1,0 +1,46 @@
+{
+   "abstract" : "Output passing message as PocketIO Server",
+   "author" : [
+      "chenryn <chenryn@>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Message-Passing-Output-PocketIO",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyMQ" : 0,
+            "Data::Section::Simple" : 0,
+            "JSON" : 0,
+            "Message::Passing" : 0,
+            "PocketIO" : 0,
+            "PocketIO::Client::IO" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01"
+}

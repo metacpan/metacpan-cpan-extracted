@@ -1,0 +1,21 @@
+---
+abstract: 'Collection of mojolicious plugins'
+author:
+  - 'Siddhartha Basu <biosidd@gmail.com>'
+build_requires:
+  Module::Build: 0.3601
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-Bundle
+requires:
+  Bio::Chado::Schema: 0.05703
+  Mojolicious: 1.21
+  Regexp::Common: 2010010201
+  YAML: 0.71
+version: 0.004

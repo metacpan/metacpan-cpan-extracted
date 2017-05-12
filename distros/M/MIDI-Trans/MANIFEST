@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+test.pl
+lib/MIDI/Trans.pm
+scripts/simple_convert.pl
+scripts/simple_input.txt

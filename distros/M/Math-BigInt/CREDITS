@@ -1,0 +1,37 @@
+I wish to thank the following people:
+
+* Mark A. Biggar and Ilya for the original versions.
+* Steffen Beyer for the discussions and ideas, and for Bit::Vector.
+* Bruce Fields for spotting bugs.
+* Mark Dickinson for spotting bugs.
+* HH for listening to my boring explanations.
+* Peter Prymmer for spotting the OS/390 problems with / 1e5
+* Tom Phoenix for the discussions about factoring/primes/speed.
+* John Peacock for pushing me to finish Math::BigInt::Calc.
+* Benjamin Trott for the _split optimization and finding the bug in badd()
+* Daniel Pfeiffer for v0.49
+* Compaq for their TestDrive accounts and the admins managing them - this makes
+  testing on a large variety of platforms possible. Thanx!
+* Sisyphus for the discussions and ideas
+* Jarkko for the inf/NaN help and for beeing generally helpful and witty
+* Creager, Robert S for pointing me towards the precision/accuracy bug and for
+  general asking questions and providing feedback
+* Feztaa for the report that let to the discovery of the _rsft() bug in v1.61
+  He also deserves the mention as the first known user of bignum :)
+* Tim Rushing for reporting the bsqrt() hang and giving me the chance to
+  improve BigInt/BigFloat.
+* cpan@ali.as for reporting the floor() bug with 0.1412024 and providing a
+  fix and testcase - thanx!
+* Stephen Ross for finding the -2 ** Y with odd Y bug
+
+Special thanx must go to John Peacock and Tom Roche, both have helped me a lot
+in developing the latest version, not only by cheerfully kicking my lazy butt
+from time to time, but also by providing advice, bug-reports, suggestions and
+nagging questions, as well as bearing with my countless ranting emails. So,
+thank you very much!
+
+Also I want to thank all the ever-busy people on p5p. You guys (and gals) rock!
+
+List still not complete ;o)
+
+Tels <http://bloodgate.com/>

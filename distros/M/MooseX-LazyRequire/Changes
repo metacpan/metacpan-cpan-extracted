@@ -1,0 +1,41 @@
+Change history for distribution MooseX-LazyRequire
+
+0.11      2014-08-16 20:49:14Z
+  - lots of cleanup of metadata
+  - canonical git repository is now https://github.com/moose/MooseX-LazyRequire
+
+0.10      2013-03-15 20:09:48Z
+  - use quotes around attribute name in error messages (David Precious)
+
+0.09      2012-12-01 22:16:14Z
+  - Invalid tests that failed on perl 5.17.6 have been fixed (they were always
+    invalid, but the changes to hash key ordering only now made the tests
+    start failing in an obvious way) (RT#81419)
+  - unnecessary dependency on MooseX::Types removed
+
+0.08      2012-07-02 16:58:41Z
+  - Convert uses of Test::Exception to Test::Fatal
+  - Add TODO test for RT#76054 (thanks for the report, ilyuha!)
+
+0.07     2011-04-04 16:08:34Z
+  - Allow this module to be used with attributes in roles when using Moose
+    1.9900+ (Dave Rolsky).
+
+0.06     2010-07-19 03:19:42Z
+  - Updated to avoid warnings from Moose 1.09 (Dave Rolsky).
+
+0.05     2010-05-07 17:40:10Z
+  - Improve distribution metadata.
+
+0.04     2009-09-11 21:05:12Z
+  - Keep dzil from hiding the 1; at the end (Jesse Luehrs).
+
+0.03     2009-08-17 09:12:11Z
+  - Remove code that wasn't meant to be there in the last release.
+
+0.02     2009-08-17 09:08:33Z
+  - Rename the attribute option from 'lazy_require' to 'lazy_required'.
+  - Depend on Test::More 0.88 for done_testing.
+
+0.01     2009-08-13 00:17:02Z
+  - Initial release.

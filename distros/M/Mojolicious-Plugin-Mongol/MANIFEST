@@ -1,0 +1,10 @@
+Build.PL
+lib/Mojolicious/Plugin/Mongol.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/plugin.t
+t/pod.t
+t/pod_coverage.t
+META.yml
+META.json

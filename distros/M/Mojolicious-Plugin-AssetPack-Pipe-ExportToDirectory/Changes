@@ -1,0 +1,10 @@
+
+0.001003  2017-04-20 12:28:46+02:00 Europe/Berlin
+	- Fix packaging only
+
+0.001002  2017-04-20 12:16:05+02:00 Europe/Berlin
+	- Optionally export gzipped variant (intended for use with
+	  ngx_http_gzip_static_module)
+
+0.001001  2017-04-06 12:22:52+02:00 Europe/Berlin
+	- Initial release

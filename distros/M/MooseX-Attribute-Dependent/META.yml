@@ -1,0 +1,454 @@
+---
+abstract: 'Restrict attributes based on values of other attributes'
+author:
+  - 'Moritz Onken'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.3601'
+  Test::More: '0.88'
+  Test::Most: '0.23'
+  blib: '1.01'
+  perl: '5.006'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-Attribute-Dependent
+provides:
+  MooseX::Attribute::Dependencies:
+    file: lib/MooseX/Attribute/Dependency.pm
+    version: v1.1.3
+  MooseX::Attribute::Dependency:
+    file: lib/MooseX/Attribute/Dependency.pm
+    version: v1.1.3
+  MooseX::Attribute::Dependent:
+    file: lib/MooseX/Attribute/Dependent.pm
+    version: v1.1.3
+  MooseX::Attribute::Dependent::Meta::Role::ApplicationToClass:
+    file: lib/MooseX/Attribute/Dependent/Meta/Role/ApplicationToClass.pm
+    version: v1.1.3
+  MooseX::Attribute::Dependent::Meta::Role::ApplicationToRole:
+    file: lib/MooseX/Attribute/Dependent/Meta/Role/ApplicationToRole.pm
+    version: v1.1.3
+  MooseX::Attribute::Dependent::Meta::Role::Attribute:
+    file: lib/MooseX/Attribute/Dependent/Meta/Role/Attribute.pm
+    version: v1.1.3
+  MooseX::Attribute::Dependent::Meta::Role::Class:
+    file: lib/MooseX/Attribute/Dependent/Meta/Role/Class.pm
+    version: v1.1.3
+  MooseX::Attribute::Dependent::Meta::Role::Composite:
+    file: lib/MooseX/Attribute/Dependent/Meta/Role/Composite.pm
+    version: v1.1.3
+  MooseX::Attribute::Dependent::Meta::Role::Method::Accessor:
+    file: lib/MooseX/Attribute/Dependent/Meta/Role/Method/Accessor.pm
+    version: v1.1.3
+  MooseX::Attribute::Dependent::Meta::Role::Method::Constructor:
+    file: lib/MooseX/Attribute/Dependent/Meta/Role/Method/Constructor.pm
+    version: v1.1.3
+  MooseX::Attribute::Dependent::Meta::Role::Role:
+    file: lib/MooseX/Attribute/Dependent/Meta/Role/Role.pm
+    version: v1.1.3
+requires:
+  List::MoreUtils: '0'
+  Moose: '0'
+  Moose::Exporter: '0'
+  Moose::Role: '0'
+  Moose::Util::MetaRole: '0'
+  overload: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Attribute-Dependent
+  homepage: http://search.cpan.org/dist/MooseX-Attribute-Dependent/
+  repository: git://github.com/mschout/p5-moosex-attribute-dependent.git
+version: 1.1.3
+x_Dist_Zilla:
+  perl:
+    version: '5.024000'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename: []
+          exclude_match: []
+          follow_symlinks: 0
+          include_dotfiles: 0
+          prefix: ''
+          prune_directory: []
+          root: .
+      name: '@Filter/GatherDir'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          bail_out_on_fail: '0'
+          fail_on_warning: author
+          fake_home: 0
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          needs_display: 0
+          phase: test
+          script_finder:
+            - ':PerlExecFiles'
+          skips: []
+          switch: []
+      name: '@Filter/Test::Compile'
+      version: '2.055'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Filter/PodSyntaxTests'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::Test::ReportPrereqs
+      name: '@Filter/Test::ReportPrereqs'
+      version: '0.025'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Filter/PruneCruft'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: '@Filter/PruneFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Filter/ManifestSkip'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@Filter/AutoPrereqs'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@Filter/ExtraTests'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@Filter/PkgVersion'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.013'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.013'
+            -
+              class: Pod::Weaver::Plugin::SingleEncoding
+              name: '@Default/SingleEncoding'
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Name
+              name: '@Default/Name'
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Version
+              name: '@Default/Version'
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Default/prelude'
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: SYNOPSIS
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: DESCRIPTION
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: OVERVIEW
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: ATTRIBUTES
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: METHODS
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: FUNCTIONS
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: '@Default/Leftovers'
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Default/postlude'
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: '@Default/Authors'
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: '@Default/Legal'
+              version: '4.013'
+      name: '@Filter/PodWeaver'
+      version: '4.008'
+    -
+      class: Dist::Zilla::Plugin::Prepender
+      name: '@Filter/Prepender'
+      version: '2.002'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Filter/ExecDir'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Filter/ShareDir'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::Bugtracker
+      name: '@Filter/Bugtracker'
+      version: '1.111080'
+    -
+      class: Dist::Zilla::Plugin::Homepage
+      name: '@Filter/Homepage'
+      version: '1.101420'
+    -
+      class: Dist::Zilla::Plugin::Repository
+      name: '@Filter/Repository'
+      version: '0.20'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '6.005'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002003'
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000031'
+          version: '0.004'
+      name: '@Filter/MetaProvides::Package'
+      version: '2.004002'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Filter/MetaConfig'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::HelpWanted
+      name: '@Filter/HelpWanted'
+      version: 0.3.1
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Filter/License'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::Covenant
+      name: '@Filter/Covenant'
+      version: 0.1.1
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Filter/MetaYAML'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@Filter/MetaJSON'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::ModuleBuild
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Filter/ModuleBuild'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@Filter/Readme'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      config:
+        Dist::Zilla::Role::FileWatcher:
+          version: '0.006'
+      name: '@Filter/ReadmeAnyFromPod'
+      version: '0.161170'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Filter/Manifest'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Filter/TestRelease'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      config:
+        Dist::Zilla::Plugin::Git::Check:
+          untracked_files: die
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+            - README.mkdn
+            - dist.ini
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+      name: '@Filter/Git::Check'
+      version: '2.039'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: v%v%n%n%c
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+            - README.mkdn
+            - dist.ini
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@Filter/Git::Commit'
+      version: '2.039'
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      config:
+        Dist::Zilla::Plugin::Git::Push:
+          push_to:
+            - origin
+          remotes_must_exist: 1
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+      name: '@Filter/Git::Push'
+      version: '2.039'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Filter/UploadToCPAN'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: build
+          type: requires
+      name: BuildRequires
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: NextRelease
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      config:
+        Dist::Zilla::Plugin::Git::NextVersion:
+          first_version: '0.001'
+          version_by_branch: 0
+          version_regexp: (?^u:^(.+)$)
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+      name: Git::NextVersion
+      version: '2.039'
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      config:
+        Dist::Zilla::Plugin::Git::Tag:
+          branch: ~
+          changelog: Changes
+          signed: 0
+          tag: 1.1.3
+          tag_format: '%v'
+          tag_message: v%v
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: Git::Tag
+      version: '2.039'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExtraTestFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':PerlExecFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: '6.005'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '6.005'
+x_author_pledge:
+  version: 1

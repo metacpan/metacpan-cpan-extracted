@@ -1,0 +1,17 @@
+NAME
+    errors.pl - Used by basic.t to test error handling.
+
+SYNOPSIS
+    errors.pl [OPTIONS]
+
+OPTIONS
+    --help -? --usage
+        Display the usage message and exit
+
+    --man
+        Display man page
+
+    --verbose
+    --doom
+    --missile_launchers
+

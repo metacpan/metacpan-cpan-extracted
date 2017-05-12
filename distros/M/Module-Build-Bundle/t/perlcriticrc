@@ -1,0 +1,58 @@
+
+severity = 3
+verbose  = 8
+
+#------------------------------------------------------------------------------
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME|SYNOPSIS|VERSION|DESCRIPTION|SUBROUTINES/METHODS|DIAGNOSTICS|CONFIGURATION AND ENVIRONMENT|DEPENDENCIES|TEST AND QUALITY|QUALITY AND CODING STANDARD|BUGS AND LIMITATIONS|BUG REPORTING|DEVELOPMENT|TODO|SEE ALSO|AUTHOR|LICENSE AND COPYRIGHT
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+#Requires Perl::Critic 1.094, for exclude_functions
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print
+
+[-Documentation::RequirePodLinksIncludeText]
+[Variables::ProhibitPunctuationVars]
+allow = $@ $!
+
+#I like constants
+#https://logiclab.jira.com/wiki/display/OPEN/Perl-Critic-Policy-ValuesAndExpressions-ProhibitConstantPragma
+[-ValuesAndExpressions::ProhibitConstantPragma]
+
+#We subclass Module::Build so this is required
+[-NamingConventions::Capitalization]
+
+# TODO
+
+[-BuiltinFunctions::ProhibitStringyEval]
+
+[-ErrorHandling::RequireCarping]
+
+[-Subroutines::ProhibitExcessComplexity]
+
+[-InputOutput::RequireBracedFileHandleWithPrint]
+
+[-RegularExpressions::RequireExtendedFormatting]
+
+[-RegularExpressions::RequireDotMatchAnything]
+
+[-RegularExpressions::RequireLineBoundaryMatching]
+
+[-RegularExpressions::ProhibitUnusualDelimiters] 
+
+[-Variables::ProhibitPunctuationVars]
+
+[-ControlStructures::ProhibitUnlessBlocks]
+
+[-Documentation::RequirePodSections]
+
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+
+#Variables::ProhibitPunctuationVars needs to be addressed in local disabling
+
+#Issue in code lifted from Module::Build
+[-ControlStructures::ProhibitCascadingIfElse]

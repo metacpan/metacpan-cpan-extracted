@@ -1,0 +1,19 @@
+TYPEMAP
+const char *	T_PV
+MP4FILE *	T_OBJECT
+u_int32_t	T_UV
+u_int16_t	T_UV
+u_int8_t	T_UV
+MP4TrackId	T_UV
+
+OUTPUT
+T_OBJECT
+	sv_setref_pv($arg, CLASS, (void*)$var);
+
+INPUT
+T_OBJECT
+	if (sv_isobject($arg) && SvTYPE(SvRV($arg)) == SVt_PVMG)
+	  $var = INT2PTR($type, SvIVX((SV *) SvRV($arg)));
+	else                     
+	  Perl_croak(aTHX_ \"${Package}::$func_name(): $var is not a blessed SV reference\");
+

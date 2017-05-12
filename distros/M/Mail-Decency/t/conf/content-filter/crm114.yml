@@ -1,0 +1,17 @@
+---
+
+disable: 0
+
+default_user: /etc/crm114
+
+weight_translate:
+    1: 100
+    -2: 0
+    -3: -100
+
+# cmd_check: '/usr/share/crm114/mailreaver.crm -u %user%'
+# cmd_learn_spam: '/usr/share/crm114/mailreaver.crm -u %user --spam'
+# cmd_unlearn_spam: '/usr/share/crm114/mailreaver.crm -u %user --good'
+# cmd_learn_ham: '/usr/share/crm114/mailreaver.crm -u %user --good'
+# cmd_unlearn_ham: '/usr/share/crm114/mailreaver.crm -u %user --spam'
+

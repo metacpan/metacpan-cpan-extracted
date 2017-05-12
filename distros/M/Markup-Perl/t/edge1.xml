@@ -1,0 +1,3 @@
+﻿use blib;
+use Markup::Perl;
+<perl>print (0..9);</perl>

@@ -1,0 +1,27 @@
+HACKING
+=======
+
+Generally speaking you should check out the latest copy of the code from
+the source repository rather than using the CPAN distribution. The file
+META.yml should contain a link to the source repository. If not, then
+try https://bitbucket.org/tobyink or e-mail tobyink@cpan.org.
+
+
+Source code formatting and white space
+--------------------------------------
+
+I tend to write using something approximating the Allman style, using tabs
+for indentation and Unix-style line breaks.
+
+	http://en.wikipedia.org/wiki/Indent_style#Allman_style
+	http://www.derkarl.org/why_to_tabs.html
+
+I nominally encode all source files as UTF-8, though in practice most of
+them use a 7-bit-safe ASCII-compatible subset of UTF-8.
+
+
+Dependencies
+------------
+
+Since October 2011, most of my releases have targeted Perl 5.10.
+

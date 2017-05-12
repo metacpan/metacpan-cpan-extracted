@@ -1,0 +1,36 @@
+MP3-CreateInlayCard README
+================================
+
+Reads a directory of MP3s, and produces a HTML file you can print for a nice
+"inlay" for a CD case.  Useful if you're burning a directory full of MP3s
+to a CD, and want an inlay label created for you.
+
+Assumes that the tracks will be burnt to the CD in the same order we see them
+in the directory.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+HTML::Template
+MP3::Tag
+File::Recurse
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-2009 by David Precious
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+$Id: README 527 2009-02-09 20:31:34Z davidp $

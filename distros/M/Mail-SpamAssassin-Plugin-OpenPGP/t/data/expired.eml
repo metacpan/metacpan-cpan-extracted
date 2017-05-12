@@ -1,0 +1,77 @@
+Return-Path: <dev-return-15305-dave=brondsema.net@forrest.apache.org>
+Delivered-To: user0009-dave@brondsema.net
+Received: (qmail 17078 invoked from network); 16 Mar 2005 22:44:46 -0000
+Received: from hermes.apache.org (HELO mail.apache.org) (209.237.227.199)
+  by 0 with SMTP; 16 Mar 2005 22:44:46 -0000
+Received: (qmail 86100 invoked by uid 500); 16 Mar 2005 22:44:37 -0000
+Precedence: bulk
+Received: (qmail 84953 invoked by uid 99); 16 Mar 2005 21:41:58 -0000
+X-ASF-Spam-Status: No, hits=0.0 required=10.0
+	tests=
+Received-SPF: pass (hermes.apache.org: local policy)
+From: =?iso-8859-1?q?J=F6rg_Werner?= <j.werner@physik.uni-stuttgart.de>
+Organization: =?iso-8859-1?q?Universit=E4t?= Stuttgart
+Subject: Plugins are not working under Tomcat
+Date: Wed, 16 Mar 2005 22:41:43 +0100
+User-Agent: KMail/1.7.2
+MIME-Version: 1.0
+Content-Type: multipart/signed;
+  boundary="nextPart1165996.huEko2r9t3";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: by amavisd-new-20030616-p10 (Debian) at physik.uni-stuttgart.de
+X-Virus-Checked: Checked
+X-Spam-Checker-Version: SpamAssassin 3.0.2 (2004-11-16) on ferrari
+X-Spam-Level: 
+X-Spam-Status: No, score=0.0 required=4.0 tests=none autolearn=failed 
+	version=3.0.2
+
+--nextPart1165996.huEko2r9t3
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+Hi,
+
+I just tried to update my Homepage using the latest forrest (svn from today=
+)=20
+and found out that the plugins are not working (I'm doing a forrest webapp)=
+=2E=20
+The main page is being displayed okay, but when trying to access the photo=
+=20
+gallery I get
+No pipeline matched request: gallery/simon/newborn/index.xml
+
+When doing a forrest run everything works. Any ideas what the reason is?
+
+Cheers,
+
+J=F6rg
+=2D-=20
+Dipl.-Phys. J=F6rg Werner   j.werner@physik.uni-stuttgart.de
+Universit=E4t Stuttgart
+5. Physikalisches Institut  Telefon: 0711/685-5195
+Pfaffenwaldring 57   Telefax: 0711/685-3810
+D-70550 Stuttgart
+Visit our Homepage:=20
+http://www.physik.uni-stuttgart.de/institute/pi/5/index.html
+My private Homepage: http://schreibubi.pi5.physik.uni-stuttgart.de/
+GPG-Key fingerprint: FDD9 7AAF BD31 1F3C FD9D  7D34 C00A 22BB C0AF DFB2
+
+
+
+--nextPart1165996.huEko2r9t3
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.0 (GNU/Linux)
+
+iD8DBQBCOKgcwAoiu8Cv37IRAl3AAJ915zvS0GNqf44Od204Zo/Qe3LB9wCgtq+9
+SaQPlENPx34pfndT2MOViTc=
+=5KUN
+-----END PGP SIGNATURE-----
+
+--nextPart1165996.huEko2r9t3--
+

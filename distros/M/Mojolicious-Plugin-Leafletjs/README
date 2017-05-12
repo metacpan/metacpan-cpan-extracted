@@ -1,0 +1,121 @@
+NAME
+    Mojolicious::Plugin::Leafletjs - A Mojolicious Plugin
+
+SYNOPSIS
+        # Mojolicious
+        $self->plugin('Leafletjs');
+
+        # Mojolicious::Lite
+        plugin 'Leafletjs';
+
+        # In your template
+        <%= leaflet {
+          name      => 'map1',
+          latitude => '35.9239',
+          longitude  => '-78.4611',
+          zoomLevel => 18,
+          markers   => [
+            {   name      => 'marker1',
+                latitude => '35.9239',
+                longitude  => '-78.4611',
+                popup     => 'A new message tada!',
+            },
+            {   name      => 'marker2',
+                latitude => '35.9235',
+                longitude  => '-78.4610',
+                popup     => 'A second popup here!',
+            }
+          ],
+        }
+        %>
+
+DESCRIPTION
+    Mojolicious::Plugin::Leafletjs is helpers for integrating simple maps
+    via leafletjs
+
+HELPERS
+  leaflet
+    Accepts the following options:
+
+    name
+        Name of map variable
+
+    longitude
+        Longitude
+
+    latitude
+        Latidude
+
+    cssid
+        CSS id of map
+
+    zoomLevel
+        Map zoomlevel
+
+    tileLayer
+        URL of map tile layer, defaults to a cloudmade.com tile
+
+    maxZoom
+        Max zoom into the map
+
+    attribution
+        Show some love for the leaflet team, openmap, and cloudmade map
+        tiles
+
+    markers
+        Array of hashes containing the following key/value:
+
+        name
+            Marker name
+
+        longitude
+            Longitude
+
+        latitude
+            Latitude
+
+        popup
+            A popup message
+
+    circles
+        Array of hashes containing the following key/value
+
+        name
+            Name of circle variable
+
+        longitude
+            longitude
+
+        latitude
+            latitude
+
+        color
+            circle color
+
+        fillColor
+            circle fill color
+
+        fillOpacity
+            circle opacity
+
+        radius
+            radius of circle in meters
+
+TODO
+    Add polygons
+
+CONTRIBUTIONS
+    Always welcomed!
+    <https://github.com/battlemidget/Mojolicious-Plugin-Leafletjs>
+
+AUTHOR
+    Adam Stokes <adamjs@cpan.org>
+
+COPYRIGHT
+    Copyright 2013- Adam Stokes
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO

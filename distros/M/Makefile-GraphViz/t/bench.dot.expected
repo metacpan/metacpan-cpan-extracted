@@ -1,0 +1,73 @@
+digraph all {
+	graph [rankdir=BT,
+		ratio=auto
+	];
+	node [fillcolor="#ffff99",
+		fontname=Arial,
+		fontsize=10,
+		label="\N",
+		shape=box,
+		style=filled
+	];
+	edge [color=red];
+	all	 [label=all,
+		shape=plaintext];
+	node1	 [label="test2.exe"];
+	node1 -> all	 [style=dashed];
+	node2	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="link /nologo ...\l",
+		shape=note];
+	node2 -> node1;
+	node3	 [label="test2.obj"];
+	node3 -> node2;
+	node4	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="cl /nologo ...\l",
+		shape=note];
+	node4 -> node3;
+	node5	 [label="test2.c"];
+	node5 -> node4;
+	node6	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="perl -S ...\l",
+		shape=note];
+	node6 -> node5;
+	node7	 [label="test2.c.tt"];
+	node7 -> node6;
+	prog	 [label=prog];
+	prog -> node6;
+	node13	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="perl -S ...\l",
+		shape=note];
+	prog -> node13;
+	timer	 [label=timer];
+	timer -> node6;
+	timer -> node13;
+	node8	 [label="test.exe"];
+	node8 -> all	 [style=dashed];
+	node9	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="link /nologo ...\l",
+		shape=note];
+	node9 -> node8;
+	node10	 [label="test.obj"];
+	node10 -> node9;
+	node11	 [fillcolor="#dddddd",
+		fontname=Monospace,
+		fontsize=8,
+		label="cl /nologo ...\l",
+		shape=note];
+	node11 -> node10;
+	node12	 [label="test.c"];
+	node12 -> node11;
+	node13 -> node12;
+	node14	 [label="test.c.tt"];
+	node14 -> node13;
+}

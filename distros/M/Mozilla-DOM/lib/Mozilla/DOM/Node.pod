@@ -1,0 +1,470 @@
+=head1 NAME
+
+Mozilla::DOM::Node
+
+=head1 DESCRIPTION
+
+Mozilla::DOM::Node is a wrapper around an instance of Mozilla's
+nsIDOMNode interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+ * The nsIDOMNode interface is the primary datatype for the entire
+ * Document Object Model.
+ * It represents a single node in the document tree.
+ *
+ * For more information on this interface please see
+ * L<http:E<sol>E<sol>www.w3.orgE<sol>TRE<sol>DOM-Level-2-CoreE<sol>>
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::Node->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 ATTRIBUTES
+
+=head2 $namednodemap = $node->B<GetAttributes>()
+
+A L<Mozilla::DOM::NamedNodeMap|Mozilla::DOM::NamedNodeMap> containing
+the attributes of this node (if it is an Element) or null otherwise.
+
+In list context, returns a list of L<Mozilla::DOM::Attr|Mozilla::DOM::Attr>,
+instead. (I considered returning a hash ($attr->GetName => $attr->GetValue),
+but then you couldn't set the attributes.)
+
+=head2 $bool = $node->B<HasAttributes>()
+
+Returns whether this node (if it is an element) has any attributes.
+
+=head2 $nodelist = $node->B<GetChildNodes>()
+
+A L<Mozilla::DOM::NodeList|Mozilla::DOM::NodeList> that contains all children
+of this node. If there are no children, this is a NodeList containing no nodes.
+
+In list context, this returns a list of L<Mozilla::DOM::Node|Mozilla::DOM::Node>,
+instead.
+
+=head2 $bool = $node->B<HasChildNodes>()
+
+This is a convenience method to allow easy determination of whether a
+node has any children.
+
+=head2 $node = $node->B<GetFirstChild>()
+
+The first child of this node. If there is no such node, this returns null.
+
+=head2 node = $node->B<GetLastChild>
+
+The last child of this node. If there is no such node, this returns null.
+
+=head2 $node = $node->B<GetPreviousSibling>()
+
+The node immediately preceding this node. If there is no such node,
+this returns null.
+
+=head2 $node = $node->B<GetNextSibling>()
+
+The node immediately following this node. If there is no such node, this returns null.
+
+=head2 $name = $node->B<GetNodeName>()
+
+The name of this node, depending on its type:
+
+=over
+
+=item Attr
+
+The name of the attribute
+
+=item CDATASection
+
+#cdata-section
+
+=item Comment
+
+#comment
+
+=item Document
+
+#document
+
+=item DocumentFragment
+
+#document-fragment
+
+=item DocumentType
+
+The document type name
+
+=item Element
+
+The tag name
+
+=item Entity
+
+The entity name
+
+=item EntityReference
+
+The name of the entity referenced
+
+=item Notation
+
+The name of the notation
+
+=item ProcessingInstruction
+
+The target
+
+=item Text
+
+#text
+
+=back
+
+=head2 $type = $node->B<GetNodeType>()
+
+Matches one of the following constants,
+which you can export with C<use Mozilla::DOM::Node qw(:types)>,
+or export them individually.
+
+=over 4
+
+=item ATTRIBUTE_NODE
+
+The node is a L<Mozilla::DOM::Attr>.
+
+=item CDATA_SECTION_NODE
+
+The node is a L<Mozilla::DOM::CDATASection>.
+
+=item COMMENT_NODE
+
+The node is a L<Mozilla::DOM::Comment>.
+
+=item DOCUMENT_NODE
+
+The node is a L<Mozilla::DOM::Document>.
+
+=item DOCUMENT_TYPE_NODE
+
+The node is a L<Mozilla::DOM::DocumentType>.
+
+=item DOCUMENT_FRAGMENT_NODE
+
+The node is a L<Mozilla::DOM::DocumentFragment>.
+
+=item ELEMENT_NODE
+
+The node is a L<Mozilla::DOM::Element>.
+
+=item ENTITY_REFERENCE_NODE
+
+The node is a L<Mozilla::DOM::EntityReference>.
+
+=item ENTITY_NODE
+
+The node is a L<Mozilla::DOM::Entity>.
+
+=item NOTATION_NODE
+
+The node is a L<Mozilla::DOM::Notation>.
+
+=item PROCESSING_INSTRUCTION_NODE
+
+The node is a L<Mozilla::DOM::ProcessingInstruction>.
+
+=item TEXT_NODE
+
+The node is a L<Mozilla::DOM::Text>.
+
+=back
+
+=head2 $value = $node->B<GetNodeValue>()
+
+The value of this node, depending on its type:
+
+=over
+
+=item Attr
+
+The value of the attribute
+
+=item CDATASection
+
+The content of the CDATA section
+
+=item Comment
+
+The content of the comment
+
+=item Document
+
+[null]
+
+=item DocumentFragment
+
+[null]
+
+=item DocumentType
+
+[null]
+
+=item Element
+
+[null]
+
+=item Entity
+
+[null]
+
+=item EntityReference
+
+[null]
+
+=item Notation
+
+[null]
+
+=item ProcessingInstruction
+
+The entire content excluding the target
+
+=item Text
+
+The content of the text node
+
+=back
+
+=head2 $node->B<SetNodeValue>($value)
+
+=over
+
+=over
+
+=item * $value (string)
+
+=back
+
+=back
+
+=head2 $document = $node->B<GetOwnerDocument>()
+
+The L<Mozilla::DOM::Document> object associated with this node.
+This is also the Document object used to create new nodes.
+When this node is a Document or a DocumentType which is not
+used with any Document yet, this is null.
+
+=head2 $node = $node->B<GetParentNode>()
+
+The parent of this node. All nodes, except Attr, Document,
+DocumentFragment, Entity, and Notation may have a parent. However, if
+a node has just been created and not yet added to the tree, or if it
+has been removed from the tree, this is null.
+
+=head2 $name = $node->B<GetLocalName>()
+
+Returns the local part of the qualified name of this node.  For nodes
+of any type other than ELEMENT_NODE and ATTRIBUTE_NODE and nodes
+created with a DOM Level 1 method, such as createElement from the
+Document interface, this is always null.
+
+=head2 $uri = $node->B<GetNamespaceURI>()
+
+The namespace URI of this node, or null if it is unspecified.  This
+is not a computed value that is the result of a namespace lookup
+based on an examination of the namespace declarations in scope. It is
+merely the namespace URI given at creation time.
+
+For nodes of any type other than ELEMENT_NODE and ATTRIBUTE_NODE and
+nodes created with a DOM Level 1 method, such as createElement from
+the Document interface, this is always null.
+
+=head2 $prefix = $node->B<GetPrefix>()
+
+The namespace prefix of this node, or null if it is unspecified.
+
+For nodes of any type other than ELEMENT_NODE and ATTRIBUTE_NODE and
+nodes created with a DOM Level 1 method, such as createElement from
+the Document interface, this is always null.
+
+=head2 $node->B<SetPrefix>($prefix)
+
+Note that setting this attribute, when permitted, changes the
+nodeName attribute, which holds the qualified name, as well as the
+tagName and name attributes of the Element and Attr interfaces, when
+applicable.
+
+Note also that changing the prefix of an attribute that is known to
+have a default value, does not make a new attribute with the default
+value and the original prefix appear, since the namespaceURI and
+localName do not change.
+
+=over
+
+=over
+
+=item * $aPrefix (string)
+
+=back
+
+=back
+
+=head2 $bool = $node->B<IsSupported>($feature, $version)
+
+Tests whether the DOM implementation implements a specific feature
+and that feature is supported by this node.
+
+=over
+
+=over
+
+=item * $feature (string)
+
+The name of the feature to test. This is the same name which can be
+passed to the method hasFeature on DOMImplementation.
+
+=item * $version (string)
+
+This is the version number of the feature to test. In Level 2,
+version 1, this is the string "2.0". If the version is not specified,
+supporting any version of the feature will cause the method to return
+true.
+
+=back
+
+two string args
+
+=back
+
+=head1 METHODS
+
+=head2 $node = $node->B<AppendChild>($newChildNode)
+
+Adds the node newChildNode to the end of the list of children of this
+node. If the newChild is already in the tree, it is first removed.
+
+=over
+
+=over
+
+=item * $newChild (Mozilla::DOM::Node)
+
+The node to add. If it is a DocumentFragment object, the entire
+contents of the document fragment are moved into the child list of
+this node.
+
+=back
+
+=back
+
+=head2 $node = $node->B<CloneNode>($deep)
+
+Returns a duplicate of this node. (See DOM 1 spec for details.)
+
+=over
+
+=over
+
+=item * $deep (boolean)
+
+If true, recursively clone the subtree under the specified node; if
+false, clone only the node itself (and its attributes, if it is an
+Element).
+
+=back
+
+DOM 2 spec:
+When a Node is copied using the cloneNode method the EventListeners
+attached to the source Node are not attached to the copied Node. If
+the user wishes the same EventListeners to be added to the newly
+created copy the user must add them manually.
+
+=back
+
+=head2 $node = $node->B<InsertBefore>($newChildNode, $refChildNode)
+
+Inserts the node newChild before the existing child node refChild. If
+refChild is null, insert newChild at the end of the list of children.
+
+If newChild is a DocumentFragment object, all of its children are
+inserted, in the same order, before refChild. If the newChild is
+already in the tree, it is first removed.
+
+=over
+
+=over
+
+=item * $newChild (Mozilla::DOM::Node)
+
+The node to insert.
+
+=item * $refChild (Mozilla::DOM::Node)
+
+The reference node, i.e., the node before which the new node must be inserted.
+
+=back
+
+=back
+
+=head2 $node = $node->B<RemoveChild>($oldChildNode)
+
+Removes the child node indicated by oldChild from the list of children,
+and returns it.
+
+=over
+
+=over
+
+=item * $oldChild (Mozilla::DOM::Node)
+
+=back
+
+=back
+
+=head2 $node = $node->B<ReplaceChild>($newChildNode, $oldChildNode)
+
+Replaces the child node oldChild with newChild in the list of
+children, and returns the oldChild node.
+
+If newChild is a DocumentFragment object, oldChild is replaced by all
+of the DocumentFragment children, which are inserted in the same
+order. If the newChild is already in the tree, it is first removed.
+
+=over
+
+=over
+
+=item * $newChild (Mozilla::DOM::Node)
+
+The new node to put in the child list.
+
+=item * $oldChild (Mozilla::DOM::Node)
+
+The node being replaced in the list.
+
+=back
+
+=back
+
+=head2 $node->B<Normalize>()
+
+Puts all Text nodes in the full depth of the sub-tree underneath this
+Node, including attribute nodes, into a "normal" form where only
+structure (e.g., elements, comments, processing instructions, CDATA
+sections, and entity references) separates Text nodes, i.e., there
+are neither adjacent Text nodes nor empty Text nodes.
+
+See DOM 2 spec for details.
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut

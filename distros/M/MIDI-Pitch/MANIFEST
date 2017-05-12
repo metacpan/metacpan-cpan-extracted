@@ -1,0 +1,14 @@
+Makefile.PL
+MANIFEST
+Changes
+lib/MIDI/Pitch.pm
+README
+t/00-load.t
+t/01-pitch.t
+t/02-rounded-pitch.t
+t/03-freq.t
+t/04-base-freq.t
+t/05-aliases.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

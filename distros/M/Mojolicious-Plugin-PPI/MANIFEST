@@ -1,0 +1,13 @@
+Build.PL
+Changes
+examples/quine.pl
+lib/Mojolicious/Plugin/PPI.pm
+MANIFEST			This list of files
+t/basic.t
+t/block.t
+t/css.t
+t/src_folder.t
+t/test.pl
+t/unknown.t
+META.yml
+META.json

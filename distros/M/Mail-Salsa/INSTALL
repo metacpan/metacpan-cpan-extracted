@@ -1,0 +1,37 @@
+- Unpack the module and install it.
+
+# tar xvfz Mail-Salsa-x.xx.tar.gz
+# cd Mail-Salsa-x.xx/bin
+# perl Makefile.PL
+# make
+# make test
+# make install
+# salsaconfig
+
+- Setup sendmail
+
+# cd /etc/mail
+
+# nano sendmail.mc
+
+define(`ALIAS_FILE', `/etc/mail/aliases,/etc/mail/salsa.aliases')dnl
+
+# touch /etc/mail/salsa.aliases
+# m4 /etc/mail/sendmail.mc > /etc/mail/sendmail.cf
+
+- Add aliases
+
+# nano /etc/mail/aliases
+
+salsa: you@yourdomain.org
+salsa-master: you@yourdomain.org
+
+# newaliases
+# /etc/init.d/sendmail restart
+
+- Add a mailling list to the system
+
+# fiesta --help
+# fiesta --add --list=mylist@mydomain.org --owner=hdias@aesbuc.pt
+
+- To setup a list send a message to: mylist-admin@mydomain.org

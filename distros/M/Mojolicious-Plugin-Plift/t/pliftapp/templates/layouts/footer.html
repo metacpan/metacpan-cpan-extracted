@@ -1,0 +1,3 @@
+<footer>
+    <p>Site Footer</p>
+</footer>

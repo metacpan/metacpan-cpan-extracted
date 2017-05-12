@@ -1,0 +1,26 @@
+---
+abstract: "default \"is\" to \"ro\" or \"rw\" for all attributes"
+author:
+  - 'Shawn M Moore, C<sartak@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Exception: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.99'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-HasDefaults
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 0.94
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: gitmo@git.moose.perl.org:MooseX-HasDefaults.git
+version: 0.03

@@ -1,0 +1,12 @@
+~$
+\.o$
+\.a$
+\.old\.*$
+^todo.nextversion$
+^loopcompiler$
+^actualize$
+^Meschach.c$
+^MANIFEST.bak$
+TAGS$
+^blib/
+^\#

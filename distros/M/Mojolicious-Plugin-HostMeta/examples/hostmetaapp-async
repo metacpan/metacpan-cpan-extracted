@@ -1,0 +1,170 @@
+#!/usr/bin/env perl
+
+# This is a Host-Meta server and discoverer
+# for Mojolicious::Plugin::HostMeta
+# in non-blocking mode
+#
+# You can run the app by starting the server with
+#
+#  $ hostmetaapp-async daemon
+#
+# or by using either morbo or hypnotoad.
+#
+# -------------------------------------
+# Copyright (C) 2011-2014, Nils Diewald
+# http://nils-diewald.de/
+# -------------------------------------
+#
+# Todo: Add -secure and -rel features
+#
+
+use Mojolicious::Lite;
+use lib 'lib', '../lib';
+
+use Carp 'verbose';
+
+plugin 'HostMeta';
+
+# Default varianles
+app->defaults(
+  title => 'HostMeta Demo'
+);
+
+
+# Prepare a link
+hook prepare_hostmeta => sub {
+  my ($c, $xrd) = @_;
+  $xrd->link(profile => '/me.html');
+};
+
+
+# Add a link to served host meta dynamicly
+hook before_serving_hostmeta => sub {
+  my ($c, $xrd) = @_;
+  $xrd->link(describedby => '/me.html')->add(Title => 'Akron');
+};
+
+
+# Index page
+get '/' => sub {
+  my $c = shift;
+  my $host = $c->param('host');
+
+  $c->render_later;
+  return $c->hostmeta(
+    $host => sub {
+      my $xrd = shift;
+      $c->stash(xrd => $xrd->to_pretty_xml) if $xrd;
+      return $c->render(template => 'index');
+    }
+  );
+} => 'index';
+
+
+# Discover host meta
+post '/' => sub {
+  my $c = shift;
+  my $host = $c->param('host');
+
+  $c->render_later;
+
+  # Discovery
+  $c->hostmeta(
+    $host => sub {
+      my $hm = shift;
+
+      if ($hm) {
+	# Check formatting
+	my $rv =
+	  ($c->param('submit') && $c->param('submit') eq 'json') ?
+	    $hm->to_json : $hm->to_pretty_xml;
+	$c->flash(xrd => $rv ) if $hm;
+      }
+
+      # Hostmeta was not found
+      else {
+	$c->flash(xrd => '[HostMeta not found]');
+      };
+
+      # Add host information for further retrieval
+      $c->flash(host => $host);
+
+      # Return to index
+      return $c->redirect_to('index');
+    });
+};
+
+
+# Start application
+app->start;
+
+
+__DATA__
+
+@@ index.html.ep
+<!DOCTYPE html>
+<html>
+  <head>
+%= stylesheet "https://fonts.googleapis.com/css?family=Chivo:900"
+%= stylesheet "https://fonts.googleapis.com/css?family=Inconsolata:400"
+%= stylesheet "http://sojolicio.us/stylesheets/styles.css", media => "screen"
+%= stylesheet "http://sojolicio.us/stylesheets/prettify-mojo.css", media => "screen"
+    <link rel="icon" href="http://sojolicio.us/images/favicon.ico" type="image/x-icon" />
+
+%= stylesheet begin
+
+form {
+  padding: .5em;
+  background-color: transparent;
+}
+
+input, textarea {
+  border: 2px solid #00A3BA;
+  background-color: #e7e7e7;
+  color: #444;
+  padding: .1em;
+  margin: .2em;
+}
+
+textarea {
+  width: 100%;
+  height: 30em;
+}
+
+%end
+
+    <title><%= $title %></title>
+  </head>
+  <body>
+    <div id="container">
+      <div id="logo"></div>
+      <a id="github-ribbon" href="https://github.com/Akron/Mojolicious-Plugin-HostMeta">
+        <img src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub">
+      </a>
+      <div class="inner">
+      <header>
+        <h1><%= $title %></h1>
+      </header>
+      <section>
+
+%= form_for 'index', method => 'POST', begin
+%= text_field 'host', value => flash('host')
+<button value='xml' name='submit' type='submit'>XML</button>
+<button value='json' name='submit' type='submit'>JSON</button>
+% end
+
+%= text_area 'xrd_field' => ( readonly => 'readonly' ) => begin
+%= flash('xrd') || stash('xrd')
+% end
+
+  <ul>
+    <li><a href="<%= url_for('index') %>">[/.well-known/host-meta]</a></li>
+% foreach (qw/gmail yahoo twitter/) {
+    <li><a href="<%= url_for('index')->query(['host' => $_ . '.com']) %>"><%= $_ %>.com</a></li>
+% };
+  </ul>
+
+      </section>
+    </div>
+  </body>
+</html>

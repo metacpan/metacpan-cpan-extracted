@@ -1,0 +1,49 @@
+Revision history for Math-Polygon-Tree
+
+0.08    2015-04-06
+        * fix longdoubles comparsion on bbox border
+
+0.07    2014-09-03
+        perl 5.18 compatibility
+        * preferable use of Math::Geometry::Planar::GPC::PolygonXS (dependency changed)
+
+0.069.1 2013-05-15
+        * (internal) removed ~~
+
+0.069 2013-05-15
+        * optionally use Math::Geometry::Planar::GPC::PolygonXS
+
+0.068 2013-02-12
+        * more options for 'rough' checks
+        * fixes
+
+0.062  2013-02-11
+        * float comparsion fix
+
+0.061  2013-02-08
+        * reimplemented tree (new structure)
+        * refactored rudiment code
+        * some tests
+        ! service functions are incompatible with older versions (return arrayrefs instead of lists)
+
+0.05   2013-01-29
+        * 'contains' returns -1 if point lays on polygon boundary (very dirty!)
+
+0.041  2010-12-29
+        * added exportable functions
+
+0.04   2010-11-07
+        * added  .poly files support
+
+0.035   2010-04-27
+        * added contains_points method
+
+0.03    2009-11-17
+        * boundaries are now reported as included
+        * removed Perl 5.8 incompatibility
+        * removed Math::Polygon dependency
+        * fixed POD to pass tests
+
+0.02    2009-08-27
+        First public release
+

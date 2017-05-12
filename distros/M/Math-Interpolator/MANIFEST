@@ -1,0 +1,25 @@
+.gitignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Math/Interpolator.pm
+lib/Math/Interpolator/Knot.pm
+lib/Math/Interpolator/Linear.pm
+lib/Math/Interpolator/Robust.pm
+lib/Math/Interpolator/Source.pm
+t/edge.t
+t/fraction.t
+t/nhood.t
+t/null.t
+t/pod_cvg.t
+t/pod_syn.t
+t/ppro.t
+t/proto.t
+t/robust.t
+t/simple.t
+t/xy.t
+SIGNATURE    Added here by Module::Build

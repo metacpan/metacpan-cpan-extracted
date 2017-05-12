@@ -1,0 +1,198 @@
+Revision history for perl distribution Mojo-IRC
+
+0.44 2017-02-18T02:50:18+0100
+ - Fix Mojo::IRC::UA did not clean up events
+
+0.43 2017-01-14T11:10:32+0100
+ - Add "message" event #29
+ - Replaced EXPERIMENTAL "irc_any" event with "message" event #29
+ - Compatible with Mojolicious 7.18 #29
+
+0.42 2016-11-16T20:04:49+0100
+ - Can detect server settings using rpl_isupport()
+ - Improved parsing nicks with modes Nordaaker/Convos#287
+
+0.41 2016-11-13T14:01:01+0100
+ - Fix parsing nicks with & and % modes Nordaaker/Convos#287
+
+0.40 2016-10-13T09:40:46+0200
+ - Add support for JOIN redirects Nordaaker/Convos#284
+
+0.39 2016-09-16T09:34:40+0200
+ - Add "host" and "server_info" to Mojo::IRC::UA->whois() output
+
+0.38 2016-09-14T23:10:59+0200
+ - Fix matching channel names case insensitive in Mojo::IRC::UA
+
+0.37 2016-09-07T09:17:08+0200
+ - Skipping t/ua-mode.t for now. https://github.com/jhthorsen/mojo-irc/issues/28
+
+0.36 2016-09-06T21:31:13+0200
+ - Fix t/ua-mode.t #28
+
+0.35 2016-08-29T09:14:48+0200
+ - Add Mojo::IRC::UA->kick() method
+ - Add Mojo::IRC::UA->mode() method
+
+0.34 2016-08-25T22:44:57+0200
+ - Add connect_timeout() attribute
+
+0.33 2016-08-24T22:40:14+0200
+ - Fix Mojo::IRC::UA triggered callback on wrong IRC event
+
+0.32 2016-08-24T17:15:41+0200
+ - Fix joining channel with key
+
+0.31 2016-04-09T23:49:41+0200
+ - Add Test::Mojo::IRC->server attribute
+ - Add Test::Mojo::IRC->start_server can be called as a class method
+ - Change channel_topic() to return {topic => "..."}
+ - Fix channel_topic() return value on error
+
+0.30 2016-03-22T12:00:55+0100
+ - Fix channels() on error to return hash-ref
+ - Breaking change: "irc_error" is not always emitted
+ - Add EXPERIMENTAL "irc_any" event
+
+0.29 2016-03-10T22:22:24+0100
+ - Prevent t/parse-irc-message.t from getting run
+
+0.28 2016-02-28T13:48:40+0100
+ - Add Mojo::IRC::UA->part_channel() method
+ - Add "local_address" attribute
+
+0.27 2015-09-21T11:22:24+0200
+ - Fix calling callbacks async
+ - Remove support for MOJO_IRC_OFFLINE=1
+
+0.26 2015-07-11T13:26:26+0200
+ - Bumping Mojolicious requirement to 6.00
+
+0.25 2015-06-15T15:31:27+0200
+ - Remove [+nt] and friends from topic returned from channels()
+ - Fix parsing to allow CR or LF at buffer end. #24
+   Contributor: Ben Tyler
+
+0.24 2015-06-02T22:18:12+0200
+ - Fix default nick only contains [a-z] and "_".
+
+0.23 2015-06-02T00:46:24+0200
+ - Fix requirement to Mojo::Util (Need version 1.33)
+
+0.22 2015-05-31T09:21:58+0200
+ - Add Mojo::IRC::UA
+ - Add Mojo::IRC::UA->channels() method
+ - Add Mojo::IRC::UA->channel_topic() method
+ - Add Mojo::IRC::UA->channel_users() method
+ - Add Mojo::IRC::UA->join_channel() method
+ - Add Mojo::IRC::UA->nick() method
+ - Add Mojo::IRC::UA->whois() method
+
+0.21 2015-05-31T07:54:33+0200
+ - Deprecated MOJO_IRC_OFFLINE in favor of Test::Mojo::IRC
+
+0.20 2015-05-30T19:29:25+0200
+ - Test::Mojo::IRC can fetch server output from __DATA__ section
+ - Fix "choppy" buffer from Test::Mojo::IRC test server
+
+0.19 2015-05-22T13:44:50+0200
+ - Add Test::Mojo::IRC
+ - Changed default value for nick() to mirror user()
+ - Changed default value for user() to reflect current logged in user
+
+0.18 2015-03-01T18:05:08Z
+ - More tests are skipped on MSWin32
+
+0.17 2015-02-15T21:44:25Z
+ - Fix parsing bug in _read() on unknown numeric IRC event, #21
+ - Fix setting nick in irc_rpl_welcome default handler, #20
+
+0.16 2015-02-08T11:41:48Z
+ - Add disconnect() can be called without a callback Contributor: Dan Book
+ - Fix "close" event can reconnect Contributor: Dan Book
+ - Fix responding to CTCP messages
+ - Fix responding to CTCP PING message
+
+0.15 2015-01-09T16:19:34Z
+ - More robust unit tests
+
+0.14 2015-01-02T13:31:11Z
+ - Fix failing test on BSD
+
+0.13 2014-09-14T20:16:25Z
+ - emit_safe() is deprecated in Mojolicious
+
+0.12 2014-09-06T19:25:13Z
+ - Skip tests on MSWin32 #9
+
+0.11 2014-08-31T14:32:11Z
+ - Fix update of current nick() on err_nicknameinuse()
+
+0.10 2014-08-16T20:24:25Z
+ - Fix update of current nick()
+ - Deprecated change_nick()
+
+0.09 2014-07-29T08:43:34Z
+ - Fix emitting err_xxx events before irc_error
+
+0.08 2014-07-27T19:06:53Z
+ - Will also emit numeric events
+ - Move events out of main module documentation
+ - Deprecated irc_err_xxx events
+
+0.07 2014-05-30T07:46:58Z
+ - Fix Mojo::IRC for Mojolicious 5.0
+
+0.0601 2014-02-22T17:43:57Z
+ - Fix missing ERR_ events.
+ - Started DEPRECATION process for irc_err_xxx events.
+
+0.06 2014-02-22T11:54:38Z
+ - Allow offline mode with MOJO_IRC_OFFLINE=1
+
+0.0501 2014-02-22T09:57:25Z
+ - Add debug info to figure out failing error.t
+   http://www.cpantesters.org/cpan/report/3758769c-6bf4-1014-9dd5-8faa6c3f6
+   a79
+
+0.05 2014-02-21T20:52:39Z
+ - Add parser() attribute
+ - Add ctcp() method to quote CTCP messages
+ - Add support for CTCP events
+
+0.04 2014-02-21T18:23:16Z
+ - Fix PASS need to be sent before NICK and USER
+   http://www.irchelp.org/irchelp/rfc/chapter4.html#c4_1_1 Contributor:
+   Stephan Jauernick
+
+0.0303 2013-10-01T12:23:30Z
+ - Fix irc_err_nicknameinuse: Need to try with same nick, not modify the
+   nick attribute.
+ - Marked change_nick() as deprecated.
+
+0.0302 2013-09-06T23:40:46Z
+ - Fix t/error.t on windows
+ - Fix Makefile.PL
+
+0.0301 2013-09-04T23:46:41Z
+ - Need to remove stream_id on error as well
+
+0.03 2013-09-04T13:48:26Z
+ - Add support for TLS
+ - Change default ping interval to every 60 seconds
+
+0.0201 2013-08-16T23:31:03Z
+ - Fix NAME in Makefile.PL
+
+0.02 2013-08-05T12:40:20Z
+ - Remove File::Slurp as a dependency
+ - Remove Carp as a dependency
+ - Add Test::more as a dependency
+ - Made unittest more robust. The write() of NICK, USER and JOIN might be
+   received at the server at once.
+
+0.01 2013-08-03T10:19:28Z
+ - Add default event handlers
+ - Add change_nick()
+ - Add reconnect when changing server.
+

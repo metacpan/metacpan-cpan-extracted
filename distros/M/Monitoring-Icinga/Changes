@@ -1,0 +1,8 @@
+Revision history for Perl extension Monitoring::Icinga.
+
+0.01  Tue Mar 25 16:00:14 2014
+        - initial version of the module
+
+0.02  Tue Mar 25 17:45:32 CET 2014
+        - Dereferenced array in some push statements
+        - Documentation improvements

@@ -1,0 +1,26 @@
+---
+abstract: 'Perl module for creating MARC record from a hash'
+author:
+  - 'Stephane Delaune <delaune.stephane@gmail.com>'
+build_requires:
+  Data::Compare: 0
+  Test::More: 0
+  YAML: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MARC-Loader
+provides:
+  MARC::Loader:
+    file: lib/MARC/Loader.pm
+    version: 0.004001
+requires:
+  MARC::Record: 0
+  Scalar::Util: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.004001

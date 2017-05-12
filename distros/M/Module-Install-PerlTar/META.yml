@@ -1,0 +1,31 @@
+---
+abstract: 'Removes the requirement for a tar executable.'
+author:
+  - 'Curtis Jewell <csjewell@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Module::Install::PerlTar
+name: Module-Install-PerlTar
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Archive::Tar: 1.66
+  IO::Compress::Gzip: 2.005
+  Module::Install: 1.00
+  perl: 5.6.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/Module-Install-PerlTar
+version: 1.001

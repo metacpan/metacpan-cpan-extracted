@@ -1,0 +1,17 @@
+.shipit
+Changes
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/rules
+hudson_test.sh
+lib/MooseX/Types/GTIN.pm
+lib/MooseX/Types/GTIN/Validate.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/001_compile.t
+t/validate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

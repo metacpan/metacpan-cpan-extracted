@@ -1,0 +1,734 @@
+# PODNAME: MarpaX::ESLIF::BNF
+
+# ABSTRACT: MarpaX::ESLIF's BNF
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+MarpaX::ESLIF::BNF - MarpaX::ESLIF's BNF
+
+=head1 VERSION
+
+version 2.0.4
+
+=head1 DESCRIPTION
+
+MarpaX::ESLIF is a Scanless Interface expressed in a BNF format, that is using L<marpaWrapper|https://github.com/jddurand/c-marpaWrapper>, itself being a thin interface on top of L<libmarpa|https://jeffreykegler.github.io/Marpa-web-site/libmarpa.html> parser.
+
+=head2 CONVENTIONS
+
+The MarpaX::ESLIF BNF is composed of unicode characters, in any encoding supported by the underlying convertor (L<ICU|http://site.icu-project.org/> or iconv, in order of preference). Unsignificant whitespaces, Perl-like comments and C++-like comments are discarded.
+
+=over
+
+=item Symbol names
+
+They consist of C<bare names>, or can be enclosed in angle brackets if whitespace if desired. They are case sensitive, and can be composed only of ASCII characters. There is no attempt to discard any leading, trailing, or repeated whitespace in angle brackets version, i.e. all the followings are different symbol names:
+
+  this
+  <this >
+  < this
+    >
+
+=item Levels
+
+The grammar can contain multiple levels, the level syntax being:
+
+  ::=         # Alias for level 0
+    ~         # Alias for level 1
+  :[\d]+:=    # General form
+
+The level 0 must exist. We will use only C<::=> and/or C<~> in the rest of this document for conveniene, though we are adressing any possible level.
+
+=item Terminals
+
+There are three types of explicit terminals.
+
+=over
+
+=item * Strings
+
+They can be single or double-quoted, the content is any valid unicode character, and the C<\> character can be used to escape the quote or C<\> itself. The C<:i> modifier can be used to force case-insensitive match:
+
+  'string'
+  'string':i
+  'string\'s'
+  "string\"s\\"
+
+=item * Character classes
+
+They are always enclosed with left and right brackets C<[]>. Modifiers can start after a C<:> character. A character class class is nothing else but a lexically restricted regular expression.
+
+=item * Regular expression
+
+They are always enclosed within slashes C<//>, and the content must be valid as per the L<PCRE2 Perl Compatible Regular Expression|http://www.pcre.org/> library. Modifiers can start after the slash on the right. Regular expression patterns are by default anchored. The slash character itself must be preceeded by a backslash, i.e. C<\/> in the string I<seen> by the parser (so, in practice, it is coded like this: C<"\\/">).
+
+=back
+
+The PCRE2 syntax is supported in its entirety, this include any PCRE2 add-on. Character classes and regular expression share the same set of modifiers, executed in order of appearance, that are:
+
+  ----------------------------------------------------------------
+  Modifiers   Explanation
+  ----------------------------------------------------------------
+  e           Unset back-references in the pattern will match to empty strings
+  i           Case-insensitive
+  j           \u, \U and \x and unset back-references will act as JavaScript standard
+  m           Multi-line regex
+  n           Enable Unicode properties and extend meaning of meta-characters
+  s           A dot meta-character in the pattern matches all characters, including newlines
+  x           Enable comments. This has some limitation due MarpaX::ESLIF semantics
+  D           A dollar meta-character matches only at the end of the subject string
+  J           Allow duplicate names for sub-patterns
+  U           Inverts the "greediness" of the quantifiers
+  a           Meta-characters will be limited to their ASCII equivalent
+  u           Forces support of large codepoints
+  b           Could mean "forced binary" mode
+  c           Could mean "forced unicode character" mode
+  A           Remove the systematic anchoring
+  ----------------------------------------------------------------
+
+Internally this correspond to this set of options in PCRE2:
+
+  ----------------------------------------------------------------
+  Modifiers         PCRE2 flag unset   PCR2 flag set
+  ----------------------------------------------------------------
+  e                                    PCRE2_MATCH_UNSET_BACKREF
+  i                                    PCRE2_CASELESS
+  j                                    PCRE2_ALT_BSUX|PCRE2_MATCH_UNSET_BACKREF
+  m                                    PCRE2_MULTILINE
+  n                                    PCRE2_UCP
+  s                                    PCRE2_DOTALL
+  x                                    PCRE2_EXTENDED
+  D                                    PCRE2_DOLLAR_ENDONLY
+  J                                    PCRE2_DUPNAMES
+  U                                    PCRE2_UNGREEDY
+  a                 PCRE2_UTF
+  N                 PCRE2_UCP
+  u                                    PCRE2_UTF
+  b                 PCRE2_UTF          PCRE2_NEVER_UTF
+  c                 PCRE2_NEVER_UTF    PCRE2_UTF
+  A                 PCRE2_ANCHORED
+  ----------------------------------------------------------------
+
+=item Lexemes
+
+Lexemes are meta-symbols that does appear as the LHS symbol anywhere within the current grammar. Therefore they behave like terminals, except that their definition is not in the current grammar. By default such meta-symbol is looked up at the next level. For example:
+
+  rule      ::= something
+  something   ~ [\d]
+
+say that symbol C<something> at grammar level C<0> is a reference to C<something> at grammar level C<1>.
+
+Lexemes can be references:
+
+=over
+
+=item implicitely
+
+Without any indication, a lexeme is always assumed to be at the grammar of the next level
+
+=item explicity by grammar description
+
+  X ::= Y@'Grammar Description'
+
+This is working because a grammar description is unique across all sub-grammars.
+
+=item explicitely by relative level
+
+  X ::= Y@+1
+  X ::= Y@-2
+  X ::= Y@3
+
+The signed integer is interpreted as a delta with current grammar level.
+
+=item explicitely by absolute level
+
+  X ::= Y@=1
+
+The unsigned integer is interpreted as an explicit grammar level.
+
+=back
+
+=item Discard
+
+Everytime expected terminals cannot be match, MarpaX::ESLIF will try to match the special rule C<:discard>. The C<:discard> rule also have precedence if it matches longer than the longest acceptable lexeme. and can not be ambiguous (else discard silently fail).
+
+=back
+
+=head2 Grammar meta settings
+
+=over
+
+=item Start rule
+
+By default, the first symbol of a grammar of level C<n> is its start symbol. This can be set once with e.g.:
+
+  :start ::= symbolname
+
+=item Grammar description
+
+By default, a grammar of level C<n> has the description C<Grammar level n>. This can be set once with e.g.:
+
+  :desc ::= 'A single-quoted string'
+
+=item Defaults
+
+By default, symbol action is C<::transfer> and rule action is C<::concat>, i.e. the parse tree value of a grammar is a binary concatenation of every input representation (see the I<representation> section below), without the eventual discard. Stack manipulation may require the trigger of a I<free> function, and this has no default. Only expected terminals or lexemes are looked up, this is the Longest Acceptable Token Match (LATM) setting, defaulting to a true value. You should not change that. Defaults can be set once, for example like this:
+
+  :default ::= action        => defaultRuleAction
+               latm          => 1
+               symbol-action => defaultSymbolAction
+               free-action   => defaultFreeAction
+
+Predefined actions are available for rules and symbols. Please refer the API documentation to know more about value types.
+
+The C<free-action> adverb is required when the end-user is pushing an opaque value of type C<PTR> or C<ARRAY> that is not declared shallowed. The internal stack manipulation may decide it does not need this value anymore: the free action is then called. This is used in low-level programming, in practice interface to high-level languages like Perl, Java etc... should I<hide> that, making the presence of this keyword in the grammar meaningless.
+
+The C<symbol-action> adverb is how a match within a sub-grammar is transfered.
+
+=over
+
+=item C<::undef>
+
+Creates a value of type UNDEF.
+
+Meaningful for both rule and symbol actions.
+
+=item C<::ascii>
+
+Creates a value of type PTR from the right-hand side representation, guaranteed to be a NUL byte terminated sequence of ASCII characters, or UNDEF if representation is empty. Please refer to the I<representation> section below.
+
+Meaningful for both rule and symbol actions.
+
+=item C<::convert[[^]]+]>
+
+Creates a value of type ARRAY from the right-hand side representation encoded in the charset specified within the brackets, or UNDEF if representation is empty. I<iconv> convention is used for the charset, i.e. a charset name, followed by eventual options like C<//TRANSLIT> and/or C<//IGNORE>. Any other option depend on how the L<tconv|https://github.com/jddurand/c-tconv> library is built, and may probably not be supported. Note that using the I<iconv> notation does not mean that this is iconv running behind.
+
+Please refer to the I<representation> section below.
+
+Meaningful for both rule and symbol actions.
+
+=item C<::concat>
+
+Creates a value of type ARRAY from the binary concatenatation all the RHS's representation, or UNDEF if representation is empty.
+
+Please refer to the I<representation> section below.
+
+Meaningful for both rule and symbol actions, and is the B<default rule action>.
+
+=item C<::copy[x]>
+
+Copies the RHS number C<x> (first RHS is at indice C<0>), putting UNDEF if it does not exist. This action is the only one that guarantees that the nature of the RHS value is unchanged.
+
+Meaningful only for rule actions.
+
+=item C<::shift>
+
+Alias for C<::copy[0]>.
+
+=item C<::transfer>
+
+Copies the single RHS number value. This action guarantees that the nature of the RHS value is unchanged.
+
+Meaningful only for symbol actions, and is the B<default symbol action>.
+
+=back
+
+=item Discard
+
+The C<:discard> symbol, despite belonging to a given grammar, is not accessible directly, and can only be set as a meta setting. An event can be associated upon discard completion, there can be multiple C<:discard> statements:
+
+  :discard ::= symbolname1 event => discard_symbolname1$
+  :discard ::= symbolname2 event => discard_symbolname2$
+
+Note than when an event is set, this will be triggered only on the C<:discard>'s RHS completion, therefore the RHS of the C<:discard> must be an LHS in the same grammar when there is an event setting.
+
+=item Events
+
+=over
+
+=item * Event names
+
+They are composed of a restricted set of the ASCII graph characters. Special cases are:
+
+=over
+
+=item C<:symbol>
+
+Transformed to the symbol name for which the event is triggered.
+
+=item C<:discard[on]>
+
+Hook that is disabling C<:discard> rule for the current recognizer. Equivalent to a call to C<MarpaX::ESLIF::recognizer_hook_discardb(1)>. Not propagated.
+
+=item C<:discard[off]>
+
+Hook that is enabling C<:discard> rule for the current recognizer. Equivalent to a call to C<MarpaX::ESLIF::recognizer_hook_discardb(0)>. Not propagated.
+
+=back
+
+Please note that the C<:discard[on]> and C<:discard[off]> events will I<never> happen if you use the grammar's C<parse()> method, the later is I<always> disabling any event. Therefore, if you grammar relies on recognizer's hooks, you will have to use the following workflow:
+
+  my $eslifRecognizer = MarpaX::ESLIF::Recognizer->new($eslifGrammar, $recognizerInterface);
+  $eslifRecognizer->scan();
+  while ($eslifRecognizer->isCanContinue) {
+    $eslifRecognizer->resume();
+  }
+
+  my $eslifValue = MarpaX::ESLIF::Value->new($eslifRecognizer, $valueInterface);
+  $eslifValue->value;
+  $valueInterface->getResult;
+
+Please remark that if you grammar I<only> have internal events, then there is no need to call C<$eslifRecognizer->resume()> -;
+
+instead of a single:
+
+  $eslifGrammar->parse($recognizerInterface, $valueInterface);
+
+=item * Event initializers
+
+By default, events are on, this is equivalent to appending C<=on> after the event name. The C<=off> characters are putting event off at startup.
+
+=back
+
+Lexemes are different than non-lexeme symbols because they are treated in the grammar are I<terminals>, others are not.
+
+=over
+
+=item Lexeme events
+
+Meta symbols that are lexemes can have pause events, C<before> mean that the scanning recognized them, C<after> mean they have been consumed, e.g.:
+
+  :lexeme ::= symbolname1 pause => before event => ^symbolname1
+  :lexeme ::= symbolname2 pause => after  event =>  symbolname2$2
+
+It is not allowed to set a lexeme event on a symbol that is not a lexeme.
+
+=item Non-lexeme events
+
+Completion, predicted or nulled events are supported, targetting a symbol name.
+
+For example:
+
+  event a     = completed  symbolname
+  event b=off = nulled     symbolname
+  event c=on  = predicted ^symbolname
+
+It is not allowed to a a non-lexeme event on a symbol that is a lexeme.
+
+=back
+
+=item Autoranking
+
+Rules can be autoranked, the higest of a set of alternative having the highest rank, default is off:
+
+  autorank is on by default
+  autorank is off by default
+
+=item Inaccessible statements
+
+Inaccessible statements can generate warnings, can be ignored, or be error on demand, default is to ignore them:
+
+  inaccessible is warn by default
+  inaccessible is ok by default
+  inaccessible is fatal by default
+
+=back
+
+=head2 Statements
+
+A statement have a symbol name on the left-hand side (LHS) and zero or more symbol names, or terminals, on the right-hand side (RHS):
+
+  LHS ::= RHS1 RHS2 etc...
+
+There are two exceptions:
+
+=over
+
+=item The I<exception statement>
+
+Its semantic is a single symbol name following by another single symbol name, with C<-> in the middle:
+
+  LHS ::= RHS1 - RHS2
+
+=item The I<sequence statement>
+
+This is a single symbol name following by the C<*> or the C<+> character:
+
+  LHS1 ::= RHS1*
+  LHS2 ::= RHS2+
+
+=back
+
+Empty rule have no RHS:
+
+  EMPTYRULE ::=
+
+Eventual ambiguities in the grammar itself may be solved by adding the C<;> character at the end of a rule, or by enclosing zero or more statements within C<{> and C<}> characters:
+
+  EMPTYRULE ::= ;
+  {
+    LHS1 ::= RHS1
+    LHS2 ::= RHS2 - RHS3
+  }
+
+=over
+
+=item Alternatives
+
+There are two types of alternatives: the standard C<|> meaning this is an I<or>, or the I<loosen> character C<||> meaning that this is an alternative starting a I<prioritized> group of alternatives, for example the calculator grammar is:
+
+  Expression  ::=  /[\d]+/
+                | '(' Expression ')'              assoc => group
+                ||    Expression '**' Expression  assoc => right
+                ||    Expression  '*' Expression
+                |     Expression  '/' Expression
+                ||    Expression  '+' Expression
+                |     Expression  '-' Expression
+
+which is strictly equivalent, in traditional BNF syntax to:
+
+  Expression  ::= Expression0
+  Expression0 ::= Expression1
+  Expression1 ::= Expression2
+  Expression2 ::= Expression3
+
+  Expression3 ::= /[\d]+/
+                | '(' Expression0 ')'
+  Expression2 ::=  Expression3 '**' Expression2
+  Expression1 ::=  Expression1  '*' Expression2
+                |  Expression1  '/' Expression2
+  Expression0 ::=  Expression0  '+' Expression1
+  Expression0 ::=  Expression0  '-' Expression1
+
+As you can see statements has been grouped at every occurence of C<||> operator. Therefore the I<loosen> operator C<||> is a I<convenience> operator, it is always possible to write an equivalent grammar without it, though this can become quite tedious. The C<assoc> adverb has a meaning only in the presence of prioritized alternatives, else it has no effect.
+
+The following is copied almost verbatim from the L<Marpa::R2 section on precedence|https://metacpan.org/pod/distribution/Marpa-R2/pod/Scanless/DSL.pod#Precedence>:
+
+In prioritized statements, every alternative has an I<arity>. The arity is the number of times an operand appears on the RHS.  A RHS symbol is an I<operand> if and only if it is the same as the LHS symbol.  Anything else is considered as an I<operator>. When the arity is C<0>, precedence and associativy are meaningless and ignored. When the arity is C<1>, precedence has effect, but not left nor right associativity.
+
+If arity is 2 or more and the alternative is left associative, the leftmost operand associates and operands after the first will have the next-tighest priority level. If arity is 2 or more and the alternative is right associative, the last operand associates and operands before the last will have the next-tighest priority level. In group associativity, all operands associate at the lowest priority.
+
+=item Adverbs
+
+Any rule can be followed by zero or more of these adverbs, if an adverb appears more than once, the latest is the winner:
+
+=over
+
+=item Action
+
+During valuation, a specific action can be associated to a rule:
+
+  action => my_action
+
+=item Left association
+
+In a prioritized statement, associate with the left-most operand:
+
+  assoc => left
+
+=item Right association
+
+In a prioritized statement, associate with the right-most operand:
+
+  assoc => right
+
+=item Group association
+
+All operands associate at the lowest priority:
+
+  assoc => group
+
+=item Separator
+
+Sequence rules can have a separator, that can be a symbol name, a string, a character class or a regular expression.
+
+  separator => comma
+  separator => ','
+  separator => [,]
+  separator => /,/
+
+Modifiers are allowed after string, character class or regular expressions.
+
+=item Proper specification
+
+Sequence rules can be I<proper>, i.e. without trailing separator:
+
+  proper => 1
+
+=item Rank specification
+
+During valuation, rules can have a rank to get prioritized. Rank is a signed integer and default to C<0>:
+
+  rank => -2
+
+Any other value but C<0> is not allowed if autoranking is set to a true value.
+
+=item Null-ranking specification
+
+Nulling symbols can rank high low, the default is low.
+
+  null-ranking => 'low'
+  null-ranking => 'high'
+
+=item Priority specification
+
+Lexemes can be prioritized, using a signed integer:
+
+  priority => 15
+
+=item Pause specification
+
+Scanner can be paused before a lexeme is recognized, or just after it has been completed:
+
+  pause => before
+  pause => after
+
+=item Event specification
+
+Events can be specified, with an eventual initializer, given that default initialization is C<=on>:
+
+  event => eventName
+  event => eventName=on
+  event => eventName=off
+
+=item Naming
+
+A name can be associated to the rule, in the form:
+
+  name => something
+  name => 'quoted name'  # No modifier is allowed after the string
+  name => "quoted name"  # No modifier is allowed after the string
+
+=back
+
+=back
+
+=head1 NAME
+
+=head1 BNF
+
+MarpaX::ESLIF BNF can be expressed in itself:
+
+  /*
+   * **********************
+   * Meta-grammar settings:
+   * **********************
+   */
+  :discard                       ::= whitespace
+  :discard                       ::= <perl comment> 
+  :discard                       ::= <cplusplus comment> 
+
+  /*
+   * ******
+   * Rules:
+   * ******
+   */
+  <statements>                   ::= statement*
+
+  <statement>                    ::= <start rule>
+                                   | <desc rule>
+                                   | <empty rule>
+                                   | <null statement>
+                                   | <statement group>
+                                   | <priority rule>
+                                   | <quantified rule>
+                                   | <discard rule>
+                                   | <default rule>
+                                   | <lexeme rule>
+                                   | <completion event declaration>
+                                   | <nulled event declaration>
+                                   | <prediction event declaration>
+                                   | <inaccessible statement>
+                                   | <exception statement>
+                                   | <autorank statement>
+
+  <start rule>                   ::= ':start' <op declare> symbol
+  <desc rule>                    ::= ':desc' <op declare> <quoted name>
+  <empty rule>                   ::= <lhs> <op declare> <adverb list>
+  <null statement>               ::= ';'
+  <statement group>              ::= '{' statements '}'
+  <priority rule>                ::= lhs <op declare> <priorities>
+  <quantified rule>              ::= lhs <op declare> <rhs primary> <quantifier> <adverb list>
+  <discard rule>                 ::= ':discard' <op declare> <rhs primary> <adverb list>
+  <default rule>                 ::= ':default' <op declare> <adverb list>
+  <lexeme rule>                  ::= ':lexeme' <op declare> symbol <adverb list>
+  <completion event declaration> ::= 'event' <event initialization> '=' 'completed' <symbol name>
+                                   | 'event' <event initialization> <op declare> 'completed' <symbol name>
+  <nulled event declaration>     ::= 'event' <event initialization> '=' 'nulled' <symbol name>
+                                   | 'event' <event initialization> <op declare> 'nulled' <symbol name>
+  <prediction event declaration> ::= 'event' <event initialization> '=' 'predicted' <symbol name>
+                                   | 'event' <event initialization> <op declare> 'predicted' <symbol name>
+  <inaccessible statement>       ::= 'inaccessible' 'is' <inaccessible treatment> 'by' 'default'
+  <inaccessible treatment>       ::= 'warn'
+  <inaccessible treatment>       ::= 'ok'
+  <inaccessible treatment>       ::= 'fatal'
+  <exception statement>          ::= lhs <op declare> <rhs primary> '-' <rhs primary> <adverb list>
+  <autorank statement>           ::= 'autorank' 'is' <on or off> 'by' 'default'
+  <op declare>                   ::= <op declare top grammar>
+                                   | <op declare lex grammar>
+                                   | <op declare any grammar>
+  <priorities>                   ::= <alternatives>+ separator => <op loosen> proper => 1
+  <alternatives>                 ::= <alternative>+ separator => <op equal priority> proper => 1
+  <alternative>                  ::= rhs <adverb list>
+  <adverb list>                  ::= <adverb list items>
+  <adverb list items>            ::= <adverb item>*
+  <adverb item>                  ::= <action>
+                                   | <left association>
+                                   | <right association>
+                                   | <group association>
+                                   | <separator specification>
+                                   | <proper specification>
+                                   | <rank specification>
+                                   | <null ranking specification>
+                                   | <priority specification>
+                                   | <pause specification>
+                                   | <latm specification>
+                                   | naming
+                                   | <null adverb>
+                                   | <symbol action>
+                                   | <free action>
+                                   | <event specification>
+  <action>                       ::= 'action' '=>' <action name>
+  <left association>             ::= 'assoc' '=>' 'left'
+  <right association>            ::= 'assoc' '=>' 'right'
+  <group association>            ::= 'assoc' '=>' 'group'
+  <separator specification>      ::= 'separator' '=>' <single symbol>
+  <proper specification>         ::= 'proper' '=>' false
+                                   | 'proper' '=>' true
+  <rank specification>           ::= 'rank' '=>' <signed integer>
+  <null ranking specification>   ::= 'null-ranking' '=>' <null ranking constant>
+                                   | 'null' 'rank' '=>' <null ranking constant>
+  <null ranking constant>        ::= 'low'
+                                   | 'high'
+  <priority specification>       ::= 'priority' '=>' <signed integer>
+  <pause specification>          ::= 'pause' '=>' 'before'
+                                   | 'pause' '=>' 'after'
+  <event specification>          ::= 'event' '=>' <event initialization>
+  <event initialization>         ::= <event name> <event initializer>
+  <event initializer>            ::= '=' <on or off>
+  <event initializer>            ::=
+  <on or off>                    ::= 'on'
+                                   | 'off'
+  <latm specification>           ::= 'latm' '=>' <false>
+                                   | 'latm' '=>' <true>
+  naming                         ::= 'name' '=>' <alternative name>
+  <null adverb>                  ::= ','
+  <symbol action>                ::= 'symbol-action' '=>' <symbol action name>
+  <free action>                  ::= 'free-action' '=>' <free name>
+  <alternative name>             ::= <standard name>
+  <alternative name>             ::= <quoted name>
+  <event name>                   ::= <restricted ascii graph name>
+                                   | ':symbol'
+                                   | ':discard[on]'
+                                   | ':discard[off]'
+  lhs                            ::= <symbol name>
+  rhs                            ::= <rhs primary>+
+  <rhs primary>                  ::= <single symbol>
+                                   | <symbol name> '@' <grammar reference>
+  <single symbol>                ::= symbol
+                                   | <character class>
+                                   | <regular expression>
+                                   | <quoted string>
+  symbol                         ::= <symbol name>
+  <symbol name>                  ::= <bare name>
+                                   | <bracketed name>
+  <action name>                  ::= <restricted ascii graph name>
+                                   | '::shift'
+                                   | '::undef'
+                                   | '::ascii'
+                                   | /::convert\[[^\]]+\]/
+                                   | '::concat'
+                                   | /::copy\[\d+\]/
+  <free name>                    ::= <restricted ascii graph name>
+  <symbol action name>           ::= <restricted ascii graph name>
+                                   | '::transfer'
+                                   | '::undef'
+                                   | '::ascii'
+                                   | /::convert\[[^\]]+\]/
+                                   | '::concat'
+  <quantifier>                   ::= '*'
+                                   | '+'
+  <signed integer>               ::= /[+-]?\d+/
+  <unsigned integer>             ::= /\d+/
+  <grammar reference>            ::= <quoted string>
+                                   | <signed integer>
+                                   | '=' <unsigned integer>
+
+  #
+  # ---------------------------------------
+  # Lexemes of the grammar given above are:
+  # ---------------------------------------
+  #
+  # <op declare any grammar> ::= <op declare any grammar>@+1
+  # <op declare top grammar> ::= <op declare top grammar>@+1
+  # <op declare lex grammar> ::= <op declare lex grammar>@+1
+  # <op loosen> ::= <op loosen>@+1
+  # <op equal priority> ::= <op equal priority>@+1
+  # <false> ::= <false>@+1
+  # <true> ::= <true>@+1
+  # <standard name> ::= <standard name>@+1
+  # <quoted name> ::= <quoted name>@+1
+  # <quoted string> ::= <quoted string>@+1
+  # <character class> ::= <character class>@+1
+  # <regular expression> ::= <regular expression>@+1
+  # <bare name> ::= <bare name>@+1
+  # <bracketed name> ::= <bracketed name>@+1
+  # <restricted ascii graph name> ::= <restricted ascii graph name>@+1
+  # <whitespace> ::= <whitespace>@+1
+  # <perl comment> ::= <perl comment>@+1
+  # <cplusplus comment> ::= <cplusplus comment>@+1
+  #
+
+  /*
+   * *************
+   * Lexeme rules:
+   * *************
+   */
+  whitespace                       ~ /[\s]+/
+  <perl comment>                   ~ /(?:(?:#)(?:[^\n]*)(?:\n|\z))/u
+  <cplusplus comment>              ~ /(?:(?:(?:\/\/)(?:[^\n]*)(?:\n|\z))|(?:(?:\/\*)(?:(?:[^\*]+|\*(?!\/))*)(?:\*\/)))/u
+  <op declare any grammar>         ~ /:\[(\d+)\]:=/
+  <op declare top grammar>         ~ '::='
+  <op declare lex grammar>         ~ '~'
+  <op loosen>                      ~ '||'
+  <op equal priority>              ~ '|'
+  <true>                           ~ '1'
+  <false>                          ~ '0'
+  <word character>                 ~ [\w]
+  <one or more word characters>    ~ <word character>+ proper => 1
+  <zero or more word characters>   ~ <word character>* proper => 1
+  <restricted ascii graph name>    ~ /[-!#$%&()*+.\/;<>?@\[\\\]^_`|~A-Za-z0-9][-!#$%&()*+.\/:;<>?@\[\\\]^_`|~A-Za-z0-9]*/
+  <bare name>                      ~ <word character>+ proper => 1
+  <standard name>                  ~ [a-zA-Z] <zero or more word characters>
+  <bracketed name>                 ~ '<' <bracketed name string> '>'
+  <bracketed name string>          ~ /[\s\w]+/
+  <quoted string>                  ~ /(?:(?|(?:')(?:[^\\']*(?:\\.[^\\']*)*)(?:')|(?:")(?:[^\\"]*(?:\\.[^\\"]*)*)(?:")))/su
+                                   | /(?:(?|(?:')(?:[^\\']*(?:\\.[^\\']*)*)(?:')|(?:")(?:[^\\"]*(?:\\.[^\\"]*)*)(?:")))/su ':' /ic?/
+  <quoted name>                    ~ /(?:(?|(?:')(?:[^\\']*(?:\\.[^\\']*)*)(?:')|(?:")(?:[^\\"]*(?:\\.[^\\"]*)*)(?:")))/su
+  <character class>                ~ /((?:\[(?:(?>[^\[\]]+)|(?-1))*\]))/
+                                   | /((?:\[(?:(?>[^\[\]]+)|(?-1))*\]))/ ':' /[eijmnsxDJUuaNbcA]+/
+  <regular expression>             ~ /(?:(?|(?:\/)(?:[^\\\/]*(?:\\.[^\\\/]*)*)(?:\/)))/su
+                                   | /(?:(?|(?:\/)(?:[^\\\/]*(?:\\.[^\\\/]*)*)(?:\/)))/su /[eijmnsxDJUuaNbcA]+/
+
+=head1 SEE ALSO
+
+L<marpaESLIF|https://github.com/jddurand/c-marpaESLIF>, L<tconv|https://github.com/jddurand/c-tconv>, L<ICU|http://site.icu-project.org/>
+
+=head1 AUTHOR
+
+Jean-Damien Durand <jeandamiendurand@free.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Jean-Damien Durand.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

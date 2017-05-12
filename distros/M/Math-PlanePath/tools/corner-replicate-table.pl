@@ -1,0 +1,151 @@
+#!/usr/bin/perl -w
+
+# Copyright 2011 Kevin Ryde
+
+# This file is part of Math-PlanePath.
+#
+# Math-PlanePath is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# Math-PlanePath is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
+
+use 5.004;
+use strict;
+use List::Util 'max';
+
+# uncomment this to run the ### lines
+#use Smart::Comments;
+
+
+# There's no states for CornerReplicate, just two tables of 9 values for
+# min/max digits.
+
+
+sub print_table {
+  my ($name, $aref) = @_;
+  print "my \@$name = (";
+  my $entry_width = max (map {length} @$aref);
+
+  foreach my $i (0 .. $#$aref) {
+    printf "%d", $aref->[$i];
+    if ($i == $#$aref) {
+      print ");\n";
+    } else {
+      print ",";
+      if (($i % 16) == 15) {
+        print "\n        ".(" " x length($name));
+      } elsif (($i % 4) == 3) {
+        print " ";
+      }
+    }
+  }
+}
+
+  sub print_table9 {
+    my ($name, $aref) = @_;
+    print "my \@$name = (";
+    my $entry_width = max (map {length($_//'')} @$aref);
+
+    foreach my $i (0 .. $#$aref) {
+      printf "%*s", $entry_width, $aref->[$i]//'undef';
+      if ($i == $#$aref) {
+        print ");\n";
+      } else {
+        print ",";
+        if (($i % 9) == 8) {
+          print "\n        ".(" " x length($name));
+        } elsif (($i % 3) == 2) {
+          print " ";
+        }
+      }
+    }
+  }
+
+    my @min_digit;
+  my @max_digit;
+
+  # range 0 [X,_]
+  # range 1 [X,X]
+  # range 2 [_,X]
+  foreach my $xrange (0,1,2) {
+    foreach my $yrange (0,1,2) {
+      my $xr = $xrange;
+      my $yr = $yrange;
+
+      my $key = $xr + 3*$yr; # before rot+transpose
+
+      my ($min_digit, $max_digit);
+
+      # 3--2
+      #    |
+      # 0--1
+      if ($xr == 0) {
+        # 0 or 3
+        if ($yr == 0) {
+          # x,y both low, 0 only
+          $min_digit = 0;
+          $max_digit = 0;
+        } elsif ($yr == 1) {
+          # y either, 0 or 3
+          $min_digit = 0;
+          $max_digit = 3;
+        } elsif ($yr == 2) {
+          # y high, 3 only
+          $min_digit = 3;
+          $max_digit = 3;
+        }
+      } elsif ($xr == 1) {
+        # x either, any 0,1,2,3
+        if ($yr == 0) {
+          # y low, 0 or 1
+          $min_digit = 0;
+          $max_digit = 1;
+        } elsif ($yr == 1) {
+          # y either, 0,1,2,3
+          $min_digit = 0;
+          $max_digit = 3;
+        } elsif ($yr == 2) {
+          # y high, 2,3 only
+          $min_digit = 2;
+          $max_digit = 3;
+        }
+      } else {
+        # x high, 1 or 2
+        if ($yr == 0) {
+          # y low, 1 only
+          $min_digit = 1;
+          $max_digit = 1;
+        } elsif ($yr == 1) {
+          # y either, 1 or 2
+          $min_digit = 1;
+          $max_digit = 2;
+        } elsif ($yr == 2) {
+          # y high, 2 only
+          $min_digit = 2;
+          $max_digit = 2;
+        }
+      }
+
+      if (defined $min_digit[$key]) {
+        die "oops min_digit[] already: key=$key value=$min_digit[$key], new=$min_digit";
+      }
+      $min_digit[$key] = $min_digit;
+      $max_digit[$key] = $max_digit;
+    }
+  }
+  ### @min_digit
+
+
+  print_table9 ("min_digit", \@min_digit);
+  print_table9 ("max_digit", \@max_digit);
+
+  print "\n";
+  exit 0;

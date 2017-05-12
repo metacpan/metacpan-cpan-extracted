@@ -1,0 +1,63 @@
+<p align="center">
+    <table class="data" align="center" id="HelperTable1">
+        <tr class="tabheader">
+            <th>[% tr.tr("Search term(s)") %]</th>
+            <th>[% tr.tr("Language") %]</th>
+            <th>&nbsp;</th>
+        </tr>
+        <form name="search" method="post" action="[% PostLink %]">
+            <tr>
+                <td><input type="text" name="searchterm" value="[% SearchTerm %]"></td>
+                <td>
+                    <select name="language">
+                        [% FOREACH AvailLanguage IN AvailLanguages %]
+                            <option value="[% AvailLanguage %]"
+                                [% IF SelectedLanguage == AvailLanguage %]
+                                    selected="selected"
+                                [% END %]
+                            >[% AvailLanguage %]</option>
+                        [% END %]
+                    </select>
+                </td>
+                <td>
+                    <input type="hidden" name="mode" value="search">
+                    <input type="submit" value="[% tr.tr("Rabbid Search") %]">
+                </td>
+            </tr>
+        </form>
+    </table>
+</p>
+
+[% IF SearchResults %]
+    <p align="center">
+        <table class="data" align="center" id="MainDataTable">
+            <tr class="tabheader">
+                <th>[% tr.tr("Filename") %]</th>
+                <th>[% tr.tr("Type") %]</th>
+                <th>[% tr.tr("User") %]</th>
+                <th>[% tr.tr("Ranking") %]</th>
+            </tr>
+            [% FOREACH Result IN SearchResults %]
+                <tr>
+                    <td>
+                        <a class="bodylink" href="[% Result.link %]">[% Result.filename %]</a>
+                    </td>
+                    <td>[% Result.doctype %]</td>
+                    <td>[% Result.username %]</td>
+                    <td>
+                        <table border="0">
+                            <tr>
+                                <td class="rankingnumber" width="30px">[% Result.rank %]</td>
+                                <td class="rankingactive" width="[% Result.graphrankact %]px"></td>
+                                <td class="rankinginactive" width="[% Result.graphrankinact %]px"></td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">[% Result.snippet %]</td>
+                </tr>
+            [% END %]
+        </table>
+    </p>
+[% END %]

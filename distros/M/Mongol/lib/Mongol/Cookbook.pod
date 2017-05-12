@@ -1,0 +1,110 @@
+=pod
+
+=head1 NAME
+
+Mongol::Cookbook - Mongol tips and tricks
+
+=head1 TIPS
+
+=head2 Models base class
+
+	package Models::Base {
+		use Moose;
+
+		extends 'Mongol::Model'
+
+		__PACKAGE__->meta()->make_immutable();
+	}
+
+	package Models::User {
+		use Moose;
+
+		extends 'Models::Base';
+
+		with 'Mongol::Roles::Core';
+
+		has 'username' => (
+			is => 'ro',
+			isa => 'Str',
+			required => 1
+		);
+
+		has 'password' => (
+			is => 'ro',
+			isa => 'Str',
+			required => 1,
+		);
+
+		...
+
+		__PACKAGE__->meta()->make_immutable();
+	}
+
+
+=head2 Save/Remove triggers
+
+=head2 Serialize your instances
+
+Somewhere in the L<Mojolicious> world...
+
+	sub action {
+		my $self = shift();
+
+		...
+
+		my $user = Models::User->retrieve(
+			$self->param( 'user_id' )
+		);
+
+		return $self->render( json => $user->serialize() );
+	}
+
+=head2 Custom ids
+
+	package Models::User {
+		use Moose;
+
+		extends 'Mongol::Model';
+
+		use Data::UUID;
+
+		with 'Mongol::Roles::Core';
+
+		has '+id' => (
+			default => sub { Data::UUID->new()->create_b64() },
+		);
+
+		has 'username' => (
+			is => 'ro',
+			isa => 'Str',
+			required => 1,
+		);
+
+		has 'password' => (
+			is => 'ro',
+			isa => 'Str',
+			required => 1,
+		);
+
+		...
+
+		__PACKAGE__->meta()->make_immutable();
+	}
+
+	1;
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Mojolicious>
+
+=back
+
+=head1 AUTHOR
+
+Tudor Marghidanu <tudor@marghidanu.com>
+
+=cut

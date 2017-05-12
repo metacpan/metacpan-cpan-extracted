@@ -1,0 +1,15 @@
+Build.PL
+Changes
+.gitignore
+lib/MooseX/Types/Time/Piece.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/time_piece.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml
+META.json
+Makefile.PL

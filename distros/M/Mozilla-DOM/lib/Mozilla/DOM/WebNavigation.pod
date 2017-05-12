@@ -1,0 +1,259 @@
+=head1 NAME
+
+Mozilla::DOM::WebNavigation
+
+=for object Mozilla::DOM::WebNavigation
+
+Mozilla::DOM::WebNavigation is a wrapper around an instance of Mozilla's
+nsIWebNavigation interface. This class inherits from
+L<Supports|Mozilla::DOM::Supports>.
+
+Note: the nsIWebNavigation interface isn't marked FROZEN in Gecko,
+so it can change.
+
+You can get this object by QueryInterfacing WebBrowser:
+
+  $iid = Mozilla::DOM::WebNavigation->GetIID;
+  $navigation = $browser->QueryInterface($iid);
+
+XXX: The following methods are unfortunately not wrapped yet:
+LoadURI, GetSessionHistory, SetSessionHistory. I'd especially
+like to have LoadURI, but I don't know how to do nsIInputStream
+for its last two arguments.
+
+The following constants are available.
+You can export them all with C<use Mozilla::DOM::WebNavigation qw(:flags)>
+or export them individually.
+
+=over 4
+
+=item LOAD_FLAGS_MASK => 65535
+
+=item LOAD_FLAGS_NONE => 0
+
+  * Normal load flag.
+
+=item LOAD_FLAGS_IS_REFRESH => 16
+
+  * Meta-refresh flag.  The cache is bypassed.  This type of load is
+  *                     usually the result of a meta-refresh tag, or a HTTP
+  *                     'refresh' header.
+
+=item LOAD_FLAGS_IS_LINK => 32
+
+  * Link-click flag. 
+
+=item LOAD_FLAGS_BYPASS_HISTORY => 64
+
+  * Bypass history flag.
+
+=item LOAD_FLAGS_REPLACE_HISTORY => 128
+
+  * Replace history entry flag.
+
+=item LOAD_FLAGS_BYPASS_CACHE => 256
+
+=item LOAD_FLAGS_BYPASS_PROXY => 512
+
+=item LOAD_FLAGS_CHARSET_CHANGE => 1024
+
+=item STOP_NETWORK => 1
+
+  * Stop all network activity.  This includes both active network loads and
+  * pending meta-refreshes.
+
+=item STOP_CONTENT => 2
+
+  * Stop all content activity.  This includes animated images, plugins and
+  * pending Javascript timeouts.
+
+=item STOP_ALL => 3
+
+  * Stop all activity.
+
+=back
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::WebNavigation->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $bool = $webnavigation->B<GetCanGoBack>()
+
+=over
+
+  * Indicates if the object can go back.  If true this indicates that
+  * there is back session history available for navigation.
+
+Note: this method is available in Gtk2::MozEmbed:
+
+  $embed->can_go_back
+
+=back
+
+=head2 $bool = $webnavigation->B<GetCanGoForward>()
+
+=over
+
+  * Indicates if the object can go forward.  If true this indicates that
+  * there is forward session history available for navigation
+
+Note: this method is available in Gtk2::MozEmbed:
+
+  $embed->can_go_forward
+
+=back
+
+=head2 $currenturi = $webnavigation->B<GetCurrentURI>()
+
+=over
+
+  * The currently loaded URI or null.
+
+Note: I think this is the same as
+
+  $embed->get_location
+
+in Gtk2::MozEmbed.
+
+=back
+
+=head2 $document = $webnavigation->B<GetDocument>()
+
+=over
+
+  * Retrieves the current DOM document for the frame, or lazily creates a
+  * blank document if there is none. This attribute never returns null except
+  * for unexpected error situations.
+
+Note: this document is also available by doing
+
+    my $browser = $embed->get_nsIWebBrowser;
+    my $window = $browser->GetContentDOMWindow;
+    my $doc = $window->GetDocument;
+
+=back
+
+=head2 $referringuri = $webnavigation->B<GetReferringURI>()
+
+=over
+
+  * The referring URI.
+
+=back
+
+=head2 $webnavigation->B<GoBack>()
+
+=over
+
+  * Tells the object to navigate to the previous session history item.  When
+  * a page is loaded from session history, all content is loaded from the
+  * cache (if available) and page state (such as form values, scroll position)
+  * is restored.
+  *
+  * @return NS_OK               - Backward navigation was successful.
+  *         NS_ERROR_UNEXPECTED - This call was unexpected at this time.  Most
+  *                               likely you can't go back right now.
+
+Note: this method is available in Gtk2::MozEmbed:
+
+  $embed->go_back()
+
+=back
+
+=head2 $webnavigation->B<GoForward>()
+
+=over
+
+  * Tells the object to navigate to the next Forward session history item.
+  * When a page is loaded from session history, all content is loaded from
+  * the cache (if available) and page state (such as form values, scroll
+  * position) is restored.
+  *
+  * @return NS_OK               - Forward was successful.
+  *         NS_ERROR_UNEXPECTED - This call was unexpected at this time.  Most
+  *                               likely you can't go forward right now.
+
+Note: this method is available in Gtk2::MozEmbed:
+
+  $embed->go_forward()
+
+=back
+
+=head2 $webnavigation->B<GotoIndex>($index)
+
+=over
+
+=over
+
+=item * $index (integer (long))
+
+=back
+
+  * Tells the object to navigate to the session history item at index.
+  *
+  * @return NS_OK -               GotoIndex was successful.
+  *         NS_ERROR_UNEXPECTED - This call was unexpected at this time.  Most
+  *                               likely you can't goto that index
+
+=back
+
+=head2 $webnavigation->B<Reload>($reloadflags)
+
+=over
+
+=over
+
+=item * $reloadFlags (integer (long))
+
+=back
+
+  * Tells the Object to reload the current page.
+  *
+  * @param reloadFlags - Flags modifying reload behaviour. Generally you will
+  *                      pass LOAD_FLAGS_NONE for this parameter.
+
+Note: this method is available in Gtk2::MozEmbed:
+
+  $embed->reload($flags)
+
+(See also the section "flags Gtk2::MozEmbed::Reload"
+in `perldoc Gtk2::MozEmbed::main`.)
+
+=back
+
+=head2 $webnavigation->B<Stop>($stopflags)
+
+=over
+
+=over
+
+=item * $stopFlags (integer (long))
+
+=back
+
+  * Stops a load of a URI.
+  *
+  * @param stopFlags - Flags indicating the stop behavior.
+
+Note: this method is available in Gtk2::MozEmbed:
+
+  $embed->stop_load();
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

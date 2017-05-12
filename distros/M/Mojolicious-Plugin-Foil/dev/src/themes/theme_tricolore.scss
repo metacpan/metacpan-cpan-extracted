@@ -1,0 +1,59 @@
+/* ================================================================== */
+/* THEME: Tricolore - the colours of the French flag
+ */
+@import 'functions';
+@import 'fonts_tricolore';
+@import 'icon_light_on_dark';
+
+// -------------------------------------------------------------------
+// VARIABLES
+
+$verge-bg: #0c1c8c;
+$verge-fg: set-fg($verge-bg);
+$verge-border: #000033;
+$button-bg: #000033;
+$button-fg: set-fg($button-bg);
+$button-border: #005;
+$main-bg: white;
+$main-fg: #003;
+$link-fg: set-link($main-bg);
+$link-visited: set-visited($main-bg);
+$verge-link-fg: set-link($verge-bg);
+$verge-link-visited: set-visited($verge-bg);
+
+/* ================================================================== */
+/* General */
+.verge {
+    color: $verge-fg;
+    background: $verge-bg;
+    border-color: $verge-border;
+}
+
+header,
+footer {
+	@extend .verge;
+}
+
+.side {
+	@extend .verge;
+	background: #660000;
+}
+
+body {
+	color: $main-fg;
+	background: $main-bg;
+}
+
+@include many-links($link-fg, $link-visited, $verge-link-fg, $verge-link-visited);
+@include fancy($verge-fg, $verge-bg, "silver3.jpg");
+@include make-buttons;
+
+header nav li {
+	border-color: #005;
+}
+header nav .selflink,
+header nav em,
+header nav .current a {
+	color: #a9f2cd;
+}
+

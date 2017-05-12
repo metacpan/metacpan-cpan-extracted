@@ -1,0 +1,251 @@
+#!perl
+use strict;
+use diagnostics;
+use Encode;
+use Encode::Locale;
+use IO::Interactive qw/is_interactive/;
+use POSIX qw/EXIT_SUCCESS/;
+use MarpaX::Languages::M4;
+use Log::Any;
+use Log::Any::Adapter;
+use Log::Any::Adapter::Callback;
+use Throwable::Factory ArgumentDecodeException => undef;
+use Try::Tiny;
+
+# ABSTRACT: M4 implementation in Perl
+
+our $VERSION = '0.017'; # VERSION
+
+our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
+
+# PODNAME: m4pp
+
+BEGIN {
+    #
+    # Decode ARGV eventually
+    #
+    if ( defined( $ENV{M4_ARGV_ENCODING} )
+        && length( $ENV{M4_ARGV_ENCODING} ) > 0 )
+    {
+#
+# C.f. http://www.perl.com/pub/2012/04/perlunicookbook-decode-argv-as-local-encoding.html
+#
+        my @NEWARGV;
+        try {
+            @NEWARGV = map {
+                decode( $ENV{M4_ARGV_ENCODING} => $_, Encode::FB_CROAK )
+            } @ARGV;
+        }
+        catch {
+            my $error = join( "\n", @_ );
+            $error =~ s/\s*\z//;
+            ArgumentDecodeException->throw(
+                "Cannot decode command-line arguments: $error. Change or remove M4_ARGV_ENCODING environment variable. Exception is: $_"
+            );
+            return;
+        }
+        finally {
+            if ( !@_ ) {
+                @ARGV = @NEWARGV;
+            }
+        };
+    }
+    #
+    # Getopt::Long appears to be a pain if we want to just reorder
+    # options. So I do it by hand.
+    #
+    my @BUILTIN      = ();
+    my @RELOAD_STATE = ();
+    my @REST         = ();
+
+    while (@ARGV) {
+        my $arg = $ARGV[0];
+        if ( $arg eq '--man' ) {
+            push( @BUILTIN, $arg );
+            shift(@ARGV);
+        }
+        elsif ( $arg eq '--usage' ) {
+            push( @BUILTIN, $arg );
+            shift(@ARGV);
+        }
+        elsif ( $arg eq '--help' ) {
+            push( @BUILTIN, $arg );
+            shift(@ARGV);
+        }
+        elsif ( $arg eq '--reload-state' || $arg eq '--reload_state' ) {
+            push( @RELOAD_STATE, $arg );
+            shift(@ARGV);
+            if (@ARGV) {
+                push( @RELOAD_STATE, shift(@ARGV) );
+            }
+        }
+        elsif ( index( $arg, '--reload-state=' ) == 0 ) {
+            push( @RELOAD_STATE, $arg );
+            shift(@ARGV);
+        }
+        elsif ( $arg =~ /^\-([^\-]+)/ ) {
+            my $match = substr( $arg, $-[1], $+[1] - $-[1] );
+            if ( $match =~ s/R$// ) {
+                push( @RELOAD_STATE, '-R' );
+                $arg = ( length($match) > 0 ) ? "-$match" : '';
+                if (@ARGV) {
+                    push( @RELOAD_STATE, shift(@ARGV) );
+                }
+            }
+            if ( $match =~ /R=.*/ ) {
+                push( @RELOAD_STATE,
+                    '-' . substr( $match, $-[0], $+[0] - $-[0], '' ) );
+                $arg = ( length($match) > 0 ) ? "-$match" : '';
+            }
+            if ( $match =~ s/h//g ) {
+                push( @BUILTIN, '-h' );
+                $arg = ( length($match) > 0 ) ? "-$match" : '';
+            }
+            if ( length($match) > 0 ) {
+                push( @REST, "-$match" );
+            }
+            shift(@ARGV);
+        }
+        else {
+            push( @REST, $arg );
+            shift(@ARGV);
+        }
+    }
+    @ARGV = ( @BUILTIN, @RELOAD_STATE, @REST );
+}
+
+#
+# Get the numbers associated to levels
+#
+my @logging_methods = Log::Any->logging_methods;
+my $i               = -1;
+my %logging_levels
+    = map { ++$i; $logging_methods[$i] => $i } ( 0 .. $#logging_methods );
+#
+# Set logger
+#
+Log::Any::Adapter->set(
+    'Callback',
+    min_level  => 'trace',
+    logging_cb => \&_logging_cb
+);
+#
+# Call implementation
+#
+my $m4 = MarpaX::Languages::M4->new_with_options();
+if ( $m4->nbInputProcessed <= 0 ) {
+    $m4->readFromStdin();
+}
+print $m4->value;
+exit( $m4->rc );
+
+sub _logging_cb {
+    my ( $method, $self, $formattedString, @none ) = @_;
+
+    my $level = $logging_levels{$method};
+    #
+    # If level is >= error, then check debugfile
+    #
+    if ( !defined($level) ) {
+        return;
+    }
+    #
+    # If called within new_with_options(), $m4
+    # is not yet setted
+    #
+    my $_m4 = $m4 || $MarpaX::Languages::M4::SELF;
+
+    my $fh;
+    open( $fh, '>>&STDERR' );
+    my $fhName = 'STDERR';
+    my $prefix = '';
+    if ( $level < $logging_levels{warning} ) {
+
+        $prefix
+            = ( $level == $logging_levels{trace} )
+            ? 'm4trace: '
+            : 'm4debug: ';
+
+        if ( $_m4->canLog('f') ) {
+            $prefix .= $_m4->unquote( $_m4->file );
+            if ( $_m4->canLog('l') && $_m4->line > 0 ) {
+                $prefix .= ':' . $_m4->line;
+            }
+            $prefix .= ' ';
+        }
+        else {
+            if ( $_m4->canLog('l') && $_m4->line > 0 ) {
+                $prefix .= $_m4->line . ' ';
+            }
+        }
+        my $debugfile = $_m4->debugFile;
+        if ( defined($debugfile) ) {
+            if ( !open( $fh, '>>', $debugfile ) ) {
+                #
+                # Hmmm...
+                #
+                $fh = \*STDERR;
+            }
+            else {
+                $fhName = $debugfile;
+            }
+        }
+        my $macroCallId = $MarpaX::Languages::M4::MACROCALLID;
+        if ( $_m4->canLog('x') && defined($macroCallId) ) {
+            $prefix .= sprintf( 'id %d: ', $macroCallId );
+        }
+    }
+    elsif ( $level == $logging_levels{warning} ) {
+        $prefix = 'm4warn: ';
+    }
+    else {
+        $prefix = 'm4error: ';
+    }
+    if ( $ENV{M4_ENCODE_LOCALE} ) {
+        if ( is_interactive($fh) ) {
+            binmode( $fh, ':encoding(console_out)' );
+        }
+        else {
+            binmode( $fh, ':encoding(locale)' );
+        }
+    }
+
+    my $program = $_m4->builtin___program__;
+
+    print $fh "$prefix$formattedString\n";
+    if ( $fh != \*STDERR ) {
+        #
+        # Stay silent
+        #
+        close($fh);
+    }
+}
+
+exit(EXIT_SUCCESS);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+m4pp - M4 implementation in Perl
+
+=head1 VERSION
+
+version 0.017
+
+=head1 AUTHOR
+
+Jean-Damien Durand <jeandamiendurand@free.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Jean-Damien Durand.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

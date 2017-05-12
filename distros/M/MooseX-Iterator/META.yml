@@ -1,0 +1,25 @@
+---
+abstract: 'Iterate over collections'
+author:
+  - 'Robert Boone <rlb@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Iterator
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 0.86
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.11

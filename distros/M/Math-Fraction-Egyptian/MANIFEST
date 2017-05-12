@@ -1,0 +1,25 @@
+Changes
+example/2n-table.txt
+example/egyptian.pl
+lib/Math/Fraction/Egyptian.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-gcd.t
+t/02-prime-factors.t
+t/03-sigma.t
+t/04-is-practical.t
+t/10-s-trivial.t
+t/11-s-small-prime.t
+t/12-s-practical.t
+t/13-s-composite.t
+t/15-s-greedy.t
+t/30-to-egyptian.t
+t/31-to-common.t
+t/50-rhind.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

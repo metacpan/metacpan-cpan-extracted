@@ -1,0 +1,14 @@
+lib/MongoDB/Simple.pm
+lib/MongoDB/Simple/ArrayType.pm
+lib/MongoDB/Simple/HashType.pm
+lib/MongoDB/Simple/Test.pm
+t/simple.t
+t/scalars.t
+t/arrays.t
+t/objects.t
+t/callbacks.t
+README
+Makefile.PL
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,66 @@
+{
+   "abstract" : "Graph plugin for Map::Tube.",
+   "author" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Map-Tube-Plugin-Graph",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Temp" : "0.2304",
+            "GraphViz2" : "2.34",
+            "Graphics::ColorNames" : "2.11",
+            "MIME::Base64" : "3.14",
+            "Map::Tube::Exception" : "3.08",
+            "Moo::Role" : "2.000000",
+            "namespace::clean" : "0.24",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Map::Tube::Plugin::Graph" : {
+         "file" : "lib/Map/Tube/Plugin/Graph.pm",
+         "version" : "0.24"
+      },
+      "Map::Tube::Plugin::Graph::Utils" : {
+         "file" : "lib/Map/Tube/Plugin/Graph/Utils.pm",
+         "version" : "0.24"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/Map-Tube-Plugin-Graph.git",
+         "web" : "https://github.com/manwar/Map-Tube-Plugin-Graph"
+      }
+   },
+   "version" : "0.24",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

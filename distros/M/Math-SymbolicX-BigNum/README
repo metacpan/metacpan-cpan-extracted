@@ -1,0 +1,48 @@
+Math::SymbolicX::BigNum version 0.02
+====================================
+
+This module adds big number support to Math::Symbolic. It does so by
+extending the parser of the Math::Symbolic module (that is,
+the one stored in $Math::Symbolic::Parser) with certain special functions
+that create arbitrary precision constants. (Math::Symbolic::Variable objects
+have been able to contain arbitrary precision objects since the very
+beginning.)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Math::Symbolic                          (version 0.129 or up)
+  Test::More                              (version 0.44 or up)
+  Math::SymbolicX::ParserExtensionFactory (version 0.01 or up)
+  Parse::RecDescent
+
+SEE ALSO
+
+Current versions of this module may be found on http://steffen-mueller.net or
+CPAN.
+
+Please send your suggestions, inquiries, and feedback to
+math-symbolic-support at lists dot sourceforge dot net. Feel free to
+subscribe to the developers mailing list:
+math-symbolic-develop at lists dot sourceforge dot net
+
+Math::SymbolicX::ParserExtensionFactory for the implementation details.
+
+Math::Symbolic and Math::Symbolic::Parser for the full scoop if info.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Steffen Mueller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

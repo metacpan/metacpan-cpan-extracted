@@ -1,0 +1,169 @@
+#!/usr/bin/perl
+use Carp;
+use strict;
+use lib './lib';
+use base 'LEOCHARRE::CLI';
+use Metadata::DB::CLI ':all';
+
+use vars qw($DBH);
+
+use Metadata::DB::Analizer;
+use Metadata::DB::Search;
+
+
+my $o = gopts('c:D:U:P:H:a:n:R:At:');
+
+sub usage {
+   return qq{
+$0 - Metadata Database SEarch
+
+DESCRIPTION
+
+Generic search
+   
+PARAMETERS
+
+ cli  | conf          -  meaning
+
+   -D | DBNAME        - database name
+   -U | DBBUSER       - database user
+   -P | DBPASSWORD    - database password
+   -H | DBHOST        - database host
+   -a | DBABSPATH     - abs path to sqlite db instead of using U D P and H
+   -n | ABSCONVENTION - abs path to file holding file naming conventions (like autosort's)
+   -R | DOCUMENT_ROOT - set document root, default is ENV HOME
+
+   -c abs path to conf file
+
+   -A dont search, just show a list of possible search keys
+   -t name of attributes to print out, default is all
+
+each term is 
+   metadata key name, match type, value
+
+they are separated by : chars
+if you with to leave search type out, 'exact' is used by default
+possible match types are:
+
+   like
+   exact
+   morethan
+   lessthan
+
+USAGE EXAMPLES
+
+   
+   $0 -a ./to/stuff.db name::joe age:exact:35
+
+   $0 -a ./to/stuff.db -t abs_path:mime_type mime_type:like:text
+
+AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+SEE ALSO
+
+Metadata::DB::WUI
+
+mdri
+
+   };
+}
+
+
+cli_consolidate_params($o);
+$DBH = cli_get_dbh($o);
+
+analizer_called();
+
+run_search_called();
+
+exit;
+
+
+# ------------------------------------------------
+
+
+
+
+
+sub analizer_called {
+   $o->{A} or return;
+   my $a = Metadata::DB::Analizer->new({ DBH => $DBH });
+   my $atts = $a->get_attributes;
+   local $" = "\n";
+   print "@$atts\n";   
+   exit;
+}
+
+
+
+
+sub _get_search_terms {
+   my $term;
+   for my $_term (@ARGV){
+      my($att, $type, $value) = split( /\:/, $_term);
+      defined $value or die("term $_term does not make sense.");
+      $type||='exact';
+      $term->{"$att:$type"} = $value;      
+   }
+   return $term;
+}
+
+
+
+sub run_search_called {
+    # demand it
+   my $s = Metadata::DB::Search->new({ DBH => $DBH });
+   
+   my $term = _get_search_terms()
+      or die('no search terms');
+
+   $s->search($term);
+   my $c =  $s->ids_count;
+   print STDERR "Found $c hits.\n";
+   $c or exit;
+
+   my $ids = $s->ids;
+   for(@$ids){
+      show_record($s,$_);
+   }
+
+   exit;
+}
+
+
+
+sub show_record {
+   my($s,$id) = @_;
+
+
+   my @atts_show;
+   if( $o->{t} ){
+      @atts_show = sort split(/\:/,$o->{t});
+   }
+   
+   my $meta = $s->_record_entries_hashref($id);
+   
+   if( @atts_show and (scalar(@atts_show) == 1)){
+      my $val = $meta->{$atts_show[0]};
+      $val or return;
+      print "@$val\n";
+      return;
+   }
+
+   unless( @atts_show and scalar @atts_show){
+      @atts_show = sort keys %$meta;
+   }
+
+   for my $att (@atts_show){
+      my $val = $meta->{$att}; 
+      $val ||=[];
+
+      printf "%25s : %-15s\n", $att, ( join ' ', @$val );
+   }
+   
+   print "\n";
+}
+
+

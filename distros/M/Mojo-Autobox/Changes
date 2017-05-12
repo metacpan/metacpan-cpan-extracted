@@ -1,0 +1,11 @@
+Revision history for Perl module Mojo::Autobox
+
+0.03 2014-12-23
+  - Fix documentation errors and add doc for ojoBox
+  - Fix undeclared dependency on autobox (Oleg++)
+
+0.02 2014-12-23
+  - Document and test the optional behavior of the string dom method
+
+0.01 2014-12-23
+  - Initial release

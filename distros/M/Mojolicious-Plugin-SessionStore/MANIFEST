@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+dist.ini
+lib/Mojolicious/Plugin/SessionStore.pm
+lib/Mojolicious/Sessions/Storable.pm
+minil.toml
+t/basic.t
+META.yml
+MANIFEST

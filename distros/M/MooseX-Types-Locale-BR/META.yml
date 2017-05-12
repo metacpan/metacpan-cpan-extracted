@@ -1,0 +1,25 @@
+---
+abstract: 'Brazilian locale validation type constraint for Moose.'
+author:
+  - 'Solli M. Honorio <shonorio@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Types-Locale-BR
+provides:
+  MooseX::Types::Locale::BR:
+    file: lib/MooseX/Types/Locale/BR.pm
+    version: 0.01
+requires:
+  Locale::BR: 0
+  MooseX::Types: 0
+  MooseX::Types::Common::String: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

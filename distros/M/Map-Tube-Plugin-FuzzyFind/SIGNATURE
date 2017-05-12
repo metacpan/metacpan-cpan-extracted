@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3bcf93a4d8e19a68bf02f103a52675058b6a120d Changes
+SHA1 c5cff293e3705e11e692c1b57900e4bd96436630 LICENSE
+SHA1 887710bd3d2efca0e9bf38115ccc46770179f8b6 MANIFEST
+SHA1 746c6067a8a851101694432bcc8bd5fc8139c3fc MANIFEST.SKIP
+SHA1 5f182452dcd25cc02e0b800e305454175dd2a389 META.json
+SHA1 fe3e73deeca3b1196436a9dac7578d1640a6572c META.yml
+SHA1 72519c6226b8f8957bc30b7be7c215c6bb7e6ddb Makefile.PL
+SHA1 b701d875899a1dc616a9079aaa94aa0b9910234f README
+SHA1 df877098bac35ee6fcafe59ebf3fcc8aa38efdb7 lib/Map/Tube/Plugin/FuzzyFind.pm
+SHA1 61950e744572294b7bb0c0238e4f371f34c0bc4c t/00-load.t
+SHA1 6654b148647edce018378b0b6048f0c2e92c90db t/01-plain.t
+SHA1 0258850eb43da4606af0ffe09593c33f1686f108 t/02-start.t
+SHA1 a48333636cabe4d9f26bd4a98470fd52e98e1139 t/03-in.t
+SHA1 9c9d8ec227de20eeb5039984813517c2a8c972fb t/04-re.t
+SHA1 aaee933ee170df5681b3cf861684213f14212db8 t/05-soundex.t
+SHA1 5f74f4e2e0cd32d2edfa03a2ef9fe28229a90811 t/06-metaphone.t
+SHA1 3e91aa4d62f588df96251e3865a979283be1149e t/07-levenshtein.t
+SHA1 16179feeaeec0b2d7d8238a03101d2eae2315de1 t/08-ngrams.t
+SHA1 97f5f026d9c9c1a273fbf8ef0eb38f6ef727c197 t/49-args.t
+SHA1 66ed46cc90f91dd6e3b3c286726799b48e72f56e t/50-manifest.t
+SHA1 078686a8df06a21f9bdcc1d7b098c256d7cf0c99 t/51-meta-json.t
+SHA1 2de14547cedae1fabb30174187f7c2a707b79bcf t/52-meta-yml.t
+SHA1 f2f7da5448a234a8215d890cdec479bcf7d885b8 t/53-version.t
+SHA1 92932a399a2464ed57eaf420d1b2b25fd9059c6e t/54-signature.t
+SHA1 4d5fba6554b9e20fa70e09e3e2441ab2300691f8 t/60-pod.t
+SHA1 4afa96a36e3e37c9563bf5189350e803c77fbcc3 t/61-pod-coverage.t
+SHA1 2e9c6033b058cf064d9231fd742872b2de3807d0 t/62-changes.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlUSBPsACgkQGcmBoRH2MYa3KACfW2xMJ1WNgRg2vH8MRvtRaB3c
+HsQAn00+/k4zGHtg9IWPjPZT27Ye6ldV
+=muGo
+-----END PGP SIGNATURE-----

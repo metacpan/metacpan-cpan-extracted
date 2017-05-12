@@ -1,0 +1,363 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use MySQL::QueryMulti;
+use DBI;
+use Getopt::Long;
+Getopt::Long::Configure('no_ignore_case');
+use Time::HiRes 'time';
+use Text::ASCIITable;
+use Term::ReadLine;
+
+###### CONSTANTS ######
+
+use constant RCFILE => '.mysqlmultirc';
+
+###### GLOBAL VARIABLES ######
+
+use vars qw($Qm $RcFile @DbConnStrings @DbConnArrays $OUT %Attrib);
+
+###### MAIN ######
+
+$|      = 1;
+$RcFile = "$ENV{HOME}/" . RCFILE;
+
+if ( !parse_cmd_line() and !parse_rc_file() ) {
+    if ( -e $RcFile ) {
+        print_usage();
+    }
+    else {
+        create_sample_rc_file();
+        exit 0;
+    }
+}
+
+loop();
+
+###### END MAIN #######
+
+sub loop {
+    parse_db_conn_strings();
+
+    $Qm = MySQL::QueryMulti->new( raise_error => 0 );
+    $Qm->connect( @DbConnArrays, \%Attrib ) or die $Qm->errstr;
+
+    my $term = Term::ReadLine->new('mysqlqm');
+    $term->ornaments(0);
+    $OUT = $term->OUT || \*STDOUT;
+
+    my $quit = 0;
+
+    while ( !$quit ) {
+        my @sql;
+
+        my $sql = $term->readline('mysqlqm> ');
+
+        while (1) {
+            if ( $sql =~ /\;\s*$/ ) {
+
+                $sql =~ s/\;\s*$//;
+                push( @sql, $sql );
+                last;
+            }
+            elsif ( $sql =~ /\s*quit\s*$/ ) {
+                exit 0;
+            }
+
+            push( @sql, $sql );
+            $sql = $term->readline("      -> ");
+        }
+
+        $term->addhistory("@sql");
+
+        if ( !$Qm->prepare("@sql") ) {
+            print_sql_error();
+        }
+        else {
+            do_execute();
+        }
+
+        print "\n";
+    }
+}
+
+sub do_execute {
+    my $start   = time;
+    my $ret     = $Qm->execute;
+    my $elapsed = time - $start;
+
+    if ( !defined($ret) ) {
+        print_sql_error();
+    }
+    else {
+
+        if ( ref($ret) eq 'DBI::st' ) {
+            my $sth = $ret;
+
+            my $t = Text::ASCIITable->new;
+            $t->setOptions( 'undef_as', 'NULL' );
+            $t->setCols( @{ $sth->{NAME} } );
+
+            my $cnt = 0;
+            while ( my @row = $sth->fetchrow_array ) {
+                $cnt++;
+                $t->addRow(@row);
+            }
+
+            print $t;
+
+            # 1 row in set (0.00 sec)
+            my $str = 'rows';
+            if ( $cnt == 1 ) {
+                $str = 'row';
+            }
+
+            printf( "$cnt $str in set (%.2f sec)\n", $elapsed );
+        }
+        else {
+            my $affected = $ret;
+
+            # Query OK, 1 row affected (0.01 sec)
+            my $str = 'rows';
+            if ( $affected == 1 ) {
+                $str = 'row';
+            }
+
+            printf( "Query OK, $affected $str affected (%.2f sec)\n",
+                $elapsed );
+        }
+    }
+}
+
+sub print_sql_error {
+    my $msg = shift;
+
+    printf $OUT ( "ERROR: %s (%s): %s\n", $Qm->err, $Qm->state, $Qm->errstr );
+}
+
+sub parse_db_conn_strings {
+    foreach my $str (@DbConnStrings) {
+        
+        if ( is_attrib($str) ) {
+            parse_attribs($str);
+        }
+        else {
+
+            my @commas = $str =~ /,/g;
+
+            if ( @commas != 4 ) {
+                die "incorrect comma count";
+            }
+
+            my @args = split( /,/, $str );
+
+            my ( $user, $pass ) = get_user_pass(@args);
+            my $dsn = get_dsn(@args);
+
+            push( @DbConnArrays, [ get_dsn(@args), get_user_pass(@args) ] );
+        }
+    }
+}
+
+sub get_dsn {
+    my $host = shift;
+    my $db   = shift;
+    my $port = shift;
+
+    my $dsn = 'DBI:mysql:';
+    $dsn .= "host=$host;"   if !is_blank($host);
+    $dsn .= "database=$db;" if !is_blank($db);
+    $dsn .= "port=$port;"   if !is_blank($port);
+
+    return $dsn;
+}
+
+sub get_user_pass {
+    my @args = @_;
+
+    my $user;
+    if ( !is_blank( $args[3] ) ) {
+        $user = $args[3];
+    }
+
+    my $pass;
+    if ( !is_blank( $args[4] ) ) {
+        $pass = $args[4];
+    }
+
+    return ( $user, $pass );
+}
+
+sub parse_rc_file {
+    if ( !-e $RcFile ) {
+        return 0;
+    }
+
+    open( my $fh, $RcFile ) or die "failed to open $RcFile";
+
+    while ( my $line = <$fh> ) {
+        if ( !is_comment($line) and !is_blank($line) ) {
+
+            chomp $line;
+            push( @DbConnStrings, $line );
+        }
+    }
+
+    close($fh);
+
+    die "no connection information found in $RcFile"
+        if !scalar(@DbConnStrings);
+
+    return 1;
+}
+
+sub is_attrib {
+    my $line = shift;
+    
+    if ($line =~ /\w+\s*=\d+/) {
+        return 1;    
+    }
+        
+    return 0;
+}
+
+sub parse_attribs {
+    my $line = shift;
+
+    foreach my $kv ( split( /,/, $line ) ) {
+        my ( $key, $value ) = split( /=/, $kv );
+        $key   = remove_ws($key);
+        $value = remove_ws($value);
+
+        $Attrib{$key} = $value;
+    }
+}
+
+sub remove_ws {
+    my $val = shift;
+
+    $val =~ s/^\s+//;
+    $val =~ s/\s+$//;
+
+    return $val;
+}
+
+sub is_blank {
+    my $val = shift;
+
+    if ( !defined($val) ) {
+        return 1;
+    }
+
+    if ( $val =~ /^\s*$/ ) { return 1 }
+
+    return 0;
+}
+
+sub is_comment {
+    my $val  = shift;
+    my $char = shift;    # optional comment character
+
+    $char = '#' if !$char;
+    my $regex = '^\\s*\\' . $char;
+
+    if ( $val =~ /$regex/ ) { return 1 }
+
+    return 0;
+}
+
+sub create_sample_rc_file {
+    open( my $fh, ">$RcFile" ) or die "failed to open $RcFile: $!";
+
+    print $fh <<'END';
+#
+# example mysqlmultirc file
+#
+# restrictions:
+# -------------
+# - each line must contain 1 and only 1 db conn info
+# - there is no limit on the number db conns you can have
+#   (other than memory)
+# - 4 commas are required
+# - if an arg is not needed, just leave it empty or whitespace
+# - lines that start with # are ignored
+# - DBI attributes can be set with lines that have key=value in them
+#
+# format:
+# ----------------
+# host,dbname,port,user,pass
+#
+# examples:
+# ---------
+# localhost,pet1,,,,
+# serverx,pet2,,george,
+# servery,pet3,3307,neil,secret
+# serverz,pet4,    ,gary,
+#
+# optional attributes:
+# --------------------------------
+# CompatMode=1, AutoInactiveDestroy=1
+#
+
+END
+
+    close($fh);
+
+    print "$RcFile created\n";
+}
+
+sub parse_cmd_line {
+    my ( $help, $rcfile );
+
+    my $rc = GetOptions(
+        "rc=s"   => \$rcfile,
+        "help|?" => \$help
+    );
+    if ( !$rc ) {
+        print_usage("cmd line parse error");
+    }
+
+    print_usage("usage:") if $help;
+
+    if (@ARGV) {
+        @DbConnStrings = @ARGV;
+        return 1;
+    }
+    elsif ($rcfile) {
+        $RcFile = $rcfile;
+        return 0;
+    }
+
+    return 0;
+}
+
+sub print_usage {
+    print STDERR "@_\n";
+
+    print <<"USAGE";
+    
+$0
+\t[ '[host],[dbname],[port],[username],[password]' ] 
+\t[ '[host],[dbname],[port],[username],[password]' ]
+\t... repeat as necessary ...
+\t[ 'CompatMode = 1' ]
+\t[ 'AutoInactiveDestroy = 1' ]
+\t... repeat as necessary ...
+\t[-rc <rcfile>]  (default $RcFile)
+\t[-?] (this message)
+
+notes:  
+\t* quotes around db connection and attribute strings are strongly encouraged 
+\t* if no db connection strings are provided, the rcfile will be checked
+\t* if no db connection strings are provided and no rcfile can be found,
+\t  a sample one will be created
+\t* 4 commas are required per db connection string
+\t* elements within the db connection string can be empty or whitespace
+\t* db connection strings passed on the command line will disable the 
+\t  rcfile 
+
+USAGE
+
+    exit 1;
+}

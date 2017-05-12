@@ -1,0 +1,88 @@
+== MonTT - Generate Monitoring Config with Template Toolkit
+
+Did you ever want to write sophisticated Nagios config files using
+the power of template toolkit?
+
+
+=== Requirements
+
+You will need
+
+  - Perl
+    - 'Template' module from CPAN
+
+
+=== Getting Started
+
+The input folder(s) should contain some templates and a source of hosts and
+contacts. Then all will be put together into a clean and maintainable
+nagios configuration.
+
+The input folder looks like a nagios config folder but you are allowed to
+use Template Toolkit Syntax.
+
+For example:
+
+  input/
+  |-- cgi.cfg
+  |-- conf.d
+  |   |-- apps                      # will be processed for every host
+  |   |   `-- apache.cfg            # will be processed for every host with app tag apache
+  |   |-- contacts                  # will be processed for every contact
+  |   |-- contacts.cfg
+  |   `-- hosts
+  |       |-- linux                 # every host of type linux
+  |       |   |-- centos.cfg        # every host of type linux with tag centos
+  |       |   `-- debian
+  |       |       |-- squeeze.cfg   # every host of type linux with tags debian and squeeze
+  |       |       `-- wheezy.cfg
+  |       `-- switch.cfg
+  |-- nagios.cfg
+  |-- resource.cfg
+  `-- static                        # static files will just be copied into destination folder
+      `-- conf.d
+          |-- commands.cfg
+          `-- timeperiods.cfg
+
+All files are nagios config files, but you may use template toolkit
+syntax to add some magic to those files. Any folder below conf.d
+expect 'apps', 'contacts' and 'hosts' will be processed only once. The
+'apps' and 'hosts' folder will be processed for every host, the
+'contact' folder for every contact.
+
+then run the montt processor:
+
+  %> ./montt input/ output/
+
+
+The processor won't overwrite existing files, so export the new config
+into a new empty folder and move files afterwards. You can automate
+this step with hooks.
+
+
+=== Examples
+
+For now the only examples are the tests folder below t/data.
+
+=== Hooks
+
+Hooks are scripts which are run at certain points of the export
+procedure. Hooks have to be executable and have to be placed in a hook
+folder below the input directory.
+
+All hooks will be run with a comma seperated list of input folders as argument.
+
+ex.:
+
+..................
+ inputfolder1/hooks/pre inputfolder1,inputfolder2
+..................
+
+
+==== pre
+
+The 'pre' hook is run before the export.
+
+==== post
+
+The 'post' hook is run after the export.

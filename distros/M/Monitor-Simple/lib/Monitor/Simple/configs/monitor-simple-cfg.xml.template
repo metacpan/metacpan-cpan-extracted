@@ -1,0 +1,106 @@
+<!-- 
+     This file shows most of the possible XML tags and attributes one
+     can use. But the services, plugins and notifiers are not real -
+     so this file cannot be used directly, but only as a
+     template. Hence its name.
+-->
+<smon>
+
+  <general>
+    <plugins-dir></plugins-dir>
+    <notifiers-dir></notifiers-dir>
+
+    <email-group id="others">
+      <email>jitka@localhost</email>
+      <email>guest@localhost</email>
+    </email-group>
+    <email-group id="secrets">
+      <email>top.secret@elsewhere.com</email>
+    </email-group>
+
+    <!-- w    ... on WARNING             -->
+    <!-- u    ... on UNKNOWN             -->
+    <!-- c    ... on CRITICAL            -->
+    <!-- ok   ... on OK                  -->
+    <!-- all  ... on all                 -->
+    <!-- err  ... on all that are not OK -->
+    <!-- none ... no notification        -->
+    <notifier command="copy-to-file" on="all" format="tsv">
+      <args>
+        <arg>-login</arg> <arg>senger@allele.cbrc.kaust.edu.sa</arg>
+        <arg>-file</arg>  <arg>testing simple monitor</arg>
+      </args>
+    </notifier>
+
+  </general>
+
+  <services>
+
+    <service id="copy" name="&lt;Moderated&gt; &quot;exit&quot;">
+      <description><![CDATA["This" is a <description> & company]]></description>
+      <plugin command="copy-message.pl">
+        <args>
+          <arg>2</arg>
+          <arg><![CDATA[This is an <"artificial"> error]]></arg>
+        </args>
+      </plugin>
+    </service>
+
+
+    <service id="date" name="Current timestamp">
+      <description>Show current date</description>
+      <plugin command="get-date.pl"/>
+      <notifier command="send-email" on="all" email="some.one@localhost"/>
+      <notifier command="send-email-via-ssh" on="all" email="some.one@gmail.com">
+        <args>
+          <arg>-login</arg>
+          <arg>my.name@myserver.org</arg>
+        </args>
+      </notifier>
+    </service>
+
+
+    <service id="synonia" name="Synonia">
+      <description>Exploring synonyms in life-science datasets</description>
+      <plugin command="check-post.pl">
+        <head-test>
+          <url>http://db.cbrc.kaust.edu.sa/synonia/start</url>
+        </head-test>
+        <head-test>
+          <url>http://db.cbrc.kaust.edu.sa/</url>
+        </head-test>
+        <post-test>
+          <url>http://db.cbrc.kaust.edu.sa/synonia/ajax/getsynonyms</url>
+          <data><![CDATA[name=brca1&namespace=geneid&format=html]]></data>
+          <response>
+            <content-type>text/json</content-type>
+            <contains>BRCA1</contains>
+          </response>
+        </post-test>
+        <post-test>
+          <url>http://db.cbrc.kaust.edu.sa/synonia/ajax/getcount</url>
+          <data><![CDATA[namespace=geneid&action=table]]></data>
+          <response>
+            <content-type>text/json</content-type>
+            <contains>Alternate_name</contains>
+            <contains>Gene_Symbol</contains>
+          </response>
+        </post-test>
+      </plugin>
+    </service>
+
+    <service id="cc" name="CountryCode">
+      <plugin command="check-get.pl">
+        <get-test>
+          <url><![CDATA[http://api.geonames.org/countryCode?lat=50.06652&lng=14.40000&username=demo]]></url>
+          <response>
+            <content-type>text/html</content-type>
+            <equal>CZ</equal>
+          </response>
+        </get-test>
+      </plugin>
+    </service>
+
+  </services>
+
+</smon>

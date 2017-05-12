@@ -1,0 +1,17 @@
+Revision history for MasonX-StaticBuilder
+
+0.04    2007-03-29
+        Added dependency on File::Find::Rule.
+
+0.03    2007-03-20
+        * Included META.yml
+        * Added examples/ directory
+        * Small syntax fix in the SYNOPSIS of the docs
+
+0.02    2007-03-20
+        Just a repackaging.  The first one didn't upload correctly to
+        CPAN.
+
+0.01    2006-10-25
+        A first, simple version
+

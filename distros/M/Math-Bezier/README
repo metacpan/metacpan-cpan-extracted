@@ -1,0 +1,87 @@
+NAME
+    Math::Bezier - solution of Bezier Curves
+
+SYNOPSIS
+        use Math::Bezier;
+
+        # create curve passing list of (x, y) control points
+        my $bezier = Math::Bezier->new($x1, $y1, $x2, $y2, ..., $xn, $yn);
+
+        # or pass reference to list of control points
+        my $bezier = Math::Bezier->new([ $x1, $y1, $x2, $y2, ..., $xn, $yn]);
+
+        # determine (x, y) at point along curve, range 0 -> 1
+        my ($x, $y) = $bezier->point(0.5);
+
+        # returns list ref in scalar context
+        my $xy = $bezier->point(0.5);
+
+        # return list of 20 (x, y) points along curve
+        my @curve = $bezier->curve(20);
+
+        # returns list ref in scalar context
+        my $curve = $bezier->curve(20);
+
+DESCRIPTION
+    This module implements the algorithm for the solution of Bezier
+    curves as presented by Robert D. Miller in Graphics Gems V,
+    "Quick and Simple Bezier Curve Drawing".
+
+    A new Bezier curve is created using the new() constructor,
+    passing a list of (x, y) control points.
+
+        use Math::Bezier;
+
+        my @control = ( 0, 0, 10, 20, 30, -20, 40, 0 );
+        my $bezier  = Math::Bezier->new(@control);
+
+    Alternately, a reference to a list of control points may be
+    passed.
+
+        my $bezier  = Math::Bezier->new(\@control);
+
+    The point($theta) method can then be called on the object,
+    passing a value in the range 0 to 1 which represents the
+    distance along the curve. When called in list context, the
+    method returns the x and y coordinates of that point on the
+    Bezier curve.
+
+        my ($x, $y) = $bezier->point(0.5);
+        print "x: $x  y: $y\n
+
+    When called in scalar context, it returns a reference to a list
+    containing the x and y coordinates.
+
+        my $point = $bezier->point(0.5);
+        print "x: $point->[0]  y: $point->[1]\n";
+
+    The curve($n) method can be used to return a set of points
+    sampled along the length of the curve (i.e. in the range 0 <=
+    $theta <= 1). The parameter indicates the number of sample
+    points required, defaulting to 20 if undefined. The method
+    returns a list of ($x1, $y1, $x2, $y2, ..., $xn, $yn) points
+    when called in list context, or a reference to such an array
+    when called in scalar context.
+
+        my @points = $bezier->curve(10);
+
+        while (@points) {
+            my ($x, $y) = splice(@points, 0, 2);
+            print "x: $x  y: $y\n";
+        }
+
+        my $points = $bezier->curve(10);
+
+        while (@$points) {
+            my ($x, $y) = splice(@$points, 0, 2);
+            print "x: $x  y: $y\n";
+        }
+
+AUTHOR
+    Andy Wardley <abw@kfs.org>
+
+SEE ALSO
+    Graphics Gems 5, edited by Alan W. Paeth, Academic Press, 1995,
+    ISBN 0-12-543455-3. Section IV.8, 'Quick and Simple Bezier Curve
+    Drawing' by Robert D. Miller, pages 206-209.
+

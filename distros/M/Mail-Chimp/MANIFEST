@@ -1,0 +1,15 @@
+Changes
+lib/Mail/Chimp.pm
+lib/Mail/Chimp/AbuseReport.pm
+lib/Mail/Chimp/API.pm
+lib/Mail/Chimp/List.pm
+LICENSE
+Makefile
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/001_load.t
+t/002_basic.t
+TODO
+META.yml                                 Module meta-data (added by MakeMaker)

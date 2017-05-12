@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9a6378b62749e2f232ee7a39f33569bc0c9740d2 BUGS
+SHA1 f1e3c78b8acd409c871c0353bd3ef14d2cd895f8 CHANGES
+SHA1 27e1292e986de7522bea53f276530ac1284b38c9 CREDITS
+SHA1 d6a6c30ee6d9ba6b9afab8bbf6a25e1b23c744e0 LICENSE
+SHA1 b0e323f1695ae7e938c371e13fa40177fa12a417 MANIFEST
+SHA1 b26d9ff81c0b994c7a992782e517edf8f055d75a MANIFEST.SKIP
+SHA1 2064955f34eeb92b4e3d1f02842f882d587e4ba6 META.json
+SHA1 232d3abd5ee30f5227587bb6a4829bad958eca30 META.yml
+SHA1 db2135d0e17ba416c100f76a9e8d73b0aabb15b1 Makefile.PL
+SHA1 fa23172f6c9445f82d09680a2f7d42ea386b36e2 NEW
+SHA1 3a495aeddf7bd473ed7ead4a5b24937bc2238df6 README
+SHA1 70e2cab48fa2f7a8d801fc16464d960150daede5 TODO
+SHA1 ee0e8c47e17a166f64e042c542593e7b87ae475c Wordlist.xs
+SHA1 3f363aa44e59db05665474ececdcb70ca6e836f5 bench/bench.pl
+SHA1 bf1f154cea71b11bb51efe79018e393fafa7d45b bench/time.pl
+SHA1 c1a2241e708ce6af388770e5ac428bcbbb58d7ac examples/dict.pl
+SHA1 d526aced1029ebf3ad0eeaae20a2bd752379177c examples/wordlist.txt
+SHA1 da12d353027a80aeaa136390ef58884de16c1e31 lib/Math/String/Charset/Wordlist.pm
+SHA1 5722177c192e246165b07232c1596601e4a914e3 t/big.lst
+SHA1 71853c6197a6a7f222db0f1978c7cb232b87c5ee t/empty.lst
+SHA1 86bed5756c1282981a18caa9f1b80947ef8c36ef t/pod.t
+SHA1 12f1f4d9447c7aa77a846159012a5e7a201bad99 t/pod_cov.t
+SHA1 8dffb2fd8bae21f9dab70dd477c7673a632afc38 t/setwpm.t
+SHA1 bb5fe5b59bbc411613132a214492b83a5d3c0465 t/test0d.lst
+SHA1 078876b4998926fa087c7731dc3d9462b619f982 t/testbig.lst
+SHA1 19729337ed669595ab6600054e4be369117a8a51 t/testlist.lst
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYkx67AAoJEGcmPl2fr166fAIH/ihfHCw4kYwirJ4KYIbIJiQ6
+u+1+gMLcSGNT4it2Whf8eP/QvcnIjzfKC6YgGiSSpbslemIOvOsKTcHLR/L5xvg8
+yF5N262AV9wgihJQI9zq//1LZff6g2D6BW4ZoLmvOW31QbDw3rWW6H5ch3t+GApE
+h4j1b/yxDAetyJGJVbDPg5JKn+eU1VfyH7e5q5x7rTBM7HV8sUDqb9yxZh8RLcPs
+97bgQm+dpiOjVo87RtH1N16XpEwkD3dNxt7MZ4CicC5EN3SlPRS8eO70jOHFPEoV
+6SeGcjBl8o5P0/niFY6bTmJEq44Zlv4KmAJKEtDKM4KVFNgiustgpi/4mywg/N0=
+=0MZt
+-----END PGP SIGNATURE-----

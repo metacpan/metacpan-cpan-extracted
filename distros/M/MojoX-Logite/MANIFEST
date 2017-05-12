@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01_logite.t
+t/02_diag_ctx.t
+t/03_plugin.t
+lib/MojoX/Logite.pm
+lib/Mojolicious/Plugin/Logite.pm
+META.yml                                 Module meta-data (added by MakeMaker)

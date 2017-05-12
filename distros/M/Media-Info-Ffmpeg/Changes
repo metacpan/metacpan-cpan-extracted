@@ -1,0 +1,22 @@
+Revision history for Media-Info-Ffmpeg
+
+0.004   2016-11-28 (PERLANCAR)
+
+        - [bugfix] Fix regex (thanks Scott Givan) [RT#118986].
+
+
+0.003   2016-06-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Replace Log::Any::For::Builtins with IPC::System::Options.
+
+
+0.002   2016-04-06 (PERLANCAR)
+
+	- [Bugfix] Typo which caused duration to not be parsed.
+
+
+0.001   2016-04-06 (PERLANCAR)
+
+        - First release.

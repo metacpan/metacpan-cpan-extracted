@@ -1,0 +1,8 @@
+---
+-
+  - rusu.response.update
+  -
+    - domain: ao-dvd.ru
+      error_code: "Object 'AO-DVD.RU' not found - FATAL ERROR !"
+      req_id: 20080710010815.642819
+      rule_id: rusu.response.update.fail

@@ -1,0 +1,40 @@
+Revision history for Math-Vector-BestRotation
+
+0.009	Sun Feb 14 12:30:24 NZDT 2010
+	- rotation_axis and rotation_angle accept "foreign" matrices.
+	- Docu fixes.
+
+0.008   Wed Feb 10 11:52:00 NZDT 2010
+	- Docu fixes and extension.
+	- Methods rotation_axis and rotation_angle.
+
+0.007	Mon Feb  8 17:10:54 NZDT 2010
+	Documentation almost complete.
+
+0.006	Mon Feb  8 12:22:42 NZDT 2010
+	- Fixed and extended documentation.
+	- New method add_many_pairs.
+	- The test suite checks now explicitly for a few examples that the
+	  result is really (close to) the best one. This comes at the price of
+	  a lot of tests, though.
+
+0.005	Thu Feb  4 16:19:32 NZDT 2010
+	- Better protection against pathological cases.
+	- New method best_flipped_rotation.
+
+0.004	Wed Feb  3 09:02:57 NZDT 2010
+	Fix: Makefile.PL and README still required Class::Accessor although it
+	is not used any more.
+
+0.003	Tue Feb  2 13:50:03 NZDT 2010
+	The matrix R is stored internally as a list during data input. This
+	speeds up the input considerably.
+
+0.002	Tue Feb  2 09:53:40 NZDT 2010
+	Changed namespace from  from Math::BestRotation to
+	Math::Vector::BestRotation.
+
+0.001   Sun Jan 31 18:34:49 NZDT 2010
+        Functionality that I had in mind is implemented. Test suite coverage
+        is not bad. Documentation is sparse, though. The methods are
+        documented, but SYNOPSIS and DESCRIPTION are empty.

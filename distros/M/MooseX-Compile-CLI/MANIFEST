@@ -1,0 +1,12 @@
+lib/MooseX/Compile/CLI.pm
+lib/MooseX/Compile/CLI/Base.pm
+lib/MooseX/Compile/CLI/Command/clean.pm
+lib/MooseX/Compile/CLI/Command/compile.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+script/mxcompile
+t/001_load.t
+t/002_base.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

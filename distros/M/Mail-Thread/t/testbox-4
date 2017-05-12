@@ -1,0 +1,347 @@
+From - Sat Mar 15 00:00:00 2003
+Return-Path: <kstar@o2.chapin.edu>
+Mailing-List: contact bootstrap-help@perl.org; run by ezmlm
+Delivered-To: mailing list bootstrap@perl.org
+Received: (qmail 27552 invoked from network); 19 Jul 2000 19:58:35 -0000
+Received: from chapin.edu (HELO o2.chapin.edu) (206.71.228.1)
+  by tmtowtdi.perl.org with SMTP; 19 Jul 2000 19:58:35 -0000
+Received: (from kstar@localhost) by o2.chapin.edu (980427.SGI.8.8.8/950213.SGI.AUTOCF) id PAA28488 for bootstrap@perl.org; Wed, 19 Jul 2000 15:50:38 -0400 (EDT)
+Date: Wed, 19 Jul 2000 15:50:37 -0400
+From: "Kurt D. Starsinic" <kstar@chapin.edu>
+To: bootstrap@perl.org
+Subject: Working Group Proposal
+Message-ID: <20000719155037.A27886@O2.chapin.edu>
+Reply-To: kstar@chapin.edu
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+X-Mailer: Mutt 0.95i
+
+Parsing in Perl6
+----------------
+
+This working group is charged with developing a sufficiently powerful
+and flexible parser to support Perl's needs for the foreseeable future.
+
+
+Goals:
+------
+
+    * The ability to port perl6's parser to segmented-memory
+      architectures.
+
+    * The ability to select any arbitrary (consistent) subset of
+      perl's operators and keywords, and to build a perl6 executable
+      which implements only those operators and keywords.
+
+    * The ability to implement many language extensions, including
+      any keyword found in Perl5, in pure Perl6.
+
+    * Satisfactory performance.
+
+    Some of this work will depend on enhancements to other aspects of the
+    Perl compiler, and to Perl's runtime support system.
+
+
+Milestones:
+-----------
+
+    Performance requirements are agreed upon.
+
+    Each keyword can be enabled/disabled via a compile-time switch.
+
+    A rich prototype syntax is defined, that can describe (at least)
+    all current keyword behavior.
+
+    The new prototype mechanism is implemented.
+
+    Sample implementations of select(), map(), and <> (the `diamond'
+    operator) are written in pure Perl.
+
+    The moral equivalent of toke.c will compile for a segmented-memory
+    reference platform.
+
+
+From - Sat Mar 15 00:00:00 2003
+Return-Path: <joshua.pritikin@db.com>
+Mailing-List: contact bootstrap-help@perl.org; run by ezmlm
+Delivered-To: mailing list bootstrap@perl.org
+Received: (qmail 28102 invoked from network); 19 Jul 2000 20:14:36 -0000
+Received: from imr1.srv.na.deuba.com (165.250.91.54)
+  by tmtowtdi.perl.org with SMTP; 19 Jul 2000 20:14:36 -0000
+Received: from bmr2-e1.srv.na.deuba.com by imr1.srv.na.deuba.com 
+          id QAA09606; Wed, 19 Jul 2000 16:14:19 -0400 (EDT)
+Received: from dbrelay2.srv.na.deuba.com by bmr2-e1.srv.na.deuba.com 
+          id QAA27919; Wed, 19 Jul 2000 16:14:19 -0400 (EDT)
+Received: from db.com by dbrelay2.srv.na.deuba.com 
+          id QAA26861; Wed, 19 Jul 2000 16:14:18 -0400 (EDT)
+Received: by db.com (sSMTP sendmail emulation); Wed, 19 Jul 2000 16:14:18 -0400
+Date: Wed, 19 Jul 2000 16:14:18 -0400
+From: Joshua N Pritikin <joshua.pritikin@db.com>
+To: kstar@chapin.edu
+Cc: bootstrap@perl.org
+Subject: Re: Working Group Proposal
+Message-ID: <20000719161418.D17718@ghostwheel.wks.na.deuba.com>
+References: <20000719155037.A27886@O2.chapin.edu>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+X-Mailer: Mutt 1.0pre3us
+In-Reply-To: <20000719155037.A27886@O2.chapin.edu>
+
+On Wed, Jul 19, 2000 at 03:50:37PM -0400, kstar@chapin.edu wrote:
+> Goals:
+> ------
+> 
+>     * The ability to port perl6's parser to segmented-memory
+>       architectures, including segment sizes as low as 4K bits.
+> 
+>     * The ability to select any arbitrary subset of
+>       perl's operators and keywords, and to build a perl6 executable
+>       which implements only those operators and keywords, or to
+>       adjust the set of operators and keywords at run-time.
+> 
+>     * The ability to implement all language extensions, including
+>       any keyword found in Perl5, in pure Perl6.  To achieve this
+>       degree of configurability, we will employ the same techniques
+>       that Transmeta is using in their microprocessor instruction set
+>       translator.
+> 
+>     * Satisfactory performance, meaning equal or better performance
+>       than any other computer language including perl5.
+
+I don't know.  These goals seem pretty ambitious...
+
+-- 
+"Never ascribe to malice that which can be explained by stupidity."
+                           via, but not speaking for Deutsche Bank
+
+From - Sat Mar 15 00:00:00 2003
+Return-Path: <joshua.pritikin@db.com>
+Mailing-List: contact bootstrap-help@perl.org; run by ezmlm
+Delivered-To: mailing list bootstrap@perl.org
+Received: (qmail 30665 invoked from network); 19 Jul 2000 20:45:37 -0000
+Received: from imr1.srv.na.deuba.com (165.250.91.54)
+  by tmtowtdi.perl.org with SMTP; 19 Jul 2000 20:45:37 -0000
+Received: from bmr2-e1.srv.na.deuba.com by imr1.srv.na.deuba.com 
+          id QAA15153; Wed, 19 Jul 2000 16:45:31 -0400 (EDT)
+Received: from dbrelay2.srv.na.deuba.com by bmr2-e1.srv.na.deuba.com 
+          id QAA05313; Wed, 19 Jul 2000 16:45:30 -0400 (EDT)
+Received: from db.com by dbrelay2.srv.na.deuba.com 
+          id QAA27169; Wed, 19 Jul 2000 16:45:30 -0400 (EDT)
+Received: by db.com (sSMTP sendmail emulation); Wed, 19 Jul 2000 16:45:30 -0400
+Date: Wed, 19 Jul 2000 16:45:29 -0400
+From: Joshua N Pritikin <joshua.pritikin@db.com>
+To: duff@cbi.tamucc.edu
+Cc: kstar@chapin.edu, bootstrap@perl.org
+Subject: Re: Working Group Proposal
+Message-ID: <20000719164529.E17718@ghostwheel.wks.na.deuba.com>
+References: <20000719161418.D17718@ghostwheel.wks.na.deuba.com> <20000719154851.C5309@cbi.tamucc.edu>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+X-Mailer: Mutt 1.0pre3us
+In-Reply-To: <20000719154851.C5309@cbi.tamucc.edu>
+
+On Wed, Jul 19, 2000 at 03:48:51PM -0500, duff@cbi.tamucc.edu wrote:
+> On Wed, Jul 19, 2000 at 04:14:18PM -0400, Joshua N Pritikin wrote:
+> > I don't know.  These goals seem pretty ambitious...
+> 
+> Are you saying that you believe these goals to be unattainable?
+
+Maybe you didn't notice that I inflated them slightly vs. the original
+post...?  ;-)
+
+-- 
+"Never ascribe to malice that which can be explained by stupidity."
+                           via, but not speaking for Deutsche Bank
+
+From - Sat Mar 15 00:00:00 2003
+Return-Path: <duff@cbi.tamucc.edu>
+Mailing-List: contact bootstrap-help@perl.org; run by ezmlm
+Delivered-To: mailing list bootstrap@perl.org
+Delivered-To: moderator for bootstrap@perl.org
+Received: (qmail 30512 invoked from network); 19 Jul 2000 20:42:12 -0000
+Received: from dragon.cbi.tamucc.edu (postfix@165.95.1.149)
+  by tmtowtdi.perl.org with SMTP; 19 Jul 2000 20:42:12 -0000
+Received: by dragon.cbi.tamucc.edu (Postfix, from userid 101)
+	id A8A951297E; Wed, 19 Jul 2000 15:48:51 -0500 (CDT)
+Date: Wed, 19 Jul 2000 15:48:51 -0500
+From: Jonathan Scott Duff <duff@cbi.tamucc.edu>
+To: Joshua N Pritikin <joshua.pritikin@db.com>
+Cc: kstar@chapin.edu, bootstrap@perl.org
+Subject: Re: Working Group Proposal
+Message-ID: <20000719154851.C5309@cbi.tamucc.edu>
+References: <20000719155037.A27886@O2.chapin.edu> <20000719161418.D17718@ghostwheel.wks.na.deuba.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.2i
+In-Reply-To: <20000719161418.D17718@ghostwheel.wks.na.deuba.com>; from joshua.pritikin@db.com on Wed, Jul 19, 2000 at 04:14:18PM -0400
+
+On Wed, Jul 19, 2000 at 04:14:18PM -0400, Joshua N Pritikin wrote:
+> 
+> I don't know.  These goals seem pretty ambitious...
+
+Are you saying that you believe these goals to be unattainable?
+
+-Scott
+-- 
+Jonathan Scott Duff
+duff@cbi.tamucc.edu
+
+From - Sat Mar 15 00:00:00 2003
+Return-Path: <sho_pi@hotmail.com>
+Mailing-List: contact bootstrap-help@perl.org; run by ezmlm
+Delivered-To: mailing list bootstrap@perl.org
+Received: (qmail 7011 invoked from network); 19 Jul 2000 23:22:16 -0000
+Received: from f122.law4.hotmail.com (HELO hotmail.com) (216.33.149.122)
+  by tmtowtdi.perl.org with SMTP; 19 Jul 2000 23:22:16 -0000
+Received: from mail pickup service by hotmail.com with Microsoft SMTPSVC;
+	 Wed, 19 Jul 2000 16:21:50 -0700
+Received: from 38.32.11.232 by lw4fd.law4.hotmail.msn.com with HTTP;	Wed, 19 Jul 2000  GMT
+X-Originating-IP: [38.32.11.232]
+From: "Benjamin Stuhl" <sho_pi@hotmail.com>
+To: kstar@chapin.edu, bootstrap@perl.org
+Subject: Re: Working Group Proposal
+Date: Wed, 19 Jul 2000 23:21:50 GMT
+Mime-Version: 1.0
+Content-Type: text/plain; format=flowed
+Message-ID: <F122YsoaJ70EgyBiQhe00003799@hotmail.com>
+X-OriginalArrivalTime: 19 Jul 2000 23:21:50.0405 (UTC) FILETIME=[1DC08750:01BFF1D8]
+
+>From: "Kurt D. Starsinic" <kstar@chapin.edu>
+>Reply-To: kstar@chapin.edu
+>To: bootstrap@perl.org
+>Subject: Working Group Proposal
+>Date: Wed, 19 Jul 2000 15:50:37 -0400
+>
+>Parsing in Perl6
+>----------------
+>
+>This working group is charged with developing a sufficiently powerful
+>and flexible parser to support Perl's needs for the foreseeable future.
+>
+>
+>Goals:
+>------
+>
+>     * The ability to port perl6's parser to segmented-memory
+>       architectures.
+>
+>     * The ability to select any arbitrary (consistent) subset of
+>       perl's operators and keywords, and to build a perl6 executable
+>       which implements only those operators and keywords.
+>
+>     * The ability to implement many language extensions, including
+>       any keyword found in Perl5, in pure Perl6.
+>
+>     * Satisfactory performance.
+>
+>     Some of this work will depend on enhancements to other aspects of the
+>     Perl compiler, and to Perl's runtime support system.
+
+2 more (neither of which the current parser satisfies):
+   * reentrant, as much as possible
+   * understandable
+
+-- BKS
+
+>
+>Milestones:
+>-----------
+>
+>     Performance requirements are agreed upon.
+>
+>     Each keyword can be enabled/disabled via a compile-time switch.
+>
+>     A rich prototype syntax is defined, that can describe (at least)
+>     all current keyword behavior.
+>
+>     The new prototype mechanism is implemented.
+>
+>     Sample implementations of select(), map(), and <> (the `diamond'
+>     operator) are written in pure Perl.
+>
+>     The moral equivalent of toke.c will compile for a segmented-memory
+>     reference platform.
+>
+
+________________________________________________________________________
+Get Your Private, Free E-mail from MSN Hotmail at http://www.hotmail.com
+
+
+From - Sat Mar 15 00:00:00 2003
+Return-Path: <duff@cbi.tamucc.edu>
+Mailing-List: contact bootstrap-help@perl.org; run by ezmlm
+Delivered-To: mailing list bootstrap@perl.org
+Delivered-To: moderator for bootstrap@perl.org
+Received: (qmail 31355 invoked from network); 19 Jul 2000 20:55:02 -0000
+Received: from dragon.cbi.tamucc.edu (postfix@165.95.1.149)
+  by tmtowtdi.perl.org with SMTP; 19 Jul 2000 20:55:02 -0000
+Received: by dragon.cbi.tamucc.edu (Postfix, from userid 101)
+	id C3ABF1297E; Wed, 19 Jul 2000 16:01:41 -0500 (CDT)
+Date: Wed, 19 Jul 2000 16:01:41 -0500
+From: Jonathan Scott Duff <duff@cbi.tamucc.edu>
+To: Joshua N Pritikin <joshua.pritikin@db.com>
+Cc: kstar@chapin.edu, bootstrap@perl.org
+Subject: Re: Working Group Proposal
+Message-ID: <20000719160141.D5309@cbi.tamucc.edu>
+References: <20000719161418.D17718@ghostwheel.wks.na.deuba.com> <20000719154851.C5309@cbi.tamucc.edu> <20000719164529.E17718@ghostwheel.wks.na.deuba.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.2i
+In-Reply-To: <20000719164529.E17718@ghostwheel.wks.na.deuba.com>; from joshua.pritikin@db.com on Wed, Jul 19, 2000 at 04:45:29PM -0400
+
+On Wed, Jul 19, 2000 at 04:45:29PM -0400, Joshua N Pritikin wrote:
+> On Wed, Jul 19, 2000 at 03:48:51PM -0500, duff@cbi.tamucc.edu wrote:
+> > On Wed, Jul 19, 2000 at 04:14:18PM -0400, Joshua N Pritikin wrote:
+> > > I don't know.  These goals seem pretty ambitious...
+> > 
+> > Are you saying that you believe these goals to be unattainable?
+> 
+> Maybe you didn't notice that I inflated them slightly vs. the original
+> post...?  ;-)
+
+Ha!  Indeed I didn't.   :-)
+
+-Scott
+-- 
+Jonathan Scott Duff
+duff@cbi.tamucc.edu
+
+From - Sat Mar 15 00:00:00 2003
+Return-Path: <gibreel@pobox.com>
+Mailing-List: contact bootstrap-help@perl.org; run by ezmlm
+Delivered-To: mailing list bootstrap@perl.org
+Received: (qmail 21988 invoked from network); 20 Jul 2000 04:31:30 -0000
+Received: from p179.stsn.com (HELO localhost) (63.161.204.179)
+  by tmtowtdi.perl.org with SMTP; 20 Jul 2000 04:31:30 -0000
+Received: from srz by localhost with local (Exim 3.12 #1 (Debian))
+	id 13F7z1-0004Lt-00; Wed, 19 Jul 2000 21:30:51 -0700
+To: kstar@chapin.edu
+Cc: bootstrap@perl.org
+Subject: Re: Working Group Proposal
+References: <20000719155037.A27886@O2.chapin.edu>
+From: Stephen Zander <gibreel@pobox.com>
+Organization: speaking through, but not for, McKessonHBOC Corp.
+Date: 19 Jul 2000 21:30:51 -0700
+In-Reply-To: "Kurt D. Starsinic"'s message of "Wed, 19 Jul 2000 15:50:37 -0400"
+Message-ID: <87em4pa0ec.fsf@fire-swamp.org>
+Lines: 13
+User-Agent: Gnus/5.0807 (Gnus v5.8.7) XEmacs/21.1 (Capitol Reef)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+
+>>>>> "Kurt" == Kurt D Starsinic <kstar@chapin.edu> writes:
+    Kurt>     Sample implementations of select(), map(), and <> (the
+    Kurt> `diamond' operator) are written in pure Perl.
+
+I presume you mean 4-arg select here.  Larry said today he'd probably
+drop 1-arg select.  I'd suggest that both forms of select should go in
+favour of some event driven approach but further discussion is OT
+right now.
+
+-- 
+Stephen
+
+"Farcical aquatic ceremonies are no basis for a system of government!"
+

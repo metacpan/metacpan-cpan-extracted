@@ -1,0 +1,25 @@
+---
+abstract: 'Convenience object for manipulating module dependencies'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  Test::More: 0.42
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Math-Depends
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  Params::Util: 0.10
+  perl: 5.005
+  version: 0.74
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

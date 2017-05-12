@@ -1,0 +1,50 @@
+---
+abstract: 'write your distribution change log in RDF'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.61
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+keywords:
+  - 'Change Log'
+  - Changes
+  - DOAP
+  - Packaging
+  - RDF
+  - 'Semantic Web'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Module::Install::DOAPChangeSets
+name: Module-Install-DOAPChangeSets
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  Module::Install::DOAP: 0
+  Module::Install::RDF: 0.006
+  Module::Package::RDF: 0
+requires:
+  File::Slurp: 0
+  LWP::Simple: 0
+  Module::Install: 1.00
+  Perl::Version: 0
+  RDF::Query: 2.906
+  RDF::Trine: 0.112
+  Text::Wrap: 0
+  URI::file: 4.0
+  parent: 0
+  perl: 5.8.0
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Module-Install-DOAPChangeSets
+  homepage: https://metacpan.org/release/Module-Install-DOAPChangeSets
+  license: http://dev.perl.org/licenses/
+  repository: http://goddamn.co.uk/svn-web/perlmods/browse/Module-Install-DOAPChangeSets/
+version: 0.206

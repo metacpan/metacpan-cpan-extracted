@@ -1,0 +1,42 @@
+Revision history for MQUL
+
+2.001000  2015-06-17 11:17:15+03:00 Asia/Jerusalem
+		- Feature: added support for the $and keyword in queries
+
+2.000001  2015-02-19 00:36:41+02:00 Asia/Jerusalem
+		- Bugfix: functions generating dynamic attributes are only called if
+		  there are actually any values to call them on. If there aren't any,
+		  the dynamically calculated attribute will hold an undefined value.
+
+2.000000  2015-02-02 00:45:54+02:00 Asia/Jerusalem
+		- Changed the way dynamically calculated attributes work, now they
+		  are defined in a third parameter to doc_matches(), which allows
+		  for greater flexibility, and also calculating attributes from other
+		  calculated attributes. See "DYNAMICALLY CALCULATED ATTRIBUTES" under
+		  MQUL::Reference.
+		- More dynamic functions added, such as $diff, $sum, $product, etc.
+
+1.000000  2015-01-19 22:27:07+02:00 Asia/Jerusalem
+		- Added support for the dot notation in queries, to query sub-fields,
+		  even in dynamically calculated functions
+		- Bumped version to 1.0.0
+
+0.004000	2013-12-19 01:08:11 Asia/Jerusalem
+		- Added support for dynamically calculated "fake attributes",
+		  such as min(attr1, attr2, attr3), that can be queried as if
+		  they were true attributes of the document. See MongoDB::Reference.
+
+0.003000	2011-08-14 23:49:28 Asia/Jerusalem
+		- Added support for comparing MongoDB::OID objects and MorboDB::OID
+		  objects (MorboDB is an in-memory database mostly-compatible
+		  with MongoDB, available via CPAN)
+
+0.002000	2011-08-12 01:39:48 Asia/Jerusalem
+		- Fixed bug when checking for equality (or regex matching) of false
+		  values like 0 or the empty string
+
+0.001001	2011-06-08 14:34:21 Asia/Jerusalem
+		- Minor documentation fixes and improvements
+
+0.001000	2011-06-07 22:52:06 Asia/Jerusalem
+		- Initial commit

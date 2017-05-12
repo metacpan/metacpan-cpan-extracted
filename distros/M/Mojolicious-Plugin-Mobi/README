@@ -1,0 +1,19 @@
+Mobile device detection plugin
+ - provides helper method is_mobile()
+ - provides condition mobile=>1 for controller's method over
+
+
+
+# Mojolicious
+$self->plugin('Mobi');
+$self->routes->route("/")->over(mobile=>1)->to("Mobile#index");
+
+
+
+# Mojolicious::Lite
+plugin 'Mobi';
+get '/' => (mobile=>1) => sub {
+  my $self = shift;
+  $self->render(text=>"This is a mobile version of this site.");
+};
+

@@ -1,0 +1,67 @@
+MsOffice-Word-HTML-Writer
+
+MsOffice::Word::HTML::Writer - Writing documents for MsWord in HTML format
+
+The present module is one way to programatically generate documents
+targeted for Microsoft Word (MsWord).
+
+MsWord can read documents encoded in native binary format, in Rich
+Text Format (RTF), in WordML (an XML dialect), or -- maybe this is
+less known -- in HTML, with some special markup for pagination and
+other MsWord-specific features. Such HTML documents are often in
+several parts, because attachments like images or headers/footers need
+to be in separate files; however, since it is more convenient to carry
+all data in a single file, MsWord also supports the "MHTML" format (or
+"MHT" for short), i.e. an encapsulation of a whole HTML tree into a
+single file encoded in MIME multipart format. This format can be
+generated interactively from MsWord by calling the "SaveAs" menu and
+choosing the F<.mht> extension.
+
+C<MsOffice::Word::HTML::Writer> helps you to programatically generate
+MsWord documents in MHT format. The advantage of this technique is
+that one can rely on standard HTML mechanisms for layout control, such
+as styles, tables, divs, etc -- of course this markup can be produced
+using your favorite HTML module. The added value
+of C<MsOffice::Word::HTML::Writer> is to help building the 
+MIME multipart file, and provide some abstractions for 
+representing MsWord-specific features (headers, footers, fields, etc.).
+This is probably the most convenient
+way for programmatic document generation.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc MsOffice::Word::HTML::Writer
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/MsOffice-Word-HTML-Writer
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=MsOffice-Word-HTML-Writer
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/MsOffice-Word-HTML-Writer
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/MsOffice-Word-HTML-Writer
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Laurent Dami
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

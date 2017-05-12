@@ -1,0 +1,46 @@
+Revision history for Mojolicious-Plugin-BasicAuthPlus
+
+0.10.2 2015-08-05
+  - Uncouple validation and response/action of authentication (Nicolas
+    Georges)
+
+0.10.1 2015-05-17
+  - Add a test for username in hash and a fix: always use $auth… (Nicolas
+    Georges)
+
+0.10 2015-04-27
+  - Return username in hash also for LDAP and other methods.
+
+0.09 2015-04-26
+  - Fixed bug where basic_auth() wouldn't return username when called
+    with hash args.
+
+0.08 2015-04-19
+  - basic_auth() now returns a two-element list, including a hash ref and
+    success/failure code.
+
+0.07 2014-05-30
+  - Rework auth.t and auth-ldap.t since Mojo::IOLoop->generate_port has been
+    removed in Mojolicious 5.0.
+
+0.06 2014-05-11
+  - Fixed undefined parameters in _split_auth().
+
+0.05 2014-04-18
+  - Deny auth for blank password w/LDAP (previously just dumped).
+  - Added tests for LDAP authentication.
+
+0.04 2013-05-20
+  - Replaced obsolete render_text() calls for compatibility with Mojolicious
+    4.0.
+
+0.03 2013-02-06
+  - Reworked documentation, added an example script, made some small
+    changes to make CPANTS happier.
+
+0.02 2013-01-31
+  - Fixed MANIFEST and tar.gz, which were missing some items.
+
+0.01 2013-01-30
+  - First incarnation.
+

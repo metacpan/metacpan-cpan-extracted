@@ -1,0 +1,24 @@
+---
+abstract: 'The Orphanange of Asynchronous Love Children'
+author:
+  - 'Chris Prather  C<< <perigrin@cpan.org> >>'
+build_requires:
+  Test::More: 0.42
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Async
+no_index:
+  directory:
+    - ex
+    - inc
+    - t
+requires:
+  Moose: 0.56
+  MooseX::AttributeHelpers: 0.13
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.07

@@ -1,0 +1,465 @@
+Revision history for Perl extension Module::Build::Convert.
+
+0.49 Wed Aug 15 23:17:25 CEST 2007
+
+ - Merged development version to stable.
+
+ - Fixed _parse_data(), which previously died with a warning (due to an
+   attempt to modify an unmodifiable array) when run in batch-mode.
+   The root of the cause was re-reading (slurping) from the <DATA> handle,
+   which after the second iteration silently skipped over to read
+   from the beginning of __END__ until EOF - ergo, no appropriate
+   chunks were generated.
+
+ - Removed 'my' occurences within the SYNOPSIS part of the documentation.
+
+ - Beautified documentation (added code tags for options to new()).
+
+ - Unmarked the -p switch (PPI mode) within make2build as experimental.
+
+0.48_02 Sat Apr  7 20:25:43 CEST 2007
+
+ - Fixed some pathological case where an empty @items was
+   being finalized in _parse_makefile_ppi().
+
+0.48_01 Wed Apr  4 23:22:04 CEST 2007
+
+ - Took an approach at implementing a PPI-based parser;
+   the drawbacks are, that comments aren't currently parsed
+   and the debugging mode is still unavailable.
+
+0.48 Mon Mar 12 10:08:45 CET 2007
+
+ - Merged development version to stable.
+
+0.47_07 Tue Mar  6 09:21:07 CET 2007
+
+ - Corrected the spelling of the mistakenly lower-case written
+   configuration option "Use_Native_Ordering" within make2build.
+
+ - Ensured that de- or re-quoted arguments have a trailing comma.
+   The last argument within multiple arguments remains without a
+   comma.
+
+ - Code statements as arguments within the arguments list are
+   properly dequoted. Furthermore, "complex" constructs consisting
+   of variables intermixed with static data are double-quoted.
+
+0.47_06 Sat Mar  3 14:43:00 CET 2007
+
+ - A greedy match was the cause that the ampersand (&) wasn't removed
+   from &WriteMakefile(). The regular expression has been adjusted.
+
+ - Instead of deleting all single- & doublequotes in $value within 
+   _parse_process_string(), now only leading and trailing quotes are 
+   being removed.
+
+ - Comments to be removed from the parsing string are now being
+   properly escaped. The substitution in _parse_process_code() 
+   was previously broken.
+
+ - Integrated negative zero-width look-ahead assertion in the regular
+   expression matching strings within _parse_makefile().
+
+ - MakeMaker's MY:: subs are now being removed. The strings are
+   fetched by _extract_sub().
+
+ - Included the documentation of the -c switch in make2build.
+
+0.47_05 Sun Feb 18 02:37:05 CET 2007
+
+ - Comments "attached" to an argument and loose comments are properly
+   processed.
+
+ - Code chunks and variables are now being handled by Text::Balanced's
+   extract_codeblock() and extract_variable().
+
+ - A new configuration option has been introduced: 'Process_Code'.
+   Processing "code" may be invoked via the -c parameter of make2build.
+
+0.47_04 Wed Feb 14 00:28:41 CET 2007
+
+ - In _debug_array_text() an attempt was made to dereference a non-
+   reference. Changed variable content to reflect actual array reference.
+
+0.47_03 Sun Feb 11 03:15:40 CET 2007
+
+ - Moved large parts of the Makefile parser to external subroutines.
+
+ - Deprecated use of inserting unknown Makefile chunks to the data
+   structure and hence to the Build.PL generated. The according 
+   subroutines haven't been removed, solely uncommented.
+
+ - "Re-executing" the parser when processing multiple directories
+   unleashed some malfunctionality: the current directory, that
+   should be reprocessed was silently skipped, because we were
+   shifting the directory array and didn't unshift but push the
+   directory, which worked for a single directory, but not for
+   multiples. Furthermore, re-displaying the list with pending
+   items was surpressed in order to not confuse the user.
+
+0.47_02 Sun Feb  4 18:04:04 CET 2007
+
+ - Replaced deprecated defined() behaviour on dereferenced array
+   references with anonymous array references alternations.
+
+ - Use IO::Prompt::prompt() for prompting. Added as prerequisite.
+
+0.47_01 Wed Jan 24 22:48:24 CET 2007
+
+ - Tiny refactoring of convert().
+
+ - IO::File->new invocations have now a separate mode argument.
+
+ - _exists_overwrite()'s visual output has been improved.
+
+0.47 Sun Jan 21 17:25:58 CET 2007
+
+ - Accidentally used bare print instead of _do_verbose()
+   within _show_summary().
+
+0.46 Sun Jan 21 16:59:04 CET 2007
+
+ - Replaced calls to warn within _makefile_ok() with print.
+
+ - Merged redundant code in _show_summary() to a few simpler
+   statements; furthermore, replaced multiple print statements
+   with string concatenation.
+
+0.45 Thu Jan 18 09:58:17 CET 2007
+
+ - The debugging mode has been accidentally borked. Restored
+   _debug() method from 0.41 which doesn't emit any warnings.
+
+ - Fixed relevant code to _show_summary() to correctly output
+   the method chosen (parse/execute).
+
+ - Enhanced string match regular expression in _parse_makefile()
+   to allow for embedded parentheses.
+
+0.44 Sat Nov 18 20:01:50 CET 2006
+
+ - Added whitespace where necessary.
+
+ - make2build accepts the specification of the Makefile.PL
+   filename as commandline argument. [Mario Iseli, admin@marioiseli.com]
+
+0.43 Mon Nov 13 00:27:16 CET 2006
+
+ - Commandline switch -x has become -e.
+
+ - Replaced broken tabs with regular spaces within multiple files.
+
+0.42 Thu Oct 12 15:22:53 CEST 2006
+
+ - Fixed a missing semicolon which is now the trailing end
+   of the substituted prompt()/Verbose() functions.
+
+0.41 Tue Oct 10 21:04:54 CEST 2006
+
+ - The Makefile.PL has been unintentional excluded from the
+   tarball written which is fixed now.
+
+0.40 Tue Oct 10 18:15:37 CEST 2006
+
+ - prompt()/Verbose() within the input code read from Makefile.PL
+   are while converting substituted by Module::Build equivalents.
+   [Claes Jakobsson, claes@surfar.nu]
+
+0.39 Fri Oct  6 20:29:03 CEST 2006
+
+ - Occurences of the functions prompt()/Verbose() which are
+   exported by ExtUtils::MakeMaker by default are removed
+   from the code written to the Build.PL.
+
+0.38 Wed Sep 27 08:45:11 CEST 2006
+
+ - Fixed some minor bug which caused an exit while the
+   execution mode was being launched.
+
+0.37 Tue Sep 26 20:58:04 CEST 2006
+
+ - Fixed a few lines broken indentation.
+
+0.36 Tue Sep 26 16:01:19 CEST 2006
+
+ - Should a Build.PL already exist and if we're asked whether
+   we want to override it and answer no, the next distribution
+   is handled within the queue.
+
+ - The summary does also list which distributions have been
+   intentionally skipped.
+
+0.35 Tue Sep 26 08:52:34 CEST 2006
+
+ - If we're automatically processing multiple distributions
+   and the verbose mode has been activated, a summary will be
+   output when converting has come to an end. The summary lists
+   which distributions were successfully processed (or not) and
+   whether they've been parsed or executed.
+
+ - Made the paths to Makefile.PL, Build.PL and MANIFEST
+   absolute to avoid misleading paths when not in the directory
+   that has been passed as argument to make2build.
+
+ - Adjusted the debugging output to be shown for all parseable
+   distributions contained within the path that has been specified
+   via make2build.
+
+0.34 Sun Sep 24 13:01:42 CEST 2006
+
+ - Module::Build::Convert is now capable of doing the conversion
+   automatically for all modules within a certain directory with
+   make2build being only called once with the relative/absolute
+   path to the top-level directory provided.
+
+ - The initial converting message showing which paths have been
+   gathered for the Build.PL & Makefile.PL has been relocated
+   in order to appear before the method _exists() is being called.
+   Increases visual overview regarding which module is being
+   currently processed largely.
+
+0.33 Fri Sep 22 16:43:04 CEST 2006
+
+ - Optimized the method _exists() to output a newline in verbose
+   mode after being asked whether one wants to override an existing
+   Build.PL.
+
+ - Prohibited the method _exists() to be twice called when we reinit
+   the conversion.
+
+ - Verbose output statements contain three leading stars (***).
+
+ - The output generated when while parsing a code bit is found,
+   is now embedded within a here-doc.
+
+ - The string parsing regular expression has been improved to
+   recognize mail adresses within <>.
+
+ - Extended the code parsing regular expression for comments.
+
+0.32 Thu Sep 21 21:32:27 CEST 2006
+
+ - Improved the debugging visual output for the parsing process.
+   Removed the usage of *empty* for missing values.
+
+ - "Press [enter] to continue" will be displayed after each string,
+   array or hash processed.
+
+0.31 Thu Sep 21 13:49:07 CEST 2006
+
+ - Modified the string parsing regular expression to not match
+   whenever a { or [ appears within the current bit that's parsed.
+
+ - The debugging output is now contained within here-docs.
+
+ - Added '' / [] / {} to the appropriate debugging descriptions 
+  (string, array and hash).
+
+ - While parsing, empty values of either a string, array or hash 
+   will be substituted with *empty*.
+
+ - Extended the _exists() method to ask whether the Build.PL
+   should be overwritten in case the option "Dont_Overwrite_Auto"
+   is activated; will continue normally if disabled.
+
+ - The initial note created by Module::Build::Compat will be
+   munged.
+
+0.30 Sat Jun 17 21:39:33 CEST 2006
+
+ - Extended t/convert.t to mark defaulted arguments to be inserted
+   as such.
+
+0.29 Thu May  4 22:52:46 CEST 2006
+
+ - Added $class variable to constructor new() which is filled with
+   the dereferenced $self if $self is a ref or solely $self otherwise.
+
+0.28 Wed Apr 26 22:08:27 CEST 2006
+
+ - Added method _exists() which conditionally checks for a preexisting
+   Build.PL and will warn & exit (die) if it finds one. May be disabled
+   by supplying the argument 'Dont_Overwrite' with a negative value to
+   the object constructor new().
+
+ - The status message output in the method _makefile_ok() when a Build.PL
+   is missing has been simplified to appreciate absolute paths correctly.
+
+0.27 Thu Apr 20 17:17:59 CEST 2006
+
+ - Included convert.t which has been previously (v.0.26) omitted.
+
+0.26 Thu Apr 20 00:22:46 CEST 2006
+
+ - The test suite has been extented to include convert.t which
+   tests for a basic makeargs conversion with all currently enlisted
+   arguments in the conversion table. The won thereof build args are
+   also subject to sane type [SCALAR, ARRAY, HASH] detection.
+
+0.25_01 Tue Feb 21 00:51:57 CET 2006
+
+ - The regular expressions of importance to the parsing process
+   have been visually reformatted with the /x modifier to be more
+   readable & fit in nicely to separate strings - use is made
+   thereof for string, array and hash detection.
+
+0.25 Tue Feb 14 17:33:46 CET 2006
+
+ - The create_makefile_pl default argument has been changed from
+   creating a passthrough Makefile.PL to write a traditional style
+   Makefile.PL instead.
+
+ - $self->{Config}{reloaded} renamed to $self->{Config}{reinit}.
+
+0.24 Sun Jan 29 21:49:32 CET 2006
+
+ - If parsing the Makefile.PL doesn't succeed entirely and
+   the 'process' starts looping endlessly, the "execute the
+   Makefile.PL" mode - available via commandline switch or
+   parameter to new() - will be activated by setting the according
+   $self->{Config}{} flag and jumping back to convert() will run
+   the complete converting procedure again.
+
+ - _compose_header() adds the use (strict|warnings);
+   pragmas, which are defined hardcoded for now, to the top of
+   the Build.PL written after having ensured that no previous
+   occurences of these pragmas could be found in the Makefile.PL.
+
+0.22 Tue Nov 15 12:29:09 CET 2005
+
+ - The default arguments 'build_requires', 'recommends' and
+   'conflicts' are excluded from being written to Build.PL
+   by default.
+
+0.21_01 Thu Nov 3 21:54:29 CET 2005
+
+ - _compose_header() has been made more consistent in adding
+   newlines in an adequate manner to the header composed.
+
+0.21 Tue Nov 1 21:42:10 CET 2005
+
+ - Moved the package Make::Build::Convert to the namespace
+   Module::Build to disambiguate its uses.
+
+0.20_07 Sun Oct 30 18:10:09 CET 2005
+
+ - To avoid that global scalars are "polluted" by running
+   "do 'Makefile.PL'", they're copied by _save_globals() and
+   restored through _restore_globals().
+
+0.20_05 Thu Oct 27 20:36:47 CEST 2005
+
+ - Polished some of the parsing code up to the extent that
+   it is able to recognize and process standalone comments properly.
+
+ - A trailing comment of a MakeMaker argument entry is appended
+   to the Module::Build equivalent for all type variants.
+
+ - Some unnecessary newlines are removed while composing
+   the header of a Build.PL.
+
+0.20_04 Sun Oct 23 14:51:30 CEST 2005
+
+ - _compose_header() rearranges the placement of the shebang,
+   line, comments, use/require statements should they appear
+   within the Makefile.PL in order to fit in nicely with the
+   default Build.PL code. The use/require ExtUtils::MakeMaker
+   statement will be removed as it becomes unneeded.
+
+0.20_03 2005/10/21
+
+ - Statically parsing the Makefile.PL as the method to
+   "receive" MakeMaker arguments, supersedes the previous
+   known "do 'Makefile.PL'" evaluation.
+
+ - _parse_args() has been added that acts as de-facto
+   replacement of _run_makefile() . Scalar, array and hash
+   arguments will be extracted by parsing the Makefile
+   string; code chunks are processed in a separate branch.
+
+ - A warning is emitted if WriteMakefile() takes indirect
+   arguments via a hash.
+
+0.20_02 2005/10/18
+
+ - The necessary subs to write and parse the contents of a
+   RC-file have been added.
+
+ - Further MakeMaker arguments to be converted includes
+   the Module::Build equivalents: PL_files, pm_files,
+   pod_files, xs_files, include_dirs, meta_add.
+
+ - Usage and version output in make2build is being embedded
+   to subs.
+
+ - The unintentional space preceeding filenames in MANIFEST
+   issue has been resolved.
+
+0.20 2005/10/15
+
+ - Conversion from script to object-oriented module.
+
+0.19 2005/10/13
+
+ - The obligatory usage screen and according switches have
+   been introduced.
+
+ - The verbosity output has been extended to mention the
+   overriding of arguments and arguments that are classified
+   as unknown to the user while conversion is in charge.
+
+ - sort_args() is able to distinguish whether the native
+   sorting order should be preserved or the default one
+   used instead.
+
+ - do_verbose() outputs based on verbosity levels.
+
+0.18_02 2005/10/12
+
+ - Test failures have been fixed.
+
+ - The code chunk that cleaned args of unneeded whitespace
+   has been replaced with a ?{} construct.
+
+ - Commas are added to enclosing brackets.
+
+0.18 2005/09/28
+
+ - The conversion & interpretation of arguments which
+   specify temporary files for removement has been implemented.
+   [Nathan Gray, kolibrie@graystudios.org]
+
+ - Array argument conversion has been integrated with included
+   string to elements conversion, when necessary.
+
+0.17 2005/03/07
+
+ - Added recommends, build_requires, conflicts, pm_files,
+   extra_compiler_flags, sign, dist_abstract, dist_author
+   to conversion table.
+
+0.16 2005/03/06
+
+ - A notice is placed in the created Build.PL, indicating
+   that it was created by make2build.
+
+0.12 2004/02/23
+
+ - ExtUtils::MakeMaker arguments DISTNAME, VERSION, VERSION_FROM,
+   are converted and output sorted.
+
+ - Default value of the license argument has been replaced
+   with 'unknown'.
+
+0.11 2004/02/22
+
+ - Documentation has been largely extended.
+
+0.07 2004/02/19
+
+ - Redundant, unneeded code removed.
+
+0.01 2004/02/09
+
+ - Initial version.

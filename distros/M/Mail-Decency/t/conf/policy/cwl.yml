@@ -1,0 +1,13 @@
+---
+
+disable: 0
+
+# enable negative cache
+use_negative_cache: 1
+
+# enable all tables
+tables:
+    - ips
+    - domains
+    - addresses
+

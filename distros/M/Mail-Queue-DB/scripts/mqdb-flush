@@ -1,0 +1,133 @@
+#!/usr/bin/perl -w
+#
+#   mqdb-flush - part of the Mail::Queue::DB suite
+#
+#   Copyright (C) 2004  S. Zachariah Sprackett <zacs@cpan.org>
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+=head1 NAME
+
+mqdb-flush - part of the Mail::Queue::Database suite
+
+=head1 SYNOPSIS
+
+mqdb-flush -m mailhost [-v]
+
+=head1 DESCRIPTION
+
+mqdb-flush flushes mail to the mailhost specified by the -m option.  The
+-v switch can be used to increase the verbosity level.
+
+mqdb-flush honours the following environment variables:
+
+=head2 MQDB_DB
+
+The location of the Berkely database file used to store the outgoing mail
+queue.  Defaults to $HOME/.mqdb_email.db
+
+=head2 MQDB_SSH
+
+The location of the SSH binary used to run the remote mail command.  Defaults
+to /usr/bin/ssh
+
+=head2 MQDB_MAILCMD
+
+The location of the sendmail binary used to send mail on the remote mail host.
+Defaults to /usr/bin/sendmail
+
+=cut
+
+use strict;
+use Mail::Queue::Database;
+use Getopt::Std;
+
+my ($file, $ssh_cmd, $sendmail_cmd, %opts);
+getopts('hm:v',\%opts);
+
+if ($opts{h}) {
+	HELP_MESSAGE();
+	exit(0);
+}
+if (!$opts{m}) {
+	HELP_MESSAGE();
+	exit(1);
+}
+
+if (exists $ENV{MQDB_DB}) {
+	$file = $ENV{MQDB_DB};
+} else {
+	$file = $ENV{HOME} . "/.mqdb_email.db";
+}
+
+if (exists $ENV{MQDB_SSH}) {
+	$ssh_cmd = $ENV{MQDB_SSH};
+} else {
+	$ssh_cmd = '/usr/bin/ssh -T';
+}
+
+if (exists $ENV{MQDB_MAILCMD}) {
+	$sendmail_cmd = $ENV{MQDB_MAILCMD};
+} else {
+	$sendmail_cmd = '/usr/sbin/sendmail';
+}
+
+
+my $z = new Mail::Queue::DB(db_file => $file);
+my $outgoing = $z->count_queue();
+
+print "$outgoing messages awaiting delivery.\n" if $opts{v};
+$z->iterate_queue(\&send_msg, 'write');
+
+sub send_msg 
+{
+	my ($id, $args, $msg) = @_;
+
+	print "Writing message id $id.\n" if $opts{v};
+	open(WTR, "|$ssh_cmd " . $opts{m} . " $sendmail_cmd $args")
+		|| die "Unable to open $ssh_cmd.\n";
+	print WTR $msg;
+	close WTR;
+
+	if ($? eq 0) {
+		$z->dequeue_mail($id, 1);
+	} else {
+		die "Sending message $id failed with RC $?.\n";
+	}
+}
+
+sub HELP_MESSAGE
+{
+	print "Usage $0: -m <mailhost> [-v]\n";
+}
+
+__END__
+
+=head1 AUTHOR
+
+S. Zachariah Sprackett <zacs@cpan.org>
+
+=head1 COPYRIGHT
+
+(C) Copyright 2004, S. Zachariah Sprackett <zacs@cpan.org>
+
+Distributed under the terms of the GPL version 2 or later.
+
+=head1 SEE ALSO
+
+L<Mail::Queue::DB>, L<mqdb-sendmail>, L<mqdb-list>, L<mqdb-rm>
+
+=cut

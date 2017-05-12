@@ -1,0 +1,76 @@
+2.000     2015-09-14 02:23:55+01:00 Europe/London
+	No new features.
+
+	Marking dev version as stable.
+
+1.999_002 2015-08-10 01:22:34+01:00 Europe/London (TRIAL RELEASE)
+	No new features.
+
+	Tests:
+	* Include t/moose-role.t, which uses MooseX::MarkAsMethods to populate
+	a Moose role. Note that passing autoclean => 1 means the ->mark_as_methods
+	call would need to be wrapped in a BEGIN block or similar.
+
+1.999_001 2015-08-09 22:43:51+01:00 Europe/London (TRIAL RELEASE)
+	Features:
+	* Mixin::Event::Dispatch::Methods for importing without inheriting
+	* Removed mention of ->trace_events_for, this was removed a while ago
+	due to performance issues anyway
+
+1.006     2014-08-17 09:35:37+01:00 Europe/London
+	Features:
+	* Provide Mixin::Event::Dispatch::Bus so that other modules don't have to
+	include their own bus (empty class with constructor that inherits from
+	M::E::D)
+
+1.005     2014-08-09 10:55:28+01:00 Europe/London
+	No new features
+
+	Dependency fixes:
+	* Remove unused Try::Tiny dep
+
+1.004     2013-09-28 20:09:45 Europe/London
+	No new features
+
+	Test fixes:
+	* Updated dzil Test::Compile plugin for win32 issue (RT88783)
+
+1.003     2013-09-10 17:37:27 Europe/London
+	No new features
+	
+	Dependency fixes:
+	* Test::CheckDeps removed - seems that Module::Build::Tiny doesn't play nicely
+	with .deb/.rpm packaging systems, since this is only used for testing have
+	removed for the moment.
+
+1.002     2013-09-08 18:17:17 Europe/London
+	No new features
+	
+	Bug fixes:
+	* method chaining to a separate Mixin::Event::Dispatch fixed
+
+1.001     2013-08-11 11:50:10 Europe/London
+	No new features
+	
+	Bug fixes:
+	* unsubscribe_from_event was clearing all handlers for the given event,
+	rather than just the ones matching the requested coderef.
+
+1.000     2012-09-22 11:52:51 Europe/London
+	Provide Mixin::Event::Dispatch::Event class and a more advanced observer
+	model via subscribe_to_event / unsubscribe_from_event.
+
+0.004     2012-01-08 07:04:56 Europe/London
+	Require a version of Test::More providing new_ok.
+
+0.003     2011-07-05 18:22:39 Europe/London
+	Check for PadWalker - without it, cycle tests fail
+
+0.002     2011-07-05 07:15:51 Europe/London
+	Add missing dependency on parent.pm for tests
+	Rename event_stack to event_handlers since the original name was misleading (thanks mst)
+	Fix typo in synopsis
+	Add note about roles
+
+0.001     2011-07-02 21:44:07 Europe/London
+	Initial version.

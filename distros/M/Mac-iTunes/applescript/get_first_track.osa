@@ -1,0 +1,10 @@
+(* $Id$ *)
+
+tell application "iTunes"
+	set myFS to alias "Otter:Users:brian:Dev:MacOSX:iTunes:mp3:The_Wee_Kirkcudbright_Centipede.mp3"
+	set myFile to "Otter:Users:brian:Dev:MacOSX:iTunes:mp3:The_Wee_Kirkcudbright_Centipede.mp3"
+	set myList to "Mac-iTunes test"
+	
+	set myCount to the count of every track in myList whose file is myFile
+	return myCount
+end tell

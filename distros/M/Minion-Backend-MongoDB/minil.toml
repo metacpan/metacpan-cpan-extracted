@@ -1,0 +1,6 @@
+name = "Minion-Backend-MongoDB"
+badges = ["travis"]
+authority="cpan:AVKHOZOV"
+
+module_maker="ModuleBuildTiny"
+

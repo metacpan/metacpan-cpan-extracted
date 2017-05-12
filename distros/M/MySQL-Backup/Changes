@@ -1,0 +1,19 @@
+Revision history for Perl extension MySQL::Backup.
+
+0.01  Tue Dec 28 02:14:02 2004
+	- original version; created by h2xs 1.23 with options
+		-XA -n Mysql::Backup
+
+0.02 Thu Jan 14 02:51:07 2005
+       - small corrections in the code
+
+0.03 Sun Apr 17 01:22:09 2006
+       - Corrections for index parsing. Thanks for Dree <dree@perl.it> for his comments on previous version.
+       - accepting of backuping only needed tables: my $mb = new MySQL::Backup('perldesk','127.0.0.1','user','password',{tables => [perlDesk_calls, perlDesk_users]});
+       - accepting few additional params, also..
+       - added support of MySQL5: problems with reserved words fixed
+       - added function for restore and upgrade DB from file
+
+0.04 Wen Sep 17 00:05:39 2007
+       - fixed test on install
+

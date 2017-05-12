@@ -1,0 +1,13 @@
+==============================
+
+  PDL::Meschach
+
+==============================
+
+PDL::Meschach links PDL to the matrix library meschach 1.2, 
+by David E. Stewart (david.stewart@anu.edu.au) and Zbigniew Leyk
+(zbigniew.leyk@anu.edu.au).
+
+Requirements: PDL1.00, perl5.003
+
+Etienne Grossmann, 11/11/1996 [etienne@isr.ist.utl.pt]

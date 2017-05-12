@@ -1,0 +1,122 @@
+NAME
+    Mac::iPhoto::Exif - Write iPhoto meta data to Exif
+
+SYNOPSIS
+     console$ iphoto2exif --directory /data/photo/2010/summer_vacation
+
+    or
+
+     use Mac::iPhoto::Exif;
+     my $iphotoexif = Mac::iPhoto::Exif->new(
+        directory   => '/data/photo/2010/summer_vacation'
+     );
+     $iphotoexif->run;
+
+DESCRIPTION
+    This module write meta data from the iPhoto database like keywords, geo
+    locations, comments, ratings and faces to the pictures Exif data.
+
+    The following exif tags are being used:
+
+    *   PersonInImage
+
+    *   Keywords
+
+    *   UserComment
+
+    *   Rating
+
+    *   GPSLatitude, GPSLongitude, GPSLatitudeRef, GPSLongitudeRef
+
+    *   Rating
+
+ACCESSORS
+  directory
+    Limit operation to one or more directories.
+
+    ArrayRef of Path::Class::Dir
+
+  exclude
+    Exclude one or more directories.
+
+    ArrayRef of Path::Class::Dir
+
+  iphoto_album
+    Path to the iPhoto AlbumData.xml database.
+
+    Path::Class::File
+
+  loglevel
+    Be more/less verbose.
+
+    Accepted loglevels are : debug, info, warn and error
+
+    Default: info
+
+  changetime
+    Change file create time according to exif timestamps
+
+    Default: true
+
+  backup
+    Backup changed files
+
+    Default: false
+
+  dryrun
+    Do not alter files, just log actions
+
+    Default: false
+
+METHODS
+  parse_album
+    Return the iPhoto album as a XML::LibXml::Doc object
+
+  run
+    Run the iPhoto to Exif conversion
+
+  log
+    Log message
+
+DISCLAIMER
+    This module has been extensively tested on my machine (OSX 10.6.6,
+    iPhoto 9.1.1) and deemed to work correctly. However I do not guarantee
+    that it will work correctly on any other machine/setup. So make sure
+    that you have backups of your valualble pictures before running this
+    program!
+
+    THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+    PERFORMANCE OF THE SOFTWARE IS WITH YOU.
+
+    IN NO EVENT WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY
+    AND/OR REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+    LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+    OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE.
+
+SUPPORT
+    Please report any bugs or feature requests to
+    "mac-iphoto-exif@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/Public/Bug/Report.html?Queue=Mac::iPhoto::Exif>. I
+    will be notified and then you'll automatically be notified of the
+    progress on your report as I make changes.
+
+AUTHOR
+        Maroš Kollár
+        CPAN ID: MAROS
+        maros [at] k-1.com
+    
+        L<http://www.k-1.com>
+
+COPYRIGHT & LICENSE
+    Mac::iPhoto::Exif is Copyright (c) 2009, Maroš Kollár -
+    <http://www.k-1.com>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

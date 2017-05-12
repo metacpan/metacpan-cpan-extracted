@@ -1,0 +1,353 @@
+NAME
+    Mail::Log::Trace - Trace an email through the mailsystem logs.
+
+SYNOPSIS
+      use Mail::Log::Trace;
+      
+  my $tracer = Mail::Log::Trace::SUBCLASS->new({log_file => 'path/to/log'});
+      $tracer->set_message_id('message_id');
+      $tracer->find_message();
+      my $from_address = $tracer->get_from_address();
+      
+  etc.
+
+DESCRIPTION
+    This is the root-level class for a mail tracer: It allows you to search
+    for and find messages in maillogs. Accessors are provided for info
+    common to most maillogs: Specific subclasses may have further accessors
+    depending on their situation.
+
+    Probably the two methods most commonly used (and sort of the point of
+    this module) are "find_message" and "find_message_info". Both are simply
+    stubs for subclasses to implement: The first is defined to find the
+    first (or first from current location...) mention of the specified
+    message in the log. Depending on the log format that may or may not be
+    the only mention, and there may be information missing/incomplete at
+    that point.
+
+    "find_message_info" should find *all* information about a specific
+    message in the log. (Well, all information about a specific instance of
+    the message: If there are multiple messages that would match the info
+    provided it must find info on the first found.) That may mean searching
+    through the log for other information.
+
+    If you just need to find if the message exists, use "find_message": it
+    will be faster (or at the least, the same speed. It should never be
+    slower.)
+
+USAGE
+    This is a an object-orientend module, with specific methods documented
+    below.
+
+    The string coersion is overloaded to return the class name, and the file
+    we are working with. Boolean currently checks to see if we were able to
+    open the file. (Which is kinda silly, as we'd throw an error if we
+    couldn't.)
+
+    All times are expected to be in Unix epoc-time format.
+
+  new (constructor)
+    The base constructor for the Mail::Log::Trace classes. It takes inital
+    values for the following in a hash: "from_address", "to_address",
+    "message_id", "log_file". The only required value is the path to the
+    logfile.
+
+      use Mail::Log::Trace;
+      my $object = Mail::Log::Trace->new({ from_address => 'from@example.com',
+                                           to_address   => 'to@example.com',
+                                           message_id   => 'messg.id.string',
+                                           log_file     => 'path/to/log',
+                                           ...
+                                          });
+
+  SETTERS
+   set_from_address
+    Sets the from address of the message we are looking for.
+
+   set_message_id
+    Sets the message_id of the message we are looking for. (Check with the
+    specific parser class for what that means in a particular log format.)
+
+   set_recieved_time
+    Sets the recieved time of the message we are looking for. (The time this
+    machine got the message.)
+
+   set_sent_time
+    Sets the sent time of the message we are looking for. (The time this
+    machine sent the message.)
+
+   set_relay_host
+    Sets the relay host of the message we are looking for. Commonly either
+    the relay we recieved it from, or the relay we sent it to. (Depending on
+    the logfile.)
+
+   set_subject
+    Sets the subject of the message we are looking for.
+
+   set_parser_class
+    Sets the parser class to use when searching the log file. A subclass
+    will have a 'default' parser that it will normally use: This is to allow
+    easy site-specific logfile formats based on more common formats. To use
+    you would subclass the default parser for the log file format of the
+    base program to handle the site's specific changes.
+
+    Takes the name of a class as a string, and will throw an exception
+    ("Mail::Log::Exceptions::InvalidParameter") if that class name doesn't
+    start with Mail::Log::Parse.
+
+   set_log
+    Sets the log file we are searching throuh. Takes a full or relative
+    path. If it doesn't exist, or can't be read by the current user, it will
+    throw an exception. ("Mail::Log::Exceptions::LogFile") Note that it does
+    *not* try to open it immedeately. That will be done at first attempt to
+    read from the logfile.
+
+   set_to_address
+    Sets the to address of the message we are looking for. Multiple
+    addresses can be specified, they will all be added, with duplicates
+    skipped. This method completely clears the array: there will be no
+    addresses in the list except those given to it. Duplicates will be
+    consolidated: Only one of any particular address will be in the final
+    array.
+
+    As a special case, passing "undef" to this will set the array to undef.
+
+   add_to_address
+    Adds to the list of to addresses we are looking for. It does *not*
+    delete the array first.
+
+    Duplicates will be consolidated, so that the array will only have one of
+    any given address. (No matter the order they are given in.)
+
+   remove_to_address
+    Removes a single to address from the array.
+
+  GETTERS
+   get_from_address
+    Gets the from address. (Either as set using the setter, or as found in
+    the log.)
+
+   get_to_address
+    Gets the to address array. (Either as set using the setters, or as found
+    in the log.)
+
+    Will return a reference to an array, or 'undef' if the to address has
+    not been set/found.
+
+   get_message_id
+    Gets the message_id. (Either as set using the setter, or as found in the
+    log.)
+
+   get_subject
+    Gets the message subject. (Either as set using the setter, or as found
+    in the log.)
+
+   get_recieved_time
+    Gets the recieved time. (Either as set using the setter, or as found in
+    the log.)
+
+   get_sent_time
+    Gets the sent time. (Either as set using the setter, or as found in the
+    log.)
+
+   get_relay_host
+    Gets the relay host. (Either as set using the setter, or as found in the
+    log.)
+
+   get_log
+    Returns the path to the logfile we are reading.
+
+   get_connect_time
+    Returns the time the remote host connected to this host to send the
+    message.
+
+   get_disconnect_time
+    Returns the time the remote host disconnected from this host after
+    sending the message.
+
+   get_delay
+    Returns the total delay in this stage in processing the message.
+
+   get_all_info
+    Returns message info as returned from the parser, for more
+    direct/complete access.
+
+    (It's probably a good idea to avoid using this, but it is useful and
+    arguably needed under certain circumstances.)
+
+  Utility subroutines
+   clear_message_info
+    Clears *all* known information on the current message, but not on the
+    log.
+
+    Use to start searching for a new message.
+
+   find_message
+    Finds the first/next occurance of a message in the log. Can be passed
+    any of the above information in a hash format.
+
+    Default is to search *forward* in the log: If you have already done a
+    search, this will start searching where the previous search ended. To
+    start over at the beginning of the logfile, set "from_start" as true in
+    the parameter hash.
+
+    This method needs to be overridden by the subclass: by default it will
+    throw an "Mail::Log::Exceptions::Unimplemented" error.
+
+   find_message_info
+    Finds as much information as possible about a specific occurance of a
+    message in the logfile. Acts much the same as find_message, other than
+    the fact that once it finds a message it will do any searching necarry
+    to find all information on that message connection.
+
+    (Also needs to be implemented by subclasses.)
+
+SUBCLASSING
+    There are two ways to subclass Mail::Log::Trace: The standard way, and
+    the automatic way. The old way is fairly straightforward: You create the
+    accessors for all the subclass-specific information, and overide
+    "find_message", "find_message_info", and "_parse_args". (Making sure for
+    "_parse_args" that you call the SUPER version.)
+
+    Or you can try to let Mail::Log::Trace do as much of that as possible,
+    and only do "find_message" and "find_message_info".
+
+    To do the latter, you need to override several of the following list of
+    methods:
+
+      _requested_public_accessors
+      _requested_public_set_only
+      _requested_public_get_only
+      _requested_array_accessors
+      _requested_special_accessors
+      _requested_cleared_parameters
+      _set_as_message_info
+
+    That looks like a long list, but it is very rare that you'll need to
+    override all of them, and all they need to do is return a static list of
+    keys that you want the relevant action taken on.
+
+    The first five build accessors for you, of the form "get_$key",
+    "set_$key" for standard public, "_get_$key" and "_set_key" for private
+    accessors (note that if you request a private setter, you'll also get a
+    *public* getter, and vice-versa), and "get_$key", "set_$key", "add_$key"
+    and "remove_$key" for keys which store arrays. All of these have been
+    heavily optimised for speed.
+
+    The last two set what keys are cleared when you call
+    "clear_message_info" and what keys will be checked when "_parse_args" is
+    called. (If none of those are present, an exception will be thrown,
+    saying there is no message-specific data.)
+
+    "_requested_special_accessors" requires a little more discussion. Unlike
+    the rest, it expects not an array, but a hash (not a hashref: a hash).
+    The keys of the hash are the keys that will have accessors built for
+    them (public, single, only), and the values are code references to
+    parsing/validation functions.
+
+    An example:
+
+      sub _requested_special_accessors { 
+          return ( year => sub {  my ($self, $year) = @_;
+                                  return '____INVALID__VALUE____' if $year < 1970;
+                                  my $maillog = $self->_get_log_parser();
+                                  if (defined($maillog)) {
+                                      $maillog->set_year($year);
+                                  }
+                                  return $year;
+                               },
+                  );
+      };
+
+    The above is from Mail::Log::Trace::Postfix, and is for the key 'year'.
+    The coderef in this case does both validation and some extra action. The
+    action is to call "$self-"_get_log_parser()->set_year()> on the year
+    being passed. (Because in this case the parser needs to have the year to
+    return info correctly.) The validation is to check to make sure the year
+    is greater than 1970. (The birth of UNIX, so we are unlikey to handle
+    any logs earlier than that.) If it is not, the special value
+    "____INVALID__VALUE____" is returned. This will cause an exception to be
+    thrown. If the value is valid, it is returned.
+
+    The purpose of all the above is to allow subclasses to check values, do
+    any parsing that is needed, and to any other actions that may be needed.
+    (This is in contrast to the normal accessors, which just store the value
+    given blindly.)
+
+    Note that "undef" should always be considered a valid value.
+
+    Normally keys should be in the 'public_accessors' list: those accessors
+    are much faster.
+
+    These accessors are built at *run time*, when the object is first
+    created. This means object creation is fairly expensive.
+
+    Of course, you still need to write "find_message" and
+    "find_message_info"...
+
+    Mail::Log::Trace is a cached inside-out object. If you don't know what
+    that means, you can probably ignore it. However if you need to store
+    object state data (and aren't using the convience accessors), it may be
+    useful to know that "$$self == refaddr $self".
+
+UTILITY SUBROUTINES
+    THESE ARE ONLY FOR USE BY SUBCLASSES
+
+    There are a few subroutines especially for use by subclasses.
+
+  _set_message_raw_info
+    Give this the raw message info, in whatever format the parser gives it.
+    The user should hopefully never want it, but just in case...
+
+  _set_log_parser
+    Sets the log parser. Takes a reference to a parser object.
+
+  _get_log_parser
+    Returns the log parser object.
+
+  _get_parser_class
+    Returns the name of the class the user wants you to use to parse the
+    file.
+
+    Please take it under advisement.
+
+BUGS
+    None known at the moment... (I am nervious about the way I'm storing
+    some of these coderefs. So far I haven't run into problems, but I'm not
+    entirely sure there aren't any. If you start getting weird behaviour
+    when using multiple Mail::Log::Trace subclasses at once, please tell
+    me.)
+
+REQUIRES
+    Scalar::Util, Mail::Log::Exceptions.
+
+    Some subclass, and probably a Mail::Log::Parse class to be useful.
+
+HISTORY
+    1.1.1 Feb 2, 2009 - Fixed a minor issue that could cause problems with
+    multiple subclass objects exisiting at the same time.
+
+    1.1.0 Dec 23, 2008 - Major re-write to make subclassing easier. Or
+    possibly more confusing.
+
+    1.00.03 Dec 5, 2208 - Licence clarification.
+
+    1.00.02 Dec 2, 2008 - I really mean it this time.
+
+    1.00.01 Dec 1, 2008 - Requirements fix, no code changes.
+
+    1.00.00 Nov 28, 2008 - original version.
+
+AUTHOR
+        Daniel T. Staal
+        CPAN ID: DSTAAL
+        dstaal@usa.net
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    This copyright will expire in 30 years, or five years after the author's
+    death, whichever occurs last, at which time the code be released to the
+    public domain.
+

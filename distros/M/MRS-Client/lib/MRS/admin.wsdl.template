@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://mrs.cmbi.ru.nl/mrsws/admin" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns="http://mrs.cmbi.ru.nl/mrsws/admin" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+ <wsdl:types>
+  <xsd:schema targetNamespace="http://mrs.cmbi.ru.nl/mrsws/admin" xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+   <xsd:element name="GetMakeStatus">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="file" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="GetMakeStatusResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="response" type="ns:MakeStatusInfo" minOccurs="0" maxOccurs="unbounded"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="GetParserScript">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="script" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="format" type="ns:ParserScriptFormat" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="GetParserScriptResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="response" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="GetUpdateLog">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="logKind" type="ns:LogFileKind" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="age" type="xsd:unsignedInt" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="GetUpdateLogResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="response" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="GetUpdateStatus">
+    <xsd:complexType>
+     <xsd:sequence/>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="GetUpdateStatusResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="response" type="ns:UpdateStatusInfo" minOccurs="0" maxOccurs="unbounded"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:simpleType name="LogFileKind">
+    <xsd:restriction base="xsd:string">
+     <xsd:enumeration value="fetch"/>
+     <xsd:enumeration value="build"/>
+    </xsd:restriction>
+   </xsd:simpleType>
+   <xsd:simpleType name="MakeStatus">
+    <xsd:restriction base="xsd:string">
+     <xsd:enumeration value="ready"/>
+     <xsd:enumeration value="parsing"/>
+     <xsd:enumeration value="creatingindex"/>
+     <xsd:enumeration value="writingindex"/>
+     <xsd:enumeration value="creatingdictionary"/>
+     <xsd:enumeration value="error"/>
+    </xsd:restriction>
+   </xsd:simpleType>
+   <xsd:complexType name="MakeStatusInfo">
+    <xsd:sequence>
+     <xsd:element name="file" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="status" type="ns:MakeStatus" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="progress" type="xsd:float" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="message" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+    </xsd:sequence>
+   </xsd:complexType>
+   <xsd:simpleType name="ParserScriptFormat">
+    <xsd:restriction base="xsd:string">
+     <xsd:enumeration value="plain"/>
+     <xsd:enumeration value="html"/>
+    </xsd:restriction>
+   </xsd:simpleType>
+   <xsd:element name="SetMakeStatus">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="file" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="status" type="ns:MakeStatus" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="progress" type="xsd:float" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="message" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="SetMakeStatusResponse">
+    <xsd:complexType>
+     <xsd:sequence>
+      <xsd:element name="response" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+     </xsd:sequence>
+    </xsd:complexType>
+   </xsd:element>
+   <xsd:complexType name="UpdateStatusInfo">
+    <xsd:sequence>
+     <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="fetchDate" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="fetching" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="buildDate" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="building" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+     <xsd:element name="failed" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+    </xsd:sequence>
+   </xsd:complexType>
+  </xsd:schema>
+ </wsdl:types>
+ <wsdl:message name="GetMakeStatusRequestMessage">
+  <wsdl:part name="parameters" element="ns:GetMakeStatus"/>
+ </wsdl:message>
+ <wsdl:message name="GetMakeStatusResponseMessage">
+  <wsdl:part name="parameters" element="ns:GetMakeStatusResponse"/>
+ </wsdl:message>
+ <wsdl:message name="GetParserScriptRequestMessage">
+  <wsdl:part name="parameters" element="ns:GetParserScript"/>
+ </wsdl:message>
+ <wsdl:message name="GetParserScriptResponseMessage">
+  <wsdl:part name="parameters" element="ns:GetParserScriptResponse"/>
+ </wsdl:message>
+ <wsdl:message name="GetUpdateLogRequestMessage">
+  <wsdl:part name="parameters" element="ns:GetUpdateLog"/>
+ </wsdl:message>
+ <wsdl:message name="GetUpdateLogResponseMessage">
+  <wsdl:part name="parameters" element="ns:GetUpdateLogResponse"/>
+ </wsdl:message>
+ <wsdl:message name="GetUpdateStatusRequestMessage">
+  <wsdl:part name="parameters" element="ns:GetUpdateStatus"/>
+ </wsdl:message>
+ <wsdl:message name="GetUpdateStatusResponseMessage">
+  <wsdl:part name="parameters" element="ns:GetUpdateStatusResponse"/>
+ </wsdl:message>
+ <wsdl:message name="SetMakeStatusRequestMessage">
+  <wsdl:part name="parameters" element="ns:SetMakeStatus"/>
+ </wsdl:message>
+ <wsdl:message name="SetMakeStatusResponseMessage">
+  <wsdl:part name="parameters" element="ns:SetMakeStatusResponse"/>
+ </wsdl:message>
+ <wsdl:portType name="mrsws_adminPortType">
+  <wsdl:operation name="GetUpdateStatus">
+   <wsdl:input message="ns:GetUpdateStatusRequestMessage"/>
+   <wsdl:output message="ns:GetUpdateStatusResponseMessage"/>
+  </wsdl:operation>
+  <wsdl:operation name="GetUpdateLog">
+   <wsdl:input message="ns:GetUpdateLogRequestMessage"/>
+   <wsdl:output message="ns:GetUpdateLogResponseMessage"/>
+  </wsdl:operation>
+  <wsdl:operation name="SetMakeStatus">
+   <wsdl:input message="ns:SetMakeStatusRequestMessage"/>
+   <wsdl:output message="ns:SetMakeStatusResponseMessage"/>
+  </wsdl:operation>
+  <wsdl:operation name="GetMakeStatus">
+   <wsdl:input message="ns:GetMakeStatusRequestMessage"/>
+   <wsdl:output message="ns:GetMakeStatusResponseMessage"/>
+  </wsdl:operation>
+  <wsdl:operation name="GetParserScript">
+   <wsdl:input message="ns:GetParserScriptRequestMessage"/>
+   <wsdl:output message="ns:GetParserScriptResponseMessage"/>
+  </wsdl:operation>
+ </wsdl:portType>
+ <wsdl:binding name="mrsws_admin" type="ns:mrsws_adminPortType">
+  <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+  <wsdl:operation name="GetUpdateStatus">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="GetUpdateLog">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="SetMakeStatus">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="GetMakeStatus">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+  <wsdl:operation name="GetParserScript">
+   <wsdl:input>
+    <soap:body use="literal"/>
+   </wsdl:input>
+   <wsdl:output>
+    <soap:body use="literal"/>
+   </wsdl:output>
+  </wsdl:operation>
+ </wsdl:binding>
+ <wsdl:service name="${SERVICE}">
+  <wsdl:port name="mrsws_admin" binding="ns:mrsws_admin">
+   <soap:address location="${LOCATION}"/>
+  </wsdl:port>
+ </wsdl:service>
+</wsdl:definitions>

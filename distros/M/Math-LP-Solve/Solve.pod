@@ -1,0 +1,255 @@
+=head1 NAME
+
+Math::LP::Solve - perl wrapper for the lp_solve linear program solver 
+
+=head1 SYNOPSIS
+
+  use Math::LP::Solve qw(:ALL); # imports all functions and variables
+
+  # construct an LP with 0 initial constraints and 2 variables
+  $lp = make_lp(0,2);
+
+  # add the constraint x1 + 2 x2 <= 3
+  $coeffs = ptrcreate('double',0.0,2); # mallocs a C array
+  ptrset($coeffs,1.0,0);
+  ptrset($coeffs,2.0,1);
+  add_constraint($lp,$coeffs,$LE,3);
+  ptrfree($coeffs); # frees the C array
+
+  # set the objective function to x1+x2 and solve for a maximum  
+  $obj = ptrcreate('double',1.0,2); 
+  set_obj_fn($lp,$obj);
+  ptrfree($obj);
+  set_maxim($lp);
+
+  # solve the LP
+  solve($lp) == $OPTIMAL or die "No solution found";
+  $solution = lprec_best_solution_get($lp);
+
+  # extract the results from the solution array
+  $obj_fn_val = ptrvalue($solution,0);
+  $constr_val = ptrvalue($solution,1);
+  $x1 = ptrvalue($solution,2);
+  $x2 = ptrvalue($solution,3);
+
+=head1 DESCRIPTION
+
+Math::LP::Solve is a wrapper around the freeware lp_solve library,
+which solves linear and mixed linear/integer programs. Most functions
+and data structures in the file lpkit.h of the lp_solve distribution
+are made available in the Math::LP::Solve namespace.
+
+This document does not go into the details of how to setup and
+solve a linear program using the lp_solve library. For details
+on this you are referred to the documentation included in the source
+code for lp_solve.
+
+That being said, a few details of the Perl wrappers around the underlying
+lp_solve library need explaining in order to be able to use them.
+(For those interested, the wrapping was done using SWIG, more info
+at http://www.swig.org/)
+All symbols (functions and variables) are divided into 4 categories.
+All these symbols are in the C<Math::LP::Solve> namespace and are not
+exported by default. They are however tagged so that you can easily
+import them into your own code. The following C<%EXPORT_TAGS> are available:
+
+=over 4
+
+=item ptrlib
+
+pointer library functions, needed to handle C-style arrays;
+
+=item accessors
+
+pairs of get/set functions to access data fields of structs;
+
+=item functions
+
+wrappers for lp_solve library functions;
+
+=item scalars
+
+perl scalar variables mapping C<#define>'d constants in lpkit.h.
+
+=back
+
+A 5th category named B<ALL> is available in C<%EXPORT_TAGS>, which includes all
+symbols of the 4 mentioned categories.
+
+=head2 Pointer library functions
+
+The pointer library functions are needed to pass arrays of coefficients etc.
+to and from the lp_solve functions and data structures. In the underlying
+C library, this is done using C<double*> pointers, which are not available
+in Perl. The pointer library functions provide a Perl interface to get
+around this problem.
+
+There are several pointer library functions, and they are fully explained
+in the SWIG documentation. However, the following is all you need to
+know to use them with lp_solve:
+
+=over 4
+
+=item ptrcreate($type,$initval,$size)
+
+Creates and returns a pointer to type C<$type>, which is an array with C<$size>
+fields initialized to C<$initval>. E.g. an array of 2 doubles initialized
+to zero is created with the command
+
+	$arr_double = Math::LP::Solve::ptrcreate('double',0.0,2);
+
+=item ptrset($ptr,$val,$index)
+
+sets the value of the C<$index>'th field of the array pointed to in C<$ptr>
+to the value C<$val>. E.g. the 2nd entry of an array of doubles is set to 3.14
+using
+
+	Math::LP::Solve::ptrset($arr_double,3.14,1);
+
+Note that the 1st entry is denoted by index 0, as in C.
+
+=item ptrvalue($ptr,$index)
+
+returns the C<$index>'th entry of the array pointed to in C<$ptr>.
+E.g. the 1st value of an array of doubles is requested using
+
+	$d0 = Math::LP::Solve::ptrvalue($arr_double,0);
+
+=item ptrfree($ptr)
+
+frees the memory allocated for C<$ptr>. Always do this when you are finished
+with an array you allocated yourself using ptrcreate(), or you will end up
+with memory leaks. Also, take care not to invoke ptrfree() twice on the same
+pointer if it is not re-created.
+
+=back
+
+=head2 Functions
+
+The functions have the same name as in C<lpkit.h>. Note however that C<double*>
+parameters need to be handled with the aforementioned pointer library 
+functions. The pointer library functions are not needed for the C<lprec*>
+parameters, as their creation, manipulation and freeing is completely
+covered by the C<lpkit.h> functions. E.g. an LP is created with
+
+	$lp = Math::LP::Solve::make_lp(0,0);
+
+subsequently manipulated with
+	
+	Math::LP::Solve::set_obj_fn($lp,$arr_double);
+
+and finally freed using
+	
+	Math::LP::Solve::delete_lp($lp);
+
+Some functions have been added to the ones available in C<lpkit.h>
+to ease file manipulation and handling names of rows and columns:
+
+=over 4
+
+=item lprec_lp_name_get($lp)
+
+returns the name of the LP;
+
+=item lprec_lp_name_set($lp,$name)
+
+sets the name of the LP to C<$name>;
+
+=item lprec_row_name_get($lp,$i) and lprec_col_name_get($lp,$i)
+
+returns the name of the row resp. column with index C<$i>;
+
+=item lprec_row_name_set($lp,$i,$name) and lprec_col_name_set($lp,$i,$name)
+
+sets the name of the row resp. column with index C<$i> to C<$name>;
+
+=item open_file($filename,$mode)
+
+opens the file C<$filename> with mode C<$mode>, which is specified as a
+string. Calls the C function fopen() internally;
+
+=item close_file($fh)
+
+closes a filehandle obtained with open_file().
+
+=back
+
+=head2 Constants
+
+Following constants are available in the Math::LP::Solve namespace:
+
+=over 4
+
+=item General constants
+
+C<$DEF_INFINITE>
+
+=item Constraint types
+
+C<$LE>, C<$EQ>, C<$GE> and C<$OF>
+
+=item Boolean values
+
+C<$TRUE> and C<$FALSE>
+
+=item Status values obtained from solve()
+
+C<$OPTIMAL>, C<$MILP_FAIL>, C<$INFEASIBLE>, C<$UNBOUNDED>, C<$FAILURE>
+and C<$RUNNING>
+
+=item Extra status values obtained from lag_solve()
+
+C<$FEAS_FOUND>, C<$NO_FEAS_FOUND> and C<$BREAK_BB>
+
+=back
+
+=head2 Data field accessors
+
+Each data field in C<struct lprec> can be queried from a Perl variable
+holding an LP using C<Math::LP::Solve::lprec_FIELD_get($lp)> and
+set using C<Math::LP::Solve::lprec_FIELD_set($lp)>.
+
+Note that the row and column names are accessed using the functions
+lprec_row_name_get(), lprec_col_name_get(), lprec_row_name_set() and
+lprec_col_name_set() described above.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item
+
+The underlying lp_solve library has been written by Michel Berkelaar 
+and adapted by Jeroen Dirks. 
+Its source code is available at ftp://ftp.ics.ele.tue.nl/pub/lp_solve/
+
+=item
+
+More information on the exporting of symbols is found in L<Exporter>.
+
+=item 
+
+The wrapping of the C library was done with the aid of SWIG.
+The SWIG homepage is located at http://www.swig.org/
+
+=item
+
+An object oriented interface to the lp_solve library has been written
+on top of Math::LP::Solve. For more info look at L<Math::LP>.
+
+=back
+
+=head1 AUTHOR
+
+Wim Verhaegen  E<lt>wimv@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2000-2001 Wim Verhaegen. All rights reserved. 
+This program is free software; you can redistribute
+and/or modify it under the same terms as Perl itself.
+
+Consult the lp_solve documentation for copyright information on
+the lp_solve library.
+
+=cut

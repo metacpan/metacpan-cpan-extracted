@@ -1,0 +1,58 @@
+#!/usr/bin/ucblogo
+
+;; Copyright 2012 Kevin Ryde
+;;
+;; This file is part of Math-PlanePath.
+;;
+;; Math-PlanePath is free software; you can redistribute it and/or modify it
+;; under the terms of the GNU General Public License as published by the Free
+;; Software Foundation; either version 3, or (at your option) any later
+;; version.
+;;
+;; Math-PlanePath is distributed in the hope that it will be useful, but
+;; WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+;; or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+;; for more details.
+;;
+;; You should have received a copy of the GNU General Public License along
+;; with Math-PlanePath.  If not, see <http://www.gnu.org/licenses/>.
+
+
+;; cf A156595 xor adjacent mephisto waltz
+;; 
+
+;;-----------------------------------------------------------------------------
+
+to increment :var
+  make :var (thing :var)+1
+end
+
+to count.ternary.twos :n
+  localmake "count 0
+  while [:n <> 0] [
+     if [(remainder :n 3) = 2] [increment "count];
+     make "n int(:n/3)
+  ]
+  output :count
+end
+
+to mephisto.turn.angle :n
+  output ifelse ((modulo (count.ternary.twos :n) 2) = 0) [60] [-60]
+end
+
+to mephisto :steps
+  right 90
+  left 45
+  penup
+  back 300
+  right 90
+  pendown
+
+  localmake "step.len 3
+  for [i 0 :steps 1] [
+     forward :step.len
+     left    mephisto.turn.angle :i
+  ]
+end
+
+mephisto 2000

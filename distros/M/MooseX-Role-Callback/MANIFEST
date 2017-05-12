@@ -1,0 +1,14 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/MooseX/Role/Callback.pm
+lib/MooseX/Role/Callback/Meta/Trait.pm
+t/01_use.t
+t/02_role.t
+t/03_class.t
+t/04_synopsis.t
+t/lib/Synopsis.pm
+t/lib/TestRole.pm

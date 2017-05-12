@@ -1,0 +1,33 @@
+Remember that you first need to create glues for each app you script.  If you
+don't have the app, you can't run gluemac on it, and can't script it.
+
+SimpleText is not scripted with a glue, it is just opened with
+Mac::Apps::Launch and scripted with PreFab Player.  Drop the
+PreFab Player extension on the glue droplet.
+
+URL Access is found in Scripting Additions in Mac OS 8.6.
+
+Mac OS X: several of these examples don't work in Mac OS X, as they require
+apps or scripting additions found in Mac OS, or perform actions that do
+not work in Mac OS X (such as setting the label of an item on the Desktop,
+which is not implemented, or pulling files out of the System Folder, which
+doesn't exit).
+
+The examples that do not work on Mac OS X:
+
+	bettertelnet_login
+	dialog_director_more_lists
+	dialog_director_stuff
+	eudora_make_hidden
+	finder_clean_up
+	finder_get_system_folder_files
+	finder_label_and_beep
+	finder_label_and_beep_cool_version
+	progress_bar_stuff
+	sherlock_search_drive
+	sherlock_search_internet
+	simple_text_and_prefab_player
+
+Mac OS X-only examples:
+
+	address_book

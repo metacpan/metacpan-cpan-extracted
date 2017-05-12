@@ -1,0 +1,11 @@
+Revision history for Perl extension Math::Random::Brownian.
+
+0.01  Tue Mar  1 11:53:57 2005
+	- original version; created by h2xs 1.23 with options
+		-A -n Math::Random::Brownian
+
+0.02  Mon Mar 14 2005
+       - Adapted circulant.c to work without meschach.
+
+0.03  Tue Mar 15 2005
+       - Adapted apprcirc.c and paxson.c to work without meschach.

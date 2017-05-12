@@ -1,0 +1,259 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+use CPANPLUS 0.0562;
+use Module::CoreList 2.02;
+
+use Getopt::Long qw(:config bundling);
+
+use MegaDistro::Config qw(:default pre build_clean help);
+use MegaDistro::Install qw(get_modules make_install);
+use MegaDistro::Package qw(make_tarball make_package);
+
+my %Config;
+
+GetOptions(
+	    'rootdir=s'      => \$Config{rootdir},
+	    'fetchdir=s'     => \$Config{fetchdir},
+	    'extractdir=s'   => \$Config{extractdir},
+	    'builddir=s'     => \$Config{builddir},
+	    'modlist=s'      => \$Config{modlist},
+	    't|disttype=s'   => \$Config{disttype},
+	    'h|help'	     => \(my $help    = 0),
+	    'v|verbose'      => \(my $verbose = 0),
+	    'q|quiet'        => \(my $quiet   = 0),
+	    'd|debug'        => \(my $debug   = 0),
+	    'x|trace'        => \(my $trace   = 0),
+	    'force'          => \(my $force   = 0),
+	    'clean'          => \(my $clean   = 0),
+	    'build-only'     => \(my $buildonly = 0),
+	  );
+
+#
+# set explicit overrides, etc.
+#
+if ( $help ) {
+	&help;
+	exit 1;
+}
+
+if ( $buildonly ) {
+	$Config{disttype} = '';
+}
+
+# if the user does not specify package-type, ask for it.
+if ( !$buildonly && !$Config{disttype} ) {
+	print "Please select a package type: " . "\n";
+	print "\n";
+	print "                0) Build Only"  . "\n";
+	print "                1) Rpm"         . "\n";
+	print "                2) Deb"         . "\n";
+	print "\n";
+	my $pkgsel;
+	do {
+		print "                   ";
+		$pkgsel = <>;
+	} until ( $pkgsel == 0 || $pkgsel == 1 || $pkgsel == 2 );
+	
+	if ( $pkgsel == 0 ) {
+		$buildonly = 1;
+	}
+	elsif ( $pkgsel == 1 ) {
+		$Config{disttype} = 'rpm';
+	}
+	elsif ( $pkgsel == 2 ) {
+		$Config{disttype} = 'deb';
+	}
+	else {
+		die "\n" . 'Invalid selection: ' . $pkgsel . "\n";
+	}
+}
+
+#TODO: Add this to pre function?
+#TODO: +Change these to macro-style conditionals? (and others?)
+if ( $quiet ) {
+	$debug = $verbose = 0;
+}
+
+
+#
+# set exportable params in the %args hash
+#
+$args{'quiet'} = $quiet;
+$args{'verbose'} = $verbose;
+$args{'debug'} = $debug;
+$args{'trace'} = $trace;
+$args{'force'} = $force;
+
+#initialize the local directory tree
+MegaDistro::Config::init_config(%Config);
+&pre;
+
+if ( $clean ) {
+	print "\nCleaning build tree...\n";
+	&build_clean;	#handle from Config::pre, later.
+	$clean = 0;
+}
+
+print 'Loading modules...' . "\n\n";
+my @modules = &get_modules;
+print 'Processing modules...' . "\n\n";
+for ( my $i = 0; $i < @modules; $i++ ) {
+	printf "[ %3d/%-3d ]%-7s", ($i+1), scalar @modules, ' ';
+	if ( &make_install($modules[ $i ]) ) { #make output change here?
+		printf "%15s", '[  ' . "Success!" . '  ]' . "\n";
+	}
+	else {
+		printf "\n%78s", '[  ' . "Failure!" . '  ]' . "\n";
+	}
+}
+print "\n";
+
+&make_tarball if $buildonly;
+if ( !$buildonly ) {
+	print 'Building package...' . "\n\n";
+	&make_package;
+}
+else {
+	print 'Skipping packaging... (build-only specified)' . "\n\n";
+}
+print 'Done.' . "\n\n";
+
+
+=pod
+
+=head1 NAME
+
+megadistro - build a list of perl modules into a binary package
+
+=head1 SYNOPSIS
+
+B<megadistro> [ B<I<OPTION>> ]... [ B<-t type> ]
+
+Usage:
+
+B<megadistro> [-q] [-dxv] [-t I<type>]
+
+B<megadistro> [--quiet] [--debug --trace --verbose] [--disttype=I<TYPE>]
+
+B<megadistro> [-q] [-dxv] [-t I<type>] [--clean] [--build-only]
+
+=head1 DESCRIPTION
+
+The megadistro packaging system is used to read-in a list of perl modules, fetch them from CPAN, build them, and then package the successfully built modules into a binary package of the type specified by the user.
+
+The current system can be run with various options, though, if B<disttype> is not explicitly specified, and B<build-only> mode is not specified, you will be prompted to select a package type. B<build-only> mode implies that no package will be built, however, the system will, instead, generate a current snapshot of the build-tree, in the form of a tarball.
+Therefore, the B<-t> I<TYPE>  or  B<--disttype=> I<TYPE> option should always be explicitly specified.
+
+NOTE: The megadistro system is still under development, and therefore, is still experimental.
+
+=head1 OPTIONS
+
+=head2 SWITCHES
+
+Note: By default, the system will adequately limit its output.
+
+=over 8
+
+=item B<-h>, B<--help>
+
+display help for command-line options
+
+=item B<-v>, B<--verbose>
+
+verbose output (not recommended)
+
+=item B<-d>, B<--debug>
+
+debugging output (only useful for development purposes)
+
+=item B<-q>, B<--quiet>
+
+only display progress status (obsolete)
+
+=item B<-x>, B<--trace>
+
+traces through the programs execution (only useful for development purposes)
+
+=item B<--clean>
+
+completely removes everything from your BUILDDIR (use with caution)
+
+=item B<--force>
+
+forces an install of all modules, even if they fail their tests (do not use unless you know what you're doing!)
+
+=item B<--build-only>
+
+skips the packaging phase, and instead generates a snapshot of your build-tree (tarball), instead of package
+
+=back
+
+=head2 OVERRIDES
+
+=over 8
+
+=item B<-t> I<TYPE>, B<--disttype>=I<TYPE>
+
+specify the type of binary package to create; valid options are: B<rpm> and B<deb>
+
+=item B<--modlist>=I<FILE>
+
+the module list file
+
+=item B<--fetchdir>=I<DIR>
+
+the directory in which modules will be downloaded to
+
+=item B<--extractdir>=I<DIR>
+
+the directory in which downloaded modules will be extracted to
+
+=item B<--builddir>=I<DIR>
+
+the directory in which the successfully built modules will be placed
+
+=back
+
+=head1 EXAMPLES
+
+=over 8
+
+=item Run system and build a I<rpm> package:
+
+B<megadistro> -t B<rpm>
+
+=item Run system and build a I<deb> package:
+
+B<megadistro> -t B<deb>
+
+=item Run system and build a tarball snapshot:
+
+B<megadistro> --build-only
+
+=back
+
+Note: If no package type is specified, you will be prompted to select one.
+
+
+=head1 BUGS
+
+For bugs, please file a bugreport at http://rt.cpan.org/NoAuth/Bugs.html?Dist=MegaDistro
+For more pressing needs or comments/suggestions please mail, with any pertinent information to dbuchman@cpan.org
+
+=head1 AUTHOR
+
+David Buchman (dbuchman@cpan.org)
+
+=head1 SPECIAL THANKS
+
+For all their guidence, and patience throught the whole initial development process, special thanks goes out to:
+
+Ask Bjørn Hansen,
+Michael G. Schwern,
+Curtis Ovid Poe,
+The Perl Foundation.
+
+=cut

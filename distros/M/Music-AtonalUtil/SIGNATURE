@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 033045b0711c72f1e6dc8cf4c67bf3387e75e497 Changes
+SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
+SHA1 8d780a0fb28ce38c43dee511c3f001915851988c MANIFEST
+SHA1 b645b22375fda115bbc1cbe10a9bfdb5dbadedc7 META.json
+SHA1 e2ac1b644fda2f3cf107122f8785e95c3a21005c META.yml
+SHA1 bac89d1c72ca285b7b1ba54b06ce7a37a10eac1a Makefile.PL
+SHA1 348ff85123552f48fbc76ff4d160baad324a046d README
+SHA1 bae8f16fe5b8334712862cf86173e6c23d8149bc eg/fortefy
+SHA1 1890a36796de7830b862db261ffc2bbb28babcec lib/Music/AtonalUtil.pm
+SHA1 7b04c2526e27edb61352c8d7742da25c6d8f3dda t/00-load.t
+SHA1 eaf34be7524d844dbef08cd6cad615db59f24cd8 t/Music-AtonalUtil.t
+SHA1 7d281bb36f065ea02988058870699261a4990770 t/forte2pcs2forte.t
+SHA1 2f70716eff94252f7c070b82a5ae6ea479d3bef2 t/pod-coverage.t
+SHA1 f8243bd368331d5d9635e89bcc00f910cc100815 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJXWXRSAAoJEKSYBH5dablg6vwIAIq/sCUIDyZhCJqdNcvCMDjY
+4wL2QvU5jVKSNv9cOwq7yuWifQ02MN0O16w/mrluUC0rFJTInavTc6b8AitlSKSs
+xaX1iXBlSVIxZbmEUJ8x7sBk6CUmjEToB2qaxFphnXoZrudUND2I0oxCfsjRq5hF
+A2EpP8mZuoBUJxhMpHfmmlr/T5OX3uOqr7uZDyDY68qnYwYwx672WDEUhfOj3A8Z
+2S+lMpupNZ137BCWw97rheQsxg+YLrL22BEKwIt0OBaeGvzqehlhaynWa2wLJapL
+2usCp6mL09K//tGOT4OafL74GcpGhFJEINjBQxaJzKUx5KTFi76a7WdqMSmB8vs=
+=PbCg
+-----END PGP SIGNATURE-----

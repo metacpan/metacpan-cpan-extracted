@@ -1,0 +1,408 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>MasonX::Request::WithApacheSession</title>
+<link rel="stylesheet" href="pod.css" type="text/css" />
+<link rev="made" href="mailto:test@cathy.beaucox.com" />
+</head>
+
+<body>
+<table class="hdrtable" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td>MasonX::Request::WithApacheSession</td></tr></table>
+
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#usage">USAGE</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#configuration">CONFIGURATION</a></li>
+	<ul>
+
+		<li><a href="#generic_parameters">Generic Parameters</a></li>
+		<li><a href="#cookierelated_parameters">Cookie-Related Parameters</a></li>
+		<li><a href="#urlrelated_parameters">URL-Related Parameters</a></li>
+		<li><a href="#apache__sessionrelated_parameters">Apache::Session-related Parameters</a></li>
+	</ul>
+
+	<li><a href="#how_cookies_are_handled">HOW COOKIES ARE HANDLED</a></li>
+	<li><a href="#support">SUPPORT</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="name">NAME</a><a name="__H1_1__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+</tr></table>
+<p>MasonX::Request::WithApacheSession - Add a session to the Mason Request object</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="synopsis">SYNOPSIS</a><a name="__H1_2__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_1__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;NAME</td>
+</tr></table>
+<p>In your <em>httpd.conf</em> file:</p>
+<pre>
+  PerlSetVar  MasonRequestClass            MasonX::Request::WithApacheSession
+  PerlSetVar  MasonSessionCookieDomain     .example.com
+  PerlSetVar  MasonSessionClass            Apache::Session::File
+  PerlSetVar  MasonSessionDirectory        /tmp/sessions/data
+  PerlSetVar  MasonSessionLockDirectory    /tmp/sessions/locks</pre>
+<p>Or when creating an ApacheHandler object:</p>
+<pre>
+  my $ah =
+      HTML::Mason::ApacheHandler-&gt;new
+          ( request_class =&gt; 'MasonX::Request::WithApacheSession',
+            session_cookie_domain  =&gt; '.example.com',
+            session_class          =&gt; 'Apache::Session::File',
+            session_directory      =&gt; '/tmp/sessions/data',
+            session_lock_directory =&gt; '/tmp/sessions/locks',
+          );</pre>
+<p>In a component:</p>
+<pre>
+  $m-&gt;session-&gt;{foo} = 1;
+  if ( $m-&gt;session-&gt;{bar}{baz} &gt; 1 ) { ... }</pre>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="description">DESCRIPTION</a><a name="__H1_3__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_2__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;SYNOPSIS</td>
+</tr></table>
+<p>This module integrates <code>Apache::Session</code> into Mason by adding methods
+to the Mason Request object available in all Mason components.</p>
+<p>Any subrequests created by a request share the same session.</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="usage">USAGE</a><a name="__H1_4__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_3__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;DESCRIPTION</td>
+</tr></table>
+<p>To use this module you need to tell Mason to use this class for
+requests.  This can be done in one of two ways.  If you are
+configuring Mason via your <em>httpd.conf</em> file, simply add this:</p>
+<pre>
+  PerlSetVar  MasonRequestClass  MasonX::Request::WithApacheSession</pre>
+<p>If you are using a <em>handler.pl</em> file, simply add this parameter to
+the parameters given to the ApacheHandler constructor:</p>
+<pre>
+  request_class =&gt; 'MasonX::Request::WithApacheSession'</pre>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="methods">METHODS</a><a name="__H1_5__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_4__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;USAGE</td>
+</tr></table>
+<p>This class adds two methods to the Request object.</p>
+<ul>
+<li><strong><a name="item_session">session</a></strong><br />
+</li>
+This method returns a hash tied to the <code>Apache::Session</code> class.
+<p></p>
+<li><strong><a name="item_delete_session">delete_session</a></strong><br />
+</li>
+This method deletes the existing session from persistent storage.  If
+you are using the built-in cookie mechanism, it also deletes the
+cookie in the browser.
+<p></p></ul>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="configuration">CONFIGURATION</a><a name="__H1_6__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_5__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;METHODS</td>
+</tr></table>
+<p>This module accepts quite a number of parameters, most of which are
+simply passed through to <code>Apache::Session</code>.  For this reason, you are
+advised to familiarize yourself with the <code>Apache::Session</code>
+documentation before attempting to configure this module.</p>
+<p>
+</p>
+<table class="h2table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr>
+<td><a name="generic_parameters">Generic Parameters</a><a name="__H2_1__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_6__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;CONFIGURATION</td>
+</tr></table>
+
+<ul>
+<li><strong><a name="item_session_class__2f_masonsessionclass__3d_3e_class_n">session_class / MasonSessionClass  =&gt;  class name</a></strong><br />
+</li>
+The name of the <code>Apache::Session</code> subclass you would like to use.
+<p>This module will load this class for you if necessary.</p>
+<p>This parameter is required.</p>
+<p></p>
+<li><strong><a name="item_session_always_write__2f_masonsessionalwayswrite__">session_always_write / MasonSessionAlwaysWrite  =&gt;  boolean</a></strong><br />
+</li>
+If this is true, then this module will ensure that <code>Apache::Session</code>
+writes the session.  If it is false, the default <code>Apache::Session</code>
+behavior is used instead.
+<p>This defaults to true.</p>
+<p></p>
+<li><strong><a name="item_session_allow_invalid_id__2f_masonsessionallowinva">session_allow_invalid_id / MasonSessionAllowInvalidId  =&gt;  boolean</a></strong><br />
+</li>
+If this is true, an attempt to create a session with a session id that
+does not exist in the session storage will be ignored, and a new
+session will be created instead.  If it is false, a
+<code>HTML::Mason::Exception::NonExistentSessionID</code> exception will be
+thrown instead.
+<p>This defaults to true.</p>
+<p></p></ul>
+<p>
+</p>
+<table class="h2table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr>
+<td><a name="cookierelated_parameters">Cookie-Related Parameters</a><a name="__H2_2__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_6__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;CONFIGURATION</td>
+</tr></table>
+
+<ul>
+<li><strong><a name="item_session_use_cookie__2f_masonsessionusecookie__3d_3">session_use_cookie / MasonSessionUseCookie  =&gt;  boolean</a></strong><br />
+</li>
+If true, then this module will use <code>Apache::Cookie</code> to set and read
+cookies that contain the session id.
+<p>The cookie will be set again every time the client accesses a Mason
+component unless the <code>session_cookie_resend</code> parameter is false.</p>
+<p></p>
+<li><strong><a name="item_session_cookie_name__2f_masonsessioncookiename__3d">session_cookie_name / MasonSessionCookieName  =&gt;  name</a></strong><br />
+</li>
+This is the name of the cookie that this module will set.  This
+defaults to ``MasonX-Request-WithApacheSession-cookie''.
+Corresponds to the <code>Apache::Cookie</code> ``-name'' constructor parameter.
+<p></p>
+<li><strong><a name="item_session_cookie_expires__2f_masonsessioncookieexpir">session_cookie_expires / MasonSessionCookieExpires  =&gt;  expiration</a></strong><br />
+</li>
+How long before the cookie expires.  This defaults to 1 day, ``+1d''.
+Corresponds to the ``-expires'' parameter.
+<p></p>
+<li><strong><a name="item_session_cookie_domain__2f_masonsessioncookiedomain">session_cookie_domain / MasonSessionCookieDomain  =&gt;  domain</a></strong><br />
+</li>
+This corresponds to the ``-domain'' parameter.  If not given this will
+not be set as part of the cookie.
+<p>If it is undefined, then no ``-domain'' parameter will be given.</p>
+<p></p>
+<li><strong><a name="item_session_cookie_path__2f_masonsessioncookiepath__3d">session_cookie_path / MasonSessionCookiePath  =&gt;  path</a></strong><br />
+</li>
+Corresponds to the ``-path'' parameter.  It defaults to ``/''.
+<p></p>
+<li><strong><a name="item_session_cookie_secure__2f_masonsessioncookiesecure">session_cookie_secure / MasonSessionCookieSecure  =&gt;  boolean</a></strong><br />
+</li>
+Corresponds to the ``-secure'' parameter.  It defaults to false.
+<p></p>
+<li><strong><a name="item_session_cookie_resend__2f_masonsessioncookieresend">session_cookie_resend / MasonSessionCookieResend  =&gt;  boolean</a></strong><br />
+</li>
+By default, this parameter is true, and the cookie will be sent for
+<em>every request</em>.  If it is false, then the cookie will only be sent
+when the session is <em>created</em>.  This is important as resending the
+cookie has the effect of updating the expiration time.
+<p></p></ul>
+<p>
+</p>
+<table class="h2table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr>
+<td><a name="urlrelated_parameters">URL-Related Parameters</a><a name="__H2_3__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_6__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;CONFIGURATION</td>
+</tr></table>
+
+<ul>
+<li><strong><a name="item_session_args_param__2f_masonsessionargsparam__3d_3">session_args_param / MasonSessionArgsParam  =&gt;  name</a></strong><br />
+</li>
+If set, then this module will first look for the session id in the
+query string or POST parameter with the specified name.
+<p>If you are also using cookies, then the module checks in the request
+arguments <em>first</em>, and then it checks for a cookie.</p>
+<p>The session id is available from <a href="#item_session"><code>$m-&gt;session-&gt;{_session_id}</code></a>.</p>
+<p></p></ul>
+<p>
+</p>
+<table class="h2table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr>
+<td><a name="apache__sessionrelated_parameters">Apache::Session-related Parameters</a><a name="__H2_4__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_6__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;CONFIGURATION</td>
+</tr></table>
+
+<p>These parameters are simply passed through to <code>Apache::Session</code>.</p>
+<ul>
+<li><strong><a name="item_session_data_source__2f_masonsessiondatasource__3d">session_data_source / MasonSessionDataSource  =&gt;  DSN</a></strong><br />
+</li>
+Corresponds to the <code>DataSource</code> parameter given to the DBI-related
+session modules.
+<p></p>
+<li><strong><a name="item_session_user_name__2f_masonsessionusername__3d_3e_">session_user_name / MasonSessionUserName  =&gt;  user name</a></strong><br />
+</li>
+Corresponds to the <code>UserName</code> parameter given to the DBI-related
+session modules.
+<p></p>
+<li><strong><a name="item_session_password__2f_masonsessionpassword__3d_3e_p">session_password / MasonSessionPassword  =&gt;  password</a></strong><br />
+</li>
+Corresponds to the <code>Password</code> parameter given to the DBI-related
+session modules.
+<p></p>
+<li><strong><a name="item_session_handle__3d_3e_dbi_handle">session_handle =&gt;  DBI handle</a></strong><br />
+</li>
+Corresponds to the <code>Handle</code> parameter given to the DBI-related
+session modules.  This cannot be set via the <em>httpd.conf</em> file,
+because it needs to be an <em>actual Perl variable</em>, not the <em>name</em> of
+that variable.
+<p></p>
+<li><strong><a name="item_session_lock_data_source__2f_masonsessionlockdatas">session_lock_data_source / MasonSessionLockDataSource  =&gt;  DSN</a></strong><br />
+</li>
+Corresponds to the <code>LockDataSource</code> parameter given to
+<code>Apache::Session::MySQL</code>.
+<p></p>
+<li><strong><a name="item_session_lock_user_name__2f_masonsessionlockusernam">session_lock_user_name / MasonSessionLockUserName  =&gt;  user name</a></strong><br />
+</li>
+Corresponds to the <code>LockUserName</code> parameter given to
+<code>Apache::Session::MySQL</code>.
+<p></p>
+<li><strong><a name="item_session_lock_password__2f_masonsessionlockpassword">session_lock_password / MasonSessionLockPassword  =&gt;  password</a></strong><br />
+</li>
+Corresponds to the <code>LockPassword</code> parameter given to
+<code>Apache::Session::MySQL</code>.
+<p></p>
+<li><strong><a name="item_session_lock_handle__3d_3e_dbi_handle">session_lock_handle  =&gt;  DBI handle</a></strong><br />
+</li>
+Corresponds to the <code>LockHandle</code> parameter given to the DBI-related
+session modules.  As with the <code>session_handle</code> parameter, this cannot
+be set via the <em>httpd.conf</em> file.
+<p></p>
+<li><strong><a name="item_session_commit__2f_masonsessioncommit__3d_3e_boole">session_commit / MasonSessionCommit =&gt;  boolean</a></strong><br />
+</li>
+Corresponds to the <code>Commit</code> parameter given to the DBI-related
+session modules.
+<p></p>
+<li><strong><a name="item_session_transaction__2f_masonsessiontransaction__3">session_transaction / MasonSessionTransaction  =&gt;  boolean</a></strong><br />
+</li>
+Corresponds to the <code>Transaction</code> parameter.
+<p></p>
+<li><strong><a name="item_session_directory__2f_masonsessiondirectory__3d_3e">session_directory / MasonSessionDirectory  =&gt;  directory</a></strong><br />
+</li>
+Corresponds to the <code>Directory</code> parameter given to
+<code>Apache::Session::File</code>.
+<p></p>
+<li><strong><a name="item_session_lock_directory__2f_masonsessionlockdirecto">session_lock_directory / MasonSessionLockDirectory  =&gt;  directory</a></strong><br />
+</li>
+Corresponds to the <code>LockDirectory</code> parameter given to
+<code>Apache::Session::File</code>.
+<p></p>
+<li><strong><a name="item_session_file_name__2f_masonsessionfilename__3d_3e_">session_file_name / MasonSessionFileName  =&gt;  file name</a></strong><br />
+</li>
+Corresponds to the <code>FileName</code> parameter given to
+<code>Apache::Session::DB_File</code>.
+<p></p>
+<li><strong><a name="item_session_store__2f_masonsessionstore__3d_3e_class">session_store / MasonSessionStore  =&gt;  class</a></strong><br />
+</li>
+Corresponds to the <code>Store</code> parameter given to
+<code>Apache::Session::Flex</code>.
+<p></p>
+<li><strong><a name="item_session_lock__2f_masonsessionlock__3d_3e_class">session_lock / MasonSessionLock  =&gt;  class</a></strong><br />
+</li>
+Corresponds to the <code>Lock</code> parameter given to
+<code>Apache::Session::Flex</code>.
+<p></p>
+<li><strong><a name="item_session_generate__2f_masonsessiongenerate__3d_3e_c">session_generate / MasonSessionGenerate  =&gt;  class</a></strong><br />
+</li>
+Corresponds to the <code>Generate</code> parameter given to
+<code>Apache::Session::Flex</code>.
+<p></p>
+<li><strong><a name="item_session_serialize__2f_masonsessionserialize__3d_3e">session_serialize / MasonSessionSerialize  =&gt;  class</a></strong><br />
+</li>
+Corresponds to the <code>Serialize</code> parameter given to
+<code>Apache::Session::Flex</code>.
+<p></p>
+<li><strong><a name="item_session_textsize__2f_masonsessiontextsize__3d_3e_s">session_textsize / MasonSessionTextsize  =&gt;  size</a></strong><br />
+</li>
+Corresponds to the <code>textsize</code> parameter given to
+<code>Apache::Session::Sybase</code>.
+<p></p>
+<li><strong><a name="item_session_long_read_len__2f_masonsessionlongreadlen_">session_long_read_len / MasonSessionLongReadLen  =&gt;  size</a></strong><br />
+</li>
+Corresponds to the <code>LongReadLen</code> parameter given to
+<code>Apache::Session::MySQL</code>.
+<p></p>
+<li><strong><a name="item_session_n_sems__2f_masonsessionnsems__3d_3e_number">session_n_sems / MasonSessionNSems  =&gt;  number</a></strong><br />
+</li>
+Corresponds to the <code>NSems</code> parameter given to
+<code>Apache::Session::Lock::Semaphore</code>.
+<p></p>
+<li><strong><a name="item_session_semaphore_key__2f_masonsessionsemaphorekey">session_semaphore_key / MasonSessionSemaphoreKey  =&gt;  key</a></strong><br />
+</li>
+Corresponds to the <code>SemaphoreKey</code> parameter given to
+<code>Apache::Session::Lock::Semaphore</code>.
+<p></p>
+<li><strong><a name="item_session_mod_usertrack_cookie_name__2f_masonsession">session_mod_usertrack_cookie_name / MasonSessionModUsertrackCookieName  =&gt;  name</a></strong><br />
+</li>
+Corresponds to the <code>ModUsertrackCookieName</code> parameter given to
+<code>Apache::Session::Generate::ModUsertrack</code>.
+<p></p>
+<li><strong><a name="item_session_save_path__2f_masonsessionsavepath__3d_3e_">session_save_path / MasonSessionSavePath  =&gt;  path</a></strong><br />
+</li>
+Corresponds to the <code>SavePath</code> parameter given to
+<code>Apache::Session::PHP</code>.
+<p></p></ul>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="how_cookies_are_handled">HOW COOKIES ARE HANDLED</a><a name="__H1_7__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_6__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;CONFIGURATION</td>
+</tr></table>
+<p>When run under the ApacheHandler module, this module attempts to first
+use <code>Apache::Cookie</code> for cookie-handling.  Otherwise it uses
+<code>CGI::Cookie</code> as a fallback.</p>
+<p>If it ends up using <code>CGI::Cookie</code> then it can only set cookies if it
+is running under either the ApacheHandler or the CGIHandler module.
+Otherwise, the <code>MasonX::Request::WithApacheSession</code> request object
+has no way to get to an object which can take the headers.  In other
+words, if there's no <code>$r</code>, there's nothing with which to set headers.</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="support">SUPPORT</a><a name="__H1_8__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_7__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;HOW COOKIES ARE HANDLED</td>
+</tr></table>
+<p>As can be seen by the number of parameters above, <code>Apache::Session</code>
+has <strong>way</strong> too many possibilities for me to test all of them.  This
+means there are almost certainly bugs.</p>
+<p>Bug reports and requests for help should be sent to the mason-users
+list.  See <a href="http://www.masonhq.com/resources/mailing_lists.html">http://www.masonhq.com/resources/mailing_lists.html</a> for
+more details.</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="author">AUTHOR</a><a name="__H1_9__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_8__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;SUPPORT</td>
+</tr></table>
+<p>Dave Rolsky, &lt;<a href="mailto:autarch@urth.org">autarch@urth.org</a>&gt;</p>
+<p>
+</p>
+<table class="h1table" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td><a name="see_also">SEE ALSO</a><a name="__H1_10__">&nbsp;&nbsp;</a><a href="#__index__"><img alt="top" src="up.gif" border="0" /></a></td>
+<td align="right" class="ref_back_color"><a href="#__H1_9__"><img alt="top" src="up.gif" border="0" /></a>&nbsp;&nbsp;AUTHOR</td>
+</tr></table>
+<p>HTML::Mason</p>
+<table class="hdrtable" cellspacing="0" cellpadding="0" border="0"
+width="100%">
+<tr><td>MasonX::Request::WithApacheSession</td></tr></table>
+
+
+</body>
+
+</html>

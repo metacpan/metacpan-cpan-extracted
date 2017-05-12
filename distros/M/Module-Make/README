@@ -1,0 +1,64 @@
+NAME
+    Module::Make - The New Way To make Modules
+
+SYNOPSIS
+        > perl -MModule::Make=new - Foo-Bar
+
+NOTE
+    THIS VERSION OF THE MODULE IS NOT READY FOR PUBLIC USE.
+
+DESCRIPTION
+    Writing Perl modules, especially modules intended for CPAN, requires a
+    lot of work that just isn't fun. Instead of just writing Perl code, you
+    need to write and maintain a bunch of auxilary files as well:
+
+        * Makefile.PL
+        * Changes
+        * README
+        * META.yml
+        * MANIFEST
+
+    In addition you need to write and maintain docs. And you need to keep a
+    version number up to date etc. Much of this is automated by various
+    tools but wounldn't it be nice if more of this stuff just happened for
+    free?
+
+    Wouldn't it be nice if your boring code could be written for you?
+    Wouldn't it be nice if your comments turned into your documentation?
+    Wouldn't it be nice if "make dist" really did everything you needed to
+    do including uploading to CPAN? Wouldn't it be nice to have full
+    control, but rarely need to lift a finger?
+
+    Module::Make takes your Perl modules to the next level. Literally.
+
+    Using Module::Make you create a <src/> directory in your module
+    distribution, put a config.yaml file in there, along with various pre-
+    source files. Module::Make figures out how to put everything together to
+    make your actual distributable code.
+
+IDEAS/TODO
+    Generate new env with:
+
+        perl -MModule::Make:maker
+
+    MM is a base class to write Foo::Make. Like Kwiki::Make.
+
+    Templates can be pulled in from open svn repos.
+
+    Some config info should be kept outside of the module src. Things that
+    point to local absolute paths for instance.
+
+    MM require GNU-make or BSD-make environments. You can still generate
+    code that ill work on windows but you wouldn't develop there.
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2007. Ingy döt Net. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

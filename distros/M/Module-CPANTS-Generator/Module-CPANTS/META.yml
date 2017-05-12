@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name: Module-CPANTS
+version: 0.20030725
+license: perl
+distribution_type: module
+requires:
+  Test::More: 0.01
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Module::CPANTS:
+    file: lib/Module/CPANTS.pm
+    version: 0.20030725
+generated_by: Module::Build version 0.19

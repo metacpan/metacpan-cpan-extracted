@@ -1,0 +1,27 @@
+cfg/defaults.cnf
+cfg/defaults.conf
+Changes
+lib/Mojar.pm
+lib/Mojar/Cache.pm
+lib/Mojar/ClassShare.pm
+lib/Mojar/Config.pm
+lib/Mojar/Config/Ini.pm
+lib/Mojar/Log.pm
+lib/Mojar/Util.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.md
+test/00-load.t
+test/10-util.t
+test/11-cache.t
+test/13-config.t
+test/14-config-ini.t
+test/20-log.t
+test/30-class-share.t
+test/manifest.t
+test/pod.t
+test/version.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

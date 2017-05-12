@@ -1,0 +1,11 @@
+Revision history for Perl extension MooX::Emulate::Class::Accessor::Fast.
+
+0.03      2015-02-04
+ - Fix Adopt creating methods on the wrong class. (haarg)
+
+0.02      2014-11-29
+ - Fix tests when Moose is not installed.
+
+0.01      2014-08-26
+ - First release.
+

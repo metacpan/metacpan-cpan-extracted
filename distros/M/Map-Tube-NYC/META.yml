@@ -1,0 +1,55 @@
+---
+abstract: 'Interface to the NYC Subway Map.'
+author:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.09'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Map-Tube-NYC
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Map::Tube::NYC:
+    file: lib/Map/Tube/NYC.pm
+    version: '0.38'
+  Map::Tube::NYC::Line::BMTCanarsie:
+    file: lib/Map/Tube/NYC/Line/BMTCanarsie.pm
+    version: '0.38'
+  Map::Tube::NYC::Line::BMTNassauStreet:
+    file: lib/Map/Tube/NYC/Line/BMTNassauStreet.pm
+    version: '0.38'
+  Map::Tube::NYC::Line::INDCrosstown:
+    file: lib/Map/Tube/NYC/Line/INDCrosstown.pm
+    version: '0.38'
+  Map::Tube::NYC::Line::INDEighthAvenue:
+    file: lib/Map/Tube/NYC/Line/INDEighthAvenue.pm
+    version: '0.38'
+  Map::Tube::NYC::Line::INDSixthAvenue:
+    file: lib/Map/Tube/NYC/Line/INDSixthAvenue.pm
+    version: '0.38'
+  Map::Tube::NYC::Line::IRTFlushing:
+    file: lib/Map/Tube/NYC/Line/IRTFlushing.pm
+    version: '0.38'
+  Map::Tube::NYC::Line::IRTLexingtonAvenue:
+    file: lib/Map/Tube/NYC/Line/IRTLexingtonAvenue.pm
+    version: '0.38'
+requires:
+  File::Share: '0.25'
+  Map::Tube: '3.28'
+  Moo: '2.000000'
+  namespace::clean: '0.24'
+  perl: '5.006'
+resources:
+  repository: https://github.com/manwar/Map-Tube-NYC.git
+version: '0.38'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

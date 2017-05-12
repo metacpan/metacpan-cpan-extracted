@@ -1,0 +1,67 @@
+{
+   "abstract" : "Test!",
+   "author" : [
+      "Robert Acock <thisusedtobeanemail@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Moonshine-Test",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::MockObject" : "0",
+            "Test::More" : "0",
+            "Test::Tester" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::AsciiEmoji" : "0.02",
+            "B" : "0",
+            "Exporter" : "0",
+            "Params::Validate" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
+            "perl" : "5.01",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Moonshine::Test" : {
+         "file" : "lib/Moonshine/Test.pm",
+         "version" : "0.14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/Moonshine-Test.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/Moonshine-Test"
+      }
+   },
+   "version" : "0.14",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

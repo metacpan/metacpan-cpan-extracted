@@ -1,0 +1,47 @@
+Metaweb
+
+This is a Perl interface to the Metaweb database, best known through the
+application Freebase (http://freebase.com).  Freebase is currently in
+alpha release, with world-readable data but requiring an invitation and
+login to be able to update/write data.
+
+This module is very much alpha code.  It has lots of stuff not
+implemented and will undergo significant changes.  Breakage may occur
+between versions, so consider yourself warned.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Metaweb
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Metaweb
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Metaweb
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Metaweb
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Metaweb
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Kirrily Robert
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

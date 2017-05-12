@@ -1,0 +1,128 @@
+=head1 NAME
+
+Mozilla::DOM::HTMLTableSectionElement
+
+=for object Mozilla::DOM::HTMLTableSectionElement
+
+Mozilla::DOM::HTMLTableSectionElement is a wrapper around an instance of Mozilla's
+nsIDOMHTMLTableSectionElement interface. This class inherits from
+L<HTMLElement|Mozilla::DOM::HTMLElement>.
+
+ * The nsIDOMHTMLTableSectionElement interface is the interface to a
+ * [X]HTML thead, tbody, and tfoot element.
+ *
+ * For more information on this interface please see
+ * http://www.w3.org/TR/DOM-Level-2-HTML/
+ *
+ * @status FROZEN
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::HTMLTableSectionElement->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $htmltablesectionelement->B<DeleteRow>($index)
+
+=over
+
+=over
+
+=item * $index (integer (long))
+
+=back
+
+=back
+
+=head2 $align = $htmltablesectionelement->B<GetAlign>()
+
+=head2 $ch = $htmltablesectionelement->B<GetCh>()
+
+=head2 $choff = $htmltablesectionelement->B<GetChOff>()
+
+=head2 $rows = $htmltablesectionelement->B<GetRows>()
+
+The collection of rows in this table section.
+
+$rows is a L<Mozilla::DOM::HTMLCollection|Mozilla::DOM::HTMLCollection>.
+
+In list context, returns a list of
+L<Mozilla::DOM::HTMLTableRowElement|Mozilla::DOM::HTMLTableRowElement>,
+instead.
+
+=head2 $valign = $htmltablesectionelement->B<GetVAlign>()
+
+=head2 $retval = $htmltablesectionelement->B<InsertRow>($index)
+
+=over
+
+=over
+
+=item * $index (integer (long))
+
+=back
+
+=back
+
+=head2 $htmltablesectionelement->B<SetAlign>($align)
+
+=over
+
+=over
+
+=item * $align (string)
+
+=back
+
+=back
+
+=head2 $htmltablesectionelement->B<SetCh>($ch)
+
+=over
+
+=over
+
+=item * $ch (string)
+
+=back
+
+=back
+
+=head2 $htmltablesectionelement->B<SetChOff>($choff)
+
+=over
+
+=over
+
+=item * $choff (string)
+
+=back
+
+=back
+
+=head2 $htmltablesectionelement->B<SetVAlign>($valign)
+
+=over
+
+=over
+
+=item * $valign (string)
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

@@ -1,0 +1,114 @@
+#! /usr/bin/perl
+#########################################################################
+#        This Perl script is Copyright (c) 2003, Peter J Billam         #
+#               c/o P J B Computing, www.pjb.com.au                     #
+#                                                                       #
+#     This script is free software; you can redistribute it and/or      #
+#            modify it under the same terms as Perl itself.             #
+#########################################################################
+use Term::Clui;
+use Math::RungeKutta qw(:ALL arr2txt);
+
+my $func_evals = 0;
+sub dydt { my ($t, @y) = @_;
+	my @dydt;
+	$dydt[$[] = $y[$[+1];
+	$dydt[$[+1] = 0.0 - $y[$[];
+	$func_evals++;
+	return @dydt;
+}
+print "Simulates one sine/cosine cycle: dydt[0]=y[1], dydt[1]=-y[0]\n";
+print "   ( use arrow keys and <Return>, or q to quit )\n";
+while (1) {
+	$algorithm = &choose("Algorithm ?",
+	 'rk2','rk4','rk4_classical','rk4_ralston','rk4_auto');
+	last unless $algorithm;
+	$n = &choose('Timesteps per cycle ?','6','8','12','16','24','32');
+	last unless $n;
+	$n = 0 + $n;
+	$twopi = 2.0 * 3.141592653589;
+	$dt= $twopi / $n;
+	@y = (0,1); $t=0;
+
+	if ($algorithm eq 'rk4_auto') {
+		my $i = 0;
+		my $mode = &choose('error adjustment mode ?','$epsilon','@errors');
+		next unless $mode;
+		my $epsilon;
+		if ($mode eq '$epsilon') {
+			$epsilon = &choose('epsilon ?',
+			 '.01','.001','.0001','.00001','.000001');
+			$epsilon = 0 + $epsilon;
+		} else {
+			my @errors = split(',',&choose('@errors ?', '.01,.01','.01,.0001',
+			 '.0001,.01','.0001,.000001','.000001,.0001'));
+			foreach (@errors) { $_ += 0.0; }
+			$epsilon = \@errors;
+		}
+		$func_evals = 0;
+		printf "i= 0 t=0.00000 dt=%g y0=0.00000 y1=1.00000\n", $dt;
+		$start = (times)[$[];
+		while ($t+$dt < $twopi) {
+			$i++;
+			($t, $dt, @y) = &rk4_auto( \@y, \&dydt, $t, $dt, $epsilon );
+			($t_midpoint, @y_midpoint) = &rk4_auto_midpoint();
+			printf "     t=%g             y0=%g y1=%g\n",
+			 $t_midpoint,$y_midpoint[$[],$y_midpoint[$[+1];
+			printf "i=%2d t=%g dt=%g y0=%g y1=%g\n",$i,$t,$dt,$y[$[],$y[$[+1];
+		}
+		$end = (times)[$[];
+		$i++; $dt = $twopi-$t;
+		($t, @y) = &rk4( \@y, \&dydt, $t, $dt );
+		printf "i=%2d t=%g dt=%g y0=%g y1=%g\n",$i,$t,$dt,$y[$[],$y[$[+1];
+		printf "that took %g CPU seconds, $func_evals func evals\n",
+		 $end-$start;
+	} else {
+		print "i= 0 t=0.00000 y0=0.00000 y1=1.00000\n";
+		foreach (1..$n) {
+			($t, @y) = &{$algorithm}( \@y, \&dydt, $t, $dt );
+			printf "i=%2d t=%g y0=%g y1=%g\n",$_,$t,$y[$[],$y[$[+1];
+		}
+	}
+	printf "error per timestep = %g\n", (abs ($y[$[+1] - 1.0)) / $n;
+}
+exit 0;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+sine-cosine - Perl script to explore Math::RungeKutta
+
+=head1 SYNOPSIS
+
+ perl exapmles/sine-cosine
+
+=head1 DESCRIPTION
+
+This script uses I<Math::RungeKutta> to integrate the equations
+I<dy0/dt=y1 dy1/dt=-y0> from I<t=0> to I<t=2pi>
+which of course should give one cycle of sine and cosine waves.
+
+It uses I<Term::Clui> to give you a choice of the various methods that
+I<Math::RungeKutta> offers, and of a selection of timestep values
+or error criteria.
+
+=head1 AUTHOR
+
+Peter J Billam  www.pjb.com.au/comp/contact.html
+
+=head1 CREDITS
+
+Based on Math::RungeKutta and Term::Clui
+
+=head1 SEE ALSO
+
+examples/exponentials,
+examples/three-body,
+Math::RungeKutta,
+Term::Clui
+
+=cut
+

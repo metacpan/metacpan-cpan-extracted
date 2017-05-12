@@ -1,0 +1,8 @@
+Revision history for SE
+
+Unreleased version
+0.2.0 DCOLLINS Feb 2 2008
+	* Unicode support
+	* Honor $self->{debug}
+0.1.0 DCOLLINS Feb 1 2009
+	* Initial version

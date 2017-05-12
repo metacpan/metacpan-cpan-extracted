@@ -1,0 +1,5 @@
+See the git repository.
+
+ * 0.56 added ->patch2instrument class method for patch number to
+   lilypond instrument name (from scm/midi.scm) mapping. Sundry tweaks
+   and improvements.

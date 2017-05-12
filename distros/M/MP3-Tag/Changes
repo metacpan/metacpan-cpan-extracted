@@ -1,0 +1,1259 @@
+Release Name: 1.14
+====================
+
+Tag.pm: Quiet warnings from 5.22.
+	Start implementing handlers: instead of FRAM(langs)[opts], one can use, e.g., func_name(ID3v1,Cue)[arg1][arg2]
+		   # ID3v2::_frame_select_by_descr is missing //s
+	New configuration variable ampersand_joiner (default '; ').
+	New method _auto_field_from() (abstracted from _auto_field()).
+	Change logic of calling ->can() in _auto_field_from().
+	_parse_rex_microinterpolate() would not update $ecount on seeing %%.
+	When parsing with %=c etc: with %==c the match fails if there is no comment.
+		(Checked the same way as for %{c:}.)
+	Support some of %-escapes not being matched (e.g, due to alternatives in a REx).
+		(0-length matches were ignored anyway [when join()ing].)
+	parse_rex(), parse_rex_match() may return an extra result (if %{handler}s are present).
+	Recognize ID3v2 frame names as [A-Z]{3}[A-Z\d] (was \w{4}).
+		(Detection frame/vs/handler happens via PACKAGES; so if lang codes inf/cue appear, we may be in trouble.)
+	Use the same code in parse(_rex)?_prepare.  (Now parse() allows the same %-constructs as parse_rex().)
+ID3v2.pm:
+	New method have_one_of_frames().
+	New methods *_have() (for simplest fields: title, comment, track, artist, album, genre, year).
+ImageExifTool.pm:
+	Comprehensive docs.
+
+Release Name: 1.13
+====================
+
+Apply patches from Ian:
+ Makefile.PL,data_pod.PL: Fix path of ID3v2-Data.pod.
+ extract-y.pl: Fix #! path to perl.
+ data_pod.PL, Cue.pm, File.pm, LastResort.pm, ID3v1.pm,
+   ID3v2.pm, Tag.pm: Fix pod
+ ID3v2.pm: fix frame numbering documentation
+   (http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D523804)
+ Many: preceeded/explicitely striking again ;-)
+
+ID3v2:	add section BUGS with explanation of how we treat v2.4 frames.
+	extract MP3 start bytes even if ID3v2 tag is present.
+	recognize MP3 MIME type by start bytes
+
+Tag.pm:	document mime_Pretype(), mime_type().
+	New optional arguments to mime_Pretype(), mime_type().
+	ID3v2 genre tag with value "Blues" or "(0)" could not be set
+		(thanks to Eric Benson for analysis).
+
+ID3v2_Data.pod: rename s/-/_/ - cygwin buggy, fails manifying
+		- this was BS, the problem is elsewhere
+
+mp3info2: state another time that COMM(eng)[lyrics] is a non-standard place
+	  for lyrics...
+
+Release Name: 1.12
+====================
+
+Music_Normalize_Fields: new short names in RUS table.
+  Eliminate one record which caused infinite recursion (vas i iva).
+
+ID3v2: replace order of encode() and func_back() when writing frames
+	(e.g., would break unicode genre with space in it).
+       "very low-level" docs had get_frame() mixed up with get_frames()
+		(thanks to Brendan Byrd)
+       new_with_parent() inserts header into parent on failure.
+       optional argument to _Data_to_MIME to return false on unknown.
+
+Tag.pm: better docs for interpolate().
+	misprints in example of update_tags().
+	When truncating inside interpolation, and the value is a number
+	  round it, not truncate.
+	Move old meaning of %{aR} to %{a3} (truncation to 3 places).
+	%{aR} is not rounded now; one may truncate as in %.5{aR} to restrict width.
+	New method mime_Pretype(); new interpolation escape %{mP}.
+	Optional argument to _Data_to_MIME() to return false on unknown.
+	For (image) mime types we can handle ourselves, do it.
+	default return for mime_type() is MP3 (in absense of support modules).
+	Misprint in _Data_to_MIME() made it useless.
+	New method aspect_ratio_inverted().
+	New escape %{aI} for aspect_ratio_inverted().
+	Allow for rounding of duration before formatting T[=>m,?H:,{mL}].
+
+File.pm: fix mismatched C<> in POD.
+
+mp3info2: -F disk_n=DISKNUMBER supported, 
+  new configuration variable frames_write_creates_dirs (default 0) to create
+    intermediate directories baz/boz on -F "foo > baz/boz/bar".
+  Use %{mP} instead of `Audio' in the -x output.
+  Make -x=output of MP3-related data conditional on its presence (still wrong
+    since MP3::Info can return such data for non-MP3 files too XXX)
+
+typeset_audio_dir:
+	new option -r
+	Make haveLyrics/haveAPIC symbols take less space
+	Macroize pre/postSectionSkip, make it and \columnsep font-size dependent
+	Slightly more docs in the generated code on grid/non-grid typesetting
+	Slightly more docs
+
+Release Name: 1.11
+====================
+
+ImageExifTool.pm: new handler (a very minimal implementation).
+
+Tag.pm: support for ImageExifTool.pm
+  (problems: deleting frames is not noticed by ExifTool, so the field can be
+     "revived" by update_tags(), so we disable id3 in ExifTool [XXX: must be
+     made conditional on the list of  handlers]; genre-->None massaged to '')
+             'NumColors' => 'Use BitDepth'???  
+  rename aspect() to aspect_ratio() (undocumented)
+  new function aspect_ratio3() rounds to 3 decimals in the fractional part
+  map %{aR} to aspect_ratio3()  [instead of aspect()]
+  new method bit_depth() (for images; exact semantic [8 or 24?!] not clear)  (undocumented)
+  new interpolation %{bD} for bit_depth
+  new method _duration() (for very few formats only???) (undocumented)
+  caching MP3::Info data avoid extraneous calls
+  Make duration-fetch methods try _duration() too.
+  mpeg_layer_roman(), frames_padded_YN(), is_copyrighted_YN() now may return ''
+    if MP3::Info fails.
+  Allow for the rest of 1-char escapes NvLrqQSmsCpouMH to be conditioned and
+    %=X-ed.
+  //o-ptimise RExes.
+
+ID3v2.pm: could modify config('default_language').
+
+mp3info2: make MP3-specific fields optional
+  emit %wx%h for images and video (and append bit_depth if present)
+
+Release Name: 1.10
+====================
+
+Bump the version number to 1.10 to sync with mp3info2.
+
+Tag.pm: allow %=n to match against 1 if %n is 01.
+  new methods extension_is(), can_write(), can_write_or_die(), die_cant_write(),
+    writable_by_extension().
+  new methods (require Image::Size) width(), height(), img_type(), mime_type(),
+    aspect(). (undocumented)
+  new interpolation escapes %w %h %{iT} %{mT} %{aR} for these methods.
+  new configuration variables: `is_writable' defaults to writable_by_extension
+    (older versions behaved as if it is 1);  `writable_extensions' to
+       mp3 mp2 id3 tag ogg mpg mpeg mp4 aiff flac ape ram mpc
+  update_tags() checks for can_write().
+
+cddb.tmp was omitted from distribution (==> test failure).
+
+ID3v2.pm: the code to treat compressed fields was completely busted.
+	  (Still not tested a lot...)
+  Now always write UTF-16 as `UTF-16LE with BOM' to cowtow to M$'s bugs
+	(must disable: triggers unsync...; set $ENV{MP3TAG_USE_UTF_16LE}
+	 to TRUE to enable).
+
+Music_Fields.pm: could give `uninitialized' warning in presence of
+	one-word person names in the tables.
+
+ImageSize.pm: new handler.
+
+mp3info2: -d was busted by the repeated-option logic.
+  allow a repeated -u to force update.
+
+typeset_audio_dir: if one of the arguments was 0, -e could fail.
+  Decrease default min-gap before [year] from 0.75em to 0.65em (looks better).
+
+Release Name: 1.00
+====================
+
+Bump all the version numbers to 1.00 (except Normalize::Text::Music_Fields).
+
+Move code to a ./lib subdirectory.  (Allows auto-install of transliterate_cp1251.)
+
+Music_Normalize_Fields.pm: renamed to Normalize::Text::Music_Fields.pm
+  Now check environment variable MUSIC_FIELDS_PATH and/or ~/.music_fields/*.
+  name_for_field_normalization method is used to choose "composer name".
+
+CDDB_File.pm: minor changes to the docs.
+
+Cue.pm: new sub-module.
+
+Tag.pm: allow access to Cue, and customization of the corresponding encoding.
+  Allow conditional interpolation on user variables (check emptiness) %{U1:\n}.
+  New configuration variable and method `name_for_field_normalization'.
+
+typeset_audio_dir: Major simplification of user interface, better docs.
+  Can generate short+long-type listings itself (two-pass so far...).
+  More consistent ornaments in the generated files.
+  Auto-generate the file *_titles.tex (used as the title of the listing).
+  Move common code to file *_common.tex.
+  New options -N, -P, -F.
+  Document option -L.
+  Directory list defaults to ".".
+  Indicator of presence of APIC frames.
+  Lyrics symbols explanation emitted correctly.
+  Allow duplication of comment-like info and a part of the main record title
+    (emphasizes this part of the title).
+  Document known possible problems during typesetting.
+
+mp3info2:
+  Since Normalize::Text::Music_Fields is always loadable now, one
+    uses a different trigger sequence to load this module (environment
+    variable and a directory ~/.music_fields are checked).
+  With -e N, N in 1..3, do not translate the non-option ARGV
+    (could conflict with interation with filesystems).
+  New bit 0x4 of -e N used to influence translation of non-option ARGV.
+  When @ARGV is re-encoded: translate back to 8-bit whatever is possible.
+
+ID3v2.pm: when ordering frames in generated tags, sort APIC frames
+  at the end (since the simplest reason for unsync-related bugs in other
+  programs is misparse of APIC frames, and it is the *consequent* frames
+  which are busted, no non-APIC frames would be affected.  (This is
+  applicable in the case when other frames contain Latin-1 info, so
+  the chance of unsync-sequences there is low...) 
+
+Release Name: 0.9714
+====================
+
+Tag.pm: misprint in POD.
+  Add new variable MP3TAG_SKIP_WEAKEN for debugging (does not help with 5.005).
+  Make documentation of encoding settings more clear.
+  New configuration variable `extra_config_keys'.
+  `n' and `I' in interpolation flags were broken.
+  interpolate_with_flags(): take into account that ->track may be not a
+    number, as "1/17".
+
+ID3v2.pm: do not prepend "(C) " to empty TCOP fields.
+
+mp3info2: -F "WHOLE > file" would not write if the given tags are not present.
+  would skip -F "WHOLE ?< file" if corresponding tags were present (as opposed to fields).
+  Long description for TDRC was missing.
+  Long description was wrongly handled in __frames_as_printable().
+  New configuration variable `empty-F-deletes'.
+  The default now is to remove the frame if value -F is empty.
+  Take into account `decode_encoding_files' when processing -F "FRAME < file";
+
+transliterate_win1251.pm: was not updated during move to a subdirectory.
+
+typeset_audio_dir: better docs.
+  Typeset track number without second part, and allowing customization too.
+
+CDDB_File.pm: take into account that ->track may be not a number, as "1/17".
+
+Release Name: 0.9713
+====================
+
+mp3info2: -e was broken by support for duplicated-options.
+  Better structuring of documentation.
+
+Release Name: 0.9712
+====================
+
+Tag.pm:
+  _massage_genres(): 'num' is required if number is wished; new semantic with
+   'prefer_num'.
+  Make methods *_set() return TRUE.
+  In dump of frames, put explanation of frames purposes.
+  Improve the docs.
+
+ID3v2.pm: add `func_back' to frame's field descriptor.
+  add 're2b' to frame's field descriptor.
+  When adding TCOM frame, massage it back to the v2.3 conventions; now one can
+    use the same values for setting frame as returned when reading frame, even
+    in presence of multiple genres.
+  Likewise for TCOP frames (via `re2b').
+  Repeated APIC frames were not expanded in get_frame_descriptors().
+  Would not support "fake" MP3 objects.
+  Allow setting of "filtered for human" fields (except TMED) via add_frame(),
+    using both raw and human-readable forms of the corresponding argument.
+  When splitting an argument for add_frame, split from the end for
+    POPM - they have numbers at end, so it is not ambiguous.
+  AENC and COMR frames had invalid format (trailing 0 omitted from URL).
+  Dump of frames: put explanation of frames purposes, align stuff vertically.
+  Optional string fields were treated with warnings...
+  Improve the docs.
+
+ID3v1.pm: reading v1 genre immediately after setting might return numeric value.
+
+Test suite for changes (except encoding stuff and as_bin()).
+Makefile.PL was clean()ing a shipped file.
+
+Release Name: 0.9711
+====================
+
+ID3v1.pm: last winamp genre was not supported;
+  logic of checking fitting to ID3v1 was not accepting "from"ified tags;
+  add more WinAmp genres (from table in MP3::Info).
+  Avoid an elusive Perl (parser?) bug with
+   can't use string ("") as an ARRAY ref while "strict refs" in use at MP3/Tag/ID3v1.pm line 220.
+  Use the leading part of track numbers of the form NUMBER/WHATEVER.
+
+Tag.pm:
+  logic of massaging genre was not accepting "from"ified tags.
+  id3v23_unsync id3v23_unsync_size_w - better docs.
+  Minor improvements to docs.
+  New methods: "simplified" title_set(), artist_set(), album_set(),
+      year_set(), comment_set(), track_set(), genre_set();
+    _Data_to_MIME(), copy_id3v2_frames(),
+    track1(), track2(), track0(), disk1(), disk2(), disk_alphanum().
+  Prefer frame_select_by_descr_simpler() to frame_select_by_descr_simple()
+    in select_id3v2_frame_by_descr(); so we can:
+  remove special-casing of _Data in _interpolate(), and the first ("supported")
+    frame of the given type can be interpolated via, e.g., "COMM", "APIC".
+  remove setting $MP3::Info::try_harder: may loop infinitely...
+  New interpolation: %{ID3v2-size}, %{ID3v2-pad}, %{ID3v2-stripped}, %{ID3v2-modified}
+    %{out_frames/QQPRE//QQPOST}.
+  Allow condition in conditional interpolation to be a 2-char (n1 etc) escape.
+  Allow select_id3v2_frames() etc to write frames which require multiple
+    arguments to add_frame(), either by adding extra arguments, or by joining
+    arguments together with ";". [Will catch less errors, but is more flexible.]
+  _massage_genres(): extra arg must now be 'num' if number is wished; new semantic
+    with 'prefer_num'.
+
+ID3v2.pm: misprint of getconfig1, and in printout of supported versions.
+  Add some E<gt> to POD; better doc of APIC in frame_select().
+  _Data_to_MIME() documented.
+  Use "Unknown...  Error?" as string representation of unknown pictype in APIC.
+  Do extra close/open before writing ID3v2, so that the size of ID3v1 tag
+   is taken into account when calculating the "best" padding.
+  New methods: frame_select_by_descr_simpler(), add_raw_frame() [undocumented],
+    copy_frames(), add_frame_split().
+  Supports optional fields in frames for read/write (missing
+    fields not set by get_frame() etc, and should be omitted in call to add_frame).
+  allow multiple values in "write" flavor of frame_select() (as in add_frame());
+    moreover, since it calls add_frame_select(), allow joining fields into
+    one with separator=";".  [Will catch less errors, but is more flexible.]
+  For APIC/COMR frames, allow the numeric "type" argument to add_frame() to be
+    specified both as a byte, and as a stringified number (no conflict possible).
+
+audio_rename: move dependent module transliterate_win1251.pm to
+    Encode:: namespace.
+  Change the default rename recipe to use disk number, and pad track number
+    to width of the maximal track number (if known).
+
+mp3info2: With -x, print "ID3v1: present" if applicable, and ID3v2 size(s).
+  Documentation was using I(fimb) where I{fimbB} was needed.
+  Move id3v2_frames_autofill() before -p and -x.
+  Do not autofill unless -u is given, or other modifications are done to ID3v2.
+  Uses foo_set() to process -a/-t/-l/-y/-c/-n/-g options, so no "sane value" check
+    is done any more...  Also disallows "asyncroneous on-demand order of setting"
+    of these fields (but it was hardly documentable anyway)...
+  Document order of processing the options.
+  New semantics "FRAME_spec < FILE", "FRAME_spec ?< FILE", "FRAME_spec > FILE"
+    for -F option (including full-tag operations).
+  Documentation on the usage strategy: Escalation of complexity.
+  Options -d/-F/-C/-P may be repeated (old nonsense of gluing together via
+    triplication is still supported, but deprecated).
+  -x may be repeated (dumps frames).
+
+File.pm: better wording in an error message.
+
+Release Name: 0.9710
+====================
+
+Some minimal changes to make test suite pass "better" on 5.005
+(Music_Translate_Fields does not work; %F is not guarantied to get full name;
+some proxying problems remains [leaks ==> files remain open];
+t/update_tags.t works well under debugger, not otherwise...).
+
+Tag.pm ID3v2.pm ParseData.pm mp3info2: support Language with parentheses, as in
+ "Cover (back)" (when used as "Picture type").
+ Document id3v2_frame_descriptors().
+ New interpolation token: %{frames}, %{frames/SEPARATOR}.
+ Allow %{ID3v2: ... } and ID3v1 as conditionals.
+ Parsing of %{composer} etc inside false conditionals was wrong.
+
+ID3v1.pm: is not confused by multipart genres (such as described by id3v2).
+
+ID3v2.pm: extra $raw-ness for get_frame() (return array [=ordered hash], or
+          array of values, or same with ignoring `decode_encoding_v2');
+ get_frame() handles MCDI as a "simple frame";
+ document get_frame_descr() and get_frame_descriptors();
+ new argument $raw_ok for as_bin() to return original tag if unmodified;
+ new method fix_frames_encoding() to make encoding standard-conformant;
+ fix_frames_encoding() autocalled (controled by `decode_encoding_v2',
+  `id3v2_fix_encoding_on_write' and `id3v2_fix_encoding_on_edit');
+ `decode_encoding_v2' may be disabled per tag via
+   frame TXXX[trusted_encoding0_v2] (in turn, this feature may be disabled
+   by `ignore_trusted_encoding0_v2');
+ frame TXXX[trusted_encoding0_v2] may be auto-added by fix_frames_encoding()
+   (controlled by `id3v2_set_trusted_encoding0');
+ special-field-readers now check their calling API (to allow future extensions);
+ reading TCON normalizes genres, skips duplicates, and handles 0-separated
+   genres (as mandated by v2.4) [thanks to neil verplank for the prototype
+   implementation];
+ reading/writing of v2.4 tags controlled by `prohibit_v24'/`write_v24';
+ misprint in "Media (e.g. label side of CD)" of APIC corrected (backward
+   compatibility value preserved);
+ APIC frames handled by frame_select() (and derivatives); uses "Picture Type"
+   instead of "Language", and auto-calculates "MIME type" for
+   TIFF/JPEG/GIF/PNG;
+ likewise for get_frame_descr().
+
+Tag.pm: simplified method get_config1() for accessing one-element configuration
+        arrays;
+ conversion milleseconds ==> seconds was wrong (!!!) when NVs are 80-bit;
+ new configuration variables `id3v2_recalculate', `ignore_trusted_encoding0_v2',
+   `id3v2_set_trusted_encoding0', `id3v2_fix_encoding_on_write',
+   `id3v2_fix_encoding_on_edit', `prohibit_v24', `write_v24' with sane defaults.
+ instead of MCDI frame, autofills TXXX[MCDI-fulltoc] (since MCDI is supposed
+   to be the "short TOC", and I do not know how to reduce one to another,
+   and know only how to easily read the "full TOC"; please advice if you know).
+
+	[For best results, it is better to rename MCDI frame if it was
+	 autofilled with v0.9709:
+	   mp3info2 -u@P "mi/@{MCDI}/@{TXXX[MCDI-fulltoc]}///m//@{MCDI}" f.mp3
+	]
+
+   Due to these changes, the mess of fixing broken encodings is more or
+   less resolved now (before, it was easy to read tags with broken
+   encoding, but not edit it).  Likewise, reading genre is much easier now
+   (but setting multipart genre may still be some challenge).
+
+[If there are some problems with reading v2.4 tags, I would like to hear about
+ them; likewise, I beg for code donation for better writing of v2.4 tags.]
+
+mp3info2: new option -N to switch off "smart-alec interface";
+  -F allows human-oriented identifiers: composer,text_by,orchestra,conductor
+  will only call autoinfo() if needed (useful for copying ID3 frames, so
+    that they are not modified before copying);
+  better logic in choosing when to emit "Performer:" line.
+  beef up docs.
+
+typeset_audio_dir: could try to print total time even without -T.
+
+audio_rename: pacify some warnings; better docs.
+
+New scripts in examples: fulltoc_2fake_cddb.pl dir_mp3_2fake_cddb.pl
+	inf_2fake_cddb cddb2cddb
+
+Music_Translate_Fields.pm: renamed to Music_Normalize_Fields.pm;
+  a tiny shim module with old name added;
+  subroutines renamed from *translate* to *normalize*;
+  shim subroutines with old names added;
+  minimal docs added;
+  new subroutine read_composer_file() [cut out from load_composer()];
+  new subroutine normalize_opus();
+  better normalization of opus when followed by variants of `No.4';
+  new subroutine _normalize_piece(): as normalize_piece(), but allows
+    better control over (no) database lookup;
+  better recognition of a key ("Piece; b#");
+  support for mail-header-format databases;
+  support for shorted opus-number ids;
+  support for creation of mail-header-format databases;
+  minimal testing suite (builtin);
+  other minor improvements.
+
+Composer files: converted to mail-header format; new files for Brahms,
+Dvorak, Schnittke, Shostakovich added.  Moved to subdirectory
+`Music_Normalize_Fields'; should be relative to Music_Normalize_Fields.pm
+
+
+Release Name: 0.9709
+====================
+
+extract-y.pl was reversing the "informativeness" test, thus one needed
+to redo Music_Translate_Fields-L_van_Beethoven.comp; add missing sonata
+names to the latter.
+
+Improve docs for ENVIRONMENT.  New customization variable local_cfg_file,
+new method parse_cfg() (reads ~/.mp3tagprc).  [not tested]
+
+New interpolation directives iC and iI to access cddb_id, cdindex_id.
+New methods cddb_id, cdindex_id, id3v2_frames_autofill.  New configuration
+variable id3v2_frames_autofill.  Support for filling MCDI frame.
+
+mp3info2: id3v2_frames_autofill() is called unless -d option is given.
+(Most probably the result is not propagated back to file unless -u option
+was given.)
+
+CDDB_File.pm: new method (and parse directive) cddb_id.
+Inf.pm: new methods (and parse directives) cddb_id, cdindex_id (cddb_id
+has the leading '0x' stripped).
+ID3v2.pm: new methods cddb_id, cdindex_id (read the corresponding TXXX frames).
+
+Splitting UCS-2 fields by short-\0 was wrong.
+
+Workaround for ITunes bug was not complete: only size calculation was
+conditional on a configuration variable, but not the actual unsyncronization...
+
+typeset_audio_dir-try.pl - new variant (untested).
+
+typeset_audio_dir was ignoring -n option.
+
+Extend matching of track number when parsing to 999 (not more to avoid
+confusion with years); such tracks are, apparently, written mod 256 into
+ID3v1 tag.
+
+Release Name: 0.9708
+=======================
+
+Allow character devices for files (so /dev/null now "works"
+  mp3info2 -D -a beethoven -t "piano in F#" /dev/null
+will print the info deduced from per-composer databases).
+
+total_secs_trunc() was not documented.
+
+New methods total_hours(), leftover_secs_float(), leftover_secs_trunc(),
+leftover_mins().  Interpolated as %H, %{SML}, %{SL}, %{mL}.  Interpolate
+leftover_msec() as %{ML}.  New method format_time().  New interpolated
+%{T[format1,format2...]}.  New class method new_fake().
+'update_length' config variable was not writable.  New method
+id3v2_frame_descriptors().
+			XXXX Undocumented...
+
+ID3v1: support new option encoded_v1_fits (default NOT as it was).
+
+ID3v2: add_frame() was not documented to support encoding.  New configuration
+variables default_language, default_descr_c.  New functions get_frame_desc(),
+get_frame_descriptors().
+
+Music_Translate_Fields: normalizes title from unambiguous short form (order
+significant, so "piano sonata" and "sonata for piano" still not synonimous).
+Allow #dup_opus_rex, #no_opus_no, #prev_short in composer table.
+New function normalize_file_lines().
+
+Table of names for Beethoven expanded to include all the Op/WoO works;
+dates are extracted from 3 sources.  Table for Gershwin.
+
+New file examples/Music_Translate_Fields-normalize.pl.
+
+mp3info2: processing of the first part of -E was completely wrong; only one
+option could have been \\-interpolated.  New syntax -E +something to add to
+the defaults.  New option -x (modelled after mp3info, plus frame descriptors).
+If file name is empty, will work with a fake tag object.  Print (guessed)
+composer and orchestra fields too.
+
+audio_rename: increase the length of -s to 110 (len controlled by environment
+variable).  Add .tag .mp3 to -e.
+Add documentation.  New option -r.  Now is installed.
+
+typeset_audio_dir: now explains the meaning of (L) and (S).
+
+Release Name: 0.9707
+=======================
+
+%M was not recognized.
+
+parsing for "%n" allows track numbers of the form 123/789 too; such track
+numbers are considered as "not fit for ID3v1".
+
+Document that set_id3v2_frame(), select_id3v2_frame() remove the old value(s).
+
+New method interpolate_with_flags().  Make ...::Parse use this method.
+
+New methods composer(), performer(), delete_tag(), _interpolate() in
+MP3::Tag.  Allow customization via local configuration modules
+MP3::Tag::User MP3::Tag::Site MP3::Tag::Vendor.
+
+New interpolated escape %{I(FLAGS)VALUE}.
+
+New configuration variables id3v23_unsync, composer, performer,
+translate_composer, translate_performer.
+
+New test t/interpolate.t.
+
+Incompatible change: kill backslashitis in %-escapes:
+    frame_select_by_descr() etc: no backslashitis whatsoever.
+    interpolate(): no need to backwack all \{}[], only the innermost delimiter
+      char, and only those backslashes which preseed the innermost delimiter.
+    Likewise for parse(), _parse_rex_microinterpolate().
+  Need to change '%{y||<%\{COMM(rus,EN,#1,)[foo]\}>}' to '%{y||<%{COMM(rus,EN,#1,)[foo]}>}'
+	'%%02t_Title: `%012.12t\'; %{TLAN} %{TLAN01: have %\{TLAN01\}} %{!TLAN02:, do not have TLAN02}'
+     to '%%02t_Title: `%012.12t\'; %{TLAN} %{TLAN01: have %{TLAN01}} %{!TLAN02:, do not have TLAN02}'
+	'%{!COMM(rus,EN,#1)[foo]:<%\{COMM(rus,EN,#1,)[foo]\}>}'
+     to '%{!COMM(rus,EN,#1)[foo]:<%{COMM(rus,EN,#1,)[foo]}>}'
+	'%{COMM(rus,EN,#1)[foo]||<%\{COMM(rus,EN,#1,)[foo]\}>}'
+     to '%{COMM(rus,EN,#1)[foo]||<%{COMM(rus,EN,#1,)[foo]}>}'
+	'%{COMM(rus,EN,#1,)[foo]||<%\{COMM(rus,EN,#1,)[foo]\}>}'
+     to '%{COMM(rus,EN,#1,)[foo]||<%{COMM(rus,EN,#1,)[foo]}>}'
+	'%{COMM01||<%\{COMM(rus,EN,#1,)[foo]\}>}'
+     to '%{COMM01||<%{COMM(rus,EN,#1,)[foo]}>}'
+	'%{TLEN||<%\{COMM(rus,EN,#1,)[foo]\}>}'
+     to	'%{TLEN||<%{COMM(rus,EN,#1,)[foo]}>}'
+	$mp3->select_id3v2_frame_by_descr('TXXX[with[\]]', 'this is my TXXX[with[]]')
+	 to $mp3->select_id3v2_frame_by_descr('TXXX[with[]]', 'this is my TXXX[with[]]')
+
+
+    In mp3info2:
+	      print $mp3->interpolate(exists $opt{p} ? $opt{p} : <<EOC);
+      Title:   %-50t Track: %n
+      %{TCOM:Composer: %\\{TCOM\\}
+      }%{TEXT:Text: %\\{TEXT\\}
+      }$performer
+      Album:   %-50l Year:  %y
+      Comment: %-50c Genre: %g
+      EOC
+    to:
+	      print $mp3->interpolate(exists $opt{p} ? $opt{p} : <<EOC);
+      Title:   %-50t Track: %n
+      %{TCOM:Composer: %{TCOM}
+      }%{TEXT:Text: %{TEXT}
+      }$performer
+      Album:   %-50l Year:  %y
+      Comment: %-50c Genre: %g
+      EOC
+
+mp3info2: allow deletion of whole tags by -d; improve docs.
+
+typeset_audio_dir: improve typesetting, allow indication whether lyrics
+is present, of total duration.
+
+Music_Translate_Fields: short_name works better for, e.g., Beethoven (allow
+  the "from" part, as von/van/di/de); normalize key signature and the
+  composition name (per composer file; set MUSIC_TRANSLATE_FIELDS_SKIP_WARNINGS
+  to skip warnings for not detailed enough standard description).
+
+Music_Translate_Fields-L_van_Beethoven.comp: new file; piano sonatas only
+	perl -wle "for (1..32) {{open my $f, qq(> $_)} system qw(mp3info2 -a Beethoven -l), qq(piano sonata No. $_), $_}"
+
+examples/empty.mp3 got a tag accidentally.
+New file examples/empty_10sec.mp3
+  perl -we "print qq(\0) x (8000*2*10)" | lame -b 8 -r -s 8 -m m - empty_10sec.mp3
+	(For experiments with players which only show ID3 when playing.)
+
+If INSTALLSCRIPT is present in Makefile.PL options, LIB will not disable
+installation of scripts.
+
+Release Name: 0.9706
+=======================
+
+The weaken()ing code was failing since weaken() does not return TRUE.  (Tested
+for no obvious memory leaks.)
+
+Allow for backwacked \[ \] \\ in descriptor of, e.g., COMM[descriptor].
+
+New configuration options:
+		   encode_encoding_v1 decode_encoding_v1 decode_encoding_v2
+		   decode_encoding_filename
+		   decode_encoding_inf decode_encoding_cddb_file
+		   decode_encoding_files encode_encoding_files
+	(en/decode_encoding_files for ParseData; applicable to non-binary i/o).
+Initialized from corresponding environment variables
+
+Document environment variables.
+
+translate_title_collection etc configuration values were not settable
+(neither were they documented...).
+
+New methods of ID3v2: frame_select_by_descr(), frame_have_by_descr(),
+frame_list_by_descr(), frame_select_by_descr_simple().
+
+New methods have_id3v2_frame_by_descr(), select_id3v2_frame_by_descr(),
+frame_translate(), frames_translate(), shorten_person() in MP3::Tag.
+interpolate() significantly simplified; new interpolation %{shP{NAME}}.
+
+New type of interpolation: frame ids connected by &.  Slightly more readable
+documentation of interpolate() and parse_rex().
+
+New configuration settings: person_frames, and translate_person
+(supported only by select_id3v2_frame_by_descr()).
+
+Music_Translate_Fields.pm: much better detection of non-canonical names
+(e.g., year removal), support for person names shortening.  New method
+check_persons() for checking consistency of translation/shortening.
+Piecewise translation for multiple authors in a field (separated by ', ',
+'; ', or ' - ').  Will translate title_collection and other CDDB fields.
+
+Music_Translate_Fields-rus.lst: better list of persons for bard repertoire
+and audiobooks; allow "fixing" wrong years too; handle "translated" and
+many more separators of multi-names; cursory support for cases (genitive);
+support for disabling translation (#keep).
+
+audio_rename.pl: transliterate cyrillic with unicode too.
+
+New options -d, -e, -F for the script mp3info2; brush up the docs.
+
+typeset_audio_dir: new option -c; new generated file *_backcover.tex; slightly
+better conversion of ASCII to TeX; use 'textcomp' (another incompatible LaTeX
+change...); new macros for skips about second-level headings; encapsulate
+\addOnRight; ornaments in *_text.tex and *_cdbooklet.tex; commented out
+support for title; begin merging together the code to generate different
+documents; consistent columnseprule; better positioning of hrule's; template
+to merge several lists into one document; document latex, dvips etc.
+
+audio_rename.pl: support unicode cyrillic.
+
+Release Name: 0.9705
+=======================
+
+New environment variables MP3TAG_DECODE_V1_DEFAULT, MP3TAG_DECODE_DEFAULT,
+MP3TAG_ENCODE_V1_DEFAULT, MP3TAG_ENCODE_DEFAULT (0 or encoding name).
+XXXX Not documented yet; does not cover all aspects (filenames, external
+     files, Inf, CDDB files).
+	v2 ENCODE (to illegal encodings) is not implemented yet.
+
+Default for MP3TAG_DECODE_UTF8 is 1 (used for encoding too).
+
+Encoding argument for v2->add_frame() is (finally!) implemented.
+
+Text field of TXXX, USER, USLT, OWNE were wrongly marked as not encoded.
+
+Setting lang=XXX via frame_select() or id3v2_select_frame() would result
+in lang=xxx.
+
+frame_select() returns the count of found frames if it is used for removal
+of frames.
+
+New parameter value 'hash' for get_frame().
+
+New method frames_list() (variant of frame_select()).
+
+Sanity check for tag size parameter in ID3v2.
+
+Sanity check for wide characters in the prepared raw tag.
+
+New method ->size for ::File.
+
+More examples for update_tags().
+
+Music_Translate_Fields: only the parsing logic remains; the data is
+moved into separate files (encoding supported) Music_Translate_Fields*.lst
+(should live alongside the .pm file).
+
+typeset_audio_dir: new option -e; unify the charset logic; add utf8.
+
+Add example/empty.mp3 (some MP3 applications do not accept "really empty"
+MP3s; this one is "almost empty").
+
+Release Name: 0.9704
+=======================
+
+Document why using "encoding" and "TPE1" mindlessly is a bad idea.
+
+Cleaning up read support of v2.4.
+
+Better error message for version mismatch.
+
+Do not warn "not supported" any more if the footer is found (how could it be
+"supported" anyway, except for skipping, which is already done, [was wrong]?).
+(untested)
+
+Extended header parsed for v2.4 too.	(untested)
+
+Footer was treated wrong...  Apparently frame flags were extracted very wrong
+as well... (untested)  Unknown frame flags are mapped to 'unknown_<letter>'.
+
+Rename 'padding_size' field to 'buggy_padding_size' to avoid confusion with
+ID3v2 padding (it is the padding after the tag [unrelated to the standard],
+not the padding inside tag).
+
+fits_tag(): return FALSE if data contains chars above 255.
+update_tags(): better docs, new argument $force2.
+
+mp3info2: in the standard report, "artist" was offset by one space.  New option
+   -2.  README.shrink updated correspondingly.
+
+typeset_audio_dir: more comments on duplex output.
+
+eat_wav_mp3_header: new options -D for dry run, -M for finding .mp3 files.
+
+Release Name: 0.9703
+=======================
+typeset_audio_dir: would not work without -B switch
+	Add generation of cdbooklet with -B.
+mp3info2: when reporting contents, print "Composer" and "Text" lines too.
+	Without -I and -p, writes "Performer" line if TXXX{TPE1} is present.
+	New option -r.
+method interpolate() could return '' when ID3v2 tag was missing even if
+	the tag would affect only a part of the output.
+There was no way to inform the parser that it is OK if the parse data
+	is coming from file, and the file does not exist.  Add 'F' flag...
+
+
+Release Name: 0.9702
+=======================
+examples/type_mp3_dir.pl:
+	new name typeset_audio_dir.pl;
+	Fully document;
+	Change the semantic of numbers in .top_heading files by 1;
+	New option -n;
+	Generate 1st level header for all "toplevel" dirs;
+	TeXify ", ` and ';
+	Add \hrule's for default toplevel headings.
+	-@ was not working;
+Correct rounding of total_secs_int().
+Truncated version in total_secs_int_trunc().
+Rename total_millisecs_int() to total_millisecs_int_fetch(),
+	likewise for total_secs_fetch().
+New method total_millisecs_int() (with caching).
+Cache duration in ms.
+New escape: %M (total millisecs, integer).
+New confiration variable: update_length.
+Will update TLEN field if needed (governed by `update_length').
+Alternation inside escapes implemented.
+New file README.shrink with recommendations on how to fix results of
+the bug with extra unmarked 0-padding.
+Remove trailing .pl from names of typeset_audio_dir, mp3info2.
+Install typeset_audio_dir, mp3info2 unless one of options -n or LIB=
+is given to Makefile.PL.
+
+Release Name: 0.9701
+=======================
+
+-P option of mp3info2 would ignore trailing empty parse patterns
+  (not very restrictive, since to succeed, pattern should have a set-field,
+  or match-exactly field; workaround: append @={U0}, and do not set U0).
+
+When updating ID3v2 tag without growing the file, the tag length would
+not include padding; thus the following update would not use the padding ==>
+tag size leak.
+
+New configuration options: id3v2_minpadding, id3v2_sizemult, id3v2_shrink,
+id3v2_mergepadding (the first two have new defaults: 128 and 512; was 2K and
+4K).
+
+Close file for write of ID3v2 tag as early as possible.
+
+Release Name: 0.97
+=======================
+
+Better docs for add_frame(), set_id3v2_frame(), for configuration parameter
+id3v2_frame_empty_ok, parse_minmatch.
+
+frame_select() now returns undef if no frame is found; likewise for
+select_id3v2_frame(); better behaviour with very low number of arguments.
+
+When interpolating %{COMM[text]}, use lang='', not undef (otherwise
+answer is returned as hash).
+
+Interpolation would interpret second % in '%%02n' as fill character.
+
+Flag 'b' of ParseData would disable whitespace stripping from the data to
+match, but not from matches.
+
+->get_config() would not work as class method.
+
+Ask MP3::Info to 'try_harder'; needed with very long ID3v2 headers...
+
+Decoding Unicode was not flexible enough: now configured by two environment
+variables: MP3TAG_DECODE_UNICODE (default 1) to enable decoding; the
+target of decoding is determined by MP3TAG_DECODE_UTF8: if 0 (default), decoded
+values are byte-encoded UTF-8 (every Perl character contains a byte of
+UTF-8 encoded string); otherwise it is a native Perl Unicode string.
+
+Language=XXX is the *official* designation of unknown language.
+
+Make dependency for ID3v2-Data.pod on Tag/ID3v2.pm.
+
+Warn in mp3info2 if -P is used without ParseData in autoinfo.  Document
+example of attaching lyrics to audio file.
+
+CDDB_File could generate warnings for files without DGENRE field.
+
+type_mp3_dir: new macro \hourmark, exchange ' and '' for minutes/sec.
+
+Release Name: 0.96
+=======================
+
+A bug fix by Ben Bennett for 2.4 support.
+
+Having a genre of the form '(2345)Some new type' would emit a warning.
+
+UTF encoded fields are decoded by default.  Set MP3TAG_ENCODING=0 in
+environment to disable.
+
+Add ID3v2-Data.pod to MANIFEST to avoid circular dependency (XXXX bug:
+it is generated using the installed version of ID3v2.pm, not the
+current version).
+
+Release Name: 0.95
+=======================
+
+After removing several of repeated frames, get_frame(s) could get confused.
+So could the code using get_frame(s).  Now better documented, and fixed.
+
+New method ->is_modified() of ID3v2.
+
+New method ->as_bin() of ID3v1 and ID3v2.
+
+New methods ->is_id3v2_modified(), ->get_id3v2_frames(), ->select_id3v2_frame(),
+->have_id3v2_frame(), ->get_id3v2_frame_ids() of MP3::Tag.
+
+Some `next's needed to be replaced by `return' in mp3info2 and audio_rename.
+
+mp3info2 would not decide that an edit is not needed if an ID3v2 frame was
+modified directly.
+
+Avoid re-parsing by ParseData more aggressively (10x speedup in one complicated
+real-life example).
+
+set_id3v2_frame() and update_tags() were assuming that get_tags() was already
+called.
+
+File->write() could lead to disaster with -l.		!!!!
+
+New options 'b', 'B', 'o', 'O', 'D' for ParseData.  With 'n', 'l' ParseData
+does not ignore empty trailing lines any more.
+
+New %-interpolations: %{ID3v1} for the tag as a whole, same for ID3v2.
+
+Be more strict during interpolation: do not recognize WORD1 as a valid short
+name of ID3v2 frame.
+
+Two new example scripts: mp3_total_time.pl, eat_wav_mp3_header.pl.
+
+Mention example scripts in documentation of MP3::Tag.
+
+Release Name: 0.94
+=======================
+
+The example of the "long" form of ID3v2-comment setting API has arguments swapped.
+
+New methods ->frame_select(), ->frame_have() of ID3v2.
+
+New methods ->pure_filetags() and ->update_tags() of MP3::Tag.
+
+New config variables id3v2_missing_fatal (it was as if it was defaulting to
+TRUE; now defaults to FALSE), parse_minmatch.
+
+New test files in t/: v2_comments.t update_tags.t parser.t 
+
+New escape %{COMM(rus,eng,xxx,#4)[short_description]} (chooses a comment with
+"short_description" descriptor in the specified list of languages; #4 means
+4th comment field, or COMM03; empty language means any language.)  Works
+as a condition for conditional interpolation too, and as a target of parsing
+and ParseData.  Similarly for other frames which have 'Language' and/or
+'Description' fields.
+
+Some POD formatting fixed.
+
+Setting "extra" ID3v2 frames was not immediately visible (only after write
+and re-read from the file).
+
+COMM's short-description was not marked as 'encoded' (due to a misprint).
+
+UNCOMPATIBLE CHANGEs:
+
+COMM's frame short-description now sits on the key "Description", not "short".
+[If you want backward compatibility, check both keys.]
+
+get_frame() considers frames the only content of which is a URL as a "simple
+frame"; likewise for frame_select(), but it also considers frames with _Data
+only as "simple frames".
+
+Release Name: 0.93
+=======================
+
+More robust processing of "Recorded..." in CDDB_File.
+
+Better error message when parse expression has some `=' omitted.
+
+When parsing with nothing to set, would emit "Unsupported reg..." (regmatch
+would return 1 elt if no capturing parens present).
+
+When rewriting id3v2 tag, protect against $\ being set.
+
+Move test.pl to t/mp3tags.t, add t/set_v2.t
+
+Allow arbitrary escapes of the form %{ABCD} or %{ABCD03} in the method parse()
+etc; here ABCD is a 4-letter word.
+
+New config parameter id3v2_frame_empty_ok.
+
+It is possible to set individual id3v2 frames via ParseData; use %{TIT1} or
+some such.  Setting to an empty string deletes the frame if config
+parameter id3v2_frame_empty_ok is true.
+
+Uses TCOM or TPE3 to find "artist" ($mp3->artist) too.
+
+New option -R (recurse into directories) for example scripts.
+
+New example script type_mp3_dir to produce a TeX file with contents of
+directories.  (Put files `.content_comment' into a directory to include comments
+specific for the directory layout.)
+
+Connect parts of comment by \n if \n is already present there.
+
+`Recorded: 1980,1985,1992' was not recognized.
+
+Allow date only at start/end of the comment.
+
+Release Name: 0.92
+=======================
+
+Include a fix by Marco Moreno of Cwd::abspath() not working on files (on
+some architectures).
+
+Release Name: 0.91
+=======================
+
+CDDB_File was removing whitespace on the boundary of continuation fields.
+
+get_user() calls ParseData->parse() to populate the userdata
+
+if $ENV{MP3TAG_TEST_WEAKEN}, will not have a workaround against broken weakrefs
+	(currently tests fail!)
+
+New %-escapes v L r q Q S m s C p o u (require MP3::Info module).
+
+New methods mpeg_version() mpeg_layer() mpeg_layer_roman() is_stereo()
+is_vbr() bitrate_kbps() frequency_Hz() frequency_kHz() size_bytes()
+total_secs() total_secs_int() total_mins() leftover_secs()
+leftover_msec() time_mm_ss() is_copyrighted() is_copyrighted_YN()
+frames_padded() frames_padded_YN() channel_mode_int() frames()
+frame_len() vbr_scale() (require MP3::Info module).
+
+The year() method of ID3v2 takes/returns timestamps in human-readable form;
+parse() recognizes the same formats for %y if option year_is_timestamp is TRUE
+(default).
+
+New option 'intact' to get_frame() of ID3v2.
+
+Support YEAR, ID3Y, ID3G in EXTD, EXTT* fields of CDDB_File.  Support also
+an alternative syntax "Recorded"/"Recorded on"/"Recorded in"/ with the format
+of the date recognized by ID3v2::year(), or just a date field without a prefix.
+The declarations of the former form are stripped from the returned comment.
+
+New fields artist_collection, title_track, comment_collection, comment_track
+in CDDB_File and corresponding accessor methods in MP3::Tag, and corresponding
+escapes aC, tT, cC, cT for interpolate().
+
+New configuration variables 'year_is_timestamp', 'comment_remove_date',
+'translate_*' (for different values of *).
+
+New handler module LastResort; currently it uses artist_collection() as comment
+if comment is not otherwise defined.
+
+New example scripts audio_rename and mod/Music_Translate_Fields.pm.
+
+The example script mp3info2 will use Music_Translate_Fields.pm (if found)
+to postprocess the resulting tag fields via translate_*() methods.
+
+Do not load Compress::Zlib unless when processing compressed data.
+
+Release Name: 0.9
+=======================
+
+Revision history for Perl modules MP3::Tag, MP3::Tag::ID3v1, MP3::Tag::ID3v2, MP3::Tag::File,
+             and for Perl program tk-tag
+
+Changes:
+
+* Bugfix for ID3v2.pm:
+  - Added support for reading ID3v2.2 and ID3v2.4 tags (alpha stage!!) and converting them to ID3v2.3
+  - Bugfix for unsynchronization (thanks to Ian Beckwith)
+  - Bugfix for number-handling in frames
+  - Bugfix for frame compression
+  - Set unsynchronization flag only, if unsynchronization was done and changed anything
+
+* Bugfix for ID3v1.pm:
+  - genres didn't return the id if the genre name was passed as parameter, but returned
+    the same name
+
+* Makefile.PL:
+  - overriding the manifypods() function in MakeMaker to add ID3v2-Data.pod to the MAN3PODS hash
+    (thanks to Dagfinn Ilmari Mannsaker)
+
+* Added copyright text, using Perl Artistic License
+
+Thanks to Ilya Zakharevich for the following changes:
+
+* Three new modules MP3::Tag::Inf, MP3::Tag::ParseData, and
+  MP3::Tag::CDDB_File added
+
+* Tag.pm:
+  - autoinfo() method returns the info for all ID3v1 tags;
+  - autoinfo() method may return the info which tag is obtained from
+    which source;
+  - Methods title(), author() etc (one per each ID3v1 tag) exist and
+    have uniform interface through all the subpackages;
+  - method song() is renamed to title(); method read_filename() is
+    renamed to parse_filename(); backward compatible name still
+    preserved;
+  - config() subroutine can now change all the arbitrary decisions;
+  - new methods interpolate() for tag interpolation into strings and
+    parse(), parse_rex() for an inverse operation;
+  - new subpackage `__hasparent' to treat cyclic object dependencies;
+  - per-object configuration;
+  - new configuration options extension, parse_data, parse_split,
+    parse_filename_ignore_case, parse_filename_merge_dots, parse_join;
+  - a way to store and query user-supplied data inside the object (may
+    be used as scratch space when parsing);
+  - new methods get_config(), get_user(), set_user(), parse_prepare(),
+    parse_rex_prepare(), parse_rex_match(), filename(), abs_filename(),
+    filename_nodir(), filename_noextension(), filename_nodir_noextension(),
+    abs_filename_noextension(), dirname(), filename_extension(),
+    filename_extension_nodot(), dir_component().
+
+* ID3v1.pm:
+  - new ID3v1 method fits_tags() to check whether the info can be
+    placed into an ID3v1 tag
+  - If no track given use automatically ID3v1.0 tag with longer comment
+  - open() file if needed; do not close() close during new().
+
+* ID3v2.pm:
+  - allow multiple frames to be returned by get_frame() in ID3v2;
+  - new method get_frames() with better order of returned values (comparing
+    to get_frame);
+  - get_frame_ids() in ID3v2 improved to take new argument 'truename' to
+    simplify looping over repeated frames;
+  - simpler treatement of sync; fix uncorrect calculation of padding length;
+  - overwrite the tail of the previously present tag with 0s;
+  - a couple of new v2.4 field names added.
+
+* File.pm:
+  - more robust parsing of filenames; year can be read from filename if
+    appended (in parentheses) to author or title; filename can be
+    F<.wav> as well.
+  - support file names starting with track numbers as in 03_This_is_the_title.mp3
+  - support track_title.ext and title_track.ext formats with one-word title too.
+  - new method filename();
+  - use the 'extension' configuration variable to strip extension.
+
+* misprints in the docs corrected and some general harmonization of function and
+  field names in the different modules
+
+* new example script mp3info2 (which provides most of functionality of the
+  "standard" mp3info utility, and much more).
+
+Release Name: 0.40
+==================
+Changes:
+
+* Updated documentation for MP3::Tag, MP3::Tag::ID3v1, MP3::Tag::ID3v2 and MP3::Tag::ID3v2-Data 
+
+* Renamed some functions. The old names will still work, but try to use the new names.
+  The following names were changed: 
+
+  - MP3::Tag::getTags() to MP3::Tag::get_tags() 
+  - MP3::Tag::newTag() to MP3::Tag::new_tag() 
+  - MP3::Tag::ID3v1::removeTag() to MP3::Tag::ID3v1::remove_tag() 
+  - MP3::Tag::ID3v1::writeTag() to MP3::Tag::ID3v1::write_tag() 
+  - MP3::Tag::ID2v2::getFrameIDs() to MP3::Tag::ID3v2::get_frame_ids() 
+  - MP3::Tag::ID2v2::getFrame() to MP3::Tag::ID3v2::get_frame() 
+  
+* Bugfix for ID3v2.pm:
+  - getFrame() returned "undef" as a string instead of simple undef
+  - artist() produced an error when TPE1 is missing in TAG
+ 
+* Bugfix for Tag.pm:
+  - DESTROY() checked only if $mp3->obj{filename} exists and not if it is defined before trying to 
+    close it  
+
+* Bugfix for ID3v1.pm:
+  - genres() expected an id3v1-object as first parameter and a genre
+    only as second parameter. Now the object can be omitted as in a call like
+    MP3::Tag::ID3v1->genres($genre) used by Tag.pm and ID3v2.pm
+
+* bugfix for File.pm:
+  - Filenames may contain surrounding whitespaces now
+
+Release Name: 0.30
+==================
+Changes:
+* Tag.pm
+  - autoinfo() function added. This returns artist/songtitle/track/album.
+    It tries to find this information in an ID3v1 or ID3v2 tag or tries 
+    to extract it from the filename. The order in which this happens
+    can be configured with the new config() function.
+* ID3v2.pm
+  - four new functions: artist(), song(), track() and album(). These
+    are included for compability with the ID3v1 and filename module.
+* Tag.pm / Tag::File.pm
+  - All file access routines are collected in an extra modul now.
+    This prevents circular references between Tag.pm and the ID3v..pm
+    modules. These circular references prevented Perl from calling
+    the destructor for mp3-objects.
+* tk-tag
+  - Loading/Saving of binary data in frame-fields is supported now
+  - tk-tag uses now the new what_data functionally of ID3v2 to offer 
+    BrowseEntrys for TCON and TFLT and also for parts of APIC and COMR
+  - Set Filename uses now the actual contents of the Tags not the old 
+    saved one
+  - Set Filename from ID3v2-Tag works now at least with Artist (%a),
+    Album(%l) and Song (%s)
+* ID3v2::what_data returns now also information about possible restricted
+  input for some frame fields (APIC; TCON; COMR; TFLT are supported yet).
+
+Release Name: 0.25
+==================
+Changes:
+
+* Bug-fix for MP3::Tag
+  If you created several mp3-objects for different files, the filehandles
+  for each file were not used correctly. Thanks to hakimian for reporting
+  this bug.
+* Bug-fix for ID3v2::remove_tag()
+  It was tried twice to rename one temp-file after removing the tag.
+  Thanks to Brent Sarten <bsarten@bigfoot.com> for reporting this.
+* Bug-fix for ID3v2::add_tag()
+  When adding a second (or third, ...) frame of a kind, a wrong header
+  could be written for this frame
+* Bug-fix for tk-tag 
+  When opening a new file, the contents of the ID3v2 tag of the last file
+  would be copied to the ID3v2 tag of the new file for all frames which
+  existed in the last file, but not in the new one.
+
+Release Name: 0.21
+==================
+Changes:
+
+* tk-tag has lots of new functions (see tk-tag README)
+* getFrameIDs returns now always a hash ref of all existing frames, not only
+  when called the first time
+* Some minor problems in documentation are corrected.
+* ID3v2::add_frame returns the name of the newly created frame, which can
+  differ from the short name when already such a frame exists.
+
+Release Name: 0.20 (beta)
+========================
+Changes:
+
+--due to problems when run at windows:
+  * Added a second seek to ID3v1::write_tag, as windows writes at a wrong 
+    position otherwise
+  * Setting Filehandle to binmode after opening a mp3 file 
+  * ID3v2: write_tag creates a temp file (if neccessary) now in the same
+    directory where the original mp3 files is located and not in /tmp
+
+* Added tk-tag.pl, a graphical interface for MP3::Tag. tk-tag.pl is a alpha
+  version
+* Added a new manpage MP3::Tag::ID3v2-Data which contains information about
+  the ID3v2 frames and the data returned by MP3::Tag::Id3v2::getFrame() 
+* Frames RVRB ("Reverb"), COMR ("Commercial frame"), AENC ("Audio encryption"),
+  GRID ("Group identification registration"), RBUF ("Recommended buffer size")
+  and SYTC ("Synchronized lyric/text") are now supported	
+* Added some test to test.pl for creating new tags
+* ID3v2::getFrameIDs returns now a hash reference, which contains the found
+  frames. The keys are the 4 byte codes of the frames, which are needed for
+  getFrame . The according values are the english (long) names of the frames.
+* ID3v2::write_tag - Updating tagsize after writing tag 
+* ID3v1::all() returns in array context all fields, otherwise only the song
+* MP3::ID3v1::write_tag didn't returned an error if a file couldn't be opened
+  for writing. Now it does.
+* Renamed MP3::TAG to MP3::Tag following a suggestion of ANDK from CPAN
+* Makefile.PL : Added that Compress::Zlib and File::Basename is needed for 
+  installation of MP3::Tag
+
+Release Name: 0.1 (beta)
+========================
+Changes:
+* Added documentation to the modules
+
+* Writing/removing of ID3v2.3 tags is supported now 
+* Adding, changing, removing frames of ID3v2.3 is supported
+
+* Changed directory structure
+* Added file for proper install of modules
+
+
+Release Name: 0.2-alpha
+=======================
+Changes: 
+* ID3v2.3 compressed frames are supported now 
+* changed directory structure, support librarys for MP3::Tag are now in a
+  subdirectory 
+* tagged.pl calls xview to show pictures, which were found in ID3v2 tags
+  (sorry, not configurable at the moment, but easy to change in tagged.pl)
+
+Release Name: 0.1-alpha
+=======================
+This is the first alpha version. It contains perl modules to
+read ID3v1/ID3v2 tags, but they are still lacking a lot of
+features. 
+
+* Reading / Writing ID3v1 works
+* Reading of most frames of ID3v2.3 works
+
+Included is a demo program tagged.pl, and a program to change ID3v1
+tags and to set automatically the filename of a mp3 file: tagit.pl See
+README.txt for details. More documentation is still lacking. Sorry.
+
+
+
+MP3::Tag can be found at http://sourceforge.net/projects/tagged

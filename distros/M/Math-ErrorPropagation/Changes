@@ -1,0 +1,6 @@
+Revision history for Perl extension ErrorPropagation.
+
+0.01  Tue Oct 22 11:51:49 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n ErrorPropagation
+

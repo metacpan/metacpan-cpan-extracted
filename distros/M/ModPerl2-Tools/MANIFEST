@@ -1,0 +1,13 @@
+Changes
+mk_README.sh
+README
+perl-ModPerl2-Tools.spec
+lib/ModPerl2/Tools.pm
+Makefile.PL
+MANIFEST
+t/TEST.PL
+t/001.t
+t/002.t
+t/003.t
+t/conf/extra.last.conf.in
+META.yml                                 Module meta-data (added by MakeMaker)

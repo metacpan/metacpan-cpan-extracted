@@ -1,0 +1,37 @@
+Revision history for MooX-CalcTime
+
+0.0.8 2016-08-05T08:26:11
+ [Yan Xueqing]
+ - Fixed running bug
+
+0.0.7 2016-08-05T08:03:49Z
+ [Yan Xueqing]
+ - Modified synopsis
+
+0.0.6 2016-08-05T06:51:34Z
+ [Yan Xueqing]
+ - Replaced get_runtime_format with get_runtime
+
+0.0.5 2016-07-29T05:37:58Z
+ [Yan Xueqing]
+ - Fixed bug that forget to load DateTime too
+
+0.0.4 2016-07-29T05:34:38Z
+ - No changes found
+
+0.0.3 2016-07-29T05:14:05Z
+ [Yan Xueqing]
+ - Added start and end time
+
+0.0.2 2016-07-29T04:59:51Z
+ [Yan Xueqing]
+ - Modified pod text
+
+0.0.1 2016-07-27T07:58:40Z
+ [Yan Xueqing]
+ - Auto commited by dzil with version 0.0.1 at 27-Jul-2016
+ - Added test file for moox-calctime
+ - Added moox-calctime module
+ - Added moox-calctime-role module
+ - Initialize gitrepo with `dzil new`
+

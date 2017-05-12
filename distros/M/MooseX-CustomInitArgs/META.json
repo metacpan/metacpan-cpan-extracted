@@ -1,0 +1,80 @@
+{
+   "abstract" : "define multiple init args with custom processing",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::7 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-CustomInitArgs",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::OptList" : "0",
+            "Moose" : "2.00"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::CustomInitArgs" : {
+         "file" : "lib/MooseX/CustomInitArgs.pm",
+         "version" : "0.004"
+      },
+      "MooseX::CustomInitArgs::Trait::Application" : {
+         "file" : "lib/MooseX/CustomInitArgs.pm",
+         "version" : "0.004"
+      },
+      "MooseX::CustomInitArgs::Trait::Attribute" : {
+         "file" : "lib/MooseX/CustomInitArgs.pm",
+         "version" : "0.004"
+      },
+      "MooseX::CustomInitArgs::Trait::Class" : {
+         "file" : "lib/MooseX/CustomInitArgs.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/MooseX-CustomInitArgs/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=MooseX-CustomInitArgs"
+      },
+      "homepage" : "https://metacpan.org/release/MooseX-CustomInitArgs",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-moosex-custominitargs.git",
+         "web" : "https://github.com/tobyink/p5-moosex-custominitargs"
+      }
+   },
+   "version" : "0.004"
+}

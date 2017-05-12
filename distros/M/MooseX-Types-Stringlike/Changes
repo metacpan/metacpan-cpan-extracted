@@ -1,0 +1,18 @@
+Revision history for MooseX-Types-Stringable
+
+0.003     2014-04-17 07:06:08-04:00 America/New_York
+
+    [Added]
+
+    - new ArrayRefOfStringlike, ArrayRefOfStringable types to facilitate
+      coercion of lists
+
+0.002     2013-11-02 21:42:57 America/New_York
+
+    [Documentation]
+
+    - Fixed missing =encoding command
+
+0.001     2012-03-26 22:55:10 EST5EDT
+    - initial release
+

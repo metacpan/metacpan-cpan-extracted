@@ -1,0 +1,53 @@
+{
+   "abstract" : "Mojo I18n with Locale::Wolowitz",
+   "author" : [
+      "Kang-min Liu <gugod@gugod.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110580",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Wolowitz",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Locale::Wolowitz" : 0,
+            "Mojo::Base" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gugod/Mojolicious-Plugin-Wolowitz/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gugod/Mojolicious-Plugin-Wolowitz.git",
+         "web" : "https://github.com/gugod/Mojolicious-Plugin-Wolowitz"
+      }
+   },
+   "version" : "1.0.1"
+}
+

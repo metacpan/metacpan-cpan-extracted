@@ -1,0 +1,3 @@
+\.svn
+t\/beerdb\.db
+^build\/

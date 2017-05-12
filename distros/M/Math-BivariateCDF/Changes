@@ -1,0 +1,6 @@
+Revision history for Perl extension Math::BivariateCDF.
+
+0.01  Wed May 18 06:05:37 2016
+	- original version; created by h2xs 1.23 with options
+		-Oxan Math::BivariateCDF toms462.h
+

@@ -1,0 +1,32 @@
+MKDoc::Control_List
+===================
+
+MKDoc::Control_List - Express complex sets of rules with control lists
+
+BUGS
+
+ - probably
+
+TODO
+
+ - allow initialisation by passing filename instead of hash
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This package depends on perl
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 MKDoc Ltd. All Rights Reserved.
+This module is Free Software. It may be used, redistributed and/or
+modified under the same terms as Perl itself.
+

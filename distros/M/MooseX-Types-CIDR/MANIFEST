@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/MooseX/Types/CIDR.pm
+t/00-compile.t
+t/00-load.t

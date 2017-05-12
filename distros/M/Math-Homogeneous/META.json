@@ -1,0 +1,78 @@
+{
+   "abstract" : "Perform homogeneous product",
+   "author" : [
+      "@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.11.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Math-Homogeneous",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Clone" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Math::Homogeneous" : {
+         "file" : "lib/Math/Homogeneous.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hoto17296/Math-Homogeneous/issues"
+      },
+      "homepage" : "https://github.com/hoto17296/Math-Homogeneous",
+      "repository" : {
+         "url" : "git://github.com/hoto17296/Math-Homogeneous.git",
+         "web" : "https://github.com/hoto17296/Math-Homogeneous"
+      }
+   },
+   "version" : "0.03",
+   "x_contributors" : [
+      "papix <mail@papix.net>",
+      "hoto <hoto17296@gmail.com>"
+   ]
+}

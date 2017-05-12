@@ -1,0 +1,88 @@
+[% IF statustext %]
+<p align="center">
+    <div class="[% statuscolor %]">[% [% tr.tr("statustext") %] %]</div>
+</p>
+[% END %]
+<p align="center">
+    <table class="data" align="center" id="MainDataTable">
+        <tr class="tabheader">
+            <th>[% tr.tr("File") %]</th>
+            <th>[% tr.tr("Creator") %]</th>
+            <th>[% tr.tr("Created") %]</th>
+            <th>[% tr.tr("Updated") %]</th>
+            <th>[% tr.tr("Public") %]</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        <form name="textdoc_new" method="post" action="[% PostLink %]">
+            <tr>
+                <td><input type="text" size="30" name="filename"></td>
+                <td>[% userData.user %]</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                    <input type="hidden" name="mode" value="create">
+                    <input type="submit" value="[% tr.tr("Create") %]">
+                </td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+        </form>
+
+        [% FOREACH File IN Files %]    
+            <form id="textdoc_[% File.id %]" method="post" action="[% PostLink %]">
+                <tr>
+                    <td>
+                        [% IF File.username == userData.user %]
+                            <input type="text" name="filename" size="30" value="[% File.filename %]">
+                        [% ELSE %]
+                            <input type="hidden" name="filename" size="30" value="[% File.filename %]">
+                            [% File.filename %]
+                        [% END %]
+                    </td>
+                    <td>[% File.username %]</td>
+                    <td>[% File.created %]</td>
+                    <td>[% File.updated %]</td>
+                    <td>
+                        <input type="checkbox" name="is_public"
+                            [% IF File.is_public == "1" %]
+                               checked="checked"
+                            [% END %]
+                        >
+                    </td>
+                    <td>
+                        <input type="hidden" name="fileid" value="[% File.id %]">
+                        <input type="hidden" name="mode" id="mode_[% File.id %]" value="update">
+                        [% IF File.username == userData.user %]    
+                            <input type="submit" value="[% tr.tr("Update") %]">
+                        [% ELSE %]
+                            &nbsp;
+                        [% END %]
+                    </td>
+                    <td>
+                        [% IF File.username == userData.user %]
+                            <input type="submit" value="[% tr.tr("Edit") %]" onClick="return setMode('mode_[% File.id %]', 'edit');">
+                        [% ELSE %]
+                            &nbsp;
+                        [% END %]
+                    </td>
+                    <td>
+                        <input type="submit" value="[% tr.tr("View") %]" onClick="return setMode('mode_[% File.id %]', 'viewuserform');">
+                    </td>
+                    <td>
+                        [% IF File.username == userData.user %]
+                            <input type="submit" value="[% tr.tr("Delete") %]" onClick="return confirmDeleteDocument('textdoc_[% File.id %]', 'mode_[% File.id %]');">
+                        [% ELSE %]
+                            &nbsp;
+                        [% END %]
+                    </td>
+                </tr>
+            </form>
+        [% END %]
+
+    </table>
+</p>

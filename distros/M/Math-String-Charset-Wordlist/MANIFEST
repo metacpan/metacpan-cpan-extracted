@@ -1,0 +1,27 @@
+bench/bench.pl
+bench/time.pl
+BUGS
+CHANGES
+CREDITS
+examples/dict.pl
+examples/wordlist.txt
+lib/Math/String/Charset/Wordlist.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+NEW
+README
+t/big.lst
+t/empty.lst
+t/pod.t
+t/pod_cov.t
+t/setwpm.t
+t/test0d.lst
+t/testbig.lst
+t/testlist.lst
+TODO
+Wordlist.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

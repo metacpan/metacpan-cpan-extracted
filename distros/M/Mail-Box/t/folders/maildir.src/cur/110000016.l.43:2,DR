@@ -1,0 +1,32 @@
+Received: from ns.ATComputing.nl (ns.ATComputing.nl [195.108.229.25])
+	by atcmpg.ATComputing.nl (8.9.0/8.9.0) with ESMTP id QAA25632
+	for <markov@ATComputing.nl>; Wed, 14 Jun 2000 16:54:28 +0200 (MET DST)
+Received: (from nobody@localhost)
+	by ns.ATComputing.nl (8.8.8/8.8.8) id QAA12167
+	for <markov@ATComputing.nl>; Wed, 14 Jun 2000 16:54:27 +0200
+Received: from ns.simplesystems.org(204.252.75.242) by ns.ATComputing.nl via smap (V2.1)
+	id xma012165; Wed, 14 Jun 00 16:54:12 +0200
+Received: from localhost (localhost [127.0.0.1])
+	by ns.simplesystems.org (8.9.3/8.9.3) with ESMTP id JAA14556
+	for <markov@ATComputing.nl>; Wed, 14 Jun 2000 09:54:08 -0500 (CDT)
+From: magick-bugs@simple.dallas.tx.us
+Date: Wed, 14 Jun 2000 09:54:08 -0500 (CDT)
+Message-Id: <200006141454.JAA14556@ns.simplesystems.org>
+To: markov@ATComputing.nl
+Subject: Re: Annotate problems (PR#298)
+X-Loop: magick-bugs@simple.dallas.tx.us
+Content-Type: text
+Status: RO
+X-Status: A
+Content-Length: 307
+Lines: 9
+
+Thank you for submitting an ImageMagick bug report to
+magick-bugs@simplesystems.org.
+
+Your bug report is available on the web at the URL
+http://www.simplesystems.org/ImageMagick/bugs?findid=298    
+
+Report any problems with the bug tracking system itself to
+Bob Friesenhahn <bfriesen@simple.dallas.tx.us>.
+

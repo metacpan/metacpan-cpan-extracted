@@ -1,0 +1,120 @@
+Revision history for Module-ThirdParty
+
+0.27    2010.06.19 (SAPER)
+        [DATA] RT#58412: Updated information for Win32::Daemon.
+        [DATA] RT#58413: Added information for Circos.
+        [DOC] Some documentation fixes and improvments.
+
+0.26    2008.01.04
+        [DATA] Removed information for HTML::Sanitizer, Net::TCLink, P4, V
+        as these modules are now available on the CPAN.
+        [API] Added function all_modules().
+        [TESTS] Added t/11index.t to check that modules listed by M::TP 
+        are not on the CPAN.
+
+0.25    2007.09.29
+        [DATA] Added information for Proton-CE.
+
+0.24    2007.09.14
+        [DATA] Added information for X-Chat Perl API, contributed by David
+        Rigaudiere. Added Information for Fuzzled and Opus10, contributed 
+        by Sofian Brabez. Removed information for Asterisk Perl modules, 
+        as they're now available on the CPAN.
+
+0.23    2007.08.17
+        [DATA] Added information for OpenBSD modules, 
+        Added information for modules pointed by David Rigaudiere: 
+        PatrolPerl, W2RK::WMI, Win32::Lanman, Win32::Setupsup.
+
+0.22    2007.07.26
+        [DATA] Added information for ActivePerl specific modules.
+        [API] provides() can now be exported on demand.
+
+0.21    2007.07.22
+        [DOC] Had forgotten to include the list of known third-party software.
+
+0.20    2007.07.22
+        [DATA] Fixed URLs for LibWhisker 1 and 2, MIM, Paradata OpenConnect, 
+        VMware Perl API, Zeus Web Server Perl Extensions.
+        [DATA] Added information for CSS::Cleaner, Devel::Gladiator, 
+        HTML::Sanitizer, DCOP-Perl, SlimServer.
+
+0.19    2007.01.25
+        [DATA] Removed Text::ChaSen as it is now available on the CPAN.
+        Added information for OwPerlProvider.
+
+0.18    2006.10.16
+        [DATA] Added information for BackupPC.
+        [DIST] Added examples in eg/.
+
+0.17    2006.09.25
+        [DATA] Added information for Abe Timmerman's V, Brian Ingerson's XXX, 
+        Nicolas Chuche's BB and Orabb. Fixed a typo in Zeus Web Server name. 
+
+0.16    2006.05.12
+        [DATA] RT#19200: Added information for Mail::SpamAssassin::AuthCourier.
+        Thanks to David Landgren for the patch.
+        [DATA] Updated URLs for some Tobi Oetiker's projects.
+
+0.15    2006.04.20
+        [DATA] Added information for Asterisk-Perl, Metasploit, Webmin, 
+        SNMP_Session and updated SmokePing.
+        [TESTS] Removed useless BEGIN from test scripts.
+
+0.14    2005.12.30
+        [DATA] Corrected information for VCP.
+        [DATA] Added information for Gedafe, Gossips, NoCatAuth, OTRS, 
+        Real Men Don't Click SmokePing, Template Tree II. 
+
+0.13    2005.11.18
+        [DATA] Corrected a few typos thanks to Test::Spelling.
+        [DATA] Added information for Fotango Vx.
+
+0.12    2005.08.14
+        [DOC] Updated Changes.
+        [TESTS] Modified 01api.t so that it passes under Perl 5.004
+
+0.11    2005.08.02
+        [DATA] Added information for PerlHP.
+        [DOC] RT#13916 (Robert Rothenberg): typo in Changes file
+
+0.10    2005.07.29
+        [DATA] Removed information for Geo::IP as it is published on the CPAN.
+        [DATA] Corrected a mistake.
+        [DOC] Small documentation update.
+
+0.09    2005.06.28
+        [DATA] Added information for Sprog.
+        [DATA] Removed information for ARSperl as it is in fact on the CPAN.
+        [FEATURE] is3rdparty now lists software case insensitively.
+        [DOC] Now includes the list of covered software.
+
+0.08    2005.06.06
+        [DATA] Added information for ARSperl.
+
+0.07    2005.06.04
+        [DATA] Added information for Zeus Web Server Perl Extensions.
+
+0.06    2005.05.10
+        [DATA] Added information for Perl::API, LibWhisker.
+
+0.05    2005.04.23
+        [FEATURE] Added the provides() functions, and the corresponding 
+        option -l to the is3rdparty command.
+        [DOC] Added references to BackPAN.
+
+0.04    2005.04.20
+        [DATA] Added information for Apple PerlObjCBridge, Movable Type, 
+        Perforce, ClearSilver, Fidelia NetVigil, Directi Perl API, MIM, 
+        CAIDA GeoPlot Perl API, ManageIT perl4patrol, Paradata OpenConnect, 
+        Fathom Management Perl API, Gemplus cardreader.
+
+0.03    2005.04.10
+        [DATA] Added information for RT (Request Tracker).
+
+0.02    2005.04.09
+        [FEATURE] Added is3rdparty command.
+
+0.01    2005.04.03
+        First version, released on an unsuspecting world.
+

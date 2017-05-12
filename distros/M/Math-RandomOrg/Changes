@@ -1,0 +1,18 @@
+Revision history for Perl extension Math/RandomOrg.pm:
+
+0.04	Mon Nov 27 2006
+	- Changes to conform to CPANTS Kwalitee:
+	  - Added pod tests.
+	  - Added examples directory.
+	  - Updated Makefile.PL to use Module::Install and provide licensing terms.
+
+0.03	Tue May 30  02:56:00 EST 2006
+	- Added checkbuf() and randseq() functions (thanks to Aaron Dalton).
+
+0.02	Wed Jan 9  06:50:00 EST 2002
+	- fixed POD syntax error
+	- cleaned up for CPAN release
+
+0.01	Tue Oct 16 16:34:00 EST 2001
+	- original version 
+

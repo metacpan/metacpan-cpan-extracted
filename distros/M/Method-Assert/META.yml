@@ -1,0 +1,23 @@
+---
+abstract: 'Ensure instance and class methods are called properly'
+author:
+  - 'Robin Smidsrød <robin@smidsrod.no>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.101610'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Method-Assert
+requires:
+  Carp: 0
+  Scalar::Util: 0
+resources:
+  repository: git://github.com/robinsmidsrod/Method-Assert.git
+version: 0.0.1

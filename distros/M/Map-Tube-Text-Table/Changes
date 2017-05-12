@@ -1,0 +1,27 @@
+0.04 2015-01-24T18:42:18+01:00
+ [Map::Tube::Text::Table]
+ - Add Map::Tube::Graph to SEE ALSO section in doc.
+ - Add Map::Tube::Plugin::Graph to SEE ALSO section in doc.
+ - Add 'print_id' parameter for ID printing in line() method.
+ - Fix junctions() method to new Map::Tube 2.72 version.
+ - Fix line() method to new Map::Tube 2.72 version.
+
+0.03 2015-01-07T07:53:38+01:00
+ [Common]
+ - Add Task::Map::Tube to SEE ALSO section in doc.
+ - Update copyright years to 2015.
+
+ [Map::Tube::Text::Table]
+ - Add lines() method.
+ - Rewrite to new Map::Tube::Text::Table::Utils::table().
+
+ [Map::Tube::Text::Table::Utils]
+ - Fix table() subroutine for situation without headers.
+ - Fix indentation in table() subroutine.
+
+0.02 2014-12-19T19:33:51+01:00
+ - Fix dependencies.
+ - Update META.yml file.
+
+0.01 2014-12-19T08:21:12+01:00
+ - First version.

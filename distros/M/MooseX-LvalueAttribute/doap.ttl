@@ -1,0 +1,173 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-LvalueAttribute/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008"^^doap-deps:CpanId ], [ doap-deps:on "Moose 2.0000"^^doap-deps:CpanId ], [ doap-deps:on "Variable::Magic"^^doap-deps:CpanId ], [
+		doap-deps:on "Hash::Util::FieldHash::Compat"^^doap-deps:CpanId;
+	], [ doap-deps:on "Exporter::Shiny"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-LvalueAttribute>;
+	doap:created         "2013-08-24"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/ctbrown>, <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/MooseX-LvalueAttribute>;
+	doap:homepage        <https://metacpan.org/release/MooseX-LvalueAttribute>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/ctbrown>, <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "MooseX-LvalueAttribute";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooseX-LvalueAttribute/v_0-900_01>, <http://purl.org/NET/cpan-uri/dist/MooseX-LvalueAttribute/v_0-900_02>, <http://purl.org/NET/cpan-uri/dist/MooseX-LvalueAttribute/v_0-980>, <http://purl.org/NET/cpan-uri/dist/MooseX-LvalueAttribute/v_0-981>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-moosex-lvalueattribute>;
+	];
+	doap:shortdesc       "lvalue attributes for Moose".
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-LvalueAttribute/v_0-900_01>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Preview for a fork/replacement for MooseX-Meta-Attribute-Lvalue";
+	dc:identifier        "MooseX-LvalueAttribute-0.900_01"^^xsd:string;
+	dc:issued            "2013-08-25"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-LvalueAttribute-0.900_01.tar.gz>;
+	doap:revision        "0.900_01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-LvalueAttribute/v_0-900_02>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "MooseX-LvalueAttribute-0.900_02"^^xsd:string;
+	dc:issued            "2013-08-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Change bug tracker link.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Export an `lvalue` constant.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Use inlining where possible to speed up lvalue accessors. Getting a reasonable speed.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-LvalueAttribute-0.900_02.tar.gz>;
+	doap:revision        "0.900_02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-LvalueAttribute/v_0-980>
+	a                    doap:Version;
+	dc:identifier        "MooseX-LvalueAttribute-0.980"^^xsd:string;
+	dc:issued            "2013-08-27"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-LvalueAttribute-0.980.tar.gz>;
+	doap:revision        "0.980"^^xsd:string;
+	rdfs:comment         "No functional changes".
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-LvalueAttribute/v_0-981>
+	a                    doap:Version;
+	dc:identifier        "MooseX-LvalueAttribute-0.981"^^xsd:string;
+	dc:issued            "2014-10-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Use Exporter::Tiny instead of Sub::Exporter.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Explicitly depend on Perl 5.8.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-LvalueAttribute-0.981.tar.gz>;
+	doap:revision        "0.981"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-Meta-Attribute-Lvalue/project>
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/ctbrown>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooseX-Meta-Attribute-Lvalue/v_0-02>, <http://purl.org/NET/cpan-uri/dist/MooseX-Meta-Attribute-Lvalue/v_0-03>, <http://purl.org/NET/cpan-uri/dist/MooseX-Meta-Attribute-Lvalue/v_0-04>, <http://purl.org/NET/cpan-uri/dist/MooseX-Meta-Attribute-Lvalue/v_0-05>.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-Meta-Attribute-Lvalue/v_0-02>
+	a                    doap:Version;
+	rdfs:label           "First CPAN release";
+	dc:identifier        "MooseX-Meta-Attribute-Lvalue-0.02"^^xsd:string;
+	dc:issued            "2008-10-23"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/ctbrown>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/C/CT/CTBROWN/MooseX-Meta-Attribute-Lvalue-0.02.tar.gz>;
+	doap:revision        "0.02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-Meta-Attribute-Lvalue/v_0-03>
+	a                    doap:Version;
+	dc:identifier        "MooseX-Meta-Attribute-Lvalue-0.03"^^xsd:string;
+	dc:issued            "2008-10-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Makefile requires Moose, Moose::Role.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fixed logic to test for 'rw' attribute using _is_metadata.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/drolsky>, <http://purl.org/NET/cpan-uri/person/sartak>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/ctbrown>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/C/CT/CTBROWN/MooseX-Meta-Attribute-Lvalue-0.03.tar.gz>;
+	doap:revision        "0.03"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-Meta-Attribute-Lvalue/v_0-04>
+	a                    doap:Version;
+	dc:identifier        "MooseX-Meta-Attribute-Lvalue-0.04"^^xsd:string;
+	dc:issued            "2008-12-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "It is no longer required to set lvalue = 1 when specifying your attribute.  All that is required is to set the traits to include 'Lvalue'. See synopsis for details.";
+		], [ rdfs:label "Added tests for does 'lvalue'." ];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/ctbrown>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/C/CT/CTBROWN/MooseX-Meta-Attribute-Lvalue-0.04.tar.gz>;
+	doap:revision        "0.04"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-Meta-Attribute-Lvalue/v_0-05>
+	a                    doap:Version;
+	dc:identifier        "MooseX-Meta-Attribute-Lvalue-0.05"^^xsd:string;
+	dc:issued            "2008-12-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Requires Moose, Moose::Role version 0.56.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/ctbrown>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/C/CT/CTBROWN/MooseX-Meta-Attribute-Lvalue-0.05.tar.gz>;
+	doap:revision        "0.05"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/ctbrown>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:ctbrown@cpan.org>;
+	foaf:name            "Christopher Brown";
+	foaf:nick            "CTBROWN";
+	foaf:page            <https://metacpan.org/author/CTBROWN>.
+
+<http://purl.org/NET/cpan-uri/person/drolsky>
+	a                    foaf:Person;
+	foaf:nick            "DROLSKY";
+	foaf:page            <https://metacpan.org/author/DROLSKY>.
+
+<http://purl.org/NET/cpan-uri/person/sartak>
+	a                    foaf:Person;
+	foaf:nick            "SARTAK";
+	foaf:page            <https://metacpan.org/author/SARTAK>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

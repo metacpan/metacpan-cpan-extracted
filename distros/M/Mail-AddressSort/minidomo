@@ -1,0 +1,231 @@
+#!/usr/bin/perl
+
+# bulksend
+# Send out email in batch lists
+
+#
+# Includes
+#
+
+use lib qw(/home/chrisj/lib/);
+
+use Net::SMTP;
+use Mail::AddressSort;
+
+#
+# Compiler Directives
+#
+
+use strict;
+use vars qw/$From @List $Msg $MailHost $RecpLimit $HostSplit $ListFile $MsgFile 
+	$Client $TestFlag $ListMgr $Batch/;
+
+#
+# Subroutines
+#
+
+sub parse
+{
+my ($x);
+$TestFlag=1;
+while (@_)
+{
+	$x=shift;
+	if ($x eq "-limit")
+	{
+		$RecpLimit=shift;
+	} elsif ($x eq "-hostsplit")
+	{
+		$HostSplit=1;
+	} elsif ($x eq "-list")
+	{
+		$ListFile=shift;
+	} elsif ($x eq "-message")
+	{
+		$MsgFile=shift;
+	} elsif ($x eq "-mailhost")
+	{
+		$MailHost=shift;
+	} elsif ($x eq "-mailfrom")
+	{
+		$From=shift;
+	} elsif ($x eq "-ok")
+	{
+		$TestFlag=0;
+		print("NOTICE: Mail will be sent!\n");
+	}
+}
+$MailHost="localhost" unless ($MailHost);
+unless ($From)
+{
+	$From=$ENV{"LOGNAME"}."\@".$ENV{"HOSTNAME"};
+	print("From not specified, using $From\n");
+}
+return;
+}
+
+sub readMessage
+{
+my (@lines,$l);
+if ($MsgFile)
+{
+	open (F, $MsgFile) || die ("Can't read $MsgFile");
+	(@lines)=<F>;
+	close(F);
+	$Msg=join("",@lines);
+} else {
+	die("No message file specified\n");
+}
+return;
+}
+
+sub readList
+{
+my (@lines,$l);
+if ($ListFile)
+{
+	open (F, $ListFile) || die ("Can't read $ListFile");
+	while($l=<F>)
+	{
+		next if ($l=~/^#/);
+		chop($l);
+		($l)=split(/\s+/,$l);
+		push(@lines,$l);
+	}
+	close(F);
+} else {
+	die("No list file specified\n");
+}
+return(@lines);
+}
+
+sub sendOut
+{
+my ($batch)=@_;
+my ($list,$address,$count);
+$count=1;
+foreach $list (@{$batch})
+{
+	$Client->mail($From);
+	$ListMgr->printBatches($batch,$count);
+	if ($TestFlag)
+	{
+		print("Fake batch $count sent\n");
+		$Client->reset();
+		$count++;
+	} else {
+		$Client->data($Msg);
+		print("Real batch $count sent\n");
+		$count++;
+	}
+}
+return;
+}
+
+#
+# Main Program Block
+#
+
+# Parse the command line arguements
+&parse(@ARGV);
+
+# Read in the message
+&readMessage();
+
+# Read in the recipient list
+(@List)=&readList();
+
+# Sort the list by domain
+$ListMgr=Mail::AddressSort->new();
+$ListMgr->input(@List);
+if ($HostSplit)
+{
+	($Batch)=$ListMgr->batches(-maxRecipients => $RecpLimit -byHost);
+} else {
+	($Batch)=$ListMgr->batches(-maxRecipients => $RecpLimit);
+}
+
+# Determine the number of users per outgoing message
+
+# Connect to the mailhost and send out the messages
+$Client=Net::SMTP->new($MailHost);
+
+unless ($Client)
+{
+	die("Unable to connect to $MailHost\n");
+}
+&sendOut($Batch);
+
+# Close client connection
+$Client->quit();
+
+#
+# Exit Program
+#
+exit 1;
+
+#
+# POD Documentation
+#
+
+=head1 NAME
+
+minidomo
+
+=head1 SYNOPSIS
+
+$ minidomo -list [listfile] -message [msgfile] -limit [integer] -hostsplit
+-mailhost [hostname] -mailfrom [address] -ok
+
+=head1 DESCRIPTION
+
+Minidomo is an example program that uses the Mail::AddressSort module to sort 
+a list of email addresses, and the Net::SMTP module to connect to a mail server
+to send a message out to those addresses in batches.
+
+It is useful for sending out a single message to a large number mailing list 
+because it can break down the list of addresses into smaller batches 
+like "bulksend".
+
+=head1 ARGUEMENTS
+
+=over 4
+
+=item -list [listfile]
+
+A file containing a list of email addresses.  It expects one address on each line, 
+with each address occuring at the start of the line.  Whitespace and other 
+characters after the address are thrown out.  Lines starting with a pound sign 
+are ignored.
+
+=item -message [msgfile]
+
+A file containing a full email message (with headers).  No editing is performed 
+to the message, it is simply passed in full after the DATA SMTP command.
+
+=item -limit [integer]
+
+The maximum number of recipients for each message batch.
+
+=item -hostsplit
+
+Indicates that each batch should only contain addresses that are addressed 
+to the same mail host.  Each batch will still be limited in size to the number 
+of recipients specified by the -limit parameter.
+
+=item -mailhost [hostname]
+
+What remote mail server to connect to.  Defaults to "localhost".
+
+=item -mailfrom [address]
+
+What email address to pass to the "MAIL FROM" SMTP command.  Defaults to the 
+username and hostname of the machine as defined in the environmental variables.
+
+=item -ok
+
+Confirmation flag.  Without this flag, minidomo only goes through the motions of 
+addressing the messages, and connecting to the remote server, but it does not 
+send the messages.
+
+=back

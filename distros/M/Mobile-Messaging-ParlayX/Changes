@@ -1,0 +1,13 @@
+Revision history for Perl extension Mobile::Messaging::ParlayX.
+
+0.0.3  Mon Jun 25 18:17:37 2007
+	- fixed incorrect tag ``ChargingInformation'' to ``charging''
+
+0.0.2  Fri Mar 23 15:00:37 2007
+	- Added prequisite XML::LibXML 1.62 to Makefile.PL (I found
+	out the hard way it did not work with 1.5x)
+	- Fixed spelling error in POD
+	- Fixed POD formatting
+
+0.0.1  Thu Mar 22 20:30:37 2007
+	- original version

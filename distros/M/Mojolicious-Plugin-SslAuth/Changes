@@ -1,0 +1,15 @@
+0.08  2014-01-12
+    - generate_port moved to Mojo::IOLoop::Server in Mojolicious 5.0 - reneeb
+
+0.07  2012-05-26
+    - POD fix
+
+0.06  2012-05-25
+    - Adjusted for recent prepare_ioloop removal Test::Mojo changes
+
+0.05  2011-06-13
+    - Bumped Mojolicious & IO::Socket::SSL requirements
+
+0.04  2011-06-08
+    - Added github urls to metadata
+    - Added github urls to metadata

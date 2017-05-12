@@ -1,0 +1,31 @@
+---
+abstract: Mojolicious Plugin enables quick and simple access for Mojo::Pg
+author:
+  - 'Pavel Kuptsov <pkuptsov@gmail.com>'
+build_requires:
+  Test::More: 0
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150001'
+keywords:
+  - mojo
+  - mojolicious
+  - postgresql
+  - mojo-pg
+  - plugin
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Mojolicious-Plugin-QuickPg
+provides:
+  Mojolicious::Plugin::QuickPg:
+    file: lib/Mojolicious/Plugin/QuickPg.pm
+    version: 1.6
+requires:
+  Mojo::Pg: 2
+  Mojolicious: 6
+  perl: 5.010001
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://bitbucket.org/pkuptsov/mojolicious-plugin-quickpg
+version: 1.6

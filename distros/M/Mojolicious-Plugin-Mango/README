@@ -1,0 +1,79 @@
+NAME
+    Mojolicious::Plugin::Mango - provide mango helpers to Mojolicious
+
+VERSION
+    version 0.0.2
+
+SYNOPSIS
+    For quick use:
+
+    In your Mojolicious app:
+
+      use Mojolicious::Lite;
+      plugin 'Mango', {default_db => 'mymongo'};
+
+    Then in your code:
+
+      sub foo {
+        my $self = shift;
+        $self->coll('coll');
+        $self->command();
+        $self->db('other')->collection('othercoll');
+      }
+
+    There's a more manually plugin step:
+
+      use Mojolicious::Lite;
+      plugin 'Mango', {
+        mango => 'mangodb://name:pass@host:port/db',
+        helper => 'foo',
+        default_db => 'default_db',
+        hosts => [ [localhost => 3000], [localhost => 4000] ],
+        no_query => 1,
+        no_command => 1,
+      };
+
+HELPERS
+    *   mango
+
+        Just call "Mango->new(@_)".
+
+    *   db or foo
+
+        The helper name is setted manually, default is db.
+
+        You could call this like: "$self->db", it will allways return a
+        Mango::Database object by "default_db"
+
+    *   coll/collection
+
+        Short for "$self->db->collection"
+
+    *   default_db
+
+        Reset default_db as you want, suggest no.
+
+    *   hosts
+
+        May set the hosts to listen.
+
+    *   kill_cursors
+
+        Delegated to "Mango->kill_cursors".
+
+    *   query
+
+        Deleaget to "Mango->query".
+
+SEE ALSO
+    Mango, Mango::Database, Mango::Collection
+
+AUTHOR
+    Huo Linhe <huolinhe@berrygenomics.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2015 by Berry Genomics.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

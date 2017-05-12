@@ -1,0 +1,304 @@
+4.023  2016-07-12 22:19:00 GMT
+    * Bug Github #55 : Fix error reporting on missing required arguments with Moo 2.002002. (intrigeri)
+    * Bug #513 : remove perl 5.10 deps (Celogeek San)
+
+4.022  2015-11-30 11:56:47 GMT
+    * Bug #501 : Remove useless space (Celogeek San)
+
+4.021  2015-11-11 16:42:01 GMT
+    * Feature #487 : Translate using Locale::TextDomain (sschober)
+      add setlocale for linux system
+
+4.020  2015-11-08 17:33:34 GMT
+    * Feature #487 : Translate using Locale::TextDomain (sschober)
+      fix LC_ALL in tests
+
+4.019  2015-10-31 16:01:55 GMT
+    * Bug #496 : Handle multiple autosplit options correctly (Celogeek San)
+    * Feature #489 : add compact help (Celogeek San)
+    * Feature #487 : Translate using Locale::TextDomain (sschober)
+    * Feature #486 : Reduce runtime dependency footprint (arc)
+    * Feature #481 : add spacer option (Celogeek San)
+    * Feature #373 : use "format" => "json" instead of json => 1 (Celogeek San)
+
+4.018  2015-03-05 07:07:03 GMT
+    * Feature #475 : Add usage_string parameters (kablamo)
+
+4.017  2015-02-13 07:13:03 GMT
+    * Bug #472 : Upgrade deps on Module::Build and Getopt::Long (Celogeek San)
+
+4.016  2015-01-24 12:30:10 GMT
+    * Feature #470 : Add "hidden" attribute, and doc (Celogeek San)
+    * Feature #471 : Added a better error message for isa check failures (Celogeek San)
+
+4.015  2015-01-13 16:06:52 GMT
+    * Bug #466 : Term::Any::Size should be recommanded but optional (Celogeek San)
+    fix eval
+
+4.014  2015-01-13 15:51:32 GMT
+    * Bug #464 : warning generated when missing required params (Celogeek San)
+    * Bug #466 : Term::Any::Size should be recommanded but optional (Celogeek San)
+
+4.013  2014-11-22 07:43:13 GMT
+    * Feature #462 : Autorange (Celogeek San)
+
+4.012  2014-10-07 09:42:27 GMT
+    * Bug #455 : Option of options should not be change for trait (Celogeek San)
+    handle shorter name
+
+4.011  2014-10-07 08:51:50 GMT
+    * Bug #455 : Option of options should not be change for trait (Celogeek San)
+
+4.010  2014-09-05 16:49:56 GMT
+    * Feature #453 : Use Text::LineFold instead of Text::WrapI18N (Celogeek San)
+    * Feature #452 : Support UTF8 source for pod and man (Celogeek San)
+
+4.009  2014-07-08 10:15:09 GMT
+    * Bug #450 : options with format "s" do not accept "0" as value (Celogeek San)
+
+4.008  2014-02-01 09:49:36 GMT
+    * Bug #405 : fix typo in pod (Celogeek San)
+
+4.007  2014-01-17 15:57:22 GMT
+    * Bug #403 : fix pod (Grzegorz Rożniecki)
+
+4.006  2013-12-18 14:31:42 GMT
+    * Bug #388 : Short option not properly fixed (fix_argv) (Celogeek San)
+
+4.005  2013-12-16 12:44:02 GMT
+   * Bug #383: autosplit should handle all variance of "-" and "_"
+    Fix tests (reused vars)
+
+4.004  2013-12-14 13:00:38 GMT
+   * Bug #383: autosplit should handle all variance of "-" and "_"
+    implement a proper fix_argv method
+
+4.003  2013-12-01 00:40:22 GMT
+    * Feature #370 : Add usage, only the usage row with all the long options (Celogeek San)
+
+4.002  2013-11-29 19:07:32 GMT
+    * Feature #380 : global improvement doc (Celogeek San)
+    * Bug #378 : fix pod typo (Celogeek San)
+    * Feature #379 : improve synopsis (Celogeek San)
+
+4.001  2013-11-26 09:15:14 GMT
+    * Bug #377 : older version of perl has different init methods (Celogeek San)
+
+4.000  2013-11-25 19:01:24 GMT
+    * Feature #328 : Rewrite pod (Celogeek San)
+      Fix: Path::Class 0.32 needed for tempfile
+      Fix: import only moox options role methods, not the one need by this module
+      Fix: JSON help format
+      Feature: improve handling of errors (catch everything and display the proper usage methods)
+      Feature: full rewrite pod documentation
+
+3.99  2013-11-13 09:36:51 GMT
+    * Feature #195 : Use pod2usage for help (Celogeek San)
+
+3.98  2013-11-10 13:03:41 GMT
+    * Feature #369 : Add support of List of all subcommand from MooX::Cmd (Celogeek San)
+
+3.97  2013-11-09 13:31:26 GMT
+    * Feature #368 : Improve support of MooX::Cmd (Celogeek San)
+
+3.96  2013-11-06 20:22:43 GMT
+    * Feature #367 : use the command name of the MooX::Cmd if available (Celogeek San)
+
+3.95  2013-11-06 20:06:26 GMT
+    * Feature #366 : Support MooX::Cmd (Celogeek San)
+
+3.94  2013-10-27 17:33:35 GMT
+    * Feature #352 : Rewrite the option text message (Celogeek San)
+
+3.93  2013-10-24 20:15:53 GMT
+    * Feature #350 : Push back Mo support with proper deps (Celogeek San)
+
+3.92  2013-10-24 16:27:01 GMT
+    * Bug #349 : drop Mo support, it use Mouse ! (Celogeek San)
+
+3.91  2013-10-24 16:04:05 GMT
+    * Bug #348 : die if the caller is not able to run "around" or "with" (Celogeek San)
+
+3.90  2013-10-14 20:30:53 GMT
+    * Feature #338 : Add test module in test build required (Celogeek San)
+
+3.89  2013-10-14 18:31:12 GMT
+    * Feature #335 : Fix changes based on kwaleeti (Celogeek San)
+
+3.88  2013-10-12 17:39:25 GMT
+    * Feature #332 : Create real usage_option method, and use it for help message (Celogeek San)
+
+3.87  2013-10-12 14:04:11 GMT
+    * Bug #331 : Fix tests with Mo (Celogeek San)
+
+3.86  2013-09-28 12:38:55 GMT
+    * Feature #329 : Add support config file to get option (Celogeek San)
+
+3.85  2013-09-22 16:06:32 GMT
+    * Feature #309 : Indicate what is expected in the help message (Celogeek San)
+
+3.84  2013-09-12 22:36:54 GMT
+    * Bug #157 : repeatable work only with the original name (Celogeek San)
+
+3.83  2013-05-13 12:35:06 GMT
+    * Bug #211 : Fix README.mkdn (Celogeek San)
+
+3.82  2013-05-13 08:40:27 GMT
+    * Feature #158 : use GRS for release (Celogeek San)
+
+3.81  2013-05-13
+    * dummy
+
+3.80  2013-04-28 23:46:23 Europe/Paris
+    * Bug #198 : Fix pod, issue with metacpan (Celogeek San)
+
+3.79  2013-04-25 00:12:25 Europe/Paris
+    * Feature #192 : support json mode (Celogeek San)
+
+3.78   2013-04-12 01:16:12 Europe/Paris
+    * Support for prefered commandline (Tom Lanyon)
+
+3.77  2013-01-05 18:23:49 Europe/Paris
+    * Support for dash in option
+
+3.76  2012-12-24 12:47:40 Europe/Paris
+    * Reupload due to pause failure
+
+3.75  2012-12-24 12:46:12 Europe/Paris
+    * Update changes
+
+3.74  2012-12-24 12:36:12 Europe/Paris
+    * [Keedi Kim] : Allow ordering of params (by name by default, can be selected order)
+
+3.73  2012-12-08 20:07:07 Europe/Paris
+    * Add deps
+
+3.72  2012-11-26 00:47:35 Europe/Paris
+    * Change bugtracker and git repository
+
+3.71  2012-09-03 02:18:06 Europe/Paris
+
+3.7   2012-09-03 02:12:10 Europe/Paris
+
+3.6   2012-08-20 00:28:50 Europe/Paris
+    * Fix: autosplit with space
+    * Add: greeding and slides
+
+3.5   2012-08-13 23:34:33 Europe/Paris
+    * working role !
+    * fix namespace clean
+    * add doc to use it
+
+3.4   2012-08-13 20:34:17 Europe/Paris
+    * disabling failing test
+    * moo is now a necessary deps
+
+3.3   2012-08-13 10:38:16 Europe/Paris
+    * support for namespace::clean
+    * fix issue with default value
+    * move ski_options to the role
+    * move options_meta and options_params to the main package
+    * fix role issues
+
+    * TODO: make role fully work
+
+3.2   2012-08-12 14:41:26 Europe/Paris
+    * add option skip_options to remove option to the terminal
+
+3.1   2012-08-12 02:45:07 Europe/Paris
+    * Fix is missing
+
+3.0   2012-08-12 02:06:35 Europe/Paris
+    * Full rewrite of MooX::Options
+    * Add easy support to use it in a Role.
+    * Break support of Mouse.
+
+2.4   2012-07-27 02:06:03 Europe/Paris
+    * Fix: Role, wasn't working very well
+
+2.3   2012-07-25 18:48:47 Europe/Paris
+    * Add MooX::Options::Role 
+      - You can create role in your module that automatically call MooX::Option
+        'option' method when the role is imported.
+
+2.2   2012-07-19 12:52:59 Europe/Paris
+    * Fix test for Moo 1.0
+
+2.1   2012-07-17 18:11:38 Europe/Paris
+    * Fix pod
+
+2.0   2012-07-17 18:04:48 Europe/Paris
+    * Add 'documentation', an alternative 'doc' option attribute
+
+1.9   2012-07-17 15:02:42 Europe/Paris
+    * Remove bugs section (duplicate)
+
+1.8   2012-07-16 16:51:44 Europe/Paris
+    * use Dist::Zilla::PluginBundle::Author::Celogeek v0.7
+
+1.7   2012-07-16 14:55:02 Europe/Paris
+    * use Dist::Zilla::PluginBundle::Author::Celogeek
+
+1.6   2012-06-08 11:20
+    * Change author name
+
+1.5   2012-06-01 01:10
+    * fix mouse test
+    * add doc, markdown, cleanup
+
+1.4   2012-05-16 23:30
+    * remove goto method, compat with older perl
+
+1.3   2012-05-12 00:30
+    * fix minimum version to 5.8.9
+    * fix test unit
+
+1.2   2012-05-02 02:20
+    * add advice on repeatable option (Alex Howarth)
+    * full test and 100% coverage
+    * fix import_options and add protection.
+
+1.1   2012-03-13 23:20
+    * remove min version for testing Moo
+    * remove deps on Mo/Moo/Mouse/Moose from test (if present do the test, else skip)
+
+1.0   2012-03-10 16:00
+    * use perl 5.006 syntax compatible, allow use MooX::Options with older version
+
+0.9   2012-02-14 21:40
+    * Add flavour to pass options to GetOpt::Long (zengargoyle)
+
+0.8   2011-12-25 14:30
+    * use Moo 0.009013 to pass cpantester tests
+
+0.7   2011-12-09 00:10
+    * change name to MooX::Options
+    * fix Global name (UPPERCASE)
+    * fix Global name (Camel_Case)
+    * fix private name (no more "_")
+
+0.6   2011-12-04 13:00
+    * add option_usage
+    * add test for it
+
+0.5   2011-12-04 12:20
+    * fix doc
+
+0.4   2011-12-04 12:00
+    * fix call chain method (don't call properly because new method was not already generated at the call)
+    * add test for chain_method (should_die_ok)
+
+0.3   2011-12-03 13:00
+    * fix test unit
+
+0.2   2011-12-02 01:30
+    * improve help test
+    * fix possible miss reading
+    * Factorize test import_options rename options for import_options (better reading) remove synopsis filter is on by default, can be cancel with \"nofilter\" import doc at the end
+    * add TODO
+    * fix tests for autosplit, add complex autosplit for str with quote
+    * add some better handle of repeatable and negativable, use Data::Record to resplit the args
+
+0.1   2011-11-30 18:30
+    * First release of MooX::Getopt
+    * Fully compatible with Mo/Moo/Mouse/Moose and more

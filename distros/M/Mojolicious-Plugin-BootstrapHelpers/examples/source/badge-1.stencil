@@ -1,0 +1,38 @@
+== stencil ==
+A basic badge:
+--input--
+    <%= badge '3' %>
+--end input--
+--output--
+    <span class="badge">3</span></a>
+--end output--
+
+== stencil ==
+A right aligned badge with a data attribute:
+--input--
+    <%= badge '4', data => { custom => 'yes' }, right %>
+--end input--
+--output--
+    <span class="badge pull-right" data-custom="yes">4</span>
+--end output--
+
+
+
+== stencil { is_html_example => 0, to_pod => 0 } ==
+--input--
+    %= badge 'Badge 2', right
+--end input--
+--output--
+    <span class="badge pull-right">Badge 2</span>
+--end output--
+
+
+== stencil { is_html_example => 0, to_pod => 0 } ==
+A badge with undef value or empty string is not rendered:
+--input--
+    % my $empty_badge = '';
+    %= badge $empty_badge
+--end input--
+--output--
+    
+--end output--

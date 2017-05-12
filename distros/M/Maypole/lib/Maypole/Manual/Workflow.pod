@@ -1,0 +1,161 @@
+=pod
+
+=head1 NAME
+
+Maypole::Manual::Workflow - Maypole's Request Workflow
+
+=head1 DESCRIPTION
+
+This chapter describes the progress of a request through Maypole.
+
+An application based on C<Maypole> provides an Apache or CGI handler,
+and eventually delivers a page. This document explains how that happens,
+and how to influence it. We'll use the C<BeerDB> project as our example.
+Here's a diagram that gives an overview:
+
+                              config $h
+                                  |
+                            Maypole $r
+    Apache::Request               |
+         +---- $r->get_request ---+
+        $ar                       |
+                                  |
+                          $r->parse_location
+                                  |
+                          $r->is_applicable
+                                  |
+    BeerDB::Beer        $r->call_authenticate
+       ->authenticate ------------+------------ $r->authenticate
+                                  |
+                         $r->additional_data
+                                  |
+                    $r->model_class->process($r)
+                                  |
+                     $r->view_object->process($r)
+
+=head2 Initialize class
+
+When the first request comes in, the application class will call its own
+C<init> method, inherited from L<Maypole>.
+This creates a new view object.
+
+=head2 Construction
+
+Once we have initialized, the handler obtains the configuration for your
+class, and puts it into a new object. We'll call this a request
+I<object> for the purposes of this document; it will be a new C<BeerDB>
+object.
+
+=head2 Getting the request
+
+Next, the handler calls C<get_request> on the new object to have it
+store a copy of the C<Apache::Request>. Of course, if you're not using
+Apache, you might want to subclass this method to return something that
+looks like an C<Apache::Request> object, and possibly also subclass the
+next stage too to get more control over what methods are called on your
+C<A::R>-lookalike. C<get_request> is expected to put the object in the
+C<ar> slot of the request object.
+
+=head2 Handling the URL
+
+Typically, the details of the request will be passed in the URL. This is
+done with the C<parse_location> method, which is expected to populate
+several slots of the request object. First, C<table> and C<action>
+should be populated with the name of the table and the action parts of
+the URL. Any other arguments should be placed in a listref in the
+C<args> slot, and GET and POST parameters should be arranged into a hash
+and placed in the C<query> and C<params> slots, respectively.
+
+Some people may not like the idea of passing everything around in the
+URL; this is the method to override for you. Of course, you'll also need
+to provide your own default templates to construct links using your
+preferred format.
+
+=head2 Is this an applicable URL?
+
+Next, the C<is_applicable> method works out if this is actually
+something that C<Maypole> should care about - whether the class
+exists in the application, whether it supports the given action, and so
+on. The action is "supported" if it exists in the model class (or its
+ancestors) and is marked with the C<:Exported> attribute; this stops web
+users from firing off random subroutines in your code.
+
+This should return an Apache status code; C<OK> if the request should
+proceed, C<DECLINED> if it should be passed on to the default handlers,
+or whatever other codes for permissions problems. 
+
+=head2 Are we allowed to do this?
+
+We then look for an appropriate C<authenticate> method to call; first
+it will try calling the C<authenticate> method of the model class, or,
+if that does not exist, the C<authenticate> method on itself. By
+default, this allows access to everyone for everything.
+Your C<authenticate> methods must return an Apache status code: C<OK> or
+C<DECLINED>. These codes are defined by the L<Maypole::Constants>
+module, which is automatically used by your application.
+
+=head2 Add any additional data to the request
+
+You can write an C<additional_data> method to do any additional fiddling
+with the request object before it is despatched. Specifically, it allows
+you to add to the C<template_args> slot, which is a hash of arguments to
+be added to the template, like this:
+
+    sub additional_data {
+        my $self = shift;
+        $self->{template_args}{answer} = 42;
+    }
+
+which adds a new template variable C<answer> with the value 42.
+
+=head2 Ask model for widget set
+
+Asking the model class to C<process> the current request allows it to do
+any work it needs for the given command, and populate the C<objects> and
+C<template> slots of the request. 
+
+The model's C<process> method is usually a thin wrapper around the
+action that we have selected. It sets the template name to the name of
+the action, fills C<objects> with an object of that class whose ID comes
+from the URL arguments if there is one. For instance, C</beer/foo/12>
+will do the moral equivalent of
+
+    $r->objects([ BeerDB::Beer->retrieve(12) ]);
+
+Then it calls the right method: in this case, the C<foo> method with
+the request object. This method will usually do any actions which are
+required, including modifying the list of objects to be passed to the
+template, or the name of the template to be called.
+
+=head2 Ask view to process template
+
+Now the view class has its C<process> method called. It finds the
+appropriate templates and calls the L<Template Toolkit|Template>
+processor.
+
+The template processor is handed the objects, the template
+name, and various other bits and pieces, and tries to find the right
+template. It does this by looking first for C</beer/foo>: that is, a
+specific template appropriate to the class. Next, it looks at
+C</custom/foo>, a local modification, before looking for
+C</factory/foo>, one of the default templates that came with
+C<Maypole>.
+
+The view puts the template's output in the C<$r-E<gt>{output}> slot. The
+application's C<handler> method calls the C<send_output> method to push
+it to the web server.
+
+=head2 Default template arguments
+
+If you're looking for the list of variables that are passed to the
+Template Toolkit template by default, you'll find it in the
+L<View|Maypole::Manual::View> chapter.
+
+=head2 Links
+
+L<Contents|Maypole::Manual>,
+Next L<The Beer Database Revisited|Maypole::Manual::Beer>,
+Previous
+L<Standard Templates and Actions|Maypole::Manual::StandardTemplates>
+
+=cut

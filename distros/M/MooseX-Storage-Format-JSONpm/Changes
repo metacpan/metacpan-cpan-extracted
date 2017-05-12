@@ -1,0 +1,14 @@
+Revision history for MooseX-Storage-Format-JSONpm
+
+0.093093  2013-10-05 09:11:19 America/New_York
+          update bugtracker and repo
+
+0.093092  2011-10-15 18:15:06 Asia/Tokyo
+          repackage to add META.yml
+
+0.093091  2009-11-05
+          improve the application of defaults
+          more docs about using this with parameters
+
+0.093090  2009-11-05
+          first post

@@ -1,0 +1,16 @@
+% layout "$controller/common", title => "Show select tables in $database";
+
+<h2>Select tables in <i><%= $database %></i> (<%= @$tables %>)</h2>
+<table>
+  % for (my $i = 0; $i < @$tables; $i += 3) {
+    <tr>
+      % for my $k (0 .. 2) {
+        <td>
+          <a href="<%= url_for("/$prefix/select")->query(database => $database, table => $tables->[$i + $k]) %>">
+            <%= $tables->[$i + $k] %>
+          </a>
+        </td>
+      % }
+    </tr>
+  % }
+</table>

@@ -1,0 +1,11 @@
+Build.PL
+lib/Mojo/JWT/Google.pm
+MANIFEST			This list of files
+README
+t/01_basic.t
+META.yml
+META.json
+t/load1.json
+t/load2.json
+t/load3.json
+t/load4.json

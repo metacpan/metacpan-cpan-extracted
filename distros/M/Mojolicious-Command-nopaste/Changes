@@ -1,0 +1,36 @@
+Revision history for Perl module Mojolicious::Command::nopaste
+
+0.10 2017-04-27
+  - Fix compatibility with newer Mojolicious
+  - Bump Mojolicious requirement to 7.13
+
+0.09 2016-08-13
+  - Handle connection errors better in gist support
+  - Added IO::Socket::SSL to recommends
+
+0.08 2015-02-07
+  - Added Gist updating
+
+0.07 2014-12-18
+  - Added service sprunge.us
+
+0.06 2014-09-01
+  - Added IRC handling via Mojo::IRC except where already handled
+
+0.05 2014-09-01
+  - Fix printed output for Gist support
+
+0.04 2014-09-01
+  - Added GitHub Gist support
+    - Added dependency on File::HomeDir
+
+0.03 2014-01-12
+  - Fix Clipboard.pm interaction
+
+0.02 2014-01-12
+  - Fix UTF-8 handling
+  - Various other bug fixes
+
+0.01 2014-01-12
+  - Initial release
+

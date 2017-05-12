@@ -1,0 +1,3 @@
+# Filter mail through Mail::CheckUser
+:0f
+| /usr/bin/cufilter

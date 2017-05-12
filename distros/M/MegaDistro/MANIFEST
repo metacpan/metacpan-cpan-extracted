@@ -1,0 +1,25 @@
+bin/megadistro
+lib/MegaDistro.pm
+lib/MegaDistro/Config.pm
+lib/MegaDistro/DebMaker/Build.pm
+lib/MegaDistro/DebMaker/Config.pm
+lib/MegaDistro/DebMaker/CtrlFile.pm
+lib/MegaDistro/Install.pm
+lib/MegaDistro/InstallDeps.pm
+lib/MegaDistro/Package.pm
+lib/MegaDistro/ParseList.pm
+lib/MegaDistro/RpmMaker/Build.pm
+lib/MegaDistro/RpmMaker/Config.pm
+lib/MegaDistro/RpmMaker/SpecFile.pm
+Makefile.PL
+MANIFEST			This list of files
+modules.list
+README
+SPEC
+STATUS
+Changes
+t/build.t
+t/deb.t
+t/rpm.t
+t/test.list
+META.yml                                 Module meta-data (added by MakeMaker)

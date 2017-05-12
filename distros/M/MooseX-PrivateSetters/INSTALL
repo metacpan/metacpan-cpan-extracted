@@ -1,0 +1,25 @@
+INSTALLATION
+============
+
+This distribution may be installed via one of the following methods:
+
+1   Using Module::Build (distributed with Perl since perl-5.9.4):
+
+    perl Build.PL
+    perl Build
+    perl Build test
+    perl Build install
+
+    This is cross platform as long as you have a recent enough perl.
+
+2   Using ExtUtils::MakeMaker (distributed with Perl since perl-5):
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+    If you are on a Windows machine you should use 'nmake' or 'dmake'
+    rather than 'make'. Or, so I'm told
+
+If you are unsure, go with the first option.

@@ -1,0 +1,79 @@
+1.1
+31 Oct 2000
+
+* Added "search" method.
+
+* Fixed documentation to match tightened MIME message/rfc822 check.
+
+* Renamed "t" directory to "examples".
+
+* Added rfc822_date to @EXPORT_OK and documentation.
+
+1.0
+10 May 2000
+
+* Make the elt method fill in a flag name of the form "user_flag_%d"
+  when a message's flag bitmap has a bit set which does not
+  correspond to a name in the stream's user_flags array.
+
+* Tighten check for MIME non-multipart nested messages from message/*
+  to message/rfc822.
+
+* Define PERL_POLLUTE so that na and sv_undef are defined for Perl 5.6.
+
+* Bump version to 1.0 since it's been working decently for a couple
+  of years without major changes.
+
+0.6
+17 Jun 1999
+
+* Added rfc822_date function (without which it's difficult to get
+  hold of a date which includes the timezone name)
+
+* Added $body->disposition to get content-disposition information
+
+
+0.5
+7 Jun 1999
+
+* $mc->status method was calling back "log" instead of "status"
+
+* Added documentation on the $mc->open method
+
+* The mailstream2sv HV was caching stale objects and the DESTROY
+  method was then causing closes on those stale streams at program
+  exit. That led to segfaults. Stale streams are now deleted from the
+  hash and the destructor has been removed since there's no nice way
+  to keep it clean.
+
+0.4
+14 Sep 1998
+
+* Added support for mail_parameters
+
+* Added $mc->append method
+  (from code submitted by Kevin Sullivan <ksulliva@kludge.psc.edu>)
+
+* Added CAVEATS section to documentation
+  (submitted by Bruce Gingery <bgingery@gtcs.com>)
+
+* Attempt to work around possible NULL parts in make_body for TYPEMESSAGE.
+
+0.3
+1 Jun 1998
+
+* Created this Changes file
+
+* Removed duplicate decrement in av_to_stringlist which was
+  causing fetchheader to return only half the requested headers
+
+* Add support for elts
+
+0.2
+14 Apr 1998
+
+* Polished up for public release.
+
+0.1
+
+* First internal version

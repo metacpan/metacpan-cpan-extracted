@@ -1,0 +1,329 @@
+=encoding utf8
+
+=head1 NAME
+
+Mail::Message::Field::Attribute - one attribute of a full field
+
+=head1 INHERITANCE
+
+ Mail::Message::Field::Attribute
+   is a Mail::Reporter
+
+=head1 SYNOPSIS
+
+ my $field    = $msg->head->get('Content-Disposition') or return;
+ my $full     = $field->study;   # full understanding in unicode
+ my $filename = $full->attribute('filename')           or return;
+
+ print ref $filename;     # this class name
+ print $filename;         # the attributes content in utf-8
+ print $filename->value;  # same
+ print $filename->string; # print string as was found in the file
+ $filename->print(\*OUT); # print as was found in the file
+
+=head1 DESCRIPTION
+
+Attributes within MIME fields can be quite complex, and therefore be slow
+and consumes a lot of memory.  The L<Mail::Message::Field::Fast|Mail::Message::Field::Fast> and
+L<Mail::Message::Field::Flex|Mail::Message::Field::Flex> simplify them the attributes a lot, which
+may result in erroneous behavior in rare cases.  With the increase of
+non-western languages on Internet, the need for the complex headers
+becomes more and more in demand.
+
+A C<Mail::Message::Field::Attribute> can be found in any structured
+L<Mail::Message::Field::Full|Mail::Message::Field::Full> header field.
+
+Extends L<"DESCRIPTION" in Mail::Reporter|Mail::Reporter/"DESCRIPTION">.
+ 
+=head1 OVERLOADED
+
+=over 4
+
+=item overload: B<comparison>
+
+When the second argument is a field, then both attribute name (case-sensitive)
+and the decoded value must be the same.  Otherwise, the value is compared.
+
+=item overload: B<stringification>
+
+Returns the decoded content of the attribute.
+
+=back
+
+=head1 METHODS
+
+Extends L<"METHODS" in Mail::Reporter|Mail::Reporter/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Mail::Reporter|Mail::Reporter/"Constructors">.
+ 
+=over 4
+
+=item Mail::Message::Field::Attribute-E<gt>B<new>( <$name, [$value] | STRING>, %options )
+
+Create a new attribute $name with the optional $value.  If no $value is specified,
+the first argument of this method is inspected for an equals sign C<'='>.
+If that character is present, the argument is taken as STRING, containing
+a preformatted attribute which is processed.  Otherwise, the argument is
+taken as name without $value: set the value later with value().
+
+Whether encoding takes place depends on the %options and the existence
+of non-ascii characters in the $value.  The $name can only contain ascii
+characters, hence is never encoded.
+
+To speed things up, attributes are not derived from the L<Mail::Reporter|Mail::Reporter>
+base-class.
+
+ -Option           --Defined in     --Default
+  charset                             'us-ascii'
+  language                            undef
+  log                Mail::Reporter   'WARNINGS'
+  trace              Mail::Reporter   'WARNINGS'
+  use_continuations                   <true>
+
+=over 2
+
+=item charset => STRING
+
+The $value is translated from utf-8 (Perl internal) to this character set,
+and the resulting string is encoded if required.  C<us-ascii> is the normal
+encoding for e-mail.  Valid character sets can be found with 
+Encode::encodings(':all').
+
+=item language => STRING
+
+RFC2231 adds the possiblity to specify a language with the field.  When no
+language is specified, none is included in the encoding.  Valid language
+names are defined by RFC2130.  This module has only limited support for
+this feature.
+
+=item log => LEVEL
+
+=item trace => LEVEL
+
+=item use_continuations => BOOLEAN
+
+Continuations are used to break-up long parameters into pieces which
+are no longer than 76 characters. Encodings are specified in RFC2231,
+but not supported by some Mail User Agents.
+
+=back
+
+example: 
+
+ my $fn    = Mail::Message::Field::Attribute
+                ->new(filename => 'xyz');
+
+ my $fattr = 'Mail::Message::Field::Attribute';  # abbrev
+ my $fn    = $fattr->new
+   ( filename => "Re\xC7u"
+   , charset  => 'iso-8859-15'
+   , language => 'nl-BE'
+   );
+ print $fn;
+   # -->  filename*=iso-8859-15'nl-BE'Re%C7u
+
+=back
+
+=head2 Error handling
+
+Extends L<"Error handling" in Mail::Reporter|Mail::Reporter/"Error handling">.
+ 
+=over 4
+
+=item $obj-E<gt>B<AUTOLOAD>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<addReport>($object)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+=item Mail::Message::Field::Attribute-E<gt>B<defaultTrace>( [$level]|[$loglevel, $tracelevel]|[$level, $callback] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<errors>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<log>( [$level, [$strings]] )
+
+=item Mail::Message::Field::Attribute-E<gt>B<log>( [$level, [$strings]] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logPriority>($level)
+
+=item Mail::Message::Field::Attribute-E<gt>B<logPriority>($level)
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<logSettings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<notImplemented>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<report>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<reportAll>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<trace>( [$level] )
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=item $obj-E<gt>B<warnings>()
+
+Inherited, see L<Mail::Reporter/"Error handling">
+
+=back
+
+=head2 Cleanup
+
+Extends L<"Cleanup" in Mail::Reporter|Mail::Reporter/"Cleanup">.
+ 
+=over 4
+
+=item $obj-E<gt>B<DESTROY>()
+
+Inherited, see L<Mail::Reporter/"Cleanup">
+
+=back
+
+=head2 The attribute
+
+=over 4
+
+=item $obj-E<gt>B<addComponent>(STRING)
+
+A component is a parameter as defined by RFC2045, optionally using
+encoding or continuations as defined by RFC2231.  Components of an
+attribute are found when a field is being parsed.  The RFCs are
+very strict on valid characters, but we cannot be: you have to accept
+what is coming in if you can.
+
+example: 
+
+ my $param = Mail::Message::Field::Attribute->new;
+ $param->addComponent("filename*=iso10646'nl-BE'%Re\47u");
+
+=item $obj-E<gt>B<charset>()
+
+Returns the character set which is used for this parameter.  If any component
+is added which contains character set information, this is directly
+available.  Be warned that a character-set is case insensitive.
+
+=item $obj-E<gt>B<language>()
+
+Returns the language which is defined in the argument.  If no language is
+defined C<undef> is returned, which should be interpreted as "ANY"
+
+=item $obj-E<gt>B<name>()
+
+Returns the name of this attribute.
+
+=item $obj-E<gt>B<string>()
+
+Returns the parameter as reference to an array of lines.  When only one line
+is returned, it may be short enough to fit on the same line with other
+components of the header field.
+
+=item $obj-E<gt>B<value>( [STRING] )
+
+Returns the value of this parameter, optionally after setting it first.
+
+=back
+
+=head2 Attribute encoding
+
+=over 4
+
+=item $obj-E<gt>B<decode>()
+
+Translate all known continuations into a value.  The produced value is
+returned and may be utf-8 encoded or a plain string.
+
+=item $obj-E<gt>B<encode>()
+
+=back
+
+=head2 Internals
+
+=over 4
+
+=item $obj-E<gt>B<mergeComponent>($attribute)
+
+Merge the components from the specified attribute into this attribute.  This
+is needed when components of the same attribute are created separately.
+Merging is required by the field parsing.
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Warning: Illegal character in parameter name '$name'
+
+The specified parameter name contains characters which are not permitted by
+the RFCs.  You can better change the name into something which is accepted,
+or risk applications to corrupt or ignore the message.
+
+=item Error: Package $package does not implement $method.
+
+Fatal error: the specific package (or one of its superclasses) does not
+implement this method where it should. This message means that some other
+related classes do implement this method however the class at hand does
+not.  Probably you should investigate this and probably inform the author
+of the package.
+
+=item Error: Too late to merge: value already changed.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Mail-Message distribution version 3.000,
+built on February 02, 2017.
+
+Do not forget to read
+L</Mail::Box-Overview>,
+L</Mail::Box-Cookbook>, and
+L</Mail::Box-Index>.
+Examples are included in the Mail-Box distribution, directories 'examples'
+and 'scripts'.
+
+Browseable manuals, papers, and other released material van be found
+at  Website: F<http://perl.overmeer.net/mailbox/>
+
+The central modules (in separate distributions) in the MailBox suite are:
+L</Mail::Message>,
+L</Mail::Box>,
+L</Mail::Box::IMAP4>,
+L</Mail::Box::POP3>,
+L</Mail::Box::Parser::C>,
+L</Mail::Box::Dbx> (unpublished),
+L</Mail::Transport>,
+L</Object::Realize::Later>, and
+L</User::Identity>.
+
+Please post questions or ideas to the author F<markov@cpan.org>.
+
+=head1 LICENSE
+
+Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

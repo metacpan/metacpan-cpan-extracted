@@ -1,0 +1,61 @@
+TYPEMAP
+
+gint				T_IV
+guint				T_UV
+guint32				T_UV
+off_t				T_IV
+# guint new type - T_UV
+gboolean			T_BOOL
+gpointer			T_PTR
+
+unsigned char *			T_PV
+const unsigned char *		T_PV
+const char *			T_PV
+
+# enums
+MIME::Fast::PartEncodingType		T_IV
+MIME::Fast::InternetAddressType		T_IV
+MIME::Fast::BestEncoding		T_IV
+MIME::Fast::FilterFromMode		T_IV
+Mime::Fast::FilterYencDirection		T_IV
+MIME::Fast::SeekWhence			T_IV
+
+# types
+MIME::Fast::Object			T_PTROBJ
+MIME::Fast::Param			T_PTROBJ
+MIME::Fast::Message			T_PTROBJ
+MIME::Fast::MessagePart			T_PTROBJ
+MIME::Fast::MessagePartial		T_PTROBJ
+MIME::Fast::MessageDelivery		T_PTROBJ
+MIME::Fast::MessageMDN			T_PTROBJ
+MIME::Fast::MessageMDNDisposition	T_PTROBJ
+MIME::Fast::Part			T_PTROBJ
+MIME::Fast::Parser			T_PTROBJ
+MIME::Fast::MultiPart			T_PTROBJ
+MIME::Fast::ContentType			T_PTROBJ
+MIME::Fast::Disposition			T_PTROBJ
+MIME::Fast::InternetAddress		T_PTROBJ
+MIME::Fast::Hash::Header		T_PTROBJ
+MIME::Fast::DataWrapper			T_PTROBJ
+MIME::Fast::Stream			T_PTROBJ
+MIME::Fast::StreamFilter		T_PTROBJ
+MIME::Fast::Filter			T_PTROBJ
+MIME::Fast::Filter::Basic		T_PTROBJ
+MIME::Fast::Filter::Best		T_PTROBJ
+MIME::Fast::Filter::Charset		T_PTROBJ
+MIME::Fast::Filter::CRLF		T_PTROBJ
+MIME::Fast::Filter::From		T_PTROBJ
+MIME::Fast::Filter::Func		T_PTROBJ
+MIME::Fast::Filter::Enriched		T_PTROBJ
+MIME::Fast::Filter::Windows		T_PTROBJ
+MIME::Fast::Filter::HTML		T_PTROBJ
+MIME::Fast::Filter::Md5			T_PTROBJ
+MIME::Fast::Filter::Strip		T_PTROBJ
+MIME::Fast::Filter::Yenc		T_PTROBJ
+MIME::Fast::Charset			T_PTROBJ
+
+const MIME::Fast::Part::EncodingType	T_IV
+const MIME::Fast::BestEncoding		T_IV
+const MIME::Fast::FilterFromMode	T_IV
+const Mime::Fast::FilterYencDirection	T_IV
+

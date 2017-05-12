@@ -1,0 +1,25 @@
+=== README for Mozilla-Persona version 0.12
+=   Generated on Thu Nov 22 10:55:35 2012 by OODoc 2.00
+
+There are various ways to install this module:
+
+ (1) if you have a command-line, you can do:
+       perl -MCPAN -e 'install <any package from this distribution>'
+
+ (2) if you use Windows, have a look at http://ppm.activestate.com/
+
+ (3) if you have downloaded this module manually (as root/administrator)
+       gzip -d Mozilla-Persona-0.12.tar.gz
+       tar -xf Mozilla-Persona-0.12.tar
+       cd Mozilla-Persona-0.12
+       perl Makefile.PL
+       make          # optional
+       make test     # optional
+       make install
+
+For usage, see the included manual-pages or
+    http://search.cpan.org/dist/Mozilla-Persona-0.12/
+
+Please report problems to
+    http://rt.cpan.org/Dist/Display.html?Queue=Mozilla-Persona
+

@@ -1,0 +1,43 @@
+Math-ContinuedFraction, Version 0.11
+
+http://search.cpan.org/dist/Math-ContinuedFraction/
+
+Create and manipulate continued fractions in perl.
+
+This module is in an alpha state. Method names and parameters
+may change in the next release, aside from the methods "new()"
+and "from_ratio()". Fortunately, there aren't many other methods
+beyond that.
+
+Although the module uses Math::BigInt and Math::BigRat modules,
+the internal calculations to create the continued fraction are
+handled with perl's regular scalars. So far this hasn't been
+a problem for the creation, and the convergent method does use
+BigInts, so we're okay.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Math::ContinuedFraction
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 John Gamble
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

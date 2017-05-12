@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+#
+# $Id: multidrop 2375 2008-10-27 09:13:06Z makholm $
+
+use strict;
+use warnings;
+
+$/ = undef;    # Slurp mode, yes you should use File::Slurp
+
+use Mail::Postfix::Postdrop;
+
+my @queue;
+for my $mail (@ARGV) {
+    open my $fh, '<', $mail
+        or error("Failed to open mail $mail: $!");
+
+    my $content = <$fh>;
+
+    my $drop = Mail::Postfix::Postdrop->new($content);
+
+    $drop->build
+        or error("Faild to build maildrop content for mail $mail");
+
+    $drop->write
+        or error("Failed to write maildrop file for mail $mail: $!");
+
+    push @queue, $drop;
+}
+
+my $drop;
+while (@queue) {
+    $drop = shift @queue;
+
+    # This might fail if the filesystem gets remounted read-only or
+    # something like that. But the risk should be minimal: 
+    $drop->release
+        or warn("Failed to release mail: $!");
+}
+
+# Notify tells Postfix to scan the queue, so all mails will be processed by a
+# single call. If the pickup deamon can't be notified it should scan the
+# queue later.
+$drop->notify()
+    or warn("Couldn't notify Postfix. Pickup deamon might be stopped");
+
+
+sub error {
+    my $msg = shift;
+
+    # Remove the existing mails from queue:
+    $_->drop() for @queue;
+
+    die "$msg\n";
+}

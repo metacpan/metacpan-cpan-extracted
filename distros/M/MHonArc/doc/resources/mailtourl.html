@@ -1,0 +1,186 @@
+<html>
+<head>
+<title>MHonArc Resources: MAILTOURL</title>
+<link rel="stylesheet" type="text/css" href="../docstyles.css">
+</head>
+<body>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="mailto.html">MAILTO</a>]</td><td><nobr>[<a href="../resources.html#mailtourl">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="main.html">MAIN</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<h1>MAILTOURL</h1>
+<!--X-TOC-Start-->
+<ul>
+<li><a href="#syntax">Syntax</a>
+<li><a href="#description">Description</a>
+<li><a href="#default">Default Setting</a>
+<li><a href="#rcvars">Resource Variables</a>
+<li><a href="#examples">Examples</a>
+<li><a href="#version">Version</a>
+<li><a href="#seealso">See Also</a>
+</ul>
+<!--X-TOC-End-->
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="syntax">Syntax</a></h2>
+
+<dl>
+
+<dt><strong>Envariable</strong></dt>
+<dd><p>
+<code>M2H_MAILTOURL=</code><var>URL-template</var>
+</p>
+</dd>
+
+<dt><strong>Element</strong></dt>
+<dd><p>
+<code>&lt;MAILTOURL&gt;<br></code>
+<var>URL-template</var><br>
+<code>&lt;/MAILTOURL&gt;<br></code>
+</p>
+</dd>
+
+<dt><strong>Command-line Option</strong></dt>
+<dd><p>
+<code>-mailtourl </code><var>URL-template</var>
+</p>
+</dd>
+
+</dl>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="description">Description</a></h2>
+
+<p>The MAILTOURL defines the URL template for hyperlinking mail
+addresses in message headers when the
+<a href="mailto.html">MAILTO</a> resource is active.
+</p>
+
+<table class="note" width="100%">
+<tr valign="baseline">
+<td><strong>NOTE:</strong></td>
+<td width="100%"><p>The MAILTOURL resource has
+different rules for variable expansion. If a
+variable does not exactly match the set of variables available for
+the MAILTOURL, the variable text will be taken literally
+as part of the element content. Therefore, a single "<CODE>$</CODE>"
+can be used to represent a "<CODE>$</CODE>" character.  </P>
+<P>Also,
+variables in the MAILTOURL should <STRONG>NOT</STRONG>
+have "<CODE>:</CODE><VAR>NU</VAR>" modifier. This will prevent the
+variables from be recognized. <EM>MHonArc</EM> will automatically
+treat the replacement value as a part of a URL string.
+</p>
+</td>
+</tr>
+</table>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="default">Default Setting</a></h2>
+
+<pre class="code">
+mailto:$TO$
+</pre>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="rcvars">Resource Variables</a></h2>
+
+<table border=1>
+<tr bgcolor="#C0C0C0">
+<th>Variable</th><th>Value</th>
+</tr>
+<tr valign=top>
+<td align=center><a name="FROMADDR" href="../rcvars.html#FROMADDR"><strong><code>$FROMADDR$</code></strong></a></td>
+<td>The e-mail address in the <tt>From:</tt> field of the message.</td>
+</tr>
+<tr valign=top>
+<td align=center><a name="FROMADDRDOMAIN" href="../rcvars.html#FROMADDRDOMAIN"><strong><code>$FROMADDRDOMAIN$</code></strong></a></td>
+<td>The e-mail address domain of the <tt>From:</tt> field of the message.</td>
+</tr>
+<tr valign=top>
+<td align=center><a name="FROMADDRNAME" href="../rcvars.html#FROMADDRNAME"><strong><code>$FROMADDRNAME$</code></strong></a></td>
+<td>The e-mail address "username" (or local-part) of the <tt>From:</tt> field of the message.</td>
+</tr>
+<tr valign=top>
+<td align=center><a name="FROMNAME" href="../rcvars.html#FROMNAME"><strong><code>$FROMNAME$</code></strong></a></td>
+<td>The human name of the person in the <tt>From:</tt> field of the message. If no human name is found, the username specified in the e-mail address is used.</td>
+</tr>
+<tr valign=top>
+<td align=center><a name="MSGGMTDATE" href="../rcvars.html#MSGGMTDATE"><strong><code>$MSGGMTDATE$</code></strong></a></td>
+<td>GMT date of current message.</td>
+</tr>
+<tr valign=top>
+<td align=center><a name="MSGID" href="../rcvars.html#MSGID"><strong><code>$MSGID$</code></strong></a></td>
+<td>The message-id of the message.</td>
+</tr>
+<tr valign=top>
+<td align=center><a name="MSGLOCALDATE" href="../rcvars.html#MSGLOCALDATE"><strong><code>$MSGLOCALDATE$</code></strong></a></td>
+<td>Local date of current message.</td>
+</tr>
+<tr valign=top>
+<td align=center><a name="TO" href="../rcvars.html#TO"><strong><code>$TO$</code></strong></a></td>
+<td>The email address (MAILTOURL only).</td>
+</tr>
+<tr valign=top>
+<td align=center><a name="TOADDRDOMAIN" href="../rcvars.html#TOADDRDOMAIN"><strong><code>$TOADDRDOMAIN$</code></strong></a></td>
+<td>The e-mail address domain (MAILTOURL only).</td>
+</tr>
+<tr valign=top>
+<td align=center><a name="TOADDRNAME" href="../rcvars.html#TOADDRNAME"><strong><code>$TOADDRNAME$</code></strong></a></td>
+<td>The e-mail address "username" (or local-part) (MAILTOURL only).</td>
+</tr>
+</table>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="examples">Examples</a></h2>
+
+<p>The following example defines how MAILTOURL can be used
+to have e-mail addresses linked to a CGI program:
+</p>
+
+<pre class="code">
+<b>&lt;MailToURL&gt;</b>
+/cgi-bin/mailform.cgi?to=$TO$;subject=$SUBJECT$;srcid=$MSGID$
+<b>&lt;/MailToURL&gt;</b>
+</pre>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="version">Version</a></h2>
+
+<p>1.0
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<h2><a name="seealso">See Also</a></h2>
+
+<p>
+<a href="mailto.html">MAILTO</a>,
+<a href="newsurl.html">NEWSURL</a>
+</p>
+
+<!-- *************************************************************** -->
+<hr>
+<!--x-rc-nav-->
+<table border=0><tr valign="top">
+<td align="left" width="50%">[Prev:&nbsp;<a href="mailto.html">MAILTO</a>]</td><td><nobr>[<a href="../resources.html#mailtourl">Resources</a>][<a href="../mhonarc.html">TOC</a>]</nobr></td><td align="right" width="50%">[Next:&nbsp;<a href="main.html">MAIN</a>]</td></tr></table>
+<!--/x-rc-nav-->
+<hr>
+<address>
+$Date: 2003/10/06 22:04:18 $ <br>
+<img align="top" src="../monicon.png" alt="">
+<a href="http://www.mhonarc.org/"><strong>MHonArc</strong></a><br>
+Copyright &#169; 1997-1998, <a href="http://www.earlhood.com/">Earl Hood</a>, <a href="mailto:mhonarc&#37;40mhonarc.org">mhonarc<!--
+-->&#64;<!--
+-->mhonarc.org</a><br>
+</address>
+
+</body>
+</html>

@@ -1,0 +1,101 @@
+NAME
+    Metabase::Client::Simple - a client that submits to Metabase servers
+
+VERSION
+    version 0.012
+
+SYNOPSIS
+      use Metabase::Client::Simple;
+      use Metabase::User::Profile;
+      use Metabase::User::Secret;
+
+      my $profile = Metabase::User::Profile->load('user.profile.json');
+      my $secret  = Metabase::User::Secret ->load('user.secret.json' );
+
+      my $client = Metabase::Client::Simple->new({
+        profile => $profile,
+        secret  => $secret,
+        uri     => 'http://metabase.example.com/',
+      });
+
+      my $fact = generate_metabase_fact;
+
+      $client->submit_fact($fact);
+
+DESCRIPTION
+    Metabase::Client::Simple provides is extremely simple, lightweight
+    library for submitting facts to a Metabase web server.
+
+METHODS
+  new
+      my $client = Metabase::Client::Simple->new(\%arg)
+
+    This is the object constructor.
+
+    Valid arguments are:
+
+      profile - a Metabase::User::Profile object
+      secret  - a Metabase::User::Secret object
+      uri     - the root URI for the metabase server
+
+    If you use a "uri" argument with the 'https' scheme, you must have
+    IO::Socket::SSL and Net::SSLeay installed. You may also require
+    Mozilla::CA.
+
+  submit_fact
+      $client->submit_fact($fact);
+
+    This method will submit a Metabase::Fact object to the client's server.
+    On success, it will return a true value. On failure, it will raise an
+    exception.
+
+  guid_exists
+      $client->guid_exists('2f8519c6-24cf-11df-90b1-0018f34ec37c');
+
+    This method will check whether the given GUID is found on the metabase
+    server. The GUID must be in lower-case, string form. It will return true
+    or false. Note that a server error will also result in a false value.
+
+  register
+      $client->register;
+
+    This method will submit the user credentials to the metabase server. It
+    will be called automatically by "submit_fact" if necessary. You
+    generally won't need to use it. On success, it will return a true value.
+    On failure, it will raise an exception.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/cpan-testers/Metabase-Client-Simple/issues>. You
+    will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/cpan-testers/Metabase-Client-Simple>
+
+      git clone https://github.com/cpan-testers/Metabase-Client-Simple.git
+
+AUTHORS
+    *   David Golden <dagolden@cpan.org>
+
+    *   Ricardo Signes <rjbs@cpan.org>
+
+CONTRIBUTORS
+    *   Alexandr Ciornii <alexchorny@gmail.com>
+
+    *   David Steinbrunner <dsteinbrunner@pobox.com>
+
+    *   James McCoy <vega.james@gmail.com>
+
+    *   Karen Etheridge <ether@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2016 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

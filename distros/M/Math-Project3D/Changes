@@ -1,0 +1,48 @@
+Revision history Math::Project3D, Math::Project3D::Function.
+
+1.02   Sat Oct  7 12:33 2006
+    - Distribution cleanup.
+    - Modified some docs.
+    - Fixed the tests (numeric eq is bad!)
+
+1.010  Sun Feb 23 16:28:18 2003
+	- Now supplies an integer of range increment count
+	  to every callback invokation in project_range_callback().
+
+1.009  Wed Dec 11 17:10:55 2002
+	- Fixed synopsis. Now almost runnable as it is in the docs.
+
+1.008  Wed Nov 27 21:48:42 2002
+	- Fixed distribution. (Sorry to not have gotten this right rightaway.)
+	- Documentation fixes.
+
+1.007  Sat Nov 23 15:23:51 2002
+	- Added rotate() method
+	- Added unrotate() method
+	- More documentation
+	- Several bugfixes (in the tests, too)
+
+1.006  Fri Nov 22 18:13:02 2002
+	- Fixed documentation
+	- Fixed unnecessary Exporter dependency.
+	  How could I possibly overlook that line?
+
+1.005  Fri Nov 22 15:00:00 2002
+	- Fixed documentation / versioning bug.
+	  What a no-brainer!
+	- Fixed module name. Underscores are a Bad Thing.
+
+1.004  Fri Nov 22 12:00:00 2002
+	- Added project_range_callback method
+	- Small bugfixes
+	- Fixed Test::More dependency in Makefile.pl
+
+1.003  Thu Nov 21 15:01:47 2002
+	- Added lots of documentation. We still need a fast
+	  way of projecting a large number of points.
+	  Adding a callback version of project() is targeted
+	  for the next release.
+	- Small bugfixes
+
+1.002  Tue Nov 19 21:01:47 2002
+	- original version (as released to CPAN).

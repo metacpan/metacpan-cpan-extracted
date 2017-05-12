@@ -1,0 +1,7 @@
+(* $Id$ *)
+
+tell application "iTunes"
+	set myName to alias "Otter:Users:brian:Dev:MacOSX:iTunes:mp3:The_Wee_Kirkcudbright_Centipede.mp3"
+	add myName to playlist "Mac-iTunes test"
+	
+end tell

@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<tube name="Köln-Bonn U- and S-Bahn and Tramways">
+  <lines>
+    <line id="1"   name="1"   color="#EE1C24"/>
+    <line id="3"   name="3"   color="#F49AC2"/>
+    <line id="4"   name="4"   color="#F172AC"/>
+    <line id="5"   name="5"   color="#9B95C9"/>
+    <line id="7"   name="7"   color="#F68C59"/>
+    <line id="9"   name="9"   color="#F68E84"/>
+    <line id="12"  name="12"  color="#8DC73F"/>
+    <line id="13"  name="13"  color="#A4846F"/>
+    <line id="15"  name="15"  color="#4FB848"/>
+    <line id="16"  name="16"  color="#00B6AD"/>
+    <line id="18"  name="18"  color="#00A1E4"/>
+    <line id="61"  name="61"  color="#8DC73F"/>
+    <line id="62"  name="62"  color="#4FB848"/>
+    <line id="63"  name="63"  color="#5ACCF6"/>
+    <line id="65"  name="65"  color="#BFD72F"/>
+    <line id="66"  name="66"  color="#ED008C"/>
+    <line id="67"  name="67"  color="#F49AC2"/>
+    <line id="68"  name="68"  color="#C8A0CB"/>
+    <line id="S6"  name="S6"  color="#F8941D"/>
+    <line id="S11" name="S11" color="#F8941D"/>
+    <line id="S12" name="S12" color="#F8941D"/>
+    <line id="S13" name="S13" color="#F8941D"/>
+    <line id="S19" name="S19" color="#F8941D"/>
+    <line id="S23" name="S23" color="#F8941D"/>
+  </lines>
+  <stations>
+    <station id="s012" name="Aachener Str. / Gürtel" line="1,13,7" link="s011,s013,s102,s164" />
+    <station id="s290" name="Adelheidisstr." line="66,67" link="s268,s289" />
+    <station id="s334" name="Airport / Businesspark" line="S12" link="s333,s335" />
+    <station id="s042" name="Akazienweg" line="3,4" link="s041,s043" />
+    <station id="s241" name="Alfter / Alanushochschule" line="18,68" link="s240,s242" />
+    <station id="s079" name="Alter Flughafen Butzweilerhof" line="5" link="s078,s080" />
+    <station id="s008" name="Alter Militärring" line="1" link="s007,s009" />
+    <station id="s174" name="Altonaer Platz" line="15" link="s141,s173" />
+    <station id="s073" name="Am Emberg" line="4" link="s072,s074" />
+    <station id="s300" name="Am Spitzenbach" line="66" link="s299,s301" />
+    <station id="s160" name="Amsterdamer Str. / Gürtel" line="13,16" link="s144,s159,s179,s180" />
+    <station id="s264" name="An der Josefshöhe" line="61,65" link="s263,s265" />
+    <station id="s050" name="Appellhofplatz / Breite Str." line="16,18,3,4" link="s017,s049,s090" />
+    <station id="s089" name="Appellhofplatz / Zeughaus" line="5" link="s049,s090" />
+    <station id="s221" name="Arnulfstr." line="18" link="s220,s222" />
+    <station id="s349" name="Au (Sieg)" line="S12" link="s348" />
+    <station id="s266" name="Auerberg Kopenhagener Str." line="61,65" link="s265" />
+    <station id="s128" name="Autobahn" line="9" link="s127,s129" />
+    <station id="s215" name="Bad Godesberg Bf" line="16,63,67" link="s214,s216" />
+    <station id="s216" name="Bad Godesberg Stadthalle" line="16,63,67" link="s215" />
+    <station id="s004" name="Bahnstr." line="1" link="s003,s005" />
+    <station id="s150" name="Barbarossaplatz" line="12,15,16,18" link="s051,s124,s151,s219" />
+    <station id="s108" name="Baumschulenweg" line="7" link="s107,s109" />
+    <station id="s184" name="Bayenthalgürtel" line="16" link="s183,s185" />
+    <station id="s036" name="Bensberg" line="1" link="s035" />
+    <station id="s317" name="Berghausen" line="S6" link="s316" />
+    <station id="s324" name="Bergisch Gladbach" line="S11" link="s323" />
+    <station id="s247" name="Bergstr." line="61,62" link="s246,s248" />
+    <station id="s167" name="Berrenrather Str. / Gürtel" line="13" link="s166,s168" />
+    <station id="s267" name="Bertha-von-Suttner-Platz / Beethovenhaus" line="62,65,66,67" link="s256,s257,s268" />
+    <station id="s271" name="Beuel Bf" line="62,65" link="s270,s272" />
+    <station id="s269" name="Beuel Rathaus" line="62,65" link="s268,s270" />
+    <station id="s054" name="Bf Deutz / LANXESS Arena" line="3,4" link="s053,s055" other_link="street:s020" />
+    <station id="s158" name="Bf Mülheim" line="13,18" link="s059,s068" />
+    <station id="s342" name="Blankenberg" line="S12" link="s341,s343" />
+    <station id="s303" name="Blumenberg" line="S11,S6" link="s302,s304" />
+    <station id="s039" name="Bocklemünd" line="3,4" link="s038,s040" />
+    <station id="s217" name="Boltensternstr." line="18" link="s159,s218" />
+    <station id="s259" name="Bonn Chlodwigplatz" line="61,65" link="s258,s260" />
+    <station id="s203" name="Bonn Hbf" line="16,18,61,62,63,66,67,68,S23" link="s202,s204,s254,s255,s256,s352" />
+    <station id="s202" name="Bonn West" line="16,18,63,68" link="s201,s203,s244" />
+    <station id="s238" name="Bornheim" line="18,68" link="s237,s239" />
+    <station id="s239" name="Bornheim Rathaus" line="18,68" link="s238,s240" />
+    <station id="s100" name="Brahmsstr." line="7" link="s099,s101" />
+    <station id="s182" name="Breslauer Platz / Hbf" line="16,18" link="s090,s147" other_link="street:s400" />
+    <station id="s028" name="Brück Mauspfad" line="1" link="s027,s029" />
+    <station id="s230" name="Brühl Mitte" line="18" link="s229,s231" />
+    <station id="s229" name="Brühl Nord" line="18" link="s228,s230" />
+    <station id="s231" name="Brühl Süd" line="18" link="s230,s232" />
+    <station id="s232" name="Brühl-Badorf" line="18" link="s231,s233" />
+    <station id="s233" name="Brühl-Schwadorf" line="18" link="s232,s234" />
+    <station id="s228" name="Brühl-Vochem" line="18" link="s227,s229" />
+    <station id="s244" name="Brühler Str." line="18,68" link="s202,s243" />
+    <station id="s309" name="Buchforst" line="S11,S6" link="s401,s310" />
+    <station id="s057" name="Buchforst Waldecker Str." line="3" link="s056,s058" />
+    <station id="s058" name="Buchheim Frankfurter Str." line="3" link="s057,s059" />
+    <station id="s059" name="Buchheim Herler Str." line="13,18,3" link="s058,s060,s158" />
+    <station id="s327" name="Buir" line="S12" link="s326,s328" />
+    <station id="s206" name="Bundesrechnungshof / Auswärtiges Amt" line="16,63,66,67,68" link="s205,s207" />
+    <station id="s198" name="Buschdorf" line="16" link="s197,s199" />
+    <station id="s169" name="Chorweiler" line="15,S11,S6" link="s170,s304,s305" />
+    <station id="s304" name="Chorweiler Nord" line="S11,S6" link="s169,s303" />
+    <station id="s149" name="Christophstr. / Mediapark" line="12,15" link="s049,s148" />
+    <station id="s010" name="Clarenbachstift" line="1" link="s009,s011" />
+    <station id="s123" name="Dasselstr. / Bf Süd" line="9" link="s122,s124" />
+    <station id="s346" name="Dattenfeld" line="S12" link="s345,s347" />
+    <station id="s322" name="Dellbrück" line="S11" link="s321,s323" />
+    <station id="s065" name="Dellbrück Hauptstr." line="18,3" link="s064,s066" />
+    <station id="s064" name="Dellbrück Mauspfad" line="18,3" link="s063,s065" />
+    <station id="s237" name="Dersdorf" line="18" link="s236,s238" />
+    <station id="s401" name="Köln Messe / Deutz" line="S11,S12,S13,S19,S6" link="s400,s309,s333" other_link="street:s020" />
+    <station id="s020" name="Bf Deutz / Messe" line="1,9" link="s019,s021" other_link="street:s401|s054" />
+    <station id="s021" name="Deutz Fachhochschule" line="1,9" link="s020,s022" />
+    <station id="s019" name="Deutzer Freiheit" line="1,7,9" link="s018,s020,s103" />
+    <station id="s319" name="Dormagen" line="S11" link="s318,s320" />
+    <station id="s320" name="Dormagen Chempark" line="S11" link="s302,s319" />
+    <station id="s245" name="Dottendorf Quirinusplatz" line="61,62" link="s246" />
+    <station id="s242" name="Dransdorf" line="18,68" link="s241,s243" />
+    <station id="s104" name="Drehbrücke" line="7" link="s103,s105" />
+    <station id="s323" name="Duckterath" line="S11" link="s322,s324" />
+    <station id="s354" name="Duisdorf" line="S23" link="s353,s355" />
+    <station id="s325" name="Düren" line="S12" link="s326" />
+    <station id="s101" name="Dürener Str. / Gürtel" line="13,7" link="s100,s102,s165" />
+    <station id="s147" name="Ebertplatz" line="12,15,16,18" link="s146,s148,s181,s182" />
+    <station id="s249" name="Eduard-Otto-Str." line="61,62" link="s248,s250" />
+    <station id="s224" name="Efferen" line="18" link="s223,s225" />
+    <station id="s045" name="Ehrenfeld" line="3,4,S12,S13,S19" link="s044,s046,s148,s332" />
+    <station id="s152" name="Eifelplatz" line="12" link="s151,s153" />
+    <station id="s151" name="Eifelstr." line="12,15,16" link="s150,s152,s175" />
+    <station id="s219" name="Eifelwall" line="18" link="s150,s220" />
+    <station id="s344" name="Eitorf" line="S12" link="s343,s345" />
+    <station id="s352" name="Endenich Nord" line="S23" link="s203,s353" />
+    <station id="s112" name="Ensen Kloster" line="7" link="s111,s113" />
+    <station id="s162" name="Escherstr." line="13" link="s084,s161" />
+    <station id="s009" name="Eupener Str." line="1" link="s008,s010" />
+    <station id="s364" name="Euskirchen" line="S23" link="s363" />
+    <station id="s166" name="Euskirchener Str." line="13" link="s119,s167" />
+    <station id="s227" name="Fischenich" line="18" link="s226,s228" />
+    <station id="s027" name="Flehbachstr." line="1" link="s026,s028" />
+    <station id="s145" name="Florastr." line="12,15" link="s144,s146" />
+    <station id="s137" name="Fordwerke Mitte" line="12" link="s136,s138" />
+    <station id="s136" name="Fordwerke Nord" line="12" link="s135,s137" />
+    <station id="s138" name="Fordwerke Süd" line="12" link="s137,s139" />
+    <station id="s032" name="Frankenforst" line="1" link="s031,s033" />
+    <station id="s350" name="Frankfurter Str." line="S13,S19" link="s333,s351" />
+    <station id="s096" name="Frchen Bahnhof" line="7" link="s095,s097" />
+    <station id="s095" name="Frechen Kirche" line="7" link="s094,s096" />
+    <station id="s094" name="Frechen Rathaus" line="7" link="s093,s095" />
+    <station id="s092" name="Frechen-Benzelrath" line="7" link="s093" />
+    <station id="s049" name="Friesenplatz" line="12,15,3,4,5" link="s016,s048,s050,s088,s089,s149" />
+    <station id="s024" name="Fuldaer Str." line="1" link="s023,s025" />
+    <station id="s139" name="Geestemünder Str." line="12" link="s138,s140" />
+    <station id="s161" name="Geldernstr. / Parkgürtel" line="13,S11,S6" link="s144,s162,s307,s308" />
+    <station id="s111" name="Gilgaustr." line="7" link="s110,s112" />
+    <station id="s165" name="Gleueler Str. / Gürtel" line="13" link="s101,s119" />
+    <station id="s190" name="Godorf" line="16" link="s189,s191" />
+    <station id="s155" name="Gottesweg" line="12" link="s154,s156" />
+    <station id="s067" name="Grünstr." line="4" link="s056,s068" />
+    <station id="s087" name="Gutenbergstr." line="5" link="s086,s088" />
+    <station id="s286" name="Hangelar Mitte" line="66,67" link="s285,s287" />
+    <station id="s285" name="Hangelar Ost" line="66,67" link="s284,s286" />
+    <station id="s287" name="Hangelar West" line="66,67" link="s286,s288" />
+    <station id="s048" name="Hans-Böckler-Platz / Bf West" line="3,4" link="s047,s049" />
+    <station id="s148" name="Hansaring" line="12,15,S11,S12,S13,S19,S6" link="s045,s400,s147,s149,s308" />
+    <station id="s250" name="Haus der Jugend" line="61,62" link="s249,s251" />
+    <station id="s097" name="Haus Vorst" line="7" link="s096,s098" />
+    <station id="s170" name="Heimersdorf" line="15" link="s169,s171" />
+    <station id="s185" name="Heinrich-Lübke-Ufer" line="16" link="s184,s186" />
+    <station id="s353" name="Helmholtzstr." line="S23" link="s352,s354" />
+    <station id="s340" name="Hennef" line="S12,S19" link="s280,s341" />
+    <station id="s341" name="Hennef Im Siegbogen" line="S12" link="s340,s342" />
+    <station id="s263" name="Henrich-Hertz-Europakolleg" line="61,65" link="s262,s264" />
+    <station id="s345" name="Herchen" line="S12" link="s344,s346" />
+    <station id="s173" name="Herforder Str." line="15" link="s172,s174" />
+    <station id="s197" name="Hersel" line="16" link="s196,s198" />
+    <station id="s154" name="Hertastr." line="12" link="s153,s155" />
+    <station id="s018" name="Heumarkt" line="1,5,7,9" link="s017,s019,s091" />
+    <station id="s208" name="Heussallee / Museumsmeile" line="16,63,66,67,68" link="s207,s209" />
+    <station id="s246" name="Hindenburgplatz" line="61,62" link="s245,s247" />
+    <station id="s212" name="Hochkreuz / Deutsches Museum" line="16,63,67" link="s211,s213" />
+    <station id="s321" name="Holweide" line="S11" link="s310,s322" />
+    <station id="s061" name="Holweide Vischeringstr." line="13,18,3" link="s060,s062" />
+    <station id="s301" name="Honnef" line="66" link="s300" />
+    <station id="s329" name="Horrem" line="S12,S19" link="s328,s330" />
+    <station id="s261" name="Husarenstr." line="61,65" link="s260,s262" />
+    <station id="s025" name="Höhenberg Frankfurter Str." line="1" link="s024,s026" />
+    <station id="s226" name="Hürth-Hermülheim" line="18" link="s225,s227" />
+    <station id="s078" name="IKEA Am Butzweilerhof" line="5" link="s077,s079" />
+    <station id="s082" name="Iltisstr." line="5" link="s081,s083" />
+    <station id="s035" name="Im Hoppenkamp" line="1" link="s034,s036" />
+    <station id="s072" name="Im Weidenburch" line="4" link="s071,s073" />
+    <station id="s355" name="Impekoven" line="S23" link="s354,s356" />
+    <station id="s262" name="Innenministerium" line="61,65" link="s261,s263" />
+    <station id="s006" name="Junkersdorf" line="1" link="s005,s007" />
+    <station id="s205" name="Juridicum" line="16,63,66,67,68" link="s204,s206" />
+    <station id="s023" name="Kalk Kapelle" line="1,9" link="s022,s024,s126" />
+    <station id="s022" name="Kalk Post" line="1,9" link="s021,s023" />
+    <station id="s069" name="Keupstr." line="4" link="s068,s070" />
+    <station id="s225" name="Kiebitzweg" line="18" link="s224,s226" />
+    <station id="s180" name="Kinderkrankenhaus" line="16" link="s160,s181" />
+    <station id="s031" name="Kippekausen" line="1" link="s030,s032" />
+    <station id="s223" name="Klettenbergpark" line="18" link="s222,s224" />
+    <station id="s055" name="Koelnmesse" line="3,4" link="s054,s056" />
+    <station id="s268" name="Konrad-Adenauer-Platz" line="62,65,66,67" link="s267,s269,s290" />
+    <station id="s357" name="Kottenforst" line="S23" link="s356,s358" />
+    <station id="s363" name="Kuchenheim" line="S23" link="s362,s364" />
+    <station id="s351" name="Köln / Bonn Flughafen" line="S13,S19" link="s337,s350" />
+    <station id="s176" name="Köln Chlodwigplatz" line="15,16" link="s175,s177" />
+    <station id="s400" name="Köln Hbf" line="S11,S12,S13,S19,S6" link="s401,s148" other_link="street:s182|s090" />
+    <station id="s090" name="Dom / Hbf" line="16,18,5" link="s050,s089,s091,s182" other_link="street:s400" />
+    <station id="s088" name="Köln West" line="5" link="s049,s087" />
+    <station id="s034" name="Kölner Str." line="1" link="s033,s035" />
+    <station id="s330" name="Königsdorf" line="S12,S19" link="s001,s329" />
+    <station id="s133" name="Königsforst" line="9" link="s132" />
+    <station id="s253" name="Königstr." line="61,62" link="s252,s254" />
+    <station id="s296" name="Königswinter Clemens-August-Str." line="66" link="s295,s297" />
+    <station id="s298" name="Königswinter Denkmal" line="66" link="s297,s299" />
+    <station id="s297" name="Königswinter Fähre" line="66" link="s296,s298" />
+    <station id="s046" name="Körnerstr." line="3,4" link="s045,s047" />
+    <station id="s274" name="Küdinghoven" line="62,65" link="s273,s275" />
+    <station id="s314" name="Küppersteg" line="S6" link="s313,s315" />
+    <station id="s316" name="Langenfeld" line="S6" link="s315,s317" />
+    <station id="s083" name="Lenauplatz" line="5" link="s082,s084" />
+    <station id="s074" name="Leuchterstr." line="4" link="s073,s075" />
+    <station id="s312" name="Leverkusen Chempark" line="S6" link="s311,s313" />
+    <station id="s313" name="Leverkusen Mitte" line="S6" link="s312,s314" />
+    <station id="s044" name="Leyendeckerstr." line="3,4" link="s043,s045" />
+    <station id="s086" name="Liebigstr." line="5" link="s085,s087" />
+    <station id="s273" name="Limperich" line="62,65" link="s272,s274" />
+    <station id="s272" name="Limperich Nord" line="62,65" link="s271,s273" />
+    <station id="s120" name="Lindenburg" line="9" link="s119,s121" />
+    <station id="s146" name="Lohsestr." line="12,15" link="s145,s147" />
+    <station id="s295" name="Longenburg" line="66" link="s294,s296" />
+    <station id="s306" name="Longerich" line="S11,S6" link="s305,s307" />
+    <station id="s307" name="Longerich Friedhof" line="S11,S6" link="s161,s306" />
+    <station id="s171" name="Longericher Str." line="15" link="s170,s172" />
+    <station id="s029" name="Lustheide" line="1" link="s028,s030" />
+    <station id="s260" name="LVR-Klinik" line="61,65" link="s259,s261" />
+    <station id="s331" name="Lövenich" line="S12,S19" link="s001,s332" />
+    <station id="s011" name="Maarweg" line="1,7" link="s010,s012,s014" />
+    <station id="s081" name="Margaretastr." line="5" link="s080,s082" />
+    <station id="s062" name="Maria-Himmelfahrt-Str." line="18,3" link="s061,s063" />
+    <station id="s098" name="Marsdorf" line="7" link="s097,s099" />
+    <station id="s125" name="Mauritiuskirche" line="9" link="s017,s124" />
+    <station id="s211" name="Max-Löbner-Str. / Friesdorf" line="16,63,67" link="s210,s212" />
+    <station id="s359" name="Meckenheim" line="S23" link="s358,s360" />
+    <station id="s358" name="Meckenheim Industriepark" line="S23" link="s357,s359" />
+    <station id="s172" name="Meerfeldstr." line="15" link="s171,s173" />
+    <station id="s013" name="Melaten" line="1" link="s012,s014" />
+    <station id="s037" name="Mengenich Ollenhauerring" line="3" link="s038" />
+    <station id="s026" name="Merheim" line="1" link="s025,s027" />
+    <station id="s134" name="Merkenich" line="12" link="s135" />
+    <station id="s135" name="Merkenich Mitte" line="12" link="s134,s136" />
+    <station id="s235" name="Merten" line="18" link="s234,s236" />
+    <station id="s343" name="Merten (Sieg)" line="S12" link="s342,s344" />
+    <station id="s326" name="Merzenich" line="S12" link="s325,s327" />
+    <station id="s188" name="Michaelshoven" line="16" link="s187,s189" />
+    <station id="s005" name="Mohnweg" line="1" link="s004,s006" />
+    <station id="s143" name="Mollwitzstr." line="12,15" link="s142,s144" />
+    <station id="s015" name="Moltkestr." line="1,7" link="s014,s016" />
+    <station id="s118" name="Mommsenstr." line="9" link="s117,s119" />
+    <station id="s207" name="Museum Koenig" line="16,63,66,67,68" link="s206,s208" />
+    <station id="s093" name="Mühlengasse" line="7" link="s092,s094" />
+    <station id="s310" name="Mülheim" line="S11,S6" link="s309,s311,s321" />
+    <station id="s071" name="Mülheim Berliner Str." line="4" link="s070,s072" />
+    <station id="s068" name="Mülheim Wiener Platz" line="13,18,4" link="s067,s069,s158,s159" />
+    <station id="s332" name="Müngersdorf / Technologiepark" line="S12,S19" link="s045,s331" />
+    <station id="s179" name="Nesselrodestr." line="16" link="s160,s178" />
+    <station id="s033" name="Neuenweg" line="1" link="s032,s034" />
+    <station id="s063" name="Neufelder Str." line="18,3" link="s062,s064" />
+    <station id="s017" name="Neumarkt" line="1,16,18,3,4,7,9" link="s016,s018,s050,s051,s125" />
+    <station id="s144" name="Neusser Str. / Gürtel" line="12,13,15" link="s143,s145,s160,s161" />
+    <station id="s140" name="Niehl" line="12" link="s139,s141" />
+    <station id="s318" name="Nievenheim" line="S11" link="s319" />
+    <station id="s308" name="Nippes" line="S11,S6" link="s148,s161" />
+    <station id="s084" name="Nußbaumerstr." line="13,5" link="s083,s085,s162" />
+    <station id="s294" name="Oberdollendorf" line="66" link="s293,s295" />
+    <station id="s293" name="Oberdollendorf Nord" line="66" link="s279,s294" />
+    <station id="s270" name="Obere Wilhelmstr." line="62,65" link="s269,s271" />
+    <station id="s278" name="Oberkassel Mitte" line="62,66" link="s277,s279" />
+    <station id="s277" name="Oberkassel Nord" line="62,66" link="s276,s278" />
+    <station id="s279" name="Oberkassel Süd / Römlinghoven" line="62,66" link="s278,s293" />
+    <station id="s362" name="Odendorf" line="S23" link="s361,s363" />
+    <station id="s075" name="Odenthaler Str." line="4" link="s074,s076" />
+    <station id="s209" name="Ollenhauerstr." line="16,63,66,67,68" link="s208,s210" />
+    <station id="s210" name="Olof-Palme-Allee" line="16,63,66,67,68" link="s209,s211,s291" />
+    <station id="s164" name="Oskar-Jäger-Str. / Gürtel" line="13" link="s012,s163" />
+    <station id="s127" name="Ostheim" line="9" link="s126,s128" />
+    <station id="s265" name="Pariser Str." line="61,65" link="s264,s266" />
+    <station id="s047" name="Piusstr." line="3,4" link="s046,s048" />
+    <station id="s214" name="Plittersdorfer Str." line="16,63,67" link="s213,s215" />
+    <station id="s153" name="Pohligstr." line="12" link="s152,s154" />
+    <station id="s107" name="Poll Salmstr." line="7" link="s106,s108" />
+    <station id="s105" name="Poller Kirchweg" line="7" link="s104,s106" />
+    <station id="s254" name="Poppelsdorfer Allee" line="61,62" link="s203,s253" />
+    <station id="s336" name="Porz" line="S12" link="s335,s337" />
+    <station id="s114" name="Porz Markt" line="7" link="s113,s115" />
+    <station id="s113" name="Porz Steinstr." line="7" link="s112,s114" />
+    <station id="s337" name="Porz-Wahn" line="S12,S13,S19" link="s336,s338,s351" />
+    <station id="s130" name="Porzer Str." line="9" link="s129,s131" />
+    <station id="s051" name="Poststr." line="16,18,3,4" link="s017,s052,s150" />
+    <station id="s201" name="Propsthof Nord" line="16,63" link="s200,s202" />
+    <station id="s248" name="Pützstr." line="61,62" link="s247,s249" />
+    <station id="s106" name="Raiffeisenstr." line="7" link="s105,s107" />
+    <station id="s276" name="Ramersdorf" line="62,65,66,68" link="s275,s277,s292" />
+    <station id="s131" name="Rath-Heumar" line="9" link="s130,s132" />
+    <station id="s091" name="Rathaus" line="5" link="s018,s090" />
+    <station id="s030" name="Refrath" line="1" link="s029,s031" />
+    <station id="s181" name="Reichenspergerplatz" line="16,18" link="s147,s180,s218" />
+    <station id="s080" name="Rektor-Klein-Str." line="5" link="s079,s081" />
+    <station id="s292" name="Rheinaue" line="66,68" link="s276,s291" />
+    <station id="s361" name="Rheinbach" line="S23" link="s360,s362" />
+    <station id="s360" name="Rheinbach Römerkanal" line="S23" link="s359,s361" />
+    <station id="s315" name="Rheindorf" line="S6" link="s314,s316" />
+    <station id="s007" name="Rheinenergiestadion" line="1" link="s006,s008" />
+    <station id="s299" name="Rhöndorf" line="66" link="s298,s300" />
+    <station id="s251" name="Rittershausstr." line="61,62" link="s250,s252" />
+    <station id="s243" name="Robert-Kirchhoff-Str." line="18,68" link="s242,s244" />
+    <station id="s291" name="Robert-Schuman-Platz" line="66,68" link="s210,s292" />
+    <station id="s186" name="Rodenkirchen" line="16" link="s185,s187" />
+    <station id="s240" name="Roisdorf West" line="18,68" link="s239,s241" />
+    <station id="s348" name="Rosbach" line="S12" link="s347,s349" />
+    <station id="s115" name="Rosenhügel" line="7" link="s114,s116" />
+    <station id="s258" name="Rosenthal" line="61,65" link="s257,s259" />
+    <station id="s016" name="Rudolfplatz" line="1,12,15,7" link="s015,s017,s049,s124" />
+    <station id="s132" name="Röttgensweg" line="9" link="s131,s133" />
+    <station id="s283" name="Sankt Augustin Kloster" line="66,67" link="s282,s284" />
+    <station id="s284" name="Sankt Augustin Ort" line="66,67" link="s283,s285" />
+    <station id="s282" name="Sankt Augustin Zentrum / Hochschule Bonn-Rhein-Sieg" line="66,67" link="s281,s283" />
+    <station id="s281" name="Sankt-Augustin-Mülldorf" line="66,67" link="s280,s282" />
+    <station id="s038" name="Schaffrathsgasse" line="3" link="s037,s039" />
+    <station id="s142" name="Scheibenstr." line="12,15" link="s141,s143" />
+    <station id="s275" name="Schießbergweg" line="62,65" link="s274,s276" />
+    <station id="s347" name="Schladern" line="S12" link="s346,s348" />
+    <station id="s076" name="Schlebusch" line="4" link="s075" />
+    <station id="s183" name="Schönhauser Str." line="16" link="s177,s184" />
+    <station id="s178" name="Sebastianstr." line="16" link="s179" />
+    <station id="s103" name="Severinsbrücke" line="7" link="s019,s104" />
+    <station id="s052" name="Severinstr." line="3,4" link="s051,s053" />
+    <station id="s280" name="Siegburg / Bonn" line="66,67,S12,S19" link="s281,s339,s340" />
+    <station id="s187" name="Siegstr." line="16" link="s186,s188" />
+    <station id="s328" name="Sindorf" line="S12" link="s327,s329" />
+    <station id="s159" name="Slabystr." line="13,18" link="s068,s160,s217" />
+    <station id="s077" name="Sparkasse Am Butzweilerhof" line="5" link="s078" />
+    <station id="s338" name="Spich" line="S12,S13,S19" link="s337,s339" />
+    <station id="s256" name="Stadthaus" line="61,62,66,67" link="s203,s255,s257,s267" />
+    <station id="s311" name="Stammheim" line="S6" link="s310,s312" />
+    <station id="s056" name="Stegerwaldsiedlung" line="3,4" link="s055,s057,s067" />
+    <station id="s335" name="Steinstr." line="S12" link="s334,s336" />
+    <station id="s129" name="Steinweg" line="9" link="s128,s130" />
+    <station id="s099" name="Stüttgenhof" line="7" link="s098,s100" />
+    <station id="s085" name="Subbelrather Str. / Gürtel" line="13,5" link="s084,s086,s163" />
+    <station id="s053" name="Suevenstr." line="3,4" link="s052,s054" />
+    <station id="s117" name="Sülz Hermeskeiler Platz" line="9" link="s118" />
+    <station id="s222" name="Sülzburgstr." line="18" link="s221,s223" />
+    <station id="s168" name="Sülzgürtel" line="13" link="s167" />
+    <station id="s189" name="Sürth" line="16" link="s188,s190" />
+    <station id="s199" name="Tannenbusch Mitte" line="16,63" link="s198,s200" />
+    <station id="s200" name="Tannenbusch Süd" line="16,63" link="s199,s201" />
+    <station id="s066" name="Thielenbruch" line="18,3" link="s065" />
+    <station id="s255" name="Thomas-Mann-Str." line="61,62" link="s203,s256" />
+    <station id="s333" name="Trimbornstr." line="S12,S13,S19" link="s401,s334,s350" />
+    <station id="s339" name="Troisdorf" line="S12,S13,S19" link="s280,s338" />
+    <station id="s177" name="Ubierring" line="15,16" link="s176,s183" />
+    <station id="s196" name="Uedorf" line="16" link="s195,s197" />
+    <station id="s175" name="Ulrepforte" line="15,16" link="s151,s176" />
+    <station id="s122" name="Universität" line="9" link="s121,s123" />
+    <station id="s204" name="Universität / Markt" line="16,63,66,67,68" link="s203,s205" />
+    <station id="s014" name="Universitätsstr." line="1,7" link="s011,s013,s015" />
+    <station id="s194" name="Urfeld" line="16" link="s193,s195" />
+    <station id="s289" name="Vilich" line="66,67" link="s288,s290" />
+    <station id="s288" name="Vilich-Müldorf" line="66,67" link="s287,s289" />
+    <station id="s126" name="Vingst" line="9" link="s023,s127" />
+    <station id="s305" name="Volkhovener Weg" line="S11,S6" link="s169,s306" />
+    <station id="s070" name="Von-Sparr-Str." line="4" link="s069,s071" />
+    <station id="s234" name="Walberberg" line="18" link="s233,s235" />
+    <station id="s236" name="Waldorf" line="18" link="s235,s237" />
+    <station id="s252" name="Weberstr." line="61,62" link="s251,s253" />
+    <station id="s002" name="Weiden Schulstr." line="1" link="s001,s003" />
+    <station id="s001" name="Weiden West" line="1,S12,S19" link="s002,s330,s331" />
+    <station id="s003" name="Weiden Zentrum" line="1" link="s002,s004" />
+    <station id="s163" name="Weinsbergstr. / Gürtel" line="13" link="s085,s164" />
+    <station id="s220" name="Weißhausstr." line="18" link="s219,s221" />
+    <station id="s192" name="Wesseling" line="16" link="s191,s193" />
+    <station id="s191" name="Wesseling Nord" line="16" link="s190,s192" />
+    <station id="s193" name="Wesseling Süd" line="16" link="s192,s194" />
+    <station id="s040" name="Westfriedhof" line="3,4" link="s039,s041" />
+    <station id="s110" name="Westhoven Berliner Str." line="7" link="s109,s111" />
+    <station id="s109" name="Westhoven Kölner Str." line="7" link="s108,s110" />
+    <station id="s121" name="Weyertal" line="9" link="s120,s122" />
+    <station id="s060" name="Wichheimer Str." line="13,18,3" link="s059,s061" />
+    <station id="s195" name="Widdig" line="16" link="s194,s196" />
+    <station id="s141" name="Wilhelm-Sollmann-Str." line="12,15" link="s140,s142,s174" />
+    <station id="s257" name="Wilhelmsplatz" line="61,65" link="s256,s258,s267" />
+    <station id="s356" name="Witterschlick" line="S23" link="s355,s357" />
+    <station id="s041" name="Wolffsohnstr." line="3,4" link="s040,s042" />
+    <station id="s302" name="Worringen" line="S11,S6" link="s303,s320" />
+    <station id="s213" name="Wurzerstr." line="16,63,67" link="s212,s214" />
+    <station id="s102" name="Wüllnerstr." line="13,7" link="s012,s101" />
+    <station id="s157" name="Zollstock Südfriedhof" line="12" link="s156" />
+    <station id="s156" name="Zollstockgürtel" line="12" link="s155,s157" />
+    <station id="s218" name="Zoo / Flora" line="18" link="s181,s217" />
+    <station id="s124" name="Zülpicher Platz" line="12,15,9" link="s016,s123,s125,s150" />
+    <station id="s119" name="Zülpicher Str. / Gürtel" line="13,9" link="s118,s120,s165,s166" />
+    <station id="s116" name="Zündorf" line="7" link="s115" />
+    <station id="s043" name="Äußere Kanalstr." line="3,4" link="s042,s044" />
+  </stations>
+</tube>

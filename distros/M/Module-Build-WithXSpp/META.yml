@@ -1,0 +1,31 @@
+---
+abstract: 'XS++ enhanced flavour of Module::Build'
+author:
+  - 'Steffen Mueller <smueller@cpan.org>'
+build_requires:
+  ExtUtils::CBuilder: 0
+  Module::Build: 0.26
+configure_requires:
+  Module::Build: 0.26
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Build-WithXSpp
+provides:
+  Module::Build::WithXSpp:
+    file: lib/Module/Build/WithXSpp.pm
+    version: 0.14
+requires:
+  Digest::MD5: 0
+  ExtUtils::CBuilder: 0
+  ExtUtils::CppGuess: 0.04
+  ExtUtils::ParseXS: 2.2205
+  ExtUtils::Typemaps: 1.00
+  ExtUtils::XSpp: 0.11
+  Module::Build: 0.26
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.14

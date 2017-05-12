@@ -1,0 +1,14 @@
+---
+abstract: 'mangle the argument list or return values of your methods'
+author:
+  - 'Jesse Luehrs <doy at tozt dot net>'
+generated_by: 'Dist::Zilla version 1.093400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MooseX-Mangle
+requires:
+  Moose: 0.90
+  Test::Exception: 0
+version: 0.02

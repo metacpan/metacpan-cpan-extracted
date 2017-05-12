@@ -1,0 +1,19 @@
+Revision history for Perl extension Module::Build::Prereq.
+
+0.04  Thu Oct 3 19:45:59 2013
+	- [RT#89229]: Update Changes file (no code changes)
+
+0.03  Tue Oct 1 10:40:37 2013
+	- RT#88812, RT88814: add utf8 encoding for POD; change module
+          references from B<> to L<> (no code changes)
+
+0.02  Wed Sep 18 15:24:09 2013
+	- usage notes; code indents (no code changes)
+	- [RT#88812]: add link to Perl::PrereqScanner
+	- [RT#88813]: add mention to CONFIGURE_REQUIRES 
+	- [RT#88796]: clarify usage for Module::Build
+
+0.01  Wed Sep 18 12:17:23 2013
+	- original version; created by h2xs 1.23 with options
+		-AX -b 5.10.0 Module::Build::Prereq
+

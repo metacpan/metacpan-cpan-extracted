@@ -1,0 +1,83 @@
+{
+   "abstract" : "A L<Data::Visitor> for creating Moose objects from blessed placeholders",
+   "author" : [
+      "Yuval Kogman <nothingmuch@woobling.org>",
+      "Jonathan Rockway <jrockway@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Blessed-Reconstruct",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Load" : "0",
+            "Class::MOP" : "0.93",
+            "Data::Visitor" : "0.21",
+            "Moose" : "1.05",
+            "Scalar::Util" : "0",
+            "Test::use::ok" : "0",
+            "namespace::clean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.88",
+            "ok" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::Blessed::Reconstruct" : {
+         "file" : "lib/MooseX/Blessed/Reconstruct.pm",
+         "version" : "1.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yanick/moosex-blessed-reconstruct/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/MooseX-Blessed-Reconstruct/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/moosex-blessed-reconstruct.git",
+         "web" : "https://github.com/yanick/moosex-blessed-reconstruct"
+      }
+   },
+   "version" : "1.00",
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "Jesse Luehrs <doy@tozt.net>",
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ]
+}
+

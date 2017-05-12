@@ -1,0 +1,7 @@
+MANIFEST
+README
+Changes
+Build.PL
+lib/Math/Integral/Romberg.pm
+t/misc.t
+META.yml

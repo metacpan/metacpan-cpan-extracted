@@ -1,0 +1,109 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: MooseX-XSAccessor
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/MooseX-XSAccessor
+
+Files: t/moose_accessor_context.t
+ t/moose_accessor_inlining.t
+ t/moose_accessor_override_method.t
+ t/moose_attr_dereference_test.t
+ t/moose_attribute_accessor_generation.t
+ t/moose_attribute_custom_metaclass.t
+ t/moose_attribute_delegation.t
+ t/moose_attribute_does.t
+ t/moose_attribute_inherited_slot_specs.t
+ t/moose_attribute_lazy_initializer.t
+ t/moose_attribute_names.t
+ t/moose_attribute_reader_generation.t
+ t/moose_attribute_required.t
+ t/moose_attribute_traits.t
+ t/moose_attribute_traits_n_meta.t
+ t/moose_attribute_traits_parameterized.t
+ t/moose_attribute_traits_registered.t
+ t/moose_attribute_triggers.t
+ t/moose_attribute_type_unions.t
+ t/moose_attribute_without_any_methods.t
+ t/moose_attribute_writer_generation.t
+ t/moose_bad_coerce.t
+ t/moose_chained_coercion.t
+ t/moose_clone_weak.t
+ t/moose_default_class_role_types.t
+ t/moose_default_undef.t
+ t/moose_delegation_and_modifiers.t
+ t/moose_delegation_arg_aliasing.t
+ t/moose_delegation_target_not_loaded.t
+ t/moose_illegal_options_for_inheritance.t
+ t/moose_inherit_lazy_build.t
+ t/moose_lazy_no_default.t
+ t/moose_method_generation_rules.t
+ t/moose_misc_attribute_coerce_lazy.t
+ t/moose_misc_attribute_tests.t
+ t/moose_more_attr_delegation.t
+ t/moose_no_init_arg.t
+ t/moose_no_slot_access.t
+ t/moose_non_alpha_attr_names.t
+ t/moose_numeric_defaults.t
+ t/moose_trigger_and_coerce.t
+Copyright: Copyright 2013 Infinity Interactive, Inc.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: CREDITS
+ Changes
+ LICENSE
+ Makefile.PL
+ README
+ doap.ttl
+Copyright: Copyright 1970 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/MooseX/XSAccessor.pm
+ t/01basic.t
+ t/02accel.t
+ t/03funky.t
+ t/04chained.t
+ t/05lvalue.t
+Copyright: This software is copyright (c) 2013, 2017 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: dist.ini
+ examples/bench.pl
+ t/lib/MyMoose.pm
+ t/lib/MyMoose/Role.pm
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: META.json
+ META.yml
+Copyright: Copyright 2017 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: lib/MooseX/XSAccessor/Trait/Attribute.pm
+Copyright: This software is copyright (c) 2013 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/moose_accessor_overwrite_warning.t
+Copyright: Copyright 2017 Infinity Interactive, Inc.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+Copyright: Unknown
+License: Unknown
+
+License: Artistic-1.0
+ This software is Copyright (c) 2017 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2017 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

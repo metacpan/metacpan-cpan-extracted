@@ -1,0 +1,67 @@
+  - Using Template.{t,pm} is a little counter-intuitive -- this looks
+    like it's a ragular Perl module, instead of a template (despite the
+    name).  I'd use something like _skeleton.pm and _skeleton.t for
+    these files. (darren chamberlain <dlc@users.sourceforge.net>)
+
+  - Something that I would consider adding is the ability to choose
+    different Template.pm's -- for example, if you are creating an Apache
+    module, as opposed to a POE component, the template you will want to
+    use will be radically different.  I think something like named templates
+    would work, so that:
+
+      newpmdist -t Apache Foo::Bar
+
+    Would look for Apache.pm in ~/.newpm instead of Template.pm.  Of course,
+    this will break if you're writing a Template Toolkit plugin, but see my
+    previous comment about _skeleton.pm.
+        (darren chamberlain <dlc@users.sourceforge.net>)
+
+
+- POD based help.  POD needs to be generated so man pages work as
+  expected.
+
+- Configurability: .newpmrc?
+
+- Update CHANGES file (make this pluggable, everyone's got a different format).
+
+- Get newpmbin to add/update EXEFILES => [...]
+    - Warn if it can't parse it.
+
+- Options: let templates defined options so, for instance, a user can
+  do
+
+      $ newpm lib/Foo/Bar.pm --class
+
+  to add in default class methods.  The template should be selected
+  when the module spec is encountered during CLI parsing and it should
+  declare what options it can take.
+
+- Support Module::Builder's way of thought
+
+- rmpm
+    - Gets rid of the file/module and its test script (if any)
+    - lists all possible references to it using greppm
+    - options to delete all references or jsut use/require references.
+    - update MANIFEST
+
+- greppm
+    - perl regexps (of course)
+    - note whether the line is pod or code
+    - --nopod, --pod
+    - always print filename and line number info so editors can parse
+      the results.
+    - allow fixed-width "file, #" labels so source code is all indented
+      similarly
+    - perhaps do tab expansion to get consistent output
+    - -r (recurse on dirnames) by default
+    - -I (skip binary files) by default
+    - search . by default, but skipping blib and pm_to_blib.  Use '-'
+      to grep stdin.
+
+- bumpver
+    - increments a module's version number
+
+- scanprereqs
+    - Use one of the prereq scanning modules to look for prereqs
+    - See if Makefile lists them
+    - perhaps update Makefile.PL (or other def files)

@@ -1,0 +1,58 @@
+diff --git a/src/libmemcached/build-aux/missing b/src/libmemcached/build-aux/missing
+index cdea514..11c96a6 100755
+--- a/src/libmemcached/build-aux/missing
++++ b/src/libmemcached/build-aux/missing
+@@ -1,7 +1,7 @@
+ #! /bin/sh
+ # Common wrapper for a few potentially missing GNU programs.
+ 
+-scriptversion=2012-06-26.16; # UTC
++scriptversion=2014-12-17.19; # UTC
+ 
+ # Copyright (C) 1996-2013 Free Software Foundation, Inc.
+ # Originally written by Fran,cois Pinard <pinard@iro.umontreal.ca>, 1996.
+@@ -96,6 +96,7 @@ if test $st -eq 63; then
+ elif test $st -eq 127; then
+   # Program was missing.
+   msg="missing on your system"
++  exit 0 # Added for Memcached::libmemcached 1.001800 - ignore missing programs.
+ else
+   # Program was found and executed, but failed.  Give up.
+   exit $st
+diff --git a/src/libmemcached/clients/memflush.cc b/src/libmemcached/clients/memflush.cc
+index 8bd0dbf..71545ea 100644
+--- a/src/libmemcached/clients/memflush.cc
++++ b/src/libmemcached/clients/memflush.cc
+@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
+ {
+   options_parse(argc, argv);
+ 
+-  if (opt_servers == false)
++  if (opt_servers == NULL)
+   {
+     char *temp;
+ 
+@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
+       opt_servers= strdup(temp);
+     }
+ 
+-    if (opt_servers == false)
++    if (opt_servers == NULL)
+     {
+       std::cerr << "No Servers provided" << std::endl;
+       exit(EXIT_FAILURE);
+diff --git a/src/libmemcached/libmemcached/byteorder.cc b/src/libmemcached/libmemcached/byteorder.cc
+index 9f11aa8..cc5ff42 100644
+--- a/src/libmemcached/libmemcached/byteorder.cc
++++ b/src/libmemcached/libmemcached/byteorder.cc
+@@ -38,6 +38,10 @@
+ #include "mem_config.h"
+ #include "libmemcached/byteorder.h"
+ 
++#ifdef HAVE_SYS_TYPES_H
++# include <sys/types.h>
++#endif
++
+ /* Byte swap a 64-bit number. */
+ #ifndef swap64
+ static inline uint64_t swap64(uint64_t in)

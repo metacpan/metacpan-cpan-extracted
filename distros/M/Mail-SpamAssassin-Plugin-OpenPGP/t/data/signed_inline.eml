@@ -1,0 +1,54 @@
+Message-ID: <45E6538A.90307@brondsema.net>
+Date: Wed, 28 Feb 2007 23:16:10 -0500
+From: Dave Brondsema <dave@brondsema.net>
+User-Agent: Thunderbird 1.5.0.9 (X11/20061206)
+MIME-Version: 1.0
+Subject: traffic data in google maps
+X-Enigmail-Version: 0.94.2.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+
+Google maps now has traffic data in the major cities, like Houston:
+
+http://maps.google.com/maps?f=q&hl=en&q=houston,tx&ie=UTF8&z=11&ll=29.679105,-95.239105&spn=0.412823,0.793076&om=1&layer=t
+
+And even Grand Rapids:
+
+http://maps.google.com/?ie=UTF8&z=11&ll=42.960945,-85.630875&spn=0.34773,0.567856&om=1&layer=t
+
+You can toggle the visibility of the traffic layer in the upper right,
+next to map and satellite.
+
+    * Green: more than 50 miles per hour
+    * Yellow: 25 - 50 miles per hour
+    * Red: less than 25 miles per hour
+    * Gray: no data currently available
+
+- --
+Dave Brondsema : dave@brondsema.net
+http://www.brondsema.net : personal
+http://www.splike.com : programming
+               <><
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org
+
+iQIVAwUBReZTimc36lVi77tzAQIwjw/+IGveqh/fXaiGFWV1PbD0WdbTwv3Wp8wR
+01CMyxbHYCs5aX07yekUSvFvTgdpmv24Bu1v6RQwAEmZkcqsH1yWgCgtHkH18AaG
+HoqkAZMcHSEZCF4GoHUMSBoNrDakRcSpldY0elxpybYDgAI5Emf5bBONa/tL+Kjb
+NKMZSSbD9zIgmb324X8JCdBLfhnEXXBVEbBptfojVLZoExobhWmCLH8I79wNIVZI
+4fgVQkkJvNAewPpZbpEoZIhFNvgeUkJq5Ps9ndwlnCUTY7drjvdFFGxIae2e8jE4
+3cs1mlF9cY18pgBCt9ytrpwoiwXmnO3Pb2j+D4WYrEGWxpsWdc5mS82QsRoOiIgG
+3GnGKuhrVcYL9G79ccEMLk3dC/1Yf98IjETNH1BacQf6TfRh11KbFSztrE/nZV7e
+PeytO9EpRm/iu8W0WETUcZKI/4c2By2OFjouw8t31+qojM7Kt8NpvLl79DkddQfU
+9lNSglx0JF1Qw/yCq54kE1Q4HN9aZ5FoUtAB0PfLMEJ8JVjdCqAGlw4aIk5fzvhi
+iDB7pUJSKxi2EVkCtktppDgj3A3ozSML6bWiibL96+H0H5dEOK3BWPxSwMnWzi+h
+OJNbitFS2GkZkUhziOhgSqPe/2Meh1hbrVbIqHn+ceDh1jQ1vo4EII5kffYw5jws
++UgJQu5/wVA=
+=4iCv
+-----END PGP SIGNATURE-----
+

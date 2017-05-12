@@ -1,0 +1,30 @@
+Revision history for Perl extension Module::Setup::Flavor::JJNAPIORK
+
+0.07    08 December 2011
+        - Fixed broken yaml file in previous release
+
+0.06    08 December 2011
+        - Fixed up the Makefile and maint stuff to use more modern version
+        - tweaked the generated templates a bit
+
+0.05    04 January 2011
+        - Updated copyright year code
+        - make it so the /maint is not included when building the dist
+        - cut down on the dependency list a bit
+        - testing out some new author side make stuff
+        - actually name the MI dependencies so that you can use this without
+          needing Task::BeLike::JJNAPIORK
+
+0.04    30 December 2010
+        - Decrease minimum required Perl version to 5.8.5
+
+0.03    20 December 2010
+        - documentation updates
+        - changes to reflect new Makefile layouts and cleaner seperation of
+          installer and author Makefile info.
+
+0.02    03 October 2010
+        - minor documentation changes and Makefile.PL tweaks
+
+0.01    17 September 2010
+        - original version

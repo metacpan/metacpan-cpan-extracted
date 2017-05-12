@@ -1,0 +1,29 @@
+---
+name: Module-Build-IkiWiki
+version: 0.0.6
+author:
+  - '"Víctor Moral" <victor@taquiones.net>'
+abstract: Extension for develop Ikiwiki plugins
+license: gpl
+resources:
+  homepage: http://taquiones.net/software/factory/module-build-ikiwiki.html
+  license: http://opensource.org/licenses/gpl-license.php
+requires:
+  Module::Build: '>= 0.26'
+  Test::More: 0
+recommends:
+  Test::Perl::Critic: 0
+  Test::Pod: '>= 1.14'
+  Test::Pod::Coverage: '>= 1.04'
+provides:
+  Module::Build::IkiWiki:
+    file: lib/Module/Build/IkiWiki.pm
+    version: 0.0.3
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+no_index:
+  directory:
+    - t/lib
+    - examples

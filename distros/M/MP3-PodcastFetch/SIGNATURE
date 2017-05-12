@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5d292abfa6b00e9cab8f1ccaec65c52ae3dda183 Build.PL
+SHA1 ff79b8af452aa97be6b22814d0cefdbe15fa2cc0 Changes
+SHA1 1be93cc4c2e38f9dd3c0d45ae636e0b00649a783 MANIFEST
+SHA1 5e67dd4ff304f9f46302d147f5e45abd846cfec5 META.json
+SHA1 bc6a8ddf5c6e301f19ecb4c8f58d672bf4bfe8dd META.yml
+SHA1 3c4be02b01f84d0b72b73144a914b22eceeb0451 Makefile.PL
+SHA1 e9c4b7463d16622e45add4ec28193b9235482044 README.md
+SHA1 afc6be5f63e5c294a6a34fcccdbefd7a8a2de5d8 bin/fetch_pods.PLS
+SHA1 2439e199b178a78763d07bb2b816238bc1eed4c0 conf/fetchpods.conf
+SHA1 7ee44aaaee31da43065efd8cc24aacc584bd8795 conf/sample_conf.conf
+SHA1 8802253793943660fec8da181ae37fca68ea8b7f lib/MP3/PodcastFetch.pm
+SHA1 f54e7317c3421c4a9a4c89bf41ab419839fc55f5 lib/MP3/PodcastFetch/Feed.pm
+SHA1 704d07cf055a92191bebaa1d9917eaabf2fde74a lib/MP3/PodcastFetch/Feed/Channel.pm
+SHA1 afe8d774ea4f9d99b1ed2e0afa70a62ae7bdcec4 lib/MP3/PodcastFetch/Feed/Item.pm
+SHA1 97001f25794758f414f1356d7dd46fb604a7dd5d lib/MP3/PodcastFetch/TagManager.pm
+SHA1 7263c462f29fff0b58c47fb1edfd4da8db1e634f lib/MP3/PodcastFetch/XML/SimpleParser.pm
+SHA1 69572ae4e7a4f8def290c0482fb486ca4b9e15e9 t/01.basic.t
+SHA1 f2b9abfd6ebb7380cafbd2b09122abfe6a5227ed t/data/test 3.mp3
+SHA1 8c6691ea2d8f0bd0c5f59c3be0ca3bfa5c6c8f85 t/data/test.xml
+SHA1 a062667dbc0b8450f272e18a77ca2ade850cd9c7 t/data/test1.mp3
+SHA1 f2b9abfd6ebb7380cafbd2b09122abfe6a5227ed t/data/test2.mp3
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQEcBAEBAgAGBQJRXri0AAoJEGdu+Qm2aLE9ebEIAIVdXXYwnKCztwXOTfdVJKgh
+CSDDrdx7R1XwmtAbyFxZ8IRmbNuL7GlrKJ1Y3n3wjneunSbgNes8Rp8Wv4a6T9vq
+K7n40LXs9ax5qXDcXI+NFu+KRpXParjweGtGwxmDwmrrXv9DYfTym/ZbeVYzJUkQ
+k35uSBES2kyvUp0U0r0x63uzIQgTPEQUurCpYdw7nURjhJ9ablTUi9VxTfWTmvls
+4Yp7JUTNbgdQATmc94nStqVLRkWJ92v5yIz5wF+XQg3n70hX0J+vg+/LF8zBLwoV
+MjIpUFF4ZdHUADheiawf5NehPNj1foQ56SoONcej4hmpqLHKRqGJgIZXXijOpT8=
+=HhTm
+-----END PGP SIGNATURE-----

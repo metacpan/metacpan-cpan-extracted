@@ -1,0 +1,11 @@
+---
+
+disable: 0
+set_header:
+    X-Something: Something is there
+remove_header:
+    - X-Universally-Unique-Identifier
+replace_header:
+    Subject: 'PREFIX: %orig%'
+
+

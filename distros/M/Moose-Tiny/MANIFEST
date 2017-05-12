@@ -1,0 +1,24 @@
+Changes
+ex/benchmark.pl
+ex/Foo_Bar_Moose.pm
+ex/Foo_Bar_Moose2.pm
+ex/Foo_Bar_Tiny.pm
+ex/Foo_Bar_Tiny2.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoManifest.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Repository.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Moose/Tiny.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+t/00.load.t
+t/01_main.t
+t/02_subclass.t

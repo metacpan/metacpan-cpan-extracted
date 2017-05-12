@@ -1,0 +1,123 @@
+package Mardent::Manual;
+
+=pod
+
+=head1 NAME
+
+Markdent::Manual - Using and Extending Markdent
+
+=head1 DESCRIPTION
+
+Markdent is an event-driven parser toolkit for Markdown. That's a mouthful, so
+let's go through that piece by piece, starting at the end.
+
+Markdown is a wiki-esque plain text markup format that is easy to read and
+easy to write. It draws inspiration from how people have communicated in plain
+text email for a long time. For example, some text like "*really*" is parsed
+as emphasis around the word "really".
+
+Existing Markdown tools in Perl (and in most other languages) are only able to
+convert Markdown directly to HTML. They are not really parsers, they're
+combined parser/converters. This is problematic if you want to do something
+with the document besides turn it into HTML. Maybe you'd like to parse it and
+cache an intermediate representation. Maybe you want to turn into markup-free
+text. Maybe you want to pull out just the links.
+
+With Markdent, you can do any and all of those things (and you can turn
+Markdown into HTML too).
+
+An event-driven parser like Markdown generates a I<sequence of events> as the
+result of parsing a document. If you're familiar with the SAX API, that is
+another event-driven parser API.
+
+With Markdent, these events can be things like "StartEmphasis", "StartLink",
+"EndCode", "Text", etc.
+
+The parser feeds these events into a handler, and the handler can decide what
+to do with them. By decoupling parsing from other tasks, it gives you great
+power in dealing with the parse results.
+
+When I call Markdent a parser I<toolkit>, that means it is designed to be part
+of a larger ecosystem. You can write your handlers, and you can even write
+your own parser dialects as roles.
+
+=head1 HANDLERS
+
+A handler object receives events with the parser and does something with
+them. All handlers implement the L<Markdent::Role::Handler> role, which simply
+requires a single method, C<< $handler->handle_event($event) >>.
+
+If you're writing your own handler, you may find it convenient to consume the
+L<Markdent::Role::EventsAsMethods> role. This provides a C<handle_event()>
+implementation that calls a different method for each type of event.
+
+This is used by the L<Markdent::Handler::HTMLStream::Document> and
+L<Markdent::Handler::HTMLStream::Fragment> handlers, for example. Since it
+generates a different tag for each event, it makes sense to have one method
+per event which knows what tag to generate.
+
+On the other hand, the L<CaptureEvents
+handler|Markdent::Handler::CaptureEvents> doesn't care what type of event it
+receives, it just stores it for later use. It only needs to implement a
+C<handle_event()> method to do its job.
+
+=head1 WHAT CAN YOU DO WITH MARKDENT?
+
+Markdent has a lot of parts, but you don't need to learn about all of them.
+
+Here are some pointers for common tasks ...
+
+=head2 Converting Markdown to HTML
+
+Take a look at the L<Markdent::Handler::HTMLStream::Document>. This turns the
+event stream into a stream of HTML output. You can send the output to any
+filehandle. Open a filehandle to a scalar to capture the output in memory.
+
+You can use L<Markdent::Handler::HTMLStream::Fragment> if you don't want to
+generate a complete HTML document.
+
+=head2 Cache Parse Results
+
+Use the L<Markdent::Handler::CaptureEvents> handler to capture events for
+caching. You can then store the generated L<Markdent::CapturedEvents> object
+using L<Storable>.
+
+=head2 Do Both
+
+Use the L<Markdent::Handler::Multiplexer> handler to do more than one thing at
+a time with the event stream.
+
+=head2 Write Your Own Handler
+
+Writing a handler is pretty easy. Take a look at any of the existing handler
+classes for ideas.
+
+=head1 PARSER
+
+The core of the Markdent parser system is the L<Markdent::Parser> module. This
+module doesn't actually do any parsing itself. Instead, it hooks together a
+block parser and a span parser, and lets the block parser start the real
+parsing process.
+
+Markdent divides parsing into blocks and spans. The block parser looks for
+block-level constructs like paragraphs, lists, blockquotes, etc. For most of
+these constructs, it passes the contents of the block on to the span
+parser. The span parser looks for things like strong and emphasis markup,
+links, HTML entities, and so on.
+
+Separating these two makes creating a Markdown dialect a bit easier, as you
+may find yourself just needing to alter the behavior of just the block I<or>
+the span parser.
+
+For example, the L<Theory dialect|Markdent::Dialect::Theory> shipped with this
+distribution is mostly implemented as a role applied to the L<Standard
+dialect's|Markdent::Dialect::Standard> block parser.
+
+See the Theory dialect for an example of how to modify the core Markdown
+dialect.
+
+=head1 WHAT DOES THE NAME MEAN?
+
+It's a combination of "Markdown" and "event".
+
+=cut

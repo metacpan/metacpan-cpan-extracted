@@ -1,0 +1,21 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.md
+lib/Mojar/Auth/Jwt.pm
+lib/Mojar/Google/Analytics.pm
+lib/Mojar/Google/Analytics/Request.pm
+lib/Mojar/Google/Analytics/Response.pm
+lib/Mojar/Guide/GoogleAnalytics.pod
+test/00-load.t
+test/10-request.t
+test/12-analytics.t
+test/20-auth.t
+test/70-retrieval.t
+test/manifest.t
+test/pod.t
+test/version.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

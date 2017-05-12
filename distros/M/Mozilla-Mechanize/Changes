@@ -1,0 +1,57 @@
+0.06  2009-10-11 | fixed for newer gtkmozembed
+  - added handler for net_state signal, which is needed for some documents
+    (I think when a document loads other docs); thanks to Marco Lamberto
+    for the bug report and suggestion that it was related to net_stop
+    not firing
+  - fixed 'width' and 'height' methods of Image.pm; they now return
+    the width and height attributes rather than using $img->GetWidth
+    and $img->GetHeight, which apparently return random numbers...
+
+0.05  2005-10-09
+  - Fixed set_visible (tests in t/field.t). Aside from unimplemented
+    methods (`success', `set_property'), all tests are passing now
+    (though tests don't fully cover the code by a long shot).
+  - Added `embedded' method to Browser class
+
+0.04  2005-10-07
+  - Ported more tests from Win32::IE::Mechanize. Radio button and maybe select
+    stuff still not good. Fixed bugs in:
+    o  Mechanize.pm:
+       - images (wrong element order), and any methods relying on it
+       - click, click_button ((still slightly) broken)
+    o  Input.pm:
+       - select_value (wasn't implemented)
+       - type, for <select>, now returns 'select-one' for single select,
+         'select-multiple' for multiple
+    Sorry if I've missed any changes. There were many, and I was
+    mostly just trying to get the tests to pass.
+
+0.03  2005-10-04
+  - Ported half of the tests from Win32::IE::Mechanize, uncovering
+    many bugs (NOTE: tests will definitely fail now):
+    o  Mechanize.pm:
+       - reload (GUI not fully loading)
+       - links (wrong element order), and any methods relying on it
+    o  Form.pm:
+       - inputs (GUI not fully loading, wrong element order)
+       - enctype, method: now return default values if not present
+       - attr, enctype, method: return default values if not present
+       - tick (wasn't working)
+    o  Input.pm:
+       - radio_value (GUI not fully loading, other problems)
+    o  Link.pm:
+       - name (failed for <area>)
+  - Put 'width', 'height', and 'visible' options in Mechanize->new
+    (not in set_property, though)
+  - Added `debug' option to Mechanize->new, which gives tracing info
+    (in principle)
+
+0.02  2005-10-01
+  - Fixed several methods that weren't allowing the GUI to run
+    o  Form.pm: submit, reset
+    o  Input.pm: click
+    o  Link.pm: click
+    Thanks to Uwe Voelker for reporting it and for example code.
+
+0.01  2005-09-25
+  - Initial release, ported from Win32::IE::Mechanize.

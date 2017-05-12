@@ -1,0 +1,240 @@
+Revision history for Perl module Mail::Bulkmail.
+
+3.12 Mon Dec 22, 2003
+	- headers_from_message would fail under mysterious cirumstances, not all of which have been
+	  explicitly discovered. Should now be resolved (thanks to Eric Litman for bringing this to my
+	  attention)
+	- Under certain conditions, ->bulkmail could hang upon server connect attempt. Basically, Mail::Bulkmail::Server wasn't
+	  always flaggin a server as worthless.  (thanks to Frank Naude for discovering one of these conditions)
+	- in a fit of generousity, Mail::Bulkmail::Object is now distributed under the Artistic License
+
+3.11 Sun Nov 30, 2003
+	- love it when I discover bugs in the test suite! Fixed a potentially fatal bug 
+	  when sending to domains under certain conditions
+	  (thanks to Eric Litman for discovering this)
+	- turned off some debugging code that had snuck by me
+	- updated the pod regarding message_from_file to help alleviate a possible PEBKAC issue
+	- the server_file can now accept more parameters, such as CONVERSATION, envelope_limit, etc.
+
+3.10 Tue Nov 25, 2003
+	- message_from_file was hopelessly broken. Now fixed.
+	- valid_email now returns a hash (see the pod)
+	- extractEmail now returns a hash (see the pod)
+	- added extractSender and extractReplyTo for dynamic senders and replies-to
+	- added the errvals method
+	- Timeouts were still breaking under Windows. Now fixed.
+	  (thanks to Finn Smith for pointing this out)
+	- Fixed a pod formatting flaw
+	  (thanks to Todd Karlsson for pointing this out)
+	- error now just returns (additionally appropriately returning void in a void context)
+
+3.09 Fri Apr 04, 2003
+	- Mail::Bulkmail::Dynamic wasn't properly doubling periods. Oops.
+	  (thanks to Matthew Williams for pointing this out)
+	- Gah. Mail::Bulkmail::DummyServer had some crap in it regarding how filehandles
+	  were created and passed. 5.8.0 would complain about it.
+	  (many thanks to Christ Faust for giving me info to help track this down)
+	- as per request, added a space after the : in the headers
+	- added a fileno test on the socket to prevent printing on a closed filehandle
+	- added a 'no warnings "portable"' to make 5.8 shut up
+	- added a few more examples to the docs
+
+3.08 Sat Mar 29, 2003
+	- Damn this makes me mad. Turns out I was doubling periods and *then* wrapping the message.
+	  In some unlikely circumstances, that could cause a lone period on a line in the middle of
+	  a message, which is, of course, bad. Now does doubling after wrapping.
+	  (thanks to Guy Matz for pointing this out!)
+
+3.07 Fri Mar 28, 2003
+	- Fixed a stupid little bug that should not have slipped by me.
+	  (thanks to Guy Matz for pointing this out!)
+	- broke the version numbers back out into the individual modules, so CPAN wouldn't bitch
+
+3.06 Tue Mar 25, 2003
+	- No longer even attempts to connect to a server if you haven't specified the Tries parameter
+	- You can now change the text of the Message after bulkmailing or mailing
+	  (This means you may change the non-merged, non-dynamic text via a new call to ->Message,
+	   it is recommended that you do not do this unless you know why you are doing it. dynamic
+	   messages and mail merges will do what you want 99% of the time)
+	- added some entries to the FAQ
+	- ->error now returns () in a list context, undef in a scalar context
+	- added some more documentation
+	- the constructor now operates on passed keys/values in the order they were passed
+	- added message_from_file flag to load in a message from a file on disk
+	- added headers_from_message to extract message headers from the value passed to ->Message
+	- you may now unset From, To, Sender, Reply-To headers by calling the relevant method and passing an undef
+	  as customary with the returns from ->header, will return 0 if you successfully set a header to undef
+	- if you wish, for some foolish reason, to name one of your log files "0", you may now do that.
+
+3.05 Thu Feb 6, 2003
+	- *mutter* fixed a flaw in my test suite
+	  (thanks to an error reported by Ben Wrigley)
+	- added the migration guide (migration.guide.txt)
+	- adjusted how Mail::Bulkmail::Dynamic internally handles headers
+	- fixed some documentation errors
+	- tweaked some of the code to look more consistent
+	- Mail::Bulkmail::Dynamic no longer incorrectly requires  a ->To header to be set.
+	  (again, thanks to Ben Wrigley)
+
+3.04 Tue Feb 4, 2003
+	- setting a header to undef now deletes it, instead of storing it in the hash as undef.
+	  This wasn't terribly important, since the header wouldn't be set in the message if it
+	  was empty, but it was good for consistency's sake. Also, if you set a header to undef,
+	  the method now returns 0, for a non-true but defined value.
+	- All $VERSION numbers now reference the master version number in Mail::Bulkmail::Object
+	- Fixed a bug where trying to call ->header in Mail::Bulkmail::Dynamic w/o using
+	  dynamic_header_data would cause a crash.
+	  (thanks to Justin Simoni for catching this)
+	- added the ->errstring convenience method (in Mail::Bulkmail::Object)
+	- Will now bubble up error codes from methods called at construction instead of replacing
+	  with the default code. Still uses the default codes if one is not passed.
+	- Fixed an obscure error that might have caused a slightly incorrect error message
+	  if there's a failure during construction.
+	- Wrappered the alarm calls in evals to catch them on systems that don't implement it.
+	  (like some stupid versions of activeperl on windows)
+
+3.03 Fri Jan 24, 2003
+	- Fixed a potentially disasterous bug that could cause the system to hang
+	  infinitely if there's a severely mal-formed Message
+	- fixed a minor logging error that could cause some errors to be logged twice
+	- DummyServer now says EHLO, to be consistent with Server
+	- if using a coderef for logging/reading, now gets the bulkmail object as its first argument
+	- Mail::Bulkmail::Server now has a CONVERSATION log, to aid in debugging.
+	- Magically fixed another bug in envelope sending. I can't say exactly what it was or how it 
+	  was fixed or when it manifested itself, but it was there.
+	  (again, many thanks to Tim de Wolf for his continued help in tracking this down)
+
+3.02 Thu Jan 23, 2003
+	- Fixed a bug in envelope sending that I can't believe I managed to allow into the final release.
+	  (many thanks to Tim de Wolf for finding this and helping me isolate it)
+	- fixed some documentation errors in the examples
+	- now logs to ERRFILE if the server didn't accept an EHLO
+	- doesn't skip current email address if there's an error on the previous one
+	- fixed a ridiculously obscure bug that could manifest with an invalid Sender
+	- headers weren't *quite* RFC 2822 compliant (they were still valid RFC 822)
+
+3.01 Thu Jan 23, 2003
+
+	- Fixed an annoylingly old bug in setting the envelope header which could
+	  cause an invalid address to be sent (thanks to Joseph Brown for identifying this)
+	- removed the debugging routine that required Data::Dumper
+
+3.00 Mon Jan 20, 2003
+
+	- Componentized the code.
+	  (Mail::Bulkmail, Mail::Bulkmail::Dynamic, Mail::Bulkmail::Server, etc.)
+	- Added multiple server support.
+	- added support for timing out if there's no reply from a server
+	- Finally fixed the damn Tz bug.
+	- Cleaned up the code an awful lot.
+	- General bug fixes, etc.
+	- Brand spanking new docs.
+	- Errors now return error codes as well as error text
+	- should be fully RFC 2821 and RFC 2822 compliant
+	- defaults now set in a conf file
+
+2.05  Tues Oct 3, 2000
+	- Added envelope_limit accessor.
+	- You can now set more defaults yourself.
+	- Cleaned up the documentation a lot.
+	- Re-wrote the date generation methods.  They're now 5-10%
+	  faster and I fixed an *old* bug causing mail to sometimes
+	  appear to have been sent yesterday, or tomorrow.
+    - Altered logging when using the envelope, see item GOOD, above.
+    - Fixed a bug with undefined values in mailmerges
+
+2.04  Tues Aug 29, 2000
+	- Added log_full_line flag.
+	- Trusting is now more trusting.
+	- Domains can once again be banned.
+	- Error checking is done less often and in a slightly
+	  different order now
+	- ->bulkmail now returns 1 on success.  Doh.
+	- Fixed an annoyingly subtle bug with construction of
+	  dynamic messages
+	- Repaired a long-standing bug in the docs.
+
+2.03  Tues Aug 22, 2000
+	- Tweaked the constructor
+	- Enhanced the 'error' method so it can behave as a
+	  class method
+	- Enhanced HFM
+	- Enhanced the test suite
+	- various bug fixes
+
+2.01  Wed Aug 16, 2000
+	- Fixed a mindnumblingly dumb bug whereby merge and
+	  dynamic hashes weren't initialized.
+
+2.00  Fri Aug 11, 2000
+	- Re-wrote everything.  Literally _everything_.  Total
+	  re-write.
+	- Added in support for dynamic messaging.
+	- Added in support for envelope sending.
+	- Added in ability to import lists from more sources.
+	- Mail::Bulkmail should now behave absolutely perfectly
+	  with -w and use strict.
+	- Did I mention that this is a ground-up re-write?  Your
+	  existing code will need to be tweaked slightly to use
+	  the new module.
+
+
+1.11  Tue Nov 09, 1999
+	- Banned addresses now checks entire address case
+	  insensitively instead of leaving the local part
+	  alone. Better safe than sorry.
+	- $self->fmdl is now used to split BULK_FILEMAP
+	- Various fixes suggested by Chris Nandor to make -w
+	  shut up.
+	- Changed the way to provide local maps to mail and
+	  bulkmail so it's more intuitive.
+
+1.10  Wed Sep 08, 1999
+	- Several little fixes.
+	- The module will now re-connect if it receives a 221
+	  (connection terminated) message from the server.
+	- Fixed a potential near-infinite loop in the
+	  _valid_email routine.
+	- _valid_email now merrily strips away comments
+	  (even nested ones).  :)
+	- hfm (headers from message) method added.
+	- fmdl (filemap delimiter) method added.
+
+1.01  Wed Sep, 01, 1999
+	- Fixed a bug in the email validation routine which
+	  would cause the module to hang severely on certain
+	  malformed addresses.  All is once again right with
+	  the world.
+	- Altered default date generation to be RFC 1123
+	  compliant (4 digit year)
+	- changed date generation so that it adds a space after
+	  the comma after the day.  This is because of a bug in
+	  Outlook that wouldn't recognize the date w/o the space.
+
+1.00  Wed Aug 18, 1999
+	- First public release onto CPAN
+
+0.93  Thu Aug 12, 1999
+	- Re-vamped the documentation substantially.
+
+0.92  Thu Aug 12, 1999
+	- Started adding a zero in front of the version name,
+	  just like I always should have
+	- Changed accessing of non-standard headers so that they
+	  have to be accessed and retrieved via the "headset"
+	  method.  This is because methods cannot have non-word
+	  characters in them.  From, Subject, and Precedence
+	  headers may also be accessed via headset, if you so
+	  choose.
+	- AUTOLOAD now complains loudly (setting ->error and
+	  printing to STDERR) if it's called.
+
+.91   Wed Aug 11, 1999
+	- Fixed bugs in setting values which require validation
+	  checks.
+	- Fixed accessing of non-standard headers so that the
+	  returns are identical to every other accesor method.
+
+.90   Tue Aug 10, 1999
+	- Initial "completed" release.  First release available
+	  to general public.

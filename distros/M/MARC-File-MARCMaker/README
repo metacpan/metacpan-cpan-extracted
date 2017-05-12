@@ -1,0 +1,28 @@
+MARC::File::MARCMaker
+===========
+
+MARC::File::MARCMaker -- Work with MARC data encoded in LC's MARCMaker and
+MARCBreaker format. This is based on code from the original MARC.pm, rewritten
+for MARC::Record compatibility.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+- MARC::Record
+
+COPYRIGHT AND LICENCE
+
+This software is free software and may be distributed under the same
+terms as Perl itself.
+
+Copyright (C) 2005  Baldus, Summers
+

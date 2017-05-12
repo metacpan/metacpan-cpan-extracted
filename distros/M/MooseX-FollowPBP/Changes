@@ -1,0 +1,29 @@
+0.05   2011-02-26
+
+- In Moose 1.9900+, attributes from roles no longer acquire the consuming
+  class's attribute traits. However, you can apply attribute traits like this
+  one to attributes in roles, and that trait is preserved when the role is
+  applied to a class.
+
+  See the documentation for more details.
+
+
+0.04   2010-07-20
+
+- Respect "is => 'bare'" attributes.
+
+
+0.03   2010-07-14
+
+- Use modern Moose APIs, to avoid warnings with the next Moose release.
+
+
+0.02   2008-02-06
+
+- Add a missing dependency on Moose so it gets tested.
+
+
+0.01   2008-12-16
+
+- This code was extracted from Moose::Policy, and works without
+  needing said module.

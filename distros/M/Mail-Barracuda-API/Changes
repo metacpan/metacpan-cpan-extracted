@@ -1,0 +1,7 @@
+Revision history for Perl extension Mail::Barracuda::API.
+
+0.01  Tue Jul 22 11:57:08 2008
+	- original version; created by h2xs 1.23 with options
+		-X -n Mail::Barracuda::API.
+    First release. Implements basic account and domain creation and removal
+

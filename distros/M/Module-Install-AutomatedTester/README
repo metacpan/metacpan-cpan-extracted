@@ -1,0 +1,49 @@
+NAME
+    Module::Install::AutomatedTester - A Module::Install extension to detect
+    whether we are being tested by CPAN Testers.
+
+SYNOPSIS
+      # In Makefile.PL
+
+      use inc::Module::Install;
+      if ( auto_tester ) {
+         # Do something if we are running under a CPAN Tester
+         # like add some prereqs, etc.
+      }
+
+DESCRIPTION
+    CPAN Testers are great and do a worthy and thankless job, testing all
+    the distributions uploaded to CPAN. Sometimes we want to know if our
+    distribution is being tested by one of these gallant individuals and
+    make them do some extra work.
+
+    Module::Install::AutomatedTesters is a Module::Install extension that
+    adds two extra commands to detect if the disttribution is being run
+    under a CPAN Tester environment so that we can do extra stuff or skip
+    stuff.
+
+COMMANDS
+    This plugin adds the following Module::Install command:
+
+    "auto_tester"
+        Does nothing on the author-side. On the user side it detects whether
+        or not automated testing is in effect.
+
+    "cpan_tester"
+        Same as the above.
+
+AUTHOR
+    Chris "BinGOs" Williams
+
+LICENSE
+    Copyright © Chris Williams
+
+    This module may be used, modified, and distributed under the same terms
+    as Perl itself. Please see the license that came with your Perl
+    distribution for details.
+
+SEE ALSO
+    Module::Install
+
+    <http://wiki.cpantesters.org/>
+

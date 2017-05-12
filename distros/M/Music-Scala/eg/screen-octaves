@@ -1,0 +1,21 @@
+#!/usr/bin/env perl
+#
+# Show files with 12 pitches and whose ultimate ratio is the octave.
+
+use strict;
+use warnings;
+use feature qw/say/;
+use Try::Tiny;
+
+use Music::Scala ();
+my $s = Music::Scala->new;
+
+for my $file ( glob('*.scl') ) {
+  try {
+    my @ratios = $s->read_scala($file)->get_ratios;
+    if ( $ratios[-1] == 2 and @ratios == 12 ) { say $file }
+  }
+  catch {
+    warn "could not parse '$file': $_\n";
+  };
+}

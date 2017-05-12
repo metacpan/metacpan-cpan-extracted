@@ -1,0 +1,50 @@
+Mail-Postfix-Postdrop
+
+Mail::Postfix::Postdrop implements parts of postfix's postdrop(1)
+utility. Using the functionel interface you can inject messages directly
+into the maildrop queu and using the OOish interface you can control parts
+of the process.
+
+The main use case is writing the mail to a queue where postfix will take
+the responsability to deliver the mail without letting postfix handle the
+mail immediately. This can be used for sending mails in transactions.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Mail::Postfix::Postdrop
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mail-Postfix-Postdrop
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Mail-Postfix-Postdrop
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Mail-Postfix-Postdrop
+
+    Search CPAN
+        http://search.cpan.org/dist/Mail-Postfix-Postdrop
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 One.com
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

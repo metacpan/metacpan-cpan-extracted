@@ -1,0 +1,38 @@
+Copyright (c) 2001 by Steve A. Fink.
+All rights reserved.
+
+See COPYING for the General Public License and Artistic.html for the
+Artistic license.
+
+You are hereby granted permission to use this software under the terms
+of either the GPL or the Artistic License. I have the right to change
+the licensing terms at any time, but if you hide a copy on a floppy in
+the back of your underwear drawer, then you'll still be able to use it
+under the terms above because that's just the way things work. (I own
+the copyright, but I just gave you a license to use this version under
+the GPL or the Artistic license, and I can't take it back without
+breaking into your house and digging through your underwear drawer.)
+You, however, cannot implement an animated paperclip extension and
+pick a different license to give your modified copy away under,
+because you don't own the copyright and the GPL doesn't allow that nya
+nya. That is, until you remember that you can choose to use it under
+the Artistic License, which does allow that sort of thing, at least
+for the part you wrote. So go right ahead.
+
+
+---- GPL boilerplate ---
+
+    Copyright (C) 2001 Steve A. Fink
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of version 2 of the GNU General Public License
+    as published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA

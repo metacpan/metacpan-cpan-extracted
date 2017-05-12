@@ -1,0 +1,9 @@
+This document will attempt to record all root causes I've seen for
+a "body of message has been altered" or "message has been altered"
+DKIM verification result.
+
+
+1. Incorrect use of Mail::DKIM's PRINT() method. The implementer fed
+   the message in as it was received over SMTP, without reversing the
+   "dot-stuffing".  So if the message contained any lines beginning
+   with a period, the message would be signed or verified incorrectly.

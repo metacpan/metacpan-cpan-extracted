@@ -1,0 +1,2411 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Changes.src</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:perlcore@ms.com" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#introduction">Introduction</a></li>
+	<li><a href="#changes_for_1_34">Changes for 1.34</a></li>
+	<li><a href="#changes_for_1_33">Changes for 1.33</a></li>
+	<ul>
+
+		<li><a href="#major_work_on_statistics_messages_and_pcf_types">Major work on Statistics messages and PCF types</a></li>
+		<li><a href="#mqsc_and_pcf_enhancements">MQSC and PCF enhancements</a></li>
+		<li><a href="#minor_tweaks">Minor tweaks</a></li>
+		<li><a href="#important_note_for_mqv5_and_perl_5_6_users">Important note for MQv5 and perl 5.6 users</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_32">Changes for 1.32</a></li>
+	<ul>
+
+		<li><a href="#reasonqualifier_macro_translation">ReasonQualifier Macro Translation</a></li>
+		<li><a href="#ssl_improvements">SSL Improvements</a></li>
+		<li><a href="#mqseries__command_fix_for_inquirechannelnames">MQSeries::Command fix for InquireChannelNames</a></li>
+		<li><a href="#portability___better_code">Portability / Better code</a></li>
+		<li><a href="#mqseries__command_fix_for_createobject">MQSeries::Command fix for CreateObject</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_31">Changes for 1.31</a></li>
+	<ul>
+
+		<li><a href="#xs_code_cleanup">XS code cleanup</a></li>
+		<li><a href="#minor_bugfixes">Minor bugfixes</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_30">Changes for 1.30</a></li>
+	<ul>
+
+		<li><a href="#support_for_properties__mq_v7_">Support for properties (MQ v7)</a></li>
+		<li><a href="#support_for_asynchronous_put_status_information__mq_v7_">Support for asynchronous put status information (MQ v7)</a></li>
+		<li><a href="#mqseries__command_enhancements_for_mq_v7">MQSeries::Command enhancements for MQ v7</a></li>
+		<li><a href="#mqseries__command_enhancements_to_support_filter_commands">MQSeries::Command enhancements to support filter commands</a></li>
+		<li><a href="#xs_code_cleanup">XS code cleanup</a></li>
+		<li><a href="#updated_examples">Updated examples</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_29">Changes for 1.29</a></li>
+	<ul>
+
+		<li><a href="#initial_support_for_mq_v7">Initial support for MQ v7</a></li>
+		<li><a href="#mqseries__command_fixes">MQSeries::Command fixes</a></li>
+		<li><a href="#support_securityparms_in_mqconnx">Support SecurityParms in MQCONNX</a></li>
+		<li><a href="#ssl_tutorial">SSL tutorial</a></li>
+		<li><a href="#minor_bugfixes">Minor bugfixes</a></li>
+		<li><a href="#channeltable_fixes">ChannelTable fixes</a></li>
+		<li><a href="#mqseries__command_fixes">MQSeries::Command fixes</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_28">Changes for 1.28</a></li>
+	<ul>
+
+		<li><a href="#compilation_fixes_when_used_with_mq_v5">Compilation fixes when used with MQ v5</a></li>
+		<li><a href="#fix_client_server_detection_on_windows">Fix client/server detection on Windows</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_27">Changes for 1.27</a></li>
+	<ul>
+
+		<li><a href="#new_entries_in_the_amqerr0x_log_parser">New entries in the AMQERR0x.LOG parser</a></li>
+		<li><a href="#other_changes_made_">Other changes made:</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_26">Changes for 1.26</a></li>
+	<ul>
+
+		<li><a href="#updated_entries_for_amq9001_and_amq9002">Updated entries for AMQ9001 and AMQ9002</a></li>
+		<li><a href="#correct_the_requestparameterorder_for_setauthorityrecord">Correct the RequestParameterOrder for SetAuthorityRecord</a></li>
+		<li><a href="#fix_the_inquirechannelstatus_pcf_command">Fix the InquireChannelStatus PCF command</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_25">Changes for 1.25</a></li>
+	<ul>
+
+		<li><a href="#add_missing_generated_files">Add missing generated files</a></li>
+		<li><a href="#fix_link_rpath_glitches_on_64bit_linux">Fix link RPATH glitches on 64-bit Linux</a></li>
+		<li><a href="#remove_vestigial_mq_v2_and_os_390_support">Remove vestigial MQ v2 and OS/390 support</a></li>
+		<li><a href="#remove_outdated_pubsub_support">Remove outdated PubSub support</a></li>
+		<li><a href="#switch_to_params__validate">Switch to Params::Validate</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_24">Changes for 1.24</a></li>
+	<ul>
+
+		<li><a href="#add_support_for_mq_v6_in_mqseries__command">Add support for MQ v6 in MQSeries::Command</a></li>
+		<li><a href="#fix_a_bug_in_mqseries__config__qmgr">Fix a bug in MQSeries::Config::QMgr</a></li>
+		<li><a href="#fix_documentation_for_carp_parameter">Fix documentation for Carp parameter</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_23">Changes for 1.23</a></li>
+	<ul>
+
+		<li><a href="#new_mqseries__message__rfh2_class">New MQSeries::Message::RFH2 class</a></li>
+		<li><a href="#support_for_nonpersistentmsgclass">Support for NonPersistentMsgClass</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_22">Changes for 1.22</a></li>
+	<ul>
+
+		<li><a href="#support_for_the_mq_client_on_linux___itanium">Support for the MQ Client on Linux / Itanium</a></li>
+		<li><a href="#support_for_sco_openserver___mqseries_5_0">Support for SCO OpenServer / MQSeries 5.0</a></li>
+		<li><a href="#mqseries__command_fixes">MQSeries::Command fixes</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_21">Changes for 1.21</a></li>
+	<ul>
+
+		<li><a href="#fixes_for_mqseries__message__iih">Fixes for MQSeries::Message::IIH</a></li>
+		<li><a href="#fix_for_mqseries__queue_get___failure_with_mqrc_format_error">Fix for MQSeries::Queue <code>Get()</code> failure with MQRC_FORMAT_ERROR</a></li>
+		<li><a href="#use_version_2_of_mqmd__mqgmo__mqpmo_by_default">Use version 2 of MQMD, MQGMO, MQPMO by default</a></li>
+		<li><a href="#handle_tooshort_input_data">Handle too-short input data</a></li>
+		<li><a href="#add_support_for_ssl_connect_options_to_mqconnx_and_mqseries__queuemanager">Add support for SSL connect options to MQCONNX and MQSeries::QueueManager</a></li>
+		<li><a href="#mqseries__command_supports_direct_mainframe_connectivity">MQSeries::Command supports direct mainframe connectivity</a></li>
+		<li><a href="#improve_support_for_wmq_5_3_queuesharing_groups">Improve support for WMQ 5.3 queue-sharing groups</a></li>
+		<li><a href="#support_for_v7_channel_tables_in_mqseries__config__channeltable">Support for V7 channel tables in MQSeries::Config::ChannelTable</a></li>
+		<li><a href="#alter_link_libraries_for_aix">Alter link libraries for AIX</a></li>
+		<li><a href="#drop_deprecated_options__methods_for_mqseries__queue">Drop deprecated options, methods for MQSeries::Queue</a></li>
+		<li><a href="#drop_deprecated_option_for_mqseries__queuemanager">Drop deprecated option for MQSeries::QueueManager</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_20">Changes for 1.20</a></li>
+	<ul>
+
+		<li><a href="#improve_mqseries__command__pcf_support_for_clusters">Improve MQSeries::Command::PCF support for clusters</a></li>
+		<li><a href="#support_file_handles_in_writefile___for_mqseries__config__channeltable">Support file handles in <code>writeFile()</code> for MQSeries::Config::ChannelTable</a></li>
+		<li><a href="#support_for_v6_channel_tables_in_mqseries__config__channeltable">Support for V6 channel tables in MQSeries::Config::ChannelTable</a></li>
+		<li><a href="#new_mqseries__message__trigger_class">New MQSeries::Message::Trigger class</a></li>
+		<li><a href="#alter_link_libraries_for_linux_and_hpux">Alter link libraries for Linux and HP-UX</a></li>
+		<li><a href="#fix_the_mqseries__command_escape___method">Fix the MQSeries::Command-&gt;<code>Escape()</code> method</a></li>
+		<li><a href="#deprecated_parameters_generate_a_warning">Deprecated parameters generate a warning</a></li>
+		<li><a href="#deprecated_methods_generate_a_warning">Deprecated methods generate a warning</a></li>
+		<li><a href="#drop_old_platforms_and_releases">Drop old platforms and releases</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_19">Changes for 1.19</a></li>
+	<ul>
+
+		<li><a href="#api_change_for_get_put_methods_of_mqseries__queue">API change for Get/Put methods of MQSeries::Queue</a></li>
+		<li><a href="#new_mqseries__message__configevent_class">New MQSeries::Message::ConfigEvent class</a></li>
+		<li><a href="#new_mqseries__message__iih_class">New MQSeries::Message::IIH class</a></li>
+		<li><a href="#add_support_for_websphere_mq_5_3_on_z_os">Add support for WebSphere MQ 5.3 on z/OS</a></li>
+		<li><a href="#new_features_for_mqseries__command">New features for MQSeries::Command</a></li>
+		<li><a href="#better_decoding_of_mqsc_results">Better decoding of MQSC results</a></li>
+		<li><a href="#parameter_verification_for_mqseries__queuemanager">Parameter verification for MQSeries::QueueManager</a></li>
+		<li><a href="#parameter_verification_for_mqseries__queue">Parameter verification for MQSeries::Queue</a></li>
+		<li><a href="#new__convert__option_for_mqseries__queue_get_method">New 'Convert' option for MQSeries::Queue Get method</a></li>
+		<li><a href="#deprecated_parameters_generate_a_warning_if_w_is_enabled">Deprecated parameters generate a warning if -w is enabled</a></li>
+		<li><a href="#deprecated_methods_generate_a_warning_if_w_is_enabled">Deprecated methods generate a warning if -w is enabled</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_18">Changes for 1.18</a></li>
+	<ul>
+
+		<li><a href="#add_support_for_websphere_mq_5_3">Add support for WebSphere MQ 5.3</a></li>
+		<li><a href="#support_channeltable_reading_writing_on_windows_nt">Support ChannelTable reading/writing on Windows NT</a></li>
+		<li><a href="#improved_client_server_api_detection">Improved client/server API detection</a></li>
+		<li><a href="#add_support_for_mqsc_inquirequeuestatus_command">Add support for MQSC InquireQueueStatus command</a></li>
+		<li><a href="#remove_support_for_perl5_004">Remove support for perl5.004</a></li>
+		<li><a href="#strict_argument_checking_for_mqseries__command_constructor">Strict argument checking for MQSeries::Command constructor</a></li>
+		<li><a href="#modified_message_retry_handling_in_mqseries__queue_get__">Modified message retry handling in MQSeries::Queue <code>Get()</code></a></li>
+		<li><a href="#reduced_memory_usage_for_mqseries__command">Reduced memory usage for MQSeries::Command</a></li>
+		<li><a href="#support_for_clientconn_options_with_mqconnx">Support for ClientConn options with MQCONNX</a></li>
+		<li><a href="#support_mq_5_2_csd03_and_csd04">Support MQ 5.2 CSD03 and CSD04</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_17">Changes for 1.17</a></li>
+	<ul>
+
+		<li><a href="#parameter_order_for_pcf_commands">Parameter order for PCF commands</a></li>
+		<li><a href="#final_message_for_mainframe_mqsc_commands">Final message for mainframe MQSC commands</a></li>
+		<li><a href="#invalid_handling_of_zerolength_messages_and_zerolength_pcf_strings">Invalid handling of zero-length messages and zero-length PCF strings</a></li>
+		<li><a href="#rename_noautoconnect_flag_for_mqseries__queuemanager_constructor">Rename NoAutoConnect flag for MQSeries::QueueManager constructor</a></li>
+		<li><a href="#rename_noautoopen_flag_for_mqseries__queue_constructor">Rename NoAutoOpen flag for MQSeries::Queue constructor</a></li>
+		<li><a href="#add_queuemanager_method_to_mqseries__queue">Add QueueManager method to MQSeries::Queue</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_16">Changes for 1.16</a></li>
+	<ul>
+
+		<li><a href="#mqseries__config__channeltable">MQSeries::Config::ChannelTable</a></li>
+		<li><a href="#mqseries__queue_set_was_horrible_broken">MQSeries::Queue-&gt;Set was horrible broken</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_15">Changes for 1.15</a></li>
+	<ul>
+
+		<li><a href="#add__afs__principal_type_to_authority_api">Add 'AFS' principal type to Authority API</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_14">Changes for 1.14</a></li>
+	<ul>
+
+		<li><a href="#support_for_a_comparecallback_method_in_createobject">Support for a compare-callback method in CreateObject</a></li>
+		<li><a href="#support_for_storageclass_objects_in_mqsc_commands">Support for StorageClass objects in MQSC commands</a></li>
+		<li><a href="#mqseries__command__base_getconvert_preserves_original_message_buffer">MQSeries::Command::Base-&gt;GetConvert preserves original message Buffer</a></li>
+		<li><a href="#mqseries__queuemanager_connecttimeout_logic_fixed">MQSeries::QueueManager ConnectTimeout logic fixed</a></li>
+		<li><a href="#mqseries__config__machine_reparsing_bug">MQSeries::Config::Machine re-parsing bug</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_13">Changes for 1.13</a></li>
+	<ul>
+
+		<li><a href="#support_for_mqseries_version_5_2_on_the_mainframe">Support for MQSeries version 5.2 on the mainframe</a></li>
+		<li><a href="#mqseries__queuemanager_autocommit_off_by_default">MQSeries::QueueManager AutoCommit off by default</a></li>
+		<li><a href="#unbloat_the_code">Un-bloat the code</a></li>
+		<li><a href="#mqseries__command_inquirechannelstatus_handles_mqrccf_chl_status_not_found_more_elegantly">MQSeries::Command-&gt;InquireChannelStatus handles MQRCCF_CHL_STATUS_NOT_FOUND more elegantly</a></li>
+		<li><a href="#mqseries__message__rulesformat_tolerant_of_leading_whitespace">MQSeries::Message::RulesFormat tolerant of leading whitespace</a></li>
+		<li><a href="#mqseries__message__xmldumper_removed">MQSeries::Message::XML-Dumper removed</a></li>
+		<li><a href="#bug_in_extended_pcf_command_inquireauthority_fixed">Bug in Extended PCF Command ``InquireAuthority'' fixed</a></li>
+		<li><a href="#minor_bug_in_handling_of_compcode_reason_values_from_mqsc_commands">Minor bug in handling of CompCode/Reason values from MQSC Commands</a></li>
+		<li><a href="#mqseries__command_reasontext_documented">MQSeries::Command-&gt;ReasonText documented</a></li>
+		<li><a href="#mqseries__command_createobject_takes_force_argument">MQSeries::Command-&gt;CreateObject takes Force argument</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_12">Changes for 1.12</a></li>
+	<ul>
+
+		<li><a href="#mqseries__command_responses">MQSeries::Command-&gt;Responses</a></li>
+		<li><a href="#support_for_control_of_implicitly_commited_transactions">Support for control of implicitly commited transactions</a></li>
+		<li><a href="#mqseries__queuemanager_connect___timeout_logic">MQSeries::QueueManager-&gt;<code>Connect()</code> timeout logic</a></li>
+		<li><a href="#os_390_support">OS/390 Support</a></li>
+		<li><a href="#mqseries__config__authority">MQSeries::Config::Authority</a></li>
+		<li><a href="#mqseries__command_createobject_fix__change__not_create">MQSeries::Command-&gt;CreateObject fix: Change, not Create</a></li>
+		<li><a href="#mqseries__command_createobject_fix__comparing_lists">MQSeries::Command-&gt;CreateObject fix: Comparing lists</a></li>
+		<li><a href="#limit_the_max___of_open_files_for_mqseries__fdc__tail">Limit the max # of open files for MQSeries::FDC::Tail</a></li>
+		<li><a href="#support_for_symbolic_wait_and_expiry_values">Support for symbolic Wait and Expiry values</a></li>
+		<li><a href="#use_of_getconvert___error_checked_properly">Use of <code>GetConvert()</code> error checked properly</a></li>
+		<li><a href="#getconvertreason___and_putconvertreason___methods_added"><code>GetConvertReason()</code> and <code>PutConvertReason()</code> methods added</a></li>
+		<li><a href="#mqseries__command__support_for_ordered_attributes">MQSeries::Command: Support for ordered attributes</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_11">Changes for 1.11</a></li>
+	<ul>
+
+		<li><a href="#mqseries__config____classes">MQSeries::Config::* classes</a></li>
+		<li><a href="#mqseries__errorlog____classes">MQSeries::ErrorLog::* classes</a></li>
+		<li><a href="#mqseries__fdc____classes">MQSeries::FDC::* classes</a></li>
+		<li><a href="#mqseries__message__deadletter_object">MQSeries::Message::DeadLetter object</a></li>
+		<li><a href="#use_of_putconvert___error_checked_properly">Use of <code>PutConvert()</code> error checked properly</a></li>
+		<li><a href="#mqseries__command_createobject_method_handles_lists_correctly">MQSeries::Command-&gt;CreateObject method handles lists correctly</a></li>
+		<li><a href="#all_getconvert___methods_save_raw_buffer">All <code>GetConvert()</code> methods save raw Buffer</a></li>
+		<li><a href="#mqseries__pubsub_____modelqname_dynamicqname_configurable">MQSeries::PubSub::*, ModelQName DynamicQName configurable</a></li>
+		<li><a href="#mqseries__pubsub__adminmessage__translatepcf">MQSeries::PubSub::AdminMessage-&gt;_TranslatePCF</a></li>
+		<li><a href="#mqseries__queue_open___was_silent_on_nonretried_errors">MQSeries::Queue-&gt;<code>Open()</code> was silent on non-retried errors</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_10">Changes for 1.10</a></li>
+	<ul>
+
+		<li><a href="#mqseries__command_mqsc_bugs">MQSeries::Command MQSC bugs</a></li>
+		<li><a href="#mqseries__message_allows_bufferlength_of_0">MQSeries::Message allows BufferLength of 0</a></li>
+		<li><a href="#mqseries__command_createobject_enhancements_and_documentation">MQSeries::Command-&gt;CreateObject enhancements and documentation</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_09">Changes for 1.09</a></li>
+	<ul>
+
+		<li><a href="#support_for_win32">Support for Win32</a></li>
+		<li><a href="#retry_logic_in_mqseries__queuemanager_connect___and_mqseries__queue_open__">Retry logic in MQSeries::QueueManager-&gt;<code>Connect()</code> and MQSeries::Queue-&gt;<code>Open()</code></a></li>
+		<li><a href="#mqseries__command_new_takes_additional_arguments_">MQSeries::Command-&gt;new takes additional arguments.</a></li>
+		<li><a href="#mqseries__command_createobject___method_added">MQSeries::Command-&gt;<code>CreateObject()</code> method added</a></li>
+		<li><a href="#mqseries__queuemanager_hconn_reference_counting">MQSeries::QueueManager Hconn reference counting</a></li>
+		<li><a href="#mqseries__queuemanager_constructor_arguments">MQSeries::QueueManager constructor arguments</a></li>
+		<li><a href="#mqseries__queue_open___ignores_the_hobj_on_errors">MQSeries::Queue-&gt;<code>Open()</code> ignores the Hobj on errors</a></li>
+		<li><a href="#mqseries__message_buffer___method_added">MQSeries::Message-&gt;<code>Buffer()</code> method added</a></li>
+		<li><a href="#mqseries__message__event_getconvert___saves_raw_buffer">MQSeries::Message::Event-&gt;<code>GetConvert()</code> saves raw Buffer</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_08">Changes for 1.08</a></li>
+	<ul>
+
+		<li><a href="#mqseries__message__event_was_broken">MQSeries::Message::Event was broken</a></li>
+		<li><a href="#mqseries__command_error_checking_enhancement">MQSeries::Command error checking enhancement</a></li>
+		<li><a href="#mqseries__queuemanager_and_mqseries__queue_constructor_bug">MQSeries::QueueManager and MQSeries::Queue constructor bug</a></li>
+		<li><a href="#mqseries__queue_put___method_wasn_t_setting_mqpmo_fail_if_quiescing">MQSeries::Queue-&gt;<code>Put()</code> method wasn't setting MQPMO_FAIL_IF_QUIESCING</a></li>
+		<li><a href="#mqseries__pubsub__broker_stream_api_enhanced_to_support_alternate_users">MQSeries::PubSub::Broker/Stream API enhanced to support alternate users</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_07">Changes for 1.07</a></li>
+	<ul>
+
+		<li><a href="#mqseries__message__pcf_memory_leak">MQSeries::Message::PCF memory leak</a></li>
+		<li><a href="#change_to_simplify_static_compiles">Change to simplify static compiles</a></li>
+		<li><a href="#default_expiry_values_were_wrong">Default Expiry values were wrong</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_06">Changes for 1.06</a></li>
+	<ul>
+
+		<li><a href="#mqseries__pubsub___">MQSeries::PubSub::*</a></li>
+		<li><a href="#mqseries__message__pcf">MQSeries::Message::PCF</a></li>
+		<li><a href="#mqseries__message__rulesformat">MQSeries::Message::RulesFormat</a></li>
+		<li><a href="#mqseries__message__xmldumper">MQSeries::Message::XML-Dumper</a></li>
+		<li><a href="#mqseries__command">MQSeries::Command</a></li>
+		<li><a href="#mqseries__queuemanager">MQSeries::QueueManager</a></li>
+		<li><a href="#mqseries__queue">MQSeries::Queue</a></li>
+		<li><a href="#mqseries_core_module">MQSeries core module</a></li>
+		<li><a href="#installation_procedures__and_other_miscellany">Installation Procedures, and other Miscellany</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_05">Changes for 1.05</a></li>
+	<ul>
+
+		<li><a href="#installation_procedures">Installation Procedures</a></li>
+		<li><a href="#mqseries">MQSeries</a></li>
+		<li><a href="#mqseries__queuemanager">MQSeries::QueueManager</a></li>
+		<li><a href="#mqseries__queue">MQSeries::Queue</a></li>
+		<li><a href="#mqseries__command">MQSeries::Command</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_04">Changes for 1.04</a></li>
+	<ul>
+
+		<li><a href="#mqseries">MQSeries</a></li>
+		<li><a href="#mqseries__command">MQSeries::Command</a></li>
+		<li><a href="#mqseries__message__storable">MQSeries::Message::Storable</a></li>
+	</ul>
+
+	<li><a href="#changes_for_1_03">Changes for 1.03</a></li>
+	<li><a href="#changes_for_1_02">Changes for 1.02</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="introduction">Introduction</a></h1>
+<p>This file documents the changes to each and every release of the
+MQSeries perl API, going back as far as the 1.02 release.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_34">Changes for 1.34</a></h1>
+<p>MQClient/typemap.PL will handle MQINT64 like how it handles MQHMSG.</p>
+<p>MQSeries/Comamnd/Base.pm: In untraslatePCF, the filters handled
+properly.  Filters may also apply to MQCFT_INTEGER64 and 
+MQCFT_INTEGER64_LIST as well as the shorter kinds.</p>
+<p>MQSeries/Command.pm : Added support for ChlAuth and Comminfo objects 
+of mqv7.1.</p>
+<p>MQSeries/ErrorLog/Parser.pm: addied a 'ip.ad.dre.ss (port)' parser
+for the error log</p>
+<p>MQSeries/ErrorLog/descriptions.pl:
+Allow single-character hostnames.  more likely this is the first
+character of an ip address where the first octet is a single digit.
+Add AMQ6048 for dbcs error.</p>
+<p>MQSeries/Message/RFH2.pm : Modified based CPAN user's input. It 
+handles NameValueData correctly. Also sets the default Format to 
+MQFMT_NONE instead of undef.</p>
+<p>util/parse_headers:
+Some defines are now both compound (ie, they are multiple macros |'ed
+together) and the last one ends in L, so the check for the former must
+move above the check for the latter so that it works with 7.1
+string leading and trailing spaces from or'ed values.  This makes the
+postponed parsing of or'ed defines work, where the or'ed define has
+spaces inside the parentheses.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_33">Changes for 1.33</a></h1>
+<p>
+</p>
+<h2><a name="major_work_on_statistics_messages_and_pcf_types">Major work on Statistics messages and PCF types</a></h2>
+<p>Support for the decoding of MQ v6 Accounting/Statistics messages was
+added to the PCF decoder, along with the new types these messages use.
+Though not strictly necessary, support for these types (MQCFT_GROUP,
+MQCFT_INTEGER64, and MQCFT_INTEGER64_LIST) is intended to be complete
+throughout the PCF framework, so encoding should work as well.</p>
+<p>New message subtypes MQSeries::Message::Accounting and
+MQSeries::Message::Statistics were added for this, both of which are
+derived from the new MQSeries::Message::System class, which mainly
+exists to handle the decoding of the messages.  The already existing
+MQSeries::Message::Event class was reparented to here.</p>
+<p>
+</p>
+<h2><a name="mqsc_and_pcf_enhancements">MQSC and PCF enhancements</a></h2>
+<p>The encoding/decoding for KeepAliveInterval has been addressed, and
+support for more PCF and MQSC commands have been added, and more MQ v7
+items and types were included as well.  This should make the
+administration of a z/OS queue manager more complete.</p>
+<p>Note that as a part of this, the CreateAuthInfo and ChangeAuthInfo
+commands now require the AuthInfoType parameter which was previously
+optional.</p>
+<p>
+</p>
+<h2><a name="minor_tweaks">Minor tweaks</a></h2>
+<p>MQSeries::Queue now allows a queue to be called ``0''.  Previously this
+was mistaken to be a false value (ok, it is, but it's also a defined
+and non-zero-length string, so you should be able to use it).</p>
+<p>MQSeries::Command was mixing up the DefinitionType setting on queues
+when creating or updating local and model queues.  In particular, you
+may end up with a PermDyn model queue where this is wrong, or the
+failure to delete a dynamic queue, in order to recreate as a local
+queue.</p>
+<p>MQSeries::QueueManager now explicitly sets the get/put counters it
+keeps to 0.  This is to eliminate messages of the form:</p>
+<pre>
+    Currently  puts and 3 gets pending</pre>
+<p>where the number of ``puts'' is simply missing.</p>
+<p>An old bug in MQSeries::Message::PCF was removed (wrt the Header and
+Parameters methods) once the new MQSeries::Message::System class was
+added.  It was completely wrong, so clearly no one had used it before
+now.  It's better now.  An old memory leak in MQEncodePCF in PCF.xs
+was also squashed (affected parties may have noticed a slow but
+continuing increase in memory size of a process that was sending lots
+of PCF messages).</p>
+<p>
+</p>
+<h2><a name="important_note_for_mqv5_and_perl_5_6_users">Important note for MQv5 and perl 5.6 users</a></h2>
+<p>With the addition of the MQ v6 Statistics and Accounting support in
+this release, as well as the new PCF stuff, the possibility exists
+that the MQSeries perl module no longer supports either MQ v5 or perl
+5.6.  Support for these will be at a best effort kind of basis, but
+with the caveat that the maintainers no longer use either of these amy
+will likely not be able to replicate anything close to an environment
+involving either of this if you have any problems.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_32">Changes for 1.32</a></h1>
+<p>The following fixes are included in the 1.32 release:</p>
+<p>
+</p>
+<h2><a name="reasonqualifier_macro_translation">ReasonQualifier Macro Translation</a></h2>
+<p>Markus Sonderegger requested MQReasonQualifierToStrings(),
+MQReasonQualifierToMacro(), and <code>MQReasonQualifierToText()</code> functions
+(and the associated hashes) to translate the ReasonQualifier values to
+something more human-friendly.</p>
+<p>
+</p>
+<h2><a name="ssl_improvements">SSL Improvements</a></h2>
+<p>SSLPeerName is now handled as part of the ClientConn passed to
+MQCONNX(), and also when passed as part of a channel definition when
+writing a channel table file.</p>
+<p>More SSL-related event types are now defined.</p>
+<p>
+</p>
+<h2><a name="mqseries__command_fix_for_inquirechannelnames">MQSeries::Command fix for InquireChannelNames</a></h2>
+<p>Investigation of a problem report with InquireChannelNames led to the
+discovery of a gap between the documentation and server-side
+implementation of InquireChannelNames.  Channel names are now taken
+from the last PCF response instead of the first on the grounds that
+that one is much more likely to contain the actual answer.</p>
+<p>
+</p>
+<h2><a name="portability___better_code">Portability / Better code</a></h2>
+<p>Some types were adjusted to better match the places where they are
+used and to avoid compiler warnings from some platforms/compilers.
+Similarly, some C++ style comments were changed to C comments so that
+pre-C99 compilers will be happy.</p>
+<p>The MQHMSG type is now translated to/from a perl type better.</p>
+<p>Macros that are defined to enable backwards compatible building
+against older MQ installs are now wrapped in #ifdef/#endif to avoid
+compiler warnings.</p>
+<p>The <code>hex()</code> function is now used to translate stringified hexadecimal
+into a number instead of eval().  Fix suggested by an anonymous
+well-intentioned problem ticket.</p>
+<p>A number of places in the code path for generation of a channel table
+could lead perl to emit warnings about undef.  Reasonable defaults
+have been applied to eliminate these.</p>
+<p>The test for <code>MQSTAT()</code> has been updated to match the current state of
+the art.</p>
+<p>
+</p>
+<h2><a name="mqseries__command_fix_for_createobject">MQSeries::Command fix for CreateObject</a></h2>
+<p><code>CreateObject()</code> would fail to create a local queue if a dynamic queue
+already existed with the same name because they have the same QType (a
+previously existing remote queue would be deleted first because the
+QType is different).  Now we also check the DefinitionType to see if a
+dynamic queue should be replaced with a local queue.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_31">Changes for 1.31</a></h1>
+<p>The following fixes are included in the 1.31 release:</p>
+<p>
+</p>
+<h2><a name="xs_code_cleanup">XS code cleanup</a></h2>
+<p>Fix support for builds on Solaris, and a few places where filters
+weren't completely supported properly.  Add some type casts to quiet
+some compiler warnings, and a workaround for non-C99 systems.</p>
+<p>
+</p>
+<h2><a name="minor_bugfixes">Minor bugfixes</a></h2>
+<p>Adjust the projected test count for one script to match the number of
+tests, fix an undefined variable use warning in MQSeries/Command.pm,
+and a parameter validation inaccuracy in MQSeries/QueueManager.pm.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_30">Changes for 1.30</a></h1>
+<p>The following changes are included in the 1.30 release:</p>
+<p>
+</p>
+<h2><a name="support_for_properties__mq_v7_">Support for properties (MQ v7)</a></h2>
+<p>The low-level API and the MQSeries::XXX classes have been extended
+with support for properties.  There is a new MQSeries::Properties
+class and the existing MQSeries::Queue and MQSeries::Message
+classes have been extended with new methods.</p>
+<p>
+</p>
+<h2><a name="support_for_asynchronous_put_status_information__mq_v7_">Support for asynchronous put status information (MQ v7)</a></h2>
+<p>The low-level API and the MQSeries::QueueManager class have been
+extended with support for asynchronous put status information.  In the
+low-level API, the function is MQSTAT; in the MQSeries::QueueManager
+class, the method is StatusInfo.</p>
+<p>
+</p>
+<h2><a name="mqseries__command_enhancements_for_mq_v7">MQSeries::Command enhancements for MQ v7</a></h2>
+<p>The MQSeries::Command class now supports the new MQ v7 attributes for
+PCF commands on distributed platforms, i.e. it supports querying and
+modifying the new queue manager, queue and channel attributes
+introduced with MQ v7.  Support for Topic and Subscription objects has
+been added to MQSeries::Command.</p>
+<p>
+</p>
+<h2><a name="mqseries__command_enhancements_to_support_filter_commands">MQSeries::Command enhancements to support filter commands</a></h2>
+<p>The MQSeries::Command class now supports filter commands for MQ v6 and
+above.  This allows Inquire commands to include a filter that is
+evaluated by the queue manager and reduces the result set to items
+matching the filter (query).</p>
+<p>
+</p>
+<h2><a name="xs_code_cleanup">XS code cleanup</a></h2>
+<p>Significant cleanups in the low-level XS code should make it possible
+to run with warnings enabled without getting large numbers of ``use of
+uninitialized value'' messages at run-time.</p>
+<p>
+</p>
+<h2><a name="updated_examples">Updated examples</a></h2>
+<p>The example scripts have been updated; most notably, a new set of
+request/reply scripts demonstrates handling syncpoint, poison
+messages, and dynamic queues.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_29">Changes for 1.29</a></h1>
+<p>The following fixes are included in the 1.29 release:</p>
+<p>
+</p>
+<h2><a name="initial_support_for_mq_v7">Initial support for MQ v7</a></h2>
+<p>The module now compiles with MQ v7 and new constants are supported.
+Support for new and enhanced APIs is not yet in place.  During
+configuration, some warnings will occur for unknown datatypes.  This
+is expected and can be ignored.</p>
+<p>Feedback on which MQ v7 features should be supported in the next
+module release is welcome.</p>
+<p>
+</p>
+<h2><a name="mqseries__command_fixes">MQSeries::Command fixes</a></h2>
+<p>Minor changes for queue-sharing groups and for the
+HeaderCompression/MessageCompression attributes.</p>
+<p>
+</p>
+<h2><a name="support_securityparms_in_mqconnx">Support SecurityParms in MQCONNX</a></h2>
+<p>Duke Nguyen contributed support for the SecurityParms data structure
+with the MQCONNX call</p>
+<p>
+</p>
+<h2><a name="ssl_tutorial">SSL tutorial</a></h2>
+<p>Morten Bjoernsvik contributed a cookbook on using SSL with the
+MQSeries client and server.</p>
+<p>
+</p>
+<h2><a name="minor_bugfixes">Minor bugfixes</a></h2>
+<p>Morten Bjoernsvik contributed a bugfix to the MQSeries::Queue module,
+avoiding a call to MQCLOSE if no queue manager connection exists.</p>
+<p>
+</p>
+<h2><a name="channeltable_fixes">ChannelTable fixes</a></h2>
+<p>Recent V6 client releases are more picky in how they parse v4 channel
+table files (the format native to the MQ 5.0 client release).  The
+MQSeries::Config::ChannelTable file has been updated to reflect this.</p>
+<p>
+</p>
+<h2><a name="mqseries__command_fixes">MQSeries::Command fixes</a></h2>
+<p>Add the missing ChannelStatistics attribute for Channel commands.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_28">Changes for 1.28</a></h1>
+<p>The following fixes are included in the 1.28 release:</p>
+<p>
+</p>
+<h2><a name="compilation_fixes_when_used_with_mq_v5">Compilation fixes when used with MQ v5</a></h2>
+<p>The changes for release 1.27 broke MQSeries::Command when used with
+an MQ v5 client.</p>
+<p>
+</p>
+<h2><a name="fix_client_server_detection_on_windows">Fix client/server detection on Windows</a></h2>
+<p>Patrick Lanners supplied a patch to improve the testing for the client
+or server API on Windows.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_27">Changes for 1.27</a></h1>
+<p>The following fixes are included in the 1.27 release:</p>
+<p>
+</p>
+<h2><a name="new_entries_in_the_amqerr0x_log_parser">New entries in the AMQERR0x.LOG parser</a></h2>
+<p>A number of additional message descriptions have been added to the
+configuration file for the AMQERR0x.LOG parser
+(MQSeries::ErrorLog::Parser).  The newly supported messages are
+specific to MQ v6 on Linux/Unix/Windows.</p>
+<p>The AMQERR0x.LOG parser does not yet support all new MQ v6 messages.
+Error reports (including AMQERR0x.LOG files) are welcome.</p>
+<p>
+</p>
+<h2><a name="other_changes_made_">Other changes made:</a></h2>
+<ul>
+<li>
+<p>Updated MQSC command attributes for OS/390 WMQ6 queue managers.</p>
+</li>
+<li>
+<p>Added/Updated PCF commands/attributes for both Mainframe and Distributed queue managers.</p>
+</li>
+<li>
+<p>Added support for BYSTRING parameters like ConnectionId.</p>
+</li>
+</ul>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_26">Changes for 1.26</a></h1>
+<p>The following fixes are included in the 1.26 release:</p>
+<p>
+</p>
+<h2><a name="updated_entries_for_amq9001_and_amq9002">Updated entries for AMQ9001 and AMQ9002</a></h2>
+<p>IBM has changed the AMQERR log format for the above codes.
+Updated descriptions.pl file in the Errorlog directory.</p>
+<p>
+</p>
+<h2><a name="correct_the_requestparameterorder_for_setauthorityrecord">Correct the RequestParameterOrder for SetAuthorityRecord</a></h2>
+<p>Thanks to ``Jean-Yves Baudy <a href="mailto:[jy.baudy@free.fr]''">[jy.baudy@free.fr]''</a> for pointing this out.
+Corrected the RequestParameterOrder file to expect the correct order.</p>
+<p>
+</p>
+<h2><a name="fix_the_inquirechannelstatus_pcf_command">Fix the InquireChannelStatus PCF command</a></h2>
+<p>Updated the ChannelStatus block in RequestParameters file with 
+all the necessary optional parameters.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_25">Changes for 1.25</a></h1>
+<p>The 1.24 release, though long-delayed, was plagued by glitches.  Our
+only excuse is that it had been too long since the last release and we
+were out of practice.  Let's hope the 1.25 release is better.</p>
+<p>
+</p>
+<h2><a name="add_missing_generated_files">Add missing generated files</a></h2>
+<p>The MQSeries 1.24 release accidentally went out without the required
+generated files.  This has been corrected.</p>
+<p>
+</p>
+<h2><a name="fix_link_rpath_glitches_on_64bit_linux">Fix link RPATH glitches on 64-bit Linux</a></h2>
+<p>The RPATH for 64-bit linux systems ended up as /opt/mqm/lib6464 due to
+duplicate addition of the '64' postfix.  This has been fixed.</p>
+<p>
+</p>
+<h2><a name="remove_vestigial_mq_v2_and_os_390_support">Remove vestigial MQ v2 and OS/390 support</a></h2>
+<p>Support for the MQ v2 release has been removed.  The lowest supported
+MQ release is now 5.2 and the lowest supported perl release is now
+perl 5.6.</p>
+<p>In a similar manner, the incomplete and known to be broken OS/390
+support is removed.  The module will still work with z/OS queue
+managers; it just won't try and compile on OS/390 anymore.</p>
+<p>
+</p>
+<h2><a name="remove_outdated_pubsub_support">Remove outdated PubSub support</a></h2>
+<p>Support for the outdated pre-MQSI v2 publish/subscribe classes
+(MQSeries::PubSub, MQSeries::Message::RulesFormat) has been removed.</p>
+<p>
+</p>
+<h2><a name="switch_to_params__validate">Switch to Params::Validate</a></h2>
+<p>The VerifyNamedParams method in the MQSeries::Utils has been dropped
+and is replaced by the use of the Params::Validate module.  This is a
+new dependency that must be installed before the MQSeries module.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_24">Changes for 1.24</a></h1>
+<p>
+</p>
+<h2><a name="add_support_for_mq_v6_in_mqseries__command">Add support for MQ v6 in MQSeries::Command</a></h2>
+<p>Support for all new parameters in PCF and MQSC commands; support for
+mainframe PCF commands; and several new PCF commands such as
+<code>InquireQueueManagerStatus</code>, <code>InquireUsage</code> and the
+authority-related commands.</p>
+<p>
+</p>
+<h2><a name="fix_a_bug_in_mqseries__config__qmgr">Fix a bug in MQSeries::Config::QMgr</a></h2>
+<p>Monique Diaz reported a bug in MQSeries::Config::QMgr, where
+re-parsing a changed queue manager config file would lead to an
+incorrect method invocation.</p>
+<p>
+</p>
+<h2><a name="fix_documentation_for_carp_parameter">Fix documentation for Carp parameter</a></h2>
+<p>Herb Williams reported that the examples for the 'Carp' parameter were
+broken.  They should now make more sense and actually work.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_23">Changes for 1.23</a></h1>
+<p>
+</p>
+<h2><a name="new_mqseries__message__rfh2_class">New MQSeries::Message::RFH2 class</a></h2>
+<p>A new class to support RFH2 messages; this allows interaction with JMS
+clients and the various WMQ Integrator products.</p>
+<p>This message type is experimental and lightly tested (bugreports and
+patches welcome).  Thanks to Tim Kimber for working on this.</p>
+<p>
+</p>
+<h2><a name="support_for_nonpersistentmsgclass">Support for NonPersistentMsgClass</a></h2>
+<p>The new queue attribute <code>NonPersistentMsgClass</code>, which is available
+for Local and Model queues starting with WMQ 5.3 CSD06, is now
+supported by MQSeries::Command::PCF and MQSeries::Command::MQSC.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_22">Changes for 1.22</a></h1>
+<p>
+</p>
+<h2><a name="support_for_the_mq_client_on_linux___itanium">Support for the MQ Client on Linux / Itanium</a></h2>
+<p>Add 64-bit client support for Linux / Itanium.  This should also make
+it easy to add support for other 64-bit clients - but note that each
+scuh platform will need to adjust the util/parse_headers script.
+Patches for other platforms are welcome.</p>
+<p>
+</p>
+<h2><a name="support_for_sco_openserver___mqseries_5_0">Support for SCO OpenServer / MQSeries 5.0</a></h2>
+<p>Leonid Lisovskiy contributed patches to make the MQSeries module
+compile on SCO OpenServer 5.0.6 using the WillowTech MQSeries 5.0
+client.</p>
+<p>
+</p>
+<h2><a name="mqseries__command_fixes">MQSeries::Command fixes</a></h2>
+<p>Support IndexType ``GroupId'' for shared queues on z/OS in
+MQSeries::Command::MQSC.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_21">Changes for 1.21</a></h1>
+<p>
+</p>
+<h2><a name="fixes_for_mqseries__message__iih">Fixes for MQSeries::Message::IIH</a></h2>
+<p>Jeff Dunn contributed patches to the IMBS Bridge Header class
+MQSeries::Message::IIH that make it work on both little-endian and
+big-endian platforms.  By default, the module assumes client and
+server will run on platforms with the same endian-ness; this can be
+overridden if this is not the case.</p>
+<p>
+</p>
+<h2><a name="fix_for_mqseries__queue_get___failure_with_mqrc_format_error">Fix for MQSeries::Queue <code>Get()</code> failure with MQRC_FORMAT_ERROR</a></h2>
+<p>When a message has format MQFMT_NONE; sender and receiver run on
+platforms with different endian-ness; and the receiver specifies
+Get-Message Option MQGMO_CONVERT; then MQ returns completion code
+MQCC_WARNING and reason code MQRC_FORMAT_ERROR.</p>
+<p>The MQSeries::Queue <code>Get()</code> method used to treat this as an error.  In
+this particular case (Format MQFMT_NONE), the warning can be ignored.
+The method now treats this as a succesful read.</p>
+<p>
+</p>
+<h2><a name="use_version_2_of_mqmd__mqgmo__mqpmo_by_default">Use version 2 of MQMD, MQGMO, MQPMO by default</a></h2>
+<p>The MQGET, MQPUT and MQPUT1 functions now use MQMD version 2 and MQGMO
+version2 by default; MQPUT and MQPUT1 now use MQPMO version2 by
+default if a distribution list is specified.  Applications using
+message grouping, segmentation, or distribution lists no longer have
+to specify the MsgDesc, GetMsgOpts or PutMsgOpts version explicitly.</p>
+<p>It is still possible to set a higher MQMD, MQGMO or MQPMO version
+explicitly.  Note that this change will break use of older (pre-5.0)
+queue managers, but as these are over 5 years out of date, this should
+not matter.</p>
+<p>
+</p>
+<h2><a name="handle_tooshort_input_data">Handle too-short input data</a></h2>
+<p>Howard Muten noted that specifiying a too-short correlation id on
+MQPUT resulted in garbage bytes written to MQ.  This turned out to be
+a generic problem, where user-supplied data that was too short was
+copied in with whatever memory contenst was following.  This has been
+fixed in the typemap code.</p>
+<p>
+</p>
+<h2><a name="add_support_for_ssl_connect_options_to_mqconnx_and_mqseries__queuemanager">Add support for SSL connect options to MQCONNX and MQSeries::QueueManager</a></h2>
+<p>Brian Bumpass contributed XS code to add support for the SSLConfig
+options to the <code>MQCONNX</code> call, as well as support for the additional
+ClientConn parameters introduced in WMQ 5.3.  These options have also
+been added to the MQSeries::QueueManager class.  Use of these options
+obviously requires a WMQ 5.3 client with the optional SSL support
+installed and configured.</p>
+<p>
+</p>
+<h2><a name="mqseries__command_supports_direct_mainframe_connectivity">MQSeries::Command supports direct mainframe connectivity</a></h2>
+<p>The MQSeries::Command class now supports connecting directly to the
+mainframe (z/OS) using client connections.  As the default syncpoint
+behavior on MQPUT for this platform is different, this module now
+explicitly specifies MQPMO_NO_SYNCPOINT when writing a message.</p>
+<p>
+</p>
+<h2><a name="improve_support_for_wmq_5_3_queuesharing_groups">Improve support for WMQ 5.3 queue-sharing groups</a></h2>
+<p>On the mainframe (z/OS), WMQ 5.3 supports queue-sharing groups.  The
+MQSeries::Command::MQSC classes have been extended to support the
+following features:</p>
+<ul>
+<li>
+<p>Add the 'Shared' option to the queue DefinitionType parameter values</p>
+</li>
+<li>
+<p>In CreateObject(), do not alter the object but delete and recreate it
+when either the QSharingGroupDisposition or CFStruct attributes has
+changed.</p>
+</li>
+</ul>
+<p>
+</p>
+<h2><a name="support_for_v7_channel_tables_in_mqseries__config__channeltable">Support for V7 channel tables in MQSeries::Config::ChannelTable</a></h2>
+<p>Mike Surikov contributed further patches to support reading and
+writing of channel table files, including fields new with version 7 of
+this file (WMQ 5.3).  Generation and parsing of the older versions is
+still supported.</p>
+<p>
+</p>
+<h2><a name="alter_link_libraries_for_aix">Alter link libraries for AIX</a></h2>
+<p>James FitzGibbon contributed some configure options for Makefile.PL to
+pick the right MQ libraries on AIX.</p>
+<p>
+</p>
+<h2><a name="drop_deprecated_options__methods_for_mqseries__queue">Drop deprecated options, methods for MQSeries::Queue</a></h2>
+<p>The deprecated option <code>NoAutoOpen</code> for the MQSeries::Queue
+constructor <code>new</code> is no longer supported.</p>
+<p>The deprecated MQSeries::Queue methods <code>Commit</code>, <code>Backout</code> and
+<code>Pending</code> are no longer supported.  Obviously, these methods are
+still supported on the MQSeries::QueueManager object.</p>
+<p>
+</p>
+<h2><a name="drop_deprecated_option_for_mqseries__queuemanager">Drop deprecated option for MQSeries::QueueManager</a></h2>
+<p>The deprecated option <code>NoAutoConnect</code> for the MQSeries::QueueManager
+constructor <code>new</code> is no longer supported.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_20">Changes for 1.20</a></h1>
+<p>
+</p>
+<h2><a name="improve_mqseries__command__pcf_support_for_clusters">Improve MQSeries::Command::PCF support for clusters</a></h2>
+<p>Minor fixes for the <code>InquireClusterQueueManager</code> command; add support
+for <code>RefreshCluster</code> command.  At this time, support for
+<code>ResetCluster</code>, <code>SuspendQueueManagerCluster</code> and
+<code>ResumeQueueManagerCluster</code> is not planned (patches are welcome).</p>
+<p>
+</p>
+<h2><a name="support_file_handles_in_writefile___for_mqseries__config__channeltable">Support file handles in <code>writeFile()</code> for MQSeries::Config::ChannelTable</a></h2>
+<p>T. Rob Wyatt requested the ability to write to a caller-supplied
+filehandle in the MQSeries::Config::ChannelTable <code>writeFile</code> method;
+this allows him to supply channel tables from a CGI script without
+having to create temporary files.</p>
+<p>Support for this is now provided using the new <code>FileHandle</code> parameter
+to the <code>writeFile</code> method.</p>
+<p>
+</p>
+<h2><a name="support_for_v6_channel_tables_in_mqseries__config__channeltable">Support for V6 channel tables in MQSeries::Config::ChannelTable</a></h2>
+<p>Mike Surikov contributed patches to support reading and writing of
+version 6 client channel table files.  Previous releases did not
+handle all fields.  The default version of files written is now
+version 6, though generation and parsing of the older version format
+is still supported.</p>
+<p>
+</p>
+<h2><a name="new_mqseries__message__trigger_class">New MQSeries::Message::Trigger class</a></h2>
+<p>A new class to support trigger monitor messages; this allows you to
+write a trigger monitor in perl.</p>
+<p>
+</p>
+<h2><a name="alter_link_libraries_for_linux_and_hpux">Alter link libraries for Linux and HP-UX</a></h2>
+<p>On Linux and HP-UX, the MQ libraries are different for single- and
+multi-threaded programs.  The makefile now tries to pick the right
+libraries based on the 'usethread' parameter in Config.pm.</p>
+<p>
+</p>
+<h2><a name="fix_the_mqseries__command_escape___method">Fix the MQSeries::Command-&gt;<code>Escape()</code> method</a></h2>
+<p>Mike Surikov supplied a patch that makes the 'Escape' method of
+MQSeries::Command work.  This is used when sending MQSC commands using
+PCF.</p>
+<p>
+</p>
+<h2><a name="deprecated_parameters_generate_a_warning">Deprecated parameters generate a warning</a></h2>
+<p>The deprecated parameters <code>NoAutoConnect</code> for
+<code>MQSeries::QueueManager</code> and <code>NoAutoOpen</code> for <code>MQSeries::Queue</code>
+will generate a run-time warning whether -w is enabled or not.  In the
+next release, the warning becomes a fatal error.</p>
+<p>
+</p>
+<h2><a name="deprecated_methods_generate_a_warning">Deprecated methods generate a warning</a></h2>
+<p>The deprecated <code>MQSeries::Queue</code> methods <code>Commit</code>, <code>Backout</code> and
+<code>Pending</code> will generate a run-time warning whether -w is enabled or
+not.  In the next release, the warning becomes a fatal error.</p>
+<p>
+</p>
+<h2><a name="drop_old_platforms_and_releases">Drop old platforms and releases</a></h2>
+<p>This release drops support for MQSeries 5.0, Solaris 2.5.1 and IRIX.
+We have not made any changes to the code that should affect these
+platforms and releases, but no longer have hese host types around.  
+If you care about these platforms, we'll be happy to merge patches to
+keep them working.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_19">Changes for 1.19</a></h1>
+<p>
+</p>
+<h2><a name="api_change_for_get_put_methods_of_mqseries__queue">API change for Get/Put methods of MQSeries::Queue</a></h2>
+<p>In previous releases, specifying the <code>PutMsgOpts</code> with the <code>Put</code>
+method or the <code>GetMsgOpts</code> with the <code>Get</code> method of
+<code>MQSeries::Queue</code> meant that <code>Sync</code>, <code>Wait</code> and <code>Convert</code>
+parameters were ignored.</p>
+<p>This has now changed: the <code>Sync</code>, <code>Wait</code> and <code>Convert</code> parameters
+will be honored and be combined with the get/put options specified
+with the <code>PutMsgOpts</code> or <code>GetMsgOpts</code> parameters.</p>
+<p>The <code>Get</code> method <code>Wait</code> and <code>Convert</code> parameters will override the
+<code>GetMsgOpts</code> options flag.</p>
+<p>The <code>Get</code> and <code>Put</code> method <code>Sync</code> paramater will check the
+<code>GetMsgOpts</code> or <code>PutMsgOpts</code> options flag for compatibility.  If a
+coflicting syncpoint option is already set, a fatal error will be
+raised.  If no conflicting option is set (this means the options flkag
+either has no syncpoint flag set at all, or has the requested flag set
+already), the requested <code>Sync</code> paramater will be added to the options
+flag.</p>
+<p>This means the following will now work:</p>
+<pre>
+    my $result = $request_queue-&gt;
+      Get('Message'    =&gt; $get_message,
+          'GetMsgOpts' =&gt; 
+          {
+            'Options'  =&gt; (MQSeries::MQGMO_SYNCPOINT_IF_PERSISTENT |
+                           MQSeries::MQGMO_FAIL_IF_QUIESCING),
+          },
+          'Wait'       =&gt; '30s',
+         );</pre>
+<p>In the past, this would cause the <code>Wait</code> flag to be silently ignored.</p>
+<p>This incompatible API change may break your code.  As it significantly
+enhances the safety of your code, this is deemed a price worth paying.</p>
+<p>
+</p>
+<h2><a name="new_mqseries__message__configevent_class">New MQSeries::Message::ConfigEvent class</a></h2>
+<p>WebSphere MQ 5.3 on z/OS can generate configuration change events that
+cannot be read on Unix and NT queue managers - distributed queue
+managers are not able to convert PCF version2 messages.  The
+MQSeries::Message::ConfigEvent class can be used to process such
+messages - highly useful to create an audit log.</p>
+<p>
+</p>
+<h2><a name="new_mqseries__message__iih_class">New MQSeries::Message::IIH class</a></h2>
+<p>A new class to support IMS Bridge Header (IIH) messages.  This is due
+to Nathan Dupra of Xerox USA.  This class is based on reverse
+engineering and somewhat experimental - feedback on functionality or
+the API is welcome.</p>
+<p>
+</p>
+<h2><a name="add_support_for_websphere_mq_5_3_on_z_os">Add support for WebSphere MQ 5.3 on z/OS</a></h2>
+<p>A number of minor changes have been made to support MQSeries::Command
+with the 5.3 release (now branded WebSphere MQ) on z/OS.  Note that
+PTF UQ68236 is required - the MQSC output of ``Display Queue'' is
+invalid without that PTF, leading to errors with the <code>InquireQueue</code>
+method.</p>
+<ul>
+<li>
+<p>Support for AuthInfo objects in <code>MQSeries::Command</code>, mostly through
+changes in the <code>MQSeries::Command::MQSC::*</code> tables.</p>
+</li>
+<li>
+<p>Support for CFStruct (Coupling Facility Application Structure) objects
+in <code>MQSeries::Command</code>, mostly through changes in the
+<code>MQSeries::Command::MQSC::*</code> tables.</p>
+</li>
+<li>
+<p>Support for the new Channel attributes in <code>MQSeries::Command</code>, mostly
+through changes in the <code>MQSeries::Command::MQSC::*</code> tables.  The new
+attributes are <code>BatchHeartBeat</code>, <code>KeepAliveInterval</code>,
+<code>LocalAddress</code>, <code>SSLCipherSpec</code>, <code>SSLClientAuth</code> and
+<code>SSLPeerName</code>.</p>
+</li>
+<li>
+<p>Support for the new QueueManager attributes in <code>MQSeries::Command</code>,
+mostly through changes in the <code>MQSeries::Command::MQSC::*</code> tables.
+The new attributes are <code>ConfigurationEvent</code>, <code>ExpiryInterval</code>,
+<code>SSLKeyRepository</code>, <code>SSLCRLNamelist</code>, <code>SSLCryptoHardware</code> and
+<code>SSLTasks</code>.</p>
+</li>
+<li>
+<p>Support for the new Queue attributes in <code>MQSeries::Command</code>,
+mostly through changes in the <code>MQSeries::Command::MQSC::*</code> tables.
+The new attribute is <code>PageSetId</code>.</p>
+</li>
+<li>
+<p>Support for the new Namelist attributes in <code>MQSeries::Command</code>,
+mostly through changes in the <code>MQSeries::Command::MQSC::*</code> tables.
+The new attribute is <code>NamelistType</code>.</p>
+</li>
+</ul>
+<p>
+</p>
+<h2><a name="new_features_for_mqseries__command">New features for MQSeries::Command</a></h2>
+<p>The <code>MQSeries::Command</code> constructor now accepts a <code>CommandQueue</code>
+parameter.  This allows you to open an arbitrary queue with arbitary
+options, then use it so send commands.</p>
+<p>In addition, a new <code>MsgDesc</code> method for <code>MQSeries::Command</code> can be
+used to fine-tune the message descriptor for outgoing commands.</p>
+<p>These new features can be used to open an arbitarry queue and override
+message persistence, as some users requested; internally, we sue it to
+set the accounting options on outgoing messages, which are then
+archived by the WMQ 5.3 configuration events on z/OS.</p>
+<p>
+</p>
+<h2><a name="better_decoding_of_mqsc_results">Better decoding of MQSC results</a></h2>
+<p>Mike Surikov pointed out more bugs in the decoding of MQSC result
+messages in <code>MQSeries::Command</code>.  I've added more fixes...</p>
+<p>
+</p>
+<h2><a name="parameter_verification_for_mqseries__queuemanager">Parameter verification for MQSeries::QueueManager</a></h2>
+<p>The parameters to the major methods of the <code>MQSeries::QueueManager</code>
+class (<code>new</code>, <code>Connect</code>, <code>Close</code>) are now enforced.  Specifying
+invalid parameter names will lead to a fatal run-time error.</p>
+<p>
+</p>
+<h2><a name="parameter_verification_for_mqseries__queue">Parameter verification for MQSeries::Queue</a></h2>
+<p>The parameters to the major methods of the <code>MQSeries::Queue</code> class
+(<code>new</code>, <code>Open</code>, <code>Get</code>) are now enforced.  Specifying invalid
+parameter names will lead to a fatal run-time error.</p>
+<p>
+</p>
+<h2><a name="new__convert__option_for_mqseries__queue_get_method">New 'Convert' option for MQSeries::Queue Get method</a></h2>
+<p>The <code>Get</code> method of <code>MQSeries::Queue</code> has a new <code>Convert</code> option.
+This is true by default, but can be set to false if conversion is not
+required.  This is useful when manually converting messages, e.g. WMQ
+5.3 configuration events.</p>
+<p>
+</p>
+<h2><a name="deprecated_parameters_generate_a_warning_if_w_is_enabled">Deprecated parameters generate a warning if -w is enabled</a></h2>
+<p>The deprecated parameters <code>NoAutoConnect</code> for
+<code>MQSeries::QueueManager</code> and <code>NoAutoOpen</code> for <code>MQSeries::Queue</code>
+will generate a warning if -w is enabled.  In the next release, the
+warning becomes mandatory.</p>
+<p>
+</p>
+<h2><a name="deprecated_methods_generate_a_warning_if_w_is_enabled">Deprecated methods generate a warning if -w is enabled</a></h2>
+<p>The deprecated <code>MQSeries::Queue</code> methods <code>Commit</code>, <code>Backout</code> and
+<code>Pending</code> will generate a warning if -w is enabled.  In the next
+release, the warning becomes mandatory.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_18">Changes for 1.18</a></h1>
+<p>
+</p>
+<h2><a name="add_support_for_websphere_mq_5_3">Add support for WebSphere MQ 5.3</a></h2>
+<p>A number of minor changes have been made to support the 5.3 release
+(now branded WebSphere MQ).</p>
+<ul>
+<li>
+<p>The format of AMQERR01.LOG files has changed: the record separator can
+now contain a filename and line.  Update to <code>MQSeries::ErrorLog::Parser</code>.</p>
+</li>
+<li>
+<p>The product name in many message in the AMQERR01.LOG file has changed;
+some error messages have been added and others have minor changes.
+Update to <code>MQSeries::ErrorLog::descriptions.pl</code>.</p>
+</li>
+<li>
+<p>The format of FDC files has changed: the product name at the start of
+each record has changed. Update to <code>MQSeries::FDC::Parser</code>, which now
+supports both the old and the new product name.</p>
+</li>
+<li>
+<p>Support for AuthInfo objects in <code>MQSeries::Command</code>, mostly through
+changes in the <code>MQSeries::Command::PCF::*</code> tables.</p>
+</li>
+<li>
+<p>Support for the new <code>InquireQueueStatus</code> command, mostly through
+changes in the <code>MQSeries::Command::PCF::*</code> tables.</p>
+</li>
+<li>
+<p>Support for the new Channel attributes in <code>MQSeries::Command</code>, mostly
+through changes in the <code>MQSeries::Command::PCF::*</code> tables.  The new
+attributes are <code>BatchHeartBeat</code>, <code>LocalAddress</code>, <code>SSLCipherSpec</code>,
+<code>SSLClientAuth</code> and <code>SSLPeerName</code>.</p>
+</li>
+<li>
+<p>Support for the new QueueManager attributes in <code>MQSeries::Command</code>,
+mostly through changes in the <code>MQSeries::Command::PCF::*</code> tables.
+The new attributes are <code>ConfigurationEvent</code>, <code>SSLKeyRepository</code>,
+<code>SSLCRLNamelist</code> and <code>SSLCryptoHardware</code>.</p>
+</li>
+</ul>
+<p>
+</p>
+<h2><a name="support_channeltable_reading_writing_on_windows_nt">Support ChannelTable reading/writing on Windows NT</a></h2>
+<p>Jim Wendorf reported that the <code>MQSeries::Config::ChannelTable</code> file
+did not reliably read and write channel tables on Windows NT.  This
+was due to missing <code>binmode()</code> statements and sort order issues and has
+now been fixed.</p>
+<p>
+</p>
+<h2><a name="improved_client_server_api_detection">Improved client/server API detection</a></h2>
+<p>Edwin Haswell contributed code for improved client vs server API
+support.  The plain ``use MQSeries;'' code should now work again for
+client installations.</p>
+<p>
+</p>
+<h2><a name="add_support_for_mqsc_inquirequeuestatus_command">Add support for MQSC InquireQueueStatus command</a></h2>
+<p>The <code>MQSeries::Command</code> class now supports the <code>InquireQueueStatus</code>
+command when using MQSC commands.  This works against mainframe queue
+managers running MQSeries release 5.2 and up.</p>
+<p>
+</p>
+<h2><a name="remove_support_for_perl5_004">Remove support for perl5.004</a></h2>
+<p>The MQSeries module now requires perl5.005.  We test internally with
+both perl5.005 and perl5.6.</p>
+<p>
+</p>
+<h2><a name="strict_argument_checking_for_mqseries__command_constructor">Strict argument checking for MQSeries::Command constructor</a></h2>
+<p>The MQSeries::Command constructor now performs strict parameter name
+validation and will throw an exception (using <code>confess())</code> if an invalid
+parameter name is passed.</p>
+<p>This has the potential of breaking existing, but buggy, code.  Similar
+changes will be made to many of the other classes and methods in
+upcoming releases.</p>
+<p>
+</p>
+<h2><a name="modified_message_retry_handling_in_mqseries__queue_get__">Modified message retry handling in MQSeries::Queue <code>Get()</code></a></h2>
+<p>Paul Meekin submitted an interesting bug showing we got message retry
+wrong when the initial data buffer is too large and message conversion
+is required (reason code MQRC_TRUNCATED_MSG_FAILED).  Effectively, we
+were re-using the MQMD returned after the warning, which caused the
+requested coded character set and encoding to be ignored.  This is now
+fixed.</p>
+<p>However, this bug also showed that some of the retry logic was
+non-functional; the non-working code has now been removed.  The retry
+logic failed in the following (rare) corner-case:</p>
+<ul>
+<li>
+<p>You are getting a string message and requesting conversion</p>
+</li>
+<li>
+<p>The data buffer specified is large enough to hold the message before
+conversion</p>
+</li>
+<li>
+<p>The message expands during conversion (e.g., Latin-1 to UTF-8)</p>
+</li>
+<li>
+<p>The data buffer specified is not large enough to hold the message
+after conversion</p>
+</li>
+</ul>
+<p>It turns out that in this case (when MQCC_WARNING and
+MQRC_CONVERTED_STRING_TOO_BIG is returned) is not retryable.  The only
+thing the application can do, if the message was read under syncpoint,
+is to roll back and try again with a properly sized data buffer.</p>
+<p>
+</p>
+<h2><a name="reduced_memory_usage_for_mqseries__command">Reduced memory usage for MQSeries::Command</a></h2>
+<p>The MQSeries::Command module will now delay loading for the
+sub-classes MQSeries::Command::PCF and MQSeries::Command::MQSC until
+either one is actually used.  Under most circumstances, this will save
+a substantial amount of memory.  Apache mod_perl users may want to
+pre-load the relevant sub-class as part of their startup script.</p>
+<p>
+</p>
+<h2><a name="support_for_clientconn_options_with_mqconnx">Support for ClientConn options with MQCONNX</a></h2>
+<p>Hirosi Taguti noted that the MQCONNX call did not properly support
+client-connection options.  After he persisted in his bug reports for
+a year, we finally fixed it - which required adding some XS code.
+Note that the syntax for the ClientConn options may be different than
+expected, as the MQCNO 'versions' and 'Options' flags must also be
+accomodated:</p>
+<pre>
+  $HConn = MQCONNX($QmgrName, 
+                   { 'ClientConn' =&gt; { 'ChannelName'   =&gt; 'FOO',
+                                       'TransportType' =&gt; 'TCP',
+                                       'ConnectionName' =&gt; &quot;hostname(1414)&quot;,
+                                     },
+                   },
+                   $CompCode, 
+                   $Reason);</pre>
+<p>The <code>MQSeries::QueueManager</code> class now uses MQCONNX and supports an
+optional <code>ClientConn</code> parameter to specify these options.</p>
+<p>
+</p>
+<h2><a name="support_mq_5_2_csd03_and_csd04">Support MQ 5.2 CSD03 and CSD04</a></h2>
+<p>Various people noted that MQSeries 5.2 CSD03 and CSD04 caused a number
+of tests to break.  This is because the various header files now
+provide two different values for various constants, depending on
+whether you compile in 32-bit mode or 64-bit mode.  As we are not
+running a full C pre-processor, that broke the constant parsing.</p>
+<p>We now support these changed header files, though we do not yet
+support the 64-bit client mode on Solaris (patches are welcome).</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_17">Changes for 1.17</a></h1>
+<p>
+</p>
+<h2><a name="parameter_order_for_pcf_commands">Parameter order for PCF commands</a></h2>
+<p>Jim Hildebrand at MQ Software tried to use the MQSeries::Command suite
+on Windows 2000 and discovered that the order in which PCF command
+options are specified was dependent on the platform hash key ordering,
+even though the PCF command server requires a specific ordering for
+some keys.  The perl hash key ordering happened to work on Solaris,
+but broke on Windows 2000 (and possibly other platforms).</p>
+<p>
+</p>
+<h2><a name="final_message_for_mainframe_mqsc_commands">Final message for mainframe MQSC commands</a></h2>
+<p>Joseph Sacco at Starwood Hotels reported that the MQSeries::Command
+suite, when run against a mainframe using MQSC commands, gave annoying
+errors messages because the terminating response line on his mainframe
+queue manager has a different format from ours.</p>
+<p>We now accept both formats.  If you run MQSeries::Command against a
+mainframe and get error messages like:</p>
+<pre>
+    Unrecognized MQSC buffer: /T2 CSQMDRTS ' DISPLAY QUEUE' NORMAL COMPLETION</pre>
+<p>then please get in touch and send us the error message.</p>
+<p>
+</p>
+<h2><a name="invalid_handling_of_zerolength_messages_and_zerolength_pcf_strings">Invalid handling of zero-length messages and zero-length PCF strings</a></h2>
+<p>Peter Giorgilli reported that we had a bug in the XS code that caused
+us to return garbage data when reading zero-length messages.  It turns
+out a similar issue caused zero-length PCF strings to be misread for
+responses from little-endian queue managers (e.g. Linux/ia32 and
+Windows).  These zero-length string bugs have been corrected
+throughout all the XS code.</p>
+<p>
+</p>
+<h2><a name="rename_noautoconnect_flag_for_mqseries__queuemanager_constructor">Rename NoAutoConnect flag for MQSeries::QueueManager constructor</a></h2>
+<p>The NoAutoConnect flag for the MQSeries::QueueManager constructor has
+been renamed to AutoConnect (with, obviously, reverse meaning of the
+option values).  The default behavior remains the same and the next
+few releases will support the old flag for backwards compatibility.</p>
+<p>
+</p>
+<h2><a name="rename_noautoopen_flag_for_mqseries__queue_constructor">Rename NoAutoOpen flag for MQSeries::Queue constructor</a></h2>
+<p>The NoAutoOpen flag for the MQSeries::Queue constructor has been
+renamed to AutoOpen (with, obviously, reverse meaning of the option
+values).  The default behavior remains the same and the next few
+releases will support the old flag for backwards compatibility.</p>
+<p>
+</p>
+<h2><a name="add_queuemanager_method_to_mqseries__queue">Add QueueManager method to MQSeries::Queue</a></h2>
+<p>In retrospect, it was probably a mistake to add <code>Commit()</code> and <code>Backout()</code>
+methods to the MQSeries::Queue class and have them delegate these
+calls to the queue manager object.  Some developers were confused by
+this and thought the scope of transactions was per-queue.</p>
+<p>However, it is valid to create an MQSeries::Queue object without
+creating an MQSeries::QueueManager object first, and <code>Commit()</code> and
+<code>Backout()</code> have to be called on something - so it seemed like a
+reasonable thing to do.</p>
+<p>A new method for MQSeries::Queue, QueueManager(), can be used to
+extract the queue manager object from a queue.  The documentation has
+been updated to reflect that <code>Commit()</code> and <code>Backout()</code> should be called
+on the queue manager object, not on the queue.  The queue-level
+<code>Commit()</code> and <code>Backout()</code> methods will be dropped in a future release.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_16">Changes for 1.16</a></h1>
+<p>
+</p>
+<h2><a name="mqseries__config__channeltable">MQSeries::Config::ChannelTable</a></h2>
+<p>The SYSTEM.DEF.CLNTCONN definition must be present, or the client can
+get upset in certain error conditions, so the code now forces this to
+the front of the list, even if you don't specify it.</p>
+<p>The physical order of the entries, and the order in which the linked
+list pointers binds them together, now patches exactly the same
+pattern as IBM uses to generate the file on a queue manager.  It is
+very possible that noone at Hursley will be able to tell one of my
+files from one of theirs. ;-)</p>
+<p>And that's a challenge....</p>
+<p>
+</p>
+<h2><a name="mqseries__queue_set_was_horrible_broken">MQSeries::Queue-&gt;Set was horrible broken</a></h2>
+<p>This was one of those 'how did this ever work?' problems.  The core
+was fatally broken.  Fixed.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_15">Changes for 1.15</a></h1>
+<p>
+</p>
+<h2><a name="add__afs__principal_type_to_authority_api">Add 'AFS' principal type to Authority API</a></h2>
+<p>The extended PCF API to query/alter Unix authorities now supports a
+thirs entity type, 'AFS' (PCF macro MQETE_AFS_GROUP).  As this
+requires a modified command server and custom Object Authority Manager
+(OAM) only used at Morgan Stanley, this should not affect anyone else.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_14">Changes for 1.14</a></h1>
+<p>
+</p>
+<h2><a name="support_for_a_comparecallback_method_in_createobject">Support for a compare-callback method in CreateObject</a></h2>
+<p>The CreateObject method of MQSeries::Command now supports an optional
+call-back to perform the comparison of object attributes.  This is
+only useful in obscure circumstances.</p>
+<p>
+</p>
+<h2><a name="support_for_storageclass_objects_in_mqsc_commands">Support for StorageClass objects in MQSC commands</a></h2>
+<p>The StorageClass object type (as used on the OS/390 version of
+MQSeries) is now supported by the MQSeries::Command class.</p>
+<p>
+</p>
+<h2><a name="mqseries__command__base_getconvert_preserves_original_message_buffer">MQSeries::Command::Base-&gt;GetConvert preserves original message Buffer</a></h2>
+<p>In order to add some statistics gathering code to the command API, the
+MQSeries::Command::Response objects will not keep the unconverted PCF
+data structures in the Buffer attribute of the object, allowing direct
+manipulation of the data, of necessary.</p>
+<p>We need to be able to measure the absolute size of the original
+message, since we are trying to gather metrics on the load placed on
+MQSeries systems by administrative tools thatuse this API.</p>
+<p>
+</p>
+<h2><a name="mqseries__queuemanager_connecttimeout_logic_fixed">MQSeries::QueueManager ConnectTimeout logic fixed</a></h2>
+<p>This is one of this ``how did this ever work?'' bugs.</p>
+<p>The logic to test the support for <code>fork()</code> in the current perl build was
+wrong.  This has been fixed, and the retry logic tested successfully.</p>
+<p>
+</p>
+<h2><a name="mqseries__config__machine_reparsing_bug">MQSeries::Config::Machine re-parsing bug</a></h2>
+<p>This code is clever, and re-parses mqs.ini whenever it changes so that
+long running daemons wil automatically detect new queue manager
+installation.  However, the method name was incorrect, and this
+resulted in a fatal runtime error.  Oops.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_13">Changes for 1.13</a></h1>
+<p>
+</p>
+<h2><a name="support_for_mqseries_version_5_2_on_the_mainframe">Support for MQSeries version 5.2 on the mainframe</a></h2>
+<p>The MQSeries::Command class now supports MQSeries version 5.2 on the
+mainframe.  This includes support for the new QSharingGroup,
+CouplingFacility, CommandScope and IntraGroupQueueing keywords; and
+the new ResetQueueStatistics method, which returns the same results
+as the Unix (PCF) version.  The new DisplayQueueStatus MQSC command is not
+yet supported.</p>
+<p>Support for MQSeries 5.2 on Unix has also been tested; however, as 
+this worked without changes, none were made.</p>
+<p>
+</p>
+<h2><a name="mqseries__queuemanager_autocommit_off_by_default">MQSeries::QueueManager AutoCommit off by default</a></h2>
+<p>As warned when we deployed 1.12, MQSeries::QueueManager's AutoCommit
+functionality is disabled by default now.  If you want pending
+transactions to be automatically committed when your disconnect, you
+must set AutoCommit in your code.</p>
+<p>
+</p>
+<h2><a name="unbloat_the_code">Un-bloat the code</a></h2>
+<p>The MQSeries modules were becoming a serious memory hog, largely due
+to the import/export of all constants in modules the included
+MQSeries.</p>
+<p>The MQSeries moduly now optionally allows importing just the
+functions, then referring to constants using an MQSeries:: prefix.
+This has been done throughout the MQSeries library internally, leading
+to a space saving of some 3 MB for programs using MQSeries::Command.</p>
+<p>This change is fully backwards-compatible.  There is no impact on
+programs using the MQSeries module, though these can reduce their
+memory footprint (if desired) by selectively importing the required
+MQSeries functions.</p>
+<p>
+</p>
+<h2><a name="mqseries__command_inquirechannelstatus_handles_mqrccf_chl_status_not_found_more_elegantly">MQSeries::Command-&gt;InquireChannelStatus handles MQRCCF_CHL_STATUS_NOT_FOUND more elegantly</a></h2>
+<p>The code has always tried to make a missing channel status appear to
+be a successful command, and to return the ``ChannelStatus'' value of
+``NotFound'', since this is not really an error.  Unfortunately, we
+broke this when we reorganized the MQSeries::Command code for 1.12.</p>
+<p>The CompCode and Reason will now be reset to MQCC_OK and MQRC_NONE,
+as well as returning a ChannelStatus of ``NotFound''.</p>
+<p>
+</p>
+<h2><a name="mqseries__message__rulesformat_tolerant_of_leading_whitespace">MQSeries::Message::RulesFormat tolerant of leading whitespace</a></h2>
+<p>In the NameValueString of the MQRFH message, that is.  According to
+IBM (I checked), there is nothing in the spec or the code of the
+pubsub <code>broker(s)</code> that will prohibit the user of leading whitespace in
+the MQRFH NameValueString, so the perl API needs to be tolerant of the
+same.</p>
+<p>
+</p>
+<h2><a name="mqseries__message__xmldumper_removed">MQSeries::Message::XML-Dumper removed</a></h2>
+<p>As this module did not compile, it probably wasn't used by anyone.</p>
+<p>
+</p>
+<h2><a name="bug_in_extended_pcf_command_inquireauthority_fixed">Bug in Extended PCF Command ``InquireAuthority'' fixed</a></h2>
+<p>The keyword in the hash tables used to map strings to PCF macros had a
+bug.  Principal was mispelled, causing any query of permissions that
+involved principals to fail.</p>
+<p>This was guaranteed to impact only MSDW....</p>
+<p>
+</p>
+<h2><a name="minor_bug_in_handling_of_compcode_reason_values_from_mqsc_commands">Minor bug in handling of CompCode/Reason values from MQSC Commands</a></h2>
+<p>These are really hex values, and we were pretending that they were
+decimal.  This generates warning when the values are used for
+numerical comparisons.</p>
+<p>The CompCode and Reason values are now ``eval''ed as hex, and thus
+converted to decimal values.</p>
+<p>
+</p>
+<h2><a name="mqseries__command_reasontext_documented">MQSeries::Command-&gt;ReasonText documented</a></h2>
+<p>This method returns either the MQReasonToText value for the commandd
+reason code, or the ReasonText returned by MQSC.  It wasn't
+documented.  It is now.</p>
+<p>
+</p>
+<h2><a name="mqseries__command_createobject_takes_force_argument">MQSeries::Command-&gt;CreateObject takes Force argument</a></h2>
+<p>You can't pass Force as an object attribute, since it is supported by
+ChangeFoo but not by CreateFoo commands, in general.  The
+specification of Force is not an argument to CreateObject itself, and
+should not be passed as a key in the Attrs hash.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_12">Changes for 1.12</a></h1>
+<p>
+</p>
+<h2><a name="mqseries__command_responses">MQSeries::Command-&gt;Responses</a></h2>
+<p>The ``Response'' method of the MQSeries::Command class conflicts with
+the MQSeries::Command::Response class, and this causes headaches in
+some code.  The method has been renamed to ``Responses''.</p>
+<p>Now, this is obviously a non-backwards compatible change, however,
+that method is very, very rarely used, and this will probably affect
+no existing code.  But, you've been warned.</p>
+<p>
+</p>
+<h2><a name="support_for_control_of_implicitly_commited_transactions">Support for control of implicitly commited transactions</a></h2>
+<p>WARNING: This is a very subtle, but very significant change to the
+API.  Anyone using transactions should read and understand the
+implications for their application.</p>
+<p>Normally, when there are pending tranactions due to uncommited <code>MQPUT()</code>
+and/or <code>MQGET()</code> calls, they will be implicitly backed out if the
+application crashes.  This is a good thing.  If the application
+chooses to cleanly exit, and calls <code>MQDISC()</code> without first calling
+MQCMIT(), then the transactions will be implicitly commited.  This is
+a good thing, when you do it intentionally.</p>
+<p>In the MQSeries::QueueManager object destructor, the code does an
+<code>MQDISC()</code> automatically in order to attempt to be a good citizen and
+cleanly disconnect from queue manager automatically.  However, if an
+application has pending tranactions, and it traps a non-MQSeries
+related error and dies, object destruction still occurs, and this
+means that the pending transactions will be automatically commited,
+often to the surprise of the application developer.</p>
+<p>This release offers the developer control of this behavior, via the
+new AutoCommit argument to the MQSeries::QueueManager constructor.  If
+AutoCommit is disabled, then the object destructor will call <code>MQBACK()</code>
+before it calls MQDISC(), if there are pending transactions (the rest
+of the code conspires to keep track of this state information for you
+automatically, of course).</p>
+<p>ANOTHER WARNING: The default behavior is not being changed in 1.12.
+AutoCommit will be 1 by default, and transactions will be
+automatically commited, in order to be backwards compatible with the
+current behavior.  In 1.13, we will change this, since we feel very
+strongly that the intuitive behavior should be the default.  If the
+application does not explicitly commit transactions, then they will be
+backed out when we destroy the MQSeries::QueueManager objects.</p>
+<p>This means that applications will <strong>NOT</strong> be required to explicitly
+call <code>MQBACK()</code> (well, the -&gt;<code>Backout()</code> method, that is) in all of their
+error handling.  This is especially important if you call some other
+API which itself raises fatal exceptions, since you won't be required
+to trap them and take special action.  As of 1.13, we will Do The
+Right Thing.</p>
+<p>
+</p>
+<h2><a name="mqseries__queuemanager_connect___timeout_logic">MQSeries::QueueManager-&gt;<code>Connect()</code> timeout logic</a></h2>
+<p>Attempts to connect to unhealthy queue managers can often hang
+indefinetely, and there is no way for applications to interrupt the
+connection, or trap the error.  You simply hang until the queue
+manager (or the wedged component) is killed.</p>
+<p>The new MQSeries::QueueManager support a ConnectTimeout attributes
+which puts a time limit on the <code>MQCONN()</code> call.</p>
+<p>
+</p>
+<h2><a name="os_390_support">OS/390 Support</a></h2>
+<p>The modules now compile and install on OS/390.  See the README file
+for version details.</p>
+<p>
+</p>
+<h2><a name="mqseries__config__authority">MQSeries::Config::Authority</a></h2>
+<p>A new class under MQSeries::Config, which can be used to parse and query
+authority files under Unix.  The 'saveauth' program in the 'examples'
+directory shows how this can be used to save all object authorities
+in a file of 'setmqaut' commands.</p>
+<p>
+</p>
+<h2><a name="mqseries__command_createobject_fix__change__not_create">MQSeries::Command-&gt;CreateObject fix: Change, not Create</a></h2>
+<p>Actually, this fixes a pretty serious bug.  CreateObject, which is a
+wonderfully powerful command, was also rather dangerous, because the
+author (er, uh, that would be me -- wpm) got a bit pazy, and just used
+the PCF Create commands, with the Replace option.  That works fine if
+you are always specifying all or most of the attributes you care
+about.  If, however, you provide a subset of the attributes you care
+about, the others will get wiped out, since you are giving a sparse
+set of attributes to, say, CreateQueue.</p>
+<p>The code will now DTRT and use the Change commands if the object
+already exists, and Create if it doesn't.  This is far safer, and
+makes the code very robust.</p>
+<p>
+</p>
+<h2><a name="mqseries__command_createobject_fix__comparing_lists">MQSeries::Command-&gt;CreateObject fix: Comparing lists</a></h2>
+<p>If one of the attributes passed in is a single element ARRAY
+reference, it would not compare correctly with a real object attribute
+of only one element, since the inquiry API will not return it as an
+ARRAY reference unless there are two or more entries.  A single
+element ARRAY ref will be flattened to a scalar to make this
+comparison correct.</p>
+<p>
+</p>
+<h2><a name="limit_the_max___of_open_files_for_mqseries__fdc__tail">Limit the max # of open files for MQSeries::FDC::Tail</a></h2>
+<p>Some vendors impose a limit of 255 stdio files that can be
+open at the same time (though the number of open file descriptors
+can be quite a bit higher).  For an queue manager running really
+poorly, the number of FDC files being written may be higher than
+that, causing perl to die with a ``too many open files'' error.
+The MQSeries::FDC::Tail class will now close and re-open files
+in such circumstances (using a least-recently-used approach).</p>
+<p>
+</p>
+<h2><a name="support_for_symbolic_wait_and_expiry_values">Support for symbolic Wait and Expiry values</a></h2>
+<p>The 'Wait' and 'Expiry' parameters for MQSeries::Command, MQSeries::Queue
+and MQSeries::PubSub::Command are specified in units of 1/1000 and 1/10
+of a second, making it easy to get the magnitude wrong.  These parameters
+can now also be specified as symbolic values, e.g. '45s' for 45 seconds
+and '2m' for 2 minutes.</p>
+<p>NOTE: These symbolic values work at the API top-level, but not when
+you manually create a MsgDesc hash. Low-level values must be specified
+in numeric form.</p>
+<p>
+</p>
+<h2><a name="use_of_getconvert___error_checked_properly">Use of <code>GetConvert()</code> error checked properly</a></h2>
+<p>See the 1.11 changes notes about PutConvert, roughly a page or so
+below this.  It was an oversight not to make the analagous changes for
+GetConvert as well as PutConvert.</p>
+<p>
+</p>
+<h2><a name="getconvertreason___and_putconvertreason___methods_added"><code>GetConvertReason()</code> and <code>PutConvertReason()</code> methods added</a></h2>
+<p>It is now possible to determine if the failure of a Put(), <code>Put1()</code> or
+<code>Get()</code> method calls was a result of a failed <code>PutConvert()</code> or
+<code>GetConvert()</code> method, which is called internally by each of the first 3
+methods.</p>
+<p>This is important when you want to know if the error was a result of
+an improperly formatted message body, or an MQSeries problem.</p>
+<p>While some noise gets generated via carp, there was until now no way
+to determine this programmatically.</p>
+<p>
+</p>
+<h2><a name="mqseries__command__support_for_ordered_attributes">MQSeries::Command: Support for ordered attributes</a></h2>
+<p>The DeleteQueue command has an undocumented dependency on the order of
+its optional attributes.  We enhanced the configuration of the PCF
+attributes such that we can now specify the order for these
+parameters.  Without this change, commands that specified the Purge
+option worked half the time, since it was just lucky if perl pulled
+the hash entries out in the right order.</p>
+<p>Now, we force the parameters to be converted into PCF code in the
+correct order.  Currently, this only applies to the Optional
+parameters for DeleteQueue, but if we run into any further
+undocumented order dependencies, we can accomodate them easily.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_11">Changes for 1.11</a></h1>
+<p>
+</p>
+<h2><a name="mqseries__config____classes">MQSeries::Config::* classes</a></h2>
+<p>Two new classes under MQSeries::Config, specifically Machine and QMgr,
+allow read access to the parsed /var/mqm/mqs.ini and
+/var/mqm/qmgrs/*/qm.ini files.</p>
+<p>
+</p>
+<h2><a name="mqseries__errorlog____classes">MQSeries::ErrorLog::* classes</a></h2>
+<p>Three new classes under MQSeries::ErrorLog, specifically Tail, Parser,
+and Entry, allow parsing and monitoring of errorlog files
+(/var/mqm/errors/AMQERR0x.LOG, /var/mqm/qmgrs/*/errors/AMQERR0x.LOG).</p>
+<p>
+</p>
+<h2><a name="mqseries__fdc____classes">MQSeries::FDC::* classes</a></h2>
+<p>Three new classes under MQSeries::FDC, specifically Tail, Parser, and
+Entry, allow parsing and monitoring of FDC files
+(/var/mqm/errors/*.FDC).</p>
+<p>
+</p>
+<h2><a name="mqseries__message__deadletter_object">MQSeries::Message::DeadLetter object</a></h2>
+<p>A new subclass of MQSeries::Message, which implements parsing of the
+MQDLH, has been added to the distribution.  This makes it trivial to
+write dead letter queue handler applications in perl.</p>
+<p>
+</p>
+<h2><a name="use_of_putconvert___error_checked_properly">Use of <code>PutConvert()</code> error checked properly</a></h2>
+<p>We only error check the return value of the <code>PutConvert()</code> method is one
+was actually called.  This makes it possible to put empty messages
+(where all of the information you care about is in the header, for
+example).</p>
+<p>
+</p>
+<h2><a name="mqseries__command_createobject_method_handles_lists_correctly">MQSeries::Command-&gt;CreateObject method handles lists correctly</a></h2>
+<p>This method tries very hard not to alter objects whose attributes are
+already correctly set, but the previous version couldn't handle
+comparing attributes whose values were lists.  For example, if you
+give more than one exit to the MsgExit parameter of a channel, then
+the PCF query will return a list of values, and this is represented as
+an ARRAY reference.</p>
+<p>The new version will correctly compare the array elements, and thus
+correctly determine whether or not the attributes with multiple values
+are in fact correct.  And yes, order is of course important.</p>
+<p>
+</p>
+<h2><a name="all_getconvert___methods_save_raw_buffer">All <code>GetConvert()</code> methods save raw Buffer</a></h2>
+<p>In all of the following modules, the <code>GetConvert()</code> method will save the
+raw buffer, which in gives the developer access to the raw,
+unconverted data, via the MQSeries::Message-&gt;<code>Buffer()</code> method.</p>
+<pre>
+  MQSeries::Message::Storable
+  MQSeries::Message::XML-Dumper
+  MQSeries::Message::RulesFormat
+  MQSeries::Message::DeadLetter (new in 1.11 -- see above)
+  MQSeries::Message::PCF</pre>
+<pre>
+  MQSeries::Command::Response
+  MQSeries::PubSub::AdminMessage</pre>
+<p>A similar change was made to MQSeries::Message::Event, in the 1.09
+release, but this has not been done for all of the supported modules
+in the distribution, for consistency (and, because the author happened
+to need this for MQSeries::Message::Storable).</p>
+<p>
+</p>
+<h2><a name="mqseries__pubsub_____modelqname_dynamicqname_configurable">MQSeries::PubSub::*, ModelQName DynamicQName configurable</a></h2>
+<p>Previously, the name of the permanent dynamic model queue, and dynamic
+queue name to be created, were simply hardcoded in the object
+constructor for both of</p>
+<pre>
+  MQSeries::PubSub::Broker
+  MQSeries::PubSub::Stream</pre>
+<p>Both are now configurable via arguments to the constructor.</p>
+<p>
+</p>
+<h2><a name="mqseries__pubsub__adminmessage__translatepcf">MQSeries::PubSub::AdminMessage-&gt;_TranslatePCF</a></h2>
+<p>This one is hard to explain.  The code to parse the PCF admin messages
+for PubSub wasn't handling multiple subscriber identities correctly.
+It does now.</p>
+<p>
+</p>
+<h2><a name="mqseries__queue_open___was_silent_on_nonretried_errors">MQSeries::Queue-&gt;<code>Open()</code> was silent on non-retried errors</a></h2>
+<p>There was a missing else condition to carp about an MQOPEN failure, if
+the ReasonCode was <strong>not</strong> in the list of values to be retried.  This
+causes significant confusion, since the failure is silent.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_10">Changes for 1.10</a></h1>
+<p>
+</p>
+<h2><a name="mqseries__command_mqsc_bugs">MQSeries::Command MQSC bugs</a></h2>
+<p>Thanks to yet another data length limitation, the string
+``INITIALIZING'' is too long for OS/390 to display, so this gets
+truncated to ``INITIALIZI'', for output of the <code>InquireChannelStatus()</code>
+command, only on that platform.  The API can parse this correctly now.</p>
+<p>The IndexType values weren't properly mapped on either requests or
+responses.  Now they are.</p>
+<p>The HardenGetBackout paremeter was incorrectly encoded in MQSC.  It is
+now.</p>
+<p>
+</p>
+<h2><a name="mqseries__message_allows_bufferlength_of_0">MQSeries::Message allows BufferLength of 0</a></h2>
+<p>This is one that came back to haunt me, as I thought I had fixed this
+way back in 1.04.  If you attempt to create an MQSeries::Message with
+a BufferLength of zero, you actually get one with the default value of
+32K.  This is bad, if you are writing some code to say, browse a queue
+and just get all of the headers, as you end up getting some of the
+data, too.  The code does the right thing now, and properly accepts a
+BufferLength of 0.</p>
+<p>
+</p>
+<h2><a name="mqseries__command_createobject_enhancements_and_documentation">MQSeries::Command-&gt;CreateObject enhancements and documentation</a></h2>
+<p>I added a new key (Clear) to indicate that when replacing a Local
+queue with another QType, the Local queue should be cleared before
+being deleted.</p>
+<p>There are also a couple of examples in the SYNOPSIS section, and
+documentation for the new method call.  This can now be considered
+production, and is no longer experimental.  The author uses this call
+almost exclusively, in new development, for creating objects.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_09">Changes for 1.09</a></h1>
+<p>
+</p>
+<h2><a name="support_for_win32">Support for Win32</a></h2>
+<p>This release compiles on Windows NT 4.0, and has thus far been tested
+with ActiveState 5.00503, build 521, with Visual C++ 6.0.  Other
+perl/compiler combinations will probably follow, but the initial
+support is all the author has to test.  I've tested it with 5.0 as a
+client, and 5.1 as both client and server.</p>
+<p>NOTE: (and a WARNING, too).  This code determines where your MQSeries
+installation is by querying the Windows Registry, using
+Win32::TieRegistry.  This is done not only at compile time (to find
+the includes files and shared libs), but also at run time to determine
+whether or not to use the client or server API, automatically.</p>
+<p>
+</p>
+<h2><a name="retry_logic_in_mqseries__queuemanager_connect___and_mqseries__queue_open__">Retry logic in MQSeries::QueueManager-&gt;<code>Connect()</code> and MQSeries::Queue-&gt;<code>Open()</code></a></h2>
+<p>The retry logic was always there in MQSeries::QueueManager-&gt;Connect(),
+but now it is much more configurable.  You can specify which reasons
+codes are worth retrying, rather than depend on a hardcoded (and
+possibly wrong or incorrect) list.</p>
+<p>MQSeries::Queue-&gt;<code>Open()</code> also support retry logic, and the author finds
+this very useful for daemons recovering from a previous crash,
+attempting to open a queue for exclusive input, and waiting for the
+previously invoked agent process to free up the input handle.</p>
+<p>The documentation for both modules has a RETRY LOGIC section.  See
+that for more information, as well as the documentation for the
+constructors, and each of the specific methods.</p>
+<p>
+</p>
+<h2><a name="mqseries__command_new_takes_additional_arguments_">MQSeries::Command-&gt;new takes additional arguments.</a></h2>
+<p>The MQSeries::Command constructor takes additional arguments allowing
+you to specify the Model Queue, and DynamicQName used to open the
+dynamic reply queue for command messages.</p>
+<p>
+</p>
+<h2><a name="mqseries__command_createobject___method_added">MQSeries::Command-&gt;<code>CreateObject()</code> method added</a></h2>
+<p>WARNING: This new method, while being Very Cool, is EXPERIMENTAL, and
+intentionally not documented, as the API will likely change.  It
+will probably stabilize in 1.10.</p>
+<p>CreateObject is a higher level wrapper function that will only create
+the specified object if it doesn't exist, or the specified attributes
+don't match.  This is a conditional object creation, that will be a
+noop if the object is already correctly configured.</p>
+<p>
+</p>
+<h2><a name="mqseries__queuemanager_hconn_reference_counting">MQSeries::QueueManager Hconn reference counting</a></h2>
+<p>A global hash, keyed on the process ID, and the Hconn value, will keep
+track of how many MQSeries::QueueManager objects have been
+instantiated for a given queue manager connections (since the Hconn
+values get reused).  The object destructor will now decrement these
+values, and only the last object will actually disconnect from the
+queue manager.</p>
+<p>This is actually a significant enhancement, as it was possible to
+pre-maturely disconnect from the queue manager when instantiating lots
+of objects, all of them specifying the queue manager by name, and thus
+internally recreating lots of MQSeries::QueueManager objects.  The
+first one to get destroyed would wipe out the connection, causing
+problems for the others.</p>
+<p>
+</p>
+<h2><a name="mqseries__queuemanager_constructor_arguments">MQSeries::QueueManager constructor arguments</a></h2>
+<p>The constructor argument QueueManager can now be another
+MQSeries::QueueManager argument, and the QueueManager name will be
+stolne from that object, and a new one instantiated.  This really just
+allows an MQSeries::QueueManager object to be passed to the
+MQSeries::PubSub::Broker constructor, actually.</p>
+<p>
+</p>
+<h2><a name="mqseries__queue_open___ignores_the_hobj_on_errors">MQSeries::Queue-&gt;<code>Open()</code> ignores the Hobj on errors</a></h2>
+<p>The Hobj value returned by <code>MQOPEN()</code> is only saved in the object hash
+when the CompCode is either MQCC_OK or MQCC_WARNING.  The value when
+there is a failure can be a large, useless negative number, but then
+this looks like a true value in perl.</p>
+<p>This confuses the subsequent attempts to call -&gt;Open(), which are
+supposed to return true if the object is already opened.  This was done via:</p>
+<pre>
+        return 1 is $self-&gt;{Hobj};</pre>
+<p>which will be wrong.  This is primarily relevant is you implement any
+form of retry logic for failed queue opens.</p>
+<p>
+</p>
+<h2><a name="mqseries__message_buffer___method_added">MQSeries::Message-&gt;<code>Buffer()</code> method added</a></h2>
+<p>A new method to return the raw buffer from an <code>MQGET()</code> call.  This is
+relevant for classes which use <code>GetConvert()</code> methods to translate the
+raw data into a customized form.  If they save the raw buffer into
+$self-&gt;{Buffer}, then it will be available.</p>
+<p>
+</p>
+<h2><a name="mqseries__message__event_getconvert___saves_raw_buffer">MQSeries::Message::Event-&gt;<code>GetConvert()</code> saves raw Buffer</a></h2>
+<p>This <code>GetConvert()</code> method will save the raw buffer, which in this case
+gives the developer access to the raw PCF data.  The author uses this
+to echo the original event, in its unaltered format, to other systems
+management packages, afte rhe gets to it first.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_08">Changes for 1.08</a></h1>
+<p>This is another relatively minor bug fix release, but since I'm
+releasing it internally at MSDW, I'm also releasing it to CPAN as
+well.</p>
+<p>
+</p>
+<h2><a name="mqseries__message__event_was_broken">MQSeries::Message::Event was broken</a></h2>
+<p>I made a global variable lexically scoped to its file with an
+erroneous ``my'' keyword.  Don't do that.  The Event parsing class was
+totally broken as a result.</p>
+<p>
+</p>
+<h2><a name="mqseries__command_error_checking_enhancement">MQSeries::Command error checking enhancement</a></h2>
+<p>When a command fails, the <code>Reason()</code> was being set to the last reason
+code found in the returned messages, which is always 3008 (command
+failed).  Now the code will catch the first non-zero return code, and
+default to that, and this reason code is usually the one you want.</p>
+<p>For example, InquireQueue for a non-existent queue name will now
+return 2085 (object not found), instead of the generic and
+uninteresting 3008.</p>
+<p>
+</p>
+<h2><a name="mqseries__queuemanager_and_mqseries__queue_constructor_bug">MQSeries::QueueManager and MQSeries::Queue constructor bug</a></h2>
+<p>Although I don't recommend using this particular interface, the
+constructors for both of these classes allow you to pass scalar
+references for the Reason and CompCode, so that the <code>MQCONN()</code> or
+<code>MQOPEN()</code> errors, if any, can be obtained.</p>
+<p>These were only being set if there was an error, and now they are set
+regardless.  Thus, if you initialize the values to, say
+MQRC_UNEXPECTED_ERROR and MQCC_FAILED, they will be left that way.</p>
+<p>Note that I highly recommend using the NoAutoConnect and NoAutoOpen
+arguments, and then error checking the -&gt;<code>Connect()</code> and -&gt;<code>Open()</code>
+methods explicitly.  The resulting code is much cleaner, IM!HO.</p>
+<p>
+</p>
+<h2><a name="mqseries__queue_put___method_wasn_t_setting_mqpmo_fail_if_quiescing">MQSeries::Queue-&gt;<code>Put()</code> method wasn't setting MQPMO_FAIL_IF_QUIESCING</a></h2>
+<p>The various *_FAIL_IF_QUIESCING options are set everywhere by default
+(as the author happens to beleive they should be), except here.  This
+is fixed.</p>
+<p>
+</p>
+<h2><a name="mqseries__pubsub__broker_stream_api_enhanced_to_support_alternate_users">MQSeries::PubSub::Broker/Stream API enhanced to support alternate users</a></h2>
+<p>In order to enable the development of adminstrative tools for
+Publish/Subscribe which allow me to age bogus subscriptions
+(i.e. subscriptions that point to non-existent queues), I needed to be
+able to DeregisterSubscriber as an alternate user ID.</p>
+<p>The API was enhanced to expose a bit more of the underlying method
+calls in order to make this possible.</p>
+<p>In addition, several minor bugs in the Administrative PubSub API were
+fixed, making it possible to get at almost all of the metatopic
+information easily.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_07">Changes for 1.07</a></h1>
+<p>This release is a minor bug fix release, but one of them is
+significant enough to justify a public release.</p>
+<p>
+</p>
+<h2><a name="mqseries__message__pcf_memory_leak">MQSeries::Message::PCF memory leak</a></h2>
+<p>The MQDecodePCF routine didn't properly mortalize the references it
+returns.  I hate it when that happens.  The result was that
+long-running applications that used the Command API (or any of the
+PCF-based formats) heavily (guess what the author was developing when
+he discovered this? ;-) will leak memory heavily.  This is fixed.</p>
+<p>In addition, the same error was made in the
+MQSeries::Message::RulesFormat XS code as well, and that was also
+fixed.</p>
+<p>Note that none of the basic MQI interfaces had any problems at all.
+There are now no known memory leaks anywhere in the XS code.  We've
+had long running perl daemons up for weeks using the basic MQSeries
+interface, with no reported issues.</p>
+<p>
+</p>
+<h2><a name="change_to_simplify_static_compiles">Change to simplify static compiles</a></h2>
+<p>The obnoxious, er, I mean, very important and absolutely essential
+legal question about the LICENSE file will be asked only once.  When
+compiling statically, the Makefile.PL gets run again, and if it blocks
+on input this is not only annoying, but it breaks the static compile.</p>
+<p>
+</p>
+<h2><a name="default_expiry_values_were_wrong">Default Expiry values were wrong</a></h2>
+<p>The default Expiry values used in the MQSeries::Command API were
+incorrect, having the same value as the WaitInterval.  As you probably
+know, Expiry is tenths of a second, and Wait is milliseconds.  Oops.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_06">Changes for 1.06</a></h1>
+<p>This release is the first to make it to CPAN (the Comprehensive Perl
+Archive Network), as the primary distribution mechanism, rather than
+IBM's proprietary Support Pac web site.  In addition, this code is now
+copyrighted by MSDW (the author's employer) but released under a
+license which is based on the Perl Artistic License.</p>
+<p>It is now truly Open Source.  Viva the Revolution, baby...</p>
+<p>
+</p>
+<h2><a name="mqseries__pubsub___">MQSeries::PubSub::*</a></h2>
+<p>The entire Publish/Subscribe API is new with this release.  This
+includes the following modules:</p>
+<dl>
+<dt><strong><a name="item_mqseries_3a_3apubsub_3a_3acommand">MQSeries::PubSub::Command</a></strong>
+
+<dd>
+<p>A base class for all of the Publish/Subscribe commands, this module is
+not used directly, but rather one of its two subclasses is.</p>
+</dd>
+</li>
+<dt><strong><a name="item_mqseries_3a_3apubsub_3a_3abroker">MQSeries::PubSub::Broker</a></strong>
+
+<dd>
+<p>This subclass of MQSeries::PubSub::Command, and
+MQSeries::QueueManager, implements an interface to the Broker-specific
+Publish/Subscribe commands.</p>
+</dd>
+<dd>
+<p>This module also supports an set of ``Extended Commands'', which are
+higher level interfaces to the contents of the administrative
+inforamtion in the metatopics.</p>
+</dd>
+</li>
+<dt><strong><a name="item_mqseries_3a_3apubsub_3a_3astream">MQSeries::PubSub::Stream</a></strong>
+
+<dd>
+<p>This subclass of MQSeries::PubSub::Command, and MQSeries::Queue,
+implements an interface to the Stream-specific Publish/Subscribe
+commands.</p>
+</dd>
+</li>
+<dt><strong><a name="item_mqseries_3a_3apubsub_3a_3amessage">MQSeries::PubSub::Message</a></strong>
+
+<dd>
+<p>This subclass of MQSeries::Message::RulesFormat provides an interface
+for creating and parsing MQRFH-formated Publish/Subscribe messages.</p>
+</dd>
+</li>
+<dt><strong><a name="item_mqseries_3a_3apubsub_3a_3aadminmessage">MQSeries::PubSub::AdminMessage</a></strong>
+
+<dd>
+<p>This quasi-subclass (not a *true* OO subclass, but who's looking) of
+MQSeries::Message::PCF provides an interface to the Publish/Subscribe
+administrative messages published in PCF format.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h2><a name="mqseries__message__pcf">MQSeries::Message::PCF</a></h2>
+<p>This is a new class which provides a much more generic interface to
+PCF messages.  Prior to this release, there were several routines
+which parsed implementation-specific formats, with a lot of duplicated
+code.</p>
+<p>This class can be used directly, but it was primary designed so that
+its two core functions (MQEncodePCF and MQDecodePCF) would be used as
+building blocks for the implementation-specific formats, such as
+Performance Events (MQSeries::Message::Event), Command server requests
+and responses (MQSeries::Command::*), and the Publish/Subscribe
+administrative messages (MQSeries::PubSub::AdminMessage).</p>
+<p>
+</p>
+<h2><a name="mqseries__message__rulesformat">MQSeries::Message::RulesFormat</a></h2>
+<p>This is a new class which provides an interface to the MQRFH Rules and
+Format messages used by the Publish/Subscribe system.  This can also
+be used to create messages for working with the NEON MQIntegrator 1.X
+product suites, since the format is the same, although the author
+hasn't actually tried this yet.</p>
+<p>
+</p>
+<h2><a name="mqseries__message__xmldumper">MQSeries::Message::XML-Dumper</a></h2>
+<p>This is a new subclass of MQSeries::Message which encodes/decodes
+complex perl data structures using the XML-Dumper module.  This was
+mostly done as a proof of principle, and to please some XML zealots.</p>
+<p>Note that the parsing of XML is much more expensive than the Storable
+approach, and if you have a perl process on the sending and receiving
+end of a message flow, the author still recommends using Storable.</p>
+<p>This requires the CPAN XML::Dumper and XML::Parser modules.</p>
+<p>
+</p>
+<h2><a name="mqseries__command">MQSeries::Command</a></h2>
+<dl>
+<dt><strong><a name="item_more_complete_documentation">More complete documentation</a></strong>
+
+<dd>
+<p>The various strings used to represent the PCF parameters and values
+have finally been documented, so someone other than the author may
+actually be able to use this code.</p>
+</dd>
+</li>
+<dt><strong><a name="item_extended_to_v5_2e1_pcf_commands">Extended to V5.1 PCF Commands</a></strong>
+
+<dd>
+<p>All of the new Commands for V5.1 are supported, and in fact, even if
+you compile the MQSeries API with 5.0, you can still use the new
+commands, and parse the resulting PCF parameters.  The code which maps
+numeric parameters to key strings has been ``flattened'' such that it
+doesn't use the actual C macros.</p>
+</dd>
+<dd>
+<p>These files (MQSeries/Command/PCF/*.pl) were auto-generated on an
+MQSeries 5.1 host, so the macro-to-number mapping has already been
+done, and it is not necessary for the C macro to have been compiled
+into constants.c.</p>
+</dd>
+</li>
+<dt><strong><a name="item_extended_to_v2_2e1_mqsc_commands">Extended to V2.1 MQSC Commands</a></strong>
+
+<dd>
+<p>Most, but not all, of the MQSC commands (i.e. commands sent to an
+MQSC-only command server, for example an MVS queue manager) have been
+supported, and the API can parse all of new V2.1 object attributes
+(like ``ALTDATE'' and ``ALTTIME'').</p>
+</dd>
+<dd>
+<p>WARNING: The MQSC code has not been extensively tested, so use it with
+caution.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h2><a name="mqseries__queuemanager">MQSeries::QueueManager</a></h2>
+<dl>
+<dt><strong><a name="item_noautoconnect_option">NoAutoConnect option</a></strong>
+
+<dd>
+<p>The call to MQCONN is normally done in the constructor, but if it
+fails, the error checking semantics are ugly.  A new option
+(NoAutoConnect) disables the implicit call to -&gt;Connect(), and allows
+the developer to make this call, and error check it explicitly.</p>
+</dd>
+<dd>
+<p>The <code>Connect()</code> method is also new.</p>
+</dd>
+</li>
+<dt><strong><a name="item_inquire_2fmqinq_support">Inquire/MQINQ Support</a></strong>
+
+<dd>
+<p>Method calls have added to support the <code>MQINQ()</code> call against the queue
+manager itself.  This includes both <code>Open()</code> and <code>Close()</code> methods, which
+were not previously available.</p>
+</dd>
+<dd>
+<p>The <code>Open()</code> method is also new, although it is just a rename of the
+older semi-private <code>_mqopen()</code> method call.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h2><a name="mqseries__queue">MQSeries::Queue</a></h2>
+<dl>
+<dt><strong><a name="item_noautoopen_option">NoAutoOpen option</a></strong>
+
+<dd>
+<p>The call to MQOPEN is normally done in the constructor, but if it
+fails, the error checking semantics are ugly.  A new option
+(NoAutoOpen) disables the implicit call to -&gt;Open(), and allows the
+developer to make this call, and error check it explicitly.</p>
+</dd>
+</li>
+<dt><strong><a name="item_inquire_2fset_mqinq_2fmqset_support">Inquire/Set MQINQ/MQSET Support</a></strong>
+
+<dd>
+<p>Method calls have added to support the <code>MQINQ()</code> and <code>MQSET()</code> calls
+against queues.</p>
+</dd>
+</li>
+<dt><strong><a name="item_close_method_call">Close method call</a></strong>
+
+<dd>
+<p>Objects can now be explicitly closed.  In previous releases this was
+done via the object destructor, and thus couldn't be error checked.
+Implicit closing is still preferred, but CloseOptions can be given to
+the constructor to control how the object is closed.</p>
+</dd>
+<dd>
+<p>This is particularly useful for creating permanent dynamic queues
+(which can accept persistent messages) which are purged and deleted
+upon close.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h2><a name="mqseries_core_module">MQSeries core module</a></h2>
+<dl>
+<dt><strong><a name="item_null_2dvalued_macros_properly_supported">Null-valued macros properly supported</a></strong>
+
+<dd>
+<p>There are several macros, such as MQCI_NONE, which are a fixed length
+string of null characters.  These were not properly defined in the
+constants.c file, and thus couldn't be used as expected.</p>
+</dd>
+<dd>
+<p>Now, these macros all evaluate to a string of nulls of the correct
+length, this you can use them precisely as documented in the MQI docs.</p>
+</dd>
+</li>
+<dt><strong><a name="item_mqparseevent_2c_mqcommandrequestpcf_2c_mqcommandre">MQParseEvent, MQCommandRequestPCF, MQCommandResponsePCF and MQParseDeadLetter</a></strong>
+
+<dd>
+<p>These core module subroutines were removed.</p>
+</dd>
+<dd>
+<p>MQParseDeadLetter never worked, and it will be implemented
+(eventually) in the same way that MQSeries::Message::RulesFormat was
+done, with its own XS source file.</p>
+</dd>
+<dd>
+<p>The other 3 all dealt with very specific implementations of the PCF
+format, and these were replaced by the MQSeries::Message::PCF class,
+which provides very generic PCF parsing and encoding routines
+(MQEncodePCF and MQDecodePCF).</p>
+</dd>
+<dd>
+<p>Mapping the generic PCF into message format specific data is done by
+``private'' class methods _TranslatePCF in each of the relevant OO
+modules.</p>
+</dd>
+<dd>
+<p>This was a key prerequisite for developing
+MQSeries::PubSub::AdminMessage, which is also based on a PCF message
+format.  Future implementations of special formats based on PCF should
+be easy.  Of course, now IBM wants to move to XML for everything,
+so...</p>
+</dd>
+</li>
+<dt><strong><a name="item_mqreasontostrings">MQReasonToStrings</a></strong>
+
+<dd>
+<p>This subroutine's implementation was dramatically reworked.</p>
+</dd>
+<dd>
+<p>This used to be implemented in C, inside the XS routine, but now the
+hash of key/value pairs mapping a numeric ReasonCode to a readable
+test string is done via a pair of automatically compiled files
+(MQSeries/Constants/Reason*.pl)</p>
+</dd>
+<dd>
+<p>In fact, all of the files in MQSeries/Constants are auto-generated from
+templates in src/pre.in, by the tool src/util/flatten_macros.  This is
+a huge win, as it basically does the macro-to-value mapping such that
+the perl API is dealing with raw numbers.</p>
+</dd>
+<dd>
+<p>There is a non-trivial startup cost otherwise, as each and every macro
+has to be looked up in the symbol table, the AUTOLOAD function called,
+a C subroutine called, etc.  This saves a few seconds of startup time.</p>
+</dd>
+</li>
+<dt><strong><a name="item_xs_code_streamlined">XS code streamlined</a></strong>
+
+<dd>
+<p>Most of the non-MQI subroutines were removed entirely, or moved
+elsewhere.  The MQSeries.xs.in directory is much more lean.</p>
+</dd>
+</li>
+<dt><strong><a name="item_xs_code_no_longer_leaks_memory">XS code no longer leaks memory</a></strong>
+
+<dd>
+<p>The author now fully understands the XS concepts of mortality and
+reference counts, and the code returns correctly mortalized, and
+properly reference counted values.</p>
+</dd>
+</li>
+<dt><strong><a name="item_support_for__22default_22_queue_manager">Support for ``default'' queue manager</a></strong>
+
+<dd>
+<p>The QueueManager key is no longer required by most of the OO API
+constructors.  If you have configured a default queue manager for your
+environment, then you can use it with the OO API as of this release.
+Before, the QueueManager key was required to have a true value, and
+since the default queue manager is ``'', and ``'' is false...</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h2><a name="installation_procedures__and_other_miscellany">Installation Procedures, and other Miscellany</a></h2>
+<ol>
+<li><strong><a name="item_004_required_2c_not_5_2e005">004 required, not 5.005</a></strong>
+
+<p>The 5.005 prerequisite was relaxed to 5.004, and the requirement that
+the perl interpreter itself be linked directly with -lthread (or
+-lpthread, or whatever) was removed.  The MQSeries.so libraries are
+themselves compiled with the appropriate dependencies on libthread,
+and this code now works fine with a standard, out-of-the-tarball
+compile of perl5.004 or later.</p>
+</li>
+<dt><strong><a name="item_new_config_parameters">New CONFIG parameters</a></strong>
+
+<dd>
+<p>It is now possible to explicitly disable either the server or client
+API compile.  The Makefile.PL now does a more generic job of
+determining whether or not you appear to have support for the server
+API, which is the more common case (eg. Linux, SunOS and IRIX only
+have client implementations available).</p>
+</dd>
+<dd>
+<p>At least one site didn't support clients at all, and they didn't want
+to build in the support, so they can now turn it off via CONFIG.</p>
+</dd>
+</li>
+<dt><strong><a name="item_manifest_and__2eexclude_auto_2dgenerated">MANIFEST and .exclude auto-generated</a></strong>
+
+<dd>
+<p>These files are now auto-generated by development utilities in the
+util subdirectory, rather than being updated manually.</p>
+</dd>
+</li>
+</ol>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_05">Changes for 1.05</a></h1>
+<p>This release required 5.005, built with thread support (this
+restriction was subsequently removed in 1.06).</p>
+<p>
+</p>
+<h2><a name="installation_procedures">Installation Procedures</a></h2>
+<dl>
+<dt><strong><a name="item_mqserver_3a_3amqseries_made_optional">MQServer::MQSeries made optional</a></strong>
+
+<dd>
+<p>Compilation of the MQServer::MQSeries API is automatically disabled on
+SunOS 4.1.3 and IRIX hosts, for which we do not have a server API.</p>
+</dd>
+</li>
+<dt><strong><a name="item_constants_2ec_2epl_added">constants.c.PL added</a></strong>
+
+<dd>
+<p>The huge, growing list of MQSeries C macros are now extracted from the
+MQSeries C include files automatically, and the @EXPORT list is built
+dynamically.  The code for constants.c is also auto-generated, and the
+code handles several different types of constant (hex, string,
+character, etc).</p>
+</dd>
+<dd>
+<p>The code also parses all of the available C header files, and makes
+all possible macros available.  This makes maintenance of the macro
+list easy, but it does result in significant bloat of the namespace
+exported by MQSeries.  So be it.</p>
+</dd>
+</li>
+<dt><strong><a name="item_test_suite">Test suite</a></strong>
+
+<dd>
+<p>The test suite was reorganized to a SysV-style rc.d directory syntax,
+with files named 10foo.t, 20bar.t, etc.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h2><a name="mqseries">MQSeries</a></h2>
+<dl>
+<dt><strong><a name="item_distribution_list_support">Distribution List Support</a></strong>
+
+<dd>
+<p>Support for Distribution lists was added to the core MQI functions,
+such as MQOPEN, MQPUT and MQPUT1.  This required a significant
+re-architecture of these functions.  The OO API classes were also
+extended to support dist lists as well.</p>
+</dd>
+<dd>
+<p>This functionality is all enabled only if one compiles with V5, of
+course.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h2><a name="mqseries__queuemanager">MQSeries::QueueManager</a></h2>
+<dl>
+<dt><strong><a name="item_mqconn_retry_logic">MQCONN retry logic</a></strong>
+
+<dd>
+<p>The MQCONN retry logic is disabled by default.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h2><a name="mqseries__queue">MQSeries::Queue</a></h2>
+<dl>
+<dt><strong><a name="item_mqopen_retry_logic">MQOPEN retry logic</a></strong>
+
+<dd>
+<p>This was stripped out of the code entirely, since it never really
+worked, and I doubt it ever would have.  Bad idea.</p>
+</dd>
+</li>
+<dt><strong><a name="item_autoresize_logic">AutoResize logic</a></strong>
+
+<dd>
+<p>Logic was added to adjust the buffer size automatically, and retry an
+<code>MQGET()</code> call, when a truncated message is received, and truncated
+messages are not accepted.  This functionality is available in the C++
+API, the source of inspiration for the idea.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h2><a name="mqseries__command">MQSeries::Command</a></h2>
+<dl>
+<dt><strong><a name="item_documentation">Documentation</a></strong>
+
+<dd>
+<p>This module was finally documented, but only the object constructor
+and basic methods were documented.  Complete documentation of the
+command syntax was not added until 1.06.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_04">Changes for 1.04</a></h1>
+<p>
+</p>
+<h2><a name="mqseries">MQSeries</a></h2>
+<p>Supports explicit loading of MQClient::MQSeries or MQServer::MQSeries,
+rather than implicit only.</p>
+<p>
+</p>
+<h2><a name="mqseries__command">MQSeries::Command</a></h2>
+<p>Introduce the Command Server API, for both PCF and MQSC command
+messages.</p>
+<p>
+</p>
+<h2><a name="mqseries__message__storable">MQSeries::Message::Storable</a></h2>
+<p>Uses nfreeze, which is supposed to use network byte order, rather than
+freeze.</p>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_03">Changes for 1.03</a></h1>
+<dl>
+<dt><strong><a name="item_oo_api">OO API</a></strong>
+
+<dd>
+<p>First implementation of the OO portion of the API</p>
+</dd>
+</li>
+<dt><strong><a name="item_xs_source">XS source</a></strong>
+
+<dd>
+<p>Eliminated the dual XS file templates, using one source for both V2
+and V5</p>
+</dd>
+</li>
+<dt><strong><a name="item_mqseries_core">MQSeries core</a></strong>
+
+<dd>
+<p>Added two new utility functions to the core API:</p>
+</dd>
+<dd>
+<pre>
+    MQParseEvent
+    MQReasonToText</pre>
+</dd>
+</li>
+<dt><strong><a name="item_locale_hacks">Locale hacks</a></strong>
+
+<dd>
+<p>MQSeries.pm will automagically set reasonable values for the LANG and
+NLSPATH environment variables, if not set.</p>
+</dd>
+</li>
+<dt><strong>Documentation</strong>
+
+<dd>
+<p>Significantly expanded documentation</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="changes_for_1_02">Changes for 1.02</a></h1>
+<dl>
+<dt><strong><a name="item_introduced_the_extended_test_suite">Introduced the extended test suite</a></strong>
+
+<dt><strong><a name="item_dual_client_2fserver_support">Dual client/server support</a></strong>
+
+<dd>
+<p>Introduced the dual namespaces to make client vs. server usage
+transparent.  That is, MQSeries.pm really pulls in
+MQServer/MQSeries.pm on a queue manager, and MQClient/MQSeries.pm
+otherwise.</p>
+</dd>
+</li>
+<dt><strong><a name="item_mqseries">PLMQ -&gt; MQSeries</a></strong>
+
+<dd>
+<p>Change the module name from PLMQ to MQSeries, and changed the API
+calls from GET to MQGET, etc., making the function mapping one to one.</p>
+</dd>
+</li>
+<dt><strong><a name="item_typemap_2epl">typemap.PL</a></strong>
+
+<dd>
+<p>Automated the typemap generation using a typemap.PL file</p>
+</dd>
+</li>
+</dl>
+
+</body>
+
+</html>

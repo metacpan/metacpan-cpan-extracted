@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Migraine
+version:             0.54
+abstract:            DB schema MIGRAtor that takes headache out of the game
+license:             ~
+author:              
+    - Esteban Manchado Velázquez <estebanm@opera.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    DBI:                           1.51
+    Test::Deep:                    0.093
+    YAML:                          0.57
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

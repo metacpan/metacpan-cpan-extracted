@@ -1,0 +1,16 @@
+MIME-Base32
+===========
+
+1.301	2016-04-14
+	- release 1.300_001 without further changes as 1.301
+
+1.300_001	2016-04-04
+	- Updated the module to fit current release standards
+	- Added POD and POD-Coverage tests
+	- Combined test.pl and test1.pl into t/00-basic.t
+	- Closes https://rt.cpan.org/Ticket/Display.html?id=105711
+	- Closes https://rt.cpan.org/Ticket/Display.html?id=53173
+	- Fixed a few minor things to prepare for a developer release
+
+1.02	2010-08-25
+	- Version released to the CPAN

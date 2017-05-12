@@ -1,0 +1,81 @@
+{
+   "abstract" : "Automatically runs Data::Dumper against the last element in the list passed to any ->log->method() if it's a ref.",
+   "author" : [
+      "Nour Sharabash <amirite@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-DumpyLog",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojo::Base" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Requirements" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "List::Util" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::DumpyLog" : {
+         "file" : "lib/Mojolicious/Plugin/DumpyLog.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sharabash/mojolicious-plugin-dumpylog/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Mojolicious-Plugin-DumpyLog",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/sharabash/mojolicious-plugin-dumpylog.git",
+         "web" : "https://github.com/sharabash/mojolicious-plugin-dumpylog"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:AMIRITE",
+   "x_contributors" : [
+      "Nour Sharabash <nour.sharabash@gmail.com>"
+   ]
+}
+

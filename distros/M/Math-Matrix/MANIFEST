@@ -1,0 +1,8 @@
+MANIFEST
+Makefile.PL
+Matrix.pm
+t/basic.t
+t/extension.t
+t/diagonal.t
+README
+META.yml                                 Module meta-data (added by MakeMaker)

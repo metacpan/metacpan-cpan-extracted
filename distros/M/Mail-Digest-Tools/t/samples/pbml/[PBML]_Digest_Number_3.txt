@@ -1,0 +1,239 @@
+------------------------ Yahoo! Groups Sponsor 
+---------------------~-->
+Send the freshest Valentine's flowers with a FREE vase from only 
+$29.99!
+Shipped direct from the grower with a 7 day freshness guarantee and 
+prices so low you save 30-55% off retail!
+http://us.click.yahoo.com/_iAw9B/xdlHAA/3jkFAA/ndFolB/TM
+---------------------------------------------------------------------~->
+
+There are 7 messages in this issue.
+
+Topics in this digest:
+
+      1. Re: how to get the current working directory
+           From: dallysome@some.web.address.com
+      2. Re: Returning 2 file handles?
+           From: dallysome@some.web.address.com
+      3. Young and inexperienced
+           From: "cravn_thebig_d_now" <cravn_thebig_d_now@some.web.address.com>
+      4. Re: HOW TO DO This...
+           From: merlyn@some.web.address.com
+      5. Re: Young and inexperienced
+           From: Mike Simpson <gb1198@some.web.address.com>
+      6. Re: Young and inexperienced
+           From: "Alan" <nitedmn@some.web.address.com>
+      7. Re: Returning 2 file handles?
+           From: "bruce" <bruce@earthlink.net>
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 1
+   Date: Wed, 11 Feb 2004 09:18:04 -0000
+   From: dallysome@some.web.address.com
+Subject: Re: how to get the current working directory
+
+--- In perl-beginner@yahoogroups.com, "fd97616" <fd97616@y...> wrote:
+> hello,
+> How do you get the currentl working directory into a variable in perl ?
+> and how do you change the directory inside a perl script.
+> 
+> like say if i am in c:\perl
+> and i need to make the current directory as: 
+> c:\
+> then how do i do this.
+> thanks.
+
+Use the 'chdir()' function.
+
+Read about it with:
+ (this is for Randall)
+  perldoc -f chdir
+or
+ http://www.perldoc.com/perl5.8.0/pod/func/chdir.html
+
+Even though you are on Windows you can use 
+ chdir( '/' );
+to get to the root directory. Using forward slashes makes your script
+more portable and reg exps and paths easier to read and write.
+
+Use the Cwd module if you need to know your current path.
+ perldoc Cwd
+or
+http://www.perldoc.com/perl5.8.0/lib/Cwd.html
+
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 2
+   Date: Wed, 11 Feb 2004 09:19:38 -0000
+   From: dallysome@some.web.address.com
+Subject: Re: Returning 2 file handles?
+
+--- In perl-beginner@yahoogroups.com, "bruce" <bruce@e...> wrote:
+> The overall program is to edit configuration files. My sub should 
+> return 2 file handles that it opens in the following manor.
+> 
+> 1)If a backup file doesn't exist
+>   a.Call an OS copy command to make one 
+> <snip other stuff not relevant to my comment>
+
+For portability I suggest using the File::Copy module instead of an OS
+copy command like 'copy' or 'cp'.
+
+perldoc File::Copy
+or
+http://www.perldoc.com/perl5.8.0/lib/File/Copy.html
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 3
+   Date: Wed, 11 Feb 2004 11:14:24 -0000
+   From: "cravn_thebig_d_now" <cravn_thebig_d_now@some.web.address.com>
+Subject: Young and inexperienced
+
+I just turned 19 and well I am new to this area. I have recently gotten 
+myself in shape and started treating my body as a temple!  I lost like 
+50 pounds and now I am back down to the weight I should be... Tipping 
+the scales at just over 100 pounds.  I am only 5'1", but when I lost the 
+weight I exercised and lifted weights so my body got real tight... yeah 
+tight everywhere.
+
+The only thing that didnt lose weight is my chest.  I am still a 34D, I 
+am a bit top heavy but they dont sag and they are both pierced.
+
+Someone please check out my profile, I dont care about age so look me 
+up on.
+
+http://www.internetsexads.com/landing.asp?afl=TYHO
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 4
+   Date: 11 Feb 2004 04:06:07 -0800
+   From: merlyn@some.web.address.com
+Subject: Re: HOW TO DO This...
+
+>>>>> "Thomas" == Thomas Sweden <Thomas.Sweden@hp.com> writes:
+
+Thomas> Why do you need a perl script when a shell script (or batch 
+script,
+Thomas> depending on OS) would do the job just fine..
+
+Thomas> #!/bin/sh
+Thomas> cd FIRST ; ls * | while read FLNAME
+
+Please don't do this.  You're saying:
+
+1) shell, please expand *
+2) ls, please list each of these 1000 files.  Oh, and if any are 
+directories
+   expand their contents for me
+3) shell, please read a line that may have one name on it, or a hundred
+
+You really just wanted:
+
+for FLNAME in *
+
+because that starts far fewer processes and is far more secure from
+filenames that contain whitespace
+
+Thomas> do
+Thomas> 	/path/to/appl -$FLNAME
+Thomas> done
+
+Thomas> In perl you'd have to either mess with Globs or pipe all sorts 
+of stuff,
+Thomas> which, IMHO, is un-necessary.
+
+Not really.  In Perl, this would be:
+
+}
+
+Or even shorter:
+
+Don't be dissing Perl in my presence. :)
+
+You could even do this from the command line:
+
+perl -e 'system "/path/to/appl", "-$_" for @ARGV' *
+
+-- 
+Randal L. Schwartz
+<merlyn@some.web.address.com> <URL:http://www.some.web.address.com/merlyn/>
+Perl/Unix/security consulting, Technical writing, Comedy, etc. etc.
+See PerlTraining.Stonehenge.com for onsite and open-enrollment Perl 
+training!
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 5
+   Date: Wed, 11 Feb 2004 09:13:57 -0500
+   From: Mike Simpson <gb1198@some.web.address.com>
+Subject: Re: Young and inexperienced
+
+Can you supply some code so we can help?
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 6
+   Date: Wed, 11 Feb 2004 08:33:23 -0600
+   From: "Alan" <nitedmn@some.web.address.com>
+Subject: Re: Young and inexperienced
+
+Maybe try gzip to compress the excess weight.
+
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+Message: 7
+   Date: Wed, 11 Feb 2004 23:54:14 -0000
+   From: "bruce" <bruce@earthlink.net>
+Subject: Re: Returning 2 file handles?
+
+I will do that.
+
+Thanks!
+Bruce
+
+
+
+________________________________________________________________________
+________________________________________________________________________
+
+
+Unsubscribing info is here: 
+http://help.some.web.address.com/help/us/groups/groups-32.html
+------------------------------------------------------------------------
+Yahoo! Groups Links
+
+<*> To visit your group on the web, go to:
+     http://groups.some.web.address.com/group/perl-beginner/
+
+<*> To unsubscribe from this group, send an email to:
+     perl-beginner-unsubscribe@yahoogroups.com
+
+<*> Your use of Yahoo! Groups is subject to:
+     http://docs.some.web.address.com/info/terms/
+ 
+ 
+

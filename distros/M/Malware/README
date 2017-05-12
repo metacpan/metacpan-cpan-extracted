@@ -1,0 +1,217 @@
+NAME
+    Malware - Perl extension for storing and manipulation malware and it's
+    attributes
+
+SYNOPSIS
+    See Constructor new()
+
+DESCRIPTION
+    The idea of this module is to allow authors to parse different inputs
+    that perform malware analysis and build objects that describe a piece of
+    malware's behaviour. From here we can write detection or blocking rules
+    based on that behavior.
+
+    For now, the parsers will live within this class as they are directly
+    connected to the API, this may change in the future.
+
+OBJECT METHODS
+  new()
+    Object Constructor
+
+      my $m = Malware->new(
+            -platform => 'win32',
+            -filesize => $size,
+            -filesizeUnits => $units,
+            -filename => $name,
+            -classification => $class,
+            -md5sum => $md5,
+            -source => $src,
+            -sourceLoc => $srcLoc,
+            -rawReport => $rawTextReport,
+            -dt_found => $dt, # [see Time::Timestamp]
+            -connections => $cons, # [see Net::Connection::Simple]
+            -securityIssues => $si,
+            -antiEmulation => $ae,
+            -backdoors => $bd, # [see Net::Protocol::Simple]
+            -malwareFiles => $mw # [hashref],
+      );
+
+    By setting the -platform, the module will try to re-bless itself as that
+    module (ie: Malware::Win32 for -platform => win32). This allows you to
+    scale into specific OS's and their properties (registry for win32).
+
+    See OBJECT ACCESSORS for the i/o of these properties
+
+  blurb()
+    Returns a blurb of the raw report in a nicer Text::Table'ish form. If
+    you subclass (Malware::$platform) this module, you can tag into this
+    method by creating a 'sub _blurb' function that returns a HASHREF in the
+    form:
+
+      sub _blurb {
+            my $self = shift;
+            my $hr = {};
+            $hr->{Registry} = $self->registry();
+            return $hr;
+      }
+
+  returnConnectionsByLayer_array()
+    Diggs into the connections property and returns the type of connection
+    you are looking for.
+
+    Example: We want all the url connections the malware made
+
+      my @http = $m->returnConnectionsByLayer(
+            -type => 'url',
+            -layer => 7,
+            -protocol => 'http')
+      );
+
+    Example: We want all the irc connections the malware made via dns
+
+      my @irc_dns = $m->returnConnectionsByLayer(
+            -type => 'dns',
+            -layer => 7,
+            -protocol => 'IRC')
+      );
+
+    Example: We want all the irc connections the malware made via direct IP
+
+      my @irc_dip = $m->returnConnectionsByLayer(
+            -type => 'dip',
+            -layer => 7,
+            -protocol => 'IRC')
+      );
+
+    All three params are required or it will return:
+
+      ("Invalid parameters...",undef)
+
+    On success it returns an @rray of strings
+
+ACCESSORS / MODIFIERS
+  filesize()
+    Sets and returns the filesize
+
+  filesizeUnits()
+    Sets and returns the filesizeUnits
+
+  filename()
+    Sets and returns the filename()
+
+  classification()
+    Sets and returns the malware classification
+
+  md5sum()
+    Sets and returns the md5sum
+
+  dt_found()
+    Sets and returns the date found, return is a Time::Timestamp object
+
+      $m->dt_found($timestamp,$timezone);
+
+    Timezone is optional, but the timing could get screwed up if you don't
+    set it
+
+  source()
+    Sets and returns the malware report source (where did you get it?)
+
+  sourceLoc()
+    Sets and returns the source location (what medium did you get it from
+    (email, website, etc...)
+
+  connections()
+    Sets and returns the connection behaviour of the malware.
+
+      my $c = Net::Connection::Simple->new(...);
+      $m->connections($c);
+
+      my @cons = @{$m->connections()};
+
+    Accepts: Net::Connection::Simple or returns ($errstr,undef)
+
+    Returns: a ref to an array of Net::Connection::Simple objects
+
+  backdoors()
+    Sets and returns the malwares backdoor behavior.
+
+      my $p = Net::Protocol::Simple->new(...);
+      $m->backdoors($p);
+
+      my @bds = @{$m->backdoors};
+
+    Accepts: Net::Protocol::Simple or returns ($errstr,undef)
+
+    Returns: a ref to an array of Net::Protocol::Simple objects
+
+  processInfo()
+    Sets and returns the processInfo behavior.
+
+    Accepts: string
+
+    Returns: a ref to an array of strings
+
+  filesystem()
+    Sets and returns the filesystem behavior.
+
+    Accepts: string
+
+    Returns: a ref to an array of strings
+
+  rawReport()
+    Sets and returns the raw report string
+
+    Accepts: string
+
+    Returns: string
+
+  malwareFiles()
+    Sets and returns a list of other files that are found to be created or
+    associated with this malware
+
+    Accepts: HASHREF or returns ($errstr,undef)
+
+      $m->malwareFiles({
+            $f1 => $md5,
+            $f2 => $virus_sig,
+      });
+
+    OR
+
+      $m->malwareFiles({
+            $f1->{md5} = $md5,
+            $f1->{vsig} = $virus_sig,
+            $f1->{snortSig} = $snort_sig,
+      });
+
+    Returns: HASHREF
+
+  antiEmulation()
+    Sets and returns the antiEmulation behavior.
+
+    Accepts: int [undef|1|0]
+
+    Returns: whatever you put in
+
+    **Note: the blurb will translate [undef] as unknown
+
+  securityIssues()
+    Sets and returns other security issues that are caused.
+
+    Accepts: string
+
+    Returns: a ref to an array of strings
+
+SEE ALSO
+    Time::Timestamp,Net::Connection::Simple,Net::Protocol::Simple
+
+AUTHOR
+    Wes Young, <saxguard9-cpan@yahoo.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Wes Young
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.7 or, at
+    your option, any later version of Perl 5 you may have available.
+

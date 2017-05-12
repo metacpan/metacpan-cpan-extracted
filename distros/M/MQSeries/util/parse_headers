@@ -1,0 +1,396 @@
+#-*-perl-*-
+#
+# $Id: parse_headers,v 38.5 2012/09/26 16:15:38 jettisu Exp $
+#
+# (c) 1999-2012 Morgan Stanley & Co. Incorporated
+# See ..../src/LICENSE for terms of distribution.
+#
+# This code pulls in all of the #define definitions, and creates
+# arrays for each type of constant.  This will be used in
+# constants.c.PL to autogenerate the functions which expand the
+# macros.
+#
+
+use English;
+use Config;
+
+opendir(INCLUDE,$include) ||
+  die "Unable to opendir $include: $ERRNO\n";
+
+foreach my $dirent ( readdir(INCLUDE) ) {
+  next unless $dirent =~ /^cm.*\.h$/;
+  next unless -f "$include/$dirent"; # Skip dangling symlinks
+  push(@headers,"$include/$dirent");
+}
+
+closedir(INCLUDE);
+
+#
+# Add in the cmqcfce.h only if we haven't found it already.
+#
+my %headers = map { $_ => 1 } @headers;
+unless ( $headers{"$include/cmqcfce.h"} ) {
+    my $found = 0;
+    foreach my $incdir ( qw(./include ../include ../../include ../../../include) ) {
+        next unless -f "$incdir/cmqcfce.h";
+        push(@headers,"$incdir/cmqcfce.h");
+        $found = 1;
+        last;
+    }
+    die "Unable to locate cmqcfce.h\n" unless $found;
+}
+
+
+#
+# Handle 64-bit support.  If your platform is 64 bit but doesn't set
+# "use64bitall", please get us the details.
+#
+my $use_64_bit = 0;
+if( $Config{use64bitall} ) {
+    $use_64_bit = 1;
+}
+
+foreach my $header ( @headers ) {
+
+    #print "Searching $header\n";
+
+    open(HEADER, '<', $header) or die "Unable to open $header: $ERRNO\n";
+
+    #
+    # To support the 64-bit macros, we support very simple conditionals,
+    # nested one deep.
+    #
+    my $conditional;            # Name (undef if not in confitional)
+    my $cond_else;              # 0: if #if, 1: in #else
+
+    #
+    # Constants defined in terms of other constants are handled at the
+    # end of the file, as they frequently contain forward definitions.
+    #
+    my %postponed;
+
+    while ( <HEADER> ) {
+
+        s/^\s*//;
+        chomp;
+
+        if (m@^#if !defined.*\s+/\*\s+File not yet included\?\s+\*/@ ||
+            m@^#endif\s+/\* End of header file \*/@
+           ) {
+            #print "Skip include guard: $_\n";
+            next;
+        }
+
+        #
+        # Entering a conditional?
+        #
+        if (/^#if !?defined\((.*?)\)/) {
+            if (defined $conditional) {
+                die "Cannot handle nested conditional in [$header]: while in [$conditional], found [$1]";
+            }
+            $conditional = $1;
+            $cond_else = 0;
+            #print "Entering [$conditional]\n";
+        } elsif (/^#else/) {
+            unless (defined $conditional) {
+                die "Have #else without conditional in [$header]";
+            }
+            #print "Entering #else $conditional\n";
+            $cond_else = 1;
+        } elsif (/^#endif/) {
+            unless (defined $conditional) {
+                die "Have #endif without conditional in [$header]";
+            }
+            #print "Leaving [$conditional]\n";
+            $conditional = undef;
+        }
+
+        #
+        # Handle line continuation
+        #
+        while ( m:\\$: ) {
+            s/\\$//;
+            my $cont = <HEADER>;
+            $cont =~ s/^\s*//;
+            $_ .= $cont;
+            chomp;
+        }
+
+        next unless /\#define/;
+
+        #
+        # Strip trailing C comments (there are a few in the V2 header
+        # files), and trailing white space.
+        #
+        s:\s+/\*.*\*/::;
+        s/\s*$//;
+
+        my ($key,$value) = (split(/\s+/,$_,3))[1,2];
+        #print STDERR "Have key [$key] value [$value]\n";
+
+        #
+        # Skip the MQ_64_BIT constant (which has no value)
+        #
+        next if ($key eq 'MQ_64_BIT');
+
+        #unless (defined $value) {
+        #    print STDERR "XX: key [$key] leads to undefined value\n";
+        #}
+
+        #
+        # If we're in a conditionial 64-bit block, we may have to
+        # skip a macro.
+        #
+        if (defined $conditional && $conditional eq 'MQ_64_BIT') {
+            if ($cond_else == 0 && $use_64_bit == 0) {
+                #print "Skip 64-bit macro value [$key] [$value]\n";
+                next;
+            } elsif ($cond_else && $use_64_bit) {
+                #print "Skip 32-bit macro value [$key] [$value]\n";
+                next;
+            }
+        }
+
+        next if $key eq "MQENTRY";
+        next if $key eq "MQPOINTER";
+
+        #
+        # Skip a bunch of stuff needed only by handicapped C
+        # programmers (we, OTOH, have perl ;-)
+        #
+        next if $key =~ /_ARRAY$/;
+        next if $key =~ /_INCLUDED$/;
+        next if $key =~ /_A$/;
+
+        #
+        # Skip some bogus macros added to 5.1 that we ain't gonna add
+        # the already overly bloated MQSeries namespace.
+        #
+        next if $key eq 'MQCHANNELEXIT';
+        next if $key eq 'MQCHANNELAUTODEFEXIT';
+        next if $key eq 'MQDATACONVEXIT';
+        next if $key eq 'MQTRANSPORTEXIT';
+
+        #
+        # We have to be careful only to skip the definitions which are
+        # for default structures.
+        #
+        next if ( $key =~ /_DEFAULT$/ && $value =~ /,/ );
+
+        #
+        # MQ V7 adds some defintions to data structures that we don't
+        # want to parse as constants.
+        #
+        next if ($key =~ /^MQPROP_INQUIRE_ALL/);  # ..ALL, ..ALL_USR
+
+        $value =~ s/^\(\s*//;
+        $value =~ s/\s*\)$//;
+
+        #
+        # Hex
+        #
+        if ( $value =~ /^0x/ ) {
+            $value =~ s/L$//;
+            $constant_hex{$key} = eval($value);
+        }
+        #
+        # Some #defines are expressed in terms of others (binary OR).
+        # Postpone them and handle them at the end of the file
+        #
+        elsif ($value =~ /^\s* (MQ\w+ \s* \| \s*)+ MQ\w+ \s*$/x) {
+            $value =~ s/^\s+//;
+            $value =~ s/\s+$//;
+            $postponed{$key} = $value;
+            next;
+        }
+
+        #
+        # Numeric constants
+        #
+        # NOTE: Special case to handle the MQ_64_BIT conditionals.
+        # This works because the ONLY parameters that are
+        # affected by these conditionals are the _LENGTH parameters
+        # for some of the structures.
+        #
+        # At this time, we assume you are not using the 64-bit client
+        # on Solaris.  Patches to support this (preferably with
+        # auto-detection in the Makefile) are welcome.
+        #
+        elsif ( $value =~ /L$/ || $value =~ /^-?\d+$/) {
+
+            $value =~ s/L$//;
+
+            if (not exists $constant_numeric{$key} || # First time
+                (not defined $value && not defined $constant_numeric{$key}) &&
+                (defined $value && defined $constant_numeric{$key} && $constant_numeric{$key} eq $value) # No change
+               ) {
+                $constant_numeric{$key} = $value;
+            } else {
+                print STDERR "WARNING: Have two conflicting constant values for [$key], using first [$constant_numeric{$key}] not second [$value]\n";
+            }
+
+        }
+        #
+        # Null strings -- very special
+        #
+        elsif ( $value =~ /^\"\\0/ ) {
+            # Strip all of the double quotes, and give us just the \0's
+            $value =~ s/\"//g;
+            # Count the null characters (i.e. count everything, and
+            # divide by 2, 'cause this is a string like "\0\0\0\0")
+            $constant_null{$key} = length($value)/2;
+        }
+        #
+        # Non-null strings
+        #
+        elsif ( $value =~ /^\"/ ) {
+            # Strip all of the double quotes, and give us just the contents
+            # NOTE: This will handle line wrapped stuff (embedded "")
+            $value =~ s/\"//g;
+            # 5.1 encodes a bunch of characters in hex for some wierd reason...
+            $value =~ s/\\x(\w{2})/chr(hex($1))/ge;
+            $constant_string{$key} = $value;
+        }
+        #
+        # Character arrays - we can parse these, but they're not
+        # consumable by the C pre-processor without a structure assignment, so
+        # we skip them.
+        #
+        # Example: MQPSC_COMMAND_A                'C','o','m','m','a','n','d'
+        #
+        elsif ($key =~ /^MQ\w+_[A-Z]?A$/ &&
+               $value =~ /^('[^']',)+'[^']'$/) {
+            #print STDERR "XXX: Skipping character array '$key' -> $value\n";
+            next;
+        }
+        #
+        # Single character string
+        #
+        elsif ( $value =~ /\'/ ) {
+            $value =~ s/\'//g;
+            $value =~ s/\\x(\w{2})/chr(hex($1))/ge;
+            $constant_char{$key} = $value;
+        }
+        #
+        # Ignore the function macros in cmqbc.h
+        #
+        elsif ( $value =~ /^mq[A-Z]/ ) {
+            next;
+        }
+        #
+        # Don't know how to parse....
+        #
+        else {
+            warn "Unrecognized value: '$key' => '$value'\n";
+        }
+
+        # Debugging....
+        # s/\s*/\t/;
+        # print "$_\n";
+
+    }
+    close(HEADER);
+
+    #
+    # Handle the postponed entries
+    #
+  POSTPONED:
+    while (my ($key, $value) = each %postponed) {
+        #print STDERR "XXX: key '$key' is composed of other constant: '$value'\n";
+        my $result = 0;
+        foreach my $constant (split /\s* \| \s*/, $value) {
+            my $num = $constant_numeric{$constant} ||
+              $constant_hex{$constant};
+            if (defined $num) {
+                #print STDERR "XXX2: OR constant $constant -> $num\n";
+                $result |= $num;
+            } else {
+                warn "Cannot add determine value for '$key', unknown constant '$constant'\n"; # not numeric/hex
+                next POSTPONED;
+            }
+        }
+        #print STDERR "XXX4: result is $key => $result\n";
+        $constant_numeric{$key} = $result;
+    }
+}                               #  End foreach: header file
+
+#
+# There's a bunch of MQ v6 and v7 constants used in the perl source
+# code that will cause breakage when compiling against MQ v5 or MQ v6
+# - unless we define them here. See also MQClient/constants.c.PL,
+# where we use these constants to add a bunch of #define entries.
+#
+our %extra_hex = (
+                  MQIMPO_CONVERT_TYPE          => 0x0002,
+                  MQIMPO_INQ_FIRST             => 0x0000,
+                  MQIMPO_INQ_NEXT              => 0x0008,
+                  MQIMPO_INQ_PROP_UNDER_CURSOR => 0x0010,
+                  MQPMO_ASYNC_RESPONSE         => 0x010000,
+                  MQSTAT_TYPE_ASYNC_ERROR      => 0x0000,
+                  MQTYPE_AS_SET                => 0x0000,
+                  MQTYPE_BOOLEAN               => 0x0004,
+                  MQTYPE_BYTE_STRING           => 0x0008,
+                  MQTYPE_FLOAT32               => 0x0100,
+                  MQTYPE_FLOAT64               => 0x0200,
+                  MQTYPE_INT8                  => 0x0010,
+                  MQTYPE_INT16                 => 0x0020,
+                  MQTYPE_INT32                 => 0x0040,
+                  MQTYPE_NULL                  => 0x0002,
+                  MQTYPE_STRING                => 0x0400,
+                );
+our %extra_num = (
+                  MQCFH_VERSION_3             => 3,
+                  MQCFOP_CONTAINS             => 10,
+                  MQCFOP_CONTAINS_GEN         => 26,
+                  MQCFOP_EQUAL                => 2,
+                  MQCFOP_EXCLUDES             => 13,
+                  MQCFOP_EXCLUDES_GEN         => 29,
+                  MQCFOP_GREATER              => 4,
+                  MQCFOP_LESS                 => 1,
+                  MQCFOP_LIKE                 => 18,
+                  MQCFOP_NOT_EQUAL            => 5,
+                  MQCFOP_NOT_GREATER          => 3,
+                  MQCFOP_NOT_LESS             => 6,
+                  MQCFOP_NOT_LIKE             => 21,
+                  MQCFT_BYTE_STRING_FILTER    => 15,
+                  MQCFT_COMMAND_XR            => 16,
+                  MQCFT_GROUP                 => 20,
+                  MQCFT_INTEGER_FILTER        => 13,
+                  MQCFT_INTEGER64             => 23,
+                  MQCFT_STRING_FILTER         => 14,
+                  MQGMO_VERSION_4             => 4,
+                  MQIAMO_OBJECT_COUNT         => 732,
+                  MQOD_VERSION_4              => 4,
+                  MQPMO_VERSION_3             => 3,
+                  MQRC_NO_SUBSCRIPTION        => 2428,
+                  MQRC_PROPERTY_NOT_AVAILABLE => 2471,
+                  MQRC_PROPERTY_VALUE_TOO_BIG => 2469,
+                  MQRC_CHANNEL_NOT_AVAILABLE  => 2537,
+                  MQRC_HOST_NOT_AVAILABLE     => 2538,
+                  MQRCCF_CHLAUTH_NOT_FOUND    => 3338,
+                 );
+foreach my $name (sort keys %extra_hex) {
+    my $value = $extra_hex{$name};
+    if (defined $constant_hex{$name}) {
+        if ($constant_hex{$name} != $value) {
+            die "Conflict for value '$name': header file '$constant_hex{$name}', hardcoded fallback '$value'";
+        }
+        delete $extra_hex{$name};
+    } else {
+        #print "Add hex constant '$name'\n";
+        $constant_hex{$name} = $value;
+    }
+}
+foreach my $name (sort keys %extra_num) {
+    my $value = $extra_num{$name};
+    if (defined $constant_numeric{$name}) {
+        if ($constant_numeric{$name} != $value) {
+            die "Conflict for value '$name': header file '$constant_numeric{$name}', hardcoded fallback '$value'";
+        }
+        delete $extra_num{$name};
+    } else {
+        $constant_numeric{$name} = $value;
+    }
+}
+
+1;

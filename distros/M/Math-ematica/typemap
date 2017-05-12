@@ -1,0 +1,52 @@
+########################### -*- Mode: Fundamental -*- #########################
+## $Basename: typemap $
+## $Revision: 1.9 $
+## Author          : Ulrich Pfeifer
+## Created On      : Sat Dec 20 19:20:45 1997
+## Last Modified By: Ulrich Pfeifer
+## Last Modified On: Sun Feb 15 13:40:58 1998
+## Language        : N/A
+## Update Count    : 35
+## Status          : Unknown, Use with caution!
+## 
+## (C) Copyright 1997, Ulrich Pfeifer, all rights reserved.
+## 
+###############################################################################
+
+MLINK                                           M_OBJECT
+mlapi_result                                    T_IV
+mlapi_token                                     T_IV
+mlapi_packet                                    T_IV
+kcharp_ct                                       T_PV
+int_nt                                          T_IV
+double_nt                                       T_NV
+long_st                                         T_IV
+SYMBOL                                          O_OBJECT
+
+# The following is Stolen from Dean Roehrichs CookBookA
+OUTPUT
+
+        # The Perl object is blessed into 'CLASS', which should be a
+        # char* having the name of the package for the blessing.
+O_OBJECT
+	sv_setref_pv( $arg, CLASS, (void*)$var );
+
+INPUT
+
+O_OBJECT
+	if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG)) {
+	    $var = ($type)SvIV((SV*)SvRV( $arg ));
+	} else {
+            warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+            XSRETURN_UNDEF;
+        }
+
+M_OBJECT
+	if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVHV)) {
+            SV **ssv = hv_fetch((HV*) SvRV($arg), \"mlink\", 5, 0);
+            $var = ($type)((ssv == NULL)? 0 : SvIV(*ssv));
+	} else {
+            warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+            XSRETURN_UNDEF;
+        }
+

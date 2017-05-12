@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e472b762e168533572c413dd1aec9976293eda3e Changes
+SHA1 618113c9ddfa98b37df836ade5df6a6534a0ac10 MANIFEST
+SHA1 93c19d43f758d6d29a86857dfc3dc1ed400ab308 MANIFEST.SKIP
+SHA1 36bfdbce3cc98c51be1ba6f8bd3c3b4825249347 META.json
+SHA1 4c120dfddace444d3f96058e22ffdf8ec9801ebf META.yml
+SHA1 a5a5f0f1b85de8b3b79dafae5e1f9c720390752e Makefile.PL
+SHA1 3859800d2401287f443379922c244e333f2e4287 README
+SHA1 63238f1a80397a68be13ce4876aa5428d9d1d310 lib/Map/Tube/Lyon.pm
+SHA1 c55d95478f09ed7f2cdff37a5e02abcf5869747a share/lyon-map.xml
+SHA1 9ee9bf0a4e8f35bc251081883b0bc475ea2923e2 t/00-load.t
+SHA1 f1895f30e010e564a104aa5c69ef2a4a8285a0bc t/01-xml.t
+SHA1 bb1679abd162ce53d46fa069805656d020ad6c74 t/02-xml.t
+SHA1 af4abf567afa74412bdf5bcaa3f316372f04dd0b t/03-map.t
+SHA1 f0d221974432b8804b08fa56695888a3455eda14 t/04-routes.t
+SHA1 a8876ad993f154fdce661398861dc84e3939a214 t/10-manifest.t
+SHA1 91f13246eb8703268429d534f5e92e8ec3c75bcd t/11-meta-json.t
+SHA1 fdade5cb5a34c23eeeaee679eaf61b262df41881 t/12-meta-yml.t
+SHA1 f541cd74227d50f6176a6e1e72405150a892e418 t/13-version.t
+SHA1 14f89781285862dbb83e30d23e37841b7aad741f t/14-signature.t
+SHA1 bdfc6984289149ff6be3ba4d8969b8b586655558 t/20-pod.t
+SHA1 0f1e5110f20dff812b9b47b1ba6494e26a83ea01 t/21-pod-coverage.t
+SHA1 9921f537ad5a4b36131bb5a98c5457f0e9e815a0 t/22-changes.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlT+Np4ACgkQGcmBoRH2MYao+ACcDu+cojQerLzLwqFI5xo85IOi
+iMYAnRfugxH3ExoFTOWoSrHaQBejSkvK
+=Se8F
+-----END PGP SIGNATURE-----

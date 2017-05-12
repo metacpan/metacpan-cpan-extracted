@@ -1,0 +1,45 @@
+
+
+%module{Math::ThinPlateSpline};
+%package{Math::ThinPlateSpline};
+
+%typemap{std::istream};
+%typemap{const std::vector<Vec>};
+%typemap{std::vector<Vec>};
+%typemap{std::vector<double>};
+%typemap{const std::vector<double>};
+
+%{
+#include <myinit.h>
+
+std::vector< Vec >
+typemap_test_function(foo)
+    std::vector< Vec > foo
+  CODE:
+    RETVAL = foo;
+  OUTPUT: RETVAL
+
+%}
+
+%name{Math::ThinPlateSpline}
+class ThinPlateSpline
+{
+  %name{new}
+    ThinPlateSpline(std::vector<Vec> controlPoints, double regularization = 0.);
+
+  %name{new_from_string}
+    ThinPlateSpline(std::istream& input);
+
+  ~ThinPlateSpline();
+
+  %name{evaluate}
+    double Evaluate(double x, double y);
+
+  %name{evaluate_many}
+    std::vector<double> Evaluate(const std::vector<double>& x, const std::vector<double>& y);
+
+  %name{get_bending_energy}
+    double GetBendingEnergy();
+};
+
+

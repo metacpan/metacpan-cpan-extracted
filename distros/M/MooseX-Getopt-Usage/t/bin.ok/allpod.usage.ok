@@ -1,0 +1,10 @@
+Usage:
+     allpod.pl [OPTIONS] [ALIENS]
+
+Options:
+    Some extra options text. Put above DESCRIPTION, should stay there.
+
+     --help -? --usage - Bool. Display the usage message and exit
+     --man             - Bool. Display man page
+     --doom            - Int.
+

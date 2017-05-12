@@ -1,0 +1,130 @@
+=head1 NAME
+
+Mozilla::DOM::CharacterData
+
+=for object Mozilla::DOM::CharacterData
+
+Mozilla::DOM::CharacterData is a wrapper around an instance of Mozilla's
+nsIDOMCharacterData interface. This inherits from
+L<Mozilla::DOM::Node|Mozilla::DOM::Node>.
+
+ * The nsIDOMCharacterData interface extends nsIDOMNode with a set of
+ * attributes and methods for accessing character data in the DOM.
+ *
+ * For more information on this interface please see
+ * L<http:E<sol>E<sol>www.w3.orgE<sol>TRE<sol>DOM-Level-2-CoreE<sol>>
+
+=head1 CLASS METHODS
+
+=head2 $iid = Mozilla::DOM::CharacterData->B<GetIID>()
+
+Pass this to QueryInterface.
+
+=head1 METHODS
+
+=head2 $characterdata->B<AppendData>($data)
+
+=over
+
+=over
+
+=item * $data (string)
+
+=back
+
+=back
+
+=head2 $characterdata->B<DeleteData>($offset, $count)
+
+=over
+
+=over
+
+=item * $offset (integer (long))
+
+=item * $count (integer (long))
+
+=back
+
+=back
+
+=head2 $data = $characterdata->B<GetData>()
+
+=over
+
+=back
+
+=head2 $len = $characterdata->B<GetLength>()
+
+=over
+
+=back
+
+=head2 $characterdata->B<InsertData>($offset, $data)
+
+=over
+
+=over
+
+=item * $offset (integer (long))
+
+=item * $data (string)
+
+=back
+
+=back
+
+=head2 $characterdata->B<ReplaceData>($offset, $count, data)
+
+=over
+
+=over
+
+=item * $offset (integer (long))
+
+=item * $count (integer (long))
+
+=item * $data (string)
+
+=back
+
+=back
+
+=head2 $characterdata->B<SetData>($data)
+
+=over
+
+=over
+
+=item * $data (string)
+
+=back
+
+=back
+
+=head2 $characterdata->B<SubstringData>($offset, $count)
+
+=over
+
+=over
+
+=item * $offset (integer (long))
+
+=item * $count (integer (long))
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<Mozilla::DOM>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2007, Scott Lanning
+
+This software is licensed under the LGPL.  See L<Mozilla::DOM> for a full notice.
+
+=cut
+

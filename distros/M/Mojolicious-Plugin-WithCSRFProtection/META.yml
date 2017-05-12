@@ -1,0 +1,594 @@
+---
+abstract: 'Mojolicious plugin providing CSRF protection at the routing level'
+author:
+  - 'Mark Fowler <mfowler@maxmind.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Mojolicious::Lite: '0'
+  Test::Mojo: '0'
+  Test::More: '0.96'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-WithCSRFProtection
+provides:
+  Mojolicious::Plugin::WithCSRFProtection:
+    file: lib/Mojolicious/Plugin/WithCSRFProtection.pm
+    version: '1.00'
+requires:
+  Mojo::Base: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/maxmind/Mojolicious-Plugin-WithCSRFProtection/issues
+  repository: git://github.com/maxmind/Mojolicious-Plugin-WithCSRFProtection.git
+version: '1.00'
+x_Dist_Zilla:
+  perl:
+    version: '5.022000'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@MAXMIND/MakeMaker'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@MAXMIND/Authority'
+      version: '1.009'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@MAXMIND/AutoPrereqs'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::CopyFilesFromBuild
+      name: '@MAXMIND/CopyFilesFromBuild'
+      version: '0.161350'
+    -
+      class: Dist::Zilla::Plugin::Git::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename:
+            - LICENSE
+            - Makefile.PL
+            - README.md
+            - cpanfile
+          exclude_match: []
+          follow_symlinks: 0
+          include_dotfiles: 0
+          prefix: ''
+          prune_directory: []
+          root: .
+        Dist::Zilla::Plugin::Git::GatherDir:
+          include_untracked: 0
+      name: '@MAXMIND/Git::GatherDir'
+      version: '2.039'
+    -
+      class: Dist::Zilla::Plugin::GitHub::Meta
+      name: '@MAXMIND/GitHub::Meta'
+      version: '0.42'
+    -
+      class: Dist::Zilla::Plugin::GitHub::Update
+      config:
+        Dist::Zilla::Plugin::GitHub::Update:
+          metacpan: 1
+      name: '@MAXMIND/GitHub::Update'
+      version: '0.42'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@MAXMIND/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '6.005'
+        Dist::Zilla::Role::MetaProvider::Provider:
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+      name: '@MAXMIND/MetaProvides::Package'
+      version: '2.003002'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@MAXMIND/NextRelease'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable
+      name: '@MAXMIND/Test::Pod::Coverage::Configurable'
+      version: '0.06'
+    -
+      class: Dist::Zilla::Plugin::Test::PodSpelling
+      config:
+        Dist::Zilla::Plugin::Test::PodSpelling:
+          directories: []
+          spell_cmd: ''
+          stopwords:
+            - Alders
+            - "Alders'"
+            - CSRF
+            - Eilam
+            - "Eilam's"
+            - MaxMind
+            - "MaxMind's"
+            - Mojolicious
+            - Oschwald
+            - "Oschwald's"
+            - POSTing
+            - Plugin
+            - Rolsky
+            - "Rolsky's"
+            - WithCSRFProtection
+            - internet
+            - jQuery
+            - todo
+          wordlist: Pod::Wordlist
+      name: '@MAXMIND/Test::PodSpelling'
+      version: '2.007002'
+    -
+      class: Dist::Zilla::Plugin::Test::ReportPrereqs
+      name: '@MAXMIND/Test::ReportPrereqs'
+      version: '0.025'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: '@MAXMIND/Test::More with subtest()'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: requires
+      name: '@MAXMIND/Modules for use with tidyall'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::PromptIfStale
+      config:
+        Dist::Zilla::Plugin::PromptIfStale:
+          check_all_plugins: 1
+          check_all_prereqs: 1
+          modules: []
+          phase: release
+          run_under_travis: 0
+          skip:
+            - Dist::Zilla::Plugin::MAXMIND::Contributors
+            - Dist::Zilla::Plugin::MAXMIND::License
+            - Dist::Zilla::Plugin::MAXMIND::Tidyall
+      name: '@MAXMIND/stale modules, release'
+      version: '0.051'
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      config:
+        Dist::Zilla::Role::FileWatcher:
+          version: '0.006'
+      name: '@MAXMIND/ReadmeMarkdownInBuild'
+      version: '0.161170'
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      config:
+        Dist::Zilla::Role::FileWatcher:
+          version: '0.006'
+      name: '@MAXMIND/ReadmeMarkdownInRoot'
+      version: '0.161170'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@MAXMIND/UploadToCPAN'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::SurgicalPodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.013'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Name
+              name: Name
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Version
+              name: Version
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Region
+              name: prelude
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: SYNOPSIS
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: DESCRIPTION
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: Leftovers
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Region
+              name: postlude
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: Authors
+              version: '4.013'
+            -
+              class: Pod::Weaver::Section::Contributors
+              name: Contributors
+              version: '0.009'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: Legal
+              version: '4.013'
+      name: '@MAXMIND/SurgicalPodWeaver'
+      version: '0.0023'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@MAXMIND/PruneCruft'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@MAXMIND/ManifestSkip'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@MAXMIND/MetaYAML'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@MAXMIND/License'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@MAXMIND/ExtraTests'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@MAXMIND/ExecDir'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@MAXMIND/ShareDir'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@MAXMIND/Manifest'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::CheckVersionIncrement
+      name: '@MAXMIND/CheckVersionIncrement'
+      version: '0.121750'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@MAXMIND/TestRelease'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@MAXMIND/ConfirmRelease'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::CheckPrereqsIndexed
+      name: '@MAXMIND/CheckPrereqsIndexed'
+      version: '0.018'
+    -
+      class: Dist::Zilla::Plugin::CPANFile
+      name: '@MAXMIND/CPANFile'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
+      config:
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+      name: '@MAXMIND/Git::CheckFor::CorrectBranch'
+      version: '0.013'
+    -
+      class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
+      config:
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+      name: '@MAXMIND/Git::CheckFor::MergeConflicts'
+      version: '0.013'
+    -
+      class: Dist::Zilla::Plugin::Git::Contributors
+      config:
+        Dist::Zilla::Plugin::Git::Contributors:
+          include_authors: 0
+          include_releaser: 1
+          order_by: name
+          paths:
+            - .
+      name: '@MAXMIND/Git::Contributors'
+      version: '0.023'
+    -
+      class: Dist::Zilla::Plugin::InstallGuide
+      name: '@MAXMIND/InstallGuide'
+      version: '1.200007'
+    -
+      class: Dist::Zilla::Plugin::MAXMIND::Contributors
+      name: '@MAXMIND/MAXMIND::Contributors'
+      version: '0.13'
+    -
+      class: Dist::Zilla::Plugin::MAXMIND::License
+      name: '@MAXMIND/MAXMIND::License'
+      version: '0.13'
+    -
+      class: Dist::Zilla::Plugin::MAXMIND::TidyAll
+      name: '@MAXMIND/MAXMIND::TidyAll'
+      version: '0.13'
+    -
+      class: Dist::Zilla::Plugin::Meta::Contributors
+      name: '@MAXMIND/Meta::Contributors'
+      version: '0.003'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@MAXMIND/MetaConfig'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@MAXMIND/MetaJSON'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::MinimumPerl
+      name: '@MAXMIND/MinimumPerl'
+      version: '1.006'
+    -
+      class: Dist::Zilla::Plugin::RewriteVersion
+      config:
+        Dist::Zilla::Plugin::RewriteVersion:
+          add_tarball_name: 0
+          finders:
+            - ':ExecFiles'
+            - ':InstallModules'
+          global: 0
+          skip_version_provider: 0
+      name: '@MAXMIND/RewriteVersion'
+      version: '0.015'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@MAXMIND/PodSyntaxTests'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Changes
+      config:
+        Dist::Zilla::Plugin::Test::CPAN::Changes:
+          changelog: Changes
+      name: '@MAXMIND/Test::CPAN::Changes'
+      version: '0.012'
+    -
+      class: Dist::Zilla::Plugin::Test::EOL
+      config:
+        Dist::Zilla::Plugin::Test::EOL:
+          filename: xt/author/eol.t
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+            - ':TestFiles'
+          trailing_whitespace: '1'
+      name: '@MAXMIND/Test::EOL'
+      version: '0.18'
+    -
+      class: Dist::Zilla::Plugin::Test::NoTabs
+      config:
+        Dist::Zilla::Plugin::Test::NoTabs:
+          filename: xt/author/no-tabs.t
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+            - ':TestFiles'
+      name: '@MAXMIND/Test::NoTabs'
+      version: '0.15'
+    -
+      class: Dist::Zilla::Plugin::Test::Portability
+      name: '@MAXMIND/Test::Portability'
+      version: '2.000007'
+    -
+      class: Dist::Zilla::Plugin::Test::TidyAll
+      name: '@MAXMIND/Test::TidyAll'
+      version: '0.03'
+    -
+      class: Dist::Zilla::Plugin::Test::Version
+      name: '@MAXMIND/Test::Version'
+      version: '1.09'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          bail_out_on_fail: '0'
+          fail_on_warning: author
+          fake_home: 0
+          filename: xt/author/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          needs_display: 0
+          phase: develop
+          script_finder:
+            - ':PerlExecFiles'
+          skips: []
+      name: '@MAXMIND/Test::Compile'
+      version: '2.054'
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      config:
+        Dist::Zilla::Plugin::Git::Check:
+          untracked_files: die
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - .mailmap
+            - CONTRIBUTING.md
+            - Changes
+            - LICENSE
+            - Makefile.PL
+            - README.md
+            - cpanfile
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+      name: '@MAXMIND/Git::Check'
+      version: '2.039'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: v%v%n%n%c
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - .mailmap
+            - CONTRIBUTING.md
+            - Changes
+            - LICENSE
+            - Makefile.PL
+            - README.md
+            - cpanfile
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@MAXMIND/commit generated files'
+      version: '2.039'
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      config:
+        Dist::Zilla::Plugin::Git::Tag:
+          branch: ~
+          changelog: Changes
+          signed: 0
+          tag: v1.00
+          tag_format: v%v
+          tag_message: v%v
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@MAXMIND/Git::Tag'
+      version: '2.039'
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      config:
+        Dist::Zilla::Plugin::Git::Push:
+          push_to:
+            - origin
+          remotes_must_exist: 1
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+      name: '@MAXMIND/Git::Push'
+      version: '2.039'
+    -
+      class: Dist::Zilla::Plugin::BumpVersionAfterRelease
+      config:
+        Dist::Zilla::Plugin::BumpVersionAfterRelease:
+          finders:
+            - ':ExecFiles'
+            - ':InstallModules'
+          global: 0
+          munge_makefile_pl: 1
+      name: '@MAXMIND/BumpVersionAfterRelease'
+      version: '0.015'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: 'Bump version after release'
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+            - dist.ini
+          allow_dirty_match:
+            - (?^:.+)
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@MAXMIND/commit version bump'
+      version: '2.039'
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      config:
+        Dist::Zilla::Plugin::Git::Push:
+          push_to:
+            - origin
+          remotes_must_exist: 1
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+      name: '@MAXMIND/push version bump'
+      version: '2.039'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExtraTestFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':PerlExecFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '6.005'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@MAXMIND/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: '6.005'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '6.005'
+x_authority: cpan:MAXMIND

@@ -1,0 +1,196 @@
+Revision history and release notes for Mail::GPG.
+
+1.0.10 Sat Sep 19, 2015, joern
+    Bugfix:
+    - Fixed incorrect and potentially insecure UTF8 handling.
+      Thanks for the report to Juerd Waalboer <juerd AT tnx.nl>.
+
+1.0.9 Mon May 18, 2015, joern
+    Bugfix:
+    - Fixed unneeded usage of // operator in test suite
+      which is not available with Perl 5.8 (thanks to
+      cpantesters :)
+
+1.0.8 Sat May 16, 2015, joern
+    Features:
+    - Added support for GnuPG 2.x by applying patch from
+      Perlbotics (Thanks!) fixing RT103828, RT81082, and
+      RT80500.
+    - Mail::GPG->query_keyring() has new 'coerce' option
+      which gives full control about multiple email addresses
+      per user (refer to manpage for details).
+
+1.0.7 Wed Aug 3, 2011, joern
+    Features:
+    - Added support for empty passphrases. Thanks for the patch
+      to hlein AT korelogic DOT com.
+    - Improved gpg I/O performance and prevent rare blocking
+      cases by using the Event module (if installed).
+      
+      Note: you can force the old IO::Select based algorithm
+            by setting $Mail::GPG::SKIP_EVENT = 1 or
+            $ENV{MAIL_GPG_SKIP_EVENT} = 1 before loading
+            Mail::GPG.
+
+1.0.6 Sat Nov 18, 2006, joern
+    Bugfix:
+    - Mail::GPG->parse() missed setting MIME::Parser->output_to_core(1)
+      so temporary files were left. Thanks for the hint to
+      David Morel <david.morel AT amakuru.net>. As well changed
+      the test suite to make use of Mail::GPG->parse().
+
+1.0.5 Sun Nov 12, 2006, joern
+    Bugfixes:
+    - Applied a patch from Alwin Stolk <pastolk AT xs4all.nl>
+      which increases message decryption performance for big
+      mail bodies.
+    - Fixed POD typo. Thanks to Edward J. Sabol for the hint.
+
+1.0.4 Fri Apr 14, 2006, joern
+    Features:
+    - Report signer's key fingerprint with get_sign_fingerprint()
+      of Mail::GPG::Result. Requested by Peter Conrad <conrad AT
+      tivano.de>.
+    - Report multiple encryption recipients with the new methods
+      get_enc_key_ids() and get_enc_mails() of Mail::GPG::Result.
+    - Switch key id reporting from 32 to 64 bit length with
+      the Mail::GPG attribute use_long_key_ids.
+    - Suppress warnings from GnuPG::Interface about unknown recored
+      type 'tru', making my patch at least in conjunction with
+      Mail::GPG obsolete. The maintainer of GnuPG::Interface
+      obviously isn't interested in new releases of his module :(.
+    
+    Bugfixes:
+    - Don't rely on gnupg's exit code anywhere but inspect
+      its status fd output only. Thanks for the hint to
+      Peter Conrad.
+
+1.0.3 Fri Dec 22, 2005, joern
+    Notes:
+    - No code changes, just removed MIME-tools patches from the
+      distribution because the official MIME-tools 5.419 package
+      now contains them.
+    - That's why Mail::GPG instists on MIME-tools 5.419 from now on.
+    - Removed all pointers to the MIME-tools patch from the
+      documentation.
+
+1.0.2 Sat Dec 17, 2005, joern
+    Features:
+    - Added a patch against MIME-tools 5.418, which hopefully
+      gets into the official distribution soon. Thanks to
+      Edward J. Sabol who helped me to get this patch right.
+
+    Bugfixes:
+    - Fixed a (potential) bug with Mail::GPG->get_key_trust(),
+      which was reported and debugged by Edward J. Sabol, but
+      couldn't be reproduced on my system. However the fix
+      is harmless, so I added it.
+
+1.0.1 Sun Dec 5, 2004, joern
+    Features:
+    - New methods requested by Kjetil Kjernsmo <kjetil AT kjernsmo.net>
+      - Mail::GPG->is_signed_quick()
+      - Mail::GPG->get_key_trust()
+      - Mail::GPG::Result->get_sign_trust()
+      - Mail::GPG::Result->get_enc_trust()
+    - A patch for GnuPG::Interface 0.33 fixing a (harmless but
+      annoying ;) warning about unknown record types on keyring
+      inspection with newer GnuPG versions.
+
+1.0.0 Sat Nov 20, 2004, joern
+    Features:
+    - New parse() convenience method for parsing a mail message.
+      It uses MIME::Parser and distinguish between MIME and
+      non-MIME messages, doing the right thing regarding reading
+      decoded or encoded bodies.
+
+    Bugfixes:
+    - decrypt(): used encoded entity instead of decoded in case
+      of a MIME message. Thanks for the report to Paul Murphy
+      <pmurphy AT ionixpharma.com>.
+
+0.98 Sun Jun 27, 2004, joern
+    Bugfixes:
+    - Mail::GPG->decrypt() died on encrypted+signed mails for
+      which the public key was missing (and thus no verification
+      possible). That's not what we expect, instead we can check
+      the verification through the returned result object but
+      have a successfully decrypted mail.
+
+0.97 Tue Jun 15, 2004, joern
+    Bugfixes:
+    - Mail::GPG::Result->as_string() reported some warnings
+      regarding uninitialized values. Thanks to Edward J. Sabol
+      <sabol AT alderaan.gsfc.nasa.gov> for his patch.
+    - mgpg-test script now has the -w switch
+
+0.96 Sat May 29, 2004, joern
+    Bugfixes:
+    - Added missing dependency GnuPG::Interface in Makefile.PL
+      Reported through cpan-testers.
+
+0.95 Sat May 29, 2004, joern
+    Features:
+    - query_keyring() now returns all matching entries as a
+      list of key-id/address pairs, which can be slurped
+      into a hash. The old behaviour is still warranted, so
+      this extension is backward compatible.
+    - The signer's aliases are now reported with the new
+      sign_mail_aliases attribute of Mail::GPG::Result. Thanks
+      for the suggestion to Piotr Maj <ant AT kernelpanic.pl>.
+
+    Bugfixes:
+    - Some methods failed on systems with non-english
+      locales. Thanks to Daniel Ciaglia <daniel AT ciaglia.de>
+      and Piotr Maj for their reports.
+    - Not a fix in Mail::GPG but in MIME-tools: some mail
+      user agents (like mutt and sylpheed) add an empty line
+      as a preamble before the first part of a MIME signed
+      mail, if the message itself has attachments. MIME-tools
+      suppress this line on output, so the signature gets
+      invalid. Mail::GPG ships with a new patch to MIME-tools
+      5.411 which fixes this problem. Thanks for the report
+      to Daniel Ciaglia.
+
+0.94 Sun Feb 15, 2004, joern
+    Bugfixes:
+    - New I/O multiplex code needed some adjustments to
+      work with Perl 5.005_03, because its read() and seek()
+      functions work on native filehandles only.
+
+0.93 Sat Feb 14 2004, joern
+    Bugfixes:
+    - Perform multiplexed I/O with gpg to prevent buffering
+      deadlocks which may occur with huge amounts of data.
+      Added a new test t/04.big.t, which creates a 4 MB
+      entity and signs it. This test takes some time (on
+      an Athlon 1800XP about 20 seconds), so be patient ;)
+    - Set LC_MESSAGES=C where output of gpg is parsed to
+      get status information. Without this some Mail::GPG
+      methods didn't work on systems with non english locales.
+
+0.92 Fri Feb 13 2004, joern
+    Bugfixes:
+    - make test failed on systems without the MIME-tools
+      patch, although the corresponding tests were skipped.
+
+0.91 Wed Feb 11 2004, joern
+    Bugfixes:
+    - mime_sign_encrypt: check key_id only if entity should
+      be signed
+    - Ignore SIGPIPE from gpg
+
+0.90 Sun Feb 8 2004 joern
+    First public release, including the following methods:
+    - mime_sign
+    - mime_encrypt
+    - mime_sign_encrypt
+    - armor_sign
+    - armor_encrypt
+    - armor_sign_encrypt
+    - decrypt
+    - verify
+    - is_encrypted
+    - is_signed
+    - query_keyring
+    - get_decrypt_key

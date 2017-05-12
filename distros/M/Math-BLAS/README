@@ -1,0 +1,7 @@
+This is Math::BLAS, a Perl package of basic linear algebra subroutines.
+
+See the file 'NEWS' for user-visible changes and new features compared
+to recent versions of Math::BLAS.
+
+You may encounter bugs in this release.  If you do, please report them
+to the authors; see the file 'META.yml' for their mail addresses.

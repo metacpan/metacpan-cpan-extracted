@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+
+use strict;
+use Mail::POPRelay;
+
+
+# main
+# ---------
+my $popRelay = new Mail::POPRelay($ARGV[0]);
+$popRelay->cleanRelayDirectory();
+$popRelay->generateRelayFile();
+
+
+__END__
+
+
+=head1 NAME
+
+poprelay_cleanup - Perform Cleanup on the Mail Relay Directory
+
+
+=head1 SYNOPSIS
+
+./poprelay_cleanup config-file
+
+
+=head1 DESCRIPTION
+
+Run this script in a crontab to cleanup the mail relay directory
+and perform other necessary actions such as restarting the mail server and/or
+recreating the access database.  Make sure to set the run interval at least
+equal to the mailRelayPeriod option specified in your config-file.
+
+Make sure to specify the correct config-file for your server configuration.
+Subtle modifications may be necessary in the config-file depending on your
+server configuration.
+
+
+=head1 DIAGNOSTICS
+
+croak().  Will write to syslog eventually.
+
+
+=head1 AUTHOR
+
+Keith Hoerling <keith@hoerling.com>
+
+
+=head1 SEE ALSO
+
+Mail::POPRelay::Daemon(3pm), Mail::POPRelay(3pm), cron(8), crontab(5).
+
+=cut
+
+# $Id: poprelay_cleanup,v 1.1.1.1 2002/05/28 07:32:59 keith Exp $

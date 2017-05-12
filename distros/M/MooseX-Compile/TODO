@@ -1,0 +1,51 @@
+- MooseX::Compile::Compiler should be a Moose class itself. This is currently broken, haven't yet figured out why
+
+- The compiler methods need better names. Most of them really really suck.
+
+- Add the ability to strip a class of it's C<meta> for moose free deployment.
+  The compiler must be able to prepare a different bootstrapped version without
+  the loading code in place.
+
+- Audit the code for extensibility
+    - How easy is it to alter the structure of the PMC?
+    - How easy is it to override minor details?
+    - How easy is it to add support for new types of data (custom metaclasses,
+      meta attrs, meta methods, code refs, etc)
+        - meta caching could change
+        - these object might also effect things in the PMC
+
+- Sugar features
+    - use Manip::END in addition to Check::UnitCheck as a compilation option
+      (at_exit => 1) for better 5.8 support and also if the metaclass gets
+      changed
+    - Accept options like immutable => 1
+
+- Inlinable & Deparsable code roles
+    - Inlinable
+        - just stupid macros with named parameters
+    - Deparsable
+        - serializable components
+            - shared environment (shared per compilation unit) - like PadWalker::closed_over
+            - private environment (per method) - like PadWalker::closed_over
+            - body - perl text (B::Simple in the future)
+        - mangling
+            - alias mangled names from shared env to private names in private
+              env?
+            - look into DDS's mangling
+        - extensible custom deparsing for closed values too
+
+- add a no meta compilation option, for non introspectable classes which are
+  completely Moose free
+
+- unit tests
+    - extract_code_symbols
+    - serialization
+        - metaclass visitors
+    - compile_symbols
+        - for each symbol category
+            - decompile a specific method, reparse it, and make sure it's the same
+    - preabmle and boostrapper
+        - output individual chunks, and make sure they have the desired behavior
+        
+    
+

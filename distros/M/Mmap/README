@@ -1,0 +1,74 @@
+		   Mmap perl module, version alpha2
+
+		 Copyright (c) 1996, Malcolm Beattie
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of either:
+
+	a) the GNU General Public License as published by the Free
+	Software Foundation; either version 1, or (at your option) any
+	later version, or
+
+	b) the "Artistic License" which comes with this kit.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
+    the GNU General Public License or the Artistic License for more details.
+
+    You should have received a copy of the Artistic License with this kit,
+    in the file named "Artistic".  If not, you can get one from the Perl
+    distribution. You should also have received a copy of the GNU General
+    Public License, in the file named "Copying". If not, you can get one
+    from the Perl distribution or else write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+DESCRIPTION
+
+The Mmap module lets you use mmap to map in a file as a perl variable
+rather than reading the file into dynamically allocated memory. It
+depends on your operating system supporting UNIX or POSIX.1b mmap, of
+course. You need to be careful how you use such a variable. Some
+programming constructs may create copies of a string which, while
+unimportant for smallish strings, are far less welcome if you're
+mapping in a file which is a few gigabytes big. If you use PROT_WRITE
+and attempt to write to the file via the variable you need to be even
+more careful. One of the few ways in which you can safely write to the
+string in-place is by using substr as an lvalue and ensuring that the
+part of the string that you replace is exactly the same length.
+
+INSTALLATION
+
+Prerequisites are perl 5.002 and an operating system that has an
+implementation of mmap(2) with either the traditional or the
+POSIX.1b API.
+
+Type
+    perl Makefile.PL
+to write a personalised Makefile for your system.
+If your platform supports dynamic loading then just type
+    make
+    make test
+and provided you see "All tests successful" you can install it with
+    make install
+
+If you need/want instead to make a statically linked perl which
+contains the module, then type
+    make perl
+    make test
+
+Documentation is included in pod format in Mmap.pm itself. The
+"make install" step will install an Mmap(3) man page or else you
+can use
+    perldoc Mmap
+which will find the documentation whether it has been installed or
+if you run it from the Mmap distribution directory.
+
+BUGS
+
+You must explicitly use munmap() rather than letting perl itself
+clean up after you since perl 5.002 can't cope with variables
+whose string contents live in non-malloc'd memory.
+
+Malcolm Beattie
+21 Jun 1996

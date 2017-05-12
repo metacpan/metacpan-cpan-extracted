@@ -1,0 +1,25 @@
+Revision history for Perl module MoopsX::ListObjects
+
+0.003001 2013-10-04
+
+  - Updated for List::Objects::WithUtils-2
+    (new object constructors and related types added)
+
+0.002002 2013-09-12
+
+  - import() now compatible with latest Moops
+
+  - ImmutableArrayObj is gone in latest List::Objects::Types
+    (Replaced with ImmutableArray)
+
+0.002001 2013-08-30
+
+  - Register with Type::Registry in ->import
+
+0.002000 2013-08-23
+
+  - MoopsX::ListObjects::Types moved to dist List::Objects::Types
+
+0.001001 2013-08-22
+
+  - Initial release

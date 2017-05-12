@@ -1,0 +1,318 @@
+NAME
+    Mail::Spool - Extensible Perl Mail Spooler
+
+SYNOPSIS
+      #!/usr/bin/perl -w
+      package MyPackage;
+
+      use Mail::Spool;
+      @ISA = qw(Mail::Spool);
+
+      my $spool = Mail::Spool->new();
+
+      $spool->dequeue_dir = '/var/spool/mail';
+
+      $spool->daemon;
+      exit;
+
+      # OR
+
+      use Mail::Spool qw(send_mail);
+      my $args = {to   => 'anybody@in.the.world',
+                  from => 'me@right.here.local',
+                  delivery => 'Interactive', # or Deferred
+                  timeout  => 2 * 60, # two minutes
+                  filename =>
+                  #or# message  => $scalar,
+                  #or# message  => \$scalar,
+                  #or# message  => $a_mail_internet_object,
+                  #or# filehandle => $open_io_handle,
+                  };
+      my $spool = Mail::Spool->new();
+      eval{ $spool->send_mail($args) };
+
+      # OR
+
+      eval{ send_mail($args) };
+      if( $@ ){
+        die "Something went wrong [$@]";
+      }
+
+OBTAINING
+    Visit http://seamons.com/ for the latest version.
+
+DESCRIPTION
+    Mail::Spool is a "pure perl" implementation of mail spooling, unspooling
+    and sending. It is intended to be used with daemons such as
+    Net::Server::SMTP (to be released soon), but it also contains its own
+    daemon (based off of Net::Server::Fork) that can be used if necessary.
+
+    It is also intended to be used as a quick spooling mechanism for perl
+    scripts. As it can write straight to the queue without opening another
+    process.
+
+    The send_mail method allows for either Deferred or Interactive sending
+    of mail.
+
+    As of this writing, a version Mail::Spool has been in use in production
+    for three months spooling and sending about 200MB a day in several
+    thousand messages.
+
+    The default setup allows for setup on multiple servers, all sharing a
+    common spool directory. NFS capable locking will take place in necessary
+    areas.
+
+PROPERTIES
+    Properties of Mail::Spool are accessed methods of the same name. They
+    may be set by calling the method and passing the new value as an
+    argument. For example:
+
+      my $dequeue_dir = $self->dequeue_dir;
+      $self->dequeue_dir($new_dequeue_dir);
+
+    The following properties are available:
+
+    dequeue_dir
+        Base location for the mail spool. Defaults to
+        $Mail::Spool::DEQUEUE_DIR which at load time contains
+        "/var/spool/mail".
+
+    dequeue_periods
+        An array ref containing the amount of time a message must wait in
+        the spool and fallback spools. Defaults to
+        $Mail::Spool::DEQUEUE_PERIODS which at load time contains an array
+        ref with 0, .5*3600, 4*3600, 8*3600, 16*3600, 24*3600, and 48*3600
+        as its values. A directory for each of these times will be created
+        (0 will be in dequeue_dir/0, .5*3600 will be dequeue_dir/1, etc).
+        For a further discussion of dequeue times and methods, please read
+        the extended comment in the source code under the subroutine
+        list_spool_handles.
+
+    dequeue_priority
+        An array ref containing an equal number of elements as
+        dequeue_periods. Elements should be integers. Defaults to
+        $Mail::Spool::DEQUEUE_PRIORITY which at load time contains an array
+        ref with 1, 3, 9, 25, 50, 100, and 200 as its values. A lower number
+        means higher priority. With a 20 second dequeue_timeout, a priority
+        of 1 checks the queue every 20 seconds, 3 checks every 60 seconds,
+        and 200 checks every 66 minutes. For a further discussion of dequeue
+        times and methods, please read the extended comment in the source
+        code under the subroutine list_spool_handles.
+
+    dequeue_timeout
+        Seconds to wait before before looking through the queues. Defaults
+        to $Mail::Spool::DEQUEUE_TIMEOUT which at load time is 20 (seconds).
+
+    max_dequeue_processes
+        Maximum number of dequeue processes to start under a daemon.
+        Defaults to $Mail::Spool::MAX_DEQUEUE_PROCESSES which at load time
+        is 20.
+
+    max_connection_time
+        Maximum amount of time to stay connected to a remote host. Defaults
+        to $Mail::Spool::MAX_CONNECTION_TIME which at load time is 6*60*60
+        (6 hours). Messages not delivered under this time period are queued
+        for later delivery.
+
+    usage_log
+        Location to store raw spool usage information. Defaults to
+        $Mail::Spool::USAGE_LOG which at load time is
+        "$Mail::Spool::DEQUEUE_DIR/usage".
+
+METHODS
+    new Returns an object blessed into the passed class. A hash, or hashref
+        passed to the the method will be set as hash keys of the object.
+
+    daemon
+        Starts a mail spool daemon using Net::Server::Fork as the back end.
+        Will run continuously until the main process is killed. Log
+        information defaults to 'Sys::Syslog'.
+
+    create_dequeue_dirs
+        May be called as a method or function. Hook to create the necessary
+        directories used by the spool daemon.
+
+    list_spool_handles
+        Returns a list of objects blessed into the Mail::Spool::Handle class
+        (by default). These handle objects represent the queue (spools) that
+        need to be processed at the moment. For an important discussion of
+        architecture and waiting times, please read the comments in the
+        source code located within this subroutine.
+
+    mail_spool_handle
+        Returns an object blessed into the Mail::Spool::Handle class. See
+        the Mail::Spool::Handle manpage.
+
+    mail_spool_node
+        Returns an object blessed into the Mail::Spool::Node class. See the
+        Mail::Spool::Node manpage.
+
+    dequeue
+        May be called as a method or function. Run through a dequeue
+        process. This consists of listing spool handles, opening the spools,
+        reading nodes from the spools, and having the nodes fallback upon
+        failed delivery. Dequeue is called periodically based upon
+        dequeue_timeout one the daemon process has been started.
+
+    parse_for_address
+        Short wrapper around Mail::Address->parse. Should take an email
+        address line and return a list of objects that can support
+        ->address, ->domain, and ->format methods. See the Mail::Address
+        manpage.
+
+    new_message_id
+        During the send_mail process if a message is deferred, the spooler
+        will attempt to parse a message id from the email. If none can be
+        found, this method is called to generate a new id which will be used
+        in the spooling process.
+
+    send_mail
+        May be called as a method or function. Send mail takes a message and
+        either sends it off or places it in the queue. Arguments are a hash
+        or a hashref. The possible arguments to send_mail are as follows:
+
+        to  Will be used in the "rcpt to" SMTP header (this will be parsed
+            out of message if not given).
+
+        from
+            Will be used in the "mail from" header (this will be parsed out
+            of message if not given).
+
+        message
+            My be either a scalar, a scalar ref, an array ref, or an object
+            which supports the following head, print, body, header,
+            head->get, head->add, and head->delete. Mail::Internet and
+            MIME::Entity objects work. If message is not given, filehandle
+            or filename may be given.
+
+        filehandle
+            Used if message is not given. Must contain an open IO::Handle
+            style object (such as IO::File or IO::Scalar).
+
+        filename
+            Used if neither message or filehandle are given. Must contain
+            the path to a readable filename.
+
+        delivery
+            Type of delivery to be used. Must be one of the following:
+            Deferred - put in the spool for later (default), Standard - same
+            as Deferred, Interative - block until sent (or timed out) and
+            die on failure, Background - block until sent (or timed out) and
+            put in spool on failure.
+
+        timeout
+            Used with delivery Interactive or delivery Background. Seconds
+            to wait while trying to connect to a host.
+
+        id  Message id to be used in the queue filename. Used under deferred
+            delivery. If none is given, will be parsed out of the message.
+            If none is found, will be generated using new_message_id.
+
+    parse_message
+        Based upon the arguments given, returns an object that possesses the
+        correct methods for use in the send_mail routine. Arguments may be
+        given either as a hash or a hashref. The main arguments are
+        "message," "filehandle," or "filename.". Message may be either a
+        scalar or scalar ref containing the message, an array ref containing
+        the lines of the message, or an object which supports head, body,
+        and print methods (such as Mail::Internet, or MIME::Entity)
+        (actually the object needs to support head, print, body, header,
+        head->get, head->add, and head->delete). If there is no message
+        argument, and there is a "filehandle" argument, parse_message will
+        create an object from the filehandle (the filehandle should be an
+        IO::Handle style object). If no filehandle is given, parse_message
+        will look for a "filename" argument. This should be a readable
+        filename accessible by the spooler. In all cases, the passed message
+        should contain the email headers necessary. If it does not, the
+        headers will be added as necessary. This method returns a
+        Mail::Internet compatible object.
+
+    _send_mail_deferred
+        Called by send_mail. Arguments should a hash or hash ref. Places the
+        message contained in the "message" argument into the mail spool and
+        returns immediately. Required arguments are "message," "to," "from,"
+        "id," and "msh" (a Mail::Spool::Handle object).
+
+    _send_mail_now
+        Called by send_mail. Arguments shoud be a hash or hash ref. Required
+        arguments are "message," "to," "from," "id," "timeout," and
+        "delivery." Looks up the mx records of the domain found in "to"
+        using the lookup_mx method, and iterates through each of these
+        records and tries to open a connection using open_smtp_connection
+        (times out after "timeout" seconds). Once a connection has been
+        established, sends the message, testing responses using
+        check_sock_status. If delivery is "Background," and a connection
+        could not be established, the message will be queued for later
+        delivery. Any errors die.
+
+    check_sock_status
+        Checks the status of the last smtp command. Arguments are the open
+        socket, the mx host, the to address, and the from address. Any
+        errors die.
+
+    lookup_mx
+        Takes a hostname as an argument. Should return a list of the mx
+        records for that hostname, ordered by their priorities. This method
+        could also be sub classed to allow for caching of the response.
+
+    lookup_host
+        Takes a hostname as an argument. Should return a hostname or an ip
+        address. Intended as a means of caching records. Default is to
+        simply return the passed host.
+
+    open_smtp_connection
+        Takes a hostname as an argument. Returns a IO::Socket style object
+        containing an open connection to that host (or undef on failure).
+        This could be overridden to allow for holding the connection open
+        across several emails to the same domain.
+
+    log_usage
+        Takes a number and word as arguments. Writes this information out to
+        a very simple log. Intended for gathering basic spool information,
+        such as total bytes spooled and total bytes sent, as well as total
+        messages spooled and sent.
+
+    AUTOLOAD
+        Used to dynamically some of the property methods.
+
+TO DO
+    Use It
+        The best way to further the status of this project is to use it. A
+        less extensible version of this module has been in use for around
+        three months as of this writing.
+
+    Extensions
+        Explore other extenstions such as optimized read of spool
+        directories to order by domain. Possibly add interface to allow
+        placing mail in postfix and sendmail compatible queues.
+
+    DNS Add modules to handle DNS caching.
+
+    Interfaces
+        Add modules containing interfaces to databases, or other "file
+        systems".
+
+BUGS
+    The current setup of Mail::Spool does represent a possible denial of
+    service if 20 or thirty messages are sent to a host that simply holds a
+    connection open and does nothing else during mail delivery. What should
+    probably be done instead is to only do one dequeue process at a time
+    (ever) and fork off a separate process for each mail. This will probably
+    be coming under later releases.
+
+SEE ALSO
+    Please see also the Mail::Spool::Handle manpage, the Mail::Spool::Node
+    manpage.
+
+COPYRIGHT
+      Copyright (C) 2001, Paul T Seamons
+                          paul@seamons.com
+                          http://seamons.com/
+
+      This package may be distributed under the terms of either the
+      GNU General Public License
+        or the
+      Perl Artistic License
+
+      All rights reserved.
+

@@ -1,0 +1,12 @@
+split: (10:00)
+	echo vopdnf
+
+blablabla: split (5:00)
+	echo blablalbalb
+
+aaaaaaaaa: split (5:00)
+	echo asdfasdfa
+
+bbbbbbbbb: aaaaaaaaa blablabla (5:00)
+	echo fim
+

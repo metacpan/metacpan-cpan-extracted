@@ -1,0 +1,13 @@
+Revision history for Perl extension Math::Orthonormalize.
+
+1.00  Thu Oct 06 19:16:07 2005
+	- general Distribution updates
+	- Added proper copyright notice
+	- Added Build.PL
+	- Added better README
+	- Corrected POD errors
+	- Added POD tests.
+
+0.10  Fri Mar 05 16:24:51 2004
+	- original version as uploaded to CPAN
+

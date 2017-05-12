@@ -1,0 +1,154 @@
+NAME
+    McBain::WithWebSocket - Load a McBain API as a WebSocket server
+
+SYNOPSIS
+            # write your API as you normally would, and create
+            # a simple server script:
+
+            #!/usr/bin/perl -w
+
+            use warnings;
+            use strict;
+            use MyAPI -withWebSocket;
+
+            MyAPI->start(80); # default port is 8080
+
+            # if your API is object oriented
+            MyAPI->new(%attrs)->start(80);
+
+DESCRIPTION
+    "McBain::WithWebSocket" turns your McBain API into a WebSocket
+    <https://en.wikipedia.org/wiki/WebSocket> server using
+    Net::WebSocket::Server.
+
+    The created server will be a JSON-in JSON-out service. When a client
+    sends a message to the server, it is expected to be a JSON string, which
+    will be converted into a hash-ref and serve as the payload for the API.
+    The payload must have a "path" key, which holds the complete path of the
+    route/method to invoke (for example, "GET:/math/sum"). The results from
+    the API will be formatted into JSON as well and sent back to the client.
+
+    Note that if an API method does not return a hash-ref, this runner
+    module will automatically turn it into a hash-ref to ensure that
+    conversion into JSON will be possible. The created hash-ref will have
+    one key - holding the method's name, with whatever was returned from the
+    method as its value. For example, if method "GET:/divide" in topic
+    "/math" returns an integer (say 7), then the client will get the JSON "{
+    "GET:/math/divide": 7 }". To avoid this behavior, make sure your API's
+    methods return hash-refs.
+
+  EXAMPLE CLIENT
+    I haven't succeeded in creating a Perl WebSocket client using any of the
+    related modules on CPAN. Documentation in this area seems to be
+    extremely lacking. On the other hand, I created a very simply client
+    with NodeJS in about two minutes. If you need to test your "McBain" API
+    running as a WebSocket server, and have a similar problem, take a look
+    at the "client.js" file in the examples directory of this distribution.
+
+  SUPPORTED HTTP METHODS
+    This runner support all methods natively supported by McBain. That is:
+    "GET", "PUT", "POST", "DELETE" and "OPTIONS".
+
+    The "OPTIONS" method is special. It returns a hash-ref of methods
+    supported by a specific route, including description and parameter
+    definitions, if any. See "OPTIONS-REQUESTS" in McBain for more
+    information.
+
+METHODS EXPORTED TO YOUR API
+  start( [ $port ] )
+    Starts the WebSocket server, listening on the supplied port. If $port is
+    not provided, 8080 is used by default.
+
+METHODS REQUIRED BY MCBAIN
+  init( $target )
+    Creates and exports the start() method for your API's root package.
+
+  generate_env( $req )
+    Receives the request JSON and creates "McBain"'s standard env hash-ref
+    from it.
+
+  generate_res( $env, $res )
+    Converts the result from an API method in JSON. Read the discussion
+    under "DESCRIPTION" for more info.
+
+  handle_exception( $err )
+    Formats exceptions into JSON.
+
+CONFIGURATION AND ENVIRONMENT
+    No configuration files are required.
+
+DEPENDENCIES
+    "McBain::WithWebSocket" depends on the following CPAN modules:
+
+    *   Carp
+
+    *   JSON
+
+    *   Net::WebSocket::Server
+
+INCOMPATIBILITIES WITH OTHER MODULES
+    None reported.
+
+BUGS AND LIMITATIONS
+    Please report any bugs or feature requests to
+    "bug-McBain-WithWebSocket@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=McBain-WithWebSocket>.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+            perldoc McBain::WithWebSocket
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=McBain-WithWebSocket>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/McBain-WithWebSocket>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/McBain-WithWebSocket>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/McBain-WithWebSocket/>
+
+AUTHOR
+    Ido Perlmuter <ido@ido50.net>
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2014, Ido Perlmuter "ido@ido50.net".
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either version 5.8.1 or any later
+    version. See perlartistic and perlgpl.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

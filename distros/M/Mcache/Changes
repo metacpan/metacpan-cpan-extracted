@@ -1,0 +1,14 @@
+Revision history for Perl extension Mcache.
+
+0.01  Mon Jan 18 13:17:24 2011
+
+0.02  Mon Apr 11 14:45:17 2011
+	Update methods for fast rebuild cache.
+
+0.03  Mon Apr 14 13:11:34 2011
+	Add randomise ID for data page.
+	Add KEYS in data page.
+
+0.031  Mon Apr 19 15:02:54 2011
+	Update function generation randomise ID
+	

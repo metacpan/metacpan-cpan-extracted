@@ -1,0 +1,30 @@
+0.16 -- updating to require a new version of Olson::Abbreviations
+0.15 -- trying something for a problem I don't see.
+0.14 -- Fixed rt #73332 about build systems and MooseX::Types version number
+0.13 -- Fixed rt #72473 and added version requirement for Moose
+0.12 -- Updated to use namespace::autoclean, fixed git repo link to be public repo, 
+0.11 -- updated yaml, damn old version of M::I too
+0.10 -- fixed bug with makefile brought up in rt
+0.09 -- fixed allowance in Makefile.pl that permitted broken versions of upstream that were
+        released subsequent to 0.08, chmod -x Makefile.PL
+0.08 -- 2009-04-16 the previous test would fail if DT:TZ's couldn't automagic detect
+        the system timezone. on debian systems you should probably just run:
+				  dpkg-reconfigure tzdata
+0.07 -- 2009-04-16 Fixed bug for timezone 'local', and 'floating' & added test
+0.06 -- Added Docs and changeslogs to clairify what 0.05 was. lawl.
+0.05 -- Added the ability to coerce from Olson Abbreviations using Olson::Abbreviation
+0.04 -- *RELEASED AS FORK* ::ButMaintained
+        - Updated to Module::Install ( Evan Carroll )
+				- removed MooseX::Types::DateTime ( Evan Caroll )
+
+0.03
+        - more explicit versions for dependencies
+        - removed a test that doesn't seem to cleanly pass in all timezones
+
+0.02
+        - Use namespace::clean in some places
+        - Try to skip out of the test suite gracefully when bad crap happens
+          (too much DWIM--)
+
+0.01
+        - Initial version

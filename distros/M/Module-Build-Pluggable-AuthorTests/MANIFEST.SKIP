@@ -1,0 +1,14 @@
+^.hg
+.old$
+.bak$
+Makefile$
+blib/
+~$
+.gz$
+tt/
+_build
+^MYMETA[.]*$
+^\.#
+^#
+^Build$
+

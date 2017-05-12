@@ -1,0 +1,74 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.013
+ [Added / configure requires]
+ - ExtUtils::MakeMaker
+ - perl 5.006
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec
+ - perl 5.006
+
+ [Changed / test requires]
+ - Test::More 1.001002 → 0.96
+
+ [Removed / build requires]
+ - Module::Build 0.4202
+
+ [Removed / configure requires]
+ - Module::Build 0.4202
+
+0.012 2013-11-25T08:27:23Z
+
+0.011 2013-11-25T02:13:53Z
+ [Changed / runtime requires]
+ - Path::ScanINC 0.002 → 0.011
+
+0.010 2013-11-21T12:25:03Z
+ [Added / runtime requires]
+ - Path::Tiny
+
+ [Removed / runtime requires]
+ - Path::Class::File
+
+ [Removed / test requires]
+ - Path::Class
+
+0.007 2013-11-20T13:09:23Z
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4202
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4202
+
+ [Changed / test requires]
+ - Test::More 0.96 → 1.001002
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.006 2012-04-13T04:02:46Z
+
+0.005 2012-04-11T20:33:42Z
+
+0.004 2012-04-11T06:01:11Z
+ [Changed / runtime requires]
+ - Path::ScanINC 0 → 0.002
+
+0.003 2012-04-10T09:11:18Z
+ [Added / test requires]
+ - Carp
+
+0.002 2012-04-09T02:01:46Z
+ [Added / runtime requires]
+ - Module::Metadata
+ - Path::ScanINC
+
+ [Added / test requires]
+ - FindBin
+ - Path::Class
+
+ [Removed / runtime requires]
+ - Path::Class::Dir

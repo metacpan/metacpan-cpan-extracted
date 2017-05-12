@@ -1,0 +1,80 @@
+This is a collection of Gravis UltraSound patches
+http://www.doomworld.com/idgames/index.php?id=13928
+
+The Gravis Ultrasound Patch File Format
+http://www.fileformat.info/format/gravis/corion.htm
+
+The GF1 Patch files are multipart sound files for the Gravis Ultrasound
+sound card to emulate MIDI sounds in high quality. Each Patch can consist
+of many samples (for example, a string ensemble consists of Violin,
+Viola, Cello, Bass) which are played depending on the note to play.
+A patch can also contain a part to be played before the loop
+and a part to be played after the tone has been released.
+
+OFFSET              Count TYPE   Description
+0000h                  12 char   ID='GF1PATCH110'
+000Ch                  10 char   Manufacturer ID
+0018h                  60 char   Description of the contained Instruments
+                                 or copyright of manufacturer.
+0054h                   1 byte   Number of instruments in this patch
+0055h                   1 byte   Number of voices for sample
+0056h                   1 byte   Number of output channels
+                                 (1=mono,2=stereo)
+0057h                   1 word   Number of waveforms
+0059h                   1 word   Master volume for all samples
+005Bh                   1 dword  Size of the following data
+0060h                  36 byte   reserved
+
+Following this header, the instruments with their headers follow.
+An instrument header contains the name and other data
+about one instrument contained within the patch.
+
+OFFSET              Count TYPE   Description
+0000h                   1 word   Instrument number. ?Maybe the MIDI instrument
+                                 number?. In the Gravis patches, this is 0, in
+                                 other patches, I found random values.
+0002h                  16 char   ASCII name of the instrument.
+0012h                   1 dword  Size of the whole instrument in bytes.
+0016h                   1 byte   Layers. Needed for whatever.
+0017h                  40 byte   reserved
+
+About the patch, I don't know anything. Maybe somebody could enlighten me.
+Each patch record has the following format :
+OFFSET              Count TYPE   Description
+0000h                   7 char   Wave file name
+0007h                   1 byte   Fractions
+0008h                   1 dword  Wave size.  Size of the wave digital data
+000Ch                   1 dword  Start of wave loop
+0010h                   1 dword  End of wave loop
+0012h                   1 word   Sample rate of the wave
+0014h                   1 word   Minimum frequency to play the wave
+0016h                   1 word   Maximum frequency to play the wave
+0018h                   1 dword  Original sample rate of the wave data
+001Ch                   1 int    Fine tune value for the wave
+001Eh                   1 byte   Stereo balance, values unknown**
+001Fh                   6 byte   Filter envelope rate
+0025h                   6 byte   Filter envelope offse
+002Bh                   1 byte   Tremolo sweep
+002Ch                   1 byte   Tremolo rate
+002Dh                   1 byte   Tremolo depth
+002Fh                   1 byte   Vibrato sweep
+0030h                   1 byte   Vibrato rate
+0031h                   1 byte   Vibrato depth
+0032h                   1 byte   Wave data, bitmapped 0/1
+                                   0 - 8/16 bit wave data
+                                   1 - signed/unsigned data
+                                   2 - de/enable looping
+                                   3 - no/has bidirectional looping
+                                   4 - loop forward/backward
+                                   5 - Turn envelope sustaining off/on
+                                   6 - Dis/Enable filter envelope
+                                   7 - reserved
+0033h                   1 int    Frequency scale, whatever that means
+0035h                   1 word   Frequency scale factor
+0037h                  36 byte   Reserved
+
+EXTENSION:PAT
+OCCURENCES:PC
+PROGRAMS:Patch Maker
+SEE ALSO:VOC,WAVe
+

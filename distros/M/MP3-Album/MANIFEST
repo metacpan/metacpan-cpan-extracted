@@ -1,0 +1,14 @@
+Album.pm
+Album.pod
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/MP3/Album/Track.pm
+lib/MP3/Album/Track.pod
+lib/MP3/Album/Layout.pm
+lib/MP3/Album/Layout.pod
+lib/MP3/Album/Layout/Fetcher.pm
+lib/MP3/Album/Layout/Fetcher/CDDB.pm
+lib/MP3/Album/Layout/Fetcher/Tag.pm
+t/album.t

@@ -1,0 +1,30 @@
+---
+abstract: 'easy aliasing of methods and attributes in Moo'
+author:
+  - 'haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>'
+build_requires:
+  Test::Fatal: '0.003'
+  Test::More: '0.94'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooX-Aliases
+no_index:
+  directory:
+    - t
+    - xt
+requires:
+  Class::Method::Modifiers: '1.05'
+  Moo: '1.001'
+  perl: '5.006'
+  strictures: '1'
+resources:
+  IRC: irc://irc.perl.org/#moose
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Aliases
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/haarg/MooX-Aliases.git
+version: '0.001006'
+x_authority: cpan:HAARG

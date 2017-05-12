@@ -1,0 +1,2 @@
+#HOSTNAME;ALIAS;ADDRESS;TYPE;TAGS;APPS
+test;test;127.0.0.1;linux;contact_groups=Oracle|Operations;Operators;db,db=cluster,db=single

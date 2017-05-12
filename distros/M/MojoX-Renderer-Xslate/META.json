@@ -1,0 +1,52 @@
+{
+   "abstract" : "Text::Xslate renderer for Mojo",
+   "author" : [
+      "gray <gray@cpan.org>",
+      "hjansen <hjansen@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MojoX-Renderer-Xslate",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Mojo" : "0",
+            "Test::More" : "0.82"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "5.81",
+            "Text::Xslate" : "0.2013",
+            "Try::Tiny" : "0",
+            "parent" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/gray/mojox-renderer-xslate"
+      }
+   },
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

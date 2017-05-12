@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 0e4868d35b99f835714b44859a0933f0c5994411 Changes
+SHA1 2746da9b93b3815e546b192c2f75a5db0f4030db MANIFEST
+SHA1 f5ace9439ee53b848843e025c28622334e28765a MANIFEST.SKIP
+SHA1 307353ede94a294ee2d5be1e9c6470795cffa687 META.json
+SHA1 916edc0a9a006e09b9aece70f590c16c291ec6a5 META.yml
+SHA1 3393c6e7a9edc3f567279d9c9a907064f7e32dbe Makefile.PL
+SHA1 a06a3c7578a3f2e85bdc49f9a5be53366771a930 README
+SHA1 498badf4c48f8e3af0945a1b746621603efabe38 lib/Map/Tube/KoelnBonn.pm
+SHA1 25f5c30fe28fe9ba332f91e414a76835e561d66f share/koelnbonn-map.xml
+SHA1 af50971203e0369156e44a018bfd890f3f731384 t/00-load.t
+SHA1 ff2ea6023c8a0bfeebedff15cff4e8f2f72c7975 t/01-xml.t
+SHA1 1280a3ff4001369cfbe3c5887ee69d06d73e6485 t/02-xml.t
+SHA1 5c3f8dd4900dd98fb94b9a26fb8c48caa1b47265 t/03-map.t
+SHA1 9834dd1110094e1ed5d28ab573a4578eb68259a9 t/04-routes.t
+SHA1 a8876ad993f154fdce661398861dc84e3939a214 t/10-manifest.t
+SHA1 f7c18c0dc0a3078405385133154fdee864ac9aba t/11-meta-json.t
+SHA1 711b042e06a3dae946ee464f13b2f8872ae69c82 t/12-meta-yml.t
+SHA1 f541cd74227d50f6176a6e1e72405150a892e418 t/13-version.t
+SHA1 14f89781285862dbb83e30d23e37841b7aad741f t/14-signature.t
+SHA1 bdfc6984289149ff6be3ba4d8969b8b586655558 t/20-pod.t
+SHA1 0f1e5110f20dff812b9b47b1ba6494e26a83ea01 t/21-pod-coverage.t
+SHA1 9921f537ad5a4b36131bb5a98c5457f0e9e815a0 t/22-changes.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlUQvswACgkQGcmBoRH2MYbr+wCgilL8rMRb6mMALPQJntoodyY0
+Pi4An0MJNgOwF2PTIyRk2q6NZygt+mHM
+=8ci8
+-----END PGP SIGNATURE-----
